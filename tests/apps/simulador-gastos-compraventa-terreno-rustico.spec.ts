@@ -48,7 +48,10 @@
  * `test.fail()`. A 21/10/2026 la base tampoco tenía ninguno abierto (43, ARREGLADOS); el de esa
  * re-inspección ([21/10-a], 3406) se REPARÓ el mismo 21/10/2026 y ya no lleva `test.fail()`.
  * A 24/10/2026 la base no tenía ninguno abierto (44, ARREGLADOS); los cinco de esa re-inspección
- * van con `test.fail()` y etiquetas [24/10-a…e] en el ÚLTIMO describe del fichero.
+ * ([24/10-a…e], 3480-3484) se escribieron con `test.fail()` y se REPARARON el mismo 24/10/2026
+ * (8c473228): ya no llevan la marca y vigilan que no vuelvan. A 26/10/2026 la base no tenía ninguno
+ * abierto; el de esa re-inspección va con `test.fail()` y la etiqueta [26/10-a] en el ÚLTIMO
+ * describe del fichero.
  * Lo anterior también está REPARADO: los de la
  * re-inspección del 26/09/2026 (2214-2220) están sin marca en su describe, con la receta de la
  * familia (base mínima del AJD, 2209; notas de la comunidad, 2208). Los casos anteriores con Canarias,
@@ -4295,7 +4298,8 @@ test.describe('Inspector 21/10/2026 — Cantabria, el límite del arancel notari
 //      650.000 €: 316,313758 × 0,95 + 9,015182 = 309,513252 → ×1,21 = 374,51; sin IGIC, 309,51.
 // Medido después en la app: todo coincide al céntimo, así que las cifras se comparan como texto.
 //
-// Hallazgos de esta sección, con `test.fail()` (con `VER_HUECOS=1` dejan de estar marcados):
+// Hallazgos de esta sección (3480-3484), escritos con `test.fail()` y REPARADOS el mismo 24/10/2026
+// en 8c473228: ya no llevan la marca y vigilan que no vuelvan. Lo que pasaba entonces:
 //  a) con la página traducida por el navegador, cambiar de comunidad con la renuncia elegida tumba
 //     la app («Algo salió mal») o mezcla las dos ramas del aviso: forma del 3476 de nave;
 //  b) con la página traducida, el recuadro, los botones y los avisos se quedan con el texto de la
@@ -4544,7 +4548,8 @@ test.describe('Inspector 24/10/2026 — La Rioja, Asturias en su tramo del 10 %,
   });
 
   /**
-   * [24/10-a] (operativa, alto) — ABIERTO. Con la página traducida por el navegador (cada nodo de
+   * [24/10-a] (operativa, alto) — REPARADO el 24/10/2026 (hallazgo 3480, 8c473228); lo que sigue es
+   * lo que pasaba. Con la página traducida por el navegador (cada nodo de
    * texto cambiado por <font><font>), cambiar de comunidad con la renuncia elegida tumba la app en
    * «Algo salió mal» (NotFoundError en removeChild) o, sin caer, deja el aviso con las dos ramas
    * mezcladas. Lo provoca el aviso de la renuncia (page.tsx, `esRenuncia && …`): alterna dos
@@ -4589,7 +4594,8 @@ test.describe('Inspector 24/10/2026 — La Rioja, Asturias en su tramo del 10 %,
   });
 
   /**
-   * [24/10-b] (operativa, medio) — ABIERTO. Con la página traducida, al cambiar entre dos
+   * [24/10-b] (operativa, medio) — REPARADO el 24/10/2026 (hallazgo 3482, 8c473228); lo que sigue
+   * es lo que pasaba. Con la página traducida, al cambiar entre dos
    * territorios que no tumban la app, los textos que React escribe en un nodo de texto JUNTO a otro
    * se quedan con el valor de la comunidad anterior (React escribe en el nodo que el traductor
    * retiró): el «ITP General {x} %» y el «{impuesto} (renuncia)» del recuadro, la nota «Tipo según
@@ -4656,7 +4662,8 @@ test.describe('Inspector 24/10/2026 — La Rioja, Asturias en su tramo del 10 %,
   });
 
   /**
-   * [24/10-c] (dato, bajo) — ABIERTO. Forma del 3478 de nave, que ya apuntaba a esta app. El sello
+   * [24/10-c] (dato, bajo) — REPARADO el 24/10/2026 (hallazgo 3483, 8c473228); lo que sigue es lo
+   * que pasaba. Forma del 3478 de nave, que ya apuntaba a esta app. El sello
    * «IRPF de la ganancia 2026 · lo que paga quien vende» solo lleva la nota de
    * GANANCIAS_PATRIMONIALES_META, y la guía «Vender la finca con ganancia» afirma que la ganancia
    * tributa en la base del ahorro al 19 %-30 %. Es la escala estatal: con residencia en el País
@@ -4688,7 +4695,8 @@ test.describe('Inspector 24/10/2026 — La Rioja, Asturias en su tramo del 10 %,
   });
 
   /**
-   * [24/10-d] (dato, bajo) — ABIERTO. La FAQ visible «¿Sobre qué valor se calcula el ITP de una
+   * [24/10-d] (dato, bajo) — REPARADO el 24/10/2026 (hallazgo 3484, 8c473228); lo que sigue es lo
+   * que pasaba. La FAQ visible «¿Sobre qué valor se calcula el ITP de una
    * finca rústica?» dice: «Si no existe valor de referencia catastral para ese inmueble, se toma el
    * valor de mercado.» El art. 10.2 del TRLITPAJD (BOE-A-1993-25359, leído el 24/10/2026): «Cuando
    * no exista valor de referencia o este no pueda ser certificado por la Dirección General del
@@ -4714,7 +4722,8 @@ test.describe('Inspector 24/10/2026 — La Rioja, Asturias en su tramo del 10 %,
   });
 
   /**
-   * [24/10-e] (calculo, alto) — ABIERTO. Con la página traducida, las CIFRAS de las tarjetas de
+   * [24/10-e] (calculo, alto) — REPARADO el 24/10/2026 (hallazgo 3481, 8c473228); lo que sigue es
+   * lo que pasaba. Con la página traducida, las CIFRAS de las tarjetas de
    * resultado dejan de seguir al cálculo. `components/ResultCard.tsx` pinta `{value}` junto a
    * `{unidad && <span>…}`: la cifra es un nodo de texto con hermano, y React escribe la nueva en el
    * nodo que el traductor ya cambió por <font>. El rótulo, único hijo de su <h3>, sí cambia, así que
@@ -4784,5 +4793,415 @@ test.describe('Inspector 24/10/2026 — La Rioja, Asturias en su tramo del 10 %,
       const anchos = await page.evaluate(() => ({ visible: document.documentElement.clientWidth, total: document.documentElement.scrollWidth }));
       expect(anchos.total).toBeLessThanOrEqual(anchos.visible);
     });
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// INSPECTOR 26/10/2026 — familia «Compraventa inmobiliaria» (testigo tests/familias/compraventa.spec.ts,
+// 93/93 en verde antes de empezar; referencia estimador-compraventa-inmueble). La base no tenía
+// ningún hallazgo abierto de esta app: los cinco del 24/10 (3480-3484) están reparados en 8c473228 y
+// sus casos de arriba siguen en verde. Desde entonces han entrado 8d859faf (ternarios), f8aa2eeb
+// (GESTORIA_POR_DEFECTO.rustico = 400, la misma cifra que había) y 4f7587b5 (el nombre del IPSI en
+// una sola cadena), además de 412caa1e y 45e79788 en componentes compartidos.
+//
+// Lo nuevo de esta ronda:
+//  - CASO 1: Canarias en compra habitual con su cierre completo (solo se había medido su rótulo) y
+//    Navarra con renuncia, que ninguna ronda había cifrado entera.
+//  - CASO 2: los dos extremos de los aranceles. 3.000 € (una finca rústica barata es lo corriente)
+//    queda en el primer tramo de los dos, el de cuota fija; 10.000.000 € lleva el registro a su TOPE
+//    del nº 2.1 (2.181,673939 €, leído en el BOE el 26/10/2026: «no podrá superar»), que ninguna
+//    ronda había alcanzado, con la notaría ya de libre acuerdo.
+//  - CASO 3: el invariante de la familia en los CUATRO campos numéricos de la app (precio, gestoría,
+//    cuota del IBI; la fecha es un <input type="date">). El testigo solo mide precio y gestoría.
+//  - RECORRIDO TRADUCIDO: la app entera con el traductor simulado (también los nodos que aparecen
+//    después de cada paso), comparada paso a paso con la MISMA app sin traducir: 46 pasos por las
+//    19 comunidades que importan (Canarias, Ceuta, Melilla, forales, Valencia con su umbral y su AJD
+//    de la renuncia, Cataluña y Baleares con escala), la renuncia, el ilegible, el 0, el vacío y el
+//    bloque del IBI. Medido el 26/10/2026: ni una caída ni una línea distinta.
+//
+// De dónde sale cada cifra (resuelta a mano antes de abrir la app; ninguna de memoria):
+//  - ITP: `TIPOS_ITP_CCAA_2025` (data/fiscal/inmuebles.ts) — Canarias 6,5, Madrid 6, Navarra 6.
+//  - AJD de la renuncia: `ITP_CCAA[x].ajd` (data/itp-ccaa.ts), sin `ajdRenuncia` propio — Madrid
+//    0,75, Navarra 0,5. IVA: `PORCENTAJES_IVA.general` = 21 (data/fiscal/iva.ts).
+//  - Notaría: `ARANCELES_NOTARIO` (RD 1426/1989, nº 2.1) × 0,95 (REBAJA_ARANCEL_CUANTIA) × 1,21 (sin el
+//    1,21 en Canarias) y la factura de `FACTURA_NOTARIAL`: ×1,5 / ×1,75 / ×2.
+//      3.000 €: cuota fija 90,151816 → ×0,95 = 85,644225 → ×1,21 = 103,629513 → 155,44 / 181,35 / 207,26.
+//      95.000 €: 90,151816 + 108,182205 + 45,0759 + 34,89879 = 278,308711 → ×0,95 = 264,393275 →
+//        396,59 / 462,69 / 528,79 sin IGIC; ×1,21 = 319,915863 → 479,87 / 559,85 / 639,83.
+//      10.000.000 €: solo hasta 6.010.121,04 (lo demás es de libre acuerdo): 90,151816 + 108,182205 +
+//        45,0759 + 90,15182 + 225,379535 + 1622,732682 = 2181,673958 → ×0,95 × 1,21 = 2507,833985 →
+//        3761,75 / 4388,71 / 5015,67.
+//  - Registro: `ARANCELES_REGISTRO` (RD 1427/1989, nº 2.1), con su tope `REGISTRO_MAXIMO`, × 0,95 +
+//    6,010121 + 3,005061 (nº 1 y nº 4), × 1,21 donde rige el IVA.
+//      3.000 €: 24,040484 × 0,95 + 9,015182 = 31,853642 → ×1,21 = 38,54.
+//      95.000 €: 129,848684 × 0,95 + 9,015182 = 132,371432 (sin IGIC: 132,37) → ×1,21 = 160,17.
+//      10.000.000 €: la escala daría 2186,313758 y el tope la deja en 2181,673939 → ×0,95 + 9,015182 =
+//        2081,605424 → ×1,21 = 2518,74 (sin el tope serían 2524,08).
+//  - Reparto del IBI: por días naturales (STS 409/2016; lib/calculadoras/prorrateoCompraventa.ts). 2026
+//    no es bisiesto: escritura el 01/07 → vendedor 181 días (01/01-30/06), comprador 184.
+//
+// Hallazgo de esta sección, con `test.fail()` salvo con `VER_HUECOS=1`:
+//  a) la FAQ de las reducciones agrarias (las dos bocas) llama «reducciones en la base imponible» a lo
+//     que la Ley 19/1995 da como EXENCIÓN a la primera instalación de un joven agricultor (art. 20.1)
+//     y a los terrenos que completan una explotación prioritaria bajo una sola linde (art. 10.1).
+// ═══════════════════════════════════════════════════════════════════════════════
+
+import { GESTORIA_POR_DEFECTO, REGISTRO_MAXIMO } from '../../data/itp-ccaa';
+
+/** Las líneas de texto de la app (el contenedor del <h1>), sin el aviso de privacidad del layout. */
+async function i26LineasApp(page: Page): Promise<string[]> {
+  return page.evaluate(() => {
+    const raiz = document.querySelector('h1')?.closest('div[class*="container"]') ?? document.body;
+    return (raiz as HTMLElement).innerText
+      .split('\n')
+      .map((l) => l.replace(/\s+/g, ' ').trim())
+      .filter((l) => l !== '');
+  });
+}
+
+/** La respuesta de la FAQ VISIBLE a una pregunta (la guía nace plegada: se lee por textContent). */
+async function i26FaqVisible(page: Page, pregunta: string): Promise<string> {
+  return page.evaluate((q) => {
+    const strong = [...document.querySelectorAll('strong')].find((s) => s.textContent?.trim() === q);
+    return (strong?.parentElement?.querySelector('p')?.textContent ?? '').replace(/\s+/g, ' ').trim();
+  }, pregunta);
+}
+
+const I26_PREGUNTA_REDUCCIONES = '¿Qué reducciones de ITP existen para explotaciones agrarias?';
+
+test.describe('inspector 26/10/2026 — Canarias y Navarra, los dos extremos del arancel, el ilegible en los cuatro campos y la app entera traducida', () => {
+  test.describe.configure({ timeout: 120_000 });
+
+  /**
+   * CASO 1 (NORMAL) — 95.000 €, gestoría 450 €.
+   *   a) Canarias, compra habitual: ITP 95.000 × 6,5 % = 6175,00 € (6,50 %). Notaría 462,69
+   *      (396,59-528,79) y registro 132,37, sin IGIC. Total = 6175 + 462,69 + 132,37 + 450 =
+   *      7220,06 € (7,60 %), PARCIAL por el IGIC de los honorarios; coste 102.220,06 €.
+   *   b) Navarra con renuncia: IVA 95.000 × 21 % = 19.950,00 · AJD 95.000 × 0,5 % = 475,00 · ningún
+   *      ITP. Notaría 559,85 (479,87-639,83), registro 160,17. Total = 19.950 + 475 + 559,85 + 160,17
+   *      + 450 = 21.595,02 € (22,73 %); coste 116.595,02 €, completo.
+   */
+  test('CASO 1 (normal) — Canarias en compra habitual, 95.000 €: ITP del 6,5 % y honorarios sin IGIC; Navarra con renuncia: IVA 21 % + AJD 0,5 %', async ({ page }) => {
+    expect(TIPOS_ITP_CCAA_2025.find((t) => t.ccaa === 'Canarias')?.tipo).toBe(6.5);
+    expect(TIPOS_ITP_CCAA_2025.find((t) => t.ccaa === 'Navarra')?.tipo).toBe(6);
+    expect(ITP_CCAA.canarias.tramosProgresivos).toBeUndefined();
+    expect(ITP_CCAA.navarra.ajd).toBe(0.5);
+    expect(ITP_CCAA.navarra.ajdRenuncia).toBeUndefined();
+    expect(TERRITORIOS_SIN_IVA.canarias?.impuesto).toBe('IGIC');
+    expect(PORCENTAJES_IVA.general).toBe(21);
+
+    await abrirHidratada(page);
+    await page.selectOption('#select-ccaa', 'canarias');
+    await sembrarValor(page, CAMPO_PRECIO, '95.000');
+    await sembrarValor(page, CAMPO_GESTORIA, '450');
+
+    // a) Canarias, compra habitual.
+    expect(sinEspacioPct(await rotuloTarjeta(page, /^ITP \(/))).toBe('ITP (6,50%)');
+    expect(await valorTarjeta(page, 'ITP (')).toBe('6175,00 €');
+    await expect(page.locator('h3', { hasText: /^(AJD|IVA|IGIC)/ })).toHaveCount(0);
+    expect(await valorTarjeta(page, 'Gastos de notaría (sin IGIC)')).toBe('462,69 €');
+    expect(await descripcionTarjeta(page, 'Gastos de notaría')).toContain('Factura estimada entre 396,59 € y 528,79 €.');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad (sin IGIC)')).toBe('132,37 €');
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('450,00 €');
+    expect(await rotuloTarjeta(page, /^Total gastos adicionales/)).toBe('Total gastos adicionales (parcial)');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('7220,06 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe(`7,60% sobre el precio de compra${sinHonorarios('IGIC')}`);
+    expect(await rotuloTarjeta(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL (PARCIAL)');
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('102.220,06 €');
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL')).toBe(SOLO_HONORARIOS('IGIC'));
+    await expect(page.locator('[class*="avisoHonorarios"]')).toContainText('llevan además IGIC');
+    const botones = (await page.locator('[role="group"] button').allInnerTexts()).map((b) => b.replace(/\s+/g, ' ').trim());
+    expect(botones[0]).toContain('Exenta de IGIC → paga ITP');
+    expect(botones[1]).toContain('Con renuncia a la exención del IGIC');
+
+    // b) Navarra con renuncia: el precio y la gestoría se conservan.
+    await page.selectOption('#select-ccaa', 'navarra');
+    await page.getByRole('button', { name: /renuncia a la exención/i }).click();
+    await expect(page.locator('h3', { hasText: /^ITP/ })).toHaveCount(0);
+    expect(sinEspacioPct(await rotuloTarjeta(page, /^IVA \(/))).toBe('IVA (renuncia · ISP) (21,00%)');
+    expect(await valorTarjeta(page, 'IVA (')).toBe('19.950,00 €');
+    expect(sinEspacioPct(await rotuloTarjeta(page, /^AJD \(/))).toBe('AJD (0,50%)');
+    expect(await valorTarjeta(page, 'AJD (')).toBe('475,00 €');
+    expect(await descripcionTarjeta(page, 'AJD (')).toBe(
+      'Tipo general de la comunidad: algunas CCAA aplican un tipo de AJD incrementado en la renuncia',
+    );
+    expect(await valorTarjeta(page, 'Gastos de notaría (IVA incluido)')).toBe('559,85 €');
+    expect(await descripcionTarjeta(page, 'Gastos de notaría')).toContain('Factura estimada entre 479,87 € y 639,83 €.');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad (IVA incluido)')).toBe('160,17 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('21.595,02 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe('22,73% sobre el precio de compra');
+    expect(await rotuloTarjeta(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL DE ADQUISICIÓN');
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('116.595,02 €');
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL')).toBe('Precio + todos los gastos (antes de deducir el IVA si tienes derecho)');
+    expect((await lineasPanelCcaa(page)).map(sinEspacioPct)).toEqual(['ITP General 6%', 'AJD (renuncia) 0,5%', 'IVA (renuncia) 21%']);
+  });
+
+  /**
+   * CASO 2 (LÍMITE) — Madrid, gestoría por defecto (`GESTORIA_POR_DEFECTO.rustico` = 400 €).
+   *   a) 3.000 €, compra habitual: ITP 180,00 (6,00 %) · notaría 181,35 (155,44-207,26) · registro
+   *      38,54. Total = 180 + 181,35 + 38,54 + 400 = 799,89 € (26,66 %); coste 3799,89 €.
+   *   b) 3.000 €, renuncia: IVA 630,00 · AJD 3.000 × 0,75 % = 22,50. Total = 630 + 22,50 + 181,35 +
+   *      38,54 + 400 = 1272,39 € (42,41 %); coste 4272,39 €.
+   *   c) 10.000.000 €, compra habitual: ITP 600.000,00 · notaría 4388,71 (3761,75-5015,67, solo el
+   *      arancel hasta 6.010.121,04 €) · registro 2518,74 (en su tope). Total = 600.000 + 4388,71 +
+   *      2518,74 + 400 = 607.307,45 € (6,07 %), PARCIAL por la notaría de libre acuerdo; coste
+   *      10.607.307,45 €.
+   *   d) 10.000.000 €, renuncia: IVA 2.100.000,00 · AJD 75.000,00. Total 2.182.307,45 € (21,82 %);
+   *      coste 12.182.307,45 €.
+   */
+  test('CASO 2 (límite) — Madrid a 3.000 € (cuota fija de los dos aranceles) y a 10.000.000 € (registro en su tope, notaría de libre acuerdo), con y sin renuncia', async ({ page }) => {
+    expect(GESTORIA_POR_DEFECTO.rustico).toBe(400);
+    expect(REGISTRO_MAXIMO).toBe(2181.673939);
+    expect(ITP_CCAA.madrid.ajd).toBe(0.75);
+    expect(TIPOS_ITP_CCAA_2025.find((t) => t.ccaa === 'Madrid')?.tipo).toBe(6);
+
+    await abrirHidratada(page);
+    await sembrarValor(page, CAMPO_PRECIO, '3.000');
+
+    // a) 3.000 €, compra habitual.
+    expect(await valorTarjeta(page, 'Precio de la finca rústica')).toBe('3000,00 €');
+    expect(sinEspacioPct(await rotuloTarjeta(page, /^ITP \(/))).toBe('ITP (6,00%)');
+    expect(await valorTarjeta(page, 'ITP (')).toBe('180,00 €');
+    expect(await valorTarjeta(page, 'Gastos de notaría (IVA incluido)')).toBe('181,35 €');
+    expect(await descripcionTarjeta(page, 'Gastos de notaría')).toContain('Factura estimada entre 155,44 € y 207,26 €.');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad (IVA incluido)')).toBe('38,54 €');
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('400,00 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('799,89 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe('26,66% sobre el precio de compra');
+    expect(await rotuloTarjeta(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL DE ADQUISICIÓN');
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('3799,89 €');
+
+    // b) 3.000 €, renuncia.
+    await page.getByRole('button', { name: /renuncia a la exención/i }).click();
+    expect(await valorTarjeta(page, 'IVA (')).toBe('630,00 €');
+    expect(sinEspacioPct(await rotuloTarjeta(page, /^AJD \(/))).toBe('AJD (0,75%)');
+    expect(await valorTarjeta(page, 'AJD (')).toBe('22,50 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('1272,39 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe('42,41% sobre el precio de compra');
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('4272,39 €');
+
+    // c) 10.000.000 €, compra habitual: el registro, en su tope del nº 2.1.
+    await page.getByRole('button', { name: /Compra habitual/i }).click();
+    await sembrarValor(page, CAMPO_PRECIO, '10.000.000');
+    expect(await valorTarjeta(page, 'ITP (')).toBe('600.000,00 €');
+    expect(await valorTarjeta(page, 'Gastos de notaría (IVA incluido)')).toBe('4388,71 €');
+    const notaria = await descripcionTarjeta(page, 'Gastos de notaría');
+    expect(notaria).toContain('factura estimada entre 3761,75 € y 5015,67 €');
+    expect(notaria).toContain('libre acuerdo');
+    // Sin el tope serían 2524,08 €.
+    expect(await valorTarjeta(page, 'Registro de la Propiedad (IVA incluido)')).toBe('2518,74 €');
+    expect(await rotuloTarjeta(page, /^Total gastos adicionales/)).toBe('Total gastos adicionales (parcial)');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('607.307,45 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe(
+      '6,07% sobre el precio de compra — SIN la parte de la notaría de libre acuerdo (el valor que excede de 6.010.121,04 €)',
+    );
+    expect(await rotuloTarjeta(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL (PARCIAL)');
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('10.607.307,45 €');
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL')).toBe('No incluye la parte de la notaría de libre acuerdo: el coste real puede ser mayor');
+
+    // d) 10.000.000 €, renuncia.
+    await page.getByRole('button', { name: /renuncia a la exención/i }).click();
+    expect(await valorTarjeta(page, 'IVA (')).toBe('2.100.000,00 €');
+    expect(await valorTarjeta(page, 'AJD (')).toBe('75.000,00 €');
+    expect(await valorTarjeta(page, 'Registro de la Propiedad (IVA incluido)')).toBe('2518,74 €');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('2.182.307,45 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe(
+      '21,82% sobre el precio de compra — SIN la parte de la notaría de libre acuerdo (el valor que excede de 6.010.121,04 €)',
+    );
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('12.182.307,45 €');
+  });
+
+  /**
+   * CASO 3 (RECHAZO) — el invariante de la familia en los cuatro campos numéricos, Madrid.
+   *   · Precio «2.000.50»: ilegible → ninguna tarjeta y el marcador lo nombra.
+   *   · Precio 3.000 y gestoría «4.00,5»: la gestoría falta → el total baja exactamente sus 400,00 de
+   *     antes (799,89 → 399,89 €, 13,33 %; coste 3399,89 €) y el cierre dice «será mayor».
+   *   · Cuota del IBI «1.2.3» (ilegible) y «-120» (legible e imposible): el bloque lo nombra, no reparte
+   *     nada y las tarjetas no se mueven (799,89 € con la gestoría de vuelta en 400).
+   *   · IBI 120 € con escritura el 01/07/2026: vendedor 120 × 181 / 365 = 59,51 € · comprador
+   *     120 × 184 / 365 = 60,49 €; el comprador abona 60,49 €, y el coste sigue en 3799,89 €.
+   */
+  test('CASO 3 (rechazo) — precio «2.000.50», gestoría «4.00,5» e IBI «1.2.3» y «-120»: nada se publica con un importe ilegible y la dirección se dice', async ({ page }) => {
+    await abrirHidratada(page);
+    const tarjetas = page.locator('[class*="resultados"] h3');
+    const marcador = page.locator('[class*="placeholder"] p');
+    const avisoIbi = page.locator('section[aria-labelledby="titulo-prorrateo"] [role="alert"]');
+    const tablaIbi = page.locator('section[aria-labelledby="titulo-prorrateo"] table');
+
+    await sembrarValor(page, CAMPO_PRECIO, '2.000.50');
+    await expect(tarjetas).toHaveCount(0);
+    await expect(marcador).toHaveText(
+      'No se ha podido leer el precio «2.000.50». Introduce el precio de la finca rústica para ver el desglose de gastos, con coma decimal (80.000 o 80000,50)',
+    );
+
+    await sembrarValor(page, CAMPO_PRECIO, '3.000');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('799,89 €');
+    await sembrarValor(page, CAMPO_GESTORIA, '4.00,5');
+    expect(await valorTarjeta(page, 'Gastos de gestoría')).toBe('Sin leer');
+    expect(await rotuloTarjeta(page, /^Total gastos adicionales/)).toBe('Total gastos adicionales (parcial)');
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('399,89 €');
+    expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe(
+      '13,33% sobre el precio de compra — SIN la gestoría, que no se ha podido leer',
+    );
+    expect(await rotuloTarjeta(page, /^COSTE TOTAL/)).toBe('COSTE TOTAL (PARCIAL)');
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('3399,89 €');
+    expect(await descripcionTarjeta(page, 'COSTE TOTAL')).toBe('No incluye la gestoría, que no se ha podido leer: el coste real será mayor');
+
+    await sembrarValor(page, CAMPO_GESTORIA, '400');
+    await sembrarValor(page, I13_IBI, '1.2.3');
+    await expect(avisoIbi).toHaveText(
+      'No se entiende el importe de «Cuota anual del IBI»: escríbelo como 450 o 450,80. Hasta corregirlo no se reparte nada, para no publicar una cifra calculada con un importe equivocado.',
+    );
+    await expect(tablaIbi).toHaveCount(0);
+    expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('799,89 €');
+
+    await sembrarValor(page, I13_IBI, '-120');
+    await expect(avisoIbi).toHaveText(
+      '«Cuota anual del IBI» no puede ser negativa: escribe el importe sin signo menos. Hasta corregirlo no se reparte nada, para no publicar una cifra calculada con un importe equivocado.',
+    );
+    await expect(tablaIbi).toHaveCount(0);
+
+    await sembrarValor(page, I13_IBI, '120');
+    await page.locator('section[aria-labelledby="titulo-prorrateo"] input[type="date"]').fill('2026-07-01');
+    await expect(avisoIbi).toHaveCount(0);
+    const fila = (await tablaIbi.locator('tbody tr').first().innerText()).replace(/\s+/g, ' ').trim();
+    expect(fila).toBe('IBI del año 01/01/2026 – 31/12/2026 59,51 € · 181 días 60,49 € · 184 días');
+    await expect(
+      page.locator('section[aria-labelledby="titulo-prorrateo"] p', { hasText: 'abona en la firma' }).locator('strong'),
+    ).toHaveText(/^60,49\s€$/);
+    // El reparto no toca el coste de la compra.
+    expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('3799,89 €');
+    expect(await page.locator('body').innerText()).not.toMatch(/NaN|undefined|Infinity/);
+  });
+
+  /**
+   * RECORRIDO TRADUCIDO (operativa) — la app entera con el traductor del navegador simulado
+   * (`i24Traducir`: cada nodo de texto a <font><font>, también los que aparecen después de cada paso,
+   * como hace el traductor real) y, al lado, la MISMA app sin traducir con los mismos pasos. Tras cada
+   * paso, las líneas de texto de las dos tienen que coincidir: una línea distinta es texto viejo (la
+   * forma de 3481/3482) y «Algo salió mal» o un pageerror, una caída (la de 3480). Medido el 26/10/2026:
+   * 46 de 46 pasos iguales, sin errores.
+   */
+  test('RECORRIDO TRADUCIDO — comunidades (Canarias, Ceuta, Melilla, forales), renuncia, ilegibles, 0, vacío e IBI: ni caída ni texto viejo frente a la página sin traducir', async ({ page, context }) => {
+    const errores: string[] = [];
+    page.on('pageerror', (e) => errores.push(e.message));
+    const ref = await context.newPage();
+    await abrirHidratada(page);
+    await abrirHidratada(ref);
+    await i24Traducir(page);
+
+    const FECHA = 'section[aria-labelledby="titulo-prorrateo"] input[type="date"]';
+    const renuncia = (p: Page) => p.getByRole('button', { name: /renuncia a la exención/i }).click();
+    const habitual = (p: Page) => p.getByRole('button', { name: /Compra habitual/i }).click();
+    const ccaa = (c: keyof typeof ITP_CCAA) => (p: Page) => p.selectOption('#select-ccaa', c).then(() => undefined);
+    const campo = (sel: string, v: string) => (p: Page) => p.locator(sel).fill(v);
+    const pasos: [string, (p: Page) => Promise<void>][] = [
+      ['precio 95000', campo(CAMPO_PRECIO, '95000')],
+      ['→ Valencia', ccaa('valencia')],
+      ['renuncia', renuncia],
+      ['→ Canarias con renuncia', ccaa('canarias')],
+      ['→ Ceuta', ccaa('ceuta')],
+      ['→ Melilla', ccaa('melilla')],
+      ['→ Canarias (vuelve la renuncia)', ccaa('canarias')],
+      ['→ Melilla desde Canarias', ccaa('melilla')],
+      ['→ País Vasco', ccaa('pais-vasco')],
+      ['→ Navarra', ccaa('navarra')],
+      ['→ Valencia (AJD de la renuncia 2 %)', ccaa('valencia')],
+      ['→ Madrid (AJD general)', ccaa('madrid')],
+      ['compra habitual', habitual],
+      ['→ Cataluña', ccaa('cataluna')],
+      ['→ Baleares', ccaa('baleares')],
+      ['precio 1.200.000', campo(CAMPO_PRECIO, '1.200.000')],
+      ['→ Valencia (umbral del millón)', ccaa('valencia')],
+      ['precio 900000', campo(CAMPO_PRECIO, '900000')],
+      ['precio 7.000.000 (notaría de libre acuerdo)', campo(CAMPO_PRECIO, '7.000.000')],
+      ['gestoría 2.000.50', campo(CAMPO_GESTORIA, '2.000.50')],
+      ['renuncia con la gestoría ilegible', renuncia],
+      ['gestoría 450', campo(CAMPO_GESTORIA, '450')],
+      ['gestoría 0', campo(CAMPO_GESTORIA, '0')],
+      ['gestoría 450 otra vez', campo(CAMPO_GESTORIA, '450')],
+      ['precio 2.000.50', campo(CAMPO_PRECIO, '2.000.50')],
+      ['precio 0', campo(CAMPO_PRECIO, '0')],
+      ['precio 0,004', campo(CAMPO_PRECIO, '0,004')],
+      ['precio vacío', campo(CAMPO_PRECIO, '')],
+      ['precio 95.000', campo(CAMPO_PRECIO, '95.000')],
+      ['→ Canarias con renuncia (otra vez)', ccaa('canarias')],
+      ['compra habitual en Canarias', habitual],
+      ['→ Ceuta en compra habitual', ccaa('ceuta')],
+      ['→ Madrid', ccaa('madrid')],
+      ['IBI 120', campo(I13_IBI, '120')],
+      ['fecha 01/07/2026', campo(FECHA, '2026-07-01')],
+      ['IBI 1.2.3', campo(I13_IBI, '1.2.3')],
+      ['IBI -120', campo(I13_IBI, '-120')],
+      ['IBI 300', campo(I13_IBI, '300')],
+      ['fecha 29/02/2024', campo(FECHA, '2024-02-29')],
+      ['fecha 31/12/2026', campo(FECHA, '2026-12-31')],
+      ['fecha vacía', campo(FECHA, '')],
+      ['IBI vacío', campo(I13_IBI, '')],
+      ['→ Aragón', ccaa('aragon')],
+      ['renuncia en Aragón', renuncia],
+      ['→ Ceuta desde la renuncia', ccaa('ceuta')],
+      ['→ Andalucía', ccaa('andalucia')],
+    ];
+
+    const diferencia = async (): Promise<string[]> => {
+      const [a, b] = await Promise.all([i26LineasApp(page), i26LineasApp(ref)]);
+      return [
+        ...a.filter((l) => !b.includes(l)).map((l) => `traducida: ${l}`),
+        ...b.filter((l) => !a.includes(l)).map((l) => `sin traducir: ${l}`),
+        ...(a.length === b.length ? [] : [`líneas: ${a.length} traducida, ${b.length} sin traducir`]),
+      ];
+    };
+
+    let pasosHechos = 0;
+    for (const [nombre, paso] of pasos) {
+      await paso(page);
+      await paso(ref);
+      expect(await page.getByText('Algo salió mal').count(), nombre).toBe(0);
+      await expect.poll(diferencia, { message: nombre, timeout: 5000 }).toEqual([]);
+      if (pasosHechos === 0) {
+        // Preparación (pasa): lo que se compara es la app con su panel de resultados, no un vacío.
+        const lineas = (await i26LineasApp(ref)).join(' ');
+        expect(lineas).toContain('Total gastos adicionales');
+        expect(lineas).toContain('Reparto del IBI');
+      }
+      pasosHechos++;
+      // El traductor real también traduce lo que acaba de aparecer.
+      await i24Traducir(page);
+    }
+    expect(pasosHechos).toBe(46);
+    expect(errores).toEqual([]);
+    await ref.close();
+  });
+
+  /**
+   * [26/10-a] (dato, medio) — ABIERTO, hallazgo (inspector 26/10/2026). La respuesta a «¿Qué
+   * reducciones de ITP existen para explotaciones agrarias?» (RESPUESTA_REDUCCIONES de metadata.ts,
+   * la FAQ visible y el FAQPage) dice que la Ley 19/1995 «prevé reducciones en la base imponible del
+   * impuesto para la adquisición de fincas por titulares de explotaciones prioritarias y por jóvenes
+   * agricultores que se instalan por primera vez». La ley (texto consolidado del BOE,
+   * eli/es/l/1995/07/04/19/con, leído el 26/10/2026) da a esa primera instalación una EXENCIÓN: la
+   * adquisición de una explotación o de una finca rústica por un agricultor joven para su primera
+   * instalación en una explotación prioritaria «estará exenta del impuesto que grave la transmisión o
+   * adquisición» (art. 20.1), igual que los terrenos que completan bajo una sola linde la superficie de
+   * una explotación prioritaria (art. 10.1). Las reducciones son las de los arts. 9 (90 %), 10.2 (50 %),
+   * 11 (75 %) y los diez puntos más del art. 20.2 en los cinco años siguientes a la instalación. Quien
+   * se instala lee una rebaja donde la ley le quita el impuesto entero (y la lista de limitaciones
+   * dice lo mismo: «pueden rebajar notablemente el impuesto»).
+   */
+  test('[26/10-a] la FAQ de las reducciones agrarias nombra la exención de la Ley 19/1995 (arts. 10.1 y 20.1), no solo reducciones', async ({ page }) => {
+    // ABIERTO, hallazgo (inspector 26/10/2026)
+    test.fail(!process.env.VER_HUECOS, 'ABIERTO, hallazgo (inspector 26/10/2026)');
+    await abrirHidratada(page);
+    const visible = await i26FaqVisible(page, I26_PREGUNTA_REDUCCIONES);
+    const faqPage = (await i13FaqPage(page)).find((x) => x.q === I26_PREGUNTA_REDUCCIONES)?.a ?? '';
+    // Preparación (pasa): las dos bocas dan la misma respuesta y hablan de la Ley 19/1995 y de los
+    // jóvenes agricultores que se instalan.
+    expect(visible).toContain('Ley 19/1995');
+    expect(visible).toContain('jóvenes agricultores que se instalan por primera vez');
+    expect(faqPage).toBe(visible);
+    // El defecto: ninguna nombra la exención.
+    expect.soft(visible, 'FAQ visible').toMatch(/exen(ta|ción)/);
+    expect.soft(faqPage, 'FAQPage').toMatch(/exen(ta|ción)/);
   });
 });

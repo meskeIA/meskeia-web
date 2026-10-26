@@ -1,6 +1,7 @@
 import { test, expect, devices, type Browser, type Page } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
 import { esperarHidratacion } from './_hidratacion';
+import { activarTemaOscuro, prepararParaMedir } from '../_contraste';
 // El CSV que descarga la app se lee con el MISMO parser que usaría una hoja de cálculo
 // (papaparse, RFC 4180, ya dependencia del proyecto) y no con un split casero: la diferencia
 // entre los dos es justo uno de los hallazgos de la 3.ª pasada.
@@ -55,14 +56,16 @@ import { parse as parsearCsv } from 'papaparse';
  *   6 (el micrófono seguía abierto tras fallar) → REGRESIÓN B.
  *   7 (aviso de error mudo)              → REGRESIÓN C.
  *
- * HALLAZGOS ABIERTOS de la 2.ª pasada: al final, marcados con `test.fail()`. Afirman lo que
- * DEBERÍA pasar y hoy fallan a propósito; el día que se reparen se les quita el `test.fail()`
- * y se quedan como regresión.
+ * Los hallazgos de la 2.ª pasada (278 y 279) se escribieron con `test.fail()` y se REPARARON el
+ * 24/08/2026: hoy son tests de regresión normales (bloque «HALLAZGOS 278 y 279»).
  *
  * 3.ª PASADA (27/08/2026) — la cola se reabrió por CÓDIGO NUEVO, no por reparación: el commit
  * fc27e76b estrenó el registro de mediciones (fila persistente, CSV, parte impreso, suelo de
  * 3 s y tope de 60). Los siete hallazgos anteriores siguen cerrados. Lo nuevo se prueba en los
- * CASOS 4 a 6 y en los tres `test.fail()` del final de este fichero.
+ * CASOS 4 a 6 y en los tres tests «REGRESIÓN 3.ª pasada» (eran `test.fail()`; los tres
+ * hallazgos, 467-469, se REPARARON en 0b1630d9).
+ *
+ * 6.ª PASADA (26/10/2026) — bloque «inspector 26/10/2026» al final del fichero.
  */
 
 test.use({
@@ -1134,9 +1137,9 @@ test.describe('CASO 6 (móvil)', () => {
 });
 
 // ===========================================================================
-// HALLAZGOS ABIERTOS de la 3.ª pasada (27/08/2026)
-// Afirman lo que DEBERÍA ocurrir y hoy fallan a propósito: `test.fail()` los da por
-// esperados. El día que se reparen, se les quita el `test.fail()` y quedan de regresión.
+// HALLAZGOS de la 3.ª pasada (27/08/2026) — 467, 468 y 469, REPARADOS en 0b1630d9
+// Se escribieron con `test.fail()` afirmando lo que DEBÍA ocurrir; reparados, se les quitó
+// el `test.fail()` y quedan de regresión. Los comentarios cuentan el defecto en pasado.
 // ===========================================================================
 
 // ---------------------------------------------------------------------------
@@ -1185,8 +1188,8 @@ test('REGRESIÓN 3.ª pasada — al llegar a 60, la app avisa de que descarta la
     .poll(idsGuardados, { message: 'la más antigua ha desaparecido del almacenamiento' })
     .not.toContain(laMasAntigua.id);
 
-  // ESTO es lo que falla: el usuario acaba de perder la primera noche de su diario y lo único
-  // que se le dice es «Medición guardada en el registro de este navegador.».
+  // ESTO era lo que fallaba (REPARADO, 467): el usuario perdía la primera noche de su diario y
+  // lo único que se le decía era «Medición guardada en el registro de este navegador.».
   await expect(
     avisoRegistro(page),
     'el aviso no menciona que se haya descartado la medición más antigua',
@@ -1250,11 +1253,11 @@ test('REGRESIÓN 3.ª pasada — un micrófono mudo se dice, no se lee como 0,0 
   await page.getByRole('button', { name: /Iniciar medición/i }).click();
   await page.waitForTimeout(8000);
 
-  // Lo que se ve hoy tras ocho segundos: una lectura de aspecto normal
+  // La lectura sigue teniendo aspecto normal tras ocho segundos…
   await expect(lecturaTexto(page)).toHaveText('0,0');
   await expect(page.locator('[class*="levelLabel"]')).toHaveText('Muy silencioso');
 
-  // ESTO es lo que falla: nada en el panel del medidor dice que no está entrando audio
+  // …y ESTO era lo que fallaba (REPARADO, 469): nada en el panel decía que no entraba audio
   await expect(
     page.locator('[class*="meterPanel"]'),
     'ningún aviso advierte de que el micrófono no entrega señal',
@@ -1640,7 +1643,8 @@ test('el icono decorativo de la tarjeta «Mínimo» está oculto al lector, como
 //   · CASO 11 (normal, escritorio): el LAeq de una señal que SUBE Y BAJA, resuelto a mano.
 //   · CASO 12 (móvil, aviso): la medición 61 en un Pixel 7 — el aviso de descarte del 467
 //     se sostiene, y lo borrado ya no está en el CSV.
-//   · Seis hallazgos con `test.fail()`: afirman lo correcto y hoy fallan a propósito.
+//   · Seis hallazgos (1700-1705) que se escribieron con `test.fail()`; REPARADOS el 25/09/2026
+//     en 7455ba15, hoy son regresión («REPARADO 5.ª pasada»).
 //
 // VALORES RESUELTOS A MANO ANTES DE EJECUTAR (fórmula de page.tsx, calibración 90, A(1 kHz)=0):
 //   L(a) = 20·log10(a/√2) + 90 · a=0,05 → 60,969 → «61,0» · a=0,5 → 80,969 → «81,0»
@@ -2026,4 +2030,758 @@ test('REPARADO 5.ª pasada — el FAQPage no atribuye a la OMS 65 dB de día, qu
   const primera: string = JSON.parse(faq).mainEntity?.[0]?.acceptedAnswer?.text ?? '';
   expect(primera).toContain('Organización Mundial de la Salud');
   expect(primera).not.toMatch(/(OMS|Organizaci[óo]n Mundial de la Salud)[^.]*\b65 dB/);
+});
+
+// ===========================================================================
+// 6.ª PASADA DEL INSPECTOR · inspector 26/10/2026
+//
+// Los 22 hallazgos anteriores siguen cerrados (sus tests, arriba). Desde la 5.ª pasada solo
+// entraron cambios transversales: contraste (dfaf84a2 y 4488bd1d, 18/10) y relacionadas
+// (99e1ee7e). Tres casos de OPERATIVA, uno en móvil, y los hallazgos nuevos con `test.fail()`.
+//
+// VALORES RESUELTOS A MANO ANTES DE EJECUTAR (fórmula de page.tsx, calibración 90, A(1 kHz)=0):
+//   L(a) = 20·log10(a/√2) + 90 · a=0,05 → 60,969 → «61,0» · a=0,5 → 80,969 → «81,0»
+//   CASO 13 · 5 s a 61,0 + 5 s a 81,0: LAeq = 80,969 + 10·log10((1 + 0,01)/2) = 78,00 → «78,0»
+//     (la media ARITMÉTICA daría 70,97: 7 dB por debajo). Mín «61,0», máx «81,0».
+//   CASO 14 · 4 s visibles a 61,0, pestaña oculta 6,5 s (dentro, 4 s a 81,0) y 3 s visibles a
+//     61,0: lo oculto no se mide → máx «61,0», LAeq «61,0», y la app dice que no cuentan
+//     6,5 − 0,04 (la última ventana sí se lee) = 6,46 s → «6 s».
+//   CASO 15 · página traducida, 4 s a 61,0 → fila con LAeq «61,0», sin caída.
+//
+// Datos normativos cotejados hoy en el BOE: RD 1367/2007 (BOE-A-2007-18397), Anexo I y
+// Anexo II tablas A y B, Anexo III tablas B1 y B2 —los de la página son correctos—; y RD
+// 286/2006 (BOE-A-2006-4414), arts. 5 y 7: valores inferiores de acción 80 dB(A) / 135 dB(C)
+// (el empresario PONE A DISPOSICIÓN los protectores), superiores 85 dB(A) / 137 dB(C) (su uso
+// es OBLIGATORIO) y límite 87 dB(A) / 140 dB(C), el único que se comprueba CON la atenuación
+// de los protectores (art. 5.2).
+// ===========================================================================
+
+declare global {
+  interface Window {
+    /** El AnalyserNode que crea la app (sonda de la 6.ª pasada). */
+    __analizador?: AnalyserNode;
+    /** Pestaña oculta simulada: ocultar y volver a mostrar. */
+    __ocultar?: () => void;
+    __mostrar?: () => void;
+    /** Veces que la app ha pedido el Wake Lock. */
+    __llamadasWakeLock?: number;
+  }
+}
+
+/** Deja a mano el AnalyserNode de la app para leer lo que de verdad le entra. */
+async function sondaAnalizador(page: Page): Promise<void> {
+  await page.addInitScript(() => {
+    const crear = BaseAudioContext.prototype.createAnalyser;
+    BaseAudioContext.prototype.createAnalyser = function (this: BaseAudioContext) {
+      const analizador = crear.call(this);
+      window.__analizador = analizador;
+      return analizador;
+    };
+  });
+}
+
+/**
+ * Pestaña oculta. Headless NO oculta pestañas: probado el 26/10/2026 con otra pestaña al
+ * frente, minimizando la ventana por CDP y con Target.createTarget, en el headless clásico y
+ * en el nuevo; y congelar la página por CDP deja el rAF corriendo. Así que se hace lo que hace
+ * el navegador al ocultarla: `visibilityState` pasa a 'hidden', se emite `visibilitychange` y
+ * los callbacks de requestAnimationFrame dejan de servirse hasta volver. El audio sigue
+ * entrando (el AudioContext no se suspende), que es justo el escenario del hallazgo 1700.
+ */
+async function pestañaOcultable(page: Page): Promise<void> {
+  await page.addInitScript(() => {
+    let oculta = false;
+    const rafOriginal = window.requestAnimationFrame.bind(window);
+    const cafOriginal = window.cancelAnimationFrame.bind(window);
+    const retenidos = new Map<number, FrameRequestCallback>();
+    const alias = new Map<number, number>();
+    let siguiente = 1e9;
+    window.requestAnimationFrame = (cb: FrameRequestCallback): number => {
+      if (!oculta) return rafOriginal(cb);
+      const id = siguiente++;
+      retenidos.set(id, cb);
+      return id;
+    };
+    window.cancelAnimationFrame = (id: number): void => {
+      if (retenidos.delete(id)) return;
+      cafOriginal(alias.get(id) ?? id);
+    };
+    Object.defineProperty(document, 'visibilityState', { configurable: true, get: () => (oculta ? 'hidden' : 'visible') });
+    Object.defineProperty(document, 'hidden', { configurable: true, get: () => oculta });
+    window.__llamadasWakeLock = 0;
+    if ('wakeLock' in navigator) {
+      const pedir = navigator.wakeLock.request.bind(navigator.wakeLock);
+      navigator.wakeLock.request = (tipo?: WakeLockType) => {
+        window.__llamadasWakeLock = (window.__llamadasWakeLock ?? 0) + 1;
+        return pedir(tipo);
+      };
+    }
+    window.__ocultar = () => {
+      oculta = true;
+      document.dispatchEvent(new Event('visibilitychange'));
+    };
+    window.__mostrar = () => {
+      oculta = false;
+      for (const [id, cb] of retenidos) alias.set(id, rafOriginal(cb));
+      retenidos.clear();
+      document.dispatchEvent(new Event('visibilitychange'));
+    };
+  });
+}
+
+/** Como `esperarSegundosDeApp`, pero sondeando cada 50 ms: el CASO 13 parte la sesión en dos. */
+async function esperarSegundosDeAppAlInstante(page: Page, segundos: number): Promise<void> {
+  await expect
+    .poll(() => segundosDeApp(page), {
+      timeout: 30000,
+      intervals: [50],
+      message: `la sesión no llegó a ${segundos} s de audio medido`,
+    })
+    .toBeGreaterThanOrEqual(segundos);
+}
+
+/** El traductor del navegador (receta de generador-loteria.spec.ts): cada texto pasa a <font><font>. */
+const traducirPagina = (page: Page) =>
+  page.evaluate(() => {
+    const caminante = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+      acceptNode: (n) => {
+        const padre = n.parentElement;
+        if (!padre || !(n.nodeValue ?? '').trim()) return NodeFilter.FILTER_REJECT;
+        if (/^(SCRIPT|STYLE|OPTION|NOSCRIPT|FONT)$/.test(padre.tagName)) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      },
+    });
+    const nodos: Text[] = [];
+    while (caminante.nextNode()) nodos.push(caminante.currentNode as Text);
+    for (const nodo of nodos) {
+      const exterior = document.createElement('font');
+      const interior = document.createElement('font');
+      interior.textContent = nodo.nodeValue;
+      exterior.appendChild(interior);
+      nodo.parentNode?.replaceChild(exterior, nodo);
+    }
+  });
+
+/** Errores de React al tocar nodos que el traductor ya cambió. */
+function vigilarErroresDeReact(page: Page): string[] {
+  const errores: string[] = [];
+  page.on('pageerror', (e) => errores.push(e.message));
+  page.on('console', (m) => {
+    if (m.type() === 'error' && /NotFoundError|insertBefore|removeChild/.test(m.text())) errores.push(m.text().slice(0, 200));
+  });
+  return errores;
+}
+
+/**
+ * Contraste del texto de `selector` contra su fondo COMPUESTO (las capas translúcidas se
+ * componen sobre la primera opaca). Con `prepararParaMedir` antes: sin él, la transición global
+ * de background-color hace leer el color de partida (medido el 26/10/2026 al imprimir).
+ */
+async function contrasteDeTexto(
+  page: Page,
+  selector: string,
+): Promise<{ ratio: number; color: string; fondo: string; texto: string; px: number; peso: number }> {
+  return page.locator(selector).first().evaluate((el) => {
+    const lienzo = document.createElement('canvas');
+    lienzo.width = lienzo.height = 1;
+    const ctx = lienzo.getContext('2d', { willReadFrequently: true })!;
+    const rgba = (css: string): number[] => {
+      ctx.clearRect(0, 0, 1, 1);
+      ctx.fillStyle = '#000';
+      ctx.fillStyle = css;
+      ctx.fillRect(0, 0, 1, 1);
+      const d = ctx.getImageData(0, 0, 1, 1).data;
+      return [d[0], d[1], d[2], d[3] / 255];
+    };
+    const capas: number[][] = [];
+    for (let m: Element | null = el; m; m = m.parentElement) {
+      const c = rgba(getComputedStyle(m).backgroundColor);
+      if (c[3] > 0) capas.push(c);
+      if (c[3] >= 1) break;
+    }
+    let fondo = [255, 255, 255];
+    for (let i = capas.length - 1; i >= 0; i--) {
+      const c = capas[i];
+      fondo = [0, 1, 2].map((k) => c[k] * c[3] + fondo[k] * (1 - c[3]));
+    }
+    const cs = getComputedStyle(el);
+    const fg = rgba(cs.color);
+    const canal = (v: number) => {
+      const s = v / 255;
+      return s <= 0.04045 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+    };
+    const lum = (p: number[]) => 0.2126 * canal(p[0]) + 0.7152 * canal(p[1]) + 0.0722 * canal(p[2]);
+    const l1 = lum(fg);
+    const l2 = lum(fondo);
+    return {
+      ratio: +((Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05)).toFixed(2),
+      color: `rgb(${fg.slice(0, 3).join(', ')})`,
+      fondo: `rgb(${fondo.map(Math.round).join(', ')})`,
+      texto: (el.textContent ?? '').trim(),
+      px: parseFloat(cs.fontSize),
+      peso: Number(cs.fontWeight),
+    };
+  });
+}
+
+/** Umbral WCAG 1.4.3: 3:1 si es texto grande (≥ 24 px, o ≥ 18,66 px en negrita 700), 4,5:1 si no. */
+const umbralWcag = (px: number, peso: number): number => (px >= 24 || (px >= 18.66 && peso >= 700) ? 3 : 4.5);
+
+/** El FAQPage de metadata.ts tal como sale en el HTML. */
+async function faqPage(page: Page): Promise<{ name: string; acceptedAnswer: { text: string } }[]> {
+  const texto = await page
+    .locator('script[type="application/ld+json"]')
+    .evaluateAll((els) => els.map((e) => e.textContent ?? '').find((t) => t.includes('FAQPage')) ?? '{}');
+  return JSON.parse(texto).mainEntity ?? [];
+}
+
+test.describe('inspector 26/10/2026', () => {
+  // -------------------------------------------------------------------------
+  // CASO 13 (normal, escritorio) — un escalón de 20 dB: el LAeq es energético
+  // -------------------------------------------------------------------------
+  test('CASO 13 (normal) — 5 s a 61,0 y 5 s a 81,0: LAeq 78,0 y no 71,0, igual en panel, fila y CSV', async ({
+    page,
+  }) => {
+    test.setTimeout(90000);
+    await micrófonoRegulable(page, 1000, 0.05);
+    await sondaAnalizador(page);
+    await instrumentar(page); // siempre DESPUÉS del micrófono sintético
+    await page.goto(RUTA);
+    await esperarAppLista(page);
+
+    await page.getByRole('button', { name: /Iniciar medición/i }).click();
+    await esperarMedicionEnMarcha(page);
+    await esperarLecturaEstable(page, 60.97);
+
+    // El medio arranca DE VERDAD: contexto 'running' y el analizador de la app recibe la senoide
+    // entera (2048 muestras, ninguna a cero, con pico 0,05 = la amplitud inyectada).
+    expect((await estadoDelMedio(page)).contextos).toContain('running');
+    const entrada = await page.evaluate(() => {
+      const an = window.__analizador as AnalyserNode;
+      const buf = new Float32Array(an.fftSize);
+      an.getFloatTimeDomainData(buf);
+      let distintas = 0;
+      let pico = 0;
+      for (const v of buf) {
+        if (v !== 0) distintas += 1;
+        pico = Math.max(pico, Math.abs(v));
+      }
+      return { n: buf.length, distintas, pico };
+    });
+    expect(entrada.distintas, 'el analizador recibe ceros').toBeGreaterThan(entrada.n * 0.9);
+    expect(entrada.pico).toBeCloseTo(0.05, 3);
+
+    // Resetear y partir la sesión en dos mitades medidas en el reloj de la APP
+    await page.getByRole('button', { name: /Resetear/i }).click();
+    await esperarSegundosDeAppAlInstante(page, 5);
+    await page.evaluate(() => {
+      const g = (window.__ganancia as GainNode).gain;
+      const t = (window.__ctxTono as AudioContext).currentTime;
+      g.setValueAtTime(0.05, t);
+      g.linearRampToValueAtTime(0.5, t + 0.02);
+    });
+    // La cifra de dB cambia con el tiempo: 61,0 → 81,0
+    await esperarLecturaEstable(page, 80.97);
+    await esperarSegundosDeAppAlInstante(page, 10);
+    await page.getByRole('button', { name: /Detener y guardar/i }).click();
+    await expect(filasRegistro(page)).toHaveCount(1);
+
+    const panel = await estadisticas(page);
+    expect(aNúmero(panel.laeq), `LAeq energético (la media aritmética daría 71,0); panel ${JSON.stringify(panel)}`).toBeCloseTo(78.0, 0);
+    expect(aNúmero(panel.min)).toBeCloseTo(60.97, 0);
+    expect(panel.max).toBe('81,0');
+
+    const celdas = (await filasRegistro(page).first().locator('td').allInnerTexts()).map((t) => t.trim());
+    expect([celdas[2], celdas[3], celdas[4], celdas[5]]).toEqual([panel.duracion, panel.laeq, panel.min, panel.max]);
+    expect(celdas[6]).toBe('90 dB');
+
+    const [descarga] = await Promise.all([
+      page.waitForEvent('download'),
+      page.getByRole('button', { name: /Descargar CSV/i }).click(),
+    ]);
+    const contenido = (await readFile((await descarga.path()) as string, 'utf8')).replace(/^﻿/, '');
+    const leido = parsearCsv<string[]>(contenido, { delimiter: ';' });
+    expect(leido.errors).toEqual([]);
+    const [fecha, , duracion, laeqCsv, minCsv, maxCsv, calibracionCsv] = leido.data[1];
+    expect(fecha).toBe(hoyEsES());
+    expect(`${duracion} s`).toBe(celdas[2]);
+    expect([laeqCsv, minCsv, maxCsv, calibracionCsv]).toEqual([celdas[3], celdas[4], celdas[5], '90']);
+    // El micrófono queda cerrado
+    expect((await estadoDelMedio(page)).contextos).toEqual(['closed']);
+  });
+
+  // -------------------------------------------------------------------------
+  // CASO 14 (móvil, Pixel 7) — la pestaña se oculta a media medición
+  // -------------------------------------------------------------------------
+  test.describe('CASO 14 (móvil)', () => {
+    test.use({ ...PIXEL_7, permissions: ['microphone'] });
+
+    test('en un Pixel 7, lo que suena con la pestaña oculta ni se mide ni se cuenta, y se dice', async ({ page }) => {
+      test.setTimeout(90000);
+      await micrófonoRegulable(page, 1000, 0.05);
+      await instrumentar(page);
+      await pestañaOcultable(page);
+      await page.goto(RUTA);
+      await esperarAppLista(page);
+
+      await page.getByRole('button', { name: /Iniciar medición/i }).tap();
+      await esperarMedicionEnMarcha(page);
+      await esperarLecturaEstable(page, 60.97);
+      await esperarSegundosDeApp(page, 4);
+      const segundosAntes = await segundosDeApp(page);
+
+      // Se oculta 6,5 s. En el reloj de AUDIO, dentro de ese hueco: de 1 a 5 s a a=0,5 (81,0)
+      await page.evaluate(() => {
+        const g = (window.__ganancia as GainNode).gain;
+        const t = (window.__ctxTono as AudioContext).currentTime;
+        g.setValueAtTime(0.05, t + 1);
+        g.linearRampToValueAtTime(0.5, t + 1.02);
+        g.setValueAtTime(0.5, t + 5);
+        g.linearRampToValueAtTime(0.05, t + 5.02);
+        window.__ocultar?.();
+      });
+      await page.waitForTimeout(3000);
+      // Oculta: el audio sigue entrando (contexto en marcha) pero el panel no avanza
+      expect((await estadoDelMedio(page)).contextos).toContain('running');
+      const notaOculta = await page.locator('[class*="laeqNota"]').innerText();
+      await page.waitForTimeout(3500);
+      expect(await page.locator('[class*="laeqNota"]').innerText(), 'oculta, la app no debería tomar muestras').toBe(notaOculta);
+      await page.evaluate(() => window.__mostrar?.());
+      const vuelta = Date.now();
+
+      await expect(page.locator('[class*="laeqNota"]')).toContainText(/No cuentan [67] s en que la app no pudo tomar muestras/);
+      await page.waitForTimeout(3000);
+      await page.getByRole('button', { name: /Detener y guardar/i }).tap();
+      const visibleTrasVolver = (Date.now() - vuelta) / 1000;
+      await expect(filasRegistro(page)).toHaveCount(1);
+
+      // Lo que sonó a 81,0 con la pestaña oculta no está en las cifras
+      const panel = await estadisticas(page);
+      expect(panel.max, 'el tramo a 81,0 sonó con la pestaña oculta: no se midió').toBe('61,0');
+      expect(aNúmero(panel.laeq)).toBeCloseTo(60.97, 0);
+      const [guardada]: SesionSembrada[] = JSON.parse(
+        (await page.evaluate((k) => window.localStorage.getItem(k), CLAVE_SESIONES)) ?? '[]',
+      );
+      // La duración anotada es lo visible: ~segundosAntes (+ <1 s de fracción) + lo visible tras
+      // volver; nunca los 6,5 s ocultos.
+      expect(guardada.duracionSegundos).toBeLessThanOrEqual(segundosAntes + 1 + visibleTrasVolver + 0.5);
+      // Por abajo, solo que se siguió midiendo al volver: con la máquina cargada se pierden
+      // fotogramas, y cada uno cuenta como mucho su ventana de análisis (hallazgo 1700).
+      expect(guardada.duracionSegundos).toBeGreaterThan(segundosAntes);
+      expect(guardada.maxDb).toBeLessThan(62);
+      await expect(avisoRegistro(page)).toHaveText(
+        /^Medición guardada en el registro de este navegador\. La duración anotada no incluye [67] s en que la app no pudo tomar muestras \(pantalla apagada, pestaña oculta o un diálogo abierto\)\.$/,
+      );
+
+      // Al volver a la pestaña la app vuelve a pedir el Wake Lock (el sistema lo suelta al ocultarla)
+      if (await page.evaluate(() => 'wakeLock' in navigator)) {
+        expect(await page.evaluate(() => window.__llamadasWakeLock ?? 0)).toBeGreaterThanOrEqual(2);
+      }
+
+      // El registro en el teléfono: la página no desborda y el botón de tema sigue en pantalla (494)
+      const medida = await page.evaluate(() => ({
+        body: document.body.scrollWidth,
+        pantalla: document.documentElement.clientWidth,
+        tema: Math.round(document.querySelector('[class*="themeToggle"]')?.getBoundingClientRect().right ?? 0),
+      }));
+      expect(medida.body).toBeLessThanOrEqual(medida.pantalla);
+      expect(medida.tema).toBeLessThanOrEqual(medida.pantalla);
+    });
+  });
+
+  // -------------------------------------------------------------------------
+  // CASO 15 (operativa) — la página traducida, sin huecos: mide, guarda, exporta y borra
+  // -------------------------------------------------------------------------
+  test('CASO 15 (traducida) — medir, guardar, exportar y borrar con la página traducida no la tumba', async ({
+    page,
+  }) => {
+    test.setTimeout(90000);
+    const errores = vigilarErroresDeReact(page);
+    await micrófonoRegulable(page, 1000, 0.05);
+    await instrumentar(page);
+    await page.goto(RUTA);
+    await esperarAppLista(page);
+
+    await traducirPagina(page);
+    await page.getByRole('button', { name: /Iniciar medición/i }).click();
+    await esperarMedicionEnMarcha(page);
+    await esperarLecturaEstable(page, 60.97); // la lectura grande sí se actualiza traducida
+    await traducirPagina(page);
+    await esperarSegundosDeApp(page, 4);
+    await traducirPagina(page);
+    // Por su clase: su rótulo se queda en «Iniciar medición» con la página traducida (hallazgo, abajo)
+    await page.locator('[class*="btnStop"]').click();
+
+    await expect(filasRegistro(page)).toHaveCount(1);
+    const celdas = (await filasRegistro(page).first().locator('td').allInnerTexts()).map((t) => t.trim());
+    expect(aNúmero(celdas[3])).toBeCloseTo(60.97, 0);
+    await expect(avisoRegistro(page)).toHaveText('Medición guardada en el registro de este navegador.');
+    expect((await estadoDelMedio(page)).pistas.every((p) => p.estado === 'ended')).toBe(true);
+
+    await traducirPagina(page);
+    const [descarga] = await Promise.all([
+      page.waitForEvent('download'),
+      page.getByRole('button', { name: /Descargar CSV/i }).click(),
+    ]);
+    const contenido = (await readFile((await descarga.path()) as string, 'utf8')).replace(/^﻿/, '');
+    const leido = parsearCsv<string[]>(contenido, { delimiter: ';' });
+    expect(leido.data).toHaveLength(2);
+    expect(leido.data[1][3]).toBe(celdas[3]);
+
+    await traducirPagina(page);
+    await filasRegistro(page).first().getByRole('button', { name: /^Borrar la medición/ }).click();
+    await expect(filasRegistro(page)).toHaveCount(0);
+    await expect(page.getByRole('heading', { name: 'Algo salió mal' })).toHaveCount(0);
+    expect(errores).toEqual([]);
+  });
+
+  // =========================================================================
+  // HALLAZGOS ABIERTOS (inspector 26/10/2026) — afirman lo correcto y hoy fallan a propósito
+  // =========================================================================
+
+  /*
+   * ABIERTO, hallazgo (inspector 26/10/2026) · operativa, alto — con la página traducida, un
+   * hueco de más de un segundo sin fotogramas TUMBA la app a media medición.
+   * El aviso del hallazgo 1700 se pinta con `{segundosSinMedir >= 1 && (<>No cuentan …</>)}`
+   * en mitad del párrafo `laeqNota`: React inserta ese fragmento delante del nodo de texto
+   * suelto «Es el promedio », que el traductor ya ha cambiado por <font>, e insertBefore lanza
+   * NotFoundError. Medido el 26/10/2026: «Algo salió mal» como único <h1>, la medición en curso
+   * se pierde (no queda fila) y el micrófono se cierra. El hueco lo abre aquí el diálogo de la
+   * propia app («Borrar el registro», 3 s); en un móvil basta con bloquear la pantalla o cambiar
+   * de app, que es lo normal en una medición nocturna. Al reanudar o resetear tras un hueco,
+   * React RETIRA ese fragmento y vuelve a caer (removeChild).
+   */
+  test('ABIERTO 26/10 — con la página traducida, un hueco sin muestras no tumba la medición', async ({ page }) => {
+    test.fail();
+    test.setTimeout(90000);
+    const errores = vigilarErroresDeReact(page);
+    await sembrarRegistro(page, [sesionDeJunio(12)]); // para que exista «Borrar el registro»
+    await micrófonoRegulable(page, 1000, 0.05);
+    await instrumentar(page);
+    await page.goto(RUTA);
+    await esperarAppLista(page);
+    await traducirPagina(page);
+    await page.getByRole('button', { name: /Iniciar medición/i }).click();
+    await esperarMedicionEnMarcha(page);
+    await esperarLectura(page);
+    await esperarSegundosDeApp(page, 3);
+    await traducirPagina(page);
+
+    page.once('dialog', async (dialogo) => {
+      await new Promise((listo) => setTimeout(listo, 3000));
+      await dialogo.dismiss();
+    });
+    await page.getByRole('button', { name: /Borrar el registro/i }).click();
+    await page.waitForTimeout(1500);
+
+    await expect(page.getByRole('heading', { name: 'Algo salió mal' }), 'la app se ha caído').toHaveCount(0);
+    // 3 s de diálogo − 0,04 s de la última ventana → «2 s» (3 si el diálogo tarda en cerrarse)
+    await expect(page.locator('[class*="laeqNota"]')).toContainText(/No cuentan [23] s en que la app no pudo tomar muestras/);
+    expect(errores).toEqual([]);
+  });
+
+  /*
+   * ABIERTO, hallazgo (inspector 26/10/2026) · operativa, medio — con la página traducida, tres
+   * textos de la app se quedan con su valor ANTERIOR (React escribe en el nodo de texto que el
+   * traductor retiró). Medido el 26/10/2026, sin caída ni error:
+   *   · el botón de parar dice «⏹️ Iniciar medición» mientras mide (y su nombre accesible
+   *     también): esperado «Detener y guardar»;
+   *   · con 2 mediciones en la tabla, el contador dice «(1 de 60 ahora mismo)», y la cabecera
+   *     del parte impreso «1 medición registrada»;
+   *   · tras pulsar «+» la calibración aplicada es 91 (localStorage) y la pantalla sigue en
+   *     «Desplazamiento: 90 dB».
+   */
+  test('ABIERTO 26/10 — con la página traducida, el botón de parar, el contador y la calibración dicen lo actual', async ({
+    page,
+  }) => {
+    test.fail();
+    test.setTimeout(90000);
+    await sembrarRegistro(page, [sesionDeJunio(12)]);
+    await micrófonoRegulable(page, 1000, 0.05);
+    await instrumentar(page);
+    await page.goto(RUTA);
+    await esperarAppLista(page);
+    await traducirPagina(page);
+    await page.getByRole('button', { name: /Iniciar medición/i }).click();
+    await esperarMedicionEnMarcha(page);
+    await esperarLectura(page);
+    await expect.soft(page.locator('[class*="btnStop"]'), 'el botón de parar').toHaveText(/Detener y guardar/);
+    await esperarSegundosDeApp(page, 4);
+    await page.locator('[class*="btnStop"]').click();
+    await expect(filasRegistro(page)).toHaveCount(2);
+    await expect.soft(page.locator('[class*="registroIntro"]'), 'el contador del tope').toContainText('(2 de 60 ahora mismo)');
+    await expect.soft(page.locator('[class*="parteSubtitulo"]'), 'la cabecera del parte').toContainText('2 mediciones registradas');
+
+    await traducirPagina(page);
+    await page.getByRole('button', { name: /Aumentar la calibración/i }).click();
+    await expect.poll(() => page.evaluate(() => localStorage.getItem('sonometro-calibracion'))).toBe('91');
+    await expect.soft(page.locator('[class*="calibracionValor"]'), 'la calibración en pantalla').toContainText('91 dB');
+  });
+
+  /*
+   * ABIERTO, hallazgo (inspector 26/10/2026) · calculo, medio — calibrar A MEDIA SESIÓN mezcla
+   * dos calibraciones en la misma fila. Es el flujo que pide el propio panel («ajusta aquí el
+   * desplazamiento hasta que las lecturas coincidan»: hay que estar midiendo para verlas), y el
+   * deslizador y los botones siguen activos mientras se mide. La fila guarda solo la calibración
+   * FINAL, y la columna «Calib.» existe para que dos filas sean comparables.
+   * Resuelto a mano: tono a=0,05 → 60,97 con cal 90 y 70,97 con cal 100. 4 s a 90 y el resto a
+   * 100 hasta 10 s: LAeq = 70,97 + 10·log10(0,4·0,1 + 0,6) = 69,03.
+   * Medido el 26/10/2026: fila «Calib. 100 dB» con mín 61,0, máx 71,0 y LAeq 68,9; correcto
+   * sería que sus cifras fueran las de la calibración que dice (71,0 / 71,0 / 71,0), o no dejar
+   * calibrar con la sesión en marcha (entonces la fila sería 90 dB y 61,0 / 61,0 / 61,0).
+   */
+  test('ABIERTO 26/10 — una fila no mezcla cifras medidas con dos calibraciones distintas', async ({ page }) => {
+    test.fail();
+    test.setTimeout(90000);
+    await micrófonoRegulable(page, 1000, 0.05);
+    await page.goto(RUTA);
+    await esperarAppLista(page);
+    await page.getByRole('button', { name: /Iniciar medición/i }).click();
+    await esperarLectura(page);
+    await esperarLecturaEstable(page, 60.97);
+    await esperarSegundosDeApp(page, 4);
+    const mas = page.getByRole('button', { name: /Aumentar la calibración/i });
+    for (let i = 0; i < 10; i++) {
+      if (await mas.isEnabled()) await mas.click();
+    }
+    await esperarSegundosDeApp(page, 10);
+    await page.getByRole('button', { name: /Detener y guardar/i }).click();
+    await expect(filasRegistro(page)).toHaveCount(1);
+    const [guardada]: SesionSembrada[] = JSON.parse(
+      (await page.evaluate((k) => window.localStorage.getItem(k), CLAVE_SESIONES)) ?? '[]',
+    );
+    // El nivel de la señal con la calibración que la fila declara
+    const nivel = 20 * Math.log10(0.05 / Math.SQRT2) + guardada.calibracion;
+    expect(guardada.minDb, `fila con «Calib. ${guardada.calibracion} dB»: su mínimo`).toBeCloseTo(nivel, 0);
+    expect(guardada.laeq, `fila con «Calib. ${guardada.calibracion} dB»: su LAeq`).toBeCloseTo(nivel, 0);
+  });
+
+  /*
+   * ABIERTO, hallazgo (inspector 26/10/2026) · accesibilidad, medio — el rótulo de la franja
+   * (blanco sobre el color de la franja) y la lectura grande (pintada con ese color) no llegan
+   * al contraste mínimo. El rótulo es 17,6 px / 600, umbral 4,5:1; la lectura, 64 px, 3:1.
+   * Medido el 26/10/2026 (anterior a la campaña del 18/10, que no tocó estos colores):
+   *   claro · rótulo: Muy silencioso 2,54 · Silencioso 2,28 · Moderado 1,98 · Algo ruidoso 1,92
+   *           · Ruidoso 2,80 · Muy ruidoso 3,76 (solo Peligroso, 4,83, cumple)
+   *   claro · lectura sobre #F5F5F5: 2,33 · 2,09 · 1,81 · 1,76 · 2,57, y «--» en reposo 2,33
+   *   oscuro · «Esperando...» blanco sobre --text-muted #9B9B9B: 2,78 · lectura Peligroso
+   *           #dc2626 sobre #383838: 2,43 (los rótulos de franja, igual que en claro)
+   */
+  test('ABIERTO 26/10 — el rótulo de la franja y la lectura grande se leen en todas las franjas y en los dos temas', async ({
+    page,
+  }) => {
+    test.fail();
+    test.setTimeout(120000);
+    /** Amplitud que da `db` dB(A) a 1 kHz con la calibración por defecto: a = √2·10^((L − 90)/20) */
+    const amplitudPara = (db: number) => Math.SQRT2 * Math.pow(10, (db - 90) / 20);
+    await micrófonoRegulable(page, 1000, amplitudPara(15));
+    await page.goto(RUTA);
+    await prepararParaMedir(page);
+    await esperarAppLista(page);
+    const fallos: string[] = [];
+    const comprobar = async (tema: string, selector: string) => {
+      const m = await contrasteDeTexto(page, selector);
+      const umbral = umbralWcag(m.px, m.peso);
+      if (m.ratio < umbral) fallos.push(`${tema} · «${m.texto}» ${m.color} sobre ${m.fondo}: ${m.ratio}:1 < ${umbral}`);
+    };
+    await comprobar('claro, reposo', '[class*="dbValue"]');
+
+    await page.getByRole('button', { name: /Iniciar medición/i }).click();
+    await esperarLectura(page);
+    // Una lectura en el centro de cada franja: a = √2·10^((L − 90)/20) con la calibración por defecto
+    const FRANJAS: [number, string][] = [
+      [15, 'Muy silencioso'],
+      [40, 'Silencioso'],
+      [55, 'Moderado'],
+      [65, 'Algo ruidoso'],
+      [78, 'Ruidoso'],
+      [92, 'Muy ruidoso'],
+      [115, 'Peligroso'],
+    ];
+    for (const [db, franja] of FRANJAS) {
+      await page.evaluate((a) => {
+        (window.__ganancia as GainNode).gain.value = a;
+      }, amplitudPara(db));
+      await esperarLecturaEstable(page, db);
+      await expect(page.locator('[class*="levelLabel"]')).toHaveText(franja);
+      await comprobar('claro', '[class*="levelLabel"]');
+      await comprobar('claro', '[class*="dbValue"]');
+    }
+    await activarTemaOscuro(page);
+    for (const [db, franja] of [FRANJAS[2], FRANJAS[6]]) {
+      await page.evaluate((a) => {
+        (window.__ganancia as GainNode).gain.value = a;
+      }, amplitudPara(db));
+      await esperarLecturaEstable(page, db);
+      await expect(page.locator('[class*="levelLabel"]')).toHaveText(franja);
+      await comprobar('oscuro', '[class*="levelLabel"]');
+      await comprobar('oscuro', '[class*="dbValue"]');
+    }
+    await page.getByRole('button', { name: /Detener y guardar/i }).click();
+    await expect(page.locator('[class*="levelLabel"]')).toHaveText('Esperando...');
+    await comprobar('oscuro, reposo', '[class*="levelLabel"]');
+
+    expect(fallos).toEqual([]);
+  });
+
+  /*
+   * ABIERTO, hallazgo (inspector 26/10/2026) · accesibilidad, bajo — en oscuro, los ejemplos de
+   * la fila ACTIVA de «Niveles de referencia» (--text-muted #9B9B9B sobre el tinte --focus,
+   * rgba(63,165,209,0,15) sobre la tarjeta #2D2D2D = rgb(47,63,69)) dan 3,92:1; 14,4 px, umbral
+   * 4,5. El token declara 4,96 sobre la tarjeta, pero la fila activa lleva tinte. En claro, 4,5+.
+   */
+  test('ABIERTO 26/10 — en oscuro, los ejemplos de la franja activa de la tabla de referencia se leen', async ({ page }) => {
+    test.fail();
+    test.setTimeout(60000);
+    await micrófonoRegulable(page, 1000, Math.SQRT2 * Math.pow(10, (55 - 90) / 20)); // 55,0 dB(A): «Moderado»
+    await page.goto(RUTA);
+    await prepararParaMedir(page);
+    await esperarAppLista(page);
+    await activarTemaOscuro(page);
+    await page.getByRole('button', { name: /Iniciar medición/i }).click();
+    await expect(page.locator('[class*="levelLabel"]')).toHaveText('Moderado', { timeout: 15000 });
+    const fila = '[class*="referenceRow"][class*="activeRow"] [class*="refExamples"]';
+    await expect(page.locator(fila)).toHaveText('Conversación normal, oficina');
+    const m = await contrasteDeTexto(page, fila);
+    expect(m.ratio, `«${m.texto}» ${m.color} sobre ${m.fondo}`).toBeGreaterThanOrEqual(umbralWcag(m.px, m.peso));
+  });
+
+  /*
+   * ABIERTO, hallazgo (inspector 26/10/2026) · accesibilidad, bajo — el título del parte
+   * impreso desde el tema OSCURO. 4488bd1d (18/10) cambió `.parteTitulo` de #2e86ab fijo a
+   * var(--primary-texto): en claro sube a #26718F (5,47:1), pero en oscuro el token vale
+   * #3FA5D1 y el papel sigue blanco (la regla de impresión pone el panel en white): 2,79:1, con
+   * 21,3 px y peso 600 (no es «texto grande»: umbral 4,5; ni siquiera llega al 3:1 del grande).
+   * Antes del 18/10, #2e86ab daba 4,11:1 en los dos temas. Es la forma que la propia campaña
+   * apartó a --primary-boton («texto de marca sobre un fondo claro FIJO»), aquí dentro de un
+   * @media print.
+   */
+  test('ABIERTO 26/10 — el título del parte impreso desde el tema oscuro se lee sobre el papel', async ({ page }) => {
+    test.fail();
+    await sembrarRegistro(page, [sesionDeJunio(12)]);
+    await page.goto(RUTA);
+    await prepararParaMedir(page);
+    await expect(filasRegistro(page)).toHaveCount(1);
+    // Control: desde el tema claro cumple
+    await page.emulateMedia({ media: 'print' });
+    const claro = await contrasteDeTexto(page, '[class*="parteTitulo"]');
+    expect(claro.ratio).toBeGreaterThanOrEqual(4.5);
+    await page.emulateMedia({ media: 'screen' });
+    await activarTemaOscuro(page);
+    await page.emulateMedia({ media: 'print' });
+    const oscuro = await contrasteDeTexto(page, '[class*="parteTitulo"]');
+    expect(oscuro.fondo, 'el papel').toBe('rgb(255, 255, 255)');
+    expect(oscuro.ratio, `«${oscuro.texto}» ${oscuro.color} sobre ${oscuro.fondo}`).toBeGreaterThanOrEqual(
+      umbralWcag(oscuro.px, oscuro.peso),
+    );
+  });
+
+  /*
+   * ABIERTO, hallazgo (inspector 26/10/2026) · contenido, bajo — la misma pregunta con dos
+   * respuestas. «¿Es lo mismo un decibelímetro que un sonómetro?» está en la FAQ visible y en el
+   * FAQPage de metadata.ts con redacciones distintas (no se contradicen; una calla «Si buscas un
+   * equipo profesional…»). Y «¿Es tan preciso como un sonómetro profesional?» (FAQPage) es la
+   * visible «¿Es fiable un sonómetro de móvil comparado con uno profesional?» con otra cifra:
+   * el FAQPage da ±1-2 dB del sonómetro de clase 1 o 2 y calla el «±3 a ±6 dB» del móvil que da
+   * la página. Reparación: UNA constante en metadata.ts que importen las dos bocas (como
+   * app/simulador-gastos-compraventa-garaje).
+   */
+  test('ABIERTO 26/10 — una pregunta que está en la FAQ visible y en el FAQPage tiene la misma respuesta', async ({
+    page,
+  }) => {
+    test.fail();
+    await page.goto(RUTA);
+    const pregunta = '¿Es lo mismo un decibelímetro que un sonómetro?';
+    const enJsonLd = (await faqPage(page)).find((q) => q.name === pregunta)?.acceptedAnswer.text ?? '(no está)';
+    const visible = (
+      (await page.locator('[class*="faqItem"]', { hasText: pregunta }).locator('p').first().textContent()) ?? ''
+    ).replace(/\s+/g, ' ').trim();
+    expect.soft(visible).toBe(enJsonLd);
+    // La de la precisión: la página da el margen del móvil frente a un clase 1 o 2; el FAQPage, no
+    await expect(page.locator('[class*="faqList"]')).toContainText('margen de error de ±3 a ±6 dB');
+    const precision =
+      (await faqPage(page)).find((q) => /preciso como un son[óo]metro profesional/.test(q.name))?.acceptedAnswer.text ?? '';
+    expect.soft(precision).toContain('±3 a ±6 dB');
+  });
+
+  /*
+   * ABIERTO, hallazgo (inspector 26/10/2026) · contenido, bajo — el FAQPage dice que la app
+   * calcula el nivel «en decibelios (dBFS y dB SPL estimado)». La app no enseña dBFS en ningún
+   * sitio, y lo que enseña es un nivel PONDERADO A —dB(A), su subtítulo y todos sus rótulos—, no
+   * dB SPL sin ponderar: la página avisa de que confundirlos es un «error frecuente».
+   */
+  test('ABIERTO 26/10 — el FAQPage dice en qué unidad mide la app: dB(A), no dBFS', async ({ page }) => {
+    test.fail();
+    await page.goto(RUTA);
+    await expect(page.locator('[class*="dbUnit"]')).toHaveText('dB(A)');
+    const respuesta =
+      (await faqPage(page)).find((q) => /C[óo]mo funciona un son[óo]metro online/.test(q.name))?.acceptedAnswer.text ?? '';
+    expect(respuesta).not.toContain('dBFS');
+    expect(respuesta).toMatch(/dB\(A\)|ponderad/);
+  });
+
+  /*
+   * ABIERTO, hallazgo (inspector 26/10/2026) · contenido, bajo — la guía sigue mandando
+   * documentar con capturas de pantalla y llega a decir «Las capturas de pantalla son tu única
+   * prueba documental», cuando la app tiene desde fc27e76b un registro con fecha y hora, CSV y
+   * parte imprimible (su propia FAQ visible lo explica). Lo mismo el paso 6 («Documenta con
+   * capturas de pantalla … mientras está midiendo»), el consejo del vecino («documenta varias
+   * noches con capturas de pantalla») y el FAQPage («Puedes tomar capturas o anotaciones»).
+   */
+  test('ABIERTO 26/10 — la guía no dice que las capturas sean la única prueba cuando hay registro, CSV y parte', async ({
+    page,
+  }) => {
+    test.fail();
+    await page.goto(RUTA);
+    // Control: la FAQ visible ya remite al registro
+    await expect(page.locator('[class*="faqList"]')).toContainText('queda con su fecha, su hora y su LAeq en el registro');
+    const guia = (await page.locator('[class*="guideSection"]').allTextContents()).join(' ');
+    expect(guia).not.toContain('Las capturas de pantalla son tu única prueba documental');
+    const vecinos =
+      (await faqPage(page)).find((q) => /documentar ruido de vecinos/.test(q.name))?.acceptedAnswer.text ?? '';
+    expect(vecinos).toMatch(/registro|CSV|imprim/i);
+  });
+
+  /*
+   * ABIERTO, hallazgo (inspector 26/10/2026) · dato, bajo — tres umbrales distintos del RD
+   * 286/2006 en la misma página. RD 286/2006 (BOE-A-2006-4414), arts. 5 y 7: a partir de
+   * 80 dB(A) el empresario PONE A DISPOSICIÓN los protectores; a partir de 85 dB(A) su uso es
+   * OBLIGATORIO; el valor LÍMITE es 87 dB(A), y es el único que se comprueba teniendo en cuenta
+   * la atenuación de los protectores (art. 5.2). La tarjeta «Ambientes laborales» dice
+   * «Obligación de EPIs >80 dB» (la tabla comparativa: «obligación de EPIs a partir de
+   * 85 dB(A)») e «Industria: máx. 85 dB (con protección)» (el máximo con protección es 87); y
+   * la FAQ «¿Cuánto tiempo se puede estar expuesto a 85 dB…?» dice «Según el RD 286/2006 … el
+   * límite es de 8 horas/día a 85 dB(A)», cuando la tabla dice «límite exposición: 87 dB(A)».
+   */
+  test('ABIERTO 26/10 — la página da los umbrales del RD 286/2006 sin contradecirse', async ({ page }) => {
+    test.fail();
+    await page.goto(RUTA);
+    // Control: la tabla comparativa y la FAQ de los tapones lo dicen bien
+    await expect(page.locator('[class*="comparativaTable"]')).toContainText('límite exposición: 87 dB(A)');
+    const tarjeta = page.locator('[class*="contentCard"]', { hasText: 'Ambientes laborales' });
+    await expect.soft(tarjeta).not.toContainText(/Obligaci[óo]n de EPIs\s*>\s*80/);
+    await expect.soft(tarjeta).not.toContainText('máx. 85 dB (con protección)');
+    await expect
+      .soft(page.locator('[class*="faqItem"]', { hasText: '¿Cuánto tiempo se puede estar expuesto a 85 dB' }))
+      .not.toContainText(/RD 286\/2006[^.]*el límite es de 8 horas\/día a 85 dB/);
+  });
+
+  /*
+   * ABIERTO, hallazgo (inspector 26/10/2026) · accesibilidad, bajo — doce emojis decorativos en
+   * su propio <span>, junto al título de su tarjeta y sin aria-hidden: el del hero (🔊), los
+   * cuatro de «Casos de uso» (🏘️ 👷 👶 🎸), los seis de «Mejores prácticas» (📏 🕐 📊 🎙️ 📸 🌬️) y
+   * el de «Errores frecuentes» (⚠️). Un lector de pantalla los anuncia delante del título
+   * («casas, Vecino afectado por local nocturno»). `node scripts/check-a11y-jsx.mjs
+   * app/sonometro/page.tsx` los lista como «emoji en nodo propio».
+   */
+  test('ABIERTO 26/10 — los emojis decorativos de las tarjetas están ocultos al lector de pantalla', async ({ page }) => {
+    test.fail();
+    await page.goto(RUTA);
+    const iconos = page.locator('[class*="heroIcon"], [class*="escenarioIcon"], [class*="tipIcon"], [class*="warningIcon"]');
+    await expect(iconos).toHaveCount(12);
+    const sinOcultar = await iconos.evaluateAll((els) =>
+      els.filter((e) => e.getAttribute('aria-hidden') !== 'true').map((e) => e.textContent),
+    );
+    expect(sinOcultar).toEqual([]);
+  });
 });

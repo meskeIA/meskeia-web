@@ -9,6 +9,8 @@ import {
   // Sello propio de los plazos de la reclamación previa, nacido el 05/09/2026 al separar
   // el trámite del complemento. Lo usa la regresión del hallazgo 652.
   RECLAMACION_PREVIA_SS_META,
+  // Serie de cuantías por año de los atrasos (S0211). La usa el bloque «inspector 26/10/2026».
+  COMPLEMENTO_BRECHA_GENERO_SERIE,
 } from '../../data/fiscal/pensiones';
 // El recuento de requisitos del art. 60 que evalúa el verificador vive en el motor del MCP,
 // que es de donde lo leen la página y su faqJsonLd desde la reparación del hallazgo 654.
@@ -2980,7 +2982,7 @@ test.describe('Re-inspección 26/09/2026 — redacción de la guía', () => {
 // el módulo como ancla, que es lo que manda la regla fiscal del Inspector.
 //
 // Tres casos nuevos RESUELTOS A MANO antes de abrir el navegador (los tres coincidieron, en
-// 1280 px y en 390 px, en claro y en oscuro), y siete hallazgos ABIERTOS con `test.fail()`.
+// 1280 px y en 390 px, en claro y en oscuro), y siete hallazgos que se abrieron con `test.fail()`.
 //
 // ✅ REPARADOS los siete (2538-2544) el 01/10/2026: sin `test.fail()`, quedan como regresión.
 // 2540 y 2541 se repararon PREGUNTANDO (P3 bis y P1 bis), no con un aviso bajo la cifra.
@@ -3704,8 +3706,8 @@ test.describe('Re-inspección 01/10/2026 — móvil y oscuro', () => {
 // «reconocimiento automático», que las fuentes de arriba convierten en hallazgo.
 // Cuatro (2927, 2928, 2930 y 2931) se REPARARON el 06/10/2026 en 033ae27d y la
 // re-inspección del 07/10 los VERIFICÓ con su caso original. El de la tool del MCP (fuera del
-// alcance de la app, cabo C0148) se REPARÓ el 13/10/2026 (test más abajo); sigue ABIERTO el
-// 2929 (comprobado de nuevo el 16/10/2026).
+// alcance de la app, cabo C0148) se REPARÓ el 13/10/2026 (test más abajo); el 2929, que seguía
+// abierto el 16/10/2026, se REPARÓ el 19/10/2026 (d3cc481b).
 // ═════════════════════════════════════════════════════════════════════════════
 
 interface Respuestas06 extends Respuestas26 {
@@ -4005,7 +4007,8 @@ test.describe('Re-inspección 06/10/2026', () => {
   });
 
   /**
-   * ABIERTO (06/10/2026) — BAJO (contenido). Pensión causada antes del 4-feb-2021 y sin el
+   * REPARADO (hallazgo 2929, abierto el 06/10/2026 y reparado el 19/10/2026) — BAJO (contenido).
+   * Era así: pensión causada antes del 4-feb-2021 y sin el
    * complemento de maternidad: el paso siguiente solo habla de quien «percibía» o «se le
    * denegó» el antiguo complemento. La SS (trámite oficial) dice que si la pensión se causó
    * entre el 1 de enero de 2016 y el 3 de febrero de 2021 «te corresponde solicitar el
@@ -4138,7 +4141,7 @@ test.describe('Re-inspección 06/10/2026 — móvil', () => {
 //   · 2931 — el sello enlaza a https://prestaciones.seg-social.es/servicio/complemento-brecha.html,
 //     que en Chromium (07/10/2026) es el trámite «Solicitar un complemento por brecha de
 //     género o por maternidad» con su contenido completo.
-// El 2929 sigue ABIERTO y con la misma forma (su test.fail, más arriba, sigue fallando).
+// El 2929 seguía abierto ese día y con la misma forma; se REPARÓ el 19/10/2026 (d3cc481b).
 //
 // Fuentes oficiales consultadas en sesión (07/10/2026):
 //   · RD 241/2026, art. 12 (BOE-A-2026-6977, XML del BOE): «Con efectos de 1 de enero de
@@ -4312,7 +4315,8 @@ test.describe('Re-inspección 07/10/2026', () => {
   });
 
   /**
-   * ABIERTO (07/10/2026) — BAJO (contenido). Residuo de 2927. La reparación cambió en el
+   * REPARADO (hallazgo 2983, abierto el 07/10/2026 y reparado el 19/10/2026) — BAJO (contenido).
+   * Residuo de 2927. La reparación cambió en el
    * FAQPage el «formulario de revisión de pensión» por el trámite «Solicitar un complemento
    * por brecha de género o por maternidad», y ese nombre está ya en el veredicto y en la FAQ.
    * Pero el paso 3 de la guía («Presenta la solicitud en la Sede Electrónica de la SS») sigue
@@ -4332,7 +4336,8 @@ test.describe('Re-inspección 07/10/2026', () => {
   });
 
   /**
-   * ABIERTO (07/10/2026) — BAJO (dato). Residuo de 2928. La incompatibilidad de la DT 33.ª
+   * REPARADO (hallazgo 2984, abierto el 07/10/2026 y reparado el 19/10/2026) — BAJO (dato).
+   * Residuo de 2928. La incompatibilidad de la DT 33.ª
    * LGSS (párrafo segundo) entró en la página como TEXTO: el paso siguiente de la rama
    * general («…es incompatible con este: la DT 33.ª LGSS te deja optar entre uno u otro»),
    * la nota de la tabla comparativa y el FAQPage («son incompatibles y hay que optar por uno
@@ -4410,8 +4415,8 @@ test.describe('Re-inspección 07/10/2026 — móvil', () => {
 //     encuentra ninguna posición con el botón a la vista en la que el veredicto quede, sin
 //     desplazarse, bajo la barra o bajo la píldora fija del pie.
 //   · a3c3ecb0: el dato está en el módulo pero no tiene consumidor (grep de `aplicableDesde`:
-//     solo data/fiscal/pensiones.ts). El 2929 sigue ABIERTO con la misma forma, igual que el
-//     2983 y el 2984: sus test.fail, más arriba, siguen fallando.
+//     solo data/fiscal/pensiones.ts). El 2929 seguía abierto ese día con la misma forma, igual
+//     que el 2983 y el 2984; los tres se REPARARON el 19/10/2026 (d3cc481b).
 //   · 99e1ee7e: las relacionadas siguen saliendo, con sus 4 tarjetas.
 //
 // Fuentes oficiales consultadas en sesión (16/10/2026), BOE consolidado de la LGSS
@@ -4651,7 +4656,8 @@ test.describe('Re-inspección 16/10/2026', () => {
   });
 
   /**
-   * ABIERTO (16/10/2026) — BAJO (contenido). El aviso en línea de la prorrata dice que «no se
+   * REPARADO (hallazgo 3338, abierto el 16/10/2026 y reparado el 18/10/2026) — BAJO (contenido).
+   * Era así: el aviso en línea de la prorrata decía que «no se
    * interpreta» un número que SÍ se lee: con «0» y con «-25», «⚠️ Escribe un porcentaje mayor
    * que 0 y no mayor que 100: «0» no se interpreta.» El motivo del veredicto sí lo dice bien
    * («no es una prorrata válida (un porcentaje mayor que 0 y no mayor que 100)»), y el campo de
@@ -4684,7 +4690,8 @@ test.describe('Re-inspección 16/10/2026', () => {
   });
 
   /**
-   * ABIERTO (16/10/2026) — BAJO (dato). La fila «Pensiones cubiertas» de la tabla comparativa
+   * REPARADO (hallazgo 3339, abierto el 16/10/2026 y reparado el 19/10/2026) — BAJO (dato).
+   * Era así: la fila «Pensiones cubiertas» de la tabla comparativa
    * dice del complemento de MATERNIDAD «Jubilación, IP, viudedad», sin excepción, mientras la
    * columna de al lado sí anota la del régimen vigente («salvo la jubilación parcial, excluida
    * por el Art. 60.4 LGSS»). El art. 60.4 del texto original (BOE-A-2015-11724, 31/10/2015)
@@ -4707,7 +4714,8 @@ test.describe('Re-inspección 16/10/2026', () => {
   });
 
   /**
-   * ABIERTO (16/10/2026) — BAJO (dato). `COMPLEMENTO_MATERNIDAD_DEROGADO.norma` y la nota de la
+   * REPARADO (hallazgo 3340, abierto el 16/10/2026 y reparado el 19/10/2026) — BAJO (dato).
+   * Era así: `COMPLEMENTO_MATERNIDAD_DEROGADO.norma` y la nota de la
    * tabla dicen «Art. 60 LGSS en su redacción anterior al RDL 3/2021 (dada por la Ley
    * 48/2015)». En el BOE consolidado, el art. 60 ya está en el TEXTO ORIGINAL del RDLeg 8/2015
    * (publicado el 31/10/2015) como «Complemento por maternidad…», y sus únicas notas de
@@ -4726,7 +4734,8 @@ test.describe('Re-inspección 16/10/2026', () => {
   });
 
   /**
-   * ABIERTO (16/10/2026) — BAJO (dato). La pregunta 1 del FAQPage afirma que el complemento
+   * REPARADO (hallazgo 3341, abierto el 16/10/2026 y reparado el 19/10/2026) — BAJO (dato).
+   * Era así: la pregunta 1 del FAQPage afirmaba que el complemento
    * «tributa como rendimiento del trabajo en el IRPF», y las advertencias del motor del MCP
    * («El complemento tributa en IRPF como rendimiento del trabajo.») lo repiten: dos frases
    * tecleadas, sin norma citada y sin campo en data/fiscal, así que la calificación fiscal queda
@@ -4884,5 +4893,462 @@ test.describe('Atrasos de la reclamación (S0211)', () => {
     });
     await expect(page.getByText('¿Cuánto te deben')).toHaveCount(0);
     await expect(page.getByText('Aquí no se calculan los atrasos')).toBeVisible();
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// INSPECTOR 26/10/2026 (Opus 5.5, xhigh)
+//
+// Volvió a la cola por 23210c38 (18/10: atrasos de la reclamación retroactiva, función NUEVA y
+// nunca inspeccionada), 770d521e (hallazgo 3338), d3cc481b (2929, 2983, 2984, 3339, 3340 y
+// 3341), a9096cc8 (plazo legal del INSS) y 8a041b51 (LIMITES_PENSION_2026). Los siete hallazgos
+// reparados se sostienen: sus tests, más arriba, pasan.
+//
+// FUENTES. Cuantías por hijo de COMPLEMENTO_BRECHA_GENERO_SERIE (data/fiscal/pensiones.ts), cada
+// una con su norma y su cita del BOE: 2021 27,00 · 2022 28,00 · 2023 30,40 · 2024 33,20 ·
+// 2025 35,90 · 2026 36,90 €/mes. Efectos: Criterio interpretativo 11/2025 de la Secretaría de
+// Estado de la Seguridad Social, leído el 26/10/2026 en el PDF oficial de seg-social.es
+// (EFECTOS_COMPLEMENTO_BRECHA_VARONES.url):
+//   · Instrucción 1: «Cuando no medie solicitud o previo reconocimiento del CRBG en favor del
+//     otro progenitor, se reconocerá el derecho a este a los hombres […]. El reconocimiento del
+//     CRBG retrotraerá sus efectos económicos hasta la fecha de efectos económicos de la pensión
+//     a la que complementa.» No fija prescripción ni otro límite de retroactividad.
+//   · Instrucción 2, párrafo primero: «En caso de que el otro progenitor también haya solicitado
+//     o anteriormente se le haya reconocido el CRBG, se reconocerá a aquel que sea titular de las
+//     referidas pensiones cuya suma sea de menor cuantía […]».
+//   · Instrucción 2, párrafo segundo: «En aquellos supuestos en que se hubiera reconocido el
+//     derecho al complemento a la progenitora en fecha anterior al 15 de mayo de 2025, y la suma
+//     de las pensiones de aquella fuera de menor cuantía, únicamente se reconocerá al progenitor
+//     varón el derecho por el periodo que medie entre la fecha del hecho causante y el día
+//     primero del mes siguiente al del reconocimiento a la progenitora.»
+//
+// MÉTODO del motor de atrasos (atrasos.ts, declarado en pantalla): un mes completo devenga
+// cuantía × hijos computables × prorrata × 14 ÷ 12; el primer y el último mes, por días. El «hoy»
+// de la página se fija con page.clock en el día de la inspección para que el año en curso tenga
+// cifra literal.
+//
+// Tres casos resueltos A MANO antes de abrir el navegador: coinciden los tres, en la web y, en
+// el importe mensual, por la tool del MCP (que no calcula atrasos ni lo promete). Cinco
+// hallazgos nuevos con test.fail(): la concurrencia del cabo C0285 (web y MCP), la cita de la
+// instrucción 1 bajo una respuesta que la contradice, la caída y los textos viejos con la
+// página traducida, y el sello del complemento.
+// ═════════════════════════════════════════════════════════════════════════════
+
+/** El «hoy» de los casos: el día de la inspección, a mediodía para no rozar el cambio de día. */
+const HOY_INSPECCION = new Date('2026-10-26T12:00:00');
+
+/** Recarga la página con el reloj fijado y espera a la hidratación, como el beforeEach. */
+async function cargarConReloj(page: Page, fecha: Date): Promise<void> {
+  await page.clock.setFixedTime(fecha);
+  await page.goto(RUTA);
+  await page.getByRole('radio', { name: 'Viudedad', exact: true }).click();
+  await expect(page.getByRole('radio', { name: 'Viudedad', exact: true })).toHaveAttribute(
+    'aria-checked',
+    'true',
+  );
+}
+
+const campoFechaEfectos = (page: Page) => page.getByLabel('Fecha de efectos económicos de tu pensión');
+
+/** El bloque «¿Cuánto te deben…?», ya normalizado. */
+async function textoAtrasos(page: Page): Promise<string> {
+  return normalizar(await page.locator('section', { hasText: '¿Cuánto te deben' }).innerText());
+}
+
+/** Imita al traductor del navegador: cada nodo de texto visible pasa a <font><font>…</font></font>. */
+const traducirPagina = (page: Page) =>
+  page.evaluate(() => {
+    const caminante = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+      acceptNode: (n) => {
+        const padre = n.parentElement;
+        if (!padre || !(n.nodeValue ?? '').trim()) return NodeFilter.FILTER_REJECT;
+        if (/^(SCRIPT|STYLE|OPTION|NOSCRIPT|FONT)$/.test(padre.tagName)) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      },
+    });
+    const nodos: Text[] = [];
+    while (caminante.nextNode()) nodos.push(caminante.currentNode as Text);
+    for (const nodo of nodos) {
+      const exterior = document.createElement('font');
+      const interior = document.createElement('font');
+      interior.textContent = nodo.nodeValue;
+      exterior.appendChild(interior);
+      nodo.parentNode?.replaceChild(exterior, nodo);
+    }
+  });
+
+/** Errores de React al tocar nodos que el traductor ya cambió. */
+function vigilarErroresDeNodo(page: Page): string[] {
+  const errores: string[] = [];
+  page.on('pageerror', (e) => errores.push(e.message));
+  page.on('console', (m) => {
+    if (m.type() === 'error' && /NotFoundError|insertBefore|removeChild/.test(m.text())) errores.push(m.text());
+  });
+  return errores;
+}
+
+/** Hombre · jubilación desde el 4-feb-2021 · 2 hijos · sin prorrata: el bloque de atrasos a la vista. */
+async function hombreConAtrasos(page: Page): Promise<void> {
+  await responder06(page, {
+    pension: 'Jubilación (ordinaria o anticipada)',
+    fecha: 'El 4-feb-2021 o después',
+    hijos: '2',
+    sexo: 'Hombre',
+    otroProgenitor: 'No lo percibe ni lo ha solicitado',
+  });
+  await expect(campoFechaEfectos(page)).toBeVisible();
+}
+
+test.describe('inspector 26/10/2026', () => {
+  /**
+   * CASO 1 (NORMAL) — hombre · incapacidad permanente · desde el 4-feb-2021 · 3 hijos · sin
+   * prorrata · el otro progenitor no lo percibe ni lo ha solicitado (instrucción 1) · fecha de
+   * efectos 20/09/2022 · hoy 26/10/2026. A mano, con la serie de data/fiscal:
+   *   2022 → 28,00 × 3 × 14/12 = 98,00 al mes · septiembre, del 20 al 30 = 11/30:
+   *          98 × 3 + 98 × 11/30 = 294 + 35,9333 = 329,93 € (3,37 meses → «3,4»)
+   *   2023 → 30,40 × 3 × 14 = 1276,80 · 2024 → 33,20 × 3 × 14 = 1394,40
+   *   2025 → 35,90 × 3 × 14 = 1507,80
+   *   2026 → 36,90 × 3 × 14/12 = 129,15 al mes · 9 meses = 1162,35 · octubre 26/31 = 108,3194
+   *          → 1270,67 € (9,84 meses → «9,8»)
+   *   Total = 329,93 + 1276,80 + 1394,40 + 1507,80 + 1270,67 = 5779,60 € · cada mes más, 129,15 €
+   *   El veredicto del mes: 3 × 36,90 = 110,70 €/mes · × 14 = 1549,80 €/año.
+   * OBTENIDO el 26/10/2026: exactamente eso.
+   */
+  test('caso 1 (26/10): hombre, IP, 3 hijos, efectos 20/09/2022 → atrasos 5779,60 € con la cuantía de cada año', async ({
+    page,
+  }) => {
+    await cargarConReloj(page, HOY_INSPECCION);
+    await responder06(page, {
+      pension: 'Incapacidad permanente',
+      fecha: 'El 4-feb-2021 o después',
+      hijos: '3',
+      sexo: 'Hombre',
+      otroProgenitor: 'No lo percibe ni lo ha solicitado',
+    });
+    const resultado = await textoResultado(page);
+    expect(resultado).toContain('+110,70 €/mes');
+    expect(resultado).toContain('Anual (14 pagas) 1549,80 €/año');
+
+    await campoFechaEfectos(page).fill('2022-09-20');
+    const t = await textoAtrasos(page);
+    expect(t).toContain('Atrasos brutos por año: 3 hijos computables');
+    expect(t).toContain('2022 3,4 28,00 €/mes 329,93 €');
+    expect(t).toContain('2023 12,0 30,40 €/mes 1276,80 €');
+    expect(t).toContain('2024 12,0 33,20 €/mes 1394,40 €');
+    expect(t).toContain('2025 12,0 35,90 €/mes 1507,80 €');
+    expect(t).toContain('2026 9,8 36,90 €/mes 1270,67 €');
+    expect(t).not.toMatch(/\b2021 \d/); // ningún tramo antes de la fecha de efectos
+    expect(t).toContain('Atrasos hasta hoy 5779,60 €');
+    expect(t).toContain('Cada mes más que tarde la resolución +129,15 €');
+  });
+
+  /**
+   * CASO 2 (LÍMITE) — todos los bordes a la vez: hombre · viudedad · prorrata «40» · 7 hijos (topan
+   * en maxHijos 4) · sin otro progenitor · con denegación propia (reclamación) · efectos el MISMO
+   * 04/02/2021 (fechaMinimaHechoCausante, el primer día del complemento) · hoy 26/10/2026.
+   *   factor = 4 hijos × 0,40 = 1,6
+   *   2021 → 27 × 1,6 × 14/12 = 50,40 al mes · febrero, del 4 al 28 = 25/28 → 45,00 · + 10 × 50,40
+   *          = 549,00 € (10,89 meses → «10,9»)
+   *   2022 → 28 × 1,6 × 14 = 627,20 · 2023 → 30,40 × 1,6 × 14 = 680,96
+   *   2024 → 33,20 × 1,6 × 14 = 743,68 · 2025 → 35,90 × 1,6 × 14 = 804,16
+   *   2026 → 36,90 × 1,6 × 14/12 = 68,88 al mes · 9 = 619,92 · 68,88 × 26/31 = 57,7703 → 677,69
+   *   Total = 4082,69 € · cada mes más, 68,88 €
+   *   Veredicto: 4 × 36,90 × 0,40 = 59,04 €/mes · × 14 = 826,56 €/año, como reclamación; el MCP igual.
+   *   El día antes, 03/02/2021, no es este complemento: aviso y ninguna cifra.
+   * OBTENIDO el 26/10/2026: exactamente eso.
+   */
+  test('caso 2 (26/10, límite): 7 hijos, prorrata 40 % y efectos el 04/02/2021 → 4082,69 €; el 03/02/2021 no da cifra', async ({
+    page,
+    request,
+  }) => {
+    expect(COMPLEMENTO_BRECHA_GENERO_2026.fechaMinimaHechoCausante).toBe('2021-02-04');
+    await cargarConReloj(page, HOY_INSPECCION);
+    await responder06(page, {
+      pension: 'Viudedad',
+      fecha: 'El 4-feb-2021 o después',
+      hijos: '7',
+      sexo: 'Hombre',
+      otroProgenitor: 'No procede (sin otro progenitor)',
+      denegacionPropia: true,
+      prorrata: '40',
+    });
+    const resultado = await textoResultado(page);
+    expect(resultado).toContain('+59,04 €/mes');
+    expect(resultado).toContain('Posible reclamación retroactiva');
+    expect(resultado).toContain('Hijos computables 4 (máx. 4)');
+    expect(resultado).toContain('Anual (14 pagas) 826,56 €/año');
+
+    await expect(campoFechaEfectos(page)).toHaveAttribute('min', '2021-02-04');
+    await campoFechaEfectos(page).fill('2021-02-04');
+    let t = await textoAtrasos(page);
+    expect(t).toContain('Atrasos brutos por año: 4 hijos computables, prorrata del 40,00 %');
+    expect(t).toContain('2021 10,9 27,00 €/mes 549,00 €');
+    expect(t).toContain('2022 12,0 28,00 €/mes 627,20 €');
+    expect(t).toContain('2023 12,0 30,40 €/mes 680,96 €');
+    expect(t).toContain('2024 12,0 33,20 €/mes 743,68 €');
+    expect(t).toContain('2025 12,0 35,90 €/mes 804,16 €');
+    expect(t).toContain('2026 9,8 36,90 €/mes 677,69 €');
+    expect(t).toContain('Atrasos hasta hoy 4082,69 €');
+    expect(t).toContain('Cada mes más que tarde la resolución +68,88 €');
+
+    await campoFechaEfectos(page).fill('2021-02-03');
+    t = await textoAtrasos(page);
+    expect(t).toContain('Esa fecha es anterior al 4 de febrero de 2021');
+    expect(t).not.toContain('Atrasos hasta hoy');
+
+    const mcp = await porMcpDelegum(request, {
+      sexo: 'hombre',
+      num_hijos: 7,
+      tipo_pension: 'viudedad',
+      fecha_hecho_causante: 'desde_2021',
+      otro_progenitor: 'no_aplica',
+      denegacion_propia: true,
+      prorrata_porcentaje: 40,
+    });
+    expect(mcp).toContain('Posible reclamación retroactiva');
+    expect(mcp).toContain('59,04 €/mes (826,56 €/año, 14 pagas)');
+  });
+
+  /**
+   * CASO 3 (RECHAZO) — hombre · jubilación · 2 hijos · sin otro progenitor que lo pida:
+   *   · efectos el 01/11/2026 con hoy 26/10/2026 → posterior a hoy: aviso y ninguna cifra (y el
+   *     campo topa en hoy: max = 2026-10-26).
+   *   · hoy 15/01/2027 y efectos el 01/06/2026 → 2027 no está en COMPLEMENTO_BRECHA_GENERO_SERIE:
+   *     el motor se niega a sumarlo con la cuantía de 2026 y la página lo dice, sin total.
+   * OBTENIDO el 26/10/2026: exactamente eso.
+   */
+  test('caso 3 (26/10, rechazo): fecha posterior a hoy, o un año sin cuantía en data/fiscal → aviso y sin total', async ({
+    page,
+  }) => {
+    await cargarConReloj(page, HOY_INSPECCION);
+    await hombreConAtrasos(page);
+    await expect(campoFechaEfectos(page)).toHaveAttribute('max', '2026-10-26');
+    await campoFechaEfectos(page).fill('2026-11-01');
+    let t = await textoAtrasos(page);
+    expect(t).toContain('La fecha de efectos no puede ser posterior a hoy.');
+    expect(t).not.toContain('Atrasos hasta hoy');
+    await expect(campoFechaEfectos(page)).toHaveAttribute('aria-invalid', 'true');
+
+    expect(COMPLEMENTO_BRECHA_GENERO_SERIE.map((s) => s.anio)).not.toContain(2027);
+    await cargarConReloj(page, new Date('2027-01-15T12:00:00'));
+    await hombreConAtrasos(page);
+    await campoFechaEfectos(page).fill('2026-06-01');
+    t = await textoAtrasos(page);
+    expect(t).toContain('Falta la cuantía de 2027 en los datos de esta herramienta');
+    expect(t).not.toContain('Atrasos hasta hoy');
+  });
+
+  /**
+   * ABIERTO, hallazgo (inspector 26/10/2026) — ALTO (cálculo). Cabo C0285. Hombre · jubilación
+   * desde el 4-feb-2021 · 2 hijos · el otro progenitor ya lo percibe y su suma de pensiones es la
+   * menor. Por la instrucción 2, párrafo segundo, del Criterio 11/2025 (cita en la cabecera del
+   * bloque), si a la madre se le reconoció antes del 15/05/2025 al padre le corresponde el
+   * complemento por el periodo entre su hecho causante y el día primero del mes siguiente al del
+   * reconocimiento a ella. La web contesta «No procede ahora» y «le corresponde a él o a ella»
+   * sin nombrar ese periodo, y no pinta la nota de la instrucción 2 que sí pinta con «No lo sé» o
+   * «La mía es menor». Con hecho causante el 01/03/2022 y reconocimiento a la madre el 10/06/2023
+   * el periodo vale, con el método de atrasos.ts, 10 × 65,33 + 6 × 70,93 = 653,33 + 425,60 =
+   * 1078,93 € que la app da por no debidos.
+   */
+  test.fail('C0285 (web): con la suma de la madre menor, el veredicto avisa del periodo de la instrucción 2', async ({
+    page,
+  }) => {
+    await responder06(page, {
+      pension: 'Jubilación (ordinaria o anticipada)',
+      fecha: 'El 4-feb-2021 o después',
+      hijos: '2',
+      sexo: 'Hombre',
+      otroProgenitor: 'Ya lo percibe por los mismos hijos',
+      sumaMenor: 'La del otro progenitor es menor',
+    });
+    const resultado = await textoResultado(page);
+    expect(resultado).toContain('Resultado orientativo'); // control: el veredicto está pintado
+    // «antes del / anterior al 15 de mayo de 2025»: no casa con «STJUE de 15 de mayo de 2025»
+    expect(resultado).toMatch(/(antes del|anterior al) (15 de mayo de 2025|15\/05\/2025)/);
+  });
+
+  /** ABIERTO, hallazgo (inspector 26/10/2026) — el mismo C0285 por la tool del MCP (gemelo). */
+  test.fail('C0285 (MCP): con la suma de la madre menor, la tool avisa del periodo de la instrucción 2', async ({
+    request,
+  }) => {
+    const mcp = await porMcpDelegum(request, {
+      sexo: 'hombre',
+      num_hijos: 2,
+      tipo_pension: 'jubilacion',
+      fecha_hecho_causante: 'desde_2021',
+      otro_progenitor: 'percibe',
+      suma_pensiones_menor: 'otro_progenitor',
+    });
+    expect(mcp).toContain('Complemento por Brecha de Género'); // control: es la respuesta de la tool
+    expect(mcp).toMatch(/(antes del|anterior al) (15 de mayo de 2025|15\/05\/2025)/);
+  });
+
+  /**
+   * ABIERTO, hallazgo (inspector 26/10/2026) — MEDIO (cálculo). Con la P5 en «Lo solicitó y se lo
+   * denegaron» (el otro progenitor SÍ lo solicitó), la página monta los atrasos y publica un total
+   * bajo la cita de la instrucción 1, «para un hombre sin solicitud ni reconocimiento previo del
+   * complemento al otro progenitor». Su supuesto es el contrario: con solicitud del otro rige la
+   * instrucción 2, que no fija esos efectos. La propia app lo declara (comentario de page.tsx:
+   * «sin que el otro progenitor lo pidiera o lo cobre»; EFECTOS_COMPLEMENTO_BRECHA_VARONES: «Si el
+   * otro progenitor lo pidió o ya lo cobra […] la app no da cifra»), pero la condición es
+   * `otroProgenitor !== 'percibe'`. Con efectos el 04/02/2021 publica 686,25 + 784,00 + 851,20 +
+   * 929,60 + 1005,20 + … € de atrasos. Correcto: sin total bajo esa cita (o con una cita que cubra
+   * el caso).
+   */
+  test.fail('el otro progenitor lo solicitó: no se publican atrasos bajo la cita «sin solicitud» de la instrucción 1', async ({
+    page,
+  }) => {
+    await responder06(page, {
+      pension: 'Jubilación (ordinaria o anticipada)',
+      fecha: 'El 4-feb-2021 o después',
+      hijos: '2',
+      sexo: 'Hombre',
+      otroProgenitor: 'Lo solicitó y se lo denegaron',
+    });
+    expect(await textoResultado(page)).toContain('+73,80 €/mes'); // control: el veredicto del mes no cambia
+    let t = '';
+    if ((await campoFechaEfectos(page).count()) > 0) {
+      await campoFechaEfectos(page).fill('2021-02-04');
+      t = await textoAtrasos(page);
+    }
+    const totalBajoLaCita = t.includes('Atrasos hasta hoy') && t.includes('sin solicitud ni reconocimiento previo');
+    expect(totalBajoLaCita).toBe(false);
+  });
+
+  /**
+   * ABIERTO, hallazgo (inspector 26/10/2026) — ALTO (operativa). Página traducida (cabo C0243):
+   * con un aviso de fecha en pantalla («Esa fecha es anterior…»), vaciar o editar el campo de la
+   * fecha de efectos —un date a medio escribir vale ''— tumba la app: NotFoundError en
+   * removeChild y «Algo salió mal». El <p> del aviso tiene tres hijos (el ⚠️, un espacio y el
+   * texto) y el de «Escribe la fecha…» uno solo: al pasar del uno al otro React retira dos nodos
+   * de texto que el traductor ya cambió por <font>. Medido el 26/10/2026.
+   */
+  test.fail('página traducida: vaciar la fecha de efectos tras un aviso no tumba la app', async ({ page }) => {
+    const errores = vigilarErroresDeNodo(page);
+    await hombreConAtrasos(page);
+    await campoFechaEfectos(page).fill('2021-01-15');
+    await expect(page.getByText(/Esa fecha es anterior al 4 de febrero de 2021/)).toBeVisible();
+    await traducirPagina(page);
+    await campoFechaEfectos(page).fill('');
+    await expect(page.getByText('Algo salió mal')).toHaveCount(0);
+    await expect(page.getByText(/Escribe la fecha y se suman los atrasos/)).toBeVisible();
+    expect(errores).toEqual([]);
+  });
+
+  /**
+   * ABIERTO, hallazgo (inspector 26/10/2026) — BAJO (operativa). Página traducida: tres avisos con
+   * la forma `<span>⚠️</span> {texto}` se quedan con el texto ANTERIOR, porque React escribe en el
+   * nodo que el traductor retiró. Atrasos: «Esa fecha es anterior al 4 de febrero de 2021» sigue
+   * ahí con una fecha posterior a hoy.
+   */
+  test.fail('página traducida: el aviso de la fecha de efectos dice el error de la fecha escrita', async ({ page }) => {
+    await hombreConAtrasos(page);
+    await campoFechaEfectos(page).fill('2021-01-15');
+    await expect(page.getByText(/Esa fecha es anterior al 4 de febrero de 2021/)).toBeVisible();
+    await traducirPagina(page);
+    await campoFechaEfectos(page).fill('2099-01-01');
+    const t = await textoAtrasos(page);
+    expect(t).toContain('La fecha de efectos no puede ser posterior a hoy.');
+    expect(t).not.toContain('Esa fecha es anterior');
+  });
+
+  /** ABIERTO, hallazgo (inspector 26/10/2026) — el mismo: el aviso de la prorrata se queda con «0». */
+  test.fail('página traducida: el aviso de la prorrata nombra el valor escrito, no el anterior', async ({ page }) => {
+    await elegir(page, 'Sí, a prorrata (totalización internacional)');
+    const aviso = page.locator('#prorrata ~ p[role="alert"]');
+    await page.locator('#prorrata').fill('0');
+    await expect(aviso).toContainText('«0» está fuera de rango');
+    await traducirPagina(page);
+    await page.locator('#prorrata').fill('-25');
+    await expect(aviso).toContainText('«-25» está fuera de rango');
+  });
+
+  /** ABIERTO, hallazgo (inspector 26/10/2026) — el mismo: el aviso de hijos no pasa a «supera el tope». */
+  test.fail('página traducida: el aviso del número de hijos dice que 25 supera el tope', async ({ page }) => {
+    const aviso = page.locator('#hijos ~ p[role="alert"]');
+    await page.locator('#hijos').fill('');
+    await expect(aviso).toContainText('Escribe un número entero de hijos, de 0 a 20.');
+    await traducirPagina(page);
+    await page.locator('#hijos').fill('25');
+    await expect(aviso).toContainText('«25» supera el tope de 20 hijos');
+  });
+
+  /**
+   * Control de la receta (26/10/2026): con la página traducida, ir y volver en cada pregunta del
+   * cuestionario y verificar no tumba la app ni deja el veredicto viejo: cada cambio desmonta el
+   * resultado (reset) y el veredicto es el único hijo de su elemento.
+   */
+  test('página traducida: ir y volver en las preguntas y verificar no tumba la app', async ({ page }) => {
+    const errores = vigilarErroresDeNodo(page);
+    const importe = page.locator('[class*="resultImporte"]');
+    const verificar = page.getByRole('button', { name: 'Verificar mi derecho' });
+    for (const [ir, esperado] of [
+      ['Jubilación parcial', 'No procede ahora'],
+      ['Antes del 4-feb-2021', 'No procede ahora'],
+      ['Sí, me alcanza alguna', 'No procede ahora'],
+      ['Ya lo percibe por los mismos hijos', 'Depende de la suma de pensiones'],
+    ] as const) {
+      const volver = {
+        'Jubilación parcial': 'Viudedad',
+        'Antes del 4-feb-2021': 'El 4-feb-2021 o después',
+        'Sí, me alcanza alguna': 'No me alcanza ninguna',
+        'Ya lo percibe por los mismos hijos': 'No lo percibe ni lo ha solicitado',
+      }[ir];
+      await traducirPagina(page);
+      await elegir(page, ir);
+      await verificar.click();
+      await expect(importe).toHaveText(esperado);
+      await traducirPagina(page);
+      await elegir(page, volver);
+      await verificar.click();
+      // Estado del beforeEach: viudedad, 2 hijos → 2 × 36,90 = 73,80 €/mes
+      await expect(importe).toHaveText(/^\+73,80\s€\/mes$/);
+    }
+    await expect(page.getByText('Algo salió mal')).toHaveCount(0);
+    expect(errores).toEqual([]);
+  });
+
+  /**
+   * ABIERTO, hallazgo (inspector 26/10/2026) — BAJO (dato). El sello del complemento dice «Art. 60
+   * LGSS (RDL 8/2015, modificado por RDL 3/2021) + RDL 3/2026». La LGSS es un Real Decreto
+   * LEGISLATIVO —el Criterio 11/2025: «aprobado por el Real Decreto Legislativo 8/2015, de 30 de
+   * octubre»; el propio módulo, en COMPLEMENTO_MATERNIDAD_DEROGADO.norma, «RDLeg 8/2015»—, y en el
+   * mismo sello «RDL» nombra Reales Decretos-ley (3/2021, 3/2026). Y el art. 60 que aplica la app
+   * es el vigente desde el 18/03/2023: el módulo dice que «solo lo modifican el RDL 3/2021 y el RDL
+   * 2/2023», y el sello calla el segundo.
+   */
+  test.fail('el sello del complemento cita la LGSS como RDLeg y la modificación del RDL 2/2023', async ({ page }) => {
+    const fuente = COMPLEMENTO_BRECHA_GENERO_META.fuente;
+    expect(normalizar(await page.locator('body').innerText())).toContain(fuente); // control: es lo que se pinta
+    expect(fuente).not.toMatch(/RDL 8\/2015/);
+    expect(fuente).toMatch(/RDL 2\/2023/);
+  });
+});
+
+// Móvil (390 × 844): la tabla de atrasos, función nueva del 18/10, cabe sin desbordar.
+test.describe('inspector 26/10/2026 — móvil', () => {
+  test.use({
+    viewport: { width: 390, height: 844 },
+    userAgent:
+      'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  /** Medido el 26/10/2026: scrollWidth 390, la tabla de 276 px de ancho. */
+  test('la tabla de atrasos desde el 04/02/2021 cabe en 390 px y el total se ve', async ({ page }) => {
+    await hombreConAtrasos(page);
+    await campoFechaEfectos(page).fill('2021-02-04');
+    const total = page.getByText('Atrasos hasta hoy');
+    await total.scrollIntoViewIfNeeded();
+    await expect(total).toBeVisible();
+    const tabla = page.locator('section', { hasText: '¿Cuánto te deben' }).locator('table');
+    const caja = await tabla.boundingBox();
+    expect(caja).not.toBeNull();
+    const { x, width } = caja as { x: number; width: number };
+    expect(x).toBeGreaterThanOrEqual(0);
+    expect(x + width).toBeLessThanOrEqual(390);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
   });
 });
