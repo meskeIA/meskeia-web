@@ -58,6 +58,7 @@ import fs from 'fs';
 import path from 'path';
 import { spawn } from 'child_process';
 import { fileURLToPath } from 'url';
+import { lineaDeBase, nuevasDelDia, nuevasQueYaNoAparecen } from './ronda-base.mjs';
 
 const RAIZ = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const PUERTO = 3050;
@@ -461,7 +462,7 @@ function comparar(actual, anterior) {
   };
 }
 
-function escribirInforme(res, dif, segundos, fecha, control) {
+function escribirInforme(res, dif, segundos, fecha, control, base, delDia) {
   fs.mkdirSync(DIR_INFORMES, { recursive: true });
   const conError = res.filter(r => r.errores.length);
   const conAviso = res.filter(r => !r.errores.length && r.avisos.length);
@@ -477,7 +478,9 @@ function escribirInforme(res, dif, segundos, fecha, control) {
     L.push('');
   }
   if (dif) {
-    L.push(`Frente a la ronda anterior: ${dif.nuevas.length} nuevas · ${dif.resueltas.length} resueltas · ${dif.persistentes.length} persistentes`);
+    // `ronda-hoy.mjs` lee esta línea hasta «persistentes»: lo que va detrás no la rompe.
+    // «Anterior» es la última ronda de un DÍA anterior, no la última vuelta (C0466).
+    L.push(`Frente a la ronda anterior: ${dif.nuevas.length} nuevas · ${dif.resueltas.length} resueltas · ${dif.persistentes.length} persistentes (la del ${base.fecha})`);
     if (dif.nuevas.length) {
       L.push('');
       L.push('**Nuevas desde la última ronda** (esto es lo que hay que mirar primero):');
@@ -509,6 +512,16 @@ function escribirInforme(res, dif, segundos, fecha, control) {
     L.push('');
   }
 
+  // Al final y bajo su propio «##»: `ronda-hoy.mjs` lee la lista de nuevas hasta el primer
+  // «#», y éstas no son nuevas de ESTA vuelta (C0466)
+  const yaNo = dif ? nuevasQueYaNoAparecen(delDia, dif.nuevas) : [];
+  if (yaNo.length) {
+    L.push('## Nuevas en una vuelta anterior de hoy que ya no aparecen');
+    L.push('');
+    for (const u of yaNo) L.push(`- ${u}`);
+    L.push('');
+  }
+
   // Local y producción llevan estado separado: mezclarlos haría que un arreglo aún
   // sin desplegar apareciese como "resuelto" en la ronda de producción.
   const sufijo = PRODUCCION ? '-produccion' : '';
@@ -524,7 +537,10 @@ function escribirInforme(res, dif, segundos, fecha, control) {
     avisos: conAviso.length,
     segundos,
     control: control ? { cazadas: control.cazadas, total: control.total } : null,
-    conIncidencia: res.filter(r => r.errores.length || r.avisos.length).map(r => r.url),
+    // La base con la que se comparó, para que otra vuelta de hoy use la misma (C0466)
+    base,
+    nuevasDelDia: delDia,
+    conIncidencia:res.filter(r => r.errores.length || r.avisos.length).map(r => r.url),
     detalle: res.filter(r => r.errores.length || r.avisos.length)
       .map(r => ({ url: r.url, errores: r.errores, avisos: r.avisos })),
   };
@@ -616,8 +632,12 @@ let anterior = null;
 if (!ES_PARCIAL) {
   try { anterior = JSON.parse(fs.readFileSync(FICHERO_ESTADO(), 'utf8')); } catch { }
 }
-const dif = comparar(res, anterior);
-const { conError, conAviso, nombre } = escribirInforme(res, dif, segundos, fecha, control);
+// La base es la última ronda de un día ANTERIOR: una segunda vuelta de hoy no se compara
+// con la primera (C0466, cabecera de ronda-base.mjs)
+const base = lineaDeBase(anterior, fecha);
+const dif = comparar(res, base);
+const delDia = nuevasDelDia(anterior, fecha, dif ? dif.nuevas : []);
+const { conError, conAviso, nombre } = escribirInforme(res, dif, segundos, fecha, control, base, delDia);
 
 console.log(`\n${'─'.repeat(64)}`);
 console.log(`${ES_PARCIAL ? 'Pasada parcial' : 'Ronda completa'}: ${res.length} URLs en ${segundos} s`);
