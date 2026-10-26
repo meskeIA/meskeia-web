@@ -48,6 +48,7 @@ import {
   calcularRegistro,
   honorariosLlevanIVA,
   calcularPlusvaliaMunicipal,
+  plusvaliaNoSujetaSinPeriodo,
   ENLACE_CATASTRO,
   TERRITORIOS_SIN_IVA,
   CIUDADES_CON_BONIFICACION,
@@ -292,7 +293,19 @@ function calcularVendedor(e: EntradaVendedor) {
    * mandaba al recibo del IBI a por un dato que no cambia nada, contra el propio bloque
    * educativo, que dice «si vendes con pérdida no hay impuesto» (patrón 4, hallazgo 1572).
    */
-  const sinIncremento = e.precioC > 0 && e.precioV <= e.precioC;
+  const datosPlusvalia = {
+    // Sin incremento el suelo y los años no intervienen (sale no sujeta): se pasan a 0.
+    valorCatastralSuelo: e.valorSuelo > 0 ? e.valorSuelo : 0,
+    precioCompra: e.precioC,
+    precioVenta: e.precioV,
+    valorCatastralTotal: e.valorTotal !== undefined && e.valorTotal > 0 ? e.valorTotal : undefined,
+    // Ceuta y Melilla: la cuota, bonificada al 50 % (art. 159.2 TRLRHL; hallazgo 3060).
+    ccaa: e.ccaa,
+    adquisicionSoloSuelo: e.compraSoloSuelo,
+  };
+  // Comprado un solar, la no sujeción compara el suelo de la venta con lo pagado por el solar,
+  // también sin años: hasta el 26/10/2026 solo valía venta ≤ compra (hallazgo 3517).
+  const sinIncremento = plusvaliaNoSujetaSinPeriodo(datosPlusvalia);
   /** Con años = 0 hacen falta además los meses completos, para prorratear el coeficiente (1560). */
   const periodoCompleto = Number.isFinite(e.anios) && (e.anios >= 1 || e.meses !== undefined);
   // En el País Vasco y Navarra la plusvalía es foral: no se liquida con el TRLRHL (3071).
@@ -301,16 +314,9 @@ function calcularVendedor(e: EntradaVendedor) {
     !plusvaliaForal && e.precioC > 0 && (sinIncremento || (e.valorSuelo > 0 && periodoCompleto));
   const resultadoPlusvalia = plusvaliaCalculable
     ? calcularPlusvaliaMunicipal({
-        // Sin incremento el suelo y los años no intervienen (sale no sujeta): se pasan a 0.
-        valorCatastralSuelo: e.valorSuelo > 0 ? e.valorSuelo : 0,
+        ...datosPlusvalia,
         aniosPropiedad: Number.isFinite(e.anios) ? e.anios : 0,
         mesesCompletos: e.meses,
-        precioCompra: e.precioC,
-        precioVenta: e.precioV,
-        valorCatastralTotal: e.valorTotal !== undefined && e.valorTotal > 0 ? e.valorTotal : undefined,
-        // Ceuta y Melilla: la cuota, bonificada al 50 % (art. 159.2 TRLRHL; hallazgo 3060).
-        ccaa: e.ccaa,
-        adquisicionSoloSuelo: e.compraSoloSuelo,
       })
     : null;
   const plusvalia = e.plusvaliaForzada ?? (resultadoPlusvalia ? resultadoPlusvalia.recomendado : 0);

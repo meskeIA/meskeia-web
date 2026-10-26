@@ -9626,8 +9626,10 @@ test.describe('Inspector 26/10/2026 — el 833 en Andalucía, la igualdad del ar
    *     salir más baja o no sujeta; con el total bien escrito (30.000) sería NO SUJETA, así que el neto real
    *     puede ser MAYOR, mientras la renta del promotor, que falta, lo bajaría: sin dirección segura.
    *     Neto publicado 42.000 − 1.260 − 420 = 40.320,00 € (PARCIAL), total 1.680,00 €.
-   *   · Años «-3» (con el total ya legible): imposibles, el blur no los acota (acotarAlSalir={false}) y la
-   *     plusvalía no se liquida: «No calculada (los años de propiedad no pueden ser negativos)». Neto
+   *   · Años «-3» (con el total ya legible): imposibles, el blur no los acota (acotarAlSalir={false}).
+   *     Con el solar a 16.800 la no sujeción no depende de los años (hallazgo 3515, 26/10/2026): sigue
+   *     «NO SUJETA», como con pérdida. Con el solar a 16.799 hay incremento (el JB: 0,25 € con años), y
+   *     la plusvalía no se liquida: «No calculada (los años de propiedad no pueden ser negativos)». Neto
    *     42.000 − 1.260 = 40.740,00 € (PARCIAL), y se pide corregirlos.
    */
   test('CASO JC (rechazo) — obra nueva con el solar: un total catastral ilegible no es un cero ni un dato, y unos años negativos no se liquidan', async ({
@@ -9656,7 +9658,9 @@ test.describe('Inspector 26/10/2026 — el 833 en Andalucía, la igualdad del ar
     await sembrarImporte(page, 'Valor catastral total (suelo + construcción) (€)', '30000');
     await sembrarImporte(page, 'Años de propiedad', '-3');
     await expect(page.locator('input[aria-label="Años de propiedad"]')).toHaveValue('-3');
-    expect(await i24Valor(page, /^Plusvalía municipal/)).toBe('Sin calcular');
+    expect(await i24Valor(page, /^Plusvalía municipal/)).toBe('NO SUJETA');
+    await sembrarImporte(page, 'Precio de compra original del garaje', '16799');
+    await expect.poll(() => i24Valor(page, /^Plusvalía municipal/)).toBe('Sin calcular');
     expect(await i24Desc(page, /^Plusvalía municipal/)).toBe('No calculada (los años de propiedad no pueden ser negativos)');
     expect(await i24Valor(page, /^Total gastos vendedor/)).toBe('1260,00 €');
     expect(await i24Valor(page, /^IMPORTE NETO VENDEDOR/)).toBe('40.740,00 €');
@@ -9866,14 +9870,14 @@ test.describe('Inspector 26/10/2026 — con el solar, la no sujeción no pide lo
   });
 
   /**
-   * HALLAZGO [26/10-b] (cálculo, bajo) — ABIERTO. Lo mismo con los años VACÍOS: los años no intervienen
+   * HALLAZGO [26/10-b] (cálculo, bajo; hallazgo 3515) — REPARADO el 26/10/2026 con
+   * `plusvaliaNoSujetaSinPeriodo` del motor compartido, en las cuatro hermanas. Lo mismo con los años VACÍOS: los años no intervienen
    * en la no sujeción (el motor compartido la da con 0, 3 o 20), así que lo esperado es «NO SUJETA» y el
    * neto 29.100,00 sin pedir nada. Obtenido el 26/10/2026: «Sin calcular · No calculada (faltan los años
    * de propiedad)» y en el neto «No descuenta la plusvalía municipal… Rellena los años de propiedad para
    * calcular lo demás.»: se pide un dato que no cambia nada (la forma del hallazgo 1564, patrón 4).
    */
   test('HALLAZGO [26/10-b] — con el solar y el suelo de la venta igual a lo pagado, NO SUJETA aunque falten los años', async ({ page }) => {
-    test.fail(!I26_VER_HUECOS, 'hallazgo [26/10-b] abierto: la no sujeción con el solar exige los años');
     for (const anios of [0, 3, 20]) {
       const r = calcularPlusvaliaMunicipal({
         valorCatastralSuelo: 9000,

@@ -8366,8 +8366,6 @@ test.describe('Inspector 25/10/2026 — la página traducida por el navegador', 
 //     la propia app (page.tsx, `calcularVendedor`, hallazgo 1564).
 // ═══════════════════════════════════════════════════════════════════════════════
 
-const T26_VER_HUECOS = T25_VER_HUECOS;
-
 /** Obra nueva con la comunidad, la modalidad y el precio, comprobando que cada botón ha entrado. */
 async function t26ObraNueva(page: Page, ccaa: string, modalidad: 'vinculado' | 'independiente', precio: string): Promise<void> {
   await t25Abrir(page, ccaa);
@@ -8586,7 +8584,8 @@ test.describe('Inspector 26/10/2026 — obra nueva con el «¿Qué compraste?»:
   });
 
   /**
-   * [26/10-a] (cálculo, bajo) — ABIERTO. Con el solar, la no sujeción del art. 104.5 TRLRHL se decide
+   * [26/10-a] (cálculo, bajo; hallazgo 3514) — REPARADO el 26/10/2026 con `plusvaliaNoSujetaSinPeriodo`
+   * del motor compartido, en las cuatro hermanas con pestaña Vendedor y solar. Con el solar, la no sujeción del art. 104.5 TRLRHL se decide
    * comparando lo pagado por el solar con el suelo de la venta (venta × suelo / total); los años no
    * intervienen. `calcularVendedor` (page.tsx l. 408-414) solo da la plusvalía por resuelta sin años
    * cuando venta ≤ compra (`sinIncremento`), que es la regla de la compra CON construcción: con el solar,
@@ -8600,7 +8599,6 @@ test.describe('Inspector 26/10/2026 — obra nueva con el «¿Qué compraste?»:
    * El motor compartido ya lo decide sin años: es el ancla de lo esperado.
    */
   test('[26/10-a] con el solar y el suelo de la venta por debajo de lo pagado, la plusvalía es NO SUJETA aunque falten los años', async ({ page }) => {
-    test.fail(!T26_VER_HUECOS, 'hallazgo [26/10-a] abierto: la no sujeción con el solar exige los años');
     for (const anios of [0, 3, 20]) {
       const r = calcularPlusvaliaMunicipal({
         valorCatastralSuelo: 9000,

@@ -7772,7 +7772,7 @@ test.describe('Inspector 25/10/2026 — la página traducida por el navegador', 
     await sembrarImporte12(page, 'Gestoría y certificados del vendedor (€)', '500');
     await esperarTarjeta2609(page, /^NETO QUE RECIBES/, '186.687,00 €');
 
-    const paso = async (nombre: string, accion: () => Promise<void>, tarjeta: string | RegExp, esperado: string) => {
+    const paso = async (nombre: string, accion: () => Promise<unknown>, tarjeta: string | RegExp, esperado: string) => {
       await traducir2510(page);
       await accion();
       await esperarTarjeta2609(page, tarjeta, esperado);
@@ -8204,7 +8204,8 @@ test.describe('Inspector 26/10/2026 — Murcia con la gestoría de serie, el pro
   });
 
   /**
-   * [26/10-a] (cálculo, bajo) — ABIERTO. La forma medida hoy en trastero, garaje y la referencia. En obra
+   * [26/10-a] (cálculo, bajo; hallazgo 3517) — REPARADO el 26/10/2026 con `plusvaliaNoSujetaSinPeriodo`
+   * del motor compartido, en las cuatro hermanas. La forma medida hoy en trastero, garaje y la referencia. En obra
    * nueva con «¿Qué compraste?» = solar, la no sujeción del art. 104.5 TRLRHL se decide comparando lo
    * pagado por el solar con el suelo de la venta (venta × suelo / total) y no depende de los años: el
    * motor compartido la da con 0, 3 o 20 (abajo). Pero calcularVendedor (page.tsx l. 295-301) solo da por
@@ -8218,7 +8219,6 @@ test.describe('Inspector 26/10/2026 — Murcia con la gestoría de serie, el pro
    *   propiedad)» y «Rellena los años de propiedad para calcular lo demás».
    */
   test('[26/10-a] en obra nueva, con el solar y los años VACÍOS, la plusvalía sale no sujeta sin pedir los años (art. 104.5 TRLRHL)', async ({ page }) => {
-    test.fail(!VER_HUECOS_2510, 'hallazgo abierto del 26/10/2026: calcularVendedor solo resuelve la plusvalía sin años con venta ≤ compra');
     for (const aniosPropiedad of [0, 3, 20]) {
       const r = calcularPlusvaliaMunicipal({
         valorCatastralSuelo: 9000,
@@ -8365,7 +8365,7 @@ test.describe('Inspector 26/10/2026 — la página traducida en el móvil (390 �
     await sembrarImporte12(page, 'Valor catastral total (suelo + construcción) (€)', '20000');
     await esperarTarjeta2609(page, 'Plusvalía municipal (IIVTNU)', '0,00 €');
 
-    const paso = async (nombre: string, accion: () => Promise<void>, tarjeta: string | RegExp, esperado: string) => {
+    const paso = async (nombre: string, accion: () => Promise<unknown>, tarjeta: string | RegExp, esperado: string) => {
       await traducir2510(page);
       await accion();
       await esperarTarjeta2609(page, tarjeta, esperado);

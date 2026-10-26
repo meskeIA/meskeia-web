@@ -11776,7 +11776,8 @@ test.describe('Inspector 26/10/2026 — con el solar, la no sujeción no pide lo
   });
 
   /**
-   * HALLAZGO [cálculo, bajo] — ABIERTO. Lo mismo con los años VACÍOS: los años no intervienen en la no
+   * HALLAZGO [cálculo, bajo] (3516) — REPARADO el 26/10/2026 con `plusvaliaNoSujetaSinPeriodo` del
+   * motor compartido, en las cuatro hermanas. Lo mismo con los años VACÍOS: los años no intervienen en la no
    * sujeción (el motor compartido la da con 0, 3 o 20), así que lo esperado es «NO SUJETA» y el neto
    * 29.100,00 sin pedir nada. Obtenido el 26/10/2026: «Sin calcular · Faltan los años de tenencia. Este
    * impuesto NO está incluido en el neto de abajo.» y en el neto «No descuenta la plusvalía municipal…
@@ -11784,7 +11785,6 @@ test.describe('Inspector 26/10/2026 — con el solar, la no sujeción no pide lo
    * del hallazgo 1564, patrón 4).
    */
   test('HALLAZGO cálculo — con el solar y el suelo de la venta igual a lo pagado, NO SUJETA aunque falten los años', async ({ page }) => {
-    test.fail(true, 'ABIERTO: la no sujeción con el solar exige los años');
     for (const anios of [0, 3, 20]) {
       const r = calcularPlusvaliaMunicipal({
         valorCatastralSuelo: 9000,

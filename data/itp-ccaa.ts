@@ -2039,6 +2039,21 @@ export function calcularPlusvaliaMunicipal(datos: DatosPlusvalia): {
   };
 }
 
+/**
+ * ¿Sale la plusvalía NO SUJETA (art. 104.5 TRLRHL) sin saber cuánto tiempo se tuvo el inmueble?
+ * La no sujeción compara valores, no periodos: venta − compra, o, comprado un solar, el suelo de
+ * la venta (venta × suelo / total) con lo pagado por el solar. Las apps de compraventa solo daban
+ * la plusvalía por resuelta sin años con venta ≤ compra, y con el solar la dejaban «Sin calcular»
+ * pidiendo un dato que no cambia nada (hallazgos 3514-3517, 26/10/2026). Se decide con el MISMO
+ * motor, para que la regla no se copie en cada app.
+ */
+export function plusvaliaNoSujetaSinPeriodo(
+  datos: Omit<DatosPlusvalia, 'aniosPropiedad' | 'mesesCompletos'>,
+): boolean {
+  if (!(datos.precioCompra > 0)) return false;
+  return calcularPlusvaliaMunicipal({ ...datos, aniosPropiedad: 0, mesesCompletos: 0 }).exento;
+}
+
 // Enlace para consultar valor de referencia catastral
 export const ENLACE_CATASTRO = 'https://www1.sedecatastro.gob.es/Accesos/SECAccvrc.aspx';
 
