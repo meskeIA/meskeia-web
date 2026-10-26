@@ -7052,7 +7052,8 @@ test.describe('Inspector 24/10/2026 — Galicia con el vendedor afecto, Asturias
   test('[24/10-a] la plusvalía «la paga el vendedor» nombra al comprador sustituto cuando vende una persona física no residente (art. 106.2 TRLRHL)', async ({ page }) => {
     await abrir0810(page);
     const faq = (await faqPage0710(page)).get('¿Qué gastos e impuestos paga el vendedor de un local comercial?') ?? '';
-    expect(faq).toContain('El vendedor paga la plusvalía municipal (IIVTNU), porque el local está sobre suelo urbano.');
+    // Desde el 3519 (26/10/2026) la frase sigue con la no sujeción sin incremento del terreno.
+    expect(faq).toContain('El vendedor paga la plusvalía municipal (IIVTNU), porque el local está sobre suelo urbano, salvo que');
     const sello = ((await page.locator('[aria-label="Datos de referencia normativos"]').nth(1).innerText()) ?? '').replace(ESPACIO_DURO, ' ');
     expect(sello).toContain('lo que paga quien vende');
     const educativo = await textoDe1310(
@@ -7220,11 +7221,6 @@ test.describe('Inspector 24/10/2026 — en el móvil (390 × 844)', () => {
 //   · IRPF → `TRAMOS_GANANCIAS_PATRIMONIALES_2025` (19/21/23/27/30 %).
 // ═════════════════════════════════════════════════════════════════════════════
 
-/**
- * `VER_HUECOS=1` quita la marca de los hallazgos abiertos y enseña por qué fallan. Los del 25/10 ya no la
- * llevan (REPARADOS ese día); la usan los del 26/10, al final del fichero.
- */
-const VER_HUECOS_2510 = Boolean(process.env.VER_HUECOS);
 
 /** Las casillas del recuadro de la comunidad, tal como se leen («ITP General8 %»). */
 async function recuadro2510(page: Page): Promise<string[]> {
@@ -8280,7 +8276,8 @@ test.describe('Inspector 26/10/2026 — Murcia con la gestoría de serie, el pro
   });
 
   /**
-   * [26/10-c] (contenido, bajo) — ABIERTO. Nodo hermano que dejó 3504: dos bocas dan la plusvalía por segura
+   * [26/10-c] (contenido, bajo; hallazgo 3519) — REPARADO el 26/10/2026: las dos bocas dicen que sin
+   * incremento del terreno la venta no está sujeta, aunque haya ganancia. Nodo hermano que dejó 3504: dos bocas dan la plusvalía por segura
    * en cualquier venta, y la propia app la da NO SUJETA (art. 104.5 TRLRHL) cuando no hay incremento del
    * suelo, también CON GANANCIA desde 0b5711db (el promotor que compró el solar, CASO 62).
    *   · El caso de uso «Vender el local con ganancia» de la guía (page.tsx l. 2491-2497) cierra, tras
@@ -8296,7 +8293,6 @@ test.describe('Inspector 26/10/2026 — Murcia con la gestoría de serie, el pro
    *   «No sujeta» · esperado: ninguna boca afirma que la plusvalía se paga siempre · obtenido: las dos.
    */
   test('[26/10-c] ni la guía ni el FAQPage dan por segura la plusvalía de una venta que la propia app da por no sujeta', async ({ page }) => {
-    test.fail(!VER_HUECOS_2510, 'hallazgo abierto del 26/10/2026: «En todos los casos hay plusvalía municipal» y «El vendedor paga la plusvalía… Hay una excepción»');
     await abrir0810(page);
     await page.selectOption('#select-ccaa', 'murcia');
     await page.getByRole('button', { name: /Obra nueva/ }).click();

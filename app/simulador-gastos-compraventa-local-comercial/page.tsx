@@ -2502,7 +2502,12 @@ export default function SimuladorLocalComercialPage() {
                 ({conPct(formatNumber(TIPO_AHORRO_MIN, 0))}-{conPct(formatNumber(TIPO_AHORRO_MAX, 0))}). Si vendes
                 como empresa, tributa en el Impuesto sobre Sociedades. Si eres el promotor y es una primera
                 entrega (obra nueva), tu renta no es una ganancia del ahorro sino un rendimiento de actividad
-                económica, o renta de tu sociedad. En todos los casos hay plusvalía municipal.
+                económica, o renta de tu sociedad. La plusvalía municipal, en cambio, no sigue a la
+                ganancia: solo se paga si el terreno ha ganado valor, y sin ese incremento la venta no está
+                sujeta aunque se gane dinero (art. 104.5 TRLRHL), como el promotor que vende el suelo por lo
+                que pagó por el solar.
+                {/* Hallazgo 3519 (26/10/2026): decía «En todos los casos hay plusvalía municipal»,
+                    y la propia calculadora la da no sujeta en ese caso (CASO 62). */}
               </p>
             </div>
           </div>
