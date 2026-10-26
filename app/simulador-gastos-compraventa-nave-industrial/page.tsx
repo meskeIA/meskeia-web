@@ -452,7 +452,9 @@ export default function SimuladorNaveIndustrialPage() {
           <span key="sin-iva">
             <strong><span aria-hidden="true">💡</span> Si eres empresa o autónomo:</strong> en{' '}
             <span>{nombreEnFrase(ccaa)}</span> no rige el IVA, sino el <span>{territorioActualSinIva.impuesto}</span>{' '}
-            <span>({territorioActualSinIva.nombre})</span>, que esta calculadora no cifra.{' '}
+            {/* Hallazgo 3520: el nombre, ÚNICO hijo de su <span> (una sola cadena con los
+                paréntesis); con «(», nombre y «)» sueltos se quedaba el del IGIC en Ceuta. */}
+            <span>{`(${territorioActualSinIva.nombre})`}</span>, que esta calculadora no cifra.{' '}
             {/* Hallazgo 3263 (19/10/2026): en Ceuta y Melilla decía que el IPSI soportado «también
                 puede ser deducible», y la Ley 8/1991, art. 20.3 (BOE-A-1991-7645, leído el
                 19/10/2026) dice: «Las cuotas soportadas o satisfechas en relación con las entregas
@@ -556,7 +558,7 @@ export default function SimuladorNaveIndustrialPage() {
                 {renunciaImposible && territorioActualSinIva ? (
                   <span key="sin-renuncia">
                     En <span>{nombreEnFrase(ccaa)}</span> no rige el IVA, sino el <span>{territorioActualSinIva.impuesto}</span>{' '}
-                    <span>({territorioActualSinIva.nombre})</span>, y en él <strong>no existe la renuncia a la
+                    <span>{`(${territorioActualSinIva.nombre})`}</span>, y en él <strong>no existe la renuncia a la
                     exención</strong>: la Ley 8/1991 toma sus exenciones de la ley del IVA (art. 7) sin
                     regular ninguna renuncia, y no deja deducir el <span>{territorioActualSinIva.impuesto}</span>{' '}
                     soportado en la compra de un inmueble (art. 20.3), que es lo que la renuncia exige en
@@ -566,7 +568,7 @@ export default function SimuladorNaveIndustrialPage() {
                 ) : territorioActualSinIva ? (
                   <span key="canarias">
                     En <span>{nombreEnFrase(ccaa)}</span> no rige el IVA, sino el <span>{territorioActualSinIva.impuesto}</span>{' '}
-                    <span>({territorioActualSinIva.nombre})</span>. También en él la segunda entrega de una nave está
+                    <span>{`(${territorioActualSinIva.nombre})`}</span>. También en él la segunda entrega de una nave está
                     exenta y, si el comprador es empresario o profesional con derecho a deducir, total o
                     parcialmente, el impuesto de la compra, quien vende puede{' '}
                     <strong>renunciar a esa exención</strong> (art. 50.Cinco Ley canaria 4/2012): la
@@ -727,7 +729,7 @@ export default function SimuladorNaveIndustrialPage() {
             {territorioActualSinIva && (
               <p className={styles.infoCcaaNote}>
                 <span aria-hidden="true">⚠️</span> En <span>{nombreEnFrase(ccaa)}</span> <strong>no se aplica el IVA</strong>:
-                la obra nueva tributa por el <span>{territorioActualSinIva.impuesto}</span> <span>({territorioActualSinIva.nombre})</span>,
+                la obra nueva tributa por el <span>{territorioActualSinIva.impuesto}</span> <span>{`(${territorioActualSinIva.nombre})`}</span>,
                 con sus propios tipos. Este simulador no lo calcula — consúltalo en la administración
                 tributaria <span>{deNombreCcaa(ccaa)}</span>.
               </p>
@@ -942,7 +944,9 @@ export default function SimuladorNaveIndustrialPage() {
               {territorioHonorarios && (
                 <p className={styles.avisoHonorarios} role="note">
                   <span aria-hidden="true">ℹ️</span> Las facturas de notaría y registro llevan además{' '}
-                  {territorioHonorarios.impuesto}, que esta herramienta no calcula, así que cuestan más de lo
+                  {/* El impuesto, único hijo de su <span> (hallazgo 3520): suelto en el <p>, con la
+                      página traducida seguía el IGIC en Ceuta y Melilla. */}
+                  <span>{territorioHonorarios.impuesto}</span>, que esta herramienta no calcula, así que cuestan más de lo
                   que se muestra.
                 </p>
               )}

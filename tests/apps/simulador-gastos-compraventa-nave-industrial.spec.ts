@@ -8026,7 +8026,8 @@ test.describe('Re-inspección 26/10/2026 — Andalucía con decimales, Asturias 
   // ─── Hallazgos de la re-inspección del 26/10/2026, con `test.fail()` salvo con VER_HUECOS=1 ───
 
   /**
-   * [26/10-a] (operativa, medio) — Resto de la receta de 3476/3477 (5ed0e98e) y forma de los hallazgos
+   * [26/10-a] (operativa, medio; hallazgo 3520) — REPARADO el 26/10/2026 con la receta de local-comercial
+   * en los dos nombres y el impuesto de los honorarios en su <span>. Resto de la receta de 3476/3477 (5ed0e98e) y forma de los hallazgos
    * 3506 (local) y 3508 (solar), que no llegó a la nave. Con la página traducida, al pasar de Canarias a
    * Ceuta o Melilla tres textos siguen con el IGIC mientras las tarjetas ya cobran la ciudad:
    *   · el aviso de cabecera y la nota del recuadro dicen «el IPSI (Impuesto General Indirecto Canario)»:
@@ -8040,7 +8041,6 @@ test.describe('Re-inspección 26/10/2026 — Andalucía con decimales, Asturias 
    * l. 786, la frase entera en una cadena.
    */
   test('[26/10-a] con la página traducida, al pasar de Canarias a Ceuta o Melilla los avisos nombran el IPSI y no el IGIC', async ({ page }) => {
-    test.fail(!I26_VER_HUECOS, 'hallazgo [26/10-a] abierto: tres textos se quedan con el IGIC al pasar de Canarias a Ceuta o Melilla');
     const IPSI = 'IPSI (Impuesto sobre la Producción, los Servicios y la Importación)';
     const viejos: string[] = [];
     for (const ciudad of ['ceuta', 'melilla'] as const) {

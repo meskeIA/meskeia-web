@@ -499,7 +499,7 @@ export default function SimuladorTerrenoRusticoPage() {
           {renunciaImposible && territorioActualSinIva && (
             <p className={styles.renunciaAviso} role="note">
               <span aria-hidden="true">ℹ️</span> En <span>{nombreEnFrase(ccaa)}</span> no rige el IVA, sino el{' '}
-              <span>{territorioActualSinIva.impuesto}</span> <span>({territorioActualSinIva.nombre})</span>, y en él{' '}
+              <span>{territorioActualSinIva.impuesto}</span> <span>{`(${territorioActualSinIva.nombre})`}</span>, y en él{' '}
               <strong>no existe la renuncia a la exención</strong>: la Ley 8/1991 toma sus exenciones de la
               ley del IVA (art. 7) sin regular ninguna renuncia, y no deja deducir el{' '}
               <span>{territorioActualSinIva.impuesto}</span> soportado en la compra de un inmueble (art. 20.3), que es lo
