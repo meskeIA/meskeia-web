@@ -1137,6 +1137,7 @@ function crearServidorDelegum(): McpServer {
         const texto = [
           `🧾 **IRPF**`,
           `📦 Base general: ${fmt(r.baseImponibleGeneral)} € · Base ahorro: ${fmt(r.baseImponibleAhorro)} €`,
+          ...(r.reduccionConjunta > 0 ? [`➖ Reducción por tributación conjunta (art. 84.2 LIRPF): ${fmt(r.reduccionConjunta)} €`] : []),
           `➖ Mínimo personal y familiar: ${fmt(r.minimoPersonalFamiliar)} €`,
           `🔢 Cuota íntegra: ${fmt(r.cuotaIntegra)} € (tipo efectivo ${pct(r.tipoEfectivoGeneral)}%)`,
           `➖ Retenciones: ${fmt(r.retenciones)} €`,

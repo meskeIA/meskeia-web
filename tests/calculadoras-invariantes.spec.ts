@@ -56,6 +56,8 @@ import {
   reduccionGastosDificilJustificacion,
 } from '../data/fiscal/estimacion-directa';
 import { calcularIRPF } from '../lib/calculadoras/irpf';
+import { estimarIRPF, cotizacionTrabajadorAnual } from '../app/estimador-irpf/motor';
+import { calcularBrutoANeto as calcularBrutoANetoApp } from '../app/estimador-sueldo-neto/motor';
 import { compararAutonomoVsSL } from '../lib/calculadoras/autonomoVsSL';
 import { calcularCompraventa } from '../lib/calculadoras/compraventa';
 import { calcularGastosCompraInmueble } from '../lib/calculadoras/gastosCompraInmueble';
@@ -5687,5 +5689,78 @@ test.describe('Unificación app ↔ motor — compraventa (26/10/2026)', () => {
             }
     expect(primero).toEqual([]);
     expect(distintos).toBe(0);
+  });
+});
+
+// ─── Unificación app ↔ motor — IRPF y sueldo neto (26/10/2026) ─────────────────────────────
+//
+// `irpf` (calcular_irpf, consulta_autonomo) y `sueldoNeto` (consulta_nomina, calcular_sueldo_neto)
+// frente a los motores de estimador-irpf y estimador-sueldo-neto. Casos resueltos a mano con
+// TRAMOS_IRPF_2025 (19/24/30/37/45/47), la escala del ahorro (19/21/23/27/30) y MINIMOS_IRPF_2025:
+//   I1 · solo 500 € de intereses: el mínimo (5.550) no cabe en la base general (0) y pasa a la
+//        del ahorro (art. 56.2) → 0 €. El motor daba 500 × 19 % = 95 €.
+//   I2 · casado sin ingresos del cónyuge, 40.000 € de capital, 2 hijos: −3.400 de la conjunta
+//        (art. 84.2) → ahorro 36.600; mínimo 5.550 + 2.400 + 2.700 = 10.650, todo al ahorro.
+//        escala(36.600) = 1.140 + 30.600 × 21 % = 7.566 · escala(10.650) = 1.140 + 4.650 × 21 % =
+//        2.116,50 → 5.449,50 €. El motor daba escala(40.000) = 8.280 €.
+//   I3 · 9.000 € netos de trabajo + 7.000 € de intereses: con más de 6.500 € de otras rentas no
+//        hay reducción del art. 20 → general 7.000 → (7.000 − 5.550) × 19 % = 275,50; ahorro
+//        1.140 + 1.000 × 21 % = 1.350 → 1.625,50 €. El motor daba 1.350 €.
+//   S1 · 30.000 € brutos: SS 6,50 % = 1.950 · RNT 28.050 (sin reducción) − 2.000 = 26.050.
+//        Soltero: escala(26.050) = 2.365,50 + 1.860 + 5.850 × 30 % = 5.980,50 − 1.054,50 = 4.926,00.
+//        Casado sin ingresos del cónyuge: base 22.650 → 2.365,50 + 1.860 + 735 − 1.054,50 = 3.906,00.
+test.describe('Unificación app ↔ motor — IRPF y sueldo neto (26/10/2026)', () => {
+  test('I1 · el mínimo que no cabe en la base general se aplica en la del ahorro (art. 56.2)', () => {
+    const r = calcularIRPF({ rendimientosTrabajo: 0, rendimientosCapitalMobiliario: 500, esTrabajador: false });
+    expect(r.minimoEnAhorro).toBeCloseTo(5550, 2);
+    expect(r.cuotaIntegra).toBe(0);
+  });
+
+  test('I2 · el matrimonio con un solo perceptor tiene la reducción de la conjunta (art. 84.2)', () => {
+    const r = calcularIRPF({ rendimientosTrabajo: 0, rendimientosCapitalMobiliario: 40000, situacion: 'casado_sin_ingresos', numHijos: 2, esTrabajador: false });
+    expect(r.reduccionConjunta).toBe(3400);
+    expect(r.baseLiquidableAhorro).toBeCloseTo(36600, 2);
+    expect(r.cuotaIntegra).toBeCloseTo(5449.5, 2);
+  });
+
+  test('I3 · con más de 6.500 € de otras rentas se pierde la reducción del art. 20', () => {
+    const r = calcularIRPF({ rendimientosTrabajo: 9000, rendimientosCapitalMobiliario: 7000 });
+    expect(r.reduccionRNT).toBe(0);
+    expect(r.cuotaIntegra).toBeCloseTo(1625.5, 2);
+  });
+
+  test('S1 · consulta_nomina aplica la conjunta al casado con cónyuge sin ingresos', () => {
+    expect(calcularSueldoNeto({ brutoAnual: 30000 }).cuotaIRPF).toBeCloseTo(4926, 2);
+    expect(calcularSueldoNeto({ brutoAnual: 30000, situacion: 'casado_sin_ingresos' }).cuotaIRPF).toBeCloseTo(3906, 2);
+  });
+
+  const PARES = [['soltero', 'soltero'], ['casado_sin_ingresos', 'casado_un_ingreso'], ['casado_con_ingresos', 'casado_dos_ingresos']] as const;
+
+  test('el sueldo neto del MCP es el de estimador-sueldo-neto en todas las situaciones', () => {
+    const distintos: string[] = [];
+    for (const bruto of [9000, 14000, 16576, 18000, 20000, 25000, 30000, 45000, 61000, 80000, 150000])
+      for (const [motor, app] of PARES)
+        for (const hijos of [0, 1, 2, 4]) for (const men3 of [0, 1]) for (const pagas of [12, 14] as const) {
+          if (men3 > hijos) continue;
+          const m = calcularSueldoNeto({ brutoAnual: bruto, situacion: motor, numHijos: hijos, hijosMenores3: men3, pagas });
+          const a = calcularBrutoANetoApp(bruto, app, hijos, men3, pagas);
+          if (Math.abs(m.netoAnual - Math.round(a.netoAnual * 100) / 100) > 0.015) distintos.push(`${motor} ${bruto} ${hijos}h: ${m.netoAnual} · ${a.netoAnual}`);
+        }
+    expect(distintos.slice(0, 3)).toEqual([]);
+  });
+
+  // Cuota ÍNTEGRA: antes de la DA 61.ª, que este motor no aplica porque recibe el trabajo neto
+  // de SS y la deducción se mide sobre los rendimientos íntegros (cabo anotado el 26/10/2026).
+  test('la cuota íntegra de calcular_irpf es la de estimador-irpf', () => {
+    const distintos: string[] = [];
+    for (const bruto of [0, 9000, 14000, 16576, 18000, 20000, 25000, 30000, 45000, 61000, 80000, 150000])
+      for (const capital of [0, 500, 7000, 40000])
+        for (const [motor, app] of PARES) for (const hijos of [0, 2]) for (const men3 of [0, 1, 3]) {
+          const ss = cotizacionTrabajadorAnual(bruto);
+          const m = calcularIRPF({ rendimientosTrabajo: bruto - ss, rendimientosCapitalMobiliario: capital, situacion: motor, numHijos: hijos, hijosMenores3: men3, esTrabajador: bruto > 0 });
+          const a = estimarIRPF({ brutoTrabajo: bruto, capitalMobiliario: capital, retenciones: 0, situacion: app, numHijos: hijos, hijosMenores3: men3, conNomina: true });
+          if (Math.abs(m.cuotaIntegra - Math.round(a.cuotaIntegra * 100) / 100) > 0.015) distintos.push(`${motor} ${bruto} cap ${capital} ${hijos}h ${men3}m3: ${m.cuotaIntegra} · ${a.cuotaIntegra}`);
+        }
+    expect(distintos.slice(0, 3)).toEqual([]);
   });
 });

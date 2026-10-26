@@ -18,6 +18,7 @@ import {
   FISCAL_IRPF_META,
   calcularDeduccionRentasBajas,
   limitarDeduccionRendimientosTrabajo,
+  REDUCCION_TRIBUTACION_CONJUNTA_2025,
 } from '@/data/fiscal';
 
 // ─── Tipos públicos ────────────────────────────────────────────────────────────
@@ -87,10 +88,8 @@ function calcularMinimo(situacion: SituacionFamiliar, numHijos: number, hijosMen
   // art. 84.2.º RIRPF para la retención). Hasta el 25/09/2026 entraba entero (hallazgo 1688
   // de estimador-sueldo-neto, mismo defecto).
   const parte = situacion === 'casado_con_ingresos' ? 0.5 : 1;
-  const minimo = MINIMOS_IRPF_2025.personal + descendientes * parte;
-  // Cónyuge sin ingresos (deducción art. 84): no aplica aquí directamente,
-  // pero el tipo de retención puede variar. Se simplifica con el mínimo personal.
-  return minimo;
+  // El cónyuge sin ingresos no cambia el mínimo: va en la reducción del art. 84.2, en la base
+  return MINIMOS_IRPF_2025.personal + descendientes * parte;
 }
 
 // ─── Función principal ─────────────────────────────────────────────────────────
@@ -127,9 +126,13 @@ export function calcularSueldoNeto(p: ParametrosSueldoNeto): ResultadoSueldoNeto
   const baseImponible = rendimiento.rendimientoNeto;
   const reduccionRNT = r(rendimiento.reduccion);
 
-  // Base liquidable general
+  // Base liquidable general, con la reducción por tributación conjunta (art. 84.2 LIRPF) del
+  // matrimonio con un solo perceptor, como estimador-sueldo-neto con «casado/a (un ingreso)».
+  // Hasta el 26/10/2026 no se aplicaba: 18.000 € brutos daban 623,82 € de IRPF donde la app da
+  // 0 € (hito unificar-app-motor).
   const minimoPersonalFamiliar = calcularMinimo(situacion, numHijos, hijosMenores3);
-  const baseLiquidableGeneral = Math.max(0, rendimiento.rendimientoNetoReducido);
+  const reduccionConjunta = situacion === 'casado_sin_ingresos' ? REDUCCION_TRIBUTACION_CONJUNTA_2025.biparental : 0;
+  const baseLiquidableGeneral = Math.max(0, rendimiento.rendimientoNetoReducido - reduccionConjunta);
   const baseLiquidable = baseLiquidableGeneral;
 
   // Cuota integra: art. 63.1.2 LIRPF. Reparado a mano el 09/09/2026; desde el 12/09/2026 la
