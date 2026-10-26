@@ -11662,7 +11662,8 @@ test.describe('Inspector 26/10/2026 — Galicia y Asturias a mano, la app entera
   });
 
   /**
-   * HALLAZGO [contenido, bajo] — ABIERTO. Cuatro reducidos de ITP_CCAA (data/itp-ccaa.ts) llevan el €
+   * HALLAZGO [contenido, bajo] (3511) — REPARADO el 26/10/2026 en el dato (data/itp-ccaa.ts), que llega
+   * a todas las apps que pintan esos nombres. Cuatro reducidos de ITP_CCAA (data/itp-ccaa.ts) llevan el €
    * pegado a la cifra en su NOMBRE —Andalucía «Vivienda habitual (valor ≤150.000€)», Cantabria «Vivienda
    * habitual < 200.000€», Valencia «Jóvenes < 35 años (valor ≤180.000€)» y Galicia «Vivienda habitual
    * (patrimonio ≤200.000€)»— y la app lo pinta tal cual en «Podrías pagar menos», en «Beneficios
@@ -11673,7 +11674,6 @@ test.describe('Inspector 26/10/2026 — Galicia y Asturias a mano, la app entera
    */
   test('HALLAZGO contenido — el € de los nombres de cuatro reducidos va pegado a la cifra', async ({ page }) => {
     test.setTimeout(90_000);
-    test.fail(true, 'ABIERTO: «≤200.000€» en el nombre del reducido de Galicia (y tres más)');
     const pegado = /\d€/;
     await abrir(page, 'galicia');
     await sembrar(page, 'Precio de la vivienda', '180000');

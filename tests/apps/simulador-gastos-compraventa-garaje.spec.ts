@@ -9433,8 +9433,6 @@ test.describe('Inspector 25/10/2026 — la página traducida por el navegador', 
 //   [26/10-a] (contenido, bajo) — cuatro nombres de reducidos de data/itp-ccaa.ts llegan con el € PEGADO.
 // ═════════════════════════════════════════════════════════════════════════════
 
-/** `VER_HUECOS=1` quita la marca del hallazgo abierto del 26/10 y enseña por qué falla. */
-const I26_VER_HUECOS = Boolean(process.env.VER_HUECOS);
 
 /** Obra nueva en Madrid, garaje independiente, 42.000 €, y la pestaña Vendedor con el solar del promotor. */
 async function i26ObraNueva(page: Page, compra: string): Promise<void> {
@@ -9775,7 +9773,8 @@ test.describe('Inspector 26/10/2026 — el 833 en Andalucía, la igualdad del ar
   });
 
   /**
-   * [26/10-a] (contenido, bajo) — ABIERTO. Cuatro nombres de tipos reducidos de data/itp-ccaa.ts llevan el
+   * [26/10-a] (contenido, bajo; hallazgo 3513) — REPARADO el 26/10/2026 en el dato, que llega a todas las
+   * hermanas. Cuatro nombres de tipos reducidos de data/itp-ccaa.ts llevan el
    * euro PEGADO a la cifra, y esta app los pinta tal cual en «Beneficios fiscales en…» y en «Podrías pagar
    * menos» (CLAUDE.md global §2: «1.234,56 €», con espacio antes del símbolo):
    *   Andalucía «Vivienda habitual (valor ≤150.000€)» · Cantabria «Vivienda habitual < 200.000€» ·
@@ -9786,7 +9785,6 @@ test.describe('Inspector 26/10/2026 — el 833 en Andalucía, la igualdad del ar
    * le llegó. Las demás hermanas que pintan los reducidos lo heredan del mismo dato.
    */
   test('[26/10-a] los nombres de los reducidos se pintan con el € separado de la cifra', async ({ page }) => {
-    test.fail(!I26_VER_HUECOS, 'hallazgo [26/10-a] abierto: cuatro nombres de reducidos con el € pegado');
     const pegados: string[] = [];
     for (const [ccaa, precio, perfil] of [
       ['andalucia', '25000', 'joven'],

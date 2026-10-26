@@ -169,7 +169,7 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
     tipoGeneral: tipoGeneralDe('Andalucía'),
     tiposReducidos: [
       {
-        nombre: 'Vivienda habitual (valor ≤150.000€)',
+        nombre: 'Vivienda habitual (valor ≤ 150.000 €)',
         tipo: 6,
         condiciones: ['Vivienda habitual', 'Valor ≤ 150.000 €'],
         valorMaximo: 150000,
@@ -405,7 +405,7 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
     tipoGeneral: tipoGeneralDe('Cantabria'),
     tiposReducidos: [
       {
-        nombre: 'Vivienda habitual < 200.000€',
+        nombre: 'Vivienda habitual < 200.000 €',
         tipo: 7,
         condiciones: ['Vivienda habitual', 'Valor < 200.000 €'],
         valorMaximo: 200000,
@@ -585,7 +585,7 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
         condiciones: ['Menor de 35 años', 'Vivienda habitual'],
       },
       {
-        nombre: 'Jóvenes < 35 años (valor ≤180.000€)',
+        nombre: 'Jóvenes < 35 años (valor ≤ 180.000 €)',
         tipo: 6,
         condiciones: ['Menor de 35 años', 'Vivienda habitual', 'Valor ≤ 180.000 €'],
         valorMaximo: 180000,
@@ -661,7 +661,7 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
     tipoGeneral: tipoGeneralDe('Galicia'),
     tiposReducidos: [
       {
-        nombre: 'Vivienda habitual (patrimonio ≤200.000€)',
+        nombre: 'Vivienda habitual (patrimonio ≤ 200.000 €)',
         tipo: 7,
         condiciones: ['Vivienda habitual', 'Patrimonio preexistente ≤ 200.000 €'],
       },
