@@ -255,8 +255,8 @@ const nextConfig: NextConfig = {
   // ============================================================================
   // sql.js intenta importar 'fs' que no existe en el browser
   // Esta configuración lo ignora para el bundle del cliente
-  // Nota: los archivos WASM se sirven desde public/wasm/ (ver app/playground-sql/page.tsx)
-  // para cumplir con la CSP estricta sin permitir CDNs externos.
+  // Nota: el WASM lo empaqueta Next desde node_modules/sql.js (new URL(…, import.meta.url) en
+  // app/playground-sql/page.tsx): mismo dominio para la CSP y siempre la versión del JS.
   turbopack: {
     resolveAlias: {
       fs: { browser: './empty-module.js' },

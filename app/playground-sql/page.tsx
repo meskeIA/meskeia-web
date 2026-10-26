@@ -107,8 +107,11 @@ export default function PlaygroundSQLPage() {
     try {
       // Cargar sql.js dinámicamente
       const initSqlJs = (await import('sql.js')).default;
+      // El wasm lo empaqueta Next desde la MISMA versión de sql.js que el JS (sale en
+      // /_next/static/media/ con huella). Hasta el 26/10/2026 era una copia a mano en
+      // public/wasm/ y la subida a sql.js 1.15.1 la dejó desfasada: «a.O is not a function».
       const SQL: SqlJsStatic = await initSqlJs({
-        locateFile: (file: string) => `/wasm/${file}`
+        locateFile: () => new URL('../../node_modules/sql.js/dist/sql-wasm-browser.wasm', import.meta.url).href
       });
 
       // Crear nueva base de datos

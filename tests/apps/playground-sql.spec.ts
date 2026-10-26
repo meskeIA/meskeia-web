@@ -5,7 +5,8 @@ import { PUERTO } from './_puerto';
 /**
  * Playground SQL — test de regresión (Inspector, 07/10/2026)
  *
- * La app ejecuta SQLite (sql.js 1.14, WebAssembly servido desde /wasm/) sobre tres datasets
+ * La app ejecuta SQLite (sql.js, WebAssembly que Next empaqueta desde node_modules: hasta el
+ * 26/10/2026 era una copia en /wasm/ que se desfasó al subir sql.js) sobre tres datasets
  * fijos de `app/playground-sql/components/datasets.ts`. Todos los valores esperados de este
  * fichero están calculados A MANO, fila a fila, sobre esos datos, antes de ejecutar la app.
  *
