@@ -525,6 +525,10 @@ test.describe('Inspector 25/09/2026 · móvil 360 × 740', () => {
     await expect(page.locator('[class*="preguntaTexto"]')).toBeAttached();
     await expect.poll(tapadas, { message: 'tras «Comenzar quiz»', timeout: 3000 }).toEqual([]);
 
+    // Lee la pregunta antes de contestar: desde la guarda de doble toque (C0082,
+    // lib/useGuardaRafaga.ts), contestar a velocidad de máquina tras «Comenzar» es el 2.º toque de
+    // su ráfaga si la opción cae cerca del botón, y se ignora (2 de 3 aislado el 26/10/2026).
+    await page.waitForTimeout(500);
     const ficha = await fichaVisible(page);
     await tocar(opciones(page).nth((await textosOpcion(page)).indexOf(ficha.correcta)));
     await expect(page.locator('[class*="feedbackMensaje"]')).toBeVisible();
