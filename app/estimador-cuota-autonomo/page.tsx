@@ -7,7 +7,7 @@ import { MeskeiaLogo, LegalNotice, Footer, EducationalSection, RelatedApps, Shar
 } from '@/components';
 import { formatCurrency, formatDate, formatNumber, parseISODateLocal, parseSpanishNumber } from '@/lib';
 import {
-  FISCAL_AUTONOMOS_META, TRAMOS_RETA_2025, TIPO_COTIZACION_RETA, cotizacionRETADesdeActividad,
+  FISCAL_AUTONOMOS_META, TRAMOS_RETA_2025, TIPO_COTIZACION_RETA, cotizacionRETADesdeActividad, TARIFA_PLANA_2025,
   NOMBRE_REGIMEN_DIRECTA, REGIMEN_DIRECTA_POR_DEFECTO, GASTOS_DIFICIL_JUSTIFICACION_EDS,
   type RegimenEstimacionDirecta,
 } from '@/data/fiscal';
@@ -34,7 +34,8 @@ const BONIFICACIONES: Bonificacion[] = [
     id: 'tarifa-plana',
     nombre: 'Tarifa Plana Nuevos Autónomos',
     descripcion: 'Cuota reducida para nuevos autónomos sin actividad previa en los últimos 2 años',
-    cuotaMensual: 80,
+    // La misma que suma calcular_cuota_autonomo del MCP (hasta el 26/10/2026, un 80 tecleado aquí)
+    cuotaMensual: TARIFA_PLANA_2025.cuota,
     duracion: '12 meses (ampliable 12 meses más si ingresos < SMI)',
     requisitos: [
       'No haber estado de alta como autónomo en los últimos 2 años',
