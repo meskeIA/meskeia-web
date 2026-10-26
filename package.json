@@ -77,6 +77,8 @@
     "inspector:probar-familias": "node scripts/inspector/probar-familias.mjs",
     "inspector:probar-cola-cabos": "node scripts/inspector/probar-cola-cabos.mjs",
     "inspector:probar-cola-reposo": "node scripts/inspector/probar-cola-reposo.mjs",
+    "inspector:orden": "node scripts/inspector/orden-del-dia.mjs",
+    "inspector:probar-orden": "node scripts/inspector/probar-orden.mjs",
     "inspector:probar-revalidar": "node scripts/inspector/probar-revalidar.mjs",
     "inspector:probar-revalidar-commits": "node scripts/inspector/probar-revalidar-commits.mjs",
     "cabos": "node scripts/cabos/cabos.mjs",
