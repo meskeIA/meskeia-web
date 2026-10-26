@@ -189,7 +189,8 @@ function revalidar(slugs) {
   const inval = db
     .prepare(`SELECT COUNT(*) n FROM apps WHERE ${SQL_INVALIDADA}`)
     .get().n;
-  console.log(`\n${n} revalidada(s) · quedan ${inval} invalidadas en la cola`);
+  // Desde el 26/10/2026 no todas vuelven: las que reposan esperan un mes (cabecera de cola.mjs)
+  console.log(`\n${n} revalidada(s) · quedan ${inval} invalidadas, contadas las que reposan (inspector:cola -- --resumen)`);
 }
 
 /**
