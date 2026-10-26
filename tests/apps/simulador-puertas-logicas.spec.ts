@@ -403,9 +403,9 @@ test.describe('Modo Retos en la página', () => {
  *   del hallazgo 135) ni quedarse en blanco.
  */
 
-const TABLA_VERDAD = 'table[class*="__truthTable"]';
-const BOTON_PUERTA = '[class*="__gateBtn"]';
-const AVISO_EXPRESION = '[class*="__expressionError"]';
+const TABLA_VERDAD = 'table[class*="_truthTable"]';
+const BOTON_PUERTA = '[class*="_gateBtn"]';
+const AVISO_EXPRESION = '[class*="_expressionError"]';
 
 /** Símbolo con el que la app rotula cada puerta: «AND» a secas también casaría con NAND. */
 const SIMBOLO_DE: Record<string, string> = {
@@ -602,8 +602,8 @@ test.describe('RE-INSPECCIÓN · CASO 2 · circuitos compuestos y límites', () 
     await abrirSimulador(page, 'Circuitos');
     await page.getByRole('button', { name: 'Full Adder (Sumador Completo)' }).click();
 
-    const conmutadores = page.locator('[class*="__ioSwitch"]');
-    const leds = () => page.locator('[class*="__ioLed"]')
+    const conmutadores = page.locator('[class*="_ioSwitch"]');
+    const leds = () => page.locator('[class*="_ioLed"]')
       .evaluateAll((els) => els.map((e) => e.textContent?.match(/[01]/)?.[0]));
 
     await expect(conmutadores).toHaveCount(3);
@@ -612,7 +612,7 @@ test.describe('RE-INSPECCIÓN · CASO 2 · circuitos compuestos y límites', () 
     for (let i = 0; i < 3; i++) await conmutadores.nth(i).click();
     // 1+1+1 = 3, que en dos bits es «11»: suma 1 y acarreo 1.
     expect(await leds()).toEqual(['1', '1']);
-    await expect(page.locator('tr[class*="__currentRow"]')).toHaveText('11111');
+    await expect(page.locator('tr[class*="_currentRow"]')).toHaveText('11111');
   });
 
   test('la puerta de una sola entrada tiene 2 filas y una sola columna de entrada', async ({ page }) => {
@@ -696,7 +696,7 @@ test.describe('RE-INSPECCIÓN · hallazgos reparados', () => {
     // REPARADO el 30/08/2026 (d749e6ac): el panel que se titula «Sintaxis válida» —y que por
     // su título se lee como una lista cerrada— solo nombraba AND, OR, NOT y XOR, mientras el
     // <h1>, el modo Tablas, la comparativa educativa y el JSON-LD presentaban las siete.
-    const ayuda = page.locator('[class*="__syntaxHelp"]');
+    const ayuda = page.locator('[class*="_syntaxHelp"]');
     for (const operador of ['NAND', 'NOR', 'XNOR']) {
       await expect(ayuda, `«Sintaxis válida» debería nombrar ${operador}`).toContainText(operador);
     }
@@ -785,10 +785,10 @@ async function elegirModo(page: Page, modo: Modo, conDedo = false): Promise<void
 
 /** Los valores 0/1 de los LED de salida (solo el valor: el rótulo «Y1» también lleva cifras). */
 const valoresLed = (page: Page): Promise<string[]> =>
-  page.locator('[class*="__ioLed"] [class*="__ioValue"]').allInnerTexts();
+  page.locator('[class*="_ioLed"] [class*="_ioValue"]').allInnerTexts();
 
-const FILA_ACTUAL = 'tr[class*="__currentRow"]';
-const VEREDICTO = '[class*="__retoVeredicto"]';
+const FILA_ACTUAL = 'tr[class*="_currentRow"]';
+const VEREDICTO = '[class*="_retoVeredicto"]';
 
 async function abrirGuiaEducativa(page: Page): Promise<void> {
   const boton = page.getByRole('button', { name: /Ver guía educativa/ });
@@ -831,7 +831,7 @@ test.describe('16/10 · CASO 1 · normal, en escritorio', () => {
     await abrirSimulador(page);
     await elegirModo(page, 'Circuitos');
     await page.getByRole('button', { name: 'Multiplexor 2:1' }).click();
-    const conmutadores = page.locator('[class*="__ioSwitch"]'); // D0, D1, S
+    const conmutadores = page.locator('[class*="_ioSwitch"]'); // D0, D1, S
 
     // Y = S ? D1 : D0. La fila resaltada se lee D0 D1 S | Y.
     await conmutadores.nth(0).click(); // D0 = 1
@@ -852,7 +852,7 @@ test.describe('16/10 · CASO 1 · normal, en escritorio', () => {
     await abrirSimulador(page);
     await elegirModo(page, 'Circuitos');
     await page.getByRole('button', { name: 'Comparador 1-bit' }).click();
-    await page.locator('[class*="__ioSwitch"]').nth(1).click(); // B = 1
+    await page.locator('[class*="_ioSwitch"]').nth(1).click(); // B = 1
 
     // Salidas en orden A>B, A=B, A<B. Con 0 frente a 1: 0, 0, 1. Fila «01» + «001».
     expect(await valoresLed(page)).toEqual(['0', '0', '1']);
@@ -870,7 +870,7 @@ test.describe('16/10 · CASO 2 · límite, en móvil (360×740, táctil)', () =>
     await abrirSimulador(page);
     await elegirModo(page, 'Circuitos', true);
     await page.getByRole('button', { name: 'Decodificador 2:4' }).tap();
-    const conmutadores = page.locator('[class*="__ioSwitch"]'); // A1, A0
+    const conmutadores = page.locator('[class*="_ioSwitch"]'); // A1, A0
 
     // Se activa la salida número 2·A1 + A0, y solo esa.
     expect(await valoresLed(page)).toEqual(['1', '0', '0', '0']); // 00 → 0 → Y0
@@ -1054,13 +1054,13 @@ test.describe('16/10 · ZonaHerramienta en escritorio', () => {
       display: getComputedStyle(e).display, ancho: e.getBoundingClientRect().width,
     }));
     expect(zona).toEqual({ display: 'contents', ancho: 0 });
-    const columnas = await page.locator('[class*="__modeSelector"]').evaluate((e) =>
+    const columnas = await page.locator('[class*="_modeSelector"]').evaluate((e) =>
       getComputedStyle(e).gridTemplateColumns.split(' ').length);
     expect(columnas).toBe(4);
 
     await page.mouse.wheel(0, 1200);
     await page.mouse.wheel(0, -1200);
-    await page.locator('[class*="__gateDescription"]').click(); // texto, no un control
+    await page.locator('[class*="_gateDescription"]').click(); // texto, no un control
     await abrirGuiaEducativa(page); // fuera de la zona: es leer, no usar
     await page.waitForTimeout(500);
     expect(primerosUsos(envios), 'emitió sin usar ningún control').toHaveLength(0);
@@ -1084,7 +1084,7 @@ test.describe('16/10 · ZonaHerramienta en escritorio', () => {
   // REPARADO (hallazgo 3353, 17/10/2026): el dibujo lleva data-zona-estatica, que ZonaHerramienta ignora.
   test('3353 · pulsar el dibujo estático del símbolo NO es usar la herramienta', async ({ page }) => {
     const envios = await abrirConAnalytics(page);
-    const dibujo = page.locator('svg[class*="__gateSvg"]');
+    const dibujo = page.locator('svg[class*="_gateSvg"]');
     await dibujo.scrollIntoViewIfNeeded();
     await dibujo.click();
     await page.waitForTimeout(800);
@@ -1173,8 +1173,8 @@ async function contrastesDeLaTabla(page: Page): Promise<{ uno: number; cabeceraY
       const [hi, lo] = [lum(fg), lum(bg)].sort((x, y) => y - x);
       return Math.round(((hi + 0.05) / (lo + 0.05)) * 100) / 100;
     };
-    const uno = t.querySelector('td[class*="__cellOne"]');
-    const y = t.querySelector('th[class*="__outputHeader"]');
+    const uno = t.querySelector('td[class*="_cellOne"]');
+    const y = t.querySelector('th[class*="_outputHeader"]');
     if (!uno || !y) throw new Error('falta la celda «1» o la cabecera Y');
     return { uno: ratio(uno), cabeceraY: ratio(y) };
   });
@@ -1233,7 +1233,7 @@ test.describe('16/10 · contenido', () => {
     await abrirGuiaEducativa(page);
     // Y = S1'S0'·D0 + S1'S0·D1 + S1S0'·D2 + S1S0·D3: un AND por cada entrada de datos (4),
     // un OR de 4 entradas y 2 NOT. Con 3 AND una de las cuatro fuentes no llega nunca a Y.
-    const tarjeta = page.locator('[class*="__escenarioCard"]').filter({ hasText: 'Multiplexor 4:1' });
+    const tarjeta = page.locator('[class*="_escenarioCard"]').filter({ hasText: 'Multiplexor 4:1' });
     await expect(tarjeta).toHaveCount(1);
     await expect(tarjeta).not.toContainText('3 puertas AND');
     await expect(tarjeta).toContainText('4 puertas AND');
@@ -1246,7 +1246,7 @@ test.describe('16/10 · contenido', () => {
     await abrirGuiaEducativa(page);
     // Dos preguntas más abajo la propia FAQ define «universal» (solo NAND y NOR lo son) y la
     // comparativa marca «Universal: No» en AND, OR, NOT, XOR y XNOR.
-    const pregunta = page.locator('[class*="__faqItem"]').filter({ hasText: '¿Es lo mismo una puerta lógica' });
+    const pregunta = page.locator('[class*="_faqItem"]').filter({ hasText: '¿Es lo mismo una puerta lógica' });
     await expect(pregunta).toHaveCount(1);
     await expect(pregunta).not.toContainText('son universales');
   });
@@ -1256,7 +1256,7 @@ test.describe('16/10 · contenido', () => {
     await abrirSimulador(page);
     await abrirGuiaEducativa(page);
     // 🎓 🔬 🔧 💻 junto al perfil de cada tarjeta y ⚠️ junto al título del recuadro de errores.
-    const sinOcultar = await page.locator('[class*="__escenarioIcon"], [class*="__warningIcon"]')
+    const sinOcultar = await page.locator('[class*="_escenarioIcon"], [class*="_warningIcon"]')
       .evaluateAll((els) => els.filter((e) => e.getAttribute('aria-hidden') !== 'true').map((e) => e.textContent));
     expect(sinOcultar).toEqual([]);
   });
@@ -1290,7 +1290,7 @@ test.describe('16/10 · contenido', () => {
       return [];
     });
     expect(faq).toHaveLength(6);
-    const visibles = await page.locator('[class*="__faqItem"]').evaluateAll((items) => items.map((i) => ({
+    const visibles = await page.locator('[class*="_faqItem"]').evaluateAll((items) => items.map((i) => ({
       pregunta: i.querySelector('h4')?.textContent ?? '',
       respuesta: i.querySelector('p')?.textContent ?? '',
     })));
@@ -1308,7 +1308,7 @@ test.describe('16/10 · contenido', () => {
     await abrirSimulador(page);
     // El evaluador admite 4 variables (A-D): cualquier expresión con una E se rechaza con
     // ««E» no es una variable válida. Usa A, B, C o D.» (RECHAZOS del CASO 3 de 30/08, arriba).
-    const seccion = page.locator('section[class*="__relatedConcepts"]');
+    const seccion = page.locator('section[class*="_relatedConcepts"]');
     await expect(seccion).toHaveCount(1);
     await expect(seccion).not.toContainText('cualquier fórmula booleana');
     await expect(seccion).toContainText('hasta cuatro variables (A, B, C y D)');

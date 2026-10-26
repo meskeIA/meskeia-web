@@ -85,12 +85,17 @@ async function texto(loc: Locator): Promise<string> {
   return ((await loc.textContent()) ?? '').replace(/ /g, ' ').trim();
 }
 
-/** El valor de la tarjeta de resultado (ResultCard) cuyo título contiene ese texto. */
+/**
+ * El valor de la tarjeta de resultado (ResultCard) cuyo título contiene ese texto: del <h3> de
+ * su cabecera sube a la tarjeta (h3 → .header → .card) y baja a su `.value`. Hasta el 26/10/2026
+ * se buscaba por `[class*="ResultCard"]`, el nombre del módulo, que el build de next 16.4.3 ya no
+ * pone en la clase (cabo C0457).
+ */
 function tarjeta(page: Page, titulo: string): Locator {
   return page
-    .locator('[class*="ResultCard"][class*="card"]')
-    .filter({ hasText: titulo })
-    .locator('p[class*="value"]')
+    .getByRole('heading', { level: 3, name: titulo })
+    .locator('xpath=../..')
+    .locator('p[class$="_value"]')
     .first();
 }
 

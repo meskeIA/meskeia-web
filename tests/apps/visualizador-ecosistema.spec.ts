@@ -54,7 +54,7 @@ const irA = async (page: Page, seccion: string): Promise<void> => {
   await nav(page).filter({ hasText: seccion }).click();
   await expect(nav(page).filter({ hasText: seccion })).toHaveAttribute('aria-pressed', 'true');
 };
-const niveles = (page: Page) => page.locator('div[class$="__piramide"] > button');
+const niveles = (page: Page) => page.locator('div[class$="_piramide"] > button');
 const contenido = (page: Page) => page.locator('div[class*="seccionContent"]');
 
 /** «10.000 kcal», «1000 kcal» o «1.000 kcal» → número. */
@@ -127,7 +127,7 @@ test('teclado — Enter cambia de sección y Espacio/Enter abren y cierran un ni
   await expect(page.getByRole('heading', { level: 3, name: 'Consumidores terciarios' })).toBeVisible();
   await page.keyboard.press('Enter');
   await expect(superior).toHaveAttribute('aria-expanded', 'false');
-  await expect(page.locator('div[class$="__nivelDetalle"]')).toHaveCount(0);
+  await expect(page.locator('div[class$="_nivelDetalle"]')).toHaveCount(0);
   await expect(page.getByText('Pulsa en cualquier nivel de la pirámide para ver los detalles')).toBeVisible();
 });
 
@@ -148,8 +148,8 @@ test('caso límite — una sola sección, una sola ficha, y cambiar de ciclo cie
     'true',
     'false',
   ]);
-  await expect(page.locator('div[class$="__nivelDetalle"]')).toHaveCount(1);
-  await expect(page.locator('div[class$="__nivelDetalle"] h3')).toHaveText('Consumidores primarios');
+  await expect(page.locator('div[class$="_nivelDetalle"]')).toHaveCount(1);
+  await expect(page.locator('div[class$="_nivelDetalle"] h3')).toHaveText('Consumidores primarios');
 
   await irA(page, 'Ciclos biogeoquímicos');
   const carbono = page.getByRole('button', { name: 'Ciclo del Carbono' });
@@ -157,13 +157,13 @@ test('caso límite — una sola sección, una sola ficha, y cambiar de ciclo cie
   await expect(carbono).toHaveAttribute('aria-pressed', 'true');
   const etapas = page.locator('div[class*="cicloDiagrama"] > button');
   await etapas.nth(3).click();
-  await expect(page.locator('div[class$="__cicloDetalle"] h3')).toHaveText('Combustibles fósiles');
-  await expect(page.locator('div[class$="__cicloDetalle"]')).toContainText('~36.000 millones de toneladas');
+  await expect(page.locator('div[class$="_cicloDetalle"] h3')).toHaveText('Combustibles fósiles');
+  await expect(page.locator('div[class$="_cicloDetalle"]')).toContainText('~36.000 millones de toneladas');
 
   await nitrogeno.click();
   await expect(nitrogeno).toHaveAttribute('aria-pressed', 'true');
   await expect(carbono).toHaveAttribute('aria-pressed', 'false');
-  await expect(page.locator('div[class$="__cicloDetalle"]')).toHaveCount(0);
+  await expect(page.locator('div[class$="_cicloDetalle"]')).toHaveCount(0);
   await expect(etapas.nth(3)).toHaveAttribute('aria-expanded', 'false');
   await expect(etapas.nth(3)).toContainText('Consumo y descomposición');
   await expect(page.locator('span[class*="cicloCentroNombre"]')).toHaveText('Ciclo del Nitrógeno');
@@ -229,7 +229,7 @@ test('atún — los kg de fitoplancton por kg de atún cuadran con el nivel dond
 test('biomasa y especies — no son el 10 % aplicado donde no aplica', async ({ page }) => {
   await irA(page, 'Pirámide trófica');
   const dato = (etiqueta: string) =>
-    page.locator('div[class$="__nivelDato"]').filter({ hasText: etiqueta }).locator('span[class*="nivelDatoValor"]');
+    page.locator('div[class$="_nivelDato"]').filter({ hasText: etiqueta }).locator('span[class*="nivelDatoValor"]');
   await niveles(page).nth(3).click();
   await expect(dato('Biomasa')).not.toHaveText('~1.000 kg por hectárea');
   await expect(dato('Biomasa')).toContainText('t por hectárea'); // del orden de toneladas, con su fuente
@@ -433,7 +433,7 @@ test.describe('móvil 375 × 667 con toque', () => {
     const caja = await oceanos.boundingBox();
     expect(caja?.x ?? -1).toBeGreaterThanOrEqual(0);
     await oceanos.tap();
-    await expect(page.locator('div[class$="__cicloDetalle"]')).toContainText('~25');
+    await expect(page.locator('div[class$="_cicloDetalle"]')).toContainText('~25');
   });
 
   // REPARADO (hallazgo 1737) — en móvil la pirámide dejaba de serlo. `.piramideNivel { min-width: 80% }` iguala los
@@ -519,7 +519,7 @@ test('datos — una sola ficha abierta, pulsarla otra vez la cierra y cambiar de
 // (fondo del contenedor #FAFAFA → #1A1A1A): sembrarlo antes pasaría en falso. Medido el
 // 27/09/2026: 0 elementos por debajo de 4,5:1 (3:1 si es texto grande) en claro y en oscuro.
 test('contraste — barrido de todo el texto propio de la app en oscuro, con fichas abiertas', async ({ page }) => {
-  const contenedor = page.locator('div[class$="__container"]').first();
+  const contenedor = page.locator('div[class$="_container"]').first();
   await expect(contenedor).toHaveCSS('background-color', 'rgb(250, 250, 250)');
   await page.getByRole('button', { name: /Cambiar a modo oscuro/i }).first().click();
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
@@ -544,7 +544,7 @@ test('contraste — barrido de todo el texto propio de la app en oscuro, con fic
         b * a + base[2] * (1 - a),
       ];
       const fallos: string[] = [];
-      for (const el of document.querySelectorAll('div[class$="__container"] *')) {
+      for (const el of document.querySelectorAll('div[class$="_container"] *')) {
         // Solo lo que pinta este módulo: el primer antepasado con clase es de Ecosistema.module.css
         let conClase: Element | null = el;
         while (conClase && !conClase.getAttribute('class')) conClase = conClase.parentElement;
@@ -711,6 +711,6 @@ test.describe('móvil 393 × 851 con toque', () => {
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(393);
     await niveles(page).first().tap();
     await expect(niveles(page).first()).toHaveAttribute('aria-expanded', 'true');
-    await expect(page.locator('div[class$="__nivelDetalle"] h3')).toHaveText('Consumidores terciarios');
+    await expect(page.locator('div[class$="_nivelDetalle"] h3')).toHaveText('Consumidores terciarios');
   });
 });

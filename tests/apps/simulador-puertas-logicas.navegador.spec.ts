@@ -41,11 +41,11 @@ const RUTA = '/simulador-puertas-logicas/';
 
 // Los nombres de clase de un CSS Module llevan un hash que cambia en cada build
 // (SimuladorPuertasLogicas-module__ExoJiG__ioSwitch), así que se busca por el sufijo estable.
-const BOTON_PUERTA = '[class*="__gateBtn"]';
-const TABLA = 'table[class*="__truthTable"]';
-const CONMUTADOR = '[class*="__ioSwitch"]';
-const LED = '[class*="__ioLed"]';
-const ERROR_EXPRESION = '[class*="__expressionError"]';
+const BOTON_PUERTA = '[class*="_gateBtn"]';
+const TABLA = 'table[class*="_truthTable"]';
+const CONMUTADOR = '[class*="_ioSwitch"]';
+const LED = '[class*="_ioLed"]';
+const ERROR_EXPRESION = '[class*="_expressionError"]';
 
 /** Símbolo que la app pinta junto a cada puerta; sirve para localizar el botón sin ambigüedad
  *  («AND» a secas también casaría con NAND). De paso comprueba que el símbolo es el estándar. */
@@ -219,7 +219,7 @@ test.describe('CASO 2 · circuitos de varias puertas', () => {
     // 1+1+1 = 3 = «11» en binario: suma 1 y acarreo 1.
     expect(await ledsDe(page)).toEqual(['1', '1']);
     // Y la fila resaltada de la tabla es la última, 1 1 1 | 1 1.
-    await expect(page.locator('tr[class*="__currentRow"]')).toHaveText('11111');
+    await expect(page.locator('tr[class*="_currentRow"]')).toHaveText('11111');
   });
 
   test('conmutar una sola entrada mueve la salida y la fila resaltada', async ({ page }) => {
@@ -230,12 +230,12 @@ test.describe('CASO 2 · circuitos de varias puertas', () => {
     // A=1, B=0, Cin=0 → 1 → S=1, Cout=0.
     await conmutadores.nth(0).click();
     expect(await ledsDe(page)).toEqual(['1', '0']);
-    await expect(page.locator('tr[class*="__currentRow"]')).toHaveText('10010');
+    await expect(page.locator('tr[class*="_currentRow"]')).toHaveText('10010');
 
     // A=1, B=1, Cin=0 → 2 → S=0, Cout=1: el acarreo aparece justo aquí.
     await conmutadores.nth(1).click();
     expect(await ledsDe(page)).toEqual(['0', '1']);
-    await expect(page.locator('tr[class*="__currentRow"]')).toHaveText('11001');
+    await expect(page.locator('tr[class*="_currentRow"]')).toHaveText('11001');
   });
 
   test('cambiar de circuito devuelve todas las entradas a 0', async ({ page }) => {
@@ -516,7 +516,7 @@ test.describe('hallazgos reparados (135-139)', () => {
     // Hasta el 23/08/2026 el emoji del LED de salida no llevaba aria-hidden (el del conmutador
     // sí) y el LED era un <div> sin role ni aria-live: al conmutar una entrada, quien no ve la
     // pantalla no se enteraba de que la salida cambiaba, que es lo que enseña este modo.
-    const indicadores = await page.locator(`${LED} [class*="__ioIndicator"]`)
+    const indicadores = await page.locator(`${LED} [class*="_ioIndicator"]`)
       .evaluateAll((els) => els.map((e) => e.getAttribute('aria-hidden')));
     expect(indicadores).toEqual(['true', 'true']);
     await expect(page.locator(LED).first()).toHaveAttribute('aria-live', 'polite');
@@ -529,7 +529,7 @@ test.describe('hallazgos reparados · móvil (138)', () => {
   test('REPARADO 138 · la flecha ya no tapa el centro del último conmutador', async ({ page }) => {
     await abrir(page, 'Circuitos');
     await page.getByRole('button', { name: 'Full Adder (Sumador Completo)' }).click();
-    await page.locator('[class*="__circuitPanel"]').scrollIntoViewIfNeeded();
+    await page.locator('[class*="_circuitPanel"]').scrollIntoViewIfNeeded();
 
     // En vertical el panel apila entradas → flecha → salidas, y hasta el 23/08/2026 se giraba
     // 90° el CONTENEDOR de la flecha (transform: rotate). El giro no cambia la caja de 252×51

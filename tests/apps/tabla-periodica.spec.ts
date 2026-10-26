@@ -113,10 +113,10 @@ const RUTA = '/tabla-periodica/';
 
 // Los nombres de clase de un CSS Module llevan un hash que cambia en cada build
 // (TablaPeriodica-module__P-1TeG__elemento), así que se busca por el sufijo estable.
-const CELDA = '[class*="__elemento"]';
-const CELDA_ACTIVA = '[class*="__elemento"]:not([class*="__filtrado"])';
-const CONTENEDOR_TABLA = '[class*="__tablaContainer"]';
-const MODAL = '[class*="__modal"]:not([class*="Overlay"])';
+const CELDA = '[class*="_elemento"]';
+const CELDA_ACTIVA = '[class*="_elemento"]:not([class*="_filtrado"])';
+const CONTENEDOR_TABLA = '[class*="_tablaContainer"]';
+const MODAL = '[class*="_modal"]:not([class*="Overlay"])';
 
 /** Abre la ficha de un elemento por su atributo title («Hierro (Fe)») y devuelve su texto. */
 async function fichaDe(page: Page, titulo: string): Promise<string> {
@@ -135,7 +135,7 @@ async function cerrarFicha(page: Page): Promise<void> {
 async function masaMolarDe(page: Page, formula: string): Promise<string> {
   await page.locator('input[placeholder^="Ej:"]').fill(formula);
   await page.getByRole('button', { name: 'Calcular' }).click();
-  const total = page.locator('[class*="__masaTotal"]');
+  const total = page.locator('[class*="_masaTotal"]');
   await expect(total).toBeVisible();
   return (await total.innerText()).replace(/\s+/g, ' ');
 }
@@ -205,14 +205,14 @@ test.describe('CASO 1 · los datos de los elementos y la calculadora de masa mol
     // El desglose tiene que enseñar la aritmética, no solo el total:
     // en H2SO4 el oxígeno pesa 4 × 15,999 = 63,996 g/mol.
     await masaMolarDe(page, 'H2SO4');
-    const desglose = (await page.locator('[class*="__desgloseMasa"]').innerText()).replace(/\s+/g, ' ');
+    const desglose = (await page.locator('[class*="_desgloseMasa"]').innerText()).replace(/\s+/g, ' ');
     expect(desglose).toContain('×4');
     expect(desglose).toContain('63,9960');
 
     // Un símbolo inventado se rechaza en vez de sumar cero.
     await page.locator('input[placeholder^="Ej:"]').fill('Xz2');
     await page.getByRole('button', { name: 'Calcular' }).click();
-    await expect(page.locator('[class*="__errorMasa"]')).toContainText('no reconocido');
+    await expect(page.locator('[class*="_errorMasa"]')).toContainText('no reconocido');
   });
 });
 
@@ -500,7 +500,7 @@ test.describe('CASO 4 · normal: buscar el oxígeno y comprobar su ficha entera'
     expect(await masaMolarDe(page, 'Fe2O3')).toContain('159,6870 g/mol');
 
     // El desglose tiene que enseñar los 3 oxígenos, no solo el total.
-    const desglose = (await page.locator('[class*="__desgloseMasa"]').innerText()).replace(/\s+/g, ' ');
+    const desglose = (await page.locator('[class*="_desgloseMasa"]').innerText()).replace(/\s+/g, ' ');
     expect(desglose).toContain('Fe (Hierro)');
     expect(desglose).toContain('×3');
     expect(desglose).toContain('47,9970');
@@ -609,23 +609,23 @@ test.describe('CASO 6 · una búsqueda sin resultados y una fórmula rechazada',
     // tiene que nombrar el símbolo que no reconoce.
     await page.locator('input[placeholder^="Ej:"]').fill('Zz2');
     await page.getByRole('button', { name: 'Calcular' }).click();
-    await expect(page.locator('[class*="__errorMasa"]')).toContainText('Elemento "Zz" no reconocido');
-    await expect(page.locator('[class*="__masaTotal"]')).toHaveCount(0);
+    await expect(page.locator('[class*="_errorMasa"]')).toContainText('Elemento "Zz" no reconocido');
+    await expect(page.locator('[class*="_masaTotal"]')).toHaveCount(0);
 
     // Vacío: se pide una fórmula en vez de devolver 0,0000 g/mol.
     await page.locator('input[placeholder^="Ej:"]').fill('');
     await page.getByRole('button', { name: 'Calcular' }).click();
-    await expect(page.locator('[class*="__errorMasa"]')).toContainText('Ingresa una fórmula química');
+    await expect(page.locator('[class*="_errorMasa"]')).toContainText('Ingresa una fórmula química');
 
     // Carácter que no pinta nada en una fórmula.
     await page.locator('input[placeholder^="Ej:"]').fill('H2O!');
     await page.getByRole('button', { name: 'Calcular' }).click();
-    await expect(page.locator('[class*="__errorMasa"]')).toContainText('solo admite letras, números y paréntesis');
+    await expect(page.locator('[class*="_errorMasa"]')).toContainText('solo admite letras, números y paréntesis');
 
     // Paréntesis sin cerrar: se avisa, no se suma a medias.
     await page.locator('input[placeholder^="Ej:"]').fill('Ca(OH2');
     await page.getByRole('button', { name: 'Calcular' }).click();
-    await expect(page.locator('[class*="__errorMasa"]')).toContainText('Falta cerrar un paréntesis');
+    await expect(page.locator('[class*="_errorMasa"]')).toContainText('Falta cerrar un paréntesis');
   });
 });
 
@@ -745,7 +745,7 @@ test.describe('hallazgos reparados · 30/08/2026', () => {
     // Con 0 resultados las 118 celdas pasan a `disabled`, o sea que salen del orden de
     // tabulación: quien navega con lector de pantalla se queda sin nada que explorar y sin
     // ningún aviso de por qué. Basta con role="status" (o aria-live="polite") en el contador.
-    const contador = page.locator('[class*="__contadorElementos"]');
+    const contador = page.locator('[class*="_contadorElementos"]');
     const anuncia = await contador.evaluate((el) =>
       el.getAttribute('aria-live') !== null || el.getAttribute('role') === 'status',
     );
@@ -1153,7 +1153,7 @@ async function responderFicha(
 ): Promise<string> {
   if (respuesta !== null) await sembrarValor(page, `#respuesta-ficha-${id}`, respuesta);
   await tarjetaFicha(page, id).getByRole('button', { name: 'Comprobar' }).click();
-  const veredicto = tarjetaFicha(page, id).locator('[class*="__aulaVeredicto"]');
+  const veredicto = tarjetaFicha(page, id).locator('[class*="_aulaVeredicto"]');
   await expect(veredicto).toBeVisible();
   return (await veredicto.innerText()).replace(/\s+/g, ' ').trim();
 }
@@ -1164,7 +1164,7 @@ const VACIA = 'Escribe una respuesta antes de comprobar.';
 
 /** El texto del contador de fichas resueltas, sin saltos de línea. */
 async function contadorFichas(page: Page): Promise<string> {
-  return (await page.locator('[class*="__aulaContadorTexto"]').innerText()).replace(/\s+/g, ' ');
+  return (await page.locator('[class*="_aulaContadorTexto"]').innerText()).replace(/\s+/g, ' ');
 }
 
 test.describe('RE-INSPECCIÓN 12/09/2026 · la tarea de aula en el navegador', () => {
@@ -1310,7 +1310,7 @@ test.describe('hallazgos reparados · 12/09/2026', () => {
     // el arreglo puede ser ampliar el rango o nombrar la excepción, pero no dejar las dos
     // cifras contradiciéndose en la misma página.
     const filas = await page
-      .locator('[class*="__comparativaTable"] tbody tr')
+      .locator('[class*="_comparativaTable"] tbody tr')
       .evaluateAll((rs) => rs.map((r) => Array.from((r as HTMLTableRowElement).cells).map((c) => c.innerText.trim())));
 
     const alcalinoterreos = filas.find((f) => f[0].includes('alcalinotérreos'));
@@ -1565,7 +1565,7 @@ test.describe('CASO 15 · rechazo: el elemento 119 y tres fórmulas imposibles',
     await sembrarValor(page, '#busqueda', '');
 
     const formula = page.locator('input[placeholder^="Ej:"]');
-    const error = page.locator('[class*="__errorMasa"]');
+    const error = page.locator('[class*="_errorMasa"]');
 
     // «NACL» — todo en mayúsculas. El parser lee /^([A-Z][a-z]?)/: ve «N» (nitrógeno)
     // y después «A», que no es ningún símbolo. Tiene que DECIRLO, no quedarse con el
@@ -1573,19 +1573,19 @@ test.describe('CASO 15 · rechazo: el elemento 119 y tres fórmulas imposibles',
     await formula.fill('NACL');
     await page.getByRole('button', { name: 'Calcular' }).click();
     await expect(error).toContainText('Elemento "A" no reconocido');
-    await expect(page.locator('[class*="__masaTotal"]')).toHaveCount(0);
+    await expect(page.locator('[class*="_masaTotal"]')).toHaveCount(0);
 
     // «h2o» — todo en minúsculas. Ningún símbolo químico empieza por minúscula.
     await formula.fill('h2o');
     await page.getByRole('button', { name: 'Calcular' }).click();
     await expect(error).toContainText('No entiendo');
-    await expect(page.locator('[class*="__masaTotal"]')).toHaveCount(0);
+    await expect(page.locator('[class*="_masaTotal"]')).toHaveCount(0);
 
     // «Nx2O» — un símbolo inventado de dos letras dentro de una fórmula plausible.
     await formula.fill('Nx2O');
     await page.getByRole('button', { name: 'Calcular' }).click();
     await expect(error).toContainText('Elemento "Nx" no reconocido');
-    await expect(page.locator('[class*="__masaTotal"]')).toHaveCount(0);
+    await expect(page.locator('[class*="_masaTotal"]')).toHaveCount(0);
 
     // Y en cuanto la fórmula es válida vuelve a calcular: N₂O = 2 × 14,007 + 15,999
     // = 44,013 g/mol. Un rechazo no puede dejar la calculadora atascada.
@@ -1678,7 +1678,7 @@ test.describe('hallazgos reparados · 14/09/2026', () => {
 
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     const filas = await page
-      .locator('[class*="__comparativaTable"] tbody tr')
+      .locator('[class*="_comparativaTable"] tbody tr')
       .evaluateAll((rs) =>
         rs.map((r) => Array.from((r as HTMLTableRowElement).cells).map((c) => c.innerText.trim())),
       );
@@ -1714,7 +1714,7 @@ test.describe('hallazgos reparados · 14/09/2026', () => {
     await cerrarFicha(page);
 
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
-    const paso2 = page.locator('[class*="__stepItem"]').filter({ hasText: 'Determinar el bloque' });
+    const paso2 = page.locator('[class*="_stepItem"]').filter({ hasText: 'Determinar el bloque' });
     await expect(paso2).toContainText('bloque p');
     // Si se enuncia la regla, hay que nombrar al helio, que es el único elemento al
     // que le falla dentro de esta tabla.
@@ -1792,7 +1792,7 @@ test.describe('hallazgos reparados · 14/09/2026', () => {
 /** Veredicto de una ficha partiendo de cero: sin veredicto previo que pueda leerse rancio. */
 async function veredictoLimpio(page: Page, id: number, respuesta: string): Promise<string> {
   await page.getByRole('button', { name: 'Empezar de nuevo' }).click();
-  await expect(tarjetaFicha(page, id).locator('[class*="__aulaVeredicto"]')).toHaveCount(0);
+  await expect(tarjetaFicha(page, id).locator('[class*="_aulaVeredicto"]')).toHaveCount(0);
   return responderFicha(page, id, respuesta);
 }
 
@@ -1846,7 +1846,7 @@ test.describe('CASO 16 · normal: el cromo, excepción al Aufbau, y el dicromato
 
     // K₂Cr₂O₇ = 2 × 39,098 + 2 × 51,996 + 7 × 15,999 = 78,196 + 103,992 + 111,993 = 294,181
     expect(await masaMolarDe(page, 'K2Cr2O7')).toContain('294,1810 g/mol');
-    const desglose = (await page.locator('[class*="__desgloseMasa"]').innerText()).replace(/\s+/g, ' ');
+    const desglose = (await page.locator('[class*="_desgloseMasa"]').innerText()).replace(/\s+/g, ' ');
     expect(desglose).toContain('K (Potasio) ×2 78,1960');
     expect(desglose).toContain('Cr (Cromo) ×2 103,9920');
     expect(desglose).toContain('O (Oxígeno) ×7 111,9930');
@@ -1946,8 +1946,8 @@ test.describe('CASO 18 · rechazo: las fichas no aprueban lo que no es la respue
 
   test('S1 en el navegador · en la práctica sin final, la respuesta ±1 nunca cuela', async ({ page }) => {
     await abrirHidratada(page);
-    const practica = page.locator('div[class*="__aulaPractica"]');
-    const veredicto = practica.locator('[class*="__aulaVeredicto"]');
+    const practica = page.locator('div[class*="_aulaPractica"]');
+    const veredicto = practica.locator('[class*="_aulaVeredicto"]');
 
     // Ocho tiradas al azar: cualquiera vale, porque el mayor valor sorteable es 83,798
     // (masa del Kr) → 1 % = 0,838 < 1, y el mayor recuento 36 → 0,36.
@@ -2036,7 +2036,7 @@ test.describe('hallazgos reparados · 27/09/2026', () => {
     await cerrarFicha(page);
 
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
-    const guia = page.locator('[class*="__guiaSection"]');
+    const guia = page.locator('[class*="_guiaSection"]');
     await expect(guia).not.toContainText('Fr (348 pm), seguido del Cs (298 pm)');
     // Las cifras que cita la guía son las de las fichas.
     await expect(guia).toContainText('el mayor es el Cs (232 pm)');
@@ -2154,12 +2154,12 @@ test.describe('hallazgos reparados · 27/09/2026', () => {
     // texto crudo para distinguir el duro del normal.
     for (const t of ['Hidrógeno (H)', 'Nitrógeno (N)', 'Argón (Ar)']) {
       await page.locator(`[title="${t}"]`).click();
-      const crudo = await page.locator('[class*="__datoCurioso"]').innerText();
+      const crudo = await page.locator('[class*="_datoCurioso"]').innerText();
       expect(crudo, t).not.toMatch(/\d%/);
       expect(crudo, t).toMatch(/\d %/);
       await cerrarFicha(page);
     }
-    const convenio = await page.locator('[class*="__aulaConvenio"]').innerText();
+    const convenio = await page.locator('[class*="_aulaConvenio"]').innerText();
     expect(convenio).not.toMatch(/\d %/); // espacio normal; con el duro (U+00A0) no casa
     expect(convenio).not.toMatch(/\d%/);
     // Desde el 17/10/2026 (hallazgo 3363) el convenio ya no cita un «1 %»: la masa se corrige
@@ -2168,10 +2168,10 @@ test.describe('hallazgos reparados · 27/09/2026', () => {
     expect(convenio).toMatch(/1 %/);
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     for (const seccion of [
-      '[class*="__escenariosSection"]',
-      '[class*="__faqSection"]',
-      '[class*="__comparativaSection"]',
-      '[class*="__tipsSection"]',
+      '[class*="_escenariosSection"]',
+      '[class*="_faqSection"]',
+      '[class*="_comparativaSection"]',
+      '[class*="_tipsSection"]',
     ]) {
       const texto = await page.locator(seccion).innerText();
       expect(texto, seccion).not.toMatch(/\d%/);
@@ -2242,7 +2242,7 @@ test.describe('hallazgos reparados · 27/09/2026', () => {
     await expect(campo).toHaveCount(1);
     await campo.fill('NACL');
     await page.getByRole('button', { name: 'Calcular' }).click();
-    const error = page.locator('[class*="__errorMasa"]');
+    const error = page.locator('[class*="_errorMasa"]');
     await expect(error).toContainText('Elemento "A" no reconocido');
 
     const region = await error.evaluate((el) => {
@@ -2368,8 +2368,8 @@ test.describe('CASO 19 · normal: la plata, excepción al Aufbau, y dos sales co
     expect(ag).not.toContain('Origen:');
     await cerrarFicha(page);
 
-    const total = page.locator('[class*="__masaTotal"]');
-    const desglose = page.locator('[class*="__desgloseMasa"]');
+    const total = page.locator('[class*="_masaTotal"]');
+    const desglose = page.locator('[class*="_desgloseMasa"]');
     // AgNO₃ = 107,87 + 14,007 + 3 × 15,999 = 169,874
     expect(await masaMolarDe(page, 'AgNO3')).toContain('169,8740 g/mol');
     await expect(desglose).toContainText('Ag (Plata)');
@@ -2456,7 +2456,7 @@ test.describe('CASO 21 · rechazo: fórmulas imposibles, la casilla de al lado y
   test('la calculadora nombra lo que no entiende y las fichas no aprueban al vecino', async ({ page }) => {
     await abrirHidratada(page);
 
-    const error = page.locator('[class*="__errorMasa"]');
+    const error = page.locator('[class*="_errorMasa"]');
     for (const [formula, mensaje] of [
       ['Wo2', 'Elemento "Wo" no reconocido'],
       ['Mg(NO3', 'Falta cerrar un paréntesis.'],
@@ -2467,7 +2467,7 @@ test.describe('CASO 21 · rechazo: fórmulas imposibles, la casilla de al lado y
       await page.getByLabel('Fórmula química').fill(formula);
       await page.getByRole('button', { name: 'Calcular' }).click();
       await expect(error, formula).toHaveText(mensaje);
-      await expect(page.locator('[class*="__masaTotal"]'), formula).toHaveCount(0);
+      await expect(page.locator('[class*="_masaTotal"]'), formula).toHaveCount(0);
     }
 
     for (const [id, respuesta] of [
@@ -2531,7 +2531,7 @@ test.describe('CASO 22 · móvil (Galaxy S8, 360 × 740): la tabla y la ficha co
     expect(medidas.contenido).toBeGreaterThan(medidas.alto); // se recorre por dentro
     await expect(modal).toContainText('Número atómico: 58');
     await expect(modal).toContainText('[Xe] 4f¹ 5d¹ 6s²');
-    const dato = modal.locator('[class*="__datoCurioso"]');
+    const dato = modal.locator('[class*="_datoCurioso"]');
     await dato.scrollIntoViewIfNeeded();
     await expect(dato).toBeInViewport();
 
@@ -2546,7 +2546,7 @@ test.describe('CASO 22 · móvil (Galaxy S8, 360 × 740): la tabla y la ficha co
     await sembrarValor(page, '#respuesta-ficha-1', 'hierro');
     const tarjeta = tarjetaFicha(page, 1);
     await tarjeta.getByRole('button', { name: 'Comprobar' }).tap();
-    await expect(tarjeta.locator('[class*="__aulaVeredicto"]')).toContainText(ACIERTO);
+    await expect(tarjeta.locator('[class*="_aulaVeredicto"]')).toContainText(ACIERTO);
     await tarjeta.getByRole('button', { name: /Abrir este elemento en la tabla/ }).tap();
     await expect(page.locator('#titulo-ficha-elemento')).toHaveText('Hierro');
     await page.getByRole('button', { name: 'Cerrar la ficha de Hierro' }).tap();
@@ -2567,7 +2567,7 @@ test.describe('CASO 22 · móvil (Galaxy S8, 360 × 740): la tabla y la ficha co
     const medida = await page.locator('[title="Hierro (Fe)"]').evaluate((el) => ({
       ancho: el.getBoundingClientRect().width,
       fuente: parseFloat(
-        getComputedStyle(el.querySelector('[class*="__numeroAtomico"]') as Element).fontSize,
+        getComputedStyle(el.querySelector('[class*="_numeroAtomico"]') as Element).fontSize,
       ),
     }));
     expect(medida.ancho).toBeGreaterThan(44); // la casilla no encoge
@@ -2584,7 +2584,7 @@ test.describe('verificación 16/10/2026 · los commits posteriores a la inspecci
     // entera se anulaba (quedaba el `transparent` de .aulaVeredicto). Ahora es --error.
     expect(await veredictoLimpio(page, 1, 'Cu')).toContain(FALLO);
     const colores = await tarjetaFicha(page, 1)
-      .locator('[class*="__aulaVeredicto"]')
+      .locator('[class*="_aulaVeredicto"]')
       .evaluate((el) => {
         const testigo = document.createElement('span');
         testigo.style.color = 'var(--error)';
@@ -2624,7 +2624,7 @@ test.describe('verificación 16/10/2026 · los commits posteriores a la inspecci
 
     // ac046fdc y cf2332d8: la FAQ visible del número de masa.
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
-    const faq = page.locator('[class*="__faqSection"]');
+    const faq = page.locator('[class*="_faqSection"]');
     await expect(faq).toContainText('su periodo de semidesintegración de 5.730 años');
     await expect(faq).not.toContainText('vida media');
     await expect(faq.locator('a[href="/visualizador-radioactividad/"]')).toHaveText('datación por carbono-14');
@@ -2688,8 +2688,8 @@ test.describe('hallazgos · 16/10/2026 (A, B, C, D y E reparados)', () => {
       await cerrarFicha(page);
     }
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
-    await expect(page.locator('[class*="__comparativaSection"]')).not.toContainText('en Kr, Xe y Rn');
-    await expect(page.locator('[class*="__comparativaSection"]')).toContainText('Sin valor salvo en Kr (3,00) y Xe (2,60)');
+    await expect(page.locator('[class*="_comparativaSection"]')).not.toContainText('en Kr, Xe y Rn');
+    await expect(page.locator('[class*="_comparativaSection"]')).toContainText('Sin valor salvo en Kr (3,00) y Xe (2,60)');
     const enTendencias = new Map<number, number | null>(
       ELEMENTOS_TENDENCIAS.map((t) => [t.Z, t.electronegatividad]),
     );
@@ -2745,13 +2745,13 @@ test.describe('hallazgos · 16/10/2026 (A, B, C, D y E reparados)', () => {
     await page.evaluate((s) => {
       Math.random = () => (s - 0.5) / 1e9;
     }, semilla);
-    const practica = page.locator('div[class*="__aulaPractica"]');
-    const veredicto = practica.locator('[class*="__aulaVeredicto"]');
+    const practica = page.locator('div[class*="_aulaPractica"]');
+    const veredicto = practica.locator('[class*="_aulaVeredicto"]');
     const responderPractica = async (respuesta: string): Promise<string> => {
       // Generar con la misma semilla saca el mismo ejercicio y BORRA el veredicto anterior,
       // así que ningún «¡Correcto!» puede leerse rancio del intento previo.
       await page.getByRole('button', { name: /Generar un ejercicio nuevo/ }).click();
-      await expect(practica.locator('[class*="__aulaEnunciado"]')).toHaveText(
+      await expect(practica.locator('[class*="_aulaEnunciado"]')).toHaveText(
         'Busca el cobalto (Co) en la tabla. ¿Cuál es la masa atómica del cobalto?',
       );
       await expect(veredicto).toHaveCount(0);
@@ -2823,7 +2823,7 @@ test.describe('hallazgos · 16/10/2026 (A, B, C, D y E reparados)', () => {
     expect(texto).toMatch(/capa electrónica más alta[^]*paladio/);
 
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
-    const paso1 = (await page.locator('[class*="__stepItem"]').first().innerText()).replace(/\s+/g, ' ');
+    const paso1 = (await page.locator('[class*="_stepItem"]').first().innerText()).replace(/\s+/g, ' ');
     expect(paso1).toContain('Localizar el elemento');
     if (/capas/.test(paso1)) expect(paso1).toMatch(/paladio|excepci|salvo/i);
   });
@@ -2926,7 +2926,7 @@ test.describe('CASO 23 · normal: el wolframio, buscado por sus dos nombres, su 
 
     // WO₃ = 183,84 + 3 × 15,999 = 231,837
     expect(await masaMolarDe(page, 'WO3')).toContain('231,8370 g/mol');
-    const desglose = page.locator('[class*="__desgloseMasa"]');
+    const desglose = page.locator('[class*="_desgloseMasa"]');
     await expect(desglose).toContainText(/W \(Wolframio\)\s+×1\s+183,8400/, { useInnerText: true });
     await expect(desglose).toContainText(/O \(Oxígeno\)\s+×3\s+47,9970/, { useInnerText: true });
 
@@ -3048,11 +3048,11 @@ test.describe('CASO 25 · rechazo: el vecino no aprueba y el fallo no escribe ni
     expect(await veredictoLimpio(page, 2, 'azufre')).toContain(ACIERTO);
 
     // La práctica sin final: su fallo tampoco escribe cifras.
-    const practica = page.locator('div[class*="__aulaPractica"]');
+    const practica = page.locator('div[class*="_aulaPractica"]');
     await page.getByRole('button', { name: /Generar un ejercicio nuevo/ }).click();
     await sembrarValor(page, '#respuesta-practica', '999,123');
     await practica.getByRole('button', { name: 'Comprobar' }).click();
-    const vPractica = practica.locator('[class*="__aulaVeredicto"]');
+    const vPractica = practica.locator('[class*="_aulaVeredicto"]');
     await expect(vPractica).toHaveText('❌ Todavía no. Busca el elemento en la tabla y abre su ficha.');
 
     // «volframio», con v: no es ninguno de los dos nombres admitidos.
@@ -3103,7 +3103,7 @@ test.describe('CASO 26 · móvil (iPhone 12, 390 × 664): buscar por el otro nom
     expect(medidas.ancho).toBe(358); // 390 − 2 × 16
     expect(medidas.alto).toBeCloseTo(597.6, 0); // max-height: 90vh de 664
     expect(medidas.contenido).toBeGreaterThan(medidas.alto);
-    const dato = page.locator(MODAL).first().locator('[class*="__datoCurioso"]');
+    const dato = page.locator(MODAL).first().locator('[class*="_datoCurioso"]');
     await dato.scrollIntoViewIfNeeded();
     await expect(dato).toBeInViewport();
 

@@ -2,6 +2,7 @@ import { test, expect, Page } from '@playwright/test';
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
+import { selectorDelModulo } from './_modulo-css';
 
 /**
  * estimador-irpf-pensionista — candado del método del art. 63.1.2.º LIRPF y de la ENTRADA
@@ -129,6 +130,7 @@ test.beforeEach(async ({ page }) => {
   await page.goto(RUTA);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Estimador IRPF Pensionista');
   await esperarHidratacion(page, CAMPOS);
+  MOD = await selectorDelModulo(page.getByRole('heading', { level: 1 }), 'title');
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -473,14 +475,19 @@ test('CASO 11 (dato) · el FAQPage que leen las IAs lleva las mismas cifras que 
 
 const NBSP = String.fromCharCode(160);
 
-/** Prefijo de las clases del módulo de ESTA app: deja fuera los componentes compartidos. */
-const MOD = '[class*="EstimadorIrpfPensionista-module"]';
+/**
+ * Prefijo de las clases del módulo de ESTA app: deja fuera los componentes compartidos (el
+ * `.container` de EducationalSection, el `.btn` de ShareCard). Lo resuelve el beforeEach desde el
+ * `<h1>`: hasta el 26/10/2026 era `[class*="EstimadorIrpfPensionista-module"]`, que el build de
+ * next 16.4.3 ya no lleva y dejaba estos casos ciegos bajo `next start` (cabo C0457).
+ */
+let MOD = '';
 
 /** Pasa la página al tema oscuro y espera a que el fondo del contenedor lo refleje. */
 async function temaOscuro(page: Page): Promise<void> {
   await page.evaluate(() => { document.documentElement.dataset.theme = 'dark'; });
   await expect
-    .poll(() => page.locator(`div${MOD}[class$="__container"]`).first().evaluate((e) => getComputedStyle(e).backgroundColor))
+    .poll(() => page.locator(`div${MOD}[class$="_container"]`).first().evaluate((e) => getComputedStyle(e).backgroundColor))
     .toBe('rgb(26, 26, 26)');
 }
 
@@ -755,7 +762,7 @@ test('CASO 24 (hallazgo 2133, reparado) · la FAQ de ascendientes toma el límit
   // en DEDUCCIONES_IRPF_DISCAPACIDAD_2025.requisitosAscendiente (art. 59 LIRPF: mayor de 65 años o
   // con discapacidad, y rentas, excluidas las exentas, no superiores a 8.000 €). Ahora sale de
   // allí, con formatCurrency como el resto de cifras de la página: «8000,00 €».
-  const faq = page.locator(`${MOD}[class$="__faqItem"]`).filter({ hasText: 'ascendiente a cargo' });
+  const faq = page.locator(`${MOD}[class$="_faqItem"]`).filter({ hasText: 'ascendiente a cargo' });
   const texto = limpiar((await faq.textContent()) ?? '');
   expect(texto).toContain('superiores a 8000,00 €');
   expect(texto).toContain('más de 65 años');
@@ -773,7 +780,7 @@ test('CASO 19 (hallazgo 2134, reparado) · los porcentajes llevan espacio duro a
   const valor = page.locator('css=div:has(> span:text-is("Tipo efectivo estimado"))').first().locator('span').nth(1);
   expect(await valor.textContent()).toBe(`11,7${NBSP}%`);
 
-  const faqs = (await page.locator(`${MOD}[class$="__faqItem"]`).allTextContents()).join(' ');
+  const faqs = (await page.locator(`${MOD}[class$="_faqItem"]`).allTextContents()).join(' ');
   expect(faqs, 'ningún porcentaje pegado a la cifra').not.toMatch(/\d%/);
   expect(faqs, 'ningún porcentaje con espacio normal').not.toMatch(/\d %/);
 });
@@ -806,8 +813,8 @@ test('CASO 21 (hallazgo 2135, reparado) · las cifras del resultado se leen con 
   //   .resultValueBig (1,4rem = 22,4 px en negrita: texto grande, exige 3:1)
   //     claro  2,69:1 (#27AE60 sobre #F0FAF0)
   await estimar(page, '1500', '65_74');
-  const cifras = `span${MOD}[class$="__resultValue"]`;
-  const neta = `span${MOD}[class$="__resultValueBig"]`;
+  const cifras = `span${MOD}[class$="_resultValue"]`;
+  const neta = `span${MOD}[class$="_resultValueBig"]`;
   const claro = await peorContraste(page, cifras);
   const netaClaro = await peorContraste(page, neta);
   await temaOscuro(page);
@@ -832,9 +839,9 @@ test('CASO 22 (hallazgo 2136, reparado) · botón, preguntas y pasos del bloque 
   //   preguntas de la FAQ (`.faqItem strong`): 3,77:1 en claro y 3,21:1 en oscuro
   //   números de la guía paso a paso (`.stepNumber`): 4,11:1 en los dos temas
   await page.getByRole('button', { name: 'Ver guía educativa' }).click();
-  const selBoton = `button${MOD}[class$="__btn"]`;
-  const selPreguntas = `${MOD}[class$="__faqItem"] > strong`;
-  const selPasos = `${MOD}[class$="__stepNumber"]`;
+  const selBoton = `button${MOD}[class$="_btn"]`;
+  const selPreguntas = `${MOD}[class$="_faqItem"] > strong`;
+  const selPasos = `${MOD}[class$="_stepNumber"]`;
   const boton = await peorContraste(page, selBoton);
   const preguntas = await peorContraste(page, selPreguntas);
   const pasos = await peorContraste(page, selPasos);
@@ -1072,7 +1079,7 @@ test('CASO 30 (sospecha del 28/09, DESCARTADA con medida) · las notas del resul
   //   700 €/mes, 75+, 10.000 € de intereses → salen las tres notas (art. 20, art. 56.2 y la que
   //   explica la pensión neta, que desde el 03/10/2026 sustituye a la de «TODAS las rentas»).
   await estimar(page, '700', '75_mas', { ahorro: '10000' });
-  const notas = `p${MOD}[class$="__resultNota"]`;
+  const notas = `p${MOD}[class$="_resultNota"]`;
   const claro = await peorContraste(page, notas);
   await temaOscuro(page);
   const oscuro = await peorContraste(page, notas);
@@ -1088,7 +1095,7 @@ test('CASO 31 (hallazgo 2777, reparado el 03/10/2026) · el aviso de error se le
   // que leer cuando la app rechaza un dato. `check:token-oscuro` no lo ve: no es un token.
   await page.addStyleTag({ content: '*,*::before,*::after{transition:none !important}' });
   await page.getByRole('button', { name: BOTON_ESTIMAR }).click();
-  const sel = `div${MOD}[class$="__errorMsg"]`;
+  const sel = `div${MOD}[class$="_errorMsg"]`;
   await expect(page.locator(sel)).toBeVisible();
   const claro = await peorContraste(page, sel);
   await temaOscuro(page);
@@ -1101,7 +1108,7 @@ test('CASO 31 (hallazgo 2777, reparado el 03/10/2026) · el aviso de error se le
 test('CASO 32 (hallazgo 2778, reparado el 03/10/2026) · el nombre accesible del botón contiene su texto visible', async ({ page }) => {
   // WCAG 2.5.3 (Label in Name, nivel A): quien maneja el navegador por voz dice lo que VE, «pulsa
   // Estimar mi IRPF como pensionista», y el aria-label lo sustituye por «Estimar IRPF pensionista».
-  const boton = page.locator(`button${MOD}[class$="__btn"]`);
+  const boton = page.locator(`button${MOD}[class$="_btn"]`);
   const visible = (await boton.innerText()).trim();
   expect(visible).toBe('Estimar mi IRPF como pensionista');
   await expect(boton).toHaveAccessibleName(new RegExp(visible));
@@ -1131,7 +1138,7 @@ test('CASO 33 (hallazgo 2776, reparado el 03/10/2026) · la «pensión neta» no
   //   Con rescate: 1.309,68 €/mes; resto de la cuota 12.558,50 − 2.664,50 = 9.894,00 €.
   //   Con alquiler: 1.309,68 €/mes; resto 43.178,50 − 2.664,50 = 40.514,00 €.
   // El caso admitía «ninguna cifra»; como ahora se publica, se exige la exacta (no un ≥).
-  const nota = page.locator(`p${MOD}[class$="__resultNota"]`).filter({ hasText: 'por sí sola' });
+  const nota = page.locator(`p${MOD}[class$="_resultNota"]`).filter({ hasText: 'por sí sola' });
 
   await estimar(page, '1500', '65_74', { rescate: '30.000' });
   expect(await fila(page, 'Cuota IRPF estimada anual')).toBe('12.558,50 €');
@@ -1139,13 +1146,13 @@ test('CASO 33 (hallazgo 2776, reparado el 03/10/2026) · la «pensión neta» no
   expect(limpiar((await nota.textContent()) ?? '')).toContain('(2664,50 € al año), repartido en 14 pagas');
   expect(limpiar((await nota.textContent()) ?? '')).toContain('Los 9894,00 € restantes de la cuota');
   // Y el rescate avisa de la DT 12.ª, que el estimador no aplica (hallazgo 2775).
-  await expect(page.locator(`p${MOD}[class$="__resultNota"]`).filter({ hasText: 'transitoria 12.ª' })).toHaveCount(1);
+  await expect(page.locator(`p${MOD}[class$="_resultNota"]`).filter({ hasText: 'transitoria 12.ª' })).toHaveCount(1);
 
   await estimar(page, '1500', '65_74', { rescate: '0', otrasRentas: '100.000' });
   expect(await fila(page, 'Cuota IRPF estimada anual')).toBe('43.178,50 €');
   expect(await netaPublicada(), 'pensión neta con alquiler').toBe(1309.68);
   expect(limpiar((await nota.textContent()) ?? '')).toContain('Los 40.514,00 € restantes de la cuota');
-  await expect(page.locator(`p${MOD}[class$="__resultNota"]`).filter({ hasText: 'transitoria 12.ª' })).toHaveCount(0);
+  await expect(page.locator(`p${MOD}[class$="_resultNota"]`).filter({ hasText: 'transitoria 12.ª' })).toHaveCount(0);
 
   // Sin otras rentas la nota explica la cifra pero no habla de un «resto» que no existe.
   await estimar(page, '1500', '65_74', { otrasRentas: '0' });
@@ -1164,8 +1171,8 @@ test('CASO 34 (hallazgo 2772, reparado el 03/10/2026) · ascendientes: el límit
   // ni obtener esa deducción». Y en otra FAQ aconseja declarar sin estar obligado para pedir la
   // devolución: un pensionista con 7.000 € de rentas que convive con su hijo y lo hace le quita al
   // hijo el mínimo por ascendiente (1.150 €, art. 59.1).
-  const faq = page.locator(`${MOD}[class$="__faqItem"]`).filter({ hasText: 'ascendiente a cargo' });
-  const tarjeta = page.locator(`${MOD}[class$="__tipCard"]`).filter({ hasText: 'Coordina con la familia' });
+  const faq = page.locator(`${MOD}[class$="_faqItem"]`).filter({ hasText: 'ascendiente a cargo' });
+  const tarjeta = page.locator(`${MOD}[class$="_tipCard"]`).filter({ hasText: 'Coordina con la familia' });
   const texto = limpiar(`${(await faq.textContent()) ?? ''} ${(await tarjeta.textContent()) ?? ''}`);
   expect(texto).toMatch(/1\.?800/);
   expect(texto).not.toMatch(/conjunta(mente)? con tus hijos/);
@@ -1176,7 +1183,7 @@ test('CASO 34 (hallazgo 2772, reparado el 03/10/2026) · ascendientes: el límit
   expect(texto).toContain('rentas superiores a 1800,00 € (art. 61.2.ª');
   expect(texto).toContain('la mitad del período impositivo');
   expect(texto).not.toMatch(/esa deducción/);
-  const conviene = page.locator(`${MOD}[class$="__faqItem"]`).filter({ hasText: 'Conviene declarar aunque no esté obligado' });
+  const conviene = page.locator(`${MOD}[class$="_faqItem"]`).filter({ hasText: 'Conviene declarar aunque no esté obligado' });
   expect(limpiar((await conviene.textContent()) ?? '')).toContain('rentas superiores a 1800,00 €, se queda sin ese mínimo');
 });
 
@@ -1211,7 +1218,7 @@ test('CASO 36 (hallazgo 2774, reparado el 03/10/2026) · los escenarios conectan
   // umbrales en el art. 96, y conviene comprobarlos aparte».
   // Y con 19.000 € de un solo pagador no hay obligación sea cual sea la retención (art. 96.2.a); la
   // app la hace depender de ella: «Si la retención aplicada es exacta, puede no ser obligatorio».
-  const texto = limpiar((await page.locator(`${MOD}[class$="__escenariosGrid"]`).textContent()) ?? '');
+  const texto = limpiar((await page.locator(`${MOD}[class$="_escenariosGrid"]`).textContent()) ?? '');
   expect(texto).not.toContain('tiene sus propios umbrales en el art. 96');
   expect(texto).not.toContain('Si la retención aplicada es exacta, puede no ser obligatorio declarar');
   // Reparado: cada escenario CONCLUYE lo que dice el art. 96.2.
@@ -1227,8 +1234,8 @@ test('CASO 37 (hallazgo 2775, reparado el 03/10/2026) · el rescate del plan men
   // puede hacer perder la reducción de esa parte. (`lib/calculadoras/rescatePlanPensiones.ts` ya la
   // modela.)
   const parrafo = page.locator('h3', { hasText: 'Rescate del plan de pensiones' }).locator('xpath=following-sibling::p[1]');
-  const escenario = page.locator(`${MOD}[class$="__escenarioCard"]`).filter({ hasText: 'plan de pensiones rescatado' });
-  const consejo = page.locator(`${MOD}[class$="__tipCard"]`).filter({ hasText: 'Planifica el rescate' });
+  const escenario = page.locator(`${MOD}[class$="_escenarioCard"]`).filter({ hasText: 'plan de pensiones rescatado' });
+  const consejo = page.locator(`${MOD}[class$="_tipCard"]`).filter({ hasText: 'Planifica el rescate' });
   const texto = limpiar(`${await parrafo.textContent()} ${await escenario.textContent()} ${await consejo.textContent()}`);
   expect(texto).toMatch(/2006|2007|transitori/i);
 });
@@ -1238,7 +1245,7 @@ test('CASO 38 (hallazgo 2779, reparado el 03/10/2026) · las pensiones exentas n
   // de lesiones de la Guerra Civil (c), las de inutilidad de clases pasivas (g) y las de orfandad de
   // la Seguridad Social de menores de 22 años (h). Un huérfano de 20 años con pensión de orfandad
   // de la SS no tributa por ella; la FAQ dice que las únicas exentas son las de incapacidad.
-  const faq = page.locator(`${MOD}[class$="__faqItem"]`).filter({ hasText: 'siempre tributan' });
+  const faq = page.locator(`${MOD}[class$="_faqItem"]`).filter({ hasText: 'siempre tributan' });
   expect(limpiar((await faq.textContent()) ?? '')).not.toMatch(/exenciones totales solo para/);
 });
 
@@ -1247,7 +1254,7 @@ test('CASO 39 (hallazgo 2780, reparado el 03/10/2026) · discapacidad ≥ 65 %: 
   // asistencia, en 3.000 euros anuales cuando acredite […] un grado de discapacidad igual o superior
   // al 65 por ciento» (DEDUCCIONES_IRPF_DISCAPACIDAD_2025.contribuyente.gastosAsistencia65oMas).
   //   Pensionista con el 65 % → mínimo por discapacidad 12.000 €; la FAQ dice 9.000 €.
-  const faq = page.locator(`${MOD}[class$="__faqItem"]`).filter({ hasText: 'discapacidad al IRPF' });
+  const faq = page.locator(`${MOD}[class$="_faqItem"]`).filter({ hasText: 'discapacidad al IRPF' });
   expect(limpiar((await faq.textContent()) ?? '')).toMatch(/asistencia/i);
   // Reparado: 9.000 + 3.000 = 12.000 €, y los tramos «33 % al 64 %» / «65 % o más» ya no comparten el 65.
   const texto = limpiar((await faq.textContent()) ?? '');
@@ -1261,7 +1268,7 @@ test('CASO 40 (hallazgo 2781, reparado el 03/10/2026) · el plazo de la campaña
   // data/fiscal/calendario.ts: «Campaña de abril a finales de junio; las fechas exactas se publican
   // cada ejercicio». El paso 6 de la guía fija «El plazo es del 2 de abril al 30 de junio. Si sale a
   // pagar y domicilias el pago, puedes presentar hasta el 25 de junio».
-  const paso = page.locator(`${MOD}[class$="__step"]`).filter({ hasText: 'Presenta antes' });
+  const paso = page.locator(`${MOD}[class$="_step"]`).filter({ hasText: 'Presenta antes' });
   const texto = limpiar((await paso.textContent()) ?? '');
   expect(texto).not.toContain('2 de abril');
   expect(texto).not.toContain('25 de junio');

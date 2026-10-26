@@ -78,16 +78,16 @@ const RUTA = '/simulador-distribucion-normal/';
 
 const resultsPanel = (page: Page) => page.locator('[role="status"]');
 const probLabel = (page: Page) =>
-  page.locator('[class$="__resultCardMain"] [class$="__resultLabel"]');
-const probValueLarge = (page: Page) => page.locator('[class$="__resultValueLarge"]');
-const probDecimal = (page: Page) => page.locator('[class$="__resultDecimal"]');
+  page.locator('[class$="_resultCardMain"] [class$="_resultLabel"]');
+const probValueLarge = (page: Page) => page.locator('[class$="_resultValueLarge"]');
+const probDecimal = (page: Page) => page.locator('[class$="_resultDecimal"]');
 
 /** Tarjeta .resultCard (Z(a) o Z(b), nunca la .resultCardMain — el sufijo $= las distingue). */
 function tarjetaZ(page: Page, cual: 'Z(a)' | 'Z(b)'): Locator {
-  return page.locator('[class$="__resultCard"]').filter({ hasText: cual });
+  return page.locator('[class$="_resultCard"]').filter({ hasText: cual });
 }
 function valorZ(page: Page, cual: 'Z(a)' | 'Z(b)'): Locator {
-  return tarjetaZ(page, cual).locator('[class$="__resultValue"]');
+  return tarjetaZ(page, cual).locator('[class$="_resultValue"]');
 }
 
 /** Los cuatro deslizadores, por su etiqueta accesible: el marcado no les pone id. */

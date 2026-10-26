@@ -17,6 +17,7 @@ import { NUM_REQUISITOS_ART60 } from '../../lib/calculadoras/complementoBrechaGe
 // (nunca con el setter nativo, que lo prohíbe `check:hidratacion`), y el contraste se mide
 // con la página asentada.
 import { sembrarValor, leerValorEnReact, esperarPaginaAsentada } from './_hidratacion';
+import { selectorDelModulo } from './_modulo-css';
 import { calcularAtrasos } from '../../app/verificador-complemento-brecha-genero/atrasos';
 import { formatCurrency } from '../../lib/formatters';
 
@@ -2733,6 +2734,9 @@ test.describe('Re-inspección 26/09/2026', () => {
     await page.getByRole('button', { name: 'Verificar mi derecho' }).click();
     await abrirGuia(page);
     await prepararMedicion(page);
+    // El botón, por el prefijo del módulo de la app (el .btn de ShareCard se llama igual): con
+    // el nombre del módulo, que el build de next 16.4.3 ya no lleva, no lo encontraba (C0457)
+    const mod = await selectorDelModulo(page.getByRole('heading', { level: 1 }), 'title');
     const selectores = [
       '[class*="optionActivo"]',
       '[class*="siguienteCard"] strong',
@@ -2740,7 +2744,7 @@ test.describe('Re-inspección 26/09/2026', () => {
       '[class*="tipCard"] h3',
       '[class*="stepNumber"]',
       '[class*="warningHeader"] h3',
-      'button[class*="VerificadorComplementoBrechaGenero"][class*="__btn"]',
+      `button${mod}[class$="_btn"]`,
     ];
     for (const sel of selectores) {
       expect.soft(await contrasteMinimo(page, sel), sel).toBeGreaterThanOrEqual(4.5);

@@ -117,7 +117,7 @@ const RUTA = '/calculadora-swolf-natacion/';
 // OJO: [class*="swolfScore"] también casaría con el contenedor "swolfScoreWrapper" (que
 // engloba etiqueta + puntuación + badge de nivel), así que se ancla con $= al sufijo exacto
 // que generan CSS Modules ("<hash>__swolfScore"), que "…Wrapper" no cumple.
-const swolfScore = (page: Page) => page.locator('[class$="__swolfScore"]').first();
+const swolfScore = (page: Page) => page.locator('[class$="_swolfScore"]').first();
 const nivelBadge = (page: Page) => page.locator('[class*="nivelBadge"]').first();
 /** 0 = Eficiencia · 1 = Ritmo medio (min/100 m) · 2 = Descripción del nivel. */
 const detalle = (page: Page, i: number) => page.locator('[class*="detalleValor"]').nth(i);

@@ -17,11 +17,17 @@
  * módulo, se monta un contenedor con esa clase y un hijo de 2.000 px, y se comprueba que con
  * scrollLeft = 0 el borde izquierdo del hijo no queda a la izquierda del contenedor.
  *
- * La clase se busca CON el nombre de su módulo: en el build de producción una página carga
- * también hojas de otras apps, y el 17/10/2026, contra `next start`, /generador-codigos-barras/
- * midió el `.canvasContainer` de SortingCanvas (visualizador-algoritmos) en vez del suyo.
+ * La clase se busca anclada a un módulo que la página PINTA: en el build de producción una
+ * página carga también hojas de otras apps, y el 17/10/2026, contra `next start`,
+ * /generador-codigos-barras/ midió el `.canvasContainer` de SortingCanvas (visualizador-algoritmos)
+ * en vez del suyo. Hasta el 26/10/2026 el ancla era el nombre del módulo en la clase compilada,
+ * que el build de next 16.4.3 ya no pone («hash_clase» en vez de «Modulo-module__hash__clase»), y
+ * el testigo salía «no se encontró la clase» bajo `next start` (cabo C0457). Ahora se toman los
+ * prefijos de módulo de las clases que hay en el DOM (`prefijosEnLaPagina`) y vale el que declara
+ * `.<prefijo><clase>` en una hoja; el nombre del módulo solo desempata, y en `next dev`.
  */
 import { test, expect } from '@playwright/test';
+import { prefijosEnLaPagina } from './_modulo-css';
 
 const CASOS: [ruta: string, modulo: string, clase: string][] = [
   ['/calculadora-algebra-booleana/', 'CalculadoraAlgebraBooleana', 'karnaughContainer'],
@@ -41,11 +47,12 @@ for (const [ruta, modulo, clase] of CASOS) {
   test(`${ruta} · .${clase}: el borde izquierdo de lo que desborda se alcanza`, async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto(ruta);
-    const medida = await page.evaluate(({ modulo, clase }) => {
-      // La clase compilada: «Modulo-module__hash__clase» (next dev y build con Turbopack) o
-      // «Modulo_clase__hash» (build con webpack). Anclada al módulo para no medir el de otra app.
-      const re = new RegExp(`\\.(${modulo}[-_][\\w-]*(?:__${clase}|_${clase}__)[\\w-]*)`);
-      let compilada: string | null = null;
+    const prefijos = await prefijosEnLaPagina(page);
+    const medida = await page.evaluate(({ modulo, clase, prefijos }) => {
+      // La clase compilada es «<prefijo><clase>»: «Modulo-module__hash__clase» en next dev y
+      // «hash_clase» en el build. Solo valen los prefijos de módulos que la página pinta.
+      const escapar = (s: string) => s.replace(/[.*+?^${}()|[\]\\-]/g, '\\$&');
+      const encontradas = new Set<string>();
       for (const hoja of Array.from(document.styleSheets)) {
         let reglas: CSSRuleList;
         try {
@@ -54,15 +61,19 @@ for (const [ruta, modulo, clase] of CASOS) {
           continue;
         }
         for (const regla of Array.from(reglas)) {
-          const m = regla instanceof CSSStyleRule ? re.exec(regla.selectorText) : null;
-          if (m) {
-            compilada = m[1];
-            break;
+          if (!(regla instanceof CSSStyleRule)) continue;
+          for (const prefijo of prefijos) {
+            // CSS.escape: un hash que empieza por cifra sale escapado en selectorText («\31 …»)
+            if (new RegExp(`\\.${escapar(CSS.escape(prefijo + clase))}(?![\\w-])`).test(regla.selectorText)) {
+              encontradas.add(prefijo + clase);
+            }
           }
         }
-        if (compilada) break;
       }
-      if (!compilada) return null;
+      const lista = Array.from(encontradas);
+      // Dos módulos pintados que declaran la misma clase: en next dev desempata el nombre
+      const compilada = lista.length === 1 ? lista[0] : (lista.find((c) => c.startsWith(`${modulo}-`)) ?? null);
+      if (!compilada) return lista.length ? { ambigua: lista } : null;
       const caja = document.createElement('div');
       caja.className = compilada;
       caja.style.width = '300px';
@@ -76,8 +87,11 @@ for (const [ruta, modulo, clase] of CASOS) {
       const resultado = { compilada, desborde: caja.scrollWidth > caja.clientWidth, perdido: izquierdaCaja - izquierdaHijo };
       caja.remove();
       return resultado;
-    }, { modulo, clase });
+    }, { modulo, clase, prefijos });
     expect(medida, `no se encontró la clase .${clase} en las hojas de estilo de ${ruta}`).not.toBeNull();
+    if (medida && 'ambigua' in medida) {
+      throw new Error(`.${clase} la declaran varios módulos pintados en ${ruta}: ${medida.ambigua.join(', ')}`);
+    }
     expect(medida!.desborde, 'el hijo de 2.000 px tiene que desbordar').toBe(true);
     expect(medida!.perdido, `px del hijo a la izquierda del contenedor (.${medida!.compilada})`).toBeLessThanOrEqual(0.5);
   });
