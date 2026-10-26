@@ -5,7 +5,7 @@ import styles from './CalculadoraPresupuestos.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, EducationalSection, LegalNotice, ShareCard, DisclaimerCard } from '@/components';
-import { formatCurrency, formatNumber, parseSpanishNumber, formatDate } from '@/lib';
+import { formatCurrency, formatNumber, parseSpanishNumber, formatDate, parseISODateLocal, hoyISOLocal } from '@/lib';
 
 // Tipos
 interface DatosFreelance {
@@ -133,7 +133,7 @@ export default function CalculadoraPresupuestosPage() {
     setConfig(prev => ({
       ...prev,
       numero: prev.numero || `PRES-${new Date().getFullYear()}-001`,
-      fecha: prev.fecha || new Date().toISOString().split('T')[0],
+      fecha: prev.fecha || hoyISOLocal(),
     }));
   }, []);
 
@@ -184,7 +184,9 @@ export default function CalculadoraPresupuestosPage() {
 
   // Fecha de validez
   const fechaValidez = () => {
-    const fecha = new Date(config.fecha);
+    // En local: `new Date('AAAA-MM-DD')` es medianoche UTC y en América daba la validez un día
+    // antes (cabo C0299)
+    const fecha = parseISODateLocal(config.fecha);
     fecha.setDate(fecha.getDate() + parseInt(config.validezDias));
     return formatDate(fecha);
   };
@@ -648,7 +650,7 @@ export default function CalculadoraPresupuestosPage() {
                   <p className={styles.docNumero}>{config.numero}</p>
                 </div>
                 <div className={styles.docHeaderRight}>
-                  <p><strong>Fecha:</strong> {formatDate(new Date(config.fecha))}</p>
+                  <p><strong>Fecha:</strong> {formatDate(parseISODateLocal(config.fecha))}</p>
                   <p><strong>Válido hasta:</strong> {fechaValidez()}</p>
                 </div>
               </div>

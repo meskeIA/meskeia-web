@@ -5,7 +5,7 @@ import styles from './GeneradorFacturas.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, DisclaimerCard, LegalNotice, EducationalSection, ShareCard, CampoNumerico } from '@/components';
-import { formatCurrency, formatDate } from '@/lib';
+import { formatCurrency, formatDate, parseISODateLocal, hoyISOLocal } from '@/lib';
 
 // Tipos
 interface DatosEmisor {
@@ -382,7 +382,7 @@ export default function GeneradorFacturasPage() {
   // Cargar datos guardados
   useEffect(() => {
     // La fecha de hoy, ya en el navegador (ver el estado inicial de config)
-    setConfig(prev => (prev.fecha ? prev : { ...prev, fecha: new Date().toISOString().split('T')[0] }));
+    setConfig(prev => (prev.fecha ? prev : { ...prev, fecha: hoyISOLocal() }));
 
     const savedEmisor = localStorage.getItem(STORAGE_KEY_EMISOR);
     if (savedEmisor) {
@@ -540,7 +540,7 @@ export default function GeneradorFacturasPage() {
     setLineas([{ id: '1', concepto: '', cantidad: 1, precioUnitario: 0, tipoIva: 21 }]);
     setConfig(prev => ({
       ...prev,
-      fecha: new Date().toISOString().split('T')[0],
+      fecha: hoyISOLocal(),
       notas: '',
     }));
     setMostrarPreview(false);
@@ -932,7 +932,7 @@ export default function GeneradorFacturasPage() {
         <div className={styles.summaryPanel}>
           <div className={styles.summaryCard}>
             <h3 className={styles.summaryTitle}>Factura {numeroFactura}</h3>
-            <p className={styles.summaryFecha}>{formatDate(new Date(config.fecha))}</p>
+            <p className={styles.summaryFecha}>{formatDate(parseISODateLocal(config.fecha))}</p>
 
             <div className={styles.summaryTotales}>
               <div className={styles.summaryRow}>
@@ -1009,7 +1009,7 @@ export default function GeneradorFacturasPage() {
                       <span className={styles.historialCliente}>{f.cliente}</span>
                     </div>
                     <div className={styles.historialMeta}>
-                      <span>{formatDate(new Date(f.fecha))}</span>
+                      <span>{formatDate(parseISODateLocal(f.fecha))}</span>
                       <span className={styles.historialTotal}>{formatCurrency(f.total)}</span>
                     </div>
                   </div>
@@ -1052,7 +1052,7 @@ export default function GeneradorFacturasPage() {
                 <div className={styles.previewNumero}>
                   <h1>FACTURA</h1>
                   <p className={styles.previewNumeroValor}>{numeroFactura}</p>
-                  <p>Fecha: {formatDate(new Date(config.fecha))}</p>
+                  <p>Fecha: {formatDate(parseISODateLocal(config.fecha))}</p>
                 </div>
               </div>
 

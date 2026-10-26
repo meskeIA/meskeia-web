@@ -17,6 +17,7 @@ import {
   formatDateTime,
   formatFechaLarga,
   parseISODateLocal,
+  hoyISOLocal,
   parseSpanishNumber,
   parseSpanishNumberOr,
   formatPercentage,
@@ -149,6 +150,19 @@ test.describe('parseISODateLocal', () => {
   // en husos horarios negativos, porque new Date(isoString) interpreta medianoche UTC.
   test('formatDate sobre el resultado no se desliza al día anterior', () => {
     expect(formatDate(parseISODateLocal('2026-01-01'))).toBe('01/01/2026');
+  });
+});
+
+test.describe('hoyISOLocal', () => {
+  // Cabo C0299: toISOString().split('T')[0] da la fecha en UTC. Se construye la fecha en local
+  // a las 23:30 del 16/10/2026: en cualquier huso, el valor tiene que ser el 16, no el 17 ni el 15.
+  test('da la fecha local, con ceros, y no la de UTC', () => {
+    expect(hoyISOLocal(new Date(2026, 9, 16, 23, 30))).toBe('2026-10-16');
+    expect(hoyISOLocal(new Date(2026, 0, 5, 0, 15))).toBe('2026-01-05');
+  });
+
+  test('es el inverso de parseISODateLocal', () => {
+    expect(hoyISOLocal(parseISODateLocal('2026-03-05'))).toBe('2026-03-05');
   });
 });
 

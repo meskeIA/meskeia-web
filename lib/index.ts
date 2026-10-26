@@ -13,6 +13,7 @@ export {
   formatDateTime,
   formatFechaLarga,
   parseISODateLocal,
+  hoyISOLocal,
   formatPercentage,
   formatCompactNumber,
   formatDuration,

@@ -116,6 +116,18 @@ export function parseISODateLocal(fechaISO: string): Date {
 }
 
 /**
+ * La fecha de hoy en LOCAL como YYYY-MM-DD, el valor de un `<input type="date">`. Es el gemelo
+ * de `parseISODateLocal`: `new Date().toISOString().split('T')[0]` da la fecha en UTC, que por
+ * la tarde en América ya es MAÑANA y en España, entre las 00:00 y las 01:00-02:00, aún es AYER
+ * (cabo C0299: la fecha que proponían generador-facturas y calculadora-presupuestos).
+ */
+export function hoyISOLocal(fecha: Date = new Date()): string {
+  const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+  const dia = String(fecha.getDate()).padStart(2, '0');
+  return `${fecha.getFullYear()}-${mes}-${dia}`;
+}
+
+/**
  * Formatea una fecha ISO (YYYY-MM-DD) en prosa española: "4 de febrero de 2021".
  * @param fechaISO - Fecha en formato YYYY-MM-DD (ej: "2021-02-04")
  * @returns String en prosa (ej: "4 de febrero de 2021")
