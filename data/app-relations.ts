@@ -1155,7 +1155,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
   'visualizador-celula': [
     { url: '/visualizador-fotosintesis/', icon: '🌿', name: 'La Fotosíntesis', description: 'De la luz a la vida' },
-    { url: '/simulador-fotosintesis-factores/', icon: '🌱', name: 'Fotosíntesis: Factores Limitantes', description: 'Mueve la luz, el CO₂ y la temperatura y mira cuál frena al cloroplasto' },
+    { url: '/simulador-mitosis-meiosis/', icon: '🧬', name: 'Mitosis y Meiosis', description: 'Cómo se divide la célula, fase a fase' },
     { url: '/visualizador-adn-numeros/', icon: '🧬', name: 'Tu ADN en Números', description: 'Cifras del genoma' },
     { url: '/simulador-osmosis/', icon: '🧫', name: 'Ósmosis', description: 'Qué le pasa a la célula en agua dulce o salada' },
   ],
@@ -2264,7 +2264,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   // ESTILOS LITERARIOS
   'visualizador-estilos-literarios': [
     { url: '/comparador-voces-narrativas/', icon: '🎭', name: 'Comparador de Voces', description: 'Compara el estilo de los grandes novelistas' },
-    { url: '/visualizador-narratologia/', icon: '🧠', name: 'Narratología Visual', description: 'Genette y Greimas: tiempo, voz y modelo actancial' },
+    { url: '/quiz-literatura-universal/', icon: '🎭', name: 'Quiz de Literatura', description: 'Autores, obras y movimientos literarios' },
     { url: '/orientador-escritura-creativa/', icon: '✍️', name: 'Orientador de Escritura', description: 'Elige tu género y obtén tu hoja de ruta' },
     { url: '/test-tipo-lector/', icon: '📚', name: 'Test Tipo Lector', description: 'Descubre tu arquetipo como lector' },
   ],
@@ -2461,7 +2461,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'detector-idioma': textoApps,
   'conjugador-verbos': [
     { url: '/buscador-palabras-patron/', icon: '🔍', name: 'Buscador por Patrón', description: 'Palabras con huecos' },
-    { url: '/contador-silabas/', icon: '📐', name: 'Contador Sílabas', description: 'Separa y cuenta sílabas' },
+    { url: '/quiz-verbos-irregulares/', icon: '📝', name: 'Quiz Verbos Inglés', description: 'Aprende verbos irregulares' },
     { url: '/generador-anagramas/', icon: '🔤', name: 'Generador Anagramas', description: 'Reordena letras' },
     { url: '/detector-idioma/', icon: '🌍', name: 'Detector Idioma', description: 'Identifica el idioma' },
   ],
@@ -3118,7 +3118,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/calculadora-electricidad/', icon: '⚡', name: 'Electricidad', description: 'Ley de Ohm y potencia básica' },
     { url: '/calculadora-resistencias-led/', icon: '🔴', name: 'Resistencias y LED', description: 'Código de colores y circuito LED' },
     { url: '/simulador-campo-electrico/', icon: '🧲', name: 'Campo Eléctrico', description: 'Cargas, líneas y equipotenciales' },
-    { url: '/simulador-condensadores/', icon: '🔋', name: 'Condensadores y Circuito RC', description: 'Carga, descarga y constante de tiempo τ = R·C' },
+    { url: '/simulador-puertas-logicas/', icon: '🔌', name: 'Puertas Lógicas', description: 'Circuitos digitales y álgebra booleana' },
     { url: '/calculadora-seccion-cable/', icon: '🔌', name: 'Sección de Cable', description: 'La resistencia del conductor llevada al dimensionado real de una línea' },
   ],
   'calculadora-electricidad': [
@@ -3360,7 +3360,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/simulador-proyectiles/', icon: '🎯', name: 'Proyectiles 2D', description: 'Movimiento parabólico interactivo' },
     { url: '/simulador-fisica/', icon: '🔬', name: 'Simulador Física', description: 'Más simulaciones de física' },
     { url: '/simulador-circuitos-electricos/', icon: '⚡', name: 'Circuitos Eléctricos', description: 'Serie, paralelo, Ley de Ohm' },
-    { url: '/glosario-fisica-quimica/', icon: '📖', name: 'Glosario Física-Química', description: 'Términos clave para estudiar' },
+    { url: '/simulador-movimiento-circular/', icon: '🔄', name: 'Movimiento Circular', description: 'MCU: otro caso de movimiento periódico con ω constante' },
   ],
   'simulador-equilibrio-quimico': [
     { url: '/simulador-titulacion/', icon: '🧪', name: 'Titulación Ácido-Base', description: 'Aplicación práctica del equilibrio: curva de pH y punto de equivalencia' },
@@ -3402,7 +3402,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/simulador-disoluciones/', icon: '🧪', name: 'Disoluciones', description: 'Molaridad, concentración y dilución' },
     { url: '/visualizador-ph-acidos-bases/', icon: '🧫', name: 'pH, Ácidos y Bases', description: 'Escala pH y reacciones' },
     { url: '/tabla-ka-kb/', icon: '🧫', name: 'Tabla de Ka y Kb', description: 'Las constantes que gobiernan la curva de pH' },
-    { url: '/tabla-periodica/', icon: '🧪', name: 'Tabla Periódica', description: 'Elementos químicos completos' },
+    { url: '/simulador-reacciones-quimicas/', icon: '⚗️', name: 'Calculadora de Reacciones', description: 'Estequiometría y reactivo limitante' },
   ],
   'simulador-disoluciones': [
     { url: '/simulador-titulacion/', icon: '🧫', name: 'Titulación ácido-base', description: 'Bureta, curva de pH e indicadores' },
