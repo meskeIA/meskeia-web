@@ -50,7 +50,8 @@
  * salir de Ceuta o Melilla y [25/10-c] el recuadro traducido que se queda con la comunidad anterior),
  * más dos de componentes compartidos registrados en otra app de la familia (3493 y 3498). La tanda de
  * /reparar de ese día reparó [25/10-b] (3507), [25/10-c] (3508), 3493 y 3498, ya sin la marca; el
- * [25/10-a] (3509) sigue ABIERTO, a decisión del usuario (dato normativo nuevo, TRLIRNR art. 25.2).
+ * [25/10-a] (3509) quedó a decisión del usuario (dato normativo nuevo, TRLIRNR art. 25.2), que dio el
+ * OK el 26/10/2026: REPARADO ese día con `RETENCION_IRNR_COMPRADOR`, ya sin la marca.
  * A 21/10/2026 se sumó uno, [21/10-a] (las notas de comunidad con ranking o
  * calificativo), reparado en b8d8bff5 y ya sin `test.fail()`. Los tres del 13/10 ([13/10-a] a
  * [13/10-c], hallazgos 3267-3269) se REPARARON el 21/10/2026 y quedan como regresión, sin marca:
@@ -4420,8 +4421,6 @@ test.describe('Inspector 21/10/2026 — re-inspección tras 011fc97f y f6de548d'
 //   (el rótulo de NumberInput) no, porque los tres rótulos de esta app son constantes.
 // ═══════════════════════════════════════════════════════════════════════════════
 
-const I25_VER_HUECOS = Boolean(process.env.VER_HUECOS);
-
 test.describe('Inspector 25/10/2026 — Andalucía, Baleares a 6,5 M, Melilla, el no residente y la página traducida', () => {
   test.describe.configure({ timeout: 90_000 });
   const SEL_PRECIO = `input[aria-label="${PRECIO}"]`;
@@ -4722,7 +4721,7 @@ test.describe('Inspector 25/10/2026 — Andalucía, Baleares a 6,5 M, Melilla, e
   });
 
   /**
-   * [25/10-a] (contenido, bajo) — ABIERTO. La app habla del vendedor NO RESIDENTE en cinco bocas, pero solo
+   * [25/10-a] (contenido, bajo) — REPARADO 26/10/2026 (hallazgo 3509). La app hablaba del vendedor NO RESIDENTE en cinco bocas, pero solo
    * para la plusvalía (el comprador, sujeto pasivo sustituto, art. 106.2 TRLRHL), y calla la otra
    * obligación que ese mismo vendedor le echa encima al comprador: el TRLIRNR (RDLeg 5/2004,
    * BOE-A-2004-4527, art. 25.2, leído el 25/10/2026) obliga al adquirente de un inmueble a un no residente
@@ -4730,11 +4729,18 @@ test.describe('Inspector 25/10/2026 — Andalucía, Baleares a 6,5 M, Melilla, e
    * acordada», y si no lo ingresa «los bienes transmitidos quedarán afectos al pago». Para el solar de
    * 95.000 € del CASO 1 son 2850 € que el comprador no paga al vendedor sino a Hacienda. «Con una
    * excepción» deja leer que la plusvalía es lo único. Es el cabo de familia del IRNR, visto del lado del
-   * comprador: ninguna hermana lo nombra.
+   * comprador: ninguna hermana lo nombra (cabo C0462).
+   * Reparación: `RETENCION_IRNR_COMPRADOR` en data/fiscal/inmuebles.ts (art. 25.2 releído en el BOE el
+   * 26/10/2026) y `fraseRetencionIrnrComprador` en data/itp-ccaa.ts, tras la salvedad en la nota
+   * «Recuerda» (con la cifra), la tarjeta de la guía y la respuesta de la plusvalía (FAQ visible y
+   * FAQPage). Ninguna tarjeta de resultados cambia. Cifra a mano: 95.000 × 3 / 100 = 2850 €.
    */
   test('[25/10-a] donde nombra al vendedor no residente, la página dice también la retención del 3 % que practica el comprador (art. 25.2 TRLIRNR)', async ({ page }) => {
-    test.fail(!I25_VER_HUECOS, 'ABIERTO: hallazgo [25/10-a], la salvedad del no residente sin la retención del 3 %');
     await abrir(page, 'madrid', 'particular', '95000');
+    // La nota tiene el precio: da la cifra, y las tarjetas de resultados no la suman.
+    const recuerda = n(await page.locator('[role="note"]', { hasText: 'Recuerda:' }).textContent());
+    expect(recuerda).toContain('retener el 3 % del precio acordado (2850,00 €)');
+    expect((await leer(page)).some((c) => /reten/i.test(c.titulo))).toBe(false);
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     // El texto de la app, sin las tarjetas de otras apps ni el pie (una relacionada puede hablar de retenciones).
     const pagina = n(
@@ -4753,6 +4759,19 @@ test.describe('Inspector 25/10/2026 — Andalucía, Baleares a 6,5 M, Melilla, e
       .filter(([, t]) => !retencion.test(t))
       .map(([boca]) => boca);
     expect(callan, 'ninguna boca nombra la retención del 3 % del comprador').toEqual([]);
+    // Y cada boca de la salvedad lleva la retención, no solo alguna de la página.
+    const pregunta = '¿Hay plusvalía municipal al comprar o vender un solar?';
+    const visible = n(await page.locator('strong', { hasText: pregunta }).locator('xpath=../p').textContent());
+    const servida = (await page.locator('script[type="application/ld+json"]').allTextContents())
+      .map((t) => JSON.parse(t) as { '@type'?: string; mainEntity?: { name: string; acceptedAnswer: { text: string } }[] })
+      .find((x) => x['@type'] === 'FAQPage')?.mainEntity?.find((e) => e.name === pregunta)?.acceptedAnswer.text ?? '';
+    const tarjetaUso = n(
+      await page.locator('div', { has: page.locator('strong', { hasText: 'El vendedor y la plusvalía municipal' }) }).last().textContent(),
+    );
+    const sinRetencion = Object.entries({ Recuerda: recuerda, 'FAQ visible': visible, FAQPage: n(servida), tarjeta: tarjetaUso })
+      .filter(([, t]) => !retencion.test(t) || !t.includes('art. 25.2 TRLIRNR') || !t.includes('afecto al pago'))
+      .map(([boca]) => boca);
+    expect(sinRetencion).toEqual([]);
   });
 
   /**

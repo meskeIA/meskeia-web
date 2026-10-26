@@ -46,6 +46,7 @@ import {
   respuestaEscriturar,
   nombreEnFrase,
   deNombreCcaa,
+  fraseRetencionIrnrComprador,
 } from '@/data/itp-ccaa';
 import { FISCAL_INMUEBLES_META, FISCAL_IVA_META, PORCENTAJES_IVA } from '@/data/fiscal';
 import {
@@ -785,12 +786,17 @@ export default function SimuladorSolarPage() {
                 </p>
               )}
 
+              {/* La retención del 3 % del no residente, con la cifra de este precio (hallazgo 3509):
+                  va en la nota y no en las tarjetas, porque no es un gasto del comprador. En su span,
+                  como una sola cadena, para que la cifra no se quede atrás con la página traducida
+                  (la forma del 3508). */}
               <div className={styles.renunciaAviso} role="note" style={{ marginTop: '0.25rem' }}>
                 <strong>Recuerda:</strong> el solar es suelo urbano, así que el <strong>vendedor</strong> pagará
                 además la <strong>plusvalía municipal</strong> (IIVTNU) si hubo incremento real del valor del
                 terreno; sin incremento, la transmisión no está sujeta (art. 104.5 TRLRHL). No es un coste del
                 comprador, con una excepción: {SALVEDAD_PLUSVALIA_NO_RESIDENTE}. En cualquier caso, puede
-                influir en la negociación del precio.
+                influir en la negociación del precio.{' '}
+                <span>{fraseRetencionIrnrComprador(resultadosComprador.precioInmueble)}</span>
               </div>
             </>
           ) : (
@@ -901,7 +907,7 @@ export default function SimuladorSolarPage() {
                 Al ser suelo urbano, el vendedor paga plusvalía municipal si hubo incremento real del valor
                 del terreno; sin incremento, la transmisión no está sujeta (art. 104.5 TRLRHL). No es coste
                 del comprador, con una excepción: {SALVEDAD_PLUSVALIA_NO_RESIDENTE}. En cualquier caso,
-                conviene tenerlo en cuenta al negociar el precio.
+                conviene tenerlo en cuenta al negociar el precio. {fraseRetencionIrnrComprador()}
               </p>
             </div>
             <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '8px', padding: '1rem' }}>

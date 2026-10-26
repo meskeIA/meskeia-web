@@ -7,6 +7,7 @@ import {
   preguntaEscriturar,
   respuestaEscriturar,
   SALVEDAD_PLUSVALIA_NO_RESIDENTE,
+  fraseRetencionIrnrComprador,
 } from '@/data/itp-ccaa';
 import { PORCENTAJES_IVA } from '@/data/fiscal';
 
@@ -40,7 +41,7 @@ export const RESPUESTA_IVA_DEDUCIBLE = 'Si eres promotor, empresario o autónomo
  */
 export { SALVEDAD_PLUSVALIA_NO_RESIDENTE };
 export const PREGUNTA_PLUSVALIA = '¿Hay plusvalía municipal al comprar o vender un solar?';
-export const RESPUESTA_PLUSVALIA = `Sí, pero la paga el vendedor, no el comprador, salvo en un caso: ${SALVEDAD_PLUSVALIA_NO_RESIDENTE}. El solar es suelo de naturaleza urbana, así que su transmisión genera plusvalía municipal (IIVTNU) sobre el incremento de valor del terreno durante el tiempo de tenencia. Si no ha habido incremento real de valor, la transmisión no está sujeta al impuesto (art. 104.5 TRLRHL, redacción del RDL 26/2021): hay que declararlo y acreditarlo con las escrituras de compra y venta.`;
+export const RESPUESTA_PLUSVALIA = `Sí, pero la paga el vendedor, no el comprador, salvo en un caso: ${SALVEDAD_PLUSVALIA_NO_RESIDENTE}. El solar es suelo de naturaleza urbana, así que su transmisión genera plusvalía municipal (IIVTNU) sobre el incremento de valor del terreno durante el tiempo de tenencia. Si no ha habido incremento real de valor, la transmisión no está sujeta al impuesto (art. 104.5 TRLRHL, redacción del RDL 26/2021): hay que declararlo y acreditarlo con las escrituras de compra y venta. ${fraseRetencionIrnrComprador()}`;
 
 export const metadata: Metadata = {
   title: 'Simulador Gastos Compra Solar / Terreno Edificable - IVA o ITP | meskeIA',

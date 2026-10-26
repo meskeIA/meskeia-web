@@ -287,6 +287,31 @@ export const EXENCION_RENTA_VITALICIA_MAYORES_65 = {
 };
 
 /**
+ * Retención que practica el COMPRADOR cuando el vendedor es un no residente sin establecimiento
+ * permanente.
+ *
+ * TRLIRNR (RDLeg 5/2004), art. 25.2 (BOE-A-2004-4527, texto consolidado, leído el 26/10/2026; el
+ * apartado viene de la Ley 35/2006 y no ha cambiado desde): en las transmisiones de inmuebles
+ * situados en España por contribuyentes sin establecimiento permanente, «el adquirente estará
+ * obligado a retener e ingresar el 3 por ciento, o a efectuar el ingreso a cuenta correspondiente,
+ * de la contraprestación acordada», y si no se ingresa, «los bienes transmitidos quedarán afectos
+ * al pago del importe que resulte menor entre dicha retención o ingreso a cuenta y el impuesto
+ * correspondiente». No procede «en los casos de aportación de bienes inmuebles, en la constitución
+ * o aumento de capitales de sociedades residentes en territorio español».
+ *
+ * Las apps lo NOMBRAN, no lo restan de ninguna tarjeta: es dinero del precio que va a Hacienda en
+ * lugar de al vendedor, no un gasto del comprador. La frase la arma `fraseRetencionIrnrComprador`
+ * (data/itp-ccaa.ts), junto a la salvedad de la plusvalía del no residente. Hallazgo 3509
+ * (simulador-gastos-compraventa-solar, 25/10/2026); el usuario dio el OK al dato el 26/10/2026.
+ */
+export const RETENCION_IRNR_COMPRADOR = {
+  porcentaje: 3,
+  fuente: 'TRLIRNR (RD Legislativo 5/2004), art. 25.2',
+  urlOficial: 'https://www.boe.es/buscar/act.php?id=BOE-A-2004-4527#a25',
+  verificado: '2026-10-26',
+};
+
+/**
  * Plazo de autoliquidación del ITP y AJD.
  *
  * ── De dónde sale (11/09/2026, hallazgo 713 del Inspector) ───────────────────

@@ -43,8 +43,8 @@
 
 // ===== TIPOS =====
 
-import { coeficienteIIVTNU, PLUSVALIA_MUNICIPAL_META, TIPOS_ITP_CCAA_2025, BONIFICACION_IIVTNU_CEUTA_MELILLA, PORCENTAJES_IVA } from '@/data/fiscal';
-import { formatNumber } from '@/lib/formatters';
+import { coeficienteIIVTNU, PLUSVALIA_MUNICIPAL_META, TIPOS_ITP_CCAA_2025, BONIFICACION_IIVTNU_CEUTA_MELILLA, PORCENTAJES_IVA, RETENCION_IRNR_COMPRADOR } from '@/data/fiscal';
+import { formatCurrency, formatNumber } from '@/lib/formatters';
 
 /**
  * El tipo general de cada comunidad se LEE de `data/fiscal`; aquí no se escribe.
@@ -1509,6 +1509,21 @@ export function motivoPlusvaliaForal(ccaa: ComunidadAutonoma): string {
  */
 export const SALVEDAD_PLUSVALIA_NO_RESIDENTE =
   'si vende una persona física no residente en España, el comprador es sujeto pasivo sustituto y es él quien la ingresa (art. 106.2 TRLRHL, en territorio común)';
+
+/**
+ * La OTRA obligación que el vendedor no residente le traslada al comprador, y que la salvedad de
+ * arriba callaba: retener el 3 % del precio a cuenta de su IRNR (`RETENCION_IRNR_COMPRADOR`, con la
+ * cita del art. 25.2 TRLIRNR en data/fiscal/inmuebles.ts). Hallazgo 3509 (solar, 26/10/2026): con
+ * «con una excepción» la plusvalía parecía lo único. Con `precio` da la cifra; sin él, solo el tipo.
+ * Es una frase entera, para ir DESPUÉS de la salvedad. Las normas forales no se han consultado.
+ */
+export function fraseRetencionIrnrComprador(precio?: number): string {
+  const { porcentaje } = RETENCION_IRNR_COMPRADOR;
+  const cifra = precio !== undefined && Number.isFinite(precio) && precio > 0
+    ? ` (${formatCurrency(Math.round(precio * porcentaje) / 100)})`
+    : '';
+  return `Si el vendedor es no residente y no actúa mediante establecimiento permanente en España, el comprador tiene además que retener el ${formatNumber(porcentaje, 0)} % del precio acordado${cifra} e ingresarlo a cuenta del impuesto del vendedor (art. 25.2 TRLIRNR): esa parte no se le paga al vendedor, sino a Hacienda. Si no se ingresa, el inmueble queda afecto al pago de la menor de las dos cantidades, la retención o el impuesto. No se aplica a la aportación de un inmueble al constituir o ampliar el capital de una sociedad residente en España.`;
+}
 
 /** Para el sello del IRPF de las apps con vendedor, que no saben dónde reside. */
 export const AVISO_IRPF_FORAL =
