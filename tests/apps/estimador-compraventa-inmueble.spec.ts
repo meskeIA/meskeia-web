@@ -11691,7 +11691,7 @@ test.describe('Inspector 26/10/2026 — Galicia y Asturias a mano, la app entera
   });
 
   /**
-   * HALLAZGO [accesibilidad, bajo] — ABIERTO. «Tipo de inmueble» (page.tsx l. 1698) y «Tipo de
+   * HALLAZGO [accesibilidad, bajo] (3512) — REPARADO el 26/10/2026 con la receta de garaje. «Tipo de inmueble» (page.tsx l. 1698) y «Tipo de
    * transmisión» (l. 1766) son <label> sin control asociado, y los botones que rotulan no están en
    * ningún grupo: el lector de pantalla oye «Vivienda (piso o casa), botón, pulsado» o «Primera mano
    * Paga IVA, botón» sin saber qué se está eligiendo (WCAG 1.3.1). La hermana garaje ya lo resolvió:
@@ -11699,7 +11699,6 @@ test.describe('Inspector 26/10/2026 — Galicia y Asturias a mano, la app entera
    * page.tsx l. 1164-1165). La app de referencia no llegó a esa receta.
    */
   test('HALLAZGO accesibilidad — «Tipo de inmueble» y «Tipo de transmisión» son <label> sin control y sus botones no tienen grupo', async ({ page }) => {
-    test.fail(true, 'ABIERTO: dos <label> sin control y dos grupos de botones sin nombre');
     await page.goto(RUTA);
     await esperarHidratacion(page, [CAMPO_PRECIO]);
     const huerfanos = await page

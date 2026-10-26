@@ -1701,8 +1701,10 @@ export default function SimuladorCompraventaPage() {
 
           {/* Tipo de inmueble */}
           <div className={styles.inputGroup}>
-            <label className={styles.label}>Tipo de inmueble</label>
-            <div className={styles.tipoInmuebleGrid}>
+            {/* Rótulo de un GRUPO de botones, no de un control: <span> + role="group", la receta de
+                la hermana garaje (hallazgo 3512, 26/10/2026). */}
+            <span className={styles.label} id="rotulo-tipo-inmueble">Tipo de inmueble</span>
+            <div className={styles.tipoInmuebleGrid} role="group" aria-labelledby="rotulo-tipo-inmueble">
               {/* Caso principal: la vivienda, a ancho completo */}
               {TIPOS_INMUEBLE.filter(t => t.grupo === 'principal').map(tipo => (
                 <button
@@ -1769,8 +1771,8 @@ export default function SimuladorCompraventaPage() {
 
           {/* Tipo de transmisión */}
           <div className={styles.inputGroup}>
-            <label className={styles.label}>Tipo de transmisión</label>
-            <div className={styles.transmisionGrid}>
+            <span className={styles.label} id="rotulo-transmision">Tipo de transmisión</span>
+            <div className={styles.transmisionGrid} role="group" aria-labelledby="rotulo-transmision">
               <button
                 type="button"
                 aria-pressed={tipoTransmision === 'segunda-mano'}
