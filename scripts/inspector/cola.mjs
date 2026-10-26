@@ -40,6 +40,24 @@
  * page.tsx:444`, «a y b») o si es `familia:<id>` de una familia declarada. Prueba:
  * `npm run inspector:probar-cola-cabos`.
  *
+ * EL REPOSO DE UN MES (26/10/2026)
+ * ────────────────────────────────
+ * Si la ÚLTIMA inspección de una app no dejó ningún hallazgo alto ni crítico, la app no vuelve
+ * al tramo 3 por cambio de código en DIAS_REPOSO días: reparar sus bajos y medios ya no la
+ * devuelve a la cola al día siguiente. Si dejó un alto, se repara y vuelve en cuanto cambia su
+ * código, como antes. El rojo, la firma y los cabos no esperan nunca: son exposición nueva o una
+ * pregunta concreta, no una re-inspección por cambio.
+ * Sale de medir el bucle Inspector → Reparar → Inspector: cada reparación cambia el código, la
+ * app queda INVALIDADA y vuelve, y desde la 2.ª vuelta cada inspección deja ~4 menores que no
+ * bajan nunca (4,6 → 4,8 → 4,0 → 4,1), así que el ciclo no tenía salida. `estimador-compraventa-
+ * inmueble` llevaba 28 inspecciones sin un solo «ok», la familia de compraventa (7 apps) se
+ * llevaba el 25 % de las inspecciones y en octubre el 92 % eran repeticiones: 14 apps nuevas de
+ * 828 sin ver. Simulado sobre el histórico, 30 días aplazan 249 de las 269 re-inspecciones tras
+ * una vuelta sin altos, y 37 de ellas traían un alto: se encuentra más tarde, no se pierde. En
+ * re-inspección no ha salido nunca un crítico. Decidido por el usuario ese día, con el mes.
+ * Una FAMILIA reposa entera o no reposa: si una hermana no está en reposo, salen todas.
+ * Prueba: `npm run inspector:probar-cola-reposo`.
+ *
  * LAS FAMILIAS SALEN JUNTAS
  * ─────────────────────────
  * Si una app pertenece a una familia declarada en `familias.mjs`, la cola saca el grupo
@@ -101,6 +119,32 @@ const CABOS = cabosPorApp();
 const SQL_CABO = `slug IN (${[...CABOS.keys()].filter((s) => /^[a-z0-9-]+$/.test(s)).map((s) => `'${s}'`).join(', ') || "''"})`;
 
 /**
+ * Apps en reposo: su última inspección tiene menos de DIAS_REPOSO días y no dejó ningún alto ni
+ * crítico (ver «EL REPOSO DE UN MES»). Una familia reposa solo si reposan todas sus hermanas.
+ */
+const DIAS_REPOSO = 30;
+function enReposo() {
+  const filas = db.prepare(`
+    SELECT slug FROM apps a
+    WHERE ultima_inspeccion IS NOT NULL
+      AND julianday('now') - julianday(substr(ultima_inspeccion, 1, 10)) < ${DIAS_REPOSO}
+      AND NOT EXISTS (
+        SELECT 1 FROM hallazgos h
+        WHERE h.severidad IN ('critico', 'alto')
+          AND h.inspeccion_id = (SELECT i.id FROM inspecciones i WHERE i.slug = a.slug ORDER BY i.fecha DESC, i.id DESC LIMIT 1)
+      )`).all();
+  const reposan = new Set(filas.map((f) => f.slug));
+  for (const f of FAMILIAS) {
+    if (!f.slugs.every((s) => reposan.has(s))) for (const s of f.slugs) reposan.delete(s);
+  }
+  return reposan;
+}
+const REPOSO = enReposo();
+const SQL_REPOSO = `slug IN (${[...REPOSO].filter((s) => /^[a-z0-9-]+$/.test(s)).map((s) => `'${s}'`).join(', ') || "''"})`;
+/** INVALIDADA que sí vuelve a la cola: la que está en reposo espera. */
+const SQL_INVALIDADA_ACTIVA = `((${SQL_INVALIDADA}) AND NOT (${SQL_REPOSO}))`;
+
+/**
  * Prioridad = uso real + riesgo + sospecha de estar rota.
  *
  * El uso entra en logaritmo a propósito: entre 5 y 50 usos hay una diferencia real,
@@ -138,15 +182,15 @@ const COLAS = [
     clave: 'FIRMA',
     titulo: 'Firma de rotura — la gente entra, no lo consigue y recarga (apareció tras la inspección)',
     sql: `SELECT *, ${PRIORIDAD} AS p FROM apps
-          WHERE ${SQL_FIRMA_NUEVA} AND COALESCE(test_estado, '') <> 'rojo' AND NOT (${SQL_INVALIDADA})
+          WHERE ${SQL_FIRMA_NUEVA} AND COALESCE(test_estado, '') <> 'rojo' AND NOT ${SQL_INVALIDADA_ACTIVA}
           ORDER BY p DESC`,
   },
   {
     clave: 'INVALIDADA',
-    titulo: 'Invalidada o con cabo — su código o sus datos han cambiado desde la inspección, o una sesión dejó una sospecha sobre ella',
+    titulo: 'Invalidada o con cabo — su código o sus datos han cambiado desde la inspección (y no está en reposo), o una sesión dejó una sospecha sobre ella',
     // Las de cabo que ya salen arriba (rojo o firma) no se repiten aquí
     sql: `SELECT *, ${PRIORIDAD} AS p FROM apps
-          WHERE (${SQL_INVALIDADA})
+          WHERE ${SQL_INVALIDADA_ACTIVA}
              OR (${SQL_CABO} AND COALESCE(test_estado, '') <> 'rojo' AND NOT (${SQL_FIRMA_NUEVA}))
           ORDER BY p DESC`,
   },
@@ -174,9 +218,11 @@ if (RESUMEN) {
       continue;
     }
     // El tramo 3 mezcla dos poblaciones: que la cifra de INVALIDADAS siga diciendo solo eso
-    const inv = db.prepare(`SELECT COUNT(*) AS n FROM apps WHERE ${SQL_INVALIDADA}`).get().n;
+    const inv = db.prepare(`SELECT COUNT(*) AS n FROM apps WHERE ${SQL_INVALIDADA_ACTIVA}`).get().n;
     log(`  cola ${c.clave.padEnd(11)} ${inv}${n > inv ? `  (+ ${n - inv} que entran por un cabo)` : ''}`);
   }
+  const reposan = db.prepare(`SELECT COUNT(*) AS n FROM apps WHERE (${SQL_INVALIDADA}) AND ${SQL_REPOSO}`).get().n;
+  log(`  en reposo:       ${reposan} invalidadas que esperan (sin altos en su última inspección, < ${DIAS_REPOSO} días)`);
   // Cobertura del uso: la cifra que de verdad dice cuánto se ha protegido
   const total = db.prepare('SELECT SUM(usos) s FROM apps').get().s || 1;
   const cubierto = db.prepare('SELECT SUM(usos) s FROM apps WHERE ultima_inspeccion IS NOT NULL').get().s || 0;
@@ -190,7 +236,7 @@ if (RESUMEN) {
   for (const f of FAMILIAS) {
     const pend = f.slugs.filter((s) => {
       const r = db.prepare(
-        `SELECT 1 x FROM apps WHERE slug = ? AND (test_estado = 'rojo' OR ${SQL_INVALIDADA} OR ultima_inspeccion IS NULL OR ${SQL_CABO})`,
+        `SELECT 1 x FROM apps WHERE slug = ? AND (test_estado = 'rojo' OR ${SQL_INVALIDADA_ACTIVA} OR ultima_inspeccion IS NULL OR ${SQL_CABO})`,
       ).get(s);
       return !!r;
     }).length;
@@ -215,7 +261,10 @@ function linea(f, sangria = '  ') {
   );
 }
 
-/** En qué cola está un slug ahora mismo, o null si está al día. */
+/**
+ * En qué cola está un slug ahora mismo, o null si está al día. Solo lo usan las hermanas de una
+ * familia que ya sale, y por eso mira la INVALIDADA sin reposo: si la familia sale, salen todas.
+ */
 const SQL_ESTADO = db.prepare(`
   SELECT slug, ${PRIORIDAD} AS p, segmento, riesgo, usos, duracion_media, deps, ultima_inspeccion,
          firma, firma_detalle,
