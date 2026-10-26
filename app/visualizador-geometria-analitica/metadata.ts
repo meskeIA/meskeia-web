@@ -3,7 +3,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Geometría Analítica: Cónicas Interactivas — meskeIA',
-  description: 'Explora las cónicas (circunferencia, elipse, parábola, hipérbola) con gráficas SVG interactivas. Sliders en tiempo real, ecuaciones canónicas, focos, vértices y coordenadas polares.',
+  description: 'Explora las cónicas (circunferencia, elipse, parábola, hipérbola) con gráficas interactivas, o escribe su ecuación general y complétala paso a paso: tipo, centro, focos y excentricidad. Con 12 casos para clase.',
   keywords: 'geometría analítica, cónicas, circunferencia, elipse, parábola, hipérbola, ecuaciones canónicas, focos, coordenadas polares, secciones cónicas, matemáticas interactivas, visualizador matemático, preparatoria, secundaria, educación media',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
@@ -34,13 +34,15 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: 'Geometría Analítica: Cónicas Interactivas',
-  description: 'Visualizador interactivo de cónicas (circunferencia, elipse, parábola, hipérbola) con sliders, ecuaciones canónicas en tiempo real, focos, vértices, directrices y coordenadas polares.',
+  description: 'Visualizador interactivo de cónicas (circunferencia, elipse, parábola, hipérbola) con sliders y ecuaciones canónicas en tiempo real. Pasa de la ecuación general Ax² + Cy² + Dx + Ey + F = 0 a la cónica completando cuadrados paso a paso, y trae 12 casos para clase con solución.',
   url: 'https://meskeia.com/visualizador-geometria-analitica/',
   category: 'EducationalApplication',
   features: [
     'Visualización SVG interactiva de las 4 cónicas',
     'Sliders para parámetros en tiempo real',
     'Ecuaciones canónicas actualizadas al instante',
+    'De la ecuación general a la cónica: completa cuadrados paso a paso y da tipo, centro, focos, directriz y excentricidad',
+    '12 casos para clase con corrección, pista y solución, más un modo práctica',
     'Focos, vértices y puntos notables con coordenadas',
     'Asíntotas de la hipérbola en líneas punteadas',
     'Tab de coordenadas polares: rosa de pétalos, espiral y cardioide',

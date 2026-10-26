@@ -11,13 +11,15 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
+import EcuacionGeneral from './EcuacionGeneral';
+import CasosAula from './CasosAula';
 
 // ─────────────────────────────────────────────
 // Tipos
 // ─────────────────────────────────────────────
 
 type TipoConica = 'circunferencia' | 'elipse' | 'parabola' | 'hiperbola';
-type TabPrincipal = TipoConica | 'polares';
+type TabPrincipal = TipoConica | 'ecuacion' | 'polares';
 type OrientacionParabola = 'vertical' | 'horizontal';
 type CurvaPolar = 'rosa' | 'espiral' | 'cardioide';
 
@@ -731,6 +733,7 @@ const TABS: TabInfo[] = [
   { id: 'elipse', titulo: 'Elipse', icono: '🥚', subtitulo: 'x²/a² + y²/b² = 1' },
   { id: 'parabola', titulo: 'Parábola', icono: '📉', subtitulo: 'y = ax²' },
   { id: 'hiperbola', titulo: 'Hipérbola', icono: '✖️', subtitulo: 'x²/a² − y²/b² = 1' },
+  { id: 'ecuacion', titulo: 'Desde la ecuación', icono: '🧮', subtitulo: 'Ax² + Cy² + … = 0' },
   { id: 'polares', titulo: 'Coordenadas Polares', icono: '🌀', subtitulo: 'r = f(θ)' },
 ];
 
@@ -804,6 +807,7 @@ export default function VisualizadorGeometriaAnalitica() {
         {tabActivo === 'hiperbola' && (
           <VisualizadorHiperbola params={paramsHiperbola} onChange={setParamsHiperbola} />
         )}
+        {tabActivo === 'ecuacion' && <EcuacionGeneral />}
         {tabActivo === 'polares' && (
           <VisualizadorPolares
             curva={curvaPolar}
@@ -813,6 +817,8 @@ export default function VisualizadorGeometriaAnalitica() {
           />
         )}
       </main>
+
+      <CasosAula />
 
       {/* Sección educativa */}
       <EducationalSection title="Geometría Analítica: la matemática del espacio con coordenadas" subtitle="Cónicas, focos, ecuaciones canónicas y coordenadas polares explicados visualmente">
