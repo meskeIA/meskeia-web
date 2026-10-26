@@ -7711,8 +7711,6 @@ test.describe('Inspección 24/10/2026 — móvil 390 × 844', () => {
 // (hallazgo [26/10-a], al final de este bloque).
 // ═══════════════════════════════════════════════════════════════════════════════
 
-/** `VER_HUECOS=1` quita la marca de los hallazgos abiertos del 26/10 y enseña por qué fallan. */
-const I26_VER_HUECOS = Boolean(process.env.VER_HUECOS);
 
 const normaliza26 = (s: string): string => s.replace(/\s+/g, ' ').trim();
 
@@ -8069,7 +8067,8 @@ test.describe('Re-inspección 26/10/2026 — Andalucía con decimales, Asturias 
   });
 
   /**
-   * [26/10-b] (dato, bajo) — Forma del hallazgo 3265 (el FAQPage «nave vs local», que daba por universal
+   * [26/10-b] (dato, bajo; hallazgo 3521) — REPARADO el 26/10/2026: la tarjeta nombra el IGIC deducible de
+   * Canarias y el IPSI no deducible de Ceuta y Melilla. Forma del hallazgo 3265 (el FAQPage «nave vs local», que daba por universal
    * el IVA) y del punto ciego del grupo B de 3478/3479, en otra boca del bloque educativo. El caso de uso
    * «Empresa compra nave nueva al promotor» dice «Paga IVA 21 % + AJD. Si la empresa destina la nave a
    * actividades sujetas y no exentas de IVA, puede deducir el IVA en la declaración trimestral (modelo
@@ -8080,7 +8079,6 @@ test.describe('Re-inspección 26/10/2026 — Andalucía con decimales, Asturias 
    * nave de segunda mano») sí nombra a Ceuta y Melilla.
    */
   test('[26/10-b] el caso de uso «Empresa compra nave nueva al promotor» dice que en Canarias, Ceuta y Melilla no se paga IVA', async ({ page }) => {
-    test.fail(!I26_VER_HUECOS, 'hallazgo [26/10-b] abierto: la tarjeta de la obra nueva da el IVA por universal');
     await page.goto(RUTA);
     const tarjeta = normaliza26(
       (await page.locator('strong', { hasText: 'Empresa compra nave nueva al promotor' }).first().locator('xpath=following-sibling::p[1]').textContent()) ?? '',

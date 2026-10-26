@@ -1043,6 +1043,10 @@ export default function SimuladorNaveIndustrialPage() {
               <p style={{ fontSize: '0.9rem', marginTop: '0.5rem' }}>
                 Paga IVA {formatNumber(IVA_NAVE_INDUSTRIAL, 0)}&nbsp;% + AJD. Si la empresa destina la nave a
                 actividades sujetas y no exentas de IVA, puede deducir el IVA en la declaración trimestral (modelo 303).
+                En Canarias no paga IVA sino IGIC, que también se deduce; en Ceuta y Melilla, IPSI, que en la
+                compra de un inmueble no se puede deducir (Ley 8/1991, art. 20.3).
+                {/* Hallazgo 3521 (26/10/2026): daba el IVA y su deducción por universales, y la app
+                    ofrece los tres territorios sin IVA (TERRITORIOS_SIN_IVA; hallazgo 3263). */}
               </p>
             </div>
             <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '8px', padding: '1rem' }}>
