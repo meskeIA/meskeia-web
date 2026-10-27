@@ -374,8 +374,16 @@ const posiblesTelefonos = (texto: string): string[] => [
  * «23456 ] cerrar corchete», «35 * asterisco». No se escriben (eso es ampliar la tabla, decisión
  * del usuario): se avisa con la verdad. El resto de signos sin celda en la app siguen con el aviso
  * genérico, que ya no afirma dónde está su celda.
+ *
+ * ⚠️ 27/10/2026 (hallazgo 3556) — aquella alta cubrió solo los seis signos citados en el 3525, y los
+ * demás de las mismas tablas seguían con el «puede que» genérico. Celdas según el Inspector
+ * (27/10/2026): § 6.2 { 5-123, } 456-2, \ 5-3, | 456-0d · § 12 + 235, = 2356, @ 5, & 6-12346 ·
+ * § 12.1 § 346 · § 13 $ 456-234, £ 5-2346, ¥ 456-13456 · § 14.1 ° 356. Tampoco se escriben.
  */
-const SIGNOS_DEL_B2_SIN_ESCRIBIR = new Set(['€', '%', '—', '[', ']', '*']);
+const SIGNOS_DEL_B2_SIN_ESCRIBIR = new Set([
+  '€', '%', '—', '[', ']', '*',
+  '{', '}', '\\', '|', '+', '=', '@', '&', '§', '$', '£', '¥', '°',
+]);
 
 /**
  * ⚠️ 27/10/2026 (hallazgo 3528) — celdas de ocho puntos (U+2840-U+28FF, puntos 7 u 8). Pasan tal

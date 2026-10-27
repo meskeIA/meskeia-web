@@ -2351,9 +2351,10 @@ test.describe('re-inspección 24/10/2026', () => {
   // ─────────────────────────────────────────────────────────────────────────
   test('REPARADO 3459 — con un solo carácter omitido, el aviso concuerda en singular', async ({ page }) => {
     // 27/10/2026: el € tiene ya su aviso propio (hallazgo 3525, celda en el B 2 § 13); el genérico
-    // se mide con el ¥ y la £, de los que la app no cita celda.
+    // se medía con el ¥ y la £, y desde el hallazgo 3556 (27/10/2026) también llevan el del B 2 § 13:
+    // se mide con un emoji y con el cirílico, de los que la signografía básica no da celda.
     await page.goto(RUTA);
-    await convertirHidratado(page, 'Precio: 5 ¥');
+    await convertirHidratado(page, 'Precio: 5 🙂');
     const aviso = avisoSinCelda(page);
     await expect(aviso).toContainText('este carácter'); // precondición: es el aviso de UN carácter
     // Lo que DEBERÍA pasar: «le asigne». Era: «este carácter: €. … sí les asigne celda».
@@ -2361,7 +2362,7 @@ test.describe('re-inspección 24/10/2026', () => {
     await expect(aviso).toContainText('le asigne celda');
     // Con dos, el plural sigue (el ternario va en las dos ramas).
     await page.goto(RUTA);
-    await convertirHidratado(page, 'Precio: 5 £ o 6 ¥');
+    await convertirHidratado(page, 'Precio: 5 Да');
     await expect(avisoSinCelda(page)).toContainText('les asigne celda');
   });
 });
@@ -3280,7 +3281,7 @@ test.describe('re-inspección 27/10/2026', () => {
   });
 
   // ─────────────────────────────────────────────────────────────────────────
-  // ABIERTO — signos con celda en el B 2 que siguen con el aviso «puede que» (lo que 3525 no cubrió)
+  // REPARADO 3556 — signos con celda en el B 2 que seguían con el aviso «puede que» (lo que 3525 no cubrió)
   // ─────────────────────────────────────────────────────────────────────────
   //
   // aa75156d dio aviso propio a los seis signos citados en el 3525 (€ % — [ ] *). Los demás que el
@@ -3288,13 +3289,21 @@ test.describe('re-inspección 27/10/2026', () => {
   // les asigne celda», cuando la fuente que la app dice seguir se la asigna. Celdas (§ 6.2, § 12,
   // § 12.1, § 13, § 14.1): { 5-123 · } 456-2 · \ 5-3 · | 456-0d · + 235 · = 2356 · @ 5 · & 6-12346 ·
   // § 346 · $ 456-234 · £ 5-2346 · ¥ 456-13456 · ° 356.
-  test.fail('ABIERTO — $ £ ¥ + = @ & ° { } \\ | §: el B 2 les da celda y el aviso no lo pone en duda', async ({ page }) => {
+  // REPARADO el 27/10/2026: los trece están en SIGNOS_DEL_B2_SIN_ESCRIBIR y llevan el aviso del €.
+  test('REPARADO 3556 — $ £ ¥ + = @ & ° { } \\ | §: el B 2 les da celda y el aviso no lo pone en duda', async ({ page }) => {
     await page.goto(RUTA);
     await convertir27(page, '$ £ ¥ + = @ & ° { } \\ | §');
     await expect(cajaResultado(page)).toBeVisible(); // precondición: hay resultado (las separaciones)
-    // Hoy: «Esta herramienta no escribe en braille estos caracteres: $ · £ · … Puede que el Código
+    // Era: «Esta herramienta no escribe en braille estos caracteres: $ · £ · … Puede que el Código
     // Braille Español sí les asigne celda: esta app no la escribe.»
     await expect(aviso27(page, 'Puede que el Código Braille Español')).toHaveCount(0, { timeout: 3000 });
+    await expect(aviso27(page, 'Documento Técnico B 2) sí les da celda').locator('strong')).toHaveText(
+      '$ · £ · ¥ · + · = · @ · & · ° · { · } · \\ · | · §',
+    );
+    // Un carácter del que la signografía básica no da celda sigue con el aviso genérico
+    await page.goto(RUTA);
+    await convertir27(page, 'sol 🙂');
+    await expect(aviso27(page, 'Puede que el Código Braille Español')).toHaveCount(1);
   });
 
   // ─────────────────────────────────────────────────────────────────────────
