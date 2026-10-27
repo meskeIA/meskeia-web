@@ -10,7 +10,6 @@
  */
 
 import {
-  coeficienteIIVTNU,
   PLUSVALIA_MUNICIPAL_META,
   FISCAL_IRPF_META,
   calcularGananciaInmueble,
@@ -25,6 +24,7 @@ import {
   AVISO_IRPF_FORAL,
   motivoPlusvaliaForal,
   avisoIrpfForalResidente,
+  calcularPlusvaliaMunicipal,
   type ComunidadAutonoma,
 } from '@/data/itp-ccaa';
 import { formatCurrency } from '@/lib/formatters';
@@ -175,7 +175,6 @@ export function calcularVentaInmueble(p: ParametrosVentaInmueble): ResultadoVent
 
   const valorCatastralSuelo = p.valorCatastralSuelo ?? 0;
   const valorCatastralTotal = p.valorCatastralTotal ?? 0;
-  const incrementoBruto = p.precioVenta - p.precioCompra;
 
   // En el País Vasco y Navarra la plusvalía es foral: no se liquida con el TRLRHL (hallazgo
   // 3071 de las apps; en Navarra la cuota salía 4,8 veces por debajo). Mejor sin cifra.
@@ -187,32 +186,30 @@ export function calcularVentaInmueble(p: ParametrosVentaInmueble): ResultadoVent
   } else if (valorCatastralSuelo > 0) {
     iivtnuCalculable = true;
 
-    // Método objetivo (art. 107.4 TRLHL): valor catastral del suelo × coeficiente
-    // Años completos, tope en 20 y prorrateo por meses bajo el año (hallazgos 1559 y 1560).
-    const coefEntry = coeficienteIIVTNU(p.aniosTenencia);
-    const baseObjetivo = r(valorCatastralSuelo * coefEntry.coeficiente);
-    const plusvaliaObjetivo = r(baseObjetivo * (tipoMunicipal / 100));
+    // Los dos métodos, del motor ÚNICO de la plusvalía (data/itp-ccaa.ts), el de la pestaña
+    // Vendedor de estimador-compraventa-inmueble y del motor compraventa. Hasta el 27/10/2026
+    // aquí había una copia propia; daba lo mismo en 8.160 casos medidos, pero una reparación
+    // futura podía llegar a una y no a la otra (cabo C0471). Sin `ccaa`: la bonificación de
+    // Ceuta y Melilla se aplica abajo, para rotular las cuotas antes y después de ella.
+    //   - Objetivo (art. 107.4 TRLRHL): suelo × coeficiente; años completos, tope en 20 y
+    //     prorrateo por meses bajo el año (hallazgos 1559 y 1560).
+    //   - Real (art. 107.5): incremento repartido en la proporción catastral suelo/total. Sin
+    //     el total, o con un suelo mayor que el total (los dos campos del recibo del IBI
+    //     intercambiados, hallazgo 900), no se calcula, y se dice.
+    const pm = calcularPlusvaliaMunicipal({
+      valorCatastralSuelo,
+      aniosPropiedad: p.aniosTenencia,
+      precioCompra: p.precioCompra,
+      precioVenta: p.precioVenta,
+      valorCatastralTotal: valorCatastralTotal > 0 ? valorCatastralTotal : undefined,
+      tipoMaximo: tipoMunicipal,
+    });
+    const plusvaliaObjetivo = r(pm.metodoObjetivo);
+    const parCatastralImposible = pm.parCatastralImposible;
+    const metodoRealDisponible = pm.metodoRealDisponible;
+    const plusvaliaReal = metodoRealDisponible ? r(pm.metodoReal) : Infinity;
 
-    // Método real (art. 107.5 TRLHL): incremento BRUTO de la operación repartido en la
-    // proporción CATASTRAL suelo/total. Sin el valor catastral total no es calculable:
-    // antes se usaba un 60 % fijo inventado, que daba un resultado sin respaldo normativo.
-    //
-    // Y tampoco es calculable con un par IMPOSIBLE. El valor catastral total incluye el suelo
-    // por definición, así que un suelo mayor que el total no describe ningún inmueble: es el
-    // despiste de intercambiar los dos campos, que salen consecutivos del MISMO recibo del
-    // IBI. El `Math.min(1, …)` de abajo se daba cuenta —acotaba la proporción al 100 %— y en
-    // vez de decirlo lo convertía en el caso «todo suelo, nada de construcción» y liquidaba:
-    // con suelo 8.000 y total 5.000 publicaba 500,00 € de plusvalía por el método real y un
-    // «IMPORTE NETO VENDEDOR» rotulado «lo que realmente recibes», sin un aviso (hallazgo 900).
-    // La salida correcta ya estaba escrita para el caso gemelo: cuando falta el total, se
-    // renuncia a comparar y se dice. Un total imposible no es un total utilizable.
-    const parCatastralImposible = valorCatastralTotal > 0 && valorCatastralSuelo > valorCatastralTotal;
-    const metodoRealDisponible = valorCatastralTotal > 0 && !parCatastralImposible;
-    const plusvaliaReal = metodoRealDisponible
-      ? r(Math.max(0, incrementoBruto * Math.min(1, valorCatastralSuelo / valorCatastralTotal)) * (tipoMunicipal / 100))
-      : Infinity;
-
-    if (incrementoBruto <= 0) {
+    if (pm.exento) {
       // Sin incremento de valor: no sujeta (RDL 26/2021)
       plusvaliaMunicipal = 0;
       metodoPlusvalia = 'No sujeta (sin incremento de valor)';
