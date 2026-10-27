@@ -25,10 +25,21 @@
  * 090b9eb0 (12/10/2026), y una sexta, quiz-tipos-plantas (C0224, 498e33d6), que quita el pie
  * durante el juego y por eso se reparó sacando el tracker del Footer.
  *
+ * SEGUNDA FORMA: UN TRACKER SUELTO JUNTO AL DEL PIE (27/10/2026, cabo C0472)
+ * ──────────────────────────────────────────────────────────────────────────
+ * También rompe un `.tsx` de `app/` que monte `<AnalyticsTracker>` Y un `<Footer appName>`: son
+ * dos trackers en la misma carga, y el tracker no deduplica. Seis apps lo hacían
+ * (calculadora-propinas, calculadora-fechas, comparador-coste-vida, conversor-divisas,
+ * enchufes-por-pais y presupuesto-viaje; reparadas en 8cc9f09a): entre el 75 y el 100 % de sus
+ * visitas tenían gemela de la misma sesión, y calculadora-propinas con dos nombres distintos.
+ * Un tracker suelto es legítimo con el Footer SIN appName (quiz-tipos-plantas, error.tsx, las
+ * portadas de los portales).
+ *
  * SIN PASIVO
  * ──────────
  * Barre `app/` entero. Con esos tres commits y la `key` puesta en los dos Footer de
- * curso-emprendimiento ya no quedaba ninguno: solo puede encenderlo código nuevo.
+ * curso-emprendimiento ya no quedaba ninguno: solo puede encenderlo código nuevo. La segunda
+ * forma, tampoco desde 8cc9f09a.
  *
  * QUÉ NO MIRA, Y POR QUÉ
  * ──────────────────────
@@ -95,6 +106,17 @@ for (const ruta of recorrer(path.join(RAIZ, 'app'))) {
       const k = m[1].match(/\bkey\s*=\s*(?:"([^"]*)"|'([^']*)'|\{\s*['"`]([^'"`]*)['"`]\s*\})/);
       return { linea: limpio.slice(0, m.index).split('\n').length, key: k ? (k[1] ?? k[2] ?? k[3]) : null };
     });
+  // Segunda forma: un <AnalyticsTracker> suelto junto a un <Footer appName> (cabo C0472)
+  if (pies.length > 0) {
+    const relT = path.relative(RAIZ, ruta).replace(/\\/g, '/');
+    for (const m of limpio.matchAll(/<AnalyticsTracker\b/g)) {
+      const linea = limpio.slice(0, m.index).split('\n').length;
+      const escape = escapeEn(lineas, linea);
+      if (escape === 'firmado') { exentos.push(`${relT}:${linea}`); continue; }
+      const porQue = escape === 'sin razón' ? ' — lleva `footer-ok:` SIN razón escrita' : '';
+      errores.push(`${relT}:${linea} — \`<AnalyticsTracker>\` suelto en un fichero que monta \`<Footer appName>\` (l. ${pies[0].linea}), que ya lleva el suyo: cada carga cuenta DOS visitas. Quita el suelto y deja el del pie.${porQue}`);
+    }
+  }
   if (pies.length < 2) continue;
   conVarios++;
   const rel = path.relative(RAIZ, ruta).replace(/\\/g, '/');

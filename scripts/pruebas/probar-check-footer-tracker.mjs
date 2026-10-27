@@ -29,6 +29,12 @@
  *  12. `footer-ok:` a secas, sin razón.
  *  13. SE PLANTA · ningún .tsx que leer.
  *
+ * La segunda forma (27/10/2026, cabo C0472), un `<AnalyticsTracker>` suelto junto al del pie:
+ *
+ *  14. calculadora-propinas antes de 8cc9f09a. Debe FALLAR.  15. Reparada. Debe CALLAR.
+ *  16. Tracker suelto con un `<Footer />` sin appName (quiz-tipos-plantas). Debe CALLAR.
+ *  17. `footer-ok: <razón>` en el tracker. Debe CALLAR.  18. El tracker en un comentario. CALLAR.
+ *
  * Trabaja sobre mini-catálogos en directorios temporales: no escribe NADA en `app/`.
  */
 
@@ -45,6 +51,7 @@ const deGit = (rev, ruta) => execFileSync('git', ['show', `${rev}:${ruta}`], { c
 const PERFIL = 'app/test-perfil-inversor/page.tsx';
 const VEHICULO = 'app/selector-vehiculo/page.tsx';
 const PLANTAS = 'app/quiz-tipos-plantas/page.tsx';
+const PROPINAS = 'app/calculadora-propinas/page.tsx';
 
 const pagina = (cuerpo) => ({ 'app/prueba/page.tsx': `export default function P() {\n${cuerpo}\n}\n` });
 
@@ -80,6 +87,21 @@ const CASOS = [
     ficheros: pagina("  if (a) return (\n    <div>\n      {/* footer-ok: */}\n      <Footer appName=\"x\" />\n    </div>\n  );\n  return <div><p /><Footer key=\"pie\" appName=\"x\" /></div>;"),
   },
   { n: 13, nombre: 'SE PLANTA · ningún .tsx que leer', debeFallar: true, ficheros: {} },
+  // Segunda forma (cabo C0472): un <AnalyticsTracker> suelto junto al del <Footer appName>
+  { n: 14, nombre: 'CASO DE ORIGEN · calculadora-propinas antes de 8cc9f09a (tracker suelto + Footer appName)', debeFallar: true, ficheros: { [PROPINAS]: deGit('8cc9f09a^', PROPINAS) } },
+  { n: 15, nombre: 'CASO DE ORIGEN REPARADO · calculadora-propinas en 8cc9f09a', debeFallar: false, ficheros: { [PROPINAS]: deGit('8cc9f09a', PROPINAS) } },
+  {
+    n: 16, nombre: 'tracker suelto con un <Footer /> SIN appName (la forma de quiz-tipos-plantas)', debeFallar: false,
+    ficheros: pagina('  return <div><AnalyticsTracker appName="x" /><Footer /></div>;'),
+  },
+  {
+    n: 17, nombre: 'tracker suelto + Footer appName con footer-ok: y razón', debeFallar: false,
+    ficheros: pagina('  return (\n    <div>\n      {/* footer-ok: el suelto registra otra aplicación, la ficha de la puerta */}\n      <AnalyticsTracker appName="y" />\n      <Footer appName="x" />\n    </div>\n  );'),
+  },
+  {
+    n: 18, nombre: '<AnalyticsTracker> citado en un comentario junto a un Footer appName', debeFallar: false,
+    ficheros: pagina('  // antes: <AnalyticsTracker appName="x" /> suelto\n  return <div><Footer appName="x" /></div>;'),
+  },
 ];
 
 let fallos = 0;
