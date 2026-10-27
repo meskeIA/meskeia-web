@@ -1684,6 +1684,16 @@ ni del dorado techo
 se admira, fabricado
 del sabio moro, en jaspes sustentado.`;
 
+const CUADERNA_DE_PRUEBA = `Por la vereda verde caminaba despacio
+mirando los tejados del antiguo palacio,
+y las nubes pasaban por el cielo de espacio
+como barcos de lana sobre un mar de topacio.
+
+Los niños en la plaza jugaban con las flores,
+los viejos en los bancos contaban sus amores,
+las madres desde lejos llamaban sin rencores
+y el sol iba tiñendo la torre de colores.`;
+
 const SONETO_GARCILASO_XXIII = `En tanto que de rosa y azucena
 se muestra la color en vuestro gesto,
 y que vuestro mirar ardiente, honesto,
@@ -1932,10 +1942,10 @@ test.describe('contador-silabas · Inspector 27/10/2026 (séptima inspección)',
     expect((await estrofasNombradas(page))[0]).toBe('Redondilla');
   });
 
-  test('HALLAZGO C0288 · la redondilla y el serventesio se reconocen también en segunda y tercera posición', async ({
+  test('HALLAZGO 3567 (C0288) · la redondilla y el serventesio se reconocen también en segunda y tercera posición', async ({
     page,
   }) => {
-    test.fail(true, 'ABIERTO: patron() compara las letras globales con «ABBA» sin renormalizarlas');
+    // REPARADO el 27/10/2026: patron() renombra las letras de cada bloque desde la A.
     // Sor Juana: abba cddc effe, doce octosílabos (testigo de arriba) → tres redondillas.
     // Martí, «Cultivo una rosa blanca»: -anca -ero -ero -anca · -anca -ivo -ivo -anca → abba
     //   acca; los ocho miden 8 (Cul-ti-vo_u-na: 9 − 1; en ju-lio co-mo_en e-ne-ro: 9 − 1;
@@ -1960,10 +1970,11 @@ test.describe('contador-silabas · Inspector 27/10/2026 (séptima inspección)',
     });
   });
 
-  test('HALLAZGO C0289 · ni la sextina de Darío ni los serventesios de Machado son cuaderna vía, ni dos liras una silva', async ({
+  test('HALLAZGO 3568 (C0289) · ni la sextina de Darío ni los serventesios de Machado son cuaderna vía, ni dos liras una silva', async ({
     page,
   }) => {
-    test.fail(true, 'ABIERTO: detectarComposicion() rotula por el metro sin mirar la estrofa ni la rima');
+    // REPARADO el 27/10/2026: la cuaderna vía exige tetrásticos AAAA y la silva, que ningún
+    // bloque sea una estrofa fija; las dos liras vuelven a la lista de estrofas.
     // La cuaderna vía son tetrásticos MONORRIMOS de alejandrinos (AAAA); la silva, una serie
     // LIBRE de 7 y 11 sin estrofas fijas.
     //   «Sonatina», estrofa 1: seis alejandrinos -esa -esa -or -oro -oro -or → AABCCB.
@@ -1978,6 +1989,17 @@ test.describe('contador-silabas · Inspector 27/10/2026 (séptima inspección)',
       rotulos.push(await composicion(page));
     }
     expect(rotulos.map((r) => ['Cuaderna vía', 'Silva'].includes(r))).toEqual([false, false, false]);
+    // Las liras: sin composición que la tape, la lista nombra las dos
+    expect(await estrofasNombradas(page)).toEqual(['Lira', 'Lira']);
+
+    // Y la cuaderna vía de verdad se sigue reconociendo: dos tetrásticos AAAA de alejandrinos,
+    // escritos para la prueba (el Berceo original pide dialefas sistemáticas que la app no
+    // aplica). A mano, todos 7 + 7: «Por la vereda verde | caminaba despacio» = 7 + 7 sin
+    // contactos; «y las nubes pasaban | por el cielo de espacio» = 7 + (8 − de_espacio);
+    // «como barcos de lana | sobre un mar de topacio» = 7 + (8 − sobre_un); «y el sol iba
+    // tiñendo | la torre de colores» = (8 − y_el) + 7. Rimas -acio ×4, -ores ×4 → AAAA BBBB.
+    await analizarTexto(page, CUADERNA_DE_PRUEBA);
+    expect(await composicion(page)).toBe('Cuaderna vía');
   });
 
   test('TESTIGO · los alejandrinos y dodecasílabos sin cesura conflictiva miden bien', async ({

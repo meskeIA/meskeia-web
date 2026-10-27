@@ -222,8 +222,27 @@ function asignarLetras(
 
 // ─── Estrofas ────────────────────────────────────────────────────────────────
 
-/** Normaliza el esquema a mayúsculas para comparar patrones sin depender del arte. */
-const patron = (letras: string[]): string => letras.join('').toUpperCase();
+/**
+ * Normaliza el esquema para comparar patrones sin depender del arte NI de la posición.
+ *
+ * ── Las letras se renombran por orden de aparición DENTRO del bloque (hallazgo 3567) ──
+ * Las letras del esquema son las del poema entero: solo la primera estrofa empieza por A.
+ * Comparadas tal cual con 'ABBA' o 'ABAB', la segunda redondilla de Sor Juana llegaba como
+ * 'CDDC', la de Martí como 'ACCA' y el segundo serventesio de Darío como 'CDCD', y las tres
+ * se quedaban sin nombre. Ahora cada bloque se reescribe desde la A: 'cddc' → 'ABBA'. El
+ * guion de un verso suelto se conserva.
+ */
+const patron = (letras: string[]): string => {
+  const renombre = new Map<string, string>();
+  return letras
+    .map((l) => {
+      if (l === '-') return '-';
+      const clave = l.toUpperCase();
+      if (!renombre.has(clave)) renombre.set(clave, LETRAS[renombre.size] ?? '?');
+      return renombre.get(clave)!;
+    })
+    .join('');
+};
 
 /** ¿Todos los versos miden lo mismo? */
 function metroUniforme(versos: VersoParaRima[], medida: number): boolean {
@@ -367,7 +386,8 @@ function detectarComposicion(
   versos: VersoParaRima[],
   letras: string[],
   tipo: TipoRima,
-  bloques: number[][]
+  bloques: number[][],
+  estrofas: (EstrofaDetectada | null)[]
 ): EstrofaDetectada | null {
   const n = versos.length;
   const esquema = letras.join('');
@@ -396,17 +416,33 @@ function detectarComposicion(
     };
   }
 
-  if (n >= 6 && metroPredominante(versos, 14) && tipo !== 'libre') {
+  /**
+   * ── Cuaderna vía y silva se reconocen por su FORMA, no solo por el metro (hallazgo 3568) ──
+   * Bastaba con seis alejandrinos rimados para rotular «Cuaderna vía», y con 7 y 11 rimados
+   * para «Silva»: la primera estrofa de «Sonatina» (AABCCB), los serventesios de «Retrato»
+   * (ABAB CDCD) y dos liras de Fray Luis salían con un nombre de estrofa falso, y como la
+   * composición oculta la lista de estrofas, la lira que sí se había reconocido desaparecía.
+   * Ahora la cuaderna vía exige tetrásticos MONORRIMOS (AAAA de cuatro en cuatro), y la silva,
+   * que ningún bloque sea una estrofa fija ya reconocida (una lira no es una silva).
+   */
+  const tetrasticosMonorrimos =
+    n >= 8 &&
+    n % 4 === 0 &&
+    Array.from({ length: n / 4 }, (_, k) => patron(letras.slice(4 * k, 4 * k + 4))).every(
+      (p) => p === 'AAAA',
+    );
+  if (tetrasticosMonorrimos && metroPredominante(versos, 14) && tipo !== 'libre') {
     return {
       nombre: 'Cuaderna vía',
       descripcion: 'Alejandrinos monorrimos agrupados de cuatro en cuatro.',
       esquema,
-      confianza: 'aproximada',
+      confianza: metroUniforme(versos, 14) ? 'exacta' : 'aproximada',
     };
   }
 
-  // Silva: alternancia libre de endecasílabos y heptasílabos
-  if (n >= 6) {
+  // Silva: alternancia libre de endecasílabos y heptasílabos, sin estrofas fijas
+  const hayEstrofaFija = estrofas.some((e) => e?.confianza === 'exacta');
+  if (n >= 6 && !hayEstrofaFija) {
     const solo7y11 = versos.every((v) => v.silabasMetricas === 7 || v.silabasMetricas === 11);
     const hayDeLosDos =
       versos.some((v) => v.silabasMetricas === 7) && versos.some((v) => v.silabasMetricas === 11);
@@ -476,7 +512,7 @@ export function analizarRimas(
     versos: versosRimados,
     esquema: elegida.letras.join(''),
     estrofas,
-    composicion: detectarComposicion(versos, elegida.letras, tipo, bloques),
+    composicion: detectarComposicion(versos, elegida.letras, tipo, bloques, estrofas),
     versosSueltos: elegida.sueltos,
   };
 }
