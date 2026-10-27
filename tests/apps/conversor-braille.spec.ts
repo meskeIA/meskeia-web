@@ -35,10 +35,12 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  * «re-inspección 23/10/2026», 3434-3444) se repararon el mismo 23/10 y van como tests normales con
  * «REPARADO (nº)»; la re-inspección del 24/10/2026 los vio sostenerse. Los de esa re-inspección
  * (3456-3460 y el cabo C0401) se repararon en 1965bb4c y 390a4a69 y van como tests normales con
- * «REPARADO»; la inspección del 26/10/2026 los vio sostenerse. Los de esa inspección (bloque del
- * final, «inspector 26/10/2026») están ABIERTOS y van con `test.fail()`: cada uno afirma lo que
- * DEBERÍA pasar y falla a propósito; el día que se corrija la app pasará a ROJO («expected to fail,
- * but passed») y habrá que quitarle la marca, no reescribir el valor esperado.
+ * «REPARADO»; la inspección del 26/10/2026 los vio sostenerse. Los de esa inspección (bloque
+ * «inspector 26/10/2026», 3524-3531) se REPARARON el 27/10/2026 en e6bcbe53 y aa75156d y van como
+ * tests normales con «REPARADO»; la re-inspección del 27/10/2026 (bloque del final) los vio
+ * sostenerse. Los hallazgos de ESA re-inspección están ABIERTOS y van con `test.fail()`: cada uno
+ * afirma lo que DEBERÍA pasar y falla a propósito; el día que se corrija la app pasará a ROJO
+ * («expected to fail, but passed») y habrá que quitarle la marca, no reescribir el valor esperado.
  */
 
 const RUTA = '/conversor-braille/';
@@ -2477,7 +2479,8 @@ test.describe('re-inspección 24/10/2026 — móvil de 360 px', () => {
 //       letra, lo que hace la app) o 2 (⠨⠨ delante de la primera). Texto en mayúsculas como cambio
 //       tipográfico, § 7.2: signos del § 9.1 (35 al abrir y al cerrar) y el texto en minúscula.
 //       → hallazgo 3529, REPARADO el 27/10/2026 con un aviso (no se distingue sigla de énfasis).
-//   (f) moneda de 2 € y (g) árabe de derecha a izquierda: sin anclar (lo cuenta el acta).
+//   (f) moneda de 2 € y (g) árabe de derecha a izquierda: sin anclar (lo cuenta el acta). Se
+//       cerraron en la re-inspección del 27/10/2026: ver el bloque del final.
 test.describe('inspector 26/10/2026', () => {
   const ADA = 'ADA 703.3 (EE. UU.)';
 
@@ -2639,14 +2642,14 @@ test.describe('inspector 26/10/2026', () => {
     await page.goto(RUTA);
     await convertirHidratado(page, 'a⡀b');
     await expect(cajaResultado(page)).toHaveText('⠁⡀⠃'); // precondición: la celda pasa tal cual
-    const vista = await celdasVista(page); // hoy: ['1', '', '1-2']
-    const hoja = await hojaPorLineas(page); // hoy: [['1', '', '1-2']]
+    const vista = await celdasVista(page); // ['1', '', '1-2'] (seis puntos; desde aa75156d, con aviso)
+    const hoja = await hojaPorLineas(page); // [['1', '', '1-2']] (ídem)
     expect((vista[1] !== '' && hoja[0]?.[1] !== '') || (await avisaOchoPuntos())).toBe(true);
 
     await page.goto(RUTA);
     await convertirHidratado(page, '⡁', 'braille');
     await expect(cajaResultado(page)).toHaveText('⡁'); // precondición
-    const hojaBraille = await hojaPorLineas(page); // hoy: [['1']], la hoja punza una «a»
+    const hojaBraille = await hojaPorLineas(page); // [['1']]: la hoja punza una «a» (desde aa75156d, con aviso)
     expect(hojaBraille[0]?.[0] !== '1' || (await avisaOchoPuntos())).toBe(true);
   });
 
@@ -2859,7 +2862,7 @@ test.describe('inspector 26/10/2026', () => {
   }) => {
     // REPARADO, hallazgo 3527 (inspector 26/10/2026)
     // (a) ADA: ⌊(172 − 2,4 − 1,5) / 6,2⌋ + 1 = ⌊27,11⌋ + 1 = 28 celdas; 6,2 mm y 10,2 mm (lo fija el 3439).
-    //     Hoy sigue «1 línea de 29 celdas · celda de 6 mm · 10 mm entre líneas».
+    //     Era (26/10): seguía «1 línea de 29 celdas · celda de 6 mm · 10 mm entre líneas».
     await page.goto(RUTA);
     await convertirHidratado(page, 'hola');
     await traducir(page);
@@ -2870,7 +2873,7 @@ test.describe('inspector 26/10/2026', () => {
     });
 
     // (b) Teclado: ⠿ (123456) y, con la página ya traducida, ⠫ (1246): dos celdas sin equivalente.
-    //     Hoy: «Esta celda no tiene … ha pasado … ⠿ ⠫».
+    //     Era (26/10): «Esta celda no tiene … ha pasado … ⠿ ⠫».
     await page.goto(RUTA);
     await esperarHidratacion(page, ['textarea']);
     await page.getByRole('button', { name: 'Braille → Texto' }).click();
@@ -2886,7 +2889,7 @@ test.describe('inspector 26/10/2026', () => {
     await expect(avisoCeldas).toContainText('han pasado al resultado sin traducir');
 
     // (c) «a⠁b» en Braille → Texto y «Borrar última»: queda una sola letra en tinta, la «a».
-    //     Hoy: «a han pasado … y no salen en la hoja».
+    //     Era (26/10): «a han pasado … y no salen en la hoja».
     await page.goto(RUTA);
     await convertirHidratado(page, 'a⠁b', 'braille');
     const avisoTinta = page.locator('[class*="avisoConversion"]').filter({ hasText: 'mezcla celdas braille' });
@@ -2897,7 +2900,7 @@ test.describe('inspector 26/10/2026', () => {
     await expect(avisoTinta).toContainText('ha pasado al resultado tal cual', { timeout: 3000 });
     await expect(avisoTinta).toContainText('no sale en la hoja');
 
-    // (d) El botón dice la celda que se va a escribir: punto 1, traducir, punto 2 → ⠃ (1-2). Hoy: «⠁».
+    // (d) El botón dice la celda que se va a escribir: punto 1, traducir, punto 2 → ⠃ (1-2). Era (26/10): «⠁».
     await page.goto(RUTA);
     await esperarHidratacion(page, ['textarea']);
     await page.getByRole('button', { name: 'Braille → Texto' }).click();
@@ -2928,3 +2931,543 @@ test.describe('inspector 26/10/2026', () => {
     expect(porcentaje === null || Number(porcentaje[1]) === 74).toBe(true);
   });
 });
+
+// ═════════════════════════════════════════════════════════════════════════════
+// re-inspección 27/10/2026 — tras e6bcbe53 (página traducida: 3524, 3527) y aa75156d (3525-3531)
+// ═════════════════════════════════════════════════════════════════════════════
+//
+// FUENTE: el B 2 (V4, mayo de 2025, última actualización 22/01/2026), descargado de once.es y leído
+// con un extractor de texto del PDF (FlateDecode + ToUnicode). Su fuente braille escribe las celdas
+// con caracteres ASCII: el orden de las series del § 3 da la tabla (p. ej. «#» = 3456, «{» = 46,
+// «_» = 6, «@» = 5, «%» = 456, «}» = 35, «+» = 235). Citas que usa este bloque, literales:
+//   § 8.1  «Cuando se representan números de teléfono, se transcriben sin espacios en blanco, sin
+//          puntos de abreviatura ni guiones, salvo que aparezcan prefijos específicos.» Ejemplos:
+//          «999 999 999 → #iiiiiiiii» · «+49 900 000 000 → +#di#ijjjjjjjj» ·
+//          «49-900 000 000 → #di#ijjjjjjjj» · «647.234.345 → #fdgbcdcde».
+//   § 8.1  «Como separador decimal se utiliza el punto 2 […] independientemente de que en el
+//          original aparezca un punto o un apóstrofo.» Ejemplo: «73,81 73.81 73’81 → #gc,ha».
+//   § 8.1  «Si en el original no aparece ningún tipo de separación, se escribirán todas las cifras
+//          juntas: 501439678 → #ejadcifgh».
+//   § 8.2  «8b → #h@b» · «234ae → #bcd@a@e» · «234a5 → #bcd@ae».
+//   § 7.1  «Al transcribir estos textos al braille no debe escribirse este signo de punto después de
+//          cada una de las letras que forman la sigla, aunque aparezca así en el original.»
+//          Ejemplo: «O.N.U. → {o{n{u».
+//   § 8.5  «para su transcripción en braille bastará con utilizar el prefijo de mayúscula 46
+//          solamente al comienzo del número.» Ejemplos: «M VIII → {m {viii».
+//   § 9.1  «el signo 35 para la apertura y cierre» (lo que dice el aviso del 3529: ⠔ = 35).
+//   § 14.3 «Son las 18:56 → {son las #ah:#ef».
+//   § 6.2, § 12, § 12.1, § 13 y § 14.1: celdas de { 5-123, } 456-2, \ 5-3, | 456-0d, + 235,
+//          = 2356, @ 5, & 6-12346, § 346, $ 456-234, £ 5-2346, ¥ 456-13456, ° 356.
+//
+// LO QUE SE SOSTIENE: 3526 («10 000» y «501 439 678» con el punto 3; «999 999 999» sin blancos y con
+// aviso), 3525 (aviso del B 2 para € % — [ ] *), 3528 (ocho puntos, en los dos sentidos), 3529
+// (aviso de sigla), 3530 (é catalana en «València és bonica») y 3531. Con la página TRADUCIDA (el
+// traductor simulado y el detector de texto viejo de generador-loteria.spec.ts) la app entera —los
+// dos sentidos, los avisos nuevos de aa75156d en singular y en plural, ejemplos, teclado de seis
+// puntos, hoja con sus cuatro controles, ⇄, guía y aviso legal— no cae ni deja texto viejo, a 1280
+// y a 390 px, y la página no desborda.
+//
+// ABIERTOS (test.fail): teléfonos con prefijo, guion o puntos (la regla de millar de aa75156d hace
+// de «+49 900 000 000» la cantidad 49.900.000.000), decimal con punto o apóstrofo, siglas con
+// puntos, números romanos llamados «sigla» por el aviso nuevo, signos del B 2 con el aviso «puede
+// que», y del cabo C0238 la (f) (moneda de 2 €, sin fuente) y la (g) (árabe de derecha a izquierda,
+// que la propia guía contradice).
+test.describe('re-inspección 27/10/2026', () => {
+  async function convertir27(page: Page, texto: string, modo: 'texto' | 'braille' = 'texto') {
+    await esperarHidratacion(page, ['textarea']);
+    if (modo === 'braille') await page.getByRole('button', { name: 'Braille → Texto' }).click();
+    const textarea = page.locator('textarea').first();
+    await textarea.fill(texto);
+    await esperarValorEnReact(page, textarea, texto);
+    await page.getByRole('button', { name: 'Convertir', exact: true }).click();
+  }
+
+  /** Texto de la caja de resultado ('' si no hay caja), cuando ya hay resultado o aviso en pantalla. */
+  const resultado27 = async (page: Page) => {
+    await page.locator('[class*="resultBox"], [class*="avisoConversion"]').first().waitFor();
+    const caja = page.locator('[class*="resultBox"]');
+    return (await caja.count()) > 0 ? ((await caja.textContent()) ?? '') : '';
+  };
+
+  const aviso27 = (page: Page, texto: string) =>
+    page.locator('[class*="avisoConversion"]').filter({ hasText: texto });
+
+  /** Puntos en relieve de la hoja, línea a línea y celda a celda (Marburg: 6 mm · 10 mm · 2,5 mm). */
+  async function hoja27(page: Page): Promise<string[][]> {
+    return page.evaluate(() => {
+      const svg = [...document.querySelectorAll('svg')].find((s) =>
+        (s.getAttribute('aria-label') || '').includes('escala real'),
+      );
+      if (!svg) return [];
+      const lineas = new Map<number, Map<number, number[]>>();
+      [...svg.querySelectorAll('circle')].forEach((c) => {
+        const cx = parseFloat(c.getAttribute('cx') || '0');
+        const cy = parseFloat(c.getAttribute('cy') || '0');
+        const linea = Math.floor(cy / 10);
+        const celda = Math.floor(cx / 6);
+        if (!lineas.has(linea)) lineas.set(linea, new Map());
+        const l = lineas.get(linea)!;
+        if (!l.has(celda)) l.set(celda, []);
+        if (c.getAttribute('fill') !== '#000000') return; // los grises son la retícula guía
+        const columna = Math.round((cx - celda * 6 - 0.75) / 2.5);
+        const fila = Math.round((cy - linea * 10 - 0.75) / 2.5);
+        l.get(celda)!.push(columna * 3 + fila + 1);
+      });
+      return [...lineas.keys()]
+        .sort((a, b) => a - b)
+        .map((k) => {
+          const l = lineas.get(k)!;
+          const max = Math.max(...l.keys());
+          return Array.from({ length: max + 1 }, (_, i) => (l.get(i) ?? []).sort((a, b) => a - b).join('-'));
+        });
+    });
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // CASO 1 (normal) — sigla, millar con blanco (normal y U+00A0), punto final; hoja de dos líneas
+  // ─────────────────────────────────────────────────────────────────────────
+  test('CASO 1 (normal) — «La ONCE reparte 1 250 000 cupones.»: cadena, aviso de sigla, hoja y vuelta', async ({ page }) => {
+    // Derivación a mano con el B 2:
+    //   'L' → ⠨ (46, § 7) ⠇ (123) · 'a' ⠁ · ⠀
+    //   'ONCE' → ⠨⠕ ⠨⠝ ⠨⠉ ⠨⠑ (§ 7.1, recurso 1, «ONCE → {o{n{c{e») · ⠀
+    //   'reparte' → ⠗ (1235) ⠑ (15) ⠏ (1234) ⠁ ⠗ ⠞ (2345) ⠑ · ⠀
+    //   '1 250 000' → ⠼ (3456) ⠁ · ⠄ (punto 3 de millar, § 8.1) ⠃ ⠑ ⠚ · ⠄ ⠚ ⠚ ⠚ · ⠀
+    //   'cupones' → ⠉ (14) ⠥ (136) ⠏ ⠕ (135) ⠝ (1345) ⠑ ⠎ (234) · '.' → ⠄ (3, § 6.1)
+    const esperado = '⠨⠇⠁⠀⠨⠕⠨⠝⠨⠉⠨⠑⠀⠗⠑⠏⠁⠗⠞⠑⠀⠼⠁⠄⠃⠑⠚⠄⠚⠚⠚⠀⠉⠥⠏⠕⠝⠑⠎⠄';
+    for (const texto of ['La ONCE reparte 1 250 000 cupones.', 'La ONCE reparte 1 250 000 cupones.']) {
+      await page.goto(RUTA);
+      await convertir27(page, texto);
+      await expect(cajaResultado(page)).toHaveText(esperado);
+      // Cuatro mayúsculas: el aviso del 3529 la nombra y da el signo 35 del § 9.1
+      await expect(aviso27(page, 'como una sigla').locator('strong')).toHaveText('ONCE');
+      await expect(aviso27(page, 'como una sigla')).toContainText('(⠔ al abrir y al cerrar)');
+      await expect(aviso27(page, 'Esta herramienta no escribe')).toHaveCount(0);
+      await expect(aviso27(page, 'teléfono')).toHaveCount(0);
+    }
+    // Hoja (29 celdas por línea con Marburg): 3 + 1 + 8 + 1 + 7 = 20, y la palabra de 10 celdas del
+    // número no cabe en las 8 que quedan (29 − 20 − 1): baja a la segunda línea con «cupones.» (19).
+    expect(await hoja27(page)).toEqual([
+      [
+        '4-6', '1-2-3', '1', '',
+        '4-6', '1-3-5', '4-6', '1-3-4-5', '4-6', '1-4', '4-6', '1-5', '',
+        '1-2-3-5', '1-5', '1-2-3-4', '1', '1-2-3-5', '2-3-4-5', '1-5',
+      ],
+      [
+        '3-4-5-6', '1', '3', '1-2', '1-5', '2-4-5', '3', '2-4-5', '2-4-5', '2-4-5', '',
+        '1-4', '1-3-6', '1-2-3-4', '1-3-5', '1-3-4-5', '1-5', '2-3-4', '3',
+      ],
+    ]);
+    await expect(page.locator('[class*="hojaAviso"]')).toHaveText('2 líneas de 29 celdas · celda de 6 mm · 10 mm entre líneas');
+    // Vuelta: el punto 3 entre cifras es el separador de millar (§ 8.1), así que vuelve como punto
+    await page.getByRole('button', { name: 'Intercambiar dirección de conversión' }).click();
+    await page.getByRole('button', { name: 'Convertir', exact: true }).click();
+    await expect(cajaResultado(page)).toHaveText('La ONCE reparte 1.250.000 cupones.');
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // CASO 2 (límite) — los ejemplos literales del § 8.1, § 8.2 y § 14.3 que la app ya cumple
+  // ─────────────────────────────────────────────────────────────────────────
+  test('CASO 2 (límite) — ejemplos literales del B 2: «999 999 999», «501439678», «8b», «234ae», «234a5», «18:56»', async ({ page }) => {
+    const casos: Array<[string, string, string]> = [
+      ['999 999 999', '⠼⠊⠊⠊⠊⠊⠊⠊⠊⠊', '§ 8.1 «#iiiiiiiii»'],
+      ['501 439 678', '⠼⠑⠚⠁⠄⠙⠉⠊⠄⠋⠛⠓', '§ 8.1 «#eja.dci.fgh»'],
+      ['501439678', '⠼⠑⠚⠁⠙⠉⠊⠋⠛⠓', '§ 8.1 «#ejadcifgh»'],
+      ['10 000,5', '⠼⠁⠚⠄⠚⠚⠚⠂⠑', '§ 8.1: punto 3 de millar y punto 2 decimal, un solo ⠼'],
+      ['8b', '⠼⠓⠐⠃', '§ 8.2 «#h@b»'],
+      ['234ae', '⠼⠃⠉⠙⠐⠁⠐⠑', '§ 8.2 «#bcd@a@e»'],
+      ['234a5', '⠼⠃⠉⠙⠐⠁⠑', '§ 8.2 «#bcd@ae»'],
+      ['Son las 18:56', '⠨⠎⠕⠝⠀⠇⠁⠎⠀⠼⠁⠓⠒⠼⠑⠋', '§ 14.3 «{son las #ah:#ef»'],
+    ];
+    for (const [texto, celdas, fuente] of casos) {
+      await page.goto(RUTA);
+      await convertir27(page, texto);
+      await expect(cajaResultado(page), `${texto} (${fuente})`).toHaveText(celdas);
+    }
+    // El teléfono del § 8.1 se nombra en su aviso (hallazgo 3526)
+    await page.goto(RUTA);
+    await convertir27(page, '999 999 999');
+    await expect(aviso27(page, 'como un número de teléfono').locator('strong')).toHaveText('999 999 999');
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // CASO 3 (rechazo) — solo signos que la app no escribe, y una caja de solo indicadores
+  // ─────────────────────────────────────────────────────────────────────────
+  test('CASO 3 (rechazo) — «€ % — [ ] *» no da celdas ni hoja y los nombra el aviso del B 2; «⠼» solo no da texto', async ({ page }) => {
+    await page.goto(RUTA);
+    await convertir27(page, '€ % — [ ] *');
+    // Los seis signos se omiten (3525): quedan las cinco separaciones de palabra
+    await expect(cajaResultado(page)).toHaveText('⠀⠀⠀⠀⠀');
+    await expect(aviso27(page, 'Documento Técnico B 2) sí les da celda').locator('strong')).toHaveText('€ · % · — · [ · ] · *');
+    await expect(aviso27(page, 'Esta herramienta no escribe en braille')).toHaveCount(0);
+    await expect(page.getByRole('button', { name: /Imprimir la hoja/ })).toBeDisabled();
+    await expect(page.locator('[class*="hojaAviso"]')).toHaveText(
+      'Convierte primero un texto: la hoja se genera con el resultado de arriba.',
+    );
+    // Braille → Texto con solo el signo de número: no hay cifra detrás, no hay texto que dar
+    await page.goto(RUTA);
+    await convertir27(page, '⠼', 'braille');
+    await expect(page.locator('[class*="resultBox"]')).toHaveCount(0);
+    await expect(aviso27(page, 'La conversión no ha dado ningún resultado')).toContainText(
+      'en la caja no hay nada que se pueda escribir con esta herramienta',
+    );
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // ABIERTO — teléfonos del § 8.1 con prefijo, guion o puntos, y el fijo en grupos 2-3-2-2
+  // ─────────────────────────────────────────────────────────────────────────
+  //
+  // aa75156d (3526) solo reconoce como teléfono nueve cifras en tres grupos de tres con blancos que
+  // empiezan por 6-9. Cualquier otro teléfono cae en la regla de millar nueva: el ejemplo LITERAL del
+  // § 8.1 «+49 900 000 000» sale ⠼⠙⠊⠄⠊⠚⠚⠄⠚⠚⠚⠄⠚⠚⠚, la cantidad 49.900.000.000, sin aviso de teléfono
+  // (antes de aa75156d salían cuatro números separados, tampoco el B 2, pero no una cantidad); igual
+  // «+34 600 123 456» → 34.600.123.456 y «91 123 45 67» → ⠼⠊⠁⠄⠁⠃⠉⠀⠼⠙⠑⠀⠼⠋⠛ («91.123 45 67»). El
+  // guion de «49-900 000 000» se queda (⠤) y «647.234.345» sale con sus puntos sin decir nada. El +
+  // (235, § 12) no lo escribe la app (ampliar la tabla es decisión del usuario): se admite sin él.
+  test.fail('ABIERTO — teléfonos del § 8.1: «+49 900 000 000» no es la cantidad 49.900.000.000', async ({ page }) => {
+    const casos: Array<[string, string[]]> = [
+      // «+49 900 000 000 → +#di#ijjjjjjjj»: ⠖ (+) · ⠼ 4 9 · ⠼ 9 0 0 0 0 0 0 0 0
+      ['+49 900 000 000', ['⠖⠼⠙⠊⠼⠊⠚⠚⠚⠚⠚⠚⠚⠚', '⠼⠙⠊⠼⠊⠚⠚⠚⠚⠚⠚⠚⠚']],
+      // «49-900 000 000 → #di#ijjjjjjjj»: sin el guion
+      ['49-900 000 000', ['⠼⠙⠊⠼⠊⠚⠚⠚⠚⠚⠚⠚⠚']],
+      // El de España, por la misma regla: ⠖ · ⠼ 3 4 · ⠼ 6 0 0 1 2 3 4 5 6
+      ['+34 600 123 456', ['⠖⠼⠉⠙⠼⠋⠚⠚⠁⠃⠉⠙⠑⠋', '⠼⠉⠙⠼⠋⠚⠚⠁⠃⠉⠙⠑⠋']],
+      // Fijo en grupos 2-3-2-2 (no es cantidad: los grupos de millar son de tres): todas juntas
+      ['91 123 45 67', ['⠼⠊⠁⠁⠃⠉⠙⠑⠋⠛']],
+    ];
+    const fallos: string[] = [];
+    for (const [texto, validos] of casos) {
+      await page.goto(RUTA);
+      await convertir27(page, texto);
+      const r = await resultado27(page);
+      if (!validos.includes(r)) fallos.push(`${texto} → ${r}`);
+    }
+    // «647.234.345 → #fdgbcdcde»: desde la tinta no se distingue de una cantidad, así que vale
+    // también la cantidad si un aviso dice que podría ser un teléfono
+    await page.goto(RUTA);
+    await convertir27(page, '647.234.345');
+    const r647 = await resultado27(page);
+    if (r647 !== '⠼⠋⠙⠛⠃⠉⠙⠉⠙⠑' && (await aviso27(page, '647').count()) === 0) fallos.push(`647.234.345 → ${r647}`);
+    // Hoy: +49 → ⠼⠙⠊⠄⠊⠚⠚⠄⠚⠚⠚⠄⠚⠚⠚ · 49- → ⠼⠙⠊⠤⠼⠊⠚⠚⠚⠚⠚⠚⠚⠚ · +34 → ⠼⠉⠙⠄⠋⠚⠚⠄⠁⠃⠉⠄⠙⠑⠋ ·
+    //       91 → ⠼⠊⠁⠄⠁⠃⠉⠀⠼⠙⠑⠀⠼⠋⠛ · 647 → ⠼⠋⠙⠛⠄⠃⠉⠙⠄⠉⠙⠑ sin aviso
+    expect(fallos).toEqual([]);
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // ABIERTO — § 8.1: el separador decimal es el punto 2 aunque la tinta traiga punto o apóstrofo
+  // ─────────────────────────────────────────────────────────────────────────
+  //
+  // «73.81» sale ⠼⠛⠉⠄⠓⠁: el punto 3 dentro de un número es el separador de MILLAR (§ 6.1 y § 8.1), y
+  // un grupo de millar tiene tres cifras, así que el lector no tiene forma de leer 73,81. «73’81» (el
+  // apóstrofo decimal de los rótulos a mano) sale ⠼⠛⠉⠼⠓⠁, dos números, con el aviso de comillas
+  // simples. El ejemplo literal da la misma celda para las tres grafías. Ojo: «Son las 18.56» es otro
+  // caso del B 2 (§ 14.3: «{son las #ah.#ef», punto 3 y signo de número otra vez), y la app tampoco
+  // lo da (⠼⠁⠓⠄⠑⠋): desde la tinta no se distingue de un decimal, así que no se exige aquí.
+  test.fail('ABIERTO — § 8.1: «73.81» y «73’81» dan la coma decimal del ejemplo literal (#gc,ha)', async ({ page }) => {
+    const fallos: string[] = [];
+    for (const texto of ['73.81', '73’81', "73'81"]) {
+      await page.goto(RUTA);
+      await convertir27(page, texto);
+      // ⠼ (3456) · 7 ⠛ · 3 ⠉ · ⠂ (punto 2, decimal) · 8 ⠓ · 1 ⠁
+      const r = await resultado27(page);
+      if (r !== '⠼⠛⠉⠂⠓⠁') fallos.push(`${texto} → ${r}`); // hoy: ⠼⠛⠉⠄⠓⠁ · ⠼⠛⠉⠼⠓⠁ · ⠼⠛⠉⠼⠓⠁
+    }
+    expect(fallos).toEqual([]);
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // ABIERTO — § 7.1: las siglas con puntos se escriben sin ellos
+  // ─────────────────────────────────────────────────────────────────────────
+  test.fail('ABIERTO — § 7.1: «O.N.U.» se escribe ⠨⠕⠨⠝⠨⠥, sin los puntos de la tinta', async ({ page }) => {
+    await page.goto(RUTA);
+    await convertir27(page, 'O.N.U.');
+    // «O.N.U. → {o{n{u»: ⠨ (46) ⠕ (135) · ⠨ ⠝ (1345) · ⠨ ⠥ (136). Hoy: ⠨⠕⠄⠨⠝⠄⠨⠥⠄
+    await expect(cajaResultado(page)).toHaveText('⠨⠕⠨⠝⠨⠥', { timeout: 3000 });
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // ABIERTO — § 8.5: un número romano no es una sigla, y el aviso del 3529 lo llama así
+  // ─────────────────────────────────────────────────────────────────────────
+  //
+  // El § 8.5 escribe el signo de mayúscula solo al comienzo del número («VIII → {viii»). La app pone
+  // uno delante de cada letra y, desde aa75156d, el aviso de cuatro o más mayúsculas dice que «XVIII
+  // se ha escrito como una sigla» y ofrece la lectura de énfasis del § 7.2. Vale la celda del § 8.5,
+  // o que el aviso no lo llame sigla y cite el § 8.5.
+  test.fail('ABIERTO — § 8.5: «VIII» y «siglo XVIII» llevan la mayúscula solo al principio, o el aviso no los llama sigla', async ({ page }) => {
+    const casos: Array<[string, string, string]> = [
+      // ⠨ (46) · v ⠧ (1236) · i ⠊ (24) ×3. Hoy: ⠨⠧⠨⠊⠨⠊⠨⠊
+      ['VIII', '⠨⠧⠊⠊⠊', 'VIII'],
+      // s ⠎ i ⠊ g ⠛ l ⠇ o ⠕ · ⠀ · ⠨ · x ⠭ (1346) · v ⠧ · i ⠊ ×3. Hoy: ⠎⠊⠛⠇⠕⠀⠨⠭⠨⠧⠨⠊⠨⠊⠨⠊
+      ['siglo XVIII', '⠎⠊⠛⠇⠕⠀⠨⠭⠧⠊⠊⠊', 'XVIII'],
+    ];
+    const fallos: string[] = [];
+    for (const [texto, celdas, numeral] of casos) {
+      await page.goto(RUTA);
+      await convertir27(page, texto);
+      await expect(cajaResultado(page)).toBeVisible(); // precondición: hay resultado
+      const r = await resultado27(page);
+      const sigla = aviso27(page, 'como una sigla');
+      const llamadaSigla =
+        (await sigla.count()) > 0 && ((await sigla.locator('strong').textContent()) ?? '').split(' · ').includes(numeral);
+      const citaRomanos = (await aviso27(page, '§ 8.5').count()) > 0;
+      if (r !== celdas && (llamadaSigla || !citaRomanos)) fallos.push(`${texto} → ${r}${llamadaSigla ? ' y «sigla»' : ''}`);
+    }
+    expect(fallos).toEqual([]);
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // ABIERTO — signos con celda en el B 2 que siguen con el aviso «puede que» (lo que 3525 no cubrió)
+  // ─────────────────────────────────────────────────────────────────────────
+  //
+  // aa75156d dio aviso propio a los seis signos citados en el 3525 (€ % — [ ] *). Los demás que el
+  // B 2 recoge en las mismas tablas siguen con el genérico: «Puede que el Código Braille Español sí
+  // les asigne celda», cuando la fuente que la app dice seguir se la asigna. Celdas (§ 6.2, § 12,
+  // § 12.1, § 13, § 14.1): { 5-123 · } 456-2 · \ 5-3 · | 456-0d · + 235 · = 2356 · @ 5 · & 6-12346 ·
+  // § 346 · $ 456-234 · £ 5-2346 · ¥ 456-13456 · ° 356.
+  test.fail('ABIERTO — $ £ ¥ + = @ & ° { } \\ | §: el B 2 les da celda y el aviso no lo pone en duda', async ({ page }) => {
+    await page.goto(RUTA);
+    await convertir27(page, '$ £ ¥ + = @ & ° { } \\ | §');
+    await expect(cajaResultado(page)).toBeVisible(); // precondición: hay resultado (las separaciones)
+    // Hoy: «Esta herramienta no escribe en braille estos caracteres: $ · £ · … Puede que el Código
+    // Braille Español sí les asigne celda: esta app no la escribe.»
+    await expect(aviso27(page, 'Puede que el Código Braille Español')).toHaveCount(0, { timeout: 3000 });
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // ABIERTO — cabo C0238 (f): la moneda de 2 € «desde 2022», sin fuente
+  // ─────────────────────────────────────────────────────────────────────────
+  //
+  // Regla 1 de neutralidad (CLAUDE.md §1.quinquies), la forma de 3441, 3457 y 3458: una afirmación
+  // fechada sin fuente. El 27/10/2026 el buscador de boe.es siguió rechazando la consulta por URL
+  // («Los valores de búsqueda enviados son incorrectos») y EUR-Lex devolvió la página vacía.
+  test.fail('ABIERTO — C0238 (f): «el 2 € tiene el valor en Braille desde 2022» lleva fuente o no se afirma', async ({ page }) => {
+    await page.goto(RUTA);
+    const parrafo = await page.evaluate(
+      () =>
+        [...document.querySelectorAll('[class*="eduEscenarioCard"]')]
+          .find((c) => (c.querySelector('h4')?.textContent ?? '').includes('Señalización'))
+          ?.querySelector('p')?.textContent ?? '',
+    );
+    expect(parrafo).toContain('ascensores'); // precondición: se leyó la tarjeta
+    const afirma = /desde 2022/.test(parrafo);
+    const conFuente = /BOE|Reglamento|Orden|Diario Oficial|DOUE/.test(parrafo);
+    expect(!afirma || conFuente).toBe(true);
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // ABIERTO — cabo C0238 (g): el árabe de derecha a izquierda, contra la propia guía
+  // ─────────────────────────────────────────────────────────────────────────
+  //
+  // Sin fuente en once.es (la página del B 12 no lo dice; el B 12-3 trata la transliteración). Pero
+  // la propia app, en el paso 5 de la guía, dice del braille sin distinguir lengua que «la mano
+  // derecha lee el final de la línea mientras la izquierda ya busca el inicio de la siguiente» y que
+  // «los lectores expertos mueven los dedos de izquierda a derecha»: con la FAQ, no pueden ser
+  // ciertas a la vez.
+  test.fail('ABIERTO — C0238 (g): la FAQ del árabe «de derecha a izquierda» y el paso 5 «de izquierda a derecha» no se contradicen', async ({ page }) => {
+    await page.goto(RUTA);
+    const textos = await page.evaluate(() => {
+      const de = (sel: string, titulo: string) =>
+        [...document.querySelectorAll(sel)]
+          .find((c) => (c.querySelector('h4')?.textContent ?? '').includes(titulo))
+          ?.querySelector('p')?.textContent ?? '';
+      return {
+        faq: de('[class*="eduFaqItem"]', '¿Es el Braille igual en todos los idiomas?'),
+        paso5: de('[class*="eduStepItem"]', 'La lectura táctil'),
+      };
+    });
+    expect(textos.faq).toContain('japonés'); // precondición: se leyó la FAQ
+    expect(textos.paso5).toContain('yemas'); // precondición: se leyó el paso 5
+    const arabeDerechaIzquierda = /árabe[^.]*derecha a izquierda/i.test(textos.faq);
+    const pasoUniversal = /de izquierda a derecha/.test(textos.paso5) && !/español|latin|árabe/i.test(textos.paso5);
+    expect(arabeDerechaIzquierda && pasoUniversal).toBe(false);
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Página traducida — la app ENTERA, a escritorio (e6bcbe53 y los avisos nuevos de aa75156d)
+  // ─────────────────────────────────────────────────────────────────────────
+  test('página traducida — la app entera no cae ni deja texto viejo (escritorio)', async ({ page }) => {
+    test.setTimeout(180_000);
+    const r = await recorridoTraducido27(page, true);
+    expect(r.control, 'control positivo del detector').toHaveLength(1);
+    expect(r.viejos).toEqual([]);
+    expect(r.caidas).toEqual([]);
+    expect(r.errores).toEqual([]);
+    expect(r.desbordes).toEqual([]);
+  });
+});
+
+test.describe('re-inspección 27/10/2026 — página traducida a 390 px', () => {
+  test.use({
+    viewport: { width: 390, height: 844 },
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
+    deviceScaleFactor: 2.625,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test('página traducida — la app entera no cae, no deja texto viejo ni desborda a 390 px', async ({ page }) => {
+    test.setTimeout(180_000);
+    const r = await recorridoTraducido27(page, false);
+    expect(r.control, 'control positivo del detector').toHaveLength(1);
+    expect(r.viejos).toEqual([]);
+    expect(r.caidas).toEqual([]);
+    expect(r.errores).toEqual([]);
+    expect(r.desbordes).toEqual([]);
+  });
+});
+
+interface NodoTraducido27 {
+  nodo: Text;
+  valor: string | null;
+  avisado: boolean;
+}
+type VentanaTraducida27 = Window & { __nodosTraducidos27?: NodoTraducido27[] };
+
+/**
+ * Recorre la app entera con la página traducida (receta de generador-loteria.spec.ts, bloque del
+ * 15/10/2026): antes de cada paso el traductor simulado cambia cada nodo de texto por
+ * <font><font>…</font></font> y APUNTA el nodo con su valor; después, un nodo apuntado cuyo valor ha
+ * cambiado es un texto que React escribió donde ya no se ve (texto viejo). Devuelve también los
+ * errores de React, las caídas a «Algo salió mal», los desbordes horizontales y un control
+ * positivo sintético del detector.
+ */
+async function recorridoTraducido27(page: Page, conTecladoFisico: boolean) {
+  const errores: string[] = [];
+  page.on('pageerror', (e) => errores.push(e.message));
+  page.on('console', (m) => {
+    if (m.type() === 'error' && /NotFoundError|insertBefore|removeChild/.test(m.text())) errores.push(m.text());
+  });
+  const traducir = () =>
+    page.evaluate(() => {
+      const w = window as VentanaTraducida27;
+      const apuntados = (w.__nodosTraducidos27 = w.__nodosTraducidos27 ?? []);
+      const caminante = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+        acceptNode: (n) => {
+          const padre = n.parentElement;
+          if (!padre || !(n.nodeValue ?? '').trim()) return NodeFilter.FILTER_REJECT;
+          if (/^(SCRIPT|STYLE|OPTION|NOSCRIPT|FONT|TEXTAREA)$/.test(padre.tagName)) return NodeFilter.FILTER_REJECT;
+          return NodeFilter.FILTER_ACCEPT;
+        },
+      });
+      const nodos: Text[] = [];
+      while (caminante.nextNode()) nodos.push(caminante.currentNode as Text);
+      for (const nodo of nodos) {
+        const exterior = document.createElement('font');
+        const interior = document.createElement('font');
+        interior.textContent = nodo.nodeValue;
+        exterior.appendChild(interior);
+        apuntados.push({ nodo, valor: nodo.nodeValue, avisado: false });
+        nodo.parentNode?.replaceChild(exterior, nodo);
+      }
+    });
+  const textoViejo = () =>
+    page.evaluate(() => {
+      const r: string[] = [];
+      for (const t of (window as VentanaTraducida27).__nodosTraducidos27 ?? []) {
+        if (!t.avisado && t.nodo.nodeValue !== t.valor) {
+          t.avisado = true;
+          r.push(`«${t.valor}» → «${t.nodo.nodeValue}»`);
+        }
+      }
+      return r;
+    });
+
+  const viejos: string[] = [];
+  const caidas: string[] = [];
+  const desbordes: string[] = [];
+  const paso = async (nombre: string, accion: () => Promise<void>) => {
+    await traducir();
+    await accion();
+    await page.waitForTimeout(150); // el commit de React tras la acción
+    for (const v of await textoViejo()) viejos.push(`${nombre}: ${v}`);
+    if ((await page.getByRole('heading', { name: 'Algo salió mal' }).count()) > 0) caidas.push(nombre);
+    const sobra = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+    if (sobra > 0) desbordes.push(`${nombre}: +${sobra} px`);
+  };
+  const boton = (nombre: string | RegExp) =>
+    page.getByRole('button', typeof nombre === 'string' ? { name: nombre, exact: true } : { name: nombre }).first();
+  const caja = page.locator('textarea').first();
+
+  await page.goto(RUTA);
+  await esperarHidratacion(page, ['textarea']);
+
+  // Texto → Braille: los avisos de aa75156d, en singular y en plural
+  for (const t of [
+    'La ONCE reparte 1 250 000 cupones.',
+    'Llama al 600 123 456 o al 699 000 111',
+    'NORMAS y LEYES',
+    'Precio: 5 € y 3 %',
+    'València és bonica',
+    'a⡀b⡁',
+    '‘encima’ ¥',
+    '¿Qué? «Sí»',
+  ]) {
+    await paso(`escribir «${t}»`, () => caja.fill(t));
+    await paso(`convertir «${t}»`, () => boton('Convertir').click());
+  }
+  await paso('Ocultar vista', () => page.locator('[class*="visualHeader"] button').click());
+  await paso('Mostrar vista', () => page.locator('[class*="visualHeader"] button').click());
+  await paso('título de la hoja', () => page.getByLabel('Título de la hoja (opcional)').fill('Etiquetas'));
+  await paso('otro título', () => page.getByLabel('Título de la hoja (opcional)').fill('Cocina'));
+  await paso('ADA', () => boton('ADA 703.3 (EE. UU.)').click());
+  await paso('Marburg', () => boton('Marburg Medium').click());
+  await paso('Espejo', () => boton('Espejo (regleta y punzón)').click());
+  await paso('Lectura', () => boton('Lectura').click());
+  await paso('Solo puntos activos', () => boton('Solo puntos activos').click());
+  await paso('Mostrar retícula', () => boton('Mostrar retícula').click());
+  // ⇄ con resultado y sin él
+  await paso('⇄ con resultado', () => boton('Intercambiar dirección de conversión').click());
+  await paso('convertir tras ⇄', () => boton('Convertir').click());
+  await paso('⇄ de vuelta', () => boton('Intercambiar dirección de conversión').click());
+  await paso('escribir sin convertir', () => caja.fill('Hola 2026'));
+  await paso('⇄ sin resultado', () => boton('Intercambiar dirección de conversión').click());
+  // Braille → Texto: ejemplos, teclado de seis puntos y los avisos de ese sentido
+  for (const ej of ['Saludo', 'Números']) {
+    await paso(`ejemplo ${ej}`, () => boton(ej).click());
+    await paso(`convertir ${ej}`, () => boton('Convertir').click());
+  }
+  await paso('Limpiar', () => boton('Limpiar').click());
+  const celdasTeclado: Array<[string, number[]]> = [
+    ['⠇', [1, 2, 3]],
+    ['⠿', [1, 2, 3, 4, 5, 6]],
+    ['⠫', [1, 2, 4, 6]],
+  ];
+  for (const [celda, puntos] of celdasTeclado) {
+    for (const p of puntos) await paso(`punto ${p} de ${celda}`, () => boton(`Punto ${p}`).click());
+    await paso(`Escribir celda ${celda}`, () => boton(/^Escribir celda/).click());
+    if (celda === '⠇') await paso('Espacio', () => boton('Espacio').click());
+  }
+  for (let i = 1; i <= 5; i++) await paso(`Borrar última ${i}`, () => boton('Borrar última').click());
+  if (conTecladoFisico) {
+    await paso('Perkins F+D', async () => {
+      await page.getByTestId('zona-perkins').focus();
+      await page.keyboard.down('KeyF');
+      await page.keyboard.down('KeyD');
+      await page.keyboard.up('KeyF');
+      await page.keyboard.up('KeyD');
+    });
+    await paso('Perkins espacio', () => page.keyboard.press('Space'));
+    await paso('Perkins retroceso', () => page.keyboard.press('Backspace'));
+  }
+  for (const t of ['a⠁b', '⠿⠫', 'hola', '⠼', '⡁']) {
+    await paso(`braille «${t}»`, () => caja.fill(t));
+    await paso(`convertir braille «${t}»`, () => boton('Convertir').click());
+  }
+  await paso('Texto → Braille', () => boton('Texto → Braille').click());
+  await paso('escribir 🙂', () => caja.fill('🙂'));
+  await paso('convertir 🙂', () => boton('Convertir').click());
+  // Guía y aviso legal
+  await paso('abrir guía', () => boton('Ver guía educativa').click());
+  await paso('cerrar guía', () => boton('Ocultar guía educativa').click());
+  await paso('ocultar aviso', () => boton('Ocultar aviso').click());
+  await paso('mostrar aviso', () => boton('Mostrar aviso').click());
+
+  // Control positivo SINTÉTICO del detector: un nodo apuntado al que se le cambia el valor
+  await traducir();
+  await page.evaluate(() => {
+    const t = ((window as VentanaTraducida27).__nodosTraducidos27 ?? []).find((x) => !x.avisado);
+    if (t) t.nodo.nodeValue = 'CONTROL';
+  });
+  const control = await textoViejo();
+  return { viejos, caidas, errores, desbordes, control };
+}

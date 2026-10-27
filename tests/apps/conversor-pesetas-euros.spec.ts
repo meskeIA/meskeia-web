@@ -3,7 +3,8 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
 
 /**
  * Inspector — conversor-pesetas-euros (segmento CÁLCULO, riesgo 2, 122 usos/90 d)
- * Primera inspección: 18/09/2026 · RE-INSPECCIÓN: 20/09/2026 (invalidada por cambio de datos).
+ * Primera inspección: 18/09/2026 · RE-INSPECCIÓN: 20/09/2026 (invalidada por cambio de datos)
+ * · TERCERA: 27/10/2026 (re-inspección tras las reparaciones; sus casos, al final del fichero).
  *
  * QUÉ PROMETE LA APP
  *   · <h1> «Conversor de Pesetas a Euros» y subtítulo «Convierte al tipo oficial y descubre
@@ -11,7 +12,8 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  *     dos se verifican aquí.
  *   · metadata.ts / FAQPage: «tipo de cambio oficial (166,386 ptas/€)», «fijado de forma
  *     irrevocable por el Reglamento (CE) 2866/98», y la fórmula literal del segundo modo:
- *     «valor hoy = (pesetas ÷ 166,386) × (IPC del año actual ÷ IPC del año de referencia)».
+ *     «valor hoy = (pesetas ÷ 166,386) × (IPC del último año cerrado ÷ IPC del año de
+ *     referencia)». Hasta el 20/09/2026 decía «IPC del año actual» (hallazgo 942, REPARADO).
  *   · El bloque educativo repite la fórmula en su tabla comparativa.
  *
  * DÓNDE VIVE EL CÁLCULO — no hay motor aparte: los dos `useMemo` de app/…/page.tsx.
@@ -90,31 +92,24 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  * El motor está sano: tipo correcto, redondeo al céntimo, sin tipo inverso, parser canónico,
  * rechazo limpio y la serie del IPC fiel a la fuente.
  *
- * ── HALLAZGOS ABIERTOS de la re-inspección (20/09/2026) — NO se asertan aquí ──
- * El Inspector no repara, y un test que fijara la conducta defectuosa la volvería norma.
- * Quedan descritos para quien los repare:
+ * ── LOS TRES HALLAZGOS de la re-inspección (20/09/2026) — REPARADOS el mismo día ──
+ * (commit 0f4a5f0a). Se describieron aquí sin asertarlos mientras estuvieron abiertos; hoy
+ * son los candados de regresión del final del fichero:
  *
- *   A. La ETIQUETA redondea la cantidad a cero decimales mientras el cálculo usa el valor
- *      completo, así que la pantalla se contradice consigo misma. Con «1499,60» en modo
- *      «Conversión oficial» sale «1500 pesetas equivalen a: 9,01 €», y 1.500 pesetas son
- *      9,02 €. La CIFRA es correcta (1.499,60 ÷ 166,386 = 9,0128 → 9,01 €); lo que miente
- *      es el rótulo. Sale de `formatNumber(resultadoDirecta.cantidad, 0)`.
+ *   A. (940, REPARADO) La ETIQUETA redondeaba la cantidad a cero decimales mientras el
+ *      cálculo usaba el valor completo: con «1499,60» salía «1500 pesetas equivalen a:
+ *      9,01 €», y 1.500 pesetas son 9,02 €. Ahora rotula las pesetas con sus decimales
+ *      (`decimalesDe`). ⚠️ El sentido euros → pesetas NO se tocó y sigue rotulando el
+ *      importe con dos decimales fijos: es el hallazgo de la inspección del 27/10/2026.
  *
- *   B. El botón «⇄» —único camino a la dirección euros → pesetas, que es la mitad de lo que
- *      prometen el <h1> y los `features` del jsonLd— no tiene `aria-label`: su nombre
- *      accesible es el propio glifo. Medido con el árbol de accesibilidad de Chromium, el
- *      `title` queda SUPERSEDED y baja a descripción, porque el contenido del botón gana.
- *      El CLAUDE.md §5 pide `aria-label` justo en este caso (botón cuyo único contenido es
- *      un signo). El candado `check:a11y-jsx` no lo ve: «⇄» (U+21C4) no está en su rango
- *      de emojis.
+ *   B. (941, REPARADO) El botón «⇄» —único camino a la dirección euros → pesetas— no tenía
+ *      `aria-label` y su nombre accesible era el propio glifo. El candado `check:a11y-jsx`
+ *      no lo veía: «⇄» (U+21C4) no está en su rango de emojis.
  *
- *   C. El FAQPage del jsonLd dice que la fórmula usa «el IPC del año actual», y el motor usa
- *      la media anual del último año CERRADO. A 20/09/2026 eso son dos cosas distintas: el
- *      INE ya publica hasta agosto de 2026 (índice 104,638 en base 2025), así que 100.000
- *      ptas de 1985 darían 2.250,94 € con el último dato publicado y la app da 2.151,17 €,
- *      un 4,64 % menos. En PANTALLA está bien dicho —el subtexto reza «en poder adquisitivo
- *      de 2025» y el FAQ visible habla del «año más reciente disponible»—; lo que promete de
- *      más es el dato estructurado, que es justo la señal que leen las IAs.
+ *   C. (942, REPARADO) El FAQPage del jsonLd decía que la fórmula usa «el IPC del año
+ *      actual», y el motor usa la media anual del último año CERRADO. Hoy dice «IPC del
+ *      último año cerrado». ⚠️ La fila «Fórmula» de la tabla educativa sigue diciendo «IPC
+ *      hoy»: es otra boca con el mismo defecto, hallazgo de la inspección del 27/10/2026.
  *
  * LOS 4 HALLAZGOS del 18/09/2026, al final, ya como candados de regresión: se repararon ese
  * mismo día. El de fondo —que el índice de 2025 era una estimación propia y no el dato
@@ -189,8 +184,8 @@ test.describe('Conversión oficial (Reglamento CE 2866/98: 166,386 ptas/€)', (
 
     // La prueba de que NO son el mismo número: 1.499,60 ÷ 166,386 = 9,012777… → 9,01 €,
     // un céntimo por debajo. Si la coma se estuviera ignorando, aquí saldría 9,02 €.
-    // ⚠️ La etiqueta de esta pantalla dice hoy «1500 pesetas» (hallazgo A del encabezado):
-    //    se comprueba la CIFRA, que es la correcta, no el rótulo, que está abierto.
+    // La etiqueta de esta pantalla decía «1500 pesetas» (hallazgo 940, REPARADO el
+    // 20/09/2026): aquí se comprueba la CIFRA; el rótulo lo vigila su candado, al final.
     await escribir(page, '#cantidad-directa', '1499,60');
     expect(await texto(valorPrincipal(page))).toBe('9,01 €');
   });
@@ -303,7 +298,8 @@ test.describe('Valor real hoy (IPC del INE, base 2025 = 100)', () => {
   test('el año más reciente del cálculo se dice en pantalla', async ({ page }) => {
     await irAValorRealHoy(page);
     // La app no promete «hoy» a secas: dice de qué año es el poder adquisitivo que usa.
-    // Es lo que salva el hallazgo C del encabezado en la pantalla, aunque no en el jsonLd.
+    // Es lo que salvaba en pantalla el hallazgo 942 mientras el jsonLd prometía «el IPC del
+    // año actual» (REPARADO el 20/09/2026: hoy dice «último año cerrado»).
     expect(await texto(page.locator('[class*="resultSubtext"]').first()))
       .toBe('en poder adquisitivo de 2025');
   });
@@ -395,4 +391,311 @@ test('el botón de invertir la conversión tiene nombre accesible', async ({ pag
   await expect(
     page.getByRole('button', { name: 'Cambiar dirección de la conversión' }),
   ).toHaveCount(1);
+});
+
+/* ══════════════════════════════════════════════════════════════════════════════════════
+ * TERCERA INSPECCIÓN — 27/10/2026
+ *
+ * LAS FUENTES, LEÍDAS EN SESIÓN (EUR-Lex devolvió la página vacía; los dos reglamentos se
+ * leyeron en la base «Diario Oficial de la UE» del BOE, que reproduce su texto):
+ *   · Reglamento (CE) 2866/98, art. 1 (BOE DOUE-L-1998-82362): «1 euro = 166,386 pesetas
+ *     españolas», en vigor el 01/01/1999. Los once tipos tienen SEIS cifras significativas
+ *     (40,3399 · 1,95583 · 166,386 · 6,55957 · 0,787564 · 1 936,27 …).
+ *   · Reglamento (CE) 1103/97 (BOE DOUE-L-1997-81104): art. 4.1, seis cifras significativas;
+ *     art. 4.2, sin redondear ni truncar el tipo; art. 4.3, «No se utilizarán tipos inversos»;
+ *     art. 5, los importes en euros al céntimo más próximo y, si el resultado cae justo en la
+ *     mitad, al alza.
+ *   · Ley 46/1998 (BOE-A-1998-29216), art. 11.1: euros al céntimo más próximo, pesetas a la
+ *     peseta más próxima, la mitad exacta al alza. Art. 4.2: curso legal de la peseta hasta el
+ *     28/02/2002; art. 24.1: canje en bancos hasta el 30/06/2002; art. 25: canje en el Banco
+ *     de España hasta el 30/06/2021.
+ *   · IPC: CSV de la tabla 24077 del INE. La media de los doce índices de 2025 da 100,0001
+ *     (IPC_DATA: 100) y la de 2002, 60,0363 (IPC_DATA: 60,0363). Para 1985, los doce meses
+ *     se reconstruyeron con el Actualizador de Rentas (ine.es/varipc, mes de 1985 → mismo mes
+ *     de 2025): su media da 27,952 frente al 27,9389 del módulo, un 0,048 % por debajo, dentro
+ *     del 0,055 % que declara la propia app en su DataReference.
+ *
+ * LOS CASOS NUEVOS, RESUELTOS A MANO ANTES DE ABRIR EL NAVEGADOR (los valores van literales
+ * en cada test, con su cuenta al lado).
+ * ══════════════════════════════════════════════════════════════════════════════════════ */
+
+/** El botón «⇄», que es el único camino al sentido euros → pesetas. */
+const botonInvertir = (page: Page) =>
+  page.getByRole('button', { name: 'Cambiar dirección de la conversión' });
+
+async function aEurosAPesetas(page: Page): Promise<void> {
+  await botonInvertir(page).click();
+  await expect(page.locator('label[for="cantidad-directa"]')).toHaveText('Cantidad en euros (€)');
+}
+
+/** El FAQPage tal como lo sirve el HTML (lo que leen buscadores y asistentes de IA). */
+async function faqServido(page: Page): Promise<{ name: string; acceptedAnswer: { text: string } }[]> {
+  const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+  for (const b of bloques) {
+    const j = JSON.parse(b) as { '@type'?: string; mainEntity?: { name: string; acceptedAnswer: { text: string } }[] };
+    if (j['@type'] === 'FAQPage' && j.mainEntity) return j.mainEntity;
+  }
+  throw new Error('El HTML no lleva ningún FAQPage');
+}
+
+const normalizar = (s: string) => s.replace(/[\s ]+/g, ' ').trim();
+
+test.describe('Tercera inspección (27/10/2026) · casos que pasan', () => {
+  test('CASO 6 · euros → pesetas con céntimos, y la vuelta devuelve el mismo importe', async ({ page }) => {
+    await aEurosAPesetas(page);
+    // El campo arranca en «100000»: escribir «2.500,75» lo mueve de verdad.
+    await escribir(page, '#cantidad-directa', '2.500,75');
+    // 2.500,75 × 166,386 = 416.089,7895 → a la peseta más próxima (art. 11.1 Ley 46/1998): 416.090
+    expect(await texto(valorPrincipal(page))).toBe('416.090 ptas');
+    // es-ES no agrupa las cuatro cifras enteras: «2500,75 €»
+    expect(await texto(etiquetaPrincipal(page))).toBe('2500,75 € equivalen a:');
+
+    // Y de vuelta: 416.090 ÷ 166,386 = 2.500,75126… → al céntimo, 2.500,75 €. Sin pérdida.
+    await botonInvertir(page).click();
+    await expect(page.locator('label[for="cantidad-directa"]')).toHaveText('Cantidad en pesetas');
+    await escribir(page, '#cantidad-directa', '416.090');
+    expect(await texto(valorPrincipal(page))).toBe('2500,75 €');
+    expect(await texto(etiquetaPrincipal(page))).toBe('416.090 pesetas equivalen a:');
+  });
+
+  test('CASO 7 · la media peseta exacta se redondea al alza, como manda la ley', async ({ page }) => {
+    await aEurosAPesetas(page);
+    // 250 × 166,386 = 41.596,5 EXACTO (250 € es el menor importe que cae justo en la mitad:
+    // con E céntimos, 166.386 × E ≡ 50.000 (mod 100.000) solo si E ≡ 25.000 (mod 50.000)). El art. 11.1
+    // de la Ley 46/1998 y el art. 5 del Reglamento 1103/97 lo mandan a la cifra superior:
+    // 41.597. Un redondeo «a la par» o un truncado darían 41.596.
+    await escribir(page, '#cantidad-directa', '250');
+    expect(await texto(valorPrincipal(page))).toBe('41.597 ptas');
+    // 750 × 166,386 = 124.789,5 → 124.790
+    await escribir(page, '#cantidad-directa', '750');
+    expect(await texto(valorPrincipal(page))).toBe('124.790 ptas');
+    // 0,01 × 166,386 = 1,66386 → 2 pesetas: un céntimo de euro vale casi dos pesetas.
+    await escribir(page, '#cantidad-directa', '0,01');
+    expect(await texto(valorPrincipal(page))).toBe('2 ptas');
+  });
+
+  test('CASO 8 · en el sentido euros → pesetas rechaza el negativo, el vacío y el texto', async ({ page }) => {
+    await aEurosAPesetas(page);
+    // «−100» lleva el signo menos tipográfico (U+2212), que parseSpanishNumber lee como «-».
+    for (const malo of ['-5', '−100', '', 'abc']) {
+      await escribir(page, '#cantidad-directa', malo);
+      await expect(valorPrincipal(page)).toHaveCount(0);
+      expect(await texto(aviso(page))).toBe('Introduce una cantidad válida para ver el resultado');
+    }
+  });
+
+  test('CASO 9 · valor real hoy con un año intermedio y con los atajos de década', async ({ page }) => {
+    await irAValorRealHoy(page);
+    await escribir(page, '#cantidad-historica', '25.000');
+    await selectorDeAño(page).selectOption('1990');
+    // 25.000 ÷ 166,386 = 150,253026 → × (100 ÷ 38,2389) = 392,9324 → 392,93 €
+    // inflación = (100 − 38,2389) ÷ 38,2389 × 100 = 161,5138 % · años = 2025 − 1990 = 35
+    expect(await texto(valorPrincipal(page))).toBe('392,93 €');
+    const tarjetas = page.locator('[class*="statCard"]');
+    expect(await texto(tarjetas.nth(0))).toContain('150,25 €');
+    expect(await texto(tarjetas.nth(1))).toContain('161,5');
+    expect(await texto(tarjetas.nth(2))).toContain('35');
+    expect(await texto(page.locator('[class*="interpretation"] p').first()))
+      .toContain('25.000 pesetas de 1990 son 150,25 €');
+
+    // Los atajos «Décadas habituales» MUEVEN el selector: se comprueba el valor que queda en
+    // él y el resultado, que es lo que un atajo roto dejaría en el año anterior.
+    await escribir(page, '#cantidad-historica', '100000');
+    await page.getByRole('button', { name: '1970', exact: true }).click();
+    await expect(selectorDeAño(page)).toHaveValue('1970');
+    // 601,012104 × (100 ÷ 3,7873) = 15.869,1444 → 15.869,14 € · (100 − 3,7873) ÷ 3,7873 = 2540,40 %
+    expect(await texto(valorPrincipal(page))).toBe('15.869,14 €');
+    expect(await texto(tarjetas.nth(1))).toContain('2540,4');
+    expect(await texto(tarjetas.nth(2))).toContain('55');
+
+    await page.getByRole('button', { name: '2000', exact: true }).click();
+    await expect(selectorDeAño(page)).toHaveValue('2000');
+    // 601,012104 × (100 ÷ 55,9782) = 1.073,6539 → 1073,65 € · (100 − 55,9782) ÷ 55,9782 = 78,64 %
+    expect(await texto(valorPrincipal(page))).toBe('1073,65 €');
+    expect(await texto(tarjetas.nth(1))).toContain('78,6');
+    expect(await texto(tarjetas.nth(2))).toContain('25');
+  });
+
+  test('942 · el FAQPage nombra el año que usa el motor: el último cerrado', async ({ page }) => {
+    // Decía «el IPC del año actual» (hallazgo 942, REPARADO el 20/09/2026). El motor usa
+    // IPC_DATA[IPC_MAX_YEAR], la media anual de 2025: el año en curso no tiene media publicada.
+    const faq = await faqServido(page);
+    const datos = faq.find((q) => q.name.startsWith('¿De dónde salen los datos'));
+    expect(datos?.acceptedAnswer.text).toContain('IPC del último año cerrado');
+    expect(datos?.acceptedAnswer.text).not.toContain('año actual');
+  });
+});
+
+test.describe('Tercera inspección · a 390 px', () => {
+  test.use({
+    viewport: { width: 390, height: 844 },
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Mobile Safari/537.36',
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test('CASO 10 · sin desborde lateral, «⇄» se toca y la cifra más larga cabe', async ({ page }) => {
+    const anchoPagina = await page.evaluate(() => document.documentElement.scrollWidth);
+    expect(anchoPagina).toBeLessThanOrEqual(390);
+
+    await botonInvertir(page).tap();
+    await expect(page.locator('label[for="cantidad-directa"]')).toHaveText('Cantidad en euros (€)');
+    await escribir(page, '#cantidad-directa', '999999999999');
+    // 999.999.999.999 × 166,386 = 166.385.999.999.833,614 → 166.385.999.999.834 ptas
+    expect(await texto(valorPrincipal(page))).toBe('166.385.999.999.834 ptas');
+    const desborda = await valorPrincipal(page).evaluate((el) => el.scrollWidth > el.clientWidth);
+    expect(desborda).toBe(false);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+  });
+});
+
+/* ── Hallazgos ABIERTOS de la tercera inspección (27/10/2026) ─────────────────────────
+ * Cada uno con `test.fail()` y el valor CORRECTO: el día que se repare, Playwright avisará de
+ * que «pasa siendo esperado que falle» y habrá que quitar la marca.
+ */
+
+/** Contraste del texto de un elemento contra el píxel de fondo que tiene 6 px a su izquierda. */
+async function contrasteContraFondo(page: Page, loc: Locator): Promise<number> {
+  await loc.scrollIntoViewIfNeeded();
+  await page.mouse.move(0, 0); // que ninguna tarjeta esté en :hover al medir
+  const caja = await loc.boundingBox();
+  if (!caja) throw new Error('El elemento no está maquetado');
+  const png = await page.screenshot({
+    clip: { x: Math.max(0, caja.x - 6), y: caja.y + caja.height / 2, width: 1, height: 1 },
+  });
+  return page.evaluate(
+    async ({ b64, color }) => {
+      const img = new Image();
+      img.src = 'data:image/png;base64,' + b64;
+      await img.decode();
+      const lienzo = document.createElement('canvas');
+      lienzo.width = img.width;
+      lienzo.height = img.height;
+      const ctx = lienzo.getContext('2d')!;
+      ctx.drawImage(img, 0, 0);
+      const [r, g, b] = Array.from(ctx.getImageData(0, 0, 1, 1).data);
+      const lum = (c: number[]) => {
+        const l = c.map((v) => {
+          const x = v / 255;
+          return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4;
+        });
+        return 0.2126 * l[0] + 0.7152 * l[1] + 0.0722 * l[2];
+      };
+      const texto = (color.match(/\d+/g) ?? []).slice(0, 3).map(Number);
+      const l1 = lum(texto);
+      const l2 = lum([r, g, b]);
+      return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+    },
+    { b64: png.toString('base64'), color: await loc.evaluate((el) => getComputedStyle(el).color) },
+  );
+}
+
+async function abrirGuia(page: Page): Promise<void> {
+  await page.getByRole('button', { name: /Ver guía educativa/ }).click();
+  await expect(page.locator('[class*="warningHeader"] h3')).toBeVisible();
+}
+
+test.describe('Tercera inspección · hallazgos abiertos', () => {
+  test('la etiqueta del sentido euros → pesetas nombra el importe tecleado, no uno redondeado', async ({ page }) => {
+    test.fail(); // ABIERTO: el rótulo usa formatCurrency(), que fija dos decimales
+    // Es el gemelo del hallazgo 940 en el otro sentido, que su reparación no tocó. Un precio
+    // unitario en euros lleva tres decimales (el litro de gasóleo, 1,455 €/l):
+    //   1,455 × 166,386 = 242,0916 → 242 ptas (la cifra es CORRECTA)
+    // pero el rótulo dice «1,46 € equivalen a: 242 ptas», y 1,46 × 166,386 = 242,9236 → 243.
+    await aEurosAPesetas(page);
+    await escribir(page, '#cantidad-directa', '1,455');
+    expect(await texto(valorPrincipal(page))).toBe('242 ptas');
+    expect(await texto(etiquetaPrincipal(page))).toBe('1,455 € equivalen a:');
+    // 2,345 × 166,386 = 390,1752 → 390 ptas; con el rótulo «2,35 €» serían 391,0071 → 391.
+    await escribir(page, '#cantidad-directa', '2,345');
+    expect(await texto(valorPrincipal(page))).toBe('390 ptas');
+    expect(await texto(etiquetaPrincipal(page))).toBe('2,345 € equivalen a:');
+    // Si la reparación elige RECHAZAR más de dos decimales en euros, este caso se reescribe
+    // para exigir el aviso en vez del rótulo.
+  });
+
+  test('la inflación acumulada separa el «%» con un espacio duro', async ({ page }) => {
+    test.fail(); // ABIERTO: `+{formatNumber(…, 1)}%` pega el signo
+    // CLAUDE.md global §2 (25/09/2026): «15 %», separado con U+00A0.
+    // 100.000 ptas de 1985: (100 − 27,9389) ÷ 27,9389 × 100 = 257,9239 → «+257,9 %».
+    // ⚠️ Al repararlo, los `toContain('+257,9%')`, '+1394,5%', '+4610,8%' y '+72,4%' de los
+    //    CASOS 4 y 4.bis, que fijan el formato pegado, tendrán que pasar a « %».
+    await irAValorRealHoy(page);
+    const bruto = (await page.locator('[class*="statCard"]').nth(1).textContent()) ?? '';
+    expect(bruto).toContain('+257,9 %');
+  });
+
+  test('la fila «Fórmula» de la tabla educativa nombra el IPC que usa el motor', async ({ page }) => {
+    test.fail(); // ABIERTO: dice «IPC hoy»
+    // El motor divide por IPC_DATA[2025] = 100, la media del último año cerrado, y así lo dicen
+    // el FAQPage («IPC del último año cerrado») y la pantalla («en poder adquisitivo de 2025»).
+    // Con el «IPC hoy» de la tabla —el último índice publicado por el INE, 104,978 en
+    // septiembre de 2026 (tabla 24077)—, 100.000 ptas de 1985 darían 601,012104 × 104,978 ÷
+    // 27,9389 = 2.258,25 €, y la fila «Ejemplo» de la misma tabla dice 2.151,17 €.
+    const fila = page.locator('table tbody tr').filter({ hasText: 'Fórmula' });
+    await expect(fila).not.toContainText('IPC hoy');
+    await expect(fila).toContainText(/último año cerrado|IPC de \d{4}/);
+  });
+
+  test('la FAQ visible y el FAQPage dan la MISMA respuesta a la misma pregunta', async ({ page }) => {
+    test.fail(); // ABIERTO: dos textos escritos por separado para cinco preguntas
+    // La reparación es UNA constante en metadata.ts que importen las dos bocas (como
+    // app/simulador-gastos-compraventa-garaje). Se comparan las preguntas que aparecen con el
+    // MISMO enunciado en las dos; hoy, «¿Cuál es el tipo de cambio oficial de pesetas a euros?».
+    const faq = await faqServido(page);
+    const items = page.locator('[class*="faqItem"]');
+    let comparadas = 0;
+    for (const q of faq) {
+      const item = items.filter({ has: page.locator('h4', { hasText: q.name }) });
+      if ((await item.count()) === 0) continue;
+      comparadas++;
+      const visible = normalizar(
+        (await item.first().locator('p:not([class*="faqTip"])').first().textContent()) ?? '',
+      );
+      expect(visible, `respuesta visible a «${q.name}»`).toBe(normalizar(q.acceptedAnswer.text));
+    }
+    expect(comparadas).toBeGreaterThan(0);
+  });
+
+  test('la FAQ «¿Por qué tantos decimales?» da la regla del Reglamento 1103/97', async ({ page }) => {
+    test.fail(); // ABIERTO: lo atribuye al valor de mercado y no a la regla legal
+    // Art. 4.1 del Reglamento (CE) 1103/97: los tipos de conversión se fijan con SEIS cifras
+    // significativas. Por eso 166,386 lleva tres decimales, 6,55957 cinco y 1 936,27 dos. La
+    // respuesta de hoy dice «Por eso [por venir del ECU] cada moneda del euro tiene su propio
+    // tipo fijo con distinto número de decimales».
+    const item = page.locator('[class*="faqItem"]').filter({ hasText: 'tantos decimales' });
+    await expect(item).toContainText('seis cifras significativas');
+  });
+
+  test('el título del recuadro de errores frecuentes se lee con contraste suficiente', async ({ page }) => {
+    test.fail(); // ABIERTO: #E65100 sobre el fondo ámbar del recuadro, ~3,3:1
+    // 16,8 px en negrita no es «texto grande» (14 pt = 18,66 px en negrita): pide 4,5:1.
+    await abrirGuia(page);
+    const ratio = await contrasteContraFondo(page, page.locator('[class*="warningHeader"] h3'));
+    expect(ratio).toBeGreaterThanOrEqual(4.5);
+  });
+
+  test('en oscuro, el modo recomendado de cada escenario se lee con contraste suficiente', async ({ page }) => {
+    test.fail(); // ABIERTO: --primary-texto oscuro (#3FA5D1) sobre #343434, ~4,45:1
+    // El tema se activa con el conmutador real, no sembrando data-theme (que puede no aplicar
+    // el color-scheme y medir otra cosa).
+    await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).click();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    await abrirGuia(page);
+    const ratio = await contrasteContraFondo(page, page.locator('[class*="escenarioExample"] code').first());
+    expect(ratio).toBeGreaterThanOrEqual(4.5);
+  });
+
+  test('las tarjetas de fechas clave no simulan ser pulsables', async ({ page }) => {
+    test.fail(); // ABIERTO: cursor de mano y elevación al pasar por encima, sin acción
+    const tarjeta = page.locator('[class*="timelineCard"]').first();
+    const { cursor, interactiva } = await tarjeta.evaluate((el) => ({
+      cursor: getComputedStyle(el).cursor,
+      interactiva: el.matches('a, button, [role="button"], [tabindex]'),
+    }));
+    expect(interactiva).toBe(false);
+    expect(cursor).not.toBe('pointer');
+  });
 });

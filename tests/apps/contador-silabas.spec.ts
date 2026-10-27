@@ -5,6 +5,9 @@ import { acentuacionDe, analizarVerso, separarSilabas } from '../../app/contador
 /**
  * Inspector — contador-silabas (segmento interactiva con motor lingüístico)
  *
+ * SÉPTIMA INSPECCIÓN: 27/10/2026, RE-INSPECCIÓN por los cinco cabos de la medición del
+ * 18/10/2026 (C0287-C0291, semilla S0212). Sus casos y sus hallazgos, ABIERTOS con
+ * test.fail(), en el último bloque del fichero.
  * SEXTA INSPECCIÓN: 30/09/2026, por la SOSPECHA del 29/09 sobre `acentuacionDe` y los
  * anglicismos en consonante + «y». Sus casos y sus TRES hallazgos, en su propio bloque al
  * final del fichero (el único que espera la hidratación con tests/apps/_hidratacion.ts).
@@ -1563,4 +1566,582 @@ test('motor 2463 · la «y» final: aguda tras vocal, llana tras consonante', ()
   expect(verso?.acentuacion).toBe('llana');
   expect(verso?.silabasMetricas).toBe(10);
   expect(verso?.nombre).toBe('decasílabo');
+});
+
+// =====================================================================================
+// SÉPTIMA INSPECCIÓN — Inspector 27/10/2026 (segmento cálculo, riesgo 3)
+//
+// RE-INSPECCIÓN por los cinco cabos de la medición del 18/10/2026 (semilla S0212): C0287
+// («y» final de diptongo ante vocal), C0288 (estrofa reconocida solo en primera posición),
+// C0289 (rótulo «Cuaderna vía»), C0290 (versos compuestos sin cesura) y C0291 (prefijo sub-).
+// Desde la sexta solo pasaron los commits de contraste de todo el catálogo (dfaf84a2,
+// 4488bd1d), que no tocan ningún motor.
+//
+// DE DÓNDE SALEN LAS REGLAS (no de lo que pinta la app):
+//   · Silabeo, h muda y diptongos: RAE, Ortografía de la lengua española (2010), cap. I.
+//   · La «y» final de «hoy», «voy», «estoy», «soy» ANTE VOCAL pasa a consonante y abre la
+//     sílaba siguiente (ho-yes, vo-yen-tran-do, so-yun): no queda ningún contacto vocálico,
+//     así que no hay sinalefa ni se ahorra sílaba (Navarro Tomás, Manual de pronunciación
+//     española; Quilis, Métrica española). La prueba de cargo es el soneto de Lope: catorce
+//     endecasílabos que solo cuadran así.
+//   · El alejandrino (7+7) y el dodecasílabo (6+6) son versos COMPUESTOS: cada hemistiquio se
+//     mide como un verso, con su ajuste por acento final, y en la cesura no hay sinalefa
+//     (Quilis, Métrica española).
+//   · No hay sinalefa sobre la vocal que lleva el ACENTO FINAL del verso: «está | hecho» y
+//     «de | oro» se leen en dialefa (Quilis; Navarro Tomás).
+//   · La h de «hermosa» (< formosa) y de «hacer» (< facere) se aspiraba en tiempos de
+//     Garcilaso e impedía la sinalefa: por eso su soneto XXIII es endecasílabo entero.
+//
+// LOS CASOS, RESUELTOS A MANO ANTES DE ABRIR EL NAVEGADOR (la cuenta, en cada test)
+//   CASO 1 (normal)  Lope, v. 2: 15 fonéticas − 4 sinalefas = 11.
+//   CASO 2 (límite)  la «y» final donde la regla SÍ vale: ante consonante y en final de verso.
+//   CASO 3 (rechazo) el metro personalizado fuera de 2..20 (21, 1, 0) no arranca el medidor.
+//   Y los cinco cabos, más tres hallazgos que salieron al medirlos (dialefa ante el acento
+//   final, la h aspirada del banco de pruebas que propone la propia app y la FAQ del hiato).
+// =====================================================================================
+
+const SONETO_LOPE = `Un soneto me manda hacer Violante,
+que en mi vida me he visto en tanto aprieto;
+catorce versos dicen que es soneto,
+burla burlando van los tres delante.
+
+Yo pensé que no hallara consonante
+y estoy a la mitad de otro cuarteto;
+mas si me veo en el primer terceto,
+no hay cosa en los cuartetos que me espante.
+
+Por el primer terceto voy entrando,
+y parece que entré con pie derecho,
+pues fin con este verso le voy dando.
+
+Ya estoy en el segundo, y aun sospecho
+que voy los trece versos acabando;
+contad si son catorce, y está hecho.`;
+
+const REDONDILLAS_SOR_JUANA = `Hombres necios que acusáis
+a la mujer sin razón,
+sin ver que sois la ocasión
+de lo mismo que culpáis:
+
+si con ansia sin igual
+solicitáis su desdén,
+¿por qué queréis que obren bien
+si las incitáis al mal?
+
+Combatís su resistencia
+y luego, con gravedad,
+decís que fue liviandad
+lo que hizo la diligencia.`;
+
+const REDONDILLAS_MARTI = `Cultivo una rosa blanca,
+en julio como en enero,
+para el amigo sincero
+que me da su mano franca.
+
+Y para el cruel que me arranca
+el corazón con que vivo,
+cardo ni ortiga cultivo;
+cultivo la rosa blanca.`;
+
+const SERVENTESIOS_DARIO = `Yo soy aquel que ayer no más decía
+el verso azul y la canción profana,
+en cuya noche un ruiseñor había
+que era alondra de luz por la mañana.
+
+El dueño fui de mi jardín de sueño,
+lleno de rosas y de cisnes vagos;
+el dueño de las tórtolas, el dueño
+de góndolas y liras en los lagos;`;
+
+const SONATINA_ESTROFA_1 = `La princesa está triste... ¿qué tendrá la princesa?
+Los suspiros se escapan de su boca de fresa,
+que ha perdido la risa, que ha perdido el color.
+La princesa está pálida en su silla de oro,
+está mudo el teclado de su clave sonoro,
+y en un vaso, olvidada, se desmaya una flor.`;
+
+const RETRATO_MACHADO = `Mi infancia son recuerdos de un patio de Sevilla,
+y un huerto claro donde madura el limonero;
+mi juventud, veinte años en tierra de Castilla;
+mi historia, algunos casos que recordar no quiero.
+
+Ni un seductor Mañara, ni un Bradomín he sido
+—ya conocéis mi torpe aliño indumentario—,
+mas recibí la flecha que me asignó Cupido,
+y amé cuanto ellas puedan tener de hospitalario.`;
+
+const LIRAS_FRAY_LUIS = `Qué descansada vida
+la del que huye del mundanal ruido,
+y sigue la escondida
+senda por donde han ido
+los pocos sabios que en el mundo han sido;
+
+que no le enturbia el pecho
+de los soberbios grandes el estado,
+ni del dorado techo
+se admira, fabricado
+del sabio moro, en jaspes sustentado.`;
+
+const SONETO_GARCILASO_XXIII = `En tanto que de rosa y azucena
+se muestra la color en vuestro gesto,
+y que vuestro mirar ardiente, honesto,
+con clara luz la tempestad serena;
+
+y en tanto que el cabello, que en la vena
+del oro se escogió, con vuelo presto
+por el hermoso cuello blanco, enhiesto,
+el viento mueve, esparce y desordena:
+
+coged de vuestra alegre primavera
+el dulce fruto antes que el tiempo airado
+cubra de nieve la hermosa cumbre.
+
+Marchitará la rosa el viento helado,
+todo lo mudará la edad ligera
+por no hacer mudanza en su costumbre.`;
+
+test.describe('contador-silabas · Inspector 27/10/2026 (séptima inspección)', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacionReact(page, ['textarea']);
+  });
+
+  /** Limpia, escribe el texto comprobando que llega al ESTADO de React y pulsa «Analizar». */
+  async function analizarTexto(page: Page, texto: string): Promise<void> {
+    await page.getByRole('button', { name: 'Limpiar' }).click();
+    await esperarValorEnReact(page, 'textarea', '');
+    await page.fill('textarea', texto);
+    await esperarValorEnReact(page, 'textarea', texto);
+    await page.getByRole('button', { name: 'Analizar Sílabas' }).click();
+  }
+
+  /** Las sílabas métricas de cada verso pintado, en orden, una vez pintados los `n`. */
+  async function medidas(page: Page, n: number): Promise<string[]> {
+    await expect(page.locator('[class*="versoCard"]')).toHaveCount(n);
+    return page
+      .locator('[class*="versoCard"] [class*="versoSilabas"]')
+      .evaluateAll((els) => els.map((el) => (el.textContent ?? '').trim()));
+  }
+
+  /** El nombre de la composición destacada («Soneto», «Silva»…), o '' si no hay ninguna. */
+  async function composicion(page: Page): Promise<string> {
+    await expect(page.locator('[class*="rimaBloque"]')).toBeVisible();
+    const nombre = page.locator('[class*="estrofaDestacada"] [class*="estrofaNombre"]');
+    return (await nombre.count()) === 0 ? '' : ((await nombre.textContent()) ?? '').trim();
+  }
+
+  /** Los nombres de la lista de estrofas firmes («Redondilla», «Serventesio»…), en orden. */
+  async function estrofasNombradas(page: Page): Promise<string[]> {
+    await expect(page.locator('[class*="rimaBloque"]')).toBeVisible();
+    return page
+      .locator('[class*="estrofasLista"] li strong')
+      .evaluateAll((els) => els.map((el) => (el.textContent ?? '').trim()));
+  }
+
+  test('CASO 1 (normal) · Lope, v. 2: cuatro sinalefas, una con h muda, dan el endecasílabo', async ({
+    page,
+  }) => {
+    // que(1) en(1) mi(1) vi-da(2) me(1) he(1) vis-to(2) en(1) tan-to(2) a-prie-to(3) = 15
+    // fonéticas, 10 palabras → media 1,5. «pr» es grupo inseparable (a-prie-to) e «ie», diptongo.
+    // Sinalefas: que_en, me_he (la h es muda y «he» no empieza por hue-/hui-/hie-/huy-),
+    // visto_en y tanto_aprieto → −4. «aprieto» llana → ±0. 15 − 4 = 11, endecasílabo.
+    await analizarTexto(page, 'que en mi vida me he visto en tanto aprieto;');
+
+    await expect(page.locator('[class*="resumenValor"]').nth(0)).toHaveText('15');
+    await expect(page.locator('[class*="resumenValor"]').nth(1)).toHaveText('10');
+    await expect(page.locator('[class*="resumenValor"]').nth(2)).toHaveText('1,5');
+    await expect(silabasDe(page, 5)).toHaveText(['he']);
+    await expect(silabasDe(page, 9)).toHaveText(['a', 'prie', 'to']);
+
+    await expect(metricasDe(page)).toHaveText('11');
+    await expect(nombreDe(page)).toContainText('endecasílabo');
+    await expect(nombreDe(page)).toContainText('arte mayor');
+    await expect(desgloseDe(page)).toContainText('15 fonéticas');
+    await expect(desgloseDe(page)).toContainText('4 sinalefas');
+    await expect(desgloseDe(page)).toContainText('llana');
+    await expect(sinalefasDe(page)).toHaveCount(4);
+    await expect(sinalefasDe(page).nth(1)).toContainText('me');
+    await expect(sinalefasDe(page).nth(1)).toContainText('he');
+  });
+
+  test('CASO 2 (límite) · la «y» final donde la regla SÍ vale: ante consonante y al final del verso', async ({
+    page,
+  }) => {
+    // Martí, «Yo soy un hombre sincero», y Lope, v. 11. Son la frontera del hallazgo C0287:
+    // aquí la «y» final no toca ninguna vocal, y la app debe acertar.
+    //   «Yo vengo de todas partes,»  Yo(1) ven-go(2) de(1) to-das(2) par-tes(2) = 8, sin
+    //       contactos, llana → 8.
+    //   «y hacia todas partes voy:»  y(1) ha-cia(2) to-das(2) par-tes(2) voy(1) = 8; la
+    //       conjunción funde con «hacia» (h muda) → −1; «voy», monosílabo, cuenta aguda → +1 = 8.
+    //   «pues fin con este verso le voy dando.» pues(1) fin(1) con(1) es-te(2) ver-so(2) le(1)
+    //       voy(1) dan-do(2) = 11; «voy» ante «d»: ningún contacto; llana → 11.
+    //   Texto entero: 8 + 8 + 11 = 27 sílabas en 5 + 5 + 8 = 18 palabras → 1,5.
+    await analizarTexto(
+      page,
+      'Yo vengo de todas partes,\ny hacia todas partes voy:\npues fin con este verso le voy dando.',
+    );
+
+    await expect(page.locator('[class*="resumenValor"]').nth(0)).toHaveText('27');
+    await expect(page.locator('[class*="resumenValor"]').nth(1)).toHaveText('18');
+    await expect(page.locator('[class*="resumenValor"]').nth(2)).toHaveText('1,5');
+    await expect(silabasDe(page, 9)).toHaveText(['voy']);
+
+    await expect(metricasDe(page, 0)).toHaveText('8');
+    await expect(sinalefasDe(page, 0)).toHaveCount(0);
+    await expect(desgloseDe(page, 0)).toContainText('llana');
+
+    await expect(metricasDe(page, 1)).toHaveText('8');
+    await expect(nombreDe(page, 1)).toContainText('octosílabo');
+    await expect(sinalefasDe(page, 1)).toHaveCount(1);
+    await expect(sinalefasDe(page, 1).first()).toContainText('hacia');
+    await expect(desgloseDe(page, 1)).toContainText('+ 1');
+    await expect(desgloseDe(page, 1)).toContainText('aguda');
+
+    await expect(metricasDe(page, 2)).toHaveText('11');
+    await expect(nombreDe(page, 2)).toContainText('endecasílabo');
+    await expect(sinalefasDe(page, 2)).toHaveCount(0);
+  });
+
+  test('CASO 3 (rechazo) · el metro personalizado fuera de 2..20 no arranca el medidor; 20 sí', async ({
+    page,
+  }) => {
+    // El formulario solo acepta enteros de 2 a 20 (`n >= 2 && n <= 20`, y min/max en el input).
+    // 21, 1 y 0 no deben fijar nada: ni medidor ni botón «Desactivar».
+    const metro = page.getByPlaceholder('ej. 6');
+    for (const fuera of ['21', '1', '0']) {
+      await metro.fill(fuera);
+      await esperarValorEnReact(page, '#metro-personalizado', fuera);
+      await page.getByRole('button', { name: 'Fijar' }).click();
+      await expect(page.locator('[class*="medidorVivo"]'), fuera).toHaveCount(0);
+      await expect(page.getByRole('button', { name: 'Desactivar' }), fuera).toHaveCount(0);
+    }
+
+    // El extremo de arriba es válido. El(1) cam-po(2) ver-de(2) = 5, llana → 5; faltan 20 − 5 = 15.
+    await metro.fill('20');
+    await esperarValorEnReact(page, '#metro-personalizado', '20');
+    await page.getByRole('button', { name: 'Fijar' }).click();
+    await expect(page.locator('[class*="medidorVivo"]')).toHaveCount(1);
+    await page.fill('textarea', 'El campo verde');
+    await expect(page.locator('[class*="medidorFila"]')).toContainText('5/20');
+    await expect(page.locator('[class*="medidorFila"]')).toContainText('faltan 15');
+  });
+
+  test('TESTIGO · Lope: los diez versos sin «y» final ante vocal ni sinalefa sobre la tónica final miden 11', async ({
+    page,
+  }) => {
+    // Vv. 1-5, 7, 8, 10, 11 y 13 del soneto, a mano:
+    //   1  Un(1) so-ne-to(3) me(1) man-da(2) ha-cer(2) Vio-lan-te(3) = 12 − manda_hacer = 11
+    //   2  15 − 4 (que_en, me_he, visto_en, tanto_aprieto) = 11
+    //   3  ca-tor-ce(3) ver-sos(2) di-cen(2) que(1) es(1) so-ne-to(3) = 12 − que_es = 11
+    //   4  bur-la(2) bur-lan-do(3) van(1) los(1) tres(1) de-lan-te(3) = 11, sin contactos
+    //   5  Yo(1) pen-sé(2) que(1) no(1) ha-lla-ra(3) con-so-nan-te(4) = 12 − no_hallara = 11
+    //   7  mas(1) si(1) me(1) ve-o(2) en(1) el(1) pri-mer(2) ter-ce-to(3) = 12 − veo_en = 11
+    //   8  no(1) hay(1) co-sa(2) en(1) los(1) cuar-te-tos(3) que(1) me(1) es-pan-te(3) = 14 − 3
+    //      (no_hay, cosa_en, me_espante) = 11
+    //   10 y(1) pa-re-ce(3) que(1) en-tré(2) con(1) pie(1) de-re-cho(3) = 12 − que_entré = 11
+    //   11 pues(1) fin(1) con(1) es-te(2) ver-so(2) le(1) voy(1) dan-do(2) = 11, sin contactos
+    //   13 que(1) voy(1) los(1) tre-ce(2) ver-sos(2) a-ca-ban-do(4) = 11, sin contactos
+    // Rima: -ante -eto -eto -ante ×2, -ando -echo ×3 → ABBA ABBA CDC DCD, soneto.
+    await analizarTexto(page, SONETO_LOPE);
+    const m = await medidas(page, 14);
+    expect([0, 1, 2, 3, 4, 6, 7, 9, 10, 12].map((i) => m[i])).toEqual(Array<string>(10).fill('11'));
+    expect(await composicion(page)).toBe('Soneto');
+    await expect(page.locator('[class*="rimaValor"]').first()).toHaveText('ABBA ABBA CDC DCD');
+
+    // La conjunción «y» ENTRE vocales (vv. 12 y 14) funde por UN solo lado, que es lo correcto
+    // (ce-yes-tá, do-yaun): el cómputo de la «y» copulativa no es el defecto (parte de C0287 no
+    // reproducida). Se mira que haya exactamente un lazo con la «y», sin fijar a qué lado cae.
+    const conLaY = async (verso: number) =>
+      (await sinalefasDe(page, verso).allTextContents()).filter((t) => /(^|\s)y(\s|$)/.test(t))
+        .length;
+    expect(await conLaY(11)).toBe(1);
+    expect(await conLaY(13)).toBe(1);
+  });
+
+  test('HALLAZGO C0287 · la «y» final de «estoy», «voy» o «soy» ante vocal no hace sinalefa', async ({
+    page,
+  }) => {
+    test.fail(true, 'ABIERTO: terminaEnVocal() da la «y» final por vocal y funde «voy_entrando»');
+    // Lope, vv. 6, 9 y 12. La «y» ante vocal es consonante de la sílaba siguiente:
+    //   6  y(1) es-toy(2) a(1) la(1) mi-tad(2) de(1) o-tro(2) cuar-te-to(3) = 13; sinalefas
+    //      y_estoy y de_otro (es-to-ya: «estoy a» no ahorra nada) → 11. La app: 10.
+    //   9  Por(1) el(1) pri-mer(2) ter-ce-to(3) voy(1) en-tran-do(3) = 11; vo-yen-tran-do, sin
+    //      sinalefa → 11. La app: 10, con el lazo «voy ⌣ entrando».
+    //   12 Ya(1) es-toy(2) en(1) el(1) se-gun-do(3) y(1) aun(1) sos-pe-cho(3) = 13; Ya_estoy y
+    //      la «y» copulativa entre vocales → −2 (es-to-yen, sin sinalefa) → 11. La app: 10.
+    // Y tres versos sueltos de la misma forma:
+    //   «hoy es lunes»  hoy(1) es(1) lu-nes(2) = 4, ho-yes sin sinalefa → 4. La app: 3.
+    //   «Yo soy un hombre sincero» (Martí)  Yo(1) soy(1) un(1) hom-bre(2) sin-ce-ro(3) = 8,
+    //       so-yun sin sinalefa → 8. La app: 7.
+    //   «Yo soy aquel que ayer no más decía» (Darío)  12 fonéticas − que_ayer = 11. La app: 10.
+    await analizarTexto(page, SONETO_LOPE);
+    const m = await medidas(page, 14);
+    const lope = [m[5], m[8], m[11]];
+
+    await analizarTexto(
+      page,
+      'hoy es lunes\nYo soy un hombre sincero\nYo soy aquel que ayer no más decía',
+    );
+    const sueltos = await medidas(page, 3);
+
+    expect({ lope, sueltos }).toEqual({ lope: ['11', '11', '11'], sueltos: ['4', '8', '11'] });
+  });
+
+  test('HALLAZGO · no hay sinalefa sobre la vocal que lleva el acento final del verso', async ({
+    page,
+  }) => {
+    test.fail(true, 'ABIERTO: «está_hecho» y «de_oro» se funden y el verso pierde una sílaba');
+    //   Lope, v. 14: con-tad(2) si(1) son(1) ca-tor-ce(3) y(1) es-tá(2) he-cho(2) = 12. La «y»
+    //       ahorra una (ce-yes-tá); «está | hecho» va en dialefa porque «he-» es la décima, el
+    //       acento final del endecasílabo → 11. La app: 10, y señala «con pausa» la fusión de la
+    //       «y», que es la buena, mientras «está ⌣ hecho» sale sin aviso.
+    //   Darío, «Sonatina», v. 4: La(1) prin-ce-sa(3) es-tá(2) pá-li-da(3) | en(1) su(1) si-lla(2)
+    //       de(1) o-ro(2). Primer hemistiquio 9 − princesa_está − 1 (esdrújulo) = 7; segundo,
+    //       7 con «de | oro» en dialefa (la «o» lleva el acento final) → 14. La app: 13.
+    await analizarTexto(
+      page,
+      'contad si son catorce, y está hecho.\nLa princesa está pálida en su silla de oro,',
+    );
+    expect(await medidas(page, 2)).toEqual(['11', '14']);
+  });
+
+  test('TESTIGO · tres redondillas de Sor Juana: doce octosílabos y la rima abba cddc effe', async ({
+    page,
+  }) => {
+    //   1  Hom-bres(2) ne-cios(2) que(1) a-cu-sáis(3) = 8 − que_acusáis + 1 (aguda) = 8
+    //   2  a(1) la(1) mu-jer(2) sin(1) ra-zón(2) = 7 + 1 = 8
+    //   3  sin(1) ver(1) que(1) sois(1) la(1) o-ca-sión(3) = 8 − la_ocasión + 1 = 8
+    //   4  de(1) lo(1) mis-mo(2) que(1) cul-páis(2) = 7 + 1 = 8
+    //   5  si(1) con(1) an-sia(2) sin(1) i-gual(2) = 7 + 1 = 8
+    //   6  so-li-ci-táis(4) su(1) des-dén(2) = 7 + 1 = 8
+    //   7  por(1) qué(1) que-réis(2) que(1) o-bren(2) bien(1) = 8 − que_obren + 1 = 8
+    //   8  si(1) las(1) in-ci-táis(3) al(1) mal(1) = 7 + 1 = 8
+    //   9  Com-ba-tís(3) su(1) re-sis-ten-cia(4) = 8, llana
+    //   10 y(1) lue-go(2) con(1) gra-ve-dad(3) = 7 + 1 = 8
+    //   11 de-cís(2) que(1) fue(1) li-vian-dad(3) = 7 + 1 = 8
+    //   12 lo(1) que(1) hi-zo(2) la(1) di-li-gen-cia(4) = 9 − que_hizo = 8
+    // Rimas -áis -ón -ón -áis · -al -én -én -al · -encia -ad -ad -encia: ninguna se repite de
+    // una estrofa a otra, así que las letras siguen el orden de aparición, abba cddc effe.
+    await analizarTexto(page, REDONDILLAS_SOR_JUANA);
+    expect(await medidas(page, 12)).toEqual(Array<string>(12).fill('8'));
+    await expect(page.locator('[class*="rimaValor"]').first()).toHaveText('abba cddc effe');
+    expect((await estrofasNombradas(page))[0]).toBe('Redondilla');
+  });
+
+  test('HALLAZGO C0288 · la redondilla y el serventesio se reconocen también en segunda y tercera posición', async ({
+    page,
+  }) => {
+    test.fail(true, 'ABIERTO: patron() compara las letras globales con «ABBA» sin renormalizarlas');
+    // Sor Juana: abba cddc effe, doce octosílabos (testigo de arriba) → tres redondillas.
+    // Martí, «Cultivo una rosa blanca»: -anca -ero -ero -anca · -anca -ivo -ivo -anca → abba
+    //   acca; los ocho miden 8 (Cul-ti-vo_u-na: 9 − 1; en ju-lio co-mo_en e-ne-ro: 9 − 1;
+    //   pa-ra_el a-mi-go sin-ce-ro: 9 − 1; que me da su ma-no fran-ca: 8; Y pa-ra_el cruel
+    //   que me_a-rran-ca: 10 − 2; el co-ra-zón con que vi-vo: 8; car-do ni_or-ti-ga cul-ti-vo:
+    //   9 − 1; cul-ti-vo la ro-sa blan-ca: 8) → dos redondillas.
+    // Darío, «Yo soy aquel…»: -ía -ana -ía -ana · -eño -agos -eño -agos → ABAB CDCD, ocho
+    //   endecasílabos (el primero lo deja en 10 el hallazgo C0287, dentro de la tolerancia de
+    //   metroPredominante) → dos serventesios.
+    // La app nombra solo la PRIMERA de cada poema: la segunda llega como «CDDC», «ACCA» o «CDCD».
+    await analizarTexto(page, REDONDILLAS_SOR_JUANA);
+    const sorJuana = await estrofasNombradas(page);
+    await analizarTexto(page, REDONDILLAS_MARTI);
+    const marti = await estrofasNombradas(page);
+    await analizarTexto(page, SERVENTESIOS_DARIO);
+    const dario = await estrofasNombradas(page);
+
+    expect({ sorJuana, marti, dario }).toEqual({
+      sorJuana: ['Redondilla', 'Redondilla', 'Redondilla'],
+      marti: ['Redondilla', 'Redondilla'],
+      dario: ['Serventesio', 'Serventesio'],
+    });
+  });
+
+  test('HALLAZGO C0289 · ni la sextina de Darío ni los serventesios de Machado son cuaderna vía, ni dos liras una silva', async ({
+    page,
+  }) => {
+    test.fail(true, 'ABIERTO: detectarComposicion() rotula por el metro sin mirar la estrofa ni la rima');
+    // La cuaderna vía son tetrásticos MONORRIMOS de alejandrinos (AAAA); la silva, una serie
+    // LIBRE de 7 y 11 sin estrofas fijas.
+    //   «Sonatina», estrofa 1: seis alejandrinos -esa -esa -or -oro -oro -or → AABCCB.
+    //   «Retrato», estrofas 1-2: ocho alejandrinos -illa -ero -illa -ero · -ido -ario -ido
+    //       -ario → ABAB CDCD, serventesios de alejandrinos.
+    //   «Vida retirada», liras 1-2: 7 11 7 7 11 · 7 11 7 7 11 con aBabB cDcdD → dos liras.
+    // La app destaca «Cuaderna vía» en las dos primeras y «Silva» en la tercera (y al haber
+    // composición oculta la lista de estrofas, donde la primera lira sí salía).
+    const rotulos: string[] = [];
+    for (const poema of [SONATINA_ESTROFA_1, RETRATO_MACHADO, LIRAS_FRAY_LUIS]) {
+      await analizarTexto(page, poema);
+      rotulos.push(await composicion(page));
+    }
+    expect(rotulos.map((r) => ['Cuaderna vía', 'Silva'].includes(r))).toEqual([false, false, false]);
+  });
+
+  test('TESTIGO · los alejandrinos y dodecasílabos sin cesura conflictiva miden bien', async ({
+    page,
+  }) => {
+    // Versos compuestos donde el corte cae entre consonante y consonante y ningún hemistiquio
+    // acaba en aguda ni en esdrújula: ahí contar el verso entero da lo mismo que por mitades.
+    //   Darío, «Era un aire suave»: E-ra_un ai-re sua-ve | de pau-sa-dos gi-ros = 6 + 6 = 12;
+    //       So-bre la te-rra-za | jun-to_a los ra-ma-jes = 6 + 6 = 12.
+    //   «Sonatina» vv. 1, 2, 3, 5 y 6 = 14 (15 − 1; 15 − 1; 16 − 3 + 1; 15 − 1; 16 − 3 + 1).
+    //   «Retrato» vv. 1-5, 7 y 8 = 14.
+    await analizarTexto(
+      page,
+      'Era un aire suave, de pausados giros;\nSobre la terraza, junto a los ramajes,',
+    );
+    expect(await medidas(page, 2)).toEqual(['12', '12']);
+    await expect(nombreDe(page, 0)).toContainText('dodecasílabo');
+
+    await analizarTexto(page, SONATINA_ESTROFA_1);
+    const s = await medidas(page, 6);
+    expect([s[0], s[1], s[2], s[4], s[5]]).toEqual(Array<string>(5).fill('14'));
+
+    await analizarTexto(page, RETRATO_MACHADO);
+    const r = await medidas(page, 8);
+    expect([r[0], r[1], r[2], r[3], r[4], r[6], r[7]]).toEqual(Array<string>(7).fill('14'));
+  });
+
+  test('HALLAZGO C0290 · el alejandrino y el dodecasílabo se miden por hemistiquios', async ({
+    page,
+  }) => {
+    test.fail(true, 'ABIERTO: analizarVerso() mide el verso compuesto entero, sin cesura');
+    //   Machado, «Retrato», v. 6: ya(1) co-no-céis(3) mi(1) tor-pe(2) | a-li-ño(3)
+    //       in-du-men-ta-rio(5). Primer hemistiquio 7, llano; segundo 8 − aliño_indumentario
+    //       = 7. En la cesura no hay sinalefa: «torpe | aliño» → 14. La app: 15 − 2 = 13.
+    //   Darío, «Era un aire suave»: di-rí-a-se(4) un(1) tré-mo-lo(3) | de(1) li-ras(2)
+    //       e-o-lias(3). Primer hemistiquio 8 − diríase_un − 1 (esdrújulo) = 6; segundo 6 → 12,
+    //       dodecasílabo. La app: 14 − 1 = 13, sin el −1 del hemistiquio esdrújulo.
+    // (El caso del cabo, «La princesa está pálida en su silla de oro», también sale 13, pero la
+    // cesura sola no lo arregla: el −1 del esdrújulo y la sinalefa «pálida_en» que se deshace
+    // se compensan. Lo que le falta es la dialefa «de | oro», hallazgo aparte, más arriba.)
+    await analizarTexto(
+      page,
+      '—ya conocéis mi torpe aliño indumentario—,\ndiríase un trémolo de liras eolias',
+    );
+    expect(await medidas(page, 2)).toEqual(['14', '12']);
+  });
+
+  test('TESTIGO · Garcilaso XXIII: doce de catorce miden 11 y el soneto se reconoce', async ({
+    page,
+  }) => {
+    //   1  En(1) tan-to(2) que(1) de(1) ro-sa(2) y(1) a-zu-ce-na(4) = 12 − rosa_y = 11
+    //   2  se(1) mues-tra(2) la(1) co-lor(2) en(1) vues-tro(2) ges-to(2) = 11
+    //   3  12 − ardiente_honesto (con pausa) = 11 · 4  11, sin contactos
+    //   5  y(1) en(1) tan-to(2) que(1) el(1) ca-be-llo(3) que(1) en(1) la(1) ve-na(2) = 14 − 3 = 11
+    //   6  del(1) o-ro(2) se(1) es-co-gió(3) con(1) vue-lo(2) pres-to(2) = 12 − se_escogió = 11
+    //   7  por(1) el(1) her-mo-so(3) cue-llo(2) blan-co(2) en-hies-to(3) = 12 − blanco_enhiesto = 11
+    //   8  el(1) vien-to(2) mue-ve(2) es-par-ce(3) y(1) de-sor-de-na(4) = 13 − 2 = 11
+    //   9  co-ged(2) de(1) vues-tra(2) a-le-gre(3) pri-ma-ve-ra(4) = 12 − 1 = 11
+    //   10 el(1) dul-ce(2) fru-to(2) an-tes(2) que(1) el(1) tiem-po(2) ai-ra-do(3) = 14 − 3 = 11
+    //   12 Mar-chi-ta-rá(4) la(1) ro-sa(2) el(1) vien-to(2) he-la-do(3) = 13 − 2 = 11
+    //   13 to-do(2) lo(1) mu-da-rá(3) la(1) e-dad(2) li-ge-ra(3) = 12 − la_edad = 11
+    // Rima -ena -esto -esto -ena ×2, -era -ado -umbre · -ado -era -umbre → ABBA ABBA CDE DCE.
+    await analizarTexto(page, SONETO_GARCILASO_XXIII);
+    const m = await medidas(page, 14);
+    expect([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12].map((i) => m[i])).toEqual(Array<string>(12).fill('11'));
+    expect(await composicion(page)).toBe('Soneto');
+    await expect(page.locator('[class*="rimaValor"]').first()).toHaveText('ABBA ABBA CDE DCE');
+  });
+
+  test('HALLAZGO · el banco de pruebas que propone la app (Garcilaso XXIII) sale con dos decasílabos sin aviso', async ({
+    page,
+  }) => {
+    test.fail(true, 'ABIERTO: la h aspirada de «hermosa» y «hacer» ni se aplica ni se avisa');
+    // El consejo «Practica con poemas que ya conoces» dice: «El Soneto XXIII de Garcilaso (…)
+    // tiene 11 sílabas por verso: es un banco de pruebas inmejorable». Dos versos solo son
+    // endecasílabos con la h aspirada del siglo XVI (h < f latina), que impide la sinalefa:
+    //   11 cu-bra(2) de(1) nie-ve(2) la(1) her-mo-sa(3) cum-bre(2) = 11, «la | hermosa» sin
+    //      fundir → 11. La app: 10, con «la ⌣ hermosa».
+    //   14 por(1) no(1) ha-cer(2) mu-dan-za(3) en(1) su(1) cos-tum-bre(3) = 12 − mudanza_en, con
+    //      «no | hacer» sin fundir → 11. La app: 10.
+    // Vale cualquiera de las dos salidas: que los 14 midan 11, o que la app avise de la h
+    // aspirada (el recuadro de limitaciones no la menciona) y no prometa el 11 sin matiz.
+    await analizarTexto(page, SONETO_GARCILASO_XXIII);
+    const m = await medidas(page, 14);
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    await expect(page.getByText('Practica con poemas que ya conoces')).toBeVisible();
+    const educativo = await page.evaluate(() => {
+      const copia = document.body.cloneNode(true) as HTMLElement;
+      copia.querySelectorAll('script, style').forEach((s) => s.remove());
+      return copia.textContent ?? '';
+    });
+    const cuadra = m.every((v) => v === '11') || /h aspirada/i.test(educativo);
+    expect(cuadra).toBe(true);
+  });
+
+  test('HALLAZGO · la FAQ visible y el FAQPage del hiato enseñan que la tilde «siempre» rompe el diptongo', async ({
+    page,
+  }) => {
+    test.fail(true, 'ABIERTO: residuo del hallazgo 698 en las dos respuestas sobre el hiato');
+    // OLE 2010: dos vocales cerradas DISTINTAS forman diptongo aunque una lleve tilde
+    // (cuí-da-te, ca-suís-ti-co), y dos cerradas IGUALES forman hiato (chi-i-ta). La app lo
+    // aplica (test 698, más arriba: «cuídate» → cuí-da-te, «Diptongo: uí») y la tarjeta de
+    // consejos ya enseña la excepción. Pero:
+    //   · la FAQ visible «¿Cuándo se produce hiato y cuándo diptongo?» dice «o débil TÓNICA (con
+    //     tilde) + cualquier vocal» y «La tilde sobre la vocal débil siempre rompe el diptongo»;
+    //   · el FAQPage «¿Qué es un hiato y en qué se diferencia del diptongo?» dice «o cuando una
+    //     vocal débil lleva tilde» y calla el hiato de dos cerradas iguales.
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const pregunta = page.getByText('¿Cuándo se produce hiato y cuándo diptongo?');
+    await pregunta.click();
+    const visible = (await pregunta.locator('xpath=..').innerText()).replace(/\s+/g, ' ');
+    const faq = await leerFaqJsonLd(page);
+    const faqHiato = faq.find((q) => q.pregunta.includes('¿Qué es un hiato'))?.respuesta ?? '';
+    expect(faqHiato).not.toBe('');
+
+    expect({
+      visibleDiceSiempre: visible.includes('siempre rompe el diptongo'),
+      faqPageNombraLasIguales: /iguales/.test(faqHiato),
+    }).toEqual({ visibleDiceSiempre: false, faqPageNombraLasIguales: true });
+  });
+
+  test('HALLAZGO · «diéresis» y «sinéresis» se escriben con tilde, y «poeta» no se parte po-eta', async ({
+    page,
+  }) => {
+    test.fail(true, 'ABIERTO: siete «sineresis/dieresis» sin tilde y un «po-eta» en el bloque educativo');
+    // Son esdrújulas: llevan tilde SIEMPRE, como explica la FAQ de al lado («¿Por qué las
+    // palabras esdrújulas llevan tilde siempre?»), y el recuadro de limitaciones ya las escribe
+    // bien. Sin tilde salen en la fila «Sineresis» de la tabla, en la tarjeta de Lengua y
+    // Literatura y en la pregunta y la respuesta de la FAQ de licencias. La misma fila escribe
+    // «po-eta → poe-ta»: po-e-ta son tres sílabas, como dice la FAQ.
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    await expect(page.getByText('Fenómenos Fonéticos: Diptongos, Hiatos y Sinalefa')).toBeVisible();
+    const educativo = await page.evaluate(() => {
+      const copia = document.body.cloneNode(true) as HTMLElement;
+      copia.querySelectorAll('script, style').forEach((s) => s.remove());
+      return copia.textContent ?? '';
+    });
+    expect(educativo.match(/sineresis|dieresis|po-eta/gi) ?? []).toEqual([]);
+  });
+
+  test('TESTIGO · «abrogar» se silabea a-bro-gar y «subrayar» cuenta 3 sílabas', async ({ page }) => {
+    // «abrogar» no tiene prefijo separable en español: «br» es grupo inseparable → a-bro-gar.
+    // En «subrayar» el número de sílabas es 3 se parta como se parta: el hallazgo C0291 es de
+    // la PARTICIÓN, no del recuento ni de la métrica.
+    await analizarTexto(page, 'abrogar subrayar');
+    await expect(silabasDe(page, 0)).toHaveText(['a', 'bro', 'gar']);
+    await expect(totalDe(page, 1)).toHaveText('3 sílabas');
+  });
+
+  test('HALLAZGO C0291 · tras el prefijo sub- la r es vibrante múltiple: sub-ra-yar, sub-ro-gar', async ({
+    page,
+  }) => {
+    test.fail(true, 'ABIERTO: separarSilabas() junta «br» también tras el prefijo sub-');
+    // OLE 2010 y DPD: en «subrayar» y «subrogar» la r tras sub- se pronuncia múltiple, así que
+    // «b» y «r» van en sílabas distintas: sub-ra-yar, sub-ro-gar. La app da su-bra-yar y
+    // su-bro-gar, una partición que no sostiene ni la fonética ni la morfología, y su recuadro
+    // de limitaciones la presenta como una variante defendible («la RAE y las distintas
+    // tradiciones gramaticales no siempre coinciden»).
+    await analizarTexto(page, 'subrayar subrogar');
+    await expect(page.locator('[class*="palabraCard"]')).toHaveCount(2);
+    await expect(totalDe(page, 0)).toHaveText('3 sílabas');
+    const partes = [
+      await silabasDe(page, 0).allTextContents(),
+      await silabasDe(page, 1).allTextContents(),
+    ];
+    expect(partes).toEqual([
+      ['sub', 'ra', 'yar'],
+      ['sub', 'ro', 'gar'],
+    ]);
+  });
 });

@@ -19,6 +19,7 @@ import {
 import { elementos } from '../../app/tabla-periodica/elementos-data';
 import { ELEMENTOS as ELEMENTOS_TENDENCIAS } from '../../app/simulador-tabla-periodica-tendencias/datos';
 import { RADIO_COVALENTE_PM, RADIO_SOLO_TEORICO_DESDE_Z } from '../../data/radios-atomicos';
+import { ELECTRONEGATIVIDAD_PAULING } from '../../data/electronegatividad';
 import { esperarHidratacion, sembrarValor } from './_hidratacion';
 import { formatNumber, parseSpanishNumber } from '../../lib/formatters';
 
@@ -50,6 +51,11 @@ import { formatNumber, parseSpanishNumber } from '../../lib/formatters';
  * RE-INSPECCIÓN 18/10/2026: al final del fichero. Verifica las dos reparaciones del 17/10
  * (26e2e846 y f6314c1f) con tres casos nuevos (23-25) y uno en un móvil de 390 px (26), y deja
  * tres hallazgos (F-H = 3373-3375), escritos con `test.fail()` y REPARADOS el 18/10/2026.
+ *
+ * RE-INSPECCIÓN 27/10/2026: al final del fichero. Vuelve a la cola por b655825c (19/10, la
+ * electronegatividad desde data/electronegatividad.ts). La reparación aguanta en todas las
+ * bocas (las 118 fichas, la tabla comparativa, las fichas de aula y las dos apps con la misma
+ * serie): CASOS 27-30, el 30 en un móvil de 360 px. Deja seis hallazgos (I-N) con `test.fail()`.
  *
  * QUÉ PROMETE
  *   <h1>      «⚛️ Tabla Periódica Interactiva»
@@ -87,7 +93,8 @@ import { formatNumber, parseSpanishNumber } from '../../lib/formatters';
  *     Y la calculadora, que no es más que sumar esas mismas masas:
  *       H2O      = 2 × 1,008 + 15,999                        = 18,015   g/mol
  *       C6H12O6  = 6 × 12,011 + 12 × 1,008 + 6 × 15,999       = 180,156  g/mol
- *       H2SO4    = 2 × 1,008 + 32,065 + 4 × 15,999            = 98,077   g/mol
+ *       H2SO4    = 2 × 1,008 + 32,06 + 4 × 15,999             = 98,072   g/mol
+ *                  (con el 32,065 de 2007 daba 98,077; el azufre es 32,06 desde el hallazgo 529)
  *       CaCO3    = 40,078 + 12,011 + 3 × 15,999               = 100,086  g/mol
  *
  *   CASO 2 — OPERATIVA. Los recuentos salen de contar el propio elementos-data.ts:
@@ -239,7 +246,10 @@ test.describe('CASO 2 · filtros, buscador y recuento', () => {
       await page.locator(CELDA_ACTIVA).evaluateAll((ns) => ns.map((n) => n.getAttribute('title'))),
     ).toEqual(['Flúor (F)', 'Cloro (Cl)', 'Bromo (Br)', 'Yodo (I)', 'Astato (At)', 'Teneso (Ts)']);
     // Y el hierro, que NO es halógeno, tiene que quedar atenuado.
-    await expect(page.locator('[title="Hierro (Fe)"]')).toHaveClass(/__filtrado/);
+    // (27/10/2026) `_filtrado\b` y no `__filtrado`: el build de producción nombra la clase
+    // «P-1TeG_filtrado», con un solo guion bajo, y contra él los dos `toHaveClass(/__filtrado/)`
+    // del fichero fallaban y los cuatro `not.toHaveClass(/__filtrado/)` pasaban sin mirar nada.
+    await expect(page.locator('[title="Hierro (Fe)"]')).toHaveClass(/_filtrado\b/);
 
     // Gases nobles: 7 — He, Ne, Ar, Kr, Xe, Rn y el sintético Og (oganesón, Z=118).
     await page.selectOption('#filtroFamilia', 'gases-nobles');
@@ -398,13 +408,14 @@ test.describe('hallazgos reparados · 21/08/2026', () => {
     // A mano: 40,078 + 2 × (15,999 + 1,008) = 40,078 + 34,014 = 74,092 g/mol.
     // El parser es /([A-Z][a-z]?)(\d*)/g: no entiende «(» ni «)», y el «2» que va DESPUÉS
     // del paréntesis no queda pegado a ningún símbolo, así que se pierde entero.
-    // Resultado de hoy: Ca×1 + O×1 + H×1 = 57,085 g/mol — un 23 % por debajo, sin ningún aviso.
+    // Resultado hasta el 23/08/2026 (REPARADO): Ca×1 + O×1 + H×1 = 57,085 g/mol — un 23 % por
+    // debajo, sin ningún aviso.
     expect(await masaMolarDe(page, 'Ca(OH)2')).toContain('74,0920 g/mol');
 
-    // Mg(NO3)2 = 24,305 + 2 × (14,007 + 3 × 15,999) = 148,313 g/mol (hoy da 86,309).
+    // Mg(NO3)2 = 24,305 + 2 × (14,007 + 3 × 15,999) = 148,313 g/mol (hasta el 23/08 daba 86,309).
     expect(await masaMolarDe(page, 'Mg(NO3)2')).toContain('148,3130 g/mol');
 
-    // Al2(SO4)3 = 2 × 26,982 + 3 × (32,06 + 4 × 15,999) = 342,132 g/mol (hoy da 150,025).
+    // Al2(SO4)3 = 2 × 26,982 + 3 × (32,06 + 4 × 15,999) = 342,132 g/mol (hasta el 23/08 daba 150,025).
     // (masa del azufre CIAAW 2021, hallazgo 529: 32,06, no la de 2007, 32,065)
     expect(await masaMolarDe(page, 'Al2(SO4)3')).toContain('342,1320 g/mol');
   });
@@ -541,7 +552,7 @@ test.describe('CASO 5 · límite: el oganesón (Z=118) y el hidrógeno', () => {
     // (He, Ne, Ar, Kr, Xe, Rn, Og).
     await page.selectOption('#filtroFamilia', 'gases-nobles');
     await expect(page.getByText('Mostrando 7 de 118 elementos')).toBeVisible();
-    await expect(page.locator('[title="Oganesón (Og)"]')).not.toHaveClass(/__filtrado/);
+    await expect(page.locator('[title="Oganesón (Og)"]')).not.toHaveClass(/_filtrado\b/);
   });
 
   test('el hidrógeno queda fuera de los alcalinos y dentro de los no metales', async ({ page }) => {
@@ -569,7 +580,7 @@ test.describe('CASO 5 · límite: el oganesón (Z=118) y el hidrógeno', () => {
       await page.locator(CELDA_ACTIVA).evaluateAll((ns) => ns.map((n) => n.getAttribute('title'))),
     ).toEqual(['Litio (Li)', 'Sodio (Na)', 'Potasio (K)', 'Rubidio (Rb)', 'Cesio (Cs)', 'Francio (Fr)']);
     // Y encima queda fuera del orden de tabulación, no como trampa clicable atenuada.
-    await expect(page.locator('[title="Hidrógeno (H)"]')).toHaveClass(/__filtrado/);
+    await expect(page.locator('[title="Hidrógeno (H)"]')).toHaveClass(/_filtrado\b/);
     await expect(page.locator('[title="Hidrógeno (H)"]')).toBeDisabled();
 
     // Filtro «No Metales»: SIETE, y ahí sí está el hidrógeno (H, C, N, O, P, S, Se).
@@ -726,8 +737,8 @@ test.describe('hallazgos reparados · 30/08/2026', () => {
     // «Sólido», que enseña 75 celdas y deja atenuados 30 elementos cuyo estado no se ha
     // dejado de conocer, solo se ha sustituido por su origen.
     await page.selectOption('#filtroEstado', 'solido');
-    await expect(page.locator('[title="Plutonio (Pu)"]')).not.toHaveClass(/__filtrado/);
-    await expect(page.locator('[title="Francio (Fr)"]')).not.toHaveClass(/__filtrado/);
+    await expect(page.locator('[title="Plutonio (Pu)"]')).not.toHaveClass(/_filtrado\b/);
+    await expect(page.locator('[title="Francio (Fr)"]')).not.toHaveClass(/_filtrado\b/);
 
     // Y el propio FAQPage de metadata.ts dice «Los elementos del 1 al 94 se encuentran en la
     // naturaleza; los del 95 al 118 son sintéticos», mientras la app marca como sintéticos
@@ -1535,7 +1546,7 @@ test.describe('CASO 14 · límite: dónde deja la app de considerar natural un e
     // porque el origen no es un estado físico.
     await page.selectOption('#filtroEstado', 'solido');
     for (const titulo of ['Neptunio (Np)', 'Plutonio (Pu)', 'Americio (Am)']) {
-      await expect(page.locator(`[title="${titulo}"]`)).not.toHaveClass(/__filtrado/);
+      await expect(page.locator(`[title="${titulo}"]`)).not.toHaveClass(/_filtrado\b/);
     }
   });
 });
@@ -2571,7 +2582,7 @@ test.describe('CASO 22 · móvil (Galaxy S8, 360 × 740): la tabla y la ficha co
       ),
     }));
     expect(medida.ancho).toBeGreaterThan(44); // la casilla no encoge
-    expect(medida.fuente).toBeGreaterThanOrEqual(8); // hoy: 6,4
+    expect(medida.fuente).toBeGreaterThanOrEqual(8); // antes del 18/10/2026 (REPARADO): 6,4
   });
 });
 
@@ -2652,7 +2663,7 @@ test.describe('verificación 16/10/2026 · los commits posteriores a la inspecci
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
-// HALLAZGOS de la re-inspección del 16/10/2026 — con `test.fail()` los ABIERTOS
+// HALLAZGOS de la re-inspección del 16/10/2026 — escritos con `test.fail()`, hoy REPARADOS
 // Cada uno afirma lo que DEBERÍA pasar; al repararlos se retira la marca y quedan como
 // regresión. El E, que necesita el viewport de 360 px, vive dentro del CASO 22.
 // Estado a 19/10/2026: los cinco REPARADOS y sin marca, hoy son regresión. B (3362) y C (3363)
@@ -2816,7 +2827,7 @@ test.describe('hallazgos · 16/10/2026 (A, B, C, D y E reparados)', () => {
     const respuesta = preguntas.find((q) => q.name.startsWith('¿Qué diferencia hay entre período y grupo'));
     expect(respuesta, 'la pregunta de período y grupo en el FAQPage').toBeTruthy();
     const texto = respuesta!.acceptedAnswer.text;
-    if (/mismo número de electrones/.test(texto)) expect(texto).toMatch(/helio|excepci|salvo/i); // hoy: sin excepción
+    if (/mismo número de electrones/.test(texto)) expect(texto).toMatch(/helio|excepci|salvo/i); // antes del 18/10/2026 (REPARADO): sin excepción
     if (/mismo número de capas/.test(texto)) expect(texto).toMatch(/paladio|excepci|salvo/i);
     // Reparado: las dos reglas siguen enunciadas, y con su excepción con nombre.
     expect(texto).toMatch(/mismo número de electrones[^.]*salvo el helio/);
@@ -3129,7 +3140,7 @@ test.describe('hallazgos · 18/10/2026 (REPARADOS)', () => {
     // Esperado: «hierro » → el hierro (1 de 118) · « » → nada que buscar (118 de 118).
     await abrirHidratada(page);
     await sembrarValor(page, '#busqueda', 'hierro ');
-    await expect(page.getByText('Mostrando 1 de 118 elementos')).toBeVisible({ timeout: 2000 }); // hoy: 0 de 118
+    await expect(page.getByText('Mostrando 1 de 118 elementos')).toBeVisible({ timeout: 2000 }); // antes del 18/10/2026 (REPARADO): 0 de 118
     await expect.poll(() => titulosActivos(page), { timeout: 2000 }).toEqual(['Hierro (Fe)']);
     await sembrarValor(page, '#busqueda', ' ');
     await expect(page.getByText('Mostrando 118 de 118 elementos')).toBeVisible({ timeout: 2000 }); // antes: 0 de 118
@@ -3184,5 +3195,410 @@ test.describe('hallazgos · 18/10/2026 (REPARADOS)', () => {
     expect(respuesta, 'la pregunta de la masa molar en el FAQPage').toBeTruthy();
     expect(respuesta!.acceptedAnswer.text).not.toMatch(/masas atómicas[^.]*se expresan en gramos por mol/); // antes: sí
     expect(respuesta!.acceptedAnswer.text).toContain('unidades de masa atómica (u)');
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN 27/10/2026
+//
+// Vuelve a la cola por b655825c (19/10/2026): la electronegatividad deja de teclearse en
+// elementos-data.ts y sale de data/electronegatividad.ts, la misma serie que lee
+// simulador-tabla-periodica-tendencias (hallazgo 3361). Lo que se comprueba es que la reparación
+// llega a TODAS las bocas, no solo a las cinco fichas que cambiaron: las 118 fichas, la tabla
+// comparativa del bloque educativo, las fichas de aula 3 y 12, el FAQ visible (H 2,20, F 3,98,
+// Cl 3,16 − Na 0,93) y el FAQPage, que no cita ninguna electronegatividad. Aguanta en todas.
+//
+// Fuentes de los valores esperados, ancladas en el repositorio:
+//   · electronegatividad: data/electronegatividad.ts, Pauling revisada por Allred (1961) según
+//     el CRC Handbook, WebElements y el Lange, cotejada el 26/09 y el 19/10/2026. Sin valor:
+//     He, Ne, Ar, Rn, Lr y Z ≥ 104, 20 de 118.
+//   · masas: IUPAC/CIAAW 2021 (cabecera de elementos-data.ts). H 1,008 · C 12,011 · N 14,007 ·
+//     O 15,999 · Fe 55,845 coinciden con la tabla de app/simulador-estequiometria/motor.ts, que
+//     cita la misma fuente, y S 32,06 con el hallazgo 529. Ca 40,078, P 30,974 y K 39,098 solo se
+//     han leído en la propia tabla: la fuente que cita (iupac.qmul.ac.uk) queda fuera de los
+//     dominios de esta inspección.
+//
+//   CASO 27 — NORMAL.
+//     Las 118 fichas: «Electronegatividad: x,xx» con dos decimales (formatNumber(x, 2), como la
+//     ficha) o «N/D» donde el módulo da null. A mano, los que cambiaron y sus vecinos: Rn N/D ·
+//     Lr N/D · Pm 1,10 · Eu 1,10 · Tb 1,10 · Sm 1,17 · Gd 1,20 · Kr 3,00 · Xe 2,60 · He N/D ·
+//     Fm 1,30 · No 1,30 · Og N/D.
+//     La comparativa, familia a familia según elementos-data.ts:
+//       alcalinos 0,70 (Fr) – 0,98 (Li) dentro de «0,7–1,0» · alcalinotérreos 0,89 (Ba) – 1,57
+//       (Be) dentro de «0,89–1,57» · halógenos 2,20 (At) – 3,98 (F) dentro de «2,2–3,98» (Ts sin
+//       valor) · transición 1,22 (Y) – 2,54 (Au) dentro de «1,22–2,54» · no metales 2,19 (P) –
+//       3,44 (O) dentro de «2,0–3,44» · metaloides 1,90 (Si) – 2,18 (As) dentro de «1,9–2,2» ·
+//       gases nobles: solo Kr y Xe tienen valor → «Sin valor salvo en Kr (3,00) y Xe (2,60)».
+//     Tres sales con paréntesis (una EMPIEZA por paréntesis y otra los anida con corchetes):
+//       (NH4)2SO4   = 2 × 14,007 + 8 × 1,008 + 32,06 + 4 × 15,999
+//                   = 28,014 + 8,064 + 32,06 + 63,996           = 132,134 → «132,1340 g/mol»
+//       Ca3(PO4)2   = 3 × 40,078 + 2 × 30,974 + 8 × 15,999
+//                   = 120,234 + 61,948 + 127,992                = 310,174 → «310,1740 g/mol»
+//       K4[Fe(CN)6] = 4 × 39,098 + 55,845 + 6 × 12,011 + 6 × 14,007
+//                   = 156,392 + 55,845 + 72,066 + 84,042        = 368,345 → «368,3450 g/mol»
+//
+//   CASO 28 — LÍMITE. El radón, el primero que pasó a N/D, con el TECLADO: foco en su casilla,
+//     Enter abre la ficha y el foco entra en «Cerrar la ficha de Radón» (es el único control de
+//     la ficha, así que Tab y Mayús+Tab se quedan en él); la ficha dice «Electronegatividad: N/D»,
+//     «Radio covalente: 142 pm» (Z 86 de la serie: fila Tl–Th 144, 144, 151, 145, 147, 142) y
+//     «Masa atómica: [222] u»; Escape la cierra y el foco vuelve a la casilla; Espacio también la
+//     abre. Y en el motor, una comparación con un N/D no se resuelve: entre Kr, Xe y Rn no hay
+//     «más electronegativo» (Rn sin valor → null); entre Kr y Xe, el Kr (3,00 > 2,60).
+//
+//   CASO 29 — RECHAZO. La calculadora nombra lo que no entiende y no escribe ninguna masa:
+//     «CuSO4·5H2O» (un hidrato, con el punto) → «La fórmula solo admite letras, números y
+//     paréntesis.» · «2H2O» (coeficiente delante) → «No entiendo «2H2».» · «h2o» → «No entiendo
+//     «h2o».» · «H0» → «Un subíndice no puede valer 0.» · «()» → «No se encontraron elementos
+//     válidos». Y en las fichas de aula 3 (el más electronegativo de F, O, Cl y N) y 12 (el
+//     menos electronegativo de F, Cl, Br e I), «Rn» es un fallo.
+//
+//   CASO 30 — MÓVIL (devices['Galaxy S8'], 360 × 740). Con K4[Fe(CN)6] la página no desborda y
+//     el campo, el botón y el desglose caben en los 360 px; la casilla del radón mide
+//     (900 − 2 × 8 − 17) / 18 = 48,17 px, se toca, y su ficha (360 − 2 × 16 = 328 px) dice N/D.
+//
+// HALLAZGOS de este día (I-N): al final, con `test.fail()` y el valor correcto.
+// ═══════════════════════════════════════════════════════════════════════════
+
+/** Lo que la ficha escribe de la electronegatividad del elemento Z según el módulo común. */
+const electronegatividadEnFicha = (z: number): string => {
+  const valor = ELECTRONEGATIVIDAD_PAULING[z - 1];
+  return valor === null ? 'N/D' : formatNumber(valor, 2);
+};
+
+/** Escribe una fórmula en la calculadora (ya hidratada) y pulsa «Calcular». */
+async function calcularFormula(page: Page, formula: string): Promise<void> {
+  await sembrarValor(page, '#formula-masa-molar', formula);
+  await page.getByRole('button', { name: 'Calcular', exact: true }).click();
+}
+
+// ── CASO 27 — NORMAL: b655825c en todas las bocas, y tres sales con paréntesis ─────────
+test.describe('CASO 27 · normal: la electronegatividad común en todas las bocas y tres sales con paréntesis', () => {
+  test('las 118 fichas dan la electronegatividad del módulo común, y los cambiados la de las fuentes', async ({ page }) => {
+    test.setTimeout(120_000);
+    // Los resueltos a mano (cabecera del bloque); el resto, del módulo que cita la fuente.
+    const aMano: Record<string, string> = {
+      'Radón (Rn)': 'N/D', 'Lawrencio (Lr)': 'N/D', 'Prometio (Pm)': '1,10', 'Europio (Eu)': '1,10',
+      'Terbio (Tb)': '1,10', 'Samario (Sm)': '1,17', 'Gadolinio (Gd)': '1,20', 'Kriptón (Kr)': '3,00',
+      'Xenón (Xe)': '2,60', 'Helio (He)': 'N/D', 'Fermio (Fm)': '1,30', 'Nobelio (No)': '1,30',
+      'Oganesón (Og)': 'N/D',
+    };
+    // Lo escrito a mano no puede contradecir al módulo: si la serie cambia, esto lo dice.
+    for (const [titulo, valor] of Object.entries(aMano)) {
+      const e = elementos.find((x) => `${x.nombre} (${x.simbolo})` === titulo);
+      expect(e, titulo).toBeTruthy();
+      expect(electronegatividadEnFicha(e!.numero), titulo).toBe(valor);
+    }
+
+    await abrirHidratada(page);
+    const distintas: string[] = [];
+    for (const e of elementos) {
+      const titulo = `${e.nombre} (${e.simbolo})`;
+      await page.locator(`[title="${titulo}"]`).click();
+      const modal = page.locator(MODAL).first();
+      await expect(modal).toBeVisible();
+      const leida = (await modal.innerText()).replace(/\s+/g, ' ').match(/Electronegatividad: (\S+)/)?.[1];
+      const esperada = aMano[titulo] ?? electronegatividadEnFicha(e.numero);
+      if (leida !== esperada) distintas.push(`${titulo}: ficha ${leida} · esperado ${esperada}`);
+      await page.keyboard.press('Escape');
+      await expect(page.locator(MODAL)).toHaveCount(0);
+    }
+    expect(distintas).toEqual([]);
+  });
+
+  test('sin navegador: la serie mide 118, tiene 20 huecos y las dos apps la leen tal cual', () => {
+    expect(ELECTRONEGATIVIDAD_PAULING).toHaveLength(118);
+    expect(ELEMENTOS_TENDENCIAS).toHaveLength(118);
+    // He, Ne, Ar, Rn, Lr y Z ≥ 104 (cabecera de data/electronegatividad.ts)
+    expect(elementos.filter((e) => e.electronegatividad === null).map((e) => e.simbolo)).toEqual([
+      'He', 'Ne', 'Ar', 'Rn', 'Lr', 'Rf', 'Db', 'Sg', 'Bh', 'Hs', 'Mt', 'Ds', 'Rg', 'Cn', 'Nh', 'Fl',
+      'Mc', 'Lv', 'Ts', 'Og',
+    ]);
+    // Ni una copia propia en ninguna de las dos: las dos dan, Z a Z, el valor del módulo.
+    const fueraDelModulo = [
+      ...elementos
+        .filter((e) => e.electronegatividad !== ELECTRONEGATIVIDAD_PAULING[e.numero - 1])
+        .map((e) => `tabla-periodica ${e.simbolo}`),
+      ...ELEMENTOS_TENDENCIAS
+        .filter((t) => t.electronegatividad !== ELECTRONEGATIVIDAD_PAULING[t.Z - 1])
+        .map((t) => `tendencias ${t.simbolo}`),
+    ];
+    expect(fueraDelModulo).toEqual([]);
+  });
+
+  test('la tabla comparativa abarca la electronegatividad de cada ficha de su familia', async ({ page }) => {
+    const extremos = (familia: string): [number, number] => {
+      const valores = elementos
+        .filter((e) => e.familia === familia && e.electronegatividad !== null)
+        .map((e) => e.electronegatividad as number);
+      return [Math.min(...valores), Math.max(...valores)];
+    };
+    // [rótulo de la fila, familia de elementos-data.ts, mínimo y máximo resueltos a mano]
+    const filasEsperadas = [
+      ['Metales alcalinos', 'metales-alcalinos', 0.7, 0.98],
+      ['alcalinotérreos', 'metales-alcalinoterreos', 0.89, 1.57],
+      ['Halógenos', 'halogenos', 2.2, 3.98],
+      ['Metales de transición', 'metales-transicion', 1.22, 2.54],
+      ['No metales', 'no-metales', 2.19, 3.44],
+      ['Metaloides', 'metaloides', 1.9, 2.18],
+    ] as const;
+    for (const [, familia, min, max] of filasEsperadas) expect(extremos(familia), familia).toEqual([min, max]);
+    expect(
+      elementos.filter((e) => e.familia === 'gases-nobles' && e.electronegatividad !== null).map((e) => e.simbolo),
+    ).toEqual(['Kr', 'Xe']);
+
+    await abrirHidratada(page);
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const filas = await page
+      .locator('[class*="_comparativaTable"] tbody tr')
+      .evaluateAll((trs) => trs.map((tr) => Array.from(tr.querySelectorAll('td')).map((td) => (td.textContent ?? '').trim())));
+    for (const [rotulo, , min, max] of filasEsperadas) {
+      const fila = filas.find((f) => f[0].includes(rotulo));
+      expect(fila, rotulo).toBeTruthy();
+      const [suelo, techo] = (fila![2].match(/\d+(?:,\d+)?/g) ?? []).slice(0, 2).map((n) => parseSpanishNumber(n));
+      expect(suelo, `${rotulo}: el suelo de «${fila![2]}»`).toBeLessThanOrEqual(min);
+      expect(techo, `${rotulo}: el techo de «${fila![2]}»`).toBeGreaterThanOrEqual(max);
+    }
+    expect(filas.find((f) => f[0].includes('Gases nobles'))?.[2]).toBe('Sin valor salvo en Kr (3,00) y Xe (2,60)');
+  });
+
+  test('la calculadora suma tres sales con paréntesis: una que empieza por él y otra con corchetes', async ({ page }) => {
+    await abrirHidratada(page);
+    const casos = [
+      ['(NH4)2SO4', '132,1340 g/mol', ['N (Nitrógeno) ×2 28,0140', 'H (Hidrógeno) ×8 8,0640', 'S (Azufre) ×1 32,0600', 'O (Oxígeno) ×4 63,9960']],
+      ['Ca3(PO4)2', '310,1740 g/mol', ['Ca (Calcio) ×3 120,2340', 'P (Fósforo) ×2 61,9480', 'O (Oxígeno) ×8 127,9920']],
+      ['K4[Fe(CN)6]', '368,3450 g/mol', ['K (Potasio) ×4 156,3920', 'Fe (Hierro) ×1 55,8450', 'C (Carbono) ×6 72,0660', 'N (Nitrógeno) ×6 84,0420']],
+    ] as const;
+    for (const [formula, total, desglose] of casos) {
+      await calcularFormula(page, formula);
+      await expect(page.locator('[class*="_masaTotal"]'), formula).toContainText(total);
+      const texto = (await page.locator('[class*="_desgloseMasa"]').innerText()).replace(/\s+/g, ' ');
+      for (const fila of desglose) expect(texto, formula).toContain(fila);
+    }
+  });
+});
+
+// ── CASO 28 — LÍMITE: el radón, primero en N/D, con el teclado ──────────────────────
+test.describe('CASO 28 · límite: el radón, el primero que pasó a N/D, abierto y cerrado con el teclado', () => {
+  test('Enter abre su ficha, el foco se queda dentro, Escape lo devuelve a la casilla y Espacio la reabre', async ({ page }) => {
+    await abrirHidratada(page);
+    const rn = page.locator('[title="Radón (Rn)"]');
+    await rn.focus();
+    await page.keyboard.press('Enter');
+    const dialogo = page.getByRole('dialog');
+    await expect(dialogo).toBeVisible();
+    const cerrar = page.getByRole('button', { name: 'Cerrar la ficha de Radón' });
+    await expect(cerrar).toBeFocused();
+    const texto = (await dialogo.innerText()).replace(/\s+/g, ' ');
+    for (const dato of ['Electronegatividad: N/D', 'Radio covalente: 142 pm', 'Masa atómica: [222] u', 'Grupo: 18', 'Período: 6']) {
+      expect(texto, dato).toContain(dato);
+    }
+    await page.keyboard.press('Tab');
+    await expect(cerrar).toBeFocused();
+    await page.keyboard.press('Shift+Tab');
+    await expect(cerrar).toBeFocused();
+    await page.keyboard.press('Escape');
+    await expect(dialogo).toHaveCount(0);
+    await expect(rn).toBeFocused();
+    await page.keyboard.press('Space');
+    await expect(dialogo).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(rn).toBeFocused();
+  });
+
+  test('sin navegador: una comparación con un N/D no se resuelve, y sin él gana el kriptón', () => {
+    expect(extremoElectronegatividad(['Kr', 'Xe', 'Rn'], 'max')).toBeNull();
+    expect(extremoElectronegatividad(['Kr', 'Xe'], 'max')?.simbolo).toBe('Kr'); // 3,00 > 2,60
+    expect(extremoElectronegatividad(['Kr', 'Xe'], 'min')?.simbolo).toBe('Xe');
+    expect(resolverCaso({ tipo: 'propiedad-numerica', simbolo: 'Rn', propiedad: 'electronegatividad' }).ok).toBe(false);
+  });
+});
+
+// ── CASO 29 — RECHAZO: fórmulas que no son fórmulas y el radón donde no toca ──────────
+test.describe('CASO 29 · rechazo: cinco fórmulas imposibles y el radón en las fichas de electronegatividad', () => {
+  test('cada fórmula da su mensaje y ninguna masa, y «Rn» no aprueba las fichas 3 y 12', async ({ page }) => {
+    await abrirHidratada(page);
+    const error = page.locator('[class*="_errorMasa"]');
+    const total = page.locator('[class*="_masaTotal"]');
+    const casos = [
+      ['CuSO4·5H2O', 'La fórmula solo admite letras, números y paréntesis.'],
+      ['2H2O', 'No entiendo «2H2».'],
+      ['h2o', 'No entiendo «h2o».'],
+      ['H0', 'Un subíndice no puede valer 0.'],
+      ['()', 'No se encontraron elementos válidos'],
+    ] as const;
+    for (const [formula, mensaje] of casos) {
+      await calcularFormula(page, formula);
+      await expect(error, formula).toHaveText(mensaje);
+      await expect(total, formula).toHaveCount(0);
+    }
+    for (const id of [3, 12]) {
+      expect(await veredictoLimpio(page, id, 'Rn'), `ficha ${id} «Rn»`).toContain(FALLO);
+    }
+  });
+});
+
+// ── CASO 30 — MÓVIL (360 px) ───────────────────────────────────────────────────
+test.describe('CASO 30 · móvil (Galaxy S8, 360 × 740): la calculadora y la ficha del radón con el dedo', () => {
+  // Enumeradas en vez de `...devices['Galaxy S8']`: el device trae `defaultBrowserType`, que
+  // obligaría a un worker nuevo y Playwright no lo admite dentro de un describe.
+  const S8 = devices['Galaxy S8'];
+  test.use({
+    viewport: S8.viewport,
+    userAgent: S8.userAgent,
+    deviceScaleFactor: S8.deviceScaleFactor,
+    isMobile: S8.isMobile,
+    hasTouch: S8.hasTouch,
+  });
+
+  test('K4[Fe(CN)6] cabe sin desbordar, y la casilla del radón se toca y su ficha dice N/D', async ({ page }) => {
+    await abrirHidratada(page);
+    expect(page.viewportSize()).toEqual({ width: 360, height: 740 });
+    const calcular = page.getByRole('button', { name: 'Calcular', exact: true });
+    await sembrarValor(page, '#formula-masa-molar', 'K4[Fe(CN)6]');
+    await calcular.tap();
+    await expect(page.locator('[class*="_masaTotal"]')).toContainText('368,3450 g/mol');
+    const pagina = await page.evaluate(() => ({
+      ancho: window.innerWidth,
+      scroll: document.documentElement.scrollWidth,
+    }));
+    expect(pagina.scroll).toBeLessThanOrEqual(pagina.ancho + 1);
+    for (const control of [page.locator('#formula-masa-molar'), calcular, page.locator('[class*="_desgloseMasa"] table')]) {
+      const caja = await control.boundingBox();
+      expect(caja!.x).toBeGreaterThanOrEqual(0);
+      expect(caja!.x + caja!.width).toBeLessThanOrEqual(360);
+    }
+    expect((await calcular.boundingBox())!.height).toBeGreaterThanOrEqual(24); // WCAG 2.5.8
+
+    const rn = page.locator('[title="Radón (Rn)"]');
+    await rn.scrollIntoViewIfNeeded();
+    expect((await rn.boundingBox())!.width).toBeCloseTo(48.17, 0); // (900 − 16 − 17) / 18
+    await rn.tap();
+    const dialogo = page.getByRole('dialog');
+    await expect(dialogo).toBeVisible();
+    expect((await page.locator(MODAL).first().boundingBox())!.width).toBe(328); // 360 − 2 × 16
+    // innerText y no toContainText: el textContent pega el rótulo y el valor («Electronegatividad:N/D»)
+    expect((await dialogo.innerText()).replace(/\s+/g, ' ')).toContain('Electronegatividad: N/D');
+    await page.getByRole('button', { name: 'Cerrar la ficha de Radón' }).tap();
+    await expect(dialogo).toHaveCount(0);
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// HALLAZGOS de la re-inspección del 27/10/2026 — ABIERTOS, con `test.fail()`
+// Cada uno afirma lo que DEBERÍA pasar; al repararlo se retira la marca y queda de regresión.
+// ═══════════════════════════════════════════════════════════════════════════
+test.describe('hallazgos · 27/10/2026 (ABIERTOS)', () => {
+  test('I · «C02» (CO₂ tecleado con un cero) sale como C₂, 24,0220 g/mol, en vez de rechazarse', async ({ page }) => {
+    test.fail(true, 'ABIERTO: lib/formula-quimica.ts lee «02» como el subíndice 2');
+    // «02» no es un subíndice: la notación no escribe ceros a la izquierda, y la misma
+    // calculadora rechaza «H0» con «Un subíndice no puede valer 0.» (CASO 29). El parser
+    // compartido (lib/formula-quimica.ts, que usa también formulador-compuestos-inorganicos) hace
+    // parseInt('02') = 2. Cambiar la O por un 0 es la errata de manual al teclear una fórmula:
+    // «C02» por CO₂ (44,009 g/mol) da 24,0220 g/mol con el desglose «C ×2», sin aviso; «H02», H₂
+    // = 2,0160 g/mol. Esperado: las dos se rechazan con un mensaje y sin masa.
+    await abrirHidratada(page);
+    for (const formula of ['C02', 'H02']) {
+      await calcularFormula(page, formula);
+      await expect(page.locator('[class*="_errorMasa"]'), formula).toBeVisible({ timeout: 2000 }); // hoy: ningún error
+      await expect(page.locator('[class*="_masaTotal"]'), formula).toHaveCount(0); // hoy: 24,0220 y 2,0160 g/mol
+    }
+  });
+
+  test('J · C0056 · la ficha de un lantánido dice «Grupo: 3» y la guía enseña que el grupo 3 es bloque d', async ({ page }) => {
+    test.fail(true, 'ABIERTO: «Grupo: 3» en los 30 del bloque f frente al paso 2 de la guía');
+    // Datos de la propia app: los 30 de La-Lu y Ac-Lr llevan grupo: 3 en elementos-data.ts (la
+    // ficha del cerio: «Grupo: 3 · Familia: Lantánidos · [Xe] 4f¹ 5d¹ 6s²»). El paso 2 de la guía
+    // dice «Grupos 3-12: bloque d (metales de transición). … Lantánidos/Actínidos: bloque f», y
+    // como excepción solo nombra al helio: con las dos cosas a la vista el cerio es a la vez
+    // bloque d (por su grupo) y bloque f (por su serie). Dicen lo mismo la fila «Metales de
+    // transición (Gp3-12)» de la comparativa y el FAQPage, que pone «metales de transición
+    // (grupos 3-12)» y aparte «lantánidos y actínidos». En el mismo portal,
+    // calculadora-configuracion-electronica escribe «Las dos series interiores, lantánidos y
+    // actínidos, no se numeran por grupo» y tendencias les da grupo null. Qué numeración da la
+    // IUPAC no está anclado en el repositorio (cabo C0056): aquí se afirma solo la contradicción
+    // interna. Esperado: o la ficha no da a la serie un número de grupo, o la guía nombra la
+    // excepción.
+    expect(
+      elementos.filter((e) => e.grupo === 3 && (e.familia === 'lantanidos' || e.familia === 'actinidos')).length,
+    ).toBe(30);
+    await abrirHidratada(page);
+    const ce = await fichaDe(page, 'Cerio (Ce)');
+    expect(ce).toContain('Familia: Lantánidos');
+    const diceGrupo3 = ce.includes('Grupo: 3');
+    await cerrarFicha(page);
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const paso2 = (
+      await page.locator('[class*="_stepItem"]').filter({ hasText: 'Determinar el bloque' }).innerText()
+    ).replace(/\s+/g, ' ');
+    const grupo3EsBloqueD = /Grupos 3-12: bloque d/.test(paso2);
+    const nombraLaSerie = /(lant|act)[^.]*grupo 3|grupo 3[^.]*(lant|act)/i.test(paso2);
+    expect(!diceGrupo3 || !grupo3EsBloqueD || nombraLaSerie, `ficha «Grupo: 3» frente a «${paso2}»`).toBe(true); // hoy: false
+  });
+
+  test('K · la calculadora da al oganesón «294,0000 g/mol», que su ficha escribe [294] por no tener peso atómico estándar', async ({ page }) => {
+    test.fail(true, 'ABIERTO: la calculadora suma el número másico como si fuera un peso atómico medido');
+    // La ficha sigue la convención de la IUPAC para los 34 elementos sin peso atómico estándar
+    // (hallazgo 530): el número másico del isótopo más estable, entre corchetes («[294] u»,
+    // «[98] u» el tecnecio), y no «294,000 u». La calculadora suma ese mismo número con cuatro
+    // decimales y sin marca: «Og» → «294,0000 g/mol»; «Tc2O7» → Tc ×2 «196,0000» y un total de
+    // «307,9930 g/mol» (2 × 98 + 7 × 15,999 = 307,993) que se lee como medido a la diezmilésima.
+    // Esperado: que el resultado no presente 294 como una masa medida (lo marque como la ficha,
+    // o avise de que es un número másico).
+    await abrirHidratada(page);
+    expect(await fichaDe(page, 'Oganesón (Og)')).toContain('Masa atómica: [294] u');
+    await cerrarFicha(page);
+    await calcularFormula(page, 'Og');
+    const resultado = page.locator('[class*="_resultadoMasa"]');
+    await expect(resultado).toBeVisible();
+    await expect(resultado).not.toContainText('294,0000', { timeout: 2000 }); // hoy: «294,0000 g/mol»
+  });
+
+  test('L · el resultado de H2O se queda en pantalla al teclear otra fórmula, sin decir de cuál es', async ({ page }) => {
+    test.fail(true, 'ABIERTO: el resultado no se retira al editar la fórmula ni nombra la suya');
+    // Los siete botones de ejemplo retiran el resultado al cambiar la fórmula
+    // (setResultadoMasa(null)); teclearla no. Calcular H2O (2 × 1,008 + 15,999 = 18,015) y escribir
+    // después «NaCl» deja «Masa Molar Total: 18,0150 g/mol» debajo de un campo que dice NaCl, y
+    // el bloque no nombra la fórmula a la que pertenece. Esperado: o se retira, o dice «H2O».
+    await abrirHidratada(page);
+    await calcularFormula(page, 'H2O');
+    await expect(page.locator('[class*="_masaTotal"]')).toContainText('18,0150 g/mol');
+    await sembrarValor(page, '#formula-masa-molar', 'NaCl');
+    const resultado = page.locator('[class*="_resultadoMasa"]');
+    const quedan = await resultado.count();
+    const texto = quedan > 0 ? await resultado.innerText() : '';
+    expect(quedan === 0 || /H2O|H₂O/.test(texto), `resultado bajo «NaCl»: ${texto}`).toBe(true); // hoy: queda, y sin su fórmula
+  });
+
+  test('M · la ficha no dice de qué escala es la electronegatividad ni por qué el radón da N/D', async ({ page }) => {
+    test.fail(true, 'ABIERTO: «Electronegatividad: N/D» sin escala ni motivo; la única nota de la ficha es la del radio');
+    // b655825c dejó la serie en data/electronegatividad.ts con su ELECTRONEGATIVIDAD_META (escala
+    // de Pauling, fuente y fecha), que no lee nadie. La ficha rotula «Electronegatividad:» a
+    // secas, y la única nota que lleva es la del radio: «Desde el fermio (Z ≥ 100) no hay ningún
+    // enlace medido y se deja en N/D». En el radón (Z = 86), el helio, el neón y el argón el único
+    // N/D de la ficha es el de la electronegatividad, y esa nota no lo explica; hasta el 19/10 el
+    // radón decía 2,20. El radio sí dice su escala y su fuente (hallazgo 2281). Y la description
+    // promete «electronegatividad de cada elemento»: 20 de 118 fichas dicen N/D.
+    // Esperado: que la ficha nombre la escala (Pauling).
+    await abrirHidratada(page);
+    const rn = await fichaDe(page, 'Radón (Rn)');
+    expect(rn).toContain('Electronegatividad: N/D');
+    expect(rn).toMatch(/Pauling/); // hoy: no aparece
+  });
+
+  test('N · el resultado de la calculadora no se anuncia: con lector de pantalla «Calcular» calla', async ({ page }) => {
+    test.fail(true, 'ABIERTO: el total no está en ninguna región viva');
+    // El hallazgo 2287 puso el ERROR en una región role="alert", y su comentario dice que esa
+    // región «no lee de paso el resultado». Pero el resultado tampoco tiene la suya: tras pulsar
+    // «Calcular» el foco se queda en el botón y el total aparece en un <div> sin aria-live ni
+    // role="status", así que el lector de pantalla no dice nada (WCAG 4.1.3, mensajes de
+    // estado). Esperado: el total, dentro de una región role="status" o aria-live.
+    await abrirHidratada(page);
+    await calcularFormula(page, 'H2O');
+    const total = page.locator('[class*="_masaTotal"]');
+    await expect(total).toContainText('18,0150 g/mol');
+    const enRegionViva = await total.evaluate((el) =>
+      Boolean(el.closest('[aria-live], [role="status"], [role="alert"]')),
+    );
+    expect(enRegionViva).toBe(true); // hoy: false
   });
 });
