@@ -1429,7 +1429,7 @@ export default function SimuladorTrigonometriaCirculoUnitario() {
           <p className={styles.hojaDatos}>
             {modoCompleto === 'blanco'
               ? 'Escribe cada ángulo en radianes y las coordenadas (cos θ, sen θ) de su punto, con su valor exacto.'
-              : 'Cada punto es (cos θ, sen θ). Ángulos en grados por fuera del número en radianes.'}
+              : 'Cada punto es (cos θ, sen θ). El ángulo va en grados junto al punto y en radianes más hacia el centro.'}
           </p>
           <CirculoCompleto conValores={modoCompleto === 'valores'} />
         </div>
