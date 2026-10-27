@@ -61,6 +61,7 @@ import {
   COMPLEMENTO_BRECHA_GENERO_2026,
   COMPLEMENTO_BRECHA_GENERO_META,
   COMPLEMENTO_MATERNIDAD_DEROGADO,
+  EFECTOS_COMPLEMENTO_BRECHA_RECONOCIDO_A_ELLA,
 } from '@/data/fiscal';
 import { formatFechaLarga, formatNumber } from '@/lib/formatters';
 
@@ -176,6 +177,20 @@ export const PASO_SOLICITUD_CONCURRENCIA =
   'mientras lo cobra el otro progenitor, no se te reconoce de oficio.';
 export const PASO_EXTINCION =
   `${conCita(CONCURRENCIA.extincion.detalle, CONCURRENCIA.extincion.norma)} ${CONCURRENCIA.extincion.efectos}`;
+
+/**
+ * Hallazgo 3536 (cabo C0285): con la suma de la madre menor, al hombre le queda el periodo de la
+ * instrucción 2, párrafo segundo, del Criterio 11/2025 si a ella se le reconoció antes de la
+ * fecha de la STJUE (`fechaCorte`, leída del módulo). Lo dicen igual la web y la tool del MCP.
+ */
+const RECONOCIDO_A_ELLA = EFECTOS_COMPLEMENTO_BRECHA_RECONOCIDO_A_ELLA;
+export const MOTIVO_PERIODO_RECONOCIDO_A_ELLA =
+  `Pero si a ella se le reconoció el complemento antes del ${formatFechaLarga(RECONOCIDO_A_ELLA.fechaCorte)}, ` +
+  'a ti te corresponde por el periodo que va desde el hecho causante de tu pensión hasta el día ' +
+  `primero del mes siguiente al de ese reconocimiento (${RECONOCIDO_A_ELLA.criterio}, ${RECONOCIDO_A_ELLA.instruccion}).`;
+export const PASO_PERIODO_RECONOCIDO_A_ELLA =
+  `Si a ella se le reconoció antes del ${formatFechaLarga(RECONOCIDO_A_ELLA.fechaCorte)}, solicita ante el INSS ` +
+  'el complemento por ese periodo citando el art. 60 LGSS y ese criterio: la fecha de su reconocimiento figura en su resolución.';
 
 /**
  * Los requisitos del art. 60 LGSS que esta calculadora evalúa DE VERDAD, enumerados una
@@ -432,9 +447,12 @@ export function calcularComplementoBrechaGenero(
   // incompatibilidad (hallazgo 2239): decide qué suma de pensiones públicas es menor.
   const concurrePropia = otroProgenitor === 'percibe' && sumaPensionesMenor === 'propia';
   if (otroProgenitor === 'percibe' && sumaPensionesMenor === 'otro_progenitor') {
+    // Hallazgo 3536 (cabo C0285): al hombre le queda un periodo si a ella se le reconoció antes
+    // de la fecha de la STJUE. Sin esta frase, la tool daba ese periodo por no debido.
+    const esHombre = p.sexo === 'hombre';
     return noProcede(
-      `${REGLA_CONCURRENCIA} El otro progenitor ya lo percibe por los mismos hijos y su suma de pensiones públicas es menor que la tuya, así que le corresponde a él o a ella.`,
-      `Comprueba la comparación. ${COMO_SE_COMPARA} Si en realidad tu suma es la menor, puedes solicitarlo.`,
+      `${REGLA_CONCURRENCIA} El otro progenitor ya lo percibe por los mismos hijos y su suma de pensiones públicas es menor que la tuya, así que le corresponde a él o a ella.${esHombre ? ` ${MOTIVO_PERIODO_RECONOCIDO_A_ELLA}` : ''}`,
+      `Comprueba la comparación. ${COMO_SE_COMPARA} Si en realidad tu suma es la menor, puedes solicitarlo.${esHombre ? ` ${PASO_PERIODO_RECONOCIDO_A_ELLA}` : ''}`,
       [COMPLEMENTO_BRECHA_GENERO_META.nota],
     );
   }

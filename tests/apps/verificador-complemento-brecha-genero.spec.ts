@@ -5139,7 +5139,7 @@ test.describe('inspector 26/10/2026', () => {
   });
 
   /**
-   * ABIERTO, hallazgo (inspector 26/10/2026) — ALTO (cálculo). Cabo C0285. Hombre · jubilación
+   * REPARADO el 27/10/2026, hallazgo (inspector 26/10/2026) — ALTO (cálculo). Cabo C0285. Hombre · jubilación
    * desde el 4-feb-2021 · 2 hijos · el otro progenitor ya lo percibe y su suma de pensiones es la
    * menor. Por la instrucción 2, párrafo segundo, del Criterio 11/2025 (cita en la cabecera del
    * bloque), si a la madre se le reconoció antes del 15/05/2025 al padre le corresponde el
@@ -5150,7 +5150,7 @@ test.describe('inspector 26/10/2026', () => {
    * el periodo vale, con el método de atrasos.ts, 10 × 65,33 + 6 × 70,93 = 653,33 + 425,60 =
    * 1078,93 € que la app da por no debidos.
    */
-  test.fail('C0285 (web): con la suma de la madre menor, el veredicto avisa del periodo de la instrucción 2', async ({
+  test('REPARADO (3536) C0285 (web): con la suma de la madre menor, el veredicto avisa del periodo de la instrucción 2', async ({
     page,
   }) => {
     await responder06(page, {
@@ -5165,10 +5165,13 @@ test.describe('inspector 26/10/2026', () => {
     expect(resultado).toContain('Resultado orientativo'); // control: el veredicto está pintado
     // «antes del / anterior al 15 de mayo de 2025»: no casa con «STJUE de 15 de mayo de 2025»
     expect(resultado).toMatch(/(antes del|anterior al) (15 de mayo de 2025|15\/05\/2025)/);
+    expect(resultado).toContain('instrucción 2, párrafo segundo');
+    // Y la nota de que aquí no se calculan los atrasos de la instrucción 2, que antes no salía
+    await expect(page.getByText(/Aquí no se calculan los atrasos: cuando el otro progenitor ya lo cobra/)).toBeVisible();
   });
 
-  /** ABIERTO, hallazgo (inspector 26/10/2026) — el mismo C0285 por la tool del MCP (gemelo). */
-  test.fail('C0285 (MCP): con la suma de la madre menor, la tool avisa del periodo de la instrucción 2', async ({
+  /** REPARADO el 27/10/2026, hallazgo (inspector 26/10/2026) — el mismo C0285 por la tool del MCP (gemelo). */
+  test('REPARADO (3536) C0285 (MCP): con la suma de la madre menor, la tool avisa del periodo de la instrucción 2', async ({
     request,
   }) => {
     const mcp = await porMcpDelegum(request, {
@@ -5184,7 +5187,7 @@ test.describe('inspector 26/10/2026', () => {
   });
 
   /**
-   * ABIERTO, hallazgo (inspector 26/10/2026) — MEDIO (cálculo). Con la P5 en «Lo solicitó y se lo
+   * REPARADO el 27/10/2026, hallazgo (inspector 26/10/2026) — MEDIO (cálculo). Con la P5 en «Lo solicitó y se lo
    * denegaron» (el otro progenitor SÍ lo solicitó), la página monta los atrasos y publica un total
    * bajo la cita de la instrucción 1, «para un hombre sin solicitud ni reconocimiento previo del
    * complemento al otro progenitor». Su supuesto es el contrario: con solicitud del otro rige la
@@ -5195,7 +5198,7 @@ test.describe('inspector 26/10/2026', () => {
    * 929,60 + 1005,20 + … € de atrasos. Correcto: sin total bajo esa cita (o con una cita que cubra
    * el caso).
    */
-  test.fail('el otro progenitor lo solicitó: no se publican atrasos bajo la cita «sin solicitud» de la instrucción 1', async ({
+  test('REPARADO (3538) el otro progenitor lo solicitó: no se publican atrasos bajo la cita «sin solicitud» de la instrucción 1', async ({
     page,
   }) => {
     await responder06(page, {
@@ -5213,17 +5216,20 @@ test.describe('inspector 26/10/2026', () => {
     }
     const totalBajoLaCita = t.includes('Atrasos hasta hoy') && t.includes('sin solicitud ni reconocimiento previo');
     expect(totalBajoLaCita).toBe(false);
+    // La reparación: sin bloque de atrasos, y la nota de la instrucción 2 dice por qué
+    await expect(campoFechaEfectos(page)).toHaveCount(0);
+    await expect(page.getByText(/Aquí no se calculan los atrasos: cuando el otro progenitor también lo solicitó/)).toBeVisible();
   });
 
   /**
-   * ABIERTO, hallazgo (inspector 26/10/2026) — ALTO (operativa). Página traducida (cabo C0243):
+   * REPARADO el 27/10/2026, hallazgo (inspector 26/10/2026) — ALTO (operativa). Página traducida (cabo C0243):
    * con un aviso de fecha en pantalla («Esa fecha es anterior…»), vaciar o editar el campo de la
    * fecha de efectos —un date a medio escribir vale ''— tumba la app: NotFoundError en
    * removeChild y «Algo salió mal». El <p> del aviso tiene tres hijos (el ⚠️, un espacio y el
    * texto) y el de «Escribe la fecha…» uno solo: al pasar del uno al otro React retira dos nodos
    * de texto que el traductor ya cambió por <font>. Medido el 26/10/2026.
    */
-  test.fail('página traducida: vaciar la fecha de efectos tras un aviso no tumba la app', async ({ page }) => {
+  test('REPARADO (3537) página traducida: vaciar la fecha de efectos tras un aviso no tumba la app', async ({ page }) => {
     const errores = vigilarErroresDeNodo(page);
     await hombreConAtrasos(page);
     await campoFechaEfectos(page).fill('2021-01-15');
@@ -5236,12 +5242,12 @@ test.describe('inspector 26/10/2026', () => {
   });
 
   /**
-   * ABIERTO, hallazgo (inspector 26/10/2026) — BAJO (operativa). Página traducida: tres avisos con
+   * REPARADO el 27/10/2026, hallazgo (inspector 26/10/2026) — BAJO (operativa). Página traducida: tres avisos con
    * la forma `<span>⚠️</span> {texto}` se quedan con el texto ANTERIOR, porque React escribe en el
    * nodo que el traductor retiró. Atrasos: «Esa fecha es anterior al 4 de febrero de 2021» sigue
    * ahí con una fecha posterior a hoy.
    */
-  test.fail('página traducida: el aviso de la fecha de efectos dice el error de la fecha escrita', async ({ page }) => {
+  test('REPARADO (3539) página traducida: el aviso de la fecha de efectos dice el error de la fecha escrita', async ({ page }) => {
     await hombreConAtrasos(page);
     await campoFechaEfectos(page).fill('2021-01-15');
     await expect(page.getByText(/Esa fecha es anterior al 4 de febrero de 2021/)).toBeVisible();
@@ -5252,8 +5258,8 @@ test.describe('inspector 26/10/2026', () => {
     expect(t).not.toContain('Esa fecha es anterior');
   });
 
-  /** ABIERTO, hallazgo (inspector 26/10/2026) — el mismo: el aviso de la prorrata se queda con «0». */
-  test.fail('página traducida: el aviso de la prorrata nombra el valor escrito, no el anterior', async ({ page }) => {
+  /** REPARADO el 27/10/2026, hallazgo (inspector 26/10/2026) — el mismo: el aviso de la prorrata se queda con «0». */
+  test('REPARADO (3539) página traducida: el aviso de la prorrata nombra el valor escrito, no el anterior', async ({ page }) => {
     await elegir(page, 'Sí, a prorrata (totalización internacional)');
     const aviso = page.locator('#prorrata ~ p[role="alert"]');
     await page.locator('#prorrata').fill('0');
@@ -5263,8 +5269,8 @@ test.describe('inspector 26/10/2026', () => {
     await expect(aviso).toContainText('«-25» está fuera de rango');
   });
 
-  /** ABIERTO, hallazgo (inspector 26/10/2026) — el mismo: el aviso de hijos no pasa a «supera el tope». */
-  test.fail('página traducida: el aviso del número de hijos dice que 25 supera el tope', async ({ page }) => {
+  /** REPARADO el 27/10/2026, hallazgo (inspector 26/10/2026) — el mismo: el aviso de hijos no pasa a «supera el tope». */
+  test('REPARADO (3539) página traducida: el aviso del número de hijos dice que 25 supera el tope', async ({ page }) => {
     const aviso = page.locator('#hijos ~ p[role="alert"]');
     await page.locator('#hijos').fill('');
     await expect(aviso).toContainText('Escribe un número entero de hijos, de 0 a 20.');
@@ -5309,7 +5315,7 @@ test.describe('inspector 26/10/2026', () => {
   });
 
   /**
-   * ABIERTO, hallazgo (inspector 26/10/2026) — BAJO (dato). El sello del complemento dice «Art. 60
+   * REPARADO el 27/10/2026, hallazgo (inspector 26/10/2026) — BAJO (dato). El sello del complemento dice «Art. 60
    * LGSS (RDL 8/2015, modificado por RDL 3/2021) + RDL 3/2026». La LGSS es un Real Decreto
    * LEGISLATIVO —el Criterio 11/2025: «aprobado por el Real Decreto Legislativo 8/2015, de 30 de
    * octubre»; el propio módulo, en COMPLEMENTO_MATERNIDAD_DEROGADO.norma, «RDLeg 8/2015»—, y en el
@@ -5317,7 +5323,7 @@ test.describe('inspector 26/10/2026', () => {
    * es el vigente desde el 18/03/2023: el módulo dice que «solo lo modifican el RDL 3/2021 y el RDL
    * 2/2023», y el sello calla el segundo.
    */
-  test.fail('el sello del complemento cita la LGSS como RDLeg y la modificación del RDL 2/2023', async ({ page }) => {
+  test('REPARADO (3540) el sello del complemento cita la LGSS como RDLeg y la modificación del RDL 2/2023', async ({ page }) => {
     const fuente = COMPLEMENTO_BRECHA_GENERO_META.fuente;
     expect(normalizar(await page.locator('body').innerText())).toContain(fuente); // control: es lo que se pinta
     expect(fuente).not.toMatch(/RDL 8\/2015/);

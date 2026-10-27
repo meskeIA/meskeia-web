@@ -14,7 +14,8 @@
 import { SMI_2026 } from './smi';
 
 export const FISCAL_PENSIONES_META = {
-  fuente: 'LGSS (RDL 8/2015), arts. 209-210 y DT 9.ª + Ley 21/2021 de Reforma de Pensiones + RD 241/2026 (revalorización y cuantías mínimas 2026)',
+  // «RDLeg»: la LGSS es un Real Decreto Legislativo, no un Real Decreto-ley (hallazgo 3540, BOE-A-2015-11724)
+  fuente: 'LGSS (RDLeg 8/2015), arts. 209-210 y DT 9.ª + Ley 21/2021 de Reforma de Pensiones + RD 241/2026 (revalorización y cuantías mínimas 2026)',
   verificado: '2026-09-21',
   vigencia: '2026',
   urlOficial: 'https://www.seg-social.es/wps/portal/wss/internet/Pensionistas',
@@ -114,7 +115,7 @@ export const TRAMOS_PORCENTAJE_PENSION_2025: TramosPorcentajePension[] = [
  * cuantías y la revalorización de 2026, que no se reverificaron el día que se cotejó esto.
  */
 export const ESCALA_PORCENTAJE_PENSION_META = {
-  fuente: 'LGSS (RDL 8/2015), art. 210.1.b) y DT 9.ª, texto consolidado del BOE (última actualización publicada el 31/07/2026)',
+  fuente: 'LGSS (RDLeg 8/2015), art. 210.1.b) y DT 9.ª, texto consolidado del BOE (última actualización publicada el 31/07/2026)',
   verificado: '2026-09-30',
   urlOficial: 'https://www.boe.es/buscar/act.php?id=BOE-A-2015-11724#dtnovena',
 };
@@ -346,7 +347,7 @@ export const LIMITES_PLAN_PENSIONES_2025 = {
 //    cotizados (ver TABLA_EDAD_JUBILACION y edadMinimaJubilacionParcial()).
 
 export const JUBILACION_PARCIAL_META = {
-  fuente: 'LGSS (RDL 8/2015) arts. 215 y 216, en la redacción dada por el RDL 11/2024 (efectos desde 01/04/2025)',
+  fuente: 'LGSS (RDLeg 8/2015) arts. 215 y 216, en la redacción dada por el RDL 11/2024 (efectos desde 01/04/2025)',
   verificado: '2026-08-12',
   vigencia: '2026',
   urlOficial: 'https://www.seg-social.es/wps/portal/wss/internet/Pensionistas/Jubilacion',
@@ -658,7 +659,14 @@ export const RECLAMACION_PREVIA_SS_META = {
 };
 
 export const COMPLEMENTO_BRECHA_GENERO_META = {
-  fuente: 'Art. 60 LGSS (RDL 8/2015, modificado por RDL 3/2021) + RDL 3/2026',
+  /**
+   * Hallazgo 3540 (27/10/2026): decía «LGSS (RDL 8/2015, modificado por RDL 3/2021)». La LGSS la
+   * aprueba un Real Decreto LEGISLATIVO, no un Real Decreto-ley, y el art. 60 que aplica la app es
+   * el vigente desde el 18/03/2023. BOE-A-2015-11724, art. 60, consultado el 27/10/2026: «Se
+   * modifica el apartado 1 y se añade el 7 por el art. único.7 del Real Decreto-ley 2/2023, de 16
+   * de marzo» y «Se modifica por el art. 1.1 del Real Decreto-ley 3/2021, de 2 de febrero».
+   */
+  fuente: 'Art. 60 LGSS (RDLeg 8/2015, modificado por RDL 3/2021 y RDL 2/2023) + RDL 3/2026',
   verificado: '2026-05-13',
   vigencia: '2026',
   urlOficial: 'https://prestaciones.seg-social.es/servicio/complemento-brecha.html',
@@ -1094,6 +1102,22 @@ export const EFECTOS_COMPLEMENTO_BRECHA_VARONES = {
   cita: 'El reconocimiento del CRBG retrotraerá sus efectos económicos hasta la fecha de efectos económicos de la pensión a la que complementa.',
   supuesto: 'sin solicitud ni reconocimiento previo del complemento al otro progenitor',
   url: 'https://www.seg-social.es/wps/wcm/connect/wss/2a479841-e2e4-4ea4-ac44-8c9fbcaa89f9/CI+11-2025+Complemento+Brecha+de+G%C3%A9nero+CBG.pdf?MOD=AJPERES',
+} as const;
+
+/**
+ * El periodo que le queda al HOMBRE cuando a la madre se le reconoció antes del 15/05/2025 y su
+ * suma de pensiones es la menor (hallazgo 3536, cabo C0285). Criterio interpretativo 11/2025,
+ * instrucción 2, párrafo segundo, leído en el PDF oficial (`EFECTOS_COMPLEMENTO_BRECHA_VARONES.url`)
+ * el 27/10/2026. La web y el MCP contestaban «le corresponde a él o a ella» sin nombrar este
+ * periodo, que la app daba así por no debido.
+ */
+export const EFECTOS_COMPLEMENTO_BRECHA_RECONOCIDO_A_ELLA = {
+  criterio: EFECTOS_COMPLEMENTO_BRECHA_VARONES.criterio,
+  instruccion: 'instrucción 2, párrafo segundo',
+  /** Fecha de la STJUE: antes de ella, el complemento solo se reconocía a la madre */
+  fechaCorte: '2025-05-15',
+  cita: 'En aquellos supuestos en que se hubiera reconocido el derecho al complemento a la progenitora en fecha anterior al 15 de mayo de 2025, y la suma de las pensiones de aquella fuera de menor cuantía, únicamente se reconocerá al progenitor varón el derecho por el periodo que medie entre la fecha del hecho causante y el día primero del mes siguiente al del reconocimiento a la progenitora.',
+  url: EFECTOS_COMPLEMENTO_BRECHA_VARONES.url,
 } as const;
 
 /** Sello propio de la serie y del criterio de efectos: se verificaron juntos, y aparte de 2026 */

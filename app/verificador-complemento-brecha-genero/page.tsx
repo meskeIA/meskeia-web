@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useRef, useEffect } from 'react';
+import { Fragment, useState, useMemo, useRef, useEffect } from 'react';
 import type { KeyboardEvent } from 'react';
 import styles from './VerificadorComplementoBrechaGenero.module.css';
 import {
@@ -33,6 +33,8 @@ import {
   PASO_SOLICITUD_CONCURRENCIA,
   PASO_EXTINCION,
   PASO_MATERNIDAD_DEROGADO,
+  MOTIVO_PERIODO_RECONOCIDO_A_ELLA,
+  PASO_PERIODO_RECONOCIDO_A_ELLA,
 } from '@/lib/calculadoras/complementoBrechaGenero';
 
 /**
@@ -380,6 +382,9 @@ function evaluar(
    */
   const concurrenciaAFavor = otroProgenitor === 'percibe' && sumaMenor === 'propia';
   if (otroProgenitor === 'percibe' && sumaMenor === 'otro_progenitor') {
+    // Hallazgo 3536 (cabo C0285): al hombre le queda el periodo de la instrucción 2, párrafo
+    // segundo, si a ella se le reconoció antes de la fecha de la STJUE. Mismas frases que el motor del MCP.
+    const esHombre = genero === 'hombre';
     return {
       procede: false,
       hijosComputables,
@@ -387,9 +392,12 @@ function evaluar(
       importeAnual: 0,
       motivo:
         `${REGLA_CONCURRENCIA} El otro progenitor ya lo percibe por los mismos hijos y su suma de ` +
-        'pensiones públicas es menor que la tuya, así que le corresponde a él o a ella.',
+        'pensiones públicas es menor que la tuya, así que le corresponde a él o a ella.' +
+        (esHombre ? ` ${MOTIVO_PERIODO_RECONOCIDO_A_ELLA}` : ''),
       esReclamacion: false,
-      pasoSiguiente: `Comprueba la comparación. ${COMO_SE_COMPARA} Si en realidad tu suma es la menor, puedes solicitarlo.`,
+      pasoSiguiente:
+        `Comprueba la comparación. ${COMO_SE_COMPARA} Si en realidad tu suma es la menor, puedes solicitarlo.` +
+        (esHombre ? ` ${PASO_PERIODO_RECONOCIDO_A_ELLA}` : ''),
     };
   }
   if (otroProgenitor === 'percibe' && sumaMenor === 'desconocida') {
@@ -631,11 +639,19 @@ export default function VerificadorComplementoBrechaGeneroPage() {
    * las de la instrucción 2 y no se da cifra: se dice por qué.
    */
   const [fechaEfectos, setFechaEfectos] = useState<string>('');
+  // Hallazgo 3538: la condición era `otroProgenitor !== 'percibe'`, que dejaba pasar «Lo solicitó
+  // y se lo denegaron» y publicaba un total bajo la cita de la instrucción 1, cuyo supuesto es que
+  // NO medie solicitud del otro progenitor. Ahora solo sin solicitud o sin otro progenitor.
+  const sinSolicitudDelOtro = otroProgenitor === 'no_percibe' || otroProgenitor === 'no_aplica';
   const atrasosAplica =
-    evaluado && resultado.procede && genero === 'hombre' && fecha === 'desde_2021' && otroProgenitor !== 'percibe';
+    evaluado && resultado.procede && genero === 'hombre' && fecha === 'desde_2021' && sinSolicitudDelOtro;
+  // La nota de la instrucción 2 sale también cuando a ella le corresponde por tener la suma
+  // menor (hallazgo 3536: ahí queda el periodo de su párrafo segundo) y cuando el otro
+  // progenitor lo solicitó y se lo denegaron (hallazgo 3538).
   const atrasosNoCubre =
-    evaluado && (resultado.procede || resultado.condicionado) && genero === 'hombre' &&
-    fecha === 'desde_2021' && otroProgenitor === 'percibe';
+    evaluado && genero === 'hombre' && fecha === 'desde_2021' && !sinSolicitudDelOtro &&
+    (resultado.procede || resultado.condicionado ||
+      (otroProgenitor === 'percibe' && sumaMenor === 'otro_progenitor' && !resultado.sinCalcular));
   const ahora = new Date();
   const hoyISO = `${ahora.getFullYear()}-${String(ahora.getMonth() + 1).padStart(2, '0')}-${String(ahora.getDate()).padStart(2, '0')}`;
   const atrasos: ResultadoAtrasos | null =
@@ -798,9 +814,13 @@ export default function VerificadorComplementoBrechaGeneroPage() {
                   {prorrataTexto.trim() !== '' && !prorrataEsValida && (
                     <p className={styles.hint} role="alert">
                       <span aria-hidden="true">⚠️</span>{' '}
-                      {Number.isFinite(prorrataLeida)
-                        ? `«${prorrataTexto}» está fuera de rango: la prorrata es un porcentaje mayor que 0 y no mayor que 100.`
-                        : `Escribe un porcentaje mayor que 0 y no mayor que 100: «${prorrataTexto}» no se interpreta.`}
+                      {/* El texto variable, único hijo de su <span> (hallazgo 3539): suelto junto al
+                          emoji, con la página traducida se quedaba con el valor anterior */}
+                      <span>
+                        {Number.isFinite(prorrataLeida)
+                          ? `«${prorrataTexto}» está fuera de rango: la prorrata es un porcentaje mayor que 0 y no mayor que 100.`
+                          : `Escribe un porcentaje mayor que 0 y no mayor que 100: «${prorrataTexto}» no se interpreta.`}
+                      </span>
                     </p>
                   )}
                   <p className={styles.hint} id="prorrata-ayuda">
@@ -851,11 +871,15 @@ export default function VerificadorComplementoBrechaGeneroPage() {
             />
             {!hijosEsValido && (
               <p className={styles.hint} role="alert">
-                <span aria-hidden="true">⚠️</span> {hijosSuperaLimite
-                  ? `«${hijosTexto}» supera el tope de ${LIMITE_HIJOS_CAMPO} hijos de este campo: el cálculo no se hace.`
-                  : hijosTexto.trim() === ''
-                    ? `Escribe un número entero de hijos, de 0 a ${LIMITE_HIJOS_CAMPO}.`
-                    : `Escribe un número entero de hijos, de 0 a ${LIMITE_HIJOS_CAMPO}: «${hijosTexto}» no se interpreta.`}
+                <span aria-hidden="true">⚠️</span>{' '}
+                {/* Texto único de su <span> (hallazgo 3539) */}
+                <span>
+                  {hijosSuperaLimite
+                    ? `«${hijosTexto}» supera el tope de ${LIMITE_HIJOS_CAMPO} hijos de este campo: el cálculo no se hace.`
+                    : hijosTexto.trim() === ''
+                      ? `Escribe un número entero de hijos, de 0 a ${LIMITE_HIJOS_CAMPO}.`
+                      : `Escribe un número entero de hijos, de 0 a ${LIMITE_HIJOS_CAMPO}: «${hijosTexto}» no se interpreta.`}
+                </span>
               </p>
             )}
             <p className={styles.hint} id="hijos-ayuda">
@@ -1132,18 +1156,22 @@ export default function VerificadorComplementoBrechaGeneroPage() {
             </p>
           </div>
 
+          {/* Cada rama con su key y el error como texto único de su <span> (hallazgos 3537 y
+              3539): con la página traducida, al pasar del aviso de tres hijos al de uno React
+              retiraba textos que el traductor ya había cambiado por <font> y la app caía, y al
+              pasar de un error a otro el aviso se quedaba con el anterior. */}
           <div role="status" aria-live="polite">
             {atrasos === null ? (
-              <p className={styles.hint}>
+              <p key="sin-fecha" className={styles.hint}>
                 Escribe la fecha y se suman los atrasos año a año, cada uno con la cuantía que
                 tuvo ese año.
               </p>
             ) : !atrasos.ok ? (
-              <p className={styles.hint}>
-                <span aria-hidden="true">⚠️</span> {errorAtrasos(atrasos)}
+              <p key="error-fecha" className={styles.hint}>
+                <span aria-hidden="true">⚠️</span> <span>{errorAtrasos(atrasos)}</span>
               </p>
             ) : (
-              <>
+              <Fragment key="atrasos-tabla">
                 <div className={styles.tableWrapper}>
                   <table className={styles.comparativaTable}>
                     <caption className={styles.atrasosCaption}>
@@ -1188,7 +1216,7 @@ export default function VerificadorComplementoBrechaGeneroPage() {
                   tramo la cifra puede diferir de lo que pague el INSS en la parte de una paga extra.
                   Si ya cobraste el complemento en algún periodo, eso se descuenta.
                 </p>
-              </>
+              </Fragment>
             )}
           </div>
         </section>
@@ -1196,10 +1224,12 @@ export default function VerificadorComplementoBrechaGeneroPage() {
       {atrasosNoCubre && (
         <div className={`${styles.card} ${styles.atrasosCard}`}>
           <p className={styles.hint}>
-            <span aria-hidden="true">ℹ️</span> Aquí no se calculan los atrasos: cuando el otro
-            progenitor ya lo cobra, el {EFECTOS_COMPLEMENTO_BRECHA_VARONES.criterio} fija otras
-            fechas de efectos (su instrucción 2), que dependen de cuándo se le reconoció a él o a
-            ella.
+            <span aria-hidden="true">ℹ️</span>{' '}
+            <span>
+              {otroProgenitor === 'percibe'
+                ? `Aquí no se calculan los atrasos: cuando el otro progenitor ya lo cobra, el ${EFECTOS_COMPLEMENTO_BRECHA_VARONES.criterio} fija otras fechas de efectos (su instrucción 2), que dependen de cuándo se le reconoció a él o a ella.`
+                : `Aquí no se calculan los atrasos: cuando el otro progenitor también lo solicitó, el ${EFECTOS_COMPLEMENTO_BRECHA_VARONES.criterio} lo resuelve por su instrucción 2, que no fija las fechas de efectos de la instrucción 1; lo que se te deba lo decide la resolución del INSS.`}
+            </span>
           </p>
         </div>
       )}

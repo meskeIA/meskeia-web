@@ -21,7 +21,7 @@ import { BASES_SS_2026 } from './irpf';
 // ─── Metadatos del módulo ────────────────────────────────────────────────────
 
 export const FISCAL_MATERNIDAD_META = {
-  fuente: 'RDL 9/2025 (BOE-A-2025-15741) + LGSS arts. 177-182 (RDL 8/2015) + Ley 35/2006 IRPF art. 81, redacción del art. 64 de la Ley 31/2022 (BOE-A-2022-22128)',
+  fuente: 'RDL 9/2025 (BOE-A-2025-15741) + LGSS arts. 177-182 (RDLeg 8/2015) + Ley 35/2006 IRPF art. 81, redacción del art. 64 de la Ley 31/2022 (BOE-A-2022-22128)',
   verificado: '2026-08-13',
   vigencia: '2026',
   urlOficial: 'https://www.boe.es/buscar/act.php?id=BOE-A-2025-15741',
