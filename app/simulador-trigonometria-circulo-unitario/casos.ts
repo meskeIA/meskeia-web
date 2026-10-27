@@ -1029,3 +1029,85 @@ export function generarEjercicioAleatorio(semilla?: number): EjercicioAleatorio 
     pista: preparado.pista,
   };
 }
+
+// ============================================================
+// EL CÍRCULO COMPLETO — los 16 ángulos notables rotulados a la vez
+// ============================================================
+
+/**
+ * Fracción de π de cada ángulo notable. Vivía en `page.tsx`; se mudó aquí porque ahora la
+ * leen el panel de valores Y el círculo completo, y dos tablas podrían rotular el mismo
+ * ángulo de dos maneras.
+ */
+export const FRACCIONES_PI: Readonly<Record<number, string>> = {
+  0: '0', 30: 'π/6', 45: 'π/4', 60: 'π/3', 90: 'π/2',
+  120: '2π/3', 135: '3π/4', 150: '5π/6', 180: 'π',
+  210: '7π/6', 225: '5π/4', 240: '4π/3', 270: '3π/2',
+  300: '5π/3', 315: '7π/4', 330: '11π/6', 360: '2π',
+};
+
+/** Los 16 puntos de la vuelta: 360° es el mismo punto que 0° y no se dibuja dos veces. */
+export const ANGULOS_CIRCULO_COMPLETO: readonly number[] = [
+  0, 30, 45, 60, 90, 120, 135, 150, 180, 210, 225, 240, 270, 300, 315, 330,
+];
+
+/**
+ * Valor ABSOLUTO exacto de (cos, sen) en el primer cuadrante, por ángulo de referencia.
+ * Es lo único escrito a mano: sale de los triángulos 30-60-90 y 45-45-90 de la cabecera.
+ */
+const EXACTOS_REFERENCIA: Readonly<Record<number, { cos: string; sen: string }>> = {
+  0: { cos: '1', sen: '0' },
+  30: { cos: '√3/2', sen: '1/2' },
+  45: { cos: '√2/2', sen: '√2/2' },
+  60: { cos: '1/2', sen: '√3/2' },
+  90: { cos: '0', sen: '1' },
+};
+
+export interface PuntoNotable {
+  grados: number;
+  radianes: string;
+  /** Coordenada x del punto, exacta: «−√3/2», «0», «1/2»… */
+  cos: string;
+  /** Coordenada y del punto, exacta. */
+  sen: string;
+  /** «I» a «IV», o «—» sobre un eje (convenio 4 de la cabecera). */
+  cuadrante: string;
+}
+
+/**
+ * Pone el signo a una magnitud exacta. El signo NO se teclea por cuadrante: se lee del
+ * propio valor con `signoDe`, la misma función que rotula los signos en el panel, para que
+ * el círculo completo y el panel no puedan discrepar. El cero va sin signo (convenio 3).
+ */
+function conSigno(magnitud: string, valor: number): string {
+  const signo = signoDe(valor).clase;
+  if (signo === 'cero') return '0';
+  return signo === 'neg' ? `−${magnitud}` : magnitud;
+}
+
+/**
+ * El punto exacto de un ángulo notable: reduce al ángulo de referencia y le pone el signo
+ * del cuadrante. Devuelve `null` si el ángulo no es notable: este círculo solo rotula lo
+ * que tiene valor exacto, nunca una aproximación con aspecto de exacta (hallazgo 1618).
+ */
+export function puntoNotable(grados: number): PuntoNotable | null {
+  if (!Number.isFinite(grados)) return null;
+  const equivalente = anguloEquivalente(grados);
+  const referencia = anguloDeReferencia(equivalente);
+  const exacto = EXACTOS_REFERENCIA[referencia];
+  const radianes = FRACCIONES_PI[equivalente];
+  if (exacto === undefined || radianes === undefined) return null;
+  const rad = gradosARadianes(equivalente);
+  return {
+    grados: equivalente,
+    radianes,
+    cos: conSigno(exacto.cos, Math.cos(rad)),
+    sen: conSigno(exacto.sen, Math.sin(rad)),
+    cuadrante: obtenerCuadrante(equivalente),
+  };
+}
+
+/** Los 16 puntos, en orden antihorario desde 0°. */
+export const CIRCULO_COMPLETO: readonly PuntoNotable[] = ANGULOS_CIRCULO_COMPLETO.map(
+  g => puntoNotable(g) as PuntoNotable,
+);

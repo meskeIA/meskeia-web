@@ -1404,3 +1404,182 @@
     flex: 1 1 auto;
   }
 }
+
+/* ============================================
+   CÍRCULO COMPLETO (S0232) — los 16 notables rotulados y la hoja para rellenar
+============================================ */
+
+.completoSection {
+  margin-bottom: var(--spacing-xl);
+  padding: var(--spacing-xl);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  box-shadow: var(--shadow-md);
+}
+
+.completoControles {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+}
+
+.completoLienzo {
+  max-width: 760px;
+  margin: 0 auto;
+  /* En el móvil el círculo no encoge por debajo de lo legible: se desplaza dentro de su caja */
+  overflow-x: auto;
+}
+
+.completoSvg {
+  display: block;
+  width: 100%;
+  height: auto;
+  font-family: inherit;
+}
+
+/* Los rótulos llevan un halo del color del fondo: los radios pasan por debajo de ellos */
+.completoSvg text {
+  paint-order: stroke;
+  stroke: var(--bg-card);
+  stroke-width: 5px;
+  stroke-linejoin: round;
+}
+
+.ccCirculo {
+  fill: rgba(46, 134, 171, 0.07);
+  stroke: var(--primary);
+  stroke-width: 2;
+}
+
+.ccEje {
+  stroke: var(--text-secondary);
+  stroke-width: 1;
+}
+
+.ccRadio {
+  stroke: var(--border);
+  stroke-width: 1;
+}
+
+.ccPunto {
+  fill: var(--primary-boton);
+}
+
+.ccGrados {
+  font-size: 15px;
+  font-weight: 700;
+  fill: var(--text-primary);
+}
+
+.ccRadianes {
+  font-size: 14px;
+  font-weight: 600;
+  fill: var(--primary-texto);
+}
+
+.ccCoordenadas {
+  font-size: 14px;
+  font-weight: 600;
+  fill: var(--text-primary);
+}
+
+.ccCuadrante {
+  font-size: 22px;
+  font-weight: 700;
+  fill: var(--text-secondary);
+}
+
+.ccSignos {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* La hoja de impresión no se ve en pantalla */
+.hojaCirculo {
+  display: none;
+}
+
+[data-theme='dark'] .completoSection {
+  background: #2A2A2A;
+}
+
+[data-theme='dark'] .completoSvg text {
+  stroke: #2A2A2A;
+}
+
+[data-theme='dark'] .ccCirculo {
+  fill: rgba(127, 179, 211, 0.08);
+}
+
+@media (max-width: 768px) {
+  .completoSection {
+    padding: var(--spacing-lg) var(--spacing-md);
+  }
+
+  /* A 390 px el viewBox de 680 dejaba la letra en ~6 px; con 600 px de ancho mínimo queda en
+     ~12 px y el círculo se recorre deslizando. Solo en pantalla: la hoja impresa no vive aquí */
+  .completoLienzo .completoSvg {
+    min-width: 600px;
+  }
+}
+
+@media print {
+  .hojaCirculo {
+    display: block !important;
+  }
+
+  .hojaPagina {
+    text-align: center;
+  }
+
+  .hojaSolucionario {
+    break-before: page;
+    page-break-before: always;
+  }
+
+  .hojaTitulo {
+    font-size: 16pt;
+    font-weight: 700;
+    margin: 0 0 3mm;
+    color: #000000;
+  }
+
+  .hojaDatos {
+    font-size: 11pt;
+    margin: 0 0 5mm;
+    color: #000000;
+  }
+
+  .hojaCirculo .completoSvg {
+    width: 100%;
+    max-height: 225mm;
+  }
+
+  /* Papel: tinta negra y el halo blanco del papel */
+  .hojaCirculo .completoSvg text {
+    fill: #000000 !important;
+    stroke: #ffffff !important;
+  }
+
+  .hojaCirculo .ccCirculo {
+    fill: none !important;
+    stroke: #000000 !important;
+  }
+
+  .hojaCirculo .ccEje,
+  .hojaCirculo .ccRadio {
+    stroke: #000000 !important;
+  }
+
+  .hojaCirculo .ccRadio {
+    stroke-opacity: 0.25;
+  }
+
+  .hojaCirculo .ccPunto {
+    fill: #000000 !important;
+  }
+}

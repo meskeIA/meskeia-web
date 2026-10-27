@@ -775,6 +775,7 @@ test.describe('Simulador del Círculo Trigonométrico · casos para clase', () =
 // ═════════════════════════════════════════════════════════════════════════════════════════
 
 import { esperarHidratacion, esperarPaginaAsentada, sembrarValor } from './_hidratacion';
+import { activarTemaOscuro } from '../_contraste';
 import { parseSpanishNumber } from '../../lib/formatters';
 
 /**
@@ -1201,5 +1202,74 @@ test.describe('Re-inspección 25/09/2026 · H4 · formato del ángulo', () => {
     const veredicto = panel.locator('article p[role="alert"]');
     await expect(veredicto).toContainText('Correcto');
     await expect(veredicto).toContainText('Correcto: 30°.', { timeout: 1500 });
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────────────────
+// S0232 (27/10/2026) · CÍRCULO COMPLETO — los 16 notables rotulados y la hoja para rellenar
+// ─────────────────────────────────────────────────────────────────────────────────────────
+//
+// Quien busca «círculo trigonométrico» a secas (609 impresiones y 2 clics en 90 días) busca
+// el círculo entero rotulado, y la app solo pintaba los notables como puntos sin etiqueta.
+// Los valores exactos los fija tests/circulo-completo-motor.spec.ts con la tabla a mano; aquí
+// se comprueba que llegan a la pantalla y al papel.
+
+test.describe('S0232 · círculo trigonométrico completo', () => {
+  const seccion = (page: Page) => page.locator('section[aria-labelledby="titulo-completo"]');
+  const rotulos = (page: Page) => seccion(page).locator('svg text');
+
+  test('con valores: los 16 puntos con sus grados, radianes y coordenadas exactas', async ({ page }) => {
+    await page.goto(RUTA);
+    const textos = await rotulos(page).allTextContents();
+    // Una fila de cada cuadrante y de dos ejes, copiadas del círculo del libro
+    for (const esperado of ['150°', '5π/6', '(−√3/2, 1/2)', '(0, −1)', '(−1, 0)', '11π/6', '(√3/2, −1/2)', '(−√2/2, −√2/2)']) {
+      expect(textos, esperado).toContain(esperado);
+    }
+    expect(textos.filter(t => /^\(.*\)$/.test(t) && t.includes(','))).toHaveLength(16); // los signos de cuadrante van en un tspan dentro de «I», «II»…
+    expect(textos.join(' ')).not.toMatch(/−0\b|NaN|undefined/);
+  });
+
+  test('en blanco: grados a la vista y huecos donde iban radianes y coordenadas', async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#slider-angulo']);
+    const enBlanco = seccion(page).getByRole('button', { name: 'En blanco, para rellenar' });
+    await enBlanco.click();
+    await expect(enBlanco).toHaveAttribute('aria-pressed', 'true');
+    const textos = await rotulos(page).allTextContents();
+    expect(textos).toContain('210°');
+    expect(textos.join(' ')).not.toContain('√');
+    expect(textos.join(' ')).not.toContain('π');
+    expect(textos.filter(t => t === '( ____ , ____ )')).toHaveLength(16);
+  });
+
+  test('al imprimir en blanco sale solo la hoja y, en página aparte, el solucionario', async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#slider-angulo']);
+    await seccion(page).getByRole('button', { name: 'En blanco, para rellenar' }).click();
+    await page.emulateMedia({ media: 'print' });
+    const hoja = page.locator('[data-hoja-circulo]');
+    await expect(hoja).toBeVisible();
+    await expect(page.locator('h1')).toBeHidden();
+    await expect(seccion(page)).toBeHidden();
+    const svgs = hoja.locator('svg');
+    await expect(svgs).toHaveCount(2);
+    await expect(svgs.nth(0).locator('text', { hasText: '√' })).toHaveCount(0);
+    await expect(svgs.nth(1).locator('text', { hasText: '(−√3/2, −1/2)' })).toHaveCount(1);
+    await page.emulateMedia({ media: 'screen' });
+    await expect(hoja).toBeHidden();
+  });
+
+  test('en oscuro los rótulos no se quedan en tinta oscura sobre fondo oscuro', async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#slider-angulo']);
+    // Con el botón de tema y no sembrando data-theme: el tema de la app lo reescribía al
+    // terminar de montar y la prueba medía el claro la mitad de las veces.
+    await activarTemaOscuro(page);
+    const luminancia = async () => {
+      const relleno = await rotulos(page).filter({ hasText: '150°' }).evaluate(el => getComputedStyle(el).fill);
+      const [r, g, b] = (relleno.match(/\d+/g) ?? []).map(Number);
+      return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+    };
+    await expect.poll(luminancia, { timeout: 2000, message: 'rótulo claro sobre fondo oscuro' }).toBeGreaterThan(160);
   });
 });

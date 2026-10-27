@@ -3,7 +3,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Simulador del Círculo Trigonométrico — Seno, Coseno y Tangente Interactivos | meskeIA',
-  description: 'Visualiza el círculo unitario en tiempo real: mueve el ángulo y observa seno, coseno y tangente con proyecciones geométricas animadas. Con ángulos notables y animación automática.',
+  description: 'Visualiza el círculo unitario en tiempo real: mueve el ángulo y observa seno, coseno y tangente con proyecciones geométricas animadas. Y el círculo completo con los 16 ángulos notables y sus valores exactos, también en blanco para imprimir y rellenar.',
   keywords: 'trigonometría, círculo unitario, seno, coseno, tangente, ángulos notables, radián, grados, círculo trigonométrico, Bachillerato, matemáticas, geometría',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: 'Simulador del Círculo Trigonométrico',
-  description: 'Simulador interactivo del círculo unitario trigonométrico. Mueve el ángulo θ con un slider o activa la animación automática para ver seno, coseno y tangente con proyecciones geométricas en tiempo real. Incluye ángulos notables, cuadrantes, identidad pitagórica y conversión grados/radianes.',
+  description: 'Simulador interactivo del círculo unitario trigonométrico. Mueve el ángulo θ con un slider o activa la animación automática para ver seno, coseno y tangente con proyecciones geométricas en tiempo real. Incluye ángulos notables, cuadrantes, identidad pitagórica, conversión grados/radianes y el círculo trigonométrico completo, imprimible en blanco con su solucionario.',
   url: 'https://meskeia.com/simulador-trigonometria-circulo-unitario/',
   category: 'EducationalApplication',
   features: [
@@ -48,6 +48,8 @@ export const jsonLd = generateWebAppSchema({
     'Botones de acceso rápido a ángulos notables (0°, 30°, 45°, 60°, 90°...)',
     'Panel de valores numéricos con 4 decimales e identidad sin²+cos²=1',
     'Indicador de cuadrante activo',
+    'Círculo trigonométrico completo: los 16 ángulos notables en grados y radianes con sus coordenadas exactas (cos θ, sen θ)',
+    'Hoja imprimible del círculo en blanco para rellenar, con solucionario en página aparte',
     'Soporte completo de dark mode y pantallas Retina/HiDPI',
     'Gratuito, sin registro, en español',
   ],

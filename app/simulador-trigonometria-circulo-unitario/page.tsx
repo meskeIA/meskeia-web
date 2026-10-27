@@ -3,6 +3,7 @@
 
 import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import styles from './SimuladorTrigonometriaCirculoUnitario.module.css';
+import impresion from '@/styles/impresion.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { parseSpanishNumber } from '@/lib';
 // La aritmética de esta página vive en `casos.ts`, fuera de la vista: el build compila el
@@ -13,6 +14,8 @@ import { parseSpanishNumber } from '@/lib';
 // ella misma produce. La cabecera de `casos.ts` deja el convenio por escrito.
 import {
   CASOS,
+  CIRCULO_COMPLETO,
+  FRACCIONES_PI,
   TOTAL_CASOS,
   calcularTangente,
   comprobarRespuesta,
@@ -30,6 +33,7 @@ import {
   textoVeredicto,
   type Comprobacion,
   type EjercicioAleatorio,
+  type PuntoNotable,
 } from './casos';
 
 // ============================================
@@ -77,6 +81,21 @@ export default function SimuladorTrigonometriaCirculoUnitario() {
   const [avisoAngulo, setAvisoAngulo] = useState('');
 
   const enRadianes = unidad === 'radianes';
+
+  /**
+   * El círculo completo se ve CON sus valores o EN BLANCO para rellenar (S0232). Quien busca
+   * «círculo trigonométrico» a secas no busca mover un ángulo: busca el círculo entero
+   * rotulado, y el simulador solo pintaba los notables como puntos sin etiqueta.
+   */
+  const [modoCompleto, setModoCompleto] = useState<'valores' | 'blanco'>('valores');
+  const lienzoCompletoRef = useRef<HTMLDivElement>(null);
+
+  // En el móvil el círculo es más ancho que la pantalla y se desliza dentro de su caja: se
+  // empieza por el centro, que es donde están 90° y 270°, y no solo por la mitad izquierda.
+  useEffect(() => {
+    const caja = lienzoCompletoRef.current;
+    if (caja) caja.scrollLeft = (caja.scrollWidth - caja.clientWidth) / 2;
+  }, []);
 
   /**
    * Escribe en el campo y, si lo escrito es un ángulo del rango, lo aplica.
@@ -416,23 +435,17 @@ export default function SimuladorTrigonometriaCirculoUnitario() {
   const cosVal = Math.cos(rad);
   const cuadrante = obtenerCuadrante(angulo);
 
-  const fracciones: Record<number, string> = {
-    0: '0', 30: 'π/6', 45: 'π/4', 60: 'π/3', 90: 'π/2',
-    120: '2π/3', 135: '3π/4', 150: '5π/6', 180: 'π',
-    210: '7π/6', 225: '5π/4', 240: '4π/3', 270: '3π/2',
-    300: '5π/3', 315: '7π/4', 330: '11π/6', 360: '2π',
-  };
   /**
    * La fracción de π solo se rotula cuando el ángulo ES el notable, no cuando está cerca.
    *
-   * Con `fracciones[Math.round(angulo)]` todo ángulo a menos de medio grado de un notable
+   * Con `FRACCIONES_PI[Math.round(angulo)]` todo ángulo a menos de medio grado de un notable
    * salía con la fracción EXACTA: 1,5708 rad se rotulaba «π/2» junto a tan = −272.241,8084
    * (la tangente que la app enseña que no existe en π/2), y 29,6° salía «π/6» siendo
    * 0,5166 rad (hallazgo 1618). El margen de 1e-9 solo absorbe el ruido de coma flotante.
    */
   const anguloEntero = Math.round(angulo);
   const esNotableExacto = Math.abs(angulo - anguloEntero) < 1e-9;
-  const fraccionRad = (esNotableExacto ? fracciones[anguloEntero] : undefined)
+  const fraccionRad = (esNotableExacto ? FRACCIONES_PI[anguloEntero] : undefined)
     ?? `${formatearNumero(rad)} rad`;
   const anguloGradosTexto = formatearGrados(angulo);
 
@@ -536,7 +549,8 @@ export default function SimuladorTrigonometriaCirculoUnitario() {
   // ============================================
 
   return (
-    <div className={styles.container}>
+    <div className={`${styles.container} ${impresion.lienzo}`}>
+      <div className={impresion.noImprimir}>
       <MeskeiaLogo />
 
       <header className={styles.hero}>
@@ -765,6 +779,49 @@ export default function SimuladorTrigonometriaCirculoUnitario() {
           </div>
         )}
       </div>
+
+      {/* ============================================
+          CÍRCULO COMPLETO — los 16 notables a la vez, y la hoja para rellenar
+          ============================================ */}
+      <section className={styles.completoSection} aria-labelledby="titulo-completo">
+        <h2 id="titulo-completo" className={styles.aulaTitulo}>
+          <span aria-hidden="true">⭕</span> Círculo trigonométrico completo
+        </h2>
+        <p className={styles.aulaIntro}>
+          Los 16 ángulos notables de la vuelta a la vez, cada uno en grados y en radianes y con
+          las coordenadas exactas de su punto, que son (cos θ, sen θ). En blanco sale la misma
+          hoja con los huecos para rellenar; al imprimirla, el solucionario va en una segunda página.
+        </p>
+
+        <div className={styles.completoControles}>
+          <div className={styles.unitToggle} role="group" aria-label="Qué muestra el círculo completo">
+            <button
+              type="button"
+              className={`${styles.unitBtn} ${modoCompleto === 'valores' ? styles.unitBtnActive : ''}`}
+              onClick={() => setModoCompleto('valores')}
+              aria-pressed={modoCompleto === 'valores'}
+            >
+              Con los valores
+            </button>
+            <button
+              type="button"
+              className={`${styles.unitBtn} ${modoCompleto === 'blanco' ? styles.unitBtnActive : ''}`}
+              onClick={() => setModoCompleto('blanco')}
+              aria-pressed={modoCompleto === 'blanco'}
+            >
+              En blanco, para rellenar
+            </button>
+          </div>
+          <button type="button" className={styles.aulaBtnPrimario} onClick={() => window.print()}>
+            <span aria-hidden="true">🖨️</span>{' '}
+            {modoCompleto === 'blanco' ? 'Imprimir hoja y solucionario' : 'Imprimir el círculo'}
+          </button>
+        </div>
+
+        <div className={styles.completoLienzo} ref={lienzoCompletoRef}>
+          <CirculoCompleto conValores={modoCompleto === 'valores'} />
+        </div>
+      </section>
 
       {/* ============================================
           CASOS DE AULA — 12 casos numerados y asignables
@@ -1360,6 +1417,119 @@ export default function SimuladorTrigonometriaCirculoUnitario() {
       <RelatedApps />
       <ShareCard appName="simulador-trigonometria-circulo-unitario" />
       <Footer appName="simulador-trigonometria-circulo-unitario" />
+      </div>
+
+      {/* Única parte que sale por la impresora (ver styles/impresion.module.css). En blanco
+          lleva detrás su solucionario, en página aparte, para que la hoja se pueda repartir. */}
+      <div className={`${styles.hojaCirculo} ${impresion.hoja}`} data-hoja-circulo="">
+        <div className={`${styles.hojaPagina} ${impresion.bloque}`}>
+          <h2 className={styles.hojaTitulo}>
+            Círculo trigonométrico{modoCompleto === 'blanco' ? ': complétalo' : ' completo'}
+          </h2>
+          <p className={styles.hojaDatos}>
+            {modoCompleto === 'blanco'
+              ? 'Escribe cada ángulo en radianes y las coordenadas (cos θ, sen θ) de su punto, con su valor exacto.'
+              : 'Cada punto es (cos θ, sen θ). Ángulos en grados por fuera del número en radianes.'}
+          </p>
+          <CirculoCompleto conValores={modoCompleto === 'valores'} />
+        </div>
+        {modoCompleto === 'blanco' && (
+          <div className={`${styles.hojaPagina} ${styles.hojaSolucionario} ${impresion.bloque}`}>
+            <h2 className={styles.hojaTitulo}>Círculo trigonométrico: solucionario</h2>
+            <CirculoCompleto conValores />
+          </div>
+        )}
+      </div>
     </div>
+  );
+}
+
+// ============================================
+// CÍRCULO COMPLETO (SVG)
+// Vectorial y no canvas: se imprime nítido a cualquier tamaño, y el texto de los rótulos
+// llega al lector de pantalla por el aria-label.
+// ============================================
+
+/** Radio del círculo en unidades del viewBox; el resto de distancias cuelgan de él. */
+const R = 200;
+const HUECO = '____';
+
+/** Texto de las coordenadas de un punto, o los huecos para rellenarlas. */
+function coordenadas(p: PuntoNotable, conValores: boolean): string {
+  return conValores ? `(${p.cos}, ${p.sen})` : `( ${HUECO} , ${HUECO} )`;
+}
+
+function CirculoCompleto({ conValores }: { conValores: boolean }) {
+  const descripcion = conValores
+    ? `Círculo trigonométrico completo. ${CIRCULO_COMPLETO.map(
+        p => `${p.grados}°, ${p.radianes} radianes: ${coordenadas(p, true)}`,
+      ).join('; ')}.`
+    : 'Círculo trigonométrico en blanco: los 16 ángulos notables en grados, con huecos para escribir los radianes y las coordenadas de cada punto.';
+
+  // Signos de (cos, sen) por cuadrante, en el centro de cada uno: es la otra mitad de lo
+  // que se busca como «círculo goniométrico signos».
+  const cuadrantes = [
+    { nombre: 'I', x: 1, y: 1, signos: '(+, +)' },
+    { nombre: 'II', x: -1, y: 1, signos: '(−, +)' },
+    { nombre: 'III', x: -1, y: -1, signos: '(−, −)' },
+    { nombre: 'IV', x: 1, y: -1, signos: '(+, −)' },
+  ];
+
+  return (
+    <svg
+      className={styles.completoSvg}
+      viewBox="-340 -262 680 524"
+      role="img"
+      aria-label={descripcion}
+    >
+      <circle cx={0} cy={0} r={R} className={styles.ccCirculo} />
+      {/* Los ejes acaban justo después del círculo: más largos cruzaban los rótulos de
+          (1, 0), (0, 1), (−1, 0) y (0, −1) por en medio */}
+      <line x1={-R - 6} y1={0} x2={R + 6} y2={0} className={styles.ccEje} />
+      <line x1={0} y1={-R - 6} x2={0} y2={R + 6} className={styles.ccEje} />
+
+      {CIRCULO_COMPLETO.map(p => {
+        const rad = (p.grados * Math.PI) / 180;
+        const dx = Math.cos(rad);
+        const dy = -Math.sin(rad);
+        // A centésimas: el seno del servidor y el del navegador difieren en la última cifra
+        // (173.20508075688767 frente a 173.2050807568877) y React lo da por desajuste al hidratar.
+        const en = (r: number) => ({ x: Math.round(r * dx * 100) / 100, y: Math.round(r * dy * 100) / 100 });
+        const punto = en(R);
+        const grados = en(R - 24);
+        const radianes = en(R - 52);
+        const fuera = en(R + 12);
+        // El rótulo exterior se apoya en el punto hacia fuera: a la derecha empieza en él,
+        // a la izquierda acaba en él, y arriba o abajo queda centrado.
+        const ancla = dx > 0.01 ? 'start' : dx < -0.01 ? 'end' : 'middle';
+        const bajada = dy < -0.01 ? -4 : dy > 0.01 ? 15 : 5;
+        // Sobre el eje horizontal el hueco de los radianes (una raya) se confundía con el eje
+        const subidaRadianes = Math.abs(dy) < 0.01 ? -8 : 4;
+        return (
+          <g key={p.grados}>
+            <line x1={0} y1={0} x2={punto.x} y2={punto.y} className={styles.ccRadio} />
+            <circle cx={punto.x} cy={punto.y} r={4.5} className={styles.ccPunto} />
+            <text x={grados.x} y={grados.y} dy={4} textAnchor="middle" className={styles.ccGrados}>
+              {p.grados}°
+            </text>
+            <text x={radianes.x} y={radianes.y} dy={subidaRadianes} textAnchor="middle" className={styles.ccRadianes}>
+              {conValores ? p.radianes : HUECO}
+            </text>
+            <text x={fuera.x} y={fuera.y} dy={bajada} textAnchor={ancla} className={styles.ccCoordenadas}>
+              {coordenadas(p, conValores)}
+            </text>
+          </g>
+        );
+      })}
+
+      {/* Al final, para quedar por encima de los radios, y cerca del centro: en mitad del
+          cuadrante pisaban los radianes de 45°, 135°, 225° y 315° */}
+      {cuadrantes.map(c => (
+        <text key={c.nombre} x={c.x * 46} y={-c.y * 46} textAnchor="middle" className={styles.ccCuadrante}>
+          <tspan x={c.x * 46} dy={conValores ? -4 : 8}>{c.nombre}</tspan>
+          {conValores && <tspan x={c.x * 46} dy={22} className={styles.ccSignos}>{c.signos}</tspan>}
+        </text>
+      ))}
+    </svg>
   );
 }
