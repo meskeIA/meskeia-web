@@ -3162,16 +3162,27 @@ test.describe('re-inspección 27/10/2026', () => {
   // simples. El ejemplo literal da la misma celda para las tres grafías. Ojo: «Son las 18.56» es otro
   // caso del B 2 (§ 14.3: «{son las #ah.#ef», punto 3 y signo de número otra vez), y la app tampoco
   // lo da (⠼⠁⠓⠄⠑⠋): desde la tinta no se distingue de un decimal, así que no se exige aquí.
-  test.fail('ABIERTO — § 8.1: «73.81» y «73’81» dan la coma decimal del ejemplo literal (#gc,ha)', async ({ page }) => {
+  // REPARADO el 27/10/2026 (hallazgo 3553): esSeparadorDecimal() da el punto 2 al punto entre
+  // cifras que no abre un grupo de tres y al apóstrofo entre cifras. El millar sigue con punto 3.
+  test('REPARADO 3553 — § 8.1: «73.81» y «73’81» dan la coma decimal del ejemplo literal (#gc,ha)', async ({ page }) => {
     const fallos: string[] = [];
     for (const texto of ['73.81', '73’81', "73'81"]) {
       await page.goto(RUTA);
       await convertir27(page, texto);
       // ⠼ (3456) · 7 ⠛ · 3 ⠉ · ⠂ (punto 2, decimal) · 8 ⠓ · 1 ⠁
       const r = await resultado27(page);
-      if (r !== '⠼⠛⠉⠂⠓⠁') fallos.push(`${texto} → ${r}`); // hoy: ⠼⠛⠉⠄⠓⠁ · ⠼⠛⠉⠼⠓⠁ · ⠼⠛⠉⠼⠓⠁
+      if (r !== '⠼⠛⠉⠂⠓⠁') fallos.push(`${texto} → ${r}`);
     }
+    // El millar del mismo apartado («501.439.678 → #eja.dci.fgh») no cambia
+    await page.goto(RUTA);
+    await convertir27(page, '501.439.678');
+    const millar = await resultado27(page);
+    if (millar !== '⠼⠑⠚⠁⠄⠙⠉⠊⠄⠋⠛⠓') fallos.push(`501.439.678 → ${millar}`);
     expect(fallos).toEqual([]);
+    // Y el apóstrofo decimal no saca el aviso de comillas simples
+    await page.goto(RUTA);
+    await convertir27(page, '73’81');
+    await expect(page.getByText(/comillas simples/i)).toHaveCount(0);
   });
 
   // ─────────────────────────────────────────────────────────────────────────

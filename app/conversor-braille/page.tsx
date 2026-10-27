@@ -86,6 +86,29 @@ const esApostrofo = (caracteres: string[], i: number): boolean =>
   ES_LETRA.test(caracteres[i + 1] ?? '');
 
 /**
+ * ⚠️ 27/10/2026 (hallazgo 3553) — B 2 § 8.1, literal: «Como separador decimal se utiliza el punto
+ * 2 […] independientemente de que en el original aparezca un punto o un apóstrofo», con el
+ * ejemplo «73,81 73.81 73’81 → #gc,ha». La app solo daba el punto 2 a la coma: el punto entre
+ * cifras salía siempre como punto 3, que dentro de un número es el de MILLAR, y el apóstrofo
+ * partía el número en dos con el aviso de comillas.
+ *
+ * Es decimal el punto entre cifras que NO va seguido de un grupo de exactamente tres cifras (los
+ * grupos de millar son de tres: «73.81» no puede ser millar, «1.234» sí), y el apóstrofo entre
+ * cifras siempre. Lo que el texto en tinta no distingue —«1.234» decimal a la inglesa, o «18.56»
+ * como hora, que el § 14.3 escribe de otra forma— se queda con la lectura española.
+ */
+const esSeparadorDecimal = (caracteres: string[], i: number): boolean => {
+  const c = caracteres[i];
+  const esCifra = (x: string | undefined) => x !== undefined && ES_CIFRA.test(x);
+  if (!esCifra(caracteres[i - 1]) || !esCifra(caracteres[i + 1])) return false;
+  if (APOSTROFOS.has(c)) return true;
+  if (c !== '.') return false;
+  let j = i + 1;
+  while (esCifra(caracteres[j])) j++;
+  return j - (i + 1) !== 3;
+};
+
+/**
  * Signos del B 2 § 6.2 que ocupan DOS celdas. Van aparte de `textToBraille` porque la
  * vuelta se resuelve mirando dos celdas seguidas, no una.
  */
@@ -340,7 +363,9 @@ const esLetraCooficialSinEscribir = (c: string): boolean =>
 /** ¿Hay en el texto alguna comilla simple que no sea un apóstrofo entre dos letras? */
 const comillasSimplesOmitidas = (texto: string): boolean => {
   const caracteres = Array.from(texto);
-  return caracteres.some((c, i) => COMILLAS_SIMPLES.has(c) && !esApostrofo(caracteres, i));
+  return caracteres.some(
+    (c, i) => COMILLAS_SIMPLES.has(c) && !esApostrofo(caracteres, i) && !esSeparadorDecimal(caracteres, i),
+  );
 };
 
 /**
@@ -699,6 +724,12 @@ export default function ConversorBraillePage() {
       // separador decimal y el punto 3 el de los grupos de tres dígitos, y ninguno
       // de los dos repite el prefijo. Antes cerraban la expresión, así que «501.439»
       // salía con un ⠼ de más delante de cada grupo (Inspector, 20/08/2026).
+      // B 2 § 8.1 (hallazgo 3553): el punto decimal y el apóstrofo decimal son el punto 2.
+      if (enExpresionNumerica && esSeparadorDecimal(caracteres, i)) {
+        result += textToBraille[','];
+        continue;
+      }
+
       if (enExpresionNumerica && (char === ',' || char === '.')) {
         const siguiente = caracteres[i + 1];
         if (siguiente && /[0-9]/.test(siguiente)) {
