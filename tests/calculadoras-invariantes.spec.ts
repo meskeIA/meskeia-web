@@ -5749,8 +5749,8 @@ test.describe('Unificación app ↔ motor — IRPF y sueldo neto (26/10/2026)', 
     expect(distintos.slice(0, 3)).toEqual([]);
   });
 
-  // Cuota ÍNTEGRA: antes de la DA 61.ª, que este motor no aplica porque recibe el trabajo neto
-  // de SS y la deducción se mide sobre los rendimientos íntegros (cabo anotado el 26/10/2026).
+  // Cuota ÍNTEGRA: antes de la DA 61.ª, que este motor solo aplica si recibe también el bruto y
+  // si es nómina, porque se mide sobre los rendimientos íntegros (cabo C0469: tests de abajo).
   test('la cuota íntegra de calcular_irpf es la de estimador-irpf', () => {
     const distintos: string[] = [];
     for (const bruto of [0, 9000, 14000, 16576, 18000, 20000, 25000, 30000, 45000, 61000, 80000, 150000])
@@ -5760,6 +5760,53 @@ test.describe('Unificación app ↔ motor — IRPF y sueldo neto (26/10/2026)', 
           const m = calcularIRPF({ rendimientosTrabajo: bruto - ss, rendimientosCapitalMobiliario: capital, situacion: motor, numHijos: hijos, hijosMenores3: men3, esTrabajador: bruto > 0 });
           const a = estimarIRPF({ brutoTrabajo: bruto, capitalMobiliario: capital, retenciones: 0, situacion: app, numHijos: hijos, hijosMenores3: men3, conNomina: true });
           if (Math.abs(m.cuotaIntegra - Math.round(a.cuotaIntegra * 100) / 100) > 0.015) distintos.push(`${motor} ${bruto} cap ${capital} ${hijos}h ${men3}m3: ${m.cuotaIntegra} · ${a.cuotaIntegra}`);
+        }
+    expect(distintos.slice(0, 3)).toEqual([]);
+  });
+
+  // Cabo C0469 (27/10/2026, opción A elegida por el usuario): con bruto_trabajo y es_nomina la
+  // tool aplica la DA 61.ª igual que estimador-irpf; sin ellos calcula como antes y avisa.
+  //   A mano: SMI 2025, 16.576 € brutos con nómina. SS 6,47 % = 1.072,47 → neto 15.503,53;
+  //   cuota íntegra 339,56 € (la del cabo). Deducción: íntegros ≤ 16.576 → 340 €, topada en la
+  //   cuota íntegra general → 339,56. Cuota tras la deducción: 0 €.
+  test('I4 · DA 61.ª: con el SMI y nómina la cuota queda en 0; sin datos, como antes y con aviso', () => {
+    const ss = cotizacionTrabajadorAnual(16576);
+    const sin = calcularIRPF({ rendimientosTrabajo: 16576 - ss });
+    expect(sin.cuotaIntegra).toBeCloseTo(339.56, 2);
+    expect(sin.cuotaDiferencial).toBeCloseTo(339.56, 2);
+    expect(sin.deduccionRendimientosTrabajo).toBe(0);
+    expect(sin.deduccionTrabajoSinDatos).toBe(true);
+
+    const con = calcularIRPF({ rendimientosTrabajo: 16576 - ss, brutoTrabajo: 16576, esNomina: true });
+    expect(con.deduccionRendimientosTrabajo).toBeCloseTo(339.56, 2);
+    expect(con.cuotaLiquida).toBe(0);
+    expect(con.cuotaDiferencial).toBe(0);
+    expect(con.deduccionTrabajoSinDatos).toBe(false);
+
+    // Una pensión no es prestación efectiva de servicios: sin deducción y sin aviso
+    const pension = calcularIRPF({ rendimientosTrabajo: 16576 - ss, brutoTrabajo: 16576, esNomina: false });
+    expect(pension.deduccionRendimientosTrabajo).toBe(0);
+    expect(pension.cuotaDiferencial).toBeCloseTo(339.56, 2);
+    expect(pension.deduccionTrabajoSinDatos).toBe(false);
+
+    // Muy por encima del límite no hay nada que avisar
+    expect(calcularIRPF({ rendimientosTrabajo: 40000 }).deduccionTrabajoSinDatos).toBe(false);
+    // Un bruto menor que el neto es un error de entrada
+    expect(() => calcularIRPF({ rendimientosTrabajo: 20000, brutoTrabajo: 15000, esNomina: true })).toThrow();
+  });
+
+  test('con bruto y nómina, la deducción y la cuota final de calcular_irpf son las de estimador-irpf', () => {
+    const distintos: string[] = [];
+    for (const bruto of [0, 9000, 14000, 16576, 17000, 17500, 18000, 18276, 20000, 25000, 45000])
+      for (const capital of [0, 500, 6500, 7000])
+        for (const [motor, app] of PARES) for (const hijos of [0, 2]) {
+          const ss = cotizacionTrabajadorAnual(bruto);
+          const m = calcularIRPF({ rendimientosTrabajo: bruto - ss, brutoTrabajo: bruto, esNomina: true, rendimientosCapitalMobiliario: capital, situacion: motor, numHijos: hijos, esTrabajador: bruto > 0 });
+          const a = estimarIRPF({ brutoTrabajo: bruto, capitalMobiliario: capital, retenciones: 0, situacion: app, numHijos: hijos, hijosMenores3: 0, conNomina: true });
+          const r2 = (n: number) => Math.round(n * 100) / 100;
+          if (Math.abs(m.deduccionRendimientosTrabajo - r2(a.deduccionRentasBajas)) > 0.015
+            || Math.abs(m.cuotaLiquida - r2(a.cuotaTrasDeducciones)) > 0.015)
+            distintos.push(`${motor} ${bruto} cap ${capital} ${hijos}h: ${m.deduccionRendimientosTrabajo}/${m.cuotaLiquida} · ${a.deduccionRentasBajas}/${a.cuotaTrasDeducciones}`);
         }
     expect(distintos.slice(0, 3)).toEqual([]);
   });

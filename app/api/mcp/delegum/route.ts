@@ -1111,9 +1111,14 @@ function crearServidorDelegum(): McpServer {
     'calcular_irpf',
     'Calcula la cuota de IRPF (renta) a partir de los rendimientos del trabajo, capital y ganancias ' +
     'patrimoniales, aplicando gastos deducibles, mínimos personales y familiares. Devuelve cuota íntegra, ' +
-    'cuota diferencial (a pagar o devolver) y tipo efectivo.',
+    'cuota diferencial (a pagar o devolver) y tipo efectivo. Con bruto_trabajo y es_nomina aplica además ' +
+    'la deducción por obtención de rendimientos del trabajo (DA 61.ª LIRPF), que deja sin cuota a quien cobra el SMI.',
     {
-      rendimientos_trabajo: z.number().nonnegative().describe('Rendimientos brutos del trabajo en euros'),
+      // «Brutos» decía hasta el 27/10/2026, pero el motor los trata como íntegros menos la SS
+      // (cabo C0469): el bruto va en bruto_trabajo
+      rendimientos_trabajo: z.number().nonnegative().describe('Rendimientos del trabajo en euros, ya restadas las cotizaciones a la Seguridad Social del trabajador (bruto − SS)'),
+      bruto_trabajo: z.number().nonnegative().optional().describe('Rendimientos ÍNTEGROS del trabajo (el bruto, antes de la Seguridad Social). Con es_nomina, permite aplicar la deducción de la DA 61.ª LIRPF'),
+      es_nomina: z.boolean().optional().describe('true si los rendimientos del trabajo son de una nómina (prestación efectiva de servicios); false si son una pensión, que no da derecho a la deducción de la DA 61.ª'),
       rendimientos_capital_mobiliario: z.number().nonnegative().optional().describe('Dividendos, intereses... (base del ahorro)'),
       rendimientos_capital_inmobiliario: z.number().nonnegative().optional().describe('Rentas de alquiler... (base general)'),
       ganancias_largo_plazo: z.number().nonnegative().optional().describe('Ganancias patrimoniales >12 meses (base del ahorro)'),
@@ -1122,11 +1127,13 @@ function crearServidorDelegum(): McpServer {
       num_hijos: z.number().int().min(0).max(15).optional().describe('Número de hijos. Por defecto 0.'),
     },
     { title: 'Calcula la cuota de IRPF y el resultado de la declaración', readOnlyHint: true },
-    async ({ rendimientos_trabajo, rendimientos_capital_mobiliario, rendimientos_capital_inmobiliario, ganancias_largo_plazo, retenciones, situacion_familiar, num_hijos }, extra) => {
+    async ({ rendimientos_trabajo, bruto_trabajo, es_nomina, rendimientos_capital_mobiliario, rendimientos_capital_inmobiliario, ganancias_largo_plazo, retenciones, situacion_familiar, num_hijos }, extra) => {
       await registrarUsoDelegum('calcular_irpf', getCaller(extra));
       try {
         const r = calcularIRPF({
           rendimientosTrabajo: rendimientos_trabajo,
+          brutoTrabajo: bruto_trabajo,
+          esNomina: es_nomina,
           rendimientosCapitalMobiliario: rendimientos_capital_mobiliario,
           rendimientosCapitalInmobiliario: rendimientos_capital_inmobiliario,
           gananciasPLargo: ganancias_largo_plazo,
@@ -1143,9 +1150,15 @@ function crearServidorDelegum(): McpServer {
           ...(r.reduccionConjunta > 0 ? [`➖ Reducción por tributación conjunta (art. 84.2 LIRPF): ${fmt(r.reduccionConjunta)} €`] : []),
           `➖ Mínimo personal y familiar: ${fmt(r.minimoPersonalFamiliar)} €`,
           `🔢 Cuota íntegra: ${fmt(r.cuotaIntegra)} € (tipo efectivo ${pct(r.tipoEfectivoGeneral)}%)`,
+          ...(r.deduccionRendimientosTrabajo > 0
+            ? [`➖ Deducción por obtención de rendimientos del trabajo (DA 61.ª LIRPF): ${fmt(r.deduccionRendimientosTrabajo)} €`]
+            : []),
           `➖ Retenciones: ${fmt(r.retenciones)} €`,
           '',
           resultado,
+          ...(r.deduccionTrabajoSinDatos
+            ? ['', '⚠️ No incluye la deducción por obtención de rendimientos del trabajo (DA 61.ª LIRPF), que con estos ingresos podría corresponder: indica bruto_trabajo y es_nomina para aplicarla.']
+            : []),
         ].join('\n');
         return conAviso(texto, AVISO_FISCAL);
       } catch (err) {

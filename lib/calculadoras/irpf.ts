@@ -19,7 +19,13 @@ import {
   calcularRendimientoNetoTrabajo,
   REDUCCION_TRIBUTACION_CONJUNTA_2025,
   FISCAL_IRPF_META,
+  calcularDeduccionRentasBajas,
+  limitarDeduccionRendimientosTrabajo,
+  DEDUCCION_RENDIMIENTOS_TRABAJO,
 } from '@/data/fiscal';
+
+/** Ejercicio de las cuantías de la DA 61.ª: el mismo que el resto de datos de este motor y que estimador-irpf. */
+const EJERCICIO_DEDUCCION_TRABAJO = 2025 as const;
 
 // ─── Tipos públicos ────────────────────────────────────────────────────────────
 
@@ -52,6 +58,13 @@ export interface ParametrosIRPF {
   hijosMenores3?: number;
   /** ¿Tiene rendimientos del trabajo? (para aplicar gastos deducibles) */
   esTrabajador?: boolean;
+  /**
+   * Rendimientos ÍNTEGROS del trabajo (el bruto, sin restar la SS). Con `esNomina`, permite
+   * aplicar la deducción de la DA 61.ª LIRPF, que se mide sobre los íntegros (cabo C0469).
+   */
+  brutoTrabajo?: number;
+  /** ¿Los rendimientos del trabajo son de prestación efectiva de servicios (nómina)? Una pensión no lo es. */
+  esNomina?: boolean;
 }
 
 export interface TramoDetalle {
@@ -88,6 +101,15 @@ export interface ResultadoIRPF {
   cuotaIntegralAhorro: number;
   /** Cuota íntegra total */
   cuotaIntegra: number;
+  /** Deducción por obtención de rendimientos del trabajo (DA 61.ª), ya topada; 0 si no se aplicó */
+  deduccionRendimientosTrabajo: number;
+  /**
+   * true si la deducción de la DA 61.ª podría corresponder y no se ha aplicado porque faltan
+   * `brutoTrabajo` y `esNomina`: el resultado no la incluye y hay que decirlo
+   */
+  deduccionTrabajoSinDatos: boolean;
+  /** Cuota tras la deducción de la DA 61.ª */
+  cuotaLiquida: number;
   /** Retenciones practicadas */
   retenciones: number;
   /** Cuota diferencial (a pagar / devolver) */
@@ -225,8 +247,37 @@ export function calcularIRPF(p: ParametrosIRPF): ResultadoIRPF {
   const cuotaAhorro = calcularCuotaIntegraGeneral(baseLiquidableAhorro, minimoEnAhorro, TRAMOS_AHORRO_2025);
 
   const cuotaIntegra = r(cuotaGeneral + cuotaAhorro);
+
+  // Deducción por obtención de rendimientos del trabajo (DA 61.ª LIRPF), como estimador-irpf:
+  // solo por prestación efectiva de servicios y medida sobre los íntegros, que este motor no
+  // conoce si solo recibe el neto de SS. Por eso va con los dos campos opcionales; sin ellos no
+  // se aplica y el resultado lo dice (cabo C0469: con el SMI de 2025, 16.576 € brutos, la tool
+  // daba 339,56 € de cuota donde la app da 0 €). El tope es la cuota íntegra general en la
+  // proporción del trabajo en la base general (DA 61.ª.1, último párrafo).
+  const otrasRentas = Math.max(0, capInmob) + Math.max(0, gananciaCorto) + Math.max(0, capMob) + Math.max(0, gananciaLargo);
+  const bruto = p.brutoTrabajo ?? 0;
+  if (p.brutoTrabajo !== undefined && bruto < p.rendimientosTrabajo) {
+    throw new Error('El bruto del trabajo no puede ser menor que los rendimientos del trabajo netos de Seguridad Social.');
+  }
+  const conDatosDeduccion = p.esNomina !== undefined && p.brutoTrabajo !== undefined;
+  const pesoTrabajo = baseImponibleGeneral > 0 ? rendimientosTrabajoNetos / baseImponibleGeneral : 0;
+  const deduccionRendimientosTrabajo = conDatosDeduccion && p.esNomina && bruto > 0
+    ? r(limitarDeduccionRendimientosTrabajo(
+        calcularDeduccionRentasBajas(bruto, otrasRentas, EJERCICIO_DEDUCCION_TRABAJO),
+        cuotaGeneral,
+        pesoTrabajo,
+      ))
+    : 0;
+  // Sin los datos, se avisa solo si la deducción podría corresponder: con un neto por encima del
+  // límite el bruto también lo está, y con más otras rentas del límite no hay deducción
+  const limites = DEDUCCION_RENDIMIENTOS_TRABAJO[EJERCICIO_DEDUCCION_TRABAJO];
+  const deduccionTrabajoSinDatos = !conDatosDeduccion && esTrabajador
+    && p.rendimientosTrabajo > 0 && p.rendimientosTrabajo < limites.limiteMaximo
+    && otrasRentas <= limites.limiteOtrasRentas && cuotaGeneral > 0;
+  const cuotaLiquida = r(Math.max(0, cuotaIntegra - deduccionRendimientosTrabajo));
+
   const retenciones = p.retenciones ?? 0;
-  const cuotaDiferencial = r(cuotaIntegra - retenciones);
+  const cuotaDiferencial = r(cuotaLiquida - retenciones);
 
   const tipoEfectivoGeneral = baseImponibleGeneral > 0
     ? r((cuotaGeneral / baseImponibleGeneral) * 100)
@@ -246,6 +297,9 @@ export function calcularIRPF(p: ParametrosIRPF): ResultadoIRPF {
     cuotaIntegraGeneral: r(cuotaGeneral),
     cuotaIntegralAhorro: r(cuotaAhorro),
     cuotaIntegra,
+    deduccionRendimientosTrabajo,
+    deduccionTrabajoSinDatos,
+    cuotaLiquida,
     retenciones,
     cuotaDiferencial,
     tipoEfectivoGeneral,
