@@ -261,6 +261,13 @@ export function separarSilabas(palabra: string): string[] {
     // app en su bloque educativo, y «tungsteno» salía «tung-ste-no» (hallazgo 259).
     else alaDerecha = esAtaqueDoble(bloque[k - 2], bloque[k - 1]) ? 2 : 1;
 
+    // ── El prefijo sub- ante r (hallazgo 3573, 27/10/2026) ───────────────────────────
+    // Tras sub- la r es vibrante MÚLTIPLE, así que «br» no es grupo: la b cierra la sílaba
+    // del prefijo y la r abre la siguiente (OLE 2010; DPD, s. v. sub-: [sub-ra-yár],
+    // [sub-ro-gár]). Antes salía su-bra-yar, partición que no sostiene ni la fonética ni la
+    // morfología. Solo a principio de palabra: «abrogar», sin prefijo, sigue a-bro-gar.
+    if (n === 0 && limpia.startsWith('subr') && k === 2) alaDerecha = 1;
+
     cortes.push(finBloque - alaDerecha);
   }
 

@@ -2169,10 +2169,11 @@ test.describe('contador-silabas · Inspector 27/10/2026 (séptima inspección)',
     await expect(totalDe(page, 1)).toHaveText('3 sílabas');
   });
 
-  test('HALLAZGO C0291 · tras el prefijo sub- la r es vibrante múltiple: sub-ra-yar, sub-ro-gar', async ({
+  test('HALLAZGO 3573 (C0291) · tras el prefijo sub- la r es vibrante múltiple: sub-ra-yar, sub-ro-gar', async ({
     page,
   }) => {
-    test.fail(true, 'ABIERTO: separarSilabas() junta «br» también tras el prefijo sub-');
+    // REPARADO el 27/10/2026: separarSilabas() corta entre b y r tras sub- inicial, y el bloque
+    // educativo ya no presenta «su-bra-yar» como variante defendible.
     // OLE 2010 y DPD: en «subrayar» y «subrogar» la r tras sub- se pronuncia múltiple, así que
     // «b» y «r» van en sílabas distintas: sub-ra-yar, sub-ro-gar. La app da su-bra-yar y
     // su-bro-gar, una partición que no sostiene ni la fonética ni la morfología, y su recuadro

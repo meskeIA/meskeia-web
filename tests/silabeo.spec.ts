@@ -42,6 +42,19 @@ test.describe('separarSilabas — casos corrientes', () => {
     expect(sil('campo')).toBe('cam-po');
     expect(sil('isla')).toBe('is-la');   // «sl» no es ataque en español
   });
+
+  /**
+   * HALLAZGO 3573 (27/10/2026) — tras el prefijo sub- la r es vibrante múltiple y «br» no es
+   * grupo (OLE 2010; DPD, s. v. sub-: [sub-ra-yár], [sub-ro-gár]). Sin prefijo, «br» sigue
+   * siendo inseparable: a-bro-gar, a-brir.
+   */
+  test('el prefijo sub- ante r se separa: sub-ra-yar', () => {
+    expect(sil('subrayar')).toBe('sub-ra-yar');
+    expect(sil('subrogar')).toBe('sub-ro-gar');
+    expect(sil('Subrayado')).toBe('Sub-ra-ya-do');
+    expect(sil('abrogar')).toBe('a-bro-gar');
+    expect(sil('sobre')).toBe('so-bre');
+  });
 });
 
 /**
