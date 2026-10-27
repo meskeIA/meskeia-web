@@ -23,6 +23,12 @@ export interface Novedad {
 // Sembrado con los cambios normativos reales recientes. Ampliar al mantener fichas.
 export const NOVEDADES: Novedad[] = [
   {
+    fecha: '2026-10-27',
+    fichaSlug: 'donaciones-isd',
+    texto:
+      'Andalucía: en donaciones no hay exención por importe. Los Grupos I y II aplican una bonificación del 99 % en la cuota, sin límite de base; la tabla decía «exento si la base < 1.000.000 €», cifra que la ley solo usa como reducción en base de las herencias (art. 40.1 de la Ley 5/2021 de Tributos Cedidos de Andalucía, BOE-A-2021-17915).',
+  },
+  {
     fecha: '2026-10-22',
     fichaSlug: 'prestaciones-dependencia',
     texto:

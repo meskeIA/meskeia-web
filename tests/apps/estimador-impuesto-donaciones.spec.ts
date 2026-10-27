@@ -880,21 +880,29 @@ test.describe('Estimador ISD donaciones — re-inspección (04/10/2026)', () => 
   });
 
   /**
-   * HALLAZGO 04/10/2026 (f) — ABIERTO (contenido, bajo). La nota de Andalucía que se ve en el
-   * recuadro ℹ️ (BONIFICACIONES_CCAA_ID.andalucia.notas) dice «Exención total si base liquidable
-   * < 1.000.000€»: el euro va pegado, y su frontera es estricta mientras el desglose de la misma
-   * pantalla aplica «≤ 1.000.000 €». Con 1.000.000 € justos la nota dice que no hay exención y el
-   * cálculo da 0,00 €; con 1.000.000,01 €, 2681,23 €. (Si la regla de Andalucía sigue vigente es
-   * trabajo de /triaje-fiscal: este testigo solo pide que la pantalla no se contradiga.)
+   * HALLAZGO 2828 (04/10/2026, f) — REPARADO el 27/10/2026. La nota de Andalucía decía «Exención
+   * total si base liquidable < 1.000.000€» y el cálculo la aplicaba con «≤»: la pantalla se
+   * contradecía justo en el umbral. Leída la ley en el BOE (Ley 5/2021, BOE-A-2021-17915), esa
+   * exención NO existe en donaciones: el art. 40.1, vigente desde el 01/01/2026, da a los Grupos
+   * I y II «una bonificación del 99% en la cuota tributaria derivada de adquisiciones inter
+   * vivos», sin umbral. (El 1.000.000 € de esa ley es la reducción en base de sucesiones, art. 28.)
+   * El testigo antiguo solo pedía que nota y desglose no se contradijeran, y consagraba la
+   * exención; ahora mide la cifra:
+   *   1.000.000 € de padre a hijo (Grupo II), en escritura, sin patrimonio previo:
+   *   Cuota íntegra = 199.291,40 + (1.000.000 − 797.555,08) × 34 % = 268.122,6728
+   *   Bonificación 99 %                                          = 265.441,446
+   *   A ingresar = 2.681,226728                                  → «2681,23 €» (cuatro cifras: sin punto)
+   * Con la exención de antes: 0,00 €.
    */
-  test('HALLAZGO 04/10 (f): la nota de Andalucía va en formato español y su frontera cuadra con el desglose', async ({ page }) => {
-    test.fail(true, 'ABIERTO: «< 1.000.000€» en la nota frente a «≤ 1.000.000 €» en el desglose');
+  test('HALLAZGO 2828: Andalucía bonifica el 99 % sin exención por importe — 1.000.000 € a un hijo, 2681,23 €', async ({ page }) => {
     await rellenar(page, { ccaa: 'andalucia', grupo: 'II', valor: '1000000' });
-    const nota = (await page.locator('[class*="infoCcaa"]').innerText()).replace(/ /g, ' ');
-    const desglose = (await panel(page)).replace(/ /g, ' ');
-    expect(desglose).toContain('CUOTA A INGRESAR');
+    expect(await cuota(page)).toBe('2681,23 €');
+    const nota = (await page.locator('[class*="infoCcaa"]').innerText()).replace(/\u00a0/g, ' ');
+    const desglose = (await panel(page)).replace(/\u00a0/g, ' ');
+    expect(desglose).toContain('art. 40.1 Ley 5/2021');
+    expect(desglose).not.toMatch(/Exención total/);
+    expect(nota).not.toMatch(/1\.000\.000/);
     expect(nota, 'el importe lleva espacio antes del €').not.toMatch(/\d€/);
-    expect(/<\s*1\.000\.000/.test(nota) && /≤\s*1\.000\.000/.test(desglose)).toBe(false);
   });
 });
 

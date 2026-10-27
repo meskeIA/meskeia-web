@@ -47,7 +47,6 @@ export interface TramoTarifaID {
 
 export interface BonificacionGrupoID {
   porcentaje?: number;
-  exencion?: number;
   limite?: number | null;
   escalonado?: Array<{ hasta?: number; desde?: number; porcentaje: number }>;
   /**
@@ -213,18 +212,27 @@ export const BONIFICACIONES_CCAA_ID: Record<string, BonificacionCCAA_ID> = {
     notas: 'Bonificación 99 % para Grupos I y II. Sin límite de importe. ⚠️ La Ley 3/2026, de 30 de junio, de Apoyo a la Empresa Familiar (BOE-A-2026-16019) añadió una reducción del 99 % EN BASE por donación de empresa individual, negocio profesional o participaciones, extendida a los Grupos I, II y III y a colaterales de cuarto grado, con requisitos de permanencia (5 años), participación (5 % individual o 20 % del grupo familiar) y formalización en escritura. Esta estimación NO la aplica: solo modela la bonificación en cuota por parentesco.',
   },
 
+  // Art. 40.1 de la Ley 5/2021 de Tributos Cedidos de Andalucía (BOE-A-2021-17915, redacción
+  // vigente desde el 01/01/2026, leída en el BOE el 27/10/2026): «Los contribuyentes incluidos
+  // en los Grupos I y II […] aplicarán una bonificación del 99% en la cuota tributaria derivada
+  // de adquisiciones inter vivos». La ley NO tiene exención por importe en donaciones: la que
+  // había aquí (base < 1.000.000 €, cuota 0) no está en ningún artículo de su capítulo del ISD,
+  // y el 1.000.000 € del art. 28 es una reducción en base de SUCESIONES. Hallazgo 2828.
+  // El documento público por encima de 5.000 € de base (art. 40.2.a) no se modela todavía.
+  // Una sola comunidad: el sello del módulo NO se mueve.
   'andalucia': {
     nombre: 'Andalucía',
     regimen: 'comun',
+    normaBonificacion: 'art. 40.1 Ley 5/2021',
     bonificaciones: {
-      'I-conyuge':      { porcentaje: 0.99, exencion: 1000000 },
-      'I-descendiente': { porcentaje: 0.99, exencion: 1000000 },
-      'II':             { porcentaje: 0.99, exencion: 1000000 },
-      'II-ascendiente': { porcentaje: 0.99, exencion: 1000000 },
+      'I-conyuge':      { porcentaje: 0.99 },
+      'I-descendiente': { porcentaje: 0.99 },
+      'II':             { porcentaje: 0.99 },
+      'II-ascendiente': { porcentaje: 0.99 },
       'III':            { porcentaje: 0 },
       'IV':             { porcentaje: 0 },
     },
-    notas: 'Exención total si base liquidable < 1.000.000€ para Grupos I y II. Si supera, bonificación 99 %.',
+    notas: 'Grupos I y II: bonificación del 99 % de la cuota, sin límite de importe. Si la base imponible supera 5.000 €, la donación debe constar en documento público, y en metálico hay que justificar en él el origen de los fondos: esta estimación no lo comprueba.',
   },
 
   'galicia': {

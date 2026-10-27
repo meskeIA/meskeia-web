@@ -36,8 +36,7 @@ function resumenBonificacion(b: BonificacionGrupoID | undefined): string {
   }
   if (b.porcentaje == null) return '—';
   let s = pct(b.porcentaje);
-  if (b.exencion) s += ` · exento si la base < ${formatCurrency(b.exencion)}`;
-  else if (b.limite) s += ` · hasta ${formatCurrency(b.limite)}`;
+  if (b.limite) s += ` · hasta ${formatCurrency(b.limite)}`;
   if (b.requiereEscritura) s += ' · requiere escritura';
   return s;
 }

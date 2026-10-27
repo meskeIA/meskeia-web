@@ -220,7 +220,6 @@ function aplicarBonificaciones(
     aplicaDisc ||
     (bGrupo !== undefined &&
       ((bGrupo.porcentaje ?? 0) > 0 ||
-        bGrupo.exencion !== undefined ||
         (bGrupo.escalonado?.length ?? 0) > 0 ||
         (bGrupo.escalaPonderada?.length ?? 0) > 0));
 
@@ -245,35 +244,25 @@ function aplicarBonificaciones(
   const norma = config.normaBonificacion ? `, ${config.normaBonificacion}` : '';
 
   if (bGrupo) {
-    if (bGrupo.exencion !== undefined && baseLiquidable <= bGrupo.exencion) {
-      // Exención total por importe (Andalucía)
+    // Con discapacidad (≥ 33 %, «consideración legal de persona con discapacidad»), la escala
+    // de límites ampliados si la comunidad la tiene.
+    const escala = gradoDisc >= 33 && bGrupo.escalaPonderadaDiscapacidad?.length
+      ? bGrupo.escalaPonderadaDiscapacidad
+      : bGrupo.escalaPonderada;
+    const fraccion = escala?.length
+      ? porcentajePonderado(escala, baseLiquidable)
+      : bGrupo.escalonado?.length
+        ? porcentajeEscalonado(bGrupo, baseLiquidable)
+        : (bGrupo.porcentaje ?? 0);
+    if (fraccion > 0) {
+      const importe = restante * fraccion;
+      const media = escala?.length && fraccion !== escala[0].marginal ? ' de media por tramos de base' : '';
       bonificaciones.push({
-        concepto: `Exención total (base liquidable ≤ ${bGrupo.exencion.toLocaleString('es-ES')} €, ${config.nombre})`,
-        porcentaje: 100,
-        importe: restante,
+        concepto: `Bonificación ${textoPorcentaje(fraccion)}${media} (${config.nombre}${norma})`,
+        porcentaje: fraccion * 100,
+        importe,
       });
-      restante = 0;
-    } else {
-      // Con discapacidad (≥ 33 %, «consideración legal de persona con discapacidad»), la escala
-      // de límites ampliados si la comunidad la tiene.
-      const escala = gradoDisc >= 33 && bGrupo.escalaPonderadaDiscapacidad?.length
-        ? bGrupo.escalaPonderadaDiscapacidad
-        : bGrupo.escalaPonderada;
-      const fraccion = escala?.length
-        ? porcentajePonderado(escala, baseLiquidable)
-        : bGrupo.escalonado?.length
-          ? porcentajeEscalonado(bGrupo, baseLiquidable)
-          : (bGrupo.porcentaje ?? 0);
-      if (fraccion > 0) {
-        const importe = restante * fraccion;
-        const media = escala?.length && fraccion !== escala[0].marginal ? ' de media por tramos de base' : '';
-        bonificaciones.push({
-          concepto: `Bonificación ${textoPorcentaje(fraccion)}${media} (${config.nombre}${norma})`,
-          porcentaje: fraccion * 100,
-          importe,
-        });
-        restante -= importe;
-      }
+      restante -= importe;
     }
   }
 
