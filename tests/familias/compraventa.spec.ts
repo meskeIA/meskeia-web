@@ -1554,3 +1554,56 @@ test.describe('Testigo de familia — el reparto del IBI en las 7 apps de compra
     });
   }
 });
+
+// ─────────────────────────────────────────────────────────────────────────────────────────
+// La forma del hallazgo 3534 (reparado en la referencia en 4b9dc668; cabos C0481 y C0486,
+// 27/10/2026). Comprado un SOLAR por el promotor, el valor catastral total decide la no sujeción
+// de la plusvalía sin los años (3516: con 20.000, el suelo de la venta es 30.000 × 9.000 / 20.000
+// = 13.500 y no supera lo pagado por el solar). Si está escrito e ilegible, ES el dato que falta:
+// la app tiene que nombrarlo, no pedir solo los años. Con el total LEGIBLE la plusvalía queda
+// resuelta y no hay nada ilegible que nombrar. Las cuatro apps con pestaña de vendedor y el
+// selector «¿Qué compraste?».
+//   Murcia · primera mano · precio 30.000 · solar 13.500 · suelo 9.000 · total «20.000.00» ·
+//   años vacíos.
+// ─────────────────────────────────────────────────────────────────────────────────────────
+const SOLAR_DEL_PROMOTOR = [
+  { slug: 'estimador-compraventa-inmueble', ccaa: '#ccaa-inmueble', primeraMano: /Primera mano/, precio: 'Precio de la vivienda', compra: 'Precio de compra original' },
+  { slug: 'simulador-gastos-compraventa-garaje', ccaa: '#select-ccaa', primeraMano: /Primera mano/, precio: 'Precio del garaje', compra: 'Precio de compra original' },
+  { slug: 'simulador-gastos-compraventa-trastero', ccaa: '#select-ccaa', primeraMano: /Primera mano/, precio: 'Precio del trastero', compra: 'Precio de compra original' },
+  { slug: 'simulador-gastos-compraventa-local-comercial', ccaa: '#select-ccaa', primeraMano: /Obra nueva \/ Promotor/, precio: 'Precio del local comercial', compra: 'Precio de compra original' },
+] as const;
+
+const porPrefijo = (prefijo: string): string => `input[aria-label^="${prefijo}"]`;
+
+test.describe('Testigo de familia — con el solar del promotor, el valor catastral total ilegible se nombra (3534)', () => {
+  test.describe.configure({ timeout: 90_000 });
+
+  for (const app of SOLAR_DEL_PROMOTOR) {
+    for (const total of ['20.000.00', '20000'] as const) {
+      const ilegible = total === '20.000.00';
+      test(`${app.slug} · total «${total}» y años vacíos: ${ilegible ? 'nombra el total que no se pudo leer' : 'plusvalía resuelta, nada ilegible'}`, async ({ page }) => {
+        await page.goto(`/${app.slug}/`);
+        await esperarHidratacion(page, [porPrefijo(app.precio)]);
+        await page.locator(app.ccaa).selectOption('murcia');
+        const primeraMano = page.getByRole('button', { name: app.primeraMano });
+        await primeraMano.click();
+        await expect(primeraMano).toHaveAttribute('aria-pressed', 'true');
+        await sembrarValor(page, porPrefijo(app.precio), '30000');
+        await irAPestana(page, 'vendedor');
+        await expect(page.locator('#compra-original')).toHaveValue('solar');
+        await sembrarValor(page, porPrefijo(app.compra), '13500');
+        await sembrarValor(page, porPrefijo('Valor catastral del suelo'), '9000');
+        await sembrarValor(page, porPrefijo('Valor catastral total'), total);
+        await expect(page.locator(porPrefijo('Valor catastral total'))).toHaveValue(total);
+
+        const aviso = `${await leerAviso(page, /^Plusval[ií]a municipal/i)} ${await leerAviso(page, /^IMPORTE NETO VENDEDOR/)}`;
+        if (ilegible) {
+          expect(aviso, 'el aviso nombra el valor catastral total').toMatch(/valor catastral total/i);
+          expect(aviso, 'y dice que no se pudo leer').toMatch(/podido leer/);
+        } else {
+          expect(aviso, 'con el total legible no hay nada que no se pudiera leer').not.toMatch(/podido leer/);
+        }
+      });
+    }
+  }
+});

@@ -737,6 +737,12 @@ export default function SimuladorTrasteroCompraventaPage() {
       !plusvaliaResuelta && ilegibleTexto(valorCatastralSuelo) ? 'el valor catastral del suelo' : null,
       !plusvaliaResuelta && ilegibleTexto(aniosPropiedad) ? 'los años de propiedad' : null,
       ilegibleTexto(precioCompraOriginal) ? 'el precio de compra original' : null,
+      // Comprado un solar, el valor catastral total decide la no sujeción SIN años (3516): si está
+      // escrito e ilegible, es el dato que de verdad falta, y se nombra. Se pedían solo los años y
+      // se callaba el total (forma del hallazgo 3534 de la referencia; cabos C0481 y C0486).
+      !plusvaliaResuelta && entrada.compraSoloSuelo && valorSuelo > 0 && ilegibleTexto(valorCatastralTotal)
+        ? 'el valor catastral total'
+        : null,
     ].filter((x): x is string => x !== null);
     const faltan = [...faltanVacios, ...faltanIlegibles];
     const porQueNoSeCalcula = [
