@@ -26,22 +26,34 @@ import { prepararParaMedir } from './_contraste';
 // Una app cualquiera sirve: lo que se mira son los componentes, no la app.
 const RUTA = '/simulador-titulacion/';
 
+/**
+ * Las raíces de los tres componentes, por lo que el build NO renombra. Hasta el 27/10/2026 se
+ * buscaban por el nombre del módulo en la clase (/MeskeiaLogo|RelatedApps|Footer/), que el build
+ * de next 16.4.3 ya no lleva: bajo `next start` no casaba ningún nodo y el test pasaba en verde
+ * sin mirar nada (cabo C0457). Por eso además se exige encontrar las cuatro.
+ */
+const RAICES =
+  '[data-barra-logo], section[aria-label="Aplicaciones relacionadas"], ' +
+  'aside[aria-label="Explora meskeIA y sus portales temáticos"], footer[data-pildora-pie]';
+const TARJETAS_RELACIONADAS = 'section[aria-label="Aplicaciones relacionadas"] a';
+const PIE = 'footer[data-pildora-pie]';
+
 /** Emojis de los tres componentes compartidos que un lector de pantalla llegaría a leer. */
 async function emojisSueltos(page: Page): Promise<string[]> {
-  return page.evaluate(() => {
+  await expect(page.locator(RAICES)).toHaveCount(4);
+  return page.evaluate((raices) => {
     const emoji = /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE0F}]/u;
-    const DE_ESTOS_COMPONENTES = /MeskeiaLogo|RelatedApps|Footer/;
 
-    return [...document.querySelectorAll('span, div, button, a')]
-      .filter((e) => DE_ESTOS_COMPONENTES.test(e.className || ''))
+    return [...document.querySelectorAll(raices)]
+      .flatMap((r) => [r, ...r.querySelectorAll('span, div, button, a')])
       .filter((e) => emoji.test(e.textContent || ''))
       // Solo el nodo que contiene el emoji, no sus ancestros
       .filter((e) => ![...e.children].some((h) => emoji.test(h.textContent || '')))
       // Y solo si de verdad se anuncia: ni oculto, ni con nombre propio
       .filter((e) => e.getAttribute('aria-hidden') !== 'true' && !e.closest('[aria-hidden="true"]'))
       .filter((e) => e.getAttribute('aria-label') === null)
-      .map((e) => `${(e.className || '').split('__').pop()} :: ${(e.textContent || '').trim().slice(0, 30)}`);
-  });
+      .map((e) => `${(e.className || '').split('_').pop()} :: ${(e.textContent || '').trim().slice(0, 30)}`);
+  }, RAICES);
 }
 
 test.describe('Componentes compartidos · accesibilidad', () => {
@@ -62,9 +74,9 @@ test.describe('Componentes compartidos · accesibilidad', () => {
 
   test('cada tarjeta de apps relacionadas se nombra por su app, no por su icono', async ({ page }) => {
     await page.goto(RUTA);
-    // `a[...]`: los `span` de dentro (cardIcon, cardName, cardDesc) también casan «card» y no
-    // tienen —ni deben tener— nombre accesible propio. La tarjeta es el ENLACE.
-    const tarjetas = page.locator('a[class*="RelatedApps"][class*="card"]');
+    // El ENLACE: los `span` de dentro (cardIcon, cardName, cardDesc) no tienen —ni deben
+    // tener— nombre accesible propio. Antes, por el nombre del módulo (cabo C0457).
+    const tarjetas = page.locator(TARJETAS_RELACIONADAS);
     const total = await tarjetas.count();
     expect(total, 'la app debería mostrar apps relacionadas').toBeGreaterThan(0);
 
@@ -90,7 +102,7 @@ test.describe('Componentes compartidos · accesibilidad', () => {
       await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark', { timeout: 1000 });
     }).toPass({ timeout: 15000 });
 
-    const ratios = await page.evaluate(() => {
+    const ratios = await page.evaluate((selectorPie) => {
       const rgba = (c: string): number[] => (c.match(/[\d.]+/g) ?? []).map(Number);
       const sobre = (arriba: number[], abajo: number[]): number[] => {
         const a = arriba[3] ?? 1;
@@ -103,7 +115,7 @@ test.describe('Componentes compartidos · accesibilidad', () => {
         });
         return 0.2126 * r + 0.7152 * g + 0.0722 * b;
       };
-      const pie = document.querySelector('footer[class*="Footer"]') as HTMLElement;
+      const pie = document.querySelector(selectorPie) as HTMLElement;
       const fondoPagina = rgba(getComputedStyle(document.body).backgroundColor);
       const fondo = sobre(rgba(getComputedStyle(pie).backgroundColor), fondoPagina);
       return ['shareText', 'shareButton'].map((clase) => {
@@ -112,7 +124,7 @@ test.describe('Componentes compartidos · accesibilidad', () => {
         const [l1, l2] = [lum(texto), lum(fondo)].sort((x, y) => y - x);
         return { clase, ratio: Math.round(((l1 + 0.05) / (l2 + 0.05)) * 100) / 100 };
       });
-    });
+    }, PIE);
     for (const { clase, ratio } of ratios) {
       expect(ratio, `${clase} en oscuro`).toBeGreaterThanOrEqual(4.5);
     }
@@ -127,7 +139,7 @@ test.describe('Componentes compartidos · accesibilidad', () => {
 
     await page.getByRole('button', { name: /Compártela/ }).click();
     // Acotado al del Footer: `components/ui/Toast.tsx` usa la misma clase y no es este.
-    const aviso = page.locator('[class*="Footer"][class*="toast"]');
+    const aviso = page.locator(`${PIE} [class*="_toast"]`);
     // En navegadores con Web Share nativo se abre el diálogo del sistema y no hay toast; se
     // comprueba solo si el camino del portapapeles es el que se ha tomado.
     if (await aviso.count()) {

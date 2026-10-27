@@ -476,7 +476,8 @@ test('formato: el % de la factura va separado con espacio duro U+00A0', async ({
   // (la de calculadora-iva dice «21/10/4 %» con espacio normal) y no se imputan a esta app.
   const texto = await page.evaluate(() => {
     const copia = document.body.cloneNode(true) as HTMLElement;
-    copia.querySelectorAll('[class*="RelatedApps"]').forEach((n) => n.remove());
+    // Por su región: el build no lleva el nombre del módulo en la clase (cabo C0457)
+    copia.querySelectorAll('section[aria-label="Aplicaciones relacionadas"]').forEach((n) => n.remove());
     return copia.textContent ?? '';
   });
   expect(texto.match(/\d(?: |)%/g) ?? [], '«N %» con espacio normal o pegado').toEqual([]);

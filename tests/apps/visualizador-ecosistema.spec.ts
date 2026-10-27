@@ -1,6 +1,7 @@
 import { test, expect, Page } from '@playwright/test';
 import { esperarPaginaAsentada } from './_hidratacion';
 import { prepararParaMedir } from '../_contraste';
+import { prefijoDeClase } from './_modulo-css';
 
 /**
  * Ciclos del Carbono y del Nitrógeno (visualizador-ecosistema) — generado por /inspector el 25/09/2026
@@ -525,8 +526,18 @@ test('contraste — barrido de todo el texto propio de la app en oscuro, con fic
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
   await expect(contenedor).toHaveCSS('background-color', 'rgb(26, 26, 26)');
 
+  // El prefijo del módulo de la app, sacado de su contenedor. Hasta el 27/10/2026 se buscaba
+  // «Ecosistema-module__» en la clase, que el build de next 16.4.3 ya no lleva: bajo `next start`
+  // se saltaban todos los elementos y el barrido salía vacío y en verde (cabo C0457)
+  const prefijo = ((await contenedor.getAttribute('class')) ?? '')
+    .split(/\s+/)
+    .map((c) => prefijoDeClase(c, 'container'))
+    .find(Boolean);
+  expect(prefijo, 'el contenedor no lleva la clase «…_container» de la app').toBeTruthy();
+  let medidos = 0;
+
   const barrer = (): Promise<string[]> =>
-    page.evaluate(() => {
+    page.evaluate((prefijo) => {
       const canal = (c: number) => {
         const s = c / 255;
         return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
@@ -548,7 +559,7 @@ test('contraste — barrido de todo el texto propio de la app en oscuro, con fic
         // Solo lo que pinta este módulo: el primer antepasado con clase es de Ecosistema.module.css
         let conClase: Element | null = el;
         while (conClase && !conClase.getAttribute('class')) conClase = conClase.parentElement;
-        if (!conClase?.getAttribute('class')?.includes('Ecosistema-module__')) continue;
+        if (!conClase || ![...conClase.classList].some((c) => c.startsWith(prefijo))) continue;
         const propio = [...el.childNodes]
           .filter((n) => n.nodeType === 3)
           .map((n) => n.textContent ?? '')
@@ -582,8 +593,12 @@ test('contraste — barrido de todo el texto propio de la app en oscuro, con fic
         const grande = px >= 24 || (px >= 18.66 && Number(cs.fontWeight) >= 700);
         const peor = Math.min(...bases.map((b) => ratio(texto, b)));
         if (peor < (grande ? 3 : 4.5)) fallos.push(`«${propio.slice(0, 40)}» ${Math.round(peor * 100) / 100}:1`);
+        else fallos.push('');
       }
       return fallos;
+    }, prefijo as string).then((r) => {
+      medidos += r.length;
+      return r.filter(Boolean);
     });
 
   const pasos: Array<[string, (() => Promise<void>) | null]> = [
@@ -601,6 +616,7 @@ test('contraste — barrido de todo el texto propio de la app en oscuro, con fic
     if (accion) await accion();
     fallos.push(...(await barrer()).map((f) => `${seccion}: ${f}`));
   }
+  expect(medidos, 'el barrido no midió ningún texto de la app').toBeGreaterThan(50);
   expect(fallos).toEqual([]);
 });
 

@@ -272,7 +272,10 @@ test.describe('Calculadora de tamaño adulto del perro — la reparación del 20
     // peso REAL de hoy; por eso se excluye del recuento en vez de contarse como promesa.)
     const cuerpo = await page.evaluate(() => {
       const clon = document.body.cloneNode(true) as HTMLElement;
-      clon.querySelectorAll('[class*="RelatedApps"], script, nextjs-portal').forEach((e) => e.remove());
+      // La banda por su región, no por el nombre del módulo, que el build no lleva (cabo C0457)
+      clon
+        .querySelectorAll('section[aria-label="Aplicaciones relacionadas"], script, nextjs-portal')
+        .forEach((e) => e.remove());
       return clon.textContent || '';
     });
     const menciones = limpiaEspacios(cuerpo).match(/dosis/gi) ?? [];
@@ -376,9 +379,18 @@ test.describe('Calculadora de tamaño adulto del perro — regresiones', () => {
     // placeholder y los ⚖️/📅 de las 27 fichas de raza), más 15 en el bloque educativo.
     const sinOcultar = await page.evaluate(() => {
       const re = /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}]/u;
-      const ajenos =
-        '[class*="ShareCard"],[class*="Footer"],[class*="LegalNotice"],[class*="MeskeiaLogo"],' +
-        '[class*="DisclaimerCard"],[class*="DataReference"],[class*="RelatedApps"],[class*="EducationalSection"]';
+      // Los componentes compartidos, por lo que el build NO renombra: hasta el 27/10/2026 se
+      // buscaban por el nombre del módulo en la clase, que el build de next 16.4.3 ya no lleva, y
+      // bajo `next start` no se apartaba ninguno (cabo C0457). Los que llevan aria-label
+      // (ShareCard, RelatedApps, la constelación del pie, DataReference y el aviso crítico) ya
+      // los aparta el closest('[aria-label]') de abajo.
+      const guia = [...document.querySelectorAll('button')].find((b) => /guía educativa/i.test(b.textContent || ''));
+      const educativa = guia?.closest('[class*="_container"]');
+      const ajenos = [
+        ...document.querySelectorAll('[data-barra-logo], footer[data-pildora-pie], [class*="_legalNotice"], [role="note"]'),
+        ...(educativa ? [educativa] : []),
+      ];
+      if (!educativa || ajenos.length < 4) return -1;
       let total = 0;
       const w = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
       let nodo: Node | null;
@@ -390,7 +402,7 @@ test.describe('Calculadora de tamaño adulto del perro — regresiones', () => {
         // Desde el 08/10/2026 (99e1ee7e) las tarjetas de relacionadas viajan del servidor en el payload
         // de React, un <script> con sus iconos: no es texto que lea un lector de pantalla.
         if (el.closest('script, style')) continue;
-        if (el.closest('nextjs-portal') || el.closest(ajenos)) continue;
+        if (el.closest('nextjs-portal') || ajenos.some((a) => a.contains(el))) continue;
         total++;
       }
       return total;

@@ -504,7 +504,15 @@ test.describe('REINSPECCIÓN 25/09/2026 · lo que tocó la reparación', () => {
     await expect(aviso).toHaveClass(/severity-high/);
     await expect(aviso).toHaveAttribute('role', 'note');
     await expect(aviso.locator('button[aria-expanded]')).toHaveCount(0);
-    expect(await aviso.evaluate((el) => el.closest('[class*="EducationalSection"]') === null)).toBe(true);
+    // La guía por su botón, no por el nombre del módulo: el build no lo lleva en la clase y
+    // closest() daba siempre null, en verde sin medir (cabo C0457)
+    expect(
+      await aviso.evaluate((el) => {
+        const boton = [...document.querySelectorAll('button')].find((b) => /guía educativa/i.test(b.textContent || ''));
+        const guia = boton?.closest('[class*="_container"]');
+        return guia ? !guia.contains(el) : 'sin guía';
+      }),
+    ).toBe(true);
     expect(
       await aviso.evaluate((el) => {
         const svg = document.querySelector('svg[role="group"]');

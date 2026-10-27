@@ -47,7 +47,9 @@ async function textosBajoUmbral(page: Page, objetivo: number[]): Promise<string[
     const fuera: string[] = [];
     for (const el of Array.from(document.querySelectorAll('body *'))) {
       const cs = getComputedStyle(el);
-      if (cs.color !== buscado || /__ia(\s|$)/.test(String(el.className))) continue;
+      // El «IA» del logo. Un guion bajo, no dos: «…module__hash__ia» en next dev y «hash_ia» en el
+      // build; con /__ia/ bajo `next start` no se saltaba (cabo C0487)
+      if (cs.color !== buscado || /_ia(\s|$)/.test(String(el.className))) continue;
       if (![...el.childNodes].some((n) => n.nodeType === 3 && n.textContent!.trim())) continue;
       if (el.getBoundingClientRect().width === 0 || cs.visibility === 'hidden') continue;
       const capas: { grad: number[][]; bg?: number[] }[] = [];

@@ -262,14 +262,16 @@ test.describe('Caso a rechazar: cuestionario incompleto', () => {
     const aviso = page.locator('[class*="disclaimer"]').first();
     await expect(aviso).toContainText('no constituye asesoramiento financiero');
     await expect(aviso.locator('button')).toHaveCount(0); // sin control de plegado
+    // La guía por su botón, no por el nombre del módulo: el build no lo lleva en la clase y el
+    // closest() no casaba nunca, en verde sin medir (cabo C0457)
     expect(
-      await page.evaluate(() =>
-        Boolean(
-          document
-            .querySelector('[class*="disclaimer"]')
-            ?.closest('details, [class*="educational"], [class*="Educational"]'),
-        ),
-      ),
+      await page.evaluate(() => {
+        const aviso = document.querySelector('[class*="disclaimer"]');
+        const boton = [...document.querySelectorAll('button')].find((b) => /guía educativa/i.test(b.textContent || ''));
+        const guia = boton?.closest('[class*="_container"]');
+        if (!aviso || !guia) return 'sin aviso o sin guía';
+        return Boolean(aviso.closest('details')) || guia.contains(aviso);
+      }),
     ).toBe(false);
 
     // Y también acompaña al resultado, que es donde el usuario se lleva un perfil puesto.
