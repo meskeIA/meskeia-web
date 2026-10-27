@@ -17,6 +17,9 @@
  * la campaña sabía migrar y siga rompiendo en lo que no (el fondo translúcido de lupa-digital).
  * Si un día la campaña y el candado discreparan, aquí se vería.
  *
+ * Los casos 17-19 (27/10/2026, cabo C0483) son la tanda 2 en impresión: `-texto` dentro de un
+ * `@media print`, con el título del parte del sonómetro de antes de 5fcd18bc como caso de origen.
+ *
  * Trabaja sobre mini-catálogos en directorios temporales: no escribe NADA en `app/`.
  */
 
@@ -204,6 +207,40 @@ const CASOS = [
     debeFallar: true,
     ficheros: { 'app/x/X.module.css': css('/* marca-ok: */', '.muestra { background: var(--secondary); color: white; }') },
   },
+  // Tanda 2 en impresión (cabo C0483): -texto dentro de @media print, el papel es blanco en los dos temas
+  {
+    n: 17,
+    nombre: 'CASO DE ORIGEN · el título del parte del sonómetro antes de 5fcd18bc: var(--primary-texto) en @media print',
+    tanda: 2,
+    debeFallar: true,
+    ficheros: {
+      'app/sonometro/Sonometro.module.css': css(
+        '@media print {', '  .parteCabecera {', '    border-bottom: 2pt solid #2e86ab;', '  }', '',
+        '  .parteTitulo {', '    margin: 0 0 2mm 0;', '    font-size: 16pt;', '    color: var(--primary-texto);', '  }', '}',
+      ),
+    },
+  },
+  {
+    n: 18,
+    nombre: 'EL MISMO, REPARADO: var(--primary-boton), y -texto FUERA del bloque de impresión',
+    tanda: null,
+    debeFallar: false,
+    ficheros: {
+      'app/sonometro/Sonometro.module.css': css(
+        '.titulo { color: var(--primary-texto); }',
+        '@media print {', '  .parteTitulo {', '    color: var(--primary-boton);', '  }', '  .borde { border-color: var(--secondary-texto); }', '}',
+      ),
+    },
+  },
+  {
+    n: 19,
+    nombre: 'IMPRESIÓN con escape y razón escrita: calla',
+    tanda: null,
+    debeFallar: false,
+    ficheros: {
+      'app/x/X.module.css': css('@media print {', '  /* marca-ok: la hoja impresa fuerza el tema claro con data-theme */', '  .t { color: var(--secondary-texto); }', '}'),
+    },
+  },
 ];
 
 function montar(ficheros) {
@@ -232,7 +269,8 @@ for (const c of CASOS) {
 
 // ─── La campaña deja callado al candado en lo que sabe migrar ──────────────────
 {
-  const todos = Object.assign({}, ...CASOS.filter((c) => c.debeFallar && c.n !== 5 && c.n !== 15).map((c, i) =>
+  // Fuera el 5 (sin sustituto), el 15 (escape sin razón) y el 17 (impresión): la campaña no los migra
+  const todos = Object.assign({}, ...CASOS.filter((c) => c.debeFallar && ![5, 15, 17].includes(c.n)).map((c, i) =>
     Object.fromEntries(Object.entries(c.ficheros).map(([r, t]) => [r.replace(/^app\/([^/]+)/, `app/$1-${i}`), t])),
   ));
   const dir = montar(todos);

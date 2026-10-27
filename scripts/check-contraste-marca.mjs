@@ -123,6 +123,40 @@ function recorrer(dir, acc = []) {
 }
 
 const rel = (p) => path.relative(RAIZ, p).replace(/\\/g, '/');
+
+/**
+ * Tanda 2 en IMPRESIÓN (27/10/2026, cabo C0483): `--primary-texto` / `--secondary-texto` como
+ * color de texto dentro de un `@media print`. El papel es blanco en los dos temas, y en oscuro
+ * esos tokens valen su tono claro: impreso desde el tema oscuro, #3FA5D1 sobre blanco da 2,79:1.
+ * Es justo lo que la tanda 2 hizo en esos bloques (4488bd1d): el título del parte del sonómetro
+ * (hallazgo 3546, 5fcd18bc) y tres títulos del acta de generador-actas (C0483). El sustituto es
+ * `-boton`, igual en los dos temas. Va aparte de `clasificar.mjs` porque la campaña no lo migra.
+ */
+function textoMarcaEnImpresion(css) {
+  const t = css.replace(/\/\*[\s\S]*?\*\//g, (c) => c.replace(/[^\n]/g, ' '));
+  const lineas = css.split('\n');
+  const out = [];
+  let i = 0;
+  while ((i = t.indexOf('@media print', i)) !== -1) {
+    const abre = t.indexOf('{', i);
+    if (abre === -1) break;
+    let prof = 1;
+    let j = abre + 1;
+    while (j < t.length && prof > 0) { if (t[j] === '{') prof++; else if (t[j] === '}') prof--; j++; }
+    const re = /(?:^|[;{\s])((?:-webkit-text-fill-)?color)\s*:\s*([^;}]*var\(--(?:primary|secondary)-texto\)[^;}]*)/g;
+    const bloque = t.slice(abre, j);
+    let m;
+    while ((m = re.exec(bloque))) {
+      const linea = t.slice(0, abre + m.index).split('\n').length + (m[0].startsWith('\n') ? 1 : 0);
+      const cerca = lineas.slice(Math.max(0, linea - 4), linea).join('\n');
+      const mk = cerca.match(/marca-ok:([^\n]*)/);
+      const razon = mk ? mk[1].replace(/\*\/.*$/, '').replace(/[^\p{L}\p{N}\s]/gu, ' ').trim() : '';
+      out.push({ linea, decl: `${m[1]}: ${m[2].trim()}`, escape: mk ? (/\p{L}{3,}/u.test(razon) ? 'firmado' : 'sin razón') : null });
+    }
+    i = j;
+  }
+  return out;
+}
 const appDe = (r) => (r.startsWith('app/') ? r.split('/').slice(0, 2).join('/') : r);
 
 const ficheros = ARBOLES.flatMap((a) => recorrer(path.join(RAIZ, a))).filter((f) => !esCongelado(rel(f), CONGELADOS));
@@ -149,6 +183,13 @@ for (const [f, t] of textos) {
       ? `usa ${tokens.map((x) => `\`${x}\``).join(' y ') || `\`${SUSTITUTO[h.tanda]}\``}`
       : `sin sustituto mecánico (${h.motivo}): resolverlo a mano y medirlo`;
     errores.push({ tanda: h.tanda, texto: `${r}:${h.linea} — \`${h.selector.slice(0, 80)}\` pone ${que} (\`${h.prop}: ${h.valor.slice(0, 70)}\`): ${como}.${porQue}` });
+  }
+  if (TANDAS.includes(2) && f.endsWith('.css')) {
+    for (const h of textoMarcaEnImpresion(t)) {
+      if (h.escape === 'firmado') { exentas.push(`${r}:${h.linea}`); continue; }
+      const porQue = h.escape === 'sin razón' ? ' — lleva `marca-ok:` SIN razón escrita' : '';
+      errores.push({ tanda: 2, texto: `${r}:${h.linea} — \`${h.decl}\` dentro de @media print: el papel es blanco en los dos temas y en oscuro ese token es el tono CLARO (#3FA5D1 da 2,79:1): usa \`var(--primary-boton)\` / \`var(--secondary-boton)\`.${porQue}` });
+    }
   }
 }
 
