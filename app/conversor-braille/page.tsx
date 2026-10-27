@@ -391,9 +391,75 @@ const ES_CELDA_OCHO_PUNTOS = /^[⡀-⣿]$/;
  * la app). Desde la tinta no se distingue una sigla de un énfasis: la app sigue escribiendo la
  * sigla y avisa de las palabras de cuatro o más mayúsculas, que es donde la duda es razonable.
  */
+/**
+ * ⚠️ 27/10/2026 (hallazgo 3554) — B 2 § 7.1, literal: «no debe escribirse este signo de punto
+ * después de cada una de las letras que forman la sigla, aunque aparezca así en el original», con
+ * el ejemplo «O.N.U. → {o{n{u». La app escribía cada punto como punto 3. Son puntos de sigla los
+ * que siguen a cada mayúscula de una serie de dos o más mayúsculas sueltas con punto («O.N.U.»,
+ * «U.E.»); una abreviatura como «EE. UU.» o una inicial suelta («J. Pérez») no lo son.
+ */
+const puntosDeSigla = (caracteres: string[]): Set<number> => {
+  const puntos = new Set<number>();
+  const esMayuscula = (c: string | undefined) => c !== undefined && /^\p{Lu}$/u.test(c);
+  for (let i = 0; i < caracteres.length; i++) {
+    if (!esMayuscula(caracteres[i]) || ES_LETRA.test(caracteres[i - 1] ?? '') || caracteres[i - 1] === '.') continue;
+    const serie: number[] = [];
+    let j = i;
+    while (esMayuscula(caracteres[j]) && caracteres[j + 1] === '.') {
+      serie.push(j + 1);
+      j += 2;
+    }
+    // «A.B.C» sin el último punto también es sigla; «O.N.Uno», no
+    const tras = caracteres[j] ?? '';
+    const cierra = !ES_LETRA.test(tras) || (esMayuscula(tras) && !ES_LETRA.test(caracteres[j + 1] ?? ''));
+    if (serie.length >= 2 && cierra) serie.forEach((p) => puntos.add(p));
+    i = Math.max(i, j - 1);
+  }
+  return puntos;
+};
+
 const palabrasEnMayusculas = (texto: string): string[] => [
-  ...new Set(texto.match(/(?<!\p{L})\p{Lu}{4,}(?!\p{L})/gu) ?? []),
+  ...new Set((texto.match(/(?<!\p{L})\p{Lu}{4,}(?!\p{L})/gu) ?? []).filter((p) => !esNumeroRomano(p))),
 ];
+
+/**
+ * ⚠️ 27/10/2026 (hallazgo 3555) — B 2 § 8.5, literal: «bastará con utilizar el prefijo de mayúscula
+ * 46 solamente al comienzo del número», con el ejemplo «M VIII → {m {viii». La app ponía ⠨ delante
+ * de cada letra, y el aviso del 3529 llamaba «sigla» a «XVIII». Ahora un número romano bien formado
+ * de dos o más letras lleva un solo ⠨ y tiene su propio aviso. Quedan fuera las siglas y palabras
+ * corrientes que también son romanos bien formados («CV», «CD», «MI»…): desde la tinta no se
+ * distinguen, y ahí la lectura más probable es la sigla. Una sigla que la app tome por romano se
+ * escribe letra a letra poniéndole puntos («C.V.», § 7.1).
+ */
+const ROMANO = /^M{0,3}(CM|CD|D?C{0,3})(XC|XL|L?X{0,3})(IX|IV|V?I{0,3})$/;
+const ROMANOS_QUE_SUELEN_SER_OTRA_COSA = new Set([
+  'MI', 'DI', 'LI', 'CI', 'CD', 'CV', 'DC', 'XL', 'CC', 'CL', 'CM', 'DL', 'MD', 'MC', 'MIL', 'MIX', 'DIV',
+]);
+
+const esNumeroRomano = (palabra: string): boolean =>
+  palabra.length >= 2 && ROMANO.test(palabra) && !ROMANOS_QUE_SUELEN_SER_OTRA_COSA.has(palabra);
+
+/** Posiciones de las letras de un número romano que van sin ⠨ (todas menos la primera), y los romanos. */
+const numerosRomanos = (caracteres: string[]): { sinMayuscula: Set<number>; romanos: string[] } => {
+  const sinMayuscula = new Set<number>();
+  const romanos: string[] = [];
+  let i = 0;
+  while (i < caracteres.length) {
+    if (!ES_LETRA.test(caracteres[i])) {
+      i++;
+      continue;
+    }
+    let j = i;
+    while (j < caracteres.length && ES_LETRA.test(caracteres[j])) j++;
+    const palabra = caracteres.slice(i, j).join('');
+    if (esNumeroRomano(palabra)) {
+      for (let k = i + 1; k < j; k++) sinMayuscula.add(k);
+      romanos.push(palabra);
+    }
+    i = j;
+  }
+  return { sinMayuscula, romanos: [...new Set(romanos)] };
+};
 
 /**
  * ⚠️ 27/10/2026 (hallazgo 3530) — B 2 § 5.1 (catalán y valenciano): é = 123456 y ó = 246, mientras
@@ -555,6 +621,8 @@ export default function ConversorBraillePage() {
   const telefonosDudosos = mode === 'textToBraille' && result ? posiblesTelefonos(input) : [];
   /** Palabras en mayúsculas escritas como sigla, que podrían ser un énfasis (§ 7.2, hallazgo 3529). */
   const mayusculas = mode === 'textToBraille' && result ? palabrasEnMayusculas(input) : [];
+  /** Números romanos escritos con un solo signo de mayúscula (§ 8.5, hallazgo 3555). */
+  const romanosEscritos = mode === 'textToBraille' && result ? numerosRomanos(normalizarTinta(input)).romanos : [];
   /** Celdas de ocho puntos que la vista y la hoja no pueden dibujar enteras (hallazgo 3528). */
   const celdasOchoPuntos = result
     ? [
@@ -757,6 +825,8 @@ export default function ConversorBraillePage() {
     // recorrerlo a pares partía el carácter en dos mitades sin celda.
     const caracteres = normalizarTinta(text);
     const blancos = blancosEntreCifras(caracteres);
+    const sinPuntoDeSigla = puntosDeSigla(caracteres);
+    const romanos = numerosRomanos(caracteres);
 
     for (let i = 0; i < caracteres.length; i++) {
       const original = caracteres[i];
@@ -774,6 +844,8 @@ export default function ConversorBraillePage() {
         enExpresionNumerica = false;
         continue;
       }
+      // B 2 § 7.1 (hallazgo 3554): los puntos de una sigla no se escriben
+      if (sinPuntoDeSigla.has(i)) continue;
 
       if (/[0-9]/.test(char)) {
         if (!enExpresionNumerica) {
@@ -866,8 +938,9 @@ export default function ConversorBraillePage() {
       const esMayuscula = original !== char && /[A-ZÁÉÍÓÚÜÑ]/.test(original);
       if (esMayuscula) {
         // El signo de mayúscula (4-6) no es ninguna cifra, así que desambigua por
-        // sí mismo: es lo que hace el B 2 § 8.5 con los números romanos.
-        result += CAPITAL_INDICATOR + celda;
+        // sí mismo: es lo que hace el B 2 § 8.5 con los números romanos, que lo
+        // llevan solo delante de la primera letra (hallazgo 3555).
+        result += (romanos.sinMayuscula.has(i) ? '' : CAPITAL_INDICATOR) + celda;
         enExpresionNumerica = false;
         continue;
       }
@@ -1325,6 +1398,18 @@ export default function ConversorBraillePage() {
                   {mayusculas.length === 1
                     ? 'se ha escrito como una sigla, con el signo de mayúscula delante de cada letra (B 2 § 7.1). Si las mayúsculas marcan énfasis y no una sigla, el B 2 § 7.2 la escribe en minúscula entre los signos de escritura especial del § 9.1 (⠔ al abrir y al cerrar), que esta app no pone.'
                     : 'se han escrito como siglas, con el signo de mayúscula delante de cada letra (B 2 § 7.1). Si las mayúsculas marcan énfasis y no una sigla, el B 2 § 7.2 las escribe en minúscula entre los signos de escritura especial del § 9.1 (⠔ al abrir y al cerrar), que esta app no pone.'}
+                </span>
+              </p>
+            )}
+
+            {romanosEscritos.length > 0 && (
+              <p className={styles.avisoConversion} role="status">
+                <span aria-hidden="true">ℹ️</span>{' '}
+                <strong>{romanosEscritos.join(' · ')}</strong>{' '}
+                <span>
+                  {romanosEscritos.length === 1
+                    ? 'se ha escrito como un número romano, con el signo de mayúscula solo delante de la primera letra (B 2 § 8.5). Si es una sigla, escríbela con un punto tras cada letra y saldrá con el signo delante de cada una (§ 7.1).'
+                    : 'se han escrito como números romanos, con el signo de mayúscula solo delante de la primera letra (B 2 § 8.5). Si alguno es una sigla, escríbela con un punto tras cada letra y saldrá con el signo delante de cada una (§ 7.1).'}
                 </span>
               </p>
             )}

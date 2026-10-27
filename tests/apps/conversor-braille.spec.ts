@@ -3206,24 +3206,39 @@ test.describe('re-inspección 27/10/2026', () => {
   });
 
   // ─────────────────────────────────────────────────────────────────────────
-  // ABIERTO — § 7.1: las siglas con puntos se escriben sin ellos
+  // REPARADO 3554 — § 7.1: las siglas con puntos se escriben sin ellos
   // ─────────────────────────────────────────────────────────────────────────
-  test.fail('ABIERTO — § 7.1: «O.N.U.» se escribe ⠨⠕⠨⠝⠨⠥, sin los puntos de la tinta', async ({ page }) => {
+  // REPARADO el 27/10/2026: puntosDeSigla() retira el punto que sigue a cada mayúscula de una serie
+  // de dos o más. Una abreviatura («EE. UU.») o una inicial suelta («J. Pérez») conservan el suyo.
+  test('REPARADO 3554 — § 7.1: «O.N.U.» se escribe ⠨⠕⠨⠝⠨⠥, sin los puntos de la tinta', async ({ page }) => {
     await page.goto(RUTA);
     await convertir27(page, 'O.N.U.');
-    // «O.N.U. → {o{n{u»: ⠨ (46) ⠕ (135) · ⠨ ⠝ (1345) · ⠨ ⠥ (136). Hoy: ⠨⠕⠄⠨⠝⠄⠨⠥⠄
+    // «O.N.U. → {o{n{u»: ⠨ (46) ⠕ (135) · ⠨ ⠝ (1345) · ⠨ ⠥ (136). Era: ⠨⠕⠄⠨⠝⠄⠨⠥⠄
     await expect(cajaResultado(page)).toHaveText('⠨⠕⠨⠝⠨⠥', { timeout: 3000 });
+    const casos: Array<[string, string]> = [
+      // l ⠇ · a ⠁ · ⠀ · O.N.U. sin puntos · ⠀ · a ⠁ p ⠏ r ⠗ o ⠕ b ⠃ ó ⠬
+      ['La O.N.U. aprobó', '⠨⠇⠁⠀⠨⠕⠨⠝⠨⠥⠀⠁⠏⠗⠕⠃⠬'],
+      // Inicial suelta: su punto se queda (punto 3, § 6.1)
+      ['J. Pérez', '⠨⠚⠄⠀⠨⠏⠮⠗⠑⠵'],
+    ];
+    for (const [texto, celdas] of casos) {
+      await page.goto(RUTA);
+      await convertir27(page, texto);
+      await expect(cajaResultado(page), texto).toHaveText(celdas);
+    }
   });
 
   // ─────────────────────────────────────────────────────────────────────────
-  // ABIERTO — § 8.5: un número romano no es una sigla, y el aviso del 3529 lo llama así
+  // REPARADO 3555 — § 8.5: un número romano no es una sigla, y el aviso del 3529 lo llamaba así
   // ─────────────────────────────────────────────────────────────────────────
   //
-  // El § 8.5 escribe el signo de mayúscula solo al comienzo del número («VIII → {viii»). La app pone
-  // uno delante de cada letra y, desde aa75156d, el aviso de cuatro o más mayúsculas dice que «XVIII
-  // se ha escrito como una sigla» y ofrece la lectura de énfasis del § 7.2. Vale la celda del § 8.5,
+  // El § 8.5 escribe el signo de mayúscula solo al comienzo del número («VIII → {viii»). La app ponía
+  // uno delante de cada letra y, desde aa75156d, el aviso de cuatro o más mayúsculas decía que «XVIII
+  // se ha escrito como una sigla» y ofrecía la lectura de énfasis del § 7.2. Vale la celda del § 8.5,
   // o que el aviso no lo llame sigla y cite el § 8.5.
-  test.fail('ABIERTO — § 8.5: «VIII» y «siglo XVIII» llevan la mayúscula solo al principio, o el aviso no los llama sigla', async ({ page }) => {
+  // REPARADO el 27/10/2026: numerosRomanos() da un solo ⠨ al romano bien formado de dos o más letras
+  // (salvo siglas corrientes que también lo son, como «CV»), con su propio aviso del § 8.5.
+  test('REPARADO 3555 — § 8.5: «VIII» y «siglo XVIII» llevan la mayúscula solo al principio, o el aviso no los llama sigla', async ({ page }) => {
     const casos: Array<[string, string, string]> = [
       // ⠨ (46) · v ⠧ (1236) · i ⠊ (24) ×3. Hoy: ⠨⠧⠨⠊⠨⠊⠨⠊
       ['VIII', '⠨⠧⠊⠊⠊', 'VIII'],
@@ -3243,6 +3258,25 @@ test.describe('re-inspección 27/10/2026', () => {
       if (r !== celdas && (llamadaSigla || !citaRomanos)) fallos.push(`${texto} → ${r}${llamadaSigla ? ' y «sigla»' : ''}`);
     }
     expect(fallos).toEqual([]);
+    // «MCMXC» (1990): ⠨ m ⠍ (134) · c ⠉ (14) · m ⠍ · x ⠭ (1346) · c ⠉, un solo signo y el aviso del § 8.5
+    await page.goto(RUTA);
+    await convertir27(page, 'MCMXC');
+    await expect(cajaResultado(page)).toHaveText('⠨⠍⠉⠍⠭⠉');
+    await expect(aviso27(page, '§ 8.5').locator('strong')).toHaveText('MCMXC');
+    await expect(aviso27(page, 'como una sigla')).toHaveCount(0);
+    // Lo que no es romano, o es una sigla corriente que lo parece, sigue letra a letra (§ 7.1)
+    const siglas: Array<[string, string]> = [
+      ['ONCE', '⠨⠕⠨⠝⠨⠉⠨⠑'],
+      ['CV', '⠨⠉⠨⠧'],
+      // «IIII» no es un romano bien formado (es IV)
+      ['IIII', '⠨⠊⠨⠊⠨⠊⠨⠊'],
+    ];
+    for (const [texto, celdas] of siglas) {
+      await page.goto(RUTA);
+      await convertir27(page, texto);
+      await expect(cajaResultado(page), texto).toHaveText(celdas);
+      await expect(aviso27(page, '§ 8.5'), texto).toHaveCount(0);
+    }
   });
 
   // ─────────────────────────────────────────────────────────────────────────
