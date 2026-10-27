@@ -88,8 +88,16 @@ const CASOS = [
   },
   { n: 13, nombre: 'SE PLANTA · ningún .tsx que leer', debeFallar: true, ficheros: {} },
   // Segunda forma (cabo C0472): un <AnalyticsTracker> suelto junto al del <Footer appName>
-  { n: 14, nombre: 'CASO DE ORIGEN · calculadora-propinas antes de 8cc9f09a (tracker suelto + Footer appName)', debeFallar: true, ficheros: { [PROPINAS]: deGit('8cc9f09a^', PROPINAS) } },
-  { n: 15, nombre: 'CASO DE ORIGEN REPARADO · calculadora-propinas en 8cc9f09a', debeFallar: false, ficheros: { [PROPINAS]: deGit('8cc9f09a', PROPINAS) } },
+  // La forma de calculadora-propinas antes y después de su reparación, escrita aquí y no sacada
+  // de git: el commit se hizo en la rama de /reparar y su sha puede cambiar al integrarlo
+  {
+    n: 14, nombre: 'CASO DE ORIGEN · la forma de calculadora-propinas (tracker suelto + Footer appName)', debeFallar: true,
+    ficheros: { [PROPINAS]: "import AnalyticsTracker from '@/components/AnalyticsTracker';\nexport default function P() {\n  return (\n    <>\n      {/* Analytics v2.1 */}\n      <AnalyticsTracker applicationName=\"calculadora-propinas\" />\n      <ShareCard appName=\"Calculadora de Propinas\" />\n      <Footer appName=\"Calculadora de Propinas\" />\n    </>\n  );\n}\n" },
+  },
+  {
+    n: 15, nombre: 'CASO DE ORIGEN REPARADO · calculadora-propinas con solo el tracker del pie', debeFallar: false,
+    ficheros: { [PROPINAS]: "export default function P() {\n  return (\n    <>\n      <ShareCard appName=\"calculadora-propinas\" />\n      <Footer appName=\"calculadora-propinas\" />\n    </>\n  );\n}\n" },
+  },
   {
     n: 16, nombre: 'tracker suelto con un <Footer /> SIN appName (la forma de quiz-tipos-plantas)', debeFallar: false,
     ficheros: pagina('  return <div><AnalyticsTracker appName="x" /><Footer /></div>;'),
