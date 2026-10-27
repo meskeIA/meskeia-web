@@ -526,7 +526,8 @@ obligatoria.
 hexadecimal o su `rgb()`), también el que un hover hereda de su estado base: usar
 `--primary-boton` / `--secondary-boton`; o si usa **la marca como color de texto**: usar
 `--primary-texto` / `--secondary-texto`, o `-boton` sobre un fondo claro que no cambia con el
-tema. Comparte criterio con `scripts/contraste-marca/campana.mjs`.
+tema; o `-texto` dentro de `@media print`, donde el papel es blanco en los dos temas: `-boton`
+(C0483). Comparte criterio con `scripts/contraste-marca/campana.mjs`.
 Barre `app/`, `components/` y `styles/`, **sin pasivo** · Escape: `marca-ok: <razón>`, razón obligatoria.
 ⚠️ No mira el texto de un `<canvas>`, el `fill` de un SVG ni un fondo de marca sin texto blanco a
 la vista; que el sustituto cumpla lo mide `tests/contraste-marca-botones.spec.ts`.
@@ -578,7 +579,8 @@ quita de su módulo · liga cada uso a SU import, no al nombre `styles` · Escap
 
 `npm run check:footer-tracker` — en el build, y **rompe el build** si un `.tsx` de `app/` monta
 más de un `<Footer appName>` (un `return` por fase) sin la **misma** `key` en todos: React lo
-remonta al cambiar de fase y su `AnalyticsTracker` registra otra visita. **Sin pasivo** ·
+remonta al cambiar de fase y su `AnalyticsTracker` registra otra visita; o un `AnalyticsTracker`
+suelto junto a un `<Footer appName>`, que ya trae el suyo (C0472). **Sin pasivo** ·
 Escape: `footer-ok: <razón>`, razón obligatoria.
 ⚠️ No ve un pie que DESAPARECE en una fase (quiz-tipos-plantas): eso lo mide
 `tests/apps/footer-una-visita-por-carga.spec.ts`.
