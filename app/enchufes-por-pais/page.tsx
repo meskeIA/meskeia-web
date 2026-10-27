@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard,
   DisclaimerCard,
 } from '@/components';
-import AnalyticsTracker from '@/components/AnalyticsTracker';
 import styles from './EnchufesPais.module.css';
 
 interface DatosPais {
@@ -123,7 +122,6 @@ export default function EnchufesPais() {
 
   return (
     <div className={styles.container}>
-      <AnalyticsTracker appName="enchufes-por-pais" />
       <MeskeiaLogo />
 
       <header className={styles.hero}>

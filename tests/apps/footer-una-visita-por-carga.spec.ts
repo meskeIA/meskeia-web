@@ -115,3 +115,20 @@ test('quiz-tipos-plantas: portada → partida entera → resultados no registra 
   await expect(page.locator('footer').first()).toBeVisible();
   await sinMontajesNuevos(page, montajes, base);
 });
+
+/**
+ * Cabo C0472 (27/10/2026): seis apps montaban un `<AnalyticsTracker>` suelto ADEMÁS del que lleva
+ * su `<Footer appName>`, así que cada carga contaba dos visitas (en el dump del 26/10, entre el
+ * 75 y el 100 % de sus filas tenían gemela de la misma sesión a 2 s o menos), y
+ * calculadora-propinas con dos nombres distintos. Se compara con una app de control que solo
+ * lleva el del Footer: la misma cuenta, sea cual sea el modo (el estricto de `next dev` duplica
+ * los dos por igual).
+ */
+for (const ruta of ['/calculadora-propinas/', '/calculadora-fechas/', '/comparador-coste-vida/', '/conversor-divisas/', '/enchufes-por-pais/', '/presupuesto-viaje/'])
+  test(`${ruta}: una carga monta el tracker las mismas veces que una app con solo el del pie`, async ({ page }) => {
+    const control = await cargar(page, '/generador-tonos/');
+    const porCarga = control();
+    // Contador nuevo: solo ve la carga de la app
+    const montajes = await cargar(page, ruta);
+    expect(montajes(), 'montajes del tracker en la carga de la app').toBe(porCarga);
+  });

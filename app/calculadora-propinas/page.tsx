@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import { MeskeiaLogo, Footer, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, DataReference, LegalNotice, ShareCard, CampoNumerico } from '@/components';
-import AnalyticsTracker from '@/components/AnalyticsTracker';
 import { formatCurrency } from '@/lib/formatters';
 import { jsonLd } from './metadata';
 import styles from './CalculadoraPropinas.module.css';
@@ -87,9 +86,6 @@ export default function CalculadoraPropinas() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-
-      {/* Analytics v2.1 */}
-      <AnalyticsTracker applicationName="calculadora-propinas" />
 
       {/* Logo meskeIA */}
       <MeskeiaLogo />
@@ -778,8 +774,10 @@ export default function CalculadoraPropinas() {
 
       {/* Footer meskeIA */}
       <RelatedApps />
-      <ShareCard appName="Calculadora de Propinas" />
-      <Footer appName="Calculadora de Propinas" />
+      {/* Con el slug, como el resto del catálogo: el nombre largo partía su serie en dos, y el
+          tracker suelto que había arriba registraba cada visita otra vez (cabo C0472) */}
+      <ShareCard appName="calculadora-propinas" />
+      <Footer appName="calculadora-propinas" />
     </>
   );
 }

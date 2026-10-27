@@ -2,7 +2,6 @@
 
 import { useState, useMemo } from 'react';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, DisclaimerCard, ShareCard } from '@/components';
-import AnalyticsTracker from '@/components/AnalyticsTracker';
 import { formatNumber } from '@/lib/formatters';
 import styles from './ComparadorCosteVida.module.css';
 
@@ -130,7 +129,6 @@ export default function ComparadorCosteVida() {
 
   return (
     <div className={styles.container}>
-      <AnalyticsTracker appName="comparador-coste-vida" />
       <MeskeiaLogo />
 
       <header className={styles.hero}>

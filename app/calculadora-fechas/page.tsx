@@ -2,7 +2,6 @@
 // @disclaimer: exempt
 import { useState, useEffect } from 'react';
 import { MeskeiaLogo, Footer, ResultCard, EducationalSection, RelatedApps, LegalNotice, ShareCard, CampoNumerico } from '@/components';
-import AnalyticsTracker from '@/components/AnalyticsTracker';
 import styles from './CalculadoraFechas.module.css';
 import { formatDate } from '@/lib';
 
@@ -399,9 +398,6 @@ export default function CalculadoraFechas() {
 
   return (
     <>
-      {/* Analytics */}
-      <AnalyticsTracker applicationName="calculadora-fechas" />
-
       {/* Logo meskeIA */}
       <MeskeiaLogo />
 

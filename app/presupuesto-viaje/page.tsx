@@ -2,7 +2,6 @@
 
 import { useState, useCallback } from 'react';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard, DisclaimerCard, CampoNumerico } from '@/components';
-import AnalyticsTracker from '@/components/AnalyticsTracker';
 import { formatCurrency, formatNumber } from '@/lib/formatters';
 import styles from './PresupuestoViaje.module.css';
 
@@ -194,7 +193,6 @@ export default function PresupuestoViaje() {
 
   return (
     <div className={styles.container}>
-      <AnalyticsTracker appName="presupuesto-viaje" />
       <MeskeiaLogo />
 
       <header className={styles.hero}>
