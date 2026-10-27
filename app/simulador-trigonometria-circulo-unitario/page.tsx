@@ -789,8 +789,9 @@ export default function SimuladorTrigonometriaCirculoUnitario() {
         </h2>
         <p className={styles.aulaIntro}>
           Los 16 ángulos notables de la vuelta a la vez, cada uno en grados y en radianes y con
-          las coordenadas exactas de su punto, que son (cos θ, sen θ). En blanco sale la misma
-          hoja con los huecos para rellenar; al imprimirla, el solucionario va en una segunda página.
+          las coordenadas exactas de su punto, que son (cos θ, sen θ). En blanco, el círculo lleva
+          solo los grados y debajo una tabla para escribir los radianes y las coordenadas; al
+          imprimirla, el solucionario va en una segunda página.
         </p>
 
         <div className={styles.completoControles}>
@@ -821,6 +822,7 @@ export default function SimuladorTrigonometriaCirculoUnitario() {
         <div className={styles.completoLienzo} ref={lienzoCompletoRef}>
           <CirculoCompleto conValores={modoCompleto === 'valores'} />
         </div>
+        {modoCompleto === 'blanco' && <TablaCirculo conValores={false} />}
       </section>
 
       {/* ============================================
@@ -1428,15 +1430,17 @@ export default function SimuladorTrigonometriaCirculoUnitario() {
           </h2>
           <p className={styles.hojaDatos}>
             {modoCompleto === 'blanco'
-              ? 'Escribe cada ángulo en radianes y las coordenadas (cos θ, sen θ) de su punto, con su valor exacto.'
+              ? 'Escribe en la tabla cada ángulo en radianes y las coordenadas (cos θ, sen θ) de su punto, con su valor exacto.'
               : 'Cada punto es (cos θ, sen θ). El ángulo va en grados junto al punto y en radianes más hacia el centro.'}
           </p>
           <CirculoCompleto conValores={modoCompleto === 'valores'} />
+          {modoCompleto === 'blanco' && <TablaCirculo conValores={false} />}
         </div>
         {modoCompleto === 'blanco' && (
           <div className={`${styles.hojaPagina} ${styles.hojaSolucionario} ${impresion.bloque}`}>
             <h2 className={styles.hojaTitulo}>Círculo trigonométrico: solucionario</h2>
             <CirculoCompleto conValores />
+            <TablaCirculo conValores />
           </div>
         )}
       </div>
@@ -1452,19 +1456,17 @@ export default function SimuladorTrigonometriaCirculoUnitario() {
 
 /** Radio del círculo en unidades del viewBox; el resto de distancias cuelgan de él. */
 const R = 200;
-const HUECO = '____';
 
-/** Texto de las coordenadas de un punto, o los huecos para rellenarlas. */
-function coordenadas(p: PuntoNotable, conValores: boolean): string {
-  return conValores ? `(${p.cos}, ${p.sen})` : `( ${HUECO} , ${HUECO} )`;
+function coordenadas(p: PuntoNotable): string {
+  return `(${p.cos}, ${p.sen})`;
 }
 
 function CirculoCompleto({ conValores }: { conValores: boolean }) {
   const descripcion = conValores
     ? `Círculo trigonométrico completo. ${CIRCULO_COMPLETO.map(
-        p => `${p.grados}°, ${p.radianes} radianes: ${coordenadas(p, true)}`,
+        p => `${p.grados}°, ${p.radianes} radianes: ${coordenadas(p)}`,
       ).join('; ')}.`
-    : 'Círculo trigonométrico en blanco: los 16 ángulos notables en grados, con huecos para escribir los radianes y las coordenadas de cada punto.';
+    : 'Círculo trigonométrico en blanco: los 16 ángulos notables, solo en grados.';
 
   // Signos de (cos, sen) por cuadrante, en el centro de cada uno: es la otra mitad de lo
   // que se busca como «círculo goniométrico signos».
@@ -1476,9 +1478,12 @@ function CirculoCompleto({ conValores }: { conValores: boolean }) {
   ];
 
   return (
+    // En blanco no hay rótulos por fuera del círculo: el viewBox se ciñe a él y el círculo sale
+    // más grande. Los huecos para escribir van en la tabla de debajo, porque sobre el círculo
+    // no caben a mano (la primera hoja impresa, 27/10/2026, los dejaba en 3-4 mm).
     <svg
-      className={styles.completoSvg}
-      viewBox="-340 -262 680 524"
+      className={`${styles.completoSvg} ${conValores ? '' : styles.completoSvgBlanco}`}
+      viewBox={conValores ? '-340 -262 680 524' : '-228 -228 456 456'}
       role="img"
       aria-label={descripcion}
     >
@@ -1503,7 +1508,7 @@ function CirculoCompleto({ conValores }: { conValores: boolean }) {
         // a la izquierda acaba en él, y arriba o abajo queda centrado.
         const ancla = dx > 0.01 ? 'start' : dx < -0.01 ? 'end' : 'middle';
         const bajada = dy < -0.01 ? -4 : dy > 0.01 ? 15 : 5;
-        // Sobre el eje horizontal el hueco de los radianes (una raya) se confundía con el eje
+        // Sobre el eje horizontal el rótulo de los radianes se monta en el eje: va por encima
         const subidaRadianes = Math.abs(dy) < 0.01 ? -8 : 4;
         return (
           <g key={p.grados}>
@@ -1512,12 +1517,16 @@ function CirculoCompleto({ conValores }: { conValores: boolean }) {
             <text x={grados.x} y={grados.y} dy={4} textAnchor="middle" className={styles.ccGrados}>
               {p.grados}°
             </text>
-            <text x={radianes.x} y={radianes.y} dy={subidaRadianes} textAnchor="middle" className={styles.ccRadianes}>
-              {conValores ? p.radianes : HUECO}
-            </text>
-            <text x={fuera.x} y={fuera.y} dy={bajada} textAnchor={ancla} className={styles.ccCoordenadas}>
-              {coordenadas(p, conValores)}
-            </text>
+            {conValores && (
+              <>
+                <text x={radianes.x} y={radianes.y} dy={subidaRadianes} textAnchor="middle" className={styles.ccRadianes}>
+                  {p.radianes}
+                </text>
+                <text x={fuera.x} y={fuera.y} dy={bajada} textAnchor={ancla} className={styles.ccCoordenadas}>
+                  {coordenadas(p)}
+                </text>
+              </>
+            )}
           </g>
         );
       })}
@@ -1531,5 +1540,40 @@ function CirculoCompleto({ conValores }: { conValores: boolean }) {
         </text>
       ))}
     </svg>
+  );
+}
+
+/** Tabla de la hoja: los 16 ángulos en dos bloques de ocho, con las casillas vacías o resueltas. */
+function TablaCirculo({ conValores }: { conValores: boolean }) {
+  const mitades = [CIRCULO_COMPLETO.slice(0, 8), CIRCULO_COMPLETO.slice(8)];
+  return (
+    <div className={styles.ccTablas} data-tabla-circulo={conValores ? 'resuelta' : 'blanco'}>
+      {mitades.map(filas => (
+        <table
+          key={filas[0].grados}
+          className={styles.ccTabla}
+          aria-label={`Ángulos de ${filas[0].grados}° a ${filas[filas.length - 1].grados}°`}
+        >
+          <thead>
+            <tr>
+              <th scope="col">Ángulo</th>
+              <th scope="col">Radianes</th>
+              <th scope="col">cos θ</th>
+              <th scope="col">sen θ</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filas.map(p => (
+              <tr key={p.grados}>
+                <th scope="row">{p.grados}°</th>
+                <td>{conValores ? p.radianes : ''}</td>
+                <td>{conValores ? p.cos : ''}</td>
+                <td>{conValores ? p.sen : ''}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      ))}
+    </div>
   );
 }

@@ -1229,17 +1229,23 @@ test.describe('S0232 · círculo trigonométrico completo', () => {
     expect(textos.join(' ')).not.toMatch(/−0\b|NaN|undefined/);
   });
 
-  test('en blanco: grados a la vista y huecos donde iban radianes y coordenadas', async ({ page }) => {
+  // La primera hoja impresa (27/10/2026) llevaba los huecos sobre el círculo y medían 3-4 mm:
+  // no cabía «−√3/2» a mano. Ahora el círculo lleva solo los grados y se escribe en una tabla.
+  test('en blanco: el círculo solo con grados y una tabla de 16 filas vacías para escribir', async ({ page }) => {
     await page.goto(RUTA);
     await esperarHidratacion(page, ['#slider-angulo']);
     const enBlanco = seccion(page).getByRole('button', { name: 'En blanco, para rellenar' });
     await enBlanco.click();
     await expect(enBlanco).toHaveAttribute('aria-pressed', 'true');
     const textos = await rotulos(page).allTextContents();
-    expect(textos).toContain('210°');
-    expect(textos.join(' ')).not.toContain('√');
-    expect(textos.join(' ')).not.toContain('π');
-    expect(textos.filter(t => t === '( ____ , ____ )')).toHaveLength(16);
+    expect(textos.filter(t => /^\d+°$/.test(t))).toHaveLength(16);
+    expect(textos.join(' ')).not.toMatch(/[√π(]/);
+    const tabla = seccion(page).locator('[data-tabla-circulo="blanco"]');
+    await expect(tabla.locator('tbody tr')).toHaveCount(16);
+    await expect(tabla.locator('tbody th').nth(9)).toHaveText('210°');
+    const casillas = await tabla.locator('tbody td').allTextContents();
+    expect(casillas).toHaveLength(48);
+    expect(casillas.every(c => c === '')).toBe(true);
   });
 
   test('al imprimir en blanco sale solo la hoja y, en página aparte, el solucionario', async ({ page }) => {
@@ -1255,6 +1261,17 @@ test.describe('S0232 · círculo trigonométrico completo', () => {
     await expect(svgs).toHaveCount(2);
     await expect(svgs.nth(0).locator('text', { hasText: '√' })).toHaveCount(0);
     await expect(svgs.nth(1).locator('text', { hasText: '(−√3/2, −1/2)' })).toHaveCount(1);
+    // La tabla para escribir va en la primera página; la resuelta, en el solucionario
+    await expect(hoja.locator('[data-tabla-circulo="blanco"] tbody tr')).toHaveCount(16);
+    const fila210 = hoja.locator('[data-tabla-circulo="resuelta"] tbody tr').nth(9);
+    await expect(fila210.locator('th, td')).toHaveText(['210°', '7π/6', '−√3/2', '−1/2']);
+    // Y las dos tablas, lado a lado, al ancho útil de un A4 (~658 px): el corte del móvil a
+    // 768 px las habría apilado en el papel
+    await page.setViewportSize({ width: 658, height: 1000 });
+    const [izquierda, derecha] = await hoja.locator('[data-tabla-circulo="blanco"] table').evaluateAll(
+      tablas => tablas.map(t => t.getBoundingClientRect().top),
+    );
+    expect(Math.abs(izquierda - derecha)).toBeLessThan(2);
     await page.emulateMedia({ media: 'screen' });
     await expect(hoja).toBeHidden();
   });

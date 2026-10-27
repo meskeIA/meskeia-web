@@ -1498,6 +1498,47 @@
   font-weight: 600;
 }
 
+.completoSvgBlanco {
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+/* La tabla para rellenar, y resuelta en el solucionario: sobre el círculo los huecos no
+   cabían a mano (la primera hoja impresa, 27/10/2026, los dejaba en 3-4 mm) */
+.ccTablas {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--spacing-md);
+  max-width: 760px;
+  margin: var(--spacing-lg) auto 0;
+}
+
+.ccTabla {
+  width: 100%;
+  border-collapse: collapse;
+  color: var(--text-primary);
+}
+
+.ccTabla th,
+.ccTabla td {
+  height: 2.4rem;
+  padding: var(--spacing-xs);
+  border: 1px solid var(--border);
+  text-align: center;
+}
+
+.ccTabla thead th {
+  height: auto;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+
+.ccTabla tbody th {
+  width: 20%;
+  font-weight: 700;
+}
+
 /* La hoja de impresión no se ve en pantalla */
 .hojaCirculo {
   display: none;
@@ -1524,6 +1565,19 @@
      ~12 px y el círculo se recorre deslizando. Solo en pantalla: la hoja impresa no vive aquí */
   .completoLienzo .completoSvg {
     min-width: 600px;
+  }
+
+  /* Sin rótulos por fuera del círculo, el de la hoja en blanco se lee bien más pequeño */
+  .completoLienzo .completoSvgBlanco {
+    min-width: 360px;
+  }
+}
+
+/* No a 768 px: al imprimir se mide contra el ancho útil del A4 (~658 px) y la hoja saldría
+   con las dos tablas una debajo de otra */
+@media (max-width: 560px) {
+  .ccTablas {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -1581,5 +1635,36 @@
 
   .hojaCirculo .ccPunto {
     fill: #000000 !important;
+  }
+
+  /* Círculo y tabla caben juntos en la página: 140 + 81 mm, más el título */
+  .hojaCirculo .completoSvgBlanco {
+    max-width: none;
+    max-height: 140mm;
+  }
+
+  .hojaCirculo .ccTablas {
+    max-width: none;
+    gap: 5mm;
+    margin-top: 5mm;
+    break-inside: avoid;
+  }
+
+  .hojaCirculo .ccTabla {
+    font-size: 11pt;
+    color: #000000 !important;
+  }
+
+  .hojaCirculo .ccTabla th,
+  .hojaCirculo .ccTabla td {
+    height: 9mm;
+    padding: 0 1mm;
+    border: 0.3mm solid #000000 !important;
+  }
+
+  .hojaCirculo .ccTabla thead th {
+    height: 7mm;
+    font-size: 10pt;
+    color: #000000 !important;
   }
 }
