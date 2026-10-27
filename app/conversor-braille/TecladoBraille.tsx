@@ -200,7 +200,9 @@ export default function TecladoBraille({ onCelda, onBorrar }: Props) {
             onClick={escribirMarcados}
             disabled={marcados.size === 0}
           >
-            Escribir celda{marcados.size > 0 ? ` ${celdaDePuntos(marcados)}` : ''}
+            {/* Un solo texto, único hijo del botón: con la página traducida, dos textos sueltos
+                hacían que React retirara uno que el traductor ya había cambiado (hallazgo 3524) */}
+            {marcados.size > 0 ? `Escribir celda ${celdaDePuntos(marcados)}` : 'Escribir celda'}
           </button>
           <button type="button" className={styles.exampleBtn} onClick={() => escribir('⠀')}>
             Espacio

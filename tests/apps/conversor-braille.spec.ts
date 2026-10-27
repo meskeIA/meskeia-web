@@ -2748,19 +2748,20 @@ test.describe('inspector 26/10/2026', () => {
   });
 
   // ─────────────────────────────────────────────────────────────────────────
-  // ABIERTO, hallazgo (inspector 26/10/2026) — página traducida (cabo C0243): la app cae
+  // REPARADO, hallazgo 3524 (inspector 26/10/2026) — página traducida (cabo C0243): la app caía
   // ─────────────────────────────────────────────────────────────────────────
   //
-  // El rótulo de la hoja es `{lineas === 0 ? <span>Convierte primero…</span> : <span>{n} línea… mm</span>}`:
-  // dos <span> sin key, y el segundo con trece textos sueltos. React reutiliza el <span> y, al volver a
-  // la primera rama, retira esos textos con removeChild; el traductor ya los cambió por <font>:
-  // NotFoundError y «Algo salió mal». Pasa en cuanto la hoja se vacía: corregir el texto, Limpiar,
-  // cambiar de sentido, un ejemplo o borrar la última celda del teclado. `check:ternario-traducido`
-  // no lo ve: sus dos ramas son JSX.
-  test.fail('ABIERTO — página traducida: corregir, Limpiar o cambiar de sentido tras convertir no tumba la app', async ({
+  // El rótulo de la hoja era `{lineas === 0 ? <span>Convierte primero…</span> : <span>{n} línea… mm</span>}`:
+  // dos <span> sin key, y el segundo con trece textos sueltos. React reutilizaba el <span> y, al volver a
+  // la primera rama, retiraba esos textos con removeChild; el traductor ya los había cambiado por
+  // <font>: NotFoundError y «Algo salió mal». Pasaba en cuanto la hoja se vaciaba: corregir el texto,
+  // Limpiar, cambiar de sentido, un ejemplo o borrar la última celda del teclado.
+  // `check:ternario-traducido` no lo ve: sus dos ramas son JSX. Ahora cada rama lleva su key y el
+  // rótulo es un texto único.
+  test('REPARADO (3524) — página traducida: corregir, Limpiar o cambiar de sentido tras convertir no tumba la app', async ({
     page,
   }) => {
-    // ABIERTO, hallazgo (inspector 26/10/2026)
+    // REPARADO, hallazgo 3524 (inspector 26/10/2026)
     const errores = vigilarErrores(page);
     for (const accion of ['corregir', 'Limpiar', 'Braille → Texto', 'Saludo']) {
       await page.goto(RUTA);
@@ -2779,9 +2780,10 @@ test.describe('inspector 26/10/2026', () => {
   });
 
   // La misma forma en el teclado de seis puntos: «Escribir celda{marcados ? ` ⠁` : ''}». Al escribir
-  // la celda, los puntos marcados se vacían y React retira el texto « ⠁» que el traductor ya cambió.
-  test.fail('ABIERTO — página traducida: «Escribir celda» con un punto marcado no tumba la app', async ({ page }) => {
-    // ABIERTO, hallazgo (inspector 26/10/2026)
+  // la celda, los puntos marcados se vaciaban y React retiraba el texto « ⠁» que el traductor ya
+  // había cambiado. Ahora el rótulo del botón es un texto único.
+  test('REPARADO (3524) — página traducida: «Escribir celda» con un punto marcado no tumba la app', async ({ page }) => {
+    // REPARADO, hallazgo 3524 (inspector 26/10/2026)
     const errores = vigilarErrores(page);
     await page.goto(RUTA);
     await esperarHidratacion(page, ['textarea']);
@@ -2798,16 +2800,17 @@ test.describe('inspector 26/10/2026', () => {
   });
 
   // ─────────────────────────────────────────────────────────────────────────
-  // ABIERTO, hallazgo (inspector 26/10/2026) — página traducida: textos que se quedan con el valor anterior
+  // REPARADO, hallazgo 3527 (inspector 26/10/2026) — página traducida: textos que se quedaban con el valor anterior
   // ─────────────────────────────────────────────────────────────────────────
   //
-  // No cae: React escribe el texto nuevo en el nodo que el traductor retiró. Las medidas del rótulo de
-  // la hoja, el número de los avisos de celdas sin texto y de tinta mezclada, y la celda del botón
-  // «Escribir celda»: cada uno es un texto suelto junto a otros, no el único hijo de su elemento.
-  test.fail('ABIERTO — página traducida: la hoja con ADA, los avisos y «Escribir celda» dicen el valor nuevo', async ({
+  // No caía: React escribía el texto nuevo en el nodo que el traductor retiró. Las medidas del rótulo
+  // de la hoja, el número de los avisos de celdas sin texto y de tinta mezclada, y la celda del botón
+  // «Escribir celda»: cada uno era un texto suelto junto a otros. Ahora cada parte variable es el
+  // único hijo de su elemento.
+  test('REPARADO (3527) — página traducida: la hoja con ADA, los avisos y «Escribir celda» dicen el valor nuevo', async ({
     page,
   }) => {
-    // ABIERTO, hallazgo (inspector 26/10/2026)
+    // REPARADO, hallazgo 3527 (inspector 26/10/2026)
     // (a) ADA: ⌊(172 − 2,4 − 1,5) / 6,2⌋ + 1 = ⌊27,11⌋ + 1 = 28 celdas; 6,2 mm y 10,2 mm (lo fija el 3439).
     //     Hoy sigue «1 línea de 29 celdas · celda de 6 mm · 10 mm entre líneas».
     await page.goto(RUTA);

@@ -1044,20 +1044,27 @@ export default function ConversorBraillePage() {
                 <span aria-hidden="true">⚠️</span>{' '}
                 La caja mezcla celdas braille con texto en tinta:{' '}
                 <strong>{tintaEnBraille.join(' · ')}</strong>{' '}
-                {tintaEnBraille.length === 1 ? 'ha pasado' : 'han pasado'} al resultado tal cual,
-                sin traducir, y no {tintaEnBraille.length === 1 ? 'sale' : 'salen'} en la hoja
-                imprimible. Si vas a escribir con el teclado de seis puntos, vacía antes la caja
-                con «Limpiar».
+                {/* La parte que cambia con el número, en su propio <span> y como texto único: un
+                    texto suelto entre otros se quedaba con el valor anterior en la página
+                    traducida (hallazgo 3527) */}
+                <span>
+                  {tintaEnBraille.length === 1
+                    ? 'ha pasado al resultado tal cual, sin traducir, y no sale en la hoja imprimible.'
+                    : 'han pasado al resultado tal cual, sin traducir, y no salen en la hoja imprimible.'}
+                </span>{' '}
+                Si vas a escribir con el teclado de seis puntos, vacía antes la caja con «Limpiar».
               </p>
             )}
 
             {celdasSinTexto.length > 0 && (
               <p className={styles.avisoConversion} role="alert">
                 <span aria-hidden="true">⚠️</span>{' '}
-                {celdasSinTexto.length === 1 ? 'Esta celda no tiene' : 'Estas celdas no tienen'}{' '}
-                equivalente en la signografía básica que cubre esta app y{' '}
-                {celdasSinTexto.length === 1 ? 'ha pasado' : 'han pasado'} al resultado sin
-                traducir: <strong>{celdasSinTexto.join(' ')}</strong>.
+                <span>
+                  {celdasSinTexto.length === 1
+                    ? 'Esta celda no tiene equivalente en la signografía básica que cubre esta app y ha pasado al resultado sin traducir:'
+                    : 'Estas celdas no tienen equivalente en la signografía básica que cubre esta app y han pasado al resultado sin traducir:'}
+                </span>{' '}
+                <strong>{celdasSinTexto.join(' ')}</strong>.
               </p>
             )}
 
@@ -1228,16 +1235,16 @@ export default function ConversorBraillePage() {
           >
             <span aria-hidden="true">🖨️</span> Imprimir la hoja
           </button>
+          {/* Cada rama con su key y el rótulo como texto único: con la página traducida, el
+              <span> reutilizado y sus trece textos sueltos tumbaban la app al vaciarse la hoja
+              (hallazgo 3524) o se quedaban con las medidas anteriores (hallazgo 3527) */}
           {hoja.numeroLineas === 0 ? (
-            <span className={styles.hojaAviso} role="status">
+            <span key="hoja-vacia" className={styles.hojaAviso} role="status">
               Convierte primero un texto: la hoja se genera con el resultado de arriba.
             </span>
           ) : (
-            <span className={styles.hojaAviso} role="status">
-              {hoja.numeroLineas} línea{hoja.numeroLineas === 1 ? '' : 's'} de{' '}
-              {hoja.celdasPorLinea} celdas · celda de {milimetros(norma.entreCeldas)} mm ·{' '}
-              {milimetros(norma.entreLineas)} mm entre líneas
-              {hoja.recortada ? ' · texto recortado a 200 líneas' : ''}
+            <span key="hoja-medidas" className={styles.hojaAviso} role="status">
+              {`${hoja.numeroLineas} línea${hoja.numeroLineas === 1 ? '' : 's'} de ${hoja.celdasPorLinea} celdas · celda de ${milimetros(norma.entreCeldas)} mm · ${milimetros(norma.entreLineas)} mm entre líneas${hoja.recortada ? ' · texto recortado a 200 líneas' : ''}`}
             </span>
           )}
         </div>
