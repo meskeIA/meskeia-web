@@ -253,9 +253,10 @@ export default function CalculadoraAlimentacionMascotasPage() {
 
             {/* Peso */}
             <div className={styles.inputGroup}>
-              <label>Peso de tu {tipoMascota}</label>
+              <label htmlFor="peso-mascota">Peso de tu {tipoMascota}</label>
               <div className={styles.inputConUnidad}>
                 <input
+                  id="peso-mascota"
                   type="text"
                   value={peso}
                   onChange={(e) => setPeso(e.target.value)}
@@ -269,8 +270,8 @@ export default function CalculadoraAlimentacionMascotasPage() {
             {/* Tamaño (solo perros) */}
             {tipoMascota === 'perro' && (
               <div className={styles.inputGroup}>
-                <label>Tamaño de raza</label>
-                <div className={styles.tamanoGrid}>
+                <label id="tamano-raza-label">Tamaño de raza</label>
+                <div role="group" aria-labelledby="tamano-raza-label" className={styles.tamanoGrid}>
                   {[
                     { id: 'mini', label: 'Mini', peso: '<5 kg' },
                     { id: 'pequeno', label: 'Pequeño', peso: '5-10 kg' },
@@ -295,8 +296,8 @@ export default function CalculadoraAlimentacionMascotasPage() {
 
             {/* Edad */}
             <div className={styles.inputGroup}>
-              <label>Etapa de vida</label>
-              <div className={styles.opcionesGrid}>
+              <label id="etapa-vida-label">Etapa de vida</label>
+              <div role="group" aria-labelledby="etapa-vida-label" className={styles.opcionesGrid}>
                 <button
                   type="button"
                   className={`${styles.opcionBtn} ${edad === 'cachorro' ? styles.active : ''}`}
@@ -327,12 +328,12 @@ export default function CalculadoraAlimentacionMascotasPage() {
             {/* Condición corporal — no aplica a cachorros en crecimiento */}
             {edad !== 'cachorro' && (
               <div className={styles.inputGroup}>
-                <label>Condición corporal</label>
+                <label id="condicion-corporal-label">Condición corporal</label>
                 <p className={styles.ayudaCondicion}>
                   Pálpale las costillas con la mano abierta y mírale la cintura desde arriba.
                   De esto depende que la ración se calcule sobre su peso real y no sobre el que tiene ahora.
                 </p>
-                <div className={styles.tamanoGrid}>
+                <div role="group" aria-labelledby="condicion-corporal-label" className={styles.tamanoGrid}>
                   {condicionesCorporales.map((c) => (
                     <button
                       key={c.id}
@@ -355,8 +356,8 @@ export default function CalculadoraAlimentacionMascotasPage() {
 
             {/* Actividad */}
             <div className={styles.inputGroup}>
-              <label>Nivel de actividad</label>
-              <div className={styles.opcionesGrid}>
+              <label id="nivel-actividad-label">Nivel de actividad</label>
+              <div role="group" aria-labelledby="nivel-actividad-label" className={styles.opcionesGrid}>
                 <button
                   type="button"
                   className={`${styles.opcionBtn} ${actividad === 'baja' ? styles.active : ''}`}

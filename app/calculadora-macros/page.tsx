@@ -218,8 +218,8 @@ export default function CalculadoraMacrosPage() {
             />
 
             <div className={styles.sexoSelector}>
-              <label className={styles.label}>Sexo</label>
-              <div className={styles.sexoBtns}>
+              <label id="sexo-label" className={styles.label}>Sexo</label>
+              <div role="group" aria-labelledby="sexo-label" className={styles.sexoBtns}>
                 <button
                   type="button"
                   aria-pressed={sexo === 'hombre'}
@@ -241,8 +241,8 @@ export default function CalculadoraMacrosPage() {
           </div>
 
           <div className={styles.seccion}>
-            <label className={styles.label}>Objetivo</label>
-            <div className={styles.objetivosGrid}>
+            <label id="objetivo-label" className={styles.label}>Objetivo</label>
+            <div role="group" aria-labelledby="objetivo-label" className={styles.objetivosGrid}>
               {objetivos.map(obj => (
                 <button
                   key={obj.id}
@@ -260,8 +260,8 @@ export default function CalculadoraMacrosPage() {
           </div>
 
           <div className={styles.seccion}>
-            <label className={styles.label}>Nivel de actividad física</label>
-            <div className={styles.actividadGrid}>
+            <label id="actividad-label" className={styles.label}>Nivel de actividad física</label>
+            <div role="group" aria-labelledby="actividad-label" className={styles.actividadGrid}>
               {nivelesActividad.map(nivel => (
                 <button
                   key={nivel.id}

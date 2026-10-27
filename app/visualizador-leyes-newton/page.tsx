@@ -340,11 +340,12 @@ export default function VisualizadorLeyesNewtonPage() {
             {/* Sliders interactivos */}
             <div className={styles.slidersPanel}>
               <div className={styles.sliderGroup}>
-                <label className={styles.sliderLabel}>
+                <label htmlFor="masa" className={styles.sliderLabel}>
                   <span>Masa (m)</span>
                   <span className={styles.sliderValue}>{formatNumber(masa, 0)} kg</span>
                 </label>
                 <input
+                  id="masa"
                   type="range"
                   min={1}
                   max={100}
@@ -355,11 +356,12 @@ export default function VisualizadorLeyesNewtonPage() {
                 />
               </div>
               <div className={styles.sliderGroup}>
-                <label className={styles.sliderLabel}>
+                <label htmlFor="fuerza" className={styles.sliderLabel}>
                   <span>Fuerza (F)</span>
                   <span className={styles.sliderValue}>{formatNumber(fuerza, 0)} N</span>
                 </label>
                 <input
+                  id="fuerza"
                   type="range"
                   min={1}
                   max={1000}

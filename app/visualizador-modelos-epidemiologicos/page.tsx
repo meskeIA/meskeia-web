@@ -640,11 +640,11 @@ const SeccionRt = () => {
 
       <div className={styles.slidersGrid}>
         <div className={styles.sliderGroup}>
-          <label className={styles.sliderLabel}>
+          <label htmlFor="rt-beta" className={styles.sliderLabel}>
             <span>β Tasa de transmisión</span>
             <span className={styles.sliderValor}>{beta.toFixed(2)}</span>
           </label>
-          <input type="range" className={styles.sliderInput}
+          <input id="rt-beta" type="range" className={styles.sliderInput}
             style={{ ['--pct' as string]: `${((beta - 0.1) / 0.7) * 100}%` }}
             min={0.1} max={0.8} step={0.01} value={beta}
             onChange={(e) => setBeta(parseFloat(e.target.value))}
@@ -653,11 +653,11 @@ const SeccionRt = () => {
           <span className={styles.sliderDesc}>R₀ = β/γ = <strong>{r0.toFixed(2)}</strong></span>
         </div>
         <div className={styles.sliderGroup}>
-          <label className={styles.sliderLabel}>
+          <label htmlFor="rt-gamma" className={styles.sliderLabel}>
             <span>γ Tasa de recuperación</span>
             <span className={styles.sliderValor}>{gamma.toFixed(2)}</span>
           </label>
-          <input type="range" className={styles.sliderInput}
+          <input id="rt-gamma" type="range" className={styles.sliderInput}
             style={{ ['--pct' as string]: `${((gamma - 0.05) / 0.45) * 100}%` }}
             min={0.05} max={0.5} step={0.01} value={gamma}
             onChange={(e) => setGamma(parseFloat(e.target.value))}
@@ -666,11 +666,11 @@ const SeccionRt = () => {
           <span className={styles.sliderDesc}>1/γ ≈ {(1 / gamma).toFixed(1)} días de infección</span>
         </div>
         <div className={styles.sliderGroup}>
-          <label className={styles.sliderLabel}>
+          <label htmlFor="rt-control" className={styles.sliderLabel}>
             <span><span aria-hidden="true">🎛️</span> Medidas de control</span>
             <span className={styles.sliderValor}>{control}%</span>
           </label>
-          <input type="range" className={styles.sliderInput}
+          <input id="rt-control" type="range" className={styles.sliderInput}
             style={{ ['--pct' as string]: `${pct}%` }}
             min={0} max={90} step={5} value={control}
             onChange={(e) => setControl(parseInt(e.target.value))}
