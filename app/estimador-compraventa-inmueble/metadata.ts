@@ -133,8 +133,11 @@ export const HORQUILLA_GASTOS_COMPRAVENTA: { min: number; max: number } = (() =>
       precio <= BANDA_PRECIO_VIVIENDA.max;
       precio += PASO
     ) {
-      const notaria = estimarFacturaNotarial(precio).medio;
-      const registro = calcularRegistro(precio);
+      // Con la comunidad, como `resultadosComprador` (hallazgo 3533): sin ella, en Ceuta y
+      // Melilla notaría y registro llevaban el IVA del 21 % que la app no cobra allí (2214), y
+      // el suelo publicado (3,3 %) quedaba por encima del 3,28 % que el motor calcula.
+      const notaria = estimarFacturaNotarial(precio, ccaa).medio;
+      const registro = calcularRegistro(precio, ccaa);
 
       const itp = importeITP(
         precio,
@@ -181,14 +184,18 @@ export const HORQUILLA_FEDATARIOS_PCT: { min: number; max: number } = (() => {
   const porcentajes: number[] = [];
   const PASO = 10000;
 
-  for (
-    let precio = BANDA_PRECIO_VIVIENDA.min;
-    precio <= BANDA_PRECIO_VIVIENDA.max;
-    precio += PASO
-  ) {
-    const fedatarios =
-      estimarFacturaNotarial(precio).medio + calcularRegistro(precio) + GESTORIA_TIPICA;
-    porcentajes.push((fedatarios / precio) * 100);
+  // Por comunidad (hallazgo 3533): en Ceuta y Melilla notaría y registro van sin IVA, y la
+  // horquilla tiene que contenerlas (0,28 % frente al 0,33 % del resto en la banda alta).
+  for (const ccaa of Object.keys(ITP_CCAA) as ComunidadAutonoma[]) {
+    for (
+      let precio = BANDA_PRECIO_VIVIENDA.min;
+      precio <= BANDA_PRECIO_VIVIENDA.max;
+      precio += PASO
+    ) {
+      const fedatarios =
+        estimarFacturaNotarial(precio, ccaa).medio + calcularRegistro(precio, ccaa) + GESTORIA_TIPICA;
+      porcentajes.push((fedatarios / precio) * 100);
+    }
   }
 
   return {

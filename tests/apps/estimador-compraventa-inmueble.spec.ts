@@ -12145,7 +12145,8 @@ test.describe('inspector 26/10/2026 (3) — Castilla-La Mancha, la frontera de u
   // ─── HALLAZGOS de esta vuelta (test.fail: se ponen en rojo al repararse) ────────────────
 
   /**
-   * HALLAZGO [cálculo, bajo] — ABIERTO, hallazgo (inspector 26/10/2026). Con el solar del promotor, el
+   * HALLAZGO [cálculo, bajo] — REPARADO el 27/10/2026, hallazgo 3534 (inspector 26/10/2026): el total
+   * ilegible entra en `camposIlegibles` cuando decide la no sujeción del solar. Era: con el solar del promotor, el
    * valor catastral total ILEGIBLE y los años vacíos, la app pide los años y no nombra el total.
    * Murcia · obra nueva 30.000 · solar 13.500 · suelo 9.000 · total «20.000.00» · años vacíos.
    *   Esperado: el total es el dato que decide la no sujeción sin años (con 20.000 legible, el suelo de
@@ -12160,7 +12161,7 @@ test.describe('inspector 26/10/2026 (3) — Castilla-La Mancha, la frontera de u
    *   vale 29.100 con la plusvalía sin calcular y con la NO SUJETA. La misma expresión llegó con
    *   a93fc5cc a garaje, trastero y local-comercial (sin medir allí).
    */
-  test.fail('HALLAZGO cálculo — con el solar, el total ilegible y los años vacíos, la app pide los años y no nombra el total', async ({ page }) => {
+  test('REPARADO (3534) — con el solar, el total ilegible y los años vacíos, la app nombra el total que no se pudo leer', async ({ page }) => {
     test.setTimeout(90_000);
     await promotorConSolar(page, '13500', '20.000.00');
     await expect(page.locator('input[aria-label^="Valor catastral total"]')).toHaveValue('20.000.00');
@@ -12203,7 +12204,8 @@ test.describe('inspector 26/10/2026 (3) — Castilla-La Mancha, la frontera de u
   });
 
   /**
-   * HALLAZGO [contenido, bajo] — ABIERTO, hallazgo (inspector 26/10/2026). La horquilla de «cuánto hay que
+   * HALLAZGO [contenido, bajo] — REPARADO el 27/10/2026, hallazgo 3533 (inspector 26/10/2026): las dos
+   * horquillas de metadata.ts pasan ya la comunidad. Era: la horquilla de «cuánto hay que
    * sumar al precio» (HORQUILLA_GASTOS_COMPRAVENTA de metadata.ts: paso 1 de la guía y dos respuestas del
    * FAQPage) se deriva con estimarFacturaNotarial(precio) y calcularRegistro(precio) SIN la comunidad, así
    * que en Ceuta y Melilla suma a notaría y registro un IVA del 21 % que la app ya no cobra desde el 2214.
@@ -12216,7 +12218,7 @@ test.describe('inspector 26/10/2026 (3) — Castilla-La Mancha, la frontera de u
    *   = 16.651,19 → 3,33 % → publica «3,3 %» como mínimo. Con la comunidad pasada, el mínimo sería 3,2 %.
    *   (Lo mismo con «notaría, registro y gestoría… rondan el 0,33 %»: en Ceuta, 1.416,69 € = 0,28 %.)
    */
-  test.fail('HALLAZGO contenido — Ceuta a 500.000 € cuesta 3,28 % y la horquilla publicada empieza en 3,3 %', async ({ page }) => {
+  test('REPARADO (3533) — Ceuta a 500.000 € cuesta 3,28 % y la horquilla publicada lo contiene', async ({ page }) => {
     test.setTimeout(90_000);
     await page.goto(RUTA);
     await esperarHidratacion(page, [PRECIO]);
