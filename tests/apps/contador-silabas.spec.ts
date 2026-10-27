@@ -2076,10 +2076,12 @@ test.describe('contador-silabas · Inspector 27/10/2026 (séptima inspección)',
     await expect(page.locator('[class*="rimaValor"]').first()).toHaveText('ABBA ABBA CDE DCE');
   });
 
-  test('HALLAZGO · el banco de pruebas que propone la app (Garcilaso XXIII) sale con dos decasílabos sin aviso', async ({
+  test('HALLAZGO 3570 · el banco de pruebas que propone la app (Garcilaso XXIII) sale con dos decasílabos sin aviso', async ({
     page,
   }) => {
-    test.fail(true, 'ABIERTO: la h aspirada de «hermosa» y «hacer» ni se aplica ni se avisa');
+    // REPARADO el 27/10/2026 por la segunda salida: el consejo lleva el matiz de los dos versos y
+    // el recuadro de limitaciones explica la h aspirada. Aplicarla exigiría un léxico de
+    // etimologías (h < f latina), que el motor no tiene.
     // El consejo «Practica con poemas que ya conoces» dice: «El Soneto XXIII de Garcilaso (…)
     // tiene 11 sílabas por verso: es un banco de pruebas inmejorable». Dos versos solo son
     // endecasílabos con la h aspirada del siglo XVI (h < f latina), que impide la sinalefa:
@@ -2100,12 +2102,16 @@ test.describe('contador-silabas · Inspector 27/10/2026 (séptima inspección)',
     });
     const cuadra = m.every((v) => v === '11') || /h aspirada/i.test(educativo);
     expect(cuadra).toBe(true);
+    // Y el consejo ya no promete el 11 sin matiz: nombra los dos versos
+    expect(educativo).toContain('cubra de nieve la hermosa cumbre');
   });
 
-  test('HALLAZGO · la FAQ visible y el FAQPage del hiato enseñan que la tilde «siempre» rompe el diptongo', async ({
+  test('HALLAZGO 3571 · la FAQ visible y el FAQPage del hiato enseñan que la tilde «siempre» rompe el diptongo', async ({
     page,
   }) => {
-    test.fail(true, 'ABIERTO: residuo del hallazgo 698 en las dos respuestas sobre el hiato');
+    // REPARADO el 27/10/2026: las dos bocas leen FAQ_HIATO de metadata.ts, con la excepción
+    // de las cerradas distintas y el hiato de las iguales. La visible toma la pregunta del
+    // FAQPage, así que se busca por ella.
     // OLE 2010: dos vocales cerradas DISTINTAS forman diptongo aunque una lleve tilde
     // (cuí-da-te, ca-suís-ti-co), y dos cerradas IGUALES forman hiato (chi-i-ta). La app lo
     // aplica (test 698, más arriba: «cuídate» → cuí-da-te, «Diptongo: uí») y la tarjeta de
@@ -2115,7 +2121,7 @@ test.describe('contador-silabas · Inspector 27/10/2026 (séptima inspección)',
     //   · el FAQPage «¿Qué es un hiato y en qué se diferencia del diptongo?» dice «o cuando una
     //     vocal débil lleva tilde» y calla el hiato de dos cerradas iguales.
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
-    const pregunta = page.getByText('¿Cuándo se produce hiato y cuándo diptongo?');
+    const pregunta = page.getByText('¿Qué es un hiato y en qué se diferencia del diptongo?');
     await pregunta.click();
     const visible = (await pregunta.locator('xpath=..').innerText()).replace(/\s+/g, ' ');
     const faq = await leerFaqJsonLd(page);
@@ -2125,13 +2131,20 @@ test.describe('contador-silabas · Inspector 27/10/2026 (séptima inspección)',
     expect({
       visibleDiceSiempre: visible.includes('siempre rompe el diptongo'),
       faqPageNombraLasIguales: /iguales/.test(faqHiato),
-    }).toEqual({ visibleDiceSiempre: false, faqPageNombraLasIguales: true });
+      faqPageNombraLaExcepcion: faqHiato.includes('cuí-da-te'),
+      mismaRespuesta: visible.includes(faqHiato),
+    }).toEqual({
+      visibleDiceSiempre: false,
+      faqPageNombraLasIguales: true,
+      faqPageNombraLaExcepcion: true,
+      mismaRespuesta: true,
+    });
   });
 
-  test('HALLAZGO · «diéresis» y «sinéresis» se escriben con tilde, y «poeta» no se parte po-eta', async ({
+  test('HALLAZGO 3572 · «diéresis» y «sinéresis» se escriben con tilde, y «poeta» no se parte po-eta', async ({
     page,
   }) => {
-    test.fail(true, 'ABIERTO: siete «sineresis/dieresis» sin tilde y un «po-eta» en el bloque educativo');
+    // REPARADO el 27/10/2026: las siete formas llevan tilde y la fila dice «po-e-ta → poe-ta».
     // Son esdrújulas: llevan tilde SIEMPRE, como explica la FAQ de al lado («¿Por qué las
     // palabras esdrújulas llevan tilde siempre?»), y el recuadro de limitaciones ya las escribe
     // bien. Sin tilde salen en la fila «Sineresis» de la tabla, en la tarjeta de Lengua y

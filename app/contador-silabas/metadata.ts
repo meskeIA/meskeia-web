@@ -34,6 +34,20 @@ export const metadata: Metadata = {
   },
 };
 
+/**
+ * La pregunta del hiato, en UNA sola constante para la FAQ visible (page.tsx) y el FAQPage.
+ *
+ * Hallazgo 3571 (27/10/2026): eran dos textos distintos para la misma pregunta. La visible
+ * decía «La tilde sobre la vocal débil siempre rompe el diptongo» y el FAQPage callaba el hiato
+ * de dos cerradas iguales; las dos contradecían al motor y a la OLE 2010, para la que dos
+ * cerradas DISTINTAS forman diptongo aunque una lleve tilde (cuí-da-te). Residuo del 698.
+ */
+export const FAQ_HIATO = {
+  pregunta: '¿Qué es un hiato y en qué se diferencia del diptongo?',
+  respuesta:
+    'Un hiato ocurre cuando dos vocales seguidas pertenecen a sílabas distintas. Se forma entre dos vocales abiertas (a, e, o): po-e-ta, ca-os; entre dos cerradas iguales: chi-i-ta, du-un-vi-ro; y cuando una cerrada (i, u) tónica, con tilde, va junto a una abierta: pa-ís, Ra-úl, Ma-rí-a. Hay diptongo, en cambio, entre una abierta y una cerrada átona (pai-sa-je, cau-sa) y entre dos cerradas distintas, aunque una lleve tilde: ciu-dad, cuí-da-te, lin-güís-ti-ca. Por eso la tilde sobre la i o la u rompe el diptongo solo cuando la otra vocal es abierta. El hiato suma una sílaba respecto al diptongo.',
+};
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -56,10 +70,10 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Qué es un hiato y en qué se diferencia del diptongo?',
+      name: FAQ_HIATO.pregunta,
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Un hiato ocurre cuando dos vocales seguidas pertenecen a sílabas distintas y se pronuncian separadas. Se forma entre dos vocales fuertes (po-e-ta), o cuando una vocal débil lleva tilde (pa-ís, Ra-úl). El hiato aumenta el número de sílabas respecto al diptongo.',
+        text: FAQ_HIATO.respuesta,
       },
     },
     {

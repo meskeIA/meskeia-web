@@ -23,6 +23,7 @@ import {
   analizarRimas,
   esquemaLegible,
 } from './rima';
+import { FAQ_HIATO } from './metadata';
 
 
 /** Metros a los que se puede ajustar un verso en el modo composición */
@@ -704,10 +705,10 @@ sabañón garrafal, morado y frito.`,
                   <td>Mantiene sílabas separadas</td>
                 </tr>
                 <tr>
-                  <td><strong>Sineresis</strong></td>
+                  <td><strong>Sinéresis</strong></td>
                   <td>Diptongo forzado en poesía</td>
                   <td>Hiato tratado como diptongo por licencia poética</td>
-                  <td>po-eta → poe-ta (verso)</td>
+                  <td>po-e-ta → poe-ta (verso)</td>
                   <td>Reduce sílabas para la métrica</td>
                 </tr>
               </tbody>
@@ -726,7 +727,7 @@ sabañón garrafal, morado y frito.`,
             <div className={styles.eduEscenarioCard}>
               <span className={styles.eduEscenarioIcon} aria-hidden="true">📚</span>
               <h4>Lengua y Literatura (secundaria y preparatoria)</h4>
-              <p>El análisis métrico es habitual en los exámenes de Lengua Castellana en secundaria y preparatoria. Incluye identificar el número de sílabas, el tipo de verso (tónico), las licencias poéticas (sinalefa, dialefa, sineresis, dieresis) y la rima (consonante o asonante). Esta herramienta ayuda a verificar cuentas antes de entregar trabajos.</p>
+              <p>El análisis métrico es habitual en los exámenes de Lengua Castellana en secundaria y preparatoria. Incluye identificar el número de sílabas, el tipo de verso (tónico), las licencias poéticas (sinalefa, dialefa, sinéresis, diéresis) y la rima (consonante o asonante). Esta herramienta ayuda a verificar cuentas antes de entregar trabajos.</p>
             </div>
             <div className={styles.eduEscenarioCard}>
               <span className={styles.eduEscenarioIcon} aria-hidden="true">🎵</span>
@@ -749,8 +750,9 @@ sabañón garrafal, morado y frito.`,
               <p className={styles.eduFaqRespuesta}>En métrica española, la última sílaba tónica del verso determina si se suma o resta una sílaba. Verso <strong>agudo</strong> (última palabra aguda, como &quot;café&quot;): se suma +1. Verso <strong>llano</strong> (última palabra llana, como &quot;casa&quot;): no se modifica. Verso <strong>esdrújulo</strong> (última palabra esdrújula, como &quot;pájaro&quot;): se resta -1. Para ver el ajuste aislado conviene un verso <strong>sin sinalefas</strong>: &quot;que van a dar en la mar&quot; tiene 7 sílabas fonéticas y ninguna fusión entre palabras, así que el +1 de la aguda (&quot;mar&quot;) lo deja en 8 sílabas métricas, un octosílabo. Cuando el verso sí las tiene, <strong>las sinalefas se restan antes</strong> del ajuste: &quot;En el principio era el amor&quot; tiene 10 sílabas fonéticas, pierde 2 en las sinalefas &quot;principio_era&quot; y &quot;era_el&quot;, y con el +1 de &quot;amor&quot; se queda en 9 sílabas métricas, un eneasílabo.</p>
             </details>
             <details className={styles.eduFaqItem}>
-              <summary className={styles.eduFaqPregunta}>¿Cuándo se produce hiato y cuándo diptongo?</summary>
-              <p className={styles.eduFaqRespuesta}>La regla básica: las vocales <strong>fuertes</strong> son a, e, o; las <strong>débiles</strong> son i, u. Diptongo: fuerte + débil (sin tilde en la débil), débil + fuerte, o dos débiles <strong>distintas</strong> (ciu-dad). Hiato: fuerte + fuerte, dos débiles <strong>iguales</strong> (chi-i-ta, du-un-vi-ro), o débil TÓNICA (con tilde) + cualquier vocal. Por eso &quot;país&quot; es hiato (i tónica lleva tilde), pero &quot;paisaje&quot; es diptongo (i átona). La tilde sobre la vocal débil siempre rompe el diptongo.</p>
+              {/* Hallazgo 3571: la misma respuesta que el FAQPage, de la misma constante. */}
+              <summary className={styles.eduFaqPregunta}>{FAQ_HIATO.pregunta}</summary>
+              <p className={styles.eduFaqRespuesta}>{FAQ_HIATO.respuesta}</p>
             </details>
             <details className={styles.eduFaqItem}>
               <summary className={styles.eduFaqPregunta}>¿La sinalefa es siempre obligatoria en poesía?</summary>
@@ -761,8 +763,8 @@ sabañón garrafal, morado y frito.`,
               <p className={styles.eduFaqRespuesta}>Por número de sílabas métricas: <strong>octosílabo (8)</strong> — el más tradicional, base del romance y la copla. <strong>Endecasílabo (11)</strong> — el más &quot;culto&quot;, base del soneto y la silva. <strong>Heptasílabo (7)</strong> — combinado con el endecasílabo en la lira. <strong>Alejandrino (14)</strong> — base del mester de clerecía medieval. <strong>Dodecasílabo (12)</strong> — usado en el modernismo. Los versos de arte menor son los de <strong>ocho o menos</strong> sílabas; los de arte mayor, los de nueve o más — que es el corte que aplica la herramienta.</p>
             </details>
             <details className={styles.eduFaqItem}>
-              <summary className={styles.eduFaqPregunta}>¿Qué son las licencias poéticas de dieresis y sineresis?</summary>
-              <p className={styles.eduFaqRespuesta}><strong>Sineresis</strong>: unir en una sola sílaba dos vocales que normalmente formarían hiato. Ejemplo: &quot;poeta&quot; normalmente es po-e-ta (3 sílabas), pero en verso puede tratarse como poe-ta (2 sílabas). <strong>Dieresis</strong>: separar en dos sílabas un diptongo que normalmente sería una. Ejemplo: &quot;suave&quot; normalmente es sua-ve, pero en verso puede leerse su-a-ve. Estas licencias permiten al poeta ajustar la métrica cuando necesita más o menos sílabas.</p>
+              <summary className={styles.eduFaqPregunta}>¿Qué son las licencias poéticas de diéresis y sinéresis?</summary>
+              <p className={styles.eduFaqRespuesta}><strong>Sinéresis</strong>: unir en una sola sílaba dos vocales que normalmente formarían hiato. Ejemplo: &quot;poeta&quot; normalmente es po-e-ta (3 sílabas), pero en verso puede tratarse como poe-ta (2 sílabas). <strong>Diéresis</strong>: separar en dos sílabas un diptongo que normalmente sería una. Ejemplo: &quot;suave&quot; normalmente es sua-ve, pero en verso puede leerse su-a-ve. Estas licencias permiten al poeta ajustar la métrica cuando necesita más o menos sílabas.</p>
             </details>
             <details className={styles.eduFaqItem}>
               <summary className={styles.eduFaqPregunta}>¿Por qué las palabras esdrújulas llevan tilde siempre?</summary>
@@ -876,7 +878,7 @@ sabañón garrafal, morado y frito.`,
             <div className={styles.eduTipCard}>
               <span className={styles.eduTipIcono} aria-hidden="true">📖</span>
               <h4>Practica con poemas que ya conoces</h4>
-              <p>Toma un poema conocido (Lorca, Machado, Neruda, Gustavo Adolfo Bécquer) cuya métrica sea conocida y verifica que tus cuentas coinciden. El Soneto XXIII de Garcilaso (&quot;En tanto que de rosa y azucena&quot;) tiene 11 sílabas por verso: es un banco de pruebas inmejorable.</p>
+              <p>Toma un poema conocido (Lorca, Machado, Neruda, Gustavo Adolfo Bécquer) cuya métrica sea conocida y verifica que tus cuentas coinciden. El Soneto XXIII de Garcilaso (&quot;En tanto que de rosa y azucena&quot;) tiene 11 sílabas por verso: es un banco de pruebas inmejorable, con un matiz que enseña mucho. En dos versos, &quot;cubra de nieve la hermosa cumbre&quot; y &quot;por no hacer mudanza en su costumbre&quot;, la h viene de una f latina (formosa, facere) y en tiempos de Garcilaso todavía era una h aspirada que impedía la sinalefa. La herramienta aplica la h muda de hoy y los da como decasílabos: deshaz a mano &quot;la ⌣ hermosa&quot; y &quot;no ⌣ hacer&quot; y te saldrán los 11.</p>
             </div>
           </div>
         </section>
@@ -888,6 +890,7 @@ sabañón garrafal, morado y frito.`,
               <strong>Limitaciones del algoritmo de silabeo automático</strong>
               <ul>
                 <li><strong>Las sinalefas se detectan, pero la última palabra la tienes tú:</strong> el cómputo métrico aplica la norma general (toda sinalefa posible se realiza), con dos excepciones que sí son predecibles: no hay sinalefa sobre la vocal que lleva el acento final del verso (&quot;y está | hecho&quot;, &quot;de | oro&quot;), ni en la cesura de un alejandrino o un dodecasílabo, que se miden por hemistiquios (7 + 7 y 6 + 6). El poeta puede romperla (dialefa) o unir un hiato (sinéresis) por motivos de ritmo; esas licencias no son predecibles por algoritmo. Las fusiones señaladas <em>con pausa</em> son las primeras candidatas a revisar si el verso no cuadra.</li>
+                <li><strong>La h aspirada de los clásicos:</strong> la herramienta trata toda h como muda, que es lo correcto en el español de hoy. Pero hasta el siglo XVI la h que venía de una f latina (hermosa &lt; formosa, hacer &lt; facere) se aspiraba e impedía la sinalefa, y Garcilaso o fray Luis cuentan con ella. En esos poemas, un verso con &quot;la hermosa&quot; o &quot;no hacer&quot; saldrá aquí con una sílaba de menos.</li>
                 <li><strong>Sinéresis y diéresis no se aplican solas:</strong> el análisis parte del silabeo estándar de cada palabra. Si el poeta trató &quot;poeta&quot; como bisílabo (sinéresis) o &quot;suave&quot; como trisílabo (diéresis), el resultado diferirá en una sílaba.</li>
                 <li><strong>Las sinalefas sí se encadenan:</strong> cuando tres o más vocales entran en contacto, se funden todas en una sílaba. «Érase un hombre a una nariz pegado» tiene 14 sílabas fonéticas y tres contactos vocálicos (se_un, bre_a, a_u): 14 − 3 = 11, el endecasílabo que Quevedo escribió. La excepción es la conjunción <em>y</em>, que funde por un solo lado —«de rosa y azucena» ahorra una sílaba, no dos—, porque entre vocales se lee [ro-sa-<em>ja</em>-zu-ce-na].</li>
                 <li><strong>Palabras compuestas y prefijadas:</strong> En palabras como &quot;subrayar&quot;, &quot;deshacer&quot; o &quot;transatlántico&quot;, el silabeo puede variar según se considere la morfología o solo la fonética. La RAE y las distintas tradiciones gramaticales no siempre coinciden.</li>
