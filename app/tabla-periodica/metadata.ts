@@ -3,7 +3,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Tabla Periódica Interactiva - 118 Elementos con Propiedades | meskeIA',
-  description: 'Tabla periódica interactiva con los 118 elementos químicos. Propiedades, masas molares y electronegatividad de cada elemento. Filtros por familia y estado. 100% gratis.',
+  description: 'Tabla periódica interactiva con los 118 elementos químicos: masa atómica, configuración electrónica, electronegatividad de Pauling donde está medida y calculadora de masa molar. Filtros por familia y estado. Gratis.',
   keywords: 'tabla periodica, elementos quimicos, quimica, masa molar, masas molares, propiedades elementos, taula periòdica, metales, no metales, gases nobles, lantanidos, actinidos, educacion, bachillerato, preparatoria, secundaria, educacion media',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',

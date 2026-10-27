@@ -3484,10 +3484,10 @@ test.describe('CASO 30 · móvil (Galaxy S8, 360 × 740): la calculadora y la fi
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
-// HALLAZGOS de la re-inspección del 27/10/2026 — ABIERTOS, con `test.fail()`
-// Cada uno afirma lo que DEBERÍA pasar; al repararlo se retira la marca y queda de regresión.
+// HALLAZGOS de la re-inspección del 27/10/2026 (3559-3564) — escritos con `test.fail()` y
+// REPARADOS el mismo día en /reparar: hoy son regresión.
 // ═══════════════════════════════════════════════════════════════════════════
-test.describe('hallazgos · 27/10/2026 (ABIERTOS)', () => {
+test.describe('hallazgos · 27/10/2026 (reparados)', () => {
   test('I · 3559 · «C02» (CO₂ tecleado con un cero) sale como C₂, 24,0220 g/mol, en vez de rechazarse', async ({ page }) => {
     // REPARADO el 27/10/2026: el parser compartido rechaza el subíndice con un cero delante.
     // «02» no es un subíndice: la notación no escribe ceros a la izquierda, y la misma
@@ -3504,8 +3504,10 @@ test.describe('hallazgos · 27/10/2026 (ABIERTOS)', () => {
     }
   });
 
-  test('J · C0056 · la ficha de un lantánido dice «Grupo: 3» y la guía enseña que el grupo 3 es bloque d', async ({ page }) => {
-    test.fail(true, 'ABIERTO: «Grupo: 3» en los 30 del bloque f frente al paso 2 de la guía');
+  test('J · 3560 · C0056 · la ficha de un lantánido dice «Grupo: 3» y la guía enseña que el grupo 3 es bloque d', async ({ page }) => {
+    // REPARADO el 27/10/2026: la ficha de los 30 del bloque f no da número de grupo, como las
+    // otras dos apps de química del portal, y la guía lo explica. El dato sigue en elementos-data
+    // (coloca la casilla), por eso el primer expect no cambia.
     // Datos de la propia app: los 30 de La-Lu y Ac-Lr llevan grupo: 3 en elementos-data.ts (la
     // ficha del cerio: «Grupo: 3 · Familia: Lantánidos · [Xe] 4f¹ 5d¹ 6s²»). El paso 2 de la guía
     // dice «Grupos 3-12: bloque d (metales de transición). … Lantánidos/Actínidos: bloque f», y
@@ -3532,11 +3534,16 @@ test.describe('hallazgos · 27/10/2026 (ABIERTOS)', () => {
     ).replace(/\s+/g, ' ');
     const grupo3EsBloqueD = /Grupos 3-12: bloque d/.test(paso2);
     const nombraLaSerie = /(lant|act)[^.]*grupo 3|grupo 3[^.]*(lant|act)/i.test(paso2);
-    expect(!diceGrupo3 || !grupo3EsBloqueD || nombraLaSerie, `ficha «Grupo: 3» frente a «${paso2}»`).toBe(true); // hoy: false
+    expect(!diceGrupo3 || !grupo3EsBloqueD || nombraLaSerie, `ficha «Grupo: 3» frente a «${paso2}»`).toBe(true);
+    expect(ce).toContain('Grupo: sin número (serie interior del bloque f)');
+    expect(paso2).toContain('no se numeran por grupo');
   });
 
-  test('K · la calculadora da al oganesón «294,0000 g/mol», que su ficha escribe [294] por no tener peso atómico estándar', async ({ page }) => {
-    test.fail(true, 'ABIERTO: la calculadora suma el número másico como si fuera un peso atómico medido');
+  test('K · 3561 · la calculadora da al oganesón «294,0000 g/mol», que su ficha escribe [294] por no tener peso atómico estándar', async ({ page }) => {
+    // REPARADO el 27/10/2026: con un elemento sin peso estándar el total sale «≈ N g/mol» sin
+    // decimales, el desglose nombra el número másico entre corchetes y una nota lo explica.
+    // Lo que NO se ha tocado: los cuatro decimales de las masas estándar (NaCl → 58,4400 con Cl
+    // 35,45). Cambiarlo movería las cifras de los CASOS 27 y 30; queda en el cabo de la tanda.
     // La ficha sigue la convención de la IUPAC para los 34 elementos sin peso atómico estándar
     // (hallazgo 530): el número másico del isótopo más estable, entre corchetes («[294] u»,
     // «[98] u» el tecnecio), y no «294,000 u». La calculadora suma ese mismo número con cuatro
@@ -3550,11 +3557,16 @@ test.describe('hallazgos · 27/10/2026 (ABIERTOS)', () => {
     await calcularFormula(page, 'Og');
     const resultado = page.locator('[class*="_resultadoMasa"]');
     await expect(resultado).toBeVisible();
-    await expect(resultado).not.toContainText('294,0000', { timeout: 2000 }); // hoy: «294,0000 g/mol»
+    await expect(resultado).not.toContainText('294,0000', { timeout: 2000 });
+    await expect(page.locator('[class*="_masaTotal"]')).toContainText('≈ 294 g/mol');
+    await expect(resultado).toContainText('número másico [294]');
+    // Tc2O7 = 2 × [98] + 7 × 15,999 = 307,993 → «≈ 308 g/mol»
+    await calcularFormula(page, 'Tc2O7');
+    await expect(page.locator('[class*="_masaTotal"]')).toContainText('≈ 308 g/mol');
   });
 
-  test('L · el resultado de H2O se queda en pantalla al teclear otra fórmula, sin decir de cuál es', async ({ page }) => {
-    test.fail(true, 'ABIERTO: el resultado no se retira al editar la fórmula ni nombra la suya');
+  test('L · 3562 · el resultado de H2O se queda en pantalla al teclear otra fórmula, sin decir de cuál es', async ({ page }) => {
+    // REPARADO el 27/10/2026: teclear retira el resultado, y el que se muestra nombra su fórmula.
     // Los siete botones de ejemplo retiran el resultado al cambiar la fórmula
     // (setResultadoMasa(null)); teclearla no. Calcular H2O (2 × 1,008 + 15,999 = 18,015) y escribir
     // después «NaCl» deja «Masa Molar Total: 18,0150 g/mol» debajo de un campo que dice NaCl, y
@@ -3562,6 +3574,7 @@ test.describe('hallazgos · 27/10/2026 (ABIERTOS)', () => {
     await abrirHidratada(page);
     await calcularFormula(page, 'H2O');
     await expect(page.locator('[class*="_masaTotal"]')).toContainText('18,0150 g/mol');
+    await expect(page.locator('[class*="_masaTotal"]')).toContainText('Masa molar de H2O');
     await sembrarValor(page, '#formula-masa-molar', 'NaCl');
     const resultado = page.locator('[class*="_resultadoMasa"]');
     const quedan = await resultado.count();
@@ -3569,8 +3582,9 @@ test.describe('hallazgos · 27/10/2026 (ABIERTOS)', () => {
     expect(quedan === 0 || /H2O|H₂O/.test(texto), `resultado bajo «NaCl»: ${texto}`).toBe(true); // hoy: queda, y sin su fórmula
   });
 
-  test('M · la ficha no dice de qué escala es la electronegatividad ni por qué el radón da N/D', async ({ page }) => {
-    test.fail(true, 'ABIERTO: «Electronegatividad: N/D» sin escala ni motivo; la única nota de la ficha es la del radio');
+  test('M · 3563 · la ficha no dice de qué escala es la electronegatividad ni por qué el radón da N/D', async ({ page }) => {
+    // REPARADO el 27/10/2026: la ficha lee ELECTRONEGATIVIDAD_META y explica dónde no hay valor;
+    // la description baja a «electronegatividad de Pauling donde está medida».
     // b655825c dejó la serie en data/electronegatividad.ts con su ELECTRONEGATIVIDAD_META (escala
     // de Pauling, fuente y fecha), que no lee nadie. La ficha rotula «Electronegatividad:» a
     // secas, y la única nota que lleva es la del radio: «Desde el fermio (Z ≥ 100) no hay ningún
@@ -3582,11 +3596,12 @@ test.describe('hallazgos · 27/10/2026 (ABIERTOS)', () => {
     await abrirHidratada(page);
     const rn = await fichaDe(page, 'Radón (Rn)');
     expect(rn).toContain('Electronegatividad: N/D');
-    expect(rn).toMatch(/Pauling/); // hoy: no aparece
+    expect(rn).toMatch(/Pauling/);
+    expect(rn).toContain('los gases nobles salvo el kriptón y el xenón');
   });
 
-  test('N · el resultado de la calculadora no se anuncia: con lector de pantalla «Calcular» calla', async ({ page }) => {
-    test.fail(true, 'ABIERTO: el total no está en ninguna región viva');
+  test('N · 3564 · el resultado de la calculadora no se anuncia: con lector de pantalla «Calcular» calla', async ({ page }) => {
+    // REPARADO el 27/10/2026: el total va en una región role="status" que existe siempre.
     // El hallazgo 2287 puso el ERROR en una región role="alert", y su comentario dice que esa
     // región «no lee de paso el resultado». Pero el resultado tampoco tiene la suya: tras pulsar
     // «Calcular» el foco se queda en el botón y el total aparece en un <div> sin aria-live ni
@@ -3599,6 +3614,10 @@ test.describe('hallazgos · 27/10/2026 (ABIERTOS)', () => {
     const enRegionViva = await total.evaluate((el) =>
       Boolean(el.closest('[aria-live], [role="status"], [role="alert"]')),
     );
-    expect(enRegionViva).toBe(true); // hoy: false
+    expect(enRegionViva).toBe(true);
+    // La región es la del total, no la del desglose: lo que se anuncia es una frase corta
+    const region = page.locator('[role="status"]').filter({ has: total });
+    await expect(region).toHaveCount(1);
+    await expect(region.locator('table')).toHaveCount(0);
   });
 });

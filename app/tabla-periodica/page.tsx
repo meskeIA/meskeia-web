@@ -8,6 +8,7 @@ import { formatNumber } from '@/lib';
 import { elementos, elementosPorSimbolo, FAMILIAS, ESTADOS, Elemento } from './elementos-data';
 import { parsearFormulaQuimica } from '@/lib/formula-quimica';
 import { RADIOS_ATOMICOS_META, RADIO_SOLO_TEORICO_DESDE_Z } from '@/data/radios-atomicos';
+import { ELECTRONEGATIVIDAD_META } from '@/data/electronegatividad';
 import {
   CASOS,
   TOTAL_CASOS,
@@ -31,6 +32,14 @@ const normalizaTexto = (s: string) => s.toLowerCase().normalize('NFD').replace(/
 const formatMasaAtomica = (masa: number): string =>
   Number.isInteger(masa) ? `[${masa}]` : formatNumber(masa, 3);
 
+/** Masa entera en este dataset = elemento sin peso atómico estándar (ver formatMasaAtomica). */
+const sinPesoEstandar = (masa: number): boolean => Number.isInteger(masa);
+const hayMasaSinPesoEstandar = (desglose: { simbolo: string }[]): boolean =>
+  desglose.some(({ simbolo }) => sinPesoEstandar(elementosPorSimbolo[simbolo].masa));
+
+/** Lantánidos y actínidos: las dos series interiores, que no se numeran por grupo (hallazgo 3560). */
+const esSerieInterior = (e: Elemento): boolean => e.familia === 'lantanidos' || e.familia === 'actinidos';
+
 // Posiciones especiales en el grid de la tabla periódica
 const getPosicion = (elemento: Elemento): { fila: number; columna: number } => {
   // Lantánidos (57-71) van en fila 8
@@ -53,7 +62,11 @@ export default function TablaPerodicaPage() {
   const [busqueda, setBusqueda] = useState<string>('');
   const [elementoSeleccionado, setElementoSeleccionado] = useState<Elemento | null>(null);
   const [formulaMolar, setFormulaMolar] = useState<string>('');
-  const [resultadoMasa, setResultadoMasa] = useState<{ masa: number; desglose: { simbolo: string; cantidad: number; masa: number }[] } | null>(null);
+  const [resultadoMasa, setResultadoMasa] = useState<{
+    formula: string;
+    masa: number;
+    desglose: { simbolo: string; cantidad: number; masa: number }[];
+  } | null>(null);
   const [errorMasa, setErrorMasa] = useState<string>('');
 
   // Fichas de búsqueda para clase. La corrección vive en `casos.ts`, fuera de la vista.
@@ -131,7 +144,7 @@ export default function TablaPerodicaPage() {
         return { simbolo, cantidad, masa };
       });
 
-      setResultadoMasa({ masa: masaTotal, desglose });
+      setResultadoMasa({ formula: formulaMolar.trim(), masa: masaTotal, desglose });
     } catch {
       setErrorMasa('Error al procesar la fórmula');
     }
@@ -417,7 +430,12 @@ export default function TablaPerodicaPage() {
             id="formula-masa-molar"
             type="text"
             value={formulaMolar}
-            onChange={(e) => setFormulaMolar(e.target.value)}
+            onChange={(e) => {
+              setFormulaMolar(e.target.value);
+              // Hallazgo 3562: los ejemplos retiraban el resultado y teclear no, así que el de
+              // H2O se quedaba bajo un campo que ya decía NaCl.
+              setResultadoMasa(null);
+            }}
             placeholder="Ej: H2O, NaCl, C6H12O6"
             className={styles.inputFormula}
             autoComplete="off"
@@ -439,12 +457,26 @@ export default function TablaPerodicaPage() {
           )}
         </div>
 
-        {resultadoMasa && (
-          <div className={styles.resultadoMasa}>
-            <div className={styles.masaTotal}>
-              <span>Masa Molar Total:</span>
-              <strong>{formatNumber(resultadoMasa.masa, 4)} g/mol</strong>
-            </div>
+        {/* Hallazgo 3564: el total no estaba en ninguna región viva y «Calcular» callaba con
+            lector de pantalla. La región existe siempre (si naciera con el resultado, muchos
+            lectores no la anunciarían) y solo lleva el total, no el desglose. El contenedor
+            pierde su caja cuando no hay resultado. */}
+        <div className={resultadoMasa ? styles.resultadoMasa : undefined}>
+          <div role="status" aria-live="polite" aria-atomic="true">
+            {resultadoMasa && (
+              <div className={styles.masaTotal}>
+                {/* Hallazgo 3562: el bloque dice de qué fórmula es */}
+                <span>Masa molar de {resultadoMasa.formula}:</span>
+                <strong>
+                  {hayMasaSinPesoEstandar(resultadoMasa.desglose)
+                    ? `≈ ${formatNumber(resultadoMasa.masa, 0)}`
+                    : formatNumber(resultadoMasa.masa, 4)}{' '}
+                  g/mol
+                </strong>
+              </div>
+            )}
+          </div>
+          {resultadoMasa && (
             <div className={styles.desgloseMasa}>
               <h4>Desglose:</h4>
               <table>
@@ -456,18 +488,34 @@ export default function TablaPerodicaPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {resultadoMasa.desglose.map(({ simbolo, cantidad, masa }) => (
-                    <tr key={simbolo}>
-                      <td>{simbolo} ({elementosPorSimbolo[simbolo].nombre})</td>
-                      <td>×{cantidad}</td>
-                      <td>{formatNumber(masa, 4)}</td>
-                    </tr>
-                  ))}
+                  {resultadoMasa.desglose.map(({ simbolo, cantidad, masa }) => {
+                    const masaAtomica = elementosPorSimbolo[simbolo].masa;
+                    return (
+                      <tr key={simbolo}>
+                        <td>{simbolo} ({elementosPorSimbolo[simbolo].nombre})</td>
+                        <td>×{cantidad}</td>
+                        <td>
+                          {sinPesoEstandar(masaAtomica)
+                            ? `≈ ${masa} (número másico [${masaAtomica}])`
+                            : formatNumber(masa, 4)}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
+              {/* Hallazgo 3561: la ficha escribe [294] y la calculadora sumaba ese número como
+                  «294,0000 g/mol», con cuatro decimales que nadie ha medido. */}
+              {hayMasaSinPesoEstandar(resultadoMasa.desglose) && (
+                <p className={styles.notaMasaAproximada}>
+                  Lleva algún elemento sin peso atómico estándar: se usa el número másico de su
+                  isótopo más estable, el mismo que la ficha escribe entre corchetes, así que el
+                  total es aproximado y se da sin decimales.
+                </p>
+              )}
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
         <div className={styles.ejemplosFormula}>
           <span>Ejemplos:</span>
@@ -517,9 +565,17 @@ export default function TablaPerodicaPage() {
 
             <div className={styles.modalDetalles}>
               <div className={styles.propiedadesGrid}>
+                {/* Hallazgo 3560 (cabo C0056): los 30 del bloque f decían «Grupo: 3» mientras la
+                    guía enseña que los grupos 3-12 son bloque d, y en el mismo portal
+                    calculadora-configuracion-electronica y tendencias no los numeran. El dato se
+                    queda en elementos-data.ts (coloca la casilla); la ficha ya no lo da. */}
                 <div className={styles.propiedad}>
                   <strong>Grupo:</strong>
-                  <span>{elementoSeleccionado.grupo}</span>
+                  <span>
+                    {esSerieInterior(elementoSeleccionado)
+                      ? 'sin número (serie interior del bloque f)'
+                      : elementoSeleccionado.grupo}
+                  </span>
                 </div>
                 <div className={styles.propiedad}>
                   <strong>Período:</strong>
@@ -563,6 +619,13 @@ export default function TablaPerodicaPage() {
                 escala para toda la tabla, así que los radios de dos fichas se pueden comparar.
                 Desde el fermio (Z&nbsp;≥&nbsp;{RADIO_SOLO_TEORICO_DESDE_Z}) no hay ningún enlace
                 medido y se deja en N/D.
+              </p>
+              {/* Hallazgo 3563: ELECTRONEGATIVIDAD_META (b655825c) no lo leía nadie, y en He, Ne,
+                  Ar y Rn el único N/D de la ficha era este, sin escala ni motivo. */}
+              <p className={styles.fuenteRadio}>
+                {ELECTRONEGATIVIDAD_META.magnitud} ({ELECTRONEGATIVIDAD_META.fuente}). N/D
+                donde ninguna de esas fuentes le da valor: los gases nobles salvo el kriptón y el
+                xenón, el lawrencio y desde el rutherfordio (Z&nbsp;≥&nbsp;104).
               </p>
 
               <div className={styles.configuracion}>
@@ -1105,7 +1168,7 @@ export default function TablaPerodicaPage() {
                     la excepción clásica, y la app ya nombra la simétrica —el hidrógeno en el grupo
                     1— en sus «Confusiones frecuentes».
                   */}
-                  Grupos 1-2: bloque s (1-2 e⁻ de valencia). Grupos 3-12: bloque d (metales de transición). Grupos 13-18: bloque p. Lantánidos/Actínidos: bloque f. <strong>Excepción</strong>: el helio está en el grupo 18 pero es del bloque s (1s²), igual que el hidrógeno está en el grupo 1 sin ser un metal alcalino.
+                  Grupos 1-2: bloque s (1-2 e⁻ de valencia). Grupos 3-12: bloque d (metales de transición). Grupos 13-18: bloque p. Lantánidos/Actínidos: bloque f; son las dos series interiores, que se dibujan aparte y no se numeran por grupo (por eso sus fichas no dan grupo). <strong>Excepción</strong>: el helio está en el grupo 18 pero es del bloque s (1s²), igual que el hidrógeno está en el grupo 1 sin ser un metal alcalino.
                 </p>
               </div>
             </div>
