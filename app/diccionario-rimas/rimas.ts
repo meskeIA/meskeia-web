@@ -54,16 +54,6 @@ const indiceVocalNuclear = (silaba: string): number => {
   return fuerte ? fuerte.i : vocales[vocales.length - 1].i;
 };
 
-/**
- * ¿Acaba en consonante + «y» («party», «ferry», «rugby», «whisky»)? En español la «y» final
- * va siempre tras vocal (rey, hoy, muy, Uruguay); tras consonante solo aparece en
- * anglicismos crudos, que se pronuncian llanos con /i/ final: /ˈparti/, /ˈferi/. La regla
- * ortográfica de la tilde (la «y» final cuenta como consonante) los daba por agudos, y con la
- * «y» ya reconocida como núcleo «party» habría rimado en consonante con «aquí» y «maní».
- */
-const esAnglicismoEnY = (limpia: string): boolean =>
-  /[^aeiouáéíóúüy]y$/.test(limpia) && !/[áéíóú]/.test(limpia);
-
 export interface Escansion {
   palabra: string;
   silabas: string[];
@@ -139,8 +129,10 @@ export const escandirPalabra = (palabra: string): Escansion | null => {
   const silabas = separarSilabas(limpia);
   if (silabas.length === 0) return null;
 
-  const acentuacion =
-    silabas.length >= 2 && esAnglicismoEnY(limpia) ? 'llana' : acentuacionDe(limpia, silabas);
+  // Los anglicismos en consonante + «y» («party», «ferry», «whisky»), que se pronuncian llanos
+  // con /i/ final, los resuelve ya acentuacionDe (hallazgo 2463): aquí había una copia de esa
+  // regla, esAnglicismoEnY, retirada el 27/10/2026 (cabo C0088)
+  const acentuacion = acentuacionDe(limpia, silabas);
 
   // La tilde escrita manda sobre cualquier regla
   const conTilde = silabas.findIndex((s) => TILDADAS.split('').some((t) => s.includes(t)));

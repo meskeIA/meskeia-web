@@ -69,7 +69,8 @@ export default function GlobalError({
           <details style={{
             marginBottom: 'var(--spacing-xl)',
             textAlign: 'left',
-            background: 'var(--bg-secondary)',
+            // Era --bg-secondary, que no existe en globals y dejaba el bloque sin fondo (C0088)
+            background: 'var(--bg-card)',
             padding: 'var(--spacing-md)',
             borderRadius: 'var(--radius-md)',
             border: '1px solid var(--border-color)',
