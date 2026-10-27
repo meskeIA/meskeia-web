@@ -206,16 +206,47 @@ export async function codificarOgg(original: AudioBuffer): Promise<Blob> {
 
   await alimentarCodificador(encoder, buffer, canales, () => errorCodificador !== null);
 
+  // Un marco de silencio (20 ms) detrás del audio. El codificador va `preSkip` muestras por
+  // detrás de lo que recibe, y al hacer flush Chromium completa el último marco de ENTRADA pero
+  // no siempre suelta el que lleva esa cola: el archivo perdía los últimos 6,5 ms de audio y la
+  // posición final se quedaba en lo codificado (144.000 en vez de 144.312, cabo C0459)
+  if (!errorCodificador) {
+    const relleno = Math.ceil(sampleRate * 0.02);
+    const silencio = new AudioData({
+      format: 'f32-planar',
+      sampleRate,
+      numberOfFrames: relleno,
+      numberOfChannels: canales,
+      timestamp: Math.round((buffer.length * 1_000_000) / sampleRate),
+      data: new Float32Array(relleno * canales),
+    });
+    encoder.encode(silencio);
+    silencio.close();
+  }
+
   await encoder.flush();
   encoder.close();
   if (errorCodificador) throw errorCodificador;
 
+  const preSkip = preSkipDeDescripcion(descripcion) ?? PRE_SKIP_LIBOPUS;
+  const muestrasAudio48k = Math.round((buffer.length * 48_000) / sampleRate);
+  // Fuera los paquetes que empiezan después del final del audio: son solo el relleno de arriba,
+  // y así el recorte de la última página nunca pasa de un paquete
+  const fin = preSkip + muestrasAudio48k;
+  const utiles: PaqueteOpus[] = [];
+  let acumulado = 0;
+  for (const p of paquetes) {
+    if (acumulado >= fin) break;
+    utiles.push(p);
+    acumulado += p.muestras48k;
+  }
+
   const archivo = empaquetarOggOpus({
-    paquetes,
+    paquetes: utiles,
     canales,
     frecuenciaOriginal: sampleRate,
-    preSkip: preSkipDeDescripcion(descripcion) ?? PRE_SKIP_LIBOPUS,
-    muestrasAudio48k: Math.round((buffer.length * 48_000) / sampleRate),
+    preSkip,
+    muestrasAudio48k,
     serie: crypto.getRandomValues(new Uint32Array(1))[0],
   });
   return new Blob([archivo], { type: 'audio/ogg' });
