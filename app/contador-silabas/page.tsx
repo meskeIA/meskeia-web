@@ -371,7 +371,8 @@ sabañón garrafal, morado y frito.`,
                     <span aria-hidden="true">🎼</span> Métrica del verso
                   </h3>
                   <p className={styles.metricaIntro}>
-                    Sílabas fonéticas menos las sinalefas, más el ajuste por acento final.
+                    Sílabas fonéticas menos las sinalefas, más el ajuste por acento final. El
+                    alejandrino y el dodecasílabo se miden por hemistiquios.
                   </p>
 
                   {resultado.versos.map((v, index) => (
@@ -398,12 +399,35 @@ sabañón garrafal, morado y frito.`,
                             {v.sinalefas.length === 1 ? 'sinalefa' : 'sinalefas'}
                           </span>
                         )}
+                        {v.cesura && v.cesura.ajustePrimero !== 0 && (
+                          <span className={styles.versoOperando}>
+                            {v.cesura.ajustePrimero > 0 ? '+ 1' : '− 1'} (primer hemistiquio{' '}
+                            {v.cesura.acentuacionPrimero === 'esdrujula' ? 'esdrújulo' : 'agudo'})
+                          </span>
+                        )}
                         <span className={styles.versoOperando}>
                           {v.ajuste > 0 ? '+ 1' : v.ajuste < 0 ? '− 1' : '± 0'} (última palabra{' '}
                           {v.acentuacion === 'esdrujula' ? 'esdrújula' : v.acentuacion})
                         </span>
                         <span className={styles.versoIgual}>= {v.silabasMetricas}</span>
                       </div>
+
+                      {/* Hallazgo 3569: los compuestos se miden por mitades, y hay que decir
+                          dónde va el corte para que la cuenta se pueda seguir a mano. */}
+                      {v.cesura && (
+                        <p className={styles.versoCesura}>
+                          Verso compuesto: {v.cesura.primero} + {v.cesura.segundo}, con la cesura
+                          tras «{v.palabras[v.cesura.despuesDe].palabra}». Cada hemistiquio se
+                          mide como un verso y en el corte no hay sinalefa.
+                        </p>
+                      )}
+                      {v.dialefaFinal !== null && (
+                        <p className={styles.versoCesura}>
+                          Sin sinalefa en «{v.palabras[v.dialefaFinal].palabra} |{' '}
+                          {v.palabras[v.dialefaFinal + 1].palabra}»: la vocal lleva el acento
+                          final del verso (dialefa).
+                        </p>
+                      )}
 
                       {v.sinalefas.length > 0 && (
                         <div className={styles.sinalefasLista}>
@@ -863,7 +887,7 @@ sabañón garrafal, morado y frito.`,
             <div>
               <strong>Limitaciones del algoritmo de silabeo automático</strong>
               <ul>
-                <li><strong>Las sinalefas se detectan, pero la última palabra la tienes tú:</strong> el cómputo métrico aplica la norma general (toda sinalefa posible se realiza). El poeta puede romperla (dialefa) o unir un hiato (sinéresis) por motivos de ritmo; esas licencias no son predecibles por algoritmo. Las fusiones señaladas <em>con pausa</em> son las primeras candidatas a revisar si el verso no cuadra.</li>
+                <li><strong>Las sinalefas se detectan, pero la última palabra la tienes tú:</strong> el cómputo métrico aplica la norma general (toda sinalefa posible se realiza), con dos excepciones que sí son predecibles: no hay sinalefa sobre la vocal que lleva el acento final del verso (&quot;y está | hecho&quot;, &quot;de | oro&quot;), ni en la cesura de un alejandrino o un dodecasílabo, que se miden por hemistiquios (7 + 7 y 6 + 6). El poeta puede romperla (dialefa) o unir un hiato (sinéresis) por motivos de ritmo; esas licencias no son predecibles por algoritmo. Las fusiones señaladas <em>con pausa</em> son las primeras candidatas a revisar si el verso no cuadra.</li>
                 <li><strong>Sinéresis y diéresis no se aplican solas:</strong> el análisis parte del silabeo estándar de cada palabra. Si el poeta trató &quot;poeta&quot; como bisílabo (sinéresis) o &quot;suave&quot; como trisílabo (diéresis), el resultado diferirá en una sílaba.</li>
                 <li><strong>Las sinalefas sí se encadenan:</strong> cuando tres o más vocales entran en contacto, se funden todas en una sílaba. «Érase un hombre a una nariz pegado» tiene 14 sílabas fonéticas y tres contactos vocálicos (se_un, bre_a, a_u): 14 − 3 = 11, el endecasílabo que Quevedo escribió. La excepción es la conjunción <em>y</em>, que funde por un solo lado —«de rosa y azucena» ahorra una sílaba, no dos—, porque entre vocales se lee [ro-sa-<em>ja</em>-zu-ce-na].</li>
                 <li><strong>Palabras compuestas y prefijadas:</strong> En palabras como &quot;subrayar&quot;, &quot;deshacer&quot; o &quot;transatlántico&quot;, el silabeo puede variar según se considere la morfología o solo la fonética. La RAE y las distintas tradiciones gramaticales no siempre coinciden.</li>

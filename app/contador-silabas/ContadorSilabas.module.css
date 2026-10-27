@@ -273,6 +273,14 @@
   white-space: nowrap;
 }
 
+/* Cesura de los versos compuestos y dialefa ante el acento final (hallazgos 3566 y 3569) */
+.versoCesura {
+  margin: 6px 0 0;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
 .versoIgual {
   font-weight: 700;
   color: var(--primary-texto);

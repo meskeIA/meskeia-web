@@ -1238,10 +1238,12 @@ test.describe('contador-silabas', () => {
       page,
     }) => {
       // Testigo de que la app SÍ aplica la regla por el lado de la h inicial:
-      // la(1) ho-ja(2) al-ta(2) = 5 − 2 sinalefas = 3.
-      await analizar(page, 'la hoja alta');
+      // la(1) ho-ja(2) al-ta(2) del(1) ár-bol(2) = 8 − 2 sinalefas (la_hoja, hoja_alta) = 6, llana.
+      // Era «la hoja alta» a secas; desde el hallazgo 3566, «alta» al FINAL del verso lleva el
+      // acento rítmico y va en dialefa, así que la frase sigue para que «alta» quede dentro.
+      await analizar(page, 'la hoja alta del árbol');
       await expect(sinalefasDe(page)).toHaveCount(2);
-      await expect(metricasDe(page)).toHaveText('3');
+      await expect(metricasDe(page)).toHaveText('6');
 
       // Por el otro lado no lo hacía. La h no representa ningún sonido en español (OLE 2010), así que
       // «oh» suena [o] y su vocal final está en contacto con la «a» de «alma»: hay sinalefa.
@@ -1887,10 +1889,11 @@ test.describe('contador-silabas · Inspector 27/10/2026 (séptima inspección)',
     expect({ lope, sueltos }).toEqual({ lope: ['11', '11', '11'], sueltos: ['4', '8', '11'] });
   });
 
-  test('HALLAZGO · no hay sinalefa sobre la vocal que lleva el acento final del verso', async ({
+  test('HALLAZGO 3566 · no hay sinalefa sobre la vocal que lleva el acento final del verso', async ({
     page,
   }) => {
-    test.fail(true, 'ABIERTO: «está_hecho» y «de_oro» se funden y el verso pierde una sílaba');
+    // REPARADO el 27/10/2026: escandirTramo() deja en dialefa el contacto con la última palabra
+    // cuando esta empieza por su vocal tónica, y la tarjeta lo dice.
     //   Lope, v. 14: con-tad(2) si(1) son(1) ca-tor-ce(3) y(1) es-tá(2) he-cho(2) = 12. La «y»
     //       ahorra una (ce-yes-tá); «está | hecho» va en dialefa porque «he-» es la décima, el
     //       acento final del endecasílabo → 11. La app: 10, y señala «con pausa» la fusión de la
@@ -1903,6 +1906,7 @@ test.describe('contador-silabas · Inspector 27/10/2026 (séptima inspección)',
       'contad si son catorce, y está hecho.\nLa princesa está pálida en su silla de oro,',
     );
     expect(await medidas(page, 2)).toEqual(['11', '14']);
+    await expect(page.locator('[class*="versoCard"]').nth(0)).toContainText('Sin sinalefa en «está | hecho»');
   });
 
   test('TESTIGO · tres redondillas de Sor Juana: doce octosílabos y la rima abba cddc effe', async ({
@@ -2001,10 +2005,11 @@ test.describe('contador-silabas · Inspector 27/10/2026 (séptima inspección)',
     expect([r[0], r[1], r[2], r[3], r[4], r[6], r[7]]).toEqual(Array<string>(7).fill('14'));
   });
 
-  test('HALLAZGO C0290 · el alejandrino y el dodecasílabo se miden por hemistiquios', async ({
+  test('HALLAZGO 3569 (C0290) · el alejandrino y el dodecasílabo se miden por hemistiquios', async ({
     page,
   }) => {
-    test.fail(true, 'ABIERTO: analizarVerso() mide el verso compuesto entero, sin cesura');
+    // REPARADO el 27/10/2026: buscarCesura() mide por mitades los versos que caen en la franja
+    // de un compuesto, y la tarjeta dice dónde va el corte.
     //   Machado, «Retrato», v. 6: ya(1) co-no-céis(3) mi(1) tor-pe(2) | a-li-ño(3)
     //       in-du-men-ta-rio(5). Primer hemistiquio 7, llano; segundo 8 − aliño_indumentario
     //       = 7. En la cesura no hay sinalefa: «torpe | aliño» → 14. La app: 15 − 2 = 13.
@@ -2019,6 +2024,12 @@ test.describe('contador-silabas · Inspector 27/10/2026 (séptima inspección)',
       '—ya conocéis mi torpe aliño indumentario—,\ndiríase un trémolo de liras eolias',
     );
     expect(await medidas(page, 2)).toEqual(['14', '12']);
+    await expect(page.locator('[class*="versoCard"]').nth(0)).toContainText(
+      'Verso compuesto: 7 + 7, con la cesura tras «torpe»',
+    );
+    // 14 fonéticas − 1 sinalefa − 1 (primer hemistiquio esdrújulo) ± 0 = 12: la cuenta se sigue
+    await expect(desgloseDe(page, 1)).toContainText('− 1 (primer hemistiquio esdrújulo)');
+    await expect(nombreDe(page, 1)).toContainText('dodecasílabo');
   });
 
   test('TESTIGO · Garcilaso XXIII: doce de catorce miden 11 y el soneto se reconoce', async ({

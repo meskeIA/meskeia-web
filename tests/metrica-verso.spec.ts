@@ -176,6 +176,88 @@ test('la «y» final de «hoy» o «rey» ante vocal es consonante y no funde', 
   expect(sinalefasDe('el ferry en el puerto')).toEqual(['y_e']);
 });
 
+/**
+ * HALLAZGO 3566 (27/10/2026) — no hay sinalefa sobre la vocal que lleva el acento FINAL del
+ * verso (Quilis, Métrica española; Navarro Tomás). A mano:
+ *   «contad si son catorce, y está hecho.» con-tad(2) si(1) son(1) ca-tor-ce(3) y(1) es-tá(2)
+ *     he-cho(2) = 12 − ce_y (la conjunción funde por un lado) = 11; «está | hecho» en dialefa.
+ *   «La princesa está pálida en su silla de oro,» 16 − princesa_está − pálida_en = 14, con
+ *     «de | oro» en dialefa (y medido por hemistiquios, 7 + 7: el hallazgo 3569).
+ * Dentro del verso, una palabra que empieza por vocal tónica sí funde: «la hoja alta del
+ * árbol» sigue con sus dos sinalefas.
+ */
+test.describe('dialefa ante el acento final del verso', () => {
+  test('«está | hecho» y «de | oro» no se funden', () => {
+    const lope = analizarVerso('contad si son catorce, y está hecho.')!;
+    expect(lope.silabasFoneticas).toBe(12);
+    expect(sinalefasDe('contad si son catorce, y está hecho.')).toEqual(['e_y']);
+    expect(lope.dialefaFinal).toBe(5);
+    expect(lope.silabasMetricas).toBe(11);
+    expect(medir('La princesa está pálida en su silla de oro,')).toBe(14);
+  });
+
+  test('la regla solo mira la última palabra del verso', () => {
+    expect(sinalefasDe('la hoja alta del árbol')).toEqual(['a_h', 'a_a']);
+    // «aprieto» no empieza por su tónica: la sinalefa tanto_aprieto sigue
+    expect(medir('que en mi vida me he visto en tanto aprieto;')).toBe(11);
+  });
+});
+
+/**
+ * HALLAZGO 3569 (27/10/2026) — el alejandrino (7 + 7) y el dodecasílabo (6 + 6) se miden por
+ * hemistiquios, cada uno con su ajuste final y sin sinalefa en la cesura (Quilis). A mano:
+ *   Machado: «ya conocéis mi torpe | aliño indumentario» = 7 (llano) + (8 − aliño_in) 7 = 14.
+ *   Darío: «diríase un trémolo | de liras eolias» = (8 − se_un − 1 esdrújulo) 6 + 6 = 12.
+ * Y los que ya salían bien, porque la cesura no choca: siguen igual.
+ */
+test.describe('versos compuestos por hemistiquios', () => {
+  test('la cesura impide la sinalefa y aplica el ajuste del primer hemistiquio', () => {
+    const machado = analizarVerso('—ya conocéis mi torpe aliño indumentario—,')!;
+    expect(machado.silabasMetricas).toBe(14);
+    expect(machado.nombre).toBe('alejandrino');
+    expect(machado.cesura).toEqual({
+      despuesDe: 3,
+      primero: 7,
+      segundo: 7,
+      ajustePrimero: 0,
+      acentuacionPrimero: 'llana',
+    });
+    expect(sinalefasDe('—ya conocéis mi torpe aliño indumentario—,')).toEqual(['o_i']);
+
+    const dario = analizarVerso('diríase un trémolo de liras eolias')!;
+    expect(dario.silabasMetricas).toBe(12);
+    expect(dario.nombre).toBe('dodecasílabo');
+    expect(dario.cesura?.ajustePrimero).toBe(-1);
+  });
+
+  test('los compuestos sin conflicto en la cesura siguen midiendo lo mismo', () => {
+    for (const [verso, n] of [
+      ['Era un aire suave, de pausados giros;', 12],
+      ['Sobre la terraza, junto a los ramajes,', 12],
+      ['La princesa está triste... ¿qué tendrá la princesa?', 14],
+      ['Los suspiros se escapan de su boca de fresa,', 14],
+      ['que ha perdido la risa, que ha perdido el color.', 14],
+      ['está mudo el teclado de su clave sonoro,', 14],
+      ['y en un vaso, olvidada, se desmaya una flor.', 14],
+      ['Mi infancia son recuerdos de un patio de Sevilla,', 14],
+      ['y un huerto claro donde madura el limonero;', 14],
+      ['mi juventud, veinte años en tierra de Castilla;', 14],
+      ['mi historia, algunos casos que recordar no quiero.', 14],
+      ['Ni un seductor Mañara, ni un Bradomín he sido', 14],
+      ['mas recibí la flecha que me asignó Cupido,', 14],
+      ['y amé cuanto ellas puedan tener de hospitalario.', 14],
+    ] as const) {
+      expect({ verso, n: medir(verso) }).toEqual({ verso, n });
+    }
+  });
+
+  test('un endecasílabo no se parte en hemistiquios', () => {
+    const a = analizarVerso('Volverán las oscuras golondrinas')!;
+    expect(a.cesura).toBeNull();
+    expect(a.silabasMetricas).toBe(11);
+  });
+});
+
 test('el ajuste por acento final se aplica sobre el recuento ya fundido', () => {
   // «¿Qué es la vida? Un frenesí» — 8 fonéticas − 2 sinalefas (e_e, a_u) + 1 (aguda) = 7...
   // no: qué(1) es(1) la(1) vi-da(2) un(1) fre-ne-sí(3) = 9 − 2 + 1 = 8, octosílabo agudo.
@@ -207,8 +289,9 @@ test('la h FINAL no bloquea la sinalefa: es muda por los dos lados', () => {
   expect(sinalefasDe('oh alma mía')).toEqual(['h_a']);
   expect(a.silabasMetricas).toBe(4);
 
-  // La h inicial ya funcionaba, y tiene que seguir funcionando igual
-  expect(sinalefasDe('la hoja alta')).toEqual(['a_h', 'a_a']);
+  // La h inicial ya funcionaba, y tiene que seguir funcionando igual. Desde el hallazgo 3566
+  // la frase sigue con «del árbol»: «alta» al FINAL lleva el acento del verso y va en dialefa.
+  expect(sinalefasDe('la hoja alta del árbol')).toEqual(['a_h', 'a_a']);
   // Y la h consonántica de «hue-/hui-/hie-/huy-» sigue bloqueando
   expect(sinalefasDe('la huella')).toEqual([]);
 });

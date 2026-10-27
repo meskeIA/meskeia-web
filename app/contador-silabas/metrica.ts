@@ -16,11 +16,26 @@ export interface Sinalefa {
   conPausa: boolean;
 }
 
+/** Verso compuesto (alejandrino 7 + 7, dodecasílabo 6 + 6): dónde va el corte y qué mide cada mitad */
+export interface Cesura {
+  /** Índice de la última palabra del primer hemistiquio */
+  despuesDe: number;
+  primero: number;
+  segundo: number;
+  /** Ajuste por el acento final del PRIMER hemistiquio (el del segundo es `ajuste`) */
+  ajustePrimero: number;
+  acentuacionPrimero: Acentuacion;
+}
+
 export interface AnalisisVerso {
   texto: string;
   palabras: { palabra: string; silabas: string[] }[];
   silabasFoneticas: number;
   sinalefas: Sinalefa[];
+  /** Índice de la palabra que NO se funde con la última por caer ahí el acento final (dialefa) */
+  dialefaFinal: number | null;
+  /** Solo en los versos compuestos */
+  cesura: Cesura | null;
   acentuacion: Acentuacion;
   ajuste: number;
   silabasMetricas: number;
@@ -233,20 +248,62 @@ const NOMBRES_VERSO: Record<number, string> = {
 export const nombreDelVerso = (silabas: number): string =>
   NOMBRES_VERSO[silabas] || `${silabas} sílabas`;
 
-/**
- * Escansión de un verso: sílabas fonéticas − sinalefas + ajuste por acento final.
- * Devuelve null si la línea no contiene palabras.
- */
-export const analizarVerso = (linea: string): AnalisisVerso | null => {
-  const encontradas = Array.from(linea.matchAll(RE_PALABRAS)).map((m) => ({
-    palabra: m[0],
-    inicio: m.index,
-    fin: m.index + m[0].length,
-  }));
-  if (encontradas.length === 0) return null;
+const ajusteDe = (acentuacion: Acentuacion): number =>
+  acentuacion === 'aguda' ? 1 : acentuacion === 'esdrujula' ? -1 : 0;
 
-  const palabras = encontradas.map((e) => ({ palabra: e.palabra, silabas: separarSilabas(e.palabra) }));
-  const silabasFoneticas = palabras.reduce((acc, p) => acc + p.silabas.length, 0);
+/** Índice (desde el principio) de la sílaba tónica de una palabra. */
+const indiceTonica = (palabra: string, silabas: string[]): number => {
+  const indiceTilde = silabas.findIndex((s) => /[áéíóú]/i.test(s));
+  if (indiceTilde !== -1) return indiceTilde;
+  const acentuacion = acentuacionDe(palabra, silabas);
+  return Math.max(0, silabas.length - 1 - (acentuacion === 'aguda' ? 0 : 1));
+};
+
+interface PalabraLocalizada {
+  palabra: string;
+  inicio: number;
+  fin: number;
+}
+
+interface Tramo {
+  silabasFoneticas: number;
+  sinalefas: Sinalefa[];
+  dialefaFinal: number | null;
+  acentuacion: Acentuacion;
+  ajuste: number;
+  silabasMetricas: number;
+}
+
+/**
+ * Escande las palabras [desde, hasta) como un verso independiente: un verso simple entero o
+ * un hemistiquio de un verso compuesto. Los índices de las sinalefas son los del verso entero.
+ *
+ * `cierraVerso` dice si la última palabra del tramo lleva el acento FINAL del verso.
+ */
+function escandirTramo(
+  linea: string,
+  encontradas: PalabraLocalizada[],
+  palabras: { palabra: string; silabas: string[] }[],
+  desde: number,
+  hasta: number,
+  cierraVerso: boolean,
+): Tramo {
+  let silabasFoneticas = 0;
+  for (let i = desde; i < hasta; i++) silabasFoneticas += palabras[i].silabas.length;
+
+  const ultima = palabras[hasta - 1];
+
+  /**
+   * ── No hay sinalefa sobre la vocal del ACENTO FINAL (hallazgo 3566, 27/10/2026) ──────
+   * Si la última palabra del verso empieza por su vocal tónica («hecho», «oro», «alma»),
+   * esa vocal lleva el acento rítmico final y la métrica pide dialefa: «contad si son
+   * catorce, y está | hecho» (Lope) es endecasílabo y «en su silla de | oro» (Darío) cierra
+   * un alejandrino (Quilis, Métrica española; Navarro Tomás). Antes se fundían y los dos
+   * versos perdían una sílaba. Solo se aplica al final del verso: dentro de un primer
+   * hemistiquio el poeta funde a menudo («mi juventud, veinte‿años», Machado).
+   */
+  const ultimaEmpiezaTonica: boolean =
+    cierraVerso && hasta - desde >= 2 && indiceTonica(ultima.palabra, ultima.silabas) === 0;
 
   /**
    * Sinalefas: vocal final de una palabra + vocal inicial de la siguiente.
@@ -272,42 +329,144 @@ export const analizarVerso = (linea: string): AnalisisVerso | null => {
    * palabra que sigue sin encadenar, y por una razón fonética, no por regla de conteo.
    */
   const sinalefas: Sinalefa[] = [];
+  let dialefaFinal: number | null = null;
   let veniaFundida: boolean = false; // ¿la palabra i se fundió ya con la i−1?
-  for (let i = 0; i < encontradas.length - 1; i++) {
+  for (let i = desde; i < hasta - 1; i++) {
     const actual = encontradas[i];
     const siguiente = encontradas[i + 1];
     const entreMedias = linea.slice(actual.fin, siguiente.inicio);
-    const funde: boolean =
+    const hayContacto: boolean =
       !hayTokenDescartado(entreMedias) &&
       !(esConjuncionY(actual.palabra) && veniaFundida) &&
       terminaEnVocal(actual.palabra) &&
       empiezaPorVocal(siguiente.palabra);
+    const sobreElAcentoFinal = ultimaEmpiezaTonica && i + 1 === hasta - 1;
+    const funde = hayContacto && !sobreElAcentoFinal;
     if (funde) {
       sinalefas.push({
         indice: i,
         texto: `${actual.palabra.slice(-1)}_${siguiente.palabra[0]}`,
         conPausa: /[,;:.…!?—)]/.test(entreMedias),
       });
+    } else if (hayContacto) {
+      dialefaFinal = i;
     }
     veniaFundida = funde;
   }
 
-  const ultima = palabras[palabras.length - 1];
   const acentuacion = acentuacionDe(ultima.palabra, ultima.silabas);
-  const ajuste = acentuacion === 'aguda' ? 1 : acentuacion === 'esdrujula' ? -1 : 0;
-
-  const silabasMetricas = Math.max(0, silabasFoneticas - sinalefas.length + ajuste);
+  const ajuste = ajusteDe(acentuacion);
 
   return {
+    silabasFoneticas,
+    sinalefas,
+    dialefaFinal,
+    acentuacion,
+    ajuste,
+    silabasMetricas: Math.max(0, silabasFoneticas - sinalefas.length + ajuste),
+  };
+}
+
+/**
+ * ── Los versos compuestos se miden por hemistiquios (hallazgo 3569, 27/10/2026) ──────────
+ * El alejandrino (7 + 7) y el dodecasílabo (6 + 6) son dos versos en uno: cada hemistiquio
+ * lleva su propio ajuste por acento final y en la cesura no hay sinalefa (Quilis, Métrica
+ * española). Medidos de una pieza, «—ya conocéis mi torpe | aliño indumentario—» (Machado)
+ * daba 13, por la fusión «torpe‿aliño», y «diríase un trémolo | de liras eolias» (Darío),
+ * también 13, sin el −1 del primer hemistiquio esdrújulo: dos «tridecasílabos» que no existen.
+ *
+ * Sin léxico no se sabe dónde quiso el poeta la cesura, así que se busca: solo en los versos
+ * cuya cuenta simple está en la franja en la que un compuesto puede caer (un alejandrino da
+ * de 12 a 15 contado de una pieza; un dodecasílabo, 12 o 13), y solo se acepta un corte entre
+ * palabras que deje dos mitades IGUALES de 7 o de 6. Si hay corte de los dos tipos, el verso
+ * es ambiguo y se queda con la cuenta simple. Un endecasílabo (11 de una pieza) no se toca.
+ */
+const FRANJA_COMPUESTO: { mitad: number; simples: number[] }[] = [
+  { mitad: 7, simples: [12, 13, 14, 15] },
+  { mitad: 6, simples: [12, 13] },
+];
+
+function buscarCesura(
+  linea: string,
+  encontradas: PalabraLocalizada[],
+  palabras: { palabra: string; silabas: string[] }[],
+  simple: number,
+): { corte: number; primero: Tramo; segundo: Tramo } | null {
+  const candidatos: { mitad: number; corte: number; primero: Tramo; segundo: Tramo; pausa: boolean }[] = [];
+  for (const { mitad, simples } of FRANJA_COMPUESTO) {
+    if (!simples.includes(simple)) continue;
+    for (let corte = 1; corte < palabras.length; corte++) {
+      const primero = escandirTramo(linea, encontradas, palabras, 0, corte, false);
+      if (primero.silabasMetricas !== mitad) continue;
+      const segundo = escandirTramo(linea, encontradas, palabras, corte, palabras.length, true);
+      if (segundo.silabasMetricas !== mitad) continue;
+      const entreMedias = linea.slice(encontradas[corte - 1].fin, encontradas[corte].inicio);
+      candidatos.push({ mitad, corte, primero, segundo, pausa: /[,;:.…!?—)]/.test(entreMedias) });
+    }
+  }
+  if (candidatos.length === 0) return null;
+  if (new Set(candidatos.map((c) => c.mitad)).size > 1) return null; // ambiguo: 7 + 7 y 6 + 6
+  // Varios cortes posibles: el que coincide con una pausa escrita, y si no, el primero
+  const elegido = candidatos.find((c) => c.pausa) ?? candidatos[0];
+  return { corte: elegido.corte, primero: elegido.primero, segundo: elegido.segundo };
+}
+
+/**
+ * Escansión de un verso: sílabas fonéticas − sinalefas + ajuste por acento final; en los
+ * compuestos, la suma de los dos hemistiquios. Devuelve null si la línea no contiene palabras.
+ */
+export const analizarVerso = (linea: string): AnalisisVerso | null => {
+  const encontradas: PalabraLocalizada[] = Array.from(linea.matchAll(RE_PALABRAS)).map((m) => ({
+    palabra: m[0],
+    inicio: m.index,
+    fin: m.index + m[0].length,
+  }));
+  if (encontradas.length === 0) return null;
+
+  const palabras = encontradas.map((e) => ({ palabra: e.palabra, silabas: separarSilabas(e.palabra) }));
+  const silabasFoneticas = palabras.reduce((acc, p) => acc + p.silabas.length, 0);
+
+  const simple = escandirTramo(linea, encontradas, palabras, 0, palabras.length, true);
+  const compuesto = buscarCesura(linea, encontradas, palabras, simple.silabasMetricas);
+
+  const base = {
     texto: linea.trim(),
     palabras,
     silabasFoneticas,
-    sinalefas,
-    acentuacion,
-    ajuste,
-    silabasMetricas,
-    nombre: nombreDelVerso(silabasMetricas),
-    arte: silabasMetricas >= 9 ? 'mayor' : 'menor',
+  };
+
+  if (compuesto) {
+    const { corte, primero, segundo } = compuesto;
+    const silabasMetricas = primero.silabasMetricas + segundo.silabasMetricas;
+    return {
+      ...base,
+      sinalefas: [...primero.sinalefas, ...segundo.sinalefas],
+      dialefaFinal: segundo.dialefaFinal,
+      cesura: {
+        despuesDe: corte - 1,
+        primero: primero.silabasMetricas,
+        segundo: segundo.silabasMetricas,
+        ajustePrimero: primero.ajuste,
+        acentuacionPrimero: primero.acentuacion,
+      },
+      acentuacion: segundo.acentuacion,
+      ajuste: segundo.ajuste,
+      silabasMetricas,
+      nombre: nombreDelVerso(silabasMetricas),
+      arte: 'mayor',
+    };
+  }
+
+  return {
+    ...base,
+    sinalefas: simple.sinalefas,
+    dialefaFinal: simple.dialefaFinal,
+    cesura: null,
+    acentuacion: simple.acentuacion,
+    ajuste: simple.ajuste,
+    silabasMetricas: simple.silabasMetricas,
+    nombre: nombreDelVerso(simple.silabasMetricas),
+    arte: simple.silabasMetricas >= 9 ? 'mayor' : 'menor',
   };
 };
 
