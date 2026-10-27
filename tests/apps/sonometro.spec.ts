@@ -2436,11 +2436,11 @@ test.describe('inspector 26/10/2026', () => {
   });
 
   // =========================================================================
-  // HALLAZGOS ABIERTOS (inspector 26/10/2026) — afirman lo correcto y hoy fallan a propósito
+  // HALLAZGOS del inspector 26/10/2026 — REPARADOS el 27/10/2026 (3541-3551)
   // =========================================================================
 
   /*
-   * ABIERTO, hallazgo (inspector 26/10/2026) · operativa, alto — con la página traducida, un
+   * REPARADO el 27/10/2026, hallazgo 3541 (inspector 26/10/2026) · operativa, alto — con la página traducida, un
    * hueco de más de un segundo sin fotogramas TUMBA la app a media medición.
    * El aviso del hallazgo 1700 se pinta con `{segundosSinMedir >= 1 && (<>No cuentan …</>)}`
    * en mitad del párrafo `laeqNota`: React inserta ese fragmento delante del nodo de texto
@@ -2451,8 +2451,7 @@ test.describe('inspector 26/10/2026', () => {
    * de app, que es lo normal en una medición nocturna. Al reanudar o resetear tras un hueco,
    * React RETIRA ese fragmento y vuelve a caer (removeChild).
    */
-  test('ABIERTO 26/10 — con la página traducida, un hueco sin muestras no tumba la medición', async ({ page }) => {
-    test.fail();
+  test('REPARADO (3541) — con la página traducida, un hueco sin muestras no tumba la medición', async ({ page }) => {
     test.setTimeout(90000);
     const errores = vigilarErroresDeReact(page);
     await sembrarRegistro(page, [sesionDeJunio(12)]); // para que exista «Borrar el registro»
@@ -2481,7 +2480,7 @@ test.describe('inspector 26/10/2026', () => {
   });
 
   /*
-   * ABIERTO, hallazgo (inspector 26/10/2026) · operativa, medio — con la página traducida, tres
+   * REPARADO el 27/10/2026, hallazgo 3542 (inspector 26/10/2026) · operativa, medio — con la página traducida, tres
    * textos de la app se quedan con su valor ANTERIOR (React escribe en el nodo de texto que el
    * traductor retiró). Medido el 26/10/2026, sin caída ni error:
    *   · el botón de parar dice «⏹️ Iniciar medición» mientras mide (y su nombre accesible
@@ -2491,10 +2490,9 @@ test.describe('inspector 26/10/2026', () => {
    *   · tras pulsar «+» la calibración aplicada es 91 (localStorage) y la pantalla sigue en
    *     «Desplazamiento: 90 dB».
    */
-  test('ABIERTO 26/10 — con la página traducida, el botón de parar, el contador y la calibración dicen lo actual', async ({
+  test('REPARADO (3542) — con la página traducida, el botón de parar, el contador y la calibración dicen lo actual', async ({
     page,
   }) => {
-    test.fail();
     test.setTimeout(90000);
     await sembrarRegistro(page, [sesionDeJunio(12)]);
     await micrófonoRegulable(page, 1000, 0.05);
@@ -2519,7 +2517,7 @@ test.describe('inspector 26/10/2026', () => {
   });
 
   /*
-   * ABIERTO, hallazgo (inspector 26/10/2026) · calculo, medio — calibrar A MEDIA SESIÓN mezcla
+   * REPARADO el 27/10/2026, hallazgo 3543 (inspector 26/10/2026) · calculo, medio — calibrar A MEDIA SESIÓN mezcla
    * dos calibraciones en la misma fila. Es el flujo que pide el propio panel («ajusta aquí el
    * desplazamiento hasta que las lecturas coincidan»: hay que estar midiendo para verlas), y el
    * deslizador y los botones siguen activos mientras se mide. La fila guarda solo la calibración
@@ -2530,8 +2528,7 @@ test.describe('inspector 26/10/2026', () => {
    * sería que sus cifras fueran las de la calibración que dice (71,0 / 71,0 / 71,0), o no dejar
    * calibrar con la sesión en marcha (entonces la fila sería 90 dB y 61,0 / 61,0 / 61,0).
    */
-  test('ABIERTO 26/10 — una fila no mezcla cifras medidas con dos calibraciones distintas', async ({ page }) => {
-    test.fail();
+  test('REPARADO (3543) — una fila no mezcla cifras medidas con dos calibraciones distintas', async ({ page }) => {
     test.setTimeout(90000);
     await micrófonoRegulable(page, 1000, 0.05);
     await page.goto(RUTA);
@@ -2544,6 +2541,8 @@ test.describe('inspector 26/10/2026', () => {
     for (let i = 0; i < 10; i++) {
       if (await mas.isEnabled()) await mas.click();
     }
+    // La reparación: calibrar con la sesión en marcha reinicia las estadísticas, y se dice
+    await expect(page.locator('[class*="avisoReinicio"]')).toContainText('las estadísticas han vuelto a empezar');
     await esperarSegundosDeApp(page, 10);
     await page.getByRole('button', { name: /Detener y guardar/i }).click();
     await expect(filasRegistro(page)).toHaveCount(1);
@@ -2557,7 +2556,7 @@ test.describe('inspector 26/10/2026', () => {
   });
 
   /*
-   * ABIERTO, hallazgo (inspector 26/10/2026) · accesibilidad, medio — el rótulo de la franja
+   * REPARADO el 27/10/2026, hallazgo 3544 (inspector 26/10/2026) · accesibilidad, medio — el rótulo de la franja
    * (blanco sobre el color de la franja) y la lectura grande (pintada con ese color) no llegan
    * al contraste mínimo. El rótulo es 17,6 px / 600, umbral 4,5:1; la lectura, 64 px, 3:1.
    * Medido el 26/10/2026 (anterior a la campaña del 18/10, que no tocó estos colores):
@@ -2567,10 +2566,9 @@ test.describe('inspector 26/10/2026', () => {
    *   oscuro · «Esperando...» blanco sobre --text-muted #9B9B9B: 2,78 · lectura Peligroso
    *           #dc2626 sobre #383838: 2,43 (los rótulos de franja, igual que en claro)
    */
-  test('ABIERTO 26/10 — el rótulo de la franja y la lectura grande se leen en todas las franjas y en los dos temas', async ({
+  test('REPARADO (3544) — el rótulo de la franja y la lectura grande se leen en todas las franjas y en los dos temas', async ({
     page,
   }) => {
-    test.fail();
     test.setTimeout(120000);
     /** Amplitud que da `db` dB(A) a 1 kHz con la calibración por defecto: a = √2·10^((L − 90)/20) */
     const amplitudPara = (db: number) => Math.SQRT2 * Math.pow(10, (db - 90) / 20);
@@ -2625,13 +2623,12 @@ test.describe('inspector 26/10/2026', () => {
   });
 
   /*
-   * ABIERTO, hallazgo (inspector 26/10/2026) · accesibilidad, bajo — en oscuro, los ejemplos de
+   * REPARADO el 27/10/2026, hallazgo 3545 (inspector 26/10/2026) · accesibilidad, bajo — en oscuro, los ejemplos de
    * la fila ACTIVA de «Niveles de referencia» (--text-muted #9B9B9B sobre el tinte --focus,
    * rgba(63,165,209,0,15) sobre la tarjeta #2D2D2D = rgb(47,63,69)) dan 3,92:1; 14,4 px, umbral
    * 4,5. El token declara 4,96 sobre la tarjeta, pero la fila activa lleva tinte. En claro, 4,5+.
    */
-  test('ABIERTO 26/10 — en oscuro, los ejemplos de la franja activa de la tabla de referencia se leen', async ({ page }) => {
-    test.fail();
+  test('REPARADO (3545) — en oscuro, los ejemplos de la franja activa de la tabla de referencia se leen', async ({ page }) => {
     test.setTimeout(60000);
     await micrófonoRegulable(page, 1000, Math.SQRT2 * Math.pow(10, (55 - 90) / 20)); // 55,0 dB(A): «Moderado»
     await page.goto(RUTA);
@@ -2647,7 +2644,7 @@ test.describe('inspector 26/10/2026', () => {
   });
 
   /*
-   * ABIERTO, hallazgo (inspector 26/10/2026) · accesibilidad, bajo — el título del parte
+   * REPARADO el 27/10/2026, hallazgo 3546 (inspector 26/10/2026) · accesibilidad, bajo — el título del parte
    * impreso desde el tema OSCURO. 4488bd1d (18/10) cambió `.parteTitulo` de #2e86ab fijo a
    * var(--primary-texto): en claro sube a #26718F (5,47:1), pero en oscuro el token vale
    * #3FA5D1 y el papel sigue blanco (la regla de impresión pone el panel en white): 2,79:1, con
@@ -2656,8 +2653,7 @@ test.describe('inspector 26/10/2026', () => {
    * apartó a --primary-boton («texto de marca sobre un fondo claro FIJO»), aquí dentro de un
    * @media print.
    */
-  test('ABIERTO 26/10 — el título del parte impreso desde el tema oscuro se lee sobre el papel', async ({ page }) => {
-    test.fail();
+  test('REPARADO (3546) — el título del parte impreso desde el tema oscuro se lee sobre el papel', async ({ page }) => {
     await sembrarRegistro(page, [sesionDeJunio(12)]);
     await page.goto(RUTA);
     await prepararParaMedir(page);
@@ -2677,7 +2673,7 @@ test.describe('inspector 26/10/2026', () => {
   });
 
   /*
-   * ABIERTO, hallazgo (inspector 26/10/2026) · contenido, bajo — la misma pregunta con dos
+   * REPARADO el 27/10/2026, hallazgo 3547 (inspector 26/10/2026) · contenido, bajo — la misma pregunta con dos
    * respuestas. «¿Es lo mismo un decibelímetro que un sonómetro?» está en la FAQ visible y en el
    * FAQPage de metadata.ts con redacciones distintas (no se contradicen; una calla «Si buscas un
    * equipo profesional…»). Y «¿Es tan preciso como un sonómetro profesional?» (FAQPage) es la
@@ -2686,10 +2682,9 @@ test.describe('inspector 26/10/2026', () => {
    * la página. Reparación: UNA constante en metadata.ts que importen las dos bocas (como
    * app/simulador-gastos-compraventa-garaje).
    */
-  test('ABIERTO 26/10 — una pregunta que está en la FAQ visible y en el FAQPage tiene la misma respuesta', async ({
+  test('REPARADO (3547) — una pregunta que está en la FAQ visible y en el FAQPage tiene la misma respuesta', async ({
     page,
   }) => {
-    test.fail();
     await page.goto(RUTA);
     const pregunta = '¿Es lo mismo un decibelímetro que un sonómetro?';
     const enJsonLd = (await faqPage(page)).find((q) => q.name === pregunta)?.acceptedAnswer.text ?? '(no está)';
@@ -2705,13 +2700,12 @@ test.describe('inspector 26/10/2026', () => {
   });
 
   /*
-   * ABIERTO, hallazgo (inspector 26/10/2026) · contenido, bajo — el FAQPage dice que la app
+   * REPARADO el 27/10/2026, hallazgo 3548 (inspector 26/10/2026) · contenido, bajo — el FAQPage dice que la app
    * calcula el nivel «en decibelios (dBFS y dB SPL estimado)». La app no enseña dBFS en ningún
    * sitio, y lo que enseña es un nivel PONDERADO A —dB(A), su subtítulo y todos sus rótulos—, no
    * dB SPL sin ponderar: la página avisa de que confundirlos es un «error frecuente».
    */
-  test('ABIERTO 26/10 — el FAQPage dice en qué unidad mide la app: dB(A), no dBFS', async ({ page }) => {
-    test.fail();
+  test('REPARADO (3548) — el FAQPage dice en qué unidad mide la app: dB(A), no dBFS', async ({ page }) => {
     await page.goto(RUTA);
     await expect(page.locator('[class*="dbUnit"]')).toHaveText('dB(A)');
     const respuesta =
@@ -2721,17 +2715,16 @@ test.describe('inspector 26/10/2026', () => {
   });
 
   /*
-   * ABIERTO, hallazgo (inspector 26/10/2026) · contenido, bajo — la guía sigue mandando
+   * REPARADO el 27/10/2026, hallazgo 3549 (inspector 26/10/2026) · contenido, bajo — la guía sigue mandando
    * documentar con capturas de pantalla y llega a decir «Las capturas de pantalla son tu única
    * prueba documental», cuando la app tiene desde fc27e76b un registro con fecha y hora, CSV y
    * parte imprimible (su propia FAQ visible lo explica). Lo mismo el paso 6 («Documenta con
    * capturas de pantalla … mientras está midiendo»), el consejo del vecino («documenta varias
    * noches con capturas de pantalla») y el FAQPage («Puedes tomar capturas o anotaciones»).
    */
-  test('ABIERTO 26/10 — la guía no dice que las capturas sean la única prueba cuando hay registro, CSV y parte', async ({
+  test('REPARADO (3549) — la guía no dice que las capturas sean la única prueba cuando hay registro, CSV y parte', async ({
     page,
   }) => {
-    test.fail();
     await page.goto(RUTA);
     // Control: la FAQ visible ya remite al registro
     await expect(page.locator('[class*="faqList"]')).toContainText('queda con su fecha, su hora y su LAeq en el registro');
@@ -2743,7 +2736,7 @@ test.describe('inspector 26/10/2026', () => {
   });
 
   /*
-   * ABIERTO, hallazgo (inspector 26/10/2026) · dato, bajo — tres umbrales distintos del RD
+   * REPARADO el 27/10/2026, hallazgo 3550 (inspector 26/10/2026) · dato, bajo — tres umbrales distintos del RD
    * 286/2006 en la misma página. RD 286/2006 (BOE-A-2006-4414), arts. 5 y 7: a partir de
    * 80 dB(A) el empresario PONE A DISPOSICIÓN los protectores; a partir de 85 dB(A) su uso es
    * OBLIGATORIO; el valor LÍMITE es 87 dB(A), y es el único que se comprueba teniendo en cuenta
@@ -2753,8 +2746,7 @@ test.describe('inspector 26/10/2026', () => {
    * la FAQ «¿Cuánto tiempo se puede estar expuesto a 85 dB…?» dice «Según el RD 286/2006 … el
    * límite es de 8 horas/día a 85 dB(A)», cuando la tabla dice «límite exposición: 87 dB(A)».
    */
-  test('ABIERTO 26/10 — la página da los umbrales del RD 286/2006 sin contradecirse', async ({ page }) => {
-    test.fail();
+  test('REPARADO (3550) — la página da los umbrales del RD 286/2006 sin contradecirse', async ({ page }) => {
     await page.goto(RUTA);
     // Control: la tabla comparativa y la FAQ de los tapones lo dicen bien
     await expect(page.locator('[class*="comparativaTable"]')).toContainText('límite exposición: 87 dB(A)');
@@ -2767,15 +2759,14 @@ test.describe('inspector 26/10/2026', () => {
   });
 
   /*
-   * ABIERTO, hallazgo (inspector 26/10/2026) · accesibilidad, bajo — doce emojis decorativos en
+   * REPARADO el 27/10/2026, hallazgo 3551 (inspector 26/10/2026) · accesibilidad, bajo — doce emojis decorativos en
    * su propio <span>, junto al título de su tarjeta y sin aria-hidden: el del hero (🔊), los
    * cuatro de «Casos de uso» (🏘️ 👷 👶 🎸), los seis de «Mejores prácticas» (📏 🕐 📊 🎙️ 📸 🌬️) y
    * el de «Errores frecuentes» (⚠️). Un lector de pantalla los anuncia delante del título
    * («casas, Vecino afectado por local nocturno»). `node scripts/check-a11y-jsx.mjs
    * app/sonometro/page.tsx` los lista como «emoji en nodo propio».
    */
-  test('ABIERTO 26/10 — los emojis decorativos de las tarjetas están ocultos al lector de pantalla', async ({ page }) => {
-    test.fail();
+  test('REPARADO (3551) — los emojis decorativos de las tarjetas están ocultos al lector de pantalla', async ({ page }) => {
     await page.goto(RUTA);
     const iconos = page.locator('[class*="heroIcon"], [class*="escenarioIcon"], [class*="tipIcon"], [class*="warningIcon"]');
     await expect(iconos).toHaveCount(12);

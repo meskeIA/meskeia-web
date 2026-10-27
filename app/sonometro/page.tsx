@@ -4,16 +4,20 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './Sonometro.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, EducationalSection, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { formatNumber, formatDate } from '@/lib';
+import { RESPUESTA_DECIBELIMETRO, RESPUESTA_PRECISION } from './metadata';
 
-// Niveles de referencia en dB
+// Niveles de referencia en dB.
+// `texto` es el color del rótulo sobre la franja (hallazgo 3544): en blanco, seis de las siete
+// franjas quedaban entre 1,92:1 y 3,76:1. Con #111111 dan de 5,0:1 (Muy ruidoso) a 8,6:1;
+// Peligroso sigue en blanco (4,83:1), que con #111111 daría 3,9:1.
 const NOISE_LEVELS = [
-  { min: 0, max: 30, label: 'Muy silencioso', color: '#10b981', icon: '🤫', examples: 'Respiración, susurro' },
-  { min: 30, max: 50, label: 'Silencioso', color: '#22c55e', icon: '🌙', examples: 'Biblioteca, habitación tranquila' },
-  { min: 50, max: 60, label: 'Moderado', color: '#84cc16', icon: '🏠', examples: 'Conversación normal, oficina' },
-  { min: 60, max: 70, label: 'Algo ruidoso', color: '#eab308', icon: '📢', examples: 'Restaurante, TV alta' },
-  { min: 70, max: 85, label: 'Ruidoso', color: '#f97316', icon: '🚗', examples: 'Tráfico, aspiradora' },
-  { min: 85, max: 100, label: 'Muy ruidoso', color: '#ef4444', icon: '⚠️', examples: 'Moto, concierto cercano' },
-  { min: 100, max: 130, label: 'Peligroso', color: '#dc2626', icon: '🔴', examples: 'Sirena, taladro, avión' },
+  { min: 0, max: 30, label: 'Muy silencioso', color: '#10b981', texto: '#111111', icon: '🤫', examples: 'Respiración, susurro' },
+  { min: 30, max: 50, label: 'Silencioso', color: '#22c55e', texto: '#111111', icon: '🌙', examples: 'Biblioteca, habitación tranquila' },
+  { min: 50, max: 60, label: 'Moderado', color: '#84cc16', texto: '#111111', icon: '🏠', examples: 'Conversación normal, oficina' },
+  { min: 60, max: 70, label: 'Algo ruidoso', color: '#eab308', texto: '#111111', icon: '📢', examples: 'Restaurante, TV alta' },
+  { min: 70, max: 85, label: 'Ruidoso', color: '#f97316', texto: '#111111', icon: '🚗', examples: 'Tráfico, aspiradora' },
+  { min: 85, max: 100, label: 'Muy ruidoso', color: '#ef4444', texto: '#111111', icon: '⚠️', examples: 'Moto, concierto cercano' },
+  { min: 100, max: 130, label: 'Peligroso', color: '#dc2626', texto: '#ffffff', icon: '🔴', examples: 'Sirena, taladro, avión' },
 ];
 
 /** Fondo de escala del medidor: 0-130 dB(A) repartidos en el semicírculo. */
@@ -218,6 +222,8 @@ export default function SonometroPage() {
   const [avisoRegistro, setAvisoRegistro] = useState<string | null>(null);
   /** «No entra audio»: distinto de `error`, que es no haber podido abrir el micrófono */
   const [avisoSinSenal, setAvisoSinSenal] = useState<string | null>(null);
+  /** Las estadísticas se reiniciaron al cambiar la calibración midiendo (hallazgo 3543) */
+  const [reinicioPorCalibracion, setReinicioPorCalibracion] = useState(false);
 
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
@@ -576,6 +582,7 @@ export default function SonometroPage() {
       gananciaARef.current = ganancias;
 
       // Resetear estadísticas
+      setReinicioPorCalibracion(false);
       setMinDb(Infinity);
       setMaxDb(0);
       setLaeq(0);
@@ -778,6 +785,7 @@ export default function SonometroPage() {
 
   // Resetear estadísticas (reinicia también la integración del LAeq)
   const resetStats = () => {
+    setReinicioPorCalibracion(false);
     setMinDb(Infinity);
     setMaxDb(0);
     setLaeq(0);
@@ -792,6 +800,23 @@ export default function SonometroPage() {
     fotogramasRef.current = 0;
   };
 
+  /**
+   * La calibración desde los controles del panel (hallazgo 3543). Calibrar con la medición en
+   * marcha es el flujo que pide el propio panel —«ajusta aquí el desplazamiento hasta que las
+   * lecturas coincidan», y las lecturas solo se ven midiendo—, pero las estadísticas acumuladas
+   * venían de la calibración anterior y la fila guardaba solo la final: «Calib. 100 dB» con un
+   * mínimo de 61,0 medido a 90. Ahora, si cambia con la sesión en marcha, las estadísticas
+   * vuelven a empezar y el panel lo dice, de modo que cada fila tiene una sola calibración.
+   */
+  const ajustarCalibracion = (valor: number) => {
+    const anterior = calibracionRef.current;
+    cambiarCalibracion(valor);
+    if (isActive && calibracionRef.current !== anterior) {
+      resetStats();
+      setReinicioPorCalibracion(true);
+    }
+  };
+
   const currentLevel = getNoiseLevel(currentDb);
 
   // Rotación de la aguja: la MISMA función que reparte los sectores de color y coloca los
@@ -803,7 +828,7 @@ export default function SonometroPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <span className={styles.heroIcon}>🔊</span>
+        <span className={styles.heroIcon} aria-hidden="true">🔊</span>
         <h1 className={styles.title}>Sonómetro</h1>
         <p className={styles.subtitle}>
           Sonómetro y decibelímetro online: mide el nivel de ruido en decibelios ponderados A —dB(A),
@@ -844,8 +869,14 @@ export default function SonometroPage() {
           </div>
 
           {/* Lectura digital */}
-          <div className={styles.digitalDisplay}>
-            <span className={styles.dbValue} style={{ color: currentLevel.color }}>
+          {/* La lectura va en el color de texto del tema y la franja colorea el borde
+              (hallazgo 3544): pintada con el color de la franja, la cifra quedaba entre 1,76:1 y
+              2,57:1 sobre el fondo claro y en 2,43:1 en oscuro con Peligroso. */}
+          <div
+            className={styles.digitalDisplay}
+            style={isActive ? { borderColor: currentLevel.color } : undefined}
+          >
+            <span className={styles.dbValue}>
               {isActive ? formatNumber(currentDb, 1) : '--'}
             </span>
             <span className={styles.dbUnit}>dB(A)</span>
@@ -853,8 +884,8 @@ export default function SonometroPage() {
 
           {/* Nivel actual */}
           <div
-            className={styles.levelIndicator}
-            style={{ background: isActive ? currentLevel.color : 'var(--text-muted)' }}
+            className={`${styles.levelIndicator} ${isActive ? '' : styles.levelIndicatorReposo}`}
+            style={isActive ? { background: currentLevel.color, color: currentLevel.texto } : undefined}
           >
             <span className={styles.levelIcon} aria-hidden="true">{isActive ? currentLevel.icon : '🎤'}</span>
             <span className={styles.levelLabel}>
@@ -864,16 +895,18 @@ export default function SonometroPage() {
 
           {/* Botones de control */}
           <div className={styles.controls}>
+            {/* Con key (hallazgo 3542): sin ella React reutilizaba el botón de iniciar como botón
+                de parar y, con la página traducida, este se quedaba rotulado «Iniciar medición» */}
             {!isActive ? (
-              <button type="button" onClick={startMeasuring} className={styles.btnStart}>
+              <button key="iniciar" type="button" onClick={startMeasuring} className={styles.btnStart}>
                 <span aria-hidden="true">🎤</span> Iniciar medición
               </button>
             ) : (
               <>
-                <button type="button" onClick={detenerYRegistrar} className={styles.btnStop}>
+                <button key="detener" type="button" onClick={detenerYRegistrar} className={styles.btnStop}>
                   <span aria-hidden="true">⏹️</span> Detener y guardar
                 </button>
-                <button type="button" onClick={resetStats} className={styles.btnReset}>
+                <button key="resetear" type="button" onClick={resetStats} className={styles.btnReset}>
                   <span aria-hidden="true">🔄</span> Resetear
                 </button>
               </>
@@ -943,20 +976,33 @@ export default function SonometroPage() {
             <p className={styles.laeqNota}>
               <strong>LAeq</strong> = nivel continuo equivalente, en dB(A), de los{' '}
               <strong>{formatDuracion(duracion)}</strong> medidos.{' '}
+              {/* El aviso y el texto que lo sigue, cada uno en su elemento (hallazgo 3541): con
+                  la página traducida, React insertaba el aviso delante del nodo de texto suelto
+                  «Es el promedio », que el traductor ya había cambiado por <font>, y la app caía
+                  (NotFoundError en insertBefore) a media medición. */}
               {segundosSinMedir >= 1 && (
-                <>
+                <span key="sin-muestras">
                   No cuentan <strong>{formatDuracion(segundosSinMedir)}</strong> en que la app
                   no pudo tomar muestras (pantalla apagada, pestaña oculta o un diálogo abierto):
                   lo que sonó entonces no está en estas cifras.{' '}
-                </>
+                </span>
               )}
-              Es el promedio <em>energético</em>,
-              el valor que utilizan las normativas de ruido: pondera los picos como
-              realmente pesan, a diferencia de una media aritmética de decibelios. La «A» es la
-              ponderación en frecuencia de la IEC 61672, la que exige la normativa: rebaja los
-              graves igual que los rebaja el oído (−19,1 dB a 100 Hz) y deja el 1 kHz intacto.
-              Para documentar una molestia, mide al menos 5 minutos seguidos.
+              <span key="explicacion-laeq">
+                Es el promedio <em>energético</em>,
+                el valor que utilizan las normativas de ruido: pondera los picos como
+                realmente pesan, a diferencia de una media aritmética de decibelios. La «A» es la
+                ponderación en frecuencia de la IEC 61672, la que exige la normativa: rebaja los
+                graves igual que los rebaja el oído (−19,1 dB a 100 Hz) y deja el 1 kHz intacto.
+                Para documentar una molestia, mide al menos 5 minutos seguidos.
+              </span>
             </p>
+            {reinicioPorCalibracion && (
+              <p className={styles.avisoReinicio} role="status">
+                Has cambiado la calibración con la medición en marcha: las estadísticas han vuelto
+                a empezar, para que la fila que se guarde tenga todas sus cifras con una sola
+                calibración.
+              </p>
+            )}
           </div>
         )}
 
@@ -968,10 +1014,10 @@ export default function SonometroPage() {
             {/* Solo en papel: quien lea la hoja no tiene delante ni el título ni la web */}
             <div className={styles.parteCabecera}>
               <h2 className={styles.parteTitulo}>Parte de mediciones de ruido</h2>
+              {/* Un solo texto (hallazgo 3542): con la página traducida, la cifra suelta se
+                  quedaba con el número anterior */}
               <p className={styles.parteSubtitulo}>
-                Emitido el {formatDate(new Date())} · {sesiones.length}{' '}
-                {sesiones.length === 1 ? 'medición registrada' : 'mediciones registradas'} ·
-                Sonómetro de meskeia.com
+                {`Emitido el ${formatDate(new Date())} · ${sesiones.length} ${sesiones.length === 1 ? 'medición registrada' : 'mediciones registradas'} · Sonómetro de meskeia.com`}
               </p>
             </div>
 
@@ -993,8 +1039,8 @@ export default function SonometroPage() {
                   documenta con varias sesiones en días y horarios distintos, no con una sola
                   lectura. El registro vive en este navegador y no se envía a ningún sitio,
                   y guarda las {MAX_SESIONES} mediciones más recientes: al llegar a ese tope,
-                  cada nueva medición desplaza a la más antigua ({sesiones.length} de {MAX_SESIONES}{' '}
-                  ahora mismo). Descarga el CSV de vez en cuando si quieres conservar el
+                  cada nueva medición desplaza a la más antigua{' '}
+                  <span>{`(${sesiones.length} de ${MAX_SESIONES} ahora mismo)`}</span>. Descarga el CSV de vez en cuando si quieres conservar el
                   histórico entero, que es justo lo que documenta que la molestia se repite.
                 </p>
 
@@ -1109,7 +1155,7 @@ export default function SonometroPage() {
             <button
               type="button"
               className={styles.btnCalib}
-              onClick={() => cambiarCalibracion(calibracion - 1)}
+              onClick={() => ajustarCalibracion(calibracion - 1)}
               disabled={calibracion <= CALIBRACION_MIN}
               aria-label="Reducir la calibración un decibelio"
             >
@@ -1122,14 +1168,14 @@ export default function SonometroPage() {
               max={CALIBRACION_MAX}
               step={1}
               value={calibracion}
-              onChange={(e) => cambiarCalibracion(Number(e.target.value))}
+              onChange={(e) => ajustarCalibracion(Number(e.target.value))}
               id="calibracion"
               aria-describedby="calibracion-valor"
             />
             <button
               type="button"
               className={styles.btnCalib}
-              onClick={() => cambiarCalibracion(calibracion + 1)}
+              onClick={() => ajustarCalibracion(calibracion + 1)}
               disabled={calibracion >= CALIBRACION_MAX}
               aria-label="Aumentar la calibración un decibelio"
             >
@@ -1138,13 +1184,13 @@ export default function SonometroPage() {
           </div>
           <div className={styles.calibracionEstado}>
             <label htmlFor="calibracion" id="calibracion-valor" className={styles.calibracionValor}>
-              Desplazamiento: <strong>{formatNumber(calibracion, 0)} dB</strong>
+              Desplazamiento: <strong>{`${formatNumber(calibracion, 0)} dB`}</strong>
             </label>
             {calibracion !== CALIBRACION_DEFECTO && (
               <button
                 type="button"
                 className={styles.btnCalibReset}
-                onClick={() => cambiarCalibracion(CALIBRACION_DEFECTO)}
+                onClick={() => ajustarCalibracion(CALIBRACION_DEFECTO)}
               >
                 <span aria-hidden="true">↩️</span> Volver al valor por defecto ({CALIBRACION_DEFECTO} dB)
               </button>
@@ -1267,8 +1313,14 @@ export default function SonometroPage() {
               <h4><span aria-hidden="true">🏢</span> Ambientes laborales</h4>
               <ul>
                 <li>Oficinas: 50-55 dB</li>
-                <li>Industria: máx. 85 dB (con protección)</li>
-                <li>Obligación de EPIs &gt;80 dB</li>
+                {/* Hallazgo 3550. Decía «Industria: máx. 85 dB (con protección)» y «Obligación de
+                    EPIs >80 dB». RD 286/2006 (BOE-A-2006-4414), art. 5.1: valor límite 87 dB(A),
+                    valores que dan lugar a una acción 85 (superior) y 80 (inferior); art. 5.2: solo
+                    el límite cuenta la atenuación de los protectores; art. 7.1: a disposición desde
+                    el inferior, uso obligatorio desde el superior. Consultado el 27/10/2026. */}
+                <li>Desde 80 dB(A) de exposición diaria: protectores a disposición del trabajador</li>
+                <li>Desde 85 dB(A): uso obligatorio de protectores</li>
+                <li>Valor límite: 87 dB(A), contando la atenuación de los protectores</li>
               </ul>
             </div>
           </div>
@@ -1415,7 +1467,7 @@ export default function SonometroPage() {
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🏘️</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏘️</span>
                 <strong>Vecino afectado por local nocturno</strong>
               </div>
               <p className={styles.escenarioExample}>
@@ -1423,13 +1475,14 @@ export default function SonometroPage() {
                 Usas el sonómetro para registrar el nivel en el interior de tu vivienda entre las 23:00 y las 3:00, ya en el periodo nocturno.
               </p>
               <p className={styles.escenarioTip}>
-                Consejo: documenta varias noches con capturas de pantalla con fecha y hora.
+                Consejo: mide varias noches y pulsa «Detener y guardar» en cada una: el registro de la
+                página guarda la fecha, la hora y el LAeq, y lo puedes imprimir como parte.
                 El límite interior nocturno en zonas residenciales suele ser 30–35 dB según la ordenanza municipal.
               </p>
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>👷</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">👷</span>
                 <strong>Trabajador que evalúa riesgo auditivo</strong>
               </div>
               <p className={styles.escenarioExample}>
@@ -1443,7 +1496,7 @@ export default function SonometroPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>👶</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">👶</span>
                 <strong>Padre o madre que mide el cuarto del bebé</strong>
               </div>
               <p className={styles.escenarioExample}>
@@ -1457,7 +1510,7 @@ export default function SonometroPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🎸</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🎸</span>
                 <strong>Músico que controla el volumen en los ensayos</strong>
               </div>
               <p className={styles.escenarioExample}>
@@ -1514,11 +1567,8 @@ export default function SonometroPage() {
             </li>
             <li className={styles.faqItem}>
               <strong>¿Es fiable un sonómetro de móvil comparado con uno profesional?</strong>
-              <p>
-                Un sonómetro de móvil tiene un margen de error de ±3 a ±6 dB respecto a un aparato
-                de clase 1 o 2 homologado. Es útil para tener una orientación, detectar problemas evidentes
-                y documentar tendencias, pero no tiene validez legal ni metrológica para procedimientos oficiales.
-              </p>
+              {/* Misma constante que el FAQPage (hallazgo 3547) */}
+              <p>{RESPUESTA_PRECISION}</p>
             </li>
             <li className={styles.faqItem}>
               <strong>¿Qué es la escala dB(A)?</strong>
@@ -1531,9 +1581,11 @@ export default function SonometroPage() {
             <li className={styles.faqItem}>
               <strong>¿Cuánto tiempo se puede estar expuesto a 85 dB sin sufrir daño?</strong>
               <p>
-                Según el RD 286/2006 y los criterios de la NIOSH, el límite es de 8 horas/día a 85 dB(A).
-                Por cada 3 dB adicionales, el tiempo máximo se reduce a la mitad: 4 horas a 88 dB,
-                2 horas a 91 dB, 1 hora a 94 dB, y así sucesivamente.
+                Según el criterio de la NIOSH, 85 dB(A) admiten 8 horas al día, y por cada 3 dB
+                adicionales el tiempo máximo se reduce a la mitad: 4 horas a 88 dB, 2 horas a 91 dB,
+                1 hora a 94 dB, y así sucesivamente. En el trabajo, en España, el RD 286/2006 no fija
+                tiempos sino niveles de exposición diaria: desde 85 dB(A) los protectores son
+                obligatorios, y el valor límite es de 87 dB(A), contando su atenuación.
               </p>
             </li>
             <li className={styles.faqItem}>
@@ -1556,13 +1608,7 @@ export default function SonometroPage() {
             </li>
             <li className={styles.faqItem}>
               <strong>¿Es lo mismo un decibelímetro que un sonómetro?</strong>
-              <p>
-                Sí: es el mismo instrumento con dos nombres. «Decibelímetro» (o medidor de
-                decibeles) es la forma habitual en gran parte de América y «sonómetro» la más
-                extendida en España. Si buscas un equipo profesional lo encontrarás casi siempre
-                como «sonómetro de clase 1» o «clase 2», porque así lo denomina la norma
-                internacional IEC 61672 que fija su precisión.
-              </p>
+              <p>{RESPUESTA_DECIBELIMETRO}</p>
             </li>
           </ul>
         </section>
@@ -1631,11 +1677,14 @@ export default function SonometroPage() {
             <li className={styles.step}>
               <span className={styles.stepNumber}>6</span>
               <div className={styles.stepContent}>
-                <strong>Documenta con capturas de pantalla</strong>
+                {/* Hallazgo 3549: mandaba hacer capturas de pantalla; la app tiene desde fc27e76b
+                    un registro con fecha y hora, CSV y parte imprimible */}
+                <strong>Guarda cada medición en el registro</strong>
                 <p>
-                  Haz capturas de pantalla del sonómetro mientras está midiendo, asegurándote de que
-                  se vea la fecha y la hora del dispositivo. Guarda también el nombre del lugar y la
-                  distancia a la fuente de ruido en un documento o nota de voz.
+                  Al terminar, pulsa «Detener y guardar»: la medición queda en el registro de esta
+                  página con su fecha, su hora, su duración y su LAeq. Anota en su fila el lugar y la
+                  distancia a la fuente de ruido, y descarga el CSV o imprime el parte para
+                  conservarlo fuera del navegador.
                 </p>
               </div>
             </li>
@@ -1658,42 +1707,42 @@ export default function SonometroPage() {
           <h2>Mejores prácticas para obtener mediciones fiables</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📏</span>
+              <span className={styles.tipIcon} aria-hidden="true">📏</span>
               <div>
                 <strong>Mide siempre a 1 metro de la fuente</strong>
                 <p>La distancia estándar internacional para comparar niveles sonoros es 1 metro. Cada vez que doblas la distancia, el nivel cae aproximadamente 6 dB.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🕐</span>
+              <span className={styles.tipIcon} aria-hidden="true">🕐</span>
               <div>
                 <strong>Toma mediciones en distintos momentos del día</strong>
                 <p>El ruido del tráfico es muy diferente a las 8:00 que a las 14:00 o las 23:00. Para documentar un problema acústico real, necesitas al menos 3 franjas horarias distintas.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📊</span>
+              <span className={styles.tipIcon} aria-hidden="true">📊</span>
               <div>
                 <strong>Usa el LAeq, no el valor pico</strong>
                 <p>El nivel equivalente continuo (LAeq) es el promedio energético de la exposición sonora en el tiempo. Es el valor que utilizan las normativas y el que mejor refleja el impacto real en la salud. El panel de estadísticas de esta página lo calcula así —energéticamente, sobre toda la sesión— y muestra junto a él cuánto tiempo llevas midiendo, porque un LAeq sin su intervalo no significa nada.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🎙️</span>
+              <span className={styles.tipIcon} aria-hidden="true">🎙️</span>
               <div>
                 <strong>Calibra o verifica el micrófono del móvil</strong>
                 <p>Los micrófonos de móvil no están calibrados de fábrica para mediciones acústicas. Si necesitas precisión, compara los resultados con una fuente sonora conocida y corrige la diferencia en el panel «Calibración del micrófono» de esta misma página: el desplazamiento que ajustes se recuerda en tu navegador para las siguientes mediciones.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📸</span>
+              <span className={styles.tipIcon} aria-hidden="true">📸</span>
               <div>
-                <strong>Documenta con capturas de pantalla con fecha y hora</strong>
-                <p>Las capturas de pantalla son tu única prueba documental. Asegúrate de que el reloj del dispositivo es visible y correcto. Anota la ubicación, distancia y condiciones de la medición.</p>
+                <strong>Documenta cada medición con su fecha y hora</strong>
+                <p>El registro de esta página anota la fecha, la hora, la duración y el LAeq de cada medición que guardas; descárgalo en CSV o imprímelo como parte. Comprueba que el reloj del dispositivo es correcto y anota en cada fila la ubicación, la distancia y las condiciones de la medición.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🌬️</span>
+              <span className={styles.tipIcon} aria-hidden="true">🌬️</span>
               <div>
                 <strong>Protege el micrófono del viento</strong>
                 <p>El viento genera turbulencias en el micrófono que elevan artificialmente las lecturas. Si mides en exterior, usa una pantalla antiviento o realiza las mediciones en días calmados sin brisa directa.</p>
@@ -1706,7 +1755,7 @@ export default function SonometroPage() {
         <section className={styles.guideSection}>
           <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
-              <span className={styles.warningIcon}>⚠️</span>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               <strong>Errores frecuentes al medir ruido con el móvil</strong>
             </div>
             <ul className={styles.warningList}>

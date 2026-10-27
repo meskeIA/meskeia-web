@@ -47,6 +47,18 @@ export const jsonLd = generateWebAppSchema({
   ],
 });
 
+/**
+ * Respuestas que salen en la FAQ visible Y en el FAQPage: una sola constante que importan las dos
+ * bocas (hallazgo 3547), como en app/simulador-gastos-compraventa-garaje. Escritas dos veces,
+ * divergían: la del decibelímetro con otra redacción, y la de la precisión callaba en el FAQPage
+ * el margen de ±3 a ±6 dB del móvil que da la página.
+ */
+export const RESPUESTA_DECIBELIMETRO =
+  'Sí: es el mismo instrumento con dos nombres. «Decibelímetro» (o medidor de decibeles) es la forma habitual en gran parte de América y «sonómetro» la más extendida en España. Si buscas un equipo profesional lo encontrarás casi siempre como «sonómetro de clase 1» o «clase 2», porque así lo denomina la norma internacional IEC 61672 que fija su precisión.';
+
+export const RESPUESTA_PRECISION =
+  'Un sonómetro de móvil tiene un margen de error de ±3 a ±6 dB respecto a un aparato de clase 1 o 2 homologado. Es útil para tener una orientación, detectar problemas evidentes y documentar tendencias, pero no tiene validez legal ni metrológica para procedimientos oficiales.';
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -66,7 +78,9 @@ export const faqJsonLd = {
       name: '¿Cómo funciona un sonómetro online con el micrófono del dispositivo?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El navegador solicita permiso para acceder al micrófono. Una vez concedido, la Web Audio API procesa la señal de audio en tiempo real y calcula el nivel de presión sonora en decibelios (dBFS y dB SPL estimado). Todo ocurre localmente; el audio no se graba ni se envía a ningún servidor.',
+        // Hallazgo 3548: decía «(dBFS y dB SPL estimado)». La app no enseña dBFS en ningún sitio, y lo
+        // que enseña es un nivel PONDERADO A —su lectura, su subtítulo y sus estadísticas dicen dB(A)—.
+        text: 'El navegador solicita permiso para acceder al micrófono. Una vez concedido, la Web Audio API procesa la señal de audio en tiempo real y calcula el nivel sonoro en decibelios con ponderación A, dB(A), la que usan las normativas de ruido. Como el micrófono no trae una sensibilidad conocida, el valor absoluto depende de un desplazamiento de calibración que se puede ajustar. Todo ocurre localmente; el audio no se graba ni se envía a ningún servidor.',
       },
     },
     {
@@ -74,7 +88,7 @@ export const faqJsonLd = {
       name: '¿Es tan preciso como un sonómetro profesional?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'No. Los micrófonos integrados de smartphones y portátiles no están calibrados para medición acústica certificada. Un sonómetro de clase 1 o 2 cumple normas IEC 61672 con precisión de ±1-2 dB. Este tipo de herramienta es útil para estimaciones orientativas y documentación informal, no para informes periciales o de cumplimiento normativo.',
+        text: RESPUESTA_PRECISION,
       },
     },
     {
@@ -82,7 +96,9 @@ export const faqJsonLd = {
       name: '¿Puedo usar el sonómetro para documentar ruido de vecinos?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Puedes tomar capturas o anotaciones de los niveles medidos como referencia personal. Para una reclamación formal ante el ayuntamiento o en un procedimiento judicial generalmente se requiere un informe de un técnico acreditado con un equipo calibrado. Aun así, las mediciones orientativas pueden servir de punto de partida para valorar si el problema justifica una queja formal.',
+        // Hallazgo 3549: mandaba «tomar capturas», cuando la app guarda cada medición en un registro
+        // con fecha y hora que se descarga en CSV o se imprime como parte.
+        text: 'Sí, como documentación orientativa. Cada vez que pulsas «Detener y guardar», la medición queda en el registro de la página con su fecha, su hora, su duración y su LAeq; puedes anotar dónde mediste, descargar el registro en CSV o imprimirlo como parte. Lo que sostiene una queja es un patrón que se repite en distintos días y horarios. Para una reclamación formal ante el ayuntamiento o en un procedimiento judicial generalmente se requiere además un informe de un técnico acreditado con un equipo calibrado.',
       },
     },
     {
@@ -90,7 +106,7 @@ export const faqJsonLd = {
       name: '¿Es lo mismo un decibelímetro que un sonómetro?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Sí, es el mismo instrumento con dos nombres. «Decibelímetro» o «medidor de decibeles» es la forma habitual en gran parte de América, y «sonómetro» la más extendida en España. Los equipos profesionales se comercializan casi siempre como sonómetros de clase 1 o clase 2, porque así los denomina la norma internacional IEC 61672, que fija su precisión.',
+        text: RESPUESTA_DECIBELIMETRO,
       },
     },
     {

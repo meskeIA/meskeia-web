@@ -177,7 +177,7 @@
   font-weight: 700;
   font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
   line-height: 1;
-  transition: color 0.2s ease;
+  color: var(--text-primary);
 }
 
 .dbUnit {
@@ -197,6 +197,16 @@
   font-weight: 600;
   font-size: 1.1rem;
   transition: background 0.2s ease;
+}
+
+/* En reposo, sobre --text-muted: blanco en claro (#6E6E6E, 5,10:1); en oscuro el token es
+   #9B9B9B y el blanco daba 2,78:1, así que el rótulo pasa a casi negro (6,9:1) (hallazgo 3544) */
+.levelIndicatorReposo {
+  background: var(--text-muted);
+}
+
+[data-theme='dark'] .levelIndicatorReposo {
+  color: #111111;
 }
 
 .levelIcon {
@@ -352,11 +362,17 @@
   background: color-mix(in srgb, var(--primary) 22%, var(--bg-card));
 }
 
-.laeqNota {
+.laeqNota,
+.avisoReinicio {
   margin: var(--spacing-md) 0 0;
   font-size: 0.88rem;
   line-height: 1.6;
   color: var(--text-secondary);
+}
+
+/* Las estadísticas volvieron a empezar al calibrar con la medición en marcha (hallazgo 3543) */
+.avisoReinicio {
+  font-weight: 600;
 }
 
 /* Panel de calibración */
@@ -538,6 +554,12 @@
 .refExamples {
   font-size: 0.9rem;
   color: var(--text-muted);
+}
+
+/* La fila activa lleva el tinte --focus: en oscuro --text-muted daba 3,92:1 sobre él; con
+   --text-secondary (#B0B0B0) da 5,05:1 (hallazgo 3545). En claro --text-muted ya cumple. */
+[data-theme='dark'] .activeRow .refExamples {
+  color: var(--text-secondary);
 }
 
 /* Disclaimer */
@@ -1361,10 +1383,12 @@
     border-bottom: 2pt solid #2e86ab;
   }
 
+  /* El papel es blanco en los dos temas: --primary-boton (#26718F, 5,47:1) es el mismo en
+     ambos; --primary-texto en oscuro vale #3FA5D1 y daba 2,79:1 sobre el papel (hallazgo 3546) */
   .parteTitulo {
     margin: 0 0 2mm 0;
     font-size: 16pt;
-    color: var(--primary-texto);
+    color: var(--primary-boton);
   }
 
   .parteSubtitulo {
