@@ -867,7 +867,11 @@ test('caso 8 · un píxel transparente no da lectura, Espacio lee el centro y la
   await page.getByRole('button', { name: /Usar este blanco para calibrar/ }).click();
   await expect(valorDeCodigo(page, 'HEX')).toHaveText('#B4B4B4');
   await expect(valorDeCodigo(page, 'RGB')).toHaveText('180, 180, 180');
-  await expect(page.locator(`${SECCION_RESULTADO} [role=status]`).first()).toHaveText('✓ Luz calibrada con este blanco');
+  // Por su texto y no por `.first()`: desde el hallazgo 3584 la primera región viva del
+  // resultado es la que confirma «Guardar como color A/B».
+  await expect(page.locator(`${SECCION_RESULTADO} [role=status]`).filter({ hasText: 'Luz calibrada' })).toHaveText(
+    '✓ Luz calibrada con este blanco',
+  );
 
   // La calibración se aplica a la lectura siguiente
   await page.setInputFiles('input[type=file]', { name: 'c.png', mimeType: 'image/png', buffer: pngSolido(100, 150, 200) });
@@ -999,11 +1003,13 @@ test('caso 10 · sin el permiso de cámara la app avisa enseguida, ofrece el mod
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
-// HALLAZGOS ABIERTOS de la re-inspección del 27/10/2026 — hoy fallan a propósito (test.fail)
+// HALLAZGOS de la re-inspección del 27/10/2026 (3582-3586) — escritos con test.fail() y
+// REPARADOS el mismo día en /reparar: hoy son regresión.
 // ═══════════════════════════════════════════════════════════════════════════
 
-test('ABIERTO · el nombre sobre su propio color se lee con al menos 3:1 (texto grande, WCAG 1.4.3)', async ({ page }) => {
-  test.fail(); // ABIERTO: textoSobre() elige blanco o #1A1A1A con la luma Rec.601 sobre 0-255 y corte 0,6
+test('REPARADO 3582 · el nombre sobre su propio color se lee con al menos 3:1 (texto grande, WCAG 1.4.3)', async ({ page }) => {
+  // REPARADO el 27/10/2026: textoSobre() compara las dos razones de WCAG y elige blanco o negro;
+  // el peor fondo queda en 4,58:1, así que aquí se exige ya el 4,5:1 del texto pequeño.
   // La app promete, en la tarjeta «Baja visión» y en el FAQPage, que «el nombre se muestra en
   // letra grande y con alto contraste sobre el propio color». El nombre mide 1,6-2,4 rem con
   // peso 900, así que es texto GRANDE y le basta 3:1. Calculado a mano con la luminancia
@@ -1018,13 +1024,14 @@ test('ABIERTO · el nombre sobre su propio color se lee con al menos 3:1 (texto 
   for (const hex of ['#00FF00', '#2ECC71', '#FF7F00']) {
     await leerFoto(page, hex);
     const k = await contrasteEn(page, `${SECCION_RESULTADO} > div > span`, `${SECCION_RESULTADO} > div`);
-    if (k < 3) pobres.push(`${hex} ${k.toFixed(2)}:1`);
+    if (k < 4.5) pobres.push(`${hex} ${k.toFixed(2)}:1`);
   }
-  expect(pobres, 'nombres por debajo de 3:1 sobre su color').toEqual([]);
+  expect(pobres, 'nombres por debajo de 4,5:1 sobre su color').toEqual([]);
 });
 
-test('ABIERTO · la cifra del veredicto cae dentro del tramo que nombra', async ({ page }) => {
-  test.fail(); // ABIERTO: el tramo se decide con el ΔE00 sin redondear y se enseña con un decimal
+test('REPARADO 3583 · la cifra del veredicto cae dentro del tramo que nombra', async ({ page }) => {
+  // REPARADO el 27/10/2026: compararColores decide el tramo con la cifra de un decimal que se
+  // enseña (DECIMALES_DELTA_E), así que 0,9712 se escribe «1,0» y es «Casi iguales».
   // La nota de la app dice «por debajo de 1 no se aprecia y por encima de 6 se ve a simple
   // vista», y los tramos son [0; 1) iguales, [1; 2,5) casi iguales, [2,5; 6) parecidos y
   // [6; ∞) distintos. Calculado con la implementación propia:
@@ -1050,8 +1057,11 @@ test('ABIERTO · la cifra del veredicto cae dentro del tramo que nombra', async 
   expect(incoherentes).toEqual([]);
 });
 
-test('ABIERTO · guardar el color A se anuncia (WCAG 4.1.3)', async ({ page }) => {
-  test.fail(); // ABIERTO: la única región viva del bloque es la del veredicto, vacía hasta tener B
+test('REPARADO 3584 · guardar el color A se anuncia (WCAG 4.1.3)', async ({ page }) => {
+  // REPARADO el 27/10/2026: una región viva junto a los botones, presente desde antes de pulsar,
+  // confirma el color guardado. No está en la sección de comparar porque esa sección NACE al
+  // guardar A, y una región que nace con su texto no se anuncia de forma fiable: el localizador
+  // se amplía a la sección del resultado.
   // Al pulsar «Guardar como color A» aparece la muestra A y «Falta: guarda un color como B»,
   // pero fuera de toda región viva: el role="status" queda vacío («» medido el 27/10/2026) y
   // un lector de pantalla no dice nada. En un Pixel 7 el bloque nace además casi fuera de la
@@ -1059,15 +1069,16 @@ test('ABIERTO · guardar el color A se anuncia (WCAG 4.1.3)', async ({ page }) =
   await page.goto(RUTA);
   await abrirModoFoto(page);
   await leerFoto(page, '#9D7181');
+  // Antes de pulsar ya hay tres regiones vivas en el resultado: calibración, copiado y guardado
+  await expect(page.locator(`${SECCION_RESULTADO} [role=status]`)).toHaveCount(3);
   await page.getByRole('button', { name: 'Guardar como color A' }).click();
-  const vivo = await page
-    .locator(`${SECCION_COMPARAR} [role=status], ${SECCION_COMPARAR} [aria-live], ${SECCION_COMPARAR}[aria-live]`)
-    .allTextContents();
-  expect(vivo.join(' '), 'lo que se anuncia al guardar A').toMatch(/Lila|#9D7181/);
+  await expect(page.locator(`${SECCION_RESULTADO} [role=status]`).filter({ hasText: '#9D7181' })).toHaveText(
+    /Color A guardado: .+, #9D7181\. Falta guardar el B\./,
+  );
 });
 
-test('ABIERTO · las cabeceras de la tabla comparativa cumplen 4,5:1 en modo oscuro', async ({ page }) => {
-  test.fail(); // ABIERTO: --primary-texto sobre rgba(46,134,171,0,15) da 4,34:1 en oscuro
+test('REPARADO 3585 · las cabeceras de la tabla comparativa cumplen 4,5:1 en modo oscuro', async ({ page }) => {
+  // REPARADO el 27/10/2026: en oscuro la cabecera lleva --text-primary sobre el mismo tinte.
   // `.comparativaTable th` (la tabla «Cómo vería los dos colores cada tipo de visión» y la del
   // bloque educativo): texto de 0,82 rem y peso 700, así que NO es texto grande y pide 4,5:1.
   // Medido en la página: rgb(63, 165, 209) sobre rgba(46, 134, 171, 0,15) compuesto con la
@@ -1088,8 +1099,8 @@ test('ABIERTO · las cabeceras de la tabla comparativa cumplen 4,5:1 en modo osc
   expect(k, `contraste de la cabecera en oscuro: ${k.toFixed(2)}:1`).toBeGreaterThanOrEqual(4.5);
 });
 
-test('ABIERTO · el featureList del JSON-LD separa el % de la cifra', async ({ page }) => {
-  test.fail(); // ABIERTO: «Procesamiento 100% en el dispositivo» en metadata.ts → jsonLd.features
+test('REPARADO 3586 · el featureList del JSON-LD separa el % de la cifra', async ({ page }) => {
+  // REPARADO el 27/10/2026: «100 % en el dispositivo», con U+00A0.
   // CLAUDE.md global §2 (25/09/2026): «15 %», separado con espacio duro U+00A0; lo que ya pega
   // el % se corrige app a app al pasar el Inspector.
   await page.goto(RUTA);
@@ -1101,4 +1112,6 @@ test('ABIERTO · el featureList del JSON-LD separa el % de la cifra', async ({ p
   );
   expect(features.length).toBeGreaterThanOrEqual(4);
   expect(features.filter((f: string) => /\d%/.test(f))).toEqual([]);
+  expect(features.filter((f: string) => /\d %/.test(f)), 'con espacio normal en vez de duro').toEqual([]);
+  expect(features.some((f: string) => f.includes('100 %'))).toBe(true);
 });

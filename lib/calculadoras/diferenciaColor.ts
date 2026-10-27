@@ -158,12 +158,25 @@ export interface ComparacionVision {
   nivel: NivelDiferencia;
 }
 
-/** Compara dos colores sRGB tal como los vería cada visión de `VISIONES_COMPARADAS`. */
+/** Decimales con los que se ENSEÑA el ΔE00, y con los que por tanto se decide el tramo. */
+export const DECIMALES_DELTA_E = 1;
+
+/**
+ * Compara dos colores sRGB tal como los vería cada visión de `VISIONES_COMPARADAS`.
+ *
+ * ── El tramo se decide con la cifra que se enseña (hallazgo 3583, 27/10/2026) ──────────
+ * Se decidía con el ΔE00 sin redondear y se escribía con un decimal, así que 0,9712 salía
+ * «No se distinguen (… 1,0)» y 1,0192 «Casi iguales (… 1,0)»: la misma cifra con dos
+ * veredictos, contra la nota de la app («por debajo de 1 no se aprecia»). La diferencia
+ * entre las dos lecturas es menor que lo que mide una cámara, así que manda la visible.
+ */
 export function compararColores(a: RGB3, b: RGB3): ComparacionVision[] {
+  const factor = 10 ** DECIMALES_DELTA_E;
   return VISIONES_COMPARADAS.map(({ tipo, nombre }) => {
     const sa = simularColor(a, tipo);
     const sb = simularColor(b, tipo);
     const deltaE = ciede2000(srgbALab(sa), srgbALab(sb));
-    return { tipo, nombre, a: sa, b: sb, deltaE, nivel: nivelDiferencia(deltaE) };
+    const mostrado = Math.round(deltaE * factor) / factor;
+    return { tipo, nombre, a: sa, b: sb, deltaE, nivel: nivelDiferencia(mostrado) };
   });
 }

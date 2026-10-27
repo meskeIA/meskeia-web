@@ -13,7 +13,12 @@ import {
 } from '@/components';
 import { type RGB, hexARgb, rgbAHex, nombreDeColor } from '@/data/colores-nombrados';
 import { formatNumber } from '@/lib';
-import { compararColores, type NivelDiferencia, type ComparacionVision } from '@/lib/calculadoras/diferenciaColor';
+import {
+  compararColores,
+  DECIMALES_DELTA_E,
+  type NivelDiferencia,
+  type ComparacionVision,
+} from '@/lib/calculadoras/diferenciaColor';
 
 /** Qué significa cada tramo de ΔE00 dicho en palabras (umbrales en `diferenciaColor.ts`). */
 const TEXTO_NIVEL: Record<NivelDiferencia, string> = {
@@ -53,10 +58,31 @@ function rgbAHsl(r: number, g: number, b: number): { h: number; s: number; l: nu
   return { h: Math.round(h * 360), s: Math.round(s * 100), l: Math.round(l * 100) };
 }
 
-// Texto de contraste (blanco o negro) sobre un fondo dado, por luminancia
+/** Luminancia relativa de WCAG 2.x: canales linealizados (sin la gamma de sRGB) y pesos Rec. 709. */
+function luminanciaRelativa(r: number, g: number, b: number): number {
+  const lin = (c: number) => {
+    const s = c / 255;
+    return s <= 0.04045 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+  };
+  return 0.2126 * lin(r) + 0.7152 * lin(g) + 0.0722 * lin(b);
+}
+
+/**
+ * Texto (blanco o negro) sobre un fondo dado: el de MÁS contraste según WCAG.
+ *
+ * Hallazgo 3582 (27/10/2026): decidía con la luma Rec. 601 sobre valores con gamma y un corte
+ * en 0,6, que no es la luminancia de WCAG. En verdes y naranjas vivos ponía el nombre en
+ * blanco con 1,4-2,5:1 donde el oscuro daba 6,9-12,7:1 (Naranja, Verde esmeralda, #00FF00), en
+ * el 9,9 % de los colores sRGB, contra la promesa de «alto contraste» de la guía y del FAQPage.
+ * Comparar las dos razones da siempre la mejor. Con negro puro el peor fondo posible queda en
+ * 4,58:1 (con el #1A1A1A de antes, 4,17:1), así que cumple también el 4,5:1 del texto pequeño
+ * de las muestras A/B y del historial, que usan esta misma función.
+ */
 function textoSobre(r: number, g: number, b: number): string {
-  const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-  return lum > 0.6 ? '#1A1A1A' : '#FFFFFF';
+  const l = luminanciaRelativa(r, g, b);
+  const conBlanco = 1.05 / (l + 0.05);
+  const conNegro = (l + 0.05) / 0.05;
+  return conNegro >= conBlanco ? '#000000' : '#FFFFFF';
 }
 
 interface Calibracion { gR: number; gG: number; gB: number; }
@@ -88,6 +114,7 @@ export default function IdentificadorColorPage() {
   const [avisoCalib, setAvisoCalib] = useState<string | null>(null);
   // Los dos colores que se comparan, en HEX ya corregido por la calibración
   const [comparacion, setComparacion] = useState<{ a: string | null; b: string | null }>({ a: null, b: null });
+  const [avisoGuardado, setAvisoGuardado] = useState<string | null>(null);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -322,6 +349,18 @@ export default function IdentificadorColorPage() {
   const nombre = colorMostrado ? nombreDeColor(colorMostrado.r, colorMostrado.g, colorMostrado.b) : null;
   const textoContraste = colorMostrado ? textoSobre(colorMostrado.r, colorMostrado.g, colorMostrado.b) : '#FFFFFF';
 
+  /** Guarda el color actual como A o B y lo confirma en la región viva de los botones (hallazgo 3584). */
+  const guardarParaComparar = (clave: 'a' | 'b') => {
+    if (!hex || !nombre) return;
+    const otra = clave === 'a' ? 'b' : 'a';
+    const siguiente = { ...comparacion, [clave]: hex };
+    setComparacion(siguiente);
+    setAvisoGuardado(
+      `Color ${clave.toUpperCase()} guardado: ${nombre}, ${hex}.` +
+        (siguiente[otra] ? ' Ya puedes ver la comparación.' : ` Falta guardar el ${otra.toUpperCase()}.`),
+    );
+  };
+
   // Comparación A/B: ¿son el mismo color, y lo serían para cada tipo de daltonismo?
   let filasComparacion: ComparacionVision[] | null = null;
   if (comparacion.a && comparacion.b) {
@@ -486,14 +525,14 @@ export default function IdentificadorColorPage() {
             <button
               type="button"
               className={styles.btnGuardarComparar}
-              onClick={() => setComparacion(c => ({ ...c, a: hex }))}
+              onClick={() => guardarParaComparar('a')}
             >
               Guardar como color A
             </button>
             <button
               type="button"
               className={styles.btnGuardarComparar}
-              onClick={() => setComparacion(c => ({ ...c, b: hex }))}
+              onClick={() => guardarParaComparar('b')}
             >
               Guardar como color B
             </button>
@@ -519,6 +558,15 @@ export default function IdentificadorColorPage() {
                 : 'Apunta a algo blanco o gris neutro bajo la misma luz y pulsa para corregir la dominante de color.'}
             </p>
             <div className={styles.calibAviso} role="status" aria-live="polite">{avisoCalib ?? ' '}</div>
+          </div>
+
+          {/* Hallazgo 3584: guardar no confirmaba nada a un lector de pantalla (la única región
+              viva de la comparación es la del veredicto, vacía hasta tener los dos), y en un
+              móvil la sección aparece casi fuera de la pantalla. La región vive en el
+              resultado, que ya está en pantalla al pulsar, y existe desde antes: así se anuncia.
+              Va detrás de la de calibración, que los specs leen como la primera. */}
+          <div className={styles.copiadoAviso} role="status" aria-live="polite">
+            {avisoGuardado ?? ' '}
           </div>
 
           <div className={styles.copiadoAviso} role="status" aria-live="polite">
@@ -559,7 +607,7 @@ export default function IdentificadorColorPage() {
             {filasComparacion && filaTipica && (
               <p className={styles.compararVeredicto}>
                 <strong>{TEXTO_NIVEL[filaTipica.nivel]}</strong>
-                {' '}(diferencia ΔE00 de {formatNumber(filaTipica.deltaE, 1)} con visión típica).
+                {' '}(diferencia ΔE00 de {formatNumber(filaTipica.deltaE, DECIMALES_DELTA_E)} con visión típica).
                 {visionesQueConfunden.length > 0 && (
                   <> Atención: con {new Intl.ListFormat('es', { type: 'conjunction' }).format(visionesQueConfunden)} se verían prácticamente iguales.</>
                 )}
@@ -589,7 +637,7 @@ export default function IdentificadorColorPage() {
                           <span className={styles.miniMuestra} style={{ backgroundColor: rgbAHex(f.b[0], f.b[1], f.b[2]) }} />
                         </span>
                       </td>
-                      <td className={styles.compararDeltaE}>{formatNumber(f.deltaE, 1)}</td>
+                      <td className={styles.compararDeltaE}>{formatNumber(f.deltaE, DECIMALES_DELTA_E)}</td>
                       <td className={seConfunden(f.nivel) && !seConfunden(filasComparacion[0].nivel) ? styles.celdaConfusion : undefined}>
                         {TEXTO_NIVEL_CORTO[f.nivel]}
                       </td>
@@ -608,7 +656,7 @@ export default function IdentificadorColorPage() {
             daltonismo simulan cada visión con el modelo de Machado y otros (2009): en las
             anomalías, con un grado moderado; la tritanopía es la menos fiable del modelo.
           </p>
-          <button type="button" className={styles.calibQuitar} onClick={() => setComparacion({ a: null, b: null })}>
+          <button type="button" className={styles.calibQuitar} onClick={() => { setComparacion({ a: null, b: null }); setAvisoGuardado(null); }}>
             Vaciar comparación
           </button>
         </section>

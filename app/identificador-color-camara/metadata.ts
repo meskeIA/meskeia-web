@@ -45,7 +45,8 @@ export const jsonLd = generateWebAppSchema({
     'Congelar la lectura para leer con calma un color inestable por la luz',
     'Historial de los últimos colores identificados para reutilizarlos',
     'Comparar dos colores: diferencia ΔE00 (CIEDE2000) y cómo los vería cada tipo de daltonismo',
-    'Procesamiento 100% en el dispositivo: la cámara y las imágenes nunca salen del navegador',
+    // Espacio duro antes del % (CLAUDE.md global §2; hallazgo 3586)
+    'Procesamiento 100 % en el dispositivo: la cámara y las imágenes nunca salen del navegador',
   ],
   keywords: ['identificar color', 'nombre de color', 'codigo hex', 'rgb', 'daltonismo', 'cuentagotas'],
 });

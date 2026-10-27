@@ -131,6 +131,22 @@ test.describe('compararColores', () => {
 
 const UMBRAL_IGUALES = 1;
 
+/**
+ * HALLAZGO 3583 (27/10/2026): compararColores decide el tramo con la cifra de UN decimal que
+ * se enseña. Pares del acta (ΔE00 calculados con este motor, validado con Sharma 2005):
+ * #808080/#807F80 = 0,9712 → «1,0» → casi iguales; #808080/#7B8581 = 5,9772 → «6,0» → distintos.
+ */
+test('compararColores: el tramo cae donde cae la cifra que se enseña', () => {
+  const tipica = (a: [number, number, number], b: [number, number, number]) =>
+    compararColores(a, b).find((f) => f.tipo === 'normal')!;
+  const casi = tipica([128, 128, 128], [128, 127, 128]);
+  expect(casi.deltaE).toBeCloseTo(0.9712, 3);
+  expect(casi.nivel).toBe('casi-iguales');
+  const borde6 = tipica([128, 128, 128], [123, 133, 129]);
+  expect(borde6.deltaE).toBeCloseTo(5.9772, 3);
+  expect(borde6.nivel).toBe('distintos');
+});
+
 test('nivelDiferencia: los cuatro tramos y sus fronteras', () => {
   expect(nivelDiferencia(0)).toBe('iguales');
   expect(nivelDiferencia(0.99)).toBe('iguales');

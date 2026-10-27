@@ -820,7 +820,13 @@
   font-weight: 700;
 }
 
-[data-theme='dark'] .comparativaTable th { background: rgba(46, 134, 171, 0.15); }
+/* Hallazgo 3585: --primary-texto sobre este tinte compuesto con la tarjeta #2A2A2A daba 4,34:1
+   en oscuro, y la cabecera (0,82 rem, 700) no es texto grande. Se mantiene el tinte de marca
+   en el fondo y el texto pasa al primario del tema. */
+[data-theme='dark'] .comparativaTable th {
+  background: rgba(46, 134, 171, 0.15);
+  color: var(--text-primary);
+}
 [data-theme='dark'] .comparativaTable tr:hover td { background: rgba(46, 134, 171, 0.08); }
 
 /* ============================================
