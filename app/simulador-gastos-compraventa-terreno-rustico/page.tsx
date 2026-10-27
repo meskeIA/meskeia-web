@@ -649,8 +649,10 @@ export default function SimuladorTerrenoRusticoPage() {
               </p>
             )}
             <p className={styles.infoCcaaNote}>
-              Puede haber <strong>reducciones de ITP</strong> para explotaciones agrarias prioritarias y jóvenes
-              agricultores (Ley 19/1995). Este simulador aplica el tipo general; confirma la reducción con tu CCAA.
+              {/* Hallazgo 3535: la Ley 19/1995 da EXENCIÓN en dos supuestos (arts. 10.1 y 20.1), no solo reducciones */}
+              Puede haber <strong>exenciones y reducciones de ITP</strong> para explotaciones agrarias prioritarias y
+              jóvenes agricultores (Ley 19/1995). Este simulador aplica el tipo general; confirma con tu CCAA si
+              tu compra está exenta o lleva reducción.
             </p>
             {/* La ficha de la comunidad, como en garaje, trastero, local-comercial y la referencia
                 (forma del hallazgo 2208 de la hermana solar): ahí viven los tipos propios que no
@@ -963,8 +965,9 @@ export default function SimuladorTerrenoRusticoPage() {
             <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '8px', padding: '1rem' }}>
               <strong><span aria-hidden="true">🚜</span> Agricultor amplía su explotación</strong>
               <p style={{ fontSize: '0.9rem', marginTop: '0.5rem' }}>
-                Si es titular de explotación prioritaria o joven agricultor, puede acceder a reducciones de ITP
-                (Ley 19/1995). Conviene verificar los requisitos y el porcentaje con la comunidad autónoma.
+                Si los terrenos completan bajo una sola linde una explotación prioritaria, la compra puede estar
+                exenta del ITP (art. 10.1 de la Ley 19/1995); si no, puede llevar una reducción de la base
+                (arts. 10.2 y 11). Conviene verificar los requisitos con la comunidad autónoma.
               </p>
             </div>
             <div style={{ background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: '8px', padding: '1rem' }}>
@@ -1046,7 +1049,7 @@ export default function SimuladorTerrenoRusticoPage() {
             <strong>Limitaciones de este simulador</strong>
           </div>
           <ul style={{ paddingLeft: '1.25rem', display: 'flex', flexDirection: 'column' as const, gap: '0.4rem' }}>
-            <li>Aplica el tipo general de ITP: no calcula las reducciones para explotaciones agrarias prioritarias ni jóvenes agricultores, que pueden rebajar notablemente el impuesto.</li>
+            <li>Aplica el tipo general de ITP: no calcula las exenciones ni las reducciones de la Ley 19/1995 para explotaciones agrarias prioritarias y jóvenes agricultores, que pueden dejar la compra exenta o rebajar mucho el impuesto.</li>
             {/* El urbanizable no es un solar para el IVA (hallazgo 2220): el art. 20.Uno.20.º LIVA
                 solo trata como edificables los solares y los terrenos con licencia de edificación, y
                 la exención solo se pierde en los urbanizados o en curso de urbanización. Para la

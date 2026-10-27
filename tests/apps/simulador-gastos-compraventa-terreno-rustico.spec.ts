@@ -50,8 +50,8 @@
  * A 24/10/2026 la base no tenía ninguno abierto (44, ARREGLADOS); los cinco de esa re-inspección
  * ([24/10-a…e], 3480-3484) se escribieron con `test.fail()` y se REPARARON el mismo 24/10/2026
  * (8c473228): ya no llevan la marca y vigilan que no vuelvan. A 26/10/2026 la base no tenía ninguno
- * abierto; el de esa re-inspección va con `test.fail()` y la etiqueta [26/10-a] en el ÚLTIMO
- * describe del fichero.
+ * abierto; el de esa re-inspección ([26/10-a], 3535, en el ÚLTIMO describe del fichero) se escribió
+ * con `test.fail()` y se REPARÓ el 27/10/2026: ya no lleva la marca.
  * Lo anterior también está REPARADO: los de la
  * re-inspección del 26/09/2026 (2214-2220) están sin marca en su describe, con la receta de la
  * familia (base mínima del AJD, 2209; notas de la comunidad, 2208). Los casos anteriores con Canarias,
@@ -5175,7 +5175,9 @@ test.describe('inspector 26/10/2026 — Canarias y Navarra, los dos extremos del
   });
 
   /**
-   * [26/10-a] (dato, medio) — ABIERTO, hallazgo (inspector 26/10/2026). La respuesta a «¿Qué
+   * [26/10-a] (dato, medio) — REPARADO el 27/10/2026, hallazgo 3535 (inspector 26/10/2026): la
+   * respuesta nombra las dos exenciones y las reducciones con su artículo (BOE releído ese día), y
+   * la nota del recuadro, el caso de uso y la limitación dicen «exenciones y reducciones». Era: la respuesta a «¿Qué
    * reducciones de ITP existen para explotaciones agrarias?» (RESPUESTA_REDUCCIONES de metadata.ts,
    * la FAQ visible y el FAQPage) dice que la Ley 19/1995 «prevé reducciones en la base imponible del
    * impuesto para la adquisición de fincas por titulares de explotaciones prioritarias y por jóvenes
@@ -5190,18 +5192,21 @@ test.describe('inspector 26/10/2026 — Canarias y Navarra, los dos extremos del
    * dice lo mismo: «pueden rebajar notablemente el impuesto»).
    */
   test('[26/10-a] la FAQ de las reducciones agrarias nombra la exención de la Ley 19/1995 (arts. 10.1 y 20.1), no solo reducciones', async ({ page }) => {
-    // ABIERTO, hallazgo (inspector 26/10/2026)
-    test.fail(!process.env.VER_HUECOS, 'ABIERTO, hallazgo (inspector 26/10/2026)');
+    // REPARADO, hallazgo 3535 (inspector 26/10/2026)
     await abrirHidratada(page);
     const visible = await i26FaqVisible(page, I26_PREGUNTA_REDUCCIONES);
     const faqPage = (await i13FaqPage(page)).find((x) => x.q === I26_PREGUNTA_REDUCCIONES)?.a ?? '';
-    // Preparación (pasa): las dos bocas dan la misma respuesta y hablan de la Ley 19/1995 y de los
-    // jóvenes agricultores que se instalan.
+    // Preparación: las dos bocas dan la misma respuesta y hablan de la Ley 19/1995 y de la primera
+    // instalación del agricultor joven.
     expect(visible).toContain('Ley 19/1995');
-    expect(visible).toContain('jóvenes agricultores que se instalan por primera vez');
+    expect(visible).toContain('primera instalación');
     expect(faqPage).toBe(visible);
-    // El defecto: ninguna nombra la exención.
-    expect.soft(visible, 'FAQ visible').toMatch(/exen(ta|ción)/);
-    expect.soft(faqPage, 'FAQPage').toMatch(/exen(ta|ción)/);
+    // El defecto: ninguna nombraba la exención. Ahora las dos, con sus artículos.
+    expect(visible, 'FAQ visible').toMatch(/exen(ta|ción)/);
+    expect(faqPage, 'FAQPage').toMatch(/exen(ta|ción)/);
+    expect(visible).toContain('(art. 20.1)');
+    expect(visible).toContain('(art. 10.1)');
+    // Y la limitación ya no lo deja en «rebajar notablemente el impuesto»
+    await expect(page.locator('li', { hasText: 'Aplica el tipo general de ITP' })).toContainText('exenciones');
   });
 });
