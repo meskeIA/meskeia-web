@@ -1437,9 +1437,13 @@
     font-size: 24pt;
   }
 
+  /* El papel es blanco en los dos temas: --primary-boton es el mismo en ambos (5,47:1);
+     --primary-texto en oscuro vale #3FA5D1 y daba 2,79:1 sobre el papel al imprimir desde el
+     tema oscuro. Regresión de 4488bd1d, la forma del hallazgo 3546 del sonómetro (cabo C0483).
+     Igual en .actaSectionTitle y .actaPuntoContent strong. */
   .actaTitle {
     font-size: 16pt;
-    color: var(--primary-texto);
+    color: var(--primary-boton);
   }
 
   .actaSubtitle {
@@ -1454,7 +1458,7 @@
 
   .actaSectionTitle {
     font-size: 12pt;
-    color: var(--primary-texto);
+    color: var(--primary-boton);
     margin-bottom: 5mm;
     padding-bottom: 2mm;
     border-bottom: 0.5pt solid #E5E5E5;
@@ -1510,7 +1514,7 @@
 
   .actaPuntoContent strong {
     font-size: 9pt;
-    color: var(--primary-texto);
+    color: var(--primary-boton);
   }
 
   /* Observaciones */
