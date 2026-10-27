@@ -56,6 +56,25 @@ export interface OpcionesFormula {
 
 const SUBINDICES_UNICODE = '₀₁₂₃₄₅₆₇₈₉';
 
+/**
+ * ── Un subíndice no puede empezar por 0 (hallazgo 3559, 27/10/2026) ─────────────────────
+ * `parseInt('02')` da 2, así que «C02» —la errata de manual al teclear CO₂ con un cero en vez
+ * de la O— pasaba por C₂ con su desglose y sin aviso, mientras «H0» sí se rechazaba. Ningún
+ * subíndice químico se escribe con un cero delante: se rechaza y se apunta a la O.
+ */
+function errorSubindice(digitos: string): ErrorFormula | null {
+  if (!digitos) return null;
+  if (/^0+$/.test(digitos)) return { error: 'Un subíndice no puede valer 0.', pista: null };
+  if (digitos.startsWith('0')) {
+    // El aviso de la O va en el propio error: tabla-periodica solo pinta `error`.
+    return {
+      error: `Un subíndice no puede empezar por 0 («${digitos}»): si querías la letra O, escríbela en mayúscula (CO2, no C02).`,
+      pista: null,
+    };
+  }
+  return null;
+}
+
 /** Escribe un símbolo con su subíndice: ('O', 3) → 'O3' */
 export function conIndice(simbolo: string, n: number): string {
   return n > 1 ? `${simbolo}${n}` : simbolo;
@@ -66,7 +85,7 @@ export function conIndice(simbolo: string, n: number): string {
  *
  * Admite paréntesis anidados, corchetes y llaves (se normalizan a paréntesis), subíndices
  * en unicode (H₂O) y espacios sueltos. Rechaza los paréntesis desbalanceados, el subíndice
- * cero y cualquier carácter que no sea letra, dígito o paréntesis.
+ * cero o con un cero delante (C02) y cualquier carácter que no sea letra, dígito o paréntesis.
  */
 export function parsearFormulaQuimica(entrada: string, opciones: OpcionesFormula): ResultadoFormula {
   const { simboloValido } = opciones;
@@ -124,8 +143,9 @@ export function parsearFormulaQuimica(entrada: string, opciones: OpcionesFormula
         num += f[i];
         i++;
       }
+      const falloMult = errorSubindice(num);
+      if (falloMult) return { ok: false, fallo: falloMult };
       const mult = num ? parseInt(num, 10) : 1;
-      if (mult === 0) return { ok: false, fallo: { error: 'Un subíndice no puede valer 0.', pista: null } };
 
       const comp = pilaComp.pop() as Record<string, number>;
       const orden = pilaOrden.pop() as string[];
@@ -154,8 +174,9 @@ export function parsearFormulaQuimica(entrada: string, opciones: OpcionesFormula
     const digitos = m[2];
     if (!simboloValido(simbolo)) return { ok: false, fallo: errorSimbolo(simbolo) };
 
+    const falloSub = errorSubindice(digitos);
+    if (falloSub) return { ok: false, fallo: falloSub };
     const n = digitos ? parseInt(digitos, 10) : 1;
-    if (n === 0) return { ok: false, fallo: { error: 'Un subíndice no puede valer 0.', pista: null } };
 
     const destino = pilaComp[pilaComp.length - 1];
     const ordenDestino = pilaOrden[pilaOrden.length - 1];

@@ -3488,8 +3488,8 @@ test.describe('CASO 30 · móvil (Galaxy S8, 360 × 740): la calculadora y la fi
 // Cada uno afirma lo que DEBERÍA pasar; al repararlo se retira la marca y queda de regresión.
 // ═══════════════════════════════════════════════════════════════════════════
 test.describe('hallazgos · 27/10/2026 (ABIERTOS)', () => {
-  test('I · «C02» (CO₂ tecleado con un cero) sale como C₂, 24,0220 g/mol, en vez de rechazarse', async ({ page }) => {
-    test.fail(true, 'ABIERTO: lib/formula-quimica.ts lee «02» como el subíndice 2');
+  test('I · 3559 · «C02» (CO₂ tecleado con un cero) sale como C₂, 24,0220 g/mol, en vez de rechazarse', async ({ page }) => {
+    // REPARADO el 27/10/2026: el parser compartido rechaza el subíndice con un cero delante.
     // «02» no es un subíndice: la notación no escribe ceros a la izquierda, y la misma
     // calculadora rechaza «H0» con «Un subíndice no puede valer 0.» (CASO 29). El parser
     // compartido (lib/formula-quimica.ts, que usa también formulador-compuestos-inorganicos) hace
@@ -3499,7 +3499,7 @@ test.describe('hallazgos · 27/10/2026 (ABIERTOS)', () => {
     await abrirHidratada(page);
     for (const formula of ['C02', 'H02']) {
       await calcularFormula(page, formula);
-      await expect(page.locator('[class*="_errorMasa"]'), formula).toBeVisible({ timeout: 2000 }); // hoy: ningún error
+      await expect(page.locator('[class*="_errorMasa"]'), formula).toContainText('no puede empezar por 0', { timeout: 2000 });
       await expect(page.locator('[class*="_masaTotal"]'), formula).toHaveCount(0); // hoy: 24,0220 y 2,0160 g/mol
     }
   });

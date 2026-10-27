@@ -114,6 +114,19 @@ test.describe('parsearFormulaQuimica — lo que debe rechazar', () => {
     expect(falla('Ca(OH)0')).toContain('no puede valer 0');
   });
 
+  /**
+   * HALLAZGO 3559 (27/10/2026) — «C02», la errata de teclear CO₂ con un cero en vez de la O,
+   * pasaba por C₂ (24,022 g/mol) porque parseInt('02') = 2. Ningún subíndice lleva un cero
+   * delante, ni de elemento ni de grupo. «C10» y «Ca(OH)10» siguen valiendo.
+   */
+  test('subíndice con un cero delante', () => {
+    expect(falla('C02')).toContain('no puede empezar por 0');
+    expect(falla('H02')).toContain('no puede empezar por 0');
+    expect(falla('Ca(OH)02')).toContain('no puede empezar por 0');
+    expect(comp('C10H22')).toEqual({ C: 10, H: 22 });
+    expect(comp('CO2')).toEqual({ C: 1, O: 2 });
+  });
+
   test('caracteres que no son fórmula', () => {
     expect(falla('H2O + NaCl')).toContain('solo admite letras');
     expect(falla('2H2O')).toContain('No entiendo');
