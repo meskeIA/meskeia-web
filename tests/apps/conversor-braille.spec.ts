@@ -1,5 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
-import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
+import { esperarHidratacion, esperarPaginaAsentada, esperarValorEnReact } from './_hidratacion';
 
 /**
  * Conversor de Código Braille — test de regresión (Inspector, 20/08/2026)
@@ -3401,6 +3401,10 @@ async function recorridoTraducido27(page: Page, conTecladoFisico: boolean) {
 
   await page.goto(RUTA);
   await esperarHidratacion(page, ['textarea']);
+  // Y la página ENTERA hidratada: el traductor simulado envolvía el texto del pie
+  // (CoquinumMasDeCategoria) antes de que React lo hidratara, y salía un «Hydration failed» que
+  // no es de la app (3 de 7 pasadas en rojo, cabo C0491)
+  await esperarPaginaAsentada(page);
 
   // Texto → Braille: los avisos de aa75156d, en singular y en plural
   for (const t of [
