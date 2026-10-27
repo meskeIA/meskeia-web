@@ -62,7 +62,7 @@ export const IPC_META = {
   fuente: 'INE · Índice de Precios de Consumo, índice general nacional (base 2025), medias anuales',
   verificado: '2026-09-19',
   urlOficial: 'https://www.ine.es/jaxiT3/Tabla.htm?t=24077',
-  nota: 'Medias anuales del índice general del INE. Los años 2002-2025 son el dato publicado; los anteriores a 2002, que el INE ya solo publica como tasas de variación, se reconstruyen desde ellas y se han cotejado con el Actualizador de Rentas del INE (desviación máxima del 0,055 %). La conversión peseta-euro (166,386) no depende de esta serie: es un tipo legal exacto del Reglamento (CE) 2866/98.',
+  nota: 'Medias anuales del índice general del INE. Los años 2002-2025 son el dato publicado; los anteriores a 2002, que el INE ya solo publica como tasas de variación, se reconstruyen desde ellas y se han cotejado con el Actualizador de Rentas del INE (desviación máxima del 0,055 %). La conversión peseta-euro (166,386) no depende de esta serie: es un tipo legal exacto del Reglamento (CE) 2866/98.',
 };
 
 export const IPC_YEARS = Object.keys(IPC_DATA).map(Number).sort((a, b) => a - b);

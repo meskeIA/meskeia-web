@@ -10,6 +10,7 @@ import DataReference from '@/components/DataReference';
 import EducationalSection from '@/components/EducationalSection';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
 import { IPC_DATA, IPC_MAX_YEAR, IPC_META, TASA_FIJA_PESETA_EURO } from '@/data/ipc-ine';
+import { PREGUNTAS_FRECUENTES } from './metadata';
 
 // La peseta circuló hasta el 28/02/2002; los años seleccionables para "valor real
 // hoy" son los que tienen IPC y son anteriores a la desaparición física de la moneda.
@@ -30,6 +31,18 @@ type Direccion = 'ptasAEuros' | 'eurosAPtas';
  */
 function decimalesDe(cantidad: number): number {
   return Number.isInteger(cantidad) ? 0 : 2;
+}
+
+/**
+ * Decimales con los que rotular una cantidad de EUROS: los que tenga el importe tecleado, con un
+ * mínimo de dos (el céntimo) y un máximo de seis. Es el gemelo del hallazgo 940 en el sentido
+ * euros → pesetas (hallazgo 3574): un precio unitario lleva tres decimales (gasóleo a 1,455 €/l).
+ */
+function decimalesEuroDe(cantidad: number): number {
+  for (let d = 2; d < 6; d++) {
+    if (Math.abs(Math.round(cantidad * 10 ** d) - cantidad * 10 ** d) < 1e-6) return d;
+  }
+  return 6;
 }
 
 export default function ConversorPesetasEurosPage() {
@@ -186,7 +199,9 @@ export default function ConversorPesetasEurosPage() {
                   <div className={styles.resultLabel}>
                     {direccion === 'ptasAEuros'
                       ? `${formatNumber(resultadoDirecta.cantidad, decimalesDe(resultadoDirecta.cantidad))} pesetas equivalen a:`
-                      : `${formatCurrency(resultadoDirecta.cantidad)} equivalen a:`}
+                      : // Hallazgo 3574: formatCurrency fija dos decimales y «1,455 €» se
+                        // rotulaba «1,46 €», que son 243 ptas y no las 242 que se muestran.
+                        `${formatNumber(resultadoDirecta.cantidad, decimalesEuroDe(resultadoDirecta.cantidad))} € equivalen a:`}
                   </div>
                   <div className={styles.resultValue}>
                     {direccion === 'ptasAEuros'
@@ -284,7 +299,8 @@ export default function ConversorPesetasEurosPage() {
                   <div className={`${styles.statCard} ${styles.negative}`}>
                     <div className={styles.statIcon} aria-hidden="true">📉</div>
                     <div className={styles.statValue}>
-                      +{formatNumber(resultadoHistorico.inflacionAcumulada, 1)}%
+                      {/* Espacio duro antes del % (CLAUDE.md global §2; hallazgo 3578) */}
+                      +{formatNumber(resultadoHistorico.inflacionAcumulada, 1)}{' '}%
                     </div>
                     <div className={styles.statLabel}>Inflación acumulada</div>
                   </div>
@@ -381,7 +397,8 @@ export default function ConversorPesetasEurosPage() {
                 <tr>
                   <td><strong>Fórmula</strong></td>
                   <td>pesetas ÷ 166,386</td>
-                  <td>(pesetas ÷ 166,386) × (IPC hoy ÷ IPC del año)</td>
+                  {/* Hallazgo 3577: decía «IPC hoy», y el motor usa la media del último año cerrado */}
+                  <td>(pesetas ÷ 166,386) × (IPC de {IPC_MAX_YEAR}, último año cerrado ÷ IPC del año)</td>
                 </tr>
                 <tr>
                   <td><strong>¿Cambia con el tiempo?</strong></td>
@@ -461,66 +478,15 @@ export default function ConversorPesetasEurosPage() {
         <section className={styles.eduFaq}>
           <h2><span aria-hidden="true">❓</span> Preguntas frecuentes sobre la conversión de pesetas</h2>
           <div className={styles.faqList}>
-            <div className={styles.faqItem}>
-              <h4><span aria-hidden="true">❓</span> ¿Cuál es el tipo de cambio oficial de pesetas a euros?</h4>
-              <p>
-                1 euro = 166,386 pesetas. Es un tipo de cambio <strong>fijado por ley</strong> —el
-                Reglamento (CE) 2866/98 del Consejo de la Unión Europea, de 31 de diciembre de
-                1998— y no un tipo de mercado: nunca ha fluctuado ni lo hará.
-              </p>
-              <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Tip:</strong> Para pasar de pesetas a euros, divide entre 166,386. Para el camino inverso, multiplica.</p>
-            </div>
-            <div className={styles.faqItem}>
-              <h4><span aria-hidden="true">❓</span> ¿Por qué el resultado de &quot;valor real hoy&quot; es tan distinto al de la conversión oficial?</h4>
-              <p>
-                Porque responden preguntas distintas. La conversión oficial solo cambia la unidad
-                monetaria (pesetas por euros) con un tipo que no varía. El &quot;valor real hoy&quot;
-                añade la inflación acumulada desde el año de referencia: cuanto más antigua sea la
-                cantidad, mayor será la diferencia entre ambos resultados.
-              </p>
-              <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Ejemplo:</strong> 100.000 pesetas de 1970 son siempre 601,01 € al cambio oficial, pero representaban un poder adquisitivo muy superior al de 601,01 € actuales.</p>
-            </div>
-            <div className={styles.faqItem}>
-              <h4><span aria-hidden="true">❓</span> ¿Todavía puedo cambiar pesetas físicas en el banco?</h4>
-              <p>
-                No. Hasta el 30 de junio de 2002 se podían cambiar en cualquier entidad bancaria, y
-                después solo en el Banco de España, hasta que ese plazo terminó definitivamente el
-                30 de junio de 2021. Las pesetas que aparezcan hoy ya no tienen valor liberatorio.
-              </p>
-              <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Alternativa:</strong> Si son billetes o monedas antiguas, poco comunes o en buen estado, un numismático puede valorarlas por su interés de colección, al margen de su valor facial.</p>
-            </div>
-            <div className={styles.faqItem}>
-              <h4><span aria-hidden="true">❓</span> ¿Hasta cuándo se pagó en pesetas en las tiendas?</h4>
-              <p>
-                Del 1 de enero al 28 de febrero de 2002 convivieron el euro y la peseta como medios
-                de pago válidos. Desde el 1 de marzo de 2002, el euro es la única moneda de curso
-                legal en España. El tipo de cambio, sin embargo, llevaba fijado desde el 1 de enero
-                de 1999, con lo que los precios ya se venían mostrando en ambas monedas antes del
-                cambio físico.
-              </p>
-              <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Dato:</strong> Esos tres años de doble indicación de precios (1999-2002) sirvieron para que el público se familiarizara con la nueva moneda antes de su circulación física.</p>
-            </div>
-            <div className={styles.faqItem}>
-              <h4><span aria-hidden="true">❓</span> ¿De dónde salen los datos que usa el cálculo de &quot;valor real hoy&quot;?</h4>
-              <p>
-                De la serie histórica del Índice de Precios al Consumo (IPC) del INE, disponible
-                desde 1961 —la misma que usa el Estimador de Inflación de meskeIA—. La fórmula
-                combina el tipo de cambio fijo con la variación del IPC entre el año de referencia y
-                el año más reciente disponible.
-              </p>
-              <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Relacionado:</strong> Si quieres comparar dos años cualquiera en euros (sin pesetas de por medio), usa el Estimador de Inflación.</p>
-            </div>
-            <div className={styles.faqItem}>
-              <h4><span aria-hidden="true">❓</span> ¿Por qué el tipo de cambio tiene tantos decimales (166,386)?</h4>
-              <p>
-                Porque no se eligió una cifra redonda: se calculó a partir del valor de mercado
-                medio de la peseta frente al ECU (la unidad de cuenta europea previa al euro) en el
-                momento de la fijación, para que el cambio fuera neutral y no favoreciera ni
-                perjudicara a nadie el día del cambio. Por eso cada moneda del euro tiene su propio
-                tipo fijo con distinto número de decimales.
-              </p>
-              <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>Comparación:</strong> El franco francés se fijó en 6,55957 y el marco alemán en 1,95583 francos/euro y marcos/euro respectivamente — cada país con su propia cifra exacta.</p>
-            </div>
+            {/* Hallazgos 3575 y 3576: las respuestas salen de PREGUNTAS_FRECUENTES (metadata.ts),
+                la misma constante que alimenta el FAQPage. */}
+            {PREGUNTAS_FRECUENTES.map(({ pregunta, respuesta, nota }) => (
+              <div key={pregunta} className={styles.faqItem}>
+                <h4><span aria-hidden="true">❓</span> {pregunta}</h4>
+                <p>{respuesta}</p>
+                <p className={styles.faqTip}><span aria-hidden="true">💡</span> <strong>{nota.etiqueta}:</strong> {nota.texto}</p>
+              </div>
+            ))}
           </div>
         </section>
 

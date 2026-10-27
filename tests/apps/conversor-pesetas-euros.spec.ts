@@ -257,7 +257,8 @@ test.describe('Valor real hoy (IPC del INE, base 2025 = 100)', () => {
     expect(await texto(etiquetaPrincipal(page))).toBe('1.000.000 pesetas de 1975 equivalen hoy a:');
     const tarjetas1975 = page.locator('[class*="statCard"]');
     expect(await texto(tarjetas1975.nth(0))).toContain('6010,12 €');
-    expect(await texto(tarjetas1975.nth(1))).toContain('+1394,5%');
+    // Desde el hallazgo 3578 el % va separado con espacio duro (texto() lo normaliza a espacio)
+    expect(await texto(tarjetas1975.nth(1))).toContain('+1394,5 %');
     expect(await texto(tarjetas1975.nth(2))).toContain('50');
 
     // Y ahora el caso de referencia, moviendo los dos controles otra vez.
@@ -268,7 +269,7 @@ test.describe('Valor real hoy (IPC del INE, base 2025 = 100)', () => {
     expect(await texto(valorPrincipal(page))).toBe('2151,17 €');
     const tarjetas1985 = page.locator('[class*="statCard"]');
     expect(await texto(tarjetas1985.nth(0))).toContain('601,01 €'); // conversión sin inflación
-    expect(await texto(tarjetas1985.nth(1))).toContain('+257,9%');  // (100−27,9389)/27,9389
+    expect(await texto(tarjetas1985.nth(1))).toContain('+257,9 %');  // (100−27,9389)/27,9389
     expect(await texto(tarjetas1985.nth(2))).toContain('40');       // 2025 − 1985
   });
 
@@ -282,7 +283,7 @@ test.describe('Valor real hoy (IPC del INE, base 2025 = 100)', () => {
     await selectorDeAño(page).selectOption('1961');
     expect(await texto(valorPrincipal(page))).toBe('28.312,23 €');
     const extremoViejo = page.locator('[class*="statCard"]');
-    expect(await texto(extremoViejo.nth(1))).toContain('+4610,8%');
+    expect(await texto(extremoViejo.nth(1))).toContain('+4610,8 %');
     expect(await texto(extremoViejo.nth(2))).toContain('64');
 
     // 2001 es el último año seleccionable y el eslabón que estaba mal antes del 19/09/2026.
@@ -291,7 +292,7 @@ test.describe('Valor real hoy (IPC del INE, base 2025 = 100)', () => {
     await selectorDeAño(page).selectOption('2001');
     expect(await texto(valorPrincipal(page))).toBe('1036,40 €');
     const extremoNuevo = page.locator('[class*="statCard"]');
-    expect(await texto(extremoNuevo.nth(1))).toContain('+72,4%');
+    expect(await texto(extremoNuevo.nth(1))).toContain('+72,4 %');
     expect(await texto(extremoNuevo.nth(2))).toContain('24');
   });
 
@@ -551,9 +552,9 @@ test.describe('Tercera inspección · a 390 px', () => {
   });
 });
 
-/* ── Hallazgos ABIERTOS de la tercera inspección (27/10/2026) ─────────────────────────
- * Cada uno con `test.fail()` y el valor CORRECTO: el día que se repare, Playwright avisará de
- * que «pasa siendo esperado que falle» y habrá que quitar la marca.
+/* ── Hallazgos de la tercera inspección (27/10/2026), 3574-3581 ──────────────────────
+ * Se escribieron con `test.fail()` y el valor CORRECTO; REPARADOS el mismo día en /reparar,
+ * hoy son regresión.
  */
 
 /** Contraste del texto de un elemento contra el píxel de fondo que tiene 6 px a su izquierda. */
@@ -597,9 +598,9 @@ async function abrirGuia(page: Page): Promise<void> {
   await expect(page.locator('[class*="warningHeader"] h3')).toBeVisible();
 }
 
-test.describe('Tercera inspección · hallazgos abiertos', () => {
-  test('la etiqueta del sentido euros → pesetas nombra el importe tecleado, no uno redondeado', async ({ page }) => {
-    test.fail(); // ABIERTO: el rótulo usa formatCurrency(), que fija dos decimales
+test.describe('Tercera inspección · hallazgos reparados', () => {
+  test('3574 · la etiqueta del sentido euros → pesetas nombra el importe tecleado, no uno redondeado', async ({ page }) => {
+    // REPARADO: el rótulo lleva los decimales del importe (mínimo dos, el céntimo).
     // Es el gemelo del hallazgo 940 en el otro sentido, que su reparación no tocó. Un precio
     // unitario en euros lleva tres decimales (el litro de gasóleo, 1,455 €/l):
     //   1,455 × 166,386 = 242,0916 → 242 ptas (la cifra es CORRECTA)
@@ -612,12 +613,13 @@ test.describe('Tercera inspección · hallazgos abiertos', () => {
     await escribir(page, '#cantidad-directa', '2,345');
     expect(await texto(valorPrincipal(page))).toBe('390 ptas');
     expect(await texto(etiquetaPrincipal(page))).toBe('2,345 € equivalen a:');
-    // Si la reparación elige RECHAZAR más de dos decimales en euros, este caso se reescribe
-    // para exigir el aviso en vez del rótulo.
+    // Y un importe de dos decimales se sigue rotulando con dos: 100 € → «100,00 € equivalen a:»
+    await escribir(page, '#cantidad-directa', '100');
+    expect(await texto(etiquetaPrincipal(page))).toBe('100,00 € equivalen a:');
   });
 
-  test('la inflación acumulada separa el «%» con un espacio duro', async ({ page }) => {
-    test.fail(); // ABIERTO: `+{formatNumber(…, 1)}%` pega el signo
+  test('3578 · la inflación acumulada separa el «%» con un espacio duro', async ({ page }) => {
+    // REPARADO: la tarjeta, el featureList y IPC_META.nota llevan U+00A0 antes del %.
     // CLAUDE.md global §2 (25/09/2026): «15 %», separado con U+00A0.
     // 100.000 ptas de 1985: (100 − 27,9389) ÷ 27,9389 × 100 = 257,9239 → «+257,9 %».
     // ⚠️ Al repararlo, los `toContain('+257,9%')`, '+1394,5%', '+4610,8%' y '+72,4%' de los
@@ -627,8 +629,8 @@ test.describe('Tercera inspección · hallazgos abiertos', () => {
     expect(bruto).toContain('+257,9 %');
   });
 
-  test('la fila «Fórmula» de la tabla educativa nombra el IPC que usa el motor', async ({ page }) => {
-    test.fail(); // ABIERTO: dice «IPC hoy»
+  test('3577 · la fila «Fórmula» de la tabla educativa nombra el IPC que usa el motor', async ({ page }) => {
+    // REPARADO: dice «IPC de 2025, último año cerrado», el que divide el motor.
     // El motor divide por IPC_DATA[2025] = 100, la media del último año cerrado, y así lo dicen
     // el FAQPage («IPC del último año cerrado») y la pantalla («en poder adquisitivo de 2025»).
     // Con el «IPC hoy» de la tabla —el último índice publicado por el INE, 104,978 en
@@ -639,8 +641,8 @@ test.describe('Tercera inspección · hallazgos abiertos', () => {
     await expect(fila).toContainText(/último año cerrado|IPC de \d{4}/);
   });
 
-  test('la FAQ visible y el FAQPage dan la MISMA respuesta a la misma pregunta', async ({ page }) => {
-    test.fail(); // ABIERTO: dos textos escritos por separado para cinco preguntas
+  test('3575 · la FAQ visible y el FAQPage dan la MISMA respuesta a la misma pregunta', async ({ page }) => {
+    // REPARADO: las dos bocas leen PREGUNTAS_FRECUENTES de metadata.ts; ahora se comparan las seis.
     // La reparación es UNA constante en metadata.ts que importen las dos bocas (como
     // app/simulador-gastos-compraventa-garaje). Se comparan las preguntas que aparecen con el
     // MISMO enunciado en las dos; hoy, «¿Cuál es el tipo de cambio oficial de pesetas a euros?».
@@ -656,29 +658,30 @@ test.describe('Tercera inspección · hallazgos abiertos', () => {
       );
       expect(visible, `respuesta visible a «${q.name}»`).toBe(normalizar(q.acceptedAnswer.text));
     }
-    expect(comparadas).toBeGreaterThan(0);
+    expect(comparadas).toBe(6);
   });
 
-  test('la FAQ «¿Por qué tantos decimales?» da la regla del Reglamento 1103/97', async ({ page }) => {
-    test.fail(); // ABIERTO: lo atribuye al valor de mercado y no a la regla legal
+  test('3576 · la FAQ «¿Por qué tantos decimales?» da la regla del Reglamento 1103/97', async ({ page }) => {
+    // REPARADO: cita el art. 4.1 del Reglamento (CE) 1103/97, consultado en boe.es el 27/10/2026.
     // Art. 4.1 del Reglamento (CE) 1103/97: los tipos de conversión se fijan con SEIS cifras
     // significativas. Por eso 166,386 lleva tres decimales, 6,55957 cinco y 1 936,27 dos. La
     // respuesta de hoy dice «Por eso [por venir del ECU] cada moneda del euro tiene su propio
     // tipo fijo con distinto número de decimales».
     const item = page.locator('[class*="faqItem"]').filter({ hasText: 'tantos decimales' });
     await expect(item).toContainText('seis cifras significativas');
+    await expect(item).not.toContainText('valor de mercado');
   });
 
-  test('el título del recuadro de errores frecuentes se lee con contraste suficiente', async ({ page }) => {
-    test.fail(); // ABIERTO: #E65100 sobre el fondo ámbar del recuadro, ~3,3:1
+  test('3579 · el título del recuadro de errores frecuentes se lee con contraste suficiente', async ({ page }) => {
+    // REPARADO: #BF360C, 4,91:1 sobre el ámbar.
     // 16,8 px en negrita no es «texto grande» (14 pt = 18,66 px en negrita): pide 4,5:1.
     await abrirGuia(page);
     const ratio = await contrasteContraFondo(page, page.locator('[class*="warningHeader"] h3'));
     expect(ratio).toBeGreaterThanOrEqual(4.5);
   });
 
-  test('en oscuro, el modo recomendado de cada escenario se lee con contraste suficiente', async ({ page }) => {
-    test.fail(); // ABIERTO: --primary-texto oscuro (#3FA5D1) sobre #343434, ~4,45:1
+  test('3580 · en oscuro, el modo recomendado de cada escenario se lee con contraste suficiente', async ({ page }) => {
+    // REPARADO: en oscuro el <code> usa --text-primary.
     // El tema se activa con el conmutador real, no sembrando data-theme (que puede no aplicar
     // el color-scheme y medir otra cosa).
     await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).click();
@@ -688,8 +691,8 @@ test.describe('Tercera inspección · hallazgos abiertos', () => {
     expect(ratio).toBeGreaterThanOrEqual(4.5);
   });
 
-  test('las tarjetas de fechas clave no simulan ser pulsables', async ({ page }) => {
-    test.fail(); // ABIERTO: cursor de mano y elevación al pasar por encima, sin acción
+  test('3581 · las tarjetas de fechas clave no simulan ser pulsables', async ({ page }) => {
+    // REPARADO: sin cursor de mano ni elevación al pasar el ratón.
     const tarjeta = page.locator('[class*="timelineCard"]').first();
     const { cursor, interactiva } = await tarjeta.evaluate((el) => ({
       cursor: getComputedStyle(el).cursor,

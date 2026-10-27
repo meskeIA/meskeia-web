@@ -322,14 +322,8 @@
   border-radius: var(--radius);
   padding: 1rem;
   text-align: center;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.timelineCard:hover {
-  border-color: var(--primary);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-sm);
+  /* Hallazgo 3581: llevaba cursor de mano y se elevaba al pasar el ratón sin tener acción
+     (CSS heredado de estimador-inflacion). Es una tarjeta de lectura. */
 }
 
 .timelineYear {
@@ -342,11 +336,6 @@
   font-size: 0.85rem;
   color: var(--text-secondary);
   margin: 0.25rem 0;
-}
-
-.timelineIpc {
-  font-size: 0.75rem;
-  color: var(--text-muted);
 }
 
 /* Disclaimer */
@@ -961,6 +950,12 @@
   background: rgba(255,255,255,0.05);
 }
 
+/* Hallazgo 3580: --primary-texto está calibrado para #1A1A1A/#2A2A2A, y este fondo aclarado
+   (≈ rgb(52,52,52)) lo dejaba en 4,45:1. */
+[data-theme='dark'] .escenarioExample code {
+  color: var(--text-primary);
+}
+
 /* FAQ */
 .faqList {
   display: flex;
@@ -1128,7 +1123,9 @@
 .warningHeader h3 {
   font-size: 1.05rem;
   font-weight: 700;
-  color: #E65100;
+  /* Hallazgo 3579: #E65100 daba 3,33:1 sobre el ámbar del recuadro (16,8 px en negrita no es
+     texto grande). #BF360C, el mismo naranja más hondo, da 4,91:1. */
+  color: #BF360C;
   margin: 0;
 }
 
