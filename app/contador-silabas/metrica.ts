@@ -68,8 +68,17 @@ const VOCALES_METRICA = 'aeiouáéíóúü';
 const esVocalMetrica = (c: string): boolean => VOCALES_METRICA.includes(c.toLowerCase());
 
 /**
- * ¿La palabra termina en sonido vocálico?
- * La «y» final suena /i/ («hoy», «rey»), así que también permite sinalefa.
+ * ¿La palabra termina en sonido vocálico que pueda fundirse con la vocal siguiente?
+ *
+ * ── La «y» final de diptongo ante vocal es CONSONANTE (hallazgo 3565, 27/10/2026) ─────
+ * La «y» de «hoy», «voy», «estoy», «soy», «muy» o «rey» cierra un diptongo; ante la vocal
+ * de la palabra siguiente pasa a [j] y abre la sílaba de esa vocal: ho-yes, vo-yen-tran-do,
+ * es-to-ya, so-yun (Navarro Tomás, Manual de pronunciación española; Quilis, Métrica
+ * española). No queda contacto vocálico, así que no hay sinalefa ni se ahorra sílaba. Antes
+ * se fundía como una vocal más y el soneto de Lope «Un soneto me manda hacer Violante»
+ * salía con tres decasílabos (vv. 6, 9 y 12). Siguen fundiendo la conjunción «y» —que va
+ * sola, sin vocal delante en la palabra— y la «y» de un anglicismo tras consonante
+ * («ferry»), que es núcleo de sílaba.
  *
  * ── La h final es MUDA (hallazgo 702, 10/09/2026) ────────────────────────────
  * Miraba el último CARÁCTER y veía una «h», mientras su hermana `empiezaPorVocal` sí la
@@ -86,7 +95,12 @@ const terminaEnVocal = (palabra: string): boolean => {
   const sinHFinal = p.replace(/h+$/, '');
   if (!sinHFinal) return false; // una palabra que solo es «h» no tiene sonido vocálico
   const ultima = sinHFinal[sinHFinal.length - 1];
-  return esVocalMetrica(ultima) || ultima === 'y';
+  if (ultima === 'y') {
+    const anterior = sinHFinal[sinHFinal.length - 2];
+    // Tras vocal (hoy, voy, rey) es la [j] de la sílaba siguiente: no funde.
+    return anterior === undefined || !esVocalMetrica(anterior);
+  }
+  return esVocalMetrica(ultima);
 };
 
 /**
@@ -131,8 +145,8 @@ const empiezaPorVocal = (palabra: string): boolean => {
  *      aguda suma 1 = 8 · octosílabo
  * Frente a «En tanto que de rosa y azucena» → 12 fonéticas, funde sa_y y AHÍ SE PARA = 11.
  *
- * No afecta a la «y» final de «hoy», «rey» o «muy», que es semivocal plena y funde como
- * cualquier vocal («hoy es lunes»).
+ * La «y» final de «hoy», «rey» o «muy» es otro caso, y no funde nunca ante vocal: pasa a
+ * consonante de la sílaba siguiente («hoy es lunes» → ho-yes-lu-nes, 4). Ver `terminaEnVocal`.
  */
 const esConjuncionY = (palabra: string): boolean => palabra.toLowerCase() === 'y';
 

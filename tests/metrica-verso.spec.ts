@@ -157,9 +157,23 @@ test('«En tanto que de rosa y azucena» es endecasílabo, no decasílabo', () =
   expect(a.silabasMetricas).toBe(11);
 });
 
-test('la «y» final de «hoy» o «rey» sí es semivocal plena y funde', () => {
-  expect(sinalefasDe('hoy es lunes')).toEqual(['y_e']);
-  expect(sinalefasDe('el rey ha muerto')).toEqual(['y_h']);
+/**
+ * HALLAZGO 3565 (27/10/2026) — este test afirmaba lo contrario («la y de hoy funde») y
+ * consagraba el defecto. Ante vocal, la «y» final de diptongo pasa a consonante y abre la
+ * sílaba siguiente: ho-yes-lu-nes, re-ya-muer-to (Navarro Tomás; Quilis). Sin contacto
+ * vocálico no hay sinalefa. A mano: hoy(1) es(1) lu-nes(2) = 4, llana → 4; el(1) rey(1) ha(1)
+ * muer-to(2) = 5, llana → 5. La conjunción «y», que va sola, sí sigue fundiendo.
+ */
+test('la «y» final de «hoy» o «rey» ante vocal es consonante y no funde', () => {
+  expect(sinalefasDe('hoy es lunes')).toEqual([]);
+  expect(medir('hoy es lunes')).toBe(4);
+  expect(sinalefasDe('el rey ha muerto')).toEqual([]);
+  expect(medir('el rey ha muerto')).toBe(5);
+  // Lope, «Un soneto me manda hacer Violante», v. 9: vo-yen-tran-do → 11
+  expect(medir('Por el primer terceto voy entrando,')).toBe(11);
+  // La conjunción sigue fundiendo por la derecha, y la «y» tras consonante («ferry») es vocal
+  expect(sinalefasDe('y escriba')).toEqual(['y_e']);
+  expect(sinalefasDe('el ferry en el puerto')).toEqual(['y_e']);
 });
 
 test('el ajuste por acento final se aplica sobre el recuento ya fundido', () => {

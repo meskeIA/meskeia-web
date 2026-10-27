@@ -1858,10 +1858,10 @@ test.describe('contador-silabas · Inspector 27/10/2026 (séptima inspección)',
     expect(await conLaY(13)).toBe(1);
   });
 
-  test('HALLAZGO C0287 · la «y» final de «estoy», «voy» o «soy» ante vocal no hace sinalefa', async ({
+  test('HALLAZGO 3565 (C0287) · la «y» final de «estoy», «voy» o «soy» ante vocal no hace sinalefa', async ({
     page,
   }) => {
-    test.fail(true, 'ABIERTO: terminaEnVocal() da la «y» final por vocal y funde «voy_entrando»');
+    // REPARADO el 27/10/2026: terminaEnVocal() ya no da por vocal la «y» que cierra diptongo.
     // Lope, vv. 6, 9 y 12. La «y» ante vocal es consonante de la sílaba siguiente:
     //   6  y(1) es-toy(2) a(1) la(1) mi-tad(2) de(1) o-tro(2) cuar-te-to(3) = 13; sinalefas
     //      y_estoy y de_otro (es-to-ya: «estoy a» no ahorra nada) → 11. La app: 10.
