@@ -3113,7 +3113,7 @@ test.describe('re-inspección 27/10/2026', () => {
   });
 
   // ─────────────────────────────────────────────────────────────────────────
-  // ABIERTO — teléfonos del § 8.1 con prefijo, guion o puntos, y el fijo en grupos 2-3-2-2
+  // REPARADO 3552 — teléfonos del § 8.1 con prefijo, guion o puntos, y el fijo en grupos 2-3-2-2
   // ─────────────────────────────────────────────────────────────────────────
   //
   // aa75156d (3526) solo reconoce como teléfono nueve cifras en tres grupos de tres con blancos que
@@ -3123,7 +3123,10 @@ test.describe('re-inspección 27/10/2026', () => {
   // «+34 600 123 456» → 34.600.123.456 y «91 123 45 67» → ⠼⠊⠁⠄⠁⠃⠉⠀⠼⠙⠑⠀⠼⠋⠛ («91.123 45 67»). El
   // guion de «49-900 000 000» se queda (⠤) y «647.234.345» sale con sus puntos sin decir nada. El +
   // (235, § 12) no lo escribe la app (ampliar la tabla es decisión del usuario): se admite sin él.
-  test.fail('ABIERTO — teléfonos del § 8.1: «+49 900 000 000» no es la cantidad 49.900.000.000', async ({ page }) => {
+  // REPARADO el 27/10/2026 (hallazgo 3552): blancosEntreCifras() reconoce el prefijo con + o con
+  // guion (el resto lleva su propio ⠼) y los grupos 2-3-2-2 y 3-2-2-2; «647.234.345» se queda como
+  // cantidad, que es como se escribe una en español, con un aviso de que podría ser un teléfono.
+  test('REPARADO 3552 — teléfonos del § 8.1: «+49 900 000 000» no es la cantidad 49.900.000.000', async ({ page }) => {
     const casos: Array<[string, string[]]> = [
       // «+49 900 000 000 → +#di#ijjjjjjjj»: ⠖ (+) · ⠼ 4 9 · ⠼ 9 0 0 0 0 0 0 0 0
       ['+49 900 000 000', ['⠖⠼⠙⠊⠼⠊⠚⠚⠚⠚⠚⠚⠚⠚', '⠼⠙⠊⠼⠊⠚⠚⠚⠚⠚⠚⠚⠚']],
@@ -3147,9 +3150,26 @@ test.describe('re-inspección 27/10/2026', () => {
     await convertir27(page, '647.234.345');
     const r647 = await resultado27(page);
     if (r647 !== '⠼⠋⠙⠛⠃⠉⠙⠉⠙⠑' && (await aviso27(page, '647').count()) === 0) fallos.push(`647.234.345 → ${r647}`);
-    // Hoy: +49 → ⠼⠙⠊⠄⠊⠚⠚⠄⠚⠚⠚⠄⠚⠚⠚ · 49- → ⠼⠙⠊⠤⠼⠊⠚⠚⠚⠚⠚⠚⠚⠚ · +34 → ⠼⠉⠙⠄⠋⠚⠚⠄⠁⠃⠉⠄⠙⠑⠋ ·
-    //       91 → ⠼⠊⠁⠄⠁⠃⠉⠀⠼⠙⠑⠀⠼⠋⠛ · 647 → ⠼⠋⠙⠛⠄⠃⠉⠙⠄⠉⠙⠑ sin aviso
+    // Era: +49 → ⠼⠙⠊⠄⠊⠚⠚⠄⠚⠚⠚⠄⠚⠚⠚ · 49- → ⠼⠙⠊⠤⠼⠊⠚⠚⠚⠚⠚⠚⠚⠚ · +34 → ⠼⠉⠙⠄⠋⠚⠚⠄⠁⠃⠉⠄⠙⠑⠋ ·
+    //      91 → ⠼⠊⠁⠄⠁⠃⠉⠀⠼⠙⠑⠀⠼⠋⠛ · 647 → ⠼⠋⠙⠛⠄⠃⠉⠙⠄⠉⠙⠑ sin aviso
     expect(fallos).toEqual([]);
+    // El teléfono con prefijo se nombra en su aviso, con el + de la tinta
+    await page.goto(RUTA);
+    await convertir27(page, '+49 900 000 000');
+    await expect(aviso27(page, 'como un número de teléfono').locator('strong')).toHaveText('+49 900 000 000');
+    // Lo que no es teléfono no cambia: un intervalo con guion, una fecha y una cantidad con + de seis cifras
+    const noTelefonos: Array<[string, string]> = [
+      ['10-20', '⠼⠁⠚⠤⠼⠃⠚'],
+      ['5-1 000', '⠼⠑⠤⠼⠁⠄⠚⠚⠚'],
+      ['12-10-2026', '⠼⠁⠃⠤⠼⠁⠚⠤⠼⠃⠚⠃⠋'],
+      ['+1 000 000', '⠼⠁⠄⠚⠚⠚⠄⠚⠚⠚'],
+    ];
+    for (const [texto, celdas] of noTelefonos) {
+      await page.goto(RUTA);
+      await convertir27(page, texto);
+      await expect(cajaResultado(page), texto).toHaveText(celdas);
+      await expect(aviso27(page, 'teléfono'), texto).toHaveCount(0);
+    }
   });
 
   // ─────────────────────────────────────────────────────────────────────────

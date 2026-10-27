@@ -254,40 +254,97 @@ const ES_CIFRA = /^[0-9]$/;
  * empieza por 6, 7, 8 o 9 (los números de teléfono de España) y la app lo dice en un aviso, con
  * la forma de escribirlo si era una cantidad.
  *
- * Devuelve las posiciones de los blancos que son separador de millar y las de los que se quitan
- * por ser de un teléfono.
+ * ⚠️ 27/10/2026 (hallazgo 3552) — esa regla solo reconocía los nueve dígitos en grupos de tres, y
+ * todo lo demás caía en la de millar: el ejemplo literal del mismo apartado, «+49 900 000 000 →
+ * +#di#ijjjjjjjj», salía como la CANTIDAD 49.900.000.000. Ahora también son teléfono:
+ * - los que llevan prefijo internacional con + («+49 900 000 000», «+34 600 123 456»): el prefijo
+ *   es un número y el resto otro, con su propio signo de número y sin blancos (§ 8.1);
+ * - el prefijo con guion delante de un teléfono de los de abajo («49-900 000 000 → #di#ijjjjjjjj»):
+ *   el guion no se escribe;
+ * - los nueve dígitos en grupos 2-3-2-2 o 3-2-2-2 que empiezan por 6-9 («91 123 45 67»), que no
+ *   pueden ser una cantidad: los grupos de millar son de tres.
+ * El + (235, § 12) no lo escribe la app: se omite con su aviso. Y «647.234.345», con puntos, se
+ * queda como cantidad —con puntos es como se escribe una en español—, con un aviso de que podría
+ * ser un teléfono (`posiblesTelefonos`).
+ *
+ * Devuelve las posiciones de los blancos que son separador de millar, las de los blancos y guiones
+ * que se quitan por ser de un teléfono, las de los que separan el prefijo (se quitan y el resto
+ * lleva otra vez el signo de número), y los teléfonos tal como venían en el texto.
  */
-const blancosEntreCifras = (caracteres: string[]): { millar: Set<number>; telefono: Set<number> } => {
+interface CifrasEnTinta {
+  millar: Set<number>;
+  telefono: Set<number>;
+  reabrir: Set<number>;
+  telefonos: string[];
+}
+
+/** Formas de un teléfono de España en tinta: longitudes de sus grupos de cifras. */
+const FORMAS_TELEFONO = ['3,3,3', '2,3,2,2', '3,2,2,2'];
+
+const blancosEntreCifras = (caracteres: string[]): CifrasEnTinta => {
   const millar = new Set<number>();
   const telefono = new Set<number>();
+  const reabrir = new Set<number>();
+  const telefonos: string[] = [];
   const esCifra = (c: string | undefined) => c !== undefined && ES_CIFRA.test(c);
   let i = 0;
   while (i < caracteres.length) {
-    if (!esCifra(caracteres[i]) || esCifra(caracteres[i - 1])) {
+    const conMas = caracteres[i] === '+' && esCifra(caracteres[i + 1]) && !esCifra(caracteres[i - 1]);
+    if (!conMas && (!esCifra(caracteres[i]) || esCifra(caracteres[i - 1]))) {
       i++;
       continue;
     }
-    let j = i;
-    while (esCifra(caracteres[j])) j++;
-    const primerGrupo = j - i;
-    const blancos: number[] = [];
-    let k = j;
-    while (
-      primerGrupo <= 3 &&
-      caracteres[k] === ' ' &&
-      esCifra(caracteres[k + 1]) &&
-      esCifra(caracteres[k + 2]) &&
-      esCifra(caracteres[k + 3]) &&
-      !esCifra(caracteres[k + 4])
-    ) {
-      blancos.push(k);
-      k += 4;
+    // Grupos de cifras separados por UN blanco o UN guion
+    const grupos: Array<{ desde: number; hasta: number }> = [];
+    const separadores: number[] = [];
+    let j = conMas ? i + 1 : i;
+    for (;;) {
+      let fin = j;
+      while (esCifra(caracteres[fin])) fin++;
+      grupos.push({ desde: j, hasta: fin });
+      if ((caracteres[fin] === ' ' || caracteres[fin] === '-') && esCifra(caracteres[fin + 1])) {
+        separadores.push(fin);
+        j = fin + 1;
+      } else break;
     }
-    const esTelefono = primerGrupo === 3 && blancos.length === 2 && /^[6-9]$/.test(caracteres[i]);
-    blancos.forEach((b) => (esTelefono ? telefono : millar).add(b));
-    i = Math.max(k, j);
+    const longitudes = grupos.map((g) => g.hasta - g.desde);
+    /** ¿Los grupos desde `k` son un teléfono de España, separados solo por blancos? */
+    const esNacional = (k: number, todoJunto: boolean): boolean =>
+      k < grupos.length &&
+      separadores.slice(k).every((p) => caracteres[p] === ' ') &&
+      (FORMAS_TELEFONO.includes(longitudes.slice(k).join(',')) ||
+        (todoJunto && longitudes.length - k === 1 && longitudes[k] === 9)) &&
+      /^[6-9]$/.test(caracteres[grupos[k].desde]);
+    const cifrasDesde = (k: number) => longitudes.slice(k).reduce((a, b) => a + b, 0);
+
+    let prefijo: boolean;
+    let esTelefono: boolean;
+    if (conMas) {
+      prefijo = grupos.length >= 2 && longitudes[0] <= 3 && cifrasDesde(1) >= 7;
+      esTelefono = prefijo;
+    } else if (grupos.length >= 2 && longitudes[0] <= 3 && caracteres[separadores[0]] === '-' && esNacional(1, true)) {
+      prefijo = true;
+      esTelefono = true;
+    } else {
+      prefijo = false;
+      esTelefono = esNacional(0, false);
+    }
+
+    if (esTelefono) {
+      separadores.forEach((p, k) => (prefijo && k === 0 ? reabrir : telefono).add(p));
+      telefonos.push(caracteres.slice(i, grupos[grupos.length - 1].hasta).join(''));
+      i = grupos[grupos.length - 1].hasta;
+      continue;
+    }
+    // Millar: blancos tras un primer grupo de hasta tres cifras, delante de grupos de tres
+    let k = 1;
+    while (longitudes[0] <= 3 && k < grupos.length && caracteres[separadores[k - 1]] === ' ' && longitudes[k] === 3) {
+      millar.add(separadores[k - 1]);
+      k++;
+    }
+    i = Math.max(grupos[k - 1].hasta, i + 1);
   }
-  return { millar, telefono };
+  return { millar, telefono, reabrir, telefonos: [...new Set(telefonos)] };
 };
 
 /** Normalización común de la entrada de «Texto → Braille» (la usan la conversión y los avisos). */
@@ -296,17 +353,17 @@ const normalizarTinta = (texto: string): string[] =>
     aEspacioNormal,
   );
 
-/** Teléfonos que se han escrito sin blancos (§ 8.1), tal como venían en el texto. */
-const telefonosDelTexto = (texto: string): string[] => {
-  const caracteres = normalizarTinta(texto);
-  const { telefono } = blancosEntreCifras(caracteres);
-  const encontrados: string[] = [];
-  const posiciones = [...telefono].sort((a, b) => a - b);
-  for (let p = 0; p < posiciones.length; p += 2) {
-    encontrados.push(caracteres.slice(posiciones[p] - 3, posiciones[p + 1] + 4).join(''));
-  }
-  return [...new Set(encontrados)];
-};
+/** Teléfonos que se han escrito sin blancos ni guiones (§ 8.1), tal como venían en el texto. */
+const telefonosDelTexto = (texto: string): string[] => blancosEntreCifras(normalizarTinta(texto)).telefonos;
+
+/**
+ * Cantidades con puntos de millar que tienen la forma de un teléfono de España (hallazgo 3552):
+ * «647.234.345». Se escriben como cantidad y se avisa de que, si es un teléfono, el § 8.1 lo
+ * escribe sin puntos («647.234.345 → #fdgbcdcde»).
+ */
+const posiblesTelefonos = (texto: string): string[] => [
+  ...new Set(normalizarTinta(texto).join('').match(/(?<![\d.,+])[6-9]\d{2}\.\d{3}\.\d{3}(?![\d]|[.,]\d)/g) ?? []),
+];
 
 /**
  * ⚠️ 27/10/2026 (hallazgo 3525) — signos a los que el B 2 da celda en la propia signografía
@@ -494,6 +551,8 @@ export default function ConversorBraillePage() {
       : [];
   /** Teléfonos escritos sin blancos (§ 8.1, hallazgo 3526). */
   const telefonos = mode === 'textToBraille' && result ? telefonosDelTexto(input) : [];
+  /** Cantidades con puntos que tienen forma de teléfono (§ 8.1, hallazgo 3552). */
+  const telefonosDudosos = mode === 'textToBraille' && result ? posiblesTelefonos(input) : [];
   /** Palabras en mayúsculas escritas como sigla, que podrían ser un énfasis (§ 7.2, hallazgo 3529). */
   const mayusculas = mode === 'textToBraille' && result ? palabrasEnMayusculas(input) : [];
   /** Celdas de ocho puntos que la vista y la hoja no pueden dibujar enteras (hallazgo 3528). */
@@ -710,6 +769,11 @@ export default function ConversorBraillePage() {
         continue;
       }
       if (blancos.telefono.has(i)) continue;
+      // Hallazgo 3552: tras el prefijo de un teléfono, el resto es otro número con su ⠼
+      if (blancos.reabrir.has(i)) {
+        enExpresionNumerica = false;
+        continue;
+      }
 
       if (/[0-9]/.test(char)) {
         if (!enExpresionNumerica) {
@@ -1235,8 +1299,20 @@ export default function ConversorBraillePage() {
                 <strong>{telefonos.join(' · ')}</strong>{' '}
                 <span>
                   {telefonos.length === 1
-                    ? 'se ha escrito como un número de teléfono, sin los blancos (B 2 § 8.1). Si era una cantidad, escríbela con puntos de millar (999.999.999) y saldrá con el punto 3 entre los grupos.'
-                    : 'se han escrito como números de teléfono, sin los blancos (B 2 § 8.1). Si eran cantidades, escríbelas con puntos de millar (999.999.999) y saldrán con el punto 3 entre los grupos.'}
+                    ? 'se ha escrito como un número de teléfono, sin blancos ni guiones y con el prefijo, si lo hay, como un número aparte (B 2 § 8.1). Si era una cantidad, escríbela con puntos de millar (999.999.999) y saldrá con el punto 3 entre los grupos.'
+                    : 'se han escrito como números de teléfono, sin blancos ni guiones y con el prefijo, si lo hay, como un número aparte (B 2 § 8.1). Si eran cantidades, escríbelas con puntos de millar (999.999.999) y saldrán con el punto 3 entre los grupos.'}
+                </span>
+              </p>
+            )}
+
+            {telefonosDudosos.length > 0 && (
+              <p className={styles.avisoConversion} role="status">
+                <span aria-hidden="true">ℹ️</span>{' '}
+                <strong>{telefonosDudosos.join(' · ')}</strong>{' '}
+                <span>
+                  {telefonosDudosos.length === 1
+                    ? 'se ha escrito como una cantidad, con el punto 3 entre los grupos (B 2 § 8.1). Si es un número de teléfono, el B 2 lo escribe sin puntos: escríbelo con blancos (999 999 999) o todo junto.'
+                    : 'se han escrito como cantidades, con el punto 3 entre los grupos (B 2 § 8.1). Si son números de teléfono, el B 2 los escribe sin puntos: escríbelos con blancos (999 999 999) o todo junto.'}
                 </span>
               </p>
             )}
