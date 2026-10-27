@@ -12173,7 +12173,8 @@ test.describe('inspector 26/10/2026 (3) — Castilla-La Mancha, la frontera de u
   });
 
   /**
-   * HALLAZGO [dato, medio] — ABIERTO, hallazgo (inspector 26/10/2026). La reparación del 3510 (370fcd43)
+   * HALLAZGO [dato, medio] — REPARADO el 27/10/2026, hallazgo 3532 (inspector 26/10/2026): la caja y la
+   * fila «IRPF ganancia patrimonial» llevan fraseRetencionIrnrComprador(), con el OK del usuario. Era: la reparación del 3510 (370fcd43)
    * llevó la retención del 3 % del art. 25.2 TRLIRNR (RETENCION_IRNR_COMPRADOR, data/fiscal/inmuebles.ts)
    * solo a RESPUESTA_QUIEN_PAGA; dos bocas de la misma página conservan la forma del 3509/3510 —la
    * salvedad de la plusvalía como lo único que el vendedor no residente traslada al comprador—:
@@ -12188,7 +12189,7 @@ test.describe('inspector 26/10/2026 (3) — Castilla-La Mancha, la frontera de u
    * afecto. Reparación: fraseRetencionIrnrComprador() (data/itp-ccaa.ts) tras la salvedad, como en la
    * FAQ; en la tabla, en la fila de la ganancia.
    */
-  test.fail('HALLAZGO dato — la caja «Olvidar los gastos del vendedor» y la tabla comparativa callan la retención del 3 % del no residente', async ({ page }) => {
+  test('REPARADO (3532) — la caja «Olvidar los gastos del vendedor» y la tabla comparativa nombran la retención del 3 % del no residente', async ({ page }) => {
     expect(RETENCION_IRNR_COMPRADOR.porcentaje).toBe(3);
     await page.goto(RUTA);
     const caja = limpio3(await page.locator('li', { hasText: 'Olvidar los gastos del vendedor' }).first().textContent());

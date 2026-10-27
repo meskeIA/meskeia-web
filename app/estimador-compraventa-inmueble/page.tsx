@@ -44,7 +44,7 @@ import {
   REGISTRO_CONCEPTOS,
   sumarLineasVisibles, superaElTope, nombreEnFrase, deNombreCcaa, AVISO_IRPF_FORAL, avisoIrpfForalResidente,
   TERRITORIOS_IIVTNU_FORAL, motivoPlusvaliaForal, CIUDADES_CON_BONIFICACION,
-  BONIFICACION_CUOTA_CEUTA_MELILLA, SALVEDAD_PLUSVALIA_NO_RESIDENTE } from '@/data/itp-ccaa';
+  BONIFICACION_CUOTA_CEUTA_MELILLA, SALVEDAD_PLUSVALIA_NO_RESIDENTE, fraseRetencionIrnrComprador } from '@/data/itp-ccaa';
 import { ESCALA_RECARGO_EXTEMPORANEO } from '@/lib/calculadoras/recargoPresentacionTardia';
 import {
   HORQUILLA_GASTOS_COMPRAVENTA,
@@ -3225,7 +3225,9 @@ export default function SimuladorCompraventaPage() {
                       y la tarjeta «IRPF del vendedor»; no la escala del ahorro. */}
                   <td>No aplica: vende el promotor (actividad económica o Impuesto sobre Sociedades)</td>
                   <td>{formatNumber(TIPO_AHORRO_MIN, 0)}&nbsp;% – {formatNumber(TIPO_AHORRO_MAX, 0)}&nbsp;%</td>
-                  <td>Vendedor</td>
+                  {/* Hallazgo 3532: la retención del 3 % del art. 25.2 TRLIRNR, la misma frase que la FAQ
+                      «¿Puedo negociar quién paga cada gasto?» (OK del usuario del 27/10/2026). */}
+                  <td>Vendedor. {fraseRetencionIrnrComprador()}</td>
                 </tr>
                 {/* Por ley la matriz es del vendedor y la primera copia del comprador, salvo pacto
                     (art. 1455 CC, hallazgo 2185): «Comprador» a secas lo daba por obligación legal. */}
@@ -3485,7 +3487,7 @@ export default function SimuladorCompraventaPage() {
             <li><strong>Ignorar el valor de referencia catastral:</strong> Si supera el precio escriturado, Hacienda aplicará ITP sobre ese valor mayor y podrás recibir una comprobación de valores.</li>
             <li><strong>Confundir ITP con AJD en segunda mano:</strong> En segunda mano, entre particulares, solo se paga ITP; el AJD solo aplica en escrituras con hipoteca. No se duplican. La excepción es la renuncia a la exención del IVA cuando vende un empresario a otro con derecho a deducir (art. 20.Dos LIVA): entonces la compra va por IVA, que ingresa el comprador, más AJD, y no por ITP.</li>
             {/* Hallazgos 3468 (la renuncia, cabo C0351) y 3467 (el no residente, cabo C0354). */}
-            <li><strong>Olvidar los gastos del vendedor:</strong> La plusvalía municipal y la posible ganancia patrimonial en IRPF son cargas del vendedor que deben negociarse antes de fijar el precio final. La plusvalía tiene una excepción: {SALVEDAD_PLUSVALIA_NO_RESIDENTE}.</li>
+            <li><strong>Olvidar los gastos del vendedor:</strong> La plusvalía municipal y la posible ganancia patrimonial en IRPF son cargas del vendedor que deben negociarse antes de fijar el precio final. La plusvalía tiene una excepción: {SALVEDAD_PLUSVALIA_NO_RESIDENTE}. {fraseRetencionIrnrComprador()}</li>
             <li><strong>Calcular el IRPF de la venta como si fuera tu única renta del ahorro:</strong> La escala del ahorro (del {TIPO_AHORRO_MIN}&nbsp;% al {TIPO_AHORRO_MAX}&nbsp;%) se aplica a todas las rentas del ahorro del año juntas: intereses, dividendos y otras ganancias. Escríbelas en la pestaña Vendedor y la cuota será la que esta venta añade. Lo que esta calculadora no hace es compensar pérdidas de otras operaciones: en la declaración, las ganancias y pérdidas patrimoniales del año sí se compensan entre sí (art. 49.1.b LIRPF).</li>
             <li><strong>No comprobar bonificaciones autonómicas:</strong> Cada comunidad tiene tipos reducidos para ciertos colectivos. Ignorarlos puede costar miles de euros en impuestos innecesarios.</li>
             <li><strong>Liquidar fuera de plazo:</strong> El ITP o, en obra nueva, el AJD debe pagarse en {PLAZO_ITP.dias} {PLAZO_ITP.unidad} desde la escritura ({PLAZO_ITP.baseNormativa}), y hay comunidades que fijan el suyo propio. Pasado ese plazo hay recargo automático
