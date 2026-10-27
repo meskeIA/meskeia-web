@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import styles from './CalendarioFiscal.module.css';
 import { MeskeiaLogo, LegalNotice, Footer, EducationalSection, RelatedApps, ShareCard, DisclaimerCard, RegionBadge } from '@/components';
-import { formatNumber, formatCurrency } from '@/lib';
+import { formatNumber, formatCurrency, parseISODateLocal } from '@/lib';
 
 // Tipos
 type TipoContribuyente = 'autonomo' | 'sociedad' | 'ambos';
@@ -450,7 +450,7 @@ export default function CalendarioFiscalPage() {
     modelosFiltrados.forEach(modelo => {
       if (modelo.periodicidad === 'trimestral') {
         Object.entries(modelo.fechasTrimestre).forEach(([trimestre, fechaStr]) => {
-          const fecha = new Date(fechaStr);
+          const fecha = parseISODateLocal(fechaStr);
           fechas.push({
             fecha,
             modelo,
@@ -460,7 +460,7 @@ export default function CalendarioFiscalPage() {
           });
         });
       } else if (modelo.fechaAnual) {
-        const fecha = new Date(modelo.fechaAnual);
+        const fecha = parseISODateLocal(modelo.fechaAnual);
         fechas.push({
           fecha,
           modelo,
@@ -483,7 +483,10 @@ export default function CalendarioFiscalPage() {
 
   // Próximas fechas (siguientes 90 días)
   const proximasFechas = useMemo(() => {
+    // Desde las 00:00 de hoy: comparado con la hora actual, el vencimiento de HOY (medianoche)
+    // salía de la lista nada más empezar el día y el «¡HOY!» de abajo no se veía nunca
     const hoy = new Date();
+    hoy.setHours(0, 0, 0, 0);
     const limite = new Date();
     limite.setDate(limite.getDate() + 90);
 
@@ -845,7 +848,7 @@ export default function CalendarioFiscalPage() {
                             <ul>
                               {Object.entries(modelo.fechasTrimestre).map(([t, fecha]) => (
                                 <li key={t}>
-                                  {t}T: {new Date(fecha).toLocaleDateString('es-ES', {
+                                  {t}T: {parseISODateLocal(fecha).toLocaleDateString('es-ES', {
                                     day: 'numeric',
                                     month: 'long',
                                     year: 'numeric'
@@ -894,7 +897,7 @@ export default function CalendarioFiscalPage() {
                           </div>
                           <div className={styles.modeloFechas}>
                             <strong>Fecha límite: </strong>
-                            {modelo.fechaAnual && new Date(modelo.fechaAnual).toLocaleDateString('es-ES', {
+                            {modelo.fechaAnual && parseISODateLocal(modelo.fechaAnual).toLocaleDateString('es-ES', {
                               day: 'numeric',
                               month: 'long',
                               year: 'numeric'

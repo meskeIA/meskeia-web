@@ -37,6 +37,54 @@ test.describe('C0299 · generador-facturas', () => {
   });
 });
 
+/**
+ * C0468 · control-gastos (27/10/2026). La fecha propuesta salía de un inicializador de useState
+ * con toISOString (C0074: el prerender lleva la del build, y además en UTC), y la lista leía la
+ * fecha del movimiento con new Date('AAAA-MM-DD'): en México un gasto del 05/03 salía «04 mar».
+ */
+test.describe('C0468 · control-gastos', () => {
+  test('propone la fecha de hoy en local y lista el movimiento el día tecleado', async ({ page }) => {
+    await page.clock.setFixedTime(TARDE_EN_MEXICO);
+    await page.goto('/control-gastos/');
+    const fecha = page.locator('input[type="date"]');
+    await expect(fecha).toHaveValue('2026-10-16');
+    await page.getByPlaceholder('Ej: Supermercado').fill('Pan');
+    await page.getByPlaceholder('0,00').fill('3');
+    await fecha.fill('2026-03-05');
+    await page.getByRole('button', { name: 'Alimentación' }).click();
+    await page.getByRole('button', { name: '+ Añadir Gasto' }).click();
+    await expect(page.locator('[class*="movimientoMeta"]').first()).toHaveText(/^05 mar/);
+  });
+});
+
+/**
+ * C0074/C0468 · calendario-fiscal-emprendedor (27/10/2026). Las fechas límite se guardan como
+ * AAAA-MM-DD y se leían con new Date(): en México el 303 del 1T salía «19 de abril» en vez del
+ * 20. Y en España, la lista de próximos vencimientos comparaba con la hora actual: el
+ * vencimiento de HOY salía de la lista nada más empezar el día y el «¡HOY!» no se veía nunca.
+ */
+test.describe('C0468 · calendario-fiscal-emprendedor', () => {
+  test('las fechas límite salen el mismo día en México', async ({ page }) => {
+    await page.clock.setFixedTime(TARDE_EN_MEXICO);
+    await page.goto('/calendario-fiscal-emprendedor/');
+    await expect(page.getByText('Calculando los vencimientos pendientes…')).toHaveCount(0);
+    await page.getByRole('button', { name: 'Modelos' }).click();
+    await page.getByText('Modelo 303', { exact: true }).first().click();
+    await expect(page.getByText('1T: 20 de abril de 2026')).toBeVisible();
+  });
+});
+
+test.describe('C0468 · calendario-fiscal-emprendedor en España', () => {
+  test.use({ timezoneId: 'Europe/Madrid' });
+
+  test('el vencimiento de hoy sigue en la lista con «¡HOY!»', async ({ page }) => {
+    // 20/04/2026 a las 10:00 en Madrid: vence el 303 del 1T
+    await page.clock.setFixedTime(new Date('2026-04-20T08:00:00Z'));
+    await page.goto('/calendario-fiscal-emprendedor/');
+    await expect(page.locator('[class*="diasNumero"]').first()).toHaveText('¡HOY!');
+  });
+});
+
 test.describe('C0299 · calculadora-presupuestos', () => {
   test('propone la fecha de hoy en local y la imprime igual', async ({ page }) => {
     await page.clock.setFixedTime(TARDE_EN_MEXICO);

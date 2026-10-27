@@ -5,7 +5,7 @@ import styles from './ControlGastos.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
-import { formatCurrency, parseSpanishNumber } from '@/lib';
+import { formatCurrency, parseSpanishNumber, hoyISOLocal, parseISODateLocal } from '@/lib';
 
 // Categorías de gastos
 const CATEGORIAS_GASTOS = [
@@ -46,7 +46,9 @@ export default function ControlGastosPage() {
   const [concepto, setConcepto] = useState('');
   const [importe, setImporte] = useState('');
   const [categoria, setCategoria] = useState('');
-  const [fecha, setFecha] = useState(() => new Date().toISOString().split('T')[0]);
+  // La fecha de hoy se pone al montar, en el navegador y en local: calculada aquí saldría la
+  // del build en el HTML prerenderizado, y con toISOString la de UTC (cabos C0074 y C0468)
+  const [fecha, setFecha] = useState('');
 
   // Lista de movimientos
   const [movimientos, setMovimientos] = useState<Movimiento[]>([]);
@@ -56,6 +58,7 @@ export default function ControlGastosPage() {
 
   // Cargar datos de localStorage al iniciar
   useEffect(() => {
+    setFecha(prev => prev || hoyISOLocal());
     const datosGuardados = localStorage.getItem('meskeia_control_gastos');
     if (datosGuardados) {
       try {
@@ -107,7 +110,7 @@ export default function ControlGastosPage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `control-gastos-${new Date().toISOString().split('T')[0]}.json`;
+    a.download = `control-gastos-${hoyISOLocal()}.json`;
     a.click();
     URL.revokeObjectURL(url);
   };
@@ -170,7 +173,7 @@ export default function ControlGastosPage() {
 
   // Formatear fecha
   const formatearFecha = (fechaStr: string) => {
-    const fecha = new Date(fechaStr);
+    const fecha = parseISODateLocal(fechaStr);
     return fecha.toLocaleDateString('es-ES', { day: '2-digit', month: 'short' });
   };
 
