@@ -2968,7 +2968,7 @@ test.describe('inspector 26/10/2026', () => {
 // puntos, hoja con sus cuatro controles, ⇄, guía y aviso legal— no cae ni deja texto viejo, a 1280
 // y a 390 px, y la página no desborda.
 //
-// ABIERTOS (test.fail): teléfonos con prefijo, guion o puntos (la regla de millar de aa75156d hace
+// REPARADOS el 27/10/2026 (3552-3558, ya tests normales; eran test.fail): teléfonos con prefijo, guion o puntos (la regla de millar de aa75156d hace
 // de «+49 900 000 000» la cantidad 49.900.000.000), decimal con punto o apóstrofo, siglas con
 // puntos, números romanos llamados «sigla» por el aviso nuevo, signos del B 2 con el aviso «puede
 // que», y del cabo C0238 la (f) (moneda de 2 €, sin fuente) y la (g) (árabe de derecha a izquierda,
@@ -3307,13 +3307,14 @@ test.describe('re-inspección 27/10/2026', () => {
   });
 
   // ─────────────────────────────────────────────────────────────────────────
-  // ABIERTO — cabo C0238 (f): la moneda de 2 € «desde 2022», sin fuente
+  // REPARADO 3557 — cabo C0238 (f): la moneda de 2 € «desde 2022», sin fuente
   // ─────────────────────────────────────────────────────────────────────────
   //
   // Regla 1 de neutralidad (CLAUDE.md §1.quinquies), la forma de 3441, 3457 y 3458: una afirmación
   // fechada sin fuente. El 27/10/2026 el buscador de boe.es siguió rechazando la consulta por URL
   // («Los valores de búsqueda enviados son incorrectos») y EUR-Lex devolvió la página vacía.
-  test.fail('ABIERTO — C0238 (f): «el 2 € tiene el valor en Braille desde 2022» lleva fuente o no se afirma', async ({ page }) => {
+  // REPARADO el 27/10/2026 (hallazgo 3557): sin fuente que consultar, la frase se retiró (precedente 1185).
+  test('REPARADO 3557 — C0238 (f): «el 2 € tiene el valor en Braille desde 2022» lleva fuente o no se afirma', async ({ page }) => {
     await page.goto(RUTA);
     const parrafo = await page.evaluate(
       () =>
@@ -3328,7 +3329,7 @@ test.describe('re-inspección 27/10/2026', () => {
   });
 
   // ─────────────────────────────────────────────────────────────────────────
-  // ABIERTO — cabo C0238 (g): el árabe de derecha a izquierda, contra la propia guía
+  // REPARADO 3558 — cabo C0238 (g): el árabe de derecha a izquierda, contra la propia guía
   // ─────────────────────────────────────────────────────────────────────────
   //
   // Sin fuente en once.es (la página del B 12 no lo dice; el B 12-3 trata la transliteración). Pero
@@ -3336,7 +3337,8 @@ test.describe('re-inspección 27/10/2026', () => {
   // derecha lee el final de la línea mientras la izquierda ya busca el inicio de la siguiente» y que
   // «los lectores expertos mueven los dedos de izquierda a derecha»: con la FAQ, no pueden ser
   // ciertas a la vez.
-  test.fail('ABIERTO — C0238 (g): la FAQ del árabe «de derecha a izquierda» y el paso 5 «de izquierda a derecha» no se contradicen', async ({ page }) => {
+  // REPARADO el 27/10/2026 (hallazgo 3558): la frase del árabe, sin fuente, se retiró de la FAQ.
+  test('REPARADO 3558 — C0238 (g): la FAQ del árabe «de derecha a izquierda» y el paso 5 «de izquierda a derecha» no se contradicen', async ({ page }) => {
     await page.goto(RUTA);
     const textos = await page.evaluate(() => {
       const de = (sel: string, titulo: string) =>

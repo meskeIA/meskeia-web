@@ -1867,7 +1867,10 @@ export default function ConversorBraillePage() {
               <div className={styles.eduEscenarioCard}>
                 <div className={styles.eduEscenarioIcon} aria-hidden="true">🏙️</div>
                 <h4>Señalización y Entorno</h4>
-                <p>El Braille aparece en la vida cotidiana: carteles de ascensores (planta, nombre), envases de medicamentos (nombre y dosis en UE es obligatorio por la Directiva 2004/27/CE), monedas de euro (el 2&nbsp;€ tiene el valor en Braille desde 2022) y tarjetas de visita.</p>
+                <p>El Braille aparece en la vida cotidiana: carteles de ascensores (planta, nombre), envases de medicamentos (nombre y dosis en UE es obligatorio por la Directiva 2004/27/CE) y tarjetas de visita.</p>
+                {/* Hallazgo 3557 (27/10/2026): se retiró «monedas de euro (el 2 € tiene el valor en
+                    Braille desde 2022)», que no tenía fuente y no se pudo anclar en el BOE ni en
+                    EUR-Lex en tres tandas (regla 1 de neutralidad, precedente 1185). */}
               </div>
               <div className={styles.eduEscenarioCard}>
                 <div className={styles.eduEscenarioIcon} aria-hidden="true">💻</div>
@@ -1900,7 +1903,10 @@ export default function ConversorBraillePage() {
               </div>
               <div className={styles.eduFaqItem}>
                 <h4>¿Es el Braille igual en todos los idiomas?</h4>
-                <p>No exactamente. El sistema de 6 puntos es universal, pero cada idioma adapta los símbolos a sus necesidades. El español tiene celdas propias para ñ, á, é, í, ó, ú y ü. En cambio no tiene signos de apertura: ¿ y ? comparten el mismo signo (puntos 2-6), igual que ¡ y ! (puntos 2-3-5), de modo que la pregunta se marca al principio y al final con la misma celda. El árabe Braille va de derecha a izquierda igual que el árabe impreso. El japonés tiene un Braille basado en sílabas (kana) en lugar de letras. El chino Braille tiene variantes por dialectos (mandarín, cantonés). El UEB (Unified English Braille) de 2004 unificó los distintos sistemas del inglés en un estándar global.</p>
+                {/* Hallazgo 3558 (27/10/2026): se retiró «El árabe Braille va de derecha a izquierda
+                    igual que el árabe impreso»: sin fuente (once.es no lo dice) y contradicho por el
+                    paso 5 de la guía, que da la lectura de izquierda a derecha. */}
+                <p>No exactamente. El sistema de 6 puntos es universal, pero cada idioma adapta los símbolos a sus necesidades. El español tiene celdas propias para ñ, á, é, í, ó, ú y ü. En cambio no tiene signos de apertura: ¿ y ? comparten el mismo signo (puntos 2-6), igual que ¡ y ! (puntos 2-3-5), de modo que la pregunta se marca al principio y al final con la misma celda. El japonés tiene un Braille basado en sílabas (kana) en lugar de letras. El chino Braille tiene variantes por dialectos (mandarín, cantonés). El UEB (Unified English Braille) de 2004 unificó los distintos sistemas del inglés en un estándar global.</p>
               </div>
               {/*
                 ⚠️ 22/09/2026 (hallazgo 1185) — esta pregunta se titulaba «¿Qué es el Braille
