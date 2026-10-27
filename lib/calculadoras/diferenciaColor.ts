@@ -11,9 +11,11 @@
 // ── Por qué existe (semilla S0202, 13/10/2026) ──────────────────────────────────────────
 // `identificador-color-camara` NOMBRA cada color, pero dos nombres («azul marino» frente a
 // «azul oscuro») no responden a la pregunta de quien tiene daltonismo ante dos calcetines o
-// dos cables: ¿son el mismo color? Para eso hace falta una distancia, y la redmean que usa la
-// app para buscar nombres sirve para ordenar candidatos, no para decir cuánto se parecen dos
-// colores. ΔE00 es la medida estándar de la CIE para eso.
+// dos cables: ¿son el mismo color? Para eso hace falta una distancia, y la redmean con la que
+// la app buscaba entonces los nombres servía para ordenar candidatos, no para decir cuánto se
+// parecen dos colores. ΔE00 es la medida estándar de la CIE para eso. Desde cd5aa836 (el mismo
+// 13/10/2026) también los nombres se eligen con ΔE00 (`nombreDeColor`, data/colores-nombrados.ts),
+// con este mismo motor (cabo C0489).
 //
 // Se mide además cómo verían los dos colores varias deficiencias de la visión del color, con
 // el modelo de Machado (`daltonismo.ts`): se simula cada color y se mide la distancia entre
