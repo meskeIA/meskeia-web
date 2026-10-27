@@ -1373,7 +1373,8 @@ test.describe('re-inspección 22/10/2026', () => {
   // ─────────────────────────────────────────────────────────────────────────
   //
   // La reparación escribe cualquier blanco que no sea salto de línea como el espacio normal:
-  // separación de palabra ⠀. «10 000» queda como con el espacio normal (⠼⠁⠚⠀⠼⠚⠚⠚).
+  // separación de palabra ⠀. «10 000» queda como con el espacio normal (desde el hallazgo 3526,
+  // 27/10/2026, ⠼⠁⠚⠄⠚⠚⠚: el punto 3 de millar del B 2 § 8.1).
   //
   // Era:
   // Un espacio duro (U+00A0: el que trae casi cualquier texto copiado de una web, Opción+Espacio en
@@ -1396,14 +1397,13 @@ test.describe('re-inspección 22/10/2026', () => {
       // Y sin el aviso de carácter sin celda, que decía «el resto del texto sí está completo»
       await expect(avisoSinCelda(page)).toHaveCount(0);
     }
-    // ⠼ · 1 ⠁ · 0 ⠚ · ⠀ + ⠼ · 0 ⠚ · 0 ⠚ · 0 ⠚ — lo mismo que con el espacio normal
-    // ⚠️ 26/10/2026: el B 2 § 8.1 da ⠼⠁⠚⠄⠚⠚⠚ («501 439 678 → #eja.dci.fgh»): hallazgo ABIERTO en el
-    // bloque «inspector 26/10/2026». Esta aserción fija lo que la app hace hoy y la reparación del
-    // § 8.1 tendrá que cambiarla; lo que protege de verdad es que el blanco no PEGUE los grupos.
+    // ⠼ · 1 ⠁ · 0 ⠚ · ⠄ (punto 3 de millar) · 0 ⠚ · 0 ⠚ · 0 ⠚ — lo mismo que con el espacio normal.
+    // 27/10/2026 (hallazgo 3526): el B 2 § 8.1 da ⠼⠁⠚⠄⠚⠚⠚ («501 439 678 → #eja.dci.fgh»); hasta
+    // entonces salía ⠼⠁⠚⠀⠼⠚⠚⠚. Lo que protege este test sigue siendo que el blanco no PEGUE los grupos.
     for (const blanco of [' ', ' ', ' ']) {
       await page.goto(RUTA);
       await convertirHidratado(page, `10${blanco}000`);
-      await expect(cajaResultado(page)).toHaveText('⠼⠁⠚⠀⠼⠚⠚⠚');
+      await expect(cajaResultado(page)).toHaveText('⠼⠁⠚⠄⠚⠚⠚');
     }
   });
 
@@ -1667,18 +1667,16 @@ test.describe('re-inspección 23/10/2026', () => {
     //   '!' → ⠖ · ' ' → ⠀ · 'Son' → ⠨⠎ ⠕ ⠝ · ' ' → ⠀
     //   '0,75' → ⠼ ⠚ (0) ⠂ (coma decimal, § 8.1) ⠛ (7 = g = 1-2-4-5) ⠑ (5)
     //   ' ' → ⠀ · 'y' → ⠽ (1-3-4-5-6 = U+283D) · ' ' → ⠀
-    //   '10' → ⠼ ⠁ ⠚ · U+00A0 → ⠀ y el segundo grupo reabre con ⠼ (ancla: la app, hallazgo 3416;
-    //   el B 2 no está citado para un blanco entre cifras, cabo C0238 b) · '000' → ⠼ ⠚ ⠚ ⠚
-    //   ⚠️ 26/10/2026: ya está citado, y el B 2 § 8.1 da ⠼⠁⠚⠄⠚⠚⠚ (hallazgo ABIERTO en el bloque
-    //   «inspector 26/10/2026»): la reparación tendrá que cambiar esta cadena.
+    //   '10' → ⠼ ⠁ ⠚ · U+00A0 entre grupos de tres cifras → ⠄, el punto 3 de millar (B 2 § 8.1:
+    //   «501 439 678 → #eja.dci.fgh»; hallazgo 3526, 27/10/2026, antes ⠀ y otro ⠼) · '000' → ⠚ ⠚ ⠚
     //   '…' → como «...» (ancla: la app, hallazgo 3418): ⠄ ⠄ ⠄ (punto 3, § 6.1)
-    await expect(cajaResultado(page)).toHaveText('⠖⠨⠕⠨⠅⠖⠀⠨⠎⠕⠝⠀⠼⠚⠂⠛⠑⠀⠽⠀⠼⠁⠚⠀⠼⠚⠚⠚⠄⠄⠄');
+    await expect(cajaResultado(page)).toHaveText('⠖⠨⠕⠨⠅⠖⠀⠨⠎⠕⠝⠀⠼⠚⠂⠛⠑⠀⠽⠀⠼⠁⠚⠄⠚⠚⠚⠄⠄⠄');
     await expect(avisoSinCelda(page)).toHaveCount(0);
 
-    // Vuelta: ¡ → ! (§ 6.1, un solo signo), el espacio duro vuelve como espacio normal y «…» como «...»
+    // Vuelta: ¡ → ! (§ 6.1, un solo signo), el millar vuelve como punto y «…» como «...»
     await page.getByRole('button', { name: 'Intercambiar dirección de conversión' }).click();
     await page.getByRole('button', { name: 'Convertir', exact: true }).click();
-    await expect(cajaResultado(page)).toHaveText('!OK! Son 0,75 y 10 000...');
+    await expect(cajaResultado(page)).toHaveText('!OK! Son 0,75 y 10.000...');
 
     // Entrada vacía: no hay resultado que inventar
     await page.goto(RUTA);
@@ -2241,11 +2239,13 @@ test.describe('re-inspección 24/10/2026', () => {
     await convertirHidratado(page, 'Precio: 5 €');
     //   'P' → ⠨ + p ⠏ (1-2-3-4) · r ⠗ · e ⠑ · c ⠉ · i ⠊ · o ⠕ · ':' → ⠒ · ' ' → ⠀
     //   '5' → ⠼ ⠑ · ' ' → ⠀ · '€' → nada (no está en la tabla de la app)
-    //   ⚠️ 26/10/2026: el B 2 § 13 SÍ da celda al euro, 456-15 (⠸⠑), y el aviso dice que quizá la
-    //   tenga «fuera de la signografía básica» (hallazgo ABIERTO en el bloque «inspector 26/10/2026»).
-    //   Si la reparación lo escribe, este caso y el del 3459 (€ y ¥, § 13: 456-13456) cambian.
+    //   27/10/2026 (hallazgo 3525): el B 2 § 13 SÍ da celda al euro, 456-15 (⠸⠑). La app aún no lo
+    //   escribe (ampliar la tabla es decisión del usuario), y su aviso propio lo dice: ya no el
+    //   genérico, que lo sacaba «fuera de la signografía básica».
     await expect(cajaResultado(page)).toHaveText('⠨⠏⠗⠑⠉⠊⠕⠒⠀⠼⠑⠀');
-    await expect(avisoSinCelda(page).locator('strong')).toHaveText('€');
+    const avisoB2 = page.locator('[class*="avisoConversion"]').filter({ hasText: 'Documento Técnico B 2) sí le da celda' });
+    await expect(avisoB2.locator('strong')).toHaveText('€');
+    await expect(avisoSinCelda(page)).toHaveCount(0);
     expect(await celdasMalDibujadas(page)).toEqual([]);
   });
 
@@ -2348,8 +2348,10 @@ test.describe('re-inspección 24/10/2026', () => {
   // REPARADO (24/10/2026, hallazgo 3459) — el aviso de un solo carácter decía «les asigne»
   // ─────────────────────────────────────────────────────────────────────────
   test('REPARADO 3459 — con un solo carácter omitido, el aviso concuerda en singular', async ({ page }) => {
+    // 27/10/2026: el € tiene ya su aviso propio (hallazgo 3525, celda en el B 2 § 13); el genérico
+    // se mide con el ¥ y la £, de los que la app no cita celda.
     await page.goto(RUTA);
-    await convertirHidratado(page, 'Precio: 5 €');
+    await convertirHidratado(page, 'Precio: 5 ¥');
     const aviso = avisoSinCelda(page);
     await expect(aviso).toContainText('este carácter'); // precondición: es el aviso de UN carácter
     // Lo que DEBERÍA pasar: «le asigne». Era: «este carácter: €. … sí les asigne celda».
@@ -2357,7 +2359,7 @@ test.describe('re-inspección 24/10/2026', () => {
     await expect(aviso).toContainText('le asigne celda');
     // Con dos, el plural sigue (el ternario va en las dos ramas).
     await page.goto(RUTA);
-    await convertirHidratado(page, 'Precio: 5 € o 6 ¥');
+    await convertirHidratado(page, 'Precio: 5 £ o 6 ¥');
     await expect(avisoSinCelda(page)).toContainText('les asigne celda');
   });
 });
@@ -2469,12 +2471,12 @@ test.describe('re-inspección 24/10/2026 — móvil de 360 px', () => {
 //   (b) § 8.1: «Cuando se escriban números formados por más de tres cifras con algún tipo de
 //       separación, debe utilizarse el punto 3 como separador de los grupos de tres dígitos.» Ejemplo
 //       literal: «501.439.678 · 501 439 678 → #eja.dci.fgh». Los teléfonos «se transcriben sin
-//       espacios en blanco» (999 999 999 → #iiiiiiiii). → hallazgo ABIERTO (test de abajo).
+//       espacios en blanco» (999 999 999 → #iiiiiiiii). → hallazgo 3526, REPARADO el 27/10/2026.
 //   (c) § 6.1: puntos suspensivos «…» = 3-3-3, lo que la app ya escribe (CASO 1). Cerrado.
 //   (d) § 7: no hay signo de «palabra en mayúsculas». Siglas, § 7.1: recurso 1 (⠨ delante de cada
 //       letra, lo que hace la app) o 2 (⠨⠨ delante de la primera). Texto en mayúsculas como cambio
 //       tipográfico, § 7.2: signos del § 9.1 (35 al abrir y al cerrar) y el texto en minúscula.
-//       → hallazgo ABIERTO.
+//       → hallazgo 3529, REPARADO el 27/10/2026 con un aviso (no se distingue sigla de énfasis).
 //   (f) moneda de 2 € y (g) árabe de derecha a izquierda: sin anclar (lo cuenta el acta).
 test.describe('inspector 26/10/2026', () => {
   const ADA = 'ADA 703.3 (EE. UU.)';
@@ -2618,18 +2620,18 @@ test.describe('inspector 26/10/2026', () => {
   });
 
   // ─────────────────────────────────────────────────────────────────────────
-  // CASO 2 (límite) — ABIERTO, hallazgo (inspector 26/10/2026) — cabo C0446: celdas de ocho puntos
+  // CASO 2 (límite) — REPARADO, hallazgo 3528 (inspector 26/10/2026) — cabo C0446: celdas de ocho puntos
   // ─────────────────────────────────────────────────────────────────────────
   //
   // Una celda pegada del bloque braille pasa tal cual (hallazgo 3434), y el bloque llega a U+28FF:
   // celdas de OCHO puntos. La vista y la hoja son rejillas de seis y no dibujan los puntos 7 y 8:
   // ⡀ (U+2840, solo el punto 7) sale como una celda en blanco —en la hoja, lo mismo que la separación
-  // de palabra— y ⡁ (U+2841, puntos 1 y 7) se dibuja y se punza como ⠁, la «a». Ningún aviso lo dice:
-  // en «Texto → Braille» el aviso es «han pasado al resultado tal cual», y en «Braille → Texto» que la
-  // celda «no tiene equivalente». Dibujar ocho puntos, avisar o rechazar es decisión de la reparación;
-  // lo que el test exige es que la celda no se dibuje como OTRA sin decirlo.
-  test.fail('ABIERTO — una celda de ocho puntos no se dibuja como un espacio ni como la «a»', async ({ page }) => {
-    // ABIERTO, hallazgo (inspector 26/10/2026)
+  // de palabra— y ⡁ (U+2841, puntos 1 y 7) se dibuja y se punza como ⠁, la «a». Ningún aviso lo
+  // decía. La reparación (27/10/2026) avisa en los dos sentidos: la hoja sigue siendo de seis puntos
+  // (Marburg y ADA son celdas de seis), y lo que el test exige es que la celda no se dibuje como OTRA
+  // sin decirlo.
+  test('REPARADO (3528) — una celda de ocho puntos no se dibuja como un espacio ni como la «a» sin avisar', async ({ page }) => {
+    // REPARADO, hallazgo 3528 (inspector 26/10/2026)
     const avisaOchoPuntos = async () =>
       (await page.locator('[class*="avisoConversion"]').allInnerTexts()).some((t) =>
         /(ocho|8) puntos|puntos? 7/i.test(t),
@@ -2668,10 +2670,10 @@ test.describe('inspector 26/10/2026', () => {
   });
 
   // ─────────────────────────────────────────────────────────────────────────
-  // ABIERTO, hallazgo (inspector 26/10/2026) — § 8.1: un blanco entre grupos de tres cifras parte el número en dos
+  // REPARADO, hallazgo 3526 (inspector 26/10/2026) — § 8.1: un blanco entre grupos de tres cifras partía el número en dos
   // ─────────────────────────────────────────────────────────────────────────
-  test.fail('ABIERTO — § 8.1: «10 000» y «1 250 000» llevan el punto 3 de millar, no dos números', async ({ page }) => {
-    // ABIERTO, hallazgo (inspector 26/10/2026). Hoy: ⠼⠁⠚⠀⠼⠚⠚⠚ y ⠼⠁⠀⠼⠃⠑⠚⠀⠼⠚⠚⠚.
+  test('REPARADO (3526) — § 8.1: «10 000» y «1 250 000» llevan el punto 3 de millar, no dos números', async ({ page }) => {
+    // REPARADO, hallazgo 3526 (inspector 26/10/2026). Era: ⠼⠁⠚⠀⠼⠚⠚⠚ y ⠼⠁⠀⠼⠃⠑⠚⠀⠼⠚⠚⠚.
     await page.goto(RUTA);
     // ⠼ (3456) · 1 ⠁ · 0 ⠚ · ⠄ (punto 3, separador de millar del § 8.1) · 0 ⠚ · 0 ⠚ · 0 ⠚
     await convertirHidratado(page, '10 000');
@@ -2680,21 +2682,41 @@ test.describe('inspector 26/10/2026', () => {
     await page.goto(RUTA);
     await convertirHidratado(page, '1 250 000');
     await expect(cajaResultado(page)).toHaveText('⠼⠁⠄⠃⠑⠚⠄⠚⠚⠚', { timeout: 3000 });
+    // El ejemplo literal del § 8.1: «501 439 678 → #eja.dci.fgh»
+    await page.goto(RUTA);
+    await convertirHidratado(page, '501 439 678');
+    await expect(cajaResultado(page)).toHaveText('⠼⠑⠚⠁⠄⠙⠉⠊⠄⠋⠛⠓');
+    // La excepción del mismo apartado: los teléfonos «se transcriben sin espacios en blanco»
+    // (999 999 999 → #iiiiiiiii). Nueve cifras en grupos de tres que empiezan por 6-9 se toman por
+    // teléfono, y el aviso lo dice con la forma de escribir una cantidad.
+    await page.goto(RUTA);
+    await convertirHidratado(page, 'Llama al 999 999 999');
+    await expect(cajaResultado(page)).toHaveText('⠨⠇⠇⠁⠍⠁⠀⠁⠇⠀⠼⠊⠊⠊⠊⠊⠊⠊⠊⠊');
+    await expect(
+      page.locator('[class*="avisoConversion"]').filter({ hasText: 'como un número de teléfono' }).locator('strong'),
+    ).toHaveText('999 999 999');
+    // Un número de más de tres cifras sin separar no se toca, ni un grupo que no es de tres
+    await page.goto(RUTA);
+    await convertirHidratado(page, '2026 100 y 12 34');
+    await expect(cajaResultado(page)).toHaveText('⠼⠃⠚⠃⠋⠀⠼⠁⠚⠚⠀⠽⠀⠼⠁⠃⠀⠼⠉⠙');
   });
 
   // ─────────────────────────────────────────────────────────────────────────
-  // ABIERTO, hallazgo (inspector 26/10/2026) — €, %, raya y corchetes: el aviso los saca de la signografía básica
+  // REPARADO, hallazgo 3525 (inspector 26/10/2026) — €, %, raya y corchetes: el aviso los sacaba de la signografía básica
   // ─────────────────────────────────────────────────────────────────────────
   //
-  // Los omite y avisa: «Puede que el Código Braille Español sí le asigne celda fuera de la signografía
-  // básica que cubre esta app». Pero la signografía básica ES el B 2, y les da celda: § 13 euro 456-15,
-  // § 12 tanto por ciento 456-356, § 6.2 raya de diálogo 36-36 y corchetes 12356 / 23456 (también
-  // asterisco 35, llaves, barra inversa y vertical, § 12 + = °, § 13 $ ¥ £…). Es la forma del 3415.
-  // Vale escribirlos o que el aviso deje de decir lo que la fuente desmiente.
-  test.fail('ABIERTO — § 6.2, § 12 y § 13: €, %, la raya y los corchetes tienen celda en la signografía básica', async ({
+  // Los omitía y avisaba: «Puede que el Código Braille Español sí le asigne celda fuera de la
+  // signografía básica que cubre esta app». Pero la signografía básica ES el B 2, y les da celda: § 13
+  // euro 456-15, § 12 tanto por ciento 456-356, § 6.2 raya de diálogo 36-36 y corchetes 12356 / 23456
+  // (también asterisco 35, llaves, barra inversa y vertical, § 12 + = °, § 13 $ ¥ £…). Es la forma
+  // del 3415. Valía escribirlos o que el aviso dejara de decir lo que la fuente desmiente. La
+  // reparación (27/10/2026) hace lo segundo: escribirlos es ampliar la tabla, decisión del usuario.
+  // Los citados literalmente (€ % — [ ] *) tienen un aviso que dice que el B 2 sí les da celda; el
+  // genérico ya no dice dónde estaría la celda de los demás.
+  test('REPARADO (3525) — § 6.2, § 12 y § 13: €, %, la raya y los corchetes tienen celda en la signografía básica', async ({
     page,
   }) => {
-    // ABIERTO, hallazgo (inspector 26/10/2026)
+    // REPARADO, hallazgo 3525 (inspector 26/10/2026)
     const casos = [
       { texto: 'Precio: 5 €', celdas: '⠸⠑', apartado: '§ 13: € = 456-15' },
       { texto: 'Sube un 15 %', celdas: '⠸⠴', apartado: '§ 12: % = 456-356' },
@@ -2708,33 +2730,58 @@ test.describe('inspector 26/10/2026', () => {
       const escrito = (await cajaResultado(page).innerText()).includes(c.celdas);
       const fueraDeLaBasica = await avisoSinCelda(page).filter({ hasText: 'fuera de la signografía básica' }).count();
       expect(escrito || fueraDeLaBasica === 0, `${c.texto} (${c.apartado})`).toBe(true);
+      // Y si no lo escribe, lo dice: el aviso del B 2 lo nombra
+      if (!escrito) {
+        await expect(
+          page.locator('[class*="avisoConversion"]').filter({ hasText: 'Documento Técnico B 2) sí' }),
+          `${c.texto} (${c.apartado})`,
+        ).toBeVisible();
+      }
     }
+    // Ningún aviso, de ningún carácter, saca ya una celda «fuera de la signografía básica»
+    await page.goto(RUTA);
+    await convertirHidratado(page, 'Ver 🙂 y ¥');
+    await expect(avisoSinCelda(page)).toBeVisible();
+    await expect(avisoSinCelda(page)).not.toContainText('fuera de la signografía');
   });
 
   // ─────────────────────────────────────────────────────────────────────────
-  // ABIERTO, hallazgo (inspector 26/10/2026) — § 7.2: una palabra en mayúsculas no es una sigla
+  // REPARADO, hallazgo 3529 (inspector 26/10/2026) — § 7.2: una palabra en mayúsculas no es una sigla
   // ─────────────────────────────────────────────────────────────────────────
-  test.fail('ABIERTO — § 7.2: «El incumplimiento de estas NORMAS es...», el ejemplo del B 2', async ({ page }) => {
-    // ABIERTO, hallazgo (inspector 26/10/2026). Hoy NORMAS sale ⠨⠝⠨⠕⠨⠗⠨⠍⠨⠁⠨⠎, el recurso 1 de las
-    // SIGLAS (§ 7.1). El B 2, literal: «{el incumplimiento de estas }normas} es...»: ⠔ (35, § 9.1)
-    // abre y cierra, y la palabra va en minúscula.
+  //
+  // NORMAS salía ⠨⠝⠨⠕⠨⠗⠨⠍⠨⠁⠨⠎, el recurso 1 de las SIGLAS (§ 7.1), sin decir nada. El B 2, literal:
+  // «{el incumplimiento de estas }normas} es...»: ⠔ (35, § 9.1) abre y cierra, y la palabra va en
+  // minúscula. Desde la tinta no se distingue una sigla («UNESCO») de un énfasis («NORMAS»), y el
+  // § 9.1 desaconseja los signos cuando las mayúsculas son puramente estéticas: escribir ⠔…⠔ a
+  // ciegas convertiría cada sigla larga en un énfasis. La reparación (27/10/2026) mantiene la sigla
+  // y lo dice: el esperado del Inspector (la cadena del § 7.2) era una de las dos salidas que él
+  // mismo dejó a la reparación. Lo que el test exige es que la palabra no salga como sigla SIN AVISO.
+  test('REPARADO (3529) — § 7.2: «El incumplimiento de estas NORMAS es...» avisa de que se ha escrito como sigla', async ({ page }) => {
+    // REPARADO, hallazgo 3529 (inspector 26/10/2026)
     await page.goto(RUTA);
     await convertirHidratado(page, 'El incumplimiento de estas NORMAS es...');
     await expect(cajaResultado(page)).toHaveText(
-      '⠨⠑⠇⠀⠊⠝⠉⠥⠍⠏⠇⠊⠍⠊⠑⠝⠞⠕⠀⠙⠑⠀⠑⠎⠞⠁⠎⠀⠔⠝⠕⠗⠍⠁⠎⠔⠀⠑⠎⠄⠄⠄',
-      { timeout: 3000 },
+      '⠨⠑⠇⠀⠊⠝⠉⠥⠍⠏⠇⠊⠍⠊⠑⠝⠞⠕⠀⠙⠑⠀⠑⠎⠞⠁⠎⠀⠨⠝⠨⠕⠨⠗⠨⠍⠨⠁⠨⠎⠀⠑⠎⠄⠄⠄',
     );
+    const aviso = page.locator('[class*="avisoConversion"]').filter({ hasText: 'como una sigla' });
+    await expect(aviso.locator('strong')).toHaveText('NORMAS');
+    await expect(aviso).toContainText('§ 7.2');
+    // Una sigla corta («ONU») no lleva el aviso: ahí no hay duda razonable
+    await page.goto(RUTA);
+    await convertirHidratado(page, 'La ONU');
+    await expect(page.locator('[class*="avisoConversion"]').filter({ hasText: 'como una sigla' })).toHaveCount(0);
   });
 
   // ─────────────────────────────────────────────────────────────────────────
-  // ABIERTO, hallazgo (inspector 26/10/2026) — § 5.1: la é catalana tiene otra celda
+  // REPARADO, hallazgo 3530 (inspector 26/10/2026) — § 5.1: la é catalana tiene otra celda
   // ─────────────────────────────────────────────────────────────────────────
   //
   // En catalán y valenciano é = 123456 (⠿) y ó = 246 (⠪), mientras la ⠮ (2346) que escribe la app es la
-  // è y la ⠬ (346) la ò. Con «València» la app sabe que el texto es catalán (avisa de la è) y escribe
-  // «és» con la é del castellano, que un lector catalán lee «ès», sin decirlo.
-  test.fail('ABIERTO — § 5.1: en «València és bonica» la é no sale con la celda de la è sin avisar', async ({ page }) => {
-    // ABIERTO, hallazgo (inspector 26/10/2026). Hoy: ⠨⠧⠁⠇⠝⠉⠊⠁⠀⠮⠎⠀⠃⠕⠝⠊⠉⠁ y el aviso solo nombra la è.
+  // è y la ⠬ (346) la ò. Con «València» la app sabe que el texto es catalán (avisa de la è) y escribía
+  // «és» con la é del castellano, que un lector catalán lee «ès», sin decirlo. La reparación
+  // (27/10/2026) la nombra en un aviso propio: la app no sabe en qué lengua está cada palabra.
+  test('REPARADO (3530) — § 5.1: en «València és bonica» la é no sale con la celda de la è sin avisar', async ({ page }) => {
+    // REPARADO, hallazgo 3530 (inspector 26/10/2026). Era: ⠨⠧⠁⠇⠝⠉⠊⠁⠀⠮⠎⠀⠃⠕⠝⠊⠉⠁ y el aviso solo nombraba la è.
     await page.goto(RUTA);
     await convertirHidratado(page, 'València és bonica');
     await expect(
@@ -2863,12 +2910,12 @@ test.describe('inspector 26/10/2026', () => {
   });
 
   // ─────────────────────────────────────────────────────────────────────────
-  // ABIERTO, hallazgo (inspector 26/10/2026) — la guía: la primera década y el punto 3 no dan el 90 %
+  // REPARADO, hallazgo 3531 (inspector 26/10/2026) — la guía: la primera década y el punto 3 no dan el 90 %
   // ─────────────────────────────────────────────────────────────────────────
-  test.fail('ABIERTO — guía: «10 celdas + añadir el punto 3» dan 20 de las 27 letras, no el 90 %', async ({ page }) => {
-    // ABIERTO, hallazgo (inspector 26/10/2026). El B 2 § 4 tiene 27 letras (a-z con la w, y la ñ);
+  test('REPARADO (3531) — guía: «10 celdas + añadir el punto 3» dan 20 de las 27 letras, no el 90 %', async ({ page }) => {
+    // REPARADO, hallazgo 3531 (inspector 26/10/2026). El B 2 § 4 tiene 27 letras (a-z con la w, y la ñ);
     // la primera década (a-j) y la segunda (k-t, «añadir punto 3») son 20: 20 / 27 = 74 %. Con las
-    // seis vocales con diacrítico, 20 / 33 = 61 %. Hoy: «te da el 90 % del alfabeto casi gratis».
+    // seis vocales con diacrítico, 20 / 33 = 61 %. Era: «te da el 90 % del alfabeto casi gratis».
     await page.goto(RUTA);
     const consejo = await page.evaluate(
       () =>

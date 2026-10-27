@@ -216,6 +216,114 @@ const ES_CELDA_BRAILLE = /^[⠀-⣿]$/;
  */
 const PUNTOS_SUSPENSIVOS_TECLADO = '...';
 
+const ES_CIFRA = /^[0-9]$/;
+
+/**
+ * ⚠️ 27/10/2026 (hallazgo 3526) — B 2 § 8.1, literal: «Cuando se escriban números formados por más
+ * de tres cifras con algún tipo de separación, debe utilizarse el punto 3 como separador de los
+ * grupos de tres dígitos», con el ejemplo «501.439.678 · 501 439 678 → #eja.dci.fgh». Un blanco
+ * entre grupos de tres cifras (la forma que recomienda la RAE, y la del formato de meskeIA con
+ * espacio duro) partía el número en dos y repetía el ⠼: «10 000» salía ⠼⠁⠚⠀⠼⠚⠚⠚.
+ *
+ * La excepción del mismo apartado: los teléfonos «se transcriben sin espacios en blanco»
+ * (999 999 999 → #iiiiiiiii). Desde el texto en tinta un teléfono y una cantidad de nueve cifras
+ * tienen la misma forma, así que se toma por teléfono el de nueve cifras en grupos de tres que
+ * empieza por 6, 7, 8 o 9 (los números de teléfono de España) y la app lo dice en un aviso, con
+ * la forma de escribirlo si era una cantidad.
+ *
+ * Devuelve las posiciones de los blancos que son separador de millar y las de los que se quitan
+ * por ser de un teléfono.
+ */
+const blancosEntreCifras = (caracteres: string[]): { millar: Set<number>; telefono: Set<number> } => {
+  const millar = new Set<number>();
+  const telefono = new Set<number>();
+  const esCifra = (c: string | undefined) => c !== undefined && ES_CIFRA.test(c);
+  let i = 0;
+  while (i < caracteres.length) {
+    if (!esCifra(caracteres[i]) || esCifra(caracteres[i - 1])) {
+      i++;
+      continue;
+    }
+    let j = i;
+    while (esCifra(caracteres[j])) j++;
+    const primerGrupo = j - i;
+    const blancos: number[] = [];
+    let k = j;
+    while (
+      primerGrupo <= 3 &&
+      caracteres[k] === ' ' &&
+      esCifra(caracteres[k + 1]) &&
+      esCifra(caracteres[k + 2]) &&
+      esCifra(caracteres[k + 3]) &&
+      !esCifra(caracteres[k + 4])
+    ) {
+      blancos.push(k);
+      k += 4;
+    }
+    const esTelefono = primerGrupo === 3 && blancos.length === 2 && /^[6-9]$/.test(caracteres[i]);
+    blancos.forEach((b) => (esTelefono ? telefono : millar).add(b));
+    i = Math.max(k, j);
+  }
+  return { millar, telefono };
+};
+
+/** Normalización común de la entrada de «Texto → Braille» (la usan la conversión y los avisos). */
+const normalizarTinta = (texto: string): string[] =>
+  Array.from(texto.replace(ANCHO_CERO_NO_SEPARABLE, '').replace(/…/g, PUNTOS_SUSPENSIVOS_TECLADO)).map(
+    aEspacioNormal,
+  );
+
+/** Teléfonos que se han escrito sin blancos (§ 8.1), tal como venían en el texto. */
+const telefonosDelTexto = (texto: string): string[] => {
+  const caracteres = normalizarTinta(texto);
+  const { telefono } = blancosEntreCifras(caracteres);
+  const encontrados: string[] = [];
+  const posiciones = [...telefono].sort((a, b) => a - b);
+  for (let p = 0; p < posiciones.length; p += 2) {
+    encontrados.push(caracteres.slice(posiciones[p] - 3, posiciones[p + 1] + 4).join(''));
+  }
+  return [...new Set(encontrados)];
+};
+
+/**
+ * ⚠️ 27/10/2026 (hallazgo 3525) — signos a los que el B 2 da celda en la propia signografía
+ * básica y que esta app aún no escribe. El aviso genérico decía que «puede que el Código Braille
+ * Español sí le asigne celda fuera de la signografía básica que cubre esta app», y la signografía
+ * básica ES el B 2. Citas literales del Inspector (26/10/2026): § 13 «456-15 € euro», § 12
+ * «456-356 % tanto por ciento», § 6.2 «36-36 — raya de diálogo», «12356 [ abrir corchete»,
+ * «23456 ] cerrar corchete», «35 * asterisco». No se escriben (eso es ampliar la tabla, decisión
+ * del usuario): se avisa con la verdad. El resto de signos sin celda en la app siguen con el aviso
+ * genérico, que ya no afirma dónde está su celda.
+ */
+const SIGNOS_DEL_B2_SIN_ESCRIBIR = new Set(['€', '%', '—', '[', ']', '*']);
+
+/**
+ * ⚠️ 27/10/2026 (hallazgo 3528) — celdas de ocho puntos (U+2840-U+28FF, puntos 7 u 8). Pasan tal
+ * cual al resultado (hallazgo 3434), pero la vista y la hoja son rejillas de seis: ⡀ salía como una
+ * celda en blanco y ⡁ (puntos 1 y 7) se punzaba como ⠁, la «a». Se avisa en los dos sentidos.
+ */
+const ES_CELDA_OCHO_PUNTOS = /^[⡀-⣿]$/;
+
+/**
+ * ⚠️ 27/10/2026 (hallazgo 3529) — B 2 § 7.2: el texto en mayúsculas como cambio tipográfico
+ * («El incumplimiento de estas NORMAS es...») se escribe en minúscula entre los signos de escritura
+ * especial del § 9.1 (35), y no como una sigla (§ 7.1, ⠨ delante de cada letra, que es lo que hace
+ * la app). Desde la tinta no se distingue una sigla de un énfasis: la app sigue escribiendo la
+ * sigla y avisa de las palabras de cuatro o más mayúsculas, que es donde la duda es razonable.
+ */
+const palabrasEnMayusculas = (texto: string): string[] => [
+  ...new Set(texto.match(/(?<!\p{L})\p{Lu}{4,}(?!\p{L})/gu) ?? []),
+];
+
+/**
+ * ⚠️ 27/10/2026 (hallazgo 3530) — B 2 § 5.1 (catalán y valenciano): é = 123456 y ó = 246, mientras
+ * la ⠮ (2346) y la ⠬ (346) que la app escribe para la é y la ó del castellano son, en catalán, la è
+ * y la ò. Con un texto catalán la app escribía «és» con la é castellana, que un lector catalán lee
+ * «ès», sin decirlo. No se cambia la celda (la app no sabe en qué lengua está cada palabra): se
+ * nombran la é y la ó en el aviso de las letras catalanas.
+ */
+const VOCALES_AGUDAS_CATALANAS = new Set(['é', 'ó']);
+
 /**
  * Letras propias del catalán y el valenciano que esta app aún no escribe (hallazgo 3415,
  * 22/10/2026). El aviso genérico decía que «puede que el Código Braille Español sí les asigne
@@ -346,10 +454,31 @@ export default function ConversorBraillePage() {
     () => (mode === 'textToBraille' && result ? caracteresSinCelda(input) : []),
     [mode, result, input],
   );
-  /** Lo que no tiene celda en esta app y quizá tampoco en la signografía básica. */
-  const sinCelda = omitidos.filter((c) => !esLetraCooficialSinEscribir(c));
+  /** Lo que no tiene celda en esta app y de lo que no consta celda en la signografía básica. */
+  const sinCelda = omitidos.filter(
+    (c) => !esLetraCooficialSinEscribir(c) && !SIGNOS_DEL_B2_SIN_ESCRIBIR.has(c),
+  );
+  /** Signos a los que el B 2 da celda y esta app aún no escribe (hallazgo 3525). */
+  const signosDelB2 = omitidos.filter((c) => SIGNOS_DEL_B2_SIN_ESCRIBIR.has(c));
   /** Letras del catalán y el valenciano que el B 2 recoge y esta app aún no escribe. */
   const cooficialesOmitidas = omitidos.filter(esLetraCooficialSinEscribir);
+  /** En un texto catalán, la é y la ó escritas con la celda del castellano (hallazgo 3530). */
+  const agudasCatalanas =
+    cooficialesOmitidas.length > 0
+      ? [...new Set(Array.from(input.toLowerCase()).filter((c) => VOCALES_AGUDAS_CATALANAS.has(c)))]
+      : [];
+  /** Teléfonos escritos sin blancos (§ 8.1, hallazgo 3526). */
+  const telefonos = mode === 'textToBraille' && result ? telefonosDelTexto(input) : [];
+  /** Palabras en mayúsculas escritas como sigla, que podrían ser un énfasis (§ 7.2, hallazgo 3529). */
+  const mayusculas = mode === 'textToBraille' && result ? palabrasEnMayusculas(input) : [];
+  /** Celdas de ocho puntos que la vista y la hoja no pueden dibujar enteras (hallazgo 3528). */
+  const celdasOchoPuntos = result
+    ? [
+        ...new Set(
+          Array.from(mode === 'textToBraille' ? result : input).filter((c) => ES_CELDA_OCHO_PUNTOS.test(c)),
+        ),
+      ]
+    : [];
 
   const omiteComillasSimples = useMemo(
     () => mode === 'textToBraille' && result !== '' && comillasSimplesOmitidas(input),
@@ -542,13 +671,20 @@ export default function ConversorBraillePage() {
 
     // Por code points, no por índices UTF-16: un emoji ocupa dos unidades y
     // recorrerlo a pares partía el carácter en dos mitades sin celda.
-    const caracteres = Array.from(
-      text.replace(ANCHO_CERO_NO_SEPARABLE, '').replace(/…/g, PUNTOS_SUSPENSIVOS_TECLADO),
-    ).map(aEspacioNormal);
+    const caracteres = normalizarTinta(text);
+    const blancos = blancosEntreCifras(caracteres);
 
     for (let i = 0; i < caracteres.length; i++) {
       const original = caracteres[i];
       const char = original.toLowerCase();
+
+      // B 2 § 8.1 (hallazgo 3526): el blanco entre grupos de tres cifras es el punto 3 de millar y
+      // no cierra el número; en un teléfono, no se escribe.
+      if (blancos.millar.has(i)) {
+        result += textToBraille['.'];
+        continue;
+      }
+      if (blancos.telefono.has(i)) continue;
 
       if (/[0-9]/.test(char)) {
         if (!enExpresionNumerica) {
@@ -996,29 +1132,107 @@ export default function ConversorBraillePage() {
               {result}
             </div>
 
+            {/* En estos avisos, la parte que cambia con el número va en su propio <span> como texto
+                único: con la página traducida, un texto suelto entre otros se quedaba con el valor
+                anterior (la forma del hallazgo 3527) */}
             {sinCelda.length > 0 && (
               <p className={styles.avisoConversion} role="alert">
                 <span aria-hidden="true">⚠️</span>{' '}
-                Esta herramienta no escribe en braille{' '}
-                {sinCelda.length === 1 ? 'este carácter' : 'estos caracteres'}:{' '}
+                <span>
+                  {sinCelda.length === 1
+                    ? 'Esta herramienta no escribe en braille este carácter:'
+                    : 'Esta herramienta no escribe en braille estos caracteres:'}
+                </span>{' '}
                 <strong>{sinCelda.map(nombraCaracter).join(' · ')}</strong>. El resto del texto
-                sí está completo. Puede que el Código Braille Español sí{' '}
-                {/* Hallazgo 3459: concuerda con «este carácter / estos caracteres». Cada forma en su
-                    <span key>, que con la página traducida no cae (check:ternario-traducido). */}
-                {sinCelda.length === 1 ? <span key="uno">le asigne</span> : <span key="varios">les asigne</span>} celda fuera
-                de la signografía básica que cubre esta app.
+                sí está completo.{' '}
+                {/* Hallazgo 3459: concuerda con «este carácter / estos caracteres». Hallazgo 3525: ya
+                    no dice que la celda estaría «fuera de la signografía básica», que es el B 2. */}
+                <span>
+                  {sinCelda.length === 1
+                    ? 'Puede que el Código Braille Español sí le asigne celda: esta app no la escribe.'
+                    : 'Puede que el Código Braille Español sí les asigne celda: esta app no la escribe.'}
+                </span>
+              </p>
+            )}
+
+            {signosDelB2.length > 0 && (
+              <p className={styles.avisoConversion} role="alert">
+                <span aria-hidden="true">⚠️</span>{' '}
+                <span>
+                  {signosDelB2.length === 1
+                    ? 'Esta herramienta aún no escribe en braille este signo, y no está en el resultado:'
+                    : 'Esta herramienta aún no escribe en braille estos signos, y no están en el resultado:'}
+                </span>{' '}
+                <strong>{signosDelB2.join(' · ')}</strong>.{' '}
+                <span>
+                  {signosDelB2.length === 1
+                    ? 'La signografía básica del Código Braille Español (Documento Técnico B 2) sí le da celda: un texto braille completo lo llevaría.'
+                    : 'La signografía básica del Código Braille Español (Documento Técnico B 2) sí les da celda: un texto braille completo los llevaría.'}
+                </span>
               </p>
             )}
 
             {cooficialesOmitidas.length > 0 && (
               <p className={styles.avisoConversion} role="alert">
                 <span aria-hidden="true">⚠️</span>{' '}
-                Esta herramienta aún no escribe en braille{' '}
-                {cooficialesOmitidas.length === 1 ? 'esta letra' : 'estas letras'} del catalán y
-                el valenciano: <strong>{cooficialesOmitidas.join(' · ')}</strong>, y no{' '}
-                {cooficialesOmitidas.length === 1 ? 'está' : 'están'} en el resultado. El
-                Documento Técnico B 2 que sigue esta app recoge las lenguas cooficiales, pero
+                <span>
+                  {cooficialesOmitidas.length === 1
+                    ? 'Esta herramienta aún no escribe en braille esta letra del catalán y el valenciano:'
+                    : 'Esta herramienta aún no escribe en braille estas letras del catalán y el valenciano:'}
+                </span>{' '}
+                <strong>{cooficialesOmitidas.join(' · ')}</strong>,{' '}
+                <span>
+                  {cooficialesOmitidas.length === 1 ? 'y no está en el resultado.' : 'y no están en el resultado.'}
+                </span>{' '}
+                El Documento Técnico B 2 que sigue esta app recoge las lenguas cooficiales, pero
                 por ahora solo escribe las letras del castellano.
+              </p>
+            )}
+
+            {agudasCatalanas.length > 0 && (
+              <p className={styles.avisoConversion} role="alert">
+                <span aria-hidden="true">⚠️</span>{' '}
+                En catalán y valenciano la é y la ó tienen otra celda (B 2 § 5.1): esta app las ha
+                escrito con la del castellano, que un lector catalán lee como è y ò:{' '}
+                <strong>{agudasCatalanas.join(' · ')}</strong>.
+              </p>
+            )}
+
+            {telefonos.length > 0 && (
+              <p className={styles.avisoConversion} role="status">
+                <span aria-hidden="true">ℹ️</span>{' '}
+                <strong>{telefonos.join(' · ')}</strong>{' '}
+                <span>
+                  {telefonos.length === 1
+                    ? 'se ha escrito como un número de teléfono, sin los blancos (B 2 § 8.1). Si era una cantidad, escríbela con puntos de millar (999.999.999) y saldrá con el punto 3 entre los grupos.'
+                    : 'se han escrito como números de teléfono, sin los blancos (B 2 § 8.1). Si eran cantidades, escríbelas con puntos de millar (999.999.999) y saldrán con el punto 3 entre los grupos.'}
+                </span>
+              </p>
+            )}
+
+            {mayusculas.length > 0 && (
+              <p className={styles.avisoConversion} role="status">
+                <span aria-hidden="true">ℹ️</span>{' '}
+                <strong>{mayusculas.join(' · ')}</strong>{' '}
+                <span>
+                  {mayusculas.length === 1
+                    ? 'se ha escrito como una sigla, con el signo de mayúscula delante de cada letra (B 2 § 7.1). Si las mayúsculas marcan énfasis y no una sigla, el B 2 § 7.2 la escribe en minúscula entre los signos de escritura especial del § 9.1 (⠔ al abrir y al cerrar), que esta app no pone.'
+                    : 'se han escrito como siglas, con el signo de mayúscula delante de cada letra (B 2 § 7.1). Si las mayúsculas marcan énfasis y no una sigla, el B 2 § 7.2 las escribe en minúscula entre los signos de escritura especial del § 9.1 (⠔ al abrir y al cerrar), que esta app no pone.'}
+                </span>
+              </p>
+            )}
+
+            {celdasOchoPuntos.length > 0 && (
+              <p className={styles.avisoConversion} role="alert">
+                <span aria-hidden="true">⚠️</span>{' '}
+                <span>
+                  {celdasOchoPuntos.length === 1
+                    ? 'Esta celda es de braille de ocho puntos (lleva el punto 7 o el 8):'
+                    : 'Estas celdas son de braille de ocho puntos (llevan el punto 7 o el 8):'}
+                </span>{' '}
+                <strong>{celdasOchoPuntos.join(' ')}</strong>.{' '}
+                La vista de celdas y la hoja imprimible solo tienen seis puntos y no dibujan el 7
+                ni el 8: en la hoja, una celda así puede punzarse como otra o quedar en blanco.
               </p>
             )}
 
@@ -1600,7 +1814,7 @@ export default function ConversorBraillePage() {
               <div className={styles.eduTipCard}>
                 <span className={styles.eduTipIcon} aria-hidden="true">🔢</span>
                 <h4>Aprende la primera década y el resto fluye</h4>
-                <p>Las letras a-j son la clave de todo el sistema. Memorizar esas 10 celdas + la regla de &quot;añadir punto 3 para la segunda década&quot; te da el 90&nbsp;% del alfabeto casi gratis.</p>
+                <p>Las letras a-j son la clave de todo el sistema. Memorizar esas 10 celdas + la regla de &quot;añadir punto 3 para la segunda década&quot; te da 20 de las 27 letras del alfabeto (el 74&nbsp;%) casi gratis.</p>
               </div>
               <div className={styles.eduTipCard}>
                 <span className={styles.eduTipIcon} aria-hidden="true">📐</span>
