@@ -11,6 +11,7 @@ import {
   EducationalSection,
   DisclaimerCard,
 } from '@/components';
+import { hoyISOLocal } from '@/lib';
 
 // ============================================
 // TIPOS
@@ -34,8 +35,11 @@ const HORARIOS_PRESET = ['08:00', '09:00', '12:00', '14:00', '20:00', '21:00', '
 
 const STORAGE_KEY = 'meskeia_medicamentos_v1';
 
+// El día en LOCAL, como la hora de horaActual(). Con toISOString era el de UTC: en México, a
+// partir de las 18:00, las tomas marcadas por la mañana salían como no tomadas porque la clave
+// ya era la de mañana (cabo C0468)
 function hoyISO(): string {
-  return new Date().toISOString().split('T')[0];
+  return hoyISOLocal();
 }
 
 function horaActual(): string {
@@ -62,6 +66,7 @@ export default function RecordatorioMedicacionPage() {
   const [formColor, setFormColor] = useState(COLORES_MEDICAMENTO[0]);
 
   // Cargar desde localStorage
+  const [cargado, setCargado] = useState(false);
   useEffect(() => {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
@@ -71,12 +76,16 @@ export default function RecordatorioMedicacionPage() {
         setMedicamentos([]);
       }
     }
+    setCargado(true);
   }, []);
 
-  // Guardar en localStorage
+  // Guardar en localStorage, solo después de haber cargado: si no, el primer guardado escribe la
+  // lista vacía del montaje, y con los efectos dobles del modo estricto la segunda lectura ya la
+  // encontraba vacía
   useEffect(() => {
+    if (!cargado) return;
     localStorage.setItem(STORAGE_KEY, JSON.stringify(medicamentos));
-  }, [medicamentos]);
+  }, [medicamentos, cargado]);
 
   const resetForm = useCallback(() => {
     setFormNombre('');

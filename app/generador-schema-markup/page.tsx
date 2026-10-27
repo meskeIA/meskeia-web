@@ -7,6 +7,7 @@ import Footer from '@/components/Footer';
 import { EducationalSection, RelatedApps, LegalNotice, ShareCard,
   DisclaimerCard,
 } from '@/components';
+import { hoyISOLocal } from '@/lib';
 
 type SchemaType = 'article' | 'product' | 'faq' | 'localbusiness' | 'recipe';
 
@@ -25,7 +26,8 @@ export default function GeneradorSchemaMarkupPage() {
   // coincidían y React descartaba el árbol al hidratar (error #418).
   const [fechaHoy, setFechaHoy] = useState('');
   useEffect(() => {
-    setFechaHoy(new Date().toISOString().split('T')[0]);
+    // En local: con toISOString, por la tarde en América ya era mañana (cabo C0468)
+    setFechaHoy(hoyISOLocal());
   }, []);
 
   // Article state

@@ -14,7 +14,7 @@ import {
   ShareCard,
   DataReference, RegionBadge
 } from '@/components';
-import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
+import { formatCurrency, formatNumber, parseSpanishNumber, hoyISOLocal } from '@/lib';
 import {
   TIPOS_DEMORA_COMERCIAL,
   INTERES_LEGAL_DINERO_2025,
@@ -40,15 +40,15 @@ interface Resultado {
   semestre?: string;
 }
 
-const hoy = (): string => {
-  const d = new Date();
-  return d.toISOString().substring(0, 10);
-};
+// Las fechas propuestas, en LOCAL: con toISOString eran las de UTC, y por la tarde en América
+// ya eran las de mañana (cabo C0468). El cálculo de abajo sí lee las fechas tecleadas como
+// medianoche UTC, a propósito: es lo que espera getTipoDemoraComercialParaFecha.
+const hoy = (): string => hoyISOLocal();
 
 const ayer = (): string => {
   const d = new Date();
   d.setDate(d.getDate() - 30);
-  return d.toISOString().substring(0, 10);
+  return hoyISOLocal(d);
 };
 
 export default function OrientadorInteresesDemoraPage() {

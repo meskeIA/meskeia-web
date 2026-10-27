@@ -6,6 +6,7 @@ import {
   MeskeiaLogo, Footer, LegalNotice, EducationalSection, RelatedApps,
   ShareCard, DisclaimerCard,
 } from '@/components';
+import { hoyISOLocal } from '@/lib';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -36,8 +37,10 @@ const STORAGE_KEY = 'meskeia_diario_emocional';
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
+// En local: con toISOString era el día en UTC, y la entrada de las 21:00 en México se
+// guardaba como de mañana, y la de las 00:30 en España como de ayer (cabo C0468)
 function hoy(): string {
-  return new Date().toISOString().slice(0, 10);
+  return hoyISOLocal();
 }
 
 function formatFechaCorta(fecha: string): string {
@@ -61,7 +64,7 @@ function getUltimos7Dias(base: string): string[] {
   for (let i = 6; i >= 0; i--) {
     const d = new Date(base + 'T12:00:00');
     d.setDate(d.getDate() - i);
-    dias.push(d.toISOString().slice(0, 10));
+    dias.push(hoyISOLocal(d));
   }
   return dias;
 }
@@ -72,7 +75,7 @@ function getUltimos30Dias(base: string): string[] {
   for (let i = 29; i >= 0; i--) {
     const d = new Date(base + 'T12:00:00');
     d.setDate(d.getDate() - i);
-    dias.push(d.toISOString().slice(0, 10));
+    dias.push(hoyISOLocal(d));
   }
   return dias;
 }

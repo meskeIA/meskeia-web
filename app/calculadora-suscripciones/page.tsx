@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react';
 import styles from './CalculadoraSuscripciones.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection, DisclaimerCard } from '@/components';
-import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
+import { formatCurrency, formatNumber, parseSpanishNumber, hoyISOLocal } from '@/lib';
 
 // Tipos
 interface Suscripcion {
@@ -226,7 +226,7 @@ export default function CalculadoraSuscripcionesPage() {
       ciclo,
       categoria,
       activa: true,
-      fechaInicio: new Date().toISOString().split('T')[0],
+      fechaInicio: hoyISOLocal(),
     };
 
     if (editandoId) {
@@ -277,7 +277,7 @@ export default function CalculadoraSuscripcionesPage() {
       ciclo: 'mensual',
       categoria: pop.categoria,
       activa: true,
-      fechaInicio: new Date().toISOString().split('T')[0],
+      fechaInicio: hoyISOLocal(),
     };
     setSuscripciones(prev => [...prev, nueva]);
   };

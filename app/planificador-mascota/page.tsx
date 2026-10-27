@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import styles from './PlanificadorMascota.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
+import { hoyISOLocal, parseISODateLocal } from '@/lib';
 
 // Tipos
 type TabType = 'perfil' | 'checklist' | 'compras' | 'vacunas';
@@ -236,8 +237,14 @@ export default function PlanificadorMascotaPage() {
   const [filtroCategoria, setFiltroCategoria] = useState<CategoriaCompra | 'todos'>('todos');
   const [mostrarSoloSinComprar, setMostrarSoloSinComprar] = useState(false);
 
+  // Tope del campo de nacimiento. Se fija al montar y en local: en el render, el HTML
+  // prerenderizado llevaba el del build (React no corrige atributos al hidratar) y con
+  // toISOString era el de UTC (cabos C0074 y C0468)
+  const [hoy, setHoy] = useState('');
+
   // Cargar datos de localStorage
   useEffect(() => {
+    setHoy(hoyISOLocal());
     const savedPerfil = localStorage.getItem('meskeia-mascota-perfil');
     const savedChecklist = localStorage.getItem('meskeia-mascota-checklist');
     const savedCompras = localStorage.getItem('meskeia-mascota-compras');
@@ -281,7 +288,8 @@ export default function PlanificadorMascotaPage() {
   // Funciones Perfil
   const calcularEdad = (): string => {
     if (!perfil.fechaNacimiento) return '';
-    const nacimiento = new Date(perfil.fechaNacimiento);
+    // En local, como la llegada de abajo (cabo C0468)
+    const nacimiento = parseISODateLocal(perfil.fechaNacimiento);
     const hoy = new Date();
     const diffMs = hoy.getTime() - nacimiento.getTime();
     const diffDias = Math.floor(diffMs / (1000 * 60 * 60 * 24));
@@ -300,7 +308,9 @@ export default function PlanificadorMascotaPage() {
 
   const calcularDiasEnCasa = (): string => {
     if (!perfil.fechaLlegada) return '';
-    const llegada = new Date(perfil.fechaLlegada);
+    // En local: new Date('AAAA-MM-DD') es medianoche UTC, y una llegada de hoy contaba «1 día»
+    // por la tarde en México y «Próximamente» antes de las 02:00 en España (cabo C0468)
+    const llegada = parseISODateLocal(perfil.fechaLlegada);
     const hoy = new Date();
     const diffDias = Math.floor((hoy.getTime() - llegada.getTime()) / (1000 * 60 * 60 * 24));
     if (diffDias < 0) return 'Próximamente';
@@ -399,8 +409,6 @@ export default function PlanificadorMascotaPage() {
       localStorage.removeItem('meskeia-mascota-perfil');
     }
   };
-
-  const hoy = new Date().toISOString().split('T')[0];
 
   return (
     <div className={styles.container}>
@@ -506,7 +514,7 @@ export default function PlanificadorMascotaPage() {
                   type="date"
                   value={perfil.fechaNacimiento}
                   onChange={(e) => setPerfil(prev => ({ ...prev, fechaNacimiento: e.target.value }))}
-                  max={hoy}
+                  max={hoy || undefined}
                   className={styles.input}
                 />
               </div>

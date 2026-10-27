@@ -6,7 +6,7 @@ import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import EducationalSection from '@/components/EducationalSection';
-import { formatDate } from '@/lib';
+import { formatDate, hoyISOLocal, parseISODateLocal } from '@/lib';
 
 // Tipos
 type TabType = 'calculadora' | 'checklist' | 'compras' | 'vacunas';
@@ -222,8 +222,17 @@ export default function CalculadoraFechaPartoPage() {
   const [filtroCategoria, setFiltroCategoria] = useState<CategoriaCompra | 'todos'>('todos');
   const [mostrarSoloSinComprar, setMostrarSoloSinComprar] = useState(false);
 
+  // Límites del campo de la FUR: de hace 294 días a hoy. Se fijan al montar y en local: en el
+  // render, el HTML prerenderizado llevaba los del build (React no corrige atributos al
+  // hidratar) y con toISOString eran los de UTC (cabos C0074 y C0468)
+  const [limitesFur, setLimitesFur] = useState({ min: '', max: '' });
+
   // Cargar datos de localStorage
   useEffect(() => {
+    const fechaMinima = new Date();
+    fechaMinima.setDate(fechaMinima.getDate() - 294);
+    setLimitesFur({ min: hoyISOLocal(fechaMinima), max: hoyISOLocal() });
+
     const savedChecklist = localStorage.getItem('meskeia-embarazo-checklist');
     const savedCompras = localStorage.getItem('meskeia-embarazo-compras');
     const savedFecha = localStorage.getItem('meskeia-embarazo-fur');
@@ -268,7 +277,9 @@ export default function CalculadoraFechaPartoPage() {
   const calcular = () => {
     if (!fechaUltimaRegla) return;
 
-    const fur = new Date(fechaUltimaRegla);
+    // En local: new Date('AAAA-MM-DD') es medianoche UTC, y en América la fecha probable de
+    // parto y la de concepción salían un día antes (cabo C0468)
+    const fur = parseISODateLocal(fechaUltimaRegla);
     const hoy = new Date();
 
     const fechaParto = new Date(fur);
@@ -376,11 +387,6 @@ export default function CalculadoraFechaPartoPage() {
     }
   };
 
-  // Fecha límites para input
-  const hoy = new Date().toISOString().split('T')[0];
-  const fechaMinima = new Date();
-  fechaMinima.setDate(fechaMinima.getDate() - 294);
-  const fechaMinimaStr = fechaMinima.toISOString().split('T')[0];
 
   return (
     <div className={styles.container}>
@@ -443,8 +449,8 @@ export default function CalculadoraFechaPartoPage() {
                 type="date"
                 value={fechaUltimaRegla}
                 onChange={(e) => setFechaUltimaRegla(e.target.value)}
-                min={fechaMinimaStr}
-                max={hoy}
+                min={limitesFur.min || undefined}
+                max={limitesFur.max || undefined}
                 className={styles.input}
               />
               <span className={styles.hint}>

@@ -5,7 +5,7 @@ import styles from './GeneradorActas.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard,
   DisclaimerCard,
 } from '@/components';
-import { formatDate as formatDateCorto } from '@/lib';
+import { formatDate as formatDateCorto, hoyISOLocal, parseISODateLocal } from '@/lib';
 
 // Tipos
 interface Asistente {
@@ -71,7 +71,9 @@ const generateId = () => Math.random().toString(36).substring(2, 11);
 // Formatear fecha para mostrar
 const formatDate = (dateStr: string): string => {
   if (!dateStr) return '';
-  const date = new Date(dateStr);
+  // En local: new Date('AAAA-MM-DD') es medianoche UTC, y en América el acta salía con el día
+  // anterior al de la reunión (cabo C0468)
+  const date = parseISODateLocal(dateStr);
   return date.toLocaleDateString('es-ES', {
     weekday: 'long',
     year: 'numeric',
@@ -86,7 +88,9 @@ export default function GeneradorActasPage() {
     id: generateId(),
     tipo: 'equipo',
     titulo: '',
-    fecha: new Date().toISOString().split('T')[0],
+    // La fecha de hoy se pone al montar (abajo): aquí saldría la del build en el HTML
+    // prerenderizado, y con toISOString la de UTC (cabos C0074 y C0468)
+    fecha: '',
     horaInicio: '09:00',
     horaFin: '10:00',
     lugar: '',
@@ -113,6 +117,7 @@ export default function GeneradorActasPage() {
 
   // Cargar datos del localStorage
   useEffect(() => {
+    setActa(prev => (prev.fecha ? prev : { ...prev, fecha: hoyISOLocal() }));
     const savedDrafts = localStorage.getItem(STORAGE_KEY);
     const savedHistory = localStorage.getItem(HISTORY_KEY);
 
@@ -176,7 +181,7 @@ export default function GeneradorActasPage() {
       id: generateId(),
       tipo: 'equipo',
       titulo: '',
-      fecha: new Date().toISOString().split('T')[0],
+      fecha: hoyISOLocal(),
       horaInicio: '09:00',
       horaFin: '10:00',
       lugar: '',

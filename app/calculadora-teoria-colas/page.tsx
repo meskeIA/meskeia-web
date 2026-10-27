@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import styles from './TeoriaColas.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
-import { formatNumber, formatDate } from '@/lib';
+import { formatNumber, formatDate, hoyISOLocal } from '@/lib';
 
 interface Metricas {
   rho: number;      // Utilización del sistema
@@ -348,7 +348,7 @@ RESULTADOS DE SIMULACIÓN
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `reporte-colas-mm1-${new Date().toISOString().slice(0, 10)}.txt`;
+    a.download = `reporte-colas-mm1-${hoyISOLocal()}.txt`;
     a.click();
     URL.revokeObjectURL(url);
   };

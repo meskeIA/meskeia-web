@@ -106,3 +106,86 @@ test.describe('C0299 · calculadora-presupuestos', () => {
     );
   });
 });
+
+/**
+ * C0468, resto de la familia (27/10/2026). Todas a las 20:00 del 16/10/2026 en Ciudad de México,
+ * cuando en UTC ya es el 17. Cada test falla con el código anterior.
+ */
+test.describe('C0468 · resto de la familia', () => {
+  test('diario-emocional: «hoy» es el 16, no el 17', async ({ page }) => {
+    await page.clock.setFixedTime(TARDE_EN_MEXICO);
+    await page.goto('/diario-emocional/');
+    await expect(page.locator('[class*="fechaHoy"]')).toHaveText('viernes 16 de octubre');
+  });
+
+  test('recordatorio-medicacion: la toma de las 08:00 sigue tomada por la noche', async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.setItem(
+        'meskeia_medicamentos_v1',
+        JSON.stringify([
+          {
+            id: '1', nombre: 'Ibuprofeno', emoji: '💊', dosis: '', horarios: ['08:00'],
+            color: '#2E86AB', tomados: { '2026-10-16_08:00': true },
+          },
+        ]),
+      );
+    });
+    await page.clock.setFixedTime(TARDE_EN_MEXICO);
+    await page.goto('/recordatorio-medicacion/');
+    await expect(page.getByRole('button', { name: 'Ibuprofeno - tomado' })).toHaveAttribute('aria-pressed', 'true');
+  });
+
+  test('conversor-horarios: convierte el día tecleado, igual que desde Madrid', async ({ page, browser }) => {
+    const leer = async (p: typeof page) => {
+      await p.goto('/conversor-horarios/');
+      await expect(p.locator('#fecha-origen')).not.toHaveValue('');
+      await p.locator('#hora-origen').fill('10:00');
+      await p.locator('#fecha-origen').fill('2026-10-20');
+      await expect(p.locator('[class*="resultadoFecha"]').first()).toBeVisible();
+      return p.locator('[class*="resultadoFecha"]').allTextContents();
+    };
+    const madrid = await browser.newContext({ timezoneId: 'Europe/Madrid', locale: 'es-ES' });
+    const desdeMadrid = await leer(await madrid.newPage());
+    await madrid.close();
+    await page.clock.setFixedTime(TARDE_EN_MEXICO);
+    expect(await leer(page)).toEqual(desdeMadrid);
+    expect(desdeMadrid.join(' ')).toContain('20 oct');
+  });
+
+  test('generador-actas: propone hoy y el acta sale con el día tecleado', async ({ page }) => {
+    await page.clock.setFixedTime(TARDE_EN_MEXICO);
+    await page.goto('/generador-actas/');
+    const fecha = page.locator('input[type="date"]').first();
+    await expect(fecha).toHaveValue('2026-10-16');
+    await fecha.fill('2026-03-05');
+    await page.getByRole('button', { name: 'Vista Previa' }).click();
+    await expect(page.getByText('Fecha:', { exact: true }).locator('..')).toContainText('jueves, 5 de marzo de 2026');
+  });
+
+  test('planificador-embarazo: FUR 05/03/2026 → parto el 10/12/2026, y tope del campo hoy', async ({ page }) => {
+    await page.clock.setFixedTime(TARDE_EN_MEXICO);
+    await page.goto('/planificador-embarazo/');
+    const fur = page.locator('input[type="date"]').first();
+    await expect(fur).toHaveAttribute('max', '2026-10-16');
+    await fur.fill('2026-03-05');
+    await page.getByRole('button', { name: /Calcular/ }).first().click();
+    await expect(page.locator('[class*="resultadoFecha"]').first()).toHaveText('jueves, 10 de diciembre de 2026');
+  });
+
+  test('planificador-mascota: llegada hoy es «¡Hoy!» y el tope del nacimiento, hoy', async ({ page }) => {
+    await page.clock.setFixedTime(TARDE_EN_MEXICO);
+    await page.goto('/planificador-mascota/');
+    const nacimiento = page.locator('input[type="date"]').first();
+    await expect(nacimiento).toHaveAttribute('max', '2026-10-16');
+    await page.getByPlaceholder('Ej: Max, Luna...').fill('Luna');
+    await page.locator('input[type="date"]').nth(1).fill('2026-10-16');
+    await expect(page.getByText('En casa', { exact: true }).locator('..')).toContainText('¡Hoy!');
+  });
+
+  test('orientador-intereses-demora: la fecha fin propuesta es hoy', async ({ page }) => {
+    await page.clock.setFixedTime(TARDE_EN_MEXICO);
+    await page.goto('/orientador-intereses-demora/');
+    await expect(page.locator('#fecha-fin')).toHaveValue('2026-10-16');
+    await expect(page.locator('#fecha-inicio')).toHaveValue('2026-09-16');
+  });
+});

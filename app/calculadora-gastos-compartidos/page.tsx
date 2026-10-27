@@ -5,7 +5,7 @@ import styles from './CalculadoraGastosCompartidos.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard, EducationalSection, DisclaimerCard } from '@/components';
-import { formatCurrency } from '@/lib';
+import { formatCurrency, hoyISOLocal } from '@/lib';
 
 // Tipos
 interface Persona {
@@ -366,7 +366,7 @@ export default function CalculadoraGastosCompartidosPage() {
         monto,
         pagadoPor: gastoPagadoPor,
         participantes: gastoParticipantes,
-        fecha: new Date().toISOString().split('T')[0],
+        fecha: hoyISOLocal(),
         categoria: gastoCategoria,
       };
       setGastos([nuevo, ...gastos]);

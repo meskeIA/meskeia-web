@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './Sonometro.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, EducationalSection, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
-import { formatNumber, formatDate } from '@/lib';
+import { formatNumber, formatDate, hoyISOLocal } from '@/lib';
 import { RESPUESTA_DECIBELIMETRO, RESPUESTA_PRECISION } from './metadata';
 
 // Niveles de referencia en dB.
@@ -773,7 +773,7 @@ export default function SonometroPage() {
     const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
     const enlace = document.createElement('a');
     enlace.href = url;
-    enlace.download = `sonometro-registro-${new Date().toISOString().slice(0, 10)}.csv`;
+    enlace.download = `sonometro-registro-${hoyISOLocal()}.csv`;
     // Un enlace fuera del documento no dispara la descarga en todos los navegadores, y
     // revocar la URL en el mismo tick del clic corre una carrera con la lectura del blob:
     // se añade, se pulsa, se retira, y la revocación espera al siguiente ciclo del bucle.

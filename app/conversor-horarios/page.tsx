@@ -4,6 +4,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import styles from './ConversorHorarios.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
+import { hoyISOLocal, parseISODateLocal } from '@/lib';
 
 // Importar estilos de flag-icons
 import 'flag-icons/css/flag-icons.min.css';
@@ -155,7 +156,7 @@ export default function ConversorHorariosPage() {
   useEffect(() => {
     const ahora = new Date();
     setHoraOrigen(ahora.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false }));
-    setFechaOrigen(ahora.toISOString().split('T')[0]);
+    setFechaOrigen(hoyISOLocal(ahora));
   }, []);
 
   // Obtener hora en una zona horaria específica
@@ -195,9 +196,10 @@ export default function ConversorHorariosPage() {
     const zonaOrigenData = zonasHorarias.find(z => z.id === zonaOrigen);
     if (!zonaOrigenData) return [];
 
-    // Crear fecha con la hora de origen
+    // Crear fecha con la hora de origen. En local: new Date('AAAA-MM-DD') es medianoche UTC, y
+    // en América convertía el día ANTERIOR al tecleado (cabo C0468)
     const [horas, minutos] = horaOrigen.split(':').map(Number);
-    const fechaBase = new Date(fechaOrigen);
+    const fechaBase = parseISODateLocal(fechaOrigen);
     fechaBase.setHours(horas, minutos, 0, 0);
 
     // Obtener offset de la zona origen
@@ -254,7 +256,7 @@ export default function ConversorHorariosPage() {
   const usarHoraActual = () => {
     const ahora = new Date();
     setHoraOrigen(ahora.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false }));
-    setFechaOrigen(ahora.toISOString().split('T')[0]);
+    setFechaOrigen(hoyISOLocal(ahora));
   };
 
   // Zona origen datos

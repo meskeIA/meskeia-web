@@ -5,6 +5,7 @@ import styles from './Notas.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard, EducationalSection, DisclaimerCard } from '@/components';
+import { hoyISOLocal } from '@/lib';
 
 // Categorías disponibles
 const CATEGORIAS = [
@@ -164,7 +165,7 @@ export default function NotasPage() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `notas-meskeia-${new Date().toISOString().split('T')[0]}.json`;
+    a.download = `notas-meskeia-${hoyISOLocal()}.json`;
     a.click();
     URL.revokeObjectURL(url);
   };

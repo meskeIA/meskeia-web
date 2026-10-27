@@ -886,7 +886,10 @@ function crearServidorDelegum(): McpServer {
     async ({ tipo_despido, salario_bruto_anual, fecha_inicio, fecha_despido, antiguedad_pre_2012, dias_cotizados_paro, num_hijos }, extra) => {
       await registrarUsoDelegum('consulta_despido', getCaller(extra));
       try {
-        const fechaFin = fecha_despido ?? new Date().toISOString().slice(0, 10);
+        // Hoy en España, no en UTC (el servidor corre en UTC): entre las 00:00 y las 01:00-02:00
+        // de Madrid, toISOString aún daba ayer (cabo C0468). en-CA formatea AAAA-MM-DD.
+        const fechaFin = fecha_despido
+          ?? new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Madrid' }).format(new Date());
         const salarioMensual = salario_bruto_anual / 12;
 
         const indem = calcularIndemnizacionDespido({
