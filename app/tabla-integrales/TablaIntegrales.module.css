@@ -789,3 +789,171 @@
 [data-theme='dark'] .avisoConstante strong {
   color: #F0A85C;
 }
+
+/* ============================================
+   FORMULARIO PARA IMPRIMIR
+============================================ */
+.imprimirBox {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--primary);
+  border-radius: var(--radius-large, 16px);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+.imprimirBox h2 {
+  margin: 0 0 var(--spacing-sm) 0;
+  font-size: 1.2rem;
+  color: var(--primary-texto);
+}
+
+.imprimirBox p {
+  color: var(--text-primary);
+  line-height: 1.7;
+  margin: 0;
+}
+
+.imprimirControles {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+}
+
+.imprimirBtn {
+  margin-top: var(--spacing-md);
+  padding: 0.7rem 1.2rem;
+  background: var(--primary-boton);
+  border: 2px solid var(--primary-boton);
+  border-radius: var(--radius);
+  color: #fff;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.imprimirBtn:hover {
+  filter: brightness(1.1);
+}
+
+.imprimirBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+[data-theme='dark'] .imprimirBox {
+  background: var(--bg-card);
+  border-color: var(--border);
+}
+
+/* La hoja de impresión no se ve en pantalla */
+.hojaFormulario {
+  display: none;
+}
+
+@media print {
+  .hojaFormulario {
+    display: block !important;
+    font-size: 9.5pt;
+    line-height: 1.25;
+  }
+
+  .hojaPagina {
+    display: block;
+  }
+
+  .hojaSolucionario {
+    break-before: page;
+    page-break-before: always;
+  }
+
+  .hojaTitulo {
+    font-size: 15pt;
+    font-weight: 700;
+    margin: 0 0 1mm;
+    text-align: center;
+    color: #000000;
+  }
+
+  .hojaDatos {
+    font-size: 9.5pt;
+    margin: 0 0 3mm;
+    text-align: center;
+    color: #000000;
+  }
+
+  /* Dos columnas fijas: el A4 deja ~718 px, así que la maquetación de móvil no pinta nada aquí */
+  .hojaColumnas {
+    column-count: 2;
+    column-gap: 6mm;
+    column-rule: 0.25mm solid #000000;
+  }
+
+  .hojaCategoria {
+    margin: 0 0 2.5mm;
+  }
+
+  .hojaCategoriaTitulo {
+    font-size: 10pt;
+    font-weight: 700;
+    margin: 0 0 1mm;
+    padding-bottom: 0.5mm;
+    border-bottom: 0.35mm solid #000000;
+    break-after: avoid;
+    page-break-after: avoid;
+    color: #000000;
+  }
+
+  .hojaFila {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    column-gap: 1.5mm;
+    min-height: 7mm;
+    padding: 0.4mm 0;
+    break-inside: avoid;
+    page-break-inside: avoid;
+    font-family: 'Cambria Math', Georgia, serif;
+  }
+
+  .hojaIntegral {
+    white-space: nowrap;
+  }
+
+  /* El hueco donde se escribe a lápiz. 8 mm y no la casilla de 9 de la familia: con 9 la
+     hoja en blanco se iba a dos páginas en Carta por una sola fila (28/10/2026), y 8 mm es
+     el mínimo que la base da por cómodo para escribir a mano. */
+  .hojaHueco {
+    flex: 1;
+    min-width: 30mm;
+    height: 8mm;
+    border-bottom: var(--linea, 0.35mm) solid #000000;
+  }
+
+  /* Los tres cambios trigonométricos, uno por línea bajo su integral */
+  .hojaBloque {
+    display: block;
+    flex-basis: 100%;
+    padding-left: 4mm;
+  }
+
+  .hojaBloque > span {
+    display: block;
+  }
+
+  .hojaCondicion {
+    font-size: 8pt;
+    font-family: Arial, sans-serif;
+  }
+
+  .hojaFormulario .frac {
+    font-size: 0.85em;
+    line-height: 1.05;
+  }
+
+  .hojaFormulario .fracNum {
+    border-bottom-width: 0.3mm;
+  }
+}

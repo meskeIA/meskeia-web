@@ -4,7 +4,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Tabla de Integrales Completa — Todas las Fórmulas con Ejemplos | meskeIA',
   description:
-    'Tabla de integrales con buscador instantáneo: inmediatas, exponenciales, logarítmicas, trigonométricas, tipo arcoseno y arcotangente, hiperbólicas y métodos de integración, con + C y ejemplos.',
+    'Tabla de integrales con buscador instantáneo: inmediatas, exponenciales, logarítmicas, trigonométricas, tipo arcoseno y arcotangente, hiperbólicas y métodos de integración, con + C y ejemplos. Se imprime en una hoja.',
   keywords:
     'tabla de integrales, integrales, formulario de integrales, tabla integrales completa, integrales inmediatas, integración por partes, ILATE, fracciones simples, regla de Barrow, primitiva, cálculo integral, matemáticas',
   authors: [{ name: 'meskeIA' }],
@@ -57,6 +57,7 @@ export const jsonLd = generateWebAppSchema({
     'Justificación y ejemplo resuelto paso a paso en cada fila desplegable',
     'Métodos de integración: sustitución, por partes (ILATE), fracciones simples y sustituciones trigonométricas',
     'Sección sobre integral definida y regla de Barrow',
+    'Formulario imprimible en una sola cara (Carta o A4) y hoja en blanco para practicar con su solucionario',
     'Funciona 100% en el navegador, sin registro ni instalación',
   ],
   keywords: ['tabla de integrales', 'integrales', 'primitiva', 'regla de Barrow', 'cálculo integral'],

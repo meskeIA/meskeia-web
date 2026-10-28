@@ -4,6 +4,7 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import styles from './TablaIntegrales.module.css';
+import impresion from '@/styles/impresion.module.css';
 import {
   MeskeiaLogo,
   Footer,
@@ -1031,6 +1032,83 @@ const INTEGRALES: EntradaIntegral[] = [
 ];
 
 /* ────────────────────────────────────────────────────────────────
+   FORMULARIO PARA IMPRIMIR
+   Quien teclea «tabla de integrales» suele querer la hoja: la búsqueda
+   devuelve casi solo PDF (semilla S0234, 28/10/2026). Las 40 fórmulas en
+   una cara, y en blanco con el solucionario en una segunda página.
+──────────────────────────────────────────────────────────────── */
+
+type ModoHoja = 'completo' | 'blanco';
+
+/**
+ * En papel la condición va entre paréntesis junto a la fórmula, así que las que en pantalla
+ * explican algo se acortan, y las que no restringen nada se quitan (cadena vacía).
+ */
+const CONDICION_EN_HOJA: Partial<Record<string, string>> = {
+  constante: '',
+  potencia: 'n ≠ −1',
+  'potencia-menos-uno': 'x ≠ 0',
+  'arctan-basica': '',
+  'log-raiz-suma': 'a > 0',
+  tgh: '',
+  'metodo-fracciones': 'grado P < grado Q',
+};
+
+/** «integral trigonométrica tras el cambio» no sirve en un formulario: se ponen los tres cambios. */
+const PRIMITIVA_EN_HOJA: Partial<Record<string, ReactNode>> = {
+  'metodo-trigonometricas': (
+    <span className={styles.hojaBloque}>
+      <span>con √(a² − x²): x = a·sen t</span>
+      <span>con √(a² + x²): x = a·tg t</span>
+      <span>con √(x² − a²): x = a·sec t</span>
+    </span>
+  ),
+};
+
+/** Su «primitiva» es una descripción, no algo que el alumno escriba: en blanco salen resueltas. */
+const SIEMPRE_RESUELTAS = new Set(['metodo-fracciones', 'metodo-trigonometricas']);
+
+function HojaFormulario({ enBlanco }: { enBlanco: boolean }) {
+  return (
+    <>
+      {CATEGORIAS.map((categoria) => (
+        <section key={categoria.id} className={styles.hojaCategoria}>
+          <h3 className={styles.hojaCategoriaTitulo}>{categoria.nombre}</h3>
+          {INTEGRALES.filter((entrada) => entrada.categoria === categoria.id).map((entrada) => {
+            const condicion = CONDICION_EN_HOJA[entrada.id] ?? entrada.condiciones ?? '';
+            const vacia = enBlanco && !SIEMPRE_RESUELTAS.has(entrada.id);
+            return (
+              <div key={entrada.id} className={styles.hojaFila}>
+                <span className={styles.hojaIntegral}>{entrada.integral}</span>
+                <span>=</span>
+                {vacia ? (
+                  <span className={styles.hojaHueco} />
+                ) : (
+                  (PRIMITIVA_EN_HOJA[entrada.id] ?? <span>{entrada.primitiva}</span>)
+                )}
+                {condicion !== '' && <span className={styles.hojaCondicion}>({condicion})</span>}
+              </div>
+            );
+          })}
+        </section>
+      ))}
+      <section className={styles.hojaCategoria}>
+        <h3 className={styles.hojaCategoriaTitulo}>Integral definida (regla de Barrow)</h3>
+        <div className={styles.hojaFila}>
+          <span className={styles.hojaIntegral}>
+            ∫<sub>a</sub>
+            <sup>b</sup> f(x) dx
+          </span>
+          <span>=</span>
+          <span>F(b) − F(a)</span>
+          <span className={styles.hojaCondicion}>(F primitiva de f, f continua en [a, b])</span>
+        </div>
+      </section>
+    </>
+  );
+}
+
+/* ────────────────────────────────────────────────────────────────
    Componente principal
 ──────────────────────────────────────────────────────────────── */
 
@@ -1038,6 +1116,7 @@ export default function TablaIntegralesPage() {
   const [consulta, setConsulta] = useState('');
   const [categoriaActiva, setCategoriaActiva] = useState<CategoriaId | 'todas'>('todas');
   const [abiertas, setAbiertas] = useState<string[]>([]);
+  const [modoHoja, setModoHoja] = useState<ModoHoja>('completo');
   const buscadorRef = useRef<HTMLInputElement>(null);
 
   // Foco automático al cargar: quien llega con un examen delante escribe directo
@@ -1063,7 +1142,8 @@ export default function TablaIntegralesPage() {
   };
 
   return (
-    <div className={styles.container}>
+    <div className={`${styles.container} ${impresion.lienzo}`}>
+      <div className={impresion.noImprimir}>
       <MeskeiaLogo />
 
       {/* Hero */}
@@ -1237,6 +1317,46 @@ export default function TablaIntegralesPage() {
           })}
         </ul>
       )}
+
+      {/* Formulario para imprimir */}
+      <section className={styles.imprimirBox} aria-labelledby="titulo-imprimir">
+        <h2 id="titulo-imprimir">
+          <span aria-hidden="true">🖨️</span> Formulario para imprimir
+        </h2>
+        <p>
+          Las {INTEGRALES.length} fórmulas y la regla de Barrow en una sola cara, en tamaño Carta o
+          A4. En blanco, la hoja deja vacía la columna de la primitiva para practicar de memoria, y
+          el solucionario sale en una segunda página para poder repartirla.
+        </p>
+        <div className={styles.imprimirControles}>
+          <div className={styles.filtros} role="group" aria-label="Qué hoja se imprime">
+            <button
+              type="button"
+              className={`${styles.filtroBtn} ${
+                modoHoja === 'completo' ? styles.filtroBtnActivo : ''
+              }`}
+              aria-pressed={modoHoja === 'completo'}
+              onClick={() => setModoHoja('completo')}
+            >
+              Formulario completo
+            </button>
+            <button
+              type="button"
+              className={`${styles.filtroBtn} ${
+                modoHoja === 'blanco' ? styles.filtroBtnActivo : ''
+              }`}
+              aria-pressed={modoHoja === 'blanco'}
+              onClick={() => setModoHoja('blanco')}
+            >
+              En blanco, para practicar
+            </button>
+          </div>
+          <button type="button" className={styles.imprimirBtn} onClick={() => window.print()}>
+            <span aria-hidden="true">🖨️</span>{' '}
+            {modoHoja === 'blanco' ? 'Imprimir hoja y solucionario' : 'Imprimir el formulario'}
+          </button>
+        </div>
+      </section>
 
       {/* Integral definida y regla de Barrow */}
       <section className={styles.barrowBox} aria-label="Integral definida y regla de Barrow">
@@ -1729,6 +1849,36 @@ export default function TablaIntegralesPage() {
       <ShareCard appName="tabla-integrales" />
 
       <Footer appName="tabla-integrales" />
+      </div>
+
+      {/* Única parte que sale por la impresora (ver styles/impresion.module.css). En blanco
+          lleva detrás su solucionario, en página aparte, para que la hoja se pueda repartir. */}
+      <div className={`${styles.hojaFormulario} ${impresion.hoja}`} data-hoja-formulario="">
+        <div className={styles.hojaPagina}>
+          <h2 className={styles.hojaTitulo}>
+            Tabla de integrales{modoHoja === 'blanco' ? ': complétala' : ''}
+          </h2>
+          <p className={styles.hojaDatos}>
+            {modoHoja === 'blanco'
+              ? 'Escribe la primitiva de cada integral. Toda primitiva lleva + C.'
+              : 'Toda primitiva lleva + C. Entre paréntesis, la condición para que la fórmula valga.'}
+          </p>
+          <div className={styles.hojaColumnas}>
+            <HojaFormulario enBlanco={modoHoja === 'blanco'} />
+          </div>
+        </div>
+        {modoHoja === 'blanco' && (
+          <div className={`${styles.hojaPagina} ${styles.hojaSolucionario}`}>
+            <h2 className={styles.hojaTitulo}>Tabla de integrales: solucionario</h2>
+            <p className={styles.hojaDatos}>
+              Toda primitiva lleva + C. Entre paréntesis, la condición para que la fórmula valga.
+            </p>
+            <div className={styles.hojaColumnas}>
+              <HojaFormulario enBlanco={false} />
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
