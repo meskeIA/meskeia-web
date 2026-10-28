@@ -72,8 +72,10 @@ const PLANTAS: PlantaQuiz[] = [
   { id: 4, emoji: '🔴', nombreComun: 'Nori', nombreCientifico: 'Pyropia yezoensis', grupo: 'alga', pista: 'La lámina rojo-morada que envuelve el sushi', explicacion: 'Alga roja (Rhodophyta): pigmento ficoeritrina que le da color rojo y permite vivir en aguas profundas captando luz azul. Fuente de agar-agar.', dificultad: 'facil' },
   { id: 5, emoji: '🌿', nombreComun: 'Fucus', nombreCientifico: 'Fucus vesiculosus', grupo: 'alga', pista: 'Alga parda con vejiguitas de aire en sus frondes, muy común en costas atlánticas', explicacion: 'Alga parda (Phaeophyta): vejiguitas de flotación (aerocistos), sin vasculatura, ciclo de vida con alternancia de generaciones. Fuente de yodo.', dificultad: 'medio' },
   { id: 6, emoji: '💚', nombreComun: 'Chara', nombreCientifico: 'Chara vulgaris', grupo: 'alga', pista: 'Alga de agua dulce que parece una planta acuática, con nudos y "hojas" ramificadas', explicacion: 'Alga verde carófita: el grupo más emparentado con las plantas terrestres. Tiene plasmodesmatos y síntesis de celulosa igual que las plantas. Vive en aguas calcáreas.', dificultad: 'dificil' },
-  // Trampa: posidonia
-  { id: 7, emoji: '🌊', nombreComun: 'Posidonia', nombreCientifico: 'Posidonia oceanica', grupo: 'dicotiledonea', pista: 'Forma praderas submarinas en el Mediterráneo; parece un alga pero tiene flores y frutos', explicacion: '¡Trampa! Es una angiosperma dicotiledónea acuática marina. Tiene raíces, tallos, hojas y flores verdaderas. Las praderas de posidonia son ecosistemas protegidos y grandes productores de O₂.', dificultad: 'dificil' },
+  // Trampa: posidonia. Es MONOCOTILEDÓNEA (familia Posidoniaceae, orden Alismatales, como todas
+  // las fanerógamas marinas): la app la daba por dicotiledónea en la clave, la explicación y la
+  // FAQ, y daba por mala la respuesta correcta (hallazgo 3724).
+  { id: 7, emoji: '🌊', nombreComun: 'Posidonia', nombreCientifico: 'Posidonia oceanica', grupo: 'monocotiledonea', pista: 'Forma praderas submarinas en el Mediterráneo; parece un alga pero tiene flores y frutos', explicacion: '¡Trampa! Es una angiosperma monocotiledónea acuática marina, de la familia de las posidoniáceas. Tiene raíces, tallos, hojas y flores verdaderas. Las praderas de posidonia son ecosistemas protegidos y grandes productores de O₂.', dificultad: 'dificil' },
 
   // BRIÓFITOS (6)
   { id: 8, emoji: '🟢', nombreComun: 'Musgo de turbera', nombreCientifico: 'Sphagnum palustre', grupo: 'briofito', pista: 'Forma alfombras esponjosas en turberas; puede absorber hasta 20 veces su peso en agua', explicacion: 'Briófito (musgo): sin vasculatura, sin raíces verdaderas (rizoides), gametofito dominante. El Sphagnum forma turba al acumularse durante miles de años.', dificultad: 'facil' },
@@ -101,7 +103,7 @@ const PLANTAS: PlantaQuiz[] = [
   { id: 26, emoji: '🌲', nombreComun: 'Ciprés mediterráneo', nombreCientifico: 'Cupressus sempervirens', grupo: 'gimnosperma', pista: 'Árbol columnar oscuro, siempreverde, símbolo del paisaje mediterráneo', explicacion: 'Gimnosperma conífera cupresácea: conos pequeños y redondeados (gálbulos). Hojas escamiformes (no aciculares). Altamente resistente a la sequía.', dificultad: 'facil' },
   { id: 27, emoji: '🌿', nombreComun: 'Welwitschia', nombreCientifico: 'Welwitschia mirabilis', grupo: 'gimnosperma', pista: 'Solo 2 hojas que crecen sin parar durante 1.000-2.000 años en el desierto de Namib; parece un pulpo', explicacion: 'Gimnosperma gnetofita: uno de los seres vivos más singulares. Solo produce 2 hojas en toda su vida que se fragmentan por el viento. Endémica del desierto de Namib. Resiste sequías extremas.', dificultad: 'dificil' },
 
-  // MONOCOTILEDÓNEAS (7)
+  // MONOCOTILEDÓNEAS (7, y la posidonia de arriba: 8 en «Practicar Monocotiledónea»)
   { id: 28, emoji: '🌾', nombreComun: 'Trigo', nombreCientifico: 'Triticum aestivum', grupo: 'monocotiledonea', pista: 'Cereal de espiga con granos encerrados en glumas; base de la alimentación en muchas regiones del mundo', explicacion: 'Angiosperma monocotiledónea: 1 cotiledón, raíz fasciculada, hojas con nervación paralela, flores trímeras. Las gramíneas (Poaceae) son la familia más importante de monocotiledóneas.', dificultad: 'facil' },
   { id: 29, emoji: '🌴', nombreComun: 'Palmera datilera', nombreCientifico: 'Phoenix dactylifera', grupo: 'monocotiledonea', pista: 'Tronco sin ramificar con corona de hojas pinnadas; produce dátiles', explicacion: 'Monocotiledónea: sin crecimiento secundario (sin madera verdadera); el tronco crece en grosor por células del meristemo primario. Hojas pinnadas. Dioica.', dificultad: 'medio' },
   { id: 30, emoji: '🌺', nombreComun: 'Orquídea silvestre', nombreCientifico: 'Orchis mascula', grupo: 'monocotiledonea', pista: 'Flores simétricas con labelo; la familia vegetal más diversa (28.000 especies)', explicacion: 'Monocotiledónea: flores de simetría bilateral (zigomorfa), 3 pétalos (uno transformado en labelo), 3 sépalos. Raíces con velamen para absorber agua del aire.', dificultad: 'medio' },
@@ -194,17 +196,22 @@ export default function QuizTiposPlantas() {
 function QuizPorFases() {
   const [juego, setJuego] = useState<EstadoJuego>(ESTADO_INICIAL);
 
-  // Opciones de la pregunta actual (re-generadas al cambiar de pregunta)
+  // Opciones de la pregunta actual (re-generadas al cambiar de pregunta). Dependían de
+  // `juego.estado`, así que al pasar de 'jugando' a 'feedback' se volvían a sortear: la rejilla
+  // cambiaba bajo el dedo al contestar y la opción elegida podía desaparecer (hallazgo 3725).
+  // Ahora solo cuenta si hay pregunta en pantalla, que es lo mismo en las dos fases.
+  const preguntaEnPantalla = juego.estado === 'jugando' || juego.estado === 'feedback';
   const opcionesActuales = useMemo(() => {
-    if (juego.estado !== 'jugando' && juego.estado !== 'feedback') return [];
+    if (!preguntaEnPantalla) return [];
     if (juego.preguntas.length === 0) return [];
     return generarOpciones(juego.preguntas[juego.indiceActual]);
-  }, [juego.indiceActual, juego.preguntas, juego.estado]);
+  }, [juego.indiceActual, juego.preguntas, preguntaEnPantalla]);
 
   const plantaActual = juego.preguntas[juego.indiceActual] ?? null;
 
   // Doble toque en el modo, «Siguiente» o «Ver resultados»: el 2.º no cae en la pantalla nueva
-  // (cabo C0082, lib/useGuardaRafaga.ts)
+  // (cabo C0082, lib/useGuardaRafaga.ts). Y en la opción: el foco a «Siguiente» sube la página y
+  // deja el botón bajo el dedo, así que el 2.º toque en el mismo punto se ignora (3679 en la familia)
   const marcarCambioPantalla = useGuardaRafaga();
 
   // --- Iniciar quiz ---
@@ -225,6 +232,7 @@ function QuizPorFases() {
   // --- Seleccionar respuesta ---
   const seleccionarRespuesta = useCallback((respuesta: GrupoPlanta) => {
     if (juego.estado !== 'jugando' || !plantaActual) return;
+    marcarCambioPantalla({ soloMismoPunto: true });
     const esCorrecta = respuesta === plantaActual.grupo;
     setJuego((prev) => ({
       ...prev,
@@ -235,7 +243,7 @@ function QuizPorFases() {
         ? prev.errores
         : [...prev.errores, { planta: plantaActual, respuestaUsuario: respuesta }],
     }));
-  }, [juego.estado, plantaActual]);
+  }, [juego.estado, plantaActual, marcarCambioPantalla]);
 
   // --- Siguiente pregunta ---
   const siguientePregunta = useCallback(() => {
@@ -527,7 +535,7 @@ function QuizPorFases() {
                 { pregunta: '¿Los hongos son plantas?', respuesta: 'No. Los hongos tienen su propio reino (Fungi). No realizan fotosíntesis, tienen quitina en sus paredes (no celulosa) y obtienen nutrientes por absorción. Son más emparentados con los animales que con las plantas.' },
                 { pregunta: '¿Cómo distingo monocotiledóneas de dicotiledóneas rápidamente?', respuesta: 'Mira las hojas: si las venas son paralelas → monocot. Si forman una red → dicot. También: flor con piezas en múltiplos de 3 → monocot; de 4 o 5 → dicot. El tronco leñoso (madera) indica casi siempre dicot.' },
                 { pregunta: '¿Las algas son el grupo más antiguo?', respuesta: 'Son el más antiguo (surgieron hace unos 3.500 millones de años), pero no necesariamente el más simple: algunas algas pardas (kelp) tienen estructuras complejas. En biología evolutiva, "antiguo" no equivale a "simple".' },
-                { pregunta: '¿La posidonia es un alga?', respuesta: '¡No! Es una trampa clásica. La posidonia es una angiosperma dicotiledónea que volvió al mar hace 65-100 millones de años. Tiene raíces, tallos, hojas y flores verdaderas. Sus praderas son ecosistemas cruciales del Mediterráneo.' },
+                { pregunta: '¿La posidonia es un alga?', respuesta: '¡No! Es una trampa clásica. La posidonia es una angiosperma monocotiledónea que volvió al mar hace 65-100 millones de años. Tiene raíces, tallos, hojas y flores verdaderas. Sus praderas son ecosistemas cruciales del Mediterráneo.' },
               ].map((item) => (
                 <details key={item.pregunta} className={styles.faqItem}>
                   <summary className={styles.faqPregunta}>{item.pregunta}</summary>
@@ -731,7 +739,7 @@ function QuizPorFases() {
               { pregunta: '¿Los hongos son plantas?', respuesta: 'No. Los hongos tienen su propio reino (Fungi). No realizan fotosíntesis, tienen quitina en sus paredes (no celulosa) y obtienen nutrientes por absorción. Son más emparentados con los animales que con las plantas.' },
               { pregunta: '¿Cómo distingo monocotiledóneas de dicotiledóneas rápidamente?', respuesta: 'Mira las hojas: si las venas son paralelas → monocot. Si forman una red → dicot. También: flor con piezas en múltiplos de 3 → monocot; de 4 o 5 → dicot. El tronco leñoso (madera) indica casi siempre dicot.' },
               { pregunta: '¿Las algas son el grupo más antiguo?', respuesta: 'Son el más antiguo (surgieron hace unos 3.500 millones de años), pero no necesariamente el más simple: algunas algas pardas (kelp) tienen estructuras complejas. En biología evolutiva, "antiguo" no equivale a "simple".' },
-              { pregunta: '¿La posidonia es un alga?', respuesta: '¡No! Es una trampa clásica. La posidonia es una angiosperma dicotiledónea que volvió al mar hace 65-100 millones de años. Tiene raíces, tallos, hojas y flores verdaderas. Sus praderas son ecosistemas cruciales del Mediterráneo.' },
+              { pregunta: '¿La posidonia es un alga?', respuesta: '¡No! Es una trampa clásica. La posidonia es una angiosperma monocotiledónea que volvió al mar hace 65-100 millones de años. Tiene raíces, tallos, hojas y flores verdaderas. Sus praderas son ecosistemas cruciales del Mediterráneo.' },
             ].map((item) => (
               <details key={item.pregunta} className={styles.faqItem}>
                 <summary className={styles.faqPregunta}>{item.pregunta}</summary>

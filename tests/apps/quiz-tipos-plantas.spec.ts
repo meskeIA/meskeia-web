@@ -13,7 +13,8 @@ import { esperarPaginaAsentada } from './_hidratacion';
  * · <h1> «¿Musgo, Helecho o Angiosperma?» · «Clasifica 40 plantas en su grupo botánico correcto».
  * · Modo Rápido (20 preguntas al azar), Modo Completo (las 40) y «Practicar por grupo» (6 botones,
  *   uno por grupo, con las plantas de ese grupo: 6 algas, 6 briófitos, 7 pteridófitos, 7
- *   gimnospermas, 7 monocotiledóneas y 7 dicotiledóneas contando la posidonia).
+ *   gimnospermas, 8 monocotiledóneas contando la posidonia y 6 dicotiledóneas; hasta el 3724 la
+ *   posidonia contaba entre las dicotiledóneas).
  * · Cada pregunta: el nombre común y el científico de una planta, una pista y cuatro grupos (el
  *   correcto y tres de los otros cinco al azar). Tras responder, la explicación y «Siguiente».
  * · Resultado: «Resultado: c/t», porcentaje, emoji por tramo, aciertos por grupo y lista de fallos.
@@ -45,7 +46,7 @@ const norm = (s: string | null | undefined): string => (s ?? '').replace(/\s+/g,
 /** Clave de la app (page.tsx, `PLANTAS`): grupo marcado como correcto, por nombre común. */
 const CLAVE: Record<string, string> = {
   'Lechuga de mar': 'Alga', Espirulina: 'Alga', 'Kelp gigante': 'Alga', Nori: 'Alga', Fucus: 'Alga', Chara: 'Alga',
-  Posidonia: 'Dicotiledónea',
+  Posidonia: 'Monocotiledónea', // era 'Dicotiledónea' hasta el hallazgo 3724
   'Musgo de turbera': 'Briófito', 'Musgo de pared': 'Briófito', Marchantia: 'Briófito', Politriquio: 'Briófito',
   Antocerota: 'Briófito', 'Hepática acuática': 'Briófito',
   'Helecho común': 'Pteridófito', 'Cola de caballo': 'Pteridófito', Licopodio: 'Pteridófito', 'Helecho árbol': 'Pteridófito',
@@ -397,13 +398,13 @@ test.describe('Doble toque · escritorio 1280 × 800', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 
 test.describe('Inspector 28/10/2026 · hallazgos de la partida', () => {
-  test('hallazgo · al responder, las cuatro opciones no se rebarajan ni cambian', async ({ page }) => {
-    // page.tsx:198-202 — `opcionesActuales` es un useMemo que depende de `juego.estado`: al pasar de
-    // 'jugando' a 'feedback' vuelve a llamar a generarOpciones(), que baraja y saca OTROS tres
-    // distractores. Medido el 28/10/2026 en una partida rápida: el orden cambia en 20 de 20
-    // respuestas, el conjunto en 18 de 20, y en 4 de 7 fallos la opción elegida desaparece (no
-    // queda ningún botón rojo). Esperado: las mismas cuatro, en el mismo orden, la elegida en rojo.
-    test.fail();
+  test('3725 · al responder, las cuatro opciones no se rebarajan ni cambian', async ({ page }) => {
+    // page.tsx:198-202 — `opcionesActuales` era un useMemo que dependía de `juego.estado`: al pasar de
+    // 'jugando' a 'feedback' volvía a llamar a generarOpciones(), que baraja y saca OTROS tres
+    // distractores. Medido el 28/10/2026 en una partida rápida: el orden cambiaba en 20 de 20
+    // respuestas, el conjunto en 18 de 20, y en 4 de 7 fallos la opción elegida desaparecía (no
+    // quedaba ningún botón rojo). Esperado: las mismas cuatro, en el mismo orden, la elegida en rojo.
+    // REPARADO el 28/10/2026: depende de si hay pregunta en pantalla, igual en las dos fases.
     test.setTimeout(60_000);
     await abrir(page);
     await empezar(page, /^Modo rápido/);
@@ -509,20 +510,19 @@ function ficha(nombreComun: string): { grupo: string; explicacion: string } {
 }
 
 test.describe('Inspector 28/10/2026 · hallazgos del banco y los textos', () => {
-  test('hallazgo · la posidonia es monocotiledónea, no dicotiledónea', async ({ page }) => {
+  test('3724 · la posidonia es monocotiledónea, no dicotiledónea', async ({ page }) => {
     // Posidonia oceanica (L.) Delile: familia Posidoniaceae, orden Alismatales, monocotiledóneas
-    // (como todas las fanerógamas marinas: Zostera, Cymodocea). La app la marca 'dicotiledonea'
-    // (page.tsx:76), lo repite la explicación y la FAQ visible («angiosperma dicotiledónea»).
-    // Caso: en «Practicar Dicotiledónea» llega la posidonia, se pulsa «Monocotiledónea» →
-    // esperado «¡Correcto!» · obtenido «❌ Era: Dicotiledónea». Se repite la partida hasta que la
-    // posidonia ofrece «Monocotiledónea» (sale con probabilidad 3/5; 8 intentos fallan 7 de 10.000).
-    test.fail();
+    // (como todas las fanerógamas marinas: Zostera, Cymodocea). La app la marcaba 'dicotiledonea'
+    // (page.tsx:76), lo repetía la explicación y la FAQ visible («angiosperma dicotiledónea»).
+    // Caso: llega la posidonia, se pulsa «Monocotiledónea» → esperado «¡Correcto!» · obtenido
+    // «❌ Era: Dicotiledónea». REPARADO el 28/10/2026: ahora es del grupo monocotiledónea, así que
+    // llega en «Practicar Monocotiledónea» (8 preguntas), donde esa opción sale siempre.
     test.setTimeout(120_000);
     await abrir(page);
     let titulo = '';
-    for (let intento = 0; intento < 8 && !titulo; intento++) {
-      await empezar(page, /^Practicar Dicotiledónea/);
-      for (let n = 1; n <= 7; n++) {
+    for (let intento = 0; intento < 2 && !titulo; intento++) {
+      await empezar(page, /^Practicar Monocotiledónea/);
+      for (let n = 1; n <= 8; n++) {
         const nombre = norm(await enunciado(page).innerText());
         if (nombre === 'Posidonia') {
           if (!(await rotulos(page)).includes('Monocotiledónea')) break;
@@ -535,13 +535,13 @@ test.describe('Inspector 28/10/2026 · hallazgos del banco y los textos', () => 
       }
       if (!titulo) await page.getByRole('button', { name: 'Salir del quiz' }).click();
     }
-    expect(titulo, 'la posidonia no llegó a ofrecer «Monocotiledónea» en 8 partidas').not.toBe('');
-    expect(titulo, 'respuesta «Monocotiledónea» a la posidonia').toBe('¡Correcto!');
+    expect(titulo, 'la posidonia no llegó en «Practicar Monocotiledónea»').not.toBe('');
+    expect(titulo, 'respuesta «Monocotiledónea» a la posidonia').toMatch(/¡Correcto!$/);
   });
 
-  test('hallazgo · la FAQ visible no dice que la posidonia sea dicotiledónea', async ({ page }) => {
+  test('3724 · la FAQ visible no dice que la posidonia sea dicotiledónea', async ({ page }) => {
     // page.tsx:734 (y :530): «La posidonia es una angiosperma dicotiledónea que volvió al mar».
-    test.fail();
+    // REPARADO el 28/10/2026.
     await abrir(page);
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     const item = page.locator('details').filter({ hasText: '¿La posidonia es un alga?' });
