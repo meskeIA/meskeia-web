@@ -253,13 +253,14 @@ export default function CaosMariposaPage() {
         {/* Controles */}
         <div className={styles.controles}>
           <div className={styles.controlGrupo}>
-            <label className={styles.controlLabel}>
+            <label htmlFor="progreso-simulacion" className={styles.controlLabel}>
               Progreso de la simulación:{' '}
               <strong>
                 paso {progreso.toLocaleString('es-ES')} / {N_STEPS.toLocaleString('es-ES')}
               </strong>
             </label>
             <input
+              id="progreso-simulacion"
               type="range"
               min={100}
               max={N_STEPS}
@@ -272,10 +273,11 @@ export default function CaosMariposaPage() {
           </div>
 
           <div className={styles.controlGrupo}>
-            <label className={styles.controlLabel}>
+            <label htmlFor="diferencia-inicial" className={styles.controlLabel}>
               Diferencia inicial (ε): <strong>{epsilon.toExponential(2)}</strong>
             </label>
             <input
+              id="diferencia-inicial"
               type="range"
               min={0}
               max={30}

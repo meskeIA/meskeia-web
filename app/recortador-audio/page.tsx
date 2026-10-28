@@ -561,8 +561,9 @@ export default function RecortadorAudioPage() {
             {/* Controles de tiempo */}
             <div className={styles.timeControls}>
               <div className={styles.timeInput}>
-                <label>Inicio</label>
+                <label htmlFor="inicio-recorte">Inicio</label>
                 <input
+                  id="inicio-recorte"
                   type="range"
                   min={0}
                   max={audioInfo.duration}
@@ -578,8 +579,9 @@ export default function RecortadorAudioPage() {
               </div>
 
               <div className={styles.timeInput}>
-                <label>Fin</label>
+                <label htmlFor="fin-recorte">Fin</label>
                 <input
+                  id="fin-recorte"
                   type="range"
                   min={0}
                   max={audioInfo.duration}
@@ -621,8 +623,9 @@ export default function RecortadorAudioPage() {
 
               <div className={styles.effectRow}>
                 <div className={styles.effectControl}>
-                  <label>Volumen: {volume}%</label>
+                  <label htmlFor="volumen">Volumen: {volume}%</label>
                   <input
+                    id="volumen"
                     type="range"
                     min={0}
                     max={200}
@@ -633,8 +636,9 @@ export default function RecortadorAudioPage() {
                 </div>
 
                 <div className={styles.effectControl}>
-                  <label>Fade In: {formatNumber(fadeIn, 1)}s</label>
+                  <label htmlFor="fade-in">Fade In: {formatNumber(fadeIn, 1)}s</label>
                   <input
+                    id="fade-in"
                     type="range"
                     min={0}
                     max={Math.min(5, selectedDuration / 2)}
@@ -646,8 +650,9 @@ export default function RecortadorAudioPage() {
                 </div>
 
                 <div className={styles.effectControl}>
-                  <label>Fade Out: {formatNumber(fadeOut, 1)}s</label>
+                  <label htmlFor="fade-out">Fade Out: {formatNumber(fadeOut, 1)}s</label>
                   <input
+                    id="fade-out"
                     type="range"
                     min={0}
                     max={Math.min(5, selectedDuration / 2)}
