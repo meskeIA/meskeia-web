@@ -3068,6 +3068,39 @@ test.describe('Simulador de heredar vivienda — re-inspección 10/09/2026', () 
   });
 
   /**
+   * Art. 27 de la Ley 5/2021 de Andalucía (BOE-A-2021-17915, leído el 28/10/2026): la reducción
+   * por vivienda habitual es del 99 % (27.1) y basta mantenerla TRES años (27.2.b). Solo cambia
+   * el porcentaje: el tope de 122.606,47 € por sujeto pasivo es el del art. 20.2.c LISD.
+   *
+   * Hijo, Andalucía, vivienda habitual de 300.000 €:
+   *   300.000 × 99 % = 297.000 → topada en 122.606,47 €
+   *   La reducción de 1.000.000 € del art. 28 deja la base liquidable en 0, así que la cuota no
+   *   se mueve: lo que cambia es el AVISO. Hasta hoy, vender a los 5 años avisaba de que se
+   *   perdía la reducción citando los 10 años del art. 20.2.c; ahora vender a los 2 años cita
+   *   los 3 del art. 27, y a los 5 no hay aviso.
+   */
+  test('art. 27 — en Andalucía la vivienda reduce el 99 % y basta mantenerla 3 años', async ({ page }) => {
+    await abrir(page);
+    await page.selectOption('#parentescoSel', 'hijo');
+    await page.selectOption('#ccaaSel', 'andalucia');
+    await casilla(page, 'viviendaHabitual', true);
+    await mover(page, 'valorRef', 300000);
+    await mover(page, 'aniosVenta', 2);
+
+    const etiqueta = (await page.locator('label:has(#viviendaHabitual)').innerText()).replace(/\s+/g, ' ');
+    expect(etiqueta).toContain('99 %');
+    expect(etiqueta).toContain('122.606,47 €');
+    expect(await linea(page, ISD, '− Reducción vivienda habitual (99 %)')).toBe('−122.606,47 €');
+
+    const aviso = await panel(page, ISD);
+    expect(aviso).toContain('el art. 27 Ley 5/2021 de Andalucía exige mantenerla 3 años');
+    expect(aviso, 'Andalucía tiene plazo propio').not.toContain('Otras comunidades fijan plazos de mantenimiento propios');
+
+    await mover(page, 'aniosVenta', 5);
+    expect(await panel(page, ISD)).not.toContain('Pierdes la reducción');
+  });
+
+  /**
    * CASO 3 (RECHAZO) — Cataluña deniega la reducción por vivienda habitual al Grupo IV, y
    * lo DICE con su norma, no con la estatal.
    *
@@ -5186,13 +5219,15 @@ test.describe('Simulador de heredar vivienda — re-inspección 21/09/2026', () 
     await mover(page, 'valorSuelo', 50000);
     await mover(page, 'valorCatastralTotal', 100000);
     await casilla(page, 'viviendaHabitual', true);
-    await mover(page, 'aniosVenta', 3);
+    // A los 2 años: el art. 27.2.b de la Ley 5/2021 pide mantenerla 3 (hasta el 28/10/2026 la app
+    // aplicaba los 10 estatales y el caso vendía a los 3; a los 3 ya no hay aviso que medir).
+    await mover(page, 'aniosVenta', 2);
     await mover(page, 'valorVta', 250000);
 
     // La reducción se aplica, pero la de 1.000.000 € de Andalucía en la base (art. 28 Ley 5/2021;
     // hasta el 28/10/2026 se modelaba como exención) deja la cuota en cero con y sin ella, así que
     // no hay nada que regularizar — y el bloque total ya lo refleja
-    expect(await linea(page, ISD, '− Reducción vivienda habitual (95 %)')).toBe('−122.606,47 €');
+    expect(await linea(page, ISD, '− Reducción vivienda habitual (99 %)')).toBe('−122.606,47 €');
     expect(await linea(page, ISD, 'Cuota ISD final')).toBe('0,00 €');
     expect(await bloqueTotal(page)).not.toContain('ISD regularizado');
 

@@ -26,6 +26,12 @@ export const NOVEDADES: Novedad[] = [
     fecha: '2026-10-28',
     fichaSlug: 'sucesiones-isd',
     texto:
+      'Andalucía: la reducción por la vivienda habitual del fallecido es del 99 % y no del 95 %, con el mismo tope estatal de 122.606,47 € por heredero, y basta mantenerla tres años en lugar de diez (art. 27 de la Ley 5/2021, BOE-A-2021-17915).',
+  },
+  {
+    fecha: '2026-10-28',
+    fichaSlug: 'sucesiones-isd',
+    texto:
       'Andalucía: ya no figura una «exención» de la herencia por debajo de 1.000.000 € de base. La Ley 5/2021 reduce 1.000.000 € de la base a los Grupos I y II y 10.000 € al Grupo III (art. 28), más 250.000 o 500.000 € con discapacidad (art. 29), y bonifica el 99 % de la cuota a los Grupos I y II (art. 39). Además aplica tarifa propia, del 7 % al 26 % (art. 37), y coeficientes propios de 1,0, 1,5 y 1,9 sin escalones por patrimonio (art. 38), en lugar de los estatales (BOE-A-2021-17915).',
   },
   {

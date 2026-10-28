@@ -723,7 +723,7 @@ function crearServidorDelegum(): McpServer {
       edad_heredero: z.number().int().min(0).max(120).optional()
         .describe('Edad del heredero (reducción adicional si <21 y grupo I/II)'),
       vivienda_habitual: z.number().nonnegative().optional()
-        .describe('Valor de la vivienda habitual del fallecido incluida en la herencia (reducción del 95 %, con tope de 122.606,47 € en régimen común y de 500.000 € en Cataluña)'),
+        .describe('Valor de la vivienda habitual del fallecido incluida en la herencia (reducción del 95 %, con tope de 122.606,47 € en régimen común y de 500.000 € en Cataluña; del 99 % con el tope estatal en Andalucía)'),
       convivio_dos_anios: z.boolean().optional()
         .describe('Si el heredero convivió con el fallecido los dos años anteriores. Solo se le exige al Grupo III (colateral) para la reducción por vivienda habitual (art. 20.2.c LISD).'),
       seguro_vida: z.number().nonnegative().optional()
@@ -1466,7 +1466,7 @@ function crearServidorDelegum(): McpServer {
       ccaa: z.enum(ENUM_CCAA).describe('Comunidad autónoma del fallecido'),
       grupo_parentesco: z.enum(['I-conyuge', 'I-descendiente', 'II', 'II-descendiente', 'II-ascendiente', 'III', 'IV'])
         .describe('Grupo de parentesco. II=HIJO de 21 o más; II-descendiente=nieto/bisnieto de 21 o más (en Cataluña reducen distinto: 100.000 € frente a 50.000 €)'),
-      vivienda_habitual: z.number().nonnegative().optional().describe('Valor de la vivienda habitual heredada (reducción 95%)'),
+      vivienda_habitual: z.number().nonnegative().optional().describe('Valor de la vivienda habitual heredada (reducción del 95 %; 99 % en Andalucía)'),
       seguro_vida: z.number().nonnegative().optional().describe(DESCRIPCION_SEGURO_VIDA),
       discapacidad: z.enum(['0', '33', '50', '65']).optional().describe(DESCRIPCION_DISCAPACIDAD_ISD),
       // Los dos requisitos que el art. 20.2.c LISD le exige al pariente COLATERAL (Grupo III)

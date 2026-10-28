@@ -374,6 +374,12 @@ export interface MejoraReduccionesCCAA_IS {
   parentesco: { norma: string; importes: Partial<Record<string, number>> };
   /** Escala por discapacidad que sustituye a la estatal, por grado mínimo. */
   discapacidad: { norma: string; '33': number; '50': number; '65': number };
+  /**
+   * Reducción por vivienda habitual del art. 20.2.c LISD con el porcentaje y el plazo de
+   * mantenimiento que fija la comunidad. El tope sigue siendo el estatal
+   * (`REDUCCION_VIVIENDA_MAX_IS`) cuando la norma autonómica solo cambia el porcentaje.
+   */
+  vivienda?: { norma: string; porcentaje: number; aniosMantenimiento: number };
   urlOficial: string;
   verificado: string;
 }
@@ -416,6 +422,14 @@ export const MEJORAS_REDUCCIONES_CCAA_IS: Record<string, MejoraReduccionesCCAA_I
       },
     },
     discapacidad: { norma: 'art. 29 Ley 5/2021 de Andalucía', '33': 250000, '50': 250000, '65': 500000 },
+    // Art. 27.1: «El porcentaje de reducción previsto en el artículo 20.2 c) de la Ley 29/1987 […]
+    // en el supuesto de adquisición mortis causa de la vivienda habitual del causante será del
+    // 99%». Art. 27.2.b: «Que la adquisición se mantenga durante los tres años siguientes a la
+    // fecha del fallecimiento del causante». Solo cambia el porcentaje: el límite de 122.606,47 €
+    // por sujeto pasivo es el del art. 20.2.c LISD. Los beneficiarios (27.2.a) son los estatales:
+    // cónyuge, ascendientes, descendientes y el colateral de más de 65 años que convivió los dos
+    // años anteriores. Hasta el 28/10/2026 se aplicaban el 95 % y los 10 años estatales.
+    vivienda: { norma: 'art. 27 Ley 5/2021 de Andalucía', porcentaje: 0.99, aniosMantenimiento: 3 },
     urlOficial: 'https://www.boe.es/buscar/act.php?id=BOE-A-2021-17915',
     verificado: '2026-10-28',
   },
@@ -646,7 +660,7 @@ export const BONIFICACIONES_CCAA_IS: Record<string, BonificacionCCAA_IS> = {
       'III':            { porcentaje: 0 },
       'IV':             { porcentaje: 0 },
     },
-    notas: 'Tarifa propia (del 7 % al 26 %) y coeficientes propios (1,0 para los Grupos I y II, 1,5 para el III y 1,9 para el IV, sin escalones por patrimonio previo). Reducción de 1.000.000 € en la base para los Grupos I y II y de 10.000 € para el III, más 250.000 o 500.000 € con discapacidad. Sobre la cuota que quede, bonificación del 99 % para los Grupos I y II.',
+    notas: 'Tarifa propia (del 7 % al 26 %) y coeficientes propios (1,0 para los Grupos I y II, 1,5 para el III y 1,9 para el IV, sin escalones por patrimonio previo). Reducción de 1.000.000 € en la base para los Grupos I y II y de 10.000 € para el III, más 250.000 o 500.000 € con discapacidad. Vivienda habitual del causante al 99 % con el tope estatal y 3 años de mantenimiento (art. 27). Sobre la cuota que quede, bonificación del 99 % para los Grupos I y II.',
   },
 
   'galicia': {

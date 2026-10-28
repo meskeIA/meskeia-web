@@ -1111,6 +1111,30 @@ test.describe('Re-inspección 21/09/2026 — Baleares al 95 %, el millón de And
   });
 
   /**
+   * Art. 27.1 Ley 5/2021 de Andalucía (leído el 28/10/2026): la reducción por vivienda habitual
+   * «será del 99%», con el tope estatal de 122.606,47 €.
+   *
+   * Hijo, Andalucía, 1.000.000 € en cuentas + vivienda habitual de 100.000 €:
+   *   Caudal 1.100.000 + ajuar 3 % 33.000 = base imponible 1.133.000,00
+   *   − parentesco 1.000.000 (art. 28) − vivienda 100.000 × 99 % = 99.000
+   *   = base liquidable 34.000,00
+   *   Tarifa del art. 37: 2620 + (34.000 − 30.000) × 12 % = 3100,00 · × 1,0 (art. 38)
+   *   − bonificación 99 % (art. 39) 3069,00 = 31,00 €
+   * Con el 95 % estatal de antes: vivienda 95.000, base liquidable 38.000, 3580,00 → 35,80 €.
+   */
+  test('art. 27 — en Andalucía la vivienda habitual reduce el 99 %: 31,00 € y no 35,80 €', async ({ page }) => {
+    await page.locator('#ccaa-causante').selectOption('andalucia');
+    await page.locator('#parentesco').selectOption('II');
+    await sembrarValor(page, page.locator('#saldos-cuentas'), '1000000');
+    await sembrarValor(page, page.locator('#vivienda-habitual'), '100000');
+
+    expect(await importeDelPanel(page, /Vivienda habitual \(99/)).toBe('99.000,00 €');
+    expect(await importeDelPanel(page, /^Base liquidable/)).toBe('34.000,00 €');
+    expect(await importeDelPanel(page, /^Cuota íntegra/)).toBe('3100,00 €');
+    expect(await cuota(page)).toBe('31,00 €');
+  });
+
+  /**
    * CASO A RECHAZAR — «300.000 aprox» en Otros inmuebles, con 100.000 € válidos al lado.
    *
    * Es lo que escribe quien no sabe aún cuánto vale el piso, y es la forma más peligrosa de

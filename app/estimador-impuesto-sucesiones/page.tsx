@@ -45,6 +45,7 @@ import {
 } from '@/data/fiscal';
 import {
   evaluarReduccionVivienda,
+  reglaViviendaIS,
   reduccionesPersonalesIS,
   calcularSucesion,
   claveBonificacionEfectiva,
@@ -882,7 +883,8 @@ export default function EstimadorImpuestoSucesionesPage() {
       limiteViviendaCataluna,
     });
     if (vivienda.reduccion > 0) {
-      reducciones.push({ concepto: `Vivienda habitual (${pct(REDUCCION_VIVIENDA_PORC_IS * 100)})`, importe: vivienda.reduccion });
+      // El porcentaje de la comunidad: 99 % en Andalucía (art. 27 Ley 5/2021), 95 % en el resto.
+      reducciones.push({ concepto: `Vivienda habitual (${pct(reglaViviendaIS(ccaa).porcentaje * 100)})`, importe: vivienda.reduccion });
     }
     // Sin edad, el motor responde «menor de 65 años», que afirma una edad que nadie ha escrito:
     // se dice lo que de verdad falta (hallazgo 2332, la misma forma que el 70 supuesto).
@@ -2100,9 +2102,11 @@ export default function EstimadorImpuestoSucesionesPage() {
                   superior —{euros(REDUCCION_VIVIENDA_MAX_CATALUNA_IS)} sobre el valor conjunto de
                   la vivienda, con un mínimo de {euros(REDUCCION_VIVIENDA_MIN_INDIVIDUAL_CATALUNA_IS)} por
                   heredero tras el prorrateo—, y por eso allí esta reducción suele
-                  decidir el resultado. Requisito: mantener la
+                  decidir el resultado. Andalucía sube el porcentaje al {formatNumber((MEJORAS_REDUCCIONES_CCAA_IS['andalucia']?.vivienda?.porcentaje ?? 0) * 100, 0)}&nbsp;% con el
+                  mismo límite estatal (art. 27 de la Ley 5/2021). Requisito: mantener la
                   vivienda {formatNumber(REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_IS, 0)} años
-                  ({formatNumber(REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_CATALUNA_IS, 0)} en Cataluña).
+                  ({formatNumber(REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_CATALUNA_IS, 0)} en Cataluña
+                  y {MEJORAS_REDUCCIONES_CCAA_IS['andalucia']?.vivienda?.aniosMantenimiento} en Andalucía).
                 </p>
               </div>
             </div>

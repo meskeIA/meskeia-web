@@ -29,6 +29,7 @@ import {
   REDUCCION_VIVIENDA_MAX_CATALUNA_IS,
   REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_IS,
   REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_CATALUNA_IS,
+  MEJORAS_REDUCCIONES_CCAA_IS,
   desglosarCuotaBaseAhorro,
   TRAMOS_GANANCIAS_PATRIMONIALES_2025,
   PLUSVALIA_MUNICIPAL_META,
@@ -51,6 +52,7 @@ import {
   calcularCuotaIntegraIS,
   tarifaYCoeficientesIS,
   evaluarReduccionVivienda,
+  reglaViviendaIS,
   reduccionesPersonalesIS,
   porcentajeBonificacionPonderada,
   EDAD_MIN_COLATERAL_VIVIENDA_IS,
@@ -841,14 +843,16 @@ export default function SimuladorHeredarViviendaPage() {
    * entrada, conocía la regla y la enunciaba — pero dentro del bloque educativo colapsado,
    * mientras el TOTAL sumaba a la vez una reducción y la venta que la anula.
    *
-   * ⚠  Solo están modelados los plazos estatal y catalán, que son los que data/fiscal trae
-   * sellados. Otras comunidades tienen el suyo propio, y eso se dice en el aviso en vez de
-   * aplicar un plazo inventado.
+   * ⚠  Solo están modelados los plazos estatal, catalán y andaluz (3 años, art. 27.2.b Ley
+   * 5/2021, desde el 28/10/2026), que son los que data/fiscal trae sellados. Otras comunidades
+   * tienen el suyo propio, y eso se dice en el aviso en vez de aplicar un plazo inventado.
+   *
+   * Porcentaje, tope, plazo y norma salen juntos de `reglaViviendaIS` del motor: hasta el
+   * 28/10/2026 aquí se escribía «Cataluña o la estatal», y al heredero andaluz que vendía en el
+   * año 5 se le avisaba de que perdía una reducción que la ley le deja conservar.
    */
-  const aniosMantenimiento =
-    ccaa === 'cataluna'
-      ? REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_CATALUNA_IS
-      : REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_IS;
+  const reglaVivienda = reglaViviendaIS(ccaa);
+  const aniosMantenimiento = reglaVivienda.aniosMantenimiento;
 
   /**
    * El tope de la reducción por vivienda habitual, EN LA COMUNIDAD ELEGIDA.
@@ -857,8 +861,9 @@ export default function SimuladorHeredarViviendaPage() {
    * decide el límite que aplica, para que la etiqueta no pueda volver a prometer otro
    * distinto del que se está usando (hallazgo 861).
    */
-  const topeReduccionVivienda =
-    ccaa === 'cataluna' ? REDUCCION_VIVIENDA_MAX_CATALUNA_IS : REDUCCION_VIVIENDA_MAX_IS;
+  const topeReduccionVivienda = reglaVivienda.tope;
+  /** El porcentaje de la comunidad elegida (99 % en Andalucía), para la casilla y el panel. */
+  const porcReduccionViviendaCCAA = formatNumber(reglaVivienda.porcentaje * 100, 0);
 
   const isdSinReduccionVivienda = useMemo(
     () => calcularISD(valorReferencia, parentesco, ccaa, false, edad, convivioDosAnios, patrimonioPreexistente),
@@ -1341,7 +1346,7 @@ export default function SimuladorHeredarViviendaPage() {
                   Es la forma exacta del hallazgo 696 —el plazo de mantenimiento que no conocía
                   los cinco años catalanes— reaparecida sobre el TOPE en vez de sobre el plazo.
                 */}
-                <span className={styles.muted}>(reducción {PORC_REDUCCION_VIVIENDA}&nbsp;% ISD hasta {formatCurrency(topeReduccionVivienda)})</span>
+                <span className={styles.muted}>(reducción {porcReduccionViviendaCCAA}&nbsp;% ISD hasta {formatCurrency(topeReduccionVivienda)})</span>
               </span>
             </label>
           </div>
@@ -1465,7 +1470,7 @@ export default function SimuladorHeredarViviendaPage() {
             </div>
             {isd.reduccionVivienda > 0 && (
               <div className={styles.panelLine}>
-                <span>− Reducción vivienda habitual ({PORC_REDUCCION_VIVIENDA}&nbsp;%)</span>
+                <span>− Reducción vivienda habitual ({porcReduccionViviendaCCAA}&nbsp;%)</span>
                 <strong>−{formatCurrency(isd.reduccionVivienda)}</strong>
               </div>
             )}
@@ -1546,9 +1551,7 @@ export default function SimuladorHeredarViviendaPage() {
                 */}
                 <span aria-hidden="true">⚠️</span> <strong>Pierdes la reducción por vivienda
                 habitual:</strong> vendes a los {aniosHastaVenta} años y{' '}
-                {ccaa === 'cataluna'
-                  ? `el art. 19 de la Ley 19/2010 de Cataluña exige mantenerla ${aniosMantenimiento} años`
-                  : `el art. 20.2.c LISD exige mantenerla ${aniosMantenimiento} años`}.{' '}
+                {`el ${reglaVivienda.norma} exige mantenerla ${aniosMantenimiento} años`}.{' '}
                 {/*
                   ⚠️ 21/09/2026 (hallazgo 1178) — este aviso exigía «presentar una autoliquidación
                   complementaria e ingresar los 0,00 € … más intereses de demora» en las
@@ -1579,7 +1582,7 @@ export default function SimuladorHeredarViviendaPage() {
                     quien fija cómo y cuándo.
                   </span>
                 )}
-                {ccaa !== 'cataluna' && ' Otras comunidades fijan plazos de mantenimiento propios: comprueba el de la tuya.'}
+                {!reglaVivienda.propia && ' Otras comunidades fijan plazos de mantenimiento propios: comprueba el de la tuya.'}
               </div>
             )}
           </div>
@@ -1966,7 +1969,8 @@ export default function SimuladorHeredarViviendaPage() {
               últimos 2 años. El tope estatal es {formatCurrency(REDUCCION_VIVIENDA_MAX_IS)}/heredero (cada CCAA puede mejorarlo).
               Requisito: mantener la vivienda al menos {REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_IS} años
               (art. 20.2.c LISD). Algunas CCAA piden menos: en Cataluña son {REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_CATALUNA_IS} años
-              (art. 19 de la Ley 19/2010). Si la vendes antes, pierdes la reducción retroactivamente.
+              (art. 19 de la Ley 19/2010) y en Andalucía {MEJORAS_REDUCCIONES_CCAA_IS['andalucia']?.vivienda?.aniosMantenimiento}, con una reducción del {formatNumber((MEJORAS_REDUCCIONES_CCAA_IS['andalucia']?.vivienda?.porcentaje ?? 0) * 100, 0)}&nbsp;% (art. 27 de la
+              Ley 5/2021). Si la vendes antes, pierdes la reducción retroactivamente.
             </p>
           </div>
         </div>
@@ -2095,7 +2099,7 @@ export default function SimuladorHeredarViviendaPage() {
             <li>No declarar la herencia pensando que "como no hay dinero líquido, no pasa nada": el plazo corre y los recargos llegan automáticamente.</li>
             <li>Renunciar a favor de otra persona: tributa como donación + ISD (doble coste).</li>
             <li>Olvidar la plusvalía municipal: es un impuesto distinto del ISD, ante el Ayuntamiento, que también vence a los {PLAZO_IIVTNU.mesesMortisCausa} meses ({PLAZO_IIVTNU.baseNormativa}).</li>
-            <li>Vender antes del plazo de mantenimiento cuando se aplicó la reducción de vivienda habitual: pierdes la reducción retroactivamente. Son {REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_IS} años con la norma estatal y {REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_CATALUNA_IS} en Cataluña.</li>
+            <li>Vender antes del plazo de mantenimiento cuando se aplicó la reducción de vivienda habitual: pierdes la reducción retroactivamente. Son {REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_IS} años con la norma estatal, {REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_CATALUNA_IS} en Cataluña y {MEJORAS_REDUCCIONES_CCAA_IS['andalucia']?.vivienda?.aniosMantenimiento} en Andalucía.</li>
             <li>Calcular la ganancia patrimonial al vender sin sumar ISD ni plusvalía pagados al valor de adquisición fiscal: pagas IRPF de más.</li>
           </ul>
           <p className={styles.warningFootnote}>

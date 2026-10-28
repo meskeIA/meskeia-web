@@ -30,6 +30,7 @@ import {
   REDUCCION_VIVIENDA_MAX_CATALUNA_IS,
   REDUCCION_VIVIENDA_MIN_INDIVIDUAL_CATALUNA_IS,
   REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_CATALUNA_IS,
+  REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_IS,
   PORC_AJUAR_DOMESTICO_IS,
   BONIFICACIONES_CCAA_IS,
   MEJORAS_REDUCCIONES_CCAA_IS,
@@ -506,6 +507,59 @@ export function reduccionesPersonalesIS(p: {
 /** Edad mínima del colateral (Grupo III) para la reducción por vivienda, art. 20.2.c LISD */
 export const EDAD_MIN_COLATERAL_VIVIENDA_IS = 65;
 
+export interface ReglaViviendaIS {
+  /** Porcentaje del valor de la vivienda que se reduce (0,95 = 95 %). */
+  porcentaje: number;
+  /** Tope por sujeto pasivo (en Cataluña, sobre el valor CONJUNTO, antes de prorratear). */
+  tope: number;
+  /** Años que hay que mantener la vivienda para conservar la reducción. */
+  aniosMantenimiento: number;
+  /** Norma que fija porcentaje y plazo en esa comunidad. */
+  norma: string;
+  /** `true` si la comunidad tiene régimen propio (Cataluña) o una mejora (Andalucía). */
+  propia: boolean;
+}
+
+/**
+ * Porcentaje, tope y plazo de mantenimiento de la reducción por vivienda habitual en una
+ * comunidad — FUENTE ÚNICA para el motor y para lo que las apps rotulan.
+ *
+ * Estatal (art. 20.2.c LISD): 95 %, 122.606,47 €, 10 años. Cataluña (arts. 17 y 19 Ley 19/2010):
+ * 95 %, 500.000 € sobre el valor conjunto, 5 años. Una mejora autonómica
+ * (`MEJORAS_REDUCCIONES_CCAA_IS[ccaa].vivienda`) cambia el porcentaje y el plazo y conserva el
+ * tope estatal: Andalucía, 99 % y 3 años (art. 27 Ley 5/2021), desde el 28/10/2026. Hasta ese
+ * día cada app decidía «Cataluña o la estatal» por su cuenta, y al heredero andaluz que vendía
+ * en el año 5 se le avisaba de que perdía una reducción que la ley le deja conservar.
+ */
+export function reglaViviendaIS(ccaa: string): ReglaViviendaIS {
+  if (ccaa === 'cataluna') {
+    return {
+      porcentaje: REDUCCION_VIVIENDA_PORC_IS,
+      tope: REDUCCION_VIVIENDA_MAX_CATALUNA_IS,
+      aniosMantenimiento: REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_CATALUNA_IS,
+      norma: 'art. 19 de la Ley 19/2010 de Cataluña',
+      propia: true,
+    };
+  }
+  const mejora = MEJORAS_REDUCCIONES_CCAA_IS[ccaa]?.vivienda;
+  if (mejora) {
+    return {
+      porcentaje: mejora.porcentaje,
+      tope: REDUCCION_VIVIENDA_MAX_IS,
+      aniosMantenimiento: mejora.aniosMantenimiento,
+      norma: mejora.norma,
+      propia: true,
+    };
+  }
+  return {
+    porcentaje: REDUCCION_VIVIENDA_PORC_IS,
+    tope: REDUCCION_VIVIENDA_MAX_IS,
+    aniosMantenimiento: REDUCCION_VIVIENDA_ANIOS_MANTENIMIENTO_IS,
+    norma: 'art. 20.2.c LISD',
+    propia: false,
+  };
+}
+
 /**
  * Reducción del art. 20.2.c LISD por vivienda habitual del causante — FUENTE ÚNICA.
  *
@@ -562,9 +616,10 @@ export function evaluarReduccionVivienda(p: {
         return { reduccion: 0, noAplicada: 'pariente colateral que no convivió los 2 años anteriores' };
       }
     }
-    const limite = p.limiteViviendaCataluna ?? REDUCCION_VIVIENDA_MAX_CATALUNA_IS;
+    const regla = reglaViviendaIS(p.ccaa);
+    const limite = p.limiteViviendaCataluna ?? regla.tope;
     return {
-      reduccion: Math.min(p.valorVivienda * REDUCCION_VIVIENDA_PORC_IS, limite),
+      reduccion: Math.min(p.valorVivienda * regla.porcentaje, limite),
       noAplicada: null,
     };
   }
@@ -587,8 +642,10 @@ export function evaluarReduccionVivienda(p: {
     }
   }
 
+  // Porcentaje y tope de la comunidad: el 99 % de Andalucía (art. 27 Ley 5/2021) entra aquí.
+  const regla = reglaViviendaIS(p.ccaa);
   return {
-    reduccion: Math.min(p.valorVivienda * REDUCCION_VIVIENDA_PORC_IS, REDUCCION_VIVIENDA_MAX_IS),
+    reduccion: Math.min(p.valorVivienda * regla.porcentaje, regla.tope),
     noAplicada: null,
   };
 }
