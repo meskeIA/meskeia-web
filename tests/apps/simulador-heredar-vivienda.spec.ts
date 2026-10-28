@@ -5189,8 +5189,9 @@ test.describe('Simulador de heredar vivienda — re-inspección 21/09/2026', () 
     await mover(page, 'aniosVenta', 3);
     await mover(page, 'valorVta', 250000);
 
-    // La reducción se aplica, pero la exención de Andalucía deja la cuota en cero con y sin
-    // ella, así que no hay nada que regularizar — y el bloque total ya lo refleja
+    // La reducción se aplica, pero la de 1.000.000 € de Andalucía en la base (art. 28 Ley 5/2021;
+    // hasta el 28/10/2026 se modelaba como exención) deja la cuota en cero con y sin ella, así que
+    // no hay nada que regularizar — y el bloque total ya lo refleja
     expect(await linea(page, ISD, '− Reducción vivienda habitual (95 %)')).toBe('−122.606,47 €');
     expect(await linea(page, ISD, 'Cuota ISD final')).toBe('0,00 €');
     expect(await bloqueTotal(page)).not.toContain('ISD regularizado');
@@ -5377,8 +5378,8 @@ test.describe('Hallazgo 1615 · años completos y prorrateo por meses', () => {
  *   catastral total de 120.000 € (proporción de suelo 0,4) · venta a los 5 años por 250.000 €.
  *
  *   ISD: 200.000 + 3 % de ajuar (PORC_AJUAR_DOMESTICO_IS) = 206.000; − 15.956,87 = 190.043,13
- *        de base liquidable, por debajo del 1.000.000 de exención de BONIFICACIONES_CCAA_IS
- *        ['andalucia'] → ISD 0,00 €.
+ *        de base liquidable antes de la mejora andaluza; con la reducción de 1.000.000 € del
+ *        art. 28 de la Ley 5/2021 (MEJORAS_REDUCCIONES_CCAA_IS['andalucia']) → ISD 0,00 €.
  *   IIVTNU de la venta: 5 años × 12 = 60 meses → coeficienteIIVTNU(5) = 0,18 →
  *        48.000 × 0,18 × 25 % (PLUSVALIA_MUNICIPAL_META.tipoOrientativo) = 2160,00 €, frente a
  *        los 5000,00 € del método real (50.000 × 0,4 × 25 %) → valor de transmisión 247.840,00.

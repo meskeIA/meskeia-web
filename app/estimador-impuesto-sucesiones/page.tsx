@@ -16,7 +16,6 @@ import {
   TARIFA_ESTATAL_IS,
   TARIFA_CATALUNA_IS,
   COEFICIENTES_IS,
-  COEFICIENTES_CATALUNA_IS,
   LIMITES_PATRIMONIO_PREEXISTENTE_IS,
   indiceTramoPatrimonioIS,
   cuotaTributariaConCorreccionIS,
@@ -49,6 +48,7 @@ import {
   reduccionesPersonalesIS,
   calcularSucesion,
   claveBonificacionEfectiva,
+  tarifaYCoeficientesIS,
   porcentajeBonificacionPonderada,
   EDAD_MIN_COLATERAL_VIVIENDA_IS,
 } from '@/lib/calculadoras/sucesiones';
@@ -378,10 +378,14 @@ const pct = (puntos: number, decimales = 0) => formatPercentage(puntos / 100, de
 const COMUNES_GRUPO_III = Object.entries(BONIFICACIONES_CCAA_IS).filter(
   ([, c]) => c.regimen === 'comun',
 );
-const COMUNES_SIN_NADA_GRUPO_III = COMUNES_GRUPO_III.filter(([, c]) => {
+// Andalucía mejora la reducción por parentesco del Grupo III (10.000 € frente a 7.993,46 €, art. 28
+// Ley 5/2021): algo le da, así que no cuenta entre las que no le dan nada (28/10/2026, C0495).
+const COMUNES_SIN_NADA_GRUPO_III = COMUNES_GRUPO_III.filter(([id, c]) => {
   const iii = c.bonificaciones['III'];
-  return !(iii?.porcentaje ?? 0) && !(iii?.reduccionBase ?? 0);
+  return !(iii?.porcentaje ?? 0) && !(iii?.reduccionBase ?? 0)
+    && MEJORAS_REDUCCIONES_CCAA_IS[id]?.parentesco.importes['III'] === undefined;
 }).length;
+const ANDALUCIA_REDUCCION_GRUPO_III = MEJORAS_REDUCCIONES_CCAA_IS['andalucia']?.parentesco.importes['III'] ?? 0;
 const ASTURIAS_REDUCCION_GRUPO_III = BONIFICACIONES_CCAA_IS['asturias'].bonificaciones['III']?.reduccionBase ?? 0;
 const BONIF_GRUPO_III = (ccaa: string) => (BONIFICACIONES_CCAA_IS[ccaa].bonificaciones['III']?.porcentaje ?? 0) * 100;
 
@@ -424,7 +428,8 @@ const fechaSello = (isoFecha: string) => formatDate(parseISODateLocal(isoFecha))
 /**
  * El rango de bonificación en cuota de unas comunidades para un grupo, LEÍDO de
  * `BONIFICACIONES_CCAA_IS`: el mínimo es el porcentaje y el máximo, el 100 % allí donde hay
- * exención total por debajo de un importe (Andalucía y Galicia hasta 1.000.000 €).
+ * exención total por debajo de un importe (Galicia hasta 1.000.000 €; Andalucía no la tiene: su
+ * millón es una reducción en base, cabo C0495).
  *
  * ⚠️ 27/09/2026 (hallazgo 2331) — «99 %–100 %» iba tecleado en la tabla comparativa y en un
  * consejo, con la tabla sellada al lado. Y derivado se ve que para Madrid y Canarias el techo es
@@ -747,7 +752,6 @@ export default function EstimadorImpuestoSucesionesPage() {
       baseAjustada = baseImponibleTotal * porcHerencia * porcentajeAdquisicion;
     }
 
-    const esCataluna = ccaa === 'cataluna';
     const esForal = ccaaInfo?.regimen === 'foral';
 
     // Reducciones
@@ -910,8 +914,9 @@ export default function EstimadorImpuestoSucesionesPage() {
     const totalReducciones = reducciones.reduce((s, r) => s + r.importe, 0);
     const baseLiquidable = Math.max(0, baseAjustada - totalReducciones);
 
-    // Tarifa
-    const tarifa = esCataluna ? TARIFA_CATALUNA_IS : TARIFA_ESTATAL_IS;
+    // Tarifa y coeficientes: estatales, catalanes o propios de la comunidad (Andalucía, arts. 37 y
+    // 38 Ley 5/2021). La elección la hace el motor, la misma para las tres apps de herencias.
+    const { tarifa, coeficientes, tarifaAplicada, propia: tarifaPropia } = tarifaYCoeficientesIS(ccaa);
     /**
      * ⚠️ 22/09/2026 (hallazgo 1195) — a céntimo, donde lo redondea `calcularSucesion`.
      *
@@ -928,7 +933,6 @@ export default function EstimadorImpuestoSucesionesPage() {
 
     // Coeficiente multiplicador
     const grupoBase = getGrupoBase(grupo);
-    const coeficientes = esCataluna ? COEFICIENTES_CATALUNA_IS : COEFICIENTES_IS;
     const filaCoeficientes = coeficientes[grupoBase] ?? [1, 1, 1, 1];
 
     /**
@@ -984,6 +988,8 @@ export default function EstimadorImpuestoSucesionesPage() {
       viviendaNoAplicada,
       baseLiquidable,
       cuotaIntegra,
+      tarifaAplicada,
+      tarifaPropia,
       coeficienteMultiplicador,
       correccionSalto,
       cuotaTributaria,
@@ -1414,6 +1420,9 @@ export default function EstimadorImpuestoSucesionesPage() {
               <div className={styles.desglose}>
                 <h3 className={styles.desgloseTitle}>Liquidación</h3>
                 <div className={styles.linea}><span>Cuota íntegra</span><span>{formatCurrency(resultado.cuotaIntegra)}</span></div>
+                {resultado.tarifaPropia && (
+                  <p className={styles.lineaNota}>{resultado.tarifaAplicada}</p>
+                )}
                 <div className={styles.linea}><span>× Coeficiente multiplicador</span><span>×{formatNumber(resultado.coeficienteMultiplicador, 4)}</span></div>
                 {resultado.correccionSalto > 0 && (
                   <div className={styles.linea}>
@@ -1700,7 +1709,8 @@ export default function EstimadorImpuestoSucesionesPage() {
                 frente a hijos y cónyuge. Lo que cambia mucho de una comunidad a otra es qué recibe
                 el Grupo III: {enLetra(COMUNES_SIN_NADA_GRUPO_III)} de las {enLetra(COMUNES_GRUPO_III.length)} comunidades
                 del régimen común no le dan nada, Asturias le reduce {euros(ASTURIAS_REDUCCION_GRUPO_III)} de
-                la base, Madrid y Murcia le bonifican {MADRID_MURCIA_GRUPO_III} de la cuota y Canarias
+                la base, Andalucía sube su reducción por parentesco a {euros(ANDALUCIA_REDUCCION_GRUPO_III)} (la
+                estatal es de {euros(REDUCCIONES_PARENTESCO_IS['III'])}), Madrid y Murcia le bonifican {MADRID_MURCIA_GRUPO_III} de la cuota y Canarias
                 el {pct(BONIF_GRUPO_III('canarias'), 1)}. Comprueba la tuya antes de dar por hecha la cifra.
               </div>
             </div>
@@ -1854,13 +1864,19 @@ export default function EstimadorImpuestoSucesionesPage() {
                 La normativa estatal establece dos tramos: discapacidad entre el 33&nbsp;% y el 64&nbsp;%
                 da derecho a una reducción adicional de <strong>{euros(REDUCCION_DISCAPACIDAD_33_IS)}</strong>;
                 discapacidad del 65&nbsp;% o superior da derecho a <strong>{euros(REDUCCION_DISCAPACIDAD_65_IS)}</strong>. Estas reducciones
-                se suman a las de parentesco. Algunas CCAA (Andalucía, Valencia, Cataluña) amplían
-                estos importes. Extremadura los sustituye por una escala de tres tramos, que esta
-                herramienta aplica: {euros(MEJORAS_REDUCCIONES_CCAA_IS['extremadura'].discapacidad['33'])} del 33&nbsp;%
+                se suman a las de parentesco. Algunas CCAA (Valencia, Cataluña) amplían estos
+                importes. Dos los sustituyen, y esta herramienta lo aplica: Andalucía, por{' '}
+                {euros(MEJORAS_REDUCCIONES_CCAA_IS['andalucia'].discapacidad['33'])} del 33&nbsp;% al 64&nbsp;%
+                y {euros(MEJORAS_REDUCCIONES_CCAA_IS['andalucia'].discapacidad['65'])} desde el 65&nbsp;%
+                ({MEJORAS_REDUCCIONES_CCAA_IS['andalucia'].discapacidad.norma}), y Extremadura, por una escala
+                de tres tramos: {euros(MEJORAS_REDUCCIONES_CCAA_IS['extremadura'].discapacidad['33'])} del 33&nbsp;%
                 al 49&nbsp;%, {euros(MEJORAS_REDUCCIONES_CCAA_IS['extremadura'].discapacidad['50'])} del 50&nbsp;% al 64&nbsp;%
                 y {euros(MEJORAS_REDUCCIONES_CCAA_IS['extremadura'].discapacidad['65'])} desde el 65&nbsp;%
-                ({MEJORAS_REDUCCIONES_CCAA_IS['extremadura'].discapacidad.norma}), y la reducción por
-                parentesco de los Grupos I y II por {euros(MEJORAS_REDUCCIONES_CCAA_IS['extremadura'].parentesco.importes['II'] ?? 0)}
+                ({MEJORAS_REDUCCIONES_CCAA_IS['extremadura'].discapacidad.norma}). Las dos mejoran también la
+                reducción por parentesco de los Grupos I y II:{' '}
+                {euros(MEJORAS_REDUCCIONES_CCAA_IS['andalucia'].parentesco.importes['II'] ?? 0)} en Andalucía
+                ({MEJORAS_REDUCCIONES_CCAA_IS['andalucia'].parentesco.norma}) y{' '}
+                {euros(MEJORAS_REDUCCIONES_CCAA_IS['extremadura'].parentesco.importes['II'] ?? 0)} en Extremadura
                 ({MEJORAS_REDUCCIONES_CCAA_IS['extremadura'].parentesco.norma}). El grado de discapacidad debe estar reconocido oficialmente antes
                 del devengo del impuesto.
               </dd>

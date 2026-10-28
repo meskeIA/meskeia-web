@@ -16,11 +16,9 @@ import { formatNumber, formatCurrency, formatDate, parseSpanishNumber } from '@/
 import {
   FISCAL_SUCESIONES_META,
   TARIFA_ESTATAL_IS,
-  TARIFA_CATALUNA_IS,
   REDUCCIONES_PARENTESCO_IS,
   BONIFICACIONES_CCAA_IS,
   COEFICIENTES_IS,
-  COEFICIENTES_CATALUNA_IS,
   LIMITES_PATRIMONIO_PREEXISTENTE_IS,
   indiceTramoPatrimonioIS,
   cuotaTributariaConCorreccionIS,
@@ -51,6 +49,7 @@ const TIPO_AHORRO_MIN = ESCALA_AHORRO[0].tipo;
 const TIPO_AHORRO_MAX = ESCALA_AHORRO[ESCALA_AHORRO.length - 1].tipo;
 import {
   calcularCuotaIntegraIS,
+  tarifaYCoeficientesIS,
   evaluarReduccionVivienda,
   reduccionesPersonalesIS,
   porcentajeBonificacionPonderada,
@@ -419,7 +418,6 @@ function calcularISD(
 
   const ccaaInfo = BONIFICACIONES_CCAA_IS[ccaa];
   const ccaaNombre = ccaaInfo?.nombre ?? 'Régimen común';
-  const esCataluna = ccaa === 'cataluna';
   // Ninguna comunidad bonifica distinto al nieto que al hijo —la distinción del art. 2 de la
   // Ley 19/2010 es solo de reducción en base—, y `bonificaciones['II-descendiente']` no existe
   // en ninguna de las 17: sin colapsarlo, el nieto perdería el 99 % de bonificación.
@@ -491,8 +489,9 @@ function calcularISD(
     Math.max(0, baseImponible - reduccionParentesco - reduccionVivienda - reduccionAutonomica)
   );
 
-  // Aplicar tarifa
-  const tarifa = esCataluna ? TARIFA_CATALUNA_IS : TARIFA_ESTATAL_IS;
+  // Aplicar tarifa: estatal, catalana o propia de la comunidad (Andalucía, arts. 37 y 38 Ley
+  // 5/2021), con la elección del motor de sucesiones.
+  const { tarifa, coeficientes: tablaCoeficientes } = tarifaYCoeficientesIS(ccaa);
   const cuotaIntegra = redondearCentimos(calcularCuotaIntegraIS(baseLiquidable, tarifa));
 
   /**
@@ -506,7 +505,6 @@ function calcularISD(
    * leía 18.437,27 € (× 1,5882) donde la ley y la app hermana dan 19.359,02 € (× 1,6676): la
    * misma herencia, dos respuestas en meskeIA.
    */
-  const tablaCoeficientes = esCataluna ? COEFICIENTES_CATALUNA_IS : COEFICIENTES_IS;
   const filaCoeficientes = tablaCoeficientes[grupo] ?? [1, 1, 1, 1];
   const tramoPatrimonio = indiceTramoPatrimonioIS(Math.max(0, patrimonioPreexistente));
   const coeficientePlano = filaCoeficientes.every((c) => c === filaCoeficientes[0]);
@@ -553,7 +551,7 @@ function calcularISD(
     if (bonifGrupo.limite && baseLiquidable > bonifGrupo.limite) {
       bonificacionPorc = 0;
     }
-    // Andalucia/Galicia: exencion total bajo umbral
+    // Galicia: exención total bajo umbral
     if (bonifGrupo.exencion && baseLiquidable < bonifGrupo.exencion) {
       bonificacionPorc = 1.0;
     }
@@ -1554,9 +1552,9 @@ export default function SimuladorHeredarViviendaPage() {
                 {/*
                   ⚠️ 21/09/2026 (hallazgo 1178) — este aviso exigía «presentar una autoliquidación
                   complementaria e ingresar los 0,00 € … más intereses de demora» en las
-                  comunidades cuyo beneficio llega DESPUÉS de la reducción (Andalucía y Galicia,
-                  exención total bajo 1.000.000 € de base liquidable; Asturias, 300.000 € de
-                  reducción en base): allí quitar la reducción de vivienda no mueve la cuota y los
+                  comunidades cuyo beneficio llega DESPUÉS de la reducción (Galicia, exención total
+                  bajo 1.000.000 € de base liquidable; Andalucía, 1.000.000 € de reducción en base
+                  desde el 28/10/2026, cabo C0495; Asturias, 300.000 €): allí quitar la reducción de vivienda no mueve la cuota y los
                   dos escenarios dan 0,00 €. El bloque total ya lo sabía y no pintaba la línea «+
                   ISD regularizado», así que la pantalla se contradecía. El incumplimiento del
                   requisito es cierto y se sigue diciendo; lo que desaparece es la orden de

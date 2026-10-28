@@ -3,8 +3,8 @@
  * Usada por: MCP server (calcular_sucesiones)
  *
  * Fuente: Ley 29/1987 ISD + normativas autonómicas 2025
- * Cubre: 17 CCAA, tarifa estatal (art. 21.2 LISD, 16 tramos), tarifa propia Cataluña,
- *        coeficientes multiplicadores, reducciones y bonificaciones autonómicas.
+ * Cubre: 17 CCAA, tarifa estatal (art. 21.2 LISD, 16 tramos), tarifas propias de Cataluña y
+ *        Andalucía, coeficientes multiplicadores, reducciones y bonificaciones autonómicas.
  *
  * Nota: Solo calcula el impuesto sobre la herencia del beneficiario individual,
  * no el reparto de la masa hereditaria ni las legitimas.
@@ -33,6 +33,7 @@ import {
   PORC_AJUAR_DOMESTICO_IS,
   BONIFICACIONES_CCAA_IS,
   MEJORAS_REDUCCIONES_CCAA_IS,
+  TARIFAS_PROPIAS_CCAA_ISD,
   FISCAL_SUCESIONES_META,
   FISCAL_SUCESIONES_CATALUNA_META,
   type TramoTarifaIS,
@@ -227,6 +228,53 @@ export function calcularCuotaIntegraIS(base: number, tarifa: TramoTarifaIS[]): n
   return 0;
 }
 
+/** La tarifa y los coeficientes con que se liquida una herencia en una comunidad. */
+export interface TarifaYCoeficientesIS {
+  tarifa: TramoTarifaIS[];
+  coeficientes: Record<string, number[]>;
+  /** Rótulo con la norma y el rango de tipos, para el desglose */
+  tarifaAplicada: string;
+  /** `true` si no es la estatal del art. 21.2 LISD */
+  propia: boolean;
+}
+
+/**
+ * Tarifa y coeficientes de una comunidad — FUENTE ÚNICA de la elección desde el 28/10/2026.
+ *
+ * Hasta esa fecha la elección era «Cataluña o la estatal», escrita igual en este motor, en
+ * `estimador-impuesto-sucesiones` y en `simulador-heredar-vivienda`, y Andalucía, que tiene
+ * tarifa propia (art. 37 Ley 5/2021, del 7 % al 26 %) y coeficientes propios (art. 38: 1,0 ·
+ * 1,5 · 1,9), liquidaba con la estatal en las tres (cabos C0023 y C0495). Una comunidad nueva con
+ * tarifa propia se declara UNA vez, en `TARIFAS_PROPIAS_CCAA_ISD` de `data/fiscal`.
+ */
+export function tarifaYCoeficientesIS(ccaa: string): TarifaYCoeficientesIS {
+  if (ccaa === 'cataluna') {
+    return {
+      tarifa: TARIFA_CATALUNA_IS,
+      coeficientes: COEFICIENTES_CATALUNA_IS,
+      tarifaAplicada: 'Tarifa propia Cataluña (7 %–32 %)',
+      propia: true,
+    };
+  }
+  const propia = TARIFAS_PROPIAS_CCAA_ISD[ccaa];
+  if (propia) {
+    const tipo = (n: number) => `${n.toLocaleString('es-ES')} %`;
+    const nombre = BONIFICACIONES_CCAA_IS[ccaa]?.nombre ?? ccaa;
+    return {
+      tarifa: propia.tarifa,
+      coeficientes: propia.coeficientes,
+      tarifaAplicada: `Tarifa propia de ${nombre}, ${propia.normaTarifa} (${tipo(propia.tarifa[0].tipo)}–${tipo(propia.tarifa[propia.tarifa.length - 1].tipo)})`,
+      propia: true,
+    };
+  }
+  return {
+    tarifa: TARIFA_ESTATAL_IS,
+    coeficientes: COEFICIENTES_IS,
+    tarifaAplicada: 'Tarifa estatal régimen común, art. 21.2 LISD (7,65 %–34 %)',
+    propia: false,
+  };
+}
+
 function getGrupoBase(grupo: GrupoParentescoIS): 'I' | 'II' | 'III' | 'IV' {
   if (grupo === 'I-conyuge' || grupo === 'I-descendiente') return 'I';
   if (grupo === 'II' || grupo === 'II-descendiente' || grupo === 'II-ascendiente') return 'II';
@@ -339,7 +387,7 @@ function aplicarBonificacionIS(
     return { bonificacion: bonif, porcentaje: pct * 100, detalle: `Bonificación escalonada ${formatPercentage(pct, 0)} (${config.nombre})` };
   }
 
-  // Exención total por importe (Andalucía, Galicia: base < 1.000.000 €)
+  // Exención total por importe (Galicia: base < 1.000.000 €; Andalucía no la tiene, cabo C0495)
   if (bGrupo.exencion !== undefined && baseLiquidable < bGrupo.exencion) {
     return { bonificacion: cuotaTributaria, porcentaje: 100, detalle: `Exención total (base liquidable < ${bGrupo.exencion.toLocaleString('es-ES')} €)` };
   }
@@ -616,21 +664,12 @@ export function calcularSucesion(p: ParametrosSucesiones): ResultadoSucesiones {
   const totalReducciones = r(reduccionParentesco + reduccionEdadMenor21 + reduccionDiscapacidad + reduccionVivienda + reduccionSeguroVida + reduccionAutonomicaBase);
   const baseLiquidable = r(Math.max(0, baseConAjuar - totalReducciones));
 
-  // 7. Tarifa
-  let tarifa: TramoTarifaIS[];
-  let tarifaAplicada: string;
-  if (esCataluna) {
-    tarifa = TARIFA_CATALUNA_IS;
-    tarifaAplicada = 'Tarifa propia Cataluña (7 %–32 %)';
-  } else {
-    tarifa = TARIFA_ESTATAL_IS;
-    tarifaAplicada = 'Tarifa estatal régimen común, art. 21.2 LISD (7,65 %–34 %)';
-  }
+  // 7. Tarifa (estatal, catalana o propia de la comunidad: `tarifaYCoeficientesIS`)
+  const { tarifa, coeficientes: coefs, tarifaAplicada } = tarifaYCoeficientesIS(p.ccaa);
 
   const cuotaIntegra = r(calcularCuotaIntegraIS(baseLiquidable, tarifa));
 
   // 8. Coeficiente multiplicador
-  const coefs = esCataluna ? COEFICIENTES_CATALUNA_IS : COEFICIENTES_IS;
   const filaCoefs = coefs[grupoBase] ?? [1, 1, 1, 1];
   // Con el importe, el tramo sale de él y se aplica la corrección del salto del art. 22.2 LISD
   // (la cuota no puede superar la del coeficiente inferior más lo que el patrimonio pasa del

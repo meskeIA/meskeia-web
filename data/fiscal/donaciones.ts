@@ -240,7 +240,7 @@ export const BONIFICACIONES_CCAA_ID: Record<string, BonificacionCCAA_ID> = {
       'III':            { porcentaje: 0 },
       'IV':             { porcentaje: 0 },
     },
-    notas: 'Grupos I y II: bonificación del 99 % de la cuota, sin límite de importe. Si la base imponible supera 5.000 €, la donación debe constar en documento público, y sin él no hay bonificación. Las donaciones del mismo donante en los tres años anteriores cuentan para ese umbral, y en metálico hay que justificar en el documento el origen de los fondos: esta estimación no lo aplica.',
+    notas: 'Tarifa propia (del 7 % al 26 %, art. 37) y coeficientes propios (1,0 para los Grupos I y II, 1,5 para el III y 1,9 para el IV, art. 38). Grupos I y II: bonificación del 99 % de la cuota, sin límite de importe. Si la base imponible supera 5.000 €, la donación debe constar en documento público, y sin él no hay bonificación. Las donaciones del mismo donante en los tres años anteriores cuentan para ese umbral, y en metálico hay que justificar en el documento el origen de los fondos: esta estimación no lo aplica.',
   },
 
   'galicia': {

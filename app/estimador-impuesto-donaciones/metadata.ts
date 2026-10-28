@@ -78,7 +78,7 @@ export const faqJsonLd = {
       name: '¿Cómo calcula el estimador el impuesto por comunidad autónoma?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `El estimador aplica la tarifa estatal según el valor neto recibido, el grupo de parentesco y el patrimonio preexistente del donatario, y luego incorpora los coeficientes multiplicadores y las bonificaciones autonómicas vigentes para ${FISCAL_DONACIONES_META.vigencia}. Cubre las 15 comunidades de régimen común, incluida Cataluña con su tarifa propia, y da una aproximación para los regímenes forales del País Vasco y Navarra.`,
+        text: `El estimador aplica la tarifa estatal según el valor neto recibido, el grupo de parentesco y el patrimonio preexistente del donatario, y luego incorpora los coeficientes multiplicadores y las bonificaciones autonómicas vigentes para ${FISCAL_DONACIONES_META.vigencia}. Cubre las 15 comunidades de régimen común, incluidas Cataluña y Andalucía con su tarifa propia, y da una aproximación para los regímenes forales del País Vasco y Navarra.`,
       },
     },
     {

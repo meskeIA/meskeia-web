@@ -24,6 +24,18 @@ export interface Novedad {
 export const NOVEDADES: Novedad[] = [
   {
     fecha: '2026-10-28',
+    fichaSlug: 'sucesiones-isd',
+    texto:
+      'Andalucía: ya no figura una «exención» de la herencia por debajo de 1.000.000 € de base. La Ley 5/2021 reduce 1.000.000 € de la base a los Grupos I y II y 10.000 € al Grupo III (art. 28), más 250.000 o 500.000 € con discapacidad (art. 29), y bonifica el 99 % de la cuota a los Grupos I y II (art. 39). Además aplica tarifa propia, del 7 % al 26 % (art. 37), y coeficientes propios de 1,0, 1,5 y 1,9 sin escalones por patrimonio (art. 38), en lugar de los estatales (BOE-A-2021-17915).',
+  },
+  {
+    fecha: '2026-10-28',
+    fichaSlug: 'donaciones-isd',
+    texto:
+      'Andalucía: las donaciones se liquidan con su tarifa propia, del 7 % al 26 %, y sus coeficientes de 1,0 (Grupos I y II), 1,5 (Grupo III) y 1,9 (Grupo IV), sin escalones por patrimonio previo (arts. 37 y 38 de la Ley 5/2021, BOE-A-2021-17915), no con la escala estatal.',
+  },
+  {
+    fecha: '2026-10-28',
     fichaSlug: 'donaciones-isd',
     texto:
       'Andalucía: la bonificación del 99 % de los Grupos I y II exige que la donación conste en documento público cuando la base imponible supera 5.000 €; sin él no se aplica (art. 40.2.a de la Ley 5/2021 de Tributos Cedidos de Andalucía, BOE-A-2021-17915). La estimación ya lo tiene en cuenta.',

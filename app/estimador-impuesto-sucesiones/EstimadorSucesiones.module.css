@@ -408,6 +408,13 @@
   font-size: 0.85rem;
 }
 
+/* Con qué tarifa se liquida, bajo la cuota íntegra, cuando no es la estatal */
+.lineaNota {
+  margin: 0 0 0.25rem;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
 /* Educational */
 .guideSection {
   line-height: 1.7;

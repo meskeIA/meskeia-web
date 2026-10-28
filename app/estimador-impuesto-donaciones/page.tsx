@@ -1003,14 +1003,16 @@ export default function EstimadorImpuestoDonacionesPage() {
             <li className={styles.step}>
               <span className={styles.stepNumber}>4</span>
               <div className={styles.stepContent}>
-                <strong>Calcular la base y aplicar la tarifa estatal</strong>
+                <strong>Calcular la base y aplicar la tarifa</strong>
                 <p>
                   Base imponible = valor del bien donado − cargas deducibles (art. 9.1.b LISD).
                   Base liquidable = base imponible, salvo reducciones propias de la comunidad (art. 20.5).
                   La tarifa estatal ({TARIFA_RESUMEN}) se aplica sobre la base liquidable
                   para obtener la cuota íntegra, que se multiplica por el coeficiente según el patrimonio
                   preexistente (art. 22.2): {rangoCoef('II')} en los Grupos I y II, {rangoCoef('III')} en
-                  el Grupo III y {rangoCoef('IV')} en el Grupo IV.
+                  el Grupo III y {rangoCoef('IV')} en el Grupo IV. Cataluña y Andalucía tienen tarifa
+                  propia; Andalucía, además, coeficientes propios que no dependen del patrimonio
+                  (arts. 37 y 38 de la Ley 5/2021), y la estimación los aplica.
                 </p>
               </div>
             </li>

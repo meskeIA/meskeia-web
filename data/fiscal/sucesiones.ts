@@ -211,6 +211,80 @@ export const COEFICIENTES_CATALUNA_IS: Record<string, number[]> = {
   'IV':  [2.0000, 2.0000, 2.0000, 2.0000],
 };
 
+// ─── Tarifas y coeficientes propios de comunidades de régimen común ──────────
+
+/**
+ * Una comunidad de régimen común que aprueba su propia tarifa (art. 48.1.b Ley 22/2009) y sus
+ * propios coeficientes multiplicadores (art. 48.1.c). Sustituyen a los estatales del art. 21.2 y
+ * del art. 22 LISD en las DOS modalidades del impuesto, herencias y donaciones, cuando la norma
+ * autonómica no las distingue.
+ *
+ * Cataluña no está aquí: tiene tarifas distintas para herencias y donaciones (y una reducida en
+ * donaciones), y cada rama la elige por su cuenta.
+ */
+export interface TarifaPropiaCCAA_ISD {
+  tarifa: TramoTarifaIS[];
+  /**
+   * Fila de coeficientes por grupo legal, con las cuatro columnas de patrimonio preexistente del
+   * art. 22.2 LISD. Si la comunidad no distingue por patrimonio, las cuatro son iguales y la
+   * corrección del salto nunca actúa.
+   */
+  coeficientes: Record<string, number[]>;
+  normaTarifa: string;
+  normaCoeficientes: string;
+  urlOficial: string;
+  verificado: string;
+}
+
+/**
+ * Andalucía — art. 37 de la Ley 5/2021, de 20 de octubre, de Tributos Cedidos (BOE-A-2021-17915,
+ * consolidado, leído el 28/10/2026; redacción única, vigente desde el 01/01/2022): «La cuota
+ * íntegra del impuesto […] se obtendrá aplicando sobre la base liquidable los tipos de gravamen que
+ * se indican en la siguiente escala». Del 7 % al 26 %. Está en la Sección 3.ª del capítulo del ISD,
+ * común a herencias y donaciones. Columna `cuota`: la del BOE al empezar el tramo, como en la
+ * estatal (8.000 × 7 % = 560; 560 + 7.000 × 8 % = 1.120…, comprobado tramo a tramo).
+ *
+ * Hasta el 28/10/2026 Andalucía liquidaba con la tarifa estatal (del 7,65 % al 34 %): 1.000.000 €
+ * donados a un hijo con escritura daban 2681,23 € en vez de 2236,20 € (cabo C0023).
+ */
+export const TARIFA_ANDALUCIA_ISD: TramoTarifaIS[] = [
+  { hasta: 8000,      cuota: 0,       tipo: 7  },
+  { hasta: 15000,     cuota: 560,     tipo: 8  },
+  { hasta: 30000,     cuota: 1120,    tipo: 10 },
+  { hasta: 50000,     cuota: 2620,    tipo: 12 },
+  { hasta: 70000,     cuota: 5020,    tipo: 14 },
+  { hasta: 100000,    cuota: 7820,    tipo: 16 },
+  { hasta: 150000,    cuota: 12620,   tipo: 18 },
+  { hasta: 200000,    cuota: 21620,   tipo: 20 },
+  { hasta: 400000,    cuota: 31620,   tipo: 22 },
+  { hasta: 800000,    cuota: 75620,   tipo: 24 },
+  { hasta: Infinity,  cuota: 171620,  tipo: 26 },
+];
+
+/**
+ * Andalucía — art. 38.1 de la Ley 5/2021 (mismo texto, leído el 28/10/2026): «se obtendrá
+ * aplicando a la cuota íntegra el coeficiente multiplicador que corresponda según los siguientes
+ * grupos de parentesco: Grupos I y II 1,0 · Grupo III 1,5 · Grupo IV 1,9». No depende del
+ * patrimonio preexistente: las cuatro columnas son iguales.
+ */
+export const COEFICIENTES_ANDALUCIA_ISD: Record<string, number[]> = {
+  'I':   [1.0, 1.0, 1.0, 1.0],
+  'II':  [1.0, 1.0, 1.0, 1.0],
+  'III': [1.5, 1.5, 1.5, 1.5],
+  'IV':  [1.9, 1.9, 1.9, 1.9],
+};
+
+export const TARIFAS_PROPIAS_CCAA_ISD: Record<string, TarifaPropiaCCAA_ISD> = {
+  'andalucia': {
+    tarifa: TARIFA_ANDALUCIA_ISD,
+    coeficientes: COEFICIENTES_ANDALUCIA_ISD,
+    normaTarifa: 'art. 37 Ley 5/2021',
+    normaCoeficientes: 'art. 38 Ley 5/2021',
+    urlOficial: 'https://www.boe.es/buscar/act.php?id=BOE-A-2021-17915',
+    verificado: '2026-10-28',
+  },
+};
+
 // ─── Reducciones estatales por parentesco ────────────────────────────────────
 
 export const REDUCCIONES_PARENTESCO_IS: Record<string, number> = {
@@ -319,6 +393,31 @@ export const MEJORAS_REDUCCIONES_CCAA_IS: Record<string, MejoraReduccionesCCAA_I
     discapacidad: { norma: 'art. 18 DLeg 1/2018 de Extremadura', '33': 60000, '50': 120000, '65': 180000 },
     urlOficial: 'https://www.boe.es/buscar/act.php?id=BOE-A-2018-8159',
     verificado: '2026-10-22',
+  },
+  // Andalucía — Ley 5/2021 (BOE-A-2021-17915, consolidado, leído el 28/10/2026; redacción única,
+  // vigente desde el 01/01/2022). Art. 28.1: «El importe de reducción previsto en el artículo
+  // 20.2 a) de la Ley 29/1987 […] será el siguiente: a) Grupo I […] 1.000.000 de euros. b) Grupo
+  // II […] 1.000.000 euros. c) Grupo III […] 10.000 euros». Art. 29.1: 250.000 € con discapacidad
+  // del 33 % al 65 % y 500.000 € del 65 % en adelante, «compatible» con la del art. 28 (29.2).
+  // El Grupo IV no tiene mejora: se queda con la estatal, que es 0.
+  // Hasta el 28/10/2026 el millón se modelaba como EXENCIÓN TOTAL de la herencia por debajo de
+  // 1.000.000 € de base liquidable, y por encima se reducían solo los 15.956,87 € estatales: un
+  // hijo con 1.019.700 € de base imponible pasaba de 0 € a 2693,95 € por 5.000 € más (cabo C0495).
+  'andalucia': {
+    parentesco: {
+      norma: 'art. 28 Ley 5/2021 de Andalucía',
+      importes: {
+        'I-conyuge':       1000000,
+        'I-descendiente':  1000000,
+        'II':              1000000,
+        'II-descendiente': 1000000,
+        'II-ascendiente':  1000000,
+        'III':             10000,
+      },
+    },
+    discapacidad: { norma: 'art. 29 Ley 5/2021 de Andalucía', '33': 250000, '50': 250000, '65': 500000 },
+    urlOficial: 'https://www.boe.es/buscar/act.php?id=BOE-A-2021-17915',
+    verificado: '2026-10-28',
   },
 };
 
@@ -531,18 +630,23 @@ export const BONIFICACIONES_CCAA_IS: Record<string, BonificacionCCAA_IS> = {
     notas: 'Bonificación 99 % para Grupos I y II. Grupo III: 50 %. ⚠️ La Ley 3/2026, de 30 de junio, de Apoyo a la Empresa Familiar (BOE-A-2026-16019) añadió una reducción del 99 % EN BASE por transmisión de empresa individual, negocio profesional o participaciones, extendida a los Grupos I, II y III y a colaterales de cuarto grado, con requisitos de permanencia (5 años) y participación (5 % individual o 20 % del grupo familiar). Esta estimación NO la aplica: solo modela la bonificación en cuota por parentesco. Si la herencia incluye una empresa familiar, el resultado real puede ser bastante menor.',
   },
 
+  // Andalucía — Ley 5/2021 (BOE-A-2021-17915, leída el 28/10/2026). Art. 39: los Grupos I y II
+  // «aplicarán una bonificación del 99% en la cuota tributaria derivada de adquisiciones mortis
+  // causa». No hay exención por importe: el millón es la reducción en base del art. 28, que está
+  // en `MEJORAS_REDUCCIONES_CCAA_IS`, y la tarifa y los coeficientes son los propios de los arts. 37
+  // y 38 (`TARIFAS_PROPIAS_CCAA_ISD`). Cabo C0495.
   'andalucia': {
     nombre: 'Andalucía',
     regimen: 'comun',
     bonificaciones: {
-      'I-conyuge':      { porcentaje: 0.99, exencion: 1000000 },
-      'I-descendiente': { porcentaje: 0.99, exencion: 1000000 },
-      'II':             { porcentaje: 0.99, exencion: 1000000 },
-      'II-ascendiente': { porcentaje: 0.99, exencion: 1000000 },
+      'I-conyuge':      { porcentaje: 0.99 },
+      'I-descendiente': { porcentaje: 0.99 },
+      'II':             { porcentaje: 0.99 },
+      'II-ascendiente': { porcentaje: 0.99 },
       'III':            { porcentaje: 0 },
       'IV':             { porcentaje: 0 },
     },
-    notas: 'Exención total si base liquidable < 1.000.000 €. Si supera, bonificación 99 %.',
+    notas: 'Tarifa propia (del 7 % al 26 %) y coeficientes propios (1,0 para los Grupos I y II, 1,5 para el III y 1,9 para el IV, sin escalones por patrimonio previo). Reducción de 1.000.000 € en la base para los Grupos I y II y de 10.000 € para el III, más 250.000 o 500.000 € con discapacidad. Sobre la cuota que quede, bonificación del 99 % para los Grupos I y II.',
   },
 
   'galicia': {

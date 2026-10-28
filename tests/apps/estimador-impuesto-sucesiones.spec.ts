@@ -26,6 +26,7 @@ import {
   BONIFICACIONES_CCAA_IS,
   FISCAL_SUCESIONES_CATALUNA_META,
   FISCAL_SUCESIONES_META,
+  MEJORAS_REDUCCIONES_CCAA_IS,
   PLAZO_ISD,
 } from '../../data/fiscal/sucesiones';
 import { calcularSucesion } from '../../lib/calculadoras/sucesiones';
@@ -1062,51 +1063,51 @@ test.describe('Re-inspección 21/09/2026 — Baleares al 95 %, el millón de And
   });
 
   /**
-   * CASO LÍMITE — el millón de ANDALUCÍA, que es la rama `exencion` de `aplicarBonificacion`
-   * y no la había ejecutado ninguna corrida anterior: `{ porcentaje: 0.99, exencion: 1000000 }`
-   * exime la cuota ENTERA mientras la base liquidable no llegue a 1.000.000 €, y por encima
-   * deja el 99 % de siempre. No es una escala: es un escalón, y lo cruza el ajuar del 3 %
-   * tanto como la herencia.
+   * CASO LÍMITE — el millón de ANDALUCÍA es una REDUCCIÓN en la base, no un escalón (cabo C0495,
+   * 28/10/2026). Ley 5/2021 (BOE-A-2021-17915, leída ese día): art. 28.1.b, «Grupo II […]
+   * 1.000.000 euros» de reducción por parentesco en lugar de los 15.956,87 € estatales; art. 37,
+   * tarifa propia del 7 % al 26 %; art. 38, coeficiente 1,0 para los Grupos I y II; art. 39,
+   * bonificación del 99 % de la cuota.
    *
    *   (a) Activos          985.000,00 → + ajuar 29.550,00 = base imponible 1.014.550,00
-   *       − parentesco      15.956,87   REDUCCIONES_PARENTESCO_IS['II']
-   *       = base liquidable 998.593,13 < 1.000.000 → EXENCIÓN TOTAL
-   *       cuota íntegra     267.644,34  TARIFA_ESTATAL_IS, tramo «Infinity»:
-   *                                     199.291,40 + 34 % × (998.593,13 − 797.555,08)
-   *       = cuota final           0,00 €
+   *       − parentesco   1.000.000,00   art. 28 Ley 5/2021
+   *       = base liquidable 14.550,00
+   *       cuota íntegra     1084,00     560 + 8 % × (14.550 − 8.000)            (art. 37)
+   *       × 1,0                                                                  (art. 38)
+   *       − bonificación    1073,16     1084,00 × 99 %                           (art. 39)
+   *       = cuota final       10,84 €
    *
    *   (b) Activos          990.000,00 → + ajuar 29.700,00 = base imponible 1.019.700,00
-   *       = base liquidable 1.003.743,13 ≥ 1.000.000 → sin exención, bonificación del 99 %
-   *       cuota íntegra     269.395,34  199.291,40 + 34 % × (1.003.743,13 − 797.555,08)
-   *       − bonificación    266.701,39   269.395,34 × 99 % sobre la cuota LIQUIDADA (1195)
-   *       = cuota final        2693,95 €  (tipo efectivo 0,26 %)
+   *       = base liquidable 19.700,00
+   *       cuota íntegra     1590,00     1.120 + 10 % × (19.700 − 15.000)
+   *       − bonificación    1574,10
+   *       = cuota final       15,90 €
    *
-   * 5.000 € más de herencia convierten una cuota de cero en 2.693,95 €.
+   * Hasta el 28/10/2026 el millón era una «exención total» de la cuota por debajo de 1.000.000 € de
+   * base liquidable, con la tarifa estatal y solo 15.956,87 € de reducción: estos mismos 5.000 € más
+   * de herencia pasaban la cuota de 0,00 € a 2693,95 €, un salto que la ley no tiene.
    */
-  test('caso límite: en Andalucía 5.000 € más de herencia pasan de 0,00 € a 2693,95 €', async ({ page }) => {
+  test('caso límite: en Andalucía 5.000 € más de herencia pasan de 10,84 € a 15,90 €, sin escalón', async ({ page }) => {
     await page.locator('#ccaa-causante').selectOption('andalucia');
     await page.locator('#parentesco').selectOption('II');
     await sembrarValor(page, page.locator('#saldos-cuentas'), '985000');
 
-    expect(await cuota(page)).toBe('0,00 €');
-    const bajoElMillon = await panelResultados(page);
-    expect(bajoElMillon).toContain('998.593,13 €');   // base liquidable, aún bajo el millón
-    expect(bajoElMillon).toContain('267.644,34 €');   // cuota íntegra del último tramo
-    // El rótulo dice POR QUÉ es cero: no es que no haya cuota, es que está exenta
-    expect(bajoElMillon).toContain('Exención total (base < 1.000.000,00 €)');
+    expect(await importeDelPanel(page, /Por parentesco \(art\. 28 Ley 5\/2021 de Andalucía\)/)).toBe('1.000.000,00 €');
+    expect(await importeDelPanel(page, /^Base liquidable/)).toBe('14.550,00 €');
+    expect(await importeDelPanel(page, /^Cuota íntegra/)).toBe('1084,00 €');
+    expect(await importeDelPanel(page, /Coeficiente multiplicador/)).toBe('×1,0000');
+    expect(await importeDelPanel(page, /Bonificación 99,0\s%\s\(Andalucía\)/)).toBe('1073,16 €');
+    expect(await cuota(page)).toBe('10,84 €');
+    const panel = (await panelResultados(page)).replace(/\u00a0/g, ' ');
+    expect(panel).toContain('Tarifa propia de Andalucía, art. 37 Ley 5/2021 (7 %–26 %)');
+    expect(panel, 'no hay exención por importe').not.toContain('Exención total');
 
     await sembrarValor(page, page.locator('#saldos-cuentas'), '990000');
 
-    expect(await cuota(page)).toBe('2693,95 €');
-    const sobreElMillon = await panelResultados(page);
-    expect(sobreElMillon).toContain('1.003.743,13 €');  // base liquidable, ya sobre el millón
-    expect(sobreElMillon).toContain('269.395,34 €');    // cuota íntegra
-    // 22/09/2026 (hallazgo 1195): la bonificación sale ahora de la cuota íntegra LIQUIDADA, y
-    // con eso el desglose cuadra con lo que se lee — 269.395,34 − 266.701,39 = 2693,95, la
-    // cuota final que esta misma prueba fija arriba. Antes daba 2693,96 y mostraba 2693,95.
-    expect(sobreElMillon).toContain('266.701,39 €');    // bonificación del 99 %
-    expect(sobreElMillon).toContain('Bonificación 99,0 % (Andalucía)');
-    expect(sobreElMillon, 'ya no hay exención al llegar al millón').not.toContain('Exención total');
+    expect(await importeDelPanel(page, /^Base liquidable/)).toBe('19.700,00 €');
+    expect(await importeDelPanel(page, /^Cuota íntegra/)).toBe('1590,00 €');
+    expect(await importeDelPanel(page, /Bonificación 99,0\s%\s\(Andalucía\)/)).toBe('1574,10 €');
+    expect(await cuota(page)).toBe('15,90 €');
   });
 
   /**
@@ -2000,7 +2001,7 @@ test.describe('Inspector 25/09/2026', () => {
   /**
    * Contraste (pasa hoy): con la MISMA herencia —hijo de 21 o más, 300.000 € en cuentas—
    *   Asturias:  309.000 − 15.956,87 − 300.000 (reducción propia en base) < 0 → 0,00 €
-   *   Andalucía: base liquidable 293.043,13 < 1.000.000 → exención total    → 0,00 €
+   *   Andalucía: 309.000 − 1.000.000 (art. 28 Ley 5/2021, reducción en base) < 0 → 0,00 €
    *   Canarias:  40.011,04 + 25,50 % × (293.043,13 − 239.389,13) = 53.692,81 × 0,1 % = 53,69 €
    * Es el caso que desmiente las dos notas del hallazgo de abajo.
    */
@@ -2053,11 +2054,14 @@ test.describe('Inspector 25/09/2026', () => {
    * la prórroga: residuo que la re-inspección del 27/09/2026 deja con su propio testigo.)
    */
   test('el consejo del Grupo III cuenta las comunidades con data/fiscal, y la tabla no teclea', async ({ page }) => {
-    const sinNada = Object.values(BONIFICACIONES_CCAA_IS).filter((c) => {
+    // Desde el 28/10/2026 Andalucía cuenta como que algo le da: sube la reducción del Grupo III a
+    // 10.000 € (art. 28.1.c Ley 5/2021) frente a los 7993,46 € estatales. Eran 10; quedan 9.
+    const sinNada = Object.entries(BONIFICACIONES_CCAA_IS).filter(([id, c]) => {
       const iii = c.bonificaciones['III'];
-      return c.regimen === 'comun' && !(iii?.porcentaje ?? 0) && !(iii?.reduccionBase ?? 0);
+      return c.regimen === 'comun' && !(iii?.porcentaje ?? 0) && !(iii?.reduccionBase ?? 0)
+        && MEJORAS_REDUCCIONES_CCAA_IS[id]?.parentesco.importes['III'] === undefined;
     }).length;
-    expect(sinNada, 'comunidades de régimen común sin nada para el Grupo III').toBe(10);
+    expect(sinNada, 'comunidades de régimen común sin nada para el Grupo III').toBe(9);
 
     const texto = await textoCompleto(page);
     expect(texto).toContain('Lo que cambia mucho de una comunidad a otra es qué recibe');
@@ -2865,24 +2869,25 @@ test.describe('Inspector 30/09/2026', () => {
   });
 
   /**
-   * CASO LÍMITE — el umbral de ANDALUCÍA al céntimo, con el tramo más alto de la tarifa.
-   * `BONIFICACIONES_CCAA_IS['andalucia']…['II'] = { porcentaje: 0,99, exencion: 1.000.000 }`, y su
-   * nota: «Exención total si base liquidable < 1.000.000 €. Si supera, bonificación 99 %». La
-   * desigualdad es ESTRICTA: con 1.000.000,00 € justos ya no hay exención.
+   * CASO LÍMITE — lo que era el umbral de ANDALUCÍA al céntimo. Hasta el 28/10/2026 una base
+   * liquidable de 1.000.000,00 € pagaba 2681,23 € y un céntimo menos, 0,00 €: el millón se modelaba
+   * como exención total de la cuota. Con la Ley 5/2021 (arts. 28, 37, 38 y 39, leídos en el BOE el
+   * 28/10/2026) el millón se resta de la base y no hay escalón: el céntimo mueve la cuota un céntimo
+   * de base y nada más (cabo C0495).
    *
    * Hijo · 900.000 € en cuentas + 98.152,36 € de seguro de vida (el seguro no genera ajuar,
-   * art. 34.3 RISD, y así la base liquidable cae en el millón exacto):
+   * art. 34.3 RISD):
    *   ajuar              27.000,00   3 % de 900.000
    *   base imponible  1.025.152,36
-   *   − parentesco       15.956,87
+   *   − parentesco   1.000.000,00    art. 28 Ley 5/2021
    *   − seguro            9195,49    REDUCCION_SEGURO_VIDA_MAX_IS (art. 20.2.b LISD)
-   *   = base liquid.  1.000.000,00
-   *   cuota íntegra    268.122,67    199.291,40 + 34 % × (1.000.000 − 797.555,08) = 268.122,6728
-   *   − bonif. 99 %    265.441,44
-   *   = cuota final       2681,23 €
-   * Un céntimo menos de seguro (98.152,35) deja la base en 999.999,99 € → exención → 0,00 €.
+   *   = base liquid.     15.956,87
+   *   cuota íntegra       1215,69    1.120 + 10 % × (15.956,87 − 15.000) = 1215,687   (art. 37)
+   *   − bonif. 99 %       1203,53    1215,69 × 99 % = 1203,5331                       (art. 39)
+   *   = cuota final         12,16 €
+   * Un céntimo menos de seguro deja la base en 15.956,86 €: 1215,686 → la misma cuota íntegra.
    */
-  test('caso límite: en Andalucía 1.000.000,00 € de base liquidable pagan 2681,23 € y un céntimo menos, 0,00 €', async ({ page }) => {
+  test('caso límite: en Andalucía el millón ya no es un escalón — un céntimo de base no cambia la cuota de 12,16 €', async ({ page }) => {
     await page.locator('#ccaa-causante').selectOption('andalucia');
     await page.locator('#parentesco').selectOption('II');
     await sembrarValor(page, page.locator('#saldos-cuentas'), '900.000');
@@ -2891,15 +2896,14 @@ test.describe('Inspector 30/09/2026', () => {
     expect(await importeDelPanel(page, /Ajuar doméstico/)).toBe('27.000,00 €');
     expect(await importeDelPanel(page, /^Base imponible total/)).toBe('1.025.152,36 €');
     expect(await importeDelPanel(page, /Seguro de vida/)).toBe('9195,49 €');
-    expect(await importeDelPanel(page, /^Base liquidable/)).toBe('1.000.000,00 €');
-    expect(await importeDelPanel(page, /^Cuota íntegra/)).toBe('268.122,67 €');
-    expect(await importeDelPanel(page, /Bonificación 99,0\s%\s\(Andalucía\)/)).toBe('265.441,44 €');
-    expect(await cuotaEstimada(page)).toBe('2681,23 €');
+    expect(await importeDelPanel(page, /^Base liquidable/)).toBe('15.956,87 €');
+    expect(await importeDelPanel(page, /^Cuota íntegra/)).toBe('1215,69 €');
+    expect(await importeDelPanel(page, /Bonificación 99,0\s%\s\(Andalucía\)/)).toBe('1203,53 €');
+    expect(await cuotaEstimada(page)).toBe('12,16 €');
 
     await sembrarValor(page, page.locator('#seguros-vida'), '98.152,35');
-    expect(await importeDelPanel(page, /^Base liquidable/)).toBe('999.999,99 €');
-    expect(await importeDelPanel(page, /Exención total/)).toBe('268.122,67 €');
-    expect(await cuotaEstimada(page)).toBe('0,00 €');
+    expect(await importeDelPanel(page, /^Base liquidable/)).toBe('15.956,86 €');
+    expect(await cuotaEstimada(page)).toBe('12,16 €');
   });
 
   /**
@@ -3032,12 +3036,12 @@ test.describe('Inspector 30/09/2026', () => {
    * REPARADO el 30/09/2026 — hallazgo (contenido, bajo, Inspector 30/09/2026) — era la sospecha del 27/09. El
    * FAQPage del JSON-LD responde a «¿Cuánto se paga…?» que «Madrid o Andalucía bonifican el 99 % de
    * la CUOTA para cónyuge e hijos»: el 99 % sale de `bonifMadrid` y se le atribuye también a
-   * Andalucía, cuando `BONIFICACIONES_CCAA_IS['andalucia']` le da exención TOTAL por debajo de
-   * 1.000.000 € de base liquidable y el 99 % solo por encima. La herramienta de la misma página lo
+   * Andalucía, que reduce 1.000.000 € de la BASE (art. 28 Ley 5/2021) antes de bonificar el 99 %.
+   * (Hasta el 28/10/2026 el módulo lo modelaba como exención total por debajo del millón, C0495.) La herramienta de la misma página lo
    * desmiente: un hijo con 300.000 € en Andalucía liquida 0,00 €; siguiendo la FAQ, el 1 % de una
    * cuota de 53.692,81 € (293.043,13 € de base liquidable), 536,93 €. Es el canal que leen las IAs.
    */
-  test('el FAQPage no reduce Andalucía a «bonifica el 99 %»: por debajo de 1.000.000 € exime', async ({ page }) => {
+  test('el FAQPage no reduce Andalucía a «bonifica el 99 %»: dice su reducción de 1.000.000 € en la base', async ({ page }) => {
     await page.locator('#ccaa-causante').selectOption('andalucia');
     await page.locator('#parentesco').selectOption('II');
     await sembrarValor(page, page.locator('#saldos-cuentas'), '300000');

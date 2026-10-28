@@ -9,6 +9,7 @@ import {
   REDUCCION_EDAD_MENOR_21_IS,
   REDUCCION_EDAD_MENOR_21_MAX_IS,
   REDUCCION_VIVIENDA_PORC_IS,
+  MEJORAS_REDUCCIONES_CCAA_IS,
   FISCAL_SUCESIONES_META,
   VALORACION_USUFRUCTO_IS,
 } from '@/data/fiscal';
@@ -31,14 +32,13 @@ const bonifMadrid = formatPercentage(BONIFICACIONES_CCAA_IS['madrid'].bonificaci
 const reduccionAsturias = eur(BONIFICACIONES_CCAA_IS['asturias'].bonificaciones['II']?.reduccionBase ?? 0);
 const porcVivienda = formatPercentage(REDUCCION_VIVIENDA_PORC_IS, 0);
 /**
- * Andalucía no bonifica el 99 % de la cuota a cónyuge e hijos: deja EXENTA la herencia por debajo
- * de un umbral de base liquidable y bonifica el 99 % solo por encima. Hasta el 30/09/2026 el
- * FAQPage se la atribuía a Madrid con su 99 % (hallazgo 2485): un hijo andaluz con 300.000 € leía
- * que le quedaba el 1 % de la cuota, 536,93 €, cuando la herramienta liquida 0 €.
+ * Andalucía actúa en la BASE, como Asturias: reduce 1.000.000 € a cónyuge, hijos y padres (art. 28
+ * Ley 5/2021) y bonifica el 99 % de la cuota que quede (art. 39). Hasta el 30/09/2026 el FAQPage se
+ * la atribuía a Madrid con su 99 % (hallazgo 2485), y hasta el 28/10/2026 la describía como una
+ * «exención» de la herencia por debajo del millón, que la ley no tiene (cabo C0495).
  */
-const bonifAndalucia = BONIFICACIONES_CCAA_IS['andalucia'].bonificaciones['II'];
-const exencionAndalucia = eur(bonifAndalucia?.exencion ?? 0);
-const bonifAndaluciaPorEncima = formatPercentage(bonifAndalucia?.porcentaje ?? 0, 0);
+const reduccionAndalucia = eur(MEJORAS_REDUCCIONES_CCAA_IS['andalucia']?.parentesco.importes['II'] ?? 0);
+const bonifAndalucia = formatPercentage(BONIFICACIONES_CCAA_IS['andalucia'].bonificaciones['II']?.porcentaje ?? 0, 0);
 /**
  * El año del título sale del sello del módulo, como el DataReference de la página (hallazgo
  * 2486): tecleado, se quedaba atrás al re-sellar `data/fiscal/sucesiones.ts`.
@@ -83,7 +83,7 @@ export const jsonLd = generateWebAppSchema({
   category: 'FinanceApplication',
   features: [
     'Estimación del ISD en las 17 comunidades autónomas, con sus bonificaciones propias',
-    'Tarifa estatal del art. 21.2 LISD y tarifa propia de Cataluña',
+    'Tarifa estatal del art. 21.2 LISD y tarifas propias de Cataluña y Andalucía',
     `Reducciones por parentesco, edad, discapacidad, seguro de vida y vivienda habitual (${porcVivienda})`,
     'Coeficiente multiplicador por grupo de parentesco y patrimonio preexistente',
     `Usufructo y nuda propiedad por la edad del usufructuario (art. 26.a LISD: ${porcMaximo} % por debajo de ${edadUmbralMaximo} años, ${edadReferencia} menos la edad desde ahí y nunca menos del ${porcMinimo} %)`,
@@ -109,7 +109,7 @@ export const faqJsonLd = {
       name: '¿Cuánto se paga por el Impuesto de Sucesiones en España?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `La cuota depende de cuatro factores: el valor neto heredado, el grado de parentesco, el patrimonio previo del heredero y la comunidad autónoma. La tarifa estatal oscila entre el ${tipoMin} para los primeros tramos y el ${tipoMax} para bases liquidables superiores a ${umbralTipoMax}. Sobre esa cuota, cada comunidad aplica su propio beneficio, y no todas por la misma vía: Madrid bonifica el ${bonifMadrid} de la CUOTA para cónyuge e hijos, Andalucía deja exenta su herencia hasta ${exencionAndalucia} de base liquidable (y bonifica el ${bonifAndaluciaPorEncima} por encima), mientras Asturias actúa antes, con una reducción de ${reduccionAsturias} en la BASE de esos mismos grupos. Los dos caminos pueden acabar en cero, así que cuál resulta más barata depende del importe heredado y del parentesco: conviene calcular el caso concreto en vez de guiarse por la fama de cada comunidad.`,
+        text: `La cuota depende de cuatro factores: el valor neto heredado, el grado de parentesco, el patrimonio previo del heredero y la comunidad autónoma. La tarifa estatal oscila entre el ${tipoMin} para los primeros tramos y el ${tipoMax} para bases liquidables superiores a ${umbralTipoMax}; Cataluña y Andalucía aplican tarifa propia. Sobre esa cuota, cada comunidad aplica su propio beneficio, y no todas por la misma vía: Madrid bonifica el ${bonifMadrid} de la CUOTA para cónyuge e hijos, mientras Asturias y Andalucía actúan antes, con una reducción en la BASE de esos mismos grupos (${reduccionAsturias} y ${reduccionAndalucia}), y Andalucía bonifica además el ${bonifAndalucia} de la cuota que quede. Los dos caminos pueden acabar en cero, así que cuál resulta más barata depende del importe heredado y del parentesco: conviene calcular el caso concreto en vez de guiarse por la fama de cada comunidad.`,
       },
     },
     {

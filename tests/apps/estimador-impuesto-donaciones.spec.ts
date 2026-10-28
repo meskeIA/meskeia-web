@@ -889,18 +889,17 @@ test.describe('Estimador ISD donaciones — re-inspección (04/10/2026)', () => 
    * vivos», sin umbral. (El 1.000.000 € de esa ley es la reducción en base de sucesiones, art. 28.)
    * El testigo antiguo solo pedía que nota y desglose no se contradijeran, y consagraba la
    * exención; ahora mide la cifra:
-   *   1.000.000 € de padre a hijo (Grupo II), en escritura, sin patrimonio previo:
-   *   Cuota íntegra = 199.291,40 + (1.000.000 − 797.555,08) × 34 % = 268.122,6728
-   *   Bonificación 99 %                                          = 265.441,446
-   *   A ingresar = 2.681,226728                                  → «2681,23 €» (cuatro cifras: sin punto)
-   * Con la exención de antes: 0,00 €.
-   * ⚠️ La cifra usa la tarifa ESTATAL, que es la que la app aplica a Andalucía. Andalucía tiene
-   * tarifa propia (art. 37 Ley 5/2021, del 7 % al 26 %) y coeficientes propios (art. 38: 1,0 ·
-   * 1,5 · 1,9), leídos en el BOE el 28/10/2026: con ellos serían 2236,20 €. Cabo C0023.
+   *   1.000.000 € de padre a hijo (Grupo II), en escritura, sin patrimonio previo, con la tarifa
+   *   propia del art. 37 y el coeficiente 1,0 del art. 38 (modelados el 28/10/2026, cabo C0023):
+   *   Cuota íntegra = 171.620 + (1.000.000 − 800.000) × 26 % = 223.620,00
+   *   Bonificación 99 %                                     = 221.383,80
+   *   A ingresar                                            → «2236,20 €» (cuatro cifras: sin punto)
+   * Con la exención de antes: 0,00 €. Con la tarifa estatal (27/10/2026): 2681,23 €.
    */
-  test('HALLAZGO 2828: Andalucía bonifica el 99 % sin exención por importe — 1.000.000 € a un hijo, 2681,23 €', async ({ page }) => {
+  test('HALLAZGO 2828: Andalucía bonifica el 99 % sin exención por importe — 1.000.000 € a un hijo, 2236,20 €', async ({ page }) => {
     await rellenar(page, { ccaa: 'andalucia', grupo: 'II', valor: '1000000' });
-    expect(await cuota(page)).toBe('2681,23 €');
+    expect(await cuota(page)).toBe('2236,20 €');
+    expect((await panel(page)).replace(/\u00a0/g, ' ')).toContain('Tarifa propia de Andalucía (art. 37 Ley 5/2021, del 7 % al 26 %)');
     const nota = (await page.locator('[class*="infoCcaa"]').innerText()).replace(/\u00a0/g, ' ');
     const desglose = (await panel(page)).replace(/\u00a0/g, ' ');
     expect(desglose).toContain('art. 40.1 Ley 5/2021');
@@ -917,6 +916,21 @@ test.describe('Estimador ISD donaciones — re-inspección (04/10/2026)', () => 
    * a un hijo, la cuota sin escritura es la cuota tributaria entera, y con escritura el 1 % de
    * ella; con 4.000 € (base por debajo de 5.000 €) sin escritura, la bonificación se mantiene.
    */
+  /**
+   * Art. 38 de la Ley 5/2021 (leído el 28/10/2026): coeficiente 1,9 para el Grupo IV, sin escalones
+   * por patrimonio preexistente. 100.000 € a un amigo con 5.000.000 € de patrimonio:
+   *   Cuota íntegra = 7.820 + (100.000 − 70.000) × 16 % = 12.620,00              (art. 37)
+   *   × 1,9 = 23.978,00 €, sin bonificación (Grupo IV)
+   * Con la tarifa y los coeficientes estatales (hasta el 28/10/2026): 9166,06 + (100.000 −
+   * 79.880,52) × 16,15 % = 12.415,356 × 2,4 (cuarto tramo de patrimonio) = 29.796,85 €.
+   */
+  test('Andalucía: el Grupo IV paga coeficiente 1,9 con cualquier patrimonio — 100.000 €, 23.978,00 €', async ({ page }) => {
+    await rellenar(page, { ccaa: 'andalucia', grupo: 'IV', valor: '100000', patrimonio: '4' });
+    expect(await cuota(page)).toBe('23.978,00 €');
+    await rellenar(page, { ccaa: 'andalucia', grupo: 'IV', valor: '100000' });
+    expect(await cuota(page)).toBe('23.978,00 €');
+  });
+
   test('Andalucía: sin escritura pierde la bonificación por encima de 5.000 € de base, y no por debajo (art. 40.2.a)', async ({ page }) => {
     const importe = (t: string): number => parseSpanishNumber(t.split('€')[0].trim());
     await rellenar(page, { ccaa: 'andalucia', grupo: 'II', valor: '20000', escritura: false });

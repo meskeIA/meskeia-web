@@ -7,6 +7,7 @@ import {
   FISCAL_INTERESES_META, INTERES_LEGAL_DINERO_2025, TIPOS_DEMORA_COMERCIAL, INTERES_DEMORA_TRIBUTARIO_2025,
   TRAMOS_GANANCIAS_PATRIMONIALES_2025,
   FISCAL_SUCESIONES_META, TARIFA_ESTATAL_IS, COEFICIENTES_IS, REDUCCIONES_PARENTESCO_IS, BONIFICACIONES_CCAA_IS,
+  TARIFAS_PROPIAS_CCAA_ISD, MEJORAS_REDUCCIONES_CCAA_IS,
   FISCAL_DONACIONES_META, TARIFA_ESTATAL_ID, COEFICIENTES_ID, BONIFICACIONES_CCAA_ID, PLAZO_AUTOLIQUIDACION_DONACIONES,
   FISCAL_PATRIMONIO_META, ESCALA_PATRIMONIO_ESTATAL, BONIFICACIONES_CCAA_PATRIMONIO, MINIMO_EXENTO_ESTATAL, EXENCION_VIVIENDA_HABITUAL, UMBRAL_OBLIGACION_DECLARAR, ITSGF_UMBRAL,
   FISCAL_AMORTIZACION_META, TABLA_AMORTIZACION_2026, MULTIPLICADORES_DEGRESIVO_2026,
@@ -112,6 +113,11 @@ const DATASETS: Record<string, Dataset> = {
       coeficientesMultiplicadores: COEFICIENTES_IS,
       reduccionesPorParentesco: REDUCCIONES_PARENTESCO_IS,
       bonificacionesPorCCAA: BONIFICACIONES_CCAA_IS,
+      // Desde el 28/10/2026: lo que una comunidad pone en lugar de la tarifa, los coeficientes y
+      // las reducciones estatales (Andalucía, Extremadura). Sin esto, quien leía el JSON aplicaba
+      // la escala estatal a Andalucía.
+      tarifasYCoeficientesPropiosPorCCAA: TARIFAS_PROPIAS_CCAA_ISD,
+      mejorasDeReduccionesPorCCAA: MEJORAS_REDUCCIONES_CCAA_IS,
     },
   },
   'donaciones-isd': {
@@ -130,6 +136,7 @@ const DATASETS: Record<string, Dataset> = {
         'No hay reducción estatal por parentesco ni por discapacidad en las donaciones: las del art. 20.2.a LISD son solo mortis causa, y sin reducción autonómica propia la base liquidable coincide con la imponible (art. 20.5 LISD).',
       plazoAutoliquidacion: PLAZO_AUTOLIQUIDACION_DONACIONES,
       bonificacionesPorCCAA: BONIFICACIONES_CCAA_ID,
+      tarifasYCoeficientesPropiosPorCCAA: TARIFAS_PROPIAS_CCAA_ISD,
     },
   },
   'impuesto-patrimonio': {

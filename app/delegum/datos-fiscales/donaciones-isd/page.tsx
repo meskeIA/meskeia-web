@@ -8,10 +8,13 @@ import DataReference from '@/components/DataReference';
 import {
   BONIFICACIONES_CCAA_ID,
   TARIFA_ESTATAL_ID,
+  TARIFA_ANDALUCIA_ISD,
+  COEFICIENTES_ANDALUCIA_ISD,
+  TARIFAS_PROPIAS_CCAA_ISD,
   FISCAL_DONACIONES_META,
   type BonificacionGrupoID,
 } from '@/data/fiscal';
-import { formatCurrency, formatDate, parseISODateLocal } from '@/lib';
+import { formatCurrency, formatNumber, formatPercentage, formatDate, parseISODateLocal } from '@/lib';
 import NovedadesFicha from '../NovedadesFicha';
 import FichasRelacionadas from '../FichasRelacionadas';
 import styles from '../Ficha.module.css';
@@ -235,6 +238,14 @@ export default function DonacionesIsdPage() {
               Sobre la cuota resultante se aplica además un coeficiente multiplicador según el grupo
               de parentesco y el patrimonio previo del donatario (desde 1,00 en Grupos I y II hasta
               2,40 en el Grupo IV), antes de la bonificación autonómica.
+            </p>
+            {/* Desde el 28/10/2026 (cabos C0023 y C0495): Andalucía liquidaba con esta tabla. */}
+            <p className={styles.tableFoot}>
+              Andalucía no usa esta escala: tiene tarifa propia, del {formatPercentage(TARIFA_ANDALUCIA_ISD[0].tipo / 100, 0)} al{' '}
+              {formatPercentage(TARIFA_ANDALUCIA_ISD[TARIFA_ANDALUCIA_ISD.length - 1].tipo / 100, 0)} ({TARIFAS_PROPIAS_CCAA_ISD['andalucia'].normaTarifa}),
+              y coeficientes propios de {formatNumber(COEFICIENTES_ANDALUCIA_ISD['II'][0], 1)} en los Grupos I y II,{' '}
+              {formatNumber(COEFICIENTES_ANDALUCIA_ISD['III'][0], 1)} en el III y {formatNumber(COEFICIENTES_ANDALUCIA_ISD['IV'][0], 1)} en
+              el IV, que no dependen del patrimonio previo ({TARIFAS_PROPIAS_CCAA_ISD['andalucia'].normaCoeficientes}).
             </p>
           </section>
 

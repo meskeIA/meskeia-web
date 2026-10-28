@@ -27,6 +27,7 @@ import {
   TARIFA_CATALUNA_ID_REDUCIDA,
   COEFICIENTES_ID,
   COEFICIENTES_CATALUNA_ID,
+  TARIFAS_PROPIAS_CCAA_ISD,
   BONIFICACIONES_CCAA_ID,
   cuotaTributariaConCorreccionIS,
   type TramoTarifaID,
@@ -319,7 +320,8 @@ export function calcularDonacion(p: ParametrosDonaciones): ResultadoDonaciones {
   const reduccionDiscapacidad = 0;
   const baseNetaReducida = baseLiquidable;
 
-  // 4. Tarifa aplicable
+  // 4. Tarifa aplicable (Cataluña, propia de la comunidad o estatal)
+  const propia = TARIFAS_PROPIAS_CCAA_ISD[p.ccaa];
   let tarifa: TramoTarifaID[];
   let tarifaAplicada: string;
 
@@ -332,6 +334,12 @@ export function calcularDonacion(p: ParametrosDonaciones): ResultadoDonaciones {
       tarifa = TARIFA_CATALUNA_ID_GENERAL;
       tarifaAplicada = `Tarifa general de Cataluña (del 7${ESPACIO_DURO}% al 32${ESPACIO_DURO}%)`;
     }
+  } else if (propia) {
+    // Andalucía: la tarifa del art. 37 de la Ley 5/2021 rige las dos modalidades del impuesto
+    // (Sección 3.ª de su capítulo del ISD). Hasta el 28/10/2026 se liquidaba con la estatal (C0023).
+    tarifa = propia.tarifa;
+    const tipo = (n: number) => `${n.toLocaleString('es-ES')}${ESPACIO_DURO}%`;
+    tarifaAplicada = `Tarifa propia de ${ccaaInfo.nombre} (${propia.normaTarifa}, del ${tipo(propia.tarifa[0].tipo)} al ${tipo(propia.tarifa[propia.tarifa.length - 1].tipo)})`;
   } else {
     tarifa = TARIFA_ESTATAL_ID;
     tarifaAplicada = `Tarifa estatal (art. 21.2 LISD, del 7,65${ESPACIO_DURO}% al 34${ESPACIO_DURO}%)`;
@@ -340,7 +348,8 @@ export function calcularDonacion(p: ParametrosDonaciones): ResultadoDonaciones {
   const cuotaIntegra = calcularTarifa(baseNetaReducida, tarifa);
 
   // 5. Coeficiente multiplicador por patrimonio preexistente (art. 22.2 LISD)
-  const coefs = esCataluna ? COEFICIENTES_CATALUNA_ID : COEFICIENTES_ID;
+  // Andalucía: coeficientes propios del art. 38 Ley 5/2021 (1,0 · 1,5 · 1,9, sin patrimonio previo)
+  const coefs = esCataluna ? COEFICIENTES_CATALUNA_ID : (propia?.coeficientes ?? COEFICIENTES_ID);
   const filaCoefs = coefs[grupoBase] ?? [1, 1, 1, 1];
   // ⚠️ 2026-10-04 (hallazgo 2823): se multiplicaba siempre por el coeficiente ENTERO del tramo, y
   //    a quien pasaba un umbral por poco se le cobraba el salto completo (un sobrino de CLM con
