@@ -442,8 +442,8 @@ test.describe('Inspector 10/10/2026 · hallazgos de la partida', () => {
   });
 
   test('hallazgo · el porcentaje va separado con espacio duro («70 %»)', async ({ page }) => {
-    // ABIERTO (inspector 10/10/2026). Regla de formato del 25/09/2026 (Ortografía RAE 2010):
-    // page.tsx:277 y :289 pegan el «%». 7/10 → «7 de 10 preguntas correctas (70 %)» y «70 %».
+    // Visto por el inspector el 10/10/2026, hoy REPARADO. Regla de formato del 25/09/2026
+    // (Ortografía RAE 2010): page.tsx:277 y :289 pegaban el «%». 7/10 → «7 de 10 preguntas correctas (70 %)» y «70 %».
     // REPARADO el 20/10/2026 (3226) con formatPercentage, como la gemela.
     test.setTimeout(90_000);
     await abrir(page, { semilla: 2 });
@@ -486,9 +486,9 @@ test.describe('Inspector 10/10/2026 · hallazgos de la partida', () => {
   });
 
   test('hallazgo · la región viva solo abarca el veredicto y la explicación, no el botón', async ({ page }) => {
-    // ABIERTO (inspector 10/10/2026). page.tsx:255 — role="alert" (con aria-live="polite", que
-    // se contradicen) envuelve el panel entero, botón «Siguiente pregunta →» incluido, y nace ya
-    // con contenido. Medido: región role=alert con 1 botón y texto «¡Correcto!…Siguiente pregunta →».
+    // Visto por el inspector el 10/10/2026, hoy REPARADO. page.tsx:255 — role="alert" (con
+    // aria-live="polite", que se contradicen) envolvía el panel entero, botón «Siguiente
+    // pregunta →» incluido, y nacía ya con contenido. Medido: región role=alert con 1 botón y texto «¡Correcto!…Siguiente pregunta →».
     // REPARADO el 20/10/2026 (3218) con la receta del 2108 de la gemela.
     await abrir(page, { semilla: 3 });
     await arrancar(page, 'Fácil');
@@ -504,8 +504,8 @@ test.describe('Inspector 10/10/2026 · hallazgos de la partida', () => {
   });
 
   test('hallazgo · «Comenzar quiz» no lleva el ▶ en su nombre accesible', async ({ page }) => {
-    // ABIERTO (inspector 10/10/2026). page.tsx:199 — «Comenzar quiz ▶» sin aria-hidden; medido el
-    // nombre accesible «Comenzar quiz ▶». REPARADO el 20/10/2026 (3219).
+    // Visto por el inspector el 10/10/2026: page.tsx:199 — «Comenzar quiz ▶» sin aria-hidden;
+    // medido el nombre accesible «Comenzar quiz ▶». REPARADO el 20/10/2026 (3219).
     await abrir(page);
     await expect(page.getByRole('button', { name: 'Comenzar quiz', exact: true })).toHaveCount(1, { timeout: 2000 });
   });
@@ -874,9 +874,9 @@ test.describe('Inspector 10/10/2026 · contenido', () => {
   });
 
   test('hallazgo · «¿Cuántas provincias tiene España?» se contesta con el mismo texto en las dos FAQ', async ({ page }) => {
-    // ABIERTO (inspector 10/10/2026). Mismas cifras (50 · 17 · Ceuta y Melilla) con dos redacciones;
-    // la del FAQPage («distribuidas en 17 comunidades autónomas y 2 ciudades autónomas») se lee como
-    // si Ceuta y Melilla tuvieran provincias. REPARADO el 20/10/2026 (3221): una constante en metadata.ts.
+    // Visto por el inspector el 10/10/2026, hoy REPARADO. Mismas cifras (50 · 17 · Ceuta y
+    // Melilla) con dos redacciones; la del FAQPage («distribuidas en 17 comunidades autónomas y 2
+    // ciudades autónomas») se leía como si Ceuta y Melilla tuvieran provincias. REPARADO el 20/10/2026 (3221): una constante en metadata.ts.
     await abrir(page);
     const pregunta = '¿Cuántas provincias tiene España?';
     expect((await faqServida(page))[pregunta]).toBe((await faqVisible(page))[pregunta]);
@@ -923,7 +923,7 @@ test.describe('Inspector 10/10/2026 · contenido', () => {
   });
 
   test('hallazgo · la guía no se contradice en Castilla y León ni en los husos horarios', async ({ page }) => {
-    // ABIERTO (inspector 10/10/2026).
+    // Visto por el inspector el 10/10/2026, hoy REPARADO (abajo). Antes:
     // · Castilla y León: la FAQ visible da 94.225 km² y «la segunda de la Unión Europea»; la
     //   explicación de la id 10, 94.226 km² y «la más extensa de España y de la Unión Europea».
     // · «Le siguen Castilla-La Mancha (79.463 km²) y Andalucía (87.268 km²)»: con sus propias cifras
@@ -944,5 +944,317 @@ test.describe('Inspector 10/10/2026 · contenido', () => {
     const tarjetas = await page.locator('[class*="tipCard"]').evaluateAll((cs) => cs.map((c) => (c.textContent ?? '').replace(/\s+/g, ' ')));
     if (tarjetas.some((t) => /Tres zonas horarias/.test(t) && /dos husos horarios/.test(t))) fallos.push('«Tres zonas horarias» frente a «dos husos horarios»');
     expect(fallos).toEqual([]);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Inspector 28/10/2026 — familia «Quizzes de opción múltiple» y cabo C0203.
+// ─────────────────────────────────────────────────────────────────────────────
+
+test.describe('Inspector 28/10/2026 · partida (casos resueltos a mano)', () => {
+  /**
+   * CASO NORMAL — Difícil, 13 bien y 7 mal, en ese orden.
+   * Esperado a mano: 20 preguntas (CONFIG dificil = 20, banco difícil = 25), todas «dificil»;
+   * el marcador en vivo sube 1 … 13 y se queda en 13 («N correctas», nunca más que las
+   * contestadas: la app no tiene porcentaje en vivo); 13/20 = 65 % → tramo ≥ 50 y < 70 → 🥉
+   * «Nivel intermedio»; estadísticas 13 · 7 · «65 %» (espacio duro) · 20; 7 fichas falladas.
+   */
+  test('caso normal: 13 de 20 en Difícil dan 65 % y «Nivel intermedio», con el marcador en vivo al día', async ({ page }) => {
+    test.setTimeout(120_000);
+    await abrir(page, { semilla: 28 });
+    await arrancar(page, 'Difícil');
+    await expect(page.locator('[class*="progresoInfo"]')).toContainText('Pregunta 1 de 20');
+    const fichas: PreguntaGeografia[] = [];
+    for (let n = 1; n <= 20; n++) {
+      fichas.push((await responder(page, n <= 13 ? 'bien' : 'mal')).ficha);
+      const esperado = Math.min(n, 13);
+      await expect(marcador(page)).toHaveText(`${esperado} ${esperado === 1 ? 'correcta' : 'correctas'}`);
+      const rotulo = await avanzar(page);
+      expect(/Ver resultado/.test(rotulo), `«Ver resultado» sale en la ${n}`).toBe(n === 20);
+    }
+    expect(new Set(fichas.map((f) => f.id)).size, 'pregunta repetida').toBe(20);
+    expect(fichas.every((f) => f.dificultad === 'dificil')).toBe(true);
+    const r = await resultado(page);
+    expect(r.titulo).toBe('Nivel intermedio');
+    expect(r.medalla).toBe('🥉');
+    expect(r.subtitulo).toBe(`13 de 20 preguntas correctas (65${DURO}%)`);
+    expect(r.stats).toEqual({ Correctas: '13', Errores: '7', 'Puntuación': `65${DURO}%`, Jugadas: '20' });
+    expect(r.errores).toBe(7);
+  });
+
+  /**
+   * CASO LÍMITE — redondeo junto a un umbral, «Jugar de nuevo» sin recargar y «Cambiar dificultad»
+   * con el ratón.
+   * Esperado a mano: Medio 10/15 = 66,67 % → Math.round = 67 % → por debajo de 70 → 🥉 «Nivel
+   * intermedio» (no 🥈). «Jugar de nuevo» no recarga, vuelve a «Pregunta 1 de 15» y «0 correctas»;
+   * 14/15 = 93,33 % → 93 % → 🥇 «¡Experto en Geografía de España!». «Cambiar dificultad» pulsado con
+   * el ratón deja el foco en «Comenzar quiz» (page.tsx, efecto de fase «inicio» con partida previa),
+   * no en <body>, y conserva «Medio» elegido.
+   */
+  test('caso límite: 10 de 15 redondea a 67 % (🥉), «Jugar de nuevo» no recarga y «Cambiar dificultad» deja el foco en «Comenzar quiz»', async ({ page }) => {
+    test.setTimeout(150_000);
+    await abrir(page, { semilla: 29 });
+    await page.evaluate(() => { (window as unknown as { __marca: string }).__marca = 'sin-recarga'; });
+    await arrancar(page, 'Medio');
+    await jugar(page, 10);
+    let r = await resultado(page);
+    expect(r.titulo).toBe('Nivel intermedio');
+    expect(r.medalla).toBe('🥉');
+    expect(r.subtitulo).toBe(`10 de 15 preguntas correctas (67${DURO}%)`);
+
+    await page.getByRole('button', { name: 'Jugar de nuevo' }).click();
+    await expect(page.locator('[class*="progresoInfo"]')).toContainText('Pregunta 1 de 15');
+    await expect(marcador(page)).toHaveText('0 correctas');
+    expect(await page.evaluate(() => (window as unknown as { __marca?: string }).__marca)).toBe('sin-recarga');
+    await jugar(page, 14);
+    r = await resultado(page);
+    expect(r.titulo).toBe('¡Experto en Geografía de España!');
+    expect(r.medalla).toBe('🥇');
+    expect(r.subtitulo).toBe(`14 de 15 preguntas correctas (93${DURO}%)`);
+
+    await page.getByRole('button', { name: 'Cambiar dificultad' }).click();
+    await expect(page.locator('[class*="inicioPanel"]')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Comenzar quiz', exact: true })).toBeFocused();
+    await expect(page.getByRole('button', { name: /^Medio/ })).toHaveAttribute('aria-pressed', 'true');
+  });
+});
+
+/** Registra cada clic en window, en captura y ANTES que la guarda de la app, y si llegó a la burbuja. */
+async function espiarClics(page: Page): Promise<void> {
+  await page.addInitScript(() => {
+    const w = window as unknown as { __clics: { d: number; t: string; llega: boolean }[] };
+    w.__clics = [];
+    const desc = (n: EventTarget | null): string => {
+      const el = n instanceof Element ? (n.closest('a,button') ?? n) : null;
+      return el ? `${el.tagName.toLowerCase()}«${(el.textContent ?? '').replace(/\s+/g, ' ').trim().slice(0, 30)}»` : String(n);
+    };
+    window.addEventListener('click', (e) => { w.__clics.push({ d: e.detail, t: desc(e.target), llega: false }); }, true);
+    window.addEventListener('click', () => { const u = w.__clics[w.__clics.length - 1]; if (u) u.llega = true; });
+  });
+}
+
+/**
+ * Doble clic o dos toques (el 2.º con detail 2, en el mismo punto y con la pantalla nueva ya
+ * pintada) en «Comenzar», en cada «Siguiente», en «Ver resultado» y en las dos salidas del
+ * resultado («Jugar de nuevo», «Cambiar dificultad»). Devuelve lo que el 2.º hizo de más, su
+ * `detail` y qué había bajo él.
+ */
+async function dobleEnCadaTransicion(page: Page, frac: number, doble: Doble, semilla: number) {
+  await espiarClics(page);
+  await abrir(page, { semilla });
+  const mal: string[] = [];
+  const detalles: number[] = [];
+  const blancos: string[] = [];
+  const estado = () =>
+    page.evaluate(() => {
+      const ops = [...document.querySelectorAll('[role="group"][aria-label="Opciones de respuesta"] button')] as HTMLButtonElement[];
+      const guia = [...document.querySelectorAll('button[aria-expanded]')].find((b) => /guía educativa/.test(b.textContent ?? ''));
+      return {
+        ruta: location.pathname,
+        inicio: Boolean(document.querySelector('[class*="inicioPanel"]')),
+        fin: Boolean(document.querySelector('[class*="finTitulo"]')),
+        progreso: (document.querySelector('[class*="progresoInfo"] span')?.textContent ?? '').trim(),
+        bloqueadas: ops.filter((b) => b.disabled).length,
+        guia: guia?.getAttribute('aria-expanded') ?? 'sin botón',
+      };
+    });
+  const pulsar = async (loc: Locator, rotulo: string, espera: 'pregunta' | 'fin' | 'inicio') => {
+    const p = await colocar(page, loc, frac);
+    const antes = await estado();
+    await page.evaluate(() => { (window as unknown as { __clics: unknown[] }).__clics = []; });
+    await doble(page, p.x, p.y);
+    const clics = await page.evaluate(() => (window as unknown as { __clics: { d: number; t: string; llega: boolean }[] }).__clics);
+    const e = await estado();
+    const seg = clics[1];
+    if (seg) {
+      detalles.push(seg.d);
+      blancos.push(seg.t);
+      if (seg.llega) mal.push(`${rotulo}: el 2.º llega a ${seg.t}`);
+    } else mal.push(`${rotulo}: no hubo 2.º clic`);
+    if (e.ruta !== RUTA) mal.push(`${rotulo}: navega a ${e.ruta}`);
+    if (e.guia !== antes.guia) mal.push(`${rotulo}: la guía pasa de ${antes.guia} a ${e.guia}`);
+    if (espera === 'pregunta' && (e.inicio || e.fin || e.bloqueadas > 0)) mal.push(`${rotulo}: la ${e.progreso} sale ya respondida o se pierde`);
+    if (espera === 'fin' && !e.fin) mal.push(`${rotulo}: la nota no se ve`);
+    if (espera === 'inicio' && !e.inicio) mal.push(`${rotulo}: no se queda en la selección de nivel`);
+    return e;
+  };
+  await page.getByRole('button', { name: /^Fácil/ }).click();
+  let e = await pulsar(page.getByRole('button', { name: /Comenzar quiz/ }), 'Comenzar', 'pregunta');
+  for (let n = 1; n <= 10 && !e.fin && !e.inicio && e.ruta === RUTA; n++) {
+    if (e.bloqueadas === 0) {
+      await page.waitForTimeout(500); // lee la pregunta: fuera de la ventana de ráfaga
+      await opciones(page).nth(3).click();
+      await expect(page.locator('[class*="feedbackMensaje"]')).toBeVisible();
+    }
+    const sig = page.getByRole('button', { name: /Siguiente pregunta|Ver resultado/ });
+    const ultimo = /Ver resultado/.test(await sig.innerText());
+    e = await pulsar(sig, ultimo ? 'Ver resultado' : `Siguiente ${n}`, ultimo ? 'fin' : 'pregunta');
+  }
+  expect(e.fin, 'la partida llega al resultado').toBe(true);
+  await page.waitForTimeout(500);
+  e = await pulsar(page.getByRole('button', { name: 'Jugar de nuevo' }), 'Jugar de nuevo', 'pregunta');
+  for (let n = 1; n <= 10 && !e.fin; n++) {
+    await page.waitForTimeout(400);
+    await opciones(page).nth(0).click();
+    await page.waitForTimeout(400);
+    await page.getByRole('button', { name: /Siguiente pregunta|Ver resultado/ }).click();
+    e = await estado();
+  }
+  expect(e.fin, 'la 2.ª partida llega al resultado').toBe(true);
+  await page.waitForTimeout(500);
+  await pulsar(page.getByRole('button', { name: 'Cambiar dificultad' }), 'Cambiar dificultad', 'inicio');
+  return { mal, detalles, blancos };
+}
+
+/**
+ * LO QUE DEBE IGNORARSE — el 2.º toque de una ráfaga. El testigo de la familia solo mide a
+ * 390 × 844 y en una hermana sin guarda pasaba por geometría; aquí se mide a 412 × 915 y 768 × 1024
+ * (toque) y a 1280 × 800 (ratón), con el botón a una altura en la que el 2.º cae, medido el
+ * 28/10/2026, sobre una opción de la pregunta nueva, «Ver guía educativa» o «Comenzar quiz».
+ * Esperado a mano (guarda en captura sobre window, page.tsx): ninguno de los 2.º llega a la app;
+ * la pregunta nueva sale sin responder, la nota se ve, la guía no se abre ni se cierra, no se sale
+ * de la ruta. Medido el 28/10/2026 en 195 transiciones (5 viewports × 3 alturas): 0 de 195.
+ */
+test.describe('Inspector 28/10/2026 · doble toque a 412 × 915', () => {
+  test.use({ viewport: { width: 412, height: 915 }, userAgent: MOVIL_UA, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
+  test('caso de rechazo: el 2.º toque no contesta, no se come la nota, no abre la guía ni saca de la app', async ({ page }) => {
+    test.setTimeout(180_000);
+    const r = await dobleEnCadaTransicion(page, 0.55, dobleToque, 962);
+    expect(r.mal).toEqual([]);
+    expect(r.detalles.every((d) => d === 2), `detail del 2.º: ${r.detalles.join(',')}`).toBe(true);
+    expect(r.blancos.some((t) => t.startsWith('button')), `el 2.º no cayó nunca en un botón: ${r.blancos.join(' · ')}`).toBe(true);
+  });
+});
+
+test.describe('Inspector 28/10/2026 · doble toque a 768 × 1024', () => {
+  test.use({ viewport: { width: 768, height: 1024 }, userAgent: MOVIL_UA, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
+  test('caso de rechazo: el 2.º toque no contesta, no se come la nota, no abre la guía ni saca de la app', async ({ page }) => {
+    test.setTimeout(180_000);
+    const r = await dobleEnCadaTransicion(page, 0.3, dobleToque, 1068);
+    expect(r.mal).toEqual([]);
+    expect(r.detalles.every((d) => d === 2), `detail del 2.º: ${r.detalles.join(',')}`).toBe(true);
+    expect(r.blancos.some((t) => t.startsWith('button')), `el 2.º no cayó nunca en un botón: ${r.blancos.join(' · ')}`).toBe(true);
+  });
+});
+
+test.describe('Inspector 28/10/2026 · doble clic a 1280 × 800', () => {
+  test.use({ viewport: { width: 1280, height: 800 } });
+  test('caso de rechazo: el 2.º clic no contesta, no se come la nota, no abre la guía ni saca de la app', async ({ page }) => {
+    test.setTimeout(180_000);
+    const r = await dobleEnCadaTransicion(page, 0.8, dobleClic, 2080);
+    expect(r.mal).toEqual([]);
+    expect(r.detalles.every((d) => d === 2), `detail del 2.º: ${r.detalles.join(',')}`).toBe(true);
+    expect(r.blancos.some((t) => /Ver guía educativa/.test(t)), `el 2.º no cayó nunca en la guía: ${r.blancos.join(' · ')}`).toBe(true);
+  });
+});
+
+/** Texto de las tarjetas de la guía (están en el DOM aunque la guía esté plegada). */
+async function tarjetaGuia(page: Page, clase: string, texto: string): Promise<string> {
+  const t = await page.evaluate(
+    ([c, x]) =>
+      [...document.querySelectorAll(`[class*="${c}"]`)]
+        .map((e) => (e.textContent ?? '').replace(/[ \t\n\r]+/g, ' ').trim())
+        .find((s) => s.includes(x)) ?? '',
+    [clase, texto],
+  );
+  expect(t, `no hay tarjeta «${clase}» con «${texto}»`).not.toBe('');
+  return t;
+}
+
+test.describe('Inspector 28/10/2026 · contenido (cabo C0203 y JSON-LD)', () => {
+  test('hallazgo · Ordesa no fue el primer parque nacional: Covadonga se declaró antes', async () => {
+    // ABIERTO (inspector 28/10/2026). id 62: «Fue el primer parque nacional español, creado en 1918.»
+    // BOE: la Ley de 22 de julio de 1918 (Gaceta de Madrid núm. 205, 24/07/1918, BOE-A-1918-3943),
+    // art. 2, declara parque nacional el macizo de Peña Santa «con el nombre de Parque Nacional de
+    // la Montaña de Covadonga»; el «Real decreto de 16 de agosto de 1918 creando el Parque Nacional
+    // del Valle de Ordesa o del río Ara […] fijando sus límites y extensión y los del Parque Nacional
+    // de Covadonga» (Gaceta núm. 230, 18/08/1918, BOE-A-1918-4414) es 25 días posterior.
+    test.fail();
+    expect(fichaDe(/Parque Nacional de Ordesa y Monte Perdido/).explicacion).not.toMatch(/primer parque nacional/i);
+  });
+
+  test('hallazgo · el Aneto no está en un «Parque Nacional Posets-Maladeta»', async () => {
+    // ABIERTO (inspector 28/10/2026). id 29: «dentro del Parque Nacional Posets-Maladeta».
+    // BOE: Ley 3/1994, de 23 de junio, de las Cortes de Aragón, «de creación del Parque
+    // Posets-Maladeta», art. 1: «Se crea el Parque de Posets-Maladeta, en el Pirineo aragonés»
+    // (figura de Parque de la Ley 4/1989). Un parque nacional se declara «por ley de las Cortes
+    // Generales» (Ley 30/2014, art. 8.1) y Posets-Maladeta no está entre los de la disposición
+    // adicional primera de esa ley.
+    test.fail();
+    expect(fichaDe(/pico más alto del Pirineo/).explicacion).not.toMatch(/Parque Nacional Posets/i);
+  });
+
+  test('hallazgo · Zaragoza es hoy la cuarta ciudad más poblada y Sevilla la quinta', async () => {
+    // ABIERTO (inspector 28/10/2026). id 11: «Sevilla … la cuarta ciudad más poblada de España»;
+    // id 17: «Zaragoza … la quinta ciudad más poblada de España». INE, cifras oficiales del Padrón a
+    // 1 de enero de 2025 (tablas «Zaragoza: Población por municipios y sexo» y «Sevilla: …»):
+    // València 840.792 · Zaragoza 693.091 · Sevilla 689.423. Esperado: Zaragoza 4.ª, Sevilla 5.ª.
+    test.fail();
+    const fallos: string[] = [];
+    if (/cuarta ciudad más poblada/.test(fichaDe(/capital de Andalucía/).explicacion)) fallos.push('Sevilla «cuarta» (INE 2025: 689.423, quinta)');
+    if (/quinta ciudad más poblada/.test(fichaDe(/capital de Aragón/).explicacion)) fallos.push('Zaragoza «quinta» (INE 2025: 693.091, cuarta)');
+    expect(fallos).toEqual([]);
+  });
+
+  test('hallazgo · la Albufera no es «la laguna más grande de España»: el Mar Menor tiene 135 km²', async ({ page }) => {
+    // ABIERTO (inspector 28/10/2026). Curiosidad de la guía: «La Albufera de Valencia es la laguna
+    // más grande de España con 2.800 ha de agua dulce. El Mar Menor (Murcia) es la laguna salada…».
+    // BOE: Ley 19/2022, de 30 de septiembre, «para el reconocimiento de personalidad jurídica a la
+    // laguna del Mar Menor», preámbulo: «con una superficie de 135 km2, la mayor laguna costera del
+    // Mediterráneo español». 135 km² = 13.500 ha > 2.800 ha.
+    test.fail();
+    await abrir(page);
+    const t = await tarjetaGuia(page, 'tipCard', 'Albufera');
+    const ha = Number(((t.match(/([\d.]+) ha/) ?? [])[1] ?? 'NaN').replace(/\./g, ''));
+    expect(ha, 'superficie que da la tarjeta').toBe(2800);
+    expect(/laguna más grande de España/.test(t) && ha < 13_500, `«${t}»`).toBe(false);
+  });
+
+  test('hallazgo · Canarias no está «en la misma latitud que el norte de Marruecos»', async ({ page }) => {
+    // ABIERTO (inspector 28/10/2026). BOE: Real Decreto 2510/1977, de 5 de agosto, sobre trazado de
+    // líneas de base rectas: el punto más septentrional de Canarias, Pta. Grieta (Alegranza), está
+    // a 29º 42' N y Pta. de la Restinga (El Hierro) a 27º 38' N; Tarifa (isla), a 36º 00' N, frente
+    // a la costa norte de Marruecos a 14 km (la propia guía). Canarias queda 6º-8º más al sur.
+    test.fail();
+    await abrir(page);
+    expect(await tarjetaGuia(page, 'tipCard', 'archipiélago canario')).not.toMatch(/norte de Marruecos/);
+  });
+
+  test('hallazgo · la Geografía no es materia obligatoria en 2.º de Bachillerato', async ({ page }) => {
+    // ABIERTO (inspector 28/10/2026). Tarjeta «Bachillerato y ESO»: «La geografía de España es
+    // materia obligatoria en 3.º ESO y en 2.º de Bachillerato». BOE: Real Decreto 243/2022, art. 9.2
+    // (materias comunes de 2.º: Historia de España, Historia de la Filosofía, Lengua Castellana y
+    // Literatura II, Lengua Extranjera II) y art. 13.2: Geografía es una de las materias de
+    // modalidad de Humanidades y Ciencias Sociales entre las que se eligen dos.
+    test.fail();
+    await abrir(page);
+    // «[^,;]*» y no «[^.]*»: «3.º ESO» lleva punto.
+    expect(await tarjetaGuia(page, 'scenarioCard', 'Bachillerato')).not.toMatch(/obligatoria[^,;]*2\.º de Bachillerato/);
+  });
+
+  test('hallazgo · ningún porcentaje de la guía va pegado al «%»', async ({ page }) => {
+    // ABIERTO (inspector 28/10/2026). Regla del 25/09/2026 (Ortografía RAE 2010): «Solo un 11% de su
+    // territorio» en la curiosidad «España, el segundo país más montañoso de Europa». Esperado «11 %».
+    test.fail();
+    await abrir(page);
+    const pegados = await page.evaluate(() =>
+      [...document.querySelectorAll('[class*="guideSection"], [class*="warningBox"]')]
+        .flatMap((s) => (s.textContent ?? '').match(/\S*\d%/g) ?? []),
+    );
+    expect(pegados).toEqual([]);
+  });
+
+  test('hallazgo · el WebApplication del JSON-LD declara al menos 4 características', async ({ page }) => {
+    // ABIERTO (inspector 28/10/2026). metadata.ts: `features: []` → featureList vacía (§1.ter).
+    test.fail();
+    await abrir(page);
+    const n = await page.evaluate(() => {
+      for (const s of document.querySelectorAll('script[type="application/ld+json"]')) {
+        const d = JSON.parse(s.textContent ?? '{}') as { '@type'?: string; featureList?: unknown[] };
+        if (d['@type'] === 'WebApplication') return Array.isArray(d.featureList) ? d.featureList.length : -1;
+      }
+      return -2;
+    });
+    expect(n).toBeGreaterThanOrEqual(4);
   });
 });

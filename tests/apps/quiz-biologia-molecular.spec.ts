@@ -1316,3 +1316,354 @@ test.describe('Inspector 04/10/2026 · móvil 360 × 740', () => {
     await expect(page.locator('[class*="puntuacionCirculo"]')).toHaveText('0/30');
   });
 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+// RE-INSPECCIÓN DEL 28/10/2026 (la familia «Quizzes de opción múltiple» entera)
+// ─────────────────────────────────────────────────────────────────────────────
+//
+// Vuelve a la cola por cd462414 (scroll-padding en globals.css) y 99e1ee7e (relacionadas desde
+// el servidor). La guarda de doble toque de esta app es LOCAL a sus manejadores: `clicDeMas` y
+// `conClic` (page.tsx:548-555, con `ultimoCambioPantallaRef`), la misma forma que la referencia
+// quiz-literatura-universal; NO usa lib/useGuardaRafaga.ts, que escucha en captura sobre
+// window. Dentro del quiz para el 2.º toque; lo que cae fuera (la guía educativa, las
+// relacionadas, el pie) actúa.
+
+/** Toca una opción con el dedo: la correcta según la clave a mano, o la primera que no lo es. */
+async function responderTocando(page: Page, modo: 'bien' | 'mal'): Promise<void> {
+  const texto = norm(await enunciado(page).innerText());
+  const correcta = CLAVE[texto];
+  expect(correcta, `enunciado fuera de la clave resuelta a mano: «${texto}»`).toBeTruthy();
+  const i = (await textosOpcion(page)).indexOf(correcta);
+  expect(i, `«${correcta}» no está entre las opciones`).toBeGreaterThanOrEqual(0);
+  const o = opciones(page).nth(modo === 'bien' ? i : i === 0 ? 1 : 0);
+  await page.waitForTimeout(500); // lee la pregunta: fuera de la ventana de ráfaga del toque anterior
+  await bajarLoJusto(o);
+  await tocarCentro(page, o);
+  await expect(page.locator(modo === 'bien' ? '[class*="feedbackCorrecto"]' : '[class*="feedbackIncorrecto"]')).toBeVisible();
+}
+
+/**
+ * Partida entera con dos toques (o un doble clic) en «Comenzar quiz», cada «Siguiente pregunta»,
+ * «Ver resultados» y, si se pide, «Volver al inicio». El 2.º llega en el mismo punto con la
+ * pantalla nueva ya pintada (dos fotogramas) y cae donde caiga: NO se recoloca el botón más que
+ * lo justo para verlo entero, como haría un dedo. Falla siempre con la opción más baja tras
+ * «leer» 450 ms. Separa lo que rompe la partida (`dentro`: contesta la pregunta nueva, salta una,
+ * sale de la app, se come la nota, empieza otra o cambia el modo) de lo que abre o cierra la
+ * guía educativa (`guia`), y anota qué había bajo el 2.º toque (`debajo`).
+ * Medido el 28/10/2026 con un script aparte (50 partidas en 9 tamaños de pantalla): el 2.º toque llega con
+ * detail 2 y la guarda lo para siempre que cae en un botón del quiz.
+ */
+async function segundosToques(page: Page, tactil: boolean, total: number, conVolver = false) {
+  const dentro: string[] = [];
+  const guia: string[] = [];
+  const debajo: string[] = [];
+  const url = page.url();
+  const conmutador = page.locator('[class*="toggleButton"]').first();
+  const pulsados = () => page.locator('main button[aria-pressed="true"]').allInnerTexts();
+  const modoInicial = await pulsados();
+  const doble = async (boton: Locator, etiqueta: string, llego: () => Promise<boolean>): Promise<boolean> => {
+    await bajarLoJusto(boton);
+    await page.waitForTimeout(60);
+    const b = await boton.boundingBox();
+    if (!b) throw new Error(`sin caja: ${etiqueta}`);
+    const [x, y] = [b.x + b.width / 2, b.y + b.height / 2];
+    const guiaAntes = await conmutador.getAttribute('aria-expanded');
+    if (tactil) await page.touchscreen.tap(x, y);
+    else await page.mouse.click(x, y);
+    // El primer toque TIENE que cambiar de pantalla; si no, el caso no mide lo que dice
+    await expect.poll(llego, { intervals: [15], timeout: 2500, message: `el primer toque en ${etiqueta} no cambió de pantalla` }).toBe(true);
+    await page.evaluate(() => new Promise<void>((r) => requestAnimationFrame(() => requestAnimationFrame(() => r()))));
+    debajo.push(
+      `${etiqueta} → ${await page.evaluate(([px, py]) => {
+        const c = document.elementFromPoint(px, py)?.closest('a, button');
+        return c ? (c.getAttribute('aria-label') ?? c.textContent ?? '').trim().replace(/\s+/g, ' ') : '';
+      }, [x, y])}`,
+    );
+    if (tactil) await page.touchscreen.tap(x, y);
+    else {
+      await page.mouse.down({ clickCount: 2 });
+      await page.mouse.up({ clickCount: 2 });
+    }
+    await page.waitForTimeout(450);
+    if (page.url() !== url) {
+      dentro.push(`${etiqueta}: sale de la app a ${new URL(page.url()).pathname}`);
+      return false;
+    }
+    const guiaDespues = await conmutador.getAttribute('aria-expanded');
+    if (guiaDespues !== guiaAntes) guia.push(`${etiqueta}: ${guiaDespues === 'true' ? 'abre' : 'cierra'} la guía`);
+    return true;
+  };
+  const fallarAbajo = async () => {
+    const correcta = CLAVE[norm(await enunciado(page).innerText())];
+    const i = (await textosOpcion(page)).indexOf(correcta);
+    await page.waitForTimeout(450);
+    const o = opciones(page).nth(i === 3 ? 2 : 3);
+    await bajarLoJusto(o);
+    if (tactil) await tocarCentro(page, o);
+    else await o.click();
+    await expect(page.locator('[class*="feedbackIncorrecto"]')).toBeVisible();
+    await page.waitForTimeout(250);
+  };
+
+  if (!(await doble(page.getByRole('button', { name: /Comenzar quiz/ }), '«Comenzar»', async () => (await pantalla(page)).opciones > 0))) {
+    return { dentro, guia, debajo };
+  }
+  let p = await pantalla(page);
+  if (p.bloqueadas > 0) dentro.push(`«Comenzar»: la ${p.contador} sale ya respondida`);
+  for (let n = 1; n <= total; n++) {
+    if ((await pantalla(page)).bloqueadas === 0) await fallarAbajo();
+    if (n === total) {
+      const sigue = await doble(botonAvanzar(page), '«Ver resultados»', async () => (await page.locator('[class*="resultadoCard"]').count()) > 0);
+      if (!sigue) return { dentro, guia, debajo };
+      const circulo = norm(await page.locator('[class*="puntuacionCirculo"]').textContent());
+      if (circulo !== `0/${total}`) dentro.push(`«Ver resultados»: la nota a la vista es «${circulo}»`);
+      break;
+    }
+    const antes = p.contador;
+    const sigue = await doble(botonAvanzar(page), `«Siguiente» (${antes})`, async () => (await pantalla(page)).contador !== antes);
+    if (!sigue) return { dentro, guia, debajo };
+    p = await pantalla(page);
+    if (p.opciones === 0) dentro.push(`«Siguiente» (${antes}): sale de la partida`);
+    else if (p.bloqueadas > 0) dentro.push(`«Siguiente» (${antes}): la ${p.contador} sale ya respondida`);
+    else if (p.contador !== `Pregunta ${n + 1} de ${total}`) dentro.push(`«Siguiente» (${antes}): salta a la ${p.contador}`);
+  }
+  if (conVolver) {
+    await page.waitForTimeout(500);
+    const comenzar = page.getByRole('button', { name: /Comenzar quiz/ });
+    if (await doble(page.getByRole('button', { name: 'Volver al inicio' }), '«Volver al inicio»', async () => (await comenzar.count()) > 0)) {
+      if ((await pantalla(page)).opciones > 0) dentro.push('«Volver al inicio»: empieza otra partida');
+      const modo = await pulsados();
+      if (JSON.stringify(modo) !== JSON.stringify(modoInicial)) dentro.push(`«Volver al inicio»: el modo pasa de ${modoInicial.join(' + ')} a ${modo.join(' + ')}`);
+    }
+  }
+  return { dentro, guia, debajo };
+}
+
+test.describe('Inspector 28/10/2026', () => {
+  /**
+   * CASO LÍMITE — «Volver al inicio» reinicia sin recargar y sin perder lo elegido. Resuelto a mano
+   * leyendo page.tsx: `reiniciar()` vacía preguntas, índice, respuesta, resultados y rachas, pero
+   * no toca `modo` ni `categoriaSeleccionada`. Práctica de Mutaciones todo bien: 6/6 → nota
+   * 60/6 = 10 → pleno «¡Perfecto!» 🏆 · Math.round(100) = «100 %» · 0 errores · racha 6. Al volver:
+   * «Práctica por categoría» y «Mutaciones» siguen pulsados, la marca puesta en window sigue ahí
+   * (no hubo recarga) y la partida siguiente arranca en «✓ 0 aciertos» sin insignia de racha.
+   * Toda fallada: 0/6 → nota 0 → «Insuficiente» 😟 · «0 %» · 6 errores · racha 0.
+   */
+  test('caso límite: «Volver al inicio» tras un 6/6 conserva modo y categoría, no recarga y la siguiente arranca de cero', async ({ page }) => {
+    test.setTimeout(90_000);
+    await abrir(page);
+    await empezar(page, 'practica', 'Mutaciones');
+    await page.evaluate(() => {
+      (window as unknown as { __sinRecarga: boolean }).__sinRecarga = true;
+    });
+    await jugar(page, POR_CATEGORIA, POR_CATEGORIA);
+    expect(await resultado(page)).toEqual({
+      circulo: '6/6',
+      etiqueta: '¡Perfecto!',
+      emoji: '🏆',
+      pct: '100 %',
+      nota: 'Nota: 10,0 sobre 10',
+      stats: ['6Aciertos', '0Errores', '6Racha máx.'],
+    });
+    await page.getByRole('button', { name: 'Volver al inicio' }).click();
+    await expect(page.getByRole('button', { name: /Práctica por categoría/ })).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.locator('button[class*="categoriaBtn"]', { hasText: 'Mutaciones' })).toHaveAttribute('aria-pressed', 'true');
+    expect(await page.evaluate(() => (window as unknown as { __sinRecarga?: boolean }).__sinRecarga), 'la página no se recargó').toBe(true);
+    await page.getByRole('button', { name: /Comenzar quiz/ }).click();
+    await expect(page.getByText(`Pregunta 1 de ${POR_CATEGORIA}`)).toBeVisible();
+    await expect(aciertosBadge(page)).toHaveText('✓ 0 aciertos');
+    await expect(page.locator('[class*="rachaBadge"]')).toHaveCount(0);
+    await jugar(page, POR_CATEGORIA, 0);
+    expect(await resultado(page)).toEqual({
+      circulo: '0/6',
+      etiqueta: 'Insuficiente',
+      emoji: '😟',
+      pct: '0 %',
+      nota: 'Nota: 0,0 sobre 10',
+      stats: ['0Aciertos', '6Errores', '0Racha máx.'],
+    });
+  });
+
+  /**
+   * El modo que solo tiene esta app en la familia: «Práctica por categoría», con botones de
+   * categoría (aria-pressed) en la pantalla de inicio. A 1280 × 800, con la semilla 101 y la
+   * práctica de Replicación, el 2.º clic de «Volver al inicio» cae sobre «🔤 Traducción»
+   * (medido el 28/10/2026). Es un botón del quiz y la guarda lo para: la categoría sigue siendo
+   * Replicación y no empieza otra partida. Se comprueba además que el 2.º clic cae de verdad ahí.
+   */
+  test('doble clic en «Volver al inicio» (práctica, escritorio): el 2.º no cambia la categoría ni empieza otra partida', async ({ page }) => {
+    test.setTimeout(90_000);
+    await sembrarAzar(page, 101);
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await abrir(page);
+    await page.getByRole('button', { name: /Práctica por categoría/ }).click();
+    await page.locator('button[class*="categoriaBtn"]', { hasText: 'Replicación' }).click();
+    await page.waitForTimeout(600);
+    const r = await segundosToques(page, false, POR_CATEGORIA, true);
+    expect(r.debajo.at(-1), 'el 2.º clic de «Volver al inicio» cae sobre otra categoría').toMatch(/Traducción/);
+    expect(r.dentro).toEqual([]);
+    await expect(page.locator('button[class*="categoriaBtn"]', { hasText: 'Replicación' })).toHaveAttribute('aria-pressed', 'true');
+  });
+
+  /**
+   * HALLAZGO (operativa) — ABIERTO. La guarda local (page.tsx:548-555) no alcanza lo que no es del
+   * quiz. Tras «Ver resultados», la tarjeta de la nota del examen es más alta que la pantalla de
+   * inicio; al pulsar «Volver al inicio» el foco sube al título y bajo el puntero queda el botón
+   * «Ver guía educativa», que el 2.º clic del doble clic abre. Medido el 28/10/2026: 1280 × 800
+   * (semilla 1), 1366 × 768 (semilla 7) y 1024 × 768 táctil (semilla 21), uno de cada examen.
+   * Lo correcto: el 2.º clic de una ráfaga que cambió de pantalla no hace nada, caiga donde caiga
+   * (lib/useGuardaRafaga.ts, en captura sobre window, como las hermanas).
+   */
+  test('hallazgo · el 2.º clic de un doble clic en «Volver al inicio» no abre la guía educativa (escritorio)', async ({ page }) => {
+    test.fail(true, 'ABIERTO: el 2.º clic de «Volver al inicio» abre la guía (guarda local, page.tsx:548-555)');
+    test.setTimeout(150_000);
+    await sembrarAzar(page, 1);
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await abrir(page);
+    const r = await segundosToques(page, false, TOTAL_EXAMEN, true);
+    expect(r.dentro).toEqual([]);
+    expect(r.guia).toEqual([]);
+  });
+
+  /**
+   * HALLAZGO (contenido) — ABIERTO. El FAQPage (solo lo leen buscadores y asistentes de IA) dice
+   * que el ADN «almacena la información genética de forma permanente en el núcleo». Es el dato de
+   * libro simplificado de más: hay ADN mitocondrial (y en los cloroplastos), y los procariotas no
+   * tienen núcleo. Contradice al propio banco: la explicación de la pregunta 22 dice que el ADN
+   * mitocondrial humano codifica 13 proteínas, que se traducen en los ribosomas de la mitocondria.
+   * Lo correcto: que la respuesta no sitúe todo el ADN en el núcleo (o diga «en eucariotas, sobre
+   * todo en el núcleo», y nombre el mitocondrial).
+   */
+  test('hallazgo · el FAQPage no dice que el ADN se guarda solo en el núcleo', async ({ page }) => {
+    test.fail(true, 'ABIERTO: «almacena la información genética de forma permanente en el núcleo»');
+    const html = await (await page.request.get(RUTA)).text();
+    const bloques = [...html.matchAll(/<script type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g)].map(
+      (m) => JSON.parse(m[1]) as { '@type'?: string; mainEntity?: { name: string; acceptedAnswer: { text: string } }[] },
+    );
+    const faq = bloques.find((b) => b['@type'] === 'FAQPage');
+    const adn = faq?.mainEntity?.find((q) => q.name === '¿Cuál es la diferencia entre ADN y ARN?')?.acceptedAnswer.text ?? '';
+    expect(adn, 'la pregunta del ADN y el ARN sigue en el FAQPage').toContain('desoxirribosa');
+    const soloNucleo = /en el núcleo/.test(adn) && !/mitocondri|cloroplast|procariot|bacteri/i.test(adn);
+    expect(soloNucleo, adn).toBe(false);
+  });
+
+  /**
+   * HALLAZGO (contenido) — ABIERTO. Neutralidad editorial (§1.quinquies, regla 3: un marco discutido
+   * no se da por probado). El dato curioso de la guía dice que la ribozima del ribosoma «Es evidencia
+   * del "mundo de ARN" primitivo, donde el ARN actuaba como enzima antes de que existieran las
+   * proteínas»: da la hipótesis por hecho. La propia app la llama «hipótesis» en la explicación de
+   * la pregunta 24 («Descubrimiento clave para la hipótesis del "mundo de ARN"»).
+   * Lo correcto: «apoya la hipótesis del mundo de ARN, según la cual…».
+   */
+  test('hallazgo · la guía no da el «mundo de ARN» por hecho probado', async ({ page }) => {
+    test.fail(true, 'ABIERTO: «donde el ARN actuaba como enzima antes de que existieran las proteínas»');
+    await abrir(page);
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const dato = norm(await page.locator('[class*="datosCuriosos"] li', { hasText: 'peptidiltransferasa' }).innerText());
+    expect(dato).toContain('mundo de ARN');
+    expect(/mundo de ARN/.test(dato) && !/hip[oó]tesis/i.test(dato), dato).toBe(false);
+  });
+});
+
+test.describe('Inspector 28/10/2026 · móvil 412 × 915', () => {
+  test.use({
+    viewport: { width: 412, height: 915 },
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Mobile Safari/537.36',
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  /**
+   * CASO NORMAL (móvil, con el dedo) — práctica de Replicación: mal, bien, bien, mal, mal, mal.
+   * Resuelto a mano ANTES de ejecutar con motor.ts y page.tsx: aciertos 2 de 6 → Math.round(33,33)
+   * = «33 %» · nota 2·10/6 = 3,33 → «3,3» → < 5 «Insuficiente» 😟 · Errores 6 − 2 = 4 · la racha
+   * llega a 2 tras la 3.ª (la insignia «🔥 Racha: 2» sale con 2 seguidas) y desaparece al fallar la
+   * 4.ª → «Racha máx.» 2 · el marcador dice «✓ 1 acierto» tras la 2.ª y «✓ 2 aciertos» tras la 3.ª
+   * · la 6.ª ofrece «Ver resultados →» · desglose de una fila, «Replicación 2/6».
+   */
+  test('caso normal (móvil): práctica de Replicación mal-bien-bien-mal-mal-mal da 2/6, 33 %, nota 3,3 e «Insuficiente»', async ({ page }) => {
+    test.setTimeout(90_000);
+    await abrir(page);
+    await page.getByRole('button', { name: /Práctica por categoría/ }).click();
+    await page.locator('button[class*="categoriaBtn"]', { hasText: 'Replicación' }).click();
+    await page.waitForTimeout(500);
+    const comenzar = page.getByRole('button', { name: /Comenzar quiz/ });
+    await bajarLoJusto(comenzar);
+    await tocarCentro(page, comenzar);
+    const PATRON = ['mal', 'bien', 'bien', 'mal', 'mal', 'mal'] as const;
+    const racha = page.locator('[class*="rachaBadge"]');
+    for (const [k, modo] of PATRON.entries()) {
+      const n = k + 1;
+      await expect(page.getByText(`Pregunta ${n} de ${POR_CATEGORIA}`)).toBeVisible();
+      await expect(enunciado(page)).toBeFocused();
+      await responderTocando(page, modo);
+      if (n === 2) await expect(aciertosBadge(page)).toHaveText('✓ 1 acierto');
+      if (n === 3) {
+        await expect(aciertosBadge(page)).toHaveText('✓ 2 aciertos');
+        await expect(racha).toHaveText(/Racha: 2$/);
+      }
+      if (n === 4) await expect(racha).toHaveCount(0);
+      const avanzar = botonAvanzar(page);
+      await expect(avanzar).toHaveText(n < POR_CATEGORIA ? 'Siguiente pregunta →' : 'Ver resultados →');
+      await bajarLoJusto(avanzar);
+      await tocarCentro(page, avanzar);
+    }
+    await expect(page.locator('[class*="resultadoCard"]')).toBeFocused();
+    expect(await resultado(page)).toEqual({
+      circulo: '2/6',
+      etiqueta: 'Insuficiente', // nota 3,33 < 5
+      emoji: '😟',
+      pct: '33 %', // Math.round(2/6·100)
+      nota: 'Nota: 3,3 sobre 10',
+      stats: ['2Aciertos', '4Errores', '2Racha máx.'],
+    });
+    await expect(page.locator('[class*="resultadoCard"]')).toHaveAttribute('aria-label', 'Resultado: 2 de 6 aciertos, Insuficiente');
+    await expect(page.locator('[class*="desgloseItem"]')).toHaveCount(1);
+    await expect(page.locator('[class*="desgloseItem"]')).toContainText('Replicación2/6');
+  });
+
+  /**
+   * DEBE IGNORARSE — a 412 × 915, el ancho en el que el testigo de la familia es ciego (en
+   * quiz-verbos-irregulares el 2.º toque de «Siguiente» contestaba 9 de 9). Aquí, con la semilla 1,
+   * examen entero con dos toques en «Comenzar», en cada «Siguiente» y en «Ver resultados»: el 2.º
+   * no contesta ni salta ninguna pregunta, no saca de la app y la nota se ve (0/30, todas falladas
+   * a propósito). Medido el 28/10/2026: algunos 2.º toques caen sobre una opción nueva (la guarda
+   * los para), y otros, fuera del quiz (el caso de abajo).
+   */
+  test('doble toque a 412 × 915: el 2.º no contesta, no salta, no saca de la app ni se come la nota', async ({ page }) => {
+    test.setTimeout(180_000);
+    await sembrarAzar(page, 1);
+    await abrir(page);
+    const r = await segundosToques(page, true, TOTAL_EXAMEN);
+    expect(r.debajo.filter((d) => /Opción [ABCD]:/.test(d)).length, `la guarda se ejerce: ${r.debajo.join(' · ')}`).toBeGreaterThan(0);
+    expect(r.dentro).toEqual([]);
+    await expect(page.locator('[class*="puntuacionCirculo"]')).toHaveText('0/30');
+  });
+
+  /**
+   * HALLAZGO (operativa) — ABIERTO. La guarda de doble toque es local a los manejadores del quiz
+   * (`clicDeMas`/`conClic`, page.tsx:548-555), como la de la referencia, y no ve lo que no es del
+   * quiz. Al pulsar «Siguiente» la explicación desaparece y, bajo el dedo, queda el botón «Ver
+   * guía educativa» (o su cabecera, y el ajuste táctil lo alcanza): el 2.º toque abre la guía, y
+   * el siguiente la cierra; el foco deja el enunciado y se va al conmutador. Medido el 28/10/2026,
+   * fallando con la opción más baja: a 412 × 915, 33 de 87 «Siguiente» y 3 de 7 «Ver resultados»;
+   * a 430 × 932, 16 de 41 y 1 de 3; a 390 × 844, 16 de 46 «Siguiente» y 3 de 4 «Comenzar» en la
+   * práctica. Ninguno salió de la app (50 partidas), pero el 2.º toque cayó 14 veces en la cabecera
+   * de las relacionadas, a un paso de sus enlaces. Con esta semilla (102, práctica de
+   * Transcripción): 4 «Siguiente» y «Ver resultados».
+   * Lo correcto: el 2.º toque no hace nada, caiga donde caiga (lib/useGuardaRafaga.ts).
+   */
+  test('hallazgo · el 2.º toque de «Siguiente» o «Ver resultados» no abre ni cierra la guía educativa', async ({ page }) => {
+    test.fail(true, 'ABIERTO: el 2.º toque abre y cierra la guía (guarda local, page.tsx:548-555)');
+    test.setTimeout(90_000);
+    await sembrarAzar(page, 102);
+    await abrir(page);
+    await page.getByRole('button', { name: /Práctica por categoría/ }).click();
+    await page.locator('button[class*="categoriaBtn"]', { hasText: 'Transcripción' }).click();
+    await page.waitForTimeout(600);
+    const r = await segundosToques(page, true, POR_CATEGORIA);
+    expect(r.guia).toEqual([]);
+  });
+});

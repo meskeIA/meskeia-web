@@ -1119,3 +1119,411 @@ test.describe('Quiz Tabla Periódica · re-inspección 25/09/2026 (móvil 412 px
     expect(vista.abajo).toBeLessThanOrEqual(vista.alto);
   });
 });
+
+// ══════════════════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN DEL 28/10/2026 (casos 17 a 26)
+// ══════════════════════════════════════════════════════════════════════════════════════
+//
+// La app entró con la familia «Quizzes de opción múltiple» (cabo C0082). Desde d9e710f8 monta
+// useGuardaRafaga (lib/useGuardaRafaga.ts, escucha en CAPTURA sobre window) y llama a
+// marcarCambioPantalla() en iniciarQuiz() —«Empezar quiz» y «Jugar otra vez»— y en siguiente()
+// —«Siguiente pregunta» y «Ver resultados»—. El testigo tests/familias/quizzes.spec.ts solo lo
+// mide a 390×844 y no recorre «Jugar otra vez»: el caso 19 lo mide a 412×915, 768×1024 y
+// 1280×800, con el 2.º clic (detail 2) en el mismo punto y la pantalla nueva ya pintada.
+// Medido antes en un script aparte (28/10/2026): en 36 de 36 dobles toques el 2.º no llegó a
+// ningún manejador, y en 29 caía FUERA de <main> (cabecera o «Ver guía educativa» del bloque
+// educativo, dos veces a 412 px: la guía no se abrió). Con touchscreen.tap Chrome entrega también detail 2 al 2.º toque.
+// Lo que la guarda no frena (ni es su trabajo): el mousedown del 2.º toque sí mueve el foco
+// adonde cae (al <body> o a una opción); con un clic suelto el foco va al enunciado (caso 17).
+
+interface PreguntaFaq {
+  name: string;
+  acceptedAnswer: { text: string };
+}
+interface BloqueJsonLd {
+  '@type': string;
+  featureList?: string[];
+  mainEntity?: PreguntaFaq[];
+}
+
+/** Los bloques JSON-LD del HTML servido (lo que leen buscadores y asistentes de IA). */
+async function jsonLdServido(page: Page): Promise<BloqueJsonLd[]> {
+  const html = await (await page.request.get(RUTA)).text();
+  return [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].map(
+    (m) => JSON.parse(m[1]) as BloqueJsonLd,
+  );
+}
+
+const habilitadas = (p: Page): Promise<number> =>
+  opciones(p).evaluateAll((bs) => bs.filter((b) => !(b as HTMLButtonElement).disabled).length);
+
+/** «Empezar quiz» con React ya enganchado y la página quieta. */
+async function esperarEmpezarHidratado(page: Page): Promise<void> {
+  await page.waitForFunction(() => {
+    const b = [...document.querySelectorAll('button')].find((x) => /Empezar quiz/.test(x.textContent ?? ''));
+    return Boolean(b && Object.keys(b).some((k) => k.startsWith('__reactProps$')));
+  });
+  await esperarPaginaAsentada(page);
+}
+
+/** Responde la pregunta en pantalla bien (la de CLAVE_IUPAC) o mal a propósito. */
+async function contestar(page: Page, bien: boolean): Promise<void> {
+  const { correcta } = await respuestaEsperada(page);
+  const textos = (await opciones(page).allInnerTexts()).map(limpiar);
+  const i = textos.indexOf(correcta);
+  await opciones(page).nth(bien ? i : textos.findIndex((_, k) => k !== i)).click();
+  await expect(page.locator(bien ? '[class*="feedbackCorrecto"]' : '[class*="feedbackIncorrecto"]')).toBeVisible();
+}
+
+/**
+ * Ratón de verdad, como el testigo de la familia: 1.er clic en el centro del botón, esperar a
+ * que la pantalla NUEVA esté pintada y el 2.º clic de la ráfaga (detail 2) en el mismo punto.
+ * Lo que haya debajo es lo que pisa. Devuelve los botones de <main> visibles antes y después.
+ */
+async function dobleToque(
+  page: Page,
+  url: string,
+  boton: Locator,
+  pintada: () => Promise<boolean>,
+  paso: string,
+): Promise<{ antes: string[]; despues: string[] }> {
+  await boton.scrollIntoViewIfNeeded();
+  await page.waitForTimeout(100);
+  const caja = await boton.boundingBox();
+  if (!caja) throw new Error(`${paso}: el botón no tiene caja`);
+  const [x, y] = [caja.x + caja.width / 2, caja.y + caja.height / 2];
+  await page.mouse.move(x, y);
+  await page.mouse.down({ clickCount: 1 });
+  await page.mouse.up({ clickCount: 1 });
+  await expect
+    .poll(pintada, { intervals: [20], timeout: 3000, message: `${paso}: el primer toque cambia de pantalla` })
+    .toBe(true);
+  await page.waitForTimeout(80);
+  const antes = await page.locator('main button:visible').allInnerTexts();
+  await page.mouse.down({ clickCount: 2 });
+  await page.mouse.up({ clickCount: 2 });
+  await page.waitForTimeout(400);
+  expect(page.url(), `${paso}: el 2.º toque no saca de la app`).toBe(url);
+  return { antes, despues: await page.locator('main button:visible').allInnerTexts() };
+}
+
+/**
+ * Partida entera con doble toque en CADA cambio de pantalla, y en «Jugar otra vez».
+ * Resuelto a mano: impares bien y pares mal → el contador tras responder va
+ * 1,1,2,2,3,3,4,4,5,5; final 5/10, Errores = 10 − 5 = 5, round(5/10·100) = 50 % y getMensaje():
+ * 50 ≥ 50 y < 70 → «Buen intento, sigue practicando» (el borde exacto del tramo).
+ * Tras cada 2.º toque: misma URL, la pregunta nueva con sus 4 opciones habilitadas y el contador
+ * quieto; en el resultado, los mismos botones antes y después y la misma nota; tras «Jugar otra
+ * vez», la pregunta 1 con «✓ 0 aciertos».
+ */
+async function partidaConDobleToque(page: Page): Promise<void> {
+  const CONTADOR = [1, 1, 2, 2, 3, 3, 4, 4, 5, 5];
+  await esperarEmpezarHidratado(page);
+  const url = page.url();
+  const preguntaPintada = async (): Promise<boolean> => (await habilitadas(page)) === 4;
+
+  await dobleToque(page, url, page.getByRole('button', { name: /Empezar quiz/ }), preguntaPintada, 'Empezar quiz');
+  await expect(page.getByText(`Pregunta 1 de ${TOTAL_PREGUNTAS}`)).toBeVisible();
+  expect(await habilitadas(page), 'Empezar: el 2.º toque no contesta la pregunta 1').toBe(4);
+  await expect(contadorAciertos(page)).toHaveText('✓ 0 aciertos');
+
+  for (let n = 1; n <= TOTAL_PREGUNTAS; n++) {
+    await contestar(page, n % 2 === 1);
+    const c = CONTADOR[n - 1];
+    const contador = `✓ ${c} ${c === 1 ? 'acierto' : 'aciertos'}`;
+    await expect(contadorAciertos(page)).toHaveText(contador);
+    if (n < TOTAL_PREGUNTAS) {
+      await dobleToque(page, url, botonAvanzar(page), preguntaPintada, `Siguiente ${n}→${n + 1}`);
+      await expect(page.getByText(`Pregunta ${n + 1} de ${TOTAL_PREGUNTAS}`)).toBeVisible();
+      expect(await habilitadas(page), `Siguiente ${n}→${n + 1}: el 2.º toque no contesta la pregunta nueva`).toBe(4);
+      await expect(contadorAciertos(page)).toHaveText(contador);
+    } else {
+      const { antes, despues } = await dobleToque(
+        page,
+        url,
+        botonAvanzar(page),
+        async () => (await page.locator('[class*="resultadoCard"]').count()) > 0,
+        'Ver resultados',
+      );
+      expect(despues, 'Ver resultados: el 2.º toque no se come la nota ni empieza otra partida').toEqual(antes);
+    }
+  }
+
+  await expect(page.locator('[class*="puntuacionCirculo"]')).toHaveText('5/10');
+  const stats = page.locator('[class*="statItem"]');
+  await expect(stats.nth(0)).toHaveText('5Aciertos');
+  await expect(stats.nth(1)).toHaveText('5Errores'); // 10 − 5
+  await expect(stats.nth(2)).toHaveText(/^50 ?%Puntuación$/); // round(5/10·100); el espacio duro, caso 20
+  await expect(page.locator('[class*="mensajeTexto"]')).toHaveText('Buen intento, sigue practicando');
+
+  await dobleToque(page, url, page.getByRole('button', { name: 'Jugar otra vez' }), preguntaPintada, 'Jugar otra vez');
+  await expect(page.getByText(`Pregunta 1 de ${TOTAL_PREGUNTAS}`)).toBeVisible();
+  expect(await habilitadas(page), 'Jugar otra vez: el 2.º toque no contesta la pregunta 1').toBe(4);
+  await expect(contadorAciertos(page)).toHaveText('✓ 0 aciertos');
+}
+
+test.describe('Quiz Tabla Periódica · re-inspección 28/10/2026 (escritorio)', () => {
+  test.beforeEach(async ({ page }) => {
+    await abrirSinAviso(page);
+  });
+
+  /**
+   * CASO 17 — Normal: 6 aciertos y 4 fallos, y el foco en cada cambio de pantalla
+   *
+   * Resuelto a mano, ronda forzada con los ids 1-10: bien las 6 primeras, mal las 4 últimas →
+   * contador 1,2,3,4,5,6,6,6,6,6 · 6/10 · Errores = 10 − 6 = 4 · round(6/10·100) = 60 % ·
+   * getMensaje(): 60 ≥ 50 y < 70 → «Buen intento, sigue practicando» (tramo que ningún otro caso
+   * cubría) · aria-label del resultado «Resultado: 6 de 10 aciertos».
+   * Invariante de la familia: tras «Siguiente pregunta» el foco está en el ENUNCIADO nuevo
+   * (<p tabindex="-1">, no un botón ni <body>); tras «Ver resultados», en la tarjeta del resultado.
+   */
+  test('caso 17 · cálculo: 6 bien y 4 mal dan 6/10, 4 errores y 60 % «Buen intento»; el foco va al enunciado', async ({ page }) => {
+    test.setTimeout(60_000);
+    const CONTADOR = [1, 2, 3, 4, 5, 6, 6, 6, 6, 6];
+    await empezarConBanco(page, 'Empezar quiz', PRIMERAS_DIEZ);
+    await expect(enunciado(page)).toBeFocused();
+    for (let n = 1; n <= TOTAL_PREGUNTAS; n++) {
+      await expect(page.getByText(`Pregunta ${n} de ${TOTAL_PREGUNTAS}`)).toBeVisible();
+      await contestar(page, n <= 6);
+      const c = CONTADOR[n - 1];
+      await expect(contadorAciertos(page)).toHaveText(`✓ ${c} ${c === 1 ? 'acierto' : 'aciertos'}`);
+      await botonAvanzar(page).click();
+      if (n < TOTAL_PREGUNTAS) {
+        await expect(enunciado(page), `tras «Siguiente» ${n}→${n + 1}, el foco en el enunciado`).toBeFocused();
+        await expect(enunciado(page)).toHaveAttribute('tabindex', '-1');
+      }
+    }
+    const tarjeta = page.locator('[class*="resultadoCard"]');
+    await expect(tarjeta).toBeFocused();
+    await expect(tarjeta).toHaveAttribute('aria-label', 'Resultado: 6 de 10 aciertos');
+    await expect(page.locator('[class*="puntuacionCirculo"]')).toHaveText('6/10');
+    const stats = page.locator('[class*="statItem"]');
+    await expect(stats.nth(0)).toHaveText('6Aciertos');
+    await expect(stats.nth(1)).toHaveText('4Errores'); // 10 − 6
+    await expect(stats.nth(2)).toHaveText(/^60 ?%Puntuación$/); // round(6/10·100)
+    await expect(page.locator('[class*="mensajeTexto"]')).toHaveText('Buen intento, sigue practicando');
+  });
+
+  /**
+   * CASO 18 — Límite: 4/10 queda justo bajo el 50 %, y «Jugar otra vez» sin recargar
+   *
+   * Resuelto a mano, ronda forzada con los ids 21-30: mal las 6 primeras y bien las 4 últimas →
+   * contador 0,0,0,0,0,0,1,2,3,4 · 4/10 · Errores = 10 − 4 = 6 · round(4/10·100) = 40 % ·
+   * getMensaje(): 40 < 50 → «La tabla periódica guarda muchos secretos». La novena dice
+   * «Siguiente pregunta →» y la décima «Ver resultados →» (indice + 1 >= 10). «Jugar otra vez»
+   * llama a iniciarQuiz() sin navegar: una sola entrada de navegación, pregunta 1, «✓ 0 aciertos»,
+   * 4 opciones habilitadas y el foco en el enunciado.
+   */
+  test('caso 18 · límite: 4/10 da 40 % y «guarda muchos secretos»; «Jugar otra vez» no recarga', async ({ page }) => {
+    test.setTimeout(60_000);
+    const CONTADOR = [0, 0, 0, 0, 0, 0, 1, 2, 3, 4];
+    await empezarConBanco(page, 'Empezar quiz', [20, 21, 22, 23, 24, 25, 26, 27, 28, 29]);
+    for (let n = 1; n <= TOTAL_PREGUNTAS; n++) {
+      await expect(page.getByText(`Pregunta ${n} de ${TOTAL_PREGUNTAS}`)).toBeVisible();
+      await contestar(page, n >= 7);
+      const c = CONTADOR[n - 1];
+      await expect(contadorAciertos(page)).toHaveText(`✓ ${c} ${c === 1 ? 'acierto' : 'aciertos'}`);
+      if (n === 9) await expect(botonAvanzar(page)).toHaveText('Siguiente pregunta →');
+      if (n === 10) await expect(botonAvanzar(page)).toHaveText('Ver resultados →');
+      await botonAvanzar(page).click();
+    }
+    await expect(page.locator('[class*="puntuacionCirculo"]')).toHaveText('4/10');
+    const stats = page.locator('[class*="statItem"]');
+    await expect(stats.nth(0)).toHaveText('4Aciertos');
+    await expect(stats.nth(1)).toHaveText('6Errores'); // 10 − 4
+    await expect(stats.nth(2)).toHaveText(/^40 ?%Puntuación$/); // round(4/10·100)
+    await expect(page.locator('[class*="mensajeTexto"]')).toHaveText('La tabla periódica guarda muchos secretos');
+
+    await page.getByRole('button', { name: 'Jugar otra vez' }).click();
+    await expect(page.getByText(`Pregunta 1 de ${TOTAL_PREGUNTAS}`)).toBeVisible();
+    await expect(contadorAciertos(page)).toHaveText('✓ 0 aciertos');
+    expect(await habilitadas(page)).toBe(4);
+    await expect(enunciado(page)).toBeFocused();
+    expect(await page.evaluate(() => performance.getEntriesByType('navigation').length)).toBe(1);
+  });
+
+  /**
+   * CASO 19 — Ignorar: el 2.º toque de un doble toque, a 768×1024 y 1280×800 (412×915, abajo)
+   * El resuelto a mano está en partidaConDobleToque().
+   */
+  for (const vista of [
+    { width: 768, height: 1024 },
+    { width: 1280, height: 800 },
+  ]) {
+    test(`caso 19 · operativa: doble toque en Empezar, cada Siguiente, Ver resultados y Jugar otra vez a ${vista.width}×${vista.height}`, async ({ page }) => {
+      test.setTimeout(90_000);
+      await page.setViewportSize(vista);
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+      await abrirSinAviso(page);
+      await partidaConDobleToque(page);
+    });
+  }
+
+  /**
+   * CASO 20 — HALLAZGO (28/10/2026): el «%» va pegado a la cifra
+   *
+   * Formato español (CLAUDE.md global §2, Ortografía de la RAE 2010): «15 %», con espacio duro
+   * U+00A0. Ronda forzada con los ids 6, 16, 20 y 22 delante y todo bien: las explicaciones dicen
+   * «el 21% de la atmósfera», «(~8% en masa)», «(~75 %)» —espacio normal, que deja saltar el «%»
+   * de línea— y «el 0,93%»; y la puntuación del resultado se pinta «100%» (page.tsx,
+   * `{Math.round(...)}%`). DEBERÍA: ninguna cifra seguida de «%» o de espacio normal y «%».
+   */
+  test('caso 20 · contenido: los porcentajes en pantalla llevan espacio duro antes del «%»', async ({ page }) => {
+    test.fail(); // HALLAZGO abierto: falla por la aserción final, no por el montaje
+    test.setTimeout(60_000);
+    await empezarConBanco(page, 'Empezar quiz', [5, 15, 19, 21, 0, 1, 2, 3, 4, 6]);
+    await expect(enunciado(page)).toHaveText('¿Qué elemento tiene número atómico 8?');
+    const textos: string[] = [];
+    for (let n = 1; n <= TOTAL_PREGUNTAS; n++) {
+      await expect(page.getByText(`Pregunta ${n} de ${TOTAL_PREGUNTAS}`)).toBeVisible();
+      await contestar(page, true);
+      textos.push(await page.locator('[class*="explicacion"]').innerText());
+      await botonAvanzar(page).click();
+    }
+    await expect(page.locator('[class*="puntuacionCirculo"]')).toHaveText('10/10');
+    textos.push(await page.locator('[class*="statItem"]').nth(2).innerText());
+    const sinEspacioDuro = textos.flatMap((t) => t.match(/[~\d,]+ ?%/g) ?? []);
+    expect(sinEspacioDuro, 'cifras con el «%» pegado o tras un espacio normal').toEqual([]);
+  });
+
+  /**
+   * CASO 21 — HALLAZGO (28/10/2026): la FAQ visible y el FAQPage responden distinto a lo mismo
+   *
+   * «¿Cuántos elementos existen?» (visible) y «¿Cuántos elementos tiene la tabla periódica?»
+   * (FAQPage) son la misma pregunta con dos respuestas escritas aparte; igual «¿Por qué los gases
+   * nobles son tan poco reactivos?» frente a «¿Qué son los gases nobles y por qué no reaccionan?».
+   * No se contradicen en cifras, pero el FAQPage añade datos (el oganesón de 2002, los siete del
+   * grupo 18) que la pantalla no da. DEBERÍA: una sola constante en metadata.ts de la que beban
+   * las dos bocas (como app/simulador-gastos-compraventa-garaje).
+   */
+  test('caso 21 · contenido: la FAQ visible y el FAQPage dan la misma respuesta a la misma pregunta', async ({ page }) => {
+    test.fail(); // HALLAZGO abierto
+    const faq = (await jsonLdServido(page)).find((b) => b['@type'] === 'FAQPage')?.mainEntity ?? [];
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const visibles = await page.locator('[class*="faqItem"]').evaluateAll((items) =>
+      items.map((i) => ({
+        pregunta: i.querySelector('strong')?.textContent?.trim() ?? '',
+        respuesta: i.querySelectorAll('p')[1]?.textContent?.trim() ?? '',
+      })),
+    );
+    const pares: [string, string][] = [
+      ['¿Cuántos elementos existen?', '¿Cuántos elementos tiene la tabla periódica?'],
+      ['¿Por qué los gases nobles son tan poco reactivos?', '¿Qué son los gases nobles y por qué no reaccionan?'],
+    ];
+    for (const [enPantalla, enJsonLd] of pares) {
+      const a = visibles.find((v) => v.pregunta === enPantalla)?.respuesta;
+      const b = faq.find((q) => q.name === enJsonLd)?.acceptedAnswer.text;
+      expect(a, `«${enPantalla}» en la FAQ visible`).toBeTruthy();
+      expect(b, `«${enJsonLd}» en el FAQPage`).toBeTruthy();
+      expect(a, `«${enPantalla}» responde igual en pantalla y en el FAQPage`).toBe(b);
+    }
+  });
+
+  /**
+   * CASO 22 — HALLAZGO (28/10/2026): el FAQPage pregunta «por qué no reaccionan» los gases nobles
+   *
+   * La guía de la propia página pone entre los «Errores frecuentes» «Asumir que los gases nobles
+   * nunca reaccionan: el Xenón y el Kriptón sí forman compuestos», y la explicación de la
+   * pregunta 37 del banco dice que el flúor reacciona «incluso con algunos gases nobles». El
+   * FAQPage, que es lo que leen buscadores y asistentes, pregunta «¿Qué son los gases nobles y
+   * por qué no reaccionan?» y responde «Por eso se llaman también gases inertes», sin un solo
+   * compuesto. DEBERÍA: no dar por hecho que no reaccionan.
+   */
+  test('caso 22 · contenido: el FAQPage no da por hecho que los gases nobles no reaccionan', async ({ page }) => {
+    test.fail(); // HALLAZGO abierto
+    const faq = (await jsonLdServido(page)).find((b) => b['@type'] === 'FAQPage')?.mainEntity ?? [];
+    const gases = faq.find((q) => /gases nobles/i.test(q.name));
+    expect(gases, 'el FAQPage tiene su pregunta de los gases nobles').toBeTruthy();
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    await expect(page.locator('[class*="warningList"]')).toContainText('Asumir que los gases nobles nunca reaccionan');
+    expect(gases?.name, 'la pregunta del FAQPage frente al error que la propia guía señala').not.toMatch(/no reaccionan/);
+  });
+
+  /**
+   * CASO 23 — HALLAZGO (28/10/2026): el JSON-LD no lista ninguna característica
+   *
+   * metadata.ts pasa `features: []` a generateWebAppSchema, así que el WebApplication sale con
+   * `featureList: []` (§1.ter pide 4-8). DEBERÍA: al menos 4, de lo que la app hace de verdad.
+   */
+  test('caso 23 · contenido: el WebApplication del JSON-LD lista al menos 4 características', async ({ page }) => {
+    test.fail(); // HALLAZGO abierto
+    const app = (await jsonLdServido(page)).find((b) => b['@type'] === 'WebApplication');
+    expect(app, 'el HTML servido lleva su WebApplication').toBeTruthy();
+    expect((app?.featureList ?? []).length, 'características en featureList').toBeGreaterThanOrEqual(4);
+  });
+
+  /**
+   * CASO 24 — HALLAZGO (28/10/2026): la guía pone la W entre los símbolos que «no coinciden con
+   * el nombre español», y la propia app lo llama «Wolframio»
+   *
+   * Paso «Aprende los símbolos irregulares»: «Memoriza los que no coinciden con el nombre
+   * español: Fe, Au, Ag, Cu, Pb, Na, K, Hg, Sn, W». El banco lo llama Wolframio en las preguntas
+   * 19, 34, 39 y 40 (la 34 pregunta precisamente por qué su símbolo es W), y así lo nombran
+   * app/tabla-periodica/elementos-data.ts y app/simulador-tabla-periodica-tendencias/datos.ts.
+   * Con «wolframio», la W sí coincide. DEBERÍA: quitar la W de esa lista (o decir «tungsteno»).
+   */
+  test('caso 24 · contenido: la W no está entre los símbolos que no coinciden con el nombre español', async ({ page }) => {
+    test.fail(); // HALLAZGO abierto
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const paso = page.locator('[class*="stepContent"]').filter({ hasText: 'Aprende los símbolos irregulares' });
+    await expect(paso).toHaveCount(1);
+    await expect(paso).toContainText('no coinciden con el nombre español');
+    expect(await paso.innerText()).not.toMatch(/\bW\b/);
+  });
+
+  /**
+   * CASO 25 — HALLAZGO (28/10/2026): «La reactividad aumenta hacia los extremos de cada período»
+   *
+   * Paso «Relaciona propiedades con posición». El extremo derecho de cada período es un gas
+   * noble, y la tabla de la misma guía dice de ellos «Grupo 18. Capa de valencia completa,
+   * mínima reactividad». DEBERÍA: exceptuar el grupo 18 (o hablar de metales a la izquierda y no
+   * metales a la derecha).
+   */
+  test('caso 25 · contenido: la regla de la reactividad por período exceptúa a los gases nobles', async ({ page }) => {
+    test.fail(); // HALLAZGO abierto
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    await expect(page.locator('table')).toContainText('mínima reactividad');
+    const paso = page.locator('[class*="stepContent"]').filter({ hasText: 'Relaciona propiedades con posición' });
+    await expect(paso).toContainText('extremos de cada período');
+    expect(await paso.innerText(), 'la regla frente a la fila «Gases nobles» de la tabla').toMatch(/gases nobles|grupo 18/i);
+  });
+
+  /**
+   * CASO 26 — HALLAZGO (28/10/2026): la lista de metaloides se da como cerrada
+   *
+   * La tabla de la guía dice «Metaloides: Propiedades intermedias: B, Si, Ge, As, Sb, Te», sin
+   * matiz. Qué elementos son metaloides es un convenio sin lista oficial, y las dos tablas de
+   * este mismo sitio ponen SIETE: app/tabla-periodica/elementos-data.ts y
+   * app/simulador-tabla-periodica-tendencias/datos.ts clasifican también el polonio (Po) como
+   * metaloide. DEBERÍA: decir que son los más citados y que la lista varía (o incluir el Po).
+   */
+  test('caso 26 · contenido: la fila de metaloides avisa de que la lista no es cerrada', async ({ page }) => {
+    test.fail(); // HALLAZGO abierto
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const fila = page.locator('table tr').filter({ hasText: 'Metaloides' });
+    await expect(fila).toContainText('B, Si, Ge, As, Sb, Te');
+    expect(await fila.innerText()).toMatch(/\bPo\b|Polonio|varía|según|suelen|más citados|convenio|discut/i);
+  });
+});
+
+test.describe('Quiz Tabla Periódica · re-inspección 28/10/2026 (móvil 412 px)', () => {
+  test.use({
+    viewport: { width: 412, height: 915 },
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Mobile Safari/537.36',
+    deviceScaleFactor: 2.625,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  /**
+   * CASO 19 (412×915) — el ancho en que quiz-verbos-irregulares contestaba la pregunta nueva 9
+   * de 9 y el testigo de la familia, a 390×844, no lo veía. Resuelto a mano: partidaConDobleToque().
+   */
+  test('caso 19 · operativa: doble toque en Empezar, cada Siguiente, Ver resultados y Jugar otra vez a 412×915', async ({ page }) => {
+    test.setTimeout(90_000);
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await abrirSinAviso(page);
+    await partidaConDobleToque(page);
+  });
+});

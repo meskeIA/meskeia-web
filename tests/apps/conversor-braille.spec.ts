@@ -37,10 +37,13 @@ import { esperarHidratacion, esperarPaginaAsentada, esperarValorEnReact } from '
  * (3456-3460 y el cabo C0401) se repararon en 1965bb4c y 390a4a69 y van como tests normales con
  * «REPARADO»; la inspección del 26/10/2026 los vio sostenerse. Los de esa inspección (bloque
  * «inspector 26/10/2026», 3524-3531) se REPARARON el 27/10/2026 en e6bcbe53 y aa75156d y van como
- * tests normales con «REPARADO»; la re-inspección del 27/10/2026 (bloque del final) los vio
- * sostenerse. Los hallazgos de ESA re-inspección están ABIERTOS y van con `test.fail()`: cada uno
- * afirma lo que DEBERÍA pasar y falla a propósito; el día que se corrija la app pasará a ROJO
- * («expected to fail, but passed») y habrá que quitarle la marca, no reescribir el valor esperado.
+ * tests normales con «REPARADO»; la re-inspección del 27/10/2026 los vio sostenerse. Los de ESA
+ * re-inspección (3552-3558) se REPARARON el 27/10/2026 en 37367e2e, b1a3f0fa, b706d47e, 31de5938
+ * y c5efdee5 y van como tests normales con «REPARADO»; la inspección del 28/10/2026 (bloque del
+ * final) los vio sostenerse. Los hallazgos de ESA inspección están ABIERTOS y van con
+ * `test.fail()`: cada uno afirma lo que DEBERÍA pasar y falla a propósito; el día que se corrija la
+ * app pasará a ROJO («expected to fail, but passed») y habrá que quitarle la marca, no reescribir el
+ * valor esperado.
  */
 
 const RUTA = '/conversor-braille/';
@@ -3174,12 +3177,12 @@ test.describe('re-inspección 27/10/2026', () => {
   });
 
   // ─────────────────────────────────────────────────────────────────────────
-  // ABIERTO — § 8.1: el separador decimal es el punto 2 aunque la tinta traiga punto o apóstrofo
+  // REPARADO 3553 — § 8.1: el separador decimal es el punto 2 aunque la tinta traiga punto o apóstrofo
   // ─────────────────────────────────────────────────────────────────────────
   //
-  // «73.81» sale ⠼⠛⠉⠄⠓⠁: el punto 3 dentro de un número es el separador de MILLAR (§ 6.1 y § 8.1), y
-  // un grupo de millar tiene tres cifras, así que el lector no tiene forma de leer 73,81. «73’81» (el
-  // apóstrofo decimal de los rótulos a mano) sale ⠼⠛⠉⠼⠓⠁, dos números, con el aviso de comillas
+  // «73.81» salía ⠼⠛⠉⠄⠓⠁: el punto 3 dentro de un número es el separador de MILLAR (§ 6.1 y § 8.1), y
+  // un grupo de millar tiene tres cifras, así que el lector no tenía forma de leer 73,81. «73’81» (el
+  // apóstrofo decimal de los rótulos a mano) salía ⠼⠛⠉⠼⠓⠁, dos números, con el aviso de comillas
   // simples. El ejemplo literal da la misma celda para las tres grafías. Ojo: «Son las 18.56» es otro
   // caso del B 2 (§ 14.3: «{son las #ah.#ef», punto 3 y signo de número otra vez), y la app tampoco
   // lo da (⠼⠁⠓⠄⠑⠋): desde la tinta no se distingue de un decimal, así que no se exige aquí.
@@ -3241,9 +3244,9 @@ test.describe('re-inspección 27/10/2026', () => {
   // (salvo siglas corrientes que también lo son, como «CV»), con su propio aviso del § 8.5.
   test('REPARADO 3555 — § 8.5: «VIII» y «siglo XVIII» llevan la mayúscula solo al principio, o el aviso no los llama sigla', async ({ page }) => {
     const casos: Array<[string, string, string]> = [
-      // ⠨ (46) · v ⠧ (1236) · i ⠊ (24) ×3. Hoy: ⠨⠧⠨⠊⠨⠊⠨⠊
+      // ⠨ (46) · v ⠧ (1236) · i ⠊ (24) ×3. Era: ⠨⠧⠨⠊⠨⠊⠨⠊
       ['VIII', '⠨⠧⠊⠊⠊', 'VIII'],
-      // s ⠎ i ⠊ g ⠛ l ⠇ o ⠕ · ⠀ · ⠨ · x ⠭ (1346) · v ⠧ · i ⠊ ×3. Hoy: ⠎⠊⠛⠇⠕⠀⠨⠭⠨⠧⠨⠊⠨⠊⠨⠊
+      // s ⠎ i ⠊ g ⠛ l ⠇ o ⠕ · ⠀ · ⠨ · x ⠭ (1346) · v ⠧ · i ⠊ ×3. Era: ⠎⠊⠛⠇⠕⠀⠨⠭⠨⠧⠨⠊⠨⠊⠨⠊
       ['siglo XVIII', '⠎⠊⠛⠇⠕⠀⠨⠭⠧⠊⠊⠊', 'XVIII'],
     ];
     const fallos: string[] = [];
@@ -3551,3 +3554,267 @@ async function recorridoTraducido27(page: Page, conTecladoFisico: boolean) {
   const control = await textoViejo();
   return { viejos, caidas, errores, desbordes, control };
 }
+
+// ═════════════════════════════════════════════════════════════════════════════
+// inspector 28/10/2026 — re-verificación de 3552-3558 (b706d47e, 31de5938, c5efdee5) y cabo C0494
+// ═════════════════════════════════════════════════════════════════════════════
+//
+// FUENTES, descargadas de once.es el 28/10/2026 y leídas con un extractor de texto del PDF
+// (FlateDecode + ToUnicode). La fuente braille escribe las celdas en ASCII: «{» = 46, «#» = 3456,
+// «@» = 5, «,» = 2, «;» = 23, «:» = 25, «*» = 256, «.» = 3.
+//   B 2 (V4, mayo de 2025, última actualización 22/01/2026):
+//   § 7     «Entramos en la ciudad de Toledo. → {entramos en la ciudad de {toledo.»
+//   § 7.1   «no debe escribirse este signo de punto después de cada una de las letras que forman la
+//           sigla, aunque aparezca así en el original. De este modo, se consigue ahorrar espacio sin
+//           alterar la información.» Ejemplo: «O.N.U. → {o{n{u».
+//   § 8.2   «todas las letras minúsculas de la primera serie que aparezcan en una expresión numérica
+//           (independientemente de su posición dentro de ella) se considerarán cifras si no van
+//           acompañadas del prefijo de latina minúscula: 234a5 → #bcd@ae · b1d4 → #@ba@dd».
+//   § 8.3   Ordinales: «Se forman con los signos de la quinta serie […] que se utilizan para escribir
+//           los «números en posición baja», seguidos de las letras «a» u «o» según el género.»
+//           Ejemplos: «1.º o 1º → #,o» · «2.ª o 2ª → #;a» · «3.er → #:r».
+//   § 8.4   «¾ → #c*» · «½ → #a;».
+//   § 8.5   «M VIII → {m {viii» · «iii vi → iii vi».
+//   § 10.3  «Su autor es Francisco de Quevedo. → {su autor es {francisco de {quevedo.»
+//   § 12    «a.m. 1-3-134-3 a. m.» · «n.o 1345-3-135 n.º número» · «a{c 1-46-14 a. C.» ·
+//           «d{c 145-46-14 d. C.»
+//   § 14.3  «EE. UU.: 3:49.63 → {e{e. {u{u.: #c:#di,fc» · «1.º: 02:08:57 → #,o: #jb:#jh:#eg» ·
+//           «grafías no adecuadas del tipo 2’54” para designar dos minutos y cincuenta y cuatro
+//           segundos. Transcribirlas utilizando los signos braille reservados para las medidas
+//           angulares no es correcto. En braille se utilizarán los dos puntos: 2’54” → #b:#ed».
+//   B 1 (Parámetros dimensionales del braille): «f = altura recomendada de los puntos: entre 0,2 y
+//           0,5 mm».
+//   B 3-1 (Normas para la transcripción), criterios generales: «Las siglas siempre se escribirán con
+//           prefijo de mayúscula para cada una de sus letras y sin punto abreviativo.»
+//
+// LO QUE SE SOSTIENE: 3554 («O.N.U.», «La O.N.U. aprobó», «J. Pérez»), 3555 («M VIII», «siglo XVIII»
+// y su aviso del § 8.5), 3556 (los trece signos con el aviso del B 2), 3557 y 3558 (la guía ya no
+// afirma el 2 € de 2022 ni el árabe de derecha a izquierda) y 3553 («73’81»): sus tests del bloque
+// anterior pasan, y el CASO 2 de aquí añade los ejemplos literales del § 8.5 que no tenían.
+//
+// CABO C0494 — SIN RESOLVER: ni el § 7.1 del B 2 ni el B 3-1 tratan la sigla que cierra la oración.
+// El § 6.1 distingue el punto ortográfico del de abreviatura (misma celda, 3) y el § 14.3 conserva
+// los puntos de la abreviatura «EE. UU.», pero no hay ningún ejemplo de una sigla al final de la
+// frase. La app da «Lo aprobó la O.N.U.» → ⠨⠇⠕⠀⠁⠏⠗⠕⠃⠬⠀⠇⠁⠀⠨⠕⠨⠝⠨⠥, sin punto final. Su test admite las
+// dos salidas y fija solo lo anclado: la sigla sin sus puntos.
+test.describe('inspector 28/10/2026', () => {
+  async function convertir28(page: Page, texto: string, modo: 'texto' | 'braille' = 'texto') {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['textarea']);
+    if (modo === 'braille') await page.getByRole('button', { name: 'Braille → Texto' }).click();
+    const textarea = page.locator('textarea').first();
+    await textarea.fill(texto);
+    await esperarValorEnReact(page, textarea, texto);
+    await page.getByRole('button', { name: 'Convertir', exact: true }).click();
+  }
+
+  /** Texto de la caja de resultado ('' si no hay caja), cuando ya hay resultado o aviso en pantalla. */
+  const resultado28 = async (page: Page) => {
+    await page.locator('[class*="resultBox"], [class*="avisoConversion"]').first().waitFor();
+    const caja = page.locator('[class*="resultBox"]');
+    return (await caja.count()) > 0 ? ((await caja.textContent()) ?? '') : '';
+  };
+
+  const aviso28 = (page: Page, texto: string) =>
+    page.locator('[class*="avisoConversion"]').filter({ hasText: texto });
+
+  /** Puntos de la hoja, línea a línea y celda a celda (Marburg: 6 mm · 10 mm · 2,5 mm, radio 0,75 mm). */
+  async function hoja28(page: Page): Promise<string[][]> {
+    return page.evaluate(() => {
+      const svg = [...document.querySelectorAll('svg')].find((s) =>
+        (s.getAttribute('aria-label') || '').includes('escala real'),
+      );
+      if (!svg) return [];
+      const lineas = new Map<number, Map<number, number[]>>();
+      [...svg.querySelectorAll('circle')].forEach((c) => {
+        const cx = parseFloat(c.getAttribute('cx') || '0');
+        const cy = parseFloat(c.getAttribute('cy') || '0');
+        const linea = Math.floor(cy / 10);
+        const celda = Math.floor(cx / 6);
+        if (!lineas.has(linea)) lineas.set(linea, new Map());
+        const l = lineas.get(linea)!;
+        if (!l.has(celda)) l.set(celda, []);
+        if (c.getAttribute('fill') !== '#000000') return; // los grises son la retícula guía
+        const columna = Math.round((cx - celda * 6 - 0.75) / 2.5);
+        const fila = Math.round((cy - linea * 10 - 0.75) / 2.5);
+        l.get(celda)!.push(columna * 3 + fila + 1);
+      });
+      return [...lineas.keys()]
+        .sort((a, b) => a - b)
+        .map((k) => {
+          const l = lineas.get(k)!;
+          const max = Math.max(...l.keys());
+          return Array.from({ length: max + 1 }, (_, i) => (l.get(i) ?? []).sort((a, b) => a - b).join('-'));
+        });
+    });
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // CASO 1 (normal) — dos frases que el B 2 transcribe enteras (§ 7 y § 10.3)
+  // ─────────────────────────────────────────────────────────────────────────
+  test('CASO 1 (normal) — «Entramos en la ciudad de Toledo.» (B 2 § 7): cadena, vista, hoja de dos líneas y vuelta', async ({ page }) => {
+    // Derivación a mano (§ 4 alfabeto, § 6.1 punto 3, § 7 signo de mayúscula 46):
+    //   'E' ⠨ (46) ⠑ (15) · n ⠝ (1345) · t ⠞ (2345) · r ⠗ (1235) · a ⠁ (1) · m ⠍ (134) · o ⠕ (135) ·
+    //   s ⠎ (234) · ⠀ · e ⠑ n ⠝ · ⠀ · l ⠇ (123) a ⠁ · ⠀ · c ⠉ (14) i ⠊ (24) u ⠥ (136) d ⠙ (145) a ⠁ d ⠙ ·
+    //   ⠀ · d ⠙ e ⠑ · ⠀ · 'T' ⠨ ⠞ · o ⠕ l ⠇ e ⠑ d ⠙ o ⠕ · '.' ⠄ (3)
+    await convertir28(page, 'Entramos en la ciudad de Toledo.');
+    await expect(cajaResultado(page)).toHaveText('⠨⠑⠝⠞⠗⠁⠍⠕⠎⠀⠑⠝⠀⠇⠁⠀⠉⠊⠥⠙⠁⠙⠀⠙⠑⠀⠨⠞⠕⠇⠑⠙⠕⠄');
+    await expect(page.locator('[class*="avisoConversion"]')).toHaveCount(0);
+    // Vista de celdas: 34 celdas; la 10.ª es la separación de palabra y la última el punto 3
+    const vista = await celdasVisuales(page);
+    expect(vista).toHaveLength(34);
+    expect(vista.slice(0, 10)).toEqual(['4-6', '1-5', '1-3-4-5', '2-3-4-5', '1-2-3-5', '1', '1-3-4', '1-3-5', '2-3-4', 'vacia']);
+    expect(vista.slice(-8)).toEqual(['4-6', '2-3-4-5', '1-3-5', '1-2-3', '1-5', '1-4-5', '1-3-5', '3']);
+    // Hoja (29 celdas por línea con Marburg, ⌊(172 − 2,5 − 1,5) / 6⌋ + 1). Palabras de 9 · 2 · 2 · 6 · 2 · 8
+    // celdas: 9 + 1 + 2 + 1 + 2 + 1 + 6 + 1 + 2 = 25, y «Toledo.» (8) no cabe en las 3 que quedan: baja
+    const hoja = await hoja28(page);
+    expect(hoja.map((l) => l.length)).toEqual([25, 8]);
+    expect(hoja[1]).toEqual(['4-6', '2-3-4-5', '1-3-5', '1-2-3', '1-5', '1-4-5', '1-3-5', '3']);
+    await expect(page.locator('[class*="hojaAviso"]')).toHaveText('2 líneas de 29 celdas · celda de 6 mm · 10 mm entre líneas');
+    // Vuelta (⇄ y Convertir): el mismo texto
+    await page.getByRole('button', { name: 'Intercambiar dirección de conversión' }).click();
+    await page.getByRole('button', { name: 'Convertir', exact: true }).click();
+    await expect(cajaResultado(page)).toHaveText('Entramos en la ciudad de Toledo.');
+    // La otra frase del B 2 (§ 10.3): f ⠋ (124) · q ⠟ (12345) · v ⠧ (1236)
+    await convertir28(page, 'Su autor es Francisco de Quevedo.');
+    await expect(cajaResultado(page)).toHaveText('⠨⠎⠥⠀⠁⠥⠞⠕⠗⠀⠑⠎⠀⠨⠋⠗⠁⠝⠉⠊⠎⠉⠕⠀⠙⠑⠀⠨⠟⠥⠑⠧⠑⠙⠕⠄');
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // CASO 2 (límite) — sigla con puntos dentro de la frase, romanos y abreviatura: ejemplos literales
+  // ─────────────────────────────────────────────────────────────────────────
+  test('CASO 2 (límite) — «Lo aprobó la O.N.U. ayer.», «M VIII», «iii vi» y «EE. UU.: 3:49.63» como en el B 2', async ({ page }) => {
+    const casos: Array<[string, string, string]> = [
+      // l ⠇ o ⠕ · a ⠁ p ⠏ r ⠗ o ⠕ b ⠃ ó ⠬ (346) · l ⠇ a ⠁ · O.N.U. sin sus puntos · a ⠁ y ⠽ (13456) e ⠑ r ⠗ · ⠄
+      ['Lo aprobó la O.N.U. ayer.', '⠨⠇⠕⠀⠁⠏⠗⠕⠃⠬⠀⠇⠁⠀⠨⠕⠨⠝⠨⠥⠀⠁⠽⠑⠗⠄', '§ 7.1 «{o{n{u» y el punto ortográfico del § 6.1'],
+      // La coma tras la sigla sí se escribe (punto 2, § 6.1); 1945 → ⠼ a i d e
+      ['La O.N.U., en 1945', '⠨⠇⠁⠀⠨⠕⠨⠝⠨⠥⠂⠀⠑⠝⠀⠼⠁⠊⠙⠑', '§ 7.1, § 6.1 y § 8.1'],
+      ['M VIII', '⠨⠍⠀⠨⠧⠊⠊⠊', '§ 8.5 «{m {viii»'],
+      ['iii vi', '⠊⠊⠊⠀⠧⠊', '§ 8.5 «iii vi»: en minúscula, sin signo de mayúscula'],
+      // Abreviatura, no sigla: conserva sus puntos. «3:49.63»: dos puntos (25) y coma decimal (2)
+      ['EE. UU.: 3:49.63', '⠨⠑⠨⠑⠄⠀⠨⠥⠨⠥⠄⠒⠀⠼⠉⠒⠼⠙⠊⠂⠋⠉', '§ 14.3 «{e{e. {u{u.: #c:#di,fc»'],
+    ];
+    for (const [texto, celdas, fuente] of casos) {
+      await convertir28(page, texto);
+      await expect(cajaResultado(page), `${texto} (${fuente})`).toHaveText(celdas);
+    }
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // C0494 — la sigla con puntos al final de la frase (sin resolver en la fuente)
+  // ─────────────────────────────────────────────────────────────────────────
+  test('C0494 — «Lo aprobó la O.N.U.»: la sigla sale sin sus puntos; el punto final no está anclado', async ({ page }) => {
+    await convertir28(page, 'Lo aprobó la O.N.U.');
+    // En tinta el punto de la U absorbe el de la frase. El § 7.1 manda quitar los de la sigla; si el
+    // punto ortográfico reaparece en braille no lo dicen ni el B 2 ni el B 3-1. Hoy la app lo quita
+    // (la primera); si se decide lo contrario, la segunda. Lo anclado es la sigla sin sus puntos.
+    const r = await resultado28(page);
+    expect(['⠨⠇⠕⠀⠁⠏⠗⠕⠃⠬⠀⠇⠁⠀⠨⠕⠨⠝⠨⠥', '⠨⠇⠕⠀⠁⠏⠗⠕⠃⠬⠀⠇⠁⠀⠨⠕⠨⠝⠨⠥⠄']).toContain(r);
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // CASO 3 (aviso) — ABIERTO (inspector 28/10/2026): los ordinales del § 8.3
+  // ─────────────────────────────────────────────────────────────────────────
+  //
+  // En Texto → Braille la app no escribe º ni ª: «1.º» sale ⠼⠁⠄ («1.»), «2.ª planta» sale
+  // ⠼⠃⠄⠀⠏⠇⠁⠝⠞⠁ («2. planta») y «n.º 5» sale ⠝⠄⠀⠼⠑, con el aviso genérico «Puede que el Código Braille
+  // Español sí le asigne celda», cuando el § 8.3 y el § 12 escriben las dos cosas. En Braille → Texto
+  // el ordinal del B 2 se lee como signo de puntuación y la cifra desaparece SIN aviso: ⠼⠂⠕ → «,o»,
+  // ⠼⠆⠁ → «;a». Mide: la celda del B 2 o un aviso que no lo ponga en duda (ida), y el ordinal o un
+  // aviso (vuelta).
+  test('ABIERTO — § 8.3: «1.º» y «2.ª» son ordinales del B 2 (#,o · #;a), y en Braille → Texto la cifra no desaparece en silencio', async ({ page }) => {
+    test.fail();
+    const fallos: string[] = [];
+    const ida: Array<[string, string]> = [
+      ['1.º', '⠼⠂⠕'], // ⠼ (3456) · 1 en posición baja ⠂ (2) · o ⠕ (135). Hoy: ⠼⠁⠄
+      ['2.ª planta', '⠼⠆⠁⠀⠏⠇⠁⠝⠞⠁'], // 2 en posición baja ⠆ (23) · a ⠁ (1). Hoy: ⠼⠃⠄⠀⠏⠇⠁⠝⠞⠁
+      ['n.º 5', '⠝⠄⠕⠀⠼⠑'], // § 12 «n.o» = 1345-3-135. Hoy: ⠝⠄⠀⠼⠑
+    ];
+    for (const [texto, celdas] of ida) {
+      await convertir28(page, texto);
+      const r = await resultado28(page);
+      const enDuda = (await aviso28(page, 'Puede que el Código Braille Español').count()) > 0;
+      if (r !== celdas && enDuda) fallos.push(`${texto} → ${r} y «Puede que…»`);
+    }
+    const vuelta: Array<[string, string[]]> = [
+      ['⠼⠂⠕', ['1.º', '1º']], // Hoy: «,o», sin aviso
+      ['⠼⠆⠁', ['2.ª', '2ª']], // Hoy: «;a», sin aviso
+    ];
+    for (const [celdas, validos] of vuelta) {
+      await convertir28(page, celdas, 'braille');
+      const r = await resultado28(page);
+      const avisa = (await page.locator('[class*="avisoConversion"]').count()) > 0;
+      if (!validos.includes(r) && !avisa) fallos.push(`${celdas} → «${r}» sin aviso`);
+    }
+    expect(fallos).toEqual([]);
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // ABIERTO (inspector 28/10/2026) — § 14.3: «2’54”» son minutos y segundos. REGRESIÓN de 37367e2e
+  // ─────────────────────────────────────────────────────────────────────────
+  //
+  // La reparación del 3553 hizo decimal TODO apóstrofo entre cifras («73’81 → #gc,ha», § 8.1). Pero el
+  // § 14.3 trae el contraejemplo literal, que la tinta sí distingue por el ” que cierra: «2’54” →
+  // #b:#ed». Hoy sale ⠼⠃⠂⠑⠙⠦ —2,54 y unas comillas de cierre— sin aviso; antes de 37367e2e salía
+  // ⠼⠃⠼⠑⠙⠦ con el aviso de comillas simples. Mide: la celda del B 2 para el ejemplo literal.
+  test('ABIERTO — § 14.3: «2’54”» se escribe con los dos puntos (#b:#ed), no como el decimal 2,54', async ({ page }) => {
+    test.fail();
+    await convertir28(page, '2’54”');
+    // ⠼ ⠃ (2) · ⠒ (25, dos puntos) · ⠼ ⠑ (5) ⠙ (4). Hoy: ⠼⠃⠂⠑⠙⠦
+    await expect(cajaResultado(page)).toHaveText('⠼⠃⠒⠼⠑⠙', { timeout: 3000 });
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // ABIERTO (inspector 28/10/2026) — § 8.2: la letra de la primera serie que ABRE la expresión
+  // ─────────────────────────────────────────────────────────────────────────
+  test('ABIERTO — § 8.2: «b1d4» abre la expresión numérica con el signo de número (#@ba@dd)', async ({ page }) => {
+    test.fail();
+    await convertir28(page, 'b1d4');
+    // ⠼ (3456) · ⠐ (5, prefijo de latina minúscula) ⠃ (b) · ⠁ (1) · ⠐ ⠙ (d) · ⠙ (4). Hoy: ⠃⠼⠁⠐⠙⠙
+    await expect(cajaResultado(page)).toHaveText('⠼⠐⠃⠁⠐⠙⠙', { timeout: 3000 });
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // ABIERTO (inspector 28/10/2026) — § 12: abreviaturas con forma propia en el B 2
+  // ─────────────────────────────────────────────────────────────────────────
+  test('ABIERTO — § 12: «a. C.», «d. C.» y «a. m.» se escriben como en el B 2 (a{c · d{c · a.m.)', async ({ page }) => {
+    test.fail();
+    const casos: Array<[string, string]> = [
+      ['a. C.', '⠁⠨⠉'], // a ⠁ · ⠨ (46) ⠉ (14), sin puntos ni blanco. Hoy: ⠁⠄⠀⠨⠉⠄
+      ['d. C.', '⠙⠨⠉'], // d ⠙ (145) · ⠨ ⠉. Hoy: ⠙⠄⠀⠨⠉⠄
+      ['a. m.', '⠁⠄⠍⠄'], // a ⠁ · ⠄ (3) · m ⠍ (134) · ⠄, sin blanco. Hoy: ⠁⠄⠀⠍⠄
+    ];
+    const fallos: string[] = [];
+    for (const [texto, celdas] of casos) {
+      await convertir28(page, texto);
+      const r = await resultado28(page);
+      if (r !== celdas) fallos.push(`${texto} → ${r}`);
+    }
+    expect(fallos).toEqual([]);
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // ABIERTO (inspector 28/10/2026) — guía, paso 5 «La lectura táctil»
+  // ─────────────────────────────────────────────────────────────────────────
+  //
+  // El 3458 retiró «Un lector experto llega a 200 WPM táctilmente, comparable a la lectura visual
+  // normal» por no tener fuente, y la misma equiparación sigue aquí sin cifra: «Los lectores expertos
+  // mueven los dedos de izquierda a derecha a la misma velocidad que un lector visual mueve los ojos».
+  // Y «relieves de solo 0,5 mm de altura»: el B 1 da como altura recomendada «entre 0,2 y 0,5 mm», así
+  // que 0,5 mm es el máximo, no un «solo».
+  test('ABIERTO — guía, paso 5: ni la velocidad «igual que la lectura visual» sin fuente ni «solo 0,5 mm» frente al B 1 (0,2-0,5 mm)', async ({ page }) => {
+    test.fail();
+    await page.goto(RUTA);
+    const paso5 = await page.evaluate(
+      () =>
+        [...document.querySelectorAll('[class*="eduStepItem"]')]
+          .find((c) => (c.querySelector('h4')?.textContent ?? '').includes('La lectura táctil'))
+          ?.querySelector('p')?.textContent ?? '',
+    );
+    expect(paso5).toContain('yemas'); // precondición: se leyó el paso 5
+    expect({
+      velocidadVisual: /misma velocidad que un lector visual/.test(paso5),
+      soloMedioMilimetro: /solo 0,5\s?mm/.test(paso5),
+    }).toEqual({ velocidadVisual: false, soloMedioMilimetro: false });
+  });
+});

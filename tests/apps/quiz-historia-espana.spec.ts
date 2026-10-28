@@ -202,7 +202,7 @@ test.describe('Quiz Historia de España · partida', () => {
     const r = await resultado(page);
     expect(r.titulo).toBe('Gran conocedor de la historia');
     expect(r.medalla).toBe('🥈');
-    // El % se admite pegado o con espacio duro: el formato se vigila en su propio test (hallazgo abierto).
+    // El % se admite pegado o con espacio duro: el formato se vigila en su propio test (hallazgo 2123, REPARADO).
     expect(r.subtitulo).toMatch(subtituloFinal(7, 10, 70));
     expect(r.stats.Correctas).toBe('7');
     expect(r.stats.Errores).toBe('3');
@@ -702,5 +702,244 @@ test.describe('Inspector 25/09/2026 · contenido del banco', () => {
     expect(pregunta(/llegó Cristóbal Colón a América/).explicacion).toMatch(
       /Diversidad Cultural|Resistencia Indígena|pueblos originarios|indígenas|conquista|coloniza/i,
     );
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * DOBLE TOQUE — Inspector 28/10/2026, familia «Quizzes de opción múltiple (quiz-*)».
+ * El testigo tests/familias/quizzes.spec.ts solo mide a 390×844, no recorre las salidas del
+ * resultado ni el doble toque sobre una OPCIÓN. Aquí, como en él: 1.er clic suelto en el centro
+ * del control, esperar a que la pantalla NUEVA esté pintada y 2.º clic con detail 2 en el mismo
+ * punto; lo que haya debajo es lo que pisa.
+ *
+ * Medido el 28/10/2026 (.inspector-trabajo/histes-rafagas.mjs, 4 vistas × 3 partidas, 160 ráfagas):
+ * 0 anomalías. El 2.º toque cayó sobre relacionadas (/quiz-geografia-espana/ 10 veces a 412 px),
+ * el conmutador de la guía (16 a 1280 px), el enlace externo «catálogo de meskeIA» (412 px, tras
+ * «Cambiar dificultad») y opciones de la pregunta nueva; useGuardaRafaga lo anuló siempre. Sobre
+ * una opción el 2.º toque cae en la MISMA opción, ya disabled: responder enfoca «Siguiente» con
+ * preventScroll (page.tsx:140) y la vista no se mueve.
+ *
+ * Esperado a mano para el flujo del test (Fácil, 10 preguntas, opción A, B, C, D por turnos; la
+ * nota se cuenta comparando el texto pulsado con la clave del banco, no con lo que dice la app):
+ *  · tras «Comenzar quiz»: «Pregunta 1 de 10», «0 correctas», 4 opciones habilitadas, foco en el h2;
+ *  · tras la ráfaga sobre una opción: la misma pregunta, su veredicto y el marcador contado;
+ *  · tras cada «Siguiente pregunta»: «Pregunta n+1 de 10», 4 habilitadas, sin veredicto, foco en el h2;
+ *  · tras «Ver resultado»: «a de 10 preguntas correctas (p %)», con p = a·10;
+ *  · tras «Jugar de nuevo»: «Pregunta 1 de 10», «0 correctas» y 4 habilitadas;
+ *  · tras «Cambiar dificultad»: pantalla de inicio con «Fácil» aún elegido y el foco en «Comenzar quiz».
+ * En todos: la URL no cambia, la guía no se abre ni se cierra y no se abre ninguna ventana.
+ */
+const UA_MOVIL = 'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Mobile Safari/537.36';
+
+/** Deja el control a la vista sin meterlo bajo la barra fija del logo. */
+async function aLaVista(control: Locator): Promise<void> {
+  await control.evaluate((el) => {
+    const r = el.getBoundingClientRect();
+    const barra = document.querySelector('[class*="headerBar"]')?.getBoundingClientRect().bottom ?? 0;
+    if (r.bottom > innerHeight - 8) scrollBy(0, r.bottom - innerHeight + 8);
+    else if (r.top < barra + 4) scrollBy(0, r.top - barra - 4);
+  });
+}
+
+/** 1.er clic, espera a la pantalla nueva, `entre()` y 2.º clic de la ráfaga (detail 2) en el mismo punto. */
+async function rafaga(page: Page, control: Locator, pintada: () => Promise<boolean>, entre?: () => Promise<void>): Promise<void> {
+  await aLaVista(control);
+  await page.waitForTimeout(80);
+  const caja = await control.boundingBox();
+  if (!caja) throw new Error('el control no tiene caja');
+  const [x, y] = [caja.x + caja.width / 2, caja.y + caja.height / 2];
+  await page.mouse.move(x, y);
+  await page.mouse.down({ clickCount: 1 });
+  await page.mouse.up({ clickCount: 1 });
+  await expect.poll(pintada, { intervals: [20], timeout: 3000, message: 'el 1.er clic cambia de pantalla' }).toBe(true);
+  await page.waitForTimeout(80);
+  if (entre) await entre();
+  await page.mouse.down({ clickCount: 2 });
+  await page.mouse.up({ clickCount: 2 });
+  await page.waitForTimeout(400);
+}
+
+async function partidaConRafagas(page: Page): Promise<void> {
+  await abrir(page);
+  const url = page.url();
+  let ventanas = 0;
+  page.context().on('page', () => { ventanas++; });
+  const guia = page.getByRole('button', { name: /guía educativa/ });
+  const guia0 = await guia.getAttribute('aria-expanded');
+  const enunciado = page.locator('[class*="preguntaTexto"]');
+  const progreso = page.locator('[class*="progresoInfo"] span').first();
+  const veredicto = page.locator('[class*="feedbackMensaje"]');
+  const habilitadas = (): Promise<number> => opciones(page).evaluateAll((bs) => bs.filter((b) => !(b as HTMLButtonElement).disabled).length);
+  const claseEnfocada = (): Promise<string> => page.evaluate(() => (document.activeElement?.className ?? '').toString());
+  const comprobar = async (paso: string): Promise<void> => {
+    expect(page.url(), `${paso}: la ráfaga no saca de la app`).toBe(url);
+    expect(await guia.getAttribute('aria-expanded'), `${paso}: la ráfaga no abre ni cierra la guía`).toBe(guia0);
+    expect(ventanas, `${paso}: la ráfaga no abre ventanas`).toBe(0);
+  };
+
+  await page.getByRole('button', { name: /^Fácil/ }).click();
+  let foco = '';
+  await rafaga(
+    page,
+    page.getByRole('button', { name: 'Comenzar quiz', exact: true }),
+    async () => (await enunciado.count()) > 0 && (await habilitadas()) === 4,
+    async () => { foco = await claseEnfocada(); },
+  );
+  expect(foco, 'Comenzar: el foco va al enunciado').toMatch(/preguntaTexto/);
+  await expect(progreso).toHaveText('Pregunta 1 de 10');
+  await expect(marcador(page)).toHaveText('0 correctas');
+  expect(await habilitadas(), 'Comenzar: el 2.º toque no contesta la 1.ª pregunta').toBe(4);
+  await comprobar('Comenzar');
+
+  let aciertos = 0;
+  for (let n = 1; n <= 10; n++) {
+    await page.waitForTimeout(450); // «leer» la pregunta: tocar la opción abre una ráfaga nueva
+    const ficha = await fichaVisible(page);
+    const i = (n - 1) % 4;
+    const acierta = (await textosOpcion(page))[i] === ficha.correcta;
+    if (acierta) aciertos++;
+    await rafaga(page, opciones(page).nth(i), async () => (await habilitadas()) === 0);
+    await expect(veredicto, `pregunta ${n}: veredicto de la opción pulsada`).toContainText(acierta ? '¡Correcto!' : 'Incorrecto');
+    expect(norm(await enunciado.innerText()), `opción ${'ABCD'[i]}: el 2.º toque no se salta la explicación`).toBe(ficha.pregunta);
+    await expect(progreso).toHaveText(`Pregunta ${n} de 10`);
+    await expect(marcador(page)).toHaveText(`${aciertos} ${aciertos === 1 ? 'correcta' : 'correctas'}`);
+    await comprobar(`opción ${'ABCD'[i]} de la pregunta ${n}`);
+
+    const avanzar = page.getByRole('button', { name: /Siguiente pregunta|Ver resultado/ });
+    if (n < 10) {
+      await rafaga(
+        page,
+        avanzar,
+        async () => (await progreso.textContent()) === `Pregunta ${n + 1} de 10` && (await habilitadas()) === 4,
+        async () => { foco = await claseEnfocada(); },
+      );
+      expect(foco, `Siguiente ${n}: el foco va al enunciado nuevo`).toMatch(/preguntaTexto/);
+      await expect(progreso).toHaveText(`Pregunta ${n + 1} de 10`);
+      expect(await habilitadas(), `Siguiente ${n}: el 2.º toque no contesta la pregunta nueva`).toBe(4);
+      await expect(veredicto).toHaveCount(0);
+      await comprobar(`Siguiente ${n}`);
+    } else {
+      await rafaga(page, avanzar, async () => (await page.locator('[class*="finTitulo"]').count()) > 0);
+      const r = await resultado(page);
+      expect(r.subtitulo, 'Ver resultado: el 2.º toque no se come la nota').toBe(`${aciertos} de 10 preguntas correctas (${aciertos * 10}${DURO}%)`);
+      await comprobar('Ver resultado');
+    }
+  }
+
+  await rafaga(
+    page,
+    page.getByRole('button', { name: 'Jugar de nuevo' }),
+    async () => (await progreso.count()) > 0 && (await progreso.textContent()) === 'Pregunta 1 de 10' && (await habilitadas()) === 4,
+  );
+  await expect(marcador(page)).toHaveText('0 correctas');
+  expect(await habilitadas(), 'Jugar de nuevo: el 2.º toque no contesta la 1.ª pregunta').toBe(4);
+  await comprobar('Jugar de nuevo');
+
+  await jugar(page, 0);
+  await rafaga(
+    page,
+    page.getByRole('button', { name: 'Cambiar dificultad' }),
+    async () => (await page.locator('[class*="inicioPanel"]').count()) > 0,
+    async () => { foco = await claseEnfocada(); },
+  );
+  expect(foco, 'Cambiar dificultad: el foco va a «Comenzar quiz»').toMatch(/btnIniciar/);
+  await expect(page.locator('[class*="inicioPanel"]')).toBeVisible();
+  await expect(page.getByRole('button', { name: /^Fácil/ })).toHaveAttribute('aria-pressed', 'true');
+  await comprobar('Cambiar dificultad');
+}
+
+for (const v of [
+  { nombre: '360 × 740', ancho: 360, alto: 740, movil: true },
+  { nombre: '412 × 915', ancho: 412, alto: 915, movil: true },
+  { nombre: '768 × 1024', ancho: 768, alto: 1024, movil: true },
+  { nombre: 'escritorio 1280 × 800', ancho: 1280, alto: 800, movil: false },
+]) {
+  test.describe(`Inspector 28/10/2026 · doble toque a ${v.nombre}`, () => {
+    if (v.movil) {
+      test.use({
+        viewport: { width: v.ancho, height: v.alto },
+        userAgent: UA_MOVIL,
+        deviceScaleFactor: 3,
+        isMobile: true,
+        hasTouch: true,
+      });
+    } else {
+      test.use({ viewport: { width: v.ancho, height: v.alto } });
+    }
+
+    test('sano · el 2.º toque de la ráfaga no contesta, no salta la explicación, no saca de la app ni se come la nota', async ({ page }) => {
+      test.setTimeout(150_000);
+      await partidaConRafagas(page);
+    });
+  });
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+// Cada caso fallaba por su aserción (comprobado el 28/10/2026 antes de marcarlo con test.fail()).
+test.describe('Inspector 28/10/2026 · contenido (hallazgos abiertos)', () => {
+  test('hallazgo · Reyes Católicos: el matrimonio de 1469 no unió las coronas', () => {
+    test.fail(); // falla por la aserción del defecto mientras siga abierto
+    // ABIERTO.La explicación de «¿Quiénes eran los Reyes Católicos?» dice que «unieron las dos
+    // coronas […] con su matrimonio (1469)», lo que la pregunta de la boda (id 20) desmiente: Isabel
+    // heredó Castilla en 1474 y Fernando Aragón en 1479. La FAQ visible fecha la unión en 1479.
+    expect(pregunta(/^¿Quiénes eran los Reyes Católicos\?$/).explicacion).not.toMatch(/unieron las dos coronas[^.]*con su matrimonio \(1469\)/);
+  });
+
+  test('hallazgo · Reyes Católicos: «se descubrió América» a secas', () => {
+    test.fail(); // falla por la aserción del defecto mientras siga abierto
+    // ABIERTO.Criterio de la propia app (hallazgo 2121, page.tsx:36): «Llegada a América» en vez de
+    // «Descubrimiento» a secas, antipatrón 8 de neutralidad. La misma explicación conserva «se
+    // descubrió América» sin contexto.
+    expect(pregunta(/^¿Quiénes eran los Reyes Católicos\?$/).explicacion).not.toMatch(/se descubrió América/);
+  });
+
+  test('hallazgo · Portugal 1580: el cardenal Enrique era tío abuelo de Sebastián, no su tío', () => {
+    test.fail(); // falla por la aserción del defecto mientras siga abierto
+    // ABIERTO.Enrique I de Portugal era hijo de Manuel I y hermano de Juan III; Sebastián era nieto
+    // de Juan III. La explicación dice «la muerte sin descendencia del rey Sebastián y de su tío Enrique».
+    expect(pregunta(/corona de Portugal/).explicacion).not.toMatch(/su tío Enrique/);
+  });
+
+  test('hallazgo · Selectividad: Historia de España ya no es obligatoria en la PAU', async ({ page }) => {
+    test.fail(); // falla por la aserción del defecto mientras siga abierto
+    // ABIERTO.Real Decreto 534/2024 (BOE-A-2024-11858), art. 12.1.b): «Historia de España o
+    // Historia de la Filosofía, a elección del alumnado», aplicable a las pruebas desde el curso
+    // 2024-2025 (disposición final cuarta). La FAQPage dice «que incluye obligatoriamente Historia de
+    // España» y la guía visible, «materia troncal en 2º de Bachillerato y en la EvAU/ABAU».
+    await abrir(page);
+    const ld = await page.evaluate(() => [...document.querySelectorAll('script[type="application/ld+json"]')].map((s) => s.textContent ?? '').join(' '));
+    await page.getByRole('button', { name: /guía educativa/ }).click();
+    const texto = norm(await page.evaluate(() => document.body.textContent));
+    const fallos: string[] = [];
+    if (/incluye obligatoriamente Historia de España/.test(ld)) fallos.push('FAQPage: «incluye obligatoriamente Historia de España»');
+    if (/troncal en 2º de Bachillerato y en la EvAU/.test(texto)) fallos.push('guía: «troncal … en la EvAU/ABAU»');
+    expect(fallos).toEqual([]);
+  });
+
+  test('hallazgo · el JSON-LD declara qué hace la app (features con 4 o más)', async ({ page }) => {
+    test.fail(); // falla por la aserción del defecto mientras siga abierto
+    // ABIERTO.metadata.ts: `features: []` (§1.ter del CLAUDE.md: 4-8 características reales).
+    await abrir(page);
+    const lista = await page.evaluate(() => {
+      for (const s of document.querySelectorAll('script[type="application/ld+json"]')) {
+        const j = JSON.parse(s.textContent ?? '{}') as { '@type'?: string; featureList?: unknown };
+        if (j['@type'] === 'WebApplication') return Array.isArray(j.featureList) ? j.featureList.length : -1;
+      }
+      return -2;
+    });
+    expect(lista, 'nº de featureList en el WebApplication (-1 sin lista, -2 sin WebApplication)').toBeGreaterThanOrEqual(4);
+  });
+
+  test('hallazgo · «Elige el modo de juego» no ofrece nada que elegir', async ({ page }) => {
+    test.fail(); // falla por la aserción del defecto mientras siga abierto
+    // ABIERTO.La pantalla de inicio rotula «Elige el modo de juego» sobre una sola tarjeta, «Modo
+    // Aprendizaje», que es un <div> con aspecto de seleccionada: ni botón ni radio ni alternativa.
+    await abrir(page);
+    const rotulo = await page.getByText('Elige el modo de juego', { exact: true }).count();
+    const elegibles = await page.locator('[class*="modoGrid"] :is(button, input, [role="radio"])').count();
+    expect(rotulo === 0 || elegibles >= 2, `rótulo «Elige el modo de juego» con ${elegibles} controles`).toBe(true);
   });
 });

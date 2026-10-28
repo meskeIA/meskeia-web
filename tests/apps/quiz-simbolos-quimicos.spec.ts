@@ -1476,3 +1476,423 @@ test.describe('Inspector 27/09/2026 · hallazgos', () => {
     expect(cuantos).toMatch(/semividas \(periodos de semidesintegración\)[^.]*curio-247, unos 15,6 millones de años/);
   });
 });
+
+// ===========================================================================
+// Inspector 28/10/2026 — 5.ª pasada, dentro de la familia «Quizzes de opción múltiple».
+// El testigo (tests/familias/quizzes.spec.ts) juega el modo por defecto con ratón y la opción A, y
+// prueba la ráfaga en «Empezar», «Siguiente» y «Ver resultados». Aquí, los caminos que no recorre y
+// que en la familia solo tiene esta app: los DOS modos con sus tres niveles, la partida entera con
+// TECLADO, y las dos salidas del resultado («Repetir quiz» y «Cambiar configuración») con doble clic
+// y con el dedo.
+// Banco cotejado entero el 28/10/2026: los 88 símbolos y números atómicos son los de la IUPAC
+// (SIMBOLO_CANONICO, arriba) y el banco coincide sin una discrepancia con las 88 filas comunes de
+// app/tabla-periodica/elementos-data.ts y de app/simulador-tabla-periodica-tendencias/datos.ts.
+// ===========================================================================
+
+/** Dónde está el foco, por la clase de módulo del elemento (o BODY). */
+function focoEn(page: Page): Promise<string> {
+  return page.evaluate(() => {
+    const a = document.activeElement;
+    if (!a || a === document.body) return 'BODY';
+    const c = String(a.className);
+    for (const n of ['preguntaCard', 'btnSiguiente', 'finPanel', 'configTitulo', 'opcionBtn', 'btnIniciar', 'difCard', 'modoCard']) {
+      if (c.includes(n)) return n;
+    }
+    return a.tagName;
+  });
+}
+
+/**
+ * Doble clic de ratón de verdad, como el testigo de la familia: 1.er clic en el centro del botón,
+ * esperar a que la pantalla NUEVA esté pintada y el 2.º clic de la ráfaga (`detail` 2) en el mismo
+ * punto, que cae sobre lo que haya debajo.
+ */
+async function dobleClicReal(page: Page, boton: Locator, pintada: () => Promise<boolean>): Promise<void> {
+  await boton.scrollIntoViewIfNeeded();
+  await page.waitForTimeout(100);
+  const caja = (await boton.boundingBox())!;
+  const [x, y] = [caja.x + caja.width / 2, caja.y + caja.height / 2];
+  await page.mouse.move(x, y);
+  await page.mouse.down({ clickCount: 1 });
+  await page.mouse.up({ clickCount: 1 });
+  await expect.poll(pintada, { intervals: [20], timeout: 3000, message: 'el primer clic cambia de pantalla' }).toBe(true);
+  await page.waitForTimeout(80);
+  await page.mouse.down({ clickCount: 2 });
+  await page.mouse.up({ clickCount: 2 });
+  await page.waitForTimeout(400);
+}
+
+/** Contesta la opción A y avanza, `n` veces: para llegar al resultado sin importar la nota. */
+async function acabarConLaA(page: Page, n: number): Promise<void> {
+  for (let i = 0; i < n; i++) {
+    await page.locator('[class*="opcionBtn"]').first().click();
+    await page.locator('[class*="btnSiguiente"]').click();
+  }
+}
+
+test.describe('Inspector 28/10/2026 · casos', () => {
+  /**
+   * CASO NORMAL — la partida ENTERA con teclado (nadie la había jugado así de principio a fin),
+   * en Medio y Símbolo → Nombre, que ningún caso anterior puntuaba con teclado.
+   * Patrón ✓ ✓ ✓ ✗ ✓ ✓ ✓ ✓ ✓ ✗ ✓ ✓ ✗ ✗ ✓. Resuelto a mano ANTES de ejecutar:
+   *   · aciertos 1 2 3 3 4 5 6 7 8 8 9 10 10 10 11 · racha 1 2 3 0 1 2 3 4 5 0 1 2 0 0 1
+   *   · foco: en la tarjeta de la pregunta al llegar a cada una (Tab k+1 veces lleva a la opción k),
+   *     en el botón de avanzar al responder, y en el resultado al final (invariante de la familia)
+   *   · final: 11 de 15 = 73,33 % → formatPercentage(…, 0) = «73 %» con espacio duro; racha máxima 5
+   *     (P5-P9); calcularMedalla: 110 < 15·9 = 135 → no oro; 110 ≥ 15·7 = 105 → plata, «¡Muy bien!» 🥈
+   *   · «Elementos a repasar (4)» con los símbolos de P4, P10, P13 y P14, en ese orden
+   * Medido el 28/10/2026: lo esperado, las 15 preguntas.
+   */
+  test('caso normal · Medio jugado solo con teclado: 11 de 15 son el 73 %, plata y racha máxima 5', async ({ page }) => {
+    test.setTimeout(90_000);
+    await abrir(page);
+    const medio = page.locator('[class*="difCard"]').filter({ hasText: 'Medio' });
+    for (let t = 0; t < 80 && !(await medio.evaluate((el) => el === document.activeElement)); t++) {
+      await page.keyboard.press('Tab');
+    }
+    await page.keyboard.press('Enter');
+    await expect(medio).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.locator('[class*="modoCard"]').filter({ hasText: 'Símbolo → Nombre' })).toHaveAttribute('aria-pressed', 'true');
+    const empezar = page.getByRole('button', { name: '¡Empezar quiz!' });
+    for (let t = 0; t < 10 && !(await empezar.evaluate((el) => el === document.activeElement)); t++) {
+      await page.keyboard.press('Tab');
+    }
+    await page.keyboard.press('Enter');
+
+    const PATRON = [true, true, true, false, true, true, true, true, true, false, true, true, false, false, true];
+    const ACIERTOS = [1, 2, 3, 3, 4, 5, 6, 7, 8, 8, 9, 10, 10, 10, 11];
+    const RACHA = [1, 2, 3, 0, 1, 2, 3, 4, 5, 0, 1, 2, 0, 0, 1];
+    const fallados: string[] = [];
+    for (let i = 0; i < 15; i++) {
+      await expect(page.getByText(`Pregunta ${i + 1} / 15`)).toBeVisible();
+      await expect.poll(() => focoEn(page), { message: `P${i + 1}: el foco llega a la pregunta` }).toBe('preguntaCard');
+      const simbolo = (await enunciado(page).textContent())!.trim();
+      const el = ELEMENTOS.find((e) => e.simbolo === simbolo);
+      expect(el, `«${simbolo}» no está en el banco`).toBeTruthy();
+      expect(el!.categoria, `${simbolo} no es del nivel Medio`).not.toBe('avanzado');
+      expect(SIMBOLO_CANONICO[el!.z - 1], `${el!.nombre}: el símbolo no es el de la IUPAC`).toBe(simbolo);
+      await expect(page.locator('[class*="elementoZ"]')).toHaveText(`Z = ${Z_CANONICO[simbolo]}`);
+      const opciones = await opcionesVisibles(page);
+      const k = PATRON[i] ? opciones.indexOf(el!.nombre) : opciones.findIndex((o) => o !== el!.nombre);
+      expect(k, `P${i + 1} (${simbolo}): falta «${el!.nombre}» entre ${opciones.join(', ')}`).toBeGreaterThanOrEqual(0);
+      for (let t = 0; t <= k; t++) await page.keyboard.press('Tab');
+      expect(await focoEn(page)).toBe('opcionBtn');
+      await page.keyboard.press('Enter');
+      await expect.poll(() => focoEn(page), { message: `P${i + 1}: el foco va a avanzar` }).toBe('btnSiguiente');
+      expect(await marcador(page)).toBe(`Pregunta ${i + 1} / 15 ✅ ${ACIERTOS[i]} · 🔥 Racha: ${RACHA[i]}`);
+      if (!PATRON[i]) fallados.push(simbolo);
+      await expect(page.getByRole('button', { name: i < 14 ? 'Siguiente pregunta →' : 'Ver resultados' })).toBeFocused();
+      await page.keyboard.press('Enter');
+    }
+
+    await expect.poll(() => focoEn(page)).toBe('finPanel');
+    const fin = page.locator('[class*="finPanel"]');
+    expect(await fin.locator('[class*="finSubtitulo"]').textContent()).toBe('Has acertado 11 de 15 (73 %)');
+    await expect(fin.locator('[class*="finTitulo"]')).toHaveText('¡Muy bien!');
+    await expect(fin.locator('[class*="medallaIcon"]')).toHaveText('🥈');
+    expect(norm(await fin.locator('[class*="statsGrid"]').innerText())).toBe(
+      '11 Aciertos 4 Errores 5 Racha máxima 73 % Precisión',
+    );
+    await expect(page.getByText('Elementos a repasar (4)')).toBeVisible();
+    expect(await page.locator('[class*="errorSimbolo"]').allTextContents()).toEqual(fallados);
+  });
+
+  /**
+   * CASO LÍMITE — el nivel más largo fallándolo TODO y, sin recargar, el más corto acertándolo todo.
+   * Resuelto a mano ANTES de ejecutar:
+   *   · Difícil (20, pool de 88), Nombre → Símbolo, 20 fallos: el marcador se queda en «✅ 0 · 🔥
+   *     Racha: 0» las veinte veces; la 20.ª ofrece «Ver resultados»; final «Has acertado 0 de 20
+   *     (0 %)», «Sigue practicando» 📚 (0 < la mitad), «Elementos a repasar (20)» con los veinte
+   *     símbolos preguntados, en orden
+   *   · «Cambiar configuración» lleva el foco a «Elige el modo de juego» y CONSERVA la configuración
+   *     (Nombre → Símbolo y Difícil siguen pulsados)
+   *   · Símbolo → Nombre en Fácil, 10 aciertos: arranca en «✅ 0 · 🔥 Racha: 0» y acaba en «Has
+   *     acertado 10 de 10 (100 %)», «¡Perfecto!» 🏆, racha máxima 10, SIN «Elementos a repasar»: los
+   *     20 errores anteriores no se arrastran, y la página es la misma (no se recargó)
+   * Medido el 28/10/2026: lo esperado.
+   */
+  test('caso límite · Difícil 0 de 20 y, sin recargar, Fácil 10 de 10: la nota no arrastra nada', async ({ page }) => {
+    test.setTimeout(120_000);
+    await abrir(page);
+    await page.evaluate(() => {
+      (window as unknown as { __marcaInspector?: string }).__marcaInspector = 'misma-carga';
+    });
+    await arrancarPartida(page, /Nombre → Símbolo/, /^Difícil/);
+    const vistos = await jugarNombreSimbolo(page, Array<boolean>(20).fill(false), async (i) => {
+      expect(await marcador(page)).toBe(`Pregunta ${i + 1} / 20 ✅ 0 · 🔥 Racha: 0`);
+      if (i === 19) await expect(page.getByRole('button', { name: 'Ver resultados' })).toBeVisible();
+    });
+    expect(new Set(vistos).size, `Difícil repitió elemento: ${vistos.join(', ')}`).toBe(20);
+
+    const fin = page.locator('[class*="finPanel"]');
+    expect(await fin.locator('[class*="finSubtitulo"]').textContent()).toBe('Has acertado 0 de 20 (0 %)');
+    await expect(fin.locator('[class*="finTitulo"]')).toHaveText('Sigue practicando');
+    await expect(fin.locator('[class*="medallaIcon"]')).toHaveText('📚');
+    expect(norm(await fin.locator('[class*="statsGrid"]').innerText())).toBe('0 Aciertos 20 Errores 0 Racha máxima 0 % Precisión');
+    await expect(page.getByText('Elementos a repasar (20)')).toBeVisible();
+    expect(await page.locator('[class*="errorSimbolo"]').allTextContents()).toEqual(vistos);
+
+    await page.getByRole('button', { name: /Cambiar configuración/ }).click();
+    await expect.poll(() => focoEn(page)).toBe('configTitulo');
+    await expect(page.locator('[class*="configTitulo"]').first()).toHaveText('Elige el modo de juego');
+    await expect(page.getByRole('button', { name: /Nombre → Símbolo/ })).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByRole('button', { name: /^Difícil/ })).toHaveAttribute('aria-pressed', 'true');
+
+    await arrancarPartida(page, /Símbolo → Nombre/, /^Fácil/);
+    expect(await marcador(page)).toBe('Pregunta 1 / 10 ✅ 0 · 🔥 Racha: 0');
+    await jugarFacil(page, 'simbolo', Array<boolean>(10).fill(true));
+    expect(await fin.locator('[class*="finSubtitulo"]').textContent()).toBe('Has acertado 10 de 10 (100 %)');
+    await expect(fin.locator('[class*="finTitulo"]')).toHaveText('¡Perfecto!');
+    await expect(fin.locator('[class*="medallaIcon"]')).toHaveText('🏆');
+    expect(norm(await fin.locator('[class*="statsGrid"]').innerText())).toBe('10 Aciertos 0 Errores 10 Racha máxima 100 % Precisión');
+    await expect(fin).not.toContainText('Elementos a repasar');
+    expect(
+      await page.evaluate(() => (window as unknown as { __marcaInspector?: string }).__marcaInspector),
+      'la página se recargó',
+    ).toBe('misma-carga');
+  });
+
+  /**
+   * CASO DE RECHAZO — la ráfaga en las dos salidas del resultado, que el testigo no recorre.
+   * A 390 × 844, el 2.º clic de un doble clic en «Repetir quiz» cae sobre una OPCIÓN de la
+   * pregunta 1 de la partida nueva (medido el 28/10/2026: la C; a 360 × 740, la A): sin la guarda
+   * (useGuardaRafaga), contestaría sin que nadie eligiera. En «Cambiar configuración» cae hoy sobre
+   * el título; queda de regresión por si la maqueta lo acerca a una tarjeta de modo o de nivel.
+   * Resuelto a mano: tras el doble clic en «Repetir quiz», «Pregunta 1 / 15», cuatro opciones
+   * habilitadas, sin aviso de corrección y «✅ 0 · 🔥 Racha: 0»; tras el doble clic en «Cambiar
+   * configuración», la pantalla de configuración con Nombre → Símbolo y Medio aún pulsados y
+   * ninguna partida empezada. Medido el 28/10/2026: lo esperado (los dos 2.º clics se ignoran).
+   */
+  test('caso de rechazo · doble clic en «Repetir quiz» y en «Cambiar configuración»: el 2.º clic no contesta ni reconfigura', async ({ page }) => {
+    test.setTimeout(90_000);
+    await page.setViewportSize({ width: 390, height: 844 });
+    await abrir(page);
+    await arrancarPartida(page, /Nombre → Símbolo/, /^Medio/);
+    await acabarConLaA(page, 15);
+    const opciones = page.locator('[class*="opcionBtn"]');
+    const habilitadas = page.locator('[class*="opcionBtn"]:not([disabled])');
+
+    await dobleClicReal(
+      page,
+      page.getByRole('button', { name: /Repetir quiz/ }),
+      async () => (await opciones.count()) === 4 && (await habilitadas.count()) === 4,
+    );
+    await expect(page.getByText('Pregunta 1 / 15')).toBeVisible();
+    await expect(habilitadas).toHaveCount(4);
+    await expect(feedback(page)).toHaveCount(0);
+    expect(await marcador(page)).toBe('Pregunta 1 / 15 ✅ 0 · 🔥 Racha: 0');
+
+    await acabarConLaA(page, 15);
+    await dobleClicReal(
+      page,
+      page.getByRole('button', { name: /Cambiar configuración/ }),
+      async () => (await page.locator('[class*="inicioPanel"]').count()) === 1,
+    );
+    await expect(page.locator('[class*="inicioPanel"]')).toBeVisible();
+    await expect(page.getByRole('button', { name: /Nombre → Símbolo/ })).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByRole('button', { name: /^Medio/ })).toHaveAttribute('aria-pressed', 'true');
+    await expect(opciones).toHaveCount(0);
+  });
+});
+
+test.describe('Inspector 28/10/2026 · móvil táctil 360 × 740', () => {
+  test.use({
+    viewport: { width: 360, height: 740 },
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Mobile Safari/537.36',
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  /**
+   * CASO DE RECHAZO, con el dedo — una segunda respuesta a la misma pregunta. Dos toques seguidos
+   * (150 ms) sobre la opción MÁS BAJA, la D: el 1.º contesta; al contestar, el foco va a «Siguiente»
+   * (que puede desplazar la vista), así que el 2.º podría caer sobre «Siguiente» y saltarse la
+   * corrección, o sobre otra opción y contestar dos veces. Resuelto a mano: tras los dos toques,
+   * sigue «Pregunta 1 / 10», el aviso de corrección está a la vista, las cuatro opciones
+   * deshabilitadas y el marcador cuenta UNA respuesta (✅ 1 si la D era la correcta, ✅ 0 si no).
+   * Y el doble toque en «Repetir quiz», con el dedo: la pregunta 1 de la partida nueva sin contestar.
+   * Medido el 28/10/2026 en 15 dobles toques (80, 150 y 250 ms): el 2.º cae en la sección, nunca
+   * en «Siguiente» ni en otra opción.
+   */
+  test('caso de rechazo · dos toques en la opción D cuentan una respuesta y no saltan la corrección', async ({ page }) => {
+    test.setTimeout(60_000);
+    await abrir(page);
+    await page.getByRole('button', { name: '¡Empezar quiz!' }).tap();
+    await expect(page.getByText('Pregunta 1 / 10')).toBeVisible();
+    await page.waitForTimeout(500);
+    const simbolo = (await enunciado(page).textContent())!.trim();
+    const textos = await opcionesVisibles(page);
+    const dEsCorrecta = textos[3] === COMUNES[simbolo];
+    const d = page.locator('[class*="opcionBtn"]').nth(3);
+    await d.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(120);
+    const caja = (await d.boundingBox())!;
+    const [x, y] = [caja.x + caja.width / 2, caja.y + caja.height / 2];
+    await page.touchscreen.tap(x, y);
+    await page.waitForTimeout(150);
+    await page.touchscreen.tap(x, y);
+    await page.waitForTimeout(400);
+
+    await expect(page.getByText('Pregunta 1 / 10')).toBeVisible();
+    await expect(feedback(page)).toBeVisible();
+    await expect(feedback(page)).toContainText(dEsCorrecta ? '¡Correcto!' : `La respuesta correcta era: ${COMUNES[simbolo]}`);
+    await expect(page.locator('[class*="opcionBtn"]:not([disabled])')).toHaveCount(0);
+    const n = dEsCorrecta ? 1 : 0;
+    expect(await marcador(page)).toBe(`Pregunta 1 / 10 ✅ ${n} · 🔥 Racha: ${n}`);
+
+    // Hasta el resultado, y doble toque en «Repetir quiz»
+    await page.locator('[class*="btnSiguiente"]').tap();
+    for (let i = 2; i <= 10; i++) {
+      await expect(page.getByText(`Pregunta ${i} / 10`)).toBeAttached();
+      await page.waitForTimeout(600); // que el toque no sea el 2.º de la ráfaga de «Siguiente»
+      await page.locator('[class*="opcionBtn"]').first().tap();
+      await page.locator('[class*="btnSiguiente"]').tap();
+    }
+    const repetir = page.getByRole('button', { name: /Repetir quiz/ });
+    await repetir.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(600); // ídem con el toque en «Ver resultados»
+    const cr = (await repetir.boundingBox())!;
+    await page.touchscreen.tap(cr.x + cr.width / 2, cr.y + cr.height / 2);
+    await page.waitForTimeout(150);
+    await page.touchscreen.tap(cr.x + cr.width / 2, cr.y + cr.height / 2);
+    await page.waitForTimeout(400);
+    await expect(page.getByText('Pregunta 1 / 10')).toBeAttached();
+    await expect(page.locator('[class*="opcionBtn"]:not([disabled])')).toHaveCount(4);
+    await expect(feedback(page)).toHaveCount(0);
+  });
+});
+
+test.describe('Inspector 28/10/2026 · hallazgos', () => {
+  /** Las preguntas y respuestas del FAQPage del JSON-LD. */
+  async function faqLd(page: Page): Promise<{ name: string; acceptedAnswer: { text: string } }[]> {
+    const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+    return bloques.map((b) => JSON.parse(b)).find((j) => j['@type'] === 'FAQPage').mainEntity;
+  }
+  async function abrirGuia(page: Page): Promise<void> {
+    await abrir(page);
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    await expect(page.locator('[class*="faqItem"]').first()).toBeVisible();
+  }
+
+  /**
+   * HALLAZGO bajo (Inspector 28/10/2026) · contenido — ABIERTO. «¿Cuántos elementos tiene la
+   * tabla periódica?» está en la FAQ visible y en el FAQPage con DOS respuestas: la visible es un
+   * resumen de la del JSON-LD (la del JSON-LD añade que los 95-118 son sintéticos y sus semividas,
+   * con el curio-247). Dos textos de la misma respuesta divergen con cada reparación (ya le pasó a
+   * esta, que se corrigió dos veces solo en el JSON-LD: 1818 y 2289). Reparación: UNA constante en
+   * metadata.ts que importen las dos bocas, como app/simulador-gastos-compraventa-garaje.
+   * Mide: el texto visible de esa respuesta es el mismo que el del FAQPage.
+   */
+  test('hallazgo · «¿Cuántos elementos tiene la tabla periódica?» tiene una sola respuesta', async ({ page }) => {
+    test.fail(); // ABIERTO (Inspector 28/10/2026)
+    const PREGUNTA = '¿Cuántos elementos tiene la tabla periódica?';
+    await abrirGuia(page);
+    const ld = (await faqLd(page)).find((q) => q.name === PREGUNTA);
+    expect(ld, 'la pregunta está en el FAQPage').toBeTruthy();
+    const item = page.locator('[class*="faqItem"]').filter({ has: page.getByRole('heading', { name: PREGUNTA }) });
+    await expect(item).toHaveCount(1);
+    expect(norm((await item.locator('p').textContent()) ?? '')).toBe(norm(ld!.acceptedAnswer.text));
+  });
+
+  /**
+   * HALLAZGO bajo (Inspector 28/10/2026) · contenido — ABIERTO. La FAQ visible pregunta «¿Por qué
+   * el oro es Au y no Go?». «Go» solo tiene sentido desde el inglés «gold»: en español el oro no
+   * empieza por G, y la propia respuesta habla de los símbolos que no coinciden «con su nombre en
+   * español». Es la forma del hallazgo 2288 (el calco del «why is tungsten W?», reparado el
+   * 27/09/2026). Mide: la pregunta no opone Au a «Go».
+   */
+  test('hallazgo · la FAQ no pregunta por qué el oro no es «Go»', async ({ page }) => {
+    test.fail(); // ABIERTO (Inspector 28/10/2026)
+    await abrirGuia(page);
+    const item = page.locator('[class*="faqItem"]').filter({ hasText: 'aurum' }).first();
+    await expect(item).toContainText('nombre en español');
+    expect(norm((await item.locator('h3').textContent()) ?? '')).not.toMatch(/\bGo\?/);
+  });
+
+  /**
+   * HALLAZGO bajo (Inspector 28/10/2026) · contenido — ABIERTO. FAQ «¿Qué elementos tienen un solo
+   * carácter en su símbolo?»: la lista de los 14 es correcta, pero la explicación —«Son generalmente
+   * los más conocidos o los que se descubrieron antes de que se estableciera el sistema de dos
+   * letras»— la desmiente la propia guía: los siete metales conocidos desde la Antigüedad, los más
+   * conocidos de todos, llevan DOS letras (Au, Ag, Cu, Fe, Pb, Sn, Hg; tarjeta «Usa el latín como
+   * guía»), y entre los de una letra están V, Y o W, que no son de los más conocidos. La notación de
+   * Berzelius (1813-1814) dio una o dos letras a la vez según la inicial del nombre latino: no hubo
+   * un «sistema de dos letras» posterior. Mide: la respuesta no atribuye la letra única a la fecha
+   * de descubrimiento.
+   */
+  test('hallazgo · la FAQ de los símbolos de una letra no los atribuye a la fecha de descubrimiento', async ({ page }) => {
+    test.fail(); // ABIERTO (Inspector 28/10/2026)
+    await abrirGuia(page);
+    const item = page.locator('[class*="faqItem"]').filter({ hasText: 'una sola letra' });
+    await expect(item).toContainText('H, B, C, N, O, F, P, S, K, V, Y, I, W y U');
+    expect(norm((await item.textContent()) ?? '')).not.toContain('se descubrieron antes de que se estableciera el sistema de dos letras');
+  });
+
+  /**
+   * HALLAZGO bajo (Inspector 28/10/2026) · contenido — ABIERTO. Dos frases de la guía sobre el
+   * latín:
+   *   · error típico 2: «Fe no tiene nada que ver con "hierro" en español, sino con ferrum». La
+   *     palabra «hierro» VIENE de ferrum (DLE, s. v. hierro: «Del lat. ferrum»), como la propia
+   *     tarjeta de curiosidades enseña con plomo/plumbum o estaño/stannum: lo que no casa es la
+   *     letra, no el origen.
+   *   · curiosidad del mercurio: «Su nombre latín hydrargyrum»: «latín» es sustantivo; el adjetivo es
+   *     «latino» («su nombre latino» o «su nombre en latín»).
+   * Mide: ninguna de las dos frases sigue en la guía.
+   */
+  test('hallazgo · la guía no dice que Fe no tiene nada que ver con «hierro» ni escribe «nombre latín»', async ({ page }) => {
+    test.fail(); // ABIERTO (Inspector 28/10/2026)
+    await abrirGuia(page);
+    const avisos = norm((await page.locator('[class*="warningGrid"]').textContent()) ?? '');
+    const curiosidades = norm((await page.locator('[class*="tipsGrid"]').textContent()) ?? '');
+    expect(avisos).toContain('ferrum');
+    expect(curiosidades).toContain('hydrargyrum');
+    expect(avisos).not.toMatch(/no tiene nada que ver con .hierro./);
+    expect(curiosidades).not.toContain('nombre latín');
+  });
+
+  /**
+   * HALLAZGO bajo (Inspector 28/10/2026) · contenido (neutralidad editorial, reglas 1 y 3 del
+   * CLAUDE.md) — ABIERTO. Paso 5 de «Cómo memorizar los símbolos químicos»: «La repetición
+   * espaciada es la técnica más efectiva. 5-10 minutos al día durante una semana son más eficaces
+   * que estudiar 2 horas un único día». Sin fuente; el superlativo no lo sostiene ni la revisión que
+   * suele citarse (Dunlosky et al., 2013, dan «utilidad alta» a DOS técnicas: la práctica de
+   * recuperación y la práctica espaciada), y la cifra compara 35-70 minutos con 120, cuando el
+   * efecto de espaciado se mide a igual tiempo de estudio. Mide: ni el superlativo ni la cifra.
+   */
+  test('hallazgo · la guía no presenta la repetición espaciada como «la técnica más efectiva» con una cifra sin fuente', async ({ page }) => {
+    test.fail(); // ABIERTO (Inspector 28/10/2026)
+    await abrirGuia(page);
+    const paso = page.locator('[class*="stepCard"]').filter({ hasText: 'quizzes diariamente' });
+    await expect(paso).toHaveCount(1);
+    const texto = norm((await paso.textContent()) ?? '');
+    expect(texto).not.toContain('la técnica más efectiva');
+    expect(texto).not.toMatch(/más eficaces que estudiar 2 horas/);
+  });
+
+  /**
+   * HALLAZGO bajo (Inspector 28/10/2026) · contenido — ABIERTO. El featureList del JSON-LD promete
+   * «Feedback inmediato con nombre, símbolo y número atómico». Al FALLAR en Nombre → Símbolo, el
+   * aviso dice «La respuesta correcta era: Fe (nombre: Hierro)» y el número atómico no sale en
+   * ninguna parte de la pregunta (en Símbolo → Nombre al menos está en la tarjeta, «Z = 26»).
+   * Resuelto a mano: Fácil, Nombre → Símbolo, fallar la 1.ª → el panel de la pregunta debería
+   * mostrar el Z de la IUPAC del elemento preguntado. Mide eso.
+   */
+  test('hallazgo · al fallar en Nombre → Símbolo el aviso también da el número atómico que promete el JSON-LD', async ({ page }) => {
+    test.fail(); // ABIERTO (Inspector 28/10/2026)
+    await abrir(page);
+    const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+    const app = bloques.map((b) => JSON.parse(b)).find((j) => j['@type'] === 'WebApplication');
+    expect(app.featureList).toContain('Feedback inmediato con nombre, símbolo y número atómico');
+    await arrancarPartida(page, /Nombre → Símbolo/, /^Fácil/);
+    const nombre = (await enunciado(page).textContent())!.trim();
+    const simbolo = SIMBOLO_DE[nombre];
+    expect(simbolo, `«${nombre}» no es de los 26 del nivel Fácil`).toBeTruthy();
+    const opciones = await opcionesVisibles(page);
+    await botonOpcion(page, opciones.find((o) => o !== simbolo)!).click();
+    await expect(feedback(page)).toContainText(`La respuesta correcta era: ${simbolo}`);
+    const panel = norm(await page.locator('[class*="quizPanel"]').innerText());
+    expect(panel).toMatch(new RegExp(`Z ?= ?${Z_CANONICO[simbolo]}(?!\\d)`));
+  });
+});

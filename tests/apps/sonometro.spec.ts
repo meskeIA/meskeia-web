@@ -1,6 +1,7 @@
 import { test, expect, devices, type Browser, type Page } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
 import { esperarHidratacion } from './_hidratacion';
+import { ORIGEN } from './_puerto';
 import { activarTemaOscuro, prepararParaMedir } from '../_contraste';
 // El CSV que descarga la app se lee con el MISMO parser que usaría una hoja de cálculo
 // (papaparse, RFC 4180, ya dependencia del proyecto) y no con un split casero: la diferencia
@@ -65,7 +66,10 @@ import { parse as parsearCsv } from 'papaparse';
  * CASOS 4 a 6 y en los tres tests «REGRESIÓN 3.ª pasada» (eran `test.fail()`; los tres
  * hallazgos, 467-469, se REPARARON en 0b1630d9).
  *
- * 6.ª PASADA (26/10/2026) — bloque «inspector 26/10/2026» al final del fichero.
+ * 6.ª PASADA (26/10/2026) — bloque «inspector 26/10/2026»; sus 11 hallazgos (3541-3551) se
+ * REPARARON el 27/10/2026 (5fcd18bc) y sus testigos son hoy de regresión.
+ *
+ * 7.ª PASADA (28/10/2026) — bloque «inspector 28/10/2026» al final del fichero.
  */
 
 test.use({
@@ -2774,5 +2778,445 @@ test.describe('inspector 26/10/2026', () => {
       els.filter((e) => e.getAttribute('aria-hidden') !== 'true').map((e) => e.textContent),
     );
     expect(sinOcultar).toEqual([]);
+  });
+});
+
+// ===========================================================================
+// 7.ª PASADA DEL INSPECTOR · inspector 28/10/2026
+//
+// Vuelve a la cola por la reparación 5fcd18bc (27/10, hallazgos 3541-3551) y por e3ba909f (nombre
+// de descarga con la fecha local; su testigo, al final de este bloque, en Ciudad de México).
+// Re-verificados en navegador y en verde: los testigos «REPARADO
+// (3541)» a «(3551)» de arriba y, por otro camino, 3541 con la pestaña OCULTA (no el diálogo) y
+// «Resetear» tras el hueco, 3542/3543 moviendo el DESLIZADOR con el teclado con la página
+// traducida (fila «100 dB» con 71,0 / 71,0 / 71,0, «Desplazamiento: 100 dB» al momento) y 3547
+// con las dos respuestas idénticas carácter a carácter.
+//
+// VALORES RESUELTOS A MANO ANTES DE EJECUTAR (page.tsx; calibración 90; A de la IEC 61672-1):
+//   CASO 16 · 1 kHz + 100 Hz sumados, a = 0,05 cada uno:
+//     sin ponderar: RMS = √(0,05²/2 + 0,05²/2) = 0,05 → 20·log10(0,05) + 90 = 63,98 → «64,0»
+//     ponderado A: A(1 kHz) = 0 y A(100 Hz) = −19,145 dB → ×0,012176 en energía:
+//       10·log10(0,05²/2 · (1 + 0,012176)) + 90 = 61,02 → «61,0» (lectura, LAeq, mín y máx)
+//   CASO 17 · tono 1 kHz a = 0,05 → 20·log10(0,05/√2) + 90 = 60,97 → «61,0». Resetear, ~4 s, 6 s
+//     con la ganancia a 0 EXACTO (lo que entrega un micrófono silenciado por el sistema, la tecla
+//     de silencio del portátil o una llamada en el móvil) y vuelta al tono ≥ 4 s. Según la propia
+//     app un cero exacto «no es una medición» y el fotograma se salta «sin tocar ninguna
+//     estadística» (measureLoop), y la duración es «tiempo de audio REALMENTE analizado»
+//     (hallazgo 1700). Luego: LAeq «61,0», máx «61,0», mín «61,0» y una duración ≈ pared − 6 s.
+//   CASO 18 · permiso denegado por el navegador (Chromium con --use-fake-ui-for-media-stream=deny,
+//     un NotAllowedError de verdad, sin tocar getUserMedia): «Permiso de micrófono denegado.
+//     Permite el acceso en la configuración del navegador.» en role="alert", lectura «--», sin
+//     estadísticas, sin AudioContext ni pista abiertos.
+//
+// Datos normativos cotejados hoy en el BOE: RD 286/2006 (BOE-A-2006-4414), arts. 5, 7 y 8 —ni
+// «alto rendimiento» ni ninguna prohibición por encima de 120 dB; el único valor de pico es el
+// límite de 140 dB(C)—; Ley 37/2003 (BOE-A-2003-20976), art. 8 —no fija ninguna cifra en dB:
+// remite al Gobierno—; RD 1367/2007 (BOE-A-2007-18397), Anexo II, tabla A (residencial 65/65/55)
+// y tabla B (estancias 45/45/35, dormitorios 40/40/30).
+// ===========================================================================
+
+/** Lo que deja una sesión con 6 s de silencio digital exacto en medio (CASO 17 y sus hallazgos). */
+interface SesionConSilencio {
+  /** La lectura grande mientras no entra audio */
+  lecturaDuranteSilencio: string;
+  alertaDuranteSilencio: string;
+  /** Segundos de pared desde «Resetear» hasta «Detener y guardar» */
+  paredDesdeReset: number;
+  guardada: SesionSembrada;
+  panel: { min: string; max: string; laeq: string; duracion: string };
+}
+
+async function medirConSilencioEnMedio(page: Page): Promise<SesionConSilencio> {
+  await micrófonoRegulable(page, 1000, 0.05);
+  await instrumentar(page); // siempre DESPUÉS del micrófono sintético
+  await page.goto(RUTA);
+  await esperarAppLista(page);
+  await page.getByRole('button', { name: /Iniciar medición/i }).click();
+  await esperarMedicionEnMarcha(page);
+  await esperarLecturaEstable(page, 60.97);
+  await page.getByRole('button', { name: /Resetear/i }).click();
+  const inicio = Date.now();
+  await esperarSegundosDeApp(page, 4);
+
+  // El micrófono enmudece 6 s (ceros exactos) y vuelve, en el reloj de AUDIO
+  await page.evaluate(() => {
+    const g = (window.__ganancia as GainNode).gain;
+    const t = (window.__ctxTono as AudioContext).currentTime;
+    g.setValueAtTime(0, t);
+    g.setValueAtTime(0.05, t + 6);
+  });
+  // 120 fotogramas seguidos a cero (FOTOGRAMAS_SIN_SENAL_AVISO): ~2 s a 60 fps, 4 s a 30
+  const alerta = page.locator('[class*="meterPanel"] [class*="errorMessage"]');
+  await expect(alerta).toContainText('No está entrando audio del micrófono', { timeout: 5500 });
+  const alertaDuranteSilencio = (await alerta.innerText()).replace(/\s+/g, ' ').trim();
+  const lecturaDuranteSilencio = (await lecturaTexto(page).innerText()).trim();
+  // Vuelve el tono: el aviso se va y la sesión sigue midiendo
+  await expect(alerta).toHaveCount(0, { timeout: 10000 });
+  const trasVolver = await segundosDeApp(page);
+  await esperarSegundosDeApp(page, trasVolver + 4);
+  await page.getByRole('button', { name: /Detener y guardar/i }).click();
+  const paredDesdeReset = (Date.now() - inicio) / 1000;
+  await expect(filasRegistro(page)).toHaveCount(1);
+  const [guardada]: SesionSembrada[] = JSON.parse(
+    (await page.evaluate((k) => window.localStorage.getItem(k), CLAVE_SESIONES)) ?? '[]',
+  );
+  return {
+    lecturaDuranteSilencio,
+    alertaDuranteSilencio,
+    paredDesdeReset,
+    guardada,
+    panel: await estadisticas(page),
+  };
+}
+
+test.describe('inspector 28/10/2026', () => {
+  // -------------------------------------------------------------------------
+  // CASO 16 (normal, móvil Pixel 7) — dos tonos a la vez: la A pondera el espectro de verdad
+  // -------------------------------------------------------------------------
+  // Las pasadas anteriores midieron un tono cada vez. Con dos a la vez, la corrección A sale del
+  // ESPECTRO (cociente de energías por bin): 1 kHz pesa entero, 100 Hz casi nada, y el nivel
+  // queda 3 dB por debajo del RMS sin ponderar. Una app que ponderara solo el pico del espectro o
+  // que no ponderase daría 64,0.
+  test.describe('CASO 16 (móvil)', () => {
+    test.use({ ...PIXEL_7, permissions: ['microphone'] });
+
+    test('en un Pixel 7, 1 kHz + 100 Hz dan 61,0 dB(A) —no los 64,0 sin ponderar— y la sesión corre', async ({ page }) => {
+      test.setTimeout(60000);
+      await page.addInitScript(() => {
+        const OriginalAudioContext = window.AudioContext;
+        let previo: AudioContext | null = null;
+        navigator.mediaDevices.getUserMedia = async () => {
+          const ctx = previo ?? (previo = new OriginalAudioContext());
+          await ctx.resume();
+          const destino = ctx.createMediaStreamDestination();
+          for (const hz of [1000, 100]) {
+            const oscilador = ctx.createOscillator();
+            oscilador.frequency.value = hz;
+            const ganancia = ctx.createGain();
+            ganancia.gain.value = 0.05;
+            oscilador.connect(ganancia).connect(destino);
+            oscilador.start();
+          }
+          return destino.stream;
+        };
+      });
+      await instrumentar(page); // siempre DESPUÉS del micrófono sintético
+      await page.goto(RUTA);
+      await esperarAppLista(page);
+      await expect(lecturaTexto(page)).toHaveText('--');
+
+      await page.getByRole('button', { name: /Iniciar medición/i }).tap();
+      // El medio arranca DE VERDAD: contexto 'running' y pista 'live', y la lectura pasa de «--» a
+      // 61,0 (calculado arriba; sin ponderar serían 63,98)
+      await esperarMedicionEnMarcha(page);
+      await esperarLecturaEstable(page, 61.02);
+      await expect(page.locator('[class*="levelLabel"]')).toHaveText('Algo ruidoso'); // franja 60-70
+
+      // La duración AVANZA en el reloj de la app: dos segundos más al cabo de un rato
+      await esperarSegundosDeApp(page, 1);
+      const antes = await segundosDeApp(page);
+      await expect
+        .poll(() => segundosDeApp(page), { timeout: 15000, message: 'la duración no avanza' })
+        .toBeGreaterThanOrEqual(antes + 2);
+      await esperarSegundosDeApp(page, 4);
+
+      // LAeq de una señal estacionaria: el mismo 61,02, y entre el mínimo y el máximo
+      const panel = await estadisticas(page);
+      expect(aNúmero(panel.laeq), `panel ${JSON.stringify(panel)}`).toBeCloseTo(61.02, 0);
+      expect(aNúmero(panel.min)).toBeLessThanOrEqual(aNúmero(panel.laeq));
+      expect(aNúmero(panel.laeq)).toBeLessThanOrEqual(aNúmero(panel.max));
+
+      await page.getByRole('button', { name: /Detener y guardar/i }).tap();
+      await expect(filasRegistro(page)).toHaveCount(1);
+      const celdas = (await filasRegistro(page).first().locator('td').allInnerTexts()).map((t) => t.trim());
+      // Columnas: fecha, hora, duración, LAeq, mín, máx, calibración
+      expect(aNúmero(celdas[3])).toBeCloseTo(61.02, 0);
+      expect(aNúmero(celdas[4])).toBeCloseTo(61.02, 0);
+      expect(aNúmero(celdas[5])).toBeCloseTo(61.02, 0);
+      expect(celdas[6]).toBe('90 dB');
+      // Y el micrófono queda cerrado en el teléfono
+      await expect.poll(async () => (await estadoDelMedio(page)).contextos).toEqual(['closed']);
+      expect((await estadoDelMedio(page)).pistas.every((p) => p.estado === 'ended')).toBe(true);
+    });
+  });
+
+  // -------------------------------------------------------------------------
+  // CASO 17 (límite, escritorio) — el micrófono enmudece 6 s a media sesión y vuelve
+  // -------------------------------------------------------------------------
+  // Lo que SÍ hace bien (los dos hallazgos de la misma sesión, abajo): avisa durante el silencio,
+  // retira el aviso al volver la señal, no tumba la medición y el LAeq y el máximo siguen en 61,0.
+  test('CASO 17 (límite) — 6 s de silencio digital a media sesión: lo avisa, sigue midiendo y el LAeq queda en 61,0', async ({
+    page,
+  }) => {
+    test.setTimeout(90000);
+    const s = await medirConSilencioEnMedio(page);
+    expect(s.alertaDuranteSilencio).toContain(
+      'No está entrando audio del micrófono (silencio digital exacto). Puede estar silenciado, tapado o en uso por otra aplicación',
+    );
+    // 60,97 (calculado arriba): las ventanas a medio llenar de los dos bordes del silencio lo
+    // bajan unas centésimas (60,94 medido el 28/10/2026), muy por dentro del medio decibelio
+    expect(s.guardada.laeq, `fila ${JSON.stringify(s.guardada)}`).toBeCloseTo(60.97, 0);
+    expect(s.guardada.maxDb).toBeCloseTo(60.97, 0);
+    expect(s.panel.max).toBe('61,0');
+    expect(s.guardada.calibracion).toBe(90);
+    // El micrófono se cierra al guardar
+    await expect.poll(async () => (await estadoDelMedio(page)).contextos).toEqual(['closed']);
+  });
+
+  /*
+   * HALLAZGO (inspector 28/10/2026) · calculo, medio — tras un silencio a media sesión, el MÍNIMO
+   * graba las ventanas de análisis a medio llenar. Es el artefacto que la app descarta al ARRANCAR
+   * (FOTOGRAMAS_ESTABILIZACION: «Con un tono constante de 61,0 dB(A) el mínimo salía 39,5 solo
+   * por esas primeras ventanas»), pero que a media sesión no descarta: las ventanas que mezclan
+   * tono y ceros —al enmudecer y al volver— entran en el resumen. Medido el 28/10/2026 con el
+   * CASO 17: mínimo 42,3 (con rampas de 20 ms, 44,8) en una sala que no bajó de 61,0, y queda en
+   * la fila, el CSV y el parte. Mientras dura el silencio, además, la lectura grande se queda
+   * congelada en la última de esas ventanas (47,7 · «Silencioso») y el aviso dice «estos 0,0
+   * dB(A) no son una medición» con otra cifra en pantalla.
+   * Mide: el mínimo de la fila es el de la señal, 60,97 (calculado arriba).
+   */
+  test('HALLAZGO (inspector 28/10/2026) — tras un silencio a media sesión el mínimo graba la ventana a medio llenar', async ({
+    page,
+  }) => {
+    test.fail();
+    test.setTimeout(90000);
+    const s = await medirConSilencioEnMedio(page);
+    expect(
+      s.guardada.minDb,
+      `fila con mín ${s.guardada.minDb.toFixed(1)}; lectura durante el silencio «${s.lecturaDuranteSilencio}»`,
+    ).toBeCloseTo(60.97, 0);
+  });
+
+  /*
+   * HALLAZGO (inspector 28/10/2026) · calculo, medio — los segundos de silencio digital a media
+   * sesión cuentan como MEDIDOS. En measureLoop, `tiempoMedidoRef += cubierto` va ANTES de la
+   * guarda de los ceros, así que el fotograma que se salta «sin tocar ninguna estadística» sí toca
+   * la duración. Es la forma del hallazgo 1700 por otra puerta: el LAeq no cubre ese tramo (bien),
+   * pero la fila dice que sí, y no lo avisa como avisa los huecos sin fotogramas («No cuentan…»).
+   * En pantalla la duración se queda quieta durante el silencio y al volver salta de golpe.
+   * Medido el 28/10/2026 (4 s de silencio en 13,45 s de pared): fila de «13 s» (13,50) con un LAeq
+   * que cubre ~9,5 s, y aviso «Medición guardada en el registro de este navegador.» a secas.
+   * Mide: de los 6 s de silencio, al menos 4,5 no figuran en la duración anotada.
+   */
+  test('HALLAZGO (inspector 28/10/2026) — los segundos de silencio digital a media sesión cuentan como medidos', async ({
+    page,
+  }) => {
+    test.fail();
+    test.setTimeout(90000);
+    const s = await medirConSilencioEnMedio(page);
+    expect(
+      s.guardada.duracionSegundos,
+      `fila de ${s.guardada.duracionSegundos.toFixed(1)} s en ${s.paredDesdeReset.toFixed(1)} s de pared, 6 de ellos sin audio`,
+    ).toBeLessThanOrEqual(s.paredDesdeReset - 4.5);
+  });
+
+  // -------------------------------------------------------------------------
+  // CASO 18 (rechazo, móvil Pixel 7) — el navegador DENIEGA el micrófono, sin simularlo
+  // -------------------------------------------------------------------------
+  // REGRESIÓN C y CASO 9 sustituyen getUserMedia por un rechazo. Aquí lo deniega Chromium:
+  // `--use-fake-ui-for-media-stream=deny` responde al permiso como un usuario que pulsa
+  // «Bloquear» (NotAllowedError, medido el 28/10/2026). Necesita su propio navegador: el del
+  // fichero lleva la interfaz falsa que CONCEDE. Se aprovecha para comprobar que el micrófono
+  // ocupado (NotReadableError) también avisa; QUÉ dice es el hallazgo de abajo.
+  test('CASO 18 (rechazo) — en un Pixel 7 con el micrófono denegado por el navegador, la app lo dice y no abre nada', async ({
+    playwright,
+  }) => {
+    test.setTimeout(60000);
+    const navegador = await playwright.chromium.launch({
+      args: ['--use-fake-device-for-media-stream', '--use-fake-ui-for-media-stream=deny'],
+    });
+    try {
+      const contexto = await navegador.newContext({ ...PIXEL_7, baseURL: ORIGEN });
+      const page = await contexto.newPage();
+      const errores: string[] = [];
+      page.on('pageerror', (e) => errores.push(e.message));
+      await instrumentar(page);
+      await page.goto(RUTA);
+      await esperarAppLista(page);
+
+      await page.getByRole('button', { name: /Iniciar medición/i }).tap();
+      const aviso = page.locator('[class*="meterPanel"] [role="alert"]');
+      // Literal de page.tsx (rama NotAllowedError del catch de startMeasuring)
+      await expect(aviso).toContainText(
+        'Permiso de micrófono denegado. Permite el acceso en la configuración del navegador.',
+      );
+      await expect(lecturaTexto(page), 'sin micrófono no hay número').toHaveText('--');
+      await expect(page.locator('[class*="levelLabel"]')).toHaveText('Esperando...');
+      await expect(page.locator('[class*="statsPanel"]')).toHaveCount(0);
+      expect(await estadoDelMedio(page)).toEqual({ contextos: [], pistas: [] });
+
+      // Reintentar no la cuelga: vuelve a pedirlo y vuelve a decirlo
+      await page.getByRole('button', { name: /Iniciar medición/i }).tap();
+      await expect(aviso).toContainText('Permiso de micrófono denegado');
+      await expect(page.getByRole('button', { name: /Iniciar medición/i })).toBeVisible();
+      expect(errores).toEqual([]);
+
+      // Micrófono ocupado por otra aplicación: también avisa en vez de quedarse muda
+      const otra = await contexto.newPage();
+      await otra.addInitScript(() => {
+        navigator.mediaDevices.getUserMedia = () =>
+          Promise.reject(new DOMException('Could not start audio source', 'NotReadableError'));
+      });
+      await otra.goto(RUTA);
+      await esperarAppLista(otra);
+      await otra.getByRole('button', { name: /Iniciar medición/i }).tap();
+      await expect(otra.locator('[class*="meterPanel"] [role="alert"]')).toBeVisible();
+      await expect(lecturaTexto(otra)).toHaveText('--');
+    } finally {
+      await navegador.close();
+    }
+  });
+
+  /*
+   * HALLAZGO (inspector 28/10/2026) · operativa, medio — con el micrófono OCUPADO, el aviso manda
+   * a revisar el https y a actualizar el navegador. Chromium rechaza getUserMedia con
+   * NotReadableError («Could not start audio source») cuando otra aplicación tiene el micrófono
+   * (una llamada, una videoconferencia, el modo exclusivo de Windows); el catch de startMeasuring
+   * solo distingue NotAllowedError y NotFoundError, y todo lo demás cae en el texto pensado para
+   * un navegador SIN mediaDevices: «Este navegador no permite acceder al micrófono desde la
+   * página. Comprueba que la dirección empieza por https:// y usa un navegador actualizado.»
+   * En meskeia.com, que va por https, con un Chrome al día, ese consejo no arregla nada; lo que
+   * hay que hacer es cerrar la otra aplicación, que la propia app sí dice en su aviso de «no entra
+   * audio» («en uso por otra aplicación»). AbortError cae en el mismo texto.
+   * Mide: el aviso no habla de https y sí de que el micrófono está en uso.
+   */
+  test('HALLAZGO (inspector 28/10/2026) — con el micrófono ocupado por otra aplicación, el aviso manda a revisar el https', async ({
+    page,
+  }) => {
+    test.fail();
+    await page.addInitScript(() => {
+      navigator.mediaDevices.getUserMedia = () =>
+        Promise.reject(new DOMException('Could not start audio source', 'NotReadableError'));
+    });
+    await page.goto(RUTA);
+    await esperarAppLista(page);
+    await page.getByRole('button', { name: /Iniciar medición/i }).click();
+    const aviso = page.locator('[class*="meterPanel"] [role="alert"]');
+    await expect(aviso).toBeVisible();
+    await expect.soft(aviso).not.toContainText('https://');
+    await expect.soft(aviso).toContainText(/en uso|otra aplicaci[óo]n|ocupado/);
+  });
+
+  /*
+   * HALLAZGO (inspector 28/10/2026) · contenido, medio — la tabla comparativa da por «Ilimitada
+   * (sin daño auditivo)» la exposición de 60 a 85 dB, que la propia página limita. La tarjeta
+   * «Salud auditiva» dice «<70 dB: Seguro indefinidamente» y «85 dB: Máx. 8 horas/día»; la FAQ
+   * aplica la regla de la NIOSH (8 h a 85 dB(A) y la mitad por cada 3 dB), que a 84 dB da
+   * 8·2^(1/3) = 10,1 h y a 82 dB, 16 h; y la tarjeta laboral del RD 286/2006 pone protectores a
+   * disposición desde 80 dB(A). La celda de la fila 60–85 los contradice a los tres.
+   * Mide: la celda «Exposición segura» de la fila 60–85 no dice «Ilimitada» a secas.
+   */
+  test('HALLAZGO (inspector 28/10/2026) — la tabla comparativa da por ilimitada la exposición a 60–85 dB que la página limita', async ({
+    page,
+  }) => {
+    test.fail();
+    await page.goto(RUTA);
+    // Control: lo que dice el resto de la página
+    const tarjeta = page.locator('[class*="contentCard"]', { hasText: 'Salud auditiva' });
+    await expect(tarjeta).toContainText('<70 dB: Seguro indefinidamente');
+    await expect(tarjeta).toContainText('85 dB: Máx. 8 horas/día');
+    const exposicion = page
+      .locator('[class*="comparativaTable"] tbody tr', { hasText: '60–85 dB' })
+      .locator('td')
+      .nth(2);
+    await expect(exposicion).not.toContainText(/^Ilimitada/);
+  });
+
+  /*
+   * HALLAZGO (inspector 28/10/2026) · contenido, bajo — el FAQPage pone el concierto en otra
+   * franja que la página. «¿Cuáles son los niveles de dB de sonidos cotidianos?» (metadata.ts,
+   * solo en el FAQPage) dice «Concierto de música amplificada: ~100-110 dB»; la tabla de
+   * referencia de la app lo pone en «Muy ruidoso 85-100» («Moto, concierto cercano») y la tabla
+   * comparativa en la fila «85–100 dB» («Maquinaria industrial, concierto, moto»). La misma
+   * respuesta dice que 10 dB más son «el doble de intensidad percibida», cuando la página reserva
+   * «intensidad» para el ×10 («+10 dB: 10x más intensidad») y habla del doble de «volumen
+   * percibido».
+   * Mide: el rango del concierto del FAQPage cae dentro de las franjas en que lo pone la página.
+   */
+  test('HALLAZGO (inspector 28/10/2026) — el FAQPage pone el concierto en 100-110 dB y la página en la franja 85-100', async ({
+    page,
+  }) => {
+    test.fail();
+    await page.goto(RUTA);
+    const respuesta =
+      (await faqPage(page)).find((q) => /sonidos cotidianos/.test(q.name))?.acceptedAnswer.text ?? '';
+    const [, desde, hasta] = respuesta.match(/Concierto[^:]*:\s*~?(\d+)(?:\s*[-–]\s*(\d+))?\s*dB/) ?? [];
+    expect(desde, `respuesta del FAQPage: «${respuesta}»`).toBeDefined();
+    const enFaq = [Number(desde), Number(hasta ?? desde)];
+    const franjas = [
+      ...(await page
+        .locator('[class*="referenceRow"]', { hasText: /concierto/i })
+        .locator('[class*="refRange"]')
+        .allTextContents()),
+      ...(await page
+        .locator('[class*="comparativaTable"] tbody tr', { hasText: /concierto/i })
+        .locator('td')
+        .first()
+        .allTextContents()),
+    ];
+    expect(franjas.length, 'la página dice en qué franja va un concierto').toBeGreaterThan(0);
+    for (const franja of franjas) {
+      const [a, b] = (franja.match(/(\d+)\s*[-–]\s*(\d+)/) ?? []).slice(1).map(Number);
+      expect
+        .soft(enFaq[0] >= a && enFaq[1] <= b, `FAQPage ${enFaq.join('-')} dB · página «${franja.trim()}»`)
+        .toBe(true);
+    }
+  });
+
+  /*
+   * HALLAZGO (inspector 28/10/2026) · dato, bajo — la columna «Normativa española» de la tabla
+   * comparativa atribuye a la norma lo que no dice.
+   *   · Fila «>120 dB»: «Prohibido sin protección auditiva de alto rendimiento». El RD 286/2006
+   *     (BOE-A-2006-4414, consultado el 28/10/2026) no contiene «alto rendimiento» ni prohíbe nada
+   *     por encima de 120 dB: lo que prohíbe (art. 8.1) es superar los valores límite, 87 dB(A) de
+   *     exposición diaria y 140 dB(C) de pico, contando la atenuación de los protectores (art. 5).
+   *   · Fila «60–85 dB»: «Zonas residenciales exteriores: 55–65 dB (Ley 37/2003)». La Ley 37/2003
+   *     (BOE-A-2003-20976) no fija ninguna cifra en dB —su art. 8.1 remite al Gobierno—; el 65/55
+   *     es del RD 1367/2007, Anexo II, tabla A, que es lo que la propia página dice más arriba
+   *     («la Ley 37/2003 del Ruido la desarrolla el RD 1367/2007, que fija los objetivos»).
+   * Mide: la fila >120 no habla de «alto rendimiento» y la 60–85 cita el RD 1367/2007.
+   */
+  test('HALLAZGO (inspector 28/10/2026) — la columna «Normativa española» atribuye a la norma lo que no dice', async ({
+    page,
+  }) => {
+    test.fail();
+    await page.goto(RUTA);
+    const normativa = (rango: string) =>
+      page.locator('[class*="comparativaTable"] tbody tr', { hasText: rango }).locator('td').nth(4);
+    // Control: la fila de 30–60 cita bien el RD 1367/2007 (tabla B: 40 dormitorios, 45 estancias)
+    await expect(normativa('30–60 dB')).toContainText('40–45 dB (RD 1367/2007)');
+    await expect.soft(normativa('>120 dB')).not.toContainText('alto rendimiento');
+    await expect.soft(normativa('60–85 dB')).toContainText('RD 1367/2007');
+  });
+
+  // -------------------------------------------------------------------------
+  // e3ba909f (27/10/2026) — el CSV se llama con el día LOCAL, no con el de UTC
+  // -------------------------------------------------------------------------
+  // En Ciudad de México (UTC−6 todo el año desde 2022) a las 19:30 del 28/10 ya es día 29 en UTC.
+  // Esperado: «sonometro-registro-2026-10-28.csv», el parte «Emitido el 28/10/2026» y la fila de
+  // las 01:00Z del 29 en «28/10/2026», «19:00» (tabla) y «19:00:00» (CSV).
+  test.describe('fecha local (e3ba909f)', () => {
+    test.use({ timezoneId: 'America/Mexico_City' });
+
+    test('en México a las 19:30, el CSV y el parte llevan el 28/10 y no el día UTC', async ({ page }) => {
+      await page.clock.setFixedTime(new Date('2026-10-29T01:30:00Z'));
+      await sembrarRegistro(page, [
+        { id: '2026-10-29T01:00:00.000Z', duracionSegundos: 300, laeq: 55.5, minDb: 40, maxDb: 70, calibracion: 90, nota: 'salón' },
+      ]);
+      await page.goto(RUTA);
+      await expect(filasRegistro(page)).toHaveCount(1);
+      const celdas = (await filasRegistro(page).first().locator('td').allInnerTexts()).map((t) => t.trim());
+      expect(celdas.slice(0, 2)).toEqual(['28/10/2026', '19:00']);
+      await expect(page.locator('[class*="parteSubtitulo"]')).toHaveText(
+        'Emitido el 28/10/2026 · 1 medición registrada · Sonómetro de meskeia.com',
+      );
+      const [descarga] = await Promise.all([
+        page.waitForEvent('download'),
+        page.getByRole('button', { name: /Descargar CSV/i }).click(),
+      ]);
+      expect(descarga.suggestedFilename()).toBe('sonometro-registro-2026-10-28.csv');
+      const contenido = (await readFile((await descarga.path()) as string, 'utf8')).replace(/^﻿/, '');
+      expect(contenido.split('\r\n')[1]).toBe('28/10/2026;19:00:00;300;55,5;40,0;70,0;90;salón');
+    });
   });
 });

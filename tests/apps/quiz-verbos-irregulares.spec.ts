@@ -1,4 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { verbosIrregulares } from '../../data/verbos-irregulares';
 import type { Locator } from '@playwright/test';
 import { esperarPaginaAsentada } from './_hidratacion';
@@ -10,7 +12,8 @@ import { esperarPaginaAsentada } from './_hidratacion';
  * ──────────────────
  * H1 «Quiz Verbos Irregulares» · subtítulo «Aprende el Past Simple en inglés de forma
  * interactiva · Niveles A1 a B2» · metadata y JSON-LD «75 verbos clasificados por nivel
- * MCER (A1-B2), opción múltiple con conjugación completa».
+ * MCER (A1-B2), opción múltiple con conjugación completa». (Así el 25/08/2026; hoy prometen
+ * 74 verbos —show no se pregunta, hallazgo 1840— y los dos modos de S0181.)
  * Los verbos son INGLESES. En el modo «Elegir entre 4 opciones» (el de por defecto) lo que se
  * pregunta es SIEMPRE el Past Simple («¿Cuál es el Past Simple de...?») y el Past Participle
  * solo se enseña en el banner de feedback. Desde el 06/10/2026 (S0181) hay además un modo
@@ -405,8 +408,8 @@ test.describe('Quiz Verbos Irregulares', () => {
    *   · marcador clavado en 0 las quince veces
    *   · 0/15 = 0 → rama «pct < 0,5» → round(0 · 80) = 0 pts
    *   · getResultadoTexto(0) → «Sigue practicando» · «0 de 15 respuestas correctas» · 0 %
-   *   (que el botón haya prometido 20 preguntas y sirva 15 sin avisar es el HALLAZGO 2,
-   *    afirmado abajo con test.fail)
+   *   (que el botón prometiera 20 preguntas y sirviera 15 sin avisar era el hallazgo 312,
+   *    REPARADO el 25/08/2026: su regresión va abajo, ya sin test.fail)
    */
   test('caso límite: A1 con 20 preguntas sirve los 15 verbos del nivel y fallarlo todo da 0 pts', async ({ page }) => {
     await page.goto(RUTA);
@@ -543,9 +546,10 @@ test.describe('Quiz Verbos Irregulares', () => {
   });
 
   /**
-   * HALLAZGO 2 (operativa) — A1 solo tiene 15 verbos, así que pedir 20 preguntas sirve 15.
-   * El truncado (Math.min en generarPreguntas) es correcto; lo que falla es que el botón
-   * sigue prometiendo «20 preguntas» y en ningún sitio se avisa de que el nivel no da para tanto.
+   * 312 (operativa), REPARADO el 25/08/2026 — A1 solo tiene 15 verbos, así que pedir 20
+   * preguntas sirve 15. El truncado (Math.min en generarPreguntas) era correcto; lo que fallaba
+   * es que el botón seguía prometiendo «20 preguntas» y en ningún sitio se avisaba de que el
+   * nivel no daba para tanto.
    */
   test('312 · pedir más preguntas que verbos tiene el nivel avisa antes de empezar', async ({ page }) => {
     await page.goto(RUTA);
@@ -1448,7 +1452,9 @@ test.describe('Inspector 25/09/2026 · móvil 360 × 740', () => {
     // Reparado el 25/09/2026 (hallazgo 1835): traerALaVista + scroll-margin-top bajo la barra.
     // Se toca en el CENTRO: bajo next dev, el indicador «N» de Next ocupa la esquina inferior
     // izquierda, y un toque a 20 px del borde de un botón que queda al pie lo atrapaba él
-    // (fallaba 1 de cada 3-6; cabos C0065 y C0031).
+    // (fallaba 1 de cada 3-6; cabos C0065 y C0031). El cabo C0142 (04/10/2026), que lo vio fallar
+    // en «¡Correcto!» 3/6 y 1/6, es ese mismo toque: el 28/10/2026, con el toque al centro
+    // (eca04181), 8 de 8 con --repeat-each 8.
     const tocar = async (loc: Locator): Promise<void> => {
       const b = await loc.boundingBox();
       if (!b) throw new Error('el elemento no tiene caja');
@@ -1753,5 +1759,495 @@ test.describe('S0181 · modo «Escribir las formas» y repaso', () => {
     await page.reload();
     await esperarPaginaAsentada(page);
     await expect(page.locator('[class*="repasoCaja"]')).toContainText('Aún no hay ninguno');
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// Inspector 28/10/2026 — la familia «quizzes» (testigo tests/familias/quizzes.spec.ts)
+// ═════════════════════════════════════════════════════════════════════════════
+//
+// El testigo de la familia pasó 48/48 el 28/10/2026, también en esta app: mide el doble toque a
+// 390 × 844, en el modo de opciones, por el camino Empezar → Siguiente → Ver resultado. Esta app
+// tiene lo que sus quince hermanas no —el modo «Escribir las formas» y la lista de repaso
+// (S0181)— y NO monta useGuardaRafaga (lib/useGuardaRafaga.ts): que el testigo pase aquí es
+// geometría. A 390 × 844 lo que queda bajo el 2.º toque es texto; a 412 × 915 es la opción A de
+// la pregunta nueva (9 de 9 «Siguiente»), a 360 × 740 escribiendo es «Comprobar», y en
+// escritorio «Jugar de nuevo» y «Repasar mis fallos» contestan la 1.ª pregunta de la partida
+// nueva (barrido del 28/10/2026 en 7 tamaños: 360, 375, 390 y 412 de ancho en móvil; 1280,
+// 1366 y 1920 en escritorio).
+//
+// DE DÓNDE SALEN LOS VALORES ESPERADOS
+// · Las formas: el CANON de arriba. Puntuación y rótulos: calcularPuntuacion() y
+//   getResultadoTexto() de page.tsx, resueltos a mano en cada caso.
+// · La precisión del HUD: round(correctas / respondidas · 100), con el «%» tras un espacio duro.
+// · El doble toque: el mismo del testigo —1.er clic suelto, pantalla nueva pintada y el 2.º clic
+//   de la ráfaga (detail 2) en el mismo punto—, así que solo cae en rojo lo que le pasa a una
+//   persona que toca dos veces.
+
+/** Contesta la pregunta en pantalla en el modo de opciones, bien o mal a propósito. */
+async function contestarOpcion(page: Page, bien: boolean): Promise<string> {
+  const inf = norm(await verboEnPantalla(page).textContent());
+  const buena = respuestaQueSePregunta(inf);
+  const elegida = bien ? buena : (await opcionesVisibles(page)).find((o) => o !== buena)!;
+  await pulsarOpcion(page, elegida);
+  await expect(feedback(page)).toContainText(bien ? '¡Correcto!' : 'Incorrecto');
+  return inf;
+}
+
+/** Opciones de la pregunta en pantalla que todavía se pueden pulsar. */
+const opcionesHabilitadas = (page: Page): Promise<number> =>
+  page.locator('[class*="opcionesGrid"] button:enabled').count();
+
+/**
+ * Ráfaga del testigo de la familia sobre `boton`: clic suelto, espera a que `pintada` diga que
+ * la pantalla nueva está en su sitio y 2.º clic de la ráfaga en el mismo punto.
+ */
+async function rafaga(page: Page, boton: Locator, pintada: () => Promise<boolean>, paso: string): Promise<void> {
+  await boton.scrollIntoViewIfNeeded();
+  await page.waitForTimeout(100);
+  const caja = await boton.boundingBox();
+  if (!caja) throw new Error(`${paso}: el botón no tiene caja`);
+  const [x, y] = [caja.x + caja.width / 2, caja.y + caja.height / 2];
+  await page.mouse.move(x, y);
+  await page.mouse.down({ clickCount: 1 });
+  await page.mouse.up({ clickCount: 1 });
+  await expect.poll(pintada, { intervals: [20], timeout: 3000, message: `${paso}: el primer toque cambia de pantalla` }).toBe(true);
+  await page.waitForTimeout(80);
+  await page.mouse.down({ clickCount: 2 });
+  await page.mouse.up({ clickCount: 2 });
+  await page.waitForTimeout(400);
+}
+
+/** Marca la página para saber después si «Jugar de nuevo» la ha recargado. */
+const marcarPagina = (page: Page): Promise<void> =>
+  page.evaluate(() => { (window as unknown as { __sinRecargar?: boolean }).__sinRecargar = true; });
+const sigueSinRecargar = (page: Page): Promise<boolean> =>
+  page.evaluate(() => (window as unknown as { __sinRecargar?: boolean }).__sinRecargar === true);
+
+/**
+ * A2 con 10 preguntas en el modo de opciones, fallando la 1.ª y la 3.ª, hasta el resultado:
+ * deja el resultado con su línea de fallados y los tres botones («Repasar mis fallos — 2
+ * preguntas», «Jugar de nuevo», «Cambiar nivel»), que es la pantalla del barrido.
+ */
+async function resultadoConDosFallos(page: Page): Promise<void> {
+  await arrancarPartida(page, 'A2 Elemental', 10);
+  for (let i = 1; i <= 10; i++) {
+    await contestarOpcion(page, i !== 1 && i !== 3);
+    await botonSiguiente(page).click();
+  }
+  await expect(page.locator('[class*="resultadoFallados"]')).toContainText('Has fallado 2 verbos');
+  await expect(page.getByRole('button', { name: 'Repasar mis fallos — 2 preguntas' })).toBeVisible();
+}
+
+test.describe('Inspector 28/10/2026', () => {
+  /**
+   * CASO NORMAL — «Todos los niveles», 15 preguntas: se fallan la 2.ª, la 5.ª, la 9.ª y la 15.ª
+   * (la última) y se aciertan las otras 11.
+   *
+   * Resuelto a mano ANTES de ejecutar:
+   *   · aciertos tras cada pregunta: 1 1 2 3 3 4 5 6 6 7 8 9 10 11 11
+   *   · precisión: 1/1 100 · 1/2 50 · 2/3 66,67→67 · 3/4 75 · 3/5 60 · 4/6 66,67→67 · 5/7
+   *     71,43→71 · 6/8 75 · 6/9 66,67→67 · 7/10 70 · 8/11 72,73→73 · 9/12 75 · 10/13 76,92→77 ·
+   *     11/14 78,57→79 · 11/15 73,33→73
+   *   · 11/15 = 0,7333 → rama «≥ 0,7»: 60 + (0,7333 − 0,7)/0,2 · 40 = 60 + 6,67 = 66,67 → 67 pts ·
+   *     «¡Muy buena puntuación!» · «11 de 15 respuestas correctas» · «11/15» · 73 %
+   *   · 15 verbos distintos, ninguno «show» · fallados en su orden: los de la 2.ª, 5.ª, 9.ª y 15.ª
+   *     → «Has fallado 4 verbos» y «Repasar mis fallos — 4 preguntas» (min(15, 4) = 4)
+   *   · «Jugar de nuevo»: la MISMA página (sin recargar), «1/15», 0 aciertos, 0 %.
+   */
+  test('caso normal · Todos los niveles, 11 de 15 con la última fallada: 67 pts, 73 % y los 4 fallados a la lista', async ({ page }) => {
+    test.setTimeout(60_000);
+    await abrirHidratada(page);
+    await marcarPagina(page);
+    await arrancarPartida(page, 'Todos los niveles', 15);
+    await expect(page.locator('[class*="btnIniciar"]')).toHaveCount(0);
+
+    const falla = new Set([2, 5, 9, 15]);
+    const aciertosTras = [1, 1, 2, 3, 3, 4, 5, 6, 6, 7, 8, 9, 10, 11, 11];
+    const precisionTras = [100, 50, 67, 75, 60, 67, 71, 75, 67, 70, 73, 75, 77, 79, 73];
+    const vistos: string[] = [];
+    const fallados: string[] = [];
+    for (let i = 1; i <= 15; i++) {
+      await expect(page.getByText(`Pregunta ${i} de 15`, { exact: true })).toBeVisible();
+      const inf = await contestarOpcion(page, !falla.has(i));
+      vistos.push(inf);
+      if (falla.has(i)) fallados.push(inf);
+      const h = await hud(page);
+      expect(h.progreso).toBe(`${i}/15`);
+      expect(h.correctas, `aciertos tras la ${i}.ª`).toBe(String(aciertosTras[i - 1]));
+      expect(h.precision, `precisión tras la ${i}.ª`).toBe(`${precisionTras[i - 1]} %`);
+      await expect(botonSiguiente(page)).toHaveText(i < 15 ? 'Siguiente pregunta →' : 'Ver resultados');
+      await botonSiguiente(page).click();
+    }
+    expect(new Set(vistos).size, `verbo repetido: ${vistos.join(', ')}`).toBe(15);
+    expect(vistos, '«show» no se pregunta (hallazgo 316)').not.toContain('show');
+
+    await expect(page.locator('[class*="resultadoPuntos"]')).toHaveText('67 pts');
+    await expect(page.locator('[class*="resultadoTitulo"]')).toHaveText('¡Muy buena puntuación!');
+    await expect(page.locator('[class*="resultadoSubtitulo"]')).toHaveText('11 de 15 respuestas correctas');
+    const valores = await page.locator('[class*="statRValor"]').allTextContents();
+    expect(valores[0]).toBe('11/15');
+    expect(valores[1]).toBe('73 %');
+    await expect(page.locator('[class*="resultadoFallados"]')).toContainText(`Has fallado 4 verbos: ${fallados.join(', ')}.`);
+    await expect(page.getByRole('button', { name: 'Repasar mis fallos — 4 preguntas' })).toBeVisible();
+
+    // «Jugar de nuevo» reinicia la nota en la misma página.
+    await page.getByRole('button', { name: /Jugar de nuevo/ }).click();
+    await expect(page.getByText('Pregunta 1 de 15', { exact: true })).toBeVisible();
+    const h = await hud(page);
+    expect([h.progreso, h.correctas, h.precision]).toEqual(['1/15', '0', '0 %']);
+    expect(await opcionesHabilitadas(page)).toBe(4);
+    expect(await sigueSinRecargar(page), '«Jugar de nuevo» ha recargado la página').toBe(true);
+  });
+
+  /**
+   * HALLAZGO alto (Inspector 28/10/2026) · operativa — la ráfaga, por los caminos que el
+   * testigo no recorre. Escritorio 1280 × 800, resultado con dos fallos (los tres botones a la
+   * vista). Doble clic en «Jugar de nuevo»: el 1.º empieza la partida y el 2.º cae en una opción
+   * de la 1.ª pregunta y la contesta. Esperado: 4 opciones habilitadas, sin veredicto, 0 aciertos.
+   */
+  test('hallazgo · doble clic en «Jugar de nuevo»: el 2.º no contesta la 1.ª pregunta de la partida nueva', async ({ page }) => {
+    // ABIERTO (Inspector 28/10/2026): mide que el 2.º clic no deje veredicto en la pregunta nueva.
+    test.fail();
+    test.setTimeout(60_000);
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await abrirHidratada(page);
+    await resultadoConDosFallos(page);
+    await rafaga(page, page.getByRole('button', { name: /Jugar de nuevo/ }), async () => (await page.locator('[class*="hudBar"]').count()) > 0, '«Jugar de nuevo»');
+    await expect(feedback(page), 'el 2.º clic ha contestado la 1.ª pregunta de la partida nueva').toHaveCount(0);
+    expect(await opcionesHabilitadas(page)).toBe(4);
+    expect((await hud(page)).correctas).toBe('0');
+  });
+
+  /** Mismo hallazgo: «Repasar mis fallos» desde el resultado (7 de 7 tamaños en el barrido). */
+  test('hallazgo · doble clic en «Repasar mis fallos» del resultado: el 2.º no contesta la 1.ª pregunta del repaso', async ({ page }) => {
+    // ABIERTO (Inspector 28/10/2026): mide que el 2.º clic no deje veredicto en la 1.ª del repaso.
+    test.fail();
+    test.setTimeout(60_000);
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await abrirHidratada(page);
+    await resultadoConDosFallos(page);
+    await rafaga(page, page.getByRole('button', { name: 'Repasar mis fallos — 2 preguntas' }), async () => (await page.locator('[class*="hudBar"]').count()) > 0, '«Repasar mis fallos»');
+    expect((await hud(page)).progreso).toBe('1/2');
+    await expect(feedback(page), 'el 2.º clic ha contestado la 1.ª pregunta del repaso').toHaveCount(0);
+    expect(await opcionesHabilitadas(page)).toBe(4);
+  });
+
+  /**
+   * Mismo hallazgo: «Cambiar nivel» al terminar un REPASO. Con cinco verbos en la lista de
+   * repaso (sembrados con el formato de motor.ts) y el repaso acertado entero, el resultado no
+   * tiene línea de fallados y «Cambiar nivel» queda donde, en la configuración, está la tarjeta
+   * «B2 Avanzado»: el 2.º clic la elige y el nivel pasa de A2 a B2 sin que nadie lo pida (en el
+   * barrido, a 412 × 915, 1280 × 800 y 1366 × 768). Esperado: la configuración tal como estaba.
+   * (Con el resultado de una partida con dos fallos el 2.º clic cae en texto: es geometría.)
+   */
+  test('hallazgo · doble clic en «Cambiar nivel» tras un repaso: el 2.º no cambia el nivel elegido', async ({ page }) => {
+    // ABIERTO (Inspector 28/10/2026): mide que el nivel elegido siga siendo A2 tras la ráfaga.
+    test.fail();
+    test.setTimeout(60_000);
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.addInitScript(() => {
+      try {
+        if (sessionStorage.getItem('repaso-sembrado')) return;
+        const ficha = { fallos: 1, racha: 0 };
+        localStorage.setItem('meskeia_verbos_irregulares_repaso', JSON.stringify({
+          elegir: { go: ficha, eat: ficha, write: ficha, fly: ficha, bite: ficha },
+          escribir: {},
+        }));
+        sessionStorage.setItem('repaso-sembrado', '1');
+      } catch {
+        /* sin almacenamiento: el caso fallará en el montaje, no en la aserción */
+      }
+    });
+    await abrirHidratada(page);
+    await page.locator('[class*="configPanel"]').getByRole('button', { name: 'Repasar mis fallos — 5 preguntas' }).click();
+    for (let i = 1; i <= 5; i++) {
+      await contestarOpcion(page, true);
+      await botonSiguiente(page).click();
+    }
+    await expect(page.locator('[class*="resultadoSubtitulo"]')).toHaveText('5 de 5 respuestas correctas');
+    await rafaga(page, page.getByRole('button', { name: /Cambiar nivel/ }), async () => (await page.locator('[class*="configPanel"]').count()) > 0, '«Cambiar nivel»');
+    await expect(page.locator('[class*="nivelBtn"][aria-pressed="true"]'), 'el 2.º clic ha cambiado el nivel').toContainText('A2 Elemental');
+  });
+
+  /**
+   * Mismo hallazgo, modo «Escribir las formas» en escritorio: el 2.º clic de «Siguiente» cae en
+   * «Ver guía educativa», la despliega y se lleva el foco, así que lo que se teclea para la
+   * pregunta nueva no entra en la casilla (9 de 9 «Siguiente» en el barrido, a 1280 × 800).
+   */
+  test('hallazgo · escribiendo, doble clic en «Siguiente»: el 2.º no abre la guía ni saca el foco de la pregunta', async ({ page }) => {
+    // ABIERTO (Inspector 28/10/2026): mide que la guía siga plegada y el foco en la casilla.
+    test.fail();
+    test.setTimeout(60_000);
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await abrirHidratada(page);
+    await arrancarEscribiendo(page, 'A2 Elemental', 10);
+    const inf = norm(await verboEnPantalla(page).textContent());
+    const { pasado, participio } = formasBuenas(inf);
+    await escribir(page, pasado, participio);
+    await expect(feedback(page)).toContainText('¡Correcto!');
+    await rafaga(page, botonSiguiente(page), async () => (await feedback(page).count()) === 0, '«Siguiente»');
+    await expect(page.getByRole('button', { name: /Ocultar guía educativa/ }), 'el 2.º clic ha desplegado la guía').toHaveCount(0);
+    await expect(casillaPasado(page), 'el foco ya no está en la pregunta nueva').toBeFocused();
+  });
+
+  /**
+   * HALLAZGO medio (Inspector 28/10/2026) · accesibilidad — el punto ciego de la familia. En el
+   * modo de opciones la pregunta nueva recibe el foco en su tarjeta (tabindex -1) y el lector
+   * anuncia «Pregunta 1 de 15 ¿Cuál es el Past Simple de...? win "ganar"». Escribiendo, el foco
+   * va a la casilla, cuyo nombre accesible es solo «Past Simple», sin aria-describedby: el lector
+   * dice «Past Simple, editar texto» y el verbo que se pregunta no se anuncia nunca, ni al
+   * empezar ni tras «Siguiente». Medido con el árbol de accesibilidad de Chromium el 28/10/2026.
+   * Esperado: lo que se anuncia al llegar a la pregunta incluye el infinitivo.
+   */
+  test('hallazgo · escribiendo, lo que se anuncia al llegar a cada pregunta incluye el verbo', async ({ page }) => {
+    // ABIERTO (Inspector 28/10/2026): mide que el elemento enfocado nombre o describa el verbo.
+    test.fail();
+    await abrirHidratada(page);
+    await arrancarEscribiendo(page, 'A1 Básico', 10);
+    const anunciado = (): Promise<string> =>
+      page.evaluate(() => {
+        const el = document.activeElement as HTMLElement | null;
+        if (!el || el === document.body) return '';
+        const textoDe = (ids: string | null): string =>
+          (ids ?? '').split(/\s+/).filter(Boolean).map((id) => document.getElementById(id)?.textContent ?? '').join(' ');
+        if (el instanceof HTMLInputElement) {
+          const etiquetas = [...(el.labels ?? [])].map((l) => l.textContent ?? '').join(' ');
+          return [el.getAttribute('aria-label') ?? '', textoDe(el.getAttribute('aria-labelledby')), etiquetas, textoDe(el.getAttribute('aria-describedby'))]
+            .join(' ').replace(/\s+/g, ' ').trim();
+        }
+        return (el.textContent ?? '').replace(/\s+/g, ' ').trim();
+      });
+    for (let i = 1; i <= 2; i++) {
+      const inf = norm(await verboEnPantalla(page).textContent());
+      await expect
+        .poll(anunciado, { message: `pregunta ${i}: lo que se anuncia al llegar no dice el verbo «${inf}»` })
+        .toMatch(new RegExp(`\\b${inf}\\b`));
+      const { pasado, participio } = formasBuenas(inf);
+      await escribir(page, pasado, participio, true);
+      await expect(botonSiguiente(page)).toBeFocused();
+      await page.keyboard.press('Enter');
+    }
+  });
+
+  /**
+   * HALLAZGO bajo (Inspector 28/10/2026) · contenido — tres preguntas del FAQPage (JSON-LD, lo que
+   * leen buscadores y asistentes) están TAMBIÉN en la FAQ visible con otra respuesta: «¿Cuántos
+   * verbos irregulares hay en inglés…?», la diferencia entre Past Simple y Past Participle y cómo
+   * memorizarlos. No se contradicen, pero dicen cosas distintas (la visible da los intervalos 1, 3,
+   * 7 y 21 días; la del JSON-LD, «patrones sonoros» y lectura). Esperado: la misma respuesta en las
+   * dos bocas (una constante en metadata.ts que importen las dos, como
+   * app/simulador-gastos-compraventa-garaje). Si la reparación quita la pregunta del JSON-LD, el
+   * caso también pasa: preguntas DISTINTAS no son hallazgo.
+   */
+  test('hallazgo · las preguntas que el FAQPage comparte con la FAQ visible tienen la misma respuesta', async ({ page }) => {
+    // ABIERTO (Inspector 28/10/2026): mide que las tres parejas den la misma respuesta.
+    test.fail();
+    await abrirHidratada(page);
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+    const ld = JSON.parse(bloques.find((b) => b.includes('FAQPage')) ?? '{}') as {
+      mainEntity?: { name: string; acceptedAnswer: { text: string } }[];
+    };
+    const visibles = await page.locator('[class*="faqItem"]').evaluateAll((items) =>
+      items.map((it) => ({
+        pregunta: it.querySelector('strong')?.textContent ?? '',
+        respuesta: [...it.querySelectorAll('p')].map((p) => p.textContent ?? '').join(' '),
+      })),
+    );
+    const temas = [/cuántos verbos irregulares/i, /diferencia.*past participle/i, /memoriz/i];
+    const distintas: string[] = [];
+    for (const tema of temas) {
+      const enLd = (ld.mainEntity ?? []).find((q) => tema.test(q.name));
+      const enPagina = visibles.find((v) => tema.test(v.pregunta));
+      if (!enLd || !enPagina) continue;
+      if (norm(enLd.acceptedAnswer.text) !== norm(enPagina.respuesta)) {
+        distintas.push(`«${enLd.name}» / «${norm(enPagina.pregunta)}»`);
+      }
+    }
+    expect(distintas, 'preguntas repetidas con respuestas distintas').toEqual([]);
+  });
+
+  /**
+   * HALLAZGO bajo (Inspector 28/10/2026) · contenido — formato español del tiempo. La ficha
+   * «Tiempo» del resultado pinta «1s» o «2m 5s» (formatTiempo de page.tsx): sin espacio entre la
+   * cifra y el símbolo, y con «m», que es el símbolo del metro. En español: «1 s», «2 min 5 s».
+   */
+  test('hallazgo · el tiempo del resultado va en formato español («5 s», «2 min 5 s»)', async ({ page }) => {
+    // ABIERTO (Inspector 28/10/2026): mide el formato de la ficha «Tiempo» (hoy «1s»).
+    test.fail();
+    await abrirHidratada(page);
+    await arrancarPartida(page, 'A1 Básico', 10);
+    await acertarHastaElFinal(page);
+    const tiempo = norm((await page.locator('[class*="statRValor"]').allTextContents())[2]);
+    expect(tiempo).toMatch(/^(\d+ min )?\d+ s$/);
+  });
+
+  /**
+   * HALLAZGO bajo (Inspector 28/10/2026) · operativa — page.tsx pide `styles.quizPanel` y el
+   * módulo no declara `.quizPanel`: el panel del quiz sale sin atributo class, sin la tarjeta
+   * (fondo, borde de 1 px, 32 px de relleno y de margen inferior) que sí tienen la configuración y
+   * el resultado. Es el pasivo de `check:clases-css`, que se drena app por app (cabo C0386).
+   */
+  test('hallazgo · toda clase que page.tsx pide al módulo CSS está declarada en él', () => {
+    // ABIERTO (Inspector 28/10/2026): mide las clases sin declarar (hoy, quizPanel).
+    test.fail();
+    const carpeta = join(process.cwd(), 'app', 'quiz-verbos-irregulares');
+    const fuente = readFileSync(join(carpeta, 'page.tsx'), 'utf8');
+    const css = readFileSync(join(carpeta, 'QuizVerbosIrregulares.module.css'), 'utf8');
+    const usadas = new Set([...fuente.matchAll(/styles\.([A-Za-z]\w*)/g)].map((m) => m[1]));
+    const declaradas = new Set([...css.matchAll(/\.([A-Za-z][\w-]*)/g)].map((m) => m[1]));
+    expect([...usadas].filter((c) => !declaradas.has(c)), 'clases sin declarar').toEqual([]);
+  });
+
+  /**
+   * HALLAZGO bajo (Inspector 28/10/2026) · contenido — la opción de todos los niveles tiene tres
+   * nombres. La tarjeta dice «Todos los niveles»; el botón de empezar y el aviso, «Nivel
+   * Completo»; la guía, «nivel Completo» (semana 1, días 28-29, consejo de la FAQ), «modo "Todos
+   * los niveles"» (días 28-29 y el escenario del proceso de selección) y «modo "Todos"» (día 30).
+   * Desde S0181 «modo» es otra cosa en esta misma pantalla —«Cómo quieres responder»: Elegir o
+   * Escribir—, así que quien busca el «modo Todos los niveles» no lo encuentra ahí.
+   * Esperado: la guía nunca llama «modo» a un nivel, y si dice «Completo», la tarjeta también.
+   */
+  test('hallazgo · la guía y los botones llaman a «Todos los niveles» igual que su tarjeta, y nunca «modo»', async ({ page }) => {
+    // ABIERTO (Inspector 28/10/2026): mide los nombres de la opción de todos los niveles.
+    test.fail();
+    await abrirHidratada(page);
+    const tarjeta = page.locator('[class*="nivelBtn"]').filter({ hasText: 'Todos' });
+    const rotulo = norm(await tarjeta.locator('[class*="nivelLabel"]').textContent()).replace(/^\S+\s+/, '');
+    await tarjeta.click();
+    const boton = norm(await page.locator('[class*="btnIniciar"]').textContent());
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const guia = norm((await page.locator('[class*="eduBloque"]').allTextContents()).join(' '));
+    const problemas: string[] = [];
+    const modo = guia.match(/modo\s*["«“]?Todos[^"»”]*/gi) ?? [];
+    if (modo.length) problemas.push(`la guía llama «modo» a un nivel: ${modo.join(' · ')}`);
+    if (/Completo/i.test(`${boton} ${guia}`) && !/Completo/i.test(rotulo)) {
+      problemas.push(`la tarjeta dice «${rotulo}» y el botón «${boton}»`);
+    }
+    expect(problemas).toEqual([]);
+  });
+});
+
+test.describe('Inspector 28/10/2026 · móvil 412 × 915', () => {
+  test.use({
+    viewport: { width: 412, height: 915 },
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Mobile Safari/537.36',
+    deviceScaleFactor: 2.625,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  /**
+   * HALLAZGO alto (Inspector 28/10/2026) · operativa — el invariante de la familia, a 412 × 915
+   * (el ancho del Pixel 7 y de buena parte de los Android). Tras «Siguiente» la vista sube a la
+   * pregunta nueva y el punto del 2.º toque queda sobre su opción A: la contesta sin que nadie la
+   * elija. En el barrido, 9 de 9 «Siguiente» de una partida de A2 (y el «Empezar» de esa misma
+   * partida). Esperado: tras cada ráfaga, la pregunta nueva sin veredicto, sus 4 opciones
+   * habilitadas y el marcador sin tocar.
+   */
+  test('hallazgo · doble toque en «Siguiente»: el 2.º no contesta la pregunta nueva', async ({ page }) => {
+    // ABIERTO (Inspector 28/10/2026): mide que tras cada ráfaga la pregunta nueva siga sin contestar.
+    test.fail();
+    test.setTimeout(90_000);
+    await abrirHidratada(page);
+    await arrancarPartida(page, 'A2 Elemental', 10);
+    for (let i = 1; i <= 9; i++) {
+      await contestarOpcion(page, true);
+      await rafaga(page, botonSiguiente(page), async () => (await feedback(page).count()) === 0, `«Siguiente» ${i}`);
+      await expect(feedback(page), `el 2.º toque de «Siguiente» ${i} ha contestado la pregunta ${i + 1}`).toHaveCount(0);
+      expect(await opcionesHabilitadas(page)).toBe(4);
+      expect((await hud(page)).correctas).toBe(String(i));
+    }
+  });
+});
+
+test.describe('Inspector 28/10/2026 · móvil 360 × 740', () => {
+  test.use({
+    viewport: { width: 360, height: 740 },
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Mobile Safari/537.36',
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  /**
+   * CASO LÍMITE — B2 escribiendo, 10 preguntas, todas mal con el dedo (toques sueltos), y
+   * «Jugar de nuevo».
+   *
+   * Resuelto a mano ANTES de ejecutar:
+   *   · se escribe «infinitivo + ed» en las dos casillas: ninguno de los 20 de B2 forma así ni el
+   *     pasado ni el participio (wake admite «waked», no «wakeed»), así que las 10 fallan.
+   *   · marcador 0 y precisión 0 % tras cada una · 0/10 = 0 → rama «< 0,5»: round(0 · 80) = 0
+   *     pts · «Sigue practicando» · «0 de 10 respuestas correctas» · «0/10» · 0 %.
+   *   · fallados: los 10, en su orden → «Has fallado 10 verbos» y «Repasar mis fallos — 10
+   *     preguntas» (min(10, 10) = 10).
+   *   · «Jugar de nuevo» (la partida era de nivel, no de repaso) → otra de B2 escribiendo en la
+   *     MISMA página: «1/10», 0, 0 %, casillas vacías y editables, foco en la del Past Simple.
+   */
+  test('caso límite · B2 escribiendo, 0 de 10 con el dedo: 0 pts, los 10 a la lista y «Jugar de nuevo» vuelve a cero', async ({ page }) => {
+    test.setTimeout(60_000);
+    await abrirHidratada(page);
+    await marcarPagina(page);
+    await page.locator('[class*="nivelBtn"]').filter({ hasText: 'B2 Avanzado' }).tap();
+    await page.getByRole('button', { name: /Escribir las formas/ }).tap();
+    await page.getByRole('button', { name: '10 preguntas', exact: true }).tap();
+    await page.locator('[class*="btnIniciar"]').tap();
+
+    const fallados: string[] = [];
+    for (let i = 1; i <= 10; i++) {
+      await expect(page.getByText(`Pregunta ${i} de 10`, { exact: true })).toBeAttached();
+      const inf = norm(await verboEnPantalla(page).textContent());
+      expect(CANON[inf]?.nivel, `«${inf}» ha salido en una partida de B2`).toBe('B2');
+      fallados.push(inf);
+      await casillaPasado(page).fill(`${inf}ed`);
+      await casillaParticipio(page).fill(`${inf}ed`);
+      await page.getByRole('button', { name: 'Comprobar', exact: true }).tap();
+      await expect(feedback(page)).toContainText('Incorrecto');
+      const h = await hud(page);
+      expect([h.progreso, h.correctas, h.precision]).toEqual([`${i}/10`, '0', '0 %']);
+      await expect(botonSiguiente(page)).toHaveText(i < 10 ? 'Siguiente pregunta →' : 'Ver resultados');
+      await botonSiguiente(page).tap();
+    }
+    expect(new Set(fallados).size).toBe(10);
+    await expect(page.locator('[class*="resultadoPuntos"]')).toHaveText('0 pts');
+    await expect(page.locator('[class*="resultadoTitulo"]')).toHaveText('Sigue practicando');
+    await expect(page.locator('[class*="resultadoSubtitulo"]')).toHaveText('0 de 10 respuestas correctas');
+    const valores = await page.locator('[class*="statRValor"]').allTextContents();
+    expect(valores[0]).toBe('0/10');
+    expect(valores[1]).toBe('0 %');
+    await expect(page.locator('[class*="resultadoFallados"]')).toContainText(`Has fallado 10 verbos: ${fallados.join(', ')}.`);
+    await expect(page.getByRole('button', { name: 'Repasar mis fallos — 10 preguntas' })).toBeVisible();
+
+    await page.getByRole('button', { name: /Jugar de nuevo/ }).tap();
+    await expect(page.getByText('Pregunta 1 de 10', { exact: true })).toBeAttached();
+    const h = await hud(page);
+    expect([h.progreso, h.correctas, h.precision]).toEqual(['1/10', '0', '0 %']);
+    expect(CANON[norm(await verboEnPantalla(page).textContent())]?.nivel).toBe('B2');
+    await expect(casillaPasado(page)).toHaveValue('');
+    await expect(casillaPasado(page)).toBeEditable();
+    await expect(casillaPasado(page)).toBeFocused();
+    expect(await sigueSinRecargar(page), '«Jugar de nuevo» ha recargado la página').toBe(true);
+  });
+
+  /**
+   * CASO DE RECHAZO / HALLAZGO alto (Inspector 28/10/2026) · operativa — el mismo hallazgo de la
+   * ráfaga en el modo que solo tiene esta app. Escribiendo, a 360 × 740, el 2.º toque de
+   * «Empezar Quiz» cae en «Comprobar»: comprueba la 1.ª pregunta con las dos casillas vacías,
+   * la da por fallada («Has dejado vacío el Past Simple…») y mete el verbo en la lista de repaso.
+   * Esperado: la 1.ª pregunta sin veredicto y las casillas editables.
+   */
+  test('hallazgo · escribiendo, doble toque en «Empezar»: el 2.º no pulsa «Comprobar» con las casillas vacías', async ({ page }) => {
+    // ABIERTO (Inspector 28/10/2026): mide que la 1.ª pregunta siga sin veredicto tras la ráfaga.
+    test.fail();
+    await abrirHidratada(page);
+    await page.getByRole('button', { name: /Escribir las formas/ }).click();
+    await page.getByRole('button', { name: '10 preguntas', exact: true }).click();
+    await rafaga(page, page.locator('[class*="btnIniciar"]'), async () => (await casillaPasado(page).count()) > 0, '«Empezar»');
+    expect((await hud(page)).progreso).toBe('1/10');
+    await expect(feedback(page), 'el 2.º toque ha comprobado la 1.ª pregunta vacía').toHaveCount(0);
+    await expect(casillaPasado(page)).toBeEditable();
   });
 });

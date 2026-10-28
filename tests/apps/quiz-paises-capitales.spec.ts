@@ -1004,3 +1004,344 @@ test.describe('Inspector 26/09/2026 · contenido del banco', () => {
     }
   });
 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Inspector 28/10/2026 (2.ª pasada, app INVALIDADA por d9e710f8: useGuardaRafaga, cabo C0082)
+// ─────────────────────────────────────────────────────────────────────────────
+
+test.describe('Inspector 28/10/2026 · nota', () => {
+  /**
+   * CASO NORMAL — País/Normal, 11 bien y 4 mal. Esperado a mano con calcularPuntuacion y
+   * getResultadoTexto (page.tsx:149-162): 11/15 = 0,7333… ≥ 0,7 → 60 + (0,7333 − 0,7)/0,2 · 40 =
+   * 60 + 6,67 = 66,67 → 67 pts · ⭐ «¡Muy buena puntuación!» · «11 de 15 respuestas correctas» ·
+   * Correctas «11/15» · Acierto 73,33 % con 0 decimales → «73 %» (espacio duro). Normal = Europa +
+   * las tres Américas del banco.
+   */
+  test('caso normal: País/Normal con 11 de 15 da 67 pts, ⭐ y «73 %»', async ({ page }) => {
+    test.setTimeout(90_000);
+    await abrir(page);
+    await arrancar(page, 'País', 'Normal');
+    const { paises, rotulos } = await jugar(page, 'País', 11);
+    expect(paises).toHaveLength(15);
+    expect(rotulos.at(-1)).toBe('Ver resultados');
+    expect(paises.every((p) => p.continent === 'Europa' || AMERICA.test(p.continent)), 'Normal saca otra región').toBe(true);
+    const r = await resultado(page);
+    expect(r.emoji).toBe('⭐');
+    expect(r.titulo).toBe('¡Muy buena puntuación!');
+    expect(r.puntos).toBe('67 pts');
+    expect(r.subtitulo).toBe('11 de 15 respuestas correctas');
+    expect(r.stats.Correctas).toBe('11/15');
+    expect(r.stats.Acierto).toBe(`73${DURO}%`);
+  });
+
+  /**
+   * CASO LÍMITE — Bandera/Difícil, 18 bien y 2 mal: 18/20 = 0,9 justo en el umbral → 100 pts, 🏆
+   * «¡Geógrafo experto!», «18/20», «90 %». «Jugar de nuevo» llama a iniciarQuiz() con el mismo modo
+   * y nivel SIN recargar (una marca puesta en window sigue ahí): «1/20», 0 correctas y Precisión «—»;
+   * fallar la primera deja Correctas 0 y Precisión 0/1 → «0 %».
+   */
+  test('caso límite: 18 de 20 (90 %) da 100 pts y «Jugar de nuevo» reinicia sin recargar', async ({ page }) => {
+    test.setTimeout(120_000);
+    await abrir(page);
+    await arrancar(page, 'Bandera', 'Difícil');
+    const { paises } = await jugar(page, 'Bandera', 18);
+    expect(paises).toHaveLength(20);
+    const r = await resultado(page);
+    expect(r.emoji).toBe('🏆');
+    expect(r.titulo).toBe('¡Geógrafo experto!');
+    expect(r.puntos).toBe('100 pts');
+    expect(r.subtitulo).toBe('18 de 20 respuestas correctas');
+    expect(r.stats.Correctas).toBe('18/20');
+    expect(r.stats.Acierto).toBe(`90${DURO}%`);
+    await page.evaluate(() => {
+      (window as unknown as { __sinRecarga: boolean }).__sinRecarga = true;
+    });
+    await page.getByRole('button', { name: /Jugar de nuevo/ }).click();
+    await expect(page.locator('[class*="preguntaBandera"]')).toBeVisible();
+    expect(await hud(page)).toEqual({ Pregunta: '1/20', Correctas: '0', Precisión: '—' });
+    expect(await page.evaluate(() => (window as unknown as { __sinRecarga?: boolean }).__sinRecarga), 'ha recargado la página').toBe(true);
+    await responder(page, 'Bandera', false);
+    expect(await hud(page)).toEqual({ Pregunta: '1/20', Correctas: '0', Precisión: `0${DURO}%` });
+  });
+
+  /**
+   * CASO LÍMITE — el otro umbral: 5/10 = 0,5 → 40 + 0 = 40 pts, 👍 «Buen intento», «50 %»; y por
+   * debajo, 4/10 = 0,4 → 0,4 · 80 = 32 pts, 📚 «Sigue practicando», «40 %». Entre las dos partidas,
+   * «Cambiar modo» vuelve a la configuración con el modo y el nivel que había.
+   */
+  test('caso límite: 5 de 10 da 40 pts «Buen intento» y 4 de 10 da 32 pts «Sigue practicando»', async ({ page }) => {
+    test.setTimeout(120_000);
+    await abrir(page);
+    await arrancar(page, 'Capital', 'Fácil');
+    await jugar(page, 'Capital', 5);
+    let r = await resultado(page);
+    expect([r.emoji, r.titulo, r.puntos, r.stats.Correctas, r.stats.Acierto]).toEqual(['👍', 'Buen intento', '40 pts', '5/10', `50${DURO}%`]);
+    await page.getByRole('button', { name: /Cambiar modo/ }).click();
+    await expect(botonModo(page, 'Capital')).toHaveAttribute('aria-pressed', 'true');
+    await expect(botonNivel(page, 'Fácil')).toHaveAttribute('aria-pressed', 'true');
+    await page.getByRole('button', { name: /Empezar Quiz — 10 preguntas/ }).click();
+    await jugar(page, 'Capital', 4);
+    r = await resultado(page);
+    expect([r.emoji, r.titulo, r.puntos, r.stats.Correctas, r.stats.Acierto]).toEqual(['📚', 'Sigue practicando', '32 pts', '4/10', `40${DURO}%`]);
+  });
+});
+
+/**
+ * Lo que un segundo toque cambiaría si llegara a un botón o a un enlace: la URL, la pantalla, la
+ * pregunta, cuántas opciones quedan sin contestar, el marcador, la nota, lo pulsado en la
+ * configuración y si la guía está abierta.
+ */
+async function huella(page: Page) {
+  return page.evaluate(() => {
+    const t = (s: string): string => (document.querySelector(s)?.textContent ?? '').replace(/\s+/g, ' ').trim();
+    const ops = [...document.querySelectorAll<HTMLButtonElement>('[class*="opcionesGrid"] button')];
+    const guia = [...document.querySelectorAll('button[aria-expanded]')].find((b) => /guía educativa/.test(b.textContent ?? ''));
+    return {
+      url: location.href,
+      pantalla: document.querySelector('[class*="resultadoPanel"]') ? 'resultado' : document.querySelector('[class*="quizPanel"]') ? 'quiz' : document.querySelector('[class*="configPanel"]') ? 'config' : '?',
+      pregunta: t('[class*="preguntaNumero"]'),
+      sinContestar: ops.filter((b) => !b.disabled).length,
+      marcador: t('[class*="hudBar"]'),
+      nota: `${t('[class*="resultadoSubtitulo"]')} · ${t('[class*="resultadoPuntos"]')}`,
+      pulsados: [...document.querySelectorAll('[aria-pressed="true"]')].map((b) => (b.textContent ?? '').replace(/\s+/g, ' ').trim()).join(' | '),
+      guia: guia?.getAttribute('aria-expanded') ?? '',
+    };
+  });
+}
+
+/**
+ * Ráfaga de ratón como la del testigo de familia: 1.er clic suelto en el centro de `boton`, esperar
+ * a que la pantalla NUEVA esté pintada y el 2.º clic en el mismo punto con detail 2. Lo que haya
+ * debajo es lo que pisa: nada de lo que mide `huella` puede cambiar. Con `enfocado`, comprueba
+ * además dónde dejó el foco el primer clic (antes del 2.º, cuyo mousedown lo movería).
+ */
+async function rafaga(page: Page, boton: Locator, pintada: () => Promise<boolean>, paso: string, enfocado?: Locator): Promise<void> {
+  await boton.scrollIntoViewIfNeeded();
+  await page.waitForTimeout(100);
+  const caja = await boton.boundingBox();
+  if (!caja) throw new Error(`${paso}: el botón no tiene caja`);
+  const [x, y] = [caja.x + caja.width / 2, caja.y + caja.height / 2];
+  await page.mouse.move(x, y);
+  await page.mouse.down({ clickCount: 1 });
+  await page.mouse.up({ clickCount: 1 });
+  await expect.poll(pintada, { intervals: [20], timeout: 3000, message: `${paso}: el primer toque cambia de pantalla` }).toBe(true);
+  await page.waitForTimeout(80);
+  if (enfocado) await expect(enfocado, `${paso}: el foco va al enunciado nuevo`).toBeFocused();
+  const antes = await huella(page);
+  await page.mouse.down({ clickCount: 2 });
+  await page.mouse.up({ clickCount: 2 });
+  await page.waitForTimeout(400);
+  expect(await huella(page), `${paso}: el 2.º toque de la ráfaga no cambia nada`).toEqual(antes);
+}
+
+/**
+ * DOBLE TOQUE — el invariante de la familia en las vistas que el testigo (390×844, modo por defecto)
+ * no mira, en los TRES modos y en las dos salidas del resultado, que el testigo no recorre.
+ * La app usa useGuardaRafaga (page.tsx:221, lib/useGuardaRafaga.ts: escucha en captura sobre window)
+ * y la llama en iniciarQuiz, siguiente y volverConfig; «Jugar de nuevo» pasa por iniciarQuiz.
+ * Medido el 28/10/2026 qué pisa el 2.º toque: a 412×915 la opción C en «Empezar» (Bandera) y la D
+ * en «Jugar de nuevo» (Capital y Bandera), y «Empezar Quiz» en «Cambiar modo» (Bandera, 412 y
+ * 1280); en «Siguiente», la cabecera de la guía o el enunciado. Con la escucha anulada (control),
+ * el 2.º toque de «Jugar de nuevo» a 412×915 contestó la pregunta 1: lo que protege es la guarda.
+ * Esperado a mano de cada partida: impares bien, pares mal → 5/10 → 40 pts.
+ */
+const VISTAS_RAFAGA = [
+  { nombre: '412×915', viewport: { width: 412, height: 915 } },
+  { nombre: '768×1024', viewport: { width: 768, height: 1024 } },
+  { nombre: '1280×800', viewport: { width: 1280, height: 800 } },
+];
+
+test.describe('Inspector 28/10/2026 · doble toque (useGuardaRafaga)', () => {
+  for (const v of VISTAS_RAFAGA) {
+    for (const modo of ['Capital', 'País', 'Bandera'] as Modo[]) {
+      test(`${v.nombre} · ${modo}: el 2.º toque no contesta, no saca de la app ni se come la nota`, async ({ page }) => {
+        test.setTimeout(120_000);
+        await page.setViewportSize(v.viewport);
+        await abrir(page);
+        await configurar(page, modo, 'Fácil');
+        const sinContestar = (): Promise<number> =>
+          opciones(page).evaluateAll((bs) => bs.filter((b) => !(b as HTMLButtonElement).disabled).length);
+        const enunciado = page.locator('[class*="preguntaCard"]');
+
+        await rafaga(page, page.getByRole('button', { name: /Empezar Quiz/ }), async () => (await sinContestar()) === 4, 'Empezar', enunciado);
+        for (let n = 1; n <= 10; n++) {
+          await responder(page, modo, n % 2 === 1);
+          const sig = page.locator('[class*="btnSiguiente"]');
+          const ultima = /Ver resultados/.test(await sig.innerText());
+          if (ultima) {
+            await rafaga(page, sig, async () => (await page.locator('[class*="resultadoPanel"]').count()) > 0, 'Ver resultados');
+            break;
+          }
+          await rafaga(page, sig, async () => (await sinContestar()) === 4, `Siguiente ${n}`, enunciado);
+          await expect(page.locator('[class*="preguntaNumero"]')).toHaveText(`Pregunta ${n + 1} de 10`);
+        }
+        const r = await resultado(page);
+        expect(r.subtitulo).toBe('5 de 10 respuestas correctas');
+        expect(r.puntos).toBe('40 pts');
+
+        await rafaga(page, page.getByRole('button', { name: /Jugar de nuevo/ }), async () => (await sinContestar()) === 4, 'Jugar de nuevo', enunciado);
+        expect(await hud(page)).toEqual({ Pregunta: '1/10', Correctas: '0', Precisión: '—' });
+        await jugar(page, modo, 10);
+        await rafaga(page, page.getByRole('button', { name: /Cambiar modo/ }), async () => (await page.locator('[class*="configPanel"]').count()) > 0, 'Cambiar modo');
+        await expect(botonModo(page, modo)).toHaveAttribute('aria-pressed', 'true');
+        await expect(botonNivel(page, 'Fácil')).toHaveAttribute('aria-pressed', 'true');
+      });
+    }
+  }
+
+  /**
+   * Lo que cae FUERA de los botones del quiz (tercer punto ciego del testigo) y lo que NO es ráfaga
+   * de un cambio de pantalla. Esperado: tras «Siguiente», un 2.º toque sobre «Ver guía educativa» no
+   * la abre, y un clic suelto después sí; tras «Ver resultados», uno sobre la 1.ª relacionada no
+   * sale de la app. Y contestar y pulsar «Siguiente» deprisa —Chrome lo cuenta como detail 2— es una
+   * intención nueva: avanza a «Pregunta 2 de 10».
+   */
+  test('fuera del quiz (guía y relacionada) y «Siguiente» rápido tras contestar', async ({ page }) => {
+    test.setTimeout(120_000);
+    for (const viewport of [{ width: 412, height: 915 }, { width: 1280, height: 800 }]) {
+      await page.setViewportSize(viewport);
+      await abrir(page);
+      const url = page.url();
+      await arrancar(page, 'Capital', 'Fácil');
+      await responder(page, 'Capital', true);
+      const sig = page.locator('[class*="btnSiguiente"]');
+      const c = await sig.boundingBox();
+      if (!c) throw new Error('«Siguiente» sin caja');
+      await page.mouse.move(c.x + c.width / 2, c.y + c.height / 2);
+      await page.mouse.down({ clickCount: 2 });
+      await page.mouse.up({ clickCount: 2 });
+      await expect(page.locator('[class*="preguntaNumero"]'), `${viewport.width}: un «Siguiente» con detail 2 tras contestar se ha comido`).toHaveText('Pregunta 2 de 10');
+
+      await responder(page, 'Capital', true);
+      await sig.click();
+      await expect(page.locator('[class*="preguntaNumero"]')).toHaveText('Pregunta 3 de 10');
+      const guia = page.locator('button[aria-expanded]').filter({ hasText: /guía educativa/ });
+      await guia.scrollIntoViewIfNeeded();
+      const g = await guia.boundingBox();
+      if (!g) throw new Error('la guía sin caja');
+      await page.mouse.move(g.x + g.width / 2, g.y + g.height / 2);
+      await page.mouse.down({ clickCount: 2 });
+      await page.mouse.up({ clickCount: 2 });
+      await page.waitForTimeout(300);
+      await expect(guia, `${viewport.width}: la ráfaga ha abierto la guía`).toHaveAttribute('aria-expanded', 'false');
+      await guia.click();
+      await expect(guia, 'un clic suelto después sí la abre').toHaveAttribute('aria-expanded', 'true');
+      await guia.click();
+      await expect(guia).toHaveAttribute('aria-expanded', 'false');
+
+      await jugar(page, 'Capital', 10);
+      await expect(page.locator('[class*="resultadoPanel"]')).toBeVisible();
+      const relacionada = page.locator('a[href*="from=related-quiz-paises-capitales"]').first();
+      await relacionada.scrollIntoViewIfNeeded();
+      const rb = await relacionada.boundingBox();
+      if (!rb) throw new Error('la relacionada sin caja');
+      await page.mouse.move(rb.x + rb.width / 2, rb.y + rb.height / 2);
+      await page.mouse.down({ clickCount: 2 });
+      await page.mouse.up({ clickCount: 2 });
+      await page.waitForTimeout(800);
+      expect(page.url(), `${viewport.width}: la ráfaga sobre la relacionada saca de la app`).toBe(url);
+      await expect(page.locator('[class*="resultadoPanel"]')).toBeVisible();
+    }
+  });
+});
+
+/**
+ * Móvil emulado de verdad (412×915, táctil): la partida entera a toques. 6 bien y 4 mal → 6/10 =
+ * 0,6 → 40 + (0,6 − 0,5)/0,2 · 20 = 50 pts, 👍 «Buen intento», «6/10», «60 %».
+ */
+test.describe('Inspector 28/10/2026 · móvil 412 × 915 táctil', () => {
+  test.use({
+    viewport: { width: 412, height: 915 },
+    userAgent: 'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Mobile Safari/537.36',
+    deviceScaleFactor: 2.625,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test('partida a toques: 6 de 10 da 50 pts y el enunciado nuevo queda a la vista', async ({ page }) => {
+    test.setTimeout(90_000);
+    const tocar = async (loc: Locator): Promise<void> => {
+      await loc.scrollIntoViewIfNeeded();
+      const b = await loc.boundingBox();
+      if (!b) throw new Error('el elemento no tiene caja');
+      await page.touchscreen.tap(b.x + b.width / 2, b.y + b.height / 2);
+    };
+    await abrir(page);
+    await tocar(botonModo(page, 'Capital'));
+    await tocar(botonNivel(page, 'Fácil'));
+    await tocar(page.getByRole('button', { name: /Empezar Quiz/ }));
+    for (let n = 1; n <= 10; n++) {
+      await expect(page.locator('[class*="preguntaNumero"]')).toHaveText(`Pregunta ${n} de 10`);
+      const { correcta } = await fichaVisible(page, 'Capital');
+      const ops = await textosOpcion(page);
+      const iC = ops.indexOf(correcta);
+      await tocar(opciones(page).nth(n <= 6 ? iC : iC === 0 ? 1 : 0));
+      await expect(aviso(page)).toContainText(n <= 6 ? '¡Correcto!' : 'Incorrecto.');
+      await tocar(page.locator('[class*="btnSiguiente"]'));
+      if (n < 10) {
+        await expect(page.locator('[class*="preguntaCard"]')).toBeFocused();
+        await expect(page.locator('[class*="preguntaCard"]')).toBeInViewport({ ratio: 1 });
+      }
+    }
+    const r = await resultado(page);
+    expect([r.emoji, r.titulo, r.puntos, r.stats.Correctas, r.stats.Acierto]).toEqual(['👍', 'Buen intento', '50 pts', '6/10', `60${DURO}%`]);
+  });
+});
+
+test.describe('Inspector 28/10/2026 · hallazgos', () => {
+  test('hallazgo · Granada: la capital es Saint George’s, no «Saint George»', () => {
+    test.fail(); // ABIERTO
+    // data/countries.ts:189 escribe «Saint George». La ciudad se llama St. George's: así la da
+    // node_modules/flag-icons/country.json (code "gd", «St. George's»), la dependencia que pinta las
+    // banderas de esta misma app. Es el mismo defecto que «Saint John» → «Saint John’s» (hallazgo
+    // 2271, reparado con el apóstrofo tipográfico). La lista de la RAE no se pudo consultar el
+    // 28/10/2026 (WebFetch denegado en la tanda).
+    expect(capitalDe('Granada')).toMatch(/^Saint George[’']s$/);
+  });
+
+  test('hallazgo · el JSON-LD declara al menos 4 características (featureList)', async ({ page }) => {
+    test.fail(); // ABIERTO
+    // metadata.ts:42 `features: []` → featureList vacío en el WebApplication (CLAUDE.md §1.ter: 4-8).
+    await abrir(page);
+    const lista = await page.evaluate(() => {
+      for (const s of document.querySelectorAll('script[type="application/ld+json"]')) {
+        try {
+          const j = JSON.parse(s.textContent ?? '');
+          if (j['@type'] === 'WebApplication') return j.featureList as unknown;
+        } catch {
+          /* otro bloque */
+        }
+      }
+      return 'sin WebApplication';
+    });
+    expect(Array.isArray(lista), `featureList: ${JSON.stringify(lista)}`).toBe(true);
+    expect((lista as string[]).length, 'características declaradas').toBeGreaterThanOrEqual(4);
+  });
+
+  test('hallazgo · «¿Cuántos países…?» tiene UNA sola respuesta en la FAQ visible y en el FAQPage', async ({ page }) => {
+    test.fail(); // ABIERTO
+    // metadata.ts:51-55 (FAQPage, lo que leen buscadores y asistentes): «¿Cuántos países y capitales
+    // hay que aprender en el mundo?» → «… 195 países, cada uno con su capital …», sin Taiwán ni las
+    // 196 entradas del quiz. page.tsx:643-646 (FAQ visible): «¿Cuántos países hay en el mundo?» →
+    // «… 195 en total … Este quiz incluye esos 195 y, además, Taiwán […] 196 entradas en total.»
+    await abrir(page);
+    const faq = await page.evaluate(() => {
+      for (const s of document.querySelectorAll('script[type="application/ld+json"]')) {
+        try {
+          const j = JSON.parse(s.textContent ?? '');
+          if (j['@type'] !== 'FAQPage') continue;
+          const q = (j.mainEntity as { name: string; acceptedAnswer: { text: string } }[]).find((e) => /Cuántos países/.test(e.name));
+          if (q) return q.acceptedAnswer.text;
+        } catch {
+          /* otro bloque */
+        }
+      }
+      return '';
+    });
+    expect(faq, 'el FAQPage ya no pregunta cuántos países hay').not.toBe('');
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const visible = norm(await page.locator('[class*="faqItem"]').filter({ hasText: '¿Cuántos países hay en el mundo?' }).locator('dd').innerText());
+    expect(visible).toContain(`${countries.length} entradas`);
+    expect(norm(faq), 'las dos bocas dan respuestas distintas').toBe(visible);
+  });
+});
