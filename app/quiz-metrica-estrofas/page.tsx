@@ -182,12 +182,16 @@ const PREGUNTAS: PreguntaMetrica[] = [
     correcta: 'Heptasílabos y endecasílabos',
     explicacion: 'La lira combina heptasílabos (7) y endecasílabos (11) con el esquema 7a 11B 7a 7b 11B. Su nombre viene del primer poema de Garcilaso que la usó: «Si de mi baja lira / tanto pudiese el son…».',
   },
+  // Hallazgo 3662: la clave era «ABABABABCC», 10 letras para 8 versos, y ninguna opción tenía 8.
+  // Las distractoras pasan también a 8 letras, para que la longitud no delate la clave.
+  // Hallazgo 3674: la ottava rima italiana (Boccaccio, Ariosto, Tasso) ya cierra en pareado; la
+  // octava real es su adaptación al castellano, no se distingue de ella por eso.
   {
     nivel: 'avanzado', categoria: 'estrofa',
     enunciado: '¿Cuál es el esquema de rima de la octava real?',
-    opciones: ['ABABABABCC', 'ABBAABBACC', 'ABABABCDCD', 'AABBCCDDEE'],
-    correcta: 'ABABABABCC',
-    explicacion: 'La octava real son 8 endecasílabos con esquema ABABABABCC: seis versos en rima alterna y un pareado final de cierre. El pareado le da un remate sentencioso que la distingue de la ottava italiana.',
+    opciones: ['ABABABCC', 'ABBAABCC', 'ABABCDCD', 'AABBCCDD'],
+    correcta: 'ABABABCC',
+    explicacion: 'La octava real son 8 endecasílabos con esquema ABABABCC: seis versos en rima alterna y un pareado final que le da un remate sentencioso. Es la adaptación al castellano de la ottava rima italiana, que ya cerraba así.',
   },
   {
     nivel: 'avanzado', categoria: 'estrofa',
@@ -300,7 +304,8 @@ export default function QuizMetricaEstrofasPage() {
   const esUltima = preguntaActual === totalPreguntas - 1;
 
   // Doble toque en «Empezar», «Siguiente» o «Ver resultado»: el 2.º no cae en la pantalla nueva
-  // (cabo C0082, lib/useGuardaRafaga.ts)
+  // (cabo C0082, lib/useGuardaRafaga.ts). Y en la opción: el foco a «Siguiente» sube la página y
+  // deja el botón bajo el dedo, así que el 2.º toque en el mismo punto se ignora (3679 en la familia)
   const marcarCambioPantalla = useGuardaRafaga();
 
   const iniciarQuiz = useCallback(() => {
@@ -315,9 +320,10 @@ export default function QuizMetricaEstrofasPage() {
 
   const responder = useCallback((opcion: string) => {
     if (seleccionada !== null) return;
+    marcarCambioPantalla({ soloMismoPunto: true });
     setSeleccionada(opcion);
     if (opcion === pregunta.correcta) setCorrectas(prev => prev + 1);
-  }, [seleccionada, pregunta]);
+  }, [seleccionada, pregunta, marcarCambioPantalla]);
 
   const siguiente = useCallback(() => {
     marcarCambioPantalla();

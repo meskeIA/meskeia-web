@@ -552,18 +552,21 @@ test.describe('Inspector 28/10/2026 · contenido del banco', () => {
     for (const [re, clave] of CLAVE_A_MANO) expect(ficha(re).correcta, String(re)).toBe(clave);
   });
 
-  test('hallazgo · octava real: el esquema es ABABABCC (8 versos), no ABABABABCC (10)', () => {
+  test('3662 · octava real: el esquema es ABABABCC (8 versos), no ABABABABCC (10)', () => {
     // La propia explicación dice «8 endecasílabos […] seis versos en rima alterna y un pareado»:
-    // ABABAB + CC = 8 letras. La clave «ABABABABCC» tiene 10 y ninguna opción tiene 8.
-    test.fail();
+    // ABABAB + CC = 8 letras. La clave «ABABABABCC» tenía 10 y ninguna opción tenía 8.
+    // REPARADO el 28/10/2026. Lo que valía era «una sola opción de 8 letras»; al reparar, las
+    // cuatro pasan a 8 letras para que la longitud no delate la clave: se mide que haya una sola
+    // con el esquema canónico y que la clave sea esa.
     const p = ficha(/octava real/);
     expect(p.correcta).toBe('ABABABCC');
-    expect(p.opciones.filter((o) => o.replace(/\s/g, '').length === 8)).toHaveLength(1);
+    expect(p.opciones.filter((o) => o === 'ABABABCC')).toHaveLength(1);
+    expect(p.opciones.every((o) => o.length === 8), 'cada opción, un esquema de 8 versos').toBe(true);
   });
 
-  test('hallazgo · el pareado final no distingue la octava real de la ottava rima italiana', () => {
+  test('3674 · el pareado final no distingue la octava real de la ottava rima italiana', () => {
     // La ottava rima (Boccaccio, Ariosto, Tasso) ya es ABABABCC: la octava real es su adaptación.
-    test.fail();
+    // REPARADO el 28/10/2026.
     expect(ficha(/octava real/).explicacion).not.toMatch(/distingue de la ottava italiana/);
   });
 
