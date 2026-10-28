@@ -3,6 +3,7 @@
 
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { enfocarALaVista } from '@/lib';
+import { useGuardaRafaga } from '@/lib/useGuardaRafaga';
 import styles from './QuizConceptosFinancieros.module.css';
 import {
   MeskeiaLogo, Footer, LegalNotice, EducationalSection, RelatedApps,
@@ -33,7 +34,13 @@ const PREGUNTAS: Pregunta[] = [
   { pregunta: 'Si la inflación es del 3% y tu cuenta da un 1%, ¿qué pasa con tu dinero?', opciones: ['Ganas un 1%', 'Pierdes poder adquisitivo (tu dinero vale menos)', 'No pasa nada', 'Ganas un 4%'], correcta: 1, explicacion: 'Si la inflación (3%) supera el rendimiento de tu ahorro (1%), pierdes un 2% de poder adquisitivo real. Tu dinero crece en cifras, pero compra menos cosas.', categoria: 'Economía básica' },
   { pregunta: '¿Qué es un aval?', opciones: ['Un seguro de vida', 'Una persona o bien que garantiza el pago de una deuda', 'Un tipo de inversión', 'Un descuento bancario'], correcta: 1, explicacion: 'Un aval es una garantía: si tú no pagas, el avalista (otra persona) o el bien avalado (una casa, por ejemplo) responde por la deuda. Es un compromiso muy serio.', categoria: 'Deuda' },
   { pregunta: '¿Cuál de estas deudas suele tener el interés más alto?', opciones: ['Hipoteca', 'Préstamo de coche', 'Tarjeta de crédito', 'Préstamo estudiantil'], correcta: 2, explicacion: 'Las tarjetas de crédito suelen tener TAE del 20-25%, muy superior a hipotecas (2-4%) o préstamos personales (6-12%). Siempre intenta pagar el total cada mes.', categoria: 'Deuda' },
-  { pregunta: '¿Qué es mejor: ahorrar 100 € al mes durante 10 años, o 200 € al mes durante 5 años?', opciones: ['Da igual, es la misma cantidad', 'Ahorrar 100 €/mes durante 10 años (si se invierte)', '200 €/mes durante 5 años siempre', 'Depende del día de la semana'], correcta: 1, explicacion: 'Ambos suman 12.000 €, pero si inviertes, el dinero ahorrado antes tiene más tiempo para crecer (interés compuesto). Tiempo > cantidad.', categoria: 'Inversión' },
+  // P14. Decía «100 € al mes durante 10 años o 200 € al mes durante 5 años» sin decir cuándo
+  // empieza cada plan, y daba por buena la de 100 €: si los dos empiezan hoy, el de 200 € mete
+  // cada euro antes y gana (hallazgo 3702). Ahora los dos acaban a la vez y el de 100 € empieza
+  // cinco años antes, que es lo que la explicación quería enseñar. Al 5 % anual (0,4167 % al mes,
+  // aportación a fin de mes): 100 · ((1 + i)^120 − 1) / i = 15.528 € y 200 · ((1 + i)^60 − 1) / i
+  // = 13.601 € a los 35; desde ahí crecen igual.
+  { pregunta: '¿Qué acaba con más dinero: ahorrar 100 € al mes de los 25 a los 35 años, o 200 € al mes de los 30 a los 35?', opciones: ['Da igual, es la misma cantidad', 'Empezar a los 25 con 100 €/mes (si se invierte)', 'Empezar a los 30 con 200 €/mes, siempre', 'Depende del día de la semana'], correcta: 1, explicacion: 'Los dos planes suman 12.000 € y terminan a la vez, pero el primero empieza cinco años antes y su dinero tiene más tiempo para crecer. Al 5 % anual, a los 35 años serían unos 15.528 € frente a 13.601 €, y desde ahí los dos crecen igual. Con el interés compuesto, empezar antes pesa más que la cantidad.', categoria: 'Inversión' },
   { pregunta: '¿Qué es el IPC?', opciones: ['Índice de Precios de Consumo — mide la inflación', 'Impuesto de Propiedad Comercial', 'Indicador de Productividad del Capital', 'Interés Personal de Crédito'], correcta: 0, explicacion: 'El IPC mide cómo varían los precios de una cesta de productos y servicios típicos. Si el IPC sube un 3%, la vida se ha encarecido un 3% de media.', categoria: 'Economía básica' },
 ];
 
@@ -45,15 +52,25 @@ export default function QuizConceptosFinancierosPage() {
   const [mostrarExplicacion, setMostrarExplicacion] = useState(false);
   const [quizTerminado, setQuizTerminado] = useState(false);
 
+  /**
+   * Doble toque (hallazgos 3700 y 3701). El 2.º toque de «Siguiente pregunta» caía sobre la
+   * pantalla nueva —contestaba la P2 con la D o abría la guía—, y el 2.º toque sobre una opción
+   * pulsaba «Siguiente», que el foco había subido bajo el dedo, y se saltaba la explicación. La
+   * receta de la familia: useGuardaRafaga (lib/useGuardaRafaga.ts), en captura sobre window.
+   */
+  const marcarCambioPantalla = useGuardaRafaga();
+
   const responder = useCallback((opcionIdx: number) => {
     if (mostrarExplicacion) return;
+    marcarCambioPantalla({ soloMismoPunto: true });
     const nuevas = [...respuestas];
     nuevas[preguntaActual] = opcionIdx;
     setRespuestas(nuevas);
     setMostrarExplicacion(true);
-  }, [preguntaActual, mostrarExplicacion, respuestas]);
+  }, [preguntaActual, mostrarExplicacion, respuestas, marcarCambioPantalla]);
 
   const siguiente = () => {
+    marcarCambioPantalla();
     setMostrarExplicacion(false);
     if (preguntaActual < PREGUNTAS.length - 1) {
       setPreguntaActual(preguntaActual + 1);
@@ -63,6 +80,7 @@ export default function QuizConceptosFinancierosPage() {
   };
 
   const reiniciar = () => {
+    marcarCambioPantalla();
     setPreguntaActual(0);
     setRespuestas(new Array(PREGUNTAS.length).fill(null));
     setMostrarExplicacion(false);

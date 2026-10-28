@@ -53,8 +53,8 @@ const CLAVE = new Map<string, string>(
     ['Si la inflación es del 3% y tu cuenta da un 1%, ¿qué pasa con tu dinero?', 'Pierdes poder adquisitivo (tu dinero vale menos)'],
     ['¿Qué es un aval?', 'Una persona o bien que garantiza el pago de una deuda'],
     ['¿Cuál de estas deudas suele tener el interés más alto?', 'Tarjeta de crédito'],
-    // La clave de la APP (ver el hallazgo del banco más abajo): no es la correcta si los dos planes empiezan hoy
-    ['¿Qué es mejor: ahorrar 100 € al mes durante 10 años, o 200 € al mes durante 5 años?', 'Ahorrar 100 €/mes durante 10 años (si se invierte)'],
+    // A los 35: 100 €·120 meses al 5 % = 15.528 € frente a 200 €·60 meses = 13.601 € (3702, más abajo)
+    ['¿Qué acaba con más dinero: ahorrar 100 € al mes de los 25 a los 35 años, o 200 € al mes de los 30 a los 35?', 'Empezar a los 25 con 100 €/mes (si se invierte)'],
     ['¿Qué es el IPC?', 'Índice de Precios de Consumo — mide la inflación'],
   ].map(([e, c]) => [norm(e), norm(c)]),
 );
@@ -384,10 +384,11 @@ async function partidaConRafagas(page: Page): Promise<string[]> {
   return incidencias;
 }
 
+// REPARADOS el 28/10/2026 (hallazgos 3700 y 3701): la app usa useGuardaRafaga, y contestar marca
+// con `soloMismoPunto`.
 test.describe('Inspector 28/10/2026 · doble toque (sin guarda)', () => {
-  test('hallazgo · 360×740: el 2.º toque del primer «Siguiente» no contesta la pregunta 2', async ({ page }) => {
+  test('3700 · 360×740: el 2.º toque del primer «Siguiente» no contesta la pregunta 2', async ({ page }) => {
     // Mide: tras el 1.er «Siguiente», el 2.º clic de la ráfaga cae en la opción D de la P2.
-    test.fail();
     await page.setViewportSize({ width: 360, height: 740 });
     await abrir(page);
     await responder(page, 'bien');
@@ -420,8 +421,7 @@ test.describe('Inspector 28/10/2026 · doble toque (sin guarda)', () => {
     [360, 740],
     [1280, 720],
   ] as const) {
-    test(`hallazgo · ${ancho}×${alto}: el doble toque en una respuesta de la P1 no se salta su explicación`, async ({ page }) => {
-      test.fail();
+    test(`3701 · ${ancho}×${alto}: el doble toque en una respuesta de la P1 no se salta su explicación`, async ({ page }) => {
       await page.setViewportSize({ width: ancho, height: alto });
       await abrir(page);
       const op = opciones(page).nth(await indiceCorrecta(page));
@@ -448,10 +448,9 @@ test.describe('Inspector 28/10/2026 · doble toque (sin guarda)', () => {
     [768, 1024],
     [1280, 800],
   ] as const) {
-    test(`hallazgo · ${ancho}×${alto}: ninguna ráfaga en «Siguiente», «Ver resultado» ni «Repetir quiz» contesta, abre la guía ni saca de la app`, async ({ page }) => {
+    test(`3700 · ${ancho}×${alto}: ninguna ráfaga en «Siguiente», «Ver resultado» ni «Repetir quiz» contesta, abre la guía ni saca de la app`, async ({ page }) => {
       // Mide la partida entera: lista cada paso en el que el 2.º toque hizo algo. Medido: 360 →
       // contesta la P2 + guía 4; 412 → guía 6; 768 → guía 12 + «Repetir quiz»; 1280 → guía 1.
-      test.fail();
       test.setTimeout(120_000);
       await page.setViewportSize({ width: ancho, height: alto });
       await abrir(page);
@@ -471,17 +470,22 @@ test.describe('Inspector 28/10/2026 · banco y nota', () => {
    * 10 años: 100 €·120 meses = 15.528 € · 200 €·60 meses y 5 años quieto = 13.601 € · 1,2834 =
    * 17.455 €. Solo gana el de 100 € si el de 200 € empieza 5 años más tarde (13.601 € al año 10),
    * y el enunciado no lo dice.
+   * REPARADO el 28/10/2026: el enunciado fija las fechas —100 € de los 25 a los 35 años, 200 € de
+   * los 30 a los 35— y el principio que la explicación quería enseñar pasa a ser cierto: los dos
+   * acaban a la vez y suman 12.000 €, pero el de 100 € empieza antes. A los 35, con las mismas
+   * cuentas: 100 €·120 meses = 15.528 € frente a 200 €·60 meses = 13.601 €; desde ahí crecen igual.
    */
-  test('hallazgo · la P14 no da por buena la opción que pierde si los dos planes empiezan hoy', async ({ page }) => {
-    test.fail();
+  test('3702 · la P14 dice cuándo empieza cada plan y da por buena la que acaba con más dinero', async ({ page }) => {
     test.setTimeout(90_000);
     const i = 0.05 / 12;
     const vfCuotas = (cuota: number, meses: number): number => (cuota * ((1 + i) ** meses - 1)) / i;
+    // Con los dos empezando HOY ganaría el de 200 € (el caso del hallazgo)…
+    expect(vfCuotas(200, 60) * (1 + i) ** 60).toBeGreaterThan(vfCuotas(100, 120));
+    // …y con los dos acabando a los 35, el de 100 € que empieza a los 25
     const plan100 = vfCuotas(100, 120);
-    const plan200 = vfCuotas(200, 60) * (1 + i) ** 60;
+    const plan200 = vfCuotas(200, 60);
     expect(plan100).toBeCloseTo(15528, -1);
-    expect(plan200).toBeCloseTo(17455, -1);
-    expect(plan200).toBeGreaterThan(plan100);
+    expect(plan200).toBeCloseTo(13601, -1);
 
     await abrir(page);
     for (let n = 1; n < 14; n++) {
@@ -489,17 +493,16 @@ test.describe('Inspector 28/10/2026 · banco y nota', () => {
       await avanzar(page);
     }
     const texto = norm(await enunciado(page).innerText());
-    expect(texto).toMatch(/100 € al mes durante 10 años.*200 € al mes durante 5 años/);
+    expect(texto).toMatch(/100 € al mes de los 25 a los 35 años.*200 € al mes de los 30 a los 35/);
     await opciones(page).first().click();
     await expect(explicacion(page)).toBeVisible();
     const ops = await textosOpcion(page);
     const clases = await opciones(page).evaluateAll((bs) => bs.map((b) => b.className));
     const marcada = ops[clases.findIndex((c) => claseTermina(c, 'correcta'))];
-    const precisaCuandoEmpiezan = /empiez|empez|a la vez|mismo momento|más tarde|después|retras/i.test(texto);
-    expect(
-      precisaCuandoEmpiezan || !/100 €\/mes durante 10 años/.test(marcada),
-      `la app marca «${marcada}» sin decir cuándo empieza cada plan`,
-    ).toBe(true);
+    expect(marcada).toMatch(/Empezar a los 25 con 100 €\/mes/);
+    const exp = norm(await explicacion(page).innerText());
+    expect(exp).toContain('15.528 €');
+    expect(exp).toContain('13.601 €');
   });
 
   /**
