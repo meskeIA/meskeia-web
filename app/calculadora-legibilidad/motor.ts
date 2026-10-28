@@ -28,9 +28,16 @@ const DIPTONGOS = [
   'iá', 'ié', 'ió', 'uá', 'ué', 'uó',
 ];
 
-/** Sílabas de una palabra en español: cada vocal abre una, salvo la segunda de un diptongo. */
+/**
+ * Sílabas de una palabra en español: cada vocal abre una, salvo la segunda de un diptongo.
+ *
+ * La «u» de que, qui, gue y gui no suena y no es vocal (hallazgo 3594): «quiero», «aquí»,
+ * «quien», «siguiente» o «química» sumaban una sílaba de más, y el resaltado de S0218 marcaba
+ * como de 4 sílabas palabras de 3. Se retira antes de contar; la de «güe», «güi» (con diéresis)
+ * sí suena y se queda.
+ */
 export function contarSilabas(palabra: string): number {
-  const p = palabra.toLowerCase().trim();
+  const p = palabra.toLowerCase().trim().replace(/([qg])u([eiéí])/g, '$1$2');
   if (!p) return 0;
   let silabas = 0;
   let i = 0;
@@ -108,29 +115,91 @@ export interface Analisis {
   palabrasMuyLargas: PalabraMarcada[];
 }
 
-/** Palabras como las cuenta la fórmula: lo que separan los espacios (incluye cifras). */
+/**
+ * Palabras como las cuenta la fórmula: lo que separan los espacios (incluye cifras), siempre que
+ * lleve al menos una letra o una cifra. La raya de un inciso o de un diálogo (—), el guion suelto
+ * o la viñeta de una lista no son palabras: cada uno sumaba una de 0 sílabas y subía la
+ * puntuación (hallazgo 3593: «Casa perro — mesa gato — …» daba 11 palabras y «Muy fácil»).
+ */
 function contarPalabras(texto: string): number {
-  return texto.trim().split(/\s+/).filter((p) => p.length > 0).length;
+  return texto.trim().split(/\s+/).filter((p) => /[\p{L}\p{N}]/u.test(p)).length;
 }
 
-/** Analiza el texto entero. Devuelve null si no hay ni una palabra. */
+/**
+ * Abreviaturas corrientes cuyo punto no cierra frase aunque detrás venga mayúscula («el Sr.
+ * García», «la Dra. Pérez», «EE. UU.»). Una inicial sola («J. R. R. Tolkien») tampoco. «etc.» no
+ * está: al final de una frase es lo normal.
+ */
+const ABREVIATURAS = new Set([
+  'sr', 'sra', 'srta', 'sres', 'sras', 'dr', 'dra', 'dres', 'd', 'dña', 'ud', 'uds', 'vd', 'vds',
+  'lic', 'ing', 'arq', 'prof', 'profa', 'pág', 'págs', 'núm', 'nº', 'art', 'arts', 'cap', 'fig',
+  'vol', 'ee', 'uu', 'av', 'avda', 'tel', 'aprox', 'ej', 'vs', 'cf', 'pp', 'mr', 'mrs', 'st',
+]);
+
+/**
+ * ¿Cierra frase el signo de la posición `i`? (hallazgo 3592). El recuento cortaba en CUALQUIER
+ * punto: el de millar de «3.500» (el formato español que usa la propia app), el de una
+ * abreviatura («Sr.», «EE. UU.») o el de una URL; y los puntos suspensivos tipográficos «…»
+ * (U+2026, los de Word y los teclados del móvil) no cortaban, cuando «...» sí.
+ *   · ! y ? cierran siempre.
+ *   · . y … cierran si detrás viene el final del texto, o blancos y algo que no sea minúscula
+ *     ni cifra (una minúscula sigue la misma frase: «… casa perro», «etc. y»), y nunca pegados
+ *     a la palabra siguiente («3.500», «www.ejemplo.com»). El punto, además, no cierra tras una
+ *     abreviatura de ABREVIATURAS ni tras una inicial sola.
+ */
+function cierraFrase(texto: string, i: number): boolean {
+  const c = texto[i];
+  if (c === '!' || c === '?') return true;
+  if (c !== '.' && c !== '…') return false;
+  let j = i + 1;
+  while (j < texto.length && (texto[j] === '.' || texto[j] === '…')) j++;
+  if (j < texto.length) {
+    if (!/\s/.test(texto[j])) return /[«»"“”’')\]]/.test(texto[j]);
+    while (j < texto.length && /\s/.test(texto[j])) j++;
+    if (j < texto.length && /[\p{Ll}\p{N}]/u.test(texto[j])) return false;
+  }
+  if (c === '.' && (i === 0 || texto[i - 1] !== '.')) {
+    const palabra = texto.slice(0, i).match(/[\p{L}º]+$/u)?.[0] ?? '';
+    if (palabra && (palabra.length === 1 || ABREVIATURAS.has(palabra.toLowerCase()))) return false;
+  }
+  return true;
+}
+
+/** Frases del texto como [inicio, fin), con su puntuación de cierre incluida. */
+function trocearFrases(texto: string): { inicio: number; fin: number }[] {
+  const frases: { inicio: number; fin: number }[] = [];
+  let desde = 0;
+  const cerrar = (hasta: number) => {
+    const trozo = texto.slice(desde, hasta);
+    if (/[\p{L}\p{N}]/u.test(trozo)) {
+      const inicio = desde + (trozo.length - trozo.trimStart().length);
+      frases.push({ inicio, fin: desde + trozo.trimEnd().length });
+    }
+    desde = hasta;
+  };
+  for (let i = 0; i < texto.length; i++) {
+    if (!cierraFrase(texto, i)) continue;
+    // La puntuación de cierre seguida («?!», «...», «.»») pertenece a la frase
+    let fin = i + 1;
+    while (fin < texto.length && /[.!?…«»"“”’')\]]/.test(texto[fin])) fin++;
+    cerrar(fin);
+    i = fin - 1;
+  }
+  cerrar(texto.length);
+  return frases;
+}
+
+/**
+ * Analiza el texto entero. Devuelve null si no hay ni una palabra, o si no hay ni una letra:
+ * con 0 sílabas la fórmula da más de 200, se acotaba a 100 y salía «Muy fácil» un texto como
+ * «2024 2025 2026» que no tiene nada que leer (hallazgo 3596).
+ */
 export function analizarTexto(texto: string): Analisis | null {
   const palabras = contarPalabras(texto);
-  if (palabras === 0) return null;
+  if (palabras === 0 || !/\p{L}/u.test(texto)) return null;
 
-  // Frases: lo que queda entre signos de cierre (. ! ?), igual que el recuento de siempre
-  const frases: { inicio: number; fin: number; palabras: number }[] = [];
-  for (const m of texto.matchAll(/[^.!?]+/g)) {
-    const trozo = m[0];
-    if (trozo.trim().length === 0) continue;
-    const inicio = (m.index ?? 0) + (trozo.length - trozo.trimStart().length);
-    let fin = (m.index ?? 0) + trozo.trimEnd().length;
-    // La puntuación de cierre pertenece a la frase (solo si va pegada al final)
-    if (fin === (m.index ?? 0) + trozo.length) {
-      while (fin < texto.length && /[.!?]/.test(texto[fin])) fin++;
-    }
-    frases.push({ inicio, fin, palabras: contarPalabras(trozo) });
-  }
+  // Frases: lo que queda entre signos que de verdad cierran frase (cierraFrase, hallazgo 3592)
+  const frases = trocearFrases(texto).map((f) => ({ ...f, palabras: contarPalabras(texto.slice(f.inicio, f.fin)) }));
   const oraciones = Math.max(frases.length, 1);
 
   // Palabras para las sílabas: tiradas de letras, como hacía obtenerPalabras()

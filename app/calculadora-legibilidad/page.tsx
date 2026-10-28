@@ -16,6 +16,7 @@ import {
   SILABAS_PALABRA_MUY_LARGA,
   type Analisis,
 } from './motor';
+import { PREGUNTAS_FRECUENTES } from './metadata';
 
 /**
  * Lo que se guarda de una versión del texto para compararla con la siguiente (S0218). El
@@ -44,10 +45,13 @@ export default function CalculadoraLegibilidadPage() {
   const [texto, setTexto] = useState('');
   const [guardada, setGuardada] = useState<VersionGuardada | null>(null);
 
-  // Se analiza a partir de 20 caracteres, como siempre
+  // Se analiza a partir de 20 caracteres, sin contar los blancos de los extremos. Era «> 20»
+  // (21) con el aviso «al menos 20» y un contador que contaba los blancos (hallazgo 3598).
+  const caracteres = texto.trim().length;
+  const bastante = caracteres >= 20;
   const analisis = useMemo(
-    () => (texto.trim().length > 20 ? analizarTexto(texto) : null),
-    [texto],
+    () => (bastante ? analizarTexto(texto) : null),
+    [texto, bastante],
   );
   const tramos = useMemo(
     () => (analisis ? marcarTexto(texto, analisis) : []),
@@ -104,10 +108,12 @@ Es importante que la sociedad se prepare para estos cambios. La educación debe 
       <div className={styles.mainContent}>
         {/* Panel de entrada */}
         <div className={styles.inputPanel}>
-          <h2 className={styles.panelTitle}>Tu texto</h2>
+          <h2 className={styles.panelTitle} id="titulo-tu-texto">Tu texto</h2>
 
           <div className={styles.inputGroup}>
+            {/* Con nombre propio (hallazgo 3601): el del placeholder desaparece al escribir */}
             <textarea
+              aria-labelledby="titulo-tu-texto"
               className={styles.textarea}
               placeholder="Pega aquí tu texto para analizar su legibilidad... (mínimo 20 caracteres)"
               value={texto}
@@ -115,11 +121,17 @@ Es importante que la sociedad se prepare para estos cambios. La educación debe 
               rows={12}
             />
             <div className={styles.charInfo}>
-              <span>{texto.length} caracteres</span>
+              <span>{caracteres} caracteres</span>
               <button
                 type="button"
                 className={styles.ejemploBtn}
-                onClick={() => setTexto(textoEjemplo)}
+                onClick={() => {
+                  // No pisa sin preguntar lo que el usuario ha escrito: el valor lo pone React y
+                  // Ctrl+Z no lo devuelve, y en el móvil no hay forma de deshacer (hallazgo 3597)
+                  const propio = texto.trim() !== '' && texto !== textoEjemplo;
+                  if (propio && !window.confirm('¿Sustituir tu texto por el ejemplo? Lo que has escrito se perderá.')) return;
+                  setTexto(textoEjemplo);
+                }}
               >
                 Cargar ejemplo
               </button>
@@ -136,7 +148,10 @@ Es importante que la sociedad se prepare para estos cambios. La educación debe 
               {/* Score principal */}
               <div className={`${styles.mainScore} ${getScoreColor(analisis.fleschSzigriszt)}`}>
                 <div className={styles.scoreCircle}>
-                  <span className={styles.scoreValue}>{Math.round(analisis.fleschSzigriszt)}</span>
+                  {/* Truncada, no redondeada (hallazgo 3595): con 54,735 el círculo decía «55» al
+                      lado de «Algo difícil» y «Por debajo de 55». Los tramos INFLESZ van en
+                      enteros, así que la parte entera cae siempre en el mismo tramo que la cifra. */}
+                  <span className={styles.scoreValue}>{Math.floor(analisis.fleschSzigriszt)}</span>
                 </div>
                 <div className={styles.scoreDetails}>
                   <span className={styles.scoreLabel}>{analisis.dificultad}</span>
@@ -191,13 +206,16 @@ Es importante que la sociedad se prepare para estos cambios. La educación debe 
                 <div className={styles.indiceItem}>
                   <div className={styles.indiceHeader}>
                     <span className={styles.indiceName}>Fernández Huerta</span>
-                    <span className={`${styles.indiceScore} ${getScoreColor(analisis.fernandezHuerta)}`}>
+                    {/* Sin los colores de INFLESZ (hallazgo 3604): esa escala es la de la
+                        puntuación Flesch-Szigriszt, y en Fernández Huerta el azul de «Normal»
+                        sugería haber pasado un umbral de 55 que no es el suyo. */}
+                    <span className={`${styles.indiceScore} ${styles.sinEscala}`}>
                       {formatNumber(analisis.fernandezHuerta, 1)}
                     </span>
                   </div>
                   <div className={styles.indiceBar}>
                     <div
-                      className={`${styles.indiceProgress} ${getScoreColor(analisis.fernandezHuerta)}`}
+                      className={`${styles.indiceProgress} ${styles.sinEscala}`}
                       style={{ width: `${analisis.fernandezHuerta}%` }}
                     />
                   </div>
@@ -224,7 +242,7 @@ Es importante que la sociedad se prepare para estos cambios. La educación debe 
                 <div className={styles.extraItem}>
                   <span className={styles.extraLabel}>Palabras largas (3+ sílabas)</span>
                   <span className={styles.extraValue}>
-                    {analisis.palabrasLargas} ({formatNumber(analisis.porcentajeLargas, 1)}%)
+                    {analisis.palabrasLargas} ({formatNumber(analisis.porcentajeLargas, 1)}{' '}%)
                   </span>
                 </div>
               </div>
@@ -237,13 +255,19 @@ Es importante que la sociedad se prepare para estos cambios. La educación debe 
                     <li>Tus oraciones son largas (promedio {formatNumber(analisis.promedioPalabrasOracion, 0)}). Intenta dividirlas para mejorar la legibilidad.</li>
                   )}
                   {analisis.porcentajeLargas > 30 && (
-                    <li>Tienes muchas palabras largas ({formatNumber(analisis.porcentajeLargas, 0)}%). Usa sinónimos más cortos cuando sea posible.</li>
+                    <li>Tienes muchas palabras largas ({formatNumber(analisis.porcentajeLargas, 0)}{' '}%). Usa sinónimos más cortos cuando sea posible.</li>
                   )}
                   {analisis.fleschSzigriszt < 55 && (
                     <li>El texto puede ser difícil para lectores generales. Simplifica si tu audiencia no es especializada.</li>
                   )}
                   {analisis.fleschSzigriszt >= 65 && (
                     <li>Excelente legibilidad. Tu texto es accesible para la mayoría de lectores.</li>
+                  )}
+                  {/* En el tramo «Normal» (55-65), sin frases largas ni muchas palabras largas,
+                      ninguna de las de arriba aplicaba y la caja salía vacía (hallazgo 3599) */}
+                  {analisis.fleschSzigriszt >= 55 && analisis.fleschSzigriszt < 65 &&
+                    analisis.promedioPalabrasOracion <= 25 && analisis.porcentajeLargas <= 30 && (
+                    <li>El texto está en el tramo «Normal» de INFLESZ. Para acercarlo a «Bastante fácil», parte las frases más largas o cambia alguna palabra larga por otra más corta.</li>
                   )}
                 </ul>
               </div>
@@ -335,7 +359,13 @@ Es importante que la sociedad se prepare para estos cambios. La educación debe 
           ) : (
             <div className={styles.placeholder}>
               <span className={styles.placeholderIcon} aria-hidden="true">📖</span>
-              <p>Escribe o pega un texto de al menos 20 caracteres</p>
+              {/* Un texto sin una letra (solo cifras o signos) no tiene nada que leer: la fórmula
+                  daba más de 200, acotado a 100 «Muy fácil» (hallazgo 3596) */}
+              <p>
+                {bastante
+                  ? 'El texto no tiene palabras que leer: la fórmula necesita letras, no solo cifras o signos'
+                  : 'Escribe o pega un texto de al menos 20 caracteres'}
+              </p>
             </div>
           )}
         </div>
@@ -487,7 +517,7 @@ Es importante que la sociedad se prepare para estos cambios. La educación debe 
             <div className={styles.formulaCard}>
               <h4>Índice Fernández Huerta</h4>
               <p className={styles.formula}>
-                P = 206.84 - 60 × (sílabas/palabras) - 1.02 × (palabras/oraciones)
+                P = 206,84 − 60 × (sílabas/palabras) − 1,02 × (palabras/oraciones)
               </p>
               <p>
                 Desarrollado específicamente para el español por José Fernández Huerta.
@@ -510,29 +540,37 @@ Es importante que la sociedad se prepare para estos cambios. La educación debe 
             </ul>
           </section>
 
-          {/* Sección original: legibilidad por tipo de contenido */}
+          {/* Puntuaciones de referencia (hallazgo 3603). Esta tarjeta daba rangos por tipo de
+              contenido sin fuente (Blog 60-70, Marketing 65-80 «Muy fácil», Legal / Médico 20-40)
+              y con otra escala que la de la app: 65-80 es «Bastante fácil» y 20-40, «Muy difícil»,
+              en la misma página que el umbral de 55 para salud. Ahora son las medias medidas en el
+              estudio que validó INFLESZ (Barrio-Cantalejo y otros, 2008), las de la guía de arriba. */}
           <section className={styles.eduSection}>
-            <h2>Legibilidad recomendada por tipo de contenido</h2>
+            <h2>Puntuaciones medidas en textos reales en español</h2>
+            <p>
+              No hay una cifra oficial por tipo de texto. Como referencia, estas son las medias que
+              midieron Barrio-Cantalejo y otros (2008) al validar la escala INFLESZ.
+            </p>
             <div className={styles.contentTypeGrid}>
               <div className={styles.contentTypeCard}>
-                <h4>Blog / Noticias</h4>
-                <span className={styles.recommendedScore}>60-70</span>
-                <p>Accesible para público general</p>
+                <h4>Libros escolares</h4>
+                <span className={styles.recommendedScore}>67,4</span>
+                <p>Media del estudio · Bastante fácil</p>
               </div>
               <div className={styles.contentTypeCard}>
-                <h4>Marketing / Ventas</h4>
-                <span className={styles.recommendedScore}>65-80</span>
-                <p>Muy fácil de leer y persuasivo</p>
+                <h4>Prensa de quiosco</h4>
+                <span className={styles.recommendedScore}>60</span>
+                <p>Media del estudio · Normal</p>
               </div>
               <div className={styles.contentTypeCard}>
-                <h4>Académico</h4>
-                <span className={styles.recommendedScore}>30-50</span>
-                <p>Especializado pero claro</p>
+                <h4>Revistas científicas</h4>
+                <span className={styles.recommendedScore}>37,9</span>
+                <p>Media del estudio · Muy difícil</p>
               </div>
               <div className={styles.contentTypeCard}>
-                <h4>Legal / Médico</h4>
-                <span className={styles.recommendedScore}>20-40</span>
-                <p>Técnico por necesidad</p>
+                <h4>Textos de salud para pacientes</h4>
+                <span className={styles.recommendedScore}>55 o más</span>
+                <p>Umbral que proponen los autores</p>
               </div>
             </div>
           </section>
@@ -550,7 +588,7 @@ Es importante que la sociedad se prepare para estos cambios. La educación debe 
                     <th>Escala</th>
                     <th>Idioma optimizado</th>
                     <th>Uso recomendado</th>
-                    <th>Puntuación ideal web</th>
+                    <th>Referencia</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -568,7 +606,7 @@ Es importante que la sociedad se prepare para estos cambios. La educación debe 
                     <td>0–100</td>
                     <td>Español</td>
                     <td>Textos web, blogs, noticias en español</td>
-                    <td>60–70</td>
+                    <td>Se lee con INFLESZ (55 para salud)</td>
                   </tr>
                   <tr>
                     <td><strong>Fernández-Huerta</strong></td>
@@ -576,7 +614,7 @@ Es importante que la sociedad se prepare para estos cambios. La educación debe 
                     <td>0–100</td>
                     <td>Español</td>
                     <td>Artículos periodísticos, divulgación científica</td>
-                    <td>60–75</td>
+                    <td>Sin tramos propios en esta app</td>
                   </tr>
                   <tr>
                     <td><strong>INFLESZ</strong></td>
@@ -620,10 +658,14 @@ Es importante que la sociedad se prepare para estos cambios. La educación debe 
                 </div>
                 <p>Optimiza artículos de blog y páginas de producto para mejorar el SEO y reducir la tasa de rebote.</p>
                 <div className={styles.escenarioExample}>
-                  <strong>Ejemplo real:</strong> Un artículo con Flesch-Szigriszt de 65 retiene un 23% más de lectores que uno con puntuación de 40, según estudios de Nielsen Norman.
+                  {/* Decía «un artículo con Flesch-Szigriszt de 65 retiene un 23% más de lectores
+                      que uno de 40, según estudios de Nielsen Norman», sin título, año ni enlace,
+                      y con un índice que Nielsen Norman no usa (hallazgo 3602, regla 1 de
+                      neutralidad). La cifra que queda es del estudio de INFLESZ. */}
+                  <strong>Ejemplo real:</strong> En el estudio que validó la escala INFLESZ, la prensa de quiosco puntuó de media 60 y los libros escolares, 67,4.
                 </div>
                 <div className={styles.escenarioTip}>
-                  Meta: puntuación entre 60 y 70. Frases de 15-18 palabras de media.
+                  Meta: para público general, los tramos «Normal» (55-64) o «Bastante fácil» (65-79). Revisar primero las frases que la app señala.
                 </div>
               </div>
 
@@ -634,10 +676,12 @@ Es importante que la sociedad se prepare para estos cambios. La educación debe 
                 </div>
                 <p>Verifica que sus artículos son comprensibles para una audiencia amplia sin perder rigor informativo.</p>
                 <div className={styles.escenarioExample}>
-                  <strong>Ejemplo real:</strong> El Libro de Estilo del País recomienda frases de no más de 20 palabras y párrafos de 3-4 líneas para mejorar la lectura en móvil.
+                  {/* Atribuía al Libro de Estilo de El País una cifra que no se pudo anclar
+                      (hallazgo 3606). Este ejemplo sale de la propia fórmula: P/F resta tal cual. */}
+                  <strong>Ejemplo:</strong> Con las mismas palabras, una noticia con frases de 15 palabras y otra con frases de 30 se separan 15 puntos de Flesch-Szigriszt: la longitud media de la frase resta tal cual.
                 </div>
                 <div className={styles.escenarioTip}>
-                  Meta: Fernández-Huerta superior a 60. Evitar subordinadas encadenadas.
+                  Meta: revisar primero las frases que la app señala. Evitar subordinadas encadenadas.
                 </div>
               </div>
 
@@ -677,47 +721,13 @@ Es importante que la sociedad se prepare para estos cambios. La educación debe 
             <h2>Preguntas frecuentes sobre legibilidad</h2>
             <div className={styles.faqList} role="list">
 
-              <div className={styles.faqItem} role="listitem">
-                <p className={styles.faqQuestion}>¿Qué mide exactamente la legibilidad?</p>
-                <p className={styles.faqAnswer}>La legibilidad mide la facilidad con la que un lector medio puede entender un texto escrito. Se calcula principalmente a partir de la longitud de las frases (palabras por oración) y la complejidad de las palabras (sílabas por palabra). No mide la calidad del contenido ni su precisión, sino la accesibilidad lingüística.</p>
-              </div>
-
-              <div className={styles.faqItem} role="listitem">
-                <p className={styles.faqQuestion}>¿Cuál es la diferencia entre Flesch y Fernández-Huerta?</p>
-                <p className={styles.faqAnswer}>La fórmula original de Flesch fue diseñada para el inglés, que tiene palabras más cortas que el español. Fernández-Huerta ajustó el coeficiente de sílabas de 84,6 a 60 para compensar la mayor longitud silábica del español. Esto hace que Fernández-Huerta sea más precisa para textos en castellano. Flesch-Szigriszt usa un coeficiente intermedio de 62,3.</p>
-              </div>
-
-              <div className={styles.faqItem} role="listitem">
-                <p className={styles.faqQuestion}>¿Qué puntuación es ideal para cada tipo de texto?</p>
-                <p className={styles.faqAnswer}>Para contenido web y blogs: 60-70 (fácil). Para textos de marketing y redes sociales: 65-80 (muy fácil). Para artículos periodísticos: 55-65. Para divulgación científica: 45-60. Para textos académicos: 30-50. Para documentos legales o médicos especializados: 20-40. Cuanto más amplia sea tu audiencia, más alta debe ser la puntuación.</p>
-                <div className={styles.faqTip}>Regla práctica: si publicas en internet, apunta a una puntuación mínima de 60.</div>
-              </div>
-
-              <div className={styles.faqItem} role="listitem">
-                <p className={styles.faqQuestion}>¿Afecta la legibilidad al posicionamiento SEO?</p>
-                <p className={styles.faqAnswer}>Google no usa directamente los índices de legibilidad como factor de ranking, pero la legibilidad impacta métricas que sí influyen en el SEO: tiempo de permanencia, tasa de rebote y porcentaje de scroll. Textos más legibles generan mejores señales de experiencia de usuario, lo que indirectamente mejora el posicionamiento orgánico.</p>
-              </div>
-
-              <div className={styles.faqItem} role="listitem">
-                <p className={styles.faqQuestion}>¿Cómo mejorar la legibilidad sin perder rigor?</p>
-                <p className={styles.faqAnswer}>El rigor está en los datos y argumentos, no en la complejidad de las frases. Puedes: usar frases cortas que expliquen una sola idea, definir los términos técnicos la primera vez que aparecen, usar listas para información enumerativa, incluir ejemplos concretos y evitar las nominalizaciones (usar &quot;analizar&quot; en vez de &quot;el análisis de&quot;).</p>
-              </div>
-
-              <div className={styles.faqItem} role="listitem">
-                <p className={styles.faqQuestion}>¿Cuál es la longitud óptima de frases y párrafos en web?</p>
-                <p className={styles.faqAnswer}>Para web, la longitud ideal de una frase es de 15 a 20 palabras. Frases de más de 25 palabras empiezan a dificultar la comprensión. Los párrafos deberían tener entre 3 y 4 líneas en pantalla (50-80 palabras). En móvil, párrafos de 2-3 líneas son preferibles para evitar bloques de texto compactos.</p>
-                <div className={styles.faqTip}>En móvil, reduce la longitud de párrafos un 20% respecto al desktop.</div>
-              </div>
-
-              <div className={styles.faqItem} role="listitem">
-                <p className={styles.faqQuestion}>¿Qué relación hay entre legibilidad y accesibilidad WCAG?</p>
-                <p className={styles.faqAnswer}>Las Pautas de Accesibilidad al Contenido Web (WCAG 2.1) incluyen el criterio 3.1.5 (Nivel AAA) que recomienda ofrecer versiones simplificadas cuando el texto requiera más de 9 años de educación para comprenderse. Una puntuación Flesch-Szigriszt superior a 65 generalmente cumple con este umbral. La legibilidad también beneficia a personas con dislexia, TDAH o dificultades cognitivas.</p>
-              </div>
-
-              <div className={styles.faqItem} role="listitem">
-                <p className={styles.faqQuestion}>¿Qué herramientas complementan el análisis de legibilidad?</p>
-                <p className={styles.faqAnswer}>Para optimizar textos de forma integral: el corrector de la RAE para ortografía, Hemingway App para detectar frases pasivas, LanguageTool para gramática, Google Search Console para medir el impacto en SEO y la función de lectura inmersiva de Microsoft Word para visualizar el texto como lo vería un lector con dislexia.</p>
-              </div>
+              {/* Fuente única con el FAQPage: PREGUNTAS_FRECUENTES de metadata.ts (hallazgo 3605) */}
+              {PREGUNTAS_FRECUENTES.map((f) => (
+                <div key={f.question} className={styles.faqItem} role="listitem">
+                  <p className={styles.faqQuestion}>{f.question}</p>
+                  <p className={styles.faqAnswer}>{f.answer}</p>
+                </div>
+              ))}
 
             </div>
           </section>
@@ -748,7 +758,7 @@ Es importante que la sociedad se prepare para estos cambios. La educación debe 
                 <span className={styles.stepNumber}>3</span>
                 <div className={styles.stepContent}>
                   <strong>Sustituye palabras complejas por sinónimos más cortos</strong>
-                  <p>Palabras como &quot;implementar&quot; → &quot;aplicar&quot;, &quot;utilizar&quot; → &quot;usar&quot;, &quot;realizar&quot; → &quot;hacer&quot;. El objetivo es que el 92% de las palabras tengan 2 sílabas o menos (límite Gunning Fog: máximo 8% de palabras difíciles).</p>
+                  <p>Palabras como &quot;implementar&quot; → &quot;aplicar&quot;, &quot;utilizar&quot; → &quot;usar&quot;, &quot;realizar&quot; → &quot;hacer&quot;. El objetivo es que el 92{' '}% de las palabras tengan 2 sílabas o menos (límite Gunning Fog: máximo 8{' '}% de palabras difíciles).</p>
                 </div>
               </li>
 
@@ -772,7 +782,7 @@ Es importante que la sociedad se prepare para estos cambios. La educación debe 
                 <span className={styles.stepNumber}>6</span>
                 <div className={styles.stepContent}>
                   <strong>Vuelve a analizar y compara</strong>
-                  <p>Pega la versión revisada en la calculadora. Compara la nueva puntuación con la línea base. Repite los pasos 2-5 hasta alcanzar tu puntuación objetivo (mínimo 60 para contenido web de audiencia amplia).</p>
+                  <p>Pega la versión revisada en la calculadora. Compara la nueva puntuación con la línea base. Repite los pasos 2-5 hasta alcanzar tu puntuación objetivo (como referencia, 55 es el umbral de INFLESZ para textos de salud dirigidos a pacientes).</p>
                 </div>
               </li>
 
@@ -826,7 +836,9 @@ Es importante que la sociedad se prepare para estos cambios. La educación debe 
               <div className={styles.tipCard}>
                 <span className={styles.tipIcon} aria-hidden="true">🔢</span>
                 <h3>Datos concretos como referencia</h3>
-                <p>En lugar de &quot;muchos estudios muestran que...&quot;, escribe &quot;3 de cada 4 usuarios abandona un artículo con frases de más de 30 palabras&quot;. Los datos concretos anclan el texto, aumentan la credibilidad y, al ser frases más cortas, mejoran la puntuación de legibilidad.</p>
+                {/* El ejemplo aconsejaba escribir «3 de cada 4 usuarios abandona…», un dato sin
+                    respaldo (hallazgo 3606): justo lo contrario de lo que pide la tarjeta. */}
+                <p>En lugar de &quot;muchos estudios muestran que...&quot;, cita el dato con su origen: quién lo midió, cuándo y sobre qué. Un dato concreto con su fuente ancla el texto y le da credibilidad.</p>
               </div>
 
             </div>
@@ -845,7 +857,7 @@ Es importante que la sociedad se prepare para estos cambios. La educación debe 
                   <strong>Frases demasiado largas:</strong> Frases de más de 30 palabras bajan la puntuación Flesch en 10-15 puntos. Una sola frase de 50 palabras puede arrastrar todo el párrafo por debajo del umbral legible.
                 </li>
                 <li>
-                  <strong>Párrafos monolíticos:</strong> Bloques de texto de más de 150 palabras sin punto y aparte generan abandono inmediato en móvil (el 65% del tráfico web en España llega desde dispositivos móviles).
+                  <strong>Párrafos monolíticos:</strong> Bloques de texto de más de 150 palabras sin punto y aparte se hacen muy pesados en el móvil, donde un bloque así ocupa varias pantallas.
                 </li>
                 <li>
                   <strong>Vocabulario técnico innecesario:</strong> Usar jerga especializada sin contexto es el error más común en webs corporativas. Si el término no es imprescindible, sustitúyelo. Si lo es, defínelo la primera vez que aparece.

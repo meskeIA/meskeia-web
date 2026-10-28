@@ -31,7 +31,9 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  *   IFSZ = 206,835 − 62,3 × (sílabas/palabras) − palabras/frases (Barrio-Cantalejo 2008)
  *   Fernández Huerta = 206,84 − 60 × (sílabas/palabras) − 1,02 × (palabras/frases); la app no
  *   cita la publicación de Fernández Huerta, así que solo se comprueba que aplica su fórmula.
- * Los que llevan test.fail() son hallazgos ABIERTOS de esta inspección: cada uno dice qué mide.
+ * Los que llevaban test.fail() eran hallazgos ABIERTOS de esta inspección; REPARADOS el
+ * 28/10/2026 (3592-3608), ya sin test.fail(). El título conserva «ABIERTO» como rastro del caso:
+ * cada uno sigue diciendo qué mide, y ahora pasa.
  */
 
 const AREA = 'textarea';
@@ -264,7 +266,6 @@ test.describe('calculadora-legibilidad · Inspector 28/10/2026', () => {
     // «Casa perro mesa gato» = 20 caracteres. El aviso promete el análisis desde 20 y el
     // motor lo da desde 21 (texto.trim().length > 20). Pasa si se analiza o si el aviso
     // deja de decir «al menos 20».
-    test.fail();
     const panel = await analizar(page, 'Casa perro mesa gato');
     await expect(page.locator('[class*="charInfo"]')).toContainText('20 caracteres');
     await expect(panel).not.toContainText('al menos 20 caracteres');
@@ -274,7 +275,6 @@ test.describe('calculadora-legibilidad · Inspector 28/10/2026', () => {
     // Frases de 27 y 28 palabras de dos sílabas: P = 55 · F = 2 · S = 110
     //   IFSZ = 206,835 − 124,6 − 27,5 = 54,735 → «Algo difícil», «Por debajo de 55»
     // El círculo pinta Math.round(54,735) = «55» al lado de «Por debajo de 55».
-    test.fail();
     await analizar(page, `${fraseDe(0, 27)} ${fraseDe(7, 28)}`);
     await expect(indice(page, 'Flesch-Szigriszt')).toContainText('54,7');
     await expect(page.locator('[class*="scoreNivel"]')).toContainText('Por debajo de 55');
@@ -286,7 +286,6 @@ test.describe('calculadora-legibilidad · Inspector 28/10/2026', () => {
     // (la cifra cuenta como palabra sin sílabas, el criterio declarado del motor)
     //   IFSZ = 206,835 − 62,3 × 1,92 − 25 = 62,219 → «62,2», igual que con «3500»
     // La app corta en el punto del millar: F = 2 → 74,719 → «74,7».
-    test.fail();
     await analizar(page, `${conMayuscula(relleno(0, 12))} 3.500 ${relleno(2, 12)}.`);
     await expect(metrica(page, 'Oraciones')).toHaveText('1Oraciones');
     await expect(indice(page, 'Flesch-Szigriszt')).toContainText('62,2');
@@ -296,7 +295,6 @@ test.describe('calculadora-legibilidad · Inspector 28/10/2026', () => {
     // «Casa perro — mesa gato — libro verde — lado mano.» tiene 8 palabras, como su versión
     // con comas: S = 16 · F = 1 → IFSZ = 206,835 − 124,6 − 8 = 74,235 → «74,2».
     // La app cuenta las 3 rayas como palabras: P = 11 → 100,0 «Muy fácil».
-    test.fail();
     await analizar(page, 'Casa perro — mesa gato — libro verde — lado mano.');
     await expect(metrica(page, 'Palabras')).toHaveText('8Palabras');
     await expect(indice(page, 'Flesch-Szigriszt')).toContainText('74,2');
@@ -305,7 +303,6 @@ test.describe('calculadora-legibilidad · Inspector 28/10/2026', () => {
   test('CASO 7f (límite) ABIERTO: la «u» muda de qu/gu se cuenta como vocal', async ({ page }) => {
     // quie-ro(2) que(1) ven-gas(2) a-quí(2) con(1) quien(1) quie-ras(2) = 11 sílabas.
     // La app da quiero 3, aquí 3, quien 2, quieras 3 → 15.
-    test.fail();
     await analizar(page, 'Quiero que vengas aquí con quien quieras.');
     await expect(metrica(page, 'Sílabas')).toHaveText('11Sílabas');
   });
@@ -313,7 +310,6 @@ test.describe('calculadora-legibilidad · Inspector 28/10/2026', () => {
   test('CASO 7g (S0218) ABIERTO: el resaltado señala como de 4 sílabas palabras que tienen 3', async ({ page }) => {
     // si-guien-tes, a-lum-nos, re-quie-ren, quí-mi-ca: ninguna llega a 4 sílabas.
     // La app marca siguientes, requieren y química (mismo defecto que el CASO 7f).
-    test.fail();
     await analizar(page, 'Los siguientes alumnos requieren química.');
     const seccion = page.locator('section[aria-labelledby="titulo-dificultad"]');
     await expect(seccion).toContainText('no hay palabras de 4 sílabas o más');
@@ -322,7 +318,6 @@ test.describe('calculadora-legibilidad · Inspector 28/10/2026', () => {
   test('CASO 8 (rechazo) ABIERTO: un texto sin una sola letra sale «Muy fácil»', async ({ page }) => {
     // «2024 2025 2026 2027 2028»: 0 sílabas, nada que leer. La app da 100,0, «Muy fácil» y
     // «Excelente legibilidad». Debe rechazarlo o avisar, no puntuarlo.
-    test.fail();
     const panel = await analizar(page, '2024 2025 2026 2027 2028');
     await expect(panel).not.toContainText('Excelente legibilidad');
     await expect(panel).not.toContainText('Muy fácil');
@@ -331,7 +326,6 @@ test.describe('calculadora-legibilidad · Inspector 28/10/2026', () => {
   test('CASO 9 ABIERTO: «Cargar ejemplo» sustituye el texto escrito sin preguntar', async ({ page }) => {
     // Con texto propio en la caja, el botón lo borra sin confirmación y Ctrl+Z no lo devuelve.
     // Pasa si pregunta (aquí se cancela) o si no pisa el texto.
-    test.fail();
     page.on('dialog', (d) => void d.dismiss());
     const propio = 'Este es mi texto propio, escrito con calma durante un buen rato.';
     await analizar(page, propio);
@@ -342,7 +336,6 @@ test.describe('calculadora-legibilidad · Inspector 28/10/2026', () => {
   test('ABIERTO: las insignias de los índices no llegan a 4,5:1 en claro', async ({ page }) => {
     // Texto de 14,4 px en negrita (no es «texto grande»): exige 4,5:1. Con el CASO 6, la
     // insignia naranja de Flesch-Szigriszt («49,8») da 1,84:1 (#f59e0b sobre su tinte al 20 %).
-    test.fail();
     await analizar(page, CASO_6);
     const insignia = indice(page, 'Flesch-Szigriszt').locator('[class*="indiceScore"]');
     expect(await contraste(insignia)).toBeGreaterThanOrEqual(4.5);
@@ -352,7 +345,6 @@ test.describe('calculadora-legibilidad · Inspector 28/10/2026', () => {
     // Una frase de 25 palabras de dos sílabas: IFSZ = 206,835 − 124,6 − 25 = 57,235 → «Normal»;
     // ni frases de más de 25 de media, ni más del 30 % de palabras largas, ni < 55 ni ≥ 65:
     // ninguna de las cuatro recomendaciones aplica y la caja queda con el título y nada debajo.
-    test.fail();
     await analizar(page, fraseDe(0, 25));
     await expect(indice(page, 'Flesch-Szigriszt')).toContainText('57,2');
     const caja = page.locator('[class*="sugerencias"]');
@@ -361,7 +353,6 @@ test.describe('calculadora-legibilidad · Inspector 28/10/2026', () => {
   });
 
   test('ABIERTO: el área de texto no tiene etiqueta, solo el placeholder', async ({ page }) => {
-    test.fail();
     const etiquetada = await page
       .locator(AREA)
       .evaluate((el: HTMLTextAreaElement) =>
@@ -372,7 +363,6 @@ test.describe('calculadora-legibilidad · Inspector 28/10/2026', () => {
 
   test('ABIERTO: el porcentaje de palabras largas va pegado al «%»', async ({ page }) => {
     // 14 de 31 = 45,16 % → «45,2 %» con espacio (CLAUDE.md global §2, 25/09/2026)
-    test.fail();
     const panel = await analizar(page, CASO_6);
     await expect(panel).toContainText(/45,2\s%/);
   });
@@ -405,5 +395,67 @@ test.describe('calculadora-legibilidad · móvil (Inspector 28/10/2026)', () => 
     await expect(tabla.getByRole('row', { name: /Flesch-Szigriszt/ })).toContainText('49,861,6+11,8');
     const desborde = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
     expect(desborde).toBeLessThanOrEqual(0);
+  });
+});
+
+/*
+ * REPARADOS el 28/10/2026 — los hallazgos de contenido y de presentación sin caso en el navegador
+ * de la tanda (3592-3608). Cada aserción nombra su hallazgo.
+ */
+test.describe('calculadora-legibilidad · reparación 28/10/2026', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/calculadora-legibilidad/');
+    await esperarHidratacion(page, [AREA]);
+  });
+
+  test('3592: abreviaturas, millar y «…» — frases contadas como se leen', async ({ page }) => {
+    // «El Sr. García y la Dra. Pérez llegaron a la casa de campo.» es UNA frase
+    await analizar(page, 'El Sr. García y la Dra. Pérez llegaron a la casa de campo.');
+    await expect(metrica(page, 'Oraciones')).toHaveText('1Oraciones');
+    // «…» seguido de mayúscula cierra frase, como «...»
+    await analizar(page, 'Llegó tarde… Nadie lo esperaba en la casa.');
+    await expect(metrica(page, 'Oraciones')).toHaveText('2Oraciones');
+    // «…» seguido de minúscula no cierra (el caso del hallazgo): 25 palabras en UNA frase
+    await analizar(page, `${conMayuscula(relleno(0, 2))} … ${relleno(0, 2)} 3.500 ${relleno(2, 2)} … ${relleno(2, 18)}.`);
+    await expect(metrica(page, 'Oraciones')).toHaveText('1Oraciones');
+  });
+
+  test('3605: la FAQ visible y el FAQPage son el mismo texto', async ({ page }) => {
+    const faq = await page.evaluate(() => {
+      for (const s of document.querySelectorAll('script[type="application/ld+json"]')) {
+        const o = JSON.parse(s.textContent ?? '{}') as { '@type'?: string; mainEntity?: { name: string; acceptedAnswer: { text: string } }[] };
+        if (o['@type'] === 'FAQPage') return o.mainEntity ?? [];
+      }
+      return [];
+    });
+    const visibles = await page.locator('[class*="faqQuestion"]').allTextContents();
+    const respuestas = await page.locator('[class*="faqAnswer"]').allTextContents();
+    expect(faq.map((q) => q.name)).toEqual(visibles);
+    expect(faq.map((q) => q.acceptedAnswer.text)).toEqual(respuestas);
+  });
+
+  test('3602, 3603 y 3606: sin las cifras que no tenían fuente', async ({ page }) => {
+    const html = await page.content();
+    for (const sinFuente of [
+      'Nielsen Norman',
+      'mínima de 60',
+      'Legal / Médico',
+      'superior a 65 generalmente cumple',
+      'el 65% del tráfico',
+      '3 de cada 4 usuarios',
+      'Libro de Estilo del País',
+      'un 20% respecto al desktop',
+    ]) {
+      expect(html, `sigue «${sinFuente}»`).not.toContain(sinFuente);
+    }
+  });
+
+  test('3604 y 3608: Fernández Huerta sin los colores de INFLESZ y el círculo redondo', async ({ page }) => {
+    await page.setViewportSize({ width: 1366, height: 768 });
+    await analizar(page, CASO_6);
+    const fh = indice(page, 'Fernández Huerta').locator('[class*="indiceScore"]');
+    await expect(fh).not.toHaveClass(/normal|facil|dificil/);
+    const caja = (await page.locator('[class*="scoreCircle"]').boundingBox())!;
+    expect(Math.round(caja.width)).toBe(Math.round(caja.height));
   });
 });
