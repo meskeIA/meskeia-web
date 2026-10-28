@@ -231,12 +231,13 @@ function aplicarBonificaciones(
   if (config.requiereEscritura && !escrituraPublica) {
     return { bonificaciones, sinBonificacion: 'Sin bonificación: requiere escritura pública notarial' };
   }
-  // Extremadura: solo la exige por encima de un importe de base imponible (art. 30.1 DLeg 1/2018).
+  // Extremadura y Andalucía: solo la exigen por encima de un importe de base imponible
+  // (art. 30.1 DLeg 1/2018 · art. 40.2.a Ley 5/2021).
   // En una donación la base imponible es el valor neto, que aquí es `baseLiquidable` (art. 20.5 LISD).
   if (config.escrituraSiBaseSupera !== undefined && baseLiquidable > config.escrituraSiBaseSupera && !escrituraPublica) {
     return {
       bonificaciones,
-      sinBonificacion: `Sin bonificación: con una base imponible de más de ${config.escrituraSiBaseSupera.toLocaleString('es-ES')} € la donación debe constar en documento público (${config.nombre}${config.normaBonificacion ? `, ${config.normaBonificacion}` : ''})`,
+      sinBonificacion: `Sin bonificación: con una base imponible de más de ${config.escrituraSiBaseSupera.toLocaleString('es-ES')} € la donación debe constar en documento público (${config.nombre}${(config.normaEscritura ?? config.normaBonificacion) ? `, ${config.normaEscritura ?? config.normaBonificacion}` : ''})`,
     };
   }
 

@@ -91,9 +91,12 @@ export interface BonificacionCCAA_ID {
   requiereEscritura?: boolean;
   /**
    * La bonificación exige documento público solo si la base imponible SUPERA este importe
-   * (Extremadura: 10.000 €, art. 30.1 DLeg 1/2018). Por debajo, no lo exige.
+   * (Extremadura: 10.000 €, art. 30.1 DLeg 1/2018; Andalucía: 5.000 €, art. 40.2.a Ley 5/2021).
+   * Por debajo, no lo exige.
    */
   escrituraSiBaseSupera?: number;
+  /** Artículo del requisito de documento público, si no es el de la bonificación */
+  normaEscritura?: string;
   /** Artículo de la bonificación por parentesco, si está cotejado (se imprime en el desglose) */
   normaBonificacion?: string;
   /** Solo en las comunidades donde está cotejada; las demás no la modelan */
@@ -218,12 +221,17 @@ export const BONIFICACIONES_CCAA_ID: Record<string, BonificacionCCAA_ID> = {
   // de adquisiciones inter vivos». La ley NO tiene exención por importe en donaciones: la que
   // había aquí (base < 1.000.000 €, cuota 0) no está en ningún artículo de su capítulo del ISD,
   // y el 1.000.000 € del art. 28 es una reducción en base de SUCESIONES. Hallazgo 2828.
-  // El documento público por encima de 5.000 € de base (art. 40.2.a) no se modela todavía.
+  // Art. 40.2.a: la bonificación exige documento público «cuando la base imponible del impuesto
+  // sea superior a 5.000 euros» (modelado desde el 28/10/2026, decisión del usuario). No se
+  // modelan: el cómputo de las donaciones del mismo donante en los tres años anteriores ni los
+  // requisitos del metálico (art. 40.2.b: plazo de un mes y origen de los fondos).
   // Una sola comunidad: el sello del módulo NO se mueve.
   'andalucia': {
     nombre: 'Andalucía',
     regimen: 'comun',
     normaBonificacion: 'art. 40.1 Ley 5/2021',
+    escrituraSiBaseSupera: 5000,
+    normaEscritura: 'art. 40.2.a Ley 5/2021',
     bonificaciones: {
       'I-conyuge':      { porcentaje: 0.99 },
       'I-descendiente': { porcentaje: 0.99 },
@@ -232,7 +240,7 @@ export const BONIFICACIONES_CCAA_ID: Record<string, BonificacionCCAA_ID> = {
       'III':            { porcentaje: 0 },
       'IV':             { porcentaje: 0 },
     },
-    notas: 'Grupos I y II: bonificación del 99 % de la cuota, sin límite de importe. Si la base imponible supera 5.000 €, la donación debe constar en documento público, y en metálico hay que justificar en él el origen de los fondos: esta estimación no lo comprueba.',
+    notas: 'Grupos I y II: bonificación del 99 % de la cuota, sin límite de importe. Si la base imponible supera 5.000 €, la donación debe constar en documento público, y sin él no hay bonificación. Las donaciones del mismo donante en los tres años anteriores cuentan para ese umbral, y en metálico hay que justificar en el documento el origen de los fondos: esta estimación no lo aplica.',
   },
 
   'galicia': {

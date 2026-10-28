@@ -23,6 +23,12 @@ export interface Novedad {
 // Sembrado con los cambios normativos reales recientes. Ampliar al mantener fichas.
 export const NOVEDADES: Novedad[] = [
   {
+    fecha: '2026-10-28',
+    fichaSlug: 'donaciones-isd',
+    texto:
+      'Andalucía: la bonificación del 99 % de los Grupos I y II exige que la donación conste en documento público cuando la base imponible supera 5.000 €; sin él no se aplica (art. 40.2.a de la Ley 5/2021 de Tributos Cedidos de Andalucía, BOE-A-2021-17915). La estimación ya lo tiene en cuenta.',
+  },
+  {
     fecha: '2026-10-27',
     fichaSlug: 'donaciones-isd',
     texto:

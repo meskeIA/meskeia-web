@@ -55,6 +55,7 @@ import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { test, expect, type Page } from '@playwright/test';
 import { esperarHidratacion, sembrarValor } from './_hidratacion';
+import { parseSpanishNumber } from '../../lib/formatters';
 import { activarTema, prepararParaMedir } from '../contraste-text-muted-auxiliares';
 
 const RUTA = '/estimador-impuesto-donaciones/';
@@ -893,6 +894,9 @@ test.describe('Estimador ISD donaciones — re-inspección (04/10/2026)', () => 
    *   Bonificación 99 %                                          = 265.441,446
    *   A ingresar = 2.681,226728                                  → «2681,23 €» (cuatro cifras: sin punto)
    * Con la exención de antes: 0,00 €.
+   * ⚠️ La cifra usa la tarifa ESTATAL, que es la que la app aplica a Andalucía. Andalucía tiene
+   * tarifa propia (art. 37 Ley 5/2021, del 7 % al 26 %) y coeficientes propios (art. 38: 1,0 ·
+   * 1,5 · 1,9), leídos en el BOE el 28/10/2026: con ellos serían 2236,20 €. Cabo C0023.
    */
   test('HALLAZGO 2828: Andalucía bonifica el 99 % sin exención por importe — 1.000.000 € a un hijo, 2681,23 €', async ({ page }) => {
     await rellenar(page, { ccaa: 'andalucia', grupo: 'II', valor: '1000000' });
@@ -903,6 +907,28 @@ test.describe('Estimador ISD donaciones — re-inspección (04/10/2026)', () => 
     expect(desglose).not.toMatch(/Exención total/);
     expect(nota).not.toMatch(/1\.000\.000/);
     expect(nota, 'el importe lleva espacio antes del €').not.toMatch(/\d€/);
+  });
+
+  /**
+   * Art. 40.2.a de la Ley 5/2021 (BOE-A-2021-17915, leído el 28/10/2026): la bonificación exige
+   * documento público «cuando la base imponible del impuesto sea superior a 5.000 euros».
+   * Modelado el 28/10/2026 a petición del usuario. Hasta entonces bonificaba sin escritura.
+   * El testigo no fija la cuota, que depende de la tarifa (C0023): mide la relación. Con 20.000 €
+   * a un hijo, la cuota sin escritura es la cuota tributaria entera, y con escritura el 1 % de
+   * ella; con 4.000 € (base por debajo de 5.000 €) sin escritura, la bonificación se mantiene.
+   */
+  test('Andalucía: sin escritura pierde la bonificación por encima de 5.000 € de base, y no por debajo (art. 40.2.a)', async ({ page }) => {
+    const importe = (t: string): number => parseSpanishNumber(t.split('€')[0].trim());
+    await rellenar(page, { ccaa: 'andalucia', grupo: 'II', valor: '20000', escritura: false });
+    const sinEscritura = importe(await cuota(page));
+    const textoSin = (await panel(page)).replace(/\u00a0/g, ' ');
+    expect(textoSin).toMatch(/documento público/);
+    expect(textoSin).toContain('art. 40.2.a Ley 5/2021');
+    await rellenar(page, { ccaa: 'andalucia', grupo: 'II', valor: '20000' });
+    const conEscritura = importe(await cuota(page));
+    expect(conEscritura).toBeCloseTo(sinEscritura * 0.01, 2);
+    await rellenar(page, { ccaa: 'andalucia', grupo: 'II', valor: '4000', escritura: false });
+    expect(await panel(page)).not.toMatch(/Sin bonificación/);
   });
 });
 
