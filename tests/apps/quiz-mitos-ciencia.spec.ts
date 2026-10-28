@@ -320,9 +320,9 @@ const MOVIL_UA = 'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (K
 test.describe('Inspector 28/10/2026 · doble toque · 360 × 740', () => {
   test.use({ viewport: { width: 360, height: 740 }, userAgent: MOVIL_UA, deviceScaleFactor: 3, isMobile: true, hasTouch: true });
 
-  test('hallazgo · la ráfaga en «Siguiente» no abre ni cierra la guía educativa', async ({ page }) => {
+  test('3736 · la ráfaga en «Siguiente» no abre ni cierra la guía educativa', async ({ page }) => {
     // Sin guarda (ni useGuardaRafaga ni local). Medido: 3 → 4 abre la guía («Ver guía educativa»).
-    test.fail();
+    // REPARADO el 28/10/2026: useGuardaRafaga.
     test.setTimeout(120_000);
     await abrir(page);
     await page.getByRole('button', { name: 'Comenzar quiz' }).click();
@@ -349,9 +349,8 @@ test.describe('Inspector 28/10/2026 · doble toque · 360 × 740', () => {
 test.describe('Inspector 28/10/2026 · doble toque · 412 × 915', () => {
   test.use({ viewport: { width: 412, height: 915 }, userAgent: MOVIL_UA, deviceScaleFactor: 2.625, isMobile: true, hasTouch: true });
 
-  test('hallazgo · la ráfaga en «Siguiente» no abre ni cierra la guía educativa', async ({ page }) => {
-    // Medido: 9 de 24 abren o cierran la guía (2→3 abre, 3→4 cierra, 4→5 abre…).
-    test.fail();
+  test('3736 · la ráfaga en «Siguiente» no abre ni cierra la guía educativa (412 px)', async ({ page }) => {
+    // Medido: 9 de 24 abren o cierran la guía (2→3 abre, 3→4 cierra, 4→5 abre…). REPARADO el 28/10/2026.
     test.setTimeout(120_000);
     await abrir(page);
     await page.getByRole('button', { name: 'Comenzar quiz' }).click();
@@ -363,9 +362,9 @@ test.describe('Inspector 28/10/2026 · doble toque · 412 × 915', () => {
 test.describe('Inspector 28/10/2026 · doble toque · 768 × 1024', () => {
   test.use({ viewport: { width: 768, height: 1024 } });
 
-  test('hallazgo · la ráfaga en «Comenzar quiz» (a ¼ del botón) no contesta la primera afirmación', async ({ page }) => {
+  test('3734 · la ráfaga en «Comenzar quiz» (a ¼ del botón) no contesta la primera afirmación', async ({ page }) => {
     // Medido: el 2.º clic cae en «Verdad» y la 1.ª sale «✗ Incorrecto» sin que nadie la eligiera.
-    test.fail();
+    // REPARADO el 28/10/2026.
     await abrir(page);
     await rafaga(page, page.getByRole('button', { name: 'Comenzar quiz' }), 0.25, () => btnVerdad(page).isVisible());
     await expect(prog(page)).toHaveText('1 / 25');
@@ -380,9 +379,9 @@ test.describe('Inspector 28/10/2026 · doble toque · 768 × 1024', () => {
     expect(await rafagasEnSiguiente(page)).toEqual([]);
   });
 
-  test('hallazgo · la ráfaga en «Repetir quiz» (a ¼ del botón) no saca de la app', async ({ page }) => {
+  test('3735 · la ráfaga en «Repetir quiz» (a ¼ del botón) no saca de la app', async ({ page }) => {
     // Medido: el 2.º clic cae en la tarjeta de relacionadas y lleva a /quiz-biologia-molecular/.
-    test.fail();
+    // REPARADO el 28/10/2026.
     test.setTimeout(120_000);
     await abrir(page);
     await page.getByRole('button', { name: 'Comenzar quiz' }).click();
@@ -398,9 +397,9 @@ test.describe('Inspector 28/10/2026 · doble toque · 768 × 1024', () => {
 test.describe('Inspector 28/10/2026 · doble toque · escritorio 1280 × 800', () => {
   test.use({ viewport: { width: 1280, height: 800 } });
 
-  test('hallazgo · la ráfaga en «Siguiente» no contesta la afirmación nueva', async ({ page }) => {
+  test('3734 · la ráfaga en «Siguiente» no contesta la afirmación nueva', async ({ page }) => {
     // Medido: 1 → 2, el 2.º clic cae en «Mito» y la 2.ª (sangre venosa) queda contestada.
-    test.fail();
+    // REPARADO el 28/10/2026.
     test.setTimeout(120_000);
     await abrir(page);
     await page.getByRole('button', { name: 'Comenzar quiz' }).click();
@@ -408,9 +407,8 @@ test.describe('Inspector 28/10/2026 · doble toque · escritorio 1280 × 800', (
     expect(await rafagasEnSiguiente(page)).toEqual([]);
   });
 
-  test('hallazgo · la ráfaga en «Comenzar quiz» (a ¾ del botón) no contesta la primera afirmación', async ({ page }) => {
-    // Medido: el 2.º clic cae en «Mito» → «✓ ¡Correcto!» regalado en la 1.ª.
-    test.fail();
+  test('3734 · la ráfaga en «Comenzar quiz» (a ¾ del botón) no contesta la primera afirmación', async ({ page }) => {
+    // Medido: el 2.º clic cae en «Mito» → «✓ ¡Correcto!» regalado en la 1.ª. REPARADO el 28/10/2026.
     await abrir(page);
     await rafaga(page, page.getByRole('button', { name: 'Comenzar quiz' }), 0.75, () => btnVerdad(page).isVisible());
     await expect(btnMito(page), 'la ráfaga ha contestado la 1.ª').toBeVisible({ timeout: 1000 });

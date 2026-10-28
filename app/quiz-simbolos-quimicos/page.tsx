@@ -159,6 +159,9 @@ export default function QuizSimbolosQuimicosPage() {
 
   const responder = useCallback((opcion: string) => {
     if (!preguntaActual || seleccionada !== null) return;
+    // El foco a «Siguiente» sube la página y deja el botón bajo el dedo: el 2.º toque en el
+    // mismo punto se ignora (3679 en la familia)
+    marcarCambioPantalla({ soloMismoPunto: true });
     setSeleccionada(opcion);
 
     const esCorrecta = opcion === preguntaActual.correcta;
@@ -181,7 +184,7 @@ export default function QuizSimbolosQuimicosPage() {
       ]);
     }
     setFase('respondida');
-  }, [preguntaActual, seleccionada]);
+  }, [preguntaActual, seleccionada, marcarCambioPantalla]);
 
   const siguiente = useCallback(() => {
     marcarCambioPantalla();

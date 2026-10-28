@@ -233,11 +233,14 @@ export default function QuizPaisesCapitalesPage() {
 
   const responder = useCallback((opcion: string) => {
     if (seleccionada !== null) return;
+    // El foco a «Siguiente» sube la página y deja el botón bajo el dedo: el 2.º toque en el
+    // mismo punto se ignora (3679 en la familia); el «Siguiente» rápido en otro punto, no
+    marcarCambioPantalla({ soloMismoPunto: true });
     setSeleccionada(opcion);
     if (opcion === pregunta.respuestaCorrecta) {
       setCorrectas(prev => prev + 1);
     }
-  }, [seleccionada, pregunta]);
+  }, [seleccionada, pregunta, marcarCambioPantalla]);
 
   const siguiente = useCallback(() => {
     marcarCambioPantalla();

@@ -135,6 +135,11 @@ const HERMANAS: Hermana[] = [
  * se va a interactuar. Mismo criterio que tests/familias/selectores.spec.ts.
  */
 async function pulsarHidratado(page: Page, texto: RegExp): Promise<void> {
+  await esperarHidratado(page, texto);
+  await page.locator('button:visible').filter({ hasText: texto }).first().click();
+}
+
+async function esperarHidratado(page: Page, texto: RegExp): Promise<void> {
   await page.waitForFunction(
     ({ fuente, banderas }) => {
       const patron = new RegExp(fuente, banderas);
@@ -146,7 +151,6 @@ async function pulsarHidratado(page: Page, texto: RegExp): Promise<void> {
     { fuente: texto.source, banderas: texto.flags },
     { timeout: 20_000 },
   );
-  await page.locator('button:visible').filter({ hasText: texto }).first().click();
 }
 
 /** Dónde está el foco: «destino» si es un elemento preparado (tabindex -1) que no es un botón. */
@@ -272,6 +276,75 @@ for (const h of HERMANAS) {
         expect(await habilitadas(), `paso ${paso}: la ráfaga no contesta la pregunta nueva`).toBe(await opciones.count());
       }
       throw new Error('60 pasos sin llegar al resultado');
+    });
+
+    /**
+     * El doble toque sobre la OPCIÓN (hallazgos 3679, 3701 y 3751, 28/10/2026). Al contestar, el
+     * foco va a «Siguiente» y, si el botón está bajo el borde, el navegador sube la página y lo
+     * deja bajo el dedo: el 2.º toque lo pulsaba y la explicación no llegaba a verse. A 360 × 740
+     * y 375 × 667, donde lo midió el Inspector. Esperado: el 2.º toque no hace nada (sigue la misma
+     * pregunta, contestada). Y lo que la guarda NO puede comerse: contestar y pulsar «Siguiente»
+     * deprisa, con el dedo YA en otro sitio, que Chrome también cuenta como detail 2.
+     */
+    test('doble toque en la opción: el 2.º toque no se salta la explicación, y el «Siguiente» rápido pasa', async ({ page }) => {
+      test.skip(Boolean(h.dobleToque?.omitido), h.dobleToque?.omitido);
+      test.setTimeout(180_000);
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+      const opciones = page.locator('button:visible').filter({ hasText: h.opcion ?? /^\s*A\S/ });
+      const habilitadas = () => opciones.evaluateAll((bs) => bs.filter((b) => !(b as HTMLButtonElement).disabled).length);
+      const avanzar = () => page.locator('button:visible').filter({ hasText: /siguiente|resultado/i }).first();
+      const saltos: string[] = [];
+
+      for (const viewport of [{ width: 360, height: 740 }, { width: 375, height: 667 }]) {
+        await page.setViewportSize(viewport);
+        await page.goto(`/${h.slug}/`);
+        const url = page.url();
+        for (const boton of h.arranque) await pulsarHidratado(page, boton);
+        await esperarHidratado(page, h.opcion ?? /^\s*A\S/);
+        for (let paso = 1; paso <= 60; paso++) {
+          await expect.poll(habilitadas, { message: `${viewport.width} · paso ${paso}: pregunta nueva sin contestar` }).toBeGreaterThan(0);
+          await page.waitForTimeout(350); // fuera de la ventana de ráfaga del «Siguiente» anterior
+          const opcion = opciones.first();
+          await opcion.scrollIntoViewIfNeeded();
+          const caja = (await opcion.boundingBox())!;
+          await page.mouse.move(caja.x + caja.width / 2, caja.y + caja.height / 2);
+          await page.mouse.down({ clickCount: 1 });
+          await page.mouse.up({ clickCount: 1 });
+          await expect.poll(habilitadas, { intervals: [20], timeout: 3000 }).toBe(0);
+          await page.waitForTimeout(80);
+          await page.mouse.down({ clickCount: 2 });
+          await page.mouse.up({ clickCount: 2 });
+          await page.waitForTimeout(400);
+          expect(page.url(), `${viewport.width} · paso ${paso}: la ráfaga no saca de la app`).toBe(url);
+          // Sigue en la pregunta contestada si «Siguiente» (o «Ver resultado») sigue a la vista y
+          // ninguna opción está habilitada. En mitos-ciencia las opciones desaparecen al contestar:
+          // por eso no vale mirar solo las opciones.
+          const sigueContestada = (await avanzar().isVisible()) && (await habilitadas()) === 0;
+          if (!sigueContestada) saltos.push(`${viewport.width} · paso ${paso}`);
+          if (!sigueContestada) {
+            if ((await habilitadas()) === 0) break; // saltó al resultado
+            continue;
+          }
+          const esUltima = /resultado/i.test(await avanzar().innerText());
+          await avanzar().click();
+          if (esUltima) break;
+        }
+      }
+      expect(saltos, 'el 2.º toque sobre la opción pulsó «Siguiente» y se saltó la explicación').toEqual([]);
+
+      // El «Siguiente» rápido de quien ha movido el dedo hasta él: avanza
+      await page.setViewportSize({ width: 1280, height: 800 });
+      await page.goto(`/${h.slug}/`);
+      for (const boton of h.arranque) await pulsarHidratado(page, boton);
+      await pulsarHidratado(page, h.opcion ?? /^\s*A\S/);
+      const sig = avanzar();
+      await expect(sig).toBeVisible();
+      await sig.scrollIntoViewIfNeeded();
+      const c = (await sig.boundingBox())!;
+      await page.mouse.move(c.x + c.width / 2, c.y + c.height / 2);
+      await page.mouse.down({ clickCount: 2 });
+      await page.mouse.up({ clickCount: 2 });
+      await expect.poll(habilitadas, { message: 'un «Siguiente» con detail 2 en otro punto se ha comido' }).toBeGreaterThan(0);
     });
   });
 }

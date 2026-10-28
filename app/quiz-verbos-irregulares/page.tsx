@@ -8,6 +8,7 @@ import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard } from '@/components';
 import EducationalSection from '@/components/EducationalSection';
 import { formatPercentage, margenBarraLogo } from '@/lib';
+import { useGuardaRafaga } from '@/lib/useGuardaRafaga';
 import { verbosIrregulares, VerboIrregular } from '@/data/verbos-irregulares';
 import {
   corregir, anotarRespuesta, verbosPendientes, leerRegistro, ACIERTOS_PARA_SALIR, REGISTRO_VACIO,
@@ -290,7 +291,16 @@ export default function QuizVerbosIrregularesPage() {
     }
   }, [pantalla, preguntaActual, respondida, modoPartida]);
 
+  /**
+   * Doble toque (hallazgo 3615). Sin guarda, el 2.º toque de «Siguiente», «Empezar Quiz», «Jugar
+   * de nuevo» o «Repasar mis fallos» contestaba la pregunta nueva (y metía el verbo en la lista de
+   * repaso), pulsaba «Comprobar» con las casillas vacías, desplegaba la guía o cambiaba el nivel.
+   * La receta de la familia: useGuardaRafaga (lib/useGuardaRafaga.ts), en captura sobre window.
+   */
+  const marcarCambioPantalla = useGuardaRafaga();
+
   const arrancar = useCallback((nuevasPreguntas: PreguntaQuiz[], nuevoOrigen: OrigenPartida) => {
+    marcarCambioPantalla();
     setPreguntas(nuevasPreguntas);
     setPreguntaActual(0);
     setSeleccionada(null);
@@ -303,7 +313,7 @@ export default function QuizVerbosIrregularesPage() {
     setOrigen(nuevoOrigen);
     setTiempoInicio(Date.now());
     setPantalla('quiz');
-  }, [modo]);
+  }, [modo, marcarCambioPantalla]);
 
   const iniciarQuiz = useCallback(() => {
     arrancar(generarPreguntas(nivel, numPreguntas), 'nivel');
@@ -316,24 +326,28 @@ export default function QuizVerbosIrregularesPage() {
 
   const responder = useCallback((opcion: string) => {
     if (seleccionada !== null) return;
+    // El foco a «Siguiente» sube la página y puede dejar el botón bajo el dedo (3679 en la familia)
+    marcarCambioPantalla({ soloMismoPunto: true });
     setSeleccionada(opcion);
     const acierto = opcion === pregunta.respuestaCorrecta;
     if (acierto) {
       setCorrectas(prev => prev + 1);
     }
     anotar(pregunta.verbo.infinitive, acierto);
-  }, [seleccionada, pregunta, anotar]);
+  }, [seleccionada, pregunta, anotar, marcarCambioPantalla]);
 
   const comprobarEscrito = useCallback(() => {
     if (correccion !== null) return;
+    marcarCambioPantalla({ soloMismoPunto: true });
     const c = corregir(pregunta.verbo, textoPasado, textoParticipio);
     setCorreccion(c);
     const acierto = c.pasadoOk && c.participioOk;
     if (acierto) setCorrectas(prev => prev + 1);
     anotar(pregunta.verbo.infinitive, acierto);
-  }, [correccion, pregunta, textoPasado, textoParticipio, anotar]);
+  }, [correccion, pregunta, textoPasado, textoParticipio, anotar, marcarCambioPantalla]);
 
   const siguiente = useCallback(() => {
+    marcarCambioPantalla();
     if (esUltima) {
       setTiempoTotal(Math.round((Date.now() - tiempoInicio) / 1000));
       setPantalla('resultado');
@@ -344,7 +358,7 @@ export default function QuizVerbosIrregularesPage() {
       setTextoPasado('');
       setTextoParticipio('');
     }
-  }, [esUltima, tiempoInicio]);
+  }, [esUltima, tiempoInicio, marcarCambioPantalla]);
 
   /** «Jugar de nuevo» repite el mismo tipo de partida; si era de repaso y ya no queda nada, juega el nivel. */
   const reiniciar = useCallback(() => {
@@ -352,9 +366,10 @@ export default function QuizVerbosIrregularesPage() {
     else iniciarQuiz();
   }, [origen, pendientes, iniciarRepaso, iniciarQuiz]);
   const volverConfig = useCallback(() => {
+    marcarCambioPantalla();
     vieneDelResultado.current = true;
     setPantalla('config');
-  }, []);
+  }, [marcarCambioPantalla]);
 
   const puntuacion = useMemo(
     () => calcularPuntuacion(correctas, totalPreguntas),

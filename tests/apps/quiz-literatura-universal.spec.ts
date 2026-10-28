@@ -1692,6 +1692,10 @@ async function contestadasSinQuerer(
   const elegirTrasLeer = async (opcion: Locator) => {
     await page.waitForTimeout(500);
     await elegir(opcion);
+    // Y lee la explicación antes de pulsar «Siguiente»: a 360 px el foco lo sube bajo el dedo, y
+    // un toque en el mismo punto a menos de 300 ms del de la opción es el 2.º de su ráfaga, que la
+    // app ignora desde el 3679 de la familia (28/10/2026)
+    await page.waitForTimeout(500);
   };
   const pantalla = () =>
     page.evaluate(() => {
@@ -1793,6 +1797,10 @@ async function enunciadosFueraDeLaVista(page: Page, niveles: RegExp[]): Promise<
       await tocarCentro(page, elegida);
       const siguiente = page.getByRole('button', { name: /Siguiente|Ver resultado/ });
       await expect(siguiente).toBeFocused();
+      // Y lee la explicación antes de seguir: a 360 px el foco sube «Siguiente» bajo el dedo, y un
+      // toque en el mismo punto a menos de 300 ms del de la opción es el 2.º de su ráfaga, que la
+      // app ignora desde el 3679 de la familia (28/10/2026): era el que se saltaba la explicación.
+      await page.waitForTimeout(500);
       await bajarLoJusto(siguiente);
       await tocarCentro(page, siguiente);
       if (n < 15) {
@@ -2210,7 +2218,7 @@ test.describe('Inspector 28/10/2026 · tableta 768 × 1024 (táctil)', () => {
 
   /**
    * CASO DE RECHAZO (sí lo cumple) · doble toque en «← Cambiar de nivel» sin responder y en «Jugar
-   * de nuevo». Resuelto sobre page.tsx: los dos llaman a `registrarClic(true)`, así que el 2.º toque
+   * de nuevo». Resuelto sobre page.tsx: los dos llaman a `marcarCambioPantalla()`, así que el 2.º toque
    * (`detail` 2) sobre un botón de nivel o sobre «Empezar» se ignora: se queda en la selección, con
    * el mismo nivel pulsado, sin empezar partida y sin salir de la página.
    */
@@ -2266,9 +2274,9 @@ test.describe('Inspector 28/10/2026 · tableta 768 × 1024 (táctil)', () => {
    * 12/15 abre la guía y «Ver resultado» saca a /visualizador-estilos-literarios/; en Mezcla, cuatro
    * «Siguiente» abren la guía y «Ver resultado» vuelve a sacar de la app.
    * Lo correcto (el invariante de la familia): el 2.º toque no hace NADA.
+   * REPARADO el 28/10/2026 (hallazgo 3621): la app usa useGuardaRafaga, como las hermanas.
    */
-  test('hallazgo · el 2.º toque de un doble toque no abre la guía, no saca de la app ni se come la nota', async ({ page }) => {
-    test.fail(); // HALLAZGO abierto el 28/10/2026: mide que el 2.º toque no actúe fuera de los botones del quiz
+  test('el 2.º toque de un doble toque no abre la guía, no saca de la app ni se come la nota (3621)', async ({ page }) => {
     test.setTimeout(240_000);
     await sembrarAzarSinAviso(page);
     expect(await segundosToquesQueActuan(page, [/^Básico/, /^Mezcla/])).toEqual([]);

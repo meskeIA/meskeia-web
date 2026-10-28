@@ -99,7 +99,8 @@ export default function QuizTablaPeriodicaPage() {
   }, [fase, indice, haRespondido]);
 
   // Doble toque en «Empezar», «Siguiente» o «Ver resultado»: el 2.º no cae en la pantalla nueva
-  // (cabo C0082, lib/useGuardaRafaga.ts)
+  // (cabo C0082, lib/useGuardaRafaga.ts). Y en la opción: el foco a «Siguiente» sube la página y
+  // deja el botón bajo el dedo, así que el 2.º toque en el mismo punto se ignora (3679 en la familia)
   const marcarCambioPantalla = useGuardaRafaga();
 
   function iniciarQuiz() {
@@ -113,6 +114,7 @@ export default function QuizTablaPeriodicaPage() {
 
   function responder(i: number) {
     if (haRespondido) return;
+    marcarCambioPantalla({ soloMismoPunto: true });
     setSeleccionada(i);
     setAciertos(prev => [...prev, i === pregunta.correcta]);
   }

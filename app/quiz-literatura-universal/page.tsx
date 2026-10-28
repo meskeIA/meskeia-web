@@ -1,7 +1,8 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useMemo, useCallback, useEffect, useRef, type MouseEvent } from 'react';
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
+import { useGuardaRafaga } from '@/lib/useGuardaRafaga';
 import {
   MeskeiaLogo,
   Footer,
@@ -169,34 +170,34 @@ export default function QuizLiteraturaUniversal() {
    *     «Siguiente» deprisa en un móvil —dos toques a menos de 100 px, que Chrome también cuenta
    *     como ráfaga— se comía el «Siguiente», que sí era una intención nueva.
    * El clic ignorado no toca el registro: el 3.º de una ráfaga se ignora igual que el 2.º.
+   *
+   * La guarda era local a estos manejadores y el 2.º toque que caía FUERA de ellos actuaba: en
+   * «Ver guía educativa» o en una tarjeta de las relacionadas, que sacaba de la app con la nota
+   * sin ver (hallazgo 3621). Ahora es useGuardaRafaga, que escucha en captura sobre `window`,
+   * como las hermanas. Y contestar marca con `soloMismoPunto`: el foco a «Siguiente» (sin
+   * preventScroll, para que el teclado lo vea) puede subir la página y dejar el botón bajo el
+   * dedo, y el 2.º toque sobre la opción se saltaba la explicación (3679 en la familia); el
+   * «Siguiente» rápido de quien mueve el dedo hasta él sigue pasando.
    */
-  const ultimoCambioPantallaRef = useRef(false);
-  const clicDeMas = (e: MouseEvent<HTMLButtonElement>): boolean =>
-    e.detail > 1 && ultimoCambioPantallaRef.current;
-  const registrarClic = (cambiaPantalla: boolean) => {
-    ultimoCambioPantallaRef.current = cambiaPantalla;
-  };
+  const marcarCambioPantalla = useGuardaRafaga();
 
-  const handleIniciar = useCallback((e: MouseEvent<HTMLButtonElement>) => {
-    if (e.detail > 1 && ultimoCambioPantallaRef.current) return;
-    ultimoCambioPantallaRef.current = true;
+  const handleIniciar = useCallback(() => {
+    marcarCambioPantalla();
     setPreguntas(seleccionarPreguntas(nivelElegido));
     setIndice(0);
     setSeleccionada(null);
     setRespondida(false);
     setAciertos(0);
     setFase('quiz');
-  }, [nivelElegido]);
+  }, [nivelElegido, marcarCambioPantalla]);
 
-  function elegirNivel(e: MouseEvent<HTMLButtonElement>, n: Nivel | 'todos') {
-    if (clicDeMas(e)) return;
-    registrarClic(false);
+  function elegirNivel(n: Nivel | 'todos') {
     setNivelElegido(n);
   }
 
-  function handleRespuesta(e: MouseEvent<HTMLButtonElement>, idx: number) {
-    if (clicDeMas(e) || respondida) return;
-    registrarClic(false);
+  function handleRespuesta(idx: number) {
+    if (respondida) return;
+    marcarCambioPantalla({ soloMismoPunto: true });
     setSeleccionada(idx);
     setRespondida(true);
     if (preguntaActual && idx === preguntaActual.correcta) {
@@ -206,9 +207,9 @@ export default function QuizLiteraturaUniversal() {
 
   // Avanza a la pregunta SIGUIENTE A LA PULSADA (`indice + 1` del render, no `i => i + 1`):
   // si el mismo botón recibiera dos clics antes de repintar, no saltaría una pregunta.
-  function handleSiguiente(e: MouseEvent<HTMLButtonElement>) {
-    if (clicDeMas(e) || !respondida) return;
-    registrarClic(true);
+  function handleSiguiente() {
+    if (!respondida) return;
+    marcarCambioPantalla();
     if (indice + 1 >= preguntas.length) {
       setFase('resultado');
     } else {
@@ -218,9 +219,8 @@ export default function QuizLiteraturaUniversal() {
     }
   }
 
-  function handleReiniciar(e: MouseEvent<HTMLButtonElement>) {
-    if (clicDeMas(e)) return;
-    registrarClic(true);
+  function handleReiniciar() {
+    marcarCambioPantalla();
     volviendoRef.current = true;
     setFase('seleccion');
     setIndice(0);
@@ -256,7 +256,7 @@ export default function QuizLiteraturaUniversal() {
                   key={n}
                   className={`${styles.nivelBtn} ${nivelElegido === n ? styles.nivelBtnActivo : ''}`}
                   style={nivelElegido === n ? { borderColor: NIVEL_CONFIG[n].color, background: NIVEL_CONFIG[n].color + '18' } : {}}
-                  onClick={e => elegirNivel(e, n)}
+                  onClick={() => elegirNivel(n)}
                   aria-pressed={nivelElegido === n}
                 >
                   <span className={styles.nivelEmoji} aria-hidden="true">{NIVEL_CONFIG[n].emoji}</span>
@@ -268,7 +268,7 @@ export default function QuizLiteraturaUniversal() {
                 type="button"
                 className={`${styles.nivelBtn} ${nivelElegido === 'todos' ? styles.nivelBtnActivo : ''}`}
                 style={nivelElegido === 'todos' ? { borderColor: '#7B5EA7', background: '#7B5EA714' } : {}}
-                onClick={e => elegirNivel(e, 'todos')}
+                onClick={() => elegirNivel('todos')}
                 aria-pressed={nivelElegido === 'todos'}
               >
                 <span className={styles.nivelEmoji} aria-hidden="true">🎲</span>
@@ -341,7 +341,7 @@ export default function QuizLiteraturaUniversal() {
                     type="button"
                     key={i}
                     className={`${styles.opcion} ${estadoClass}`}
-                    onClick={e => handleRespuesta(e, i)}
+                    onClick={() => handleRespuesta(i)}
                     disabled={respondida}
                     aria-label={`${String.fromCharCode(65 + i)}. ${opcion}${marca}`}
                   >

@@ -405,8 +405,8 @@ test.describe('Inspector 28/10/2026 · doble toque sobre una opción · móvil 3
    * ratón (detail 2) y con toques: 360 × 740 → preguntas 10, 21 y 23; 375 × 667 → 7, 9, 21 y 22;
    * 390, 412 y 768 px → ninguna.
    */
-  test('hallazgo · el 2.º toque sobre la opción elegida no pulsa «Siguiente» ni salta la explicación', async ({ page }) => {
-    test.fail(); // ABIERTO — medido: [10, 21, 23]
+  test('3679 · el 2.º toque sobre la opción elegida no pulsa «Siguiente» ni salta la explicación', async ({ page }) => {
+    // REPARADO el 28/10/2026 (medido antes: [10, 21, 23]): contestar marca la guarda con soloMismoPunto
     test.setTimeout(120_000);
     await abrir(page);
     await comenzarExamen(page);

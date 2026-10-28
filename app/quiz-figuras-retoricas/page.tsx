@@ -110,7 +110,8 @@ export default function QuizFigurasRetoricaPage() {
   const esUltima = preguntaActual === totalPreguntas - 1;
 
   // Doble toque en «Empezar», «Siguiente» o «Ver resultado»: el 2.º no cae en la pantalla nueva
-  // (cabo C0082, lib/useGuardaRafaga.ts)
+  // (cabo C0082, lib/useGuardaRafaga.ts). Y en la opción: el foco a «Siguiente» sube la página y
+  // deja el botón bajo el dedo, así que el 2.º toque en el mismo punto se ignora (3679 en la familia)
   const marcarCambioPantalla = useGuardaRafaga();
 
   const iniciarQuiz = useCallback(() => {
@@ -126,11 +127,12 @@ export default function QuizFigurasRetoricaPage() {
 
   const responder = useCallback((opcion: string) => {
     if (seleccionada !== null) return;
+    marcarCambioPantalla({ soloMismoPunto: true });
     setSeleccionada(opcion);
     if (opcion === pregunta.respuestaCorrecta) {
       setCorrectas(prev => prev + 1);
     }
-  }, [seleccionada, pregunta]);
+  }, [seleccionada, pregunta, marcarCambioPantalla]);
 
   const siguiente = useCallback(() => {
     marcarCambioPantalla();

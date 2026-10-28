@@ -412,7 +412,8 @@ export default function QuizConceptosInversionPage() {
   });
 
   // Doble toque en «Empezar», «Siguiente» o «Ver resultado»: el 2.º no cae en la pantalla nueva
-  // (cabo C0082, lib/useGuardaRafaga.ts)
+  // (cabo C0082, lib/useGuardaRafaga.ts). Y en la opción: el foco a «Siguiente» sube la página y
+  // deja el botón bajo el dedo, así que el 2.º toque en el mismo punto se ignora (hallazgo 3751)
   const marcarCambioPantalla = useGuardaRafaga();
 
   const iniciar = useCallback(() => {
@@ -436,6 +437,7 @@ export default function QuizConceptosInversionPage() {
 
   const responder = useCallback((idx: number) => {
     if (estado !== 'jugando') return;
+    marcarCambioPantalla({ soloMismoPunto: true });
     setRespuestaElegida(idx);
     const p = preguntas[indice];
     const esCorrecta = idx === p.correcta;
@@ -448,7 +450,7 @@ export default function QuizConceptosInversionPage() {
       },
     }));
     setEstado('respondida');
-  }, [estado, preguntas, indice]);
+  }, [estado, preguntas, indice, marcarCambioPantalla]);
 
   const siguiente = useCallback(() => {
     marcarCambioPantalla();

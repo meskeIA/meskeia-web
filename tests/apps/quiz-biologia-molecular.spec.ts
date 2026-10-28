@@ -1514,8 +1514,8 @@ test.describe('Inspector 28/10/2026', () => {
    * Lo correcto: el 2.º clic de una ráfaga que cambió de pantalla no hace nada, caiga donde caiga
    * (lib/useGuardaRafaga.ts, en captura sobre window, como las hermanas).
    */
-  test('hallazgo · el 2.º clic de un doble clic en «Volver al inicio» no abre la guía educativa (escritorio)', async ({ page }) => {
-    test.fail(true, 'ABIERTO: el 2.º clic de «Volver al inicio» abre la guía (guarda local, page.tsx:548-555)');
+  test('3641 · el 2.º clic de un doble clic en «Volver al inicio» no abre la guía educativa (escritorio)', async ({ page }) => {
+    // REPARADO el 28/10/2026: useGuardaRafaga en vez de la guarda local.
     test.setTimeout(150_000);
     await sembrarAzar(page, 1);
     await page.setViewportSize({ width: 1280, height: 800 });
@@ -1655,8 +1655,8 @@ test.describe('Inspector 28/10/2026 · móvil 412 × 915', () => {
    * Transcripción): 4 «Siguiente» y «Ver resultados».
    * Lo correcto: el 2.º toque no hace nada, caiga donde caiga (lib/useGuardaRafaga.ts).
    */
-  test('hallazgo · el 2.º toque de «Siguiente» o «Ver resultados» no abre ni cierra la guía educativa', async ({ page }) => {
-    test.fail(true, 'ABIERTO: el 2.º toque abre y cierra la guía (guarda local, page.tsx:548-555)');
+  test('3641 · el 2.º toque de «Siguiente» o «Ver resultados» no abre ni cierra la guía educativa', async ({ page }) => {
+    // REPARADO el 28/10/2026: useGuardaRafaga en vez de la guarda local.
     test.setTimeout(90_000);
     await sembrarAzar(page, 102);
     await abrir(page);

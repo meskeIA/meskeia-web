@@ -1,7 +1,8 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useCallback, useEffect, useRef, type MouseEvent } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
+import { useGuardaRafaga } from '@/lib/useGuardaRafaga';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import LegalNotice from '@/components/LegalNotice';
@@ -544,13 +545,15 @@ export default function QuizBiologiaMolecularPage() {
    * eligiera (29 de 29 «Siguiente» a 360 px con dos toques). Un clic se ignora cuando es el 2.º de
    * una ráfaga (`detail` > 1, lo cuenta el navegador; con teclado es 0) Y el anterior cambió de
    * pantalla: contestar y pulsar «Siguiente» deprisa sigue funcionando.
+   *
+   * La guarda era local a los botones del quiz y no veía lo demás: al encoger la pantalla, el 2.º
+   * toque caía en «Ver guía educativa» y la abría o la cerraba (hallazgo 3641, 33 de 87
+   * «Siguiente» a 412 px). Ahora es useGuardaRafaga, en captura sobre `window`, como las
+   * hermanas. Contestar marca con `soloMismoPunto` (3679 en la familia; ver `responder`).
    */
-  const ultimoCambioPantallaRef = useRef(false);
-  const clicDeMas = (e: MouseEvent<HTMLButtonElement>): boolean =>
-    e.detail > 1 && ultimoCambioPantallaRef.current;
-  const conClic = (cambiaPantalla: boolean, accion: () => void) => (e: MouseEvent<HTMLButtonElement>) => {
-    if (clicDeMas(e)) return;
-    ultimoCambioPantallaRef.current = cambiaPantalla;
+  const marcarCambioPantalla = useGuardaRafaga();
+  const conClic = (cambiaPantalla: boolean, accion: () => void) => () => {
+    if (cambiaPantalla) marcarCambioPantalla();
     accion();
   };
 
@@ -570,6 +573,8 @@ export default function QuizBiologiaMolecularPage() {
   const responder = useCallback(
     (opcion: string) => {
       if (estado !== 'jugando' || respuesta !== null || !preguntaActual) return;
+      // El foco a «Siguiente» sube la página y puede dejar el botón bajo el dedo
+      marcarCambioPantalla({ soloMismoPunto: true });
       const bien = esCorrecta(preguntaActual, opcion);
       setRespuesta(opcion);
       setResultados((prev) => [...prev, bien]);
@@ -583,7 +588,7 @@ export default function QuizBiologiaMolecularPage() {
         setRachaActual(0);
       }
     },
-    [estado, respuesta, preguntaActual, rachaActual]
+    [estado, respuesta, preguntaActual, rachaActual, marcarCambioPantalla]
   );
 
   // Avanza a la siguiente A LA PULSADA (`indice + 1` del render): dos clics antes de repintar no

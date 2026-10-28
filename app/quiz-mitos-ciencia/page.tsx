@@ -3,6 +3,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { enfocarALaVista } from '@/lib';
+import { useGuardaRafaga } from '@/lib/useGuardaRafaga';
 import styles from './QuizMitosCiencia.module.css';
 import {
   MeskeiaLogo,
@@ -260,7 +261,17 @@ export default function QuizMitosCiencia() {
   const porcentaje = Math.round((puntuacion / PREGUNTAS.length) * 100);
   const nivel = NIVELES.find(n => puntuacion >= n.min) ?? NIVELES[NIVELES.length - 1];
 
+  /**
+   * Doble toque (hallazgos 3734, 3735 y 3736). No había guarda: el 2.º clic de «Siguiente» o de
+   * «Comenzar quiz» contestaba la afirmación nueva (el centro de «Siguiente» cae en el hueco entre
+   * «Verdad» y «Mito», así que bastaba desviarse un poco), el de «Repetir quiz» caía en una
+   * relacionada y sacaba de la app, y el de «Siguiente» en móvil abría o cerraba la guía. La
+   * receta de la familia: useGuardaRafaga (lib/useGuardaRafaga.ts), en captura sobre window.
+   */
+  const marcarCambioPantalla = useGuardaRafaga();
+
   function iniciar() {
+    marcarCambioPantalla();
     setFase('jugando');
     setIndice(0);
     setAciertos([]);
@@ -269,6 +280,8 @@ export default function QuizMitosCiencia() {
 
   function responder(esVerdad: boolean) {
     if (fase === 'revelado') return;
+    // La revelación sube la página y puede dejar «Siguiente» bajo el dedo (3679 en la familia)
+    marcarCambioPantalla({ soloMismoPunto: true });
     const correcto = esVerdad === pregunta.esVerdad;
     setSeleccion(esVerdad);
     setAciertos(prev => [...prev, correcto]);
@@ -276,6 +289,7 @@ export default function QuizMitosCiencia() {
   }
 
   function siguiente() {
+    marcarCambioPantalla();
     if (indice + 1 >= PREGUNTAS.length) {
       setFase('fin');
     } else {

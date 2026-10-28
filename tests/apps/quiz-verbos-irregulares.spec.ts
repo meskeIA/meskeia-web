@@ -1907,8 +1907,7 @@ test.describe('Inspector 28/10/2026', () => {
    * de la 1.ª pregunta y la contesta. Esperado: 4 opciones habilitadas, sin veredicto, 0 aciertos.
    */
   test('hallazgo · doble clic en «Jugar de nuevo»: el 2.º no contesta la 1.ª pregunta de la partida nueva', async ({ page }) => {
-    // ABIERTO (Inspector 28/10/2026): mide que el 2.º clic no deje veredicto en la pregunta nueva.
-    test.fail();
+    // REPARADO el 28/10/2026 (useGuardaRafaga): mide que el 2.º clic no deje veredicto en la pregunta nueva.
     test.setTimeout(60_000);
     await page.setViewportSize({ width: 1280, height: 800 });
     await abrirHidratada(page);
@@ -1921,8 +1920,7 @@ test.describe('Inspector 28/10/2026', () => {
 
   /** Mismo hallazgo: «Repasar mis fallos» desde el resultado (7 de 7 tamaños en el barrido). */
   test('hallazgo · doble clic en «Repasar mis fallos» del resultado: el 2.º no contesta la 1.ª pregunta del repaso', async ({ page }) => {
-    // ABIERTO (Inspector 28/10/2026): mide que el 2.º clic no deje veredicto en la 1.ª del repaso.
-    test.fail();
+    // REPARADO el 28/10/2026: mide que el 2.º clic no deje veredicto en la 1.ª del repaso.
     test.setTimeout(60_000);
     await page.setViewportSize({ width: 1280, height: 800 });
     await abrirHidratada(page);
@@ -1942,8 +1940,7 @@ test.describe('Inspector 28/10/2026', () => {
    * (Con el resultado de una partida con dos fallos el 2.º clic cae en texto: es geometría.)
    */
   test('hallazgo · doble clic en «Cambiar nivel» tras un repaso: el 2.º no cambia el nivel elegido', async ({ page }) => {
-    // ABIERTO (Inspector 28/10/2026): mide que el nivel elegido siga siendo A2 tras la ráfaga.
-    test.fail();
+    // REPARADO el 28/10/2026: mide que el nivel elegido siga siendo A2 tras la ráfaga.
     test.setTimeout(60_000);
     await page.setViewportSize({ width: 1280, height: 800 });
     await page.addInitScript(() => {
@@ -2148,8 +2145,7 @@ test.describe('Inspector 28/10/2026 · móvil 412 × 915', () => {
    * habilitadas y el marcador sin tocar.
    */
   test('hallazgo · doble toque en «Siguiente»: el 2.º no contesta la pregunta nueva', async ({ page }) => {
-    // ABIERTO (Inspector 28/10/2026): mide que tras cada ráfaga la pregunta nueva siga sin contestar.
-    test.fail();
+    // REPARADO el 28/10/2026: mide que tras cada ráfaga la pregunta nueva siga sin contestar.
     test.setTimeout(90_000);
     await abrirHidratada(page);
     await arrancarPartida(page, 'A2 Elemental', 10);
@@ -2221,6 +2217,9 @@ test.describe('Inspector 28/10/2026 · móvil 360 × 740', () => {
     await expect(page.locator('[class*="resultadoFallados"]')).toContainText(`Has fallado 10 verbos: ${fallados.join(', ')}.`);
     await expect(page.getByRole('button', { name: 'Repasar mis fallos — 10 preguntas' })).toBeVisible();
 
+    // Leer la nota antes de seguir: un toque a menos de 300 ms del de «Ver resultados» y en el
+    // mismo sitio es el 2.º de su ráfaga (detail 2), y la guarda lo ignora a propósito (3615)
+    await page.waitForTimeout(500);
     await page.getByRole('button', { name: /Jugar de nuevo/ }).tap();
     await expect(page.getByText('Pregunta 1 de 10', { exact: true })).toBeAttached();
     const h = await hud(page);
@@ -2240,8 +2239,7 @@ test.describe('Inspector 28/10/2026 · móvil 360 × 740', () => {
    * Esperado: la 1.ª pregunta sin veredicto y las casillas editables.
    */
   test('hallazgo · escribiendo, doble toque en «Empezar»: el 2.º no pulsa «Comprobar» con las casillas vacías', async ({ page }) => {
-    // ABIERTO (Inspector 28/10/2026): mide que la 1.ª pregunta siga sin veredicto tras la ráfaga.
-    test.fail();
+    // REPARADO el 28/10/2026: mide que la 1.ª pregunta siga sin veredicto tras la ráfaga.
     await abrirHidratada(page);
     await page.getByRole('button', { name: /Escribir las formas/ }).click();
     await page.getByRole('button', { name: '10 preguntas', exact: true }).click();

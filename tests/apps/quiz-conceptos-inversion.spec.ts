@@ -444,8 +444,8 @@ test.describe('Inspector 28/10/2026 · doble toque', () => {
    * Medido el 28/10/2026: 375×667 → 5 de 25 (2 corridas; en la última pregunta pulsa «Ver
    * resultado») · 360×740 → 2 de 25 (2 corridas) · 390, 412, 768, 1280×720, 1280×800, 1920 → 0.
    */
-  test('hallazgo · 375×667: el doble toque en una respuesta no se salta su explicación', async ({ page }) => {
-    test.fail();
+  test('3751 · 375×667: el doble toque en una respuesta no se salta su explicación', async ({ page }) => {
+    // REPARADO el 28/10/2026: contestar marca la guarda con soloMismoPunto.
     test.setTimeout(150_000);
     await page.setViewportSize({ width: 375, height: 667 });
     await abrir(page);

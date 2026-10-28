@@ -346,7 +346,8 @@ export default function QuizComplejidadAlgoritmosPage() {
   const pct = preguntas.length > 0 ? Math.round((totalAciertos / preguntas.length) * 100) : 0;
 
   // Doble toque en «Empezar», «Siguiente» o «Ver resultado»: el 2.º no cae en la pantalla nueva
-  // (cabo C0082, lib/useGuardaRafaga.ts)
+  // (cabo C0082, lib/useGuardaRafaga.ts). Y en la opción: el foco a «Siguiente» sube la página y
+  // deja el botón bajo el dedo, así que el 2.º toque en el mismo punto se ignora (hallazgo 3679)
   const marcarCambioPantalla = useGuardaRafaga();
 
   function iniciarQuiz() {
@@ -373,6 +374,7 @@ export default function QuizComplejidadAlgoritmosPage() {
 
   function responder(i: number) {
     if (haRespondido) return;
+    marcarCambioPantalla({ soloMismoPunto: true });
     const esCorrecto = i === preguntaActual.correcta;
     setSeleccionada(i);
     setAciertos(prev => [...prev, esCorrecto]);

@@ -20,25 +20,44 @@ import { useCallback, useEffect, useRef } from 'react';
  * Va en captura sobre `window` para alcanzar también lo que no es de la app (las relacionadas,
  * el pie). Un clic suelto cierra la ráfaga.
  *
+ * `marcarCambioPantalla({ soloMismoPunto: true })` es para el clic que NO cambia de pantalla
+ * pero mueve la página: contestar, cuando el foco va a «Siguiente» y el navegador sube la vista
+ * para enseñarlo, de modo que el botón queda bajo el dedo y el 2.º toque sobre la opción se
+ * saltaba la explicación (hallazgos 3679, 3701 y 3751). Entonces solo se ignora el 2.º toque que
+ * cae donde cayó el 1.º (a menos de `RADIO_MISMO_PUNTO` px): el dedo no se ha movido, así que no
+ * es una intención nueva. El «Siguiente» rápido de quien SÍ ha ido a por él pasa.
+ *
  * Uso: `const marcarCambioPantalla = useGuardaRafaga();` y llamarla en cada manejador que cambia
  * de pantalla. Es la receta que llevaban copiada once selectores y quiz-geografia-espana (cabo
  * C0317); nace con los quizzes del cabo C0082 (26/10/2026), testigo tests/familias/quizzes.spec.ts.
  */
-export function useGuardaRafaga(): () => void {
-  const cambioPantallaRef = useRef(false);
+const RADIO_MISMO_PUNTO = 24;
+
+type Marca = false | 'pantalla' | 'punto';
+
+export function useGuardaRafaga(): (opciones?: { soloMismoPunto?: boolean }) => void {
+  const cambioPantallaRef = useRef<Marca>(false);
+  const puntoRef = useRef({ x: 0, y: 0 });
   useEffect(() => {
     function filtrar(e: MouseEvent) {
-      if (e.detail > 1 && cambioPantallaRef.current) {
+      const marca = cambioPantallaRef.current;
+      if (e.detail > 1 && marca) {
+        const { x, y } = puntoRef.current;
+        if (marca === 'punto' && Math.hypot(e.clientX - x, e.clientY - y) > RADIO_MISMO_PUNTO) {
+          cambioPantallaRef.current = false;
+          return;
+        }
         e.preventDefault();
         e.stopPropagation();
       } else if (e.detail <= 1) {
         cambioPantallaRef.current = false;
+        puntoRef.current = { x: e.clientX, y: e.clientY };
       }
     }
     window.addEventListener('click', filtrar, true);
     return () => window.removeEventListener('click', filtrar, true);
   }, []);
-  return useCallback(() => {
-    cambioPantallaRef.current = true;
+  return useCallback((opciones?: { soloMismoPunto?: boolean }) => {
+    cambioPantallaRef.current = opciones?.soloMismoPunto ? 'punto' : 'pantalla';
   }, []);
 }
