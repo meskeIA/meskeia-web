@@ -3713,55 +3713,72 @@ test.describe('inspector 28/10/2026', () => {
   });
 
   // ─────────────────────────────────────────────────────────────────────────
-  // CASO 3 (aviso) — ABIERTO (inspector 28/10/2026): los ordinales del § 8.3
+  // CASO 3 (aviso) — REPARADO (28/10/2026, hallazgo 3587): los ordinales del § 8.3
   // ─────────────────────────────────────────────────────────────────────────
   //
-  // En Texto → Braille la app no escribe º ni ª: «1.º» sale ⠼⠁⠄ («1.»), «2.ª planta» sale
-  // ⠼⠃⠄⠀⠏⠇⠁⠝⠞⠁ («2. planta») y «n.º 5» sale ⠝⠄⠀⠼⠑, con el aviso genérico «Puede que el Código Braille
+  // En Texto → Braille la app no escribía º ni ª: «1.º» salía ⠼⠁⠄ («1.»), «2.ª planta»
+  // ⠼⠃⠄⠀⠏⠇⠁⠝⠞⠁ («2. planta») y «n.º 5» ⠝⠄⠀⠼⠑, con el aviso genérico «Puede que el Código Braille
   // Español sí le asigne celda», cuando el § 8.3 y el § 12 escriben las dos cosas. En Braille → Texto
-  // el ordinal del B 2 se lee como signo de puntuación y la cifra desaparece SIN aviso: ⠼⠂⠕ → «,o»,
+  // el ordinal del B 2 se leía como signo de puntuación y la cifra desaparecía SIN aviso: ⠼⠂⠕ → «,o»,
   // ⠼⠆⠁ → «;a». Mide: la celda del B 2 o un aviso que no lo ponga en duda (ida), y el ordinal o un
-  // aviso (vuelta).
-  test('ABIERTO — § 8.3: «1.º» y «2.ª» son ordinales del B 2 (#,o · #;a), y en Braille → Texto la cifra no desaparece en silencio', async ({ page }) => {
-    test.fail();
+  // aviso (vuelta). REPARADO con AVISOS: escribir el ordinal es ampliar la tabla de la app, que es
+  // decisión del usuario (el criterio de los signos del 3525 y el 3556), así que la ida avisa con
+  // la verdad —el B 2 les da celda y la app aún no la escribe— y la vuelta avisa del ordinal. Si
+  // se decide escribirlos, este caso sigue valiendo: acepta la celda del B 2.
+  test('§ 8.3: «1.º» y «2.ª» son ordinales del B 2 (#,o · #;a), y en Braille → Texto la cifra no desaparece en silencio (3587)', async ({ page }) => {
     const fallos: string[] = [];
     const ida: Array<[string, string]> = [
-      ['1.º', '⠼⠂⠕'], // ⠼ (3456) · 1 en posición baja ⠂ (2) · o ⠕ (135). Hoy: ⠼⠁⠄
-      ['2.ª planta', '⠼⠆⠁⠀⠏⠇⠁⠝⠞⠁'], // 2 en posición baja ⠆ (23) · a ⠁ (1). Hoy: ⠼⠃⠄⠀⠏⠇⠁⠝⠞⠁
-      ['n.º 5', '⠝⠄⠕⠀⠼⠑'], // § 12 «n.o» = 1345-3-135. Hoy: ⠝⠄⠀⠼⠑
+      ['1.º', '⠼⠂⠕'], // ⠼ (3456) · 1 en posición baja ⠂ (2) · o ⠕ (135). Hoy: ⠼⠁⠄ y el aviso del B 2
+      ['2.ª planta', '⠼⠆⠁⠀⠏⠇⠁⠝⠞⠁'], // 2 en posición baja ⠆ (23) · a ⠁ (1). Hoy: ⠼⠃⠄⠀⠏⠇⠁⠝⠞⠁ y el aviso
+      ['n.º 5', '⠝⠄⠕⠀⠼⠑'], // § 12 «n.o» = 1345-3-135. Hoy: ⠝⠄⠀⠼⠑ y el aviso
     ];
     for (const [texto, celdas] of ida) {
       await convertir28(page, texto);
       const r = await resultado28(page);
       const enDuda = (await aviso28(page, 'Puede que el Código Braille Español').count()) > 0;
       if (r !== celdas && enDuda) fallos.push(`${texto} → ${r} y «Puede que…»`);
+      // Y sin la celda, el aviso que dice la verdad: el B 2 le da celda y la app no la escribe
+      const delB2 = (await aviso28(page, 'Documento Técnico B 2) sí').count()) > 0;
+      if (r !== celdas && !delB2) fallos.push(`${texto} → ${r} sin el aviso del B 2`);
     }
     const vuelta: Array<[string, string[]]> = [
-      ['⠼⠂⠕', ['1.º', '1º']], // Hoy: «,o», sin aviso
-      ['⠼⠆⠁', ['2.ª', '2ª']], // Hoy: «;a», sin aviso
+      ['⠼⠂⠕', ['1.º', '1º']], // Antes: «,o», sin aviso
+      ['⠼⠆⠁', ['2.ª', '2ª']], // Antes: «;a», sin aviso
     ];
     for (const [celdas, validos] of vuelta) {
       await convertir28(page, celdas, 'braille');
       const r = await resultado28(page);
-      const avisa = (await page.locator('[class*="avisoConversion"]').count()) > 0;
+      const avisa = (await aviso28(page, 'ordinal').count()) > 0;
       if (!validos.includes(r) && !avisa) fallos.push(`${celdas} → «${r}» sin aviso`);
+    }
+    // Y el aviso del ordinal no suena con un decimal ni con una cifra seguida de coma
+    for (const celdas of ['⠼⠛⠉⠂⠓⠁', '⠼⠁⠂⠀⠙⠕⠎']) {
+      await convertir28(page, celdas, 'braille');
+      await resultado28(page);
+      expect(await aviso28(page, 'ordinal').count(), `${celdas}: no es un ordinal`).toBe(0);
     }
     expect(fallos).toEqual([]);
   });
 
   // ─────────────────────────────────────────────────────────────────────────
-  // ABIERTO (inspector 28/10/2026) — § 14.3: «2’54”» son minutos y segundos. REGRESIÓN de 37367e2e
+  // REPARADO (28/10/2026, hallazgo 3588) — § 14.3: «2’54”» son minutos y segundos. Era REGRESIÓN de 37367e2e
   // ─────────────────────────────────────────────────────────────────────────
   //
   // La reparación del 3553 hizo decimal TODO apóstrofo entre cifras («73’81 → #gc,ha», § 8.1). Pero el
   // § 14.3 trae el contraejemplo literal, que la tinta sí distingue por el ” que cierra: «2’54” →
-  // #b:#ed». Hoy sale ⠼⠃⠂⠑⠙⠦ —2,54 y unas comillas de cierre— sin aviso; antes de 37367e2e salía
-  // ⠼⠃⠼⠑⠙⠦ con el aviso de comillas simples. Mide: la celda del B 2 para el ejemplo literal.
-  test('ABIERTO — § 14.3: «2’54”» se escribe con los dos puntos (#b:#ed), no como el decimal 2,54', async ({ page }) => {
-    test.fail();
+  // #b:#ed». Salía ⠼⠃⠂⠑⠙⠦ —2,54 y unas comillas de cierre— sin aviso; antes de 37367e2e salía
+  // ⠼⠃⠼⠑⠙⠦ con el aviso de comillas simples. Mide: la celda del B 2 para el ejemplo literal, la
+  // forma tecleada («2'54''», el mismo tiempo sin comillas tipográficas) y que el decimal del § 8.1
+  // no se mueve.
+  test('§ 14.3: «2’54”» se escribe con los dos puntos (#b:#ed), no como el decimal 2,54 (3588)', async ({ page }) => {
     await convertir28(page, '2’54”');
-    // ⠼ ⠃ (2) · ⠒ (25, dos puntos) · ⠼ ⠑ (5) ⠙ (4). Hoy: ⠼⠃⠂⠑⠙⠦
+    // ⠼ ⠃ (2) · ⠒ (25, dos puntos) · ⠼ ⠑ (5) ⠙ (4)
     await expect(cajaResultado(page)).toHaveText('⠼⠃⠒⠼⠑⠙', { timeout: 3000 });
+    await expect(page.locator('[class*="avisoConversion"]'), 'ni comillas ni signo sin celda que avisar').toHaveCount(0);
+    await convertir28(page, "2'54''");
+    await expect(cajaResultado(page)).toHaveText('⠼⠃⠒⠼⠑⠙', { timeout: 3000 });
+    await convertir28(page, '73’81');
+    await expect(cajaResultado(page), '§ 8.1: el apóstrofo decimal sigue siendo el punto 2').toHaveText('⠼⠛⠉⠂⠓⠁', { timeout: 3000 });
   });
 
   // ─────────────────────────────────────────────────────────────────────────

@@ -101,12 +101,72 @@ const esSeparadorDecimal = (caracteres: string[], i: number): boolean => {
   const c = caracteres[i];
   const esCifra = (x: string | undefined) => x !== undefined && ES_CIFRA.test(x);
   if (!esCifra(caracteres[i - 1]) || !esCifra(caracteres[i + 1])) return false;
-  if (APOSTROFOS.has(c)) return true;
+  if (APOSTROFOS.has(c)) return !minutosYSegundos(caracteres).separador.has(i);
   if (c !== '.') return false;
   let j = i + 1;
   while (esCifra(caracteres[j])) j++;
   return j - (i + 1) !== 3;
 };
+
+/** Lo que cierra los segundos en «2’54”»: la comilla de cierre, el signo de segundo o dos apóstrofos. */
+const CIERRES_DE_SEGUNDOS = new Set(['”', '″', '"']);
+
+/**
+ * ⚠️ 28/10/2026 (hallazgo 3588) — la reparación del 3553 hizo decimal CUALQUIER apóstrofo entre
+ * cifras, y el B 2 § 14.3 trae el contraejemplo literal: «Fuera del contexto científico, podemos
+ * encontrarnos grafías no adecuadas del tipo 2’54” para designar dos minutos y cincuenta y cuatro
+ * segundos. Transcribirlas utilizando los signos braille reservados para las medidas angulares no
+ * es correcto. En braille se utilizarán los dos puntos: 2’54” → #b:#ed». La tinta sí lo distingue,
+ * por lo que cierra los segundos: el apóstrofo entre cifras cuyas cifras de después acaban en ”
+ * (o en ″, o en '' tecleado) es el de minutos y segundos. Se escribe con los dos puntos, el número
+ * de los segundos lleva su propio signo de número y el cierre no se escribe. El decimal del § 8.1
+ * («73’81», sin cierre) sigue siendo el punto 2.
+ */
+const minutosYSegundos = (caracteres: string[]): { separador: Set<number>; cierre: Set<number> } => {
+  const separador = new Set<number>();
+  const cierre = new Set<number>();
+  for (let i = 1; i < caracteres.length; i++) {
+    if (!APOSTROFOS.has(caracteres[i]) || !ES_CIFRA.test(caracteres[i - 1])) continue;
+    let j = i + 1;
+    while (j < caracteres.length && ES_CIFRA.test(caracteres[j])) j++;
+    if (j === i + 1) continue;
+    if (CIERRES_DE_SEGUNDOS.has(caracteres[j] ?? '')) {
+      separador.add(i);
+      cierre.add(j);
+    } else if (APOSTROFOS.has(caracteres[j] ?? '') && APOSTROFOS.has(caracteres[j + 1] ?? '')) {
+      separador.add(i);
+      cierre.add(j);
+      cierre.add(j + 1);
+    }
+  }
+  return { separador, cierre };
+};
+
+/**
+ * ⚠️ 28/10/2026 (hallazgo 3587) — B 2 § 8.3, literal: los ordinales «se forman con los signos de
+ * la quinta serie […] que se utilizan para escribir los números en posición baja, seguidos de las
+ * letras «a» u «o» según el género», con los ejemplos «1.º o 1º → #,o», «2.ª o 2ª → #;a» y
+ * «3.er → #:r»; el § 12, «n.o 1345-3-135 n.º número»; y el § 8.4, «¾ → #c*» y «½ → #a;». La app
+ * omitía º, ª, ½ y ¾ con el aviso de que «puede que» el Código les diera celda, y en la vuelta
+ * leía la cifra baja como signo de puntuación: ⠼⠂⠕ volvía «,o» y la cifra desaparecía sin aviso.
+ *
+ * ESCRIBIRLOS es ampliar la tabla, que es decisión del usuario (el mismo criterio que los signos
+ * del 3525 y el 3556, en SIGNOS_DEL_B2_SIN_ESCRIBIR): de momento la ida avisa con la verdad, como
+ * con esos, y la vuelta avisa de lo que parece un ordinal o una fracción del B 2.
+ *
+ * Los números en posición baja son las diez cifras bajadas una fila (a = 1 → punto 2, b = 12 →
+ * 23…): 1 ⠂ · 2 ⠆ · 3 ⠒, como en los ejemplos.
+ */
+const CIFRAS_BAJAS = '⠂⠆⠒⠲⠢⠖⠶⠦⠔⠴';
+/** Fracciones de un solo signo en tinta (§ 8.4), que esta app aún no escribe. */
+const FRACCIONES_DE_UN_SIGNO = ['½', '⅓', '⅔', '¼', '¾', '⅕', '⅖', '⅗', '⅘', '⅙', '⅚', '⅐', '⅛', '⅜', '⅝', '⅞', '⅑', '⅒'];
+/**
+ * En «Braille → Texto»: signo de número seguido JUSTO DESPUÉS de cifras en posición baja y de
+ * «o», «a» o «r» es un ordinal del § 8.3 («#,o»). La fracción del § 8.4 («#a;») no se busca:
+ * tiene la forma de un número seguido de punto y coma o de coma («1;», «1,»), y avisar de ella
+ * sonaría en cualquier cifra seguida de puntuación.
+ */
+const ORDINAL_EN_BRAILLE = new RegExp(`⠼[${CIFRAS_BAJAS}]+[⠕⠁⠗]`);
 
 /**
  * Signos del B 2 § 6.2 que ocupan DOS celdas. Van aparte de `textToBraille` porque la
@@ -190,23 +250,29 @@ const PRIMERA_SERIE = /^[a-j]$/;
  * desaparecían sin avisar, porque el SVG filtra todo lo que no sea U+2800-U+28FF:
  * el usuario veía una hoja coherente a la que le faltaban caracteres.
  */
-const caracteresSinCelda = (texto: string): string[] => [
-  ...new Set(
-    Array.from(texto).filter(
-      (c) =>
-        !textToBraille[c.toLowerCase()] &&
-        !SIGNOS_COMPUESTOS[c] &&
-        // Las comillas simples llevan su propio aviso (`comillasSimplesOmitidas`)
-        !COMILLAS_SIMPLES.has(c) &&
-        // «…» se escribe como tres puntos (hallazgo 3418)
-        c !== '…' &&
-        // Una celda braille ya es braille: pasa tal cual (hallazgo 3434)
-        !ES_CELDA_BRAILLE.test(c) &&
-        // El salto de línea y los demás blancos sí se escriben: son separación de palabra
-        !/\s/.test(c),
+const caracteresSinCelda = (texto: string): string[] => {
+  const caracteres = Array.from(texto);
+  // El ″ que cierra unos segundos no se escribe a propósito (hallazgo 3588)
+  const cierres = minutosYSegundos(caracteres).cierre;
+  return [
+    ...new Set(
+      caracteres.filter(
+        (c, i) =>
+          !cierres.has(i) &&
+          !textToBraille[c.toLowerCase()] &&
+          !SIGNOS_COMPUESTOS[c] &&
+          // Las comillas simples llevan su propio aviso (`comillasSimplesOmitidas`)
+          !COMILLAS_SIMPLES.has(c) &&
+          // «…» se escribe como tres puntos (hallazgo 3418)
+          c !== '…' &&
+          // Una celda braille ya es braille: pasa tal cual (hallazgo 3434)
+          !ES_CELDA_BRAILLE.test(c) &&
+          // El salto de línea y los demás blancos sí se escriben: son separación de palabra
+          !/\s/.test(c),
+      ),
     ),
-  ),
-];
+  ];
+};
 
 /**
  * ⚠️ 22/10/2026 (hallazgo 3416) — el espacio duro (U+00A0: el de casi cualquier texto copiado de
@@ -383,6 +449,8 @@ const posiblesTelefonos = (texto: string): string[] => [
 const SIGNOS_DEL_B2_SIN_ESCRIBIR = new Set([
   '€', '%', '—', '[', ']', '*',
   '{', '}', '\\', '|', '+', '=', '@', '&', '§', '$', '£', '¥', '°',
+  // § 8.3 y § 12 (ordinales y «n.º») y § 8.4 (fracciones): hallazgo 3587, ver CIFRAS_BAJAS
+  'º', 'ª', ...FRACCIONES_DE_UN_SIGNO,
 ]);
 
 /**
@@ -494,8 +562,15 @@ const esLetraCooficialSinEscribir = (c: string): boolean =>
 /** ¿Hay en el texto alguna comilla simple que no sea un apóstrofo entre dos letras? */
 const comillasSimplesOmitidas = (texto: string): boolean => {
   const caracteres = Array.from(texto);
+  const tiempos = minutosYSegundos(caracteres);
   return caracteres.some(
-    (c, i) => COMILLAS_SIMPLES.has(c) && !esApostrofo(caracteres, i) && !esSeparadorDecimal(caracteres, i),
+    (c, i) =>
+      COMILLAS_SIMPLES.has(c) &&
+      !esApostrofo(caracteres, i) &&
+      !esSeparadorDecimal(caracteres, i) &&
+      // «2’54”» y «2'54''» (hallazgo 3588): ni el apóstrofo ni el cierre son comillas
+      !tiempos.separador.has(i) &&
+      !tiempos.cierre.has(i),
   );
 };
 
@@ -639,6 +714,9 @@ export default function ConversorBraillePage() {
         ),
       ]
     : [];
+
+  /** En la vuelta, un ordinal del B 2 que la app aún no lee (hallazgo 3587). */
+  const ordinalSinLeer = mode === 'brailleToText' && result !== '' && ORDINAL_EN_BRAILLE.test(input);
 
   const omiteComillasSimples = useMemo(
     () => mode === 'textToBraille' && result !== '' && comillasSimplesOmitidas(input),
@@ -835,10 +913,12 @@ export default function ConversorBraillePage() {
     const blancos = blancosEntreCifras(caracteres);
     const sinPuntoDeSigla = puntosDeSigla(caracteres);
     const romanos = numerosRomanos(caracteres);
+    const tiempos = minutosYSegundos(caracteres);
 
     for (let i = 0; i < caracteres.length; i++) {
       const original = caracteres[i];
       const char = original.toLowerCase();
+
 
       // B 2 § 8.1 (hallazgo 3526): el blanco entre grupos de tres cifras es el punto 3 de millar y
       // no cierra el número; en un teléfono, no se escribe.
@@ -854,6 +934,13 @@ export default function ConversorBraillePage() {
       }
       // B 2 § 7.1 (hallazgo 3554): los puntos de una sigla no se escriben
       if (sinPuntoDeSigla.has(i)) continue;
+      // B 2 § 14.3 (hallazgo 3588): «2’54” → #b:#ed», los dos puntos y otro signo de número
+      if (tiempos.separador.has(i)) {
+        result += textToBraille[':'];
+        enExpresionNumerica = false;
+        continue;
+      }
+      if (tiempos.cierre.has(i)) continue;
 
       if (/[0-9]/.test(char)) {
         if (!enExpresionNumerica) {
@@ -1433,6 +1520,16 @@ export default function ConversorBraillePage() {
                 <strong>{celdasOchoPuntos.join(' ')}</strong>.{' '}
                 La vista de celdas y la hoja imprimible solo tienen seis puntos y no dibujan el 7
                 ni el 8: en la hoja, una celda así puede punzarse como otra o quedar en blanco.
+              </p>
+            )}
+
+            {ordinalSinLeer && (
+              <p className={styles.avisoConversion} role="alert">
+                <span aria-hidden="true">⚠️</span> El texto braille lleva un{' '}
+                <strong>ordinal</strong>: signo de número, cifras en posición baja y «o», «a» o
+                «r», que es como el Código Braille Español escribe «1.º» ⠼⠂⠕ o «2.ª» ⠼⠆⠁ (B 2
+                § 8.3). Esta app aún no lo lee: el resultado lo muestra como signos de puntuación,
+                sin la cifra.
               </p>
             )}
 
