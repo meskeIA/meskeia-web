@@ -3721,43 +3721,63 @@ test.describe('inspector 28/10/2026', () => {
   // Español sí le asigne celda», cuando el § 8.3 y el § 12 escriben las dos cosas. En Braille → Texto
   // el ordinal del B 2 se leía como signo de puntuación y la cifra desaparecía SIN aviso: ⠼⠂⠕ → «,o»,
   // ⠼⠆⠁ → «;a». Mide: la celda del B 2 o un aviso que no lo ponga en duda (ida), y el ordinal o un
-  // aviso (vuelta). REPARADO con AVISOS: escribir el ordinal es ampliar la tabla de la app, que es
-  // decisión del usuario (el criterio de los signos del 3525 y el 3556), así que la ida avisa con
-  // la verdad —el B 2 les da celda y la app aún no la escribe— y la vuelta avisa del ordinal. Si
-  // se decide escribirlos, este caso sigue valiendo: acepta la celda del B 2.
-  test('§ 8.3: «1.º» y «2.ª» son ordinales del B 2 (#,o · #;a), y en Braille → Texto la cifra no desaparece en silencio (3587)', async ({ page }) => {
-    const fallos: string[] = [];
-    const ida: Array<[string, string]> = [
-      ['1.º', '⠼⠂⠕'], // ⠼ (3456) · 1 en posición baja ⠂ (2) · o ⠕ (135). Hoy: ⠼⠁⠄ y el aviso del B 2
-      ['2.ª planta', '⠼⠆⠁⠀⠏⠇⠁⠝⠞⠁'], // 2 en posición baja ⠆ (23) · a ⠁ (1). Hoy: ⠼⠃⠄⠀⠏⠇⠁⠝⠞⠁ y el aviso
-      ['n.º 5', '⠝⠄⠕⠀⠼⠑'], // § 12 «n.o» = 1345-3-135. Hoy: ⠝⠄⠀⠼⠑ y el aviso
+  // aviso (vuelta). Primero se reparó con AVISOS (48bd8811): escribirlo era ampliar la tabla, que es
+  // decisión del usuario. El 28/10/2026 la tomó (cabo C0506): la app ESCRIBE ordinales, «n.º» y
+  // fracciones, y la vuelta LEE el ordinal. Este caso ya no admite el aviso como salida: exige la
+  // celda del B 2 y ningún aviso.
+  test('§ 8.3, § 8.4 y § 12: ordinales, «n.º» y fracciones con las celdas del B 2, y la vuelta lee el ordinal (3587, C0506)', async ({ page }) => {
+    const ida: Array<[string, string, string]> = [
+      // ⠼ (3456) · 1 en posición baja ⠂ (2) · o ⠕ (135)
+      ['1.º', '⠼⠂⠕', '§ 8.3 «1.º o 1º → #,o»'],
+      ['1º', '⠼⠂⠕', '§ 8.3 «1.º o 1º → #,o»'],
+      // 2 en posición baja ⠆ (23) · a ⠁ (1)
+      ['2.ª planta', '⠼⠆⠁⠀⠏⠇⠁⠝⠞⠁', '§ 8.3 «2.ª o 2ª → #;a»'],
+      // 3 en posición baja ⠒ (25) · r ⠗ (1235); la «e» no se escribe
+      ['3.er', '⠼⠒⠗', '§ 8.3 «3.er → #:r»'],
+      // Dos cifras: 1 ⠂ y 2 ⠆ en posición baja
+      ['12.º', '⠼⠂⠆⠕', '§ 8.3, con dos cifras'],
+      // § 14.3 «1.º: 02:08:57 → #,o: #jb:#jh:#eg»
+      ['1.º: 02:08:57', '⠼⠂⠕⠒⠀⠼⠚⠃⠒⠼⠚⠓⠒⠼⠑⠛', '§ 14.3, literal'],
+      // § 12 «n.o» = 1345-3-135; la cifra que sigue, número normal
+      ['n.º 5', '⠝⠄⠕⠀⠼⠑', '§ 12 «n.o»'],
+      ['N.º 5', '⠨⠝⠄⠕⠀⠼⠑', '§ 12 con mayúscula (§ 7)'],
+      // § 8.4: numerador en posición normal, denominador en posición baja (4 → ⠲, 256)
+      ['¾', '⠼⠉⠲', '§ 8.4 «¾ → #c*»'],
+      ['½ kilo', '⠼⠁⠆⠀⠅⠊⠇⠕', '§ 8.4 «½ → #a;»'],
     ];
-    for (const [texto, celdas] of ida) {
+    for (const [texto, celdas, fuente] of ida) {
       await convertir28(page, texto);
-      const r = await resultado28(page);
-      const enDuda = (await aviso28(page, 'Puede que el Código Braille Español').count()) > 0;
-      if (r !== celdas && enDuda) fallos.push(`${texto} → ${r} y «Puede que…»`);
-      // Y sin la celda, el aviso que dice la verdad: el B 2 le da celda y la app no la escribe
-      const delB2 = (await aviso28(page, 'Documento Técnico B 2) sí').count()) > 0;
-      if (r !== celdas && !delB2) fallos.push(`${texto} → ${r} sin el aviso del B 2`);
+      await expect(cajaResultado(page), `${texto} (${fuente})`).toHaveText(celdas, { timeout: 3000 });
+      await expect(page.locator('[class*="avisoConversion"]'), `${texto}: sin aviso`).toHaveCount(0);
     }
-    const vuelta: Array<[string, string[]]> = [
-      ['⠼⠂⠕', ['1.º', '1º']], // Antes: «,o», sin aviso
-      ['⠼⠆⠁', ['2.ª', '2ª']], // Antes: «;a», sin aviso
+    // Lo que no es ordinal no se mueve: un decimal con punto y un número seguido de «.» y letra
+    for (const [texto, celdas] of [['1.5', '⠼⠁⠂⠑'], ['3.b', '⠼⠉⠄⠐⠃']] as const) {
+      await convertir28(page, texto);
+      await expect(cajaResultado(page), texto).toHaveText(celdas, { timeout: 3000 });
+    }
+    // Vuelta: el ordinal se lee, sin aviso, también con una cifra baja sin otro uso (4 → ⠲)
+    const vuelta: Array<[string, string]> = [
+      ['⠼⠂⠕', '1.º'],
+      ['⠼⠆⠁', '2.ª'],
+      ['⠼⠒⠗', '3.er'],
+      ['⠼⠲⠕', '4.º'],
+      ['⠼⠂⠕⠒⠀⠼⠚⠃⠒⠼⠚⠓⠒⠼⠑⠛', '1.º: 02:08:57'],
     ];
-    for (const [celdas, validos] of vuelta) {
+    for (const [celdas, texto] of vuelta) {
       await convertir28(page, celdas, 'braille');
-      const r = await resultado28(page);
-      const avisa = (await aviso28(page, 'ordinal').count()) > 0;
-      if (!validos.includes(r) && !avisa) fallos.push(`${celdas} → «${r}» sin aviso`);
+      await expect(cajaResultado(page), celdas).toHaveText(texto, { timeout: 3000 });
+      await expect(page.locator('[class*="avisoConversion"]'), `${celdas}: sin aviso`).toHaveCount(0);
     }
+    // Con una letra detrás (¿un plural?) la fuente no dice cómo es: no se lee y se avisa
+    await convertir28(page, '⠼⠂⠕⠎', 'braille');
+    await resultado28(page);
+    await expect(aviso28(page, 'ordinal')).toHaveCount(1);
     // Y el aviso del ordinal no suena con un decimal ni con una cifra seguida de coma
     for (const celdas of ['⠼⠛⠉⠂⠓⠁', '⠼⠁⠂⠀⠙⠕⠎']) {
       await convertir28(page, celdas, 'braille');
       await resultado28(page);
       expect(await aviso28(page, 'ordinal').count(), `${celdas}: no es un ordinal`).toBe(0);
     }
-    expect(fallos).toEqual([]);
   });
 
   // ─────────────────────────────────────────────────────────────────────────

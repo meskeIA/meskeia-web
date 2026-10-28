@@ -150,23 +150,126 @@ const minutosYSegundos = (caracteres: string[]): { separador: Set<number>; cierr
  * omitía º, ª, ½ y ¾ con el aviso de que «puede que» el Código les diera celda, y en la vuelta
  * leía la cifra baja como signo de puntuación: ⠼⠂⠕ volvía «,o» y la cifra desaparecía sin aviso.
  *
- * ESCRIBIRLOS es ampliar la tabla, que es decisión del usuario (el mismo criterio que los signos
- * del 3525 y el 3556, en SIGNOS_DEL_B2_SIN_ESCRIBIR): de momento la ida avisa con la verdad, como
- * con esos, y la vuelta avisa de lo que parece un ordinal o una fracción del B 2.
+ * ⚠️ 28/10/2026 (cabo C0506) — el usuario decide ESCRIBIRLOS: «1.º» y «1º» → ⠼⠂⠕, «2.ª» → ⠼⠆⠁,
+ * «3.er» → ⠼⠒⠗, «n.º» → ⠝⠄⠕ y las fracciones de un signo con el numerador en posición normal y el
+ * denominador en posición baja (½ → ⠼⠁⠆, ¾ → ⠼⠉⠲). La vuelta lee el ordinal. Lo que la fuente no
+ * trae se queda como estaba: el plural («1.os»), «nº» sin punto (º suelto, con el aviso del B 2) y
+ * la fracción pegada a un entero («2½»), que se escribe con su propio signo de número sin que el
+ * B 2 citado lo diga. La fracción NO se lee en la vuelta: «#a;» tiene la forma de un número
+ * seguido de punto y coma o de coma («1;», «1,»), y leerla rompería cualquier cifra seguida de
+ * puntuación. El resto de signos del 3525 y el 3556 siguen sin escribirse: la decisión fue solo esta.
  *
  * Los números en posición baja son las diez cifras bajadas una fila (a = 1 → punto 2, b = 12 →
  * 23…): 1 ⠂ · 2 ⠆ · 3 ⠒, como en los ejemplos.
  */
 const CIFRAS_BAJAS = '⠂⠆⠒⠲⠢⠖⠶⠦⠔⠴';
-/** Fracciones de un solo signo en tinta (§ 8.4), que esta app aún no escribe. */
-const FRACCIONES_DE_UN_SIGNO = ['½', '⅓', '⅔', '¼', '¾', '⅕', '⅖', '⅗', '⅘', '⅙', '⅚', '⅐', '⅛', '⅜', '⅝', '⅞', '⅑', '⅒'];
+const CIFRA_BAJA: { [cifra: string]: string } = Object.fromEntries(
+  Array.from('1234567890').map((cifra, k) => [cifra, CIFRAS_BAJAS[k]]),
+);
+/** Fracciones de un solo signo en tinta (§ 8.4): numerador y denominador. */
+const FRACCIONES: { [signo: string]: [string, string] } = {
+  '½': ['1', '2'], '⅓': ['1', '3'], '⅔': ['2', '3'], '¼': ['1', '4'], '¾': ['3', '4'],
+  '⅕': ['1', '5'], '⅖': ['2', '5'], '⅗': ['3', '5'], '⅘': ['4', '5'], '⅙': ['1', '6'],
+  '⅚': ['5', '6'], '⅐': ['1', '7'], '⅛': ['1', '8'], '⅜': ['3', '8'], '⅝': ['5', '8'],
+  '⅞': ['7', '8'], '⅑': ['1', '9'], '⅒': ['1', '10'],
+};
+/** Letra del ordinal en braille (§ 8.3) → cómo se escribe en tinta. */
+const ORDINAL_A_TINTA: { [celda: string]: string } = { '⠕': '.º', '⠁': '.ª', '⠗': '.er' };
+
+/**
+ * Ordinales, «n.º» y fracciones del texto en tinta: posición donde empiezan → celdas que se
+ * escriben y posición donde terminan (sin incluir). La conversión salta lo cubierto y los avisos
+ * de signos sin celda no lo cuentan.
+ */
+const ordinalesYFracciones = (caracteres: string[]): Map<number, { celdas: string; hasta: number }> => {
+  const encontrados = new Map<number, { celdas: string; hasta: number }>();
+  const esCifra = (c: string | undefined) => c !== undefined && ES_CIFRA.test(c);
+  for (let i = 0; i < caracteres.length; i++) {
+    const c = caracteres[i];
+    const fraccion = FRACCIONES[c];
+    if (fraccion) {
+      const [numerador, denominador] = fraccion;
+      const celdas =
+        NUMBER_INDICATOR +
+        Array.from(numerador).map((x) => textToBraille[x]).join('') +
+        Array.from(denominador).map((x) => CIFRA_BAJA[x]).join('');
+      encontrados.set(i, { celdas, hasta: i + 1 });
+      continue;
+    }
+    // § 12: «n.º» (o «N.º»), como palabra suelta
+    if (
+      (c === 'n' || c === 'N') &&
+      !ES_LETRA.test(caracteres[i - 1] ?? '') &&
+      caracteres[i + 1] === '.' &&
+      caracteres[i + 2] === 'º' &&
+      !ES_LETRA.test(caracteres[i + 3] ?? '')
+    ) {
+      encontrados.set(i, { celdas: (c === 'N' ? CAPITAL_INDICATOR : '') + '⠝⠄⠕', hasta: i + 3 });
+      i += 2;
+      continue;
+    }
+    // § 8.3: cifras que empiezan número (ni detrás de otra cifra ni de un separador entre cifras)
+    if (!esCifra(c) || esCifra(caracteres[i - 1])) continue;
+    if (/^[ .,’']$/.test(caracteres[i - 1] ?? '') && esCifra(caracteres[i - 2])) continue;
+    let j = i;
+    while (esCifra(caracteres[j])) j++;
+    const conPunto = caracteres[j] === '.';
+    const marca = caracteres[conPunto ? j + 1 : j];
+    let letra = '';
+    let hasta = 0;
+    if (marca === 'º' || marca === 'ª') {
+      letra = marca === 'º' ? '⠕' : '⠁';
+      hasta = (conPunto ? j + 1 : j) + 1;
+    } else if (conPunto && caracteres[j + 1] === 'e' && caracteres[j + 2] === 'r' && !ES_LETRA.test(caracteres[j + 3] ?? '')) {
+      letra = '⠗';
+      hasta = j + 3;
+    }
+    if (letra) {
+      const cifras = caracteres.slice(i, j).map((x) => CIFRA_BAJA[x]).join('');
+      encontrados.set(i, { celdas: NUMBER_INDICATOR + cifras + letra, hasta });
+    }
+    i = j - 1;
+  }
+  return encontrados;
+};
+
+/** Posiciones del texto que cubre un ordinal, un «n.º» o una fracción. */
+const posicionesDeOrdinales = (caracteres: string[]): Set<number> => {
+  const cubiertas = new Set<number>();
+  ordinalesYFracciones(caracteres).forEach(({ hasta }, desde) => {
+    for (let k = desde; k < hasta; k++) cubiertas.add(k);
+  });
+  return cubiertas;
+};
+
 /**
  * En «Braille → Texto»: signo de número seguido JUSTO DESPUÉS de cifras en posición baja y de
- * «o», «a» o «r» es un ordinal del § 8.3 («#,o»). La fracción del § 8.4 («#a;») no se busca:
- * tiene la forma de un número seguido de punto y coma o de coma («1;», «1,»), y avisar de ella
- * sonaría en cualquier cifra seguida de puntuación.
+ * «o», «a» o «r» es un ordinal del § 8.3 («#,o»). Se lee si detrás no viene otra letra; con una
+ * letra detrás («⠼⠂⠕⠎», ¿«1.os»?) la fuente citada no dice cómo es, y se avisa en vez de leerlo.
  */
-const ORDINAL_EN_BRAILLE = new RegExp(`⠼[${CIFRAS_BAJAS}]+[⠕⠁⠗]`);
+const leerOrdinal = (celdas: string[], i: number): { texto: string; hasta: number } | null => {
+  if (celdas[i] !== NUMBER_INDICATOR) return null;
+  let j = i + 1;
+  let cifras = '';
+  while (j < celdas.length && CIFRAS_BAJAS.includes(celdas[j])) {
+    cifras += '1234567890'[CIFRAS_BAJAS.indexOf(celdas[j])];
+    j++;
+  }
+  const fin = ORDINAL_A_TINTA[celdas[j] ?? ''];
+  if (!cifras || !fin) return null;
+  if (ES_LETRA.test(brailleToText[celdas[j + 1] ?? ''] ?? '')) return null;
+  return { texto: cifras + fin, hasta: j + 1 };
+};
+
+/** ¿Hay en el braille un ordinal que `leerOrdinal` no lee (con una letra detrás)? */
+const ORDINAL_EN_BRAILLE = new RegExp(`⠼[${CIFRAS_BAJAS}]+[⠕⠁⠗]`, 'g');
+const hayOrdinalSinLeer = (braille: string): boolean => {
+  const celdas = Array.from(braille);
+  return [...braille.matchAll(ORDINAL_EN_BRAILLE)].some((m) => {
+    const desde = Array.from(braille.slice(0, m.index)).length;
+    return leerOrdinal(celdas, desde) === null;
+  });
+};
 
 /**
  * Signos del B 2 § 6.2 que ocupan DOS celdas. Van aparte de `textToBraille` porque la
@@ -254,11 +357,14 @@ const caracteresSinCelda = (texto: string): string[] => {
   const caracteres = Array.from(texto);
   // El ″ que cierra unos segundos no se escribe a propósito (hallazgo 3588)
   const cierres = minutosYSegundos(caracteres).cierre;
+  // Ordinales, «n.º» y fracciones se escriben con sus celdas del B 2 (C0506)
+  const ordinales = posicionesDeOrdinales(caracteres);
   return [
     ...new Set(
       caracteres.filter(
         (c, i) =>
           !cierres.has(i) &&
+          !ordinales.has(i) &&
           !textToBraille[c.toLowerCase()] &&
           !SIGNOS_COMPUESTOS[c] &&
           // Las comillas simples llevan su propio aviso (`comillasSimplesOmitidas`)
@@ -449,8 +555,8 @@ const posiblesTelefonos = (texto: string): string[] => [
 const SIGNOS_DEL_B2_SIN_ESCRIBIR = new Set([
   '€', '%', '—', '[', ']', '*',
   '{', '}', '\\', '|', '+', '=', '@', '&', '§', '$', '£', '¥', '°',
-  // § 8.3 y § 12 (ordinales y «n.º») y § 8.4 (fracciones): hallazgo 3587, ver CIFRAS_BAJAS
-  'º', 'ª', ...FRACCIONES_DE_UN_SIGNO,
+  // § 8.3 y § 12: º y ª SUELTOS, fuera de un ordinal o de «n.º», que sí se escriben (C0506)
+  'º', 'ª',
 ]);
 
 /**
@@ -715,8 +821,8 @@ export default function ConversorBraillePage() {
       ]
     : [];
 
-  /** En la vuelta, un ordinal del B 2 que la app aún no lee (hallazgo 3587). */
-  const ordinalSinLeer = mode === 'brailleToText' && result !== '' && ORDINAL_EN_BRAILLE.test(input);
+  /** En la vuelta, un ordinal del B 2 que la app no lee: con una letra detrás (hallazgo 3587, C0506). */
+  const ordinalSinLeer = mode === 'brailleToText' && result !== '' && hayOrdinalSinLeer(input);
 
   const omiteComillasSimples = useMemo(
     () => mode === 'textToBraille' && result !== '' && comillasSimplesOmitidas(input),
@@ -749,6 +855,13 @@ export default function ConversorBraillePage() {
         formanCompuesto.add(i);
         formanCompuesto.add(i + 1);
         i++;
+        continue;
+      }
+      // Las cifras en posición baja de un ordinal que se ha leído (⠲ ⠶ ⠔ ⠴ no tienen otro uso)
+      const ordinal = leerOrdinal(celdas, i);
+      if (ordinal) {
+        for (let k = i; k < ordinal.hasta; k++) formanCompuesto.add(k);
+        i = ordinal.hasta - 1;
       }
     }
     return [
@@ -914,11 +1027,20 @@ export default function ConversorBraillePage() {
     const sinPuntoDeSigla = puntosDeSigla(caracteres);
     const romanos = numerosRomanos(caracteres);
     const tiempos = minutosYSegundos(caracteres);
+    const ordinales = ordinalesYFracciones(caracteres);
 
     for (let i = 0; i < caracteres.length; i++) {
       const original = caracteres[i];
       const char = original.toLowerCase();
 
+      // B 2 § 8.3, § 8.4 y § 12 (C0506): ordinal, fracción o «n.º», con su propio signo de número
+      const ordinal = ordinales.get(i);
+      if (ordinal) {
+        result += ordinal.celdas;
+        enExpresionNumerica = false;
+        i = ordinal.hasta - 1;
+        continue;
+      }
 
       // B 2 § 8.1 (hallazgo 3526): el blanco entre grupos de tres cifras es el punto 3 de millar y
       // no cierra el número; en un teléfono, no se escribe.
@@ -1087,6 +1209,16 @@ export default function ConversorBraillePage() {
       if (char === LATIN_PREFIX) {
         // El prefijo NO cierra la expresión: solo exime a la celda siguiente.
         siguienteEsLatina = true;
+        continue;
+      }
+
+      // B 2 § 8.3 (C0506): «⠼⠂⠕» es «1.º», no un signo de número seguido de «,o»
+      const ordinal = leerOrdinal(celdas, i);
+      if (ordinal) {
+        result += ordinal.texto;
+        enExpresionNumerica = false;
+        nextIsCapital = false;
+        i = ordinal.hasta - 1;
         continue;
       }
 
@@ -1526,10 +1658,10 @@ export default function ConversorBraillePage() {
             {ordinalSinLeer && (
               <p className={styles.avisoConversion} role="alert">
                 <span aria-hidden="true">⚠️</span> El texto braille lleva un{' '}
-                <strong>ordinal</strong>: signo de número, cifras en posición baja y «o», «a» o
-                «r», que es como el Código Braille Español escribe «1.º» ⠼⠂⠕ o «2.ª» ⠼⠆⠁ (B 2
-                § 8.3). Esta app aún no lo lee: el resultado lo muestra como signos de puntuación,
-                sin la cifra.
+                <strong>ordinal</strong> seguido de otra letra: signo de número, cifras en
+                posición baja y «o», «a» o «r», que es como el Código Braille Español escribe
+                «1.º» ⠼⠂⠕ o «2.ª» ⠼⠆⠁ (B 2 § 8.3). Con la letra detrás (¿un plural, «1.os»?) esta
+                app no lo lee: el resultado lo muestra como signos de puntuación, sin la cifra.
               </p>
             )}
 
