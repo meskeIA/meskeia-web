@@ -206,7 +206,7 @@ const PREGUNTAS: Pregunta[] = [
       'El físico reparte dividendos; el sintético los acumula',
     ],
     correcta: 1,
-    explicacion: 'La réplica física compra los valores reales del índice (total o muestral). La sintética firma un swap con una contraparte que se compromete a pagar el rendimiento del índice. La sintética puede ser más eficiente en mercados difíciles de acceder, pero añade riesgo de contraparte (si el banco contraparte quiebra). Los reguladores europeos limitan la exposición a swaps al 10% del patrimonio.',
+    explicacion: 'La réplica física compra los valores reales del índice (total o muestral). La sintética firma un swap con una contraparte que se compromete a pagar el rendimiento del índice. La sintética puede ser más eficiente en mercados difíciles de acceder, pero añade riesgo de contraparte (si el banco contraparte quiebra). En España, el Reglamento de IIC (RD 1082/2012, art. 51.3, que traslada la Directiva 2009/65/CE) limita la exposición al riesgo frente a una misma contraparte de derivados al 5 % del patrimonio del fondo, o al 10 % si la contraparte es una entidad de crédito.',
   },
   {
     id: 13, categoria: 'fondos-etf',
@@ -385,7 +385,8 @@ function mezclar<T>(arr: T[]): T[] {
 
 function clasificacion(pct: number): { texto: string; icono: string; color: string } {
   if (pct === 100) return { texto: 'Experto en inversión', icono: '🏆', color: '#F39C12' };
-  if (pct >= 80)  return { texto: 'Nivel avanzado — listo para construir cartera propia', icono: '🌟', color: '#27AE60' };
+  // Hallazgo 3792: un nivel de conocimiento, no una invitación a invertir (app exenta de disclaimer)
+  if (pct >= 80)  return { texto: 'Nivel avanzado — dominas la mayoría de los conceptos', icono: '🌟', color: '#27AE60' };
   if (pct >= 60)  return { texto: 'Nivel intermedio — base sólida para seguir aprendiendo', icono: '👍', color: '#2E86AB' };
   if (pct >= 40)  return { texto: 'Nivel básico-medio — repasa los conceptos clave', icono: '📚', color: '#E07B39' };
   return { texto: 'Nivel inicial — empieza por el quiz básico de finanzas', icono: '🌱', color: '#8E44AD' };

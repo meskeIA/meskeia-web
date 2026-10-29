@@ -19,8 +19,8 @@ import { TRAMOS_GANANCIAS_PATRIMONIALES_2025 } from '../../data/fiscal/inmuebles
  * DE DÓNDE SALEN LOS VALORES ESPERADOS
  * ────────────────────────────────────
  * · Nota: `pct = Math.round(correctas / total · 100)` y `clasificacion()` (page.tsx:386-392):
- *   100 → 🏆 «Experto en inversión» · ≥ 80 → 🌟 «Nivel avanzado — listo para construir cartera
- *   propia» · ≥ 60 → 👍 «Nivel intermedio — base sólida para seguir aprendiendo» · ≥ 40 → 📚 «Nivel
+ *   100 → 🏆 «Experto en inversión» · ≥ 80 → 🌟 «Nivel avanzado — dominas la mayoría de los
+ *   conceptos» (hasta el 29/10/2026, «listo para construir cartera propia»: hallazgo 3792) · ≥ 60 → 👍 «Nivel intermedio — base sólida para seguir aprendiendo» · ≥ 40 → 📚 «Nivel
  *   básico-medio — repasa los conceptos clave» · resto → 🌱 «Nivel inicial — empieza por el quiz
  *   básico de finanzas». Con 25 preguntas cada acierto vale 4 %, así que no hay redondeo.
  * · Desglose: en el orden de `resultadosCat` (Riesgo y Rentabilidad, Renta Fija y Bonos, Fondos y
@@ -254,8 +254,8 @@ test.describe('Quiz Conceptos de Inversión · partida', () => {
     test.setTimeout(300_000);
     await abrir(page);
     const tramos: [number, string][] = [
-      [24, 'Nivel avanzado — listo para construir cartera propia'],
-      [20, 'Nivel avanzado — listo para construir cartera propia'],
+      [24, 'Nivel avanzado — dominas la mayoría de los conceptos'],
+      [20, 'Nivel avanzado — dominas la mayoría de los conceptos'],
       [19, 'Nivel intermedio — base sólida para seguir aprendiendo'],
       [15, 'Nivel intermedio — base sólida para seguir aprendiendo'],
       [14, 'Nivel básico-medio — repasa los conceptos clave'],
@@ -290,7 +290,7 @@ test.describe('Quiz Conceptos de Inversión · partida', () => {
     const r = await resultado(page);
     expect(r.puntuacion).toBe('4 / 5');
     expect(r.pct).toBe('80% de respuestas correctas');
-    expect(r.nivel).toBe('Nivel avanzado — listo para construir cartera propia');
+    expect(r.nivel).toBe('Nivel avanzado — dominas la mayoría de los conceptos');
     expect(r.categorias).toEqual(['🏦 Fondos y ETF 4/5']);
   });
 
@@ -897,8 +897,8 @@ test.describe('Inspector 29/10/2026 · hallazgos', () => {
    * 80 % → ese tramo. Esperado: un nivel de conocimiento que no invite a una decisión financiera, o la
    * exención retirada con su DisclaimerCard.
    */
+  // REPARADO (3792, 29/10/2026): el tramo ≥ 80 % dice «Nivel avanzado — dominas la mayoría de los conceptos»
   test('hallazgo · el 80 % no se lee como «listo para construir cartera propia» en una página sin disclaimer', async ({ page }) => {
-    test.fail();
     test.setTimeout(90_000);
     await page.setViewportSize({ width: 1280, height: 800 });
     await abrir(page);
@@ -924,8 +924,8 @@ test.describe('Inspector 29/10/2026 · hallazgos', () => {
    * rentabilidad: lo acotado es el riesgo frente a cada contraparte, 5 % o 10 %, no «la exposición a
    * swaps». No está en data/fiscal.
    */
+  // REPARADO (3793, 29/10/2026): la explicación cita el art. 51.3 del RD 1082/2012 (releído en boe.es)
   test('hallazgo · el límite de la réplica sintética es el riesgo frente a una contraparte (5 % / 10 %), no «la exposición a swaps al 10 %»', async ({ page }) => {
-    test.fail();
     test.setTimeout(90_000);
     await page.setViewportSize({ width: 1280, height: 800 });
     await abrir(page);
@@ -939,5 +939,6 @@ test.describe('Inspector 29/10/2026 · hallazgos', () => {
     }
     expect(replica, 'la pregunta de la réplica sale en la práctica de Fondos y ETF').toMatch(/riesgo de contraparte/);
     expect(replica).not.toMatch(/limitan la exposición a swaps al 10%/);
+    expect(replica).toMatch(/misma contraparte de derivados al 5\s?% del patrimonio del fondo, o al 10\s?% si la contraparte es una entidad de crédito/);
   });
 });
