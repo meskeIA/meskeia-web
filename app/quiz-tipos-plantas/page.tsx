@@ -118,7 +118,7 @@ const PLANTAS: PlantaQuiz[] = [
   { id: 37, emoji: '🍅', nombreComun: 'Tomate', nombreCientifico: 'Solanum lycopersicum', grupo: 'dicotiledonea', pista: 'Fruto baya con placentación axial; flor amarilla de 5 pétalos soldados en campana', explicacion: 'Dicotiledónea solanácea: el tomate es botanicamente una baya (fruto carnoso). 5 pétalos fusionados (simpétala). Hojas compuestas con nervación reticulada.', dificultad: 'facil' },
   { id: 38, emoji: '🌳', nombreComun: 'Roble', nombreCientifico: 'Quercus robur', grupo: 'dicotiledonea', pista: 'Árbol caducifolio con hojas lobuladas, bellotas en cúpula y madera durísima', explicacion: 'Dicotiledónea: las bellotas son frutos secos (aquenios) sobre una cúpula. Madera con anillos anuales (crecimiento secundario). Flores pequeñas anemófilas. Hojas con nervación pinnada reticulada.', dificultad: 'facil' },
   { id: 39, emoji: '💜', nombreComun: 'Lavanda', nombreCientifico: 'Lavandula angustifolia', grupo: 'dicotiledonea', pista: 'Arbusto aromático con flores violetas en espiga; hojas grises estrechas y fragantes', explicacion: 'Dicotiledónea lamiácea: flores zigomorfas (bilaterales) de 2 labios, muy características de la familia Lamiaceae. Hojas opuestas con nervación reticulada.', dificultad: 'medio' },
-  { id: 40, emoji: '🥑', nombreComun: 'Aguacate', nombreCientifico: 'Persea americana', grupo: 'dicotiledonea', pista: 'Fruto-drupa con semilla enorme; árbol siempreverde de hoja grande y brillante, originario de México', explicacion: 'Dicotiledónea laurácea: el aguacate es una drupa (fruto carnoso con hueso). Flores pequeñas con 6 tépalos en 2 verticilos. Hojas alternadas con nervación pinnada.', dificultad: 'medio' },
+  { id: 40, emoji: '🥑', nombreComun: 'Aguacate', nombreCientifico: 'Persea americana', grupo: 'dicotiledonea', pista: 'Fruto-drupa con semilla enorme; árbol siempreverde de hoja grande y brillante, originario de México', explicacion: 'Dicotiledónea laurácea: el aguacate es una drupa (fruto carnoso con hueso). Ojo, es la excepción a la regla de las flores: tiene 6 tépalos en 2 verticilos (flor de base 3, como una monocotiledónea) porque las lauráceas son magnólidas, dicotiledóneas que no son eudicotiledóneas. Lo que la delata es la hoja: nervación pinnada en red, no paralela.', dificultad: 'medio' },
 ];
 
 // ============================================================================
@@ -301,8 +301,11 @@ function QuizPorFases() {
     const esFeedback = juego.estado === 'feedback';
     const esCorrecta = juego.respuestaSeleccionada === plantaActual.grupo;
 
+    // Hallazgo 3787: la vista de juego no lleva logo ni hero, pero sí la región principal y el
+    // título de la app, como el inicio, el resultado y la referencia de la familia
     return (
-      <div className={styles.quizWrapper}>
+      <main className={styles.quizWrapper}>
+        <h1 className="sr-only">Quiz: Clasifica 40 Plantas</h1>
         {/* Barra de progreso */}
         <div className={styles.barraProgreso} role="progressbar" aria-valuenow={juego.indiceActual + 1} aria-valuemin={0} aria-valuemax={juego.preguntas.length} aria-valuetext={`Pregunta ${juego.indiceActual + 1} de ${juego.preguntas.length}`}>
           <div className={styles.barraRelleno} style={{ width: `${progreso}%` }} />
@@ -378,7 +381,7 @@ function QuizPorFases() {
             </button>
           </div>
         )}
-      </div>
+      </main>
     );
   }
 
@@ -533,7 +536,7 @@ function QuizPorFases() {
               <h4 className={styles.eduSubtitulo}>Preguntas frecuentes</h4>
               {[
                 { pregunta: '¿Los hongos son plantas?', respuesta: 'No. Los hongos tienen su propio reino (Fungi). No realizan fotosíntesis, tienen quitina en sus paredes (no celulosa) y obtienen nutrientes por absorción. Son más emparentados con los animales que con las plantas.' },
-                { pregunta: '¿Cómo distingo monocotiledóneas de dicotiledóneas rápidamente?', respuesta: 'Mira las hojas: si las venas son paralelas → monocot. Si forman una red → dicot. También: flor con piezas en múltiplos de 3 → monocot; de 4 o 5 → dicot. El tronco leñoso (madera) indica casi siempre dicot.' },
+                { pregunta: '¿Cómo distingo monocotiledóneas de dicotiledóneas rápidamente?', respuesta: 'Mira las hojas: si las venas son paralelas → monocot. Si forman una red → dicot. También: flor con piezas en múltiplos de 3 → monocot; de 4 o 5 → dicot (con excepciones: varias magnólidas, como el aguacate, son dicotiledóneas de flor trímera, así que manda la hoja). El tronco leñoso (madera) indica casi siempre dicot.' },
                 { pregunta: '¿Las algas son el grupo más antiguo?', respuesta: 'Son el más antiguo (surgieron hace unos 3.500 millones de años), pero no necesariamente el más simple: algunas algas pardas (kelp) tienen estructuras complejas. En biología evolutiva, "antiguo" no equivale a "simple".' },
                 { pregunta: '¿La posidonia es un alga?', respuesta: '¡No! Es una trampa clásica. La posidonia es una angiosperma monocotiledónea que volvió al mar hace 65-100 millones de años. Tiene raíces, tallos, hojas y flores verdaderas. Sus praderas son ecosistemas cruciales del Mediterráneo.' },
               ].map((item) => (
@@ -737,7 +740,7 @@ function QuizPorFases() {
             <h4 className={styles.eduSubtitulo}>Preguntas frecuentes</h4>
             {[
               { pregunta: '¿Los hongos son plantas?', respuesta: 'No. Los hongos tienen su propio reino (Fungi). No realizan fotosíntesis, tienen quitina en sus paredes (no celulosa) y obtienen nutrientes por absorción. Son más emparentados con los animales que con las plantas.' },
-              { pregunta: '¿Cómo distingo monocotiledóneas de dicotiledóneas rápidamente?', respuesta: 'Mira las hojas: si las venas son paralelas → monocot. Si forman una red → dicot. También: flor con piezas en múltiplos de 3 → monocot; de 4 o 5 → dicot. El tronco leñoso (madera) indica casi siempre dicot.' },
+              { pregunta: '¿Cómo distingo monocotiledóneas de dicotiledóneas rápidamente?', respuesta: 'Mira las hojas: si las venas son paralelas → monocot. Si forman una red → dicot. También: flor con piezas en múltiplos de 3 → monocot; de 4 o 5 → dicot (con excepciones: varias magnólidas, como el aguacate, son dicotiledóneas de flor trímera, así que manda la hoja). El tronco leñoso (madera) indica casi siempre dicot.' },
               { pregunta: '¿Las algas son el grupo más antiguo?', respuesta: 'Son el más antiguo (surgieron hace unos 3.500 millones de años), pero no necesariamente el más simple: algunas algas pardas (kelp) tienen estructuras complejas. En biología evolutiva, "antiguo" no equivale a "simple".' },
               { pregunta: '¿La posidonia es un alga?', respuesta: '¡No! Es una trampa clásica. La posidonia es una angiosperma monocotiledónea que volvió al mar hace 65-100 millones de años. Tiene raíces, tallos, hojas y flores verdaderas. Sus praderas son ecosistemas cruciales del Mediterráneo.' },
             ].map((item) => (

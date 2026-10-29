@@ -774,7 +774,7 @@ test.describe('Inspector 29/10/2026 · escritorio 1280 × 800', () => {
     // la familia, quiz-literatura-universal, mantiene su <h1> y su <main> durante la partida, y esta
     // misma app los tiene en el inicio y en el resultado. Esperado: 1 <h1> y 1 <main> en la
     // pregunta 1 de Modo Rápido · obtenido el 29/10/2026: 0 y 0 (a 1280 y a 360 px).
-    test.fail();
+    // REPARADO (3787, 29/10/2026): <main> en la vista de juego y un <h1> solo para el lector.
     await abrir29(page);
     await empezar(page, /^Modo rápido/);
     const cuenta = await page.evaluate(() => ({
@@ -792,7 +792,7 @@ test.describe('Inspector 29/10/2026 · escritorio 1280 × 800', () => {
     // propia guía contesta «Monocotiledónea» y la app le dice «❌ Era: Dicotiledónea» sin explicar
     // la excepción (las lauráceas son magnólidas: dicotiledóneas pero no eudicotiledóneas).
     // Esperado: la ficha o la guía avisan de la excepción · obtenido el 29/10/2026: ninguna lo hace.
-    test.fail();
+    // REPARADO (3788, 29/10/2026): la ficha y la regla de la FAQ nombran la excepción de las magnólidas.
     await abrir29(page);
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     const regla = page.locator('details').filter({ hasText: '¿Cómo distingo monocotiledóneas de dicotiledóneas rápidamente?' });
