@@ -1403,8 +1403,9 @@ function casosInspector29(movil: boolean): void {
   });
 
   /**
-   * HALLAZGO (cabo C0203, punto b) — id 61 «¿Qué río tiene la mayor cuenca hidrográfica dentro de
-   * España?» da por correcta «Duero».
+   * REPARADO (hallazgo 3780, cabo C0203 punto b) — id 61 «¿Qué río tiene la mayor cuenca
+   * hidrográfica dentro de España?» daba por correcta «Duero»; ahora «Ebro», y la explicación
+   * deja al Duero la mayor cuenca de la Península contando Portugal.
    * Fuentes: Confederación Hidrográfica del Ebro, https://www.chebro.es/es/web/guest/la-cuenca-del-ebro
    * — «una superficie total de 85.534 Km2» y «Es la cuenca hidrográfica más extensa de España,
    * representando el 17 % del territorio peninsular español». Confederación Hidrográfica del Duero,
@@ -1413,24 +1414,32 @@ function casosInspector29(movil: boolean): void {
    * se la da al Tajo).
    * Esperado: contestar «Ebro» es «✅ ¡Correcto!» y el marcador sube. Obtenido (29/10/2026, 1280 y
    * 360 px, semilla 61, la id 61 sale 16.ª): «❌ Incorrecto. La respuesta correcta es: "Duero"».
-   * El test.fail() va DESPUÉS de llegar a la id 61: si la partida no la saca, el test cae de verdad.
+   * Al repararlo (29/10/2026) la semilla 61 ya no sacaba la id 61: el orden depende de cuántas
+   * llamadas a Math.random hace la página antes de «Comenzar», y eso varía en `next dev`. Con el
+   * test.fail() el testigo daba verde cayendo en el «sale en la partida», sin medir nada. Ahora
+   * prueba semillas hasta que la saca (20 de las 25 difíciles por partida: 4 semillas fallan
+   * juntas con probabilidad 0,2⁴ ≈ 0,16 %), y el dato se comprueba también en el banco.
    */
   test('hallazgo · la mayor cuenca hidrográfica dentro de España es la del Ebro (CHE), no la del Duero', async ({ page }) => {
-    test.setTimeout(120_000);
-    await abrir(page, { semilla: 61 });
-    await esperarHidratado29(page);
-    await arrancar(page, 'Difícil');
-    let n = 1;
-    for (; n <= 20; n++) {
-      if ((await fichaVisible(page)).id === 61) break;
-      await responder(page, 'bien');
-      await avanzar(page);
+    test.setTimeout(240_000);
+    const ficha61 = PREGUNTAS_GEOGRAFIA.find((p) => p.id === 61);
+    expect(ficha61?.correcta, 'el banco da «Ebro» en la id 61').toBe('Ebro');
+    let n = 21;
+    for (const semilla of [61, 62, 63, 64]) {
+      await abrir(page, { semilla });
+      await esperarHidratado29(page);
+      await arrancar(page, 'Difícil');
+      for (n = 1; n <= 20; n++) {
+        if ((await fichaVisible(page)).id === 61) break;
+        await responder(page, 'bien');
+        await avanzar(page);
+      }
+      if (n <= 20) break;
     }
-    expect(n, 'la id 61 sale en la partida de la semilla 61').toBeLessThanOrEqual(20);
+    expect(n, 'la id 61 sale en alguna de las 4 partidas').toBeLessThanOrEqual(20);
     const antes = n - 1;
     const iEbro = (await textosOpcion(page)).indexOf('Ebro');
     expect(iEbro, '«Ebro» está entre las opciones').toBeGreaterThanOrEqual(0);
-    test.fail(); // ABIERTO (inspector 29/10/2026)
     await opciones(page).nth(iEbro).click();
     await expect(page.locator('[class*="feedbackMensaje"]')).toHaveText('✅ ¡Correcto!', { timeout: 3000 });
     await expect(marcador(page)).toHaveText(`${antes + 1} ${antes + 1 === 1 ? 'correcta' : 'correctas'}`, { timeout: 1000 });
