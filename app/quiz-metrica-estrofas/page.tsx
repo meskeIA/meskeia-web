@@ -2,7 +2,7 @@
 // @disclaimer: exempt
 
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
-import { enfocarALaVista } from '@/lib';
+import { enfocarALaVista, enfocarSinCentrar } from '@/lib';
 import { useGuardaRafaga } from '@/lib/useGuardaRafaga';
 import styles from './QuizMetricaEstrofas.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard } from '@/components';
@@ -358,7 +358,7 @@ export default function QuizMetricaEstrofasPage() {
     vistaRef.current = vista;
     if (venia === null || venia === vista) return;
     if (pantalla === 'quiz' && seleccionada === null) enfocarALaVista(enunciadoRef.current);
-    else if (pantalla === 'quiz') siguienteRef.current?.focus();
+    else if (pantalla === 'quiz') enfocarSinCentrar(siguienteRef.current); // sin centrarlo (3770)
     else if (pantalla === 'resultado') enfocarALaVista(resultadoRef.current);
   }, [pantalla, preguntaActual, seleccionada]);
 
@@ -374,7 +374,8 @@ export default function QuizMetricaEstrofasPage() {
   const formatTiempo = (seg: number): string => {
     const m = Math.floor(seg / 60);
     const s = seg % 60;
-    return m > 0 ? `${m}m ${s}s` : `${s}s`;
+    // «min» y «s»: «m» es el símbolo del metro (hallazgo 3772), como ya escribe quiz-paises-capitales
+    return m > 0 ? `${m} min ${s} s` : `${s} s`;
   };
 
   return (
@@ -466,6 +467,7 @@ export default function QuizMetricaEstrofasPage() {
               className={styles.progresoFill}
               style={{ width: `${(preguntaActual / totalPreguntas) * 100}%` }}
               role="progressbar"
+              aria-label="Progreso del quiz" // un progressbar necesita nombre (hallazgo 3773)
               aria-valuenow={preguntaActual}
               aria-valuemin={0}
               aria-valuemax={totalPreguntas}

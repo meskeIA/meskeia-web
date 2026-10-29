@@ -2,7 +2,7 @@
 // @disclaimer: exempt
 
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
-import { enfocarALaVista } from '@/lib';
+import { enfocarALaVista, enfocarSinCentrar } from '@/lib';
 import { useGuardaRafaga } from '@/lib/useGuardaRafaga';
 import {
   MeskeiaLogo,
@@ -285,7 +285,7 @@ function QuizPorFases() {
     vistaRef.current = vista;
     if (venia === null || venia === vista) return;
     if (juego.estado === 'jugando') enfocarALaVista(enunciadoRef.current);
-    else if (juego.estado === 'feedback') siguienteRef.current?.focus();
+    else if (juego.estado === 'feedback') enfocarSinCentrar(siguienteRef.current); // sin centrarlo (3770)
     else if (juego.estado === 'resultados') enfocarALaVista(resultadoRef.current);
   }, [juego.estado, juego.indiceActual]);
 
@@ -307,7 +307,7 @@ function QuizPorFases() {
       <main className={styles.quizWrapper}>
         <h1 className="sr-only">Quiz: Clasifica 40 Plantas</h1>
         {/* Barra de progreso */}
-        <div className={styles.barraProgreso} role="progressbar" aria-valuenow={juego.indiceActual + 1} aria-valuemin={0} aria-valuemax={juego.preguntas.length} aria-valuetext={`Pregunta ${juego.indiceActual + 1} de ${juego.preguntas.length}`}>
+        <div className={styles.barraProgreso} role="progressbar" aria-label="Progreso del quiz" aria-valuenow={juego.indiceActual + 1} aria-valuemin={0} aria-valuemax={juego.preguntas.length} aria-valuetext={`Pregunta ${juego.indiceActual + 1} de ${juego.preguntas.length}`}>
           <div className={styles.barraRelleno} style={{ width: `${progreso}%` }} />
         </div>
 
