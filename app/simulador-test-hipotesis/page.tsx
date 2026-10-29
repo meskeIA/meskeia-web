@@ -459,10 +459,11 @@ export default function SimuladorTestHipotesisPage() {
         <div className={styles.controls}>
           <div className={styles.controlsGrid}>
             <div className={styles.controlGroup}>
-              <label className={styles.controlLabel}>
+              <label htmlFor="media-h0" className={styles.controlLabel}>
                 Media bajo H₀ (μ₀ = <strong>{fmt(mu0, 1)}</strong>)
               </label>
               <input
+                id="media-h0"
                 type="range"
                 min={20}
                 max={80}
@@ -474,10 +475,11 @@ export default function SimuladorTestHipotesisPage() {
               />
             </div>
             <div className={styles.controlGroup}>
-              <label className={styles.controlLabel}>
+              <label htmlFor="media-h1" className={styles.controlLabel}>
                 Media verdadera bajo H₁ (μ₁ = <strong>{fmt(mu1, 1)}</strong>)
               </label>
               <input
+                id="media-h1"
                 type="range"
                 min={20}
                 max={80}
@@ -492,10 +494,11 @@ export default function SimuladorTestHipotesisPage() {
 
           <div className={styles.controlsGrid}>
             <div className={styles.controlGroup}>
-              <label className={styles.controlLabel}>
+              <label htmlFor="desviacion-poblacional" className={styles.controlLabel}>
                 Desviación poblacional (σ = <strong>{fmt(sigma, 1)}</strong>)
               </label>
               <input
+                id="desviacion-poblacional"
                 type="range"
                 min={1}
                 max={30}
@@ -507,10 +510,10 @@ export default function SimuladorTestHipotesisPage() {
               />
             </div>
             <div className={styles.controlGroup}>
-              <label className={styles.controlLabel}>
+              <label id="tamano-muestral-label" className={styles.controlLabel}>
                 Tamaño muestral (n = <strong>{n}</strong>)
               </label>
-              <div className={styles.discreteSteps} role="group" aria-label="Tamaño muestral">
+              <div className={styles.discreteSteps} role="group" aria-labelledby="tamano-muestral-label" aria-label="Tamaño muestral">
                 {N_VALORES.map(v => (
                   <button
                     key={v}
@@ -528,10 +531,10 @@ export default function SimuladorTestHipotesisPage() {
 
           <div className={styles.controlsGrid}>
             <div className={styles.controlGroup}>
-              <label className={styles.controlLabel}>
+              <label id="nivel-significacion-label" className={styles.controlLabel}>
                 Nivel de significación (α = <strong>{alpha}</strong>)
               </label>
-              <div className={styles.discreteSteps} role="group" aria-label="Nivel alfa">
+              <div className={styles.discreteSteps} role="group" aria-labelledby="nivel-significacion-label" aria-label="Nivel alfa">
                 {ALPHAS.map(v => (
                   <button
                     key={v}
@@ -546,10 +549,11 @@ export default function SimuladorTestHipotesisPage() {
               </div>
             </div>
             <div className={styles.controlGroup}>
-              <label className={styles.controlLabel}>
+              <label htmlFor="media-observada" className={styles.controlLabel}>
                 Media observada (X̄ = <strong>{fmt(xBar, 2)}</strong>)
               </label>
               <input
+                id="media-observada"
                 type="range"
                 min={Math.min(mu0, mu1) - 5 * ee}
                 max={Math.max(mu0, mu1) + 5 * ee}

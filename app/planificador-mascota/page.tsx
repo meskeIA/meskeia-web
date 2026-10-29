@@ -486,8 +486,9 @@ export default function PlanificadorMascotaPage() {
             </div>
 
             <div className={styles.inputGroup}>
-              <label>Nombre</label>
+              <label htmlFor="nombre">Nombre</label>
               <input
+                id="nombre"
                 type="text"
                 value={perfil.nombre}
                 onChange={(e) => setPerfil(prev => ({ ...prev, nombre: e.target.value }))}
@@ -497,8 +498,9 @@ export default function PlanificadorMascotaPage() {
             </div>
 
             <div className={styles.inputGroup}>
-              <label>Raza (opcional)</label>
+              <label htmlFor="raza">Raza (opcional)</label>
               <input
+                id="raza"
                 type="text"
                 value={perfil.raza}
                 onChange={(e) => setPerfil(prev => ({ ...prev, raza: e.target.value }))}
@@ -509,8 +511,9 @@ export default function PlanificadorMascotaPage() {
 
             <div className={styles.inputRow}>
               <div className={styles.inputGroup}>
-                <label>Fecha de nacimiento</label>
+                <label htmlFor="fecha-nacimiento">Fecha de nacimiento</label>
                 <input
+                  id="fecha-nacimiento"
                   type="date"
                   value={perfil.fechaNacimiento}
                   onChange={(e) => setPerfil(prev => ({ ...prev, fechaNacimiento: e.target.value }))}
@@ -519,8 +522,9 @@ export default function PlanificadorMascotaPage() {
                 />
               </div>
               <div className={styles.inputGroup}>
-                <label>Fecha de llegada a casa</label>
+                <label htmlFor="fecha-llegada">Fecha de llegada a casa</label>
                 <input
+                  id="fecha-llegada"
                   type="date"
                   value={perfil.fechaLlegada}
                   onChange={(e) => setPerfil(prev => ({ ...prev, fechaLlegada: e.target.value }))}
@@ -531,8 +535,8 @@ export default function PlanificadorMascotaPage() {
 
             {perfil.tipo === 'perro' && (
               <div className={styles.inputGroup}>
-                <label>Tamaño esperado de adulto</label>
-                <div className={styles.tamanoGrid}>
+                <label id="tamano-label">Tamaño esperado de adulto</label>
+                <div role="group" aria-labelledby="tamano-label" className={styles.tamanoGrid}>
                   {(['pequeno', 'mediano', 'grande', 'gigante'] as TamanoPerro[]).map(tam => (
                     <button
                       key={tam}
@@ -555,8 +559,9 @@ export default function PlanificadorMascotaPage() {
 
             <div className={styles.inputRow}>
               <div className={styles.inputGroup}>
-                <label>Peso actual (kg)</label>
+                <label htmlFor="peso-actual">Peso actual (kg)</label>
                 <input
+                  id="peso-actual"
                   type="text"
                   value={perfil.peso}
                   onChange={(e) => setPerfil(prev => ({ ...prev, peso: e.target.value }))}

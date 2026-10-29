@@ -108,10 +108,11 @@ export default function VisualizadorPrecioRealCosasPage() {
         {/* Slider de sueldo */}
         <div className={styles.sliderZona}>
           <div className={styles.sliderHeader}>
-            <label className={styles.sliderLabel}>Tu sueldo neto mensual</label>
+            <label htmlFor="sueldo-neto-mensual" className={styles.sliderLabel}>Tu sueldo neto mensual</label>
             <span className={styles.sliderValor}>{formatCurrency(sueldoNetoMensual)}</span>
           </div>
           <input
+            id="sueldo-neto-mensual"
             type="range"
             className={styles.slider}
             min={1000}

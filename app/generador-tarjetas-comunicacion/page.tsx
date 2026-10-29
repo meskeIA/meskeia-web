@@ -420,8 +420,9 @@ export default function GeneradorTarjetasPage() {
           {/* Controles de impresión */}
           <div className={styles.imprimirControles}>
             <div className={styles.controlGrupo}>
-              <label className={styles.controlLabel}>Mazo a imprimir</label>
+              <label htmlFor="mazo-a-imprimir" className={styles.controlLabel}>Mazo a imprimir</label>
               <select
+                id="mazo-a-imprimir"
                 className={styles.controlSelect}
                 value={mazoActivo}
                 onChange={e => setMazoActivo(e.target.value)}
@@ -434,8 +435,8 @@ export default function GeneradorTarjetasPage() {
             </div>
 
             <div className={styles.controlGrupo}>
-              <label className={styles.controlLabel}>Tamaño de tarjeta</label>
-              <div className={styles.tamanoOpciones} role="group" aria-label="Tamaño de tarjeta">
+              <label id="tamano-tarjeta-label" className={styles.controlLabel}>Tamaño de tarjeta</label>
+              <div className={styles.tamanoOpciones} role="group" aria-labelledby="tamano-tarjeta-label" aria-label="Tamaño de tarjeta">
                 {([
                   { key: 'pequena', label: 'Pequeña', sub: '5×5 cm' },
                   { key: 'mediana', label: 'Mediana', sub: '7×7 cm' },

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useId } from 'react';
 import styles from './AsistenteConstitucionAsociacion.module.css';
 import { MeskeiaLogo, LegalNotice, Footer, EducationalSection, RelatedApps, ShareCard, DisclaimerCard } from '@/components';
 import { formatDate } from '@/lib';
@@ -146,6 +146,7 @@ export default function AsistenteConstitucionAsociacionPage() {
   const [finPersonalizado, setFinPersonalizado] = useState('');
   const [actividadPersonalizada, setActividadPersonalizada] = useState('');
   const [documentoActivo, setDocumentoActivo] = useState<'acta' | 'estatutos' | 'solicitud'>('acta');
+  const baseId = useId();
 
   // ============================================
   // FUNCIONES AUXILIARES
@@ -852,8 +853,9 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
 
                   <div className={styles.fundadorGrid}>
                     <div className={styles.inputGroup}>
-                      <label>Nombre completo *</label>
+                      <label htmlFor={`${baseId}-nombre-${index}`}>Nombre completo *</label>
                       <input
+                        id={`${baseId}-nombre-${index}`}
                         type="text"
                         value={fundador.nombre}
                         onChange={(e) => actualizarFundador(fundador.id, 'nombre', e.target.value)}
@@ -861,8 +863,9 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
                       />
                     </div>
                     <div className={styles.inputGroup}>
-                      <label>DNI/NIE *</label>
+                      <label htmlFor={`${baseId}-dni-${index}`}>DNI/NIE *</label>
                       <input
+                        id={`${baseId}-dni-${index}`}
                         type="text"
                         value={fundador.dni}
                         onChange={(e) => actualizarFundador(fundador.id, 'dni', e.target.value)}
@@ -870,16 +873,18 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
                       />
                     </div>
                     <div className={styles.inputGroup}>
-                      <label>Nacionalidad</label>
+                      <label htmlFor={`${baseId}-nacionalidad-${index}`}>Nacionalidad</label>
                       <input
+                        id={`${baseId}-nacionalidad-${index}`}
                         type="text"
                         value={fundador.nacionalidad}
                         onChange={(e) => actualizarFundador(fundador.id, 'nacionalidad', e.target.value)}
                       />
                     </div>
                     <div className={styles.inputGroup}>
-                      <label>Cargo en Junta Directiva *</label>
+                      <label htmlFor={`${baseId}-cargo-${index}`}>Cargo en Junta Directiva *</label>
                       <select
+                        id={`${baseId}-cargo-${index}`}
                         value={fundador.cargo}
                         onChange={(e) => actualizarFundador(fundador.id, 'cargo', e.target.value)}
                       >
@@ -900,8 +905,9 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
                       </select>
                     </div>
                     <div className={styles.inputGroupFull}>
-                      <label>Domicilio *</label>
+                      <label htmlFor={`${baseId}-domicilio-${index}`}>Domicilio *</label>
                       <input
+                        id={`${baseId}-domicilio-${index}`}
                         type="text"
                         value={fundador.domicilio}
                         onChange={(e) => actualizarFundador(fundador.id, 'domicilio', e.target.value)}
@@ -909,8 +915,9 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
                       />
                     </div>
                     <div className={styles.inputGroup}>
-                      <label>Localidad</label>
+                      <label htmlFor={`${baseId}-localidad-${index}`}>Localidad</label>
                       <input
+                        id={`${baseId}-localidad-${index}`}
                         type="text"
                         value={fundador.localidad}
                         onChange={(e) => actualizarFundador(fundador.id, 'localidad', e.target.value)}
@@ -918,8 +925,9 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
                       />
                     </div>
                     <div className={styles.inputGroup}>
-                      <label>Provincia</label>
+                      <label htmlFor={`${baseId}-provincia-${index}`}>Provincia</label>
                       <select
+                        id={`${baseId}-provincia-${index}`}
                         value={fundador.provincia}
                         onChange={(e) => actualizarFundador(fundador.id, 'provincia', e.target.value)}
                       >
@@ -930,8 +938,9 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
                       </select>
                     </div>
                     <div className={styles.inputGroup}>
-                      <label>Código Postal</label>
+                      <label htmlFor={`${baseId}-codigo-postal-${index}`}>Código Postal</label>
                       <input
+                        id={`${baseId}-codigo-postal-${index}`}
                         type="text"
                         value={fundador.codigoPostal}
                         onChange={(e) => actualizarFundador(fundador.id, 'codigoPostal', e.target.value)}
@@ -983,8 +992,9 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
               <h3>Denominación</h3>
               <div className={styles.inputGrid}>
                 <div className={styles.inputGroupFull}>
-                  <label>Nombre completo de la Asociación *</label>
+                  <label htmlFor="denominacion">Nombre completo de la Asociación *</label>
                   <input
+                    id="denominacion"
                     type="text"
                     value={datosAsociacion.denominacion}
                     onChange={(e) => actualizarDatos('denominacion', e.target.value)}
@@ -995,8 +1005,9 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
                   </span>
                 </div>
                 <div className={styles.inputGroup}>
-                  <label>Siglas (opcional)</label>
+                  <label htmlFor="siglas">Siglas (opcional)</label>
                   <input
+                    id="siglas"
                     type="text"
                     value={datosAsociacion.siglas}
                     onChange={(e) => actualizarDatos('siglas', e.target.value.toUpperCase())}
@@ -1005,8 +1016,9 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
                   />
                 </div>
                 <div className={styles.inputGroup}>
-                  <label>Ámbito territorial</label>
+                  <label htmlFor="ambito-territorial">Ámbito territorial</label>
                   <select
+                    id="ambito-territorial"
                     value={datosAsociacion.ambitoTerritorial}
                     onChange={(e) => actualizarDatos('ambitoTerritorial', e.target.value)}
                   >
@@ -1026,8 +1038,9 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
               <h3>Domicilio Social</h3>
               <div className={styles.inputGrid}>
                 <div className={styles.inputGroupFull}>
-                  <label>Dirección completa *</label>
+                  <label htmlFor="domicilio-social">Dirección completa *</label>
                   <input
+                    id="domicilio-social"
                     type="text"
                     value={datosAsociacion.domicilioSocial}
                     onChange={(e) => actualizarDatos('domicilioSocial', e.target.value)}
@@ -1035,8 +1048,9 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
                   />
                 </div>
                 <div className={styles.inputGroup}>
-                  <label>Localidad *</label>
+                  <label htmlFor="localidad-social">Localidad *</label>
                   <input
+                    id="localidad-social"
                     type="text"
                     value={datosAsociacion.localidad}
                     onChange={(e) => actualizarDatos('localidad', e.target.value)}
@@ -1044,8 +1058,9 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
                   />
                 </div>
                 <div className={styles.inputGroup}>
-                  <label>Provincia *</label>
+                  <label htmlFor="provincia-social">Provincia *</label>
                   <select
+                    id="provincia-social"
                     value={datosAsociacion.provincia}
                     onChange={(e) => actualizarDatos('provincia', e.target.value)}
                   >
@@ -1056,8 +1071,9 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
                   </select>
                 </div>
                 <div className={styles.inputGroup}>
-                  <label>Código Postal</label>
+                  <label htmlFor="codigo-postal-social">Código Postal</label>
                   <input
+                    id="codigo-postal-social"
                     type="text"
                     value={datosAsociacion.codigoPostal}
                     onChange={(e) => actualizarDatos('codigoPostal', e.target.value)}
@@ -1191,8 +1207,9 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
               <h3>Cuotas de los socios</h3>
               <div className={styles.inputGrid}>
                 <div className={styles.inputGroup}>
-                  <label>Cuota de ingreso (€)</label>
+                  <label htmlFor="cuota-ingreso">Cuota de ingreso (€)</label>
                   <input
+                    id="cuota-ingreso"
                     type="number"
                     value={datosAsociacion.cuotaIngreso || ''}
                     onChange={(e) => actualizarDatos('cuotaIngreso', parseFloat(e.target.value) || 0)}
@@ -1202,8 +1219,9 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
                   <span className={styles.inputHint}>Dejar en 0 si no hay cuota de ingreso</span>
                 </div>
                 <div className={styles.inputGroup}>
-                  <label>Cuota periódica (€)</label>
+                  <label htmlFor="cuota-periodica">Cuota periódica (€)</label>
                   <input
+                    id="cuota-periodica"
                     type="number"
                     value={datosAsociacion.cuotaPeriodica || ''}
                     onChange={(e) => actualizarDatos('cuotaPeriodica', parseFloat(e.target.value) || 0)}
@@ -1212,8 +1230,9 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
                   />
                 </div>
                 <div className={styles.inputGroup}>
-                  <label>Periodicidad</label>
+                  <label htmlFor="periodo-cuota">Periodicidad</label>
                   <select
+                    id="periodo-cuota"
                     value={datosAsociacion.periodoCuota}
                     onChange={(e) => actualizarDatos('periodoCuota', e.target.value)}
                   >
@@ -1230,8 +1249,9 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
               <h3>Duración del mandato de la Junta Directiva</h3>
               <div className={styles.inputGrid}>
                 <div className={styles.inputGroup}>
-                  <label>Duración (años)</label>
+                  <label htmlFor="duracion-mandato">Duración (años)</label>
                   <select
+                    id="duracion-mandato"
                     value={datosAsociacion.duracionMandatoJunta}
                     onChange={(e) => actualizarDatos('duracionMandatoJunta', parseInt(e.target.value))}
                   >
@@ -1249,8 +1269,9 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
               <h3>Patrimonio inicial (opcional)</h3>
               <div className={styles.inputGrid}>
                 <div className={styles.inputGroup}>
-                  <label>Patrimonio inicial (€)</label>
+                  <label htmlFor="patrimonio-inicial">Patrimonio inicial (€)</label>
                   <input
+                    id="patrimonio-inicial"
                     type="number"
                     value={datosAsociacion.patrimonioInicial || ''}
                     onChange={(e) => actualizarDatos('patrimonioInicial', parseFloat(e.target.value) || 0)}
@@ -1259,8 +1280,9 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
                   />
                 </div>
                 <div className={styles.inputGroupFull}>
-                  <label>Descripción del patrimonio</label>
+                  <label htmlFor="descripcion-patrimonio">Descripción del patrimonio</label>
                   <input
+                    id="descripcion-patrimonio"
                     type="text"
                     value={datosAsociacion.descripcionPatrimonio}
                     onChange={(e) => actualizarDatos('descripcionPatrimonio', e.target.value)}

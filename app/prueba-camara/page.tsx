@@ -311,8 +311,9 @@ export default function PruebaCamaraPage() {
                   {/* Selector de cámara */}
                   {cameras.length > 1 && (
                     <div className={styles.settingRow}>
-                      <label>Cámara:</label>
+                      <label htmlFor="camara">Cámara:</label>
                       <select
+                        id="camara"
                         value={selectedCamera}
                         onChange={(e) => setSelectedCamera(e.target.value)}
                         className={styles.select}
@@ -341,8 +342,9 @@ export default function PruebaCamaraPage() {
 
                   {/* Brillo */}
                   <div className={styles.settingRow}>
-                    <label>Brillo: {brightness}%</label>
+                    <label htmlFor="brillo">Brillo: {brightness}%</label>
                     <input
+                      id="brillo"
                       type="range"
                       min="50"
                       max="150"
@@ -354,8 +356,9 @@ export default function PruebaCamaraPage() {
 
                   {/* Contraste */}
                   <div className={styles.settingRow}>
-                    <label>Contraste: {contrast}%</label>
+                    <label htmlFor="contraste">Contraste: {contrast}%</label>
                     <input
+                      id="contraste"
                       type="range"
                       min="50"
                       max="150"

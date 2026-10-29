@@ -155,8 +155,8 @@ export default function GlosarioFisicaQuimicaPage() {
 
           {/* Filtro categoría */}
           <div className={styles.inputGroup}>
-            <label className={styles.label}>Categoría</label>
-            <div className={styles.selectorGrid}>
+            <label id="categoria-label" className={styles.label}>Categoría</label>
+            <div role="group" aria-labelledby="categoria-label" className={styles.selectorGrid}>
               <button
                 type="button"
                 className={`${styles.selectorBtn} ${categoriaFiltro === 'todos' ? styles.selectorActivo : ''}`}
@@ -186,8 +186,8 @@ export default function GlosarioFisicaQuimicaPage() {
 
           {/* Filtro nivel */}
           <div className={styles.inputGroup}>
-            <label className={styles.label}>Nivel</label>
-            <div className={styles.selectorGrid}>
+            <label id="nivel-label" className={styles.label}>Nivel</label>
+            <div role="group" aria-labelledby="nivel-label" className={styles.selectorGrid}>
               <button
                 type="button"
                 className={`${styles.selectorBtn} ${nivelFiltro === 'todos' ? styles.selectorActivo : ''}`}

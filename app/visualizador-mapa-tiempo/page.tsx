@@ -125,10 +125,11 @@ export default function VisualizadorMapaTiempoPage() {
         {/* Slider esperanza de vida */}
         <div className={styles.sliderZona}>
           <div className={styles.sliderHeader}>
-            <label className={styles.sliderLabel}>Esperanza de vida</label>
+            <label htmlFor="esperanza-vida" className={styles.sliderLabel}>Esperanza de vida</label>
             <span className={styles.sliderValor}>{esperanzaVida} años</span>
           </div>
           <input
+            id="esperanza-vida"
             type="range"
             className={styles.slider}
             min={60}

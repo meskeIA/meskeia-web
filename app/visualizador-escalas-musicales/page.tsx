@@ -545,8 +545,8 @@ export default function VisualizadorEscalasMusicales() {
             </div>
           </div>
 
-          <div className={styles.selectorGroup}>
-            <label className={styles.selectorLabel}>Tipo de escala</label>
+          <div role="group" aria-labelledby="tipo-escala-label" className={styles.selectorGroup}>
+            <label id="tipo-escala-label" className={styles.selectorLabel}>Tipo de escala</label>
             {GRUPOS_ESCALA.map((grupo) => (
               <div key={grupo.id} className={styles.grupoEscala}>
                 <span className={styles.grupoLabel}>{grupo.label}</span>

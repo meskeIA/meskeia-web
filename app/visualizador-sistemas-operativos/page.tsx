@@ -537,8 +537,8 @@ export default function VisualizadorSistemasOperativos() {
             {/* Selector de algoritmo */}
             <div className={styles.controles}>
               <div className={styles.controlGroup}>
-                <label className={styles.controlLabel}>Algoritmo:</label>
-                <div className={styles.algoBotones}>
+                <label id="algoritmo-label" className={styles.controlLabel}>Algoritmo:</label>
+                <div role="group" aria-labelledby="algoritmo-label" className={styles.algoBotones}>
                   {(['FIFO', 'RR', 'SJF', 'PRIORIDAD'] as AlgoritmoScheduling[]).map(alg => (
                     <button
                       key={alg}

@@ -794,8 +794,8 @@ export default function GuiaTiposPastaPage() {
 
         <div className={styles.filtrosGrid}>
           <div className={styles.filtroGrupo}>
-            <label className={styles.filtroLabel}>Forma</label>
-            <div className={styles.filtroBotones}>
+            <label id="forma-label" className={styles.filtroLabel}>Forma</label>
+            <div role="group" aria-labelledby="forma-label" className={styles.filtroBotones}>
               <button
                 type="button"
                 aria-pressed={formaFiltro === 'Todas'}
@@ -819,8 +819,8 @@ export default function GuiaTiposPastaPage() {
           </div>
 
           <div className={styles.filtroGrupo}>
-            <label className={styles.filtroLabel}>Región</label>
-            <div className={styles.filtroBotones}>
+            <label id="region-label" className={styles.filtroLabel}>Región</label>
+            <div role="group" aria-labelledby="region-label" className={styles.filtroBotones}>
               <button
                 type="button"
                 aria-pressed={regionFiltro === 'Todas'}
@@ -844,8 +844,8 @@ export default function GuiaTiposPastaPage() {
           </div>
 
           <div className={styles.filtroGrupo}>
-            <label className={styles.filtroLabel}>Salsa ideal</label>
-            <div className={styles.filtroBotones}>
+            <label id="salsa-ideal-label" className={styles.filtroLabel}>Salsa ideal</label>
+            <div role="group" aria-labelledby="salsa-ideal-label" className={styles.filtroBotones}>
               <button
                 type="button"
                 aria-pressed={salsaFiltro === 'Todas'}
@@ -869,8 +869,8 @@ export default function GuiaTiposPastaPage() {
           </div>
 
           <div className={styles.filtroGrupo}>
-            <label className={styles.filtroLabel}>Dificultad casera</label>
-            <div className={styles.filtroBotones}>
+            <label id="dificultad-casera-label" className={styles.filtroLabel}>Dificultad casera</label>
+            <div role="group" aria-labelledby="dificultad-casera-label" className={styles.filtroBotones}>
               <button
                 type="button"
                 aria-pressed={dificultadFiltro === 'Todas'}

@@ -358,10 +358,11 @@ function SeccionSistema() {
       {/* Slider PIB */}
       <div className={styles.sliderZona}>
         <div className={styles.sliderHeader}>
-          <label className={styles.sliderLabel}>Gasto sanitario (% del PIB)</label>
+          <label htmlFor="gasto-sanitario-pib" className={styles.sliderLabel}>Gasto sanitario (% del PIB)</label>
           <span className={styles.sliderValor}>{formatNumber(pibSlider / 10, 1)}%</span>
         </div>
         <input
+          id="gasto-sanitario-pib"
           type="range"
           className={styles.slider}
           min={50}

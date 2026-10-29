@@ -141,10 +141,11 @@ export default function CalculadoraSuenoPage() {
           </div>
 
           <div className={styles.horaSection}>
-            <label className={styles.label}>
+            <label htmlFor="hora" className={styles.label}>
               {modo === 'despertar' ? '¿A qué hora quieres despertar?' : '¿A qué hora te vas a dormir?'}
             </label>
             <input
+              id="hora"
               type="time"
               value={hora}
               onChange={(e) => setHora(e.target.value)}

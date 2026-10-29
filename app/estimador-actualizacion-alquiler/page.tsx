@@ -181,8 +181,9 @@ export default function EstimadorActualizacionAlquilerPage() {
 
           <div className={styles.fechaRow}>
             <div className={styles.fechaField}>
-              <label className={styles.fieldLabel}>Mes del aniversario del contrato</label>
+              <label htmlFor="mes-aniversario" className={styles.fieldLabel}>Mes del aniversario del contrato</label>
               <select
+                id="mes-aniversario"
                 value={mesAniversario}
                 onChange={e => setMesAniversario(parseInt(e.target.value))}
                 className={styles.select}
@@ -195,8 +196,9 @@ export default function EstimadorActualizacionAlquilerPage() {
             </div>
 
             <div className={styles.fechaField}>
-              <label className={styles.fieldLabel}>Año del aniversario</label>
+              <label htmlFor="anio-aniversario" className={styles.fieldLabel}>Año del aniversario</label>
               <select
+                id="anio-aniversario"
                 value={anioAniversario}
                 onChange={e => setAnioAniversario(parseInt(e.target.value))}
                 className={styles.select}

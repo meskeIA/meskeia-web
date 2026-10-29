@@ -927,9 +927,10 @@ export default function CalendarioFiscalPage() {
               </h3>
               <div className={styles.estimadorForm}>
                 <div className={styles.formGroup}>
-                  <label>IVA repercutido (cobrado)</label>
+                  <label htmlFor="iva-repercutido">IVA repercutido (cobrado)</label>
                   <div className={styles.inputConUnidad}>
                     <input
+                      id="iva-repercutido"
                       type="text"
                       value={ivaRepercutido}
                       onChange={(e) => setIvaRepercutido(e.target.value)}
@@ -940,9 +941,10 @@ export default function CalendarioFiscalPage() {
                   </div>
                 </div>
                 <div className={styles.formGroup}>
-                  <label>IVA soportado (pagado)</label>
+                  <label htmlFor="iva-soportado">IVA soportado (pagado)</label>
                   <div className={styles.inputConUnidad}>
                     <input
+                      id="iva-soportado"
                       type="text"
                       value={ivaSoportado}
                       onChange={(e) => setIvaSoportado(e.target.value)}
@@ -969,9 +971,10 @@ export default function CalendarioFiscalPage() {
                 </h3>
                 <div className={styles.estimadorForm}>
                   <div className={styles.formGroup}>
-                    <label>Beneficio del trimestre (ingresos - gastos)</label>
+                    <label htmlFor="beneficio-trimestral">Beneficio del trimestre (ingresos - gastos)</label>
                     <div className={styles.inputConUnidad}>
                       <input
+                        id="beneficio-trimestral"
                         type="text"
                         value={beneficioTrimestral}
                         onChange={(e) => setBeneficioTrimestral(e.target.value)}
@@ -982,9 +985,10 @@ export default function CalendarioFiscalPage() {
                     </div>
                   </div>
                   <div className={styles.formGroup}>
-                    <label>Retenciones recibidas en facturas</label>
+                    <label htmlFor="retenciones-recibidas">Retenciones recibidas en facturas</label>
                     <div className={styles.inputConUnidad}>
                       <input
+                        id="retenciones-recibidas"
                         type="text"
                         value={retencionesRecibidas}
                         onChange={(e) => setRetencionesRecibidas(e.target.value)}

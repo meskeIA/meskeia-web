@@ -112,8 +112,8 @@ export default function HuesosCuerpoHumanoPage() {
 
         <div className={styles.filtersRow}>
           <div className={styles.filterGroup}>
-            <label className={styles.filterLabel}>Región:</label>
-            <div className={styles.filterButtons}>
+            <label id="region-label" className={styles.filterLabel}>Región:</label>
+            <div role="group" aria-labelledby="region-label" className={styles.filterButtons}>
               <button
                 type="button"
                 className={`${styles.filterButton} ${regionFiltro === 'todas' ? styles.active : ''}`}
@@ -137,8 +137,8 @@ export default function HuesosCuerpoHumanoPage() {
           </div>
 
           <div className={styles.filterGroup}>
-            <label className={styles.filterLabel}>Tipo de hueso:</label>
-            <div className={styles.filterButtons}>
+            <label id="tipo-hueso-label" className={styles.filterLabel}>Tipo de hueso:</label>
+            <div role="group" aria-labelledby="tipo-hueso-label" className={styles.filterButtons}>
               <button
                 type="button"
                 className={`${styles.filterButton} ${tipoFiltro === 'todos' ? styles.active : ''}`}

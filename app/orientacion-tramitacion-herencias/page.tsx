@@ -308,8 +308,8 @@ export default function OrientacionTramitacionHerenciasPage() {
         <div className={styles.cuestionario}>
           {/* Testamento */}
           <div className={styles.pregunta}>
-            <label className={styles.preguntaLabel}>¿Existe testamento?</label>
-            <div className={styles.opciones}>
+            <label id="testamento-label" className={styles.preguntaLabel}>¿Existe testamento?</label>
+            <div role="group" aria-labelledby="testamento-label" className={styles.opciones}>
               {(['si', 'no', 'nose'] as const).map(v => (
                 <button
                   type="button"
@@ -331,8 +331,8 @@ export default function OrientacionTramitacionHerenciasPage() {
 
           {/* Inmuebles */}
           <div className={styles.pregunta}>
-            <label className={styles.preguntaLabel}>¿Hay inmuebles (pisos, casas, locales, terrenos)?</label>
-            <div className={styles.opciones}>
+            <label id="inmuebles-label" className={styles.preguntaLabel}>¿Hay inmuebles (pisos, casas, locales, terrenos)?</label>
+            <div role="group" aria-labelledby="inmuebles-label" className={styles.opciones}>
               {(['si', 'no'] as const).map(v => (
                 <button
                   type="button"
@@ -349,8 +349,8 @@ export default function OrientacionTramitacionHerenciasPage() {
 
           {/* Cuentas */}
           <div className={styles.pregunta}>
-            <label className={styles.preguntaLabel}>¿Hay cuentas bancarias o inversiones?</label>
-            <div className={styles.opciones}>
+            <label id="cuentas-label" className={styles.preguntaLabel}>¿Hay cuentas bancarias o inversiones?</label>
+            <div role="group" aria-labelledby="cuentas-label" className={styles.opciones}>
               {(['si', 'no'] as const).map(v => (
                 <button
                   type="button"
@@ -367,8 +367,8 @@ export default function OrientacionTramitacionHerenciasPage() {
 
           {/* Vehículos */}
           <div className={styles.pregunta}>
-            <label className={styles.preguntaLabel}>¿Hay vehículos (coches, motos, embarcaciones)?</label>
-            <div className={styles.opciones}>
+            <label id="vehiculos-label" className={styles.preguntaLabel}>¿Hay vehículos (coches, motos, embarcaciones)?</label>
+            <div role="group" aria-labelledby="vehiculos-label" className={styles.opciones}>
               {(['si', 'no'] as const).map(v => (
                 <button
                   type="button"
@@ -385,8 +385,8 @@ export default function OrientacionTramitacionHerenciasPage() {
 
           {/* Deudas */}
           <div className={styles.pregunta}>
-            <label className={styles.preguntaLabel}>¿Hay deudas conocidas (hipotecas, préstamos)?</label>
-            <div className={styles.opciones}>
+            <label id="deudas-label" className={styles.preguntaLabel}>¿Hay deudas conocidas (hipotecas, préstamos)?</label>
+            <div role="group" aria-labelledby="deudas-label" className={styles.opciones}>
               {(['si', 'no'] as const).map(v => (
                 <button
                   type="button"
@@ -408,8 +408,8 @@ export default function OrientacionTramitacionHerenciasPage() {
 
           {/* Herederos */}
           <div className={styles.pregunta}>
-            <label className={styles.preguntaLabel}>¿Cuántos herederos hay?</label>
-            <div className={styles.opciones}>
+            <label id="herederos-label" className={styles.preguntaLabel}>¿Cuántos herederos hay?</label>
+            <div role="group" aria-labelledby="herederos-label" className={styles.opciones}>
               {(['1', '2-3', '4+'] as const).map(v => (
                 <button
                   type="button"
@@ -426,8 +426,8 @@ export default function OrientacionTramitacionHerenciasPage() {
 
           {/* Menores */}
           <div className={styles.pregunta}>
-            <label className={styles.preguntaLabel}>¿Hay herederos menores de edad o incapacitados?</label>
-            <div className={styles.opciones}>
+            <label id="menores-label" className={styles.preguntaLabel}>¿Hay herederos menores de edad o incapacitados?</label>
+            <div role="group" aria-labelledby="menores-label" className={styles.opciones}>
               {(['si', 'no'] as const).map(v => (
                 <button
                   type="button"
