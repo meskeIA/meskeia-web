@@ -127,6 +127,8 @@
 /* Fila de número de preguntas */
 .preguntasRow {
   display: flex;
+  /* A 360 px los tres botones no caben en la tarjeta y salían por los dos lados (hallazgo 3785) */
+  flex-wrap: wrap;
   gap: 0.5rem;
   justify-content: center;
   margin-bottom: var(--spacing-xl);

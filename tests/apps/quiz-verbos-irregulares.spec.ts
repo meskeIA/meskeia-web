@@ -1980,7 +1980,7 @@ test.describe('Inspector 28/10/2026', () => {
     // (3 de 3 el 29/10/2026), y un Enter tras teclear la despliega. Lo que queda es el hallazgo
     // nuevo del Inspector 29/10/2026 («el 2.º toque se lleva el foco de la casilla»), y por él
     // sigue el test.fail(): falla en la aserción del foco, no en la de la guía.
-    test.fail();
+    // REPARADO del todo el 29/10/2026 (hallazgo 3768): useGuardaRafaga frena también el mousedown.
     test.setTimeout(60_000);
     await page.setViewportSize({ width: 1280, height: 800 });
     await abrirHidratada(page);
@@ -2077,8 +2077,7 @@ test.describe('Inspector 28/10/2026', () => {
    * cifra y el símbolo, y con «m», que es el símbolo del metro. En español: «1 s», «2 min 5 s».
    */
   test('hallazgo · el tiempo del resultado va en formato español («5 s», «2 min 5 s»)', async ({ page }) => {
-    // ABIERTO (Inspector 28/10/2026): mide el formato de la ficha «Tiempo» (hoy «1s»).
-    test.fail();
+    // REPARADO (3618, con el 3772 de figuras-retoricas, 29/10/2026): «5 s», «2 min 5 s». Era «1s».
     await abrirHidratada(page);
     await arrancarPartida(page, 'A1 Básico', 10);
     await acertarHastaElFinal(page);
@@ -2541,8 +2540,8 @@ test.describe('Inspector 29/10/2026 · móvil 360 × 740', () => {
    * Esperado: tras cada ráfaga, el foco en la casilla «Past Simple», como tras un toque suelto.
    */
   test('hallazgo · escribiendo, tras la ráfaga en «Empezar», «Siguiente» o «Jugar de nuevo» el foco sigue en la casilla del Past Simple', async ({ page }) => {
-    // ABIERTO (Inspector 29/10/2026): mide dónde queda el foco tras cada ráfaga (hoy: «Comprobar», tarjeta, tarjeta, body).
-    test.fail();
+    // REPARADO (3768, 29/10/2026): el mousedown del 2.º toque ya no mueve el foco (lib/useGuardaRafaga.ts).
+    // Antes: «Comprobar», tarjeta, tarjeta, body.
     test.setTimeout(90_000);
     await abrirConProps(page);
     await page.locator('[class*="nivelBtn"]').filter({ hasText: 'A2 Elemental' }).click();
@@ -2598,12 +2597,12 @@ test.describe('Inspector 29/10/2026', () => {
    * (enterKeyHint "next" en la primera), sin veredicto ni anotación; con las dos llenas, corrige.
    */
   test('hallazgo · Enter en la casilla del Past Simple con el participio vacío no corrige: pasa a la casilla del participio', async ({ page }) => {
-    // ABIERTO (Inspector 29/10/2026): mide que no haya veredicto, que el foco pase al participio y que la lista siga vacía.
-    test.fail();
+    // REPARADO (3769, 29/10/2026): Enter con el participio vacío pasa a su casilla; enterKeyHint «next».
     await page.setViewportSize({ width: 1280, height: 800 });
     await abrirConProps(page);
     await arrancarEscribiendo(page, 'A1 Básico', 10);
     await expect(casillaPasado(page)).toBeFocused();
+    await expect(casillaPasado(page)).toHaveAttribute('enterkeyhint', 'next');
     const inf = norm(await verboEnPantalla(page).textContent());
     await page.keyboard.type(formasBuenas(inf).pasado);
     await page.keyboard.press('Enter');

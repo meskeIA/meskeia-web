@@ -7,7 +7,7 @@ import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard } from '@/components';
 import EducationalSection from '@/components/EducationalSection';
-import { formatPercentage, margenBarraLogo } from '@/lib';
+import { formatPercentage, margenBarraLogo, enfocarSinCentrar } from '@/lib';
 import { useGuardaRafaga } from '@/lib/useGuardaRafaga';
 import { verbosIrregulares, VerboIrregular } from '@/data/verbos-irregulares';
 import {
@@ -269,6 +269,7 @@ export default function QuizVerbosIrregularesPage() {
   const resultadoRef = useRef<HTMLDivElement>(null);
   const tituloConfigRef = useRef<HTMLHeadingElement>(null);
   const inputPasadoRef = useRef<HTMLInputElement>(null);
+  const inputParticipioRef = useRef<HTMLInputElement>(null);
   const vieneDelResultado = useRef(false);
 
   // Al escribir, la pregunta nueva lleva el foco a la primera casilla: se contesta tecleando
@@ -276,7 +277,7 @@ export default function QuizVerbosIrregularesPage() {
   useEffect(() => {
     if (pantalla === 'quiz') {
       if (respondida) {
-        botonSiguienteRef.current?.focus();
+        enfocarSinCentrar(botonSiguienteRef.current); // sin centrarlo: el veredicto, a la vista (3770)
       } else {
         traerALaVista(quizPanelRef.current, preguntaRef.current);
         if (modoPartida === 'escribir') inputPasadoRef.current?.focus({ preventScroll: true });
@@ -384,7 +385,8 @@ export default function QuizVerbosIrregularesPage() {
   const formatTiempo = (seg: number): string => {
     const m = Math.floor(seg / 60);
     const s = seg % 60;
-    return m > 0 ? `${m}m ${s}s` : `${s}s`;
+    // «min» y «s»: «m» es el símbolo del metro (hallazgo 3772), como ya escribe quiz-paises-capitales
+    return m > 0 ? `${m} min ${s} s` : `${s} s`;
   };
 
   return (
@@ -597,7 +599,7 @@ export default function QuizVerbosIrregularesPage() {
                       <label htmlFor={campo.id} className={styles.escrituraLabel}>{campo.etiqueta}</label>
                       <input
                         id={campo.id}
-                        ref={campo.clave === 'pasado' ? inputPasadoRef : undefined}
+                        ref={campo.clave === 'pasado' ? inputPasadoRef : inputParticipioRef}
                         type="text"
                         lang="en"
                         className={`${styles.escrituraInput} ${ok === true ? styles.escrituraOk : ''} ${ok === false ? styles.escrituraMal : ''}`}
@@ -609,7 +611,15 @@ export default function QuizVerbosIrregularesPage() {
                         autoCapitalize="none"
                         autoCorrect="off"
                         spellCheck={false}
-                        enterKeyHint="done"
+                        // Hallazgo 3769: Enter en el Past Simple con el participio vacío pasa a la
+                        // segunda casilla en vez de corregir con ella vacía (y la tecla del móvil
+                        // dice «Siguiente»); con las dos llenas, corrige como siempre.
+                        enterKeyHint={campo.clave === 'pasado' && !textoParticipio.trim() ? 'next' : 'done'}
+                        onKeyDown={campo.clave === 'pasado' ? (e) => {
+                          if (e.key !== 'Enter' || correccion !== null || textoParticipio.trim()) return;
+                          e.preventDefault();
+                          inputParticipioRef.current?.focus();
+                        } : undefined}
                       />
                       {ok !== undefined && (
                         <span className={ok ? styles.escrituraMarcaOk : styles.escrituraMarcaMal}>

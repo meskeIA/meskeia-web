@@ -54,8 +54,27 @@ export function useGuardaRafaga(): (opciones?: { soloMismoPunto?: boolean }) => 
         puntoRef.current = { x: e.clientX, y: e.clientY };
       }
     }
+    /**
+     * ⚠️ 29/10/2026 (hallazgo 3768) — ignorar el CLIC no basta: el mousedown del 2.º toque llega
+     * antes y mueve el foco a lo que haya debajo. En quiz-verbos-irregulares, modo «Escribir», el
+     * foco salía de la casilla «Past Simple» hacia «Comprobar» o «Ver guía educativa», y el Enter
+     * siguiente corregía con las casillas vacías. El mousedown que cumple lo mismo que el clic
+     * ignorado no hace su acción por defecto (mover el foco, seleccionar texto). No cambia la marca:
+     * de eso se encarga el clic.
+     */
+    function frenarFoco(e: MouseEvent) {
+      const marca = cambioPantallaRef.current;
+      if (e.detail <= 1 || !marca) return;
+      const { x, y } = puntoRef.current;
+      if (marca === 'punto' && Math.hypot(e.clientX - x, e.clientY - y) > RADIO_MISMO_PUNTO) return;
+      e.preventDefault();
+    }
     window.addEventListener('click', filtrar, true);
-    return () => window.removeEventListener('click', filtrar, true);
+    window.addEventListener('mousedown', frenarFoco, true);
+    return () => {
+      window.removeEventListener('click', filtrar, true);
+      window.removeEventListener('mousedown', frenarFoco, true);
+    };
   }, []);
   return useCallback((opciones?: { soloMismoPunto?: boolean }) => {
     cambioPantallaRef.current = opciones?.soloMismoPunto ? 'punto' : 'pantalla';
