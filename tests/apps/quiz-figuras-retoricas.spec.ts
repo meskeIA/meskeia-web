@@ -724,3 +724,173 @@ test.describe('Inspector 29/10/2026 · hallazgos', () => {
     expect(describe).toEqual([]);
   });
 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * INSPECTOR 29/10/2026 (tarde) — re-inspección tras /reparar (e387448a, 5b65607f y f0b18db0).
+ * 3772, 3773, 3774 y 3775 se comprobaron con su caso y dan lo esperado (sus tests de arriba, en
+ * verde). Los 18 hallazgos del 28/10 siguen abiertos en la base: sus `test.fail()` no se tocan.
+ *
+ * El reloj se fija con `Date.now` (window.__fijo) para que el tiempo de la partida sea EXACTO y
+ * no dependa de lo que tarde el test. Valores resueltos a mano con formatTiempo (page.tsx:184-189):
+ * m = ⌊seg/60⌋, s = seg mod 60 → m > 0 ? «m min s s» : «s s»; tiempoTotal = round(ms/1000).
+ *  · normal (escritorio): Básico, 10 bien, 135 000 ms → 135 s = 2·60 + 15 → «2 min 15 s». La barra
+ *    se llama «Progreso del quiz» y su aria-valuenow es preguntaActual: 0 en la 1.ª … 9 en la 10.ª,
+ *    sobre aria-valuemax 10; en el resultado no hay barra.
+ *  · límite (360 × 740): el umbral del minuto. 59 000 ms → 59 s → «59 s»; «Jugar de nuevo» vuelve
+ *    a poner tiempoInicio (iniciarQuiz, page.tsx:124) y 60 000 ms → 60 s = 1·60 + 0 → «1 min 0 s».
+ *    Y la fila «Número de preguntas» cabe en la pantalla (cabo C0518: con el flex-wrap de 3785 se
+ *    apila; medido a 360 y 320 px, los tres botones dentro).
+ *  · rechazo (360 × 740, táctil): doble toque en «Siguiente» en las 9 transiciones. El 2.º toque
+ *    (detail 2) no contesta la pregunta nueva y el foco se queda en el enunciado, no en la opción
+ *    que hay debajo ni en <body> (invariante de la familia y cabo C0514, que la guarda frena desde
+ *    f0b18db0). Medido: 18 de 18 en el enunciado.
+ */
+async function relojFijo(page: Page): Promise<void> {
+  await page.addInitScript(() => {
+    const real = Date.now.bind(Date);
+    const w = window as unknown as { __fijo?: number };
+    Date.now = () => (typeof w.__fijo === 'number' ? w.__fijo : real());
+  });
+}
+async function fijarReloj(page: Page, t: number): Promise<void> {
+  await page.evaluate((x) => { (window as unknown as { __fijo: number }).__fijo = x; }, t);
+}
+/** Juega 10 bien y, justo antes de «Ver resultados», pone el reloj en inicio + ms. */
+async function partidaCronometrada(page: Page, inicio: number, ms: number, barra?: Locator): Promise<void> {
+  for (let n = 1; n <= 10; n++) {
+    if (barra) {
+      await expect(barra).toHaveAttribute('aria-valuenow', String(n - 1));
+      await expect(barra).toHaveAttribute('aria-valuemax', '10');
+    }
+    await responder(page, 'bien');
+    if (n === 10) await fijarReloj(page, inicio + ms);
+    await avanzar(page);
+  }
+}
+
+test.describe('Inspector 29/10/2026 (tarde) · escritorio 1280 × 800', () => {
+  test.use({ viewport: { width: 1280, height: 800 } });
+
+  test('caso normal: 135 s de partida dan «2 min 15 s» y la barra se llama «Progreso del quiz»', async ({ page }) => {
+    test.setTimeout(90_000);
+    await relojFijo(page);
+    await abrir(page);
+    await elegir(page, 'Básico', 10);
+    const T0 = 1_000_000_000_000;
+    await fijarReloj(page, T0);
+    await page.locator('[class*="btnIniciar"]').click();
+    await expect(contador(page)).toHaveText('Pregunta 1 de 10');
+    const barra = page.getByRole('progressbar', { name: 'Progreso del quiz' });
+    await expect(barra).toHaveCount(1);
+    await partidaCronometrada(page, T0, 135_000, barra);
+    const r = await resultado(page);
+    expect(r.sub).toBe('10 de 10 respuestas correctas');
+    expect(r.stats.Tiempo).toBe('2 min 15 s');
+    await expect(page.getByRole('progressbar')).toHaveCount(0);
+  });
+
+  test('hallazgo · el verso de Manrique que la guía da como Metáfora no es la clave de Alegoría', async ({ page }) => {
+    test.fail(); // ABIERTO — la reparación de 3775 (e387448a) puso como ejemplo de Alegoría
+    // «Nuestras vidas son los ríos / que van a dar en la mar…» (data/figuras-retoricas.ts:334), que la
+    // tabla de la propia guía (page.tsx:422-427) da como ejemplo canónico de METÁFORA. En «Todas», con
+    // Metáfora entre las opciones, quien responde lo que enseña la tabla saca «Incorrecto». Medido el
+    // 29/10/2026 (Math.random sembrado, semilla 632): 1.ª pregunta Manrique, opciones Metonimia,
+    // Metáfora, Ironía y Alegoría; Metáfora → «Incorrecto · Alegoría».
+    await abrir(page);
+    const filaMetafora = page.locator('table tbody tr').filter({ has: page.locator('td strong', { hasText: /^Metáfora$/ }) });
+    await expect(filaMetafora).toHaveCount(1);
+    const versoTabla = norm(await filaMetafora.locator('em').first().textContent()).replace(/^"|"$/g, '');
+    const clave = (s: string): string => s.toLowerCase().replace(/[^a-záéíóúñü]+/g, ' ').trim();
+    const enAlegoria = figura('alegoria').ejemplos.filter((e) => clave(e).includes(clave(versoTabla)));
+    expect(enAlegoria, `la guía da «${versoTabla}» como Metáfora`).toEqual([]);
+  });
+
+  test('hallazgo · la opción correcta y la fallada se distinguen por algo más que el color', async ({ page }) => {
+    test.fail(); // ABIERTO — forma del cabo C0516: tras fallar, la elegida y la correcta conservan
+    // el mismo texto y el mismo aria-label («Opción B: Metáfora», «Opción D: Alegoría»); solo cambian
+    // el color de texto, el borde y el fondo (rojo / verde). La referencia, quiz-literatura-universal
+    // (hallazgo 303), añade ✓/✗ y «(respuesta correcta)» / «(tu respuesta, incorrecta)» (WCAG 1.4.1).
+    await abrir(page);
+    await arrancar(page, 'Básico', 10);
+    await page.waitForTimeout(550);
+    const f = await figuraVisible(page);
+    const leer = (): Promise<string[]> =>
+      opciones(page).evaluateAll((bs) => bs.map((b) => `${b.getAttribute('aria-label')} | ${(b.textContent ?? '').trim()}`));
+    const antes = await leer();
+    const iC = (await nombresOpcion(page)).indexOf(f.nombre);
+    const iF = iC === 0 ? 1 : 0;
+    await opciones(page).nth(iF).click();
+    await expect(feedback(page)).toBeVisible();
+    const despues = await leer();
+    expect(despues[iC], 'la correcta solo cambia de color').not.toBe(antes[iC]);
+    expect(despues[iF], 'la fallada solo cambia de color').not.toBe(antes[iF]);
+  });
+});
+
+test.describe('Inspector 29/10/2026 (tarde) · móvil 360 × 740', () => {
+  test.use({ viewport: { width: 360, height: 740 }, userAgent: UA_MOVIL, deviceScaleFactor: 3, isMobile: true, hasTouch: true });
+
+  test('caso límite: 59 s dan «59 s» y, tras «Jugar de nuevo», 60 s dan «1 min 0 s»; la fila de preguntas cabe', async ({ page }) => {
+    test.setTimeout(120_000);
+    await relojFijo(page);
+    await abrir(page);
+    const fuera = await page.locator('[class*="preguntasRow"] button').evaluateAll((bs) =>
+      bs.filter((b) => { const r = b.getBoundingClientRect(); return r.left < 0 || r.right > window.innerWidth; }).map((b) => b.textContent ?? ''),
+    );
+    expect(fuera, 'botones de «Número de preguntas» fuera de la pantalla').toEqual([]);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBe(360);
+
+    await elegir(page, 'Básico', 10);
+    const T1 = 3_000_000_000_000;
+    await fijarReloj(page, T1);
+    await page.locator('[class*="btnIniciar"]').click();
+    await expect(contador(page)).toHaveText('Pregunta 1 de 10');
+    await partidaCronometrada(page, T1, 59_000);
+    expect((await resultado(page)).stats.Tiempo).toBe('59 s');
+
+    const T2 = 4_000_000_000_000;
+    await fijarReloj(page, T2);
+    await page.waitForTimeout(600);
+    await page.locator('[class*="btnRejugar"]').click();
+    await expect(contador(page)).toHaveText('Pregunta 1 de 10');
+    await partidaCronometrada(page, T2, 60_000);
+    expect((await resultado(page)).stats.Tiempo).toBe('1 min 0 s');
+  });
+
+  test('caso de rechazo: el 2.º toque en «Siguiente» no contesta y el foco se queda en el enunciado', async ({ page }) => {
+    test.setTimeout(120_000);
+    await abrir(page);
+    await elegir(page, 'Básico', 10);
+    await page.locator('[class*="btnIniciar"]').click();
+    await expect(contador(page)).toHaveText('Pregunta 1 de 10');
+    for (let n = 1; n <= 9; n++) {
+      await responder(page, 'bien');
+      await dobleToque(page, page.locator('[class*="btnSiguiente"]'), true, () => expect(contador(page)).toHaveText(`Pregunta ${n + 1} de 10`));
+      await expect(contador(page), 'el 2.º toque ha saltado otra pregunta').toHaveText(`Pregunta ${n + 1} de 10`);
+      await expect(feedback(page), `el 2.º toque ha contestado la pregunta ${n + 1}`).toHaveCount(0);
+      await expect(page.locator('[class*="preguntaCard"]'), `tras el doble toque ${n} el foco no está en el enunciado`).toBeFocused();
+    }
+  });
+});
+
+test.describe('Inspector 29/10/2026 (tarde) · contenido del banco', () => {
+  test('hallazgo · reparación incompleta de 3775: ninguna glosa del enunciado nombra o describe su figura', () => {
+    test.fail(); // ABIERTO — fuera de la alegoría y de los 9 ejemplos de 3657, otros cinco se delatan en
+    // el paréntesis que se pinta en la PREGUNTA (page.tsx:282-284): Ironía «(dicho con sarcasmo)»
+    // nombra el sarcasmo, que la FAQ visible define como «una ironía más mordaz»; y los 4 de
+    // Hipérbaton escriben entre paréntesis el orden natural con las MISMAS palabras («Del monte en la
+    // ladera. (En la ladera del monte)»), que es el mecanismo de su definición («Alteración del orden
+    // gramatical natural») y lo que la guía pide dar para identificarlo (page.tsx:650-654).
+    const glosa = (e: string): string => (e.match(/\(([^)]*)\)/) ?? [])[1] ?? '';
+    const palabras = (s: string): string => (s.toLowerCase().match(/[a-záéíóúñü]+/g) ?? []).sort().join(' ');
+    const delatan: string[] = [];
+    for (const e of figura('ironia').ejemplos) if (/sarcasm/i.test(glosa(e))) delatan.push(`ironia: ${e}`);
+    for (const e of figura('hiperbaton').ejemplos) {
+      const g = glosa(e);
+      if (g && palabras(g) === palabras(e.split('(')[0])) delatan.push(`hiperbaton: ${e}`);
+    }
+    expect(delatan).toEqual([]);
+  });
+});

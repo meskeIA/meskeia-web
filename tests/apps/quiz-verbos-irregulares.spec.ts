@@ -1476,6 +1476,13 @@ test.describe('Inspector 25/09/2026 · móvil 360 × 740', () => {
     const inf = norm(await verboEnPantalla(page).textContent());
     await tocar(await botonDeOpcion(page, respuestaQueSePregunta(inf)));
     await expect(feedback(page)).toContainText('¡Correcto!');
+    // Pausa de lectura (29/10/2026, re-inspección de la tarde). Desde f0b18db0 «Siguiente» recibe
+    // el foco sin centrarse (enfocarSinCentrar, hallazgo 3770): cuando la correcta es la D, pegada
+    // al pie tras el desplazamiento de arriba, el botón asoma justo bajo ese punto (D en y = 699,
+    // «Siguiente» en y = 706). Tocarlo 50 ms después era, para el navegador, el 2.º toque de un doble
+    // toque en el mismo punto, y useGuardaRafaga lo ignora a propósito (3679): el caso fallaba 2 de 8
+    // por el ritmo del test, no por la app. Quien lee el veredicto antes de seguir no toca tan deprisa.
+    await page.waitForTimeout(LECTURA_MS);
     // …baja lo justo para ver «Siguiente» entero y lo toca.
     await page.evaluate(() => {
       const r = (document.querySelector('[class*="btnSiguiente"]') as Element).getBoundingClientRect();
@@ -1975,12 +1982,11 @@ test.describe('Inspector 28/10/2026', () => {
    * pregunta nueva no entra en la casilla (9 de 9 «Siguiente» en el barrido, a 1280 × 800).
    */
   test('hallazgo · escribiendo, doble clic en «Siguiente»: el 2.º no abre la guía ni saca el foco de la pregunta', async ({ page }) => {
-    // REPARADO A MEDIAS el 28/10/2026 (hallazgo 3615, cerrado en la base): la guía ya no se
-    // despliega, pero el mousedown del 2.º clic sigue llevándose el foco a «Ver guía educativa»
-    // (3 de 3 el 29/10/2026), y un Enter tras teclear la despliega. Lo que queda es el hallazgo
-    // nuevo del Inspector 29/10/2026 («el 2.º toque se lleva el foco de la casilla»), y por él
-    // sigue el test.fail(): falla en la aserción del foco, no en la de la guía.
-    // REPARADO del todo el 29/10/2026 (hallazgo 3768): useGuardaRafaga frena también el mousedown.
+    // REPARADO en dos tiempos. El 28/10/2026 (hallazgo 3615, c5b619bb) la guía dejó de
+    // desplegarse, pero el mousedown del 2.º clic seguía llevándose el foco a «Ver guía educativa»
+    // (3 de 3 el 29/10/2026) y un Enter tras teclear la desplegaba: por eso este caso llevó
+    // test.fail() en la aserción del foco. El 29/10/2026 (hallazgo 3768, f0b18db0) useGuardaRafaga
+    // frena también el mousedown; re-inspeccionado esa tarde, también con el dedo.
     test.setTimeout(60_000);
     await page.setViewportSize({ width: 1280, height: 800 });
     await abrirHidratada(page);
@@ -2610,5 +2616,317 @@ test.describe('Inspector 29/10/2026', () => {
     await expect(feedback(page), 'Enter en el pasado ha corregido con el participio vacío').toHaveCount(0);
     await expect(casillaParticipio(page)).toBeFocused();
     expect((await listaGuardada(page))?.escribir ?? {}, `«${inf}» ha entrado en la lista de repaso sin llegar a escribir el participio`).toEqual({});
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// Inspector 29/10/2026 (tarde) — re-inspección tras /reparar (f0b18db0: hallazgos 3768 y 3769)
+// ═════════════════════════════════════════════════════════════════════════════
+//
+// Lo que la reparación dice haber cerrado, y cómo se mide aquí por un camino que el resto del
+// fichero no recorre: con TOQUES de verdad (page.touchscreen.tap, que llega como pointerdown →
+// touchstart → mousedown → click), no con el ratón de `rafaga()`. Medido antes de escribir esto
+// (29/10/2026, 360 × 740 con hasTouch): el 2.º toque llega con detail 2 en el mousedown y en el
+// clic, así que la guarda lo reconoce; cae en el título o el icono de la guía (escribiendo) o en
+// una opción de la pregunta nueva (eligiendo), y el foco se queda donde lo dejó el 1.º.
+//   · 3768: tras la ráfaga en «Empezar», «Siguiente», «Ver resultados», «Repasar mis fallos» o
+//     «Jugar de nuevo», lo tecleado entra en la casilla del Past Simple.
+//   · 3769: Enter en el Past Simple con el participio vacío pasa a la casilla del participio.
+//   · alrededor: Enter con las dos llenas sigue corrigiendo (desde las dos casillas), un acierto
+//     cuenta, la lista de repaso solo recibe los fallados y el foco tras «Siguiente» del modo de
+//     opciones sigue yendo al enunciado (invariante de la familia), también tras una ráfaga.
+//
+// DE DÓNDE SALEN LOS VALORES ESPERADOS
+// · Las formas: el CANON de arriba (cotejado con Oxford/Cambridge el 25/09/2026). El fallo se
+//   fabrica regularizando (infinitivo + «ed»): ninguna forma de A1 ni de A2 se escribe así.
+// · Puntuación y rótulos: calcularPuntuacion() y getResultadoTexto() de page.tsx, a mano en cada
+//   caso. Precisión del HUD: correctas / respondidas con formatPercentage(·, 0), espacio duro
+//   antes del «%» y la mitad hacia arriba (5/8 = 62,5 → 63).
+// · La lista de repaso: anotarRespuesta de motor.ts — un fallo apunta {fallos: 1, racha: 0}; un
+//   acierto de un verbo que no está en la lista no lo apunta.
+
+/** Espacio duro: el que formatPercentage pone antes del «%». */
+const ED = ' ';
+
+/** Cuenta el `detail` de cada clic, para saber que los dos toques formaron una ráfaga. */
+async function contarClics(page: Page): Promise<void> {
+  await page.addInitScript(() => {
+    const w = window as unknown as { __clics: number[] };
+    w.__clics = [];
+    window.addEventListener('click', (e) => w.__clics.push(e.detail), true);
+  });
+}
+
+/**
+ * Ráfaga con el DEDO sobre `boton`: toque suelto, espera a que `pintada` diga que la pantalla
+ * nueva está en su sitio y 2.º toque en el mismo punto. Exige que el navegador los haya contado
+ * como ráfaga (detail 1 y 2): si no, el caso mediría un toque nuevo, no el doble toque.
+ */
+async function rafagaTactil(page: Page, boton: Locator, pintada: () => Promise<boolean>, paso: string): Promise<void> {
+  await boton.scrollIntoViewIfNeeded();
+  await page.waitForTimeout(100);
+  const caja = await boton.boundingBox();
+  if (!caja) throw new Error(`${paso}: el botón no tiene caja`);
+  const [x, y] = [caja.x + caja.width / 2, caja.y + caja.height / 2];
+  await page.evaluate(() => { (window as unknown as { __clics: number[] }).__clics = []; });
+  await page.touchscreen.tap(x, y);
+  await expect.poll(pintada, { intervals: [20], timeout: 3000, message: `${paso}: el primer toque cambia de pantalla` }).toBe(true);
+  await page.waitForTimeout(80);
+  await page.touchscreen.tap(x, y);
+  await page.waitForTimeout(400);
+  const clics = await page.evaluate(() => (window as unknown as { __clics: number[] }).__clics);
+  expect(clics, `${paso}: los dos toques no han llegado como ráfaga (detail de cada clic)`).toEqual([1, 2]);
+}
+
+test.describe('Inspector 29/10/2026 (tarde) · móvil 360 × 740 con el dedo', () => {
+  test.use({
+    viewport: { width: 360, height: 740 },
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Mobile Safari/537.36',
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  /**
+   * CASO NORMAL — A2 escribiendo, 10 preguntas, con el dedo y tecleando: doble toque en «Empezar»
+   * y en cada «Siguiente» / «Ver resultados» / «Repasar mis fallos». Se fallan la 3.ª y la 7.ª
+   * (las dos casillas regularizadas) y se aciertan las otras 8. Cada pregunta se contesta
+   * tecleando el pasado, Enter, el participio y Enter; en la 2.ª, el participio se escribe con
+   * Tab y el Enter se pulsa de vuelta en la casilla del pasado, con las dos ya llenas.
+   *
+   * Resuelto a mano ANTES de ejecutar:
+   *   · A2 tiene 20 verbos ≥ 10 → «Empezar Quiz — 10 preguntas · Nivel A2».
+   *   · tras cada ráfaga, el foco en la casilla «Past Simple»: lo tecleado entra ahí (3768).
+   *   · Enter en el pasado con el participio vacío: sin veredicto, foco al participio y la lista
+   *     sin tocar (3769). Enter con las dos llenas, desde cualquiera de las dos: corrige.
+   *   · aciertos tras cada pregunta: 1 2 2 3 4 5 5 6 7 8
+   *   · precisión: 1/1 100 · 2/2 100 · 2/3 66,67→67 · 3/4 75 · 4/5 80 · 5/6 83,33→83 · 5/7 71,43→71
+   *     · 6/8 75 · 7/9 77,78→78 · 8/10 80
+   *   · 8/10 = 0,8 → rama «≥ 0,7»: 60 + (0,8 − 0,7)/0,2 · 40 = 80 pts · «¡Muy buena puntuación!» ·
+   *     «8 de 10 respuestas correctas» · «8/10» · «80 %»
+   *   · fallados, en su orden: los de la 3.ª y la 7.ª → «Has fallado 2 verbos: X, Y.» y «Repasar
+   *     mis fallos — 2 preguntas» (min(10, 2) = 2); la lista del modo escribir guarda esos dos con
+   *     {fallos: 1, racha: 0} y la de elegir sigue vacía.
+   *   · doble toque en «Repasar mis fallos»: «1/2», sin veredicto y el foco en la casilla del pasado.
+   */
+  test('caso normal · A2 escribiendo con el dedo, 8 de 10: tras cada doble toque lo tecleado entra en el pasado, 80 pts y los 2 fallados a la lista', async ({ page }) => {
+    test.setTimeout(120_000);
+    await contarClics(page);
+    await abrirConProps(page);
+    await page.locator('[class*="nivelBtn"]').filter({ hasText: 'A2 Elemental' }).tap();
+    await page.getByRole('button', { name: /Escribir las formas/ }).tap();
+    await page.getByRole('button', { name: '10 preguntas', exact: true }).tap();
+    await expect(page.locator('[class*="btnIniciar"]')).toHaveText('Empezar Quiz — 10 preguntas · Nivel A2');
+    await page.waitForTimeout(LECTURA_MS);
+    await rafagaTactil(page, page.locator('[class*="btnIniciar"]'), async () => (await casillaPasado(page).count()) > 0, '«Empezar»');
+
+    const falla = new Set([3, 7]);
+    const aciertosTras = [1, 2, 2, 3, 4, 5, 5, 6, 7, 8];
+    const precisionTras = [100, 100, 67, 75, 80, 83, 71, 75, 78, 80];
+    const fallados: string[] = [];
+    for (let i = 1; i <= 10; i++) {
+      await expect(page.getByText(`Pregunta ${i} de 10`, { exact: true })).toBeAttached();
+      await expect(feedback(page), `el 2.º toque ha comprobado la pregunta ${i}`).toHaveCount(0);
+      await expect(casillaPasado(page), `pregunta ${i}: tras el doble toque el foco no está en la casilla del pasado`).toBeFocused();
+      const inf = norm(await verboEnPantalla(page).textContent());
+      expect(CANON[inf]?.nivel, `«${inf}» ha salido en una partida de A2`).toBe('A2');
+      const bien = !falla.has(i);
+      if (!bien) fallados.push(inf);
+      const { pasado, participio } = bien ? formasBuenas(inf) : { pasado: `${inf}ed`, participio: `${inf}ed` };
+      const antes = (await listaGuardada(page))?.escribir ?? {};
+
+      await page.keyboard.type(pasado);
+      await expect(casillaPasado(page), 'lo tecleado no ha entrado en la casilla del pasado').toHaveValue(pasado);
+      if (i === 2) {
+        await page.keyboard.press('Tab');
+        await page.keyboard.type(participio);
+        await expect(casillaParticipio(page)).toHaveValue(participio);
+        await casillaPasado(page).focus();
+        await page.keyboard.press('Enter'); // las dos llenas: corrige desde la del pasado
+      } else {
+        await page.keyboard.press('Enter');
+        await page.waitForTimeout(200);
+        await expect(feedback(page), `pregunta ${i}: Enter en el pasado ha corregido con el participio vacío`).toHaveCount(0);
+        await expect(casillaParticipio(page)).toBeFocused();
+        expect((await listaGuardada(page))?.escribir ?? {}, 'Enter en el pasado ha tocado la lista de repaso').toEqual(antes);
+        await page.keyboard.type(participio);
+        await page.keyboard.press('Enter'); // las dos llenas: corrige desde la del participio
+      }
+
+      await expect(feedback(page)).toContainText(bien ? '¡Correcto!' : 'Incorrecto');
+      if (!bien) await expect(feedback(page)).toContainText(`En el Past Simple has escrito «${pasado}». En el Past Participle has escrito «${participio}».`);
+      expect(Object.values(await hud(page)), `HUD tras la ${i}.ª`).toEqual([`${i}/10`, String(aciertosTras[i - 1]), `${precisionTras[i - 1]}${ED}%`]);
+      await expect(botonSiguiente(page)).toBeFocused();
+      await expect(botonSiguiente(page)).toHaveText(i < 10 ? 'Siguiente pregunta →' : 'Ver resultados');
+      await page.waitForTimeout(LECTURA_MS);
+      if (i < 10) await rafagaTactil(page, botonSiguiente(page), async () => (await feedback(page).count()) === 0, `«Siguiente» ${i}`);
+      else await rafagaTactil(page, botonSiguiente(page), async () => (await page.locator('[class*="resultadoPanel"]').count()) > 0, '«Ver resultados»');
+    }
+
+    await expect(page.locator('[class*="hudBar"]'), 'el 2.º toque de «Ver resultados» ha empezado otra partida').toHaveCount(0);
+    await expect(page.locator('[class*="resultadoPuntos"]')).toHaveText('80 pts');
+    await expect(page.locator('[class*="resultadoTitulo"]')).toHaveText('¡Muy buena puntuación!');
+    await expect(page.locator('[class*="resultadoSubtitulo"]')).toHaveText('8 de 10 respuestas correctas');
+    const valores = (await page.locator('[class*="statRValor"]').allTextContents()).map((v) => v.trim());
+    expect(valores.slice(0, 2)).toEqual(['8/10', `80${ED}%`]);
+    await expect(page.locator('[class*="resultadoFallados"]')).toContainText(`Has fallado 2 verbos: ${fallados.join(', ')}.`);
+    const lista = await listaGuardada(page);
+    expect(lista?.escribir, 'la lista de repaso no guarda exactamente los dos fallados').toEqual(
+      Object.fromEntries(fallados.map((f) => [f, { fallos: 1, racha: 0 }])),
+    );
+    expect(lista?.elegir ?? {}).toEqual({});
+
+    await page.waitForTimeout(500);
+    await rafagaTactil(page, page.getByRole('button', { name: 'Repasar mis fallos — 2 preguntas' }), async () => (await page.locator('[class*="hudBar"]').count()) > 0, '«Repasar mis fallos»');
+    expect(Object.values(await hud(page))).toEqual(['1/2', '0', `0${ED}%`]);
+    await expect(feedback(page), 'el 2.º toque de «Repasar mis fallos» ha comprobado la 1.ª pregunta').toHaveCount(0);
+    expect(fallados).toContain(norm(await verboEnPantalla(page).textContent()));
+    await expect(casillaPasado(page)).toBeFocused();
+  });
+
+  /**
+   * CASO DE RECHAZO — modo de opciones, A1, 10 preguntas, con el dedo: doble toque en «Empezar»,
+   * en cada «Siguiente», en «Ver resultados» y en «Jugar de nuevo». A 360 × 740 el 2.º toque de
+   * «Siguiente» cae en una opción de la pregunta nueva (medido: la D, 3 de 3): lo que se rechaza
+   * es que la conteste. Se fallan la 1.ª, la 4.ª, la 8.ª y la última.
+   *
+   * Resuelto a mano ANTES de ejecutar:
+   *   · tras cada ráfaga: la pregunta siguiente, sin veredicto, 4 opciones habilitadas y el foco
+   *     en el enunciado (tarjeta con tabindex -1: el invariante de la familia).
+   *   · aciertos tras cada pregunta: 0 1 2 2 3 4 5 5 6 6
+   *   · precisión: 0/1 0 · 1/2 50 · 2/3 67 · 2/4 50 · 3/5 60 · 4/6 67 · 5/7 71 · 5/8 62,5→63 ·
+   *     6/9 67 · 6/10 60
+   *   · 6/10 = 0,6 → rama «≥ 0,5»: 40 + (0,6 − 0,5)/0,2 · 20 = 50 pts · «Buen intento» ·
+   *     «6 de 10 respuestas correctas» · «6/10» · «60 %» · «Has fallado 4 verbos» y la lista de
+   *     elegir con esos 4; la de escribir, vacía.
+   *   · doble toque en «Ver resultados»: el resultado se queda y recibe el foco. En «Jugar de
+   *     nuevo»: «1/10 · 0 · 0 %», sin veredicto, 4 opciones habilitadas y el foco en el enunciado.
+   */
+  test('caso de rechazo · eligiendo con el dedo, el 2.º toque de cada ráfaga no contesta ni saca el foco del enunciado: 6 de 10, 50 pts', async ({ page }) => {
+    test.setTimeout(120_000);
+    await contarClics(page);
+    await abrirConProps(page);
+    await page.locator('[class*="nivelBtn"]').filter({ hasText: 'A1 Básico' }).tap();
+    await page.getByRole('button', { name: '10 preguntas', exact: true }).tap();
+    await page.waitForTimeout(LECTURA_MS);
+    await rafagaTactil(page, page.locator('[class*="btnIniciar"]'), async () => (await page.locator('[class*="opcionesGrid"]').count()) > 0, '«Empezar»');
+
+    const falla = new Set([1, 4, 8, 10]);
+    const aciertosTras = [0, 1, 2, 2, 3, 4, 5, 5, 6, 6];
+    const precisionTras = [0, 50, 67, 50, 60, 67, 71, 63, 67, 60];
+    const fallados: string[] = [];
+    for (let i = 1; i <= 10; i++) {
+      await expect(page.getByText(`Pregunta ${i} de 10`, { exact: true })).toBeAttached();
+      await expect(feedback(page), `el 2.º toque ha contestado la pregunta ${i}`).toHaveCount(0);
+      expect(await opcionesHabilitadas(page), `pregunta ${i}: opciones habilitadas`).toBe(4);
+      await expect(page.locator('[class*="preguntaCard"]'), `pregunta ${i}: el foco no está en el enunciado`).toBeFocused();
+      const inf = norm(await verboEnPantalla(page).textContent());
+      expect(CANON[inf]?.nivel, `«${inf}» ha salido en una partida de A1`).toBe('A1');
+      const ops = await opcionesVisibles(page);
+      const buena = respuestaQueSePregunta(inf);
+      const bien = !falla.has(i);
+      if (!bien) fallados.push(inf);
+      await page.waitForTimeout(LECTURA_MS);
+      await (await botonDeOpcion(page, bien ? buena : ops.find((o) => o !== buena)!)).tap();
+      await expect(feedback(page)).toContainText(bien ? '¡Correcto!' : 'Incorrecto');
+      expect(Object.values(await hud(page)), `HUD tras la ${i}.ª`).toEqual([`${i}/10`, String(aciertosTras[i - 1]), `${precisionTras[i - 1]}${ED}%`]);
+      await page.waitForTimeout(LECTURA_MS);
+      if (i < 10) await rafagaTactil(page, botonSiguiente(page), async () => (await feedback(page).count()) === 0, `«Siguiente» ${i}`);
+      else await rafagaTactil(page, botonSiguiente(page), async () => (await page.locator('[class*="resultadoPanel"]').count()) > 0, '«Ver resultados»');
+    }
+
+    await expect(page.locator('[class*="hudBar"]'), 'el 2.º toque de «Ver resultados» ha empezado otra partida').toHaveCount(0);
+    await expect(page.locator('[class*="resultadoPanel"]')).toBeFocused();
+    await expect(page.locator('[class*="resultadoPuntos"]')).toHaveText('50 pts');
+    await expect(page.locator('[class*="resultadoTitulo"]')).toHaveText('Buen intento');
+    await expect(page.locator('[class*="resultadoSubtitulo"]')).toHaveText('6 de 10 respuestas correctas');
+    const valores = (await page.locator('[class*="statRValor"]').allTextContents()).map((v) => v.trim());
+    expect(valores.slice(0, 2)).toEqual(['6/10', `60${ED}%`]);
+    await expect(page.locator('[class*="resultadoFallados"]')).toContainText(`Has fallado 4 verbos: ${fallados.join(', ')}.`);
+    const lista = await listaGuardada(page);
+    expect(Object.keys(lista?.elegir ?? {}).sort(), 'la lista de elegir no guarda exactamente los 4 fallados').toEqual(fallados.slice().sort());
+    expect(lista?.escribir ?? {}).toEqual({});
+
+    await page.waitForTimeout(500);
+    await rafagaTactil(page, page.getByRole('button', { name: /Jugar de nuevo/ }), async () => (await page.locator('[class*="hudBar"]').count()) > 0, '«Jugar de nuevo»');
+    expect(Object.values(await hud(page))).toEqual(['1/10', '0', `0${ED}%`]);
+    await expect(feedback(page), 'el 2.º toque de «Jugar de nuevo» ha contestado la 1.ª pregunta').toHaveCount(0);
+    expect(await opcionesHabilitadas(page)).toBe(4);
+    await expect(page.locator('[class*="preguntaCard"]')).toBeFocused();
+  });
+});
+
+test.describe('Inspector 29/10/2026 (tarde)', () => {
+  /**
+   * CASO LÍMITE / HALLAZGO bajo (Inspector 29/10/2026, tarde) · operativa — reparación incompleta
+   * de 3769. f0b18db0 aplicó la regla «Enter no corrige mientras la OTRA casilla esté vacía: lleva
+   * a ella» solo en la casilla del Past Simple (el onKeyDown y el enterKeyHint «next» van solo en
+   * esa). En la del Past Participle, Enter con el pasado vacío corrige: «Incorrecto · Has dejado
+   * vacío el Past Simple», la pregunta cuenta como fallada y el verbo entra en la lista de repaso
+   * sin haber llegado a escribir la otra forma, que es el daño del 3769. Y su enterKeyHint es
+   * siempre «done», así que el teclado del móvil ofrece «Hecho» con la primera casilla vacía.
+   * Medido el 29/10/2026 en escritorio (drive, sleep) y con el dedo a 360 × 740 (feel):
+   * localStorage {"escribir":{"feel":{"fallos":1,"racha":0}}}.
+   * Se llega así a la casilla del participio tocándola: las dos van en la misma fila, también a
+   * 360 px. (Distinto, y fuera de este caso: Enter en la casilla del participio VACÍA con el pasado
+   * lleno corrige, porque ahí no queda otra forma por escribir: es comprobar desde la casilla que se
+   * deja en blanco.)
+   * Esperado (la regla de la reparación, en la otra casilla): sin veredicto, el foco a la casilla
+   * del Past Simple y la lista de repaso sin tocar. Con las dos llenas, corrige (caso normal de
+   * arriba).
+   */
+  test('hallazgo · Enter en la casilla del Past Participle con el pasado vacío no corrige: pasa a la casilla del pasado', async ({ page }) => {
+    // ABIERTO (Inspector 29/10/2026, tarde): falla en la aserción del veredicto.
+    test.fail();
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await abrirConProps(page);
+    await arrancarEscribiendo(page, 'A1 Básico', 10);
+    await expect(casillaPasado(page)).toBeFocused();
+    const inf = norm(await verboEnPantalla(page).textContent());
+    await casillaParticipio(page).click();
+    await page.keyboard.type(formasBuenas(inf).participio);
+    await expect(casillaParticipio(page)).toHaveValue(formasBuenas(inf).participio);
+    await page.keyboard.press('Enter');
+    await page.waitForTimeout(300);
+    await expect(feedback(page), 'Enter en el participio ha corregido con el pasado vacío').toHaveCount(0);
+    await expect(casillaPasado(page)).toBeFocused();
+    expect((await listaGuardada(page))?.escribir ?? {}, `«${inf}» ha entrado en la lista de repaso sin llegar a escribir el pasado`).toEqual({});
+  });
+
+  /**
+   * HALLAZGO bajo (Inspector 29/10/2026, tarde) · accesibilidad — forma del cabo C0516 en esta app.
+   * En el modo de opciones, tras contestar mal, la opción buena y la fallada se distinguen SOLO por
+   * el color: las dos quedan con opacidad 1 (las neutras, 0,42), el mismo borde de 2 px sólido y el
+   * mismo peso, y ni el texto («Dgot», «Aget») ni el nombre accesible («Opción D: got», «Opción A:
+   * get») cambian. Verde y rojo tienen casi la misma luminancia: en claro, texto rgb(39,103,73)
+   * frente a rgb(197,48,48), 1,23:1, y borde rgb(72,187,120) frente a rgb(252,129,129), 1,01:1; en
+   * oscuro, texto 1,32:1 y el mismo borde. Medido el 29/10/2026 a 1280 × 800 y a 360 × 740, con la
+   * transición de color ya terminada (WCAG 1.4.1). Lo atenúa el aviso de debajo, que dice
+   * «Incorrecto» y escribe la conjugación buena. La referencia de la familia, quiz-literatura-
+   * universal, lo resolvió en su 303 con ✓/✗ visibles y «(respuesta correcta)» / «(tu respuesta,
+   * incorrecta)» en el nombre de la opción.
+   * Esperado: algo más que el color —el texto visible o el nombre accesible— cambia en la correcta
+   * y en la fallada.
+   */
+  test('hallazgo · tras fallar, la opción correcta y la fallada se distinguen por algo más que el color', async ({ page }) => {
+    // ABIERTO (Inspector 29/10/2026, tarde): falla en la aserción de la opción correcta.
+    test.fail();
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await abrirHidratada(page);
+    await arrancarPartida(page, 'A1 Básico', 10);
+    const inf = norm(await verboEnPantalla(page).textContent());
+    const ops = await opcionesVisibles(page);
+    const iBuena = ops.indexOf(respuestaQueSePregunta(inf));
+    const iMala = iBuena === 0 ? 1 : 0;
+    const botones = page.locator('[class*="opcionesGrid"] button');
+    const huella = (i: number): Promise<string> =>
+      botones.nth(i).evaluate((b) => `${b.getAttribute('aria-label') ?? ''} | ${(b.textContent ?? '').trim()}`);
+    const antesBuena = await huella(iBuena);
+    const antesMala = await huella(iMala);
+    await botones.nth(iMala).click();
+    await expect(feedback(page)).toContainText('Incorrecto');
+    expect(await huella(iBuena), 'la opción correcta solo cambia de color').not.toBe(antesBuena);
+    expect(await huella(iMala), 'la opción fallada solo cambia de color').not.toBe(antesMala);
   });
 });

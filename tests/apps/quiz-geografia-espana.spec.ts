@@ -1411,7 +1411,7 @@ function casosInspector29(movil: boolean): void {
    * representando el 17 % del territorio peninsular español». Confederación Hidrográfica del Duero,
    * https://www.chduero.es/web/guest/la-cuenca-del-duero — la parte española «cubre 78.859 km2» y la
    * demarcación es «la más extensa de la Península Ibérica con 98.073 km2» (la explicación de la app
-   * se la da al Tajo).
+   * se la daba al Tajo; REPARADO en fa1153c1, que se la da ya al Duero).
    * Esperado: contestar «Ebro» es «✅ ¡Correcto!» y el marcador sube. Obtenido (29/10/2026, 1280 y
    * 360 px, semilla 61, la id 61 sale 16.ª): «❌ Incorrecto. La respuesta correcta es: "Duero"».
    * Al repararlo (29/10/2026) la semilla 61 ya no sacaba la id 61: el orden depende de cuántas
@@ -1454,4 +1454,304 @@ test.describe('Inspector 29/10/2026 · escritorio 1280 × 800', () => {
 test.describe('Inspector 29/10/2026 · móvil 360 × 740', () => {
   test.use({ viewport: { width: 360, height: 740 }, userAgent: MOVIL_UA, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
   casosInspector29(true);
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Inspector 29/10/2026 (tarde) — re-inspección tras /reparar. fa1153c1 cerró el 3780 (id 61, la
+// mayor cuenca dentro de España). De las reparaciones de familia del día, 5b65607f SÍ llegó a esta
+// app (enfocarSinCentrar al contestar) y f0b18db0 NO: su guarda de doble toque es una copia en
+// línea (page.tsx, «ultimoCambioPantallaRef»), no lib/useGuardaRafaga.ts, y solo filtra el clic:
+// ni frena el mousedown (3768) ni tiene el modo «mismo punto» del clic que contesta (3679/3701/3751).
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * De dónde sale el texto esperado de la id 61 (leído el 29/10/2026 por la tarde):
+ * · Confederación Hidrográfica del Ebro, https://www.chebro.es/es/web/guest/la-cuenca-del-ebro —
+ *   «una superficie total de 85.534 Km2», «Es la cuenca hidrográfica más extensa de España» y «el
+ *   17 % del territorio peninsular español» (con Andorra y Francia en la cabecera del Segre, sin
+ *   cifra; aun descontándolas, la parte española supera a la del Duero).
+ * · Confederación Hidrográfica del Duero, https://www.chduero.es/web/guest/la-cuenca-del-duero — la
+ *   parte española «cubre 78.859 km2»; la demarcación internacional, 98.073 km², «la más extensa de
+ *   la Península Ibérica».
+ * Ninguna otra opción (Guadalquivir, Tajo, Duero) es también correcta: la del Duero, la mayor de las
+ * tres, se queda en 78.859 km² dentro de España.
+ */
+const PREGUNTA_CUENCA = '¿Qué río tiene la mayor cuenca hidrográfica dentro de España?';
+const EXPLICACION_CUENCA =
+  'El Ebro tiene la cuenca hidrográfica más extensa de España: 85.534 km², el 17 % del territorio peninsular español (Confederación Hidrográfica del Ebro). El Duero tiene la mayor cuenca de la Península Ibérica si se cuenta su parte portuguesa, pero en territorio español cubre 78.859 km² (Confederación Hidrográfica del Duero).';
+
+/** El veredicto y «Siguiente»/«Ver resultado» enteros en pantalla, por debajo de la barra del logo. */
+async function veredictoALaVista(page: Page): Promise<string> {
+  return page.evaluate(() => {
+    const barra = (document.querySelector('[class*="headerBar"]') as Element).getBoundingClientRect().bottom;
+    const v = (document.querySelector('[class*="feedbackMensaje"]') as Element).getBoundingClientRect();
+    const s = (document.querySelector('[class*="btnSiguiente"]') as Element).getBoundingClientRect();
+    const mal: string[] = [];
+    if (v.top < barra || v.bottom > innerHeight) mal.push(`veredicto ${Math.round(v.top)}…${Math.round(v.bottom)}`);
+    if (s.top < barra || s.bottom > innerHeight) mal.push(`botón ${Math.round(s.top)}…${Math.round(s.bottom)}`);
+    return mal.length ? `${mal.join(' · ')} (barra ${Math.round(barra)}, alto ${innerHeight})` : 'a la vista';
+  });
+}
+
+/** Lo que tiene el foco, legible: «<body>» o «TAG«texto»». */
+async function quienTieneElFoco(page: Page): Promise<string> {
+  return page.evaluate(() => {
+    const a = document.activeElement;
+    if (!a || a === document.body) return '<body>';
+    return `${a.tagName}«${(a.textContent ?? '').replace(/\s+/g, ' ').trim().slice(0, 30)}»`;
+  });
+}
+
+test.describe('Inspector 29/10/2026 (tarde) · móvil 360 × 640', () => {
+  test.use({ viewport: { width: 360, height: 640 }, userAgent: MOVIL_UA, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
+
+  /**
+   * CASO NORMAL — Difícil, todas bien salvo la id 61, que se contesta «Duero» (la clave vieja).
+   * Esperado a mano: la id 61 ofrece Ebro, Guadalquivir, Tajo y Duero; «Duero» da «❌ Incorrecto. La
+   * respuesta correcta es: "Ebro"» (CHE, arriba) con la explicación literal de EXPLICACION_CUENCA, el
+   * marcador NO sube, el foco va a «Siguiente»/«Ver resultado» y a 360 × 640 el veredicto y el botón
+   * quedan enteros bajo la barra del logo. Al final 19/20 = 0,95 → Math.round = 95 % → tramo ≥ 90 →
+   * 🥇 «¡Experto en Geografía de España!»; «19 de 20 preguntas correctas (95 %)» con espacio duro;
+   * estadísticas 19 · 1 · «95 %» · 20; una sola ficha fallada, la id 61 con «✓ Ebro».
+   * El orden es aleatorio: si la id 61 no sale (20 de 25 por partida), «Jugar de nuevo» (hasta 4).
+   */
+  test('caso normal: «Duero» en la mayor cuenca dentro de España es «❌ … "Ebro"», a la vista, y 19 de 20 dan 95 % y 🥇', async ({ page }) => {
+    test.setTimeout(300_000);
+    await abrir(page, { semilla: 2961 });
+    await esperarHidratado29(page);
+    await arrancar(page, 'Difícil');
+    let vista = false;
+    for (let partida = 1; partida <= 4 && !vista; partida++) {
+      if (partida > 1) {
+        await page.getByRole('button', { name: 'Jugar de nuevo' }).click();
+        await expect(progreso29(page)).toHaveText('Pregunta 1 de 20');
+      }
+      for (let n = 1; n <= 20; n++) {
+        await expect(progreso29(page)).toHaveText(`Pregunta ${n} de 20`);
+        const ficha = await fichaVisible(page);
+        if (ficha.id !== 61) {
+          await responder(page, 'bien');
+        } else {
+          vista = true;
+          const previas = n - 1; // todas las anteriores, bien
+          const ops = await textosOpcion(page);
+          expect([...ops].sort()).toEqual(['Duero', 'Ebro', 'Guadalquivir', 'Tajo']);
+          await tocarCentro(page, opciones(page).nth(ops.indexOf('Duero')));
+          await expect(page.locator('[class*="feedbackMensaje"]')).toHaveText('❌ Incorrecto. La respuesta correcta es: "Ebro"');
+          expect(norm(await page.locator('[class*="explicacionTexto"]').innerText())).toBe(norm(EXPLICACION_CUENCA));
+          await expect(marcador(page)).toHaveText(`${previas} ${previas === 1 ? 'correcta' : 'correctas'}`);
+          await expect(page.locator('[class*="btnSiguiente"]')).toBeFocused();
+          await expect.poll(() => veredictoALaVista(page), { timeout: 3000 }).toBe('a la vista');
+        }
+        if (/Ver resultado/.test(await avanzar(page))) break;
+      }
+      await expect(page.locator('[class*="finTitulo"]')).toBeVisible();
+    }
+    expect(vista, 'la id 61 sale en alguna de las 4 partidas').toBe(true);
+    const r = await resultado(page);
+    expect(r.titulo).toBe('¡Experto en Geografía de España!');
+    expect(r.medalla).toBe('🥇');
+    expect(r.subtitulo).toBe(`19 de 20 preguntas correctas (95${DURO}%)`);
+    expect(r.stats).toEqual({ Correctas: '19', Errores: '1', 'Puntuación': `95${DURO}%`, Jugadas: '20' });
+    const lista = (await page.locator('[class*="errorItem"]').allTextContents()).map((t) => t.replace(/[ \t\n\r]+/g, ' ').trim());
+    expect(lista).toEqual([`${PREGUNTA_CUENCA}✓ Ebro`]);
+  });
+
+  /**
+   * CASO LÍMITE — Difícil a 360 × 640, contestando con un solo toque la opción MÁS BAJA que no es la
+   * buena (la D, o la C si la D es la buena), después de bajar lo justo para verla: el sitio donde
+   * enfocarSinCentrar (5b65607f, 3770) tiene que mover la página. Esperado a mano: en las 20, el foco
+   * en «Siguiente pregunta →» (en la 20.ª, «Ver resultado») y el veredicto y el botón enteros bajo la
+   * barra; 0/20 = 0 % → tramo < 50 → 🗺️ «Sigue explorando España»; «0 de 20 preguntas correctas
+   * (0 %)»; estadísticas 0 · 20 · «0 %» · 20; 20 fichas falladas; el foco en el título del resultado.
+   */
+  test('caso límite: 20 fallos con la opción más baja dejan el veredicto a la vista y dan 0 % y 🗺️', async ({ page }) => {
+    test.setTimeout(180_000);
+    await abrir(page, { semilla: 2963 });
+    await esperarHidratado29(page);
+    await arrancar(page, 'Difícil');
+    const fuera: string[] = [];
+    for (let n = 1; n <= 20; n++) {
+      await expect(progreso29(page)).toHaveText(`Pregunta ${n} de 20`);
+      const ficha = await fichaVisible(page);
+      const iC = (await textosOpcion(page)).indexOf(ficha.correcta);
+      await page.waitForTimeout(500); // lee la pregunta: fuera de la ventana de ráfaga
+      await tocarCentro(page, opciones(page).nth(iC === 3 ? 2 : 3));
+      await expect(page.locator('[class*="feedbackMensaje"]')).toHaveText(`❌ Incorrecto. La respuesta correcta es: "${ficha.correcta}"`);
+      await expect(page.getByRole('button', { name: n < 20 ? 'Siguiente pregunta →' : 'Ver resultado' })).toBeFocused();
+      await page.waitForTimeout(200); // la 2.ª mirada de enfocarSinCentrar (120 ms)
+      const v = await veredictoALaVista(page);
+      if (v !== 'a la vista') fuera.push(`${n} (id ${ficha.id}): ${v}`);
+      await tocarCentro(page, page.getByRole('button', { name: /Siguiente pregunta|Ver resultado/ }));
+    }
+    expect(fuera).toEqual([]);
+    const r = await resultado(page);
+    expect(r.titulo).toBe('Sigue explorando España');
+    expect(r.medalla).toBe('🗺️');
+    expect(r.subtitulo).toBe(`0 de 20 preguntas correctas (0${DURO}%)`);
+    expect(r.stats).toEqual({ Correctas: '0', Errores: '20', 'Puntuación': `0${DURO}%`, Jugadas: '20' });
+    expect(r.errores).toBe(20);
+    await expect(page.locator('[class*="finTitulo"]')).toBeFocused();
+  });
+
+  /**
+   * CASO DE RECHAZO · HALLAZGO NUEVO (operativa) — dos toques sobre la opción más baja, con ella
+   * pegada al borde inferior (a 4 px), se saltan el veredicto y la explicación. El 1.º contesta;
+   * enfocarSinCentrar (5b65607f) sube la vista lo justo para que «Siguiente pregunta →» asome por
+   * abajo, y queda bajo el dedo; el 2.º toque (detail 2) cae en él y la guarda en línea lo deja pasar,
+   * porque `responder` no marca nada (el hook compartido marca `soloMismoPunto` y lo ignora: 3679,
+   * 3701 y 3751). Antes de 5b65607f el foco iba con preventScroll y la página no se movía.
+   * Esperado: sigue «Pregunta n de 20» con su veredicto, su explicación y «Siguiente» (una sola
+   * intención). Medido el 29/10/2026: 32 de 32 (8 por caso, a 360 × 640 y 360 × 740, con la opción a
+   * 4 y a 20 px del borde) pasan a la pregunta siguiente sin enseñar ni el veredicto ni la explicación.
+   */
+  test('hallazgo · dos toques en la opción más baja, pegada al borde, no se saltan el veredicto ni la explicación', async ({ page }) => {
+    test.fail();
+    test.setTimeout(90_000);
+    await abrir(page, { semilla: 2962 });
+    await esperarHidratado29(page);
+    await arrancar(page, 'Difícil');
+    const saltos: string[] = [];
+    for (let vuelta = 1; vuelta <= 3; vuelta++) {
+      const antes = norm(await progreso29(page).innerText());
+      await page.waitForTimeout(500); // lee la pregunta: fuera de la ventana de ráfaga
+      const d = opciones(page).nth(3);
+      await d.evaluate((e) => {
+        const r = e.getBoundingClientRect();
+        scrollBy(0, r.bottom - innerHeight + 4);
+      });
+      await page.waitForTimeout(80);
+      const c = await d.boundingBox();
+      if (!c) throw new Error('la opción D no tiene caja');
+      await dobleToque(page, c.x + c.width / 2, c.y + c.height / 2);
+      await page.waitForTimeout(200);
+      const ahora = norm(await progreso29(page).innerText());
+      if (ahora !== antes) {
+        saltos.push(`${antes} → ${ahora} sin veredicto ni explicación`);
+        continue;
+      }
+      await expect(page.locator('[class*="explicacionTexto"]')).toBeVisible();
+      await avanzar(page);
+    }
+    expect(saltos).toEqual([]); // medido: las 3 vueltas saltan
+  });
+
+  /**
+   * HALLAZGO NUEVO (contenido) — la explicación que escribió la reparación (fa1153c1) pone «17 %» con
+   * un espacio normal (U+0020). Regla del 25/09/2026 (CLAUDE.md §2, Ortografía de la RAE de 2010): el
+   * «%» va separado con espacio duro (U+00A0), y el código nuevo lo cumple. Esperado «17 %» con
+   * U+00A0 · obtenido U+0020 (data/preguntas-geografia-espana.ts, id 61).
+   */
+  test('hallazgo · la explicación nueva de la id 61 separa el «%» con espacio duro', () => {
+    test.fail();
+    const e = PREGUNTAS_GEOGRAFIA.find((p) => p.id === 61)?.explicacion ?? '';
+    expect(e).toContain('85.534 km²');
+    expect(e).toContain(`17${DURO}%`);
+  });
+});
+
+test.describe('Inspector 29/10/2026 (tarde) · escritorio 1280 × 800', () => {
+  test.use({ viewport: { width: 1280, height: 800 } });
+
+  /**
+   * HALLAZGO NUEVO (accesibilidad, forma del cabo C0514, variante de la OPCIÓN) — tras un doble clic
+   * sobre una opción, el foco cae a <body> en vez de quedarse en «Siguiente pregunta →», adonde lo
+   * lleva la app al contestar. El 2.º clic cae sobre la opción ya deshabilitada y el navegador suelta
+   * el foco; la guarda en línea (solo «click») no lo ve. No cuenta de más ni contesta otra cosa (caso
+   * de rechazo del bloque de la mañana). Medido el 29/10/2026: 6 de 6 en Fácil a 1280 × 800, y por
+   * toque 6 de 6 a 360 × 740 (la C y la D) y 6 de 6 a 360 × 640.
+   */
+  test('hallazgo · tras un doble clic en una opción, el foco se queda en «Siguiente», no cae a <body>', async ({ page }) => {
+    test.fail();
+    test.setTimeout(60_000);
+    await abrir(page, { semilla: 2964 });
+    await esperarHidratado29(page);
+    await arrancar(page, 'Fácil');
+    const perdidos: string[] = [];
+    for (let n = 1; n <= 3; n++) {
+      await expect(progreso29(page)).toHaveText(`Pregunta ${n} de 10`);
+      await page.waitForTimeout(500);
+      const c = await opciones(page).nth(2).boundingBox();
+      if (!c) throw new Error('la opción C no tiene caja');
+      await dobleClic(page, c.x + c.width / 2, c.y + c.height / 2);
+      await expect(page.locator('[class*="explicacionTexto"]')).toBeVisible();
+      const f = await quienTieneElFoco(page);
+      if (!/^BUTTON«Siguiente pregunta/.test(f)) perdidos.push(`${n}/10: foco en ${f}`);
+      await page.getByRole('button', { name: 'Siguiente pregunta →' }).click();
+    }
+    expect(perdidos).toEqual([]); // medido: «<body>» las tres veces
+  });
+
+  /**
+   * HALLAZGO NUEVO (accesibilidad, forma del cabo C0514 en «Siguiente»; la app no recibió f0b18db0)
+   * — tras un doble clic en «Siguiente pregunta →», el mousedown del 2.º (detail 2) mueve el foco a
+   * lo que haya bajo el puntero en la pantalla nueva: la guarda en línea ignora su clic pero no su
+   * mousedown, que es lo que f0b18db0 añadió a lib/useGuardaRafaga.ts (3768). Esperado (invariante
+   * de la familia): el foco en el enunciado nuevo (H2, tabindex −1). Medido el 29/10/2026: en 8 de 8
+   * se queda en «⬇️ Ver guía educativa» a 1280 × 800 y en <body> a 360 × 740 (bajo el dedo, un h3).
+   */
+  test('hallazgo · tras un doble clic en «Siguiente», el foco va al enunciado nuevo y no a lo que haya debajo', async ({ page }) => {
+    test.fail();
+    test.setTimeout(60_000);
+    await abrir(page, { semilla: 2965 });
+    await esperarHidratado29(page);
+    await arrancar(page, 'Fácil');
+    const robados: string[] = [];
+    for (let n = 1; n <= 3; n++) {
+      await page.waitForTimeout(500);
+      await responder(page, 'bien');
+      await page.waitForTimeout(300);
+      const c = await page.getByRole('button', { name: 'Siguiente pregunta →' }).boundingBox();
+      if (!c) throw new Error('«Siguiente» no tiene caja');
+      await dobleClic(page, c.x + c.width / 2, c.y + c.height / 2);
+      await expect(progreso29(page)).toHaveText(`Pregunta ${n + 1} de 10`);
+      const f = await focoActual(page);
+      if (f !== 'H2:-1') robados.push(`pregunta ${n + 1}: foco en ${await quienTieneElFoco(page)}`);
+    }
+    expect(robados).toEqual([]); // medido: «⬇️ Ver guía educativa» las tres veces
+  });
+
+  /**
+   * HALLAZGO NUEVO (accesibilidad, forma del cabo C0516) — tras contestar, la opción buena y la
+   * fallada solo se distinguen por el color (borde y fondo verdes o rojos, letra sobre #047857 o
+   * #b91c1c; .opcion-correcta y .opcion-seleccionada-mal no añaden contenido). Su texto visible («A
+   * Ebro», con la letra aria-hidden) y su nombre accesible no cambian y no llevan aria-label (WCAG
+   * 1.4.1). El veredicto sí lo dice con texto («❌ Incorrecto. La respuesta correcta es: …»), la
+   * lista de opciones no. La referencia, quiz-literatura-universal, pone ✓/✗ visibles (aria-hidden)
+   * y «(respuesta correcta)» / «(tu respuesta, incorrecta)» en el nombre.
+   * A mano: Fácil, fallar la 1.ª con la A (o la B si la A es la buena) → esperado que el texto o el
+   * nombre accesible de la buena y de la fallada cambien al contestar.
+   */
+  test('hallazgo · la opción correcta y la fallada no se distinguen solo por el color', async ({ page }) => {
+    test.fail();
+    await abrir(page, { semilla: 2966 });
+    await esperarHidratado29(page);
+    await arrancar(page, 'Fácil');
+    const f = await fichaVisible(page);
+    const iC = (await textosOpcion(page)).indexOf(f.correcta);
+    const iMal = iC === 0 ? 1 : 0;
+    const marcas = () =>
+      opciones(page).evaluateAll((bs) => bs.map((b) => `${(b as HTMLElement).innerText} | ${b.getAttribute('aria-label') ?? ''}`.replace(/\s+/g, ' ').trim()));
+    const antes = await marcas();
+    await opciones(page).nth(iMal).click();
+    await expect(page.locator('[class*="feedbackMensaje"]')).toContainText('Incorrecto');
+    // Sano: el color sí cambia (el defecto es que sea lo ÚNICO que cambia).
+    const clases = await opciones(page).evaluateAll((bs) => bs.map((b) => b.className));
+    expect(/opcion-correcta/.test(clases[iC]) && /opcion-seleccionada-mal/.test(clases[iMal])).toBe(true);
+    const despues = await marcas();
+    expect([iC, iMal].filter((i) => despues[i] === antes[i]).map((i) => despues[i]), 'texto y nombre idénticos a antes de contestar').toEqual([]);
+  });
+
+  /**
+   * SANO (cabos C0515 y C0518, medidos el 29/10/2026) — la app no tiene cronómetro (no hay
+   * formatTiempo que dé «2m 15s»); la barra de progreso tiene nombre («Progreso: pregunta 1 de 10»);
+   * y la fila de «Jugar de nuevo» / «Cambiar dificultad» lleva flex-wrap: a 320 y a 360 px la página
+   * no desborda en la partida ni en el resultado (scrollWidth = clientWidth).
+   */
+  test('sano · la barra de progreso tiene nombre y no hay cronómetro', async ({ page }) => {
+    await abrir(page, { semilla: 2967 });
+    await arrancar(page, 'Fácil');
+    await expect(page.getByRole('progressbar', { name: 'Progreso: pregunta 1 de 10' })).toHaveCount(1);
+    await expect(page.locator('[class*="quizPanel"]')).not.toContainText(/\d+\s?m\s?\d+\s?s|\d+:\d{2}/);
+  });
 });

@@ -1546,3 +1546,286 @@ test.describe('Inspector 29/10/2026 · hallazgos', () => {
     await expect(aviso(page)).toContainText(/legalmente|no tiene (una )?capital|capital oficial/);
   });
 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+// inspector 29/10/2026 (tarde) — re-inspección tras /reparar (fe9973e8 dio por arreglados 3777 y
+// 3778; 5b65607f y f0b18db0, la parte de la familia). Lo que el testigo de familia no mide: los
+// tres modos Capital / País / Bandera, la barra hasta el final y tras «Jugar de nuevo», y el matiz
+// de Nauru fuera del modo Capital.
+// ─────────────────────────────────────────────────────────────────────────────
+
+const MOVIL_TACTIL = {
+  userAgent: 'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Mobile Safari/537.36',
+  deviceScaleFactor: 3,
+  isMobile: true,
+  hasTouch: true,
+};
+
+/** Lo que dice la barra «Preguntas respondidas»: texto, valor y ancho (en %). */
+async function estadoBarra(page: Page): Promise<{ texto: string | null; ahora: string | null; ancho: number }> {
+  return barra(page).evaluate((b) => ({
+    texto: b.getAttribute('aria-valuetext'),
+    ahora: b.getAttribute('aria-valuenow'),
+    ancho: parseFloat((b as HTMLElement).style.width),
+  }));
+}
+
+/** Elementos de las clases dadas que no se ven enteros: fuera de la vista o bajo la barra fija del logo. */
+function fueraDeVista(page: Page, clases: string[]): Promise<string[]> {
+  return page.evaluate((cls) => {
+    const tapa = document.querySelector('[class*="headerBar"]')?.getBoundingClientRect().bottom ?? 0;
+    const fuera: string[] = [];
+    for (const c of cls) {
+      const e = document.querySelector(`[class*="${c}"]`);
+      if (!e) {
+        fuera.push(`${c} no está`);
+        continue;
+      }
+      const r = e.getBoundingClientRect();
+      if (r.top < tapa || r.bottom > innerHeight) fuera.push(`${c} ${Math.round(r.top)}…${Math.round(r.bottom)} (barra hasta ${Math.round(tapa)}, alto ${innerHeight})`);
+    }
+    return fuera;
+  }, clases);
+}
+
+test.describe('inspector 29/10/2026 (tarde) — re-inspección tras /reparar · escritorio 1280 × 800', () => {
+  test.use({ viewport: { width: 1280, height: 800 } });
+
+  /**
+   * CASO NORMAL — la forma entera del 3777 en los TRES modos (Fácil, 10 preguntas), fallando la 4 y
+   * la 7. Esperado a mano desde page.tsx:183 (`respondidas` = índice + 1 en cuanto se contesta):
+   * tras contestar la n, la barra dice «n de 10», aria-valuenow n y ancho n · 10 %; tras «Siguiente»,
+   * lo mismo hasta contestar la siguiente; tras la 10, «10 de 10» y 100 % (antes de reparar se quedaba
+   * en «9 de 10»). Nota (calcularPuntuacion, page.tsx:151-157): 8/10 = 0,8 → 60 + (0,8 − 0,7)/0,2 · 40
+   * = 80 pts · ⭐ «¡Muy buena puntuación!» · «8 de 10 respuestas correctas» · «8/10» · «80 %»; tiempo
+   * con «s» o «min» (no la «m» del metro, cabo C0515). «Jugar de nuevo» (iniciarQuiz) pone la barra
+   * en «0 de 10», valor 0 y ancho 0 %, y el marcador en 1/10, 0, «—».
+   * Medido el 29/10/2026 (tarde): igual en Capital, País y Bandera.
+   */
+  test('caso normal: en Capital, País y Bandera la barra dice «n de 10» al contestar la n, llega a «10 de 10» y «Jugar de nuevo» la deja en «0 de 10»', async ({ page }) => {
+    test.setTimeout(150_000);
+    for (const modo of ['Capital', 'País', 'Bandera'] as Modo[]) {
+      await abrir(page);
+      await esperarBotonHidratado(page, /Empezar Quiz/);
+      await arrancar(page, modo, 'Fácil');
+      expect(await estadoBarra(page), `${modo}: al empezar`).toEqual({ texto: '0 de 10', ahora: '0', ancho: 0 });
+      for (let n = 1; n <= 10; n++) {
+        await expect(page.locator('[class*="preguntaNumero"]')).toHaveText(`Pregunta ${n} de 10`);
+        await responder(page, modo, n !== 4 && n !== 7);
+        const b = await estadoBarra(page);
+        expect([b.texto, b.ahora], `${modo}: tras contestar la ${n}`).toEqual([`${n} de 10`, String(n)]);
+        expect(b.ancho, `${modo}: ancho tras contestar la ${n}`).toBeCloseTo(n * 10, 3);
+        const rotulo = await avanzar(page);
+        if (n < 10) {
+          await expect(page.locator('[class*="preguntaNumero"]')).toHaveText(`Pregunta ${n + 1} de 10`);
+          await expect(barra(page), `${modo}: tras «Siguiente» ${n}`).toHaveAttribute('aria-valuetext', `${n} de 10`);
+        } else {
+          expect(rotulo).toBe('Ver resultados');
+        }
+      }
+      const r = await resultado(page);
+      expect([r.emoji, r.titulo, r.puntos, r.subtitulo, r.stats.Correctas, r.stats.Acierto], modo).toEqual([
+        '⭐', '¡Muy buena puntuación!', '80 pts', '8 de 10 respuestas correctas', '8/10', `80${DURO}%`,
+      ]);
+      expect(r.stats.Tiempo).toMatch(/^\d+ s$|^\d+ min \d+ s$/);
+      await page.getByRole('button', { name: /Jugar de nuevo/ }).click();
+      await expect(page.locator('[class*="preguntaNumero"]')).toHaveText('Pregunta 1 de 10');
+      expect(await estadoBarra(page), `${modo}: tras «Jugar de nuevo»`).toEqual({ texto: '0 de 10', ahora: '0', ancho: 0 });
+      expect(await hud(page)).toEqual({ Pregunta: '1/10', Correctas: '0', Precisión: '—' });
+    }
+  });
+
+  /**
+   * CASO LÍMITE — el matiz de Nauru (3778) fuera del modo Capital, y también al fallar.
+   * Fuente oficial: ficha país de Nauru de exteriores.gob.es (Documents/FichasPais/NAURU_FICHA
+   * PAIS.pdf, «NAURU_sin mapa», consultada el 29/10/2026): «Capital: No hay capital oficial, pero el
+   * Parlamento y la mayoría del Gobierno tienen sede en Yaren». La nota de la app (NOTA_CAPITAL,
+   * page.tsx:64) lo dice igual: «Nauru no tiene una capital legalmente designada; Yaren actúa como
+   * ciudad principal.»
+   * Semilla 34 en Maestro: generarPreguntas consume los mismos números en los tres modos (ningún
+   * descarte para Nauru), así que la pregunta 1 es Nauru en todos y las opciones salen en el mismo
+   * orden: Capital Ottawa / Tegucigalpa / Maputo / Yaren → País y Bandera Canadá / Honduras /
+   * Mozambique / Nauru (simulado y comprobado en el navegador el 29/10/2026, tarde).
+   * Esperado: Capital, acertando → «¡Correcto! La respuesta es Yaren.» + nota · País
+   * («¿A qué país pertenece la capital Yaren?»), FALLANDO con Canadá → «Incorrecto. La respuesta
+   * correcta es Nauru.» + nota (NOTA_CAPITAL no depende del acierto) · Bandera → «¡Correcto! La
+   * respuesta es Nauru.»; ahí no se afirma ninguna capital, así que no hace falta el matiz.
+   */
+  test('caso límite: Nauru lleva su matiz en Capital y en País (también al fallar); en Bandera se contesta el país', async ({ page }) => {
+    test.setTimeout(90_000);
+    const NOTA = 'Nauru no tiene una capital legalmente designada; Yaren actúa como ciudad principal.';
+    const casos: { modo: Modo; enunciado: string | null; ops: string[]; elegir: string; veredicto: string; nota: boolean }[] = [
+      { modo: 'Capital', enunciado: 'Nauru', ops: ['Ottawa', 'Tegucigalpa', 'Maputo', 'Yaren'], elegir: 'Yaren', veredicto: '¡Correcto! La respuesta es Yaren.', nota: true },
+      { modo: 'País', enunciado: 'Yaren', ops: ['Canadá', 'Honduras', 'Mozambique', 'Nauru'], elegir: 'Canadá', veredicto: 'Incorrecto. La respuesta correcta es Nauru.', nota: true },
+      { modo: 'Bandera', enunciado: null, ops: ['Canadá', 'Honduras', 'Mozambique', 'Nauru'], elegir: 'Nauru', veredicto: '¡Correcto! La respuesta es Nauru.', nota: false },
+    ];
+    for (const c of casos) {
+      await abrir(page);
+      await esperarBotonHidratado(page, /Empezar Quiz/);
+      await arrancarConSemilla(page, c.modo, 'Maestro', 34);
+      if (c.enunciado) {
+        await expect(page.locator('[class*="preguntaTexto"] strong'), `${c.modo}: la semilla 34 ya no lleva a Nauru`).toHaveText(c.enunciado);
+      } else {
+        expect(codigoBandera(await page.locator('[class*="preguntaBandera"]').getAttribute('class')), 'Bandera: la semilla 34 ya no lleva a Nauru').toBe('nr');
+      }
+      expect(await textosOpcion(page), c.modo).toEqual(c.ops);
+      await opciones(page).nth(c.ops.indexOf(c.elegir)).click();
+      await expect(aviso(page)).toContainText(c.veredicto);
+      if (c.nota) await expect(aviso(page), `${c.modo}: sin el matiz de Nauru`).toContainText(NOTA);
+      await expect(page.locator('[class*="btnSiguiente"]'), `${c.modo}: el foco va a «Siguiente»`).toBeFocused();
+    }
+  });
+
+  test('hallazgo · tras contestar, la opción correcta y la fallada se distinguen solo por el color (forma del cabo C0516)', async ({ page }) => {
+    test.fail(); // ABIERTO (nuevo, 29/10/2026 tarde)
+    // page.tsx:406-426 — al contestar, la correcta recibe .opcionCorrecta (verde) y la fallada
+    // .opcionIncorrecta (rojo), pero su nombre accesible sigue siendo «Opción B: Lisboa» y no llevan
+    // ninguna marca visible: solo cambia el color (WCAG 1.4.1). La referencia de la familia,
+    // quiz-literatura-universal (hallazgo 303), pinta ✓/✗ (aria-hidden) y añade «(respuesta
+    // correcta)» / «(tu respuesta, incorrecta)» al aria-label. Medido el 29/10/2026 (tarde) en
+    // Capital/Fácil fallando la 1: «Opción A: Minsk» (fallada) y «Opción B: Lisboa» (correcta), con
+    // texto «AMinsk» y «BLisboa». Es la misma fila en los tres modos: comparten el botón.
+    await abrir(page);
+    await esperarBotonHidratado(page, /Empezar Quiz/);
+    await arrancar(page, 'Capital', 'Fácil');
+    await responder(page, 'Capital', false);
+    const marcas = await opciones(page).evaluateAll((bs) =>
+      bs
+        .filter((b) => /opcion(Correcta|Incorrecta)/.test(b.className))
+        .map((b) => ({ correcta: /opcionCorrecta/.test(b.className), nombre: b.getAttribute('aria-label') ?? '', texto: b.textContent ?? '' })),
+    );
+    expect(marcas, 'una correcta y una fallada pintadas').toHaveLength(2);
+    for (const m of marcas) {
+      const dicho = m.correcta ? /correcta/i.test(m.nombre) || /[✓✔]/.test(m.texto) : /incorrecta|tu respuesta/i.test(m.nombre) || /[✗✘]/.test(m.texto);
+      expect(dicho, `${m.correcta ? 'correcta' : 'fallada'}: «${m.nombre}» / «${m.texto}»`).toBe(true);
+    }
+  });
+});
+
+test.describe('inspector 29/10/2026 (tarde) — re-inspección tras /reparar · móvil 360 × 740 táctil', () => {
+  test.use({ viewport: { width: 360, height: 740 }, ...MOVIL_TACTIL });
+
+  const tocar = async (page: Page, loc: Locator): Promise<void> => {
+    await loc.scrollIntoViewIfNeeded();
+    const b = await loc.boundingBox();
+    if (!b) throw new Error('el elemento no tiene caja');
+    await page.touchscreen.tap(b.x + b.width / 2, b.y + b.height / 2);
+  };
+
+  /**
+   * CASO MÓVIL — el veredicto tras la reparación (3770 en esta app, enfocarSinCentrar) con la nota
+   * más larga del banco: Palestina. Semilla 8 en Difícil/Capital → pregunta 1 = Palestina con Ramala /
+   * Puerto España / La Habana / Reikiavik (bloque del 26/09/2026). A 360 × 740 y a 360 × 640, tocando
+   * la A (correcta) y la D (la más baja, fallada).
+   * Esperado a mano: el aviso entero («¡Correcto! La respuesta es Ramala.» o «Incorrecto. La respuesta
+   * correcta es Ramala.» + «Ramala es la sede de la Autoridad Nacional Palestina…») y «Siguiente»
+   * se ven enteros, por debajo de la barra fija del logo; el foco en «Siguiente»; la barra «1 de 20».
+   * Tras tocar «Siguiente» (en la D): «Pregunta 2 de 20», foco en el enunciado, marcador y enunciado
+   * a la vista, barra «1 de 20», Correctas 0, Precisión 0/1 = «0 %».
+   * Medido el 29/10/2026 (tarde) a 360 × 640: aviso en y = 403…552 bajo la barra (0…62).
+   */
+  test('caso móvil: con la nota de Palestina el veredicto queda entero a la vista a 360 × 740 y 360 × 640, y el foco sigue a «Siguiente» y al enunciado', async ({ page }) => {
+    test.setTimeout(120_000);
+    for (const alto of [740, 640]) {
+      await page.setViewportSize({ width: 360, height: alto });
+      for (const [i, acierto] of [[0, true], [3, false]] as [number, boolean][]) {
+        await abrir(page);
+        await esperarBotonHidratado(page, /Empezar Quiz/);
+        await tocar(page, botonModo(page, 'Capital'));
+        await tocar(page, botonNivel(page, 'Difícil'));
+        await expect(botonNivel(page, 'Difícil')).toHaveAttribute('aria-pressed', 'true');
+        await page.evaluate((s) => {
+          let a = s;
+          (window as unknown as { __azar: () => number }).__azar = Math.random;
+          Math.random = (): number => {
+            a |= 0;
+            a = (a + 0x6d2b79f5) | 0;
+            let t = Math.imul(a ^ (a >>> 15), 1 | a);
+            t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+            return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+          };
+        }, 8);
+        try {
+          await tocar(page, page.getByRole('button', { name: /Empezar Quiz/ }));
+          await expect(page.locator('[class*="preguntaTexto"]')).toBeVisible();
+        } finally {
+          await page.evaluate(() => {
+            Math.random = (window as unknown as { __azar: () => number }).__azar;
+          });
+        }
+        await expect(page.locator('[class*="preguntaTexto"] strong'), 'semilla 8: el caso ya no mide lo que dice').toHaveText('Palestina');
+        expect(await textosOpcion(page)).toEqual(['Ramala', 'Puerto España', 'La Habana', 'Reikiavik']);
+        await page.waitForTimeout(600); // toque suelto: lejos en el tiempo del de «Empezar»
+        await tocar(page, opciones(page).nth(i));
+        await expect(aviso(page)).toContainText(acierto ? '¡Correcto! La respuesta es Ramala.' : 'Incorrecto. La respuesta correcta es Ramala.');
+        await expect(aviso(page)).toContainText('Ramala es la sede de la Autoridad Nacional Palestina');
+        await expect(page.locator('[class*="btnSiguiente"]'), `360×${alto}, opción ${'ABCD'[i]}`).toBeFocused();
+        await page.waitForTimeout(300); // enfocarSinCentrar vuelve a mirar a los 120 ms
+        expect(await fueraDeVista(page, ['feedbackBanner', 'btnSiguiente']), `360×${alto}, opción ${'ABCD'[i]}: veredicto tapado`).toEqual([]);
+        await expect(barra(page)).toHaveAttribute('aria-valuetext', '1 de 20');
+        if (!acierto) {
+          await page.waitForTimeout(600);
+          await tocar(page, page.locator('[class*="btnSiguiente"]'));
+          await expect(page.locator('[class*="preguntaNumero"]')).toHaveText('Pregunta 2 de 20');
+          await expect(page.locator('[class*="preguntaCard"]')).toBeFocused();
+          await page.waitForTimeout(300);
+          expect(await fueraDeVista(page, ['hudBar', 'preguntaCard']), `360×${alto}: tras «Siguiente»`).toEqual([]);
+          await expect(barra(page)).toHaveAttribute('aria-valuetext', '1 de 20');
+          expect(await hud(page)).toEqual({ Pregunta: '2/20', Correctas: '0', Precisión: `0${DURO}%` });
+        }
+      }
+    }
+  });
+
+  test('hallazgo · un doble toque en una opción deja el foco en <body> (forma del cabo C0514)', async ({ page }) => {
+    test.fail(); // ABIERTO (nuevo, 29/10/2026 tarde)
+    // Al contestar, la app lleva el foco a «Siguiente» (page.tsx:206-207) y deja las cuatro opciones
+    // disabled (page.tsx:419). Si se contesta con un doble toque y la página no se ha movido bajo el
+    // dedo, el 2.º toque cae sobre la opción ya deshabilitada: Chrome no le entrega mousedown ni
+    // click (solo pointerdown), así que frenarFoco de lib/useGuardaRafaga.ts (f0b18db0) no lo ve, y el
+    // navegador suelta el foco al <body>. Es la variante del cabo C0514 medida en quiz-tabla-periodica
+    // (hallazgo 3802). Medido el 29/10/2026 (tarde), País/Fácil, dos toques en el mismo punto a 110 ms:
+    // a 360 × 740, 7 de 10 preguntas con el foco en <body> (las otras 3, el 2.º toque cayó sobre el
+    // aviso o sobre «Siguiente», que la guarda ignora); a 360 × 640, 5 de 10. El recuento no se
+    // altera (un acierto por pregunta) y con ratón a 1280 × 800 el foco se queda en «Siguiente» (3 de 3).
+    // Esperado: el foco en «Siguiente» tras cada doble toque, como tras un toque suelto.
+    test.setTimeout(120_000);
+    await abrir(page);
+    await esperarBotonHidratado(page, /Empezar Quiz/);
+    await tocar(page, botonModo(page, 'País'));
+    await tocar(page, botonNivel(page, 'Fácil'));
+    await tocar(page, page.getByRole('button', { name: /Empezar Quiz/ }));
+    const enBody: string[] = [];
+    let aciertos = 0;
+    for (let n = 1; n <= 10; n++) {
+      await expect(page.locator('[class*="preguntaNumero"]')).toHaveText(`Pregunta ${n} de 10`);
+      await page.waitForTimeout(700); // la ráfaga es la del doble toque, no la del toque anterior
+      const { correcta } = await fichaVisible(page, 'País');
+      const ops = await textosOpcion(page);
+      const iC = ops.indexOf(correcta);
+      const elegida = n % 2 === 1 ? iC : iC === 0 ? 1 : 0;
+      if (elegida === iC) aciertos++;
+      const op = opciones(page).nth(elegida);
+      await op.scrollIntoViewIfNeeded();
+      const b = await op.boundingBox();
+      if (!b) throw new Error('la opción no tiene caja');
+      const [x, y] = [b.x + b.width / 2, b.y + b.height / 2];
+      await page.touchscreen.tap(x, y);
+      await page.waitForTimeout(110);
+      await page.touchscreen.tap(x, y);
+      await page.waitForTimeout(400);
+      await expect(aviso(page)).toHaveCount(1);
+      expect((await hud(page)).Correctas, `pregunta ${n}: un doble toque puntúa una vez`).toBe(String(aciertos));
+      const debajo = await page.evaluate(([px, py]) => {
+        const e = document.elementFromPoint(px, py);
+        return { body: document.activeElement === document.body, deshabilitada: Boolean(e?.closest('button:disabled')) };
+      }, [x, y]);
+      if (debajo.body) enBody.push(`pregunta ${n}${debajo.deshabilitada ? ' (2.º toque sobre la opción deshabilitada)' : ''}`);
+      if (n < 10) {
+        await page.waitForTimeout(400);
+        await tocar(page, page.locator('[class*="btnSiguiente"]'));
+      }
+    }
+    expect(enBody, 'preguntas en que el doble toque deja el foco en <body>').toEqual([]);
+  });
+});

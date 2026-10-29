@@ -2151,3 +2151,232 @@ test.describe('Inspector 29/10/2026 · casos (360 × 740 táctil)', () => {
     expect(await marcador(page)).toBe(`Pregunta 10 / 10 ✅ ${dEsCorrecta ? 10 : 9} · 🔥 Racha: ${dEsCorrecta ? 10 : 0}`);
   });
 });
+
+// ===========================================================================
+// inspector 29/10/2026 (tarde) — re-inspección tras /reparar. Vuelve a la cola por 5b65607f
+// (al contestar, «Siguiente» recibe el foco con `enfocarSinCentrar`, sin centrarse: hallazgo 3770)
+// y f0b18db0 (useGuardaRafaga frena también el MOUSEDOWN del 2.º toque: hallazgo 3768).
+// Medido en el navegador antes de escribir esto:
+//   · veredicto a la vista: Difícil, los dos sentidos, 20 de 20 respuestas a 360 × 640 con el dedo
+//     y en escritorio, y otras 20 con teclado: «Siguiente» con el foco, entero y pegado al borde de
+//     abajo (y = 587…632 de 640), y el aviso entero bajo la barra del logo (y = 491…571, margen 62)
+//   · ráfaga en «Empezar», «Siguiente» y «Ver resultados»: el foco en la tarjeta nueva o en el
+//     resultado, la pregunta nueva sin contestar y la nota cuadrando, en los dos sentidos
+//   · ráfaga en una OPCIÓN: cuenta una sola respuesta, pero el foco acaba en <body> (hallazgo de
+//     abajo, la forma del cabo C0514 que f0b18db0 no alcanza)
+// Cabos de la familia medidos aquí: C0515 limpio (no hay temporizador, y la barra se llama
+// «Preguntas respondidas» con su aria-valuetext) · C0516 limpio en lo visual (✅ y ❌ visibles junto
+// a la opción, no solo el color) · C0518 limpio (la configuración no desborda a 360 ni a 320 px).
+// ===========================================================================
+
+test.describe('inspector 29/10/2026 (tarde) — re-inspección tras /reparar · casos', () => {
+  /**
+   * CASO LÍMITE — partida entera SOLO con teclado a 360 × 640, Difícil (20 preguntas, pool de 88),
+   * Nombre → Símbolo, contestando con Espacio en las impares y con Enter en las pares. Falla P4 y la
+   * ÚLTIMA (P20). 18 de 20 cae justo en el umbral del oro.
+   * Resuelto a mano ANTES de ejecutar:
+   *   · aciertos 1 2 3 3 4 5 … 17 18 18 · racha 1 2 3 0 1 2 … 14 15 0
+   *   · 18/20 = 0,9 → formatPercentage(0,9; 0) = «90 %» con espacio duro (U+00A0)
+   *   · calcularMedalla(18, 20): no es 20 de 20 (sin copa); 18·10 = 180 ≥ 20·9 = 180 → «¡Excelente!» 🥇
+   *     (la comparación es entera: un redondeo de más o de menos lo dejaría en plata)
+   *   · racha máxima 15 (P5-P19); errores 2 → «Elementos a repasar (2)» con los símbolos de P4 y P20
+   *   · tras cada respuesta: el foco en «Siguiente» sin Tab (5b65607f) y el aviso entero entre la barra
+   *     del logo (scroll-padding-top) y el borde de abajo; tras cada Enter en «Siguiente», el foco en la
+   *     tarjeta de la pregunta nueva; al final, en el resultado (invariante de la familia)
+   * La clave: el símbolo que la IUPAC da a ese Z (SIMBOLO_CANONICO), no el del banco.
+   * Medido el 29/10/2026 (tarde): lo esperado en las 20.
+   */
+  test('caso límite · Difícil Nombre → Símbolo con teclado a 360 × 640: 18 de 20 es el 90 % justo y da oro', async ({ page }) => {
+    test.setTimeout(90_000);
+    await page.setViewportSize({ width: 360, height: 640 });
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await abrirHidratada(page);
+    const irCon = async (loc: Locator): Promise<void> => {
+      for (let t = 0; t < 80 && !(await loc.evaluate((el) => el === document.activeElement)); t++) {
+        await page.keyboard.press('Tab');
+      }
+      await expect(loc).toBeFocused();
+    };
+    await irCon(page.locator('[class*="modoCard"]').filter({ hasText: 'Nombre → Símbolo' }));
+    await page.keyboard.press('Enter');
+    await irCon(page.locator('[class*="difCard"]').filter({ hasText: 'Difícil' }));
+    await page.keyboard.press('Space');
+    await expect(page.locator('[class*="difCard"]').filter({ hasText: 'Difícil' })).toHaveAttribute('aria-pressed', 'true');
+    await irCon(page.getByRole('button', { name: '¡Empezar quiz!' }));
+    await page.keyboard.press('Enter');
+
+    const FALLA = new Set([3, 19]); // P4 y P20
+    const ACIERTOS = [1, 2, 3, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 18];
+    const RACHA = [1, 2, 3, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0];
+    const fallados: string[] = [];
+    for (let i = 0; i < 20; i++) {
+      await expect(page.getByText(`Pregunta ${i + 1} / 20`)).toBeVisible();
+      await expect.poll(() => focoEn(page), { message: `P${i + 1}: el foco llega a la pregunta` }).toBe('preguntaCard');
+      const k = clave29((await enunciado(page).textContent())!.trim(), 'ns');
+      const opciones = await opcionesVisibles(page);
+      const n = FALLA.has(i) ? opciones.findIndex((o) => o !== k.correcta) : opciones.indexOf(k.correcta);
+      expect(n, `P${i + 1}: falta «${k.correcta}» entre ${opciones.join(', ')}`).toBeGreaterThanOrEqual(0);
+      for (let t = 0; t <= n; t++) await page.keyboard.press('Tab');
+      expect(await focoEn(page)).toBe('opcionBtn');
+      await page.keyboard.press(i % 2 === 0 ? 'Space' : 'Enter');
+      if (FALLA.has(i)) fallados.push(k.simbolo);
+
+      await expect.poll(() => focoEn(page), { message: `P${i + 1}: el foco va a «Siguiente» sin Tab` }).toBe('btnSiguiente');
+      if (FALLA.has(i)) await expect(feedback(page)).toContainText(`La respuesta correcta era: ${k.simbolo} (nombre: ${k.nombre})`);
+      else await expect(feedback(page)).toContainText(`¡Correcto! ${k.nombre} · símbolo ${k.simbolo}`);
+      expect(await marcador(page)).toBe(`Pregunta ${i + 1} / 20 ✅ ${ACIERTOS[i]} · 🔥 Racha: ${RACHA[i]}`);
+      const vista = await feedback(page).evaluate((el) => {
+        const r = el.getBoundingClientRect();
+        const margen = parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0;
+        return { arriba: r.top, abajo: r.bottom, margen, alto: window.innerHeight };
+      });
+      expect(vista.arriba, `P${i + 1}: el aviso queda bajo la barra del logo`).toBeGreaterThanOrEqual(vista.margen);
+      expect(vista.abajo, `P${i + 1}: el aviso se sale por abajo`).toBeLessThanOrEqual(vista.alto);
+      await expect(page.getByRole('button', { name: i < 19 ? 'Siguiente pregunta →' : 'Ver resultados' })).toBeInViewport({ ratio: 1 });
+      await page.keyboard.press('Enter');
+    }
+
+    await expect.poll(() => focoEn(page)).toBe('finPanel');
+    const fin = page.locator('[class*="finPanel"]');
+    expect(await fin.locator('[class*="finSubtitulo"]').textContent()).toBe('Has acertado 18 de 20 (90 %)');
+    await expect(fin.locator('[class*="finTitulo"]')).toHaveText('¡Excelente!');
+    await expect(fin.locator('[class*="medallaIcon"]')).toHaveText('🥇');
+    expect(norm(await fin.locator('[class*="statsGrid"]').innerText())).toBe('18 Aciertos 2 Errores 15 Racha máxima 90 % Precisión');
+    await expect(page.getByText('Elementos a repasar (2)')).toBeVisible();
+    expect(await page.locator('[class*="errorSimbolo"]').allTextContents()).toEqual(fallados);
+  });
+});
+
+test.describe('inspector 29/10/2026 (tarde) — re-inspección tras /reparar · 360 × 740 táctil', () => {
+  test.use({
+    viewport: { width: 360, height: 740 },
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Mobile Safari/537.36',
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  /** Dos toques de verdad en el centro de `loc`, separados por `ms`. */
+  async function dosToques(page: Page, loc: Locator, ms: number): Promise<void> {
+    await loc.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(150);
+    const caja = (await loc.boundingBox())!;
+    const [x, y] = [caja.x + caja.width / 2, caja.y + caja.height / 2];
+    await page.touchscreen.tap(x, y);
+    await page.waitForTimeout(ms);
+    await page.touchscreen.tap(x, y);
+    await page.waitForTimeout(450);
+  }
+
+  /**
+   * CASO NORMAL, con el dedo — Fácil, Nombre → Símbolo, TODO con dos toques seguidos (150 ms):
+   * «Empezar», cada respuesta (la opción A, B, C, D por turno, sea buena o mala) y cada «Siguiente».
+   * Es como juega quien toca dos veces por costumbre, y lo que tocaron 5b65607f y f0b18db0.
+   * Resuelto a mano, PARA ESTE FLUJO (la clave de cada pregunta la da la IUPAC por Z):
+   *   · cada doble toque en una opción cuenta UNA respuesta: aciertos y racha se recalculan aquí
+   *     pregunta a pregunta con la clave, y el marcador tiene que dar exactamente eso
+   *   · cada doble toque en «Siguiente» deja la pregunta nueva SIN contestar (4 opciones
+   *     habilitadas, sin aviso) y el foco en su tarjeta; el de «Empezar», igual con la 1.ª
+   *   · el de «Ver resultados», el foco en el resultado, «Has acertado <aciertos> de 10» y el
+   *     mismo número de «Elementos a repasar» que de fallos contados aquí
+   * Dónde queda el foco tras el doble toque en la OPCIÓN no se afirma aquí: es el hallazgo de abajo.
+   * Medido el 29/10/2026 (tarde): lo esperado, en los dos sentidos y a 120, 150 y 250 ms.
+   */
+  test('caso normal · todo con dos toques: una respuesta por pregunta, ninguna pregunta contestada por el 2.º toque y la nota cuadra', async ({ page }) => {
+    test.setTimeout(120_000);
+    await abrirHidratada(page);
+    await pulsar29(page, page.locator('[class*="modoCard"]').filter({ hasText: 'Nombre → Símbolo' }), true);
+    await pulsar29(page, page.locator('[class*="difCard"]').filter({ hasText: 'Fácil' }), true);
+    await page.waitForTimeout(600);
+    await dosToques(page, page.getByRole('button', { name: '¡Empezar quiz!' }), 150);
+    await expect(page.getByText('Pregunta 1 / 10')).toBeVisible();
+    await expect.poll(() => focoEn(page)).toBe('preguntaCard');
+    await expect(page.locator('[class*="opcionBtn"]:not([disabled])')).toHaveCount(4);
+
+    let aciertos = 0;
+    let racha = 0;
+    const fallados: string[] = [];
+    for (let i = 0; i < 10; i++) {
+      await expect(page.getByText(`Pregunta ${i + 1} / 10`)).toBeAttached();
+      const k = clave29((await enunciado(page).textContent())!.trim(), 'ns');
+      const n = i % 4;
+      const acierto = (await opcionesVisibles(page))[n] === k.correcta;
+      if (acierto) { aciertos++; racha++; } else { racha = 0; fallados.push(k.simbolo); }
+      await page.waitForTimeout(600); // fuera de la ráfaga anterior
+      await dosToques(page, page.locator('[class*="opcionBtn"]').nth(n), 150);
+      await expect(feedback(page)).toBeAttached();
+      await expect(feedback(page)).toContainText(acierto ? '¡Correcto!' : `La respuesta correcta era: ${k.simbolo}`);
+      expect(await marcador(page), `P${i + 1}: el 2.º toque contó otra respuesta`).toBe(
+        `Pregunta ${i + 1} / 10 ✅ ${aciertos} · 🔥 Racha: ${racha}`,
+      );
+      await expect(page.locator('[class*="opcionBtn"]:not([disabled])')).toHaveCount(0);
+
+      await page.waitForTimeout(600);
+      await dosToques(page, page.locator('[class*="btnSiguiente"]'), 150);
+      if (i < 9) {
+        await expect(page.getByText(`Pregunta ${i + 2} / 10`)).toBeAttached();
+        await expect(page.locator('[class*="opcionBtn"]:not([disabled])'), `P${i + 2}: la contestó el 2.º toque`).toHaveCount(4);
+        await expect(feedback(page)).toHaveCount(0);
+        await expect.poll(() => focoEn(page), { message: `P${i + 2}: el foco tras los dos toques en «Siguiente»` }).toBe('preguntaCard');
+      }
+    }
+
+    await expect.poll(() => focoEn(page)).toBe('finPanel');
+    const fin = page.locator('[class*="finPanel"]');
+    expect(norm((await fin.locator('[class*="finSubtitulo"]').textContent()) ?? '')).toMatch(
+      new RegExp(`^Has acertado ${aciertos} de 10 \\(${aciertos * 10} %\\)$`),
+    );
+    if (fallados.length) {
+      await expect(page.getByText(`Elementos a repasar (${fallados.length})`)).toBeVisible();
+      expect(await page.locator('[class*="errorSimbolo"]').allTextContents()).toEqual(fallados);
+    } else {
+      await expect(fin).not.toContainText('Elementos a repasar');
+    }
+    expect(page.url()).toMatch(/\/quiz-simbolos-quimicos\/$/);
+  });
+});
+
+test.describe('inspector 29/10/2026 (tarde) — re-inspección tras /reparar · hallazgos', () => {
+  /**
+   * HALLAZGO bajo (inspector 29/10/2026, tarde) · accesibilidad — la forma del cabo C0514, que
+   * f0b18db0 no alcanza en esta app. Un doble clic (o dos toques) en una OPCIÓN cuenta una sola
+   * respuesta, pero el foco, que 5b65607f deja en «Siguiente», acaba en <body>. Al contestar, las
+   * cuatro opciones quedan `disabled`, y el 2.º toque cae sobre una de ellas (la misma en escritorio;
+   * otra, si la página ha subido): Chrome no envía mousedown ni click a un botón deshabilitado, solo
+   * pointerdown, así que el freno nuevo de useGuardaRafaga (que escucha el mousedown) no llega a
+   * ejecutarse, y la acción por defecto suelta el foco al <body>.
+   * Medido el 29/10/2026 (tarde) registrando los eventos del 2.º toque: «pointerdown BUTTON
+   * opcionBtn[disabled] → focusout btnSiguiente», sin mousedown. 10 de 10 dobles clics a 1280 × 800;
+   * con el dedo a 360 × 740, 10 de 10 en Nombre → Símbolo (250 ms) y 6 de 10 en Símbolo → Nombre
+   * (120 ms: las opciones A y B). Enter ya no avanza; el primer Tab vuelve a «Siguiente».
+   * DEBERÍA: tras el doble clic en la opción, el foco sigue en «Siguiente».
+   */
+  test('hallazgo · el doble clic en una opción no suelta al <body> el foco que tenía «Siguiente»', async ({ page }) => {
+    test.fail(); // ABIERTO (inspector 29/10/2026, tarde)
+    test.setTimeout(60_000);
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await abrirHidratada(page);
+    await arrancar29(page, 'Símbolo → Nombre', 'Fácil', false);
+    const focos: string[] = [];
+    for (let i = 0; i < 4; i++) {
+      await expect(page.getByText(`Pregunta ${i + 1} / 10`)).toBeVisible();
+      await page.waitForTimeout(600);
+      const opcion = page.locator('[class*="opcionBtn"]').nth(i);
+      await opcion.scrollIntoViewIfNeeded();
+      const caja = (await opcion.boundingBox())!;
+      await page.mouse.move(caja.x + caja.width / 2, caja.y + caja.height / 2);
+      await page.mouse.down({ clickCount: 1 });
+      await page.mouse.up({ clickCount: 1 });
+      await page.waitForTimeout(120);
+      await page.mouse.down({ clickCount: 2 });
+      await page.mouse.up({ clickCount: 2 });
+      await page.waitForTimeout(450);
+      await expect(feedback(page)).toBeVisible();
+      focos.push(`${'ABCD'[i]} → ${await focoEn(page)}`);
+      await page.waitForTimeout(600);
+      await page.locator('[class*="btnSiguiente"]').click();
+    }
+    expect(focos).toEqual(['A → btnSiguiente', 'B → btnSiguiente', 'C → btnSiguiente', 'D → btnSiguiente']);
+  });
+});

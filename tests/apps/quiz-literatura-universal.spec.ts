@@ -2302,7 +2302,8 @@ test.describe('Inspector 28/10/2026 · tableta 768 × 1024 (táctil)', () => {
  *     scroll-padding de arriba y el de abajo —su centro a 399 px de 740 = (66 + 732) / 2—, y tras
  *     una explicación larga el veredicto recién dado («Incorrecto. La respuesta era: …») sube bajo la
  *     píldora del logo o por encima de la pantalla: 3 de 60 respuestas a 360 × 740 y 9 de 60 a
- *     360 × 640; 0 de 60 a 390 × 844, 412 × 915, 1366 × 657 y 1280 × 800. Hallazgo, al final.
+ *     360 × 640; 0 de 60 a 390 × 844, 412 × 915, 1366 × 657 y 1280 × 800. Hallazgo 3770, al final
+ *     (REPARADO esa misma tarde, 5b65607f; re-medido en el bloque «(tarde)» de abajo).
  *
  * Valores esperados resueltos a mano sobre page.tsx ANTES de ejecutar. `evaluacion()`: ≥ 0,9
  * «¡Excelente! Dominas la literatura.» 🏆 · ≥ 0,7 «Muy bien…» 🌟 · ≥ 0,5 «Bien…» 📚 · resto «Sigue
@@ -2568,10 +2569,10 @@ test.describe('Inspector 29/10/2026 · móvil 360 × 740', () => {
   });
 
   /**
-   * HALLAZGO (operativa) — abierto el 29/10/2026. Al responder, la app lleva el foco a «Siguiente»
-   * con `focus()` sin preventScroll (page.tsx, efecto de foco y vista), y Chrome CENTRA el botón en la
-   * ventana. Con una explicación larga, la página salta hacia abajo y el veredicto que la persona
-   * acaba de recibir —«¡Correcto!» o «Incorrecto. La respuesta era: …»— queda bajo la píldora fija
+   * HALLAZGO 3770 (operativa) — abierto y REPARADO el 29/10/2026 (5b65607f). Al responder, la app llevaba el foco a «Siguiente»
+   * con `focus()` sin preventScroll (page.tsx, efecto de foco y vista), y Chrome CENTRABA el botón en la
+   * ventana. Con una explicación larga, la página saltaba hacia abajo y el veredicto que la persona
+   * acababa de recibir —«¡Correcto!» o «Incorrecto. La respuesta era: …»— quedaba bajo la píldora fija
    * del logo o por encima de la pantalla, y las cuatro opciones con su verde y su rojo, más arriba
    * todavía: para saber si acertó tiene que volver a subir. Medido el 29/10/2026, fallando con la
    * opción más baja: 3 de 60 respuestas a 360 × 740 (b18 en y = 36…85 y a13 en 35…108, con la
@@ -2617,15 +2618,15 @@ test.describe('Inspector 29/10/2026 · móvil 360 × 740', () => {
       }
     }
     expect(vistas.has('b18'), 'b18 no salió en 4 partidas: el caso no mide lo que dice').toBe(true);
-    expect(tapados).toEqual([]); // hoy: b18 (5/15) con el veredicto en y = 36…85 y la píldora hasta 52
+    expect(tapados).toEqual([]); // era (mañana del 29/10): b18 (5/15) con el veredicto en y = 36…85 y la píldora hasta 52
   });
 });
 
 test.describe('Inspector 29/10/2026 · contenido', () => {
   /**
-   * HALLAZGO (contenido) — abierto el 29/10/2026. La respuesta del FAQPage «¿Qué diferencia hay entre
+   * HALLAZGO 3771 (contenido) — abierto y REPARADO el 29/10/2026 (5b65607f). La respuesta del FAQPage «¿Qué diferencia hay entre
    * los niveles básico, medio y avanzado?» (metadata.ts; solo la leen buscadores y asistentes de IA)
-   * dice que «El nivel medio introduce movimientos literarios» y que «El nivel avanzado requiere
+   * decía que «El nivel medio introduce movimientos literarios» y que «El nivel avanzado requiere
    * conocer detalles técnicos, citas precisas…». El banco lo reparte al revés: Básico ya tiene dos
    * preguntas de la categoría movimientos (b04, realismo mágico, y b15, Victor Hugo) y la categoría
    * citas tiene 2 preguntas en Básico (b02 y b14), 1 en Medio (m16) y 1 en Avanzado (a18). Y la tabla
@@ -2654,5 +2655,331 @@ test.describe('Inspector 29/10/2026 · contenido', () => {
     }
     expect(choques).toEqual([]); // era: Básico con 2 de movimientos; citas 1 en Avanzado frente a 2 en Básico
     expect(respuesta, 'coherente con la tabla visible: Básico lleva las primeras frases').toMatch(/básico[^.]*primeras frases famosas/);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * INSPECTOR 29/10/2026 (tarde) — re-inspección tras /reparar
+ *
+ * La sesión de /reparar cerró los dos hallazgos de la mañana: 3770 con `enfocarSinCentrar`
+ * (lib/cromoFijo.ts, 5b65607f: foco sin desplazar y, si «Siguiente» no se ve entero, `nearest`, con
+ * una segunda mirada a los 120 ms) y 3771 en el FAQPage (5b65607f). Además, f0b18db0 añadió a
+ * useGuardaRafaga el freno del mousedown del 2.º toque (hallazgo 3768 de quiz-verbos-irregulares),
+ * que esta app también usa. Nada se da por cerrado porque el commit exista: aquí se repite la
+ * MEDIDA de la mañana y se mira alrededor de lo tocado.
+ *
+ * Medido por la tarde sobre `next start` (sondas fuera del repositorio), fallando con la opción
+ * más baja, tocando como un dedo y midiendo pasada la segunda mirada de los 120 ms:
+ *   · 3770: 0 de 60 veredictos tapados a 360 × 740 (dos tandas: semillas 1740 y 2900) y 0 de 60 a
+ *     360 × 640 (tres tandas: 1740, 2900 y 3300, esta última contestando la opción MÁS ALTA);
+ *     también 0 de 60 a 320 × 568, fuera de la medida de la mañana. b18, la explicación más larga,
+ *     deja el veredicto en y = 246…295 a 360 × 640 (era −14…35) y «Siguiente» en 585…632: lo
+ *     justo para asomar sobre los 8 px del scroll-padding inferior, no centrado.
+ *   · Teclado en escritorio (1280 × 800 y 1366 × 657): foco en «Siguiente» las 30 veces, entero,
+ *     sin tapar por la píldora del pie y, cuando la página se mueve, con su borde inferior en
+ *     800 − 63 = 737 (657 − 63 = 594); Tab → «← Cambiar de nivel», Mayús+Tab → «Siguiente», Enter →
+ *     el enunciado nuevo, a la vista.
+ *   · Cabo C0514 (forma medida aquí esta mañana: la ráfaga en «Siguiente» dejaba el foco en una
+ *     opción no elegida a 360 × 740 y en <body> a 1280 × 800): hoy, con el freno del mousedown, el
+ *     foco queda en el enunciado nuevo 14 de 14 veces y en la nota al final, en los dos tamaños.
+ *
+ * Valores esperados resueltos a mano sobre page.tsx ANTES de ejecutar. `evaluacion()`: ≥ 0,9
+ * «¡Excelente!…» · ≥ 0,7 «Muy bien…» · ≥ 0,5 «Bien…» · resto «Sigue leyendo. El conocimiento llega
+ * con tiempo.» 🌱; barra Math.round(aciertos / 15 · 100) %. Las respuestas buenas salen de la clave
+ * BANCO de este fichero (verificada contra el hecho literario el 25/08 y el 25/09/2026), no de la app.
+ */
+
+/** Geometría del veredicto y de «Siguiente» frente a la barra fija y al borde inferior. */
+async function vistaTrasResponder(page: Page) {
+  return page.evaluate(() => {
+    const caja = (e: Element | null) => {
+      if (!e) return null;
+      const r = e.getBoundingClientRect();
+      return { arriba: Math.round(r.top), abajo: Math.round(r.bottom) };
+    };
+    const barra = document.querySelector('[class*="headerBar"]')!;
+    const sig = [...document.querySelectorAll('button')].find((b) => /Siguiente|Ver resultado/.test(b.textContent ?? '')) ?? null;
+    // ¿Qué hay de verdad en el centro de «Siguiente»? (la píldora del pie es fija en escritorio)
+    let tapadoPor: string | null = null;
+    if (sig) {
+      const r = sig.getBoundingClientRect();
+      const e = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2);
+      if (!e || !(e === sig || sig.contains(e))) tapadoPor = e ? `${e.tagName}.${String(e.className).slice(0, 30)}` : 'nada';
+    }
+    return {
+      veredicto: caja(document.querySelector('[class*="explicacionVeredicto"]')),
+      siguiente: caja(sig),
+      tapadoPor,
+      enfocado: document.activeElement === sig,
+      barra: Math.round(barra.getBoundingClientRect().bottom),
+      pildora: Math.round(barra.firstElementChild!.getBoundingClientRect().bottom),
+      alto: innerHeight,
+      scroll: Math.round(scrollY),
+    };
+  });
+}
+
+test.describe('Inspector 29/10/2026 (tarde) · móvil 360 × 640', () => {
+  test.use({
+    viewport: { width: 360, height: 640 },
+    userAgent: UA_MOVIL,
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  /**
+   * CASO NORMAL — la medida de la mañana del 3770, en el tamaño donde más fallaba (9 de 60).
+   * Cuatro partidas táctiles sembradas (semillas 2900-2903: Básico, Medio, Avanzado y Mezcla), 60
+   * respuestas, fallando con la opción más baja (la D, o la C si la D es la buena) salvo las dos
+   * primeras de Mezcla, que se aciertan. Con esas semillas salen b18, a06 y a13, tres de las
+   * explicaciones largas que esta mañana tapaban el veredicto.
+   * Resuelto a mano:
+   *   · tras cada respuesta, el veredicto ENTERO entre la píldora del logo (52 px) y el borde inferior
+   *     (640), y «Siguiente» con el foco y entero bajo la barra (62 px): 0 de 60 fuera;
+   *   · si la página se movió al contestar, `nearest` deja «Siguiente» con su borde inferior a
+   *     8 px del de la ventana (el scroll-padding inferior en móvil), nunca centrado (centrado
+   *     quedaría a ~280 px): como mucho a 40 px del borde, el criterio del testigo;
+   *   · Mezcla 2/15 = 0,1333 < 0,5 → «Sigue leyendo. El conocimiento llega con tiempo.» 🌱 ·
+   *     barra Math.round(13,33) = 13 %.
+   */
+  test('caso normal (3770 reparado): 60 respuestas táctiles a 360 × 640 sin un veredicto tapado, y Mezcla 2/15 da «Sigue leyendo» y 13 %', async ({ page }) => {
+    test.setTimeout(330_000);
+    const NIVELES = [/^Básico/, /^Medio/, /^Avanzado/, /^Mezcla/];
+    const fuera: string[] = [];
+    const vistas = new Set<string>();
+    let respuestas = 0;
+    for (let k = 0; k < NIVELES.length; k++) {
+      await sembrarCon(page, 2900 + k); // la última semilla registrada es la que manda en cada carga
+      await arrancarTactil(page, NIVELES[k]);
+      for (let n = 1; n <= 15; n++) {
+        const ficha = BANCO[await enunciado(page)];
+        expect(ficha, 'enunciado fuera del banco verificado').toBeTruthy();
+        vistas.add(ficha.id);
+        const iCorrecta = (await textosOpcion(page)).indexOf(ficha.correcta);
+        const acierta = k === 3 && n <= 2;
+        const elegida = opciones(page).nth(acierta ? iCorrecta : (iCorrecta === 3 ? 2 : 3));
+        await page.waitForTimeout(500); // lee la pregunta: el toque no entra en la ráfaga anterior
+        await bajarLoJusto(elegida);
+        const antes = await page.evaluate(() => Math.round(scrollY));
+        await tocarCentro(page, elegida);
+        const avanzar = page.getByRole('button', { name: /Siguiente|Ver resultado/ });
+        await expect(avanzar).toBeFocused();
+        await page.waitForTimeout(350); // pasada la segunda mirada de enfocarSinCentrar (120 ms)
+        const v = await vistaTrasResponder(page);
+        respuestas++;
+        const donde = `${ficha.id} (${NIVELES[k].source.slice(1)} ${n}/15)`;
+        if (!v.veredicto || v.veredicto.arriba < v.pildora || v.veredicto.abajo > v.alto) {
+          fuera.push(`${donde}: veredicto en y = ${v.veredicto?.arriba}…${v.veredicto?.abajo}, píldora hasta ${v.pildora}`);
+        }
+        if (!v.enfocado || !v.siguiente || v.siguiente.arriba < v.barra || v.siguiente.abajo > v.alto) {
+          fuera.push(`${donde}: «Siguiente» ${JSON.stringify(v.siguiente)} enfocado=${v.enfocado}`);
+        } else if (v.scroll !== antes && v.alto - v.siguiente.abajo > 40) {
+          fuera.push(`${donde}: la página saltó ${v.scroll - antes} px y «Siguiente» quedó en ${v.siguiente.arriba}…${v.siguiente.abajo}`);
+        }
+        await page.waitForTimeout(300); // lee la explicación
+        await tocarAlli(page, avanzar);
+        if (n < 15) await expect(page.locator('[class*="quizNumero"]')).toHaveText(`${n + 1}/15`);
+        else await expect(page.locator('[class*="resultadoCard"]')).toBeFocused();
+      }
+    }
+    expect(respuestas).toBe(60);
+    expect(['b18', 'a06', 'a13'].filter((id) => !vistas.has(id)), 'no salieron las explicaciones largas: el caso no mide lo que dice').toEqual([]);
+    expect(fuera).toEqual([]); // la mañana del 29/10, con focus() a secas: 9 de 60 a este tamaño
+    expect(await resultado(page)).toEqual({
+      puntuacion: '2 / 15 correctas', // las dos primeras de Mezcla, acertadas
+      etiqueta: 'Sigue leyendo. El conocimiento llega con tiempo.', // 0,1333 < 0,5
+      emoji: '🌱',
+      barra: '13%', // Math.round(2/15*100)
+    });
+  });
+});
+
+test.describe('Inspector 29/10/2026 (tarde) · escritorio 1280 × 800', () => {
+  test.use({ viewport: { width: 1280, height: 800 } });
+
+  /**
+   * CASO LÍMITE — alrededor de la reparación: la partida entera SOLO con teclado, que es para quien
+   * existe el foco en «Siguiente». Avanzado (semilla 4100), las cuatro primeras bien y el resto mal
+   * con la opción más baja. Resuelto a mano sobre page.tsx y lib/cromoFijo.ts:
+   *   · al responder con Enter, el foco en «Siguiente», entero bajo la barra (92 px), sin la píldora
+   *     del pie encima de su centro y con el veredicto a la vista; si la página se mueve, `nearest`
+   *     deja su borde inferior en 800 − 63 = 737 (scroll-padding inferior: píldora 55 + 8), no
+   *     centrado (centrado, a ~360 px del borde): como mucho a 70 px del borde;
+   *   · Tab → «← Cambiar de nivel» (lo siguiente en el DOM: las opciones ya están deshabilitadas);
+   *     Mayús+Tab → «Siguiente»; Enter → el enunciado nuevo con el foco y a la vista; al final, la nota;
+   *   · 4/15 = 0,2667 < 0,5 → «Sigue leyendo. El conocimiento llega con tiempo.» 🌱 · barra
+   *     Math.round(26,67) = 27 % · tarjeta «Resultado: 4 de 15 correctas. Sigue leyendo. El
+   *     conocimiento llega con tiempo.»
+   */
+  test('caso límite: solo teclado en Avanzado — «Siguiente» con el foco, entero y sin salto de centrado; Tab, Mayús+Tab y Enter siguen el invariante (4/15, 27 %)', async ({ page }) => {
+    test.setTimeout(150_000);
+    await sembrarCon(page, 4100);
+    await abrirHidratada(page);
+    await page.getByRole('button', { name: /^Avanzado/ }).focus();
+    await page.keyboard.press('Space');
+    await expect(page.getByRole('button', { name: /^Avanzado/ })).toHaveAttribute('aria-pressed', 'true');
+    await page.keyboard.press('Tab'); // Mezcla
+    await page.keyboard.press('Tab'); // Empezar
+    await expect(page.getByRole('button', { name: /Empezar el quiz/ })).toBeFocused();
+    await page.keyboard.press('Enter');
+
+    const fallos: string[] = [];
+    for (let n = 1; n <= 15; n++) {
+      if ((await focoActual(page)) !== 'ENUNCIADO') fallos.push(`${n}/15: la pregunta empieza con el foco en ${await focoActual(page)}`);
+      const ficha = BANCO[await enunciado(page)];
+      expect(ficha.nivel, `Avanzado ha colado ${ficha.id}`).toBe('avanzado');
+      const iCorrecta = (await textosOpcion(page)).indexOf(ficha.correcta);
+      const k = n <= 4 ? iCorrecta : (iCorrecta === 3 ? 2 : 3);
+      for (let t = 0; t <= k; t++) await page.keyboard.press('Tab'); // del enunciado (tabIndex −1) a la opción k
+      await expect(opciones(page).nth(k)).toBeFocused();
+      const antes = await page.evaluate(() => Math.round(scrollY));
+      await page.keyboard.press('Enter');
+      await expect(page.getByRole('button', { name: /Siguiente|Ver resultado/ })).toBeFocused();
+      await page.waitForTimeout(350);
+      const v = await vistaTrasResponder(page);
+      if (!v.siguiente || v.siguiente.arriba < v.barra || v.siguiente.abajo > v.alto) fallos.push(`${ficha.id}: «Siguiente» fuera ${JSON.stringify(v.siguiente)}`);
+      else if (v.scroll !== antes && v.alto - v.siguiente.abajo > 70) fallos.push(`${ficha.id}: salto de ${v.scroll - antes} px y «Siguiente» en ${v.siguiente.arriba}…${v.siguiente.abajo}`);
+      if (v.tapadoPor) fallos.push(`${ficha.id}: el centro de «Siguiente» lo tapa ${v.tapadoPor}`);
+      if (!v.veredicto || v.veredicto.arriba < v.barra || v.veredicto.abajo > v.alto) fallos.push(`${ficha.id}: veredicto fuera ${JSON.stringify(v.veredicto)}`);
+
+      await page.keyboard.press('Tab');
+      await expect(page.getByRole('button', { name: /Cambiar de nivel/ }), `${n}/15: Tab desde «Siguiente»`).toBeFocused();
+      await page.keyboard.press('Shift+Tab');
+      await expect(page.getByRole('button', { name: /Siguiente|Ver resultado/ }), `${n}/15: Mayús+Tab de vuelta`).toBeFocused();
+      await page.keyboard.press('Enter');
+      if (n < 15) {
+        await expect(page.locator('[class*="quizNumero"]')).toHaveText(`${n + 1}/15`);
+        await expect(page.locator('h2[class*="pregunta"]')).toBeFocused();
+        const e = await caja(page, 'h2[class*="pregunta"]');
+        if (e.arriba < e.barra || e.abajo > e.alto) fallos.push(`enunciado tras ${ficha.id}: ${JSON.stringify(e)}`);
+      }
+    }
+    await expect(page.locator('[class*="resultadoCard"]')).toBeFocused();
+    expect(fallos).toEqual([]);
+    expect(await resultado(page)).toEqual({
+      puntuacion: '4 / 15 correctas', // Enter sobre la buena en las cuatro primeras
+      etiqueta: 'Sigue leyendo. El conocimiento llega con tiempo.', // 0,2667 < 0,5
+      emoji: '🌱',
+      barra: '27%', // Math.round(4/15*100)
+    });
+    await expect(page.locator('[class*="resultadoCard"]')).toHaveAttribute(
+      'aria-label',
+      'Resultado: 4 de 15 correctas. Sigue leyendo. El conocimiento llega con tiempo.',
+    );
+  });
+
+  /**
+   * CASO DE RECHAZO (escritorio) — la forma del cabo C0514 que esta mañana se midió en esta app: un
+   * doble clic en «Siguiente» dejaba el foco en <body> (2 de 3). Básico (semilla 5200), doble clic en
+   * cada «Siguiente» y en «Ver resultado», la 1.ª bien y el resto mal. Resuelto sobre
+   * lib/useGuardaRafaga.ts: el 1.º clic avanza y marca el cambio de pantalla; el mousedown y el clic
+   * del 2.º (`detail` 2) se frenan, así que el foco sigue en el enunciado nuevo, sin contestar
+   * (4 opciones activas, contador n + 1), y al final en la nota. 1/15 = 0,0667 → «Sigue leyendo…» 🌱 · 7 %.
+   */
+  test('caso de rechazo: doble clic en cada «Siguiente» y en «Ver resultado» — el foco queda en el enunciado nuevo y en la nota, nunca en <body> (1/15, 7 %)', async ({ page }) => {
+    test.setTimeout(150_000);
+    await sembrarCon(page, 5200);
+    await abrirHidratada(page);
+    const url = page.url();
+    await page.getByRole('button', { name: /^Básico/ }).click();
+    await page.waitForTimeout(400);
+    await page.getByRole('button', { name: /Empezar el quiz/ }).click();
+    await expect(page.locator('h2[class*="pregunta"]')).toBeFocused();
+    const fallos: string[] = [];
+    for (let n = 1; n <= 15; n++) {
+      const ficha = BANCO[await enunciado(page)];
+      const iCorrecta = (await textosOpcion(page)).indexOf(ficha.correcta);
+      await page.waitForTimeout(500);
+      await opciones(page).nth(n === 1 ? iCorrecta : (iCorrecta === 3 ? 2 : 3)).click();
+      await page.waitForTimeout(500);
+      const avanzar = page.getByRole('button', { name: /Siguiente|Ver resultado/ });
+      await bajarLoJusto(avanzar);
+      const b = (await avanzar.boundingBox())!;
+      await page.mouse.dblclick(b.x + b.width / 2, b.y + b.height / 2);
+      await page.waitForTimeout(400);
+      const foco = await focoActual(page);
+      if (n < 15) {
+        const p = await page.evaluate(() => ({
+          contador: document.querySelector('[class*="quizNumero"]')?.textContent?.trim() ?? null,
+          activas: [...document.querySelectorAll('button')].filter((x) => x.querySelector('[class*="opcionLetra"]') && !(x as HTMLButtonElement).disabled).length,
+        }));
+        if (foco !== 'ENUNCIADO') fallos.push(`doble clic en «Siguiente» ${n}/15 (${ficha.id}): foco en ${foco}`);
+        if (p.contador !== `${n + 1}/15` || p.activas !== 4) fallos.push(`doble clic en «Siguiente» ${n}/15: ${JSON.stringify(p)}`);
+      } else if (foco !== 'NOTA') {
+        fallos.push(`doble clic en «Ver resultado»: foco en ${foco}`);
+      }
+    }
+    expect(fallos).toEqual([]); // la mañana del 29/10: <body> en 2 de 3 dobles clics (cabo C0514)
+    expect(page.url()).toBe(url);
+    expect(await guiaAbierta(page)).toBe('false');
+    expect(await resultado(page)).toEqual({
+      puntuacion: '1 / 15 correctas', // solo la 1.ª, acertada; los segundos clics no contestan nada
+      etiqueta: 'Sigue leyendo. El conocimiento llega con tiempo.', // 0,0667 < 0,5
+      emoji: '🌱',
+      barra: '7%', // Math.round(1/15*100)
+    });
+  });
+});
+
+test.describe('Inspector 29/10/2026 (tarde) · móvil 360 × 740', () => {
+  test.use({
+    viewport: { width: 360, height: 740 },
+    userAgent: UA_MOVIL,
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  /**
+   * CASO DE RECHAZO (móvil) — la otra mitad del cabo C0514 en esta app: esta mañana, dos toques
+   * seguidos en «Siguiente» dejaban el foco en una opción NO elegida de la pregunta nueva (4 de 4),
+   * porque el mousedown del 2.º toque lo movía aunque la guarda ignorara su clic. Medio (semilla
+   * 5100), dos toques a 110 ms en el mismo punto en cada «Siguiente» y en «Ver resultado», la 1.ª
+   * bien y el resto mal con la opción más baja. Resuelto sobre lib/useGuardaRafaga.ts (freno del
+   * mousedown, f0b18db0): foco en el enunciado nuevo, sin contestar, sin salir ni abrir la guía, y
+   * al final en la nota. 1/15 = 0,0667 → «Sigue leyendo…» 🌱 · barra 7 %.
+   */
+  test('caso de rechazo: dos toques en cada «Siguiente» y en «Ver resultado» — el 2.º no se lleva el foco a una opción (1/15, 7 %)', async ({ page }) => {
+    test.setTimeout(150_000);
+    await sembrarCon(page, 5100);
+    await arrancarTactil(page, /^Medio/);
+    const url = page.url();
+    const fallos: string[] = [];
+    for (let n = 1; n <= 15; n++) {
+      const ficha = BANCO[await enunciado(page)];
+      expect(ficha.nivel, `Medio ha colado ${ficha.id}`).toBe('medio');
+      const iCorrecta = (await textosOpcion(page)).indexOf(ficha.correcta);
+      await page.waitForTimeout(500);
+      await tocarAlli(page, opciones(page).nth(n === 1 ? iCorrecta : (iCorrecta === 3 ? 2 : 3)));
+      await expect(page.getByRole('button', { name: /Siguiente|Ver resultado/ })).toBeFocused();
+      await page.waitForTimeout(500);
+      await rafagaDeToques(page, page.getByRole('button', { name: /Siguiente|Ver resultado/ }), 2);
+      const foco = await focoActual(page);
+      if (page.url() !== url) {
+        fallos.push(`tras ${ficha.id}: sale a ${page.url()}`);
+        break;
+      }
+      if (n < 15) {
+        const p = await page.evaluate(() => ({
+          contador: document.querySelector('[class*="quizNumero"]')?.textContent?.trim() ?? null,
+          activas: [...document.querySelectorAll('button')].filter((x) => x.querySelector('[class*="opcionLetra"]') && !(x as HTMLButtonElement).disabled).length,
+        }));
+        if (foco !== 'ENUNCIADO') fallos.push(`dos toques en «Siguiente» ${n}/15 (${ficha.id}): foco en ${foco}`);
+        if (p.contador !== `${n + 1}/15` || p.activas !== 4) fallos.push(`dos toques en «Siguiente» ${n}/15: ${JSON.stringify(p)}`);
+      } else if (foco !== 'NOTA') {
+        fallos.push(`dos toques en «Ver resultado»: foco en ${foco}`);
+      }
+    }
+    expect(fallos).toEqual([]); // la mañana del 29/10: una opción no elegida en 4 de 4 (cabo C0514)
+    expect(await guiaAbierta(page)).toBe('false');
+    expect(await resultado(page)).toEqual({
+      puntuacion: '1 / 15 correctas', // solo la 1.ª, acertada
+      etiqueta: 'Sigue leyendo. El conocimiento llega con tiempo.', // 0,0667 < 0,5
+      emoji: '🌱',
+      barra: '7%', // Math.round(1/15*100)
+    });
   });
 });

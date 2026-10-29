@@ -717,3 +717,283 @@ test.describe('inspector 29/10/2026 · contenido', () => {
     expect(conArquea.length > 0 || avisaQueNoSalen, 'el quiz tiene arqueas o la guía dice que no las tiene').toBe(true);
   });
 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * INSPECTOR 29/10/2026 (tarde) — re-inspección tras /reparar (6b82c3a3: 3782-3785; familia 5b65607f
+ * y f0b18db0). Valores esperados calculados a mano ANTES de ejecutar, con `calcularPuntuacion`,
+ * `getResultadoTexto` y `formatTiempo` (page.tsx:56-69, 164-169) y el banco de
+ * `data/organismos-naturaleza.ts`. Ninguno depende del orden de preguntas ni de opciones: la clave
+ * se lee del banco por el nombre del organismo que se ve.
+ */
+async function anuncioOpciones(page: Page): Promise<string[]> {
+  // Lo que distingue a cada opción para quien no ve el color: nombre accesible, texto y descripción
+  return opciones(page).evaluateAll((bs) => bs.map((b) => {
+    const desc = (b.getAttribute('aria-describedby') ?? '').split(' ').filter(Boolean)
+      .map((id) => document.getElementById(id)?.textContent ?? '').join(' ');
+    return `${b.getAttribute('aria-label') ?? ''} | ${(b.textContent ?? '').trim()} | ${desc}`.trim();
+  }));
+}
+
+test.describe('inspector 29/10/2026 (tarde) — re-inspección tras /reparar', () => {
+  /**
+   * CASO NORMAL + CRONÓMETRO — Intermedio, 10 preguntas, 6 bien y 4 mal, con el reloj de la página
+   * adelantado 125 s en la 5.ª pregunta (page.clock: el tiempo sigue corriendo de verdad).
+   * A mano: 6/10 = 0,6 → tramo ≥ 0,5: 40 + (0,6 − 0,5)/0,2·20 = 40 + 10 = 50 pts · 👍 «Buen intento»
+   * · «6 de 10 respuestas correctas» · «6/10» · round(60) = 60 %. Tiempo (page.tsx:120) =
+   * round((fin − inicio)/1000) = 125 + lo transcurrido de verdad (~7-15 s) → entre 2 y 3 minutos, en
+   * «min» y «s» (hallazgo 3772 de la familia, cabo C0515): «2 min N s». «Correctas» del HUD sube de
+   * 1 en 1 en las seis primeras y se queda en 6. «Jugar de nuevo» rearranca el reloj: 0 de 10 en
+   * menos de un minuto → «N s», con N = lo transcurrido de verdad.
+   * Medido el 29/10/2026 (tarde): 50 pts, 👍, 6/10, «60%», «2 min 11 s» con 6,5 s reales; 2.ª, «6 s».
+   */
+  test('caso normal: 6 de 10 en Intermedio dan 50 pts y «Buen intento», y el reloj cuenta «2 min N s»', async ({ page }) => {
+    test.setTimeout(120_000);
+    await page.clock.install();
+    await abrir(page);
+    await esperarBotonHidratado(page);
+    await elegir(page, 'Intermedio', 10);
+    const t0 = Date.now();
+    await page.locator('[class*="btnIniciar"]').click();
+    await expect(contador(page)).toHaveText('Pregunta 1 de 10');
+    const vistas: OrganismoNaturaleza[] = [];
+    for (let n = 1; n <= 10; n++) {
+      if (n === 5) await page.clock.fastForward(125_000);
+      const o = await responder(page, n <= 6 ? 'bien' : 'mal');
+      vistas.push(o);
+      await expect(page.locator('[class*="feedbackResultado"]')).toHaveText(n <= 6 ? '¡Correcto!' : 'Incorrecto');
+      // El veredicto nombra el grupo del banco
+      await expect(page.locator('[class*="feedbackGrupo"]')).toHaveText(o.grupo);
+      await expect(hudValor(page, 1)).toHaveText(String(Math.min(n, 6)));
+      await avanzar(page);
+    }
+    await expect(page.locator('[class*="resultadoPanel"]')).toBeVisible();
+    const real = (Date.now() - t0) / 1000;
+    expect(vistas.every((o) => o.nivel === 'intermedio'), 'Intermedio ha colado otro nivel').toBe(true);
+    expect(new Set(vistas.map((o) => o.id)).size, 'organismo repetido').toBe(10);
+    const r = await resultado(page);
+    expect(r.emoji).toBe('👍');
+    expect(r.titulo).toBe('Buen intento');
+    expect(r.puntos).toBe('50 pts');
+    expect(r.sub).toBe('6 de 10 respuestas correctas');
+    expect(r.stats.Correctas).toBe('6/10');
+    expect(r.stats.Acierto).toMatch(porcentaje(60)); // pegado o con espacio duro: 3720 sigue abierto
+    expect(real, 'la partida ha tardado tanto que el caso deja de valer').toBeLessThan(50);
+    const m = /^(\d+) min (\d+) s$/.exec(r.stats.Tiempo);
+    expect(m, `«${r.stats.Tiempo}» no va en «N min N s»`).toBeTruthy();
+    const seg = Number(m?.[1]) * 60 + Number(m?.[2]);
+    expect(Number(m?.[1])).toBe(2);
+    expect(seg).toBeGreaterThanOrEqual(125 + Math.floor(real) - 2);
+    expect(seg).toBeLessThanOrEqual(125 + Math.ceil(real) + 1);
+
+    // «Jugar de nuevo»: el reloj empieza de cero
+    const t1 = Date.now();
+    await page.locator('[class*="btnRejugar"]').click();
+    await expect(contador(page)).toHaveText('Pregunta 1 de 10');
+    await jugar(page, 0);
+    const r2 = await resultado(page);
+    const real2 = (Date.now() - t1) / 1000;
+    expect(r2.sub).toBe('0 de 10 respuestas correctas');
+    expect(r2.puntos).toBe('0 pts');
+    const m2 = /^(\d+) s$/.exec(r2.stats.Tiempo);
+    expect(m2, `«${r2.stats.Tiempo}» debería ir en segundos (menos de un minuto)`).toBeTruthy();
+    expect(Number(m2?.[1])).toBeLessThanOrEqual(Math.ceil(real2) + 1);
+    expect(Number(m2?.[1])).toBeGreaterThanOrEqual(Math.floor(real2) - 2);
+  });
+
+  test('sano · la FAQ de hongos es UNA: la del HTML servido (FAQPage) es la visible, y no se repite', async ({ page }) => {
+    // 3782 REPARADO: app/quiz-reinos-naturaleza/faq.ts la escriben page.tsx y metadata.ts. Se mira en
+    // el HTML que sirve el layout, no en el módulo: es lo que leen buscadores y asistentes.
+    const html = await (await page.request.get(RUTA)).text();
+    type Ld = { '@type': string; mainEntity?: { name: string; acceptedAnswer: { text: string } }[] };
+    const lds = [...html.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/gs)].map((x) => JSON.parse(x[1]) as Ld);
+    const faq = lds.find((x) => x['@type'] === 'FAQPage');
+    expect(faq, 'el HTML servido no lleva FAQPage').toBeTruthy();
+    const hongos = (faq?.mainEntity ?? []).filter((q) => /hongo/i.test(q.name));
+    expect(hongos.map((q) => q.name)).toEqual(['¿Por qué los hongos no son plantas?']);
+    await abrir(page);
+    const item = page.locator('[class*="faqItem"]', { hasText: '¿Por qué los hongos no son plantas?' });
+    await expect(item).toHaveCount(1);
+    expect(norm(await item.locator('dd').textContent())).toBe(norm(hongos[0].acceptedAnswer.text));
+  });
+
+  test('hallazgo · la guía de 7 pasos no lleva a Plantae las macroalgas del banco (Nori, Kelp)', async ({ page }) => {
+    test.fail(); // ABIERTO (29/10/2026 tarde) — la reparación de 3783 escribió la excepción de la
+    // esponja como regla general: paso 4, «con un pluricelular sin tejidos, pasa también al paso 5»,
+    // y el paso 5 da «Si tiene cloroplastos y realiza fotosíntesis → Plantae». El Alga roja (Nori),
+    // pluricelular de talo sin tejidos verdaderos y fotosintética, y el Kelp llegan así a Plantae;
+    // el banco las da como «Protista (Alga)» y la FAQ visible dice «La mayoría de las algas
+    // (macroalgas…) pertenecen al reino Protista». Antes, «sin diferenciación de tejidos → Protista».
+    await abrir(page);
+    await page.locator('[class*="toggleButton"]').click();
+    const pasos = (await page.locator('[class*="stepGuide"] > li').allInnerTexts()).map(norm);
+    expect(pasos).toHaveLength(7);
+    expect(organismo('alga-roja').grupo).toBe('Protista (Alga)');
+    expect(organismo('kelp').grupo).toBe('Protista (Alga)');
+    const sinTejidosAlPaso5 = /pluricelular sin tejidos, pasa también al paso 5/.test(pasos[3]);
+    const fotosintesisAPlantae = /fotosíntesis → Plantae/.test(pasos[4]);
+    expect(sinTejidosAlPaso5 && fotosintesisAPlantae, 'Nori: pluricelular sin tejidos → paso 5 → Plantae').toBe(false);
+  });
+
+  test('hallazgo · tras fallar, la correcta y la elegida se distinguen por algo más que el color', async ({ page }) => {
+    test.fail(); // ABIERTO (29/10/2026 tarde) — forma del cabo C0516: tras contestar, las opciones
+    // solo cambian de clase (verde la correcta, rojo la elegida, page.tsx:271-276); ni ✓/✗, ni
+    // nombre accesible nuevo («Opción A: Anfibio» sigue igual), ni descripción. El panel sí dice
+    // «Incorrecto» y el grupo correcto, pero no qué botón es cuál.
+    await abrir(page);
+    await arrancar(page, 'Básico', 10);
+    await page.waitForTimeout(550);
+    const o = await organismoVisible(page);
+    const ops = await textosOpcion(page);
+    const iC = ops.indexOf(o.grupo);
+    const iMal = iC === 0 ? 1 : 0;
+    const antes = await anuncioOpciones(page);
+    await opciones(page).nth(iMal).click();
+    await expect(page.locator('[class*="feedbackResultado"]')).toHaveText('Incorrecto');
+    const despues = await anuncioOpciones(page);
+    expect({ correcta: despues[iC] !== antes[iC], elegida: despues[iMal] !== antes[iMal] }).toEqual({ correcta: true, elegida: true });
+  });
+});
+
+test.describe('inspector 29/10/2026 (tarde) · doble clic en una opción, escritorio 1920 × 1080', () => {
+  test.use({ viewport: { width: 1920, height: 1080 } });
+
+  test('hallazgo · el 2.º clic de un doble clic en una opción no tira el foco a <body>', async ({ page }) => {
+    test.fail(); // ABIERTO (29/10/2026 tarde) — forma del cabo C0514: la opción contestada queda
+    // disabled y el 2.º clic solo entrega pointerdown (ni mousedown ni click), así que el freno de
+    // lib/useGuardaRafaga.ts no lo ve y el foco, que ya estaba en «Siguiente», cae a <body>. Medido:
+    // 1920 × 1080 en 3 de 4 opciones (B, C, D de la 2.ª pregunta) y 412 × 915 con toques, 2 de 4.
+    // Precondición: en la 2.ª pregunta la página ya no se mueve al contestar (scrollY igual), así que el
+    // 2.º clic cae en la misma opción, ya deshabilitada.
+    await abrir(page);
+    await esperarBotonHidratado(page);
+    await arrancar(page, 'Básico', 10);
+    await responder(page, 'bien');
+    await avanzar(page);
+    await expect(contador(page)).toHaveText('Pregunta 2 de 10');
+    await page.waitForTimeout(700);
+    const y0 = await page.evaluate(() => scrollY);
+    const caja = await opciones(page).nth(1).boundingBox();
+    if (!caja) throw new Error('la opción B no tiene caja');
+    await page.mouse.dblclick(caja.x + caja.width / 2, caja.y + caja.height / 2);
+    await page.waitForTimeout(400);
+    await expect(feedback(page)).toBeVisible();
+    expect(await page.evaluate(() => scrollY), 'la página se ha movido: el 2.º clic no cae en la opción').toBe(y0);
+    await expect(page.locator('[class*="btnSiguiente"]')).toBeFocused();
+  });
+});
+
+test.describe('inspector 29/10/2026 (tarde) · móvil 360 × 740', () => {
+  test.use({ viewport: { width: 360, height: 740 }, userAgent: UA_MOVIL, deviceScaleFactor: 3, isMobile: true, hasTouch: true });
+
+  /**
+   * FORMA DE 3785 — ningún botón de la pantalla de configuración (niveles, «Número de preguntas»,
+   * «Empezar Quiz») sale de su tarjeta, ni a 360 ni a 320 px, y la página no gana scroll lateral.
+   * A mano: a 360 px la tarjeta da 246 px de contenido (57-303, medido por la mañana) y cada botón
+   * «N preguntas» ~118 px: con flex-wrap caben 2 + 1; a 320 px, 206 px: uno por fila. Esperado: 0 fuera.
+   */
+  test('caso móvil: a 360 y a 320 px ningún botón de la configuración sale de su tarjeta', async ({ page }) => {
+    const medir = (): Promise<{ fuera: string[]; scroll: number }> => page.evaluate(() => {
+      const panel = document.querySelector('[class*="configPanel"]') as HTMLElement;
+      const cs = getComputedStyle(panel);
+      const c = panel.getBoundingClientRect();
+      const izq = c.left + parseFloat(cs.borderLeftWidth) + parseFloat(cs.paddingLeft);
+      const der = c.right - parseFloat(cs.borderRightWidth) - parseFloat(cs.paddingRight);
+      const fuera = [...panel.querySelectorAll('button')].filter((b) => {
+        const r = b.getBoundingClientRect();
+        return r.left < izq - 1 || r.right > der + 1;
+      }).map((b) => (b.textContent ?? '').trim());
+      return { fuera, scroll: document.documentElement.scrollWidth };
+    });
+    await abrir(page);
+    expect(await medir()).toEqual({ fuera: [], scroll: 360 });
+    await page.setViewportSize({ width: 320, height: 740 });
+    await page.waitForTimeout(300);
+    expect(await medir()).toEqual({ fuera: [], scroll: 320 });
+  });
+
+  /**
+   * CASO LÍMITE a 360 × 640 — Avanzado con 10 (juega el nivel entero, también el Virus, el feedback
+   * más largo: 508 px), 5 bien y 5 mal, con toques. Tras cada respuesta: foco en «Siguiente» y el
+   * veredicto («¡Correcto!»/«Incorrecto») entero a la vista, bajo la barra del logo
+   * (scroll-padding-top) y por encima del borde inferior, con «Siguiente» también entero; tras
+   * «Siguiente», foco en el enunciado y a la vista; al final, el resultado enfocado y a la vista.
+   * A mano: 5/10 = 0,5 → justo el tramo ≥ 0,5: 40 + 0/0,2·20 = 40 pts · 👍 «Buen intento» · «5/10»
+   * · 50 %. Medido el 29/10/2026 (tarde) a 360 × 640: «Siguiente» en 585-632 px en las 10; el
+   * veredicto, entre 61 y 197 px (el más alto, el Prión, feedback de 533 px: 61-83, con la barra del
+   * logo en 0-62 y el veredicto en el punto central). A 320 × 568 los feedbacks de Avanzado (505-576
+   * px) ya no caben con «Siguiente» y el veredicto queda bajo la barra o por encima de la pantalla en
+   * los 10: es un alto de pantalla fuera del encargo (360 × 640), anotado sin hallazgo.
+   */
+  test('caso límite: 5 de 10 a 360 × 640 dan 40 pts, con el veredicto y el foco siempre a la vista', async ({ page }) => {
+    test.setTimeout(120_000);
+    await page.setViewportSize({ width: 360, height: 640 });
+    await abrir(page);
+    await esperarBotonHidratado(page);
+    await elegir(page, 'Avanzado', 10);
+    await page.locator('[class*="btnIniciar"]').tap();
+    await expect(contador(page)).toHaveText('Pregunta 1 de 10');
+    const fallos: string[] = [];
+    const vistas: string[] = [];
+    for (let n = 1; n <= 10; n++) {
+      await page.waitForTimeout(600);
+      await expect(page.locator('[class*="preguntaCard"]')).toBeFocused();
+      const o = await organismoVisible(page);
+      vistas.push(o.id);
+      const ops = await textosOpcion(page);
+      const iC = ops.indexOf(o.grupo);
+      await opciones(page).nth(n <= 5 ? iC : iC === 0 ? 1 : 0).tap();
+      await expect(feedback(page)).toBeVisible();
+      await page.waitForTimeout(300); // enfocarSinCentrar vuelve a mirar a los 120 ms
+      await expect(page.locator('[class*="btnSiguiente"]')).toBeFocused();
+      const v = await page.evaluate(() => {
+        // «A la vista» = dentro de la ventana y SIN la barra fija del logo encima: lo que hay en el
+        // centro del veredicto es el veredicto. (No vale el scroll-padding-top, 66 px, que deja 4 px de
+        // aire bajo la barra de 62: el Prión queda en 61-83 px y se lee entero.)
+        const el = document.querySelector('[class*="feedbackResultado"]') as HTMLElement;
+        const ver = el.getBoundingClientRect();
+        const centro = document.elementFromPoint(ver.left + 20, ver.top + ver.height / 2);
+        const sig = (document.querySelector('[class*="btnSiguiente"]') as HTMLElement).getBoundingClientRect();
+        return {
+          veredicto: ver.top >= 0 && ver.bottom <= innerHeight && Boolean(centro && (centro === el || el.contains(centro))),
+          siguiente: sig.bottom <= innerHeight + 1 && sig.top >= 0,
+        };
+      });
+      if (!v.veredicto || !v.siguiente) fallos.push(`${n} ${o.id}: ${JSON.stringify(v)}`);
+      await page.locator('[class*="btnSiguiente"]').tap();
+      if (n < 10) {
+        await expect(contador(page)).toHaveText(`Pregunta ${n + 1} de 10`);
+        const enVista = await page.locator('[class*="preguntaCard"]').evaluate((el) => {
+          const r = el.getBoundingClientRect();
+          return r.top >= 0 && r.top < innerHeight;
+        });
+        if (!enVista) fallos.push(`${n + 1}: el enunciado no está a la vista`);
+      }
+    }
+    expect(fallos).toEqual([]);
+    expect([...vistas].sort()).toEqual(organismosNaturaleza.filter((o) => o.nivel === 'avanzado').map((o) => o.id).sort());
+    await expect(page.locator('[class*="resultadoPanel"]')).toBeFocused();
+    expect(await page.locator('[class*="resultadoPanel"]').evaluate((el) => {
+      const r = el.getBoundingClientRect();
+      return r.top >= 0 && r.top < innerHeight;
+    })).toBe(true);
+    const r = await resultado(page);
+    expect(r.emoji).toBe('👍');
+    expect(r.titulo).toBe('Buen intento');
+    expect(r.puntos).toBe('40 pts');
+    expect(r.sub).toBe('5 de 10 respuestas correctas');
+    expect(r.stats.Correctas).toBe('5/10');
+    expect(r.stats.Acierto).toMatch(porcentaje(50));
+    // Los dos botones del resultado caben en su tarjeta (botonesResultado ya tenía flex-wrap)
+    const fuera = await page.evaluate(() => {
+      const panel = document.querySelector('[class*="resultadoPanel"]') as HTMLElement;
+      const c = panel.getBoundingClientRect();
+      return [...panel.querySelectorAll('button')].filter((b) => {
+        const x = b.getBoundingClientRect();
+        return x.left < c.left - 1 || x.right > c.right + 1;
+      }).length;
+    });
+    expect(fuera).toBe(0);
+  });
+});

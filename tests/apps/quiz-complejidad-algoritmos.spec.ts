@@ -886,3 +886,349 @@ test.describe('Inspector 29/10/2026 · hallazgo nuevo', () => {
     expect(bajos).toEqual([]);
   });
 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * INSPECTOR 29/10/2026 (tarde) — re-inspección tras /reparar (6856d845 y 655ecb17: 3781, 3683 y
+ * 3691). Los colores se miden PINTADOS: `pintados()` compone, desde <html> hasta el elemento, cada
+ * fondo con su alfa y cada `opacity`, que getComputedStyle no aplica (el `contrastes()` de arriba
+ * no la ve: por eso su test del 3781 pasa con el puntero encima del botón).
+ *
+ * Valores esperados, calculados a mano ANTES de ejecutar (WCAG 2.x, luminancia relativa):
+ *  · Blanco sobre los --cat-* nuevos (QuizComplejidadAlgoritmos.module.css:26-30): #26718F L 0,1421
+ *    → 1,05/0,1921 = 5,47 · #327874 L 0,1537 → 5,15 · #B35A1F L 0,1700 → 4,77 · #7B5EA7 L 0,1500
+ *    → 5,25 · #2E7D59 L 0,1597 → 5,01. El texto es blanco en los dos temas: mismas cifras.
+ *  · `.btnCategoria:hover { opacity: 0.85 }` (css:199-201): con el puntero encima el botón se
+ *    mezcla al 85 % con la tarjeta. En claro (tarjeta #FFFFFF) el texto sigue blanco y el fondo
+ *    aclara: #26718F → (70,6; 134,3; 159,8) L 0,210 → 4,04 · #327874 → 3,84 · #B35A1F →
+ *    (190,4; 114,8; 64,6) L 0,236 → 3,67 · #7B5EA7 → 3,87 · #2E7D59 → 3,76. En oscuro (tarjeta
+ *    #2A2A2A) el texto baja a #DFDFDF: 4,76 · 4,52 · 4,24 · 4,58 · 4,41. Y el inactivo en claro,
+ *    #666 sobre #F5F5F5 → #7D7D7D sobre #F7F7F7: 3,83.
+ *  · Estado activo frente al inactivo en OSCURO: el fondo activo (--cat-*) contra el inactivo
+ *    (--hover #333333, L 0,0331): 0,1921/0,0831 = 2,31 · 2,45 · 2,65 · 2,41 · 2,52; contra la
+ *    tarjeta #2A2A2A (L 0,0232): 2,63 · 2,78 · 3,01 · 2,73 · 2,87. Con los --cat-* de antes de
+ *    6856d845 eran 3,08 · 4,51 · 4,25 · 2,41 · 3,60 contra el inactivo.
+ *  · Círculo de la nota: «/N» es blanco con `opacity: 0.85` (css:528-532) sobre --primary-boton
+ *    #26718F → texto (222,5; 233,7; 238,2) L 0,805 → 0,855/0,192 = 4,45; 20,8 px a peso 500 no es
+ *    texto grande: exige 4,5.
+ *  · Marcador «✓ N correctas»: --correcto-text #155724 (L 0,0711) sobre #FAFAFA (L 0,955) →
+ *    1,005/0,1211 = 8,3; en oscuro #7AE79A sobre #1A1A1A, holgado.
+ */
+interface Pintado { t: string; ratio: number; lumFondo: number; opacidad: string }
+
+async function pintados(page: Page, selector: string): Promise<Pintado[]> {
+  return page.evaluate((sel) => {
+    interface C { r: number; g: number; b: number; a: number }
+    const parse = (c: string): C => {
+      const m = (c.match(/[\d.]+/g) ?? ['0', '0', '0', '0']).map(Number);
+      return { r: m[0], g: m[1], b: m[2], a: m.length > 3 ? m[3] : 1 };
+    };
+    const sobre = (c: C, f: C): C => ({ r: c.a * c.r + (1 - c.a) * f.r, g: c.a * c.g + (1 - c.a) * f.g, b: c.a * c.b + (1 - c.a) * f.b, a: 1 });
+    const mezcla = (o: number, x: C, f: C): C => ({ r: o * x.r + (1 - o) * f.r, g: o * x.g + (1 - o) * f.g, b: o * x.b + (1 - o) * f.b, a: 1 });
+    const lum = (c: C): number => {
+      const f = (v: number) => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; };
+      return 0.2126 * f(c.r) + 0.7152 * f(c.g) + 0.0722 * f(c.b);
+    };
+    const blanco: C = { r: 255, g: 255, b: 255, a: 1 };
+    return [...document.querySelectorAll(sel)].map((el) => {
+      const cadena: Element[] = [];
+      for (let n: Element | null = el; n; n = n.parentElement) cadena.unshift(n);
+      const fondo = (i: number, bajo: C): C => {
+        const cs = getComputedStyle(cadena[i]);
+        let dentro = sobre(parse(cs.backgroundColor), bajo);
+        if (i < cadena.length - 1) dentro = fondo(i + 1, dentro);
+        return mezcla(Number(cs.opacity), dentro, bajo);
+      };
+      const texto = (i: number, bajo: C): C => {
+        const cs = getComputedStyle(cadena[i]);
+        const bajoDentro = sobre(parse(cs.backgroundColor), bajo);
+        const dentro = i < cadena.length - 1 ? texto(i + 1, bajoDentro) : sobre(parse(cs.color), bajoDentro);
+        return mezcla(Number(cs.opacity), dentro, bajo);
+      };
+      const lf = lum(fondo(0, blanco));
+      const lt = lum(texto(0, blanco));
+      return {
+        t: (el.textContent ?? '').trim(),
+        ratio: Math.round(((Math.max(lf, lt) + 0.05) / (Math.min(lf, lt) + 0.05)) * 100) / 100,
+        lumFondo: lf,
+        opacidad: getComputedStyle(el).opacity,
+      };
+    });
+  }, selector);
+}
+
+const ratioLum = (a: number, b: number): number => Math.round(((Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05)) * 100) / 100;
+const BLANCO_SOBRE_CAT = [5.47, 5.15, 4.77, 5.25, 5.01]; // a mano, ver la cabecera del bloque
+
+async function botonCategoria(page: Page, c: Categoria): Promise<Locator> {
+  const b = page.getByRole('button', { name: c, exact: true });
+  await expect(b).toBeVisible();
+  return b;
+}
+
+test.describe('Inspector 29/10/2026 (tarde) · re-inspección tras /reparar · escritorio', () => {
+  /**
+   * CASO NORMAL — sin el puntero encima, el blanco sobre cada --cat-* llega a lo calculado a mano
+   * en el botón activo, la insignia del inicio, la de cada pregunta y la del desglose, en los dos
+   * temas; el marcador y la barra (con nombre, 655ecb17) se leen a la vez. Examen contestando
+   * siempre la A: la barra marca aria-valuenow = índice (0…24) sobre 25.
+   */
+  test('caso normal: sin puntero encima, las cinco categorías dan 5,47 · 5,15 · 4,77 · 5,25 · 5,01 en botón e insignias, en claro y en oscuro', async ({ page }) => {
+    test.setTimeout(120_000);
+    for (const tema of ['light', 'dark'] as const) {
+      await abrir(page, tema);
+      await esperarBotonHidratado(page, /Práctica por categoría/);
+      await page.getByRole('button', { name: /Práctica por categoría/ }).click();
+      const activos: number[] = [];
+      for (const c of CATEGORIAS) {
+        await (await botonCategoria(page, c)).click();
+        await page.mouse.move(2, 2);
+        await page.waitForTimeout(450); // transition: all 0.2s del botón
+        const p = await pintados(page, '[class*="btnCategoriaActivo"]');
+        expect(p.map((x) => x.t), `${tema}: un solo botón activo`).toEqual([c]);
+        activos.push(p[0].ratio);
+      }
+      activos.forEach((r, i) => expect(r, `${tema}: botón activo ${CATEGORIAS[i]}`).toBeCloseTo(BLANCO_SOBRE_CAT[i], 1));
+      const inicio = await pintados(page, '[class*="badgesCategoria"] span');
+      expect(inicio.map((x) => x.t)).toEqual(CATEGORIAS);
+      inicio.forEach((x, i) => expect(x.ratio, `${tema}: insignia del inicio ${x.t}`).toBeCloseTo(BLANCO_SOBRE_CAT[i], 1));
+
+      await page.getByRole('button', { name: /Examen completo/ }).click();
+      await page.getByRole('button', { name: /Comenzar examen/ }).click();
+      const vistas = new Map<string, number>();
+      for (let n = 1; n <= 25; n++) {
+        await expect(contador(page)).toHaveText(`Pregunta ${n} de 25`);
+        const barra = page.getByRole('progressbar', { name: 'Progreso del quiz' });
+        await expect(barra).toHaveAttribute('aria-valuenow', String(n - 1));
+        await expect(barra).toHaveAttribute('aria-valuemax', '25');
+        const [ins] = await pintados(page, '[class*="tarjetaPregunta"] > span[class*="badgeCategoria"]');
+        vistas.set(ins.t, ins.ratio);
+        await opciones(page).first().click();
+        await expect(feedback(page)).toBeVisible();
+        const [m] = await pintados(page, '[class*="aciertosActuales"]');
+        expect(m.ratio, `${tema}: marcador en la pregunta ${n}`).toBeGreaterThanOrEqual(4.5);
+        await siguiente(page).click();
+      }
+      expect([...vistas.keys()].sort()).toEqual([...CATEGORIAS].sort());
+      CATEGORIAS.forEach((c, i) => expect(vistas.get(c), `${tema}: insignia de la pregunta ${c}`).toBeCloseTo(BLANCO_SOBRE_CAT[i], 1));
+      const desglose = await pintados(page, '[class*="badgePequeno"]');
+      expect(desglose.map((x) => x.t)).toEqual(CATEGORIAS);
+      desglose.forEach((x, i) => expect(x.ratio, `${tema}: insignia del desglose ${x.t}`).toBeCloseTo(BLANCO_SOBRE_CAT[i], 1));
+      const [numero] = await pintados(page, '[class*="numeroAciertos"]');
+      expect(numero.ratio).toBeCloseTo(5.47, 1);
+    }
+  });
+
+  /**
+   * CASO LÍMITE — el botón recién elegido CON EL PUNTERO ENCIMA, que es donde queda tras el clic.
+   * Esperado: ≥ 4,5 en las cinco, en los dos temas, y el inactivo bajo el puntero también.
+   * Obtenido (29/10/2026, tarde): claro 4,04 · 3,84 · 3,67 · 3,87 · 3,76 y el inactivo 3,83;
+   * oscuro 4,76 · 4,52 · 4,24 · 4,58 · 4,41. Es la regla `.btnCategoria:hover { opacity: 0.85 }`.
+   */
+  test('hallazgo · reparación incompleta de 3781: con el puntero encima (tras el clic) el botón de categoría baja de 4,5:1', async ({ page }) => {
+    test.fail(); // ABIERTO — hallazgo nuevo de la re-inspección del 29/10/2026 (tarde)
+    test.setTimeout(60_000);
+    const bajos: string[] = [];
+    for (const tema of ['light', 'dark'] as const) {
+      await abrir(page, tema);
+      await esperarBotonHidratado(page, /Práctica por categoría/);
+      await page.getByRole('button', { name: /Práctica por categoría/ }).click();
+      for (const c of CATEGORIAS) {
+        await (await botonCategoria(page, c)).click(); // el puntero se queda encima
+        await page.waitForTimeout(450);
+        const [p] = await pintados(page, '[class*="btnCategoriaActivo"]');
+        if (p.ratio < 4.5) bajos.push(`${tema} activo ${c} ${p.ratio} (opacity ${p.opacidad})`);
+      }
+      const otro = await botonCategoria(page, 'Notación Big O');
+      await otro.hover();
+      await page.waitForTimeout(450);
+      const [q] = await pintados(page, '[class*="categoriasGrid"] button:not([aria-pressed="true"]):hover');
+      if (q && q.ratio < 4.5) bajos.push(`${tema} inactivo Notación ${q.ratio}`);
+    }
+    expect(bajos).toEqual([]);
+  });
+
+  /**
+   * Lo que la reparación ha movido alrededor: en OSCURO, oscurecer los --cat-* ha acercado el fondo
+   * del botón activo al gris del inactivo. Esperado ≥ 3:1 (WCAG 1.4.11, indicador de estado)
+   * contra el inactivo y contra la tarjeta. Obtenido: contra el inactivo 2,31 · 2,45 · 2,65 ·
+   * 2,41 · 2,52 (antes de 6856d845, 3,08 · 4,51 · 4,25 · 2,41 · 3,60); contra la tarjeta 2,63 ·
+   * 2,78 · 3,01 · 2,73 · 2,87. El activo pierde además la franja de color de la izquierda.
+   */
+  test('hallazgo · en oscuro, el botón de categoría activo se distingue del inactivo con 3:1', async ({ page }) => {
+    test.fail(); // ABIERTO — hallazgo nuevo de la re-inspección del 29/10/2026 (tarde)
+    await abrir(page, 'dark');
+    await esperarBotonHidratado(page, /Práctica por categoría/);
+    await page.getByRole('button', { name: /Práctica por categoría/ }).click();
+    const bajos: string[] = [];
+    for (const c of CATEGORIAS) {
+      await (await botonCategoria(page, c)).click();
+      await page.mouse.move(2, 2);
+      await page.waitForTimeout(450);
+      const [act] = await pintados(page, '[class*="btnCategoriaActivo"]');
+      const [inact] = await pintados(page, '[class*="categoriasGrid"] button:not([aria-pressed="true"])');
+      const [tarjeta] = await pintados(page, '[class*="categoriasGrid"]');
+      const r1 = ratioLum(act.lumFondo, inact.lumFondo);
+      const r2 = ratioLum(act.lumFondo, tarjeta.lumFondo);
+      if (r1 < 3 || r2 < 3) bajos.push(`${c}: ${r1} contra el inactivo, ${r2} contra la tarjeta`);
+    }
+    expect(bajos).toEqual([]);
+  });
+
+  /** «/25» del círculo: blanco con opacity 0.85 sobre #26718F → 4,45 a mano (ver la cabecera). */
+  test('hallazgo · el «/N» del círculo de la nota llega a 4,5:1', async ({ page }) => {
+    test.fail(); // ABIERTO — hallazgo nuevo de la re-inspección del 29/10/2026 (tarde); medido 4,45
+    await abrir(page, 'light');
+    await esperarBotonHidratado(page, /Práctica por categoría/);
+    await comenzarPractica(page, 'Comparativa');
+    await jugar(page, 5);
+    await expect(tarjetaResultado(page)).toBeVisible();
+    const [total] = await pintados(page, '[class*="totalPreguntas"]');
+    expect(total.t).toBe('/5');
+    expect(total.ratio).toBeGreaterThanOrEqual(4.5);
+  });
+
+  /**
+   * Forma del cabo C0514: un doble clic sobre una OPCIÓN. La 1.ª pulsación contesta y deshabilita
+   * las opciones; el foco va a «Siguiente» (page.tsx:338). La 2.ª cae sobre un botón disabled, que
+   * no recibe mousedown ni click, así que la guarda (lib/useGuardaRafaga.ts) no la ve.
+   * Esperado: foco en «Siguiente pregunta →». Obtenido: <body> (1280 × 800 y 360 × 740).
+   */
+  test('hallazgo · forma del cabo C0514: tras un doble clic en una opción el foco sigue en «Siguiente»', async ({ page }) => {
+    test.fail(); // ABIERTO — hallazgo nuevo de la re-inspección del 29/10/2026 (tarde)
+    await abrir(page);
+    await esperarBotonHidratado(page, /Comenzar examen/);
+    await comenzarExamen(page);
+    await opciones(page).first().dblclick();
+    await expect(feedback(page)).toBeVisible();
+    await page.waitForTimeout(300);
+    await expect(siguiente(page)).toBeFocused({ timeout: 1000 });
+  });
+
+  /**
+   * Forma del cabo C0516: tras fallar, la correcta y la elegida solo se distinguen por el color
+   * (opcionCorrecta / opcionIncorrecta). Esperado: una marca que no sea color —✓/✗ visibles o
+   * «correcta»/«tu respuesta» en el nombre accesible—. Obtenido: los nombres no cambian («AO(n)»,
+   * «BO(log n)»…) y el panel solo dice «✗ Incorrecto».
+   */
+  test('hallazgo · forma del cabo C0516: la correcta y la fallada se distinguen por algo más que el color', async ({ page }) => {
+    test.fail(); // ABIERTO — hallazgo nuevo de la re-inspección del 29/10/2026 (tarde)
+    await abrir(page);
+    await esperarBotonHidratado(page, /Comenzar examen/);
+    await comenzarExamen(page);
+    const { ficha } = await responder(page, 'mal');
+    expect(ficha.n).toBeGreaterThan(0);
+    const marcas = await page.evaluate(() => {
+      const nombre = (b: Element | null): string => {
+        if (!b) return '';
+        const desc = (b.getAttribute('aria-describedby') ?? '').split(' ').map((id) => document.getElementById(id)?.textContent ?? '').join(' ');
+        return `${b.getAttribute('aria-label') ?? b.textContent ?? ''} ${desc}`.trim();
+      };
+      return {
+        correcta: nombre(document.querySelector('[class*="opcionCorrecta"]')),
+        fallada: nombre(document.querySelector('[class*="opcionIncorrecta"]')),
+      };
+    });
+    expect(marcas.correcta, 'la correcta').toMatch(/✓|correcta/i);
+    expect(marcas.fallada, 'la fallada').toMatch(/✗|incorrecta|tu respuesta|fallada/i);
+  });
+
+  /**
+   * P21 escribe el orden al revés que P2. P2 enseña «de mejor a peor: O(1) < O(log n) < O(n) < …»
+   * (el «<» compara el crecimiento); la explicación de P21 abre con «O(1) > O(log n) > O(n)», que con
+   * ese mismo convenio dice que O(1) crece más deprisa que O(n). Esperado: el mismo símbolo que P2
+   * (o «mejor que» en palabras). Obtenido: «O(1) > O(log n) > O(n)».
+   */
+  test('hallazgo · la explicación de P21 no invierte el «<» que enseña P2', async ({ page }) => {
+    test.fail(); // ABIERTO — hallazgo nuevo de la re-inspección del 29/10/2026 (tarde)
+    await abrir(page);
+    await esperarBotonHidratado(page, /Práctica por categoría/);
+    await comenzarPractica(page, 'Comparativa');
+    let explicacion = '';
+    for (let n = 1; n <= 5 && !explicacion; n++) {
+      const { ficha } = await responder(page, 'bien');
+      if (ficha.n === 21) explicacion = norm(await page.locator('[class*="explicacionFeedback"]').innerText());
+      else await siguiente(page).click();
+    }
+    expect(explicacion, 'P21 está en la práctica de Comparativa').not.toBe('');
+    expect(explicacion).not.toMatch(/O\(1\) > O\(log n\) > O\(n\)/);
+  });
+});
+
+test.describe('Inspector 29/10/2026 (tarde) · re-inspección tras /reparar · móvil 360 × 740', () => {
+  test.use({ viewport: { width: 360, height: 740 }, userAgent: UA_MOVIL, deviceScaleFactor: 3, isMobile: true, hasTouch: true });
+
+  /**
+   * CASO MÓVIL — práctica de «Estructuras de Datos» con toques: bien, bien, mal, bien, mal.
+   * Clave a mano: P11 HashSet promedio O(1) · P12 cola con puntero O(1) · P13 BST balanceado
+   * O(log n) · P14 cima del heap O(1) · P15 espacio de Merge Sort O(n). Marcador tras cada
+   * respuesta 1, 2, 2, 3, 3 → 3/5 = 0,6 → 60 → tramo ≥ 60 → 👍 «Buen nivel para entrevistas
+   * júnior»; 3 aciertos, 2 errores, sin desglose. Barra «Progreso del quiz» con aria-valuenow
+   * 0…4 sobre 5. Insignia «Estructuras de Datos» (#B35A1F) a 4,77 sin puntero. Sin desborde
+   * horizontal a 360 px en el inicio, la pregunta y el resultado (cabo C0518: limpio).
+   */
+  test('caso móvil: práctica de Estructuras de Datos por toques, bien-bien-mal-bien-mal → 3/5, 60 % y sin desborde', async ({ page }) => {
+    test.setTimeout(60_000);
+    await abrir(page, 'light');
+    await esperarBotonHidratado(page, /Práctica por categoría/);
+    const sinDesborde = async (donde: string) =>
+      expect(await page.evaluate(() => document.documentElement.scrollWidth), `${donde}: desborde horizontal`).toBe(360);
+    await page.getByRole('button', { name: /Práctica por categoría/ }).tap();
+    const est = await botonCategoria(page, 'Estructuras de Datos');
+    await est.tap();
+    await expect(est).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByRole('button', { name: /^Practicar / })).toHaveText('Practicar Estructuras de Datos →');
+    await sinDesborde('inicio');
+    await page.getByRole('button', { name: /^Practicar Estructuras/ }).tap();
+    const plan: ('bien' | 'mal')[] = ['bien', 'bien', 'mal', 'bien', 'mal'];
+    const jugadas: number[] = [];
+    const marcas: string[] = [];
+    for (let n = 0; n < 5; n++) {
+      await expect(contador(page)).toHaveText(`Pregunta ${n + 1} de 5`);
+      await expect(page.getByRole('progressbar', { name: 'Progreso del quiz' })).toHaveAttribute('aria-valuenow', String(n));
+      await expect(page.getByRole('progressbar')).toHaveAttribute('aria-valuemax', '5');
+      const [ins] = await pintados(page, '[class*="tarjetaPregunta"] > span[class*="badgeCategoria"]');
+      expect(ins.t).toBe('Estructuras de Datos');
+      expect(ins.ratio).toBeCloseTo(4.77, 1);
+      if (n === 0) await sinDesborde('pregunta');
+      await page.waitForTimeout(550); // un toque tras otro cercano sería ráfaga
+      const ficha = await fichaVisible(page);
+      const iC = indiceCorrecta(ficha, await textosOpcion(page));
+      await opciones(page).nth(plan[n] === 'bien' ? iC : (iC + 1) % 4).tap();
+      await expect(feedback(page)).toBeVisible();
+      jugadas.push(ficha.n);
+      marcas.push((norm(await marcador(page).innerText()).match(/\d+/) ?? [''])[0]);
+      await page.waitForTimeout(550);
+      await siguiente(page).tap();
+    }
+    expect([...jugadas].sort((a, b) => a - b), 'la práctica de Estructuras son P11-P15').toEqual([11, 12, 13, 14, 15]);
+    expect(marcas).toEqual(['1', '2', '2', '3', '3']);
+    const r = await resultado(page);
+    expect(r.circulo).toBe('3/5');
+    expect(r.emoji).toBe('👍');
+    expect(r.texto).toBe('Buen nivel para entrevistas júnior');
+    expect(r.stats.Aciertos).toBe('3');
+    expect(r.stats.Errores).toBe('2');
+    expect(r.stats['Puntuación']).toMatch(porcentaje(60));
+    expect(r.desglose).toEqual({});
+    await sinDesborde('resultado');
+  });
+
+  /**
+   * El mismo hallazgo de la opacidad, en el móvil: tras tocar la categoría, Chrome deja :hover
+   * pegado al botón tocado. Esperado ≥ 4,5. Obtenido: «Estructuras de Datos» 3,67 (opacity 0.85).
+   */
+  test('hallazgo · reparación incompleta de 3781 (móvil): la categoría recién tocada se queda en :hover y baja de 4,5:1', async ({ page }) => {
+    test.fail(); // ABIERTO — hallazgo nuevo de la re-inspección del 29/10/2026 (tarde)
+    await abrir(page, 'light');
+    await esperarBotonHidratado(page, /Práctica por categoría/);
+    await page.getByRole('button', { name: /Práctica por categoría/ }).tap();
+    const est = await botonCategoria(page, 'Estructuras de Datos');
+    await est.tap();
+    await page.waitForTimeout(450);
+    const [p] = await pintados(page, '[class*="btnCategoriaActivo"]');
+    expect(p.t).toBe('Estructuras de Datos');
+    expect(p.ratio).toBeGreaterThanOrEqual(4.5);
+  });
+});

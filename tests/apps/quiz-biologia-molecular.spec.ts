@@ -1832,11 +1832,13 @@ test.describe('Inspector 29/10/2026', () => {
   });
 
   /**
-   * HALLAZGO (contenido) — ABIERTO. La meta description escribe el ordinal sin el punto que pide la
-   * Ortografía de la RAE (2010) para su abreviatura: «Para Bachillerato y 1º de carrera.» (lo
-   * correcto es «1.º»). La propia app lo escribe bien en el FAQPage: «(2.º curso, asignatura de
-   * Biología)». Es el texto que sale en el resultado del buscador. Medido el 29/10/2026 en el HTML
-   * servido: esperado «1.º de carrera» · obtenido «1º de carrera».
+   * HALLAZGO 3779 (contenido) — REPARADO el 29/10/2026 (5b65607f; era ABIERTO). La meta description
+   * escribía el ordinal sin el punto que pide la Ortografía de la RAE (2010) para su abreviatura:
+   * «Para Bachillerato y 1º de carrera.» (lo correcto es «1.º»). La propia app lo escribía bien en el
+   * FAQPage: «(2.º curso, asignatura de Biología)». Es el texto que sale en el resultado del
+   * buscador. Medido el 29/10/2026 por la mañana en el HTML servido: esperado «1.º de carrera» ·
+   * obtenido «1º de carrera». Re-medido por la tarde: «1.º de carrera», y ningún «1º» en el title,
+   * el openGraph, el twitter, el JSON-LD ni la página (caso del bloque de la tarde).
    */
   test('hallazgo · la description escribe el ordinal con punto («1.º»), como el FAQPage («2.º curso»)', async ({ page }) => {
     // REPARADO (3779, 29/10/2026): decía «1º de carrera»
@@ -1948,5 +1950,375 @@ test.describe('Inspector 29/10/2026 · móvil 360 × 740', () => {
       avanzar: 0,
       aciertos: '✓ 1 acierto',
     });
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// INSPECTOR 29/10/2026 (TARDE) — RE-INSPECCIÓN TRAS /REPARAR
+// ─────────────────────────────────────────────────────────────────────────────
+//
+// Vuelve a la cola por 5b65607f (3770 en la familia: «Siguiente» recibe el foco con
+// enfocarSinCentrar, sin que Chrome lo centre; y 3779 de esta app, la description con «1.º»). La
+// guarda de ráfaga (lib/useGuardaRafaga.ts) frena desde f0b18db0 también el mousedown del 2.º toque.
+// Lo que el testigo de la familia no mide aquí: los modos de práctica por categoría. Todos los
+// valores esperados se resolvieron a mano ANTES de ejecutar, con motor.ts (nota = aciertos·10/total,
+// escala RD 1125/2003; Math.round para el %) y el render de page.tsx.
+//
+// Medido por la tarde con scripts aparte: a 360 × 640, examen entero fallando con la opción más
+// baja (semilla 1), 0 de 30 veredictos fuera de la vista tras contestar, el foco siempre en
+// «Siguiente» y, tras avanzar, en el enunciado. Límite que no es hallazgo: a 320 × 568, con las
+// dos explicaciones más largas (traducción mitocondrial y cola poli-A), el bloque del veredicto
+// mide más que la pantalla y, al asomar «Siguiente», el «✗ Incorrecto» queda arriba (y = −25…0):
+// no cabe todo y el foco tiene que verse (WCAG 2.4.11).
+
+/** Los 6 enunciados de cada categoría: CLAVE se escribió a mano en bloques de 6 (ids 1-6, 7-12…). */
+const ENUNCIADOS_POR_CATEGORIA: Record<string, string[]> = {
+  'ADN y ARN': Object.keys(CLAVE).slice(0, 6),
+  Replicación: Object.keys(CLAVE).slice(6, 12),
+  Transcripción: Object.keys(CLAVE).slice(12, 18),
+  Traducción: Object.keys(CLAVE).slice(18, 24),
+  Mutaciones: Object.keys(CLAVE).slice(24, 30),
+};
+
+/** Posición de un selector frente a la barra fija del logo y el borde inferior. */
+async function posicionFrenteABarra(page: Page, sel: string) {
+  return page.evaluate((s) => {
+    const r = (document.querySelector(s) as Element).getBoundingClientRect();
+    const barra = (document.querySelector('[class*="headerBar"]') as Element).getBoundingClientRect().bottom;
+    return { arriba: Math.round(r.top), abajo: Math.round(r.bottom), barra: Math.round(barra), alto: innerHeight };
+  }, sel);
+}
+
+/**
+ * Cómo se distingue el botón de modo pulsado (aria-pressed="true") del otro: su borde frente a la
+ * tarjeta (si es distinto del borde del otro) y su fondo frente al fondo del otro, compuestos sobre
+ * la tarjeta de inicio, que es opaca.
+ */
+async function indicadorModo(page: Page) {
+  return page.evaluate(() => {
+    const leer = (c: string): number[] => {
+      const m = c.match(/rgba?\(([^)]+)\)/);
+      if (!m) return [0, 0, 0, 0];
+      const p = m[1].split(/[ ,/]+/).filter(Boolean).map(Number);
+      return [p[0], p[1], p[2], p[3] ?? 1];
+    };
+    const sobre = (f: number[], b: number[]): number[] => [0, 1, 2].map((i) => f[i] * f[3] + b[i] * (1 - f[3])).concat(1);
+    const lum = (c: number[]): number => {
+      const f = (v: number): number => {
+        const x = v / 255;
+        return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4;
+      };
+      return 0.2126 * f(c[0]) + 0.7152 * f(c[1]) + 0.0722 * f(c[2]);
+    };
+    const ratio = (a: number[], b: number[]): number => {
+      const [x, y] = [lum(a), lum(b)];
+      return Math.round(((Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05)) * 100) / 100;
+    };
+    const tarjeta = leer(getComputedStyle(document.querySelector('[class*="inicioCard"]') as Element).backgroundColor);
+    const botones = [...document.querySelectorAll<HTMLButtonElement>('button[class*="modoBtn"]')];
+    const pintura = (b: HTMLButtonElement) => {
+      const cs = getComputedStyle(b);
+      const fondo = sobre(leer(cs.backgroundColor), tarjeta);
+      return { borde: cs.borderTopColor, bordeCompuesto: sobre(leer(cs.borderTopColor), fondo), fondo };
+    };
+    const activo = botones.find((b) => b.getAttribute('aria-pressed') === 'true') as HTMLButtonElement;
+    const inactivo = botones.find((b) => b.getAttribute('aria-pressed') === 'false') as HTMLButtonElement;
+    const [a, i] = [pintura(activo), pintura(inactivo)];
+    return {
+      tema: document.documentElement.getAttribute('data-theme'),
+      pulsado: (activo.querySelector('[class*="modoBtnLabel"]')?.textContent ?? '').trim(),
+      mismoBorde: a.borde === i.borde,
+      bordeFrenteATarjeta: a.borde === i.borde ? 1 : ratio(a.bordeCompuesto, tarjeta),
+      fondoFrenteAlOtro: ratio(a.fondo, i.fondo),
+    };
+  });
+}
+
+test.describe('Inspector 29/10/2026 (tarde) — re-inspección tras /reparar', () => {
+  /**
+   * CASO NORMAL — las 5 prácticas por categoría seguidas, volviendo al inicio entre una y otra.
+   * Resuelto a mano ANTES de ejecutar (B = bien, M = mal, en el orden en que salgan):
+   *   · ADN y ARN BMMMMM → 1/6 · Math.round(16,67) = «17 %» · nota 10/6 = 1,67 → «1,7» → < 5
+   *     «Insuficiente» 😟 · 5 errores · racha 1.
+   *   · Replicación BBBBBB → 6/6 · «100 %» · nota 10 → pleno «¡Perfecto!» 🏆 · 0 errores · racha 6.
+   *   · Transcripción BMBBMB → 4/6 · Math.round(66,67) = «67 %» · nota 6,67 → «6,7» → [5 · 7)
+   *     «Aprobado» 😊 · 2 errores · racha máx. 2.
+   *   · Traducción BBBBBM → 5/6 · Math.round(83,33) = «83 %» · nota 8,33 → «8,3» → [7 · 9)
+   *     «Notable» 👍 · 1 error · racha 5.
+   *   · Mutaciones MBBBMM → 3/6 · «50 %» · nota 5 justo → «Aprobado» 😊 · 3 errores · racha 3.
+   * En cada una: «Pregunta n de 6», la insignia de la pregunta es la de la categoría elegida, salen
+   * EXACTAMENTE sus 6 enunciados (sin repetir ni colarse otra), el desglose tiene una sola fila con
+   * la barra al mismo % y la tarjeta se anuncia «Resultado: k de 6 aciertos, <clasificación>».
+   */
+  test('caso normal: las 5 prácticas por categoría seguidas dan cada una su recuento, su nota y una sola fila de desglose', async ({ page }) => {
+    test.setTimeout(150_000);
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await abrir(page);
+    await esperarHidratado(page, /Comenzar quiz/);
+    const PLAN = [
+      { cat: 'ADN y ARN', patron: 'BMMMMM', circulo: '1/6', etiqueta: 'Insuficiente', emoji: '😟', pct: '17 %', nota: 'Nota: 1,7 sobre 10', stats: ['1Aciertos', '5Errores', '1Racha máx.'], fila: 'ADN y ARN 1/6 17%' },
+      { cat: 'Replicación', patron: 'BBBBBB', circulo: '6/6', etiqueta: '¡Perfecto!', emoji: '🏆', pct: '100 %', nota: 'Nota: 10,0 sobre 10', stats: ['6Aciertos', '0Errores', '6Racha máx.'], fila: 'Replicación 6/6 100%' },
+      { cat: 'Transcripción', patron: 'BMBBMB', circulo: '4/6', etiqueta: 'Aprobado', emoji: '😊', pct: '67 %', nota: 'Nota: 6,7 sobre 10', stats: ['4Aciertos', '2Errores', '2Racha máx.'], fila: 'Transcripción 4/6 67%' },
+      { cat: 'Traducción', patron: 'BBBBBM', circulo: '5/6', etiqueta: 'Notable', emoji: '👍', pct: '83 %', nota: 'Nota: 8,3 sobre 10', stats: ['5Aciertos', '1Errores', '5Racha máx.'], fila: 'Traducción 5/6 83%' },
+      { cat: 'Mutaciones', patron: 'MBBBMM', circulo: '3/6', etiqueta: 'Aprobado', emoji: '😊', pct: '50 %', nota: 'Nota: 5,0 sobre 10', stats: ['3Aciertos', '3Errores', '3Racha máx.'], fila: 'Mutaciones 3/6 50%' },
+    ];
+    for (const [k, p] of PLAN.entries()) {
+      if (k > 0) await page.getByRole('button', { name: 'Volver al inicio' }).click();
+      await empezar(page, 'practica', p.cat);
+      const vistas: string[] = [];
+      for (let n = 1; n <= POR_CATEGORIA; n++) {
+        await expect(page.getByText(`Pregunta ${n} de ${POR_CATEGORIA}`)).toBeVisible();
+        await expect(page.locator('[class*="categoriaBadge"]')).toContainText(p.cat);
+        vistas.push((await responder(page, p.patron[n - 1] === 'B' ? 'bien' : 'mal')).texto);
+        await botonAvanzar(page).click();
+      }
+      expect([...vistas].sort(), `${p.cat}: sus 6 enunciados, sin repetir ni colarse otra`).toEqual([...ENUNCIADOS_POR_CATEGORIA[p.cat]].sort());
+      const { cat, patron, fila, ...esperado } = p;
+      expect(await resultado(page), `${cat} ${patron}`).toEqual(esperado);
+      expect(await filasDesglose(page), cat).toEqual([fila]);
+      await expect(page.locator('[class*="resultadoCard"]')).toHaveAttribute(
+        'aria-label',
+        `Resultado: ${p.circulo.split('/')[0]} de ${POR_CATEGORIA} aciertos, ${p.etiqueta}`,
+      );
+    }
+  });
+
+  /**
+   * DEBE RECHAZARSE — un doble clic en una opción es UNA respuesta. Resuelto a mano leyendo page.tsx
+   * y lib/useGuardaRafaga.ts: el 1.º clic contesta (las 4 quedan disabled y `responder` marca
+   * `soloMismoPunto`); el 2.º, en el mismo punto y con detail 2, cae sobre un botón deshabilitado y
+   * además la guarda lo ignora. Práctica de Mutaciones: doble clic en la correcta de la 1.ª →
+   * «✓ 1 acierto», 4 bloqueadas, veredicto y «Siguiente» presentes, una sola opción marcada como
+   * correcta y ninguna como fallada, y sigue en «Pregunta 1 de 6». Tras «Siguiente», doble clic en
+   * una falsa de la 2.ª → el marcador sigue en «✓ 1 acierto», una sola fallada, «Pregunta 2 de 6».
+   */
+  test('debe rechazarse: un doble clic en una opción cuenta una sola respuesta y no avanza', async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await abrir(page);
+    await esperarHidratado(page, /Comenzar quiz/);
+    await empezar(page, 'practica', 'Mutaciones');
+    await page.waitForTimeout(500); // fuera de la ventana de ráfaga del clic en «Comenzar»
+    let ops = await textosOpcion(page);
+    await opciones(page).nth(ops.indexOf(CLAVE[norm(await enunciado(page).innerText())])).dblclick();
+    await page.waitForTimeout(400);
+    expect(await estadoPregunta(page), 'doble clic en la correcta').toEqual({
+      opciones: 4,
+      bloqueadas: 4,
+      contador: 'Pregunta 1 de 6',
+      veredicto: 1,
+      avanzar: 1,
+      aciertos: '✓ 1 acierto',
+    });
+    await expect(page.locator('[class*="opcionCorrecta"]')).toHaveCount(1);
+    await expect(page.locator('[class*="opcionIncorrecta"]')).toHaveCount(0);
+
+    await botonAvanzar(page).click();
+    await expect(page.getByText('Pregunta 2 de 6')).toBeVisible();
+    await page.waitForTimeout(500);
+    ops = await textosOpcion(page);
+    const iCorrecta = ops.indexOf(CLAVE[norm(await enunciado(page).innerText())]);
+    await opciones(page).nth(iCorrecta === 0 ? 1 : 0).dblclick();
+    await page.waitForTimeout(400);
+    expect(await estadoPregunta(page), 'doble clic en una falsa').toEqual({
+      opciones: 4,
+      bloqueadas: 4,
+      contador: 'Pregunta 2 de 6',
+      veredicto: 1,
+      avanzar: 1,
+      aciertos: '✓ 1 acierto',
+    });
+    await expect(page.locator('[class*="opcionIncorrecta"]')).toHaveCount(1);
+  });
+
+  /**
+   * HALLAZGO (accesibilidad) — ABIERTO. Forma del cabo C0514 (la variante del doble toque sobre una
+   * OPCIÓN, medida también en quiz-simbolos-quimicos). Tras contestar, 5b65607f lleva el foco a
+   * «Siguiente»; pero el 2.º clic del doble clic cae sobre la opción, que ya está disabled. Chrome no
+   * entrega mousedown ni click a un botón deshabilitado (solo pointerdown), así que el freno del
+   * mousedown de useGuardaRafaga (f0b18db0) no lo ve, y el navegador suelta el foco a <body>.
+   * Medido el 29/10/2026 (tarde): a 1280 × 800 con el ratón, 6 de 6 dobles clics en una opción
+   * dejan el foco en <body>; a 360 × 740 con dos toques a 120 ms, 2 de 6 (los de la opción A: en las
+   * otras la página sube al asomar «Siguiente» y el 2.º toque ya no cae en la opción). Después, Enter
+   * no hace nada («Pregunta 1 de 6» sigue) y solo el Tab llega a «Siguiente». La respuesta cuenta una
+   * vez (caso de arriba): lo que se pierde es el foco.
+   * Lo correcto (invariante de la familia): el foco nunca cae a <body>; tras contestar, en «Siguiente».
+   */
+  test('hallazgo · tras un doble clic en una opción el foco sigue en «Siguiente» y Enter avanza', async ({ page }) => {
+    test.fail(true, 'ABIERTO (forma del cabo C0514): el foco cae a <body> y Enter no avanza');
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await abrir(page);
+    await esperarHidratado(page, /Comenzar quiz/);
+    await empezar(page, 'practica', 'Mutaciones');
+    await page.waitForTimeout(500);
+    const ops = await textosOpcion(page);
+    await opciones(page).nth(ops.indexOf(CLAVE[norm(await enunciado(page).innerText())])).dblclick();
+    await expect(page.locator('[class*="feedbackCorrecto"]')).toBeVisible();
+    await expect(aciertosBadge(page)).toHaveText('✓ 1 acierto');
+    await page.waitForTimeout(400);
+    await expect(botonAvanzar(page), 'el foco tras el doble clic').toBeFocused({ timeout: 1000 });
+    await page.keyboard.press('Enter');
+    await expect(page.getByText('Pregunta 2 de 6')).toBeVisible({ timeout: 2000 });
+  });
+
+  /**
+   * REPARACIÓN DE 3779 — la forma, no solo el caso: el ordinal sin punto no está en ninguna boca.
+   * Resuelto a mano leyendo metadata.ts y page.tsx: la description dice «1.º de carrera», el FAQPage
+   * «2.º curso», el title, el openGraph y el twitter no llevan ordinales, y la página (con la guía
+   * abierta) tampoco. Medido el 29/10/2026 (tarde): lo mismo.
+   */
+  test('3779 · ningún ordinal sin punto («1º») en el title, la description, el openGraph, el twitter, el JSON-LD ni la página', async ({ page }) => {
+    const html = await (await page.request.get(RUTA)).text();
+    const leer = (re: RegExp): string => html.match(re)?.[1] ?? '';
+    const bocas: Record<string, string> = {
+      title: leer(/<title>([^<]*)<\/title>/),
+      description: leer(/<meta name="description" content="([^"]*)"/),
+      'og:description': leer(/<meta property="og:description" content="([^"]*)"/),
+      'twitter:description': leer(/<meta name="twitter:description" content="([^"]*)"/),
+      'JSON-LD': [...html.matchAll(/<script type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g)].map((m) => m[1]).join(' '),
+    };
+    for (const [boca, texto] of Object.entries(bocas)) expect(texto, `${boca} en el HTML servido`).not.toBe('');
+    expect(bocas.description).toContain('Para Bachillerato y 1.º de carrera.');
+    expect(bocas['JSON-LD']).toContain('2.º curso');
+    await abrir(page);
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    bocas['página'] = await page.locator('body').innerText();
+    const sinPunto = Object.entries(bocas).flatMap(([boca, t]) => (t.match(/\d[ºª]/g) ?? []).map((m) => `${boca}: «${m}»`));
+    expect(sinPunto).toEqual([]);
+  });
+});
+
+test.describe('Inspector 29/10/2026 (tarde) · móvil 360 × 640', () => {
+  test.use({
+    viewport: { width: 360, height: 640 },
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Mobile Safari/537.36',
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  /**
+   * CASO LÍMITE (móvil, con el dedo) — práctica de Traducción, que tiene la explicación más larga del
+   * banco (la de «¿Dónde ocurre la traducción en eucariotas?», con las 13 proteínas del ADN
+   * mitocondrial), fallando las 6 con la opción más baja, la que obliga a bajar. Resuelto a mano
+   * leyendo page.tsx y lib/cromoFijo.ts (5b65607f): al contestar, el foco va a «Siguiente» sin
+   * centrarlo y, si no se ve, la página baja lo justo para que asome, así que el «✗ Incorrecto» y el
+   * botón quedan los dos entre la barra del logo y el borde inferior (a 360 × 640 el bloque más
+   * largo mide ~490 px y caben 578); tras «Siguiente», el foco en el enunciado nuevo, a la vista. Al
+   * final: 0/6 → nota 0 → «Insuficiente» 😟 · «0 %» · 6 errores · racha 0, el foco en la tarjeta y
+   * el círculo de la nota a la vista. Salen exactamente los 6 enunciados de Traducción.
+   */
+  test('caso límite (móvil): práctica de Traducción fallando con la más baja deja veredicto y «Siguiente» a la vista y da 0/6', async ({ page }) => {
+    test.setTimeout(90_000);
+    await abrir(page);
+    await esperarHidratado(page, /Comenzar quiz/);
+    for (const control of [
+      page.getByRole('button', { name: /Práctica por categoría/ }),
+      page.locator('button[class*="categoriaBtn"]', { hasText: 'Traducción' }),
+      page.getByRole('button', { name: /Comenzar quiz/ }),
+    ]) {
+      await page.waitForTimeout(500); // fuera de la ventana de ráfaga del toque anterior
+      await bajarLoJusto(control);
+      await tocarCentro(page, control);
+    }
+    const fuera: string[] = [];
+    const vistas: string[] = [];
+    for (let n = 1; n <= POR_CATEGORIA; n++) {
+      await expect(page.getByText(`Pregunta ${n} de ${POR_CATEGORIA}`)).toBeVisible();
+      await expect(enunciado(page)).toBeFocused();
+      const e = await posicionFrenteABarra(page, '[class*="preguntaTexto"]');
+      if (e.arriba < e.barra || e.abajo > e.alto) fuera.push(`enunciado de la ${n}: ${JSON.stringify(e)}`);
+      const texto = norm(await enunciado(page).innerText());
+      vistas.push(texto);
+      const i = (await textosOpcion(page)).indexOf(CLAVE[texto]);
+      expect(i, `«${texto}» con su respuesta entre las opciones`).toBeGreaterThanOrEqual(0);
+      const o = opciones(page).nth(i === 3 ? 2 : 3);
+      await page.waitForTimeout(500); // lee la pregunta
+      await bajarLoJusto(o);
+      await tocarCentro(page, o);
+      await expect(page.locator('[class*="feedbackIncorrecto"]')).toBeVisible();
+      const avanzar = botonAvanzar(page);
+      await expect(avanzar).toBeFocused();
+      await page.waitForTimeout(250); // la segunda mirada de enfocarSinCentrar (120 ms)
+      const v = await posicionFrenteABarra(page, '[class*="feedbackResultado"]');
+      const s = await posicionFrenteABarra(page, '[class*="btnSiguiente"]');
+      if (v.arriba < v.barra || v.abajo > v.alto) fuera.push(`veredicto de la ${n}: ${JSON.stringify(v)}`);
+      if (s.arriba < s.barra || s.abajo > s.alto) fuera.push(`«Siguiente» de la ${n}: ${JSON.stringify(s)}`);
+      await expect(avanzar).toHaveText(n < POR_CATEGORIA ? 'Siguiente pregunta →' : 'Ver resultados →');
+      await page.waitForTimeout(500);
+      await bajarLoJusto(avanzar);
+      await tocarCentro(page, avanzar);
+    }
+    const tarjeta = page.locator('[class*="resultadoCard"]');
+    await expect(tarjeta).toBeFocused();
+    const c = await posicionFrenteABarra(page, '[class*="puntuacionCirculo"]');
+    if (c.arriba < c.barra || c.abajo > c.alto) fuera.push(`nota: ${JSON.stringify(c)}`);
+    expect(fuera).toEqual([]);
+    expect([...vistas].sort()).toEqual([...ENUNCIADOS_TRADUCCION].sort());
+    expect(await resultado(page)).toEqual({
+      circulo: '0/6',
+      etiqueta: 'Insuficiente',
+      emoji: '😟',
+      pct: '0 %',
+      nota: 'Nota: 0,0 sobre 10',
+      stats: ['0Aciertos', '6Errores', '0Racha máx.'],
+    });
+    expect(await filasDesglose(page)).toEqual(['Traducción 0/6 0%']);
+  });
+});
+
+test.describe('Inspector 29/10/2026 (tarde) · móvil 360 × 740', () => {
+  test.use({
+    viewport: { width: 360, height: 740 },
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Mobile Safari/537.36',
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  const tocarModo = async (page: Page, nombre: RegExp): Promise<void> => {
+    const b = page.getByRole('button', { name: nombre });
+    await page.waitForTimeout(500);
+    await bajarLoJusto(b);
+    await tocarCentro(page, b);
+    await page.mouse.move(0, 0); // sin :hover pegado tras el toque
+    await page.waitForTimeout(200);
+  };
+
+  /**
+   * Control en CLARO — resuelto a mano con el CSS del módulo: `.modoBtnActivo` pone el borde en
+   * var(--primary) (#2E86AB) y el otro botón lo lleva en rgba(0, 0, 0, 0,1); #2E86AB sobre la tarjeta
+   * blanca da 4,11:1 (≥ 3:1, WCAG 1.4.11). Al tocar «Práctica por categoría», es el pulsado.
+   */
+  test('control: en claro, el modo elegido se distingue del otro por su borde (≥ 3:1)', async ({ page }) => {
+    await abrir(page, 'light');
+    await prepararParaMedir(page);
+    await tocarModo(page, /Práctica por categoría/);
+    const r = await indicadorModo(page);
+    expect(r).toMatchObject({ tema: 'light', pulsado: 'Práctica por categoría', mismoBorde: false });
+    expect(r.bordeFrenteATarjeta).toBeGreaterThanOrEqual(3);
+  });
+
+  /**
+   * HALLAZGO (accesibilidad) — ABIERTO. La forma del 1744 en el selector de modo: en oscuro,
+   * `[data-theme='dark'] .modoBtn` (0,2,0) pisa el borde de `.modoBtnActivo` (0,1,0), así que el modo
+   * pulsado lleva el MISMO borde que el otro, rgba(255, 255, 255, 0,1); `[data-theme='dark']
+   * .modoBtnActivo` solo cambia el fondo, a rgba(46, 134, 171, 0,15) frente a rgba(255, 255, 255,
+   * 0,04): sobre la tarjeta rgb(45, 45, 45) son rgb(45, 58, 64) y rgb(53, 53, 53), 1,04:1. Iconos y
+   * textos son iguales en los dos: en oscuro no se ve cuál está elegido (aria-pressed sí lo dice al
+   * lector de pantalla; a la vista solo lo delata lo que aparece debajo, la lista de categorías o
+   * las insignias). Las categorías no tienen el problema: su borde va en `style`. Resuelto a mano con
+   * el CSS ANTES de medir; medido el 29/10/2026 (tarde): lo mismo, 1,04:1.
+   * Lo correcto: el pulsado se distingue del otro con al menos 3:1 (WCAG 1.4.11), como en claro.
+   */
+  test('hallazgo · en oscuro el modo elegido se distingue del otro (borde o fondo ≥ 3:1)', async ({ page }) => {
+    test.fail(true, 'ABIERTO: en oscuro los dos botones de modo llevan el mismo borde y los fondos dan 1,04:1');
+    await abrir(page, 'dark');
+    await prepararParaMedir(page);
+    await tocarModo(page, /Práctica por categoría/);
+    const r = await indicadorModo(page);
+    expect(r).toMatchObject({ tema: 'dark', pulsado: 'Práctica por categoría' });
+    expect(Math.max(r.bordeFrenteATarjeta, r.fondoFrenteAlOtro), JSON.stringify(r)).toBeGreaterThanOrEqual(3);
   });
 });

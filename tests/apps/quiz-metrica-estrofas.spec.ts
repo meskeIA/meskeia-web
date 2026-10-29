@@ -468,6 +468,8 @@ test.describe('Inspector 28/10/2026 · hallazgos de la partida', () => {
   test('hallazgo · emojis sin aria-hidden en la región viva, los niveles y la categoría; barra de progreso sin nombre', async ({ page }) => {
     // page.tsx:240-249 (🟢🟡🔴 y 📏🏛️🎵✍️ en cadenas que se pintan), :509-511 (✅/❌ dentro del
     // role="alert") y :459-466 (role="progressbar" sin aria-label).
+    // La parte de la barra quedó REPARADA el 29/10/2026 (56bfa250, hermana de 3773: «Progreso del
+    // quiz»); el test sigue fallando por los emojis, que el 3678 conserva abiertos.
     test.fail();
     await abrir(page);
     const fallos: string[] = [];
@@ -822,5 +824,379 @@ test.describe('Inspector 29/10/2026 · caso límite a 360 × 740', () => {
     expect(r.subtitulo).toBe('9 de 10 respuestas correctas');
     expect(r.stats.Correctas).toBe('9/10');
     expect(r.stats.Acierto).toMatch(new RegExp(`^90${DURO}?%$`));
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * INSPECTOR 29/10/2026 (tarde) — re-inspección tras /reparar
+ *
+ * Vuelve a la cola por 56bfa250 (hermanas de 3770, 3772 y 3773: «Siguiente» enfocado con
+ * `enfocarSinCentrar`, el tiempo en «min» y «s» y el aria-label «Progreso del quiz» de la barra) y
+ * por la guarda de ráfagas compartida (f0b18db0: frena también el mousedown del 2.º toque). Nada se
+ * da por bueno porque el commit exista. Medido por la tarde con sondas fuera del repositorio:
+ *   · 3772 (hermana): 59 000 ms → «59 s»; 60 000 → «1 min 0 s»; 3 725 000 → «62 min 5 s». Bien.
+ *   · 3773 (hermana): nombre «Progreso del quiz»; aria-valuenow 0 en 1/8 y 7 en 8/8 (preguntas ya
+ *     contestadas, el criterio de la familia), aria-valuemax 8. Bien.
+ *   · 3770 (hermana): fallando con la opción más baja en Avanzado (8) e Intermedio (10), 0 de 18
+ *     veredictos fuera de la vista a 360 × 640 y 0 de 18 a 360 × 740; «Siguiente» enfocado con el
+ *     borde inferior a 8 px del de la ventana (632 de 640), nunca centrado. Bien.
+ *   · Teclado a 1280 × 800: Enter en la opción → «Siguiente»; Enter → el enunciado nuevo; «Ver
+ *     resultados» → el panel del resultado. Recuento y nota bien en tres partidas seguidas.
+ *   · Cabos de la familia: C0515 limpio (lo de arriba) · C0518 limpio (flex-wrap: a 360 px los tres
+ *     botones en dos filas dentro de la tarjeta, 16…344; a 320 px, en tres) · C0514, variante del
+ *     doble toque sobre una OPCIÓN, reproducido · C0516 reproducido. Los dos, hallazgos nuevos abajo.
+ */
+async function relojFijo(page: Page): Promise<void> {
+  await page.addInitScript(() => {
+    const real = Date.now.bind(Date);
+    const w = window as unknown as { __fijo?: number };
+    Date.now = () => (typeof w.__fijo === 'number' ? w.__fijo : real());
+  });
+}
+
+const fijarReloj = (page: Page, t: number): Promise<void> =>
+  page.evaluate((x) => {
+    (window as unknown as { __fijo: number }).__fijo = x;
+  }, t);
+
+const barraProgreso = (page: Page) =>
+  page.locator('[role="progressbar"]').evaluate((b) => ({
+    now: b.getAttribute('aria-valuenow'),
+    max: b.getAttribute('aria-valuemax'),
+    ancho: (b as HTMLElement).style.width,
+  }));
+
+/** Geometría del veredicto y de «Siguiente» frente a la barra fija del logo y al borde inferior. */
+async function vistaTrasContestar(page: Page) {
+  return page.evaluate(() => {
+    const caja = (e: Element | null) => {
+      if (!e) return null;
+      const r = e.getBoundingClientRect();
+      return { arriba: Math.round(r.top), abajo: Math.round(r.bottom) };
+    };
+    const barra = document.querySelector('[class*="headerBar"]');
+    const sig = document.querySelector('[class*="btnSiguiente"]');
+    return {
+      veredicto: caja(document.querySelector('[class*="feedbackCabecera"]')),
+      siguiente: caja(sig),
+      enfocado: document.activeElement === sig,
+      barra: barra ? Math.round(barra.getBoundingClientRect().bottom) : 0,
+      pildora: barra?.firstElementChild ? Math.round(barra.firstElementChild.getBoundingClientRect().bottom) : 0,
+      alto: innerHeight,
+      scroll: Math.round(scrollY),
+    };
+  });
+}
+
+/** Doble clic de ratón en el centro de `loc`: 1.er clic (detail 1) y, 90 ms después, el 2.º (detail 2). */
+async function dobleClicEn(page: Page, loc: Locator): Promise<void> {
+  const c = await loc.boundingBox();
+  if (!c) throw new Error('sin caja');
+  await page.mouse.move(c.x + c.width / 2, c.y + c.height / 2);
+  await page.mouse.down({ clickCount: 1 });
+  await page.mouse.up({ clickCount: 1 });
+  await page.waitForTimeout(90);
+  await page.mouse.down({ clickCount: 2 });
+  await page.mouse.up({ clickCount: 2 });
+  await page.waitForTimeout(400);
+}
+
+test.describe('Inspector 29/10/2026 (tarde) · escritorio 1280 × 800', () => {
+  test.use({ viewport: { width: 1280, height: 800 } });
+
+  /**
+   * CASO NORMAL — tres partidas seguidas de Básico con 8 («Jugar de nuevo»), la 1.ª con teclado, y
+   * el reloj fijo para que el tiempo sea EXACTO. A mano con calcularPuntuacion, getResultadoTexto y
+   * formatTiempo (page.tsx:276-289 y 374-379; tiempoTotal = round(ms / 1000)):
+   *  · P1, 5 bien y 3 mal, 59 000 ms: 5/8 = 0,625 → 40 + 0,125/0,2 · 20 = 52,5 → 53 pts, «Buen
+   *    intento», «5/8»; 59 s → m = 0 → «59 s».
+   *  · P2, 8 bien, 60 000 ms: 8/8 → 100 pts, «¡Dominas la métrica!», «8/8»; 60 s = 1·60 + 0 →
+   *    «1 min 0 s». «Jugar de nuevo» vuelve a poner tiempoInicio (iniciarQuiz): si no lo hiciera,
+   *    contaría desde P1, 10 060 s → «167 min 40 s».
+   *  · P3, 0 bien, 3 725 000 ms: 0/8 → 0 pts, «Sigue repasando», «0/8»; 3725 s = 62·60 + 5 →
+   *    «62 min 5 s» (sin horas: es correcto, solo largo).
+   *  · Barra: nombre «Progreso del quiz»; aria-valuenow = preguntaActual → 0 en 1/8 (ancho 0 %) y
+   *    7 en 8/8 (7/8 · 100 = 87,5 %), aria-valuemax 8. Cada partida arranca en 1/8 con 0 correctas.
+   *  · Teclado en P1: desde el enunciado, Tab × (k + 1) lleva a la opción k; Enter contesta y el foco
+   *    va a «Siguiente»; Enter en «Siguiente» → el enunciado nuevo (tabindex −1); la 8.ª, «Ver
+   *    resultados» → el panel del resultado.
+   */
+  test('caso normal: tres partidas con «Jugar de nuevo» dan «59 s», «1 min 0 s» y «62 min 5 s», con la barra y el foco de teclado en su sitio', async ({ page }) => {
+    test.setTimeout(120_000);
+    await relojFijo(page);
+    await abrir(page);
+    await esperarHidratado(page, /^Empezar Quiz/);
+    await configurar(page, 'Básico', 8);
+    const T0 = 1_000_000_000_000;
+    await fijarReloj(page, T0);
+    await empezar(page);
+    await expect(page.getByRole('progressbar')).toHaveAccessibleName('Progreso del quiz');
+    expect(await barraProgreso(page)).toEqual({ now: '0', max: '8', ancho: '0%' });
+    expect((await hud(page)).slice(0, 2)).toEqual(['1/8', '0']);
+    await expect.poll(() => enunciadoConFoco(page)).toBe(true);
+
+    for (let n = 1; n <= 8; n++) {
+      const f = await fichaVisible(page);
+      const ops = await textosOpcion(page);
+      const iC = ops.indexOf(f.correcta);
+      const k = n <= 5 ? iC : iC === 0 ? 1 : 0;
+      for (let t = 0; t <= k; t++) await page.keyboard.press('Tab');
+      expect(await page.evaluate(() => document.activeElement?.getAttribute('aria-label') ?? '')).toBe(`Opción ${'ABCD'[k]}: ${ops[k]}`);
+      await page.keyboard.press('Enter');
+      const sig = page.getByRole('button', { name: n < 8 ? /Siguiente pregunta/ : /Ver resultados/ });
+      await expect(sig).toBeFocused();
+      if (n === 8) {
+        expect(await barraProgreso(page)).toEqual({ now: '7', max: '8', ancho: '87.5%' });
+        expect((await hud(page)).slice(0, 2)).toEqual(['8/8', '5']);
+        await fijarReloj(page, T0 + 59_000);
+      }
+      await page.keyboard.press('Enter');
+      if (n < 8) await expect.poll(() => enunciadoConFoco(page)).toBe(true);
+    }
+    await expect(page.locator('[class*="resultadoPanel"]')).toBeFocused();
+    let r = await resultado(page);
+    expect([r.puntos, r.titulo, r.stats.Correctas, r.stats.Tiempo]).toEqual(['53 pts', 'Buen intento', '5/8', '59 s']);
+
+    const PARTIDAS: [number, number, string[]][] = [
+      [60_000, 8, ['100 pts', '¡Dominas la métrica!', '8/8', '1 min 0 s']],
+      [3_725_000, 0, ['0 pts', 'Sigue repasando', '0/8', '62 min 5 s']],
+    ];
+    let Ti = T0;
+    for (const [ms, bien, esperado] of PARTIDAS) {
+      Ti += 10_000_000;
+      await fijarReloj(page, Ti);
+      await page.getByRole('button', { name: /Jugar de nuevo/ }).click();
+      await expect(page.locator('[class*="preguntaCard"]')).toBeVisible();
+      expect((await hud(page)).slice(0, 2)).toEqual(['1/8', '0']);
+      expect(await barraProgreso(page)).toEqual({ now: '0', max: '8', ancho: '0%' });
+      for (let n = 1; n <= 8; n++) {
+        await responder(page, n <= bien ? 'bien' : 'mal');
+        if (n === 8) await fijarReloj(page, Ti + ms);
+        await page.waitForTimeout(150);
+        await avanzar(page);
+      }
+      r = await resultado(page);
+      expect([r.puntos, r.titulo, r.stats.Correctas, r.stats.Tiempo]).toEqual(esperado);
+    }
+    expect(r.marca).toBe('sin-recarga');
+  });
+});
+
+test.describe('Inspector 29/10/2026 (tarde) · móvil 360 × 640', () => {
+  test.use({
+    viewport: { width: 360, height: 640 },
+    userAgent: 'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Mobile Safari/537.36',
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  /**
+   * CASO LÍMITE — las explicaciones más largas en la pantalla más baja de la medida del 3770.
+   * Avanzado con 8 (su banco entero: verso blanco, 253 caracteres de explicación y la clave más
+   * larga; décima, 248; petrarquista, 243) e Intermedio con 10 (su banco entero), tocando como un
+   * dedo y fallando siempre con la opción más baja (la D, o la C si la D es la buena), que es la que
+   * más mueve la página al contestar. A mano:
+   *  · tras cada respuesta, el veredicto («Incorrecto» + «Respuesta correcta: …», .feedbackCabecera)
+   *    ENTERO entre la píldora del logo y el borde inferior (640), y «Siguiente» con el foco y entero
+   *    bajo la barra; si la página se movió, su borde inferior a ≤ 40 px del de la ventana (`nearest`
+   *    lo deja a 8 px, el scroll-padding inferior; centrado quedaría a ~300): 0 de 18 fuera;
+   *  · tras tocar «Siguiente», el foco en el enunciado nuevo;
+   *  · 0/8 y 0/10 → p·80 = 0 pts, «Sigue repasando», «0 de 8» y «0 de 10 respuestas correctas».
+   *  · Cabo C0518: a 360 px la fila «Número de preguntas» se parte (flex-wrap) y sus tres botones
+   *    quedan dentro de la tarjeta; el documento no pasa de 360 px de ancho.
+   */
+  test('caso límite: 18 respuestas táctiles fallando con la opción más baja, sin un veredicto tapado ni «Siguiente» centrado', async ({ page }) => {
+    test.setTimeout(150_000);
+    await abrir(page);
+    await esperarHidratado(page, /^Empezar Quiz/);
+    const fila = await page.evaluate(() => {
+      const tarjeta = document.querySelector('[class*="configPanel"]')!.getBoundingClientRect();
+      const fuera = [...document.querySelectorAll('[class*="preguntasRow"] button')].filter((b) => {
+        const r = b.getBoundingClientRect();
+        return r.left < tarjeta.left || r.right > tarjeta.right || r.right > innerWidth;
+      }).length;
+      return { botones: document.querySelectorAll('[class*="preguntasRow"] button').length, fuera, ancho: document.documentElement.scrollWidth };
+    });
+    expect(fila).toEqual({ botones: 3, fuera: 0, ancho: 360 });
+
+    const fuera: string[] = [];
+    for (const [nivel, num] of [['Avanzado', 8], ['Intermedio', 10]] as const) {
+      if (nivel === 'Intermedio') {
+        await page.getByRole('button', { name: /Cambiar nivel/ }).tap();
+        await expect(page.locator('[class*="configPanel"]')).toBeVisible();
+        await page.waitForTimeout(300);
+      }
+      await configurar(page, nivel, num);
+      await page.waitForTimeout(300);
+      await botonEmpezar(page).tap();
+      await expect(page.locator('[class*="preguntaCard"]')).toBeVisible();
+      for (let n = 1; n <= num; n++) {
+        await page.waitForTimeout(400); // lee la pregunta: el toque no entra en la ráfaga anterior
+        const f = await fichaVisible(page);
+        expect(f.nivel).toBe(nivel === 'Avanzado' ? 'avanzado' : 'intermedio');
+        const iC = (await textosOpcion(page)).indexOf(f.correcta);
+        const op = opciones(page).nth(iC === 3 ? 2 : 3);
+        await op.evaluate((e) => e.scrollIntoView({ block: 'nearest' }));
+        await page.waitForTimeout(200);
+        const antes = await page.evaluate(() => Math.round(scrollY));
+        const c = await op.boundingBox();
+        if (!c) throw new Error('opción sin caja');
+        await page.touchscreen.tap(c.x + c.width / 2, c.y + c.height / 2);
+        const sig = page.getByRole('button', { name: n < num ? /Siguiente pregunta/ : /Ver resultados/ });
+        await expect(sig).toBeFocused();
+        await page.waitForTimeout(350); // pasada la segunda mirada de enfocarSinCentrar (120 ms)
+        const v = await vistaTrasContestar(page);
+        const donde = `${nivel} ${n}/${num} «${f.enunciado.slice(0, 30)}»`;
+        if (!v.veredicto || v.veredicto.arriba < v.pildora || v.veredicto.abajo > v.alto) {
+          fuera.push(`${donde}: veredicto ${JSON.stringify(v.veredicto)}, píldora hasta ${v.pildora}`);
+        }
+        if (!v.enfocado || !v.siguiente || v.siguiente.arriba < v.barra || v.siguiente.abajo > v.alto) {
+          fuera.push(`${donde}: «Siguiente» ${JSON.stringify(v.siguiente)} enfocado=${v.enfocado}`);
+        } else if (v.scroll !== antes && v.alto - v.siguiente.abajo > 40) {
+          fuera.push(`${donde}: la página saltó ${v.scroll - antes} px y «Siguiente» quedó en ${v.siguiente.arriba}…${v.siguiente.abajo}`);
+        }
+        await page.waitForTimeout(300); // lee la explicación
+        await sig.tap();
+        if (n < num) await expect.poll(() => enunciadoConFoco(page), { message: `${donde}: foco tras «Siguiente»` }).toBe(true);
+      }
+      const r = await resultado(page);
+      expect([r.puntos, r.titulo, r.subtitulo]).toEqual(['0 pts', 'Sigue repasando', `0 de ${num} respuestas correctas`]);
+    }
+    expect(fuera).toEqual([]);
+  });
+});
+
+test.describe('Inspector 29/10/2026 (tarde) · doble clic sobre una opción (1366 × 1024)', () => {
+  test.use({ viewport: { width: 1366, height: 1024 } });
+
+  /**
+   * CASO DE RECHAZO — doble clic de ratón sobre la opción BUENA en las tres primeras de Básico. A
+   * esta altura «Siguiente» ya se ve al contestar y la página no se mueve: el 2.º clic cae en el
+   * mismo punto, sobre la opción que el 1.º acaba de deshabilitar. A mano: `responder` sale si
+   * `seleccionada !== null` y las cuatro quedan disabled → «Correctas» sube de 1 en 1 (1, 2, 3), una
+   * sola opción en verde y ninguna en rojo, y el 2.º clic no contesta la siguiente: se sigue en n/10
+   * con el veredicto «¡Correcto!» montado.
+   */
+  test('caso de rechazo: el doble clic en una opción cuenta un acierto, no dos, y no marca ni contesta otra', async ({ page }) => {
+    await abrir(page);
+    await esperarHidratado(page, /^Empezar Quiz/);
+    await configurar(page, 'Básico', 10);
+    await empezar(page);
+    for (let n = 1; n <= 3; n++) {
+      await page.waitForTimeout(400);
+      const f = await fichaVisible(page);
+      const iC = (await textosOpcion(page)).indexOf(f.correcta);
+      await dobleClicEn(page, opciones(page).nth(iC));
+      await expect(page.locator('[class*="feedbackResultado"]')).toHaveText('¡Correcto!');
+      expect((await hud(page)).slice(0, 2)).toEqual([`${n}/10`, String(n)]);
+      const clases = await opciones(page).evaluateAll((bs) => bs.map((b) => b.className));
+      expect(clases.filter((c) => /opcionCorrecta/.test(c))).toHaveLength(1);
+      expect(clases.filter((c) => /opcionIncorrecta/.test(c))).toHaveLength(0);
+      await avanzar(page);
+      await expect.poll(async () => (await hud(page))[0]).toBe(`${n + 1}/10`);
+    }
+  });
+
+  /**
+   * HALLAZGO NUEVO (accesibilidad, forma del cabo C0514) — tras un doble clic o un doble toque sobre
+   * una opción, el foco cae a <body>. Debería quedarse en «Siguiente», adonde lo lleva la app al
+   * contestar (efecto de foco, page.tsx:355-363, `enfocarSinCentrar`). El 2.º clic cae en el mismo
+   * punto sobre la opción ya deshabilitada: Chrome no entrega mousedown ni click a un botón
+   * deshabilitado, así que el `frenarFoco` de lib/useGuardaRafaga.ts (f0b18db0) no llega a verlo y
+   * el navegador suelta el foco. Después Enter no hace nada (sigue en 1/10) y hace falta un Tab para
+   * volver a «Siguiente». No cuenta de más ni contesta nada (caso de rechazo, arriba). Medido el
+   * 29/10/2026 sobre la buena de Básico: con ratón, 10 de 10 a 1366 × 1024 y 9 de 10 a 1280 × 800;
+   * por toque, 8 de 10 a 360 × 740 y 9 de 10 a 412 × 915. Es lo mismo que el 3802 de
+   * quiz-tabla-periodica: la guarda es compartida.
+   */
+  test('hallazgo · tras un doble clic en una opción, el foco se queda en «Siguiente», no cae a <body>', async ({ page }) => {
+    test.fail();
+    await abrir(page);
+    await esperarHidratado(page, /^Empezar Quiz/);
+    await configurar(page, 'Básico', 10);
+    await empezar(page);
+    const enBody: string[] = [];
+    for (let n = 1; n <= 3; n++) {
+      await page.waitForTimeout(400);
+      const f = await fichaVisible(page);
+      const iC = (await textosOpcion(page)).indexOf(f.correcta);
+      await dobleClicEn(page, opciones(page).nth(iC));
+      await expect(page.locator('[class*="feedbackResultado"]')).toHaveText('¡Correcto!');
+      const fueraDeSiguiente = await page.evaluate(() => !document.activeElement?.matches('[class*="btnSiguiente"]'));
+      if (fueraDeSiguiente) enBody.push(`${n}/10: foco en ${await page.evaluate(() => (document.activeElement === document.body ? '<body>' : document.activeElement?.tagName ?? 'nada'))}`);
+      await avanzar(page);
+      await page.waitForTimeout(300);
+    }
+    expect(enBody).toEqual([]); // medido: 1/10, 2/10 y 3/10 con el foco en <body>
+  });
+
+  /**
+   * HALLAZGO NUEVO (accesibilidad, forma del cabo C0516) — tras contestar, la opción buena y la
+   * fallada solo se distinguen por el color: borde y fondo verdes (#22c55e) o rojos (#ef4444); las
+   * dos con opacidad 1 y las otras dos a 0,5. Su texto visible y su nombre accesible («Opción A: 8»)
+   * no cambian, y no hay ✓/✗ ni pseudoelemento (WCAG 1.4.1). El panel del veredicto sí lo dice con
+   * texto («Incorrecto» · «Respuesta correcta: 10»), pero la lista de opciones no. La referencia,
+   * quiz-literatura-universal, lo resolvió con ✓/✗ visibles (aria-hidden) y «(respuesta correcta)» /
+   * «(tu respuesta, incorrecta)» en el aria-label; igual quiz-tabla-periodica (3776).
+   * A mano: Intermedio con 8, fallar la 1.ª con la opción A (o la B si la A es la buena) → esperado
+   * que el texto o el nombre accesible de la buena y de la fallada cambien al contestar.
+   */
+  test('hallazgo · la opción correcta y la fallada no se distinguen solo por el color', async ({ page }) => {
+    test.fail();
+    await abrir(page);
+    await esperarHidratado(page, /^Empezar Quiz/);
+    await configurar(page, 'Intermedio', 8);
+    await empezar(page);
+    const f = await fichaVisible(page);
+    const iC = (await textosOpcion(page)).indexOf(f.correcta);
+    const iMal = iC === 0 ? 1 : 0;
+    const marcas = () =>
+      opciones(page).evaluateAll((bs) => bs.map((b) => `${(b as HTMLElement).innerText} | ${b.getAttribute('aria-label') ?? ''}`.replace(/\s+/g, ' ').trim()));
+    const antes = await marcas();
+    await opciones(page).nth(iMal).click();
+    await expect(page.locator('[class*="feedbackResultado"]')).toHaveText('Incorrecto');
+    // Sano: el color sí cambia (el defecto es que sea lo ÚNICO que cambia)
+    const clases = await opciones(page).evaluateAll((bs) => bs.map((b) => b.className));
+    expect(/opcionCorrecta/.test(clases[iC]) && /opcionIncorrecta/.test(clases[iMal])).toBe(true);
+    const despues = await marcas();
+    const iguales = [iC, iMal].filter((i) => despues[i] === antes[i]).map((i) => despues[i]);
+    expect(iguales, 'texto y nombre accesible idénticos a antes de contestar').toEqual([]); // medido: los dos iguales
+  });
+});
+
+test.describe('Inspector 29/10/2026 (tarde) · FAQPage', () => {
+  /**
+   * HALLAZGO NUEVO (contenido) — el FAQPage (metadata.ts:84-89; solo lo leen buscadores y asistentes
+   * de IA) responde a «¿Para qué nivel educativo está pensado este quiz de métrica?» que «el nivel
+   * básico trabaja los versos más comunes (octosílabo, endecasílabo) y la sinalefa; el intermedio
+   * introduce estrofas clásicas y esquemas de rima». El banco ya las pone en Básico: tres preguntas
+   * de la categoría estrofa («¿Cuántos versos tiene el soneto?», «¿Qué estrofa de 4 octosílabos tiene
+   * esquema de rima abba?» —estrofa Y esquema de rima— y «¿Qué tipo de verso usa el romance?») y una
+   * de rima («¿Qué tipo de rima coincide solo en las vocales…?»). Contado en page.tsx el 29/10/2026.
+   * Es la misma forma que el 3771 de quiz-literatura-universal; la otra mitad de esa respuesta (el
+   * avanzado y el «cómputo silábico») es el 3670, abierto.
+   */
+  test('hallazgo · el FAQPage no dice que el intermedio «introduce» las estrofas y los esquemas de rima que Básico ya pregunta', async ({ page }) => {
+    test.fail();
+    await page.goto(RUTA);
+    const bloques = await page.evaluate(() =>
+      [...document.querySelectorAll('script[type="application/ld+json"]')].map((s) => s.textContent ?? ''),
+    );
+    type Bloque = { '@type'?: string; mainEntity?: { name: string; acceptedAnswer?: { text?: string } }[] };
+    const faq = bloques.map((b) => JSON.parse(b) as Bloque).find((j) => j['@type'] === 'FAQPage');
+    const respuesta = faq?.mainEntity?.find((q) => /nivel educativo/.test(q.name))?.acceptedAnswer?.text ?? '';
+    const cuenta = (nivel: string, categoria: string): number => BANCO.filter((p) => p.nivel === nivel && p.categoria === categoria).length;
+    expect([cuenta('basico', 'estrofa'), cuenta('basico', 'rima')]).toEqual([3, 1]); // sano: el banco que se ha contado
+    const choques: string[] = [];
+    if (/intermedio introduce estrofas clásicas/.test(respuesta) && cuenta('basico', 'estrofa') > 0) {
+      choques.push(`«el intermedio introduce estrofas clásicas», y Básico ya tiene ${cuenta('basico', 'estrofa')}`);
+    }
+    if (/introduce[^.;]*esquemas de rima/.test(respuesta) && BANCO.some((p) => p.nivel === 'basico' && /esquema de rima/.test(p.enunciado))) {
+      choques.push('«introduce … esquemas de rima», y Básico ya pregunta el esquema abba de la redondilla');
+    }
+    expect(choques).toEqual([]); // medido: los dos
   });
 });

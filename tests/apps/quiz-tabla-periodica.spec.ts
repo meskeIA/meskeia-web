@@ -130,9 +130,10 @@ const CLAVE_IUPAC: Record<string, string> = {
 };
 
 // ── Localizadores. Las clases van hasheadas por CSS Modules pero conservan el nombre
-//    original dentro (p. ej. «QuizTablaPeriodica-module__nE35HW__opcionCorrecta»), y la
-//    opción marcada como correcta NO tiene ninguna marca textual: la clase es el único
-//    asidero posible para leer la clave de respuestas desde fuera.
+//    original dentro (p. ej. «QuizTablaPeriodica-module__nE35HW__opcionCorrecta»). Hasta el
+//    29/10/2026 la opción correcta no llevaba ninguna marca textual y la clase era el único
+//    asidero; desde la reparación del 3776 lleva ✓ y «(respuesta correcta)» en su nombre
+//    accesible (casos 30 y 31), pero la clase sigue siendo el asidero que usan los casos viejos.
 const enunciado = (p: Page): Locator => p.locator('[class*="preguntaTexto"]');
 const opciones = (p: Page): Locator => p.locator('main button[class*="opcion"]');
 const opcionCorrecta = (p: Page): Locator => p.locator('main button[class*="opcionCorrecta"]');
@@ -1738,5 +1739,261 @@ test.describe('Quiz Tabla Periódica · inspector 29/10/2026 (móvil 360 px)', (
     expect(vista.arriba, `nota desde y = ${vista.arriba}; el logo acaba en ${vista.finLogo}`).toBeGreaterThanOrEqual(vista.finLogo);
     expect(vista.abajo).toBeLessThanOrEqual(vista.alto);
     expect(vista.ancho, 'el resultado no desborda en horizontal').toBe(360);
+  });
+});
+
+// ══════════════════════════════════════════════════════════════════════════════════════
+// INSPECTOR 29/10/2026 (tarde) — re-inspección tras /reparar (casos 31 a 33)
+// ══════════════════════════════════════════════════════════════════════════════════════
+//
+// Vuelve a la cola por 2cc8e356 (hallazgo 3776: ✓/✗ visibles con aria-hidden y «(respuesta
+// correcta)» / «(tu respuesta, incorrecta)» en el aria-label de cada opción; y su parte del 3770,
+// enfocarSinCentrar en «Siguiente») y por los de la familia 5b65607f y f0b18db0 (la guarda de
+// ráfagas frena también el mousedown del 2.º toque). El caso 31 mide la reparación entera —fallar Y
+// acertar, en claro Y en oscuro, la buena, la fallada y las neutras—; el 32, lo que podía romper
+// alrededor (veredicto tapado a 360 × 740 y 360 × 640 con las explicaciones más largas, foco tras
+// contestar y tras «Siguiente», marcas sin desbordar), y el 33, el sitio que f0b18db0 no alcanza:
+// el 2.º toque sobre la opción que el 1.º acaba de deshabilitar (forma del cabo C0514).
+// Los hallazgos 3631-3637 de los casos 20-26 siguen abiertos en la base a 29/10/2026 (tarde).
+
+/** La línea del veredicto («✓ ¡Correcto!» / «✗ Incorrecto») frente al logo fijo y a la pantalla. */
+async function vistaDelVeredicto(page: Page): Promise<{ arriba: number; abajo: number; finLogo: number; alto: number; ancho: number }> {
+  return page.evaluate(() => {
+    const logo = document.querySelector('[class*="headerBar"]')?.firstElementChild?.getBoundingClientRect();
+    const v = (document.querySelector('[class*="feedbackResultado"]') as Element).getBoundingClientRect();
+    return {
+      arriba: Math.round(v.top),
+      abajo: Math.round(v.bottom),
+      finLogo: Math.round(logo?.bottom ?? 0),
+      alto: innerHeight,
+      ancho: document.documentElement.scrollWidth,
+    };
+  });
+}
+
+/**
+ * Posiciones del banco con las explicaciones más largas delante (ids 39, 38, 20, 28, 34, 23, 17,
+ * 18, 36 y 40): son las que más empujan «Siguiente» hacia abajo al contestar.
+ */
+const RONDA_LARGA = [38, 37, 19, 27, 33, 22, 16, 17, 35, 39];
+
+/**
+ * CASO 32 — resuelto a mano ANTES de ejecutar, con CLAVE_IUPAC y la lógica de page.tsx:
+ *   1.ª id 39 → «Renio» (CRC Handbook: Re 5.596 °C)          BIEN → ✓ 1 acierto
+ *   2.ª id 38 → la buena es «Estaño»                          mal  → ✓ 1 acierto
+ *   3.ª id 20 → la buena es «Hidrógeno»                       mal  → ✓ 1 acierto
+ *   4.ª id 28 → «7» (grupo 18 de la IUPAC: He, Ne, Ar, Kr, Xe, Rn, Og)  BIEN → ✓ 2 aciertos
+ *   5.ª id 34 → la buena es «Su nombre alemán es "Wolfram"»   mal  → ✓ 2 aciertos
+ *   6.ª id 23 → la buena es «Cloro (Cl)»                      mal  → ✓ 2 aciertos
+ *   7.ª id 17 → «Flúor» (3,98 en la escala de Pauling)        BIEN → ✓ 3 aciertos
+ *   8.ª-10.ª ids 18, 36, 40 → buenas «Mercurio y Bromo», «Helio», «Osmio»  mal → ✓ 3 aciertos
+ * Las falladas, con la opción MÁS BAJA que no sea la buena (D, o C si la buena es la D): es la que
+ * deja el veredicto más arriba al bajar la página hasta «Siguiente».
+ * Tras cada respuesta: la elegida lleva ✓ (si acierta) o ✗ (si falla) y la buena termina su nombre
+ * en «(respuesta correcta)»; el foco está en «Siguiente pregunta →» y el veredicto se ve entero entre
+ * el logo fijo y el borde inferior, sin scroll lateral. Tras «Siguiente», el foco en el enunciado.
+ * Final: 3/10 · Errores = 10 − 3 = 7 · round(3/10·100) = 30 % · getMensaje(): 30 < 50 → «La tabla
+ * periódica guarda muchos secretos» · aria-label «Resultado: 3 de 10 aciertos» (el 3/10 no lo
+ * recorría ningún caso anterior) · foco en la tarjeta y la nota entera bajo el logo.
+ */
+async function rondaLargaConVeredictoALaVista(page: Page, ancho: number): Promise<void> {
+  const BIEN = new Set([1, 4, 7]);
+  const CONTADOR = [1, 1, 1, 2, 2, 2, 3, 3, 3, 3];
+  await empezarConBanco(page, 'Empezar quiz', RONDA_LARGA);
+  await expect(enunciado(page)).toHaveText('Según el CRC Handbook, ¿cuál es el elemento con mayor punto de ebullición?');
+  for (let n = 1; n <= TOTAL_PREGUNTAS; n++) {
+    await expect(page.getByText(`Pregunta ${n} de ${TOTAL_PREGUNTAS}`)).toBeVisible();
+    const { pregunta, correcta } = await respuestaEsperada(page);
+    const textos = (await opciones(page).allInnerTexts()).map(limpiar);
+    const buena = textos.indexOf(correcta);
+    const bien = BIEN.has(n);
+    const elegida = bien ? buena : buena === 3 ? 2 : 3;
+    await opciones(page).nth(elegida).tap();
+    await expect(page.locator(bien ? '[class*="feedbackCorrecto"]' : '[class*="feedbackIncorrecto"]')).toBeVisible();
+    const c = CONTADOR[n - 1];
+    await expect(contadorAciertos(page)).toHaveText(`✓ ${c} ${c === 1 ? 'acierto' : 'aciertos'}`);
+    await expect(opciones(page).nth(elegida).locator('[class*="opcionMarca"]')).toHaveText(bien ? '✓' : '✗');
+    await expect(opciones(page).nth(buena)).toHaveAccessibleName(/ \(respuesta correcta\)$/);
+    if (!bien) await expect(opciones(page).nth(elegida)).toHaveAccessibleName(/ \(tu respuesta, incorrecta\)$/);
+    await expect(botonAvanzar(page), `«${pregunta}»: el foco va a «Siguiente»`).toBeFocused();
+    await page.waitForTimeout(200); // la 2.ª mirada de enfocarSinCentrar llega a los 120 ms
+    const v = await vistaDelVeredicto(page);
+    expect(v.arriba, `«${pregunta}»: veredicto desde y = ${v.arriba}; el logo acaba en ${v.finLogo}`).toBeGreaterThanOrEqual(v.finLogo);
+    expect(v.abajo, `«${pregunta}»: el veredicto no se sale por abajo`).toBeLessThanOrEqual(v.alto);
+    expect(v.ancho, `«${pregunta}»: la marca no desborda en horizontal`).toBe(ancho);
+    await botonAvanzar(page).tap();
+    if (n < TOTAL_PREGUNTAS) await expect(enunciado(page), `${n}→${n + 1}: foco en el enunciado nuevo`).toBeFocused();
+  }
+  const tarjeta = page.locator('[class*="resultadoCard"]');
+  await expect(tarjeta).toBeFocused();
+  await expect(tarjeta).toHaveAttribute('aria-label', 'Resultado: 3 de 10 aciertos');
+  await expect(page.locator('[class*="puntuacionCirculo"]')).toHaveText('3/10');
+  const stats = page.locator('[class*="statItem"]');
+  await expect(stats.nth(0)).toHaveText('3Aciertos');
+  await expect(stats.nth(1)).toHaveText('7Errores'); // 10 − 3
+  await expect(stats.nth(2)).toHaveText(/^30 ?%Puntuación$/); // round(3/10·100); el espacio duro es el 3631
+  await expect(page.locator('[class*="mensajeTexto"]')).toHaveText('La tabla periódica guarda muchos secretos');
+  const nota = await page.evaluate(() => {
+    const logo = document.querySelector('[class*="headerBar"]')?.firstElementChild?.getBoundingClientRect();
+    const r = (document.querySelector('[class*="puntuacionCirculo"]') as Element).getBoundingClientRect();
+    return { arriba: Math.round(r.top), abajo: Math.round(r.bottom), finLogo: Math.round(logo?.bottom ?? 0), alto: innerHeight };
+  });
+  expect(nota.arriba, `nota desde y = ${nota.arriba}; el logo acaba en ${nota.finLogo}`).toBeGreaterThanOrEqual(nota.finLogo);
+  expect(nota.abajo).toBeLessThanOrEqual(nota.alto);
+}
+
+test.describe('Quiz Tabla Periódica · inspector 29/10/2026 (tarde) — re-inspección tras /reparar (escritorio)', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+  });
+
+  /**
+   * CASO 31 — La reparación del 3776 entera: fallar y acertar, en claro y en oscuro
+   *
+   * Resuelto a mano ANTES de ejecutar, ronda forzada con los ids 1-10 (las opciones no se barajan:
+   * van en el orden del banco) y la clave de CLAVE_IUPAC:
+   *   · antes de contestar, el nombre no delata la buena: «A 47», «B 79», «C 82», «D 29»
+   *   · la del Oro (Au, Z = 79) fallada con «47» → «A 47 (tu respuesta, incorrecta)» con ✗ ·
+   *     «B 79 (respuesta correcta)» con ✓ · «C 82» y «D 29» sin marca · «✓ 0 aciertos»
+   *   · la de Z = 1 acertada con «Hidrógeno» → «A Helio», «B Litio», «C Hidrógeno (respuesta
+   *     correcta)» con ✓, «D Berilio»; ninguna ✗ · «✓ 1 acierto»
+   *   · las marcas llevan aria-hidden="true" (el veredicto ya está en el nombre: no se lee dos
+   *     veces) y su color llega a 4,5:1 sobre el fondo real de la opción (texto de 16 px y peso
+   *     400, WCAG 1.4.3); tras «Siguiente», el foco en el enunciado nuevo
+   * Medido el 29/10/2026 (tarde): ✓ 4,59:1 y ✗ 5,72:1 en claro; ✓ 6,45:1 y ✗ 6,47:1 en oscuro.
+   */
+  test('caso 31 · accesibilidad: en claro y en oscuro la fallada, la buena y las neutras se distinguen sin color', async ({ page }) => {
+    test.setTimeout(90_000);
+    const marcas = page.locator('main [class*="opcionMarca"]');
+    const comprobarMarca = async (i: number, simbolo: string): Promise<void> => {
+      const marca = opciones(page).nth(i).locator('[class*="opcionMarca"]');
+      await expect(marca).toHaveText(simbolo);
+      await expect(marca).toHaveAttribute('aria-hidden', 'true');
+      const m = await contrasteDe(marca);
+      expect(m.ratio, `«${simbolo}» de la opción ${'ABCD'[i]}: ${m.ratio}:1`).toBeGreaterThanOrEqual(m.umbral);
+    };
+    for (const tema of ['light', 'dark'] as const) {
+      await abrirSinAviso(page);
+      await esperarEmpezarHidratado(page);
+      await activarTema(page, tema);
+      await page.emulateMedia({ colorScheme: tema, reducedMotion: 'reduce' });
+      await empezarConBanco(page, 'Empezar quiz', PRIMERAS_DIEZ);
+      await expect(enunciado(page)).toHaveText('¿Cuál es el número atómico del Oro (Au)?');
+      const antes = ['A 47', 'B 79', 'C 82', 'D 29'];
+      for (const [i, nombre] of antes.entries()) await expect(opciones(page).nth(i)).toHaveAccessibleName(nombre);
+      await expect(marcas).toHaveCount(0);
+
+      await pulsarOpcion(page, '47'); // fallo a propósito
+      await expect(page.locator('[class*="feedbackIncorrecto"]')).toBeVisible();
+      await page.mouse.move(0, 0);
+      const fallo = ['A 47 (tu respuesta, incorrecta)', 'B 79 (respuesta correcta)', 'C 82', 'D 29'];
+      for (const [i, nombre] of fallo.entries()) await expect(opciones(page).nth(i), tema).toHaveAccessibleName(nombre);
+      await expect(marcas).toHaveCount(2);
+      await comprobarMarca(0, '✗');
+      await comprobarMarca(1, '✓');
+      await expect(contadorAciertos(page)).toHaveText('✓ 0 aciertos');
+
+      await botonAvanzar(page).click();
+      await expect(enunciado(page)).toHaveText('¿Qué elemento tiene número atómico 1?');
+      await expect(enunciado(page)).toBeFocused();
+      await pulsarOpcion(page, 'Hidrógeno'); // acierto
+      await expect(page.locator('[class*="feedbackCorrecto"]')).toBeVisible();
+      await page.mouse.move(0, 0);
+      const acierto = ['A Helio', 'B Litio', 'C Hidrógeno (respuesta correcta)', 'D Berilio'];
+      for (const [i, nombre] of acierto.entries()) await expect(opciones(page).nth(i), tema).toHaveAccessibleName(nombre);
+      await expect(marcas).toHaveCount(1);
+      await comprobarMarca(2, '✓');
+      await expect(contadorAciertos(page)).toHaveText('✓ 1 acierto');
+    }
+  });
+});
+
+test.describe('Quiz Tabla Periódica · inspector 29/10/2026 (tarde) — re-inspección tras /reparar (móvil 360 × 740)', () => {
+  test.use({
+    viewport: { width: 360, height: 740 },
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 14; SM-A146B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Mobile Safari/537.36',
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test.beforeEach(async ({ page }) => {
+    await abrirSinAviso(page);
+    await esperarEmpezarHidratado(page);
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+  });
+
+  test('caso 32 · operativa: 3 bien y 7 mal con las explicaciones largas dan 3/10 y 30 %, con el veredicto a la vista a 360 × 740', async ({ page }) => {
+    test.setTimeout(90_000);
+    await rondaLargaConVeredictoALaVista(page, 360);
+  });
+
+  /**
+   * CASO 33 — HALLAZGO nuevo (29/10/2026, tarde), forma del cabo C0514: el 2.º toque de un doble
+   * toque en una OPCIÓN se lleva el foco a <body>
+   *
+   * Resuelto a mano leyendo page.tsx y lib/useGuardaRafaga.ts: al contestar, el foco va a
+   * «Siguiente pregunta →» (efecto de las líneas 74-77, «la única acción que queda por hacer»), y
+   * responder() marca la ráfaga con soloMismoPunto, así que el 2.º toque en el mismo punto es la
+   * misma intención y no debe hacer nada; f0b18db0 frena además su mousedown para que no mueva el
+   * foco. Ronda forzada ids 1-10: la del Oro con «79» (toque suelto, bien) y la de Z = 1 con
+   * DOBLE toque en «Hidrógeno» → «✓ 2 aciertos», las 4 opciones deshabilitadas y el foco en
+   * «Siguiente pregunta →».
+   * Medido el 29/10/2026 (tarde): el foco queda en <body>. Cuando «Siguiente» ya se ve y la página no
+   * se mueve, el 2.º toque cae sobre la opción que el 1.º acaba de deshabilitar; Chrome NO entrega
+   * mousedown ni click a un botón deshabilitado (solo pointerdown), así que el frenarFoco de la guarda
+   * no llega a verlo, y el navegador suelta el foco al <body>. 9 de 10 preguntas a 360 × 740 y 10 de
+   * 10 a 412 × 915 por toque; con ratón a 1.280 × 800, 9 de 10. Luego, Enter no hace nada: hace
+   * falta un Tab para volver a «Siguiente». No cuenta de más ni contesta nada.
+   * DEBERÍA: tras el doble toque, el foco sigue en «Siguiente pregunta →».
+   */
+  test('caso 33 · accesibilidad: un doble toque en una opción deja el foco en «Siguiente pregunta», no en <body>', async ({ page }) => {
+    test.fail(); // HALLAZGO abierto: falla por la aserción final, no por el montaje
+    await empezarConBanco(page, 'Empezar quiz', PRIMERAS_DIEZ);
+    const t1 = (await opciones(page).allInnerTexts()).map(limpiar);
+    await opciones(page).nth(t1.indexOf('79')).tap();
+    await expect(contadorAciertos(page)).toHaveText('✓ 1 acierto');
+    await botonAvanzar(page).tap();
+    await expect(enunciado(page)).toHaveText('¿Qué elemento tiene número atómico 1?');
+    await expect(enunciado(page)).toBeFocused();
+    await page.waitForTimeout(250);
+
+    const t2 = (await opciones(page).allInnerTexts()).map(limpiar);
+    const caja = await opciones(page).nth(t2.indexOf('Hidrógeno')).boundingBox();
+    if (!caja) throw new Error('la opción «Hidrógeno» no tiene caja');
+    const [x, y] = [caja.x + caja.width / 2, caja.y + caja.height / 2];
+    await page.touchscreen.tap(x, y);
+    await page.waitForTimeout(90);
+    await page.touchscreen.tap(x, y); // el 2.º toque, en el mismo punto
+    await page.waitForTimeout(350);
+    await expect(contadorAciertos(page)).toHaveText('✓ 2 aciertos');
+    expect(await habilitadas(page), 'contestada: las 4 opciones deshabilitadas').toBe(0);
+    const bajoElDedo = await page.evaluate(
+      ([px, py]) => (document.elementFromPoint(px, py)?.closest('button') as HTMLButtonElement | null)?.disabled ?? false,
+      [x, y],
+    );
+    expect(bajoElDedo, 'montaje: el 2.º toque cayó sobre la opción ya deshabilitada').toBe(true);
+    await expect(botonAvanzar(page), 'tras el doble toque, el foco sigue en «Siguiente»').toBeFocused();
+  });
+});
+
+test.describe('Quiz Tabla Periódica · inspector 29/10/2026 (tarde) — re-inspección tras /reparar (móvil 360 × 640)', () => {
+  test.use({
+    viewport: { width: 360, height: 640 },
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 14; SM-A146B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Mobile Safari/537.36',
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test('caso 32 · operativa: la misma ronda larga, en oscuro, con el veredicto a la vista a 360 × 640', async ({ page }) => {
+    test.setTimeout(90_000);
+    await abrirSinAviso(page);
+    await esperarEmpezarHidratado(page);
+    await activarTema(page, 'dark');
+    await page.emulateMedia({ colorScheme: 'dark', reducedMotion: 'reduce' });
+    await rondaLargaConVeredictoALaVista(page, 360);
   });
 });
