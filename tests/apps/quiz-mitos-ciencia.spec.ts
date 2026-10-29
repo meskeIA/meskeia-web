@@ -673,7 +673,7 @@ test.describe('inspector 29/10/2026 · hallazgos nuevos', () => {
     // WCAG 1.4.3 pide 4,5:1). A mano: color resultante (62, 131, 88) → luminancia 0,180 frente a
     // 0,906 del fondo → (0,956) / (0,230) = 4,16:1. Medido 29/10/2026: 4,16 a 1280 y a 360 px. En la
     // insignia de fallo (#991b1b) da 4,70 y en oscuro 6,75 / 5,58: solo falla el acierto en claro.
-    test.fail();
+    // REPARADO (3789, 29/10/2026): .respuestaCorrecta sin opacity (6,49:1).
     await abrir(page);
     await page.getByRole('button', { name: 'Comenzar quiz' }).click();
     await page.evaluate(() => document.documentElement.setAttribute('data-theme', 'light'));
@@ -711,7 +711,7 @@ test.describe('inspector 29/10/2026 · hallazgos nuevos', () => {
     // page.tsx, id 9: `emoji: '🦚'` (U+1F99A PEACOCK, «pavo real» en el lector). La tarjeta es el
     // destino del foco y el emoji no lleva aria-hidden: se anuncia «pavo real, "Los avestruces…"».
     // Esperado: el emoji no es un pavo real (o queda fuera del texto accesible).
-    test.fail();
+    // REPARADO (3790, 29/10/2026): los dos, 🏜️ y aria-hidden en .preguntaEmoji para las 25.
     await abrir(page);
     await page.getByRole('button', { name: 'Comenzar quiz' }).click();
     for (let n = 1; n < 9; n++) {
@@ -725,6 +725,8 @@ test.describe('inspector 29/10/2026 · hallazgos nuevos', () => {
       return clon.textContent ?? '';
     });
     expect(leido).not.toContain('🦚');
+    await expect(page.locator('[class*="preguntaEmoji"]')).toHaveAttribute('aria-hidden', 'true');
+    await expect(page.locator('[class*="preguntaEmoji"]')).not.toHaveText('🦚');
   });
 
   test('hallazgo · las dos escalas del átomo de hidrógeno cuadran entre sí (naranja a 2 km frente a canica en un estadio)', () => {
@@ -734,9 +736,12 @@ test.describe('inspector 29/10/2026 · hallazgos nuevos', () => {
     // de un estadio (≈ 120 m del centro): cociente 120 / 0,016 = 7.500. A mano, con el cociente de la
     // propia app la canica pone el electrón a 0,016 × 25.000 = 400 m (≈ 500 m con el real), unas
     // 3-4 veces más lejos que las gradas; con el estadio, el núcleo sería de ≈ 4 mm, no una canica.
-    test.fail();
+    // REPARADO (3791, 29/10/2026): las dos con el cociente real (≈ 31.500): naranja (8 cm) → 2,5 km,
+    // canica (1,6 cm) → 500 m, fuera del estadio.
     const naranja = /núcleo de un átomo de hidrógeno tuviera el tamaño de una naranja, su único electrón estaría a unos 2 kilómetros/.test(FUENTE);
     const canica = /átomo de hidrógeno tuviera el tamaño de un estadio de fútbol, su núcleo sería una canica/.test(FUENTE);
     expect(naranja && canica, 'la app da dos escalas incompatibles del mismo átomo').toBe(false);
+    expect(FUENTE).toMatch(/naranja, su único electrón estaría a unos 2,5 kilómetros/);
+    expect(FUENTE).toMatch(/canica en el centro de un estadio de fútbol, su electrón no estaría en las gradas: estaría a unos 500 metros/);
   });
 });

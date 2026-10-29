@@ -273,7 +273,7 @@
 .respuestaCorrecta {
   font-size: 0.8rem;
   font-weight: 600;
-  opacity: 0.8;
+  /* Sin opacity: con 0,8, «Era un MITO» del acierto en claro daba 4,16:1 (hallazgo 3789) */
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }

@@ -99,7 +99,8 @@ const PREGUNTAS: Pregunta[] = [
     esVerdad: false,
     explicacion: 'Los avestruces nunca hacen esto: enterrar la cabeza implicaría no poder respirar. El comportamiento observado es que inclinan la cabeza al suelo para dar la vuelta a sus huevos o buscar vegetación. También se agazapan pegando el cuello al suelo para camuflarse, lo que a distancia puede parecer que "entierran la cabeza".',
     categoria: 'animales',
-    emoji: '🦚',
+    // Unicode no tiene avestruz; era 🦚, un pavo real (hallazgo 3790). La arena del mito.
+    emoji: '🏜️',
   },
   {
     id: 10,
@@ -162,7 +163,7 @@ const PREGUNTAS: Pregunta[] = [
     id: 17,
     afirmacion: 'Los átomos son partículas sólidas y compactas',
     esVerdad: false,
-    explicacion: 'Un átomo es casi todo espacio vacío. Si el núcleo de un átomo de hidrógeno tuviera el tamaño de una naranja, su único electrón estaría a unos 2 kilómetros de distancia. La materia sólida que percibimos lo es por las fuerzas electromagnéticas entre átomos, no porque los átomos sean bloques compactos.',
+    explicacion: 'Un átomo es casi todo espacio vacío. Si el núcleo de un átomo de hidrógeno tuviera el tamaño de una naranja, su único electrón estaría a unos 2,5 kilómetros de distancia. La materia sólida que percibimos lo es por las fuerzas electromagnéticas entre átomos, no porque los átomos sean bloques compactos.',
     categoria: 'fisica',
     emoji: '⚛️',
   },
@@ -403,7 +404,8 @@ export default function QuizMitosCiencia() {
               ref={afirmacionRef}
               tabIndex={-1}
             >
-              <div className={styles.preguntaEmoji}>{pregunta.emoji}</div>
+              {/* Decorativo: la tarjeta recibe el foco y el lector leía el nombre del emoji (hallazgo 3790) */}
+              <div className={styles.preguntaEmoji} aria-hidden="true">{pregunta.emoji}</div>
               <p className={styles.afirmacion}>&ldquo;{pregunta.afirmacion}&rdquo;</p>
             </div>
 
@@ -664,7 +666,11 @@ export default function QuizMitosCiencia() {
           </div>
           <div className={styles.tipCard}>
             <span className={styles.tipIcon}>⚛️</span>
-            <p>Si un átomo de hidrógeno tuviera el tamaño de un estadio de fútbol, su núcleo sería una canica en el centro y su electrón estaría orbitando en las gradas exteriores. Todo lo demás sería vacío absoluto.</p>
+            {/* Hallazgo 3791: la canica en el centro y el electrón «en las gradas» daban un átomo 3-4
+                veces menos vacío que la naranja a 2,5 km de la explicación 17. Las dos escalas salen
+                del mismo cociente: radio de Bohr (52,9 pm) entre el diámetro del protón (1,68 fm),
+                ≈ 31.500: 1,6 cm × 31.500 ≈ 500 m; 8 cm × 31.500 ≈ 2,5 km. */}
+            <p>Si el núcleo de un átomo de hidrógeno fuera una canica en el centro de un estadio de fútbol, su electrón no estaría en las gradas: estaría a unos 500 metros, fuera del estadio. Todo lo que hay entre medias es vacío.</p>
           </div>
         </div>
 
