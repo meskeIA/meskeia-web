@@ -149,7 +149,7 @@ export default function CalculadoraCaloriasPage() {
           />
 
           <div className={styles.actividadSection}>
-            <label className={styles.label}>Actividad</label>
+            <label id="actividad-label" className={styles.label}>Actividad</label>
 
             <div className={styles.categoriasTabs}>
               {categorias.map(cat => (
@@ -165,7 +165,7 @@ export default function CalculadoraCaloriasPage() {
               ))}
             </div>
 
-            <div className={styles.actividadesGrid}>
+            <div role="group" aria-labelledby="actividad-label" className={styles.actividadesGrid}>
               {actividadesFiltradas.map((actividad, index) => (
                 <button
                   type="button"
