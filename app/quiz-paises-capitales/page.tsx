@@ -9,7 +9,7 @@ import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { countries, Country } from '@/data/countries';
 import EducationalSection from '@/components/EducationalSection';
-import { formatPercentage, margenBarraLogo } from '@/lib';
+import { formatPercentage, margenBarraLogo, enfocarSinCentrar } from '@/lib';
 import { useGuardaRafaga } from '@/lib/useGuardaRafaga';
 
 type ModoJuego = 'capital' | 'pais' | 'bandera';
@@ -60,6 +60,8 @@ const BANDERAS_GEMELAS: Record<string, string> = { id: 'mc', mc: 'id', td: 'ro',
 const NOTA_CAPITAL: Record<string, string> = {
   Israel: 'Israel designa Jerusalén como su capital; la ONU no reconoce ese estatus.',
   Palestina: 'Ramala es la sede de la Autoridad Nacional Palestina; Palestina proclama Jerusalén como su capital, estatus que la ONU no reconoce.',
+  // Hallazgo 3778: la FAQ de la guía ya lo decía, y el quiz daba Yaren sin matiz
+  Nauru: 'Nauru no tiene una capital legalmente designada; Yaren actúa como ciudad principal.',
 };
 
 const MODO_CONFIG: Record<ModoJuego, { label: string; icon: string; desc: string }> = {
@@ -202,7 +204,7 @@ export default function QuizPaisesCapitalesPage() {
   useEffect(() => {
     if (pantalla === 'quiz') {
       if (seleccionada !== null) {
-        botonSiguienteRef.current?.focus();
+        enfocarSinCentrar(botonSiguienteRef.current); // sin centrarlo: el veredicto, a la vista (3770)
       } else {
         traerALaVista(quizPanelRef.current, [hudRef.current, preguntaRef.current]);
         preguntaRef.current?.focus({ preventScroll: true });
@@ -354,11 +356,13 @@ export default function QuizPaisesCapitalesPage() {
           <div className={styles.progresoBar}>
             <div
               className={styles.progresoFill}
-              style={{ width: `${((preguntaActual) / totalPreguntas) * 100}%` }}
+              // Mide las RESPONDIDAS, como dice su nombre y como la Precisión: con el índice de la
+              // pregunta, tras contestar decía una de menos y nunca llegaba al total (hallazgo 3777)
+              style={{ width: `${(respondidas / totalPreguntas) * 100}%` }}
               role="progressbar"
               aria-label="Preguntas respondidas"
-              aria-valuetext={`${preguntaActual} de ${totalPreguntas}`}
-              aria-valuenow={preguntaActual}
+              aria-valuetext={`${respondidas} de ${totalPreguntas}`}
+              aria-valuenow={respondidas}
               aria-valuemin={0}
               aria-valuemax={totalPreguntas}
             />

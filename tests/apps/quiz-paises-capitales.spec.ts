@@ -1508,7 +1508,7 @@ test.describe('Inspector 29/10/2026 · móvil 360 × 740', () => {
 
 test.describe('Inspector 29/10/2026 · hallazgos', () => {
   test('hallazgo · la barra «Preguntas respondidas» cuenta la pregunta recién contestada', async ({ page }) => {
-    test.fail(); // ABIERTO
+    // REPARADO (3777, 29/10/2026): valuenow, valuetext y ancho salen de `respondidas`. Era:
     // page.tsx:354-364 — role="progressbar" con aria-label «Preguntas respondidas», pero
     // aria-valuenow={preguntaActual}, aria-valuetext «${preguntaActual} de ${total}» y el ancho
     // preguntaActual/total: el índice de la pregunta, no las respondidas. La propia app cuenta las
@@ -1529,7 +1529,7 @@ test.describe('Inspector 29/10/2026 · hallazgos', () => {
   });
 
   test('hallazgo · Nauru: el aviso de respuesta da Yaren sin el matiz que pone la propia guía', async ({ page }) => {
-    test.fail(); // ABIERTO
+    // REPARADO (3778, 29/10/2026): entrada de Nauru en NOTA_CAPITAL con el texto de la guía. Era:
     // Guía (page.tsx:684): «Nauru (Oceanía) no tiene una capital legalmente designada, aunque Yaren
     // actúa como ciudad principal donde se ubican las instituciones». El quiz pregunta «¿Cuál es la
     // capital de Nauru?» y contesta «¡Correcto! La respuesta es Yaren.» sin nota: NOTA_CAPITAL
