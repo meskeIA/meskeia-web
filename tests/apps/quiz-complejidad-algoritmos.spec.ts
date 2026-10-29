@@ -556,7 +556,8 @@ test.describe('Inspector 28/10/2026 · hallazgos de la partida', () => {
   });
 
   test('hallazgo · las insignias de categoría y el marcador «✓ N correctas» llegan a 4,5:1 (tema claro)', async ({ page }) => {
-    test.fail(); // ABIERTO — texto blanco de 12,5 px sobre los colores de categoría del módulo
+    // REPARADO el 29/10/2026 (3683, con el 3781): los --cat-* bajan a tonos que dan ≥ 4,5:1 con el
+    // blanco y el marcador usa --correcto-text. Antes: texto blanco de 12,5 px sobre los colores de categoría del módulo
     // (--cat-*, page.tsx:478/514/611): Notación 4,11 · Búsqueda 2,80 · Estructuras 2,97 · Comparativa
     // 3,51 (solo Análisis, 5,25, cumple; igual en oscuro, el color no cambia de tema). El marcador
     // verde (#28A745 sobre #FAFAFA, 14 px) da 3,00. check:contraste-marca no lo ve: el hexadecimal de
@@ -868,16 +869,18 @@ test.describe('Inspector 29/10/2026 · hallazgo nuevo', () => {
    * hallazgo 3683, pero otro elemento que su descripción no nombra.
    */
   test('hallazgo · el botón de categoría seleccionado llega a 4,5:1 en las cinco', async ({ page }) => {
-    test.fail(); // ABIERTO — medido: 4,11 · 2,80 · 2,97 · 5,25 · 3,51
-    await abrir(page, 'light');
-    await esperarBotonHidratado(page, /Práctica por categoría/);
-    await page.getByRole('button', { name: /Práctica por categoría/ }).click();
+    // REPARADO el 29/10/2026 (3781): antes, medido 4,11 · 2,80 · 2,97 · 5,25 · 3,51 en los dos temas
     const bajos: string[] = [];
-    for (const c of CATEGORIAS) {
-      const boton = page.getByRole('button', { name: c, exact: true });
-      await boton.click();
-      await expect(boton).toHaveAttribute('aria-pressed', 'true');
-      bajos.push(...(await contrastes(page, '[class*="btnCategoriaActivo"]')));
+    for (const tema of ['light', 'dark'] as const) {
+      await abrir(page, tema);
+      await esperarBotonHidratado(page, /Práctica por categoría/);
+      await page.getByRole('button', { name: /Práctica por categoría/ }).click();
+      for (const c of CATEGORIAS) {
+        const boton = page.getByRole('button', { name: c, exact: true });
+        await boton.click();
+        await expect(boton).toHaveAttribute('aria-pressed', 'true');
+        bajos.push(...(await contrastes(page, '[class*="btnCategoriaActivo"]')).map((b) => `${tema}: ${b}`));
+      }
     }
     expect(bajos).toEqual([]);
   });

@@ -21,12 +21,13 @@
   --gap-lg: 1.5rem;
   --gap-xl: 2rem;
 
-  /* Colores categorías */
-  --cat-notacion: #2E86AB;
-  --cat-busqueda: #48A9A6;
-  --cat-estructuras: #E07B39;
-  --cat-analisis: #7B5EA7;
-  --cat-comparativa: #3D9970;
+  /* Colores categorías: llevan texto blanco encima (botón activo e insignias), así que cada uno
+     da ≥ 4,5:1 con el blanco (hallazgos 3781 y 3683). Antes 4,11 · 2,80 · 2,97 · 5,25 · 3,51. */
+  --cat-notacion: #26718F;     /* el --primary-boton de globals: 5,47:1 */
+  --cat-busqueda: #327874;     /* el --secondary-boton de globals: 5,15:1 */
+  --cat-estructuras: #B35A1F;  /* 4,77:1 */
+  --cat-analisis: #7B5EA7;     /* 5,25:1 */
+  --cat-comparativa: #2E7D59;  /* 5,01:1 */
 
   /* Feedback */
   --correcto-bg: #D4EDDA;
@@ -309,7 +310,8 @@
 }
 
 .aciertosActuales {
-  color: var(--correcto-border);
+  /* El color del texto del acierto, no el del borde: #28A745 sobre #FAFAFA daba 3,00:1 (hallazgo 3683) */
+  color: var(--correcto-text);
   font-weight: 600;
 }
 
