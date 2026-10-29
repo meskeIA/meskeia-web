@@ -1,7 +1,11 @@
-.container { --primary: #2E86AB; --secondary: #48A9A6; --bg-primary: #FAFAFA; --bg-card: #FFFFFF; --text-primary: #1A1A1A; --text-secondary: #666666; --border: #E5E5E5; --success: #27AE60; --danger: #E74C3C; --radius: 12px; --radius-large: 16px; --spacing-md: 1rem; --spacing-lg: 1.5rem; --spacing-xl: 2rem; max-width: 900px; margin: 0 auto; padding: var(--spacing-xl) var(--spacing-lg); min-height: 100vh; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-primary); color: var(--text-primary); }
+.container { --primary: #2E86AB; --secondary: #48A9A6; --bg-primary: #FAFAFA; --bg-card: #FFFFFF; --text-primary: #1A1A1A; --text-secondary: #666666; --border: #E5E5E5; --success: #15803D; --danger: #B91C1C; --radius: 12px; --radius-large: 16px; --spacing-md: 1rem; --spacing-lg: 1.5rem; --spacing-xl: 2rem; max-width: 900px; margin: 0 auto; padding: var(--spacing-xl) var(--spacing-lg); min-height: 100vh; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: var(--bg-primary); color: var(--text-primary); }
 
 /* En oscuro servía el valor del claro como texto, por debajo de 4,5:1 (C0226).
-   Medido por píxel, también sobre el tinte de su propio color. */
+   Medido por píxel, también sobre el tinte de su propio color.
+   En claro, --success y --danger eran #27AE60 y #E74C3C: el texto de la opción correcta y de la
+   fallada daba 2,65 y 3,45:1 sobre su tinte, y la letra blanca 2,87 y 3,82:1 (hallazgo 3786).
+   Ahora #15803D y #B91C1C, los de la referencia quiz-literatura-universal: 4,65 · 5,86 en el texto
+   y 5,02 · 6,47 en la letra. */
 [data-theme='dark'] .container {
   --success: #86EFAC;
   --danger: #FCA5A5;

@@ -813,6 +813,9 @@ test.describe('inspector 29/10/2026', () => {
     await expect(page.locator('html')).toHaveAttribute('data-theme', tema);
     await opciones(page).nth(0).click();
     await expect(explicacion(page)).toBeVisible();
+    // Los colores se leen con las transiciones terminadas: a mitad, la letra blanca se medía sobre un
+    // fondo aún casi blanco («1,04:1» el 29/10/2026, con la captura correcta)
+    await page.evaluate(() => Promise.all(document.getAnimations().map((a) => a.finished.catch(() => undefined))));
     const crudo = await page.evaluate(() => {
       const num = (s: string): number[] => (s.match(/[\d.]+/g) ?? []).map(Number);
       // Fondo efectivo: compone los fondos semitransparentes desde el elemento hasta uno opaco
@@ -866,7 +869,9 @@ test.describe('inspector 29/10/2026', () => {
   });
 
   /**
-   * HALLAZGO (29/10/2026, ABIERTO) — en CLARO, tras contestar, la opción correcta pinta su texto
+   * REPARADO (hallazgo 3786, 29/10/2026): --success y --danger del claro pasan a #15803D y
+   * #B91C1C, los de la referencia.
+   * Antes — en CLARO, tras contestar, la opción correcta pinta su texto
    * con --success (#27AE60) y la fallada con --danger (#E74C3C), y sus letras van en blanco sobre
    * esos mismos colores (QuizConceptosFinancieros.module.css:32-41). Texto de 14,7 px y letra de
    * 13,1 px en negrita: exigen 4,5:1. Medido: texto de la correcta 2,65:1, su letra 2,87:1; texto de
@@ -875,7 +880,6 @@ test.describe('inspector 29/10/2026', () => {
    * #15803d / #b91c1c bajo la letra también en claro («5,02:1», «6,47:1»).
    */
   test('hallazgo · en claro, la opción correcta y la fallada se leen a ≥ 4,5:1', async ({ page }) => {
-    test.fail();
     expect(pordebajo(await medirOpciones(page, 'light'))).toEqual([]);
   });
 });
