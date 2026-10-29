@@ -543,3 +543,165 @@ test.describe('Inspector 28/10/2026 · contenido del banco', () => {
     expect(guia).not.toMatch(/esporas \(Fungi\)/);
   });
 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * INSPECTOR 29/10/2026 — 2.ª pasada, tras la reparación de la familia (c5b619bb, d9e710f8).
+ * Valores esperados calculados a mano ANTES de ejecutar, con `calcularPuntuacion` y
+ * `getResultadoTexto` (page.tsx:55-68) y el banco de `data/organismos-naturaleza.ts`.
+ * Sin <input>: además de `esperarPaginaAsentada`, se espera a que React cuelgue sus props de
+ * «Empezar Quiz» (`__reactProps$`), como `esperarHidratado` del testigo de la familia.
+ */
+async function esperarBotonHidratado(page: Page): Promise<void> {
+  await page.waitForFunction(() => {
+    const b = [...document.querySelectorAll('button')].find((x) => /Empezar Quiz/.test(x.textContent ?? ''));
+    return Boolean(b && Object.keys(b).some((k) => k.startsWith('__reactProps$')));
+  }, null, { timeout: 20_000 });
+}
+
+test.describe('inspector 29/10/2026 · los tres casos', () => {
+  /**
+   * CASO NORMAL — Todos, 15 preguntas, 11 bien y 4 mal (las 4 últimas).
+   * A mano: el banco tiene 43 → 15 distintos. 11/15 = 0,7333 ≥ 0,7 → 60 + (0,7333 − 0,7)/0,2·40 =
+   * 60 + 6,67 = 66,67 → 67 pts · ⭐ «¡Muy buena puntuación!» · «11/15» · round(73,33) = 73 %.
+   */
+  test('caso normal: 11 de 15 en Todos dan 67 pts, 73 % y «¡Muy buena puntuación!»', async ({ page }) => {
+    test.setTimeout(120_000);
+    await abrir(page);
+    await esperarBotonHidratado(page);
+    await elegir(page, 'Todos', 15);
+    await expect(page.locator('[class*="btnIniciar"]')).toHaveText('Empezar Quiz — 15 preguntas · ⭐ Todos');
+    await page.locator('[class*="btnIniciar"]').click();
+    await expect(contador(page)).toHaveText('Pregunta 1 de 15');
+    const vistas = await jugar(page, 11);
+    expect(vistas).toHaveLength(15);
+    expect(new Set(vistas.map((o) => o.id)).size, 'organismo repetido en la partida').toBe(15);
+    const r = await resultado(page);
+    expect(r.emoji).toBe('⭐');
+    expect(r.titulo).toBe('¡Muy buena puntuación!');
+    expect(r.puntos).toBe('67 pts');
+    expect(r.sub).toBe('11 de 15 respuestas correctas');
+    expect(r.stats.Correctas).toBe('11/15');
+    // El % se admite pegado o con espacio duro: el formato es el hallazgo 3720, abierto
+    expect(r.stats.Acierto).toMatch(porcentaje(73));
+  });
+
+  /**
+   * CASO DE RECHAZO — «Siguiente» sin contestar. El botón solo se monta con una respuesta
+   * (page.tsx:291-326): antes de contestar no existe, Enter sobre la tarjeta enfocada no avanza ni
+   * contesta, y Tab lleva a la opción A. Esperado: «Pregunta 1 de 10», Correctas «0», sin veredicto.
+   */
+  test('caso de rechazo: sin contestar no hay «Siguiente» y Enter en la tarjeta no avanza', async ({ page }) => {
+    await abrir(page);
+    await esperarBotonHidratado(page);
+    await elegir(page, 'Avanzado', 10);
+    await page.locator('[class*="btnIniciar"]').focus();
+    await page.keyboard.press('Enter');
+    await expect(page.locator('[class*="preguntaCard"]')).toBeFocused();
+    await expect(page.locator('[class*="btnSiguiente"]')).toHaveCount(0);
+    await page.keyboard.press('Enter');
+    await page.waitForTimeout(300);
+    await expect(contador(page)).toHaveText('Pregunta 1 de 10');
+    await expect(feedback(page)).toHaveCount(0);
+    await expect(hudValor(page, 1)).toHaveText('0');
+    await page.keyboard.press('Tab');
+    expect(await page.evaluate(() => document.activeElement?.getAttribute('aria-label') ?? '')).toMatch(/^Opción A: /);
+  });
+});
+
+test.describe('inspector 29/10/2026 · móvil 360 × 740', () => {
+  test.use({ viewport: { width: 360, height: 740 }, userAgent: UA_MOVIL, deviceScaleFactor: 3, isMobile: true, hasTouch: true });
+
+  /**
+   * CASO LÍMITE — Básico con 20 preguntas: el nivel tiene justo 20, así que se juega el banco
+   * entero del nivel y la 20.ª es la última («Ver resultados»). 18 bien y 2 mal (las 2 últimas).
+   * A mano: 18/20 = 0,9 ≥ 0,9 → 100 pts · 🏆 «¡Eres un experto en biología!» · «18/20» · 90 %.
+   */
+  test('caso límite: 18 de 20 en Básico (el nivel entero) dan 100 pts, 90 % y 🏆', async ({ page }) => {
+    test.setTimeout(150_000);
+    await abrir(page);
+    await esperarBotonHidratado(page);
+    await arrancar(page, 'Básico', 20);
+    await expect(contador(page)).toHaveText('Pregunta 1 de 20');
+    const vistas = await jugar(page, 18); // `jugar` solo sale por «Ver resultados»
+    expect(vistas.map((o) => o.id).sort(), 'Básico con 20 juega sus 20 organismos').toEqual(
+      organismosNaturaleza.filter((o) => o.nivel === 'basico').map((o) => o.id).sort(),
+    );
+    const r = await resultado(page);
+    expect(r.emoji).toBe('🏆');
+    expect(r.titulo).toBe('¡Eres un experto en biología!');
+    expect(r.puntos).toBe('100 pts');
+    expect(r.sub).toBe('18 de 20 respuestas correctas');
+    expect(r.stats.Correctas).toBe('18/20');
+    expect(r.stats.Acierto).toMatch(porcentaje(90));
+  });
+
+  test('hallazgo · los botones de «Número de preguntas» caben en su tarjeta a 360 px', async ({ page }) => {
+    test.fail(); // ABIERTO — `.preguntasRow` (QuizReinosNaturaleza.module.css:98) es flex sin
+    // `flex-wrap` y centrado: a 360 px los tres botones necesitan 360 px y la tarjeta da 246 px de
+    // contenido (57-303), así que salen por los dos lados hasta el borde de la pantalla (0-118,
+    // 126-239, 247-360; medido 29/10/2026). A 320 px, 20 px de «10 preguntas» y de «20 preguntas»
+    // quedan fuera de la pantalla.
+    await abrir(page);
+    const m = await page.evaluate(() => {
+      const panel = document.querySelector('[class*="configPanel"]') as HTMLElement;
+      const cs = getComputedStyle(panel);
+      const c = panel.getBoundingClientRect();
+      const izq = c.left + parseFloat(cs.borderLeftWidth) + parseFloat(cs.paddingLeft);
+      const der = c.right - parseFloat(cs.borderRightWidth) - parseFloat(cs.paddingRight);
+      return [...document.querySelectorAll('[class*="preguntasRow"] button')].map((b) => {
+        const r = b.getBoundingClientRect();
+        return `${(b.textContent ?? '').trim()}: ${r.left >= izq - 1 && r.right <= der + 1 ? 'dentro' : `fuera (${Math.round(r.left)}-${Math.round(r.right)})`}`;
+      });
+    });
+    expect(m).toEqual(['10 preguntas: dentro', '15 preguntas: dentro', '20 preguntas: dentro']);
+  });
+});
+
+test.describe('inspector 29/10/2026 · contenido', () => {
+  test('hallazgo · «hongo frente a planta» tiene UNA respuesta en la FAQ visible y en el FAQPage', async ({ page }) => {
+    test.fail(); // ABIERTO — la misma pregunta con dos redacciones y dos respuestas. Visible
+    // (page.tsx:484-485), «¿Por qué los hongos no son plantas?»: «heterótrofos por absorción…
+    // quitina». FAQPage (metadata.ts:75-78), «¿Qué diferencia hay entre un hongo y una planta?»:
+    // «obtienen energía descomponiendo materia orgánica o como parásitos», que deja fuera a los
+    // simbiontes del propio banco (Trufa: «necesitan la simbiosis con raíces»; Liquen), y la frase
+    // «los distingue de las plantas que no realizan fotosíntesis» se lee como «plantas que no la
+    // realizan». Reparación: UNA constante en metadata.ts que importen las dos bocas.
+    await abrir(page);
+    const visible = norm(await page.locator('[class*="faqItem"]', { hasText: '¿Por qué los hongos no son plantas?' }).locator('dd').textContent());
+    const ld = faqJsonLd.mainEntity.find((q) => /hongo y una planta/.test(q.name));
+    expect(ld).toBeTruthy();
+    expect(organismo('trufa').curiosidad).toMatch(/simbiosis/);
+    expect(visible).toBe(norm(ld?.acceptedAnswer.text));
+  });
+
+  test('hallazgo · la guía de 7 pasos lleva la esponja a Animalia', async ({ page }) => {
+    test.fail(); // ABIERTO — paso 4 (page.tsx:542-543): «sin diferenciación de tejidos → muy
+    // probablemente Protista. Si es pluricelular con tejidos diferenciados → pasa al paso 5», y solo
+    // desde ahí se llega a Animalia (paso 6). El banco dice de la Esponja marina, que da como
+    // «Animal (Porífero)», que «no tiene tejidos ni órganos diferenciados»: con la guía no llega a su
+    // reino, y la propia guía la pone entre los «organismos trampa… favoritos del examen».
+    await abrir(page);
+    await page.locator('[class*="toggleButton"]').click();
+    const guia = norm(await page.locator('[data-guia-educativa]').textContent());
+    const esponja = organismo('esponja');
+    expect(esponja.grupo).toBe('Animal (Porífero)');
+    const sinTejidosAProtista = /sin diferenciación de tejidos → muy probablemente Protista/.test(guia);
+    const esponjaSinTejidos = /no tiene tejidos ni órganos diferenciados/.test(esponja.curiosidad);
+    expect({ sinTejidosAProtista, esponjaSinTejidos }).not.toEqual({ sinTejidosAProtista: true, esponjaSinTejidos: true });
+  });
+
+  test('hallazgo · Archaea, uno de los «6 Reinos» de la guía, sale en alguna pregunta', async ({ page }) => {
+    test.fail(); // ABIERTO — la guía declara «Los 6 Reinos» con Archaea (page.tsx:376, 425) y, para la
+    // EvAU, que «puede incluir preguntas sobre Archaea», recomienda «Practica en modo Todos»
+    // (page.tsx:453-454). Ninguno de los 43 organismos es una arquea ni lleva «Archaea» como
+    // respuesta o distractor (contado en el banco el 29/10/2026: 0).
+    await abrir(page);
+    await page.locator('[class*="toggleButton"]').click();
+    const guia = norm(await page.locator('[data-guia-educativa]').textContent());
+    expect(guia).toMatch(/preguntas sobre Archaea/);
+    const conArquea = organismosNaturaleza.filter((o) => /arque|archaea/i.test([o.grupo, ...o.confundibleCon].join(' ')));
+    expect(conArquea.length).toBeGreaterThan(0);
+  });
+});

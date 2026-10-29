@@ -35,8 +35,9 @@ import { esperarPaginaAsentada } from './_hidratacion';
  * las 20 preguntas de una partida rápida: 0 respuestas fantasma, 0 explicaciones saltadas, 0
  * salidas de la app. Bajo el dedo quedan una opción (tras «Modo Rápido»), el conmutador de tema 🌙
  * (tras «Salir», a 360 y 412) o un botón «Practicar Alga» (tras «Volver a jugar»): la guarda los
- * absorbe todos. Responder no marca cambio de pantalla, pero aquí el 2.º toque sobre la opción
- * cae siempre en la propia opción ya deshabilitada (0 de 20 a los cuatro anchos).
+ * absorbe todos. Responder no marcaba cambio de pantalla, pero aquí el 2.º toque sobre la opción
+ * caía siempre en la propia opción ya deshabilitada (0 de 20 a los cuatro anchos); desde
+ * 2b3df054 (28/10/2026) responder la marca con `soloMismoPunto`, la línea de la familia.
  */
 
 const RUTA = '/quiz-tipos-plantas/';
@@ -607,5 +608,216 @@ test.describe('Inspector 28/10/2026 · hallazgos del banco y los textos', () => 
     const titulo = await page.getByRole('heading', { name: 'Los 6 grupos del reino vegetal' }).count();
     const conAlga = await page.locator('[class*="vistaGrupoCard"]').filter({ hasText: 'Alga' }).count();
     expect(titulo > 0 && conAlga > 0, 'las algas figuran entre «Los 6 grupos del reino vegetal»').toBe(false);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * INSPECTOR 29/10/2026 — 2.ª pasada como app, tras la reparación de la familia (c5b619bb,
+ * d9e710f8) y la propia (2b3df054: la posidonia en monocotiledónea y las opciones que se
+ * rebarajaban al contestar). Siguen abiertos 3726-3733 (sus `test.fail` de arriba).
+ *
+ * Sin <input>: además de la página asentada, se espera a que React cuelgue sus props del botón
+ * «Modo Rápido» (`__reactProps$`), como `esperarHidratado` del testigo de la familia.
+ */
+async function abrir29(page: Page): Promise<void> {
+  await abrir(page);
+  await page.waitForFunction(
+    () => {
+      const b = [...document.querySelectorAll('button')].find((x) => /Modo Rápido/.test(x.textContent ?? ''));
+      return Boolean(b && Object.keys(b).some((k) => k.startsWith('__reactProps$')));
+    },
+    undefined,
+    { timeout: 20_000 },
+  );
+}
+
+/**
+ * CASO NORMAL 29 — Modo Completo: se fallan las 6 dicotiledóneas y se aciertan las otras 34.
+ * Esperado a mano (banco de page.tsx, `PLANTAS`): 40 plantas distintas; por grupo 6 algas, 6
+ * briófitos, 7 pteridófitos, 7 gimnospermas, 8 monocotiledóneas (con la posidonia) y 6
+ * dicotiledóneas; 34/40 = 85 % → Math.round 85 → tramo ≥ 80 → 🏆; «Repasa estos 6 errores:».
+ */
+async function partidaCompletaSinDicot(page: Page): Promise<void> {
+  test.setTimeout(150_000);
+  await abrir29(page);
+  await empezar(page, /^Modo completo: las 40 plantas/);
+  await expect(contador(page)).toHaveText('Pregunta 1 / 40');
+  const vistas: string[] = [];
+  for (let n = 1; n <= 45; n++) {
+    const nombre = norm(await enunciado(page).innerText());
+    vistas.push(nombre);
+    await responder(page, CLAVE[nombre] === 'Dicotiledónea' ? 'mal' : 'bien');
+    if (/resultados/.test(await avanzar(page))) break;
+  }
+  expect(vistas, 'el Modo Completo pregunta las 40').toHaveLength(40);
+  expect(new Set(vistas).size, 'sin plantas repetidas').toBe(40);
+  const r = await resultado(page);
+  expect(r.titulo).toBe('Resultado: 34/40');
+  expect(r.emoji).toBe('🏆');
+  expect(r.porcentaje).toMatch(pct(85));
+  expect(r.tituloErrores).toBe('Repasa estos 6 errores:');
+  expect(r.errores).toBe(6);
+  expect(r.porGrupo).toEqual({
+    Alga: '6/6',
+    'Briófito': '6/6',
+    'Pteridófito': '7/7',
+    Gimnosperma: '7/7',
+    'Monocotiledónea': '8/8',
+    'Dicotiledónea': '0/6',
+  });
+  const ancho = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+  expect(ancho, 'el resultado no desborda en horizontal').toBeLessThanOrEqual(0);
+}
+
+test.describe('Inspector 29/10/2026 · escritorio 1280 × 800', () => {
+  test.use({ viewport: { width: 1280, height: 800 } });
+
+  test('caso normal: Modo Completo fallando las 6 dicotiledóneas da 34/40, 85 % y 🏆', async ({ page }) => {
+    await partidaCompletaSinDicot(page);
+  });
+
+  /**
+   * CASO LÍMITE — los bordes de los tramos y del redondeo, sin recargar entre partidas.
+   * Esperado a mano (`Math.round(c / t * 100)`; ≥ 80 🏆 · ≥ 50 👍 · resto 😅):
+   *   · Practicar Alga, 3 bien + 3 mal → 3/6 = 50 % → 👍 (borde inferior de 👍), «Alga 3/6».
+   *   · Practicar Monocotiledónea, 5 bien + 3 mal → 5/8 = 62,5 → Math.round 63 → 👍, la 8.ª
+   *     pregunta dice «Ver resultados →».
+   *   · Modo Rápido, 16 bien + 4 mal → 16/20 = 80 % → 🏆 (borde inferior de 🏆).
+   */
+  test('caso límite: 50 % da 👍, 62,5 % redondea a 63 % y 80 % da 🏆', async ({ page }) => {
+    test.setTimeout(150_000);
+    await abrir29(page);
+
+    await empezar(page, /^Practicar Alga: 6 preguntas/);
+    expect(await jugar(page, 3)).toHaveLength(6);
+    let r = await resultado(page);
+    expect(r.titulo).toBe('Resultado: 3/6');
+    expect(r.emoji).toBe('👍');
+    expect(r.porcentaje).toMatch(pct(50));
+    expect(r.tituloErrores).toBe('Repasa estos 3 errores:');
+    expect(r.porGrupo).toEqual({ Alga: '3/6' });
+
+    await page.getByRole('button', { name: /Volver a jugar/ }).click();
+    await empezar(page, /^Practicar Monocotiledónea: 8 preguntas/);
+    await expect(contador(page)).toHaveText('Pregunta 1 / 8');
+    const mono = await jugar(page, 5);
+    expect(mono).toHaveLength(8);
+    r = await resultado(page);
+    expect(r.titulo).toBe('Resultado: 5/8');
+    expect(r.emoji).toBe('👍');
+    expect(r.porcentaje).toMatch(pct(63));
+    expect(r.porGrupo).toEqual({ 'Monocotiledónea': '5/8' });
+
+    await page.getByRole('button', { name: /Volver a jugar/ }).click();
+    await empezar(page, /^Modo rápido: 20 preguntas/);
+    expect(await jugar(page, 16)).toHaveLength(20);
+    r = await resultado(page);
+    expect(r.titulo).toBe('Resultado: 16/20');
+    expect(r.emoji).toBe('🏆');
+    expect(r.porcentaje).toMatch(pct(80));
+    expect(r.tituloErrores).toBe('Repasa estos 4 errores:');
+  });
+
+  /**
+   * CASO DE RECHAZO — «Siguiente» sin contestar y el recorrido solo con teclado.
+   * Esperado a mano: antes de responder no hay «Siguiente» (el panel de la explicación solo se
+   * pinta en 'feedback'); Intro y Espacio sobre el enunciado enfocado no contestan ni avanzan
+   * («Pregunta 1 / 7», 4 opciones activas, 0 correctas). Tab lleva a la 1.ª opción e Intro la
+   * elige: el marcador suma 1 solo si esa era la correcta según la clave; el foco pasa a
+   * «Siguiente», e Intro lleva a «Pregunta 2 / 7» con el foco en el enunciado nuevo (h2,
+   * tabindex -1), nunca en <body>, y sin contestarla.
+   */
+  test('caso de rechazo: sin contestar no hay «Siguiente» y el teclado no salta preguntas', async ({ page }) => {
+    test.setTimeout(60_000);
+    await abrir29(page);
+    await empezar(page, /^Practicar Gimnosperma: 7 preguntas/);
+    await page.waitForTimeout(600);
+    const foco = () => page.evaluate(() => {
+      const a = document.activeElement as HTMLElement | null;
+      return `${a?.tagName ?? '—'}:${a?.getAttribute('tabindex') ?? ''}:${(a?.textContent ?? '').replace(/\s+/g, ' ').trim().slice(0, 30)}`;
+    });
+    const nombre = norm(await enunciado(page).innerText());
+    expect(await foco()).toBe(`H2:-1:${nombre}`);
+    await expect(page.locator('[class*="btnSiguiente"]')).toHaveCount(0);
+
+    await page.keyboard.press('Enter');
+    await page.keyboard.press('Space');
+    await page.waitForTimeout(200);
+    await expect(contador(page)).toHaveText('Pregunta 1 / 7');
+    await expect(feedback(page)).toHaveCount(0);
+    expect(await habilitadas(page)).toBe(4);
+    await expect(marcador(page)).toHaveText(/^✅ 0 correctas$/);
+
+    const primera = (await rotulos(page))[0];
+    const suma = primera === CLAVE[nombre] ? 1 : 0;
+    await page.keyboard.press('Tab');
+    await expect(opciones(page).nth(0)).toBeFocused();
+    await page.keyboard.press('Enter');
+    await expect(feedback(page)).toBeVisible();
+    await expect(page.locator('[class*="btnSiguiente"]')).toBeFocused();
+    await expect(marcador(page)).toHaveText(new RegExp(`^✅ ${suma} correctas$`));
+
+    await page.keyboard.press('Enter');
+    await expect(contador(page)).toHaveText('Pregunta 2 / 7');
+    const nombre2 = norm(await enunciado(page).innerText());
+    expect(await foco()).toBe(`H2:-1:${nombre2}`);
+    await expect(feedback(page)).toHaveCount(0);
+    expect(await habilitadas(page)).toBe(4);
+    await expect(marcador(page)).toHaveText(new RegExp(`^✅ ${suma} correctas$`));
+  });
+
+  test('hallazgo · durante la partida la página se queda sin <h1> ni <main>', async ({ page }) => {
+    // page.tsx:298-383 — en 'jugando' y 'feedback' la app devuelve solo el `quizWrapper` (sin logo,
+    // hero ni <main>): el único encabezado es el <h2> con el nombre de la planta. La referencia de
+    // la familia, quiz-literatura-universal, mantiene su <h1> y su <main> durante la partida, y esta
+    // misma app los tiene en el inicio y en el resultado. Esperado: 1 <h1> y 1 <main> en la
+    // pregunta 1 de Modo Rápido · obtenido el 29/10/2026: 0 y 0 (a 1280 y a 360 px).
+    test.fail();
+    await abrir29(page);
+    await empezar(page, /^Modo rápido/);
+    const cuenta = await page.evaluate(() => ({
+      h1: document.querySelectorAll('h1').length,
+      main: document.querySelectorAll('main').length,
+    }));
+    expect(cuenta).toEqual({ h1: 1, main: 1 });
+  });
+
+  test('hallazgo · la regla «múltiplos de 3 → monocot» de la guía choca con el aguacate sin avisar', async ({ page }) => {
+    // La FAQ visible enseña «flor con piezas en múltiplos de 3 → monocot; de 4 o 5 → dicot» y la
+    // tabla «Dicotiledóneas: […] flores 4-5-meras»; la ficha del aguacate (la app lo da por
+    // Dicotiledónea) dice «Flores pequeñas con 6 tépalos en 2 verticilos», es decir, trímeras, como
+    // el tulipán («los 6 tépalos son característica de las Liliaceae»). Quien aplica la regla de la
+    // propia guía contesta «Monocotiledónea» y la app le dice «❌ Era: Dicotiledónea» sin explicar
+    // la excepción (las lauráceas son magnólidas: dicotiledóneas pero no eudicotiledóneas).
+    // Esperado: la ficha o la guía avisan de la excepción · obtenido el 29/10/2026: ninguna lo hace.
+    test.fail();
+    await abrir29(page);
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const regla = page.locator('details').filter({ hasText: '¿Cómo distingo monocotiledóneas de dicotiledóneas rápidamente?' });
+    await regla.locator('summary').click();
+    await expect(regla.locator('p')).toContainText('múltiplos de 3 → monocot');
+    const aguacate = ficha('Aguacate');
+    expect(aguacate.grupo).toBe('dicotiledonea');
+    expect(aguacate.explicacion).toContain('6 tépalos en 2 verticilos');
+    const avisos = [aguacate.explicacion, norm(await regla.locator('p').innerText())].filter((t) =>
+      /magn[oó]lid|excepci|eudicot|no siempre|salvo/i.test(t),
+    );
+    expect(avisos, 'la ficha del aguacate o la regla avisan de la excepción').not.toEqual([]);
+  });
+});
+
+test.describe('Inspector 29/10/2026 · móvil 360 × 740', () => {
+  test.use({
+    viewport: { width: 360, height: 740 },
+    userAgent: MOVIL.userAgent,
+    deviceScaleFactor: MOVIL.deviceScaleFactor,
+    isMobile: MOVIL.isMobile,
+    hasTouch: MOVIL.hasTouch,
+  });
+
+  test('caso normal a 360 px: Modo Completo fallando las 6 dicotiledóneas da 34/40, 85 % y 🏆', async ({ page }) => {
+    await partidaCompletaSinDicot(page);
   });
 });

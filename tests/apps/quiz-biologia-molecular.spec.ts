@@ -1322,11 +1322,11 @@ test.describe('Inspector 04/10/2026 · móvil 360 × 740', () => {
 // ─────────────────────────────────────────────────────────────────────────────
 //
 // Vuelve a la cola por cd462414 (scroll-padding en globals.css) y 99e1ee7e (relacionadas desde
-// el servidor). La guarda de doble toque de esta app es LOCAL a sus manejadores: `clicDeMas` y
+// el servidor). La guarda de doble toque de esta app ERA local a sus manejadores: `clicDeMas` y
 // `conClic` (page.tsx:548-555, con `ultimoCambioPantallaRef`), la misma forma que la referencia
-// quiz-literatura-universal; NO usa lib/useGuardaRafaga.ts, que escucha en captura sobre
-// window. Dentro del quiz para el 2.º toque; lo que cae fuera (la guía educativa, las
-// relacionadas, el pie) actúa.
+// quiz-literatura-universal, y no usaba lib/useGuardaRafaga.ts. Dentro del quiz paraba el 2.º
+// toque; lo que caía fuera (la guía educativa, las relacionadas, el pie) actuaba. Desde
+// c5b619bb (28/10/2026) es useGuardaRafaga, en captura sobre window, como las hermanas.
 
 /** Toca una opción con el dedo: la correcta según la clave a mano, o la primera que no lo es. */
 async function responderTocando(page: Page, modo: 'bien' | 'mal'): Promise<void> {
@@ -1506,8 +1506,8 @@ test.describe('Inspector 28/10/2026', () => {
   });
 
   /**
-   * HALLAZGO (operativa) — ABIERTO. La guarda local (page.tsx:548-555) no alcanza lo que no es del
-   * quiz. Tras «Ver resultados», la tarjeta de la nota del examen es más alta que la pantalla de
+   * HALLAZGO 3641 (operativa) — REPARADO el 28/10/2026 (c5b619bb; era ABIERTO). La guarda local
+   * (page.tsx:548-555) no alcanzaba lo que no es del quiz. Tras «Ver resultados», la tarjeta de la nota del examen es más alta que la pantalla de
    * inicio; al pulsar «Volver al inicio» el foco sube al título y bajo el puntero queda el botón
    * «Ver guía educativa», que el 2.º clic del doble clic abre. Medido el 28/10/2026: 1280 × 800
    * (semilla 1), 1366 × 768 (semilla 7) y 1024 × 768 táctil (semilla 21), uno de cada examen.
@@ -1643,9 +1643,9 @@ test.describe('Inspector 28/10/2026 · móvil 412 × 915', () => {
   });
 
   /**
-   * HALLAZGO (operativa) — ABIERTO. La guarda de doble toque es local a los manejadores del quiz
-   * (`clicDeMas`/`conClic`, page.tsx:548-555), como la de la referencia, y no ve lo que no es del
-   * quiz. Al pulsar «Siguiente» la explicación desaparece y, bajo el dedo, queda el botón «Ver
+   * HALLAZGO 3641 (operativa) — REPARADO el 28/10/2026 (c5b619bb; era ABIERTO). La guarda de doble
+   * toque era local a los manejadores del quiz (`clicDeMas`/`conClic`, page.tsx:548-555), como la de
+   * la referencia, y no veía lo que no es del quiz. Al pulsar «Siguiente» la explicación desaparece y, bajo el dedo, queda el botón «Ver
    * guía educativa» (o su cabecera, y el ajuste táctil lo alcanza): el 2.º toque abre la guía, y
    * el siguiente la cierra; el foco deja el enunciado y se va al conmutador. Medido el 28/10/2026,
    * fallando con la opción más baja: a 412 × 915, 33 de 87 «Siguiente» y 3 de 7 «Ver resultados»;
@@ -1665,5 +1665,283 @@ test.describe('Inspector 28/10/2026 · móvil 412 × 915', () => {
     await page.waitForTimeout(600);
     const r = await segundosToques(page, true, POR_CATEGORIA);
     expect(r.guia).toEqual([]);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// RE-INSPECCIÓN DEL 29/10/2026 (la familia «Quizzes de opción múltiple» entera)
+// ─────────────────────────────────────────────────────────────────────────────
+//
+// Vuelve a la cola por la reparación de la familia del 28/10/2026 (c5b619bb: useGuardaRafaga en
+// vez de la guarda local; responder marca `soloMismoPunto`). Los 3 casos se resolvieron a mano
+// ANTES de ejecutar, con la fórmula de motor.ts (nota = aciertos·10/total, escala RD 1125/2003) y
+// el render de page.tsx; medidos el 29/10/2026 en escritorio (1280 × 800) y a 360 × 740 con el
+// dedo, con lo mismo en los dos tamaños.
+
+/** Los 6 enunciados de la categoría Traducción (ids 19-24 del banco), escritos a mano. */
+const ENUNCIADOS_TRADUCCION = new Set([
+  '¿Cuántas bases forman un codón?',
+  '¿Cuál es el codón de inicio de la traducción?',
+  '¿Cuántos codones de parada (stop) existen en el código genético estándar?',
+  '¿Dónde ocurre la traducción en eucariotas?',
+  '¿Qué es el sitio A del ribosoma?',
+  '¿Qué enzima cataliza la formación del enlace peptídico?',
+]);
+
+/** Sin <input>: la hidratación se espera a que React cuelgue sus props del botón (como el testigo). */
+async function esperarHidratado(page: Page, texto: RegExp): Promise<void> {
+  await page.waitForFunction(
+    ({ fuente, banderas }) => {
+      const patron = new RegExp(fuente, banderas);
+      const boton = [...document.querySelectorAll('button')].find(
+        (b) => (b as HTMLElement).offsetParent !== null && patron.test(b.textContent ?? ''),
+      );
+      return Boolean(boton && Object.keys(boton).some((k) => k.startsWith('__reactProps$')));
+    },
+    { fuente: texto.source, banderas: texto.flags },
+    { timeout: 20_000 },
+  );
+}
+
+/** Filas del desglose: rótulo sin el emoji (aria-hidden), marcador y ancho de la barra. */
+async function filasDesglose(page: Page) {
+  return page.locator('[class*="desgloseItem"]').evaluateAll((filas) =>
+    filas.map((f) => {
+      const cat = f.querySelector('[class*="desgloseCat"]') as Element;
+      const rotulo = [...cat.childNodes]
+        .filter((n) => !(n instanceof Element && n.getAttribute('aria-hidden') === 'true'))
+        .map((n) => n.textContent ?? '')
+        .join('')
+        .trim();
+      const marcador = (f.querySelector('[class*="desgloseScore"]')?.textContent ?? '').trim();
+      const ancho = (f.querySelector('[class*="desgloseBarraRelleno"]') as HTMLElement | null)?.style.width ?? '';
+      return `${rotulo} ${marcador} ${ancho}`;
+    }),
+  );
+}
+
+/** Lo que se ve de la pregunta en curso: opciones, bloqueadas, contador, veredicto y «Siguiente». */
+async function estadoPregunta(page: Page) {
+  return {
+    ...(await pantalla(page)),
+    veredicto: await page.locator('[class*="feedbackResultado"]').count(),
+    avanzar: await botonAvanzar(page).count(),
+    aciertos: norm(await aciertosBadge(page).textContent()),
+  };
+}
+
+test.describe('Inspector 29/10/2026', () => {
+  /**
+   * CASO NORMAL — examen completo acertando todas MENOS las 6 de Traducción.
+   * Resuelto a mano ANTES de ejecutar:
+   *   · aciertos 30 − 6 = 24 · nota 24·10/30 = 8 exacto → [7 · 9) «Notable» 👍 · Math.round(80) =
+   *     «80 %» · «Nota: 8,0 sobre 10» · Errores 6.
+   *   · Desglose en el orden de CATEGORIAS_ORDEN: ADN y ARN 6/6, Replicación 6/6, Transcripción 6/6,
+   *     Traducción 0/6 y Mutaciones 6/6, con barras al 100 %, 100 %, 100 %, 0 % y 100 %.
+   *   · «Racha máx.» = la serie más larga de preguntas seguidas que NO son de Traducción en el
+   *     orden que salga: se cuenta en el propio flujo del test (con la semilla 29102026, medido el
+   *     29/10/2026, la serie es T····TT······T·····T····T····· y da 6).
+   *   · aria-label de la tarjeta: «Resultado: 24 de 30 aciertos, Notable», con el foco en ella.
+   */
+  test('caso normal: examen fallando las 6 de Traducción da 24/30, 80 %, nota 8,0, «Notable» y el desglose 6-6-6-0-6', async ({ page }) => {
+    test.setTimeout(150_000);
+    await sembrarAzar(page, 29102026);
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await abrir(page);
+    await esperarHidratado(page, /Comenzar quiz/);
+    await empezar(page, 'examen');
+    const serie: boolean[] = []; // true = acertada
+    for (let n = 1; n <= TOTAL_EXAMEN; n++) {
+      await expect(page.getByText(`Pregunta ${n} de ${TOTAL_EXAMEN}`)).toBeVisible();
+      const bien = !ENUNCIADOS_TRADUCCION.has(norm(await enunciado(page).innerText()));
+      await responder(page, bien ? 'bien' : 'mal');
+      serie.push(bien);
+      await botonAvanzar(page).click();
+    }
+    expect(serie.filter((b) => !b), 'salen las 6 de Traducción').toHaveLength(POR_CATEGORIA);
+    let rachaMax = 0;
+    let racha = 0;
+    for (const b of serie) {
+      racha = b ? racha + 1 : 0;
+      rachaMax = Math.max(rachaMax, racha);
+    }
+    expect(await resultado(page)).toEqual({
+      circulo: '24/30',
+      etiqueta: 'Notable', // nota 8 ∈ [7 · 9)
+      emoji: '👍',
+      pct: '80 %', // Math.round(24/30·100), con espacio duro (hallazgo 2832)
+      nota: 'Nota: 8,0 sobre 10',
+      stats: ['24Aciertos', '6Errores', `${rachaMax}Racha máx.`],
+    });
+    expect(await filasDesglose(page)).toEqual([
+      'ADN y ARN 6/6 100%',
+      'Replicación 6/6 100%',
+      'Transcripción 6/6 100%',
+      'Traducción 0/6 0%',
+      'Mutaciones 6/6 100%',
+    ]);
+    const tarjeta = page.locator('[class*="resultadoCard"]');
+    await expect(tarjeta).toBeFocused();
+    await expect(tarjeta).toHaveAttribute('aria-label', 'Resultado: 24 de 30 aciertos, Notable');
+  });
+
+  /**
+   * DEBE RECHAZARSE (teclado) — resuelto a mano leyendo page.tsx: sin contestar no se pinta
+   * «Siguiente» (solo existe con estado 'respondida'); el enunciado enfocado es un <p tabIndex=-1>,
+   * no un botón, así que Enter y Espacio sobre él no contestan ni avanzan; un clic en el enunciado,
+   * en la insignia de la categoría o en el contador tampoco. Tras contestar, el foco está en
+   * «Siguiente» y dos Enter seguidos avanzan UNA pregunta: el 1.º avanza y lleva el foco al
+   * enunciado nuevo, y el 2.º cae en ese <p>, que no hace nada → «Pregunta 2 de 30» sin contestar
+   * (4 opciones habilitadas, sin veredicto) y el marcador en «✓ 1 acierto».
+   */
+  test('debe rechazarse: sin contestar no hay «Siguiente» y nada que no sea una opción contesta; Enter×2 en «Siguiente» avanza una sola', async ({ page }) => {
+    await abrir(page);
+    await esperarHidratado(page, /Comenzar quiz/);
+    await empezar(page, 'examen');
+    await expect(enunciado(page)).toBeFocused();
+    const intacta = { opciones: 4, bloqueadas: 0, contador: 'Pregunta 1 de 30', veredicto: 0, avanzar: 0, aciertos: '✓ 0 aciertos' };
+    expect(await estadoPregunta(page)).toEqual(intacta);
+    await page.keyboard.press('Enter');
+    await page.keyboard.press(' ');
+    await page.waitForTimeout(300);
+    expect(await estadoPregunta(page), 'Enter y Espacio sobre el enunciado').toEqual(intacta);
+    await enunciado(page).click();
+    await page.locator('[class*="categoriaBadge"]').click();
+    await page.getByText('Pregunta 1 de 30').click();
+    await page.waitForTimeout(300);
+    expect(await estadoPregunta(page), 'clics en el enunciado, la insignia y el contador').toEqual(intacta);
+
+    await responder(page, 'bien');
+    await expect(botonAvanzar(page)).toBeFocused();
+    await page.keyboard.press('Enter');
+    await page.keyboard.press('Enter');
+    await page.waitForTimeout(400);
+    expect(await estadoPregunta(page), 'dos Enter en «Siguiente»').toEqual({
+      opciones: 4,
+      bloqueadas: 0,
+      contador: 'Pregunta 2 de 30',
+      veredicto: 0,
+      avanzar: 0,
+      aciertos: '✓ 1 acierto',
+    });
+    await expect(enunciado(page)).toBeFocused();
+  });
+
+  /**
+   * HALLAZGO (contenido) — ABIERTO. La meta description escribe el ordinal sin el punto que pide la
+   * Ortografía de la RAE (2010) para su abreviatura: «Para Bachillerato y 1º de carrera.» (lo
+   * correcto es «1.º»). La propia app lo escribe bien en el FAQPage: «(2.º curso, asignatura de
+   * Biología)». Es el texto que sale en el resultado del buscador. Medido el 29/10/2026 en el HTML
+   * servido: esperado «1.º de carrera» · obtenido «1º de carrera».
+   */
+  test('hallazgo · la description escribe el ordinal con punto («1.º»), como el FAQPage («2.º curso»)', async ({ page }) => {
+    test.fail(true, 'ABIERTO: la description dice «1º de carrera»');
+    const html = await (await page.request.get(RUTA)).text();
+    const descripcion = html.match(/<meta name="description" content="([^"]*)"/)?.[1] ?? '';
+    expect(descripcion).not.toMatch(/\dº/);
+  });
+});
+
+test.describe('Inspector 29/10/2026 · móvil 360 × 740', () => {
+  test.use({
+    viewport: { width: 360, height: 740 },
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Mobile Safari/537.36',
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  /**
+   * CASO LÍMITE (móvil, con el dedo) — examen entero, las 30 acertadas.
+   * Resuelto a mano ANTES de ejecutar:
+   *   · 30/30 → pleno → «¡Perfecto!» 🏆 (no «Sobresaliente»: el pleno va antes que el ≥ 9) · «100 %»
+   *     · «Nota: 10,0 sobre 10» · 0 errores · «Racha máx.» 30 · las 5 filas del desglose 6/6 al 100 %.
+   *   · En la 30.ª, antes de contestar: barra al 29/30 = 96,67 % (cuenta las ya respondidas) e
+   *     insignia «🔥 Racha: 29»; al contestarla, «Racha: 30» y «✓ 30 aciertos».
+   *   · «Siguiente pregunta →» hasta la 29.ª y «Ver resultados →» solo en la 30.ª; el foco acaba en
+   *     la tarjeta, con aria-label «Resultado: 30 de 30 aciertos, ¡Perfecto!».
+   */
+  test('caso límite (móvil): 30 de 30 con el dedo da «¡Perfecto!», 100 %, nota 10,0 y racha 30; solo la 30.ª ofrece «Ver resultados»', async ({ page }) => {
+    test.setTimeout(180_000);
+    await sembrarAzar(page, 7);
+    await abrir(page);
+    await esperarHidratado(page, /Comenzar quiz/);
+    const comenzar = page.getByRole('button', { name: /Comenzar quiz/ });
+    await bajarLoJusto(comenzar);
+    await tocarCentro(page, comenzar);
+    const racha = page.locator('[class*="rachaBadge"]');
+    for (let n = 1; n <= TOTAL_EXAMEN; n++) {
+      await expect(page.getByText(`Pregunta ${n} de ${TOTAL_EXAMEN}`)).toBeVisible();
+      await expect(enunciado(page)).toBeFocused();
+      if (n === TOTAL_EXAMEN) {
+        const ancho = await page.locator('[class*="barraRelleno"]').evaluate((e) => parseFloat((e as HTMLElement).style.width));
+        expect(ancho).toBeCloseTo(((TOTAL_EXAMEN - 1) / TOTAL_EXAMEN) * 100, 2);
+        await expect(racha).toHaveText(/Racha: 29$/);
+      }
+      await responderTocando(page, 'bien');
+      if (n === TOTAL_EXAMEN) {
+        await expect(racha).toHaveText(/Racha: 30$/);
+        await expect(aciertosBadge(page)).toHaveText('✓ 30 aciertos');
+      }
+      const avanzar = botonAvanzar(page);
+      await expect(avanzar).toHaveText(n < TOTAL_EXAMEN ? 'Siguiente pregunta →' : 'Ver resultados →');
+      await bajarLoJusto(avanzar);
+      await tocarCentro(page, avanzar);
+    }
+    const tarjeta = page.locator('[class*="resultadoCard"]');
+    await expect(tarjeta).toBeFocused();
+    expect(await resultado(page)).toEqual({
+      circulo: '30/30',
+      etiqueta: '¡Perfecto!',
+      emoji: '🏆',
+      pct: '100 %', // con espacio duro (hallazgo 2832)
+      nota: 'Nota: 10,0 sobre 10',
+      stats: ['30Aciertos', '0Errores', '30Racha máx.'],
+    });
+    expect(await filasDesglose(page)).toEqual([
+      'ADN y ARN 6/6 100%',
+      'Replicación 6/6 100%',
+      'Transcripción 6/6 100%',
+      'Traducción 6/6 100%',
+      'Mutaciones 6/6 100%',
+    ]);
+    await expect(tarjeta).toHaveAttribute('aria-label', 'Resultado: 30 de 30 aciertos, ¡Perfecto!');
+  });
+
+  /**
+   * DEBE RECHAZARSE (móvil) — lo mismo que en escritorio, con el dedo: tocar el enunciado, la
+   * insignia de la categoría o el contador no contesta ni avanza, y sin contestar no hay
+   * «Siguiente». Contestada la 1.ª, un toque en «Siguiente» deja la 2.ª sin contestar.
+   */
+  test('debe rechazarse (móvil): tocar lo que no es una opción no contesta ni avanza', async ({ page }) => {
+    await abrir(page);
+    await esperarHidratado(page, /Comenzar quiz/);
+    const comenzar = page.getByRole('button', { name: /Comenzar quiz/ });
+    await bajarLoJusto(comenzar);
+    await tocarCentro(page, comenzar);
+    await expect(page.getByText('Pregunta 1 de 30')).toBeVisible();
+    const intacta = { opciones: 4, bloqueadas: 0, contador: 'Pregunta 1 de 30', veredicto: 0, avanzar: 0, aciertos: '✓ 0 aciertos' };
+    expect(await estadoPregunta(page)).toEqual(intacta);
+    for (const loc of [enunciado(page), page.locator('[class*="categoriaBadge"]'), page.getByText('Pregunta 1 de 30')]) {
+      await page.waitForTimeout(450); // fuera de la ventana de ráfaga del toque anterior
+      await bajarLoJusto(loc);
+      await tocarCentro(page, loc);
+    }
+    await page.waitForTimeout(300);
+    expect(await estadoPregunta(page), 'toques en el enunciado, la insignia y el contador').toEqual(intacta);
+    await responderTocando(page, 'bien');
+    const avanzar = botonAvanzar(page);
+    await bajarLoJusto(avanzar);
+    await tocarCentro(page, avanzar);
+    await expect(page.getByText('Pregunta 2 de 30')).toBeVisible();
+    expect(await estadoPregunta(page)).toEqual({
+      opciones: 4,
+      bloqueadas: 0,
+      contador: 'Pregunta 2 de 30',
+      veredicto: 0,
+      avanzar: 0,
+      aciertos: '✓ 1 acierto',
+    });
   });
 });

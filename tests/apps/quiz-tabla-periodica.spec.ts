@@ -1360,7 +1360,7 @@ test.describe('Quiz Tabla Periódica · re-inspección 28/10/2026 (escritorio)',
   }
 
   /**
-   * CASO 20 — HALLAZGO (28/10/2026): el «%» va pegado a la cifra
+   * CASO 20 — HALLAZGO 3631 (28/10/2026, abierto): el «%» va pegado a la cifra
    *
    * Formato español (CLAUDE.md global §2, Ortografía de la RAE 2010): «15 %», con espacio duro
    * U+00A0. Ronda forzada con los ids 6, 16, 20 y 22 delante y todo bien: las explicaciones dicen
@@ -1387,7 +1387,7 @@ test.describe('Quiz Tabla Periódica · re-inspección 28/10/2026 (escritorio)',
   });
 
   /**
-   * CASO 21 — HALLAZGO (28/10/2026): la FAQ visible y el FAQPage responden distinto a lo mismo
+   * CASO 21 — HALLAZGO 3632 (28/10/2026, abierto): la FAQ visible y el FAQPage responden distinto a lo mismo
    *
    * «¿Cuántos elementos existen?» (visible) y «¿Cuántos elementos tiene la tabla periódica?»
    * (FAQPage) son la misma pregunta con dos respuestas escritas aparte; igual «¿Por qué los gases
@@ -1420,7 +1420,7 @@ test.describe('Quiz Tabla Periódica · re-inspección 28/10/2026 (escritorio)',
   });
 
   /**
-   * CASO 22 — HALLAZGO (28/10/2026): el FAQPage pregunta «por qué no reaccionan» los gases nobles
+   * CASO 22 — HALLAZGO 3633 (28/10/2026, abierto): el FAQPage pregunta «por qué no reaccionan» los gases nobles
    *
    * La guía de la propia página pone entre los «Errores frecuentes» «Asumir que los gases nobles
    * nunca reaccionan: el Xenón y el Kriptón sí forman compuestos», y la explicación de la
@@ -1440,7 +1440,7 @@ test.describe('Quiz Tabla Periódica · re-inspección 28/10/2026 (escritorio)',
   });
 
   /**
-   * CASO 23 — HALLAZGO (28/10/2026): el JSON-LD no lista ninguna característica
+   * CASO 23 — HALLAZGO 3634 (28/10/2026, abierto): el JSON-LD no lista ninguna característica
    *
    * metadata.ts pasa `features: []` a generateWebAppSchema, así que el WebApplication sale con
    * `featureList: []` (§1.ter pide 4-8). DEBERÍA: al menos 4, de lo que la app hace de verdad.
@@ -1453,7 +1453,7 @@ test.describe('Quiz Tabla Periódica · re-inspección 28/10/2026 (escritorio)',
   });
 
   /**
-   * CASO 24 — HALLAZGO (28/10/2026): la guía pone la W entre los símbolos que «no coinciden con
+   * CASO 24 — HALLAZGO 3635 (28/10/2026, abierto): la guía pone la W entre los símbolos que «no coinciden con
    * el nombre español», y la propia app lo llama «Wolframio»
    *
    * Paso «Aprende los símbolos irregulares»: «Memoriza los que no coinciden con el nombre
@@ -1472,7 +1472,7 @@ test.describe('Quiz Tabla Periódica · re-inspección 28/10/2026 (escritorio)',
   });
 
   /**
-   * CASO 25 — HALLAZGO (28/10/2026): «La reactividad aumenta hacia los extremos de cada período»
+   * CASO 25 — HALLAZGO 3636 (28/10/2026, abierto): «La reactividad aumenta hacia los extremos de cada período»
    *
    * Paso «Relaciona propiedades con posición». El extremo derecho de cada período es un gas
    * noble, y la tabla de la misma guía dice de ellos «Grupo 18. Capa de valencia completa,
@@ -1489,7 +1489,7 @@ test.describe('Quiz Tabla Periódica · re-inspección 28/10/2026 (escritorio)',
   });
 
   /**
-   * CASO 26 — HALLAZGO (28/10/2026): la lista de metaloides se da como cerrada
+   * CASO 26 — HALLAZGO 3637 (28/10/2026, abierto): la lista de metaloides se da como cerrada
    *
    * La tabla de la guía dice «Metaloides: Propiedades intermedias: B, Si, Ge, As, Sb, Te», sin
    * matiz. Qué elementos son metaloides es un convenio sin lista oficial, y las dos tablas de
@@ -1525,5 +1525,217 @@ test.describe('Quiz Tabla Periódica · re-inspección 28/10/2026 (móvil 412 px
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await abrirSinAviso(page);
     await partidaConDobleToque(page);
+  });
+});
+
+// ══════════════════════════════════════════════════════════════════════════════════════
+// INSPECTOR 29/10/2026 (casos 27 a 30)
+// ══════════════════════════════════════════════════════════════════════════════════════
+//
+// Vuelve a la cola por c5b619bb (28/10/2026): responder() llama ahora a
+// marcarCambioPantalla({ soloMismoPunto: true }), así que el 2.º toque de una ráfaga que cae a
+// menos de 24 px del 1.º también se ignora al contestar. Eso lo mide el testigo de la familia
+// (tests/familias/quizzes.spec.ts); aquí van los tres casos del Inspector, resueltos a mano antes de
+// abrir la app, y el sitio en que esta app se aparta de la referencia (quiz-literatura-universal):
+// cómo se marcan las opciones ya contestadas (caso 30).
+// Los hallazgos 3631-3637 de los casos 20-26 siguen abiertos en la base a 29/10/2026.
+
+test.describe('Quiz Tabla Periódica · inspector 29/10/2026 (escritorio)', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await abrirSinAviso(page);
+    await esperarEmpezarHidratado(page);
+  });
+
+  /**
+   * CASO 27 — Normal: 8 aciertos y 2 fallos con las preguntas de los ids 31-40
+   *
+   * Resuelto a mano ANTES de ejecutar, ronda forzada con las posiciones 30-39 del banco en orden
+   * (ids 31-40) y la clave de CLAVE_IUPAC: bien todas salvo la 3.ª (id 33, la del Mg: la buena es
+   * «Magnesio», átomo central de la clorofila) y la 8.ª (id 38, isótopos estables: la buena es
+   * «Estaño»).
+   *   contador tras cada respuesta: 1, 2, 2, 3, 4, 5, 6, 6, 7, 8
+   *   final 8/10 · Errores = 10 − 8 = 2 · Puntuación = round(8/10·100) = 80 %
+   *   getMensaje(): 80 ≥ 70 y < 90 → «¡Muy buen nivel!» · aria-label «Resultado: 8 de 10 aciertos»
+   * El 8/10 no lo recorría ningún caso anterior (sí 10, 9, 7, 6, 5, 4 y 0).
+   */
+  test('caso 27 · cálculo: 8 bien y 2 mal (ids 31-40) dan 8/10, 2 errores, 80 % y «¡Muy buen nivel!»', async ({ page }) => {
+    test.setTimeout(60_000);
+    const MAL = new Set([3, 8]);
+    const CONTADOR = [1, 2, 2, 3, 4, 5, 6, 6, 7, 8];
+    await empezarConBanco(page, 'Empezar quiz', [30, 31, 32, 33, 34, 35, 36, 37, 38, 39]);
+    await expect(enunciado(page)).toHaveText('¿Qué elemento es el principal componente de los chips modernos?');
+    for (let n = 1; n <= TOTAL_PREGUNTAS; n++) {
+      await expect(page.getByText(`Pregunta ${n} de ${TOTAL_PREGUNTAS}`)).toBeVisible();
+      await contestar(page, !MAL.has(n));
+      const c = CONTADOR[n - 1];
+      await expect(contadorAciertos(page)).toHaveText(`✓ ${c} ${c === 1 ? 'acierto' : 'aciertos'}`);
+      if (n === 3) {
+        // Fallada a propósito: la app pinta como buena la de la clave y lo explica.
+        await expect(enunciado(page)).toHaveText('¿Qué elemento es esencial para la fotosíntesis y tiene símbolo Mg?');
+        expect(limpiar(await opcionCorrecta(page).innerText())).toBe('Magnesio');
+        await expect(page.locator('[class*="explicacion"]')).toContainText('clorofila');
+      }
+      if (n === 8) {
+        await expect(enunciado(page)).toHaveText('¿Qué elemento tiene el mayor número de isótopos estables?');
+        expect(limpiar(await opcionCorrecta(page).innerText())).toBe('Estaño');
+      }
+      await botonAvanzar(page).click();
+    }
+    await expect(page.locator('[class*="resultadoCard"]')).toHaveAttribute('aria-label', 'Resultado: 8 de 10 aciertos');
+    await expect(page.locator('[class*="puntuacionCirculo"]')).toHaveText('8/10');
+    const stats = page.locator('[class*="statItem"]');
+    await expect(stats.nth(0)).toHaveText('8Aciertos');
+    await expect(stats.nth(1)).toHaveText('2Errores'); // 10 − 8
+    await expect(stats.nth(2)).toHaveText(/^80 ?%Puntuación$/); // round(8/10·100); el espacio duro es el 3631
+    await expect(page.locator('[class*="mensajeTexto"]')).toHaveText('¡Muy buen nivel!');
+  });
+
+  /**
+   * CASO 29 — Rechazo: sin contestar no se avanza, ni con teclado; y un Enter de más tras
+   * «Siguiente pregunta» no contesta ni salta la pregunta nueva
+   *
+   * Resuelto a mano leyendo page.tsx: el botón de avanzar solo se pinta con `haRespondido &&`; al
+   * empezar, el foco va al enunciado (<p tabindex="-1">), que no tiene manejador, así que Enter y
+   * Espacio ahí no hacen nada → sigue «Pregunta 1 de 10», «✓ 0 aciertos», 4 opciones habilitadas,
+   * sin veredicto ni botón de avanzar. El primer Tab lleva a la opción A, que en la del Oro es «47»
+   * (las opciones NO se barajan: es la A del banco) → Enter = fallo, foco a «Siguiente pregunta».
+   * Enter → pregunta 2 y el foco al enunciado nuevo; el 2.º Enter (teclado: detail 0, la guarda de
+   * ráfagas no lo filtra) cae en ese enunciado → sigue «Pregunta 2 de 10», «¿Qué elemento tiene
+   * número atómico 1?», 4 opciones habilitadas, sin veredicto, «✓ 0 aciertos».
+   */
+  test('caso 29 · operativa: sin contestar no se avanza (ni con Enter) y un Enter de más tras «Siguiente» no contesta la nueva', async ({ page }) => {
+    await empezarConBanco(page, 'Empezar quiz', PRIMERAS_DIEZ);
+    await expect(enunciado(page)).toBeFocused();
+    await expect(botonAvanzar(page)).toHaveCount(0);
+    await page.keyboard.press('Enter');
+    await page.keyboard.press('Space');
+    await expect(page.getByText(`Pregunta 1 de ${TOTAL_PREGUNTAS}`)).toBeVisible();
+    await expect(contadorAciertos(page)).toHaveText('✓ 0 aciertos');
+    expect(await habilitadas(page), 'Enter y Espacio en el enunciado no contestan').toBe(4);
+    await expect(page.locator('[class*="feedbackResultado"]')).toHaveCount(0);
+    await expect(botonAvanzar(page)).toHaveCount(0);
+
+    await page.keyboard.press('Tab');
+    await expect(opciones(page).first()).toBeFocused();
+    await expect(opciones(page).first()).toContainText('47');
+    await page.keyboard.press('Enter'); // A = «47»: fallo a propósito
+    await expect(page.locator('[class*="feedbackIncorrecto"]')).toBeVisible();
+    await expect(botonAvanzar(page)).toBeFocused();
+    await page.keyboard.press('Enter');
+    await page.keyboard.press('Enter'); // el de más
+    await expect(page.getByText(`Pregunta 2 de ${TOTAL_PREGUNTAS}`)).toBeVisible();
+    await expect(enunciado(page)).toHaveText('¿Qué elemento tiene número atómico 1?');
+    await expect(enunciado(page)).toBeFocused();
+    expect(await habilitadas(page), 'el Enter de más no contesta la pregunta 2').toBe(4);
+    await expect(page.locator('[class*="feedbackResultado"]')).toHaveCount(0);
+    await expect(contadorAciertos(page)).toHaveText('✓ 0 aciertos');
+  });
+
+  /**
+   * CASO 30 — HALLAZGO (29/10/2026): tras contestar, la buena y la fallada se distinguen solo por
+   * el color, y su nombre accesible no lo dice
+   *
+   * Ronda forzada ids 1-10, la del Oro fallada con «47». Medido el 29/10/2026 a 1.280 × 800: «A 47»
+   * lleva borde rgb(220, 38, 38) y «B 79» rgb(22, 163, 74) —rojo frente a verde, el par que
+   * confunde una deuteranopía— y el círculo de la letra #b91c1c / #15803d; las otras dos bajan a
+   * opacidad 0,4. Ninguna lleva ✓ ni ✗, y el árbol de accesibilidad da «A 47», «B 79», «C 82» y
+   * «D 29», las cuatro [disabled]: nada dice cuál es la buena ni cuál la elegida (WCAG 1.4.1).
+   * La referencia de la familia, quiz-literatura-universal, lo resolvió en su hallazgo 303: ✓/✗
+   * visibles con aria-hidden y «(respuesta correcta)» / «(tu respuesta, incorrecta)» en el
+   * aria-label de la opción.
+   * DEBERÍA: la buena y la fallada se distinguen sin el color, a la vista y en el nombre accesible.
+   */
+  test('caso 30 · accesibilidad: la opción correcta y la fallada no se distinguen solo por el color', async ({ page }) => {
+    test.fail(); // HALLAZGO abierto: falla por las aserciones finales, no por el montaje
+    await empezarConBanco(page, 'Empezar quiz', PRIMERAS_DIEZ);
+    await pulsarOpcion(page, '47');
+    await expect(page.locator('[class*="feedbackIncorrecto"]')).toBeVisible();
+    await expect(opcionCorrecta(page)).toContainText('79'); // el montaje: la buena es la de la clave
+    const fallada = page.locator('main button[class*="opcionIncorrecta"]');
+    await expect(fallada).toContainText('47');
+    await expect(opcionCorrecta(page)).toHaveAccessibleName(/correcta/i);
+    await expect(fallada).toHaveAccessibleName(/incorrecta|tu respuesta/i);
+    await expect(opcionCorrecta(page)).toContainText('✓');
+    await expect(fallada).toContainText('✗');
+  });
+});
+
+test.describe('Quiz Tabla Periódica · inspector 29/10/2026 (móvil 360 px)', () => {
+  test.use({
+    viewport: { width: 360, height: 740 },
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 14; SM-A146B) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Mobile Safari/537.36',
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test.beforeEach(async ({ page }) => {
+    await abrirSinAviso(page);
+    await esperarEmpezarHidratado(page);
+  });
+
+  /**
+   * CASO 28 — Límite: el elemento 1, el 118 y la última pregunta, todo bien, a 360 px
+   *
+   * Resuelto a mano ANTES de ejecutar, ronda forzada con las posiciones [1, 27, 33, 0, 2, 3, 4, 5,
+   * 6, 38] del banco y la clave de CLAVE_IUPAC:
+   *   1.ª  id 2  «¿Qué elemento tiene número atómico 1?» → «Hidrógeno» (Z = 1)
+   *   2.ª  id 28 grupo 18 → «7», y la explicación nombra al «Oganesón (Og)», Z = 118
+   *   3.ª  id 34 la de opciones más largas → «Su nombre alemán es "Wolfram"»
+   *   4.ª-9.ª ids 1, 3, 4, 5, 6, 7 → «79», «26», «Carbono», «92», «Oxígeno», «11»
+   *   10.ª id 39 la del renio (la explicación más larga) → «Renio»; la 9.ª dice «Siguiente
+   *        pregunta →» y la 10.ª «Ver resultados →» (indice + 1 >= 10)
+   *   contador 1…10 (singular en el 1) · 10/10 · Errores = 10 − 10 = 0 · round(10/10·100) = 100 %
+   *   getMensaje(): 100 ≥ 90 → «¡Experto en química!» · aria-label «Resultado: 10 de 10 aciertos»
+   * A 360 px ninguna pregunta desborda en horizontal (scrollWidth del documento = 360), y tras
+   * «Ver resultados» el círculo de la nota se ve entero bajo el logo fijo con el foco en la tarjeta
+   * (el caso 16b lo mide a 1.280 × 800; a 360 no lo medía ninguno).
+   */
+  test('caso 28 · límite: Z = 1, Z = 118 y la última, 10/10 a 360 px; la nota se ve y no hay scroll lateral', async ({ page }) => {
+    test.setTimeout(60_000);
+    await empezarConBanco(page, 'Empezar quiz', [1, 27, 33, 0, 2, 3, 4, 5, 6, 38]);
+    const ESPERADAS = [
+      'Hidrógeno', '7', 'Su nombre alemán es "Wolfram"', '79', '26', 'Carbono', '92', 'Oxígeno', '11', 'Renio',
+    ];
+    for (let n = 1; n <= TOTAL_PREGUNTAS; n++) {
+      await expect(page.getByText(`Pregunta ${n} de ${TOTAL_PREGUNTAS}`)).toBeVisible();
+      const { pregunta, correcta } = await respuestaEsperada(page);
+      expect(correcta, `la ${n}.ª de la ronda forzada es «${pregunta}»`).toBe(ESPERADAS[n - 1]);
+      const ancho = await page.evaluate(() => document.documentElement.scrollWidth);
+      expect(ancho, `«${pregunta}» a 360 px sin desbordar en horizontal`).toBe(360);
+      await pulsarOpcion(page, correcta);
+      await expect(page.locator('[class*="feedbackCorrecto"]')).toBeVisible();
+      await expect(contadorAciertos(page)).toHaveText(`✓ ${n} ${n === 1 ? 'acierto' : 'aciertos'}`);
+      if (n === 1) await expect(page.locator('[class*="explicacion"]')).toContainText('primer elemento');
+      if (n === 2) await expect(page.locator('[class*="explicacion"]')).toContainText('Oganesón (Og)');
+      if (n === 9) await expect(botonAvanzar(page)).toHaveText('Siguiente pregunta →');
+      if (n === 10) await expect(botonAvanzar(page)).toHaveText('Ver resultados →');
+      await botonAvanzar(page).click();
+    }
+    const tarjeta = page.locator('[class*="resultadoCard"]');
+    await expect(tarjeta).toHaveAttribute('aria-label', 'Resultado: 10 de 10 aciertos');
+    await expect(page.locator('[class*="puntuacionCirculo"]')).toHaveText('10/10');
+    const stats = page.locator('[class*="statItem"]');
+    await expect(stats.nth(0)).toHaveText('10Aciertos');
+    await expect(stats.nth(1)).toHaveText('0Errores'); // 10 − 10
+    await expect(stats.nth(2)).toHaveText(/^100 ?%Puntuación$/); // round(10/10·100)
+    await expect(page.locator('[class*="mensajeTexto"]')).toHaveText('¡Experto en química!');
+    await expect(tarjeta).toBeFocused();
+    const vista = await page.evaluate(() => {
+      const logo = document.querySelector('[class*="headerBar"]')?.firstElementChild?.getBoundingClientRect();
+      const c = (document.querySelector('[class*="puntuacionCirculo"]') as Element).getBoundingClientRect();
+      return {
+        arriba: Math.round(c.top),
+        abajo: Math.round(c.bottom),
+        finLogo: Math.round(logo?.bottom ?? 0),
+        alto: innerHeight,
+        ancho: document.documentElement.scrollWidth,
+      };
+    });
+    expect(vista.arriba, `nota desde y = ${vista.arriba}; el logo acaba en ${vista.finLogo}`).toBeGreaterThanOrEqual(vista.finLogo);
+    expect(vista.abajo).toBeLessThanOrEqual(vista.alto);
+    expect(vista.ancho, 'el resultado no desborda en horizontal').toBe(360);
   });
 });

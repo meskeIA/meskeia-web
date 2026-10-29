@@ -1769,12 +1769,14 @@ test.describe('S0181 · modo «Escribir las formas» y repaso', () => {
 // El testigo de la familia pasó 48/48 el 28/10/2026, también en esta app: mide el doble toque a
 // 390 × 844, en el modo de opciones, por el camino Empezar → Siguiente → Ver resultado. Esta app
 // tiene lo que sus quince hermanas no —el modo «Escribir las formas» y la lista de repaso
-// (S0181)— y NO monta useGuardaRafaga (lib/useGuardaRafaga.ts): que el testigo pase aquí es
-// geometría. A 390 × 844 lo que queda bajo el 2.º toque es texto; a 412 × 915 es la opción A de
-// la pregunta nueva (9 de 9 «Siguiente»), a 360 × 740 escribiendo es «Comprobar», y en
-// escritorio «Jugar de nuevo» y «Repasar mis fallos» contestan la 1.ª pregunta de la partida
+// (S0181)— y aquel día NO montaba useGuardaRafaga (lib/useGuardaRafaga.ts): que el testigo
+// pasara aquí era geometría. A 390 × 844 lo que quedaba bajo el 2.º toque era texto; a 412 × 915,
+// la opción A de la pregunta nueva (9 de 9 «Siguiente»); a 360 × 740 escribiendo, «Comprobar»; y
+// en escritorio «Jugar de nuevo» y «Repasar mis fallos» contestaban la 1.ª pregunta de la partida
 // nueva (barrido del 28/10/2026 en 7 tamaños: 360, 375, 390 y 412 de ancho en móvil; 1280,
-// 1366 y 1920 en escritorio).
+// 1366 y 1920 en escritorio). REPARADO el 28/10/2026 (hallazgo 3615, c5b619bb): la guarda va en
+// arrancar, responder, comprobar, Siguiente y Cambiar nivel. Lo que dejó sin cubrir —el foco que
+// se lleva el 2.º toque— es el hallazgo del Inspector 29/10/2026, al final del fichero.
 //
 // DE DÓNDE SALEN LOS VALORES ESPERADOS
 // · Las formas: el CANON de arriba. Puntuación y rótulos: calcularPuntuacion() y
@@ -1973,7 +1975,11 @@ test.describe('Inspector 28/10/2026', () => {
    * pregunta nueva no entra en la casilla (9 de 9 «Siguiente» en el barrido, a 1280 × 800).
    */
   test('hallazgo · escribiendo, doble clic en «Siguiente»: el 2.º no abre la guía ni saca el foco de la pregunta', async ({ page }) => {
-    // ABIERTO (Inspector 28/10/2026): mide que la guía siga plegada y el foco en la casilla.
+    // REPARADO A MEDIAS el 28/10/2026 (hallazgo 3615, cerrado en la base): la guía ya no se
+    // despliega, pero el mousedown del 2.º clic sigue llevándose el foco a «Ver guía educativa»
+    // (3 de 3 el 29/10/2026), y un Enter tras teclear la despliega. Lo que queda es el hallazgo
+    // nuevo del Inspector 29/10/2026 («el 2.º toque se lleva el foco de la casilla»), y por él
+    // sigue el test.fail(): falla en la aserción del foco, no en la de la guía.
     test.fail();
     test.setTimeout(60_000);
     await page.setViewportSize({ width: 1280, height: 800 });
@@ -2247,5 +2253,363 @@ test.describe('Inspector 28/10/2026 · móvil 360 × 740', () => {
     expect((await hud(page)).progreso).toBe('1/10');
     await expect(feedback(page), 'el 2.º toque ha comprobado la 1.ª pregunta vacía').toHaveCount(0);
     await expect(casillaPasado(page)).toBeEditable();
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// Inspector 29/10/2026 — re-inspección tras la guarda de doble toque de la familia (c5b619bb)
+// ═════════════════════════════════════════════════════════════════════════════
+//
+// La familia «quizzes» se reparó el 28/10/2026 (d9e710f8 y c5b619bb): esta app monta ya
+// useGuardaRafaga en arrancar, responder, comprobar, «Siguiente» y «Cambiar nivel», y el testigo
+// tests/familias/quizzes.spec.ts pasa entero. Lo que el testigo NO mide, y mira este bloque:
+//   · que el enunciado de la pregunta nueva quede A LA VISTA (no bajo la barra fija) a 360 px
+//     tras CADA «Siguiente», en los dos modos;
+//   · la ráfaga en «Ver resultados» y en «Jugar de nuevo» del modo «Escribir las formas»;
+//   · el modo «Escribir las formas» y la lista de repaso, que solo tiene esta hermana: es el punto
+//     ciego de la familia (ninguna otra tiene una casilla donde teclear tras «Siguiente»).
+//
+// DE DÓNDE SALEN LOS VALORES ESPERADOS
+// · Las formas: el CANON de arriba (cotejado con Oxford/Cambridge el 25/09/2026).
+// · Puntuación y rótulos: calcularPuntuacion() y getResultadoTexto() de page.tsx, resueltos a
+//   mano en cada caso. La precisión del HUD: correctas / respondidas con formatPercentage(·, 0),
+//   que es toLocaleString('es-ES'): redondea la mitad hacia arriba (5/8 = 62,5 → 63) y pone un
+//   espacio duro antes del «%».
+// · «A la vista»: ninguna línea de «Pregunta N de M», del enunciado ni del verbo por encima del
+//   borde, por debajo del pie de la ventana o cruzando un hijo de la barra fija del logo.
+// · Entre contestar y «Siguiente», y entre «Siguiente» y la respuesta siguiente, una pausa de
+//   lectura: un 2.º toque en el mismo punto dentro de la ventana de ráfaga es, para el navegador,
+//   el de un doble toque, y la guarda lo ignora a propósito (3615).
+
+/** Pausa de lectura entre dos toques de la misma persona (fuera de la ventana de ráfaga). */
+const LECTURA_MS = 400;
+
+/** Abre la app hidratada y espera además a que React cuelgue sus props de «Empezar Quiz». */
+async function abrirConProps(page: Page): Promise<void> {
+  await abrirHidratada(page);
+  await page.waitForFunction(() => {
+    const b = [...document.querySelectorAll('button')].find((x) => /Empezar Quiz/.test(x.textContent ?? ''));
+    return Boolean(b && Object.keys(b).some((k) => k.startsWith('__reactProps$')));
+  });
+}
+
+/** Líneas de la pregunta en pantalla que no se ven: fuera de la ventana o bajo la barra fija. */
+function lineasTapadas(page: Page): Promise<string[]> {
+  return page.evaluate(() => {
+    const barra = document.querySelector('[class*="headerBar"]');
+    const tapas = barra ? [...barra.children].map((c) => c.getBoundingClientRect()) : [];
+    const cruza = (a: DOMRect, b: DOMRect): boolean => a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom;
+    const fuera: string[] = [];
+    for (const clase of ['preguntaNumero', 'preguntaEtiqueta', 'verboPrincipal']) {
+      const el = document.querySelector(`[class*="${clase}"]`);
+      if (!el) {
+        fuera.push(`${clase} no está`);
+        continue;
+      }
+      const rango = document.createRange();
+      rango.selectNodeContents(el);
+      for (const l of rango.getClientRects()) {
+        if (l.top < 0 || l.bottom > innerHeight || tapas.some((t) => cruza(t, l))) fuera.push(`${clase} ${Math.round(l.top)}…${Math.round(l.bottom)}`);
+      }
+    }
+    return [...new Set(fuera)];
+  });
+}
+
+/** Lo que guarda la lista de repaso del navegador, por modo. */
+const listaGuardada = (page: Page): Promise<{ elegir?: Record<string, unknown>; escribir?: Record<string, unknown> } | null> =>
+  page.evaluate(() => JSON.parse(localStorage.getItem('meskeia_verbos_irregulares_repaso') ?? 'null'));
+
+test.describe('Inspector 29/10/2026 · móvil 360 × 740', () => {
+  test.use({
+    viewport: { width: 360, height: 740 },
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Mobile Safari/537.36',
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  /**
+   * CASO NORMAL — B1, 15 preguntas, modo de opciones, con el dedo: se fallan la 1.ª, la 4.ª, la
+   * 8.ª, la 11.ª y la 15.ª (la primera y la última) y se aciertan las otras 10.
+   *
+   * Resuelto a mano ANTES de ejecutar:
+   *   · B1 tiene 19 verbos preguntables (show fuera, hallazgo 316) ≥ 15 → «Empezar Quiz — 15
+   *     preguntas · Nivel B1», sin aviso; 15 verbos de B1 distintos, ninguno «show».
+   *   · aciertos tras cada pregunta: 0 1 2 2 3 4 5 5 6 7 7 8 9 10 10
+   *   · precisión: 0/1 0 · 1/2 50 · 2/3 66,67→67 · 2/4 50 · 3/5 60 · 4/6 66,67→67 · 5/7 71,43→71 ·
+   *     5/8 62,5→63 · 6/9 66,67→67 · 7/10 70 · 7/11 63,64→64 · 8/12 66,67→67 · 9/13 69,23→69 ·
+   *     10/14 71,43→71 · 10/15 66,67→67
+   *   · 10/15 = 0,6667 → rama «≥ 0,5» de calcularPuntuacion: 40 + (0,6667 − 0,5)/0,2 · 20 = 40 +
+   *     16,67 = 56,67 → 57 pts (la rama que ningún caso anterior de este spec recorría) ·
+   *     getResultadoTexto(0,6667) → «Buen intento» · «10 de 15 respuestas correctas» · «10/15» · 67 %
+   *   · fallados en su orden (los de la 1.ª, 4.ª, 8.ª, 11.ª y 15.ª) → «Has fallado 5 verbos: …» y
+   *     «Repasar mis fallos — 5 preguntas» (min(15, 5) = 5)
+   *   · tras cada uno de los 14 «Siguiente», el enunciado nuevo A LA VISTA (lo que el testigo de la
+   *     familia aún no mide) y el foco en la tarjeta de la pregunta (tabindex -1); tras «Ver
+   *     resultados», el foco en el panel del resultado.
+   */
+  test('caso normal · B1 con el dedo, 10 de 15 fallando la 1.ª y la última: 57 pts, «Buen intento», 67 % y el enunciado a la vista tras cada «Siguiente»', async ({ page }) => {
+    test.setTimeout(90_000);
+    await abrirConProps(page);
+    await page.locator('[class*="nivelBtn"]').filter({ hasText: 'B1 Intermedio' }).tap();
+    await page.getByRole('button', { name: '15 preguntas', exact: true }).tap();
+    await expect(page.locator('[class*="btnIniciar"]')).toHaveText('Empezar Quiz — 15 preguntas · Nivel B1');
+    await expect(page.locator('[class*="avisoNivel"]')).toHaveCount(0);
+    await page.locator('[class*="btnIniciar"]').tap();
+
+    const falla = new Set([1, 4, 8, 11, 15]);
+    const aciertosTras = [0, 1, 2, 2, 3, 4, 5, 5, 6, 7, 7, 8, 9, 10, 10];
+    const precisionTras = [0, 50, 67, 50, 60, 67, 71, 63, 67, 70, 64, 67, 69, 71, 67];
+    const vistos: string[] = [];
+    const fallados: string[] = [];
+    for (let i = 1; i <= 15; i++) {
+      await expect(page.getByText(`Pregunta ${i} de 15`, { exact: true })).toBeAttached();
+      const inf = norm(await verboEnPantalla(page).textContent());
+      vistos.push(inf);
+      expect(CANON[inf]?.nivel, `«${inf}» ha salido en una partida de B1`).toBe('B1');
+      const ops = await opcionesVisibles(page);
+      const buena = respuestaQueSePregunta(inf);
+      expect(ops, `Q${i} (${inf}): la buena no está entre ${ops.join(', ')}`).toContain(buena);
+      const acierta = !falla.has(i);
+      if (!acierta) fallados.push(inf);
+      await page.waitForTimeout(LECTURA_MS);
+      await (await botonDeOpcion(page, acierta ? buena : ops.find((o) => o !== buena)!)).tap();
+      await expect(feedback(page)).toContainText(acierta ? '¡Correcto!' : 'Incorrecto');
+      const h = await hud(page);
+      expect(h.progreso).toBe(`${i}/15`);
+      expect(h.correctas, `aciertos tras la ${i}.ª`).toBe(String(aciertosTras[i - 1]));
+      expect(h.precision, `precisión tras la ${i}.ª`).toBe(`${precisionTras[i - 1]} %`);
+      await expect(botonSiguiente(page)).toHaveText(i < 15 ? 'Siguiente pregunta →' : 'Ver resultados');
+      await page.waitForTimeout(LECTURA_MS);
+      await botonSiguiente(page).tap();
+      if (i < 15) {
+        await expect(page.getByText(`Pregunta ${i + 1} de 15`, { exact: true })).toBeAttached();
+        await expect
+          .poll(() => lineasTapadas(page), { message: `tras el «Siguiente» ${i}, la pregunta ${i + 1} no está a la vista`, timeout: 3000 })
+          .toEqual([]);
+        await expect(page.locator('[class*="preguntaCard"]'), `tras el «Siguiente» ${i}, el foco no está en el enunciado`).toBeFocused();
+      }
+    }
+    expect(new Set(vistos).size, `verbo repetido: ${vistos.join(', ')}`).toBe(15);
+    expect(vistos).not.toContain('show');
+
+    await expect(page.locator('[class*="resultadoPuntos"]')).toHaveText('57 pts');
+    await expect(page.locator('[class*="resultadoTitulo"]')).toHaveText('Buen intento');
+    await expect(page.locator('[class*="resultadoSubtitulo"]')).toHaveText('10 de 15 respuestas correctas');
+    const valores = (await page.locator('[class*="statRValor"]').allTextContents()).map((v) => v.trim());
+    expect(valores[0]).toBe('10/15');
+    expect(valores[1]).toBe('67 %');
+    await expect(page.locator('[class*="resultadoFallados"]')).toContainText(`Has fallado 5 verbos: ${fallados.join(', ')}.`);
+    await expect(page.getByRole('button', { name: 'Repasar mis fallos — 5 preguntas' })).toBeVisible();
+    await expect(page.locator('[class*="resultadoPanel"]')).toBeFocused();
+    await expect(page.locator('[class*="resultadoTitulo"]')).toBeInViewport();
+  });
+
+  /**
+   * CASO LÍMITE — A1 escribiendo, 15 preguntas (el nivel entero), todas bien con el dedo; la
+   * última pregunta y la ráfaga del testigo en «Ver resultados» y en «Jugar de nuevo».
+   *
+   * Resuelto a mano ANTES de ejecutar:
+   *   · A1 tiene 15 verbos → «Empezar Quiz — 15 preguntas · Nivel A1»; salen los 15, una vez cada
+   *     uno. Se escribe el canon (en «be», «was / were»: pasadosAdmitidos de motor.ts lo trocea).
+   *   · cada pregunta: «¡Correcto!» y HUD i/15 · i · 100 % · tras cada «Siguiente», el enunciado a
+   *     la vista y el foco en la casilla «Past Simple» (el diseño de este modo, page.tsx).
+   *   · 15/15 = 1 ≥ 0,9 → 100 pts · «¡Dominas el inglés!» · «15 de 15 respuestas correctas» ·
+   *     «15/15» · 100 % · sin línea de fallados ni «Repasar mis fallos» (almacenamiento limpio): los
+   *     botones son «🔄 Jugar de nuevo» y «⚙️ Cambiar nivel».
+   *   · ráfaga en «Ver resultados»: el 2.º toque no se come la nota → el mismo resultado, los
+   *     mismos dos botones.
+   *   · ráfaga en «Jugar de nuevo» (la partida era de nivel, no de repaso): otra de A1 escribiendo
+   *     en la MISMA página → 1/15 · 0 · 0 %, sin veredicto, la casilla del pasado vacía y editable,
+   *     y el enunciado a la vista. (Dónde queda el FOCO tras esa ráfaga es el hallazgo de abajo.)
+   */
+  test('caso límite · A1 escribiendo, 15 de 15 con el dedo: 100 pts, enunciado a la vista, y las ráfagas en «Ver resultados» y «Jugar de nuevo» no se comen la nota ni contestan', async ({ page }) => {
+    test.setTimeout(90_000);
+    await abrirConProps(page);
+    await marcarPagina(page);
+    await page.locator('[class*="nivelBtn"]').filter({ hasText: 'A1 Básico' }).tap();
+    await page.getByRole('button', { name: /Escribir las formas/ }).tap();
+    await page.getByRole('button', { name: '15 preguntas', exact: true }).tap();
+    await expect(page.locator('[class*="btnIniciar"]')).toHaveText('Empezar Quiz — 15 preguntas · Nivel A1');
+    await page.locator('[class*="btnIniciar"]').tap();
+
+    const vistos: string[] = [];
+    for (let i = 1; i <= 15; i++) {
+      await expect(page.getByText(`Pregunta ${i} de 15`, { exact: true })).toBeAttached();
+      await expect.poll(() => lineasTapadas(page), { message: `la pregunta ${i} no está a la vista`, timeout: 3000 }).toEqual([]);
+      await expect(casillaPasado(page), `la pregunta ${i} no deja el foco en la casilla del pasado`).toBeFocused();
+      const inf = norm(await verboEnPantalla(page).textContent());
+      vistos.push(inf);
+      expect(CANON[inf]?.nivel, `«${inf}» ha salido en una partida de A1`).toBe('A1');
+      const { pasado, participio } = formasBuenas(inf);
+      await casillaPasado(page).fill(pasado);
+      await casillaParticipio(page).fill(participio);
+      await page.waitForTimeout(LECTURA_MS); // lo que se tarda en teclear
+      await page.getByRole('button', { name: 'Comprobar', exact: true }).tap();
+      await expect(feedback(page), `«${inf}» escrito «${pasado} / ${participio}»`).toContainText('¡Correcto!');
+      expect([...Object.values(await hud(page))]).toEqual([`${i}/15`, String(i), '100 %']);
+      await expect(botonSiguiente(page)).toHaveText(i < 15 ? 'Siguiente pregunta →' : 'Ver resultados');
+      await page.waitForTimeout(LECTURA_MS);
+      if (i < 15) await botonSiguiente(page).tap();
+    }
+    expect(vistos.slice().sort()).toEqual(Object.keys(CANON).filter((inf) => CANON[inf].nivel === 'A1').sort());
+
+    // La última: ráfaga en «Ver resultados»
+    await rafaga(page, botonSiguiente(page), async () => (await page.locator('[class*="resultadoPanel"]').count()) > 0, '«Ver resultados»');
+    await expect(page.locator('[class*="hudBar"]'), 'el 2.º toque de «Ver resultados» ha empezado otra partida').toHaveCount(0);
+    await expect(page.locator('[class*="resultadoPuntos"]')).toHaveText('100 pts');
+    await expect(page.locator('[class*="resultadoTitulo"]')).toHaveText('¡Dominas el inglés!');
+    await expect(page.locator('[class*="resultadoSubtitulo"]')).toHaveText('15 de 15 respuestas correctas');
+    const valores = (await page.locator('[class*="statRValor"]').allTextContents()).map((v) => v.trim());
+    expect(valores[0]).toBe('15/15');
+    expect(valores[1]).toBe('100 %');
+    await expect(page.locator('[class*="resultadoFallados"]')).toHaveCount(0);
+    expect((await page.locator('[class*="botonesResultado"] button').allTextContents()).map(norm)).toEqual(['🔄 Jugar de nuevo', '⚙️ Cambiar nivel']);
+    await expect(page.getByRole('button', { name: /Ocultar guía educativa/ }), 'el 2.º toque ha desplegado la guía').toHaveCount(0);
+
+    // Leer la nota y ráfaga en «Jugar de nuevo»
+    await page.waitForTimeout(500);
+    await rafaga(page, page.getByRole('button', { name: /Jugar de nuevo/ }), async () => (await page.locator('[class*="hudBar"]').count()) > 0, '«Jugar de nuevo»');
+    await expect(page.getByText('Pregunta 1 de 15', { exact: true })).toBeAttached();
+    expect([...Object.values(await hud(page))]).toEqual(['1/15', '0', '0 %']);
+    await expect(feedback(page), 'el 2.º toque de «Jugar de nuevo» ha comprobado la 1.ª pregunta').toHaveCount(0);
+    expect(CANON[norm(await verboEnPantalla(page).textContent())]?.nivel).toBe('A1');
+    await expect(casillaPasado(page)).toHaveValue('');
+    await expect(casillaPasado(page)).toBeEditable();
+    await expect.poll(() => lineasTapadas(page), { message: 'la 1.ª pregunta de la partida nueva no está a la vista', timeout: 3000 }).toEqual([]);
+    expect(await sigueSinRecargar(page), '«Jugar de nuevo» ha recargado la página').toBe(true);
+  });
+
+  /**
+   * CASO DE RECHAZO — escribiendo, la ráfaga del testigo en «Siguiente» tres veces. A 360 × 740 el
+   * 2.º toque cae en la tarjeta de la pregunta nueva (medido el 29/10/2026); lo que tiene que
+   * rechazarse es cualquier efecto: ni «Comprobar» con las casillas vacías, ni otro avance.
+   *
+   * Resuelto a mano ANTES de ejecutar: se aciertan la 1.ª, la 2.ª y la 3.ª (A2, 10 preguntas). Tras
+   * la ráfaga i: «Pregunta i+1 de 10» · HUD (i+1)/10 · i aciertos · i/i = 100 % (las respondidas
+   * son i: la nueva aún no) · sin veredicto · casillas vacías y editables · «Comprobar» a la vista ·
+   * guía plegada · la lista de repaso del modo escribir, vacía (acertar un verbo que no está en la
+   * lista no lo apunta: anotarRespuesta de motor.ts).
+   */
+  test('caso de rechazo · escribiendo, el 2.º toque de «Siguiente» no comprueba la pregunta nueva ni avanza otra', async ({ page }) => {
+    test.setTimeout(60_000);
+    await abrirConProps(page);
+    await page.locator('[class*="nivelBtn"]').filter({ hasText: 'A2 Elemental' }).tap();
+    await page.getByRole('button', { name: /Escribir las formas/ }).tap();
+    await page.getByRole('button', { name: '10 preguntas', exact: true }).tap();
+    await page.locator('[class*="btnIniciar"]').tap();
+    for (let i = 1; i <= 3; i++) {
+      await expect(page.getByText(`Pregunta ${i} de 10`, { exact: true })).toBeAttached();
+      const { pasado, participio } = formasBuenas(norm(await verboEnPantalla(page).textContent()));
+      await casillaPasado(page).fill(pasado);
+      await casillaParticipio(page).fill(participio);
+      await page.waitForTimeout(LECTURA_MS);
+      await page.getByRole('button', { name: 'Comprobar', exact: true }).tap();
+      await expect(feedback(page)).toContainText('¡Correcto!');
+      await page.waitForTimeout(LECTURA_MS);
+      await rafaga(page, botonSiguiente(page), async () => (await feedback(page).count()) === 0, `«Siguiente» ${i}`);
+      await expect(page.getByText(`Pregunta ${i + 1} de 10`, { exact: true }), `la ráfaga ${i} ha avanzado más de una pregunta`).toBeAttached();
+      expect([...Object.values(await hud(page))]).toEqual([`${i + 1}/10`, String(i), '100 %']);
+      await expect(feedback(page), `el 2.º toque de «Siguiente» ${i} ha comprobado la pregunta ${i + 1}`).toHaveCount(0);
+      await expect(casillaPasado(page)).toHaveValue('');
+      await expect(casillaParticipio(page)).toHaveValue('');
+      await expect(casillaPasado(page)).toBeEditable();
+      await expect(page.getByRole('button', { name: 'Comprobar', exact: true })).toBeVisible();
+      await expect(page.getByRole('button', { name: /Ocultar guía educativa/ })).toHaveCount(0);
+      expect((await listaGuardada(page))?.escribir ?? {}, 'la ráfaga ha apuntado un verbo en la lista de repaso').toEqual({});
+    }
+  });
+
+  /**
+   * HALLAZGO medio (Inspector 29/10/2026) · operativa — lo que dejó sin cubrir la reparación del
+   * 3615 (28/10/2026). useGuardaRafaga ignora el CLIC del 2.º toque de la ráfaga, pero no su
+   * mousedown/pointerdown, que sigue moviendo el foco a lo que haya debajo. En el modo de opciones
+   * apenas se nota; escribiendo, la pregunta nueva deja el foco en la casilla «Past Simple» para
+   * contestar tecleando, y el 2.º toque se lo quita. A 360 × 740 (29/10/2026), tras la ráfaga en
+   * «Empezar Quiz» el foco queda en «Comprobar» o en <body>, según dónde haya quedado la página;
+   * tras «Siguiente», en la tarjeta de la pregunta; tras «Jugar de nuevo», en <body>. Lo que se
+   * teclea después no entra en la casilla, y con «Comprobar» enfocado el Enter de quien acaba de
+   * teclear el pasado comprueba la pregunta con las dos casillas VACÍAS: «Incorrecto», 0 aciertos
+   * y el verbo a la lista de repaso (3 de 3: speak, drive, sleep). En escritorio, el caso
+   * «escribiendo, doble clic en Siguiente» de la sección del 28/10/2026: el foco va a «Ver guía
+   * educativa» y el Enter la despliega.
+   * Es de la familia: en la referencia, quiz-literatura-universal, la misma ráfaga deja el foco en
+   * una opción no elegida o en <body> (medido el 29/10/2026); aquí pesa más porque solo esta
+   * hermana tiene casillas.
+   * Esperado: tras cada ráfaga, el foco en la casilla «Past Simple», como tras un toque suelto.
+   */
+  test('hallazgo · escribiendo, tras la ráfaga en «Empezar», «Siguiente» o «Jugar de nuevo» el foco sigue en la casilla del Past Simple', async ({ page }) => {
+    // ABIERTO (Inspector 29/10/2026): mide dónde queda el foco tras cada ráfaga (hoy: «Comprobar», tarjeta, tarjeta, body).
+    test.fail();
+    test.setTimeout(90_000);
+    await abrirConProps(page);
+    await page.locator('[class*="nivelBtn"]').filter({ hasText: 'A2 Elemental' }).click();
+    await page.getByRole('button', { name: /Escribir las formas/ }).click();
+    await page.getByRole('button', { name: '10 preguntas', exact: true }).click();
+    await page.waitForTimeout(LECTURA_MS);
+    const dondeFoco = (): Promise<string> =>
+      page.evaluate(() => {
+        const el = document.activeElement;
+        if (!el || el === document.body) return 'body';
+        return el.id || el.className.toString().split(' ')[0] || el.tagName;
+      });
+    const fuera: string[] = [];
+    await rafaga(page, page.locator('[class*="btnIniciar"]'), async () => (await casillaPasado(page).count()) > 0, '«Empezar»');
+    await expect(feedback(page)).toHaveCount(0);
+    if (!(await casillaPasado(page).evaluate((c) => c === document.activeElement))) fuera.push(`«Empezar» → ${await dondeFoco()}`);
+    for (let i = 1; i <= 10; i++) {
+      const { pasado, participio } = formasBuenas(norm(await verboEnPantalla(page).textContent()));
+      await casillaPasado(page).fill(pasado);
+      await casillaParticipio(page).fill(participio);
+      await page.getByRole('button', { name: 'Comprobar', exact: true }).click();
+      await expect(feedback(page)).toContainText('¡Correcto!');
+      await page.waitForTimeout(LECTURA_MS);
+      if (i <= 2) {
+        await rafaga(page, botonSiguiente(page), async () => (await feedback(page).count()) === 0, `«Siguiente» ${i}`);
+        await expect(feedback(page)).toHaveCount(0);
+        if (!(await casillaPasado(page).evaluate((c) => c === document.activeElement))) fuera.push(`«Siguiente» ${i} → ${await dondeFoco()}`);
+      } else {
+        await botonSiguiente(page).click();
+        await page.waitForTimeout(LECTURA_MS);
+      }
+    }
+    await expect(page.locator('[class*="resultadoSubtitulo"]')).toHaveText('10 de 10 respuestas correctas');
+    await page.waitForTimeout(500);
+    await rafaga(page, page.getByRole('button', { name: /Jugar de nuevo/ }), async () => (await page.locator('[class*="hudBar"]').count()) > 0, '«Jugar de nuevo»');
+    await expect(feedback(page)).toHaveCount(0);
+    if (!(await casillaPasado(page).evaluate((c) => c === document.activeElement))) fuera.push(`«Jugar de nuevo» → ${await dondeFoco()}`);
+    expect(fuera, 'tras la ráfaga el foco no está en la casilla del Past Simple').toEqual([]);
+  });
+});
+
+test.describe('Inspector 29/10/2026', () => {
+  /**
+   * HALLAZGO bajo (Inspector 29/10/2026) · operativa — punto ciego de la familia (solo esta app
+   * tiene casillas). Las dos casillas del modo «Escribir las formas» llevan enterKeyHint="done", y
+   * el <form> corrige con Enter desde cualquiera de las dos (page.tsx, a propósito). Quien teclea el
+   * pasado y pulsa Enter —o la tecla de acción del teclado del móvil, que con "done" se ofrece como
+   * «Hecho» aunque quede la segunda casilla— manda la pregunta con el participio vacío: «Incorrecto ·
+   * Has dejado vacío el Past Participle», la pregunta cuenta como fallada y el verbo entra en la
+   * lista de repaso, sin haber llegado a escribir la segunda forma. Medido el 29/10/2026 (A1,
+   * «give»: localStorage {"escribir":{"give":{"fallos":1,"racha":0}}}).
+   * Esperado: con el participio vacío, Enter en la casilla del pasado lleva a la del participio
+   * (enterKeyHint "next" en la primera), sin veredicto ni anotación; con las dos llenas, corrige.
+   */
+  test('hallazgo · Enter en la casilla del Past Simple con el participio vacío no corrige: pasa a la casilla del participio', async ({ page }) => {
+    // ABIERTO (Inspector 29/10/2026): mide que no haya veredicto, que el foco pase al participio y que la lista siga vacía.
+    test.fail();
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await abrirConProps(page);
+    await arrancarEscribiendo(page, 'A1 Básico', 10);
+    await expect(casillaPasado(page)).toBeFocused();
+    const inf = norm(await verboEnPantalla(page).textContent());
+    await page.keyboard.type(formasBuenas(inf).pasado);
+    await page.keyboard.press('Enter');
+    await page.waitForTimeout(300);
+    await expect(feedback(page), 'Enter en el pasado ha corregido con el participio vacío').toHaveCount(0);
+    await expect(casillaParticipio(page)).toBeFocused();
+    expect((await listaGuardada(page))?.escribir ?? {}, `«${inf}» ha entrado en la lista de repaso sin llegar a escribir el participio`).toEqual({});
   });
 });

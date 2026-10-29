@@ -1896,3 +1896,258 @@ test.describe('Inspector 28/10/2026 · hallazgos', () => {
     expect(panel).toMatch(new RegExp(`Z ?= ?${Z_CANONICO[simbolo]}(?!\\d)`));
   });
 });
+
+// ===========================================================================
+// Inspector 29/10/2026 — 6.ª pasada. Vuelve a la cola por c5b619bb (28/10/2026, tarde): `responder`
+// marca ahora `marcarCambioPantalla({ soloMismoPunto: true })`, y el 2.º toque de una ráfaga a menos
+// de 24 px del 1.º se ignora tras contestar. Lo que puede romper esa marca y se mide aquí: que un
+// «Siguiente» humano (un toque nuevo, en otro punto) se pierda, y que la ÚLTIMA pregunta, donde el
+// botón es «Ver resultados», se salte la corrección. Tres casos, los tres modos de nivel y los dos
+// sentidos del quiz, en escritorio con ratón y a 360 px con el dedo.
+// Banco: sin cambios desde ae8b2b3c (26/09/2026); los 88 símbolos se vuelven a cotejar por Z con
+// SIMBOLO_CANONICO en cada pregunta jugada. El 2.º mousedown que se lleva el foco a <body> tras el
+// doble toque en la opción es el cabo C0514 de la familia (hallazgo 3768): aquí no se afirma.
+// ===========================================================================
+
+/** Clave de la pregunta visible: el banco, con su símbolo cotejado por Z contra la IUPAC. */
+function clave29(visto: string, modo: 'sn' | 'ns'): { simbolo: string; nombre: string; correcta: string } {
+  const el = ELEMENTOS.find((e) => (modo === 'sn' ? e.simbolo : e.nombre) === visto);
+  expect(el, `«${visto}» no está en el banco`).toBeTruthy();
+  const simbolo = SIMBOLO_CANONICO[el!.z - 1];
+  expect(el!.simbolo, `${el!.nombre}: el banco no da el símbolo de la IUPAC`).toBe(simbolo);
+  return { simbolo, nombre: el!.nombre, correcta: modo === 'sn' ? el!.nombre : simbolo };
+}
+
+/** Abre la app y espera a que React haya colgado sus props del botón de empezar (no hay <input>). */
+async function abrirHidratada(page: Page): Promise<void> {
+  await page.goto(RUTA);
+  await page.waitForFunction(() => {
+    const b = [...document.querySelectorAll('button')].find((x) => /Empezar quiz/.test(x.textContent ?? ''));
+    return Boolean(b && Object.keys(b).some((k) => k.startsWith('__reactProps$')));
+  }, null, { timeout: 30_000 });
+}
+
+/** Pulsa con el ratón o, en táctil, con un toque suelto (600 ms: fuera de cualquier ráfaga). */
+async function pulsar29(page: Page, loc: Locator, tactil: boolean): Promise<void> {
+  if (tactil) {
+    await page.waitForTimeout(600);
+    await loc.tap();
+  } else {
+    await loc.click();
+  }
+}
+
+async function arrancar29(page: Page, modo: string, nivel: string, tactil: boolean): Promise<void> {
+  await pulsar29(page, page.locator('[class*="modoCard"]').filter({ hasText: modo }), tactil);
+  await pulsar29(page, page.locator('[class*="difCard"]').filter({ hasText: nivel }), tactil);
+  await pulsar29(page, page.getByRole('button', { name: '¡Empezar quiz!' }), tactil);
+  await expect(page.getByText(/^Pregunta 1 \/ \d+$/)).toBeVisible();
+}
+
+/**
+ * Juega `patron` (true = la clave; false = la primera opción que no lo es) en una partida de
+ * `total` preguntas y devuelve los símbolos fallados, en orden. Tras cada «Siguiente» exige el
+ * invariante de la familia: el foco en la tarjeta de la pregunta nueva, no en <body>. Entre
+ * contestar y «Siguiente» deja la pausa de quien lee la corrección (400 ms con ratón).
+ */
+async function jugar29(
+  page: Page,
+  modo: 'sn' | 'ns',
+  patron: boolean[],
+  total: number,
+  tactil: boolean,
+  trasResponder?: (i: number, k: { simbolo: string; nombre: string }) => Promise<void>,
+): Promise<string[]> {
+  const fallos: string[] = [];
+  for (let i = 0; i < patron.length; i++) {
+    await expect(page.getByText(`Pregunta ${i + 1} / ${total}`)).toBeVisible();
+    if (i > 0) await expect.poll(() => focoEn(page), { message: `P${i + 1}: el foco llega a la pregunta` }).toBe('preguntaCard');
+    const k = clave29((await enunciado(page).textContent())!.trim(), modo);
+    const opciones = await opcionesVisibles(page);
+    const n = patron[i] ? opciones.indexOf(k.correcta) : opciones.findIndex((o) => o !== k.correcta);
+    expect(n, `P${i + 1}: falta «${k.correcta}» entre ${opciones.join(', ')}`).toBeGreaterThanOrEqual(0);
+    await pulsar29(page, page.locator('[class*="opcionBtn"]').nth(n), tactil);
+    await expect(feedback(page)).toBeVisible();
+    if (!patron[i]) fallos.push(k.simbolo);
+    if (trasResponder) await trasResponder(i, k);
+    if (!tactil) await page.waitForTimeout(400);
+    await pulsar29(page, page.locator('[class*="btnSiguiente"]'), tactil);
+  }
+  return fallos;
+}
+
+test.describe('Inspector 29/10/2026 · casos (escritorio)', () => {
+  /**
+   * CASO NORMAL — Difícil (20 preguntas, pool de 88), Símbolo → Nombre, con ratón y a ritmo de
+   * persona. Patrón ✓ ✗ ✓ ✓ ✗ ✓ ✓ ✓ ✗ ✗ ✓ ✓ ✓ ✓ ✓ ✗ ✓ ✓ ✓ ✓. Resuelto a mano ANTES de ejecutar:
+   *   · aciertos 1 1 2 3 3 4 5 6 6 6 7 8 9 10 11 11 12 13 14 15
+   *   · racha    1 0 1 2 0 1 2 3 0 0 1 2 3 4  5  0  1  2  3  4
+   *   · 15/20 = 0,75 → formatPercentage(0,75; 0) = «75 %» con espacio duro
+   *   · calcularMedalla(15, 20): 150 < 20·9 = 180 (no oro), 150 ≥ 20·7 = 140 → «¡Muy bien!» 🥈
+   *   · racha máxima 5 (P11-P15); errores 5 → «Elementos a repasar (5)»: P2, P5, P9, P10 y P16
+   *   · cada uno de los 19 «Siguiente» deja el foco en la tarjeta de la pregunta, y el último
+   *     («Ver resultados») en el resultado
+   * Medido el 29/10/2026 en escritorio y a 360 px: lo esperado. Ningún «Siguiente» se perdió con la
+   * marca nueva de `responder`.
+   */
+  test('caso normal · Difícil Símbolo → Nombre, 15 de 20: 75 %, plata, racha máxima 5 y 5 a repasar', async ({ page }) => {
+    test.setTimeout(90_000);
+    await abrirHidratada(page);
+    await arrancar29(page, 'Símbolo → Nombre', 'Difícil', false);
+    const PATRON = [1, 0, 1, 1, 0, 1, 1, 1, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1].map(Boolean);
+    const ACIERTOS = [1, 1, 2, 3, 3, 4, 5, 6, 6, 6, 7, 8, 9, 10, 11, 11, 12, 13, 14, 15];
+    const RACHA = [1, 0, 1, 2, 0, 1, 2, 3, 0, 0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4];
+    const fallos = await jugar29(page, 'sn', PATRON, 20, false, async (i, k) => {
+      if (PATRON[i]) await expect(feedback(page)).toContainText(`¡Correcto! ${k.nombre} · símbolo ${k.simbolo}`);
+      else await expect(feedback(page)).toContainText(`La respuesta correcta era: ${k.nombre}`);
+      expect(await marcador(page)).toBe(`Pregunta ${i + 1} / 20 ✅ ${ACIERTOS[i]} · 🔥 Racha: ${RACHA[i]}`);
+    });
+    expect(fallos).toHaveLength(5);
+
+    await expect.poll(() => focoEn(page)).toBe('finPanel');
+    const fin = page.locator('[class*="finPanel"]');
+    expect(await fin.locator('[class*="finSubtitulo"]').textContent()).toBe('Has acertado 15 de 20 (75 %)');
+    await expect(fin.locator('[class*="finTitulo"]')).toHaveText('¡Muy bien!');
+    await expect(fin.locator('[class*="medallaIcon"]')).toHaveText('🥈');
+    expect(norm(await fin.locator('[class*="statsGrid"]').innerText())).toBe('15 Aciertos 5 Errores 5 Racha máxima 75 % Precisión');
+    await expect(page.getByText('Elementos a repasar (5)')).toBeVisible();
+    expect(await page.locator('[class*="errorSimbolo"]').allTextContents()).toEqual(fallos);
+  });
+
+  /**
+   * CASO DE RECHAZO, con ratón — en la ÚLTIMA pregunta (Fácil, Símbolo → Nombre, nueve aciertos
+   * antes): sin contestar no hay «Ver resultados», y Enter y Espacio con el foco en la tarjeta no
+   * contestan; después, doble clic en la opción D (el 2.º, `detail` 2, en el mismo punto, 90 ms
+   * después). Resuelto a mano: tras Enter/Espacio sigue «Pregunta 10 / 10 ✅ 9 · 🔥 Racha: 9», cuatro
+   * opciones habilitadas y sin aviso; tras el doble clic, UNA respuesta: «✅ 10 · 🔥 Racha: 10» si la
+   * D era la correcta y «✅ 9 · 🔥 Racha: 0» si no, el aviso a la vista y «Ver resultados» SIN pulsar
+   * (el resultado no aparece hasta pulsarlo). Al pulsarlo: 10 de 10 (100 %) «¡Perfecto!» 🏆 o 9 de
+   * 10 (90 %) «¡Excelente!» 🥇 (90 ≥ 10·9), con «Elementos a repasar (1)».
+   * Medido el 29/10/2026: lo esperado, en escritorio y a 360 px.
+   */
+  test('caso de rechazo · última pregunta: sin contestar no hay resultado, y el doble clic en la D no se salta la corrección', async ({ page }) => {
+    test.setTimeout(60_000);
+    await abrirHidratada(page);
+    await arrancar29(page, 'Símbolo → Nombre', 'Fácil', false);
+    await jugar29(page, 'sn', Array<boolean>(9).fill(true), 10, false);
+    await expect(page.getByText('Pregunta 10 / 10')).toBeVisible();
+    await page.waitForTimeout(450);
+    await expect(page.locator('[class*="btnSiguiente"]')).toHaveCount(0);
+    await expect.poll(() => focoEn(page)).toBe('preguntaCard');
+    await page.keyboard.press('Enter');
+    await page.keyboard.press('Space');
+    expect(await marcador(page)).toBe('Pregunta 10 / 10 ✅ 9 · 🔥 Racha: 9');
+    await expect(page.locator('[class*="opcionBtn"]:not([disabled])')).toHaveCount(4);
+    await expect(feedback(page)).toHaveCount(0);
+
+    const simbolo = (await enunciado(page).textContent())!.trim();
+    const dEsCorrecta = (await opcionesVisibles(page))[3] === clave29(simbolo, 'sn').correcta;
+    const d = page.locator('[class*="opcionBtn"]').nth(3);
+    await d.scrollIntoViewIfNeeded();
+    const caja = (await d.boundingBox())!;
+    await page.mouse.move(caja.x + caja.width / 2, caja.y + caja.height / 2);
+    await page.mouse.down({ clickCount: 1 });
+    await page.mouse.up({ clickCount: 1 });
+    await page.waitForTimeout(90);
+    await page.mouse.down({ clickCount: 2 });
+    await page.mouse.up({ clickCount: 2 });
+    await page.waitForTimeout(500);
+
+    await expect(page.getByText('Pregunta 10 / 10')).toBeVisible();
+    await expect(feedback(page)).toBeVisible();
+    await expect(page.locator('[class*="finPanel"]')).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Ver resultados' })).toBeVisible();
+    expect(await marcador(page)).toBe(`Pregunta 10 / 10 ✅ ${dEsCorrecta ? 10 : 9} · 🔥 Racha: ${dEsCorrecta ? 10 : 0}`);
+
+    await page.waitForTimeout(400);
+    await page.getByRole('button', { name: 'Ver resultados' }).click();
+    const fin = page.locator('[class*="finPanel"]');
+    expect(await fin.locator('[class*="finSubtitulo"]').textContent()).toBe(
+      dEsCorrecta ? 'Has acertado 10 de 10 (100 %)' : 'Has acertado 9 de 10 (90 %)',
+    );
+    await expect(fin.locator('[class*="finTitulo"]')).toHaveText(dEsCorrecta ? '¡Perfecto!' : '¡Excelente!');
+    await expect(fin.locator('[class*="medallaIcon"]')).toHaveText(dEsCorrecta ? '🏆' : '🥇');
+    if (dEsCorrecta) await expect(fin).not.toContainText('Elementos a repasar');
+    else await expect(page.getByText('Elementos a repasar (1)')).toBeVisible();
+  });
+});
+
+test.describe('Inspector 29/10/2026 · casos (360 × 740 táctil)', () => {
+  test.use({
+    viewport: { width: 360, height: 740 },
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Mobile Safari/537.36',
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  /**
+   * CASO LÍMITE — Medio (15 preguntas), Nombre → Símbolo, con el dedo, fallando SOLO la primera:
+   * la racha máxima se alcanza justo en la última pregunta, y 14 de 15 cae entre el oro y la copa.
+   * Resuelto a mano ANTES de ejecutar:
+   *   · aciertos 0 1 2 … 14 y racha 0 1 2 … 14 (marcador final «✅ 14 · 🔥 Racha: 14»)
+   *   · P1: «La respuesta correcta era: <símbolo> (nombre: <nombre>)»
+   *   · 14/15 = 0,9333 → «93 %»; calcularMedalla(14, 15): no es 15 de 15 (sin copa), 140 ≥ 15·9 = 135
+   *     → «¡Excelente!» 🥇
+   *   · racha máxima 14 (P2-P15, que cierra en la última); «Elementos a repasar (1)» con el de P1
+   * Medido el 29/10/2026 a 360 px y en escritorio: lo esperado.
+   */
+  test('caso límite · Medio Nombre → Símbolo con el dedo, falla solo la 1.ª: 14 de 15, 93 %, oro y racha máxima 14 en la última', async ({ page }) => {
+    test.setTimeout(90_000);
+    await abrirHidratada(page);
+    await arrancar29(page, 'Nombre → Símbolo', 'Medio', true);
+    const PATRON = [false, ...Array<boolean>(14).fill(true)];
+    const fallos = await jugar29(page, 'ns', PATRON, 15, true, async (i, k) => {
+      if (i === 0) await expect(feedback(page)).toContainText(`La respuesta correcta era: ${k.simbolo} (nombre: ${k.nombre})`);
+      else await expect(feedback(page)).toContainText('¡Correcto!');
+      expect(await marcador(page)).toBe(`Pregunta ${i + 1} / 15 ✅ ${i} · 🔥 Racha: ${i}`);
+    });
+
+    await expect.poll(() => focoEn(page)).toBe('finPanel');
+    const fin = page.locator('[class*="finPanel"]');
+    expect(await fin.locator('[class*="finSubtitulo"]').textContent()).toBe('Has acertado 14 de 15 (93 %)');
+    await expect(fin.locator('[class*="finTitulo"]')).toHaveText('¡Excelente!');
+    await expect(fin.locator('[class*="medallaIcon"]')).toHaveText('🥇');
+    expect(norm(await fin.locator('[class*="statsGrid"]').innerText())).toBe('14 Aciertos 1 Errores 14 Racha máxima 93 % Precisión');
+    await expect(page.getByText('Elementos a repasar (1)')).toBeVisible();
+    expect(await page.locator('[class*="errorSimbolo"]').allTextContents()).toEqual(fallos);
+  });
+
+  /**
+   * CASO DE RECHAZO, con el dedo — el mismo de escritorio: en la última pregunta (Fácil, nueve
+   * aciertos antes) Enter/Espacio sin contestar no hacen nada, y dos toques en la D a 120 ms
+   * cuentan UNA respuesta sin pulsar «Ver resultados». Resuelto a mano igual que arriba.
+   */
+  test('caso de rechazo · última pregunta con el dedo: dos toques en la D no saltan al resultado', async ({ page }) => {
+    test.setTimeout(90_000);
+    await abrirHidratada(page);
+    await arrancar29(page, 'Símbolo → Nombre', 'Fácil', true);
+    await jugar29(page, 'sn', Array<boolean>(9).fill(true), 10, true);
+    await expect(page.getByText('Pregunta 10 / 10')).toBeVisible();
+    await page.waitForTimeout(600);
+    await expect(page.getByRole('button', { name: /Ver resultados|Siguiente pregunta/ })).toHaveCount(0);
+    await page.keyboard.press('Enter');
+    await page.keyboard.press('Space');
+    expect(await marcador(page)).toBe('Pregunta 10 / 10 ✅ 9 · 🔥 Racha: 9');
+    await expect(feedback(page)).toHaveCount(0);
+
+    const simbolo = (await enunciado(page).textContent())!.trim();
+    const dEsCorrecta = (await opcionesVisibles(page))[3] === clave29(simbolo, 'sn').correcta;
+    const d = page.locator('[class*="opcionBtn"]').nth(3);
+    await d.scrollIntoViewIfNeeded();
+    await page.waitForTimeout(120);
+    const caja = (await d.boundingBox())!;
+    const [x, y] = [caja.x + caja.width / 2, caja.y + caja.height / 2];
+    await page.touchscreen.tap(x, y);
+    await page.waitForTimeout(120);
+    await page.touchscreen.tap(x, y);
+    await page.waitForTimeout(500);
+
+    await expect(page.getByText('Pregunta 10 / 10')).toBeAttached();
+    await expect(feedback(page)).toBeAttached();
+    await expect(page.locator('[class*="finPanel"]')).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Ver resultados' })).toBeAttached();
+    expect(await marcador(page)).toBe(`Pregunta 10 / 10 ✅ ${dEsCorrecta ? 10 : 9} · 🔥 Racha: ${dEsCorrecta ? 10 : 0}`);
+  });
+});

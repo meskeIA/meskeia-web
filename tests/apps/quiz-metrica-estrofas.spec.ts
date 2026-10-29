@@ -685,3 +685,142 @@ test.describe('Inspector 28/10/2026 · contenido del banco', () => {
     expect(fallos).toEqual([]);
   });
 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * INSPECTOR 29/10/2026 — re-inspección tras la reparación de la familia (c5b619bb, d9e710f8) y de
+ * la octava real (2c0b05f7). Tres casos nuevos, resueltos a mano ANTES de ejecutar la app, con
+ * `calcularPuntuacion` (page.tsx:276-282) y `getResultadoTexto` (page.tsx:284-289).
+ *
+ * Sin <input>: la hidratación se espera a que React cuelgue sus props del botón (`__reactProps$`),
+ * como `esperarHidratado` del testigo de la familia (tests/familias/quizzes.spec.ts).
+ */
+async function esperarHidratado(page: Page, texto: RegExp): Promise<void> {
+  await page.waitForFunction(
+    ({ fuente, banderas }) => {
+      const patron = new RegExp(fuente, banderas);
+      const boton = [...document.querySelectorAll('button')].find(
+        (b) => (b as HTMLElement).offsetParent !== null && patron.test(b.textContent ?? ''),
+      );
+      return Boolean(boton && Object.keys(boton).some((k) => k.startsWith('__reactProps$')));
+    },
+    { fuente: texto.source, banderas: texto.flags },
+    { timeout: 20_000 },
+  );
+}
+
+const enunciadoConFoco = (page: Page): Promise<boolean> =>
+  page.evaluate(() => Boolean(document.activeElement?.matches('[class*="preguntaCard"][tabindex="-1"]')));
+
+test.describe('Inspector 29/10/2026 · caso normal y de rechazo (escritorio 1280 × 800)', () => {
+  test.use({ viewport: { width: 1280, height: 800 } });
+
+  test('caso normal: Intermedio con 8, 5 bien y 3 mal → 53 pts, «Buen intento», 63 % de acierto', async ({ page }) => {
+    // A mano: 5/8 = 0,625 → tramo ≥ 0,5: 40 + (0,625 − 0,5)/0,2 · 20 = 40 + 12,5 = 52,5 →
+    // Math.round → 53 pts. Título (≥ 0,5 y < 0,7): «Buen intento». Acierto: 5/8 · 100 = 62,5 →
+    // Math.round → 63 (el «%» pegado es el hallazgo 3676, abierto: se admite con o sin espacio duro).
+    // Banco intermedio = 10 preguntas → con 8 salen 8 distintas, todas del nivel.
+    test.setTimeout(90_000);
+    await abrir(page);
+    await esperarHidratado(page, /^Empezar Quiz/);
+    await configurar(page, 'Intermedio', 8);
+    await expect(botonEmpezar(page)).toHaveText(/Empezar Quiz — 8 preguntas · .*Intermedio/);
+    await empezar(page);
+    expect((await hud(page))[0]).toBe('1/8');
+    const { fichas, focos } = await jugar(page, 5);
+    expect(fichas).toHaveLength(8);
+    expect(new Set(fichas.map((f) => f.enunciado)).size, 'pregunta repetida').toBe(8);
+    expect(fichas.every((f) => f.nivel === 'intermedio'), 'Intermedio ha colado otro nivel').toBe(true);
+    expect(focos).toEqual(Array(7).fill('DIV[-1].enunciado'));
+
+    const r = await resultado(page);
+    expect(r.puntos).toBe('53 pts');
+    expect(r.titulo).toBe('Buen intento');
+    expect(r.subtitulo).toBe('5 de 8 respuestas correctas');
+    expect(r.stats.Correctas).toBe('5/8');
+    expect(r.stats.Acierto).toMatch(new RegExp(`^63${DURO}?%$`));
+  });
+
+  test('caso de rechazo: sin contestar no hay «Siguiente», y Enter o Espacio sobre el enunciado no contestan', async ({ page }) => {
+    // A mano: el botón «Siguiente pregunta» solo se monta con `seleccionada !== null` (page.tsx:507),
+    // así que antes de contestar no existe; el enunciado (tabindex −1) no tiene manejador de teclado:
+    // Enter y Espacio no deben contestar → HUD 1/8 · 0 correctas, 4 opciones habilitadas, sin veredicto.
+    // Tab desde el enunciado lleva a la opción A, no a un «Siguiente». Luego, fallar la 1: «Incorrecto»,
+    // 0 correctas, una opción verde y una roja, las cuatro deshabilitadas; «Siguiente» lleva a 2/8.
+    await abrir(page);
+    await esperarHidratado(page, /^Empezar Quiz/);
+    await configurar(page, 'Avanzado', 8);
+    await empezar(page);
+    await expect.poll(() => enunciadoConFoco(page), { message: 'el foco no está en el enunciado' }).toBe(true);
+    await expect(page.getByRole('button', { name: /Siguiente pregunta|Ver resultados/ })).toHaveCount(0);
+
+    await page.keyboard.press('Enter');
+    await page.keyboard.press('Space');
+    await page.waitForTimeout(300);
+    expect(await hud(page)).toEqual(['1/8', '0', expect.stringMatching(new RegExp(`^0${DURO}?%$`))]);
+    await expect(page.locator('[class*="feedbackResultado"]')).toHaveCount(0);
+    await expect(page.locator('button:has([class*="opcionLetra"]):enabled')).toHaveCount(4);
+
+    await page.keyboard.press('Tab');
+    expect(await page.evaluate(() => document.activeElement?.getAttribute('aria-label') ?? '')).toMatch(/^Opción A: /);
+
+    const f = await responder(page, 'mal');
+    await expect(page.locator('[class*="feedbackResultado"]')).toHaveText('Incorrecto');
+    await expect(page.locator('[class*="feedbackRespuesta"]')).toHaveText(`Respuesta correcta: ${f.correcta}`);
+    expect((await hud(page))[1]).toBe('0');
+    const clases = await opciones(page).evaluateAll((bs) =>
+      bs.map((b) => `${/opcionCorrecta/.test(b.className) ? 'C' : /opcionIncorrecta/.test(b.className) ? 'I' : 'N'}${(b as HTMLButtonElement).disabled ? 'd' : ''}`),
+    );
+    expect(clases.filter((c) => c === 'Cd')).toHaveLength(1);
+    expect(clases.filter((c) => c === 'Id')).toHaveLength(1);
+    expect(clases.every((c) => c.endsWith('d')), 'opción habilitada tras contestar').toBe(true);
+    await avanzar(page);
+    await expect.poll(async () => (await hud(page))[0]).toBe('2/8');
+    expect((await hud(page))[1]).toBe('0');
+  });
+});
+
+test.describe('Inspector 29/10/2026 · caso límite a 360 × 740', () => {
+  test.use({
+    viewport: { width: 360, height: 740 },
+    userAgent: 'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Mobile Safari/537.36',
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test('caso límite: Básico con 10, 9 bien y la ÚLTIMA mal → 90 % justo en el umbral da 100 pts', async ({ page }) => {
+    // A mano: 9/10 = 0,9 → tramo ≥ 0,9 (umbral exacto: 9/10 y el literal 0,9 son el mismo double)
+    // → 100 pts y «¡Dominas la métrica!». «9 de 10 respuestas correctas», «9/10», Acierto 90.
+    // La 10.ª es la última: HUD «10/10», veredicto «Incorrecto» con su clave, botón «Ver resultados».
+    // Banco básico = 10 → con 10 sale el banco básico entero, sin repetir.
+    test.setTimeout(90_000);
+    await abrir(page);
+    await esperarHidratado(page, /^Empezar Quiz/);
+    await configurar(page, 'Básico', 10);
+    await empezar(page);
+    const fichas: Ficha[] = [];
+    for (let n = 1; n <= 9; n++) {
+      fichas.push(await responder(page, 'bien'));
+      expect(await avanzar(page)).toMatch(/Siguiente pregunta/);
+      await expect(page.locator('[class*="feedbackResultado"]')).toHaveCount(0);
+    }
+    expect((await hud(page)).slice(0, 2)).toEqual(['10/10', '9']);
+    const ultima = await responder(page, 'mal');
+    fichas.push(ultima);
+    await expect(page.locator('[class*="feedbackResultado"]')).toHaveText('Incorrecto');
+    await expect(page.locator('[class*="feedbackRespuesta"]')).toHaveText(`Respuesta correcta: ${ultima.correcta}`);
+    expect((await hud(page))[1]).toBe('9');
+    expect(await avanzar(page)).toBe('Ver resultados');
+
+    const basico = BANCO.filter((p) => p.nivel === 'basico').map((p) => p.enunciado).sort();
+    expect(fichas.map((f) => f.enunciado).sort()).toEqual(basico);
+    const r = await resultado(page);
+    expect(r.puntos).toBe('100 pts');
+    expect(r.titulo).toBe('¡Dominas la métrica!');
+    expect(r.subtitulo).toBe('9 de 10 respuestas correctas');
+    expect(r.stats.Correctas).toBe('9/10');
+    expect(r.stats.Acierto).toMatch(new RegExp(`^90${DURO}?%$`));
+  });
+});

@@ -726,3 +726,159 @@ test.describe('Inspector 28/10/2026 · contenido del banco', () => {
     expect(fallos).toEqual([]);
   });
 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * INSPECTOR 29/10/2026 — 2.ª pasada, tras la guarda de la familia (d9e710f8, c5b619bb).
+ * Tres casos resueltos a mano ANTES de ejecutar, en escritorio (1280 × 800) y a 360 × 740.
+ *
+ * CASO NORMAL — práctica de «Análisis de Código» (P16-P20 del banco, las cinco con código),
+ * respondiendo bien, mal, bien, bien, mal. La clave, derivada a mano:
+ *   · P16 `for i in range(n): for j in range(i, n)` → Σ (n − i) = n(n+1)/2 → O(n²)
+ *   · P17 `while i > 1: i = i // 2` → ⌊log₂ n⌋ vueltas → O(log n)
+ *   · P18 fib ingenuo T(n) = T(n−1) + T(n−2) + O(1) → Θ(φⁿ) ⊂ O(2ⁿ): la única cota superior de las 4
+ *   · P19 fib con memo: cada fib(k), k = 0…n, se calcula una vez → O(n)
+ *   · P20 un bucle de n y DESPUÉS dos anidados → n + n² → O(n²)
+ * Nota: 3/5 = 0,6 → Math.round(60) = 60 (page.tsx:346) → tramo ≥ 60 → 👍 «Buen nivel para
+ * entrevistas júnior»; aciertos 3 · errores 2; sin desglose (solo sale en el examen). Marcador tras
+ * cada respuesta: 1, 1, 2, 3, 3. La 5.ª dice «Ver resultados →».
+ *
+ * CASO LÍMITE — examen completo con las 25 mal. 0/25 → 0 % → 📚 «Necesitas repasar los
+ * fundamentos», 25 errores, y el desglose 0/5 en las cinco categorías (5 preguntas cada una) con
+ * las barritas a 0 %. En la 25.ª: «Pregunta 25 de 25», «Ver resultados →» y la barra en 24/25
+ * (aria-valuenow = índice, page.tsx:508).
+ *
+ * CASO DE RECHAZO — «Siguiente» sin contestar: no existe hasta responder. Con el foco en el
+ * enunciado (tabindex -1), Enter, Espacio y las flechas no contestan ni avanzan: sigue «Pregunta
+ * 1 de 25», «✓ 0 correctas», sin panel; y Tab lleva a la opción A.
+ *
+ * El % se admite pegado o con espacio duro, y el marcador en plural: los vigilan sus hallazgos
+ * abiertos (3689 y 3690, arriba).
+ */
+async function esperarBotonHidratado(page: Page, texto: RegExp): Promise<void> {
+  // Sin <input>: React cuelga sus props del botón al hidratar (esperarHidratado del testigo)
+  await page.waitForFunction(
+    (fuente) => {
+      const patron = new RegExp(fuente);
+      const boton = [...document.querySelectorAll('button')].find((b) => patron.test(b.textContent ?? ''));
+      return Boolean(boton && Object.keys(boton).some((k) => k.startsWith('__reactProps$')));
+    },
+    texto.source,
+  );
+}
+
+const ANCHOS_29 = [
+  { nombre: 'escritorio 1280 × 800', uso: { viewport: { width: 1280, height: 800 } } },
+  {
+    nombre: 'móvil 360 × 740',
+    uso: { viewport: { width: 360, height: 740 }, userAgent: UA_MOVIL, deviceScaleFactor: 3, isMobile: true, hasTouch: true },
+  },
+];
+
+for (const ancho of ANCHOS_29) {
+  test.describe(`Inspector 29/10/2026 · tres casos · ${ancho.nombre}`, () => {
+    test.use(ancho.uso);
+
+    test('caso normal: práctica de Análisis de Código, bien-mal-bien-bien-mal → 3/5, 60 % y «Buen nivel para entrevistas júnior»', async ({ page }) => {
+      test.setTimeout(60_000);
+      await abrir(page);
+      await esperarBotonHidratado(page, /Práctica por categoría/);
+      await comenzarPractica(page, 'Análisis de Código');
+      const plan: ('bien' | 'mal')[] = ['bien', 'mal', 'bien', 'bien', 'mal'];
+      const jugadas: number[] = [];
+      const marcas: string[] = [];
+      for (let n = 0; n < 5; n++) {
+        await expect(contador(page)).toHaveText(`Pregunta ${n + 1} de 5`);
+        const { ficha } = await responder(page, plan[n]);
+        jugadas.push(ficha.n);
+        marcas.push((norm(await marcador(page).innerText()).match(/\d+/) ?? [''])[0]);
+        await expect(siguiente(page)).toHaveText(n === 4 ? 'Ver resultados →' : 'Siguiente pregunta →');
+        await siguiente(page).click();
+      }
+      expect([...jugadas].sort((a, b) => a - b), 'la práctica de Análisis son P16-P20').toEqual([16, 17, 18, 19, 20]);
+      expect(marcas, 'marcador tras cada respuesta').toEqual(['1', '1', '2', '3', '3']);
+      const r = await resultado(page);
+      expect(r.circulo).toBe('3/5');
+      expect(r.emoji).toBe('👍');
+      expect(r.texto).toBe('Buen nivel para entrevistas júnior');
+      expect(r.stats.Aciertos).toBe('3');
+      expect(r.stats.Errores).toBe('2');
+      expect(r.stats['Puntuación']).toMatch(porcentaje(60));
+      expect(r.desglose, 'la práctica no lleva desglose por categoría').toEqual({});
+    });
+
+    test('caso límite: examen con las 25 mal → 0/25, 0 %, «Necesitas repasar los fundamentos» y 0/5 en cada categoría', async ({ page }) => {
+      test.setTimeout(90_000);
+      await abrir(page);
+      await esperarBotonHidratado(page, /Comenzar examen/);
+      await comenzarExamen(page);
+      for (let n = 1; n <= 25; n++) {
+        await expect(contador(page)).toHaveText(`Pregunta ${n} de 25`);
+        await responder(page, 'mal');
+        await expect(marcador(page)).toHaveText('✓ 0 correctas');
+        if (n === 25) {
+          await expect(siguiente(page)).toHaveText('Ver resultados →');
+          const barra = page.locator('[role="progressbar"]');
+          await expect(barra).toHaveAttribute('aria-valuenow', '24');
+          await expect(barra).toHaveAttribute('aria-valuemax', '25');
+        }
+        await siguiente(page).click();
+      }
+      const r = await resultado(page);
+      expect(r.circulo).toBe('0/25');
+      expect(r.emoji).toBe('📚');
+      expect(r.texto).toBe('Necesitas repasar los fundamentos');
+      expect(r.stats.Aciertos).toBe('0');
+      expect(r.stats.Errores).toBe('25');
+      expect(r.stats['Puntuación']).toMatch(porcentaje(0));
+      expect(r.desglose).toEqual(Object.fromEntries(CATEGORIAS.map((c) => [c, '0/5'])));
+      const anchos = await page.locator('[class*="barritaRelleno"]').evaluateAll((bs) => bs.map((b) => (b as HTMLElement).style.width));
+      expect(anchos).toEqual(['0%', '0%', '0%', '0%', '0%']);
+    });
+
+    test('caso de rechazo: sin contestar no hay «Siguiente», y Enter, Espacio o flechas en el enunciado no contestan ni avanzan', async ({ page }) => {
+      await abrir(page);
+      await esperarBotonHidratado(page, /Comenzar examen/);
+      await page.getByRole('button', { name: /Comenzar examen/ }).focus();
+      await page.keyboard.press('Enter');
+      await expect(contador(page)).toHaveText('Pregunta 1 de 25');
+      await expect(enunciado(page)).toBeFocused();
+      await expect(page.getByRole('button', { name: /Siguiente pregunta|Ver resultados/ })).toHaveCount(0);
+      for (const tecla of ['Enter', ' ', 'ArrowRight', 'ArrowDown']) await page.keyboard.press(tecla);
+      await page.waitForTimeout(300);
+      await expect(contador(page)).toHaveText('Pregunta 1 de 25');
+      await expect(feedback(page)).toHaveCount(0);
+      await expect(marcador(page)).toHaveText('✓ 0 correctas');
+      await expect(page.getByRole('button', { name: /Siguiente pregunta|Ver resultados/ })).toHaveCount(0);
+      await page.keyboard.press('Tab');
+      await expect(opciones(page).first(), 'Tab desde el enunciado va a la opción A').toBeFocused();
+    });
+  });
+}
+
+test.describe('Inspector 29/10/2026 · hallazgo nuevo', () => {
+  /**
+   * El botón de categoría SELECCIONADO en «Práctica por categoría» pone texto blanco de 14 px
+   * (peso 500, texto normal: exige 4,5:1) sobre el mismo --cat-* de las insignias
+   * (QuizComplejidadAlgoritmos.module.css:202-217). Calculado a mano con el blanco: Notación
+   * #2E86AB 4,11 · Búsqueda #48A9A6 2,80 · Estructuras #E07B39 2,97 · Análisis #7B5EA7 5,25 ·
+   * Comparativa #3D9970 3,51; medido el 29/10/2026 igual en claro y en oscuro (el --cat-* no cambia
+   * de tema). Notación es la que sale marcada por defecto. Es la misma raíz que las insignias del
+   * hallazgo 3683, pero otro elemento que su descripción no nombra.
+   */
+  test('hallazgo · el botón de categoría seleccionado llega a 4,5:1 en las cinco', async ({ page }) => {
+    test.fail(); // ABIERTO — medido: 4,11 · 2,80 · 2,97 · 5,25 · 3,51
+    await abrir(page, 'light');
+    await esperarBotonHidratado(page, /Práctica por categoría/);
+    await page.getByRole('button', { name: /Práctica por categoría/ }).click();
+    const bajos: string[] = [];
+    for (const c of CATEGORIAS) {
+      const boton = page.getByRole('button', { name: c, exact: true });
+      await boton.click();
+      await expect(boton).toHaveAttribute('aria-pressed', 'true');
+      bajos.push(...(await contrastes(page, '[class*="btnCategoriaActivo"]')));
+    }
+    expect(bajos).toEqual([]);
+  });
+});

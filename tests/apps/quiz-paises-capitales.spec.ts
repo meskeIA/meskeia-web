@@ -1296,6 +1296,10 @@ test.describe('Inspector 28/10/2026 · hallazgos', () => {
     // banderas de esta misma app. Es el mismo defecto que «Saint John» → «Saint John’s» (hallazgo
     // 2271, reparado con el apóstrofo tipográfico). La lista de la RAE no se pudo consultar el
     // 28/10/2026 (WebFetch denegado en la tanda).
+    // 29/10/2026: rae.es devolvió HTTP 403. La ficha país de exteriores.gob.es
+    // (Documents/FichasPais/GRANADA_FICHA PAIS.pdf, «GRANADA_SIN MAPA_2025») dice literalmente
+    // «Capital: Saint George», como el banco: hay una fuente oficial española a favor de la forma
+    // actual. Quien repare decide con la RAE delante; este caso sigue la forma de flag-icons.
     expect(capitalDe('Granada')).toMatch(/^Saint George[’']s$/);
   });
 
@@ -1343,5 +1347,202 @@ test.describe('Inspector 28/10/2026 · hallazgos', () => {
     const visible = norm(await page.locator('[class*="faqItem"]').filter({ hasText: '¿Cuántos países hay en el mundo?' }).locator('dd').innerText());
     expect(visible).toContain(`${countries.length} entradas`);
     expect(norm(faq), 'las dos bocas dan respuestas distintas').toBe(visible);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Inspector 29/10/2026 (3.ª pasada, app INVALIDADA por c5b619bb: responder marca la guarda con
+// soloMismoPunto). Los tres casos se juegan en escritorio y a 360 px.
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** Sin <input>: React ha colgado sus props del botón (como `esperarHidratado` del testigo). */
+async function esperarBotonHidratado(page: Page, texto: RegExp): Promise<void> {
+  await page.waitForFunction(
+    ({ fuente, banderas }) => {
+      const patron = new RegExp(fuente, banderas);
+      const b = [...document.querySelectorAll('button')].find((x) => patron.test(x.textContent ?? ''));
+      return Boolean(b && Object.keys(b).some((k) => k.startsWith('__reactProps$')));
+    },
+    { fuente: texto.source, banderas: texto.flags },
+    { timeout: 20_000 },
+  );
+}
+
+const barra = (page: Page): Locator => page.locator('[role="progressbar"]');
+
+/** Juega `total` preguntas fallando las que diga `fallar(n)`; devuelve los países y el marcador final. */
+async function jugarPatron(page: Page, modo: Modo, total: number, fallar: (n: number) => boolean) {
+  const paises: Country[] = [];
+  const numero = page.locator('[class*="preguntaNumero"]');
+  let marcadorFinal: Record<string, string> = {};
+  let rotuloFinal = '';
+  for (let n = 1; n <= total; n++) {
+    await expect(numero).toHaveText(`Pregunta ${n} de ${total}`);
+    const { pais } = await responder(page, modo, !fallar(n));
+    paises.push(pais);
+    if (n === total) marcadorFinal = await hud(page);
+    const rotulo = await avanzar(page);
+    if (n < total) expect(rotulo, `pregunta ${n}`).toBe('Siguiente pregunta →');
+    else rotuloFinal = rotulo;
+  }
+  return { paises, marcadorFinal, rotuloFinal };
+}
+
+/**
+ * CASO NORMAL — País/Experto (25 preguntas), fallando la 3, 8, 13, 18 y 23.
+ * Esperado a mano (calcularPuntuacion y getResultadoTexto, page.tsx:149-162): 20/25 = 0,8 →
+ * 60 + (0,8 − 0,7)/0,2 · 40 = 80 pts · ⭐ «¡Muy buena puntuación!» · «20 de 25 respuestas
+ * correctas» · «20/25» · Acierto «80 %». Marcador tras contestar la 25: «25/25», «20», Precisión
+ * 20/25 = «80 %». Experto = Europa + América + Asia + África (DIFICULTAD_CONFIG, page.tsx:30): ningún
+ * país de Oceanía. La 25 ofrece «Ver resultados».
+ */
+async function casoNormal(page: Page): Promise<void> {
+  await abrir(page);
+  await esperarBotonHidratado(page, /Empezar Quiz/);
+  await configurar(page, 'País', 'Experto');
+  await expect(page.locator('[class*="btnIniciar"]')).toHaveText('Empezar Quiz — 25 preguntas');
+  await page.locator('[class*="btnIniciar"]').click();
+  const { paises, marcadorFinal, rotuloFinal } = await jugarPatron(page, 'País', 25, (n) => n % 5 === 3);
+  expect(new Set(paises.map((p) => p.name)).size, 'país repetido').toBe(25);
+  expect(paises.filter((p) => p.continent === 'Oceanía').map((p) => p.name), 'Experto no incluye Oceanía').toEqual([]);
+  expect(marcadorFinal).toEqual({ Pregunta: '25/25', Correctas: '20', Precisión: `80${DURO}%` });
+  expect(rotuloFinal).toBe('Ver resultados');
+  const r = await resultado(page);
+  expect([r.emoji, r.titulo, r.puntos, r.subtitulo, r.stats.Correctas, r.stats.Acierto]).toEqual([
+    '⭐', '¡Muy buena puntuación!', '80 pts', '20 de 25 respuestas correctas', '20/25', `80${DURO}%`,
+  ]);
+}
+
+/**
+ * CASO LÍMITE — Bandera/Maestro (el nivel más largo, 30 preguntas sobre el banco entero), todo mal.
+ * Esperado a mano: 0/30 = 0 → 0 · 80 = 0 pts · 📚 «Sigue practicando» · «0 de 30 respuestas
+ * correctas» · «0/30» · «0 %». Marcador tras contestar la 30: «30/30», «0», Precisión 0/30 = «0 %».
+ * Cada fallo dice «Incorrecto. La respuesta correcta es <país>.» y la 30 ofrece «Ver resultados».
+ * Además, flag-icons dibuja las 196 banderas del banco (ninguna clase fi-xx sin imagen).
+ */
+async function casoLimite(page: Page): Promise<void> {
+  await abrir(page);
+  await esperarBotonHidratado(page, /Empezar Quiz/);
+  await configurar(page, 'Bandera', 'Maestro');
+  await page.getByRole('button', { name: /Empezar Quiz — 30 preguntas/ }).click();
+  const { paises, marcadorFinal, rotuloFinal } = await jugarPatron(page, 'Bandera', 30, () => true);
+  expect(new Set(paises.map((p) => p.name)).size, 'país repetido').toBe(30);
+  expect(marcadorFinal).toEqual({ Pregunta: '30/30', Correctas: '0', Precisión: `0${DURO}%` });
+  expect(rotuloFinal).toBe('Ver resultados');
+  const r = await resultado(page);
+  expect([r.emoji, r.titulo, r.puntos, r.subtitulo, r.stats.Correctas, r.stats.Acierto]).toEqual([
+    '📚', 'Sigue practicando', '0 pts', '0 de 30 respuestas correctas', '0/30', `0${DURO}%`,
+  ]);
+  const sinImagen = await page.evaluate(
+    (codigos) =>
+      codigos.filter((c) => {
+        const s = document.createElement('span');
+        s.className = `fi fi-${c}`;
+        document.body.appendChild(s);
+        const fondo = getComputedStyle(s).backgroundImage;
+        s.remove();
+        return !fondo || fondo === 'none';
+      }),
+    countries.map((c) => c.code),
+  );
+  expect(sinImagen, 'banderas del banco que flag-icons no dibuja').toEqual([]);
+}
+
+/**
+ * CASO DE RECHAZO — «Siguiente» sin contestar (Capital/Normal). Esperado: antes de responder no
+ * existe «Siguiente» ni «Ver resultados» (el botón se monta con la respuesta, page.tsx:426-446);
+ * Enter, Espacio, flechas, «a» o «1» con el foco en el enunciado no contestan ni avanzan: sigue
+ * «Pregunta 1 de 15», marcador «1/15», «0», «—», 4 opciones habilitadas y ningún aviso.
+ */
+async function casoRechazo(page: Page): Promise<void> {
+  await abrir(page);
+  await esperarBotonHidratado(page, /Empezar Quiz/);
+  await configurar(page, 'Capital', 'Normal');
+  await page.getByRole('button', { name: /Empezar Quiz — 15 preguntas/ }).click();
+  await expect(page.locator('[class*="preguntaCard"]')).toBeFocused();
+  await expect(page.getByRole('button', { name: /Siguiente|Ver resultados/ })).toHaveCount(0);
+  for (const tecla of ['Enter', 'Space', 'ArrowRight', 'ArrowDown', 'a', '1']) await page.keyboard.press(tecla);
+  await page.waitForTimeout(300);
+  await expect(page.locator('[class*="preguntaNumero"]')).toHaveText('Pregunta 1 de 15');
+  expect(await hud(page)).toEqual({ Pregunta: '1/15', Correctas: '0', Precisión: '—' });
+  await expect(aviso(page)).toHaveCount(0);
+  await expect(page.locator('[class*="btnSiguiente"]')).toHaveCount(0);
+  expect(await opciones(page).evaluateAll((bs) => bs.filter((b) => !(b as HTMLButtonElement).disabled).length)).toBe(4);
+}
+
+test.describe('Inspector 29/10/2026 · escritorio 1280 × 800', () => {
+  test.use({ viewport: { width: 1280, height: 800 } });
+  test('caso normal: País/Experto con 20 de 25 da 80 pts, ⭐ y «80 %», sin Oceanía', async ({ page }) => {
+    test.setTimeout(120_000);
+    await casoNormal(page);
+  });
+  test('caso límite: Bandera/Maestro con 0 de 30 da 0 pts y «Sigue practicando»; las 196 banderas se dibujan', async ({ page }) => {
+    test.setTimeout(150_000);
+    await casoLimite(page);
+  });
+  test('caso de rechazo: sin contestar no hay «Siguiente» y el teclado no avanza ni contesta', async ({ page }) => {
+    await casoRechazo(page);
+  });
+});
+
+test.describe('Inspector 29/10/2026 · móvil 360 × 740', () => {
+  test.use({
+    viewport: { width: 360, height: 740 },
+    userAgent: 'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Mobile Safari/537.36',
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+  test('caso normal a 360 px: 20 de 25 da 80 pts', async ({ page }) => {
+    test.setTimeout(150_000);
+    await casoNormal(page);
+  });
+  test('caso límite a 360 px: 0 de 30 da 0 pts', async ({ page }) => {
+    test.setTimeout(180_000);
+    await casoLimite(page);
+  });
+  test('caso de rechazo a 360 px: sin contestar no se avanza', async ({ page }) => {
+    await casoRechazo(page);
+  });
+});
+
+test.describe('Inspector 29/10/2026 · hallazgos', () => {
+  test('hallazgo · la barra «Preguntas respondidas» cuenta la pregunta recién contestada', async ({ page }) => {
+    test.fail(); // ABIERTO
+    // page.tsx:354-364 — role="progressbar" con aria-label «Preguntas respondidas», pero
+    // aria-valuenow={preguntaActual}, aria-valuetext «${preguntaActual} de ${total}» y el ancho
+    // preguntaActual/total: el índice de la pregunta, no las respondidas. La propia app cuenta las
+    // respondidas como preguntaActual + 1 en cuanto se contesta (`respondidas`, page.tsx:181, la de
+    // la Precisión). Medido el 29/10/2026 en escritorio y a 360 px: tras contestar la 1 de 25,
+    // «0 de 25» con la Precisión ya en «100 %»; tras contestar la última, «24 de 25» (96 %) y
+    // «29 de 30» (96,67 %): la barra nunca llega al total.
+    // Esperado a mano: Capital/Fácil, contestada la 1 → «1 de 10», valuenow 1.
+    await abrir(page);
+    await esperarBotonHidratado(page, /Empezar Quiz/);
+    await arrancar(page, 'Capital', 'Fácil');
+    await expect(barra(page)).toHaveAttribute('aria-label', 'Preguntas respondidas');
+    await expect(barra(page)).toHaveAttribute('aria-valuetext', '0 de 10');
+    await responder(page, 'Capital', true);
+    expect((await hud(page)).Precisión, 'la Precisión ya cuenta 1 respondida').toBe(`100${DURO}%`);
+    await expect(barra(page)).toHaveAttribute('aria-valuetext', '1 de 10');
+    await expect(barra(page)).toHaveAttribute('aria-valuenow', '1');
+  });
+
+  test('hallazgo · Nauru: el aviso de respuesta da Yaren sin el matiz que pone la propia guía', async ({ page }) => {
+    test.fail(); // ABIERTO
+    // Guía (page.tsx:684): «Nauru (Oceanía) no tiene una capital legalmente designada, aunque Yaren
+    // actúa como ciudad principal donde se ubican las instituciones». El quiz pregunta «¿Cuál es la
+    // capital de Nauru?» y contesta «¡Correcto! La respuesta es Yaren.» sin nota: NOTA_CAPITAL
+    // (page.tsx:60-63) solo matiza Israel y Palestina, la misma clase que el hallazgo 2273.
+    // Semilla 34 en Maestro/Capital (simulada con generarPreguntas y mulberry32 y comprobada en el
+    // navegador el 29/10/2026): pregunta 1 = Nauru con Ottawa / Tegucigalpa / Maputo / Yaren.
+    await abrir(page);
+    await esperarBotonHidratado(page, /Empezar Quiz/);
+    await arrancarConSemilla(page, 'Capital', 'Maestro', 34);
+    await expect(page.locator('[class*="preguntaTexto"] strong'), 'semilla 34: el caso ya no mide lo que dice').toHaveText('Nauru');
+    expect(await textosOpcion(page)).toEqual(['Ottawa', 'Tegucigalpa', 'Maputo', 'Yaren']);
+    await responder(page, 'Capital', true);
+    await expect(aviso(page)).toContainText('¡Correcto! La respuesta es Yaren.');
+    await expect(aviso(page)).toContainText(/legalmente|no tiene (una )?capital|capital oficial/);
   });
 });

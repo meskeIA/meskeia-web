@@ -25,8 +25,9 @@ import { join } from 'node:path';
  *
  * DOBLE TOQUE (invariante de la familia, cabo C0082)
  * ──────────────────────────────────────────────────
- * La app NO usa `useGuardaRafaga` ni ninguna guarda: ningún manejador mira `detail`. El 2.º clic de
- * la ráfaga cae sobre lo que haya debajo en la pantalla nueva. Medido el 28/10/2026 con ratón
+ * La app NO usaba `useGuardaRafaga` ni ninguna guarda (REPARADO el 28/10/2026 en c5b619bb: la monta
+ * en iniciar, responder y siguiente). Antes, el 2.º clic de la ráfaga caía sobre lo que hubiera
+ * debajo en la pantalla nueva. Medido el 28/10/2026, ANTES de la reparación, con ratón
  * (1.er clic con detail 1, pantalla nueva pintada, 2.º con detail 2 en el mismo punto):
  * · «Comenzar quiz» a ¼ o ¾ del ancho del botón: contesta la 1.ª pregunta («Verdad» o «Mito») a
  *   768, 1280, 1366 y 1920 px. En el centro exacto se libra por caer en el hueco de 1 rem entre
@@ -545,5 +546,197 @@ test.describe('Inspector 28/10/2026 · accesibilidad', () => {
     });
     expect(leidos.length).toBe(5);
     for (const t of leidos) expect(t).not.toMatch(/\p{Extended_Pictographic}/u);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// INSPECTOR 29/10/2026 (2.ª pasada, tras la reparación de familia c5b619bb y d9e710f8)
+//
+// Los tres casos se deciden por el CONTENIDO de la afirmación (clave escrita a mano arriba), no por
+// su posición, para que sigan valiendo si la reparación de 3737 baraja el orden. Valores esperados
+// calculados a mano con `porcentaje = Math.round(puntuacion / 25 * 100)` y NIVELES de page.tsx
+// (≥ 23 Científico/a · ≥ 18 Investigador/a · ≥ 13 Curioso/a · ≥ 8 Aprendiz · resto Principiante).
+// El desglose sale en el orden fijo de CATEGORIAS: Cuerpo (7) · Animales (8) · Física (4) ·
+// Historia (2) · Biología (4).
+// ─────────────────────────────────────────────────────────────────────────────
+
+test.describe('inspector 29/10/2026 · casos', () => {
+  /**
+   * CASO NORMAL — se aciertan Cuerpo, Física e Historia y se fallan Animales y Biología.
+   * A mano: 7 + 4 + 2 = 13 aciertos → round(13 / 25 × 100) = 52 % → 13 ≥ 13 → «Curioso/a» (justo en
+   * el umbral). Desglose 7/7 · 0/8 · 4/4 · 2/2 · 0/4; barras round(100 × aciertos / total):
+   * 100 % · 0 % · 100 % · 100 % · 0 %.
+   */
+  test('caso normal: Cuerpo, Física e Historia bien y el resto mal dan 13 / 25, 52 % y «Curioso/a»', async ({ page }) => {
+    test.setTimeout(90_000);
+    await abrir(page);
+    await page.getByRole('button', { name: 'Comenzar quiz' }).click();
+    await jugar(page, (c) => c.cat === 'cuerpo' || c.cat === 'fisica' || c.cat === 'historia');
+    const r = await resultado(page);
+    expect(r.puntos).toBe('13');
+    expect(r.total).toBe('/ 25');
+    expect(r.pct).toMatch(new RegExp(`^52${DURO}?%$`)); // el espacio duro lo vigila 3741
+    expect(r.nivel).toBe('Curioso/a');
+    expect(r.cats).toEqual(['7/7', '0/8', '4/4', '2/2', '0/4']);
+    const barras = await page.locator('[class*="catBarFill"]').evaluateAll((els) => els.map((e) => (e as HTMLElement).style.width));
+    expect(barras).toEqual(['100%', '0%', '100%', '100%', '0%']);
+  });
+
+  test('caso de rechazo: sin contestar no hay «Siguiente», Enter y Espacio sobre la afirmación no contestan, y la respuesta dada no se puede cambiar', async ({ page }) => {
+    // A mano: en la fase de pregunta solo existen «Verdad» y «Mito»; el foco tras «Comenzar» está en
+    // la afirmación (un div con tabindex -1), donde Enter y Espacio no hacen nada → sigue «1 / 25» sin
+    // revelación. Se contesta MAL la 1.ª con teclado: los dos botones desaparecen (0), el foco va a
+    // la revelación y Enter ahí tampoco avanza; el siguiente Tab es «Siguiente →». Acertando las 24
+    // restantes: 24 / 25 → round(96) = 96 % → «Científico/a» (los toques rechazados no suman nada).
+    test.setTimeout(90_000);
+    await abrir(page);
+    await page.getByRole('button', { name: 'Comenzar quiz' }).focus();
+    await page.keyboard.press('Enter');
+    await expect(prog(page)).toHaveText('1 / 25');
+    await expect(btnAvanzar(page)).toHaveCount(0);
+    await expect.poll(() => page.evaluate(() => document.activeElement?.getAttribute('tabindex'))).toBe('-1');
+    await page.keyboard.press('Enter');
+    await page.keyboard.press('Space');
+    await page.waitForTimeout(200);
+    await expect(prog(page)).toHaveText('1 / 25');
+    await expect(revelacion(page)).toHaveCount(0);
+
+    const c = await clave(page);
+    await (c.verdad ? btnMito(page) : btnVerdad(page)).focus();
+    await page.keyboard.press('Enter');
+    await expect(revelacion(page)).toBeVisible();
+    await expect(page.locator('[class*="resultadoBadge"]')).toContainText('Incorrecto');
+    await expect(page.getByRole('button', { name: /^(Verdad|Mito)$/ })).toHaveCount(0);
+    await expect.poll(() => page.evaluate(() => document.activeElement?.className ?? '')).toMatch(/revelacion/);
+    await page.keyboard.press('Enter');
+    await page.waitForTimeout(200);
+    await expect(prog(page)).toHaveText('1 / 25');
+    await page.keyboard.press('Tab');
+    await expect(btnAvanzar(page)).toBeFocused();
+    await expect(btnAvanzar(page)).toHaveText('Siguiente →');
+    await page.keyboard.press('Enter');
+
+    for (let n = 2; n <= 25; n++) {
+      await expect(prog(page)).toHaveText(`${n} / 25`);
+      await responder(page, true);
+      await btnAvanzar(page).click();
+    }
+    const r = await resultado(page);
+    expect(r.puntos).toBe('24');
+    expect(r.pct).toMatch(new RegExp(`^96${DURO}?%$`));
+    expect(r.nivel).toBe('Científico/a');
+  });
+});
+
+test.describe('inspector 29/10/2026 · caso límite a 360 × 740', () => {
+  test.use({ viewport: { width: 360, height: 740 }, userAgent: MOVIL_UA, deviceScaleFactor: 3, isMobile: true, hasTouch: true });
+
+  /**
+   * CASO LÍMITE — umbral exacto de «Científico/a» y la última pregunta.
+   * Se fallan solo el chicle y la miel (Biología) y se acierta el resto.
+   * A mano: 25 − 2 = 23 → round(23 / 25 × 100) = 92 % → 23 ≥ 23 → «Científico/a».
+   * Desglose 7/7 · 8/8 · 4/4 · 2/2 · 2/4. La 24.ª ofrece «Siguiente →» y la 25.ª «Ver resultados»
+   * con «25 / 25»; tras responder, el veredicto queda a la vista bajo la barra del logo.
+   */
+  test('caso límite: 23 de 25 dan 92 % y «Científico/a»; la 25.ª dice «Ver resultados»', async ({ page }) => {
+    test.setTimeout(120_000);
+    await abrir(page);
+    await page.getByRole('button', { name: 'Comenzar quiz' }).click();
+    // Hueco de la barra fija del logo: el scroll-padding-top del documento (lib/cromoFijo.ts)
+    const barra = await page.evaluate(() => parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0);
+    for (let n = 1; n <= 25; n++) {
+      await expect(prog(page)).toHaveText(`${n} / 25`);
+      const c = await clave(page);
+      await responder(page, !/chicle|miel/.test(c.texto));
+      // el foco (y el scroll que lo acompaña) llegan en el efecto posterior al pintado
+      await expect.poll(() => page.evaluate(() => document.activeElement?.className ?? '')).toMatch(/revelacion/);
+      const caja = await page.locator('[class*="resultadoBadge"]').boundingBox();
+      expect(caja, 'veredicto sin caja').toBeTruthy();
+      const { y, height } = caja as { y: number; height: number };
+      expect(y + height, `pregunta ${n}: veredicto por debajo del borde de la pantalla`).toBeLessThanOrEqual(740);
+      expect(y, `pregunta ${n}: veredicto tapado por la barra del logo`).toBeGreaterThanOrEqual(barra - 1);
+      if (n === 24) await expect(btnAvanzar(page)).toHaveText('Siguiente →');
+      if (n === 25) await expect(btnAvanzar(page)).toHaveText('Ver resultados');
+      await btnAvanzar(page).click();
+    }
+    const r = await resultado(page);
+    expect(r.puntos).toBe('23');
+    expect(r.pct).toMatch(new RegExp(`^92${DURO}?%$`));
+    expect(r.nivel).toBe('Científico/a');
+    expect(r.cats).toEqual(['7/7', '8/8', '4/4', '2/2', '2/4']);
+  });
+});
+
+test.describe('inspector 29/10/2026 · hallazgos nuevos', () => {
+  test('hallazgo · «Era un MITO» en la insignia de un acierto llega a 4,5:1 en tema claro', async ({ page }) => {
+    // .respuestaCorrecta: #166534 con opacity 0.8 sobre #dcfce7, 12,8 px y peso 600 (texto pequeño,
+    // WCAG 1.4.3 pide 4,5:1). A mano: color resultante (62, 131, 88) → luminancia 0,180 frente a
+    // 0,906 del fondo → (0,956) / (0,230) = 4,16:1. Medido 29/10/2026: 4,16 a 1280 y a 360 px. En la
+    // insignia de fallo (#991b1b) da 4,70 y en oscuro 6,75 / 5,58: solo falla el acierto en claro.
+    test.fail();
+    await abrir(page);
+    await page.getByRole('button', { name: 'Comenzar quiz' }).click();
+    await page.evaluate(() => document.documentElement.setAttribute('data-theme', 'light'));
+    await responder(page, true);
+    await expect(page.locator('[class*="resultadoBadge"]')).toContainText('¡Correcto!');
+    const ratio = await page.locator('[class*="respuestaCorrecta"]').evaluate((el) => {
+      type C = { r: number; g: number; b: number; a: number };
+      const parse = (s: string): C | null => {
+        const m = s.match(/rgba?\(([^)]+)\)/);
+        if (!m) return null;
+        const p = m[1].split(',').map((x) => parseFloat(x));
+        return { r: p[0], g: p[1], b: p[2], a: p.length > 3 ? p[3] : 1 };
+      };
+      const sobre = (f: C, b: C): C => ({ r: f.r * f.a + b.r * (1 - f.a), g: f.g * f.a + b.g * (1 - f.a), b: f.b * f.a + b.b * (1 - f.a), a: 1 });
+      const lin = (v: number): number => { const x = v / 255; return x <= 0.03928 ? x / 12.92 : ((x + 0.055) / 1.055) ** 2.4; };
+      const L = (c: C): number => 0.2126 * lin(c.r) + 0.7152 * lin(c.g) + 0.0722 * lin(c.b);
+      const capas: C[] = [];
+      let op = 1;
+      for (let n: Element | null = el; n; n = n.parentElement) {
+        op *= parseFloat(getComputedStyle(n).opacity);
+        const c = parse(getComputedStyle(n).backgroundColor);
+        if (c && c.a > 0 && (capas.length === 0 || capas[capas.length - 1].a < 1)) capas.push(c);
+      }
+      let fondo: C = { r: 255, g: 255, b: 255, a: 1 };
+      for (let i = capas.length - 1; i >= 0; i--) fondo = sobre(capas[i], fondo);
+      const t = parse(getComputedStyle(el).color) as C;
+      const texto = sobre({ ...t, a: t.a * op }, fondo);
+      const [a, b] = [L(texto), L(fondo)];
+      return (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+    });
+    expect(ratio).toBeGreaterThanOrEqual(4.5);
+  });
+
+  test('hallazgo · la afirmación de los avestruces no la ilustra un pavo real (🦚), que además se lee al enfocar la tarjeta', async ({ page }) => {
+    // page.tsx, id 9: `emoji: '🦚'` (U+1F99A PEACOCK, «pavo real» en el lector). La tarjeta es el
+    // destino del foco y el emoji no lleva aria-hidden: se anuncia «pavo real, "Los avestruces…"».
+    // Esperado: el emoji no es un pavo real (o queda fuera del texto accesible).
+    test.fail();
+    await abrir(page);
+    await page.getByRole('button', { name: 'Comenzar quiz' }).click();
+    for (let n = 1; n < 9; n++) {
+      await responder(page, true);
+      await btnAvanzar(page).click();
+    }
+    await expect(page.locator('[class*="afirmacion"]')).toContainText('avestruces');
+    const leido = await page.locator('[class*="preguntaCard"]').evaluate((el) => {
+      const clon = el.cloneNode(true) as HTMLElement;
+      clon.querySelectorAll('[aria-hidden="true"]').forEach((n) => n.remove());
+      return clon.textContent ?? '';
+    });
+    expect(leido).not.toContain('🦚');
+  });
+
+  test('hallazgo · las dos escalas del átomo de hidrógeno cuadran entre sí (naranja a 2 km frente a canica en un estadio)', () => {
+    // Explicación 17: núcleo = naranja (≈ 8 cm) → electrón a 2 km: cociente 2.000 / 0,08 = 25.000
+    // (el real, radio de Bohr 52,9 pm / diámetro del protón 1,68 fm ≈ 31.500). Guía («Datos
+    // científicos que sorprenden»): núcleo = canica (≈ 1,6 cm) y electrón «en las gradas exteriores»
+    // de un estadio (≈ 120 m del centro): cociente 120 / 0,016 = 7.500. A mano, con el cociente de la
+    // propia app la canica pone el electrón a 0,016 × 25.000 = 400 m (≈ 500 m con el real), unas
+    // 3-4 veces más lejos que las gradas; con el estadio, el núcleo sería de ≈ 4 mm, no una canica.
+    test.fail();
+    const naranja = /núcleo de un átomo de hidrógeno tuviera el tamaño de una naranja, su único electrón estaría a unos 2 kilómetros/.test(FUENTE);
+    const canica = /átomo de hidrógeno tuviera el tamaño de un estadio de fútbol, su núcleo sería una canica/.test(FUENTE);
+    expect(naranja && canica, 'la app da dos escalas incompatibles del mismo átomo').toBe(false);
   });
 });

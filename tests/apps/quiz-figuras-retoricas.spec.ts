@@ -570,3 +570,157 @@ test.describe('Inspector 28/10/2026 · contenido del banco', () => {
     expect(dario).toMatch(/bajo el ala aleve del leve abanico/i);
   });
 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * INSPECTOR 29/10/2026 — 2.ª pasada, tras la reparación de la familia (c5b619bb y d9e710f8).
+ * Los 18 hallazgos del 28/10 siguen abiertos en la base: sus `test.fail()` de arriba no se tocan.
+ *
+ * Tres casos nuevos, resueltos a mano con `calcularPuntuacion` y `getResultadoTexto`
+ * (page.tsx:73-86) ANTES de ejecutar la app:
+ *  · normal (escritorio): Todas, 15 preguntas, fallos en la 2.ª, 5.ª, 9.ª y 15.ª → 11/15 = 0,7333…
+ *    ≥ 0,7 → 60 + (0,7333 − 0,7)/0,2·40 = 66,67 → 67 pts · «¡Muy buena puntuación!» ·
+ *    Acierto round(73,33) = 73 %. «Todas» tiene 26 figuras ≥ 15, así que se juegan las 15.
+ *  · límite (360 px): Intermedio, 10, acierta las 9 primeras y falla LA ÚLTIMA → 9/10 = 0,9, justo
+ *    el umbral (≥ 0,9) → 100 pts · «¡Dominas la retórica!» · 90 %. La 9.ª dice «Siguiente
+ *    pregunta →» y la 10.ª «Ver resultados».
+ *  · rechazo (escritorio y 360 px): «Siguiente» sin contestar. El botón solo se monta tras
+ *    responder (page.tsx:311-351): antes no existe, y Enter o Espacio sobre el enunciado enfocado
+ *    no avanzan ni contestan → sigue «Pregunta 1 de 10», 4 opciones habilitadas, 0 correctas.
+ */
+async function jugarConFallos(page: Page, fallos: Set<number>): Promise<string[]> {
+  const rotulos: string[] = [];
+  for (let n = 1; n <= 25; n++) {
+    await responder(page, fallos.has(n) ? 'mal' : 'bien');
+    const r = await avanzar(page);
+    rotulos.push(r);
+    if (/Ver resultados/.test(r)) break;
+  }
+  return rotulos;
+}
+
+async function siguienteSinContestar(page: Page): Promise<void> {
+  await abrir(page);
+  await arrancar(page, 'Básico', 10);
+  await expect(page.locator('[class*="preguntaCard"]')).toBeFocused();
+  await page.waitForTimeout(550);
+  await expect(page.locator('[class*="btnSiguiente"]'), '«Siguiente» existe antes de contestar').toHaveCount(0);
+  await page.keyboard.press('Enter');
+  await page.keyboard.press('Space');
+  await page.waitForTimeout(300);
+  await expect(contador(page)).toHaveText('Pregunta 1 de 10');
+  await expect(feedback(page)).toHaveCount(0);
+  await expect(hudValor(page, 1)).toHaveText('0');
+  for (let i = 0; i < 4; i++) await expect(opciones(page).nth(i)).toBeEnabled();
+  // Al contestar, y solo entonces, aparece «Siguiente pregunta →»
+  await responder(page, 'bien');
+  await expect(page.locator('[class*="btnSiguiente"]')).toHaveText('Siguiente pregunta →');
+}
+
+test.describe('Inspector 29/10/2026 · escritorio 1280 × 800', () => {
+  test.use({ viewport: { width: 1280, height: 800 } });
+
+  test('caso normal: Todas, 15 preguntas, 11 bien y 4 mal dan 67 pts, 73 % y «¡Muy buena puntuación!»', async ({ page }) => {
+    test.setTimeout(120_000);
+    await abrir(page);
+    await arrancar(page, 'Todas', 15);
+    await expect(contador(page)).toHaveText('Pregunta 1 de 15');
+    const rotulos = await jugarConFallos(page, new Set([2, 5, 9, 15]));
+    expect(rotulos).toHaveLength(15);
+    expect(rotulos[13]).toBe('Siguiente pregunta →');
+    expect(rotulos[14]).toBe('Ver resultados');
+    const r = await resultado(page);
+    expect(r.titulo).toBe('¡Muy buena puntuación!');
+    expect(r.puntos).toBe('67 pts');
+    expect(r.sub).toBe('11 de 15 respuestas correctas');
+    expect(r.stats.Correctas).toBe('11/15');
+    expect(r.stats.Acierto).toMatch(porcentaje(73));
+    await expect(page.locator('[class*="resultadoPanel"]')).toBeFocused();
+  });
+
+  test('caso de rechazo: sin contestar no hay «Siguiente», y Enter o Espacio no avanzan', async ({ page }) => {
+    await siguienteSinContestar(page);
+  });
+});
+
+test.describe('Inspector 29/10/2026 · móvil 360 × 780', () => {
+  test.use({ viewport: { width: 360, height: 780 }, userAgent: UA_MOVIL, deviceScaleFactor: 3, isMobile: true, hasTouch: true });
+
+  test('caso límite: Intermedio, 9 bien y la ÚLTIMA mal → 9/10 = 0,9 da 100 pts y «¡Dominas la retórica!»', async ({ page }) => {
+    test.setTimeout(120_000);
+    await abrir(page);
+    await arrancar(page, 'Intermedio', 10);
+    const rotulos = await jugarConFallos(page, new Set([10]));
+    expect(rotulos).toHaveLength(10);
+    expect(rotulos[8]).toBe('Siguiente pregunta →');
+    expect(rotulos[9]).toBe('Ver resultados');
+    const r = await resultado(page);
+    expect(r.titulo).toBe('¡Dominas la retórica!');
+    expect(r.puntos).toBe('100 pts');
+    expect(r.sub).toBe('9 de 10 respuestas correctas');
+    expect(r.stats.Correctas).toBe('9/10');
+    expect(r.stats.Acierto).toMatch(porcentaje(90));
+  });
+
+  test('caso de rechazo: sin contestar no hay «Siguiente», y Enter o Espacio no avanzan', async ({ page }) => {
+    await siguienteSinContestar(page);
+  });
+});
+
+test.describe('Inspector 29/10/2026 · hallazgos', () => {
+  test('hallazgo · el tiempo usa «min» para los minutos, no «m» (el metro)', async ({ page }) => {
+    test.fail(); // ABIERTO — formatTiempo (page.tsx:184-188) escribe `${m}m ${s}s`: «2m 15s». «m» es
+    // el símbolo del metro; el minuto es «min», como ya escribe lib/formatters.ts (formatDuration).
+    // Medido 29/10/2026: partida de 15 preguntas con el reloj adelantado 125 s → «2m 15s».
+    // La misma función está copiada en quiz-verbos-irregulares, quiz-metrica-estrofas y
+    // quiz-reinos-naturaleza.
+    test.setTimeout(120_000);
+    // Adelanta Date.now 125 s justo antes de «Ver resultados»: la partida pasa del minuto
+    await page.addInitScript(() => {
+      const real = Date.now.bind(Date);
+      const w = window as unknown as { __salto: number };
+      w.__salto = 0;
+      Date.now = () => real() + w.__salto;
+    });
+    await abrir(page);
+    await arrancar(page, 'Básico', 10);
+    for (let n = 1; n <= 10; n++) {
+      await responder(page, 'bien');
+      if (n === 10) await page.evaluate(() => { (window as unknown as { __salto: number }).__salto = 125_000; });
+      await avanzar(page);
+    }
+    const r = await resultado(page);
+    // Se admite con o sin espacio (normal o duro): lo que se mide es el símbolo del minuto
+    expect(r.stats.Tiempo).toMatch(/^\d+[  ]?min[  ]?\d+[  ]?s$/);
+  });
+
+  test('hallazgo · la barra de progreso tiene nombre accesible', async ({ page }) => {
+    test.fail(); // ABIERTO — page.tsx:266-273: role="progressbar" sin aria-label ni aria-labelledby;
+    // el árbol de accesibilidad da «- progressbar» a secas (medido 29/10/2026). WAI-ARIA 1.2 exige
+    // nombre a progressbar. La misma barra está en ocho quizzes de la familia.
+    await abrir(page);
+    await arrancar(page, 'Básico', 10);
+    await expect(page.getByRole('progressbar')).toHaveAccessibleName(/\S/, { timeout: 2000 });
+  });
+
+  test('hallazgo · los iconos de los cuatro perfiles de la guía llevan aria-hidden', async ({ page }) => {
+    test.fail(); // ABIERTO — page.tsx:512, 531, 550 y 569: <span className={styles.escenarioIcon}>🎓</span>
+    // (📖, 📝, 📚) junto al <strong> del perfil, sin aria-hidden (sí lo llevan tipIcon y warningIcon).
+    await abrir(page);
+    const sinOcultar = await page.locator('[class*="escenarioIcon"]').evaluateAll((ss) =>
+      ss.filter((s) => s.getAttribute('aria-hidden') !== 'true').map((s) => s.textContent ?? ''),
+    );
+    expect(sinOcultar).toEqual([]);
+  });
+
+  test('hallazgo · los ejemplos de Alegoría son un texto alegórico, no su descripción', () => {
+    test.fail(); // ABIERTO — data/figuras-retoricas.ts:330-333: tres de los cuatro «ejemplos» describen
+    // la figura («los prisioneros… representan la ignorancia», «el jardín… representa el alma»,
+    // «El laberinto como metáfora de la mente humana, desarrollada en toda la novela»). El último dice
+    // «metáfora», y la alegoría es, por la definición del propio banco, una «Metáfora extendida»: en
+    // «Todas», con Metáfora entre las opciones, elegirla da «Incorrecto».
+    const describe = figura('alegoria').ejemplos.filter((e) => /\brepresenta|\bmetáfora\b/i.test(e));
+    expect(describe).toEqual([]);
+  });
+});

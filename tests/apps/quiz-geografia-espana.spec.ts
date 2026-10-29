@@ -1258,3 +1258,191 @@ test.describe('Inspector 28/10/2026 · contenido (cabo C0203 y JSON-LD)', () => 
     expect(n).toBeGreaterThanOrEqual(4);
   });
 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Inspector 29/10/2026 — familia «Quizzes de opción múltiple» (tras c5b619bb y d9e710f8) y el
+// resto del cabo C0203, ya con las fuentes oficiales permitidas.
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** Sin <input>: la hidratación se confirma cuando React cuelga sus props de «Comenzar quiz» (como el testigo). */
+async function esperarHidratado29(page: Page): Promise<void> {
+  await page.waitForFunction(() => {
+    const b = [...document.querySelectorAll('button')].find((x) => /Comenzar quiz/.test(x.textContent ?? ''));
+    return Boolean(b && Object.keys(b).some((k) => k.startsWith('__reactProps$')));
+  });
+}
+
+/** «TAG:tabindex» del elemento con el foco. */
+async function focoActual(page: Page): Promise<string> {
+  return page.evaluate(() => {
+    const a = document.activeElement;
+    return `${a?.tagName ?? '—'}:${a?.getAttribute('tabindex') ?? ''}`;
+  });
+}
+
+const progreso29 = (page: Page): Locator => page.locator('[class*="progresoInfo"] span').first();
+
+function casosInspector29(movil: boolean): void {
+  /**
+   * CASO NORMAL — Fácil, en el orden B M B B M B M B B M (B = la correcta del banco, M = otra).
+   * Esperado a mano: 10 preguntas (CONFIG facil = 10); el marcador en vivo va 1 · 1 · 2 · 3 · 3 ·
+   * 4 · 4 · 5 · 6 · 6 («1 correcta» en singular); tras cada «Siguiente» el foco va al enunciado
+   * nuevo (H2 con tabindex −1, invariante de la familia); las opciones nunca llevan aria-pressed;
+   * «Ver resultado» solo en la 10.ª. 6/10 = 60 % → tramo ≥ 50 y < 70 → 🥉 «Nivel intermedio»;
+   * «6 de 10 preguntas correctas (60 %)» con espacio duro; estadísticas 6 · 4 · «60 %» · 10; la
+   * lista de falladas son las 4 «M», cada una con su correcta, y el foco acaba en el título.
+   */
+  test('caso normal: Fácil con B M B B M B M B B M da 6 de 10, 60 % y «Nivel intermedio»', async ({ page }) => {
+    test.setTimeout(90_000);
+    await abrir(page, { semilla: 2910 });
+    await esperarHidratado29(page);
+    await arrancar(page, 'Fácil');
+    const patron = 'BMBBMBMBBM';
+    const enVivo = ['1 correcta', '1 correcta', '2 correctas', '3 correctas', '3 correctas', '4 correctas', '4 correctas', '5 correctas', '6 correctas', '6 correctas'];
+    const falladas: string[] = [];
+    for (let n = 0; n < 10; n++) {
+      await expect(progreso29(page)).toHaveText(`Pregunta ${n + 1} de 10`);
+      expect(await opciones(page).evaluateAll((bs) => bs.filter((b) => b.hasAttribute('aria-pressed')).length), 'opciones con aria-pressed').toBe(0);
+      const { ficha } = await responder(page, patron[n] === 'B' ? 'bien' : 'mal');
+      if (patron[n] === 'M') falladas.push(`${ficha.pregunta}✓ ${ficha.correcta}`);
+      await expect(marcador(page)).toHaveText(enVivo[n]);
+      const rotulo = await avanzar(page);
+      expect(/Ver resultado/.test(rotulo), `«Ver resultado» en la ${n + 1}`).toBe(n === 9);
+      if (n < 9) await expect.poll(() => focoActual(page), `foco tras «Siguiente» ${n + 1}`).toBe('H2:-1');
+    }
+    const r = await resultado(page);
+    expect(r.titulo).toBe('Nivel intermedio');
+    expect(r.medalla).toBe('🥉');
+    expect(r.subtitulo).toBe(`6 de 10 preguntas correctas (60${DURO}%)`);
+    expect(r.stats).toEqual({ Correctas: '6', Errores: '4', 'Puntuación': `60${DURO}%`, Jugadas: '10' });
+    const lista = (await page.locator('[class*="errorItem"]').allTextContents()).map((t) => t.replace(/[ \t\n\r]+/g, ' ').trim());
+    expect(lista).toEqual(falladas);
+    await expect(page.locator('[class*="finTitulo"]')).toBeFocused();
+  });
+
+  /**
+   * CASO LÍMITE — Difícil, las 20 bien (la clave del banco: mide la mecánica; la id 61 se juzga
+   * aparte, abajo).
+   * Esperado a mano: 20 preguntas distintas y todas «dificil» (banco difícil = 25); «Ver resultado»
+   * solo en «Pregunta 20 de 20»; 20/20 = 100 % → ≥ 90 → 🥇 «¡Experto en Geografía de España!»;
+   * «20 de 20 preguntas correctas (100 %)»; estadísticas 20 · 0 · «100 %» · 20; sin bloque
+   * «Preguntas que has fallado».
+   */
+  test('caso límite: Difícil 20 de 20 da 100 %, 🥇 y ningún bloque de falladas', async ({ page }) => {
+    test.setTimeout(120_000);
+    await abrir(page, { semilla: 2911 });
+    await esperarHidratado29(page);
+    await arrancar(page, 'Difícil');
+    const fichas: PreguntaGeografia[] = [];
+    for (let n = 1; n <= 20; n++) {
+      await expect(progreso29(page)).toHaveText(`Pregunta ${n} de 20`);
+      fichas.push((await responder(page, 'bien')).ficha);
+      await expect(marcador(page)).toHaveText(`${n} ${n === 1 ? 'correcta' : 'correctas'}`);
+      const rotulo = await avanzar(page);
+      expect(/Ver resultado/.test(rotulo), `«Ver resultado» en la ${n}`).toBe(n === 20);
+    }
+    expect(new Set(fichas.map((f) => f.id)).size, 'pregunta repetida').toBe(20);
+    expect(fichas.every((f) => f.dificultad === 'dificil')).toBe(true);
+    const r = await resultado(page);
+    expect(r.titulo).toBe('¡Experto en Geografía de España!');
+    expect(r.medalla).toBe('🥇');
+    expect(r.subtitulo).toBe(`20 de 20 preguntas correctas (100${DURO}%)`);
+    expect(r.stats).toEqual({ Correctas: '20', Errores: '0', 'Puntuación': `100${DURO}%`, Jugadas: '20' });
+    expect(r.errores).toBe(0);
+    await expect(page.locator('[class*="erroresSection"]')).toHaveCount(0);
+  });
+
+  /**
+   * CASO DE RECHAZO — avanzar sin contestar, cambiar la respuesta dada y el doble toque/clic sobre
+   * una opción.
+   * Esperado a mano (page.tsx): en fase «jugando» no hay «Siguiente» (solo se pinta en
+   * «respondida»); Intro y Espacio con el foco en el enunciado (H2, no un botón) no hacen nada:
+   * sigue «Pregunta 1 de 10», ninguna opción bloqueada y sin veredicto. Tras fallar, las 4 opciones
+   * quedan disabled: pulsar la correcta (forzado) no cambia «0 correctas» ni el «❌ Incorrecto».
+   * Un doble clic (escritorio) o dos toques (360 px) sobre una opción de la 2.ª pregunta la
+   * contestan UNA vez y no se saltan la explicación: sigue «Pregunta 2 de 10» con su explicación y
+   * «Siguiente pregunta →», y el marcador sube a lo sumo 1.
+   */
+  test('caso de rechazo: sin «Siguiente» antes de contestar, la respuesta no se cambia y el doble toque contesta una vez', async ({ page }) => {
+    test.setTimeout(90_000);
+    await abrir(page, { semilla: 2912 });
+    await esperarHidratado29(page);
+    await arrancar(page, 'Fácil');
+    await expect(page.getByRole('button', { name: /Siguiente pregunta|Ver resultado/ })).toHaveCount(0);
+    await expect.poll(() => focoActual(page)).toBe('H2:-1');
+    await page.keyboard.press('Enter');
+    await page.keyboard.press('Space');
+    await expect(progreso29(page)).toHaveText('Pregunta 1 de 10');
+    await expect(page.locator('[class*="feedbackMensaje"]')).toHaveCount(0);
+    expect(await opciones(page).evaluateAll((bs) => bs.filter((b) => (b as HTMLButtonElement).disabled).length)).toBe(0);
+
+    const { ficha } = await responder(page, 'mal');
+    const iC = (await textosOpcion(page)).indexOf(ficha.correcta);
+    await opciones(page).nth(iC).click({ force: true });
+    await opciones(page).nth(iC).evaluate((b) => (b as HTMLButtonElement).click());
+    await expect(marcador(page)).toHaveText('0 correctas');
+    await expect(page.locator('[class*="feedbackMensaje"]')).toHaveText(`❌ Incorrecto. La respuesta correcta es: "${ficha.correcta}"`);
+    await expect(progreso29(page)).toHaveText('Pregunta 1 de 10');
+
+    await avanzar(page);
+    await expect(progreso29(page)).toHaveText('Pregunta 2 de 10');
+    await page.waitForTimeout(600); // lee la pregunta: fuera de la ventana de ráfaga del «Siguiente»
+    const segunda = await fichaVisible(page);
+    const tercera = opciones(page).nth(2);
+    const acierta = (await textosOpcion(page))[2] === segunda.correcta;
+    await bajarLoJusto(tercera);
+    const caja = await tercera.boundingBox();
+    if (!caja) throw new Error('la opción C no tiene caja');
+    await (movil ? dobleToque : dobleClic)(page, caja.x + caja.width / 2, caja.y + caja.height / 2);
+    await page.waitForTimeout(300);
+    await expect(progreso29(page)).toHaveText('Pregunta 2 de 10');
+    await expect(page.locator('[class*="feedbackMensaje"]')).toHaveCount(1);
+    await expect(page.locator('[class*="explicacionTexto"]')).toHaveText(segunda.explicacion);
+    await expect(page.getByRole('button', { name: 'Siguiente pregunta →' })).toHaveCount(1);
+    await expect(marcador(page)).toHaveText(acierta ? '1 correcta' : '0 correctas');
+  });
+
+  /**
+   * HALLAZGO (cabo C0203, punto b) — id 61 «¿Qué río tiene la mayor cuenca hidrográfica dentro de
+   * España?» da por correcta «Duero».
+   * Fuentes: Confederación Hidrográfica del Ebro, https://www.chebro.es/es/web/guest/la-cuenca-del-ebro
+   * — «una superficie total de 85.534 Km2» y «Es la cuenca hidrográfica más extensa de España,
+   * representando el 17 % del territorio peninsular español». Confederación Hidrográfica del Duero,
+   * https://www.chduero.es/web/guest/la-cuenca-del-duero — la parte española «cubre 78.859 km2» y la
+   * demarcación es «la más extensa de la Península Ibérica con 98.073 km2» (la explicación de la app
+   * se la da al Tajo).
+   * Esperado: contestar «Ebro» es «✅ ¡Correcto!» y el marcador sube. Obtenido (29/10/2026, 1280 y
+   * 360 px, semilla 61, la id 61 sale 16.ª): «❌ Incorrecto. La respuesta correcta es: "Duero"».
+   * El test.fail() va DESPUÉS de llegar a la id 61: si la partida no la saca, el test cae de verdad.
+   */
+  test('hallazgo · la mayor cuenca hidrográfica dentro de España es la del Ebro (CHE), no la del Duero', async ({ page }) => {
+    test.setTimeout(120_000);
+    await abrir(page, { semilla: 61 });
+    await esperarHidratado29(page);
+    await arrancar(page, 'Difícil');
+    let n = 1;
+    for (; n <= 20; n++) {
+      if ((await fichaVisible(page)).id === 61) break;
+      await responder(page, 'bien');
+      await avanzar(page);
+    }
+    expect(n, 'la id 61 sale en la partida de la semilla 61').toBeLessThanOrEqual(20);
+    const antes = n - 1;
+    const iEbro = (await textosOpcion(page)).indexOf('Ebro');
+    expect(iEbro, '«Ebro» está entre las opciones').toBeGreaterThanOrEqual(0);
+    test.fail(); // ABIERTO (inspector 29/10/2026)
+    await opciones(page).nth(iEbro).click();
+    await expect(page.locator('[class*="feedbackMensaje"]')).toHaveText('✅ ¡Correcto!', { timeout: 3000 });
+    await expect(marcador(page)).toHaveText(`${antes + 1} ${antes + 1 === 1 ? 'correcta' : 'correctas'}`, { timeout: 1000 });
+  });
+}
+
+test.describe('Inspector 29/10/2026 · escritorio 1280 × 800', () => {
+  test.use({ viewport: { width: 1280, height: 800 } });
+  casosInspector29(false);
+});
+
+test.describe('Inspector 29/10/2026 · móvil 360 × 740', () => {
+  test.use({ viewport: { width: 360, height: 740 }, userAgent: MOVIL_UA, deviceScaleFactor: 2, isMobile: true, hasTouch: true });
+  casosInspector29(true);
+});

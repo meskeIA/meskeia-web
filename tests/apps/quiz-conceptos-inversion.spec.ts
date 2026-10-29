@@ -720,3 +720,224 @@ test.describe('Inspector 28/10/2026 · banco', () => {
     expect(fallos).toEqual([]);
   });
 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * INSPECTOR 29/10/2026 (2.ª pasada, tras c5b619bb y d9e710f8). Los once hallazgos del 28/10
+ * (3752-3762) siguen ABIERTOS en la base y sus test.fail() de arriba se quedan como están; el 3751
+ * está REPARADO. Este bloque lleva los tres casos de la pasada sobre la PRÁCTICA POR CATEGORÍA, la
+ * pantalla que la referencia (quiz-literatura-universal) no tiene, en escritorio y a 360 px, y dos
+ * hallazgos nuevos.
+ *
+ * Valores esperados, a mano, con `pct = Math.round(correctas / total · 100)` y los tramos de
+ * clasificacion() (page.tsx:386-392); en práctica el total es 5, así que cada acierto vale 20 %.
+ */
+
+/** Sin <input>: React ha colgado sus props del botón (mismo criterio que esperarHidratado del testigo). */
+async function esperarBotonHidratado(page: Page, texto: string): Promise<void> {
+  await page.waitForFunction(
+    (t) => {
+      const b = [...document.querySelectorAll('button')].find(
+        (x) => (x as HTMLElement).offsetParent !== null && (x.textContent ?? '').includes(t),
+      );
+      return Boolean(b && Object.keys(b).some((k) => k.startsWith('__reactProps$')));
+    },
+    texto,
+    { timeout: 20_000 },
+  );
+}
+
+async function empezarPractica(page: Page, cat: Cat): Promise<void> {
+  await esperarBotonHidratado(page, 'Práctica por categoría');
+  await page.getByRole('button', { name: /Práctica por categoría/ }).click();
+  await page.getByRole('button', { name: cat }).click();
+  await expect(page.getByRole('button', { name: cat })).toHaveAttribute('aria-pressed', 'true');
+  await empezar(page).click();
+  await expect(contador(page)).toHaveText('1 / 5');
+}
+
+/**
+ * CASO NORMAL — práctica «Cartera y Estrategia»: las dos primeras bien y las tres últimas mal.
+ * A mano: 2 / 5 = 40 % → tramo ≥ 40 → 📚 «Nivel básico-medio — repasa los conceptos clave», y el
+ * desglose solo con su categoría: «⚖️ Cartera y Estrategia 2/5».
+ */
+async function casoNormal(page: Page): Promise<void> {
+  await abrir(page);
+  await empezarPractica(page, CE);
+  let n = 0;
+  expect(await jugar(page, 5, (_t, cat) => (expect(cat).toBe(CE), ++n <= 2 ? 'bien' : 'mal'))).toBe(2);
+  const r = await resultado(page);
+  expect(r.puntuacion).toBe('2 / 5');
+  expect(r.pct).toBe('40% de respuestas correctas');
+  expect(r.nivel).toBe('Nivel básico-medio — repasa los conceptos clave');
+  expect(r.icono).toBe('📚');
+  expect(r.categorias).toEqual(['⚖️ Cartera y Estrategia 2/5']);
+}
+
+/**
+ * CASO LÍMITE — práctica «Riesgo y Rentabilidad» toda bien y, tras «Volver a empezar», práctica
+ * «Valoración de Activos» toda mal. A mano: 5 / 5 = 100 % → 🏆 «Experto en inversión» y «📊 Riesgo y
+ * Rentabilidad 5/5»; la 5.ª pregunta rotula «Ver resultado →» (lo comprueba jugar()) y el foco va a la
+ * tarjeta del resultado. Luego 0 / 5 = 0 % → 🌱 «Nivel inicial — empieza por el quiz básico de
+ * finanzas» y «🔍 Valoración de Activos 0/5»: el desglose se reinicia, no arrastra la partida anterior.
+ */
+async function casoLimite(page: Page): Promise<void> {
+  await abrir(page);
+  await empezarPractica(page, RR);
+  expect(await jugar(page, 5, (_t, cat) => (expect(cat).toBe(RR), 'bien'))).toBe(5);
+  await expect
+    .poll(() => page.evaluate(() => document.activeElement === document.querySelector('div[class*="_resultadoTarjeta"]')), {
+      message: 'foco en la tarjeta tras «Ver resultado»',
+    })
+    .toBe(true);
+  let r = await resultado(page);
+  expect(r.puntuacion).toBe('5 / 5');
+  expect(r.pct).toBe('100% de respuestas correctas');
+  expect(r.nivel).toBe('Experto en inversión');
+  expect(r.icono).toBe('🏆');
+  expect(r.categorias).toEqual(['📊 Riesgo y Rentabilidad 5/5']);
+
+  await page.getByRole('button', { name: '↺ Volver a empezar' }).click();
+  await empezarPractica(page, VA);
+  expect(await jugar(page, 5, (_t, cat) => (expect(cat).toBe(VA), 'mal'))).toBe(0);
+  r = await resultado(page);
+  expect(r.puntuacion).toBe('0 / 5');
+  expect(r.pct).toBe('0% de respuestas correctas');
+  expect(r.nivel).toBe('Nivel inicial — empieza por el quiz básico de finanzas');
+  expect(r.icono).toBe('🌱');
+  expect(r.categorias).toEqual(['🔍 Valoración de Activos 0/5']);
+}
+
+/**
+ * CASO DE RECHAZO — «Siguiente» sin contestar, y una categoría elegida que no debe colarse en el
+ * examen. A mano: elegir práctica + «Fondos y ETF» y volver a «Examen completo» oculta el selector y
+ * «Empezar» da «1 / 25» (el examen son las 25, no las 5 de la categoría). Antes de contestar no hay
+ * botón «Siguiente pregunta» ni «Ver resultado», y Enter o Espacio sobre el enunciado (que tiene el
+ * foco) no avanzan ni contestan: sigue «1 / 25», el mismo enunciado, sin veredicto y con las 4
+ * opciones habilitadas.
+ */
+async function casoRechazo(page: Page): Promise<void> {
+  await abrir(page);
+  await esperarBotonHidratado(page, 'Práctica por categoría');
+  await page.getByRole('button', { name: /Práctica por categoría/ }).click();
+  await page.getByRole('button', { name: FE }).click();
+  await page.getByRole('button', { name: /Examen completo/ }).click();
+  await expect(page.getByRole('button', { name: FE })).toHaveCount(0);
+  await empezar(page).click();
+  await expect(contador(page)).toHaveText('1 / 25');
+  await expect(siguiente(page)).toHaveCount(0);
+  await expect
+    .poll(() => page.evaluate(() => document.activeElement === document.querySelector('p[class*="_pregunta"]')), {
+      message: 'foco en el enunciado tras «Empezar»',
+    })
+    .toBe(true);
+  const antes = norm(await enunciado(page).innerText());
+  await page.keyboard.press('Enter');
+  await page.keyboard.press(' ');
+  await page.waitForTimeout(300);
+  await expect(contador(page)).toHaveText('1 / 25');
+  await expect(veredicto(page)).toHaveCount(0);
+  await expect(siguiente(page)).toHaveCount(0);
+  expect(norm(await enunciado(page).innerText())).toBe(antes);
+  await expect(opciones(page)).toHaveCount(4);
+  for (let i = 0; i < 4; i++) await expect(opciones(page).nth(i)).toBeEnabled();
+}
+
+test.describe('Inspector 29/10/2026 · escritorio (1280×800)', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+  });
+  test('caso normal: práctica «Cartera y Estrategia» 2 de 5 → 40 % «Nivel básico-medio»', async ({ page }) => {
+    test.setTimeout(90_000);
+    await casoNormal(page);
+  });
+  test('caso límite: 5 de 5 «Experto en inversión» y luego 0 de 5 «Nivel inicial»', async ({ page }) => {
+    test.setTimeout(120_000);
+    await casoLimite(page);
+  });
+  test('caso de rechazo: sin contestar no hay «Siguiente» y la categoría elegida no se cuela en el examen', async ({ page }) => {
+    test.setTimeout(90_000);
+    await casoRechazo(page);
+  });
+});
+
+test.describe('Inspector 29/10/2026 · móvil (360×740)', () => {
+  test.use({
+    viewport: { width: 360, height: 740 },
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
+    deviceScaleFactor: 2,
+    isMobile: true,
+    hasTouch: true,
+  });
+  test('caso normal a 360 px: práctica «Cartera y Estrategia» 2 de 5 → 40 %', async ({ page }) => {
+    test.setTimeout(90_000);
+    await casoNormal(page);
+    // Medido el 29/10/2026: sin desborde horizontal en inicio, pregunta, respuesta ni resultado
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(360);
+  });
+  test('caso límite a 360 px: 5 de 5 y luego 0 de 5', async ({ page }) => {
+    test.setTimeout(120_000);
+    await casoLimite(page);
+  });
+  test('caso de rechazo a 360 px: sin contestar no hay «Siguiente»', async ({ page }) => {
+    test.setTimeout(90_000);
+    await casoRechazo(page);
+  });
+});
+
+test.describe('Inspector 29/10/2026 · hallazgos', () => {
+  /**
+   * HALLAZGO NUEVO (contenido) — page.tsx:388 y la línea 2 `// @disclaimer: exempt`. La exención de
+   * _private/DISCLAIMER-POLICY.md §7 (paso 1) exige un NO a «¿El usuario podría tomar decisiones de
+   * impacto basándose en el resultado?», y el tramo ≥ 80 % dice «Nivel avanzado — listo para construir
+   * cartera propia»: convierte 4 aciertos de 5 en una invitación a invertir, en una página sin
+   * DisclaimerCard (role="note"). A mano: práctica «Fondos y ETF», 4 bien y la última mal → 4 / 5 =
+   * 80 % → ese tramo. Esperado: un nivel de conocimiento que no invite a una decisión financiera, o la
+   * exención retirada con su DisclaimerCard.
+   */
+  test('hallazgo · el 80 % no se lee como «listo para construir cartera propia» en una página sin disclaimer', async ({ page }) => {
+    test.fail();
+    test.setTimeout(90_000);
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await abrir(page);
+    await empezarPractica(page, FE);
+    let n = 0;
+    expect(await jugar(page, 5, () => (++n <= 4 ? 'bien' : 'mal'))).toBe(4);
+    const r = await resultado(page);
+    expect(r.pct).toBe('80% de respuestas correctas');
+    const avisos = await page.locator('[role="note"]').count();
+    expect({ nivel: r.nivel, invitaAInvertir: /construir cartera propia/.test(r.nivel), avisos }).toMatchObject({
+      invitaAInvertir: false,
+    });
+  });
+
+  /**
+   * HALLAZGO NUEVO (dato) — explicación de «Un ETF de réplica física completa vs uno de réplica
+   * sintética» (page.tsx:209): «Los reguladores europeos limitan la exposición a swaps al 10% del
+   * patrimonio». La norma limita otra cosa y con otra cifra: RD 1082/2012 (Reglamento de IIC), art.
+   * 51.3, leído en boe.es el 29/10/2026: «La exposición al riesgo frente a una misma contraparte
+   * asociada a los instrumentos financieros derivados […] no podrá superar el 5% del patrimonio de la
+   * IIC. Este límite quedará ampliado al 10% cuando la contraparte sea una entidad de crédito» (es el
+   * art. 52.1 de la Directiva 2009/65/CE). Un ETF sintético obtiene por swap el 100 % de su
+   * rentabilidad: lo acotado es el riesgo frente a cada contraparte, 5 % o 10 %, no «la exposición a
+   * swaps». No está en data/fiscal.
+   */
+  test('hallazgo · el límite de la réplica sintética es el riesgo frente a una contraparte (5 % / 10 %), no «la exposición a swaps al 10 %»', async ({ page }) => {
+    test.fail();
+    test.setTimeout(90_000);
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await abrir(page);
+    await empezarPractica(page, FE);
+    let replica = '';
+    for (let n = 1; n <= 5; n++) {
+      const texto = norm(await enunciado(page).innerText());
+      await responder(page, 'bien');
+      if (/réplica física completa/.test(texto)) replica = norm(await explicacion(page).innerText());
+      await siguiente(page).click();
+    }
+    expect(replica, 'la pregunta de la réplica sale en la práctica de Fondos y ETF').toMatch(/riesgo de contraparte/);
+    expect(replica).not.toMatch(/limitan la exposición a swaps al 10%/);
+  });
+});

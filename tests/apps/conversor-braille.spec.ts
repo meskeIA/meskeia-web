@@ -39,11 +39,13 @@ import { esperarHidratacion, esperarPaginaAsentada, esperarValorEnReact } from '
  * «inspector 26/10/2026», 3524-3531) se REPARARON el 27/10/2026 en e6bcbe53 y aa75156d y van como
  * tests normales con «REPARADO»; la re-inspección del 27/10/2026 los vio sostenerse. Los de ESA
  * re-inspección (3552-3558) se REPARARON el 27/10/2026 en 37367e2e, b1a3f0fa, b706d47e, 31de5938
- * y c5efdee5 y van como tests normales con «REPARADO»; la inspección del 28/10/2026 (bloque del
- * final) los vio sostenerse. Los hallazgos de ESA inspección están ABIERTOS y van con
- * `test.fail()`: cada uno afirma lo que DEBERÍA pasar y falla a propósito; el día que se corrija la
- * app pasará a ROJO («expected to fail, but passed») y habrá que quitarle la marca, no reescribir el
- * valor esperado.
+ * y c5efdee5 y van como tests normales con «REPARADO»; la inspección del 28/10/2026 (bloque
+ * «inspector 28/10/2026») los vio sostenerse. De ESA inspección, 3587 y 3588 se REPARARON el
+ * 28/10/2026 en dfc246e6 y e4b499d9 (van como tests normales con «REPARADO») y 3589-3591 siguen
+ * ABIERTOS. Los ABIERTOS —esos tres y los de la inspección del 29/10/2026 (bloque del final)— van
+ * con `test.fail()`: cada uno afirma lo que DEBERÍA pasar y falla a propósito; el día que se
+ * corrija la app pasará a ROJO («expected to fail, but passed») y habrá que quitarle la marca, no
+ * reescribir el valor esperado.
  */
 
 const RUTA = '/conversor-braille/';
@@ -3853,5 +3855,228 @@ test.describe('inspector 28/10/2026', () => {
       velocidadVisual: /misma velocidad que un lector visual/.test(paso5),
       soloMedioMilimetro: /solo 0,5\s?mm/.test(paso5),
     }).toEqual({ velocidadVisual: false, soloMedioMilimetro: false });
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// inspector 29/10/2026 — lo nuevo de dfc246e6 y e4b499d9: ordinales (§ 8.3), fracciones (§ 8.4),
+// «2’54”» (§ 14.3) y la lectura del ordinal en Braille → Texto
+// ═════════════════════════════════════════════════════════════════════════════
+//
+// FUENTE: el B 2 (V4, última actualización 22/01/2026), descargado de once.es el 29/10/2026 y leído
+// con un extractor de texto del PDF. La fuente braille del documento escribe las celdas en ASCII:
+// «#» = 3456, «,» = 2, «;» = 23, «:» = 25, «*» = 256, «>» = 356, «8» = 1256, «{» = 46.
+//   § 3     «Serie 5.ª Puntos: 2, 3, 5, 6 — , ; : * ? + = < } >»: las cifras «en posición baja»,
+//           1 ⠂ (2) · 2 ⠆ (23) · 3 ⠒ (25) · 4 ⠲ (256) · … · 0 ⠴ (356).
+//   § 8.3   «Se forman con los signos de la quinta serie […] seguidos de las letras «a» u «o» según
+//           el género. 1.º o 1º → #,o · 2.ª o 2ª → #;a». Y: «Los ordinales «primer» y «tercer» se
+//           representan de la siguiente forma: 1.er o 1er · 3.er o 3er → #,r · #:r».
+//   § 8.4   «el signo de número seguido del numerador en su posición normal y del denominador en
+//           posición baja […] ¾ → #c* · ½ → #a;».
+//   § 6.2   «* 256 — asterisco con significado de incorrecto, supuesto…» · § 12 «* 256 — / signo de
+//           dividir» · § 12 «> 356 — » recordatorio de comillas»: ⠲ y ⠴ SÍ tienen equivalente.
+//   § 14.1  «Los grados, minutos y segundos tienen signos braille específicos»: «> 356 ° grado ·
+//           8 1256 ’ minuto · 88 1256-1256 ” segundo». Ejemplo: «9°18’27” → #i>#ah8 #bg88».
+//   § 14.3  «1.º: 02:08:57 · 2.º: 02:10:22 · 3.º: 02:11:49 → #,o: #jb:#jh:#eg · #;o: #jb:#aj:#bb ·
+//           #:o: #jb:#aa:#di» y «1.º: 28,34 · 2.º: 30,66 · 3.º: 30,96 → #,o: #bh,cd · #;o: #cj,ff ·
+//           #:o: #cj,if»; «Fuera del contexto científico, podemos encontrarnos grafías no adecuadas
+//           del tipo 2’54” para designar dos minutos y cincuenta y cuatro segundos. […] En braille se
+//           utilizarán los dos puntos: 2’54” → #b:#ed».
+//   § 8.1   «73,81 73.81 73’81 → #gc,ha» · § 6.1 comillas 236, el mismo signo al abrir y al cerrar.
+//
+// LO QUE SE SOSTIENE: los ejemplos literales del bloque del 28/10 («1.º», «2.ª planta», «3.er»,
+// «n.º 5», «¾», «½ kilo», «2’54”», «73’81» y la vuelta del ordinal) pasan, y el CASO 1 de aquí añade
+// los resultados de natación y de la maratón del § 14.3, ida y vuelta.
+test.describe('inspector 29/10/2026', () => {
+  async function convertir29(page: Page, texto: string, modo: 'texto' | 'braille' = 'texto') {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['textarea']);
+    if (modo === 'braille') await page.getByRole('button', { name: 'Braille → Texto' }).click();
+    const textarea = page.locator('textarea').first();
+    await textarea.fill(texto);
+    await esperarValorEnReact(page, textarea, texto);
+    await page.getByRole('button', { name: 'Convertir', exact: true }).click();
+  }
+
+  /** Texto de la caja de resultado ('' si no hay caja), cuando ya hay resultado o aviso en pantalla. */
+  const resultado29 = async (page: Page) => {
+    await page.locator('[class*="resultBox"], [class*="avisoConversion"]').first().waitFor();
+    const caja = page.locator('[class*="resultBox"]');
+    return (await caja.count()) > 0 ? ((await caja.textContent()) ?? '') : '';
+  };
+
+  /** Todos los avisos de la app juntos (los de la conversión, no el anunciador de rutas de Next). */
+  const avisos29 = async (page: Page) =>
+    (await page.locator('[class*="avisoConversion"]').allTextContents()).join(' ');
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // CASO 1 (normal) — § 14.3: resultados con ordinales, ida y vuelta
+  // ─────────────────────────────────────────────────────────────────────────
+  test('CASO 1 (normal) — § 14.3: los resultados de natación y de la maratón, con sus ordinales, ida y vuelta', async ({ page }) => {
+    const ida: Array<[string, string, string]> = [
+      // ⠼ (3456) · 1 en posición baja ⠂ (2) · o ⠕ (135) · «:» ⠒ (25) · ⠀ · ⠼ 2 ⠃ 8 ⠓ · coma decimal ⠂ (2) · 3 ⠉ 4 ⠙
+      ['1.º: 28,34', '⠼⠂⠕⠒⠀⠼⠃⠓⠂⠉⠙', '§ 14.3 «#,o: #bh,cd»'],
+      // 2 en posición baja ⠆ (23) · 3 ⠉ 0 ⠚ · ⠂ · 6 ⠋ 6 ⠋
+      ['2.º: 30,66', '⠼⠆⠕⠒⠀⠼⠉⠚⠂⠋⠋', '§ 14.3 «#;o: #cj,ff»'],
+      // 3 en posición baja ⠒ (25) · 3 ⠉ 0 ⠚ · ⠂ · 9 ⠊ 6 ⠋
+      ['3.º: 30,96', '⠼⠒⠕⠒⠀⠼⠉⠚⠂⠊⠋', '§ 14.3 «#:o: #cj,if»'],
+      // Cada grupo de la hora con su signo de número y los dos puntos ⠒ entre ellos
+      ['2.º: 02:10:22', '⠼⠆⠕⠒⠀⠼⠚⠃⠒⠼⠁⠚⠒⠼⠃⠃', '§ 14.3 «#;o: #jb:#aj:#bb»'],
+      ['3.º: 02:11:49', '⠼⠒⠕⠒⠀⠼⠚⠃⠒⠼⠁⠁⠒⠼⠙⠊', '§ 14.3 «#:o: #jb:#aa:#di»'],
+      // La lista en tres renglones, como en el B 2: cada salto de línea es una separación ⠀
+      ['1.º: 28,34\n2.º: 30,66\n3.º: 30,96', '⠼⠂⠕⠒⠀⠼⠃⠓⠂⠉⠙⠀⠼⠆⠕⠒⠀⠼⠉⠚⠂⠋⠋⠀⠼⠒⠕⠒⠀⠼⠉⠚⠂⠊⠋', '§ 14.3, la lista entera'],
+      // «primer» con punto: 1 en posición baja ⠂ · r ⠗ (1235); la «e» no se escribe
+      ['1.er', '⠼⠂⠗', '§ 8.3 «1.er o 1er → #,r»'],
+    ];
+    for (const [texto, celdas, fuente] of ida) {
+      await convertir29(page, texto);
+      await expect(cajaResultado(page), `${texto} (${fuente})`).toHaveText(celdas, { timeout: 3000 });
+      await expect(page.locator('[class*="avisoConversion"]'), `${texto}: sin aviso`).toHaveCount(0);
+    }
+    // Vuelta: el B 2 da las dos grafías de «primer» («1.er o 1er»), así que vale cualquiera
+    const vuelta: Array<[string, string[]]> = [
+      ['⠼⠆⠕⠒⠀⠼⠉⠚⠂⠋⠋', ['2.º: 30,66']],
+      ['⠼⠒⠕⠒⠀⠼⠚⠃⠒⠼⠁⠁⠒⠼⠙⠊', ['3.º: 02:11:49']],
+      ['⠼⠂⠗', ['1.er', '1er']],
+    ];
+    for (const [celdas, textos] of vuelta) {
+      await convertir29(page, celdas, 'braille');
+      expect(textos, celdas).toContain(await resultado29(page));
+      await expect(page.locator('[class*="avisoConversion"]'), `${celdas}: sin aviso`).toHaveCount(0);
+    }
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // CASO 2 (límite) — ABIERTO (inspector 29/10/2026): § 8.3 «1er» y «3er», sin punto
+  // ─────────────────────────────────────────────────────────────────────────
+  //
+  // El § 8.3 da las dos grafías en el mismo ejemplo, «1.er o 1er · 3.er o 3er → #,r · #:r», y la app
+  // solo reconoce la que lleva punto: «1er» sale ⠼⠁⠐⠑⠗ y «3er» ⠼⠉⠐⠑⠗ (la cifra en su posición normal,
+  // el prefijo de latina minúscula y las letras «e» y «r»), mientras «1.er» y «3.er» salen ⠼⠂⠗ y ⠼⠒⠗.
+  test('ABIERTO — CASO 2 (límite) — § 8.3: «1er» y «3er», sin punto, son #,r y #:r igual que «1.er» y «3.er»', async ({ page }) => {
+    test.fail();
+    const casos: Array<[string, string]> = [
+      ['1er', '⠼⠂⠗'], // ⠼ · 1 en posición baja ⠂ (2) · r ⠗ (1235)
+      ['3er', '⠼⠒⠗'], // ⠼ · 3 en posición baja ⠒ (25) · r ⠗
+      ['el 1er premio', '⠑⠇⠀⠼⠂⠗⠀⠏⠗⠑⠍⠊⠕'], // e ⠑ l ⠇ · ⠀ · #,r · ⠀ · p ⠏ r ⠗ e ⠑ m ⠍ i ⠊ o ⠕
+    ];
+    const fallos: string[] = [];
+    for (const [texto, celdas] of casos) {
+      await convertir29(page, texto);
+      const r = await resultado29(page);
+      if (r !== celdas) fallos.push(`${texto} → ${r}`);
+    }
+    expect(fallos).toEqual([]);
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // ABIERTO (inspector 29/10/2026) — § 8.3: el ordinal detrás de un número y un blanco
+  // ─────────────────────────────────────────────────────────────────────────
+  //
+  // `ordinalesYFracciones` salta toda cifra precedida de blanco, punto, coma o apóstrofo con otra
+  // cifra delante, para no tomar por ordinal el segundo grupo de «10 000» o de «1.5». Pero un ordinal
+  // también puede ir detrás de un número y un blanco: la línea de resultados del § 14.3 escrita de un
+  // tirón da el primer ordinal bien y el segundo como «2.» (⠼⠃⠄), con el aviso de que la app «aún no
+  // escribe» la º que acaba de escribir dos palabras antes. Lo mismo un piso tras el número de portal.
+  test('ABIERTO — § 8.3: el ordinal que va detrás de un número y un blanco también se escribe («… 02:08:57 2.º …», «Mayor 12 3.º»)', async ({ page }) => {
+    test.fail();
+    const casos: Array<[string, string]> = [
+      // § 14.3 en una línea: #,o #jb:#jh:#eg #;o #jb:#aj:#bb (el blanco tras «57» separa; «2» no es grupo de millar)
+      ['1.º 02:08:57 2.º 02:10:22', '⠼⠂⠕⠀⠼⠚⠃⠒⠼⠚⠓⠒⠼⠑⠛⠀⠼⠆⠕⠀⠼⠚⠃⠒⠼⠁⠚⠒⠼⠃⠃'],
+      // M ⠨⠍ a ⠁ y ⠽ o ⠕ r ⠗ · ⠀ · 12 ⠼⠁⠃ · ⠀ · 3.º ⠼⠒⠕ (§ 8.3)
+      ['Mayor 12 3.º', '⠨⠍⠁⠽⠕⠗⠀⠼⠁⠃⠀⠼⠒⠕'],
+    ];
+    const fallos: string[] = [];
+    for (const [texto, celdas] of casos) {
+      await convertir29(page, texto);
+      const r = await resultado29(page);
+      if (r !== celdas) fallos.push(`${texto} → ${r}`);
+      if ((await avisos29(page)).includes('º')) fallos.push(`${texto}: avisa de que no escribe la º`);
+    }
+    expect(fallos).toEqual([]);
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // CASO 3 (rechazo) — ABIERTO (inspector 29/10/2026): la regla «2’54”» del § 14.3 fuera de su caso
+  // ─────────────────────────────────────────────────────────────────────────
+  //
+  // dfc246e6 toma por minutos y segundos TODO «cifras ’ cifras ”» y escribe los dos puntos ⠒ con otro
+  // signo de número, quitando el ” sin aviso. El § 14.3 lo reserva para las «grafías no adecuadas del
+  // tipo 2’54” […] fuera del contexto científico», y el § 14.1 trae el contraejemplo literal: con el
+  // grado delante es una medida angular, «9°18’27” → #i>#ah8 #bg88», con el minuto 1256 y el segundo
+  // 1256-1256. La app da ⠼⠊⠼⠁⠓⠒⠼⠃⠛, con un único aviso (el de la °), y su propia vuelta lo lee
+  // «918:27»: unas coordenadas («40°25’08”N») salen como una hora. Y el ” que cierra unas comillas
+  // también se lo come: «“73’81”» (el decimal del § 8.1 entre comillas; 81 segundos no existen) sale
+  // ⠦⠼⠛⠉⠒⠼⠓⠁, «73:81» y las comillas sin cerrar.
+  test('ABIERTO — CASO 3 (rechazo) — § 14.1: «9°18’27”» es un ángulo y «“73’81”» un decimal entre comillas: ninguno lleva los dos puntos del § 14.3', async ({ page }) => {
+    test.fail();
+    await convertir29(page, '9°18’27”');
+    const angulo = await resultado29(page);
+    const avisosAngulo = await avisos29(page);
+    // La forma del B 2: ⠼⠊ · ⠴ (356, grado) · ⠼⠁⠓ · ⠳ (1256, minuto) · [⠀] · ⠼⠃⠛ · ⠳⠳ (segundo). Si la app
+    // sigue sin escribir esos signos (la ° está entre los que no escribe, hallazgo 3556), que los omita
+    // avisando del minuto y del segundo, no que los cambie por los dos puntos y por nada.
+    const formaDelB2 = ['⠼⠊⠴⠼⠁⠓⠳⠼⠃⠛⠳⠳', '⠼⠊⠴⠼⠁⠓⠳⠀⠼⠃⠛⠳⠳'].includes(angulo);
+    await convertir29(page, '“73’81”');
+    const comillas = await resultado29(page);
+    expect({
+      anguloConDosPuntos: angulo.includes('⠒'),
+      anguloEscritoOAvisado: formaDelB2 || (avisosAngulo.includes('’') && avisosAngulo.includes('”')),
+      // ⠦ (236) · ⠼ 7 ⠛ 3 ⠉ · coma decimal ⠂ (2) · 8 ⠓ 1 ⠁ · ⠦
+      decimalEntreComillas: comillas,
+    }).toEqual({
+      anguloConDosPuntos: false,
+      anguloEscritoOAvisado: true,
+      decimalEntreComillas: '⠦⠼⠛⠉⠂⠓⠁⠦',
+    });
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // ABIERTO (inspector 29/10/2026) — § 8.4: la vuelta de una fracción que la app escribe
+  // ─────────────────────────────────────────────────────────────────────────
+  //
+  // La ida escribe «¾» ⠼⠉⠲ (§ 8.4 «¾ → #c*»); con ⇄ y Convertir vuelve «3⠲» y el aviso «Esta celda no
+  // tiene equivalente en la signografía básica que cubre esta app», que es el B 2: allí ⠲ (256) es el
+  // 4 en posición baja del § 8.4, el asterisco del § 6.2 y el signo de dividir del § 12. Igual «⅒»
+  // ⠼⠁⠂⠴ → «1,⠴», con ⠴ (356, el grado del § 14.1). Que la fracción no se lea en la vuelta lo decidió
+  // e4b499d9; lo que no se sostiene es negar que la celda esté en el documento que la app sigue.
+  test('ABIERTO — § 8.4: en Braille → Texto, ⠲ y ⠴ de una fracción que la app escribe no se avisan como «sin equivalente en la signografía básica»', async ({ page }) => {
+    test.fail();
+    await convertir29(page, '¾');
+    await expect(cajaResultado(page)).toHaveText('⠼⠉⠲', { timeout: 3000 }); // la ida, que pasa
+    await page.getByRole('button', { name: 'Intercambiar dirección de conversión' }).click();
+    await page.getByRole('button', { name: 'Convertir', exact: true }).click();
+    const vueltaTres = await resultado29(page);
+    const avisosTres = await avisos29(page);
+    await convertir29(page, '⠼⠁⠂⠴', 'braille');
+    const vueltaDecimo = await resultado29(page);
+    const avisosDecimo = await avisos29(page);
+    expect({
+      cifraTres: vueltaTres.startsWith('3') || vueltaTres === '¾',
+      cifraUno: vueltaDecimo.startsWith('1') || vueltaDecimo === '⅒',
+      niegaElB2: [avisosTres, avisosDecimo].some((a) => a.includes('no tiene equivalente en la signografía básica')),
+    }).toEqual({ cifraTres: true, cifraUno: true, niegaElB2: false });
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // ABIERTO (inspector 29/10/2026) — featureList del JSON-LD
+  // ─────────────────────────────────────────────────────────────────────────
+  //
+  // Seis características, ninguna falsa, pero no anuncian ni la hoja imprimible a escala real (con su
+  // regla de 100 mm y el modo espejo para regleta y punzón) ni los signos numéricos del B 2 que la app
+  // escribe desde el 28/10 (ordinales, «n.º», fracciones), y una de las seis es «En español».
+  test('ABIERTO — JSON-LD: el featureList anuncia la hoja imprimible y los ordinales y fracciones del B 2', async ({ page }) => {
+    test.fail();
+    await page.goto(RUTA);
+    const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+    const app = bloques
+      .map((b) => JSON.parse(b) as { '@type'?: string; featureList?: string[] })
+      .find((b) => b['@type'] === 'WebApplication');
+    const lista = (app?.featureList ?? []).join(' · ');
+    expect(lista.length, 'precondición: hay featureList').toBeGreaterThan(0);
+    expect({
+      hojaImprimible: /imprimible|escala real/i.test(lista),
+      ordinalesYFracciones: /ordinal/i.test(lista) && /fracci/i.test(lista),
+    }).toEqual({ hojaImprimible: true, ordinalesYFracciones: true });
   });
 });

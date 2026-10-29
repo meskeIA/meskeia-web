@@ -249,9 +249,9 @@ test.describe('Quiz de Conceptos Financieros · partida', () => {
    */
   test('caso de rechazo: la segunda respuesta a la misma pregunta no cuenta', async ({ page }) => {
     test.setTimeout(90_000);
-    // A 1280×720 (y a 360×740) el 2.º clic del doble clic cae en «Siguiente pregunta», que el foco
-    // sube bajo el puntero: es el hallazgo del doble toque en una opción, medido aparte. Aquí se
-    // aísla la regla «una respuesta por pregunta» en un alto donde no ocurre.
+    // A 1280×720 (y a 360×740) el 2.º clic del doble clic caía en «Siguiente pregunta», que el foco
+    // subía bajo el puntero: era el hallazgo 3701, REPARADO el 28/10/2026 (useGuardaRafaga) y medido
+    // aparte. Aquí se aísla la regla «una respuesta por pregunta» en un alto donde nunca ocurrió.
     await page.setViewportSize({ width: 1280, height: 800 });
     await abrir(page);
     const iC = await indiceCorrecta(page);
@@ -649,5 +649,233 @@ test.describe('Inspector 28/10/2026 · contenido y accesibilidad', () => {
       .evaluate((b) => b.getAttribute('aria-label') ?? b.textContent ?? '');
     if (!/correcta|✓/i.test(nombreCorrecta)) fallos.push(`la opción buena se anuncia igual que antes: «${nombreCorrecta}»`);
     expect(fallos).toEqual([]);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * INSPECTOR 29/10/2026 (2.ª pasada, tras la reparación de la familia del 28/10: c5b619bb, d9e710f8
+ * y 37fae977 en esta app). Los valores esperados se calcularon a mano ANTES de ejecutar la app:
+ *   · `porcentaje = aciertos / 15 · 100` y los tramos de `getNivel()` (page.tsx:114-119).
+ *   · Las categorías y su orden, del banco (page.tsx:23-45): Economía básica (P1, P11, P15) ·
+ *     Ahorro e inversión (P2, P3) · Presupuesto (P4, P5) · Ahorro (P6) · Deuda (P7, P12, P13) ·
+ *     Banca (P8) · Inversión (P9, P14) · Impuestos (P10).
+ *   · La barra: `(preguntaActual + (mostrarExplicacion ? 1 : 0)) / 15 · 100` (page.tsx:139).
+ */
+
+/** Sin <input>: React ha colgado sus props del botón de la opción A (como `esperarHidratado` del testigo). */
+async function esperarOpcionesHidratadas(page: Page): Promise<void> {
+  await page.waitForFunction(
+    () => {
+      const b = document.querySelector('[class*="opcionBtn"]');
+      return Boolean(b && Object.keys(b).some((k) => k.startsWith('__reactProps$')));
+    },
+    null,
+    { timeout: 20_000 },
+  );
+}
+
+const anchoBarra = async (page: Page): Promise<number> =>
+  parseFloat((await page.locator('[class*="progressFill"]').evaluate((e) => (e as HTMLElement).style.width)) || 'NaN');
+
+const sinDesbordeHorizontal = (page: Page): Promise<boolean> =>
+  page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth);
+
+test.describe('inspector 29/10/2026', () => {
+  /**
+   * CASO NORMAL (1280×800) — impares bien, pares mal: P1, P3, P5, P7, P9, P11, P13 y P15 = 8 aciertos.
+   * 8 / 15 = 53,3 % → tramo ≥ 50 → 📚 «En camino», «Conoces lo esencial pero hay margen de mejora.»
+   * Por tema: Economía básica 3/3 (P1, P11, P15 impares) · Ahorro e inversión 1/2 (P3) ·
+   * Presupuesto 1/2 (P5) · Ahorro 0/1 (P6) · Deuda 2/3 (P7 y P13; P12 mal) · Banca 0/1 (P8) ·
+   * Inversión 1/2 (P9) · Impuestos 0/1 (P10). Suma: 3+1+1+0+2+0+1+0 = 8.
+   */
+  test('caso normal: impares bien y pares mal dan «8 / 15», «En camino» y el resumen por tema', async ({ page }) => {
+    test.setTimeout(90_000);
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await abrir(page);
+    await esperarOpcionesHidratadas(page);
+    expect(await jugar(page, (n) => (n % 2 === 1 ? 'bien' : 'mal'))).toBe(8);
+    const r = await resultado(page);
+    expect(r.puntuacion).toBe('8 / 15');
+    expect(r.emoji).toBe('📚');
+    expect(r.titulo).toBe('En camino');
+    expect(r.texto).toBe('Conoces lo esencial pero hay margen de mejora.');
+    expect(r.temas).toEqual([
+      'Economía básica 3/3',
+      'Ahorro e inversión 1/2',
+      'Presupuesto 1/2',
+      'Ahorro 0/1',
+      'Deuda 2/3',
+      'Banca 0/1',
+      'Inversión 1/2',
+      'Impuestos 0/1',
+    ]);
+  });
+
+  /**
+   * CASO LÍMITE (360×740) — la última pregunta. P1-P14 bien y la P15 mal.
+   * En la P15 sin contestar: «Pregunta 15 de 15» y la barra a 14/15 = 93,33 %; contestada, la
+   * barra a 15/15 = 100 % y el botón dice «Ver resultado», no «Siguiente pregunta».
+   * 14 / 15 = 93,3 % ≥ 90 → 🏆 «¡Experto financiero!»; por tema solo cae Economía básica, 2/3 (P15).
+   * A 360 px ni la pregunta ni el resultado desbordan en horizontal.
+   */
+  test('caso límite: la P15 a 360 px, barra al 100 %, «Ver resultado» y 14 / 15 «¡Experto financiero!»', async ({ page }) => {
+    test.setTimeout(90_000);
+    await page.setViewportSize({ width: 360, height: 740 });
+    await abrir(page);
+    await esperarOpcionesHidratadas(page);
+    expect(await sinDesbordeHorizontal(page), 'la pregunta desborda a 360 px').toBe(true);
+    for (let n = 1; n <= 14; n++) {
+      await expect(progreso(page)).toHaveText(`Pregunta ${n} de 15`);
+      await responder(page, 'bien');
+      expect(await avanzar(page)).toBe('Siguiente pregunta');
+    }
+    await expect(progreso(page)).toHaveText('Pregunta 15 de 15');
+    expect(await anchoBarra(page)).toBeCloseTo((14 / 15) * 100, 2);
+    expect(await responder(page, 'mal')).toBe(false);
+    expect(await anchoBarra(page)).toBeCloseTo(100, 2);
+    expect(await avanzar(page)).toBe('Ver resultado');
+    const r = await resultado(page);
+    expect(r.puntuacion).toBe('14 / 15');
+    expect(r.emoji).toBe('🏆');
+    expect(r.titulo).toBe('¡Experto financiero!');
+    expect(r.temas).toEqual([
+      'Economía básica 2/3',
+      'Ahorro e inversión 2/2',
+      'Presupuesto 2/2',
+      'Ahorro 1/1',
+      'Deuda 3/3',
+      'Banca 1/1',
+      'Inversión 2/2',
+      'Impuestos 1/1',
+    ]);
+    expect(await sinDesbordeHorizontal(page), 'el resultado desborda a 360 px').toBe(true);
+  });
+
+  /**
+   * CASO DE RECHAZO — avanzar sin contestar. «Siguiente pregunta» solo existe con la explicación
+   * a la vista (page.tsx:185): antes de contestar no hay botón para avanzar. Enter y Espacio sobre
+   * el enunciado enfocado (tabindex -1, no es un botón) no contestan nada, y Tab lleva a la
+   * opción A sin contestarla. Esperado: «Pregunta 1 de 15», 0 explicaciones y 0 botones de avance.
+   */
+  for (const [ancho, alto] of [
+    [1280, 800],
+    [360, 740],
+  ] as const) {
+    test(`caso de rechazo (${ancho}×${alto}): sin contestar no hay forma de avanzar ni de contestar desde el enunciado`, async ({ page }) => {
+      await page.setViewportSize({ width: ancho, height: alto });
+      await abrir(page);
+      await esperarOpcionesHidratadas(page);
+      const avance = page.getByRole('button', { name: /Siguiente pregunta|Ver resultado/ });
+      await expect(avance).toHaveCount(0);
+      await enunciado(page).focus();
+      await page.keyboard.press('Enter');
+      await page.keyboard.press('Space');
+      await page.waitForTimeout(300);
+      await expect(progreso(page)).toHaveText('Pregunta 1 de 15');
+      await expect(explicacion(page)).toHaveCount(0);
+      await expect(avance).toHaveCount(0);
+      await page.keyboard.press('Tab');
+      await expect
+        .poll(() => page.evaluate(() => (document.activeElement?.textContent ?? '').trim()))
+        .toBe('AQue suben los sueldos');
+      await expect(explicacion(page)).toHaveCount(0);
+      for (let i = 0; i < 4; i++) await expect(opciones(page).nth(i)).toBeEnabled();
+    });
+  }
+
+  /** Contraste WCAG de dos colores sRGB [r, g, b]. */
+  const contraste = (a: number[], b: number[]): number => {
+    const lum = ([r, g, bl]: number[]): number => {
+      const f = (c: number): number => {
+        const s = c / 255;
+        return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+      };
+      return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(bl);
+    };
+    const [x, y] = [lum(a), lum(b)].sort((m, n) => n - m);
+    return (x + 0.05) / (y + 0.05);
+  };
+
+  /** Contesta mal la P1 (A) y mide texto y letra de la A (fallada) y la B (correcta) sobre su fondo efectivo. */
+  async function medirOpciones(page: Page, tema: 'light' | 'dark'): Promise<Record<string, number>> {
+    await page.addInitScript((t) => {
+      try {
+        localStorage.setItem('meskeia-theme', t);
+      } catch {
+        /* sin almacenamiento */
+      }
+    }, tema);
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await abrir(page);
+    await esperarOpcionesHidratadas(page);
+    await expect(page.locator('html')).toHaveAttribute('data-theme', tema);
+    await opciones(page).nth(0).click();
+    await expect(explicacion(page)).toBeVisible();
+    const crudo = await page.evaluate(() => {
+      const num = (s: string): number[] => (s.match(/[\d.]+/g) ?? []).map(Number);
+      // Fondo efectivo: compone los fondos semitransparentes desde el elemento hasta uno opaco
+      const fondo = (el: Element): number[] => {
+        const capas: number[][] = [];
+        for (let e: Element | null = el; e; e = e.parentElement) {
+          const c = num(getComputedStyle(e).backgroundColor);
+          if (c.length === 4 && c[3] === 0) continue;
+          capas.push(c);
+          if (c.length === 3 || c[3] === 1) break;
+        }
+        let base = [255, 255, 255];
+        for (const c of capas.reverse()) {
+          const a = c.length === 4 ? c[3] : 1;
+          base = base.map((v, i) => c[i] * a + v * (1 - a));
+        }
+        return base;
+      };
+      const ops = [...document.querySelectorAll('[class*="opcionBtn"]')];
+      return [0, 1].map((i) => {
+        const b = ops[i];
+        const l = b.querySelector('[class*="opcionLetra"]') as Element;
+        return {
+          texto: num(getComputedStyle(b).color).slice(0, 3),
+          fondoTexto: fondo(b),
+          letra: num(getComputedStyle(l).color).slice(0, 3),
+          fondoLetra: fondo(l),
+        };
+      });
+    });
+    const [fallada, correcta] = crudo;
+    return {
+      'texto de la fallada': contraste(fallada.texto, fallada.fondoTexto),
+      'letra de la fallada': contraste(fallada.letra, fallada.fondoLetra),
+      'texto de la correcta': contraste(correcta.texto, correcta.fondoTexto),
+      'letra de la correcta': contraste(correcta.letra, correcta.fondoLetra),
+    };
+  }
+
+  const pordebajo = (r: Record<string, number>): string[] =>
+    Object.entries(r)
+      .filter(([, v]) => v < 4.5)
+      .map(([k, v]) => `${k} ${v.toFixed(2)}:1`);
+
+  /**
+   * En oscuro lo reparó C0226 (QuizConceptosFinancieros.module.css:3-46). Medido el 29/10/2026:
+   * texto de la fallada 7,00:1 · su letra 6,47:1 · texto de la correcta 9,13:1 · su letra 5,02:1.
+   */
+  test('sano · en oscuro, la opción correcta y la fallada se leen a ≥ 4,5:1 (C0226)', async ({ page }) => {
+    expect(pordebajo(await medirOpciones(page, 'dark'))).toEqual([]);
+  });
+
+  /**
+   * HALLAZGO (29/10/2026, ABIERTO) — en CLARO, tras contestar, la opción correcta pinta su texto
+   * con --success (#27AE60) y la fallada con --danger (#E74C3C), y sus letras van en blanco sobre
+   * esos mismos colores (QuizConceptosFinancieros.module.css:32-41). Texto de 14,7 px y letra de
+   * 13,1 px en negrita: exigen 4,5:1. Medido: texto de la correcta 2,65:1, su letra 2,87:1; texto de
+   * la fallada 3,45:1, su letra 3,82:1. C0226 lo arregló solo en oscuro (#15803D / #B91C1C bajo la
+   * letra); la referencia quiz-literatura-universal deja el texto de la opción en su color y usa
+   * #15803d / #b91c1c bajo la letra también en claro («5,02:1», «6,47:1»).
+   */
+  test('hallazgo · en claro, la opción correcta y la fallada se leen a ≥ 4,5:1', async ({ page }) => {
+    test.fail();
+    expect(pordebajo(await medirOpciones(page, 'light'))).toEqual([]);
   });
 });
