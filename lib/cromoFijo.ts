@@ -32,3 +32,31 @@ export function enfocarALaVista(destino: HTMLElement | null): void {
   }
   destino.focus({ preventScroll: true });
 }
+
+/**
+ * Lleva el foco a un botón que aparece DEBAJO de lo que hay que leer («Siguiente» tras contestar)
+ * sin centrarlo: si no se ve entero, la página se mueve lo justo para que asome por abajo
+ * (`block: 'nearest'`) y lo de encima —el veredicto, la explicación— sigue a la vista.
+ *
+ * ⚠️ 29/10/2026 (hallazgo 3770) — `focus()` a secas deja que Chrome CENTRE el botón entre los
+ * `scroll-padding` de arriba y de abajo: con una explicación larga, a 360 × 740 la página bajaba de
+ * golpe 564 px y el veredicto quedaba bajo la píldora del logo o fuera de la pantalla. Lo llevaban
+ * trece quizzes; historia y geografía usaban `preventScroll` y el botón podía quedarse fuera.
+ */
+export function enfocarSinCentrar(boton: HTMLElement | null): void {
+  if (!boton) return;
+  boton.focus({ preventScroll: true });
+  const asomar = () => {
+    const r = boton.getBoundingClientRect();
+    if (r.top < margenBarraLogo() || r.bottom > window.innerHeight) {
+      boton.scrollIntoView({ block: 'nearest', behavior: 'auto' });
+    }
+  };
+  asomar();
+  // La página puede crecer justo después (medido en quiz-conceptos-financieros: 16 px entre este
+  // efecto y el siguiente fotograma) y dejar el botón por debajo del borde. Se vuelve a mirar una
+  // vez asentada, solo si el foco sigue en él: es lo justo para que asome, nunca un salto.
+  window.setTimeout(() => {
+    if (document.activeElement === boton) asomar();
+  }, 120);
+}

@@ -2580,8 +2580,9 @@ test.describe('Inspector 29/10/2026 · móvil 360 × 740', () => {
    * semilla 1740, b18 sale la 5.ª de la primera partida de Básico. Lo correcto: el veredicto ENTERO
    * entre lo opaco de la barra (la píldora) y el borde inferior de la ventana.
    */
+  // REPARADO (3770, 29/10/2026): `enfocarSinCentrar` de lib/cromoFijo.ts, en las 15 hermanas que
+  // enfocaban «Siguiente» al contestar; el testigo de familia lo mide en todas.
   test('hallazgo · tras responder, el veredicto queda a la vista: ni bajo la píldora del logo ni por encima de la pantalla', async ({ page }) => {
-    test.fail(); // HALLAZGO abierto el 29/10/2026
     test.setTimeout(240_000);
     await sembrarCon(page, 1740);
     await arrancarTactil(page, /^Básico/);
@@ -2632,7 +2633,7 @@ test.describe('Inspector 29/10/2026 · contenido', () => {
    * Contado en preguntas.ts el 29/10/2026.
    */
   test('hallazgo · el FAQPage no atribuye a Medio y Avanzado lo que el banco pone ya en Básico', async ({ page }) => {
-    test.fail(); // HALLAZGO abierto el 29/10/2026
+    // REPARADO (3771, 29/10/2026): la respuesta repite lo que dice la tabla visible «Niveles del quiz»
     await page.goto(RUTA);
     const bloques = await page.evaluate(() =>
       [...document.querySelectorAll('script[type="application/ld+json"]')].map((s) => s.textContent ?? ''),
@@ -2651,6 +2652,7 @@ test.describe('Inspector 29/10/2026 · contenido', () => {
     if (/nivel avanzado requiere[^.]*citas precisas/.test(respuesta) && cuenta('avanzado', 'citas') < cuenta('basico', 'citas')) {
       choques.push(`«el avanzado requiere… citas precisas», con ${cuenta('avanzado', 'citas')} en Avanzado y ${cuenta('basico', 'citas')} en Básico`);
     }
-    expect(choques).toEqual([]); // hoy: Básico con 2 de movimientos; citas 1 en Avanzado frente a 2 en Básico
+    expect(choques).toEqual([]); // era: Básico con 2 de movimientos; citas 1 en Avanzado frente a 2 en Básico
+    expect(respuesta, 'coherente con la tabla visible: Básico lleva las primeras frases').toMatch(/básico[^.]*primeras frases famosas/);
   });
 });

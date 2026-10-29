@@ -2,7 +2,7 @@
 // @disclaimer: exempt
 
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { enfocarALaVista } from '@/lib';
+import { enfocarALaVista, enfocarSinCentrar } from '@/lib';
 import { useGuardaRafaga } from '@/lib/useGuardaRafaga';
 import {
   MeskeiaLogo,
@@ -485,7 +485,7 @@ export default function QuizConceptosInversionPage() {
     pantallaRef.current = pantalla;
     if (venia === null || venia === pantalla) return;
     if (estado === 'jugando') enfocarALaVista(enunciadoRef.current);
-    else if (estado === 'respondida') siguienteRef.current?.focus();
+    else if (estado === 'respondida') enfocarSinCentrar(siguienteRef.current); // sin centrarlo (3770)
     else if (estado === 'fin') enfocarALaVista(resultadoRef.current);
   }, [estado, indice]);
 

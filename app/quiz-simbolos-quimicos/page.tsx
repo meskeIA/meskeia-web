@@ -4,7 +4,7 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import styles from './QuizSimbolosQuimicos.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, ShareCard, LegalNotice, RelatedApps } from '@/components';
-import { formatPercentage, margenBarraLogo } from '@/lib';
+import { formatPercentage, margenBarraLogo, enfocarSinCentrar } from '@/lib';
 import { useGuardaRafaga } from '@/lib/useGuardaRafaga';
 import { ELEMENTOS, TOTAL_ELEMENTOS, type Elemento } from '@/data/elementos-quimicos';
 
@@ -127,7 +127,7 @@ export default function QuizSimbolosQuimicosPage() {
 
   useEffect(() => {
     if (fase === 'respondida') {
-      botonSiguienteRef.current?.focus();
+      enfocarSinCentrar(botonSiguienteRef.current); // sin centrarlo: el veredicto, a la vista (3770)
     } else if (fase === 'jugando') {
       traerALaVista(quizPanelRef.current, preguntaRef.current);
       preguntaRef.current?.focus({ preventScroll: true });

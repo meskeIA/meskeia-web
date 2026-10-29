@@ -2,7 +2,7 @@
 // @disclaimer: exempt
 
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { enfocarALaVista } from '@/lib';
+import { enfocarALaVista, enfocarSinCentrar } from '@/lib';
 import { useGuardaRafaga } from '@/lib/useGuardaRafaga';
 import styles from './QuizConceptosFinancieros.module.css';
 import {
@@ -104,7 +104,7 @@ export default function QuizConceptosFinancierosPage() {
     pantallaRef.current = pantalla;
     if (venia === null || venia === pantalla) return;
     if (quizTerminado) enfocarALaVista(resultadoRef.current);
-    else if (mostrarExplicacion) siguienteRef.current?.focus();
+    else if (mostrarExplicacion) enfocarSinCentrar(siguienteRef.current); // sin centrarlo (3770)
     else enfocarALaVista(enunciadoRef.current);
   }, [quizTerminado, preguntaActual, mostrarExplicacion]);
 

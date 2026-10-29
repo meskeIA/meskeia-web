@@ -25,6 +25,11 @@
  *   > toque no contesta la pregunta nueva, no saca de la app ni se lleva la nota (cabo C0082,
  *   > 26/10/2026; receta de la referencia, ce0ad0bc, y `useGuardaRafaga` de lib/guardaRafaga.ts).
  *
+ *   > Al contestar, el foco va a «Siguiente» SIN centrarlo: se ve entero y, si la página se ha
+ *   > movido, lo justo para que asome por abajo, con el veredicto encima a la vista (hallazgo 3770,
+ *   > 29/10/2026: con `focus()` a secas Chrome lo centraba y el veredicto quedaba bajo la píldora
+ *   > del logo; receta, `enfocarSinCentrar` de lib/cromoFijo.ts).
+ *
  * Lo que NO mide todavía: que el enunciado quede a la vista bajo la barra fija a 360 px. Es
  * receta de la misma familia, y entra aquí como caso nuevo con su `falla` por hermana.
  * Tampoco el banco de cada quiz (barajado, niveles): lo mide el spec de cada uno en tests/apps/.
@@ -47,6 +52,8 @@ interface Hermana {
   foco?: { falla?: string };
   /** Ídem para el doble toque; `omitido` si el caso no es determinista en esa hermana. */
   dobleToque?: { falla?: string; omitido?: string };
+  /** Ídem para «Siguiente» enfocado sin centrar (hallazgo 3770); `omitido` si no enfoca el botón. */
+  sinCentrar?: { falla?: string; omitido?: string };
 }
 
 const EMPEZAR = /empezar|comenzar/i;
@@ -126,6 +133,9 @@ const HERMANAS: Hermana[] = [
     slug: 'quiz-mitos-ciencia',
     arranque: [EMPEZAR],
     opcion: /Verdad/,
+    // Al contestar no enfoca «Siguiente»: enfoca el bloque de la revelación con enfocarALaVista,
+    // que lo pone arriba con el veredicto dentro. El caso del 3770 no se aplica.
+    sinCentrar: { omitido: 'enfoca el bloque de la revelación, no el botón «Siguiente»' },
   },
 ];
 
@@ -345,6 +355,56 @@ for (const h of HERMANAS) {
       await page.mouse.down({ clickCount: 2 });
       await page.mouse.up({ clickCount: 2 });
       await expect.poll(habilitadas, { message: 'un «Siguiente» con detail 2 en otro punto se ha comido' }).toBeGreaterThan(0);
+    });
+
+    /**
+     * Hallazgo 3770 (quiz-literatura-universal, 29/10/2026): al contestar, `focus()` a secas en
+     * «Siguiente» deja que Chrome lo CENTRE, y con una explicación larga la página baja de golpe y
+     * el veredicto se va bajo la píldora del logo. A 360 × 640, en las cinco primeras preguntas:
+     * «Siguiente» con el foco, entero en la ventana, y si la página se ha movido al contestar, con
+     * su borde inferior a menos de 40 px del de la ventana (`nearest`), no en el centro.
+     */
+    test('al contestar, «Siguiente» recibe el foco sin centrarse: se ve entero y la página no salta', async ({ page }) => {
+      test.skip(Boolean(h.sinCentrar?.omitido), h.sinCentrar?.omitido);
+      if (h.sinCentrar?.falla) test.fail();
+      test.setTimeout(120_000);
+      await page.setViewportSize({ width: 360, height: 640 });
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+      await page.goto(`/${h.slug}/`);
+      for (const boton of h.arranque) await pulsarHidratado(page, boton);
+      await esperarHidratado(page, h.opcion ?? /^\s*A\S/);
+      const opciones = page.locator('button:visible').filter({ hasText: h.opcion ?? /^\s*A\S/ });
+      const avanzar = () => page.locator('button:visible').filter({ hasText: /siguiente|resultado/i }).first();
+      const fallos: string[] = [];
+      for (let paso = 1; paso <= 5; paso++) {
+        const opcion = opciones.first();
+        await opcion.scrollIntoViewIfNeeded();
+        await page.waitForTimeout(350); // fuera de la ventana de ráfaga del paso anterior
+        const caja = (await opcion.boundingBox())!;
+        const antes = await page.evaluate(() => window.scrollY);
+        await page.mouse.click(caja.x + caja.width / 2, caja.y + caja.height / 2);
+        await expect(avanzar()).toBeFocused();
+        // Hasta que la página deje de moverse (un desplazamiento suave anterior puede seguir en curso)
+        let previo = -1;
+        for (let i = 0; i < 30; i++) {
+          await page.waitForTimeout(100);
+          const y = await page.evaluate(() => window.scrollY);
+          if (y === previo) break;
+          previo = y;
+        }
+        const m = await avanzar().evaluate((b) => {
+          const r = b.getBoundingClientRect();
+          return { arriba: r.top, abajo: r.bottom, alto: window.innerHeight, scroll: window.scrollY };
+        });
+        const seMovio = Math.abs(m.scroll - antes) > 1;
+        if (m.arriba < 0 || m.abajo > m.alto + 1) fallos.push(`paso ${paso}: «Siguiente» fuera (y = ${m.arriba}…${m.abajo})`);
+        else if (seMovio && m.alto - m.abajo > 40) {
+          fallos.push(`paso ${paso}: la página saltó ${Math.round(m.scroll - antes)} px y «Siguiente» quedó en y = ${Math.round(m.arriba)}…${Math.round(m.abajo)}`);
+        }
+        if (/resultado/i.test(await avanzar().innerText())) break;
+        await avanzar().click();
+      }
+      expect(fallos).toEqual([]);
     });
   });
 }

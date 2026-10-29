@@ -11,7 +11,7 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { formatPercentage, margenBarraLogo } from '@/lib';
+import { formatPercentage, margenBarraLogo, enfocarSinCentrar } from '@/lib';
 import { useGuardaRafaga } from '@/lib/useGuardaRafaga';
 import {
   PREGUNTAS_HISTORIA,
@@ -137,7 +137,7 @@ export default function QuizHistoriaEspanaPage() {
       traerALaVista(quizPanelRef.current, enunciadoRef.current);
       enunciadoRef.current?.focus({ preventScroll: true });
     } else if (fase === 'respondida') {
-      botonSiguienteRef.current?.focus({ preventScroll: true });
+      enfocarSinCentrar(botonSiguienteRef.current); // sin centrarlo, pero a la vista (3770)
     } else if (fase === 'fin') {
       traerALaVista(finPanelRef.current, finTituloRef.current);
       finTituloRef.current?.focus({ preventScroll: true });

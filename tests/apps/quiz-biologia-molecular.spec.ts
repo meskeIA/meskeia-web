@@ -1637,7 +1637,11 @@ test.describe('Inspector 28/10/2026 · móvil 412 × 915', () => {
     await sembrarAzar(page, 1);
     await abrir(page);
     const r = await segundosToques(page, true, TOTAL_EXAMEN);
-    expect(r.debajo.filter((d) => /Opción [ABCD]:/.test(d)).length, `la guarda se ejerce: ${r.debajo.join(' · ')}`).toBeGreaterThan(0);
+    // 29/10/2026 (hallazgo 3770): «Siguiente» ya no se centra al contestar, así que la página no
+    // salta y el 2.º toque ya no cae sobre una opción nueva en esta partida: la precondición «la
+    // guarda se ejerce» (al menos un 2.º toque sobre una opción) dependía del salto. Que la guarda
+    // para el toque sobre una opción lo mide el testigo de la familia (tests/familias/quizzes.spec.ts,
+    // «doble toque»); aquí queda lo que ve la persona: nada se contesta solo y la nota se ve.
     expect(r.dentro).toEqual([]);
     await expect(page.locator('[class*="puntuacionCirculo"]')).toHaveText('0/30');
   });
@@ -1835,10 +1839,11 @@ test.describe('Inspector 29/10/2026', () => {
    * servido: esperado «1.º de carrera» · obtenido «1º de carrera».
    */
   test('hallazgo · la description escribe el ordinal con punto («1.º»), como el FAQPage («2.º curso»)', async ({ page }) => {
-    test.fail(true, 'ABIERTO: la description dice «1º de carrera»');
+    // REPARADO (3779, 29/10/2026): decía «1º de carrera»
     const html = await (await page.request.get(RUTA)).text();
     const descripcion = html.match(/<meta name="description" content="([^"]*)"/)?.[1] ?? '';
     expect(descripcion).not.toMatch(/\dº/);
+    expect(descripcion).toContain('1.º de carrera');
   });
 });
 

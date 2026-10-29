@@ -94,7 +94,9 @@ export const faqJsonLd = {
       name: '¿Qué diferencia hay entre los niveles básico, medio y avanzado?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El nivel básico se centra en obras y autores muy conocidos (Cervantes, Shakespeare, García Márquez) con preguntas directas. El nivel medio introduce movimientos literarios, contexto histórico y obras menos populares. El nivel avanzado requiere conocer detalles técnicos, citas precisas, obras secundarias de autores consagrados y conexiones entre corrientes literarias.',
+        // Hallazgo 3771: decía que el medio «introduce movimientos» y el avanzado pide «citas
+        // precisas», y Básico ya tiene preguntas de las dos. Ahora es la tabla visible «Niveles del quiz».
+        text: 'El nivel básico pregunta por autores y obras muy conocidos (Cervantes, Shakespeare, García Márquez) y por primeras frases famosas, como «Llamadme Ismael». El nivel medio añade contexto histórico, técnicas literarias, premios y generaciones. El nivel avanzado entra en teoría y crítica literaria, movimientos menores y autores internacionales menos leídos.',
       },
     },
     {

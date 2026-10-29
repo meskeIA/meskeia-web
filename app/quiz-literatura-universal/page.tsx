@@ -13,7 +13,7 @@ import {
 } from '@/components';
 import styles from './QuizLiteraturaUniversal.module.css';
 import { POOL, preguntasDeNivel, type Nivel, type Categoria, type Pregunta } from './preguntas';
-import { margenBarraLogo } from '@/lib';
+import { margenBarraLogo, enfocarSinCentrar } from '@/lib';
 
 // ── Tipos ──────────────────────────────────────────────────────────────────
 
@@ -147,7 +147,9 @@ export default function QuizLiteraturaUniversal() {
       traerALaVista(seleccionBoxRef.current, seleccionTituloRef.current);
       seleccionTituloRef.current?.focus({ preventScroll: true });
     } else if (fase === 'quiz' && respondida) {
-      botonSiguienteRef.current?.focus();
+      // Sin centrarlo: con focus() a secas Chrome lo centraba y el veredicto quedaba bajo la
+      // píldora del logo o fuera de la pantalla a 360 px (hallazgo 3770)
+      enfocarSinCentrar(botonSiguienteRef.current);
     } else if (fase === 'quiz') {
       traerALaVista(quizBoxRef.current, enunciadoRef.current);
       enunciadoRef.current?.focus({ preventScroll: true });

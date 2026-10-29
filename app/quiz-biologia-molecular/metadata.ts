@@ -4,7 +4,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Quiz Biología Molecular — ADN, ARN, Replicación y Traducción | meskeIA',
   description:
-    'Practica biología molecular con 30 preguntas: ADN/ARN, replicación, transcripción, traducción y mutaciones. Con explicaciones detalladas. Para Bachillerato y 1º de carrera.',
+    'Practica biología molecular con 30 preguntas: ADN/ARN, replicación, transcripción, traducción y mutaciones. Con explicaciones detalladas. Para Bachillerato y 1.º de carrera.',
   keywords: [
     'quiz biología molecular',
     'test ADN ARN',

@@ -9,7 +9,7 @@ import LegalNotice from '@/components/LegalNotice';
 import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
-import { formatNumber, margenBarraLogo } from '@/lib';
+import { formatNumber, margenBarraLogo, enfocarSinCentrar } from '@/lib';
 import styles from './QuizBiologiaMolecular.module.css';
 import {
   componerPartida,
@@ -525,7 +525,7 @@ export default function QuizBiologiaMolecularPage() {
 
   useEffect(() => {
     if (estado === 'respondida') {
-      botonSiguienteRef.current?.focus();
+      enfocarSinCentrar(botonSiguienteRef.current); // sin centrarlo: el veredicto, a la vista (3770)
     } else if (estado === 'jugando') {
       traerALaVista(quizAreaRef.current, enunciadoRef.current);
       enunciadoRef.current?.focus({ preventScroll: true });
