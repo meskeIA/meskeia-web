@@ -36,6 +36,7 @@ import {
   GANANCIAS_PATRIMONIALES_META,
   PLAZO_ISD,
   PLAZO_IIVTNU,
+  ESCALA_RECARGO_EXTEMPORANEO,
 } from '@/data/fiscal';
 
 /**
@@ -58,7 +59,6 @@ import {
   EDAD_MIN_COLATERAL_VIVIENDA_IS,
   type GrupoParentescoIS,
 } from '@/lib/calculadoras/sucesiones';
-import { ESCALA_RECARGO_EXTEMPORANEO } from '@/lib/calculadoras/recargoPresentacionTardia';
 import styles from './SimuladorHeredarVivienda.module.css';
 import { diasDelMes, mesesCompletosEntre } from './tenencia';
 

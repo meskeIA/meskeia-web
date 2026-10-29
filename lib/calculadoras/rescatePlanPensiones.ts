@@ -9,7 +9,9 @@
  *
  * Marco normativo:
  *   - LIRPF art. 17.2.a: prestaciones de sistemas de prevision social como RDT
- *   - LIRPF DA 12.a: regimen transitorio reduccion 40% para aportaciones pre-2007
+ *   - LIRPF DT 12.ª: regimen transitorio reduccion 40% para aportaciones pre-2007
+ *     (hasta el 29/10/2026 este fichero la llamaba «DA 12.a»: es la disposicion
+ *     TRANSITORIA duodecima, no una adicional)
  *   - RDL 11/2021 + RD 712/2022: plazo especial COVID para rescates (expirado)
  *   - Ley 12/2022: reforma limites aportacion (no afecta a rescate)
  *   - DGT consultas vinculantes: criterios de aplicacion de la reduccion 40%
@@ -25,12 +27,17 @@
  *   b) En forma de CAPITAL (cobro unico): toda la prestacion es RDT del ejercicio
  *   c) MIXTA: parte en capital, parte en renta
  *
- * REDUCCION DEL 40% (DA 12.a LIRPF — regimen transitorio):
- *   - Solo para aportaciones realizadas ANTES del 31/12/2006
+ * REDUCCION DEL 40% (DT 12.ª LIRPF — regimen transitorio):
+ *   - Solo para aportaciones realizadas HASTA el 31/12/2006
  *   - Solo si el cobro es en forma de CAPITAL (no en renta)
  *   - Solo aplicable UNA VEZ por cada plan (y por cada contingencia)
- *   - Plazo para aplicarla: maximo 2 anos desde que se produce la contingencia
- *     (jubilacion, incapacidad, fallecimiento, dependencia, desempleo de larga duracion)
+ *   - Plazo para aplicarla: en el ejercicio en que se produce la contingencia o en los
+ *     dos siguientes (DT 12.ª.4), sea jubilacion, incapacidad, fallecimiento, dependencia
+ *     o desempleo de larga duracion. `anosDesdeContingencia` se lee como ejercicios
+ *     transcurridos: 0 = el mismo ano.
+ *   - El porcentaje y el plazo NO se escriben aqui: son REGIMEN_TRANSITORIO_PLANES de
+ *     data/fiscal/pensiones-irpf.ts desde el 29/10/2026 (cabo C0124), y la escala es
+ *     TRAMOS_IRPF_2025 de data/fiscal/irpf.ts (hasta esa fecha, una copia local identica)
  *   - Para planes de empresa: tambien aplica si las aportaciones de la empresa
  *     son anteriores a 2007
  *
@@ -44,27 +51,17 @@
  *   - LIQUIDEZ EXCEPCIONAL: a partir de los 10 anos de la aportacion (desde 2025
  *     para aportaciones realizadas antes de 01/01/2015)
  *
- * Fuente: LIRPF art. 17.2.a + DA 12.a — vigente 2025
- * Verificado: 2025-01-15
+ * Fuente: LIRPF art. 17.2.a + DT 12.ª — sellos en data/fiscal (pensiones-irpf.ts e irpf.ts)
  *
  * Encadenable con: calcular_irpf, calcular_reduccion_plan_pensiones_irpf, calcular_pension_jubilacion_ss
  */
 
+import { REGIMEN_TRANSITORIO_PLANES, cuotaEscalaGeneral } from '@/data/fiscal';
+
 // --- Constantes ---
 
-const PCT_REDUCCION_PRE2007 = 40;     // % reduccion sobre capital pre-2007
-const ANOS_PLAZO_REDUCCION = 2;       // Anos desde contingencia para aplicar reduccion
-
-// Escala general IRPF 2025 (base general — estatal + autonomica media)
-// Nota: tipo efectivo depende de la escala autonomica concreta
-const TRAMOS_GENERAL_2025: { hasta: number; tipo: number }[] = [
-  { hasta: 12_450, tipo: 19 },
-  { hasta: 20_200, tipo: 24 },
-  { hasta: 35_200, tipo: 30 },
-  { hasta: 60_000, tipo: 37 },
-  { hasta: 300_000, tipo: 45 },
-  { hasta: Infinity, tipo: 47 },
-];
+const PCT_REDUCCION_PRE2007 = REGIMEN_TRANSITORIO_PLANES.reduccionCapitalPct;          // % reduccion sobre capital pre-2007
+const ANOS_PLAZO_REDUCCION = REGIMEN_TRANSITORIO_PLANES.ejerciciosSiguientesContingencia; // ejercicios tras el de la contingencia
 
 // --- Tipos publicos ---
 
@@ -97,7 +94,7 @@ export interface ParametrosRescatePlanPensiones {
   importeCapital?: number;
   /** Renta anual en caso de cobro periodico (EUR/ano) */
   rentaAnual?: number;
-  /** Anos desde la contingencia (para validar plazo de la reduccion 40%) */
+  /** Ejercicios transcurridos desde el de la contingencia, 0 = el mismo (plazo de la DT 12.ª.4) */
   anosDesdeContingencia?: number;
   /**
    * Otros rendimientos del trabajo en el mismo ejercicio (EUR)
@@ -130,23 +127,6 @@ export interface ResultadoRescatePlanPensiones {
   fuenteDatos: string;
 }
 
-// --- Funcion auxiliar ---
-
-function cuotaEscalaGeneral(base: number): number {
-  if (base <= 0) return 0;
-  let cuota = 0;
-  let resto = base;
-  let ant = 0;
-  for (const t of TRAMOS_GENERAL_2025) {
-    const tramo = Math.min(resto, t.hasta - ant);
-    cuota += tramo * t.tipo / 100;
-    resto -= tramo;
-    ant = t.hasta;
-    if (resto <= 0) break;
-  }
-  return cuota;
-}
-
 // --- Funcion principal ---
 
 export function calcularRescatePlanPensiones(
@@ -169,10 +149,10 @@ export function calcularRescatePlanPensiones(
 
   if (capitalPre2007 > 0) {
     if (p.formaRescate === 'renta') {
-      motivoNoReduccion = 'La reduccion del 40% solo aplica al rescate en CAPITAL, no en forma de renta periodica.';
+      motivoNoReduccion = 'La reduccion del ' + PCT_REDUCCION_PRE2007 + '% solo aplica al rescate en CAPITAL, no en forma de renta periodica.';
     } else if (p.anosDesdeContingencia !== undefined && p.anosDesdeContingencia > ANOS_PLAZO_REDUCCION) {
-      motivoNoReduccion = 'Han transcurrido mas de ' + ANOS_PLAZO_REDUCCION + ' anos desde la contingencia. ' +
-        'El plazo para aplicar la reduccion del 40% ha expirado (DA 12.a LIRPF).';
+      motivoNoReduccion = 'Han pasado mas de ' + ANOS_PLAZO_REDUCCION + ' ejercicios desde el de la contingencia. ' +
+        'El plazo para aplicar la reduccion del ' + PCT_REDUCCION_PRE2007 + '% ha expirado (DT 12.ª.4 LIRPF).';
     } else if (importeCapital <= 0) {
       motivoNoReduccion = 'No hay importe de capital definido.';
     } else {
@@ -183,7 +163,7 @@ export function calcularRescatePlanPensiones(
     }
   } else if (p.formaRescate !== 'renta') {
     motivoNoReduccion = 'No se han indicado aportaciones pre-2007 (capitalPre2007 = 0). ' +
-      'La reduccion del 40% solo aplica sobre la parte acumulada de aportaciones anteriores a 01/01/2007.';
+      'La reduccion del ' + PCT_REDUCCION_PRE2007 + '% solo aplica sobre la parte acumulada de aportaciones anteriores a 01/01/2007.';
   }
 
   // Base imponible del capital
@@ -220,10 +200,10 @@ export function calcularRescatePlanPensiones(
 
   if (aplicaReduccion40pct) {
     advertencias.push(
-      'REDUCCION 40% (DA 12.a LIRPF): aplica sobre la parte del capital ' +
+      'REDUCCION ' + PCT_REDUCCION_PRE2007 + '% (DT 12.ª LIRPF): aplica sobre la parte del capital ' +
       'correspondiente a aportaciones pre-2007 (' + capitalPre2007.toLocaleString('es-ES') + ' EUR). ' +
       'Esta reduccion solo puede aplicarse UNA VEZ por plan y contingencia, ' +
-      'y en los ' + ANOS_PLAZO_REDUCCION + ' anos siguientes a la contingencia.'
+      'y en el ejercicio de la contingencia o en los ' + ANOS_PLAZO_REDUCCION + ' siguientes.'
     );
   }
 
@@ -231,7 +211,7 @@ export function calcularRescatePlanPensiones(
     advertencias.push(
       'LIQUIDEZ EXCEPCIONAL: desde 2025, pueden rescatarse aportaciones realizadas ' +
       'antes del 01/01/2015 que lleven 10 anos en el plan. No se requiere contingencia especial, ' +
-      'pero tributan igualmente como RDT (sin reduccion del 40%).'
+      'pero tributan igualmente como RDT (sin reduccion del ' + PCT_REDUCCION_PRE2007 + '%).'
     );
   }
 
@@ -264,6 +244,6 @@ export function calcularRescatePlanPensiones(
     cuotaEstimadaCapital,
     ahorroReduccion,
     advertencias,
-    fuenteDatos: 'LIRPF art. 17.2.a + DA 12.a — vigente 2025',
+    fuenteDatos: 'LIRPF art. 17.2.a + DT 12.ª — ' + REGIMEN_TRANSITORIO_PLANES.baseNormativa,
   };
 }

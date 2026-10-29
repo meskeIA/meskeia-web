@@ -21,6 +21,11 @@ import {
   DEDUCCION_MATERNIDAD_IRPF,
   SECCIONES_IAE,
   calcularCuotaIntegraGeneral,
+  ESCALA_RECARGO_EXTEMPORANEO,
+  RECARGOS_PERIODO_EJECUTIVO,
+  SANCION_PRESENTACION_TARDIA_SIN_PERJUICIO,
+  MODELO_720,
+  FRACCIONAMIENTO_IRPF,
 } from '@/data/fiscal';
 import { EJERCICIO, estimarIRPF, type EntradaIRPF, type ResultadoIRPF, type SituacionFamiliar } from './motor';
 
@@ -976,7 +981,7 @@ export default function EstimadorIRPFPage() {
               <div className={styles.stepContent}>
                 <h4>Confirmar, domiciliar o fraccionar el pago</h4>
                 <p>
-                  Si sale a devolver, recibirás el importe en tu cuenta en 4–8 semanas. Si sale a pagar, puedes <strong>domiciliar el pago hasta el 25 de junio</strong> (cargo el 30 de junio) o <strong>fraccionar en dos plazos</strong>: 60&nbsp;% en junio y el 40&nbsp;% restante el 5 de noviembre, sin recargo ni intereses. El fraccionamiento es automático si lo marcas al confirmar.
+                  Si sale a devolver, recibirás el importe en tu cuenta en 4–8 semanas. Si sale a pagar, puedes <strong>domiciliar el pago hasta el 25 de junio</strong> (cargo el 30 de junio) o <strong>fraccionar en dos plazos</strong>: {tipoPct(FRACCIONAMIENTO_IRPF.primerPlazoPct)} en junio y el {tipoPct(FRACCIONAMIENTO_IRPF.segundoPlazoPct)} restante el 5 de noviembre, sin recargo ni intereses (art. 62.2 del Reglamento del IRPF). El fraccionamiento es automático si lo marcas al confirmar.
                 </p>
               </div>
             </div>
@@ -1052,19 +1057,19 @@ export default function EstimadorIRPFPage() {
                 <strong>Confirmar el borrador sin revisarlo.</strong> El borrador puede incluir rendimientos de ejercicios anteriores imputados erróneamente, inmuebles vendidos que siguen generando imputación de renta, o retenciones mal cuantificadas. Confirmarlo sin revisar implica aceptar posibles errores como propios.
               </li>
               <li>
-                <strong>Olvidar declarar cuentas o inmuebles en el extranjero.</strong> Si tienes cuentas bancarias, inmuebles o valores en el extranjero con saldo superior a 50.000 €, debes presentar el modelo 720. Tras la STJUE de 27/01/2022 y la Ley 5/2022, el régimen sancionador se ajustó al régimen general de la LGT; consulta el detalle vigente en la AEAT.
+                <strong>Olvidar declarar cuentas o inmuebles en el extranjero.</strong> Si tienes en el extranjero cuentas bancarias, valores o inmuebles y el valor conjunto de alguno de esos tres bloques supera {eur0(MODELO_720.umbralPorBloque)}, debes presentar el modelo 720; en los años siguientes, solo si ese valor sube más de {eur0(MODELO_720.incrementoParaVolverADeclarar)} (disposición adicional 18.ª LGT y su reglamento). Tras la STJUE de 27/01/2022 y la Ley 5/2022, el régimen sancionador se ajustó al régimen general de la LGT; consulta el detalle vigente en la AEAT.
               </li>
               <li>
-                <strong>No declarar el alquiler de tu vivienda (o segunda residencia).</strong> La AEAT cruza datos con los inquilinos: si tu inquilino se aplica una deducción por alquiler, declara tu NIF, y si tú no declaras los ingresos, Hacienda detectará la discrepancia. Si lo regularizas tú antes de que te lo pida, pagas la cuota más un recargo del 1&nbsp;% y otro 1&nbsp;% por cada mes completo de retraso, que pasa a ser del 15&nbsp;% más intereses de demora pasados 12 meses (art. 27 LGT); si llega antes Hacienda, la cuota va con intereses y sanción.
+                <strong>No declarar el alquiler de tu vivienda (o segunda residencia).</strong> La AEAT cruza datos con los inquilinos: si tu inquilino se aplica una deducción por alquiler, declara tu NIF, y si tú no declaras los ingresos, Hacienda detectará la discrepancia. Si lo regularizas tú antes de que te lo pida, pagas la cuota más un recargo del {tipoPct(ESCALA_RECARGO_EXTEMPORANEO.porcentajeBase)} y otro {tipoPct(ESCALA_RECARGO_EXTEMPORANEO.porcentajePorMes)} por cada mes completo de retraso, que pasa a ser del {tipoPct(ESCALA_RECARGO_EXTEMPORANEO.porcentajeMas12Meses)} más intereses de demora pasados {ESCALA_RECARGO_EXTEMPORANEO.mesesEscalaProporcional} meses (art. 27 LGT); si llega antes Hacienda, la cuota va con intereses y sanción.
               </li>
               <li>
                 <strong>Ignorar la exención por reinversión en vivienda habitual al vender.</strong> Si vendes tu vivienda habitual y reinviertes el total en otra en el plazo de <strong>2 años</strong>, la ganancia patrimonial queda exenta de IRPF. Si no lo declaras correctamente (aunque no debas pagar), la AEAT puede considerar que no has aplicado la exención correctamente.
               </li>
               <li>
-                <strong>No fraccionar el pago si la cuota es alta.</strong> Si la declaración sale a pagar más de 1000 € y no tienes liquidez inmediata, el fraccionamiento automático (60&nbsp;% en junio + 40&nbsp;% en noviembre) <strong>no tiene coste ni recargo</strong>. Presentarla en plazo sin pagar sí genera recargos del periodo ejecutivo: del 5&nbsp;%, 10&nbsp;% o 20&nbsp;% según cuándo acabes pagando (art. 28 LGT).
+                <strong>No fraccionar el pago si la cuota es alta.</strong> Si la declaración sale a pagar más de 1000 € y no tienes liquidez inmediata, el fraccionamiento automático ({tipoPct(FRACCIONAMIENTO_IRPF.primerPlazoPct)} en junio + {tipoPct(FRACCIONAMIENTO_IRPF.segundoPlazoPct)} en noviembre) <strong>no tiene coste ni recargo</strong>. Presentarla en plazo sin pagar sí genera recargos del periodo ejecutivo: del {tipoPct(RECARGOS_PERIODO_EJECUTIVO.ejecutivo)}, {tipoPct(RECARGOS_PERIODO_EJECUTIVO.apremioReducido)} o {tipoPct(RECARGOS_PERIODO_EJECUTIVO.apremioOrdinario)} según cuándo acabes pagando (art. 28 LGT).
               </li>
               <li>
-                <strong>Presentar fuera de plazo aunque salga a devolver.</strong> Presentar la declaración después del 30 de junio, aunque el resultado sea a devolver, si estabas obligado a presentarla puede conllevar una <strong>multa de 200 €</strong>, que se queda en la mitad —100 €— si la presentas antes de que Hacienda te la requiera (art. 198 LGT). No existe ventaja fiscal en retrasar una declaración a devolver.
+                <strong>Presentar fuera de plazo aunque salga a devolver.</strong> Presentar la declaración después del 30 de junio, aunque el resultado sea a devolver, si estabas obligado a presentarla puede conllevar una <strong>multa de {eur0(SANCION_PRESENTACION_TARDIA_SIN_PERJUICIO.multaFija)}</strong>, que se queda en la mitad —{eur0(SANCION_PRESENTACION_TARDIA_SIN_PERJUICIO.multaSinRequerimiento)}— si la presentas antes de que Hacienda te la requiera (art. 198 LGT). No existe ventaja fiscal en retrasar una declaración a devolver.
               </li>
             </ul>
           </div>

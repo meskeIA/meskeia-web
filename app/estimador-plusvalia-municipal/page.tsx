@@ -21,8 +21,8 @@ import {
   PLUSVALIA_MUNICIPAL_META,
   PLAZO_IIVTNU,
   PRESCRIPCION_DEVOLUCION_IIVTNU,
+  ESCALA_RECARGO_EXTEMPORANEO,
 } from '@/data/fiscal';
-import { ESCALA_RECARGO_EXTEMPORANEO } from '@/lib/calculadoras/recargoPresentacionTardia';
 
 /*
  * Datos normativos, leídos de su módulo y no escritos a mano (hallazgo 1645 del Inspector,

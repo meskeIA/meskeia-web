@@ -396,9 +396,39 @@ cifras) · **Verificado** (sello del módulo a fecha del manifiesto).
 - **Vigilar**: la Ley de Presupuestos y las leyes de acompañamiento, que es donde se movió la exención (la escalada 10.000 / 20.000 / 40.000 € de la Ley 6/2018); cualquier cambio del tipo del 20 %.
 - **Cadencia**: baja; sin cambios desde 2020.
 - **Alerta metodológica**: que la exención deje de aplicarse por décimo o apuesta (ap. 1) o deje de prorratearse entre cotitulares (ap. 2 y 3): el reparto de la peña depende de las dos cosas.
-- **Dependencias internas**: `generador-loteria` — el reparto del premio de una peña (`app/generador-loteria/reparto.ts`) y las cifras de su FAQ, que ya no van escritas a mano.
+- **Dependencias internas**: `generador-loteria` — el reparto del premio de una peña (`app/generador-loteria/reparto.ts`) y las cifras de su FAQ, que ya no van escritas a mano — y, desde el 29/10/2026 (cabo C0124), `orientador-tipos-renta-irpf`, que calcula su ejemplo con `gravamenPremio`.
 - **Auditoría de origen (05/10/2026)** — nace de S0180. Hasta entonces la FAQ de `generador-loteria` citaba las cifras como texto (hallazgo 2734) porque nada las calculaba. Cotejado en sesión contra el consolidado del BOE (DA 33.ª y DT 35.ª). La nota de la AEAT del 15/12/2025 sobre premios compartidos (nivel 3) solo se usa para el consejo de acreditar el reparto, no para sellar.
 - **Verificado**: 2026-10-05 · vigencia 2020-2026.
+
+#### `recargos-sanciones.ts` — Recargos, sanciones y fraccionamiento del pago (LGT y RIRPF)
+- **Contiene**: la escala del recargo por declarar tarde sin requerimiento (`ESCALA_RECARGO_EXTEMPORANEO`: 1 % más otro 1 % por mes completo, 15 % pasados 12 meses, reducción del 25 % del recargo, con el interés de demora de `intereses.ts`); los recargos del período ejecutivo (5, 10 y 20 %); la multa por no presentar en plazo sin perjuicio económico (200 €, la mitad sin requerimiento); los umbrales del modelo 720 (50.000 € por bloque, 20.000 € de subida para volver a declarar) y el fraccionamiento 60/40 de la Renta.
+- **Normativa**: LGT (BOE-A-2003-23186), arts. 27 (ap. 2 en la redacción de la Ley 11/2021, BOE-A-2021-11473), 28 y 198, y DA 18.ª en la redacción de la Ley 5/2022 (BOE-A-2022-3712); RGAT (RD 1065/2007, BOE-A-2007-15984), arts. 42 bis, 42 ter y 54 bis; RIRPF (BOE-A-2007-6820), art. 62.2.
+- **Vigilar**: leyes de medidas de prevención del fraude (la Ley 11/2021 cambió a la vez el art. 27 y el 198); reformas del RGAT; reales decretos que modifiquen el RIRPF.
+- **Cadencia**: baja; puntual.
+- **Alerta metodológica**: que el recargo del art. 27 vuelva a ser escalonado (5/10/15/20 %, como antes de la Ley 11/2021) o cambie lo que reduce el 27.5; que el fraccionamiento deje de ser sin intereses. Las fechas del segundo plazo y de la domiciliación NO están aquí: las fija cada año la orden del modelo 100.
+- **Dependencias internas**: `lib/calculadoras/recargoPresentacionTardia.ts` (motor del recargo) y las apps que pintan la escala: `estimador-compraventa-inmueble`, `estimador-impuesto-donaciones`, `estimador-impuesto-sucesiones`, `estimador-plusvalia-municipal`, `orientacion-tramitacion-herencias`, `simulador-gastos-compraventa-garaje`, `simulador-gastos-compraventa-trastero` y `simulador-heredar-vivienda`; la guía de `estimador-irpf` usa el módulo entero.
+- **Auditoría de origen (29/10/2026)** — nace del cabo C0055 (inspector, 27/09/2026): la guía de `estimador-irpf` tecleaba las cifras de los arts. 27, 28 y 198, del modelo 720 y del fraccionamiento, y la escala del art. 27 vivía sin sello en `lib/calculadoras`. Ninguna estaba mal. Cotejado en sesión contra el consolidado del BOE; la versión anterior de la DA 18.ª se leyó para confirmar que la Ley 5/2022 suprimió su régimen sancionador propio.
+- **Verificado**: 2026-10-29 · vigencia 2026.
+
+#### `retribuciones-exentas.ts` — Dietas y retribuciones en especie exentas del IRPF
+- **Contiene**: dietas de manutención exentas (26,67 y 53,34 € en España, 48,08 y 91,35 € en el extranjero, sin y con pernocta; nueve meses como máximo en un mismo destino), kilometraje en vehículo propio (0,26 €/km), vales y tarjetas de comedor (11 € por día hábil), transporte colectivo (1.500 € al año; 136,36 € al mes si es con tarjeta) y seguro de enfermedad (500 € por persona, 1.500 € con discapacidad).
+- **Normativa**: RIRPF (RD 439/2007, BOE-A-2007-6820), arts. 9, 45 y 46 bis, con la Orden HFP/792/2023 (BOE-A-2023-16461) para el kilometraje; LIRPF (BOE-A-2006-20764), art. 42.3 a), c) y e), y art. 30.2.5.ª c) para la manutención del autónomo.
+- **Vigilar**: la orden ministerial que revise las cuantías del art. 9 (el 9.A.5 las liga a la revisión de las dietas de los funcionarios: así subió el kilometraje en 2023); reales decretos que modifiquen los arts. 45 y 46 bis; leyes que toquen el art. 42.3.
+- **Cadencia**: baja; puntual por orden ministerial.
+- **Alerta metodológica**: una orden de revisión **no cambia el texto consolidado del artículo**: el 9.A.2.b sigue diciendo «0,19 euros por kilómetro» y la cuantía vigente va en una nota del bloque. Hay que leer las notas, no solo el texto.
+- **Dependencias internas**: `estimador-sueldo-neto`, `selector-movilidad-urbana` y `presupuesto-viaje`; `lib/calculadoras/kilometraje.ts` (tool MCP `calcular_kilometraje`), `lib/calculadoras/deduccionAutonomoIRPF.ts` y `lib/calculadoras/gastosDeduciblesAutonomo.ts` (MCP de Delegum).
+- **Auditoría de origen (29/10/2026)** — nace de los cabos C0109 (`selector-movilidad-urbana`, 02/10/2026) y C0183 (resto de C0075, 09/10/2026): cifras tecleadas en dos apps y como constantes locales en dos motores. Ninguna estaba mal; al cotejarlas se corrigieron dos citas (el kilometraje del empleado es el art. 9.A.2.b, no el «9.B.2»; la manutención del autónomo, el 30.2.5.ª c, no el «30.2.6»). `orientador-gastos-deducibles` sigue con las cifras tecleadas a propósito: aplica el kilometraje al autónomo, que el art. 9 no cubre, y eso se repara en la app antes de sellar nada (cabo aparte).
+- **Verificado**: 2026-10-29 · vigencia 2026.
+
+#### `pensiones-irpf.ts` — Rescate de planes (DT 12.ª) y pensiones de orfandad exentas
+- **Contiene**: el régimen transitorio de lo aportado a planes de pensiones hasta el 31/12/2006 (reducción del 40 % sobre lo cobrado en capital, más de dos años desde la primera aportación salvo invalidez, y cobro en el ejercicio de la contingencia o en los dos siguientes) y la edad de la exención de orfandad del art. 7.h (menores de 22 años).
+- **Normativa**: LIRPF (BOE-A-2006-20764), DT 12.ª en la redacción de la Ley 26/2014 (BOE-A-2014-12327), y art. 7.h; RDLeg 3/2004 (TRLIRPF, BOE-A-2004-4347), art. 17.2.b, al que remite la DT 12.ª en su redacción a 31/12/2006 (derogado: sin texto consolidado, se leyó el publicado).
+- **Vigilar**: reformas de la DT 12.ª (la Ley 26/2014 le añadió el plazo del ap. 4) y del art. 7 (el RDL 29/2026 lo tocó sin cambiar la letra h).
+- **Cadencia**: muy baja: régimen transitorio cerrado.
+- **Alerta metodológica**: que una ley reabra o amplíe el plazo del ap. 4, como ya hizo la de 2014 con las contingencias de 2011 a 2014.
+- **Dependencias internas**: `estimador-irpf-pensionista` y `lib/calculadoras/rescatePlanPensiones.ts` (Action de ChatGPT `rescate-plan-pensiones`).
+- **Auditoría de origen (29/10/2026)** — nace del cabo C0124 (reparación del 03/10/2026): el 40 % y el plazo eran constantes sin exportar del motor, que además llamaba «DA 12.ª» a la disposición transitoria, y los 22 años, texto de la FAQ. Ninguna cifra estaba mal. `simulador-renta-plan-pensiones` y `optimizador-rentas-60` siguen escribiendo el 40 % a mano (cabo aparte: el primero sitúa el plazo en el «primer cobro» y no en la contingencia).
+- **Verificado**: 2026-10-29 · vigencia 2026.
 
 #### `nomada-digital.ts` — Visa nómada digital
 - **Contiene**: mínimos de ingresos (**múltiplos del SMI** — se actualiza en cascada con `smi.ts`), duraciones de visado/autorización/renovación, requisitos.
@@ -634,6 +664,9 @@ informe del vigía enumerar las apps afectadas por cada hallazgo.)*
 | `nomada-digital` | requisitos-nomada-digital | — | — |
 | `patrimonio` | orientador-limite-conjunto-patrimonio · orientador-impuesto-patrimonio | impuesto-patrimonio | ✅ |
 | `pensiones` | estimador-pension-viudedad · estimador-complemento-minimos · planificador-ahorro-jubilacion · selector-plan-pensiones · simulador-jubilacion-publica · simulador-renta-plan-pensiones · verificador-complemento-brecha-genero · visualizador-jubilacion-perspectiva | pensiones-jubilacion | ✅ |
+| `pensiones-irpf` | estimador-irpf-pensionista · *(y el motor `rescatePlanPensiones`, vía Action de ChatGPT)* | — | — |
+| `recargos-sanciones` | estimador-irpf · estimador-compraventa-inmueble · estimador-impuesto-donaciones · estimador-impuesto-sucesiones · estimador-plusvalia-municipal · orientacion-tramitacion-herencias · simulador-gastos-compraventa-garaje · simulador-gastos-compraventa-trastero · simulador-heredar-vivienda · *(y el motor `recargoPresentacionTardia`)* | — | — |
+| `retribuciones-exentas` | estimador-sueldo-neto · selector-movilidad-urbana · presupuesto-viaje · *(y los motores `kilometraje`, `deduccionAutonomoIRPF` y `gastosDeduciblesAutonomo`, vía MCP)* | — | — |
 | `smi` | calculadora-propinas · estimador-smi | smi-salario-minimo | ✅ |
 | `sociedades` | comparador-autonomo-vs-sl · simulador-financiacion-empresarial | impuesto-sociedades | ✅ |
 | `sucesiones` | estimador-impuesto-sucesiones · simulador-heredar-vivienda | sucesiones-isd | ✅ |

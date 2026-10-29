@@ -4,8 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import styles from './OrientacionHerencias.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, DisclaimerCard, DataReference, ShareCard } from '@/components';
 import Link from 'next/link';
-import { ESCALA_RECARGO_EXTEMPORANEO } from '@/lib/calculadoras/recargoPresentacionTardia';
-import { PLAZO_ISD, PLAZO_IIVTNU } from '@/data/fiscal';
+import { PLAZO_ISD, PLAZO_IIVTNU, ESCALA_RECARGO_EXTEMPORANEO } from '@/data/fiscal';
 
 // ===== TIPOS =====
 interface Respuestas {

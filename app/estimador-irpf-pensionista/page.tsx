@@ -5,7 +5,7 @@ import styles from './EstimadorIrpfPensionista.module.css';
 import { MeskeiaLogo, LegalNotice, Footer, NumberInput, EducationalSection, RelatedApps, ShareCard, DisclaimerCard,
   DataReference, RegionBadge
 } from '@/components';
-import { formatCurrency, formatNumber, formatPercentage, parseSpanishNumber } from '@/lib';
+import { formatCurrency, formatNumber, formatPercentage, formatDate, parseISODateLocal, parseSpanishNumber } from '@/lib';
 import {
   FISCAL_IRPF_META,
   cuotaEscalaGeneral,
@@ -22,6 +22,8 @@ import {
   NORMAS_MINIMOS_FAMILIARES_IRPF,
   CALENDARIO_FISCAL,
   FISCAL_CALENDARIO_META,
+  REGIMEN_TRANSITORIO_PLANES,
+  PENSIONES_ORFANDAD_EXENTAS,
 } from '@/data/fiscal';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
@@ -131,6 +133,15 @@ const NORMAS_MINIMOS = NORMAS_MINIMOS_FAMILIARES_IRPF;
  */
 const PLAZO_CAMPANA_RENTA =
   CALENDARIO_FISCAL.find((m) => m.modelo === '100')?.plazo ?? FISCAL_CALENDARIO_META.nota;
+
+/**
+ * Régimen transitorio del rescate (DT 12.ª LIRPF) y edad de la exención de orfandad (art. 7.h),
+ * de `data/fiscal/pensiones-irpf.ts` desde el 29/10/2026 (cabo C0124): iban como texto.
+ */
+const PLANES = REGIMEN_TRANSITORIO_PLANES;
+const FECHA_LIMITE_PLANES = formatDate(parseISODateLocal(PLANES.fechaLimiteAportaciones));
+/** Primer año cuyas aportaciones ya no tienen el régimen transitorio: el siguiente al de la fecha límite. */
+const ANIO_PLANES_SIN_REDUCCION = Number(PLANES.fechaLimiteAportaciones.slice(0, 4)) + 1;
 
 /** Primer y último tipo de la escala del ahorro (art. 66), para el texto de ayuda del campo. */
 const TIPO_AHORRO_MIN = TRAMOS_GANANCIAS_PATRIMONIALES_2025[0].tipo;
@@ -431,7 +442,7 @@ export default function EstimadorIrpfPensionista() {
             onChange={setRescatePP}
             label="Rescate de plan de pensiones este año (€)"
             placeholder="0"
-            helperText="Si rescatas un plan de pensiones, se suma como rendimiento del trabajo. El estimador lo suma entero: no aplica la reducción del régimen transitorio (DT 12.ª) a lo aportado hasta 2006. Pon 0 si no aplica."
+            helperText={`Si rescatas un plan de pensiones, se suma como rendimiento del trabajo. El estimador lo suma entero: no aplica la reducción del régimen transitorio (DT 12.ª) a lo aportado hasta el ${FECHA_LIMITE_PLANES}. Pon 0 si no aplica.`}
             min={LIMITES.rescate.min}
             max={LIMITES.rescate.max}
             acotarAlSalir={false}
@@ -592,8 +603,8 @@ export default function EstimadorIrpfPensionista() {
 
               {resultado.rescatePP > 0 && (
                 <p className={styles.resultNota}>
-                  El rescate se ha sumado entero. Si parte de él procede de aportaciones hechas hasta el
-                  31/12/2006 y lo cobras en forma de capital en el año de la jubilación o en los dos
+                  El rescate se ha sumado entero. Si parte de él procede de aportaciones hechas hasta el{' '}
+                  {FECHA_LIMITE_PLANES} y lo cobras en forma de capital en el año de la jubilación o en los dos
                   siguientes, esa parte admite la reducción del régimen transitorio (disposición
                   transitoria 12.ª LIRPF), que este estimador no aplica: tu cuota sería menor.
                 </p>
@@ -623,10 +634,10 @@ export default function EstimadorIrpfPensionista() {
         <p>
           El rescate tributa como rendimiento del trabajo (art. 17.2.a LIRPF) y se suma a la pensión
           en la base general: un rescate grande en forma de capital puede subir tu tipo marginal. Lo
-          aportado desde 2007 tributa entero cobres cuando cobres, así que repartirlo en varios años
-          o cobrarlo como renta suaviza el tramo. Lo aportado hasta el 31/12/2006 tiene un régimen
-          transitorio (disposición transitoria 12.ª LIRPF): esa parte admite la reducción del
-          art. 17 de la ley vigente a esa fecha si la cobras en forma de capital, y solo «en el
+          aportado desde {ANIO_PLANES_SIN_REDUCCION} tributa entero cobres cuando cobres, así que repartirlo en varios años
+          o cobrarlo como renta suaviza el tramo. Lo aportado hasta el {FECHA_LIMITE_PLANES} tiene un régimen
+          transitorio (disposición transitoria 12.ª LIRPF): esa parte admite la reducción del{' '}
+          {formatPorcentaje(PLANES.reduccionCapitalPct)} del art. 17 de la ley vigente a esa fecha si la cobras en forma de capital, y solo «en el
           ejercicio en el que acaezca la contingencia correspondiente, o en los dos ejercicios
           siguientes» (DT 12.ª.4). Cobrada después, o como renta, esa reducción se pierde. Pide a la
           gestora cuánto de tu plan es de cada época antes de decidir. Este estimador suma el rescate
@@ -777,7 +788,7 @@ export default function EstimadorIrpfPensionista() {
           <div className={styles.escenarioExample}>
             Pensión {formatCurrency(ESC_RESCATE_PP.rendimientosIntegrosTrabajo - ESC_RESCATE_PP.rescatePP)} + rescate {formatCurrency(ESC_RESCATE_PP.rescatePP)} = {formatCurrency(ESC_RESCATE_PP.rendimientosIntegrosTrabajo)} → reducción art. 20 {formatCurrency(ESC_RESCATE_PP.reduccionRRT)} y cuota {formatCurrency(ESC_RESCATE_PP.cuotaIRPF)}
           </div>
-          <div className={styles.escenarioTip}><span aria-hidden="true">💡</span> El ejemplo suma el rescate entero. Si parte del plan son aportaciones hechas hasta el 31/12/2006, cobrarla en capital este año o en los dos siguientes le permite aplicar a esa parte la reducción del régimen transitorio (DT 12.ª LIRPF); más tarde la pierde. Lo aportado desde 2007 tributa entero en cualquier año: eso sí puede convenir repartirlo en años de menos ingresos.</div>
+          <div className={styles.escenarioTip}><span aria-hidden="true">💡</span> El ejemplo suma el rescate entero. Si parte del plan son aportaciones hechas hasta el {FECHA_LIMITE_PLANES}, cobrarla en capital este año o en los dos siguientes le permite aplicar a esa parte la reducción del régimen transitorio (DT 12.ª LIRPF); más tarde la pierde. Lo aportado desde {ANIO_PLANES_SIN_REDUCCION} tributa entero en cualquier año: eso sí puede convenir repartirlo en años de menos ingresos.</div>
         </div>
       </div>
 
@@ -792,8 +803,9 @@ export default function EstimadorIrpfPensionista() {
             exentas varias: las de incapacidad permanente absoluta o gran invalidez de la Seguridad
             Social (letra f); las de inutilidad o incapacidad permanente de clases pasivas que
             inhabilitan para toda profesión u oficio (g); las de orfandad y a favor de nietos y
-            hermanos de los regímenes públicos percibidas por «menores de veintidós años o
-            incapacitados para todo trabajo» (h); las derivadas de actos de terrorismo (a), y las
+            hermanos de los regímenes públicos percibidas por menores de{' '}
+            {PENSIONES_ORFANDAD_EXENTAS.menoresDe} años o por quienes estén incapacitados para todo
+            trabajo (h); las derivadas de actos de terrorismo (a), y las
             reconocidas por lesiones o mutilaciones de la Guerra Civil (c). Una pensión exenta no se
             suma a las demás rentas: no la incluyas en este estimador.
           </p>
@@ -973,7 +985,7 @@ export default function EstimadorIrpfPensionista() {
         <div className={styles.tipCard}>
           <div className={styles.tipIcon} aria-hidden="true">📊</div>
           <strong>Planifica el rescate del plan de pensiones</strong>
-          <p>Lo aportado desde 2007 tributa entero cobres cuando cobres: repartirlo en años de menos ingresos o cobrarlo como renta suaviza el tramo. Lo aportado hasta el 31/12/2006 solo conserva la reducción del régimen transitorio si lo cobras en capital en el año de la jubilación o en los dos siguientes (DT 12.ª.4 LIRPF): retrasarlo más, o cobrarlo como renta, la pierde. Pide a la gestora cuánto hay de cada época.</p>
+          <p>Lo aportado desde {ANIO_PLANES_SIN_REDUCCION} tributa entero cobres cuando cobres: repartirlo en años de menos ingresos o cobrarlo como renta suaviza el tramo. Lo aportado hasta el {FECHA_LIMITE_PLANES} solo conserva la reducción del régimen transitorio si lo cobras en capital en el año de la jubilación o en los dos siguientes (DT 12.ª.4 LIRPF): retrasarlo más, o cobrarlo como renta, la pierde. Pide a la gestora cuánto hay de cada época.</p>
         </div>
       </div>
 
@@ -987,7 +999,7 @@ export default function EstimadorIrpfPensionista() {
           <li><strong>Confirmar el borrador sin revisar</strong>: El borrador puede tener errores en mínimos por edad, deducciones autonómicas o tratamiento de otros ingresos. Siempre revisar antes de confirmar.</li>
           <li><strong>No declarar pensiones del extranjero</strong>: Las pensiones de sistemas públicos extranjeros también tributan en España (convenios de doble imposición aparte). No declararlas es un error grave.</li>
           <li><strong>Olvidar que la pensión de viudedad también tributa</strong>: Muchos pensionistas con viudedad olvidan incluirla, lo que puede generar liquidaciones de la AEAT.</li>
-          <li><strong>Decidir la fecha del rescate del plan sin mirar de qué época son las aportaciones</strong>: El año de jubilación ya suele traer ingresos altos (últimas nóminas + pensión), y sumarle el rescate sube el tramo. Pero si hay aportaciones anteriores a 2007, la reducción del régimen transitorio para cobrarlas en capital solo vale ese año y los dos siguientes (DT 12.ª.4 LIRPF): retrasar el rescate más allá la pierde.</li>
+          <li><strong>Decidir la fecha del rescate del plan sin mirar de qué época son las aportaciones</strong>: El año de jubilación ya suele traer ingresos altos (últimas nóminas + pensión), y sumarle el rescate sube el tramo. Pero si hay aportaciones anteriores a {ANIO_PLANES_SIN_REDUCCION}, la reducción del régimen transitorio para cobrarlas en capital solo vale ese año y los dos siguientes (DT 12.ª.4 LIRPF): retrasar el rescate más allá la pierde.</li>
           <li><strong>No aprovechar deducciones autonómicas</strong>: Muchas CCAA tienen deducciones específicas para mayores que no aparecen en el borrador automáticamente.</li>
           <li><strong>Desconocer el límite de {formatCurrency(OBLIGACION.trabajo.variosPagadores)} con dos pagadores</strong>: Si la pensión y un segundo pagador que supere {formatCurrency(OBLIGACION.trabajo.limiteSegundoPagador)} rebasan juntos ese umbral, hay obligación de declarar aunque cada uno por separado esté por debajo del límite general de {formatCurrency(OBLIGACION.trabajo.unPagador)}. Salvo que todo sean pensiones o prestaciones pasivas y hayas pedido el procedimiento especial de retención (art. 89.A del Reglamento del IRPF): entonces el límite sigue en {formatCurrency(EXCEPCION_PENSIONISTAS.limite)} ({EXCEPCION_PENSIONISTAS.articulo}).</li>
         </ul>

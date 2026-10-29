@@ -6,16 +6,23 @@
  * en actividades económicas o desplazamientos laborales.
  *
  * Modelos:
- * A) Empleados: exención IRPF hasta 0,26 €/km (RIRPF art. 9.B.2)
+ * A) Empleados: exención IRPF por kilómetro (RIRPF art. 9.A.2.b, cuantía de la
+ *    Orden HFP/792/2023)
  * B) Autónomos: deducción en IRPF e IVA si el vehículo es afecto a la actividad
  *
- * Fuente: RIRPF art. 9.B.2 + Resolución DGT — módulo km 2025: 0,26 €/km
+ * El módulo por kilómetro NO se escribe aquí: es `KILOMETRAJE_EXENTO` de
+ * data/fiscal/retribuciones-exentas.ts desde el 29/10/2026 (cabo C0183). Hasta
+ * entonces vivía como constante local (0,26) citando el art. 9.B.2, que no existe:
+ * el kilometraje del empleado es el 9.A.2.b (el 9.B.1.a es el de las relaciones
+ * laborales especiales).
  */
+
+import { KILOMETRAJE_EXENTO } from '@/data/fiscal';
 
 // ─── Constantes ────────────────────────────────────────────────────────────────
 
-/** Módulo exento de km para empleados (€/km) — AEAT 2025 */
-const MODULO_KM_EXENTO = 0.26;
+/** Módulo exento de km para empleados (€/km). Fuente única: data/fiscal */
+const MODULO_KM_EXENTO = KILOMETRAJE_EXENTO.eurosPorKm;
 
 /** Límite de IVA deducible para autónomos sin justificación exclusividad (50%) */
 const PCT_IVA_DEDUCIBLE_PARCIAL = 0.5;

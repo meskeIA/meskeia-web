@@ -26,7 +26,7 @@ import {
 } from '@/lib/calculadoras/fechas';
 import { calcularGastoEnergetico, type Electrodomestico } from '@/lib/calculadoras/gastoEnergetico';
 import { calcularComparador } from '@/app/comparador-electrico/motor';
-import { AYUDA_AUTO_PLUS_2026, MOVES_III_HISTORICO } from '@/data/fiscal';
+import { AYUDA_AUTO_PLUS_2026, MOVES_III_HISTORICO, KILOMETRAJE_EXENTO } from '@/data/fiscal';
 import { convertirEdadMascota, type TipoMascota, type TamanoPerro } from '@/lib/calculadoras/edadMascota';
 import { calcularReglaTres, type TipoRegla, type TipoRelacion } from '@/lib/calculadoras/reglaTres';
 import { convertirUnidades, type CategoriaUnidad } from '@/lib/calculadoras/conversorUnidades';
@@ -898,7 +898,7 @@ function crearServidorMCP(): McpServer {
   servidor.tool(
     'calcular_kilometraje',
     'Calcula la compensación o deducción fiscal por uso de vehículo propio en actividades económicas. ' +
-    'Para empleados: exención IRPF hasta 0,26 €/km (RIRPF art. 9.B.2 — módulo AEAT 2025). ' +
+    `Para empleados: exención IRPF hasta ${KILOMETRAJE_EXENTO.eurosPorKm.toLocaleString('es-ES', { minimumFractionDigits: 2 })} €/km (${KILOMETRAJE_EXENTO.baseNormativa}). ` +
     'Para autónomos: deducción en IRPF e IVA según exclusividad del uso del vehículo. ' +
     'Encadenable con calcular_irpf, calcular_cuota_autonomo, comparar_autonomo_vs_sl. ' +
     'Ideal para: "¿Cuánto me puedo deducir por usar el coche en el trabajo?" o ' +
@@ -938,7 +938,7 @@ function crearServidorMCP(): McpServer {
         texto = [
           `🚗 **Kilometraje Profesional — Empleado**`,
           '',
-          `📍 ${kmProfesionalesAnuales.toLocaleString('es-ES')} km profesionales/año | Módulo AEAT 2025: ${res.moduloKm.toFixed(2).replace('.', ',')} €/km`,
+          `📍 ${kmProfesionalesAnuales.toLocaleString('es-ES')} km profesionales/año | Exento por km: ${fmt(res.moduloKm)} €/km`,
           '',
           `💶 Compensación máxima exenta de IRPF: **${fmt(res.compensacionMaximaExenta)} €/año**`,
           compensacionRecibidaPorKm ? `  Compensación recibida: ${fmt(res.compensacionRecibida)} €/año` : '',
@@ -946,7 +946,7 @@ function crearServidorMCP(): McpServer {
           costeRealPorKm ? `  Coste real del desplazamiento: ${fmt(res.costeRealDesplazamiento)} €/año` : '',
           res.diferenciaSinCubrir > 0 ? `  Coste no cubierto por la empresa: ${fmt(res.diferenciaSinCubrir)} €/año` : '',
           '',
-          `📚 Fuente: RIRPF art. 9.B.2 — módulo 0,26 €/km (2025)`,
+          `📚 Fuente: ${KILOMETRAJE_EXENTO.baseNormativa}`,
         ].filter(l => l !== '').join('\n');
       } else {
         const ra = res as import('@/lib/calculadoras/kilometraje').ResultadoAutonomo;

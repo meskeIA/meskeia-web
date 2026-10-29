@@ -32,11 +32,14 @@
  *      desde 2024 vuelve a ser el 5% del art. 30 RIRPF. El porcentaje y el tope los pone
  *      data/fiscal/estimacion-directa.ts
  *
- * D) DIETAS Y GASTOS DE MANUTENCIÓN (art. 30.2.6 LIRPF)
- *    - El autónomo puede deducir sus propias dietas si:
- *      a) La actividad se realiza en un establecimiento de hostelería
+ * D) DIETAS Y GASTOS DE MANUTENCIÓN (art. 30.2.5.ª.c LIRPF)
+ *    - El autónomo puede deducir su propia manutención si:
+ *      a) El gasto se hace en un establecimiento de restauración u hostelería
  *      b) Se paga por medios electrónicos
- *      c) Límites = mismos que para trabajadores (26,67 €/día España sin pernoctar)
+ *      c) Límites = los de las dietas de los trabajadores (art. 9.A.3.a RIRPF), que
+ *         vienen de data/fiscal/retribuciones-exentas.ts desde el 29/10/2026 (cabo C0183)
+ *    - Hasta esa fecha la cita era «art. 30.2.6», que no es: la manutención es la letra c)
+ *      de la regla 5.ª del art. 30.2, en la redacción de la Ley 6/2017.
  *
  * E) VEHÍCULO (uso exclusivo actividad económica — difícil de acreditar)
  *    - Para transporte de mercancías, enseñanza conductores, agentes comerciales:
@@ -61,7 +64,7 @@
  * Encadenable con: calcular_modelo_130, calcular_cuota_autonomo, calcular_irpf
  */
 
-import { TRAMOS_IRPF_2025, cuotaEscalaGeneral, MINIMOS_IRPF_2025, FISCAL_IRPF_META } from '@/data/fiscal';
+import { TRAMOS_IRPF_2025, cuotaEscalaGeneral, MINIMOS_IRPF_2025, FISCAL_IRPF_META, DIETAS_MANUTENCION_EXENTAS } from '@/data/fiscal';
 import {
   GASTOS_DIFICIL_JUSTIFICACION_EDS,
   reduccionGastosDificilJustificacion,
@@ -78,10 +81,11 @@ const PCT_SUMINISTROS_DEDUCIBLE = 30;        // % sobre la parte proporcional
 // único que el Vigía Normativo puede re-sellar.
 const PCT_DIFICIL_JUSTIFICACION_EDS = GASTOS_DIFICIL_JUSTIFICACION_EDS.porcentaje;
 const LIMITE_DIFICIL_JUSTIFICACION = GASTOS_DIFICIL_JUSTIFICACION_EDS.limiteAnual;
-const DIETA_MAX_ESPANIA_SIN_PERNOCTAR = 26.67; // €/día (art. 9 RIRPF)
-const DIETA_MAX_ESPANIA_PERNOCTANDO = 53.34;
-const DIETA_MAX_EXTRANJERO_SIN_PERNOCTAR = 48.08;
-const DIETA_MAX_EXTRANJERO_PERNOCTANDO = 91.35;
+// Límites diarios de la manutención (art. 30.2.5.ª.c LIRPF → art. 9.A.3.a RIRPF), de data/fiscal
+const DIETA_MAX_ESPANIA_SIN_PERNOCTAR = DIETAS_MANUTENCION_EXENTAS.espana.sinPernocta;
+const DIETA_MAX_ESPANIA_PERNOCTANDO = DIETAS_MANUTENCION_EXENTAS.espana.conPernocta;
+const DIETA_MAX_EXTRANJERO_SIN_PERNOCTAR = DIETAS_MANUTENCION_EXENTAS.extranjero.sinPernocta;
+const DIETA_MAX_EXTRANJERO_PERNOCTANDO = DIETAS_MANUTENCION_EXENTAS.extranjero.conPernocta;
 
 // ─── Tipos públicos ────────────────────────────────────────────────────────────
 
@@ -413,7 +417,7 @@ export function calcularDeduccionAutonomoIRPF(p: ParametrosDeduccionAutonomoIRPF
       observacion:
         `Límite según días declarados: ${fmt(limiteDietas)} €` +
         (excesoDietas > 0 ? `. No deducible por exceso sobre el límite: ${fmt(excesoDietas)} €` : '') +
-        '. Requiere pago con tarjeta y que la actividad se realice en establecimiento de hostelería (art. 30.2.6 LIRPF).',
+        '. Requiere pago con tarjeta u otro medio electrónico y que el gasto se haga en un establecimiento de restauración u hostelería (art. 30.2.5.ª.c LIRPF).',
     });
     advertencias.push('Las dietas del autónomo son deducibles solo si se pagan con medios electrónicos y en establecimientos de hostelería/restauración. Los importes en efectivo no son deducibles.');
 
@@ -423,8 +427,8 @@ export function calcularDeduccionAutonomoIRPF(p: ParametrosDeduccionAutonomoIRPF
     if (gastoDietas > 0 && totalDiasDietas === 0) {
       advertencias.push(
         `DIETAS SIN DÍAS DECLARADOS: ha declarado ${fmt(gastoDietas)} € de dietas pero ningún día de ` +
-        'desplazamiento. El límite del art. 9 RIRPF se calcula POR DÍA (26,67 €/día en España sin ' +
-        'pernoctar, 53,34 € pernoctando; 48,08 € y 91,35 € en el extranjero), de modo que sin días el ' +
+        `desplazamiento. El límite del art. 9 RIRPF se calcula POR DÍA (${fmt(DIETA_MAX_ESPANIA_SIN_PERNOCTAR)} €/día en España sin ` +
+        `pernoctar, ${fmt(DIETA_MAX_ESPANIA_PERNOCTANDO)} € pernoctando; ${fmt(DIETA_MAX_EXTRANJERO_SIN_PERNOCTAR)} € y ${fmt(DIETA_MAX_EXTRANJERO_PERNOCTANDO)} € en el extranjero), de modo que sin días el ` +
         'importe deducible es 0 €. Indique los días de cada tipo y repita el cálculo.'
       );
     }

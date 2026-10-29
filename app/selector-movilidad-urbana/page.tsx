@@ -22,8 +22,16 @@ import {
   rangoMensual,
   rangoAnual,
 } from './motor';
+import { formatNumber } from '@/lib';
+import { TRANSPORTE_COLECTIVO_EXENTO } from '@/data/fiscal';
 
 // Las preguntas con sus pesos, las fichas de cada medio, los costes y la lógica viven en ./motor.ts.
+
+// Límites del transporte colectivo exento (art. 42.3.e LIRPF y art. 46 bis RIRPF): de
+// data/fiscal/retribuciones-exentas.ts desde el 29/10/2026 (cabo C0109); hasta entonces iban
+// tecleados en el bloque educativo, sin sello que el Vigía Normativo pudiera renovar.
+const TRANSPORTE_LIMITE_ANUAL = `${formatNumber(TRANSPORTE_COLECTIVO_EXENTO.limiteAnual, 0)} €`;
+const TRANSPORTE_LIMITE_MENSUAL = `${formatNumber(TRANSPORTE_COLECTIVO_EXENTO.limiteMensualTarjeta, 2)} €`;
 
 // ===== COMPONENTE PRINCIPAL =====
 
@@ -447,10 +455,10 @@ export default function SelectorMovilidadUrbana() {
               «tarjetas o cualquier otro medio electrónico de pago»: el «vale» se ha retirado. */}
           <p>
             Si tu empresa te paga el transporte público entre casa y el trabajo, esa retribución en
-            especie está exenta de IRPF hasta 1.500 € al año por trabajador (Ley del IRPF, art.
+            especie está exenta de IRPF hasta {TRANSPORTE_LIMITE_ANUAL} al año por trabajador (Ley del IRPF, art.
             42.3.e). Si lo hace con una tarjeta de transporte u otro medio electrónico de pago, el
-            Reglamento del IRPF (art. 46 bis) pone además un tope de <strong>136,36 € al mes</strong>,
-            sin pasar de los 1.500 € al año, y lo que exceda de esos límites tributa como
+            Reglamento del IRPF (art. 46 bis) pone además un tope de <strong>{TRANSPORTE_LIMITE_MENSUAL} al mes</strong>,
+            sin pasar de los {TRANSPORTE_LIMITE_ANUAL} al año, y lo que exceda de esos límites tributa como
             retribución en especie. Es una exención de lo que paga la empresa, no una deducción que
             el trabajador se aplique en su declaración.
           </p>

@@ -27,7 +27,11 @@
  *   demora. La reducción es del RECARGO: los intereses del art. 27.2 se exigen
  *   aparte y no se reducen. Solo afectaba al tramo de más de 12 meses.
  *
- * Interés de demora tributario: NO se escribe aquí. Se importa de
+ * La escala NO se escribe aquí: es `ESCALA_RECARGO_EXTEMPORANEO` de
+ * `data/fiscal/recargos-sanciones.ts`, con su sello y su ficha en el manifiesto de
+ * vigilancia. Vivió en este fichero hasta el 29/10/2026 (cabo C0055).
+ *
+ * Interés de demora tributario: tampoco. Llega con la escala desde
  * `data/fiscal/intereses.ts` (LGT art. 26: interés legal + 25%), que es el que
  * vigila el ciclo fiscal mensual. Hasta el 07/09/2026 vivía a mano como
  * `4.0625` con sello de enero de 2025: el valor era correcto, pero el día que
@@ -47,48 +51,18 @@
  * Encadenable con: calcular_sancion_tributaria, calcular_pago_aplazado_aeat, calcular_interes_demora
  */
 
-import { INTERES_DEMORA_TRIBUTARIO_2025 } from '@/data/fiscal';
+import { ESCALA_RECARGO_EXTEMPORANEO } from '@/data/fiscal';
 
-// ─── Constantes (art. 27 LGT) ──────────────────────────────────────────────────
+// ─── Constantes (art. 27 LGT), todas de data/fiscal/recargos-sanciones.ts ────────
 
-const PCT_RECARGO_BASE = 1;              // % fijo de partida (art. 27.2, primer inciso)
-const PCT_RECARGO_POR_MES = 1;           // % adicional por cada mes completo
-const MESES_ESCALA_PROPORCIONAL = 12;    // transcurridos estos meses, se va al recargo fijo
-const PCT_RECARGO_MAS_12_MESES = 15;     // % fijo una vez transcurridos 12 meses
-const PCT_REDUCCION_PRONTO_PAGO = 25;    // % de reducción si paga en voluntario (art. 27.5)
+const PCT_RECARGO_BASE = ESCALA_RECARGO_EXTEMPORANEO.porcentajeBase;                   // % fijo de partida (art. 27.2, primer inciso)
+const PCT_RECARGO_POR_MES = ESCALA_RECARGO_EXTEMPORANEO.porcentajePorMes;              // % adicional por cada mes completo
+const MESES_ESCALA_PROPORCIONAL = ESCALA_RECARGO_EXTEMPORANEO.mesesEscalaProporcional; // transcurridos estos meses, se va al recargo fijo
+const PCT_RECARGO_MAS_12_MESES = ESCALA_RECARGO_EXTEMPORANEO.porcentajeMas12Meses;     // % fijo una vez transcurridos 12 meses
+const PCT_REDUCCION_PRONTO_PAGO = ESCALA_RECARGO_EXTEMPORANEO.reduccionProntoPago;     // % de reducción si paga en voluntario (art. 27.5)
 
 /** Interés de demora tributario vigente (%). Fuente única: data/fiscal/intereses.ts */
-const TIPO_INTERES_DEMORA_ANUAL = INTERES_DEMORA_TRIBUTARIO_2025.tipo;
-
-/**
- * La escala, expuesta para que ninguna app la vuelva a escribir a mano.
- *
- * ── Por qué (27/08/2026) ──────────────────────────────────────────────────────
- * Los hallazgos 436 y 454 del Inspector encontraron «recargos del 5% al 20%» en el
- * bloque educativo de dos apps del clúster de compraventa: la escala ANTERIOR a la
- * Ley 11/2021, que sobre un ITP de 1.500 € hace temer 75 € donde el art. 27.2 LGT
- * cobra 15 €. Aquel número no salía de ningún módulo, así que nada podía avisar de
- * que había envejecido. Quien necesite el TEXTO de la escala lo compone desde aquí.
- *
- * ⚠️ 07/09/2026 — esta constante nació aquel día CON EL 1% BASE FUERA. Al componer
- * un texto desde aquí, usar `porcentajeBase` + `porcentajePorMes`: el recargo NO es
- * «1% por mes», es «1% más 1% por cada mes completo».
- */
-export const ESCALA_RECARGO_EXTEMPORANEO = {
-  /** % fijo de partida, se debe desde el primer día de retraso (art. 27.2 LGT) */
-  porcentajeBase: PCT_RECARGO_BASE,
-  /** % adicional por cada mes completo de retraso (art. 27.2 LGT) */
-  porcentajePorMes: PCT_RECARGO_POR_MES,
-  /** Meses transcurridos a partir de los cuales se aplica el recargo fijo */
-  mesesEscalaProporcional: MESES_ESCALA_PROPORCIONAL,
-  /** % fijo una vez transcurridos 12 meses, más intereses de demora */
-  porcentajeMas12Meses: PCT_RECARGO_MAS_12_MESES,
-  /** % de reducción si el recargo se paga en período voluntario (art. 27.5 LGT) */
-  reduccionProntoPago: PCT_REDUCCION_PRONTO_PAGO,
-  /** Interés de demora tributario anual (%) — de data/fiscal, no escrito aquí */
-  interesDemoraAnual: TIPO_INTERES_DEMORA_ANUAL,
-  baseNormativa: 'Art. 27.2 LGT (Ley 58/2003), redacción de la Ley 11/2021 (BOE-A-2021-11473)',
-} as const;
+const TIPO_INTERES_DEMORA_ANUAL = ESCALA_RECARGO_EXTEMPORANEO.interesDemoraAnual;
 
 /**
  * % de recargo para un número de meses completos de retraso, según el art. 27.2.

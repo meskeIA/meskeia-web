@@ -44,3 +44,6 @@ export * from './modulos-irpf';
 export * from './ayudas-vehiculo';
 export * from './premios-loterias';
 export * from './subastas';
+export * from './recargos-sanciones';
+export * from './retribuciones-exentas';
+export * from './pensiones-irpf';

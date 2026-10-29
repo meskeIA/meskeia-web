@@ -3,6 +3,7 @@
 import { useState, useCallback } from 'react';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard, DisclaimerCard, CampoNumerico } from '@/components';
 import { formatCurrency, formatNumber } from '@/lib/formatters';
+import { DIETAS_MANUTENCION_EXENTAS } from '@/data/fiscal';
 import styles from './PresupuestoViaje.module.css';
 
 interface GastoItem {
@@ -666,9 +667,14 @@ export default function PresupuestoViaje() {
             <li className={styles.faqItem}>
               <strong>¿El presupuesto de viaje es deducible de impuestos para autónomos?</strong>
               <p>Sí, si el viaje tiene finalidad profesional demostrable: asistencia a ferias, visitas a clientes,
-              formación. Son deducibles: transporte, alojamiento y manutención (con límites: 26,67 €/día en España
-              y 48,08 €/día en el extranjero para manutención). Guarda siempre factura o ticket, y justifica la
-              relación con tu actividad económica.</p>
+              formación. Son deducibles: transporte, alojamiento y manutención. La manutención tiene los
+              límites diarios de las dietas de los trabajadores: en España,{' '}
+              {formatCurrency(DIETAS_MANUTENCION_EXENTAS.espana.sinPernocta)} sin pernoctar y{' '}
+              {formatCurrency(DIETAS_MANUTENCION_EXENTAS.espana.conPernocta)} si pernoctas fuera; en el extranjero,{' '}
+              {formatCurrency(DIETAS_MANUTENCION_EXENTAS.extranjero.sinPernocta)} y{' '}
+              {formatCurrency(DIETAS_MANUTENCION_EXENTAS.extranjero.conPernocta)}. Además, tienes que pagarla con
+              tarjeta u otro medio electrónico. Guarda siempre factura o ticket, y justifica la relación con tu
+              actividad económica.</p>
             </li>
           </ul>
 

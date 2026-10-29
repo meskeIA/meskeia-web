@@ -22,8 +22,8 @@ import {
   PLAZO_IIVTNU,
   type BonificacionCCAA_ID,
   type BonificacionGrupoID,
+  ESCALA_RECARGO_EXTEMPORANEO,
 } from '@/data/fiscal';
-import { ESCALA_RECARGO_EXTEMPORANEO } from '@/lib/calculadoras/recargoPresentacionTardia';
 /*
   25/09/2026 — la app ya no repite la aritmética: usa el MISMO motor que el MCP de Delegum y el
   GPT. Las dos copias compartían el defecto del hallazgo 1862 (restar a una donación las

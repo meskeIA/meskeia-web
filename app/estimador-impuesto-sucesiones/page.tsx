@@ -6,10 +6,7 @@ import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, ShareCard, LegalN
   DataReference, RegionBadge
 } from '@/components';
 import { formatCurrency, formatDate, formatNumber, formatPercentage, parseISODateLocal, parseSpanishNumber } from '@/lib';
-import {
-  ESCALA_RECARGO_EXTEMPORANEO,
-  porcentajeRecargoExtemporaneo,
-} from '@/lib/calculadoras/recargoPresentacionTardia';
+import { porcentajeRecargoExtemporaneo } from '@/lib/calculadoras/recargoPresentacionTardia';
 import {
   FISCAL_SUCESIONES_META,
   FISCAL_SUCESIONES_CATALUNA_META,
@@ -42,6 +39,7 @@ import {
   MEJORAS_REDUCCIONES_CCAA_IS,
   TramoTarifaIS,
   BonificacionGrupoIS,
+  ESCALA_RECARGO_EXTEMPORANEO,
 } from '@/data/fiscal';
 import {
   evaluarReduccionVivienda,

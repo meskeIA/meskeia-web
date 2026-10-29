@@ -202,11 +202,9 @@ import {
   COEFICIENTES_IS,
   LIMITES_PATRIMONIO_PREEXISTENTE_IS,
   cuotaTributariaConCorreccionIS,
-} from '../../data/fiscal';
-import {
   ESCALA_RECARGO_EXTEMPORANEO,
-  porcentajeRecargoExtemporaneo,
-} from '../../lib/calculadoras/recargoPresentacionTardia';
+} from '../../data/fiscal';
+import { porcentajeRecargoExtemporaneo } from '../../lib/calculadoras/recargoPresentacionTardia';
 
 const RUTA = '/simulador-heredar-vivienda/';
 

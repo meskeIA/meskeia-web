@@ -6,7 +6,7 @@ import { MeskeiaLogo, LegalNotice, Footer, NumberInput, ResultCard, EducationalS
   DataReference, RegionBadge
 } from '@/components';
 import { formatNumber, formatCurrency, formatPercentage, formatDate, parseISODateLocal, parseSpanishNumber } from '@/lib';
-import { FISCAL_IRPF_META, FISCAL_SS_CUENTA_AJENA_META, TRAMOS_IRPF_2025, calcularCuotaIntegraGeneral, desglosarEscalaGeneral, cuotaEscalaGeneral, COTIZACIONES_SS_2026, BASES_SS_2026, MINIMOS_IRPF_2025, OBLIGACION_DECLARAR_2025, SMI_2026, LIMITES_PLAN_PENSIONES_2025, DEDUCCION_MATERNIDAD_IRPF, REDUCCION_TRIBUTACION_CONJUNTA_2025 } from '@/data/fiscal';
+import { FISCAL_IRPF_META, FISCAL_SS_CUENTA_AJENA_META, TRAMOS_IRPF_2025, calcularCuotaIntegraGeneral, desglosarEscalaGeneral, cuotaEscalaGeneral, COTIZACIONES_SS_2026, BASES_SS_2026, MINIMOS_IRPF_2025, OBLIGACION_DECLARAR_2025, SMI_2026, LIMITES_PLAN_PENSIONES_2025, DEDUCCION_MATERNIDAD_IRPF, REDUCCION_TRIBUTACION_CONJUNTA_2025, COMEDOR_FORMULAS_INDIRECTAS, TRANSPORTE_COLECTIVO_EXENTO, SEGURO_ENFERMEDAD_EXENTO, DIETAS_MANUTENCION_EXENTAS } from '@/data/fiscal';
 import { calcularBrutoANeto, calcularNetoABruto, tipoMarginal, TIPO_SS_TRABAJADOR, COTIZACION_EMPRESA_2026, TIPO_SS_EMPRESA, type SituacionFamiliar } from './motor';
 
 // Tipos de cálculo
@@ -30,6 +30,19 @@ const REDUCCION_MONOPARENTAL = REDUCCION_TRIBUTACION_CONJUNTA_2025.monoparental;
 const MATERNIDAD = DEDUCCION_MATERNIDAD_IRPF;
 const MATERNIDAD_TECHO_CON_GUARDERIA =
   MATERNIDAD.importeAnualPorHijo + MATERNIDAD.incrementoGuarderia.importeMaximoAnual;
+
+/**
+ * Retribución flexible y dietas exentas (art. 42.3 LIRPF, arts. 9 y 45 RIRPF), de
+ * data/fiscal/retribuciones-exentas.ts desde el 29/10/2026 (cabo C0183): iban tecleadas en la
+ * FAQ, en los pasos y en los errores frecuentes. Los ejemplos del seguro médico salen del límite
+ * por persona: tres asegurados al tipo de un tramo real de la escala, y una familia de cuatro.
+ */
+const SEGURO = SEGURO_ENFERMEDAD_EXENTO;
+const SEGURO_TRES_PERSONAS = 3 * SEGURO.porPersona;
+const MARGINAL_EJEMPLO_SEGURO = TRAMOS_IRPF_2025[2].tipo;
+const AHORRO_SEGURO_TRES = (SEGURO_TRES_PERSONAS * MARGINAL_EJEMPLO_SEGURO) / 100;
+const SEGURO_FAMILIA_CUATRO = 4 * SEGURO.porPersona;
+const DIETAS = DIETAS_MANUTENCION_EXENTAS;
 
 // El motor de cálculo (IRPF + SS) vive en ./motor.ts desde el 25/09/2026: lo comparten la
 // calculadora, los ejemplos del bloque educativo y el FAQPage de metadata.ts.
@@ -886,7 +899,7 @@ export default function EstimadorSueldoNetoPage() {
             <div className={styles.faqItemPro}>
               <h4>¿Los cheques comida y tickets guardería reducen mi IRPF?</h4>
               <p>
-                Sí, son retribución en especie con límites exentos de IRPF. Los <strong>cheques restaurante</strong> están exentos hasta <strong>11 €/día</strong> de uso efectivo (límite anual ~2.640 € aprox.). Los <strong>cheques guardería</strong> están exentos sin límite de importe, siempre que el hijo sea menor de 3 años. Ambos sí cotizan a la Seguridad Social (incluyen en la base de cotización).
+                Sí, son retribución en especie con límites exentos de IRPF. Los <strong>cheques restaurante</strong> están exentos hasta <strong>{formatCurrency(COMEDOR_FORMULAS_INDIRECTAS.eurosPorDia)} por día hábil</strong>, y lo que no gastas un día no se acumula al siguiente (art. 45 del Reglamento del IRPF). Los <strong>cheques guardería</strong> están exentos sin límite de importe, siempre que el hijo sea menor de 3 años. Ambos sí cotizan a la Seguridad Social (incluyen en la base de cotización).
               </p>
             </div>
 
@@ -952,12 +965,12 @@ export default function EstimadorSueldoNetoPage() {
               <div className={styles.stepContent}>
                 <h4>Calcula si te conviene retribución en especie</h4>
                 <p>
-                  Conceptos como <strong>seguro médico privado (hasta 500 €/año por persona asegurada, exento de IRPF)</strong>,
-                  guardería (exenta sin límite para menores de 3 años), tarjeta transporte (hasta 1.500 €/año) o
-                  cheques restaurante (hasta 11 €/día) pueden reducir significativamente tu base imponible sin reducir
-                  tu retribución real. Un seguro médico de 1.500 €/año que cubra a tres personas queda exento
-                  entero (3 × 500 €) y, con un tipo marginal del 30&nbsp;%, supone unos 450 € menos de IRPF
-                  (1.500 × 30&nbsp;%).
+                  Conceptos como <strong>seguro médico privado (hasta {formatCurrency(SEGURO.porPersona)}/año por persona asegurada, exento de IRPF)</strong>,
+                  guardería (exenta sin límite para menores de 3 años), tarjeta transporte (hasta {formatCurrency(TRANSPORTE_COLECTIVO_EXENTO.limiteAnual)}/año) o
+                  cheques restaurante (hasta {formatCurrency(COMEDOR_FORMULAS_INDIRECTAS.eurosPorDia)}/día) pueden reducir significativamente tu base imponible sin reducir
+                  tu retribución real. Un seguro médico de {formatCurrency(SEGURO_TRES_PERSONAS)}/año que cubra a tres personas queda exento
+                  entero (3 × {formatCurrency(SEGURO.porPersona)}) y, con un tipo marginal del {pct(MARGINAL_EJEMPLO_SEGURO, 0)}, supone unos {formatCurrency(AHORRO_SEGURO_TRES)} menos de IRPF
+                  ({formatNumber(SEGURO_TRES_PERSONAS, 0)} × {pct(MARGINAL_EJEMPLO_SEGURO, 0)}).
                 </p>
               </div>
             </div>
@@ -1017,10 +1030,10 @@ export default function EstimadorSueldoNetoPage() {
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">🏥</span>
               <p>
-                <strong>Solicita retribución flexible:</strong> hasta 500 € al año en seguro médico están
-                exentos de IRPF por persona asegurada (tú, tu cónyuge y tus hijos), y 1.500 € por cada
+                <strong>Solicita retribución flexible:</strong> hasta {formatCurrency(SEGURO.porPersona)} al año en seguro médico están
+                exentos de IRPF por persona asegurada (tú, tu cónyuge y tus hijos), y {formatCurrency(SEGURO.porPersonaConDiscapacidad)} por cada
                 persona con discapacidad (art. 42.3.c LIRPF). Para una familia de 4 personas sin
-                discapacidad, el límite exento es de 2.000 €/año; lo que lo supere tributa como
+                discapacidad, el límite exento es de {formatCurrency(SEGURO_FAMILIA_CUATRO)}/año; lo que lo supere tributa como
                 retribución en especie.
               </p>
             </div>
@@ -1101,8 +1114,9 @@ export default function EstimadorSueldoNetoPage() {
               </li>
               <li>
                 <strong>Olvidar que las dietas por encima del límite legal tributan como salario.</strong>
-                Los límites exentos son 26,67 €/día sin pernocta (53,34 € con pernocta en España;
-                91,35 € en el extranjero). Todo lo que supere ese importe se suma a tu base imponible
+                Los límites exentos de manutención son {formatCurrency(DIETAS.espana.sinPernocta)}/día en España sin pernoctar
+                y {formatCurrency(DIETAS.espana.conPernocta)} si pernoctas fuera; en el extranjero, {formatCurrency(DIETAS.extranjero.sinPernocta)} y{' '}
+                {formatCurrency(DIETAS.extranjero.conPernocta)} (art. 9 del Reglamento del IRPF). Todo lo que supere ese importe se suma a tu base imponible
                 del IRPF.
               </li>
               <li>

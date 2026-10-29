@@ -111,6 +111,58 @@ const VIGILANCIA = [
     },
   },
   {
+    modulo: 'recargos-sanciones',
+    meta: 'FISCAL_RECARGOS_SANCIONES_META',
+    norma: 'BOE-A-2003-23186',
+    nombreNorma: 'Ley 58/2003 General Tributaria',
+    articulos: {
+      a27: 'Recargo por declaración extemporánea',
+      a28: 'Recargos del período ejecutivo',
+      a198: 'No presentar en plazo sin perjuicio económico',
+      dadecimoctava: 'Modelo 720 (bienes en el extranjero)',
+    },
+  },
+  {
+    modulo: 'recargos-sanciones',
+    meta: 'FISCAL_RECARGOS_SANCIONES_META',
+    norma: 'BOE-A-2007-6820',
+    nombreNorma: 'RD 439/2007 del Reglamento del IRPF',
+    articulos: {
+      a62: 'Fraccionamiento 60/40 de la autoliquidación',
+    },
+  },
+  {
+    modulo: 'retribuciones-exentas',
+    meta: 'FISCAL_RETRIBUCIONES_EXENTAS_META',
+    norma: 'BOE-A-2007-6820',
+    nombreNorma: 'RD 439/2007 del Reglamento del IRPF',
+    articulos: {
+      a9: 'Dietas de manutención y kilometraje',
+      a45: 'Vales y tarjetas de comedor',
+      a46bis: 'Tarjeta de transporte colectivo',
+    },
+  },
+  {
+    modulo: 'retribuciones-exentas',
+    meta: 'FISCAL_RETRIBUCIONES_EXENTAS_META',
+    norma: 'BOE-A-2006-20764',
+    nombreNorma: 'Ley 35/2006 del IRPF',
+    articulos: {
+      a42: 'Rentas en especie exentas (comedor, seguro, transporte)',
+      a30: 'Manutención deducible del autónomo',
+    },
+  },
+  {
+    modulo: 'pensiones-irpf',
+    meta: 'FISCAL_PENSIONES_IRPF_META',
+    norma: 'BOE-A-2006-20764',
+    nombreNorma: 'Ley 35/2006 del IRPF',
+    articulos: {
+      dtduodecima: 'Régimen transitorio del rescate de planes',
+      a7: 'Rentas exentas (orfandad, letra h)',
+    },
+  },
+  {
     modulo: 'sociedades',
     meta: 'FISCAL_SOCIEDADES_META',
     norma: 'BOE-A-2014-12328',

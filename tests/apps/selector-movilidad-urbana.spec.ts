@@ -628,7 +628,9 @@ test.describe('Inspección 24/09/2026 — restricciones declaradas, datos de la 
     // Reescrito el 02/10/2026 con el 2701: los 1.500 € anuales los fija la Ley del IRPF, art.
     // 42.3.e) (BOE-A-2006-20764), y el art. 46 bis del Reglamento añade el tope mensual de la
     // tarjeta; el test de abajo comprueba que el 46 bis se sigue citando y con su cifra.
-    expect(guia).toContain('esa retribución en especie está exenta de IRPF hasta 1.500 € al año por trabajador (Ley del IRPF, art. 42.3.e)');
+    // Desde el 29/10/2026 la cifra sale de TRANSPORTE_COLECTIVO_EXENTO (C0109) con formatNumber:
+    // con cuatro cifras enteras no se agrupa (RAE 2010), así que se lee «1500 €».
+    expect(guia).toContain('esa retribución en especie está exenta de IRPF hasta 1500 € al año por trabajador (Ley del IRPF, art. 42.3.e)');
     expect(guia).toContain('Reglamento del IRPF (art. 46 bis)');
     expect(guia).toContain('no una deducción que el trabajador se aplique en su declaración');
   });
@@ -949,7 +951,7 @@ test.describe('Re-inspección 02/10/2026 — casos del motor en el navegador', (
   test('2701: si la guía habla de la tarjeta de transporte, da también su tope de 136,36 € al mes', async ({ page }) => {
     await abrirTest(page);
     await page.getByRole('button', { name: 'Ver guía educativa' }).first().click();
-    const parrafo = (await page.locator('p', { hasText: '1.500 € al año por trabajador' }).first().innerText()).replace(/\s+/g, ' ');
+    const parrafo = (await page.locator('p', { hasText: '1500 € al año por trabajador' }).first().innerText()).replace(/\s+/g, ' ');
     expect(parrafo).toContain('art. 46 bis');
     expect(!/tarjeta/.test(parrafo) || /136,36/.test(parrafo), parrafo).toBe(true);
     expect(parrafo).toContain('136,36 € al mes');

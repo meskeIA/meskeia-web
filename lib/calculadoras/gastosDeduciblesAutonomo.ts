@@ -32,8 +32,9 @@
  *
  *   4. DIETAS Y GASTOS DE MANUTENCIÓN:
  *      Solo deducibles si se realizan fuera del municipio del local/domicilio fiscal
- *      Limites: 26,67 EUR/dia (sin pernocta) o 53,34 EUR/dia (con pernocta) en España
- *      En extranjero: 48,08 EUR (sin pernocta) o 91,35 EUR (con pernocta)
+ *      Limites: los de las dietas de manutencion de los trabajadores (art. 30.2.5.ª.c LIRPF ->
+ *      art. 9.A.3.a RIRPF), que la nota de la linea toma de DIETAS_MANUTENCION_EXENTAS de
+ *      data/fiscal/retribuciones-exentas.ts desde el 29/10/2026 (cabo C0183)
  *      Deben pagarse con tarjeta o transferencia (no efectivo)
  *
  *   5. SEGURIDAD SOCIAL (CUOTA AUTONOMO): 100% deducible
@@ -56,7 +57,15 @@
  * Encadenable con: calcular_irpf, calcular_autonomos_cuota_ss, calcular_modelo_130
  */
 
+import { DIETAS_MANUTENCION_EXENTAS } from '@/data/fiscal';
+
 // --- Constantes ---
+
+const fmtEur = (n: number) => n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const { espana: DIETA_ESPANA, extranjero: DIETA_EXTRANJERO } = DIETAS_MANUTENCION_EXENTAS;
+const NOTA_LIMITES_DIETAS =
+  `Límites diarios: ${fmtEur(DIETA_ESPANA.sinPernocta)} EUR (sin pernocta) / ${fmtEur(DIETA_ESPANA.conPernocta)} EUR (con pernocta) en España; ` +
+  `${fmtEur(DIETA_EXTRANJERO.sinPernocta)} EUR / ${fmtEur(DIETA_EXTRANJERO.conPernocta)} EUR en el extranjero`;
 
 const PCT_SUMINISTROS_VIVIENDA = 30;         // % de los suministros × % afectacion
 const PCT_VEHICULO_NO_EXCLUSIVO = 50;        // % deducible si actividad no de transporte
@@ -231,7 +240,7 @@ export function calcularGastosDeduciblesAutonomo(
   // 11. Dietas
   if (p.dietasPagadasConTarjeta && p.dietasPagadasConTarjeta > 0) {
     lineas.push({ concepto: 'Dietas pagadas con tarjeta (fuera del municipio)', gastoTotal: p.dietasPagadasConTarjeta, porcentajeDeducible: 100, importeDeducible: r(p.dietasPagadasConTarjeta),
-      nota: 'Límites: 26,67 EUR/día (sin pernocta) / 53,34 EUR/día (con pernocta) en España' });
+      nota: NOTA_LIMITES_DIETAS });
     advertencias.push(
       'DIETAS: solo deducibles si se producen en municipio diferente al del domicilio fiscal, ' +
       'se pagan con tarjeta o transferencia (NO efectivo), y existen justificantes del desplazamiento ' +

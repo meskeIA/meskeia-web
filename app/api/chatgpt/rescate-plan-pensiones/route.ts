@@ -5,7 +5,7 @@
  * Calcula la tributación del rescate de un plan de pensiones en el IRPF.
  * Las prestaciones tributan como Rendimiento del Trabajo (base general).
  * Incluye la reducción del 40% por aportaciones anteriores a 31/12/2006
- * si el cobro es en forma de capital (DA 12.ª LIRPF).
+ * si el cobro es en forma de capital (DT 12.ª LIRPF).
  *
  * Analytics: registra cada llamada con modo='chatgpt' en Turso.
  */
@@ -19,7 +19,7 @@ import { datosLlamanteGpt } from '@/lib/analytics-gpt';
 export const runtime = 'nodejs';
 
 const AVISO_LEGAL =
-  '⚠️ Resultado orientativo basado en LIRPF art. 17.2.a + DA 12.ª — vigente 2025. ' +
+  '⚠️ Resultado orientativo basado en LIRPF art. 17.2.a + DT 12.ª. ' +
   'El rescate en capital puede generar un salto de tramo IRPF significativo. ' +
   'Consulta con un asesor fiscal antes de rescatar, especialmente si tienes aportaciones pre-2007. ' +
   'Fuente: meskeia.com/rescate-plan-pensiones';

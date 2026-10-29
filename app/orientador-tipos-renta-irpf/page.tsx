@@ -19,11 +19,22 @@ import {
   TRAMOS_IRPF_2025,
   TRAMOS_GANANCIAS_PATRIMONIALES_2025,
   FISCAL_IRPF_META,
+  EXENCION_PREMIO_LOTERIA,
+  TIPO_GRAVAMEN_PREMIO_LOTERIA,
+  IMPORTE_MINIMO_EXENCION_COMPLETA,
+  gravamenPremio,
   type TramoIRPF,
 } from '@/data/fiscal';
 
 // Escala de la base del ahorro (capital mobiliario + ganancias por transmisión)
 const TRAMOS_AHORRO_IRPF_2025 = TRAMOS_GANANCIAS_PATRIMONIALES_2025;
+
+// Gravamen especial de loterías (DA 33.ª LIRPF), de data/fiscal/premios-loterias.ts desde el
+// 29/10/2026 (cabo C0124): el 20 % y los 40.000 € iban tecleados en seis sitios, y el importe
+// del ejemplo se calculaba aquí a mano. Lo calcula ahora `gravamenPremio`, el mismo que reparte
+// el premio de una peña en generador-loteria.
+const TIPO_LOTERIA = `${formatNumber(TIPO_GRAVAMEN_PREMIO_LOTERIA * 100, 0)} %`;
+const EXENTO_LOTERIA = `${formatNumber(EXENCION_PREMIO_LOTERIA, 0)} €`;
 
 // ─── Tipos ───────────────────────────────────────────────────────────────────
 
@@ -113,10 +124,10 @@ const CATEGORIAS: Record<string, Categoria> = {
     id: 'especial',
     nombre: 'Gravamen especial (premios de lotería)',
     base: 'especial',
-    retencion: 'Retención del 20 % sobre el importe del premio que excede de 40.000 € exentos.',
-    particularidad: 'No va ni en la base general ni en la del ahorro: tiene un gravamen especial propio del 20 %.',
+    retencion: `Retención del ${TIPO_LOTERIA} sobre el importe del premio que excede de ${EXENTO_LOTERIA} exentos.`,
+    particularidad: `No va ni en la base general ni en la del ahorro: tiene un gravamen especial propio del ${TIPO_LOTERIA}.`,
     casilla: 'Retención en origen (modelo 136 si no se retuvo)',
-    baseLegal: 'Disposición adicional 33ª Ley 35/2006 del IRPF.',
+    baseLegal: 'Disposición adicional 33.ª Ley 35/2006 del IRPF.',
   },
 };
 
@@ -236,10 +247,10 @@ const CASOS: Caso[] = [
   },
   // Otros
   {
-    id: 'premio-loteria', icon: '🎰', label: 'Premio de lotería (ONLAE, ONCE…)', grupo: 'Otros',
+    id: 'premio-loteria', icon: '🎰', label: 'Premio de lotería (SELAE, ONCE…)', grupo: 'Otros',
     categoriaId: 'especial',
-    tributa: 'Los premios de loterías y apuestas del Estado, ONCE, Cruz Roja y equivalentes de la UE tienen un gravamen especial del 20 %.',
-    particularidad: 'Los primeros 40.000 € de cada premio están exentos; el 20 % se aplica solo sobre el exceso.',
+    tributa: `Los premios de las loterías y apuestas del Estado (SELAE) y de las comunidades autónomas, la ONCE, Cruz Roja y sus equivalentes de la UE tienen un gravamen especial del ${TIPO_LOTERIA}.`,
+    particularidad: `Los primeros ${EXENTO_LOTERIA} de cada décimo o apuesta premiados están exentos; el ${TIPO_LOTERIA} se aplica solo sobre el exceso.`,
     alerta: 'No se mezcla con el resto de tu renta: ni sube tu tipo general ni se compensa con pérdidas. Suele venir ya retenido.',
   },
   {
@@ -294,6 +305,8 @@ export default function OrientadorTiposRentaIrpfPage() {
   const categoria = CATEGORIAS[caso.categoriaId];
   const base: BaseFiscal = caso.baseOverride ?? categoria.base;
   const importe = parseSpanishNumber(importeTexto) || 0;
+  // Un décimo o apuesta de al menos 0,50 €: exención entera (DA 33.ª.2)
+  const gravamenLoteria = gravamenPremio(importe, IMPORTE_MINIMO_EXENCION_COMPLETA);
 
   const tramos = base === 'ahorro' ? TRAMOS_AHORRO_IRPF_2025 : TRAMOS_IRPF_2025;
   const marginalAhorro = base === 'ahorro' && importe > 0 ? tramoMarginal(importe, TRAMOS_AHORRO_IRPF_2025) : null;
@@ -372,7 +385,7 @@ export default function OrientadorTiposRentaIrpfPage() {
               <h3 className={styles.datoTitulo}>Escala aplicable</h3>
               {base === 'especial' ? (
                 <p className={styles.datoEspecial}>
-                  Gravamen especial del <strong>20 %</strong> sobre el exceso de 40.000 € exentos por premio.
+                  Gravamen especial del <strong>{TIPO_LOTERIA}</strong> sobre el exceso de {EXENTO_LOTERIA} exentos por premio.
                 </p>
               ) : (
                 <>
@@ -447,9 +460,9 @@ export default function OrientadorTiposRentaIrpfPage() {
                   </span>
                 ) : base === 'especial' ? (
                   <span key="rama-2">
-                    {importe > 40000
-                      ? `Tributarías al 20 % sobre ${formatNumber(importe - 40000, 0)} € = ${formatNumber((importe - 40000) * 0.2, 0)} €.`
-                      : 'Por debajo de 40.000 € el premio está totalmente exento.'}
+                    {gravamenLoteria.base > 0
+                      ? `Tributarías al ${TIPO_LOTERIA} sobre ${formatNumber(gravamenLoteria.base, 0)} € = ${formatNumber(gravamenLoteria.retencion, 0)} €.`
+                      : `Hasta ${EXENTO_LOTERIA} el premio está totalmente exento.`}
                   </span>
                 ) : (
                   <span key="rama-3">
@@ -584,8 +597,8 @@ export default function OrientadorTiposRentaIrpfPage() {
             <div className={styles.faqItem}>
               <dt>¿El premio de la lotería tributa en el IRPF normal?</dt>
               <dd>
-                No exactamente. Los premios de loterías del Estado, ONCE, Cruz Roja y equivalentes de la UE tienen un <strong>gravamen especial del 20 %</strong>
-                sobre el exceso de 40.000 € exentos. No se mezcla con el resto de tu renta. En cambio, los premios de concursos o sorteos privados sí son
+                No exactamente. Los premios de las loterías del Estado y de las comunidades autónomas, la ONCE, Cruz Roja y sus equivalentes de la UE tienen un <strong>gravamen especial del {TIPO_LOTERIA}</strong>
+                sobre el exceso de {EXENTO_LOTERIA} exentos. No se mezcla con el resto de tu renta. En cambio, los premios de concursos o sorteos privados sí son
                 ganancia patrimonial (base general).
               </dd>
             </div>
@@ -670,7 +683,7 @@ export default function OrientadorTiposRentaIrpfPage() {
               <li><strong>Olvidar la segunda vivienda vacía:</strong> genera renta imputada aunque no obtengas ningún ingreso por ella.</li>
               <li><strong>No declarar Letras del Tesoro por no llevar retención:</strong> Hacienda tiene el dato y son rendimiento del capital mobiliario.</li>
               <li><strong>Pensar que permutar una cripto por otra no tributa:</strong> es una alteración patrimonial, aunque no pases a euros.</li>
-              <li><strong>Meter los premios de lotería en la renta general:</strong> tienen su propio gravamen especial del 20 %.</li>
+              <li><strong>Meter los premios de lotería en la renta general:</strong> tienen su propio gravamen especial del {TIPO_LOTERIA}.</li>
             </ul>
           </div>
         </section>

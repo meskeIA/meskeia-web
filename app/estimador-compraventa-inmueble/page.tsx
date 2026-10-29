@@ -8,7 +8,7 @@ import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, NumberInput, Resu
 import ProrrateoIbiComunidad from '@/components/ProrrateoIbiComunidad';
 import { formatCurrency, formatNumber, formatTipoNominal, parseSpanishNumber, parseSpanishNumberOr } from '@/lib';
 import { veredictoIlegibles, enumerar, faltaOFaltan, noSePudoLeer, mayuscula, enumerarNi, escritoIlegible, escritoNoValido, avisoEscritoNoValido, type Veredicto } from '@/lib/sondeoIlegibles';
-import { IVA_INMUEBLES_2025, FISCAL_INMUEBLES_META, PLUSVALIA_MUNICIPAL_META, GANANCIAS_PATRIMONIALES_META, FISCAL_IVA_META, TRAMOS_GANANCIAS_PATRIMONIALES_2025, calcularGananciaInmueble, PLAZO_ITP, PORCENTAJES_IVA, BONIFICACION_IIVTNU_CEUTA_MELILLA, DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA, NOMBRE_OTRAS_RENTAS_AHORRO, AYUDA_OTRAS_RENTAS_AHORRO, textoOtrasRentasAhorro, NOMBRE_RENTA_PROMOTOR, AVISO_VENTA_PROMOTOR, EXENCION_RENTA_VITALICIA_MAYORES_65 } from '@/data/fiscal';
+import { IVA_INMUEBLES_2025, FISCAL_INMUEBLES_META, PLUSVALIA_MUNICIPAL_META, GANANCIAS_PATRIMONIALES_META, FISCAL_IVA_META, TRAMOS_GANANCIAS_PATRIMONIALES_2025, calcularGananciaInmueble, PLAZO_ITP, PORCENTAJES_IVA, BONIFICACION_IIVTNU_CEUTA_MELILLA, DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA, NOMBRE_OTRAS_RENTAS_AHORRO, AYUDA_OTRAS_RENTAS_AHORRO, textoOtrasRentasAhorro, NOMBRE_RENTA_PROMOTOR, AVISO_VENTA_PROMOTOR, EXENCION_RENTA_VITALICIA_MAYORES_65, ESCALA_RECARGO_EXTEMPORANEO } from '@/data/fiscal';
 import {
   ITP_CCAA,
   ComunidadAutonoma,
@@ -45,7 +45,6 @@ import {
   sumarLineasVisibles, superaElTope, nombreEnFrase, deNombreCcaa, AVISO_IRPF_FORAL, avisoIrpfForalResidente,
   TERRITORIOS_IIVTNU_FORAL, motivoPlusvaliaForal, CIUDADES_CON_BONIFICACION,
   BONIFICACION_CUOTA_CEUTA_MELILLA, SALVEDAD_PLUSVALIA_NO_RESIDENTE, fraseRetencionIrnrComprador } from '@/data/itp-ccaa';
-import { ESCALA_RECARGO_EXTEMPORANEO } from '@/lib/calculadoras/recargoPresentacionTardia';
 import {
   HORQUILLA_GASTOS_COMPRAVENTA,
   GESTORIA_TIPICA,

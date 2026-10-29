@@ -31,8 +31,8 @@
 
 import { test, expect } from '@playwright/test';
 
+import { ESCALA_RECARGO_EXTEMPORANEO } from '../data/fiscal';
 import {
-  ESCALA_RECARGO_EXTEMPORANEO,
   calcularRecargoPresentacionTardia,
   porcentajeRecargoExtemporaneo,
 } from '../lib/calculadoras/recargoPresentacionTardia';

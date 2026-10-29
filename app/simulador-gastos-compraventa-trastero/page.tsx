@@ -51,7 +51,7 @@ const AVISO_BASE_AJD =
 /** La salvedad del AJD detrás de un texto, con o sin punto final, solo si hay AJD. */
 const conAvisoBaseAjd = (texto: string, ajd: number): string =>
   ajd > 0 ? `${texto}${texto.endsWith('.') ? '' : '.'} ${AVISO_BASE_AJD}` : texto;
-import { PLAZO_ITP, IVA_INMUEBLES_2025, calcularGananciaInmueble, FISCAL_INMUEBLES_META, PLUSVALIA_MUNICIPAL_META, GANANCIAS_PATRIMONIALES_META, TRAMOS_GANANCIAS_PATRIMONIALES_2025, BONIFICACION_IIVTNU_CEUTA_MELILLA, DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA, NOMBRE_OTRAS_RENTAS_AHORRO, AYUDA_OTRAS_RENTAS_AHORRO, textoOtrasRentasAhorro, NOMBRE_RENTA_PROMOTOR, AVISO_VENTA_PROMOTOR, LIMITACION_ABATIMIENTO } from '@/data/fiscal';
+import { PLAZO_ITP, IVA_INMUEBLES_2025, calcularGananciaInmueble, FISCAL_INMUEBLES_META, PLUSVALIA_MUNICIPAL_META, GANANCIAS_PATRIMONIALES_META, TRAMOS_GANANCIAS_PATRIMONIALES_2025, BONIFICACION_IIVTNU_CEUTA_MELILLA, DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA, NOMBRE_OTRAS_RENTAS_AHORRO, AYUDA_OTRAS_RENTAS_AHORRO, textoOtrasRentasAhorro, NOMBRE_RENTA_PROMOTOR, AVISO_VENTA_PROMOTOR, LIMITACION_ABATIMIENTO, ESCALA_RECARGO_EXTEMPORANEO } from '@/data/fiscal';
 import {
   ITP_CCAA,
   ComunidadAutonoma,
@@ -91,7 +91,6 @@ import {
   SALVEDAD_PLUSVALIA_NO_RESIDENTE,
   GESTORIA_POR_DEFECTO,
 } from '@/data/itp-ccaa';
-import { ESCALA_RECARGO_EXTEMPORANEO } from '@/lib/calculadoras/recargoPresentacionTardia';
 
 // ===== TIPOS =====
 type TipoTransmision = 'segunda-mano' | 'primera-mano';
