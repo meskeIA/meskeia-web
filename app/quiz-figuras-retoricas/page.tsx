@@ -2,7 +2,7 @@
 // @disclaimer: exempt
 
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
-import { enfocarALaVista } from '@/lib';
+import { enfocarALaVista, enfocarSinCentrar } from '@/lib';
 import { useGuardaRafaga } from '@/lib/useGuardaRafaga';
 import styles from './QuizFigurasRetorica.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
@@ -167,7 +167,7 @@ export default function QuizFigurasRetoricaPage() {
     vistaRef.current = vista;
     if (venia === null || venia === vista) return;
     if (pantalla === 'quiz' && seleccionada === null) enfocarALaVista(enunciadoRef.current);
-    else if (pantalla === 'quiz') siguienteRef.current?.focus();
+    else if (pantalla === 'quiz') enfocarSinCentrar(siguienteRef.current); // sin centrarlo (3770)
     else if (pantalla === 'resultado') enfocarALaVista(resultadoRef.current);
   }, [pantalla, preguntaActual, seleccionada]);
 
@@ -184,7 +184,8 @@ export default function QuizFigurasRetoricaPage() {
   const formatTiempo = (seg: number): string => {
     const m = Math.floor(seg / 60);
     const s = seg % 60;
-    return m > 0 ? `${m}m ${s}s` : `${s}s`;
+    // «min» y «s»: «m» es el símbolo del metro (hallazgo 3772), como ya escribe quiz-paises-capitales
+    return m > 0 ? `${m} min ${s} s` : `${s} s`;
   };
 
   return (
@@ -267,6 +268,7 @@ export default function QuizFigurasRetoricaPage() {
               className={styles.progresoFill}
               style={{ width: `${(preguntaActual / totalPreguntas) * 100}%` }}
               role="progressbar"
+              aria-label="Progreso del quiz" // un progressbar necesita nombre (hallazgo 3773)
               aria-valuenow={preguntaActual}
               aria-valuemin={0}
               aria-valuemax={totalPreguntas}
@@ -509,7 +511,7 @@ export default function QuizFigurasRetoricaPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🎓</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🎓</span>
                 <div>
                   <strong>Estudiante de 4º ESO / Bachillerato</strong>
                   <div className={styles.escenarioSubtitle}>Preparando selectividad (EvAU / PAU)</div>
@@ -528,7 +530,7 @@ export default function QuizFigurasRetoricaPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>📖</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">📖</span>
                 <div>
                   <strong>Estudiante de Filología</strong>
                   <div className={styles.escenarioSubtitle}>Análisis literario y estilístico</div>
@@ -547,7 +549,7 @@ export default function QuizFigurasRetoricaPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>📝</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">📝</span>
                 <div>
                   <strong>Opositor a Secundaria</strong>
                   <div className={styles.escenarioSubtitle}>Especialidad de Lengua Castellana y Literatura</div>
@@ -566,7 +568,7 @@ export default function QuizFigurasRetoricaPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>📚</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">📚</span>
                 <div>
                   <strong>Lector Curioso</strong>
                   <div className={styles.escenarioSubtitle}>Enriquecer la comprensión lectora</div>

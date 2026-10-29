@@ -670,7 +670,7 @@ test.describe('Inspector 29/10/2026 · móvil 360 × 780', () => {
 
 test.describe('Inspector 29/10/2026 · hallazgos', () => {
   test('hallazgo · el tiempo usa «min» para los minutos, no «m» (el metro)', async ({ page }) => {
-    test.fail(); // ABIERTO — formatTiempo (page.tsx:184-188) escribe `${m}m ${s}s`: «2m 15s». «m» es
+    // REPARADO (3772, 29/10/2026) en las cuatro copias: «2 min 15 s». Era: formatTiempo (page.tsx:184-188) escribe `${m}m ${s}s`: «2m 15s». «m» es
     // el símbolo del metro; el minuto es «min», como ya escribe lib/formatters.ts (formatDuration).
     // Medido 29/10/2026: partida de 15 preguntas con el reloj adelantado 125 s → «2m 15s».
     // La misma función está copiada en quiz-verbos-irregulares, quiz-metrica-estrofas y
@@ -696,7 +696,7 @@ test.describe('Inspector 29/10/2026 · hallazgos', () => {
   });
 
   test('hallazgo · la barra de progreso tiene nombre accesible', async ({ page }) => {
-    test.fail(); // ABIERTO — page.tsx:266-273: role="progressbar" sin aria-label ni aria-labelledby;
+    // REPARADO (3773, 29/10/2026): «Progreso del quiz», también en las hermanas sin nombre. Era: page.tsx:266-273: role="progressbar" sin aria-label ni aria-labelledby;
     // el árbol de accesibilidad da «- progressbar» a secas (medido 29/10/2026). WAI-ARIA 1.2 exige
     // nombre a progressbar. La misma barra está en ocho quizzes de la familia.
     await abrir(page);
@@ -705,7 +705,7 @@ test.describe('Inspector 29/10/2026 · hallazgos', () => {
   });
 
   test('hallazgo · los iconos de los cuatro perfiles de la guía llevan aria-hidden', async ({ page }) => {
-    test.fail(); // ABIERTO — page.tsx:512, 531, 550 y 569: <span className={styles.escenarioIcon}>🎓</span>
+    // REPARADO (3774, 29/10/2026). Era: page.tsx:512, 531, 550 y 569: <span className={styles.escenarioIcon}>🎓</span>
     // (📖, 📝, 📚) junto al <strong> del perfil, sin aria-hidden (sí lo llevan tipIcon y warningIcon).
     await abrir(page);
     const sinOcultar = await page.locator('[class*="escenarioIcon"]').evaluateAll((ss) =>
@@ -715,7 +715,7 @@ test.describe('Inspector 29/10/2026 · hallazgos', () => {
   });
 
   test('hallazgo · los ejemplos de Alegoría son un texto alegórico, no su descripción', () => {
-    test.fail(); // ABIERTO — data/figuras-retoricas.ts:330-333: tres de los cuatro «ejemplos» describen
+    // REPARADO (3775, 29/10/2026). Era: data/figuras-retoricas.ts:330-333: tres de los cuatro «ejemplos» describen
     // la figura («los prisioneros… representan la ignorancia», «el jardín… representa el alma»,
     // «El laberinto como metáfora de la mente humana, desarrollada en toda la novela»). El último dice
     // «metáfora», y la alegoría es, por la definición del propio banco, una «Metáfora extendida»: en

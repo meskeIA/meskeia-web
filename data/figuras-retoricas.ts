@@ -328,9 +328,11 @@ export const figurasRetorica: FiguraRetorica[] = [
     nivel: 'avanzado',
     ejemplos: [
       'La vida es un río: nace pequeño en la montaña, crece, supera obstáculos y al final desemboca en el mar (la muerte).',
-      'La caverna de Platón: los prisioneros encadenados representan la ignorancia humana y las sombras representan las apariencias.',
-      'El jardín abandonado a lo largo del poema representa el alma en pecado.',
-      'El laberinto como metáfora de la mente humana, desarrollada en toda la novela.',
+      // Hallazgo 3775: tres ejemplos describían la figura y daban su clave («representa…», «como
+      // metáfora de…»), y el que decía «metáfora» castigaba a quien elegía Metáfora. Ahora son
+      // textos alegóricos, sin nombrar la figura ni su sentido.
+      'Nuestras vidas son los ríos / que van a dar en la mar, / que es el morir; / allí van los señoríos / derechos a se acabar / y consumir (Jorge Manrique).',
+      'Unos prisioneros encadenados en una cueva solo ven sombras en la pared y las toman por el mundo real; cuando uno sale y ve el sol, los demás no le creen (Platón).',
     ],
   },
 
