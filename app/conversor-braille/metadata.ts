@@ -40,12 +40,13 @@ export const jsonLd = generateWebAppSchema({
   url: 'https://meskeia.com/conversor-braille/',
   category: 'UtilityApplication',
   features: [
-    'Conversión bidireccional texto ↔ Braille',
-    'Alfabeto Braille español completo (ñ, vocales acentuadas)',
-    'Visualización con celdas Braille Unicode',
-    'Soporte para números y signos de puntuación',
+    'Conversión bidireccional texto ↔ braille español según el Documento Técnico B 2 de la Comisión Braille Española',
+    'Alfabeto braille español completo (ñ, vocales acentuadas) y signos de puntuación',
+    'Números con signo de número, coma decimal, punto de millar, ordinales (1.º, 2.ª, 3.er), «n.º» y fracciones (½, ¾)',
+    'Hoja imprimible a escala real (Marburg Medium o ADA) con regla de calibración de 100 mm y modo espejo para regleta y punzón',
+    'Vista de los seis puntos de cada celda',
     'Teclado braille de seis puntos (F D S J K L, como una máquina Perkins) o puntos táctiles para escribir celdas y traducirlas',
-    'En español',
+    'Avisa de lo que no puede escribir o leer en vez de omitirlo en silencio',
   ],
   keywords: ['Braille', 'accesibilidad', 'discapacidad visual', 'conversor texto Braille'],
 });

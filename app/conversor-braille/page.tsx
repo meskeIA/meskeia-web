@@ -101,7 +101,9 @@ const esSeparadorDecimal = (caracteres: string[], i: number): boolean => {
   const c = caracteres[i];
   const esCifra = (x: string | undefined) => x !== undefined && ES_CIFRA.test(x);
   if (!esCifra(caracteres[i - 1]) || !esCifra(caracteres[i + 1])) return false;
-  if (APOSTROFOS.has(c)) return !minutosYSegundos(caracteres).separador.has(i);
+  if (APOSTROFOS.has(c)) {
+    return !minutosYSegundos(caracteres).separador.has(i) && !medidasAngulares(caracteres).has(i);
+  }
   if (c !== '.') return false;
   let j = i + 1;
   while (esCifra(caracteres[j])) j++;
@@ -110,6 +112,54 @@ const esSeparadorDecimal = (caracteres: string[], i: number): boolean => {
 
 /** Lo que cierra los segundos en «2’54”»: la comilla de cierre, el signo de segundo o dos apóstrofos. */
 const CIERRES_DE_SEGUNDOS = new Set(['”', '″', '"']);
+
+/**
+ * ¿La comilla doble de la posición `j` cierra unas comillas abiertas antes? (hallazgo 3763)
+ * «“73’81”» es el decimal del § 8.1 entre comillas, no 73 minutos y 81 segundos. La ” cierra si
+ * hay una “ sin cerrar delante; la " recta, si delante hay un número impar de ellas. El ″ (signo
+ * de segundo) nunca es una comilla.
+ */
+const cierraComillas = (caracteres: string[], j: number): boolean => {
+  const antes = caracteres.slice(0, j);
+  if (caracteres[j] === '”') {
+    return antes.filter((c) => c === '“').length > antes.filter((c) => c === '”').length;
+  }
+  if (caracteres[j] === '"') return antes.filter((c) => c === '"').length % 2 === 1;
+  return false;
+};
+
+/**
+ * ⚠️ 29/10/2026 (hallazgo 3763) — B 2 § 14.1, literal: «9°18’27” → #i>#ah8 #bg88», con el grado
+ * 356, el minuto 1256 y el segundo 1256-1256. La regla del § 14.3 (hallazgo 3588) tomaba por hora
+ * todo «cifras ’ cifras ”», y con el grado delante escribía los dos puntos: unas coordenadas
+ * («40°25’08”N») se punzaban como una hora, y la vuelta las leía «918:27».
+ *
+ * Con un grado detrás de una cifra, el ’ que sigue a las cifras de después es el minuto y el ” (o
+ * ″, o dos apóstrofos) que cierra las siguientes, el segundo. Esta app no escribe esos signos, igual
+ * que no escribe el grado (hallazgo 3556): se omiten y se avisa de ellos, sin cambiarlos por los dos
+ * puntos ni por un decimal. Devuelve la posición de cada marca y el carácter de la tinta.
+ */
+const medidasAngulares = (caracteres: string[]): Map<number, string> => {
+  const marcas = new Map<number, string>();
+  const esCifra = (c: string | undefined) => c !== undefined && ES_CIFRA.test(c);
+  const esMinuto = (c: string | undefined) => c !== undefined && (APOSTROFOS.has(c) || c === '′');
+  for (let i = 1; i < caracteres.length; i++) {
+    if (caracteres[i] !== '°' || !esCifra(caracteres[i - 1])) continue;
+    let j = i + 1;
+    while (esCifra(caracteres[j])) j++;
+    if (j === i + 1 || !esMinuto(caracteres[j])) continue;
+    marcas.set(j, caracteres[j]);
+    let k = j + 1;
+    while (esCifra(caracteres[k])) k++;
+    if (k === j + 1) continue;
+    if (CIERRES_DE_SEGUNDOS.has(caracteres[k] ?? '')) marcas.set(k, caracteres[k]);
+    else if (APOSTROFOS.has(caracteres[k] ?? '') && APOSTROFOS.has(caracteres[k + 1] ?? '')) {
+      marcas.set(k, caracteres[k]);
+      marcas.set(k + 1, caracteres[k + 1]);
+    }
+  }
+  return marcas;
+};
 
 /**
  * ⚠️ 28/10/2026 (hallazgo 3588) — la reparación del 3553 hizo decimal CUALQUIER apóstrofo entre
@@ -125,12 +175,15 @@ const CIERRES_DE_SEGUNDOS = new Set(['”', '″', '"']);
 const minutosYSegundos = (caracteres: string[]): { separador: Set<number>; cierre: Set<number> } => {
   const separador = new Set<number>();
   const cierre = new Set<number>();
+  const angulares = medidasAngulares(caracteres);
   for (let i = 1; i < caracteres.length; i++) {
     if (!APOSTROFOS.has(caracteres[i]) || !ES_CIFRA.test(caracteres[i - 1])) continue;
+    // Hallazgo 3763: con el grado delante es un ángulo (§ 14.1), no una hora
+    if (angulares.has(i)) continue;
     let j = i + 1;
     while (j < caracteres.length && ES_CIFRA.test(caracteres[j])) j++;
     if (j === i + 1) continue;
-    if (CIERRES_DE_SEGUNDOS.has(caracteres[j] ?? '')) {
+    if (CIERRES_DE_SEGUNDOS.has(caracteres[j] ?? '') && !cierraComillas(caracteres, j)) {
       separador.add(i);
       cierre.add(j);
     } else if (APOSTROFOS.has(caracteres[j] ?? '') && APOSTROFOS.has(caracteres[j + 1] ?? '')) {
@@ -210,19 +263,27 @@ const ordinalesYFracciones = (caracteres: string[]): Map<number, { celdas: strin
     }
     // § 8.3: cifras que empiezan número (ni detrás de otra cifra ni de un separador entre cifras)
     if (!esCifra(c) || esCifra(caracteres[i - 1])) continue;
-    if (/^[ .,’']$/.test(caracteres[i - 1] ?? '') && esCifra(caracteres[i - 2])) continue;
     let j = i;
     while (esCifra(caracteres[j])) j++;
+    // Hallazgo 3764: tras un blanco solo es grupo de millar un grupo de TRES cifras (§ 8.1); «57 2.º»
+    // y «12 3.º» son un número y un ordinal. Tras punto, coma o apóstrofo, sigue el mismo número.
+    const prev = caracteres[i - 1] ?? '';
+    if (esCifra(caracteres[i - 2]) && (/^[.,’']$/.test(prev) || (prev === ' ' && j - i === 3))) {
+      i = j - 1;
+      continue;
+    }
     const conPunto = caracteres[j] === '.';
     const marca = caracteres[conPunto ? j + 1 : j];
+    /** Hallazgo 3765: «1.er o 1er · 3.er o 3er → #,r · #:r» (§ 8.3), con punto y sin él. */
+    const e = conPunto ? j + 1 : j;
     let letra = '';
     let hasta = 0;
     if (marca === 'º' || marca === 'ª') {
       letra = marca === 'º' ? '⠕' : '⠁';
       hasta = (conPunto ? j + 1 : j) + 1;
-    } else if (conPunto && caracteres[j + 1] === 'e' && caracteres[j + 2] === 'r' && !ES_LETRA.test(caracteres[j + 3] ?? '')) {
+    } else if (caracteres[e] === 'e' && caracteres[e + 1] === 'r' && !ES_LETRA.test(caracteres[e + 2] ?? '')) {
       letra = '⠗';
-      hasta = j + 3;
+      hasta = e + 2;
     }
     if (letra) {
       const cifras = caracteres.slice(i, j).map((x) => CIFRA_BAJA[x]).join('');
@@ -259,6 +320,41 @@ const leerOrdinal = (celdas: string[], i: number): { texto: string; hasta: numbe
   if (!cifras || !fin) return null;
   if (ES_LETRA.test(brailleToText[celdas[j + 1] ?? ''] ?? '')) return null;
   return { texto: cifras + fin, hasta: j + 1 };
+};
+
+/** Numerador y denominador → la fracción de un solo signo en tinta («3/4» → «¾»). */
+const FRACCION_DE: { [clave: string]: string } = Object.fromEntries(
+  Object.entries(FRACCIONES).map(([signo, [numerador, denominador]]) => [`${numerador}/${denominador}`, signo]),
+);
+/** Cifras en posición baja que no son además un signo de puntuación de la tabla: 4, 7, 9 y 0. */
+const CIFRAS_BAJAS_SIN_PUNTUACION = '⠲⠶⠔⠴';
+
+/**
+ * ⚠️ 29/10/2026 (hallazgo 3766) — en «Braille → Texto», una fracción de las que escribe la ida
+ * (§ 8.4, «¾ → #c*»): signo de número, cifras en posición normal y cifras en posición baja. e4b499d9
+ * decidió no leerlas porque «#a;» tiene la forma de «1;», y eso sigue: solo se leen las que llevan
+ * en el denominador una cifra baja que NO es un signo de puntuación de la tabla (4, 7, 9 o 0: ¼ ¾
+ * ⅐ ⅑ ⅒) y que existen como signo de tinta. Antes ⠲ y ⠴ pasaban sin traducir con el aviso de que no
+ * estaban en la signografía básica, que es el B 2 donde son el 4 y el 0 en posición baja.
+ */
+const leerFraccion = (celdas: string[], i: number): { texto: string; hasta: number } | null => {
+  if (celdas[i] !== NUMBER_INDICATOR) return null;
+  let j = i + 1;
+  let numerador = '';
+  while (j < celdas.length && PRIMERA_SERIE.test(brailleToText[celdas[j]] ?? '')) {
+    numerador += '1234567890'['abcdefghij'.indexOf(brailleToText[celdas[j]])];
+    j++;
+  }
+  const desde = j;
+  let denominador = '';
+  while (j < celdas.length && CIFRAS_BAJAS.includes(celdas[j])) {
+    denominador += '1234567890'[CIFRAS_BAJAS.indexOf(celdas[j])];
+    j++;
+  }
+  if (!numerador || !denominador) return null;
+  if (!celdas.slice(desde, j).some((c) => CIFRAS_BAJAS_SIN_PUNTUACION.includes(c))) return null;
+  const signo = FRACCION_DE[`${numerador}/${denominador}`];
+  return signo ? { texto: signo, hasta: j } : null;
 };
 
 /** ¿Hay en el braille un ordinal que `leerOrdinal` no lee (con una letra detrás)? */
@@ -669,6 +765,7 @@ const esLetraCooficialSinEscribir = (c: string): boolean =>
 const comillasSimplesOmitidas = (texto: string): boolean => {
   const caracteres = Array.from(texto);
   const tiempos = minutosYSegundos(caracteres);
+  const angulares = medidasAngulares(caracteres);
   return caracteres.some(
     (c, i) =>
       COMILLAS_SIMPLES.has(c) &&
@@ -676,9 +773,16 @@ const comillasSimplesOmitidas = (texto: string): boolean => {
       !esSeparadorDecimal(caracteres, i) &&
       // «2’54”» y «2'54''» (hallazgo 3588): ni el apóstrofo ni el cierre son comillas
       !tiempos.separador.has(i) &&
-      !tiempos.cierre.has(i),
+      !tiempos.cierre.has(i) &&
+      // «9°18’27”» (hallazgo 3763): minuto y segundo, con su propio aviso
+      !angulares.has(i),
   );
 };
+
+/** Las marcas de minuto y segundo de un ángulo que no se han escrito (hallazgo 3763), sin repetir. */
+const angularesOmitidos = (texto: string): string[] => [
+  ...new Set(medidasAngulares(normalizarTinta(texto)).values()),
+];
 
 /**
  * Cómo nombrar en el aviso un carácter que no se ve.
@@ -804,6 +908,8 @@ export default function ConversorBraillePage() {
     cooficialesOmitidas.length > 0
       ? [...new Set(Array.from(input.toLowerCase()).filter((c) => VOCALES_AGUDAS_CATALANAS.has(c)))]
       : [];
+  /** Minuto y segundo de un ángulo, que no se escriben (§ 14.1, hallazgo 3763). */
+  const marcasAngulares = mode === 'textToBraille' && result ? angularesOmitidos(input) : [];
   /** Teléfonos escritos sin blancos (§ 8.1, hallazgo 3526). */
   const telefonos = mode === 'textToBraille' && result ? telefonosDelTexto(input) : [];
   /** Cantidades con puntos que tienen forma de teléfono (§ 8.1, hallazgo 3552). */
@@ -858,7 +964,8 @@ export default function ConversorBraillePage() {
         continue;
       }
       // Las cifras en posición baja de un ordinal que se ha leído (⠲ ⠶ ⠔ ⠴ no tienen otro uso)
-      const ordinal = leerOrdinal(celdas, i);
+      // … y las de una fracción leída (hallazgo 3766)
+      const ordinal = leerOrdinal(celdas, i) ?? leerFraccion(celdas, i);
       if (ordinal) {
         for (let k = i; k < ordinal.hasta; k++) formanCompuesto.add(k);
         i = ordinal.hasta - 1;
@@ -1027,6 +1134,7 @@ export default function ConversorBraillePage() {
     const sinPuntoDeSigla = puntosDeSigla(caracteres);
     const romanos = numerosRomanos(caracteres);
     const tiempos = minutosYSegundos(caracteres);
+    const angulares = medidasAngulares(caracteres);
     const ordinales = ordinalesYFracciones(caracteres);
 
     for (let i = 0; i < caracteres.length; i++) {
@@ -1063,6 +1171,12 @@ export default function ConversorBraillePage() {
         continue;
       }
       if (tiempos.cierre.has(i)) continue;
+      // B 2 § 14.1 (hallazgo 3763): el minuto y el segundo de un ángulo no se escriben; los nombra
+      // el aviso de `angularesOmitidos`, y el número siguiente lleva su propio signo de número.
+      if (angulares.has(i)) {
+        enExpresionNumerica = false;
+        continue;
+      }
 
       if (/[0-9]/.test(char)) {
         if (!enExpresionNumerica) {
@@ -1213,7 +1327,8 @@ export default function ConversorBraillePage() {
       }
 
       // B 2 § 8.3 (C0506): «⠼⠂⠕» es «1.º», no un signo de número seguido de «,o»
-      const ordinal = leerOrdinal(celdas, i);
+      // B 2 § 8.4 (hallazgo 3766): «⠼⠉⠲» es «¾»
+      const ordinal = leerOrdinal(celdas, i) ?? leerFraccion(celdas, i);
       if (ordinal) {
         result += ordinal.texto;
         enExpresionNumerica = false;
@@ -1567,6 +1682,21 @@ export default function ConversorBraillePage() {
               </p>
             )}
 
+            {marcasAngulares.length > 0 && (
+              <p className={styles.avisoConversion} role="alert">
+                <span aria-hidden="true">⚠️</span>{' '}
+                <span>
+                  Detrás de un grado, el minuto y el segundo de una medida angular tampoco se han
+                  escrito, y no están en el resultado:
+                </span>{' '}
+                <strong>{marcasAngulares.join(' · ')}</strong>.{' '}
+                <span>
+                  El Documento Técnico B 2 (§ 14.1) les da celda propia. No se han cambiado por los
+                  dos puntos de una hora, que el B 2 reserva para tiempos como «2’54”».
+                </span>
+              </p>
+            )}
+
             {cooficialesOmitidas.length > 0 && (
               <p className={styles.avisoConversion} role="alert">
                 <span aria-hidden="true">⚠️</span>{' '}
@@ -1704,8 +1834,8 @@ export default function ConversorBraillePage() {
                 <span aria-hidden="true">⚠️</span>{' '}
                 <span>
                   {celdasSinTexto.length === 1
-                    ? 'Esta celda no tiene equivalente en la signografía básica que cubre esta app y ha pasado al resultado sin traducir:'
-                    : 'Estas celdas no tienen equivalente en la signografía básica que cubre esta app y han pasado al resultado sin traducir:'}
+                    ? 'Esta app no sabe leer esta celda en este sitio, y ha pasado al resultado sin traducir:'
+                    : 'Esta app no sabe leer estas celdas en este sitio, y han pasado al resultado sin traducir:'}
                 </span>{' '}
                 <strong>{celdasSinTexto.join(' ')}</strong>.
               </p>

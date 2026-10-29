@@ -2885,13 +2885,15 @@ test.describe('inspector 26/10/2026', () => {
     await page.getByRole('button', { name: 'Braille → Texto' }).click();
     for (const p of [1, 2, 3, 4, 5, 6]) await page.getByRole('button', { name: `Punto ${p}`, exact: true }).click();
     await page.getByRole('button', { name: /^Escribir celda/ }).click();
-    const avisoCeldas = page.locator('[class*="avisoConversion"]').filter({ hasText: 'equivalente' });
-    await expect(avisoCeldas).toContainText('Esta celda no tiene'); // precondición
+    // 29/10/2026 (hallazgo 3766): el aviso ya no dice «no tiene equivalente en la signografía
+    // básica», que negaba el B 2; dice «no sabe leer esta celda».
+    const avisoCeldas = page.locator('[class*="avisoConversion"]').filter({ hasText: 'no sabe leer' });
+    await expect(avisoCeldas).toContainText('no sabe leer esta celda'); // precondición
     await traducir(page);
     for (const p of [1, 2, 4, 6]) await page.getByRole('button', { name: `Punto ${p}`, exact: true }).click();
     await page.getByRole('button', { name: /^Escribir celda/ }).click();
     await expect(avisoCeldas.locator('strong')).toHaveText('⠿ ⠫'); // precondición: el <strong> sí cambia
-    await expect(avisoCeldas).toContainText('Estas celdas no tienen', { timeout: 3000 });
+    await expect(avisoCeldas).toContainText('no sabe leer estas celdas', { timeout: 3000 });
     await expect(avisoCeldas).toContainText('han pasado al resultado sin traducir');
 
     // (c) «a⠁b» en Braille → Texto y «Borrar última»: queda una sola letra en tinta, la «a».
@@ -3947,14 +3949,13 @@ test.describe('inspector 29/10/2026', () => {
   });
 
   // ─────────────────────────────────────────────────────────────────────────
-  // CASO 2 (límite) — ABIERTO (inspector 29/10/2026): § 8.3 «1er» y «3er», sin punto
+  // CASO 2 (límite) — REPARADO (hallazgo 3765, 29/10/2026): § 8.3 «1er» y «3er», sin punto
   // ─────────────────────────────────────────────────────────────────────────
   //
   // El § 8.3 da las dos grafías en el mismo ejemplo, «1.er o 1er · 3.er o 3er → #,r · #:r», y la app
-  // solo reconoce la que lleva punto: «1er» sale ⠼⠁⠐⠑⠗ y «3er» ⠼⠉⠐⠑⠗ (la cifra en su posición normal,
+  // solo reconocía la que lleva punto: «1er» salía ⠼⠁⠐⠑⠗ y «3er» ⠼⠉⠐⠑⠗ (la cifra en su posición normal,
   // el prefijo de latina minúscula y las letras «e» y «r»), mientras «1.er» y «3.er» salen ⠼⠂⠗ y ⠼⠒⠗.
-  test('ABIERTO — CASO 2 (límite) — § 8.3: «1er» y «3er», sin punto, son #,r y #:r igual que «1.er» y «3.er»', async ({ page }) => {
-    test.fail();
+  test('REPARADO 3765 — CASO 2 (límite) — § 8.3: «1er» y «3er», sin punto, son #,r y #:r igual que «1.er» y «3.er»', async ({ page }) => {
     const casos: Array<[string, string]> = [
       ['1er', '⠼⠂⠗'], // ⠼ · 1 en posición baja ⠂ (2) · r ⠗ (1235)
       ['3er', '⠼⠒⠗'], // ⠼ · 3 en posición baja ⠒ (25) · r ⠗
@@ -3970,16 +3971,17 @@ test.describe('inspector 29/10/2026', () => {
   });
 
   // ─────────────────────────────────────────────────────────────────────────
-  // ABIERTO (inspector 29/10/2026) — § 8.3: el ordinal detrás de un número y un blanco
+  // REPARADO (hallazgo 3764, 29/10/2026) — § 8.3: el ordinal detrás de un número y un blanco
   // ─────────────────────────────────────────────────────────────────────────
   //
-  // `ordinalesYFracciones` salta toda cifra precedida de blanco, punto, coma o apóstrofo con otra
+  // `ordinalesYFracciones` saltaba toda cifra precedida de blanco, punto, coma o apóstrofo con otra
   // cifra delante, para no tomar por ordinal el segundo grupo de «10 000» o de «1.5». Pero un ordinal
   // también puede ir detrás de un número y un blanco: la línea de resultados del § 14.3 escrita de un
-  // tirón da el primer ordinal bien y el segundo como «2.» (⠼⠃⠄), con el aviso de que la app «aún no
-  // escribe» la º que acaba de escribir dos palabras antes. Lo mismo un piso tras el número de portal.
-  test('ABIERTO — § 8.3: el ordinal que va detrás de un número y un blanco también se escribe («… 02:08:57 2.º …», «Mayor 12 3.º»)', async ({ page }) => {
-    test.fail();
+  // tirón daba el primer ordinal bien y el segundo como «2.» (⠼⠃⠄), con el aviso de que la app «aún no
+  // escribe» la º que acaba de escribir dos palabras antes. Ahora, tras un blanco, solo se salta un
+  // grupo de TRES cifras, que es lo único que puede ser un grupo de millar. El «10 000» lo sigue
+  // vigilando el REPARADO (3526).
+  test('REPARADO 3764 — § 8.3: el ordinal que va detrás de un número y un blanco también se escribe («… 02:08:57 2.º …», «Mayor 12 3.º»)', async ({ page }) => {
     const casos: Array<[string, string]> = [
       // § 14.3 en una línea: #,o #jb:#jh:#eg #;o #jb:#aj:#bb (el blanco tras «57» separa; «2» no es grupo de millar)
       ['1.º 02:08:57 2.º 02:10:22', '⠼⠂⠕⠀⠼⠚⠃⠒⠼⠚⠓⠒⠼⠑⠛⠀⠼⠆⠕⠀⠼⠚⠃⠒⠼⠁⠚⠒⠼⠃⠃'],
@@ -3997,10 +3999,14 @@ test.describe('inspector 29/10/2026', () => {
   });
 
   // ─────────────────────────────────────────────────────────────────────────
-  // CASO 3 (rechazo) — ABIERTO (inspector 29/10/2026): la regla «2’54”» del § 14.3 fuera de su caso
+  // CASO 3 (rechazo) — REPARADO (hallazgo 3763, 29/10/2026): la regla «2’54”» del § 14.3 fuera de su caso
   // ─────────────────────────────────────────────────────────────────────────
   //
-  // dfc246e6 toma por minutos y segundos TODO «cifras ’ cifras ”» y escribe los dos puntos ⠒ con otro
+  // Reparado sin escribir los signos del § 14.1, que el usuario no ha decidido escribir (C0506 fue
+  // solo ordinales, «n.º» y fracciones): con el grado delante, el ’ y el ” se omiten con su aviso
+  // (⠼⠊⠼⠁⠓⠼⠃⠛), y el ” que cierra una “ abierta antes es una comilla, no un segundo.
+  //
+  // Antes: dfc246e6 tomaba por minutos y segundos TODO «cifras ’ cifras ”» y escribía los dos puntos ⠒ con otro
   // signo de número, quitando el ” sin aviso. El § 14.3 lo reserva para las «grafías no adecuadas del
   // tipo 2’54” […] fuera del contexto científico», y el § 14.1 trae el contraejemplo literal: con el
   // grado delante es una medida angular, «9°18’27” → #i>#ah8 #bg88», con el minuto 1256 y el segundo
@@ -4008,11 +4014,18 @@ test.describe('inspector 29/10/2026', () => {
   // «918:27»: unas coordenadas («40°25’08”N») salen como una hora. Y el ” que cierra unas comillas
   // también se lo come: «“73’81”» (el decimal del § 8.1 entre comillas; 81 segundos no existen) sale
   // ⠦⠼⠛⠉⠒⠼⠓⠁, «73:81» y las comillas sin cerrar.
-  test('ABIERTO — CASO 3 (rechazo) — § 14.1: «9°18’27”» es un ángulo y «“73’81”» un decimal entre comillas: ninguno lleva los dos puntos del § 14.3', async ({ page }) => {
-    test.fail();
+  test('REPARADO 3763 — CASO 3 (rechazo) — § 14.1: «9°18’27”» es un ángulo y «“73’81”» un decimal entre comillas: ninguno lleva los dos puntos del § 14.3', async ({ page }) => {
     await convertir29(page, '9°18’27”');
     const angulo = await resultado29(page);
     const avisosAngulo = await avisos29(page);
+    // Lo que hace hoy: ⠼⠊ · (° omitido) · ⠼⠁⠓ · (’ omitido) · ⠼⠃⠛ · (” omitido), sin ⠒
+    expect(angulo).toBe('⠼⠊⠼⠁⠓⠼⠃⠛');
+    // Las coordenadas del hallazgo, con la N detrás (⠨⠝): tampoco una hora
+    await convertir29(page, '40°25’08”N');
+    expect(await resultado29(page)).toBe('⠼⠙⠚⠼⠃⠑⠼⠚⠓⠨⠝');
+    // Y la hora del § 14.3 sigue: «2’54” → #b:#ed»
+    await convertir29(page, '2’54”');
+    expect(await resultado29(page)).toBe('⠼⠃⠒⠼⠑⠙');
     // La forma del B 2: ⠼⠊ · ⠴ (356, grado) · ⠼⠁⠓ · ⠳ (1256, minuto) · [⠀] · ⠼⠃⠛ · ⠳⠳ (segundo). Si la app
     // sigue sin escribir esos signos (la ° está entre los que no escribe, hallazgo 3556), que los omita
     // avisando del minuto y del segundo, no que los cambie por los dos puntos y por nada.
@@ -4032,16 +4045,21 @@ test.describe('inspector 29/10/2026', () => {
   });
 
   // ─────────────────────────────────────────────────────────────────────────
-  // ABIERTO (inspector 29/10/2026) — § 8.4: la vuelta de una fracción que la app escribe
+  // REPARADO (hallazgo 3766, 29/10/2026) — § 8.4: la vuelta de una fracción que la app escribe
   // ─────────────────────────────────────────────────────────────────────────
   //
+  // Ahora la vuelta lee las fracciones cuyo denominador lleva una cifra baja que no es puntuación
+  // (4, 7, 9, 0): «⠼⠉⠲» → «¾», «⠼⠁⠂⠴» → «⅒». Las de 2, 3, 5, 6 y 8 siguen sin leerse, como decidió
+  // e4b499d9 («#a;» es también «1;»). Y el aviso de celdas sin leer ya no dice que no estén en la
+  // signografía básica.
+  //
+  // Antes:
   // La ida escribe «¾» ⠼⠉⠲ (§ 8.4 «¾ → #c*»); con ⇄ y Convertir vuelve «3⠲» y el aviso «Esta celda no
   // tiene equivalente en la signografía básica que cubre esta app», que es el B 2: allí ⠲ (256) es el
   // 4 en posición baja del § 8.4, el asterisco del § 6.2 y el signo de dividir del § 12. Igual «⅒»
   // ⠼⠁⠂⠴ → «1,⠴», con ⠴ (356, el grado del § 14.1). Que la fracción no se lea en la vuelta lo decidió
   // e4b499d9; lo que no se sostiene es negar que la celda esté en el documento que la app sigue.
-  test('ABIERTO — § 8.4: en Braille → Texto, ⠲ y ⠴ de una fracción que la app escribe no se avisan como «sin equivalente en la signografía básica»', async ({ page }) => {
-    test.fail();
+  test('REPARADO 3766 — § 8.4: en Braille → Texto, ⠲ y ⠴ de una fracción que la app escribe no se avisan como «sin equivalente en la signografía básica»', async ({ page }) => {
     await convertir29(page, '¾');
     await expect(cajaResultado(page)).toHaveText('⠼⠉⠲', { timeout: 3000 }); // la ida, que pasa
     await page.getByRole('button', { name: 'Intercambiar dirección de conversión' }).click();
@@ -4056,17 +4074,21 @@ test.describe('inspector 29/10/2026', () => {
       cifraUno: vueltaDecimo.startsWith('1') || vueltaDecimo === '⅒',
       niegaElB2: [avisosTres, avisosDecimo].some((a) => a.includes('no tiene equivalente en la signografía básica')),
     }).toEqual({ cifraTres: true, cifraUno: true, niegaElB2: false });
+    expect([vueltaTres, vueltaDecimo]).toEqual(['¾', '⅒']);
+    expect(avisosTres + avisosDecimo).not.toContain('sin traducir');
+    // «⠼⠁⠆» (½) sigue sin leerse como fracción: es también «1;» (e4b499d9)
+    await convertir29(page, '⠼⠁⠆', 'braille');
+    expect(await resultado29(page)).toBe('1;');
   });
 
   // ─────────────────────────────────────────────────────────────────────────
-  // ABIERTO (inspector 29/10/2026) — featureList del JSON-LD
+  // REPARADO (hallazgo 3767, 29/10/2026) — featureList del JSON-LD
   // ─────────────────────────────────────────────────────────────────────────
   //
-  // Seis características, ninguna falsa, pero no anuncian ni la hoja imprimible a escala real (con su
+  // Antes: seis características, ninguna falsa, pero no anunciaban ni la hoja imprimible a escala real (con su
   // regla de 100 mm y el modo espejo para regleta y punzón) ni los signos numéricos del B 2 que la app
   // escribe desde el 28/10 (ordinales, «n.º», fracciones), y una de las seis es «En español».
-  test('ABIERTO — JSON-LD: el featureList anuncia la hoja imprimible y los ordinales y fracciones del B 2', async ({ page }) => {
-    test.fail();
+  test('REPARADO 3767 — JSON-LD: el featureList anuncia la hoja imprimible y los ordinales y fracciones del B 2', async ({ page }) => {
     await page.goto(RUTA);
     const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
     const app = bloques
