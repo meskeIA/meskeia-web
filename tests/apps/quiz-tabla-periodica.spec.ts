@@ -142,7 +142,8 @@ const botonAvanzar = (p: Page): Locator =>
 
 /** Texto de una opción sin la letra A/B/C/D del recuadro. */
 function limpiar(texto: string): string {
-  return texto.replace(/^[ABCD]\s*/, '').replace(/\s+/g, ' ').trim();
+  // Sin la ✓ / ✗ que la opción lleva tras contestar desde el 29/10/2026 (hallazgo 3776)
+  return texto.replace(/^[ABCD]\s*/, '').replace(/\s*[✓✗]\s*$/, '').replace(/\s+/g, ' ').trim();
 }
 
 /** Lee el enunciado en pantalla y devuelve su respuesta correcta según la clave a mano. */
@@ -1647,7 +1648,7 @@ test.describe('Quiz Tabla Periódica · inspector 29/10/2026 (escritorio)', () =
    * DEBERÍA: la buena y la fallada se distinguen sin el color, a la vista y en el nombre accesible.
    */
   test('caso 30 · accesibilidad: la opción correcta y la fallada no se distinguen solo por el color', async ({ page }) => {
-    test.fail(); // HALLAZGO abierto: falla por las aserciones finales, no por el montaje
+    // REPARADO (3776, 29/10/2026): ✓/✗ visibles y el veredicto en el aria-label, como la referencia
     await empezarConBanco(page, 'Empezar quiz', PRIMERAS_DIEZ);
     await pulsarOpcion(page, '47');
     await expect(page.locator('[class*="feedbackIncorrecto"]')).toBeVisible();

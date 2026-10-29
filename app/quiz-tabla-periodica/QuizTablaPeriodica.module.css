@@ -257,6 +257,13 @@
   color: white;
 }
 
+/* ✓ y ✗ tras responder: la buena y la fallada no se distinguen solo por el color (hallazgo 3776) */
+.opcionMarca { font-size: 1rem; margin-left: auto; flex-shrink: 0; }
+.opcionCorrecta .opcionMarca { color: #15803d; }
+.opcionIncorrecta .opcionMarca { color: #b91c1c; }
+[data-theme='dark'] .opcionCorrecta .opcionMarca { color: #4ade80; }
+[data-theme='dark'] .opcionIncorrecta .opcionMarca { color: #fca5a5; }
+
 .opcionApagada {
   opacity: 0.4;
   cursor: default;

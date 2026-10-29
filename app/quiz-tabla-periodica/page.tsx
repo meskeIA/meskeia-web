@@ -10,7 +10,7 @@ import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
 import styles from './QuizTablaPeriodica.module.css';
-import { margenBarraLogo } from '@/lib';
+import { margenBarraLogo, enfocarSinCentrar } from '@/lib';
 import { useGuardaRafaga } from '@/lib/useGuardaRafaga';
 
 
@@ -73,7 +73,7 @@ export default function QuizTablaPeriodicaPage() {
    */
   const botonSiguienteRef = useRef<HTMLButtonElement>(null);
   useEffect(() => {
-    if (haRespondido) botonSiguienteRef.current?.focus();
+    if (haRespondido) enfocarSinCentrar(botonSiguienteRef.current); // sin centrarlo (3770)
   }, [haRespondido, indice]);
 
   /**
@@ -242,6 +242,17 @@ export default function QuizTablaPeriodicaPage() {
                     else if (i === seleccionada) clase = `${styles.opcion} ${styles.opcionIncorrecta}`;
                     else clase = `${styles.opcion} ${styles.opcionApagada}`;
                   }
+                  // Hallazgo 3776: la buena y la fallada se distinguían solo por el color (WCAG
+                  // 1.4.1). Receta de la referencia (quiz-literatura-universal, hallazgo 303): ✓/✗
+                  // visibles y el veredicto de cada opción en su nombre accesible.
+                  const letra = ['A', 'B', 'C', 'D'][i];
+                  const marca = !haRespondido
+                    ? ''
+                    : i === pregunta.correcta
+                      ? ' (respuesta correcta)'
+                      : i === seleccionada
+                        ? ' (tu respuesta, incorrecta)'
+                        : '';
                   return (
                     <button
                       key={i}
@@ -249,11 +260,14 @@ export default function QuizTablaPeriodicaPage() {
                       className={clase}
                       onClick={() => responder(i)}
                       disabled={haRespondido}
+                      aria-label={`${letra} ${opcion}${marca}`}
                     >
                       <span className={styles.opcionLetra}>
-                        {['A', 'B', 'C', 'D'][i]}
+                        {letra}
                       </span>
                       {opcion}
+                      {haRespondido && i === pregunta.correcta && <span className={styles.opcionMarca} aria-hidden="true">✓</span>}
+                      {haRespondido && i === seleccionada && i !== pregunta.correcta && <span className={styles.opcionMarca} aria-hidden="true">✗</span>}
                     </button>
                   );
                 })}
