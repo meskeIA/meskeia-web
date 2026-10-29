@@ -2,13 +2,14 @@
 // @disclaimer: exempt
 
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
-import { enfocarALaVista } from '@/lib';
+import { enfocarALaVista, enfocarSinCentrar } from '@/lib';
 import { useGuardaRafaga } from '@/lib/useGuardaRafaga';
 import styles from './QuizReinosNaturaleza.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { organismosNaturaleza, OrganismoNaturaleza } from '@/data/organismos-naturaleza';
+import { FAQ_HONGOS } from './faq';
 
 type Nivel = 'basico' | 'intermedio' | 'avanzado' | 'todos';
 type Pantalla = 'config' | 'quiz' | 'resultado';
@@ -146,7 +147,7 @@ export default function QuizReinosNaturalezaPage() {
     vistaRef.current = vista;
     if (venia === null || venia === vista) return;
     if (pantalla === 'quiz' && seleccionada === null) enfocarALaVista(enunciadoRef.current);
-    else if (pantalla === 'quiz') siguienteRef.current?.focus();
+    else if (pantalla === 'quiz') enfocarSinCentrar(siguienteRef.current); // sin centrarlo (3770)
     else if (pantalla === 'resultado') enfocarALaVista(resultadoRef.current);
   }, [pantalla, preguntaActual, seleccionada]);
 
@@ -163,7 +164,8 @@ export default function QuizReinosNaturalezaPage() {
   const formatTiempo = (seg: number): string => {
     const m = Math.floor(seg / 60);
     const s = seg % 60;
-    return m > 0 ? `${m}m ${s}s` : `${s}s`;
+    // «min» y «s»: «m» es el símbolo del metro (hallazgo 3772), como ya escribe quiz-paises-capitales
+    return m > 0 ? `${m} min ${s} s` : `${s} s`;
   };
 
   return (
@@ -246,6 +248,7 @@ export default function QuizReinosNaturalezaPage() {
               className={styles.progresoFill}
               style={{ width: `${(preguntaActual / totalPreguntas) * 100}%` }}
               role="progressbar"
+              aria-label="Progreso del quiz" // un progressbar necesita nombre (hallazgo 3773)
               aria-valuenow={preguntaActual}
               aria-valuemin={0}
               aria-valuemax={totalPreguntas}
@@ -451,7 +454,9 @@ export default function QuizReinosNaturalezaPage() {
                 <strong>Estudiante de Bachillerato / Selectividad</strong>
               </div>
               <p className={styles.escenarioExample}>La EvAU puede incluir preguntas sobre Archaea, Protista y diferencias pro/eucariota. Cada punto cuenta.</p>
-              <p className={styles.escenarioTip}>Practica en modo <strong>Todos</strong> y revisa las curiosidades científicas de cada feedback.</p>
+              {/* Hallazgo 3784: el quiz no tiene ninguna arquea entre sus 43 organismos; la guía
+                  no manda a practicarlas aquí, sino a la tabla y la FAQ de esta misma página */}
+              <p className={styles.escenarioTip}>Practica en modo <strong>Todos</strong> y revisa las curiosidades científicas de cada feedback. Las <strong>arqueas</strong> no salen en el quiz: repásalas en la tabla de los 6 reinos y en la pregunta sobre bacterias y arqueas de esta guía.</p>
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
@@ -481,8 +486,9 @@ export default function QuizReinosNaturalezaPage() {
               <dd>Depende del sistema de clasificación. El sistema de <strong>6 reinos</strong> (Animalia, Plantae, Fungi, Protista, Eubacteria, Archaea) es el más usado en la educación secundaria española. En investigación moderna se usa el sistema de 3 dominios (Bacteria, Archaea, Eukarya), que agrupa los primeros cuatro reinos bajo Eukarya.</dd>
             </div>
             <div className={styles.faqItem}>
-              <dt>¿Por qué los hongos no son plantas?</dt>
-              <dd>Porque no realizan la fotosíntesis. Los hongos son <strong>heterótrofos por absorción</strong>: secretan enzimas digestivas al exterior y absorben los nutrientes del medio. Además, su pared celular está hecha de <strong>quitina</strong> (como el exoesqueleto de los insectos), no de celulosa como las plantas.</dd>
+              {/* La misma pregunta y respuesta que el FAQPage (hallazgo 3782) */}
+              <dt>{FAQ_HONGOS.pregunta}</dt>
+              <dd>{FAQ_HONGOS.respuesta}</dd>
             </div>
             <div className={styles.faqItem}>
               <dt>¿Cuál es la diferencia entre bacteria y archaea?</dt>
@@ -540,7 +546,7 @@ export default function QuizReinosNaturalezaPage() {
               <span className={styles.stepNumber}>4</span>
               <div className={styles.stepContent}>
                 <strong>Eucariota: ¿es unicelular o pluricelular?</strong>
-                <p>Si es unicelular o forma colonias simples sin diferenciación de tejidos → muy probablemente <strong>Protista</strong>. Si es pluricelular con tejidos diferenciados → pasa al paso 5.</p>
+                <p>Si es unicelular o forma colonias simples sin diferenciación de tejidos → muy probablemente <strong>Protista</strong>. Si es pluricelular con tejidos diferenciados → pasa al paso 5. Ojo con la excepción: las <strong>esponjas</strong> son pluricelulares sin tejidos verdaderos y, aun así, son <strong>Animalia</strong> (sin pared celular, se alimentan filtrando el agua): con un pluricelular sin tejidos, pasa también al paso 5.</p>
               </div>
             </li>
             <li className={styles.step}>

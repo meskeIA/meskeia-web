@@ -638,7 +638,8 @@ test.describe('inspector 29/10/2026 · móvil 360 × 740', () => {
   });
 
   test('hallazgo · los botones de «Número de preguntas» caben en su tarjeta a 360 px', async ({ page }) => {
-    test.fail(); // ABIERTO — `.preguntasRow` (QuizReinosNaturaleza.module.css:98) es flex sin
+    // REPARADO (3785, 29/10/2026): flex-wrap, también en verbos-irregulares y figuras-retoricas.
+    // Era: `.preguntasRow` (QuizReinosNaturaleza.module.css:98) es flex sin
     // `flex-wrap` y centrado: a 360 px los tres botones necesitan 360 px y la tarjeta da 246 px de
     // contenido (57-303), así que salen por los dos lados hasta el borde de la pantalla (0-118,
     // 126-239, 247-360; medido 29/10/2026). A 320 px, 20 px de «10 preguntas» y de «20 preguntas»
@@ -661,7 +662,9 @@ test.describe('inspector 29/10/2026 · móvil 360 × 740', () => {
 
 test.describe('inspector 29/10/2026 · contenido', () => {
   test('hallazgo · «hongo frente a planta» tiene UNA respuesta en la FAQ visible y en el FAQPage', async ({ page }) => {
-    test.fail(); // ABIERTO — la misma pregunta con dos redacciones y dos respuestas. Visible
+    // REPARADO (3782, 29/10/2026): una sola constante, app/quiz-reinos-naturaleza/faq.ts, que
+    // importan page.tsx y metadata.ts; la respuesta nombra también a los simbiontes. Era: la misma
+    // pregunta con dos redacciones y dos respuestas. Visible
     // (page.tsx:484-485), «¿Por qué los hongos no son plantas?»: «heterótrofos por absorción…
     // quitina». FAQPage (metadata.ts:75-78), «¿Qué diferencia hay entre un hongo y una planta?»:
     // «obtienen energía descomponiendo materia orgánica o como parásitos», que deja fuera a los
@@ -670,14 +673,17 @@ test.describe('inspector 29/10/2026 · contenido', () => {
     // realizan». Reparación: UNA constante en metadata.ts que importen las dos bocas.
     await abrir(page);
     const visible = norm(await page.locator('[class*="faqItem"]', { hasText: '¿Por qué los hongos no son plantas?' }).locator('dd').textContent());
-    const ld = faqJsonLd.mainEntity.find((q) => /hongo y una planta/.test(q.name));
-    expect(ld).toBeTruthy();
+    const ld = faqJsonLd.mainEntity.filter((q) => /hongo/.test(q.name));
+    expect(ld, 'una sola pregunta sobre hongos en el FAQPage').toHaveLength(1);
+    expect(ld[0].name).toBe('¿Por qué los hongos no son plantas?');
     expect(organismo('trufa').curiosidad).toMatch(/simbiosis/);
-    expect(visible).toBe(norm(ld?.acceptedAnswer.text));
+    expect(visible).toBe(norm(ld[0].acceptedAnswer.text));
+    expect(visible, 'nombra a los simbiontes que enseña el banco').toMatch(/simbiosis/);
   });
 
   test('hallazgo · la guía de 7 pasos lleva la esponja a Animalia', async ({ page }) => {
-    test.fail(); // ABIERTO — paso 4 (page.tsx:542-543): «sin diferenciación de tejidos → muy
+    // REPARADO (3783, 29/10/2026): el paso 4 nombra la excepción de las esponjas y las manda al
+    // paso 5 aunque no tengan tejidos verdaderos. Era: paso 4 (page.tsx:542-543): «sin diferenciación de tejidos → muy
     // probablemente Protista. Si es pluricelular con tejidos diferenciados → pasa al paso 5», y solo
     // desde ahí se llega a Animalia (paso 6). El banco dice de la Esponja marina, que da como
     // «Animal (Porífero)», que «no tiene tejidos ni órganos diferenciados»: con la guía no llega a su
@@ -689,11 +695,16 @@ test.describe('inspector 29/10/2026 · contenido', () => {
     expect(esponja.grupo).toBe('Animal (Porífero)');
     const sinTejidosAProtista = /sin diferenciación de tejidos → muy probablemente Protista/.test(guia);
     const esponjaSinTejidos = /no tiene tejidos ni órganos diferenciados/.test(esponja.curiosidad);
-    expect({ sinTejidosAProtista, esponjaSinTejidos }).not.toEqual({ sinTejidosAProtista: true, esponjaSinTejidos: true });
+    // La regla puede seguir, si el mismo paso saca a las esponjas de ella y las lleva a Animalia
+    const excepcionEsponjas = /esponjas[^.]*sin tejidos verdaderos[^.]*Animalia/.test(guia);
+    expect(sinTejidosAProtista && esponjaSinTejidos && !excepcionEsponjas).toBe(false);
+    expect(excepcionEsponjas).toBe(true);
   });
 
   test('hallazgo · Archaea, uno de los «6 Reinos» de la guía, sale en alguna pregunta', async ({ page }) => {
-    test.fail(); // ABIERTO — la guía declara «Los 6 Reinos» con Archaea (page.tsx:376, 425) y, para la
+    // REPARADO (3784, 29/10/2026) bajando la promesa (Frontera N2 promesa): la guía ya no manda a
+    // practicar Archaea en el quiz y dice que las arqueas no salen en él. Si un día se añaden
+    // arqueas al banco, también pasa. Era: la guía declara «Los 6 Reinos» con Archaea (page.tsx:376, 425) y, para la
     // EvAU, que «puede incluir preguntas sobre Archaea», recomienda «Practica en modo Todos»
     // (page.tsx:453-454). Ninguno de los 43 organismos es una arquea ni lleva «Archaea» como
     // respuesta o distractor (contado en el banco el 29/10/2026: 0).
@@ -702,6 +713,7 @@ test.describe('inspector 29/10/2026 · contenido', () => {
     const guia = norm(await page.locator('[data-guia-educativa]').textContent());
     expect(guia).toMatch(/preguntas sobre Archaea/);
     const conArquea = organismosNaturaleza.filter((o) => /arque|archaea/i.test([o.grupo, ...o.confundibleCon].join(' ')));
-    expect(conArquea.length).toBeGreaterThan(0);
+    const avisaQueNoSalen = /arqueas no salen en el quiz/.test(guia);
+    expect(conArquea.length > 0 || avisaQueNoSalen, 'el quiz tiene arqueas o la guía dice que no las tiene').toBe(true);
   });
 });

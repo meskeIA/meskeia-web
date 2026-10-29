@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
+import { FAQ_HONGOS } from './faq';
 
 export const metadata: Metadata = {
   title: 'Quiz Reinos de la Naturaleza - ¿Animal, Planta, Hongo o Bacteria? | meskeIA',
@@ -72,10 +73,10 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Qué diferencia hay entre un hongo y una planta?',
+      name: FAQ_HONGOS.pregunta,
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Los hongos pertenecen al reino Fungi y los distingue de las plantas que no realizan fotosíntesis: obtienen energía descomponiendo materia orgánica o como parásitos. Además, su pared celular está hecha de quitina (como el exoesqueleto de los insectos), no de celulosa como en las plantas.',
+        text: FAQ_HONGOS.respuesta,
       },
     },
     {
