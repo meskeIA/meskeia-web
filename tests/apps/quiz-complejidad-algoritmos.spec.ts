@@ -528,7 +528,8 @@ test.describe('Inspector 28/10/2026 · hallazgos de la partida', () => {
   });
 
   test('hallazgo · la barra de progreso tiene nombre accesible', async ({ page }) => {
-    test.fail(); // ABIERTO — page.tsx:502-509: role="progressbar" sin aria-label ni aria-labelledby
+    // REPARADO (3691, con el 3773 de figuras-retoricas, 29/10/2026): «Progreso del quiz».
+    // Era: page.tsx:502-509: role="progressbar" sin aria-label ni aria-labelledby
     // (ARIA 1.2 exige nombre en progressbar; axe «aria-progressbar-name»). El lector dice «barra de
     // progreso, 0» sin decir de qué.
     await abrir(page);

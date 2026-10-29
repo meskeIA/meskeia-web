@@ -2,7 +2,7 @@
 // @disclaimer: exempt
 
 import { useEffect, useRef, useState } from 'react';
-import { enfocarALaVista } from '@/lib';
+import { enfocarALaVista, enfocarSinCentrar } from '@/lib';
 import { useGuardaRafaga } from '@/lib/useGuardaRafaga';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
@@ -335,7 +335,7 @@ export default function QuizComplejidadAlgoritmosPage() {
     pantallaRef.current = pantalla;
     if (venia === null || venia === pantalla) return;
     if (estado === 'jugando') enfocarALaVista(enunciadoRef.current);
-    else if (estado === 'respondida') siguienteRef.current?.focus();
+    else if (estado === 'respondida') enfocarSinCentrar(siguienteRef.current); // sin centrarlo (3770)
     else if (estado === 'fin') enfocarALaVista(resultadoRef.current);
     else if (estado === 'inicio') enfocarALaVista(inicioRef.current);
   }, [estado, indice]);
@@ -505,6 +505,7 @@ export default function QuizComplejidadAlgoritmosPage() {
                   className={styles.barraRelleno}
                   style={{ width: `${(indice / preguntas.length) * 100}%` }}
                   role="progressbar"
+                  aria-label="Progreso del quiz" // un progressbar necesita nombre (hallazgo 3773)
                   aria-valuenow={indice}
                   aria-valuemin={0}
                   aria-valuemax={preguntas.length}
