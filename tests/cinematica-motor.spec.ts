@@ -179,6 +179,31 @@ test.describe('Marcas de los ejes', () => {
     // bruto = 0,075 → potencia 0,01 → 0,1 es el primero ≥ 0,075
     expect(e.marcas).toEqual([0, 0.1, 0.2, 0.3]);
   });
+
+  // C0512 (caída en producción el 28/10/2026): con extremos que solo separa el redondeo,
+  // el paso salía tan pequeño que lo/paso pasaba de 2^53, k++ dejaba de avanzar y el bucle
+  // llenaba el array hasta «RangeError: Invalid array length». Esos rangos son una recta
+  // horizontal: se tratan como tal, con su margen alrededor.
+  for (const [min, max] of [
+    [0.3, 0.1 + 0.2],
+    [1, 1 + 2 ** -52],
+    [10, 10 + 2 ** -49],
+    [-4.9, -4.9 * (1 + 1e-13)],
+  ] as const) {
+    test(`extremos separados solo por el redondeo (${min} y ${max}) → recta horizontal, sin colgarse`, () => {
+      const e = marcasEje(min, max);
+      expect(e.marcas.length).toBeGreaterThanOrEqual(2);
+      expect(e.marcas.length).toBeLessThanOrEqual(12);
+      expect(e.min).toBeLessThan(Math.min(min, max));
+      expect(e.max).toBeGreaterThan(Math.max(min, max));
+    });
+  }
+
+  test('un rango estrecho pero real (10 a 10,001) se sigue rotulando a su escala', () => {
+    // bruto = 0,001/4 = 0,00025 → potencia 0,0001 → 0,00025
+    const e = marcasEje(10, 10.001);
+    expect(e.marcas).toEqual([10, 10.00025, 10.0005, 10.00075, 10.001]);
+  });
 });
 
 test.describe('Tiro parabólico', () => {

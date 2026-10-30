@@ -139,7 +139,11 @@ export function rangoPosicion(mov: MovimientoRectilineo, T: number): [number, nu
 export function marcasEje(min: number, max: number, objetivo = 4): { min: number; max: number; marcas: number[] } {
   let lo = Math.min(min, max);
   let hi = Math.max(min, max);
-  if (lo === hi) {
+  // Extremos que solo separa el redondeo (0,3 frente a 0,1 + 0,2) son también una recta
+  // horizontal: con ellos el paso sale tan pequeño que lo/paso pasa de 2^53, k++ deja de
+  // avanzar y el bucle llena el array hasta «Invalid array length» (C0512, caída del 28/10/2026).
+  const ancho = hi - lo;
+  if (ancho <= Math.max(Math.abs(lo), Math.abs(hi)) * 1e-9 || ancho < 1e-300) {
     // Recta horizontal (a(t) siempre, v(t) en el MRU): se abre un margen alrededor
     const margen = lo === 0 ? 1 : Math.abs(lo) * 0.5;
     lo -= margen;
