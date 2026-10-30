@@ -11,7 +11,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import ZonaHerramienta from '@/components/ZonaHerramienta';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 // El volumen se calcula en ./casos.ts, el mismo módulo con que se corrigen los casos para clase:
 // si la tarjeta y el corrector calcularan por separado, la app suspendería una respuesta que ella
@@ -691,7 +690,6 @@ export default function VisualizadorVolumenesPage() {
       </header>
 
       <LegalNotice />
-      <ZonaHerramienta app="visualizador-volumenes">
 
       {/* Selector de figura */}
       <div className={styles.figSelector} role="group" aria-label="Seleccionar figura geométrica">
@@ -790,8 +788,6 @@ export default function VisualizadorVolumenesPage() {
           <code className={styles.formulaTexto}>{formula}</code>
         </div>
       </div>
-
-      </ZonaHerramienta>
 
       {/* Tarea de aula (skill /casos-aula-meskeia): FUERA de EducationalSection, que nace
           colapsada, y después de la herramienta, para que la fórmula siga siendo el primer

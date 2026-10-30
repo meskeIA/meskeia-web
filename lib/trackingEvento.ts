@@ -49,8 +49,9 @@ const yaEmitidos = new Set<string>();
  * @param evento  Nombre corto y estable del evento, sin el prefijo (p. ej. 'pestana-vendedor').
  * @param app     Slug de la app donde ocurre, que va en `datos_adicionales` para poder
  *                repartir el mismo evento entre varias apps hermanas.
- * @param extra   Campos adicionales para `datos_adicionales` (p. ej. `{ t: 7 }`, segundos hasta
- *                el primer uso en `evt:primer-uso`). Nunca datos del usuario: solo medidas.
+ * @param extra   Campos adicionales para `datos_adicionales` (p. ej. `{ t: 7 }`, los segundos
+ *                hasta el primer uso que medía `evt:primer-uso`, piloto retirado el 30/10/2026).
+ *                Nunca datos del usuario: solo medidas.
  */
 export function registrarEventoInteraccion(
   evento: string,

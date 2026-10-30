@@ -4,7 +4,6 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import styles from './SimuladorPuertasLogicas.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
-import ZonaHerramienta from '@/components/ZonaHerramienta';
 import { evaluarExpresion, extraerVariables, MAX_VARIABLES } from './motor';
 import { RETOS, corregirIntento, type Correccion } from './motor-retos';
 import { PREGUNTAS_FRECUENTES } from './metadata';
@@ -318,7 +317,6 @@ export default function SimuladorPuertasLogicasPage() {
       </header>
 
       <LegalNotice />
-      <ZonaHerramienta app="simulador-puertas-logicas">
 
       {/* Mode Selector */}
       <div className={styles.modeSelector} ref={selectorModoRef}>
@@ -432,8 +430,7 @@ export default function SimuladorPuertasLogicasPage() {
           <div className={styles.gateDiagram}>
             <h3>Símbolo</h3>
             <div className={styles.diagramContainer}>
-              {/* data-zona-estatica: dibujo, no lienzo; pulsarlo no es usar (hallazgo 3353) */}
-              <svg viewBox="0 0 200 100" className={styles.gateSvg} data-zona-estatica>
+              <svg viewBox="0 0 200 100" className={styles.gateSvg}>
                 {/* Inputs */}
                 <line x1="10" y1="30" x2="50" y2="30" stroke="currentColor" strokeWidth="2" />
                 {GATES[selectedGate].inputs === 2 && (
@@ -955,8 +952,6 @@ export default function SimuladorPuertasLogicasPage() {
           </div>
         </div>
       )}
-
-      </ZonaHerramienta>
 
       {/* Educational Section */}
       <EducationalSection

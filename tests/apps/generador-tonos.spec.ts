@@ -2713,9 +2713,9 @@ test.describe('Inspector 27/09/2026 — medir con el tono sonando, en móvil (Pi
  *   · LÍMITE: el techo, 20.000 Hz, con el volumen al máximo (tecla Fin): el pico del sonido en
  *     20.000 Hz ± 1 bin (1,35-1,46 Hz; Nyquist es 22.050 o 24.000, no satura), ganancia 1,0 y
  *     «100 %» en el rótulo y en el aria-valuetext. Medido: 19.999,99 Hz y ganancia 1.
- *   · ZonaHerramienta (3d5c5db0, `display: contents`): ninguna caja propia, el panel en la misma
- *     columna que el hero, el Tab sigue el orden de siempre (campo → deslizador → «Ir a 20 Hz»), las
- *     teclas responden (ArrowUp: 440 → 441; Espacio en Reproducir) y nada sale hacia /api/analytics.
+ *   · ZonaHerramienta (3d5c5db0, `display: contents`, retirada el 30/10/2026): el Tab sigue el orden
+ *     de siempre (campo → deslizador → «Ir a 20 Hz») y las teclas responden (ArrowUp: 440 → 441;
+ *     Espacio en Reproducir). Lo que miraba de la propia envoltura se fue con ella.
  */
 test.describe('Inspector 13/10/2026', () => {
   /** Pico del sonido emitido cerca de `cerca`, afinado con la parábola (FFT de 32.768 de INSTRUMENTAR). */
@@ -2809,30 +2809,14 @@ test.describe('Inspector 13/10/2026', () => {
     await expect(page.getByText('Umbral del ultrasonido - Inaudible para la mayoría')).toBeVisible();
   });
 
-  test('ZonaHerramienta (3d5c5db0) — la envoltura no se ve, no cambia el teclado ni manda nada a /api/analytics', async ({
+  // Nació para la <ZonaHerramienta> (3d5c5db0); el piloto se retiró el 30/10/2026 y queda lo que no
+  // dependía de ella: el orden de tabulación y que las teclas lleguen a los controles.
+  test('teclado — el Tab sigue campo → deslizador → «Ir a 20 Hz» y las teclas llegan a los controles', async ({
     page,
   }) => {
-    const enviadas: string[] = [];
-    await page.route('**/api/analytics/**', (ruta) => {
-      enviadas.push(ruta.request().postData() ?? '');
-      return ruta.fulfill({ status: 204, body: '' });
-    });
     await abrir(page);
 
-    const zona = await page.evaluate(() => {
-      const z = document.querySelector('[data-zona-herramienta]');
-      const panel = z?.querySelector('[class*="mainPanel"]')?.getBoundingClientRect();
-      const hero = document.querySelector('header[class*="hero"]')?.getBoundingClientRect();
-      return {
-        app: z?.getAttribute('data-zona-herramienta') ?? null,
-        display: z ? getComputedStyle(z).display : null,
-        cajas: z?.getClientRects().length ?? -1,
-        mismaColumna: !!panel && !!hero && panel.left === hero.left && panel.width === hero.width,
-      };
-    });
-    expect(zona).toEqual({ app: 'generador-tonos', display: 'contents', cajas: 0, mismaColumna: true });
-
-    // El orden de tabulación es el del DOM, con la envoltura o sin ella.
+    // El orden de tabulación es el del DOM.
     await campoFrecuencia(page).focus();
     await page.keyboard.press('Tab');
     await expect(page.getByLabel('Seleccionar frecuencia')).toBeFocused();
@@ -2848,9 +2832,6 @@ test.describe('Inspector 13/10/2026', () => {
     await expect.poll(async () => (await registros(page)).length, { timeout: 5000 }).toBe(1);
     expect((await registros(page))[0].frecuenciasAplicadas).toEqual([441]);
     await expect(botonDetener(page)).toHaveAttribute('aria-pressed', 'true');
-
-    // En localhost la medición no se emite (lib/trackingEvento.ts: solo dominios de producción).
-    expect(enviadas.filter((cuerpo) => cuerpo.includes('evt:'))).toEqual([]);
   });
 
   /**

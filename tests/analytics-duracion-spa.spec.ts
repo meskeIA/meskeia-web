@@ -37,7 +37,7 @@
  * P1). El servidor local tiene las credenciales de Turso: hasta ese día cada pasada de este
  * fichero escribía sus visitas en producción, 126 filas de calculadora-iva y
  * orientador-iva-espana con `ip_address = '::ffff::'` en 7 tandas desde el 16/09. Ahora todo
- * /api/analytics/ se contesta con `page.route`, como en `primer-uso-zona.spec.ts`, y cada
+ * /api/analytics/ se contesta con `page.route`, y cada
  * caso termina comprobando que el route contestó tantas peticiones como envíos salieron de
  * la página: si una se le escapara, habría llegado al servidor. La captura de abajo no
  * cambia, porque mira los envíos dentro del navegador, antes de la red.

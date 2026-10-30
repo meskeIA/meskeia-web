@@ -4,7 +4,6 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import styles from './SimuladorPotencialAccion.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
-import ZonaHerramienta from '@/components/ZonaHerramienta';
 
 import {
   simular,
@@ -284,7 +283,6 @@ export default function SimuladorPotencialAccionPage() {
       </header>
 
       <LegalNotice />
-      <ZonaHerramienta app="simulador-potencial-accion">
 
       <div className={styles.mainContent}>
         <p className={styles.descriptionCard}>
@@ -479,8 +477,6 @@ export default function SimuladorPotencialAccionPage() {
           </div>
         </div>
       </div>
-
-      </ZonaHerramienta>
 
       {/* ============================================
           BLOQUE EDUCATIVO v2.0

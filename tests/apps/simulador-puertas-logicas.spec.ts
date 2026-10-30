@@ -1,5 +1,4 @@
 import { test, expect, devices, type Page } from '@playwright/test';
-import { PUERTO } from './_puerto';
 import {
   analizar,
   contarOperadores,
@@ -11,11 +10,6 @@ import {
   RETOS,
   type Reto,
 } from '../../app/simulador-puertas-logicas/motor-retos';
-
-// Al NIVEL DEL FICHERO porque `launchOptions` fuerza un worker nuevo: mapea meskeia.com al
-// servidor local para que el bloque de <ZonaHerramienta> (16/10/2026, al final) vea un host de
-// producción y emita `evt:primer-uso`. Al resto de tests no les afecta: van a localhost.
-test.use({ launchOptions: { args: [`--host-resolver-rules=MAP meskeia.com 127.0.0.1:${PUERTO}`] } });
 
 /**
  * Simulador de Puertas Lógicas — modo Retos (18/08/2026)
@@ -759,9 +753,9 @@ test.describe('RE-INSPECCIÓN · hallazgos reparados', () => {
  *   ninguna variable (solo constantes), la doble prima y un reto resuelto desde el móvil.
  * CASO 3 · RECHAZO — expresiones rotas que deben avisar sin pintar tabla y, en Retos, un
  *   operador prohibido, una variable ajena y una expresión incompleta.
- * Y además: <ZonaHerramienta> (evt:primer-uso, con /api/analytics interceptado: nada llega a
- * Turso), el contraste de las tablas de verdad y el contenido (bloque educativo, FAQPage y
- * featureList). Los hallazgos abiertos van con test.fail(): afirman lo correcto y hoy fallan.
+ * Y además: el contraste de las tablas de verdad y el contenido (bloque educativo, FAQPage y
+ * featureList). Los casos de <ZonaHerramienta> (evt:primer-uso) se fueron con el piloto, retirado
+ * el 30/10/2026. Los hallazgos abiertos van con test.fail(): afirman lo correcto y hoy fallan.
  */
 
 const MOVIL_360 = {
@@ -987,151 +981,6 @@ test.describe('16/10 · CASO 3 · lo que debe rechazarse', () => {
     await expect(veredicto).toHaveText('No se puede evaluar. La expresión termina antes de tiempo');
 
     await expect(page.getByText('Resueltos: 0 de 9')).toBeVisible();
-  });
-});
-
-// ───────────────────────────────────────────────────────────────────────────────
-// <ZonaHerramienta> — evt:primer-uso (piloto del 09/10/2026, 3d5c5db0)
-// ───────────────────────────────────────────────────────────────────────────────
-// Mismo montaje que tests/primer-uso-zona.spec.ts: meskeia.com mapeado al servidor local (por
-// el `test.use` del nivel del fichero), `navigator.webdriver` falso y un UA sin «Headless». TODO
-// /api/analytics se contesta con page.route: el servidor local tiene las credenciales de Turso.
-const SLUG = 'simulador-puertas-logicas';
-const UA_ESCRITORIO =
-  'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36';
-
-interface Envio {
-  aplicacion: string;
-  datos_adicionales?: { app?: string; t?: number };
-}
-
-async function abrirConAnalytics(page: Page): Promise<Envio[]> {
-  const envios: Envio[] = [];
-  await page.addInitScript(() => {
-    Object.defineProperty(Object.getPrototypeOf(navigator), 'webdriver', { get: () => false });
-    try { localStorage.setItem('meskeia_transparency_banner_dismissed', 'true'); } catch { /* modo privado */ }
-  });
-  await page.route('**/api/analytics/**', async (ruta) => {
-    const cuerpo = ruta.request().postData();
-    if (ruta.request().url().includes('/api/analytics/track') && cuerpo) envios.push(JSON.parse(cuerpo) as Envio);
-    await ruta.fulfill({ status: 200, contentType: 'application/json', body: '{"status":"success"}' });
-  });
-  await page.goto(`http://meskeia.com/${SLUG}/`, { waitUntil: 'domcontentloaded' });
-  // La visita la registra AnalyticsTracker en un efecto: que llegue prueba que React hidrató.
-  await expect.poll(() => envios.some((e) => e.aplicacion === SLUG), { timeout: 20000 }).toBe(true);
-  return envios;
-}
-
-const primerosUsos = (envios: Envio[]): Envio[] => envios.filter((e) => e.aplicacion === 'evt:primer-uso');
-
-/** Deslizamiento táctil REAL (CDP): desplaza la página como un pulgar, sin soltar en el sitio. */
-async function deslizarDesde(page: Page, x: number, y: number, pasos: number, paso: number): Promise<void> {
-  const cdp = await page.context().newCDPSession(page);
-  await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x, y }] });
-  for (let i = 1; i <= pasos; i++) {
-    await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x, y: y - i * paso }] });
-    await page.waitForTimeout(16);
-  }
-  await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
-  // Que acabe la inercia: un toque durante ella solo la frena y no pulsa nada.
-  let previo = -1;
-  for (let i = 0; i < 40; i++) {
-    await page.waitForTimeout(250);
-    const actual = await page.evaluate(() => window.scrollY);
-    if (actual === previo) break;
-    previo = actual;
-  }
-}
-
-test.describe('16/10 · ZonaHerramienta en escritorio', () => {
-  test.use({ userAgent: UA_ESCRITORIO });
-
-  test('no cambia la maquetación; desplazarse, pulsar texto y abrir la guía no emiten; un botón emite UNA vez', async ({ page }) => {
-    const envios = await abrirConAnalytics(page);
-
-    // display: contents → el envoltorio no tiene caja y el selector de modo sigue en 4 columnas.
-    const zona = await page.locator(`[data-zona-herramienta="${SLUG}"]`).evaluate((e) => ({
-      display: getComputedStyle(e).display, ancho: e.getBoundingClientRect().width,
-    }));
-    expect(zona).toEqual({ display: 'contents', ancho: 0 });
-    const columnas = await page.locator('[class*="_modeSelector"]').evaluate((e) =>
-      getComputedStyle(e).gridTemplateColumns.split(' ').length);
-    expect(columnas).toBe(4);
-
-    await page.mouse.wheel(0, 1200);
-    await page.mouse.wheel(0, -1200);
-    await page.locator('[class*="_gateDescription"]').click(); // texto, no un control
-    await abrirGuiaEducativa(page); // fuera de la zona: es leer, no usar
-    await page.waitForTimeout(500);
-    expect(primerosUsos(envios), 'emitió sin usar ningún control').toHaveLength(0);
-
-    await page.locator(BOTON_PUERTA).filter({ hasText: /^⊼\s*NAND$/ }).click();
-    await expect.poll(() => primerosUsos(envios).length).toBe(1);
-    expect(primerosUsos(envios)[0].datos_adicionales?.app).toBe(SLUG);
-    expect(typeof primerosUsos(envios)[0].datos_adicionales?.t).toBe('number');
-
-    // Más usos en la misma carga no vuelven a emitir.
-    await page.locator(BOTON_PUERTA).filter({ hasText: /^⊕\s*XOR$/ }).click();
-    await elegirModo(page, 'Expresiones');
-    await page.getByLabel('Expresión Booleana').fill('A AND B');
-    await page.waitForTimeout(500);
-    expect(primerosUsos(envios), 'se repitió en la misma carga').toHaveLength(1);
-  });
-
-  // HALLAZGO ABIERTO (16/10/2026): `svg` está en CONTROLES de ZonaHerramienta porque en otros
-  // simuladores es el lienzo donde se arrastra; aquí el «Símbolo» de la puerta es un dibujo
-  // estático y pulsarlo cuenta como uso.
-  // REPARADO (hallazgo 3353, 17/10/2026): el dibujo lleva data-zona-estatica, que ZonaHerramienta ignora.
-  test('3353 · pulsar el dibujo estático del símbolo NO es usar la herramienta', async ({ page }) => {
-    const envios = await abrirConAnalytics(page);
-    const dibujo = page.locator('svg[class*="_gateSvg"]');
-    await dibujo.scrollIntoViewIfNeeded();
-    await dibujo.click();
-    await page.waitForTimeout(800);
-    expect(primerosUsos(envios)).toHaveLength(0);
-  });
-});
-
-test.describe('16/10 · ZonaHerramienta en móvil (360×740, táctil)', () => {
-  test.use(MOVIL_360);
-
-  test('deslizar sobre la tabla desplaza sin emitir; un toque en una puerta emite UNA vez', async ({ page }) => {
-    const envios = await abrirConAnalytics(page);
-    const tabla = page.locator(TABLA_VERDAD).first();
-    await tabla.evaluate((t) => t.scrollIntoView({ block: 'center' }));
-    await page.waitForTimeout(500);
-    const antes = await page.evaluate(() => window.scrollY);
-    const caja = await tabla.boundingBox();
-    if (!caja) throw new Error('la tabla no tiene caja');
-    await deslizarDesde(page, Math.round(caja.x + caja.width / 2), Math.round(caja.y + caja.height / 2), 6, 20);
-    expect(await page.evaluate(() => window.scrollY), 'el deslizamiento debe desplazar').toBeGreaterThan(antes);
-    expect(primerosUsos(envios), 'desplazarse no es usar').toHaveLength(0);
-
-    const or = page.locator(BOTON_PUERTA).filter({ hasText: /^∨\s*OR$/ });
-    await or.evaluate((b) => b.scrollIntoView({ block: 'center' }));
-    await expect(async () => { // repetir el toque es inocuo: vuelve a elegir OR
-      await or.tap();
-      await expect(or).toHaveAttribute('aria-pressed', 'true', { timeout: 1000 });
-    }).toPass({ timeout: 10000 });
-    expect(await columnaSalida(page)).toEqual([0, 1, 1, 1]); // OR: 1 si alguna es 1
-    await expect.poll(() => primerosUsos(envios).length).toBe(1);
-  });
-
-  // HALLAZGO ABIERTO (16/10/2026): ZonaHerramienta escucha `pointerdown`, que en táctil salta al
-  // POSAR el dedo, antes de saber si el gesto es un toque o un desplazamiento. Deslizar para bajar
-  // la página empezando sobre cualquier botón (los 4 de modo llenan la mitad baja de la primera
-  // pantalla en móvil) emite evt:primer-uso sin que se haya usado nada: la puerta activa no cambia.
-  // REPARADO (hallazgo 3353, 17/10/2026): con el dedo, ZonaHerramienta cuenta al soltar (pointerup),
-  // que no llega cuando el navegador se queda el gesto para desplazar (pointercancel).
-  test('3353 · deslizar el dedo sobre un botón solo para desplazarse NO es usar', async ({ page }) => {
-    const envios = await abrirConAnalytics(page);
-    const not = page.locator(BOTON_PUERTA).filter({ hasText: /^¬\s*NOT$/ });
-    await not.evaluate((b) => b.scrollIntoView({ block: 'center' }));
-    await page.waitForTimeout(500);
-    const caja = await not.boundingBox();
-    if (!caja) throw new Error('el botón NOT no tiene caja');
-    await deslizarDesde(page, Math.round(caja.x + caja.width / 2), Math.round(caja.y + caja.height / 2), 8, 25);
-    expect(primerosUsos(envios)).toHaveLength(0);
   });
 });
 
