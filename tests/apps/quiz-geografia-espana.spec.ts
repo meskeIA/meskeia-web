@@ -1224,6 +1224,20 @@ test.describe('Inspector 28/10/2026 · contenido (cabo C0203 y JSON-LD)', () => 
     expect(await tarjetaGuia(page, 'tipCard', 'archipiélago canario')).not.toMatch(/norte de Marruecos/);
   });
 
+  test('REPARADO (C0203, decisión del usuario 30/10/2026) · sin las cuatro afirmaciones que ninguna fuente oficial ancla', async ({ page }) => {
+    // El inspector del 29/10 no encontró fuente oficial que confirme ni desmienta: (e) id 73 «el
+    // país europeo con más municipios» (el INE no compara países); (h) Cabrera entre las islas
+    // habitadas de Baleares (la Ley 14/1991 no habla de población; el INE agrupa por municipios);
+    // (i) id 37 Sanabria «el lago natural más grande» (su propia explicación solo respalda «el
+    // mayor de origen glaciar»); (j) id 32 «Hísperia» como nombre de la Península (dle.rae.es da
+    // 403 a la tarea). Regla 1 de neutralidad: se retiran o se matizan a lo que la app sí sostiene.
+    expect(fichaDe(/Cuántos municipios tiene España/).explicacion).not.toMatch(/país europeo con más municipios/);
+    expect(fichaDe(/lago de origen glaciar/).pregunta).not.toMatch(/lago natural más grande/);
+    expect(fichaDe(/río atraviesa la ciudad de Zaragoza/).explicacion).not.toMatch(/Hísperia/);
+    await abrir(page);
+    expect((await faqVisible(page))['¿Cuántas islas tiene España?'] ?? '').not.toMatch(/Cabrera/);
+  });
+
   test('hallazgo · la Geografía no es materia obligatoria en 2.º de Bachillerato', async ({ page }) => {
     // ABIERTO (inspector 28/10/2026). Tarjeta «Bachillerato y ESO»: «La geografía de España es
     // materia obligatoria en 3.º ESO y en 2.º de Bachillerato». BOE: Real Decreto 243/2022, art. 9.2

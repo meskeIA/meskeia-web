@@ -557,7 +557,7 @@ export default function QuizGeografiaEspanaPage() {
             </div>
             <div className={styles.faqItem}>
               <h3>¿Cuántas islas tiene España?</h3>
-              <p>Los archipiélagos principales son las Islas Canarias (8 islas habitadas: las siete con cabildo propio y La Graciosa, agregada a Lanzarote, según el art. 4.1 del Estatuto de Autonomía de Canarias de 2018) y las Islas Baleares (5 islas habitadas principales: Mallorca, Menorca, Ibiza, Formentera y Cabrera). Hay además numerosos islotes.</p>
+              <p>Los archipiélagos principales son las Islas Canarias (8 islas habitadas: las siete con cabildo propio y La Graciosa, agregada a Lanzarote, según el art. 4.1 del Estatuto de Autonomía de Canarias de 2018) y las Islas Baleares, cuyas islas mayores son Mallorca, Menorca, Ibiza y Formentera. Hay además numerosos islotes.</p>
             </div>
           </div>
         </section>
