@@ -263,18 +263,39 @@ for (const h of HERMANAS) {
      * CADA «Siguiente» y en «Ver resultado». Medido el 30/09 en literatura-universal (46 de 56 a
      * 360 px) y el 10/10 en geografia-espana (hallazgo 3214).
      */
-    test('doble toque: el segundo toque de la ráfaga no contesta, no saca de la app ni se come la nota', async ({ page }) => {
+    /**
+     * Cabo C0501 (28/10/2026): el testigo pasó 48/48 y la tanda encontró el invariante roto en 5
+     * hermanas. Lo que se cerró aquí, el 30/10/2026: (1) solo medía a 390 × 844 (verbos-irregulares
+     * pasaba por geometría y a 412 × 915 el 2.º toque contestaba 9 de 9): ahora a 360 × 740,
+     * 412 × 915 y 768 × 1024; (3) no miraba si la ráfaga abría la guía (aria-expanded); (5) en
+     * mitos-ciencia, «main button» daba [] (la página no tiene <main>) y «0 opciones» se tomaba por
+     * «pantalla nueva» aunque fuera la misma pregunta contestada: ahora la huella son TODOS los
+     * botones visibles, y la pantalla nueva, que esa huella cambie. El (4), la ráfaga sobre la opción,
+     * tiene su propio caso más abajo. Queda fuera el (2), las salidas del resultado («Jugar de
+     * nuevo», «Repasar fallos»…), que cambian de una hermana a otra.
+     */
+    // Sin el 390 × 844 de antes: queda entre los dos móviles, y cada ancho son ~15 s por hermana
+    // en el build (64 casos tardaban 15 min con un worker).
+    for (const viewport of [
+      { width: 360, height: 740 },
+      { width: 412, height: 915 },
+      { width: 768, height: 1024 },
+    ])
+    test(`doble toque a ${viewport.width} × ${viewport.height}: el segundo toque de la ráfaga no contesta, no saca de la app ni se come la nota`, async ({ page }) => {
       test.skip(Boolean(h.dobleToque?.omitido), h.dobleToque?.omitido);
       if (h.dobleToque?.falla) test.fail();
       test.setTimeout(120_000);
-      await page.setViewportSize({ width: 390, height: 844 });
+      await page.setViewportSize(viewport);
       await page.emulateMedia({ reducedMotion: 'reduce' });
       await page.goto(`/${h.slug}/`);
       const url = page.url();
       const opciones = page.locator('button:visible').filter({ hasText: h.opcion ?? /^\s*A\S/ });
       const habilitadas = () => opciones.evaluateAll((bs) => bs.filter((b) => !(b as HTMLButtonElement).disabled).length);
-      /** Los botones que se ven: la huella de la pantalla en la que se está. */
-      const botonesVisibles = () => page.locator('main button:visible').allInnerTexts();
+      /** Los botones que se ven en TODA la página: la huella de la pantalla en la que se está. */
+      const botonesVisibles = () => page.locator('button:visible').allInnerTexts();
+      /** Desplegables abiertos (la guía, una FAQ): una ráfaga no debe abrir ninguno. */
+      const abiertos = () => page.locator('[aria-expanded="true"]').count();
+      const abiertosAlEmpezar = await abiertos();
 
       /**
        * Clic suelto y, ya pintada la pantalla nueva, el 2.º de la ráfaga en el mismo punto.
@@ -296,6 +317,7 @@ for (const h of HERMANAS) {
         await page.mouse.up({ clickCount: 2 });
         await page.waitForTimeout(400);
         expect(page.url(), `${paso}: la ráfaga no saca de la app`).toBe(url);
+        expect(await abiertos(), `${paso}: la ráfaga no abre la guía ni otro desplegable`).toBe(abiertosAlEmpezar);
         return { antes, despues: await botonesVisibles() };
       }
 
@@ -324,11 +346,13 @@ for (const h of HERMANAS) {
         await pulsarHidratado(page, h.opcion ?? /^\s*A\S/); // suelto: cierra la ráfaga
         await expect.poll(habilitadas, { message: `paso ${paso}: contestar deshabilita las opciones` }).toBe(0);
         const avanzar = page.locator('button:visible').filter({ hasText: /siguiente|resultado/i }).first();
-        // Pantalla nueva: o una pregunta con sus opciones habilitadas, o el resultado (sin opciones)
+        // Pantalla nueva: cambian los botones visibles. No vale «0 opciones»: en mitos-ciencia la
+        // pregunta contestada ya no tiene opciones, y se tomaba por el resultado (C0501).
         const esUltima = /resultado/i.test(await avanzar.innerText());
+        const huella = JSON.stringify(await botonesVisibles());
         const { antes, despues } = await dobleToque(
           avanzar,
-          async () => (await opciones.count()) === 0 || (await habilitadas()) > 0,
+          async () => JSON.stringify(await botonesVisibles()) !== huella,
           `paso ${paso}`,
         );
         if (esUltima || (await opciones.count()) === 0) {
