@@ -664,6 +664,13 @@ export const STEMUM_APPS: StemumApp[] = [
     disciplina: 'matematicas',
   },
   {
+    slug: 'simulador-tangencias-potencia',
+    icon: '⭕',
+    titulo: 'Tangencias y potencia de un punto',
+    desc: 'Dibujo técnico con regla y compás: potencia, eje radical, tangentes y circunferencias tangentes, paso a paso y con 12 casos numerados.',
+    disciplina: 'matematicas',
+  },
+  {
     slug: 'simulador-derivada-pendiente',
     icon: '📐',
     titulo: 'La derivada como pendiente',

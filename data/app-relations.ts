@@ -2572,14 +2572,23 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'simulador-teorema-tales': [
     { url: '/calculadora-escalas/', icon: '📐', name: 'Calculadora de Escalas', description: 'Del plano a la realidad en 1:50, 1:100 o la escala que sea' },
     { url: '/simulador-teorema-pitagoras/', icon: '📐', name: 'Teorema de Pitágoras', description: 'El lado que falta en un triángulo rectángulo, con demostración visual' },
-    { url: '/calculadora-geometria/', icon: '📐', name: 'Calculadora de Geometría', description: 'Áreas y perímetros de las figuras semejantes' },
+    { url: '/simulador-tangencias-potencia/', icon: '⭕', name: 'Tangencias y Potencia de un Punto', description: 'La geometría plana de Dibujo Técnico, con regla y compás' },
     { url: '/tabla-areas-volumenes/', icon: '📐', name: 'Tabla de Áreas y Volúmenes', description: 'Las fórmulas sobre las que actúa la razón de semejanza' },
   ],
   'calculadora-escalas': [
     { url: '/simulador-teorema-tales/', icon: '📏', name: 'Teorema de Tales y Semejanza', description: 'La proporcionalidad que hay detrás de toda escala' },
     { url: '/transportador-angulos/', icon: '📐', name: 'Transportador de Ángulos', description: 'Mide un ángulo sobre la foto del plano' },
-    { url: '/conversor-unidades/', icon: '📏', name: 'Conversor de Unidades', description: 'Cuando lo que hay que cambiar es la unidad, no la escala' },
+    { url: '/simulador-tangencias-potencia/', icon: '⭕', name: 'Tangencias y Potencia de un Punto', description: 'El otro gran tema de Dibujo Técnico: tangentes, enlaces y potencia' },
     { url: '/calculadora-geometria/', icon: '📐', name: 'Calculadora de Geometría', description: 'Áreas y perímetros, ya con la medida real en la mano' },
+  ],
+
+  // Dibujo Técnico — geometría plana (30/10/2026). Enlaza con la otra app de Dibujo Técnico
+  // (escalas), con Tales y con las cónicas, que también son temario de la asignatura.
+  'simulador-tangencias-potencia': [
+    { url: '/calculadora-escalas/', icon: '📐', name: 'Calculadora de Escalas', description: 'La otra mitad del Dibujo Técnico: del plano a la realidad' },
+    { url: '/simulador-teorema-tales/', icon: '📏', name: 'Teorema de Tales y Semejanza', description: 'Proporciones, semejanza y el cuarto proporcional' },
+    { url: '/visualizador-geometria-analitica/', icon: '📐', name: 'Cónicas', description: 'Elipse, parábola e hipérbola: las curvas del segundo curso' },
+    { url: '/transportador-angulos/', icon: '📐', name: 'Transportador de Ángulos', description: 'Mide sobre una foto el ángulo que acabas de trazar' },
   ],
 
   'calculadora-geometria': [
@@ -4567,7 +4576,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'visualizador-geometria-analitica': [
     { url: '/visualizador-trigonometria/', icon: '📐', name: 'Trigonometría', description: 'Las coordenadas polares y las cónicas usan seno y coseno como base' },
     { url: '/visualizador-algebra-lineal/', icon: '🔢', name: 'Álgebra Lineal', description: 'Las transformaciones lineales cambian la forma de las cónicas en el plano' },
-    { url: '/visualizador-geometria-fractales/', icon: '🌀', name: 'Geometría Fractal', description: 'Las cónicas son formas euclidianas; los fractales exploran geometrías más complejas' },
+    { url: '/simulador-tangencias-potencia/', icon: '⭕', name: 'Tangencias y Potencia de un Punto', description: 'La circunferencia en Dibujo Técnico: tangentes, eje radical y Apolonio' },
     { url: '/visualizador-volumenes/', icon: '🔷', name: 'Volúmenes 3D', description: 'Las secciones cónicas (elipse, parábola) generan las figuras de revolución: esfera, cono, cilindro' },
   ],
   'visualizador-volumenes': [
