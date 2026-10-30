@@ -514,10 +514,11 @@ export default function SimuladorCineticaArrheniusPage() {
         <div className={styles.controls}>
           <div className={styles.controlsGrid}>
             <div className={styles.controlGroup}>
-              <label className={styles.controlLabel}>
+              <label htmlFor="energia-activacion" className={styles.controlLabel}>
                 Energía de activación (Ea = <strong>{fmt(ea, 0)} kJ/mol</strong>)
               </label>
               <input
+                id="energia-activacion"
                 type="range"
                 min={20}
                 max={300}
@@ -529,10 +530,11 @@ export default function SimuladorCineticaArrheniusPage() {
               />
             </div>
             <div className={styles.controlGroup}>
-              <label className={styles.controlLabel}>
+              <label htmlFor="factor-preexponencial" className={styles.controlLabel}>
                 Factor pre-exponencial (A = <strong>10^{fmt(logA, 1)} {reaccionActual?.unidadA ?? ''}</strong>)
               </label>
               <input
+                id="factor-preexponencial"
                 type="range"
                 min={5}
                 max={20}
@@ -547,10 +549,11 @@ export default function SimuladorCineticaArrheniusPage() {
 
           <div className={styles.controlsGrid}>
             <div className={styles.controlGroup}>
-              <label className={styles.controlLabel}>
+              <label htmlFor="temperatura-t1" className={styles.controlLabel}>
                 Temperatura T₁ = <strong>{T1} K</strong> ({fmt(T1 - 273.15, 1)} °C)
               </label>
               <input
+                id="temperatura-t1"
                 type="range"
                 min={250}
                 max={1000}
@@ -562,10 +565,11 @@ export default function SimuladorCineticaArrheniusPage() {
               />
             </div>
             <div className={styles.controlGroup}>
-              <label className={styles.controlLabel}>
+              <label htmlFor="temperatura-t2" className={styles.controlLabel}>
                 Temperatura T₂ = <strong>{T2} K</strong> ({fmt(T2 - 273.15, 1)} °C)
               </label>
               <input
+                id="temperatura-t2"
                 type="range"
                 min={250}
                 max={1000}

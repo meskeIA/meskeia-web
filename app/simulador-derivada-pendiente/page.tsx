@@ -482,10 +482,11 @@ export default function SimuladorDerivadaPendientePage() {
         {/* CONTROLES */}
         <div className={styles.controls}>
           <div className={styles.controlGroup}>
-            <label className={styles.controlLabel}>
+            <label htmlFor="posicion-punto-p" className={styles.controlLabel}>
               Posición del punto P (x = <strong>{fmt(xPunto)}</strong>)
             </label>
             <input
+              id="posicion-punto-p"
               type="range"
               min={funcion.xMin}
               max={funcion.xMax}
@@ -518,10 +519,11 @@ export default function SimuladorDerivadaPendientePage() {
 
           {modoSecante && (
             <div className={styles.controlGroup}>
-              <label className={styles.controlLabel}>
+              <label htmlFor="distancia-h-secante" className={styles.controlLabel}>
                 Distancia entre P y Q (h = <strong>{fmt(hSecante)}</strong>)
               </label>
               <input
+                id="distancia-h-secante"
                 type="range"
                 min={0.01}
                 max={(funcion.xMax - funcion.xMin) / 3}

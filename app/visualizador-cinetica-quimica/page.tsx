@@ -510,10 +510,11 @@ export default function VisualizadorCineticaQuimica() {
 
             {/* Slider Ea */}
             <div className={styles.controlGrupo}>
-              <label className={styles.controlLabel}>
+              <label htmlFor="energia-activacion" className={styles.controlLabel}>
                 Energía de activación Ea: <span className={styles.controlValor}>{ea} kJ/mol</span>
               </label>
               <input
+                id="energia-activacion"
                 type="range"
                 min={30}
                 max={250}
@@ -526,10 +527,11 @@ export default function VisualizadorCineticaQuimica() {
 
             {/* Slider ΔH */}
             <div className={styles.controlGrupo}>
-              <label className={styles.controlLabel}>
+              <label htmlFor="entalpia-reaccion" className={styles.controlLabel}>
                 Entalpía de reacción ΔH: <span className={styles.controlValor}>{deltaH} kJ/mol</span>
               </label>
               <input
+                id="entalpia-reaccion"
                 type="range"
                 min={-300}
                 max={150}
@@ -604,10 +606,11 @@ export default function VisualizadorCineticaQuimica() {
           {/* Controles */}
           <div className={styles.controlsPanel}>
             <div className={styles.controlGrupo}>
-              <label className={styles.controlLabel}>
+              <label htmlFor="ea-arrhenius" className={styles.controlLabel}>
                 Ea: <span className={styles.controlValor}>{eaArr} kJ/mol</span>
               </label>
               <input
+                id="ea-arrhenius"
                 type="range"
                 min={20}
                 max={200}
@@ -618,10 +621,11 @@ export default function VisualizadorCineticaQuimica() {
               />
             </div>
             <div className={styles.controlGrupo}>
-              <label className={styles.controlLabel}>
+              <label htmlFor="temperatura-arrhenius" className={styles.controlLabel}>
                 T: <span className={styles.controlValor}>{tArr} K ({tArr - 273} °C)</span>
               </label>
               <input
+                id="temperatura-arrhenius"
                 type="range"
                 min={273}
                 max={1000}
@@ -672,8 +676,9 @@ export default function VisualizadorCineticaQuimica() {
               <p className={styles.ordenFormula}>[A] = [A]₀ − k·t</p>
               <SvgOrden orden={0} k={kOrden0} color="#2E86AB" />
               <div className={styles.kSliderRow}>
-                <label>k:</label>
+                <label htmlFor="k-orden-0">k:</label>
                 <input
+                  id="k-orden-0"
                   type="range"
                   min={0.05}
                   max={0.5}
@@ -696,8 +701,9 @@ export default function VisualizadorCineticaQuimica() {
               <p className={styles.ordenFormula}>[A] = [A]₀ · e<sup>−kt</sup></p>
               <SvgOrden orden={1} k={kOrden1} color="#48A9A6" />
               <div className={styles.kSliderRow}>
-                <label>k:</label>
+                <label htmlFor="k-orden-1">k:</label>
                 <input
+                  id="k-orden-1"
                   type="range"
                   min={0.05}
                   max={1.0}
@@ -720,8 +726,9 @@ export default function VisualizadorCineticaQuimica() {
               <p className={styles.ordenFormula}>1/[A] = 1/[A]₀ + k·t</p>
               <SvgOrden orden={2} k={kOrden2} color="#E67E22" />
               <div className={styles.kSliderRow}>
-                <label>k:</label>
+                <label htmlFor="k-orden-2">k:</label>
                 <input
+                  id="k-orden-2"
                   type="range"
                   min={0.1}
                   max={2.0}

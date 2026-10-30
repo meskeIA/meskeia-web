@@ -180,8 +180,9 @@ export default function EspejoPage() {
       {activo && (
         <div className={styles.section}>
           <div className={styles.ajuste}>
-            <label><span aria-hidden="true">☀️</span> Brillo: {brillo}%</label>
+            <label htmlFor="brillo"><span aria-hidden="true">☀️</span> Brillo: {brillo}%</label>
             <input
+              id="brillo"
               type="range"
               min="50"
               max="150"
@@ -192,8 +193,9 @@ export default function EspejoPage() {
           </div>
 
           <div className={styles.ajuste}>
-            <label><span aria-hidden="true">🔍</span> Zoom: {zoom}x</label>
+            <label htmlFor="zoom"><span aria-hidden="true">🔍</span> Zoom: {zoom}x</label>
             <input
+              id="zoom"
               type="range"
               min="1"
               max="2"

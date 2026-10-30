@@ -466,10 +466,11 @@ export default function SimuladorIntervalosConfianzaPage() {
             <div className={styles.controls}>
               <div className={styles.controlsGrid}>
                 <div className={styles.controlGroup}>
-                  <label className={styles.controlLabel}>
+                  <label htmlFor="media-poblacional" className={styles.controlLabel}>
                     Media poblacional (μ = <strong>{fmt(muPob, 1)}</strong>)
                   </label>
                   <input
+                    id="media-poblacional"
                     type="range"
                     min={0}
                     max={100}
@@ -481,10 +482,11 @@ export default function SimuladorIntervalosConfianzaPage() {
                   />
                 </div>
                 <div className={styles.controlGroup}>
-                  <label className={styles.controlLabel}>
+                  <label htmlFor="desviacion-poblacional" className={styles.controlLabel}>
                     Desviación poblacional (σ = <strong>{fmt(sigmaPob, 1)}</strong>)
                   </label>
                   <input
+                    id="desviacion-poblacional"
                     type="range"
                     min={1}
                     max={30}
@@ -499,10 +501,10 @@ export default function SimuladorIntervalosConfianzaPage() {
 
               <div className={styles.controlsGrid}>
                 <div className={styles.controlGroup}>
-                  <label className={styles.controlLabel}>
+                  <label id="tamano-muestral-label" className={styles.controlLabel}>
                     Tamaño muestral (n = <strong>{n}</strong>)
                   </label>
-                  <div className={styles.discreteSteps} role="group" aria-label="Tamaño muestral">
+                  <div aria-labelledby="tamano-muestral-label" className={styles.discreteSteps} role="group" aria-label="Tamaño muestral">
                     {N_VALORES.map(v => (
                       <button
                         type="button"
@@ -517,10 +519,10 @@ export default function SimuladorIntervalosConfianzaPage() {
                   </div>
                 </div>
                 <div className={styles.controlGroup}>
-                  <label className={styles.controlLabel}>
+                  <label id="nivel-confianza-label" className={styles.controlLabel}>
                     Nivel de confianza (<strong>{(nivel * 100).toFixed(0)} %</strong>)
                   </label>
-                  <div className={styles.discreteSteps} role="group" aria-label="Nivel de confianza">
+                  <div aria-labelledby="nivel-confianza-label" className={styles.discreteSteps} role="group" aria-label="Nivel de confianza">
                     {NIVELES.map(v => (
                       <button
                         type="button"
@@ -612,13 +614,14 @@ export default function SimuladorIntervalosConfianzaPage() {
             <div className={styles.controls}>
               <div className={styles.controlsGrid}>
                 <div className={styles.controlGroup}>
-                  <label className={styles.controlLabel}>
+                  <label htmlFor="media-muestral" className={styles.controlLabel}>
                     Media muestral (X̄ = <strong>{fmt(xBarCalc, 2)}</strong>)
                   </label>
                   {/* Los tres campos: con `type="number"` y `|| respaldo`, vaciar escribía el
                       respaldo bajo el cursor (n: «2», y «30» daba «230») y la media no dejaba
                       teclear «-» (cabo C0081) */}
                   <CampoNumerico
+                    id="media-muestral"
                     valor={xBarCalc}
                     paso={0.1}
                     onCambio={setXBarCalc}
@@ -627,10 +630,11 @@ export default function SimuladorIntervalosConfianzaPage() {
                   />
                 </div>
                 <div className={styles.controlGroup}>
-                  <label className={styles.controlLabel}>
+                  <label htmlFor="desviacion-muestral" className={styles.controlLabel}>
                     Desviación muestral (s = <strong>{fmt(sCalc, 2)}</strong>)
                   </label>
                   <CampoNumerico
+                    id="desviacion-muestral"
                     valor={sCalc}
                     paso={0.1}
                     min={0}
@@ -643,10 +647,11 @@ export default function SimuladorIntervalosConfianzaPage() {
 
               <div className={styles.controlsGrid}>
                 <div className={styles.controlGroup}>
-                  <label className={styles.controlLabel}>
+                  <label htmlFor="tamano-muestral-calc" className={styles.controlLabel}>
                     Tamaño muestral (n = <strong>{nCalc}</strong>)
                   </label>
                   <CampoNumerico
+                    id="tamano-muestral-calc"
                     valor={nCalc}
                     min={2}
                     decimales={0}
@@ -656,10 +661,10 @@ export default function SimuladorIntervalosConfianzaPage() {
                   />
                 </div>
                 <div className={styles.controlGroup}>
-                  <label className={styles.controlLabel}>
+                  <label id="nivel-confianza-calc-label" className={styles.controlLabel}>
                     Nivel de confianza (<strong>{(nivelCalc * 100).toFixed(0)} %</strong>)
                   </label>
-                  <div className={styles.discreteSteps} role="group" aria-label="Nivel de confianza">
+                  <div aria-labelledby="nivel-confianza-calc-label" className={styles.discreteSteps} role="group" aria-label="Nivel de confianza">
                     {NIVELES.map(v => (
                       <button
                         type="button"

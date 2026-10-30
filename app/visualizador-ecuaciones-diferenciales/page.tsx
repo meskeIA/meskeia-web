@@ -263,8 +263,9 @@ function TabCampo() {
     <div className={styles.tabContenido}>
       <div className={styles.controlsRow}>
         <div className={styles.controlGrupo}>
-          <label className={styles.controlLabel}>Ecuación diferencial</label>
+          <label htmlFor="ecuacion-diferencial" className={styles.controlLabel}>Ecuación diferencial</label>
           <select
+            id="ecuacion-diferencial"
             className={styles.select}
             value={odeIdx}
             onChange={e => { setOdeIdx(Number(e.target.value)); setPuntosVisibles(61); }}
@@ -276,10 +277,11 @@ function TabCampo() {
           <span className={styles.hint}>{ode.descripcion}</span>
         </div>
         <div className={styles.controlGrupo}>
-          <label className={styles.controlLabel}>
+          <label htmlFor="condicion-inicial-y0" className={styles.controlLabel}>
             Condición inicial y₀ = <strong>{y0}</strong>
           </label>
           <input
+            id="condicion-inicial-y0"
             type="range"
             min="-3" max="3" step="0.5"
             value={y0}
@@ -433,38 +435,38 @@ function TabLotkaVolterra() {
           </p>
 
           <div className={styles.sliderGrupo}>
-            <label className={styles.controlLabel}>α (crecimiento conejos) = <strong>{alpha.toFixed(2)}</strong></label>
-            <input type="range" min="0.5" max="2" step="0.05" value={alpha}
+            <label htmlFor="lv-alpha" className={styles.controlLabel}>α (crecimiento conejos) = <strong>{alpha.toFixed(2)}</strong></label>
+            <input id="lv-alpha" type="range" min="0.5" max="2" step="0.05" value={alpha}
               onChange={e => { setAlpha(Number(e.target.value)); setVisibles(300); }}
               className={styles.slider} />
           </div>
           <div className={styles.sliderGrupo}>
-            <label className={styles.controlLabel}>β (eficiencia depredación) = <strong>{beta.toFixed(2)}</strong></label>
-            <input type="range" min="0.05" max="0.3" step="0.01" value={beta}
+            <label htmlFor="lv-beta" className={styles.controlLabel}>β (eficiencia depredación) = <strong>{beta.toFixed(2)}</strong></label>
+            <input id="lv-beta" type="range" min="0.05" max="0.3" step="0.01" value={beta}
               onChange={e => { setBeta(Number(e.target.value)); setVisibles(300); }}
               className={styles.slider} />
           </div>
           <div className={styles.sliderGrupo}>
-            <label className={styles.controlLabel}>δ (conversión de comida) = <strong>{delta.toFixed(2)}</strong></label>
-            <input type="range" min="0.05" max="0.3" step="0.01" value={delta}
+            <label htmlFor="lv-delta" className={styles.controlLabel}>δ (conversión de comida) = <strong>{delta.toFixed(2)}</strong></label>
+            <input id="lv-delta" type="range" min="0.05" max="0.3" step="0.01" value={delta}
               onChange={e => { setDelta(Number(e.target.value)); setVisibles(300); }}
               className={styles.slider} />
           </div>
           <div className={styles.sliderGrupo}>
-            <label className={styles.controlLabel}>γ (mortalidad lobos) = <strong>{gamma.toFixed(2)}</strong></label>
-            <input type="range" min="0.5" max="2" step="0.05" value={gamma}
+            <label htmlFor="lv-gamma" className={styles.controlLabel}>γ (mortalidad lobos) = <strong>{gamma.toFixed(2)}</strong></label>
+            <input id="lv-gamma" type="range" min="0.5" max="2" step="0.05" value={gamma}
               onChange={e => { setGamma(Number(e.target.value)); setVisibles(300); }}
               className={styles.slider} />
           </div>
           <div className={styles.sliderGrupo}>
-            <label className={styles.controlLabel}>R₀ (conejos iniciales) = <strong>{r0}</strong></label>
-            <input type="range" min="5" max="50" step="1" value={r0}
+            <label htmlFor="lv-conejos-iniciales" className={styles.controlLabel}>R₀ (conejos iniciales) = <strong>{r0}</strong></label>
+            <input id="lv-conejos-iniciales" type="range" min="5" max="50" step="1" value={r0}
               onChange={e => { setR0(Number(e.target.value)); setVisibles(300); }}
               className={styles.slider} />
           </div>
           <div className={styles.sliderGrupo}>
-            <label className={styles.controlLabel}>L₀ (lobos iniciales) = <strong>{l0}</strong></label>
-            <input type="range" min="1" max="20" step="1" value={l0}
+            <label htmlFor="lv-lobos-iniciales" className={styles.controlLabel}>L₀ (lobos iniciales) = <strong>{l0}</strong></label>
+            <input id="lv-lobos-iniciales" type="range" min="1" max="20" step="1" value={l0}
               onChange={e => { setL0(Number(e.target.value)); setVisibles(300); }}
               className={styles.slider} />
           </div>
@@ -619,18 +621,18 @@ function TabAplicaciones() {
           </p>
           <div className={styles.controlsRow}>
             <div className={styles.sliderGrupo}>
-              <label className={styles.controlLabel}>T₀ temperatura inicial = <strong>{t0Temp}°C</strong></label>
-              <input type="range" min="30" max="100" step="1" value={t0Temp}
+              <label htmlFor="temperatura-inicial" className={styles.controlLabel}>T₀ temperatura inicial = <strong>{t0Temp}°C</strong></label>
+              <input id="temperatura-inicial" type="range" min="30" max="100" step="1" value={t0Temp}
                 onChange={e => setT0Temp(Number(e.target.value))} className={styles.slider} />
             </div>
             <div className={styles.sliderGrupo}>
-              <label className={styles.controlLabel}>T<sub>amb</sub> ambiente = <strong>{tAmb}°C</strong></label>
-              <input type="range" min="0" max="40" step="1" value={tAmb}
+              <label htmlFor="temperatura-ambiente" className={styles.controlLabel}>T<sub>amb</sub> ambiente = <strong>{tAmb}°C</strong></label>
+              <input id="temperatura-ambiente" type="range" min="0" max="40" step="1" value={tAmb}
                 onChange={e => setTAmb(Number(e.target.value))} className={styles.slider} />
             </div>
             <div className={styles.sliderGrupo}>
-              <label className={styles.controlLabel}>k constante de enfriamiento = <strong>{k.toFixed(2)}</strong></label>
-              <input type="range" min="0.01" max="0.2" step="0.01" value={k}
+              <label htmlFor="constante-enfriamiento" className={styles.controlLabel}>k constante de enfriamiento = <strong>{k.toFixed(2)}</strong></label>
+              <input id="constante-enfriamiento" type="range" min="0.01" max="0.2" step="0.01" value={k}
                 onChange={e => setK(Number(e.target.value))} className={styles.slider} />
             </div>
           </div>
@@ -671,18 +673,18 @@ function TabAplicaciones() {
           </p>
           <div className={styles.controlsRow}>
             <div className={styles.sliderGrupo}>
-              <label className={styles.controlLabel}>R resistencia = <strong>{rKOhm} kΩ</strong></label>
-              <input type="range" min="1" max="100" step="1" value={rKOhm}
+              <label htmlFor="rc-resistencia" className={styles.controlLabel}>R resistencia = <strong>{rKOhm} kΩ</strong></label>
+              <input id="rc-resistencia" type="range" min="1" max="100" step="1" value={rKOhm}
                 onChange={e => setRKOhm(Number(e.target.value))} className={styles.slider} />
             </div>
             <div className={styles.sliderGrupo}>
-              <label className={styles.controlLabel}>C capacidad = <strong>{cUF} μF</strong></label>
-              <input type="range" min="1" max="100" step="1" value={cUF}
+              <label htmlFor="rc-capacidad" className={styles.controlLabel}>C capacidad = <strong>{cUF} μF</strong></label>
+              <input id="rc-capacidad" type="range" min="1" max="100" step="1" value={cUF}
                 onChange={e => setCUF(Number(e.target.value))} className={styles.slider} />
             </div>
             <div className={styles.sliderGrupo}>
-              <label className={styles.controlLabel}>V<sub>fuente</sub> = <strong>{vFuente} V</strong></label>
-              <input type="range" min="1" max="12" step="0.5" value={vFuente}
+              <label htmlFor="rc-tension-fuente" className={styles.controlLabel}>V<sub>fuente</sub> = <strong>{vFuente} V</strong></label>
+              <input id="rc-tension-fuente" type="range" min="1" max="12" step="0.5" value={vFuente}
                 onChange={e => setVFuente(Number(e.target.value))} className={styles.slider} />
             </div>
           </div>

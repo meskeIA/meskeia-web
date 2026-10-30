@@ -329,8 +329,9 @@ export default function PruebaCamaraPage() {
 
                   {/* Espejo */}
                   <div className={styles.settingRow}>
-                    <label>Espejo:</label>
+                    <label htmlFor="espejo">Espejo:</label>
                     <button
+                      id="espejo"
                       type="button"
                       onClick={() => setIsMirrored(!isMirrored)}
                       aria-pressed={isMirrored}

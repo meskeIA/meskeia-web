@@ -1,7 +1,7 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect, useCallback, useId } from 'react';
 import styles from './TransformadaFourier.module.css';
 import {
   MeskeiaLogo,
@@ -353,6 +353,7 @@ function ComponenteSlider({
   onRemove: (id: number) => void;
   puedeBorrar: boolean;
 }) {
+  const baseId = useId();
   return (
     <div className={styles.componenteCard} style={{ borderLeftColor: comp.color }}>
       <div className={styles.componenteHeader}>
@@ -371,10 +372,11 @@ function ComponenteSlider({
         )}
       </div>
       <div className={styles.sliderFila}>
-        <label className={styles.sliderLabel}>
+        <label htmlFor={`${baseId}-frecuencia`} className={styles.sliderLabel}>
           Frecuencia: <strong>{comp.frecuencia} Hz</strong>
         </label>
         <input
+          id={`${baseId}-frecuencia`}
           type="range"
           min={1}
           max={10}
@@ -387,10 +389,11 @@ function ComponenteSlider({
         />
       </div>
       <div className={styles.sliderFila}>
-        <label className={styles.sliderLabel}>
+        <label htmlFor={`${baseId}-amplitud`} className={styles.sliderLabel}>
           Amplitud: <strong>{comp.amplitud.toFixed(1)}</strong>
         </label>
         <input
+          id={`${baseId}-amplitud`}
           type="range"
           min={0.1}
           max={1}

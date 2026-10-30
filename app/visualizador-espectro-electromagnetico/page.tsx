@@ -301,11 +301,12 @@ export default function EspectroElectromagneticoPage() {
 
           <div className={styles.calcGrid}>
             <div className={styles.calcInput}>
-              <label className={styles.sliderLabel}>
+              <label htmlFor="longitud-onda" className={styles.sliderLabel}>
                 <span>Longitud de onda (nm)</span>
                 <span className={styles.sliderValue}>{lambdaInput} nm</span>
               </label>
               <input
+                id="longitud-onda"
                 type="range"
                 min="0.001"
                 max="1000000"

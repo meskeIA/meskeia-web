@@ -321,8 +321,9 @@ export default function CalculadoraGastoEnergeticoPage() {
           </div>
 
           <div className={styles.potenciaSelector}>
-            <label>Potencia contratada:</label>
+            <label htmlFor="potencia-contratada">Potencia contratada:</label>
             <select
+              id="potencia-contratada"
               value={potenciaContratada}
               onChange={(e) => setPotenciaContratada(parseFloat(e.target.value))}
             >

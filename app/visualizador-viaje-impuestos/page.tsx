@@ -258,10 +258,11 @@ export default function VisualizadorViajeImpuestosPage() {
           <p className={styles.calculadoraDesc}>Indica cuánto pagas de IRPF al año y te mostramos cómo se reparte tu aportación</p>
           <div className={styles.sliderZona}>
             <div className={styles.sliderHeader}>
-              <label className={styles.sliderLabel}>Tu IRPF anual</label>
+              <label htmlFor="irpf-anual" className={styles.sliderLabel}>Tu IRPF anual</label>
               <span className={styles.sliderValor}>{formatCurrency(irpfAnual)}</span>
             </div>
             <input
+              id="irpf-anual"
               type="range"
               className={styles.slider}
               min={500}

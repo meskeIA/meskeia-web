@@ -260,11 +260,11 @@ export default function CalculadoraProfundidadCampoPage() {
             </div>
 
             <div className={styles.inputGroup}>
-              <label>
+              <label id="apertura-label">
                 Apertura (f-stop)
                 <span className={styles.valueBadge}>f/{formatNumber(apertura, apertura < 10 && apertura % 1 !== 0 ? 1 : 0)}</span>
               </label>
-              <div className={styles.aperturaGrid}>
+              <div role="group" aria-labelledby="apertura-label" className={styles.aperturaGrid}>
                 {APERTURAS.map((a, idx) => (
                   <button
                     key={a}

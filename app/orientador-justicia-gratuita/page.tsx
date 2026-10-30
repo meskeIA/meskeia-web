@@ -151,8 +151,8 @@ export default function OrientadorJusticiaGratuitaPage() {
 
             {/* Caso automático */}
             <div className={styles.formGroup}>
-              <label className={styles.label}>¿Te encuentras en alguna de estas situaciones?</label>
-              <div className={styles.optionGrid}>
+              <label id="situacion-label" className={styles.label}>¿Te encuentras en alguna de estas situaciones?</label>
+              <div role="group" aria-labelledby="situacion-label" className={styles.optionGrid}>
                 <button
                   type="button"
                   className={`${styles.optionBtn} ${casoAutomatico === null ? styles.optionActivo : ''}`}
@@ -179,8 +179,8 @@ export default function OrientadorJusticiaGratuitaPage() {
             {casoAutomatico === null && (
               <>
                 <div className={styles.formGroup}>
-                  <label className={styles.label}>Tamaño de tu unidad familiar</label>
-                  <div className={styles.optionGrid}>
+                  <label id="unidad-familiar-label" className={styles.label}>Tamaño de tu unidad familiar</label>
+                  <div role="group" aria-labelledby="unidad-familiar-label" className={styles.optionGrid}>
                     {([
                       { id: 'persona_sola' as const, label: 'Persona sola', umbral: UMBRALES.persona_sola },
                       { id: 'familia_2' as const, label: '2 miembros', umbral: UMBRALES.familia_2 },

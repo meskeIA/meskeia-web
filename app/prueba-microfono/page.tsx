@@ -449,8 +449,9 @@ export default function PruebaMicrofonoPage() {
                   {/* Selector de micrófono */}
                   {microphones.length > 1 && (
                     <div className={styles.optionRow}>
-                      <label>Micrófono:</label>
+                      <label htmlFor="selector-microfono">Micrófono:</label>
                       <select
+                        id="selector-microfono"
                         value={selectedMicrophone}
                         onChange={(e) => setSelectedMicrophone(e.target.value)}
                         className={styles.select}
@@ -466,8 +467,8 @@ export default function PruebaMicrofonoPage() {
 
                   {/* Tipo de visualización */}
                   <div className={styles.optionRow}>
-                    <label>Visualización:</label>
-                    <div className={styles.toggleGroup}>
+                    <label id="visualizacion-label">Visualización:</label>
+                    <div role="group" aria-labelledby="visualizacion-label" className={styles.toggleGroup}>
                       <button
                         type="button"
                         onClick={() => setShowWaveform(true)}
@@ -489,8 +490,9 @@ export default function PruebaMicrofonoPage() {
 
                   {/* Sensibilidad */}
                   <div className={styles.optionRow}>
-                    <label>Sensibilidad: {Math.round(sensitivity * 100)}%</label>
+                    <label htmlFor="sensibilidad">Sensibilidad: {Math.round(sensitivity * 100)}%</label>
                     <input
+                      id="sensibilidad"
                       type="range"
                       min="0.5"
                       max="2"

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useId } from 'react';
 import styles from './AsistenteConstitucionSociedad.module.css';
 import { MeskeiaLogo, Footer, NumberInput, RelatedApps, EducationalSection, LegalNotice, DisclaimerCard, ShareCard } from '@/components';
 import { formatCurrency, parseSpanishNumber } from '@/lib';
@@ -173,6 +173,7 @@ export default function AsistenteConstitucionSociedadPage() {
   const [marcados, setMarcados] = useState<Set<string>>(new Set());
   const [datos, setDatos] = useState<DatosSociedad>(DATOS_INICIALES);
   const [faseAbierta, setFaseAbierta] = useState<number | null>(1);
+  const baseId = useId();
 
   // Persistencia localStorage
   useEffect(() => {
@@ -412,8 +413,9 @@ export default function AsistenteConstitucionSociedadPage() {
               { campo: 'denominacion3' as keyof DatosSociedad, label: '3.ª opción', placeholder: 'Ej.: Innovatech Group' },
             ].map(({ campo, label, placeholder }) => (
               <div key={campo} className={styles.campo}>
-                <label className={styles.label}>{label}</label>
+                <label htmlFor={`${baseId}-${campo}`} className={styles.label}>{label}</label>
                 <input
+                  id={`${baseId}-${campo}`}
                   type="text"
                   value={datos[campo] as string}
                   onChange={e => actualizarDato(campo, e.target.value)}
@@ -450,21 +452,21 @@ export default function AsistenteConstitucionSociedadPage() {
           <div className={styles.formSeccion}>
             <h3 className={styles.formSeccionTitulo}><span aria-hidden="true">📍</span> Domicilio Social</h3>
             <div className={styles.campo}>
-              <label className={styles.label}>Calle y número</label>
-              <input type="text" value={datos.domicilio} onChange={e => actualizarDato('domicilio', e.target.value)} placeholder="Calle Mayor, 1" className={styles.input} />
+              <label htmlFor="domicilio" className={styles.label}>Calle y número</label>
+              <input id="domicilio" type="text" value={datos.domicilio} onChange={e => actualizarDato('domicilio', e.target.value)} placeholder="Calle Mayor, 1" className={styles.input} />
             </div>
             <div className={styles.camposGrid}>
               <div className={styles.campo}>
-                <label className={styles.label}>Localidad</label>
-                <input type="text" value={datos.localidad} onChange={e => actualizarDato('localidad', e.target.value)} placeholder="Madrid" className={styles.input} />
+                <label htmlFor="localidad" className={styles.label}>Localidad</label>
+                <input id="localidad" type="text" value={datos.localidad} onChange={e => actualizarDato('localidad', e.target.value)} placeholder="Madrid" className={styles.input} />
               </div>
               <div className={styles.campo}>
-                <label className={styles.label}>Provincia</label>
-                <input type="text" value={datos.provincia} onChange={e => actualizarDato('provincia', e.target.value)} placeholder="Madrid" className={styles.input} />
+                <label htmlFor="provincia" className={styles.label}>Provincia</label>
+                <input id="provincia" type="text" value={datos.provincia} onChange={e => actualizarDato('provincia', e.target.value)} placeholder="Madrid" className={styles.input} />
               </div>
               <div className={styles.campo}>
-                <label className={styles.label}>Código postal</label>
-                <input type="text" value={datos.codigoPostal} onChange={e => actualizarDato('codigoPostal', e.target.value)} placeholder="28001" className={styles.input} maxLength={5} />
+                <label htmlFor="codigo-postal" className={styles.label}>Código postal</label>
+                <input id="codigo-postal" type="text" value={datos.codigoPostal} onChange={e => actualizarDato('codigoPostal', e.target.value)} placeholder="28001" className={styles.input} maxLength={5} />
               </div>
             </div>
           </div>
@@ -474,8 +476,9 @@ export default function AsistenteConstitucionSociedadPage() {
             <h3 className={styles.formSeccionTitulo}><span aria-hidden="true">🎯</span> Objeto Social</h3>
             <p className={styles.formSeccionDesc}>Describe las actividades de la empresa. Redacción amplia para no limitar futuras actividades.</p>
             <div className={styles.campo}>
-              <label className={styles.label}>Objeto social</label>
+              <label htmlFor="objeto-social" className={styles.label}>Objeto social</label>
               <textarea
+                id="objeto-social"
                 value={datos.objetoSocial}
                 onChange={e => actualizarDato('objetoSocial', e.target.value)}
                 placeholder="La actividad de la sociedad comprenderá: desarrollo, consultoría y comercialización de software y soluciones tecnológicas..."

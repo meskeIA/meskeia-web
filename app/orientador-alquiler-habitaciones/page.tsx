@@ -100,8 +100,9 @@ export default function OrientadorAlquilerHabitacionesPage() {
           </h2>
 
           <div className={styles.formGroup}>
-            <label className={styles.label}>¿Tu vivienda está en zona tensionada?</label>
+            <label htmlFor="zona-tensionada" className={styles.label}>¿Tu vivienda está en zona tensionada?</label>
             <select
+              id="zona-tensionada"
               className={styles.select}
               value={esZonaTensionada ? 'si' : 'no'}
               onChange={e => { setEsZonaTensionada(e.target.value === 'si'); setCalculado(false); }}
