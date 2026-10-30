@@ -309,6 +309,18 @@
   opacity: 0.5;
 }
 
+/* ✓/✗ de la buena y la fallada: no solo el color del borde (hallazgo 3811) */
+.opcionMarca {
+  margin-left: auto;
+  flex-shrink: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+.opcionCorrecta .opcionMarca { color: #15803d; }
+.opcionIncorrecta .opcionMarca { color: #b91c1c; }
+[data-theme='dark'] .opcionCorrecta .opcionMarca { color: #4ade80; }
+[data-theme='dark'] .opcionIncorrecta .opcionMarca { color: #fca5a5; }
+
 /* ── Feedback ── */
 .feedbackPanel {
   border-radius: 12px;

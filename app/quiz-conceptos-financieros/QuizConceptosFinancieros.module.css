@@ -35,6 +35,8 @@
 .seleccionada { border-color: var(--primary); background: rgba(46, 134, 171, 0.08); }
 .correcta { border-color: var(--success); background: rgba(39, 174, 96, 0.08); color: var(--success); font-weight: 600; }
 .incorrecta { border-color: var(--danger); background: rgba(231, 76, 60, 0.08); color: var(--danger); }
+/* ✓/✗ de la buena y la fallada: no solo el color (cabo C0516). Heredan el de su estado. */
+.opcionMarca { margin-left: auto; flex-shrink: 0; font-size: 1.05rem; font-weight: 700; }
 .opcionLetra { display: flex; align-items: center; justify-content: center; width: 1.8rem; height: 1.8rem; border-radius: 50%; background: var(--bg-primary); border: 1.5px solid var(--border); font-weight: 700; font-size: 0.82rem; flex-shrink: 0; }
 .correcta .opcionLetra { background: var(--success); color: white; border-color: var(--success); }
 

@@ -252,7 +252,15 @@ async function opcionesVisibles(page: Page): Promise<string[]> {
   const etiquetas = await botones.evaluateAll((bs) =>
     bs.map((b) => b.getAttribute('aria-label') ?? '')
   );
-  return etiquetas.map((a) => a.replace(/^Opción [A-D]: /, ''));
+  return etiquetas.map(sinMarcas);
+}
+
+/**
+ * El texto de la opción desde su aria-label, sin «Opción X: » ni la marca que lleva tras contestar
+ * («(respuesta correcta)» / «(tu respuesta, incorrecta)», hallazgo 3800).
+ */
+function sinMarcas(aria: string): string {
+  return aria.replace(/^Opción [A-D]: /, '').replace(/ \((respuesta correcta|tu respuesta, incorrecta)\)$/, '');
 }
 
 /** Pulsa la opción cuyo texto sea exactamente `texto`. `forzar` salta el check de habilitado. */
@@ -262,7 +270,7 @@ async function pulsarOpcion(page: Page, texto: string, forzar = false) {
   for (let i = 0; i < total; i++) {
     const b = botones.nth(i);
     const aria = (await b.getAttribute('aria-label')) ?? '';
-    if (aria.replace(/^Opción [A-D]: /, '') === texto) {
+    if (sinMarcas(aria) === texto) {
       await b.click({ force: forzar });
       return;
     }
@@ -2877,8 +2885,7 @@ test.describe('Inspector 29/10/2026 (tarde)', () => {
    * arriba).
    */
   test('hallazgo · Enter en la casilla del Past Participle con el pasado vacío no corrige: pasa a la casilla del pasado', async ({ page }) => {
-    // ABIERTO (Inspector 29/10/2026, tarde): falla en la aserción del veredicto.
-    test.fail();
+    // REPARADO (3799, /reparar 30/10/2026): la regla del 3769 vale ya en las dos casillas.
     await page.setViewportSize({ width: 1280, height: 800 });
     await abrirConProps(page);
     await arrancarEscribiendo(page, 'A1 Básico', 10);
@@ -2910,8 +2917,8 @@ test.describe('Inspector 29/10/2026 (tarde)', () => {
    * y en la fallada.
    */
   test('hallazgo · tras fallar, la opción correcta y la fallada se distinguen por algo más que el color', async ({ page }) => {
-    // ABIERTO (Inspector 29/10/2026, tarde): falla en la aserción de la opción correcta.
-    test.fail();
+    // REPARADO (3800, /reparar 30/10/2026): ✓/✗ visibles y la marca en el aria-label. Antes fallaba
+    // en la aserción de la opción correcta.
     await page.setViewportSize({ width: 1280, height: 800 });
     await abrirHidratada(page);
     await arrancarPartida(page, 'A1 Básico', 10);

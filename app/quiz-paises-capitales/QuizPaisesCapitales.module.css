@@ -332,6 +332,15 @@
   opacity: 0.5;
 }
 
+/* ✓/✗ de la buena y la fallada: no solo el color (hallazgo 3806). Heredan el color de su estado,
+   que ya tiene variante oscura. */
+.opcionMarca {
+  margin-left: auto;
+  flex-shrink: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
 [data-theme='dark'] .opcionCorrecta {
   background: rgba(39, 103, 73, 0.2) !important;
   color: #68D391 !important;

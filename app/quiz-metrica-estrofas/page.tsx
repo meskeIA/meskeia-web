@@ -490,6 +490,12 @@ export default function QuizMetricaEstrofasPage() {
                 else if (opcion === seleccionada) claseExtra = styles.opcionIncorrecta;
                 else claseExtra = styles.opcionNeutral;
               }
+              // Hallazgo 3811 (cabo C0516): la buena y la fallada no solo por el color (WCAG
+              // 1.4.1). Receta de quiz-literatura-universal (303): ✓/✗ visibles y aria-hidden, y la
+              // marca en el nombre accesible.
+              const esBuena = seleccionada !== null && opcion === pregunta.correcta;
+              const esFallada = seleccionada !== null && opcion === seleccionada && !esBuena;
+              const marca = esBuena ? ' (respuesta correcta)' : esFallada ? ' (tu respuesta, incorrecta)' : '';
               return (
                 <button
                   type="button"
@@ -497,10 +503,12 @@ export default function QuizMetricaEstrofasPage() {
                   className={`${styles.opcion} ${claseExtra}`}
                   onClick={() => responder(opcion)}
                   disabled={seleccionada !== null}
-                  aria-label={`Opción ${LETRAS[i]}: ${opcion}`}
+                  aria-label={`Opción ${LETRAS[i]}: ${opcion}${marca}`}
                 >
                   <span className={styles.opcionLetra}>{LETRAS[i]}</span>
                   {opcion}
+                  {esBuena && <span className={styles.opcionMarca} aria-hidden="true">✓</span>}
+                  {esFallada && <span className={styles.opcionMarca} aria-hidden="true">✗</span>}
                 </button>
               );
             })}

@@ -347,6 +347,11 @@ function QuizPorFases() {
                   claseBoton = `${styles.btnOpcion} ${styles.btnDesactivado}`;
                 }
               }
+              // Cabo C0516: la buena y la fallada no solo por el color (WCAG 1.4.1). Receta de
+              // quiz-literatura-universal (303): ✓/✗ visibles y aria-hidden, y la marca en el nombre.
+              const esBuena = esFeedback && grupo === plantaActual.grupo;
+              const esFallada = esFeedback && grupo === juego.respuestaSeleccionada && !esBuena;
+              const marca = esBuena ? ' (respuesta correcta)' : esFallada ? ' (tu respuesta, incorrecta)' : '';
               return (
                 <button
                   key={grupo}
@@ -357,9 +362,14 @@ function QuizPorFases() {
                   // Sin aria-pressed: elegir respuesta es una acción, no un conmutador (queda
                   // disabled y no se puede despulsar). Receta del hallazgo 285, familia de los quizzes.
                   style={{ borderColor: esFeedback && grupo === plantaActual.grupo ? info.color : undefined }}
+                  aria-label={marca ? `${info.label}: ${info.descripcion}${marca}` : undefined}
                 >
                   <span className={styles.opcionEmoji} aria-hidden="true">{info.emoji}</span>
-                  <span className={styles.opcionLabel}>{info.label}</span>
+                  <span className={styles.opcionLabel}>
+                    {info.label}
+                    {esBuena && <span className={styles.opcionMarca} aria-hidden="true">✓</span>}
+                    {esFallada && <span className={styles.opcionMarca} aria-hidden="true">✗</span>}
+                  </span>
                   <span className={styles.opcionDescripcion}>{info.descripcion}</span>
                 </button>
               );

@@ -412,7 +412,8 @@ test.describe('Inspector 28/10/2026 · hallazgos de la partida', () => {
     const fallos: string[] = [];
     for (let n = 1; n <= 6; n++) {
       const r = await responder(page, 'mal');
-      const despues = await rotulos(page);
+      // Sin las marcas ✓/✗ que se añaden al contestar (cabo C0516, 30/10/2026): se mide el orden y el conjunto
+      const despues = (await rotulos(page)).map((t) => t.replace(/[✓✗]/g, '').trim());
       if (despues.join('|') !== r.antes.join('|')) fallos.push(`P${n} ${r.nombre}: [${r.antes}] → [${despues}]`);
       const roja = page.locator('[class*="opcionesGrid"] button[class*="btnIncorrecto"]');
       if ((await roja.count()) !== 1 || norm(await roja.first().innerText().catch(() => '')).indexOf(r.elegida) < 0) {

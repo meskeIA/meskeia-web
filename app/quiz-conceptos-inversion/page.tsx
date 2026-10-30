@@ -607,6 +607,11 @@ export default function QuizConceptosInversionPage() {
                 }
                 // Sin aria-pressed: elegir respuesta es una acción, no un conmutador (queda
                 // disabled y no se puede despulsar). Receta del hallazgo 285, familia de los quizzes.
+                // Cabo C0516: la buena y la fallada no solo por el color (WCAG 1.4.1). Receta de
+                // quiz-literatura-universal (303): ✓/✗ visibles y aria-hidden, y la marca en el nombre.
+                const esBuena = estado === 'respondida' && i === preguntaActual.correcta;
+                const esFallada = estado === 'respondida' && i === respuestaElegida && !esBuena;
+                const marca = esBuena ? ' (respuesta correcta)' : esFallada ? ' (tu respuesta, incorrecta)' : '';
                 return (
                   <button
                     key={i}
@@ -614,9 +619,12 @@ export default function QuizConceptosInversionPage() {
                     onClick={() => responder(i)}
                     disabled={estado === 'respondida'}
                     className={cls}
+                    aria-label={marca ? `${LETRAS[i]}. ${op}${marca}` : undefined}
                   >
                     <span className={styles.opcionLetra}>{LETRAS[i]}</span>
                     <span>{op}</span>
+                    {esBuena && <span className={styles.opcionMarca} aria-hidden="true">✓</span>}
+                    {esFallada && <span className={styles.opcionMarca} aria-hidden="true">✗</span>}
                   </button>
                 );
               })}

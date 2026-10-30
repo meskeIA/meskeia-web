@@ -1677,8 +1677,8 @@ test.describe('inspector 29/10/2026 (tarde) — re-inspección tras /reparar · 
   });
 
   test('hallazgo · tras contestar, la opción correcta y la fallada se distinguen solo por el color (forma del cabo C0516)', async ({ page }) => {
-    test.fail(); // ABIERTO (nuevo, 29/10/2026 tarde)
-    // page.tsx:406-426 — al contestar, la correcta recibe .opcionCorrecta (verde) y la fallada
+    // REPARADO (3806, /reparar 30/10/2026): ✓/✗ visibles y la marca en el aria-label. El título
+    // describe el defecto que había. Era: page.tsx:406-426 — al contestar, la correcta recibe .opcionCorrecta (verde) y la fallada
     // .opcionIncorrecta (rojo), pero su nombre accesible sigue siendo «Opción B: Lisboa» y no llevan
     // ninguna marca visible: solo cambia el color (WCAG 1.4.1). La referencia de la familia,
     // quiz-literatura-universal (hallazgo 303), pinta ✓/✗ (aria-hidden) y añade «(respuesta

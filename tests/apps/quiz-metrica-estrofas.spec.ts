@@ -1146,7 +1146,7 @@ test.describe('Inspector 29/10/2026 (tarde) · doble clic sobre una opción (136
    * que el texto o el nombre accesible de la buena y de la fallada cambien al contestar.
    */
   test('hallazgo · la opción correcta y la fallada no se distinguen solo por el color', async ({ page }) => {
-    test.fail();
+    // REPARADO (3811, /reparar 30/10/2026): ✓/✗ visibles y la marca en el aria-label
     await abrir(page);
     await esperarHidratado(page, /^Empezar Quiz/);
     await configurar(page, 'Intermedio', 8);

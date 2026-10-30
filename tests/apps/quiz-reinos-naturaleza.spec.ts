@@ -837,7 +837,7 @@ test.describe('inspector 29/10/2026 (tarde) — re-inspección tras /reparar', (
   });
 
   test('hallazgo · tras fallar, la correcta y la elegida se distinguen por algo más que el color', async ({ page }) => {
-    test.fail(); // ABIERTO (29/10/2026 tarde) — forma del cabo C0516: tras contestar, las opciones
+    // REPARADO (3821, /reparar 30/10/2026): ✓/✗ visibles y la marca en el aria-label. Era — forma del cabo C0516: tras contestar, las opciones
     // solo cambian de clase (verde la correcta, rojo la elegida, page.tsx:271-276); ni ✓/✗, ni
     // nombre accesible nuevo («Opción A: Anfibio» sigue igual), ni descripción. El panel sí dice
     // «Incorrecto» y el grupo correcto, pero no qué botón es cuál.

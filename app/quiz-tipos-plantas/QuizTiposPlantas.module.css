@@ -387,6 +387,12 @@
   opacity: 0.45;
 }
 
+/* ✓/✗ de la buena y la fallada: no solo el color (cabo C0516). Heredan el de su estado. */
+.opcionMarca {
+  margin-left: 0.35rem;
+  font-weight: 700;
+}
+
 .opcionEmoji {
   font-size: 1.3rem;
 }

@@ -313,18 +313,29 @@ export default function QuizHistoriaEspanaPage() {
 
           {/* Opciones */}
           <div className={styles.opcionesGrid} role="group" aria-label="Opciones de respuesta">
-            {opcionesOrdenadas.map((opcion, i) => (
-              <button
-                key={opcion}
-                type="button"
-                className={`${styles.opcionBtn} ${claseOpcion(opcion)}`}
-                onClick={() => responder(opcion)}
-                disabled={fase === 'respondida'}
-              >
-                <span className={styles.opcionLetra} aria-hidden="true">{LETRAS[i]}</span>
-                <span className={styles.opcionTexto}>{opcion}</span>
-              </button>
-            ))}
+            {opcionesOrdenadas.map((opcion, i) => {
+              // Cabo C0516 (alcance de 3825, la gemela): la buena y la fallada no solo por el color
+              // (WCAG 1.4.1). Receta de quiz-literatura-universal (303): ✓/✗ visibles y aria-hidden,
+              // y la marca en el nombre accesible.
+              const esBuena = fase === 'respondida' && opcion === preguntaActual.correcta;
+              const esFallada = fase === 'respondida' && opcion === seleccionada && !esBuena;
+              const marca = esBuena ? ' (respuesta correcta)' : esFallada ? ' (tu respuesta, incorrecta)' : '';
+              return (
+                <button
+                  key={opcion}
+                  type="button"
+                  className={`${styles.opcionBtn} ${claseOpcion(opcion)}`}
+                  onClick={() => responder(opcion)}
+                  disabled={fase === 'respondida'}
+                  aria-label={marca ? `${opcion}${marca}` : undefined}
+                >
+                  <span className={styles.opcionLetra} aria-hidden="true">{LETRAS[i]}</span>
+                  <span className={styles.opcionTexto}>{opcion}</span>
+                  {esBuena && <span className={styles.opcionMarca} aria-hidden="true">✓</span>}
+                  {esFallada && <span className={styles.opcionMarca} aria-hidden="true">✗</span>}
+                </button>
+              );
+            })}
           </div>
 
           {/* Feedback — la región viva existe desde el principio (una región que nace ya con

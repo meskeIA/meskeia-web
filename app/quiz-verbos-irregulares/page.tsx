@@ -565,6 +565,12 @@ export default function QuizVerbosIrregularesPage() {
                   else if (opcion === seleccionada) claseExtra = styles.opcionIncorrecta;
                   else claseExtra = styles.opcionNeutral;
                 }
+                // Hallazgo 3800 (cabo C0516): la buena y la fallada no solo por el color, que aquí
+                // además tienen casi la misma luminancia (WCAG 1.4.1). Receta de
+                // quiz-literatura-universal (303): ✓/✗ visibles y aria-hidden, y la marca en el nombre.
+                const esBuena = seleccionada !== null && opcion === pregunta.respuestaCorrecta;
+                const esFallada = seleccionada !== null && opcion === seleccionada && !esBuena;
+                const marca = esBuena ? ' (respuesta correcta)' : esFallada ? ' (tu respuesta, incorrecta)' : '';
                 return (
                   <button
                     type="button"
@@ -572,10 +578,12 @@ export default function QuizVerbosIrregularesPage() {
                     className={`${styles.opcion} ${claseExtra}`}
                     onClick={() => responder(opcion)}
                     disabled={seleccionada !== null}
-                    aria-label={`Opción ${LETRAS[i]}: ${opcion}`}
+                    aria-label={`Opción ${LETRAS[i]}: ${opcion}${marca}`}
                   >
                     <span className={styles.opcionLetra}>{LETRAS[i]}</span>
                     {opcion}
+                    {esBuena && <span className={styles.opcionMarca} aria-hidden="true">✓</span>}
+                    {esFallada && <span className={styles.opcionMarca} aria-hidden="true">✗</span>}
                   </button>
                 );
               })}
@@ -594,6 +602,7 @@ export default function QuizVerbosIrregularesPage() {
                 {CAMPOS_ESCRITURA.map(campo => {
                   const valor = campo.clave === 'pasado' ? textoPasado : textoParticipio;
                   const ok = correccion === null ? undefined : campo.clave === 'pasado' ? correccion.pasadoOk : correccion.participioOk;
+                  const otraVacia = !(campo.clave === 'pasado' ? textoParticipio : textoPasado).trim();
                   return (
                     <div key={campo.id} className={styles.escrituraCampo}>
                       <label htmlFor={campo.id} className={styles.escrituraLabel}>{campo.etiqueta}</label>
@@ -614,12 +623,15 @@ export default function QuizVerbosIrregularesPage() {
                         // Hallazgo 3769: Enter en el Past Simple con el participio vacío pasa a la
                         // segunda casilla en vez de corregir con ella vacía (y la tecla del móvil
                         // dice «Siguiente»); con las dos llenas, corrige como siempre.
-                        enterKeyHint={campo.clave === 'pasado' && !textoParticipio.trim() ? 'next' : 'done'}
-                        onKeyDown={campo.clave === 'pasado' ? (e) => {
-                          if (e.key !== 'Enter' || correccion !== null || textoParticipio.trim()) return;
+                        // Hallazgo 3799: la regla valía solo en el Past Simple; en el Past Participle,
+                        // con el pasado vacío, Enter corregía y el verbo contaba como fallado. Ahora
+                        // vale en las dos: Enter con la OTRA casilla vacía lleva a ella.
+                        enterKeyHint={otraVacia ? 'next' : 'done'}
+                        onKeyDown={(e) => {
+                          if (e.key !== 'Enter' || correccion !== null || !otraVacia) return;
                           e.preventDefault();
-                          inputParticipioRef.current?.focus();
-                        } : undefined}
+                          (campo.clave === 'pasado' ? inputParticipioRef : inputPasadoRef).current?.focus();
+                        }}
                       />
                       {ok !== undefined && (
                         <span className={ok ? styles.escrituraMarcaOk : styles.escrituraMarcaMal}>

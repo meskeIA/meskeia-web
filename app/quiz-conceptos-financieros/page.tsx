@@ -153,6 +153,11 @@ export default function QuizConceptosFinancierosPage() {
                     if (i === PREGUNTAS[preguntaActual].correcta) estado = styles.correcta;
                     else if (i === respuestas[preguntaActual]) estado = styles.incorrecta;
                   }
+                  // Cabo C0516: la buena y la fallada no solo por el color (WCAG 1.4.1). Receta de
+                  // quiz-literatura-universal (303): ✓/✗ visibles y aria-hidden, y la marca en el nombre.
+                  const esBuena = mostrarExplicacion && i === PREGUNTAS[preguntaActual].correcta;
+                  const esFallada = mostrarExplicacion && i === respuestas[preguntaActual] && !esBuena;
+                  const marca = esBuena ? ' (respuesta correcta)' : esFallada ? ' (tu respuesta, incorrecta)' : '';
                   return (
                     <button
                       key={i}
@@ -160,9 +165,12 @@ export default function QuizConceptosFinancierosPage() {
                       className={`${styles.opcionBtn} ${estado} ${!mostrarExplicacion && respuestas[preguntaActual] === i ? styles.seleccionada : ''}`}
                       onClick={() => responder(i)}
                       disabled={mostrarExplicacion}
+                      aria-label={marca ? `${String.fromCharCode(65 + i)}. ${op}${marca}` : undefined}
                     >
                       <span className={styles.opcionLetra}>{String.fromCharCode(65 + i)}</span>
                       {op}
+                      {esBuena && <span className={styles.opcionMarca} aria-hidden="true">✓</span>}
+                      {esFallada && <span className={styles.opcionMarca} aria-hidden="true">✗</span>}
                     </button>
                   );
                 })}

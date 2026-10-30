@@ -54,6 +54,8 @@ interface Hermana {
   dobleToque?: { falla?: string; omitido?: string };
   /** Ídem para «Siguiente» enfocado sin centrar (hallazgo 3770); `omitido` si no enfoca el botón. */
   sinCentrar?: { falla?: string; omitido?: string };
+  /** Ídem para la buena y la fallada marcadas con algo más que color (cabo C0516). */
+  marcaSinColor?: { falla?: string; omitido?: string };
 }
 
 const EMPEZAR = /empezar|comenzar/i;
@@ -136,6 +138,8 @@ const HERMANAS: Hermana[] = [
     // Al contestar no enfoca «Siguiente»: enfoca el bloque de la revelación con enfocarALaVista,
     // que lo pone arriba con el veredicto dentro. El caso del 3770 no se aplica.
     sinCentrar: { omitido: 'enfoca el bloque de la revelación, no el botón «Siguiente»' },
+    // Al contestar, Verdad/Mito desaparecen y la revelación dice con texto si era verdad o mito.
+    marcaSinColor: { omitido: 'las respuestas desaparecen al contestar: no queda opción que marcar' },
   },
 ];
 
@@ -393,6 +397,38 @@ for (const h of HERMANAS) {
         if ((await dondeFoco(page)) === 'body') caidas.push(`${viewport.width} × ${viewport.height}`);
       }
       expect(caidas, 'tras el doble clic en la opción, el foco cayó a <body>').toEqual([]);
+    });
+
+    /**
+     * Cabo C0516 (hallazgos 3776, 3800, 3804, 3806, 3811, 3817, 3821 y 3825, 29/10/2026): tras
+     * contestar, la opción buena y la fallada se distinguían SOLO por el color, que además en
+     * varias tenía casi la misma luminancia en verde y en rojo (WCAG 1.4.1). Receta de la
+     * referencia (hallazgo 303): ✓/✗ visibles (aria-hidden) y «(respuesta correcta)» / «(tu
+     * respuesta, incorrecta)» en el nombre accesible. Se mide el texto visible y el nombre de cada
+     * opción antes y después de contestar la A: la pulsada cambia, y si es la fallada, cambia otra
+     * más (la buena).
+     */
+    test('tras contestar, la buena y la fallada se distinguen por algo más que el color', async ({ page }) => {
+      test.skip(Boolean(h.marcaSinColor?.omitido), h.marcaSinColor?.omitido);
+      if (h.marcaSinColor?.falla) test.fail();
+      await page.goto(`/${h.slug}/`);
+      for (const boton of h.arranque) await pulsarHidratado(page, boton);
+      await esperarHidratado(page, h.opcion ?? /^\s*A\S/);
+      const pulsada = page.locator('button:visible').filter({ hasText: h.opcion ?? /^\s*A\S/ }).first();
+      const todas = pulsada.locator('xpath=..').locator('button');
+      const firmas = () =>
+        todas.evaluateAll((bs) => bs.map((b) => `${b.getAttribute('aria-label') ?? ''} | ${(b as HTMLElement).innerText}`.replace(/\s+/g, ' ').trim()));
+      const indice = await pulsada.evaluate((b) => [...(b.parentElement?.querySelectorAll('button') ?? [])].indexOf(b as HTMLButtonElement));
+      const antes = await firmas();
+      await page.waitForTimeout(350);
+      await pulsada.click();
+      await expect.poll(() => todas.evaluateAll((bs) => bs.every((b) => (b as HTMLButtonElement).disabled))).toBe(true);
+      const despues = await firmas();
+      const cambian = despues.map((f, i) => (f !== antes[i] ? i : -1)).filter((i) => i >= 0);
+      expect(cambian, 'la opción pulsada no cambia ni de texto ni de nombre: solo de color').toContain(indice);
+      if (/✗|incorrecta/i.test(despues[indice])) {
+        expect(cambian.length, 'fallada: la buena no cambia ni de texto ni de nombre').toBeGreaterThanOrEqual(2);
+      }
     });
 
     /**

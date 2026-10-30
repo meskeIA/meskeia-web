@@ -219,6 +219,12 @@
   border-color: #E74C3C;
   background: rgba(231,76,60,0.08);
 }
+/* ✓/✗ de la buena y la fallada: no solo el color del borde (cabo C0516) */
+.opcionMarca { margin-left: auto; flex-shrink: 0; font-size: 1.05rem; font-weight: 700; }
+.opcionCorrecta .opcionMarca { color: #15803d; }
+.opcionIncorrecta .opcionMarca { color: #b91c1c; }
+[data-theme='dark'] .opcionCorrecta .opcionMarca { color: #4ade80; }
+[data-theme='dark'] .opcionIncorrecta .opcionMarca { color: #fca5a5; }
 .opcionLetra {
   min-width: 1.5rem;
   height: 1.5rem;
