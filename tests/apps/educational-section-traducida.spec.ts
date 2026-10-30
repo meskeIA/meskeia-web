@@ -1,4 +1,5 @@
 import { test, expect, Page } from '@playwright/test';
+import { asentarAntesDeTraducir } from './_hidratacion';
 
 /**
  * Testigo de componente — el botón de `components/EducationalSection.tsx` con la página traducida.
@@ -17,7 +18,12 @@ import { test, expect, Page } from '@playwright/test';
 
 const APPS = ['/simulador-genetica/', '/calculadora-porcentajes/'] as const;
 
-const traducir = (page: Page) =>
+// Antes del primer <font>, la página entera asentada (cabo C0493: ver asentarAntesDeTraducir)
+const traducir = async (page: Page) => {
+  await asentarAntesDeTraducir(page);
+  return traducirYa(page);
+};
+const traducirYa = (page: Page) =>
   page.evaluate(() => {
     const caminante = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
       acceptNode: (n) => {

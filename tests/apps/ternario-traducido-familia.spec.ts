@@ -1,4 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
+import { asentarAntesDeTraducir } from './_hidratacion';
 
 /**
  * Testigo de familia — un rótulo que alterna texto suelto y fragmento, con la página traducida.
@@ -16,7 +17,12 @@ import { test, expect, type Page } from '@playwright/test';
  * Reinyección: con el ternario viejo en generador-sombras, el test de esa app cae.
  */
 
-const traducir = (page: Page) =>
+// Antes del primer <font>, la página entera asentada (cabo C0493: ver asentarAntesDeTraducir)
+const traducir = async (page: Page) => {
+  await asentarAntesDeTraducir(page);
+  return traducirYa(page);
+};
+const traducirYa = (page: Page) =>
   page.evaluate(() => {
     const caminante = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
       acceptNode: (n) => {

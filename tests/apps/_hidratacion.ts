@@ -479,3 +479,28 @@ export async function esperarPaginaAsentada(
     { quietud: quietudMs, maximo: maximoMs },
   );
 }
+
+type VentanaAsentada = Window & { __asentadaParaTraducir?: boolean };
+
+/**
+ * Antes de que el TRADUCTOR SIMULADO toque la página (los `createElement('font')` de los specs
+ * de página traducida): la página entera hidratada y quieta, UNA vez por navegación. Va al
+ * principio de la función que traduce, así que cubre todas sus llamadas sin pagar la espera en
+ * cada paso: la marca vive en `window` y una navegación nueva la borra.
+ *
+ * ── De dónde sale (cabo C0493, 30/10/2026) ───────────────────────────────────
+ * Los specs esperaban a UN control de la app (`esperarHidratacion` con su input) y traducían.
+ * Ese control hidrata antes que el resto: si el traductor envuelve en <font> el texto de un
+ * trozo aún sin hidratar (el pie, las relacionadas, un Suspense), React da «Hydration failed»,
+ * REGENERA ese árbol en el cliente y se lleva los <font>: el test sigue, pero mide una página
+ * que ya no está traducida. Medido con `.reparar-trabajo/medir-c0493.mjs` (4 cargas por app,
+ * traduciendo en cuanto hay un control hidratado): error de hidratación en 14 de las 16 apps con
+ * traductor, de 1 a 4 de cada 4 cargas. El primero fue conversor-braille (cabo C0491, 88075014).
+ */
+export async function asentarAntesDeTraducir(page: Page): Promise<void> {
+  if (await page.evaluate(() => (window as VentanaAsentada).__asentadaParaTraducir === true)) return;
+  await esperarPaginaAsentada(page);
+  await page.evaluate(() => {
+    (window as VentanaAsentada).__asentadaParaTraducir = true;
+  });
+}

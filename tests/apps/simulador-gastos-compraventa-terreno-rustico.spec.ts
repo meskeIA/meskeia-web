@@ -79,7 +79,7 @@ import {
 } from '../../data/itp-ccaa';
 // Añadido en la re-inspección del 12/09/2026: los casos nuevos siembran esperando a que
 // React haya montado el input, en vez de confiar en el `load` de `page.goto()`.
-import { esperarHidratacion, esperarValorEnReact, sembrarValor } from './_hidratacion';
+import { esperarHidratacion, esperarValorEnReact, sembrarValor, asentarAntesDeTraducir } from './_hidratacion';
 
 const RUTA = '/simulador-gastos-compraventa-terreno-rustico/';
 
@@ -4317,6 +4317,8 @@ import { DEDUCCION_IRPF_RENTAS_CEUTA_MELILLA } from '../../data/fiscal/inmuebles
 
 /** El traductor del navegador, simulado como en tests/apps/ternario-traducido-familia.spec.ts. */
 async function i24Traducir(page: Page): Promise<void> {
+  // Antes del primer <font>, la página entera asentada (cabo C0493: ver asentarAntesDeTraducir)
+  await asentarAntesDeTraducir(page);
   await page.evaluate(() => {
     const caminante = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
       acceptNode: (n) => {

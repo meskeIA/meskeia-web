@@ -1,6 +1,6 @@
 import { test, expect, devices, type Browser, type Page } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
-import { esperarHidratacion } from './_hidratacion';
+import { esperarHidratacion, asentarAntesDeTraducir } from './_hidratacion';
 import { ORIGEN } from './_puerto';
 import { activarTemaOscuro, prepararParaMedir } from '../_contraste';
 // El CSV que descarga la app se lee con el MISMO parser que usaría una hoja de cálculo
@@ -2145,7 +2145,12 @@ async function esperarSegundosDeAppAlInstante(page: Page, segundos: number): Pro
 }
 
 /** El traductor del navegador (receta de generador-loteria.spec.ts): cada texto pasa a <font><font>. */
-const traducirPagina = (page: Page) =>
+// Antes del primer <font>, la página entera asentada (cabo C0493: ver asentarAntesDeTraducir)
+const traducirPagina = async (page: Page) => {
+  await asentarAntesDeTraducir(page);
+  return traducirPaginaYa(page);
+};
+const traducirPaginaYa = (page: Page) =>
   page.evaluate(() => {
     const caminante = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
       acceptNode: (n) => {

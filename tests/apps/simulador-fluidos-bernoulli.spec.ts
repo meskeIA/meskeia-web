@@ -1,5 +1,5 @@
 import { test, expect, Page } from '@playwright/test';
-import { esperarHidratacion, sembrarValorAcotado } from './_hidratacion';
+import { esperarHidratacion, sembrarValorAcotado, asentarAntesDeTraducir } from './_hidratacion';
 
 /**
  * Inspector — simulador-fluidos-bernoulli (segmento cálculo/física, riesgo 3, 182 usos)
@@ -1856,7 +1856,12 @@ test.describe('Inspector 13/10/2026 — operativa en móvil táctil de 390 px', 
  * <font><font>texto</font></font> y el nodo original sale del DOM. Es el `traducir()` de
  * tests/apps/texto-condicional-traducido-familia.spec.ts (C0312) y del testigo del 3314.
  */
-const traducirPagina = (page: Page) =>
+// Antes del primer <font>, la página entera asentada (cabo C0493: ver asentarAntesDeTraducir)
+const traducirPagina = async (page: Page) => {
+  await asentarAntesDeTraducir(page);
+  return traducirPaginaYa(page);
+};
+const traducirPaginaYa = (page: Page) =>
   page.evaluate(() => {
     const caminante = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
       acceptNode: (n) => {

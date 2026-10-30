@@ -1,5 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
-import { esperarHidratacion, esperarPaginaAsentada, esperarValorEnReact } from './_hidratacion';
+import { esperarHidratacion, esperarPaginaAsentada, esperarValorEnReact, asentarAntesDeTraducir } from './_hidratacion';
 
 /**
  * Conversor de Código Braille — test de regresión (Inspector, 20/08/2026)
@@ -2562,7 +2562,12 @@ test.describe('inspector 26/10/2026', () => {
   }
 
   /** El traductor del navegador (receta de ternario-traducido-familia.spec.ts): cada texto → <font><font>. */
-  const traducir = (page: Page) =>
+  // Antes del primer <font>, la página entera asentada (cabo C0493: ver asentarAntesDeTraducir)
+  const traducir = async (page: Page) => {
+    await asentarAntesDeTraducir(page);
+    return traducirYa(page);
+  };
+  const traducirYa = (page: Page) =>
     page.evaluate(() => {
       const caminante = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
         acceptNode: (n) => {
@@ -3424,7 +3429,12 @@ async function recorridoTraducido27(page: Page, conTecladoFisico: boolean) {
   page.on('console', (m) => {
     if (m.type() === 'error' && /NotFoundError|insertBefore|removeChild/.test(m.text())) errores.push(m.text());
   });
-  const traducir = () =>
+  // Antes del primer <font>, la página entera asentada (cabo C0493: ver asentarAntesDeTraducir)
+  const traducir = async () => {
+    await asentarAntesDeTraducir(page);
+    return traducirYa();
+  };
+  const traducirYa = () =>
     page.evaluate(() => {
       const w = window as VentanaTraducida27;
       const apuntados = (w.__nodosTraducidos27 = w.__nodosTraducidos27 ?? []);

@@ -77,7 +77,7 @@ import { test, expect, type Page } from '@playwright/test';
 import { IVA_INMUEBLES_2025 } from '../../data/fiscal/inmuebles';
 import { FISCAL_IVA_META, PORCENTAJES_IVA } from '../../data/fiscal/iva';
 import { ITP_CCAA, LIMITE_ARANCEL_NOTARIAL, RANGO_AJD_OTROS, RANGO_ITP_OTROS } from '../../data/itp-ccaa';
-import { esperarHidratacion, sembrarValor, esperarValorEnReact } from './_hidratacion';
+import { esperarHidratacion, sembrarValor, esperarValorEnReact, asentarAntesDeTraducir } from './_hidratacion';
 // Re-inspección del 26/09/2026 (bloques del final del fichero).
 import { BONIFICACION_CUOTA_CEUTA_MELILLA, FACTURA_NOTARIAL, REGISTRO_CONCEPTOS } from '../../data/itp-ccaa';
 // Re-inspección del 06/10/2026 (último bloque).
@@ -4497,7 +4497,12 @@ test.describe('Inspector 25/10/2026 — Andalucía, Baleares a 6,5 M, Melilla, e
   }
 
   /** El traductor del navegador, como en generador-loteria: cada nodo de texto pasa a <font><font>…</font></font>. */
-  const traducir = (page: Page) =>
+  // Antes del primer <font>, la página entera asentada (cabo C0493: ver asentarAntesDeTraducir)
+  const traducir = async (page: Page) => {
+    await asentarAntesDeTraducir(page);
+    return traducirYa(page);
+  };
+  const traducirYa = (page: Page) =>
     page.evaluate(() => {
       const caminante = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
         acceptNode: (nodo) => {
@@ -5053,7 +5058,12 @@ test.describe('Inspector 26/10/2026 — Galicia, Cataluña a 2 M, la retención 
   type Ventana26 = Window & { __nodos26?: Nodo26[] };
 
   /** El traductor de generador-loteria: cada nodo de texto a <font><font>…, apuntando el nodo retirado. */
-  const traducir26 = (page: Page) =>
+  // Antes del primer <font>, la página entera asentada (cabo C0493: ver asentarAntesDeTraducir)
+  const traducir26 = async (page: Page) => {
+    await asentarAntesDeTraducir(page);
+    return traducir26Ya(page);
+  };
+  const traducir26Ya = (page: Page) =>
     page.evaluate(() => {
       const w = window as Ventana26;
       const apuntados = (w.__nodos26 = w.__nodos26 ?? []);

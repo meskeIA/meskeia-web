@@ -1,5 +1,5 @@
 import { test, expect, Page, Locator } from '@playwright/test';
-import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
+import { esperarHidratacion, esperarValorEnReact, asentarAntesDeTraducir } from './_hidratacion';
 import { FISCAL_PREMIOS_LOTERIAS_META } from '../../data/fiscal/premios-loterias';
 
 /**
@@ -2192,7 +2192,12 @@ test.describe('13/10 · página traducida por el navegador', () => {
       if (m.type() === 'error' && /NotFoundError|insertBefore|removeChild/.test(m.text())) errores.push(m.text());
     });
     /** Imita al traductor: cada nodo de texto visible pasa a <font><font>texto</font></font>. */
-    const traducir = () =>
+    // Antes del primer <font>, la página entera asentada (cabo C0493: ver asentarAntesDeTraducir)
+    const traducir = async () => {
+      await asentarAntesDeTraducir(page);
+      return traducirYa();
+    };
+    const traducirYa = () =>
       page.evaluate(() => {
         const caminante = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
           acceptNode: (n) => {
@@ -2370,7 +2375,12 @@ test.describe('Inspector 14/10/2026', () => {
   }
 
   /** El traductor del navegador, como en el bloque del 13/10: cada texto pasa a <font><font>…. */
-  const traducir = (page: Page) =>
+  // Antes del primer <font>, la página entera asentada (cabo C0493: ver asentarAntesDeTraducir)
+  const traducir = async (page: Page) => {
+    await asentarAntesDeTraducir(page);
+    return traducirYa(page);
+  };
+  const traducirYa = (page: Page) =>
     page.evaluate(() => {
       const caminante = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
         acceptNode: (n) => {
@@ -2810,7 +2820,12 @@ test.describe('re-inspección 14/10/2026 (tarde)', () => {
     ins.map((i) => ((i as HTMLInputElement).labels?.[0]?.textContent ?? '').replace(/\s+/g, ' ').trim()));
 
   /** El traductor del navegador, como en los bloques del 13/10 y del 14/10: cada texto a <font><font>…. */
-  const traducirT = (page: Page) =>
+  // Antes del primer <font>, la página entera asentada (cabo C0493: ver asentarAntesDeTraducir)
+  const traducirT = async (page: Page) => {
+    await asentarAntesDeTraducir(page);
+    return traducirTYa(page);
+  };
+  const traducirTYa = (page: Page) =>
     page.evaluate(() => {
       const caminante = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
         acceptNode: (n) => {
@@ -3235,7 +3250,12 @@ test.describe('re-inspección 15/10/2026', () => {
    * El traductor de los bloques anteriores (cada texto a <font><font>…), que además APUNTA cada
    * nodo que retira con su valor de ese momento, para el detector de texto viejo de abajo.
    */
-  const traducirQ = (page: Page) =>
+  // Antes del primer <font>, la página entera asentada (cabo C0493: ver asentarAntesDeTraducir)
+  const traducirQ = async (page: Page) => {
+    await asentarAntesDeTraducir(page);
+    return traducirQYa(page);
+  };
+  const traducirQYa = (page: Page) =>
     page.evaluate(() => {
       const w = window as VentanaTraducida;
       const apuntados = (w.__nodosTraducidos = w.__nodosTraducidos ?? []);
@@ -4438,7 +4458,12 @@ test.describe('re-inspección 22/10/2026', () => {
     type VentanaV = Window & { __nodosV?: NodoV[] };
 
     /** El traductor de los bloques anteriores: cada texto a <font><font>…, y apunta el nodo retirado. */
-    const traducirV = (page: Page) =>
+    // Antes del primer <font>, la página entera asentada (cabo C0493: ver asentarAntesDeTraducir)
+    const traducirV = async (page: Page) => {
+      await asentarAntesDeTraducir(page);
+      return traducirVYa(page);
+    };
+    const traducirVYa = (page: Page) =>
       page.evaluate(() => {
         const w = window as VentanaV;
         const apuntados = (w.__nodosV = w.__nodosV ?? []);
@@ -4686,7 +4711,12 @@ test.describe('re-inspección 23/10/2026', () => {
   type VentanaW = Window & { __nodosW?: NodoW[] };
 
   /** El traductor de los bloques anteriores: cada texto a <font><font>…, y apunta el nodo retirado. */
-  const traducirW = (page: Page) =>
+  // Antes del primer <font>, la página entera asentada (cabo C0493: ver asentarAntesDeTraducir)
+  const traducirW = async (page: Page) => {
+    await asentarAntesDeTraducir(page);
+    return traducirWYa(page);
+  };
+  const traducirWYa = (page: Page) =>
     page.evaluate(() => {
       const w = window as VentanaW;
       const apuntados = (w.__nodosW = w.__nodosW ?? []);

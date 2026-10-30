@@ -1,4 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
+import { asentarAntesDeTraducir } from './_hidratacion';
 
 /**
  * Afinador de Instrumentos — test de regresión de la ampliación del 21/09/2026 (S0156)
@@ -192,7 +193,12 @@ test.describe('Página traducida por el navegador', () => {
     });
 
     /** Imita al traductor: cada nodo de texto visible pasa a <font><font>texto</font></font>. */
-    const traducir = () =>
+    // Antes del primer <font>, la página entera asentada (cabo C0493: ver asentarAntesDeTraducir)
+    const traducir = async () => {
+      await asentarAntesDeTraducir(page);
+      return traducirYa();
+    };
+    const traducirYa = () =>
       page.evaluate(() => {
         const caminante = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
           acceptNode: (n) => {

@@ -526,7 +526,7 @@ test.describe('Simulador de genética — regresiones de los hallazgos reparados
  * incompleta, donde el heterocigoto NO se parece al dominante.
  * ═══════════════════════════════════════════════════════════════════════════════════════ */
 
-import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
+import { esperarHidratacion, esperarValorEnReact, asentarAntesDeTraducir } from './_hidratacion';
 import {
   CASOS,
   TOTAL_CASOS,
@@ -3506,6 +3506,8 @@ test.describe('Inspector 28/09/2026 — hallazgos reparados', () => {
 test.describe('simulador-genetica · página traducida por el navegador', () => {
   /** Imita al traductor: cada nodo de texto visible pasa a <font><font>texto</font></font>. */
   async function traducir(page: Page): Promise<number> {
+    // Antes del primer <font>, la página entera asentada (cabo C0493: ver asentarAntesDeTraducir)
+    await asentarAntesDeTraducir(page);
     return page.evaluate(() => {
       const caminante = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
         acceptNode: (n) => {
@@ -3860,6 +3862,8 @@ test.describe('Re-inspección 14/10/2026 · móvil 390 px', () => {
 
 /** Imita al traductor del navegador, igual que el bloque del cabo C0233: cada texto, a <font><font>. */
 async function traducirPagina(page: Page): Promise<number> {
+  // Antes del primer <font>, la página entera asentada (cabo C0493: ver asentarAntesDeTraducir)
+  await asentarAntesDeTraducir(page);
   return page.evaluate(() => {
     const caminante = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
       acceptNode: (n) => {

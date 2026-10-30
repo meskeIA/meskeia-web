@@ -31,7 +31,7 @@
  */
 
 import { test, expect, type Locator, type Page } from '@playwright/test';
-import { esperarHidratacion, esperarValorEnReact, sembrarValor } from './_hidratacion';
+import { esperarHidratacion, esperarValorEnReact, sembrarValor, asentarAntesDeTraducir } from './_hidratacion';
 import { activarTema, desplegarTodo, prepararParaMedir } from '../contraste-text-muted-auxiliares';
 import { PUERTO } from './_puerto';
 import {
@@ -1096,7 +1096,12 @@ test.describe('re-inspección 24/10/2026 · móvil 390 × 844', () => {
 interface NodoTraducido { nodo: Text; valor: string | null; avisado: boolean }
 type VentanaTraducida = Window & { __nodosTraducidos?: NodoTraducido[] };
 
-const traducir = (page: Page) =>
+// Antes del primer <font>, la página entera asentada (cabo C0493: ver asentarAntesDeTraducir)
+const traducir = async (page: Page) => {
+  await asentarAntesDeTraducir(page);
+  return traducirYa(page);
+};
+const traducirYa = (page: Page) =>
   page.evaluate(() => {
     const w = window as VentanaTraducida;
     const apuntados = (w.__nodosTraducidos = w.__nodosTraducidos ?? []);

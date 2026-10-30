@@ -31,7 +31,7 @@ import { TRAMOS_GANANCIAS_PATRIMONIALES_2025 } from '../../data/fiscal/inmuebles
 import { GANANCIAS_PATRIMONIALES_META, FISCAL_INMUEBLES_META } from '../../data/fiscal/inmuebles';
 // ── Añadido por la reparación del 26/09/2026 (hallazgos 2182-2186 y receta 1 de la familia) ──
 import { FACTURA_NOTARIAL, REGISTRO_CONCEPTOS } from '../../data/itp-ccaa';
-import { esperarHidratacion, esperarValorEnReact, sembrarValor } from './_hidratacion';
+import { esperarHidratacion, esperarValorEnReact, sembrarValor, asentarAntesDeTraducir } from './_hidratacion';
 // ── Añadido por la re-inspección del 06/10/2026 (describe del final del fichero) ──
 import { parseSpanishNumber } from '../../lib/formatters';
 // ── Añadidos por la re-inspección del 12/10/2026 (describe del final del fichero) ──
@@ -10466,7 +10466,12 @@ test.describe('Inspector 25/10/2026 — las reparaciones del 24/10, la página t
   type VentanaTraducida = Window & { __nodosTraducidos?: NodoTraducido[] };
 
   /** Cada nodo de texto visible pasa a <font><font>texto</font></font>, y se apunta el retirado. */
-  const traducir = (page: Page) =>
+  // Antes del primer <font>, la página entera asentada (cabo C0493: ver asentarAntesDeTraducir)
+  const traducir = async (page: Page) => {
+    await asentarAntesDeTraducir(page);
+    return traducirYa(page);
+  };
+  const traducirYa = (page: Page) =>
     page.evaluate(() => {
       const w = window as VentanaTraducida;
       const apuntados = (w.__nodosTraducidos = w.__nodosTraducidos ?? []);
@@ -11331,7 +11336,12 @@ test.describe('Inspector 26/10/2026 — Galicia y Asturias a mano, la app entera
   type VentanaTraducida = Window & { __nodosTraducidos?: NodoTraducido[] };
 
   /** El traductor de tests/apps/generador-loteria.spec.ts: cada texto a <font><font>, apuntando el retirado. */
-  const traducir = (page: Page) =>
+  // Antes del primer <font>, la página entera asentada (cabo C0493: ver asentarAntesDeTraducir)
+  const traducir = async (page: Page) => {
+    await asentarAntesDeTraducir(page);
+    return traducirYa(page);
+  };
+  const traducirYa = (page: Page) =>
     page.evaluate(() => {
       const w = window as VentanaTraducida;
       const apuntados = (w.__nodosTraducidos = w.__nodosTraducidos ?? []);
@@ -12014,7 +12024,12 @@ test.describe('inspector 26/10/2026 (3) — Castilla-La Mancha, la frontera de u
   type VentanaTraducida3 = Window & { __nodosTraducidos3?: NodoTraducido3[] };
 
   /** El traductor de tests/apps/generador-loteria.spec.ts: cada texto a <font><font>, apuntando el retirado. */
-  const traducir3 = (page: Page) =>
+  // Antes del primer <font>, la página entera asentada (cabo C0493: ver asentarAntesDeTraducir)
+  const traducir3 = async (page: Page) => {
+    await asentarAntesDeTraducir(page);
+    return traducir3Ya(page);
+  };
+  const traducir3Ya = (page: Page) =>
     page.evaluate(() => {
       const w = window as VentanaTraducida3;
       const apuntados = (w.__nodosTraducidos3 = w.__nodosTraducidos3 ?? []);

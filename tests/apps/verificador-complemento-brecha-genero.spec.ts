@@ -18,7 +18,7 @@ import { NUM_REQUISITOS_ART60 } from '../../lib/calculadoras/complementoBrechaGe
 // Re-inspección 26/09/2026: el campo de hijos se siembra con los helpers de hidratación
 // (nunca con el setter nativo, que lo prohíbe `check:hidratacion`), y el contraste se mide
 // con la página asentada.
-import { sembrarValor, leerValorEnReact, esperarPaginaAsentada } from './_hidratacion';
+import { sembrarValor, leerValorEnReact, esperarPaginaAsentada, asentarAntesDeTraducir } from './_hidratacion';
 import { selectorDelModulo } from './_modulo-css';
 import { calcularAtrasos } from '../../app/verificador-complemento-brecha-genero/atrasos';
 import { formatCurrency } from '../../lib/formatters';
@@ -4956,7 +4956,12 @@ async function textoAtrasos(page: Page): Promise<string> {
 }
 
 /** Imita al traductor del navegador: cada nodo de texto visible pasa a <font><font>…</font></font>. */
-const traducirPagina = (page: Page) =>
+// Antes del primer <font>, la página entera asentada (cabo C0493: ver asentarAntesDeTraducir)
+const traducirPagina = async (page: Page) => {
+  await asentarAntesDeTraducir(page);
+  return traducirPaginaYa(page);
+};
+const traducirPaginaYa = (page: Page) =>
   page.evaluate(() => {
     const caminante = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
       acceptNode: (n) => {

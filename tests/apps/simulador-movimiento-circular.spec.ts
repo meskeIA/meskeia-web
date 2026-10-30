@@ -1,5 +1,5 @@
 import { test, expect, Page } from '@playwright/test';
-import { esperarHidratacion, esperarValorEnReact, leerValorEnReact, sembrarValorAcotado } from './_hidratacion';
+import { esperarHidratacion, esperarValorEnReact, leerValorEnReact, sembrarValorAcotado, asentarAntesDeTraducir } from './_hidratacion';
 import { prepararParaMedir } from '../_contraste';
 
 /**
@@ -1691,7 +1691,9 @@ test.describe('Inspector 28/09/2026 — re-inspección tras los casos de aula y 
  * ═══════════════════════════════════════════════════════════════════════════════════════ */
 
 /** El traductor del navegador simulado: cada nodo de texto visible pasa a <font><font>…. */
-function traducirPagina(page: Page): Promise<void> {
+async function traducirPagina(page: Page): Promise<void> {
+  // Antes del primer <font>, la página entera asentada (cabo C0493: ver asentarAntesDeTraducir)
+  await asentarAntesDeTraducir(page);
   return page.evaluate(() => {
     const caminante = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
       acceptNode: (n) => {
@@ -2032,7 +2034,9 @@ interface NodoTraducido {
 type VentanaTraducida = Window & { __nodosTraducidos?: NodoTraducido[] };
 
 /** El traductor simulado de `traducirPagina`, que además APUNTA cada nodo que retira y su valor. */
-function traducirApuntando(page: Page): Promise<void> {
+async function traducirApuntando(page: Page): Promise<void> {
+  // Antes del primer <font>, la página entera asentada (cabo C0493: ver asentarAntesDeTraducir)
+  await asentarAntesDeTraducir(page);
   return page.evaluate(() => {
     const w = window as VentanaTraducida;
     const apuntados = (w.__nodosTraducidos = w.__nodosTraducidos ?? []);

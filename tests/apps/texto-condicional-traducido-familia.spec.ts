@@ -1,4 +1,5 @@
 import { test, expect, type Page, type Locator } from '@playwright/test';
+import { asentarAntesDeTraducir } from './_hidratacion';
 
 /**
  * Testigo de familia — texto suelto que aparece y desaparece, con la página traducida.
@@ -17,7 +18,12 @@ import { test, expect, type Page, type Locator } from '@playwright/test';
  * Reinyección: con `{germinaOK && '…'}` de vuelta en visualizador-germinacion, su test cae.
  */
 
-const traducir = (page: Page) =>
+// Antes del primer <font>, la página entera asentada (cabo C0493: ver asentarAntesDeTraducir)
+const traducir = async (page: Page) => {
+  await asentarAntesDeTraducir(page);
+  return traducirYa(page);
+};
+const traducirYa = (page: Page) =>
   page.evaluate(() => {
     const caminante = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
       acceptNode: (n) => {

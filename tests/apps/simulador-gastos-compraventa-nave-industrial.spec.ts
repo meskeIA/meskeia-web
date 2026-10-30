@@ -176,7 +176,7 @@ import {
   REGISTRO_CONCEPTOS,
   REGISTRO_MAXIMO,
 } from '../../data/itp-ccaa';
-import { esperarHidratacion, esperarValorEnReact, sembrarValor } from './_hidratacion';
+import { esperarHidratacion, esperarValorEnReact, sembrarValor, asentarAntesDeTraducir } from './_hidratacion';
 
 const RUTA = '/simulador-gastos-compraventa-nave-industrial/';
 
@@ -7193,6 +7193,8 @@ const I24_VER_HUECOS = Boolean(process.env.VER_HUECOS);
  * misma simulación que tests/apps/ternario-traducido-familia.spec.ts (cabo C0262).
  */
 async function traducirPagina(page: Page): Promise<void> {
+  // Antes del primer <font>, la página entera asentada (cabo C0493: ver asentarAntesDeTraducir)
+  await asentarAntesDeTraducir(page);
   await page.evaluate(() => {
     const caminante = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
       acceptNode: (n) => {

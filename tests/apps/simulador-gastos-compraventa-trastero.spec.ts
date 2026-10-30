@@ -221,7 +221,7 @@ import { test, expect, Page, devices } from '@playwright/test';
 // Los casos añadidos el 12/09/2026 siembran con estos dos: `rellenar` usa `fill()` sin
 // esperar a que React haya montado el input, y en esa ventana el DOM cambia sin que el
 // estado de React se entere (ver la cabecera de `_hidratacion.ts`).
-import { esperarHidratacion, esperarValorEnReact, sembrarValor } from './_hidratacion';
+import { esperarHidratacion, esperarValorEnReact, sembrarValor, asentarAntesDeTraducir } from './_hidratacion';
 // Inspector 25/10/2026: los datos de los casos 64-66 y de los hallazgos [25/10-*] se leen de los
 // mismos módulos que componen la página, para que el esperado no sea una copia tecleada.
 import { ITP_CCAA, TERRITORIOS_SIN_IVA, calcularPlusvaliaMunicipal, GESTORIA_POR_DEFECTO, ARANCELES_NOTARIO, ARANCELES_REGISTRO, REBAJA_ARANCEL_CUANTIA, REGISTRO_CONCEPTOS, FACTURA_NOTARIAL } from '../../data/itp-ccaa';
@@ -8078,6 +8078,8 @@ type T25Ventana = Window & { __t25Nodos?: T25Nodo[] };
  * garaje), que APUNTA cada nodo que retira para el detector de texto viejo de abajo.
  */
 async function t25Traducir(page: Page): Promise<void> {
+  // Antes del primer <font>, la página entera asentada (cabo C0493: ver asentarAntesDeTraducir)
+  await asentarAntesDeTraducir(page);
   await page.evaluate(() => {
     const w = window as T25Ventana;
     const apuntados = (w.__t25Nodos = w.__t25Nodos ?? []);

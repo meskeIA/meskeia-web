@@ -2,7 +2,7 @@ import { test, expect, Page, devices } from '@playwright/test';
 // Los casos del 12/09/2026 siembran con estos helpers: `page.goto()` espera al evento
 // `load`, que no garantiza que React haya ejecutado los chunks, y sembrar en esa ventana
 // mueve el DOM sin que el estado se entere (candado `check:hidratacion`).
-import { esperarHidratacion, esperarValorEnReact, sembrarValor } from './_hidratacion';
+import { esperarHidratacion, esperarValorEnReact, sembrarValor, asentarAntesDeTraducir } from './_hidratacion';
 // Re-inspección del 23/09/2026: las escalas y los coeficientes con los que se resuelven sus
 // casos a mano se LEEN de la misma ficha que compone la página, y se comprueban antes de
 // usarlos, para que el ancla no sea una copia (como en la hermana garaje, hallazgo 625).
@@ -7588,6 +7588,8 @@ interface NodoTraducido2510 {
 type VentanaTraducida2510 = Window & { __nodosTraducidos2510?: NodoTraducido2510[] };
 
 async function traducir2510(page: Page): Promise<void> {
+  // Antes del primer <font>, la página entera asentada (cabo C0493: ver asentarAntesDeTraducir)
+  await asentarAntesDeTraducir(page);
   await page.evaluate(() => {
     const w = window as VentanaTraducida2510;
     const apuntados = (w.__nodosTraducidos2510 = w.__nodosTraducidos2510 ?? []);

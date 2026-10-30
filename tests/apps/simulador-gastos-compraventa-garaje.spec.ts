@@ -141,7 +141,7 @@ import {
 } from '../../data/fiscal/inmuebles';
 // Siembra con testigo: ver la cabecera de `_hidratacion.ts`. El `rellenar` de este fichero
 // es anterior (fill() a secas) y se conserva para no reescribir 2.900 líneas de casos válidos.
-import { esperarHidratacion, esperarValorEnReact, sembrarValor } from './_hidratacion';
+import { esperarHidratacion, esperarValorEnReact, sembrarValor, asentarAntesDeTraducir } from './_hidratacion';
 // Sección 25 (Inspector 13/10/2026): los aranceles con la rebaja del 5 % del nº 2.1 y las dos
 // normas de Ceuta y Melilla de la pestaña Vendedor, leídas de los módulos que aplican la app.
 import {
@@ -8923,6 +8923,8 @@ async function i25Pegar(page: Page, etiqueta: string, texto: string): Promise<vo
 
 /** Lo que hace el traductor del navegador: cada nodo de texto pasa a <font><font>…</font></font>. */
 async function i25Traducir(page: Page): Promise<void> {
+  // Antes del primer <font>, la página entera asentada (cabo C0493: ver asentarAntesDeTraducir)
+  await asentarAntesDeTraducir(page);
   await page.evaluate(() => {
     const caminante = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
       acceptNode: (n) => {
@@ -9680,7 +9682,12 @@ test.describe('Inspector 26/10/2026 — el 833 en Andalucía, la igualdad del ar
     page,
   }) => {
     const errores = i25VigilarCaidas(page);
-    const traducir = () =>
+    // Antes del primer <font>, la página entera asentada (cabo C0493: ver asentarAntesDeTraducir)
+    const traducir = async () => {
+      await asentarAntesDeTraducir(page);
+      return traducirYa();
+    };
+    const traducirYa = () =>
       page.evaluate(() => {
         const w = window as Window & { __i26Nodos?: { nodo: Text; valor: string | null }[] };
         const apuntados = (w.__i26Nodos = w.__i26Nodos ?? []);

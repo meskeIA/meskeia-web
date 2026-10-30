@@ -687,7 +687,7 @@ test.describe('Simulador de Mitosis y Meiosis · casos para clase', () => {
 // REINSPECCIÓN · 25/09/2026 — los 12 casos EN EL NAVEGADOR y lo que la tanda dejó abierto
 // ═══════════════════════════════════════════════════════════════════════════════
 
-import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
+import { esperarHidratacion, esperarValorEnReact, asentarAntesDeTraducir } from './_hidratacion';
 
 /**
  * Qué cambió desde el 26/08: 4da98ff9 (12 casos de aula, 21/09), 12829fc3 (margen de ruido
@@ -1699,7 +1699,12 @@ async function coberturaAnillo(page: Page, celulas: 1 | 2 | 4, fraccion: number)
 }
 
 /** El mismo traductor simulado que tests/apps/casos-aula-pagina-traducida.spec.ts. */
-const traducirPagina = (page: Page) =>
+// Antes del primer <font>, la página entera asentada (cabo C0493: ver asentarAntesDeTraducir)
+const traducirPagina = async (page: Page) => {
+  await asentarAntesDeTraducir(page);
+  return traducirPaginaYa(page);
+};
+const traducirPaginaYa = (page: Page) =>
   page.evaluate(() => {
     const caminante = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
       acceptNode: (n) => {
