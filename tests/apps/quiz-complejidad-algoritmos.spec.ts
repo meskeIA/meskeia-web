@@ -1027,7 +1027,7 @@ test.describe('Inspector 29/10/2026 (tarde) · re-inspección tras /reparar · e
    * oscuro 4,76 · 4,52 · 4,24 · 4,58 · 4,41. Es la regla `.btnCategoria:hover { opacity: 0.85 }`.
    */
   test('hallazgo · reparación incompleta de 3781: con el puntero encima (tras el clic) el botón de categoría baja de 4,5:1', async ({ page }) => {
-    test.fail(); // ABIERTO — hallazgo nuevo de la re-inspección del 29/10/2026 (tarde)
+    // REPARADO (3813, /reparar 30/10/2026): el :hover ya no baja la opacidad
     test.setTimeout(60_000);
     const bajos: string[] = [];
     for (const tema of ['light', 'dark'] as const) {
@@ -1055,9 +1055,13 @@ test.describe('Inspector 29/10/2026 (tarde) · re-inspección tras /reparar · e
    * contra el inactivo y contra la tarjeta. Obtenido: contra el inactivo 2,31 · 2,45 · 2,65 ·
    * 2,41 · 2,52 (antes de 6856d845, 3,08 · 4,51 · 4,25 · 2,41 · 3,60); contra la tarjeta 2,63 ·
    * 2,78 · 3,01 · 2,73 · 2,87. El activo pierde además la franja de color de la izquierda.
+   * REPARADO (3814, /reparar 30/10/2026). El esperado del acta pedía que lo diera el FONDO, pero el
+   * fondo no puede: para llegar a 3:1 contra la tarjeta (#2A2A2A) el --cat-* tendría que subir a una
+   * luminancia de 0,169 y contra el gris del inactivo a 0,2, y con más de 0,183 el blanco encima baja
+   * de 4,5:1. WCAG 1.4.11 pide 3:1 al INDICADOR, que puede ser un borde: en oscuro el activo lleva un
+   * borde #E5E5E5 de 2 px. Vale el fondo a 3:1 o el borde a 3:1 contra los dos.
    */
   test('hallazgo · en oscuro, el botón de categoría activo se distingue del inactivo con 3:1', async ({ page }) => {
-    test.fail(); // ABIERTO — hallazgo nuevo de la re-inspección del 29/10/2026 (tarde)
     await abrir(page, 'dark');
     await esperarBotonHidratado(page, /Práctica por categoría/);
     await page.getByRole('button', { name: /Práctica por categoría/ }).click();
@@ -1071,14 +1075,21 @@ test.describe('Inspector 29/10/2026 (tarde) · re-inspección tras /reparar · e
       const [tarjeta] = await pintados(page, '[class*="categoriasGrid"]');
       const r1 = ratioLum(act.lumFondo, inact.lumFondo);
       const r2 = ratioLum(act.lumFondo, tarjeta.lumFondo);
-      if (r1 < 3 || r2 < 3) bajos.push(`${c}: ${r1} contra el inactivo, ${r2} contra la tarjeta`);
+      const borde = await page.locator('[class*="btnCategoriaActivo"]').evaluate((b) => {
+        const cs = getComputedStyle(b);
+        const [r, g, bl] = (cs.borderTopColor.match(/[\d.]+/g) ?? ['0', '0', '0']).map(Number);
+        const f = (v: number) => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; };
+        return { ancho: parseFloat(cs.borderTopWidth), lum: 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(bl) };
+      });
+      const porBorde = borde.ancho >= 2 && ratioLum(borde.lum, inact.lumFondo) >= 3 && ratioLum(borde.lum, tarjeta.lumFondo) >= 3;
+      if ((r1 < 3 || r2 < 3) && !porBorde) bajos.push(`${c}: ${r1} contra el inactivo, ${r2} contra la tarjeta, sin borde que lo marque`);
     }
     expect(bajos).toEqual([]);
   });
 
   /** «/25» del círculo: blanco con opacity 0.85 sobre #26718F → 4,45 a mano (ver la cabecera). */
   test('hallazgo · el «/N» del círculo de la nota llega a 4,5:1', async ({ page }) => {
-    test.fail(); // ABIERTO — hallazgo nuevo de la re-inspección del 29/10/2026 (tarde); medido 4,45
+    // REPARADO (3815, /reparar 30/10/2026): sin opacity; antes medido 4,45
     await abrir(page, 'light');
     await esperarBotonHidratado(page, /Práctica por categoría/);
     await comenzarPractica(page, 'Comparativa');
@@ -1114,7 +1125,7 @@ test.describe('Inspector 29/10/2026 (tarde) · re-inspección tras /reparar · e
    * «BO(log n)»…) y el panel solo dice «✗ Incorrecto».
    */
   test('hallazgo · forma del cabo C0516: la correcta y la fallada se distinguen por algo más que el color', async ({ page }) => {
-    test.fail(); // ABIERTO — hallazgo nuevo de la re-inspección del 29/10/2026 (tarde)
+    // REPARADO (3817, /reparar 30/10/2026): ✓/✗ visibles y la marca en el aria-label
     await abrir(page);
     await esperarBotonHidratado(page, /Comenzar examen/);
     await comenzarExamen(page);
@@ -1142,7 +1153,7 @@ test.describe('Inspector 29/10/2026 (tarde) · re-inspección tras /reparar · e
    * (o «mejor que» en palabras). Obtenido: «O(1) > O(log n) > O(n)».
    */
   test('hallazgo · la explicación de P21 no invierte el «<» que enseña P2', async ({ page }) => {
-    test.fail(); // ABIERTO — hallazgo nuevo de la re-inspección del 29/10/2026 (tarde)
+    // REPARADO (3818, /reparar 30/10/2026): «De mejor a peor, como en la escala de P2: O(1) < O(log n) < O(n)»
     await abrir(page);
     await esperarBotonHidratado(page, /Práctica por categoría/);
     await comenzarPractica(page, 'Comparativa');
@@ -1221,7 +1232,7 @@ test.describe('Inspector 29/10/2026 (tarde) · re-inspección tras /reparar · m
    * pegado al botón tocado. Esperado ≥ 4,5. Obtenido: «Estructuras de Datos» 3,67 (opacity 0.85).
    */
   test('hallazgo · reparación incompleta de 3781 (móvil): la categoría recién tocada se queda en :hover y baja de 4,5:1', async ({ page }) => {
-    test.fail(); // ABIERTO — hallazgo nuevo de la re-inspección del 29/10/2026 (tarde)
+    // REPARADO (3813, /reparar 30/10/2026): el :hover ya no baja la opacidad
     await abrir(page, 'light');
     await esperarBotonHidratado(page, /Práctica por categoría/);
     await page.getByRole('button', { name: /Práctica por categoría/ }).tap();

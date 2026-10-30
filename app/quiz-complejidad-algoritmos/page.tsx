@@ -235,7 +235,7 @@ const BANCO_PREGUNTAS: PreguntaAlgo[] = [
       'BST balanceado O(log n)',
     ],
     correcta: 2,
-    explicacion: 'O(1) > O(log n) > O(n). Para 10M elementos: HashSet ≈ 1 operación, BST/binary search ≈ 23 comparaciones, búsqueda lineal ≈ 5M comparaciones. El HashSet es el ganador claro si no necesitas orden.',
+    explicacion: 'De mejor a peor, como en la escala de P2: O(1) < O(log n) < O(n). Para 10M elementos: HashSet ≈ 1 operación, BST/binary search ≈ 23 comparaciones, búsqueda lineal ≈ 5M comparaciones. El HashSet es el ganador claro si no necesitas orden.',
   },
   {
     id: 22,
@@ -536,6 +536,11 @@ export default function QuizComplejidadAlgoritmosPage() {
                   }
                   // Sin aria-pressed: elegir respuesta es una acción, no un conmutador (queda
                   // disabled y no se puede despulsar). Receta del hallazgo 285, familia de los quizzes.
+                  // Hallazgo 3817 (cabo C0516): la buena y la fallada no solo por el color (WCAG
+                  // 1.4.1): ✓/✗ visibles y aria-hidden, y la marca en el nombre accesible.
+                  const esBuena = haRespondido && i === preguntaActual.correcta;
+                  const esFallada = haRespondido && i === seleccionada && !esBuena;
+                  const marca = esBuena ? ' (respuesta correcta)' : esFallada ? ' (tu respuesta, incorrecta)' : '';
                   return (
                     <button
                       key={i}
@@ -543,11 +548,14 @@ export default function QuizComplejidadAlgoritmosPage() {
                       className={claseOpcion}
                       onClick={() => responder(i)}
                       disabled={haRespondido}
+                      aria-label={marca ? `${opcion}${marca}` : undefined}
                     >
                       <span className={styles.letraOpcion} aria-hidden="true">
                         {['A', 'B', 'C', 'D'][i]}
                       </span>
                       <span>{opcion}</span>
+                      {esBuena && <span className={styles.marcaOpcion} aria-hidden="true">✓</span>}
+                      {esFallada && <span className={styles.marcaOpcion} aria-hidden="true">✗</span>}
                     </button>
                   );
                 })}

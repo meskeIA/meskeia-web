@@ -196,13 +196,23 @@
   transition: all 0.2s;
 }
 
-.btnCategoria:hover {
-  opacity: 0.85;
+/* Hallazgo 3813: era `opacity: 0.85`, que fundía el botón con la tarjeta y bajaba el blanco del
+   activo de 4,5:1 justo con el puntero encima (donde queda tras el clic, y pegado en el móvil). El
+   inactivo oscurece el texto; el activo no cambia. */
+.btnCategoria:hover:not(.btnCategoriaActivo) {
+  color: var(--text-primary);
 }
 
 .btnCategoriaActivo {
   color: white !important;
   border-color: transparent !important;
+}
+
+/* Hallazgo 3814: en oscuro el fondo del activo queda a menos de 3:1 del gris del inactivo y de la
+   tarjeta, y no se puede aclarar sin bajar el blanco de 4,5:1. El estado lo marca un borde claro
+   (WCAG 1.4.11: 3:1 contra los dos). */
+[data-theme='dark'] .btnCategoriaActivo {
+  border-color: #E5E5E5 !important;
 }
 
 .cat_notacion { border-left: 4px solid var(--cat-notacion); }
@@ -442,6 +452,15 @@
   opacity: 0.45;
 }
 
+/* ✓/✗ de la buena y la fallada, que no se distinguen solo por el color (hallazgo 3817). Heredan el
+   color de --correcto-text / --incorrecto-text, que ya tienen su variante oscura. */
+.marcaOpcion {
+  margin-left: auto;
+  flex-shrink: 0;
+  font-weight: 700;
+  font-size: 1.05rem;
+}
+
 /* ── Panel de feedback ── */
 .panelFeedback {
   margin-top: var(--gap-lg);
@@ -525,10 +544,10 @@
   line-height: 1;
 }
 
+/* Sin opacity (hallazgo 3815): blanco al 85 % sobre --primary-boton daba 4,45:1 en texto pequeño */
 .totalPreguntas {
   font-size: 1.3rem;
   font-weight: 500;
-  opacity: 0.85;
 }
 
 .mensajeClasificacion {
