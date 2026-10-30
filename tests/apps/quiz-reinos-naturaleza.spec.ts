@@ -962,6 +962,12 @@ test.describe('inspector 29/10/2026 (tarde) · móvil 360 × 740', () => {
         };
       });
       if (!v.veredicto || !v.siguiente) fallos.push(`${n} ${o.id}: ${JSON.stringify(v)}`);
+      // Cabo C0528 (30/10/2026): tocar «Siguiente» a los 300 ms de contestar falló 1 de 3 aislado.
+      // Si la buena es la opción de abajo, enfocarSinCentrar deja «Siguiente» bajo el mismo punto,
+      // Chrome cuenta el toque como 2.º de una ráfaga y useGuardaRafaga (soloMismoPunto) se lo
+      // come: es lo que debe hacer, porque el dedo no se ha movido. Quien lee el veredicto tarda
+      // más: se toca fuera de la ventana de ráfaga, como en tests/familias/quizzes.spec.ts.
+      await page.waitForTimeout(400);
       await page.locator('[class*="btnSiguiente"]').tap();
       if (n < 10) {
         await expect(contador(page)).toHaveText(`Pregunta ${n + 1} de 10`);
