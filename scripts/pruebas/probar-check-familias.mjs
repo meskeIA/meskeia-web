@@ -20,6 +20,8 @@
  *      o las marcas sobrevivirían a las reparaciones que se olvidan de quitarlas.
  *   6. Una tabla que el candado no entiende: tiene que PLANTARSE, no dar verde por no mirar.
  *   7. Un `falla` sin razón escrita.
+ *   8. Un servidor en el puerto que no es `next dev` (un `next start` olvidado, cabo C0530): tiene
+ *      que plantarse diciéndolo, no medir el build de antes.
  *
  * La 1 toca un fichero real, así que exige que esté limpio en git ANTES de empezar y lo
  * restaura en un `finally`, comprobando después que ha quedado idéntico. Las demás trabajan
@@ -28,9 +30,10 @@
  */
 
 import fs from 'node:fs';
+import http from 'node:http';
 import os from 'node:os';
 import path from 'node:path';
-import { execFileSync, spawnSync } from 'node:child_process';
+import { execFileSync, spawn, spawnSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const RAIZ = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
@@ -49,10 +52,17 @@ function declaracion(nombre, familias) {
   return ruta;
 }
 
+/**
+ * El testigo en LF. Con autocrlf la copia de trabajo puede estar en CRLF (la de la tarea
+ * /reparar lo está: el 30/10/2026 las trampas 4, 5 y 7 no llegaban a montarse porque sus
+ * patrones llevan «\n»), igual que el fichero de la trampa 1.
+ */
+const leerTestigo = () => fs.readFileSync(TESTIGO, 'utf8').replace(/\r\n/g, '\n');
+
 /** Copia del testigo con un cambio, fuera del repositorio (solo para las trampas estáticas). */
 function testigoDesechable(nombre, cambiar) {
   const ruta = path.join(tmp, `${nombre}.spec.ts`);
-  const src = fs.readFileSync(TESTIGO, 'utf8');
+  const src = leerTestigo();
   const nuevo = cambiar(src);
   if (nuevo === src) throw new Error(`la trampa ${nombre} no ha cambiado nada: su patrón ya no casa`);
   fs.writeFileSync(ruta, nuevo, 'utf8');
@@ -154,7 +164,7 @@ const casos = [
     correr: () => {
       // Un caso VERDE del garaje marcado como hueco abierto: tiene que romper. La fila de la
       // gestoría del comprador está en cuatro hermanas; la primera de la tabla es la del garaje.
-      const src = fs.readFileSync(TESTIGO, 'utf8');
+      const src = leerTestigo();
       const fila = "        etiqueta: 'Gastos de gestoría del comprador (€)',\n";
       if (!src.includes(fila)) throw new Error('no se encuentra la fila de la gestoría del garaje');
       const trampa = src.replace(fila, `${fila}        falla: 'TRAMPA — este caso ya pasa',\n`);
@@ -191,6 +201,41 @@ const casos = [
       return correr(['--estatico', '--declaracion', declaracion('falla-vacio', [{ ...FAM, testigo: t }])]);
     },
   },
+  {
+    // Cabo C0530 (30/10/2026): un `next start` huérfano en el 3050 sirvió el build de la víspera
+    // y el testigo dio 3 rojos falsos. En el puerto, un servidor que no lleva el cliente de
+    // recarga de next dev: el candado tiene que plantarse diciéndolo, sin ejecutar el testigo.
+    // Asíncrono: con spawnSync el servidor de este mismo proceso no podría contestar.
+    nombre: '8-servidor-que-no-es-next-dev',
+    debeFallar: true,
+    espera: 'no es `next dev`',
+    correr: async () => {
+      const servidor = http.createServer((_, res) => {
+        res.writeHead(200, { 'content-type': 'text/html' });
+        res.end('<html><script src="/_next/static/chunks/app-page.js"></script>build de ayer</html>');
+      });
+      await new Promise((ok) => servidor.listen(0, ok));
+      const puerto = /** @type {import('node:net').AddressInfo} */ (servidor.address()).port;
+      try {
+        return await new Promise((ok) => {
+          const hijo = spawn(process.execPath, [CANDADO, '--grep', 'ninguno'], {
+            cwd: RAIZ,
+            env: { ...process.env, PUERTO_PRUEBAS: String(puerto) },
+          });
+          let salida = '';
+          hijo.stdout.on('data', (d) => (salida += d));
+          hijo.stderr.on('data', (d) => (salida += d));
+          const corte = setTimeout(() => hijo.kill(), 2 * 60 * 1000);
+          hijo.on('close', (codigo) => {
+            clearTimeout(corte);
+            ok({ fallo: codigo !== 0, salida });
+          });
+        });
+      } finally {
+        servidor.close();
+      }
+    },
+  },
 ];
 
 let fallos = 0;
@@ -200,7 +245,7 @@ try {
   for (const caso of casos) {
     let r;
     try {
-      r = caso.correr();
+      r = await caso.correr();
     } catch (e) {
       fallos++;
       console.log(`  ✗ ${caso.nombre} — la trampa no se pudo montar: ${e.message}`);

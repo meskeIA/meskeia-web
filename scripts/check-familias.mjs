@@ -21,7 +21,8 @@
  *      · cada `falla:` —un hueco abierto y declarado— lleva su razón escrita.
  *
  *   B. Que el testigo PASE. Se ejecuta con Playwright (arranca y cierra el servidor solo, o
- *      reutiliza el del 3050). Un caso que falla rompe el build, y un `falla` cuyo caso ya
+ *      reutiliza el del 3050 si es un `next dev`; si es otra cosa, se planta: cabo C0530,
+ *      más abajo). Un caso que falla rompe el build, y un `falla` cuyo caso ya
  *      pasa también: Playwright lo da por fallido («expected to fail»), así que una marca
  *      muerta no puede sobrevivir a una reparación que se olvidó de quitarla.
  *
@@ -251,6 +252,35 @@ if (process.env.VERCEL) {
 }
 
 // ── B. El testigo, ejecutado ─────────────────────────────────────────────────
+/**
+ * ⚠️ 30/10/2026 (cabo C0530) — playwright.config.ts reutiliza lo que haya en el puerto. Un
+ * `next start` huérfano en el 3050 (lanzado de madrugada desde meskeia-web, vivo cuatro horas
+ * después con el build de la víspera) sirvió el código de ANTES y dio 3 rojos falsos de
+ * quiz-geografia-espana que pararon el build del /push. Este candado corre antes de `next build`:
+ * lo que mide es el código fuente, y eso solo lo sirve `next dev`. Un servidor que no lleva el
+ * cliente de recarga en caliente de next dev no vale, y se dice en vez de medir otra cosa.
+ */
+const PUERTO = Number(process.env.PUERTO_PRUEBAS) || 3050;
+async function servidorAjeno() {
+  const ruta = `http://localhost:${PUERTO}/${FAMILIAS[0]?.referencia ?? ''}/`;
+  let html;
+  try {
+    const r = await fetch(ruta, { signal: AbortSignal.timeout(90_000) });
+    html = await r.text();
+  } catch {
+    return null; // nadie escucha (Playwright arrancará next dev) o tarda: que decida Playwright
+  }
+  return /hmr-client|webpack-hmr|react-refresh/i.test(html) ? null : ruta;
+}
+const ajeno = await servidorAjeno();
+if (ajeno) {
+  console.error(`\n✗ familias: en el ${PUERTO} responde un servidor que no es \`next dev\` (${ajeno}).`);
+  console.error('  Probablemente un `next start` olvidado: serviría el build de antes, no el código que se');
+  console.error(`  va a construir, y el testigo mediría otra cosa. Deténlo (npx kill-port ${PUERTO}; si no cierra,`);
+  console.error('  Stop-Process con el PID de netstat) y vuelve a lanzar.\n');
+  process.exit(1);
+}
+
 const CLI = path.join(RAIZ, 'node_modules/@playwright/test/cli.js');
 const testigos = FAMILIAS.map((f) => f.testigo);
 const r = spawnSync(
