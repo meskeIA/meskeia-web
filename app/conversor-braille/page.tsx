@@ -741,6 +741,19 @@ const ES_CELDA_OCHO_PUNTOS = /^[⡀-⣿]$/;
  * que siguen a cada mayúscula de una serie de dos o más mayúsculas sueltas con punto («O.N.U.»,
  * «U.E.»); una abreviatura como «EE. UU.» o una inicial suelta («J. Pérez») no lo son.
  */
+/** La sigla entre `inicio` y `fin` (posición tras su último punto) cierra una oración que no es solo ella. */
+const cierraLaOracion = (caracteres: string[], inicio: number, fin: number): boolean => {
+  if (!caracteres.slice(0, inicio).some((c) => c.trim() !== '')) return false;
+  let k = fin;
+  let salto = false;
+  while (k < caracteres.length && caracteres[k].trim() === '') {
+    if (caracteres[k] === '\n' || caracteres[k] === '\r') salto = true;
+    k++;
+  }
+  if (k >= caracteres.length || salto) return true;
+  return k > fin && /^\p{Lu}$/u.test(caracteres[k]);
+};
+
 const puntosDeSigla = (caracteres: string[]): Set<number> => {
   const puntos = new Set<number>();
   const esMayuscula = (c: string | undefined) => c !== undefined && /^\p{Lu}$/u.test(c);
@@ -755,7 +768,15 @@ const puntosDeSigla = (caracteres: string[]): Set<number> => {
     // «A.B.C» sin el último punto también es sigla; «O.N.Uno», no
     const tras = caracteres[j] ?? '';
     const cierra = !ES_LETRA.test(tras) || (esMayuscula(tras) && !ES_LETRA.test(caracteres[j + 1] ?? ''));
-    if (serie.length >= 2 && cierra) serie.forEach((p) => puntos.add(p));
+    if (serie.length >= 2 && cierra) {
+      // C0494 (decisión del usuario, 29/10/2026): si la sigla acaba en punto y cierra la oración
+      // —al final del texto, o seguida de mayúscula o de salto de línea—, ese último punto es
+      // también el de la frase y se escribe (⠄): quitarlo alteraría la información (§ 7.1). La
+      // sigla sola no es una oración: «O.N.U.» sigue siendo el «{o{n{u» del § 7.1. Riesgo
+      // aceptado: «la O.N.U. Europa…» recibe un punto de más.
+      if (!ES_LETRA.test(tras) && cierraLaOracion(caracteres, i, j)) serie.pop();
+      serie.forEach((p) => puntos.add(p));
+    }
     i = Math.max(i, j - 1);
   }
   return puntos;

@@ -3600,11 +3600,11 @@ async function recorridoTraducido27(page: Page, conTecladoFisico: boolean) {
 // afirma el 2 € de 2022 ni el árabe de derecha a izquierda) y 3553 («73’81»): sus tests del bloque
 // anterior pasan, y el CASO 2 de aquí añade los ejemplos literales del § 8.5 que no tenían.
 //
-// CABO C0494 — SIN RESOLVER: ni el § 7.1 del B 2 ni el B 3-1 tratan la sigla que cierra la oración.
-// El § 6.1 distingue el punto ortográfico del de abreviatura (misma celda, 3) y el § 14.3 conserva
-// los puntos de la abreviatura «EE. UU.», pero no hay ningún ejemplo de una sigla al final de la
-// frase. La app da «Lo aprobó la O.N.U.» → ⠨⠇⠕⠀⠁⠏⠗⠕⠃⠬⠀⠇⠁⠀⠨⠕⠨⠝⠨⠥, sin punto final. Su test admite las
-// dos salidas y fija solo lo anclado: la sigla sin sus puntos.
+// CABO C0494 — ni el § 7.1 del B 2 ni el B 3-1 tratan la sigla que cierra la oración. El § 6.1
+// distingue el punto ortográfico del de abreviatura (misma celda, 3) y el § 14.3 conserva los puntos
+// de la abreviatura «EE. UU.», pero no hay ningún ejemplo de una sigla al final de la frase. La app
+// daba «Lo aprobó la O.N.U.» → ⠨⠇⠕⠀⠁⠏⠗⠕⠃⠬⠀⠇⠁⠀⠨⠕⠨⠝⠨⠥, sin punto final. RESUELTO el 30/10/2026 con la
+// decisión del usuario del 29/10 (salida 1): el punto de la frase se restituye (⠄).
 test.describe('inspector 28/10/2026', () => {
   async function convertir28(page: Page, texto: string, modo: 'texto' | 'braille' = 'texto') {
     await page.goto(RUTA);
@@ -3711,13 +3711,32 @@ test.describe('inspector 28/10/2026', () => {
   // ─────────────────────────────────────────────────────────────────────────
   // C0494 — la sigla con puntos al final de la frase (sin resolver en la fuente)
   // ─────────────────────────────────────────────────────────────────────────
-  test('C0494 — «Lo aprobó la O.N.U.»: la sigla sale sin sus puntos; el punto final no está anclado', async ({ page }) => {
-    await convertir28(page, 'Lo aprobó la O.N.U.');
-    // En tinta el punto de la U absorbe el de la frase. El § 7.1 manda quitar los de la sigla; si el
-    // punto ortográfico reaparece en braille no lo dicen ni el B 2 ni el B 3-1. Hoy la app lo quita
-    // (la primera); si se decide lo contrario, la segunda. Lo anclado es la sigla sin sus puntos.
+  test('REPARADO C0494 — la sigla que cierra la oración recupera el punto de la frase (⠄)', async ({ page }) => {
+    // En tinta el punto de la U absorbe el de la frase. El § 7.1 manda quitar los de la sigla «sin
+    // alterar la información», y perder el final de la oración la altera. Decidido por el usuario
+    // el 29/10/2026 (salida 1): cuando la sigla cierra la oración —al final del texto, o seguida de
+    // mayúscula o de salto de línea— se escribe ⠄ tras ella. Riesgo aceptado: «la O.N.U. Europa…»
+    // (sigla + nombre propio a media frase) recibe un punto de más. La sigla SOLA no es una
+    // oración: «O.N.U.» sigue siendo «{o{n{u», el ejemplo literal del § 7.1 (test del 3554).
+    const casos: Array<[string, string]> = [
+      ['Lo aprobó la O.N.U.', '⠨⠇⠕⠀⠁⠏⠗⠕⠃⠬⠀⠇⠁⠀⠨⠕⠨⠝⠨⠥⠄'],
+      // Seguida de mayúscula: o ⠕ n ⠝ u ⠥ · ⠄ · ⠀ · ⠨ a ⠁ y ⠽ e ⠑ r ⠗
+      ['Lo aprobó la O.N.U. Ayer', '⠨⠇⠕⠀⠁⠏⠗⠕⠃⠬⠀⠇⠁⠀⠨⠕⠨⠝⠨⠥⠄⠀⠨⠁⠽⠑⠗'],
+      // Con blancos al final, también cierra
+      ['Lo aprobó la O.N.U.  ', '⠨⠇⠕⠀⠁⠏⠗⠕⠃⠬⠀⠇⠁⠀⠨⠕⠨⠝⠨⠥⠄⠀⠀'],
+      // A media frase, sin cambios
+      ['Lo aprobó la O.N.U. ayer.', '⠨⠇⠕⠀⠁⠏⠗⠕⠃⠬⠀⠇⠁⠀⠨⠕⠨⠝⠨⠥⠀⠁⠽⠑⠗⠄'],
+    ];
+    for (const [texto, celdas] of casos) {
+      await convertir28(page, texto);
+      expect(await resultado28(page), texto).toBe(celdas);
+    }
+  });
+
+  test('REPARADO C0494 — la sigla seguida de salto de línea también cierra la oración', async ({ page }) => {
+    await convertir28(page, 'Lo aprobó la O.N.U.\nhoy');
     const r = await resultado28(page);
-    expect(['⠨⠇⠕⠀⠁⠏⠗⠕⠃⠬⠀⠇⠁⠀⠨⠕⠨⠝⠨⠥', '⠨⠇⠕⠀⠁⠏⠗⠕⠃⠬⠀⠇⠁⠀⠨⠕⠨⠝⠨⠥⠄']).toContain(r);
+    expect(r.startsWith('⠨⠇⠕⠀⠁⠏⠗⠕⠃⠬⠀⠇⠁⠀⠨⠕⠨⠝⠨⠥⠄'), r).toBe(true);
   });
 
   // ─────────────────────────────────────────────────────────────────────────
