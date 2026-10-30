@@ -37,6 +37,26 @@ export interface Post {
 
 export const POSTS: Post[] = [
   {
+    slug: 'bce-mantiene-tipos-octubre-2026-euribor',
+    titulo:
+      'El BCE mantiene los tipos en octubre, pero el euríbor ya está más de un punto por encima de hace un año',
+    fecha: '2026-11-01',
+    resumen:
+      'El Banco Central Europeo dejó sus tres tipos oficiales sin cambios el 29 de octubre, tras las subidas de junio y septiembre. El euríbor a un año, en cambio, cerró septiembre en el 3,247 %, frente al 2,172 % de septiembre de 2025: quien revisa su hipoteca variable este otoño lo nota aunque el BCE haga una pausa.',
+    cuerpo: [
+      'El Consejo de Gobierno del Banco Central Europeo decidió el 29 de octubre de 2026 mantener sin variación sus tres tipos de interés oficiales: la facilidad de depósito sigue en el 2,50 %, las operaciones principales de financiación en el 2,65 % y la facilidad marginal de crédito en el 2,90 %. Es una pausa después de dos subidas de 25 puntos básicos: la acordada el 11 de junio, con efecto desde el 17 de junio, y la del 10 de septiembre, con efectos a partir del 16 de septiembre. El comunicado explica que «los precios de la energía han continuado subiendo, lo que plantea riesgos al alza para las perspectivas de inflación y a la baja para las perspectivas de crecimiento», y que las decisiones se tomarán reunión a reunión, «sin comprometerse de antemano con ninguna senda concreta de tipos».',
+      'Que el BCE no mueva sus tipos no significa que la hipoteca variable deje de encarecerse. El euríbor a un año, la referencia de la mayoría de esos préstamos, es la media mensual de un tipo a doce meses, y la serie oficial que publica el Banco de España en el BOE ha subido mes a mes: 2,798 % en junio, 2,855 % en julio, 2,954 % en agosto y 3,247 % en septiembre (Resolución de 1 de octubre de 2026, BOE núm. 244, de 2 de octubre). Un año antes, en septiembre de 2025, estaba en el 2,172 %: la diferencia es de 1,075 puntos. El propio BCE recoge en su comunicado que «las condiciones de financiación se han endurecido desde la última reunión del Consejo de Gobierno».',
+      'Sirve un ejemplo para ver qué supone en una cuota. En una hipoteca a euríbor más un punto que se revisa una vez al año con el índice de septiembre, el tipo aplicable pasa del 3,172 % al 4,247 %. Para una deuda pendiente de 150.000 € a 20 años, la cuota calculada con el 3,172 % es de 844,87 € al mes, y con el 4,247 %, de 928,61 €: 83,74 € más cada mes, unos 1005 € al año. Son cifras ilustrativas: cada escritura fija qué mes del índice se toma en la revisión, el diferencial que se suma y si hay redondeo, y la cuota real depende del capital y el plazo que queden en ese momento.',
+      'La media de octubre todavía no es oficial. El Banco de España la fija por resolución el primer día hábil del mes siguiente y el BOE la publica al día siguiente, como hizo con las de junio (BOE del 2 de julio), julio (4 de agosto), agosto (2 de septiembre) y septiembre (2 de octubre), así que la de octubre llegará en los primeros días de noviembre. Esa resolución es la que tiene valor de tipo oficial de referencia, con la definición que recoge el anejo 8 de la Circular del Banco de España 5/2012; las cifras que se calculan antes a partir de las cotizaciones diarias pueden no coincidir con ella en las milésimas. Quien tenga la revisión ligada al índice de octubre puede esperar a esa publicación para hacer la cuenta.',
+      'Para repetir el cálculo con el capital pendiente, el plazo y el tipo resultante de un préstamo concreto, el estimador enlazado abajo calcula la cuota con el sistema francés y su tabla de amortización.',
+    ],
+    fuente: 'Banco Central Europeo — Decisiones de política monetaria, 29 de octubre de 2026 (vía Banco de España)',
+    fuenteUrl:
+      'https://www.bde.es/f/webbe/GAP/Secciones/SalaPrensa/ComunicadosBCE/DecisionesPoliticaMonetaria/26/mp261029.pdf',
+    visualizadorUrl: 'https://meskeia.com/estimador-hipoteca/',
+    visualizadorTitulo: 'Estimador de Hipoteca',
+  },
+  {
     slug: 'reduccion-jornada-cume-gran-dependencia-ley-4-2026',
     titulo:
       'Hijos con cáncer o enfermedad grave: desde el 23 de octubre, la reducción de jornada puede mantenerse más allá del límite de edad',
