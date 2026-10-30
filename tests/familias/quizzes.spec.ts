@@ -207,6 +207,55 @@ for (const h of HERMANAS) {
     });
 
     /**
+     * Cabo C0515 (hallazgo 3773, quiz-figuras-retoricas, 29/10/2026): la barra de progreso llevaba
+     * role="progressbar" sin aria-label ni aria-labelledby, y el lector la anunciaba sin nombre. Se
+     * reparó en las hermanas que la tienen (56bfa250, 6b82c3a3 y anteriores); esta fila mide que
+     * toda barra de la pantalla de pregunta tenga nombre. Las que no tienen barra pasan sin medir nada.
+     */
+    test('la barra de progreso, si la hay, tiene nombre accesible', async ({ page }) => {
+      await page.goto(`/${h.slug}/`);
+      for (const boton of h.arranque) await pulsarHidratado(page, boton);
+      await esperarHidratado(page, h.opcion ?? /^\s*A\S/);
+      // Sin «:visible»: en varias la barra ES el relleno, y en la primera pregunta mide 0 px de ancho
+      const sinNombre = await page.locator('[role="progressbar"]').evaluateAll((bs) =>
+        bs
+          .filter((b) => {
+            const etiqueta = (b.getAttribute('aria-label') ?? '').trim();
+            const ids = (b.getAttribute('aria-labelledby') ?? '').split(/\s+/).filter(Boolean);
+            const porId = ids.map((id) => document.getElementById(id)?.textContent?.trim() ?? '').join('');
+            return !etiqueta && !porId;
+          })
+          .map((b) => b.outerHTML.slice(0, 120)),
+      );
+      expect(sinNombre, 'barra de progreso sin nombre').toEqual([]);
+    });
+
+    /**
+     * Cabo C0518 (hallazgo 3785, quiz-reinos-naturaleza, 29/10/2026): a 360 px la fila «Número de
+     * preguntas» (flex sin wrap) no cabía y sus botones extremos salían por los dos lados (a 320 px,
+     * 20 px fuera). Se reparó con flex-wrap en reinos, verbos-irregulares y figuras-retoricas. Esta
+     * fila mide en todas, a 360 y 320 px, que ningún botón de la pantalla de inicio se salga de la
+     * pantalla en horizontal.
+     */
+    test('a 360 y 320 px, ningún botón de la pantalla de inicio se sale de la pantalla', async ({ page }) => {
+      const fuera: string[] = [];
+      for (const ancho of [360, 320]) {
+        await page.setViewportSize({ width: ancho, height: 740 });
+        await page.goto(`/${h.slug}/`);
+        await page.waitForLoadState('load');
+        // Todos los botones, no solo los de <main>: quiz-mitos-ciencia no tiene <main> (C0501)
+        const cortados = await page.locator('button:visible').evaluateAll((bs) =>
+          bs
+            .map((b) => ({ r: b.getBoundingClientRect(), t: (b.textContent ?? '').trim().slice(0, 30) }))
+            .filter(({ r }) => r.width > 0 && (r.left < -1 || r.right > window.innerWidth + 1))
+            .map(({ r, t }) => `«${t}» ${Math.round(r.left)}…${Math.round(r.right)}`),
+        );
+        for (const c of cortados) fuera.push(`${ancho} px: ${c}`);
+      }
+      expect(fuera, 'botón fuera de la pantalla').toEqual([]);
+    });
+
+    /**
      * Ratón de verdad, como en tests/familias/selectores.spec.ts: el 1.er clic en el centro del
      * botón, esperar a que la pantalla NUEVA esté pintada y el 2.º clic de la ráfaga en el mismo
      * punto, que el navegador entrega con `detail` 2. Lo que haya debajo es lo que pisa: así solo
