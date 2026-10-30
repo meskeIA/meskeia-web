@@ -20,6 +20,9 @@
  * Los casos 17-19 (27/10/2026, cabo C0483) son la tanda 2 en impresión: `-texto` dentro de un
  * `@media print`, con el título del parte del sonómetro de antes de 5fcd18bc como caso de origen.
  *
+ * Los casos 20-22 (30/10/2026, cabo C0502) son la marca que llega por una variable propia del
+ * módulo, con la insignia del hallazgo 3683 como caso de origen.
+ *
  * Trabaja sobre mini-catálogos en directorios temporales: no escribe NADA en `app/`.
  */
 
@@ -241,6 +244,46 @@ const CASOS = [
       'app/x/X.module.css': css('@media print {', '  /* marca-ok: la hoja impresa fuerza el tema claro con data-theme */', '  .t { color: var(--secondary-texto); }', '}'),
     },
   },
+  // La marca por una variable propia del módulo (cabo C0502, 30/10/2026)
+  {
+    n: 20,
+    nombre: 'CASO DE ORIGEN · hallazgo 3683 (quiz-complejidad-algoritmos): blanco sobre --cat-notacion: #2E86AB',
+    tanda: 1,
+    debeFallar: true,
+    ficheros: {
+      'app/quiz-complejidad-algoritmos/QuizComplejidadAlgoritmos.module.css': css(
+        '.container {', '  --cat-notacion: #2E86AB;', '  --cat-ordenacion: #10B981;', '}',
+        '.categoriaBadge {', '  font-size: 0.78rem;', '  background: var(--cat-notacion);', '  color: white;', '}',
+      ),
+    },
+  },
+  {
+    n: 21,
+    nombre: 'EL CENSO DEL MISMO DÍA · la insignia de orientador-iva-espana: color: var(--mec-repercutido), que vale #2E86AB',
+    tanda: 2,
+    debeFallar: true,
+    ficheros: {
+      'app/orientador-iva-espana/OrientadorIvaEspana.module.css': css(
+        '.container {', '  --mec-repercutido: #2E86AB;', '}',
+        "[data-theme='dark'] .container {", '  --mec-repercutido: #5BA3C7;', '}',
+        '.mec_repercutido .resultadoBadge { color: var(--mec-repercutido); border-color: var(--mec-repercutido); }',
+      ),
+    },
+  },
+  {
+    n: 22,
+    nombre: 'LOS DOS, REPARADOS en el valor de la variable, y una variable de marca que solo pinta una barra: calla',
+    tanda: null,
+    debeFallar: false,
+    ficheros: {
+      'app/x/X.module.css': css(
+        '.container {', '  --cat-notacion: #26718F;', '  --mec-repercutido: #26718F;', '  --barra: #2E86AB;', '}',
+        '.categoriaBadge { background: var(--cat-notacion); color: white; }',
+        '.badge { color: var(--mec-repercutido); }',
+        '.relleno { background: var(--barra); height: 4px; }',
+      ),
+    },
+  },
 ];
 
 function montar(ficheros) {
@@ -269,8 +312,9 @@ for (const c of CASOS) {
 
 // ─── La campaña deja callado al candado en lo que sabe migrar ──────────────────
 {
-  // Fuera el 5 (sin sustituto), el 15 (escape sin razón) y el 17 (impresión): la campaña no los migra
-  const todos = Object.assign({}, ...CASOS.filter((c) => c.debeFallar && ![5, 15, 17].includes(c.n)).map((c, i) =>
+  // Fuera el 5 (sin sustituto), el 15 (escape sin razón), el 17 (impresión) y el 20 y el 21 (la
+  // marca por una variable propia, que se corrige a mano en su valor): la campaña no los migra
+  const todos = Object.assign({}, ...CASOS.filter((c) => c.debeFallar && ![5, 15, 17, 20, 21].includes(c.n)).map((c, i) =>
     Object.fromEntries(Object.entries(c.ficheros).map(([r, t]) => [r.replace(/^app\/([^/]+)/, `app/$1-${i}`), t])),
   ));
   const dir = montar(todos);

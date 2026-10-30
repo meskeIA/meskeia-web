@@ -26,6 +26,11 @@
  *             a propósito: su tamaño real no se sabe por la forma del código —rem, clamp,
  *             herencia— y el token no cuesta nada.
  *
+ *   Las dos, también cuando la marca llega por una VARIABLE PROPIA del módulo (`--cat-x: #2E86AB`
+ *   y luego `color: var(--cat-x)`), desde el 30/10/2026 (cabo C0502: hallazgo 3683 de
+ *   quiz-complejidad-algoritmos, y cuatro casos más en tres apps que el censo encontró y se
+ *   repararon en el mismo commit). Se corrige el VALOR de la variable, no la declaración que la usa.
+ *
  * En `app/`, `components/` y `styles/`, hojas `.module.css` y `style={{…}}` de los `.tsx`. El
  * criterio NO vive aquí: lo importa de `scripts/contraste-marca/clasificar.mjs`, el mismo que
  * usa el script de la campaña, para que lo que se migra y lo que se vigila no diverjan.
@@ -57,6 +62,9 @@
  *   · `--accent` (#7FB3D3) como texto: no tiene token. Sí rompe como FONDO de un texto blanco
  *     (unos 2,1:1), que no tiene sustituto mecánico y se resuelve a mano.
  *   · El texto de un `<canvas>` y el `fill` de un SVG: el color no está en un `color:`.
+ *   · Un color que llega por una EXPRESIÓN de JS (`style={{ background: CATEGORIAS[c].color }}`,
+ *     hallazgo 3758 de quiz-conceptos-inversion): el valor no está en el código del estilo. Eso
+ *     solo lo ve un spec por píxel. Tampoco una variable propia declarada SOLO en oscuro.
  *   · Las apps con PALETA PROPIA (redeclaran `--primary` a otro tono): ahí no es la marca.
  *   · El estado deshabilitado (`:disabled`, exento en WCAG 1.4.3). `:not(:disabled)` sí cuenta.
  *   · Que el sustituto CUMPLA en la página real: eso se mide por píxel
@@ -86,7 +94,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { analizarCss, analizarTsx, paletaPropia } from './contraste-marca/clasificar.mjs';
+import { analizarCss, analizarTsx, conVariablesPropias, paletaPropia } from './contraste-marca/clasificar.mjs';
 import { prefijosCongelados, esCongelado } from './contraste-marca/congelados.mjs';
 
 const arg = (n) => {
@@ -183,6 +191,22 @@ for (const [f, t] of textos) {
       ? `usa ${tokens.map((x) => `\`${x}\``).join(' y ') || `\`${SUSTITUTO[h.tanda]}\``}`
       : `sin sustituto mecánico (${h.motivo}): resolverlo a mano y medirlo`;
     errores.push({ tanda: h.tanda, texto: `${r}:${h.linea} — \`${h.selector.slice(0, 80)}\` pone ${que} (\`${h.prop}: ${h.valor.slice(0, 70)}\`): ${como}.${porQue}` });
+  }
+  // La marca que llega por una variable propia del módulo (C0502): se analiza la hoja con cada
+  // `var(--propia)` sustituido por su valor, y lo que sale de MÁS es lo que la pasada de arriba no ve.
+  if (f.endsWith('.css')) {
+    const { css: sustituido, propias } = conVariablesPropias(t);
+    if (propias.size) {
+      const ya = new Set(hallazgos.filter((h) => h.defecto).map((h) => `${h.tanda}:${h.linea}:${h.prop}`));
+      for (const h of analizarCss(sustituido).hallazgos) {
+        if (!h.defecto || !TANDAS.includes(h.tanda) || ya.has(`${h.tanda}:${h.linea}:${h.prop}`)) continue;
+        if (h.escape === 'firmado') { exentas.push(`${r}:${h.linea}`); continue; }
+        const porQue = h.escape === 'sin razón' ? ' — lleva `marca-ok:` SIN razón escrita' : '';
+        const via = [...propias].filter(([nombre]) => new RegExp(String.raw`var\(\s*${nombre}\s*\)`).test(t.split('\n')[h.linea - 1] ?? '')).map(([nombre, p]) => `\`${nombre}: ${p.valor}\` (l. ${p.linea})`);
+        const que = h.tanda === 1 ? 'texto blanco sobre la marca' : 'la marca como color de texto';
+        errores.push({ tanda: h.tanda, texto: `${r}:${h.linea} — \`${h.selector.slice(0, 80)}\` pone ${que} a través de la variable propia ${via.join(' y ') || 'del módulo'}: cambia el VALOR de la variable a \`${SUSTITUTO[h.tanda]}\` (o a un tono medido que llegue a 4,5:1).${porQue}` });
+      }
+    }
   }
   if (TANDAS.includes(2) && f.endsWith('.css')) {
     for (const h of textoMarcaEnImpresion(t)) {

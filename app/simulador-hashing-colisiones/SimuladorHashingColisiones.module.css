@@ -15,9 +15,12 @@
   --border: #e5e5e5;
   --hover: #f5f5f5;
   --celda-vacia: #e8e8e8;
-  --celda-ocupada: #2e86ab;
+  /* Fondo de celdas con el número en blanco: van a 4,5:1 en los dos temas (cabo C0502, 30/10/2026).
+     Antes, la marca: blanco sobre #2e86ab 4,11:1 y sobre #48a9a6 (la celda al insertar) 2,80:1.
+     Ahora el --primary-boton y el --secondary-boton: 5,47 y 5,15. La colisión ya daba 4,53. */
+  --celda-ocupada: #26718F;
   --celda-colision: #dc3545;
-  --celda-insertando: #48a9a6;
+  --celda-insertando: #327874;
   --radius: 10px;
   --radius-lg: 14px;
 
@@ -237,10 +240,12 @@
   box-shadow: 0 0 0 3px rgba(72, 169, 166, 0.4);
 }
 
+/* Sin opacidad (cabo C0502, 30/10/2026): a 0,75 el índice blanco de una celda ocupada se quedaba
+   en 3,83:1 aun con el fondo ya en --primary-boton (2,88:1 con el de antes). Texto de 11,5 px:
+   pide 4,5:1. */
 .celdaIndice {
   font-size: 0.72rem;
   font-weight: 700;
-  opacity: 0.75;
   line-height: 1;
 }
 
@@ -252,10 +257,13 @@
   justify-content: center;
 }
 
+/* El chip OSCURECE la celda en vez de aclararla (cabo C0502): el tinte blanco al 20 % dejaba la
+   palabra en 3,68:1 sobre la celda ocupada y por debajo sobre la de colisión; el negro al 18 %
+   la sube por encima de 6:1 en las dos. */
 .chip {
   font-size: 0.68rem;
   font-weight: 600;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.18);
   border-radius: 4px;
   padding: 1px 5px;
   white-space: nowrap;

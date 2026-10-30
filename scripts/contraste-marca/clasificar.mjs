@@ -257,9 +257,40 @@ function lineaDe(texto, pos) {
   return lo + 1;
 }
 
+// ─── Variables propias del módulo ─────────────────────────────────────────────
+
+/**
+ * La marca que llega por una VARIABLE PROPIA del módulo (cabo C0502, 30/10/2026): `--cat-notacion:
+ * #2E86AB` y luego `background: var(--cat-notacion); color: white`. El análisis de arriba busca
+ * la marca en la declaración y no sigue `var(--cat-notacion)`, así que no la veía (hallazgo 3683
+ * de quiz-complejidad-algoritmos; el censo de ese día dio cuatro más en tres apps: las insignias
+ * de orientador-iva-espana y orientador-tipos-renta-irpf y la celda de simulador-hashing-colisiones).
+ *
+ * Devuelve el CSS con cada `var(--propia)` sin reserva sustituido por el valor de marca que el
+ * módulo le da FUERA del tema oscuro, y la lista de las sustituidas. Un valor de variable cabe en
+ * una línea, así que las líneas no se mueven y los hallazgos del CSS sustituido se pueden
+ * comparar, línea a línea, con los del original. Fuera: los tokens de marca y sus `-texto` y
+ * `-boton`, que ya analiza lo de arriba, y lo que el módulo declara solo en oscuro.
+ */
+export function conVariablesPropias(css) {
+  const propias = new Map();
+  for (const b of parsearCss(css)) {
+    if (b.contexto.oscuroMedia || RE_TEMA_OSCURO.test(b.selector)) continue;
+    for (const d of b.decls) {
+      if (!d.prop.startsWith('--') || /^--(primary|secondary|accent)(-texto|-boton)?$/.test(d.prop)) continue;
+      if (d.valor.includes('\n')) continue;
+      const refs = referencias(d.valor);
+      if (refs.length && refs.every((r) => r.token !== 'accent') && !propias.has(d.prop)) propias.set(d.prop, { valor: d.valor, linea: d.linea });
+    }
+  }
+  if (!propias.size) return { css, propias };
+  const sustituido = css.replace(/var\(\s*(--[\w-]+)\s*\)/g, (todo, nombre) => (propias.has(nombre) ? propias.get(nombre).valor : todo));
+  return { css: sustituido, propias };
+}
+
 // ─── Selectores: tema, base y estado ──────────────────────────────────────────
 
-const RE_TEMA_OSCURO = /\[data-theme\s*=\s*["']?dark["']?\s*\]|:global\(\s*\.dark\s*\)/i;
+const RE_TEMA_OSCURO =/\[data-theme\s*=\s*["']?dark["']?\s*\]|:global\(\s*\.dark\s*\)/i;
 const quitarTema = (s) =>
   s.replace(/:global\(\s*(\[data-theme[^\]]*\])\s*\)/gi, '$1').replace(/\[data-theme[^\]]*\]\s*/gi, '').replace(/:global\(\s*\.dark\s*\)\s*/gi, '').replace(/\s+/g, ' ').trim();
 const quitarEstados = (s) => s.replace(/::?[a-z-]+(\((?:[^()]|\([^()]*\))*\))?/gi, '').replace(/\[[^\]]*\]/g, '').replace(/\s+/g, ' ').trim();

@@ -18,10 +18,13 @@
   --spacing-lg: 1.5rem;
   --spacing-xl: 2rem;
 
-  /* Colores por base fiscal */
-  --base-general: #2E86AB;
-  --base-ahorro: #16a34a;
-  --base-especial: #E87722;
+  /* Colores por base fiscal. Pintan también el TEXTO de .resultadoBadge (12,8 px en negrita
+     sobre --bg-card), así que van a 4,5:1 sobre blanco (cabo C0502, 30/10/2026). Antes:
+     #2E86AB 4,11 · #16a34a 3,30 · #E87722 2,96. Ahora 5,47 (el --primary-texto del claro) ·
+     5,02 · 5,18. */
+  --base-general: #26718F;
+  --base-ahorro: #15803d;
+  --base-especial: #c2410c;
 
   max-width: 1000px;
   margin: 0 auto;
