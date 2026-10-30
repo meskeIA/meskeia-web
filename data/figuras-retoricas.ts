@@ -116,7 +116,9 @@ export const figurasRetorica: FiguraRetorica[] = [
       '¡Vaya, llegaste puntualísimo! (dicho a quien llega tarde)',
       '¡Qué tiempo tan maravilloso! (dicho bajo una tormenta)',
       '¡Menuda genialidad! (ante una idea obvia o tonta)',
-      'Con lo listo que eres, seguro que lo entiendes. (dicho con sarcasmo)',
+      // Hallazgo 3805: la glosa decía «(dicho con sarcasmo)», y la FAQ define el sarcasmo como «una
+      // ironía más mordaz»: daba la figura en el enunciado. Ahora describe la situación, como las demás.
+      'Con lo listo que eres, seguro que lo entiendes. (dicho a quien lleva una hora sin entenderlo)',
     ],
   },
 
@@ -157,11 +159,13 @@ export const figurasRetorica: FiguraRetorica[] = [
     distincion: 'El orden "natural" en español es Sujeto-Verbo-Complemento. El hipérbaton lo altera, especialmente en poesía clásica. No altera el significado, solo el orden.',
     grupo: 'sintaxis',
     nivel: 'basico',
+    // Hallazgo 3805: cada ejemplo llevaba entre paréntesis el orden natural con las mismas palabras,
+    // que es justo el mecanismo de la definición y se pintaba en la PREGUNTA: daba la respuesta.
     ejemplos: [
-      'Del monte en la ladera. (En la ladera del monte)',
-      'A Dafne ya los brazos le crecían. (Ya le crecían los brazos a Dafne) — Garcilaso de la Vega, Soneto XIII',
-      'De su patria el recuerdo le dolía. (El recuerdo de su patria le dolía)',
-      'Aquel que de mi nombre se ha enterado. (Aquel que se ha enterado de mi nombre)',
+      'Del monte en la ladera, por mi mano plantado tengo un huerto (Fray Luis de León).',
+      'A Dafne ya los brazos le crecían (Garcilaso de la Vega, Soneto XIII).',
+      'De su patria el recuerdo le dolía.',
+      'Aquel que de mi nombre se ha enterado.',
     ],
   },
 
@@ -331,7 +335,10 @@ export const figurasRetorica: FiguraRetorica[] = [
       // Hallazgo 3775: tres ejemplos describían la figura y daban su clave («representa…», «como
       // metáfora de…»), y el que decía «metáfora» castigaba a quien elegía Metáfora. Ahora son
       // textos alegóricos, sin nombrar la figura ni su sentido.
-      'Nuestras vidas son los ríos / que van a dar en la mar, / que es el morir; / allí van los señoríos / derechos a se acabar / y consumir (Jorge Manrique).',
+      // Hallazgo 3803: aquí estaba «Nuestras vidas son los ríos…» de Manrique, que la tabla de la guía
+      // da como ejemplo canónico de METÁFORA: con Metáfora entre las opciones había dos respuestas
+      // buenas. Ahora es el prado de Berceo, la alegoría de la introducción de los Milagros.
+      'Un romero cansado llega a un prado verde, lleno de flores, con fuentes claras y árboles que dan sombra, y allí descansa de su camino (Gonzalo de Berceo, introducción de los «Milagros de Nuestra Señora»).',
       'Unos prisioneros encadenados en una cueva solo ven sombras en la pared y las toman por el mundo real; cuando uno sale y ve el sol, los demás no le creen (Platón).',
     ],
   },

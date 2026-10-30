@@ -792,7 +792,7 @@ test.describe('Inspector 29/10/2026 (tarde) · escritorio 1280 × 800', () => {
   });
 
   test('hallazgo · el verso de Manrique que la guía da como Metáfora no es la clave de Alegoría', async ({ page }) => {
-    test.fail(); // ABIERTO — la reparación de 3775 (e387448a) puso como ejemplo de Alegoría
+    // REPARADO (3803, /reparar 30/10/2026): la Alegoría usa ahora el prado de Berceo. Era: la reparación de 3775 (e387448a) puso como ejemplo de Alegoría
     // «Nuestras vidas son los ríos / que van a dar en la mar…» (data/figuras-retoricas.ts:334), que la
     // tabla de la propia guía (page.tsx:422-427) da como ejemplo canónico de METÁFORA. En «Todas», con
     // Metáfora entre las opciones, quien responde lo que enseña la tabla saca «Incorrecto». Medido el
@@ -808,7 +808,7 @@ test.describe('Inspector 29/10/2026 (tarde) · escritorio 1280 × 800', () => {
   });
 
   test('hallazgo · la opción correcta y la fallada se distinguen por algo más que el color', async ({ page }) => {
-    test.fail(); // ABIERTO — forma del cabo C0516: tras fallar, la elegida y la correcta conservan
+    // REPARADO (3804, /reparar 30/10/2026): ✓/✗ y la marca en el aria-label. Era — forma del cabo C0516: tras fallar, la elegida y la correcta conservaban
     // el mismo texto y el mismo aria-label («Opción B: Metáfora», «Opción D: Alegoría»); solo cambian
     // el color de texto, el borde y el fondo (rojo / verde). La referencia, quiz-literatura-universal
     // (hallazgo 303), añade ✓/✗ y «(respuesta correcta)» / «(tu respuesta, incorrecta)» (WCAG 1.4.1).
@@ -877,7 +877,8 @@ test.describe('Inspector 29/10/2026 (tarde) · móvil 360 × 740', () => {
 
 test.describe('Inspector 29/10/2026 (tarde) · contenido del banco', () => {
   test('hallazgo · reparación incompleta de 3775: ninguna glosa del enunciado nombra o describe su figura', () => {
-    test.fail(); // ABIERTO — fuera de la alegoría y de los 9 ejemplos de 3657, otros cinco se delatan en
+    // REPARADO (3805, /reparar 30/10/2026): la ironía describe la situación y el hipérbaton va sin el
+    // orden natural entre paréntesis. Era — fuera de la alegoría y de los 9 ejemplos de 3657, otros cinco se delatan en
     // el paréntesis que se pinta en la PREGUNTA (page.tsx:282-284): Ironía «(dicho con sarcasmo)»
     // nombra el sarcasmo, que la FAQ visible define como «una ironía más mordaz»; y los 4 de
     // Hipérbaton escriben entre paréntesis el orden natural con las MISMAS palabras («Del monte en la
