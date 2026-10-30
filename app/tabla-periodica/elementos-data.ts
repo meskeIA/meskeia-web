@@ -4,9 +4,18 @@
  *
  * MASAS ATÓMICAS
  * ──────────────
- * Pesos atómicos estándar de la IUPAC / CIAAW, tabla 2021 (sin cambios en la revisión de
- * 2023 para estos elementos). Fuente: https://iupac.qmul.ac.uk/AtWt/
- * Verificado: 2026-08-23.
+ * Pesos atómicos estándar ABREVIADOS de la CIAAW/IUPAC, tabla 2024. Fuente:
+ * https://www.ciaaw.org/abridged-atomic-weights.htm
+ * Verificado: 2026-10-30, elemento a elemento (cabo C0490).
+ *
+ * Cada peso abreviado tiene sus propios decimales (Na 22,990 tres, Cl 35,45 dos, H 1,0080
+ * cuatro), y un número de JavaScript pierde el cero final: `22.990` es `22.99`. Por eso los
+ * decimales van ESCRITOS en `PESO_ABREVIADO_CIAAW_2024`, con el literal de la fuente, y de ahí
+ * salen la ficha y el redondeo de la calculadora de masa molar (al peso menos preciso, como
+ * simulador-estequiometria). Hasta el 30/10/2026 la ficha daba siempre tres decimales (35,450 u,
+ * un cero que la IUPAC no da) y la calculadora cuatro (NaCl 58,4400 g/mol); además el helio y
+ * el berilio iban redondeados a tres decimales (4,003 y 9,012) y el circonio tenía el valor
+ * anterior a la revisión de 2024 (91,224; hoy 91,222).
  *
  * ⚠️ Los pesos atómicos SE REVISAN: la IUPAC publica actualizaciones cada pocos años y
  * algunos elementos cambian de cifra. Hasta el 23/08/2026 el módulo no declaraba fuente ni
@@ -54,6 +63,9 @@ export interface Elemento {
    */
   otrosNombres?: readonly string[];
   masa: number;
+  /** Decimales del peso abreviado de la CIAAW (`PESO_ABREVIADO_CIAAW_2024`); null en los
+   *  elementos sin peso atómico estándar, cuya `masa` es el número másico entero. */
+  decimalesMasa: number | null;
   grupo: number;
   periodo: number;
   familia: string;
@@ -105,14 +117,37 @@ export const ESTADOS: Record<string, string> = {
   'gas': 'Gas',
 };
 
-const ELEMENTOS_SIN_RADIO: Omit<Elemento, 'radioAtomico' | 'electronegatividad'>[] = [
+/**
+ * Tabla abreviada 2024 de la CIAAW, con el literal tal como la escribe la fuente (los ceros
+ * finales cuentan). Los 34 elementos que no están no tienen peso atómico estándar.
+ */
+export const PESO_ABREVIADO_CIAAW_2024: Readonly<Record<number, string>> = {
+  1: '1.0080', 2: '4.0026', 3: '6.94', 4: '9.0122', 5: '10.81', 6: '12.011', 7: '14.007',
+  8: '15.999', 9: '18.998', 10: '20.180', 11: '22.990', 12: '24.305', 13: '26.982',
+  14: '28.085', 15: '30.974', 16: '32.06', 17: '35.45', 18: '39.95', 19: '39.098',
+  20: '40.078', 21: '44.956', 22: '47.867', 23: '50.942', 24: '51.996', 25: '54.938',
+  26: '55.845', 27: '58.933', 28: '58.693', 29: '63.546', 30: '65.38', 31: '69.723',
+  32: '72.630', 33: '74.922', 34: '78.971', 35: '79.904', 36: '83.798', 37: '85.468',
+  38: '87.62', 39: '88.906', 40: '91.222', 41: '92.906', 42: '95.95', 44: '101.07',
+  45: '102.91', 46: '106.42', 47: '107.87', 48: '112.41', 49: '114.82', 50: '118.71',
+  51: '121.76', 52: '127.60', 53: '126.90', 54: '131.29', 55: '132.91', 56: '137.33',
+  57: '138.91', 58: '140.12', 59: '140.91', 60: '144.24', 62: '150.36', 63: '151.96',
+  64: '157.25', 65: '158.93', 66: '162.50', 67: '164.93', 68: '167.26', 69: '168.93',
+  70: '173.05', 71: '174.97', 72: '178.49', 73: '180.95', 74: '183.84', 75: '186.21',
+  76: '190.23', 77: '192.22', 78: '195.08', 79: '196.97', 80: '200.59', 81: '204.38',
+  82: '207.2', 83: '208.98', 90: '232.04', 91: '231.04', 92: '238.03',
+};
+
+const decimalesDe = (literal: string): number => literal.split('.')[1]?.length ?? 0;
+
+const ELEMENTOS_SIN_RADIO: Omit<Elemento, 'radioAtomico' | 'electronegatividad' | 'decimalesMasa'>[] = [
   // Período 1
-  { numero: 1, simbolo: "H", nombre: "Hidrógeno", masa: 1.008, grupo: 1, periodo: 1, familia: "no-metales", estado: "gas", configuracionElectronica: "1s¹", usos: ["Combustible en cohetes", "Soldadura", "Refinado de petróleo"], datoCurioso: "Es el elemento más abundante del universo: cerca del 75 % de la masa de la materia ordinaria." },
-  { numero: 2, simbolo: "He", nombre: "Helio", masa: 4.003, grupo: 18, periodo: 1, familia: "gases-nobles", estado: "gas", configuracionElectronica: "1s²", usos: ["Globos", "Criogenia", "Respiración profunda"], datoCurioso: "Es el segundo elemento más abundante del universo, pero raro en la Tierra." },
+  { numero: 1, simbolo: "H", nombre: "Hidrógeno", masa: 1.0080, grupo: 1, periodo: 1, familia: "no-metales", estado: "gas", configuracionElectronica: "1s¹", usos: ["Combustible en cohetes", "Soldadura", "Refinado de petróleo"], datoCurioso: "Es el elemento más abundante del universo: cerca del 75 % de la masa de la materia ordinaria." },
+  { numero: 2, simbolo: "He", nombre: "Helio", masa: 4.0026, grupo: 18, periodo: 1, familia: "gases-nobles", estado: "gas", configuracionElectronica: "1s²", usos: ["Globos", "Criogenia", "Respiración profunda"], datoCurioso: "Es el segundo elemento más abundante del universo, pero raro en la Tierra." },
 
   // Período 2
   { numero: 3, simbolo: "Li", nombre: "Litio", masa: 6.94, grupo: 1, periodo: 2, familia: "metales-alcalinos", estado: "solido", configuracionElectronica: "[He] 2s¹", usos: ["Baterías", "Medicamentos", "Aleaciones"], datoCurioso: "Es el metal más ligero y puede flotar en el agua." },
-  { numero: 4, simbolo: "Be", nombre: "Berilio", masa: 9.012, grupo: 2, periodo: 2, familia: "metales-alcalinoterreos", estado: "solido", configuracionElectronica: "[He] 2s²", usos: ["Aleaciones aeroespaciales", "Rayos X", "Reactores nucleares"], datoCurioso: "Es extremadamente tóxico pero indispensable en aeronáutica." },
+  { numero: 4, simbolo: "Be", nombre: "Berilio", masa: 9.0122, grupo: 2, periodo: 2, familia: "metales-alcalinoterreos", estado: "solido", configuracionElectronica: "[He] 2s²", usos: ["Aleaciones aeroespaciales", "Rayos X", "Reactores nucleares"], datoCurioso: "Es extremadamente tóxico pero indispensable en aeronáutica." },
   { numero: 5, simbolo: "B", nombre: "Boro", masa: 10.81, grupo: 13, periodo: 2, familia: "metaloides", estado: "solido", configuracionElectronica: "[He] 2s² 2p¹", usos: ["Vidrio borosilicato", "Detergentes", "Semiconductores"], datoCurioso: "Forma enlaces químicos únicos que desafían las reglas tradicionales." },
   { numero: 6, simbolo: "C", nombre: "Carbono", masa: 12.011, grupo: 14, periodo: 2, familia: "no-metales", estado: "solido", configuracionElectronica: "[He] 2s² 2p²", usos: ["Base de vida orgánica", "Acero", "Diamantes", "Grafito"], datoCurioso: "Puede formar más compuestos que cualquier otro elemento." },
   { numero: 7, simbolo: "N", nombre: "Nitrógeno", masa: 14.007, grupo: 15, periodo: 2, familia: "no-metales", estado: "gas", configuracionElectronica: "[He] 2s² 2p³", usos: ["Fertilizantes", "Explosivos", "Criogenia"], datoCurioso: "Constituye el 78 % del aire seco, en volumen." },
@@ -144,7 +179,7 @@ const ELEMENTOS_SIN_RADIO: Omit<Elemento, 'radioAtomico' | 'electronegatividad'>
   { numero: 29, simbolo: "Cu", nombre: "Cobre", masa: 63.546, grupo: 11, periodo: 4, familia: "metales-transicion", estado: "solido", configuracionElectronica: "[Ar] 3d¹⁰ 4s¹", usos: ["Cables eléctricos", "Tuberías", "Monedas"], datoCurioso: "Primer metal usado por humanos, excelente conductor." },
   { numero: 30, simbolo: "Zn", nombre: "Zinc", masa: 65.38, grupo: 12, periodo: 4, familia: "metales-transicion", estado: "solido", configuracionElectronica: "[Ar] 3d¹⁰ 4s²", usos: ["Galvanizado", "Baterías", "Suplementos"], datoCurioso: "Esencial para el sistema inmunológico." },
   { numero: 31, simbolo: "Ga", nombre: "Galio", masa: 69.723, grupo: 13, periodo: 4, familia: "otros-metales", estado: "solido", configuracionElectronica: "[Ar] 3d¹⁰ 4s² 4p¹", usos: ["Semiconductores", "LEDs", "Termómetros"], datoCurioso: "Se derrite en la mano: funde a 29,76 °C." },
-  { numero: 32, simbolo: "Ge", nombre: "Germanio", masa: 72.63, grupo: 14, periodo: 4, familia: "metaloides", estado: "solido", configuracionElectronica: "[Ar] 3d¹⁰ 4s² 4p²", usos: ["Semiconductores", "Fibra óptica", "Detectores"], datoCurioso: "Predicho por Mendeleev como 'eka-silicio'." },
+  { numero: 32, simbolo: "Ge", nombre: "Germanio", masa: 72.630, grupo: 14, periodo: 4, familia: "metaloides", estado: "solido", configuracionElectronica: "[Ar] 3d¹⁰ 4s² 4p²", usos: ["Semiconductores", "Fibra óptica", "Detectores"], datoCurioso: "Predicho por Mendeleev como 'eka-silicio'." },
   { numero: 33, simbolo: "As", nombre: "Arsénico", masa: 74.922, grupo: 15, periodo: 4, familia: "metaloides", estado: "solido", configuracionElectronica: "[Ar] 3d¹⁰ 4s² 4p³", usos: ["Semiconductores", "Pesticidas", "Medicina"], datoCurioso: "Históricamente usado como veneno por su difícil detección." },
   { numero: 34, simbolo: "Se", nombre: "Selenio", masa: 78.971, grupo: 16, periodo: 4, familia: "no-metales", estado: "solido", configuracionElectronica: "[Ar] 3d¹⁰ 4s² 4p⁴", usos: ["Electrónica", "Vidrio", "Suplementos"], datoCurioso: "Esencial en pequeñas cantidades, tóxico en grandes." },
   { numero: 35, simbolo: "Br", nombre: "Bromo", masa: 79.904, grupo: 17, periodo: 4, familia: "halogenos", estado: "liquido", configuracionElectronica: "[Ar] 3d¹⁰ 4s² 4p⁵", usos: ["Retardantes de fuego", "Fotografía", "Medicina"], datoCurioso: "Único no metal líquido a temperatura ambiente." },
@@ -154,7 +189,7 @@ const ELEMENTOS_SIN_RADIO: Omit<Elemento, 'radioAtomico' | 'electronegatividad'>
   { numero: 37, simbolo: "Rb", nombre: "Rubidio", masa: 85.468, grupo: 1, periodo: 5, familia: "metales-alcalinos", estado: "solido", configuracionElectronica: "[Kr] 5s¹", usos: ["Relojes atómicos", "Células fotoeléctricas"], datoCurioso: "Se enciende espontáneamente en el aire." },
   { numero: 38, simbolo: "Sr", nombre: "Estroncio", masa: 87.62, grupo: 2, periodo: 5, familia: "metales-alcalinoterreos", estado: "solido", configuracionElectronica: "[Kr] 5s²", usos: ["Fuegos artificiales rojos", "Imanes", "Vidrio"], datoCurioso: "Da color rojo brillante a los fuegos artificiales." },
   { numero: 39, simbolo: "Y", nombre: "Itrio", masa: 88.906, grupo: 3, periodo: 5, familia: "metales-transicion", estado: "solido", configuracionElectronica: "[Kr] 4d¹ 5s²", usos: ["LEDs", "Superconductores", "Láseres"], datoCurioso: "Usado en pantallas de TV y monitores." },
-  { numero: 40, simbolo: "Zr", nombre: "Circonio", masa: 91.224, grupo: 4, periodo: 5, familia: "metales-transicion", estado: "solido", configuracionElectronica: "[Kr] 4d² 5s²", usos: ["Reactores nucleares", "Cerámica", "Joyería"], datoCurioso: "Muy resistente a la corrosión y al calor." },
+  { numero: 40, simbolo: "Zr", nombre: "Circonio", masa: 91.222, grupo: 4, periodo: 5, familia: "metales-transicion", estado: "solido", configuracionElectronica: "[Kr] 4d² 5s²", usos: ["Reactores nucleares", "Cerámica", "Joyería"], datoCurioso: "Muy resistente a la corrosión y al calor." },
   { numero: 41, simbolo: "Nb", nombre: "Niobio", masa: 92.906, grupo: 5, periodo: 5, familia: "metales-transicion", estado: "solido", configuracionElectronica: "[Kr] 4d⁴ 5s¹", usos: ["Acero de alta resistencia", "Superconductores"], datoCurioso: "Brasil tiene las mayores reservas mundiales." },
   { numero: 42, simbolo: "Mo", nombre: "Molibdeno", masa: 95.95, grupo: 6, periodo: 5, familia: "metales-transicion", estado: "solido", configuracionElectronica: "[Kr] 4d⁵ 5s¹", usos: ["Acero de alta temperatura", "Catalizadores"], datoCurioso: "Esencial para las enzimas de fijación de nitrógeno." },
   { numero: 43, simbolo: "Tc", nombre: "Tecnecio", masa: 98, grupo: 7, periodo: 5, familia: "metales-transicion", estado: "solido", configuracionElectronica: "[Kr] 4d⁵ 5s²", usos: ["Medicina nuclear", "Diagnóstico"], datoCurioso: "Primer elemento producido artificialmente." },
@@ -247,9 +282,15 @@ const ELEMENTOS_SIN_RADIO: Omit<Elemento, 'radioAtomico' | 'electronegatividad'>
   { numero: 118, simbolo: "Og", nombre: "Oganesón", masa: 294, grupo: 18, periodo: 7, familia: "gases-nobles", estado: "solido", origen: "sintetico", configuracionElectronica: "[Rn] 5f¹⁴ 6d¹⁰ 7s² 7p⁶", usos: ["Investigación científica"], datoCurioso: "Elemento más pesado conocido, nombrado por Yuri Oganessian." },
 ];
 
-/** Los 118 elementos, con el radio y la electronegatividad leídos de sus series únicas de `data/`. */
+/**
+ * Los 118 elementos, con el radio y la electronegatividad leídos de sus series únicas de `data/`.
+ * La masa de los que tienen peso estándar sale del literal de la CIAAW, así que el número de la
+ * línea no puede divergir de los decimales que se pintan.
+ */
 export const elementos: Elemento[] = ELEMENTOS_SIN_RADIO.map((e) => ({
   ...e,
+  masa: PESO_ABREVIADO_CIAAW_2024[e.numero] !== undefined ? Number(PESO_ABREVIADO_CIAAW_2024[e.numero]) : e.masa,
+  decimalesMasa: PESO_ABREVIADO_CIAAW_2024[e.numero] !== undefined ? decimalesDe(PESO_ABREVIADO_CIAAW_2024[e.numero]) : null,
   electronegatividad: electronegatividadPauling(e.numero),
   radioAtomico: e.numero >= RADIO_SOLO_TEORICO_DESDE_Z ? null : radioCovalente(e.numero),
 }));

@@ -52,7 +52,7 @@
  * fichas 3, 7 y 11» funcione como consigna de clase.
  */
 
-import { parseSpanishNumber } from '@/lib';
+import { formatNumber, parseSpanishNumber } from '@/lib';
 import { corregirNumero } from '@/lib/calculadoras/correctorCasosAula';
 import { elementos, type Elemento } from './elementos-data';
 
@@ -364,7 +364,14 @@ function propiedadDe(elemento: Elemento, propiedad: PropiedadPedida): ResultadoB
   const base = { ok: true, simbolo: elemento.simbolo, error: null };
   switch (propiedad) {
     case 'masa':
-      return { ...base, texto: formatearNumero(elemento.masa), numero: elemento.masa };
+      // Con los decimales del peso abreviado, como la ficha (cabo C0490): «1,0080», no «1,008».
+      return {
+        ...base,
+        texto: elemento.decimalesMasa === null
+          ? formatearNumero(elemento.masa)
+          : formatNumber(elemento.masa, elemento.decimalesMasa),
+        numero: elemento.masa,
+      };
     case 'radioAtomico':
       return elemento.radioAtomico === null
         ? falloBusqueda('Ese elemento no tiene radio atómico en los datos de la tabla')

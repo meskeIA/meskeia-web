@@ -166,12 +166,13 @@ test.describe('CASO 1 · los datos de los elementos y la calculadora de masa mol
     expect(hierro).toContain('Período: 4');
     await cerrarFicha(page);
 
-    // Oro. Masa atómica IUPAC/CIAAW 2021: 196,966570(4) u → 196,97, que la ficha muestra
-    // con tres decimales: «196,970 u». Configuración: [Xe] 4f¹⁴ 5d¹⁰ 6s¹ (excepción al
+    // Oro. Masa atómica IUPAC/CIAAW: 196,966570(4) u → abreviado 196,97 (tabla abreviada 2024),
+    // y la ficha lo escribe con esos dos decimales (cabo C0490; hasta el 30/10/2026 rellenaba
+    // un tercero, «196,970 u»). Configuración: [Xe] 4f¹⁴ 5d¹⁰ 6s¹ (excepción al
     // Aufbau, subnivel d lleno). Electronegatividad Pauling: 2,54, la mayor de un metal.
     const oro = await fichaDe(page, 'Oro (Au)');
     expect(oro).toContain('Número atómico: 79');
-    expect(oro).toContain('Masa atómica: 196,970 u');
+    expect(oro).toContain('Masa atómica: 196,97 u');
     expect(oro).toContain('[Xe] 4f¹⁴ 5d¹⁰ 6s¹');
     expect(oro).toContain('Electronegatividad: 2,54');
     await cerrarFicha(page);
@@ -195,26 +196,30 @@ test.describe('CASO 1 · los datos de los elementos y la calculadora de masa mol
   test('la masa molar de las cuatro fórmulas de ejemplo sale a mano igual', async ({ page }) => {
     await page.goto(RUTA);
 
-    // H2O = 2 × 1,008 + 15,999 = 18,015 g/mol
-    // (la app muestra 4 decimales y separador decimal español: «18,0150»)
-    expect(await masaMolarDe(page, 'H2O')).toContain('18,0150 g/mol');
+    // El total va con los decimales del peso atómico MENOS preciso de la fórmula (cabo C0490,
+    // el convenio de simulador-estequiometria; hasta el 30/10/2026 eran siempre cuatro).
+    // H2O = 2 × 1,0080 + 15,999 = 18,015 g/mol → el oxígeno tiene tres: «18,015»
+    expect(await masaMolarDe(page, 'H2O')).toContain('18,015 g/mol');
 
-    // C6H12O6 = 6 × 12,011 + 12 × 1,008 + 6 × 15,999 = 72,066 + 12,096 + 95,994 = 180,156
-    expect(await masaMolarDe(page, 'C6H12O6')).toContain('180,1560 g/mol');
+    // C6H12O6 = 6 × 12,011 + 12 × 1,0080 + 6 × 15,999 = 72,066 + 12,096 + 95,994 = 180,156
+    expect(await masaMolarDe(page, 'C6H12O6')).toContain('180,156 g/mol');
 
-    // H2SO4 = 2 × 1,008 + 32,06 + 4 × 15,999 = 2,016 + 32,06 + 63,996 = 98,072
-    // (masa del azufre CIAAW 2021, hallazgo 529: 32,06, no la de 2007, 32,065)
-    expect(await masaMolarDe(page, 'H2SO4')).toContain('98,0720 g/mol');
+    // H2SO4 = 2 × 1,0080 + 32,06 + 4 × 15,999 = 2,016 + 32,06 + 63,996 = 98,072 → el azufre
+    // tiene dos decimales: «98,07» (masa del azufre CIAAW, hallazgo 529: 32,06, no la de 2007, 32,065)
+    expect(await masaMolarDe(page, 'H2SO4')).toContain('98,07 g/mol');
 
     // CaCO3 = 40,078 + 12,011 + 3 × 15,999 = 40,078 + 12,011 + 47,997 = 100,086
-    expect(await masaMolarDe(page, 'CaCO3')).toContain('100,0860 g/mol');
+    expect(await masaMolarDe(page, 'CaCO3')).toContain('100,086 g/mol');
 
-    // El desglose tiene que enseñar la aritmética, no solo el total:
-    // en H2SO4 el oxígeno pesa 4 × 15,999 = 63,996 g/mol.
+    // El desglose tiene que enseñar la aritmética, no solo el total, con los decimales de cada
+    // peso: en H2SO4 el oxígeno pesa 4 × 15,999 = 63,996, el azufre 32,06 y el H 2 × 1,0080 = 2,0160.
     await masaMolarDe(page, 'H2SO4');
     const desglose = (await page.locator('[class*="_desgloseMasa"]').innerText()).replace(/\s+/g, ' ');
     expect(desglose).toContain('×4');
-    expect(desglose).toContain('63,9960');
+    expect(desglose).toContain('63,996');
+    expect(desglose).not.toContain('63,9960');
+    expect(desglose).toContain('×1 32,06');
+    expect(desglose).toContain('×2 2,0160');
 
     // Un símbolo inventado se rechaza en vez de sumar cero.
     await page.locator('input[placeholder^="Ej:"]').fill('Xz2');
@@ -410,14 +415,16 @@ test.describe('hallazgos reparados · 21/08/2026', () => {
     // del paréntesis no queda pegado a ningún símbolo, así que se pierde entero.
     // Resultado hasta el 23/08/2026 (REPARADO): Ca×1 + O×1 + H×1 = 57,085 g/mol — un 23 % por
     // debajo, sin ningún aviso.
-    expect(await masaMolarDe(page, 'Ca(OH)2')).toContain('74,0920 g/mol');
+    // Con los decimales del peso menos preciso (C0490): tres, los del oxígeno.
+    expect(await masaMolarDe(page, 'Ca(OH)2')).toContain('74,092 g/mol');
 
     // Mg(NO3)2 = 24,305 + 2 × (14,007 + 3 × 15,999) = 148,313 g/mol (hasta el 23/08 daba 86,309).
-    expect(await masaMolarDe(page, 'Mg(NO3)2')).toContain('148,3130 g/mol');
+    expect(await masaMolarDe(page, 'Mg(NO3)2')).toContain('148,313 g/mol');
 
-    // Al2(SO4)3 = 2 × 26,982 + 3 × (32,06 + 4 × 15,999) = 342,132 g/mol (hasta el 23/08 daba 150,025).
+    // Al2(SO4)3 = 2 × 26,982 + 3 × (32,06 + 4 × 15,999) = 342,132 g/mol (hasta el 23/08 daba 150,025),
+    // con los dos decimales del azufre: «342,13».
     // (masa del azufre CIAAW 2021, hallazgo 529: 32,06, no la de 2007, 32,065)
-    expect(await masaMolarDe(page, 'Al2(SO4)3')).toContain('342,1320 g/mol');
+    expect(await masaMolarDe(page, 'Al2(SO4)3')).toContain('342,13 g/mol');
   });
 
   test('HALLAZGO 2 · ninguna de las 118 celdas se puede abrir con el teclado', async ({ page }) => {
@@ -508,13 +515,13 @@ test.describe('CASO 4 · normal: buscar el oxígeno y comprobar su ficha entera'
     // Y la calculadora, con esa misma masa dentro de un compuesto corriente.
     // Fe₂O₃ (óxido de hierro III, la herrumbre):
     //   2 × 55,845 + 3 × 15,999 = 111,690 + 47,997 = 159,687 g/mol
-    expect(await masaMolarDe(page, 'Fe2O3')).toContain('159,6870 g/mol');
+    expect(await masaMolarDe(page, 'Fe2O3')).toContain('159,687 g/mol');
 
     // El desglose tiene que enseñar los 3 oxígenos, no solo el total.
     const desglose = (await page.locator('[class*="_desgloseMasa"]').innerText()).replace(/\s+/g, ' ');
     expect(desglose).toContain('Fe (Hierro)');
     expect(desglose).toContain('×3');
-    expect(desglose).toContain('47,9970');
+    expect(desglose).toContain('47,997');
   });
 });
 
@@ -565,7 +572,7 @@ test.describe('CASO 5 · límite: el oganesón (Z=118) y el hidrógeno', () => {
     // educativo defiende («Hidrógeno no es un metal alcalino»), lo cuenta como no metal.
     const hidrogeno = await fichaDe(page, 'Hidrógeno (H)');
     expect(hidrogeno).toContain('Número atómico: 1');
-    expect(hidrogeno).toContain('Masa atómica: 1,008 u');   // IUPAC/CIAAW 2021, abreviado 1,008
+    expect(hidrogeno).toContain('Masa atómica: 1,0080 u');  // CIAAW, tabla abreviada 2024: 1,0080 (C0490)
     expect(hidrogeno).toContain('Grupo: 1');                // la casilla sí es la del grupo 1
     expect(hidrogeno).toContain('Familia: No Metales');     // pero la familia NO es alcalinos
     expect(hidrogeno).toContain('Estado: Gas');
@@ -693,12 +700,15 @@ test.describe('hallazgos reparados · 30/08/2026', () => {
     // es la procedencia que el módulo declara, y que el número no coincide con el del libro
     // de texto del que el estudiante viene comparando (35,45 para el cloro es el valor que
     // aparece impreso en cualquier tabla actual).
+    //
+    // Y con los decimales que da la tabla abreviada (cabo C0490, 30/10/2026): hasta entonces la
+    // ficha rellenaba siempre un tercero, «35,450 u», con un cero que la IUPAC no da.
     const masas: Record<string, string> = {
-      'Boro (B)': 'Masa atómica: 10,810 u',
+      'Boro (B)': 'Masa atómica: 10,81 u',
       'Silicio (Si)': 'Masa atómica: 28,085 u',
-      'Azufre (S)': 'Masa atómica: 32,060 u',
-      'Cloro (Cl)': 'Masa atómica: 35,450 u',
-      'Argón (Ar)': 'Masa atómica: 39,950 u',
+      'Azufre (S)': 'Masa atómica: 32,06 u',
+      'Cloro (Cl)': 'Masa atómica: 35,45 u',
+      'Argón (Ar)': 'Masa atómica: 39,95 u',
     };
     for (const [titulo, esperada] of Object.entries(masas)) {
       expect(await fichaDe(page, titulo)).toContain(esperada);
@@ -1498,8 +1508,9 @@ test.describe('CASO 13 · normal: el cobalto, buscado por nombre, símbolo y nú
 
     // El mismo dato, dentro de la calculadora. CoCl₂ (cloruro de cobalto II, el papel
     // indicador de humedad que pasa de azul a rosa):
-    //   58,933 + 2 × 35,45 = 58,933 + 70,90 = 129,833 g/mol
-    expect(await masaMolarDe(page, 'CoCl2')).toContain('129,8330 g/mol');
+    //   58,933 + 2 × 35,45 = 58,933 + 70,90 = 129,833 g/mol → con los dos decimales del
+    //   cloro, «129,83» (cabo C0490)
+    expect(await masaMolarDe(page, 'CoCl2')).toContain('129,83 g/mol');
   });
 });
 
@@ -1600,7 +1611,7 @@ test.describe('CASO 15 · rechazo: el elemento 119 y tres fórmulas imposibles',
 
     // Y en cuanto la fórmula es válida vuelve a calcular: N₂O = 2 × 14,007 + 15,999
     // = 44,013 g/mol. Un rechazo no puede dejar la calculadora atascada.
-    expect(await masaMolarDe(page, 'N2O')).toContain('44,0130 g/mol');
+    expect(await masaMolarDe(page, 'N2O')).toContain('44,013 g/mol');
   });
 });
 
@@ -1765,7 +1776,8 @@ test.describe('hallazgos reparados · 14/09/2026', () => {
 //       Su vecino, el manganeso, sí sigue el Aufbau: [Ar] 3d⁵ 4s².
 //       K₂Cr₂O₇ (dicromato de potasio):
 //         2 × 39,098 = 78,196 · 2 × 51,996 = 103,992 · 7 × 15,999 = 111,993
-//         78,196 + 103,992 + 111,993 = 294,181 g/mol → la app escribe «294,1810»
+//         78,196 + 103,992 + 111,993 = 294,181 g/mol → la app escribe «294,181» (los tres
+//         decimales de los tres pesos; hasta el C0490, 30/10/2026, «294,1810»)
 //
 //   CASO 17 — LÍMITE. Los extremos del bloque f y la búsqueda por número y por
 //     símbolo en minúsculas o mayúsculas:
@@ -1774,7 +1786,7 @@ test.describe('hallazgos reparados · 14/09/2026', () => {
 //       «lr»  → 1: Lawrencio por su símbolo (ningún nombre contiene «lr»)
 //       «LU»  → 5: la búsqueda es por subcadena y normaliza, así que entran fLUor,
 //               aLUminio, teLUrio, LUtecio (también por símbolo) y pLUtonio.
-//       Lu: Z 71 · 174,970 u (CIAAW 174,97) · período 6 · lantánido · χ 1,27 ·
+//       Lu: Z 71 · 174,97 u (CIAAW 174,97) · período 6 · lantánido · χ 1,27 ·
 //           [Xe] 4f¹⁴ 5d¹ 6s² · natural (sin fila «Origen»)
 //       Lr: Z 103 · [262] u (sin peso atómico estándar) · período 7 · actínido ·
 //           sintético · radio N/D · [Rn] 5f¹⁴ 7s² 7p¹
@@ -1856,11 +1868,12 @@ test.describe('CASO 16 · normal: el cromo, excepción al Aufbau, y el dicromato
     await cerrarFicha(page);
 
     // K₂Cr₂O₇ = 2 × 39,098 + 2 × 51,996 + 7 × 15,999 = 78,196 + 103,992 + 111,993 = 294,181
-    expect(await masaMolarDe(page, 'K2Cr2O7')).toContain('294,1810 g/mol');
+    expect(await masaMolarDe(page, 'K2Cr2O7')).toContain('294,181 g/mol');
     const desglose = (await page.locator('[class*="_desgloseMasa"]').innerText()).replace(/\s+/g, ' ');
-    expect(desglose).toContain('K (Potasio) ×2 78,1960');
-    expect(desglose).toContain('Cr (Cromo) ×2 103,9920');
-    expect(desglose).toContain('O (Oxígeno) ×7 111,9930');
+    expect(desglose).toContain('K (Potasio) ×2 78,196');
+    expect(desglose).toContain('Cr (Cromo) ×2 103,992');
+    expect(desglose).toContain('O (Oxígeno) ×7 111,993');
+    expect(desglose).not.toContain('78,1960');
   });
 });
 
@@ -1892,7 +1905,7 @@ test.describe('CASO 17 · límite: lutecio y lawrencio, por número, por símbol
 
     const lu = await fichaDe(page, 'Lutecio (Lu)');
     expect(lu).toContain('Número atómico: 71');
-    expect(lu).toContain('Masa atómica: 174,970 u'); // CIAAW: 174,97
+    expect(lu).toContain('Masa atómica: 174,97 u'); // CIAAW: 174,97
     expect(lu).toContain('Período: 6');
     expect(lu).toContain('Familia: Lantánidos');
     expect(lu).toContain('Electronegatividad: 1,27');
@@ -2292,7 +2305,7 @@ test.describe('hallazgos reparados · 27/09/2026', () => {
 //   CASO 19 — NORMAL. La PLATA, otra excepción al orden de llenado (Cr y Cu ya están en los
 //     casos 1, 5 y 16): por Aufbau sería [Kr] 4d⁹ 5s².
 //       «plata» → 1 («platino» no contiene «plata»)
-//       Ag: Z 47 · 107,870 u (CIAAW 107,87) · grupo 11 · período 5 · metal de transición ·
+//       Ag: Z 47 · 107,87 u (CIAAW 107,87) · grupo 11 · período 5 · metal de transición ·
 //           sólido · radio covalente 128 pm (Z 47 de la serie) · χ 1,93 · [Kr] 4d¹⁰ 5s¹
 //       AgNO₃    = 107,87 + 14,007 + 3 × 15,999 = 107,87 + 14,007 + 47,997 = 169,874
 //       Mg(NO₃)₂ = 24,305 + 2 × 14,007 + 6 × 15,999 = 24,305 + 28,014 + 95,994 = 148,313
@@ -2301,8 +2314,8 @@ test.describe('hallazgos reparados · 27/09/2026', () => {
 //     ficha 3 acepta el flúor en mayúsculas, con artículo y por su símbolo en minúscula.
 //
 //   CASO 20 — LÍMITE. El bloque f y la cola de los actínidos:
-//       Ce: Z 58 · 140,120 u · período 6 · lantánidos · 163 pm · χ 1,12 · [Xe] 4f¹ 5d¹ 6s²
-//       U : Z 92 · 238,030 u · período 7 · actínidos  · 170 pm · χ 1,38 · [Rn] 5f³ 6d¹ 7s²
+//       Ce: Z 58 · 140,12 u · período 6 · lantánidos · 163 pm · χ 1,12 · [Xe] 4f¹ 5d¹ 6s²
+//       U : Z 92 · 238,03 u · período 7 · actínidos  · 170 pm · χ 1,38 · [Rn] 5f³ 6d¹ 7s²
 //       Fm, Md, No: [257], [258], [259] u · sintéticos · radio N/D (Z ≥ 100) · χ 1,30, el
 //       mismo valor que da tendencias. El cabo C0056 los nombraba: aquí coinciden. El Rn y el
 //       Lr no coinciden, y van al HALLAZGO A.
@@ -2367,7 +2380,7 @@ test.describe('CASO 19 · normal: la plata, excepción al Aufbau, y dos sales co
 
     const ag = await fichaDe(page, 'Plata (Ag)');
     expect(ag).toContain('Número atómico: 47');
-    expect(ag).toContain('Masa atómica: 107,870 u'); // CIAAW 2021: 107,8682 → 107,87
+    expect(ag).toContain('Masa atómica: 107,87 u'); // CIAAW: 107,8682 → abreviado 107,87
     expect(ag).toContain('Grupo: 11');
     expect(ag).toContain('Período: 5');
     expect(ag).toContain('Familia: Metales de Transición');
@@ -2381,18 +2394,19 @@ test.describe('CASO 19 · normal: la plata, excepción al Aufbau, y dos sales co
 
     const total = page.locator('[class*="_masaTotal"]');
     const desglose = page.locator('[class*="_desgloseMasa"]');
-    // AgNO₃ = 107,87 + 14,007 + 3 × 15,999 = 169,874
-    expect(await masaMolarDe(page, 'AgNO3')).toContain('169,8740 g/mol');
+    // AgNO₃ = 107,87 + 14,007 + 3 × 15,999 = 169,874 → con los dos decimales de la plata,
+    // «169,87» (cabo C0490)
+    expect(await masaMolarDe(page, 'AgNO3')).toContain('169,87 g/mol');
     await expect(desglose).toContainText('Ag (Plata)');
     // Mg(NO₃)₂ = 24,305 + 2 × 14,007 + 6 × 15,999 = 148,313: el subíndice del paréntesis
     // multiplica a los DOS elementos de dentro.
     await page.getByLabel('Fórmula química').fill('Mg(NO3)2');
     await page.getByRole('button', { name: 'Calcular' }).click();
-    await expect(total).toContainText('148,3130 g/mol');
+    await expect(total).toContainText('148,313 g/mol');
     // innerText y no textContent: este pega las celdas sin separarlas.
-    await expect(desglose).toContainText(/Mg \(Magnesio\)\s+×1\s+24,3050/, { useInnerText: true });
-    await expect(desglose).toContainText(/N \(Nitrógeno\)\s+×2\s+28,0140/, { useInnerText: true });
-    await expect(desglose).toContainText(/O \(Oxígeno\)\s+×6\s+95,9940/, { useInnerText: true });
+    await expect(desglose).toContainText(/Mg \(Magnesio\)\s+×1\s+24,305$/m, { useInnerText: true });
+    await expect(desglose).toContainText(/N \(Nitrógeno\)\s+×2\s+28,014$/m, { useInnerText: true });
+    await expect(desglose).toContainText(/O \(Oxígeno\)\s+×6\s+95,994$/m, { useInnerText: true });
 
     // Ficha 4 · masa del cobre 63,546: el dato de la ficha, el de la casilla y el entero.
     for (const r of ['63,546', '63,55', '64']) {
@@ -2419,7 +2433,7 @@ test.describe('CASO 20 · límite: el bloque f (Ce y U), la cola de los actínid
 
     const ce = await fichaDe(page, 'Cerio (Ce)');
     for (const dato of [
-      'Número atómico: 58', 'Masa atómica: 140,120 u', 'Período: 6', 'Familia: Lantánidos',
+      'Número atómico: 58', 'Masa atómica: 140,12 u', 'Período: 6', 'Familia: Lantánidos',
       'Estado: Sólido', 'Radio covalente: 163 pm', 'Electronegatividad: 1,12', '[Xe] 4f¹ 5d¹ 6s²',
     ]) {
       expect(ce, `Ce · ${dato}`).toContain(dato);
@@ -2429,7 +2443,7 @@ test.describe('CASO 20 · límite: el bloque f (Ce y U), la cola de los actínid
 
     const u = await fichaDe(page, 'Uranio (U)');
     for (const dato of [
-      'Número atómico: 92', 'Masa atómica: 238,030 u', 'Período: 7', 'Familia: Actínidos',
+      'Número atómico: 92', 'Masa atómica: 238,03 u', 'Período: 7', 'Familia: Actínidos',
       'Radio covalente: 170 pm', 'Electronegatividad: 1,38', '[Rn] 5f³ 6d¹ 7s²',
     ]) {
       expect(u, `U · ${dato}`).toContain(dato);
@@ -2862,10 +2876,10 @@ test.describe('hallazgos · 16/10/2026 (A, B, C, D y E reparados)', () => {
 //       «wolframio» → 1 · «tungsteno» → 1 (otro nombre) · «74» → 1 (ningún otro Z de 1 a 118
 //       contiene «74») · «W» → 2: el wolframio (símbolo y nombre) y el LaWrencio, que lleva una
 //       «w» en el nombre (la búsqueda es por subcadena, como «Co» → 6 en el CASO 13).
-//       W: Z 74 · 183,84 → «183,840 u» · grupo 6 · período 6 · metal de transición · sólido ·
+//       W: Z 74 · 183,84 → «183,84 u» · grupo 6 · período 6 · metal de transición · sólido ·
 //          radio covalente 137 pm (Z = 74: fila Lu–Hg 162, 152, 146, 137) · χ 2,36 (tendencias) ·
 //          [Xe] 4f¹⁴ 5d⁴ 6s² · natural (sin fila «Origen»)
-//       WO₃ = 183,84 + 3 × 15,999 = 183,84 + 47,997 = 231,837 → «231,8370 g/mol»
+//       WO₃ = 183,84 + 3 × 15,999 = 183,84 + 47,997 = 231,837 → «231,84 g/mol» (C0490)
 //       Ficha 1 (Z = 26, el hierro): «wolframio», «tungsteno» y «W» fallan; «hierro» acierta.
 //
 //   CASO 24 — LÍMITE. La regla de la masa en sus bordes (ficha 4, Cu = 63,546): margen = media
@@ -2878,7 +2892,7 @@ test.describe('hallazgos · 16/10/2026 (A, B, C, D y E reparados)', () => {
 //                 «63,5461» (decimales de más con otra cifra: 0,0001 > 0,00005) · «63.546» (un
 //                 punto con 3 cifras es millar: 63 546, decisión escrita en «ficha 4 · la masa…»)
 //     Y los primeros de cada serie del bloque f, por número:
-//       «57» → Lantano: 138,91 → «138,910 u» · período 6 · lantánidos · 180 pm (Z 57: fila Sb–Nd
+//       «57» → Lantano: 138,91 → «138,91 u» · período 6 · lantánidos · 180 pm (Z 57: fila Sb–Nd
 //              140, 136, 133, 131, 232, 196, 180) · χ 1,10 (tendencias 1,1) · [Xe] 5d¹ 6s²
 //       «89» → Actinio: 227 entera → «[227] u» · período 7 · actínidos · 186 pm (Z 89: fila Tl–Th
 //              144, 144, 151, 145, 147, 142, 223, 201, 186) · χ 1,10 (tendencias 1,1) ·
@@ -2919,7 +2933,7 @@ test.describe('CASO 23 · normal: el wolframio, buscado por sus dos nombres, su 
     await expect(page.locator('#titulo-ficha-elemento')).toHaveText('Wolframio');
     for (const dato of [
       'Número atómico: 74',
-      'Masa atómica: 183,840 u', // CIAAW 2021: 183,84
+      'Masa atómica: 183,84 u', // CIAAW, abreviado: 183,84
       'Grupo: 6', // tendencias: grupo 6
       'Período: 6',
       'Familia: Metales de Transición',
@@ -2935,11 +2949,11 @@ test.describe('CASO 23 · normal: el wolframio, buscado por sus dos nombres, su 
     await page.getByRole('button', { name: 'Cerrar la ficha de Wolframio' }).click();
     await expect(page.getByRole('dialog')).toHaveCount(0);
 
-    // WO₃ = 183,84 + 3 × 15,999 = 231,837
-    expect(await masaMolarDe(page, 'WO3')).toContain('231,8370 g/mol');
+    // WO₃ = 183,84 + 3 × 15,999 = 231,837 → con los dos decimales del wolframio, «231,84»
+    expect(await masaMolarDe(page, 'WO3')).toContain('231,84 g/mol');
     const desglose = page.locator('[class*="_desgloseMasa"]');
-    await expect(desglose).toContainText(/W \(Wolframio\)\s+×1\s+183,8400/, { useInnerText: true });
-    await expect(desglose).toContainText(/O \(Oxígeno\)\s+×3\s+47,9970/, { useInnerText: true });
+    await expect(desglose).toContainText(/W \(Wolframio\)\s+×1\s+183,84$/m, { useInnerText: true });
+    await expect(desglose).toContainText(/O \(Oxígeno\)\s+×3\s+47,997$/m, { useInnerText: true });
 
     // Ficha 1 (Z = 26): los dos nombres del W, y su símbolo, son otro elemento.
     for (const r of ['wolframio', 'tungsteno', 'W']) {
@@ -3017,7 +3031,7 @@ test.describe('CASO 24 · límite: la regla de redondeo de la masa en sus bordes
 
     const la = await fichaDe(page, 'Lantano (La)');
     for (const dato of [
-      'Número atómico: 57', 'Masa atómica: 138,910 u', 'Período: 6', 'Familia: Lantánidos',
+      'Número atómico: 57', 'Masa atómica: 138,91 u', 'Período: 6', 'Familia: Lantánidos',
       'Estado: Sólido', 'Radio covalente: 180 pm', 'Electronegatividad: 1,10', '[Xe] 5d¹ 6s²',
     ]) {
       expect(la, `La · ${dato}`).toContain(dato);
@@ -3230,12 +3244,16 @@ test.describe('hallazgos · 18/10/2026 (REPARADOS)', () => {
 //       3,44 (O) dentro de «2,0–3,44» · metaloides 1,90 (Si) – 2,18 (As) dentro de «1,9–2,2» ·
 //       gases nobles: solo Kr y Xe tienen valor → «Sin valor salvo en Kr (3,00) y Xe (2,60)».
 //     Tres sales con paréntesis (una EMPIEZA por paréntesis y otra los anida con corchetes):
-//       (NH4)2SO4   = 2 × 14,007 + 8 × 1,008 + 32,06 + 4 × 15,999
-//                   = 28,014 + 8,064 + 32,06 + 63,996           = 132,134 → «132,1340 g/mol»
+//       (NH4)2SO4   = 2 × 14,007 + 8 × 1,0080 + 32,06 + 4 × 15,999
+//                   = 28,014 + 8,0640 + 32,06 + 63,996          = 132,134 → «132,13 g/mol»
 //       Ca3(PO4)2   = 3 × 40,078 + 2 × 30,974 + 8 × 15,999
-//                   = 120,234 + 61,948 + 127,992                = 310,174 → «310,1740 g/mol»
+//                   = 120,234 + 61,948 + 127,992                = 310,174 → «310,174 g/mol»
 //       K4[Fe(CN)6] = 4 × 39,098 + 55,845 + 6 × 12,011 + 6 × 14,007
-//                   = 156,392 + 55,845 + 72,066 + 84,042        = 368,345 → «368,3450 g/mol»
+//                   = 156,392 + 55,845 + 72,066 + 84,042        = 368,345 → «368,345 g/mol»
+//     Cada total, con los decimales del peso menos preciso (cabo C0490, 30/10/2026): el azufre
+//     tiene dos (32,06), así que el sulfato de amonio sale con dos; los otros dos, con tres. Y cada
+//     fila del desglose, con los de su elemento: el H con cuatro (1,0080), el S con dos. Hasta el
+//     C0490 todo salía con cuatro («132,1340», «32,0600»), ceros que ninguna tabla da.
 //
 //   CASO 28 — LÍMITE. El radón, el primero que pasó a N/D, con el TECLADO: foco en su casilla,
 //     Enter abre la ficha y el foco entra en «Cerrar la ficha de Radón» (es el único control de
@@ -3364,15 +3382,16 @@ test.describe('CASO 27 · normal: la electronegatividad común en todas las boca
   test('la calculadora suma tres sales con paréntesis: una que empieza por él y otra con corchetes', async ({ page }) => {
     await abrirHidratada(page);
     const casos = [
-      ['(NH4)2SO4', '132,1340 g/mol', ['N (Nitrógeno) ×2 28,0140', 'H (Hidrógeno) ×8 8,0640', 'S (Azufre) ×1 32,0600', 'O (Oxígeno) ×4 63,9960']],
-      ['Ca3(PO4)2', '310,1740 g/mol', ['Ca (Calcio) ×3 120,2340', 'P (Fósforo) ×2 61,9480', 'O (Oxígeno) ×8 127,9920']],
-      ['K4[Fe(CN)6]', '368,3450 g/mol', ['K (Potasio) ×4 156,3920', 'Fe (Hierro) ×1 55,8450', 'C (Carbono) ×6 72,0660', 'N (Nitrógeno) ×6 84,0420']],
+      ['(NH4)2SO4', '132,13 g/mol', ['N (Nitrógeno) ×2 28,014', 'H (Hidrógeno) ×8 8,0640', 'S (Azufre) ×1 32,06', 'O (Oxígeno) ×4 63,996']],
+      ['Ca3(PO4)2', '310,174 g/mol', ['Ca (Calcio) ×3 120,234', 'P (Fósforo) ×2 61,948', 'O (Oxígeno) ×8 127,992']],
+      ['K4[Fe(CN)6]', '368,345 g/mol', ['K (Potasio) ×4 156,392', 'Fe (Hierro) ×1 55,845', 'C (Carbono) ×6 72,066', 'N (Nitrógeno) ×6 84,042']],
     ] as const;
     for (const [formula, total, desglose] of casos) {
       await calcularFormula(page, formula);
       await expect(page.locator('[class*="_masaTotal"]'), formula).toContainText(total);
-      const texto = (await page.locator('[class*="_desgloseMasa"]').innerText()).replace(/\s+/g, ' ');
-      for (const fila of desglose) expect(texto, formula).toContain(fila);
+      // Con un espacio detrás de cada fila: «32,06» no puede aprobar dentro de «32,0600».
+      const texto = (await page.locator('[class*="_desgloseMasa"]').innerText()).replace(/\s+/g, ' ') + ' ';
+      for (const fila of desglose) expect(texto, formula).toContain(`${fila} `);
     }
   });
 });
@@ -3456,7 +3475,7 @@ test.describe('CASO 30 · móvil (Galaxy S8, 360 × 740): la calculadora y la fi
     const calcular = page.getByRole('button', { name: 'Calcular', exact: true });
     await sembrarValor(page, '#formula-masa-molar', 'K4[Fe(CN)6]');
     await calcular.tap();
-    await expect(page.locator('[class*="_masaTotal"]')).toContainText('368,3450 g/mol');
+    await expect(page.locator('[class*="_masaTotal"]')).toContainText('368,345 g/mol');
     const pagina = await page.evaluate(() => ({
       ancho: window.innerWidth,
       scroll: document.documentElement.scrollWidth,
@@ -3542,8 +3561,8 @@ test.describe('hallazgos · 27/10/2026 (reparados)', () => {
   test('K · 3561 · la calculadora da al oganesón «294,0000 g/mol», que su ficha escribe [294] por no tener peso atómico estándar', async ({ page }) => {
     // REPARADO el 27/10/2026: con un elemento sin peso estándar el total sale «≈ N g/mol» sin
     // decimales, el desglose nombra el número másico entre corchetes y una nota lo explica.
-    // Lo que NO se ha tocado: los cuatro decimales de las masas estándar (NaCl → 58,4400 con Cl
-    // 35,45). Cambiarlo movería las cifras de los CASOS 27 y 30; queda en el cabo de la tanda.
+    // Los cuatro decimales de las masas estándar (NaCl → 58,4400 con Cl 35,45) se quedaron
+    // fuera, en el cabo C0490, reparado el 30/10/2026: test «C0490» justo debajo.
     // La ficha sigue la convención de la IUPAC para los 34 elementos sin peso atómico estándar
     // (hallazgo 530): el número másico del isótopo más estable, entre corchetes («[294] u»,
     // «[98] u» el tecnecio), y no «294,000 u». La calculadora suma ese mismo número con cuatro
@@ -3565,6 +3584,45 @@ test.describe('hallazgos · 27/10/2026 (reparados)', () => {
     await expect(page.locator('[class*="_masaTotal"]')).toContainText('≈ 308 g/mol');
   });
 
+  test('C0490 · la ficha y la calculadora dan los decimales del peso abreviado de la CIAAW, ni uno de relleno', async ({ page }) => {
+    // REPARADO el 30/10/2026 (cabo C0490, resto del 3561). Fuente: tabla abreviada 2024 de la
+    // CIAAW, https://www.ciaaw.org/abridged-atomic-weights.htm — Na 22.990, Cl 35.45, H 1.0080,
+    // He 4.0026, Be 9.0122, Zr 91.222, Ge 72.630, Ni 58.693, Zn 65.38.
+    // Antes: la ficha, siempre tres decimales («Cl 35,450 u», «Zn 65,380 u»); la calculadora,
+    // siempre cuatro (NaCl «58,4400 g/mol»); He 4,003 y Be 9,012 redondeados y el Zr con su valor
+    // anterior a la revisión de 2024 (91,224).
+    // Resuelto a mano:
+    //   NaCl  = 22,990 + 35,45 = 58,44            → dos decimales (el cloro): «58,44 g/mol»
+    //   ZnCl2 = 65,38 + 2 × 35,45 = 136,28        → «136,28 g/mol»
+    //   NiO   = 58,693 + 15,999 = 74,692          → tres: «74,692 g/mol»
+    //   H2    = 2 × 1,0080 = 2,0160               → cuatro: «2,0160 g/mol»
+    //   BeO   = 9,0122 + 15,999 = 25,0112         → tres (el oxígeno): «25,011 g/mol»
+    //   ZrO2  = 91,222 + 31,998 = 123,220         → «123,220 g/mol» (con el 91,224 de antes, 123,222)
+    await abrirHidratada(page);
+    for (const [titulo, masa] of [
+      ['Sodio (Na)', '22,990'], ['Cloro (Cl)', '35,45'], ['Zinc (Zn)', '65,38'], ['Níquel (Ni)', '58,693'],
+      ['Hidrógeno (H)', '1,0080'], ['Helio (He)', '4,0026'], ['Berilio (Be)', '9,0122'],
+      ['Circonio (Zr)', '91,222'], ['Germanio (Ge)', '72,630'], ['Plomo (Pb)', '207,2'],
+    ] as const) {
+      expect(await fichaDe(page, titulo), titulo).toContain(`Masa atómica: ${masa} u`);
+      await cerrarFicha(page);
+    }
+    const total = page.locator('[class*="_masaTotal"]');
+    for (const [formula, esperado] of [
+      ['NaCl', '58,44 g/mol'], ['ZnCl2', '136,28 g/mol'], ['NiO', '74,692 g/mol'],
+      ['H2', '2,0160 g/mol'], ['BeO', '25,011 g/mol'], ['ZrO2', '123,220 g/mol'],
+    ] as const) {
+      await calcularFormula(page, formula);
+      // Pegado a los dos puntos en textContent; el texto entero, para que «58,44» no apruebe en «158,44».
+      await expect(total, formula).toHaveText(`Masa molar de ${formula}:${esperado}`);
+    }
+    // El desglose del NaCl, cada fila con los decimales de su elemento.
+    await calcularFormula(page, 'NaCl');
+    const desglose = (await page.locator('[class*="_desgloseMasa"]').innerText()).replace(/\s+/g, ' ') + ' ';
+    expect(desglose).toContain('Na (Sodio) ×1 22,990 ');
+    expect(desglose).toContain('Cl (Cloro) ×1 35,45 ');
+  });
+
   test('L · 3562 · el resultado de H2O se queda en pantalla al teclear otra fórmula, sin decir de cuál es', async ({ page }) => {
     // REPARADO el 27/10/2026: teclear retira el resultado, y el que se muestra nombra su fórmula.
     // Los siete botones de ejemplo retiran el resultado al cambiar la fórmula
@@ -3573,7 +3631,7 @@ test.describe('hallazgos · 27/10/2026 (reparados)', () => {
     // el bloque no nombra la fórmula a la que pertenece. Esperado: o se retira, o dice «H2O».
     await abrirHidratada(page);
     await calcularFormula(page, 'H2O');
-    await expect(page.locator('[class*="_masaTotal"]')).toContainText('18,0150 g/mol');
+    await expect(page.locator('[class*="_masaTotal"]')).toContainText('18,015 g/mol');
     await expect(page.locator('[class*="_masaTotal"]')).toContainText('Masa molar de H2O');
     await sembrarValor(page, '#formula-masa-molar', 'NaCl');
     const resultado = page.locator('[class*="_resultadoMasa"]');
@@ -3610,7 +3668,7 @@ test.describe('hallazgos · 27/10/2026 (reparados)', () => {
     await abrirHidratada(page);
     await calcularFormula(page, 'H2O');
     const total = page.locator('[class*="_masaTotal"]');
-    await expect(total).toContainText('18,0150 g/mol');
+    await expect(total).toContainText('18,015 g/mol');
     const enRegionViva = await total.evaluate((el) =>
       Boolean(el.closest('[aria-live], [role="status"], [role="alert"]')),
     );

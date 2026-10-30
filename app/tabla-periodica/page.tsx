@@ -28,14 +28,23 @@ const normalizaTexto = (s: string) => s.toLowerCase().normalize('NFD').replace(/
  * másico del isótopo más estable), IUPAC escribe el valor entre corchetes en vez de darlo
  * como si fuera un peso atómico estándar medido. La celda de la rejilla ya evita los
  * decimales falsos; el modal seguía imprimiendo «294,000 u» (hallazgo 530).
+ *
+ * Los demás, con los decimales de su peso abreviado (cabo C0490): «35,45 u» y no «35,450 u».
  */
-const formatMasaAtomica = (masa: number): string =>
-  Number.isInteger(masa) ? `[${masa}]` : formatNumber(masa, 3);
+const formatMasaAtomica = (e: Elemento): string =>
+  e.decimalesMasa === null ? `[${e.masa}]` : formatNumber(e.masa, e.decimalesMasa);
 
-/** Masa entera en este dataset = elemento sin peso atómico estándar (ver formatMasaAtomica). */
-const sinPesoEstandar = (masa: number): boolean => Number.isInteger(masa);
+/** Elemento sin peso atómico estándar: su masa es el número másico (ver formatMasaAtomica). */
+const sinPesoEstandar = (simbolo: string): boolean => elementosPorSimbolo[simbolo].decimalesMasa === null;
 const hayMasaSinPesoEstandar = (desglose: { simbolo: string }[]): boolean =>
-  desglose.some(({ simbolo }) => sinPesoEstandar(elementosPorSimbolo[simbolo].masa));
+  desglose.some(({ simbolo }) => sinPesoEstandar(simbolo));
+
+/**
+ * Decimales de la masa molar: los del peso atómico menos preciso de la fórmula, el convenio de
+ * simulador-estequiometria (cabo C0490). NaCl lleva el cloro, con dos: 58,44 g/mol, no 58,4400.
+ */
+const decimalesMasaMolar = (desglose: { simbolo: string }[]): number =>
+  Math.min(...desglose.map(({ simbolo }) => elementosPorSimbolo[simbolo].decimalesMasa ?? 0));
 
 /** Lantánidos y actínidos: las dos series interiores, que no se numeran por grupo (hallazgo 3560). */
 const esSerieInterior = (e: Elemento): boolean => e.familia === 'lantanidos' || e.familia === 'actinidos';
@@ -470,7 +479,7 @@ export default function TablaPerodicaPage() {
                 <strong>
                   {hayMasaSinPesoEstandar(resultadoMasa.desglose)
                     ? `≈ ${formatNumber(resultadoMasa.masa, 0)}`
-                    : formatNumber(resultadoMasa.masa, 4)}{' '}
+                    : formatNumber(resultadoMasa.masa, decimalesMasaMolar(resultadoMasa.desglose))}{' '}
                   g/mol
                 </strong>
               </div>
@@ -489,15 +498,15 @@ export default function TablaPerodicaPage() {
                 </thead>
                 <tbody>
                   {resultadoMasa.desglose.map(({ simbolo, cantidad, masa }) => {
-                    const masaAtomica = elementosPorSimbolo[simbolo].masa;
+                    const elemento = elementosPorSimbolo[simbolo];
                     return (
                       <tr key={simbolo}>
-                        <td>{simbolo} ({elementosPorSimbolo[simbolo].nombre})</td>
+                        <td>{simbolo} ({elemento.nombre})</td>
                         <td>×{cantidad}</td>
                         <td>
-                          {sinPesoEstandar(masaAtomica)
-                            ? `≈ ${masa} (número másico [${masaAtomica}])`
-                            : formatNumber(masa, 4)}
+                          {elemento.decimalesMasa === null
+                            ? `≈ ${masa} (número másico [${elemento.masa}])`
+                            : formatNumber(masa, elemento.decimalesMasa)}
                         </td>
                       </tr>
                     );
@@ -559,7 +568,7 @@ export default function TablaPerodicaPage() {
               <div className={styles.modalInfo}>
                 <h2 id="titulo-ficha-elemento">{elementoSeleccionado.nombre}</h2>
                 <p>Número atómico: {elementoSeleccionado.numero}</p>
-                <p>Masa atómica: {formatMasaAtomica(elementoSeleccionado.masa)} u</p>
+                <p>Masa atómica: {formatMasaAtomica(elementoSeleccionado)} u</p>
               </div>
             </div>
 
