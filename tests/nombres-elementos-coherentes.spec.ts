@@ -13,15 +13,12 @@ import { ELEMENTOS as TENDENCIAS } from '../app/simulador-tabla-periodica-tenden
  * par las admite el DLE; lo que no cuadra es que el mismo elemento tenga dos nombres según la app.
  * Referencia: data/elementos-quimicos.ts. Un sinónimo va en su sitio (otrosNombres, sinonimos),
  * no en el nombre.
+ *
+ * Cabo C0533 (30/10/2026): el Zn se llama «zinc» en todas, decisión del usuario. Era la grafía de
+ * casi todo el catálogo y la de Latam; «cinc», la que prefiere el DLE, queda como sinónimo de
+ * búsqueda (otrosNombres de tabla-periodica, sinonimos de tabla-valencias).
  */
 const clave = (s: string) => s.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase().trim();
-
-/**
- * Fuera, a sabiendas: el Zn. «Zinc» (data/, tabla-periodica, tendencias) y «cinc» (formulador,
- * tabla-solubilidad, tabla-potenciales-redox y la prosa de varias apps) se reparten el sitio, y
- * elegir uno toca la salida del formulador y los textos de media docena de apps: cabo aparte.
- */
-const PENDIENTES = new Set(['Zn']);
 
 const tablas: Array<[string, ReadonlyArray<{ simbolo: string; nombre: string }>]> = [
   ['calculadora-configuracion-electronica/motor.ts', CONFIGURACION],
@@ -37,7 +34,7 @@ test('C0504 · cada elemento se llama igual en todas las tablas que lo nombran',
   for (const [fichero, lista] of tablas) {
     for (const e of lista) {
       const ref = canonico.get(e.simbolo);
-      if (ref && !PENDIENTES.has(e.simbolo) && clave(ref) !== clave(e.nombre)) distintos.push(`${fichero}: ${e.simbolo} «${e.nombre}» frente a «${ref}»`);
+      if (ref && clave(ref) !== clave(e.nombre)) distintos.push(`${fichero}: ${e.simbolo} «${e.nombre}» frente a «${ref}»`);
     }
   }
   expect(distintos).toEqual([]);

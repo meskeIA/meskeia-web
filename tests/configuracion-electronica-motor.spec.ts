@@ -141,7 +141,7 @@ test.describe('Excepciones a la regla de Madelung', () => {
     expect(pd.capaValencia.electrones).toBe(0);
   });
 
-  test('el cinc es del bloque d aunque su vecino el cobre sea una excepción', () => {
+  test('el zinc es del bloque d aunque su vecino el cobre sea una excepción', () => {
     const zn = analizar(30, 0)!;
     expect(zn.bloque).toBe('d');
     expect(zn.grupo).toBe(12);
@@ -179,7 +179,7 @@ test.describe('Regla de Hund y magnetismo', () => {
     ['nitrógeno', 7, 0, 3, true],
     ['neón', 10, 0, 0, false],
     ['cobre', 29, 0, 1, true],
-    ['cinc', 30, 0, 0, false],
+    ['zinc', 30, 0, 0, false],
     ['Fe³⁺', 26, 3, 5, true],
     ['Mn²⁺', 25, 2, 5, true],
     ['paladio', 46, 0, 0, false],

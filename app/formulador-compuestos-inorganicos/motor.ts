@@ -123,7 +123,7 @@ export const ELEMENTOS: Elemento[] = [
   { simbolo: 'Sr', nombre: 'estroncio', tipo: 'metal', positivas: [2], tradicional: { 2: 'estróncico' } },
   { simbolo: 'Ba', nombre: 'bario', tipo: 'metal', positivas: [2], tradicional: { 2: 'bárico' } },
   { simbolo: 'Ra', nombre: 'radio', tipo: 'metal', positivas: [2], tradicional: { 2: 'rádico' } },
-  { simbolo: 'Zn', nombre: 'cinc', tipo: 'metal', positivas: [2], tradicional: { 2: 'cíncico' } },
+  { simbolo: 'Zn', nombre: 'zinc', tipo: 'metal', positivas: [2], tradicional: { 2: 'cíncico' } },
   { simbolo: 'Cd', nombre: 'cadmio', tipo: 'metal', positivas: [2], tradicional: { 2: 'cádmico' } },
   { simbolo: 'Al', nombre: 'aluminio', tipo: 'metal', positivas: [3], tradicional: { 3: 'alumínico' } },
   // ── Metales de varias valencias ──

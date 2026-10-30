@@ -796,7 +796,7 @@ test.describe('hallazgos reparados · 30/08/2026', () => {
  *   NUNCA copiados de lo que devuelve la app. Los tres que fijan el convenio:
  *
  *     · Z = 26 es el hierro. El número atómico ES el número de protones, por definición.
- *     · [Ar] 3d¹⁰ 4s¹ es el cobre, no el níquel ni el cinc: es la excepción al orden de
+ *     · [Ar] 3d¹⁰ 4s¹ es el cobre, no el níquel ni el zinc: es la excepción al orden de
  *       llenado que se estudia junto a la del cromo ([Ar] 3d⁵ 4s¹).
  *     · El único metal líquido a temperatura ambiente es el mercurio. El otro líquido de la
  *       tabla, el bromo, NO es metal: es un halógeno. Esa es justo la trampa de la ficha 9.

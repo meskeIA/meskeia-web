@@ -472,7 +472,7 @@ function grupoDe(neutro: Subnivel[], bloque: Bloque, z: number, periodo: number)
  * porque el bloque es una propiedad de la posición en la tabla y la tabla está
  * construida con el orden ideal. Restar las configuraciones reales se equivoca
  * en las dos direcciones: el cerio parecería del bloque d (su orbital más alto
- * es el 5d, aunque el electrón nuevo entre en el 4f) y el cinc parecería del
+ * es el 5d, aunque el electrón nuevo entre en el 4f) y el zinc parecería del
  * bloque s, porque su vecino el cobre es una excepción y le había quitado un
  * electrón al 4s.
  */

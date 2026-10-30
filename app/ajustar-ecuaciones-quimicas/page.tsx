@@ -548,7 +548,7 @@ function calcularOxidacion(entrada: string): ResultadoOxidacion {
     if (ALCALINOS.has(el)) asignadas[el] = { eo: 1, regla: 'Metal alcalino (grupo 1): siempre +1 en sus compuestos' };
     else if (ALCALINOTERREOS.has(el)) asignadas[el] = { eo: 2, regla: 'Metal alcalinotérreo (grupo 2): siempre +2 en sus compuestos' };
     else if (el === 'Al') asignadas[el] = { eo: 3, regla: 'El aluminio actúa con +3 en sus compuestos' };
-    else if (el === 'Zn') asignadas[el] = { eo: 2, regla: 'El cinc actúa con +2 en sus compuestos' };
+    else if (el === 'Zn') asignadas[el] = { eo: 2, regla: 'El zinc actúa con +2 en sus compuestos' };
     else if (el === 'Ag') asignadas[el] = { eo: 1, regla: 'La plata actúa con +1 en sus compuestos' };
   });
 

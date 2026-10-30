@@ -110,7 +110,7 @@ export const faqJsonLd = {
       name: '¿Cómo se saben los electrones desapareados y si un átomo es paramagnético?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Por la regla de Hund: dentro de un mismo subnivel los electrones ocupan primero orbitales distintos con el mismo espín, y solo se emparejan cuando ya no quedan orbitales libres. Un subnivel p con 3 electrones tiene tres desapareados, y con 4 tiene solo dos, porque el cuarto se empareja con uno de los anteriores. Si al terminar queda algún electrón desapareado la sustancia es paramagnética y es atraída por un imán; si todos están emparejados es diamagnética. Por eso el hierro, con cuatro desapareados, responde a un campo magnético y el cinc, con ninguno, no.',
+        text: 'Por la regla de Hund: dentro de un mismo subnivel los electrones ocupan primero orbitales distintos con el mismo espín, y solo se emparejan cuando ya no quedan orbitales libres. Un subnivel p con 3 electrones tiene tres desapareados, y con 4 tiene solo dos, porque el cuarto se empareja con uno de los anteriores. Si al terminar queda algún electrón desapareado la sustancia es paramagnética y es atraída por un imán; si todos están emparejados es diamagnética. Por eso el hierro, con cuatro desapareados, responde a un campo magnético y el zinc, con ninguno, no.',
       },
     },
   ],
