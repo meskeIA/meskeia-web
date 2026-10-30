@@ -682,6 +682,27 @@ const anchoBarra = async (page: Page): Promise<number> =>
 const sinDesbordeHorizontal = (page: Page): Promise<boolean> =>
   page.evaluate(() => document.documentElement.scrollWidth <= document.documentElement.clientWidth);
 
+test.describe('cabo C0505 (decisión del usuario 28/10/2026)', () => {
+  // El quiz es universal salvo la P10: el IRPF es el impuesto sobre la renta de España, y la
+  // explicación lo daba por «el impuesto principal que pagas» a cualquiera (§1.bis Latam-friendly).
+  // Con decirlo en la explicación no hace falta RegionBadge: el resto del banco no es de un país.
+  test('REPARADO · la explicación del IRPF dice que es el impuesto de España', async ({ page }) => {
+    test.setTimeout(90_000);
+    await abrir(page);
+    await esperarOpcionesHidratadas(page);
+    for (let n = 1; n <= 15; n++) {
+      const esIrpf = norm(await enunciado(page).innerText()) === '¿Qué es el IRPF?';
+      await responder(page, 'bien');
+      if (esIrpf) {
+        await expect(explicacion(page)).toContainText('impuesto sobre la renta de España');
+        return;
+      }
+      await avanzar(page);
+    }
+    throw new Error('la partida no trae la pregunta del IRPF');
+  });
+});
+
 test.describe('inspector 29/10/2026', () => {
   /**
    * CASO NORMAL (1280×800) — impares bien, pares mal: P1, P3, P5, P7, P9, P11, P13 y P15 = 8 aciertos.
