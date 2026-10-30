@@ -68,6 +68,17 @@
  * ──────────────
  * `hidratacion-ok: <razón>` en esa línea o en la anterior. Lo hay de verdad: el test que
  * REPRODUCE la carrera (`tests/hidratacion-carrera.spec.ts`) tiene que sembrar mal a propósito.
+ *
+ * SEGUNDA REGLA: EL TRADUCTOR SIMULADO SOBRE UNA PÁGINA A MEDIO HIDRATAR (30/10/2026, cabo C0493)
+ * ──────────────────────────────────────────────────────────────────────────────────────────────
+ * Un fichero de pruebas que simula la página traducida (`createElement('font')`) tiene que
+ * llamar a `asentarAntesDeTraducir` (o a `esperarPaginaAsentada`) de `tests/apps/_hidratacion.ts`.
+ * Si traduce en cuanto hidrata UN control, envuelve texto de trozos que React aún no ha hidratado:
+ * React da «Hydration failed», regenera ese árbol en el cliente y se lleva los <font>, y el test
+ * sigue en verde midiendo una página sin traducir. Medido: 14 de 16 apps, de 1 a 4 cargas de cada
+ * 4; los 21 specs que lo hacían se repararon en 58731924. Juzga el FICHERO, no la línea: la espera
+ * va en la función que traduce, que puede estar lejos del `createElement`. Mismo escape, en la
+ * línea de uno de sus `createElement` o en la anterior, y vale para el fichero entero.
  */
 
 import fs from 'node:fs';
@@ -108,7 +119,12 @@ function objetivos() {
   return todos;
 }
 
+/** Segunda regla (C0493): el traductor simulado y la espera que lo hace válido. */
+const TRADUCTOR_SIMULADO = /createElement\(\s*['"]font['"]\s*\)/;
+const ESPERA_ASENTADA = /\b(asentarAntesDeTraducir|esperarPaginaAsentada)\s*\(/;
+
 const fallos = [];
+const traductores = [];
 let analizados = 0;
 
 for (const rel of objetivos()) {
@@ -118,20 +134,49 @@ for (const rel of objetivos()) {
   if (!fs.existsSync(abs)) continue;
   analizados++;
 
-  const lineas = fs.readFileSync(abs, 'utf8').split('\n');
+  const contenido = fs.readFileSync(abs, 'utf8');
+  const lineas = contenido.split('\n');
   lineas.forEach((texto, i) => {
     if (!SIEMBRA_A_MANO.test(texto)) return;
     if (ESCAPE.test(texto) || (i > 0 && ESCAPE.test(lineas[i - 1]))) return;
     fallos.push({ rel: normalizado, n: i + 1, texto: texto.trim().slice(0, 100) });
   });
+
+  // Segunda regla (C0493): el traductor simulado, con la página asentada antes
+  // La regla juzga el fichero, así que el escape también: basta junto a uno de sus createElement
+  const firmado = lineas.some((t, i) => TRADUCTOR_SIMULADO.test(t) && (ESCAPE.test(t) || (i > 0 && ESCAPE.test(lineas[i - 1]))));
+  if (!ESPERA_ASENTADA.test(contenido) && !firmado) {
+    lineas.forEach((texto, i) => {
+      if (TRADUCTOR_SIMULADO.test(texto)) traductores.push({ rel: normalizado, n: i + 1, texto: texto.trim().slice(0, 100) });
+    });
+  }
 }
 
-if (fallos.length === 0) {
+if (traductores.length > 0) {
+  // Un aviso por fichero basta: la espera va en la función, no en cada `createElement`
+  const porFichero = new Map();
+  for (const t of traductores) if (!porFichero.has(t.rel)) porFichero.set(t.rel, t);
+  console.error(`\n✗ HIDRATACIÓN EN TESTS: ${porFichero.size} fichero(s) traducen la página sin esperar a que esté asentada\n`);
+  for (const t of porFichero.values()) {
+    console.error(`  ${t.rel}:${t.n}`);
+    console.error(`    ${t.texto}`);
+  }
+  console.error(
+    '\n  El traductor simulado envuelve en <font> texto que React quizá no ha hidratado aún: React\n' +
+      '  da «Hydration failed», regenera ese árbol y se lleva los <font>, y el test mide una página\n' +
+      '  sin traducir. Llama a `asentarAntesDeTraducir(page)` de tests/apps/_hidratacion.ts al\n' +
+      '  principio de la función que traduce (espera una vez por navegación).\n' +
+      '  Falso positivo: `hidratacion-ok: <razón>` en la línea del createElement o en la anterior.\n',
+  );
+}
+
+if (fallos.length === 0 && traductores.length === 0) {
   console.log(
-    `✓ hidratación en tests: 0 siembras a mano fuera del helper (${analizados} ficheros de prueba)`,
+    `✓ hidratación en tests: 0 siembras a mano fuera del helper y ningún traductor simulado sin asentar (${analizados} ficheros de prueba)`,
   );
   process.exit(0);
 }
+if (fallos.length === 0) process.exit(1);
 
 console.error(`\n✗ HIDRATACIÓN EN TESTS: ${fallos.length} siembra(s) a mano fuera del helper\n`);
 for (const f of fallos) {

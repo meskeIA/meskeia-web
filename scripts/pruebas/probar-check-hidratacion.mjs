@@ -125,6 +125,33 @@ try {
   fs.writeFileSync(abs(VICTIMA), original);
 }
 
+// ── 4. Segunda regla (C0493): un traductor simulado sin la espera de la página asentada ─
+// Caso de origen: los 21 specs de página traducida de antes de 58731924. Se le quita la espera a
+// uno de verdad y el barrido tiene que nombrarlo; el fichero se restaura siempre.
+
+const TRADUCTOR = 'tests/apps/sonometro.spec.ts';
+const conEspera = fs.readFileSync(abs(TRADUCTOR));
+try {
+  const sinEspera = conEspera.toString('utf8').replaceAll('await asentarAntesDeTraducir(page);', '');
+  if (sinEspera === conEspera.toString('utf8')) {
+    anotar('la espera se pudo retirar de un spec con traductor', false, `no se encontró en ${TRADUCTOR}`);
+  } else {
+    fs.writeFileSync(abs(TRADUCTOR), sinEspera);
+    const r = candado();
+    anotar(
+      'el barrido caza un traductor simulado sin la página asentada (C0493)',
+      r.codigo === 1 && r.salida.includes(TRADUCTOR) && r.salida.includes('sin esperar a que esté asentada'),
+      `código ${r.codigo}`,
+    );
+    const firmado = sinEspera.replace("const exterior = document.createElement('font');", "// hidratacion-ok: prueba del escape del propio candado\n    const exterior = document.createElement('font');");
+    fs.writeFileSync(abs(TRADUCTOR), firmado);
+    const r2 = candado();
+    anotar('el escape hidratacion-ok en la línea anterior lo deja pasar', r2.codigo === 0 || !r2.salida.includes(TRADUCTOR), `código ${r2.codigo}`);
+  }
+} finally {
+  fs.writeFileSync(abs(TRADUCTOR), conEspera);
+}
+
 const traRestaurar = candado();
 anotar('el árbol queda restaurado', traRestaurar.codigo === 0, `código ${traRestaurar.codigo}`);
 
