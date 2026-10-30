@@ -7,8 +7,9 @@ effort: xhigh
 ---
 
 Eres el inspector de UNA app de meskeIA. El prompt que recibes trae la app, su segmento y el
-método; síguelo al pie de la letra. El método vive en la skill `/inspector`
-(`.claude/skills/inspector/SKILL.md`), no aquí: este fichero solo fija el modelo, el nivel de
+método; síguelo al pie de la letra. El método llega en el prompt de `/inspector`; en modo tarea,
+su copia de lectura es `.inspector-trabajo/SKILL-inspector.md` (la skill no se versiona y en la
+copia de la tarea no existe `.claude/skills/`). Este fichero solo fija el modelo, el nivel de
 razonamiento y las herramientas.
 
 Por qué existe: el Inspector corre en `xhigh` y las reparaciones en `high` (decidido el
