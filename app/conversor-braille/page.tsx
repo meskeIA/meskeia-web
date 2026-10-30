@@ -119,13 +119,28 @@ const CIERRES_DE_SEGUNDOS = new Set(['”', '″', '"']);
  * hay una “ sin cerrar delante; la " recta, si delante hay un número impar de ellas. El ″ (signo
  * de segundo) nunca es una comilla.
  */
-const cierraComillas = (caracteres: string[], j: number): boolean => {
-  const antes = caracteres.slice(0, j);
-  if (caracteres[j] === '”') {
-    return antes.filter((c) => c === '“').length > antes.filter((c) => c === '”').length;
+const cierraComillas = (caracteres: string[], j: number, gastadas: Set<number>): boolean => {
+  /**
+   * ⚠️ 30/10/2026 (hallazgo 3795) — contaba también las comillas que ya eran el signo de segundo
+   * de un tiempo: en «4'30" y 4'25"» la segunda " «cerraba» la primera, y el tiempo salía como el
+   * decimal 4,25 y una comilla. Ahora no cuentan las `gastadas` (segundos, marcas de un ángulo o de
+   * pulgadas ya decididas a su izquierda). Y con unas comillas abiertas, el ” de un tiempo solo las
+   * cierra si la comilla siguiente no es otro cierre: en «“Hizo 2’54” en la final”» el cierre de
+   * verdad es el del final, y el de en medio es el segundo del § 14.3.
+   */
+  const cuenta = (signo: string) =>
+    caracteres.slice(0, j).filter((c, k) => c === signo && !gastadas.has(k)).length;
+  const abiertas =
+    caracteres[j] === '”' ? cuenta('“') - cuenta('”') > 0 : caracteres[j] === '"' && cuenta('"') % 2 === 1;
+  if (!abiertas) return false;
+  for (let k = j + 1; k < caracteres.length; k++) {
+    const c = caracteres[k];
+    if (c === '“') return true;
+    if (c === '”') return false;
+    // La " recta abre si va a principio de palabra (tras un blanco o un signo de apertura)
+    if (c === '"') return /^[\s(¿¡]$/.test(caracteres[k - 1]);
   }
-  if (caracteres[j] === '"') return antes.filter((c) => c === '"').length % 2 === 1;
-  return false;
+  return true;
 };
 
 /**
@@ -143,15 +158,31 @@ const medidasAngulares = (caracteres: string[]): Map<number, string> => {
   const marcas = new Map<number, string>();
   const esCifra = (c: string | undefined) => c !== undefined && ES_CIFRA.test(c);
   const esMinuto = (c: string | undefined) => c !== undefined && (APOSTROFOS.has(c) || c === '′');
+  /**
+   * ⚠️ 30/10/2026 (hallazgo 3794) — solo veía el segundo pegado a cifras enteras: con decimales
+   * («40°25'08.5"N», el formato en que Google Maps copia unas coordenadas) el segundo caía a la tabla
+   * y salía como la comilla ⠦. Ahora las cifras admiten su parte decimal (punto o coma y cifras), y
+   * entre el grado y el minuto, o entre el minuto y el segundo, un blanco («40° 25’ 08” N»).
+   */
+  const finDeCifras = (desde: number): number => {
+    let k = desde;
+    while (esCifra(caracteres[k])) k++;
+    if (k > desde && (caracteres[k] === '.' || caracteres[k] === ',') && esCifra(caracteres[k + 1])) {
+      k++;
+      while (esCifra(caracteres[k])) k++;
+    }
+    return k;
+  };
+  const trasBlanco = (k: number): number => (caracteres[k] === ' ' ? k + 1 : k);
   for (let i = 1; i < caracteres.length; i++) {
     if (caracteres[i] !== '°' || !esCifra(caracteres[i - 1])) continue;
-    let j = i + 1;
-    while (esCifra(caracteres[j])) j++;
-    if (j === i + 1 || !esMinuto(caracteres[j])) continue;
+    const desdeMinutos = trasBlanco(i + 1);
+    const j = finDeCifras(desdeMinutos);
+    if (j === desdeMinutos || !esMinuto(caracteres[j])) continue;
     marcas.set(j, caracteres[j]);
-    let k = j + 1;
-    while (esCifra(caracteres[k])) k++;
-    if (k === j + 1) continue;
+    const desdeSegundos = trasBlanco(j + 1);
+    const k = finDeCifras(desdeSegundos);
+    if (k === desdeSegundos) continue;
     if (CIERRES_DE_SEGUNDOS.has(caracteres[k] ?? '')) marcas.set(k, caracteres[k]);
     else if (APOSTROFOS.has(caracteres[k] ?? '') && APOSTROFOS.has(caracteres[k + 1] ?? '')) {
       marcas.set(k, caracteres[k]);
@@ -176,6 +207,8 @@ const minutosYSegundos = (caracteres: string[]): { separador: Set<number>; cierr
   const separador = new Set<number>();
   const cierre = new Set<number>();
   const angulares = medidasAngulares(caracteres);
+  /** Comillas que ya no abren ni cierran nada: marcas de un ángulo y cierres de segundos anteriores. */
+  const gastadas = new Set<number>(angulares.keys());
   for (let i = 1; i < caracteres.length; i++) {
     if (!APOSTROFOS.has(caracteres[i]) || !ES_CIFRA.test(caracteres[i - 1])) continue;
     // Hallazgo 3763: con el grado delante es un ángulo (§ 14.1), no una hora
@@ -183,7 +216,8 @@ const minutosYSegundos = (caracteres: string[]): { separador: Set<number>; cierr
     let j = i + 1;
     while (j < caracteres.length && ES_CIFRA.test(caracteres[j])) j++;
     if (j === i + 1) continue;
-    if (CIERRES_DE_SEGUNDOS.has(caracteres[j] ?? '') && !cierraComillas(caracteres, j)) {
+    if (CIERRES_DE_SEGUNDOS.has(caracteres[j] ?? '') && !cierraComillas(caracteres, j, gastadas)) {
+      gastadas.add(j);
       separador.add(i);
       cierre.add(j);
     } else if (APOSTROFOS.has(caracteres[j] ?? '') && APOSTROFOS.has(caracteres[j + 1] ?? '')) {
@@ -193,6 +227,27 @@ const minutosYSegundos = (caracteres: string[]): { separador: Set<number>; cierr
     }
   }
   return { separador, cierre };
+};
+
+/**
+ * ⚠️ 30/10/2026 (hallazgo 3798) — B 2 § 14, literal: «hay representaciones de unidades de medida que
+ * no incluyen letra inicial alguna. Ejemplo: 7" [7 pulgadas] → #g88», con 1256-1256. La app escribía
+ * la " pegada a una cifra como la comilla 236 del § 6.1, que abre unas comillas que nadie cierra
+ * («Pantalla de 6,7"»). Es la marca de pulgadas (o de segundos) la " , ” o ″ pegada a una cifra que
+ * no es el cierre de un tiempo, ni una marca de un ángulo, ni cierra unas comillas abiertas
+ * («“tengo 7”» sí las cierra). Igual que el segundo de un ángulo, esta app no escribe ese signo: se
+ * omite y lo nombra su aviso. Devuelve la posición de cada marca y el carácter de la tinta.
+ */
+const marcasDeUnidad = (caracteres: string[]): Map<number, string> => {
+  const marcas = new Map<number, string>();
+  const gastadas = new Set<number>([...medidasAngulares(caracteres).keys(), ...minutosYSegundos(caracteres).cierre]);
+  for (let j = 1; j < caracteres.length; j++) {
+    if (!CIERRES_DE_SEGUNDOS.has(caracteres[j]) || !ES_CIFRA.test(caracteres[j - 1]) || gastadas.has(j)) continue;
+    if (cierraComillas(caracteres, j, gastadas)) continue;
+    marcas.set(j, caracteres[j]);
+    gastadas.add(j);
+  }
+  return marcas;
 };
 
 /**
@@ -353,6 +408,10 @@ const leerFraccion = (celdas: string[], i: number): { texto: string; hasta: numb
   }
   if (!numerador || !denominador) return null;
   if (!celdas.slice(desde, j).some((c) => CIFRAS_BAJAS_SIN_PUNTUACION.includes(c))) return null;
+  // ⚠️ 30/10/2026 (hallazgo 3796) — con otro número detrás no es una fracción de un signo: es el
+  // quebrado de Primaria del § 8.4 («½ #a*#b», 256 de dividir) o la igualdad del § 12 («= 2356»).
+  // Leerlo como fracción daba «¼2» o «⅐1» sin aviso; se deja la celda con el de celdas sin traducir.
+  if (celdas[j] === NUMBER_INDICATOR) return null;
   const signo = FRACCION_DE[`${numerador}/${denominador}`];
   return signo ? { texto: signo, hasta: j } : null;
 };
@@ -453,6 +512,10 @@ const caracteresSinCelda = (texto: string): string[] => {
   const caracteres = Array.from(texto);
   // El ″ que cierra unos segundos no se escribe a propósito (hallazgo 3588)
   const cierres = minutosYSegundos(caracteres).cierre;
+  // El minuto y el segundo de un ángulo (′ ″ incluidos) y la marca de pulgadas tienen su propio
+  // aviso, que dice que el B 2 sí les da celda: aquí dudaba de ello (hallazgo 3797)
+  const angulares = medidasAngulares(caracteres);
+  const unidades = marcasDeUnidad(caracteres);
   // Ordinales, «n.º» y fracciones se escriben con sus celdas del B 2 (C0506)
   const ordinales = posicionesDeOrdinales(caracteres);
   return [
@@ -460,6 +523,8 @@ const caracteresSinCelda = (texto: string): string[] => {
       caracteres.filter(
         (c, i) =>
           !cierres.has(i) &&
+          !angulares.has(i) &&
+          !unidades.has(i) &&
           !ordinales.has(i) &&
           !textToBraille[c.toLowerCase()] &&
           !SIGNOS_COMPUESTOS[c] &&
@@ -784,6 +849,11 @@ const angularesOmitidos = (texto: string): string[] => [
   ...new Set(medidasAngulares(normalizarTinta(texto)).values()),
 ];
 
+/** Las marcas de pulgadas pegadas a una cifra que no se han escrito (hallazgo 3798), sin repetir. */
+const unidadesOmitidas = (texto: string): string[] => [
+  ...new Set(marcasDeUnidad(normalizarTinta(texto)).values()),
+];
+
 /**
  * Cómo nombrar en el aviso un carácter que no se ve.
  *
@@ -910,6 +980,8 @@ export default function ConversorBraillePage() {
       : [];
   /** Minuto y segundo de un ángulo, que no se escriben (§ 14.1, hallazgo 3763). */
   const marcasAngulares = mode === 'textToBraille' && result ? angularesOmitidos(input) : [];
+  /** Pulgadas pegadas a una cifra, que no se escriben (§ 14, hallazgo 3798). */
+  const marcasDeUnidadOmitidas = mode === 'textToBraille' && result ? unidadesOmitidas(input) : [];
   /** Teléfonos escritos sin blancos (§ 8.1, hallazgo 3526). */
   const telefonos = mode === 'textToBraille' && result ? telefonosDelTexto(input) : [];
   /** Cantidades con puntos que tienen forma de teléfono (§ 8.1, hallazgo 3552). */
@@ -1135,6 +1207,7 @@ export default function ConversorBraillePage() {
     const romanos = numerosRomanos(caracteres);
     const tiempos = minutosYSegundos(caracteres);
     const angulares = medidasAngulares(caracteres);
+    const unidades = marcasDeUnidad(caracteres);
     const ordinales = ordinalesYFracciones(caracteres);
 
     for (let i = 0; i < caracteres.length; i++) {
@@ -1174,6 +1247,11 @@ export default function ConversorBraillePage() {
       // B 2 § 14.1 (hallazgo 3763): el minuto y el segundo de un ángulo no se escriben; los nombra
       // el aviso de `angularesOmitidos`, y el número siguiente lleva su propio signo de número.
       if (angulares.has(i)) {
+        enExpresionNumerica = false;
+        continue;
+      }
+      // B 2 § 14 (hallazgo 3798): la marca de pulgadas tampoco se escribe; la nombra su aviso
+      if (unidades.has(i)) {
         enExpresionNumerica = false;
         continue;
       }
@@ -1693,6 +1771,21 @@ export default function ConversorBraillePage() {
                 <span>
                   El Documento Técnico B 2 (§ 14.1) les da celda propia. No se han cambiado por los
                   dos puntos de una hora, que el B 2 reserva para tiempos como «2’54”».
+                </span>
+              </p>
+            )}
+
+            {marcasDeUnidadOmitidas.length > 0 && (
+              <p className={styles.avisoConversion} role="alert">
+                <span aria-hidden="true">⚠️</span>{' '}
+                <span>
+                  Detrás de una cifra, la marca de pulgadas no se ha escrito, y no está en el
+                  resultado:
+                </span>{' '}
+                <strong>{marcasDeUnidadOmitidas.join(' · ')}</strong>.{' '}
+                <span>
+                  El Documento Técnico B 2 (§ 14) le da celda propia («7"» son 7 pulgadas). No se ha
+                  escrito como unas comillas, que abrirían un texto entrecomillado que nadie cierra.
                 </span>
               </p>
             )}

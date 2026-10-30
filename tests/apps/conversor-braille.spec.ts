@@ -4267,17 +4267,18 @@ test.describe('inspector 29/10/2026 (tarde) — re-inspección tras /reparar', (
   });
 
   // ─────────────────────────────────────────────────────────────────────────
-  // ABIERTO (inspector 29/10/2026 tarde) — reparación incompleta de 3763: segundos con decimales
+  // REPARADO (hallazgo 3794, /reparar 30/10/2026) — reparación incompleta de 3763: segundos con decimales
   // ─────────────────────────────────────────────────────────────────────────
   //
-  // `medidasAngulares` solo marca el segundo si el ” (o la ") va JUSTO detrás de las cifras: con
-  // segundos decimales —el formato en que Google Maps copia unas coordenadas— el minuto sí se omite
-  // con su aviso, pero el segundo cae a la tabla y sale como la comilla ⠦ (236), sin aviso propio:
-  // hoy ⠼⠙⠚⠼⠃⠑⠼⠚⠓⠂⠑⠦⠨⠝⠀⠼⠉⠼⠙⠃⠼⠁⠃⠂⠉⠦⠨⠺, y el aviso del ángulo nombra solo «'». En el B 2 el
+  // `medidasAngulares` solo marcaba el segundo si el ” (o la ") iba JUSTO detrás de las cifras: con
+  // segundos decimales —el formato en que Google Maps copia unas coordenadas— el minuto sí se omitía
+  // con su aviso, pero el segundo caía a la tabla y salía como la comilla ⠦ (236), sin aviso propio:
+  // ⠼⠙⠚⠼⠃⠑⠼⠚⠓⠂⠑⠦⠨⠝⠀⠼⠉⠼⠙⠃⠼⠁⠃⠂⠉⠦⠨⠺, y el aviso del ángulo nombraba solo «'». En el B 2 el
   // segundo es 1256-1256 (§ 14.1) y la comilla, 236 (§ 6.1). Vale la salida con los signos omitidos
-  // (como hace la app con los segundos enteros) o la del § 14.1 escrita entera.
-  test('ABIERTO — reparación incompleta de 3763: con segundos decimales («40°25\'08.5"N») el segundo sale como la comilla ⠦', async ({ page }) => {
-    test.fail();
+  // (como hace la app con los segundos enteros) o la del § 14.1 escrita entera. Ahora las cifras de
+  // minutos y segundos admiten su parte decimal y un blanco delante («40° 25’ 08” N»), y el aviso del
+  // ángulo nombra también el segundo.
+  test('REPARADO — reparación incompleta de 3763: con segundos decimales («40°25\'08.5"N») el segundo sale como la comilla ⠦', async ({ page }) => {
     const casos: Array<[string, string[]]> = [
       // 08,5 lleva el punto 2 decimal del § 8.1: #jh,e
       [
@@ -4289,43 +4290,59 @@ test.describe('inspector 29/10/2026 (tarde) — re-inspección tras /reparar', (
       ],
       // La misma forma con coma decimal y comillas tipográficas. Hoy: ⠼⠙⠚⠼⠃⠑⠼⠚⠓⠂⠑⠦⠨⠝
       ['40°25’08,5”N', ['⠼⠙⠚⠼⠃⠑⠼⠚⠓⠂⠑⠨⠝', '⠼⠙⠚⠴⠼⠃⠑⠳⠼⠚⠓⠂⠑⠳⠳⠨⠝']],
+      // Con blancos: #dj · ⠀ · #be · ⠀ · #jh · ⠀ · ⠨⠝ (el ° lo omite el aviso del 3556)
+      ['40° 25’ 08” N', ['⠼⠙⠚⠀⠼⠃⠑⠀⠼⠚⠓⠀⠨⠝']],
     ];
-    expect(await fallosT(page, casos)).toEqual([]);
+    const fallos = await fallosT(page, casos);
+    // El aviso del ángulo nombra también el segundo, y no sale el de comillas simples
+    await convertirT(page, '40°25\'08.5"N');
+    await resultadoT(page);
+    const avisos = await avisosT(page);
+    const angular = avisos.find((a) => a.includes('Detrás de un grado')) ?? '';
+    if (!angular.includes('"')) fallos.push('el aviso del ángulo no nombra "');
+    await convertirT(page, '40° 25’ 08” N');
+    await resultadoT(page);
+    if ((await avisosT(page)).some((a) => a.includes('comillas simples'))) fallos.push('con blancos: aviso de comillas simples');
+    expect(fallos).toEqual([]);
   });
 
   // ─────────────────────────────────────────────────────────────────────────
-  // ABIERTO (inspector 29/10/2026 tarde) — REGRESIÓN de e852bdcd: `cierraComillas` y el § 14.3
+  // REPARADO (hallazgo 3795, /reparar 30/10/2026) — REGRESIÓN de e852bdcd: `cierraComillas` y el § 14.3
   // ─────────────────────────────────────────────────────────────────────────
   //
-  // Para que «“73’81”» fuera un decimal entre comillas, e852bdcd decide que el ” cierra comillas si
-  // antes hay más “ que ” y que la " recta cierra si antes hay un número impar de ellas. Pero cuenta
-  // también las que ya se han gastado como signo de segundo: en «4'30" y 4'25"» (dos parciales
-  // tecleados, sin una sola comilla) la segunda " «cierra» la primera, y en «“Hizo 2’54” en la
-  // final”» el ” del tiempo se toma por el cierre aunque el de verdad viene al final. El tiempo vuelve
-  // a salir como el decimal 4,25 o 2,54 seguido de una comilla, sin aviso: el defecto del 3588.
-  // Antes de e852bdcd los dos eran tiempos (§ 14.3 «2’54” → #b:#ed»).
-  test('ABIERTO — regresión de e852bdcd: el segundo tiempo de «4\'30" y 4\'25"» y el tiempo dentro de “…” salen como decimal y comilla', async ({ page }) => {
-    test.fail();
+  // Para que «“73’81”» fuera un decimal entre comillas, e852bdcd decidió que el ” cierra comillas si
+  // antes hay más “ que ” y que la " recta cierra si antes hay un número impar de ellas. Pero contaba
+  // también las que ya se habían gastado como signo de segundo: en «4'30" y 4'25"» (dos parciales
+  // tecleados, sin una sola comilla) la segunda " «cerraba» la primera, y en «“Hizo 2’54” en la
+  // final”» el ” del tiempo se tomaba por el cierre aunque el de verdad viene al final. Ahora no
+  // cuentan las gastadas, y con unas comillas abiertas el ” de un tiempo solo las cierra si la comilla
+  // siguiente no es otro cierre. Los decimales entre comillas siguen siéndolo (los dos últimos casos).
+  test('REPARADO — regresión de e852bdcd: el segundo tiempo de «4\'30" y 4\'25"» y el tiempo dentro de “…” salen como decimal y comilla', async ({ page }) => {
     const casos: Array<[string, string[]]> = [
-      // #d:#cj · ⠀ y ⠽ ⠀ · #d:#be. Hoy: ⠼⠙⠒⠼⠉⠚⠀⠽⠀⠼⠙⠂⠃⠑⠦ (4,25 y unas comillas)
+      // #d:#cj · ⠀ y ⠽ ⠀ · #d:#be. Antes: ⠼⠙⠒⠼⠉⠚⠀⠽⠀⠼⠙⠂⠃⠑⠦ (4,25 y unas comillas)
       ['4\'30" y 4\'25"', ['⠼⠙⠒⠼⠉⠚⠀⠽⠀⠼⠙⠒⠼⠃⠑']],
-      // ⠦ · ⠨⠓ i ⠊ z ⠵ o ⠕ · ⠀ · #b:#ed · ⠀ e n ⠀ l a ⠀ f i n a l · ⠦. Hoy: …⠼⠃⠂⠑⠙⠦⠀⠑⠝⠀⠇⠁⠀⠋⠊⠝⠁⠇⠦
+      // ⠦ · ⠨⠓ i ⠊ z ⠵ o ⠕ · ⠀ · #b:#ed · ⠀ e n ⠀ l a ⠀ f i n a l · ⠦. Antes: …⠼⠃⠂⠑⠙⠦⠀⠑⠝⠀⠇⠁⠀⠋⠊⠝⠁⠇⠦
       ['“Hizo 2’54” en la final”', ['⠦⠨⠓⠊⠵⠕⠀⠼⠃⠒⠼⠑⠙⠀⠑⠝⠀⠇⠁⠀⠋⠊⠝⠁⠇⠦']],
+      // Lo mismo con comillas rectas
+      ['"Hizo 2\'54" en la final"', ['⠦⠨⠓⠊⠵⠕⠀⠼⠃⠒⠼⠑⠙⠀⠑⠝⠀⠇⠁⠀⠋⠊⠝⠁⠇⠦']],
+      // Dos decimales del § 8.1 entre comillas: cada cierre cierra la suya. ⠦ #gc,ha ⠦ ⠀ ⠽ ⠀ ⠦ #ab,e ⠦
+      ['“73’81” y “12’5”', ['⠦⠼⠛⠉⠂⠓⠁⠦⠀⠽⠀⠦⠼⠁⠃⠂⠑⠦']],
+      ['"73\'81" y "12\'5"', ['⠦⠼⠛⠉⠂⠓⠁⠦⠀⠽⠀⠦⠼⠁⠃⠂⠑⠦']],
     ];
     expect(await fallosT(page, casos)).toEqual([]);
   });
 
   // ─────────────────────────────────────────────────────────────────────────
-  // ABIERTO (inspector 29/10/2026 tarde) — REGRESIÓN de e852bdcd (3766): `leerFraccion` en la vuelta
+  // REPARADO (hallazgo 3796, /reparar 30/10/2026) — REGRESIÓN de e852bdcd (3766): `leerFraccion` en la vuelta
   // ─────────────────────────────────────────────────────────────────────────
   //
-  // La vuelta lee como fracción todo «⠼ + cifras + 4, 7, 9 o 0 en posición baja» que exista como
-  // signo de tinta, mire lo que mire detrás. El mismo § 8.4 trae otra forma del quebrado, la de
-  // Primaria, «½ #a*#b», con 256 como signo de dividir (NOTA del § 8.4 y § 12): ⠼⠁⠲⠼⠃ vuelve «¼2».
+  // La vuelta leía como fracción todo «⠼ + cifras + 4, 7, 9 o 0 en posición baja» que existiera como
+  // signo de tinta, mirara lo que mirara detrás. El mismo § 8.4 trae otra forma del quebrado, la de
+  // Primaria, «½ #a*#b», con 256 como signo de dividir (NOTA del § 8.4 y § 12): ⠼⠁⠲⠼⠃ volvía «¼2».
   // Igual «¾» en esa forma, ⠼⠉⠲⠼⠙ → «¾4», y una igualdad del § 12 («= 2356»), ⠼⠁⠶⠼⠁ → «⅐1». Sin
-  // aviso. Antes de e852bdcd salían «1⠲2», «3⠲4» y «1⠶1» con el aviso de celdas sin traducir.
-  test('ABIERTO — regresión de e852bdcd (3766): la vuelta lee el quebrado de Primaria del § 8.4 «½ #a*#b» (⠼⠁⠲⠼⠃) como «¼2»', async ({ page }) => {
-    test.fail();
+  // aviso. Ahora, con otro signo de número detrás, no se lee como fracción: vuelven «1⠲2», «3⠲4» y
+  // «1⠶1» con el aviso de celdas sin traducir, como antes de e852bdcd. «⠼⠁⠲» sola sigue siendo «¼».
+  test('REPARADO — regresión de e852bdcd (3766): la vuelta lee el quebrado de Primaria del § 8.4 «½ #a*#b» (⠼⠁⠲⠼⠃) como «¼2»', async ({ page }) => {
     const casos: Array<[string, string[]]> = [
       // 1 ⠁ · 256 ⠲ dividir · 2 ⠃: «1/2» o «½»; o, si no se lee, la celda tal cual con su aviso
       ['⠼⠁⠲⠼⠃', ['1/2', '½', '1⠲2']],
@@ -4337,16 +4354,15 @@ test.describe('inspector 29/10/2026 (tarde) — re-inspección tras /reparar', (
   });
 
   // ─────────────────────────────────────────────────────────────────────────
-  // ABIERTO (inspector 29/10/2026 tarde) — dos avisos que se contradicen con ′ y ″
+  // REPARADO (hallazgo 3797, /reparar 30/10/2026) — dos avisos que se contradecían con ′ y ″
   // ─────────────────────────────────────────────────────────────────────────
   //
   // Con las primas tipográficas (las de unas coordenadas copiadas de Wikipedia), `medidasAngulares`
   // las reconoce como minuto y segundo y su aviso dice que «El Documento Técnico B 2 (§ 14.1) les
-  // da celda propia», pero `caracteresSinCelda` no las descuenta y el aviso genérico, en la misma
-  // caja, dice de ′ · ″ que «Puede que el Código Braille Español sí les asigne celda». La forma del
-  // 3525/3556.
-  test('ABIERTO — con ′ y ″ el aviso genérico duda («Puede que…») de lo que el aviso del ángulo afirma (§ 14.1)', async ({ page }) => {
-    test.fail();
+  // da celda propia», pero `caracteresSinCelda` no las descontaba y el aviso genérico, en la misma
+  // caja, decía de ′ · ″ que «Puede que el Código Braille Español sí les asigne celda». La forma del
+  // 3525/3556. Ahora `caracteresSinCelda` descuenta las marcas del ángulo.
+  test('REPARADO — con ′ y ″ el aviso genérico duda («Puede que…») de lo que el aviso del ángulo afirma (§ 14.1)', async ({ page }) => {
     await convertirT(page, '40°25′08″N 3°42′12″O');
     const r = await resultadoT(page);
     const dudan = (await avisosT(page)).filter((a) => a.includes('Puede que') && /[′″]/.test(a));
@@ -4361,21 +4377,30 @@ test.describe('inspector 29/10/2026 (tarde) — re-inspección tras /reparar', (
   });
 
   // ─────────────────────────────────────────────────────────────────────────
-  // ABIERTO (inspector 29/10/2026 tarde) — § 14: «7"» (pulgadas) sale con una comilla
+  // REPARADO (hallazgo 3798, /reparar 30/10/2026) — § 14: «7"» (pulgadas) salía con una comilla
   // ─────────────────────────────────────────────────────────────────────────
   //
-  // B 2 § 14, literal: «7" [7 pulgadas] → #g88», con 1256-1256 (⠳⠳). La app escribe ⠼⠛⠦: la comilla
+  // B 2 § 14, literal: «7" [7 pulgadas] → #g88», con 1256-1256 (⠳⠳). La app escribía ⠼⠛⠦: la comilla
   // del § 6.1, que abre unas comillas que nadie cierra, con solo el ℹ️ de que las comillas abren y
   // cierran igual. Vale ⠳⠳ o, si la app no escribe ese signo, omitirlo con su aviso, como hace con
-  // el segundo de un ángulo; no la comilla.
-  test('ABIERTO — § 14: «7"» (7 pulgadas) y «Pantalla de 6,7"» salen con la comilla ⠦ en vez de 1256-1256', async ({ page }) => {
-    test.fail();
+  // el segundo de un ángulo; no la comilla. Ahora se omite y lo nombra su aviso; la comilla pegada a
+  // una cifra que CIERRA unas comillas abiertas («“tengo 7”») sigue siendo la comilla.
+  test('REPARADO — § 14: «7"» (7 pulgadas) y «Pantalla de 6,7"» salen con la comilla ⠦ en vez de 1256-1256', async ({ page }) => {
     const casos: Array<[string, string[]]> = [
-      // #g · ⠳⠳. Hoy: ⠼⠛⠦
+      // #g · ⠳⠳. Antes: ⠼⠛⠦
       ['7"', ['⠼⠛⠳⠳', '⠼⠛']],
-      // ⠨⠏ a n t a l l a · ⠀ d e ⠀ · #f,g · ⠳⠳. Hoy: …⠼⠋⠂⠛⠦
+      // ⠨⠏ a n t a l l a · ⠀ d e ⠀ · #f,g · ⠳⠳. Antes: …⠼⠋⠂⠛⠦
       ['Pantalla de 6,7"', ['⠨⠏⠁⠝⠞⠁⠇⠇⠁⠀⠙⠑⠀⠼⠋⠂⠛⠳⠳', '⠨⠏⠁⠝⠞⠁⠇⠇⠁⠀⠙⠑⠀⠼⠋⠂⠛']],
+      // La comilla que cierra sigue siendo comilla: ⠦ ⠞ ⠑ ⠝ ⠛ ⠕ ⠀ #g ⠦
+      ['“tengo 7”', ['⠦⠞⠑⠝⠛⠕⠀⠼⠛⠦']],
+      ['"tengo 7"', ['⠦⠞⠑⠝⠛⠕⠀⠼⠛⠦']],
     ];
-    expect(await fallosT(page, casos)).toEqual([]);
+    const fallos = await fallosT(page, casos);
+    await convertirT(page, 'Pantalla de 6,7"');
+    await resultadoT(page);
+    const avisos = await avisosT(page);
+    if (!avisos.some((a) => a.includes('pulgadas') && a.includes('"'))) fallos.push('sin aviso de la marca de pulgadas');
+    if (avisos.some((a) => a.includes('Puede que'))) fallos.push('el aviso genérico duda de la marca');
+    expect(fallos).toEqual([]);
   });
 });
