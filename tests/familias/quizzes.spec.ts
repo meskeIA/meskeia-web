@@ -396,6 +396,39 @@ for (const h of HERMANAS) {
     });
 
     /**
+     * Cabo C0514, la otra mitad (hallazgo 3768, f0b18db0): el 2.º clic de un doble clic en
+     * «Siguiente» se ignora, pero su mousedown movía el foco a lo que hubiera debajo en la pantalla
+     * nueva (una opción no elegida, «Ver guía educativa» o <body>). Esperado: el foco en el
+     * enunciado nuevo, como con un clic suelto. Ratón de verdad, a 1280 × 800 y 360 × 740.
+     */
+    test('doble clic en «Siguiente»: el foco va al enunciado nuevo, no a lo que haya debajo', async ({ page }) => {
+      test.setTimeout(90_000);
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+      const robados: string[] = [];
+      for (const viewport of [{ width: 1280, height: 800 }, { width: 360, height: 740 }]) {
+        await page.setViewportSize(viewport);
+        await page.goto(`/${h.slug}/`);
+        for (const boton of h.arranque) await pulsarHidratado(page, boton);
+        await pulsarHidratado(page, h.opcion ?? /^\s*A\S/);
+        const sig = page.locator('button:visible').filter({ hasText: /siguiente/i }).first();
+        await expect(sig).toBeVisible();
+        await sig.scrollIntoViewIfNeeded();
+        await page.waitForTimeout(600); // lee la explicación: fuera de la ventana de ráfaga
+        const caja = (await sig.boundingBox())!;
+        await page.mouse.move(caja.x + caja.width / 2, caja.y + caja.height / 2);
+        await page.mouse.down({ clickCount: 1 });
+        await page.mouse.up({ clickCount: 1 });
+        await page.waitForTimeout(120);
+        await page.mouse.down({ clickCount: 2 });
+        await page.mouse.up({ clickCount: 2 });
+        await page.waitForTimeout(300);
+        const f = await dondeFoco(page);
+        if (f !== 'destino') robados.push(`${viewport.width} × ${viewport.height}: ${f}`);
+      }
+      expect(robados, 'tras el doble clic en «Siguiente», el foco no está en el enunciado nuevo').toEqual([]);
+    });
+
+    /**
      * Hallazgo 3770 (quiz-literatura-universal, 29/10/2026): al contestar, `focus()` a secas en
      * «Siguiente» deja que Chrome lo CENTRE, y con una explicación larga la página baja de golpe y
      * el veredicto se va bajo la píldora del logo. A 360 × 640, en las cinco primeras preguntas:
