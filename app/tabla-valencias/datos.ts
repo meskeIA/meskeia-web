@@ -307,11 +307,11 @@ export const ELEMENTOS: Elemento[] = [
     ],
   },
   {
-    simbolo: 'Te', nombre: 'Teluro', z: 52, categoria: 'anfigenos', grupo: 'Grupo 16', valencias: '2, 4, 6',
+    simbolo: 'Te', nombre: 'Telurio', z: 52, categoria: 'anfigenos', grupo: 'Grupo 16', valencias: '2, 4, 6',
     sinonimos: ['teluro', 'telurio', 'teluroso', 'telurico', 'telururo'], tradicional: { 4: 'teluroso', 6: 'telúrico' },
     estados: [
-      { valor: 4, frecuente: true, masComun: true, ejemplo: 'TeO₂', nombreEjemplo: 'óxido de teluro(IV)' },
-      { valor: 6, frecuente: true, ejemplo: 'TeO₃', nombreEjemplo: 'óxido de teluro(VI)' },
+      { valor: 4, frecuente: true, masComun: true, ejemplo: 'TeO₂', nombreEjemplo: 'óxido de telurio(IV)' },
+      { valor: 6, frecuente: true, ejemplo: 'TeO₃', nombreEjemplo: 'óxido de telurio(VI)' },
       { valor: -2, frecuente: true, ejemplo: 'H₂Te', nombreEjemplo: 'telururo de hidrógeno' },
     ],
   },

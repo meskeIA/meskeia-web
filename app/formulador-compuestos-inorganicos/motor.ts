@@ -165,7 +165,7 @@ export const ELEMENTOS: Elemento[] = [
     anion: 'seleniuro', hidracido: 'selenhídrico',
   },
   {
-    simbolo: 'Te', nombre: 'teluro', tipo: 'nometal', positivas: [4, 6], negativa: -2,
+    simbolo: 'Te', nombre: 'telurio', tipo: 'nometal', positivas: [4, 6], negativa: -2,
     anion: 'telururo', hidracido: 'telurhídrico',
   },
   { simbolo: 'N', nombre: 'nitrógeno', tipo: 'nometal', positivas: [1, 3, 5], negativa: -3, anion: 'nitruro' },
@@ -202,7 +202,7 @@ export const ANIONES_OXO: AnionOxo[] = [
   { formula: 'IO2', atomos: { I: 1, O: 2 }, carga: 1, nombre: 'yodito', central: 'I', valencia: 3, acido: 'HIO2', hidrogenos: 1, acidoTradicional: 'ácido yodoso', anionStock: 'dioxoyodato(III)' },
   { formula: 'IO3', atomos: { I: 1, O: 3 }, carga: 1, nombre: 'yodato', central: 'I', valencia: 5, acido: 'HIO3', hidrogenos: 1, acidoTradicional: 'ácido yódico', anionStock: 'trioxoyodato(V)' },
   { formula: 'IO4', atomos: { I: 1, O: 4 }, carga: 1, nombre: 'peryodato', central: 'I', valencia: 7, acido: 'HIO4', hidrogenos: 1, acidoTradicional: 'ácido peryódico', anionStock: 'tetraoxoyodato(VII)' },
-  // ── Azufre, selenio, teluro ──
+  // ── Azufre, selenio, telurio ──
   { formula: 'SO2', atomos: { S: 1, O: 2 }, carga: 2, nombre: 'hiposulfito', central: 'S', valencia: 2, acido: 'H2SO2', hidrogenos: 2, acidoTradicional: 'ácido hiposulfuroso', anionStock: 'dioxosulfato(II)' },
   { formula: 'SO3', atomos: { S: 1, O: 3 }, carga: 2, nombre: 'sulfito', central: 'S', valencia: 4, acido: 'H2SO3', hidrogenos: 2, acidoTradicional: 'ácido sulfuroso', anionStock: 'trioxosulfato(IV)' },
   { formula: 'SO4', atomos: { S: 1, O: 4 }, carga: 2, nombre: 'sulfato', central: 'S', valencia: 6, acido: 'H2SO4', hidrogenos: 2, acidoTradicional: 'ácido sulfúrico', anionStock: 'tetraoxosulfato(VI)' },

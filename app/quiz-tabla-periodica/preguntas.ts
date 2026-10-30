@@ -334,7 +334,7 @@ export const BANCO_PREGUNTAS: Pregunta[] = [
   {
     id: 38,
     pregunta: '¿Qué elemento tiene el mayor número de isótopos estables?',
-    opciones: ['Plomo', 'Estaño', 'Teluro', 'Xenón'],
+    opciones: ['Plomo', 'Estaño', 'Telurio', 'Xenón'],
     correcta: 1,
     explicacion: 'El Estaño (Sn) tiene 10 isótopos estables, más que cualquier otro elemento. El Xenón tiene 9 isótopos naturales, pero en dos de ellos (¹²⁴Xe y ¹³⁶Xe) se ha observado una desintegración lentísima, con semividas de más de 10²¹ años, así que estables le quedan 7.',
     categoria: 'curiosidad',
