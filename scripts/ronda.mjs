@@ -56,7 +56,7 @@
 import { chromium } from 'playwright';
 import fs from 'fs';
 import path from 'path';
-import { spawn } from 'child_process';
+import { spawn, spawnSync } from 'child_process';
 import { fileURLToPath } from 'url';
 import { lineaDeBase, nuevasDelDia, nuevasQueYaNoAparecen } from './ronda-base.mjs';
 
@@ -201,8 +201,24 @@ async function asegurarServidor() {
     if (await responde()) return proc;
   }
   console.error('✗ El servidor no llegó a responder en 40 s.');
-  proc.kill();
+  cerrarServidor(proc);
   process.exit(1);
+}
+
+/**
+ * Cierra el servidor que levantó la ronda, con todo su árbol. En Windows, con `shell: true`,
+ * `proc` es la consola intermedia: `proc.kill()` la mata y deja vivo el `next start` que cuelga
+ * de ella. Así quedó un `next start -p 3050` huérfano del 30/10/2026 (06:12) vivo cuatro horas,
+ * con el build de antes en memoria, y `check:familias` lo reutilizó y dio 3 rojos falsos en el
+ * build del /push (cabos C0530 y C0534).
+ */
+function cerrarServidor(proc) {
+  if (!proc) return;
+  if (process.platform === 'win32') {
+    spawnSync('taskkill', ['/pid', String(proc.pid), '/T', '/F'], { stdio: 'ignore' });
+  } else {
+    proc.kill();
+  }
 }
 
 // ─── Revisión de una página ───────────────────────────────────────────────────
@@ -587,13 +603,13 @@ if (AUTOCOMPROBAR || !ES_PARCIAL) {
   control = await pruebaDeControl(ctx, tituloHome);
   if (AUTOCOMPROBAR) {
     await navegador.close();
-    if (proc) proc.kill();
+    cerrarServidor(proc);
     imprimirControl(control);
     process.exit(control.vale ? 0 : 1);
   }
   if (!control.vale) {
     await navegador.close();
-    if (proc) proc.kill();
+    cerrarServidor(proc);
     imprimirControl(control);
     const acta = escribirActaControlFallido(control, fechaHoy);
     console.log(`\n  Barrido ABORTADO: no se toca la línea de base.`);
@@ -622,7 +638,7 @@ if (sospechosas.length) {
 }
 
 await navegador.close();
-if (proc) proc.kill();
+cerrarServidor(proc);
 
 const segundos = Math.round((Date.now() - t0) / 1000);
 
