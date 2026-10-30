@@ -117,7 +117,7 @@ export default function ExtractorAudioVideoPage() {
       const ffmpeg = ffmpegRef.current;
 
       if (!ffmpegCargadoRef.current) {
-        const baseURL = 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/umd';
+        const baseURL = 'https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/umd'; // enlace-ok: base del CDN; se carga añadiéndole el nombre del fichero
         await ffmpeg.load({
           coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, 'text/javascript'),
           wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, 'application/wasm'),

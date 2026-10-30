@@ -9,7 +9,7 @@ import { RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/compo
 
 // API Key de OpenWeatherMap (límite gratuito: 1000 calls/día)
 const OPENWEATHER_API_KEY = process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY;
-const OPENWEATHER_BASE_URL = 'https://api.openweathermap.org/data/2.5';
+const OPENWEATHER_BASE_URL = 'https://api.openweathermap.org/data/2.5'; // enlace-ok: base de la API; responde 401 sin clave
 
 interface WeatherData {
   name: string;

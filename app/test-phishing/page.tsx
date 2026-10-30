@@ -39,7 +39,7 @@ const CASOS: Caso[] = [
     extra: 'seguridad@bancounion-alertas-verificar.com',
     asunto: 'Su cuenta será bloqueada en 24 horas',
     cuerpo: 'Estimado cliente, hemos detectado un acceso inusual. Debe verificar su identidad inmediatamente o su cuenta será suspendida. Confirme sus datos en el siguiente enlace.',
-    url: 'http://verificar-bancounion.secure-login.com',
+    url: 'http://verificar-bancounion.secure-login.com', // enlace-ok: dominio inventado del ejercicio
     esPhishing: true,
     senales: [
       'El dominio del remitente no es el oficial del banco: añade palabras como "alertas-verificar".',
@@ -77,7 +77,7 @@ const CASOS: Caso[] = [
     id: 'web-typosquat',
     tipo: 'web',
     cuerpo: 'Página de inicio de sesión de una red social a la que llegas desde un enlace de un mensaje. Fíjate en la barra de direcciones antes de escribir tu usuario y contraseña.',
-    url: 'http://faceb00k-login-seguro.com',
+    url: 'http://faceb00k-login-seguro.com', // enlace-ok: dominio inventado del ejercicio
     esPhishing: true,
     senales: [
       'El dominio imita al real cambiando letras por números (faceb00k con ceros).',
@@ -118,7 +118,7 @@ const CASOS: Caso[] = [
     extra: 'ganador@promo-regalos-2026.com',
     asunto: '🎉 ¡Has sido seleccionado para un premio!',
     cuerpo: 'Enhorabuena, tu dirección ha resultado ganadora del sorteo de un teléfono de última generación. Reclama tu premio en las próximas 2 horas rellenando tus datos.',
-    url: 'http://reclama-tu-premio.online',
+    url: 'http://reclama-tu-premio.online', // enlace-ok: dominio inventado del ejercicio
     esPhishing: true,
     senales: [
       'Un premio que no has solicitado: si es demasiado bueno para ser verdad, no lo es.',
@@ -170,7 +170,7 @@ const CASOS: Caso[] = [
     id: 'web-banco-legit',
     tipo: 'web',
     cuerpo: 'Accedes a la banca online tecleando tú mismo la dirección en el navegador (no desde un enlace). Compruebas la barra de direcciones antes de introducir tus claves.',
-    url: 'https://www.bancounion.es',
+    url: 'https://www.bancounion.es', // enlace-ok: dominio inventado del ejercicio
     esPhishing: false,
     senales: [
       'La conexión es segura (https:// con candado).',
@@ -185,7 +185,7 @@ const CASOS: Caso[] = [
     extra: 'devoluciones@tributos-reembolso.org',
     asunto: 'Tiene una devolución pendiente de 327,50 €',
     cuerpo: 'Le corresponde una devolución de impuestos. Para recibirla, introduzca los datos de su tarjeta bancaria en el formulario seguro antes de que caduque.',
-    url: 'http://tributos-reembolso.org/cobro',
+    url: 'http://tributos-reembolso.org/cobro', // enlace-ok: dominio inventado del ejercicio
     esPhishing: true,
     senales: [
       'Las administraciones no piden los datos de tu tarjeta por correo con un enlace.',

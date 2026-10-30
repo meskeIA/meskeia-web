@@ -15,7 +15,7 @@
 export const dynamic = 'force-static';
 
 const SERVER_CARD = {
-  $schema: 'https://modelcontextprotocol.io/schemas/server-card/v1.0',
+  $schema: 'https://modelcontextprotocol.io/schemas/server-card/v1.0', // enlace-ok: identificador del esquema, no una página
   version: '1.0',
   protocolVersion: '2025-06-18',
   serverInfo: {
