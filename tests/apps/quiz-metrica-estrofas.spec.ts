@@ -1113,7 +1113,8 @@ test.describe('Inspector 29/10/2026 (tarde) · doble clic sobre una opción (136
    * quiz-tabla-periodica: la guarda es compartida.
    */
   test('hallazgo · tras un doble clic en una opción, el foco se queda en «Siguiente», no cae a <body>', async ({ page }) => {
-    test.fail();
+    // REPARADO (3810, /reparar 30/10/2026): useGuardaRafaga devuelve el foco cuando el 2.º toque cae
+    // en un control deshabilitado (testigo de la familia: «doble clic en la opción»).
     await abrir(page);
     await esperarHidratado(page, /^Empezar Quiz/);
     await configurar(page, 'Básico', 10);

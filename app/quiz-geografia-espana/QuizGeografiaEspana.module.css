@@ -260,6 +260,12 @@
 .opcion-seleccionada-mal { border-color: var(--color-fail); background: rgba(239,68,68,0.1); }
 .opcion-seleccionada-mal .opcionLetra { background: #b91c1c; color: white; }
 .opcion-neutral { }
+/* ✓/✗ de la buena y la fallada: no solo el color (hallazgo 3825, WCAG 1.4.1) */
+.opcionMarca { font-size: 1.1rem; font-weight: 700; flex-shrink: 0; }
+.opcion-correcta .opcionMarca { color: #047857; }
+.opcion-seleccionada-mal .opcionMarca { color: #b91c1c; }
+[data-theme='dark'] .opcion-correcta .opcionMarca { color: #4ade80; }
+[data-theme='dark'] .opcion-seleccionada-mal .opcionMarca { color: #fca5a5; }
 
 /* Feedback */
 .feedbackPanel { display: flex; flex-direction: column; gap: 0.75rem; }

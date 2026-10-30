@@ -1096,7 +1096,8 @@ test.describe('Inspector 29/10/2026 (tarde) · re-inspección tras /reparar · e
    * Esperado: foco en «Siguiente pregunta →». Obtenido: <body> (1280 × 800 y 360 × 740).
    */
   test('hallazgo · forma del cabo C0514: tras un doble clic en una opción el foco sigue en «Siguiente»', async ({ page }) => {
-    test.fail(); // ABIERTO — hallazgo nuevo de la re-inspección del 29/10/2026 (tarde)
+    // REPARADO (3816, /reparar 30/10/2026): useGuardaRafaga devuelve el foco cuando el 2.º toque cae
+    // en un control deshabilitado (testigo de la familia: «doble clic en la opción»).
     await abrir(page);
     await esperarBotonHidratado(page, /Comenzar examen/);
     await comenzarExamen(page);

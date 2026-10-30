@@ -69,11 +69,35 @@ export function useGuardaRafaga(): (opciones?: { soloMismoPunto?: boolean }) => 
       if (marca === 'punto' && Math.hypot(e.clientX - x, e.clientY - y) > RADIO_MISMO_PUNTO) return;
       e.preventDefault();
     }
+    /**
+     * ⚠️ 30/10/2026 (cabo C0514, hallazgos 3801, 3802, 3807, 3808, 3810, 3816, 3820 y 3823) — al
+     * contestar, las opciones quedan deshabilitadas y el foco va a «Siguiente». El 2.º toque de la
+     * ráfaga cae sobre la opción ya deshabilitada, y Chrome no le entrega mousedown ni click, solo
+     * pointerdown: `frenarFoco` no lo veía y el navegador soltaba el foco a <body> (luego Enter no
+     * avanzaba). Ni `preventDefault` en el pointerdown evita ese desenfoque, así que se devuelve el
+     * foco adonde estaba en cuanto el navegador lo suelta. Vale para cualquier pulsación sobre un
+     * control deshabilitado: el <body> no es destino para nadie. No toca un foco que va a otro
+     * elemento (un Tab inmediato), solo el que cae a <body>.
+     */
+    function retenerFoco(e: PointerEvent) {
+      const control = e.target instanceof Element ? e.target.closest('button, input, select, textarea') : null;
+      if (!control || !(control as HTMLButtonElement).disabled) return;
+      const activo = document.activeElement;
+      if (!(activo instanceof HTMLElement) || activo === document.body) return;
+      const devolver = () =>
+        setTimeout(() => {
+          if (!document.activeElement || document.activeElement === document.body) activo.focus({ preventScroll: true });
+        }, 0);
+      activo.addEventListener('blur', devolver, { once: true });
+      setTimeout(() => activo.removeEventListener('blur', devolver), 500);
+    }
     window.addEventListener('click', filtrar, true);
     window.addEventListener('mousedown', frenarFoco, true);
+    window.addEventListener('pointerdown', retenerFoco, true);
     return () => {
       window.removeEventListener('click', filtrar, true);
       window.removeEventListener('mousedown', frenarFoco, true);
+      window.removeEventListener('pointerdown', retenerFoco, true);
     };
   }, []);
   return useCallback((opciones?: { soloMismoPunto?: boolean }) => {

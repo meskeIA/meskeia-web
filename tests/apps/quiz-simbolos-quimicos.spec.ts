@@ -2353,7 +2353,8 @@ test.describe('inspector 29/10/2026 (tarde) — re-inspección tras /reparar · 
    * DEBERÍA: tras el doble clic en la opción, el foco sigue en «Siguiente».
    */
   test('hallazgo · el doble clic en una opción no suelta al <body> el foco que tenía «Siguiente»', async ({ page }) => {
-    test.fail(); // ABIERTO (inspector 29/10/2026, tarde)
+    // REPARADO (3801, /reparar 30/10/2026): useGuardaRafaga devuelve el foco cuando el 2.º toque cae
+    // en un control deshabilitado (testigo de la familia: «doble clic en la opción»).
     test.setTimeout(60_000);
     await page.setViewportSize({ width: 1280, height: 800 });
     await abrirHidratada(page);

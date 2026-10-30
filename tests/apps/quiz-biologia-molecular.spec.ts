@@ -2144,7 +2144,8 @@ test.describe('Inspector 29/10/2026 (tarde) — re-inspección tras /reparar', (
    * Lo correcto (invariante de la familia): el foco nunca cae a <body>; tras contestar, en «Siguiente».
    */
   test('hallazgo · tras un doble clic en una opción el foco sigue en «Siguiente» y Enter avanza', async ({ page }) => {
-    test.fail(true, 'ABIERTO (forma del cabo C0514): el foco cae a <body> y Enter no avanza');
+    // REPARADO (3808, /reparar 30/10/2026): useGuardaRafaga devuelve el foco adonde estaba cuando el
+    // 2.º toque cae en un control deshabilitado (testigo de la familia: «doble clic en la opción»).
     await page.setViewportSize({ width: 1280, height: 800 });
     await abrir(page);
     await esperarHidratado(page, /Comenzar quiz/);

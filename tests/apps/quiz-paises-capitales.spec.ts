@@ -1778,7 +1778,8 @@ test.describe('inspector 29/10/2026 (tarde) — re-inspección tras /reparar · 
   });
 
   test('hallazgo · un doble toque en una opción deja el foco en <body> (forma del cabo C0514)', async ({ page }) => {
-    test.fail(); // ABIERTO (nuevo, 29/10/2026 tarde)
+    // REPARADO (3807, /reparar 30/10/2026): useGuardaRafaga devuelve el foco cuando el 2.º toque cae
+    // en un control deshabilitado (testigo de la familia: «doble clic en la opción»).
     // Al contestar, la app lleva el foco a «Siguiente» (page.tsx:206-207) y deja las cuatro opciones
     // disabled (page.tsx:419). Si se contesta con un doble toque y la página no se ha movido bajo el
     // dedo, el 2.º toque cae sobre la opción ya deshabilitada: Chrome no le entrega mousedown ni

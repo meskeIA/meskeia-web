@@ -12,6 +12,7 @@ import {
   ShareCard,
 } from '@/components';
 import { formatPercentage, margenBarraLogo, enfocarSinCentrar } from '@/lib';
+import { useGuardaRafaga } from '@/lib/useGuardaRafaga';
 import {
   PREGUNTAS_GEO_FACIL,
   PREGUNTAS_GEO_MEDIO,
@@ -143,23 +144,17 @@ export default function QuizGeografiaEspanaPage() {
    * Un clic se ignora cuando es el 2.º de una ráfaga (`detail` > 1, que el teclado no produce)
    * Y el clic anterior de la app cambió de pantalla. Va en captura sobre window para alcanzar
    * también los enlaces que no son de la app; un clic suelto cierra la ráfaga.
+   *
+   * ⚠️ 30/10/2026 (hallazgos 3822, 3823 y 3824) — era una copia en línea de la guarda, y se quedó
+   * atrás de la de la familia en tres cosas: no frenaba el mousedown del 2.º toque (el foco iba a lo
+   * que hubiera debajo en la pantalla nueva), no marcaba el contestar con «mismo punto» (dos toques
+   * en una opción baja pulsaban «Siguiente» sin enseñar la explicación) y no retenía el foco cuando
+   * el 2.º toque caía en la opción ya deshabilitada (caía a <body>). Ahora es useGuardaRafaga.
    */
-  const ultimoCambioPantallaRef = useRef(false);
-  useEffect(() => {
-    function filtrar(e: MouseEvent) {
-      if (e.detail > 1 && ultimoCambioPantallaRef.current) {
-        e.preventDefault();
-        e.stopPropagation();
-      } else if (e.detail <= 1) {
-        ultimoCambioPantallaRef.current = false;
-      }
-    }
-    window.addEventListener('click', filtrar, true);
-    return () => window.removeEventListener('click', filtrar, true);
-  }, []);
+  const marcarCambioPantalla = useGuardaRafaga();
 
   const iniciarQuiz = useCallback(() => {
-    ultimoCambioPantallaRef.current = true;
+    marcarCambioPantalla();
     const seleccionadas = seleccionarPreguntas(dificultad);
     setPreguntas(seleccionadas);
     setIndice(0);
@@ -168,10 +163,12 @@ export default function QuizGeografiaEspanaPage() {
     setAciertos(0);
     setErrores([]);
     setFase('jugando');
-  }, [dificultad]);
+  }, [dificultad, marcarCambioPantalla]);
 
   const responder = useCallback((opcion: string) => {
     if (fase !== 'jugando' || !preguntaActual) return;
+    // El foco a «Siguiente» sube la página y puede dejar el botón bajo el dedo (3822, 3679 en la familia)
+    marcarCambioPantalla({ soloMismoPunto: true });
     setSeleccionada(opcion);
     const esCorrecta = opcion === preguntaActual.correcta;
     if (esCorrecta) {
@@ -180,10 +177,10 @@ export default function QuizGeografiaEspanaPage() {
       setErrores(prev => [...prev, { pregunta: preguntaActual.pregunta, correcta: preguntaActual.correcta }]);
     }
     setFase('respondida');
-  }, [fase, preguntaActual]);
+  }, [fase, preguntaActual, marcarCambioPantalla]);
 
   const siguiente = useCallback(() => {
-    ultimoCambioPantallaRef.current = true;
+    marcarCambioPantalla();
     const siguienteIndice = indice + 1;
     if (siguienteIndice >= preguntas.length) {
       setFase('fin');
@@ -193,17 +190,17 @@ export default function QuizGeografiaEspanaPage() {
       setSeleccionada(null);
       setFase('jugando');
     }
-  }, [indice, preguntas]);
+  }, [indice, preguntas, marcarCambioPantalla]);
 
   const reiniciar = useCallback(() => {
-    ultimoCambioPantallaRef.current = true;
+    marcarCambioPantalla();
     setFase('inicio');
     setPreguntas([]);
     setIndice(0);
     setSeleccionada(null);
     setAciertos(0);
     setErrores([]);
-  }, []);
+  }, [marcarCambioPantalla]);
 
   const porcentaje = useMemo(() => {
     if (preguntas.length === 0) return 0;
@@ -318,18 +315,29 @@ export default function QuizGeografiaEspanaPage() {
 
           {/* Opciones */}
           <div className={styles.opcionesGrid} role="group" aria-label="Opciones de respuesta">
-            {opcionesOrdenadas.map((opcion, i) => (
-              <button
-                key={opcion}
-                type="button"
-                className={`${styles.opcionBtn} ${claseOpcion(opcion)}`}
-                onClick={() => responder(opcion)}
-                disabled={fase === 'respondida'}
-              >
-                <span className={styles.opcionLetra} aria-hidden="true">{LETRAS[i]}</span>
-                <span className={styles.opcionTexto}>{opcion}</span>
-              </button>
-            ))}
+            {opcionesOrdenadas.map((opcion, i) => {
+              // Hallazgo 3825 (forma del cabo C0516): la buena y la fallada no pueden distinguirse
+              // solo por el color (WCAG 1.4.1). Receta de quiz-literatura-universal (303): ✓/✗
+              // visibles y aria-hidden, y la marca en el nombre accesible del botón.
+              const esBuena = fase === 'respondida' && opcion === preguntaActual.correcta;
+              const esFallada = fase === 'respondida' && opcion === seleccionada && !esBuena;
+              const marca = esBuena ? ' (respuesta correcta)' : esFallada ? ' (tu respuesta, incorrecta)' : '';
+              return (
+                <button
+                  key={opcion}
+                  type="button"
+                  className={`${styles.opcionBtn} ${claseOpcion(opcion)}`}
+                  onClick={() => responder(opcion)}
+                  disabled={fase === 'respondida'}
+                  aria-label={marca ? `${opcion}${marca}` : undefined}
+                >
+                  <span className={styles.opcionLetra} aria-hidden="true">{LETRAS[i]}</span>
+                  <span className={styles.opcionTexto}>{opcion}</span>
+                  {esBuena && <span className={styles.opcionMarca} aria-hidden="true">✓</span>}
+                  {esFallada && <span className={styles.opcionMarca} aria-hidden="true">✗</span>}
+                </button>
+              );
+            })}
           </div>
 
           {/* Feedback */}

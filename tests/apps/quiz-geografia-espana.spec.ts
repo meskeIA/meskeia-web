@@ -602,6 +602,10 @@ async function segundosQueActuan(page: Page, frac: number, doble: Doble, elegir:
       await page.waitForTimeout(500); // lee la pregunta
       await elegir(page, opciones(page).nth(iC === 3 ? 2 : 3));
       await expect(page.locator('[class*="feedbackMensaje"]')).toBeVisible();
+      // Lee el veredicto: desde 3822 (30/10/2026) un toque en el MISMO punto dentro de la ventana de
+      // ráfaga del que contestó se ignora (useGuardaRafaga, `soloMismoPunto`), que es lo que impide
+      // saltarse la explicación. Sin esta pausa, el 1.º toque en «Siguiente» sería ese 2.º toque.
+      await page.waitForTimeout(500);
     }
     const sig = page.getByRole('button', { name: /Siguiente pregunta|Ver resultado/ });
     const ultimo = /Ver resultado/.test(await sig.innerText());
@@ -1582,6 +1586,9 @@ test.describe('Inspector 29/10/2026 (tarde) · móvil 360 × 640', () => {
       await page.waitForTimeout(200); // la 2.ª mirada de enfocarSinCentrar (120 ms)
       const v = await veredictoALaVista(page);
       if (v !== 'a la vista') fuera.push(`${n} (id ${ficha.id}): ${v}`);
+      // Lee el veredicto antes de avanzar: un toque en el mismo punto dentro de la ventana de ráfaga
+      // del que contestó se ignora desde 3822 (useGuardaRafaga, `soloMismoPunto`)
+      await page.waitForTimeout(400);
       await tocarCentro(page, page.getByRole('button', { name: /Siguiente pregunta|Ver resultado/ }));
     }
     expect(fuera).toEqual([]);
@@ -1604,9 +1611,10 @@ test.describe('Inspector 29/10/2026 (tarde) · móvil 360 × 640', () => {
    * Esperado: sigue «Pregunta n de 20» con su veredicto, su explicación y «Siguiente» (una sola
    * intención). Medido el 29/10/2026: 32 de 32 (8 por caso, a 360 × 640 y 360 × 740, con la opción a
    * 4 y a 20 px del borde) pasan a la pregunta siguiente sin enseñar ni el veredicto ni la explicación.
+   * REPARADO (3822, /reparar 30/10/2026): la guarda en línea se cambió por useGuardaRafaga, y
+   * `responder` marca `soloMismoPunto`.
    */
   test('hallazgo · dos toques en la opción más baja, pegada al borde, no se saltan el veredicto ni la explicación', async ({ page }) => {
-    test.fail();
     test.setTimeout(90_000);
     await abrir(page, { semilla: 2962 });
     await esperarHidratado29(page);
@@ -1633,17 +1641,16 @@ test.describe('Inspector 29/10/2026 (tarde) · móvil 360 × 640', () => {
       await expect(page.locator('[class*="explicacionTexto"]')).toBeVisible();
       await avanzar(page);
     }
-    expect(saltos).toEqual([]); // medido: las 3 vueltas saltan
+    expect(saltos).toEqual([]); // medido antes de 3822: las 3 vueltas saltaban
   });
 
   /**
    * HALLAZGO NUEVO (contenido) — la explicación que escribió la reparación (fa1153c1) pone «17 %» con
    * un espacio normal (U+0020). Regla del 25/09/2026 (CLAUDE.md §2, Ortografía de la RAE de 2010): el
    * «%» va separado con espacio duro (U+00A0), y el código nuevo lo cumple. Esperado «17 %» con
-   * U+00A0 · obtenido U+0020 (data/preguntas-geografia-espana.ts, id 61).
+   * U+00A0 · obtenido U+0020 (data/preguntas-geografia-espana.ts, id 61). REPARADO (3826, 30/10/2026).
    */
   test('hallazgo · la explicación nueva de la id 61 separa el «%» con espacio duro', () => {
-    test.fail();
     const e = PREGUNTAS_GEOGRAFIA.find((p) => p.id === 61)?.explicacion ?? '';
     expect(e).toContain('85.534 km²');
     expect(e).toContain(`17${DURO}%`);
@@ -1660,9 +1667,10 @@ test.describe('Inspector 29/10/2026 (tarde) · escritorio 1280 × 800', () => {
    * el foco; la guarda en línea (solo «click») no lo ve. No cuenta de más ni contesta otra cosa (caso
    * de rechazo del bloque de la mañana). Medido el 29/10/2026: 6 de 6 en Fácil a 1280 × 800, y por
    * toque 6 de 6 a 360 × 740 (la C y la D) y 6 de 6 a 360 × 640.
+   * REPARADO (3823, /reparar 30/10/2026): useGuardaRafaga devuelve el foco cuando el 2.º toque cae en
+   * un control deshabilitado (testigo de la familia: «doble clic en la opción»).
    */
   test('hallazgo · tras un doble clic en una opción, el foco se queda en «Siguiente», no cae a <body>', async ({ page }) => {
-    test.fail();
     test.setTimeout(60_000);
     await abrir(page, { semilla: 2964 });
     await esperarHidratado29(page);
@@ -1679,7 +1687,7 @@ test.describe('Inspector 29/10/2026 (tarde) · escritorio 1280 × 800', () => {
       if (!/^BUTTON«Siguiente pregunta/.test(f)) perdidos.push(`${n}/10: foco en ${f}`);
       await page.getByRole('button', { name: 'Siguiente pregunta →' }).click();
     }
-    expect(perdidos).toEqual([]); // medido: «<body>» las tres veces
+    expect(perdidos).toEqual([]); // medido antes de 3823: «<body>» las tres veces
   });
 
   /**
@@ -1689,9 +1697,9 @@ test.describe('Inspector 29/10/2026 (tarde) · escritorio 1280 × 800', () => {
    * mousedown, que es lo que f0b18db0 añadió a lib/useGuardaRafaga.ts (3768). Esperado (invariante
    * de la familia): el foco en el enunciado nuevo (H2, tabindex −1). Medido el 29/10/2026: en 8 de 8
    * se queda en «⬇️ Ver guía educativa» a 1280 × 800 y en <body> a 360 × 740 (bajo el dedo, un h3).
+   * REPARADO (3824, /reparar 30/10/2026): useGuardaRafaga frena también el mousedown del 2.º clic.
    */
   test('hallazgo · tras un doble clic en «Siguiente», el foco va al enunciado nuevo y no a lo que haya debajo', async ({ page }) => {
-    test.fail();
     test.setTimeout(60_000);
     await abrir(page, { semilla: 2965 });
     await esperarHidratado29(page);
@@ -1708,7 +1716,7 @@ test.describe('Inspector 29/10/2026 (tarde) · escritorio 1280 × 800', () => {
       const f = await focoActual(page);
       if (f !== 'H2:-1') robados.push(`pregunta ${n + 1}: foco en ${await quienTieneElFoco(page)}`);
     }
-    expect(robados).toEqual([]); // medido: «⬇️ Ver guía educativa» las tres veces
+    expect(robados).toEqual([]); // medido antes de 3824: «⬇️ Ver guía educativa» las tres veces
   });
 
   /**
@@ -1721,9 +1729,9 @@ test.describe('Inspector 29/10/2026 (tarde) · escritorio 1280 × 800', () => {
    * y «(respuesta correcta)» / «(tu respuesta, incorrecta)» en el nombre.
    * A mano: Fácil, fallar la 1.ª con la A (o la B si la A es la buena) → esperado que el texto o el
    * nombre accesible de la buena y de la fallada cambien al contestar.
+   * REPARADO (3825, /reparar 30/10/2026): ✓/✗ visibles (aria-hidden) y la marca en el aria-label.
    */
   test('hallazgo · la opción correcta y la fallada no se distinguen solo por el color', async ({ page }) => {
-    test.fail();
     await abrir(page, { semilla: 2966 });
     await esperarHidratado29(page);
     await arrancar(page, 'Fácil');

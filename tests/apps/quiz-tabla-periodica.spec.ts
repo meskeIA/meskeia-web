@@ -1949,7 +1949,8 @@ test.describe('Quiz Tabla Periódica · inspector 29/10/2026 (tarde) — re-insp
    * DEBERÍA: tras el doble toque, el foco sigue en «Siguiente pregunta →».
    */
   test('caso 33 · accesibilidad: un doble toque en una opción deja el foco en «Siguiente pregunta», no en <body>', async ({ page }) => {
-    test.fail(); // HALLAZGO abierto: falla por la aserción final, no por el montaje
+    // REPARADO (3802, /reparar 30/10/2026): useGuardaRafaga devuelve el foco cuando el 2.º toque cae
+    // en un control deshabilitado (testigo de la familia: «doble clic en la opción»).
     await empezarConBanco(page, 'Empezar quiz', PRIMERAS_DIEZ);
     const t1 = (await opciones(page).allInnerTexts()).map(limpiar);
     await opciones(page).nth(t1.indexOf('79')).tap();

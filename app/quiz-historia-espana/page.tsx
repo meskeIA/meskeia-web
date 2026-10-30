@@ -164,6 +164,10 @@ export default function QuizHistoriaEspanaPage() {
 
   const responder = useCallback((opcion: string) => {
     if (fase !== 'jugando' || !preguntaActual) return;
+    // El 2.º clic de un doble clic en el mismo punto no mueve el foco que va a «Siguiente», ni
+    // pulsa lo que quede debajo (3679 en la familia; cabo C0514, 30/10/2026: era la única hermana
+    // que no lo marcaba, y a 1920 × 1080 el foco caía a <body>)
+    marcarCambioPantalla({ soloMismoPunto: true });
     setSeleccionada(opcion);
     const esCorrecta = opcion === preguntaActual.correcta;
     if (esCorrecta) {
@@ -172,7 +176,7 @@ export default function QuizHistoriaEspanaPage() {
       setErrores(prev => [...prev, { pregunta: preguntaActual.pregunta, correcta: preguntaActual.correcta }]);
     }
     setFase('respondida');
-  }, [fase, preguntaActual]);
+  }, [fase, preguntaActual, marcarCambioPantalla]);
 
   const siguiente = useCallback(() => {
     marcarCambioPantalla();

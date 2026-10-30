@@ -358,6 +358,44 @@ for (const h of HERMANAS) {
     });
 
     /**
+     * Cabo C0514, variante de la OPCIÓN (hallazgos 3801, 3802, 3807, 3808, 3810, 3816, 3820 y 3823,
+     * 29/10/2026): al contestar, las opciones quedan deshabilitadas y el foco va a «Siguiente». El
+     * 2.º clic de un doble clic cae sobre la opción ya deshabilitada, y Chrome no le entrega
+     * mousedown ni click, solo pointerdown: el freno del mousedown de useGuardaRafaga no lo veía y
+     * el navegador soltaba el foco a <body>; luego Enter no avanzaba. Ratón de verdad en el mismo
+     * punto, a 1280 × 800 y 1920 × 1080 (donde lo midió el Inspector en reinos-naturaleza), en la
+     * primera pregunta. Esperado: el foco no cae a <body> (en mitos-ciencia va a la revelación).
+     */
+    test('doble clic en la opción: el foco no cae a <body>', async ({ page }) => {
+      test.skip(Boolean(h.dobleToque?.omitido), h.dobleToque?.omitido);
+      test.setTimeout(90_000);
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+      const opciones = page.locator('button:visible').filter({ hasText: h.opcion ?? /^\s*A\S/ });
+      const habilitadas = () => opciones.evaluateAll((bs) => bs.filter((b) => !(b as HTMLButtonElement).disabled).length);
+      const caidas: string[] = [];
+      for (const viewport of [{ width: 1280, height: 800 }, { width: 1920, height: 1080 }]) {
+        await page.setViewportSize(viewport);
+        await page.goto(`/${h.slug}/`);
+        for (const boton of h.arranque) await pulsarHidratado(page, boton);
+        await esperarHidratado(page, h.opcion ?? /^\s*A\S/);
+        const opcion = opciones.first();
+        await opcion.scrollIntoViewIfNeeded();
+        await page.waitForTimeout(350);
+        const caja = (await opcion.boundingBox())!;
+        await page.mouse.move(caja.x + caja.width / 2, caja.y + caja.height / 2);
+        await page.mouse.down({ clickCount: 1 });
+        await page.mouse.up({ clickCount: 1 });
+        await expect.poll(habilitadas, { intervals: [20], timeout: 3000 }).toBe(0);
+        await page.waitForTimeout(80);
+        await page.mouse.down({ clickCount: 2 });
+        await page.mouse.up({ clickCount: 2 });
+        await page.waitForTimeout(300);
+        if ((await dondeFoco(page)) === 'body') caidas.push(`${viewport.width} × ${viewport.height}`);
+      }
+      expect(caidas, 'tras el doble clic en la opción, el foco cayó a <body>').toEqual([]);
+    });
+
+    /**
      * Hallazgo 3770 (quiz-literatura-universal, 29/10/2026): al contestar, `focus()` a secas en
      * «Siguiente» deja que Chrome lo CENTRE, y con una explicación larga la página baja de golpe y
      * el veredicto se va bajo la píldora del logo. A 360 × 640, en las cinco primeras preguntas:

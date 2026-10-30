@@ -860,7 +860,8 @@ test.describe('inspector 29/10/2026 (tarde) · doble clic en una opción, escrit
   test.use({ viewport: { width: 1920, height: 1080 } });
 
   test('hallazgo · el 2.º clic de un doble clic en una opción no tira el foco a <body>', async ({ page }) => {
-    test.fail(); // ABIERTO (29/10/2026 tarde) — forma del cabo C0514: la opción contestada queda
+    // REPARADO (3820, /reparar 30/10/2026): useGuardaRafaga devuelve el foco cuando el 2.º toque cae
+    // en un control deshabilitado. Era — forma del cabo C0514: la opción contestada queda
     // disabled y el 2.º clic solo entrega pointerdown (ni mousedown ni click), así que el freno de
     // lib/useGuardaRafaga.ts no lo ve y el foco, que ya estaba en «Siguiente», cae a <body>. Medido:
     // 1920 × 1080 en 3 de 4 opciones (B, C, D de la 2.ª pregunta) y 412 × 915 con toques, 2 de 4.

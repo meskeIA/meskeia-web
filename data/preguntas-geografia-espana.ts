@@ -585,7 +585,7 @@ export const PREGUNTAS_GEOGRAFIA: PreguntaGeografia[] = [
     pregunta: '¿Qué río tiene la mayor cuenca hidrográfica dentro de España?',
     opciones: ['Ebro', 'Guadalquivir', 'Tajo', 'Duero'],
     correcta: 'Ebro',
-    explicacion: 'El Ebro tiene la cuenca hidrográfica más extensa de España: 85.534 km², el 17 % del territorio peninsular español (Confederación Hidrográfica del Ebro). El Duero tiene la mayor cuenca de la Península Ibérica si se cuenta su parte portuguesa, pero en territorio español cubre 78.859 km² (Confederación Hidrográfica del Duero).',
+    explicacion: 'El Ebro tiene la cuenca hidrográfica más extensa de España: 85.534 km², el 17 % del territorio peninsular español (Confederación Hidrográfica del Ebro). El Duero tiene la mayor cuenca de la Península Ibérica si se cuenta su parte portuguesa, pero en territorio español cubre 78.859 km² (Confederación Hidrográfica del Duero).',
     categoria: 'rios',
     dificultad: 'dificil',
   },
