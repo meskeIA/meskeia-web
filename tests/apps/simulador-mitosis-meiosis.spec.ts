@@ -1024,6 +1024,12 @@ test.describe('reinspección 25/09/2026 — hallazgos reparados el 26/09/2026', 
     await elegirModo(page, 'Meiosis');
     await expect(page.getByRole('tab')).toHaveCount(9);
     await abrirBloqueEducativo(page);
+    // ⚠️ Inspector 30/10/2026 (cabo C0087 a, hallazgo «6/9 fases» del bloque de abajo): estos dos
+    // expect FIJAN el texto que ese hallazgo da por incorrecto: «9 fases» cuenta la interfase como
+    // fase de la meiosis, y la FAQPage de la propia app dice que la interfase no forma parte de la
+    // división. Que pasen no lo hace correcto. Lo que este test protege es que la cifra salga del
+    // motor (FASES_MEIOSIS.length) y no a mano; al reparar, cambiar aquí la redacción esperada
+    // («9 etapas» o la que se elija), no borrar el test.
     await expect(page.locator('td', { hasText: 'meiosis I + meiosis II' })).toContainText('9 fases');
     await expect(page.locator('meta[name="description"]')).toHaveAttribute(
       'content',
@@ -1293,6 +1299,11 @@ test.describe('Inspector 30/09/2026 — casos a mano', () => {
     await expect(page.getByRole('tab')).toHaveCount(9);
     await abrirBloqueEducativo(page);
     const fila = page.locator('tr', { hasText: 'Número de divisiones' });
+    // ⚠️ Inspector 30/10/2026 (cabo C0087 a): estos dos expect FIJAN el texto que el hallazgo
+    // «6/9 fases» del bloque de abajo da por incorrecto. «1 (6 fases)» cuenta la interfase y la
+    // citocinesis como fases de la mitosis, y la FAQPage de metadata.ts (reparada en el 2503)
+    // dice «La mitosis, o división del núcleo, tiene cuatro fases». Que pasen no lo hace correcto:
+    // al reparar, cambiar aquí la redacción esperada, no borrar el test.
     await expect(fila).toContainText('1 (6 fases)');
     await expect(fila).toContainText('2 (meiosis I + meiosis II, 9 fases)');
   });
@@ -1574,5 +1585,387 @@ test.describe('Inspector 30/09/2026 — hallazgos REPARADOS el 30/09/2026 (2500-
     expect(c6).toContain('12 cromosomas × 2');
     expect(c6).toContain('6 × 4');
     expect(c6).toContain('has sumado las 2 células');
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// Inspector 30/10/2026 — reinspección tras 4fc83bcd (rótulos de pista y solución con la página
+// traducida), aced16e6 (Auto/Pausa en un span por rama) y el cabo C0087
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/**
+ * RESUELTOS A MANO ANTES DE ABRIR LA APP (n = 2n / 2). Biología: la fase S duplica cada
+ * cromosoma en dos cromátidas hermanas; se cuentan centrómeros; la anafase I separa homólogos y
+ * es la única que reduce; la anafase de la mitosis y la anafase II separan hermanas y el
+ * recuento por polo no baja; en la anafase y la telofase la célula aún no se ha partido y
+ * contiene los dos polos; segregación independiente = 2^n. Ninguna cifra sale de la app.
+ *
+ *   CASO D · normal — la baraja ENTERA del modo práctica con fórmulas escritas aquí:
+ *     mitosis  metafase  cromosomas/célula 2n · cromátidas/célula 2·2n
+ *              anafase   cromosomas/polo 2n · cromosomas/célula 2·2n (los dos polos dentro)
+ *              citocinesis cromosomas/célula 2n
+ *     meiosis  metafase I cromátidas/célula 2·2n · anafase I cromosomas/polo n, cromátidas/polo 2n
+ *              metafase II cromosomas/célula n · anafase II cromosomas/polo n
+ *              telofase II cromosomas/célula n · en total 4 × n · gametos distintos 2^n
+ *     y en pantalla (hora fija → semilla, leída en página recién cargada):
+ *       1790337600105 · 2n = 10, meiosis, anafase I, cromosomas por polo → 10 / 2 = 5; «10» se
+ *                       alcanza por dos caminos: cromátidas o sin reducción (5 × 2) y la célula
+ *                       entera (5 + 5)
+ *       1790337600122 · 2n = 6, meiosis, anafase I, cromátidas por polo → 3 × 2 = 6
+ *       1790337600148 · 2n = 14, mitosis, metafase, cromátidas por célula → 14 × 2 = 28
+ *     (cada hora leída en una página recién cargada: en cadena, la 121 repite el enunciado de la
+ *     120 y `nuevaPractica` salta a la 122, así que una exploración seguida queda corrida)
+ *   CASO E · límite
+ *       1790337600125 · 2n = 16 (el máximo de la baraja), mitosis, anafase, cromosomas en CADA
+ *                       célula → 16 por polo × 2 = 32; «16» es contar un solo polo (la MITAD)
+ *       1790337600130 · 2n = 4 (el mínimo), meiosis, anafase I, cromátidas por polo → 2 × 2 = 4
+ *       última fase de la meiosis: 4 células, cada una con su contorno, y «Resultado: 4 células (n=2)»
+ *   CASO F · rechazo — con el 32 de arriba: «32,5» no es un recuento; «1e1» y «treinta y dos» no
+ *       son un número; «-32» es negativo. En el motor, 2n = 9 y 2n = 4,5 no existen.
+ *   Contenido de ADN (c): la app no lo calcula ni lo muestra en ninguna fase; no hay nada que cotejar.
+ */
+
+const SEMILLAS_30_10 = [
+  { t: 1790337600105, dosN: '2n = 10', fase: 'Anafase I', pide: 'recibe CADA POLO', valor: '5' },
+  { t: 1790337600122, dosN: '2n = 6', fase: 'Anafase I', pide: 'CROMÁTIDAS hay en CADA POLO', valor: '6' },
+  { t: 1790337600148, dosN: '2n = 14', fase: 'Metafase', pide: 'CROMÁTIDAS hay en CADA CÉLULA', valor: '28' },
+  { t: 1790337600125, dosN: '2n = 16', fase: 'Anafase', pide: 'CROMOSOMAS (no cromátidas) hay en CADA CÉLULA', valor: '32' },
+  { t: 1790337600130, dosN: '2n = 4', fase: 'Anafase I', pide: 'CROMÁTIDAS hay en CADA POLO', valor: '4' },
+];
+
+async function practicaConHora(page: Page, t: number): Promise<void> {
+  await page.clock.setFixedTime(new Date(t));
+  await page.reload();
+  await esperarHidratacion(page, [ENTRADA_CASOS]);
+  await seccionCasos(page).getByRole('button', { name: /Practicar/ }).click();
+}
+
+/** Dos fotogramas: el canvas se pinta en un efecto, después de que el texto de la fase cambie. */
+const esperarDibujo = (page: Page) =>
+  page.evaluate(() => new Promise<void>((r) => requestAnimationFrame(() => requestAnimationFrame(() => r()))));
+
+/**
+ * Porcentaje de un anillo (radio = `fraccion` × radio de la célula) con trazo azul de membrana
+ * #2E86AB, en la PRIMERA célula de la fase. Misma geometría que `dibujar()` de page.tsx: una
+ * célula de radio 0,38·mín(W, H); dos de 0,38·mín(W/2, H) separadas 0,25 radios; cuatro de
+ * 0,4·mín(W/2, H/2). fraccion = 1 es la membrana plasmática; 0,55, la envoltura nuclear.
+ */
+async function coberturaAnillo(page: Page, celulas: 1 | 2 | 4, fraccion: number): Promise<number> {
+  return page.evaluate(
+    ({ celulas, fraccion }) => {
+      const canvas = document.querySelector('canvas') as HTMLCanvasElement;
+      const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+      const dpr = canvas.width / canvas.offsetWidth;
+      const W = canvas.offsetWidth;
+      const H = canvas.offsetHeight;
+      let R: number;
+      let cx: number;
+      let cy: number;
+      if (celulas === 1) {
+        R = Math.min(W, H) * 0.38;
+        cx = W / 2;
+        cy = H / 2;
+      } else if (celulas === 2) {
+        R = Math.min(W / 2, H) * 0.38;
+        cx = W / 2 - R * 1.25;
+        cy = H / 2;
+      } else {
+        R = Math.min(W / 2, H / 2) * 0.4;
+        cx = W / 2 - R * 1.18;
+        cy = H / 2 - R * 1.18;
+      }
+      const datos = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+      const radio = R * fraccion;
+      let cubiertos = 0;
+      for (let a = 0; a < 360; a++) {
+        const t = (a * Math.PI) / 180;
+        for (let d = -4; d <= 4; d += 0.5) {
+          const X = Math.round((cx + (radio + d) * Math.cos(t)) * dpr);
+          const Y = Math.round((cy + (radio + d) * Math.sin(t)) * dpr);
+          const i = (Y * canvas.width + X) * 4;
+          const [r, g, b] = [datos[i], datos[i + 1], datos[i + 2]];
+          // el azul de membrana con alfa >= ~0,4 sobre el fondo claro u oscuro; el teal de los
+          // cromosomas (g ≈ b), el gris del huso y el relleno del núcleo (15 %) quedan fuera
+          if (b - r > 50 && b - g > 15 && r < 200) {
+            cubiertos++;
+            break;
+          }
+        }
+      }
+      return Math.round((cubiertos / 360) * 100);
+    },
+    { celulas, fraccion }
+  );
+}
+
+/** El mismo traductor simulado que tests/apps/casos-aula-pagina-traducida.spec.ts. */
+const traducirPagina = (page: Page) =>
+  page.evaluate(() => {
+    const caminante = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+      acceptNode: (n) => {
+        const padre = n.parentElement;
+        if (!padre || !(n.nodeValue ?? '').trim()) return NodeFilter.FILTER_REJECT;
+        if (/^(SCRIPT|STYLE|OPTION|NOSCRIPT|FONT)$/.test(padre.tagName)) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      },
+    });
+    const nodos: Text[] = [];
+    while (caminante.nextNode()) nodos.push(caminante.currentNode as Text);
+    for (const nodo of nodos) {
+      const exterior = document.createElement('font');
+      const interior = document.createElement('font');
+      interior.textContent = nodo.nodeValue;
+      exterior.appendChild(interior);
+      nodo.parentNode?.replaceChild(exterior, nodo);
+    }
+  });
+
+/** Respuesta de la FAQPage (JSON-LD) cuya pregunta casa con `patron`. */
+async function respuestaFaqLd(page: Page, patron: string): Promise<string | null> {
+  return page.evaluate((p) => {
+    for (const s of document.querySelectorAll('script[type="application/ld+json"]')) {
+      const datos = JSON.parse(s.textContent ?? '{}');
+      if (datos['@type'] !== 'FAQPage') continue;
+      for (const q of datos.mainEntity) {
+        if (new RegExp(p).test(q.name)) return String(q.acceptedAnswer.text);
+      }
+    }
+    return null;
+  }, patron);
+}
+
+const rotuloResultado = (page: Page) => page.locator('[class*="resultadoCell"]');
+
+test.describe('Inspector 30/10/2026 — casos a mano', () => {
+  test.beforeEach(async ({ page }) => {
+    await esperarHidratacion(page, [ENTRADA_CASOS]);
+  });
+
+  test('CASO D · la baraja entera del modo práctica cuadra con las fórmulas escritas a mano', () => {
+    type Formula = (dosN: number) => number;
+    const aMano: Record<string, Formula> = {
+      'mitosis|metafase|cromosomas-en-celula': (d) => d,
+      'mitosis|metafase|cromatidas-en-celula': (d) => 2 * d,
+      'mitosis|anafase|cromosomas-por-polo': (d) => d,
+      'mitosis|anafase|cromosomas-en-celula': (d) => 2 * d,
+      'mitosis|citocinesis|cromosomas-en-celula': (d) => d,
+      'meiosis|metafase-i|cromatidas-en-celula': (d) => 2 * d,
+      'meiosis|anafase-i|cromosomas-por-polo': (d) => d / 2,
+      'meiosis|anafase-i|cromatidas-por-polo': (d) => d,
+      'meiosis|metafase-ii|cromosomas-en-celula': (d) => d / 2,
+      'meiosis|anafase-ii|cromosomas-por-polo': (d) => d / 2,
+      'meiosis|telofase-ii|cromosomas-en-celula': (d) => d / 2,
+      'meiosis|telofase-ii|cromosomas-totales': (d) => 4 * (d / 2),
+      'meiosis|telofase-ii|gametos-distintos': (d) => 2 ** (d / 2),
+    };
+    // Las 13 plantillas con los 7 valores de 2n de la baraja (4 a 16)
+    for (const [clave, formula] of Object.entries(aMano)) {
+      const [division, faseId, magnitud] = clave.split('|') as ['mitosis' | 'meiosis', string, MagnitudCaso];
+      for (const dosN of [4, 6, 8, 10, 12, 14, 16]) {
+        expect(resolverCaso({ division, faseId, dosN, magnitud }).valor, `${clave} · 2n = ${dosN}`).toBe(
+          formula(dosN)
+        );
+      }
+    }
+    // Y lo que de verdad sale al alumno: 300 semillas, ninguna fuera de esas plantillas
+    for (let semilla = 1; semilla <= 300; semilla++) {
+      const e = generarEjercicioAleatorio(semilla);
+      const clave = `${e.datos.division}|${e.datos.faseId}|${e.datos.magnitud}`;
+      expect(aMano[clave], `semilla ${semilla}: plantilla no prevista ${clave}`).toBeDefined();
+      expect(e.respuesta, `semilla ${semilla} · ${clave} · 2n = ${e.datos.dosN}`).toBe(aMano[clave](e.datos.dosN));
+    }
+  });
+
+  test('CASO D y E · práctica en pantalla: 2n = 10, 6 y 14, y los extremos 2n = 16 y 2n = 4', async ({ page }) => {
+    test.setTimeout(90000);
+    for (const s of SEMILLAS_30_10) {
+      await practicaConHora(page, s.t);
+      const enunciado = seccionCasos(page).locator('h3 + p');
+      await expect(enunciado, `hora ${s.t}`).toContainText(s.dosN);
+      await expect(enunciado, `hora ${s.t}`).toContainText(`En la ${s.fase},`);
+      await expect(enunciado, `hora ${s.t}`).toContainText(s.pide);
+      expect(await responder(page, s.valor), `hora ${s.t}`).toContain('¡Correcto!');
+    }
+    // 2n = 10, anafase I: «10» son las cromátidas / el 2n sin reducir, y la célula con sus dos polos
+    await practicaConHora(page, 1790337600105);
+    const diez = await responder(page, '10');
+    expect(diez).toContain('dos caminos');
+    expect(diez).toContain('reducción');
+    expect(diez).toContain('célula entera');
+    // 2n = 16, anafase de la mitosis, en la célula: «16» es un solo polo
+    await practicaConHora(page, 1790337600125);
+    expect(await responder(page, '16')).toContain('has contado un solo polo');
+  });
+
+  test('CASO E · última fase de la meiosis: 4 células con su contorno y el rótulo final', async ({ page }) => {
+    await elegirModo(page, 'Meiosis');
+    await irAFase(page, 'Telofase II / Citocinesis II');
+    await esperarDibujo(page);
+    // Membrana plasmática completa (3 px) en la primera de las cuatro células
+    expect(await coberturaAnillo(page, 4, 1)).toBeGreaterThanOrEqual(95);
+    await expect(rotuloResultado(page)).toContainText('Resultado: 4 células (n=2)');
+    await expect(page.getByRole('button', { name: 'Fase siguiente' })).toBeDisabled();
+  });
+
+  test('CASO F · se rechaza lo que no es un recuento, en pantalla y en el motor', async ({ page }) => {
+    await practicaConHora(page, 1790337600125); // 2n = 16, anafase, en la célula: esperado 32
+    expect(await responder(page, '32,5')).toContain('número entero');
+    expect(await responder(page, '1e1')).toContain('Escribe un número entero');
+    expect(await responder(page, 'treinta y dos')).toContain('Escribe un número entero');
+    expect(await responder(page, '-32')).toContain('No es correcto');
+    // En el motor: no hay 2n impar ni fraccionario
+    const metafaseII = FASES_MEIOSIS.find((f) => f.id === 'metafase-ii')!;
+    expect(escalarFase(metafaseII, 4.5)).toBeNull();
+    const impar = resolverCaso({ division: 'mitosis', faseId: 'anafase', dosN: 9, magnitud: 'cromosomas-por-polo' });
+    expect(impar.ok).toBe(false);
+    expect(impar.error).toContain('entero y par');
+  });
+
+  test('4fc83bcd y aced16e6 aguantan: con la página traducida, pista, solución y Auto/Pausa cambian de rótulo', async ({
+    page,
+  }) => {
+    const errores: string[] = [];
+    page.on('pageerror', (e) => errores.push(String(e)));
+    const sec = seccionCasos(page);
+    await traducirPagina(page);
+    const pista = sec.locator('[class*="casoAyudaBoton"]').first();
+    await pista.click();
+    await expect(pista).toHaveAttribute('aria-expanded', 'true');
+    await expect(pista).toContainText('Ocultar pista');
+    await traducirPagina(page);
+    const solucion = sec.locator('[class*="casoAyudaBoton"]').nth(1);
+    await solucion.click();
+    await expect(solucion).toContainText('Ocultar solución');
+    await traducirPagina(page);
+    const auto = page.locator('button[aria-label*="reproducción automática"]');
+    await auto.click();
+    await expect(auto).toContainText('Pausa');
+    await auto.click();
+    await expect(auto).toContainText('Auto');
+    expect(errores).toEqual([]);
+  });
+});
+
+test.describe('Inspector 30/10/2026 — hallazgos', () => {
+  test.beforeEach(async ({ page }) => {
+    await esperarHidratacion(page, [ENTRADA_CASOS]);
+  });
+
+  test('HALLAZGO (C0087 a) · la tabla y la meta description cuentan interfase y citocinesis como fases', async ({
+    page,
+  }) => {
+    test.fail();
+    // ABIERTO (inspector 30/10/2026). La propia app, tras el 2503:
+    //   FAQPage (metadata.ts): «La mitosis, o división del núcleo, tiene cuatro fases: profase (…),
+    //   metafase (…), anafase (…) y telofase (…)» y «La interfase … no forma parte de la mitosis».
+    //   Truco visible: «la mitosis propiamente dicha es PMAT».
+    // Pero la tabla visible dice «1 (6 fases)» y «2 (meiosis I + meiosis II, 9 fases)», y la meta
+    // description «mitosis (6 fases) y meiosis (9 fases)»: cuentan la interfase (y en la mitosis
+    // la citocinesis) como fases de la división. A mano: mitosis = 4 fases (5 con prometafase);
+    // meiosis = 8 (profase I … telofase II). Las seis y las nueve son ETAPAS del recorrido, como
+    // ya dice el WebApplication del JSON-LD («6 etapas, de la interfase a la citocinesis»).
+    // Los expect de «CASO B · el 2n más pequeño…» (30/09) y «HALLAZGO 2154» fijan el texto actual.
+    await abrirBloqueEducativo(page);
+    const celdas = await page.locator('tr', { hasText: 'Número de divisiones' }).locator('td').allTextContents();
+    const meta = (await page.locator('meta[name="description"]').getAttribute('content')) ?? '';
+    expect(celdas[1], 'celda de la mitosis').not.toMatch(/\b6 fases\b/);
+    expect(celdas[2], 'celda de la meiosis').not.toMatch(/\b9 fases\b/);
+    expect(meta).not.toMatch(/mitosis \(6 fases\)/);
+    expect(meta).not.toMatch(/meiosis \(9 fases\)/);
+  });
+
+  test('HALLAZGO (C0087 b) · la membrana plasmática no desaparece: lo que se disuelve es la envoltura nuclear', async ({
+    page,
+  }) => {
+    test.fail();
+    // ABIERTO (inspector 30/10/2026). `dibujarCelula` gobierna el CONTORNO DE LA CÉLULA con
+    // `fase.membrana`, que en el motor es el estado de la membrana NUCLEAR («La membrana nuclear
+    // comienza a desintegrarse»). A mano: la membrana plasmática está en todas las fases (≥ 85 %
+    // del anillo, con margen para un surco de citocinesis); en la profase la que se desintegra es
+    // la envoltura nuclear, que debería salir discontinua como la app pinta lo que «se disuelve».
+    // Medido el 30/10/2026 a 480 px (claro y oscuro igual): Interfase 100 % · Profase 64 %
+    // (discontinua) · Metafase 0 % · Anafase 0 % · Telofase 93 % a 1 px (lineWidth = 0 no tiene
+    // efecto) · Metafase I, Anafase I, Metafase II y Anafase II 0 %; y en las tres profases la
+    // envoltura nuclear sale CONTINUA (98-100 %). Sin contorno, lo único que delimita la célula es
+    // su relleno, a 1,07:1 del fondo en claro y 1,13:1 en oscuro.
+    const fases: [string, 'Mitosis' | 'Meiosis', 1 | 2][] = [
+      ['Interfase', 'Mitosis', 1],
+      ['Profase', 'Mitosis', 1],
+      ['Metafase', 'Mitosis', 1],
+      ['Anafase', 'Mitosis', 1],
+      ['Telofase', 'Mitosis', 1],
+      ['Profase I', 'Meiosis', 1],
+      ['Metafase I', 'Meiosis', 1],
+      ['Anafase I', 'Meiosis', 1],
+      ['Profase II', 'Meiosis', 2],
+      ['Metafase II', 'Meiosis', 2],
+      ['Anafase II', 'Meiosis', 2],
+    ];
+    const sinContorno: string[] = [];
+    const nucleoContinuoEnProfase: string[] = [];
+    let modo: 'Mitosis' | 'Meiosis' = 'Mitosis';
+    for (const [fase, division, celulas] of fases) {
+      if (division !== modo) {
+        await elegirModo(page, division);
+        modo = division;
+      }
+      await irAFase(page, fase);
+      await esperarDibujo(page);
+      const plasmatica = await coberturaAnillo(page, celulas, 1);
+      if (plasmatica < 85) sinContorno.push(`${fase}: ${plasmatica} %`);
+      if (fase.startsWith('Profase')) {
+        const nuclear = await coberturaAnillo(page, celulas, 0.55);
+        if (nuclear >= 90) nucleoContinuoEnProfase.push(`${fase}: ${nuclear} %`);
+      }
+    }
+    expect({ sinContorno, nucleoContinuoEnProfase }).toEqual({ sinContorno: [], nucleoContinuoEnProfase: [] });
+  });
+
+  test('HALLAZGO · con la página traducida, el rótulo de resultado se queda en el de la interfase', async ({
+    page,
+  }) => {
+    test.fail();
+    // ABIERTO (inspector 30/10/2026). Es la forma del 3297 que 4fc83bcd reparó en los botones de
+    // pista y solución: `<span aria-hidden>🔬</span> {resultadoTexto}` deja el texto como nodo
+    // suelto junto a su hermano, el traductor lo cambia por <font> y React sigue escribiendo en el
+    // nodo retirado. A mano: en la citocinesis de la mitosis el rótulo es «Resultado: 2 células
+    // (2n=4)» (6 fases, la última). Medido: sigue «División: mitosis → 2 células hijas», y también
+    // en la Telofase II de la meiosis, donde lo correcto es «Resultado: 4 células (n=2)».
+    await traducirPagina(page);
+    await irAFase(page, 'Citocinesis');
+    await expect(rotuloResultado(page)).toContainText('Resultado: 2 células (2n=4)', { timeout: 3000 });
+  });
+
+  test('HALLAZGO · la pregunta del crossing-over está en las dos FAQ con respuestas distintas', async ({
+    page,
+  }) => {
+    test.fail();
+    // ABIERTO (inspector 30/10/2026). Visible: «¿Qué es el crossing-over y para qué sirve?» —
+    // «Es el intercambio de segmentos de ADN entre cromátidas no hermanas de cromosomas homólogos
+    // durante la Profase I…». FAQPage: «¿Qué ocurre en el crossing-over y por qué es importante?»
+    // — «…cuando cromosomas homólogos intercambian segmentos de ADN en puntos llamados quiasmas…
+    // Es el principal mecanismo de variabilidad genética…». La reparación es UNA constante en
+    // metadata.ts que importen las dos bocas.
+    await abrirBloqueEducativo(page);
+    const visible = await page
+      .locator('[class*="faqItem"]', { hasText: '¿Qué es el crossing-over' })
+      .locator('p')
+      .first()
+      .innerText();
+    const estructurada = await respuestaFaqLd(page, 'crossing-over');
+    const normal = (s: string | null) => (s ?? '').replace(/\s+/g, ' ').trim();
+    expect(normal(estructurada)).toBe(normal(visible));
+  });
+
+  test('HALLAZGO · la FAQPage llama «gametos» a las cuatro células de la meiosis', async ({ page }) => {
+    test.fail();
+    // ABIERTO (inspector 30/10/2026). FAQPage: «La meiosis, en cambio, produce cuatro células hijas
+    // con la mitad de cromosomas (n), llamadas gametos». La propia app es más precisa en la
+    // Telofase II («Estas son las células que pueden convertirse en gametos») y en el caso 10
+    // («las que pueden convertirse en gametos»): en la ovogénesis solo una de ellas es el óvulo y
+    // las otras son corpúsculos polares, y en las plantas la meiosis da esporas.
+    const respuesta = await respuestaFaqLd(page, 'diferencia entre mitosis y meiosis');
+    expect(respuesta).not.toBeNull();
+    expect(respuesta).not.toMatch(/llamadas gametos/);
   });
 });

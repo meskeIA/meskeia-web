@@ -757,14 +757,17 @@ test.describe('Inspector 27/09/2026 · móvil 393×851', () => {
 // ════════════════════════════════════════════════════════════════════════════════════════
 //
 // Entró por la sospecha del 27/09/2026 (SOSPECHAS.md): «el editor no admite arrastre táctil (no
-// tiene manejadores touch) ni se puede usar con teclado (el SVG es role=img)». Medido en
+// tiene manejadores touch) ni se puede usar con teclado (el SVG es role=img)». Medido entonces en
 // navegador, 390×844 con isMobile y hasTouch:
-//   · CREAR, CONECTAR, MARCAR y BORRAR con el dedo SÍ funcionan: son toques, y el navegador los
+//   · CREAR, CONECTAR, MARCAR y BORRAR con el dedo SÍ funcionaban: son toques, y el navegador los
 //     convierte en clics. El autómata del caso normal móvil se construye entero así.
-//   · ARRASTRAR un estado con el dedo NO lo mueve: la app solo escucha mousedown/mousemove, que
-//     un gesto de arrastre táctil no produce; el dedo desplaza la página (37 px medidos).
-//   · Con TECLADO no hay ninguna ruta al lienzo: 0 elementos enfocables dentro del editor.
-//   · El lienzo NO atrapa el desplazamiento (touch-action: auto, y 49 px libres a cada lado).
+//   · ARRASTRAR un estado con el dedo NO lo movía: la app solo escuchaba mousedown/mousemove, que
+//     un gesto de arrastre táctil no produce; el dedo desplazaba la página (37 px medidos).
+//     REPARADO el 30/09/2026 (hallazgo 2469) con eventos de puntero; re-verificado el 30/10/2026.
+//   · Con TECLADO no había ninguna ruta al lienzo: 0 elementos enfocables dentro del editor.
+//     REPARADO el 30/09/2026 (hallazgo 2470): «El autómata en texto», bajo el lienzo.
+//   · El lienzo NO atrapa el desplazamiento (entonces touch-action: auto; desde la reparación,
+//     manipulation), y deja 49 px libres a cada lado.
 // Todos los valores esperados se calcularon a mano antes de abrir el navegador.
 
 /** Nombre del panel «Editor visual» (el lienzo, su barra y su resumen). */
@@ -1260,8 +1263,8 @@ test.describe('Inspector 30/09/2026 · móvil 390×844 con el dedo', () => {
   // desplazando la página). El gesto se envía como toques reales (CDP
   // Input.dispatchTouchEvent), no como ratón. A MANO: arrastrar q1 de (520, 250) a (650, 120)
   // lo deja en (650, 120) ±5, como hace el ratón en escritorio (caso del 27/09); y mientras se
-  // arrastra un estado la página no se desplaza. Medido: q1 sigue en (520, 250) y la página
-  // baja 37 px.
+  // arrastra un estado la página no se desplaza. Medido antes de la reparación: q1 seguía en
+  // (520, 250) y la página bajaba 37 px.
   test('arrastrar un estado con el dedo lo deja bajo el dedo y no desplaza la página', async ({ page }) => {
     await lienzo(page).evaluate((el) => el.scrollIntoView({ block: 'center' }));
     const desde = await aPantalla(page, 520, 250);
@@ -1310,5 +1313,422 @@ test.describe('Inspector 30/09/2026 · móvil 390×844 con el dedo', () => {
     await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
     await cdp.detach();
     await expect.poll(() => page.evaluate(() => window.scrollY), { timeout: 2000 }).toBeGreaterThan(scrollAntes + 50);
+  });
+});
+
+// ════════════════════════════════════════════════════════════════════════════════════════
+// INSPECTOR 30/10/2026 — re-inspección tras 579f29b1 (hallazgos 2469-2476), aced16e6 y 8d859faf
+// ════════════════════════════════════════════════════════════════════════════════════════
+//
+// Las 71 pruebas de los tres specs de la app pasan: las reparaciones de 2290-2297 y 2469-2476
+// aguantan, también el arrastre con el dedo en un viewport móvil con hasTouch (2469), que aquí
+// se vuelve a medir sobre un autómata construido entero con toques. Lo nuevo cubre lo que aún no
+// estaba: el AFD que da la determinización, minimizado y llevado otra vez al lienzo sin que cambie
+// el lenguaje; la rama «Sin los inalcanzables» del resumen; un símbolo fuera del alfabeto a mitad
+// de cadena; y cinco hallazgos nuevos, marcados con test.fail().
+// Todos los valores esperados se calcularon a mano antes de abrir el navegador.
+
+/** Las transiciones como las lista «El autómata en texto», cada una como [desde, símbolo, hasta]. */
+async function transicionesEnTexto(page: Page): Promise<string[][]> {
+  return page
+    .locator('section[aria-labelledby="editor-texto-titulo"] li')
+    .filter({ hasText: ' va a ' })
+    .evaluateAll((lis) => lis.map((li) => [...li.querySelectorAll('code')].map((c) => c.textContent ?? '')));
+}
+
+/** Crea una transición desde «El autómata en texto»; `pulsar` es un clic o un toque. */
+async function crearTransicionEnTexto(
+  page: Page,
+  de: string,
+  simbolo: string,
+  a: string,
+  pulsar: (loc: import('@playwright/test').Locator) => Promise<void>,
+): Promise<void> {
+  await page.getByLabel('Desde', { exact: true }).selectOption(de);
+  await page.getByLabel('va a', { exact: true }).selectOption(a);
+  await page.getByLabel(/^con el símbolo/).fill(simbolo);
+  await esperarValorEnReact(page, '#editor-simbolo', simbolo);
+  await pulsar(page.getByRole('button', { name: 'Crear transición' }));
+}
+
+const conRaton = (loc: import('@playwright/test').Locator) => loc.click();
+const conDedo = (loc: import('@playwright/test').Locator) => loc.tap();
+
+/** Lleva la animación, ya pausada, hasta el paso n (numerado como en pantalla, desde 1). */
+async function irAlPaso(
+  page: Page,
+  n: number,
+  pulsar: (loc: import('@playwright/test').Locator) => Promise<void>,
+): Promise<void> {
+  const mostrado = async () => Number((await anunciadorDelPaso(page).innerText()).match(/^Paso (\d+)/)?.[1]);
+  for (let actual = await mostrado(); actual !== n; actual = await mostrado()) {
+    await pulsar(page.getByRole('button', { name: actual > n ? 'Paso anterior' : 'Paso siguiente', exact: true }));
+  }
+}
+
+test.describe('Inspector 30/10/2026 · casos resueltos a mano (escritorio)', () => {
+  // CASO NORMAL — «Contiene 01» → AFD → mínimo, y el lenguaje no cambia por el camino.
+  // A MANO, subconjuntos desde {q0} con los símbolos de las flechas, {0, 1}
+  // (A = {q0}, B = {q0,q1}, C = {q0,q2}, D = {q0,q1,q2}):
+  //   A 0→B (nuevo) 1→A · B 0→B 1→C (nuevo) · C 0→D (nuevo) 1→C · D 0→D 1→C
+  //   8 filas, ninguna a ∅; 4 estados; finales C y D, los que contienen q2; 8 transiciones.
+  // Lote sobre el AFD: 01 y 1101 contienen «01» ⇒ ACEPTADAS; 10, ε y 0 no ⇒ RECHAZADAS.
+  // Traza de 1101: A -1→ A -1→ A -0→ B -1→ C ⇒ 5 pasos, el último «Lee "1" → {q0,q2}» y el
+  // anterior «Lee "0" → {q0,q1}».
+  // Minimizado: P0 = {C,D} | {A,B}. Firmas (0,1): A → (N,N), B → (N,F) ⇒ se separan; C → (F,F) y
+  // D → (F,F) ⇒ siguen juntos. R2 no parte nada: 3 clases, C ≡ D; 3 rondas en pantalla (la
+  // inicial, la 1 y la final). Es total: no hace falta el ∅ implícito. Mínimo: 3 estados, 1 final,
+  // 3 × 2 = 6 transiciones, y el mismo veredicto para las cinco cadenas.
+  test('«Contiene 01»: la tabla de 8 filas, el AFD de 4 estados y su mínimo de 3 reconocen el mismo lenguaje', async ({
+    page,
+  }) => {
+    await page.getByRole('button', { name: /Contiene "01"/ }).click();
+    await page.getByRole('button', { name: 'Determinizar (AFND → AFD)', exact: true }).click();
+    const resultado = page.locator('[class*="convResultado"]');
+    const filas = await resultado
+      .locator('table tbody tr')
+      .evaluateAll((trs) => trs.map((tr) => [...tr.querySelectorAll('td')].map((td) => (td.textContent ?? '').trim())));
+    expect(filas).toEqual([
+      ['{q0}', '0', '{q0,q1}nuevo'],
+      ['{q0}', '1', '{q0}'],
+      ['{q0,q1}', '0', '{q0,q1}'],
+      ['{q0,q1}', '1', '{q0,q2}nuevo'],
+      ['{q0,q2}', '0', '{q0,q1,q2}nuevo'],
+      ['{q0,q2}', '1', '{q0,q2}'],
+      ['{q0,q1,q2}', '0', '{q0,q1,q2}'],
+      ['{q0,q1,q2}', '1', '{q0,q2}'],
+    ]);
+    await expect(resultado.locator('[class*="convResumen"]')).toHaveText(
+      'El AFD resultante tiene 4 estados sobre el alfabeto {0, 1}. Son finales los conjuntos que contienen algún estado final del original: {q0,q2}, {q0,q1,q2}.',
+    );
+    // Ninguna fila llega a ∅: la nota del sumidero omitido no tiene por qué salir.
+    await expect(resultado.locator('[class*="convNota"]')).not.toContainText('∅');
+
+    await page.getByRole('button', { name: 'Cargar el AFD en el lienzo' }).click();
+    const resumen = page.locator('[class*="estadoResumen"]');
+    await expect(resumen).toContainText('4 estados');
+    await expect(resumen).toContainText('8 transiciones');
+    await expect(resumen).toContainText('Finales: 2');
+    const cadenas = '01\n10\n\n1101\n0';
+    const veredictos = [/Aceptada/, /Rechazada/, /Rechazada/, /Aceptada/, /Rechazada/];
+    await escribirLote(page, cadenas);
+    await expect(veredictosDelLote(page)).toHaveText(veredictos);
+
+    await page.locator('#cadena').fill('1101');
+    await page.getByRole('button', { name: 'Validar', exact: true }).click();
+    await page.getByRole('button', { name: 'Pausar', exact: true }).click();
+    await irAlPaso(page, 5, conRaton);
+    await expect(anunciadorDelPaso(page)).toHaveText('Paso 5 / 5: Lee "1" → {q0,q2}');
+    await expect(page.locator('[role="alert"]', { hasText: 'ACEPTADA' })).toBeVisible();
+    await irAlPaso(page, 4, conRaton);
+    await expect(anunciadorDelPaso(page)).toHaveText('Paso 4 / 5: Lee "0" → {q0,q1}');
+
+    await page.getByRole('button', { name: 'Minimizar el AFD', exact: true }).click();
+    await expect(resultado.locator('[class*="convResumen"]')).toHaveText(
+      'Se fusionan {{q0,q1,q2},{q0,q2}}. El autómata mínimo tiene 3 estados.',
+    );
+    await expect(resultado.locator('ol[class*="convRondas"] > li')).toHaveCount(3);
+    await expect(resultado).not.toContainText('Al autómata le faltan transiciones');
+
+    await page.getByRole('button', { name: 'Cargar el autómata mínimo en el lienzo' }).click();
+    await expect(resumen).toContainText('3 estados');
+    await expect(resumen).toContainText('6 transiciones');
+    await expect(resumen).toContainText('Finales: 1');
+    // El lote se recalcula con el autómata del lienzo: el mismo texto da los mismos veredictos.
+    await expect(veredictosDelLote(page)).toHaveText(veredictos);
+  });
+
+  // CASO LÍMITE — un estado al que no se llega. «Pares de 0» (del beforeEach) + «Nuevo estado»
+  // (q2, sin flechas). A MANO: desde q0 se alcanzan q0 y q1 (q0-0→q1, q1-0→q0, bucles con 1); q2
+  // no recibe ninguna ⇒ inalcanzable. Sin él, P0 = {q0} | {q1} ya es estable y es total (sin ∅
+  // implícito): ningún par equivalente ⇒ la rama «Sin los inalcanzables, el autómata mínimo tiene
+  // 2 estados», no «ya era mínimo», que habría contado 3. El mínimo cargado reconoce lo mismo:
+  // ε (cero ceros) y 00 ACEPTADAS, 0 RECHAZADA.
+  test('un estado inalcanzable se descarta antes de particionar y el resumen lo dice: mínimo de 2 estados', async ({
+    page,
+  }) => {
+    await page.getByRole('button', { name: 'Nuevo estado' }).click();
+    const resumen = page.locator('[class*="estadoResumen"]');
+    await expect(resumen).toContainText('3 estados');
+    await page.getByRole('button', { name: 'Minimizar el AFD', exact: true }).click();
+    const resultado = page.locator('[class*="convResultado"]');
+    await expect(resultado).toContainText(
+      'Antes de particionar se descartan los estados a los que no se llega desde el inicial: q2. No cambian el lenguaje reconocido.',
+    );
+    await expect(resultado.locator('[class*="convResumen"]')).toHaveText(
+      'Ningún par de estados resultó equivalente. Sin los inalcanzables, el autómata mínimo tiene 2 estados.',
+    );
+    await expect(resultado).not.toContainText('Al autómata le faltan transiciones');
+
+    await page.getByRole('button', { name: 'Cargar el autómata mínimo en el lienzo' }).click();
+    await expect(resumen).toContainText('2 estados');
+    await expect(resumen).toContainText('4 transiciones');
+    await escribirLote(page, '\n00\n0');
+    await expect(veredictosDelLote(page)).toHaveText([/Aceptada/, /Aceptada/, /Rechazada/]);
+  });
+
+  // LO QUE DEBE RECHAZARSE — «012» en «Pares de 0» (Σ = {0, 1}). El 0 y el 1 se leerían, pero el 2
+  // no es un símbolo del alfabeto: la cadena no es una entrada del autómata. A MANO: se detiene en
+  // el tercer símbolo sin recorrer nada ⇒ 2 pasos (el inicial y el aviso), FUERA DEL ALFABETO, y la
+  // cinta deja el «0» y el «1» como leídos y el «2» como la celda en curso. El lote dice lo mismo.
+  test('«012» sobre {0, 1}: FUERA DEL ALFABETO en el segundo paso, con el «2» señalado en la cinta', async ({
+    page,
+  }) => {
+    await page.locator('#cadena').fill('012');
+    await page.getByRole('button', { name: 'Validar', exact: true }).click();
+    await expect(page.locator('[role="alert"]', { hasText: 'FUERA DEL ALFABETO' })).toBeVisible();
+    await expect(anunciadorDelPaso(page)).toHaveText(
+      'Paso 2 / 2: "2" no pertenece al alfabeto declarado {0, 1}: la cadena no es una entrada válida',
+    );
+    await expect(page.locator('[class*="celdaLeida"]')).toHaveText(['0', '1']);
+    await expect(page.locator('[class*="celdaActual"]')).toHaveText(['2']);
+    await escribirLote(page, '012');
+    await expect(veredictosDelLote(page)).toHaveText([/Fuera del alfabeto/]);
+  });
+
+  // HALLAZGO NUEVO (30/10/2026) — mover un estado retira el resultado de la conversión.
+  // Mover es maquetación: no cambia ni un estado, ni una flecha, ni cuál es inicial o final, así que
+  // la partición de «Pares de 0» sigue describiendo el autómata de la pantalla. Pero `automataActual`
+  // se memoriza sobre `estados`, que lleva las coordenadas: cada pointermove del arrastre crea un
+  // autómata «nuevo» y salta el efecto que borra los resultados obsoletos. Basta un temblor de 1 px
+  // al pulsar un estado en «Mover». Medido: «Refinamiento de particiones» desaparece; un clic
+  // limpio, sin movimiento, no lo retira. En móvil se nota más: el resultado queda bajo el lienzo, y
+  // quien sube a ordenar el dibujo para cotejarlo con la tabla vuelve y no la encuentra.
+  test('mover un estado no retira la minimización, porque el autómata no ha cambiado', async ({ page }) => {
+    test.fail(); // ABIERTO — hallazgo nuevo del Inspector 30/10/2026
+    await page.getByRole('button', { name: 'Minimizar el AFD', exact: true }).click();
+    const titulo = page.getByRole('heading', { name: 'Refinamiento de particiones' });
+    await expect(titulo).toBeVisible();
+
+    const desde = await aPantalla(page, 520, 250);
+    const hasta = await aPantalla(page, 600, 380);
+    await page.mouse.move(desde.x, desde.y);
+    await page.mouse.down();
+    await page.mouse.move(hasta.x, hasta.y, { steps: 6 });
+    await page.mouse.up();
+    // El arrastre se hizo, y el autómata es el mismo: 2 estados, 4 transiciones, q0 inicial y final.
+    expect(Math.abs(Number(await circuloDe(page, 'q1').getAttribute('cx')) - 600)).toBeLessThanOrEqual(5);
+    const resumen = page.locator('[class*="estadoResumen"]');
+    await expect(resumen).toContainText('2 estados');
+    await expect(resumen).toContainText('4 transiciones');
+    await expect(resumen).toContainText('Finales: 1');
+
+    await expect(titulo).toBeVisible({ timeout: 1000 });
+  });
+
+  // HALLAZGO NUEVO (30/10/2026) — el editor admite un símbolo de varios caracteres, que la lectura
+  // de la cadena, carácter a carácter, no puede tomar nunca.
+  // «a,b» es como se rotula a mano una flecha con dos símbolos, y es como el propio lienzo pinta dos
+  // flechas agrupadas («a, b»). A MANO, lo dibujado es q0 -a→ q1 y q0 -b→ q1 con q1 final: «a» y «b»
+  // ACEPTADAS. La app crea UNA transición con el símbolo «a,b» (el campo admite 8 caracteres y el
+  // diálogo del lienzo, cualquiera), que el lienzo rotula «a,b»: «a», «b» y «ab» salen SIN
+  // TRANSICIÓN, y «Determinizar» la acepta «sobre el alfabeto {a,b}», que se lee como Σ = {a, b},
+  // con una sola fila por conjunto. Se exige lo que deja cualquier reparación (partir el rótulo en
+  // dos transiciones o negarse a crearlo): que ninguna transición quede con más de un carácter.
+  test('una transición «a,b» no se queda como un único símbolo de tres caracteres', async ({ page }) => {
+    test.fail(); // ABIERTO — hallazgo nuevo del Inspector 30/10/2026
+    await page.getByRole('button', { name: 'Limpiar todo' }).click();
+    await page.locator('#alfabeto').fill('a,b');
+    await esperarValorEnReact(page, '#alfabeto', 'a,b');
+    await page.getByRole('button', { name: 'Nuevo estado' }).click();
+    await page.getByRole('button', { name: 'Nuevo estado' }).click();
+    await page.getByRole('button', { name: 'Final (q1)' }).click();
+    await crearTransicionEnTexto(page, 'q0', 'a,b', 'q1', conRaton);
+
+    const simbolos = (await transicionesEnTexto(page)).map((t) => t[1]);
+    expect(
+      simbolos.filter((s) => Array.from(s).length !== 1),
+      'símbolos de más de un carácter, que ninguna cadena puede leer',
+    ).toEqual([]);
+  });
+
+  // El mismo hueco por el alfabeto: Σ = {10, 11} se acepta sin aviso y la transición «10» casa con
+  // él, así que tampoco la avisa «símbolos que no están en el alfabeto». Pero ninguna cadena puede
+  // usarlos: «10» sale FUERA DEL ALFABETO porque se lee «1» (medido: '"1" no pertenece al alfabeto
+  // declarado {10, 11}'). Con símbolos de un carácter eso no puede pasar; aquí se exige un aviso.
+  test('un alfabeto con símbolos de dos caracteres se avisa, porque la cadena se lee carácter a carácter', async ({
+    page,
+  }) => {
+    test.fail(); // ABIERTO — el mismo hallazgo que el caso de «a,b», Inspector 30/10/2026
+    await page.getByRole('button', { name: 'Limpiar todo' }).click();
+    await page.locator('#alfabeto').fill('10,11');
+    await esperarValorEnReact(page, '#alfabeto', '10,11');
+    await page.getByRole('button', { name: 'Nuevo estado' }).click();
+    await page.getByRole('button', { name: 'Nuevo estado' }).click();
+    await page.getByRole('button', { name: 'Final (q1)' }).click();
+    await crearTransicionEnTexto(page, 'q0', '10', 'q1', conRaton);
+    await expect(page.locator('[class*="estadoResumen"]')).toContainText('1 transición');
+
+    await expect(page.locator('[class*="avisosAutomata"]')).not.toHaveText('', { timeout: 1000 });
+  });
+
+  // HALLAZGO NUEVO (30/10/2026) — «⟲ Reiniciar» se anuncia con su símbolo. Sus hermanos de la fila
+  // (▶ Validar, ⏸ Pausar, ◀ Paso anterior, Paso siguiente ▶) llevan el símbolo en un
+  // <span aria-hidden="true">, como pide el CLAUDE.md §5; este no, y su nombre accesible es
+  // «⟲ Reiniciar». El candado check:a11y-jsx no lo ve: ⟲ (U+27F2) no es un emoji.
+  test('«Reiniciar» se anuncia sin el símbolo decorativo, como sus hermanos de la fila', async ({ page }) => {
+    test.fail(); // ABIERTO — hallazgo nuevo del Inspector 30/10/2026
+    await expect(page.locator('[class*="controlesAnimacion"] button')).toHaveCount(5);
+    await expect(page.getByRole('button', { name: 'Reiniciar', exact: true })).toHaveCount(1, { timeout: 1000 });
+  });
+
+  // HALLAZGO NUEVO (30/10/2026) — dos preguntas del FAQPage (faqJsonLd de metadata.ts, lo que leen
+  // buscadores y asistentes) están también en la FAQ visible de la guía, con otra respuesta:
+  //   · «¿Qué son las ε-transiciones en un autómata no determinista?» frente a «¿Qué es una
+  //     ε-transición y para qué sirve?»
+  //   · «¿Cuál es la diferencia entre un DFA y un NFA?» frente a «¿Cuál es la diferencia real entre
+  //     DFA y NFA en potencia?»
+  // No se contradicen, pero son dos textos que envejecen por separado. Se exige lo que deja la
+  // reparación (UNA constante en metadata.ts que importen las dos bocas, como
+  // app/simulador-gastos-compraventa-garaje): que la respuesta visible contenga la del FAQPage. Si
+  // la reparación quita la pregunta de una de las dos bocas, no queda pareja que comparar.
+  test('una pregunta del FAQPage que también está en la FAQ visible tiene la misma respuesta', async ({ page }) => {
+    test.fail(); // ABIERTO — hallazgo nuevo del Inspector 30/10/2026
+    interface PreguntaFaq {
+      name: string;
+      acceptedAnswer: { text: string };
+    }
+    const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+    const faq = bloques
+      .map((b) => JSON.parse(b) as { '@type'?: string; mainEntity?: PreguntaFaq[] })
+      .find((j) => j['@type'] === 'FAQPage');
+    expect(faq?.mainEntity?.length).toBe(5);
+    const visibles = await page.locator('[data-guia-educativa] [class*="faqItem"]').evaluateAll((items) =>
+      items.map((it) => ({
+        pregunta: it.querySelector('h4')?.textContent ?? '',
+        respuesta: [...it.querySelectorAll('p')].map((p) => p.textContent ?? '').join(' '),
+      })),
+    );
+    expect(visibles.length).toBe(6);
+    const normal = (s: string) => s.replace(/\s+/g, ' ').trim();
+    const discrepantes: string[] = [];
+    for (const tema of [/ε-transici/i, /diferencia.*DFA.*NFA/i]) {
+      for (const f of (faq?.mainEntity ?? []).filter((q) => tema.test(q.name))) {
+        for (const v of visibles.filter((x) => tema.test(x.pregunta))) {
+          if (!normal(v.respuesta).includes(normal(f.acceptedAnswer.text))) discrepantes.push(`«${f.name}» / «${v.pregunta}»`);
+        }
+      }
+    }
+    expect(discrepantes).toEqual([]);
+  });
+
+  // HALLAZGO NUEVO (30/10/2026) — el consejo de la guía para «Contiene 01» enseña lo contrario de lo
+  // que la app demuestra: «verifica que también puede construirse como DFA con más estados». A MANO
+  // (caso normal de arriba): la determinización da 4 estados, pero C ≡ D y el AFD MÍNIMO tiene 3, los
+  // mismos que el AFND («aún no he visto 0», «acabo de ver un 0», «ya vi 01»). Quien sigue el consejo
+  // y pulsa luego «Minimizar» ve que el DFA NO necesita más estados; el ejemplo que sí los necesita
+  // es otro (el «antepenúltimo símbolo es un 1» de la práctica: 4 en el AFND, 8 en el AFD).
+  test('el consejo de «Contiene 01» no dice que el DFA necesite más estados que el AFND', async ({ page }) => {
+    test.fail(); // ABIERTO — hallazgo nuevo del Inspector 30/10/2026
+    await page.getByRole('button', { name: /Contiene "01"/ }).click();
+    await expect(page.locator('[class*="estadoResumen"]')).toContainText('3 estados');
+    await page.getByRole('button', { name: 'Determinizar (AFND → AFD)', exact: true }).click();
+    await page.getByRole('button', { name: 'Cargar el AFD en el lienzo' }).click();
+    await page.getByRole('button', { name: 'Minimizar el AFD', exact: true }).click();
+    await expect(page.locator('[class*="convResumen"]')).toContainText('El autómata mínimo tiene 3 estados.');
+
+    const consejo = page.locator('[data-guia-educativa] [class*="escenarioCard"]', { hasText: 'Contiene 01' });
+    await expect(consejo).toHaveCount(1);
+    await expect(consejo).not.toContainText(/con más estados/, { timeout: 1000 });
+  });
+});
+
+test.describe('Inspector 30/10/2026 · móvil 393×851 con el dedo', () => {
+  test.use({
+    viewport: { width: 393, height: 851 },
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Mobile Safari/537.36',
+    deviceScaleFactor: 2.75,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  // CASO NORMAL Y LÍMITE construidos ENTEROS con toques, desde «El autómata en texto»: AFD
+  // «termina en 1» sobre {0, 1} (el alfabeto que deja «Pares de 0»; «Limpiar todo» no lo toca),
+  // con un estado de más:
+  //   q0 (inicial, por ser el primero) -0→ q0 · q0 -1→ q1 · q1 (final) -0→ q2 · q1 -1→ q1 ·
+  //   q2 -0→ q2 · q2 -1→ q1
+  // A MANO: ε → q0, no final ⇒ RECHAZADA (el límite) · 1 → q1 ⇒ ACEPTADA · 10 → q1 → q2 ⇒
+  //   RECHAZADA · 101 → q1 → q2 → q1 ⇒ ACEPTADA, en 4 pasos · 0 → q0 ⇒ RECHAZADA.
+  // Minimizado: P0 = {q1} | {q0,q2}; firmas (0,1): q0 → (N,F) y q2 → (N,F) ⇒ q0 ≡ q2 y nada se
+  //   parte ⇒ «Se fusionan {q0,q2}. El autómata mínimo tiene 2 estados.»
+  // Los estados caen donde los pone `posicionLibre`: q0 (160, 250), q1 (400, 250), q2 (640, 250).
+  // Arrastrar q2 con el dedo hasta (600, 420) lo deja allí ±5 y no desplaza la página (2469).
+  // Con «Alternar final» y un toque sobre q0, q0 pasa a ser final: ε y 0 ACEPTADAS (se quedan en
+  // q0), 10 RECHAZADA (acaba en q2) y 1 ACEPTADA.
+  test('el AFD «termina en 1» se construye, valida, minimiza, arrastra y edita con el dedo', async ({ page }) => {
+    await conDedo(page.getByRole('button', { name: 'Limpiar todo' }));
+    await expect(page.locator('#alfabeto')).toHaveValue('0,1');
+    for (let i = 0; i < 3; i++) await conDedo(page.getByRole('button', { name: 'Nuevo estado' }));
+    await conDedo(page.getByRole('button', { name: 'Final (q1)' }));
+    for (const [de, s, a] of [
+      ['q0', '0', 'q0'],
+      ['q0', '1', 'q1'],
+      ['q1', '0', 'q2'],
+      ['q1', '1', 'q1'],
+      ['q2', '0', 'q2'],
+      ['q2', '1', 'q1'],
+    ]) {
+      await crearTransicionEnTexto(page, de, s, a, conDedo);
+    }
+    const resumen = page.locator('[class*="estadoResumen"]');
+    await expect(resumen).toContainText('3 estados');
+    await expect(resumen).toContainText('6 transiciones');
+    await expect(resumen).toContainText('Iniciales: 1');
+    await expect(resumen).toContainText('Finales: 1');
+    await expect(page.locator('[class*="avisosAutomata"]')).toHaveText('');
+    expect(await circuloDe(page, 'q2').getAttribute('cx')).toBe('640');
+    expect(await circuloDe(page, 'q2').getAttribute('cy')).toBe('250');
+
+    await escribirLote(page, '\n1\n10\n101\n0');
+    await expect(veredictosDelLote(page)).toHaveText([/Rechazada/, /Aceptada/, /Rechazada/, /Aceptada/, /Rechazada/]);
+
+    await page.locator('#cadena').fill('101');
+    await conDedo(page.getByRole('button', { name: 'Validar', exact: true }));
+    await conDedo(page.getByRole('button', { name: 'Pausar', exact: true }));
+    await irAlPaso(page, 4, conDedo);
+    await expect(anunciadorDelPaso(page)).toHaveText('Paso 4 / 4: Lee "1" → q1');
+    await expect(page.locator('[role="alert"]', { hasText: 'ACEPTADA' })).toBeVisible();
+    await irAlPaso(page, 3, conDedo);
+    await expect(anunciadorDelPaso(page)).toHaveText('Paso 3 / 4: Lee "0" → q2');
+    await irAlPaso(page, 1, conDedo);
+    await expect(anunciadorDelPaso(page)).toHaveText('Paso 1 / 4: Estado(s) inicial(es): q0');
+
+    await conDedo(page.getByRole('button', { name: 'Minimizar el AFD', exact: true }));
+    await expect(page.locator('[class*="convResumen"]')).toHaveText(
+      'Se fusionan {q0,q2}. El autómata mínimo tiene 2 estados.',
+    );
+
+    // Arrastre con el dedo (toques reales por CDP, como el caso de 2469)
+    await lienzo(page).evaluate((el) => el.scrollIntoView({ block: 'center' }));
+    const desde = await aPantalla(page, 640, 250);
+    const hasta = await aPantalla(page, 600, 420);
+    const scrollAntes = await page.evaluate(() => window.scrollY);
+    const cdp = await page.context().newCDPSession(page);
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: desde.x, y: desde.y }] });
+    for (let i = 1; i <= 12; i++) {
+      await cdp.send('Input.dispatchTouchEvent', {
+        type: 'touchMove',
+        touchPoints: [{ x: desde.x + ((hasta.x - desde.x) * i) / 12, y: desde.y + ((hasta.y - desde.y) * i) / 12 }],
+      });
+      await page.waitForTimeout(16);
+    }
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+    await cdp.detach();
+    const q2 = circuloDe(page, 'q2');
+    await expect
+      .poll(async () => Math.abs(Number(await q2.getAttribute('cx')) - 600), { timeout: 2000 })
+      .toBeLessThanOrEqual(5);
+    expect(Math.abs(Number(await q2.getAttribute('cy')) - 420)).toBeLessThanOrEqual(5);
+    expect(Math.abs((await page.evaluate(() => window.scrollY)) - scrollAntes)).toBeLessThanOrEqual(2);
+
+    // La barra y el lienzo, con el dedo: «Alternar final» y un toque sobre q0
+    await conDedo(page.getByRole('button', { name: 'Alternar final' }));
+    await lienzo(page).evaluate((el) => el.scrollIntoView({ block: 'center' }));
+    const q0 = await aPantalla(page, 160, 250);
+    await page.touchscreen.tap(q0.x, q0.y);
+    await expect(resumen).toContainText('Finales: 2');
+    await escribirLote(page, '\n0\n10\n1');
+    await expect(veredictosDelLote(page)).toHaveText([/Aceptada/, /Aceptada/, /Rechazada/, /Aceptada/]);
   });
 });

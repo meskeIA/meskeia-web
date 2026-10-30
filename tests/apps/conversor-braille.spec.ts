@@ -44,8 +44,10 @@ import { esperarHidratacion, esperarPaginaAsentada, esperarValorEnReact } from '
  * 28/10/2026 en dfc246e6 y e4b499d9 (van como tests normales con «REPARADO») y 3589-3591 siguen
  * ABIERTOS. Los de la inspección del 29/10/2026 por la mañana (bloque «inspector 29/10/2026»,
  * 3763-3767) se REPARARON ese mismo día en e852bdcd y van como tests normales con «REPARADO»; la
- * re-inspección de esa tarde (bloque del final) los vio sostenerse y dejó otros ABIERTOS. Los
- * ABIERTOS —3589-3591 y los del bloque del final— van con `test.fail()`: cada uno afirma lo que
+ * re-inspección de esa tarde (bloque «inspector 29/10/2026 (tarde)») los vio sostenerse y dejó
+ * 3794-3798, que se REPARARON el 30/10/2026 en fe9e238a y van como tests normales con «REPARADO»;
+ * la inspección del 30/10/2026 (bloque del final) los vio sostenerse con otras entradas y dejó
+ * otros ABIERTOS. Los ABIERTOS —3589-3591 y los del bloque del final— van con `test.fail()`: cada uno afirma lo que
  * DEBERÍA pasar y falla a propósito; el día que se corrija la app pasará a ROJO («expected to
  * fail, but passed») y habrá que quitarle la marca, no reescribir el valor esperado.
  */
@@ -4127,10 +4129,11 @@ test.describe('inspector 29/10/2026', () => {
 // otras formas (la ª detrás de una hora, «1er.» al final de la frase, ¼ y ⅒ en la vuelta, grados y
 // minutos sin segundos, la pareja de coordenadas con segundos enteros y comillas rectas). Las horas,
 // los decimales, las comillas y el millar de antes no se mueven (CASO 1).
-// LO QUE NO (ABIERTOS, al final del bloque): los segundos con decimales siguen saliendo como
-// comilla; la regla de la comilla que cierra se lleva el segundo tiempo de una lista con comillas
-// rectas y el tiempo dentro de unas “…”; la vuelta de fracciones lee el quebrado de Primaria del
-// § 8.4 como otra fracción; con ′ y ″ dos avisos se contradicen; y «7"» sale con comillas.
+// LO QUE NO SE SOSTENÍA (3794-3798, al final del bloque; REPARADOS el 30/10/2026 en fe9e238a, y
+// la inspección del 30/10/2026 los vio sostenerse con otras entradas): los segundos con decimales
+// salían como comilla; la regla de la comilla que cierra se llevaba el segundo tiempo de una lista
+// con comillas rectas y el tiempo dentro de unas “…”; la vuelta de fracciones leía el quebrado de
+// Primaria del § 8.4 como otra fracción; con ′ y ″ dos avisos se contradecían; y «7"» salía con comillas.
 test.describe('inspector 29/10/2026 (tarde) — re-inspección tras /reparar', () => {
   async function convertirT(page: Page, texto: string, modo: 'texto' | 'braille' = 'texto') {
     await page.goto(RUTA);
@@ -4402,5 +4405,371 @@ test.describe('inspector 29/10/2026 (tarde) — re-inspección tras /reparar', (
     if (!avisos.some((a) => a.includes('pulgadas') && a.includes('"'))) fallos.push('sin aviso de la marca de pulgadas');
     if (avisos.some((a) => a.includes('Puede que'))) fallos.push('el aviso genérico duda de la marca');
     expect(fallos).toEqual([]);
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// inspector 30/10/2026 — re-inspección tras fe9e238a (3794-3798), con el B 2 y el B 1 leídos enteros
+// ═════════════════════════════════════════════════════════════════════════════
+//
+// FUENTES, descargadas de once.es el 30/10/2026 y leídas con un extractor de texto del PDF. Celdas en
+// la fuente ASCII del documento («#» 3456, «,» 2, «;» 23, «:» 25, «_» 6, «{» 46, «?» 26, «í» 34):
+//   B 2 (V4, 22/01/2026):
+//   § 7.1   «Para escribir las siglas se pueden utilizar varios recursos. 1) Escribir el signo de
+//           mayúscula antes de cada una de las letras que forman la sigla. Ejemplo: ONCE {o{n{c{e
+//           2) Escribir dos signos de mayúscula antes de la primera letra de la sigla. Ejemplo: ONCE
+//           {{once».
+//   § 6.2   «- 36 - guion, guion de corte de palabra, raya» · «_, 6-2 / barra inclinada» · «_?,
+//           6-26-2 // doble barra oblicua» · «@k 5-13 < abrir paréntesis angular» · «{, 46-2 >».
+//   § 9.2   «antes de la letra afectada se escribirá el signo braille con el punto 6 […] Søren
+//           Kierkegaard → {s_oren {kierkegaard».
+//   § 10    ejemplos con palabra partida a final de renglón: «super- lativa», «{si- glo de {oro»;
+//           § 10.2 «cabello, / oro […] bello; // mientras → cabello, _, oro […] bello; _?, mientras».
+//   § 12    «X 236 signo de multiplicar (aspa)» · «± 235-25-36» · «÷ 5-2» · «‰ 456-356-356 tanto
+//           por mil» · «© 126-46-14-345» · «® 126-46-1235-345» · § 12.1 «¶ 146 sección».
+//   § 13    «¢ 45-14 centavo» · § 14.4 «20 cm2 → #bj cm1#b» (16, signo de superíndice).
+//   § 14    «se deja un espacio en blanco de no separación entre la cifra y el símbolo», con la nota
+//           «Tal y como se indica en el Código matemático unificado para Iberoamérica, «espacio en
+//           blanco de no separación significa que la cantidad y la unidad deben estar en el mismo
+//           renglón»». Ejemplos «8 m #h m · 1,5 l #a,e l · 2 g #b g · 7,1 cm #g,a cm».
+//   § 14.3  «10 h 15 min 52 s → #aj h #ae min #eb s» y «2’54” → #b:#ed» («En braille se utilizarán
+//           los dos puntos»). § 14.1: «8 1256 minuto · 88 1256-1256 segundo». § 14.6 «km/h km_,h».
+//   § 15.1  «Si en la dirección aparecen números se escribirán en braille computarizado»: 1 16 · 2 126
+//           · 3 146 · … · 0 346. § 15.2 «Se utilizarán los signos de braille computarizado para la
+//           escritura de letras, números y signos de puntuación» y «La barra inclinada se
+//           representará con el signo braille formado por los puntos 34»: «www.…org/blog →
+//           www.…orgíblog». «Nunca se escribe guion al final de la línea» (solo en las URL).
+//   § 8.1   «Como separador decimal se utiliza el punto 2 […] independientemente de que en el
+//           original aparezca un punto o un apóstrofo» y el punto 3 para «números formados por más de
+//           tres cifras».
+//   B 1 (V2, 2024) «a = b = 2,5 mm · c = 6 mm · d = 10 mm · e = 1,5 mm»: son las medidas de Marburg de
+//   la hoja, que cuadran; con 172 mm útiles caben 29 celdas por renglón.
+//   once.es, «Documentos técnicos relacionados con el braille»: el B 5 (signografía matemática) «ha
+//   dejado de aplicarse» y lo sustituye el «Código matemático unificado para Iberoamérica»; el B 1
+//   cita el «Documento técnico V 1: Tabla ANSI española para braille computarizado».
+//
+// LO QUE SE SOSTIENE: 3794-3798 con otras entradas (segundos decimales de otra coordenada y con
+// blancos, tres parciales con comillas rectas, un tiempo al final de unas comillas, dos pulgadas en
+// la misma frase, dos títulos entrecomillados con cifra al final, primas con decimales tras un grado
+// y la vuelta «⠼⠉⠲⠀⠼⠃» → «¾ 2»), y las unidades del § 14 (CASO 1). 3589-3591 siguen ABIERTOS.
+test.describe('inspector 30/10/2026', () => {
+  async function convertir30(page: Page, texto: string, modo: 'texto' | 'braille' = 'texto') {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['textarea']);
+    if (modo === 'braille') await page.getByRole('button', { name: 'Braille → Texto' }).click();
+    const textarea = page.locator('textarea').first();
+    await textarea.fill(texto);
+    await esperarValorEnReact(page, textarea, texto);
+    await page.getByRole('button', { name: 'Convertir', exact: true }).click();
+  }
+
+  /** Texto de la caja de resultado ('' si no hay caja), cuando ya hay resultado o aviso en pantalla. */
+  const resultado30 = async (page: Page) => {
+    await page.locator('[class*="resultBox"], [class*="avisoConversion"]').first().waitFor();
+    const caja = page.locator('[class*="resultBox"]');
+    return (await caja.count()) > 0 ? ((await caja.textContent()) ?? '') : '';
+  };
+
+  /** Los avisos de la conversión (no el anunciador de rutas de Next), uno por elemento. */
+  const avisos30 = (page: Page) => page.locator('[class*="avisoConversion"]').allTextContents();
+
+  /** Convierte cada entrada y devuelve «entrada → obtenido» de las que no dan la salida esperada. */
+  async function fallos30(page: Page, casos: Array<[string, string]>, modo: 'texto' | 'braille' = 'texto') {
+    const fallos: string[] = [];
+    for (const [entrada, esperada] of casos) {
+      await convertir30(page, entrada, modo);
+      const r = await resultado30(page);
+      if (r !== esperada) fallos.push(`${entrada} → ${r}`);
+    }
+    return fallos;
+  }
+
+  /**
+   * Los renglones de la hoja a escala real: por renglón, los puntos de cada celda («134» = m, «» =
+   * celda vacía). Con la retícula activada (por defecto) cada celda dibuja sus seis círculos, así
+   * que también se cuentan las celdas vacías. Paso de Marburg (B 1): 6 mm entre celdas y 10 mm entre
+   * renglones; dentro de la celda, 2,5 mm entre puntos y el primero a 0,75 mm (el radio).
+   */
+  const renglonesDeLaHoja = (page: Page) =>
+    page.evaluate(() => {
+      const svg = [...document.querySelectorAll('svg')].find((s) =>
+        (s.getAttribute('aria-label') || '').includes('escala real'),
+      );
+      if (!svg) return [] as string[][];
+      const renglones = new Map<number, Map<number, number[]>>();
+      svg.querySelectorAll('circle').forEach((c) => {
+        const x = parseFloat(c.getAttribute('cx') || '0');
+        const y = parseFloat(c.getAttribute('cy') || '0');
+        const renglon = Math.floor(y / 10);
+        const celda = Math.floor(x / 6);
+        const columna = x - celda * 6 > 2 ? 1 : 0;
+        const fila = Math.round((y - renglon * 10 - 0.75) / 2.5);
+        if (!renglones.has(renglon)) renglones.set(renglon, new Map());
+        const celdas = renglones.get(renglon)!;
+        if (!celdas.has(celda)) celdas.set(celda, []);
+        if (c.getAttribute('fill') === '#000000') celdas.get(celda)!.push(columna === 0 ? fila + 1 : fila + 4);
+      });
+      return [...renglones.entries()]
+        .sort((a, b) => a[0] - b[0])
+        .map(([, celdas]) =>
+          [...celdas.entries()].sort((a, b) => a[0] - b[0]).map(([, p]) => p.sort((a, b) => a - b).join('')),
+        );
+    });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // CASO 1 (normal) — las unidades del § 14 con sus ejemplos literales, ida y vuelta
+  // ─────────────────────────────────────────────────────────────────────────
+  test('CASO 1 (normal) — § 14: «8 m», «1,5 l», «2 g», «7,1 cm», «km/h» y «10 h 15 min 52 s» como en el B 2, ida y vuelta', async ({ page }) => {
+    const ida: Array<[string, string]> = [
+      ['8 m', '⠼⠓⠀⠍'], //            § 14 «#h m»: ⠼ (3456) h ⠓ (125) · ⠀ · m ⠍ (134)
+      ['8 m', '⠼⠓⠀⠍'], //       el mismo, con el espacio duro de la tinta
+      ['1,5 l', '⠼⠁⠂⠑⠀⠇'], //        § 14 «#a,e l»: coma decimal ⠂ (2) · l ⠇ (123)
+      ['2 g', '⠼⠃⠀⠛'], //            § 14 «#b g»: tras el blanco la g (1245) no lleva prefijo
+      ['7,1 cm', '⠼⠛⠂⠁⠀⠉⠍'], //      § 14 «#g,a cm»
+      ['km/h', '⠅⠍⠠⠂⠓'], //          § 14.6 «km_,h»: barra ⠠⠂ (6-2)
+      ['10 h 15 min 52 s', '⠼⠁⠚⠀⠓⠀⠼⠁⠑⠀⠍⠊⠝⠀⠼⠑⠃⠀⠎'], // § 14.3 «#aj h #ae min #eb s»
+      ['cabello, / oro', '⠉⠁⠃⠑⠇⠇⠕⠂⠀⠠⠂⠀⠕⠗⠕'], // § 10.2 «cabello, _, oro»: la barra simple es 6-2
+      ['1.234', '⠼⠁⠄⠃⠉⠙'], //         § 8.1: punto 3 de millar (la lectura española de un punto ante tres cifras)
+    ];
+    const vuelta: Array<[string, string]> = [
+      ['⠼⠁⠂⠑⠀⠇', '1,5 l'],
+      ['⠅⠍⠠⠂⠓', 'km/h'],
+      ['⠼⠃⠀⠛', '2 g'],
+      ['⠨⠕⠨⠝⠨⠉⠨⠑', 'ONCE'], // § 7.1, recurso 1: ⠨ delante de cada letra
+    ];
+    expect({ ida: await fallos30(page, ida), vuelta: await fallos30(page, vuelta, 'braille') }).toEqual({ ida: [], vuelta: [] });
+    // Ninguna de estas entradas tiene nada que avisar
+    await convertir30(page, '10 h 15 min 52 s');
+    await resultado30(page);
+    expect(await avisos30(page)).toEqual([]);
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // CASO 2 (límite) — un renglón de la hoja lleno hasta la última celda
+  // ─────────────────────────────────────────────────────────────────────────
+  //
+  // «La pared del salón mide 8 m» son 29 celdas: ⠨⠇⠁ (3) · ⠀ · pared (5) · ⠀ · del (3) · ⠀ · salón (5)
+  // · ⠀ · mide (4) · ⠀ · ⠼⠓ (2) · ⠀ · ⠍ (1). Con Marburg (B 1: c = 6 mm) y 172 mm útiles caben
+  // ⌊(172 − 2,5 − 1,5) / 6⌋ + 1 = 29 celdas: un renglón exacto, de (29 − 1) · 6 + 2,5 + 1,5 = 172 mm de
+  // ancho y 2 · 2,5 + 1,5 = 6,5 mm de alto (el «alto celda» del B 1).
+  test('CASO 2 (límite) — «La pared del salón mide 8 m» llena el renglón de 29 celdas sin pasar al siguiente', async ({ page }) => {
+    await convertir30(page, 'La pared del salón mide 8 m');
+    await expect(cajaResultado(page)).toHaveText('⠨⠇⠁⠀⠏⠁⠗⠑⠙⠀⠙⠑⠇⠀⠎⠁⠇⠬⠝⠀⠍⠊⠙⠑⠀⠼⠓⠀⠍', { timeout: 3000 });
+    await expect(page.locator('[class*="hojaAviso"]')).toHaveText(
+      '1 línea de 29 celdas · celda de 6 mm · 10 mm entre líneas',
+    );
+    const renglones = await renglonesDeLaHoja(page);
+    expect(renglones.map((r) => r.length)).toEqual([29]);
+    expect(renglones[0].slice(-4)).toEqual(['3456', '125', '', '134']); // ⠼ ⠓ ⠀ ⠍
+    const svg = page.locator('svg[aria-label*="escala real"]');
+    await expect(svg).toHaveAttribute('width', '172mm');
+    await expect(svg).toHaveAttribute('height', '6.5mm');
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // CASO 3 (rechazo) — lo que no tiene celda se omite, se nombra y el resto queda entero
+  // ─────────────────────────────────────────────────────────────────────────
+  test('CASO 3 (rechazo) — «hola 😀»: el emoji se omite con el aviso genérico y «hola» queda entera', async ({ page }) => {
+    await convertir30(page, 'hola 😀');
+    // h ⠓ (125) o ⠕ (135) l ⠇ (123) a ⠁ (1) · el blanco ⠀; el emoji no tiene celda
+    expect(await resultado30(page)).toBe('⠓⠕⠇⠁⠀');
+    const avisos = await avisos30(page);
+    expect(avisos.some((a) => a.includes('no escribe en braille este carácter') && a.includes('😀'))).toBe(true);
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // REPARADOS 3794-3798 (fe9e238a) — la misma forma con otras entradas que las de sus tests
+  // ─────────────────────────────────────────────────────────────────────────
+  test('REPARADOS 3794-3798 — otras coordenadas, tres parciales, un tiempo al final de unas comillas, dos pulgadas y «⠼⠉⠲⠀⠼⠃»', async ({ page }) => {
+    // [entrada, salidas válidas: con los signos del § 14.1 omitidos (lo que hace la app) o escritos (⠴ 356, ⠳ 1256, ⠳⠳)]
+    const casos: Array<[string, string[]]> = [
+      // 3794: segundo decimal con punto, otra coordenada. #ea · #cj · #bf,d · ⠨⠝
+      ['51°30\'26.4"N', ['⠼⠑⠁⠼⠉⠚⠼⠃⠋⠂⠙⠨⠝', '⠼⠑⠁⠴⠼⠉⠚⠳⠼⠃⠋⠂⠙⠳⠳⠨⠝']],
+      // 3794 con blancos Y decimales a la vez: #dj ⠀ #be ⠀ #jh,e ⠀ ⠨⠝
+      ['40° 25\' 08.5" N', ['⠼⠙⠚⠀⠼⠃⠑⠀⠼⠚⠓⠂⠑⠀⠨⠝', '⠼⠙⠚⠴⠀⠼⠃⠑⠳⠀⠼⠚⠓⠂⠑⠳⠳⠀⠨⠝']],
+      // 3797 con decimales: las primas tras un grado
+      ['51°30′26.4″N', ['⠼⠑⠁⠼⠉⠚⠼⠃⠋⠂⠙⠨⠝', '⠼⠑⠁⠴⠼⠉⠚⠳⠼⠃⠋⠂⠙⠳⠳⠨⠝']],
+      // 3795 con TRES tiempos y comillas rectas: #d:#cj ⠀⠽⠀ #d:#be ⠀⠽⠀ #d:#bj (§ 14.3)
+      ['Parciales: 4\'30" y 4\'25" y 4\'20"', ['⠨⠏⠁⠗⠉⠊⠁⠇⠑⠎⠒⠀⠼⠙⠒⠼⠉⠚⠀⠽⠀⠼⠙⠒⠼⠃⠑⠀⠽⠀⠼⠙⠒⠼⠃⠚']],
+      // 3795: el tiempo al FINAL de unas comillas rectas: el primer " es el segundo y el último cierra
+      ['Dijo "corrí en 2\'54""', ['⠨⠙⠊⠚⠕⠀⠦⠉⠕⠗⠗⠌⠀⠑⠝⠀⠼⠃⠒⠼⠑⠙⠦']],
+      // 3798 dos veces en la frase: #bg y #bd, sin comillas
+      ['Monitor 27" y 24"', ['⠨⠍⠕⠝⠊⠞⠕⠗⠀⠼⠃⠛⠀⠽⠀⠼⠃⠙', '⠨⠍⠕⠝⠊⠞⠕⠗⠀⠼⠃⠛⠳⠳⠀⠽⠀⠼⠃⠙⠳⠳']],
+      // 3798: la " tras una cifra que CIERRA unas comillas sigue siendo comilla (dos títulos)
+      ['"Capítulo 5" y "Capítulo 6"', ['⠦⠨⠉⠁⠏⠌⠞⠥⠇⠕⠀⠼⠑⠦⠀⠽⠀⠦⠨⠉⠁⠏⠌⠞⠥⠇⠕⠀⠼⠋⠦']],
+    ];
+    const fallos: string[] = [];
+    for (const [entrada, validas] of casos) {
+      await convertir30(page, entrada);
+      const r = await resultado30(page);
+      if (!validas.includes(r)) fallos.push(`${entrada} → ${r}`);
+    }
+    // 3796: con un blanco detrás (no otro ⠼) sí es la fracción ¾ del § 8.4 seguida de un número
+    await convertir30(page, '⠼⠉⠲⠀⠼⠃', 'braille');
+    const vuelta = await resultado30(page);
+    if (vuelta !== '¾ 2') fallos.push(`⠼⠉⠲⠀⠼⠃ → ${vuelta}`);
+    expect(fallos).toEqual([]);
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // ABIERTO — § 7.1, recurso 2: la vuelta de una sigla con dos signos de mayúscula
+  // ─────────────────────────────────────────────────────────────────────────
+  //
+  // El B 2 da dos recursos para las siglas y la ida usa el 1 (válido). La vuelta solo entiende el 1:
+  // con ⠨⠨ delante pone en mayúscula la primera letra y las demás en minúscula, sin aviso. «⠨⠨⠕⠝⠉⠑»,
+  // el ejemplo literal del § 7.1, vuelve «Once» (el número once), y «⠇⠁⠀⠨⠨⠕⠝⠉⠑», «la Once».
+  test('ABIERTO — § 7.1 recurso 2: «⠨⠨⠕⠝⠉⠑» ({{once) vuelve «ONCE», no «Once»', async ({ page }) => {
+    test.fail();
+    const fallos = await fallos30(
+      page,
+      [
+        ['⠨⠨⠕⠝⠉⠑', 'ONCE'], // ⠨⠨ (46-46) · o ⠕ n ⠝ c ⠉ e ⠑. Hoy: «Once»
+        ['⠇⠁⠀⠨⠨⠕⠝⠉⠑', 'la ONCE'], // Hoy: «la Once»
+        ['⠨⠨⠗⠞⠧⠑', 'RTVE'], // r ⠗ (1235) t ⠞ (2345) v ⠧ (1236) e ⠑. Hoy: «Rtve»
+      ],
+      'braille',
+    );
+    expect(fallos).toEqual([]);
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // ABIERTO — § 14.3 con las primas tipográficas: «2′54″» no es «2’54”»
+  // ─────────────────────────────────────────────────────────────────────────
+  //
+  // `minutosYSegundos` solo reconoce ’ y ' como minuto; con la prima ′ (U+2032) y la doble prima ″
+  // (U+2033), los signos que la tipografía pide para minutos y segundos, el tiempo sale ⠼⠃⠼⠑⠙ (dos
+  // números pegados, sin los dos puntos), la ′ con el aviso genérico «Puede que el Código Braille
+  // Español sí le asigne celda» (el § 14.1 se la da: 1256) y la ″ con el aviso de que es «la marca de
+  // pulgadas». El § 14.3 escribe esta grafía con los dos puntos: «2’54” → #b:#ed».
+  test('ABIERTO — § 14.3: «2′54″» con primas sale con los dos puntos (#b:#ed), sin llamar pulgadas a la ″ ni dudar de la ′', async ({ page }) => {
+    test.fail();
+    const fallos = await fallos30(page, [
+      ['2′54″', '⠼⠃⠒⠼⠑⠙'], // ⠼ 2 ⠃ · ⠒ (25) · ⠼ 5 ⠑ 4 ⠙. Hoy: ⠼⠃⠼⠑⠙
+      ['Hizo 2′54″ en la final', '⠨⠓⠊⠵⠕⠀⠼⠃⠒⠼⠑⠙⠀⠑⠝⠀⠇⠁⠀⠋⠊⠝⠁⠇'],
+    ]);
+    await convertir30(page, '2′54″');
+    await resultado30(page);
+    const avisos = await avisos30(page);
+    if (avisos.some((a) => a.includes('pulgadas'))) fallos.push('la ″ de un tiempo sale como marca de pulgadas');
+    if (avisos.some((a) => a.includes('Puede que') && a.includes('′'))) fallos.push('el aviso genérico duda de la ′');
+    expect(fallos).toEqual([]);
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // ABIERTO — § 15.2: la barra y las cifras de una URL
+  // ─────────────────────────────────────────────────────────────────────────
+  //
+  // En una URL el B 2 escribe la barra con 34 (⠌) y las cifras en braille computarizado (2 = 126 ⠣),
+  // y la app escribe la barra del texto corriente (⠠⠂, 6-2) y el signo de número, sin aviso. Vale la
+  // forma del B 2 o un aviso que diga que la URL no sigue el § 15.
+  test('ABIERTO — § 15.2: «www.once.es/blog» lleva la barra 34 (⠌) y «www.web2.org» la cifra computarizada (⠣), o un aviso', async ({ page }) => {
+    test.fail();
+    const casos: Array<[string, string]> = [
+      // w ⠺ w ⠺ w ⠺ · punto ⠄ (3) · o n c e · ⠄ · e s · barra ⠌ (34) · b l o g. Hoy: …⠎⠠⠂⠃⠇⠕⠛
+      ['www.once.es/blog', '⠺⠺⠺⠄⠕⠝⠉⠑⠄⠑⠎⠌⠃⠇⠕⠛'],
+      // … w e b · 2 computarizado ⠣ (126) · ⠄ · o r g. Hoy: …⠃⠼⠃⠄⠕⠗⠛
+      ['www.web2.org', '⠺⠺⠺⠄⠺⠑⠃⠣⠄⠕⠗⠛'],
+    ];
+    const fallos: string[] = [];
+    for (const [entrada, esperada] of casos) {
+      await convertir30(page, entrada);
+      const r = await resultado30(page);
+      const avisa = (await avisos30(page)).some((a) => /URL|dirección web|§ 15/.test(a));
+      if (r !== esperada && !avisa) fallos.push(`${entrada} → ${r}, sin aviso`);
+    }
+    expect(fallos).toEqual([]);
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // ABIERTO — § 6.2: la doble barra oblicua es un signo propio, 6-26-2
+  // ─────────────────────────────────────────────────────────────────────────
+  test('ABIERTO — § 6.2 y § 10.2: «bello; // mientras» lleva la doble barra ⠠⠢⠂ (6-26-2), no dos barras ⠠⠂⠠⠂', async ({ page }) => {
+    test.fail();
+    // b e l l o · ⠆ (23) · ⠀ · ⠠⠢⠂ (6-26-2) · ⠀ · m i e n t r a s. Hoy: …⠀⠠⠂⠠⠂⠀…
+    expect(await fallos30(page, [['bello; // mientras', '⠃⠑⠇⠇⠕⠆⠀⠠⠢⠂⠀⠍⠊⠑⠝⠞⠗⠁⠎']])).toEqual([]);
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // ABIERTO — § 8.1: con un 0 delante, el punto no puede ser de millar
+  // ─────────────────────────────────────────────────────────────────────────
+  //
+  // `esSeparadorDecimal` toma por millar todo punto seguido de tres cifras. Con un 0 delante no hay
+  // número «de más de tres cifras» que agrupar (0.125 no es mil ciento veinticinco), así que es el
+  // decimal que el § 8.1 escribe con el punto 2 venga como venga en la tinta: la forma en que lo
+  // escriben México y buena parte de Centroamérica. La app da ⠼⠚⠄⠁⠃⠑, que su propia vuelta lee «0.125».
+  test('ABIERTO — § 8.1: «0.125» y «0.500 kg» llevan la coma decimal ⠂, no el punto 3 de millar', async ({ page }) => {
+    test.fail();
+    expect(
+      await fallos30(page, [
+        ['0.125', '⠼⠚⠂⠁⠃⠑'], // ⠼ 0 ⠚ · punto 2 ⠂ · 1 ⠁ 2 ⠃ 5 ⠑. Hoy: ⠼⠚⠄⠁⠃⠑
+        ['0.500 kg', '⠼⠚⠂⠑⠚⠚⠀⠅⠛'], // Hoy: ⠼⠚⠄⠑⠚⠚⠀⠅⠛
+      ]),
+    ).toEqual([]);
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // ABIERTO — lo que el 3525 y el 3556 no cubrieron: más signos a los que el B 2 da celda
+  // ─────────────────────────────────────────────────────────────────────────
+  //
+  // Siguen con el aviso genérico «Puede que el Código Braille Español sí les asigne celda»: × (236),
+  // ± (235-25-36), ÷ (5-2), ‰ (456-356-356), © y ® (§ 12), ¶ (146, § 12.1), ¢ (45-14, § 13), ² y ³
+  // (16 + cifra, § 14.4), < y > (5-13 y 46-2, § 6.2) y ø (punto 6 + o, § 9.2).
+  test('ABIERTO — × ± ÷ ‰ © ® ¶ ¢ ² ³ < > ø: el B 2 les da celda y el aviso no lo pone en duda', async ({ page }) => {
+    test.fail();
+    await convertir30(page, '× ± ÷ ‰ © ® ¶ ¢ ² ³ < > ø');
+    await resultado30(page);
+    const dudan = (await avisos30(page)).filter((a) => a.includes('Puede que'));
+    const nombrados = [...'×±÷‰©®¶¢²³<>ø'].filter((c) => dudan.some((a) => a.includes(c)));
+    expect(nombrados).toEqual([]);
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // ABIERTO — el reparto de renglones de la hoja: cifra y unidad juntas (§ 14) y guion de corte (§ 6.2)
+  // ─────────────────────────────────────────────────────────────────────────
+  //
+  // (a) «La pared del salón mide 18 m» son 30 celdas: el renglón se llena con «⠼⠁⠓» en las celdas
+  //     26-28 y la «m» pasa sola al segundo, aunque el § 14 pide «la cantidad y la unidad en el mismo
+  //     renglón». Esperado: 24 celdas («La pared del salón mide») y 5 (⠼⠁⠓⠀⠍). Hoy: 28 y 1.
+  // (b) «Hipopotomonstrosesquipedaliofobia» (34 celdas, más que un renglón) se parte a las 29 celdas
+  //     con una letra al final: el que lee lee dos palabras. El B 2 parte con el guion de corte de
+  //     palabra 36 (§ 6.2; «super- lativa», «si- glo» en el § 10), y solo lo prohíbe en las URL (§ 15.2).
+  test('ABIERTO — hoja: «18 m» no se separa de su cifra en otro renglón y una palabra partida acaba en el guion ⠤ (36)', async ({ page }) => {
+    test.fail();
+    const fallos: string[] = [];
+    await convertir30(page, 'La pared del salón mide 18 m');
+    await resultado30(page);
+    const unidad = await renglonesDeLaHoja(page);
+    if (JSON.stringify(unidad.map((r) => r.length)) !== JSON.stringify([24, 5]))
+      fallos.push(`18 m: renglones de ${unidad.map((r) => r.length).join(' y ')} celdas`);
+    // ⠼ (3456) · 1 ⠁ (1) · 8 ⠓ (125) · ⠀ · m ⠍ (134)
+    if (JSON.stringify(unidad[1]) !== JSON.stringify(['3456', '1', '125', '', '134']))
+      fallos.push(`18 m: segundo renglón ${JSON.stringify(unidad[1])}`);
+    await convertir30(page, 'Hipopotomonstrosesquipedaliofobia');
+    await resultado30(page);
+    const larga = await renglonesDeLaHoja(page);
+    if (larga.length < 2 || larga[0][larga[0].length - 1] !== '36')
+      fallos.push(`palabra partida: el primer renglón acaba en «${larga[0]?.[larga[0].length - 1]}», no en el guion 36`);
+    expect(fallos).toEqual([]);
+  });
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // ABIERTO — guía, «Comparativa»: el braille matemático e informático de EE. UU. como el estándar
+  // ─────────────────────────────────────────────────────────────────────────
+  //
+  // La tabla da «Braille Matemático (Nemeth) … Nemeth (EE.UU.)» y «Braille Informático … NABCC /
+  // EE.UU.». Para el braille en español, la CBE aplica el «Código matemático unificado para
+  // Iberoamérica» (sustituye al B 5 desde marzo de 2023, según once.es) y la «Tabla ANSI española para
+  // braille computarizado» (V 1, citada en el B 1). Vale cualquier redacción que nombre los del español.
+  test('ABIERTO — guía: la tabla comparativa nombra el código matemático de Iberoamérica y la tabla ANSI española, no solo Nemeth y NABCC', async ({ page }) => {
+    test.fail();
+    await page.goto(RUTA);
+    const filas = await page.locator('[class*="eduTablaComparativa"] tbody tr').allTextContents();
+    const matematico = filas.find((f) => f.includes('Matemático')) ?? '';
+    const informatico = filas.find((f) => f.includes('Informático')) ?? '';
+    expect(matematico, 'precondición: se leyó la fila del braille matemático').not.toBe('');
+    expect({
+      matematico: /Iberoam|Comisión Braille|CBE/.test(matematico),
+      informatico: /ANSI española|Comisión Braille|CBE/.test(informatico),
+    }).toEqual({ matematico: true, informatico: true });
   });
 });

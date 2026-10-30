@@ -63,7 +63,8 @@ import { parseSpanishNumber } from '../../lib/formatters';
  *  B · 274 (bajo, contenido) En 6 estados de Deportes el ΔEV salía -4,44·10⁻¹⁶ y el medidor
  *                     rotulaba «(≈0 EV)». REPARADO: el rótulo se redondea antes de formatear.
  *
- * La TERCERA inspección (29/09/2026, foco en la tarea de aula) está al final del fichero.
+ * La TERCERA inspección (29/09/2026, foco en la tarea de aula) está al final del fichero, y la
+ * CUARTA (30/10/2026, revalidación tras el motor compartido del corrector), detrás de ella.
  * ─────────────────────────────────────────────────────────────────────────────────────────
  */
 
@@ -1388,4 +1389,283 @@ test.describe('móvil · Pixel 7', () => {
       .evaluateAll((bs) => bs.map((b) => Math.round(b.getBoundingClientRect().height)));
     expect(Math.min(...alturas)).toBeGreaterThanOrEqual(44);
   });
+
+  /**
+   * CUARTA INSPECCIÓN (30/10/2026) · CASO MÓVIL — los TRES deslizadores se ven enteros en 412 px
+   * y responden al dedo: un toque en el extremo y un arrastre táctil de punta a punta.
+   *
+   * Retrato parte de ISO 800 · f/2,8 · 1/125 s (modo libre):
+   *   · Toque en el extremo derecho del ISO → ISO 6400: log₂(6400/800) = log₂ 8 = +3 EV
+   *     → «Sobreexpuesto (zonas quemadas) (+3,0 EV)» (+3 > 1,5).
+   *   · Arrastre táctil hasta el extremo izquierdo → ISO 100: log₂(100/800) = −3 EV
+   *     → «Subexpuesto (foto oscura) (-3,0 EV)» (−3 < −1,5).
+   * El arrastre va por CDP (`Input.dispatchTouchEvent`): `tap()` solo da toques sueltos, y un
+   * arrastre con el ratón no prueba lo que hace un dedo.
+   */
+  test('CUARTA · móvil: los deslizadores se ven y responden al toque y al arrastre del dedo', async ({
+    page,
+  }) => {
+    const anchos = await page.evaluate(() => ({
+      scroll: document.documentElement.scrollWidth,
+      cliente: document.documentElement.clientWidth,
+    }));
+    expect(anchos.scroll).toBeLessThanOrEqual(anchos.cliente);
+
+    for (const sel of DESLIZADORES) {
+      const deslizador = page.locator(sel);
+      await deslizador.scrollIntoViewIfNeeded();
+      await expect(deslizador).toBeVisible();
+      const caja = (await deslizador.boundingBox())!;
+      expect(caja.x, `${sel} empieza dentro de la pantalla`).toBeGreaterThanOrEqual(0);
+      expect(caja.x + caja.width, `${sel} acaba dentro de la pantalla`).toBeLessThanOrEqual(anchos.cliente);
+      expect(caja.width, `${sel} tiene recorrido para el dedo`).toBeGreaterThan(200);
+    }
+
+    const iso = page.locator('#iso-slider');
+    await iso.scrollIntoViewIfNeeded();
+    const caja = (await iso.boundingBox())!;
+    await iso.tap({ position: { x: caja.width - 2, y: caja.height / 2 } });
+    await expect(rotulo(page, 'iso-slider')).toHaveText('ISO 6400');
+    await expect(exposicion(page)).toHaveText('Sobreexpuesto (zonas quemadas) (+3,0 EV)');
+
+    const cdp = await page.context().newCDPSession(page);
+    const c = (await iso.boundingBox())!;
+    const y = c.y + c.height / 2;
+    const x0 = c.x + c.width - 4;
+    const x1 = c.x + 4;
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: x0, y }] });
+    for (let i = 1; i <= 10; i++) {
+      await cdp.send('Input.dispatchTouchEvent', {
+        type: 'touchMove',
+        touchPoints: [{ x: x0 + ((x1 - x0) * i) / 10, y }],
+      });
+    }
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+    await expect(rotulo(page, 'iso-slider')).toHaveText('ISO 100');
+    await expect(exposicion(page)).toHaveText('Subexpuesto (foto oscura) (-3,0 EV)');
+
+    // Pestañas y modo, también a toques
+    await page.getByRole('tab', { name: /Deportes/ }).tap();
+    await expect(page.getByRole('tab', { name: /Deportes/ })).toHaveAttribute('aria-selected', 'true');
+    await expect(rotulo(page, 'iso-slider')).toHaveText('ISO 400');
+    await page.getByRole('button', { name: 'Modo compensado' }).tap();
+    await expect(page.getByRole('button', { name: 'Modo compensado' })).toHaveAttribute('aria-pressed', 'true');
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════
+ * CUARTA INSPECCIÓN · 30/10/2026 — revalidación (dependencia cambiada: el motor compartido
+ * lib/calculadoras/correctorCasosAula.ts, commits 2221d315, 03ec4600 y 3b92acef)
+ *
+ * Las regresiones 2403-2411 de arriba siguen en verde con el corrector compartido. Aquí, dos
+ * casos de cálculo que ningún test anterior cubría y los hallazgos nuevos.
+ *
+ * Fórmula (la de la caja de la app, convenio de fotómetro, + = más luz), con los valores
+ * ROTULADOS de las escalas:   ΔEV = log₂(ISO/ISO₀) + 2·log₂(N₀/N) + log₂(t/t₀)
+ * Es la relación APEX de exposición (EV = log₂(N²/t), con el ISO sumando log₂(ISO/100))
+ * expresada como desviación respecto a la combinación de la escena y con el signo cambiado.
+ * ═══════════════════════════════════════════════════════════════════════════════════════ */
+
+/**
+ * CASO NORMAL · los tres ejes a la vez, en modo libre (Deportes: ISO 400 · f/4 · 1/1000 s).
+ *   ISO 400 → 800:        log₂(800/400)      = +1,000000
+ *   f/4 → f/5,6:          2·log₂(4/5,6)      = −0,970854   (5,6 es el rótulo de 4·√2 = 5,657)
+ *   1/1000 → 1/250 s:     log₂(1000/250)     = +2,000000
+ *   ΔEV = +2,029146 → «Sobreexpuesto (zonas quemadas) (+2,0 EV)» (> 1,5)
+ *   marcador: 50 + 2,029146/3·50 = 83,8191 % · velo blanco: min(0,85; 2,029146/4) = 0,507287
+ * Paso intermedio (solo ISO y diafragma): 1 − 0,970854 = +0,029146 → «Exposición correcta».
+ * Precisión 2 en el marcador: el defecto de contar muescas daría +2,000 (0,029 de distancia).
+ */
+test('CUARTA · CASO NORMAL: ISO, diafragma y velocidad a la vez dan +2,029146 EV (Deportes, libre)', async ({
+  page,
+}) => {
+  await elegirEscena(page, 'Deportes');
+  await expect(exposicion(page)).toHaveText('Exposición correcta (+0,0 EV)');
+
+  await mover(page, 'iso-slider', 3);
+  await expect(rotulo(page, 'iso-slider')).toHaveText('ISO 800');
+  await expect(exposicion(page)).toHaveText('Ligeramente sobreexpuesto (+1,0 EV)');
+
+  await mover(page, 'ap-slider', 4);
+  await expect(rotulo(page, 'ap-slider')).toHaveText('f/5,6');
+  expect(await evDelMarcador(page)).toBeCloseTo(0.029146, 2);
+  await expect(exposicion(page)).toHaveText('Exposición correcta (+0,0 EV)');
+
+  await mover(page, 'sh-slider', 8);
+  await expect(rotulo(page, 'sh-slider')).toHaveText('1/250 s');
+  await expect(exposicion(page)).toHaveText('Sobreexpuesto (zonas quemadas) (+2,0 EV)');
+  expect(await evDelMarcador(page)).toBeCloseTo(2.029146, 2);
+  const velo = await page.locator('svg rect[fill="#fff"]').getAttribute('opacity');
+  expect(parseFloat(String(velo))).toBeCloseTo(0.507287, 3);
+});
+
+/**
+ * CASO LÍMITE · abrir a f/1,4 en modo compensado: la cascada por el camino diafragma →
+ * velocidad → ISO, que el CASO 2 (ISO → velocidad → diafragma) no recorre.
+ *
+ * Deportes (ISO 400 · f/4 · 1/1000 s): f/4 → f/1,4 = 2·log₂(4/1,4) = +3,029146 de luz. La
+ * velocidad tendría que ir a log₂(1/1000) − 3,029146 = −12,994931, por debajo de 1/4000 s
+ * (−11,965784): se queda en 1/4000 y faltan −1,029146, que pone el ISO: 2 − 1,029146 = 0,970854
+ * → ISO 200 (1 stop). ΔEV = −1 + 3,029146 − 2 = +0,029146 → «Exposición correcta (+0,0 EV)».
+ *
+ * Paisaje (ISO 100 · f/11 · 1/250 s): f/11 → f/1,4 = 2·log₂(11/1,4) = +5,948010. La velocidad
+ * topa en 1/4000 s (−4,000000) y el ISO ya está en 100: no queda quien reste.
+ * ΔEV = 5,948010 − 4 = +1,948010 → «Sobreexpuesto (zonas quemadas) (+1,9 EV)» y el aviso de
+ * límite, que aquí SÍ es verdad (ISO en su mínimo y velocidad en su máximo).
+ */
+test('CUARTA · CASO LÍMITE: f/1,4 en modo compensado, con cascada en Deportes y tope real en Paisaje', async ({
+  page,
+}) => {
+  await elegirEscena(page, 'Deportes');
+  await elegirModo(page, 'compensado');
+  await mover(page, 'ap-slider', 0);
+  await expect(rotulo(page, 'ap-slider')).toHaveText('f/1,4');
+  await expect(rotulo(page, 'sh-slider')).toHaveText('1/4000 s');
+  await expect(rotulo(page, 'iso-slider')).toHaveText('ISO 200');
+  expect(await evDelMarcador(page)).toBeCloseTo(0.029146, 2);
+  await expect(exposicion(page)).toHaveText('Exposición correcta (+0,0 EV)');
+  await expect(page.getByText('El modo compensado ha llegado al límite')).toHaveCount(0);
+
+  await elegirEscena(page, 'Paisaje');
+  await mover(page, 'ap-slider', 0);
+  await expect(rotulo(page, 'ap-slider')).toHaveText('f/1,4');
+  await expect(rotulo(page, 'sh-slider')).toHaveText('1/4000 s');
+  await expect(rotulo(page, 'iso-slider')).toHaveText('ISO 100');
+  expect(await evDelMarcador(page)).toBeCloseTo(1.94801, 2);
+  // toContainText: con el tope, la región viva lleva además el aviso
+  await expect(exposicion(page)).toContainText('Sobreexpuesto (zonas quemadas) (+1,9 EV)');
+  await expect(page.getByText('El modo compensado ha llegado al límite')).toBeVisible();
+});
+
+/**
+ * HALLAZGO NUEVO (medio, accesibilidad) · el veredicto del medidor no llega a 4,5:1 en claro.
+ * «Exposición correcta» va en #16a34a y «Ligeramente sobre/subexpuesto» en #ca8a04 sobre el
+ * blanco del panel: 3,30:1 y 2,94:1. Es texto de 13,6 px en negrita (no llega a «grande», que en
+ * negrita empieza en 18,66 px), así que exige 4,5:1. «Sobreexpuesto (zonas quemadas)» (#dc2626)
+ * da 4,83:1 y en oscuro los tres pasan (7,90 · 9,55 · 4,98).
+ */
+test('HALLAZGO · el rótulo del medidor llega a 4,5:1 en el tema claro en sus tres estados', async ({
+  page,
+}) => {
+  test.fail(); // ABIERTO: «Exposición correcta» 3,30:1 y «Ligeramente…» 2,94:1 en claro
+  await prepararParaMedir(page);
+  await activarTema(page, 'light');
+  const rotuloMedidor = page.locator('[role="status"] p').first();
+  const medidas: string[] = [];
+  let peor = Infinity;
+  for (const [iso, estado] of [
+    [3, 'Exposición correcta'],
+    [4, 'Ligeramente sobreexpuesto'],
+    [6, 'Sobreexpuesto (zonas quemadas)'],
+  ] as const) {
+    if (iso !== 3) await mover(page, 'iso-slider', iso);
+    await expect(rotuloMedidor).toContainText(estado);
+    const r = await contrasteEfectivo(rotuloMedidor);
+    medidas.push(`${estado}: ${r.toFixed(2)}:1`);
+    peor = Math.min(peor, r);
+  }
+  expect(peor, medidas.join(' · ')).toBeGreaterThanOrEqual(4.5);
+});
+
+/**
+ * HALLAZGO NUEVO (bajo, accesibilidad) · el emoji de la tarjeta de escena se lee en voz alta.
+ * `<strong>{escena.emoji} {escena.nombre}:</strong>` pinta «👤 Retrato:», «🏔️ Paisaje:» y
+ * «🏃 Deportes:» sin `<span aria-hidden="true">` (regla del CLAUDE.md global §5); en las
+ * pestañas de arriba el mismo emoji sí lo lleva. check:a11y-jsx no lo ve porque es una variable.
+ */
+test('HALLAZGO · el emoji de la tarjeta de escena va oculto al lector de pantalla', async ({ page }) => {
+  test.fail(); // ABIERTO: el nombre accesible del <strong> empieza por el emoji en las tres escenas
+  for (const nombre of ['Retrato', 'Paisaje', 'Deportes']) {
+    await elegirEscena(page, nombre);
+    const strong = page.locator('[class*="escenaInfo"] strong');
+    await expect(strong).toContainText(nombre);
+    const emojisALaVista = await strong.evaluate((el) => {
+      const recorrido = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+      let n = 0;
+      for (let t = recorrido.nextNode(); t; t = recorrido.nextNode()) {
+        if (/\p{Extended_Pictographic}/u.test(t.textContent ?? '') && !t.parentElement?.closest('[aria-hidden="true"]')) n++;
+      }
+      return n;
+    });
+    expect(emojisALaVista, `tarjeta de ${nombre}`).toBe(0);
+  }
+});
+
+/** FAQPage servido en el JSON-LD de la página, pregunta → respuesta. */
+async function faqDelJsonLd(page: Page): Promise<Map<string, string>> {
+  const bloques = await page
+    .locator('script[type="application/ld+json"]')
+    .evaluateAll((ss) => ss.map((s) => s.textContent ?? ''));
+  const faq = new Map<string, string>();
+  for (const b of bloques) {
+    const j = JSON.parse(b) as {
+      '@type'?: string;
+      mainEntity?: { name: string; acceptedAnswer: { text: string } }[];
+    };
+    if (j['@type'] === 'FAQPage') for (const q of j.mainEntity ?? []) faq.set(q.name, q.acceptedAnswer.text);
+  }
+  return faq;
+}
+
+/**
+ * HALLAZGO NUEVO (bajo, contenido) · la misma pregunta con dos respuestas.
+ *   FAQ visible  «¿Modo manual o automático?» → «Para aprender, ve directamente al manual. …
+ *                los modos semiautomáticos son ideales: prioridad de apertura (Av/A) … prioridad
+ *                de velocidad (Tv/S) …»
+ *   FAQPage      «¿Qué diferencia hay entre el modo automático de una cámara y el modo manual?» →
+ *                «En modo automático la cámara decide los tres parámetros … Los modos
+ *                semimanuales (Av, Tv, P) son puntos intermedios.»
+ * No se contradicen de frente, pero cada boca dice una cosa (semiautomáticos Av/Tv frente a
+ * semimanuales Av/Tv/P). La reparación es UNA constante en metadata.ts que importen las dos.
+ */
+test('HALLAZGO · la pregunta de modo manual o automático dice lo mismo en la FAQ visible y en el FAQPage', async ({
+  page,
+}) => {
+  test.fail(); // ABIERTO: dos respuestas distintas para la misma pregunta
+  const faq = await faqDelJsonLd(page);
+  const enJsonLd = [...faq.entries()].find(([q]) => /manual/i.test(q) && /autom/i.test(q));
+  expect(enJsonLd, 'el FAQPage trae la pregunta de manual/automático').toBeTruthy();
+  const item = page.locator('[class*="faqItem"]').filter({ hasText: /Modo manual o automático/ });
+  await expect(item).toHaveCount(1);
+  const visible = ((await item.locator('p').first().textContent()) ?? '').replace(/\s+/g, ' ').trim();
+  expect(visible).toBe(enJsonLd![1]);
+});
+
+/**
+ * HALLAZGO NUEVO (bajo, contenido) · formato español (CLAUDE.md global §2 y Ortografía de la
+ * RAE: espacio entre la cifra y el símbolo).
+ *   FAQPage (bokeh): «número f bajo, como f/1.8», con punto decimal; la FAQ visible escribe
+ *   «f/1,4 o f/1,8».
+ *   Pantalla: «Velocidad rápida (1/4000s) … Lenta (1s)» bajo el deslizador, y en la guía
+ *   «1/125s», «1/60s», «1/1000s», «25s», «1/250s», «1/15s o 1/8s», «1/100s», «1/30s»; los
+ *   rótulos de los deslizadores y los casos de aula dicen «1/125 s», con espacio.
+ */
+test('HALLAZGO · decimales con coma y velocidades con espacio antes de la «s»', async ({ page }) => {
+  test.fail(); // ABIERTO: «f/1.8» en el FAQPage y «1/4000s», «25s»… en pantalla
+  const faq = await faqDelJsonLd(page);
+  for (const [q, r] of faq) expect(r, q).not.toMatch(/f\/\d+\.\d/);
+  const textos = await page
+    .locator('[class*="unitLabel"], [class*="escenarioCard"] p, [class*="faqItem"] p, [class*="warningList"] li')
+    .allTextContents();
+  const pegadas = textos.flatMap((t) => t.match(/(?:1\/\d+|\b\d+)s\b/g) ?? []);
+  expect(pegadas, 'velocidades sin espacio antes de la «s»').toEqual([]);
+});
+
+/**
+ * HALLAZGO NUEVO (bajo, contenido) · el límite de 25 s para la Vía Láctea se da como universal.
+ * La tarjeta dice «ISO 3200 + f/2,8 + 25s con trípode … (más de 25s y las estrellas se
+ * mueven)», sin focal. La traza de una estrella en el sensor es f·ω·t, con ω = 2π/86.164 s (un
+ * día sidéreo) = 7,29·10⁻⁵ rad/s: en 25 s, 36 µm con un 20 mm y 91 µm con un 50 mm (15 píxeles
+ * de 6 µm). La regla práctica del 500 (500/focal en formato completo) da 25 s solo con 20 mm;
+ * con 50 mm, 10 s. La propia guía ata la trepidación a la focal (regla 1/focal) y aquí no.
+ */
+test('HALLAZGO · si la tarjeta de la Vía Láctea da un límite de exposición, lo liga a la focal', async ({
+  page,
+}) => {
+  test.fail(); // ABIERTO: «más de 25s y las estrellas se mueven», sin focal
+  const tarjeta = page.locator('[class*="escenarioCard"]').filter({ hasText: 'Vía Láctea' });
+  await expect(tarjeta).toHaveCount(1);
+  const texto = ((await tarjeta.textContent()) ?? '').replace(/\s+/g, ' ');
+  const daLimite = /más de 25\s?s/.test(texto);
+  expect(!daLimite || /focal|\d+\s?mm/i.test(texto), texto).toBe(true);
 });
