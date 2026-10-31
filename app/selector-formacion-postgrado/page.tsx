@@ -13,6 +13,7 @@ import {
   RegionBadge,
 } from '@/components';
 import { calcularResultado, enumerar, FORMACIONES, LABELS, CON_ARTICULO, PREGUNTAS, RESTRICCION_CORTA } from './motor';
+import { useGuardaRafaga } from '@/lib/useGuardaRafaga';
 
 // Las preguntas con sus pesos, las fichas de cada vía y la lógica viven en ./motor.ts.
 
@@ -47,27 +48,16 @@ export default function SelectorFormacionPostgradoPage() {
   const pregunta = PREGUNTAS[preguntaActual];
   const opcionSeleccionada = respuestas[pregunta.id] ?? -1;
 
-  /**
-   * Doble clic y dos toques seguidos (hallazgo 3101; receta `clicDeMas` de la familia, 2659 de
-   * selector-smartphone). El primer clic cambia de pregunta y el segundo caía en lo que hubiera en
-   * ese punto en la nueva: «Anterior» (deshacía el avance) o una opción que nadie había elegido. Un
-   * clic se ignora cuando es el 2.º de una ráfaga (`detail` > 1, que el teclado no produce) Y el
-   * clic anterior de la app cambió de pantalla.
-   */
-  const ultimoCambioPantallaRef = useRef(false);
-  const clicDeMas = (e: React.MouseEvent<HTMLButtonElement>): boolean =>
-    e.detail > 1 && ultimoCambioPantallaRef.current;
-  const registrarClic = (cambiaPantalla: boolean) => {
-    ultimoCambioPantallaRef.current = cambiaPantalla;
-  };
+  // Doble clic y dos toques seguidos (hallazgo 3101): el 2.º toque de una ráfaga tras un clic que
+  // cambia de pantalla se ignora, también sobre las relacionadas y el pie. Receta de la familia en
+  // lib/useGuardaRafaga.ts (cabo C0317).
+  const marcarCambioPantalla = useGuardaRafaga();
 
   const seleccionarOpcion = (idx: number) => {
-    registrarClic(false);
     setRespuestas((prev) => ({ ...prev, [pregunta.id]: idx }));
   };
 
-  const elegirOpcion = (e: React.MouseEvent<HTMLButtonElement>, idx: number) => {
-    if (clicDeMas(e)) return;
+  const elegirOpcion = (idx: number) => {
     seleccionarOpcion(idx);
   };
 
@@ -92,15 +82,15 @@ export default function SelectorFormacionPostgradoPage() {
 
   // A la pregunta SIGUIENTE A LA PULSADA (`preguntaActual ± 1` del render, no `p => p ± 1`): dos
   // clics antes de repintar no saltan una pregunta.
-  const irAnterior = (e: React.MouseEvent<HTMLButtonElement>) => {
-    if (clicDeMas(e) || preguntaActual === 0) return;
-    registrarClic(true);
+  const irAnterior = () => {
+    if (preguntaActual === 0) return;
+    marcarCambioPantalla();
     setPreguntaActual(preguntaActual - 1);
   };
 
-  const irSiguiente = (e: React.MouseEvent<HTMLButtonElement>) => {
-    if (clicDeMas(e) || opcionSeleccionada === -1) return;
-    registrarClic(true);
+  const irSiguiente = () => {
+    if (opcionSeleccionada === -1) return;
+    marcarCambioPantalla();
     if (preguntaActual < totalPreguntas - 1) {
       setPreguntaActual(preguntaActual + 1);
     } else {
@@ -108,9 +98,8 @@ export default function SelectorFormacionPostgradoPage() {
     }
   };
 
-  const reiniciar = (e: React.MouseEvent<HTMLButtonElement>) => {
-    if (clicDeMas(e)) return;
-    registrarClic(true);
+  const reiniciar = () => {
+    marcarCambioPantalla();
     setRespuestas({});
     setPaso('quiz');
     setPreguntaActual(0);
@@ -204,7 +193,7 @@ export default function SelectorFormacionPostgradoPage() {
                   key={idx}
                   type="button"
                   className={`${styles.opcion} ${opcionSeleccionada === idx ? styles.seleccionada : ''}`}
-                  onClick={(e) => elegirOpcion(e, idx)}
+                  onClick={() => elegirOpcion(idx)}
                   // role="radio" + aria-checked, no aria-pressed: la elección es ÚNICA entre
                   // varias, no un conmutador. El contenedor declaraba radiogroup sin un solo
                   // radio dentro (selector-smartphone, hallazgo 950).

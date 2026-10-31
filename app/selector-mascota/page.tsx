@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useEffect, useRef, useState, type MouseEvent } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styles from './SelectorMascota.module.css';
-import { margenBarraLogo } from '@/lib';
+import { enfocarALaVista } from '@/lib';
 import {
   calcularResultado,
   MASCOTAS,
@@ -21,6 +21,7 @@ import {
   ShareCard,
   DisclaimerCard,
 } from '@/components';
+import { useGuardaRafaga } from '@/lib/useGuardaRafaga';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -178,11 +179,7 @@ export default function SelectorMascota() {
       : pantalla === 'test' ? enunciado.current
         : null;
     if (!destino) return;
-    const caja = destino.getBoundingClientRect();
-    if (caja.top < margenBarraLogo() || caja.bottom > window.innerHeight) {
-      destino.scrollIntoView({ block: 'start', behavior: 'instant' });
-    }
-    destino.focus({ preventScroll: true });
+    enfocarALaVista(destino);
   }, [pantalla, paso]);
 
   const preguntaActual = PREGUNTAS[paso];
@@ -191,43 +188,10 @@ export default function SelectorMascota() {
   const respuestaActual = respuestas[preguntaActual.id] ?? '';
   const marcadas = respuestaActual.split(',').filter(Boolean);
 
-  /**
-   * Doble clic y dos toques seguidos (hallazgo 2671, receta de quiz-literatura-universal,
-   * ce0ad0bc). «Empezar», «Siguiente», «Anterior», «Ver resultado» y «Repetir» cambian la
-   * pantalla en el primer clic, y el segundo caía en el mismo punto sobre lo que hubiera debajo
-   * en la pantalla nueva: a 412 px, el «Siguiente» de la pregunta 8 contestaba la 9, que tiene
-   * una opción más y crece hacia abajo. Un clic se ignora cuando cumple las dos cosas:
-   *   · es el 2.º (o 3.º…) de una ráfaga: `detail` > 1. Lo cuenta el navegador, no un
-   *     temporizador; con teclado o lector de pantalla es 0;
-   *   · y el clic ANTERIOR de la app cambió de pantalla. Sin esto, elegir y pulsar «Siguiente»
-   *     deprisa en un móvil —dos toques cercanos, que Chrome también cuenta como ráfaga— se
-   *     comería el «Siguiente», que sí era una intención nueva.
-   */
-  const ultimoCambioPantallaRef = useRef(false);
-  const clicDeMas = (e: MouseEvent<HTMLButtonElement>): boolean =>
-    e.detail > 1 && ultimoCambioPantallaRef.current;
-  const registrarClic = (cambiaPantalla: boolean) => {
-    ultimoCambioPantallaRef.current = cambiaPantalla;
-  };
-
-  // Lo que el segundo toque pisa tras «Ver resultado» o «Repetir el test» no es de esta app: la
-  // página sube o encoge y el toque cae en un enlace de la cabecera común («Contacto» de
-  // <LegalNotice />, el aviso de transparencia) o del pie, que `clicDeMas` no alcanza (hallazgo
-  // 3211). La misma regla, en fase de captura sobre window, antes de que el enlace o React lo
-  // vean, como en selector-alquiler-vs-compra (3111). Un clic suelto (detail 1) no se toca y
-  // cierra la ráfaga: la app vuelve a marcar el cambio de pantalla en su propio manejador.
-  useEffect(() => {
-    function filtrar(e: globalThis.MouseEvent) {
-      if (e.detail > 1 && ultimoCambioPantallaRef.current) {
-        e.preventDefault();
-        e.stopPropagation();
-      } else if (e.detail <= 1) {
-        ultimoCambioPantallaRef.current = false;
-      }
-    }
-    window.addEventListener('click', filtrar, true);
-    return () => window.removeEventListener('click', filtrar, true);
-  }, []);
+  // Doble clic y dos toques seguidos (hallazgo 2671): el 2.º toque de una ráfaga tras un clic que
+  // cambia de pantalla se ignora, también sobre las relacionadas y el pie. Receta de la familia en
+  // lib/useGuardaRafaga.ts (cabo C0317).
+  const marcarCambioPantalla = useGuardaRafaga();
 
   function seleccionarOpcion(valor: string) { setRespuestas(prev => ({ ...prev, [preguntaActual.id]: valor })); }
 
@@ -243,9 +207,7 @@ export default function SelectorMascota() {
     setRespuestas(prev => ({ ...prev, [preguntaActual.id]: valor }));
   }
 
-  function pulsarOpcion(e: MouseEvent<HTMLButtonElement>, op: Opcion) {
-    if (clicDeMas(e)) return;
-    registrarClic(false);
+  function pulsarOpcion(op: Opcion) {
     if (preguntaActual.multiple) alternarCasilla(op);
     else seleccionarOpcion(op.valor);
   }
@@ -274,25 +236,23 @@ export default function SelectorMascota() {
 
   // Avanza desde la pregunta DEL RENDER (`paso + 1`, no `p => p + 1`) y solo si está respondida:
   // dos clics antes de repintar no saltan una pregunta (hallazgo 2671).
-  function avanzar(e: MouseEvent<HTMLButtonElement>) {
-    if (clicDeMas(e) || !respuestaActual) return;
-    registrarClic(true);
+  function avanzar() {
+    if (!respuestaActual) return;
+    marcarCambioPantalla();
     if (paso < totalPreguntas - 1) { setPaso(paso + 1); }
     else { setResultado(calcularResultado(respuestas)); setPantalla('resultado'); }
   }
-  function retroceder(e: MouseEvent<HTMLButtonElement>) {
-    if (clicDeMas(e) || paso === 0) return;
-    registrarClic(true);
+  function retroceder() {
+    if (paso === 0) return;
+    marcarCambioPantalla();
     setPaso(paso - 1);
   }
-  function empezar(e: MouseEvent<HTMLButtonElement>) {
-    if (clicDeMas(e)) return;
-    registrarClic(true);
+  function empezar() {
+    marcarCambioPantalla();
     setPantalla('test');
   }
-  function reiniciar(e: MouseEvent<HTMLButtonElement>) {
-    if (clicDeMas(e)) return;
-    registrarClic(true);
+  function reiniciar() {
+    marcarCambioPantalla();
     setPantalla('intro'); setPaso(0); setRespuestas({}); setResultado(null);
   }
 
@@ -401,7 +361,7 @@ export default function SelectorMascota() {
                 return (
                   <button key={op.valor} type="button"
                     className={`${styles.opcionBtn} ${marcada ? styles.opcionSeleccionada : ''}`}
-                    onClick={e => pulsarOpcion(e, op)}
+                    onClick={() => pulsarOpcion(op)}
                     // role="radio" + aria-checked, no aria-pressed: la elección es ÚNICA entre
                     // varias, no un conmutador. El contenedor declaraba radiogroup sin un solo
                     // radio dentro (hallazgo 1341; selector-smartphone, hallazgo 950).

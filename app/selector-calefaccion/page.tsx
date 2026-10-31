@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useRef, useState, type KeyboardEvent, type MouseEvent } from 'react';
+import React, { useEffect, useRef, useState, type KeyboardEvent } from 'react';
 import styles from './SelectorCalefaccion.module.css';
 import {
   MeskeiaLogo,
@@ -25,6 +25,7 @@ import {
   enumerar,
   type Resultado,
 } from './motor';
+import { useGuardaRafaga } from '@/lib/useGuardaRafaga';
 
 // Los sistemas, las preguntas con sus pesos y la lógica de recomendación viven en ./motor.ts.
 
@@ -65,37 +66,10 @@ export default function SelectorCalefaccion() {
   const totalPreguntas = PREGUNTAS.length;
   const progreso = (paso / totalPreguntas) * 100;
 
-  /**
-   * Doble clic y dos toques seguidos (hallazgo 2674, forma del 2507 de quiz-literatura-universal).
-   * «Empezar», «Siguiente», «Anterior», «Ver resultado» y «Repetir» cambian la pantalla en el
-   * primer toque, y el segundo caía en el mismo punto sobre lo que hubiera debajo: como las
-   * preguntas no tienen todas el mismo número de opciones, la botonera se desplaza, y el segundo
-   * toque contestaba la pregunta nueva sin leerla, abría una app de «Apps relacionadas» o, tras
-   * «Ver resultado», el enlace de Delegum del aviso legal. Un doble toque es UNA intención, así
-   * que se ignora un clic cuando cumple las dos cosas:
-   *   · es el 2.º (o 3.º…) de una ráfaga: `detail` > 1. Lo cuenta el navegador, no un
-   *     temporizador de la app; con teclado o lector de pantalla es 0;
-   *   · y el clic ANTERIOR dentro de la app cambió de pantalla. Sin esta condición, elegir una
-   *     opción y pulsar «Siguiente» deprisa —dos toques cercanos, que Chrome también cuenta como
-   *     ráfaga— se comería el «Siguiente», que sí era una intención nueva.
-   * Se filtra en la fase de CAPTURA del contenedor, así que vale también para los enlaces de los
-   * componentes compartidos que hay debajo (aviso legal, apps relacionadas, pie). El clic
-   * ignorado no toca el registro: el 3.º de una ráfaga se ignora igual que el 2.º.
-   */
-  const ultimoCambioPantallaRef = useRef(false);
-  function filtrarClicDeMas(e: MouseEvent<HTMLDivElement>) {
-    if (e.detail > 1 && ultimoCambioPantallaRef.current) {
-      e.preventDefault();
-      e.stopPropagation();
-      return;
-    }
-    // Cualquier clic que pasa empieza sin cambio de pantalla; los botones que la cambian lo
-    // marcan en su propio manejador, que corre después (fase de burbuja).
-    ultimoCambioPantallaRef.current = false;
-  }
-  const cambiaPantalla = () => {
-    ultimoCambioPantallaRef.current = true;
-  };
+  // Doble clic y dos toques seguidos (hallazgo 2674): el 2.º toque de una ráfaga tras un clic que
+  // cambia de pantalla se ignora, también sobre las relacionadas y el pie. Receta de la familia en
+  // lib/useGuardaRafaga.ts (cabo C0317).
+  const marcarCambioPantalla = useGuardaRafaga();
 
   function seleccionarOpcion(valor: string) {
     setRespuestas(prev => ({ ...prev, [preguntaActual.id]: valor }));
@@ -116,14 +90,13 @@ export default function SelectorCalefaccion() {
     else if (e.key === 'End') destino = total - 1;
     else return;
     e.preventDefault();
-    ultimoCambioPantallaRef.current = false;
     seleccionarOpcion(preguntaActual.opciones[destino].valor);
     const radios = e.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('[role="radio"]');
     radios?.[destino]?.focus();
   }
 
   function empezar() {
-    cambiaPantalla();
+    marcarCambioPantalla();
     setPantalla('test');
   }
 
@@ -131,7 +104,7 @@ export default function SelectorCalefaccion() {
   // respondida: dos clics que llegaran antes de repintar no saltan una pregunta sin contestar.
   function avanzar() {
     if (!respuestas[PREGUNTAS[paso].id]) return;
-    cambiaPantalla();
+    marcarCambioPantalla();
     if (paso < totalPreguntas - 1) {
       setPaso(paso + 1);
     } else {
@@ -142,12 +115,12 @@ export default function SelectorCalefaccion() {
 
   function retroceder() {
     if (paso === 0) return;
-    cambiaPantalla();
+    marcarCambioPantalla();
     setPaso(paso - 1);
   }
 
   function reiniciar() {
-    cambiaPantalla();
+    marcarCambioPantalla();
     volviendoRef.current = true;
     setPantalla('intro');
     setPaso(0);
@@ -156,7 +129,7 @@ export default function SelectorCalefaccion() {
   }
 
   return (
-    <div className={styles.container} onClickCapture={filtrarClicDeMas}>
+    <div className={styles.container}>
       <MeskeiaLogo />
 
       {pantalla !== 'resultado' ? (

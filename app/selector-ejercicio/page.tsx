@@ -5,6 +5,7 @@ import styles from './SelectorEjercicio.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard, DisclaimerCard, RegionBadge } from '@/components';
 import { calcularResultado, PREGUNTAS, EJERCICIOS, CON_ARTICULO, type Resultado } from './motor';
 import { margenBarraLogo } from '@/lib';
+import { useGuardaRafaga } from '@/lib/useGuardaRafaga';
 
 // Las preguntas con sus pesos, las fichas de cada actividad y la lógica viven en ./motor.ts.
 
@@ -67,39 +68,10 @@ export default function SelectorEjercicio() {
     }
   }, [pantalla, paso]);
 
-  /**
-   * Doble clic y dos toques seguidos (hallazgos 2682 y 2683; receta de quiz-literatura-universal,
-   * 2507). «Empezar», «Siguiente», «Anterior», «Ver resultado» y «Repetir» cambian la pantalla en
-   * el primer toque; la pregunta nueva tiene otro número de opciones (7, 4, 3…), la tarjeta
-   * cambia de alto bajo el dedo y el segundo toque caía sobre lo que hubiera debajo: contestaba
-   * la pregunta siguiente, devolvía a la anterior o abría una app relacionada y se perdía todo lo
-   * respondido. Un doble clic es UNA intención, así que un clic se ignora cuando cumple dos cosas:
-   *   · es el 2.º (o 3.º…) de una ráfaga: `detail` > 1. Lo cuenta el navegador (clics seguidos en
-   *     el mismo sitio), no un temporizador de la app; con teclado o lector de pantalla es 0;
-   *   · y el clic ANTERIOR aceptado en la página cambió de pantalla. Sin esta condición, marcar
-   *     una opción y tocar «Siguiente» deprisa —dos toques cercanos, que Chrome también cuenta
-   *     como ráfaga— se comería el «Siguiente», que sí era una intención nueva.
-   * Se escucha en `window`, en captura, y no solo en cada botón: el segundo toque podía caer en
-   * un ENLACE (las apps relacionadas), que no pasa por ningún manejador de la app. El clic
-   * ignorado no toca el registro: el 3.º de una ráfaga se ignora igual que el 2.º.
-   */
-  const ultimoCambioPantallaRef = useRef(false);
-  useEffect(() => {
-    const filtrar = (e: globalThis.MouseEvent) => {
-      if (e.detail > 1 && ultimoCambioPantallaRef.current) {
-        e.preventDefault();
-        e.stopImmediatePropagation();
-        return;
-      }
-      // Clic aceptado: si cambia de pantalla, su manejador lo anota justo después.
-      ultimoCambioPantallaRef.current = false;
-    };
-    window.addEventListener('click', filtrar, true);
-    return () => window.removeEventListener('click', filtrar, true);
-  }, []);
-  const anotarCambioPantalla = () => {
-    ultimoCambioPantallaRef.current = true;
-  };
+  // Doble clic y dos toques seguidos (hallazgos 2682 y 2683): el 2.º toque de una ráfaga tras un
+  // clic que cambia de pantalla se ignora, también sobre las relacionadas y el pie. Receta de la
+  // familia en lib/useGuardaRafaga.ts (cabo C0317).
+  const marcarCambioPantalla = useGuardaRafaga();
 
   const totalPreguntas = PREGUNTAS.length;
   const preguntaActual = PREGUNTAS[paso];
@@ -130,7 +102,7 @@ export default function SelectorEjercicio() {
   }
 
   function empezar() {
-    anotarCambioPantalla();
+    marcarCambioPantalla();
     setPantalla('test');
   }
 
@@ -138,7 +110,7 @@ export default function SelectorEjercicio() {
   // si esta está respondida: dos clics antes de repintar no saltan una pregunta.
   function avanzar(e: MouseEvent<HTMLButtonElement>) {
     if (!respuestas[preguntaActual.id] || e.currentTarget.disabled) return;
-    anotarCambioPantalla();
+    marcarCambioPantalla();
     if (paso < totalPreguntas - 1) {
       setPaso(paso + 1);
     } else {
@@ -149,12 +121,12 @@ export default function SelectorEjercicio() {
 
   function retroceder() {
     if (paso === 0) return;
-    anotarCambioPantalla();
+    marcarCambioPantalla();
     setPaso(paso - 1);
   }
 
   function reiniciar() {
-    anotarCambioPantalla();
+    marcarCambioPantalla();
     volviendoRef.current = true;
     setPantalla('inicio');
     setPaso(0);

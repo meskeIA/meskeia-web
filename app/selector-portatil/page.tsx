@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useEffect, useRef, useState, type KeyboardEvent, type MouseEvent } from 'react';
+import React, { useEffect, useRef, useState, type KeyboardEvent } from 'react';
 import styles from './SelectorPortatil.module.css';
-import { margenBarraLogo } from '@/lib';
+import { enfocarALaVista } from '@/lib';
 import {
   MeskeiaLogo,
   Footer,
@@ -25,6 +25,7 @@ import {
   RAM_EXIGENTE_GB,
   type Resultado,
 } from './motor';
+import { useGuardaRafaga } from '@/lib/useGuardaRafaga';
 
 // Las preguntas, el perfil técnico y la lógica de recomendación viven en ./motor.ts.
 
@@ -66,40 +67,19 @@ export default function SelectorPortatil() {
       : pantalla === 'test' ? enunciado.current
         : null;
     if (!destino) return;
-    const caja = destino.getBoundingClientRect();
-    if (caja.top < margenBarraLogo() || caja.bottom > window.innerHeight) {
-      destino.scrollIntoView({ block: 'start', behavior: 'instant' });
-    }
-    destino.focus({ preventScroll: true });
+    enfocarALaVista(destino);
   }, [pantalla, paso]);
 
-  /**
-   * Doble clic y dos toques seguidos (hallazgo 2704, receta de la familia: 2659 de
-   * selector-smartphone). «Empezar», «Siguiente», «Anterior», «Ver resultado» y «Repetir» cambian
-   * la pantalla en el primer clic, y el segundo caía en el mismo punto sobre lo que hubiera debajo
-   * en la pantalla nueva: de la pregunta 8 (3 opciones) a la 9 (4), marcaba «Más de 1.800 €»; con
-   * «Empezar» al pie de la pantalla, abría una app relacionada. Un doble clic es UNA intención,
-   * así que un clic se ignora cuando cumple las dos cosas:
-   *   · es el 2.º (o 3.º…) de una ráfaga: `detail` > 1. Lo cuenta el navegador, no un
-   *     temporizador; con teclado o lector de pantalla es 0;
-   *   · y el clic ANTERIOR de la app cambió de pantalla. Sin esto, elegir y pulsar «Siguiente»
-   *     deprisa en un móvil —dos toques cercanos, que Chrome también cuenta como ráfaga— se
-   *     comería el «Siguiente», que sí era una intención nueva.
-   */
-  const ultimoCambioPantallaRef = useRef(false);
-  const clicDeMas = (e: MouseEvent<HTMLButtonElement>): boolean =>
-    e.detail > 1 && ultimoCambioPantallaRef.current;
-  const registrarClic = (cambiaPantalla: boolean) => {
-    ultimoCambioPantallaRef.current = cambiaPantalla;
-  };
+  // Doble clic y dos toques seguidos (hallazgo 2704): el 2.º toque de una ráfaga tras un clic que
+  // cambia de pantalla se ignora, también sobre las relacionadas y el pie. Receta de la familia en
+  // lib/useGuardaRafaga.ts (cabo C0317).
+  const marcarCambioPantalla = useGuardaRafaga();
 
   function seleccionarOpcion(valor: string) {
-    registrarClic(false);
     setRespuestas(prev => ({ ...prev, [preguntaActual.id]: valor }));
   }
 
-  function elegirOpcion(e: MouseEvent<HTMLButtonElement>, valor: string) {
-    if (clicDeMas(e)) return;
+  function elegirOpcion(valor: string) {
     seleccionarOpcion(valor);
   }
 
@@ -123,9 +103,8 @@ export default function SelectorPortatil() {
     radios?.[destino]?.focus();
   }
 
-  function empezar(e: MouseEvent<HTMLButtonElement>) {
-    if (clicDeMas(e)) return;
-    registrarClic(true);
+  function empezar() {
+    marcarCambioPantalla();
     setPantalla('test');
   }
 
@@ -133,9 +112,9 @@ export default function SelectorPortatil() {
   // antes de repintar no saltan una pregunta. Y solo con la pregunta respondida, aunque el botón ya
   // esté desactivado sin ella: el `disabled` lo pone el render, y un clic que llega antes de
   // repintar no lo ve (hallazgo 2704).
-  function avanzar(e: MouseEvent<HTMLButtonElement>) {
-    if (clicDeMas(e) || !respuestaActual) return;
-    registrarClic(true);
+  function avanzar() {
+    if (!respuestaActual) return;
+    marcarCambioPantalla();
     if (paso < totalPreguntas - 1) {
       setPaso(paso + 1);
     } else {
@@ -144,15 +123,14 @@ export default function SelectorPortatil() {
     }
   }
 
-  function retroceder(e: MouseEvent<HTMLButtonElement>) {
-    if (clicDeMas(e) || paso === 0) return;
-    registrarClic(true);
+  function retroceder() {
+    if (paso === 0) return;
+    marcarCambioPantalla();
     setPaso(paso - 1);
   }
 
-  function reiniciar(e: MouseEvent<HTMLButtonElement>) {
-    if (clicDeMas(e)) return;
-    registrarClic(true);
+  function reiniciar() {
+    marcarCambioPantalla();
     setPantalla('intro');
     setPaso(0);
     setRespuestas({});
@@ -257,7 +235,7 @@ export default function SelectorPortatil() {
                   key={op.valor}
                   type="button"
                   className={`${styles.opcionBtn} ${respuestaActual === op.valor ? styles.opcionSeleccionada : ''}`}
-                  onClick={e => elegirOpcion(e, op.valor)}
+                  onClick={() => elegirOpcion(op.valor)}
                   // role="radio" + aria-checked, no aria-pressed: la elección es ÚNICA entre
                   // varias, no un conmutador. El contenedor declaraba radiogroup sin un solo
                   // radio dentro (selector-smartphone, hallazgo 950).

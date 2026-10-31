@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import styles from './SelectorDieta.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard, DisclaimerCard, RegionBadge } from '@/components';
 import { calcularResultado, DIETAS, PREGUNTAS, type ResultadoCalculo } from './motor';
+import { useGuardaRafaga } from '@/lib/useGuardaRafaga';
 
 // Las preguntas con sus pesos, las fichas y el cálculo viven en ./motor.ts.
 
@@ -36,40 +37,13 @@ export default function SelectorDieta() {
   const totalPreguntas = PREGUNTAS.length;
   const porcentajeProgreso = ((indicePregunta + 1) / totalPreguntas) * 100;
 
-  /**
-   * Doble clic y dos toques seguidos (hallazgos 3141 y 3147; receta `clicDeMas` de la familia,
-   * 2659 de selector-smartphone). El primer clic cambia la pantalla y el segundo caía sobre lo que
-   * hubiera debajo en la nueva: «Comenzar» marcaba la primera respuesta, «Siguiente» de la P6
-   * marcaba «Como fuera o con horarios muy irregulares» y «Ver resultado» pulsaba «Repetir el
-   * test», que devolvía a la intro con las 10 respuestas borradas. Un clic se ignora cuando es el
-   * 2.º de una ráfaga (`detail` > 1, que el teclado no produce) Y el anterior cambió de pantalla.
-   */
-  const ultimoCambioPantallaRef = useRef(false);
-  const clicDeMas = (e: React.MouseEvent<HTMLButtonElement>): boolean =>
-    e.detail > 1 && ultimoCambioPantallaRef.current;
-  const registrarClic = (cambiaPantalla: boolean) => {
-    ultimoCambioPantallaRef.current = cambiaPantalla;
-  };
+  // Doble clic y dos toques seguidos (hallazgos 3141 y 3147): el 2.º toque de una ráfaga tras un
+  // clic que cambia de pantalla se ignora, también sobre las relacionadas y el pie. Receta de la
+  // familia en lib/useGuardaRafaga.ts (cabo C0317).
+  const marcarCambioPantalla = useGuardaRafaga();
 
-  // Lo que el segundo toque pisa no siempre es de esta app (Apps relacionadas, el aviso legal), y
-  // `clicDeMas` no alcanza un enlace ajeno. La misma regla, en fase de captura sobre window
-  // (selector-alquiler-vs-compra, 7cc1064e). Un clic suelto (detail 1) cierra la ráfaga.
-  useEffect(() => {
-    function filtrar(e: MouseEvent) {
-      if (e.detail > 1 && ultimoCambioPantallaRef.current) {
-        e.preventDefault();
-        e.stopPropagation();
-      } else if (e.detail <= 1) {
-        ultimoCambioPantallaRef.current = false;
-      }
-    }
-    window.addEventListener('click', filtrar, true);
-    return () => window.removeEventListener('click', filtrar, true);
-  }, []);
-
-  const handleEmpezar = (e: React.MouseEvent<HTMLButtonElement>) => {
-    if (clicDeMas(e)) return;
-    registrarClic(true);
+  const handleEmpezar = () => {
+    marcarCambioPantalla();
     setPantalla('test');
     setIndicePregunta(0);
     setRespuestas({});
@@ -77,12 +51,10 @@ export default function SelectorDieta() {
   };
 
   const seleccionarOpcion = (valor: string) => {
-    registrarClic(false);
     setRespuestas((prev) => ({ ...prev, [preguntaActual.id]: valor }));
   };
 
-  const handleSeleccionarOpcion = (e: React.MouseEvent<HTMLButtonElement>, valor: string) => {
-    if (clicDeMas(e)) return;
+  const handleSeleccionarOpcion = (valor: string) => {
     seleccionarOpcion(valor);
   };
 
@@ -108,9 +80,9 @@ export default function SelectorDieta() {
   // Avanza a la pregunta SIGUIENTE A LA PULSADA (`indicePregunta + 1` del render, no `i => i + 1`):
   // dos clics antes de repintar no saltan una pregunta. Y solo con la pregunta respondida: el
   // `disabled` lo pone el render, y un clic que llega antes de repintar no lo ve.
-  const handleSiguiente = (e: React.MouseEvent<HTMLButtonElement>) => {
-    if (clicDeMas(e) || !respuestas[preguntaActual.id]) return;
-    registrarClic(true);
+  const handleSiguiente = () => {
+    if (!respuestas[preguntaActual.id]) return;
+    marcarCambioPantalla();
     if (indicePregunta < totalPreguntas - 1) {
       setIndicePregunta(indicePregunta + 1);
     } else {
@@ -119,9 +91,8 @@ export default function SelectorDieta() {
     }
   };
 
-  const handleAnterior = (e: React.MouseEvent<HTMLButtonElement>) => {
-    if (clicDeMas(e)) return;
-    registrarClic(true);
+  const handleAnterior = () => {
+    marcarCambioPantalla();
     if (indicePregunta > 0) {
       setIndicePregunta(indicePregunta - 1);
     } else {
@@ -129,9 +100,8 @@ export default function SelectorDieta() {
     }
   };
 
-  const handleRepetir = (e: React.MouseEvent<HTMLButtonElement>) => {
-    if (clicDeMas(e)) return;
-    registrarClic(true);
+  const handleRepetir = () => {
+    marcarCambioPantalla();
     setPantalla('inicio');
     setIndicePregunta(0);
     setRespuestas({});
@@ -232,7 +202,7 @@ export default function SelectorDieta() {
                   key={op.valor}
                   type="button"
                   className={`${styles.opcionBtn} ${respuestas[preguntaActual.id] === op.valor ? styles.opcionSeleccionada : ''}`}
-                  onClick={(e) => handleSeleccionarOpcion(e, op.valor)}
+                  onClick={() => handleSeleccionarOpcion(op.valor)}
                   role="radio"
                   aria-checked={respuestas[preguntaActual.id] === op.valor}
                   // Tabindex itinerante: la marcada, o la primera si no hay ninguna.

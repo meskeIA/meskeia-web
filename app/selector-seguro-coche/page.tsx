@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type KeyboardEvent } from 'react';
 import styles from './SelectorSeguroCoche.module.css';
-import { margenBarraLogo } from '@/lib';
+import { enfocarALaVista } from '@/lib';
 import {
   MeskeiaLogo,
   Footer,
@@ -25,6 +25,7 @@ import {
   type Nota,
   type Resultado,
 } from './motor';
+import { useGuardaRafaga } from '@/lib/useGuardaRafaga';
 
 // Las preguntas con sus pesos, las fichas de cada modalidad y la lógica viven en ./motor.ts.
 
@@ -124,39 +125,16 @@ export default function SelectorSeguroCochePage() {
     if (!navegado.current) return;
     const destino = calculo ? tituloResultado.current : enunciado.current;
     if (!destino) return;
-    const caja = destino.getBoundingClientRect();
-    if (caja.top < margenBarraLogo() || caja.bottom > window.innerHeight) {
-      destino.scrollIntoView({ block: 'start', behavior: 'instant' });
-    }
-    destino.focus({ preventScroll: true });
+    enfocarALaVista(destino);
   }, [calculo, preguntaActual]);
 
-  /**
-   * Doble clic y dos toques seguidos (hallazgo 3134, cabo C0104; receta `clicDeMas` de
-   * selector-smartphone, b0f31109, con la guarda en captura sobre window de
-   * selector-alquiler-vs-compra, 7cc1064e). Al cambiar el número de opciones la botonera se mueve
-   * bajo el dedo y el segundo toque marcaba una opción de la pregunta nueva, caía en «Anterior»
-   * (en móvil va justo debajo de «Siguiente») o, tras «Ver resultado», en el enlace de Delegum de
-   * <LegalNotice />. Un clic se ignora cuando es el 2.º de una ráfaga (`detail` > 1, que el
-   * teclado no produce) Y el clic anterior de la app cambió de pantalla. Va en captura sobre
-   * window, antes de que React o el enlace lo vean; un clic suelto cierra la ráfaga.
-   */
-  const ultimoCambioPantalla = useRef(false);
-  useEffect(() => {
-    function filtrar(e: globalThis.MouseEvent) {
-      if (e.detail > 1 && ultimoCambioPantalla.current) {
-        e.preventDefault();
-        e.stopPropagation();
-      } else if (e.detail <= 1) {
-        ultimoCambioPantalla.current = false;
-      }
-    }
-    window.addEventListener('click', filtrar, true);
-    return () => window.removeEventListener('click', filtrar, true);
-  }, []);
+  // Doble clic y dos toques seguidos (hallazgo 3134, cabo C0104): el 2.º toque de una ráfaga tras
+  // un clic que cambia de pantalla se ignora, también sobre las relacionadas y el pie. Receta de la
+  // familia en lib/useGuardaRafaga.ts (cabo C0317).
+  const marcarCambioPantalla = useGuardaRafaga();
   /** Marca que el clic en curso cambia de pantalla (y que el efecto de foco debe actuar). */
   const cambiaPantalla = () => {
-    ultimoCambioPantalla.current = true;
+    marcarCambioPantalla();
     navegado.current = true;
   };
 

@@ -20,6 +20,7 @@ import {
   REFERENCIA_NORMATIVA,
 } from './cifras';
 import styles from './SelectorTipoVivienda.module.css';
+import { useGuardaRafaga } from '@/lib/useGuardaRafaga';
 
 // Las preguntas, sus puntos, lo que cada respuesta descarta y la resolución viven en ./motor.ts;
 // las cifras de la guía que salen de la normativa, en ./cifras.ts.
@@ -214,27 +215,12 @@ export default function SelectorTipoVivienda() {
     else enunciado.current?.focus();
   }, [preguntaActual, mostrarResultado]);
 
-  /**
-   * Doble clic y dos toques seguidos (cabo C0005, receta de selector-tablet y
-   * selector-alquiler-vs-compra, 3111): tras «Siguiente» la botonera se mueve bajo el dedo y el
-   * segundo toque marcaba una opción de la pregunta nueva. Un clic se ignora cuando es el 2.º de
-   * una ráfaga (`detail` > 1, que el teclado no produce) Y el clic anterior cambió de pantalla.
-   */
-  const ultimoCambioPantalla = useRef(false);
-  useEffect(() => {
-    function filtrar(e: MouseEvent) {
-      if (e.detail > 1 && ultimoCambioPantalla.current) {
-        e.preventDefault();
-        e.stopPropagation();
-      } else if (e.detail <= 1) {
-        ultimoCambioPantalla.current = false;
-      }
-    }
-    window.addEventListener('click', filtrar, true);
-    return () => window.removeEventListener('click', filtrar, true);
-  }, []);
+  // Doble clic y dos toques seguidos (cabo C0005): el 2.º toque de una ráfaga tras un clic que
+  // cambia de pantalla se ignora, también sobre las relacionadas y el pie. Receta de la familia en
+  // lib/useGuardaRafaga.ts (cabo C0317).
+  const marcarCambioPantalla = useGuardaRafaga();
   const cambiaPantalla = () => {
-    ultimoCambioPantalla.current = true;
+    marcarCambioPantalla();
     moverFoco.current = true;
   };
 

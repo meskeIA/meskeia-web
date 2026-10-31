@@ -2,9 +2,10 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import styles from './SelectorSeguroSalud.module.css';
-import { margenBarraLogo } from '@/lib';
+import { enfocarALaVista } from '@/lib';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard, DisclaimerCard, RegionBadge } from '@/components';
 import { calcularResultado, PREGUNTAS, VEREDICTOS, TEXTO_CARENCIAS, TEXTO_COPAGO, TEXTO_ESPERA_SNS, type Resultado } from './motor';
+import { useGuardaRafaga } from '@/lib/useGuardaRafaga';
 
 // Las preguntas, los puntos, los veredictos y la lógica viven en ./motor.ts.
 
@@ -34,36 +35,13 @@ export default function SelectorSeguroSalud() {
       : pantalla === 'test' ? enunciado.current
         : null;
     if (!destino) return;
-    const caja = destino.getBoundingClientRect();
-    if (caja.top < margenBarraLogo() || caja.bottom > window.innerHeight) {
-      destino.scrollIntoView({ block: 'start', behavior: 'instant' });
-    }
-    destino.focus({ preventScroll: true });
+    enfocarALaVista(destino);
   }, [pantalla, paso]);
 
-  /**
-   * Doble clic y dos toques seguidos (hallazgos 3125 y 3126, cabo C0104; receta `clicDeMas` de la
-   * familia con la guarda en captura sobre window de selector-alquiler-vs-compra, 3111). El
-   * primer toque cambia la pantalla y el segundo caía en una opción de la pregunta nueva (en la
-   * 10, la mutualidad, que FUERZA el veredicto) o, tras «Ver resultado», en «Contacto» o la banda
-   * de Delegum de la cabecera común. Un clic se ignora cuando es el 2.º de una ráfaga (`detail`
-   * > 1, que el teclado no produce) Y el clic anterior de la app cambió de pantalla. Va en
-   * captura sobre window, antes de que React o el enlace lo vean; un clic suelto cierra la ráfaga.
-   */
-  const ultimoCambioPantalla = useRef(false);
-  useEffect(() => {
-    function filtrar(e: MouseEvent) {
-      if (e.detail > 1 && ultimoCambioPantalla.current) {
-        e.preventDefault();
-        e.stopPropagation();
-      } else if (e.detail <= 1) {
-        ultimoCambioPantalla.current = false;
-      }
-    }
-    window.addEventListener('click', filtrar, true);
-    return () => window.removeEventListener('click', filtrar, true);
-  }, []);
-  const cambiaPantalla = () => { ultimoCambioPantalla.current = true; };
+  // Doble clic y dos toques seguidos (hallazgos 3125 y 3126, cabo C0104): el 2.º toque de una
+  // ráfaga tras un clic que cambia de pantalla se ignora, también sobre las relacionadas y el pie.
+  // Receta de la familia en lib/useGuardaRafaga.ts (cabo C0317).
+  const marcarCambioPantalla = useGuardaRafaga();
 
   const preguntaActual = PREGUNTAS[paso];
   const totalPreguntas = PREGUNTAS.length;
@@ -94,17 +72,17 @@ export default function SelectorSeguroSalud() {
   // repintar no saltan una pregunta.
   function avanzar() {
     if (!respuestas[preguntaActual.id]) return;
-    cambiaPantalla();
+    marcarCambioPantalla();
     if (paso < totalPreguntas - 1) { setPaso(paso + 1); }
     else { setResultado(calcularResultado(respuestas)); setPantalla('resultado'); }
   }
   function retroceder() {
     if (paso === 0) return;
-    cambiaPantalla();
+    marcarCambioPantalla();
     setPaso(paso - 1);
   }
-  function empezar() { cambiaPantalla(); setPantalla('test'); }
-  function reiniciar() { cambiaPantalla(); setPantalla('intro'); setPaso(0); setRespuestas({}); setResultado(null); }
+  function empezar() { marcarCambioPantalla(); setPantalla('test'); }
+  function reiniciar() { marcarCambioPantalla(); setPantalla('intro'); setPaso(0); setRespuestas({}); setResultado(null); }
 
   return (
     <div className={styles.container}>

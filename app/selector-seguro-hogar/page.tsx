@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import styles from './SelectorSeguroHogar.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard, DisclaimerCard, RegionBadge } from '@/components';
 import { calcularResultado, PREGUNTAS, VEREDICTOS, UMBRAL_BASICA, UMBRAL_ESTANDAR, type Resultado } from './motor';
+import { useGuardaRafaga } from '@/lib/useGuardaRafaga';
 
 // Las preguntas con sus puntos, los veredictos y la lógica viven en ./motor.ts.
 
@@ -36,51 +37,21 @@ export default function SelectorSeguroHogar() {
   const totalPreguntas = PREGUNTAS.length;
   const progreso = (paso / totalPreguntas) * 100;
 
-  /**
-   * Doble clic y dos toques seguidos (hallazgo 3116; receta `clicDeMas` de la familia, 2659 de
-   * selector-smartphone). El primer clic cambia la pantalla y el segundo caía sobre lo que hubiera
-   * debajo en la nueva: marcaba una respuesta que nadie había elegido (P5 → P6 marcaba «Nadie de
-   * forma habitual», con su aviso legal), abría una app relacionada o, tras «Ver resultado», la
-   * tarjeta de Delegum. Un clic se ignora cuando es el 2.º de una ráfaga (`detail` > 1, que el
-   * teclado no produce) Y el clic anterior de la app cambió de pantalla.
-   */
-  const ultimoCambioPantallaRef = useRef(false);
-  const clicDeMas = (e: React.MouseEvent<HTMLButtonElement>): boolean =>
-    e.detail > 1 && ultimoCambioPantallaRef.current;
-  const registrarClic = (cambiaPantalla: boolean) => {
-    ultimoCambioPantallaRef.current = cambiaPantalla;
-  };
-
-  // Lo que el segundo toque pisa no siempre es de esta app (Apps relacionadas, la tarjeta de
-  // Delegum, «Contacto»), y `clicDeMas` no alcanza un enlace ajeno. La misma regla, en fase de
-  // captura sobre window, antes de que el enlace o React lo vean (selector-alquiler-vs-compra,
-  // 7cc1064e). Un clic suelto (detail 1) no se toca y cierra la ráfaga.
-  useEffect(() => {
-    function filtrar(e: MouseEvent) {
-      if (e.detail > 1 && ultimoCambioPantallaRef.current) {
-        e.preventDefault();
-        e.stopPropagation();
-      } else if (e.detail <= 1) {
-        ultimoCambioPantallaRef.current = false;
-      }
-    }
-    window.addEventListener('click', filtrar, true);
-    return () => window.removeEventListener('click', filtrar, true);
-  }, []);
+  // Doble clic y dos toques seguidos (hallazgo 3116): el 2.º toque de una ráfaga tras un clic que
+  // cambia de pantalla se ignora, también sobre las relacionadas y el pie. Receta de la familia en
+  // lib/useGuardaRafaga.ts (cabo C0317).
+  const marcarCambioPantalla = useGuardaRafaga();
 
   function seleccionarOpcion(valor: string) {
-    registrarClic(false);
     setRespuestas(prev => ({ ...prev, [preguntaActual.id]: valor }));
   }
 
-  function elegirOpcion(e: React.MouseEvent<HTMLButtonElement>, valor: string) {
-    if (clicDeMas(e)) return;
+  function elegirOpcion(valor: string) {
     seleccionarOpcion(valor);
   }
 
-  function empezar(e: React.MouseEvent<HTMLButtonElement>) {
-    if (clicDeMas(e)) return;
-    registrarClic(true);
+  function empezar() {
+    marcarCambioPantalla();
     setPantalla('test');
   }
 
@@ -106,9 +77,9 @@ export default function SelectorSeguroHogar() {
   // Avanza a la pregunta SIGUIENTE A LA PULSADA (`paso + 1` del render, no `p => p + 1`): dos
   // clics antes de repintar no saltan una pregunta. Y solo con la pregunta respondida: el
   // `disabled` lo pone el render, y un clic que llega antes de repintar no lo ve.
-  function avanzar(e: React.MouseEvent<HTMLButtonElement>) {
-    if (clicDeMas(e) || !respuestas[preguntaActual.id]) return;
-    registrarClic(true);
+  function avanzar() {
+    if (!respuestas[preguntaActual.id]) return;
+    marcarCambioPantalla();
     if (paso < totalPreguntas - 1) {
       setPaso(paso + 1);
     } else {
@@ -117,15 +88,14 @@ export default function SelectorSeguroHogar() {
     }
   }
 
-  function retroceder(e: React.MouseEvent<HTMLButtonElement>) {
-    if (clicDeMas(e) || paso === 0) return;
-    registrarClic(true);
+  function retroceder() {
+    if (paso === 0) return;
+    marcarCambioPantalla();
     setPaso(paso - 1);
   }
 
-  function reiniciar(e: React.MouseEvent<HTMLButtonElement>) {
-    if (clicDeMas(e)) return;
-    registrarClic(true);
+  function reiniciar() {
+    marcarCambioPantalla();
     setPantalla('inicio');
     setPaso(0);
     setRespuestas({});
@@ -244,7 +214,7 @@ export default function SelectorSeguroHogar() {
                   key={op.valor}
                   type="button"
                   className={`${styles.opcionBtn} ${respuestas[preguntaActual.id] === op.valor ? styles.opcionSeleccionada : ''}`}
-                  onClick={e => elegirOpcion(e, op.valor)}
+                  onClick={() => elegirOpcion(op.valor)}
                   // role="radio" + aria-checked, no aria-pressed: la elección es ÚNICA entre
                   // varias, no un conmutador. El contenedor declaraba radiogroup sin un solo
                   // radio dentro (selector-smartphone, hallazgo 950).

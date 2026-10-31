@@ -24,6 +24,7 @@ import {
 } from './motor';
 import { formatNumber } from '@/lib';
 import { TRANSPORTE_COLECTIVO_EXENTO } from '@/data/fiscal';
+import { useGuardaRafaga } from '@/lib/useGuardaRafaga';
 
 // Las preguntas con sus pesos, las fichas de cada medio, los costes y la lógica viven en ./motor.ts.
 
@@ -61,44 +62,14 @@ export default function SelectorMovilidadUrbana() {
   const opcionSeleccionada = respuestas[preguntaActual];
   const porcentajeProgreso = ((preguntaActual + 1) / PREGUNTAS.length) * 100;
 
-  /**
-   * Doble clic y dos toques seguidos (hallazgo 2698; receta común de la familia, referencia
-   * selector-smartphone, 2659). Hasta 480 px la navegación va en columna invertida, «Siguiente»
-   * arriba y «Anterior» debajo: al pasar a una pregunta con menos opciones la tarjeta encoge, la
-   * navegación sube y el segundo toque caía en «Anterior», que devolvía a la pregunta recién
-   * contestada. Un doble toque es UNA intención, así que un clic se ignora cuando:
-   *   · es el 2.º (o 3.º…) de una ráfaga: `detail` > 1, que cuenta el navegador (con teclado o
-   *     lector de pantalla es 0);
-   *   · y el clic ANTERIOR de la app cambió de pantalla. Sin esta condición, contestar y tocar
-   *     «Siguiente» deprisa —dos toques cercanos que Chrome también cuenta como ráfaga— se comía
-   *     el «Siguiente», que sí era una intención nueva.
-   * El clic ignorado no toca el registro: el 3.º de una ráfaga se ignora igual que el 2.º.
-   */
-  const ultimoCambioPantalla = useRef(false);
-  const clicDeMas = (e: React.MouseEvent<HTMLButtonElement>): boolean =>
-    e.detail > 1 && ultimoCambioPantalla.current;
+  // Doble clic y dos toques seguidos (hallazgo 2698): el 2.º toque de una ráfaga tras un clic que
+  // cambia de pantalla se ignora, también sobre las relacionadas y el pie. Receta de la familia en
+  // lib/useGuardaRafaga.ts (cabo C0317).
+  const marcarCambioPantalla = useGuardaRafaga();
   const registrarClic = (cambiaPantalla: boolean): void => {
-    ultimoCambioPantalla.current = cambiaPantalla;
+    if (cambiaPantalla) marcarCambioPantalla();
     if (cambiaPantalla) moverFoco.current = true;
   };
-
-  // Lo que el segundo toque pisa no siempre es de esta app: el foco al encabezado nuevo centra la
-  // vista, la página sube unos 500 px y bajo el dedo queda la fila de enlaces de <LegalNotice />
-  // («Política de Privacidad», «Contacto»), que `clicDeMas` no alcanza (hallazgo 3209). La misma
-  // regla, en fase de captura sobre window, antes de que el enlace o React lo vean, como en
-  // selector-alquiler-vs-compra (3111). Un clic suelto (detail 1) no se toca y cierra la ráfaga.
-  useEffect(() => {
-    function filtrar(e: MouseEvent) {
-      if (e.detail > 1 && ultimoCambioPantalla.current) {
-        e.preventDefault();
-        e.stopPropagation();
-      } else if (e.detail <= 1) {
-        ultimoCambioPantalla.current = false;
-      }
-    }
-    window.addEventListener('click', filtrar, true);
-    return () => window.removeEventListener('click', filtrar, true);
-  }, []);
 
   function seleccionarOpcion(indice: number): void {
     registrarClic(false);
@@ -107,8 +78,7 @@ export default function SelectorMovilidadUrbana() {
     setRespuestas(nuevasRespuestas);
   }
 
-  function elegirOpcion(e: React.MouseEvent<HTMLButtonElement>, indice: number): void {
-    if (clicDeMas(e)) return;
+  function elegirOpcion(indice: number): void {
     seleccionarOpcion(indice);
   }
 
@@ -135,8 +105,8 @@ export default function SelectorMovilidadUrbana() {
   // Avanza a la pregunta SIGUIENTE A LA PULSADA (la del render, no `p => p + 1`): dos clics antes
   // de repintar no saltan una pregunta. Y solo con la pregunta respondida, aunque el botón ya esté
   // desactivado sin ella: el `disabled` lo pone el render, y un clic que llega antes no lo ve.
-  function irSiguiente(e: React.MouseEvent<HTMLButtonElement>): void {
-    if (clicDeMas(e) || respuestas[preguntaActual] === -1) return;
+  function irSiguiente(): void {
+    if (respuestas[preguntaActual] === -1) return;
     registrarClic(true);
     if (preguntaActual < PREGUNTAS.length - 1) {
       setPreguntaActual(preguntaActual + 1);
@@ -145,14 +115,13 @@ export default function SelectorMovilidadUrbana() {
     }
   }
 
-  function irAnterior(e: React.MouseEvent<HTMLButtonElement>): void {
-    if (clicDeMas(e) || preguntaActual === 0) return;
+  function irAnterior(): void {
+    if (preguntaActual === 0) return;
     registrarClic(true);
     setPreguntaActual(preguntaActual - 1);
   }
 
-  function reiniciar(e: React.MouseEvent<HTMLButtonElement>): void {
-    if (clicDeMas(e)) return;
+  function reiniciar(): void {
     registrarClic(true);
     setPreguntaActual(0);
     setRespuestas(Array(PREGUNTAS.length).fill(-1));
@@ -215,7 +184,7 @@ export default function SelectorMovilidadUrbana() {
                   key={idx}
                   type="button"
                   className={`${styles.opcion} ${opcionSeleccionada === idx ? styles.seleccionada : ''}`}
-                  onClick={(e) => elegirOpcion(e, idx)}
+                  onClick={() => elegirOpcion(idx)}
                   // role="radio" + aria-checked, no aria-pressed: la elección es ÚNICA entre
                   // varias, no un conmutador. El contenedor declaraba radiogroup sin un solo
                   // radio dentro (selector-smartphone, hallazgo 950).
