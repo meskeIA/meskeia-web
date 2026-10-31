@@ -491,7 +491,7 @@ export default function SimuladorElasticidadPrecio() {
             aria-valuemax={50}
           />
           <span className={styles.sliderValue}>
-            {deltaP > 0 ? '+' : ''}{deltaP}%
+            <span>{deltaP > 0 ? '+' : ''}</span>{deltaP}%
           </span>
         </div>
 
@@ -526,10 +526,10 @@ export default function SimuladorElasticidadPrecio() {
           </div>
           <div className={styles.resultRow}>
             <span className={styles.resultLabel}>
-              ΔP = {deltaP > 0 ? '+' : ''}{deltaP}% → ΔQ
+              ΔP = <span>{deltaP > 0 ? '+' : ''}</span>{deltaP}% → ΔQ
             </span>
             <span className={`${styles.resultValue} ${resultado.deltaQ < 0 ? styles.valorNegativo : styles.valorPositivo}`}>
-              {resultado.deltaQ > 0 ? '+' : ''}{formatNumber(resultado.deltaQ, 1)}%
+              <span>{resultado.deltaQ > 0 ? '+' : ''}</span>{formatNumber(resultado.deltaQ, 1)}%
             </span>
           </div>
           <div className={styles.resultRow}>
@@ -551,8 +551,8 @@ export default function SimuladorElasticidadPrecio() {
                   : ''
               }`}
             >
-              {resultado.deltaIT >= 0 ? '+' : ''}{formatNumber(resultado.deltaIT, 0)} €
-              {' '}({resultado.deltaIT_pct >= 0 ? '+' : ''}{formatNumber(resultado.deltaIT_pct, 1)}%)
+              <span>{resultado.deltaIT >= 0 ? '+' : ''}</span>{formatNumber(resultado.deltaIT, 0)} €
+              {' '}(<span>{resultado.deltaIT_pct >= 0 ? '+' : ''}</span>{formatNumber(resultado.deltaIT_pct, 1)}%)
             </span>
           </div>
 

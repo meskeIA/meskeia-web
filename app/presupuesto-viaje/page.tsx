@@ -299,7 +299,7 @@ export default function PresupuestoViaje() {
         {/* Panel de resultados */}
         <section className={styles.panelResultados} aria-live="polite">
           <h2>
-            Resumen{destino ? ` — ${destino}` : ''}
+            Resumen<span>{destino ? ` — ${destino}` : ''}</span>
           </h2>
 
           <div className={styles.totalGeneral}>

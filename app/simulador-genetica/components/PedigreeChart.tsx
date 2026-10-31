@@ -85,7 +85,7 @@ export default function PedigreeChart({ pedigree, rasgos }: PedigreeChartProps) 
             de cada símbolo, el genotipo y el fenotipo de los dos. El símbolo (afectado,
             portador) sigue solo a <strong>{rasgo.name}</strong>. Los cuatro hijos son ejemplos de
             lo que puede salir, no una muestra en proporción
-            {queEnsenan ? `: ${queEnsenan}` : ''}. Las proporciones están en Estadísticas.
+            <span>{queEnsenan ? `: ${queEnsenan}` : ''}</span>. Las proporciones están en Estadísticas.
           </span>
         ) : (
           <span key="rama-2">

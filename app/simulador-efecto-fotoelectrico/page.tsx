@@ -438,7 +438,7 @@ export default function SimuladorEfectoFotoelectricoPage() {
 
           <figure className={styles.figura}>
             <figcaption className={styles.figuraTitulo}>
-              Energía cinética máxima frente a frecuencia{metal ? ` · ${metal.nombre}` : ''}
+              Energía cinética máxima frente a frecuencia<span>{metal ? ` · ${metal.nombre}` : ''}</span>
             </figcaption>
             <svg
               viewBox={`0 0 ${GRAF_W} ${GRAF_H}`}

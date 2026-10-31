@@ -347,14 +347,14 @@ export default function SimuladorDerivaGenetica() {
             </button>
           </div>
           <p className={styles.modoDescripcion}>
-            {modo === 'deriva' &&
-              'Solo deriva: con N pequeña, las frecuencias derivan al azar hasta fijar o perder el alelo.'}
-            {modo === 'direccional' &&
-              'Selección direccional: el alelo "a" es desfavorable (w_aa = 0,8). El alelo A se acerca a la fijación.'}
-            {modo === 'equilibradora' &&
-              'Heterocigoto ventaja (anemia falciforme): los heterocigotos sobreviven mejor; el polimorfismo se mantiene.'}
-            {modo === 'hardy-weinberg' &&
-              'Población grande sin selección, mutación ni migración: las frecuencias se mantienen estables.'}
+            <span>{modo === 'deriva' &&
+              'Solo deriva: con N pequeña, las frecuencias derivan al azar hasta fijar o perder el alelo.'}</span>
+            <span>{modo === 'direccional' &&
+              'Selección direccional: el alelo "a" es desfavorable (w_aa = 0,8). El alelo A se acerca a la fijación.'}</span>
+            <span>{modo === 'equilibradora' &&
+              'Heterocigoto ventaja (anemia falciforme): los heterocigotos sobreviven mejor; el polimorfismo se mantiene.'}</span>
+            <span>{modo === 'hardy-weinberg' &&
+              'Población grande sin selección, mutación ni migración: las frecuencias se mantienen estables.'}</span>
           </p>
         </section>
 

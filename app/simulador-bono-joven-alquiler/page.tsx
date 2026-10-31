@@ -488,7 +488,7 @@ export default function SimuladorBonoJovenAlquilerPage() {
             <span aria-hidden="true">⚠️</span>{' '}
             <strong>La renta supera el máximo que da derecho a la ayuda.</strong> Para{' '}
             {tipoVivienda === 'vivienda' ? 'una vivienda completa' : 'una habitación'}
-            {municipioPequeno ? ' en un municipio de 10.000 habitantes o menos' : ''} el tope es{' '}
+            <span>{municipioPequeno ? ' en un municipio de 10.000 habitantes o menos' : ''}</span> el tope es{' '}
             {formatCurrency(rentaMaxima)}/mes (RD 326/2026, art. 133.1.e) y has introducido{' '}
             {formatCurrency(alquilerNum)}/mes. Tu comunidad autónoma puede elevar ese máximo, pero
             solo con acuerdo previo del Ministerio: compruébalo en su convocatoria.
@@ -636,12 +636,12 @@ export default function SimuladorBonoJovenAlquilerPage() {
                 que sugería.
               */}
               <p className={styles.resultadoTexto}>
-                {rentaDentroDelLimite === false && (
-                  <>
+                <span>{rentaDentroDelLimite === false && (
+                  <span>
                     La renta que has introducido ({formatCurrency(alquilerNum)}/mes) supera el máximo
                     de {formatCurrency(rentaMaxima)}/mes que da derecho a esta ayuda.{' '}
-                  </>
-                )}
+                  </span>
+                )}</span>
                 {/*
                   ⚠️ 21/09/2026 (hallazgo 1169) — la coletilla «así que una renta más baja no
                   bastaría por sí sola» se añadió para el caso de DOS causas y se imprimía
@@ -651,13 +651,13 @@ export default function SimuladorBonoJovenAlquilerPage() {
                   causa real y este sugería una que no existe—, y en los dos casos lo que falla
                   es la acción que induce. Ahora solo sale cuando la renta ES la otra causa.
                 */}
-                {REQUISITOS.filter((r) => r.bloqueante).some((r) => estados[r.id] === 'no') && (
-                  <>
+                <span>{REQUISITOS.filter((r) => r.bloqueante).some((r) => estados[r.id] === 'no') && (
+                  <span>
                     {rentaDentroDelLimite === false ? 'Y además, hay' : 'Hay'} al menos un requisito
                     imprescindible que no cumples
-                    {rentaDentroDelLimite === false ? ', así que una renta más baja no bastaría por sí sola' : ''}.{' '}
-                  </>
-                )}
+                    <span>{rentaDentroDelLimite === false ? ', así que una renta más baja no bastaría por sí sola' : ''}</span>.{' '}
+                  </span>
+                )}</span>
                 El Bono Joven al Alquiler no estaría disponible para tu situación actual.
                 Consulta otras ayudas al alquiler disponibles en tu Comunidad Autónoma.
               </p>
@@ -831,9 +831,9 @@ export default function SimuladorBonoJovenAlquilerPage() {
                 RD 326/2026 te obliga a comunicarlo al órgano que te concedió la ayuda en el plazo máximo
                 de {CAMBIO_DOMICILIO.diasParaComunicar} días desde la firma del nuevo contrato. Conservas la
                 ayuda si el nuevo alquiler cumple todos los requisitos y el nuevo contrato se firma
-                {CAMBIO_DOMICILIO.exigeContinuidadEntreContratos ? ' sin interrupción temporal con el anterior' : ''};
+                <span>{CAMBIO_DOMICILIO.exigeContinuidadEntreContratos ? ' sin interrupción temporal con el anterior' : ''}</span>;
                 la cuantía se ajusta a la nueva renta
-                {CAMBIO_DOMICILIO.cuantiaPuedeSubir ? '' : ' y nunca puede superar la que venías cobrando'}.
+                <span>{CAMBIO_DOMICILIO.cuantiaPuedeSubir ? '' : ' y nunca puede superar la que venías cobrando'}</span>.
                 El artículo no regula la mudanza a otra comunidad autónoma: pregúntalo antes de mudarte.
               </p>
             </div>

@@ -572,9 +572,9 @@ export default function SimuladorConcurrencia() {
                       {h.nombre}
                     </span>
                     <span className={`${styles.hiloEstado} ${claseEstado}`}>
-                      {h.estado === 'listo' && 'listo'}
-                      {h.estado === 'bloqueado' && 'bloqueado'}
-                      {h.estado === 'terminado' && 'terminado'}
+                      <span>{h.estado === 'listo' && 'listo'}</span>
+                      <span>{h.estado === 'bloqueado' && 'bloqueado'}</span>
+                      <span>{h.estado === 'terminado' && 'terminado'}</span>
                     </span>
                   </div>
                   <div className={styles.hiloInstr}>

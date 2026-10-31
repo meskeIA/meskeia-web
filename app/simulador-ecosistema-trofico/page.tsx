@@ -334,7 +334,7 @@ export default function SimuladorEcosistemaTroficoPage() {
                           0,168 (hallazgo 328). */}
                       {delta !== 0 && (
                         <span className={styles.barraDelta}>
-                          {' '}({delta > 0 ? '+' : ''}{formatNumber(delta, cifra.decimales)})
+                          {' '}(<span>{delta > 0 ? '+' : ''}</span>{formatNumber(delta, cifra.decimales)})
                         </span>
                       )}
                     </span>
@@ -384,7 +384,7 @@ export default function SimuladorEcosistemaTroficoPage() {
                       {nivel.nombre}: {formatNumber(nivel.energiaPorcentaje, nivel.energiaPorcentaje < 1 ? 1 : 0)}&nbsp;%
                       {/* Decía «Productores: 100 % energía solar», que se lee como que las plantas
                           se quedan con toda la luz del sol (hallazgo 2482). */}
-                      {idx === 0 ? ' de la energía fijada' : ''}
+                      <span>{idx === 0 ? ' de la energía fijada' : ''}</span>
                     </span>
                   </div>
                 ))}

@@ -449,7 +449,7 @@ export default function SimuladorFlotabilidadPage() {
               {/* Rótulos */}
               <text x={RECIPIENTE_IZQ + 8} y={FONDO - 12} className={styles.svgRotulo}>
                 {liquido ? liquido.nombre : 'Líquido'}
-                {esPositivo(densidadLiquido) ? ` · ${formatNumber(densidadLiquido, 0)} kg/m³` : ''}
+                <tspan>{esPositivo(densidadLiquido) ? ` · ${formatNumber(densidadLiquido, 0)} kg/m³` : ''}</tspan>
               </text>
               <text x={RECIPIENTE_DER + 6} y={SUPERFICIE + 4} className={styles.svgRotuloSecundario}>
                 superficie
@@ -482,9 +482,9 @@ export default function SimuladorFlotabilidadPage() {
                   >
                     <span className={styles.veredictoTexto}>{NOMBRE_VEREDICTO[resultado.veredicto]}</span>
                     <span className={styles.veredictoMotivo}>
-                      {resultado.veredicto === 'flota' && `ρc = ${formatNumber(densidadCuerpo, 0)} < ρl = ${formatNumber(densidadLiquido, 0)} kg/m³`}
-                      {resultado.veredicto === 'se-hunde' && `ρc = ${formatNumber(densidadCuerpo, 0)} > ρl = ${formatNumber(densidadLiquido, 0)} kg/m³`}
-                      {resultado.veredicto === 'indiferente' && `ρc = ρl = ${formatNumber(densidadLiquido, 0)} kg/m³: flota entre dos aguas`}
+                      <span>{resultado.veredicto === 'flota' && `ρc = ${formatNumber(densidadCuerpo, 0)} < ρl = ${formatNumber(densidadLiquido, 0)} kg/m³`}</span>
+                      <span>{resultado.veredicto === 'se-hunde' && `ρc = ${formatNumber(densidadCuerpo, 0)} > ρl = ${formatNumber(densidadLiquido, 0)} kg/m³`}</span>
+                      <span>{resultado.veredicto === 'indiferente' && `ρc = ρl = ${formatNumber(densidadLiquido, 0)} kg/m³: flota entre dos aguas`}</span>
                     </span>
                   </div>
 
@@ -566,7 +566,7 @@ export default function SimuladorFlotabilidadPage() {
 
             {/* ── Fórmulas según el veredicto ────────────────────────────── */}
             <div className={styles.formulaBox}>
-              {!resultado && <>Con los tres datos aparecen aquí las fórmulas con tus números.</>}
+              <span>{!resultado && <span>Con los tres datos aparecen aquí las fórmulas con tus números.</span>}</span>
               {resultado && (
                 <>
                   <p className={styles.formulaLinea}>

@@ -484,7 +484,7 @@ export default function QuizVerbosIrregularesPage() {
                   {pendientes.length === 1
                     ? 'Tienes 1 verbo fallado'
                     : `Tienes ${pendientes.length} verbos fallados`}{' '}
-                  en el modo «{MODOS[modo].label}»{pendientes.length > 1 ? ', del más fallado al menos' : ''}:{' '}
+                  en el modo «{MODOS[modo].label}»<span>{pendientes.length > 1 ? ', del más fallado al menos' : ''}</span>:{' '}
                   <span className={styles.repasoLista} lang="en">
                     {pendientes.map(v => v.infinitive).join(', ')}
                   </span>

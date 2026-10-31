@@ -508,7 +508,7 @@ export default function SimuladorCineticaArrheniusPage() {
       {/* MAIN */}
       <div className={styles.mainContent}>
         <p className={styles.descriptionCard}>
-          {reaccionActual && <><strong>{reaccionActual.nombre}</strong>: {reaccionActual.notasClave}</>}
+          <span>{reaccionActual && <span><strong>{reaccionActual.nombre}</strong>: {reaccionActual.notasClave}</span>}</span>
         </p>
 
         <div className={styles.controls}>

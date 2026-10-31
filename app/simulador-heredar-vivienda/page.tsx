@@ -1582,7 +1582,7 @@ export default function SimuladorHeredarViviendaPage() {
                     quien fija cómo y cuándo.
                   </span>
                 )}
-                {!reglaVivienda.propia && ' Otras comunidades fijan plazos de mantenimiento propios: comprueba el de la tuya.'}
+                <span>{!reglaVivienda.propia && ' Otras comunidades fijan plazos de mantenimiento propios: comprueba el de la tuya.'}</span>
               </div>
             )}
           </div>
@@ -1955,7 +1955,7 @@ export default function SimuladorHeredarViviendaPage() {
               base del ahorro ({TIPO_AHORRO_MIN}-{TIPO_AHORRO_MAX}&nbsp;%) sea cual sea el plazo de tenencia. Los tramos son:{' '}
               {ESCALA_AHORRO.map((tramo, i) => (
                 <span key={tramo.tipo}>
-                  {i > 0 && ', '}
+                  <span>{i > 0 && ', '}</span>
                   {tramo.tipo}&nbsp;% ({Number.isFinite(tramo.hasta) ? `hasta ${formatCurrency(tramo.hasta)}` : `más de ${formatCurrency(ESCALA_AHORRO[i - 1].hasta)}`})
                 </span>
               ))}.

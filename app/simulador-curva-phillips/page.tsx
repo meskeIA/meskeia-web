@@ -418,7 +418,7 @@ export default function SimuladorCurvaPhillipsPage() {
           <label className={styles.sliderLabel}>
             Shock de oferta ε
             <span className={styles.sliderValue} style={{ color: shock > 0 ? '#C0392B' : shock < 0 ? '#27AE60' : undefined }}>
-              {shock >= 0 ? '+' : ''}{fmt(shock, 1)} pp
+              <span>{shock >= 0 ? '+' : ''}</span>{fmt(shock, 1)} pp
             </span>
           </label>
           <input
@@ -476,7 +476,7 @@ export default function SimuladorCurvaPhillipsPage() {
             {fmt(piActual, 1)} %
           </span>
           <span className={styles.resultadoFormula}>
-            π = {fmt(piE, 1)} − 0,5 × ({fmt(u, 1)} − 5) {shock !== 0 ? `+ (${shock >= 0 ? '+' : ''}${fmt(shock, 1)})` : ''}
+            π = {fmt(piE, 1)} − 0,5 × ({fmt(u, 1)} − 5) <span>{shock !== 0 ? `+ (${shock >= 0 ? '+' : ''}${fmt(shock, 1)})` : ''}</span>
           </span>
         </div>
 

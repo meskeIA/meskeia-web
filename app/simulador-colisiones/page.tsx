@@ -166,7 +166,7 @@ export default function SimuladorColisionesPage() {
               <span className={styles.sliderLimits}><span>1 kg</span><span>20 kg</span></span>
             </div>
             <div className={styles.sliderRow}>
-              <label htmlFor="velocidad-a">Velocidad: <strong>{v1 > 0 ? '+' : ''}{v1} m/s</strong></label>
+              <label htmlFor="velocidad-a">Velocidad: <strong><span>{v1 > 0 ? '+' : ''}</span>{v1} m/s</strong></label>
               <input id="velocidad-a" type="range" min={-10} max={10} step={0.5} value={v1}
                 onChange={e => { setV1(Number(e.target.value)); resetear(); }}
                 className={styles.slider} aria-label="Velocidad inicial objeto A" />
@@ -187,7 +187,7 @@ export default function SimuladorColisionesPage() {
               <span className={styles.sliderLimits}><span>1 kg</span><span>20 kg</span></span>
             </div>
             <div className={styles.sliderRow}>
-              <label htmlFor="velocidad-b">Velocidad: <strong>{v2 > 0 ? '+' : ''}{v2} m/s</strong></label>
+              <label htmlFor="velocidad-b">Velocidad: <strong><span>{v2 > 0 ? '+' : ''}</span>{v2} m/s</strong></label>
               <input id="velocidad-b" type="range" min={-10} max={10} step={0.5} value={v2}
                 onChange={e => { setV2(Number(e.target.value)); resetear(); }}
                 className={styles.slider} aria-label="Velocidad inicial objeto B" />
@@ -252,7 +252,7 @@ export default function SimuladorColisionesPage() {
                   stroke={colores.b1} strokeWidth="2" markerEnd={v1 > 0 ? 'url(#arrow-b1-r)' : 'url(#arrow-b1-l)'} />
                 <text x={`${pos1 + tamBloque(m1) / 2 + (v1 > 0 ? 14 : -14)}%`} y="35"
                   textAnchor="middle" fontSize="9" fill={colores.b1}>
-                  {v1 > 0 ? '+' : ''}{v1} m/s
+                  <tspan>{v1 > 0 ? '+' : ''}</tspan>{v1} m/s
                 </text>
               </g>
             )}
@@ -265,7 +265,7 @@ export default function SimuladorColisionesPage() {
                   stroke={colores.b2} strokeWidth="2" markerEnd={v2 > 0 ? 'url(#arrow-b2-r)' : 'url(#arrow-b2-l)'} />
                 <text x={`${pos2 + tamBloque(m2) / 2 + (v2 > 0 ? 14 : -14)}%`} y="35"
                   textAnchor="middle" fontSize="9" fill={colores.b2}>
-                  {v2 > 0 ? '+' : ''}{v2} m/s
+                  <tspan>{v2 > 0 ? '+' : ''}</tspan>{v2} m/s
                 </text>
               </g>
             )}
@@ -402,7 +402,7 @@ export default function SimuladorColisionesPage() {
                   color: resultado.delta_ek < -0.01 ? '#E07B39' : '#27AE60',
                 }}>
                   ΔEk = {formatNumber(resultado.delta_ek, 2)} J
-                  ({resultado.delta_ek_pct >= 0 ? '+' : ''}{formatNumber(resultado.delta_ek_pct, 1)}%)
+                  (<span>{resultado.delta_ek_pct >= 0 ? '+' : ''}</span>{formatNumber(resultado.delta_ek_pct, 1)}%)
                 </p>
               </div>
             </div>

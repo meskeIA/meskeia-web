@@ -461,7 +461,7 @@ export default function SimuladorFotografiaPage() {
               </div>
               <div role="status" aria-live="polite">
                 <p className={`${styles.exposureLabel} ${exposureClass}`}>
-                  {exposureLabel} ({deltaEVRotulado >= 0 ? '+' : ''}
+                  {exposureLabel} (<span>{deltaEVRotulado >= 0 ? '+' : ''}</span>
                   {formatNumber(deltaEVRotulado, 1)} EV)
                 </p>
                 {compensacionTopada && (

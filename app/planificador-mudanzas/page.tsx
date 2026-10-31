@@ -820,7 +820,7 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
               <div className={`${styles.resumenCard} ${diferencia >= 0 ? styles.positivo : styles.negativo}`}>
                 <span className={styles.resumenLabel}>Diferencia</span>
                 <span className={styles.resumenValor}>
-                  {diferencia >= 0 ? '+' : ''}{formatCurrency(diferencia)}
+                  <span>{diferencia >= 0 ? '+' : ''}</span>{formatCurrency(diferencia)}
                 </span>
               </div>
             </div>

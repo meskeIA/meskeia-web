@@ -127,9 +127,9 @@ export default function CasosAula() {
           <span aria-hidden="true">🌳</span> Modo{' '}
           <strong>{datos.modo === 'avl' ? 'AVL (con rebalanceo)' : 'BST (sin rebalanceo)'}</strong>{' '}
           · inserciones: {listaDeValores(datos.inserciones)}
-          {datos.eliminaciones && datos.eliminaciones.length > 0
+          <span>{datos.eliminaciones && datos.eliminaciones.length > 0
             ? ` · borrados: ${listaDeValores(datos.eliminaciones)}`
-            : ''}
+            : ''}</span>
         </p>
 
         <div className={styles.casoRespuesta}>

@@ -406,23 +406,23 @@ export default function SelectorMascota() {
             <p className={styles.avisoRecorte} role="note">
               <span aria-hidden="true">⚠️</span> Por estilo de vida encajaría{' '}
               <strong>{porPerfil.conArticulo}</strong>, pero{' '}
-              {motivoRecorte === 'alergia' && 'has declarado alergia al pelo: la recomendación se limita a animales sin pelo.'}
-              {motivoRecorte === 'salud' && resultado.mascotaPorPerfil === 'reptil' &&
-                'con niños menores de 5 años los CDC de Estados Unidos no recomiendan reptiles en casa (riesgo de salmonela).'}
+              <span>{motivoRecorte === 'alergia' && 'has declarado alergia al pelo: la recomendación se limita a animales sin pelo.'}</span>
+              <span>{motivoRecorte === 'salud' && resultado.mascotaPorPerfil === 'reptil' &&
+                'con niños menores de 5 años los CDC de Estados Unidos no recomiendan reptiles en casa (riesgo de salmonela).'}</span>
               {/* Los CDC incluyen a los roedores en la misma recomendación (hallazgo 1441) */}
-              {motivoRecorte === 'salud' && resultado.mascotaPorPerfil === 'roedor' &&
-                'con niños menores de 5 años los CDC de Estados Unidos recomiendan evitar el contacto con roedores, y a esa edad el riesgo de infección con cualquier pequeño mamífero es mayor.'}
+              <span>{motivoRecorte === 'salud' && resultado.mascotaPorPerfil === 'roedor' &&
+                'con niños menores de 5 años los CDC de Estados Unidos recomiendan evitar el contacto con roedores, y a esa edad el riesgo de infección con cualquier pequeño mamífero es mayor.'}</span>
               {/* Poco tiempo y la casa vacía muchas horas descartan al perro (hallazgo 2665) */}
-              {motivoRecorte === 'atencion' && (
-                <>has dicho que tienes {TIEMPO_ESCASO[respuestas[1]]} y que la casa se queda vacía{' '}
+              <span>{motivoRecorte === 'atencion' && (
+                <span>has dicho que tienes {TIEMPO_ESCASO[respuestas[1]]} y que la casa se queda vacía{' '}
                   {AUSENCIA_LARGA[respuestas[2]]}: un perro necesita salir varias veces al día, y las guías
                   de bienestar animal (RSPCA, PDSA) aconsejan no dejarlo solo más de cuatro horas seguidas.
-                  La recomendación se limita a animales que llevan bien esas ausencias.</>
-              )}
-              {motivoRecorte === 'presupuesto' && (
-                <>su coste mensual ({porPerfil.costeMensual}) no cabe en tu presupuesto de{' '}
-                  {ETIQUETA_MENSUAL[respuestas[10]]}: la recomendación se ajusta a lo que cabe en ese tramo.</>
-              )}
+                  La recomendación se limita a animales que llevan bien esas ausencias.</span>
+              )}</span>
+              <span>{motivoRecorte === 'presupuesto' && (
+                <span>su coste mensual ({porPerfil.costeMensual}) no cabe en tu presupuesto de{' '}
+                  {ETIQUETA_MENSUAL[respuestas[10]]}: la recomendación se ajusta a lo que cabe en ese tramo.</span>
+              )}</span>
             </p>
           )}
 

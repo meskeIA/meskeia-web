@@ -314,9 +314,9 @@ export default function SelectorFormacionPostgradoPage() {
                 <strong>Duración estimada:</strong> {resultado.duracion} &nbsp;·&nbsp;{' '}
                 <strong>Coste orientativo:</strong> {resultado.coste}. Estas cifras son orientativas y pueden variar según institución, región y modalidad.
                 {/* El test no pregunta si se tiene un grado (hallazgo 3103). */}
-                {resultado.requisitoAcceso && (
-                  <> <strong>Requisito de acceso:</strong> {resultado.requisitoAcceso}.</>
-                )}
+                <span>{resultado.requisitoAcceso && (
+                  <span> <strong>Requisito de acceso:</strong> {resultado.requisitoAcceso}.</span>
+                )}</span>
               </span>
             </div>
 

@@ -549,7 +549,7 @@ export default function SelectorGestionEstresPage() {
                   className={`${styles.metodoBar} ${metodo === metodoGanador ? styles.destacado : ''}`}
                 >
                   <span className={styles.metodoNombre}>
-                    {metodo === metodoGanador ? '★ ' : ''}
+                    <span>{metodo === metodoGanador ? '★ ' : ''}</span>
                     {nombresMetodos[metodo]}
                   </span>
                   <span className={styles.metodoPuntos}>{pts} pts</span>

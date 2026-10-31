@@ -628,7 +628,7 @@ export default function SimuladorCondensadoresPage() {
               aria-pressed={fuenteC === 'parte1'}
               onClick={() => setFuenteC('parte1')}
             >
-              C de la parte 1{resultado ? ` (${conPrefijo(resultado.capacidad, 'F')})` : ''}
+              C de la parte 1<span>{resultado ? ` (${conPrefijo(resultado.capacidad, 'F')})` : ''}</span>
             </button>
             <button
               type="button"
@@ -705,7 +705,7 @@ export default function SimuladorCondensadoresPage() {
             <label className={styles.sliderLabel} htmlFor="tiempo-rc">
               Instante t
               <span className={styles.sliderValue}>
-                {formatNumber(tTau, 2)}τ{rc ? ` = ${conPrefijo(tTau * rc.tau, 's', 0)}` : ''}
+                {formatNumber(tTau, 2)}τ<span>{rc ? ` = ${conPrefijo(tTau * rc.tau, 's', 0)}` : ''}</span>
               </span>
             </label>
             <input
@@ -735,7 +735,7 @@ export default function SimuladorCondensadoresPage() {
                 </div>
                 <div className={styles.valueCard}>
                   <span className={styles.valueName}>
-                    Corriente I(t){modoRC === 'descarga' ? ', en sentido contrario a la carga' : ''}
+                    Corriente I(t)<span>{modoRC === 'descarga' ? ', en sentido contrario a la carga' : ''}</span>
                   </span>
                   <span className={styles.valueNum}>{conPrefijo(rc.corriente, 'A')}</span>
                 </div>

@@ -389,7 +389,7 @@ export default function SelectorAlquilerVsCompra() {
               Tu puntuación total es {puntuacionConSigno(resultado.puntuacion)}: a partir de{' '}
               {puntuacionConSigno(UMBRAL)} la orientación es comprar, hasta {puntuacionConSigno(-UMBRAL)} alquilar,
               y entre medias, esperar.
-              {resultado.limitado && ' Aquí pasa de ese umbral, pero lo que has declarado arriba impide recomendar la compra.'}
+              <span>{resultado.limitado && ' Aquí pasa de ese umbral, pero lo que has declarado arriba impide recomendar la compra.'}</span>
             </p>
             {resultado.razones.length > 0 ? (
               resultado.razones.map((razon) => (

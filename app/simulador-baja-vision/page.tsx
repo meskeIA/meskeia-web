@@ -323,7 +323,7 @@ export default function SimuladorBajaVision() {
               de eso se ocupa la ficha de arriba, que sí es role="status" (hallazgo 959). */}
           <p className={styles.demoSubtitulo}>
             Así verías esta interfaz de ejemplo con <strong>{condicion.nombre.toLowerCase()}</strong>
-            {condicion.tieneIntensidad ? ` (intensidad ${intensidad} %)` : ''}:
+            <span>{condicion.tieneIntensidad ? ` (intensidad ${intensidad} %)` : ''}</span>:
           </p>
 
           <div className={styles.demoWrapper}>

@@ -211,7 +211,7 @@ export default function CasosAula() {
               <strong>
                 {esperado.toLocaleString('es-ES', { maximumFractionDigits: 2 })}
                 {/* Con espacio duro (U+00A0), para que el «%» no salte solo de línea (2378). */}
-                {/^%\s*/.test(etiqueta) ? ' %' : ''}
+                <span>{/^%\s*/.test(etiqueta) ? ' %' : ''}</span>
               </strong>{' '}
               {etiqueta.replace(/^%\s*/, '')}
             </p>

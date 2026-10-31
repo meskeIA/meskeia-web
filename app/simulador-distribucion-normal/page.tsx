@@ -701,9 +701,9 @@ export default function SimuladorDistribucionNormalPage() {
             <>
               <div className={styles.resultCardMain}>
                 <span className={styles.resultLabel}>
-                  {tipoProb === 'menor' && `P(X < ${fmt(a, sigma < 1 ? 3 : 2)})`}
-                  {tipoProb === 'mayor' && `P(X > ${fmt(a, sigma < 1 ? 3 : 2)})`}
-                  {tipoProb === 'entre' && `P(${fmt(Math.min(a, b), sigma < 1 ? 3 : 2)} < X < ${fmt(Math.max(a, b), sigma < 1 ? 3 : 2)})`}
+                  <span>{tipoProb === 'menor' && `P(X < ${fmt(a, sigma < 1 ? 3 : 2)})`}</span>
+                  <span>{tipoProb === 'mayor' && `P(X > ${fmt(a, sigma < 1 ? 3 : 2)})`}</span>
+                  <span>{tipoProb === 'entre' && `P(${fmt(Math.min(a, b), sigma < 1 ? 3 : 2)} < X < ${fmt(Math.max(a, b), sigma < 1 ? 3 : 2)})`}</span>
                 </span>
                 <span className={styles.resultValueLarge}>{fmtProb(probabilidad)}</span>
                 <span className={styles.resultDecimal}>= {fmt(probabilidad, 4)}</span>

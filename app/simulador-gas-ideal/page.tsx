@@ -419,26 +419,26 @@ function GasIdealTab(): React.ReactElement {
               <p className={styles.resultTitle}>Resultado</p>
               <div className={styles.resultRow}>
                 <span className={styles.resultLabel}>
-                  {calcVar === 'P' && 'Presión P'}
-                  {calcVar === 'V' && 'Volumen V'}
-                  {calcVar === 'T' && 'Temperatura T'}
-                  {calcVar === 'n' && 'Cantidad n'}
+                  <span>{calcVar === 'P' && 'Presión P'}</span>
+                  <span>{calcVar === 'V' && 'Volumen V'}</span>
+                  <span>{calcVar === 'T' && 'Temperatura T'}</span>
+                  <span>{calcVar === 'n' && 'Cantidad n'}</span>
                 </span>
                 <span className={styles.resultValueAccent}>
                   {formatNumber(calculado, calcVar === 'n' ? 4 : 3)}{' '}
-                  {calcVar === 'P' && 'atm'}
-                  {calcVar === 'V' && 'L'}
-                  {calcVar === 'T' && 'K'}
-                  {calcVar === 'n' && 'mol'}
+                  <span>{calcVar === 'P' && 'atm'}</span>
+                  <span>{calcVar === 'V' && 'L'}</span>
+                  <span>{calcVar === 'T' && 'K'}</span>
+                  <span>{calcVar === 'n' && 'mol'}</span>
                 </span>
               </div>
               <div className={styles.resultRow}>
                 <span className={styles.resultLabel}>Equivalencia</span>
                 <span className={styles.resultValue}>
-                  {calcVar === 'P' && `${formatNumber(calculado * ATM_TO_PA / 1000, 2)} kPa`}
-                  {calcVar === 'V' && `${formatNumber(calculado * L_TO_M3 * 1000, 2)} dm³`}
-                  {calcVar === 'T' && `${formatNumber(calculado - 273.15, 2)} °C`}
-                  {calcVar === 'n' && `${formatNumber(calculado * 6.022, 3)} ×10²³ moléculas`}
+                  <span>{calcVar === 'P' && `${formatNumber(calculado * ATM_TO_PA / 1000, 2)} kPa`}</span>
+                  <span>{calcVar === 'V' && `${formatNumber(calculado * L_TO_M3 * 1000, 2)} dm³`}</span>
+                  <span>{calcVar === 'T' && `${formatNumber(calculado - 273.15, 2)} °C`}</span>
+                  <span>{calcVar === 'n' && `${formatNumber(calculado * 6.022, 3)} ×10²³ moléculas`}</span>
                 </span>
               </div>
             </div>
@@ -542,10 +542,10 @@ function ProcesosTab(): React.ReactElement {
             className={`${styles.cicloCard} ${proceso === p ? styles.cicloCardActive : ''}`}
             onClick={() => setProceso(p)}
           >
-            {p === 'isotermo' && 'Isotermo (T cte)'}
-            {p === 'isobaro' && 'Isobárico (P cte)'}
-            {p === 'isocoro' && 'Isocórico (V cte)'}
-            {p === 'adiabatico' && 'Adiabático (Q=0)'}
+            <span>{p === 'isotermo' && 'Isotermo (T cte)'}</span>
+            <span>{p === 'isobaro' && 'Isobárico (P cte)'}</span>
+            <span>{p === 'isocoro' && 'Isocórico (V cte)'}</span>
+            <span>{p === 'adiabatico' && 'Adiabático (Q=0)'}</span>
           </button>
         ))}
       </div>
@@ -815,10 +815,10 @@ function CiclosTab(): React.ReactElement {
             className={`${styles.cicloCard} ${ciclo === c ? styles.cicloCardActive : ''}`}
             onClick={() => setCiclo(c)}
           >
-            {c === 'carnot' && 'Carnot'}
-            {c === 'otto' && 'Otto (gasolina)'}
-            {c === 'diesel' && 'Diesel'}
-            {c === 'stirling' && 'Stirling'}
+            <span>{c === 'carnot' && 'Carnot'}</span>
+            <span>{c === 'otto' && 'Otto (gasolina)'}</span>
+            <span>{c === 'diesel' && 'Diesel'}</span>
+            <span>{c === 'stirling' && 'Stirling'}</span>
           </button>
         ))}
       </div>
@@ -1027,18 +1027,18 @@ function CiclosTab(): React.ReactElement {
 
           <div className={styles.formulaBox}>
             <p className={styles.formulaTex}>
-              {ciclo === 'carnot' && 'η = 1 − Tc/Th'}
-              {ciclo === 'otto' && 'η = 1 − 1/rᵞ⁻¹'}
-              {ciclo === 'diesel' && 'η = 1 − (1/rᵞ⁻¹) · (rcᵞ−1)/(γ(rc−1))'}
-              {ciclo === 'stirling' && 'η = 1 − Tc/Th  (con regenerador ideal)'}
+              <span>{ciclo === 'carnot' && 'η = 1 − Tc/Th'}</span>
+              <span>{ciclo === 'otto' && 'η = 1 − 1/rᵞ⁻¹'}</span>
+              <span>{ciclo === 'diesel' && 'η = 1 − (1/rᵞ⁻¹) · (rcᵞ−1)/(γ(rc−1))'}</span>
+              <span>{ciclo === 'stirling' && 'η = 1 − Tc/Th  (con regenerador ideal)'}</span>
             </p>
             <p className={styles.formulaCaption}>
-              {ciclo === 'carnot' && 'Cota máxima absoluta: ningún ciclo real supera Carnot'}
-              {ciclo === 'otto' &&
-                'Motor de gasolina: solo depende de la compresión y γ. La T pico tiene que superar la T tras la compresión'}
-              {ciclo === 'diesel' &&
-                'Penaliza el cut-off (rc) por la inyección continua. La T máxima es T₃ = T₂·rc: la fija el cut-off'}
-              {ciclo === 'stirling' && <>Cota teórica igual a Carnot. Real: 30-40&nbsp;%.</>}
+              <span>{ciclo === 'carnot' && 'Cota máxima absoluta: ningún ciclo real supera Carnot'}</span>
+              <span>{ciclo === 'otto' &&
+                'Motor de gasolina: solo depende de la compresión y γ. La T pico tiene que superar la T tras la compresión'}</span>
+              <span>{ciclo === 'diesel' &&
+                'Penaliza el cut-off (rc) por la inyección continua. La T máxima es T₃ = T₂·rc: la fija el cut-off'}</span>
+              <span>{ciclo === 'stirling' && <span>Cota teórica igual a Carnot. Real: 30-40&nbsp;%.</span>}</span>
             </p>
             {ciclo !== 'carnot' && ciclo !== 'stirling' && (
               <p className={styles.formulaCaption}>

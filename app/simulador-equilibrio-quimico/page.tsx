@@ -617,9 +617,9 @@ export default function SimuladorEquilibrioQuimicoPage() {
             <div className={styles.resultRow}>
               <span className={styles.resultLabel}>Dirección de desplazamiento</span>
               <span className={styles.resultValueAccent}>
-                {direccion === 'derecha' && '→ Productos'}
-                {direccion === 'izquierda' && '← Reactivos'}
-                {direccion === 'equilibrio' && '⇌ Equilibrio'}
+                <span>{direccion === 'derecha' && '→ Productos'}</span>
+                <span>{direccion === 'izquierda' && '← Reactivos'}</span>
+                <span>{direccion === 'equilibrio' && '⇌ Equilibrio'}</span>
               </span>
             </div>
           </div>
@@ -649,12 +649,12 @@ export default function SimuladorEquilibrioQuimicoPage() {
               (hallazgo 788). Lo único que se recuerda del clic es qué se hizo. */}
           <div className={styles.mensajePedagogico} role="status">
             <strong>Le Chatelier dice:</strong> {accion}{' '}
-            {direccion === 'derecha' &&
-              `Ahora Q = ${formatNumber(Q, 4)} está por DEBAJO de Kc = ${formatNumber(KcEfectiva, 4)}, así que el sistema avanza hacia los productos (→) hasta recuperar el equilibrio.`}
-            {direccion === 'izquierda' &&
-              `Ahora Q = ${formatNumber(Q, 4)} está por ENCIMA de Kc = ${formatNumber(KcEfectiva, 4)}, así que el sistema retrocede hacia los reactivos (←) hasta recuperar el equilibrio.`}
-            {direccion === 'equilibrio' &&
-              `Q = ${formatNumber(Q, 4)} y Kc = ${formatNumber(KcEfectiva, 4)} coinciden: el sistema está en equilibrio y no se mueve.`}
+            <span>{direccion === 'derecha' &&
+              `Ahora Q = ${formatNumber(Q, 4)} está por DEBAJO de Kc = ${formatNumber(KcEfectiva, 4)}, así que el sistema avanza hacia los productos (→) hasta recuperar el equilibrio.`}</span>
+            <span>{direccion === 'izquierda' &&
+              `Ahora Q = ${formatNumber(Q, 4)} está por ENCIMA de Kc = ${formatNumber(KcEfectiva, 4)}, así que el sistema retrocede hacia los reactivos (←) hasta recuperar el equilibrio.`}</span>
+            <span>{direccion === 'equilibrio' &&
+              `Q = ${formatNumber(Q, 4)} y Kc = ${formatNumber(KcEfectiva, 4)} coinciden: el sistema está en equilibrio y no se mueve.`}</span>
             {notaKc && <> {notaKc}</>}
           </div>
 
@@ -743,7 +743,7 @@ export default function SimuladorEquilibrioQuimicoPage() {
                         htmlFor={`respuesta-caso-${caso.id}`}
                       >
                         {caso.etiquetaRespuesta}
-                        {caso.requiereRedondeo ? ' (redondea a 2 decimales)' : ''}
+                        <span>{caso.requiereRedondeo ? ' (redondea a 2 decimales)' : ''}</span>
                       </label>
                       <input
                         id={`respuesta-caso-${caso.id}`}

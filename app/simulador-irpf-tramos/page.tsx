@@ -357,7 +357,7 @@ export default function SimuladorIrpfTramosPage() {
         </div>
 
         <div className={styles.comparativaCol}>
-          <h3 className={styles.comparativaTitulo}>Con incremento {incremento >= 0 ? '+' : ''}{formatCurrency(incremento)}</h3>
+          <h3 className={styles.comparativaTitulo}>Con incremento <span>{incremento >= 0 ? '+' : ''}</span>{formatCurrency(incremento)}</h3>
           <p className={styles.comparativaBase}>{formatCurrency(baseFinal)}</p>
           <ul className={styles.comparativaLista}>
             <li>
@@ -481,7 +481,7 @@ export default function SimuladorIrpfTramosPage() {
           <div className={styles.sliderGroup}>
             <label className={styles.sliderLabel} htmlFor="incSlider">
               Incremento simulado: <span className={styles.sliderValue}>
-                {incremento >= 0 ? '+' : ''}{formatCurrency(incremento)}
+                <span>{incremento >= 0 ? '+' : ''}</span>{formatCurrency(incremento)}
               </span>
             </label>
             <input
@@ -522,9 +522,9 @@ export default function SimuladorIrpfTramosPage() {
         {/* Visualización */}
         <div className={styles.panel}>
           <h2 className={styles.panelTitle}>
-            {vista === 'tramos' && 'Cómo se reparte tu base entre los 6 tramos'}
-            {vista === 'escalera' && 'Escalera de tipos marginales'}
-            {vista === 'comparativa' && '¿Qué pasa si tu base cambia?'}
+            <span>{vista === 'tramos' && 'Cómo se reparte tu base entre los 6 tramos'}</span>
+            <span>{vista === 'escalera' && 'Escalera de tipos marginales'}</span>
+            <span>{vista === 'comparativa' && '¿Qué pasa si tu base cambia?'}</span>
           </h2>
           {vista === 'tramos' && renderVistaTramos()}
           {vista === 'escalera' && renderVistaEscalera()}

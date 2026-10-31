@@ -1688,14 +1688,14 @@ export default function SimuladorGrafosPage() {
           )}
 
           <div className={styles.hint}>
-            {modo === 'add-node' && <>Modo añadir nodo: haz clic en el lienzo para crear un nodo nuevo.</>}
-            {modo === 'add-edge' && (
-              <>
+            <span>{modo === 'add-node' && <span>Modo añadir nodo: haz clic en el lienzo para crear un nodo nuevo.</span>}</span>
+            <span>{modo === 'add-edge' && (
+              <span>
                 Modo añadir arista: clic en el primer nodo, luego en el segundo. {seleccionAristaFrom && <strong> (Origen seleccionado: {seleccionAristaFrom})</strong>}
-              </>
-            )}
-            {modo === 'move' && <>Modo mover: arrastra cualquier nodo para reposicionarlo.</>}
-            {modo === 'delete' && <>Modo eliminar: clic en un nodo o arista para borrarlo.</>}
+              </span>
+            )}</span>
+            <span>{modo === 'move' && <span>Modo mover: arrastra cualquier nodo para reposicionarlo.</span>}</span>
+            <span>{modo === 'delete' && <span>Modo eliminar: clic en un nodo o arista para borrarlo.</span>}</span>
           </div>
 
           <div className={styles.actionRow}>
@@ -1705,7 +1705,7 @@ export default function SimuladorGrafosPage() {
               aria-pressed={seleccionMarcado === 'origen'}
               onClick={() => setSeleccionMarcado(seleccionMarcado === 'origen' ? null : 'origen')}
             >
-              <span aria-hidden="true">📍</span> Marcar origen {origen && <>({origen})</>}
+              <span aria-hidden="true">📍</span> Marcar origen <span>{origen && <span>({origen})</span>}</span>
             </button>
             <button
               type="button"
@@ -1713,7 +1713,7 @@ export default function SimuladorGrafosPage() {
               aria-pressed={seleccionMarcado === 'destino'}
               onClick={() => setSeleccionMarcado(seleccionMarcado === 'destino' ? null : 'destino')}
             >
-              <span aria-hidden="true">🎯</span> Marcar destino {destino && <>({destino})</>}
+              <span aria-hidden="true">🎯</span> Marcar destino <span>{destino && <span>({destino})</span>}</span>
             </button>
             <button type="button" className={`${styles.actionBtn} ${styles.dangerBtn}`} onClick={limpiarGrafo}>
               Limpiar grafo

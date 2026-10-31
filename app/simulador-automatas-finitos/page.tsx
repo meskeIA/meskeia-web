@@ -860,15 +860,15 @@ export default function SimuladorAutomatasFinitos() {
           </div>
 
           <div className={styles.modoHint}>
-            {modo === 'move' && 'Arrastra los estados para reorganizarlos.'}
-            {modo === 'add-state' && 'Haz clic en el lienzo para añadir un estado.'}
+            <span>{modo === 'move' && 'Arrastra los estados para reorganizarlos.'}</span>
+            <span>{modo === 'add-state' && 'Haz clic en el lienzo para añadir un estado.'}</span>
             {modo === 'add-transition' &&
               (origenTransicion === null
                 ? 'Selecciona el estado de origen.'
                 : `Origen: ${etiquetaDe.get(origenTransicion) ?? origenTransicion}. Selecciona el destino.`)}
-            {modo === 'set-initial' && 'Haz clic en el estado que será el inicial.'}
-            {modo === 'toggle-final' && 'Haz clic en un estado para alternar si es final.'}
-            {modo === 'delete' && 'Haz clic en un estado o transición para eliminar.'}
+            <span>{modo === 'set-initial' && 'Haz clic en el estado que será el inicial.'}</span>
+            <span>{modo === 'toggle-final' && 'Haz clic en un estado para alternar si es final.'}</span>
+            <span>{modo === 'delete' && 'Haz clic en un estado o transición para eliminar.'}</span>
           </div>
 
           {/* SVG Editor */}
@@ -1183,7 +1183,7 @@ export default function SimuladorAutomatasFinitos() {
                   </div>
                   <div className={styles.editorCampo}>
                     <label htmlFor="editor-simbolo">
-                      con el símbolo{tipo === 'nfa' ? ' (ε para épsilon)' : ''}
+                      con el símbolo<span>{tipo === 'nfa' ? ' (ε para épsilon)' : ''}</span>
                     </label>
                     <input
                       id="editor-simbolo"
@@ -1261,13 +1261,13 @@ export default function SimuladorAutomatasFinitos() {
                 Cada fila es un paso del algoritmo: desde un conjunto de estados y con un símbolo, se
                 calcula el conjunto de llegada. Las filas marcadas como <strong>nuevo</strong> son las que
                 descubren un estado del AFD.
-                {determinizacion.omitidoVacio && (
-                  <>
+                <span>{determinizacion.omitidoVacio && (
+                  <span>
                     {' '}
                     Las que llegan a <strong>∅</strong> se dejan en blanco: no generan estado sumidero, igual
                     que al resolverlo en papel.
-                  </>
-                )}
+                  </span>
+                )}</span>
               </p>
               <div className={styles.convTablaWrap}>
                 <table className={styles.convTabla}>
@@ -1383,7 +1383,7 @@ export default function SimuladorAutomatasFinitos() {
                     Se fusionan{' '}
                     {minimizacion.fusionados.map((g, i) => (
                       <span key={i}>
-                        {i > 0 && ', '}
+                        <span>{i > 0 && ', '}</span>
                         <code>{`{${g.join(',')}}`}</code>
                       </span>
                     ))}

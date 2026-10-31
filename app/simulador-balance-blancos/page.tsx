@@ -233,7 +233,7 @@ export default function SimuladorBalanceBlancosPage() {
 
             <div className={styles.balanceMeter}>
               <p className={styles.balanceTitle}>
-                Diferencia con el WB correcto: {deltaK > 0 ? '+' : ''}
+                Diferencia con el WB correcto: <span>{deltaK > 0 ? '+' : ''}</span>
                 {formatNumber(deltaK, 0)} K
               </p>
               <div className={styles.balanceBar}>

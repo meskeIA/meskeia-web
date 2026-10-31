@@ -508,7 +508,7 @@ export default function SimuladorHashingColisiones() {
               disabled={quedan === 0}
               aria-label={quedan > 0 ? `Insertar siguiente: ${palabrasSet[indiceSet]}` : 'No quedan palabras'}
             >
-              Insertar siguiente{quedan > 0 ? ` (${palabrasSet[indiceSet]})` : ''}
+              Insertar siguiente<span>{quedan > 0 ? ` (${palabrasSet[indiceSet]})` : ''}</span>
             </button>
 
             <button

@@ -1035,7 +1035,7 @@ export default function SimuladorJubilacionPublicaPage() {
             <tbody>
               {TABLA_EDAD_JUBILACION.map(row => (
                 <tr key={row.anio} className={row.anio === ANIO_VIGENTE ? styles.tablaHighlight : ''}>
-                  <td>{row.anio}{row.anio === ANIO_VIGENTE ? ' ←' : ''}</td>
+                  <td>{row.anio}<span>{row.anio === ANIO_VIGENTE ? ' ←' : ''}</span></td>
                   <td>{edadTexto(row.edadSinCotizacion.anios, row.edadSinCotizacion.meses)}</td>
                   <td>{edadTexto(row.cotizacionPara65.anios, row.cotizacionPara65.meses)} cotizados</td>
                 </tr>

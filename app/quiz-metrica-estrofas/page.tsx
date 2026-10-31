@@ -530,9 +530,9 @@ export default function QuizMetricaEstrofasPage() {
                       {seleccionada === pregunta.correcta ? '¡Correcto!' : 'Incorrecto'}
                     </p>
                     <p className={styles.feedbackRespuesta}>
-                      {seleccionada !== pregunta.correcta && (
-                        <>Respuesta correcta: <strong>{pregunta.correcta}</strong></>
-                      )}
+                      <span>{seleccionada !== pregunta.correcta && (
+                        <span>Respuesta correcta: <strong>{pregunta.correcta}</strong></span>
+                      )}</span>
                     </p>
                   </div>
                 </div>

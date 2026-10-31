@@ -1111,17 +1111,17 @@ export default function SimuladorKmeans() {
               Eje X: {resumenImportado.nombres.x} (de {formatoValor(resumenImportado.rangoX.min)} a{' '}
               {formatoValor(resumenImportado.rangoX.max)}) · Eje Y: {resumenImportado.nombres.y} (de{' '}
               {formatoValor(resumenImportado.rangoY.min)} a {formatoValor(resumenImportado.rangoY.max)}).
-              {resumenImportado.filasIgnoradas === 1 && (
-                <> Se ha descartado 1 fila que no contenía dos números.</>
-              )}
-              {resumenImportado.filasIgnoradas > 1 && (
-                <> Se han descartado {formatNumber(resumenImportado.filasIgnoradas, 0)} filas que no
-                  contenían dos números.</>
-              )}
-              {resumenImportado.recortadoA !== null && (
-                <> Solo se han conservado los primeros{' '}
-                  {formatNumber(resumenImportado.recortadoA, 0)} puntos.</>
-              )}
+              <span>{resumenImportado.filasIgnoradas === 1 && (
+                <span> Se ha descartado 1 fila que no contenía dos números.</span>
+              )}</span>
+              <span>{resumenImportado.filasIgnoradas > 1 && (
+                <span> Se han descartado {formatNumber(resumenImportado.filasIgnoradas, 0)} filas que no
+                  contenían dos números.</span>
+              )}</span>
+              <span>{resumenImportado.recortadoA !== null && (
+                <span> Solo se han conservado los primeros{' '}
+                  {formatNumber(resumenImportado.recortadoA, 0)} puntos.</span>
+              )}</span>
               {resumenImportado.aviso && (
                 <> <strong>Revisa la lectura:</strong> {resumenImportado.aviso}</>
               )}
@@ -1409,12 +1409,12 @@ export default function SimuladorKmeans() {
           */}
           <p className={styles.lienzoNota} role="status">
             {puntos.length} {puntos.length === 1 ? 'punto' : 'puntos'} en el lienzo
-            {puntos.length < k && (
-              <>
+            <span>{puntos.length < k && (
+              <span>
                 {' '}· <strong>Con K = {k} hacen falta al menos {k} puntos</strong> para agrupar:
                 añade más con un clic en el lienzo o baja K.
-              </>
-            )}
+              </span>
+            )}</span>
           </p>
         </div>
 
