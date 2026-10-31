@@ -750,7 +750,7 @@ export default function CalculadoraTrigonometriaPage() {
                     htmlFor={`respuesta-caso-${caso.id}`}
                   >
                     Tu respuesta ({caso.etiquetaRespuesta})
-                    {caso.requiereRedondeo ? ' — redondea a 2 decimales' : ''}
+                    <span>{caso.requiereRedondeo ? ' — redondea a 2 decimales' : ''}</span>
                   </label>
                   <input
                     id={`respuesta-caso-${caso.id}`}
@@ -838,7 +838,7 @@ export default function CalculadoraTrigonometriaPage() {
               <div className={styles.casosCampo}>
                 <label className={styles.casosCampoEtiqueta} htmlFor="respuesta-aleatoria">
                   Tu respuesta ({ejercicio.etiquetaRespuesta})
-                  {ejercicio.requiereRedondeo ? ' — redondea a 2 decimales' : ''}
+                  <span>{ejercicio.requiereRedondeo ? ' — redondea a 2 decimales' : ''}</span>
                 </label>
                 <input
                   id="respuesta-aleatoria"

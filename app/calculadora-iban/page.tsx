@@ -889,9 +889,9 @@ export default function CalculadoraIbanPage() {
                   </li>
                   <li>
                     <strong>Longitud:</strong> {validacion.longitudReal} caracteres
-                    {validacion.longitudEsperada
+                    <span>{validacion.longitudEsperada
                       ? ` (esperada: ${validacion.longitudEsperada})`
-                      : ''}
+                      : ''}</span>
                   </li>
                   <li>
                     <strong>Formato agrupado:</strong> {validacion.ibanFormateado}

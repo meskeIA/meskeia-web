@@ -222,9 +222,9 @@ export default function CalculadoraEstadisticaMedicaPage() {
         <div className={styles.inputPanel}>
           <div className={styles.panelHeader}>
             <h2>
-              {mode === 'diagnostico' && 'Tabla 2x2 - Prueba Diagnóstica'}
-              {mode === 'epidemiologia' && 'Tabla 2x2 - Estudio Epidemiológico'}
-              {mode === 'nnt' && 'Tasas de Eventos'}
+              <span>{mode === 'diagnostico' && 'Tabla 2x2 - Prueba Diagnóstica'}</span>
+              <span>{mode === 'epidemiologia' && 'Tabla 2x2 - Estudio Epidemiológico'}</span>
+              <span>{mode === 'nnt' && 'Tasas de Eventos'}</span>
             </h2>
             <div className={styles.panelActions}>
               <button type="button" onClick={loadExample} className={styles.exampleBtn}>

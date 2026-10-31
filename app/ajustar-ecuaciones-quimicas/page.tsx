@@ -1342,7 +1342,7 @@ export default function AjustarEcuacionesQuimicas() {
                     <p className={styles.semiResumen}>
                       {semi.tipo === 'oxidación' ? 'Cede' : 'Capta'} <strong>{semi.electrones}</strong>{' '}
                       {semi.electrones === 1 ? 'electrón' : 'electrones'} por cada{' '}
-                      {(semi.izq.get(semi.especieInicial) ?? 1) === 1 ? '' : `${semi.izq.get(semi.especieInicial)} `}
+                      <span>{(semi.izq.get(semi.especieInicial) ?? 1) === 1 ? '' : `${semi.izq.get(semi.especieInicial)} `}</span>
                       {bonita(semi.especieInicial)}.
                     </p>
                   </div>

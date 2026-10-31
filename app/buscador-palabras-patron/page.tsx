@@ -296,12 +296,12 @@ export default function BuscadorPalabrasPatronPage() {
           <div className={styles.patternHelp}>
             <span className={styles.helpText} id="pattern-help">
               Cada <code className={styles.codeInline}>_</code> (o <code className={styles.codeInline}>?</code>) representa una letra cualquiera.
-              {longitudPatron > 0 && (
-                <>
+              <span>{longitudPatron > 0 && (
+                <span>
                   {' '}Longitud: <strong>{longitudPatron} {longitudPatron === 1 ? 'letra' : 'letras'}</strong>{' '}
                   ({huecosCount} {huecosCount === 1 ? 'hueco' : 'huecos'})
-                </>
-              )}
+                </span>
+              )}</span>
             </span>
           </div>
           <div className={styles.examples}>

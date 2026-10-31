@@ -438,9 +438,9 @@ export default function CalculadoraRecetaPanPage() {
               {(['liquido', 'remojo', 'seco'] as const).map((familia) => (
                 <div key={familia} className={styles.familiaBloque}>
                   <h3 className={styles.familiaTitulo}>
-                    {familia === 'liquido' && 'Traen agua, azúcar o grasa dentro → corrigen la fórmula'}
-                    {familia === 'remojo' && 'Piden su propia agua → se remojan aparte'}
-                    {familia === 'seco' && 'No tocan nada → solo se suman al peso'}
+                    <span>{familia === 'liquido' && 'Traen agua, azúcar o grasa dentro → corrigen la fórmula'}</span>
+                    <span>{familia === 'remojo' && 'Piden su propia agua → se remojan aparte'}</span>
+                    <span>{familia === 'seco' && 'No tocan nada → solo se suman al peso'}</span>
                   </h3>
                   <div className={styles.extrasGrid}>
                     {EXTRAS.filter((e) => e.familia === familia).map((e) => {

@@ -261,7 +261,7 @@ Ejemplo: 5, 7, 8, 6, 9   ·   con decimales: 1,5 2,3 4,7 o bien 1.5 2.3 4.7"
             <div className={styles.datosInfo}>
               <span>
                 Ordenados: {valores.slice(0, 5).map(v => formatNumber(v, 2)).join(', ')}
-                {valores.length > 5 ? '...' : ''}
+                <span>{valores.length > 5 ? '...' : ''}</span>
               </span>
             </div>
           )}
@@ -571,7 +571,7 @@ Ejemplo: 5, 7, 8, 6, 9   ·   con decimales: 1,5 2,3 4,7 o bien 1.5 2.3 4.7"
                 <div className={styles.aulaRespuesta}>
                   <label className={styles.aulaEtiquetaCampo} htmlFor={`respuesta-caso-${caso.id}`}>
                     {caso.etiquetaRespuesta}
-                    {caso.requiereRedondeo ? ' (redondea a 2 decimales)' : ''}
+                    <span>{caso.requiereRedondeo ? ' (redondea a 2 decimales)' : ''}</span>
                   </label>
                   <input
                     id={`respuesta-caso-${caso.id}`}
@@ -676,7 +676,7 @@ Ejemplo: 5, 7, 8, 6, 9   ·   con decimales: 1,5 2,3 4,7 o bien 1.5 2.3 4.7"
               <div className={styles.aulaRespuesta}>
                 <label className={styles.aulaEtiquetaCampo} htmlFor="respuesta-aleatoria">
                   {ejercicio.etiquetaRespuesta}
-                  {ejercicio.requiereRedondeo ? ' (redondea a 2 decimales)' : ''}
+                  <span>{ejercicio.requiereRedondeo ? ' (redondea a 2 decimales)' : ''}</span>
                 </label>
                 <input
                   id="respuesta-aleatoria"

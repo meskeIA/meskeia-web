@@ -481,7 +481,7 @@ export default function CalculadoraGastosCompartidosPage() {
                   <div className={styles.personaInfo}>
                     <span className={styles.personaNombre}>{s.nombre}</span>
                     <span className={`${styles.personaBalance} ${s.centimos >= 0 ? styles.positivo : styles.negativo}`}>
-                      {s.centimos > 0 ? '+' : ''}{formatCurrency(s.centimos / 100)}
+                      <span>{s.centimos > 0 ? '+' : ''}</span>{formatCurrency(s.centimos / 100)}
                     </span>
                   </div>
                   <button
@@ -543,7 +543,7 @@ export default function CalculadoraGastosCompartidosPage() {
                   bastan para dejar todas las cuentas a cero.
                 </span>
               )}
-              {!liquidacionExacta && ' Con más de 12 personas con saldo pendiente se usa un reparto aproximado, que puede no ser el mínimo absoluto.'}
+              <span>{!liquidacionExacta && ' Con más de 12 personas con saldo pendiente se usa un reparto aproximado, que puede no ser el mínimo absoluto.'}</span>
             </p>
 
             <div className={styles.deudasList}>

@@ -395,7 +395,7 @@ export default function CalculadoraMacrosPage() {
                   <div className={styles.detalleItem}>
                     <span className={styles.detalleLabel}>Ajuste por objetivo</span>
                     <span className={styles.detalleValor}>
-                      {ratiosMacros[objetivo].ajusteCalorias > 0 ? '+' : ''}
+                      <span>{ratiosMacros[objetivo].ajusteCalorias > 0 ? '+' : ''}</span>
                       {formatNumber(ratiosMacros[objetivo].ajusteCalorias, 0)} kcal
                     </span>
                   </div>

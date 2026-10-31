@@ -534,9 +534,9 @@ export default function CalculadoraPotenciaCiclismoPage() {
                           Reparto del esfuerzo: {formatNumber(vatios.desglose.gravedad, 0)} W contra la
                           gravedad · {formatNumber(vatios.desglose.rodadura, 0)} W de rodadura ·{' '}
                           {formatNumber(vatios.desglose.aerodinamica, 0)} W contra el aire.
-                          {vatios.vam !== null && (
-                            <> Esa subida son {formatNumber(vatios.vam, 0)} m/h de VAM.</>
-                          )}
+                          <span>{vatios.vam !== null && (
+                            <span> Esa subida son {formatNumber(vatios.vam, 0)} m/h de VAM.</span>
+                          )}</span>
                         </p>
                       )}
                       {/* La potencia a esa velocidad NO es el FTP salvo en un caso concreto, y la guía

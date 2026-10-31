@@ -396,7 +396,7 @@ export default function CalculadoraFrigoriasBtuPage() {
                             {formatNumber(datos.correccion, 2)})
                           </th>
                           <td>
-                            {datos.envolvente - datos.base >= 0 ? '+' : ''}
+                            <span>{datos.envolvente - datos.base >= 0 ? '+' : ''}</span>
                             {formatNumber(datos.envolvente - datos.base, 0)}
                           </td>
                           <td>{formatNumber(((datos.envolvente - datos.base) / datos.frioW) * 100, 0)} %</td>

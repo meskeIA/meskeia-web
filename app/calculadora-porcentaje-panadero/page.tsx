@@ -748,13 +748,13 @@ export default function CalculadoraPorcentajePanaderoPage() {
               Introduce el porcentaje de cada ingrediente respecto a la harina (el mismo que
               verías en modo &quot;Por gramos&quot;) y la calculadora reparte los gramos para que
               la masa dé justo ese peso final.
-              {otros.some(i => i.esPrefermento) && (
-                <>
+              <span>{otros.some(i => i.esPrefermento) && (
+                <span>
                   {' '}Con prefermento, el agua que declares es el <strong>agua total</strong> de
                   la fórmula: abajo verás cuánta hay que pesar aparte una vez descontada la que
                   ya viene dentro del prefermento.
-                </>
-              )}
+                </span>
+              )}</span>
             </p>
           )}
 
@@ -964,7 +964,7 @@ export default function CalculadoraPorcentajePanaderoPage() {
                     {/* Harina siempre primero */}
                     <tr className={styles.rowHarina}>
                       <td>
-                        <span aria-hidden="true">🌾</span> Harina{hayPrefermentos ? ' (total)' : ''}
+                        <span aria-hidden="true">🌾</span> Harina<span>{hayPrefermentos ? ' (total)' : ''}</span>
                       </td>
                       <td>{formatNumber(gramosFormula[0] ?? 0, 0)} g</td>
                       <td className={styles.pct}>100,0 %</td>
@@ -1061,21 +1061,21 @@ export default function CalculadoraPorcentajePanaderoPage() {
                   hidratación real de ESTA masa», y esa masa no se puede amasar. */}
               {!formulaImposible && resultado.hidratacion_pct > 0 && (
                 <div className={styles.hidratacionNote} role="note">
-                  <span aria-hidden="true">💧</span> La hidratación{hayPrefermentos ? ' real' : ''} de
+                  <span aria-hidden="true">💧</span> La hidratación<span>{hayPrefermentos ? ' real' : ''}</span> de
                   esta masa es <strong>{formatNumber(resultado.hidratacion_pct, 1)} %</strong>
-                  {resultado.hidratacion_pct < 60 && ' — masa seca, fácil de moldear'}
-                  {resultado.hidratacion_pct >= 60 && resultado.hidratacion_pct < 70 && ' — hidratación estándar, equilibrada'}
-                  {resultado.hidratacion_pct >= 70 && resultado.hidratacion_pct < 80 && ' — hidratación alta, miga abierta'}
-                  {resultado.hidratacion_pct >= 80 && ' — hidratación muy alta, técnica avanzada'}
-                  {hayPrefermentos && hidratacionSinContarPrefermento !== null && (
-                    <>
+                  <span>{resultado.hidratacion_pct < 60 && ' — masa seca, fácil de moldear'}</span>
+                  <span>{resultado.hidratacion_pct >= 60 && resultado.hidratacion_pct < 70 && ' — hidratación estándar, equilibrada'}</span>
+                  <span>{resultado.hidratacion_pct >= 70 && resultado.hidratacion_pct < 80 && ' — hidratación alta, miga abierta'}</span>
+                  <span>{resultado.hidratacion_pct >= 80 && ' — hidratación muy alta, técnica avanzada'}</span>
+                  <span>{hayPrefermentos && hidratacionSinContarPrefermento !== null && (
+                    <span>
                       {' '}Contando la harina y el agua que trae dentro el prefermento: sin
                       contarlas saldría{' '}
                       <strong>{formatNumber(hidratacionSinContarPrefermento, 1)} %</strong>, que
                       es la cifra que da cualquier calculadora que trate la masa madre como un
                       ingrediente más.
-                    </>
-                  )}
+                    </span>
+                  )}</span>
                 </div>
               )}
             </>

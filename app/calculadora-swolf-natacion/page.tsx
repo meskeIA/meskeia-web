@@ -291,8 +291,8 @@ export default function CalculadoraSwolfNatacionPage() {
           <p className={styles.referenciaNota}>
             Cada nivel empieza donde acaba el anterior. Son cortes orientativos para crol: no
             existe una escala oficial de SWOLF.
-            {metrosPiscina === 50 &&
-              ' En 50 m son el doble que en 25 m, porque el largo mide el doble.'}
+            <span>{metrosPiscina === 50 &&
+              ' En 50 m son el doble que en 25 m, porque el largo mide el doble.'}</span>
           </p>
         </div>
 

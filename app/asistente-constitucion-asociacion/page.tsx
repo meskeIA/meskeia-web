@@ -1473,9 +1473,9 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
             <div className={styles.documentPreview}>
               <div className={styles.documentHeader}>
                 <h3>
-                  {documentoActivo === 'acta' && <><span aria-hidden="true">📋</span> Acta Fundacional</>}
-                  {documentoActivo === 'estatutos' && <><span aria-hidden="true">📜</span> Estatutos</>}
-                  {documentoActivo === 'solicitud' && <><span aria-hidden="true">📝</span> Solicitud de Inscripción</>}
+                  <span>{documentoActivo === 'acta' && <span><span aria-hidden="true">📋</span> Acta Fundacional</span>}</span>
+                  <span>{documentoActivo === 'estatutos' && <span><span aria-hidden="true">📜</span> Estatutos</span>}</span>
+                  <span>{documentoActivo === 'solicitud' && <span><span aria-hidden="true">📝</span> Solicitud de Inscripción</span>}</span>
                 </h3>
                 <button
                   type="button"

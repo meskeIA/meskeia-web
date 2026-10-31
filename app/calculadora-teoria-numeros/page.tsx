@@ -580,7 +580,7 @@ export default function CalculadoraTeoriaNumerosPage() {
                     <h4>Lista de primos</h4>
                     <p className={styles.primos}>
                       {(resultados.primos ?? []).slice(0, 100).join(', ')}
-                      {(resultados.primos ?? []).length > 100 ? '...' : ''}
+                      <span>{(resultados.primos ?? []).length > 100 ? '...' : ''}</span>
                     </p>
                   </div>
                 </>
@@ -703,8 +703,8 @@ export default function CalculadoraTeoriaNumerosPage() {
                         )}
                       </p>
                       <p className={styles.antiprimoVecinos}>
-                        {analisisAntiprimo.anterior && (
-                          <>
+                        <span>{analisisAntiprimo.anterior && (
+                          <span>
                             Antiprimo anterior:{' '}
                             <button
                               type="button"
@@ -715,8 +715,8 @@ export default function CalculadoraTeoriaNumerosPage() {
                               {formatNumber(analisisAntiprimo.anterior.numero, 0)}
                             </button>{' '}
                             ({analisisAntiprimo.anterior.divisores} divisores).{' '}
-                          </>
-                        )}
+                          </span>
+                        )}</span>
                         {analisisAntiprimo.siguiente ? (
                           <span key="rama-1">
                             Siguiente:{' '}

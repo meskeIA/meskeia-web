@@ -806,7 +806,7 @@ function Resultados({ resultado: r, regimen, reformaRige, ccaa }: ResultadosProp
                   {formatNumber(red.tipo, 2)}&nbsp;% — {separarPorcentajes(red.nombre)}
                 </strong>
                 . Requisitos: {separarPorcentajes(red.condiciones.join(' · '))}
-                {red.valorMaximo ? ` · Valor máximo ${formatCurrency(red.valorMaximo)}` : ''}
+                <span>{red.valorMaximo ? ` · Valor máximo ${formatCurrency(red.valorMaximo)}` : ''}</span>
                 {superaElTope(red, itp.base) && <span key="tope"> · la base supera ese límite</span>}
               </li>
             ))}

@@ -487,8 +487,8 @@ export default function CalculadoraPinturaPage() {
                       {(resultado.techo > 0 || resultado.huecos > 0) && (
                         <span className={styles.detalleNota}>
                           paredes {formatNumber(resultado.paredes, 1)}
-                          {resultado.techo > 0 && ` + techo ${formatNumber(resultado.techo, 1)}`}
-                          {resultado.huecos > 0 && ` − huecos ${formatNumber(resultado.huecos, 1)}`}
+                          <span>{resultado.techo > 0 && ` + techo ${formatNumber(resultado.techo, 1)}`}</span>
+                          <span>{resultado.huecos > 0 && ` − huecos ${formatNumber(resultado.huecos, 1)}`}</span>
                         </span>
                       )}
                     </span>
@@ -520,8 +520,8 @@ export default function CalculadoraPinturaPage() {
                       {resultado.botesPequenos} {resultado.botesPequenos === 1 ? 'bote' : 'botes'}
                       <span className={styles.detalleNota}>
                         {formatNumber(resultado.litrosBotesPequenos, 0)} L comprados
-                        {resultado.precio > 0 &&
-                          ` · ${formatCurrency(resultado.costeBotesPequenos)}`}
+                        <span>{resultado.precio > 0 &&
+                          ` · ${formatCurrency(resultado.costeBotesPequenos)}`}</span>
                       </span>
                     </span>
                   </div>
@@ -532,8 +532,8 @@ export default function CalculadoraPinturaPage() {
                       {resultado.botesGrandes} {resultado.botesGrandes === 1 ? 'bote' : 'botes'}
                       <span className={styles.detalleNota}>
                         {formatNumber(resultado.litrosBotesGrandes, 0)} L comprados
-                        {resultado.precio > 0 &&
-                          ` · ${formatCurrency(resultado.costeBotesGrandes)}`}
+                        <span>{resultado.precio > 0 &&
+                          ` · ${formatCurrency(resultado.costeBotesGrandes)}`}</span>
                       </span>
                     </span>
                   </div>

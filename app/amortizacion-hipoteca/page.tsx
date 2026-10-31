@@ -828,9 +828,9 @@ export default function AmortizacionHipotecaPage() {
             <div className={styles.placeholder}>
               <div className={styles.placeholderIcon}>🏠</div>
               <p>
-                {modo === 'simple' && 'Introduce los datos de tu hipoteca y la amortización anticipada para ver el resultado'}
-                {modo === 'escenarios' && 'Compara diferentes importes de amortización para encontrar el escenario óptimo'}
-                {modo === 'periodica' && 'Simula un plan de amortizaciones anuales y ve cómo evoluciona tu hipoteca'}
+                <span>{modo === 'simple' && 'Introduce los datos de tu hipoteca y la amortización anticipada para ver el resultado'}</span>
+                <span>{modo === 'escenarios' && 'Compara diferentes importes de amortización para encontrar el escenario óptimo'}</span>
+                <span>{modo === 'periodica' && 'Simula un plan de amortizaciones anuales y ve cómo evoluciona tu hipoteca'}</span>
               </p>
             </div>
           )}

@@ -550,12 +550,12 @@ export default function CalculadoraAlgebraBooleanaPage() {
                       ? `Esenciales (obligatorios): ${karnaughGroups.filter(g => g.esencial).map(g => g.term).join(', ')}`
                       : 'No hay implicantes esenciales: la elección se resuelve por búsqueda exacta'}
                     <br />
-                    {karnaughGroups.filter(g => !g.esencial).length > 0 && (
-                      <>Añadidos para cubrir el resto: {karnaughGroups.filter(g => !g.esencial).map(g => g.term).join(', ')}<br /></>
-                    )}
-                    {primosDescartados.length > 0 && (
-                      <>Descartados por redundantes: {primosDescartados.join(', ')}</>
-                    )}
+                    <span>{karnaughGroups.filter(g => !g.esencial).length > 0 && (
+                      <span>Añadidos para cubrir el resto: {karnaughGroups.filter(g => !g.esencial).map(g => g.term).join(', ')}<br /></span>
+                    )}</span>
+                    <span>{primosDescartados.length > 0 && (
+                      <span>Descartados por redundantes: {primosDescartados.join(', ')}</span>
+                    )}</span>
                   </span>
                 ) : <span key="sin-grupos">No hay grupos que formar</span>}
               </div>
@@ -564,9 +564,9 @@ export default function CalculadoraAlgebraBooleanaPage() {
                 <strong>Paso 4:</strong> Escribir la expresión {outputMode === 'sop' ? 'SOP' : 'POS'}
                 <br />
                 {simplifiedExpression}
-                {costeExpresion.terminos > 0 && (
-                  <> — {costeExpresion.terminos} {costeExpresion.terminos === 1 ? 'término' : 'términos'}, {costeExpresion.literales} {costeExpresion.literales === 1 ? 'literal' : 'literales'}</>
-                )}
+                <span>{costeExpresion.terminos > 0 && (
+                  <span> — {costeExpresion.terminos} {costeExpresion.terminos === 1 ? 'término' : 'términos'}, {costeExpresion.literales} {costeExpresion.literales === 1 ? 'literal' : 'literales'}</span>
+                )}</span>
               </div>
             </div>
           )}

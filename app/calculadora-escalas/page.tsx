@@ -751,8 +751,8 @@ export default function CalculadoraEscalasPage() {
               <div className={styles.tablaContenedor}>
                 <table className={styles.tabla}>
                   <caption className={styles.tablaCaption}>
-                    {filasLista.length} medida{filasLista.length === 1 ? '' : 's'} convertida
-                    {filasLista.length === 1 ? '' : 's'} a escala {textoDeEscala(escala)}
+                    {filasLista.length} medida<span>{filasLista.length === 1 ? '' : 's'}</span> convertida
+                    <span>{filasLista.length === 1 ? '' : 's'}</span> a escala {textoDeEscala(escala)}
                   </caption>
                   <thead>
                     <tr>
@@ -965,7 +965,7 @@ export default function CalculadoraEscalasPage() {
                   <div className={styles.aulaRespuesta}>
                     <label className={styles.aulaEtiquetaCampo} htmlFor={`respuesta-caso-${caso.id}`}>
                       {caso.etiquetaRespuesta}
-                      {caso.unidad !== '' ? ` (en ${caso.unidad})` : ''}
+                      <span>{caso.unidad !== '' ? ` (en ${caso.unidad})` : ''}</span>
                     </label>
                     <input
                       id={`respuesta-caso-${caso.id}`}

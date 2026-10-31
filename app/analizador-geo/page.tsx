@@ -540,20 +540,20 @@ Tip: Incluye los títulos, subtítulos, listas y todo el texto que quieras anali
                 <div key={key} className={styles.categoryCard}>
                   <div className={styles.categoryHeader}>
                     <span className={styles.categoryIcon} aria-hidden="true">
-                      {key === 'estructura' && '📐'}
-                      {key === 'citabilidad' && '📌'}
-                      {key === 'entidades' && '🏷️'}
-                      {key === 'eeat' && '🏆'}
-                      {key === 'frescura' && '📅'}
-                      {key === 'formato' && '✨'}
+                      <span>{key === 'estructura' && '📐'}</span>
+                      <span>{key === 'citabilidad' && '📌'}</span>
+                      <span>{key === 'entidades' && '🏷️'}</span>
+                      <span>{key === 'eeat' && '🏆'}</span>
+                      <span>{key === 'frescura' && '📅'}</span>
+                      <span>{key === 'formato' && '✨'}</span>
                     </span>
                     <span className={styles.categoryName}>
-                      {key === 'estructura' && 'Estructura'}
-                      {key === 'citabilidad' && 'Citabilidad'}
-                      {key === 'entidades' && 'Entidades'}
-                      {key === 'eeat' && 'E-E-A-T'}
-                      {key === 'frescura' && 'Frescura'}
-                      {key === 'formato' && 'Formato'}
+                      <span>{key === 'estructura' && 'Estructura'}</span>
+                      <span>{key === 'citabilidad' && 'Citabilidad'}</span>
+                      <span>{key === 'entidades' && 'Entidades'}</span>
+                      <span>{key === 'eeat' && 'E-E-A-T'}</span>
+                      <span>{key === 'frescura' && 'Frescura'}</span>
+                      <span>{key === 'formato' && 'Formato'}</span>
                     </span>
                     <span className={styles.categoryScore}>
                       {cat.score}/{cat.maxScore}

@@ -121,7 +121,7 @@ export default function CalculadoraCostesTeletrabajoPage() {
               <span>5</span>
             </div>
             <span className={styles.helperText}>
-              {5 - diasTeletrabajo} día{5 - diasTeletrabajo !== 1 ? 's' : ''} en oficina
+              {5 - diasTeletrabajo} día<span>{5 - diasTeletrabajo !== 1 ? 's' : ''}</span> en oficina
             </span>
           </div>
 
@@ -230,7 +230,7 @@ export default function CalculadoraCostesTeletrabajoPage() {
       {hayDatos ? (
         <>
           <section className={styles.resultadoSection}>
-            <h2 className={styles.resultadoTitulo}>Resultado: teletrabajo {diasTeletrabajo} día{diasTeletrabajo !== 1 ? 's' : ''} por semana</h2>
+            <h2 className={styles.resultadoTitulo}>Resultado: teletrabajo {diasTeletrabajo} día<span>{diasTeletrabajo !== 1 ? 's' : ''}</span> por semana</h2>
 
             <div className={styles.resultadoGrid}>
               <div className={`${styles.resultCard} ${calculos.ahorroTransporte > 0 ? styles.ahorro : styles.neutro}`}>

@@ -992,9 +992,9 @@ export default function AlgebraEcuacionesPage() {
                       <p className={styles.candidatosTexto}>
                         Divisores del término independiente entre divisores del coeficiente
                         principal: {polyResultado.candidatos.slice(0, 24).join(', ')}
-                        {polyResultado.candidatos.length > 24
+                        <span>{polyResultado.candidatos.length > 24
                           ? ` … (${polyResultado.candidatos.length} en total)`
-                          : ''}
+                          : ''}</span>
                       </p>
                       {polyResultado.descartados.length > 0 && (
                         <p className={styles.candidatosTexto}>

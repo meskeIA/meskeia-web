@@ -807,7 +807,7 @@ export default function CalculadoraJugadaScrabblePage() {
                 </select>
                 <p className={styles.ayudaCampo}>
                   Las posiciones se cuentan desde la primera letra, hasta las {maxCasillasBonus} casillas que
-                  tu atril{gancho !== '' ? ' y el gancho' : ''} pueden llegar a ocupar. Si eliges «la ficha más
+                  tu atril<span>{gancho !== '' ? ' y el gancho' : ''}</span> pueden llegar a ocupar. Si eliges «la ficha más
                   valiosa», el resultado es el techo de la jugada: solo lo alcanzarás si la palabra encaja así
                   en el tablero.
                 </p>
@@ -954,21 +954,21 @@ export default function CalculadoraJugadaScrabblePage() {
 
                     <p className={styles.jugadaDetalle}>
                       Coloca {jugada.fichasUsadas} {jugada.fichasUsadas === 1 ? 'ficha' : 'fichas'} de tu atril
-                      {jugada.indiceGancho !== -1 && <> y aprovecha la <strong>{jugada.fichas[jugada.indiceGancho]}</strong> del tablero</>}
-                      {jugada.indicesComodin.length > 0 && (
-                        <> · comodín sobre {jugada.indicesComodin.map((i) => jugada.fichas[i]).join(' y ')}</>
-                      )}
+                      <span>{jugada.indiceGancho !== -1 && <span> y aprovecha la <strong>{jugada.fichas[jugada.indiceGancho]}</strong> del tablero</span>}</span>
+                      <span>{jugada.indicesComodin.length > 0 && (
+                        <span> · comodín sobre {jugada.indicesComodin.map((i) => jugada.fichas[i]).join(' y ')}</span>
+                      )}</span>
                       {jugada.bonos.map((bono) => (
                         <span key={bono.indice}> · ×{bono.multiplicador} en la <strong>{jugada.fichas[bono.indice]}</strong></span>
                       ))}
-                      {multPalabraResultado > 1 && (
-                        <>
+                      <span>{multPalabraResultado > 1 && (
+                        <span>
                           {' '}· palabra ×{multPalabraResultado}
-                          {multPalabraResultado === 4 && ' (dos casillas de doble palabra)'}
-                          {multPalabraResultado === 9 && ' (dos casillas de triple palabra)'}
-                        </>
-                      )}
-                      {jugada.atrilCompleto && <> · <strong>+{BONUS_ATRIL_COMPLETO} por colocar las siete fichas</strong></>}
+                          <span>{multPalabraResultado === 4 && ' (dos casillas de doble palabra)'}</span>
+                          <span>{multPalabraResultado === 9 && ' (dos casillas de triple palabra)'}</span>
+                        </span>
+                      )}</span>
+                      <span>{jugada.atrilCompleto && <span> · <strong>+{BONUS_ATRIL_COMPLETO} por colocar las siete fichas</strong></span>}</span>
                     </p>
                     <button
                       type="button"

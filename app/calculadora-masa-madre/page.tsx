@@ -220,9 +220,9 @@ export default function CalculadoraMasaMadrePage() {
               <span className={styles.inputSuffix}>g</span>
             </div>
             <div id="levadura-hint" className={styles.inputHint}>
-              {tipoLevadura === 'fresca' && 'Pan casero típico: 5–15 g por 500 g harina'}
-              {tipoLevadura === 'seca' && 'Pan casero típico: 1–5 g (un sobre ≈ 7 g)'}
-              {tipoLevadura === 'instantanea' && 'Recetas pan: 1–5 g por 500 g harina'}
+              <span>{tipoLevadura === 'fresca' && 'Pan casero típico: 5–15 g por 500 g harina'}</span>
+              <span>{tipoLevadura === 'seca' && 'Pan casero típico: 1–5 g (un sobre ≈ 7 g)'}</span>
+              <span>{tipoLevadura === 'instantanea' && 'Recetas pan: 1–5 g por 500 g harina'}</span>
             </div>
           </div>
 
@@ -354,11 +354,11 @@ export default function CalculadoraMasaMadrePage() {
                 <span key="rama-1">
                   <strong>Fermentación en bloque a {formatNumber(tempC, 0)} °C:</strong>{' '}
                   {formatearTiempo(rango.horasMin)} – {formatearTiempo(rango.horasMax)}
-                  {rango.factor !== 1 && (
-                    <> (×{formatNumber(rango.factor, 2)} sobre las{' '}
+                  <span>{rango.factor !== 1 && (
+                    <span> (×{formatNumber(rango.factor, 2)} sobre las{' '}
                     {FERMENTACION_MM_REF.horasMin}–{FERMENTACION_MM_REF.horasMax} h de
-                    referencia a {FERMENTACION_MM_REF.tempRefC} °C)</>
-                  )}
+                    referencia a {FERMENTACION_MM_REF.tempRefC} °C)</span>
+                  )}</span>
                   . Después, 1–2 h en frío. Es una estimación con masa madre activa: guíate
                   por el volumen de la masa, no solo por el reloj.
                 </span>

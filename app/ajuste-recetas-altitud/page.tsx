@@ -101,9 +101,9 @@ export default function AjusteRecetasAltitudPage() {
             <span className={styles.ebullicionValor}>{formatNumber(tbAgua, 1)} °C</span>
             <span className={styles.ebullicionTexto}>
               hierve el agua a {formatNumber(altitudNum, 0)} m
-              {altitudNum > 0 && (
-                <> · {formatNumber(100 - tbAgua, 1)} °C menos que al nivel del mar</>
-              )}
+              <span>{altitudNum > 0 && (
+                <span> · {formatNumber(100 - tbAgua, 1)} °C menos que al nivel del mar</span>
+              )}</span>
             </span>
           </div>
         </section>

@@ -501,8 +501,8 @@ export default function CalculadoraSeccionCable() {
             <span className={styles.inputHint}>
               {metodoTabla?.descripcion}. Con {resultado.conductoresCargados} conductores cargados
               ({sistema === 'monofasico' ? 'fase y neutro' : 'tres fases'}).
-              {sistema === 'monofasico' &&
-                ' Los métodos F y G solo aparecen en la tabla para líneas trifásicas.'}
+              <span>{sistema === 'monofasico' &&
+                ' Los métodos F y G solo aparecen en la tabla para líneas trifásicas.'}</span>
             </span>
           </div>
           <p className={styles.resultNota}>
@@ -550,7 +550,7 @@ export default function CalculadoraSeccionCable() {
                   onClick={() => setLimiteId(l.id)}
                 >
                   {l.nombre}
-                  {l.id !== 'libre' && ` · ${formatNumber(l.porcentaje, 1)} %`}
+                  <span>{l.id !== 'libre' && ` · ${formatNumber(l.porcentaje, 1)} %`}</span>
                 </button>
               ))}
             </div>

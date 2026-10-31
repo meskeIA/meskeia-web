@@ -522,7 +522,7 @@ export default function CalculadoraRentabilidadAlquilerPage() {
             <div className={`${styles.tableRow} ${styles.total}`}>
               <span className={styles.rowLabel}>Resultado anual neto</span>
               <span className={`${styles.rowValue} ${resultado.cashFlowMensual >= 0 ? styles.green : styles.red}`}>
-                {resultado.cashFlowMensual >= 0 ? '+ ' : ''}{formatCurrency((resultado.alquilerBrutoAnual - resultado.gastosTotalesAnual))}
+                <span>{resultado.cashFlowMensual >= 0 ? '+ ' : ''}</span>{formatCurrency((resultado.alquilerBrutoAnual - resultado.gastosTotalesAnual))}
               </span>
             </div>
           </div>

@@ -461,7 +461,7 @@ export default function CalculadoraTramosPage() {
                     <div>
                       <dt>Diferencia con el progresivo</dt>
                       <dd>
-                        {calculo.esc.total - calculo.prog.total >= 0 ? '+' : ''}
+                        <span>{calculo.esc.total - calculo.prog.total >= 0 ? '+' : ''}</span>
                         {fmtImporte(calculo.esc.total - calculo.prog.total)}
                       </dd>
                     </div>
@@ -652,11 +652,11 @@ export default function CalculadoraTramosPage() {
                             ) : (
                               <span key="rama-2">
                                 hasta {fmtLimiteZona(u.zona.hasta)}
-                                {u.zona.recortada
+                                <span>{u.zona.recortada
                                   ? ' (como mínimo: ahí acaba el tramo).'
                                   : fmtLimiteZona(u.zona.hasta).endsWith('.')
                                     ? ''
-                                    : '.'}
+                                    : '.'}</span>
                               </span>
                             )}
                           </>

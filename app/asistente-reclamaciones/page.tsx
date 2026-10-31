@@ -276,9 +276,9 @@ export default function AsistenteReclamacionesPage() {
                       className={styles.organismCard}
                     >
                       <span className={styles.organismType}>
-                        {org.type === 'nacional' && '🇪🇸'}
-                        {org.type === 'autonomico' && '🏠'}
-                        {org.type === 'europeo' && '🇪🇺'}
+                        <span>{org.type === 'nacional' && '🇪🇸'}</span>
+                        <span>{org.type === 'autonomico' && '🏠'}</span>
+                        <span>{org.type === 'europeo' && '🇪🇺'}</span>
                       </span>
                       <span className={styles.organismName}>{org.name}</span>
                       <span className={styles.organismDesc}>{org.description}</span>

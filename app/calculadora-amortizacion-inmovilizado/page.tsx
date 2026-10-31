@@ -362,7 +362,7 @@ export default function CalculadoraAmortizacionInmovilizado() {
           <p className={styles.tipoNota}>
             <strong>{tipoSeleccionado.nombre}:</strong> coeficiente lineal máximo {tipoSeleccionado.coefLinealMax} % ·
             período máximo {tipoSeleccionado.periodoMax} años (vida útil elegible entre {Math.round(100 / tipoSeleccionado.coefLinealMax)} y {tipoSeleccionado.periodoMax} años).
-            {tipoSeleccionado.degresivoExcluido && ' El método degresivo por porcentaje constante no es aplicable a este tipo de activo según la LIS.'}
+            <span>{tipoSeleccionado.degresivoExcluido && ' El método degresivo por porcentaje constante no es aplicable a este tipo de activo según la LIS.'}</span>
           </p>
         )}
 

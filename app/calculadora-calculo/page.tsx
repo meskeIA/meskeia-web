@@ -589,7 +589,7 @@ export default function CalculadoraCalculoPage() {
                     <h4>Primeros términos</h4>
                     <p className={styles.terminos}>
                       {(resultados.terminos ?? []).map((t: number, i: number) => formatNumber(t, 2)).join(', ')}
-                      {parseInt(numTerminos) > 10 ? '...' : ''}
+                      <span>{parseInt(numTerminos) > 10 ? '...' : ''}</span>
                     </p>
                     <p className={styles.formulaSmall}>{resultados.formula}</p>
                   </div>

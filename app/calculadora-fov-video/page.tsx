@@ -137,7 +137,7 @@ export default function CalculadoraFovVideoPage() {
                 <p className={styles.fovClasificacion}>{resultado.clasificacion}</p>
                 <p className={styles.fovSensorInfo}>
                   {resultado.sensorNombre} — {resultado.focal_mm} mm
-                  {resultado.factorCrop > 1 ? ` (≡ ${resultado.focalEquivalenteFF} mm en FF)` : ''}
+                  <span>{resultado.factorCrop > 1 ? ` (≡ ${resultado.focalEquivalenteFF} mm en FF)` : ''}</span>
                 </p>
               </div>
 

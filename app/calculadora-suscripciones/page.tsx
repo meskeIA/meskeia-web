@@ -383,9 +383,9 @@ export default function CalculadoraSuscripcionesPage() {
                     <div className={styles.suscripcionTexto}>
                       <span className={styles.suscripcionNombre}>{s.nombre}</span>
                       <span className={styles.suscripcionCiclo}>
-                        {s.ciclo === 'mensual' && 'Mensual'}
-                        {s.ciclo === 'anual' && 'Anual'}
-                        {s.ciclo === 'semanal' && 'Semanal'}
+                        <span>{s.ciclo === 'mensual' && 'Mensual'}</span>
+                        <span>{s.ciclo === 'anual' && 'Anual'}</span>
+                        <span>{s.ciclo === 'semanal' && 'Semanal'}</span>
                       </span>
                     </div>
                   </div>

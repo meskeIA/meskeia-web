@@ -500,7 +500,7 @@ export default function ArbolDecisionIa() {
                     </strong>
                   </p>
                   <p className={styles.resultadoCamino}>
-                    Ruta: {resultado.camino.length} nodo{resultado.camino.length !== 1 ? 's' : ''} recorrido{resultado.camino.length !== 1 ? 's' : ''}
+                    Ruta: {resultado.camino.length} nodo<span>{resultado.camino.length !== 1 ? 's' : ''}</span> recorrido<span>{resultado.camino.length !== 1 ? 's' : ''}</span>
                     {' '}(trayectoria resaltada en naranja en el árbol)
                   </p>
                 </div>

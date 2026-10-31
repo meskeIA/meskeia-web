@@ -1045,7 +1045,7 @@ export default function AsistenteAltaAutonomoPage() {
               {cuotaInfo.tarifaPlana !== null && (
                 <div className={styles.infoTarifaPlana}>
                   <span aria-hidden="true">✅</span> <strong>¡Puedes solicitar la tarifa plana!</strong> {TARIFA_PLANA_TXT}/mes durante {TARIFA_PLANA.duracion} meses
-                  {datos.situacionLaboral === 'pluriactividad' && ', también en pluriactividad (art. 38 ter de la Ley 20/2007)'}.
+                  <span>{datos.situacionLaboral === 'pluriactividad' && ', también en pluriactividad (art. 38 ter de la Ley 20/2007)'}</span>.
                 </div>
               )}
 
