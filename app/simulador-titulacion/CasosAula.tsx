@@ -228,7 +228,7 @@ export default function CasosAula({ onCargarEnSimulador }: Props) {
             {/* Mismos decimales que el último paso: `textoRespuesta` con 2, que es lo que
                 pide cada enunciado. */}
             <p className={styles.casoResultado}>
-              Respuesta: <strong>{magnitud === 'pH' ? 'pH = ' : ''}{textoRespuesta(esperado, unidad)}</strong>
+              Respuesta: <strong><span>{magnitud === 'pH' ? 'pH = ' : ''}</span>{textoRespuesta(esperado, unidad)}</strong>
             </p>
           </div>
         )}

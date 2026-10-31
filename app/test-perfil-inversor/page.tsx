@@ -1725,7 +1725,7 @@ function GuiaPerfilInversor() {
                 Es la regla que aplica este test, según cuándo necesitarás el dinero:{' '}
                 {Object.values(TOPE_POR_HORIZONTE).map((t, i) => (
                   <span key={t.plazo}>
-                    {i > 0 ? '; ' : ''}
+                    <span>{i > 0 ? '; ' : ''}</span>
                     <strong>
                       {t.plazo} → como mucho {PROFILES[t.perfil].name.toLowerCase()}
                     </strong>

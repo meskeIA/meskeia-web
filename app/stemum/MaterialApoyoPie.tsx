@@ -28,7 +28,7 @@ export default function MaterialApoyoPie({
       {material.map((m, i, arr) => (
         <span key={m.slug}>
           <Link href={`/${m.slug}`} className={styles.link}>{m.titulo}</Link>
-          {i < arr.length - 2 ? ', ' : i === arr.length - 2 ? ' y ' : ''}
+          <span>{i < arr.length - 2 ? ', ' : i === arr.length - 2 ? ' y ' : ''}</span>
         </span>
       ))}
       {' '}en{' '}

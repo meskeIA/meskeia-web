@@ -1022,7 +1022,7 @@ export default function SimuladorRegresionPage() {
         {/* Canvas */}
         <div className={styles.panel}>
           <h2 className={styles.panelTitle}>
-            3. Lienzo {puntos.length > 0 ? `(${puntos.length} puntos)` : ''}
+            3. Lienzo <span>{puntos.length > 0 ? `(${puntos.length} puntos)` : ''}</span>
           </h2>
 
           <div className={styles.canvasContainer}>
@@ -1127,9 +1127,9 @@ export default function SimuladorRegresionPage() {
             </svg>
             <p className={styles.canvasHint}>
               Haz clic en el lienzo para añadir un punto
-              {tipo === 'logistica'
+              <span>{tipo === 'logistica'
                 ? ` de clase ${claseActual} (${claseActual === 0 ? 'azul' : 'rojo'})`
-                : ''}
+                : ''}</span>
               . Mínimo 2 puntos para entrenar.
             </p>
           </div>

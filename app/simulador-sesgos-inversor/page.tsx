@@ -412,7 +412,7 @@ export default function SimuladorSesgosInversorPage() {
               <div className={styles.progresoInfo}>
                 <span>Escenario {indice + 1} de {ESCENARIOS.length}</span>
                 <span className={styles.sesgosProgreso}>
-                  {sesgosDetectados.length} sesgo{sesgosDetectados.length !== 1 ? 's' : ''} detectado{sesgosDetectados.length !== 1 ? 's' : ''}
+                  {sesgosDetectados.length} sesgo<span>{sesgosDetectados.length !== 1 ? 's' : ''}</span> detectado<span>{sesgosDetectados.length !== 1 ? 's' : ''}</span>
                 </span>
               </div>
               <div className={styles.barraProgreso}>

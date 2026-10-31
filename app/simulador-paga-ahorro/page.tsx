@@ -198,7 +198,7 @@ export default function SimuladorPagaAhorroPage() {
                     <span className={styles.resumenIcono} aria-hidden="true">🐷</span>
                     <div>
                       <div className={`${styles.resumenValor} ${sobrante >= 0 ? styles.positivo : styles.negativo}`}>
-                        {sobrante >= 0 ? '+' : ''}{formatCurrency(sobrante)}
+                        <span>{sobrante >= 0 ? '+' : ''}</span>{formatCurrency(sobrante)}
                       </div>
                       <div className={styles.resumenLabel}>
                         {sobrante >= 0 ? 'Puedes ahorrar' : '¡Gastas más de lo que recibes!'}
@@ -224,11 +224,11 @@ export default function SimuladorPagaAhorroPage() {
                     {porcentajeAhorro >= 30 ? '🌟' : porcentajeAhorro >= 20 ? '👍' : porcentajeAhorro >= 10 ? '💪' : '⚠️'}
                   </span>
                   <p>
-                    {porcentajeAhorro >= 30 && '¡Genial! Ahorras más del 30%. Tienes muy buen control de tu dinero.'}
-                    {porcentajeAhorro >= 20 && porcentajeAhorro < 30 && 'Bien hecho. Ahorras más del 20%, que es el objetivo recomendado.'}
-                    {porcentajeAhorro >= 10 && porcentajeAhorro < 20 && 'Puedes mejorar. Intenta llegar al 20% de ahorro reduciendo algún gasto.'}
-                    {porcentajeAhorro > 0 && porcentajeAhorro < 10 && 'Ahorras poco. Revisa tus gastos: ¿hay algo que puedas reducir o eliminar?'}
-                    {porcentajeAhorro <= 0 && '¡Cuidado! Gastas más de lo que recibes. Necesitas reducir gastos urgentemente.'}
+                    <span>{porcentajeAhorro >= 30 && '¡Genial! Ahorras más del 30%. Tienes muy buen control de tu dinero.'}</span>
+                    <span>{porcentajeAhorro >= 20 && porcentajeAhorro < 30 && 'Bien hecho. Ahorras más del 20%, que es el objetivo recomendado.'}</span>
+                    <span>{porcentajeAhorro >= 10 && porcentajeAhorro < 20 && 'Puedes mejorar. Intenta llegar al 20% de ahorro reduciendo algún gasto.'}</span>
+                    <span>{porcentajeAhorro > 0 && porcentajeAhorro < 10 && 'Ahorras poco. Revisa tus gastos: ¿hay algo que puedas reducir o eliminar?'}</span>
+                    <span>{porcentajeAhorro <= 0 && '¡Cuidado! Gastas más de lo que recibes. Necesitas reducir gastos urgentemente.'}</span>
                   </p>
                 </div>
 
@@ -248,7 +248,7 @@ export default function SimuladorPagaAhorroPage() {
                       </div>
                       <p className={styles.objetivoTexto}>
                         Ahorrando {formatCurrency(sobrante)}/mes, lo tendrás en <strong>{mesesParaObjetivo} {mesesParaObjetivo === 1 ? 'mes' : 'meses'}</strong>
-                        {mesesParaObjetivo <= 3 && ' — ¡casi lo tienes!'}
+                        <span>{mesesParaObjetivo <= 3 && ' — ¡casi lo tienes!'}</span>
                       </p>
                     </div>
                   </div>

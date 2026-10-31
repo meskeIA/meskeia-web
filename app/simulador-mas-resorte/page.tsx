@@ -541,41 +541,41 @@ export default function SimuladorMasResortePage() {
             motor: en el crítico decía que oscilaba mientras las tarjetas decían «no oscila»
             (hallazgo 2155). Todas con x(0) = A y v(0) = 0, como el PASO 3. */}
         <div className={styles.formulaBox}>
-          {valores.regimen === 'libre' && (
-            <>
+          <span>{valores.regimen === 'libre' && (
+            <span>
               <code>ω₀ = √(k/m)</code> &nbsp;·&nbsp;
               <code>T = 2π/ω₀</code> &nbsp;·&nbsp;
               <code>x(t) = A·cos(ω₀t)</code> &nbsp;·&nbsp;
               <code>E = ½·k·A²</code> (constante)
-            </>
-          )}
-          {valores.regimen === 'subamortiguado' && (
-            <>
+            </span>
+          )}</span>
+          <span>{valores.regimen === 'subamortiguado' && (
+            <span>
               <code>β = γ/(2m)</code> &nbsp;·&nbsp;
               <code>ω_d = √(ω₀² − β²)</code> &nbsp;·&nbsp;
               <code>T = 2π/ω_d</code> &nbsp;·&nbsp;
               <code>x(t) = A·e^(−βt)·[cos(ω_d·t) + (β/ω_d)·sen(ω_d·t)]</code> &nbsp;·&nbsp;
               <code>E(0) = ½·k·A²</code>, y solo decrece
-            </>
-          )}
-          {valores.regimen === 'critico' && (
-            <>
+            </span>
+          )}</span>
+          <span>{valores.regimen === 'critico' && (
+            <span>
               <code>γ = γ_c = 2√(k·m)</code> &nbsp;·&nbsp;
               <code>β = γ/(2m) = ω₀</code> &nbsp;·&nbsp;
               <code>x(t) = A·(1 + βt)·e^(−βt)</code> &nbsp;·&nbsp;
               no oscila: no hay período &nbsp;·&nbsp;
               <code>E(0) = ½·k·A²</code>
-            </>
-          )}
-          {valores.regimen === 'sobreamortiguado' && (
-            <>
+            </span>
+          )}</span>
+          <span>{valores.regimen === 'sobreamortiguado' && (
+            <span>
               <code>β = γ/(2m) &gt; ω₀</code> &nbsp;·&nbsp;
               <code>r = √(β² − ω₀²)</code> &nbsp;·&nbsp;
               <code>x(t) = A·e^(−βt)·[cosh(r·t) + (β/r)·senh(r·t)]</code> &nbsp;·&nbsp;
               no oscila: no hay período &nbsp;·&nbsp;
               <code>E(0) = ½·k·A²</code>
-            </>
-          )}
+            </span>
+          )}</span>
         </div>
 
         {/* ── Animación + gráfica ──────────────────────────────────────── */}

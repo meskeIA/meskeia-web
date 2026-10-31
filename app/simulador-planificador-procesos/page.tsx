@@ -947,9 +947,9 @@ export default function SimuladorPlanificadorProcesos() {
             <p className={styles.notaDesempate}>
               <strong>Empates:</strong> gana el proceso que llegó antes (si llegaron a la vez, el de la fila más
               alta).
-              {algoritmo === 'srtf' || (algoritmo === 'priority' && apropiativo)
+              <span>{algoritmo === 'srtf' || (algoritmo === 'priority' && apropiativo)
                 ? ' Y un empate no expulsa al que ya está en la CPU: solo lo expulsa uno estrictamente mejor.'
-                : ''}
+                : ''}</span>
             </p>
           )}
         </div>
@@ -1288,7 +1288,7 @@ export default function SimuladorPlanificadorProcesos() {
               <table className={styles.metricasTable}>
                 <caption className={styles.practicaCaption}>
                   Tus tiempos para {algoritmo.toUpperCase()}
-                  {algoritmo === 'rr' ? ` con quantum ${quantum}` : ''}
+                  <span>{algoritmo === 'rr' ? ` con quantum ${quantum}` : ''}</span>
                 </caption>
                 <thead>
                   <tr>

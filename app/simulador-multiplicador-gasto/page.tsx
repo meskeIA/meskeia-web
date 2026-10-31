@@ -397,7 +397,7 @@ export default function SimuladorMultiplicadorGastoPage() {
 
             {rondasExtra > 0 && (
               <p className={styles.rondasExtra}>
-                … {rondasExtra} ronda{rondasExtra === 1 ? '' : 's'} más (impulso &lt; 0,50 €)
+                … {rondasExtra} ronda<span>{rondasExtra === 1 ? '' : 's'}</span> más (impulso &lt; 0,50 €)
               </p>
             )}
           </div>

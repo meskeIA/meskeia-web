@@ -521,9 +521,9 @@ function SeccionCalentamiento({ nivelIdx, setNivelIdx }: { nivelIdx: number; set
 
       <div className={styles.insight}>
         <p>
-          {nivel.grados === 1 && 'Ya estamos viviendo los efectos del +1°C. Las olas de calor récord, los incendios forestales y las inundaciones extremas de los últimos años no son casualidad.'}
-          {nivel.grados === 2 && 'El Acuerdo de París fijó +2°C como límite (idealmente +1,5°C). Para lograrlo, las emisiones globales deben reducirse a la mitad antes de 2030 y llegar a cero neto antes de 2050.'}
-          {nivel.grados === 4 && 'Un mundo +4°C sería irreconocible. No es el peor escenario posible, pero sería catastrófico para la civilización tal como la conocemos. La buena noticia: aún estamos a tiempo de evitarlo.'}
+          <span>{nivel.grados === 1 && 'Ya estamos viviendo los efectos del +1°C. Las olas de calor récord, los incendios forestales y las inundaciones extremas de los últimos años no son casualidad.'}</span>
+          <span>{nivel.grados === 2 && 'El Acuerdo de París fijó +2°C como límite (idealmente +1,5°C). Para lograrlo, las emisiones globales deben reducirse a la mitad antes de 2030 y llegar a cero neto antes de 2050.'}</span>
+          <span>{nivel.grados === 4 && 'Un mundo +4°C sería irreconocible. No es el peor escenario posible, pero sería catastrófico para la civilización tal como la conocemos. La buena noticia: aún estamos a tiempo de evitarlo.'}</span>
         </p>
       </div>
     </div>

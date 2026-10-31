@@ -302,7 +302,7 @@ export default function TableroComunicacionPage() {
           style={categoriaActiva === 'favoritos' ? { borderBottomColor: '#D97706', color: '#D97706' } : {}}
         >
           <span aria-hidden="true">⭐</span>
-          <span>Favoritos{favoritos.length > 0 ? ` (${favoritos.length})` : ''}</span>
+          <span>Favoritos<span>{favoritos.length > 0 ? ` (${favoritos.length})` : ''}</span></span>
         </button>
         {CATEGORIAS.map(cat => (
           <button

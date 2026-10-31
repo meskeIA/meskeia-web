@@ -437,9 +437,9 @@ export default function VisualizadorCircuitosElectronicos() {
                       <p className={styles.graficaLabel}>Impedancia Z vs Frecuencia (escala log)</p>
                       <GraficaImpedancia componente={componenteSeleccionado} r={rOhms} c={cFarads} l={lHenrios} />
                       <p className={styles.graficaHint}>
-                        {componenteSeleccionado === 'R' && 'Z = R — independiente de la frecuencia'}
-                        {componenteSeleccionado === 'L' && 'Z_L = ωL — sube proporcionalmente a f'}
-                        {componenteSeleccionado === 'C' && 'Z_C = 1/(ωC) — baja al aumentar f'}
+                        <span>{componenteSeleccionado === 'R' && 'Z = R — independiente de la frecuencia'}</span>
+                        <span>{componenteSeleccionado === 'L' && 'Z_L = ωL — sube proporcionalmente a f'}</span>
+                        <span>{componenteSeleccionado === 'C' && 'Z_C = 1/(ωC) — baja al aumentar f'}</span>
                       </p>
                     </div>
                   </div>
@@ -839,7 +839,7 @@ export default function VisualizadorCircuitosElectronicos() {
                   <div className={styles.nivelNumero}>{nivel.id}</div>
                   <div className={styles.nivelInfo}>
                     <span className={styles.nivelNombre}>{nivel.nombre}</span>
-                    <span className={styles.nivelTransistores}>≈ {formatearTransistores(nivel.transistores)} transistor{nivel.transistores > 1 ? 'es' : ''}</span>
+                    <span className={styles.nivelTransistores}>≈ {formatearTransistores(nivel.transistores)} transistor<span>{nivel.transistores > 1 ? 'es' : ''}</span></span>
                   </div>
                   <div className={styles.nivelFlecha} aria-hidden="true">▶</div>
                 </button>

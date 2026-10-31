@@ -374,9 +374,9 @@ export default function SimuladorModeloOsi() {
                 {frame.lado === 'emisor' ? '▼' : frame.lado === 'medio' ? '⇄' : '▲'}
               </div>
               <div className={styles.medioTexto}>
-                {frame.lado === 'emisor' && 'Encapsulando'}
-                {frame.lado === 'medio' && 'Medio físico'}
-                {frame.lado === 'receptor' && 'Desencapsulando'}
+                <span>{frame.lado === 'emisor' && 'Encapsulando'}</span>
+                <span>{frame.lado === 'medio' && 'Medio físico'}</span>
+                <span>{frame.lado === 'receptor' && 'Desencapsulando'}</span>
               </div>
             </div>
             {renderStack('receptor')}

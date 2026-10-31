@@ -1607,14 +1607,14 @@ export default function TablaKaKbPage() {
                           <strong>Electrolito fuerte.</strong> En agua se disocia prácticamente al
                           100 %, así que su constante no tiene sentido práctico: el disolvente
                           «nivela» a todos estos ácidos al ion H₃O⁺ y no permite distinguirlos.
-                          {typeof especie.pkaNominal === 'number' && (
-                            <>
+                          <span>{typeof especie.pkaNominal === 'number' && (
+                            <span>
                               {' '}
                               Las tablas recogen un pKa orientativo de{' '}
                               {formatNumber(especie.pkaNominal, 1)}, medido en disolventes menos
                               básicos que el agua, y solo sirve para ordenar la serie.
-                            </>
-                          )}
+                            </span>
+                          )}</span>
                         </p>
                         <p className={styles.avisoFuerteCierre}>
                           Para calcular el pH no se plantea equilibrio:{' '}

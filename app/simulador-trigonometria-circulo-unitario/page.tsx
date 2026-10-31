@@ -929,7 +929,7 @@ export default function SimuladorTrigonometriaCirculoUnitario() {
                 htmlFor={`respuesta-caso-${casoActivo.id}`}
               >
                 Tu respuesta ({casoActivo.etiquetaRespuesta})
-                {casoActivo.requiereRedondeo ? ' — redondea a 2 decimales' : ''}
+                <span>{casoActivo.requiereRedondeo ? ' — redondea a 2 decimales' : ''}</span>
               </label>
               <input
                 id={`respuesta-caso-${casoActivo.id}`}
@@ -1091,7 +1091,7 @@ export default function SimuladorTrigonometriaCirculoUnitario() {
               <div className={styles.aulaCampo}>
                 <label className={styles.aulaCampoEtiqueta} htmlFor="respuesta-practica">
                   Tu respuesta ({ejercicio.etiquetaRespuesta})
-                  {ejercicio.requiereRedondeo ? ' — redondea a 2 decimales' : ''}
+                  <span>{ejercicio.requiereRedondeo ? ' — redondea a 2 decimales' : ''}</span>
                 </label>
                 <input
                   id="respuesta-practica"

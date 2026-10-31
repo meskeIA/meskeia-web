@@ -437,7 +437,7 @@ export default function SimuladorTeoremaBayesPage() {
         </div>
 
         <p className={styles.descriptionCard}>
-          {escenarioActual && <><strong>{escenarioActual.nombre}</strong>: {escenarioActual.notas}</>}
+          <span>{escenarioActual && <span><strong>{escenarioActual.nombre}</strong>: {escenarioActual.notas}</span>}</span>
         </p>
 
         <div className={styles.controls}>

@@ -245,7 +245,7 @@ export default function TestZaritCuidadorPage() {
 
             {respondidas > 0 && respondidas < totalPreguntas && (
               <p className={styles.faltanInfo}>
-                Te faltan {totalPreguntas - respondidas} pregunta{totalPreguntas - respondidas > 1 ? 's' : ''} por responder.
+                Te faltan {totalPreguntas - respondidas} pregunta<span>{totalPreguntas - respondidas > 1 ? 's' : ''}</span> por responder.
                 Puedes navegar libremente usando los botones numerados.
               </p>
             )}

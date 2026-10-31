@@ -748,13 +748,13 @@ export default function SimuladorMonticuloBinario() {
             aria-live="polite"
           >
             <strong>Comprobación del estado visible:</strong> {comprobacion.mensaje}
-            {fijos > 0 && (
-              <>
+            <span>{fijos > 0 && (
+              <span>
                 {' '}
                 Las {formatNumber(fijos, 0)} últimas posiciones ya están fijadas por el heapsort y
                 han salido del montículo, por eso no aparecen en el árbol.
-              </>
-            )}
+              </span>
+            )}</span>
           </div>
 
           <div className={styles.infoLayout}>

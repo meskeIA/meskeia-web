@@ -442,7 +442,7 @@ export default function VisualizadorBeneficioLiquidezPage() {
                     <td>{d.cobroMes > 0 ? fmtEur(d.cobroMes) : '—'}</td>
                     <td>{d.pagoMes > 0 ? fmtEur(d.pagoMes) : '—'}</td>
                     <td className={d.flujoMes >= 0 ? styles.tdPositivo : styles.tdNegativo}>
-                      {d.flujoMes >= 0 ? '+' : ''}{fmtEur(d.flujoMes)}
+                      <span>{d.flujoMes >= 0 ? '+' : ''}</span>{fmtEur(d.flujoMes)}
                     </td>
                     <td className={negativo ? styles.tdNegativo : styles.tdPositivo}>
                       <strong>{fmtEur(d.cajaCumulada)}</strong>

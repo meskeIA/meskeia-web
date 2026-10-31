@@ -470,7 +470,7 @@ export default function SimuladorProgramacionDinamica() {
                 <tr>
                   <th className={styles.esquina}>
                     {tabla.encabFila}
-                    {tabla.encabFila && tabla.encabCol ? ' \\ ' : ''}
+                    <span>{tabla.encabFila && tabla.encabCol ? ' \\ ' : ''}</span>
                     {tabla.encabCol}
                   </th>
                   {tabla.etiqCol.map((et, c) => (

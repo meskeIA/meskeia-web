@@ -658,14 +658,14 @@ export default function VisualizadorCicloCarbonoCompleto() {
                 <span className={styles.emisionResultLabel}>CO₂ estimado en 2100</span>
               </div>
               <p className={styles.emisionResultDesc}>
-                {reduccionEmisiones === 0 &&
-                  'Sin reducción: ~600 ppm en 2100. Calentamiento de 3–4°C. Riesgo de múltiples tipping points.'}
-                {reduccionEmisiones > 0 && reduccionEmisiones < 50 &&
-                  'Reducción insuficiente: todavía por encima de los 450 ppm considerados seguros. Urgente acelerar la transición.'}
-                {reduccionEmisiones >= 50 && reduccionEmisiones < 100 &&
-                  'Reducción significativa: el CO₂ sube más despacio pero no se estabiliza. Los sumideros naturales ayudan pero no bastan solos.'}
-                {reduccionEmisiones === 100 &&
-                  'Net-zero: el CO₂ se estabiliza y luego declina lentamente gracias a los sumideros naturales. El calentamiento se frenaría en ~1,5–2°C adicionales respecto a hoy.'}
+                <span>{reduccionEmisiones === 0 &&
+                  'Sin reducción: ~600 ppm en 2100. Calentamiento de 3–4°C. Riesgo de múltiples tipping points.'}</span>
+                <span>{reduccionEmisiones > 0 && reduccionEmisiones < 50 &&
+                  'Reducción insuficiente: todavía por encima de los 450 ppm considerados seguros. Urgente acelerar la transición.'}</span>
+                <span>{reduccionEmisiones >= 50 && reduccionEmisiones < 100 &&
+                  'Reducción significativa: el CO₂ sube más despacio pero no se estabiliza. Los sumideros naturales ayudan pero no bastan solos.'}</span>
+                <span>{reduccionEmisiones === 100 &&
+                  'Net-zero: el CO₂ se estabiliza y luego declina lentamente gracias a los sumideros naturales. El calentamiento se frenaría en ~1,5–2°C adicionales respecto a hoy.'}</span>
               </p>
             </div>
           </div>

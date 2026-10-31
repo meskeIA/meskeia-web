@@ -254,8 +254,8 @@ export default function SimuladorMontyHallPage() {
 
           {/* INSTRUCCIÓN DINÁMICA */}
           <p className={styles.instruccion} role="status" aria-live="polite">
-            {fase === 'elegir' && 'Haz clic en una puerta para elegirla.'}
-            {fase === 'decidir' && 'Monty ha abierto una puerta con cabra. ¿Cambias de puerta o mantienes tu elección?'}
+            <span>{fase === 'elegir' && 'Haz clic en una puerta para elegirla.'}</span>
+            <span>{fase === 'decidir' && 'Monty ha abierto una puerta con cabra. ¿Cambias de puerta o mantienes tu elección?'}</span>
             {fase === 'resultado' && mensajeResultado()}
           </p>
 
@@ -332,7 +332,7 @@ export default function SimuladorMontyHallPage() {
               <span className={styles.statLabel}>Partidas</span>
             </div>
             <div className={styles.statItem}>
-              <span className={styles.statValue}>{pctVictorias}{totalJugadas > 0 ? ' %' : ''}</span>
+              <span className={styles.statValue}>{pctVictorias}<span>{totalJugadas > 0 ? ' %' : ''}</span></span>
               <span className={styles.statLabel}>% victorias</span>
             </div>
           </div>

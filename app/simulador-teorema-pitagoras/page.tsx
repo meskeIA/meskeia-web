@@ -936,7 +936,7 @@ export default function SimuladorTeoremaPitagorasPage() {
                     <div className={styles.casoRespuesta}>
                       <label className={styles.campoEtiqueta} htmlFor={`respuesta-caso-${caso.id}`}>
                         Tu respuesta en {caso.unidad}
-                        {caso.requiereRedondeo ? ' (redondea a 2 decimales)' : ''}
+                        <span>{caso.requiereRedondeo ? ' (redondea a 2 decimales)' : ''}</span>
                       </label>
                       <input
                         id={`respuesta-caso-${caso.id}`}
@@ -1037,7 +1037,7 @@ export default function SimuladorTeoremaPitagorasPage() {
                   <div className={styles.casoRespuesta}>
                     <label className={styles.campoEtiqueta} htmlFor="respuesta-aleatoria">
                       Tu respuesta en {ejercicio.unidad}
-                      {ejercicio.requiereRedondeo ? ' (redondea a 2 decimales)' : ''}
+                      <span>{ejercicio.requiereRedondeo ? ' (redondea a 2 decimales)' : ''}</span>
                     </label>
                     <input
                       id="respuesta-aleatoria"

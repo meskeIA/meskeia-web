@@ -344,9 +344,9 @@ export default function SimuladorOsmosisPage() {
                   <div className={styles.destacado}>
                     <span className={styles.destacadoNombre}>Paso neto de agua</span>
                     <span className={styles.destacadoValor}>
-                      {membrana.sentido === 'B_a_A' && 'De B hacia A'}
-                      {membrana.sentido === 'A_a_B' && 'De A hacia B'}
-                      {membrana.sentido === 'ninguno' && 'Ninguno'}
+                      <span>{membrana.sentido === 'B_a_A' && 'De B hacia A'}</span>
+                      <span>{membrana.sentido === 'A_a_B' && 'De A hacia B'}</span>
+                      <span>{membrana.sentido === 'ninguno' && 'Ninguno'}</span>
                     </span>
                     <span className={styles.destacadoSub}>
                       {membrana.sentido === 'ninguno'
@@ -499,9 +499,9 @@ export default function SimuladorOsmosisPage() {
                     <span className={styles.destacadoNombre}>{NOMBRE_TONICIDAD[celula.tonicidad]}</span>
                     <span className={styles.destacadoValor}>{EXPLICACION[celula.estado].titulo}</span>
                     <span className={styles.destacadoSub}>
-                      {celula.agua === 'entra' && 'El agua entra en la célula'}
-                      {celula.agua === 'sale' && 'El agua sale de la célula'}
-                      {celula.agua === 'equilibrio' && 'Sin paso neto apreciable de agua'}
+                      <span>{celula.agua === 'entra' && 'El agua entra en la célula'}</span>
+                      <span>{celula.agua === 'sale' && 'El agua sale de la célula'}</span>
+                      <span>{celula.agua === 'equilibrio' && 'Sin paso neto apreciable de agua'}</span>
                     </span>
                   </div>
 
@@ -517,7 +517,7 @@ export default function SimuladorOsmosisPage() {
                     <div className={styles.tarjeta}>
                       <span className={styles.tarjetaNombre}>Medio frente al interior</span>
                       <span className={styles.tarjetaValor}>
-                        {celula.diferenciaRelativa > 0 ? '+' : ''}
+                        <span>{celula.diferenciaRelativa > 0 ? '+' : ''}</span>
                         {formatPercentage(celula.diferenciaRelativa, 1)}
                       </span>
                     </div>
@@ -920,7 +920,7 @@ function DibujoCelula({ tipo, estado }: DibujoCelulaProps) {
 
       <text x={150} y={222} textAnchor="middle" className={styles.svgRotuloSecundario}>
         {nombre}
-        {estado ? ` · ${ESTADO_CORTO[estado]}` : ''}
+        <tspan>{estado ? ` · ${ESTADO_CORTO[estado]}` : ''}</tspan>
       </text>
     </svg>
   );

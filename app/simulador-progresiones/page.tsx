@@ -1002,7 +1002,7 @@ export default function SimuladorProgresionesPage() {
                     <div className={styles.casoRespuesta}>
                       <label className={styles.campoEtiqueta} htmlFor={`respuesta-caso-${caso.id}`}>
                         Tu respuesta ({caso.etiquetaRespuesta})
-                        {caso.requiereRedondeo ? ' — redondea a 2 decimales' : ''}
+                        <span>{caso.requiereRedondeo ? ' — redondea a 2 decimales' : ''}</span>
                       </label>
                       <input
                         id={`respuesta-caso-${caso.id}`}
@@ -1091,7 +1091,7 @@ export default function SimuladorProgresionesPage() {
                   <div className={styles.casoRespuesta}>
                     <label className={styles.campoEtiqueta} htmlFor="respuesta-aleatoria">
                       Tu respuesta ({ejercicio.etiquetaRespuesta})
-                      {ejercicio.requiereRedondeo ? ' — redondea a 2 decimales' : ''}
+                      <span>{ejercicio.requiereRedondeo ? ' — redondea a 2 decimales' : ''}</span>
                     </label>
                     <input
                       id="respuesta-aleatoria"

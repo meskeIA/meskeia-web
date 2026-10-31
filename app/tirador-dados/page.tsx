@@ -363,7 +363,7 @@ export default function TiradorDadosPage() {
 
                     {modifier !== 0 && (
                       <div className={styles.modifierDisplay}>
-                        {modifier > 0 ? '+' : ''}{modifier} modificador
+                        <span>{modifier > 0 ? '+' : ''}</span>{modifier} modificador
                       </div>
                     )}
 

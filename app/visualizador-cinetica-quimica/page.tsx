@@ -153,7 +153,7 @@ function SvgPerfil({ ea, deltaH, mostrarCat, eaCat }: SvgPerfilProps) {
       {/* Línea de productos */}
       <line x1={x4 - 20} y1={yProd} x2={x4} y2={yProd} stroke="#48A9A6" strokeWidth="1.5" strokeDasharray="3 2" opacity="0.5" />
       <text x={x4 - 2} y={yProd - 5} fontSize="8" fill="#48A9A6" textAnchor="end">Productos</text>
-      <text x={x4 - 2} y={yProd + 12} fontSize="7" fill="#999" textAnchor="end">{deltaH > 0 ? '+' : ''}{deltaH} kJ/mol</text>
+      <text x={x4 - 2} y={yProd + 12} fontSize="7" fill="#999" textAnchor="end"><tspan>{deltaH > 0 ? '+' : ''}</tspan>{deltaH} kJ/mol</text>
 
       {/* Curva principal */}
       <path d={pathNormal} fill="none" stroke="#2E86AB" strokeWidth="2.5" strokeLinejoin="round" />

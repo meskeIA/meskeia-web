@@ -399,7 +399,7 @@ export default function SimuladorPrincipioPascalPage() {
                 )}
                 <text x={D_IZQ + 8} y={D_FONDO - 12} className={styles.svgRotulo}>
                   {liquido.nombre}
-                  {esPositivo(liquido.densidad) ? ` · ${formatNumber(liquido.densidad, 0)} kg/m³` : ''}
+                  <tspan>{esPositivo(liquido.densidad) ? ` · ${formatNumber(liquido.densidad, 0)} kg/m³` : ''}</tspan>
                 </text>
                 {/* Composición de la presión absoluta */}
                 {presion && (

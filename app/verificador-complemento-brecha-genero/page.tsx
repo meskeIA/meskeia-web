@@ -1177,7 +1177,7 @@ export default function VerificadorComplementoBrechaGeneroPage() {
                     <caption className={styles.atrasosCaption}>
                       Atrasos brutos por año: {resultado.hijosComputables}{' '}
                       {resultado.hijosComputables === 1 ? 'hijo computable' : 'hijos computables'}
-                      {resultado.prorrata !== undefined ? `, prorrata del ${formatPercentage(resultado.prorrata / 100)}` : ''}
+                      <span>{resultado.prorrata !== undefined ? `, prorrata del ${formatPercentage(resultado.prorrata / 100)}` : ''}</span>
                     </caption>
                     <thead>
                       <tr>

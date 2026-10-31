@@ -336,7 +336,7 @@ export default function SimuladorModeloBohrPage() {
                   <div className={styles.destacado}>
                     <span className={styles.destacadoNombre}>
                       {t.sentido === 'emision' ? 'Fotón emitido' : 'Fotón absorbido'} · {t.serie ? `serie de ${t.serie}` : 'serie sin nombre propio'}
-                      {t.esLimite ? ' (límite de la serie)' : ''}
+                      <span>{t.esLimite ? ' (límite de la serie)' : ''}</span>
                     </span>
                     <span className={styles.destacadoValor}>
                       <span className={styles.muestraLinea} style={{ background: colorLinea }} aria-hidden="true" />
@@ -414,9 +414,9 @@ export default function SimuladorModeloBohrPage() {
                   </p>
                   <p className={styles.formulaLinea}>
                     <code>λ = {formatoSignificativo(t.lambdaNm, 5)} nm</code>
-                    {lambdaLibro !== null && (
-                      <> · con R = 1,097·10⁷ m⁻¹ del libro sale {formatoSignificativo(lambdaLibro, 4)} nm</>
-                    )}
+                    <span>{lambdaLibro !== null && (
+                      <span> · con R = 1,097·10⁷ m⁻¹ del libro sale {formatoSignificativo(lambdaLibro, 4)} nm</span>
+                    )}</span>
                   </p>
                 </div>
               ) : (
@@ -511,8 +511,8 @@ export default function SimuladorModeloBohrPage() {
                       <tr key={l.nSuperior} className={actual ? styles.filaActual : undefined}>
                         <td>
                           {textoNivel(l.nSuperior)} ↔ {t.nInferior}
-                          {l.nSuperior === Infinity ? ' (límite)' : ''}
-                          {actual ? ' · el elegido' : ''}
+                          <span>{l.nSuperior === Infinity ? ' (límite)' : ''}</span>
+                          <span>{actual ? ' · el elegido' : ''}</span>
                         </td>
                         <td>{formatoSignificativo(l.lambdaNm, 5)}</td>
                         <td>{formatNumber(l.energiaFotonEV, 3)}</td>

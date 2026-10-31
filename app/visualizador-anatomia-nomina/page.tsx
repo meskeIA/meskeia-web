@@ -191,7 +191,7 @@ function LineaClickable({ linea, activa, onClick }: {
       >
         <span className={styles.lineaConcepto}>{linea.concepto}</span>
         <span className={styles.lineaImporte}>
-          {linea.tipo === 'deduccion' ? '−' : ''} {formatCurrency(linea.importe)}
+          <span>{linea.tipo === 'deduccion' ? '−' : ''}</span> {formatCurrency(linea.importe)}
         </span>
         <span className={`${styles.lineaChevron} ${activa ? styles.chevronAbierto : ''}`} aria-hidden="true">▼</span>
       </button>

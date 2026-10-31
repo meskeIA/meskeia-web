@@ -502,8 +502,8 @@ export default function VisualizadorBaseDatosRelacional() {
                 </tbody>
               </table>
               <p className={styles.joinCount}>
-                {JOIN_RESULTS[joinActivo].length} fila{JOIN_RESULTS[joinActivo].length !== 1 ? 's' : ''} devuelta
-                {JOIN_RESULTS[joinActivo].length !== 1 ? 's' : ''}
+                {JOIN_RESULTS[joinActivo].length} fila<span>{JOIN_RESULTS[joinActivo].length !== 1 ? 's' : ''}</span> devuelta
+                <span>{JOIN_RESULTS[joinActivo].length !== 1 ? 's' : ''}</span>
               </p>
             </div>
           </div>

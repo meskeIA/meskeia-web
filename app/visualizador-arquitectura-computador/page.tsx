@@ -660,9 +660,9 @@ export default function VisualizadorArquitecturaComputadorPage() {
                 <span className={styles.fdeLeyendaColor} style={{ backgroundColor: fasesColores[f] }} />
                 <strong>{f}</strong>
                 <span>
-                  {f === 'Fetch' && 'Traer instrucción de memoria al IR'}
-                  {f === 'Decode' && 'Unidad de Control interpreta la instrucción'}
-                  {f === 'Execute' && 'ALU opera o la CPU accede a memoria/E/S'}
+                  <span>{f === 'Fetch' && 'Traer instrucción de memoria al IR'}</span>
+                  <span>{f === 'Decode' && 'Unidad de Control interpreta la instrucción'}</span>
+                  <span>{f === 'Execute' && 'ALU opera o la CPU accede a memoria/E/S'}</span>
                 </span>
               </div>
             ))}

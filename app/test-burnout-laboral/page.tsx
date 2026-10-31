@@ -349,9 +349,9 @@ export default function TestBurnoutLaboralPage() {
           {/* PREGUNTA ACTUAL */}
           <div className={styles.tarjetaPregunta}>
             <div className={styles.dimensionBadge}>
-              {pregunta.dimension === 'agotamiento' && <><span aria-hidden="true">💫</span> Agotamiento emocional</>}
-              {pregunta.dimension === 'cinismo' && <><span aria-hidden="true">🧊</span> Cinismo / Despersonalización</>}
-              {pregunta.dimension === 'realizacion' && <><span aria-hidden="true">⭐</span> Realización personal</>}
+              <span>{pregunta.dimension === 'agotamiento' && <span><span aria-hidden="true">💫</span> Agotamiento emocional</span>}</span>
+              <span>{pregunta.dimension === 'cinismo' && <span><span aria-hidden="true">🧊</span> Cinismo / Despersonalización</span>}</span>
+              <span>{pregunta.dimension === 'realizacion' && <span><span aria-hidden="true">⭐</span> Realización personal</span>}</span>
             </div>
             <p className={styles.textoPregunta}>{pregunta.texto}</p>
 
@@ -410,7 +410,7 @@ export default function TestBurnoutLaboralPage() {
 
           {respondidas < totalPreguntas && respondidas > 0 && (
             <p className={styles.faltanInfo}>
-              Te faltan {totalPreguntas - respondidas} pregunta{totalPreguntas - respondidas > 1 ? 's' : ''} por responder.
+              Te faltan {totalPreguntas - respondidas} pregunta<span>{totalPreguntas - respondidas > 1 ? 's' : ''}</span> por responder.
               Puedes navegar libremente usando los botones numerados.
             </p>
           )}

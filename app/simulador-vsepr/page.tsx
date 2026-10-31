@@ -515,7 +515,7 @@ export default function SimuladorVseprPage() {
             La combinación X={enlaces} y E={libres} no corresponde a una geometría VSEPR estándar de
             la tabla de referencia. El lienzo dibuja igualmente{' '}
             {contarPares(enlaces, 'átomo X', 'átomos X')}
-            {libres > 0 ? ` y ${contarPares(libres, 'par libre', 'pares libres')}` : ''}, repartidos{' '}
+            <span>{libres > 0 ? ` y ${contarPares(libres, 'par libre', 'pares libres')}` : ''}</span>, repartidos{' '}
             {DISPOSICION_POR_TOTAL[totalPares] ?? 'sin disposición definida'}. Prueba con otros
             valores: por ejemplo, X=4 y E=0 (CH₄ tetraédrico) o X=2 y E=2 (H₂O angular).
           </section>

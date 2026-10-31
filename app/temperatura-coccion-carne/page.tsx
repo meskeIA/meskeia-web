@@ -65,7 +65,7 @@ export default function TemperaturaCoccionCarnePage() {
             </span>
             <span className={styles.seguroTexto}>
               temperatura mínima segura (USDA)
-              {alimento.reposoMin > 0 && <> · reposo de {alimento.reposoMin} min</>}
+              <span>{alimento.reposoMin > 0 && <span> · reposo de {alimento.reposoMin} min</span>}</span>
             </span>
           </div>
         </section>
