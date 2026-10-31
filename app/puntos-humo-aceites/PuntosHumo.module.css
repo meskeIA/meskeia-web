@@ -21,8 +21,8 @@
 .badge { display: inline-block; font-size: 0.74rem; font-weight: 700; padding: 3px 10px; border-radius: 12px; background: color-mix(in srgb, var(--primary) 10%, var(--bg-card)); color: var(--primary-texto); border: 1px solid color-mix(in srgb, var(--primary) 25%, transparent); }
 .badgeSec { background: color-mix(in srgb, var(--secondary) 12%, var(--bg-card)); color: var(--secondary-texto); border-color: color-mix(in srgb, var(--secondary) 30%, transparent); }
 .badgeCrudo { background: color-mix(in srgb, #4caf50 12%, var(--bg-card)); color: #2e7d32; border-color: color-mix(in srgb, #4caf50 30%, transparent); }
-.badgeMedia { background: color-mix(in srgb, #fbc02d 14%, var(--bg-card)); color: #b26a00; border-color: color-mix(in srgb, #fbc02d 35%, transparent); }
-.badgeAlta { background: color-mix(in srgb, #fb8c00 14%, var(--bg-card)); color: #e65100; border-color: color-mix(in srgb, #fb8c00 35%, transparent); }
+.badgeMedia { background: color-mix(in srgb, #fbc02d 14%, var(--bg-card)); color: var(--ambar-texto, #b26a00); border-color: color-mix(in srgb, #fbc02d 35%, transparent); }
+.badgeAlta { background: color-mix(in srgb, #fb8c00 14%, var(--bg-card)); color: var(--naranja-texto, #e65100); border-color: color-mix(in srgb, #fb8c00 35%, transparent); }
 [data-theme='dark'] .badgeCrudo { color: #81c784; }
 [data-theme='dark'] .badgeMedia { color: #ffd54f; }
 [data-theme='dark'] .badgeAlta { color: #ffb74d; }

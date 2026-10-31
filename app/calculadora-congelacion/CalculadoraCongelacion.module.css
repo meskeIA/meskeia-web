@@ -64,8 +64,8 @@
 .sinResultados { text-align: center; color: var(--text-muted); padding: 24px; }
 
 .badge { display: inline-block; font-size: 0.72rem; font-weight: 700; padding: 3px 10px; border-radius: 12px; white-space: nowrap; }
-.badgeBien { color: #2e7d32; background: color-mix(in srgb, #2e7d32 12%, var(--bg-card)); border: 1px solid color-mix(in srgb, #2e7d32 30%, transparent); }
-.badgeRegular { color: #b26a00; background: color-mix(in srgb, #f59e0b 12%, var(--bg-card)); border: 1px solid color-mix(in srgb, #f59e0b 35%, transparent); }
+.badgeBien { color: var(--verde-texto, #2e7d32); background: color-mix(in srgb, #2e7d32 12%, var(--bg-card)); border: 1px solid color-mix(in srgb, #2e7d32 30%, transparent); }
+.badgeRegular { color: var(--ambar-texto, #b26a00); background: color-mix(in srgb, #f59e0b 12%, var(--bg-card)); border: 1px solid color-mix(in srgb, #f59e0b 35%, transparent); }
 .badgeNo { color: #c62828; background: color-mix(in srgb, #c62828 10%, var(--bg-card)); border: 1px solid color-mix(in srgb, #c62828 30%, transparent); }
 [data-theme='dark'] .badgeBien { color: #81c784; }
 [data-theme='dark'] .badgeRegular { color: #fbbf24; }

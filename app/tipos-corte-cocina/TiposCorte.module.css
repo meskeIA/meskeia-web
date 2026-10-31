@@ -27,7 +27,7 @@
 /* Badges por forma del corte */
 .badgeDados { background: color-mix(in srgb, #3f51b5 12%, var(--bg-card)); color: #303f9f; border-color: color-mix(in srgb, #3f51b5 30%, transparent); }
 .badgeTiras { background: color-mix(in srgb, #009688 12%, var(--bg-card)); color: #00796b; border-color: color-mix(in srgb, #009688 30%, transparent); }
-.badgeLaminas { background: color-mix(in srgb, #fb8c00 14%, var(--bg-card)); color: #e65100; border-color: color-mix(in srgb, #fb8c00 35%, transparent); }
+.badgeLaminas { background: color-mix(in srgb, #fb8c00 14%, var(--bg-card)); color: var(--naranja-texto, #e65100); border-color: color-mix(in srgb, #fb8c00 35%, transparent); }
 .badgeOtros { background: color-mix(in srgb, #6a1b9a 12%, var(--bg-card)); color: #6a1b9a; border-color: color-mix(in srgb, #6a1b9a 30%, transparent); }
 [data-theme='dark'] .badgeDados { color: #9fa8da; }
 [data-theme='dark'] .badgeTiras { color: #80cbc4; }

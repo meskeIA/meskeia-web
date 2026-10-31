@@ -545,7 +545,7 @@
 
 .circuitoPasoRapido {
   background: color-mix(in srgb, #e74c3c 15%, var(--bg-card));
-  color: #c0392b;
+  color: var(--rojo-texto, #c0392b);
   border: 1px solid color-mix(in srgb, #e74c3c 30%, transparent);
 }
 

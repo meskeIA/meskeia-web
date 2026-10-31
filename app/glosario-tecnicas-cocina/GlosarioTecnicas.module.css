@@ -21,8 +21,8 @@
 .badge { display: inline-block; font-size: 0.74rem; font-weight: 700; padding: 3px 10px; border-radius: 12px; background: color-mix(in srgb, var(--primary) 10%, var(--bg-card)); color: var(--primary-texto); border: 1px solid color-mix(in srgb, var(--primary) 25%, transparent); }
 .badgeSec { background: color-mix(in srgb, var(--secondary) 12%, var(--bg-card)); color: var(--secondary-texto); border-color: color-mix(in srgb, var(--secondary) 30%, transparent); }
 .badgeSuave { background: color-mix(in srgb, #4caf50 12%, var(--bg-card)); color: #2e7d32; border-color: color-mix(in srgb, #4caf50 30%, transparent); }
-.badgeMedio { background: color-mix(in srgb, #fbc02d 14%, var(--bg-card)); color: #b26a00; border-color: color-mix(in srgb, #fbc02d 35%, transparent); }
-.badgePicante { background: color-mix(in srgb, #fb8c00 14%, var(--bg-card)); color: #e65100; border-color: color-mix(in srgb, #fb8c00 35%, transparent); }
+.badgeMedio { background: color-mix(in srgb, #fbc02d 14%, var(--bg-card)); color: var(--ambar-texto, #b26a00); border-color: color-mix(in srgb, #fbc02d 35%, transparent); }
+.badgePicante { background: color-mix(in srgb, #fb8c00 14%, var(--bg-card)); color: var(--naranja-texto, #e65100); border-color: color-mix(in srgb, #fb8c00 35%, transparent); }
 .badgeMuy { background: color-mix(in srgb, #e53935 12%, var(--bg-card)); color: #c62828; border-color: color-mix(in srgb, #e53935 30%, transparent); }
 .badgeExtremo { background: color-mix(in srgb, #6a1b9a 12%, var(--bg-card)); color: #6a1b9a; border-color: color-mix(in srgb, #6a1b9a 30%, transparent); }
 [data-theme='dark'] .badgeSuave { color: #81c784; }
@@ -68,7 +68,7 @@
 .sinResultados { margin-top: 24px; color: var(--text-secondary); font-size: 0.95rem; text-align: center; }
 
 .badgeLiquido { background: color-mix(in srgb, #1e88e5 12%, var(--bg-card)); color: #1565c0; border-color: color-mix(in srgb, #1e88e5 30%, transparent); }
-.badgeGrasa { background: color-mix(in srgb, #fb8c00 14%, var(--bg-card)); color: #e65100; border-color: color-mix(in srgb, #fb8c00 35%, transparent); }
+.badgeGrasa { background: color-mix(in srgb, #fb8c00 14%, var(--bg-card)); color: var(--naranja-texto, #e65100); border-color: color-mix(in srgb, #fb8c00 35%, transparent); }
 .badgePrevia { background: color-mix(in srgb, #43a047 12%, var(--bg-card)); color: #2e7d32; border-color: color-mix(in srgb, #43a047 30%, transparent); }
 .badgeAcabado { background: color-mix(in srgb, #8e24aa 12%, var(--bg-card)); color: #6a1b9a; border-color: color-mix(in srgb, #8e24aa 30%, transparent); }
 [data-theme='dark'] .badgeLiquido { color: #90caf9; }

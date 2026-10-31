@@ -125,6 +125,17 @@ function resolverFondo(valor, tokens) {
   if (/^(transparent|none|inherit|initial|unset)$/.test(v)) return { tipo: 'transparente' };
   const mv = v.match(/^var\(\s*(--[\w-]+)\s*(?:,\s*([^)]+))?\)$/);
   if (mv) v = tokens[mv[1]] ?? GLOBALES[mv[1]] ?? (mv[2] ? mv[2].trim() : null) ?? '';
+  // color-mix(in srgb, A p%, B): el tinte de las insignias de Coquinum (214 fondos así); con
+  // `transparent` como B es A al p % sobre blanco
+  const mx = v.match(/^color-mix\(\s*in\s+srgb\s*,\s*(.+?)\s+([\d.]+)%\s*,\s*(.+)\)$/);
+  if (mx) {
+    const a = resolverFondo(mx[1], tokens);
+    const b = mx[3].trim() === 'transparent' ? { hex: '#ffffff' } : resolverFondo(mx[3], tokens);
+    if (!a.hex || !b.hex) return { tipo: 'otro' };
+    const p = +mx[2] / 100;
+    const [ca, cb] = [canales(a.hex), canales(b.hex)];
+    return { hex: aHex6(...ca.map((c, i) => c * p + cb[i] * (1 - p))) };
+  }
   if (/gradient\(/.test(v)) {
     const colores = [...v.matchAll(/#[0-9a-f]{3,6}\b|rgba?\([^)]*\)|var\(\s*--[\w-]+\s*\)/g)].map((m) => {
       const x = m[0].startsWith('var(') ? tokens[m[0].slice(4, -1).trim()] ?? GLOBALES[m[0].slice(4, -1).trim()] : m[0];

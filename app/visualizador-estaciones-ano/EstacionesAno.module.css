@@ -513,7 +513,7 @@
 
 .mitoBadgeFalso {
   background: color-mix(in srgb, #E05555 15%, var(--bg-card));
-  color: #E05555;
+  color: var(--rojo-texto, #E05555);
 }
 
 .mitoBadgeVerdadero {
