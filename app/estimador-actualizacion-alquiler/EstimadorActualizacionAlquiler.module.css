@@ -386,8 +386,8 @@
   background: #1e2228;
 }
 
-.cellBien { color: #16a34a !important; font-weight: 600; }
-.cellNeutral { color: #d97706 !important; }
+.cellBien { color: var(--verde-texto, #16a34a) !important; font-weight: 600; }
+.cellNeutral { color: var(--ambar-texto, #d97706) !important; }
 .cellMal { color: #dc2626 !important; }
 
 .tablaNota {

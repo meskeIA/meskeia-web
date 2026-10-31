@@ -274,7 +274,7 @@
 
 .copyBtnOk {
   border-color: #27ae60;
-  color: #27ae60;
+  color: var(--verde-texto, #27ae60);
   background: #f0fff4;
 }
 

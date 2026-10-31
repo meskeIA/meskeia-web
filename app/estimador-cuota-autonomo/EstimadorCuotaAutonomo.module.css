@@ -335,7 +335,7 @@
 
 .desgloseValorPositivo {
   font-weight: 700;
-  color: #10B981;
+  color: var(--verde-texto, #10B981);
 }
 
 /* Info del tramo */

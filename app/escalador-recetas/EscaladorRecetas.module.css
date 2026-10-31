@@ -140,7 +140,7 @@
 }
 
 .badgeNoLineal {
-  color: #f59e0b;
+  color: var(--ambar-texto, #f59e0b);
   font-weight: 700;
 }
 
@@ -244,7 +244,7 @@
 .btnEliminar:hover:not(:disabled) {
   background: #fee2e2;
   border-color: #f87171;
-  color: #ef4444;
+  color: var(--rojo-texto, #ef4444);
 }
 
 .btnEliminar:disabled {
@@ -427,7 +427,7 @@
 }
 
 .badgeAjustado {
-  color: #f59e0b;
+  color: var(--ambar-texto, #f59e0b);
   font-weight: 700;
   font-size: 1.1rem;
   line-height: 1;

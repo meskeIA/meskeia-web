@@ -201,7 +201,7 @@
 }
 
 .vozDetectada {
-  color: #16A34A;
+  color: var(--verde-texto, #16A34A);
   font-weight: 700;
 }
 
@@ -226,7 +226,7 @@
 
 .btnDesactivarMic:hover {
   border-color: #EF4444;
-  color: #EF4444;
+  color: var(--rojo-texto, #EF4444);
 }
 
 .btnDesactivarMic:focus-visible {
@@ -461,11 +461,11 @@
 }
 
 .vozOk {
-  color: #16A34A;
+  color: var(--verde-texto, #16A34A);
 }
 
 .vozBaja {
-  color: #D97706;
+  color: var(--ambar-texto, #D97706);
 }
 
 .exito {
@@ -495,7 +495,7 @@
 
 .btnDetener:hover {
   border-color: #EF4444;
-  color: #EF4444;
+  color: var(--rojo-texto, #EF4444);
 }
 
 .btnDetener:focus-visible {
@@ -747,7 +747,7 @@
 
 .btnLimpiarHistorial:hover {
   border-color: #EF4444;
-  color: #EF4444;
+  color: var(--rojo-texto, #EF4444);
 }
 
 /* ============================================

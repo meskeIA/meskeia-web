@@ -142,7 +142,7 @@
 
 .deleteBtn:hover {
   background: #fee2e2;
-  color: #dc2626;
+  color: var(--rojo-texto, #dc2626);
 }
 
 [data-theme='dark'] .deleteBtn:hover {
@@ -352,7 +352,7 @@
 .metodoStatValorPositivo {
   font-size: 0.95rem;
   font-weight: 600;
-  color: #059669;
+  color: var(--verde-texto, #059669);
 }
 
 .ordenPago {

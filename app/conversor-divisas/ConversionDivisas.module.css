@@ -254,7 +254,7 @@
   border-radius: 10px;
   padding: 1rem 1.2rem;
   text-align: center;
-  color: #dc3545;
+  color: var(--rojo-texto, #dc3545);
   margin-bottom: 1rem;
 }
 

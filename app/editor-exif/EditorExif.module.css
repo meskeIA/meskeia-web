@@ -308,7 +308,7 @@
 
 .noMetadata h3 {
   font-size: 1.25rem;
-  color: var(--success);
+  color: var(--verde-texto, var(--success));
   margin: 0 0 var(--spacing-sm);
 }
 
@@ -339,7 +339,7 @@
 }
 
 .gpsWarning strong {
-  color: var(--error);
+  color: var(--rojo-texto, var(--error));
   display: block;
   margin-bottom: var(--spacing-xs);
 }

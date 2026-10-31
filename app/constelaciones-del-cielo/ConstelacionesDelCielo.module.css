@@ -239,7 +239,7 @@
 
 .badge[data-type="zodiacal"] {
   background: rgba(255, 193, 7, 0.15);
-  color: #d4a106;
+  color: var(--ambar-texto, #d4a106);
 }
 
 .badge[data-type="boreal"] {

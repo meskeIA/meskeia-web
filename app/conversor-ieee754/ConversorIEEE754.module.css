@@ -311,10 +311,10 @@
 
 /* Special values styling */
 .normal { color: var(--primary-texto); }
-.denormalized { color: #f39c12; }
+.denormalized { color: var(--ambar-texto, #f39c12); }
 .zero { color: var(--text-muted); }
 .infinity { color: #9b59b6; }
-.nan { color: #e74c3c; }
+.nan { color: var(--rojo-texto, #e74c3c); }
 
 /* Full Binary Section */
 .fullBinarySection {

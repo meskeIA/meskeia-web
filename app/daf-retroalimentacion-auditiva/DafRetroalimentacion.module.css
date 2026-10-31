@@ -239,7 +239,7 @@
   font-weight: 600;
 }
 
-.vozOk { color: #16A34A; }
+.vozOk { color: var(--verde-texto, #16A34A); }
 .vozBaja { color: var(--text-muted); }
 
 .btnDetener {
@@ -263,7 +263,7 @@
 
 .btnDetener:hover {
   border-color: #EF4444;
-  color: #EF4444;
+  color: var(--rojo-texto, #EF4444);
 }
 
 .btnDetener:focus-visible {

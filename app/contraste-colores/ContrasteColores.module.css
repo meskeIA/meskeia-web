@@ -216,7 +216,7 @@
 }
 
 .pass {
-  color: #28A745;
+  color: var(--verde-texto, #28A745);
   font-weight: 600;
 }
 

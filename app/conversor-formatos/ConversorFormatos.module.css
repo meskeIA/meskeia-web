@@ -136,7 +136,7 @@
 .errorBox {
   background: rgba(239, 68, 68, 0.1);
   border: 1px solid var(--error);
-  color: var(--error);
+  color: var(--rojo-texto, var(--error));
   padding: var(--spacing-md);
   border-radius: var(--radius);
   text-align: center;
@@ -213,7 +213,7 @@
 
 .resetBtn:hover {
   border-color: var(--error);
-  color: var(--error);
+  color: var(--rojo-texto, var(--error));
 }
 
 /* Preview Section */
@@ -468,7 +468,7 @@
 .resultHeader h3 {
   margin: 0;
   font-size: 1.1rem;
-  color: var(--success);
+  color: var(--verde-texto, var(--success));
 }
 
 .resultActions {
@@ -1084,7 +1084,7 @@
   border-radius: 4px;
   font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
   font-size: 0.85em;
-  color: #d97706;
+  color: var(--ambar-texto, #d97706);
 }
 
 /* Responsive para secciones profesionales */

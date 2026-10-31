@@ -379,7 +379,7 @@
 }
 
 .consejoPositivo {
-  color: #059669 !important;
+  color: var(--verde-texto, #059669) !important;
 }
 
 /* Placeholder */

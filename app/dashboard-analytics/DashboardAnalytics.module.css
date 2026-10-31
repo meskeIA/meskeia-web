@@ -485,11 +485,11 @@
 }
 
 .statusLoading {
-  color: #f59e0b;
+  color: var(--ambar-texto, #f59e0b);
 }
 
 .statusSuccess {
-  color: #10b981;
+  color: var(--verde-texto, #10b981);
 }
 
 .lastUpdate {
@@ -952,12 +952,12 @@
 
 .comparativaTendencia.up {
   background: rgba(16, 185, 129, 0.1);
-  color: #10b981;
+  color: var(--verde-texto, #10b981);
 }
 
 .comparativaTendencia.down {
   background: rgba(239, 68, 68, 0.1);
-  color: #ef4444;
+  color: var(--rojo-texto, #ef4444);
 }
 
 .comparativaTendencia.neutral {
@@ -1123,7 +1123,7 @@
   border-radius: 10px;
   font-size: 0.75rem;
   background: rgba(16, 163, 127, 0.12);
-  color: #10A37F;
+  color: var(--verde-texto, #10A37F);
 }
 
 .rowChatGPT {

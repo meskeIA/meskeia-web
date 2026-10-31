@@ -319,11 +319,11 @@
 }
 
 .totalPesos span:nth-child(2) {
-  color: var(--success);
+  color: var(--verde-texto, var(--success));
 }
 
 .totalError span:nth-child(2) {
-  color: var(--danger);
+  color: var(--rojo-texto, var(--danger));
 }
 
 .normalizarBtn {
@@ -501,7 +501,7 @@
 
 .interpretacion h4 {
   font-size: 1rem;
-  color: var(--success);
+  color: var(--verde-texto, var(--success));
   margin-bottom: var(--spacing-md);
 }
 

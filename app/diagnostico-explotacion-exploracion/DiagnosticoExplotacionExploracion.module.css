@@ -164,7 +164,7 @@
 
 .explotacion {
   background: #FFF3E0;
-  color: #E65100;
+  color: var(--naranja-texto, #E65100);
 }
 
 [data-theme='dark'] .explotacion {

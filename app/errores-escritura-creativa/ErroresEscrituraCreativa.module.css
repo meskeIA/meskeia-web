@@ -241,7 +241,7 @@
 }
 
 .ejemploMalo .ejemplosLabel {
-  color: #e74c3c;
+  color: var(--rojo-texto, #e74c3c);
 }
 
 .ejemploBueno {
@@ -253,7 +253,7 @@
 }
 
 .ejemploBueno .ejemplosLabel {
-  color: #27ae60;
+  color: var(--verde-texto, #27ae60);
 }
 
 .ejemploTexto {

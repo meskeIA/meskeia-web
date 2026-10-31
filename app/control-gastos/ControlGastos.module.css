@@ -122,11 +122,11 @@
 }
 
 .resumenCard.ingresos .resumenValor {
-  color: var(--success);
+  color: var(--verde-texto, var(--success));
 }
 
 .resumenCard.gastos .resumenValor {
-  color: var(--danger);
+  color: var(--rojo-texto, var(--danger));
 }
 
 .resumenCard.balance .resumenValor {
@@ -134,7 +134,7 @@
 }
 
 .resumenCard.ahorro .resumenValor {
-  color: var(--warning);
+  color: var(--ambar-texto, var(--warning));
 }
 
 /* Main Content */
@@ -197,11 +197,11 @@
 }
 
 .tipoBtn.ingreso.activo {
-  color: var(--success);
+  color: var(--verde-texto, var(--success));
 }
 
 .tipoBtn.gasto.activo {
-  color: var(--danger);
+  color: var(--rojo-texto, var(--danger));
 }
 
 /* Inputs */
@@ -414,11 +414,11 @@
 }
 
 .movimientoImporte.ingreso {
-  color: var(--success);
+  color: var(--verde-texto, var(--success));
 }
 
 .movimientoImporte.gasto {
-  color: var(--danger);
+  color: var(--rojo-texto, var(--danger));
 }
 
 .btnEliminar {
@@ -432,7 +432,7 @@
 }
 
 .btnEliminar:hover {
-  color: var(--danger);
+  color: var(--rojo-texto, var(--danger));
   opacity: 1;
 }
 

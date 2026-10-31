@@ -160,7 +160,7 @@
 .errorMsg {
   background: rgba(239, 68, 68, 0.1);
   border: 1px solid var(--error);
-  color: var(--error);
+  color: var(--rojo-texto, var(--error));
   padding: var(--spacing-md);
   border-radius: var(--radius);
   text-align: center;
@@ -636,7 +636,7 @@
 }
 
 .warningHeader h3 {
-  color: #D97706;
+  color: var(--ambar-texto, #D97706);
   font-size: 1.2rem;
   margin: 0;
 }

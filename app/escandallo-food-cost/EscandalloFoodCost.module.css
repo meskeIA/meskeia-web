@@ -131,7 +131,7 @@
 .btnEliminar:hover:not(:disabled) {
   background: #fee2e2;
   border-color: #f87171;
-  color: #ef4444;
+  color: var(--rojo-texto, #ef4444);
 }
 
 .btnEliminar:disabled { opacity: 0.35; cursor: not-allowed; }

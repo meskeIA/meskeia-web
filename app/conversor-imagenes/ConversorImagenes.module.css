@@ -399,7 +399,7 @@
 }
 
 .resultHighlight .resultValue {
-  color: #2ecc71;
+  color: var(--verde-texto, #2ecc71);
 }
 
 /* Placeholder */

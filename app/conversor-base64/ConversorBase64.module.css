@@ -115,7 +115,7 @@
   background: rgba(231, 76, 60, 0.15);
   border: 1px solid #e74c3c;
   border-radius: var(--radius);
-  color: #e74c3c;
+  color: var(--rojo-texto, #e74c3c);
   margin-bottom: var(--spacing-lg);
 }
 
@@ -795,7 +795,7 @@
 .warningHeader h4 {
   font-size: 0.95rem;
   font-weight: 700;
-  color: #b8860b;
+  color: var(--ambar-texto, #b8860b);
   margin: 0;
 }
 
@@ -829,7 +829,7 @@
   content: '•';
   position: absolute;
   left: 0;
-  color: #ffc107;
+  color: var(--ambar-texto, #ffc107);
   font-weight: 700;
 }
 

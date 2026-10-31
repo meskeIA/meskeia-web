@@ -218,11 +218,11 @@
 }
 
 .valorPositivo {
-  color: var(--success) !important;
+  color: var(--verde-texto, var(--success)) !important;
 }
 
 .valorNegativo {
-  color: var(--danger) !important;
+  color: var(--rojo-texto, var(--danger)) !important;
 }
 
 /* Barra de Progreso */
@@ -398,11 +398,11 @@
 }
 
 .mejora {
-  color: var(--success) !important;
+  color: var(--verde-texto, var(--success)) !important;
 }
 
 .empeora {
-  color: var(--danger) !important;
+  color: var(--rojo-texto, var(--danger)) !important;
 }
 
 /* Escenario Custom */
@@ -852,7 +852,7 @@
   content: '•';
   position: absolute;
   left: 0;
-  color: #F59E0B;
+  color: var(--ambar-texto, #F59E0B);
   font-weight: 700;
 }
 
