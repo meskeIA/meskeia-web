@@ -62,18 +62,39 @@
  *   · `familia-ok: <razón>` en el propio `<NumberInput …>` o en las tres líneas anteriores:
  *     un campo que de verdad no mueve ninguna cifra publicada. La razón es obligatoria.
  *
- * COSTE: ~20 s (52 casos en 4 workers). En Vercel la parte B se omite: allí no hay navegador,
- * y el build de producción se valida en local antes de subir, igual que `check:tipos`.
+ * COSTE: ~2,5 min (371 casos en 12 workers, 31/10/2026). En Vercel la parte B se omite: allí no
+ * hay navegador, y el build de producción se valida en local antes de subir, igual que `check:tipos`.
+ *
+ * ⚠️ EN EL BUILD VA DESPUÉS DE `next build`, CONTRA UN `next start` PROPIO (31/10/2026, C0537)
+ * ─────────────────────────────────────────────────────────────────────────────────────────
+ * Nació con 52 casos y ~20 s; el 31/10 eran 371 (los 16 quizzes, 23/10, y el doble toque a
+ * tres anchos, 30/10) y tardaba 447 s contra `next dev` con 4 workers. Desde el 29/10 los 13
+ * builds medidos toparon en los 10 minutos de la herramienta: `next build` eran 49 s y los otros
+ * 31 candados, 27. El 80 % es el doble toque (`waitForTimeout` dentro de la ráfaga, que no se
+ * acorta sin dejar de medirla), así que lo que escala es el reparto. Medido con los 371:
+ *
+ *     next dev   · 4 workers 447 s ·  12 workers 192 s
+ *     next start · 4 workers 395 s ·  8 workers 209 s · 12 workers 156 s
+ *
+ * Por eso en la cadena del build van dos llamadas: `--estatico` antes de `next build` (la parte A,
+ * que falla rápido) y `--tras-build` al final, que levanta `next start` en el 3054 con el build
+ * RECIÉN hecho, pasa el testigo y lo apaga. El build de producción no compila al visitar, y un
+ * commit que toca `data/` no obliga a recompilar las 39 apps en frío. No es el `next start`
+ * huérfano de C0530: aquel servía el build de la víspera en el 3050; este es propio, en su
+ * puerto, con el BUILD_ID de hace unos segundos, y si el puerto ya está ocupado se planta.
+ * Sin bandera, contra `next dev` como siempre: para lanzarlo a mano sin construir.
  */
 
 import fs from 'node:fs';
 import path from 'node:path';
-import { spawnSync } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const RAIZ = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
 const ESTATICO = args.includes('--estatico');
+const TRAS_BUILD = args.includes('--tras-build');
+const WORKERS = 12;
 const valorDe = (bandera) => {
   const i = args.indexOf(bandera);
   return i >= 0 ? args[i + 1] : null;
@@ -260,7 +281,20 @@ if (process.env.VERCEL) {
  * lo que mide es el código fuente, y eso solo lo sirve `next dev`. Un servidor que no lleva el
  * cliente de recarga en caliente de next dev no vale, y se dice en vez de medir otra cosa.
  */
-const PUERTO = Number(process.env.PUERTO_PRUEBAS) || 3050;
+const PUERTO = TRAS_BUILD
+  ? Number(process.env.PUERTO_FAMILIAS) || 3054
+  : Number(process.env.PUERTO_PRUEBAS) || 3050;
+const responde = async (ruta, ms) => {
+  try {
+    const r = await fetch(ruta, { signal: AbortSignal.timeout(ms) });
+    // Sin leer el cuerpo, un process.exit posterior tumba Node en Windows con «Assertion failed:
+    // !(handle->flags & UV_HANDLE_CLOSING)» y código 127 (visto el 31/10/2026).
+    await r.body?.cancel();
+    return r.ok;
+  } catch {
+    return false;
+  }
+};
 async function servidorAjeno() {
   const ruta = `http://localhost:${PUERTO}/${FAMILIAS[0]?.referencia ?? ''}/`;
   let html;
@@ -272,7 +306,58 @@ async function servidorAjeno() {
   }
   return /hmr-client|webpack-hmr|react-refresh/i.test(html) ? null : ruta;
 }
-const ajeno = await servidorAjeno();
+/**
+ * `--tras-build`: el `next start` propio. Se planta si no hay un build de hace menos de 15
+ * minutos (mediría otro código) o si el puerto ya responde (otro build a la vez, o un servidor
+ * olvidado). Se apaga con el árbol entero: en Windows `next start` deja un hijo
+ * (start-server.js) que sobrevive a matar al padre, y un Node huérfano bloquea el perfil al
+ * apagar el PC (CLAUDE.md, «Servidor local de pruebas»).
+ */
+let servidor = null;
+function apagarServidor() {
+  if (!servidor || servidor.exitCode !== null) return;
+  if (process.platform === 'win32') {
+    spawnSync('taskkill', ['/pid', String(servidor.pid), '/T', '/F'], { stdio: 'ignore' });
+  } else {
+    try { process.kill(-servidor.pid, 'SIGTERM'); } catch { servidor.kill('SIGTERM'); }
+  }
+  servidor = null;
+}
+if (TRAS_BUILD) {
+  const buildId = path.join(RAIZ, '.next/BUILD_ID');
+  const edad = fs.existsSync(buildId) ? (Date.now() - fs.statSync(buildId).mtimeMs) / 60000 : Infinity;
+  if (edad > 15) {
+    console.error(`\n✗ familias: --tras-build mide el build RECIÉN hecho, y ${Number.isFinite(edad) ? `el de .next/ es de hace ${Math.round(edad)} min` : 'no hay ninguno en .next/'}.`);
+    console.error('  Va al final de `npm run build`; a mano, sin construir: `npm run check:familias` (contra next dev).\n');
+    process.exit(1);
+  }
+  if (await responde(`http://localhost:${PUERTO}/`, 3000)) {
+    console.error(`\n✗ familias: el ${PUERTO} ya está ocupado. ¿Otro build a la vez, o un servidor olvidado?`);
+    console.error('  Un solo build a la vez. Si no hay ninguno, un `next start` olvidado: en Windows `npx kill-port`');
+    console.error(`  no siempre lo cierra (31/10/2026); Get-NetTCPConnection -LocalPort ${PUERTO} da el PID para Stop-Process.\n`);
+    process.exit(1);
+  }
+  servidor = spawn(process.execPath, [path.join(RAIZ, 'node_modules/next/dist/bin/next'), 'start', '-p', String(PUERTO)], {
+    cwd: RAIZ,
+    stdio: 'ignore',
+    windowsHide: true,
+    detached: process.platform !== 'win32',
+  });
+  process.on('exit', apagarServidor);
+  for (const senal of ['SIGINT', 'SIGTERM']) process.on(senal, () => { apagarServidor(); process.exit(130); });
+  const ruta = `http://localhost:${PUERTO}/${FAMILIAS[0]?.referencia ?? ''}/`;
+  let listo = false;
+  for (let i = 0; i < 60 && !listo; i++) {
+    listo = await responde(ruta, 2000);
+    if (!listo) await new Promise((ok) => setTimeout(ok, 1000));
+  }
+  if (!listo) {
+    console.error(`\n✗ familias: el next start del ${PUERTO} no respondió en 60 s (${ruta}).\n`);
+    process.exit(1);
+  }
+}
+
+const ajeno = TRAS_BUILD ? null : await servidorAjeno();
 if (ajeno) {
   console.error(`\n✗ familias: en el ${PUERTO} responde un servidor que no es \`next dev\` (${ajeno}).`);
   console.error('  Probablemente un `next start` olvidado: serviría el build de antes, no el código que se');
@@ -285,9 +370,18 @@ const CLI = path.join(RAIZ, 'node_modules/@playwright/test/cli.js');
 const testigos = FAMILIAS.map((f) => f.testigo);
 const r = spawnSync(
   process.execPath,
-  [CLI, 'test', ...testigos, '--fully-parallel', '--workers=4', '--reporter=line', ...(GREP ? ['-g', GREP] : [])],
-  { cwd: RAIZ, encoding: 'utf8', maxBuffer: 64 * 1024 * 1024, timeout: 8 * 60 * 1000 },
+  [CLI, 'test', ...testigos, '--fully-parallel', `--workers=${WORKERS}`, '--reporter=line', ...(GREP ? ['-g', GREP] : [])],
+  {
+    cwd: RAIZ,
+    encoding: 'utf8',
+    maxBuffer: 64 * 1024 * 1024,
+    timeout: 8 * 60 * 1000,
+    // Con PUERTO_PRUEBAS, Playwright reutiliza el servidor que ya responde y no toma el cerrojo
+    // del 3050 (tests/_cerrojo-playwright.ts): el servidor lo gestiona este script.
+    env: TRAS_BUILD ? { ...process.env, PUERTO_PRUEBAS: String(PUERTO) } : process.env,
+  },
 );
+apagarServidor();
 const salida = `${r.stdout ?? ''}${r.stderr ?? ''}`;
 const cuenta = (re) => Number(salida.match(re)?.[1] ?? 0);
 const pasados = cuenta(/(\d+) passed/);
@@ -305,7 +399,7 @@ if (pasados + fallidos === 0) {
   console.error(`  Últimas líneas de su salida:\n${salida.trim().split('\n').slice(-25).map((l) => `    ${l}`).join('\n') || '    (ninguna)'}\n`);
 }
 if (/Timed out waiting \d+ms from config\.webServer/.test(salida)) {
-  console.error('  El servidor del 3050 no respondió. Si hay uno colgado: npx kill-port 3050\n');
+  console.error(`  El servidor del ${PUERTO} no respondió. Si hay uno colgado: npx kill-port ${PUERTO}\n`);
 }
 const desde = salida.search(/^\s+1\) \[/m);
 // Sin las líneas de progreso («[28/52] …») que el reporter intercala entre los errores.

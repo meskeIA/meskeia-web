@@ -2,7 +2,7 @@
 /**
  * probar-check-familias.mjs — las trampas de `check:familias`
  *
- * Ejecutar:  npm run familias:probar-candado      (~1 min: tres de las trampas abren navegador)
+ * Ejecutar:  npm run familias:probar-candado      (~5 min: tres de las trampas abren navegador y la 2 pasa el testigo entero)
  *
  * Un candado nuevo se prueba REINYECTÁNDOLE su caso de origen y exigiendo que falle
  * ([[project_test_juicio_baseline]]): si no, lo único que se sabe es que calla, y callar lo
@@ -22,6 +22,9 @@
  *   7. Un `falla` sin razón escrita.
  *   8. Un servidor en el puerto que no es `next dev` (un `next start` olvidado, cabo C0530): tiene
  *      que plantarse diciéndolo, no medir el build de antes.
+ *   9. `--tras-build` con su puerto ya ocupado (otro build a la vez): se planta sin levantar el suyo.
+ *  10. `--tras-build` con un build de hace una hora: se planta, porque mediría otro código (C0537).
+ *      La 9 y la 10 mueven la fecha de `.next/BUILD_ID` y la restauran en un `finally`.
  *
  * La 1 toca un fichero real, así que exige que esté limpio en git ANTES de empezar y lo
  * restaura en un `finally`, comprobando después que ha quedado idéntico. Las demás trabajan
@@ -236,7 +239,59 @@ const casos = [
       }
     },
   },
+  {
+    // C0537 (31/10/2026): en el build, el testigo corre tras `next build` contra un `next start`
+    // propio. Si su puerto ya responde, es otro build a la vez o un servidor olvidado.
+    nombre: '9-tras-build-con-el-puerto-ocupado',
+    debeFallar: true,
+    espera: 'ya está ocupado',
+    correr: async () => {
+      const servidor = http.createServer((_, res) => res.end('ocupado'));
+      await new Promise((ok) => servidor.listen(0, ok));
+      const puerto = /** @type {import('node:net').AddressInfo} */ (servidor.address()).port;
+      try {
+        return await conBuildDeHace(0, () => correrAsincrono(['--tras-build', '--grep', 'ninguno'], { PUERTO_FAMILIAS: String(puerto) }));
+      } finally {
+        servidor.close();
+      }
+    },
+  },
+  {
+    nombre: '10-tras-build-con-un-build-viejo',
+    debeFallar: true,
+    espera: 'mide el build RECIÉN hecho',
+    correr: () => conBuildDeHace(60, () => correrAsincrono(['--tras-build', '--grep', 'ninguno'], {})),
+  },
 ];
+
+/** Corre el candado sin bloquear el bucle de eventos (la 9 necesita contestar desde aquí). */
+function correrAsincrono(argumentos, env) {
+  return new Promise((ok) => {
+    const hijo = spawn(process.execPath, [CANDADO, ...argumentos], { cwd: RAIZ, env: { ...process.env, ...env } });
+    let salida = '';
+    hijo.stdout.on('data', (d) => (salida += d));
+    hijo.stderr.on('data', (d) => (salida += d));
+    const corte = setTimeout(() => hijo.kill(), 2 * 60 * 1000);
+    hijo.on('close', (codigo) => {
+      clearTimeout(corte);
+      ok({ fallo: codigo !== 0, salida });
+    });
+  });
+}
+
+/** Pone a `.next/BUILD_ID` la fecha de hace N minutos mientras dura `fn`, y la restaura. */
+async function conBuildDeHace(minutos, fn) {
+  const buildId = path.join(RAIZ, '.next/BUILD_ID');
+  if (!fs.existsSync(buildId)) throw new Error('no hay .next/BUILD_ID: haz un build antes de las trampas 9 y 10');
+  const { atime, mtime } = fs.statSync(buildId);
+  const fecha = new Date(Date.now() - minutos * 60000);
+  fs.utimesSync(buildId, fecha, fecha);
+  try {
+    return await fn();
+  } finally {
+    fs.utimesSync(buildId, atime, mtime);
+  }
+}
 
 let fallos = 0;
 console.log('\nTrampas de check:familias\n');

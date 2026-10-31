@@ -694,7 +694,8 @@ que el input YA tiene (el caso pasa aunque la app esté sorda): eso lo audita
 
 ### Candado de las familias de apps
 
-`npm run check:familias` — en el build (~20 s), y **rompe el build** si el testigo de una familia
+`npm run check:familias` — en el build, **tras `next build`** contra un `next start` propio en el
+3054 (~2,5 min), y **rompe el build** si el testigo de una familia
 no está en verde o si su tabla no cubre cada `<NumberInput>` de cada hermana. Lee
 `scripts/inspector/familias.mjs`: una familia nueva entra en el build con declararla allí. Es
 el único que **ejecuta** en vez de leer, porque un aviso que dice lo contrario de lo que pasa no
@@ -758,7 +759,9 @@ crónica va a la cabecera de su script, y aquí queda qué rompe, qué barre, el
   mirado nada**, por los restos que Next deja en `.next/dev/types/`. `check:tipos` los retira,
   revalida, y **falla si no consigue dejar la validación limpia**. Tampoco
   `npx tsc --noEmit <fichero>`: ignora el `tsconfig.json` y da error siempre. Los dos casos
-  (14/08 y 10/09/2026), en la cabecera de `scripts/check-tipos.mjs`.
+  (14/08 y 10/09/2026), en la cabecera de `scripts/check-tipos.mjs`. Tercero (25-31/10/2026):
+  tsc necesita 4,8 GB y abortaba sin memoria con «0 errores»; `check:tipos` le da 8 GB y falla
+  si tsc no termina · prueba: `npm run tipos:probar-candado`.
 - Objetivo: 0 errores TypeScript en todo el proyecto
 - Archivos de tipos custom en `types/`
 - Casts conocidos: Chart.js → `as never`, jStat → `Record`, libs sin tipos → `.d.ts` en `types/`

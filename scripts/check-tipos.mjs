@@ -57,19 +57,46 @@ if (process.env.VERCEL) {
   process.exit(0);
 }
 
-/** Ejecuta tsc y devuelve sus líneas de error, vengan de donde vengan */
+/**
+ * Ejecuta tsc y devuelve sus líneas de error, vengan de donde vengan.
+ *
+ * ── El tercer caso: tsc sin memoria (31/10/2026, cabo C0537) ──────────────────
+ * Desde Next 16.4.3 (25/10/2026) tsc necesita 4,8 GB (5.657 ficheros, 1,6 M de líneas) y Node
+ * da unos 4: abortaba a los ~146 s con «JavaScript heap out of memory», sin una sola línea
+ * «error TS», y esto devolvía [] → «✓ tipos: 0 errores». Seis días ciega: entraron 7 errores
+ * (dos apps fiscales, contador-silabas y un spec) y un commit fiscal escribió «check:tipos
+ * 0 errores» en su mensaje. Tampoco se escribía la caché incremental, así que cada build
+ * pagaba el análisis entero hasta caer. Ahora: memoria explícita (TIPOS_MEMORIA_MB, 8 GB
+ * por defecto; el PC tiene 32) y un tsc que sale con error SIN errores no es un verde,
+ * es una validación que no ha terminado. Prueba: `npm run tipos:probar-candado`.
+ */
+const MEMORIA_MB = Number(process.env.TIPOS_MEMORIA_MB) || 8192;
 function tsc() {
+  const env = { ...process.env, NODE_OPTIONS: `${process.env.NODE_OPTIONS ?? ''} --max-old-space-size=${MEMORIA_MB}`.trim() };
   try {
-    execFileSync('npx', ['tsc', '--noEmit'], { cwd: RAIZ, encoding: 'utf8', stdio: 'pipe', shell: true });
+    execFileSync('npx', ['tsc', '--noEmit'], { cwd: RAIZ, encoding: 'utf8', stdio: 'pipe', shell: true, env, maxBuffer: 64 * 1024 * 1024 });
     return [];
   } catch (e) {
-    return String(e.stdout || '').split('\n').filter(l => l.includes('error TS'));
+    const lineas = String(e.stdout || '').split('\n').filter(l => l.includes('error TS'));
+    if (lineas.length === 0) {
+      const motivo = `${e.stdout || ''}${e.stderr || ''}`.split('\n').find(l => /heap out of memory|FATAL ERROR/i.test(l));
+      return { ciega: `código ${e.status ?? e.signal ?? '?'}${motivo ? ` · ${motivo.trim()}` : ''}` };
+    }
+    return lineas;
   }
+}
+
+/** Un tsc que no terminó no da verde: se dice, y se sale. */
+function exigirTerminado(r) {
+  if (!r.ciega) return r;
+  console.error(`\n✗ TIPOS: tsc no ha terminado y no ha dado ningún error: la validación está CIEGA (${r.ciega}).`);
+  console.error(`  Con ${MEMORIA_MB} MB de memoria. Si es eso, súbela con TIPOS_MEMORIA_MB; «0 errores» aquí NO sería un verde.\n`);
+  process.exit(1);
 }
 
 const esGenerado = l => l.startsWith('.next/') || l.startsWith('.next\\');
 
-let errores = tsc();
+let errores = exigirTerminado(tsc());
 let limpiados = [];
 
 // 1. Si los ficheros generados están corruptos, se borran: son regenerables y su única
@@ -84,7 +111,7 @@ if (errores.some(esGenerado)) {
   if (limpiados.length) {
     console.log(`  · ficheros generados corruptos, retirados: ${limpiados.join(', ')}`);
     console.log('    (los regenera Next en el siguiente dev/build)');
-    errores = tsc();
+    errores = exigirTerminado(tsc());
   }
 }
 
@@ -104,8 +131,9 @@ if (restanGenerados.length) {
 if (AUTOCOMPROBAR) {
   const cebo = path.join(RAIZ, 'app', '__comprobacion-de-tipos.ts');
   fs.writeFileSync(cebo, 'export const x: number = "esto no es un número";\n', 'utf8');
-  const conCebo = tsc();
-  fs.rmSync(cebo);
+  const conCeboBruto = tsc();
+  fs.rmSync(cebo); // antes de exigirTerminado, que sale sin pasar por aquí
+  const conCebo = exigirTerminado(conCeboBruto);
   const cazado = conCebo.some(l => l.includes('__comprobacion-de-tipos'));
   if (!cazado) {
     console.error('\n✗ TIPOS: se ha inyectado un error a propósito y tsc NO lo ha detectado.');
