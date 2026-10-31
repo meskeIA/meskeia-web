@@ -137,12 +137,12 @@
 }
 
 .estadoDivergente {
-  color: #e74c3c;
+  color: var(--rojo-texto, #e74c3c);
   font-weight: 600;
 }
 
 .estadoJuntas {
-  color: #27ae60;
+  color: var(--verde-texto, #27ae60);
   font-weight: 600;
 }
 

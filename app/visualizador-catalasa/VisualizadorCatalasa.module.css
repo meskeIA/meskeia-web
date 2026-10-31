@@ -86,14 +86,14 @@
 }
 
 .reactivo {
-  color: #e74c3c;
+  color: var(--rojo-texto, #e74c3c);
   background: rgba(231, 76, 60, 0.08);
   padding: 0.2rem 0.6rem;
   border-radius: 8px;
 }
 
 .producto {
-  color: #27ae60;
+  color: var(--verde-texto, #27ae60);
   background: rgba(39, 174, 96, 0.08);
   padding: 0.2rem 0.6rem;
   border-radius: 8px;

@@ -127,7 +127,7 @@
 .vennCirculo:last-child { background: rgba(39, 174, 96, 0.12); border-color: #27AE60; }
 .vennInterseccion { background: var(--bg-card); border: 2px solid var(--secondary); border-radius: var(--radius); padding: var(--spacing-md); text-align: center; z-index: 1; margin: 0 -20px; min-width: 160px; }
 .vennLabel { display: block; font-size: 0.75rem; font-weight: 700; color: var(--primary-texto); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.3rem; }
-.vennCirculo:last-child .vennLabel { color: #27AE60; }
+.vennCirculo:last-child .vennLabel { color: var(--verde-texto, #27AE60); }
 .vennInterseccion .vennLabel { color: var(--secondary-texto); }
 .vennItems { font-size: 0.78rem; color: var(--text-secondary); line-height: 1.5; }
 

@@ -81,8 +81,8 @@
 .fichaCampoFull { grid-column: 1 / -1; }
 .fichaLabel { font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.3px; }
 .fichaValor { font-size: 0.88rem; font-weight: 600; color: var(--text-primary); }
-.fichaValorBueno { font-size: 0.88rem; font-weight: 600; color: #4CAF50; }
-.fichaValorMalo { font-size: 0.88rem; font-weight: 600; color: #F44336; }
+.fichaValorBueno { font-size: 0.88rem; font-weight: 600; color: var(--verde-texto, #4CAF50); }
+.fichaValorMalo { font-size: 0.88rem; font-weight: 600; color: var(--rojo-texto, #F44336); }
 [data-theme='dark'] .fichaValorBueno { color: #81C784; }
 [data-theme='dark'] .fichaValorMalo { color: #EF9A9A; }
 .fichaDesc { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.6; margin: 0; }

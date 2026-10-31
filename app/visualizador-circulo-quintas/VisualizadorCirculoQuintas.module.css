@@ -687,7 +687,7 @@
 .warningTitulo {
   font-size: 1rem;
   font-weight: 700;
-  color: #C0622D;
+  color: var(--naranja-texto, #C0622D);
   margin: 0 0 var(--spacing-md);
 }
 
@@ -716,7 +716,7 @@
   content: '•';
   position: absolute;
   left: 0;
-  color: #E07B54;
+  color: var(--naranja-texto, #E07B54);
   font-weight: 700;
 }
 

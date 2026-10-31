@@ -470,7 +470,7 @@
 
 .parkinsonBadgeAfectado {
   background: rgba(224, 112, 112, 0.12);
-  color: #E07070;
+  color: var(--rojo-texto, #E07070);
   padding: 0.2rem 0.7rem;
   border-radius: 20px;
   font-size: 0.85rem;
@@ -530,7 +530,7 @@
 }
 
 .flechaDebil {
-  color: #E07070;
+  color: var(--rojo-texto, #E07070);
   font-size: 0.9rem;
 }
 
@@ -622,12 +622,12 @@
 
 .badgeAbajo {
   background: rgba(224, 112, 112, 0.12);
-  color: #E07070;
+  color: var(--rojo-texto, #E07070);
 }
 
 .badgeComplejo {
   background: rgba(230, 160, 50, 0.12);
-  color: #B07800;
+  color: var(--ambar-texto, #B07800);
 }
 
 .moduladorTitulo {

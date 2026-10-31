@@ -44,7 +44,7 @@
 .embudoResumen { display: flex; align-items: center; justify-content: center; gap: var(--spacing-sm); padding: var(--spacing-md); background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); margin-top: var(--spacing-md); }
 .embudoResumenNumero { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); }
 .embudoResumenFlecha { font-size: 1.2rem; color: var(--text-muted); }
-.embudoResumenDestacado { font-size: 1.5rem; font-weight: 800; color: var(--verde); background: rgba(39, 174, 96, 0.1); padding: 0.2rem 0.6rem; border-radius: 8px; }
+.embudoResumenDestacado { font-size: 1.5rem; font-weight: 800; color: var(--verde-texto, var(--verde)); background: rgba(39, 174, 96, 0.1); padding: 0.2rem 0.6rem; border-radius: 8px; }
 
 .tiempoCard { display: flex; gap: var(--spacing-md); align-items: center; background: var(--bg-card); border: 2px solid var(--primary); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg); }
 .tiempoIcono { font-size: 2rem; flex-shrink: 0; }

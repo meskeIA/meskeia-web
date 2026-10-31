@@ -649,7 +649,7 @@
 
 .estadoPreclinico {
   background: rgba(255, 165, 0, 0.12);
-  color: #b36e00;
+  color: var(--ambar-texto, #b36e00);
 }
 
 [data-theme='dark'] .estadoAprobado {
@@ -1360,7 +1360,7 @@
   content: '▸';
   position: absolute;
   left: 0;
-  color: #f39c12;
+  color: var(--ambar-texto, #f39c12);
   font-weight: 700;
 }
 

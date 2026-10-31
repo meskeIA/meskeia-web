@@ -232,7 +232,7 @@
 }
 
 .azul { color: var(--primary-texto); }
-.rojo { color: #E76F51; }
+.rojo { color: var(--rojo-texto, #E76F51); }
 .verde { color: var(--secondary-texto); }
 
 .yieldInterpretacion {
@@ -638,7 +638,7 @@
 }
 
 .escenarioAmbar h3 {
-  color: #c97a2a;
+  color: var(--ambar-texto, #c97a2a);
 }
 
 .escenarioRojo {
@@ -647,7 +647,7 @@
 }
 
 .escenarioRojo h3 {
-  color: #E76F51;
+  color: var(--rojo-texto, #E76F51);
 }
 
 /* Mecanismos grid */

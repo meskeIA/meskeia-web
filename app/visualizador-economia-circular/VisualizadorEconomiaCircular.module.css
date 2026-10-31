@@ -345,7 +345,7 @@
 }
 
 .tablaLineal {
-  color: #EF4444;
+  color: var(--rojo-texto, #EF4444);
   font-weight: 600;
   text-align: center;
 }

@@ -727,7 +727,7 @@
   content: '✗';
   position: absolute;
   left: 0;
-  color: #E67E22;
+  color: var(--naranja-texto, #E67E22);
   font-weight: bold;
 }
 

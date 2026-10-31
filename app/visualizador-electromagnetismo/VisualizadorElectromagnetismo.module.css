@@ -398,7 +398,7 @@
 .brujulaNorte {
   font-size: 0.7rem;
   font-weight: 800;
-  color: #E74C3C;
+  color: var(--rojo-texto, #E74C3C);
   line-height: 1;
 }
 

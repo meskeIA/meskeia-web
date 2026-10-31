@@ -81,7 +81,7 @@
 .pilaAnodo { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.3); }
 .pilaCatodo { background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.3); }
 .pilaReaccionLabel { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.3rem; }
-.pilaAnodo .pilaReaccionLabel { color: #EF4444; }
+.pilaAnodo .pilaReaccionLabel { color: var(--rojo-texto, #EF4444); }
 .pilaCatodo .pilaReaccionLabel { color: #3B82F6; }
 .pilaReaccionFormula { font-family: 'Courier New', monospace; font-size: 0.82rem; color: var(--text-primary); font-weight: 600; }
 .pilaReaccionPot { font-size: 0.78rem; color: var(--text-muted); margin-top: 0.2rem; }
@@ -100,7 +100,7 @@
 .serieBarra { height: 100%; border-radius: 4px; transition: width 0.4s ease; }
 .seriePot { font-size: 0.82rem; font-weight: 700; text-align: right; }
 .seriePotPos { color: #2563EB; }
-.seriePotNeg { color: #EF4444; }
+.seriePotNeg { color: var(--rojo-texto, #EF4444); }
 .serieRef { color: var(--text-muted); font-size: 0.75rem; text-align: right; }
 
 .serieInstruccion { font-size: 0.82rem; color: var(--text-muted); text-align: center; margin-bottom: var(--spacing-md); }
@@ -111,15 +111,15 @@
 .serieResultadoAnodo { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.3); }
 .serieResultadoCatodo { background: rgba(59,130,246,0.08); border: 1px solid rgba(59,130,246,0.3); }
 .serieResultadoRol { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.2rem; }
-.serieResultadoAnodo .serieResultadoRol { color: #EF4444; }
+.serieResultadoAnodo .serieResultadoRol { color: var(--rojo-texto, #EF4444); }
 .serieResultadoCatodo .serieResultadoRol { color: #3B82F6; }
 .serieResultadoPar { font-family: 'Courier New', monospace; font-size: 0.9rem; font-weight: 600; color: var(--text-primary); }
 .serieResultadoPot { font-size: 0.78rem; color: var(--text-muted); }
 .serieFemFinal { text-align: center; margin-top: var(--spacing-sm); }
 .serieFemFormula { font-size: 0.82rem; color: var(--text-secondary); }
 .serieFemValor { font-size: 1.6rem; font-weight: 800; }
-.serieFemPos { color: #16A34A; }
-.serieFemNeg { color: #EF4444; }
+.serieFemPos { color: var(--verde-texto, #16A34A); }
+.serieFemNeg { color: var(--rojo-texto, #EF4444); }
 .serieEspontaneo { font-size: 0.82rem; font-weight: 700; margin-top: 0.3rem; }
 .serieMnemonico { background: var(--bg-card); border: 1px solid var(--border); border-left: 4px solid #F59E0B; border-radius: 0 var(--radius) var(--radius) 0; padding: var(--spacing-sm) var(--spacing-md); margin-top: var(--spacing-md); font-size: 0.82rem; color: var(--text-primary); }
 
@@ -153,8 +153,8 @@
 .voltajeSlider::-webkit-slider-thumb { -webkit-appearance: none; width: 20px; height: 20px; border-radius: 50%; background: var(--primary); cursor: pointer; }
 .voltajeSlider::-moz-range-thumb { width: 20px; height: 20px; border-radius: 50%; background: var(--primary); cursor: pointer; border: none; }
 .voltajeInfo { text-align: center; font-size: 0.82rem; border-radius: 8px; padding: 0.4rem var(--spacing-md); }
-.voltajeBajo { background: rgba(239,68,68,0.1); color: #EF4444; border: 1px solid rgba(239,68,68,0.3); }
-.voltajeOk { background: rgba(22,163,74,0.1); color: #16A34A; border: 1px solid rgba(22,163,74,0.3); }
+.voltajeBajo { background: rgba(239,68,68,0.1); color: var(--rojo-texto, #EF4444); border: 1px solid rgba(239,68,68,0.3); }
+.voltajeOk { background: rgba(22,163,74,0.1); color: var(--verde-texto, #16A34A); border: 1px solid rgba(22,163,74,0.3); }
 
 .electroplatingInfo { background: var(--hover); border-radius: var(--radius); padding: var(--spacing-lg); }
 .electroplatingTitulo { font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin-bottom: var(--spacing-md); }

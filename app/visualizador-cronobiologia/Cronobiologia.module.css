@@ -618,7 +618,7 @@
 .jetlagTitulo {
   font-size: 1rem;
   font-weight: 700;
-  color: #B7791F;
+  color: var(--ambar-texto, #B7791F);
   margin: 0 0 0.75rem;
 }
 
@@ -1220,7 +1220,7 @@
   content: '•';
   position: absolute;
   left: 0;
-  color: #FB923C;
+  color: var(--naranja-texto, #FB923C);
   font-weight: 700;
 }
 

@@ -399,7 +399,7 @@
 
 .feedbackTipoNeg {
   background: rgba(39, 174, 96, 0.12);
-  color: #1E8449;
+  color: var(--verde-texto, #1E8449);
 }
 
 .feedbackNombre {
@@ -552,7 +552,7 @@
 }
 
 .cascadaIntensmedia {
-  color: #E67E22;
+  color: var(--naranja-texto, #E67E22);
 }
 
 .cascadaIntensbaja {
@@ -748,13 +748,13 @@
 
 .escenarioRiesgo {
   margin-left: auto;
-  color: #E74C3C;
+  color: var(--rojo-texto, #E74C3C);
   font-size: 0.9rem;
 }
 
 .escenarioOk {
   margin-left: auto;
-  color: #27AE60;
+  color: var(--verde-texto, #27AE60);
   font-size: 0.85rem;
 }
 

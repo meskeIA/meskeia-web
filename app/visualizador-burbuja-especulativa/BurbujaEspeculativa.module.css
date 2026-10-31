@@ -392,7 +392,7 @@
 }
 
 .casosDatoCaida {
-  color: #EF4444 !important;
+  color: var(--rojo-texto, #EF4444) !important;
   font-weight: 600;
 }
 
@@ -457,7 +457,7 @@
 }
 
 .tablaCaida {
-  color: #EF4444 !important;
+  color: var(--rojo-texto, #EF4444) !important;
   font-weight: 600;
 }
 
@@ -577,7 +577,7 @@
 
 .creditoInverso {
   font-size: 0.88rem;
-  color: #EF4444;
+  color: var(--rojo-texto, #EF4444);
   font-style: italic;
   margin: 0.5rem 0 0;
 }
@@ -671,13 +671,13 @@
 
 .alertaMedia {
   background: rgba(245, 158, 11, 0.1);
-  color: #D97706;
+  color: var(--ambar-texto, #D97706);
   border: 1px solid rgba(245, 158, 11, 0.2);
 }
 
 .alertaAlta {
   background: rgba(239, 68, 68, 0.1);
-  color: #DC2626;
+  color: var(--rojo-texto, #DC2626);
   border: 1px solid rgba(239, 68, 68, 0.2);
 }
 

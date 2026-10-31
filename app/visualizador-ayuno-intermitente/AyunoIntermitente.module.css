@@ -372,7 +372,7 @@
 }
 
 .contraRelativa {
-  color: #D97706;
+  color: var(--ambar-texto, #D97706);
 }
 
 .contraGrid {
@@ -426,7 +426,7 @@
 
 .badgeAbsoluta {
   background: #FEE2E2;
-  color: #DC2626;
+  color: var(--rojo-texto, #DC2626);
 }
 
 .badgeRelativa {

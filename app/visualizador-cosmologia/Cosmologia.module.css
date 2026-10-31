@@ -195,7 +195,7 @@
 }
 [data-theme='dark'] .warningBox { background: rgba(231,76,60,0.08); border-color: rgba(231,76,60,0.3); }
 .warningBox p { font-size: 0.9rem; color: var(--text-primary); line-height: 1.6; margin: 0; }
-.warningBox strong { color: #e74c3c; }
+.warningBox strong { color: var(--rojo-texto, #e74c3c); }
 
 /* Info lista */
 .infoLista { list-style: none; padding: 0; margin: 0; }

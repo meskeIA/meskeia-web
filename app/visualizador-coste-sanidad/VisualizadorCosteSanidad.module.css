@@ -51,8 +51,8 @@
 .operacionFilaRojo { background: rgba(231, 76, 60, 0.04); border-radius: 6px; padding: 0.3rem 0.5rem; }
 .operacionPais { font-size: 0.82rem; color: var(--text-secondary); }
 .operacionCoste { font-size: 0.88rem; font-weight: 600; color: var(--text-primary); }
-.operacionCosteGratis { font-size: 0.88rem; font-weight: 700; color: var(--verde); }
-.operacionCosteAlto { font-size: 0.88rem; font-weight: 700; color: var(--rojo); }
+.operacionCosteGratis { font-size: 0.88rem; font-weight: 700; color: var(--verde-texto, var(--verde)); }
+.operacionCosteAlto { font-size: 0.88rem; font-weight: 700; color: var(--rojo-texto, var(--rojo)); }
 
 /* Chart */
 .chartContainer { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
@@ -75,7 +75,7 @@
 .costeAlto { border-color: var(--rojo); background: rgba(231, 76, 60, 0.03); }
 .costePais { display: block; font-size: 0.88rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.3rem; }
 .costeResumen { display: block; font-size: 1rem; font-weight: 700; color: var(--primary-texto); margin-bottom: var(--spacing-sm); }
-.costeAlto .costeResumen { color: var(--rojo); }
+.costeAlto .costeResumen { color: var(--rojo-texto, var(--rojo)); }
 .costeDetalle { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin: 0; }
 
 /* Financiación - Sección 4 */

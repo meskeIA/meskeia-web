@@ -181,8 +181,8 @@
 .estresItem { margin-bottom: 0.6rem; }
 .estresItem dt { font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 0.1rem; }
 .estresItem dd { font-size: 0.87rem; color: var(--text-primary); margin: 0; line-height: 1.4; }
-.itemVerde { color: #27ae60; }
-.itemRojo { color: #e74c3c; }
+.itemVerde { color: var(--verde-texto, #27ae60); }
+.itemRojo { color: var(--rojo-texto, #e74c3c); }
 
 /* ─── Sistemas grid (8 tarjetas) ─────────────────── */
 .sistemasGrid {

@@ -311,7 +311,7 @@
 
 .estadoSilenciado {
   background: rgba(231, 76, 60, 0.1);
-  color: #e74c3c;
+  color: var(--rojo-texto, #e74c3c);
 }
 
 .genDesc {
@@ -396,7 +396,7 @@
 
 .efectoSenal {
   background: rgba(241, 196, 15, 0.15);
-  color: #9a7d0a;
+  color: var(--ambar-texto, #9a7d0a);
 }
 
 [data-theme='dark'] .efectoActiva {
@@ -610,7 +610,7 @@
 
 .impactoMedio {
   background: rgba(241, 196, 15, 0.12);
-  color: #9a7d0a;
+  color: var(--ambar-texto, #9a7d0a);
 }
 
 .impactoBajo {

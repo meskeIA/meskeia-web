@@ -582,12 +582,12 @@
 }
 
 .factoresHeader[data-tipo="positivo"] {
-  color: #27ae60;
+  color: var(--verde-texto, #27ae60);
   border-color: #27ae60;
 }
 
 .factoresHeader[data-tipo="negativo"] {
-  color: #e74c3c;
+  color: var(--rojo-texto, #e74c3c);
   border-color: #e74c3c;
 }
 

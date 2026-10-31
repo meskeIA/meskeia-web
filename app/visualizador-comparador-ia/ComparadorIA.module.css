@@ -334,7 +334,7 @@
 .estrellas {
   font-size: 0.85rem;
   letter-spacing: -0.05em;
-  color: #f0a500;
+  color: var(--ambar-texto, #f0a500);
 }
 
 /* ─── Badges de casos de uso en tabla ─── */

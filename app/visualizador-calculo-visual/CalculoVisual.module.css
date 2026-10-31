@@ -192,7 +192,7 @@
 }
 
 .puntoDer {
-  color: #27AE60;
+  color: var(--verde-texto, #27AE60);
   font-weight: 600;
   font-size: 0.9rem;
   font-family: monospace;

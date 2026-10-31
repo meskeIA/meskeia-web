@@ -423,9 +423,9 @@
   font-weight: 800;
 }
 
-.nairuPctAlto { color: #E74C3C; }
-.nairuPctMedio { color: #E67E22; }
-.nairuPctBajo { color: #27AE60; }
+.nairuPctAlto { color: var(--rojo-texto, #E74C3C); }
+.nairuPctMedio { color: var(--naranja-texto, #E67E22); }
+.nairuPctBajo { color: var(--verde-texto, #27AE60); }
 
 .nairuPaisComentario {
   font-size: 0.8rem;

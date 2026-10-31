@@ -441,11 +441,11 @@
 }
 
 .balanzaPositiva .balanzaValor {
-  color: #27AE60;
+  color: var(--verde-texto, #27AE60);
 }
 
 .balanzaNegativa .balanzaValor {
-  color: #E74C3C;
+  color: var(--rojo-texto, #E74C3C);
 }
 
 .balanzaEstado {
@@ -596,11 +596,11 @@
 }
 
 .textoPositivo {
-  color: #27AE60;
+  color: var(--verde-texto, #27AE60);
 }
 
 .textoNegativo {
-  color: #E74C3C;
+  color: var(--rojo-texto, #E74C3C);
 }
 
 .ejemploCambio {

@@ -493,7 +493,7 @@
 }
 
 .hashCharCambiado {
-  color: #e53e3e;
+  color: var(--rojo-texto, #e53e3e);
   font-weight: 700;
   transition: color 0.2s;
 }
@@ -505,7 +505,7 @@
 .hashDiff {
   margin: 0.5rem 0 0;
   font-size: 0.82rem;
-  color: #e53e3e;
+  color: var(--rojo-texto, #e53e3e);
 }
 
 [data-theme='dark'] .hashDiff {
@@ -590,7 +590,7 @@
 
 .badgePeligro {
   background: rgba(229, 62, 62, 0.12);
-  color: #e53e3e;
+  color: var(--rojo-texto, #e53e3e);
   padding: 0.15rem 0.5rem;
   border-radius: 0.3rem;
   font-size: 0.75rem;
@@ -1165,7 +1165,7 @@
 
 .badgeAmarillo {
   background: rgba(214, 158, 46, 0.15);
-  color: #b7791f;
+  color: var(--ambar-texto, #b7791f);
   padding: 0.15rem 0.55rem;
   border-radius: 0.3rem;
   font-size: 0.75rem;

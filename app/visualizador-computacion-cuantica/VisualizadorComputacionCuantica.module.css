@@ -566,7 +566,7 @@
 }
 
 .circuitoQubit {
-  color: #3fb950;
+  color: var(--verde-texto, #3fb950);
   min-width: 50px;
 }
 

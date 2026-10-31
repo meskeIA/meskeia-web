@@ -298,9 +298,9 @@
   color: var(--text-primary);
 }
 
-.rojo { color: var(--rojo); }
+.rojo { color: var(--rojo-texto, var(--rojo)); }
 .azul { color: var(--primary-texto); }
-.verde { color: var(--verde); }
+.verde { color: var(--verde-texto, var(--verde)); }
 
 /* ─── Insight contextual ─── */
 .insight {
@@ -399,7 +399,7 @@
 .inflacionPerdida {
   display: block;
   font-size: 0.78rem;
-  color: var(--rojo);
+  color: var(--rojo-texto, var(--rojo));
   font-weight: 600;
 }
 

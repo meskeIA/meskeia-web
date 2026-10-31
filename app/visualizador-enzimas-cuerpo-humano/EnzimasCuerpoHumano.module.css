@@ -89,7 +89,7 @@
 .sliderSustrato:focus-visible { outline: 2px solid var(--secondary); outline-offset: 4px; }
 
 /* Tags informativas */
-.warningBox { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.3rem 0.8rem; background: #FFF3E0; border: 1px solid #FF9800; border-radius: 8px; font-size: 0.82rem; color: #E65100; font-weight: 600; }
+.warningBox { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.3rem 0.8rem; background: #FFF3E0; border: 1px solid #FF9800; border-radius: 8px; font-size: 0.82rem; color: var(--naranja-texto, #E65100); font-weight: 600; }
 [data-theme='dark'] .warningBox { background: #3E2723; border-color: #E65100; color: #FFAB40; }
 .infoTag { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.3rem 0.8rem; background: #E3F2FD; border: 1px solid #90CAF9; border-radius: 8px; font-size: 0.82rem; color: #1565C0; font-weight: 600; }
 [data-theme='dark'] .infoTag { background: #1A237E; border-color: #3F51B5; color: #90CAF9; }

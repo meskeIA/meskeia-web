@@ -195,7 +195,7 @@
 
 .sliderMargen {
   font-weight: 600;
-  color: var(--color-holgado);
+  color: var(--verde-texto, var(--color-holgado));
 }
 
 /* Selector de botones */
@@ -387,10 +387,10 @@
 
 .tdMes { text-align: center; font-weight: 700; color: var(--text-secondary); }
 
-.tdPositivo { color: var(--color-holgado); font-weight: 600; }
+.tdPositivo { color: var(--verde-texto, var(--color-holgado)); font-weight: 600; }
 .tdNegativo { color: var(--color-critico); font-weight: 600; }
 .tdBeneficio { color: var(--secondary-texto); font-weight: 600; }
-.tdBrecha { color: var(--color-adecuado); }
+.tdBrecha { color: var(--ambar-texto, var(--color-adecuado)); }
 
 .filaNegativa { background: #fff5f5 !important; }
 [data-theme='dark'] .filaNegativa { background: #2d1515 !important; }
@@ -613,7 +613,7 @@
   line-height: 1.5;
 }
 
-.warningList li::before { content: '•'; position: absolute; left: 0; color: #f59e0b; font-weight: 700; }
+.warningList li::before { content: '•'; position: absolute; left: 0; color: var(--ambar-texto, #f59e0b); font-weight: 700; }
 
 [data-theme='dark'] .warningList li { color: #fcd34d; }
 

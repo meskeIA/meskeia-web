@@ -519,7 +519,7 @@
 .tokamakTemp {
   font-size: 0.9rem;
   font-weight: 700;
-  color: #E85D4A;
+  color: var(--rojo-texto, #E85D4A);
 }
 
 .tokamakLabel {

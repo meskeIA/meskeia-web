@@ -211,7 +211,7 @@
   border: none;
   font-family: monospace;
   font-weight: 700;
-  color: #2a9d5c;
+  color: var(--verde-texto, #2a9d5c);
   cursor: pointer;
   padding: 0;
   text-decoration: underline dotted;
@@ -255,7 +255,7 @@
 }
 
 .fkTag {
-  color: #2a9d5c;
+  color: var(--verde-texto, #2a9d5c);
   background: rgba(42, 157, 92, 0.1);
   border-radius: 4px;
   padding: 0 4px;
@@ -552,7 +552,7 @@
 }
 
 .rendRapido .rendValor {
-  color: #27ae60;
+  color: var(--verde-texto, #27ae60);
 }
 
 .rendSub {
@@ -724,12 +724,12 @@
 }
 
 .celVerde {
-  color: #27ae60;
+  color: var(--verde-texto, #27ae60);
   font-weight: 600;
 }
 
 .celAmbar {
-  color: #d68910;
+  color: var(--ambar-texto, #d68910);
   font-weight: 600;
 }
 

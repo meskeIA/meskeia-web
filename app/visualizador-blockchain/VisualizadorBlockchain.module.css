@@ -145,7 +145,7 @@
   border: 2px solid var(--rojo);
   border-radius: var(--radius);
   padding: var(--spacing-md) var(--spacing-lg);
-  color: var(--rojo);
+  color: var(--rojo-texto, var(--rojo));
   margin-bottom: var(--spacing-lg);
   font-size: 0.95rem;
   line-height: 1.5;
@@ -216,12 +216,12 @@
 
 .valido {
   background: rgba(39, 174, 96, 0.12);
-  color: var(--verde);
+  color: var(--verde-texto, var(--verde));
 }
 
 .invalido {
   background: rgba(231, 76, 60, 0.12);
-  color: var(--rojo);
+  color: var(--rojo-texto, var(--rojo));
 }
 
 .bloqueCampo {
@@ -254,7 +254,7 @@
 }
 
 .hashInvalido {
-  color: var(--rojo);
+  color: var(--rojo-texto, var(--rojo));
 }
 
 .editableRow {
@@ -365,7 +365,7 @@
 }
 
 .flechaRota {
-  color: var(--rojo);
+  color: var(--rojo-texto, var(--rojo));
 }
 
 /* ─── Botones generales ─── */
@@ -566,7 +566,7 @@
 }
 
 .powSimNonce {
-  color: #7EE787;
+  color: var(--verde-texto, #7EE787);
   font-family: 'Courier New', Courier, monospace;
   font-size: 1.4rem;
   font-weight: 700;
@@ -580,11 +580,11 @@
 }
 
 .hashAnimado {
-  color: #E3B341;
+  color: var(--ambar-texto, #E3B341);
 }
 
 .powSolucion {
-  color: #7EE787;
+  color: var(--verde-texto, #7EE787);
   font-family: 'Courier New', Courier, monospace;
   font-size: 0.82rem;
   margin-top: var(--spacing-sm);
@@ -967,7 +967,7 @@
   border-radius: var(--radius);
   padding: 0.6rem 1.1rem;
   font-size: 0.9rem;
-  color: var(--verde);
+  color: var(--verde-texto, var(--verde));
   font-weight: 600;
 }
 
