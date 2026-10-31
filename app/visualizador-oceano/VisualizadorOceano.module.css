@@ -86,7 +86,7 @@
 .degradacionObjeto { font-size: 0.82rem; color: var(--text-primary); font-weight: 500; }
 .degradacionBarraContainer { height: 10px; background: var(--border); border-radius: 5px; overflow: hidden; }
 .degradacionBarra { height: 100%; background: linear-gradient(90deg, #F59E0B, #EF4444); border-radius: 5px; transition: width 0.5s ease; }
-.degradacionAnios { font-size: 0.82rem; font-weight: 700; color: var(--rojo); text-align: right; }
+.degradacionAnios { font-size: 0.82rem; font-weight: 700; color: var(--rojo-texto, var(--rojo)); text-align: right; }
 
 .paisesContainer { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-xl); }
 .paisesTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); text-align: center; margin-bottom: 0.2rem; }

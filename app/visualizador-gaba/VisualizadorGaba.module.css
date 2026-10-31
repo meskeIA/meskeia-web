@@ -141,7 +141,7 @@
 
 .balanzaTipo {
   background: rgba(224, 112, 112, 0.12);
-  color: #c0544c;
+  color: var(--rojo-texto, #c0544c);
   font-size: 0.75rem;
   font-weight: 700;
   padding: 0.2rem 0.6rem;

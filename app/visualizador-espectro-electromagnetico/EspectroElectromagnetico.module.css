@@ -129,10 +129,10 @@
 .peligroBarContainer { height: 14px; background: var(--border); border-radius: 7px; overflow: hidden; }
 .peligroBar { height: 100%; border-radius: 7px; }
 .peligroTag { font-size: 0.68rem; font-weight: 700; padding: 0.15rem 0.5rem; border-radius: 10px; white-space: nowrap; }
-.peligroSeguro { background: rgba(39,174,96,0.12); color: #27ae60; }
-.peligroPrecaucion { background: rgba(241,196,15,0.15); color: #b7950b; }
+.peligroSeguro { background: rgba(39,174,96,0.12); color: var(--verde-texto, #27ae60); }
+.peligroPrecaucion { background: rgba(241,196,15,0.15); color: var(--ambar-texto, #b7950b); }
 [data-theme='dark'] .peligroPrecaucion { background: rgba(241,196,15,0.1); color: #f1c40f; }
-.peligroPeligro { background: rgba(231,76,60,0.12); color: #e74c3c; }
+.peligroPeligro { background: rgba(231,76,60,0.12); color: var(--rojo-texto, #e74c3c); }
 .peligroExtremo { background: rgba(142,68,173,0.12); color: #8e44ad; }
 
 .proteccionGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-md); }

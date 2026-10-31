@@ -263,7 +263,7 @@
 }
 
 .bloqueRojo .bloqueValor {
-  color: var(--rojo);
+  color: var(--rojo-texto, var(--rojo));
 }
 
 .bloqueNaranja {
@@ -272,7 +272,7 @@
 }
 
 .bloqueNaranja .bloqueValor {
-  color: var(--naranja);
+  color: var(--naranja-texto, var(--naranja));
 }
 
 .bloqueAmarillo {
@@ -281,7 +281,7 @@
 }
 
 .bloqueAmarillo .bloqueValor {
-  color: #d4a017;
+  color: var(--ambar-texto, #d4a017);
 }
 
 [data-theme='dark'] .bloqueAmarillo .bloqueValor {
@@ -313,7 +313,7 @@
 }
 
 .bloqueVerde .bloqueValor {
-  color: var(--verde);
+  color: var(--verde-texto, var(--verde));
 }
 
 .bloqueAzul {
@@ -363,7 +363,7 @@
   border-left: 3px solid var(--rojo);
   padding: 0.5rem 0.8rem;
   border-radius: 0 6px 6px 0;
-  color: var(--rojo);
+  color: var(--rojo-texto, var(--rojo));
 }
 
 [data-theme='dark'] .alerta {
@@ -414,7 +414,7 @@
 }
 
 .resumenNeto {
-  color: var(--verde);
+  color: var(--verde-texto, var(--verde));
   font-size: 1.8rem;
   display: inline-block;
 }
@@ -451,7 +451,7 @@
 .donutPct {
   font-size: 1.6rem;
   font-weight: 700;
-  color: var(--verde);
+  color: var(--verde-texto, var(--verde));
 }
 
 .donutLabel {

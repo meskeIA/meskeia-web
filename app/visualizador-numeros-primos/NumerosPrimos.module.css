@@ -132,8 +132,8 @@
 .rsaCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); text-align: center; }
 .rsaLabel { display: block; font-size: 0.78rem; color: var(--text-muted); margin-bottom: 0.3rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
 .rsaEcuacion { font-size: 1.3rem; font-weight: 700; color: var(--text-primary); font-family: 'Courier New', monospace; }
-.rsaFacil { color: var(--verde); }
-.rsaDificil { color: #e74c3c; }
+.rsaFacil { color: var(--verde-texto, var(--verde)); }
+.rsaDificil { color: var(--rojo-texto, #e74c3c); }
 .rsaFlecha { text-align: center; font-size: 1.5rem; color: var(--text-muted); }
 .rsaPregunta { font-size: 1rem; color: var(--text-primary); font-weight: 600; text-align: center; margin-bottom: var(--spacing-sm); }
 .rsaRespuesta { font-size: 0.88rem; color: var(--text-secondary); text-align: center; line-height: 1.5; }

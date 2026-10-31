@@ -315,7 +315,7 @@
 
 .absorptionValorBueno {
   font-size: 0.88rem;
-  color: #27AE60;
+  color: var(--verde-texto, #27AE60);
   font-weight: 600;
 }
 

@@ -87,7 +87,7 @@
 .cloroplastoTitulo { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: var(--spacing-lg); text-align: center; }
 .cloroplastoDiagrama { display: flex; justify-content: center; }
 .cloroplastoOuter { border: 3px solid var(--verde); border-radius: 50% / 40%; padding: var(--spacing-md); position: relative; min-width: 280px; }
-.cloroplastoLabel { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: var(--bg-card); padding: 0 var(--spacing-sm); font-size: 0.72rem; color: var(--verde); font-weight: 600; }
+.cloroplastoLabel { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: var(--bg-card); padding: 0 var(--spacing-sm); font-size: 0.72rem; color: var(--verde-texto, var(--verde)); font-weight: 600; }
 .cloroplastoInner { border: 2px dashed var(--secondary); border-radius: 40% / 30%; padding: var(--spacing-lg) var(--spacing-md); display: flex; flex-direction: column; align-items: center; gap: var(--spacing-md); }
 .estromaLabel { font-size: 0.72rem; color: var(--secondary-texto); font-weight: 600; }
 .tilacoidesStack { display: flex; flex-direction: column; gap: 4px; width: 100%; }

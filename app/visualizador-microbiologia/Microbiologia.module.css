@@ -215,7 +215,7 @@
 .antibMec { padding: 0.65rem 1rem; font-size: 0.82rem; color: var(--text-secondary); }
 .sensibleSi { color: #2E7D32; font-weight: 800; font-size: 1.1rem; }
 .sensibleNo { color: #C62828; font-weight: 800; font-size: 1.1rem; }
-.sensibleParcial { color: #E65100; font-weight: 800; font-size: 1.1rem; }
+.sensibleParcial { color: var(--naranja-texto, #E65100); font-weight: 800; font-size: 1.1rem; }
 
 /* ─── Dominios ─── */
 .dominioTree { width: 100%; max-width: 500px; height: auto; display: block; margin: 0 auto var(--spacing-xl); }
@@ -534,7 +534,7 @@
 .warningHeader strong {
   font-size: 0.95rem;
   font-weight: 700;
-  color: #E65100;
+  color: var(--naranja-texto, #E65100);
 }
 .warningList {
   list-style: none;
@@ -555,7 +555,7 @@
   content: '•';
   position: absolute;
   left: 0.2rem;
-  color: #F57F17;
+  color: var(--naranja-texto, #F57F17);
   font-weight: 700;
 }
 .warningList li strong {

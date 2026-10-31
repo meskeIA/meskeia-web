@@ -94,8 +94,8 @@
 .tendenciaEstado { display: block; font-size: 0.78rem; color: var(--primary-texto); font-weight: 600; }
 .tendenciaDesc { font-size: 0.88rem; color: var(--text-primary); line-height: 1.5; margin-bottom: var(--spacing-sm); }
 .tendenciaProsCons { display: flex; flex-direction: column; gap: 0.4rem; }
-.tendenciaPros { font-size: 0.82rem; color: var(--verde); line-height: 1.4; }
-.tendenciaContras { font-size: 0.82rem; color: var(--rojo); line-height: 1.4; }
+.tendenciaPros { font-size: 0.82rem; color: var(--verde-texto, var(--verde)); line-height: 1.4; }
+.tendenciaContras { font-size: 0.82rem; color: var(--rojo-texto, var(--rojo)); line-height: 1.4; }
 .tendenciaTag { display: inline-flex; align-items: center; justify-content: center; width: 18px; height: 18px; border-radius: 50%; font-size: 0.75rem; font-weight: 700; margin-right: 0.3rem; }
 .tendenciaPros .tendenciaTag { background: rgba(39,174,96,0.12); }
 .tendenciaContras .tendenciaTag { background: rgba(231,76,60,0.12); }

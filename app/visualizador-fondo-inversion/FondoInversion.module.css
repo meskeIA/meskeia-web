@@ -280,7 +280,7 @@
 }
 
 .tipoActivo h4 {
-  color: #e74c3c;
+  color: var(--rojo-texto, #e74c3c);
   margin: 0 0 0.5rem;
   font-size: 0.95rem;
 }
@@ -446,7 +446,7 @@
 }
 
 .buffettBox h3 {
-  color: #d68910;
+  color: var(--ambar-texto, #d68910);
   margin: 0 0 0.75rem;
 }
 
@@ -494,7 +494,7 @@
 }
 
 .buffettGanador {
-  color: #27ae60 !important;
+  color: var(--verde-texto, #27ae60) !important;
 }
 
 .buffettNota {
@@ -585,7 +585,7 @@
 
 .bestRow td {
   background: rgba(39, 174, 96, 0.07) !important;
-  color: #1e8449 !important;
+  color: var(--verde-texto, #1e8449) !important;
   font-style: italic;
 }
 
@@ -710,11 +710,11 @@
 }
 
 .resultCardWarning .resultValor {
-  color: #e74c3c;
+  color: var(--rojo-texto, #e74c3c);
 }
 
 .resultCardPositivo .resultValor {
-  color: #27ae60;
+  color: var(--verde-texto, #27ae60);
 }
 
 .resultSub {
@@ -739,7 +739,7 @@
 }
 
 .ilusionCard h3 {
-  color: #e74c3c;
+  color: var(--rojo-texto, #e74c3c);
   font-size: 1rem;
   margin: 0 0 0.75rem;
   display: flex;

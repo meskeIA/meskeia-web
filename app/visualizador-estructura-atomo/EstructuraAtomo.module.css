@@ -460,7 +460,7 @@
 }
 
 .radiactivo {
-  color: #FF9800;
+  color: var(--ambar-texto, #FF9800);
 }
 
 .isotopoComposicion {

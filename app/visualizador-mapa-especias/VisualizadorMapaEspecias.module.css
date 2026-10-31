@@ -124,7 +124,7 @@
 
 .cocinaSalud { background: rgba(22, 163, 74, 0.06); border-radius: var(--radius); padding: var(--spacing-md); margin-bottom: var(--spacing-md); }
 [data-theme='dark'] .cocinaSalud { background: rgba(22, 163, 74, 0.1); }
-.cocinaSaludLabel { font-size: 0.82rem; font-weight: 600; color: #16A34A; display: block; margin-bottom: 0.3rem; }
+.cocinaSaludLabel { font-size: 0.82rem; font-weight: 600; color: var(--verde-texto, #16A34A); display: block; margin-bottom: 0.3rem; }
 .cocinaSalud p { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; margin: 0; }
 
 .cocinaHistoria { background: rgba(46, 134, 171, 0.06); border-radius: var(--radius); padding: var(--spacing-md); }

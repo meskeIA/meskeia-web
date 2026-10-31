@@ -76,7 +76,7 @@
 .celdaValor { padding: 0.65rem 1rem; color: var(--text-secondary); }
 .ganador { background: #F0FFF4; color: var(--text-primary); }
 [data-theme='dark'] .ganador { background: #052e16; }
-.ganadorMarca { color: #16A34A; }
+.ganadorMarca { color: var(--verde-texto, #16A34A); }
 
 .warningBox { background: #FEF3C7; border-left: 4px solid #D97706; border-radius: 0 8px 8px 0; padding: 1rem; font-size: 0.88rem; color: #92400E; margin-top: 1rem; }
 [data-theme='dark'] .warningBox { background: #451A00; color: #FDE68A; }

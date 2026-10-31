@@ -74,7 +74,7 @@
   border: 2px solid transparent;
 }
 .baseA { background: #E8F5E9; color: #2E7D32; }
-.baseT { background: #FFF3E0; color: #E65100; }
+.baseT { background: #FFF3E0; color: var(--naranja-texto, #E65100); }
 .baseG { background: #E3F2FD; color: #1565C0; }
 .baseC { background: #FCE4EC; color: #AD1457; }
 .baseMutada { border-color: #F44336; box-shadow: 0 0 6px rgba(244,67,54,0.4); }

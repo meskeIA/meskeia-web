@@ -87,7 +87,7 @@
 [data-theme='dark'] .warningBox { background: #422006; border-color: #B45309; color: #FDE68A; }
 
 /* Ángulo crítico label */
-.criticalAngle { font-size: 0.82rem; color: #e67e22; font-weight: 600; text-align: center; margin-top: var(--spacing-sm); }
+.criticalAngle { font-size: 0.82rem; color: var(--naranja-texto, #e67e22); font-weight: 600; text-align: center; margin-top: var(--spacing-sm); }
 
 /* Responsive */
 @media (max-width: 768px) {

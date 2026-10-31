@@ -189,8 +189,8 @@
   font-size: 0.87rem; color: var(--text-primary); border-top: 1px solid var(--border);
   align-items: center;
 }
-.icpMas span:nth-child(2) { color: var(--rojo); font-weight: 700; }
-.icpMenos span:nth-child(2) { color: var(--verde); font-weight: 700; }
+.icpMas span:nth-child(2) { color: var(--rojo-texto, var(--rojo)); font-weight: 700; }
+.icpMenos span:nth-child(2) { color: var(--verde-texto, var(--verde)); font-weight: 700; }
 
 /* ─── Tipos de inflación ─── */
 .inflacionTable {

@@ -46,7 +46,7 @@
 
 .resultadoInfo { flex: 1; }
 .resultadoTexto { font-size: 1rem; color: var(--text-primary); line-height: 1.6; margin: 0; }
-.resultadoAlerta { font-size: 1rem; color: #e74c3c; line-height: 1.6; margin: 0; }
+.resultadoAlerta { font-size: 1rem; color: var(--rojo-texto, #e74c3c); line-height: 1.6; margin: 0; }
 
 /* Hitos */
 .hitosGrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: var(--spacing-md); margin-bottom: var(--spacing-xl); }

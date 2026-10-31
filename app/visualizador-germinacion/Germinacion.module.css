@@ -123,8 +123,8 @@
 .sliderContainer { display: flex; align-items: center; gap: var(--spacing-md); }
 .slider { flex: 1; accent-color: var(--primary); }
 .sliderValor { font-size: 1rem; font-weight: 700; min-width: 70px; text-align: center; }
-.sliderOptimo { color: var(--verde); }
-.sliderFuera { color: var(--rojo); }
+.sliderOptimo { color: var(--verde-texto, var(--verde)); }
+.sliderFuera { color: var(--rojo-texto, var(--rojo)); }
 
 .factorEstado { display: flex; align-items: center; gap: 0.3rem; font-size: 0.88rem; color: var(--text-secondary); padding: var(--spacing-sm) 0; }
 .factorEstadoIcono { font-size: 1rem; }

@@ -255,7 +255,7 @@
 
 .btnFiltro_bajo {
   border-color: #22C55E;
-  color: #22C55E;
+  color: var(--verde-texto, #22C55E);
 }
 
 .btnFiltro_bajo.btnFiltroIGActivo {
@@ -265,7 +265,7 @@
 
 .btnFiltro_medio {
   border-color: #F59E0B;
-  color: #F59E0B;
+  color: var(--ambar-texto, #F59E0B);
 }
 
 .btnFiltro_medio.btnFiltroIGActivo {
@@ -275,7 +275,7 @@
 
 .btnFiltro_alto {
   border-color: #EF4444;
-  color: #EF4444;
+  color: var(--rojo-texto, #EF4444);
 }
 
 .btnFiltro_alto.btnFiltroIGActivo {

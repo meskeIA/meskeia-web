@@ -67,7 +67,7 @@
 .sliderResultado { text-align: center; font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5; }
 .sliderListas { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-md); margin-top: var(--spacing-md); }
 .sliderListaTitulo { font-size: 0.82rem; font-weight: 700; margin-bottom: 0.3rem; }
-.sliderListaRaya { color: #16A34A; }
+.sliderListaRaya { color: var(--verde-texto, #16A34A); }
 .sliderListaNoRaya { color: #DC2626; }
 .sliderListaItem { font-size: 0.78rem; color: var(--text-secondary); padding: 0.15rem 0; }
 

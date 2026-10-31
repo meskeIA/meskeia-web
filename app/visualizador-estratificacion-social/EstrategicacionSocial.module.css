@@ -562,7 +562,7 @@
 }
 
 .teoriaVigencia .teoriaEtiq {
-  color: #27ae60;
+  color: var(--verde-texto, #27ae60);
 }
 
 /* ══════════════════════════════════════

@@ -280,13 +280,13 @@
 .actinaMiosina {
   font-size: 1.2rem;
   font-weight: 700;
-  color: #FF6B35;
+  color: var(--naranja-texto, #FF6B35);
 }
 
 .tensionLabel {
   font-size: 1.1rem;
   font-weight: 700;
-  color: #FF6B35;
+  color: var(--naranja-texto, #FF6B35);
   text-transform: uppercase;
   letter-spacing: 1px;
 }
@@ -306,13 +306,13 @@
 .deficitLabel {
   font-size: 1.1rem;
   font-weight: 700;
-  color: #FF3355;
+  color: var(--rojo-texto, #FF3355);
 }
 
 .espasmoLabel {
   font-size: 1.1rem;
   font-weight: 700;
-  color: #FF3355;
+  color: var(--rojo-texto, #FF3355);
   text-transform: uppercase;
   letter-spacing: 1px;
 }
@@ -431,7 +431,7 @@
 .nmdaMgBlock span:first-child {
   font-size: 1.2rem;
   font-weight: 700;
-  color: #FF6B35;
+  color: var(--naranja-texto, #FF6B35);
 }
 
 .nmdaBlockText {
@@ -441,7 +441,7 @@
 
 .nmdaMgSale {
   font-size: 0.9rem;
-  color: #FF6B35;
+  color: var(--naranja-texto, #FF6B35);
   font-weight: 600;
 }
 

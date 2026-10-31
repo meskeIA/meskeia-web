@@ -492,7 +492,7 @@
 
 .cypBadgeInductor {
   background: rgba(255, 193, 7, 0.1);
-  color: #b8860b;
+  color: var(--ambar-texto, #b8860b);
   border: 1px solid rgba(255, 193, 7, 0.25);
 }
 
@@ -562,7 +562,7 @@
 
 .cypTipoInductor {
   background: rgba(255, 193, 7, 0.15);
-  color: #b8860b;
+  color: var(--ambar-texto, #b8860b);
 }
 
 .cypTipoInhibidor {

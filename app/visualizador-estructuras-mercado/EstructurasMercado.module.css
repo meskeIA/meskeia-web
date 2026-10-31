@@ -447,7 +447,7 @@
 }
 
 .nashLabel {
-  color: #E83F6F;
+  color: var(--rojo-texto, #E83F6F);
   font-weight: 600;
 }
 

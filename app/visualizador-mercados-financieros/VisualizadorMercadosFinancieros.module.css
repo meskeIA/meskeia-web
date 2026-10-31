@@ -190,7 +190,7 @@
 
 .riesgoMedio {
   background: rgba(240, 165, 0, 0.15);
-  color: #c47d00;
+  color: var(--ambar-texto, #c47d00);
 }
 
 .riesgoAlto {
@@ -344,7 +344,7 @@
 
 .ordenPrecioAsk {
   font-weight: 600;
-  color: var(--color-ask, #E05C5C);
+  color: var(--rojo-texto, var(--color-ask, #E05C5C));
 }
 
 .mensajeMatching {

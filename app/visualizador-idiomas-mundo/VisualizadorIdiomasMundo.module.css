@@ -82,9 +82,9 @@
 .lenguaHeader { display: flex; justify-content: space-between; align-items: center; margin-bottom: var(--spacing-sm); }
 .lenguaNombre { font-weight: 700; font-size: 0.95rem; color: var(--text-primary); }
 .lenguaBadge { font-size: 0.7rem; font-weight: 600; padding: 0.15rem 0.5rem; border-radius: 20px; }
-.badge_critico { background: rgba(231,76,60,0.1); color: var(--rojo); }
-.badge_peligro { background: rgba(230,126,34,0.1); color: #E67E22; }
-.badge_salvada { background: rgba(39,174,96,0.1); color: var(--verde); }
+.badge_critico { background: rgba(231,76,60,0.1); color: var(--rojo-texto, var(--rojo)); }
+.badge_peligro { background: rgba(230,126,34,0.1); color: var(--naranja-texto, #E67E22); }
+.badge_salvada { background: rgba(39,174,96,0.1); color: var(--verde-texto, var(--verde)); }
 .lenguaMeta { display: flex; justify-content: space-between; font-size: 0.82rem; color: var(--text-muted); margin-bottom: var(--spacing-sm); }
 .lenguaDetalle { font-size: 0.85rem; color: var(--text-secondary); line-height: 1.4; margin: 0; }
 

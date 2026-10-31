@@ -581,7 +581,7 @@
 }
 
 .tempEtiquetaCaliente {
-  color: #e67e22;
+  color: var(--naranja-texto, #e67e22);
   font-weight: 600;
 }
 
@@ -858,8 +858,8 @@
 }
 
 .penaltyTituloMal { color: #c0392b; }
-.penaltyTituloBien { color: #27ae60; }
-.penaltyTituloAlto { color: #e67e22; }
+.penaltyTituloBien { color: var(--verde-texto, #27ae60); }
+.penaltyTituloAlto { color: var(--naranja-texto, #e67e22); }
 
 .penaltyTexto {
   font-size: 0.87rem;

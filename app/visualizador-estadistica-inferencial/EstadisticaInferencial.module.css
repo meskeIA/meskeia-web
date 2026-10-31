@@ -200,11 +200,11 @@
 }
 
 .resultadoItem .valorRechaza {
-  color: #e53e3e;
+  color: var(--rojo-texto, #e53e3e);
 }
 
 .resultadoItem .valorAcepta {
-  color: #38a169;
+  color: var(--verde-texto, #38a169);
 }
 
 /* ─── Mensaje interpretativo ─── */
@@ -246,7 +246,7 @@
 
 .leyendaVP { background: rgba(56, 161, 105, 0.15); color: #276749; border: 1px solid rgba(56,161,105,0.3); }
 .leyendaFP { background: rgba(229, 62, 62, 0.12); color: #c53030; border: 1px solid rgba(229,62,62,0.3); }
-.leyendaFN { background: rgba(237, 137, 54, 0.12); color: #c05621; border: 1px solid rgba(237,137,54,0.3); }
+.leyendaFN { background: rgba(237, 137, 54, 0.12); color: var(--naranja-texto, #c05621); border: 1px solid rgba(237,137,54,0.3); }
 .leyendaVN { background: rgba(113, 128, 150, 0.12); color: #4a5568; border: 1px solid rgba(113,128,150,0.3); }
 
 .leyendaItem small {

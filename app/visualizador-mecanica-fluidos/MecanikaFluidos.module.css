@@ -144,7 +144,7 @@
 .toggleRow { display: flex; justify-content: center; margin-bottom: var(--spacing-lg); }
 .toggleBtn {
   padding: 0.6rem 1.4rem; border-radius: 8px; border: 2px solid var(--naranja);
-  background: transparent; color: var(--naranja); font-weight: 700; font-size: 0.9rem;
+  background: transparent; color: var(--naranja-texto, var(--naranja)); font-weight: 700; font-size: 0.9rem;
   cursor: pointer; transition: all 0.2s;
 }
 .toggleBtn:hover { background: var(--naranja); color: white; }
@@ -160,7 +160,7 @@
   color: var(--text-primary);
 }
 [data-theme='dark'] .warningBox { background: #2A2218; border-left-color: #F4A261; color: var(--text-primary); }
-.warningBox strong { display: block; font-size: 0.95rem; margin-bottom: 0.35rem; color: #C17D0A; }
+.warningBox strong { display: block; font-size: 0.95rem; margin-bottom: 0.35rem; color: var(--ambar-texto, #C17D0A); }
 [data-theme='dark'] .warningBox strong { color: #F4A261; }
 .warningBox p { margin: 0; }
 

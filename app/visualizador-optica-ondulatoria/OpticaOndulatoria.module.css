@@ -242,8 +242,8 @@
   padding: 0.3rem 0.7rem; border-radius: 20px;
   font-size: 0.8rem; font-weight: 700;
 }
-.propSi { background: rgba(39,174,96,0.15); color: var(--verde); border: 1px solid rgba(39,174,96,0.3); }
-.propNo { background: rgba(231,76,60,0.1); color: var(--rojo); border: 1px solid rgba(231,76,60,0.2); }
+.propSi { background: rgba(39,174,96,0.15); color: var(--verde-texto, var(--verde)); border: 1px solid rgba(39,174,96,0.3); }
+.propNo { background: rgba(231,76,60,0.1); color: var(--rojo-texto, var(--rojo)); border: 1px solid rgba(231,76,60,0.2); }
 
 /* Responsive */
 @media (max-width: 640px) {

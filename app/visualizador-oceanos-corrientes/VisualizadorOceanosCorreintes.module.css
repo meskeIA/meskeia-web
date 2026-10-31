@@ -710,11 +710,11 @@
 }
 
 .phEspecieEstadoMid {
-  color: #e67e22;
+  color: var(--naranja-texto, #e67e22);
 }
 
 .phEspecieEstadoOk {
-  color: #27ae60;
+  color: var(--verde-texto, #27ae60);
 }
 
 /* ─────────────────────────────────────────────

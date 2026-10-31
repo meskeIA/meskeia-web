@@ -1095,7 +1095,7 @@
 
 .warningHeader strong {
   font-size: 0.9rem;
-  color: #c0622a;
+  color: var(--naranja-texto, #c0622a);
 }
 
 .warningList {
