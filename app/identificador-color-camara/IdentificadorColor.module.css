@@ -293,7 +293,7 @@
 
 .btnControlSec:hover {
   border-color: #EF4444;
-  color: #EF4444;
+  color: var(--rojo-texto, #EF4444);
 }
 
 /* ============================================
@@ -425,7 +425,7 @@
   text-align: center;
   font-size: 0.88rem;
   font-weight: 600;
-  color: #16A34A;
+  color: var(--verde-texto, #16A34A);
   margin-top: 0.6rem;
 }
 
@@ -477,7 +477,7 @@
   gap: 0.35rem;
   font-size: 0.92rem;
   font-weight: 700;
-  color: #16A34A;
+  color: var(--verde-texto, #16A34A);
   background: rgba(22, 163, 74, 0.1);
   border: 1px solid rgba(22, 163, 74, 0.3);
   border-radius: 999px;
@@ -499,7 +499,7 @@
 
 .calibQuitar:hover {
   border-color: #EF4444;
-  color: #EF4444;
+  color: var(--rojo-texto, #EF4444);
 }
 
 .calibQuitar:focus-visible {
@@ -519,7 +519,7 @@
   text-align: center;
   font-size: 0.85rem;
   font-weight: 600;
-  color: #16A34A;
+  color: var(--verde-texto, #16A34A);
   margin-top: 0.4rem;
 }
 

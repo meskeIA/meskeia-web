@@ -167,7 +167,7 @@
   font-size: 0.8rem;
   font-weight: 600;
   background: #FEE2E2;
-  color: #DC2626;
+  color: var(--rojo-texto, #DC2626);
   padding: 0.25rem 0.75rem;
   border-radius: 20px;
 }
@@ -243,7 +243,7 @@
   margin-bottom: 0.25rem;
 }
 
-.badgeImprescindible { background: #FEE2E2; color: #DC2626; }
+.badgeImprescindible { background: #FEE2E2; color: var(--rojo-texto, #DC2626); }
 .badgeRecomendable   { background: color-mix(in srgb, var(--primary) 12%, transparent); color: var(--primary-texto); }
 .badgeOpcional       { background: var(--border, #eee); color: var(--text-secondary); }
 
@@ -406,7 +406,7 @@
 .checklistCompleto {
   font-size: 0.95rem;
   font-weight: 600;
-  color: #16A34A;
+  color: var(--verde-texto, #16A34A);
   margin: 1rem 0 0;
   text-align: center;
 }
@@ -768,7 +768,7 @@
   content: '•';
   position: absolute;
   left: 0;
-  color: #F59E0B;
+  color: var(--ambar-texto, #F59E0B);
   font-weight: 700;
 }
 

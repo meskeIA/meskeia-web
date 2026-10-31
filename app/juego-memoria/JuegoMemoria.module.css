@@ -98,7 +98,7 @@
   margin-top: 15px;
   padding-top: 15px;
   border-top: 1px solid var(--border);
-  color: #F59E0B;
+  color: var(--ambar-texto, #F59E0B);
   font-weight: 500;
 }
 
@@ -231,7 +231,7 @@
 }
 
 .nuevoRecord {
-  color: #F59E0B;
+  color: var(--ambar-texto, #F59E0B);
   font-weight: 600;
   font-size: 1.2rem;
   margin-bottom: 20px;

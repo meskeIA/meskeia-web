@@ -370,12 +370,12 @@
 }
 
 .iconSi {
-  color: #4CAF50;
+  color: var(--verde-texto, #4CAF50);
   font-size: 1rem;
 }
 
 .iconNo {
-  color: #F44336;
+  color: var(--rojo-texto, #F44336);
   font-size: 1rem;
 }
 
@@ -405,7 +405,7 @@
 
 .mantMedio {
   background: #FFF3E0;
-  color: #E65100;
+  color: var(--naranja-texto, #E65100);
 }
 
 .mantAlto {
@@ -651,7 +651,7 @@
 }
 
 .warningBox h3 {
-  color: #E65100;
+  color: var(--naranja-texto, #E65100);
   font-size: 0.95rem;
   margin-bottom: var(--spacing-sm);
 }

@@ -270,11 +270,11 @@
 }
 
 .positivo {
-  color: #10b981;
+  color: var(--verde-texto, #10b981);
 }
 
 .negativo {
-  color: #ef4444;
+  color: var(--rojo-texto, #ef4444);
 }
 
 .puntoEquilibrio {
@@ -701,7 +701,7 @@
   content: '•';
   position: absolute;
   left: 0;
-  color: #f59e0b;
+  color: var(--ambar-texto, #f59e0b);
   font-weight: 700;
 }
 

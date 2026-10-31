@@ -108,15 +108,15 @@
 }
 
 .victoria {
-  color: #10B981;
+  color: var(--verde-texto, #10B981);
 }
 
 .derrota {
-  color: #EF4444;
+  color: var(--rojo-texto, #EF4444);
 }
 
 .empate {
-  color: #F59E0B;
+  color: var(--ambar-texto, #F59E0B);
 }
 
 /* Tablero */
@@ -165,7 +165,7 @@
 }
 
 .o {
-  color: #EF4444;
+  color: var(--rojo-texto, #EF4444);
 }
 
 /* Reiniciar */
@@ -218,7 +218,7 @@
 
 .resetBtn:hover {
   border-color: #EF4444;
-  color: #EF4444;
+  color: var(--rojo-texto, #EF4444);
 }
 
 .statsGrid {
@@ -689,7 +689,7 @@
 .warningHeader h3 {
   font-size: 1rem;
   font-weight: 600;
-  color: #D97706;
+  color: var(--ambar-texto, #D97706);
   margin: 0;
 }
 

@@ -123,7 +123,7 @@
 }
 
 .errorCount span {
-  color: #e53e3e;
+  color: var(--rojo-texto, #e53e3e);
   font-weight: 700;
 }
 
@@ -229,7 +229,7 @@
 }
 
 .letraPerdida {
-  color: #e53e3e;
+  color: var(--rojo-texto, #e53e3e);
 }
 
 /* Teclado virtual */

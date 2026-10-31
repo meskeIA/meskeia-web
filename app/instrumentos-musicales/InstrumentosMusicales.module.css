@@ -249,12 +249,12 @@
 
 .badge[data-family="vientometal"] {
   background: rgba(255, 193, 7, 0.15);
-  color: #d4a106;
+  color: var(--ambar-texto, #d4a106);
 }
 
 .badge[data-family="percusión"] {
   background: rgba(220, 20, 60, 0.15);
-  color: #dc143c;
+  color: var(--rojo-texto, #dc143c);
 }
 
 .badge[data-family="teclado"] {
@@ -284,12 +284,12 @@
 
 .badge[data-register="medio"] {
   background: rgba(76, 175, 80, 0.15);
-  color: #4caf50;
+  color: var(--verde-texto, #4caf50);
 }
 
 .badge[data-register="agudo"] {
   background: rgba(255, 152, 0, 0.15);
-  color: #ff9800;
+  color: var(--ambar-texto, #ff9800);
 }
 
 .badge[data-register="amplio"] {

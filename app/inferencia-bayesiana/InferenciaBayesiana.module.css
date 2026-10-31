@@ -501,7 +501,7 @@
 }
 
 .warning {
-  color: var(--error);
+  color: var(--rojo-texto, var(--error));
   font-weight: 600;
 }
 
@@ -587,13 +587,13 @@
 .obsPositive {
   background: rgba(16, 185, 129, 0.1);
   border-color: var(--success);
-  color: var(--success);
+  color: var(--verde-texto, var(--success));
 }
 
 .obsNegative {
   background: rgba(239, 68, 68, 0.1);
   border-color: var(--error);
-  color: var(--error);
+  color: var(--rojo-texto, var(--error));
 }
 
 .btnSmall {
@@ -666,11 +666,11 @@
 }
 
 .arrowUp {
-  color: var(--success);
+  color: var(--verde-texto, var(--success));
 }
 
 .arrowDown {
-  color: var(--error);
+  color: var(--rojo-texto, var(--error));
 }
 
 /* Diagnostic Test */
@@ -710,25 +710,25 @@
 
 .truePositive {
   background: rgba(16, 185, 129, 0.15);
-  color: var(--success);
+  color: var(--verde-texto, var(--success));
   font-weight: 500;
 }
 
 .trueNegative {
   background: rgba(16, 185, 129, 0.15);
-  color: var(--success);
+  color: var(--verde-texto, var(--success));
   font-weight: 500;
 }
 
 .falsePositive {
   background: rgba(239, 68, 68, 0.15);
-  color: var(--error);
+  color: var(--rojo-texto, var(--error));
   font-weight: 500;
 }
 
 .falseNegative {
   background: rgba(239, 68, 68, 0.15);
-  color: var(--error);
+  color: var(--rojo-texto, var(--error));
   font-weight: 500;
 }
 

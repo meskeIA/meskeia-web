@@ -537,7 +537,7 @@
 
 .warningBox h4 {
   margin: 0 0 0.6rem;
-  color: #b8860b;
+  color: var(--ambar-texto, #b8860b);
   font-size: 1rem;
 }
 

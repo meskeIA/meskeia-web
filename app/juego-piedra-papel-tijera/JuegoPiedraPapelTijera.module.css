@@ -257,7 +257,7 @@
 
 .resetBtn:hover {
   border-color: #EF4444;
-  color: #EF4444;
+  color: var(--rojo-texto, #EF4444);
 }
 
 .statsGrid {
@@ -727,7 +727,7 @@
   content: '•';
   position: absolute;
   left: 0;
-  color: #F59E0B;
+  color: var(--ambar-texto, #F59E0B);
   font-weight: 700;
 }
 

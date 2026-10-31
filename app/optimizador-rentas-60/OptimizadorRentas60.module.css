@@ -232,7 +232,7 @@
 .desgloseItem:last-child { border-bottom: none; }
 .desgloseItem span:first-child { flex: 1; }
 
-.descuento { color: var(--success); font-weight: 600; }
+.descuento { color: var(--verde-texto, var(--success)); font-weight: 600; }
 
 .desgloseTotal {
   color: var(--text-primary) !important;

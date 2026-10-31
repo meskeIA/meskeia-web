@@ -178,7 +178,7 @@
 
 .clearButton:hover {
   background: #fee;
-  color: #e74c3c;
+  color: var(--rojo-texto, #e74c3c);
   border-color: #e74c3c;
 }
 
@@ -359,7 +359,7 @@
 
 .deleteTaskButton:hover {
   opacity: 1;
-  color: #e74c3c;
+  color: var(--rojo-texto, #e74c3c);
 }
 
 .emptyQuadrant {

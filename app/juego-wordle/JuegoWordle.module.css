@@ -684,7 +684,7 @@
   content: '✕';
   position: absolute;
   left: 0;
-  color: #f97316;
+  color: var(--naranja-texto, #f97316);
   font-size: 0.75rem;
   top: 2px;
   font-weight: 700;

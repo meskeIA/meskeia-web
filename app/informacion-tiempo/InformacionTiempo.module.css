@@ -178,7 +178,7 @@
   border: 1px solid #fca5a5;
   border-radius: 10px;
   padding: 15px 20px;
-  color: #dc2626;
+  color: var(--rojo-texto, #dc2626);
   text-align: center;
 }
 
@@ -856,7 +856,7 @@
   content: '→';
   position: absolute;
   left: 0;
-  color: #f6c844;
+  color: var(--ambar-texto, #f6c844);
   font-weight: 700;
 }
 

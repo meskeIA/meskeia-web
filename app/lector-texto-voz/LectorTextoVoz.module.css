@@ -430,7 +430,7 @@
 
 .btnStop:hover {
   border-color: #EF4444;
-  color: #EF4444;
+  color: var(--rojo-texto, #EF4444);
   transform: translateY(-2px);
 }
 

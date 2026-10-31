@@ -144,7 +144,7 @@
 
 .celda.error {
   background: #FEE2E2;
-  color: #DC2626;
+  color: var(--rojo-texto, #DC2626);
 }
 
 [data-theme='dark'] .celda.error {
@@ -865,7 +865,7 @@
   content: '✗';
   position: absolute;
   left: 0;
-  color: #F97316;
+  color: var(--naranja-texto, #F97316);
   font-weight: 700;
 }
 

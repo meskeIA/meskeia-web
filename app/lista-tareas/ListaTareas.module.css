@@ -355,7 +355,7 @@
 }
 
 .tareaFecha.fechaVencida {
-  color: #ef4444;
+  color: var(--rojo-texto, #ef4444);
   font-weight: 500;
 }
 
@@ -379,7 +379,7 @@
 
 .deleteBtn:hover {
   background: #fee2e2;
-  color: #dc2626;
+  color: var(--rojo-texto, #dc2626);
 }
 
 /* Acciones Panel */
@@ -948,7 +948,7 @@
   content: '✗';
   position: absolute;
   left: 0;
-  color: #f59e0b;
+  color: var(--ambar-texto, #f59e0b);
   font-weight: 700;
 }
 

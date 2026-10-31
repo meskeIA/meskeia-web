@@ -206,7 +206,7 @@
 /* Colores por categoría */
 .badgeNuez {
   background: #fef3e2;
-  color: #b7650a;
+  color: var(--ambar-texto, #b7650a);
 }
 
 .badgeSemilla {

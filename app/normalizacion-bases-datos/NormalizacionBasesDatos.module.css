@@ -282,7 +282,7 @@
 }
 
 .errorTitulo {
-  color: var(--error);
+  color: var(--rojo-texto, var(--error));
   font-weight: 700;
   font-size: var(--font-lg);
   margin: 0 0 var(--spacing-xs);
@@ -295,7 +295,7 @@
 }
 
 .errorLinea {
-  color: var(--error);
+  color: var(--rojo-texto, var(--error));
   font-size: var(--font-sm);
   font-weight: 600;
   margin: var(--spacing-sm) 0 0;
@@ -517,11 +517,11 @@
 }
 
 .peldano[data-estado='cumple'] .peldanoMarca {
-  color: var(--success);
+  color: var(--verde-texto, var(--success));
 }
 
 .peldano[data-estado='falla'] .peldanoMarca {
-  color: var(--error);
+  color: var(--rojo-texto, var(--error));
 }
 
 .peldano[data-estado='arrastre'] .peldanoMarca {
@@ -584,7 +584,7 @@
 .violacionDf {
   font-family: 'SF Mono', Monaco, monospace;
   font-weight: 700;
-  color: var(--error);
+  color: var(--rojo-texto, var(--error));
 }
 
 .violacionMotivo {

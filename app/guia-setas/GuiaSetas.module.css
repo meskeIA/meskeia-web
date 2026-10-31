@@ -238,7 +238,7 @@
 
 .comestible {
   background: rgba(34,197,94,0.15);
-  color: #15803d;
+  color: var(--verde-texto, #15803d);
 }
 
 .comestiblePrecaucion {
@@ -253,7 +253,7 @@
 
 .toxica {
   background: rgba(249,115,22,0.15);
-  color: #c2410c;
+  color: var(--naranja-texto, #c2410c);
 }
 
 .mortal {

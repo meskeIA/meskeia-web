@@ -148,7 +148,7 @@
 }
 
 .statValue.tiempo {
-  color: #F59E0B;
+  color: var(--ambar-texto, #F59E0B);
 }
 
 /* Problema */
@@ -286,7 +286,7 @@
 
 .btnAccion:hover {
   border-color: #F59E0B;
-  color: #F59E0B;
+  color: var(--ambar-texto, #F59E0B);
 }
 
 /* Pantalla de resultados */
@@ -335,7 +335,7 @@
 .statFinal .valor {
   font-size: 2rem;
   font-weight: 700;
-  color: #F59E0B;
+  color: var(--ambar-texto, #F59E0B);
 }
 
 .statFinal .label {
@@ -418,7 +418,7 @@
 .statItem .valor {
   font-size: 1.5rem;
   font-weight: 700;
-  color: #F59E0B;
+  color: var(--ambar-texto, #F59E0B);
 }
 
 .statItem .label {

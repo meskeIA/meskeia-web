@@ -200,7 +200,7 @@
 }
 .badgeSemillas {
   background: #fef3e2;
-  color: #b7650a;
+  color: var(--ambar-texto, #b7650a);
 }
 .badgeAlgas {
   background: #e0f4f8;
@@ -220,7 +220,7 @@
 }
 .badgeEspecias {
   background: #fff0e8;
-  color: #c0581c;
+  color: var(--naranja-texto, #c0581c);
 }
 
 .origen {

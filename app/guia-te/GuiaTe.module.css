@@ -240,7 +240,7 @@
 .sinCafeina {
   font-size: 0.72rem;
   font-weight: 600;
-  color: #16a34a;
+  color: var(--verde-texto, #16a34a);
   background: #dcfce7;
   padding: 0.18rem 0.5rem;
   border-radius: 10px;

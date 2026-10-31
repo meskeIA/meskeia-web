@@ -592,7 +592,7 @@
 .warningTitulo {
   font-size: 0.95rem;
   font-weight: 700;
-  color: #f57c00;
+  color: var(--ambar-texto, #f57c00);
   margin: 0 0 0.75rem;
   display: flex;
   align-items: center;
@@ -620,7 +620,7 @@
   content: '▶';
   position: absolute;
   left: 0;
-  color: #f57c00;
+  color: var(--ambar-texto, #f57c00);
   font-size: 0.6rem;
   top: 0.25rem;
 }

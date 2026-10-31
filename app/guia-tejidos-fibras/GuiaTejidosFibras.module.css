@@ -188,7 +188,7 @@
 }
 
 .sosAltaBtn  { border-color: rgba(76,175,80,0.3);  color: #2e7d32; }
-.sosMediaBtn { border-color: rgba(255,152,0,0.3);  color: #e65100; }
+.sosMediaBtn { border-color: rgba(255,152,0,0.3);  color: var(--naranja-texto, #e65100); }
 .sosBajaBtn  { border-color: rgba(244,67,54,0.3);  color: #c62828; }
 
 /* ── Resultados ── */
@@ -267,7 +267,7 @@
 }
 
 .sosAlta  { background: rgba(76,175,80,0.12);  color: #2e7d32; }
-.sosMedia { background: rgba(255,152,0,0.12);  color: #e65100; }
+.sosMedia { background: rgba(255,152,0,0.12);  color: var(--naranja-texto, #e65100); }
 .sosBaja  { background: rgba(244,67,54,0.12);  color: #c62828; }
 
 /* ── Badges origen ── */
@@ -281,7 +281,7 @@
 }
 
 .origenVegetal      { background: rgba(76,175,80,0.12);  color: #2e7d32; }
-.origenAnimal       { background: rgba(255,152,0,0.12);  color: #e65100; }
+.origenAnimal       { background: rgba(255,152,0,0.12);  color: var(--naranja-texto, #e65100); }
 .origenMineral      { background: rgba(158,158,158,0.15);color: #555555; }
 .origenSintetica    { background: rgba(33,150,243,0.12); color: #1565c0; }
 .origenSemisintetica{ background: rgba(156,39,176,0.12); color: #7b1fa2; }
@@ -655,7 +655,7 @@
 .warningHeader h3 {
   font-size: 1.05rem;
   font-weight: 700;
-  color: #d97706;
+  color: var(--ambar-texto, #d97706);
   margin: 0;
 }
 
@@ -676,7 +676,7 @@
   padding-left: 0.75rem;
 }
 
-.warningList li strong { color: #d97706; }
+.warningList li strong { color: var(--ambar-texto, #d97706); }
 
 /* =========================================================
    DARK MODE

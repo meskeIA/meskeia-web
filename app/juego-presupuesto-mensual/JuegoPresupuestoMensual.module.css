@@ -12,8 +12,8 @@
 .heroIcon { font-size: 3rem; display: block; margin-bottom: 1rem; }
 .title { font-size: 2rem; font-weight: 700; margin: 0 0 0.5rem; }
 .subtitle { font-size: 1.1rem; opacity: 0.9; margin: 0; }
-.positivo { color: var(--success); }
-.negativo { color: var(--danger); }
+.positivo { color: var(--verde-texto, var(--success)); }
+.negativo { color: var(--rojo-texto, var(--danger)); }
 
 .seccionTitulo { font-size: 1.3rem; font-weight: 700; color: var(--text-primary); margin: 0 0 var(--spacing-md); text-align: center; }
 
@@ -46,8 +46,8 @@
 .opcionBtn { display: flex; justify-content: space-between; align-items: center; padding: 0.85rem 1rem; border: 1.5px solid var(--border); border-radius: var(--radius); background: var(--bg-card); cursor: pointer; transition: all 0.15s; text-align: left; }
 .opcionBtn:hover { border-color: var(--primary); background: rgba(46, 134, 171, 0.04); }
 .opcionTexto { font-size: 0.92rem; color: var(--text-primary); flex: 1; }
-.opcionCoste { font-size: 0.88rem; font-weight: 700; color: var(--danger); margin-left: 0.75rem; white-space: nowrap; }
-.gratis { color: var(--success); }
+.opcionCoste { font-size: 0.88rem; font-weight: 700; color: var(--rojo-texto, var(--danger)); margin-left: 0.75rem; white-space: nowrap; }
+.gratis { color: var(--verde-texto, var(--success)); }
 
 /* ─── Resultado ──────────────────────────── */
 .resultadoSection { max-width: 800px; margin: 0 auto var(--spacing-xl); }

@@ -380,7 +380,7 @@
 
 .aptoSi {
   font-size: 0.78rem;
-  color: #16a34a;
+  color: var(--verde-texto, #16a34a);
   font-weight: 600;
 }
 
@@ -629,7 +629,7 @@
 }
 
 .tdSi {
-  color: #16a34a;
+  color: var(--verde-texto, #16a34a);
   font-weight: 600;
 }
 
