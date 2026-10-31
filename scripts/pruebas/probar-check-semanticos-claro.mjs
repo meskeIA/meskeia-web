@@ -33,6 +33,7 @@
  *  13. `var(--rojo-texto)` SIN reserva: en oscuro el token no existe y el color cae a lo heredado.
  *  14. `semanticos-ok:` a secas, sin razón.
  *  15. Un `rgba()` de fondo, que se compone sobre blanco y no se toma por oscuro.
+ *  17. Un tinte `color-mix(in srgb, #2e7d32 12%, var(--bg-card))`, que se compone con su base.
  *
  * Y la manera de dar verde sin mirar, que debe PLANTARLO:
  *
@@ -77,6 +78,13 @@ const CASOS = [
   { n: 13, nombre: 'token de texto SIN reserva', falla: true, css: '.error { color: var(--rojo-texto); }\n' },
   { n: 14, nombre: 'escape sin razón', falla: true, css: '.marca { color: #ef4444; } /* semanticos-ok: */\n' },
   { n: 15, nombre: 'fondo rgba() claro, compuesto sobre blanco', falla: true, css: '.badge { background: rgba(16, 185, 129, 0.1); color: #10b981; }\n' },
+  // La primera versión no sabía leer color-mix() y lo dejaba sin juzgar: 32 reglas en 17 hojas
+  // (insignias de Coquinum), entre ellas este verde que contra blanco pasa (5,13:1) y contra su
+  // tinte real se queda en 4,36:1
+  {
+    n: 17, nombre: 'tinte color-mix() de las insignias de Coquinum', falla: true,
+    css: '.badgeBien { color: #2e7d32; background: color-mix(in srgb, #2e7d32 12%, var(--bg-card)); }\n',
+  },
 ];
 
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'semanticos-claro-'));

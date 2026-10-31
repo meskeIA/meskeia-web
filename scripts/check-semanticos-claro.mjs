@@ -13,7 +13,8 @@
  * semántica —rojo, naranja, ámbar o verde, por su tono— escrito como literal, como token propio
  * del módulo (`--danger: #ef4444` y luego `var(--danger)`) o como token global sin variante de
  * texto (`var(--error)` es #F44336: 3,68:1 sobre blanco). Lo mide contra el fondo que sabe:
- * el de la misma regla si lo declara (un `rgba()` compuesto sobre blanco) y, si no, contra el
+ * el de la misma regla si lo declara (un `rgba()` compuesto sobre blanco, un `color-mix()`
+ * compuesto con su base) y, si no, contra el
  * BLANCO, que es la cota alta (sobre #FAFAFA o un tinte el contraste real es menor). Umbral
  * 4,5:1, o 3:1 si la misma regla declara texto grande (≥ 24 px, o ≥ 18,66 px en negrita) o es
  * un `::before`/`::after`/`::marker` (iconos y viñetas: no-texto, WCAG 1.4.11).
