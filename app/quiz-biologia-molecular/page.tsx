@@ -9,7 +9,7 @@ import LegalNotice from '@/components/LegalNotice';
 import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
-import { formatNumber, margenBarraLogo, enfocarSinCentrar } from '@/lib';
+import { formatNumber, enfocarSinCentrar, traerALaVista } from '@/lib';
 import styles from './QuizBiologiaMolecular.module.css';
 import {
   componerPartida,
@@ -65,17 +65,6 @@ const COLORES_CATEGORIA: Record<Categoria, string> = {
   'traduccion': '#C47D2A',
   'mutaciones': '#C0392B',
 };
-
-/**
- * Lleva `bloque` al principio de la pantalla (bajo la barra fija del logo) solo si `clave`
- * no se ve entero: tapado por el logo fijo, por encima del borde o por debajo del final.
- */
-function traerALaVista(bloque: HTMLElement | null, clave: HTMLElement | null) {
-  if (!bloque || !clave) return;
-  const r = clave.getBoundingClientRect();
-  if (r.top >= margenBarraLogo() && r.bottom <= window.innerHeight) return;
-  bloque.scrollIntoView({ block: 'start', behavior: 'auto' });
-}
 
 // ============================================================================
 // DATOS: 30 PREGUNTAS

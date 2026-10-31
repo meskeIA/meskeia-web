@@ -18,7 +18,7 @@ import {
   FISCAL_AYUDAS_VEHICULO_META,
   MOVES_III_HISTORICO,
 } from '@/data/fiscal';
-import { formatDate, formatNumber, formatPercentage, parseISODateLocal, margenBarraLogo } from '@/lib';
+import { formatDate, formatNumber, formatPercentage, parseISODateLocal, traerALaVista } from '@/lib';
 import {
   CANDIDATOS,
   NOMBRE,
@@ -142,14 +142,6 @@ const ETIQUETAS: Record<TipoVehiculo, string> = {
   moto_electrica: 'Moto eléctrica',
   esperar: 'Esperar',
 };
-
-/** Lleva `bloque` arriba de la pantalla solo si `clave` no se ve entera bajo el logo fijo. */
-function traerALaVista(bloque: HTMLElement | null, clave: HTMLElement | null) {
-  if (!bloque || !clave) return;
-  const r = clave.getBoundingClientRect();
-  if (r.top >= margenBarraLogo() && r.bottom <= window.innerHeight) return;
-  bloque.scrollIntoView({ block: 'start', behavior: 'auto' });
-}
 
 const mayuscula = (s: string): string => s.charAt(0).toUpperCase() + s.slice(1);
 

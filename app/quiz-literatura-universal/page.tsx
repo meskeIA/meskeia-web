@@ -13,7 +13,7 @@ import {
 } from '@/components';
 import styles from './QuizLiteraturaUniversal.module.css';
 import { POOL, preguntasDeNivel, type Nivel, type Categoria, type Pregunta } from './preguntas';
-import { margenBarraLogo, enfocarSinCentrar } from '@/lib';
+import { enfocarSinCentrar, traerALaVista } from '@/lib';
 
 // ── Tipos ──────────────────────────────────────────────────────────────────
 
@@ -81,17 +81,6 @@ function seleccionarPreguntas(nivel: Nivel | 'todos'): PreguntaEnJuego[] {
   return mezclar(preguntasDeNivel(nivel))
     .slice(0, PREGUNTAS_POR_PARTIDA)
     .map(barajarOpciones);
-}
-
-/**
- * Lleva `bloque` al principio de la pantalla (bajo la barra fija del logo) solo si `clave`
- * no se ve entero: tapado por el logo fijo, por encima del borde o por debajo del final.
- */
-function traerALaVista(bloque: HTMLElement | null, clave: HTMLElement | null) {
-  if (!bloque || !clave) return;
-  const r = clave.getBoundingClientRect();
-  if (r.top >= margenBarraLogo() && r.bottom <= window.innerHeight) return;
-  bloque.scrollIntoView({ block: 'start', behavior: 'auto' });
 }
 
 function evaluacion(aciertos: number, total: number): { label: string; emoji: string; color: string } {

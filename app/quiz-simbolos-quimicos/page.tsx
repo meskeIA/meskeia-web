@@ -4,7 +4,7 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import styles from './QuizSimbolosQuimicos.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, ShareCard, LegalNotice, RelatedApps } from '@/components';
-import { formatPercentage, margenBarraLogo, enfocarSinCentrar } from '@/lib';
+import { formatPercentage, enfocarSinCentrar, traerALaVista } from '@/lib';
 import { useGuardaRafaga } from '@/lib/useGuardaRafaga';
 import { ELEMENTOS, TOTAL_ELEMENTOS, type Elemento } from '@/data/elementos-quimicos';
 
@@ -77,18 +77,6 @@ function calcularMedalla(aciertos: number, total: number): { emoji: string; text
   if (aciertos * 10 >= total * 7) return { emoji: '🥈', texto: '¡Muy bien!' };
   if (aciertos * 10 >= total * 5) return { emoji: '🥉', texto: 'Vas por buen camino' };
   return { emoji: '📚', texto: 'Sigue practicando' };
-}
-
-/**
- * Lleva `bloque` al principio de la pantalla (bajo la barra fija del logo) solo si `clave`
- * no se ve entera: tapada por el logo fijo, por encima del borde o por debajo del final.
- * Mismo patrón que quiz-literatura-universal y quiz-biologia-molecular.
- */
-function traerALaVista(bloque: HTMLElement | null, clave: HTMLElement | null) {
-  if (!bloque || !clave) return;
-  const r = clave.getBoundingClientRect();
-  if (r.top >= margenBarraLogo() && r.bottom <= window.innerHeight) return;
-  bloque.scrollIntoView({ block: 'start', behavior: 'auto' });
 }
 
 export default function QuizSimbolosQuimicosPage() {

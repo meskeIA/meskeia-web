@@ -4,24 +4,12 @@ import React, { useEffect, useRef, useState, type MouseEvent } from 'react';
 import styles from './SelectorEjercicio.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard, DisclaimerCard, RegionBadge } from '@/components';
 import { calcularResultado, PREGUNTAS, EJERCICIOS, CON_ARTICULO, type Resultado } from './motor';
-import { margenBarraLogo } from '@/lib';
+import { traerALaVista } from '@/lib';
 import { useGuardaRafaga } from '@/lib/useGuardaRafaga';
 
 // Las preguntas con sus pesos, las fichas de cada actividad y la lógica viven en ./motor.ts.
 
 type Pantalla = 'inicio' | 'test' | 'resultado';
-
-/**
- * Lleva `bloque` al principio de la pantalla (bajo la barra fija del logo) solo si `clave`
- * no se ve entera: tapada por la barra del logo, por encima del borde o por debajo del final.
- * Mismo criterio que quiz-literatura-universal (hallazgo 2507).
- */
-function traerALaVista(bloque: HTMLElement | null, clave: HTMLElement | null) {
-  if (!bloque || !clave) return;
-  const r = clave.getBoundingClientRect();
-  if (r.top >= margenBarraLogo() && r.bottom <= window.innerHeight) return;
-  bloque.scrollIntoView({ block: 'start', behavior: 'auto' });
-}
 
 /** Lista legible: «A, B y C». */
 function enumerar(items: string[]): string {

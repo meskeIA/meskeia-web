@@ -11,7 +11,7 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { formatPercentage, margenBarraLogo, enfocarSinCentrar } from '@/lib';
+import { formatPercentage, enfocarSinCentrar, traerTramoALaVista } from '@/lib';
 import { useGuardaRafaga } from '@/lib/useGuardaRafaga';
 import {
   PREGUNTAS_GEO_FACIL,
@@ -45,19 +45,6 @@ const BANCO_POR_NIVEL: Record<DificultadGeografia, PreguntaGeografia[]> = {
   medio: PREGUNTAS_GEO_MEDIO,
   dificil: PREGUNTAS_GEO_DIFICIL,
 };
-
-/**
- * Lleva `bloque` al principio de la pantalla (bajo la barra fija del logo) solo si su
- * cabecera queda tapada por la barra del logo o por encima del borde, o si `clave` no cabe
- * por abajo. Patrón de quiz-literatura-universal (hallazgo 1716), como en la gemela.
- */
-function traerALaVista(bloque: HTMLElement | null, clave: HTMLElement | null) {
-  if (!bloque || !clave) return;
-  const arriba = bloque.getBoundingClientRect().top;
-  const abajo = clave.getBoundingClientRect().bottom;
-  if (arriba >= margenBarraLogo() && abajo <= window.innerHeight) return;
-  bloque.scrollIntoView({ block: 'start', behavior: 'auto' });
-}
 
 function mezclar<T>(arr: T[]): T[] {
   const copia = [...arr];
@@ -124,12 +111,12 @@ export default function QuizGeografiaEspanaPage() {
   useEffect(() => {
     if (fase === 'jugando') {
       huboPartida.current = true;
-      traerALaVista(quizPanelRef.current, enunciadoRef.current);
+      traerTramoALaVista(quizPanelRef.current, enunciadoRef.current);
       enunciadoRef.current?.focus({ preventScroll: true });
     } else if (fase === 'respondida') {
       enfocarSinCentrar(botonSiguienteRef.current); // sin centrarlo, pero a la vista (3770)
     } else if (fase === 'fin') {
-      traerALaVista(finPanelRef.current, finTituloRef.current);
+      traerTramoALaVista(finPanelRef.current, finTituloRef.current);
       finTituloRef.current?.focus({ preventScroll: true });
     } else if (fase === 'inicio' && huboPartida.current) {
       botonComenzarRef.current?.focus();

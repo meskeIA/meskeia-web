@@ -9,7 +9,7 @@ import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { countries, Country } from '@/data/countries';
 import EducationalSection from '@/components/EducationalSection';
-import { formatPercentage, margenBarraLogo, enfocarSinCentrar } from '@/lib';
+import { formatPercentage, enfocarSinCentrar, traerALaVista } from '@/lib';
 import { useGuardaRafaga } from '@/lib/useGuardaRafaga';
 
 type ModoJuego = 'capital' | 'pais' | 'bandera';
@@ -124,21 +124,6 @@ function generarPreguntas(modo: ModoJuego, dificultad: Dificultad): PreguntaQuiz
     const opciones = generarOpciones(respuestaCorrecta, poolRespuestas, excluidosDe(pais, modo));
     return { pais, opciones, respuestaCorrecta };
   });
-}
-
-/**
- * Lleva `bloque` al principio de la pantalla (bajo la barra fija del logo) solo si alguna de
- * las `claves` no se ve entera: tapada por el logo fijo, por encima del borde o por debajo del
- * final. Mismo patrón que quiz-historia-espana y quiz-verbos-irregulares.
- */
-function traerALaVista(bloque: HTMLElement | null, claves: (HTMLElement | null)[]) {
-  if (!bloque) return;
-  const tapada = claves.some(clave => {
-    if (!clave) return false;
-    const r = clave.getBoundingClientRect();
-    return r.top < margenBarraLogo() || r.bottom > window.innerHeight;
-  });
-  if (tapada) bloque.scrollIntoView({ block: 'start', behavior: 'auto' });
 }
 
 /** «5 s» · «1 min 5 s»: «m» es el símbolo del metro, el del minuto es «min» (hallazgo 2270). */

@@ -7,7 +7,7 @@ import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard } from '@/components';
 import EducationalSection from '@/components/EducationalSection';
-import { formatPercentage, margenBarraLogo, enfocarSinCentrar } from '@/lib';
+import { formatPercentage, enfocarSinCentrar, traerALaVista } from '@/lib';
 import { useGuardaRafaga } from '@/lib/useGuardaRafaga';
 import { verbosIrregulares, VerboIrregular } from '@/data/verbos-irregulares';
 import {
@@ -138,18 +138,6 @@ function preguntasDe(seleccionados: VerboIrregular[], pool: VerboIrregular[]): P
     const opciones = generarOpciones(correcta, verbo.infinitive, poolRespuestas);
     return { verbo, opciones, respuestaCorrecta: correcta };
   });
-}
-
-/**
- * Lleva `bloque` al principio de la pantalla (bajo la barra fija del logo) solo si `clave`
- * no se ve entera: tapada por el logo fijo, por encima del borde o por debajo del final.
- * Mismo patrón que quiz-literatura-universal y quiz-simbolos-quimicos.
- */
-function traerALaVista(bloque: HTMLElement | null, clave: HTMLElement | null) {
-  if (!bloque || !clave) return;
-  const r = clave.getBoundingClientRect();
-  if (r.top >= margenBarraLogo() && r.bottom <= window.innerHeight) return;
-  bloque.scrollIntoView({ block: 'start', behavior: 'auto' });
 }
 
 function calcularPuntuacion(correctas: number, total: number): number {

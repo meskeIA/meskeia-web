@@ -34,6 +34,44 @@ export function enfocarALaVista(destino: HTMLElement | null): void {
 }
 
 /**
+ * Lleva `bloque` al principio de la pantalla (bajo la barra fija: el `scrollIntoView` deja el
+ * hueco solo) solo si alguna de las `claves` no se ve entera: tapada por la barra, por encima del
+ * borde o por debajo del final. Una clave `null` no cuenta; sin bloque, no hace nada.
+ *
+ * A diferencia de `enfocarALaVista`, sube un elemento y mira OTRO —el panel de la pregunta según
+ * se vea o no su enunciado— y no mueve el foco. Nació en quiz-literatura-universal (hallazgo 1716)
+ * y diez apps llevaban su copia hasta la campaña C0546 (31/10/2026); quiz-paises-capitales mira
+ * dos claves a la vez (el marcador y la pregunta).
+ */
+export function traerALaVista(
+  bloque: HTMLElement | null,
+  claves: HTMLElement | null | (HTMLElement | null)[],
+): void {
+  if (!bloque) return;
+  const lista = Array.isArray(claves) ? claves : [claves];
+  const tapada = lista.some((clave) => {
+    if (!clave) return false;
+    const r = clave.getBoundingClientRect();
+    return r.top < margenBarraLogo() || r.bottom > window.innerHeight;
+  });
+  if (tapada) bloque.scrollIntoView({ block: 'start', behavior: 'auto' });
+}
+
+/**
+ * Como `traerALaVista`, pero lo que tiene que verse es el TRAMO que va del borde de arriba de
+ * `bloque` al de abajo de `hasta`: sube el bloque si su cabecera queda bajo la barra o por encima
+ * del borde, o si `hasta` no cabe por abajo. Es la variante de quiz-geografia-espana y
+ * quiz-historia-espana, cuya cabecera del panel (el progreso) va por encima del enunciado.
+ */
+export function traerTramoALaVista(bloque: HTMLElement | null, hasta: HTMLElement | null): void {
+  if (!bloque || !hasta) return;
+  const arriba = bloque.getBoundingClientRect().top;
+  const abajo = hasta.getBoundingClientRect().bottom;
+  if (arriba >= margenBarraLogo() && abajo <= window.innerHeight) return;
+  bloque.scrollIntoView({ block: 'start', behavior: 'auto' });
+}
+
+/**
  * Lleva el foco a un botón que aparece DEBAJO de lo que hay que leer («Siguiente» tras contestar)
  * sin centrarlo: si no se ve entero, la página se mueve lo justo para que asome por abajo
  * (`block: 'nearest'`) y lo de encima —el veredicto, la explicación— sigue a la vista.

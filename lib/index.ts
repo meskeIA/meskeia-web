@@ -47,4 +47,4 @@ export {
 export { withFrom } from './trackingFrom';
 export { registrarEventoInteraccion } from './trackingEvento';
 export { URL_PRIVACIDAD, URL_TERMINOS } from './urls-legales';
-export { margenBarraLogo, enfocarALaVista, enfocarSinCentrar } from './cromoFijo';
+export { margenBarraLogo, enfocarALaVista, enfocarSinCentrar, traerALaVista, traerTramoALaVista } from './cromoFijo';

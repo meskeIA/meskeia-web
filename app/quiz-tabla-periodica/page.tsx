@@ -10,7 +10,7 @@ import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
 import styles from './QuizTablaPeriodica.module.css';
-import { margenBarraLogo, enfocarSinCentrar } from '@/lib';
+import { enfocarSinCentrar, traerALaVista } from '@/lib';
 import { useGuardaRafaga } from '@/lib/useGuardaRafaga';
 
 
@@ -40,18 +40,6 @@ function mezclarArray<T>(arr: T[]): T[] {
     [copia[i], copia[j]] = [copia[j], copia[i]];
   }
   return copia;
-}
-
-/**
- * Lleva `bloque` al principio de la pantalla (bajo la barra fija del logo) solo si `clave`
- * no se ve entero: tapado por el logo fijo, por encima del borde o por debajo del final.
- * Salto instantáneo, sin animación: es el sitio donde ya estaba el usuario hace un momento.
- */
-function traerALaVista(bloque: HTMLElement | null, clave: HTMLElement | null) {
-  if (!bloque || !clave) return;
-  const r = clave.getBoundingClientRect();
-  if (r.top >= margenBarraLogo() && r.bottom <= window.innerHeight) return;
-  bloque.scrollIntoView({ block: 'start', behavior: 'auto' });
 }
 
 export default function QuizTablaPeriodicaPage() {
