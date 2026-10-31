@@ -1538,16 +1538,16 @@ test('CUARTA · CASO LÍMITE: f/1,4 en modo compensado, con cascada en Deportes 
 });
 
 /**
- * HALLAZGO NUEVO (medio, accesibilidad) · el veredicto del medidor no llega a 4,5:1 en claro.
- * «Exposición correcta» va en #16a34a y «Ligeramente sobre/subexpuesto» en #ca8a04 sobre el
- * blanco del panel: 3,30:1 y 2,94:1. Es texto de 13,6 px en negrita (no llega a «grande», que en
- * negrita empieza en 18,66 px), así que exige 4,5:1. «Sobreexpuesto (zonas quemadas)» (#dc2626)
- * da 4,83:1 y en oscuro los tres pasan (7,90 · 9,55 · 4,98).
+ * HALLAZGO 3835 (medio, accesibilidad; REPARADO 31/10/2026 en la campaña C0296) · el veredicto
+ * del medidor no llegaba a 4,5:1 en claro. «Exposición correcta» iba en #16a34a y «Ligeramente
+ * sobre/subexpuesto» en #ca8a04 sobre el blanco del panel: 3,30:1 y 2,94:1. Es texto de 13,6 px
+ * en negrita (no llega a «grande», que en negrita empieza en 18,66 px), así que exige 4,5:1.
+ * «Sobreexpuesto (zonas quemadas)» (#dc2626) da 4,83:1 y en oscuro los tres pasan (7,90 · 9,55 ·
+ * 4,98). Ahora var(--verde-texto, …) y var(--ambar-texto, …): en oscuro, el color de antes.
  */
-test('HALLAZGO · el rótulo del medidor llega a 4,5:1 en el tema claro en sus tres estados', async ({
+test('HALLAZGO 3835 · el rótulo del medidor llega a 4,5:1 en el tema claro en sus tres estados', async ({
   page,
 }) => {
-  test.fail(); // ABIERTO: «Exposición correcta» 3,30:1 y «Ligeramente…» 2,94:1 en claro
   await prepararParaMedir(page);
   await activarTema(page, 'light');
   const rotuloMedidor = page.locator('[role="status"] p').first();

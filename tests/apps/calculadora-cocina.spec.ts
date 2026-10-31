@@ -910,12 +910,12 @@ test.describe('Re-inspección 30/10/2026 — bloque educativo y FAQPage', () => 
 });
 
 test.describe('Re-inspección 30/10/2026 — contraste de los colores escritos a mano en el módulo', () => {
-  test('HALLAZGO (30/10/2026, ABIERTO) · claro: la temperatura de la tabla de tiempos (#e67e22) da 2,85:1', async ({
+  test('HALLAZGO 3860 (30/10/2026, REPARADO 31/10 en C0296) · claro: la temperatura de la tabla de tiempos llega a 4,5:1', async ({
     page,
   }) => {
-    // .temperatura { color: #e67e22 } sobre la tarjeta blanca: 2,85:1. Es texto de 13,6 px
-    // seminegrita (pequeño), así que pide 4,5:1. En oscuro, sobre #2D2D2D, da 4,83:1.
-    test.fail();
+    // .temperatura { color: #e67e22 } sobre la tarjeta blanca daba 2,85:1. Es texto de 13,6 px
+    // seminegrita (pequeño), así que pide 4,5:1. En oscuro, sobre #2D2D2D, da 4,83:1. La campaña
+    // C0296 lo pasó a var(--naranja-texto, #e67e22): en claro #B93E0B, en oscuro el de antes.
     await page.goto(RUTA);
     await prepararParaMedir(page);
     await activarTema(page, 'light');
