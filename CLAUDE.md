@@ -600,6 +600,19 @@ testigos `tests/familias/selectores.spec.ts` y `quizzes.spec.ts`.
 > después (3768, C0514). Crónica: cabecera de `scripts/check-guarda-rafaga.mjs` · pruebas:
 > `npm run guarda-rafaga:probar-candado`.
 
+### Candado de los ayudantes del cromo fijo copiados
+
+`npm run check:cromo-fijo` — en el build, y **rompe el build** si un `.tsx` de `app/` o
+`components/` declara una función o constante con el nombre de un ayudante de `lib/cromoFijo.ts`
+(`traerALaVista`, `traerTramoALaVista`, `enfocarALaVista`, `enfocarSinCentrar`…): es una copia, y
+se importan de `@/lib`. Lee los nombres de los `export function` del fichero: uno nuevo queda
+cubierto solo. Barre el árbol entero, **sin pasivo** · Escape: `cromo-ok: <razón>`, razón obligatoria.
+⚠️ No ve una copia renombrada: medir la barra con `margenBarraLogo()` para decidir otra cosa es
+legítimo (simulador-teorema-central-limite).
+> Salió del cabo C0546: diez copias de `traerALaVista` en quizzes y selectores, traídas de la app
+> hermana. Crónica: cabecera de `scripts/check-cromo-fijo-copiado.mjs` · pruebas:
+> `npm run cromo-fijo:probar-candado`.
+
 ### Candado del ternario que tumba la página traducida
 
 `npm run check:ternario-traducido` — en el build, y **rompe el build** si un ternario hijo de JSX
