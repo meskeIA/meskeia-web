@@ -309,7 +309,7 @@
 
 .btnEliminar:hover:not(:disabled) {
   background: #fee2e2;
-  color: #dc2626;
+  color: var(--rojo-texto, #dc2626);
 }
 
 /* ─── Botón añadir actividad ───────────────────────────────────────────────── */

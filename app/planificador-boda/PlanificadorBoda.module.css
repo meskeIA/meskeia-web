@@ -634,7 +634,7 @@
   border: 1px solid var(--danger);
   border-radius: var(--radius);
   background: transparent;
-  color: var(--danger);
+  color: var(--rojo-texto, var(--danger));
   cursor: pointer;
   transition: all 0.2s ease;
 }
@@ -1159,7 +1159,7 @@
 
 .warningHeader h3 {
   margin: 0;
-  color: var(--danger);
+  color: var(--rojo-texto, var(--danger));
   font-size: 1.15rem;
   font-weight: 700;
 }
@@ -1194,7 +1194,7 @@
 
 .warningList li strong {
   display: block;
-  color: var(--danger);
+  color: var(--rojo-texto, var(--danger));
   margin-bottom: var(--spacing-xs);
   font-weight: 600;
 }

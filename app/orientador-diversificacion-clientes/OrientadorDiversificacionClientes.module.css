@@ -214,7 +214,7 @@
   border: 1px solid var(--border);
   border-radius: 50%;
   background: var(--bg-primary);
-  color: var(--danger);
+  color: var(--rojo-texto, var(--danger));
   font-size: 1.2rem;
   cursor: pointer;
   transition: all 0.2s;
@@ -278,13 +278,13 @@
 }
 
 .sumaOk {
-  color: var(--success);
+  color: var(--verde-texto, var(--success));
   border-color: var(--success);
   background: rgba(40, 167, 69, 0.08);
 }
 
 .sumaError {
-  color: var(--danger);
+  color: var(--rojo-texto, var(--danger));
   border-color: var(--danger);
   background: rgba(220, 53, 69, 0.08);
 }

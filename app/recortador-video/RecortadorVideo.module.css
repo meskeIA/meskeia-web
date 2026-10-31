@@ -314,7 +314,7 @@
 .notaProgreso { font-size: 0.85rem; color: var(--text-secondary); margin: 0.5rem 0 0; }
 
 .resultado { margin-top: var(--spacing-lg); }
-.resultadoOk { color: var(--success); font-weight: 500; margin: 0 0 var(--spacing-md); }
+.resultadoOk { color: var(--verde-texto, var(--success)); font-weight: 500; margin: 0 0 var(--spacing-md); }
 .videoResultado {
   display: block;
   width: 100%;

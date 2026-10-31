@@ -172,7 +172,7 @@
 }
 
 [data-theme='dark'] .warningBox { background: #3e2723; border-color: #5d4037; }
-.warningBox h3 { color: #e65100; margin-bottom: 0.75rem; font-size: 1rem; }
+.warningBox h3 { color: var(--naranja-texto, #e65100); margin-bottom: 0.75rem; font-size: 1rem; }
 [data-theme='dark'] .warningBox h3 { color: #ffab40; }
 .warningBox ul { margin: 0; padding-left: 1.5rem; }
 .warningBox li { color: var(--text-primary); font-size: 0.9rem; margin-bottom: 0.4rem; line-height: 1.5; }

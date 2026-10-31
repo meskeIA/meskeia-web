@@ -192,8 +192,8 @@
   white-space: nowrap;
 }
 
-.colorVerde .resultadoPorcentaje   { color: #28a745; }
-.colorNaranja .resultadoPorcentaje { color: #fd7e14; }
+.colorVerde .resultadoPorcentaje   { color: var(--verde-texto, #28a745); }
+.colorNaranja .resultadoPorcentaje { color: var(--naranja-texto, #fd7e14); }
 .colorRojo .resultadoPorcentaje    { color: #dc3545; }
 .colorGris .resultadoPorcentaje    { color: #6c757d; }
 

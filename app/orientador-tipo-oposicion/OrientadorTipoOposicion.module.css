@@ -56,7 +56,7 @@
 
 .avisoCard { display: flex; gap: 0.75rem; align-items: flex-start; padding: 1rem; border-radius: var(--radius); background: rgba(230, 126, 34, 0.06); border: 1px solid rgba(230, 126, 34, 0.15); margin-top: var(--spacing-lg); }
 .avisoCard p { margin: 0; font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5; }
-.avisoCard strong { color: #E67E22; }
+.avisoCard strong { color: var(--naranja-texto, #E67E22); }
 
 /* ===== PROFESIONALIZACIÓN v2.0 ===== */
 .guideSection h2 { font-size: 1.2rem; font-weight: 700; color: var(--primary-texto); margin: 1.5rem 0 0.75rem; }

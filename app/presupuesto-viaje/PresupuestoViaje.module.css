@@ -182,7 +182,7 @@
   border-radius: 50%;
   border: none;
   background: rgba(220, 53, 69, 0.1);
-  color: #dc3545;
+  color: var(--rojo-texto, #dc3545);
   font-size: 0.9rem;
   cursor: pointer;
   display: flex;
@@ -268,7 +268,7 @@
 }
 
 .btnEliminarGasto:hover {
-  color: #dc3545;
+  color: var(--rojo-texto, #dc3545);
   background: rgba(220, 53, 69, 0.1);
 }
 
@@ -574,7 +574,7 @@
   color: var(--text-muted);
 }
 
-.textoVerde { color: #16a34a; font-weight: 600; }
+.textoVerde { color: var(--verde-texto, #16a34a); font-weight: 600; }
 .textoRojo  { color: #dc2626; font-weight: 600; }
 
 [data-theme='dark'] .textoVerde { color: #4ade80; }
@@ -916,7 +916,7 @@
   content: '→';
   position: absolute;
   left: 0;
-  color: #d4a008;
+  color: var(--ambar-texto, #d4a008);
   font-weight: 700;
 }
 

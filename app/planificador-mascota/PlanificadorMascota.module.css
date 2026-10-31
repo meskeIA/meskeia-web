@@ -609,7 +609,7 @@
 }
 
 .recomendado {
-  color: #fd7e14;
+  color: var(--naranja-texto, #fd7e14);
 }
 
 .opcional {

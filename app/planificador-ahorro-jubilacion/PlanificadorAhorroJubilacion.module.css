@@ -138,8 +138,8 @@
 .resultLabel { color: var(--text-secondary); font-size: 0.9rem; }
 .resultValue { font-weight: 700; color: var(--primary-texto); font-size: 1.1rem; }
 .resultValueBig { font-weight: 700; color: var(--primary-texto); font-size: 1.4rem; }
-.resultValueDanger { font-weight: 700; color: var(--danger); font-size: 1.1rem; }
-.resultValuePositive { font-weight: 700; color: var(--success); font-size: 1.1rem; }
+.resultValueDanger { font-weight: 700; color: var(--rojo-texto, var(--danger)); font-size: 1.1rem; }
+.resultValuePositive { font-weight: 700; color: var(--verde-texto, var(--success)); font-size: 1.1rem; }
 .resultNote { font-size: 0.85rem; color: var(--text-secondary); }
 
 /* Barra visual brecha */
@@ -256,7 +256,7 @@
 .escenarioLabel { font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 0.25rem; }
 .escenarioRent { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.5rem; }
 .escenarioCapital { font-weight: 700; color: var(--primary-texto); font-size: 1.1rem; display: block; }
-.escenarioPension { font-size: 0.85rem; color: var(--success); margin-top: 0.25rem; }
+.escenarioPension { font-size: 0.85rem; color: var(--verde-texto, var(--success)); margin-top: 0.25rem; }
 
 /* Tabla proyección */
 .tabla {

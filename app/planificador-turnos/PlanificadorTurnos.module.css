@@ -696,7 +696,7 @@
 
 .dropdownItemRemove {
   border-top: 1px solid var(--border);
-  color: var(--danger);
+  color: var(--rojo-texto, var(--danger));
   justify-content: center;
 }
 
@@ -788,7 +788,7 @@
 }
 
 .horasExcedidas {
-  color: var(--danger);
+  color: var(--rojo-texto, var(--danger));
   font-weight: 600;
 }
 

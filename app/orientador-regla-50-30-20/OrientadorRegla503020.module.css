@@ -130,7 +130,7 @@
 }
 
 .positive {
-  color: #28a745;
+  color: var(--verde-texto, #28a745);
 }
 
 .negative {

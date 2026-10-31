@@ -236,12 +236,12 @@
 
 .dificultadFacil {
   background: rgba(39, 174, 96, 0.12);
-  color: #27ae60;
+  color: var(--verde-texto, #27ae60);
 }
 
 .dificultadAvanzada {
   background: rgba(231, 76, 60, 0.12);
-  color: #e74c3c;
+  color: var(--rojo-texto, #e74c3c);
 }
 
 [data-theme='dark'] .dificultadFacil {

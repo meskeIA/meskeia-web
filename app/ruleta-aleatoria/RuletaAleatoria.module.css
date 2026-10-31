@@ -962,7 +962,7 @@
   content: '•';
   position: absolute;
   left: 0;
-  color: #f9a825;
+  color: var(--ambar-texto, #f9a825);
   font-weight: 700;
 }
 

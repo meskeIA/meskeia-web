@@ -250,7 +250,7 @@
 
 .btnEliminarRutina:hover {
   border-color: #EF4444;
-  color: #EF4444;
+  color: var(--rojo-texto, #EF4444);
 }
 
 .btnEliminarRutina:focus-visible {
@@ -448,7 +448,7 @@
 }
 
 .tareaCheck {
-  color: #16A34A;
+  color: var(--verde-texto, #16A34A);
   font-weight: 900;
   font-size: 1rem;
 }
@@ -473,7 +473,7 @@
 
 .btnSalir:hover {
   border-color: #EF4444;
-  color: #EF4444;
+  color: var(--rojo-texto, #EF4444);
 }
 
 .btnSalir:focus-visible {
@@ -736,7 +736,7 @@
 
 .btnEliminarTarea:hover {
   border-color: #EF4444;
-  color: #EF4444;
+  color: var(--rojo-texto, #EF4444);
 }
 
 /* Formulario nueva tarea */

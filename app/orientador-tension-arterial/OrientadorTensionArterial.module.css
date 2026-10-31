@@ -634,7 +634,7 @@
 
 .btnEliminar:hover {
   background: #fee2e2;
-  color: #DC2626;
+  color: var(--rojo-texto, #DC2626);
 }
 
 .btnEliminar:focus-visible {

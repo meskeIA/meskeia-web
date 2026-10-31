@@ -196,7 +196,7 @@
 }
 
 .btnRemove:hover {
-  color: var(--danger);
+  color: var(--rojo-texto, var(--danger));
 }
 
 .btnRemove:focus-visible {
@@ -370,7 +370,7 @@
 }
 
 .uncovered {
-  color: var(--danger);
+  color: var(--rojo-texto, var(--danger));
 }
 
 .alertBox {
@@ -393,7 +393,7 @@
   border: 2px solid var(--danger);
   border-radius: var(--radius);
   background: transparent;
-  color: var(--danger);
+  color: var(--rojo-texto, var(--danger));
   cursor: pointer;
   transition: all 0.2s ease;
 }

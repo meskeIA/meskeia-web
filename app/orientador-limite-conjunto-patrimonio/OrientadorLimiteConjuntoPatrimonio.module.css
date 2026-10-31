@@ -321,7 +321,7 @@
 }
 
 .cifraValue.positivo {
-  color: var(--color-success);
+  color: var(--verde-texto, var(--color-success));
 }
 
 /* Llamada a la acción del asesor */

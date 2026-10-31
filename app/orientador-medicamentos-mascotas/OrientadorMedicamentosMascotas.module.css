@@ -326,7 +326,7 @@
 
 .productoBadge.mixto {
   background: rgba(255, 152, 0, 0.1);
-  color: #ff9800;
+  color: var(--ambar-texto, #ff9800);
 }
 
 .productoDescripcion {
@@ -426,7 +426,7 @@
 }
 
 .factoresBox h3 {
-  color: #e65100;
+  color: var(--naranja-texto, #e65100);
   margin-bottom: 15px;
 }
 
@@ -524,7 +524,7 @@
 
 .urgenciaBadge.alta {
   background: rgba(220, 53, 69, 0.1);
-  color: #dc3545;
+  color: var(--rojo-texto, #dc3545);
 }
 
 .urgenciaBadge.media {
@@ -534,7 +534,7 @@
 
 .urgenciaBadge.baja {
   background: rgba(40, 167, 69, 0.1);
-  color: #28a745;
+  color: var(--verde-texto, #28a745);
 }
 
 .sintomaCausas {

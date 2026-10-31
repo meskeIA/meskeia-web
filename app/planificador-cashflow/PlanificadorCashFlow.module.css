@@ -331,11 +331,11 @@
 .graficoFlujo {
   font-size: 0.7rem;
   font-weight: 600;
-  color: var(--success);
+  color: var(--verde-texto, var(--success));
 }
 
 .flujoNegativo {
-  color: var(--danger) !important;
+  color: var(--rojo-texto, var(--danger)) !important;
 }
 
 .leyenda {
@@ -410,7 +410,7 @@
 .saldoNegativo {
   background: #FEE2E2;
   border-color: var(--danger);
-  color: var(--danger);
+  color: var(--rojo-texto, var(--danger));
 }
 
 [data-theme='dark'] .saldoNegativo {
@@ -480,11 +480,11 @@
 }
 
 .valorPositivo {
-  color: var(--success);
+  color: var(--verde-texto, var(--success));
 }
 
 .valorNegativo {
-  color: var(--danger);
+  color: var(--rojo-texto, var(--danger));
 }
 
 /* Escenarios */
@@ -519,7 +519,7 @@
 }
 
 .alertaLiquidez h4 {
-  color: var(--danger);
+  color: var(--rojo-texto, var(--danger));
   margin-bottom: var(--spacing-sm);
 }
 

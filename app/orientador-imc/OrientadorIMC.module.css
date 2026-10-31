@@ -1253,7 +1253,7 @@
   font-size: 1.25rem;
   font-weight: 700;
   margin: 0 0 var(--spacing-lg);
-  color: #f57c00;
+  color: var(--ambar-texto, #f57c00);
   text-align: center;
 }
 

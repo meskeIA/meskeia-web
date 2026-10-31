@@ -134,7 +134,7 @@
 }
 
 .foralAviso {
-  color: var(--warn);
+  color: var(--naranja-texto, var(--warn));
   font-weight: 600;
 }
 
@@ -277,7 +277,7 @@
 .veredictoForal {
   font-size: 0.86rem;
   line-height: 1.55;
-  color: var(--warn);
+  color: var(--naranja-texto, var(--warn));
   background: rgba(232, 119, 34, 0.08);
   border-radius: var(--radius);
   padding: 0.6rem 0.9rem;
@@ -682,7 +682,7 @@
   content: '•';
   position: absolute;
   left: 0;
-  color: #f59e0b;
+  color: var(--ambar-texto, #f59e0b);
   font-weight: 700;
 }
 

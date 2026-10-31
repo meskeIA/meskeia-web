@@ -115,7 +115,7 @@
 .completado {
   font-size: 0.95rem;
   font-weight: 700;
-  color: #16A34A;
+  color: var(--verde-texto, #16A34A);
   margin: 0;
 }
 
@@ -187,7 +187,7 @@
 
 .horaCheck {
   font-size: 1rem;
-  color: #16A34A;
+  color: var(--verde-texto, #16A34A);
 }
 
 .medsBloqueGrid {

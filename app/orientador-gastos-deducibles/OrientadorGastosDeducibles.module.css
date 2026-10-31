@@ -408,7 +408,7 @@
 }
 
 .valorPositivo {
-  color: var(--success);
+  color: var(--verde-texto, var(--success));
 }
 
 .valorDestacado {
@@ -464,7 +464,7 @@
 
 .tdDestacado {
   font-weight: 600;
-  color: var(--success);
+  color: var(--verde-texto, var(--success));
 }
 
 .tabla tfoot .tdDestacado {

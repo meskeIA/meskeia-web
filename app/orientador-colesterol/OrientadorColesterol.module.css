@@ -217,7 +217,7 @@
 .evaluationItem.bajo,
 .evaluationItem.normal {
   background: rgba(39, 174, 96, 0.1);
-  color: var(--success);
+  color: var(--verde-texto, var(--success));
 }
 
 .evaluationItem.cercano_optimo,
@@ -225,13 +225,13 @@
 .evaluationItem.moderado,
 .evaluationItem.limite_alto {
   background: rgba(243, 156, 18, 0.1);
-  color: var(--warning);
+  color: var(--ambar-texto, var(--warning));
 }
 
 .evaluationItem.alto,
 .evaluationItem.muy_alto {
   background: rgba(231, 76, 60, 0.1);
-  color: var(--danger);
+  color: var(--rojo-texto, var(--danger));
 }
 
 /* Recommendations */

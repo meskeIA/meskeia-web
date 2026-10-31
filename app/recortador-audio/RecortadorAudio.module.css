@@ -415,7 +415,7 @@
 
 .result h3 {
   margin: 0 0 var(--spacing-md);
-  color: var(--success);
+  color: var(--verde-texto, var(--success));
 }
 
 .resultInfo {

@@ -129,7 +129,7 @@
 .resultIcon { font-size: 2rem; margin-bottom: 0.5rem; }
 .resultTitulo { font-size: 1.2rem; font-weight: 700; margin-bottom: 0.4rem; }
 .resultMotivo { font-size: 0.88rem; opacity: 0.9; margin: 0; line-height: 1.5; }
-.resultHeroNegativo .resultTitulo { color: var(--danger); }
+.resultHeroNegativo .resultTitulo { color: var(--rojo-texto, var(--danger)); }
 .resultHeroNegativo .resultMotivo { color: var(--text-secondary); }
 
 /* ─── Cards info ───────────────────────────────────────── */
@@ -143,7 +143,7 @@
 .margenCard p { margin: 0; color: var(--text-secondary); }
 
 .alternativasCard { background: rgba(230, 126, 34, 0.06); border: 1px solid rgba(230, 126, 34, 0.15); }
-.alternativasCard strong { display: block; color: #E67E22; margin-bottom: 0.2rem; }
+.alternativasCard strong { display: block; color: var(--naranja-texto, #E67E22); margin-bottom: 0.2rem; }
 .alternativasCard p { margin: 0; color: var(--text-secondary); line-height: 1.5; }
 
 /* ─── Umbrales ─────────────────────────────────────────── */
@@ -182,7 +182,7 @@
   display: flex; gap: 0.5rem; align-items: flex-start;
   font-size: 0.85rem; color: var(--text-secondary); line-height: 1.4;
 }
-.prestacionesList li span { color: var(--success); font-weight: bold; }
+.prestacionesList li span { color: var(--verde-texto, var(--success)); font-weight: bold; }
 
 /* ===== PROFESIONALIZACIÓN v2.0 ===== */
 
@@ -219,12 +219,12 @@
 .warningBox { background: #fff8e1; border: 1px solid #f9a825; border-radius: 10px; padding: 1.5rem; margin: 2rem 0; }
 [data-theme='dark'] .warningBox { background: rgba(249,168,37,0.1); border-color: #f9a825; }
 .warningHeader { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; }
-.warningHeader strong { font-size: 1rem; color: #e65100; }
+.warningHeader strong { font-size: 1rem; color: var(--naranja-texto, #e65100); }
 [data-theme='dark'] .warningHeader strong { color: #ffb74d; }
 .warningIcon { font-size: 1.4rem; }
 .warningList { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.6rem; }
 .warningList li { font-size: 0.88rem; color: var(--text-secondary); padding-left: 1.25rem; position: relative; line-height: 1.5; }
-.warningList li::before { content: '\2022'; position: absolute; left: 0; color: #f9a825; font-weight: bold; }
+.warningList li::before { content: '\2022'; position: absolute; left: 0; color: var(--ambar-texto, #f9a825); font-weight: bold; }
 
 @media (max-width: 768px) {
   .umbralGrid { grid-template-columns: 1fr; }

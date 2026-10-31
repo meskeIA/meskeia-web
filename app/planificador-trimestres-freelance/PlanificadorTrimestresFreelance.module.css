@@ -289,7 +289,7 @@
   right: 0;
   top: -18px;
   font-size: 0.65rem;
-  color: var(--color-red);
+  color: var(--rojo-texto, var(--color-red));
   font-weight: 600;
   white-space: nowrap;
 }
@@ -453,11 +453,11 @@
 }
 
 .statPositive {
-  color: var(--color-green);
+  color: var(--verde-texto, var(--color-green));
 }
 
 .statNegative {
-  color: var(--color-red);
+  color: var(--rojo-texto, var(--color-red));
 }
 
 .cardFiscal {
