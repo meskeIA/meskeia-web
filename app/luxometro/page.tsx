@@ -597,8 +597,8 @@ export default function LuxometroPage() {
                 <span className={styles.refCardIcon}>{ref.icon}</span>
                 <span className={styles.refCardLabel}>{ref.label}</span>
                 <span className={styles.refCardRange}>
-                  {ref.min === 0 ? '<' : ''}{formatNumber(ref.min === 0 ? ref.max : ref.min, 0)}
-                  {ref.min > 0 && ` - ${formatNumber(ref.max, 0)}`} lux
+                  <span>{ref.min === 0 ? '<' : ''}</span>{formatNumber(ref.min === 0 ? ref.max : ref.min, 0)}
+                  <span>{ref.min > 0 && ` - ${formatNumber(ref.max, 0)}`}</span> lux
                 </span>
               </div>
             ))}

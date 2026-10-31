@@ -253,7 +253,7 @@ export default function GeneradorIncipitPage() {
             <span aria-hidden="true">🎲</span> Generar
           </button>
           <span className={styles.contadorInfo}>
-            {totalFiltrados} íncipit{totalFiltrados !== 1 ? 's' : ''} en esta combinación
+            {totalFiltrados} íncipit<span>{totalFiltrados !== 1 ? 's' : ''}</span> en esta combinación
           </span>
         </div>
       </section>

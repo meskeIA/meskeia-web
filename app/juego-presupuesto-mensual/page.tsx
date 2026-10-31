@@ -248,10 +248,10 @@ export default function JuegoPresupuestoMensualPage() {
             <div className={styles.resultadoHero} data-nota={nota}>
               <div className={styles.notaBadge}>{nota}</div>
               <h2>
-                {nota === 'A' && '¡Excelente gestión!'}
-                {nota === 'B' && 'Buena gestión'}
-                {nota === 'C' && 'Has llegado justo'}
-                {nota === 'D' && 'Te has pasado del presupuesto'}
+                <span>{nota === 'A' && '¡Excelente gestión!'}</span>
+                <span>{nota === 'B' && 'Buena gestión'}</span>
+                <span>{nota === 'C' && 'Has llegado justo'}</span>
+                <span>{nota === 'D' && 'Te has pasado del presupuesto'}</span>
               </h2>
               <p className={styles.resultadoSaldo}>
                 Saldo final: <strong className={saldoFinal >= 0 ? styles.positivo : styles.negativo}>{formatCurrency(saldoFinal)}</strong>

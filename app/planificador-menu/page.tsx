@@ -237,9 +237,9 @@ export default function PlanificadorMenuPage() {
             {(['desayuno', 'almuerzo', 'cena'] as MealType[]).map(mealType => (
               <tr key={mealType}>
                 <td className={styles.mealLabel}>
-                  {mealType === 'desayuno' && <><span aria-hidden="true">🌅</span> Desayuno</>}
-                  {mealType === 'almuerzo' && <><span aria-hidden="true">☀️</span> Almuerzo</>}
-                  {mealType === 'cena' && <><span aria-hidden="true">🌙</span> Cena</>}
+                  <span>{mealType === 'desayuno' && <span><span aria-hidden="true">🌅</span> Desayuno</span>}</span>
+                  <span>{mealType === 'almuerzo' && <span><span aria-hidden="true">☀️</span> Almuerzo</span>}</span>
+                  <span>{mealType === 'cena' && <span><span aria-hidden="true">🌙</span> Cena</span>}</span>
                 </td>
                 {DAYS.map(day => (
                   <td key={`${day.id}-${mealType}`} className={styles.mealCell}>

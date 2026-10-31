@@ -547,7 +547,7 @@ export default function GoldenHourPage() {
               {proximo && ahora !== null && (
                 <p className={styles.nextEvent}>
                   Próximo: <strong>{NOMBRE_EVENTO[proximo.clave]}</strong> a las {formatHora(proximo.instante, zona)}
-                  {diasEntre(fechaEnZona(ahora, zona), fechaEnZona(proximo.instante, zona)) > 0 ? ' de mañana' : ''}
+                  <span>{diasEntre(fechaEnZona(ahora, zona), fechaEnZona(proximo.instante, zona)) > 0 ? ' de mañana' : ''}</span>
                 </p>
               )}
             </div>

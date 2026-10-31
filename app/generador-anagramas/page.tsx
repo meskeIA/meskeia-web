@@ -277,7 +277,7 @@ function InsigniaPuntos({ resultado }: { resultado: ResultadoPalabra }) {
       <span className={styles.soloLectores}>
         {' '}
         {resultado.puntos === 1 ? 'punto' : 'puntos'}
-        {digrafos && `, solo con la ficha ${digrafos}`}
+        <span>{digrafos && `, solo con la ficha ${digrafos}`}</span>
       </span>
       {/* Lo que hace falta para jugarla, a la vista: una palabra con RR no vale con dos R */}
       {digrafos && (
@@ -1047,8 +1047,8 @@ export default function GeneradorAnagramasPage() {
                 </strong>
               </>
             )}
-            {atril.comodinesIgnorados > 0 &&
-              ` — se ignoran ${atril.comodinesIgnorados} comodín(es) por encima del máximo de ${MAX_COMODINES}`}
+            <span>{atril.comodinesIgnorados > 0 &&
+              ` — se ignoran ${atril.comodinesIgnorados} comodín(es) por encima del máximo de ${MAX_COMODINES}`}</span>
             {/*
               * La cifra se CUENTA del lemario cargado, no se estima. Antes decía «medio
               * diccionario» y son 95 palabras sobre 86.973 —el 0,1 %— (hallazgo 460); y con
@@ -1187,11 +1187,11 @@ export default function GeneradorAnagramasPage() {
                   La más valiosa:{' '}
                   <strong>{textoPuntos(mejorPuntuacion.conDigrafo)}</strong> con la ficha{' '}
                   {mejorPuntuacion.digrafos.join(' y ')}
-                  {mejorPuntuacion.sueltas > 0 && (
-                    <>
+                  <span>{mejorPuntuacion.sueltas > 0 && (
+                    <span>
                       {' '}· con letras sueltas, <strong>{textoPuntos(mejorPuntuacion.sueltas)}</strong>
-                    </>
-                  )}
+                    </span>
+                  )}</span>
                 </span>
               ) : (
                 mejorPuntuacion.sueltas > 0 && (

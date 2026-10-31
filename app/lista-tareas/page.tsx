@@ -354,7 +354,7 @@ export default function ListaTareasPage() {
                         {tarea.fechaLimite && (
                           <span className={`${styles.tareaFecha} ${vencida ? styles.fechaVencida : ''}`}>
                             <span aria-hidden="true">📅</span> {formatearFecha(tarea.fechaLimite)}
-                            {vencida && ' (vencida)'}
+                            <span>{vencida && ' (vencida)'}</span>
                           </span>
                         )}
                       </div>

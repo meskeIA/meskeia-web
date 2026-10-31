@@ -350,14 +350,14 @@ export default function CalculadoraTIRVANPage() {
                   {resultado.van >= 0
                     ? `El proyecto genera un valor añadido de ${formatCurrency(resultado.van)} por encima de la rentabilidad mínima exigida (${tasaDescuento}%). `
                     : `El proyecto destruye valor: ${formatCurrency(Math.abs(resultado.van))} por debajo de la rentabilidad mínima exigida. `}
-                  {resultado.tirEncontrada && (
-                    <>
+                  <span>{resultado.tirEncontrada && (
+                    <span>
                       La rentabilidad real del proyecto (TIR) es del {formatNumber(resultado.tir!, 2)}%,
                       {resultado.tir! > parseSpanishNumber(tasaDescuento)
                         ? ` superior a la tasa de descuento del ${tasaDescuento}%.`
                         : ` inferior a la tasa de descuento del ${tasaDescuento}%.`}
-                    </>
-                  )}
+                    </span>
+                  )}</span>
                 </p>
                 <div className={`${styles.recomendacion} ${esProyectoRentable ? styles.positiva : styles.negativa}`}>
                   {esProyectoRentable

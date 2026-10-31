@@ -207,7 +207,7 @@ export default function HuesosCuerpoHumanoPage() {
               <span className={styles.artLabel}>Articulaciones:</span>
               <span className={styles.artValue}>
                 {hueso.articulaciones.slice(0, 3).join(', ')}
-                {hueso.articulaciones.length > 3 && ` +${hueso.articulaciones.length - 3}`}
+                <span>{hueso.articulaciones.length > 3 && ` +${hueso.articulaciones.length - 3}`}</span>
               </span>
             </div>
 

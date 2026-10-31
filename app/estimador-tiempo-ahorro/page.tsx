@@ -194,10 +194,10 @@ export default function EstimadorTiempoAhorroPage() {
                 <div className={styles.motivacionCard}>
                   <span aria-hidden="true">💪</span>
                   <p>
-                    {resultado.meses <= 3 && '¡Casi lo tienes! Solo un poco más de constancia y lo conseguirás.'}
-                    {resultado.meses > 3 && resultado.meses <= 6 && 'Buen objetivo a medio plazo. La constancia es la clave: no te desanimes.'}
-                    {resultado.meses > 6 && resultado.meses <= 12 && 'Es un objetivo ambicioso pero alcanzable. Márcate hitos intermedios para mantener la motivación.'}
-                    {resultado.meses > 12 && 'Es un objetivo de largo recorrido. Si te encaja con tu ritmo actual, mantenerlo es perfectamente válido; si quieres acelerarlo y tu situación te lo permite, puedes ajustar el ahorro mensual.'}
+                    <span>{resultado.meses <= 3 && '¡Casi lo tienes! Solo un poco más de constancia y lo conseguirás.'}</span>
+                    <span>{resultado.meses > 3 && resultado.meses <= 6 && 'Buen objetivo a medio plazo. La constancia es la clave: no te desanimes.'}</span>
+                    <span>{resultado.meses > 6 && resultado.meses <= 12 && 'Es un objetivo ambicioso pero alcanzable. Márcate hitos intermedios para mantener la motivación.'}</span>
+                    <span>{resultado.meses > 12 && 'Es un objetivo de largo recorrido. Si te encaja con tu ritmo actual, mantenerlo es perfectamente válido; si quieres acelerarlo y tu situación te lo permite, puedes ajustar el ahorro mensual.'}</span>
                   </p>
                 </div>
               </div>

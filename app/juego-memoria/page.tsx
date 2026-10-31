@@ -232,9 +232,9 @@ export default function JuegoMemoriaPage() {
                 className={`${styles.dificultadBtn} ${dificultad === d ? styles.active : ''}`}
                 aria-pressed={dificultad === d}
               >
-                {d === 'facil' && <><span aria-hidden="true">😊</span> Fácil (6)</>}
-                {d === 'medio' && <><span aria-hidden="true">🤔</span> Medio (8)</>}
-                {d === 'dificil' && <><span aria-hidden="true">🧠</span> Difícil (12)</>}
+                <span>{d === 'facil' && <span><span aria-hidden="true">😊</span> Fácil (6)</span>}</span>
+                <span>{d === 'medio' && <span><span aria-hidden="true">🤔</span> Medio (8)</span>}</span>
+                <span>{d === 'dificil' && <span><span aria-hidden="true">🧠</span> Difícil (12)</span>}</span>
               </button>
             ))}
           </div>

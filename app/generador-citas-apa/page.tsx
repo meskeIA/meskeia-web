@@ -1980,8 +1980,8 @@ export default function GeneradorCitasApaPage() {
 
           {otrasNormas > 0 && (
             <p className={styles.listaNota}>
-              <span aria-hidden="true">ℹ️</span> Tienes {otrasNormas} referencia{otrasNormas === 1 ? '' : 's'}{' '}
-              guardada{otrasNormas === 1 ? '' : 's'} en otras normas. Cambia de norma arriba para verlas.
+              <span aria-hidden="true">ℹ️</span> Tienes {otrasNormas} referencia<span>{otrasNormas === 1 ? '' : 's'}</span>{' '}
+              guardada<span>{otrasNormas === 1 ? '' : 's'}</span> en otras normas. Cambia de norma arriba para verlas.
             </p>
           )}
         </section>

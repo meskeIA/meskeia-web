@@ -377,7 +377,7 @@ function GraficaRespuesta({ series, etiquetaEjeY, descripcion }: { series: Serie
             className={db === 0 ? styles.ejeCero : styles.rejilla}
           />
           <text x={VIS.izq - 8} y={posY(db, tope) + 4} className={styles.etiquetaEje} textAnchor="end">
-            {db > 0 ? '+' : ''}{formatNumber(db, 0)}
+            <tspan>{db > 0 ? '+' : ''}</tspan>{formatNumber(db, 0)}
           </text>
         </g>
       ))}
@@ -1625,16 +1625,16 @@ export default function GeneradorTonosPage() {
               aria-pressed={tipoOnda === tipo}
             >
               <span className={styles.ondaIcono} aria-hidden="true">
-                {tipo === 'sine' && '〰️'}
-                {tipo === 'triangle' && '📐'}
-                {tipo === 'square' && '⬜'}
-                {tipo === 'sawtooth' && '📈'}
+                <span>{tipo === 'sine' && '〰️'}</span>
+                <span>{tipo === 'triangle' && '📐'}</span>
+                <span>{tipo === 'square' && '⬜'}</span>
+                <span>{tipo === 'sawtooth' && '📈'}</span>
               </span>
               <span className={styles.ondaNombre}>
-                {tipo === 'sine' && 'Senoidal'}
-                {tipo === 'triangle' && 'Triangular'}
-                {tipo === 'square' && 'Cuadrada'}
-                {tipo === 'sawtooth' && 'Sierra'}
+                <span>{tipo === 'sine' && 'Senoidal'}</span>
+                <span>{tipo === 'triangle' && 'Triangular'}</span>
+                <span>{tipo === 'square' && 'Cuadrada'}</span>
+                <span>{tipo === 'sawtooth' && 'Sierra'}</span>
               </span>
             </button>
           ))}

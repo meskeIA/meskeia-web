@@ -359,7 +359,7 @@ export default function EstimadorPlusvalidasIRPFPage() {
               <span className={styles.infoPanelCuota}>0,00 €</span>
               <p>
                 El traspaso de participaciones entre fondos de inversión <strong>no tributa en el año</strong>. La ganancia
-                latente {resultado.gananciaPatrimonial > 0 && (<>de <strong>{formatCurrency(resultado.gananciaPatrimonial)}</strong> </>)}
+                latente <span>{resultado.gananciaPatrimonial > 0 && (<span>de <strong>{formatCurrency(resultado.gananciaPatrimonial)}</strong> </span>)}</span>
                 queda diferida: el nuevo fondo hereda el valor de adquisición original y solo tributarás cuando hagas el
                 reembolso definitivo a efectivo.
               </p>

@@ -578,7 +578,7 @@ export default function CalculadoraROIMarketingPage() {
                     <td>{formatNumber(canal.clientes, 0)}</td>
                     <td>{formatCurrency(canal.ingresosTotales)}</td>
                     <td className={canal.beneficio >= 0 ? styles.valorPositivo : styles.valorNegativo}>
-                      {canal.beneficio >= 0 ? '+' : ''}{formatCurrency(canal.beneficio)}
+                      <span>{canal.beneficio >= 0 ? '+' : ''}</span>{formatCurrency(canal.beneficio)}
                     </td>
                     <td className={canal.roi > 100 ? styles.valorExcelente : canal.roi > 0 ? styles.valorBueno : styles.valorMalo}>
                       {formatNumber(canal.roi, 1)}%
@@ -603,7 +603,7 @@ export default function CalculadoraROIMarketingPage() {
                   <td><strong>{formatNumber(calculos.clientesTotal, 0)}</strong></td>
                   <td><strong>{formatCurrency(calculos.ingresosTotal)}</strong></td>
                   <td className={calculos.beneficioTotal >= 0 ? styles.valorPositivo : styles.valorNegativo}>
-                    <strong>{calculos.beneficioTotal >= 0 ? '+' : ''}{formatCurrency(calculos.beneficioTotal)}</strong>
+                    <strong><span>{calculos.beneficioTotal >= 0 ? '+' : ''}</span>{formatCurrency(calculos.beneficioTotal)}</strong>
                   </td>
                   <td className={calculos.roiTotal > 100 ? styles.valorExcelente : calculos.roiTotal > 0 ? styles.valorBueno : styles.valorMalo}>
                     <strong>{formatNumber(calculos.roiTotal, 1)}%</strong>
@@ -633,7 +633,7 @@ export default function CalculadoraROIMarketingPage() {
                   {formatNumber(canal.roi, 0)}% ROI
                 </span>
                 <span className={styles.rankingBeneficio}>
-                  {canal.beneficio >= 0 ? '+' : ''}{formatCurrency(canal.beneficio)}
+                  <span>{canal.beneficio >= 0 ? '+' : ''}</span>{formatCurrency(canal.beneficio)}
                 </span>
               </div>
             ))}

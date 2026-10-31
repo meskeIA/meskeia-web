@@ -332,30 +332,30 @@ export default function OrientadorImpuestoPatrimonioPage() {
                 {veredicto === 'no-obligado' ? '✅' : '📋'}
               </span>
               <h2 className={styles.veredictoTitulo}>
-                {veredicto === 'obligado-2m' && 'Estás obligado a declarar'}
-                {veredicto === 'obligado-base' && 'Probablemente debas declarar'}
-                {veredicto === 'no-obligado' && 'En principio, no estás obligado a declarar'}
+                <span>{veredicto === 'obligado-2m' && 'Estás obligado a declarar'}</span>
+                <span>{veredicto === 'obligado-base' && 'Probablemente debas declarar'}</span>
+                <span>{veredicto === 'no-obligado' && 'En principio, no estás obligado a declarar'}</span>
               </h2>
             </div>
 
             <p className={styles.veredictoMensaje}>
-              {veredicto === 'obligado-2m' && (
-                <>Tus bienes y derechos brutos suman <strong>{formatCurrency(patrimonioBruto)}</strong>, por encima de los{' '}
+              <span>{veredicto === 'obligado-2m' && (
+                <span>Tus bienes y derechos brutos suman <strong>{formatCurrency(patrimonioBruto)}</strong>, por encima de los{' '}
                 {formatNumber(UMBRAL_OBLIGACION_DECLARAR, 0)} €. Estás obligado a declarar <strong>aunque no pagues cuota</strong>,
-                con independencia de tu comunidad.</>
-              )}
-              {veredicto === 'obligado-base' && (
-                <>Tu base imponible (<strong>{formatCurrency(baseImponible)}</strong>) supera el mínimo exento de {ccaa?.nombre}{' '}
+                con independencia de tu comunidad.</span>
+              )}</span>
+              <span>{veredicto === 'obligado-base' && (
+                <span>Tu base imponible (<strong>{formatCurrency(baseImponible)}</strong>) supera el mínimo exento de {ccaa?.nombre}{' '}
                 (<strong>{formatCurrency(minimoExento)}</strong>). En principio debes declarar.
-                {ccaa?.bonificacion === 'total' && ' Tu comunidad bonifica la cuota cerca del 100 %, así que probablemente no pagues, pero verifica si debes presentar la declaración igualmente.'}
-                {ccaa?.bonificacion === 'parcial' && ' Tu comunidad aplica una bonificación parcial sobre la cuota.'}
-                </>
-              )}
-              {veredicto === 'no-obligado' && (
-                <>Tu base imponible (<strong>{formatCurrency(baseImponible)}</strong>) no supera el mínimo exento de {ccaa?.nombre}{' '}
+                <span>{ccaa?.bonificacion === 'total' && ' Tu comunidad bonifica la cuota cerca del 100 %, así que probablemente no pagues, pero verifica si debes presentar la declaración igualmente.'}</span>
+                <span>{ccaa?.bonificacion === 'parcial' && ' Tu comunidad aplica una bonificación parcial sobre la cuota.'}</span>
+                </span>
+              )}</span>
+              <span>{veredicto === 'no-obligado' && (
+                <span>Tu base imponible (<strong>{formatCurrency(baseImponible)}</strong>) no supera el mínimo exento de {ccaa?.nombre}{' '}
                 (<strong>{formatCurrency(minimoExento)}</strong>) y tus bienes brutos no llegan a {formatNumber(UMBRAL_OBLIGACION_DECLARAR, 0)} €.
-                En principio no tienes obligación de declarar.</>
-              )}
+                En principio no tienes obligación de declarar.</span>
+              )}</span>
             </p>
 
             {ccaa?.foral && (
@@ -413,21 +413,21 @@ export default function OrientadorImpuestoPatrimonioPage() {
                 </div>
                 <p className={styles.cuotaAviso}>
                   <span aria-hidden="true">⚠️</span>{' '}
-                  {resultadoCuota.bonificacionVariableItsgf
+                  <span>{resultadoCuota.bonificacionVariableItsgf
                     ? `La bonificación de ${ccaa?.nombre ?? ''} es variable — interactúa con el Impuesto Temporal de Solidaridad de las Grandes Fortunas (ITSGF). La cuota real puede diferir de esta orientación. `
                     : resultadoCuota.porcentajeBonificacion === 100
                     ? `${ccaa?.nombre ?? ''} aplica bonificación del 100% — la cuota es orientativa (sin ITSGF). `
                     : ''
-                  }
-                  {resultadoCuota.porcentajeBonificacion < 100 && (
-                    <>
+                  }</span>
+                  <span>{resultadoCuota.porcentajeBonificacion < 100 && (
+                    <span>
                       Revisa el{' '}
                       <Link href="/orientador-limite-conjunto-patrimonio/" className={styles.enlaceInline}>
                         límite conjunto IRPF-Patrimonio
                       </Link>
                       {', que puede reducir adicionalmente la cuota. '}
-                    </>
-                  )}
+                    </span>
+                  )}</span>
                   Cifra orientativa — consulta con un asesor fiscal para el cálculo exacto.
                 </p>
               </div>

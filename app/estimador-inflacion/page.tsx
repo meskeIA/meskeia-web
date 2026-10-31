@@ -394,7 +394,7 @@ export default function CalculadoraInflacionPage() {
                 <div className={`${styles.statCard} ${resultado.inflacionAcumulada >= 0 ? styles.negative : styles.positive}`}>
                   <div className={styles.statIcon}>{resultado.inflacionAcumulada >= 0 ? '📉' : '📈'}</div>
                   <div className={styles.statValue}>
-                    {resultado.inflacionAcumulada >= 0 ? '+' : ''}{formatNumber(resultado.inflacionAcumulada, 2)}%
+                    <span>{resultado.inflacionAcumulada >= 0 ? '+' : ''}</span>{formatNumber(resultado.inflacionAcumulada, 2)}%
                   </div>
                   <div className={styles.statLabel}>Inflación acumulada</div>
                 </div>
@@ -416,7 +416,7 @@ export default function CalculadoraInflacionPage() {
                 <div className={`${styles.statCard} ${resultado.diferencia >= 0 ? styles.negative : styles.positive}`}>
                   <div className={styles.statIcon}>💸</div>
                   <div className={styles.statValue}>
-                    {resultado.diferencia >= 0 ? '+' : ''}{formatCurrency(resultado.diferencia)}
+                    <span>{resultado.diferencia >= 0 ? '+' : ''}</span>{formatCurrency(resultado.diferencia)}
                   </div>
                   <div className={styles.statLabel}>
                     {resultado.diferencia >= 0 ? 'Necesitas más' : 'Ahorras'}

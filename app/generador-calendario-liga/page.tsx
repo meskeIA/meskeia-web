@@ -294,9 +294,9 @@ export default function GeneradorCalendarioLigaPage() {
 
                 <p className={styles.resumen}>
                   Sorteo n.º <strong>{calendario.semilla}</strong>
-                  {calendario.participantes.length % 2 !== 0 && (
-                    <> · número impar: en cada jornada descansa uno</>
-                  )}
+                  <span>{calendario.participantes.length % 2 !== 0 && (
+                    <span> · número impar: en cada jornada descansa uno</span>
+                  )}</span>
                 </p>
 
                 <div className={styles.acciones}>

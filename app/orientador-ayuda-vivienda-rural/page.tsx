@@ -254,9 +254,9 @@ export default function OrientadorAyudaViviendaRural() {
               <p>
                 Según los criterios del Plan Estatal 2026-2030, podrías optar a una ayuda orientativa de{' '}
                 <strong>{formatCurrency(precio > 0 ? ayudaOrientativa : AYUDA_MAX)}</strong>
-                {precio > 0 && bajaTope && ` (el 20% de ${formatCurrency(precio)})`}
-                {precio > 0 && !bajaTope && ` (tope máximo)`}
-                {precio === 0 && ` (hasta el 20% del precio, con tope de 15.000 €)`}.
+                <span>{precio > 0 && bajaTope && ` (el 20% de ${formatCurrency(precio)})`}</span>
+                <span>{precio > 0 && !bajaTope && ` (tope máximo)`}</span>
+                <span>{precio === 0 && ` (hasta el 20% del precio, con tope de 15.000 €)`}</span>.
                 {' '}Recuerda: esta ayuda no es tramitable hasta que tu Comunidad Autónoma abra su convocatoria (previsto 2.º semestre 2026).
               </p>
             </div>

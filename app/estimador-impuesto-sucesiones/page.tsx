@@ -1235,8 +1235,8 @@ export default function EstimadorImpuestoSucesionesPage() {
                   {VALORACION_USUFRUCTO_IS.edadReferencia} − edad, con un mínimo del{' '}
                   {pct(VALORACION_USUFRUCTO_IS.porcMinimo)}
                   {/* Solo con una edad posible: con «-5» enseñaba el 70 % (hallazgo 2332). */}
-                  {Number.isFinite(leerEdad(edadUsufructuario) ?? Number.NaN) &&
-                    ` → ${formatPercentage(porcentajeUsufructoVitalicio(leerEdad(edadUsufructuario) ?? 0), 0)}`}
+                  <span>{Number.isFinite(leerEdad(edadUsufructuario) ?? Number.NaN) &&
+                    ` → ${formatPercentage(porcentajeUsufructoVitalicio(leerEdad(edadUsufructuario) ?? 0), 0)}`}</span>
                 </span>
               </div>
             )}
@@ -1365,7 +1365,7 @@ export default function EstimadorImpuestoSucesionesPage() {
                 <div className={styles.linea}>
                   <span>
                     + Ajuar doméstico ({pct(PORC_AJUAR_DOMESTICO_IS * 100)}
-                    {resultado.segurosFueraDelAjuar ? ' del caudal relicto, sin los seguros de vida' : ''})
+                    <span>{resultado.segurosFueraDelAjuar ? ' del caudal relicto, sin los seguros de vida' : ''}</span>)
                   </span>
                   <span>{formatCurrency(resultado.ajuarDomestico)}</span>
                 </div>
@@ -1383,7 +1383,7 @@ export default function EstimadorImpuestoSucesionesPage() {
                     <span>Porcentaje de herencia</span>
                     <span>
                       {pct(resultado.porcentajeHerenciaAplicado * 100, 2)}
-                      {Number.parseFloat(porcentajeHerencia) > 100 ? ' (capado al 100 %)' : ''}
+                      <span>{Number.parseFloat(porcentajeHerencia) > 100 ? ' (capado al 100 %)' : ''}</span>
                     </span>
                   </div>
                   {tipoAdquisicion !== 'plena' && (

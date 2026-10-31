@@ -262,7 +262,7 @@ export default function EstimadorLegitimas() {
                     <span className={styles.bloqueImporte}>{formatCurrency(resultado.motor.legitimaTotal - resultado.motor.tercioMejora)}</span>
                     <span className={styles.bloqueLabel}>Legítima estricta</span>
                     <span className={styles.bloqueSublabel}>
-                      {resultado.motor.legitimaPorHijo !== null && `${formatCurrency(resultado.motor.legitimaPorHijo)}/hijo · `}
+                      <span>{resultado.motor.legitimaPorHijo !== null && `${formatCurrency(resultado.motor.legitimaPorHijo)}/hijo · `}</span>
                       Obligatoria e igual para todos
                     </span>
                   </div>
@@ -333,7 +333,7 @@ export default function EstimadorLegitimas() {
                 </div>
                 <div className={styles.resumenItem}>
                   <span className={styles.resumenLabel}>Herederos forzosos</span>
-                  <strong>{resultado.numHijos} hijo{resultado.numHijos > 1 ? 's' : ''}</strong>
+                  <strong>{resultado.numHijos} hijo<span>{resultado.numHijos > 1 ? 's' : ''}</span></strong>
                 </div>
               </div>
 

@@ -204,7 +204,7 @@ export default function CalculadoraRegla503020Page() {
                   <span>{formatCurrency(resultado.ideal.necesidades)}</span>
                   <span>{formatCurrency(resultado.real.necesidades)}</span>
                   <span className={resultado.diferencias.necesidades > 0 ? styles.negative : styles.positive}>
-                    {resultado.diferencias.necesidades > 0 ? '+' : ''}{formatCurrency(resultado.diferencias.necesidades)}
+                    <span>{resultado.diferencias.necesidades > 0 ? '+' : ''}</span>{formatCurrency(resultado.diferencias.necesidades)}
                   </span>
                 </div>
 
@@ -216,7 +216,7 @@ export default function CalculadoraRegla503020Page() {
                   <span>{formatCurrency(resultado.ideal.deseos)}</span>
                   <span>{formatCurrency(resultado.real.deseos)}</span>
                   <span className={resultado.diferencias.deseos > 0 ? styles.negative : styles.positive}>
-                    {resultado.diferencias.deseos > 0 ? '+' : ''}{formatCurrency(resultado.diferencias.deseos)}
+                    <span>{resultado.diferencias.deseos > 0 ? '+' : ''}</span>{formatCurrency(resultado.diferencias.deseos)}
                   </span>
                 </div>
 
@@ -228,7 +228,7 @@ export default function CalculadoraRegla503020Page() {
                   <span>{formatCurrency(resultado.ideal.ahorro)}</span>
                   <span>{formatCurrency(resultado.real.ahorro)}</span>
                   <span className={resultado.diferencias.ahorro < 0 ? styles.negative : styles.positive}>
-                    {resultado.diferencias.ahorro > 0 ? '+' : ''}{formatCurrency(resultado.diferencias.ahorro)}
+                    <span>{resultado.diferencias.ahorro > 0 ? '+' : ''}</span>{formatCurrency(resultado.diferencias.ahorro)}
                   </span>
                 </div>
               </div>

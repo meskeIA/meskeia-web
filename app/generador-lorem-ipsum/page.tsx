@@ -208,9 +208,9 @@ export default function GeneradorLoremIpsumPage() {
 
           {resultado && (
             <div className={styles.stats}>
-              <span><span aria-hidden="true">📄</span> {stats.parrafos} párrafo{stats.parrafos !== 1 ? 's' : ''}</span>
-              <span><span aria-hidden="true">📝</span> {stats.palabras} palabra{stats.palabras !== 1 ? 's' : ''}</span>
-              <span><span aria-hidden="true">🔤</span> {stats.caracteres} carácter{stats.caracteres !== 1 ? 'es' : ''}</span>
+              <span><span aria-hidden="true">📄</span> {stats.parrafos} párrafo<span>{stats.parrafos !== 1 ? 's' : ''}</span></span>
+              <span><span aria-hidden="true">📝</span> {stats.palabras} palabra<span>{stats.palabras !== 1 ? 's' : ''}</span></span>
+              <span><span aria-hidden="true">🔤</span> {stats.caracteres} carácter<span>{stats.caracteres !== 1 ? 'es' : ''}</span></span>
             </div>
           )}
         </section>

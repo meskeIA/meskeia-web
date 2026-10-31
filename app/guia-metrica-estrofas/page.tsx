@@ -326,7 +326,7 @@ export default function GuiaMetricaEstrofasPage() {
                   <div className={styles.contadorDetalles}>
                     {resultado.sinalefas > 0 && (
                       <span className={styles.contadorBadge}>
-                        {resultado.sinalefas} sinalefa{resultado.sinalefas > 1 ? 's' : ''}
+                        {resultado.sinalefas} sinalefa<span>{resultado.sinalefas > 1 ? 's' : ''}</span>
                       </span>
                     )}
                     <span className={styles.contadorBadge}>Última palabra: {resultado.acentoFinal}</span>

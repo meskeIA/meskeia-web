@@ -190,9 +190,9 @@ export default function JuegoPiedraPapelTijeraPage() {
                 <div className={styles.pensando} aria-hidden="true">🤔</div>
               ) : resultado ? (
                 <div className={`${styles.resultadoIcono} ${styles[resultado]}`} aria-hidden="true">
-                  {resultado === 'ganaste' && '🎉'}
-                  {resultado === 'perdiste' && '😢'}
-                  {resultado === 'empate' && '🤝'}
+                  <span>{resultado === 'ganaste' && '🎉'}</span>
+                  <span>{resultado === 'perdiste' && '😢'}</span>
+                  <span>{resultado === 'empate' && '🤝'}</span>
                 </div>
               ) : (
                 <span>VS</span>
@@ -219,9 +219,9 @@ export default function JuegoPiedraPapelTijeraPage() {
           {resultado && !animando && (
             <div className={`${styles.resultadoPanel} ${styles[resultado]}`}>
               <span className={styles.resultadoTexto}>
-                {resultado === 'ganaste' && <>¡Ganaste! <span aria-hidden="true">🎊</span></>}
-                {resultado === 'perdiste' && <>Perdiste <span aria-hidden="true">😔</span></>}
-                {resultado === 'empate' && <>¡Empate! <span aria-hidden="true">🤝</span></>}
+                <span>{resultado === 'ganaste' && <span>¡Ganaste! <span aria-hidden="true">🎊</span></span>}</span>
+                <span>{resultado === 'perdiste' && <span>Perdiste <span aria-hidden="true">😔</span></span>}</span>
+                <span>{resultado === 'empate' && <span>¡Empate! <span aria-hidden="true">🤝</span></span>}</span>
               </span>
               <span className={styles.resultadoDetalle}>
                 {getOpcionInfo(eleccionJugador)?.nombre} vs {getOpcionInfo(eleccionPC)?.nombre}

@@ -289,7 +289,7 @@ export default function CalculadoraReformasHogar() {
                 {formatCurrency(totalMin)} – {formatCurrency(totalMax)}
               </span>
               <span className={styles.totalCalidad}>
-                Calidad {CALIDADES.find(c => c.id === calidad)?.label} · {resultados.length} partida{resultados.length !== 1 ? 's' : ''}
+                Calidad {CALIDADES.find(c => c.id === calidad)?.label} · {resultados.length} partida<span>{resultados.length !== 1 ? 's' : ''}</span>
               </span>
             </div>
           </section>

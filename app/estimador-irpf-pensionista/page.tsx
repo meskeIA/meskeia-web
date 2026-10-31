@@ -591,14 +591,14 @@ export default function EstimadorIrpfPensionista() {
                 de la retención que te aplica la Seguridad Social, que solo mira la pensión y tu situación
                 personal; la retención real sale del procedimiento del Reglamento del IRPF y puede no
                 coincidir al euro: la diferencia se ajusta en la declaración.
-                {resultado.cuotaIRPF > resultado.cuotaPension && (
-                  <>
+                <span>{resultado.cuotaIRPF > resultado.cuotaPension && (
+                  <span>
                     {' '}Los {formatCurrency(resultado.cuotaIRPF - resultado.cuotaPension)} restantes de
                     la cuota los añaden el rescate, los alquileres o los intereses y dividendos, y no salen
                     de la pensión: los retiene quien los paga (la gestora del plan, el banco) o se pagan en
                     la declaración.
-                  </>
-                )}
+                  </span>
+                )}</span>
               </p>
 
               {resultado.rescatePP > 0 && (

@@ -608,9 +608,9 @@ export default function IdentificadorColorPage() {
               <p className={styles.compararVeredicto}>
                 <strong>{TEXTO_NIVEL[filaTipica.nivel]}</strong>
                 {' '}(diferencia ΔE00 de {formatNumber(filaTipica.deltaE, DECIMALES_DELTA_E)} con visión típica).
-                {visionesQueConfunden.length > 0 && (
-                  <> Atención: con {new Intl.ListFormat('es', { type: 'conjunction' }).format(visionesQueConfunden)} se verían prácticamente iguales.</>
-                )}
+                <span>{visionesQueConfunden.length > 0 && (
+                  <span> Atención: con {new Intl.ListFormat('es', { type: 'conjunction' }).format(visionesQueConfunden)} se verían prácticamente iguales.</span>
+                )}</span>
               </p>
             )}
           </div>

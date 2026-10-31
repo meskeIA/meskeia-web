@@ -156,7 +156,7 @@ export default function OrientadorDeduccionObrasEnergeticasPage() {
                 </dl>
                 <dl className={styles.detalle}>
                   <dt>Base máxima anual</dt>
-                  <dd>{formatCurrency(m.baseMaximaAnual)}{m.baseMaximaAcumulada ? ` (acumulada: ${formatCurrency(m.baseMaximaAcumulada)})` : ''}</dd>
+                  <dd>{formatCurrency(m.baseMaximaAnual)}<span>{m.baseMaximaAcumulada ? ` (acumulada: ${formatCurrency(m.baseMaximaAcumulada)})` : ''}</span></dd>
                 </dl>
                 <dl className={styles.detalle}>
                   <dt>Plazo obras</dt>

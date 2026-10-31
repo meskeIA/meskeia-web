@@ -507,7 +507,7 @@ export default function GeneradorRuidoBlancoPage() {
         {restante !== null && (
           <p className={styles.cuentaAtras} role="status" aria-live="polite">
             <span aria-hidden="true">⏱️</span> Se apagará en {formatearTiempo(restante)}
-            {fundido > 0 && ` · fundido de ${formatNumber(fundido, 0)} s`}
+            <span>{fundido > 0 && ` · fundido de ${formatNumber(fundido, 0)} s`}</span>
           </p>
         )}
 

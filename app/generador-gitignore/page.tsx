@@ -352,7 +352,7 @@ export default function GeneradorGitignorePage() {
           </div>
 
           <p className={styles.selectedCount}>
-            {selectedTechs.size} tecnología{selectedTechs.size !== 1 ? 's' : ''} seleccionada{selectedTechs.size !== 1 ? 's' : ''}
+            {selectedTechs.size} tecnología<span>{selectedTechs.size !== 1 ? 's' : ''}</span> seleccionada<span>{selectedTechs.size !== 1 ? 's' : ''}</span>
           </p>
 
           {categories.map((category) => {

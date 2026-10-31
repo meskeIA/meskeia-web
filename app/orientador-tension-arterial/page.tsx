@@ -156,7 +156,7 @@ function Resultado({ lectura, recomendacionRef }: ResultadoProps) {
           La guía define sus cortes en valores enteros, así que se ha redondeado al más próximo:{' '}
           {redondeos.map((r, i) => (
             <span key={r.campo}>
-              {i > 0 ? ' · ' : ''}
+              <span>{i > 0 ? ' · ' : ''}</span>
               {r.campo} {formatNumber(r.tecleado, r.decimales)} → <strong>{r.usado}</strong>
             </span>
           ))}
@@ -531,7 +531,7 @@ export default function CalculadoraTensionArterial() {
                   return (
                     <span key={m.id}>
                       {valorGuardado(m.sistolica)}/{valorGuardado(m.diastolica)} mmHg
-                      {cuando ? ` del ${cuando.fecha} a las ${cuando.hora}` : ''}
+                      <span>{cuando ? ` del ${cuando.fecha} a las ${cuando.hora}` : ''}</span>
                     </span>
                   );
                 })}

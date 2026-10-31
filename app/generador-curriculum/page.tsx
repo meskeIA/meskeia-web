@@ -645,7 +645,7 @@ export default function GeneradorCurriculumPage() {
                   {cv.experiencia.filter((e) => e.puesto || e.empresa).map((e) => (
                     <div key={e.id} className={styles.pvItem}>
                       <div className={styles.pvItemHead}>
-                        <strong>{e.puesto}{e.empresa ? ` · ${e.empresa}` : ''}</strong>
+                        <strong>{e.puesto}<span>{e.empresa ? ` · ${e.empresa}` : ''}</span></strong>
                         <span className={styles.pvFecha}>{[e.inicio, e.actual ? 'Actualidad' : e.fin].filter(Boolean).join(' – ')}</span>
                       </div>
                       {e.ubicacion && <div className={styles.pvSub}>{e.ubicacion}</div>}
@@ -661,7 +661,7 @@ export default function GeneradorCurriculumPage() {
                   {cv.formacion.filter((f) => f.titulo || f.centro).map((f) => (
                     <div key={f.id} className={styles.pvItem}>
                       <div className={styles.pvItemHead}>
-                        <strong>{f.titulo}{f.centro ? ` · ${f.centro}` : ''}</strong>
+                        <strong>{f.titulo}<span>{f.centro ? ` · ${f.centro}` : ''}</span></strong>
                         <span className={styles.pvFecha}>{[f.inicio, f.actual ? 'En curso' : f.fin].filter(Boolean).join(' – ')}</span>
                       </div>
                       {f.ubicacion && <div className={styles.pvSub}>{f.ubicacion}</div>}
@@ -687,7 +687,7 @@ export default function GeneradorCurriculumPage() {
                   <h4 className={styles.pvH4}>Idiomas</h4>
                   <ul className={styles.pvChips}>
                     {cv.idiomas.filter((i) => i.idioma).map((i) => (
-                      <li key={i.id}>{i.idioma}{i.nivel ? ` — ${i.nivel}` : ''}</li>
+                      <li key={i.id}>{i.idioma}<span>{i.nivel ? ` — ${i.nivel}` : ''}</span></li>
                     ))}
                   </ul>
                 </div>
@@ -698,7 +698,7 @@ export default function GeneradorCurriculumPage() {
                   <h4 className={styles.pvH4}>Certificaciones</h4>
                   {cv.certificaciones.filter((c) => c.nombre).map((c) => (
                     <div key={c.id} className={styles.pvLinea}>
-                      <span>{c.nombre}{c.entidad ? ` · ${c.entidad}` : ''}</span>
+                      <span>{c.nombre}<span>{c.entidad ? ` · ${c.entidad}` : ''}</span></span>
                       <span className={styles.pvFecha}>{c.anio}</span>
                     </div>
                   ))}

@@ -266,7 +266,7 @@ export default function ExtractorAudioVideoPage() {
                 <p className={styles.nombreArchivo}>{infoVideo.nombre}</p>
                 <p className={styles.infoArchivo}>
                   {formatearTamanio(infoVideo.tamanio)}
-                  {duracion > 0 ? ` · ${formatearTiempo(duracion)}` : ''}
+                  <span>{duracion > 0 ? ` · ${formatearTiempo(duracion)}` : ''}</span>
                   {' · Haz clic para cambiar'}
                 </p>
               </div>
