@@ -292,7 +292,12 @@ for (const h of HERMANAS) {
       const opciones = page.locator('button:visible').filter({ hasText: h.opcion ?? /^\s*A\S/ });
       const habilitadas = () => opciones.evaluateAll((bs) => bs.filter((b) => !(b as HTMLButtonElement).disabled).length);
       /** Los botones que se ven en TODA la página: la huella de la pantalla en la que se está. */
-      const botonesVisibles = () => page.locator('button:visible').allInnerTexts();
+      // Sin el indicador de next dev («Compiling...», en el shadow root de <nextjs-portal>): el
+      // localizador atraviesa el shadow DOM, y aparecía o no según compilase (31/10/2026)
+      const botonesVisibles = () =>
+        page
+          .locator('button:visible')
+          .evaluateAll((els) => els.filter((el) => !(el.getRootNode() instanceof ShadowRoot)).map((el) => (el as HTMLElement).innerText));
       /** Desplegables abiertos (la guía, una FAQ): una ráfaga no debe abrir ninguno. */
       const abiertos = () => page.locator('[aria-expanded="true"]').count();
       const abiertosAlEmpezar = await abiertos();
