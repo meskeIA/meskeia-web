@@ -329,7 +329,7 @@
 }
 
 .valorPositivo {
-  color: #16a34a;
+  color: var(--verde-texto, #16a34a);
 }
 
 .valorNegativo {
@@ -401,7 +401,7 @@
 }
 
 .tdPositivo {
-  color: #16a34a;
+  color: var(--verde-texto, #16a34a);
   font-weight: 600;
 }
 

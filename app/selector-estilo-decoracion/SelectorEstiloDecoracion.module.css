@@ -122,7 +122,7 @@
   background: rgba(255,140,0,0.06); border: 1px solid rgba(255,140,0,0.22);
   border-radius: 12px; padding: 1.25rem 1.5rem; margin-bottom: 1.75rem;
 }
-.evitarTitulo { font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #c06000; margin: 0 0 0.75rem; }
+.evitarTitulo { font-size: 0.85rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--ambar-texto, #c06000); margin: 0 0 0.75rem; }
 .evitarItem { font-size: 0.88rem; color: var(--text-primary); line-height: 1.5; padding: 0.3rem 0; display: flex; gap: 0.5rem; }
 .evitarItem::before { content: '↓'; color: #c06000; font-weight: 700; flex-shrink: 0; }
 

@@ -279,7 +279,7 @@
 }
 
 .recomendacion_pomodoro .recomendacionTitulo {
-  color: #e74c3c;
+  color: var(--rojo-texto, #e74c3c);
 }
 
 .recomendacion_kanban {
@@ -303,7 +303,7 @@
 }
 
 .recomendacion_inbox_zero .recomendacionTitulo {
-  color: #e8a020;
+  color: var(--ambar-texto, #e8a020);
 }
 
 /* ---- Pasos para empezar ---- */

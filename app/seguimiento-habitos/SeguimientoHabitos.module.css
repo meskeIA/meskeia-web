@@ -218,7 +218,7 @@
   font-size: 0.75rem;
   padding: var(--spacing-xs) var(--spacing-sm);
   background: rgba(229, 115, 115, 0.15);
-  color: #E57373;
+  color: var(--rojo-texto, #E57373);
   border-radius: 50px;
   font-weight: 600;
 }
@@ -1328,7 +1328,7 @@ details[open] .edu-faq-question::after {
 .edu-warning-title {
   font-size: 0.95rem;
   font-weight: 700;
-  color: #b8860b;
+  color: var(--ambar-texto, #b8860b);
   margin-bottom: 0.75rem;
 }
 
@@ -1357,7 +1357,7 @@ details[open] .edu-faq-question::after {
   content: '•';
   position: absolute;
   left: 0;
-  color: #ffc107;
+  color: var(--ambar-texto, #ffc107);
 }
 
 /* Responsive */

@@ -357,7 +357,7 @@
 }
 
 .warningBox strong {
-  color: #b87200;
+  color: var(--ambar-texto, #b87200);
 }
 
 /* ---- Etiqueta de resultado ---- */
@@ -384,7 +384,7 @@
 
 .etiqueta_mixto {
   background-color: rgba(232, 160, 32, 0.15);
-  color: #a06a00;
+  color: var(--ambar-texto, #a06a00);
 }
 
 .etiqueta_ninguno {

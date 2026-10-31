@@ -373,7 +373,7 @@
 }
 
 .warningBox strong {
-  color: #b87010;
+  color: var(--ambar-texto, #b87010);
 }
 
 /* ---------- Botón Reiniciar ---------- */

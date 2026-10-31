@@ -221,7 +221,7 @@
   border: 1px solid var(--border);
   border-radius: 6px;
   background: var(--bg-primary);
-  color: var(--error);
+  color: var(--rojo-texto, var(--error));
   font-size: 0.9rem;
   line-height: 1;
   cursor: pointer;

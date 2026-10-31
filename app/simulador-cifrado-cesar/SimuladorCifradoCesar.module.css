@@ -272,7 +272,7 @@
 
 .copyBtnSuccess {
   border-color: #16a34a;
-  color: #16a34a;
+  color: var(--verde-texto, #16a34a);
 }
 
 /* ============================================================

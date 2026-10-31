@@ -376,7 +376,7 @@
 .alertasTitulo {
   font-size: 0.9rem;
   font-weight: 700;
-  color: #b07a10;
+  color: var(--ambar-texto, #b07a10);
   margin: 0 0 0.6rem;
   display: flex;
   align-items: center;

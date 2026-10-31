@@ -298,11 +298,11 @@
 }
 
 .ventajasTitulo.verde {
-  color: #16a34a;
+  color: var(--verde-texto, #16a34a);
 }
 
 .ventajasTitulo.naranja {
-  color: #d97706;
+  color: var(--ambar-texto, #d97706);
 }
 
 .ventajasList {

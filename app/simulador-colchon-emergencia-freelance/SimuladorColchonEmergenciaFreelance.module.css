@@ -206,10 +206,10 @@
   margin-bottom: 0.25rem;
 }
 
-.critico .semaforoMeses { color: #D35F5F; }
-.insuficiente .semaforoMeses { color: #E8A838; }
-.minimo .semaforoMeses { color: #D4A76A; }
-.bueno .semaforoMeses { color: #5BAE7C; }
+.critico .semaforoMeses { color: var(--rojo-texto, #D35F5F); }
+.insuficiente .semaforoMeses { color: var(--naranja-texto, #E8A838); }
+.minimo .semaforoMeses { color: var(--ambar-texto, #D4A76A); }
+.bueno .semaforoMeses { color: var(--verde-texto, #5BAE7C); }
 .excelente .semaforoMeses { color: var(--primary-texto); }
 
 .semaforoLabel {
@@ -223,10 +223,10 @@
   font-weight: 700;
 }
 
-.critico .semaforoTexto { color: #D35F5F; }
-.insuficiente .semaforoTexto { color: #E8A838; }
-.minimo .semaforoTexto { color: #D4A76A; }
-.bueno .semaforoTexto { color: #5BAE7C; }
+.critico .semaforoTexto { color: var(--rojo-texto, #D35F5F); }
+.insuficiente .semaforoTexto { color: var(--naranja-texto, #E8A838); }
+.minimo .semaforoTexto { color: var(--ambar-texto, #D4A76A); }
+.bueno .semaforoTexto { color: var(--verde-texto, #5BAE7C); }
 .excelente .semaforoTexto { color: var(--primary-texto); }
 
 .semaforoDetalle {
@@ -457,7 +457,7 @@
 }
 
 .objetivoLogrado {
-  color: #5BAE7C;
+  color: var(--verde-texto, #5BAE7C);
   font-weight: 600;
 }
 

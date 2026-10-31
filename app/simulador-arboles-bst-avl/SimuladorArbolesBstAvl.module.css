@@ -228,7 +228,7 @@
 
 .toolBtnDanger {
   border-color: rgba(239, 68, 68, 0.3);
-  color: rgb(239, 68, 68);
+  color: var(--rojo-texto, rgb(239, 68, 68));
 }
 
 .toolBtnDanger:hover {

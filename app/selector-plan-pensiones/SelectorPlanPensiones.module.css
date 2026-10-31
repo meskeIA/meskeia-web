@@ -300,11 +300,11 @@
 }
 
 .razonCardTitulo.ventajas {
-  color: #2c8a5f;
+  color: var(--verde-texto, #2c8a5f);
 }
 
 .razonCardTitulo.inconvenientes {
-  color: #c05c2e;
+  color: var(--naranja-texto, #c05c2e);
 }
 
 .razonCard ul {
@@ -339,7 +339,7 @@
 .alertasTitulo {
   font-size: 0.85rem;
   font-weight: 700;
-  color: #c05c2e;
+  color: var(--naranja-texto, #c05c2e);
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-bottom: 0.6rem;
@@ -376,7 +376,7 @@
 }
 
 .warningBox strong {
-  color: #b87010;
+  color: var(--ambar-texto, #b87010);
 }
 
 /* ---------- Botón Reiniciar ---------- */

@@ -253,7 +253,7 @@
 .tecnologia_oled .tecnologiaEtiqueta { color: var(--primary-texto); }
 .tecnologia_qled .tecnologiaEtiqueta { color: var(--secondary-texto); }
 .tecnologia_led_ips .tecnologiaEtiqueta { color: #5b9e6f; }
-.tecnologia_led_va .tecnologiaEtiqueta { color: #e8a020; }
+.tecnologia_led_va .tecnologiaEtiqueta { color: var(--ambar-texto, #e8a020); }
 
 .tecnologiaTitulo {
   font-size: clamp(1.5rem, 3.5vw, 2rem);

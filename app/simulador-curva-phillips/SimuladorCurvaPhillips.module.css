@@ -340,13 +340,13 @@
 
 .badgeEquilibrio {
   background: rgba(39, 174, 96, 0.12);
-  color: #1E8449;
+  color: var(--verde-texto, #1E8449);
   border: 2px solid #27AE60;
 }
 
 .badgeSobrecalentada {
   background: rgba(224, 122, 31, 0.12);
-  color: #B35A00;
+  color: var(--ambar-texto, #B35A00);
   border: 2px solid #E07A1F;
 }
 

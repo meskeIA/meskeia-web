@@ -389,7 +389,7 @@
 }
 
 .viaFila dd.positivo {
-  color: #1f9d55;
+  color: var(--verde-texto, #1f9d55);
 }
 
 .viaFila dd.negativo {
@@ -770,7 +770,7 @@
   line-height: 1.5;
 }
 
-.warningList li::before { content: '•'; position: absolute; left: 0; color: #f59e0b; font-weight: 700; }
+.warningList li::before { content: '•'; position: absolute; left: 0; color: var(--ambar-texto, #f59e0b); font-weight: 700; }
 
 [data-theme='dark'] .warningList li { color: #fcd34d; }
 

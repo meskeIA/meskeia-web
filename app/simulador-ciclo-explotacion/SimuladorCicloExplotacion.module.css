@@ -544,7 +544,7 @@
 }
 
 .metricaHolgada .metricaValor {
-  color: #16a34a;
+  color: var(--verde-texto, #16a34a);
 }
 
 [data-theme='dark'] .metricaHolgada {
@@ -558,7 +558,7 @@
 }
 
 .metricaMedia .metricaValor {
-  color: #d97706;
+  color: var(--ambar-texto, #d97706);
 }
 
 [data-theme='dark'] .metricaMedia {

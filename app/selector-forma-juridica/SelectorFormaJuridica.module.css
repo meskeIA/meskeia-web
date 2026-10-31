@@ -231,7 +231,7 @@
 }
 
 .veredicto_valorar .veredictoTitulo {
-  color: #e8a020;
+  color: var(--ambar-texto, #e8a020);
 }
 
 .veredictoDesc {

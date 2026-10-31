@@ -97,7 +97,7 @@
   border-radius: 8px;
   padding: 0.65rem 1rem;
   font-size: 0.875rem;
-  color: #c0621a;
+  color: var(--naranja-texto, #c0621a);
 }
 
 /* ── Botón simular ── */
@@ -176,7 +176,7 @@
   font-size: 0.85rem;
   margin-bottom: 0.2rem;
 }
-.resConservado { font-size: 0.82rem; font-weight: 600; color: #27AE60; margin: 0.3rem 0 0; }
+.resConservado { font-size: 0.82rem; font-weight: 600; color: var(--verde-texto, #27AE60); margin: 0.3rem 0 0; }
 .resDelta { font-size: 0.85rem; font-weight: 700; margin: 0.3rem 0 0; }
 
 /* ── Fórmulas ── */
@@ -233,7 +233,7 @@
 .warningBox { background: rgba(224,123,57,0.08); border: 1px solid rgba(224,123,57,0.3); border-radius: 10px; padding: 1.1rem 1.25rem; }
 .warningHeader { display: flex; align-items: center; gap: 0.7rem; margin-bottom: 0.75rem; }
 .warningIcon { font-size: 1.4rem; }
-.warningHeader h3 { font-size: 0.95rem; font-weight: 700; color: #c0621a; margin: 0; }
+.warningHeader h3 { font-size: 0.95rem; font-weight: 700; color: var(--naranja-texto, #c0621a); margin: 0; }
 .warningList { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.6rem; }
 .warningList li { font-size: 0.85rem; color: var(--text-primary); line-height: 1.5; }
 

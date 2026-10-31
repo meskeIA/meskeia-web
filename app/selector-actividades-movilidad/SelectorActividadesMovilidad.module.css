@@ -170,10 +170,10 @@
   font-weight: 700;
   margin-bottom: var(--spacing-md);
 }
-.nivelBadge[data-nivel='alta'] { background: rgba(39, 174, 96, 0.1); color: #27AE60; border: 2px solid #27AE60; }
+.nivelBadge[data-nivel='alta'] { background: rgba(39, 174, 96, 0.1); color: var(--verde-texto, #27AE60); border: 2px solid #27AE60; }
 .nivelBadge[data-nivel='media'] { background: rgba(46, 134, 171, 0.1); color: var(--primary-texto); border: 2px solid #2E86AB; }
-.nivelBadge[data-nivel='reducida'] { background: rgba(230, 126, 34, 0.1); color: #E67E22; border: 2px solid #E67E22; }
-.nivelBadge[data-nivel='muy_reducida'] { background: rgba(231, 76, 60, 0.1); color: #E74C3C; border: 2px solid #E74C3C; }
+.nivelBadge[data-nivel='reducida'] { background: rgba(230, 126, 34, 0.1); color: var(--naranja-texto, #E67E22); border: 2px solid #E67E22; }
+.nivelBadge[data-nivel='muy_reducida'] { background: rgba(231, 76, 60, 0.1); color: var(--rojo-texto, #E74C3C); border: 2px solid #E74C3C; }
 
 .nivelDescripcion {
   font-size: 1rem;
@@ -273,9 +273,9 @@
   border-radius: 12px;
   border: 1px solid;
 }
-.categoriaBadge[data-cat='fisica'] { background: rgba(39,174,96,0.1); color: #27AE60; border-color: rgba(39,174,96,0.2); }
+.categoriaBadge[data-cat='fisica'] { background: rgba(39,174,96,0.1); color: var(--verde-texto, #27AE60); border-color: rgba(39,174,96,0.2); }
 .categoriaBadge[data-cat='cognitiva'] { background: rgba(46,134,171,0.1); color: var(--primary-texto); border-color: rgba(46,134,171,0.2); }
-.categoriaBadge[data-cat='social'] { background: rgba(230,126,34,0.1); color: #E67E22; border-color: rgba(230,126,34,0.2); }
+.categoriaBadge[data-cat='social'] { background: rgba(230,126,34,0.1); color: var(--naranja-texto, #E67E22); border-color: rgba(230,126,34,0.2); }
 .categoriaBadge[data-cat='creativa'] { background: rgba(142,68,173,0.1); color: #8E44AD; border-color: rgba(142,68,173,0.2); }
 
 .actividadDesc {
@@ -415,7 +415,7 @@
 }
 .warningHeader strong {
   font-size: 1rem;
-  color: #e65100;
+  color: var(--naranja-texto, #e65100);
 }
 [data-theme='dark'] .warningHeader strong { color: #ffb74d; }
 .warningIcon { font-size: 1.4rem; }
@@ -438,7 +438,7 @@
   content: '\2022';
   position: absolute;
   left: 0;
-  color: #f9a825;
+  color: var(--ambar-texto, #f9a825);
   font-weight: bold;
 }
 

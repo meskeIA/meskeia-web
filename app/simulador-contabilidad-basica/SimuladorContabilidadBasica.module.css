@@ -464,7 +464,7 @@
 
 .btnEliminar:hover {
   background: #fee2e2;
-  color: #dc2626;
+  color: var(--rojo-texto, #dc2626);
 }
 
 [data-theme='dark'] .btnEliminar:hover {
@@ -491,7 +491,7 @@
 
 .btnEliminarLinea:hover:not(:disabled) {
   background: #fee2e2;
-  color: #dc2626;
+  color: var(--rojo-texto, #dc2626);
   border-color: #dc2626;
 }
 
@@ -1000,7 +1000,7 @@
   content: '•';
   position: absolute;
   left: 0;
-  color: #f59e0b;
+  color: var(--ambar-texto, #f59e0b);
   font-weight: 700;
 }
 
