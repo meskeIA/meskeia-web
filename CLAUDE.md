@@ -605,11 +605,12 @@ testigos `tests/familias/selectores.spec.ts` y `quizzes.spec.ts`.
 `npm run check:ternario-traducido` — en el build, y **rompe el build** si un ternario hijo de JSX
 alterna **texto suelto y JSX** (`{c ? '✓ Copiado' : <>…</>}`, también con plantilla o anidado):
 con la página traducida, al cambiar de rama React retira un nodo de texto que el traductor ya
-cambió por `<font>` y la app cae. Receta: cada rama en su `<span key>`. Barre `app/` y
-`components/`, **sin pasivo** · Escape: `traduccion-ok: <razón>`, razón obligatoria.
-⚠️ No ve `{x && 'texto'}` ni una hoja que sea variable: eso lo mide
-`tests/apps/ternario-traducido-familia.spec.ts`.
-> Salió del hallazgo 3314 (ShareCard) y el cabo C0262. Crónica: cabecera de
+cambió por `<font>` y la app cae. Receta: cada rama en su `<span key>`. También si un texto
+**aparece y desaparece** junto a hermanos (`{n !== 1 ? 's' : ''}`, `{x && <>…</>}`): cae al
+retirarlo y al añadirlo. Receta: `<span>{condición}</span>` siempre montado; `{x && <span>}` NO
+basta. Barre `app/` y `components/`, **sin pasivo** · Escape: `traduccion-ok: <razón>`, razón obligatoria.
+⚠️ No ve una hoja que sea variable: eso lo miden los testigos `tests/apps/*-traducido-familia.spec.ts`.
+> Salió del hallazgo 3314 (ShareCard) y los cabos C0262 y C0312. Crónica: cabecera de
 > `scripts/check-ternario-traducido.mjs` · pruebas: `npm run ternario:probar-candado`.
 
 ### Candado del parser numérico

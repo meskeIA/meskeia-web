@@ -33,6 +33,23 @@
  * caía al pasar de PNG a JPEG. Dos fragmentos con la MISMA forma reescriben el texto en su
  * sitio y no caen (se quedan viejos: cabo C0243, que esto no mira).
  *
+ * Y, desde el cabo C0312 (31/10/2026), el TEXTO QUE APARECE Y DESAPARECE junto a hermanos:
+ *
+ *   {n} tecnología{n !== 1 ? 's' : ''} seleccionada   ·   {modo === 'move' && <>Modo mover…</>}
+ *
+ * Un `&&` o un ternario cuyas hojas son texto suelto (o un fragmento con texto) y vacías
+ * (`''`, `null`, `false`, `undefined`), en un elemento con más hijos. Al retirarlo, React quita
+ * un nodo de texto que ya es un <font> (removeChild); al AÑADIRLO, lo inserta delante del
+ * hermano de texto siguiente, que tampoco está (insertBefore). Las dos caen: medido el
+ * 31/10/2026 en generador-gitignore (de 3 a 1 tecnologías y de 1 a 2) y simulador-grafos
+ * (cambiar de modo). Un fragmento con texto cae aunque no tenga hermanos: sus hijos son varios
+ * nodos. Como hijo ÚNICO de su elemento, un texto no cae: React lo cambia con textContent.
+ * Receta: un elemento SIEMPRE montado con la condición dentro, `<span>{n !== 1 ? 's' : ''}</span>`
+ * (`<tspan>` dentro de un `<text>` de SVG), y el fragmento pasa a `<span>`. Donde no cabe un
+ * span (un `<option>`, un padre flex con `gap`), todo el contenido en una sola plantilla:
+ * `{`${n} hijo${n > 1 ? 's' : ''}`}`. ⚠️ `{x && <span>texto</span>}` NO basta: arregla retirar
+ * pero no insertar (era la receta de dc07fd4d, y gitignore seguía cayendo al pasar de 1 a 2).
+ *
  * DE DÓNDE SALE
  * ─────────────
  * Del hallazgo 3314 (cabo C0233): Copiar de ShareCard y los cuatro pies de portal tumbaban la
@@ -40,6 +57,12 @@
  * catálogo: un grep aproximado daba 75 ficheros, pero el censo exacto dio 20 apariciones en
  * 19 apps, reparadas en 9a553aee (19/10/2026), con su testigo de comportamiento
  * `tests/apps/ternario-traducido-familia.spec.ts`.
+ *
+ * La forma del texto que aparece y desaparece, del cabo C0312: dc07fd4d (visualizador-germinacion
+ * y analizador-titulos-seo) y los hallazgos 3407 (simulador-fluidos-bernoulli), 3491, 3494,
+ * 3502 (compraventa) y 3541 (sonometro). Censo el 31/10/2026: 591 apariciones en 222 ficheros,
+ * reparadas en la campaña c3843ed6…d34e9b8f, con texto visible y captura iguales antes y
+ * después en las 221 rutas afectadas.
  *
  * SIN PASIVO
  * ──────────
@@ -50,15 +73,15 @@
  *
  * QUÉ NO MIRA, Y POR QUÉ
  * ──────────────────────
- *   · El texto que APARECE y DESAPARECE (`{x && 'texto'}`, `{x ? 'texto' : null}`): retirarlo
- *     tiene el mismo riesgo, pero es una forma mucho más común y nadie la ha medido con la página
- *     traducida. Va aparte (cabo de la entrada), no aquí.
+ *   · Un ELEMENTO que aparece y desaparece delante de un texto (`{x && <b>…</b>} sigue`):
+ *     insertarlo cae igual (insertBefore sobre un texto traducido), pero la forma está en todo el
+ *     catálogo y no se ha medido cuánto. Va a su cabo, no aquí.
  *   · Una hoja que es una VARIABLE o una llamada (`{cargando ? 'Cargando…' : resultado}`): por la
  *     forma del código no se sabe si guarda texto o JSX.
  *   · Dos elementos del mismo tipo SIN `key` y con hijos distintos (`<span>A</span>` frente a
  *     `<span><b /> B</span>`): React reutiliza el `<span>` y retira el texto de dentro. Lo mide
  *     el testigo de familia, que traduce, pulsa y vuelve. (Con fragmentos sí lo mira: arriba.)
- *   · Un fragmento con texto frente a `null` o una variable: es la forma de C0312.
+ *   · Un texto o un fragmento frente a una VARIABLE (`{a ? 'x' : resultado}`): no se sabe qué guarda.
  *   · Los ternarios de un atributo (`title={a ? 'x' : 'y'}`): no crean nodos de texto.
  *
  * ESCAPE
@@ -133,14 +156,38 @@ function forma(n) {
 }
 
 // ¿Cae al cambiar de rama? Texto suelto frente a JSX (la forma de origen), o un fragmento con
-// texto suelto frente a otra rama que se pinta (texto o JSX) con otra forma. Una rama vacía o
-// variable (`null`, `resultado`) es la forma de C0312, que va aparte.
+// texto suelto frente a otra rama que se pinta (texto o JSX) con otra forma. Una rama vacía la
+// mira `apareceYDesaparece` (C0312); una variable (`resultado`), nadie.
 function cae(ramas) {
   const clases = new Set(ramas.map(clase));
   if (clases.has('texto') && clases.has('jsx')) return 'texto';
   const pintadas = ramas.filter((r) => clase(r) !== 'otro');
   if (!pintadas.some(hijosConTexto)) return null;
   return new Set(pintadas.map(forma)).size > 1 ? 'fragmento' : null;
+}
+
+// ─── Texto que aparece y desaparece (C0312) ───────────────────────────────────
+const vacia = (n) => n.kind === ts.SyntaxKind.NullKeyword || n.kind === ts.SyntaxKind.FalseKeyword
+  || (ts.isIdentifier(n) && n.text === 'undefined')
+  || ((ts.isStringLiteral(n) || ts.isNoSubstitutionTemplateLiteral(n)) && n.text === '');
+const sinVacios = (hijos) => hijos.filter((h) => !(ts.isJsxText(h) && h.text.trim() === '') && !(ts.isJsxExpression(h) && !h.expression));
+
+// `{x && 'texto'}`, `{x ? 'texto' : null}` o lo mismo con un fragmento con texto: lo que se pinta
+// es texto suelto y la otra posibilidad es nada. Cae si comparte padre con otros hijos (React
+// retira o inserta un nodo de texto entre hermanos), o siempre si es un fragmento (sus hijos ya
+// son varios nodos). Como hijo único, el texto se cambia con textContent y no cae.
+function apareceYDesaparece(nodo) {
+  const e = sinParentesis(nodo.expression);
+  let pintadas;
+  if (ts.isBinaryExpression(e) && e.operatorToken.kind === ts.SyntaxKind.AmpersandAmpersandToken) {
+    pintadas = [sinParentesis(e.right)];
+  } else if (ts.isConditionalExpression(e)) {
+    const hs = hojas(e);
+    pintadas = hs.filter((h) => !vacia(h));
+    if (pintadas.length === hs.length) return false;
+  } else return false;
+  if (!pintadas.every((h) => clase(h) === 'texto' || hijosConTexto(h))) return false;
+  return pintadas.some(hijosConTexto) || sinVacios(nodo.parent.children).length > 1;
 }
 
 // ─── Escape ────────────────────────────────────────────────────────────────────
@@ -160,8 +207,8 @@ for (const carpeta of CARPETAS) {
   for (const ruta of recorrer(path.join(RAIZ, carpeta))) {
     ficheros++;
     const txt = fs.readFileSync(ruta, 'utf8');
-    // Prefiltro barato: sin «?» no hay ternario que mirar
-    if (!txt.includes('?')) continue;
+    // Prefiltro barato: sin «?» ni «&&» no hay nada que mirar
+    if (!txt.includes('?') && !txt.includes('&&')) continue;
     const fuente = ts.createSourceFile(ruta, txt, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
     const lineas = txt.split('\n');
     const rel = path.relative(RAIZ, ruta).replace(/\\/g, '/');
@@ -169,19 +216,23 @@ for (const carpeta of CARPETAS) {
       if (
         ts.isJsxExpression(nodo) && nodo.expression
         && (ts.isJsxElement(nodo.parent) || ts.isJsxFragment(nodo.parent))
-        && ts.isConditionalExpression(sinParentesis(nodo.expression))
       ) {
-        const tipo = cae(hojas(nodo.expression));
+        const esTernario = ts.isConditionalExpression(sinParentesis(nodo.expression));
+        const tipo = (esTernario && cae(hojas(nodo.expression))) || (apareceYDesaparece(nodo) ? 'aparece' : null);
         if (tipo) {
           const linea = fuente.getLineAndCharacterOfPosition(nodo.getStart(fuente)).line + 1;
           const escape = escapeEn(lineas, linea);
           if (escape === 'firmado') exentos.push(`${rel}:${linea}`);
           else {
             const porQue = escape === 'sin razón' ? ' — lleva `traduccion-ok:` SIN razón escrita' : '';
-            const que = tipo === 'texto'
-              ? 'un ternario alterna texto suelto y JSX'
-              : 'un ternario alterna un fragmento con texto suelto y otra rama de distinta forma';
-            errores.push(`${rel}:${linea} — ${que}: con la página traducida, al cambiar de rama React retira un nodo de texto que ya no está y la app cae (NotFoundError). Pon cada rama en su elemento con \`key\`: <span key="a">…</span> : <span key="b">…</span>.${porQue}`);
+            if (tipo === 'aparece') {
+              errores.push(`${rel}:${linea} — un texto suelto aparece y desaparece junto a otros hijos: con la página traducida, React lo retira o lo inserta junto a un nodo de texto que ya no está y la app cae (NotFoundError). Pon la condición DENTRO de un elemento siempre montado: <span>{n !== 1 ? 's' : ''}</span> (y un fragmento, como <span>); en un <option> o un padre flex con gap, todo el contenido en una plantilla. {x && <span>…</span>} no basta: sigue cayendo al insertar.${porQue}`);
+            } else {
+              const que = tipo === 'texto'
+                ? 'un ternario alterna texto suelto y JSX'
+                : 'un ternario alterna un fragmento con texto suelto y otra rama de distinta forma';
+              errores.push(`${rel}:${linea} — ${que}: con la página traducida, al cambiar de rama React retira un nodo de texto que ya no está y la app cae (NotFoundError). Pon cada rama en su elemento con \`key\`: <span key="a">…</span> : <span key="b">…</span>.${porQue}`);
+            }
           }
         }
       }

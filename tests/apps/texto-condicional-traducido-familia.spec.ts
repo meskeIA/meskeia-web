@@ -16,6 +16,12 @@ import { asentarAntesDeTraducir } from './_hidratacion';
  *     cambia con textContent. Es el control de abajo.
  * Receta: el texto condicional en su propio <span>; React retira el elemento, no el texto.
  * Reinyección: con `{germinaOK && '…'}` de vuelta en visualizador-germinacion, su test cae.
+ *
+ * Campaña del 31/10/2026: AÑADIR el texto también cae (insertBefore delante de un hermano de
+ * texto ya traducido), y `{x && <span>…</span>}` no lo arregla: generador-gitignore seguía
+ * cayendo al pasar de 1 a 2 tecnologías. Receta definitiva: el span SIEMPRE montado con la
+ * condición dentro (`<span>{n !== 1 ? 's' : ''}</span>`), de modo que React solo cambia su
+ * textContent. Los tres casos de abajo, rojos antes de la campaña (c1a69d37^, 48639006^).
  */
 
 // Antes del primer <font>, la página entera asentada (cabo C0493: ver asentarAntesDeTraducir)
@@ -78,6 +84,41 @@ const CASOS: Caso[] = [
     },
   },
   {
+    // Plural «tecnología{s}», 3 → 1: retira la «s»
+    slug: 'generador-gitignore',
+    preparar: async (page) => {
+      const deseleccionar = page.getByRole('button', { name: /^Deseleccionar / });
+      await hidratado(deseleccionar.first());
+      return async () => {
+        await deseleccionar.first().click();
+        await deseleccionar.first().click();
+      };
+    },
+  },
+  {
+    // El mismo plural, 1 → 2: inserta la «s» delante de « seleccionada», ya traducido
+    slug: 'generador-gitignore',
+    preparar: async (page) => {
+      const deseleccionar = page.getByRole('button', { name: /^Deseleccionar / });
+      await hidratado(deseleccionar.first());
+      await deseleccionar.first().click();
+      await deseleccionar.first().click();
+      return () => page.getByRole('button', { name: /^Seleccionar [^t]/ }).first().click();
+    },
+  },
+  {
+    // Un fragmento por modo en el mismo div: cambiar de modo retira uno e inserta otro
+    slug: 'simulador-grafos',
+    preparar: async (page) => {
+      const mover = page.locator('button[aria-pressed]').filter({ hasText: 'Mover' });
+      await hidratado(mover);
+      return async () => {
+        await mover.click();
+        await page.locator('button[aria-pressed]').filter({ hasText: 'Eliminar' }).click();
+      };
+    },
+  },
+  {
     // Control: hijo único de su elemento. No cae ni ha caído nunca.
     slug: 'checklist-preparar-verifactu',
     preparar: async (page) => {
@@ -91,8 +132,8 @@ const CASOS: Caso[] = [
 ];
 
 test.describe('texto condicional con la página traducida (C0312)', () => {
-  for (const c of CASOS) {
-    test(`${c.slug}: retirar el texto condicional con la página traducida no tumba la app`, async ({ page }) => {
+  CASOS.forEach((c, i) => {
+    test(`${c.slug} (${i + 1}): retirar o añadir el texto condicional con la página traducida no tumba la app`, async ({ page }) => {
       const errores: string[] = [];
       page.on('pageerror', (e) => errores.push(e.message));
       page.on('console', (m) => {
@@ -108,5 +149,5 @@ test.describe('texto condicional con la página traducida (C0312)', () => {
       await expect(page.getByText('Algo salió mal')).toHaveCount(0);
       expect(errores).toEqual([]);
     });
-  }
+  });
 });

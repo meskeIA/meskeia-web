@@ -840,6 +840,7 @@ export default function EstimadorSueldoNetoPage() {
                   <li>Mínimo personal + mínimo por un hijo: <strong>{formatCurrency(PARCIAL.minimos)}</strong></li>
                   <li>
                     IRPF anual: <strong>{formatCurrency(PARCIAL.irpfAnual)}</strong>
+                    {/* traduccion-ok: PARCIAL es una constante del módulo, así que el texto no aparece ni desaparece en la misma carga; con un span la flex del li cambiaría (C0312) */}
                     {PARCIAL.irpfAnual === 0 && PARCIAL.baseLiquidable <= PARCIAL.minimos && (
                       <> (la base no supera el mínimo personal y familiar, que tributa a tipo cero)</>
                     )}

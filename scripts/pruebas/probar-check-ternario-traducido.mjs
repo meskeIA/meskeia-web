@@ -38,8 +38,18 @@
  *  17. terreno rústico antes de 8c473228 (hallazgo 3480). Debe FALLAR.
  *  18. La forma de conversor-colores, medida con la página traducida: cae. Debe FALLAR.
  *  19. Dos fragmentos con la MISMA forma. Debe CALLAR.
- *  20. Fragmento con texto frente a null (C0312, aparte). Debe CALLAR.
+ *  20. Fragmento con texto frente a null. Callaba hasta C0312; desde el 31/10/2026 debe FALLAR.
  *  21. La receta, cada fragmento en su span con key. Debe CALLAR.
+ *
+ * Y el texto que aparece y desaparece (cabo C0312, 31/10/2026):
+ *
+ *  22. visualizador-germinacion antes de dc07fd4d — `{germinaOK && '…'}`. Debe FALLAR.
+ *  23. generador-gitignore antes de c1a69d37 — el plural, medido: cae al quitar y al poner. FALLAR.
+ *  24. simulador-grafos antes de 48639006 — fragmentos por modo, medido: cae. Debe FALLAR.
+ *  25. Las dos, reparadas en la campaña. Deben CALLAR.
+ *  26. `{a ? ' (aprox.)' : null}` con hermanos. Debe FALLAR.
+ *  27-31. Lo que NO debe encender: el hijo único, la receta (span siempre montado), el fragmento
+ *      hecho span dentro de otro, la plantilla única de un <option> y una variable frente a vacío.
  *
  * Trabaja sobre mini-catálogos en directorios temporales: no escribe NADA en `app/`.
  */
@@ -60,6 +70,9 @@ const BOOLEANA = 'app/calculadora-algebra-booleana/page.tsx';
 const BERNOULLI = 'app/simulador-fluidos-bernoulli/page.tsx';
 const NAVE = 'app/simulador-gastos-compraventa-nave-industrial/page.tsx';
 const RUSTICO = 'app/simulador-gastos-compraventa-terreno-rustico/page.tsx';
+const GERMINACION = 'app/visualizador-germinacion/page.tsx';
+const GITIGNORE = 'app/generador-gitignore/page.tsx';
+const GRAFOS = 'app/simulador-grafos/page.tsx';
 
 const pagina = (cuerpo) => ({ 'app/prueba/page.tsx': `export default function P() {\n  return (\n    <div>\n${cuerpo}\n    </div>\n  );\n}\n` });
 
@@ -70,8 +83,9 @@ const CASOS = [
   { n: 4, nombre: 'CASO DE ORIGEN · algebra-booleana antes de 9a553aee (varias líneas)', debeFallar: true, ficheros: { [BOOLEANA]: deGit('9a553aee^', BOOLEANA) } },
   { n: 5, nombre: 'CASO DE ORIGEN · fluidos-bernoulli antes de 9a553aee (anidado)', debeFallar: true, ficheros: { [BERNOULLI]: deGit('9a553aee^', BERNOULLI) } },
   {
+    // booleana y bernoulli, ya sin la forma de C0312 que 9a553aee aún les dejaba (c3843ed6, aac8b3dd)
     n: 6, nombre: 'CASO DE ORIGEN REPARADO · las tres en 9a553aee', debeFallar: false,
-    ficheros: { [MONEDA]: deGit('9a553aee', MONEDA), [BOOLEANA]: deGit('9a553aee', BOOLEANA), [BERNOULLI]: deGit('9a553aee', BERNOULLI) },
+    ficheros: { [MONEDA]: deGit('9a553aee', MONEDA), [BOOLEANA]: deGit('c3843ed6', BOOLEANA), [BERNOULLI]: deGit('aac8b3dd', BERNOULLI) },
   },
   { n: 7, nombre: 'dos textos', debeFallar: false, ficheros: pagina("      <button type=\"button\">{a ? 'Copiado' : 'Copiar'}</button>") },
   { n: 8, nombre: 'ternario en un atributo', debeFallar: false, ficheros: pagina("      <Tip contenido={a ? 'x' : <b>y</b>} />") },
@@ -106,13 +120,27 @@ const CASOS = [
     ficheros: pagina("      <p>{a ? <>Hay <b>{n}</b> filas</> : <>Sin <b>{m}</b> datos</>}</p>"),
   },
   {
-    n: 20, nombre: 'fragmento con texto frente a null (la forma de C0312, va aparte)', debeFallar: false,
+    n: 20, nombre: 'fragmento con texto frente a null (C0312: cae aunque no tenga hermanos)', debeFallar: true,
     ficheros: pagina("      <p>{a ? <>Hola <b>!</b></> : null}</p>"),
   },
   {
     n: 21, nombre: 'la receta: cada fragmento en su span con key', debeFallar: false,
     ficheros: pagina("      <p>\n        {png ? (\n          <span key=\"rama-1\">PNG conserva el color <strong>exacto</strong>.</span>\n        ) : (\n          <span key=\"rama-2\"><span aria-hidden=\"true\">⚠️</span> JPEG remuestrea el color {hex}.</span>\n        )}\n      </p>"),
   },
+  // Cabo C0312 (31/10/2026): texto suelto que aparece y desaparece junto a hermanos
+  { n: 22, nombre: 'CASO DE ORIGEN · visualizador-germinacion antes de dc07fd4d (&&)', debeFallar: true, ficheros: { [GERMINACION]: deGit('dc07fd4d^', GERMINACION) } },
+  { n: 23, nombre: 'CASO DE ORIGEN · generador-gitignore antes de c1a69d37 (plural, medido: cae)', debeFallar: true, ficheros: { [GITIGNORE]: deGit('c1a69d37^', GITIGNORE) } },
+  { n: 24, nombre: 'CASO DE ORIGEN · simulador-grafos antes de 48639006 (fragmentos, medido: cae)', debeFallar: true, ficheros: { [GRAFOS]: deGit('48639006^', GRAFOS) } },
+  {
+    n: 25, nombre: 'CASO DE ORIGEN REPARADO · gitignore y grafos tras la campaña', debeFallar: false,
+    ficheros: { [GITIGNORE]: deGit('c1a69d37', GITIGNORE), [GRAFOS]: deGit('48639006', GRAFOS) },
+  },
+  { n: 26, nombre: 'ternario texto frente a null, con hermanos', debeFallar: true, ficheros: pagina("      <p>Total{a ? ' (aprox.)' : null}: {n}</p>") },
+  { n: 27, nombre: 'texto con && como hijo ÚNICO (textContent, medido: no cae)', debeFallar: false, ficheros: pagina("      <span>{a && '✓'}</span>") },
+  { n: 28, nombre: 'la receta: span siempre montado con la condición dentro', debeFallar: false, ficheros: pagina("      <p>{n} tecnología<span>{n !== 1 ? 's' : ''}</span> seleccionada</p>") },
+  { n: 29, nombre: 'la receta: el fragmento pasa a span, dentro de otro siempre montado', debeFallar: false, ficheros: pagina("      <p>Hola <span>{a && <span>y <b>adiós</b></span>}</span></p>") },
+  { n: 30, nombre: 'la variante: todo en una plantilla (un <option>)', debeFallar: false, ficheros: pagina("      <select><option>{`${n} hijo${n > 1 ? 's' : ''}`}</option></select>") },
+  { n: 31, nombre: 'una hoja que es una variable frente a vacío', debeFallar: false, ficheros: pagina("      <p>Hola {a ? resultado : ''}</p>") },
 ];
 
 let fallos = 0;
