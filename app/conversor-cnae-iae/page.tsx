@@ -26,6 +26,7 @@ import {
   CNAE_VIGENCIA,
   CNAE_IAE_RUTA_CATALOGO,
 } from '@/data/fiscal';
+import { ACTIVIDAD_IAE_DE_OFICIO, type ActividadIae } from './oficios-iae';
 
 /**
  * Retira del texto de la fuente el nombre de la normativa cuando `DataReference` ya lo va a
@@ -401,6 +402,24 @@ function consultaIaeEnMasculino(consultaNormalizada: string): string | null {
     }
   }
   return cambiada ? palabras.join(' ') : null;
+}
+
+/**
+ * La actividad del IAE del oficio tecleado, en cualquier género y número, o null (hito
+ * cnae-iae-sinonimos-oficio): «peluqueras» → «peluquería». Las parejas y por qué son esas, en
+ * `./oficios-iae`. Se usa en la CONSULTA, como el masculino del 2222: el oficio busca además su
+ * actividad y devuelve lo que devolvería escribirla.
+ */
+function actividadIaeDeOficio(consultaNormalizada: string): ActividadIae | null {
+  const singulares = [consultaNormalizada];
+  if (consultaNormalizada.endsWith('es')) singulares.push(consultaNormalizada.slice(0, -2));
+  if (consultaNormalizada.endsWith('s')) singulares.push(consultaNormalizada.slice(0, -1));
+  for (const forma of singulares) {
+    const actividad =
+      ACTIVIDAD_IAE_DE_OFICIO[forma] ?? ACTIVIDAD_IAE_DE_OFICIO[otroGenero(forma) ?? ''];
+    if (actividad) return actividad;
+  }
+  return null;
 }
 
 /** Deja solo los dígitos: «47.11» → «4711». */
@@ -901,9 +920,18 @@ export default function ConversorCnaeIaePage() {
   const digitosConsultaIae = digitosSiEsCodigo(consultaIae);
   /** «abogada» se busca también como «abogado» (hallazgo 2222); null si no nombra profesión. */
   const consultaIaeMasculina = consultaIaeEnMasculino(consultaIaeNormalizada);
+  /** «peluquero» se busca también como «peluquería»; null si no es un oficio del puente. */
+  const actividadDelOficio = useMemo(
+    () => actividadIaeDeOficio(consultaIaeNormalizada),
+    [consultaIaeNormalizada],
+  );
 
   const resultadosIae = useMemo<IaeIndexada[]>(() => {
     if (iaeIndexado.length === 0) return [];
+
+    const terminosActividad = actividadDelOficio
+      ? (actividadDelOficio.buscar ?? [actividadDelOficio.actividad]).map(normalizarTexto)
+      : [];
 
     const relevanciaDe = (entrada: IaeIndexada, consulta: string): number => {
       if (consulta.length === 0) return 0;
@@ -916,14 +944,15 @@ export default function ConversorCnaeIaePage() {
       return 4;
     };
     // El femenino de una profesión puntúa como su masculino: «médica» pone delante el 831
-    // «Médicos de Medicina General», igual que «médico» (hallazgo 2222).
+    // «Médicos de Medicina General», igual que «médico» (hallazgo 2222). Y un oficio, como su
+    // actividad: «peluquero» ordena igual que «peluquería».
+    const consultas = [
+      consultaIaeNormalizada,
+      ...(consultaIaeMasculina === null ? [] : [consultaIaeMasculina]),
+      ...terminosActividad,
+    ];
     const relevancia = (entrada: IaeIndexada): number =>
-      consultaIaeMasculina === null
-        ? relevanciaDe(entrada, consultaIaeNormalizada)
-        : Math.min(
-            relevanciaDe(entrada, consultaIaeNormalizada),
-            relevanciaDe(entrada, consultaIaeMasculina),
-          );
+      Math.min(...consultas.map((consulta) => relevanciaDe(entrada, consulta)));
 
     let base = iaeIndexado;
 
@@ -935,10 +964,7 @@ export default function ConversorCnaeIaePage() {
         if (digitosConsultaIae.length > 0) {
           return entrada.codigoDigitos.startsWith(digitosConsultaIae);
         }
-        return (
-          entrada.textoBusqueda.includes(consultaIaeNormalizada) ||
-          (consultaIaeMasculina !== null && entrada.textoBusqueda.includes(consultaIaeMasculina))
-        );
+        return consultas.some((consulta) => entrada.textoBusqueda.includes(consulta));
       });
     }
 
@@ -964,6 +990,7 @@ export default function ConversorCnaeIaePage() {
     consultaIae,
     consultaIaeNormalizada,
     consultaIaeMasculina,
+    actividadDelOficio,
     digitosConsultaIae,
     seccionIae,
   ]);
@@ -1466,6 +1493,13 @@ export default function ConversorCnaeIaePage() {
               <p className={styles.contador} role="status" aria-live="polite">
                 {formatNumber(resultadosIae.length, 0)}{' '}
                 {resultadosIae.length === 1 ? 'resultado' : 'resultados'}
+                {actividadDelOficio && (
+                  <span>
+                    {' '}
+                    · las Tarifas no nombran el oficio: se busca también «
+                    {actividadDelOficio.actividad}»
+                  </span>
+                )}
                 {resultadosIae.length > LIMITE_RESULTADOS && !verTodosIae && (
                   <>
                     {' '}

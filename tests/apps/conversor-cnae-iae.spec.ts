@@ -4695,3 +4695,109 @@ test.describe('Inspector 24/10/2026 — CASO 1 a 390 px', () => {
     expect(desborde).toBe(0);
   });
 });
+
+// ═══════════════════════════════════════════════════════════════════════════
+// HITO cnae-iae-sinonimos-oficio (31/10/2026) — el oficio encuentra en el IAE lo que encuentra
+// su actividad. Las Tarifas nombran actividades y no oficios: «peluquería» daba 3 epígrafes y
+// «peluquero» y «peluquera», 0 (medido en navegador el 22/09/2026, testigo del 1188). La vía que
+// preveía la Agenda —derivarlos por la tabla oficial CNAE→IAE— no existe: la `correspondencia`
+// del catálogo es CNAE-2009→CNAE-2025. El puente es de VOCABULARIO, en
+// `app/conversor-cnae-iae/oficios-iae.ts`, con sus exclusiones y el porqué de cada una.
+// ═══════════════════════════════════════════════════════════════════════════
+test.describe('Buscador CNAE-IAE — el oficio encuentra en el IAE lo que encuentra su actividad', () => {
+  const sinTildes = (t: string): string =>
+    t.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
+
+  /*
+   * No hace falta navegador: es un contrato sobre el dato. Cada pareja tiene que ser un oficio
+   * que el diccionario de la CNAE YA tiene (el hito no inventa oficios), de la misma familia
+   * que su actividad (peluquero/peluquería: sin eso sería elegir epígrafe, que es lo que la app
+   * niega hacer) y con lo que se busca presente de verdad en el literal de las Tarifas.
+   */
+  test('CANDADO — cada oficio del puente está en el diccionario, es de la familia de su actividad y su actividad está en las Tarifas', async () => {
+    const { readFileSync } = await import('node:fs');
+    const { join } = await import('node:path');
+    const { ACTIVIDAD_IAE_DE_OFICIO } = await import('../../app/conversor-cnae-iae/oficios-iae');
+    const catalogo = JSON.parse(
+      readFileSync(join(process.cwd(), 'public', 'datos', 'cnae-iae-catalogo.json'), 'utf8'),
+    ) as { iae: { titulo: string }[]; sinonimos: Record<string, string[]> };
+
+    const delDiccionario = new Set(Object.values(catalogo.sinonimos).flat().map(sinTildes));
+    const titulosIae = catalogo.iae.map((e) => sinTildes(e.titulo));
+
+    const fallos: string[] = [];
+    for (const [oficio, { actividad, buscar }] of Object.entries(ACTIVIDAD_IAE_DE_OFICIO)) {
+      if (oficio !== sinTildes(oficio)) fallos.push(`«${oficio}»: la clave va normalizada`);
+      if (!delDiccionario.has(oficio)) fallos.push(`«${oficio}» no es un sinónimo del diccionario de la CNAE`);
+      const a = sinTildes(actividad);
+      let comun = 0;
+      while (comun < Math.min(a.length, oficio.length) && a[comun] === oficio[comun]) comun++;
+      if (comun < 4 && !oficio.startsWith(a)) fallos.push(`«${oficio}» y «${actividad}» no son de la misma familia`);
+      for (const termino of (buscar ?? [actividad]).map(sinTildes)) {
+        if (!termino.includes(a)) fallos.push(`«${termino}» no contiene la actividad «${actividad}»`);
+        if (!titulosIae.some((t) => t.includes(termino))) fallos.push(`«${termino}» no figura en las Tarifas`);
+      }
+    }
+    expect(fallos).toEqual([]);
+  });
+
+  test('«peluquero», «peluquera» y «peluqueros» dan los 3 epígrafes de «peluquería», y lo dicen', async ({
+    page,
+  }) => {
+    await abrirHidratado(page);
+
+    // Resuelto a mano sobre el catálogo sellado: «peluqueria» casa como palabra completa en el
+    // grupo 972 y en sus dos epígrafes (el 972.2 la hereda del grupo); a igual relevancia van
+    // primero los epígrafes, por código.
+    for (const consulta of ['peluquero', 'peluquera', 'peluqueros', 'Peluqueras']) {
+      await buscarIaeVerificado(page, consulta);
+      await expect(contador(page)).toHaveText(/^3 resultados/, { timeout: 2000 });
+      await expect(fichas(page).first()).toContainText('Servicios de peluquería de señora y caballero');
+      await expect(fichas(page).locator('[class*="codigoCnae"]')).toHaveText(['972.1', '972.2', '972']);
+      await expect(contador(page)).toContainText('«peluquería»');
+    }
+
+    // La actividad escrita tal cual no lleva el aviso: no hay oficio que traducir.
+    await buscarIaeVerificado(page, 'peluquería');
+    await expect(contador(page)).toHaveText(/^3 resultados/, { timeout: 2000 });
+    await expect(contador(page)).not.toContainText('oficio');
+
+    // Y la CNAE sigue igual: el puente es solo del IAE.
+    await buscarCnaeVerificado(page, 'peluquera');
+    await expect(fichas(page).first()).toContainText('96.21');
+  });
+
+  test('cada oficio del puente, en masculino y en femenino, da lo mismo que su actividad', async ({ page }) => {
+    const { ACTIVIDAD_IAE_DE_OFICIO } = await import('../../app/conversor-cnae-iae/oficios-iae');
+    await abrirHidratado(page);
+
+    const femenino = (o: string): string => (o.endsWith('or') ? `${o}a` : `${o.slice(0, -1)}a`);
+    for (const [oficio, { actividad, buscar }] of Object.entries(ACTIVIDAD_IAE_DE_OFICIO)) {
+      if (buscar) continue; // «pan» por subcadena no es la referencia: va en su propio caso
+      await buscarIaeVerificado(page, actividad);
+      await expect(contador(page)).not.toHaveText(/^0 resultados/, { timeout: 2000 });
+      const esperado = (await contador(page).innerText()).match(/^[\d.]+ resultados?/)![0];
+      const codigos = await fichas(page).locator('[class*="codigoCnae"]').allInnerTexts();
+      for (const forma of [oficio, femenino(oficio)]) {
+        await buscarIaeVerificado(page, forma);
+        await expect(contador(page), forma).toHaveText(new RegExp(`^${esperado}`), { timeout: 2000 });
+        await expect(fichas(page).locator('[class*="codigoCnae"]'), forma).toHaveText(codigos);
+      }
+    }
+  });
+
+  test('«panadera» llega al pan de la industria (419) y del comercio (644), no a «paneles» ni a «españoles»', async ({
+    page,
+  }) => {
+    await abrirHidratado(page);
+    // A mano: «del pan» casa en el grupo 419 y sus tres epígrafes (4), y «de pan» en el grupo
+    // 644 y sus seis, del 644.1 al 644.6, que lo heredan del título del grupo (7): 11. «pan» a
+    // secas daría además el 462.3 «paneles» y el 618.2 «españoles».
+    await buscarIaeVerificado(page, 'panadera');
+    await expect(contador(page)).toHaveText(/^11 resultados/, { timeout: 2000 });
+    await panelActivo(page).getByRole('button', { name: /^Ver los/ }).click();
+    const codigos = await fichas(page).locator('[class*="codigoCnae"]').allInnerTexts();
+    expect(codigos).toEqual(expect.arrayContaining(['419.1', '644.2']));
+    expect(codigos.every((c) => c.startsWith('419') || c.startsWith('644'))).toBe(true);
+  });
+});
