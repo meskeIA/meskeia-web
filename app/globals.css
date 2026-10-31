@@ -25,6 +25,18 @@
   --primary-boton: #26718F;      /* texto blanco encima: 5,47:1 */
   --secondary-boton: #327874;    /* texto blanco encima: 5,15:1 */
 
+  /* ── Texto SEMÁNTICO en claro (cabo C0296, 31/10/2026) ──────────────────
+     El rojo, naranja, ámbar y verde que los módulos escriben como texto (#ef4444,
+     #f59e0b, #27ae60…) no llegaban a 4,5:1 sobre blanco en 1.074 reglas de 483 apps.
+     Se usan SIEMPRE con el color de antes como reserva —var(--rojo-texto, #ef4444)—
+     porque en oscuro valen `initial` (abajo) y manda la reserva: el oscuro se queda
+     como estaba. El porqué y el candado, en scripts/check-semanticos-claro.mjs.
+     Cada uno, en el peor de blanco, #FAFAFA, #F5F5F5 y el tinte al 20 % de su color: */
+  --rojo-texto: #B91C1C;         /* 6,47:1 sobre blanco · 4,99 sobre su tinte */
+  --naranja-texto: #B93E0B;      /* 5,59 · 4,56 */
+  --ambar-texto: #8A5A00;        /* 5,93 · 5,10 */
+  --verde-texto: #157A3C;        /* 5,41 · 4,55 */
+
   --text-primary: #1A1A1A;
   --text-secondary: #666666;
   --text-muted: #6E6E6E; /* 5,10:1 sobre blanco · 4,89 sobre la página #FAFAFA · 4,68
@@ -126,6 +138,14 @@
   --secondary-texto: #5ABDB9;
   --primary-boton: #26718F;
   --secondary-boton: #327874;
+
+  /* Los semánticos de texto NO existen en oscuro: `initial` hace que su var() tome la
+     reserva, que es el color que cada módulo tenía antes (C0296). Un tono pastel aquí
+     iría encima de los tintes claros que dos de cada tres módulos no cambian en oscuro. */
+  --rojo-texto: initial;
+  --naranja-texto: initial;
+  --ambar-texto: initial;
+  --verde-texto: initial;
 
   /* Textos invertidos */
   --text-primary: #E8E8E8;

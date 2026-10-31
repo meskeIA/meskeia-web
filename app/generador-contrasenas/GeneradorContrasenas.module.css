@@ -385,17 +385,17 @@
 .historyStrength0,
 .historyStrength1 {
   background: #ffe0e0;
-  color: #c0392b;
+  color: var(--rojo-texto, #c0392b);
 }
 
 .historyStrength2 {
   background: #ffecd9;
-  color: #d35400;
+  color: var(--naranja-texto, #d35400);
 }
 
 .historyStrength3 {
   background: #fff4e0;
-  color: #e67e22;
+  color: var(--ambar-texto, #e67e22);
 }
 
 .historyStrength4 {
@@ -405,7 +405,7 @@
 
 .historyStrength5 {
   background: #d5f4e6;
-  color: #27ae60;
+  color: var(--verde-texto, #27ae60);
 }
 
 .btnHistoryCopy {

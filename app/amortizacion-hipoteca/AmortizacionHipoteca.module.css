@@ -281,7 +281,7 @@
 }
 
 .saving {
-  color: var(--success) !important;
+  color: var(--verde-texto, var(--success)) !important;
 }
 
 .opcionFooter {
@@ -334,7 +334,7 @@
 }
 
 .comparativaTable .better {
-  color: var(--success);
+  color: var(--verde-texto, var(--success));
   font-weight: 600;
 }
 
@@ -433,7 +433,7 @@
 }
 
 .infoCard strong {
-  color: var(--success);
+  color: var(--verde-texto, var(--success));
 }
 
 .disclaimer {
@@ -910,7 +910,7 @@
   content: '•';
   position: absolute;
   left: 0;
-  color: #f59e0b;
+  color: var(--ambar-texto, #f59e0b);
   font-weight: 700;
 }
 

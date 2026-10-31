@@ -141,9 +141,9 @@
   font-size: 0.85rem;
 }
 
-.charCounter .optimo { color: var(--success); font-weight: 600; }
-.charCounter .corto { color: var(--warning); font-weight: 600; }
-.charCounter .largo { color: var(--error); font-weight: 600; }
+.charCounter .optimo { color: var(--verde-texto, var(--success)); font-weight: 600; }
+.charCounter .corto { color: var(--ambar-texto, var(--warning)); font-weight: 600; }
+.charCounter .largo { color: var(--rojo-texto, var(--error)); font-weight: 600; }
 .charLimit { color: var(--text-muted); }
 
 /* Ejemplos */
@@ -322,17 +322,17 @@
 
 .checkItem.passed {
   background: rgba(34, 197, 94, 0.1);
-  color: var(--success);
+  color: var(--verde-texto, var(--success));
 }
 
 .checkItem.failed {
   background: rgba(239, 68, 68, 0.1);
-  color: var(--error);
+  color: var(--rojo-texto, var(--error));
 }
 
 .checkItem.warning {
   background: rgba(245, 158, 11, 0.1);
-  color: var(--warning);
+  color: var(--ambar-texto, var(--warning));
 }
 
 .checkItem.neutral {
