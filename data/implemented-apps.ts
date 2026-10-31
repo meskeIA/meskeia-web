@@ -281,6 +281,7 @@ export const implementedAppsUrls = [
   "/juego-space-invaders/",     // Arcade clásico de invasores
   "/juego-platform-runner/",    // Juego de plataformas
   "/ruleta-aleatoria/",         // Ruleta personalizable para sorteos
+  "/sorteo-amigo-invisible/",   // Amigo invisible / amigo secreto con exclusiones y enlace privado
   "/generador-loteria/",        // Números para Primitiva, Euromillones, Bonoloto
   "/cara-o-cruz/",              // Lanza moneda con animación y estadísticas
   "/tirador-dados/",            // Dados virtuales para rol y juegos de mesa

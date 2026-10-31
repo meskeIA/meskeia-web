@@ -438,6 +438,12 @@ const ligaApp: RelatedApp = {
   name: 'Calendario de Liga',
   description: 'Todos contra todos en jornadas equilibradas',
 };
+const amigoInvisibleApp: RelatedApp = {
+  url: '/sorteo-amigo-invisible/',
+  icon: '🎁',
+  name: 'Amigo Invisible',
+  description: 'Sorteo con exclusiones y enlace privado',
+};
 const fichasCalculoApp: RelatedApp = {
   url: '/generador-fichas-calculo/',
   icon: '➗',
@@ -2897,7 +2903,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     ligaApp,
     { url: '/ruleta-aleatoria/', icon: '🎰', name: 'Ruleta', description: 'Sorteos y decisiones al azar' },
     { url: '/generador-loteria/', icon: '🎲', name: 'Lotería', description: 'Combinaciones aleatorias' },
-    { url: '/tirador-dados/', icon: '🎲', name: 'Tirador de Dados', description: 'Dados para rol y mesa' },
+    amigoInvisibleApp,
   ],
   'generador-calendario-liga': [
     bingoApp,
@@ -2978,7 +2984,13 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
   'juego-tres-en-raya': juegosCasualApps.filter(a => a.url !== '/juego-tres-en-raya/'),
   'juego-piedra-papel-tijera': juegosCasualApps.filter(a => a.url !== '/juego-piedra-papel-tijera/'),
-  'ruleta-aleatoria': [bingoApp, ...juegosCasualApps.filter(a => a.url !== '/ruleta-aleatoria/').slice(0, 3)],
+  'ruleta-aleatoria': [bingoApp, amigoInvisibleApp, ...juegosCasualApps.filter(a => a.url !== '/ruleta-aleatoria/').slice(0, 2)],
+  'sorteo-amigo-invisible': [
+    bingoApp,
+    { url: '/calculadora-gastos-compartidos/', icon: '🧾', name: 'Gastos Compartidos', description: 'Quién debe a quién tras la cena' },
+    { url: '/ruleta-aleatoria/', icon: '🎰', name: 'Ruleta', description: 'Sorteos y decisiones al azar' },
+    { url: '/generador-loteria/', icon: '🎲', name: 'Lotería', description: 'Combinaciones aleatorias' },
+  ],
   'generador-loteria': [bingoApp, ...juegosCasualApps.filter(a => a.url !== '/generador-loteria/').slice(0, 3)],
   'cara-o-cruz': juegosCasualApps.filter(a => a.url !== '/cara-o-cruz/'),
   'tirador-dados': [bingoApp, ligaApp, ...juegosCasualApps.filter(a => a.url !== '/tirador-dados/').slice(0, 2)],
