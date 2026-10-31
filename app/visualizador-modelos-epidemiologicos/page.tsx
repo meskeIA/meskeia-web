@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useId } from 'react';
 import styles from './ModelosEpidemiologicos.module.css';
 import {
   MeskeiaLogo,
@@ -276,6 +276,7 @@ const SeccionSIR = () => {
 
   const epidemia = r0 > 1;
 
+  const idBase = useId();
   const crearSlider = useCallback(
     (
       etiqueta: string,
@@ -290,11 +291,12 @@ const SeccionSIR = () => {
       const pct = ((valor - min) / (max - min)) * 100;
       return (
         <div className={styles.sliderGroup}>
-          <label className={styles.sliderLabel}>
+          <label htmlFor={`${idBase}-${simbolo}`} className={styles.sliderLabel}>
             <span>{simbolo} {etiqueta}</span>
             <span className={styles.sliderValor}>{valor.toFixed(2)}</span>
           </label>
           <input
+            id={`${idBase}-${simbolo}`}
             type="range"
             className={styles.sliderInput}
             style={{ ['--pct' as string]: `${pct}%` }}
@@ -309,7 +311,7 @@ const SeccionSIR = () => {
         </div>
       );
     },
-    []
+    [idBase]
   );
 
   return (
@@ -453,6 +455,7 @@ const SeccionSEIR = () => {
   const picoSEIR = Math.max(...ptosSEIR.map(p => p.i));
   const diaSEIR = ptosSEIR.findIndex(p => p.i === picoSEIR);
 
+  const idBase = useId();
   const crearSlider = useCallback(
     (
       etiqueta: string,
@@ -467,11 +470,12 @@ const SeccionSEIR = () => {
       const pct = ((valor - min) / (max - min)) * 100;
       return (
         <div className={styles.sliderGroup}>
-          <label className={styles.sliderLabel}>
+          <label htmlFor={`${idBase}-${simbolo}`} className={styles.sliderLabel}>
             <span>{simbolo} {etiqueta}</span>
             <span className={styles.sliderValor}>{valor.toFixed(2)}</span>
           </label>
           <input
+            id={`${idBase}-${simbolo}`}
             type="range"
             className={styles.sliderInput}
             style={{ ['--pct' as string]: `${pct}%` }}
@@ -483,7 +487,7 @@ const SeccionSEIR = () => {
         </div>
       );
     },
-    []
+    [idBase]
   );
 
   return (
