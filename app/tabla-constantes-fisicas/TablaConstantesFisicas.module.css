@@ -290,7 +290,7 @@
 }
 
 .badgeMedida {
-  color: #B45309;
+  color: var(--naranja-texto, #B45309);
   background: rgba(224, 122, 31, 0.14);
 }
 

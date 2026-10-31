@@ -333,7 +333,7 @@
 .dangerBtn {
   background: rgba(239, 68, 68, 0.06);
   border-color: rgba(239, 68, 68, 0.3);
-  color: rgb(220, 38, 38);
+  color: var(--rojo-texto, rgb(220, 38, 38));
 }
 
 .dangerBtn:hover {

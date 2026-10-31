@@ -451,7 +451,7 @@
 }
 
 .expressionError {
-  color: #ef4444;
+  color: var(--rojo-texto, #ef4444);
   font-size: 0.9rem;
   margin-top: var(--spacing-sm);
 }

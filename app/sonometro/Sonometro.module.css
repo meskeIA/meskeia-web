@@ -1299,7 +1299,7 @@
 
 .btnBorrarTodo:hover {
   border-color: #ef4444;
-  color: #ef4444;
+  color: var(--rojo-texto, #ef4444);
 }
 
 .btnImprimir:focus-visible,

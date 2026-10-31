@@ -104,7 +104,7 @@
   border-radius: 6px;
   margin-left: 0.4rem;
 }
-.exotermica  { background: #fef2f2; color: #dc2626; }
+.exotermica  { background: #fef2f2; color: var(--rojo-texto, #dc2626); }
 .endotermica { background: #eff6ff; color: #1d4ed8; }
 .variable    { background: #f3f4f6; color: #6b7280; }
 
@@ -304,8 +304,8 @@
 .rowBase td:first-child { color: var(--primary-texto); }
 
 .tagR { color: #dc2626; font-size: 0.75rem; font-weight: 700; }
-.tagP { color: #059669; font-size: 0.75rem; font-weight: 700; }
-.tagLimite { color: #f59e0b; font-size: 0.75rem; font-weight: 700; }
+.tagP { color: var(--verde-texto, #059669); font-size: 0.75rem; font-weight: 700; }
+.tagLimite { color: var(--ambar-texto, #f59e0b); font-size: 0.75rem; font-weight: 700; }
 
 /* Ecuación display */
 .ecuacionDisplay {
@@ -522,7 +522,7 @@
   position: relative;
 }
 
-.warningList li::before { content: '✗'; position: absolute; left: 0; color: #f59e0b; font-weight: 700; }
+.warningList li::before { content: '✗'; position: absolute; left: 0; color: var(--ambar-texto, #f59e0b); font-weight: 700; }
 
 /* Dark mode */
 [data-theme='dark'] .reaccionCard,

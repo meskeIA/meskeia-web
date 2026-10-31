@@ -142,7 +142,7 @@
 
 .precioAdvertencia {
   font-size: 0.85rem;
-  color: #D94F4F;
+  color: var(--rojo-texto, #D94F4F);
   font-weight: 500;
   flex-basis: 100%;
 }

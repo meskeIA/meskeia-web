@@ -421,7 +421,7 @@
 
 .nivelBadgeAlto {
   background: rgba(220, 38, 38, 0.1);
-  color: #dc2626;
+  color: var(--rojo-texto, #dc2626);
 }
 
 .nivelBadgeModerado {
@@ -477,7 +477,7 @@
   align-items: center;
   gap: 0.4rem;
   background: rgba(22, 163, 74, 0.07);
-  color: #16a34a;
+  color: var(--verde-texto, #16a34a);
   border: 1px solid rgba(22, 163, 74, 0.2);
   border-radius: 20px;
   padding: 0.3rem 0.85rem;

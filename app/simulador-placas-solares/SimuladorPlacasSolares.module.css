@@ -203,8 +203,8 @@
   margin-bottom: 0.25rem;
 }
 
-.resultValueHighlight { color: var(--color-ok); }
-.resultValueSolar { color: var(--color-solar); }
+.resultValueHighlight { color: var(--verde-texto, var(--color-ok)); }
+.resultValueSolar { color: var(--ambar-texto, var(--color-solar)); }
 .resultLabel { font-size: 0.8rem; color: var(--text-secondary); line-height: 1.3; }
 
 /* ─── BARRA COMPARATIVA ─── */
@@ -328,7 +328,7 @@
 .tipCard p { font-size: 0.85rem; color: var(--text-secondary); margin: 0; line-height: 1.5; }
 
 .warningBox { background: rgba(245,158,11,0.07); border: 1px solid rgba(245,158,11,0.3); border-radius: var(--radius-large); padding: 1.5rem; }
-.warningBox h2 { font-size: 1.1rem; font-weight: 700; color: var(--color-warn); margin: 0 0 1rem; }
+.warningBox h2 { font-size: 1.1rem; font-weight: 700; color: var(--ambar-texto, var(--color-warn)); margin: 0 0 1rem; }
 .warningGrid { display: flex; flex-direction: column; gap: 0.75rem; }
 .warningItem { background: var(--bg-card); border-radius: var(--radius); padding: 1rem; }
 .warningItem strong { display: block; font-size: 0.9rem; margin-bottom: 0.35rem; }

@@ -261,7 +261,7 @@
 
 .removeRowBtn:hover {
   border-color: #ef4444;
-  color: #ef4444;
+  color: var(--rojo-texto, #ef4444);
 }
 
 .addRowBtn {
@@ -366,7 +366,7 @@
 }
 
 .sqlTable {
-  color: #34d399;
+  color: var(--verde-texto, #34d399);
 }
 
 .sqlOperator {
@@ -374,7 +374,7 @@
 }
 
 .sqlString {
-  color: #fbbf24;
+  color: var(--ambar-texto, #fbbf24);
 }
 
 [data-theme='dark'] .sqlBox {

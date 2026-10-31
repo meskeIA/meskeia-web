@@ -260,7 +260,7 @@
   border-radius: 6px;
   padding: 4px 10px;
   cursor: pointer;
-  color: rgb(239, 68, 68);
+  color: var(--rojo-texto, rgb(239, 68, 68));
   font-family: inherit;
   font-size: 0.85rem;
 }
@@ -576,13 +576,13 @@
 .resultadoAceptado {
   background: rgba(16, 185, 129, 0.1);
   border: 1px solid rgba(16, 185, 129, 0.4);
-  color: rgb(16, 185, 129);
+  color: var(--verde-texto, rgb(16, 185, 129));
 }
 
 .resultadoRechazado {
   background: rgba(239, 68, 68, 0.1);
   border: 1px solid rgba(239, 68, 68, 0.4);
-  color: rgb(239, 68, 68);
+  color: var(--rojo-texto, rgb(239, 68, 68));
 }
 
 .resultadoNeutro {

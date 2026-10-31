@@ -250,11 +250,11 @@
 }
 
 .lineaResta strong {
-  color: #ef4444;
+  color: var(--rojo-texto, #ef4444);
 }
 
 .lineaSuma strong {
-  color: #f59e0b;
+  color: var(--ambar-texto, #f59e0b);
 }
 
 .lineaSubtotal {
@@ -293,7 +293,7 @@
 }
 
 .colModulos .lineaTotal strong {
-  color: #d97706;
+  color: var(--ambar-texto, #d97706);
 }
 
 .colModulos .lineaSubtotal {
@@ -644,7 +644,7 @@
   content: '✗';
   position: absolute;
   left: 0;
-  color: #f59e0b;
+  color: var(--ambar-texto, #f59e0b);
   font-weight: 700;
 }
 

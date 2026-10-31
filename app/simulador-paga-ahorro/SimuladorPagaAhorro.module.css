@@ -63,8 +63,8 @@
 /* ─── Resultados ─────────────────────────── */
 .placeholder { text-align: center; color: var(--text-secondary); padding: 2rem; font-size: 0.95rem; }
 .resultados { display: flex; flex-direction: column; gap: var(--spacing-md); }
-.positivo { color: var(--success); }
-.negativo { color: var(--danger); }
+.positivo { color: var(--verde-texto, var(--success)); }
+.negativo { color: var(--rojo-texto, var(--danger)); }
 
 /* Barra de gastos vs sobrante */
 .barraContainer { margin-bottom: 0.5rem; }

@@ -115,7 +115,7 @@
 .funcPrimitiva {
   font-family: var(--font-mono, monospace);
   font-size: 1.05rem;
-  color: #E07A1F;
+  color: var(--naranja-texto, #E07A1F);
 }
 
 .funcNotes {

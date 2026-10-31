@@ -346,7 +346,7 @@
 }
 
 .valueRowSin .valueNum {
-  color: #E07A1F;
+  color: var(--naranja-texto, #E07A1F);
 }
 
 .valueRowCos .valueNum {
@@ -354,7 +354,7 @@
 }
 
 .valueIdentidad {
-  color: #2a9d2a !important;
+  color: var(--verde-texto, #2a9d2a) !important;
 }
 
 .valueCuadrante {
@@ -391,13 +391,13 @@
 
 .signoPos {
   font-size: 0.8rem;
-  color: #2a9d2a;
+  color: var(--verde-texto, #2a9d2a);
   font-weight: 600;
 }
 
 .signoNeg {
   font-size: 0.8rem;
-  color: #E07A1F;
+  color: var(--naranja-texto, #E07A1F);
   font-weight: 600;
 }
 

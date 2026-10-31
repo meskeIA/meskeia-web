@@ -835,7 +835,7 @@
 
 .mensajeOk {
   background: var(--ok-bg);
-  color: var(--ok);
+  color: var(--verde-texto, var(--ok));
 }
 
 .mensajeCerca {

@@ -466,7 +466,7 @@
 }
 
 .tablaRowDestacada td:first-child {
-  color: #E07A1F;
+  color: var(--naranja-texto, #E07A1F);
 }
 
 /* ---- FORMULA BOX ------------------------------------------- */

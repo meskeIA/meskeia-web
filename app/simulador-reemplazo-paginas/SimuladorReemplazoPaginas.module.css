@@ -78,7 +78,7 @@
 }
 
 .expressionError {
-  color: #ef4444;
+  color: var(--rojo-texto, #ef4444);
   font-size: 0.9rem;
   margin-top: var(--spacing-sm);
 }
@@ -319,13 +319,13 @@
 
 .celdaHit {
   background: rgba(22, 163, 74, 0.18);
-  color: #15803d;
+  color: var(--verde-texto, #15803d);
   font-weight: 700;
 }
 
 .celdaFault {
   background: rgba(245, 158, 11, 0.22);
-  color: #b45309;
+  color: var(--naranja-texto, #b45309);
   font-weight: 700;
 }
 
@@ -337,13 +337,13 @@
 
 .statusHit {
   background: rgba(22, 163, 74, 0.18);
-  color: #15803d;
+  color: var(--verde-texto, #15803d);
   font-weight: 700;
 }
 
 .statusFault {
   background: rgba(245, 158, 11, 0.22);
-  color: #b45309;
+  color: var(--naranja-texto, #b45309);
   font-weight: 700;
 }
 
@@ -395,12 +395,12 @@
 
 .legendHit {
   background: rgba(22, 163, 74, 0.18);
-  color: #15803d;
+  color: var(--verde-texto, #15803d);
 }
 
 .legendFault {
   background: rgba(245, 158, 11, 0.22);
-  color: #b45309;
+  color: var(--naranja-texto, #b45309);
 }
 
 .legendEvict {

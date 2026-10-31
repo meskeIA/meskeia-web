@@ -258,7 +258,7 @@
 .opLogList li {
   font-family: 'SF Mono', Monaco, monospace;
   font-size: 0.82rem;
-  color: #4ade80;
+  color: var(--verde-texto, #4ade80);
 }
 
 /* Responsive */

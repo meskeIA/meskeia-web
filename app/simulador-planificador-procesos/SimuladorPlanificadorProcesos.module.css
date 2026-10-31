@@ -231,7 +231,7 @@
   border-radius: 6px;
   padding: 4px 10px;
   cursor: pointer;
-  color: rgb(239, 68, 68);
+  color: var(--rojo-texto, rgb(239, 68, 68));
   font-family: inherit;
   font-size: 0.85rem;
 }
@@ -458,7 +458,7 @@
 }
 
 .inanicionAlert strong {
-  color: rgb(239, 68, 68);
+  color: var(--rojo-texto, rgb(239, 68, 68));
 }
 
 .inanicionOk {
@@ -475,7 +475,7 @@
 }
 
 .inanicionOk strong {
-  color: rgb(16, 185, 129);
+  color: var(--verde-texto, rgb(16, 185, 129));
 }
 
 /* Métricas por proceso */
@@ -987,7 +987,7 @@
 }
 
 .practicaFallo strong {
-  color: rgb(239, 68, 68);
+  color: var(--rojo-texto, rgb(239, 68, 68));
 }
 
 /* La marca ✓/✗ acompaña al color: quien no distingue el verde del rojo

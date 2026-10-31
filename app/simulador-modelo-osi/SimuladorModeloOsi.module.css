@@ -240,7 +240,7 @@
 
 .bloqueCab {
   background: rgba(192, 101, 58, 0.15);
-  color: #c0653a;
+  color: var(--naranja-texto, #c0653a);
   border: 1px solid rgba(192, 101, 58, 0.4);
 }
 
