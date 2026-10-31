@@ -443,10 +443,11 @@ export default function SimuladorTeoremaBayesPage() {
         <div className={styles.controls}>
           <div className={styles.controlsGrid}>
             <div className={styles.controlGroup}>
-              <label className={styles.controlLabel}>
+              <label htmlFor="prevalencia" className={styles.controlLabel}>
                 Prevalencia P(D) = <strong>{fmtPct(prevalencia, 2)}</strong>
               </label>
               <input
+                id="prevalencia"
                 type="range"
                 min={0.001}
                 max={0.5}
@@ -458,10 +459,11 @@ export default function SimuladorTeoremaBayesPage() {
               />
             </div>
             <div className={styles.controlGroup}>
-              <label className={styles.controlLabel}>
+              <label htmlFor="sensibilidad" className={styles.controlLabel}>
                 Sensibilidad P(+|D) = <strong>{fmtPct(sensibilidad, 1)}</strong>
               </label>
               <input
+                id="sensibilidad"
                 type="range"
                 min={0.50}
                 max={0.999}
@@ -473,10 +475,11 @@ export default function SimuladorTeoremaBayesPage() {
               />
             </div>
             <div className={styles.controlGroup}>
-              <label className={styles.controlLabel}>
+              <label htmlFor="especificidad" className={styles.controlLabel}>
                 Especificidad P(−|¬D) = <strong>{fmtPct(especificidad, 1)}</strong>
               </label>
               <input
+                id="especificidad"
                 type="range"
                 min={0.50}
                 max={0.999}

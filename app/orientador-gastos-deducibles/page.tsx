@@ -214,8 +214,9 @@ export default function OrientadorGastosDeduciblesPage() {
               helperText="Facturación anual antes de gastos"
             />
             <div className={styles.selectGroup}>
-              <label className={styles.selectLabel}>Tramo IRPF</label>
+              <label htmlFor="tipo-irpf" className={styles.selectLabel}>Tramo IRPF</label>
               <select
+                id="tipo-irpf"
                 className={styles.select}
                 value={tipoIRPF}
                 onChange={(e) => setTipoIRPF(e.target.value)}
@@ -228,8 +229,9 @@ export default function OrientadorGastosDeduciblesPage() {
               </select>
             </div>
             <div className={styles.selectGroup}>
-              <label className={styles.selectLabel}>Tipo IVA de tu actividad</label>
+              <label htmlFor="tipo-iva" className={styles.selectLabel}>Tipo IVA de tu actividad</label>
               <select
+                id="tipo-iva"
                 className={styles.select}
                 value={tipoIVA}
                 onChange={(e) => setTipoIVA(e.target.value)}

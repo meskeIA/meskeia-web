@@ -383,8 +383,9 @@ export default function AmortizacionHipotecaPage() {
             <h2 className={styles.sectionTitle}>Datos del préstamo original</h2>
 
             <div className={styles.formGroup}>
-              <label>Importe inicial (€)</label>
+              <label htmlFor="importe-inicial">Importe inicial (€)</label>
               <input
+                id="importe-inicial"
                 type="text"
                 value={importeInicial}
                 onChange={(e) => setImporteInicial(e.target.value)}
@@ -394,8 +395,9 @@ export default function AmortizacionHipotecaPage() {
 
             <div className={styles.formRow}>
               <div className={styles.formGroup}>
-                <label>Plazo (años)</label>
+                <label htmlFor="plazo-anios">Plazo (años)</label>
                 <input
+                  id="plazo-anios"
                   type="number"
                   value={plazoAnios}
                   onChange={(e) => setPlazoAnios(e.target.value)}
@@ -404,8 +406,9 @@ export default function AmortizacionHipotecaPage() {
                 />
               </div>
               <div className={styles.formGroup}>
-                <label>Tipo interés (%)</label>
+                <label htmlFor="tipo-interes">Tipo interés (%)</label>
                 <input
+                  id="tipo-interes"
                   type="text"
                   value={tipoInteres}
                   onChange={(e) => setTipoInteres(e.target.value)}
@@ -415,8 +418,9 @@ export default function AmortizacionHipotecaPage() {
             </div>
 
             <div className={styles.formGroup}>
-              <label>Fecha de inicio</label>
+              <label htmlFor="fecha-inicio">Fecha de inicio</label>
               <input
+                id="fecha-inicio"
                 type="date"
                 value={fechaInicio}
                 onChange={(e) => setFechaInicio(e.target.value)}
@@ -429,16 +433,18 @@ export default function AmortizacionHipotecaPage() {
             <div className={styles.inputCard}>
               <h2 className={styles.sectionTitle}>Amortización anticipada</h2>
               <div className={styles.formGroup}>
-                <label>Fecha de amortización</label>
+                <label htmlFor="fecha-amortizacion">Fecha de amortización</label>
                 <input
+                  id="fecha-amortizacion"
                   type="date"
                   value={fechaAmortizacion}
                   onChange={(e) => setFechaAmortizacion(e.target.value)}
                 />
               </div>
               <div className={styles.formGroup}>
-                <label>Importe a amortizar (€)</label>
+                <label htmlFor="importe-amortizacion">Importe a amortizar (€)</label>
                 <input
+                  id="importe-amortizacion"
                   type="text"
                   value={importeAmortizacion}
                   onChange={(e) => setImporteAmortizacion(e.target.value)}
@@ -453,8 +459,9 @@ export default function AmortizacionHipotecaPage() {
               <h2 className={styles.sectionTitle}>Comparar escenarios</h2>
               <p className={styles.modoDesc}>Compara diferentes importes de amortización para encontrar el óptimo</p>
               <div className={styles.formGroup}>
-                <label>Fecha de amortización</label>
+                <label htmlFor="fecha-amortizacion-escenarios">Fecha de amortización</label>
                 <input
+                  id="fecha-amortizacion-escenarios"
                   type="date"
                   value={fechaAmortizacion}
                   onChange={(e) => setFechaAmortizacion(e.target.value)}
@@ -462,8 +469,9 @@ export default function AmortizacionHipotecaPage() {
               </div>
               <div className={styles.formRow}>
                 <div className={styles.formGroup}>
-                  <label>Escenario 1 (€)</label>
+                  <label htmlFor="escenario-1">Escenario 1 (€)</label>
                   <input
+                    id="escenario-1"
                     type="text"
                     value={escenario1}
                     onChange={(e) => setEscenario1(e.target.value)}
@@ -471,8 +479,9 @@ export default function AmortizacionHipotecaPage() {
                   />
                 </div>
                 <div className={styles.formGroup}>
-                  <label>Escenario 2 (€)</label>
+                  <label htmlFor="escenario-2">Escenario 2 (€)</label>
                   <input
+                    id="escenario-2"
                     type="text"
                     value={escenario2}
                     onChange={(e) => setEscenario2(e.target.value)}
@@ -482,8 +491,9 @@ export default function AmortizacionHipotecaPage() {
               </div>
               <div className={styles.formRow}>
                 <div className={styles.formGroup}>
-                  <label>Escenario 3 (€)</label>
+                  <label htmlFor="escenario-3">Escenario 3 (€)</label>
                   <input
+                    id="escenario-3"
                     type="text"
                     value={escenario3}
                     onChange={(e) => setEscenario3(e.target.value)}
@@ -491,8 +501,9 @@ export default function AmortizacionHipotecaPage() {
                   />
                 </div>
                 <div className={styles.formGroup}>
-                  <label>Escenario 4 (€)</label>
+                  <label htmlFor="escenario-4">Escenario 4 (€)</label>
                   <input
+                    id="escenario-4"
                     type="text"
                     value={escenario4}
                     onChange={(e) => setEscenario4(e.target.value)}
@@ -509,8 +520,9 @@ export default function AmortizacionHipotecaPage() {
               <p className={styles.modoDesc}>Simula amortizaciones recurrentes cada año</p>
               <div className={styles.formRow}>
                 <div className={styles.formGroup}>
-                  <label>Amortización anual (€)</label>
+                  <label htmlFor="amortizacion-anual">Amortización anual (€)</label>
                   <input
+                    id="amortizacion-anual"
                     type="text"
                     value={amortizacionAnual}
                     onChange={(e) => setAmortizacionAnual(e.target.value)}
@@ -518,8 +530,9 @@ export default function AmortizacionHipotecaPage() {
                   />
                 </div>
                 <div className={styles.formGroup}>
-                  <label>Durante (años)</label>
+                  <label htmlFor="anios-amortizando">Durante (años)</label>
                   <input
+                    id="anios-amortizando"
                     type="number"
                     value={aniosAmortizando}
                     onChange={(e) => setAniosAmortizando(e.target.value)}

@@ -242,8 +242,9 @@ export default function ControlGastosPage() {
           </div>
 
           <div className={styles.inputGroup}>
-            <label className={styles.label}>Concepto</label>
+            <label htmlFor="concepto" className={styles.label}>Concepto</label>
             <input
+              id="concepto"
               type="text"
               className={styles.input}
               value={concepto}
@@ -253,8 +254,9 @@ export default function ControlGastosPage() {
           </div>
 
           <div className={styles.inputGroup}>
-            <label className={styles.label}>Importe</label>
+            <label htmlFor="importe" className={styles.label}>Importe</label>
             <input
+              id="importe"
               type="text"
               className={styles.input}
               value={importe}
@@ -264,8 +266,9 @@ export default function ControlGastosPage() {
           </div>
 
           <div className={styles.inputGroup}>
-            <label className={styles.label}>Fecha</label>
+            <label htmlFor="fecha" className={styles.label}>Fecha</label>
             <input
+              id="fecha"
               type="date"
               className={styles.input}
               value={fecha}
@@ -274,8 +277,8 @@ export default function ControlGastosPage() {
           </div>
 
           <div className={styles.inputGroup}>
-            <label className={styles.label}>Categoría</label>
-            <div className={styles.categoriaGrid}>
+            <label id="categoria-label" className={styles.label}>Categoría</label>
+            <div role="group" aria-labelledby="categoria-label" className={styles.categoriaGrid}>
               {categoriasActuales.map((cat) => (
                 <button
                   key={cat.id}

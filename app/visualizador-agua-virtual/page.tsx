@@ -327,10 +327,11 @@ function SeccionHuella() {
       {/* Slider de pais */}
       <div className={styles.sliderZona}>
         <div className={styles.sliderHeader}>
-          <label className={styles.sliderLabel}>Si todos vivieran como en...</label>
+          <label htmlFor="pais-estilo-vida" className={styles.sliderLabel}>Si todos vivieran como en...</label>
           <span className={styles.sliderValor}>{paisActual.bandera} {paisActual.pais}</span>
         </div>
         <input
+          id="pais-estilo-vida"
           type="range"
           className={styles.slider}
           min={0}

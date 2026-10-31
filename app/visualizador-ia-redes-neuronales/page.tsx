@@ -205,10 +205,11 @@ export default function VisualizadorIaRedesNeuronales() {
               {/* Panel de controles */}
               <div className={styles.controlesNeurona}>
                 <div className={styles.controlGrupo}>
-                  <label className={styles.controlLabel}>
+                  <label htmlFor="entrada-1" className={styles.controlLabel}>
                     Entrada x₁ = <strong>{entrada1.toFixed(2)}</strong>
                   </label>
                   <input
+                    id="entrada-1"
                     type="range" min="-2" max="2" step="0.1"
                     value={entrada1}
                     onChange={e => setEntrada1(parseFloat(e.target.value))}
@@ -217,10 +218,11 @@ export default function VisualizadorIaRedesNeuronales() {
                   />
                 </div>
                 <div className={styles.controlGrupo}>
-                  <label className={styles.controlLabel}>
+                  <label htmlFor="entrada-2" className={styles.controlLabel}>
                     Entrada x₂ = <strong>{entrada2.toFixed(2)}</strong>
                   </label>
                   <input
+                    id="entrada-2"
                     type="range" min="-2" max="2" step="0.1"
                     value={entrada2}
                     onChange={e => setEntrada2(parseFloat(e.target.value))}
@@ -229,10 +231,11 @@ export default function VisualizadorIaRedesNeuronales() {
                   />
                 </div>
                 <div className={styles.controlGrupo}>
-                  <label className={styles.controlLabel}>
+                  <label htmlFor="peso-1" className={styles.controlLabel}>
                     Peso w₁ = <strong>{peso1.toFixed(2)}</strong>
                   </label>
                   <input
+                    id="peso-1"
                     type="range" min="-2" max="2" step="0.1"
                     value={peso1}
                     onChange={e => setPeso1(parseFloat(e.target.value))}
@@ -241,10 +244,11 @@ export default function VisualizadorIaRedesNeuronales() {
                   />
                 </div>
                 <div className={styles.controlGrupo}>
-                  <label className={styles.controlLabel}>
+                  <label htmlFor="peso-2" className={styles.controlLabel}>
                     Peso w₂ = <strong>{peso2.toFixed(2)}</strong>
                   </label>
                   <input
+                    id="peso-2"
                     type="range" min="-2" max="2" step="0.1"
                     value={peso2}
                     onChange={e => setPeso2(parseFloat(e.target.value))}
@@ -253,10 +257,11 @@ export default function VisualizadorIaRedesNeuronales() {
                   />
                 </div>
                 <div className={styles.controlGrupo}>
-                  <label className={styles.controlLabel}>
+                  <label htmlFor="bias" className={styles.controlLabel}>
                     Bias b = <strong>{bias.toFixed(2)}</strong>
                   </label>
                   <input
+                    id="bias"
                     type="range" min="-2" max="2" step="0.1"
                     value={bias}
                     onChange={e => setBias(parseFloat(e.target.value))}
@@ -506,10 +511,11 @@ export default function VisualizadorIaRedesNeuronales() {
 
               <div className={styles.simuladorEntrenamiento}>
                 <div className={styles.controlGrupo}>
-                  <label className={styles.controlLabel}>
+                  <label htmlFor="learning-rate" className={styles.controlLabel}>
                     Learning rate (α) = <strong>{learningRate.toFixed(3)}</strong>
                   </label>
                   <input
+                    id="learning-rate"
                     type="range" min="0.001" max="1.0" step="0.001"
                     value={learningRate}
                     onChange={e => setLearningRate(parseFloat(e.target.value))}

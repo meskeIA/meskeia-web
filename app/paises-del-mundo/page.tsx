@@ -174,8 +174,8 @@ export default function PaisesDelMundoPage() {
 
           {/* Filtro por continente */}
           <div className={styles.filterContainer}>
-            <label className={styles.filterLabel}>Filtrar por continente:</label>
-            <div className={styles.filterButtons}>
+            <label id="continente-label" className={styles.filterLabel}>Filtrar por continente:</label>
+            <div role="group" aria-labelledby="continente-label" className={styles.filterButtons}>
               {continents.map((continent) => (
                 <button
                   type="button"

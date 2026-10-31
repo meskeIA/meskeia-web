@@ -506,10 +506,11 @@ export default function SimuladorIntegralAreaPage() {
         <div className={styles.controls}>
           <div className={styles.controlsGrid}>
             <div className={styles.controlGroup}>
-              <label className={styles.controlLabel}>
+              <label htmlFor="limite-inferior" className={styles.controlLabel}>
                 Límite inferior (a = <strong>{fmt(a, 3)}</strong>)
               </label>
               <input
+                id="limite-inferior"
                 type="range"
                 min={funcion.xMin}
                 max={funcion.xMax}
@@ -521,10 +522,11 @@ export default function SimuladorIntegralAreaPage() {
               />
             </div>
             <div className={styles.controlGroup}>
-              <label className={styles.controlLabel}>
+              <label htmlFor="limite-superior" className={styles.controlLabel}>
                 Límite superior (b = <strong>{fmt(b, 3)}</strong>)
               </label>
               <input
+                id="limite-superior"
                 type="range"
                 min={funcion.xMin}
                 max={funcion.xMax}
@@ -538,10 +540,10 @@ export default function SimuladorIntegralAreaPage() {
           </div>
 
           <div className={styles.controlGroup}>
-            <label className={styles.controlLabel}>
+            <label id="num-rectangulos-label" className={styles.controlLabel}>
               Número de rectángulos (n = <strong>{n}</strong>)
             </label>
-            <div className={styles.discreteSteps} role="group" aria-label="Número de rectángulos">
+            <div className={styles.discreteSteps} role="group" aria-labelledby="num-rectangulos-label" aria-label="Número de rectángulos">
               {N_VALORES.map(v => (
                 <button
                   type="button"

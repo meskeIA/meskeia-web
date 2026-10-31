@@ -218,8 +218,9 @@ export default function NotasPage() {
           </h2>
 
           <div className={styles.formGroup}>
-            <label className={styles.label}>Título</label>
+            <label htmlFor="nota-titulo" className={styles.label}>Título</label>
             <input
+              id="nota-titulo"
               type="text"
               value={titulo}
               onChange={(e) => setTitulo(e.target.value)}
@@ -230,8 +231,9 @@ export default function NotasPage() {
           </div>
 
           <div className={styles.formGroup}>
-            <label className={styles.label}>Categoría</label>
+            <label htmlFor="nota-categoria" className={styles.label}>Categoría</label>
             <select
+              id="nota-categoria"
               value={categoria}
               onChange={(e) => setCategoria(e.target.value)}
               className={styles.select}
@@ -245,8 +247,9 @@ export default function NotasPage() {
           </div>
 
           <div className={styles.formGroup}>
-            <label className={styles.label}>Contenido</label>
+            <label htmlFor="nota-contenido" className={styles.label}>Contenido</label>
             <textarea
+              id="nota-contenido"
               value={contenido}
               onChange={(e) => setContenido(e.target.value)}
               placeholder="Escribe o pega tu texto aquí..."

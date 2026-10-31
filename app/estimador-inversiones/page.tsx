@@ -337,9 +337,10 @@ export default function CalculadoraInversionesPage() {
           <h2 className={styles.sectionTitle}><span aria-hidden="true">💰</span> Capital a Invertir</h2>
 
           <div className={styles.inputGroup}>
-            <label className={styles.label}>Importe total</label>
+            <label htmlFor="importe-total" className={styles.label}>Importe total</label>
             <div className={styles.inputWrapper}>
               <input
+                id="importe-total"
                 type="text"
                 className={styles.input}
                 value={capitalInvertir}
@@ -354,10 +355,11 @@ export default function CalculadoraInversionesPage() {
 
           <div className={styles.sliderGroup}>
             <div className={styles.sliderHeader}>
-              <label className={styles.label}>Tu edad</label>
+              <label htmlFor="edad-inversor" className={styles.label}>Tu edad</label>
               <span className={styles.sliderValue}>{edadInversor} años</span>
             </div>
             <input
+              id="edad-inversor"
               type="range"
               className={styles.slider}
               min="18"
@@ -369,10 +371,11 @@ export default function CalculadoraInversionesPage() {
 
           <div className={styles.sliderGroup}>
             <div className={styles.sliderHeader}>
-              <label className={styles.label}>Horizonte temporal</label>
+              <label htmlFor="horizonte-temporal" className={styles.label}>Horizonte temporal</label>
               <span className={styles.sliderValue}>{horizonteTemporal} años</span>
             </div>
             <input
+              id="horizonte-temporal"
               type="range"
               className={styles.slider}
               min="1"
@@ -554,8 +557,8 @@ export default function CalculadoraInversionesPage() {
         {/* Selector de Perfil y Horizonte */}
         <div className={styles.comparadorConfig}>
           <div className={styles.configItem}>
-            <label className={styles.label}>Perfil de riesgo</label>
-            <div className={styles.perfilesRow}>
+            <label id="perfil-riesgo-label" className={styles.label}>Perfil de riesgo</label>
+            <div role="group" aria-labelledby="perfil-riesgo-label" className={styles.perfilesRow}>
               {(Object.keys(PERFILES) as PerfilInversor[]).map((key) => (
                 <button
                   key={key}
@@ -570,8 +573,9 @@ export default function CalculadoraInversionesPage() {
             </div>
           </div>
           <div className={styles.configItem}>
-            <label className={styles.label}>Horizonte: {horizonteTemporal} años</label>
+            <label htmlFor="horizonte-comparador" className={styles.label}>Horizonte: {horizonteTemporal} años</label>
             <input
+              id="horizonte-comparador"
               type="range"
               className={styles.slider}
               min="1"
@@ -586,9 +590,10 @@ export default function CalculadoraInversionesPage() {
         {/* Inputs de Escenarios */}
         <div className={styles.escenariosInputGrid}>
           <div className={styles.escenarioInput}>
-            <label className={styles.escenarioLabel}><span aria-hidden="true">💰</span> Escenario 1</label>
+            <label htmlFor="escenario-1" className={styles.escenarioLabel}><span aria-hidden="true">💰</span> Escenario 1</label>
             <div className={styles.inputWrapper}>
               <input
+                id="escenario-1"
                 type="text"
                 className={styles.input}
                 value={escenario1}
@@ -599,9 +604,10 @@ export default function CalculadoraInversionesPage() {
             </div>
           </div>
           <div className={styles.escenarioInput}>
-            <label className={styles.escenarioLabel}><span aria-hidden="true">💰</span> Escenario 2</label>
+            <label htmlFor="escenario-2" className={styles.escenarioLabel}><span aria-hidden="true">💰</span> Escenario 2</label>
             <div className={styles.inputWrapper}>
               <input
+                id="escenario-2"
                 type="text"
                 className={styles.input}
                 value={escenario2}
@@ -612,9 +618,10 @@ export default function CalculadoraInversionesPage() {
             </div>
           </div>
           <div className={styles.escenarioInput}>
-            <label className={styles.escenarioLabel}><span aria-hidden="true">💰</span> Escenario 3</label>
+            <label htmlFor="escenario-3" className={styles.escenarioLabel}><span aria-hidden="true">💰</span> Escenario 3</label>
             <div className={styles.inputWrapper}>
               <input
+                id="escenario-3"
                 type="text"
                 className={styles.input}
                 value={escenario3}

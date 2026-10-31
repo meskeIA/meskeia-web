@@ -188,10 +188,11 @@ function SeccionMultiplicador() {
       {/* Slider de coeficiente de reserva */}
       <div className={styles.sliderZona}>
         <div className={styles.sliderHeader}>
-          <label className={styles.sliderLabel}>Coeficiente de reserva</label>
+          <label htmlFor="coef-reserva" className={styles.sliderLabel}>Coeficiente de reserva</label>
           <span className={styles.sliderValor}>{coefReserva}%</span>
         </div>
         <input
+          id="coef-reserva"
           type="range"
           className={styles.slider}
           min={1}

@@ -319,8 +319,9 @@ export default function CalculadoraCalculoPage() {
             {tipoCalculo === 'derivadas' && (
               <>
                 <div className={styles.funcionSelector}>
-                  <label className={styles.label}>Función f(x)</label>
+                  <label htmlFor="funcion-derivada" className={styles.label}>Función f(x)</label>
                   <select
+                    id="funcion-derivada"
                     value={funcionDerivada}
                     onChange={(e) => setFuncionDerivada(e.target.value)}
                     className={styles.select}
@@ -343,8 +344,9 @@ export default function CalculadoraCalculoPage() {
             {tipoCalculo === 'integrales' && (
               <>
                 <div className={styles.funcionSelector}>
-                  <label className={styles.label}>Función f(x)</label>
+                  <label htmlFor="funcion-integral" className={styles.label}>Función f(x)</label>
                   <select
+                    id="funcion-integral"
                     value={funcionIntegral}
                     onChange={(e) => setFuncionIntegral(e.target.value)}
                     className={styles.select}
@@ -381,8 +383,9 @@ export default function CalculadoraCalculoPage() {
             {tipoCalculo === 'limites' && (
               <>
                 <div className={styles.funcionSelector}>
-                  <label className={styles.label}>Función f(x)</label>
+                  <label htmlFor="funcion-limite" className={styles.label}>Función f(x)</label>
                   <select
+                    id="funcion-limite"
                     value={funcionLimite}
                     onChange={(e) => setFuncionLimite(e.target.value)}
                     className={styles.select}

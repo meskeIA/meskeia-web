@@ -223,8 +223,9 @@ export default function DeclaracionRentaFallecidosPage() {
             </p>
 
             <div className={styles.formGroup}>
-              <label className={styles.label}>Rendimientos del trabajo del fallecido (hasta la fecha de fallecimiento)</label>
+              <label htmlFor="rendimientos-trabajo" className={styles.label}>Rendimientos del trabajo del fallecido (hasta la fecha de fallecimiento)</label>
               <select
+                id="rendimientos-trabajo"
                 className={styles.select}
                 value={verificacion.rendimientosTrabajo}
                 onChange={e => setVerificacion({ ...verificacion, rendimientosTrabajo: e.target.value as DatosVerificacion['rendimientosTrabajo'] })}
@@ -237,8 +238,9 @@ export default function DeclaracionRentaFallecidosPage() {
             </div>
 
             <div className={styles.formGroup}>
-              <label className={styles.label}>Rendimientos del capital mobiliario (intereses, dividendos...)</label>
+              <label htmlFor="capital-mobiliario" className={styles.label}>Rendimientos del capital mobiliario (intereses, dividendos...)</label>
               <select
+                id="capital-mobiliario"
                 className={styles.select}
                 value={verificacion.capitalMobiliario}
                 onChange={e => setVerificacion({ ...verificacion, capitalMobiliario: e.target.value as DatosVerificacion['capitalMobiliario'] })}
@@ -283,8 +285,9 @@ export default function DeclaracionRentaFallecidosPage() {
             <h2 className={styles.panelTitle}><span aria-hidden="true">2️⃣</span> ¿Individual o conjunta?</h2>
 
             <div className={styles.formGroup}>
-              <label className={styles.label}>¿Cuándo se produjo el fallecimiento?</label>
+              <label htmlFor="fecha-fallecimiento" className={styles.label}>¿Cuándo se produjo el fallecimiento?</label>
               <select
+                id="fecha-fallecimiento"
                 className={styles.select}
                 value={situacion.fechaFallecimiento}
                 onChange={e => setSituacion({ ...situacion, fechaFallecimiento: e.target.value as DatosSituacion['fechaFallecimiento'] })}
@@ -401,8 +404,9 @@ export default function DeclaracionRentaFallecidosPage() {
             <h2 className={styles.panelTitle}><span aria-hidden="true">4️⃣</span> Documentación necesaria</h2>
 
             <div className={styles.formGroup}>
-              <label className={styles.label}>¿La declaración sale a devolver o a pagar?</label>
+              <label htmlFor="tipo-declaracion" className={styles.label}>¿La declaración sale a devolver o a pagar?</label>
               <select
+                id="tipo-declaracion"
                 className={styles.select}
                 value={situacion.tipoDeclaracion}
                 onChange={e => setSituacion({ ...situacion, tipoDeclaracion: e.target.value as DatosSituacion['tipoDeclaracion'] })}
@@ -415,8 +419,9 @@ export default function DeclaracionRentaFallecidosPage() {
 
             {(situacion.tipoDeclaracion === 'a-devolver' || situacion.tipoDeclaracion === 'no-se') && (
               <div className={styles.formGroup}>
-                <label className={styles.label}>¿El importe de la devolución supera los {formatCurrency(UMBRAL_DEVOLUCION)}?</label>
+                <label htmlFor="importe-devolucion" className={styles.label}>¿El importe de la devolución supera los {formatCurrency(UMBRAL_DEVOLUCION)}?</label>
                 <select
+                  id="importe-devolucion"
                   className={styles.select}
                   value={situacion.importeDevolucion}
                   onChange={e => setSituacion({ ...situacion, importeDevolucion: e.target.value as DatosSituacion['importeDevolucion'] })}

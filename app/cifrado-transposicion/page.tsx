@@ -447,8 +447,9 @@ export default function CifradoTransposicionPage() {
           {/* Configuración específica por método */}
           {metodo === 'columnas' && (
             <div className={styles.configItem}>
-              <label className={styles.label}>Palabra clave</label>
+              <label htmlFor="palabra-clave" className={styles.label}>Palabra clave</label>
               <input
+                id="palabra-clave"
                 type="text"
                 value={clave}
                 onChange={(e) => setClave(e.target.value.toUpperCase())}
@@ -462,8 +463,9 @@ export default function CifradoTransposicionPage() {
 
           {metodo === 'railfence' && (
             <div className={styles.configItem}>
-              <label className={styles.label}>Número de rieles: {rieles}</label>
+              <label htmlFor="numero-rieles" className={styles.label}>Número de rieles: {rieles}</label>
               <input
+                id="numero-rieles"
                 type="range"
                 min={2}
                 max={10}
@@ -476,8 +478,9 @@ export default function CifradoTransposicionPage() {
 
           {metodo === 'escitala' && (
             <div className={styles.configItem}>
-              <label className={styles.label}>Diámetro del bastón: {diametro}</label>
+              <label htmlFor="diametro-baston" className={styles.label}>Diámetro del bastón: {diametro}</label>
               <input
+                id="diametro-baston"
                 type="range"
                 min={2}
                 max={12}

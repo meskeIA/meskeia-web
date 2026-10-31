@@ -336,10 +336,11 @@ function SeccionEscala() {
       {/* Selector de objeto */}
       <div className={styles.sliderZona}>
         <div className={styles.sliderHeader}>
-          <label className={styles.sliderLabel}>Si el Sol fuera un/a...</label>
+          <label htmlFor="objeto-escala" className={styles.sliderLabel}>Si el Sol fuera un/a...</label>
           <span className={styles.sliderValor}>{objetoActual.nombre} ({formatNumber(objetoActual.tamanioCm, 0)} cm)</span>
         </div>
         <input
+          id="objeto-escala"
           type="range"
           className={styles.slider}
           min={0}

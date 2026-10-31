@@ -431,8 +431,9 @@ export default function ConversorTallasPage() {
               <h3 className={styles.sectionTitle}>Ropa de Hombre</h3>
 
               <div className={styles.formGroup}>
-                <label className={styles.label}>Tipo de prenda</label>
+                <label htmlFor="hombre-tipo" className={styles.label}>Tipo de prenda</label>
                 <select
+                  id="hombre-tipo"
                   className={styles.select}
                   value={hombreTipo}
                   onChange={(e) => {
@@ -449,8 +450,9 @@ export default function ConversorTallasPage() {
               </div>
 
               <div className={styles.formGroup}>
-                <label className={styles.label}>Tu sistema de tallas</label>
+                <label htmlFor="hombre-sistema" className={styles.label}>Tu sistema de tallas</label>
                 <select
+                  id="hombre-sistema"
                   className={styles.select}
                   value={hombreSistema}
                   onChange={(e) => setHombreSistema(e.target.value as SistemaType)}
@@ -462,8 +464,9 @@ export default function ConversorTallasPage() {
               </div>
 
               <div className={styles.formGroup}>
-                <label className={styles.label}>Tu talla</label>
+                <label htmlFor="hombre-talla" className={styles.label}>Tu talla</label>
                 <input
+                  id="hombre-talla"
                   type="text"
                   className={styles.input}
                   value={hombreInput}
@@ -502,8 +505,9 @@ export default function ConversorTallasPage() {
               <h3 className={styles.sectionTitle}>Ropa de Mujer</h3>
 
               <div className={styles.formGroup}>
-                <label className={styles.label}>Tipo de prenda</label>
+                <label htmlFor="mujer-tipo" className={styles.label}>Tipo de prenda</label>
                 <select
+                  id="mujer-tipo"
                   className={styles.select}
                   value={mujerTipo}
                   onChange={(e) => {
@@ -519,8 +523,9 @@ export default function ConversorTallasPage() {
               </div>
 
               <div className={styles.formGroup}>
-                <label className={styles.label}>Tu sistema de tallas</label>
+                <label htmlFor="mujer-sistema" className={styles.label}>Tu sistema de tallas</label>
                 <select
+                  id="mujer-sistema"
                   className={styles.select}
                   value={mujerSistema}
                   onChange={(e) => setMujerSistema(e.target.value as SistemaType)}
@@ -532,8 +537,9 @@ export default function ConversorTallasPage() {
               </div>
 
               <div className={styles.formGroup}>
-                <label className={styles.label}>Tu talla</label>
+                <label htmlFor="mujer-talla" className={styles.label}>Tu talla</label>
                 <input
+                  id="mujer-talla"
                   type="text"
                   className={styles.input}
                   value={mujerInput}
@@ -572,8 +578,9 @@ export default function ConversorTallasPage() {
               <h3 className={styles.sectionTitle}>Calzado</h3>
 
               <div className={styles.formGroup}>
-                <label className={styles.label}>Tipo de calzado</label>
+                <label htmlFor="calzado-tipo" className={styles.label}>Tipo de calzado</label>
                 <select
+                  id="calzado-tipo"
                   className={styles.select}
                   value={calzadoTipo}
                   onChange={(e) => {
@@ -589,8 +596,9 @@ export default function ConversorTallasPage() {
               </div>
 
               <div className={styles.formGroup}>
-                <label className={styles.label}>Tu sistema de tallas</label>
+                <label htmlFor="calzado-sistema" className={styles.label}>Tu sistema de tallas</label>
                 <select
+                  id="calzado-sistema"
                   className={styles.select}
                   value={calzadoSistema}
                   onChange={(e) => setCalzadoSistema(e.target.value as SistemaType)}
@@ -602,8 +610,9 @@ export default function ConversorTallasPage() {
               </div>
 
               <div className={styles.formGroup}>
-                <label className={styles.label}>Tu talla</label>
+                <label htmlFor="calzado-talla" className={styles.label}>Tu talla</label>
                 <input
+                  id="calzado-talla"
                   type="text"
                   className={styles.input}
                   value={calzadoInput}
@@ -648,8 +657,9 @@ export default function ConversorTallasPage() {
               <h3 className={styles.sectionTitle}>Complementos</h3>
 
               <div className={styles.formGroup}>
-                <label className={styles.label}>Tipo de complemento</label>
+                <label htmlFor="complemento-tipo" className={styles.label}>Tipo de complemento</label>
                 <select
+                  id="complemento-tipo"
                   className={styles.select}
                   value={complementoTipo}
                   onChange={(e) => {
@@ -665,8 +675,9 @@ export default function ConversorTallasPage() {
               </div>
 
               <div className={styles.formGroup}>
-                <label className={styles.label}>Tu sistema de tallas</label>
+                <label htmlFor="complemento-sistema" className={styles.label}>Tu sistema de tallas</label>
                 <select
+                  id="complemento-sistema"
                   className={styles.select}
                   value={complementoSistema}
                   onChange={(e) => setComplementoSistema(e.target.value as SistemaType)}
@@ -678,8 +689,9 @@ export default function ConversorTallasPage() {
               </div>
 
               <div className={styles.formGroup}>
-                <label className={styles.label}>Tu talla</label>
+                <label htmlFor="complemento-talla" className={styles.label}>Tu talla</label>
                 <input
+                  id="complemento-talla"
                   type="text"
                   className={styles.input}
                   value={complementoInput}

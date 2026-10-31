@@ -256,9 +256,10 @@ export default function CalculadoraMedicamentosMascotasPage() {
 
             {/* Peso */}
             <div className={styles.inputGroup}>
-              <label>Peso de tu {tipoMascota}</label>
+              <label htmlFor="peso-mascota">Peso de tu {tipoMascota}</label>
               <div className={styles.inputConUnidad}>
                 <input
+                  id="peso-mascota"
                   type="text"
                   value={peso}
                   onChange={(e) => setPeso(e.target.value)}
@@ -271,8 +272,8 @@ export default function CalculadoraMedicamentosMascotasPage() {
 
             {/* Tipo */}
             <div className={styles.inputGroup}>
-              <label>Tipo de antiparasitario</label>
-              <div className={styles.tipoSelector}>
+              <label id="tipo-antiparasitario-label">Tipo de antiparasitario</label>
+              <div role="group" aria-labelledby="tipo-antiparasitario-label" className={styles.tipoSelector}>
                 <button
                   type="button"
                   className={`${styles.tipoBtn} ${tipoAntiparasitario === 'externo' ? styles.active : ''}`}
