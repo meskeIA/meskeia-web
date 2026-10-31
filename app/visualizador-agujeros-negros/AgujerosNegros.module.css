@@ -606,13 +606,13 @@
 }
 
 .hawkingEscape {
-  color: var(--ambar-texto, #f59e0b);
+  color: #f59e0b; /* semanticos-ok: etiqueta del diagrama de Hawking, sobre el fondo espacial #050510 */
   font-size: 0.8rem;
   font-weight: 600;
 }
 
 .hawkingCae {
-  color: var(--rojo-texto, #ef4444);
+  color: #ef4444; /* semanticos-ok: etiqueta del diagrama de Hawking, sobre el fondo espacial #050510 */
   font-size: 0.8rem;
 }
 

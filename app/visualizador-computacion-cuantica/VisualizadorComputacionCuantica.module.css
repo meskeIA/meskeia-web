@@ -566,7 +566,7 @@
 }
 
 .circuitoQubit {
-  color: var(--verde-texto, #3fb950);
+  color: #3fb950; /* semanticos-ok: qubit del circuito, sobre el fondo #0d1117 del padre */
   min-width: 50px;
 }
 

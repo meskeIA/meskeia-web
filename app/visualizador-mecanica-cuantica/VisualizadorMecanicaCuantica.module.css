@@ -657,7 +657,7 @@
   position: absolute;
   left: 40%;
   top: 35%;
-  color: var(--rojo-texto, #f44336);
+  color: #f44336; /* semanticos-ok: marca del túnel, sobre el lienzo oscuro #0a0a1a del padre */
   font-size: 1.2rem;
   animation: aparecer 2.5s ease-in-out infinite;
   animation-delay: 1s;
@@ -691,7 +691,7 @@
   position: absolute;
   right: 10%;
   top: 30%;
-  color: var(--verde-texto, #4CAF50);
+  color: #4CAF50; /* semanticos-ok: marca del túnel, sobre el lienzo oscuro #0a0a1a del padre */
   font-size: 1.5rem;
   font-weight: bold;
   transition: opacity 0.3s ease;

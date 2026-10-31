@@ -566,7 +566,7 @@
 }
 
 .powSimNonce {
-  color: var(--verde-texto, #7EE787);
+  color: #7EE787; /* semanticos-ok: simulación de prueba de trabajo, sobre .powSimBox #0D1117 */
   font-family: 'Courier New', Courier, monospace;
   font-size: 1.4rem;
   font-weight: 700;
@@ -580,11 +580,11 @@
 }
 
 .hashAnimado {
-  color: var(--ambar-texto, #E3B341);
+  color: #E3B341; /* semanticos-ok: simulación de prueba de trabajo, sobre .powSimBox #0D1117 */
 }
 
 .powSolucion {
-  color: var(--verde-texto, #7EE787);
+  color: #7EE787; /* semanticos-ok: simulación de prueba de trabajo, sobre .powSimBox #0D1117 */
   font-family: 'Courier New', Courier, monospace;
   font-size: 0.82rem;
   margin-top: var(--spacing-sm);

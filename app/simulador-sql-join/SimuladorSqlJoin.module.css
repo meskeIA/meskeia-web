@@ -366,7 +366,7 @@
 }
 
 .sqlTable {
-  color: var(--verde-texto, #34d399);
+  color: #34d399; /* semanticos-ok: el nombre de tabla va sobre el bloque SQL #1e293b del padre */
 }
 
 .sqlOperator {
@@ -374,7 +374,7 @@
 }
 
 .sqlString {
-  color: var(--ambar-texto, #fbbf24);
+  color: #fbbf24; /* semanticos-ok: literal de la consulta, sobre el bloque SQL #1e293b */
 }
 
 [data-theme='dark'] .sqlBox {

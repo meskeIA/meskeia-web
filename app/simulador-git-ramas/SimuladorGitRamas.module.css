@@ -258,7 +258,7 @@
 .opLogList li {
   font-family: 'SF Mono', Monaco, monospace;
   font-size: 0.82rem;
-  color: var(--verde-texto, #4ade80);
+  color: #4ade80; /* semanticos-ok: el registro de operaciones va sobre la consola #1a1a1a del padre */
 }
 
 /* Responsive */
