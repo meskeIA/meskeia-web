@@ -18,6 +18,7 @@ import {
   ShareCard,
   DisclaimerCard,
 } from '@/components';
+import { useGuardaRafaga } from '@/lib/useGuardaRafaga';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -251,41 +252,21 @@ export default function SelectorSmartphone() {
   const totalPreguntas = PREGUNTAS.length;
   const progreso = ((paso) / totalPreguntas) * 100;
 
-  /**
-   * Doble clic y dos toques seguidos (hallazgo 2659, la forma del 2507 de los quizzes).
-   * «Empezar», «Siguiente», «Anterior», «Ver resultado» y «Repetir» cambian la pantalla en el
-   * primer clic, y el foco desplaza la página; el segundo clic caía en el mismo punto sobre lo que
-   * hubiera debajo en la pantalla nueva. Con «Empezar» centrado hacia y 360 en un móvil, marcaba
-   * «Fotografía y vídeo» en la pregunta 1 (+2 a la gama) sin que nadie la eligiera. Un doble clic
-   * es UNA intención, así que un clic se ignora cuando cumple las dos cosas:
-   *   · es el 2.º (o 3.º…) de una ráfaga: `detail` > 1. Lo cuenta el navegador (clics seguidos en
-   *     el mismo sitio), no un temporizador de la app; con teclado o lector de pantalla es 0;
-   *   · y el clic ANTERIOR de la app cambió de pantalla. Sin esta condición, contestar y tocar
-   *     «Siguiente» deprisa —dos toques cercanos, que Chrome también cuenta como ráfaga— se comía
-   *     el «Siguiente», que sí era una intención nueva.
-   * El clic ignorado no toca el registro: el 3.º de una ráfaga se ignora igual que el 2.º.
-   * Receta común de la familia de selectores; la de los quizzes, en quiz-literatura-universal.
-   */
-  const ultimoCambioPantallaRef = useRef(false);
-  const clicDeMas = (e: React.MouseEvent<HTMLButtonElement>): boolean =>
-    e.detail > 1 && ultimoCambioPantallaRef.current;
-  const registrarClic = (cambiaPantalla: boolean) => {
-    ultimoCambioPantallaRef.current = cambiaPantalla;
-  };
+  // Doble clic y dos toques seguidos (hallazgo 2659): el 2.º toque de una ráfaga tras
+  // un clic que cambia de pantalla se ignora, también sobre las relacionadas y el pie. Receta de
+  // la familia en lib/useGuardaRafaga.ts (cabo C0317).
+  const marcarCambioPantalla = useGuardaRafaga();
 
   function seleccionarOpcion(valor: string) {
-    registrarClic(false);
     setRespuestas(prev => ({ ...prev, [preguntaActual.id]: valor }));
   }
 
-  function elegirOpcion(e: React.MouseEvent<HTMLButtonElement>, valor: string) {
-    if (clicDeMas(e)) return;
+  function elegirOpcion(valor: string) {
     seleccionarOpcion(valor);
   }
 
-  function empezar(e: React.MouseEvent<HTMLButtonElement>) {
-    if (clicDeMas(e)) return;
-    registrarClic(true);
+  function empezar() {
+    marcarCambioPantalla();
     setPantalla('test');
   }
 
@@ -313,9 +294,9 @@ export default function SelectorSmartphone() {
   // botón recibiera dos clics antes de repintar, no saltaría una pregunta. Y solo con la pregunta
   // respondida, aunque el botón ya esté desactivado sin ella: el `disabled` lo pone el render, y
   // un clic que llega antes de repintar no lo ve.
-  function avanzar(e: React.MouseEvent<HTMLButtonElement>) {
-    if (clicDeMas(e) || !respuestas[preguntaActual.id]) return;
-    registrarClic(true);
+  function avanzar() {
+    if (!respuestas[preguntaActual.id]) return;
+    marcarCambioPantalla();
     if (paso < totalPreguntas - 1) {
       setPaso(paso + 1);
     } else {
@@ -325,15 +306,14 @@ export default function SelectorSmartphone() {
     }
   }
 
-  function retroceder(e: React.MouseEvent<HTMLButtonElement>) {
-    if (clicDeMas(e) || paso === 0) return;
-    registrarClic(true);
+  function retroceder() {
+    if (paso === 0) return;
+    marcarCambioPantalla();
     setPaso(paso - 1);
   }
 
-  function reiniciar(e: React.MouseEvent<HTMLButtonElement>) {
-    if (clicDeMas(e)) return;
-    registrarClic(true);
+  function reiniciar() {
+    marcarCambioPantalla();
     setPantalla('intro');
     setPaso(0);
     setRespuestas({});
@@ -454,7 +434,7 @@ export default function SelectorSmartphone() {
                   key={op.valor}
                   type="button"
                   className={`${styles.opcionBtn} ${respuestas[preguntaActual.id] === op.valor ? styles.opcionSeleccionada : ''}`}
-                  onClick={e => elegirOpcion(e, op.valor)}
+                  onClick={() => elegirOpcion(op.valor)}
                   // role="radio" + aria-checked, no aria-pressed: la semántica real es la
                   // elección ÚNICA entre cuatro, no un conmutador. El contenedor declaraba
                   // radiogroup y no había un solo radio dentro (hallazgo 950).
