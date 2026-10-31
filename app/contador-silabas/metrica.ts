@@ -341,7 +341,7 @@ function escandirTramo(
       terminaEnVocal(actual.palabra) &&
       empiezaPorVocal(siguiente.palabra);
     const sobreElAcentoFinal = ultimaEmpiezaTonica && i + 1 === hasta - 1;
-    const funde = hayContacto && !sobreElAcentoFinal;
+    const funde: boolean = hayContacto && !sobreElAcentoFinal;
     if (funde) {
       sinalefas.push({
         indice: i,

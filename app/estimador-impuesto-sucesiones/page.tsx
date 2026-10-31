@@ -88,6 +88,10 @@ interface ResultadoSucesiones {
   baseLiquidable: number;
   // Liquidación
   cuotaIntegra: number;
+  /** Rótulo de la tarifa con su norma (tarifaYCoeficientesIS) */
+  tarifaAplicada: string;
+  /** `true` si la comunidad tiene tarifa propia: entonces se muestra el rótulo */
+  tarifaPropia: boolean;
   coeficienteMultiplicador: number;
   /** Lo que la corrección del salto del art. 22.2 LISD resta de la cuota (0 si no procede) */
   correccionSalto: number;

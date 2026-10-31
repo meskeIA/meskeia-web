@@ -807,7 +807,7 @@ test.describe('inspector 29/10/2026 (tarde) — re-inspección tras /reparar', (
     // el HTML que sirve el layout, no en el módulo: es lo que leen buscadores y asistentes.
     const html = await (await page.request.get(RUTA)).text();
     type Ld = { '@type': string; mainEntity?: { name: string; acceptedAnswer: { text: string } }[] };
-    const lds = [...html.matchAll(/<script type="application\/ld\+json">(.*?)<\/script>/gs)].map((x) => JSON.parse(x[1]) as Ld);
+    const lds = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].map((x) => JSON.parse(x[1]) as Ld);
     const faq = lds.find((x) => x['@type'] === 'FAQPage');
     expect(faq, 'el HTML servido no lleva FAQPage').toBeTruthy();
     const hongos = (faq?.mainEntity ?? []).filter((q) => /hongo/i.test(q.name));

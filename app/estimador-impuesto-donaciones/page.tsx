@@ -117,9 +117,6 @@ function describirBonificacion(b: BonificacionGrupoID | undefined): string {
       })
       .join('; ');
   }
-  if (b.exencion !== undefined) {
-    return `Exención si la base no supera ${euros0(b.exencion)}; por encima, ${pctFraccion(b.porcentaje ?? 0)}`;
-  }
   if (b.porcentaje && b.porcentaje > 0) return pctFraccion(b.porcentaje);
   return 'Sin bonificación';
 }
