@@ -304,7 +304,7 @@
   background: rgba(239, 68, 68, 0.1);
   border: 1px solid var(--danger);
   border-radius: var(--radius);
-  color: var(--danger);
+  color: var(--rojo-texto, var(--danger));
 }
 
 .error span {
@@ -826,7 +826,7 @@
 }
 
 .warningList li em {
-  color: var(--danger);
+  color: var(--rojo-texto, var(--danger));
   font-style: normal;
   font-weight: 600;
 }

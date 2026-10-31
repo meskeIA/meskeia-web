@@ -318,8 +318,8 @@
   font-variant-numeric: tabular-nums;
 }
 
-.expOk { color: #16a34a; }
-.expWarn { color: #ca8a04; }
+.expOk { color: var(--verde-texto, #16a34a); }
+.expWarn { color: var(--ambar-texto, #ca8a04); }
 .expBad { color: #dc2626; }
 
 /* Fórmula */
@@ -594,7 +594,7 @@
   content: '✗';
   position: absolute;
   left: 0;
-  color: #f59e0b;
+  color: var(--ambar-texto, #f59e0b);
   font-weight: 700;
 }
 

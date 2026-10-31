@@ -497,7 +497,7 @@
   border: 1px solid var(--danger);
   border-radius: var(--radius);
   padding: var(--spacing-md);
-  color: var(--danger);
+  color: var(--rojo-texto, var(--danger));
   font-size: 0.9rem;
 }
 
@@ -807,7 +807,7 @@
 .warningTitle {
   font-size: 1.05rem;
   font-weight: 700;
-  color: var(--danger);
+  color: var(--rojo-texto, var(--danger));
   margin: 0 0 var(--spacing-md) 0;
 }
 
@@ -1038,14 +1038,14 @@
 .tipsHeader {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--success);
+  color: var(--verde-texto, var(--success));
   margin: 0 0 var(--spacing-sm) 0;
 }
 
 .errorsHeader {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--danger);
+  color: var(--rojo-texto, var(--danger));
   margin: 0 0 var(--spacing-sm) 0;
 }
 

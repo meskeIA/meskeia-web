@@ -200,17 +200,17 @@
 
 .estadoAfinacion.afinado {
   background: rgba(34, 197, 94, 0.15);
-  color: #16A34A;
+  color: var(--verde-texto, #16A34A);
 }
 
 .estadoAfinacion.bajo {
   background: rgba(239, 68, 68, 0.15);
-  color: #DC2626;
+  color: var(--rojo-texto, #DC2626);
 }
 
 .estadoAfinacion.alto {
   background: rgba(245, 158, 11, 0.15);
-  color: #D97706;
+  color: var(--ambar-texto, #D97706);
 }
 
 /* Botón escuchar */
@@ -255,7 +255,7 @@
   padding: 20px;
   background: rgba(239, 68, 68, 0.1);
   border-radius: 12px;
-  color: #DC2626;
+  color: var(--rojo-texto, #DC2626);
 }
 
 .errorPermiso p {

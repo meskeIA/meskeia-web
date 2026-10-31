@@ -652,7 +652,7 @@
 .errorMsg {
   background: rgba(244, 67, 54, 0.1);
   border: 1px solid var(--error);
-  color: var(--error);
+  color: var(--rojo-texto, var(--error));
   padding: 12px 14px;
   border-radius: 8px;
   margin-top: 15px;

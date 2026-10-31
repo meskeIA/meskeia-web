@@ -821,7 +821,7 @@
   position: absolute;
   left: 0;
   top: 1px;
-  color: #f59e0b;
+  color: var(--ambar-texto, #f59e0b);
   font-weight: 900;
   font-size: 1rem;
 }

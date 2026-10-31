@@ -300,7 +300,7 @@
 }
 
 .temperatura {
-  color: #e67e22;
+  color: var(--naranja-texto, #e67e22);
   font-weight: 600;
 }
 

@@ -319,7 +319,7 @@
   border: 1px solid var(--danger);
   border-radius: var(--radius);
   background: transparent;
-  color: var(--danger);
+  color: var(--rojo-texto, var(--danger));
   font-size: 0.85rem;
   cursor: pointer;
   transition: all 0.2s ease;

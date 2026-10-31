@@ -152,8 +152,8 @@
   margin-bottom: 0.25rem;
 }
 
-.resultCard.ahorro .resultValor { color: var(--color-ok); }
-.resultCard.coste .resultValor { color: var(--color-fail); }
+.resultCard.ahorro .resultValor { color: var(--verde-texto, var(--color-ok)); }
+.resultCard.coste .resultValor { color: var(--rojo-texto, var(--color-fail)); }
 .resultCard.neutro .resultValor { color: var(--primary-texto); }
 
 .resultLabel { font-size: 0.78rem; color: var(--text-secondary); }
@@ -171,8 +171,8 @@
 
 .totalLabel { font-size: 0.9rem; color: var(--text-secondary); margin: 0 0 0.3rem; }
 .totalValorMes { font-size: 2rem; font-weight: 800; margin: 0 0 0.2rem; }
-.totalBox.ahorroTotal .totalValorMes { color: var(--color-ok); }
-.totalBox.costeTotal .totalValorMes { color: var(--color-fail); }
+.totalBox.ahorroTotal .totalValorMes { color: var(--verde-texto, var(--color-ok)); }
+.totalBox.costeTotal .totalValorMes { color: var(--rojo-texto, var(--color-fail)); }
 .totalValorAnual { font-size: 1rem; font-weight: 600; color: var(--text-secondary); margin: 0; }
 
 /* Desglose */
@@ -199,8 +199,8 @@
 
 .desgloseConcepto { color: var(--text-primary); }
 .desgloseImporte { font-weight: 700; }
-.desgloseImporte.positivo { color: var(--color-ok); }
-.desgloseImporte.negativo { color: var(--color-fail); }
+.desgloseImporte.positivo { color: var(--verde-texto, var(--color-ok)); }
+.desgloseImporte.negativo { color: var(--rojo-texto, var(--color-fail)); }
 .desgloseImporte.cero { color: var(--text-secondary); }
 
 /* Estado vacío */
@@ -243,7 +243,7 @@
 .tipCard h3 { font-size: 0.9rem; font-weight: 700; margin: 0 0 0.4rem; }
 .tipCard p { font-size: 0.85rem; color: var(--text-secondary); margin: 0; line-height: 1.5; }
 .warningBox { background: rgba(245,158,11,0.07); border: 1px solid rgba(245,158,11,0.3); border-radius: var(--radius-large); padding: 1.5rem; }
-.warningBox h2 { font-size: 1.1rem; font-weight: 700; color: var(--color-warn); margin: 0 0 1rem; }
+.warningBox h2 { font-size: 1.1rem; font-weight: 700; color: var(--ambar-texto, var(--color-warn)); margin: 0 0 1rem; }
 .warningGrid { display: flex; flex-direction: column; gap: 0.75rem; }
 .warningItem { background: var(--bg-card); border-radius: var(--radius); padding: 1rem; }
 .warningItem strong { display: block; font-size: 0.9rem; margin-bottom: 0.35rem; }

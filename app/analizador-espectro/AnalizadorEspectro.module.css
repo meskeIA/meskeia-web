@@ -316,7 +316,7 @@
 .errorMessage {
   background: #fef2f2;
   border: 1px solid #fecaca;
-  color: #dc2626;
+  color: var(--rojo-texto, #dc2626);
   padding: var(--spacing-md);
   border-radius: var(--radius);
   text-align: center;

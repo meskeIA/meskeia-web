@@ -172,7 +172,7 @@
   background: #fef2f2;
   border: 1px solid #fca5a5;
   border-radius: var(--radius);
-  color: #dc2626;
+  color: var(--rojo-texto, #dc2626);
   font-size: 0.9rem;
   margin-bottom: var(--spacing-md);
 }

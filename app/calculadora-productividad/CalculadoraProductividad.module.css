@@ -130,7 +130,7 @@
 
 .clearButton:hover {
   background: #fee;
-  color: #e74c3c;
+  color: var(--rojo-texto, #e74c3c);
   border-color: #e74c3c;
 }
 
@@ -185,7 +185,7 @@
 
 .removeButton:hover {
   opacity: 1;
-  color: #e74c3c;
+  color: var(--rojo-texto, #e74c3c);
 }
 
 /* Project Inputs */
@@ -298,19 +298,19 @@
 }
 
 .interpretationGood {
-  color: #27ae60;
+  color: var(--verde-texto, #27ae60);
   margin: 0 0 var(--spacing-md);
   line-height: 1.6;
 }
 
 .interpretationWarning {
-  color: #f39c12;
+  color: var(--ambar-texto, #f39c12);
   margin: 0 0 var(--spacing-md);
   line-height: 1.6;
 }
 
 .interpretationBad {
-  color: #e74c3c;
+  color: var(--rojo-texto, #e74c3c);
   margin: 0 0 var(--spacing-md);
   line-height: 1.6;
 }

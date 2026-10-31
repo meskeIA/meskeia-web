@@ -327,11 +327,11 @@
 }
 
 .statCard.success .statValue {
-  color: var(--success);
+  color: var(--verde-texto, var(--success));
 }
 
 .statCard.warning .statValue {
-  color: var(--warning);
+  color: var(--ambar-texto, var(--warning));
 }
 
 /* Conversor */
@@ -435,15 +435,15 @@
 }
 
 .simuladorResultadoValor.imposible {
-  color: var(--danger);
+  color: var(--rojo-texto, var(--danger));
 }
 
 .simuladorResultadoValor.dificil {
-  color: var(--warning);
+  color: var(--ambar-texto, var(--warning));
 }
 
 .simuladorResultadoValor.alcanzable {
-  color: var(--success);
+  color: var(--verde-texto, var(--success));
 }
 
 /* EvAU Sections */

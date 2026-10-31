@@ -237,7 +237,7 @@
 }
 
 .dosisChoque .dosisValue {
-  color: #e67e00;
+  color: var(--ambar-texto, #e67e00);
 }
 
 .btnPrimary {

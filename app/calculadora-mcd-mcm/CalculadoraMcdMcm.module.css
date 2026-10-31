@@ -145,7 +145,7 @@
 
 .removeBtn:hover {
   border-color: var(--error);
-  color: var(--error);
+  color: var(--rojo-texto, var(--error));
 }
 
 .addBtn {
@@ -169,7 +169,7 @@
 .errorMsg {
   background: rgba(239, 68, 68, 0.1);
   border: 1px solid var(--error);
-  color: var(--error);
+  color: var(--rojo-texto, var(--error));
   padding: var(--spacing-md);
   border-radius: var(--radius);
   margin-bottom: var(--spacing-lg);

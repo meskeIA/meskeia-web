@@ -234,7 +234,7 @@
 
 .btnQuitar:hover:not(:disabled) {
   border-color: var(--error);
-  color: var(--error);
+  color: var(--rojo-texto, var(--error));
 }
 
 .btnQuitar:disabled {

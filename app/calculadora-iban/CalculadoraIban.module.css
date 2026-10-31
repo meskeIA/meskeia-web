@@ -603,7 +603,7 @@
   font-weight: 700;
 }
 
-.tdNegative { color: #e53e3e; font-weight: 600; }
+.tdNegative { color: var(--rojo-texto, #e53e3e); font-weight: 600; }
 .tdPositive { color: #2f855a; font-weight: 600; }
 
 [data-theme='dark'] .tdNegative { color: #fc8181; }

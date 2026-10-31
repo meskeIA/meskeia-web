@@ -606,7 +606,7 @@
 
 .btnSecundario:hover {
   border-color: #e74c3c;
-  color: #e74c3c;
+  color: var(--rojo-texto, #e74c3c);
 }
 
 /* Costes */

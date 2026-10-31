@@ -269,7 +269,7 @@
 
 .ceroDiv {
   background: rgba(239, 68, 68, 0.15) !important;
-  color: var(--danger) !important;
+  color: var(--rojo-texto, var(--danger)) !important;
   font-weight: 600;
 }
 
@@ -638,7 +638,7 @@
 .warningHeader h3 {
   font-size: 1.05rem;
   font-weight: 600;
-  color: var(--warning);
+  color: var(--ambar-texto, var(--warning));
   margin: 0;
 }
 

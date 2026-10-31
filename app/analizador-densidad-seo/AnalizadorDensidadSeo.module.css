@@ -329,17 +329,17 @@
 /* Density Colors */
 .densityLow {
   background: var(--warning);
-  color: var(--warning);
+  color: var(--ambar-texto, var(--warning));
 }
 
 .densityOptimal {
   background: var(--success);
-  color: var(--success);
+  color: var(--verde-texto, var(--success));
 }
 
 .densityHigh {
   background: var(--error);
-  color: var(--error);
+  color: var(--rojo-texto, var(--error));
 }
 
 /* Phrases List */

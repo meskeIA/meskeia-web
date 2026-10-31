@@ -553,7 +553,7 @@
   align-items: center;
   gap: 8px;
   margin-bottom: var(--spacing-sm);
-  color: #e65100;
+  color: var(--naranja-texto, #e65100);
   font-size: 1rem;
 }
 

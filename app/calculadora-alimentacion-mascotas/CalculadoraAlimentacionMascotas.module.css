@@ -447,7 +447,7 @@
 
 .badgeAlto {
   background: rgba(220, 53, 69, 0.1);
-  color: #dc3545;
+  color: var(--rojo-texto, #dc3545);
 }
 
 .badgeMedio {
@@ -818,7 +818,7 @@
 
 .perdidaBox h4 {
   font-size: 0.9rem;
-  color: #B8860B;
+  color: var(--ambar-texto, #B8860B);
   margin: 0 0 8px;
 }
 

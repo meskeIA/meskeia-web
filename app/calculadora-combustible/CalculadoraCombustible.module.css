@@ -225,7 +225,7 @@
 
 .eficienciaBadge.normal {
   background: #FBBF24;
-  color: #92400E;
+  color: var(--naranja-texto, #92400E);
 }
 
 .eficienciaBadge.alto {
@@ -312,7 +312,7 @@
 
 .escalaBarra.normal {
   background: #FBBF24;
-  color: #92400E;
+  color: var(--naranja-texto, #92400E);
 }
 
 .escalaBarra.alto {

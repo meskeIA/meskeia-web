@@ -190,7 +190,7 @@
 .finalPrice .priceValue {
   font-size: 2rem;
   font-weight: 700;
-  color: var(--success);
+  color: var(--verde-texto, var(--success));
 }
 
 .arrow {

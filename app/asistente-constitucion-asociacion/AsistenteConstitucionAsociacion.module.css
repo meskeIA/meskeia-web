@@ -282,7 +282,7 @@
   background: transparent;
   border: 1px solid #e74c3c;
   border-radius: var(--radius);
-  color: #e74c3c;
+  color: var(--rojo-texto, #e74c3c);
   cursor: pointer;
   font-size: 0.85rem;
   transition: all 0.2s;

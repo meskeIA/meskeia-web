@@ -216,7 +216,7 @@
 
 .outputOne {
   background: rgba(46, 204, 113, 0.2) !important;
-  color: #27ae60;
+  color: var(--verde-texto, #27ae60);
 }
 
 .outputZero {
@@ -225,7 +225,7 @@
 
 .outputX {
   background: rgba(241, 196, 15, 0.2) !important;
-  color: #f39c12;
+  color: var(--ambar-texto, #f39c12);
 }
 
 .outputHeader {
@@ -360,7 +360,7 @@
 }
 
 .cellOne {
-  color: #27ae60;
+  color: var(--verde-texto, #27ae60);
 }
 
 .cellZero {
@@ -368,7 +368,7 @@
 }
 
 .cellX {
-  color: #f39c12;
+  color: var(--ambar-texto, #f39c12);
 }
 
 /* Groups Legend */

@@ -200,7 +200,7 @@
 }
 
 .statNumber { font-size: 1.6rem; font-weight: 700; color: var(--primary-texto); }
-.statNumberSuccess { font-size: 1.6rem; font-weight: 700; color: var(--success); }
+.statNumberSuccess { font-size: 1.6rem; font-weight: 700; color: var(--verde-texto, var(--success)); }
 .statNumberDanger { font-size: 1.6rem; font-weight: 700; color: var(--danger); }
 .statLabel { font-size: 0.72rem; color: var(--text-secondary); margin-top: 0.2rem; }
 
@@ -218,7 +218,7 @@
 
 .ayudasCardTitulo {
   font-weight: 700;
-  color: var(--success);
+  color: var(--verde-texto, var(--success));
   margin-bottom: 0.25rem;
   font-size: 0.85rem;
 }

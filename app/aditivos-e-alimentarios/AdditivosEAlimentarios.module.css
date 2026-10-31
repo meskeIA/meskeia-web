@@ -251,17 +251,17 @@
 
 .origenNatural {
   background: rgba(34,197,94,0.12);
-  color: #16a34a;
+  color: var(--verde-texto, #16a34a);
 }
 
 .origenSintetico {
   background: rgba(239,68,68,0.10);
-  color: #dc2626;
+  color: var(--rojo-texto, #dc2626);
 }
 
 .origenSemisintetico {
   background: rgba(245,158,11,0.12);
-  color: #d97706;
+  color: var(--ambar-texto, #d97706);
 }
 
 /* ── Función ── */
@@ -574,7 +574,7 @@
 .warningHeader h3 {
   font-size: 1.05rem;
   font-weight: 700;
-  color: #d97706;
+  color: var(--ambar-texto, #d97706);
   margin: 0;
 }
 
@@ -596,7 +596,7 @@
 }
 
 .warningList li strong {
-  color: #d97706;
+  color: var(--ambar-texto, #d97706);
 }
 
 /* =========================================================

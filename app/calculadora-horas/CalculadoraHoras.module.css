@@ -230,7 +230,7 @@
 
 .btnQuitar:hover:not(:disabled) {
   border-color: #d64545;
-  color: #d64545;
+  color: var(--rojo-texto, #d64545);
 }
 
 .btnQuitar:disabled {

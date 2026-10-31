@@ -432,7 +432,7 @@
 }
 
 .resumenCritico .resumenNum { color: var(--color-critico); }
-.resumenHolgado .resumenNum { color: var(--color-holgado); }
+.resumenHolgado .resumenNum { color: var(--verde-texto, var(--color-holgado)); }
 
 /* ─── Grupos de ratios ────────────────────────────────────────────────────── */
 .grupoSeccion {
@@ -789,7 +789,7 @@
   line-height: 1.5;
 }
 
-.warningList li::before { content: '•'; position: absolute; left: 0; color: #f59e0b; font-weight: 700; }
+.warningList li::before { content: '•'; position: absolute; left: 0; color: var(--ambar-texto, #f59e0b); font-weight: 700; }
 
 [data-theme='dark'] .warningList li { color: #fcd34d; }
 

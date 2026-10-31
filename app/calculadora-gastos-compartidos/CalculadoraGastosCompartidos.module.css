@@ -110,11 +110,11 @@
 }
 
 .personaBalance.positivo {
-  color: #10b981;
+  color: var(--verde-texto, #10b981);
 }
 
 .personaBalance.negativo {
-  color: #ef4444;
+  color: var(--rojo-texto, #ef4444);
 }
 
 /* Resumen Panel */
@@ -223,7 +223,7 @@
 
 .deudaMonto {
   font-weight: 700;
-  color: #ef4444;
+  color: var(--rojo-texto, #ef4444);
   font-size: 1.1rem;
 }
 
@@ -337,7 +337,7 @@
   border: 1px solid #ef4444;
   border-radius: 8px;
   background: transparent;
-  color: #ef4444;
+  color: var(--rojo-texto, #ef4444);
   cursor: pointer;
   transition: all 0.2s;
 }

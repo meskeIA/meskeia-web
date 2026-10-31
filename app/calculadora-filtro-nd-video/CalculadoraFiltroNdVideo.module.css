@@ -320,7 +320,7 @@
 
 /* Colores de desviación */
 .desvPerfecta {
-  color: #2ecc71;
+  color: var(--verde-texto, #2ecc71);
   font-weight: 700;
 }
 
