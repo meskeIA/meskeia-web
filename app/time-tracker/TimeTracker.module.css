@@ -91,7 +91,7 @@
 }
 
 .timerValue.active {
-  color: var(--success);
+  color: var(--verde-texto, var(--success));
 }
 
 .timerProject {
@@ -465,7 +465,7 @@
 
 .entryAmount {
   font-size: 0.85rem;
-  color: var(--success);
+  color: var(--verde-texto, var(--success));
 }
 
 .deleteBtn {

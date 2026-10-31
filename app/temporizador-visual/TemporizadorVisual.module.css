@@ -334,7 +334,7 @@
 
 .sonidoOn {
   background: rgba(34, 197, 94, 0.12);
-  color: #16A34A;
+  color: var(--verde-texto, #16A34A);
   border-color: rgba(34, 197, 94, 0.3);
 }
 

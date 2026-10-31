@@ -500,7 +500,7 @@
 }
 
 .warningBox strong {
-  color: #E67E22;
+  color: var(--naranja-texto, #E67E22);
 }
 
 /* ─── Dark mode ─────────────────────────────── */

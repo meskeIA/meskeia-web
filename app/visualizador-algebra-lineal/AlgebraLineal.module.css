@@ -249,7 +249,7 @@
 }
 
 .metricaRoja .metricaValor { color: #c0392b; }
-.metricaAmarilla .metricaValor { color: #e67e22; }
+.metricaAmarilla .metricaValor { color: var(--naranja-texto, #e67e22); }
 
 /* ── Formula box ── */
 .formulaBox {

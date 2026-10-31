@@ -305,7 +305,7 @@
 }
 
 .metaBacteriostático {
-  color: #D4820A;
+  color: var(--ambar-texto, #D4820A);
   font-weight: 700;
 }
 

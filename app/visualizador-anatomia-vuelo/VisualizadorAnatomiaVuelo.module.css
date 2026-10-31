@@ -104,8 +104,8 @@
 }
 .flujoFlecha { font-size: 1.1rem; color: var(--primary-texto); letter-spacing: 4px; }
 .flujoTexto { font-size: 0.75rem; color: var(--text-secondary); font-weight: 600; }
-.flujoSuperior .flujoTexto { color: var(--verde); }
-.flujoInferior .flujoTexto { color: var(--rojo); }
+.flujoSuperior .flujoTexto { color: var(--verde-texto, var(--verde)); }
+.flujoInferior .flujoTexto { color: var(--rojo-texto, var(--rojo)); }
 .perfilExplicacion { font-size: 0.88rem; color: var(--text-primary); line-height: 1.5; text-align: center; margin: 0; }
 
 /* Tarjetas de fuerzas */

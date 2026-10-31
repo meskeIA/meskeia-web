@@ -411,7 +411,7 @@
   padding: 1.5rem;
 }
 
-.warningBox h2 { font-size: 1.1rem; font-weight: 700; color: var(--color-warn); margin: 0 0 1rem; }
+.warningBox h2 { font-size: 1.1rem; font-weight: 700; color: var(--ambar-texto, var(--color-warn)); margin: 0 0 1rem; }
 
 .warningGrid { display: flex; flex-direction: column; gap: 0.75rem; }
 

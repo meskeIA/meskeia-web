@@ -168,7 +168,7 @@
 
 .badgePoco {
   background: rgba(224, 122, 31, 0.14);
-  color: #B45309;
+  color: var(--naranja-texto, #B45309);
   border-color: #E07A1F;
 }
 

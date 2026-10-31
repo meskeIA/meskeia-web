@@ -93,7 +93,7 @@
 .splicingVisual { display: flex; flex-direction: column; align-items: center; gap: var(--spacing-md); }
 .splicingPre, .splicingPost { display: flex; gap: 0.3rem; flex-wrap: wrap; justify-content: center; }
 .exonBloque { padding: 0.4rem 0.8rem; background: rgba(46,134,171,0.15); border: 2px solid #2E86AB; border-radius: 6px; font-size: 0.82rem; font-weight: 700; color: var(--primary-texto); }
-.intronBloque { padding: 0.4rem 0.8rem; background: rgba(231,76,60,0.1); border: 2px dashed #E74C3C; border-radius: 6px; font-size: 0.82rem; font-weight: 600; color: #E74C3C; opacity: 0.7; }
+.intronBloque { padding: 0.4rem 0.8rem; background: rgba(231,76,60,0.1); border: 2px dashed #E74C3C; border-radius: 6px; font-size: 0.82rem; font-weight: 600; color: var(--rojo-texto, #E74C3C); opacity: 0.7; }
 .splicingFlecha { font-size: 0.88rem; color: var(--text-secondary); font-weight: 600; }
 .splicingNota { font-size: 0.85rem; color: var(--text-secondary); text-align: center; margin: var(--spacing-md) 0 0 0; line-height: 1.5; }
 

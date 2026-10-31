@@ -296,12 +296,12 @@
 
 /* Colores por etiqueta */
 .excelente {
-  color: #059669;
+  color: var(--verde-texto, #059669);
 }
 
 .scoreBadge.excelente {
   background: rgba(5, 150, 105, 0.1);
-  color: #059669;
+  color: var(--verde-texto, #059669);
 }
 
 .bueno {
@@ -314,12 +314,12 @@
 }
 
 .mejorable {
-  color: #D97706;
+  color: var(--ambar-texto, #D97706);
 }
 
 .scoreBadge.mejorable {
   background: rgba(217, 119, 6, 0.1);
-  color: #D97706;
+  color: var(--ambar-texto, #D97706);
 }
 
 .critico {
@@ -328,7 +328,7 @@
 
 .scoreBadge.critico {
   background: rgba(220, 38, 38, 0.1);
-  color: #DC2626;
+  color: var(--rojo-texto, #DC2626);
 }
 
 /* Radar chart */

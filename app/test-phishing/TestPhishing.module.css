@@ -218,7 +218,7 @@
 
 .btnLegit {
   border-color: var(--success);
-  color: var(--success);
+  color: var(--verde-texto, var(--success));
 }
 
 .btnLegit:hover {

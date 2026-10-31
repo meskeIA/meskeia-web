@@ -606,13 +606,13 @@
 }
 
 .hawkingEscape {
-  color: #f59e0b;
+  color: var(--ambar-texto, #f59e0b);
   font-size: 0.8rem;
   font-weight: 600;
 }
 
 .hawkingCae {
-  color: #ef4444;
+  color: var(--rojo-texto, #ef4444);
   font-size: 0.8rem;
 }
 

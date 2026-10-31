@@ -289,11 +289,11 @@
 }
 
 .success .resultIcon {
-  color: #2ecc71;
+  color: var(--verde-texto, #2ecc71);
 }
 
 .error .resultIcon {
-  color: #e74c3c;
+  color: var(--rojo-texto, #e74c3c);
 }
 
 .resultText {
@@ -774,7 +774,7 @@
   border-radius: 4px;
   font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
   font-size: 0.85em;
-  color: #d97706;
+  color: var(--ambar-texto, #d97706);
 }
 
 @media (max-width: 1024px) {

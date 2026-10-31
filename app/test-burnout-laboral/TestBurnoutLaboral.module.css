@@ -489,17 +489,17 @@
 
 .dimNivel.nivelBajo {
   background: var(--bg-bajo);
-  color: var(--color-bajo);
+  color: var(--verde-texto, var(--color-bajo));
 }
 
 .dimNivel.nivelModerado {
   background: var(--bg-moderado);
-  color: var(--color-moderado);
+  color: var(--ambar-texto, var(--color-moderado));
 }
 
 .dimNivel.nivelAlto {
   background: var(--bg-alto);
-  color: var(--color-alto);
+  color: var(--rojo-texto, var(--color-alto));
 }
 
 .dimDescripcion {

@@ -597,7 +597,7 @@
   content: '\2022';
   position: absolute;
   left: 0;
-  color: #f9a825;
+  color: var(--ambar-texto, #f9a825);
   font-weight: bold;
 }
 .warningList li strong { color: var(--text-primary); }

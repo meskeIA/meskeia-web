@@ -582,7 +582,7 @@
   font-size: 0.7rem;
   font-weight: 700;
   text-transform: uppercase;
-  color: #10b981;
+  color: var(--verde-texto, #10b981);
   border: 1px solid #10b981;
   border-radius: var(--radius);
   padding: 1px 6px;
@@ -710,7 +710,7 @@
 .arrayPropioError {
   margin: var(--spacing-sm) 0 0 0;
   font-size: 0.85rem;
-  color: #ef4444;
+  color: var(--rojo-texto, #ef4444);
 }
 
 .configSelect {
@@ -1061,7 +1061,7 @@
 .tipsHeader {
   font-weight: 700;
   font-size: 1rem;
-  color: var(--color-sorted);
+  color: var(--verde-texto, var(--color-sorted));
   margin-bottom: var(--spacing-md);
   padding-bottom: var(--spacing-sm);
   border-bottom: 2px solid var(--color-sorted);
@@ -1070,7 +1070,7 @@
 .errorsHeader {
   font-weight: 700;
   font-size: 1rem;
-  color: var(--color-swapping);
+  color: var(--rojo-texto, var(--color-swapping));
   margin-bottom: var(--spacing-md);
   padding-bottom: var(--spacing-sm);
   border-bottom: 2px solid var(--color-swapping);
@@ -1090,7 +1090,7 @@
   content: '✓';
   position: absolute;
   left: 0;
-  color: var(--color-sorted);
+  color: var(--verde-texto, var(--color-sorted));
   font-weight: 700;
 }
 

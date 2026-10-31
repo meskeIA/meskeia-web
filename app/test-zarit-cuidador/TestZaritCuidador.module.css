@@ -458,20 +458,20 @@
 
 .zonaBajo {
   flex: 25;
-  color: var(--color-bajo);
+  color: var(--verde-texto, var(--color-bajo));
   font-weight: 600;
 }
 
 .zonaMedia {
   flex: 9;
-  color: var(--color-moderado);
+  color: var(--ambar-texto, var(--color-moderado));
   font-weight: 600;
   text-align: center;
 }
 
 .zonaAlta {
   flex: 55;
-  color: var(--color-alto);
+  color: var(--rojo-texto, var(--color-alto));
   font-weight: 600;
   text-align: right;
 }
@@ -702,9 +702,9 @@
   white-space: nowrap;
 }
 
-.tablaComparativa th:nth-child(2) { color: var(--color-bajo); }
-.tablaComparativa th:nth-child(3) { color: var(--color-moderado); }
-.tablaComparativa th:nth-child(4) { color: var(--color-alto); }
+.tablaComparativa th:nth-child(2) { color: var(--verde-texto, var(--color-bajo)); }
+.tablaComparativa th:nth-child(3) { color: var(--ambar-texto, var(--color-moderado)); }
+.tablaComparativa th:nth-child(4) { color: var(--rojo-texto, var(--color-alto)); }
 
 .tablaComparativa tr:hover td {
   background: rgba(46, 134, 171, 0.03);

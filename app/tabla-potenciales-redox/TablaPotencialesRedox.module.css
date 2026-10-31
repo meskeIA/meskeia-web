@@ -500,7 +500,7 @@
 
 .badgeOxidante {
   background: rgba(224, 122, 31, 0.14);
-  color: #b45309;
+  color: var(--naranja-texto, #b45309);
 }
 
 .badgeReductor {

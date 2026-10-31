@@ -574,7 +574,7 @@
 .eventoAnio {
   font-size: 0.72rem;
   font-weight: 700;
-  color: #E9C46A;
+  color: var(--ambar-texto, #E9C46A);
 }
 
 .eventoTexto {

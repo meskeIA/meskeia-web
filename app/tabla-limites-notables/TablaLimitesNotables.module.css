@@ -270,7 +270,7 @@
   display: inline-block;
   margin-top: 4px;
   font-size: 0.78rem;
-  color: #b45309;
+  color: var(--naranja-texto, #b45309);
   background: rgba(224, 122, 31, 0.12);
   border-radius: 4px;
   padding: 2px 6px;

@@ -193,11 +193,11 @@
 }
 
 .char.correct {
-  color: var(--success);
+  color: var(--verde-texto, var(--success));
 }
 
 .char.error {
-  color: var(--error);
+  color: var(--rojo-texto, var(--error));
   background: rgba(239, 68, 68, 0.2);
   text-decoration: underline;
 }
@@ -245,7 +245,7 @@
 
 .btnStop:hover {
   border-color: var(--error);
-  color: var(--error);
+  color: var(--rojo-texto, var(--error));
 }
 
 /* Results Panel */

@@ -124,7 +124,7 @@
 }
 
 .patternError {
-  color: #e74c3c;
+  color: var(--rojo-texto, #e74c3c);
 }
 
 .errorMessage {
@@ -134,7 +134,7 @@
   padding: var(--spacing-sm) var(--spacing-md);
   background: rgba(231, 76, 60, 0.15);
   border-radius: var(--radius);
-  color: #e74c3c;
+  color: var(--rojo-texto, #e74c3c);
   font-size: 0.85rem;
   margin-bottom: var(--spacing-md);
 }

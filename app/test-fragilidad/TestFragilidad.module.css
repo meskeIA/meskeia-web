@@ -259,19 +259,19 @@
 .nivelRobusto {
   background: #f0faf0;
   border-color: var(--success);
-  color: var(--success);
+  color: var(--verde-texto, var(--success));
 }
 
 .nivelPrefragil {
   background: #fef9e7;
   border-color: var(--warning);
-  color: var(--warning);
+  color: var(--naranja-texto, var(--warning));
 }
 
 .nivelFragil {
   background: #fdf2f2;
   border-color: var(--danger);
-  color: var(--danger);
+  color: var(--rojo-texto, var(--danger));
 }
 
 [data-theme='dark'] .nivelRobusto { background: #1a3a1a; }
@@ -358,8 +358,8 @@
   font-size: 0.82rem;
 }
 
-.resumenSi .resumenValor { color: var(--danger); }
-.resumenNo .resumenValor { color: var(--success); }
+.resumenSi .resumenValor { color: var(--rojo-texto, var(--danger)); }
+.resumenNo .resumenValor { color: var(--verde-texto, var(--success)); }
 
 /* ─── Recomendaciones ───────────────────────────────── */
 

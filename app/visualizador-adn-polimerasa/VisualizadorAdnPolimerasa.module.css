@@ -516,7 +516,7 @@
 
 .badgeMito {
   background: rgba(39, 174, 96, 0.15);
-  color: #27ae60;
+  color: var(--verde-texto, #27ae60);
 }
 
 .celdaDetalle {

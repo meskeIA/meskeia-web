@@ -126,7 +126,7 @@
 
 .capturandoAviso {
   font-size: 0.8rem;
-  color: var(--warning);
+  color: var(--ambar-texto, var(--warning));
   margin: 0;
 }
 
