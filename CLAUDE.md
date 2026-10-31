@@ -588,6 +588,18 @@ Escape: `footer-ok: <razón>`, razón obligatoria.
 > C0042. Crónica: cabecera de `scripts/check-footer-tracker.mjs` · pruebas:
 > `npm run footer-tracker:probar-candado`.
 
+### Candado de la guarda de doble toque copiada
+
+`npm run check:guarda-rafaga` — en el build, y **rompe el build** si un `.tsx` de `app/` o
+`components/` escribe a mano la guarda de doble toque (`.detail > 1` o `>= 2`): va en
+**`useGuardaRafaga`** de `@/lib/useGuardaRafaga`, que llevan los quizzes y los selectores.
+Barre el árbol entero, **sin pasivo** · Escape: `rafaga-ok: <razón>`, razón obligatoria.
+⚠️ No ve una guarda escrita con un temporizador: eso lo mide el caso «doble toque» de los
+testigos `tests/familias/selectores.spec.ts` y `quizzes.spec.ts`.
+> Salió del cabo C0317: 16 selectores con su copia, que no tenían lo que la receta aprendió
+> después (3768, C0514). Crónica: cabecera de `scripts/check-guarda-rafaga.mjs` · pruebas:
+> `npm run guarda-rafaga:probar-candado`.
+
 ### Candado del ternario que tumba la página traducida
 
 `npm run check:ternario-traducido` — en el build, y **rompe el build** si un ternario hijo de JSX
