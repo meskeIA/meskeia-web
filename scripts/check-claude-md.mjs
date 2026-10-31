@@ -288,6 +288,13 @@ const OBLIGACIONES = [
     'Exige que la variante EXISTA', 'tests/contraste-text-muted-*.spec.ts',
     'un valor se decide midiendo contra el fondo REAL', 'npm run oscuro:probar-candado',
   ]],
+  ['Candado del texto semántico en claro', [
+    'npm run check:semanticos-claro', 'rompe el build', 'texto rojo, naranja, ámbar o verde',
+    'var(--rojo-texto, <color de antes>)', 'solo existen en claro, en oscuro manda la reserva',
+    'Rompe también sin reserva', 'sin pasivo', 'fuera, cursos y portales',
+    'semanticos-ok: <razón>', 'razón obligatoria', 'No ve un fondo oscuro que pone el TSX',
+    'npm run semanticos-claro:probar-candado',
+  ]],
   ['Candado de la clase que el módulo CSS no declara', [
     'npm run check:clases-css', 'rompe el build', 'el .module.css importado no declara .x',
     'las líneas que el commit añade', 'que el commit quita de su módulo',

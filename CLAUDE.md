@@ -551,6 +551,20 @@ porque un valor se decide midiendo contra el fondo REAL.
 > 2,48–2,81:1. Crónica: cabecera de `scripts/check-token-oscuro.mjs` · pruebas:
 > `npm run oscuro:probar-candado`.
 
+### Candado del texto semántico en claro
+
+`npm run check:semanticos-claro` — en el build, y **rompe el build** si un `.module.css` pinta
+texto rojo, naranja, ámbar o verde (literal, token del módulo o `var(--error)`) por debajo de
+4,5:1 en claro (3:1 si es grande o `::before`) contra el fondo de su regla o, sin él, el blanco.
+Receta: **`var(--rojo-texto, <color de antes>)`**, igual con `--naranja-`, `--ambar-` y
+`--verde-texto`: solo existen en claro, en oscuro manda la reserva. Rompe también sin reserva.
+Barre `app/`, `components/` y `styles/`, **sin pasivo**; fuera, cursos y portales · Escape:
+`semanticos-ok: <razón>`, razón obligatoria.
+⚠️ No ve un fondo oscuro que pone el TSX: lo mide el píxel.
+> Salió del cabo C0296 (mi-ip y adaptacion-hogar, f9af2556): 1.062 reglas en 478 hojas.
+> Crónica: cabecera de `scripts/check-semanticos-claro.mjs` · pruebas:
+> `npm run semanticos-claro:probar-candado`.
+
 ### Candado de la variable CSS que no existe
 
 `npm run check:var-css` — en el build, y **rompe el build** si un `.module.css` usa `var(--x)`
