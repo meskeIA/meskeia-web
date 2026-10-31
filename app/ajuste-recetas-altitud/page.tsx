@@ -71,8 +71,7 @@ export default function AjusteRecetasAltitudPage() {
                 )}
                 {CIUDADES.map((c) => (
                   <option key={c.nombre} value={c.nombre}>
-                    {c.nombre}
-                    {c.pais !== '—' ? ` (${c.pais})` : ''} · {formatNumber(c.altitud, 0)} m
+                    {`${c.nombre}${c.pais !== '—' ? ` (${c.pais})` : ''} · ${formatNumber(c.altitud, 0)} m`}
                   </option>
                 ))}
               </select>

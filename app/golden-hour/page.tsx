@@ -664,8 +664,8 @@ export default function GoldenHourPage() {
             <div className={styles.dayLength}>
               <span>
                 <span aria-hidden="true">🌞</span> Duración del día: <strong>{formatDuracion(eventos.duracionDia)}</strong>
-                {eventos.regimen === 'solDeMedianoche' && ' (sol de medianoche)'}
-                {eventos.regimen === 'nochePolar' && ' (noche polar)'}
+                <span>{eventos.regimen === 'solDeMedianoche' && ' (sol de medianoche)'}</span>
+                <span>{eventos.regimen === 'nochePolar' && ' (noche polar)'}</span>
               </span>
             </div>
           </div>

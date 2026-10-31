@@ -514,7 +514,7 @@ export default function EstimadorComplementoMinimosPage() {
                   <div className={styles.desgloseItem}>
                     <span>Complemento a mínimos</span>
                     <strong className={resultado.complemento > 0 ? styles.importePositivo : ''}>
-                      {resultado.complemento > 0 ? '+' : ''}{formatCurrency(resultado.complemento)}/mes
+                      <span>{resultado.complemento > 0 ? '+' : ''}</span>{formatCurrency(resultado.complemento)}/mes
                     </strong>
                   </div>
                   <div className={`${styles.desgloseItem} ${styles.desgloseFinal}`}>

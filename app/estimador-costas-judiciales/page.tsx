@@ -391,7 +391,7 @@ function BloqueCondena({ resultado, incluirPerito }: BloqueCondenaProps) {
           : 'El art. 394.3 LEC limita lo que pagarías de la parte contraria por abogado y demás profesionales no sujetos a arancel a un '}
         <strong>tercio de la cuantía del proceso</strong>: en tu caso,{' '}
         <strong>{formatCurrency(resultado.limiteCostas)}</strong>
-        {resultado.cuantiaIndeterminada && ` (la pretensión de cuantía indeterminada se valora en ${formatCurrency(valorIndeterminada)})`}.
+        <span>{resultado.cuantiaIndeterminada && ` (la pretensión de cuantía indeterminada se valora en ${formatCurrency(valorIndeterminada)})`}</span>.
         {resultado.limiteCostasMuerde
           ? ` Ese tope está por debajo del máximo estimado de ${sujetos}, así que aquí sí muerde.`
           : ' Con esta cuantía el tope queda por encima del máximo estimado, así que no llega a aplicarse.'}

@@ -242,9 +242,7 @@ export default function OrientadorLimiteConjuntoPatrimonioPage() {
                 <option value="">Selecciona tu CCAA…</option>
                 {BONIFICACIONES_CCAA_PATRIMONIO.map(c => (
                   <option key={c.id} value={c.id}>
-                    {c.nombre}
-                    {c.bonificacion === 'total' ? ' (bonificación 100%)' : ''}
-                    {c.bonificacion === 'parcial' ? ' (bonificación parcial)' : ''}
+                    {`${c.nombre}${c.bonificacion === 'total' ? ' (bonificación 100%)' : ''}${c.bonificacion === 'parcial' ? ' (bonificación parcial)' : ''}`}
                   </option>
                 ))}
               </select>

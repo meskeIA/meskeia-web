@@ -898,7 +898,7 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
                               value={cargo.id}
                               disabled={esUnico && yaAsignado}
                             >
-                              {cargo.nombre} {esUnico && yaAsignado ? '(ya asignado)' : ''}
+                              {`${cargo.nombre} ${esUnico && yaAsignado ? '(ya asignado)' : ''}`}
                             </option>
                           );
                         })}

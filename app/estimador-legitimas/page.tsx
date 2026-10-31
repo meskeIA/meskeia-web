@@ -182,7 +182,7 @@ export default function EstimadorLegitimas() {
               onChange={e => { setNumHijosStr(e.target.value); setResultado(null); }}
             >
               {[1, 2, 3, 4, 5, 6].map(n => (
-                <option key={n} value={n}>{n} hijo{n > 1 ? 's' : ''}</option>
+                <option key={n} value={n}>{`${n} hijo${n > 1 ? 's' : ''}`}</option>
               ))}
             </select>
             <p className={styles.hint}>Si hay nietos (en lugar de hijos fallecidos), se representan en la misma porción que correspondía a su progenitor.</p>

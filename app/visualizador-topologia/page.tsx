@@ -396,7 +396,7 @@ export default function VisualizadorTopologiaPage() {
                 {superficieSeleccionada.cerrada ? '✓ Cerrada' : '✗ Con borde'}
               </span>
               <span className={`${styles.badge} ${styles.badgeMorado}`}>
-                {superficieSeleccionada.caras} cara{superficieSeleccionada.caras > 1 ? 's' : ''}
+                {`${superficieSeleccionada.caras} cara${superficieSeleccionada.caras > 1 ? 's' : ''}`}
               </span>
               <span className={`${styles.badge} ${styles.badgeAzul}`}>
                 χ = {superficieSeleccionada.euler}

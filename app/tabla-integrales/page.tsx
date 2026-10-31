@@ -1856,7 +1856,7 @@ export default function TablaIntegralesPage() {
       <div className={`${styles.hojaFormulario} ${impresion.hoja}`} data-hoja-formulario="">
         <div className={styles.hojaPagina}>
           <h2 className={styles.hojaTitulo}>
-            Tabla de integrales{modoHoja === 'blanco' ? ': complétala' : ''}
+            Tabla de integrales<span>{modoHoja === 'blanco' ? ': complétala' : ''}</span>
           </h2>
           <p className={styles.hojaDatos}>
             {modoHoja === 'blanco'

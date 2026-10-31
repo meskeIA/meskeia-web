@@ -1086,7 +1086,7 @@ export default function VerificadorComplementoBrechaGeneroPage() {
                     <strong>{resultado.hijosComputables} (máx. {COMPLEMENTO_BRECHA_GENERO_2026.maxHijos})</strong>
                   </div>
                   <div className={styles.desgloseItem}>
-                    <span>Cuantía por hijo{resultado.prorrata !== undefined ? ' (importe teórico)' : ''}</span>
+                    <span>Cuantía por hijo<span>{resultado.prorrata !== undefined ? ' (importe teórico)' : ''}</span></span>
                     <strong>{formatCurrency(COMPLEMENTO_BRECHA_GENERO_2026.cuantiaPorHijoMensual)}/mes</strong>
                   </div>
                   {resultado.prorrata !== undefined && (

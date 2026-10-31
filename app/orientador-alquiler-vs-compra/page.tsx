@@ -537,7 +537,7 @@ export default function CalculadoraAlquilerVsCompraPage() {
                     <span>{formatCurrency(compra)}</span>
                     <span>{formatCurrency(alquiler)}</span>
                     <span className={diff >= 0 ? styles.positivo : styles.negativo}>
-                      {diff >= 0 ? '+' : ''}{formatCurrency(diff)}
+                      <span>{diff >= 0 ? '+' : ''}</span>{formatCurrency(diff)}
                     </span>
                   </div>
                 );

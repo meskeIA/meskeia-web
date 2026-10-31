@@ -657,8 +657,7 @@ export default function TablaValenciasPage() {
             >
               {opcionesPos.map((est) => (
                 <option key={est.valor} value={est.valor}>
-                  {formatearEstado(est.valor)}
-                  {est.masComun ? ' (el más frecuente)' : est.frecuente ? '' : ' (poco frecuente)'}
+                  {`${formatearEstado(est.valor)}${est.masComun ? ' (el más frecuente)' : est.frecuente ? '' : ' (poco frecuente)'}`}
                 </option>
               ))}
             </select>
@@ -690,8 +689,7 @@ export default function TablaValenciasPage() {
             >
               {opcionesNeg.map((est) => (
                 <option key={est.valor} value={est.valor}>
-                  {formatearEstado(est.valor)}
-                  {est.masComun ? ' (el más frecuente)' : est.frecuente ? '' : ' (poco frecuente)'}
+                  {`${formatearEstado(est.valor)}${est.masComun ? ' (el más frecuente)' : est.frecuente ? '' : ' (poco frecuente)'}`}
                 </option>
               ))}
             </select>

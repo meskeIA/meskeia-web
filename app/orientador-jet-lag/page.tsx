@@ -210,7 +210,7 @@ export default function SimuladorJetLagPage() {
             >
               {CIUDADES.map((c, i) => (
                 <option key={i} value={i}>
-                  {c.emoji} {c.nombre} ({c.pais}) — UTC{c.utc >= 0 ? '+' : ''}{c.utc}
+                  {`${c.emoji} ${c.nombre} (${c.pais}) — UTC${c.utc >= 0 ? '+' : ''}${c.utc}`}
                 </option>
               ))}
             </select>
@@ -231,7 +231,7 @@ export default function SimuladorJetLagPage() {
             >
               {CIUDADES.map((c, i) => (
                 <option key={i} value={i}>
-                  {c.emoji} {c.nombre} ({c.pais}) — UTC{c.utc >= 0 ? '+' : ''}{c.utc}
+                  {`${c.emoji} ${c.nombre} (${c.pais}) — UTC${c.utc >= 0 ? '+' : ''}${c.utc}`}
                 </option>
               ))}
             </select>
@@ -241,7 +241,7 @@ export default function SimuladorJetLagPage() {
             <p className={styles.diferenciaLabel}>Diferencia horaria</p>
             <p className={styles.diferenciaValor}>
               {resultado.diferencia}
-              <span>hora{resultado.diferencia !== 1 ? 's' : ''}</span>
+              <span>{`hora${resultado.diferencia !== 1 ? 's' : ''}`}</span>
             </p>
           </div>
         </div>

@@ -553,8 +553,7 @@ export default function TestCompetenciasDigitalesPage() {
                                   : styles.deltaFlat
                             }
                           >
-                            {delta > 0 ? '▲' : delta < 0 ? '▼' : '='} {delta > 0 ? '+' : ''}
-                            {delta.toFixed(1)}
+                            {`${delta > 0 ? '▲' : delta < 0 ? '▼' : '='} ${delta > 0 ? '+' : ''}${delta.toFixed(1)}`}
                           </span>
                         )}
                       </li>

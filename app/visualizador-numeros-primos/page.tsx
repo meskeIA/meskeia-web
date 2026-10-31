@@ -524,7 +524,7 @@ function SeccionCriba() {
               Solucionario: criba del {formatNumber(desde, 0)} al {formatNumber(hasta, 0)}
             </h2>
             <p className={styles.hojaDatos}>
-              Hay {formatNumber(resuelta.primos.length, 0)} primo{resuelta.primos.length === 1 ? '' : 's'}:
+              Hay {formatNumber(resuelta.primos.length, 0)} primo<span>{resuelta.primos.length === 1 ? '' : 's'}</span>:
             </p>
             <p className={styles.listaPrimos}>{resuelta.primos.join(', ')}</p>
           </div>

@@ -492,19 +492,19 @@ export default function EstimadorIRPFPage() {
                   {formatCurrency(resultado.cuotaMinimoGeneral)}), que es la forma en que la ley lo
                   grava a tipo cero (art. 63.1.2.º LIRPF). Cuota íntegra general:{' '}
                   {formatCurrency(resultado.cuotaIntegraGeneral)}.
-                  {resultado.reduccionConjunta > 0 && (
-                    <>
+                  <span>{resultado.reduccionConjunta > 0 && (
+                    <span>
                       {' '}Antes de todo eso se restó de la base la reducción por tributación
                       conjunta de {formatCurrency(resultado.reduccionConjunta)} (art. 84.2
                       LIRPF), que esa sí reduce la base.
-                    </>
-                  )}
-                  {resultado.reduccionPerdidaPorOtrasRentas && (
-                    <>
+                    </span>
+                  )}</span>
+                  <span>{resultado.reduccionPerdidaPorOtrasRentas && (
+                    <span>
                       {' '}No se aplica la reducción por rendimientos del trabajo: tus otras rentas
                       superan {eur0(REDUCCION_RENDIMIENTOS_TRABAJO_2025.limiteOtrasRentas)} (art. 20 LIRPF).
-                    </>
-                  )}
+                    </span>
+                  )}</span>
                 </p>
 
                 {resultado.baseLiquidableAhorro > 0 && (
@@ -540,13 +540,13 @@ export default function EstimadorIRPFPage() {
                       Los dividendos y los intereses no se suman a la base general: tributan en la
                       base del ahorro con su propia escala (art. 66 LIRPF), que suma{' '}
                       {formatCurrency(resultado.cuotaEscalaAhorro)}.
-                      {resultado.minimoEnAhorro > 0 && (
-                        <>
+                      <span>{resultado.minimoEnAhorro > 0 && (
+                        <span>
                           {' '}La parte del mínimo que no cabía en la base general (
                           {formatCurrency(resultado.minimoEnAhorro)}) se grava a tipo cero en esta
                           base (art. 56.2 LIRPF): {formatCurrency(resultado.cuotaMinimoAhorro)} menos.
-                        </>
-                      )}
+                        </span>
+                      )}</span>
                       {' '}Cuota íntegra del ahorro: {formatCurrency(resultado.cuotaIntegraAhorro)}.
                     </p>
                   </>
