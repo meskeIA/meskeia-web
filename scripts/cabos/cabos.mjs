@@ -90,6 +90,14 @@ export const DESTINOS = {
     consumidor: 'reparar',
     que: 'trabajo técnico ya entendido que no es de una app: herramienta, test inestable, candado candidato, configuración',
   },
+  // 31/10/2026, decidido por el usuario: lo que /reparar dejaba «abierto» tanda tras tanda por
+  // ser de más de 20 apps o por tocar package.json. Ese día eran 17 cabos de destino reparar, y
+  // C0312 (493 apariciones) llevaba 12 días con «sigue sin censar». Una conversación con
+  // /campana <id> lo drena entera y cierra el cabo; /parte lista las pendientes en su bloque 3.
+  campana: {
+    consumidor: 'campana',
+    que: 'campaña mecánica sobre muchas apps: recuento exacto por la forma del código, receta única y una comprobación automática de que no cambia nada más. La hace una conversación entera con /campana <id>',
+  },
   usuario: {
     consumidor: 'parte',
     que: 'decisión que no es de Claude (el qué: publicar, retirar, prometer, neutralidad editorial)',
