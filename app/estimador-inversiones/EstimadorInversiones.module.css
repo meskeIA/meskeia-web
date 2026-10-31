@@ -396,11 +396,11 @@
 }
 
 .metricaCard.positivo .metricaValor {
-  color: var(--success);
+  color: var(--verde-texto, var(--success));
 }
 
 .metricaCard.negativo .metricaValor {
-  color: var(--danger);
+  color: var(--rojo-texto, var(--danger));
 }
 
 /* Recomendaciones */
@@ -1153,7 +1153,7 @@
 }
 
 .positivo {
-  color: var(--success) !important;
+  color: var(--verde-texto, var(--success)) !important;
 }
 
 /* Tabla Comparativa */

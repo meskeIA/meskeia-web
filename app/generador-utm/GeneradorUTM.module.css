@@ -69,7 +69,7 @@
   background: rgba(231, 76, 60, 0.15);
   border: 1px solid #e74c3c;
   border-radius: var(--radius);
-  color: #e74c3c;
+  color: var(--rojo-texto, #e74c3c);
   margin-bottom: var(--spacing-lg);
 }
 
@@ -116,7 +116,7 @@
 }
 
 .required {
-  color: #e74c3c;
+  color: var(--rojo-texto, #e74c3c);
 }
 
 .input,
@@ -367,7 +367,7 @@
 
 .historyBtnDelete:hover {
   border-color: #e74c3c;
-  color: #e74c3c;
+  color: var(--rojo-texto, #e74c3c);
 }
 
 /* ===== EDUCATIONAL SECTION STYLES ===== */
@@ -436,7 +436,7 @@
   font-size: 0.8rem;
   font-weight: 600;
   background: rgba(46, 213, 115, 0.15);
-  color: #27ae60;
+  color: var(--verde-texto, #27ae60);
 }
 
 .badgeNo {

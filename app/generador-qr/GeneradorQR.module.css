@@ -372,7 +372,7 @@
 .btnEliminarLogo {
   padding: var(--spacing-sm) var(--spacing-md);
   background: #fee2e2;
-  color: #dc2626;
+  color: var(--rojo-texto, #dc2626);
   border: none;
   border-radius: var(--radius);
   font-size: 0.85rem;

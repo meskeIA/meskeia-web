@@ -329,7 +329,7 @@
 }
 
 .favoritoActivo {
-  color: var(--warning);
+  color: var(--ambar-texto, var(--warning));
 }
 
 .nombreTipo {

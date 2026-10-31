@@ -254,7 +254,7 @@
   display: inline-block;
   padding: 0.2rem 0.75rem;
   background: #fed7d7;
-  color: #c53030;
+  color: var(--rojo-texto, #c53030);
   border-radius: 999px;
   font-size: 0.8rem;
   font-weight: 600;

@@ -556,7 +556,7 @@
 }
 
 .warningHeader h3 {
-  color: #D97706;
+  color: var(--ambar-texto, #D97706);
   font-size: 1.2rem;
   margin: 0;
 }

@@ -222,11 +222,11 @@
   flex-shrink: 0;
 }
 
-.familiaPickante  { background: rgba(239,68,68,0.12);  color: #dc2626; }
-.familiaDulce     { background: rgba(245,158,11,0.12); color: #d97706; }
+.familiaPickante  { background: rgba(239,68,68,0.12);  color: var(--rojo-texto, #dc2626); }
+.familiaDulce     { background: rgba(245,158,11,0.12); color: var(--ambar-texto, #d97706); }
 .familiaTerroso   { background: rgba(120,85,50,0.12);  color: #7c5523; }
 .familiaFloral    { background: rgba(139,92,246,0.12); color: #7c3aed; }
-.familiaHerbal    { background: rgba(22,163,74,0.12);  color: #15803d; }
+.familiaHerbal    { background: rgba(22,163,74,0.12);  color: var(--verde-texto, #15803d); }
 .familiaAcido     { background: rgba(132,204,22,0.12); color: #4d7c0f; }
 .familiaAmargo    { background: rgba(100,116,139,0.12);color: #475569; }
 
@@ -614,7 +614,7 @@
 .warningHeader h3 {
   font-size: 1.05rem;
   font-weight: 700;
-  color: #d97706;
+  color: var(--ambar-texto, #d97706);
   margin: 0;
 }
 
@@ -635,7 +635,7 @@
   padding-left: 0.75rem;
 }
 
-.warningList li strong { color: #d97706; }
+.warningList li strong { color: var(--ambar-texto, #d97706); }
 
 /* =========================================================
    DARK MODE

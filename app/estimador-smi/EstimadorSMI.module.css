@@ -402,7 +402,7 @@
 }
 
 .warningBox h3 {
-  color: #e65100;
+  color: var(--naranja-texto, #e65100);
   margin-bottom: 0.75rem;
   font-size: 1rem;
 }

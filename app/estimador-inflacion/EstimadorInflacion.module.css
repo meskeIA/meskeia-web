@@ -1128,7 +1128,7 @@
 .warningHeader h3 {
   font-size: 1.05rem;
   font-weight: 700;
-  color: #E65100;
+  color: var(--naranja-texto, #E65100);
   margin: 0;
 }
 

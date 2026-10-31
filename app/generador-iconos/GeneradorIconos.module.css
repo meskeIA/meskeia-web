@@ -730,7 +730,7 @@
 .compatStatus {
   font-size: 0.85rem;
   font-weight: 600;
-  color: #27ae60;
+  color: var(--verde-texto, #27ae60);
   white-space: nowrap;
 }
 
@@ -1203,7 +1203,7 @@
 .warningHeader h3 {
   font-size: 1.1rem;
   font-weight: 700;
-  color: #b7620a;
+  color: var(--ambar-texto, #b7620a);
   margin: 0;
 }
 

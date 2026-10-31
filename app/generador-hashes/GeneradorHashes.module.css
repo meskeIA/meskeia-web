@@ -315,13 +315,13 @@
 .comparacionResultado.exito {
   background: rgba(16, 185, 129, 0.1);
   border: 2px solid var(--success);
-  color: var(--success);
+  color: var(--verde-texto, var(--success));
 }
 
 .comparacionResultado.error {
   background: rgba(239, 68, 68, 0.1);
   border: 2px solid var(--error);
-  color: var(--error);
+  color: var(--rojo-texto, var(--error));
 }
 
 .resultadoIcon {
@@ -549,9 +549,9 @@
 .comparativaTable tr:hover td { background: var(--hover); }
 .comparativaTable tr:last-child td { border-bottom: none; }
 
-.tdNegative { color: #e53e3e !important; font-weight: 600 !important; }
-.tdWarning  { color: #d97706 !important; font-weight: 600 !important; }
-.tdPositive { color: #38a169 !important; font-weight: 600 !important; }
+.tdNegative { color: var(--rojo-texto, #e53e3e) !important; font-weight: 600 !important; }
+.tdWarning  { color: var(--ambar-texto, #d97706) !important; font-weight: 600 !important; }
+.tdPositive { color: var(--verde-texto, #38a169) !important; font-weight: 600 !important; }
 
 [data-theme='dark'] .tdNegative { color: #fc8181 !important; }
 [data-theme='dark'] .tdWarning  { color: #fbbf24 !important; }

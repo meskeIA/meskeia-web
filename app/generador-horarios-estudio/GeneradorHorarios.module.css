@@ -299,7 +299,7 @@
 }
 
 .estrellaActiva {
-  color: var(--warning);
+  color: var(--ambar-texto, var(--warning));
 }
 
 /* Botones */

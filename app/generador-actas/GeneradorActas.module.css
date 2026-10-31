@@ -199,7 +199,7 @@
   border: 1px solid var(--error);
   border-radius: var(--radius);
   background: transparent;
-  color: var(--error);
+  color: var(--rojo-texto, var(--error));
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -255,7 +255,7 @@
 
 .stepButton.stepCompleted {
   border-color: var(--success);
-  color: var(--success);
+  color: var(--verde-texto, var(--success));
 }
 
 .stepIcon {
@@ -522,12 +522,12 @@
 }
 
 .presente {
-  color: var(--success);
+  color: var(--verde-texto, var(--success));
   font-weight: 500;
 }
 
 .ausente {
-  color: var(--error);
+  color: var(--rojo-texto, var(--error));
   font-weight: 500;
 }
 
@@ -537,7 +537,7 @@
   border: none;
   border-radius: var(--radius);
   background: transparent;
-  color: var(--error);
+  color: var(--rojo-texto, var(--error));
   cursor: pointer;
   transition: all 0.2s;
 }
@@ -783,17 +783,17 @@
 
 /* Prioridades */
 .prioridadAlta {
-  color: var(--error);
+  color: var(--rojo-texto, var(--error));
   font-weight: 500;
 }
 
 .prioridadMedia {
-  color: var(--warning);
+  color: var(--ambar-texto, var(--warning));
   font-weight: 500;
 }
 
 .prioridadBaja {
-  color: var(--success);
+  color: var(--verde-texto, var(--success));
   font-weight: 500;
 }
 

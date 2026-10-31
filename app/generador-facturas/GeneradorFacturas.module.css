@@ -142,11 +142,11 @@
 }
 
 .validationIcon.valid {
-  color: #10b981;
+  color: var(--verde-texto, #10b981);
 }
 
 .validationIcon.invalid {
-  color: #ef4444;
+  color: var(--rojo-texto, #ef4444);
 }
 
 .validationIcon.loading {
@@ -176,15 +176,15 @@
 }
 
 .validationMessage.error {
-  color: #ef4444;
+  color: var(--rojo-texto, #ef4444);
 }
 
 .validationMessage.success {
-  color: #10b981;
+  color: var(--verde-texto, #10b981);
 }
 
 .validationMessage.warning {
-  color: #f59e0b;
+  color: var(--ambar-texto, #f59e0b);
 }
 
 .validationMessage.info {
@@ -317,7 +317,7 @@
   border: none;
   border-radius: 6px;
   background: #fee2e2;
-  color: #ef4444;
+  color: var(--rojo-texto, #ef4444);
   font-size: 1.2rem;
   cursor: pointer;
   display: flex;
@@ -395,7 +395,7 @@
 }
 
 .summaryRow.retencion {
-  color: #ef4444;
+  color: var(--rojo-texto, #ef4444);
 }
 
 .summaryTotal {
@@ -1424,7 +1424,7 @@
 .warningHeader h3 {
   font-size: 1.05rem;
   font-weight: 700;
-  color: #E65100;
+  color: var(--naranja-texto, #E65100);
   margin: 0;
 }
 

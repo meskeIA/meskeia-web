@@ -329,7 +329,7 @@
 }
 
 .valorExcelente {
-  color: var(--success) !important;
+  color: var(--verde-texto, var(--success)) !important;
 }
 
 .valorBueno {
@@ -337,7 +337,7 @@
 }
 
 .valorMalo {
-  color: var(--danger) !important;
+  color: var(--rojo-texto, var(--danger)) !important;
 }
 
 /* Recomendaciones */
@@ -750,11 +750,11 @@
 }
 
 .valorPositivo {
-  color: var(--success) !important;
+  color: var(--verde-texto, var(--success)) !important;
 }
 
 .valorNegativo {
-  color: var(--danger) !important;
+  color: var(--rojo-texto, var(--danger)) !important;
 }
 
 .estadoBadge {

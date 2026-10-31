@@ -989,7 +989,7 @@
   content: '✕';
   position: absolute;
   left: 0;
-  color: #FF9800;
+  color: var(--ambar-texto, #FF9800);
   font-weight: 700;
 }
 

@@ -353,7 +353,7 @@
   border: 2px solid var(--error);
   border-radius: var(--radius);
   background: transparent;
-  color: var(--error);
+  color: var(--rojo-texto, var(--error));
   cursor: pointer;
   transition: all 0.2s ease;
 }
@@ -399,7 +399,7 @@
 
 .btnQuitar:hover:not(:disabled) {
   border-color: var(--error);
-  color: var(--error);
+  color: var(--rojo-texto, var(--error));
 }
 
 .btnQuitar:disabled {
@@ -433,7 +433,7 @@
   gap: var(--spacing-sm);
   font-size: 0.85rem;
   font-weight: 600;
-  color: var(--error);
+  color: var(--rojo-texto, var(--error));
 }
 
 /* ── Resultado ───────────────────────────────────────────────────── */

@@ -219,7 +219,7 @@
 
 .familiaSpritz {
   background: #fee2e2;
-  color: #dc2626;
+  color: var(--rojo-texto, #dc2626);
 }
 
 .familiaCremoso {

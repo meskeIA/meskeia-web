@@ -138,8 +138,8 @@
 
 .resultLabel { color: var(--text-secondary); font-size: 0.9rem; }
 .resultValue { font-weight: 700; color: var(--primary-texto); font-size: 1.1rem; }
-.resultValueDanger { font-weight: 700; color: var(--danger); font-size: 1.1rem; }
-.resultValuePositive { font-weight: 700; color: var(--success); font-size: 1.1rem; }
+.resultValueDanger { font-weight: 700; color: var(--rojo-texto, var(--danger)); font-size: 1.1rem; }
+.resultValuePositive { font-weight: 700; color: var(--verde-texto, var(--success)); font-size: 1.1rem; }
 .resultValueBig { font-weight: 700; color: var(--exito-texto); font-size: 1.4rem; }
 .resultValueSmall { font-weight: 600; color: var(--text-secondary); font-size: 0.85rem; }
 

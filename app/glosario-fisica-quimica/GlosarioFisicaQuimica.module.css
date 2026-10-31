@@ -246,17 +246,17 @@
 
 .nivelBasico {
   background: rgba(16, 185, 129, 0.15);
-  color: var(--success);
+  color: var(--verde-texto, var(--success));
 }
 
 .nivelIntermedio {
   background: rgba(245, 158, 11, 0.15);
-  color: var(--warning);
+  color: var(--ambar-texto, var(--warning));
 }
 
 .nivelAvanzado {
   background: rgba(239, 68, 68, 0.15);
-  color: var(--danger);
+  color: var(--rojo-texto, var(--danger));
 }
 
 .expandIcon {

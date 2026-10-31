@@ -653,7 +653,7 @@
   content: '✗';
   position: absolute;
   left: 0;
-  color: #f97316;
+  color: var(--naranja-texto, #f97316);
   font-weight: 700;
 }
 

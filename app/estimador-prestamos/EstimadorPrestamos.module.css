@@ -825,12 +825,12 @@
 }
 
 .mejorValor {
-  color: #10B981 !important;
+  color: var(--verde-texto, #10B981) !important;
   font-weight: 700 !important;
 }
 
 .checkMark {
-  color: #10B981;
+  color: var(--verde-texto, #10B981);
 }
 
 /* Responsive para Comparador */
@@ -1522,7 +1522,7 @@
 .warningSolution {
   background: rgba(76, 175, 80, 0.15);
   border-left: 3px solid #4caf50;
-  color: #2e7d32;
+  color: var(--verde-texto, #2e7d32);
 }
 
 [data-theme='dark'] .warningBox {

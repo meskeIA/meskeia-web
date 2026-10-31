@@ -220,9 +220,9 @@
 }
 
 .charStatus.vacio { color: var(--text-muted); }
-.charStatus.corto { color: var(--warning); }
-.charStatus.optimo { color: var(--success); }
-.charStatus.largo { color: var(--error); }
+.charStatus.corto { color: var(--ambar-texto, var(--warning)); }
+.charStatus.optimo { color: var(--verde-texto, var(--success)); }
+.charStatus.largo { color: var(--rojo-texto, var(--error)); }
 
 .charNumbers {
   font-size: 0.85rem;
@@ -365,17 +365,17 @@
 
 .checkItem.passed {
   background: rgba(34, 197, 94, 0.1);
-  color: var(--success);
+  color: var(--verde-texto, var(--success));
 }
 
 .checkItem.failed {
   background: rgba(239, 68, 68, 0.1);
-  color: var(--error);
+  color: var(--rojo-texto, var(--error));
 }
 
 .checkItem.warning {
   background: rgba(245, 158, 11, 0.1);
-  color: var(--warning);
+  color: var(--ambar-texto, var(--warning));
 }
 
 .checkIcon {

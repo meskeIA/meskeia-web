@@ -272,7 +272,7 @@
 }
 
 .desgloseCard.intereses .desgloseValor {
-  color: var(--success);
+  color: var(--verde-texto, var(--success));
 }
 
 /* Tabla de Evolución */
@@ -323,7 +323,7 @@
 }
 
 .positivo {
-  color: var(--success);
+  color: var(--verde-texto, var(--success));
 }
 
 /* Fórmula Box */

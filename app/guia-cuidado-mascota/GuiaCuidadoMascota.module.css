@@ -527,7 +527,7 @@
 
 .quickTip::before {
   content: '✓';
-  color: var(--success);
+  color: var(--verde-texto, var(--success));
   font-weight: bold;
   flex-shrink: 0;
 }

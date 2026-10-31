@@ -294,7 +294,7 @@
 }
 
 .resumenCard.intereses .resumenValor {
-  color: var(--danger);
+  color: var(--rojo-texto, var(--danger));
 }
 
 /* Ratio Deuda */
@@ -357,15 +357,15 @@
 }
 
 .ratioAviso.bueno {
-  color: var(--success);
+  color: var(--verde-texto, var(--success));
 }
 
 .ratioAviso.moderado {
-  color: var(--warning);
+  color: var(--ambar-texto, var(--warning));
 }
 
 .ratioAviso.alto {
-  color: var(--danger);
+  color: var(--rojo-texto, var(--danger));
 }
 
 /* Tabla Amortización */
@@ -440,11 +440,11 @@
 }
 
 .interesesCell {
-  color: var(--danger);
+  color: var(--rojo-texto, var(--danger));
 }
 
 .capitalCell {
-  color: var(--success);
+  color: var(--verde-texto, var(--success));
 }
 
 /* Disclaimer */
@@ -1458,7 +1458,7 @@
 }
 
 .comparadorRowIntereses strong {
-  color: var(--danger);
+  color: var(--rojo-texto, var(--danger));
 }
 
 .comparadorTag {
