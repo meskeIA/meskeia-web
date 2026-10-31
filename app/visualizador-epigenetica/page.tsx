@@ -505,9 +505,9 @@ const SeccionHistonas = () => {
                 : styles.efectoSenal
             }`}
           >
-            {detalle.tipoEfecto === 'activa' && <><span aria-hidden="true">✅</span> Activa transcripción</>}
-            {detalle.tipoEfecto === 'silencia' && <><span aria-hidden="true">🔴</span> Silencia transcripción</>}
-            {detalle.tipoEfecto === 'senal' && <><span aria-hidden="true">⚡</span> Señalización / Reparación</>}
+            <span>{detalle.tipoEfecto === 'activa' && <span><span aria-hidden="true">✅</span> Activa transcripción</span>}</span>
+            <span>{detalle.tipoEfecto === 'silencia' && <span><span aria-hidden="true">🔴</span> Silencia transcripción</span>}</span>
+            <span>{detalle.tipoEfecto === 'senal' && <span><span aria-hidden="true">⚡</span> Señalización / Reparación</span>}</span>
           </span>
           <p className={styles.histonaDetalleContexto}>{detalle.contexto}</p>
         </div>

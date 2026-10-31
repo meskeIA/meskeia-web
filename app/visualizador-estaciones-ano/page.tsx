@@ -465,12 +465,12 @@ export default function VisualizadorEstacionesAno() {
             <div className={styles.sliderContainer}>
               <label htmlFor="latitud-slider" className={styles.sliderLabel}>
                 Latitud: <strong>{latitud}°N</strong>
-                {latitud === 0 && ' (Ecuador)'}
-                {latitud === 40 && ' (Madrid)'}
-                {latitud === 50 && ' (Londres)'}
-                {latitud === 60 && ' (Estocolmo)'}
-                {Math.abs(latitud - 66.5) < 1 && ' (Círculo Polar)'}
-                {latitud === 90 && ' (Polo Norte)'}
+                <span>{latitud === 0 && ' (Ecuador)'}</span>
+                <span>{latitud === 40 && ' (Madrid)'}</span>
+                <span>{latitud === 50 && ' (Londres)'}</span>
+                <span>{latitud === 60 && ' (Estocolmo)'}</span>
+                <span>{Math.abs(latitud - 66.5) < 1 && ' (Círculo Polar)'}</span>
+                <span>{latitud === 90 && ' (Polo Norte)'}</span>
               </label>
               <input
                 id="latitud-slider"

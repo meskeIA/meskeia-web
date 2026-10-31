@@ -388,7 +388,7 @@ function SeccionCriba() {
 
       {resuelta.primosFueraDeHoja.length > 0 && (
         <p className={styles.notaRango}>
-          {resuelta.primosFueraDeHoja.length === 1 ? 'El' : 'Los'} primo{resuelta.primosFueraDeHoja.length === 1 ? '' : 's'}{' '}
+          {resuelta.primosFueraDeHoja.length === 1 ? 'El' : 'Los'} primo<span>{resuelta.primosFueraDeHoja.length === 1 ? '' : 's'}</span>{' '}
           {listaConY(resuelta.primosFueraDeHoja)} {resuelta.primosFueraDeHoja.length === 1 ? 'no está' : 'no están'} en
           la cuadrícula porque {resuelta.primosFueraDeHoja.length === 1 ? 'es menor' : 'son menores'} que {formatNumber(desde, 0)},
           pero sus múltiplos sí: se tachan igual.

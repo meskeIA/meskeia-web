@@ -333,7 +333,7 @@ export default function VisualizadorOro() {
                       backgroundColor: metal.color,
                     }}
                   />
-                  <span className={styles.metalBarValor}>{metal.potencial > 0 ? '+' : ''}{metal.potencial} V</span>
+                  <span className={styles.metalBarValor}><span>{metal.potencial > 0 ? '+' : ''}</span>{metal.potencial} V</span>
                 </div>
                 <span className={styles.metalBarDesc}>{metal.descripcion}</span>
               </div>

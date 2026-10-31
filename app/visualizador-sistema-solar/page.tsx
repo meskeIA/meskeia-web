@@ -259,7 +259,7 @@ function SeccionPlanetas() {
                   </div>
                   <div className={styles.planetaStat}>
                     <span className={styles.planetaStatLabel}>Temperatura media</span>
-                    <span className={styles.planetaStatValor}>{p.tempMedia > 0 ? '+' : ''}{formatNumber(p.tempMedia, 0)} °C</span>
+                    <span className={styles.planetaStatValor}><span>{p.tempMedia > 0 ? '+' : ''}</span>{formatNumber(p.tempMedia, 0)} °C</span>
                   </div>
                   <div className={styles.planetaStat}>
                     <span className={styles.planetaStatLabel}>Duración del día</span>

@@ -876,10 +876,10 @@ export default function SonidoOndasPage() {
                 </svg>
                 <p className={styles.formaNombre}>{inst.nombre}</p>
                 <p className={styles.formaDesc}>
-                  {idx === 0 && 'Solo la frecuencia fundamental, sin armónicos'}
-                  {idx === 1 && 'Armónicos débiles, sonido suave y limpio'}
-                  {idx === 2 && 'Armónicos fuertes, sonido rico y complejo'}
-                  {idx === 3 && 'Mezcla equilibrada, sonido cálido'}
+                  <span>{idx === 0 && 'Solo la frecuencia fundamental, sin armónicos'}</span>
+                  <span>{idx === 1 && 'Armónicos débiles, sonido suave y limpio'}</span>
+                  <span>{idx === 2 && 'Armónicos fuertes, sonido rico y complejo'}</span>
+                  <span>{idx === 3 && 'Mezcla equilibrada, sonido cálido'}</span>
                 </p>
               </div>
             ))}

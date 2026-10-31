@@ -424,7 +424,7 @@ function DiagramaHepcidina() {
           <span className={styles.hepcidinLabel}>Hepcidina hepática</span>
           <span className={styles.hepcidinValor}>
             {escenario.nivelHepcidina === 'baja' ? '↓ Baja' : '↑ Alta'}
-            {escenario.nivelHepcidina === 'alta-paradoja' && ' (paradoja)'}
+            <span>{escenario.nivelHepcidina === 'alta-paradoja' && ' (paradoja)'}</span>
           </span>
         </div>
 

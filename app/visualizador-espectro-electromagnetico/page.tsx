@@ -536,10 +536,10 @@ export default function EspectroElectromagneticoPage() {
                   />
                 </div>
                 <span className={`${styles.peligroTag} ${styles[`peligro${nivel.zona.charAt(0).toUpperCase()}${nivel.zona.slice(1)}`]}`}>
-                  {nivel.zona === 'seguro' && 'Seguro'}
-                  {nivel.zona === 'precaucion' && 'Precaución'}
-                  {nivel.zona === 'peligro' && 'Peligro'}
-                  {nivel.zona === 'extremo' && 'Extremo'}
+                  <span>{nivel.zona === 'seguro' && 'Seguro'}</span>
+                  <span>{nivel.zona === 'precaucion' && 'Precaución'}</span>
+                  <span>{nivel.zona === 'peligro' && 'Peligro'}</span>
+                  <span>{nivel.zona === 'extremo' && 'Extremo'}</span>
                 </span>
               </div>
             ))}

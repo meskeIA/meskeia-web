@@ -231,18 +231,18 @@ export default function RelatividadGeneralPage(): React.ReactNode {
               aria-label={`Masa del objeto: ${NOMBRES_MASA[masa - 1]}`}
             />
             <p className={styles.masaDesc} role="status" aria-live="polite">
-              {masa <= 2 &&
-                'La curvatura es pequeña. La gravedad Newtoniana es suficientemente exacta.'}
-              {masa === 3 &&
-                'Curvatura moderada. La luz se desvía levemente. Las correcciones relativistas son medibles.'}
-              {masa >= 4 &&
+              <span>{masa <= 2 &&
+                'La curvatura es pequeña. La gravedad Newtoniana es suficientemente exacta.'}</span>
+              <span>{masa === 3 &&
+                'Curvatura moderada. La luz se desvía levemente. Las correcciones relativistas son medibles.'}</span>
+              <span>{masa >= 4 &&
                 masa <= 5 &&
-                'Curvatura significativa. Las geodésicas se curvan notablemente. La luz dobla su trayectoria.'}
-              {masa >= 6 &&
+                'Curvatura significativa. Las geodésicas se curvan notablemente. La luz dobla su trayectoria.'}</span>
+              <span>{masa >= 6 &&
                 masa <= 7 &&
-                '¡Curvatura extrema! El tiempo se ralentiza mucho cerca de la masa. Zona de peligro.'}
-              {masa === 8 &&
-                'Agujero negro: el horizonte de sucesos atrapa todo lo que entra. Ni la luz escapa.'}
+                '¡Curvatura extrema! El tiempo se ralentiza mucho cerca de la masa. Zona de peligro.'}</span>
+              <span>{masa === 8 &&
+                'Agujero negro: el horizonte de sucesos atrapa todo lo que entra. Ni la luz escapa.'}</span>
             </p>
           </div>
         </section>

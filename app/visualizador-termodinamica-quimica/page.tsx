@@ -165,7 +165,7 @@ const DiagramaEntalpia = () => {
             x={x1 + 5} y={(yReactivos + yProductos) / 2 + 4}
             fontSize="11" fill={esExo ? '#22C55E' : '#F43F5E'} fontWeight="700"
           >
-            ΔH={ejemplo.dH > 0 ? '+' : ''}{formatNumber(ejemplo.dH, 0)}
+            ΔH=<tspan>{ejemplo.dH > 0 ? '+' : ''}</tspan>{formatNumber(ejemplo.dH, 0)}
           </text>
 
           {/* Barrera Ea (si existe) */}
@@ -203,7 +203,7 @@ const DiagramaEntalpia = () => {
       </p>
       <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', lineHeight: 1.6, margin: 0 }}>
         {ejemplo.descripcion}
-        {ejemplo.ea > 0 && catalizador > 0 && ' El catalizador reduce la barrera de activación sin afectar ΔH (los productos y reactivos quedan en la misma posición energética).'}
+        <span>{ejemplo.ea > 0 && catalizador > 0 && ' El catalizador reduce la barrera de activación sin afectar ΔH (los productos y reactivos quedan en la misma posición energética).'}</span>
       </p>
     </div>
   );
@@ -273,7 +273,7 @@ const CalculadoraGibbs = () => {
             className={styles.slider}
             aria-label={`Entalpía: ${dH} kJ/mol`}
           />
-          <span className={styles.sliderValue}>{dH > 0 ? '+' : ''}{formatNumber(dH, 0)} kJ/mol</span>
+          <span className={styles.sliderValue}><span>{dH > 0 ? '+' : ''}</span>{formatNumber(dH, 0)} kJ/mol</span>
         </div>
 
         <div className={styles.sliderRow}>
@@ -284,7 +284,7 @@ const CalculadoraGibbs = () => {
             className={styles.slider}
             aria-label={`Entropía: ${dS} J/mol·K`}
           />
-          <span className={styles.sliderValue}>{dS > 0 ? '+' : ''}{formatNumber(dS, 0)} J/mol·K</span>
+          <span className={styles.sliderValue}><span>{dS > 0 ? '+' : ''}</span>{formatNumber(dS, 0)} J/mol·K</span>
         </div>
 
         <div className={styles.sliderRow}>
@@ -301,7 +301,7 @@ const CalculadoraGibbs = () => {
 
       <div className={`${styles.resultadoGibbs} ${claseResultado}`} role="status" aria-live="polite">
         <div className={styles.resultadoDG} style={{ color: colorDG }}>
-          ΔG = {dGkJ > 0 ? '+' : ''}{formatNumber(dGkJ, 1)} kJ/mol
+          ΔG = <span>{dGkJ > 0 ? '+' : ''}</span>{formatNumber(dGkJ, 1)} kJ/mol
         </div>
         <p className={styles.resultadoDesc} style={{ color: colorDG }}>{etiqueta}</p>
       </div>
@@ -376,7 +376,7 @@ const EquilibrioKeq = () => {
             className={styles.slider}
             aria-label={`log10 de Kₑq: ${logKeq}`}
           />
-          <span className={styles.sliderValue}>{logKeq >= 0 ? '+' : ''}{formatNumber(logKeq, 1)}</span>
+          <span className={styles.sliderValue}><span>{logKeq >= 0 ? '+' : ''}</span>{formatNumber(logKeq, 1)}</span>
         </div>
 
         <div className={styles.keqDisplay} aria-live="polite">
@@ -421,7 +421,7 @@ const EquilibrioKeq = () => {
       <div className={styles.relacionGibbs} aria-live="polite">
         <span>Relación con energía libre estándar: ΔG° = −RT · ln(Kₑq)</span>
         <strong>
-          ΔG° = {dG0 > 0 ? '+' : ''}{formatNumber(dG0, 1)} kJ/mol
+          ΔG° = <span>{dG0 > 0 ? '+' : ''}</span>{formatNumber(dG0, 1)} kJ/mol
           {dG0 < -5 ? ' → Productos favorecidos' : dG0 > 5 ? ' → Reactivos favorecidos' : ' → Equilibrio intermedio'}
         </strong>
       </div>

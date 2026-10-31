@@ -56,21 +56,21 @@ export default function LecturaSerie({
         <strong>
           {valores.length} {valores.length === 1 ? 'valor leído' : 'valores leídos'}
         </strong>
-        {valores.length > 0 && <>: {muestra.join(' · ')}{resto > 0 && ` … (+${resto})`}</>}
+        <span>{valores.length > 0 && <span>: {muestra.join(' · ')}<span>{resto > 0 && ` … (+${resto})`}</span></span>}</span>
       </p>
 
       {papelComa !== 'sin-comas' && (
         <p className={styles.detalle}>
           La coma se ha interpretado como{' '}
           <strong>{papelComa === 'decimal' ? 'separador decimal' : 'separador entre valores'}</strong>
-          {modo !== 'auto' && ' porque tú lo has indicado'}.
+          <span>{modo !== 'auto' && ' porque tú lo has indicado'}</span>.
         </p>
       )}
 
       {descartados.length > 0 && (
         <p className={styles.descartados}>
           No se ha reconocido como número: {descartados.slice(0, 5).map((d) => `«${d}»`).join(', ')}
-          {descartados.length > 5 && ` y ${descartados.length - 5} más`}.
+          <span>{descartados.length > 5 && ` y ${descartados.length - 5} más`}</span>.
         </p>
       )}
 

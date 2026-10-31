@@ -312,7 +312,7 @@ const SeccionSerie = () => {
                   />
                 </div>
                 <span className={`${styles.seriePot} ${par.potencial >= 0 ? styles.seriePotPos : styles.seriePotNeg}`}>
-                  {par.potencial >= 0 ? '+' : ''}{par.potencial.toFixed(2)} V
+                  <span>{par.potencial >= 0 ? '+' : ''}</span>{par.potencial.toFixed(2)} V
                 </span>
               </button>
             );
@@ -346,7 +346,7 @@ const SeccionSerie = () => {
                 E°celda = {SERIE_REDOX[resultado.catodo].potencial.toFixed(2)} − ({SERIE_REDOX[resultado.anodo].potencial.toFixed(2)}) =
               </p>
               <p className={`${styles.serieFemValor} ${resultado.fem > 0 ? styles.serieFemPos : styles.serieFemNeg}`}>
-                {resultado.fem > 0 ? '+' : ''}{resultado.fem.toFixed(2)} V
+                <span>{resultado.fem > 0 ? '+' : ''}</span>{resultado.fem.toFixed(2)} V
               </p>
               <p className={`${styles.serieEspontaneo} ${resultado.fem > 0 ? styles.serieFemPos : styles.serieFemNeg}`}>
                 {resultado.fem > 0 ? <span key="rama-1"><span aria-hidden="true">✅</span> {'Reacción espontánea (ΔG < 0)'}</span> : <span key="rama-2"><span aria-hidden="true">❌</span> No espontánea (requiere energía externa)</span>}

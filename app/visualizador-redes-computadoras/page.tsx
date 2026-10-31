@@ -619,7 +619,7 @@ export default function VisualizadorRedesComputadoras() {
                       {r.id}
                     </text>
                     <text x={r.x} y={r.y + 38} fontSize="10" textAnchor="middle" fill="#555">
-                      {esOrigen ? <><tspan aria-hidden="true">🟢</tspan> Origen</> : esDestino ? <><tspan aria-hidden="true">🔴</tspan> Destino</> : ''}
+                      <tspan>{esOrigen ? <tspan key="a"><tspan aria-hidden="true">🟢</tspan> Origen</tspan> : esDestino ? <tspan key="b"><tspan aria-hidden="true">🔴</tspan> Destino</tspan> : ''}</tspan>
                     </text>
                   </g>
                 );

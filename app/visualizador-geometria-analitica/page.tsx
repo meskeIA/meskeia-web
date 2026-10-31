@@ -179,9 +179,9 @@ function VisualizadorCircunferencia({ params, onChange }: VisualizadorCircunfere
       <div className={styles.panelEcuacion}>
         <div className={styles.ecuacionTitulo}>Ecuación canónica</div>
         <div className={styles.ecuacion}>
-          (x {h !== 0 ? (h > 0 ? `− ${h}` : `+ ${Math.abs(h)}`) : ''})²
+          (x <span>{h !== 0 ? (h > 0 ? `− ${h}` : `+ ${Math.abs(h)}`) : ''}</span>)²
           {' + '}
-          (y {k !== 0 ? (k > 0 ? `− ${k}` : `+ ${Math.abs(k)}`) : ''})²
+          (y <span>{k !== 0 ? (k > 0 ? `− ${k}` : `+ ${Math.abs(k)}`) : ''}</span>)²
           {' = '}
           {r}²
           {' = '}
@@ -285,9 +285,9 @@ function VisualizadorElipse({ params, onChange }: VisualizadorElipseProps) {
       <div className={styles.panelEcuacion}>
         <div className={styles.ecuacionTitulo}>Ecuación canónica</div>
         <div className={styles.ecuacion}>
-          (x {h !== 0 ? (h > 0 ? `− ${h}` : `+ ${Math.abs(h)}`) : ''})² / {a}²
+          (x <span>{h !== 0 ? (h > 0 ? `− ${h}` : `+ ${Math.abs(h)}`) : ''}</span>)² / {a}²
           {' + '}
-          (y {k !== 0 ? (k > 0 ? `− ${k}` : `+ ${Math.abs(k)}`) : ''})² / {bEfectivo.toFixed(1)}²
+          (y <span>{k !== 0 ? (k > 0 ? `− ${k}` : `+ ${Math.abs(k)}`) : ''}</span>)² / {bEfectivo.toFixed(1)}²
           {' = 1'}
         </div>
         <div className={styles.infoNotables}>
@@ -539,9 +539,9 @@ function VisualizadorHiperbola({ params, onChange }: VisualizadorHiperbolaProps)
       <div className={styles.panelEcuacion}>
         <div className={styles.ecuacionTitulo}>Ecuación canónica</div>
         <div className={styles.ecuacion}>
-          (x {h !== 0 ? (h > 0 ? `− ${h}` : `+ ${Math.abs(h)}`) : ''})² / {a}²
+          (x <span>{h !== 0 ? (h > 0 ? `− ${h}` : `+ ${Math.abs(h)}`) : ''}</span>)² / {a}²
           {' − '}
-          (y {k !== 0 ? (k > 0 ? `− ${k}` : `+ ${Math.abs(k)}`) : ''})² / {b}²
+          (y <span>{k !== 0 ? (k > 0 ? `− ${k}` : `+ ${Math.abs(k)}`) : ''}</span>)² / {b}²
           {' = 1'}
         </div>
         <div className={styles.infoNotables}>
@@ -676,9 +676,9 @@ function VisualizadorPolares({ curva, onCurva, nPetalos, onNPetalos }: Visualiza
       <div className={styles.panelEcuacion}>
         <div className={styles.ecuacionTitulo}>Ecuación polar</div>
         <div className={styles.ecuacion}>
-          {curva === 'rosa' && `r = 4|cos(${nPetalos}θ)`}
-          {curva === 'espiral' && `r = θ / (0,8π)`}
-          {curva === 'cardioide' && `r = 3(1 + cos θ)`}
+          <span>{curva === 'rosa' && `r = 4|cos(${nPetalos}θ)`}</span>
+          <span>{curva === 'espiral' && `r = θ / (0,8π)`}</span>
+          <span>{curva === 'cardioide' && `r = 3(1 + cos θ)`}</span>
         </div>
         <div className={styles.infoNotables}>
           {curva === 'rosa' && (

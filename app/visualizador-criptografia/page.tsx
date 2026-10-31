@@ -645,7 +645,7 @@ export default function VisualizadorCriptografia() {
                       <strong>{paso.titulo}</strong>
                       {paso.desde && (
                         <span className={styles.tlsDireccion}>
-                          {paso.desde}{paso.hacia ? ` → ${paso.hacia}` : ''}
+                          {paso.desde}<span>{paso.hacia ? ` → ${paso.hacia}` : ''}</span>
                         </span>
                       )}
                       <p>{paso.descripcion}</p>

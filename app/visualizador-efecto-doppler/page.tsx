@@ -195,10 +195,10 @@ export default function VisualizadorEfectoDoppler(): React.ReactNode {
             onClick={() => setTab(t)}
             className={`${styles.tab} ${tab === t ? styles.tabActive : ''}`}
           >
-            {t === 'efecto' && <><span aria-hidden="true">🌊</span> El efecto</>}
-            {t === 'slider' && <><span aria-hidden="true">🎚️</span> Interactivo</>}
-            {t === 'aplicaciones' && <><span aria-hidden="true">📡</span> Aplicaciones</>}
-            {t === 'cosmos' && <><span aria-hidden="true">🌌</span> Cosmos</>}
+            <span>{t === 'efecto' && <span><span aria-hidden="true">🌊</span> El efecto</span>}</span>
+            <span>{t === 'slider' && <span><span aria-hidden="true">🎚️</span> Interactivo</span>}</span>
+            <span>{t === 'aplicaciones' && <span><span aria-hidden="true">📡</span> Aplicaciones</span>}</span>
+            <span>{t === 'cosmos' && <span><span aria-hidden="true">🌌</span> Cosmos</span>}</span>
           </button>
         ))}
       </nav>

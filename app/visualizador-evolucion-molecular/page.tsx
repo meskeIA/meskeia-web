@@ -719,7 +719,7 @@ export default function VisualizadorEvolucionMolecular() {
             <div className={styles.mrcaInfo} role="region" aria-live="polite">
               <div className={styles.mrcaTitulo}>
                 MRCA: {especieObjA?.nombre.split(' ')[0] ?? '—'} + {especieObjB?.nombre.split(' ')[0] ?? '—'}
-                {difMrca > 0 && <span> · {difMrca} diferencia{difMrca !== 1 ? 's' : ''} en secuencia</span>}
+                {difMrca > 0 && <span> · {difMrca} diferencia<span>{difMrca !== 1 ? 's' : ''}</span> en secuencia</span>}
               </div>
               <div className={styles.mrcaDescripcion}>{getMrcaDescripcion()}</div>
             </div>

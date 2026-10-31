@@ -688,7 +688,7 @@ export default function VisualizadorComercioInternacional() {
               <p className={styles.balanzaTipo}>Balanza Comercial</p>
               <p className={styles.balanzaDescripcion}>Bienes tangibles (coches, máquinas, alimentos)</p>
               <p className={styles.balanzaValor}>
-                {datosBalanza.balanzaComercial >= 0 ? '+' : ''}
+                <span>{datosBalanza.balanzaComercial >= 0 ? '+' : ''}</span>
                 {datosBalanza.balanzaComercial.toLocaleString('es-ES')}M€
               </p>
               <span className={styles.balanzaEstado}>
@@ -702,7 +702,7 @@ export default function VisualizadorComercioInternacional() {
               <p className={styles.balanzaTipo}>Balanza de Servicios</p>
               <p className={styles.balanzaDescripcion}>Turismo, transporte, seguros, royalties</p>
               <p className={styles.balanzaValor}>
-                {datosBalanza.balanzaServicios >= 0 ? '+' : ''}
+                <span>{datosBalanza.balanzaServicios >= 0 ? '+' : ''}</span>
                 {datosBalanza.balanzaServicios.toLocaleString('es-ES')}M€
               </p>
               <span className={styles.balanzaEstado}>
@@ -716,7 +716,7 @@ export default function VisualizadorComercioInternacional() {
               <p className={styles.balanzaTipo}>Cuenta Corriente</p>
               <p className={styles.balanzaDescripcion}>Comercial + Servicios + Rentas + Transferencias</p>
               <p className={styles.balanzaValor}>
-                {datosBalanza.balanzaCorriente >= 0 ? '+' : ''}
+                <span>{datosBalanza.balanzaCorriente >= 0 ? '+' : ''}</span>
                 {datosBalanza.balanzaCorriente.toLocaleString('es-ES')}M€
               </p>
               <span className={styles.balanzaEstado}>
@@ -790,7 +790,7 @@ export default function VisualizadorComercioInternacional() {
                     variacionCambio > 0 ? styles.textoPositivo : variacionCambio < 0 ? styles.textoNegativo : ''
                   }
                 >
-                  {variacionCambio > 0 ? '+' : ''}{variacionCambio}%
+                  <span>{variacionCambio > 0 ? '+' : ''}</span>{variacionCambio}%
                 </strong>{' '}
                 {apreciacion ? '(apreciación)' : depreciacion ? '(depreciación)' : '(neutro)'}
               </label>

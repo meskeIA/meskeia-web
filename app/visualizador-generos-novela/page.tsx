@@ -461,7 +461,7 @@ export default function VisualizadorGenerosNovelaPage() {
           />
           {filtroBusco !== 'todos' && (
             <p className={styles.filtrosResultado}>
-              {generosFiltrados.length} género{generosFiltrados.length !== 1 ? 's' : ''} encontrado{generosFiltrados.length !== 1 ? 's' : ''}
+              {generosFiltrados.length} género<span>{generosFiltrados.length !== 1 ? 's' : ''}</span> encontrado<span>{generosFiltrados.length !== 1 ? 's' : ''}</span>
             </p>
           )}
         </div>

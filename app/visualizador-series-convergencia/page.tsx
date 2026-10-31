@@ -691,7 +691,7 @@ function PiTab() {
           <div key={s.nombre} className={styles.piCard}>
             <div className={styles.piCardHeader}>
               <span className={styles.piNombre}>{s.nombre}</span>
-              <span className={styles.piDec}>{s.dec} decimal{s.dec !== 1 ? 'es' : ''} exacto{s.dec !== 1 ? 's' : ''}</span>
+              <span className={styles.piDec}>{s.dec} decimal<span>{s.dec !== 1 ? 'es' : ''}</span> exacto<span>{s.dec !== 1 ? 's' : ''}</span></span>
             </div>
             <div className={styles.piFormula}>{s.formula}</div>
             <div className={styles.piValor}>{s.valor.toFixed(10)}</div>

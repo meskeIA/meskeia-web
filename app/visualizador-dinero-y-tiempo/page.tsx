@@ -714,7 +714,7 @@ function SeccionAmortizar() {
         <div className={styles.detalleCard}>
           <span className={styles.detalleLabel}>Diferencia en {plazoRestante} años</span>
           <span className={`${styles.detalleValor} ${diferencia > 0 ? styles.azul : styles.verde}`}>
-            {diferencia > 0 ? '+' : ''}{formatCurrency(diferencia)} {diferencia > 0 ? '(invertir)' : '(amortizar)'}
+            <span>{diferencia > 0 ? '+' : ''}</span>{formatCurrency(diferencia)} {diferencia > 0 ? '(invertir)' : '(amortizar)'}
           </span>
         </div>
       </div>

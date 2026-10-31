@@ -468,10 +468,10 @@ export default function VisualizadorMecanicaCuantica() {
             </div>
 
             <p className={styles.gatoEstadoTexto} role="status" aria-live="polite">
-              {estadoGato === 'superposicion' &&
-                'Estado actual: superposición cuántica (50% vivo + 50% muerto)'}
-              {estadoGato === 'vivo' && 'Colapso de función de onda → resultado: vivo'}
-              {estadoGato === 'muerto' && 'Colapso de función de onda → resultado: muerto'}
+              <span>{estadoGato === 'superposicion' &&
+                'Estado actual: superposición cuántica (50% vivo + 50% muerto)'}</span>
+              <span>{estadoGato === 'vivo' && 'Colapso de función de onda → resultado: vivo'}</span>
+              <span>{estadoGato === 'muerto' && 'Colapso de función de onda → resultado: muerto'}</span>
             </p>
           </div>
 

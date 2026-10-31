@@ -558,7 +558,7 @@ export default function VisualizadorOceanosCorreintes() {
                     <div className={styles.tempCiudad}>{c.pais} {c.ciudad}</div>
                     <div className={styles.tempLatitud}>{c.latitud}</div>
                     <div className={`${styles.tempValor} ${esFria ? styles.tempSinCorriente : ''}`}>
-                      {tempMostrada > 0 ? '+' : ''}{tempMostrada}°C
+                      <span>{tempMostrada > 0 ? '+' : ''}</span>{tempMostrada}°C
                     </div>
                     <div className={styles.tempDelta}>
                       {sinCorriente

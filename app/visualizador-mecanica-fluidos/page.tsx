@@ -701,9 +701,9 @@ export default function VisualizadorMecanikaFluidos() {
               Flujo {flujo.label}
             </div>
             <div className={styles.resultadoRango}>
-              {re < 2300 && 'Por debajo del umbral de transición (2.300) — flujo ordenado y predecible'}
-              {re >= 2300 && re <= 4000 && 'Zona de transición entre 2.300 y 4.000 — comportamiento inestable'}
-              {re > 4000 && 'Por encima del umbral turbulento (4.000) — flujo caótico con vórtices'}
+              <span>{re < 2300 && 'Por debajo del umbral de transición (2.300) — flujo ordenado y predecible'}</span>
+              <span>{re >= 2300 && re <= 4000 && 'Zona de transición entre 2.300 y 4.000 — comportamiento inestable'}</span>
+              <span>{re > 4000 && 'Por encima del umbral turbulento (4.000) — flujo caótico con vórtices'}</span>
             </div>
           </div>
 

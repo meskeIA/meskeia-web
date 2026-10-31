@@ -384,7 +384,7 @@ function VisualFiscal() {
       <div className={styles.datoBloque} style={{ marginTop: '1rem', borderColor: superavit ? '#27ae60' : '#e74c3c', borderWidth: 2, borderStyle: 'solid' }}>
         <div className={styles.datoEtiqueta}>{superavit ? 'Superávit' : 'Déficit'}</div>
         <div className={styles.datoValor} style={{ color: superavit ? '#27ae60' : '#e74c3c' }}>
-          {superavit ? '+' : ''}{saldo}
+          <span>{superavit ? '+' : ''}</span>{saldo}
         </div>
         <div className={styles.datoNota}>{superavit ? 'ingresa más de lo que gasta (reduce deuda)' : 'gasta más de lo que ingresa (aumenta deuda)'}</div>
       </div>

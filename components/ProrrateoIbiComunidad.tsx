@@ -111,13 +111,13 @@ export default function ProrrateoIbiComunidad({ conComunidad = true }: Props) {
   return (
     <section className={styles.bloque} aria-labelledby="titulo-prorrateo">
       <h2 id="titulo-prorrateo" className={styles.titulo}>
-        <span aria-hidden="true">📅</span> Reparto del IBI{conComunidad ? ' y la comunidad' : ''} el año de la venta
+        <span aria-hidden="true">📅</span> Reparto del IBI<span>{conComunidad ? ' y la comunidad' : ''}</span> el año de la venta
       </h2>
       <p className={styles.intro}>
         El IBI lo debe quien es propietario el <strong>1 de enero</strong>, normalmente el vendedor, que paga el
         recibo de todo el año. Salvo pacto en contrario, puede repercutir al comprador la parte de los días en que
         este ya es dueño (Tribunal Supremo, sentencia 409/2016, de 15 de junio).
-        {conComunidad && ' Con la comunidad se suele hacer lo mismo, por días del periodo de la cuota.'}
+        <span>{conComunidad && ' Con la comunidad se suele hacer lo mismo, por días del periodo de la cuota.'}</span>
       </p>
 
       <div className={styles.campos}>

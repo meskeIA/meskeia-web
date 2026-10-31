@@ -486,10 +486,10 @@ function SeccionFaraday(): React.ReactNode {
             onClick={() => setEstado(est)}
             aria-pressed={estado === est}
           >
-            {est === 'lejos' && <><span aria-hidden="true">⬅</span> Lejos</>}
-            {est === 'acercando' && <><span aria-hidden="true">➡</span> Acercar</>}
-            {est === 'cerca' && <><span aria-hidden="true">⏸</span> Cerca</>}
-            {est === 'alejando' && <><span aria-hidden="true">⬅</span> Alejar</>}
+            <span>{est === 'lejos' && <span><span aria-hidden="true">⬅</span> Lejos</span>}</span>
+            <span>{est === 'acercando' && <span><span aria-hidden="true">➡</span> Acercar</span>}</span>
+            <span>{est === 'cerca' && <span><span aria-hidden="true">⏸</span> Cerca</span>}</span>
+            <span>{est === 'alejando' && <span><span aria-hidden="true">⬅</span> Alejar</span>}</span>
           </button>
         ))}
       </div>

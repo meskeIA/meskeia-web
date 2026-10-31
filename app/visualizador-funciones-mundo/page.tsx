@@ -416,7 +416,7 @@ export default function VisualizadorFuncionesMundoPage() {
                   <div className={styles.casoCampo}>
                     <label className={styles.casoEtiquetaCampo} htmlFor={`respuesta-caso-${caso.id}`}>
                       Tu respuesta en {caso.etiquetaRespuesta}
-                      {caso.requiereRedondeo ? ' (redondea a 2 decimales)' : ''}
+                      <span>{caso.requiereRedondeo ? ' (redondea a 2 decimales)' : ''}</span>
                     </label>
                     <input
                       id={`respuesta-caso-${caso.id}`}
@@ -516,7 +516,7 @@ export default function VisualizadorFuncionesMundoPage() {
                 <div className={styles.casoCampo}>
                   <label className={styles.casoEtiquetaCampo} htmlFor="respuesta-aleatoria">
                     Tu respuesta en {ejercicio.etiquetaRespuesta}
-                    {ejercicio.requiereRedondeo ? ' (redondea a 2 decimales)' : ''}
+                    <span>{ejercicio.requiereRedondeo ? ' (redondea a 2 decimales)' : ''}</span>
                   </label>
                   <input
                     id="respuesta-aleatoria"

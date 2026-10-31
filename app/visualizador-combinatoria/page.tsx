@@ -452,11 +452,11 @@ export default function VisualizadorCombinatoriaPage() {
 
             {/* Descripción del patrón */}
             <div className={styles.patternDesc}>
-              {pascalPattern === 'binomial' && 'Coeficientes binomiales C(n,k): cada número es la suma de los dos de arriba.'}
-              {pascalPattern === 'fibonacci' && 'Las sumas de las diagonales (/↗) dan la secuencia de Fibonacci: 1, 1, 2, 3, 5, 8, 13…'}
-              {pascalPattern === 'potencias2' && `La suma de cada fila es 2ⁿ. Fila actual más larga suma ${rowSums[pascalRows]?.toLocaleString('es-ES')}.`}
-              {pascalPattern === 'triangulares' && 'Columna k=2 resaltada: 1, 3, 6, 10, 15, 21… son los números triangulares T(n).'}
-              {pascalPattern === 'sierpinski' && 'Al resaltar los números IMPARES aparece el fractal triángulo de Sierpinski.'}
+              <span>{pascalPattern === 'binomial' && 'Coeficientes binomiales C(n,k): cada número es la suma de los dos de arriba.'}</span>
+              <span>{pascalPattern === 'fibonacci' && 'Las sumas de las diagonales (/↗) dan la secuencia de Fibonacci: 1, 1, 2, 3, 5, 8, 13…'}</span>
+              <span>{pascalPattern === 'potencias2' && `La suma de cada fila es 2ⁿ. Fila actual más larga suma ${rowSums[pascalRows]?.toLocaleString('es-ES')}.`}</span>
+              <span>{pascalPattern === 'triangulares' && 'Columna k=2 resaltada: 1, 3, 6, 10, 15, 21… son los números triangulares T(n).'}</span>
+              <span>{pascalPattern === 'sierpinski' && 'Al resaltar los números IMPARES aparece el fractal triángulo de Sierpinski.'}</span>
             </div>
 
             {/* SVG Pascal */}

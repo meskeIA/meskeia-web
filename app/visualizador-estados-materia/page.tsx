@@ -463,9 +463,9 @@ export default function VisualizadorEstadosMateria() {
         <div className={styles.sliderResultado} role="alert" aria-live="polite" style={{ borderLeftColor: estadoAguaColor }}>
           <span className={styles.sliderEstado} style={{ color: estadoAguaColor }}>{estadoAgua}</span>
           <span className={styles.sliderDetalle}>
-            {temperatura <= 0 && 'Las moléculas están fijas en una estructura cristalina hexagonal.'}
-            {temperatura > 0 && temperatura < 100 && 'Las moléculas fluyen libremente pero mantienen contacto entre sí.'}
-            {temperatura >= 100 && 'Las moléculas escapan al aire con alta energía cinética.'}
+            <span>{temperatura <= 0 && 'Las moléculas están fijas en una estructura cristalina hexagonal.'}</span>
+            <span>{temperatura > 0 && temperatura < 100 && 'Las moléculas fluyen libremente pero mantienen contacto entre sí.'}</span>
+            <span>{temperatura >= 100 && 'Las moléculas escapan al aire con alta energía cinética.'}</span>
           </span>
         </div>
       </div>

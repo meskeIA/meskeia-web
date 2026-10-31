@@ -394,10 +394,10 @@ export default function VisualizadorProteinasPlegamiento() {
               >
                 <span className={styles.nivelNum}>{n}°</span>
                 <span className={styles.nivelLabel}>
-                  {n === '1' && 'Primaria'}
-                  {n === '2' && 'Secundaria'}
-                  {n === '3' && 'Terciaria'}
-                  {n === '4' && 'Cuaternaria'}
+                  <span>{n === '1' && 'Primaria'}</span>
+                  <span>{n === '2' && 'Secundaria'}</span>
+                  <span>{n === '3' && 'Terciaria'}</span>
+                  <span>{n === '4' && 'Cuaternaria'}</span>
                 </span>
               </button>
             ))}

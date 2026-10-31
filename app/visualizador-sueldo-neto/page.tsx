@@ -367,9 +367,9 @@ export default function VisualizadorSueldoNetoPage() {
                 Los tramos se aplican a la base <strong>entera</strong> ({formatCurrency(datos.baseLiquidable)})
                 y suman {formatCurrency(datos.cuotaEscalaIRPF)}. De ahí se resta la misma escala aplicada
                 al mínimo personal de {formatCurrency(datos.minimoPersonal)}
-                {minimoCapado && (
-                  <>, que no puede superar la base y aquí se limita a {formatCurrency(datos.minimoAplicado)}</>
-                )}{' '}—{formatCurrency(datos.cuotaMinimoIRPF)}—, que es la forma en que la ley lo grava
+                <span>{minimoCapado && (
+                  <span>, que no puede superar la base y aquí se limita a {formatCurrency(datos.minimoAplicado)}</span>
+                )}</span>{' '}—{formatCurrency(datos.cuotaMinimoIRPF)}—, que es la forma en que la ley lo grava
                 a tipo cero (art. 63.1.2.º LIRPF). Cuota íntegra:{' '}
                 {formatCurrency(datos.cuotaIntegraIRPF)}.
               </p>
@@ -517,10 +517,10 @@ export default function VisualizadorSueldoNetoPage() {
             a partir de {formatCurrency(BRUTO_TOPE_SS)} de bruto anual la cotización deja de crecer. El
             IRPF, en cambio, queda muy rebajado en sueldos bajos por el mínimo personal, la reducción
             del art. 20 y la deducción de la DA 61.ª
-            {BRUTO_CRUCE_SS_IRPF !== null && (
-              <>: con el supuesto de esta página, la SS pesa más que el IRPF por debajo de unos{' '}
-              {formatCurrency(BRUTO_CRUCE_SS_IRPF)} de bruto</>
-            )}
+            <span>{BRUTO_CRUCE_SS_IRPF !== null && (
+              <span>: con el supuesto de esta página, la SS pesa más que el IRPF por debajo de unos{' '}
+              {formatCurrency(BRUTO_CRUCE_SS_IRPF)} de bruto</span>
+            )}</span>
             .
           </p>
 
