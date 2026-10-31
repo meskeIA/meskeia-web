@@ -613,6 +613,18 @@ y buena parte del pasivo no valida el resultado. El pasivo lo drena el Inspector
 > Salió de `conversor-numeros-letras` (24/08/2026) y `calculadora-masa-madre` (25/08). Crónica y
 > pasivo: cabecera de `scripts/check-parser-numerico.mjs` · casos: `scripts/pruebas/parser-numerico.tsx`.
 
+### Candado del reloj y el azar en el render
+
+`npm run check:reloj-azar` — en el build, y **rompe el build** si el commit escribe un `useState`
+cuyo valor inicial llega a `Math.random`, `crypto.randomUUID`, `Date.now`, `new Date()` o
+`hoyISOLocal()` (también por una variable o función del mismo fichero), o el `min`/`max` de un
+`<input>` de fecha calculado en el render: el HTML prerenderizado lleva el valor del build y
+React 19 no corrige el atributo al hidratar. Receta: el valor al montar, en un efecto.
+Juzga **las líneas que el commit añade** · Escape: `reloj-ok: <razón>`, razón obligatoria ·
+`npm run check:reloj-azar -- --todo` mide el pasivo, que decide el Inspector app por app.
+> Salió del cabo C0074: simulador-kmeans (a59e60ca) y control-gastos (8a4c1c03). Crónica:
+> cabecera de `scripts/check-reloj-azar.mjs` · pruebas: `npm run reloj-azar:probar-candado`.
+
 ### Candado de las características del JSON-LD
 
 `npm run check:features` — en el build, y **rompe el build** si un `metadata.ts` o `layout.tsx`
