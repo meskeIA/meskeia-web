@@ -353,7 +353,7 @@ export default function EstadisticaAvanzadaPage() {
               ) : (
                 <p className={styles.placeholder}>
                   Introduce datos para ver los resultados del test t.
-                  {ttestType === 'paired' && ' Las muestras pareadas deben tener el mismo tamaño.'}
+                  <span>{ttestType === 'paired' && ' Las muestras pareadas deben tener el mismo tamaño.'}</span>
                 </p>
               )}
             </div>
@@ -639,8 +639,8 @@ export default function EstadisticaAvanzadaPage() {
                   />
                   <span id="ea-chi-tabla-ayuda" className={styles.helperText}>
                     Cada línea es una categoría de la primera variable; cada columna, una de la segunda.
-                    {filasTabla.length > 0 &&
-                      ` Leídas ${filasTabla.length} ${filasTabla.length === 1 ? 'fila' : 'filas'} de ${filasTabla.map(f => f.length).join(', ')} valores.`}
+                    <span>{filasTabla.length > 0 &&
+                      ` Leídas ${filasTabla.length} ${filasTabla.length === 1 ? 'fila' : 'filas'} de ${filasTabla.map(f => f.length).join(', ')} valores.`}</span>
                   </span>
                 </div>
               )}

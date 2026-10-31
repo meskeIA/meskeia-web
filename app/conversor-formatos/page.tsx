@@ -690,7 +690,7 @@ export default function ConversorFormatosPage() {
                 {/* Preview del resultado (solo para texto) */}
                 {!(convertedContent instanceof Blob) && (
                   <div className={styles.resultPreview}>
-                    <pre>{convertedContent.slice(0, 2000)}{convertedContent.length > 2000 ? '\n...(truncado)' : ''}</pre>
+                    <pre>{convertedContent.slice(0, 2000)}<span>{convertedContent.length > 2000 ? '\n...(truncado)' : ''}</span></pre>
                   </div>
                 )}
               </div>

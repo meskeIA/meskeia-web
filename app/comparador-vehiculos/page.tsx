@@ -649,7 +649,7 @@ export default function ComparadorVehiculosPage() {
                           <span>{detalle.label}</span>
                           <span className={detalle.valor < 0 ? styles.valorNegativo : ''}>
                             {formatCurrency(Math.abs(detalle.valor))}
-                            {detalle.valor < 0 && ' ✓'}
+                            <span>{detalle.valor < 0 && ' ✓'}</span>
                           </span>
                         </div>
                       ))}

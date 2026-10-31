@@ -238,7 +238,7 @@ export default function CalculadoraBreakEvenPage() {
                 <div className={styles.estadoItem}>
                   <span className={styles.estadoLabel}>{calculos.esRentable ? 'Ganancia' : 'Pérdida'}</span>
                   <span className={`${styles.estadoValor} ${calculos.esRentable ? styles.valorPositivo : styles.valorNegativo}`}>
-                    {calculos.esRentable ? '+' : ''}{formatCurrency(calculos.gananciaActual)}
+                    <span>{calculos.esRentable ? '+' : ''}</span>{formatCurrency(calculos.gananciaActual)}
                   </span>
                 </div>
               </div>

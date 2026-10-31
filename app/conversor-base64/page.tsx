@@ -226,7 +226,7 @@ export default function ConversorBase64Page() {
                   <span>Entrada: {textInput.length} caracteres</span>
                   <span>Salida: {textOutput.length} caracteres</span>
                   <span>
-                    {textOutput.length > textInput.length ? '+' : ''}
+                    <span>{textOutput.length > textInput.length ? '+' : ''}</span>
                     {((textOutput.length / textInput.length - 1) * 100).toFixed(1)}%
                   </span>
                 </div>

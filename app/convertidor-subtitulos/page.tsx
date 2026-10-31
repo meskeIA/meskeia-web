@@ -581,9 +581,9 @@ export default function ConvertidorSubtitulosPage() {
             formatoDetectado ? (
               <div className={styles.infoBox} role="status" aria-live="polite">
                 ✓ Formato detectado: <strong>{NOMBRES_FORMATO[formatoDetectado]}</strong>
-                {formatoOrigen !== 'auto' && formatoOrigen !== formatoDetectado && (
-                  <> · forzando <strong>{NOMBRES_FORMATO[formatoOrigen]}</strong></>
-                )}
+                <span>{formatoOrigen !== 'auto' && formatoOrigen !== formatoDetectado && (
+                  <span> · forzando <strong>{NOMBRES_FORMATO[formatoOrigen]}</strong></span>
+                )}</span>
               </div>
             ) : (
               <div className={styles.warningBoxInline} role="alert">

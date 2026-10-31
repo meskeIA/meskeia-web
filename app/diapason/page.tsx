@@ -438,16 +438,16 @@ export default function DiapasonPage() {
               aria-pressed={tipoOnda === tipo}
             >
               <span className={styles.ondaIcono} aria-hidden="true">
-                {tipo === 'sine' && '〰️'}
-                {tipo === 'triangle' && '📐'}
-                {tipo === 'square' && '⬜'}
-                {tipo === 'sawtooth' && '📈'}
+                <span>{tipo === 'sine' && '〰️'}</span>
+                <span>{tipo === 'triangle' && '📐'}</span>
+                <span>{tipo === 'square' && '⬜'}</span>
+                <span>{tipo === 'sawtooth' && '📈'}</span>
               </span>
               <span className={styles.ondaNombre}>
-                {tipo === 'sine' && 'Senoidal'}
-                {tipo === 'triangle' && 'Triangular'}
-                {tipo === 'square' && 'Cuadrada'}
-                {tipo === 'sawtooth' && 'Sierra'}
+                <span>{tipo === 'sine' && 'Senoidal'}</span>
+                <span>{tipo === 'triangle' && 'Triangular'}</span>
+                <span>{tipo === 'square' && 'Cuadrada'}</span>
+                <span>{tipo === 'sawtooth' && 'Sierra'}</span>
               </span>
             </button>
           ))}

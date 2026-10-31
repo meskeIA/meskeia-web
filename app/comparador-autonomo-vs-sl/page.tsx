@@ -340,9 +340,9 @@ export default function ComparadorAutonomoVsSLPage() {
                 </div>
                 <p className={styles.notaRegimen}>
                   Régimen supuesto: {NOMBRE_REGIMEN_DIRECTA[resultados.autonomo.regimen].toLowerCase()}
-                  {resultados.autonomo.regimen === 'simplificada'
+                  <span>{resultados.autonomo.regimen === 'simplificada'
                     ? ` (resta un ${GASTOS_DIFICIL_JUSTIFICACION_EDS.porcentaje} % de gastos de difícil justificación, máximo ${formatCurrency(GASTOS_DIFICIL_JUSTIFICACION_EDS.limiteAnual)} al año)`
-                    : ''}
+                    : ''}</span>
                 </p>
                 {resultados.autonomo.reduccionDificilJustificacion > 0 && (
                   <div className={styles.filaResultado}>
@@ -378,7 +378,7 @@ export default function ComparadorAutonomoVsSLPage() {
               <div className={styles.columnaHeader}>
                 <span className={styles.columnaEmoji} aria-hidden="true">🏢</span>
                 <h2 className={styles.columnaTitulo}>Sociedad Limitada</h2>
-                <p className={styles.columnaSubtitulo}>IS {labelTipoIS(tipoIS)}% + dividendos{repartirDividendos ? '' : ' (sin repartir)'}</p>
+                <p className={styles.columnaSubtitulo}>IS {labelTipoIS(tipoIS)}% + dividendos<span>{repartirDividendos ? '' : ' (sin repartir)'}</span></p>
               </div>
               <div className={styles.columnaBody}>
                 <div className={styles.filaResultado}>
@@ -404,7 +404,7 @@ export default function ComparadorAutonomoVsSLPage() {
                   </div>
                 )}
                 <div className={styles.filaResultado + ' ' + styles.filaTotal}>
-                  <span>Total cargas (IS + SS{repartirDividendos ? ' + IRPF div.' : ''})</span>
+                  <span>Total cargas (IS + SS<span>{repartirDividendos ? ' + IRPF div.' : ''}</span>)</span>
                   <span>{formatCurrency(resultados.sl.totalCargas)}</span>
                 </div>
                 <div className={styles.filaResultado}>

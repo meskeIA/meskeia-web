@@ -428,9 +428,9 @@ export default function EstimadorCuotaAutonomoPage() {
                 </div>
                 <p className={styles.notaRegimen}>
                   Régimen supuesto: {NOMBRE_REGIMEN_DIRECTA[regimen].toLowerCase()}
-                  {regimen === 'simplificada'
+                  <span>{regimen === 'simplificada'
                     ? ` (resta un ${GASTOS_DIFICIL_JUSTIFICACION_EDS.porcentaje} % de gastos de difícil justificación, máximo ${formatCurrency(GASTOS_DIFICIL_JUSTIFICACION_EDS.limiteAnual)} al año, sobre el rendimiento ya descontada la cuota)`
-                    : ''}
+                    : ''}</span>
                 </p>
                 <div className={styles.desgloseItem}>
                   <span className={styles.desgloseLabel}>Base de cotización</span>

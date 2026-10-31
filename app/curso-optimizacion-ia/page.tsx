@@ -139,7 +139,7 @@ export default function CursoOptimizacionIAPage() {
                 </div>
                 <div className={styles.moduleInfo}>
                   <h3 className={styles.moduleTitle}>{module.title}</h3>
-                  <p className={styles.moduleSubtitle}>{module.chapters.length} capítulo{module.chapters.length > 1 ? 's' : ''}</p>
+                  <p className={styles.moduleSubtitle}>{module.chapters.length} capítulo<span>{module.chapters.length > 1 ? 's' : ''}</span></p>
                 </div>
                 <span className={styles.moduleProgress}>{moduleProgress}%</span>
               </div>

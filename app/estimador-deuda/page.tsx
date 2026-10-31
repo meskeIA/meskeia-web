@@ -393,8 +393,8 @@ export default function CalculadoraDeudaPage() {
                         <div className={styles.metodoStat}>
                           <span className={styles.metodoStatLabel}>Tiempo para liquidar todas las deudas</span>
                           <span className={styles.metodoStatValor}>
-                            {Math.floor(resultados.metodos[0].mesesTotales / 12) > 0 &&
-                              `${Math.floor(resultados.metodos[0].mesesTotales / 12)} años `}
+                            <span>{Math.floor(resultados.metodos[0].mesesTotales / 12) > 0 &&
+                              `${Math.floor(resultados.metodos[0].mesesTotales / 12)} años `}</span>
                             {resultados.metodos[0].mesesTotales % 12} meses
                           </span>
                         </div>
@@ -448,7 +448,7 @@ export default function CalculadoraDeudaPage() {
                             <div className={styles.metodoStat}>
                               <span className={styles.metodoStatLabel}>Tiempo para liquidar</span>
                               <span className={styles.metodoStatValor}>
-                                {Math.floor(metodo.mesesTotales / 12) > 0 && `${Math.floor(metodo.mesesTotales / 12)} años `}
+                                <span>{Math.floor(metodo.mesesTotales / 12) > 0 && `${Math.floor(metodo.mesesTotales / 12)} años `}</span>
                                 {metodo.mesesTotales % 12} meses
                               </span>
                             </div>

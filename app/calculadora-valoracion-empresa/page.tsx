@@ -402,7 +402,7 @@ export default function CalculadoraValoracionEmpresa() {
                 {fmtEur(consensoMin)} – {fmtEur(consensoMax)}
               </div>
               <p className={styles.consensoNota}>
-                Basado en {metodosIngresos.length} método{metodosIngresos.length !== 1 ? 's' : ''} con datos disponibles (excluyendo valor contable)
+                Basado en {metodosIngresos.length} método<span>{metodosIngresos.length !== 1 ? 's' : ''}</span> con datos disponibles (excluyendo valor contable)
               </p>
             </div>
             <div className={styles.consensoBadge}>

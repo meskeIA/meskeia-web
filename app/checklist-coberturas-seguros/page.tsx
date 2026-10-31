@@ -290,10 +290,10 @@ export default function ChecklistCoberturasSeguroPage() {
                 {colores.label}
               </span>
               <span className={styles.leyendaDesc}>
-                {tipo === 'obligatorio' && 'Exigido por ley'}
-                {tipo === 'muy-recomendable' && 'Altamente aconsejable'}
-                {tipo === 'recomendable' && 'Buena idea tenerlo'}
-                {tipo === 'opcional' && 'Según tu situación'}
+                <span>{tipo === 'obligatorio' && 'Exigido por ley'}</span>
+                <span>{tipo === 'muy-recomendable' && 'Altamente aconsejable'}</span>
+                <span>{tipo === 'recomendable' && 'Buena idea tenerlo'}</span>
+                <span>{tipo === 'opcional' && 'Según tu situación'}</span>
               </span>
             </div>
           ))}

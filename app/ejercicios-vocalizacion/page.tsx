@@ -617,7 +617,7 @@ export default function EjerciciosVocalizacionPage() {
                       <span className={styles.historialFecha}>{r.fecha}</span>
                       <span className={styles.historialEjercicio}>{r.ejercicio}</span>
                       <span className={styles.historialDuracion}>
-                        {r.duracion}s / {r.objetivo}s {r.exito ? '✓' : ''}
+                        {r.duracion}s / {r.objetivo}s <span>{r.exito ? '✓' : ''}</span>
                       </span>
                     </div>
                   ))}

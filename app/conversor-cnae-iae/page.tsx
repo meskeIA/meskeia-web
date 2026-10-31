@@ -1321,8 +1321,8 @@ export default function ConversorCnaeIaePage() {
               <p className={styles.contador} role="status" aria-live="polite">
                 {formatNumber(resultadosCnae.length, 0)}{' '}
                 {resultadosCnae.length === 1 ? 'resultado' : 'resultados'}
-                {resultadosCnae.length > LIMITE_RESULTADOS && !verTodosCnae && (
-                  <>
+                <span>{resultadosCnae.length > LIMITE_RESULTADOS && !verTodosCnae && (
+                  <span>
                     {' '}
                     · se muestran los {LIMITE_RESULTADOS} primeros{' '}
                     <button
@@ -1332,8 +1332,8 @@ export default function ConversorCnaeIaePage() {
                     >
                       Ver los {resultadosCnae.length}
                     </button>
-                  </>
-                )}
+                  </span>
+                )}</span>
               </p>
             )}
 
@@ -1500,8 +1500,8 @@ export default function ConversorCnaeIaePage() {
                     {actividadDelOficio.actividad}»
                   </span>
                 )}
-                {resultadosIae.length > LIMITE_RESULTADOS && !verTodosIae && (
-                  <>
+                <span>{resultadosIae.length > LIMITE_RESULTADOS && !verTodosIae && (
+                  <span>
                     {' '}
                     · se muestran {LIMITE_RESULTADOS}, con al menos uno de cada sección{' '}
                     <button
@@ -1511,8 +1511,8 @@ export default function ConversorCnaeIaePage() {
                     >
                       Ver los {resultadosIae.length}
                     </button>
-                  </>
-                )}
+                  </span>
+                )}</span>
               </p>
             )}
 

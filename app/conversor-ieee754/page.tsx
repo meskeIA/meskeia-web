@@ -507,11 +507,11 @@ export default function ConversorIEEE754Page() {
                 <span className={styles.resultLabel}>Tipo</span>
               </div>
               <div className={`${styles.resultValue} ${styles[result.isSpecial]}`}>
-                {result.isSpecial === 'normal' && 'Normalizado'}
-                {result.isSpecial === 'denormalized' && 'Denormalizado'}
-                {result.isSpecial === 'zero' && 'Cero'}
-                {result.isSpecial === 'infinity' && 'Infinito'}
-                {result.isSpecial === 'nan' && 'NaN'}
+                <span>{result.isSpecial === 'normal' && 'Normalizado'}</span>
+                <span>{result.isSpecial === 'denormalized' && 'Denormalizado'}</span>
+                <span>{result.isSpecial === 'zero' && 'Cero'}</span>
+                <span>{result.isSpecial === 'infinity' && 'Infinito'}</span>
+                <span>{result.isSpecial === 'nan' && 'NaN'}</span>
               </div>
             </div>
           </div>

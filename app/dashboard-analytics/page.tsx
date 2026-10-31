@@ -980,7 +980,7 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
                                   style={{ fontSize: '0.8rem', color: pct >= 0 ? '#22c55e' : '#ef4444', fontWeight: 600, minWidth: '45px' }}
                                   title={esMesEnCurso ? 'Proyección pro-rata del mes en curso' : undefined}
                                 >
-                                  {esMesEnCurso ? '≈' : ''}{pct >= 0 ? '+' : '-'}{Math.abs(pct)}%
+                                  <span>{esMesEnCurso ? '≈' : ''}</span>{pct >= 0 ? '+' : '-'}{Math.abs(pct)}%
                                 </span>
                               )}
                             </div>
@@ -1373,7 +1373,7 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
             <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: '0 0 0.75rem' }}>
               Mostrando <strong>{formatearNumero(rankingVisible.filas.length)}</strong> de{' '}
               {formatearNumero(rankingVisible.totalFiltradas)} apps
-              {filtroEstadoRank !== 'todas' ? ' del filtro seleccionado' : ''}.
+              <span>{filtroEstadoRank !== 'todas' ? ' del filtro seleccionado' : ''}</span>.
             </p>
 
             <div className={styles.tableContainer}>
@@ -1401,7 +1401,7 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
                           }
                         >
                           {c.label}
-                          {ordenRank.col === c.col ? (ordenRank.desc ? ' ↓' : ' ↑') : ''}
+                          <span>{ordenRank.col === c.col ? (ordenRank.desc ? ' ↓' : ' ↑') : ''}</span>
                         </button>
                       </th>
                     ))}
@@ -1683,7 +1683,7 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
                             : registro.modo === 'bot'
                             ? <span className={styles.badgeBot}><span aria-hidden="true">🕷️</span> Bot</span>
                             : registro.modo === 'share-emit'
-                            ? <span className={styles.badgeShare}><span aria-hidden="true">🔗</span> Compartido{registro.datos_adicionales?.share_emit ? ` · ${registro.datos_adicionales.share_emit}` : ''}</span>
+                            ? <span className={styles.badgeShare}><span aria-hidden="true">🔗</span> Compartido<span>{registro.datos_adicionales?.share_emit ? ` · ${registro.datos_adicionales.share_emit}` : ''}</span></span>
                             : <span className={styles.badgeWeb}><span aria-hidden="true">🌐</span> Web</span>}
                         </td>
                         <td>{registro.timestamp}</td>

@@ -3258,7 +3258,7 @@ export default function SimuladorCompraventaPage() {
               </div>
               <p>Marta, {EJEMPLO_MARTA_EDAD} años, compra su primera vivienda habitual de segunda mano en {nombreEnFrase(EJEMPLO_MARTA.ccaa)} por
               {' '}{eurosEnteros(EJEMPLO_MARTA.precio)}. {EJEMPLO_MARTA_JOVEN_APLICA
-                ? <span key="rama-1">Al ser menor de {EJEMPLO_MARTA_EDAD_TOPE} años{EJEMPLO_MARTA_TOPE ? <> y no superar los {eurosEnteros(EJEMPLO_MARTA_TOPE)}</> : null}, se aplica el tipo
+                ? <span key="rama-1">Al ser menor de {EJEMPLO_MARTA_EDAD_TOPE} años<span>{EJEMPLO_MARTA_TOPE ? <span> y no superar los {eurosEnteros(EJEMPLO_MARTA_TOPE)}</span> : null}</span>, se aplica el tipo
               reducido de ITP del {formatTipoNominal(EJEMPLO_MARTA_TIPO_JOVEN)}&nbsp;% ({eurosEnteros(EJEMPLO_MARTA_ITP)}) en lugar del tipo general
               del {formatTipoNominal(EJEMPLO_MARTA_TIPO_GENERAL)}&nbsp;%.</span>
                 : <span key="rama-2">Aunque es menor de {EJEMPLO_MARTA_EDAD_TOPE} años, su compra supera el tope de {EJEMPLO_MARTA_TOPE ? eurosEnteros(EJEMPLO_MARTA_TOPE) : 'valor'} del tipo
@@ -3276,9 +3276,9 @@ export default function SimuladorCompraventaPage() {
               <p>Carlos compra un piso nuevo en Valencia por {eurosEnteros(EJEMPLO_OBRA_NUEVA.precio)}. Paga el {formatNumber(IVA_INMUEBLES_2025.obraNueva, 0)}&nbsp;% de IVA ({eurosEnteros(EJEMPLO_OBRA_NUEVA_IVA)})
               más el {formatTipoNominal(EJEMPLO_OBRA_NUEVA_AJD_TIPO)}&nbsp;% de AJD ({eurosEnteros(EJEMPLO_OBRA_NUEVA_AJD)}) al ser la primera transmisión del promotor.
               El total de impuestos asciende a {eurosEnteros(EJEMPLO_OBRA_NUEVA_IVA + EJEMPLO_OBRA_NUEVA_AJD)}.
-              {EJEMPLO_OBRA_NUEVA_AJD_HABITUAL.motivo === 'vivienda-habitual'
-                ? <> Si el piso va a ser su vivienda habitual, el AJD valenciano baja al {formatTipoNominal(EJEMPLO_OBRA_NUEVA_AJD_HABITUAL.tipo)}&nbsp;%.</>
-                : null}</p>
+              <span>{EJEMPLO_OBRA_NUEVA_AJD_HABITUAL.motivo === 'vivienda-habitual'
+                ? <span> Si el piso va a ser su vivienda habitual, el AJD valenciano baja al {formatTipoNominal(EJEMPLO_OBRA_NUEVA_AJD_HABITUAL.tipo)}&nbsp;%.</span>
+                : null}</span></p>
               <div className={styles.casoResultado}>IVA + AJD frente a ITP en segunda mano</div>
             </div>
             <div className={styles.casoCard}>

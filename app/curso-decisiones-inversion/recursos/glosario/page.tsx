@@ -196,7 +196,7 @@ export default function GlosarioPage() {
           <div className={styles.sectionHeader}>
             <span className={styles.sectionIcon}>📚</span>
             <h2 className={styles.sectionTitleText}>
-              {filteredTerms.length} término{filteredTerms.length !== 1 ? 's' : ''} encontrado{filteredTerms.length !== 1 ? 's' : ''}
+              {filteredTerms.length} término<span>{filteredTerms.length !== 1 ? 's' : ''}</span> encontrado<span>{filteredTerms.length !== 1 ? 's' : ''}</span>
             </h2>
           </div>
 

@@ -1144,16 +1144,16 @@ export default function CreadorThumbnailsPage() {
                   onClick={() => setSelectedId(el.id)}
                 >
                   <span className={styles.layerIcon} aria-hidden="true">
-                    {el.type === 'text' && '📝'}
-                    {el.type === 'image' && '🖼️'}
-                    {el.type === 'shape' && '⬜'}
+                    <span>{el.type === 'text' && '📝'}</span>
+                    <span>{el.type === 'image' && '🖼️'}</span>
+                    <span>{el.type === 'shape' && '⬜'}</span>
                     {el.type === 'emoji' && el.emoji}
                   </span>
                   <span className={styles.layerName}>
                     {el.type === 'text' && (el.text?.slice(0, 15) || 'Texto')}
-                    {el.type === 'image' && 'Imagen'}
+                    <span>{el.type === 'image' && 'Imagen'}</span>
                     {el.type === 'shape' && SHAPES.find(s => s.type === el.shapeType)?.name}
-                    {el.type === 'emoji' && 'Emoji'}
+                    <span>{el.type === 'emoji' && 'Emoji'}</span>
                   </span>
                   <button
                     type="button"

@@ -428,7 +428,7 @@ export default function ConversorNumerosLetrasPage() {
                 <p className={styles.avisoTexto}>
                   {citar(marca.textos)} {monedaDeLaMarca || !nombresMarca.includes(' o ') ? 'indica' : 'puede ser'}{' '}
                   {nombresMarca}, pero el texto sale en <strong>{moneda.plural}</strong>, la moneda
-                  elegida.{monedaDeLaMarca ? '' : ' Elige la tuya en «Moneda».'}
+                  elegida.<span>{monedaDeLaMarca ? '' : ' Elige la tuya en «Moneda».'}</span>
                 </p>
                 {monedaDeLaMarca && (
                   <button
@@ -487,7 +487,7 @@ export default function ConversorNumerosLetrasPage() {
                 <span aria-hidden="true">🗣️</span> En voz alta también se dice{' '}
                 {resultado.orales.map((o, i) => (
                   <span key={o}>
-                    {i > 0 ? ' o ' : ''}
+                    <span>{i > 0 ? ' o ' : ''}</span>
                     <em>«{o}»</em>
                   </span>
                 ))}

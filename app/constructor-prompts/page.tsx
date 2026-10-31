@@ -573,9 +573,9 @@ export default function ConstructorPrompts() {
             <div className={styles.calidadRow} role="status" aria-live="polite">
               <span className={styles.calidadLabel}>Calidad del prompt:</span>
               <span className={styles.calidadBadge} style={{ background: calidadColor }}>
-                {calidad === 'básico' && <><span aria-hidden="true">⚠️</span> Básico</>}
-                {calidad === 'bueno' && <><span aria-hidden="true">👍</span> Bueno</>}
-                {calidad === 'excelente' && <><span aria-hidden="true">⭐</span> Excelente</>}
+                <span>{calidad === 'básico' && <span><span aria-hidden="true">⚠️</span> Básico</span>}</span>
+                <span>{calidad === 'bueno' && <span><span aria-hidden="true">👍</span> Bueno</span>}</span>
+                <span>{calidad === 'excelente' && <span><span aria-hidden="true">⭐</span> Excelente</span>}</span>
               </span>
               <span className={styles.calidadInfo}>
                 {totalCampos} de 9 dimensiones configuradas

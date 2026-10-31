@@ -543,14 +543,14 @@ export default function EstimadorComplementoMinimosPage() {
                     <strong>Límite de ingresos 2026:</strong>{' '}
                     {formatCurrency(resultado.limiteIngresos)}/año{' '}
                     ({resultado.conConyugeACargo ? 'con cónyuge a cargo' : 'sin cónyuge a cargo'})
-                    {resultado.complementoDiferencial && (
-                      <>
+                    <span>{resultado.complementoDiferencial && (
+                      <span>
                         {' · '}Tus ingresos lo superan, pero no tanto como para perder el
                         complemento entero: el art. 9.2 del RD 241/2026 reconoce la diferencia
                         entre lo que sumas (rentas + pensión) y la suma del límite más la
                         cuantía mínima anual.
-                      </>
-                    )}
+                      </span>
+                    )}</span>
                   </p>
                 </div>
 
@@ -559,35 +559,35 @@ export default function EstimadorComplementoMinimosPage() {
                   <span aria-hidden="true">📏</span>
                   <p>
                     <strong>Tope del complemento:</strong>{' '}
-                    {resultado.exencionTope === 'antes2013' && (
-                      <>
+                    <span>{resultado.exencionTope === 'antes2013' && (
+                      <span>
                         no lo hay. Tu pensión se causó antes del {FECHA_TOPE}, y el tope de la
                         pensión no contributiva solo rige para las causadas desde esa fecha
                         (art. 9.5 del RD 241/2026).
-                      </>
-                    )}
-                    {resultado.exencionTope === 'terceraPersona' && (
-                      <>
+                      </span>
+                    )}</span>
+                    <span>{resultado.exencionTope === 'terceraPersona' && (
+                      <span>
                         no lo hay. La gran incapacidad con el complemento para la persona que te
                         atiende queda fuera del tope (art. 9.7 del RD 241/2026).
-                      </>
-                    )}
-                    {resultado.topeMensual !== null && (
-                      <>
+                      </span>
+                    )}</span>
+                    <span>{resultado.topeMensual !== null && (
+                      <span>
                         {formatCurrency(resultado.topeMensual)}/mes,{' '}
                         {resultado.conConyugeACargo
                           ? 'la pensión no contributiva de una unidad con dos beneficiarios (art. 10.4 del RD 241/2026 y art. 364.1.a LGSS)'
                           : 'la pensión no contributiva del año (art. 9.5 del RD 241/2026)'}.
-                        {resultado.topeAplicado && (
-                          <>
+                        <span>{resultado.topeAplicado && (
+                          <span>
                             {' '}Lo que te faltaba hasta el mínimo
                             ({formatCurrency(resultado.complementoSinTope)}/mes) lo supera, así que
                             el complemento se queda en el tope y tu pensión final no llega al
                             mínimo garantizado.
-                          </>
-                        )}
-                      </>
-                    )}
+                          </span>
+                        )}</span>
+                      </span>
+                    )}</span>
                   </p>
                 </div>
               </div>

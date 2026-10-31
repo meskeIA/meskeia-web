@@ -552,9 +552,9 @@ export default function SimuladorHipotecaPage() {
                   {formatCurrency(resultado.cuotaMensual)}
                 </span>
                 <span className={styles.resultadoSubtexto}>
-                  {tipoInteres === 'fijo' && `Tipo fijo: ${formatNumber(resultado.tipoEfectivo, 2)}%`}
-                  {tipoInteres === 'variable' && `TIN: ${formatNumber(resultado.tipoEfectivo, 2)}% (Euríbor + diferencial)`}
-                  {tipoInteres === 'mixta' && `${formatNumber(interesAnual, 2)}% fijo · Luego Euríbor ${formatNumber(euribor, 2)}% + ${formatNumber(diferencial, 2)}%`}
+                  <span>{tipoInteres === 'fijo' && `Tipo fijo: ${formatNumber(resultado.tipoEfectivo, 2)}%`}</span>
+                  <span>{tipoInteres === 'variable' && `TIN: ${formatNumber(resultado.tipoEfectivo, 2)}% (Euríbor + diferencial)`}</span>
+                  <span>{tipoInteres === 'mixta' && `${formatNumber(interesAnual, 2)}% fijo · Luego Euríbor ${formatNumber(euribor, 2)}% + ${formatNumber(diferencial, 2)}%`}</span>
                 </span>
                 {tipoInteres === 'mixta' && resultado.cuotaMixta2 > 0 && (
                   <span className={styles.resultadoCuota2}>

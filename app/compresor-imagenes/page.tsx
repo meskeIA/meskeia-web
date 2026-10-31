@@ -643,15 +643,15 @@ export default function CompresorImagenesPage() {
                   </span>
                   <span className={styles.colSize}>{formatSize(image.originalSize)}</span>
                   <span className={styles.colSize}>
-                    {image.status === 'processing' && '⏳'}
+                    <span>{image.status === 'processing' && '⏳'}</span>
                     {image.status === 'done' && image.compressedSize && formatSize(image.compressedSize)}
-                    {image.status === 'error' && '❌'}
-                    {image.status === 'pending' && '-'}
+                    <span>{image.status === 'error' && '❌'}</span>
+                    <span>{image.status === 'pending' && '-'}</span>
                   </span>
                   <span className={`${styles.colReduction} ${image.status === 'done' ? styles.reductionSuccess : ''}`}>
-                    {image.status === 'done' && image.compressedSize && (
-                      <>-{formatNumber(((image.originalSize - image.compressedSize) / image.originalSize) * 100, 1)}%</>
-                    )}
+                    <span>{image.status === 'done' && image.compressedSize && (
+                      <span>-{formatNumber(((image.originalSize - image.compressedSize) / image.originalSize) * 100, 1)}%</span>
+                    )}</span>
                   </span>
                   <span className={styles.colActions}>
                     {image.status === 'done' && (
@@ -787,11 +787,11 @@ export default function CompresorImagenesPage() {
                 <div className={styles.comparisonLabels}>
                   <span className={styles.labelOriginal}>
                     Original: {formatSize(selectedImage.originalSize)}
-                    {selectedImage.originalWidth && ` (${selectedImage.originalWidth}×${selectedImage.originalHeight})`}
+                    <span>{selectedImage.originalWidth && ` (${selectedImage.originalWidth}×${selectedImage.originalHeight})`}</span>
                   </span>
                   <span className={styles.labelCompressed}>
                     Comprimida: {formatSize(selectedImage.compressedSize || 0)}
-                    {selectedImage.compressedWidth && ` (${selectedImage.compressedWidth}×${selectedImage.compressedHeight})`}
+                    <span>{selectedImage.compressedWidth && ` (${selectedImage.compressedWidth}×${selectedImage.compressedHeight})`}</span>
                   </span>
                 </div>
 

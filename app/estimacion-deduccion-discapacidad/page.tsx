@@ -195,11 +195,11 @@ export default function EstimacionDeduccionDiscapacidadPage() {
             <p className={styles.helpText}>
               Añade {formatCurrency(3000)} adicionales al mínimo si se acredita la necesidad de ayuda
               de terceros o movilidad reducida (certificado oficial).
-              {grado === '65oMas' && (
-                <> Con un grado igual o superior al 65 % estos {formatCurrency(3000)} se aplican
+              <span>{grado === '65oMas' && (
+                <span> Con un grado igual o superior al 65 % estos {formatCurrency(3000)} se aplican
                   igualmente, aunque no marques la casilla: el grado es por sí solo uno de los tres
-                  supuestos del artículo 60 de la Ley del IRPF.</>
-              )}
+                  supuestos del artículo 60 de la Ley del IRPF.</span>
+              )}</span>
             </p>
           </div>
 

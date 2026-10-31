@@ -309,13 +309,13 @@ export default function DiccionarioRimasPage() {
         </div>
 
         <p id="estado-diccionario" className={styles.estado} role="status" aria-live="polite">
-          {estado === 'cargando' && 'Descargando el diccionario…'}
-          {estado === 'indexando' && `Preparando las rimas… ${progreso}%`}
-          {estado === 'listo' &&
+          <span>{estado === 'cargando' && 'Descargando el diccionario…'}</span>
+          <span>{estado === 'indexando' && `Preparando las rimas… ${progreso}%`}</span>
+          <span>{estado === 'listo' &&
             indice &&
-            `Listo: ${formatNumber(indice.entradas.length, 0)} palabras indexadas`}
-          {estado === 'error' &&
-            'No se pudo cargar el diccionario. Recarga la página para reintentar.'}
+            `Listo: ${formatNumber(indice.entradas.length, 0)} palabras indexadas`}</span>
+          <span>{estado === 'error' &&
+            'No se pudo cargar el diccionario. Recarga la página para reintentar.'}</span>
         </p>
 
         {/* Tipo de rima */}

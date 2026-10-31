@@ -255,7 +255,7 @@ export default function CalculadoraCostePlazosPage() {
                       }
                     </span>
                     <span className={styles.resultadoPorcentaje}>
-                      ({resultado.costeFinanciacion >= 0 ? '+' : ''}{formatNumber(resultado.porcentajeExtra, 1)}% sobre el precio)
+                      (<span>{resultado.costeFinanciacion >= 0 ? '+' : ''}</span>{formatNumber(resultado.porcentajeExtra, 1)}% sobre el precio)
                     </span>
                   </div>
                 </div>

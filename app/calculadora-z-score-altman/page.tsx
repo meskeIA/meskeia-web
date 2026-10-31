@@ -337,7 +337,7 @@ export default function CalculadoraZScoreAltman() {
                     style={{ width: `${(Math.abs(c.aporte) / maxAporteAbs) * 100}%`, background: c.aporte < 0 ? '#c0392b' : 'var(--primary)' }}
                   />
                 </div>
-                <span className={styles.desgloseAporte}>{c.aporte >= 0 ? '+' : ''}{formatNumber(c.aporte, 2)}</span>
+                <span className={styles.desgloseAporte}><span>{c.aporte >= 0 ? '+' : ''}</span>{formatNumber(c.aporte, 2)}</span>
               </div>
             ))}
           </div>

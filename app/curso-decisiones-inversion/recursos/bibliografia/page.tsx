@@ -165,11 +165,11 @@ export default function BibliografiaPage() {
           <section key={category} className={styles.contentSection}>
             <div className={styles.sectionHeader}>
               <span className={styles.sectionIcon}>
-                {category === 'Clásicos' && '🏛️'}
-                {category === 'Inversión indexada' && '📈'}
-                {category === 'Psicología' && '🧠'}
-                {category === 'Estrategia' && '🎯'}
-                {category === 'España' && '🇪🇸'}
+                <span>{category === 'Clásicos' && '🏛️'}</span>
+                <span>{category === 'Inversión indexada' && '📈'}</span>
+                <span>{category === 'Psicología' && '🧠'}</span>
+                <span>{category === 'Estrategia' && '🎯'}</span>
+                <span>{category === 'España' && '🇪🇸'}</span>
               </span>
               <h2 className={styles.sectionTitleText}>{category}</h2>
             </div>

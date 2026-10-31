@@ -522,11 +522,11 @@ export default function ComparadorElectrico() {
                 <span className={styles.statLabel}>
                   Diferencia al comprar: eléctrico con cargador y tras la ayuda, menos gasolina
                   {/* Con diferencia 0 cuestan lo mismo: no «ya es más barato» (hallazgo 2834) */}
-                  {resultado.inversionInicialExtra < 0
+                  <span>{resultado.inversionInicialExtra < 0
                     ? ' (el eléctrico ya es más barato)'
                     : resultado.inversionInicialExtra === 0
                       ? ' (cuestan lo mismo)'
-                      : ''}
+                      : ''}</span>
                 </span>
               </div>
               <div className={styles.statCard}>
@@ -570,7 +570,7 @@ export default function ComparadorElectrico() {
                         <td className={styles.celCosteEV}>{formatCurrency(fila.costeTotalEV)}</td>
                         <td>{formatCurrency(fila.costeTotalGas)}</td>
                         <td className={fila.ventajaEV >= 0 ? styles.celAhorro : undefined}>
-                          {fila.ventajaEV >= 0 ? '+' : ''}
+                          <span>{fila.ventajaEV >= 0 ? '+' : ''}</span>
                           {formatCurrency(fila.ventajaEV)}
                         </td>
                       </tr>

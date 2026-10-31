@@ -284,7 +284,7 @@ export default function EstimadorCostesDivorcioPage() {
               <div className={styles.resultados}>
                 <div className={styles.totalHero}>
                   <div className={styles.totalLabel}>
-                    Coste total estimado{resultado.porConyuge ? ' (por cónyuge)' : ''}
+                    Coste total estimado<span>{resultado.porConyuge ? ' (por cónyuge)' : ''}</span>
                   </div>
                   <div className={styles.totalImporte}>
                     {formatCurrency(resultado.total.min)} – {formatCurrency(resultado.total.max)}
