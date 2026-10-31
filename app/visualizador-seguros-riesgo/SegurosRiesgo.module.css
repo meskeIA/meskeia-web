@@ -381,17 +381,17 @@
 }
 
 .badgeAlerta {
-  color: #E74C3C;
+  color: var(--rojo-texto, #E74C3C);
   font-weight: 700;
 }
 
 .badgeOk {
-  color: #F39C12;
+  color: var(--ambar-texto, #F39C12);
   font-weight: 700;
 }
 
 .badgeExcelente {
-  color: #27AE60;
+  color: var(--verde-texto, #27AE60);
   font-weight: 700;
 }
 

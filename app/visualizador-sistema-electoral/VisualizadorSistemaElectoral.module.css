@@ -80,7 +80,7 @@
 .tablaDivisor { font-weight: 600; color: var(--text-secondary); text-align: left; white-space: nowrap; }
 .tablaCociente { position: relative; }
 .tablaGanador { background: rgba(46,134,171,0.08); font-weight: 700; border: 2px solid var(--primary); border-radius: 4px; }
-.tablaCheck { position: absolute; top: 2px; right: 4px; font-size: 0.7rem; color: var(--verde); }
+.tablaCheck { position: absolute; top: 2px; right: 4px; font-size: 0.7rem; color: var(--verde-texto, var(--verde)); }
 
 /* Rondas lista */
 .rondasLista { display: flex; flex-direction: column; gap: 0.3rem; margin-bottom: var(--spacing-lg); }

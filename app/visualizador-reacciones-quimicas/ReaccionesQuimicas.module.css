@@ -125,13 +125,13 @@
 .conteoLabel { font-size: 0.75rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase; }
 .conteoNumero { font-size: 1.3rem; font-weight: 800; text-align: center; padding: var(--spacing-sm); border-radius: var(--radius); }
 .conteoElemento { display: flex; justify-content: center; }
-.conteoBien { color: var(--verde); background: rgba(39,174,96,0.08); }
-.conteoMal { color: var(--rojo); background: rgba(231,76,60,0.08); }
+.conteoBien { color: var(--verde-texto, var(--verde)); background: rgba(39,174,96,0.08); }
+.conteoMal { color: var(--rojo-texto, var(--rojo)); background: rgba(231,76,60,0.08); }
 
 /* Estado del balance */
 .estadoBalance { text-align: center; padding: var(--spacing-md); border-radius: var(--radius); font-weight: 600; font-size: 0.95rem; margin-bottom: var(--spacing-lg); }
-.balanceOk { background: rgba(39,174,96,0.1); color: var(--verde); border: 1px solid rgba(39,174,96,0.3); }
-.balanceNo { background: rgba(231,76,60,0.1); color: var(--rojo); border: 1px solid rgba(231,76,60,0.3); }
+.balanceOk { background: rgba(39,174,96,0.1); color: var(--verde-texto, var(--verde)); border: 1px solid rgba(39,174,96,0.3); }
+.balanceNo { background: rgba(231,76,60,0.1); color: var(--rojo-texto, var(--rojo)); border: 1px solid rgba(231,76,60,0.3); }
 
 .balanceoAcciones { display: flex; gap: var(--spacing-md); justify-content: center; margin-bottom: var(--spacing-md); }
 .btnSecundario { padding: var(--spacing-sm) var(--spacing-lg); font-size: 0.88rem; font-weight: 600; border: 2px solid var(--border); border-radius: var(--radius); background: var(--bg-card); color: var(--text-primary); cursor: pointer; transition: all 0.2s; }

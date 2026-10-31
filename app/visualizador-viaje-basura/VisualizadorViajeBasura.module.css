@@ -56,8 +56,8 @@
 [data-theme='dark'] .errorCard { background: rgba(239, 68, 68, 0.1); border-color: rgba(239, 68, 68, 0.3); }
 .errorItem { font-size: 0.85rem; color: var(--text-primary); display: block; margin-bottom: 0.2rem; }
 .errorLinea { font-size: 0.8rem; line-height: 1.4; }
-.errorMal { color: var(--rojo); }
-.errorBien { color: var(--verde); }
+.errorMal { color: var(--rojo-texto, var(--rojo)); }
+.errorBien { color: var(--verde-texto, var(--verde)); }
 
 /* ─── Sección Después: Viaje ─── */
 .viajeSelectorGrid { display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-lg); }

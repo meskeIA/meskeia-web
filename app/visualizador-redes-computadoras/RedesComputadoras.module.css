@@ -523,7 +523,7 @@
 
 .routingFlecha {
   font-size: 1.4rem;
-  color: #F4A261;
+  color: var(--naranja-texto, #F4A261);
   font-weight: bold;
 }
 
@@ -572,7 +572,7 @@
 }
 
 .rutaCoste {
-  color: #F4A261;
+  color: var(--naranja-texto, #F4A261);
   font-weight: 700;
 }
 
@@ -645,7 +645,7 @@
 }
 
 .latenciaAlta {
-  color: #E74C3C;
+  color: var(--rojo-texto, #E74C3C);
   font-weight: 600;
 }
 

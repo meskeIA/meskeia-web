@@ -95,8 +95,8 @@
 .comparativaIncorrecto { border-color: #E53935; }
 .comparativaCorrecto { border-color: #43A047; }
 .comparativaEtiqueta { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: var(--spacing-sm); }
-.comparativaIncorrecto .comparativaEtiqueta { color: #E53935; }
-.comparativaCorrecto .comparativaEtiqueta { color: #43A047; }
+.comparativaIncorrecto .comparativaEtiqueta { color: var(--rojo-texto, #E53935); }
+.comparativaCorrecto .comparativaEtiqueta { color: var(--verde-texto, #43A047); }
 .comparativaNombre { font-size: 1.2rem; font-weight: 700; color: var(--text-primary); margin: 0 0 0.2rem 0; }
 .comparativaSubtitulo { font-size: 0.82rem; color: var(--text-muted); margin-bottom: var(--spacing-lg); }
 

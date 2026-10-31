@@ -15,7 +15,7 @@
 }
 
 .required {
-  color: #E53E3E;
+  color: var(--rojo-texto, #E53E3E);
   margin-left: 0.25rem;
 }
 

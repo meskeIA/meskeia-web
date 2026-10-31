@@ -402,7 +402,7 @@
 
 .badgeMix {
   background: #fff8e1;
-  color: #e65100;
+  color: var(--naranja-texto, #e65100);
 }
 
 [data-theme='dark'] .badgeUp {

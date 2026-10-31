@@ -92,7 +92,7 @@
 
 .phBarZones { display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--text-muted); margin-top: 0.3rem; padding: 0 4px; }
 .phZoneAcido { color: #CC3333; font-weight: 600; }
-.phZoneNeutro { color: #33AA66; font-weight: 600; }
+.phZoneNeutro { color: var(--verde-texto, #33AA66); font-weight: 600; }
 .phZoneBase { color: #6644CC; font-weight: 600; }
 
 .sliderContainer { padding: 0 2px; margin-bottom: var(--spacing-lg); }

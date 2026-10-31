@@ -753,7 +753,7 @@
 .warningTitle {
   font-size: 1rem;
   font-weight: 700;
-  color: #C45E1A;
+  color: var(--naranja-texto, #C45E1A);
   margin: 0 0 var(--spacing-sm) 0;
 }
 

@@ -124,9 +124,9 @@
 .tablaCasos tr:last-child td { border-bottom: none; }
 .filaActiva { background: rgba(46, 134, 171, 0.1); font-weight: 600; }
 [data-theme='dark'] .filaActiva { background: rgba(46, 134, 171, 0.2); }
-.signoPos { color: #F43F5E; font-weight: 700; }
-.signoNeg { color: #22C55E; font-weight: 700; }
-.signoCero { color: #F59E0B; font-weight: 700; }
+.signoPos { color: var(--rojo-texto, #F43F5E); font-weight: 700; }
+.signoNeg { color: var(--verde-texto, #22C55E); font-weight: 700; }
+.signoCero { color: var(--ambar-texto, #F59E0B); font-weight: 700; }
 
 /* ─── Sección 3: Equilibrio Kₑq ─── */
 .keqDisplay {

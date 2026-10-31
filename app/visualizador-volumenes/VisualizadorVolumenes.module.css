@@ -652,7 +652,7 @@
 
 .warningHeader h2 {
   font-size: 1.1rem !important;
-  color: #c06010 !important;
+  color: var(--naranja-texto, #c06010) !important;
   margin: 0 !important;
   border-bottom: none !important;
   padding-bottom: 0 !important;
@@ -673,7 +673,7 @@
 }
 
 .warningList li strong {
-  color: #c06010;
+  color: var(--naranja-texto, #c06010);
 }
 
 /* =========================================================

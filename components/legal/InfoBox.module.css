@@ -12,7 +12,7 @@
 
 .successTitle {
   font-weight: 600;
-  color: #059669;
+  color: var(--verde-texto, #059669);
   margin-bottom: 0.5rem;
   display: flex;
   align-items: center;
@@ -50,7 +50,7 @@
 
 .warningTitle {
   font-weight: 600;
-  color: #D97706;
+  color: var(--ambar-texto, #D97706);
   margin-bottom: 0.5rem;
   display: flex;
   align-items: center;

@@ -310,7 +310,7 @@
 }
 
 .convDiverge .convBadge {
-  color: #E84A5F;
+  color: var(--rojo-texto, #E84A5F);
 }
 
 .convLimite {

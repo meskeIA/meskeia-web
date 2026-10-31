@@ -25,7 +25,7 @@
 .mitoIcono { font-size: 1.2rem; }
 .realidadIcono { font-size: 1.2rem; }
 .mitoTitulo { font-size: 0.85rem; font-weight: 700; text-transform: uppercase; color: #DC2626; margin: 0; }
-.realidadTitulo { font-size: 0.85rem; font-weight: 700; text-transform: uppercase; color: #16A34A; margin: 0; }
+.realidadTitulo { font-size: 0.85rem; font-weight: 700; text-transform: uppercase; color: var(--verde-texto, #16A34A); margin: 0; }
 .mitoTexto { font-size: 0.9rem; color: var(--text-secondary); font-style: italic; margin: 0 0 0.75rem; padding: 0.5rem 0.75rem; background: #FEE2E2; border-radius: 6px; }
 [data-theme='dark'] .mitoTexto { background: #3B0A0A; }
 .realidadTexto { font-size: 0.9rem; color: var(--text-secondary); margin: 0 0 0.75rem; font-weight: 500; }
@@ -86,7 +86,7 @@
 .casoIcono { font-size: 1.5rem; }
 .casoTitulo { font-size: 1rem; font-weight: 700; color: var(--primary-texto); margin: 0; }
 .casoPregunta { font-size: 0.88rem; color: var(--text-primary); margin: 0 0 0.5rem; }
-.casoRespuesta { font-size: 0.88rem; color: #16A34A; font-weight: 600; margin: 0 0 0.5rem; }
+.casoRespuesta { font-size: 0.88rem; color: var(--verde-texto, #16A34A); font-weight: 600; margin: 0 0 0.5rem; }
 .casoDetalle { font-size: 0.84rem; color: var(--text-secondary); line-height: 1.5; margin: 0; }
 
 /* Info box */

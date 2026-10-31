@@ -514,7 +514,7 @@
 .gpGanaLabel {
   font-size: 0.8rem;
   font-weight: 700;
-  color: #27ae60;
+  color: var(--verde-texto, #27ae60);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
@@ -522,7 +522,7 @@
 .gpPierdeLabel {
   font-size: 0.8rem;
   font-weight: 700;
-  color: #e74c3c;
+  color: var(--rojo-texto, #e74c3c);
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }

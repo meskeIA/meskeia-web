@@ -517,7 +517,7 @@
 }
 
 .energiaFormulaC {
-  color: #E74C3C;
+  color: var(--rojo-texto, #E74C3C);
 }
 
 .energiaValor {

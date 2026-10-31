@@ -85,7 +85,7 @@
 .prosLabel, .contrasLabel { display: block; font-weight: 700; color: var(--text-primary); margin-bottom: var(--spacing-sm); }
 .prosList, .contrasList { list-style: none; padding: 0; margin: 0; }
 .prosList li, .contrasList li { padding: 0.2rem 0; color: var(--text-primary); line-height: 1.4; }
-.prosList li::before { content: '+ '; color: var(--verde); font-weight: 700; }
+.prosList li::before { content: '+ '; color: var(--verde-texto, var(--verde)); font-weight: 700; }
 .contrasList li::before { content: '- '; color: var(--rojo); font-weight: 700; }
 
 /* Grid de personas (inmunidad de rebaño) */
@@ -119,7 +119,7 @@
 .umbralDatos { display: flex; justify-content: space-between; align-items: center; }
 .umbralPorcentaje { font-size: 0.78rem; color: var(--text-secondary); }
 .umbralR0 { font-size: 0.78rem; color: var(--text-muted); font-style: italic; }
-.umbralLogrado { display: block; font-size: 0.78rem; color: var(--verde); font-weight: 600; margin-top: 0.3rem; }
+.umbralLogrado { display: block; font-size: 0.78rem; color: var(--verde-texto, var(--verde)); font-weight: 600; margin-top: 0.3rem; }
 
 /* Impacto grid */
 .impactoGrid { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--spacing-sm); margin-bottom: var(--spacing-xl); }

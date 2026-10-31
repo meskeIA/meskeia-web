@@ -242,7 +242,7 @@
 .badgeEndotermo {
   display: inline-block;
   background: rgba(239, 68, 68, 0.12);
-  color: #ef4444;
+  color: var(--rojo-texto, #ef4444);
   border-radius: 20px;
   padding: 4px 12px;
   font-size: 0.8rem;
@@ -1296,7 +1296,7 @@
   content: '•';
   position: absolute;
   left: 0;
-  color: #f59e0b;
+  color: var(--ambar-texto, #f59e0b);
   font-weight: 700;
 }
 

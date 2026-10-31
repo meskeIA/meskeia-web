@@ -422,7 +422,7 @@
   width: 100%;
   background: none;
   border: 2px solid var(--color-gold);
-  color: var(--color-gold);
+  color: var(--ambar-texto, var(--color-gold));
   font-size: 0.9rem;
   font-weight: 600;
   padding: 0.65rem 1rem;
@@ -645,7 +645,7 @@
 .useCardDato {
   font-size: 0.9rem;
   font-weight: 600;
-  color: var(--color-gold);
+  color: var(--ambar-texto, var(--color-gold));
   margin: 0 0 0.5rem;
 }
 

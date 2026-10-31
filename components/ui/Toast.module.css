@@ -69,7 +69,7 @@
 }
 
 .success .icon {
-  color: #10B981;
+  color: var(--verde-texto, #10B981);
   background: rgba(16, 185, 129, 0.1);
 }
 
@@ -78,7 +78,7 @@
 }
 
 .error .icon {
-  color: #EF4444;
+  color: var(--rojo-texto, #EF4444);
   background: rgba(239, 68, 68, 0.1);
 }
 
@@ -87,7 +87,7 @@
 }
 
 .warning .icon {
-  color: #F59E0B;
+  color: var(--ambar-texto, #F59E0B);
   background: rgba(245, 158, 11, 0.1);
 }
 

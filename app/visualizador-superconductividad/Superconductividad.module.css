@@ -111,7 +111,7 @@
 
 .tipoAmbiente {
   background: rgba(39, 174, 96, 0.15);
-  color: #27AE60;
+  color: var(--verde-texto, #27AE60);
 }
 
 .tcDestacado {
@@ -614,7 +614,7 @@
 }
 
 .warningBox strong {
-  color: #E67E22;
+  color: var(--naranja-texto, #E67E22);
 }
 
 /* ── Dark Mode ───────────────────────────────────────────────────────────── */

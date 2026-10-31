@@ -190,7 +190,7 @@
 }
 
 .estrellaActiva {
-  color: #f59e0b;
+  color: var(--ambar-texto, #f59e0b);
   font-size: 0.95rem;
 }
 
@@ -544,12 +544,12 @@
 }
 
 .riesgoMedio {
-  color: #f59e0b;
+  color: var(--ambar-texto, #f59e0b);
   font-weight: 600;
 }
 
 .riesgoBajo {
-  color: #22c55e;
+  color: var(--verde-texto, #22c55e);
   font-weight: 600;
 }
 

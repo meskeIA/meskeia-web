@@ -246,17 +246,17 @@
 }
 
 .zonaVerde {
-  color: #16a34a;
+  color: var(--verde-texto, #16a34a);
   font-weight: 600;
 }
 
 .zonaAnaranjada {
-  color: #ea580c;
+  color: var(--naranja-texto, #ea580c);
   font-weight: 600;
 }
 
 .zonaRoja {
-  color: #ef4444;
+  color: var(--rojo-texto, #ef4444);
   font-weight: 600;
 }
 

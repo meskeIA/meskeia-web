@@ -142,7 +142,7 @@
 .tabla tr:hover td { background: var(--hover); }
 .tablaSimbolo { font-weight: 700; color: var(--primary-texto); }
 .codigo { font-family: 'Courier New', monospace; background: var(--bg-primary); padding: 1px 5px; border-radius: 4px; font-size: 0.85rem; color: var(--primary-texto); }
-.reduccion { color: #2ECC71; font-weight: 700; }
+.reduccion { color: var(--verde-texto, #2ECC71); font-weight: 700; }
 
 /* Eficiencia */
 .eficienciaGrid {

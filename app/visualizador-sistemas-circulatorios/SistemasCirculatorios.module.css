@@ -90,7 +90,7 @@
 
 .flujoSangre { display: flex; gap: var(--spacing-lg); justify-content: center; flex-wrap: wrap; }
 .flujoSangreItem { display: flex; align-items: center; gap: 0.3rem; font-size: 0.82rem; color: var(--text-secondary); }
-.sangreOxigenada { color: #ef4444; font-size: 1.2rem; }
+.sangreOxigenada { color: var(--rojo-texto, #ef4444); font-size: 1.2rem; }
 .sangreDesoxigenada { color: #3b82f6; font-size: 1.2rem; }
 .sangreMezclada { color: #a855f7; font-size: 1.2rem; }
 
@@ -131,8 +131,8 @@
 .prosContras { display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-md); }
 .prosCol, .contrasCol { display: flex; flex-direction: column; gap: 0.3rem; }
 .prosContrasTitulo { font-size: 0.82rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.2rem; }
-.prosItem { font-size: 0.78rem; color: var(--verde); line-height: 1.4; }
-.contrasItem { font-size: 0.78rem; color: var(--rojo); line-height: 1.4; }
+.prosItem { font-size: 0.78rem; color: var(--verde-texto, var(--verde)); line-height: 1.4; }
+.contrasItem { font-size: 0.78rem; color: var(--rojo-texto, var(--rojo)); line-height: 1.4; }
 
 /* Gráfico temperatura */
 .graficoCard { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-xl); }

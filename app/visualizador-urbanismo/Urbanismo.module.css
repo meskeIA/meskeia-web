@@ -518,7 +518,7 @@
 .scoreEjemplar {
   border-color: #27ae60;
   background: rgba(39, 174, 96, 0.08);
-  color: #1e8449;
+  color: var(--verde-texto, #1e8449);
 }
 
 .scoreSostenible {
@@ -530,7 +530,7 @@
 .scoreTransicion {
   border-color: #f39c12;
   background: rgba(243, 156, 18, 0.08);
-  color: #b7770d;
+  color: var(--ambar-texto, #b7770d);
 }
 
 .scoreConvencional {

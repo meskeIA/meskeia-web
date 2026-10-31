@@ -411,7 +411,7 @@
 
 .huecoIcon {
   background: transparent;
-  color: #E55A5A;
+  color: var(--rojo-texto, #E55A5A);
   border: 2px solid #E55A5A;
   border-radius: 50%;
   width: 28px;
@@ -437,7 +437,7 @@
 
 .huecoLabel {
   font-size: 0.65rem;
-  color: #E55A5A;
+  color: var(--rojo-texto, #E55A5A);
   font-weight: 600;
   white-space: nowrap;
 }
@@ -520,7 +520,7 @@
 
 .huecosMini {
   font-size: 1.2rem;
-  color: #E55A5A;
+  color: var(--rojo-texto, #E55A5A);
   letter-spacing: 0.2rem;
 }
 
@@ -573,7 +573,7 @@
   padding: 0.6rem 1rem;
   background: rgba(229, 90, 90, 0.1);
   border-radius: 8px;
-  color: #E55A5A;
+  color: var(--rojo-texto, #E55A5A);
   font-weight: 600;
   font-size: 0.9rem;
   margin-bottom: 1rem;

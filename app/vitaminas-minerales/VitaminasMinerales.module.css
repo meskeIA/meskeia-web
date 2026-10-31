@@ -254,7 +254,7 @@
 
 .badge[data-subtype="liposoluble"] {
   background: rgba(139, 195, 74, 0.15);
-  color: #7cb342;
+  color: var(--verde-texto, #7cb342);
 }
 
 .badge[data-subtype="macromineral"] {
@@ -264,7 +264,7 @@
 
 .badge[data-subtype="oligoelemento"] {
   background: rgba(255, 193, 7, 0.15);
-  color: #f9a825;
+  color: var(--ambar-texto, #f9a825);
 }
 
 .cdrBadge {
@@ -338,7 +338,7 @@
   background: rgba(76, 175, 80, 0.1);
   border-radius: var(--radius);
   font-size: 0.85rem;
-  color: #4caf50;
+  color: var(--verde-texto, #4caf50);
   border: 1px solid rgba(76, 175, 80, 0.2);
 }
 
@@ -390,7 +390,7 @@
   background: rgba(255, 152, 0, 0.1);
   border-radius: var(--radius);
   font-size: 0.85rem;
-  color: #ff9800;
+  color: var(--ambar-texto, #ff9800);
   border: 1px solid rgba(255, 152, 0, 0.2);
 }
 

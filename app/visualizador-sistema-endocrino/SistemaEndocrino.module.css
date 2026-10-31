@@ -48,8 +48,8 @@
 .glandulaUbicacion { font-size: 0.82rem; color: var(--text-muted); font-style: italic; }
 .glandulaHormona { font-size: 0.92rem; color: var(--text-primary); line-height: 1.5; margin: 0 0 var(--spacing-sm) 0; }
 .glandulaFuncion { font-size: 0.92rem; color: var(--text-primary); line-height: 1.5; margin: 0 0 var(--spacing-sm) 0; }
-.glandulaExceso { font-size: 0.85rem; color: var(--rojo); line-height: 1.4; margin: 0 0 0.3rem 0; }
-.glandulaDeficit { font-size: 0.85rem; color: var(--naranja); line-height: 1.4; margin: 0; }
+.glandulaExceso { font-size: 0.85rem; color: var(--rojo-texto, var(--rojo)); line-height: 1.4; margin: 0 0 0.3rem 0; }
+.glandulaDeficit { font-size: 0.85rem; color: var(--naranja-texto, var(--naranja)); line-height: 1.4; margin: 0; }
 
 /* Leyenda silueta */
 .siluetaLeyenda { display: flex; flex-wrap: wrap; gap: var(--spacing-sm); justify-content: center; margin-top: var(--spacing-md); font-size: 0.78rem; color: var(--text-secondary); }

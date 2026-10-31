@@ -224,7 +224,7 @@
 
 .columnaTitleQuark { color: var(--primary-texto); }
 .columnaTitleLeptón { color: var(--secondary-texto); }
-.columnaTitleBosón { color: #E8A838; }
+.columnaTitleBosón { color: var(--ambar-texto, #E8A838); }
 
 .columnaBadge {
   font-size: 0.7rem;
@@ -361,7 +361,7 @@
 
 .antiBadge {
   font-size: 0.45rem;
-  color: #E84A5F;
+  color: var(--rojo-texto, #E84A5F);
   font-weight: 700;
   text-transform: uppercase;
 }
@@ -410,7 +410,7 @@
   display: inline-block;
   font-size: 0.75rem;
   background: rgba(232, 168, 56, 0.15);
-  color: #b8870d;
+  color: var(--ambar-texto, #b8870d);
   border-radius: 10px;
   padding: 0.15rem 0.5rem;
   font-weight: 600;
@@ -765,7 +765,7 @@
 }
 
 .timelinePuntoNobel {
-  color: #E8A838;
+  color: var(--ambar-texto, #E8A838);
 }
 
 .timelineContenido {
@@ -817,7 +817,7 @@
   display: block;
   font-size: 1.1rem;
   font-weight: 700;
-  color: #E84A5F;
+  color: var(--rojo-texto, #E84A5F);
   margin-bottom: 0.3rem;
 }
 
@@ -966,7 +966,7 @@
 }
 
 .warningBox strong {
-  color: #b8870d;
+  color: var(--ambar-texto, #b8870d);
   display: block;
   margin-bottom: 0.25rem;
 }
