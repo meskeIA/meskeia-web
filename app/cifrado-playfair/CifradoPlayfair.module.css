@@ -541,9 +541,9 @@
 .comparativaTable tr:hover td { background: var(--bg-primary, #FAFAFA); }
 .comparativaTable tr:last-child td { border-bottom: none; }
 
-.tdNegative { color: #e53e3e !important; font-weight: 600 !important; }
-.tdWarning  { color: #d97706 !important; font-weight: 600 !important; }
-.tdPositive { color: #38a169 !important; font-weight: 600 !important; }
+.tdNegative { color: var(--rojo-texto, #e53e3e) !important; font-weight: 600 !important; }
+.tdWarning  { color: var(--ambar-texto, #d97706) !important; font-weight: 600 !important; }
+.tdPositive { color: var(--verde-texto, #38a169) !important; font-weight: 600 !important; }
 
 [data-theme='dark'] .tdNegative { color: #fc8181 !important; }
 [data-theme='dark'] .tdWarning  { color: #fbbf24 !important; }

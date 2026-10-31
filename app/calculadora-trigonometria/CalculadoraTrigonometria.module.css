@@ -560,7 +560,7 @@
 .tipsHeader {
   font-weight: 700;
   font-size: 1rem;
-  color: var(--success);
+  color: var(--verde-texto, var(--success));
   margin-bottom: var(--spacing-md);
   padding-bottom: var(--spacing-sm);
   border-bottom: 2px solid var(--success);
@@ -569,7 +569,7 @@
 .errorsHeader {
   font-weight: 700;
   font-size: 1rem;
-  color: var(--danger);
+  color: var(--rojo-texto, var(--danger));
   margin-bottom: var(--spacing-md);
   padding-bottom: var(--spacing-sm);
   border-bottom: 2px solid var(--danger);
@@ -589,7 +589,7 @@
   content: '✓';
   position: absolute;
   left: 0;
-  color: var(--success);
+  color: var(--verde-texto, var(--success));
   font-weight: 700;
 }
 
@@ -920,7 +920,7 @@
 
 .warningHeader strong {
   font-size: 1rem;
-  color: var(--danger);
+  color: var(--rojo-texto, var(--danger));
   font-weight: 700;
 }
 

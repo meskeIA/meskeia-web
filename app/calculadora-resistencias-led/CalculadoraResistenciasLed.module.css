@@ -413,7 +413,7 @@
   border: 1px solid rgba(255,152,0,0.4);
   border-radius: var(--radius);
   padding: var(--spacing-md);
-  color: #c77700;
+  color: var(--ambar-texto, #c77700);
   font-size: 0.9rem;
 }
 

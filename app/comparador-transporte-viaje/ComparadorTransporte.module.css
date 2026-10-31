@@ -435,7 +435,7 @@
 .metricaValorCo2 {
   font-size: 1rem;
   font-weight: 700;
-  color: #16a34a;
+  color: var(--verde-texto, #16a34a);
 }
 
 /* Equipaje */

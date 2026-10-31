@@ -450,7 +450,7 @@
 .analisisTitleGreen {
   font-size: 0.88rem;
   font-weight: 700;
-  color: #27ae60;
+  color: var(--verde-texto, #27ae60);
   margin: 0 0 0.6rem;
 }
 

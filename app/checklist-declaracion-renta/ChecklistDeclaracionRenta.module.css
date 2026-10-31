@@ -302,7 +302,7 @@
 .mensajeCompleto h2 {
   font-size: 1.3rem;
   margin: 0 0 0.5rem;
-  color: #16a34a;
+  color: var(--verde-texto, #16a34a);
 }
 
 .mensajeCompleto p {
@@ -455,7 +455,7 @@
 .badgeObligatorio {
   font-size: 0.7rem;
   font-weight: 700;
-  color: #dc2626;
+  color: var(--rojo-texto, #dc2626);
   background: #fef2f2;
   border: 1px solid #fecaca;
   border-radius: 99px;
@@ -572,9 +572,9 @@
   background: #1e2228;
 }
 
-.cellSi { color: #16a34a !important; font-weight: 600; }
+.cellSi { color: var(--verde-texto, #16a34a) !important; font-weight: 600; }
 .cellNo { color: var(--text-muted) !important; }
-.cellOpcional { color: #d97706 !important; font-weight: 500; }
+.cellOpcional { color: var(--ambar-texto, #d97706) !important; font-weight: 500; }
 
 /* Escenarios */
 .escenariosGrid {

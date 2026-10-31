@@ -880,7 +880,7 @@
   content: '✗';
   position: absolute;
   left: 0;
-  color: #F59E0B;
+  color: var(--ambar-texto, #F59E0B);
   font-weight: bold;
 }
 

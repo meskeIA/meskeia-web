@@ -128,10 +128,10 @@
 
 .fortalezaDebilidad { display: flex; flex-direction: column; gap: 0.75rem; }
 .fortaleza { background: rgba(39,174,96,0.06); border-left: 3px solid #27AE60; border-radius: 0 8px 8px 0; padding: 0.65rem 0.85rem; }
-.fortalezaLabel { font-size: 0.75rem; font-weight: 700; color: #27AE60; display: block; margin-bottom: 0.25rem; }
+.fortalezaLabel { font-size: 0.75rem; font-weight: 700; color: var(--verde-texto, #27AE60); display: block; margin-bottom: 0.25rem; }
 .fortaleza p { font-size: 0.84rem; color: var(--text-primary); margin: 0; line-height: 1.5; }
 .debilidad { background: rgba(231,76,60,0.05); border-left: 3px solid #E67E22; border-radius: 0 8px 8px 0; padding: 0.65rem 0.85rem; }
-.debilidadLabel { font-size: 0.75rem; font-weight: 700; color: #E67E22; display: block; margin-bottom: 0.25rem; }
+.debilidadLabel { font-size: 0.75rem; font-weight: 700; color: var(--naranja-texto, #E67E22); display: block; margin-bottom: 0.25rem; }
 .debilidad p { font-size: 0.84rem; color: var(--text-primary); margin: 0; line-height: 1.5; }
 
 .listaCheck { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 0.4rem; }

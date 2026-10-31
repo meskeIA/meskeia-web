@@ -99,7 +99,7 @@
 
 .errorMsg {
   display: block;
-  color: #e74c3c;
+  color: var(--rojo-texto, #e74c3c);
   font-size: 0.85rem;
   margin-top: var(--spacing-xs);
 }

@@ -355,8 +355,8 @@
   color: var(--text-primary);
 }
 
-.metricaValue.denso { color: var(--warning); }
-.metricaValue.ligero { color: var(--success); }
+.metricaValue.denso { color: var(--ambar-texto, var(--warning)); }
+.metricaValue.ligero { color: var(--verde-texto, var(--success)); }
 .metricaValue.normal { color: var(--primary-texto); }
 
 /* Badge Section */
@@ -831,7 +831,7 @@
 .warningHeader h4 {
   margin: 0;
   font-size: 1rem;
-  color: var(--warning, #f59e0b);
+  color: var(--ambar-texto, var(--warning, #f59e0b));
   font-weight: 600;
 }
 

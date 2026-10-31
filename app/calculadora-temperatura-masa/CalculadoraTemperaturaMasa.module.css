@@ -319,12 +319,12 @@
 }
 
 .tempFrio .resultadoTempC { color: var(--primary-texto); }
-.tempTibio .resultadoTempC { color: #e67e22; }
-.tempCaliente .resultadoTempC { color: #e74c3c; }
+.tempTibio .resultadoTempC { color: var(--naranja-texto, #e67e22); }
+.tempCaliente .resultadoTempC { color: var(--rojo-texto, #e74c3c); }
 
 .resultadoFrio .resultadoTempC { color: var(--primary-texto); }
-.resultadoTibio .resultadoTempC { color: #e67e22; }
-.resultadoCaliente .resultadoTempC { color: #e74c3c; }
+.resultadoTibio .resultadoTempC { color: var(--naranja-texto, #e67e22); }
+.resultadoCaliente .resultadoTempC { color: var(--rojo-texto, #e74c3c); }
 
 .resultadoTempF {
   font-size: 1.1rem;

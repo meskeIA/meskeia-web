@@ -340,7 +340,7 @@
 
 .clearBtn:hover {
   border-color: var(--error);
-  color: var(--error);
+  color: var(--rojo-texto, var(--error));
 }
 
 /* Table */
@@ -427,7 +427,7 @@
 }
 
 .reductionSuccess {
-  color: var(--success);
+  color: var(--verde-texto, var(--success));
   font-weight: 600;
 }
 
@@ -495,7 +495,7 @@
 }
 
 .statHighlight .statValue {
-  color: var(--success);
+  color: var(--verde-texto, var(--success));
 }
 
 /* Actions */
@@ -1292,7 +1292,7 @@
   display: inline-block;
   font-size: 1.1rem;
   font-weight: 600;
-  color: var(--success);
+  color: var(--verde-texto, var(--success));
   background: rgba(16, 185, 129, 0.1);
   padding: var(--spacing-sm) var(--spacing-lg);
   border-radius: var(--radius);

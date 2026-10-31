@@ -307,7 +307,7 @@
 }
 
 .warning {
-  color: #d97706;
+  color: var(--ambar-texto, #d97706);
   font-weight: 500;
 }
 
@@ -457,12 +457,12 @@
 }
 
 .cellBuena {
-  color: #059669;
+  color: var(--verde-texto, #059669);
   font-weight: 600;
 }
 
 .cellMedia {
-  color: #d97706;
+  color: var(--ambar-texto, #d97706);
   font-weight: 500;
 }
 

@@ -233,13 +233,13 @@
 /* Colores especiales para valores */
 .valorCell .limitada,
 .limitada {
-  color: #27ae60;
+  color: var(--verde-texto, #27ae60);
   font-weight: 500;
 }
 
 .valorCell .ilimitada,
 .ilimitada {
-  color: #e74c3c;
+  color: var(--rojo-texto, #e74c3c);
   font-weight: 500;
 }
 
@@ -663,7 +663,7 @@
   content: '✓';
   position: absolute;
   left: 0;
-  color: #27ae60;
+  color: var(--verde-texto, #27ae60);
   font-weight: bold;
 }
 

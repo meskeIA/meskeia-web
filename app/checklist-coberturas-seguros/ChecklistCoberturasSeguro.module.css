@@ -541,7 +541,7 @@
   font-size: 0.8rem;
   font-weight: 600;
   background: #fee2e2;
-  color: #dc2626;
+  color: var(--rojo-texto, #dc2626);
 }
 
 .badgeYes {
@@ -551,7 +551,7 @@
   font-size: 0.8rem;
   font-weight: 600;
   background: #fef3c7;
-  color: #d97706;
+  color: var(--ambar-texto, #d97706);
 }
 
 .badgeNo {

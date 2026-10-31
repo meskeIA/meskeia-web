@@ -104,7 +104,7 @@
 }
 
 .errorMsg {
-  color: #e74c3c;
+  color: var(--rojo-texto, #e74c3c);
   font-size: 0.85rem;
   text-align: center;
 }

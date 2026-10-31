@@ -501,7 +501,7 @@
 }
 
 .tdNegative {
-  color: #e53e3e !important;
+  color: var(--rojo-texto, #e53e3e) !important;
   font-weight: 600 !important;
 }
 

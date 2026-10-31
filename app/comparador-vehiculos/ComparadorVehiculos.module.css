@@ -153,7 +153,7 @@
 
 .infoFiscal {
   font-size: 0.85rem;
-  color: var(--success);
+  color: var(--verde-texto, var(--success));
   margin: var(--spacing-sm) 0 0;
   padding: var(--spacing-sm);
   background: rgba(39, 174, 96, 0.1);
@@ -325,17 +325,17 @@
 
 .propiedadSí {
   background: rgba(39, 174, 96, 0.15);
-  color: var(--success);
+  color: var(--verde-texto, var(--success));
 }
 
 .propiedadNo {
   background: rgba(231, 76, 60, 0.15);
-  color: var(--danger);
+  color: var(--rojo-texto, var(--danger));
 }
 
 .propiedadOpción {
   background: rgba(243, 156, 18, 0.15);
-  color: var(--warning);
+  color: var(--ambar-texto, var(--warning));
 }
 
 /* Detalles por opción */
@@ -373,7 +373,7 @@
   font-weight: 600;
   padding: 4px 10px;
   background: rgba(39, 174, 96, 0.15);
-  color: var(--success);
+  color: var(--verde-texto, var(--success));
   border-radius: 50px;
 }
 
@@ -405,7 +405,7 @@
 }
 
 .valorNegativo {
-  color: var(--success);
+  color: var(--verde-texto, var(--success));
 }
 
 .incluyeNoIncluye {
@@ -998,7 +998,7 @@
 .warningHeader h3 {
   font-size: 1.05rem;
   font-weight: 700;
-  color: #E65100;
+  color: var(--naranja-texto, #E65100);
   margin: 0;
 }
 

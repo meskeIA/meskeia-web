@@ -231,11 +231,11 @@
 }
 
 .metricValue.red {
-  color: #ef4444;
+  color: var(--rojo-texto, #ef4444);
 }
 
 .metricValue.green {
-  color: #22c55e;
+  color: var(--verde-texto, #22c55e);
 }
 
 .metricSub {
@@ -292,11 +292,11 @@
 }
 
 .rowValue.red {
-  color: #ef4444;
+  color: var(--rojo-texto, #ef4444);
 }
 
 .rowValue.green {
-  color: #22c55e;
+  color: var(--verde-texto, #22c55e);
 }
 
 /* ===== SEMÁFORO DE RENTABILIDAD ===== */

@@ -130,7 +130,7 @@
 
 .bannerMasBarato {
   background: rgba(39, 174, 96, 0.1);
-  color: #1e8449;
+  color: var(--verde-texto, #1e8449);
   border: 1px solid rgba(39, 174, 96, 0.25);
 }
 
@@ -735,7 +735,7 @@
 
 .warningHeader strong {
   font-size: 0.95rem;
-  color: #b8790a;
+  color: var(--ambar-texto, #b8790a);
 }
 
 [data-theme='dark'] .warningHeader strong {

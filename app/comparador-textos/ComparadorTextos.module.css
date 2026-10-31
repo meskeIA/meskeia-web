@@ -97,7 +97,7 @@
 }
 
 .labelModificado {
-  color: #16a34a;
+  color: var(--verde-texto, #16a34a);
 }
 
 .textArea {
@@ -315,7 +315,7 @@
 }
 
 .diffAgregado .diffMark {
-  color: #16a34a;
+  color: var(--verde-texto, #16a34a);
 }
 
 .diffEliminado .diffContent:nth-child(2) {

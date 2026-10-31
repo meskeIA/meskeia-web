@@ -124,7 +124,7 @@
 .ideNombre { display: block; font-weight: 700; font-size: 0.9rem; }
 .ideEmpresa { display: block; font-size: 0.72rem; color: var(--text-muted); }
 .basadoLabel { font-size: 0.75rem; color: var(--text-secondary); }
-.siTag { color: #27ae60; font-weight: 600; font-size: 0.82rem; }
+.siTag { color: var(--verde-texto, #27ae60); font-weight: 600; font-size: 0.82rem; }
 .noTag { color: var(--text-muted); font-size: 0.82rem; }
 .precioTag { padding: 3px 8px; border: 1.5px solid; border-radius: 6px; font-size: 0.82rem; font-weight: 700; white-space: nowrap; }
 .dispLabel { font-size: 0.75rem; color: var(--text-muted); }

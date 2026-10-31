@@ -152,7 +152,7 @@
 }
 .filaValor { font-weight: 600; }
 .filaTotal { font-weight: 700; font-size: 1rem; color: var(--text-primary); }
-.filaNetoPositivo { font-weight: 700; color: #38a169; }
+.filaNetoPositivo { font-weight: 700; color: var(--verde-texto, #38a169); }
 
 /* Resultado ganador */
 .resultadoGanador {
@@ -166,7 +166,7 @@
 
 .ganadorLabel { font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 0.5rem; }
 .ganadorTexto { font-size: 1.5rem; font-weight: 800; color: var(--primary-texto); }
-.ganadorAhorro { font-size: 1rem; color: #38a169; font-weight: 600; margin-top: 0.5rem; }
+.ganadorAhorro { font-size: 1rem; color: var(--verde-texto, #38a169); font-weight: 600; margin-top: 0.5rem; }
 .ganadorNota { font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.75rem; }
 
 /* Placeholder */
