@@ -1,4 +1,5 @@
 import { test, expect, Page } from '@playwright/test';
+import { esperarPaginaAsentada } from './_hidratacion';
 
 /**
  * estimador-smi — candado del método del art. 63.1.2.º LIRPF
@@ -47,6 +48,10 @@ async function fila(page: Page, etiqueta: string): Promise<string> {
 test.beforeEach(async ({ page }) => {
   await page.goto(RUTA);
   await expect(page.getByRole('heading', { level: 3, name: 'Neto anual', exact: true })).toBeVisible();
+  // Cabo C0547: el data-theme sembrado antes de la hidratación lo devolvía a claro el proveedor
+  // de tema al montar (1 de 102 en la batería de C0312), y el selectOption de las pagas corre el
+  // mismo riesgo. Todo se toca con la página ya asentada.
+  await esperarPaginaAsentada(page);
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
