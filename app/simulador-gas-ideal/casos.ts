@@ -45,7 +45,13 @@
 
 import { formatNumber } from '@/lib';
 import { ATM_TO_PA, L_TO_M3, calcularGasIdeal, calcularProceso } from './motor';
-import { corregirNumero, redondearA, toleranciaRelativa } from '@/lib/calculadoras/correctorCasosAula';
+import {
+  corregirNumero,
+  redondearA,
+  textoDesviacion,
+  toleranciaDeRedondeo,
+  toleranciaRelativa,
+} from '@/lib/calculadoras/correctorCasosAula';
 
 /** Paso de °C a K: la app resta este mismo 273,15 para mostrar los °C. */
 const CERO_CELSIUS_K = 273.15;
@@ -505,6 +511,9 @@ export function toleranciaDe(valor: number): number {
   return toleranciaRelativa(valor);
 }
 
+/** Las preguntas de PV = nRT: la respuesta depende de qué R use el libro. */
+const CON_R: ReadonlySet<Magnitud> = new Set<Magnitud>(['presion', 'volumen', 'temperatura', 'moles']);
+
 export interface Veredicto {
   correcto: boolean;
   motivo: string;
@@ -512,12 +521,34 @@ export interface Veredicto {
   tolerancia: number;
 }
 
-/** Corrige la respuesta del alumno. Nunca lanza. */
-export function comprobarRespuesta(usuario: number, esperado: number): Veredicto {
+/**
+ * Corrige la respuesta del alumno. Nunca lanza.
+ *
+ * Con `datos` la tolerancia sale de la pregunta (cabo C0267, 01/11/2026). Si usa R, el 1 % de
+ * `toleranciaDe`: es lo que promete la pista (R = 0,0821 cambia el resultado menos de un 0,1 %).
+ * Si no la usa (Boyle, Charles, Gay-Lussac, el trabajo, las finales), la respuesta es exacta o
+ * solo exige el redondeo final, y el 1 % aprobaba 446 K para los 450 exactos del caso 11: se
+ * corrige contra la cifra SIN redondear con la política de redondeo, media unidad del último
+ * decimal si hay que redondear y 0 si no (la de 776a332a en simulador-movimiento-circular). El
+ * 273 de los libros en vez de 273,15 da la misma cifra redondeada en los casos 7, 9 y 12.
+ * Sin `datos`, la relativa de siempre.
+ */
+export function comprobarRespuesta(usuario: number, esperado: number, datos?: DatosCaso): Veredicto {
+  let objetivo = esperado;
+  let tolerancia = toleranciaDe(esperado);
+  let decimales = 2;
+  if (datos && !CON_R.has(datos.magnitud)) {
+    const r = resolverCaso(datos);
+    if (r.ok) {
+      decimales = datos.decimales ?? 2;
+      objetivo = r.valor;
+      tolerancia = toleranciaDeRedondeo(r.valor, decimales, redondear);
+    }
+  }
   // Magnitudes continuas: ningún valor es imposible por sí mismo dentro de la tolerancia
   // (sonda del 15/10/2026 sobre los 12 casos y 40 semillas del modo práctica).
-  const c = corregirNumero(usuario, esperado, { tolerancia: toleranciaDe(esperado), magnitud: 'real' });
-  const { diferencia, tolerancia } = c;
+  const c = corregirNumero(usuario, objetivo, { tolerancia, magnitud: 'real' });
+  const { diferencia } = c;
 
   if (c.estado === 'no-numerico') {
     return {
@@ -535,7 +566,8 @@ export function comprobarRespuesta(usuario: number, esperado: number): Veredicto
 
   return {
     correcto: false,
-    motivo: `No es correcto. Te has desviado ${numero(diferencia, 2)} de la respuesta.`,
+    // Con tolerancia 0, «8,004» para 8 no puede decir «Te has desviado 0» (hallazgo 3369)
+    motivo: `No es correcto. Te has desviado ${textoDesviacion(diferencia, decimales, numero)} de la respuesta.`,
     diferencia,
     tolerancia,
   };

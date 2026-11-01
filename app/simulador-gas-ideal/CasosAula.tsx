@@ -69,7 +69,8 @@ export default function CasosAula() {
     // parseSpanishNumber admite «4,92» y «4.92»; devuelve NaN con cualquier otra cosa, y de
     // ese NaN se encarga comprobarRespuesta con un mensaje propio (nunca «NaN» en pantalla).
     const valor = parseSpanishNumber(respuesta);
-    const r = comprobarRespuesta(valor, esperado);
+    // Con los datos de la pregunta: sin R, se corrige contra la cifra exacta (cabo C0267)
+    const r = comprobarRespuesta(valor, esperado, practica ? practica.datos : caso.datos);
     setVeredicto({ correcto: r.correcto, motivo: r.motivo });
   }
 

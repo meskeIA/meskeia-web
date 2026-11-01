@@ -168,6 +168,41 @@ test.describe('simulador-gas-ideal · casos para clase', () => {
     expect(comprobarRespuesta(40, 313).correcto).toBe(false);
   });
 
+  test('C0267 · sin R, la respuesta es exacta o solo exige el redondeo final: el 1 % ya no aprueba lo que no es ningún redondeo', async () => {
+    // Cabo C0267 (reparar 01/11/2026), la forma del hallazgo 3342 de simulador-movimiento-circular.
+    // El 1 % se queda donde la pista lo promete: con R (0,0821 frente a 8,314, menos de un 0,1 %).
+    // Sin R, a mano:
+    //   caso 11 · T₂ = 300 · 1,8 / 1,2 = 450 K exactos      → 446 no es redondeo de nada
+    //   caso 8  · V₂ = 4 · 3 / 1,5 = 8 L exactos             → 7,95 tampoco
+    //   caso 10 · W = 2 · 101.325 · 0,003 = 607,95 J → 608   → 603 no; 101.300 Pa da 607,8 → 608, sí
+    //   caso 12 · T₂ = 2 · 293,15 − 273,15 = 313,15 °C → 313 → 310 no; con 273, 2 · 293 − 273 = 313, sí
+    //   caso 7  · con 273 en vez de 273,15, 2 · 333 / 293 = 2,2730 → 2,27, sí (el convenio del libro)
+    const caso = (id: number) => CASOS.find((c) => c.id === id)!;
+    const corrige = (usuario: number, id: number) =>
+      comprobarRespuesta(usuario, caso(id).respuesta, caso(id).datos).correcto;
+    expect(corrige(450, 11)).toBe(true);
+    expect(corrige(446, 11)).toBe(false);
+    expect(corrige(454, 11)).toBe(false);
+    expect(corrige(8, 8)).toBe(true);
+    expect(corrige(7.95, 8)).toBe(false);
+    expect(corrige(608, 10)).toBe(true);
+    expect(corrige(603, 10)).toBe(false);
+    expect(corrige(313, 12)).toBe(true);
+    expect(corrige(310, 12)).toBe(false);
+    expect(corrige(2.27, 7)).toBe(true);
+    expect(corrige(4, 9)).toBe(true);
+    // Con R sigue la relativa: R = 0,0821 en el caso 1.
+    expect(corrige(Number(((2 * 0.0821 * 300) / 10).toFixed(2)), 1)).toBe(true);
+    // El motivo no dice «Te has desviado 0» con tolerancia 0 (hallazgo 3369).
+    expect(comprobarRespuesta(8.004, 8, caso(8).datos).motivo).not.toMatch(/desviado 0 /);
+    // Y la clave, tecleada como la da la solución, aprueba siempre: los 12 casos y 500 prácticas.
+    for (const c of CASOS) expect(comprobarRespuesta(c.respuesta, c.respuesta, c.datos).correcto, `caso ${c.id}`).toBe(true);
+    for (let semilla = 1; semilla <= 500; semilla++) {
+      const e = generarEjercicioAleatorio(semilla);
+      expect(comprobarRespuesta(e.respuesta, e.respuesta, e.datos).correcto, `semilla ${semilla}`).toBe(true);
+    }
+  });
+
   test('8 · corregir no lanza nunca, ni con entradas que no son números', async () => {
     expect(comprobarRespuesta(608, 608).correcto).toBe(true);
     expect(comprobarRespuesta(NaN, 2.5).correcto).toBe(false);
