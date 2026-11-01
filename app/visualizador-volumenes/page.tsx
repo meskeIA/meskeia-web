@@ -622,6 +622,10 @@ function Slider({ label, valor, min, max, onChange, simbolo = '' }: SliderProps)
  * la tarjeta del resultado ocupa media fila y «4.188.790.204.786.391» o «7,871076×10⁻¹⁵» no
  * caben en una línea; así se parten por donde se leen y no por cualquier cifra. <wbr> no
  * añade texto: lo que lee el lector de pantalla es el mismo número.
+ *
+ * Cada trozo va en su <span> (cabo C0548): suelto junto al <wbr>, con la página traducida se
+ * quedaba la cifra vieja y, al pasar a un número con menos trozos, retirar uno ya traducido
+ * tumbaba la app.
  */
 function ConCortes({ texto }: { texto: string }) {
   const CORTE = '|';
@@ -629,7 +633,7 @@ function ConCortes({ texto }: { texto: string }) {
   return (
     <>
       {trozos.map((t, i) => (
-        <Fragment key={i}>{i > 0 && <wbr />}{t}</Fragment>
+        <Fragment key={i}>{i > 0 && <wbr />}<span>{t}</span></Fragment>
       ))}
     </>
   );

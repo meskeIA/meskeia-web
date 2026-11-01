@@ -303,11 +303,13 @@ export default function AnalizadorDensidadSeoPage() {
                       <span className={styles.keywordStatLabel}>densidad</span>
                     </div>
                   </div>
+                  {/* Icono y recomendación, cada uno solo en su span siempre montado (cabo C0548):
+                      con la página traducida, insertar el icono delante del texto tumbaba la app */}
                   <div className={styles.keywordRecommendation}>
-                    {analisis.keywordAnalisis.estado === 'bajo' && <span aria-hidden="true">⚠️ </span>}
-                    {analisis.keywordAnalisis.estado === 'optimo' && <span aria-hidden="true">✅ </span>}
-                    {analisis.keywordAnalisis.estado === 'alto' && <span aria-hidden="true">🚨 </span>}
-                    {analisis.keywordAnalisis.recomendacion}
+                    <span aria-hidden="true">
+                      {{ bajo: '⚠️ ', optimo: '✅ ', alto: '🚨 ' }[analisis.keywordAnalisis.estado]}
+                    </span>
+                    <span>{analisis.keywordAnalisis.recomendacion}</span>
                   </div>
                 </div>
               )}

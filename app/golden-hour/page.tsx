@@ -516,9 +516,11 @@ export default function GoldenHourPage() {
                 </select>
                 {desfaseTexto && <span className={styles.zonaDesfase}>{desfaseTexto} ese día</span>}
               </div>
+              {/* Aviso y nota, cada uno solo en su span siempre montado (cabo C0548): con la
+                  página traducida, el ⚠️ se insertaba delante de un texto que ya era un <font> */}
               <p className={styles.zonaNota}>
-                {zonaDudosa && <span aria-hidden="true">⚠️ </span>}
-                {notaZona[origenZona]}
+                <span aria-hidden="true">{zonaDudosa ? '⚠️ ' : ''}</span>
+                <span>{notaZona[origenZona]}</span>
               </p>
             </div>
           )}

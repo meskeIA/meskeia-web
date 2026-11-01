@@ -414,7 +414,9 @@ export default function RuletaAleatoriaPage() {
           <div className={styles.historyList}>
             {history.map((result, index) => (
               <span key={index} className={styles.historyItem}>
-                {index === 0 && <span role="img" aria-label="Último resultado">🏆</span>} {result}
+                {/* El resultado solo en su span (cabo C0548): con la página traducida, la clave
+                    por posición dejaba en pantalla el texto de la tirada anterior */}
+                {index === 0 && <span role="img" aria-label="Último resultado">🏆</span>} <span>{result}</span>
               </span>
             ))}
           </div>

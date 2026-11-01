@@ -612,8 +612,11 @@ export default function ComparadorVehiculosPage() {
                           className={idx === 0 ? styles.mejorOpcion : ''}
                         >
                           <td>
+                            {/* El nombre en su span (cabo C0548): con la página traducida, la
+                                etiqueta que cambia de fila se insertaba delante de un texto
+                                que ya era un <font> y tumbaba la app */}
                             {idx === 0 && <span className={styles.badge}>Mejor</span>}
-                            {resultado.nombre}
+                            <span>{resultado.nombre}</span>
                           </td>
                           <td className={styles.costeTotal}>
                             {formatCurrency(resultado.costeTotal)}
