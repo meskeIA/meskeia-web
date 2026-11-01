@@ -3,6 +3,7 @@
 
 import { useRef, useEffect, useState, useCallback } from 'react';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, ShareCard, EducationalSection } from '@/components';
+import { trazarRectRedondeado } from '@/lib';
 import styles from './SimuladorTcpHandshake.module.css';
 
 // ============================================
@@ -199,7 +200,7 @@ function dibujarCanvas(canvas: HTMLCanvasElement, opts: OpcionesRender) {
   const dibujarColumna = (x: number, label: string, color: string) => {
     ctx.fillStyle = color;
     ctx.beginPath();
-    ctx.roundRect(x - ANCHO_COL / 2, 10, ANCHO_COL, 36, 6);
+    trazarRectRedondeado(ctx, x - ANCHO_COL / 2, 10, ANCHO_COL, 36, 6);
     ctx.fill();
     ctx.fillStyle = '#fff';
     ctx.font = 'bold 13px system-ui, sans-serif';

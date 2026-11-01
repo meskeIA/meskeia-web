@@ -4,6 +4,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import styles from './SimuladorFuncionesTransformaciones.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { trazarRectRedondeado } from '@/lib';
 
 import { FUNCIONES_BASE, evaluarBase, evaluarTransformada, fmtParam, construirEcuacion, ajustarB, type FuncionBase } from './motor';
 import { cifra } from './casos';
@@ -186,7 +187,7 @@ export default function SimuladorFuncionesTransformacionesPage() {
 
     ctx.fillStyle = isDark ? 'rgba(30,30,30,0.85)' : 'rgba(255,255,255,0.90)';
     ctx.beginPath();
-    ctx.roundRect(labelX - textWidth - 10, labelY - 2, textWidth + 20, 24, 4);
+    trazarRectRedondeado(ctx, labelX - textWidth - 10, labelY - 2, textWidth + 20, 24, 4);
     ctx.fill();
 
     ctx.fillStyle = colorEtiqueta;

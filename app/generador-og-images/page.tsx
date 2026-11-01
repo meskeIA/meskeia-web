@@ -7,6 +7,7 @@ import Footer from '@/components/Footer';
 import { EducationalSection, RelatedApps, LegalNotice, ShareCard,
   DisclaimerCard,
 } from '@/components';
+import { trazarRectRedondeado } from '@/lib';
 
 // Constantes del canvas OG estándar
 const CANVAS_WIDTH = 1200;
@@ -307,7 +308,7 @@ export default function GeneradorOGImagesPage() {
 
       // Rectángulo con bordes redondeados
       ctx.beginPath();
-      ctx.roundRect(badgeX, badgeY, badgeWidth, badgeHeight, 8);
+      trazarRectRedondeado(ctx, badgeX, badgeY, badgeWidth, badgeHeight, 8);
       ctx.fill();
 
       // Texto del badge

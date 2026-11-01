@@ -10,7 +10,7 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { parseSpanishNumber } from '@/lib';
+import { parseSpanishNumber, trazarRectRedondeado } from '@/lib';
 import {
   cromatidasPorCromosoma,
   cromosomasPorPolo,
@@ -84,12 +84,12 @@ function dibujarCromosoma(
   // Cromátida (o primera cromátida hermana): una barra continua de brazo a brazo, con el
   // centrómero en el centro.
   ctx.beginPath();
-  ctx.roundRect(-ancho / 2, -largo, ancho, largo * 2, ancho / 2);
+  trazarRectRedondeado(ctx, -ancho / 2, -largo, ancho, largo * 2, ancho / 2);
   ctx.fill();
   if (cromatidas === 2) {
     // Segunda cromátida hermana, pegada a la primera y en otro tono para poder contarlas.
     ctx.beginPath();
-    ctx.roundRect(ancho * 0.3, -largo, ancho, largo * 2, ancho / 2);
+    trazarRectRedondeado(ctx, ancho * 0.3, -largo, ancho, largo * 2, ancho / 2);
     ctx.globalAlpha = 0.75;
     ctx.fill();
     ctx.globalAlpha = 1;

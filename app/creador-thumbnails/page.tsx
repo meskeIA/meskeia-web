@@ -7,6 +7,7 @@ import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard, EducationalSection,
   DisclaimerCard, CampoNumerico,
 } from '@/components';
+import { trazarRectRedondeado } from '@/lib';
 
 // Constantes del canvas
 const CANVAS_WIDTH = 1280;
@@ -304,7 +305,7 @@ export default function CreadorThumbnailsPage() {
         ctx.fill();
         return;
       case 'badge':
-        ctx.roundRect(0, 0, w, h, 8);
+        trazarRectRedondeado(ctx, 0, 0, w, h, 8);
         ctx.fill();
         if (badgeText) {
           ctx.fillStyle = '#FFFFFF';

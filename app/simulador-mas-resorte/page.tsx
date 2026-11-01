@@ -11,7 +11,7 @@ import {
   ShareCard,
   NumberInput,
 } from '@/components';
-import { formatNumber, parseSpanishNumber } from '@/lib';
+import { formatNumber, parseSpanishNumber, trazarRectRedondeado } from '@/lib';
 import styles from './SimuladorMasResorte.module.css';
 import {
   describirOscilador,
@@ -223,7 +223,7 @@ export default function SimuladorMasResortePage() {
           ctx.strokeStyle = '#1a5278';
           ctx.lineWidth = 1.5;
           ctx.beginPath();
-          ctx.roundRect(cx - bw / 2, bloqueY - bloqueH / 2, bw, bloqueH, 5);
+          trazarRectRedondeado(ctx, cx - bw / 2, bloqueY - bloqueH / 2, bw, bloqueH, 5);
           ctx.fill();
           ctx.stroke();
 
