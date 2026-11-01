@@ -221,10 +221,10 @@ export default function ConversorBinarioPage() {
         icon="💻"
       >
         {/* Tabla Comparativa */}
-        <div className="edu-table-wrapper">
-          <h3 className="edu-section-title"><span aria-hidden="true">📊</span> Comparativa de Sistemas de Numeración</h3>
-          <div className="edu-table-scroll">
-            <table className="edu-table">
+        <div className={styles['edu-table-wrapper']}>
+          <h3 className={styles['edu-section-title']}><span aria-hidden="true">📊</span> Comparativa de Sistemas de Numeración</h3>
+          <div className={styles['edu-table-scroll']}>
+            <table className={styles['edu-table']}>
               <thead>
                 <tr>
                   <th>Sistema</th>
@@ -276,26 +276,26 @@ export default function ConversorBinarioPage() {
         </div>
 
         {/* Casos de Uso */}
-        <div className="edu-escenarios-section">
-          <h3 className="edu-section-title"><span aria-hidden="true">🎯</span> ¿Cuándo necesitas el código binario?</h3>
-          <div className="edu-escenarios-grid">
-            <div className="edu-escenario-card">
-              <span className="edu-escenario-icon" aria-hidden="true">⚙️</span>
+        <div className={styles['edu-escenarios-section']}>
+          <h3 className={styles['edu-section-title']}><span aria-hidden="true">🎯</span> ¿Cuándo necesitas el código binario?</h3>
+          <div className={styles['edu-escenarios-grid']}>
+            <div className={styles['edu-escenario-card']}>
+              <span className={styles['edu-escenario-icon']} aria-hidden="true">⚙️</span>
               <h4>Programación de bajo nivel</h4>
               <p>En ensamblador, drivers y firmware trabajas directamente con bits y bytes. Entender el binario es esencial para manipular registros de CPU y puertos de E/S, sin importar si el equipo se llama ordenador o computadora.</p>
             </div>
-            <div className="edu-escenario-card">
-              <span className="edu-escenario-icon" aria-hidden="true">🌐</span>
+            <div className={styles['edu-escenario-card']}>
+              <span className={styles['edu-escenario-icon']} aria-hidden="true">🌐</span>
               <h4>Depuración de redes</h4>
               <p>Las máscaras de subred, direcciones IP y cabeceras de paquetes se entienden mejor en binario. Ejemplo: /24 = 11111111.11111111.11111111.00000000.</p>
             </div>
-            <div className="edu-escenario-card">
-              <span className="edu-escenario-icon" aria-hidden="true">🔒</span>
+            <div className={styles['edu-escenario-card']}>
+              <span className={styles['edu-escenario-icon']} aria-hidden="true">🔒</span>
               <h4>Criptografía y hashing</h4>
               <p>SHA-256, AES y otros algoritmos operan a nivel de bits con operaciones XOR, AND, OR y rotaciones. El resultado final se expresa habitualmente en hexadecimal.</p>
             </div>
-            <div className="edu-escenario-card">
-              <span className="edu-escenario-icon" aria-hidden="true">🔌</span>
+            <div className={styles['edu-escenario-card']}>
+              <span className={styles['edu-escenario-icon']} aria-hidden="true">🔌</span>
               <h4>Electrónica digital</h4>
               <p>Puertas lógicas AND, OR, NOT, XOR implementan el binario en hardware. Cada flip-flop almacena un bit. Comprender binario es la base de todo diseño digital.</p>
             </div>
@@ -303,54 +303,54 @@ export default function ConversorBinarioPage() {
         </div>
 
         {/* FAQ */}
-        <div className="edu-faq-section">
-          <h3 className="edu-section-title"><span aria-hidden="true">❓</span> Preguntas Frecuentes</h3>
-          <div className="edu-faq-list">
-            <details className="edu-faq-item">
-              <summary className="edu-faq-question">¿Por qué los ordenadores (computadoras) usan binario y no decimal?</summary>
-              <div className="edu-faq-answer">
+        <div className={styles['edu-faq-section']}>
+          <h3 className={styles['edu-section-title']}><span aria-hidden="true">❓</span> Preguntas Frecuentes</h3>
+          <div className={styles['edu-faq-list']}>
+            <details className={styles['edu-faq-item']}>
+              <summary className={styles['edu-faq-question']}>¿Por qué los ordenadores (computadoras) usan binario y no decimal?</summary>
+              <div className={styles['edu-faq-answer']}>
                 <p>Los transistores, el componente básico de los chips, tienen dos estados estables: conducen corriente (1) o no (0). El sistema binario se mapea perfectamente a esta realidad física. Representar 10 estados distintos (decimal) con transistores sería mucho más difícil, propenso a errores y consumiría más energía.</p>
               </div>
             </details>
-            <details className="edu-faq-item">
-              <summary className="edu-faq-question">¿Qué es exactamente un byte y por qué 8 bits?</summary>
-              <div className="edu-faq-answer">
+            <details className={styles['edu-faq-item']}>
+              <summary className={styles['edu-faq-question']}>¿Qué es exactamente un byte y por qué 8 bits?</summary>
+              <div className={styles['edu-faq-answer']}>
                 <p>Un byte son 8 bits. Con 8 bits puedes representar 2⁸ = 256 valores distintos (0–255), suficiente para todos los caracteres ASCII básicos. El tamaño de 8 bits se estableció como estándar en los años 60-70 por razones prácticas de hardware. Antes existían bytes de 6, 7 o 9 bits en distintas arquitecturas.</p>
               </div>
             </details>
-            <details className="edu-faq-item">
-              <summary className="edu-faq-question">¿Cuál es la diferencia entre ASCII y Unicode?</summary>
-              <div className="edu-faq-answer">
+            <details className={styles['edu-faq-item']}>
+              <summary className={styles['edu-faq-question']}>¿Cuál es la diferencia entre ASCII y Unicode?</summary>
+              <div className={styles['edu-faq-answer']}>
                 <p>ASCII usa 7 bits (128 caracteres) o 8 bits en versiones extendidas. Solo cubre el inglés básico. Unicode es un estándar universal que cubre más de 140.000 caracteres de todos los idiomas, emojis y símbolos. UTF-8 (la codificación más común de Unicode) usa entre 1 y 4 bytes por carácter, siendo compatible con ASCII para los primeros 128 caracteres.</p>
               </div>
             </details>
-            <details className="edu-faq-item">
-              <summary className="edu-faq-question">¿Por qué los programadores prefieren hexadecimal al binario?</summary>
-              <div className="edu-faq-answer">
+            <details className={styles['edu-faq-item']}>
+              <summary className={styles['edu-faq-question']}>¿Por qué los programadores prefieren hexadecimal al binario?</summary>
+              <div className={styles['edu-faq-answer']}>
                 <p>Hexadecimal es un atajo del binario: cada dígito hex representa exactamente 4 bits (un nibble). Es más compacto y legible. Por ejemplo, el byte 11111111 en binario es FF en hex. Colores web (#FF5733), direcciones de memoria (0x7FFF) y valores de hash se expresan en hex por su compacidad.</p>
               </div>
             </details>
-            <details className="edu-faq-item">
-              <summary className="edu-faq-question">¿Qué es el complemento a dos y para qué sirve?</summary>
-              <div className="edu-faq-answer">
+            <details className={styles['edu-faq-item']}>
+              <summary className={styles['edu-faq-question']}>¿Qué es el complemento a dos y para qué sirve?</summary>
+              <div className={styles['edu-faq-answer']}>
                 <p>Es el sistema estándar para representar números negativos en binario. Para obtener el complemento a dos de un número: invierte todos los bits y suma 1. Así, en 8 bits, -1 es 11111111. La ventaja es que la suma y resta funcionan igual para positivos y negativos, simplificando enormemente el hardware de la ALU del procesador.</p>
               </div>
             </details>
-            <details className="edu-faq-item">
-              <summary className="edu-faq-question">¿Qué significa big-endian y little-endian?</summary>
-              <div className="edu-faq-answer">
+            <details className={styles['edu-faq-item']}>
+              <summary className={styles['edu-faq-question']}>¿Qué significa big-endian y little-endian?</summary>
+              <div className={styles['edu-faq-answer']}>
                 <p>Define el orden en que se almacenan los bytes de un número multibyte en memoria. Big-endian almacena el byte más significativo primero (como escribimos los números), mientras que little-endian almacena el menos significativo primero. Los procesadores Intel/AMD son little-endian; muchos protocolos de red (TCP/IP) usan big-endian. Esto importa al intercambiar datos entre sistemas distintos.</p>
               </div>
             </details>
-            <details className="edu-faq-item">
-              <summary className="edu-faq-question">¿Qué es el BCD (Binary Coded Decimal)?</summary>
-              <div className="edu-faq-answer">
+            <details className={styles['edu-faq-item']}>
+              <summary className={styles['edu-faq-question']}>¿Qué es el BCD (Binary Coded Decimal)?</summary>
+              <div className={styles['edu-faq-answer']}>
                 <p>BCD codifica cada dígito decimal (0–9) en 4 bits de forma separada. El número 65 en BCD sería 0110 0101 (6=0110, 5=0101). Es ineficiente comparado con binario puro, pero facilita la conversión a pantallas de 7 segmentos y evita errores de redondeo en cálculos financieros. Se usa en cajeros automáticos y relojes digitales.</p>
               </div>
             </details>
-            <details className="edu-faq-item">
-              <summary className="edu-faq-question">¿Cómo se multiplica en binario?</summary>
-              <div className="edu-faq-answer">
+            <details className={styles['edu-faq-item']}>
+              <summary className={styles['edu-faq-question']}>¿Cómo se multiplica en binario?</summary>
+              <div className={styles['edu-faq-answer']}>
                 <p>La multiplicación binaria sigue las mismas reglas que la decimal pero simplificada: 0×cualquier cosa=0, 1×cualquier cosa=ese número. Se hacen productos parciales y se suman desplazando. En hardware, los procesadores modernos usan el algoritmo de Booth o multiplicadores de árbol de Wallace para hacerlo en un solo ciclo de reloj, usando desplazamientos de bits.</p>
               </div>
             </details>
@@ -358,47 +358,47 @@ export default function ConversorBinarioPage() {
         </div>
 
         {/* Guía Paso a Paso */}
-        <div className="edu-guide-section">
-          <h3 className="edu-section-title"><span aria-hidden="true">📋</span> Guía: Convierte decimal a binario manualmente</h3>
-          <ol className="edu-steps-list">
-            <li className="edu-step-item">
-              <div className="edu-step-number">1</div>
-              <div className="edu-step-content">
+        <div className={styles['edu-guide-section']}>
+          <h3 className={styles['edu-section-title']}><span aria-hidden="true">📋</span> Guía: Convierte decimal a binario manualmente</h3>
+          <ol className={styles['edu-steps-list']}>
+            <li className={styles['edu-step-item']}>
+              <div className={styles['edu-step-number']}>1</div>
+              <div className={styles['edu-step-content']}>
                 <strong>Toma el número decimal</strong>
                 <span>Ejemplo: 42. Lo dividiremos repetidamente entre 2 hasta llegar a 0.</span>
               </div>
             </li>
-            <li className="edu-step-item">
-              <div className="edu-step-number">2</div>
-              <div className="edu-step-content">
+            <li className={styles['edu-step-item']}>
+              <div className={styles['edu-step-number']}>2</div>
+              <div className={styles['edu-step-content']}>
                 <strong>Divide entre 2 y anota el resto</strong>
                 <span>42 ÷ 2 = 21 resto 0 → 21 ÷ 2 = 10 resto 1 → 10 ÷ 2 = 5 resto 0</span>
               </div>
             </li>
-            <li className="edu-step-item">
-              <div className="edu-step-number">3</div>
-              <div className="edu-step-content">
+            <li className={styles['edu-step-item']}>
+              <div className={styles['edu-step-number']}>3</div>
+              <div className={styles['edu-step-content']}>
                 <strong>Continúa dividiendo</strong>
                 <span>5 ÷ 2 = 2 resto 1 → 2 ÷ 2 = 1 resto 0 → 1 ÷ 2 = 0 resto 1</span>
               </div>
             </li>
-            <li className="edu-step-item">
-              <div className="edu-step-number">4</div>
-              <div className="edu-step-content">
+            <li className={styles['edu-step-item']}>
+              <div className={styles['edu-step-number']}>4</div>
+              <div className={styles['edu-step-content']}>
                 <strong>Lee los restos de abajo hacia arriba</strong>
                 <span>Los restos obtenidos fueron: 0, 1, 0, 1, 0, 1. Leídos al revés: 101010.</span>
               </div>
             </li>
-            <li className="edu-step-item">
-              <div className="edu-step-number">5</div>
-              <div className="edu-step-content">
+            <li className={styles['edu-step-item']}>
+              <div className={styles['edu-step-number']}>5</div>
+              <div className={styles['edu-step-content']}>
                 <strong>Verifica el resultado</strong>
                 <span>101010 en binario = 32+8+2 = 42 ✓. Puedes verificar sumando las potencias de 2 de cada bit en 1.</span>
               </div>
             </li>
-            <li className="edu-step-item">
-              <div className="edu-step-number">6</div>
-              <div className="edu-step-content">
+            <li className={styles['edu-step-item']}>
+              <div className={styles['edu-step-number']}>6</div>
+              <div className={styles['edu-step-content']}>
                 <strong>Practica con la herramienta</strong>
                 <span>Usa el conversor de arriba para confirmar tus cálculos manuales. Prueba con letras para ver cómo ASCII conecta caracteres con números.</span>
               </div>
@@ -407,36 +407,36 @@ export default function ConversorBinarioPage() {
         </div>
 
         {/* Tips Grid */}
-        <div className="edu-tips-section">
-          <h3 className="edu-section-title"><span aria-hidden="true">💡</span> Consejos para Dominar el Binario</h3>
-          <div className="edu-tips-grid">
-            <div className="edu-tip-card">
-              <span className="edu-tip-icon" aria-hidden="true">🧠</span>
+        <div className={styles['edu-tips-section']}>
+          <h3 className={styles['edu-section-title']}><span aria-hidden="true">💡</span> Consejos para Dominar el Binario</h3>
+          <div className={styles['edu-tips-grid']}>
+            <div className={styles['edu-tip-card']}>
+              <span className={styles['edu-tip-icon']} aria-hidden="true">🧠</span>
               <h4>Memoriza potencias de 2</h4>
               <p>1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024. Son la base de todo. Con práctica, los reconocerás automáticamente.</p>
             </div>
-            <div className="edu-tip-card">
-              <span className="edu-tip-icon" aria-hidden="true">⚡</span>
+            <div className={styles['edu-tip-card']}>
+              <span className={styles['edu-tip-icon']} aria-hidden="true">⚡</span>
               <h4>Hex como atajo</h4>
               <p>Agrupa los bits en grupos de 4 y convierte cada grupo a hex. 1111 0000 = F0. Mucho más rápido que leer 8 bits individuales.</p>
             </div>
-            <div className="edu-tip-card">
-              <span className="edu-tip-icon" aria-hidden="true">🏷️</span>
+            <div className={styles['edu-tip-card']}>
+              <span className={styles['edu-tip-icon']} aria-hidden="true">🏷️</span>
               <h4>Prefijos estándar</h4>
               <p>En código: 0b101010 (binario), 0x2A (hex), 0o52 (octal). Muchos lenguajes como Python, JavaScript y C los soportan nativamente.</p>
             </div>
-            <div className="edu-tip-card">
-              <span className="edu-tip-icon" aria-hidden="true">📚</span>
+            <div className={styles['edu-tip-card']}>
+              <span className={styles['edu-tip-icon']} aria-hidden="true">📚</span>
               <h4>ASCII de memoria</h4>
               <p>&apos;A&apos;=65, &apos;a&apos;=97 (diferencia de 32=00100000, el bit 5). Los dígitos &apos;0&apos;–&apos;9&apos; van de 48 a 57. Fácil de recordar.</p>
             </div>
-            <div className="edu-tip-card">
-              <span className="edu-tip-icon" aria-hidden="true">🔢</span>
+            <div className={styles['edu-tip-card']}>
+              <span className={styles['edu-tip-icon']} aria-hidden="true">🔢</span>
               <h4>Truco para binario rápido</h4>
               <p>Para saber si un número es par o impar en binario, mira solo el último bit: 0=par, 1=impar. Los desplazamientos de bits multiplican y dividen por 2.</p>
             </div>
-            <div className="edu-tip-card">
-              <span className="edu-tip-icon" aria-hidden="true">🎯</span>
+            <div className={styles['edu-tip-card']}>
+              <span className={styles['edu-tip-icon']} aria-hidden="true">🎯</span>
               <h4>Máscaras de bits</h4>
               <p>Usa AND para leer bits, OR para activarlos, XOR para invertirlos. Ejemplo: valor & 0b00001111 extrae los 4 bits menos significativos (nibble bajo).</p>
             </div>

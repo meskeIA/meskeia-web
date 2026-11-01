@@ -191,6 +191,31 @@ test('/seguimiento-habitos/ · a 390 px, con un hábito, ninguna de las tres vis
   expect(conModal, `modal: body ${conModal} px`).toBeLessThanOrEqual(390);
 });
 
+// C0553 (01/11/2026): el 451 px de seguimiento-habitos que C0200 no reprodujo salía al ABRIR la
+// guía. Sus clases edu-* vivían en el .module.css pero el TSX las ponía como cadena
+// (className="edu-table-scroll"): CSS Modules las renombra, así que no llegaba ninguna, y la
+// tabla, sin su caja con overflow-x, ensanchaba la página. Las dos apps con la misma plantilla
+// tenían el mismo defecto.
+for (const ruta of ['/seguimiento-habitos/', '/conversor-binario/', '/codificador-base64/']) {
+  test(`${ruta} · a 390 px, con la guía abierta, la tabla desplaza en su caja y la página no desborda (C0553)`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto(ruta);
+    await page.waitForLoadState('networkidle');
+    const guia = page.getByRole('button', { name: /guía/i }).first();
+    await expect(async () => {
+      await guia.click();
+      await expect(guia).toHaveAttribute('aria-expanded', 'true', { timeout: 1000 });
+    }).toPass({ timeout: 15000 });
+    const tabla = page.locator('table[class*="edu-table"]').first();
+    await expect(tabla).toBeVisible();
+    await expect(tabla.locator('xpath=..')).toHaveCSS('overflow-x', 'auto');
+    const ancho = await page.evaluate(() => document.body.scrollWidth);
+    expect(ancho, `guía abierta: body ${ancho} px`).toBeLessThanOrEqual(390);
+  });
+}
+
 test('/calculadora-matematica/ · a 390 px ninguno de los cinco tipos desborda (C0201)', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/calculadora-matematica/');
