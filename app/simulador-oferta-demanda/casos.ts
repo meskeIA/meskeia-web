@@ -41,7 +41,12 @@
  */
 
 import { formatNumber } from '@/lib';
-import { corregirNumero, dentroDeTolerancia, toleranciaRelativa } from '@/lib/calculadoras/correctorCasosAula';
+import {
+  corregirNumero,
+  dentroDeTolerancia,
+  exigeRedondeo,
+  toleranciaRelativa,
+} from '@/lib/calculadoras/correctorCasosAula';
 
 /* ─────────────────────────── El motor de la app (movido de page.tsx) ─────────────────────────── */
 
@@ -338,9 +343,13 @@ export function comprobarRespuesta(usuario: Respuesta | null, esperado: Respuest
   if (typeof usuario !== 'number' || !Number.isFinite(usuario) || typeof esperado !== 'number') {
     return { correcto: false, motivo: 'Escribe un número (puedes usar la coma decimal).' };
   }
+  // Una respuesta EXACTA a dos decimales no tiene margen (cabo C0267, 01/11/2026): el 1 % daba
+  // por buenas 19,9 u. m. para un precio de 20, que no es ningún redondeo. La que exige
+  // redondear (un corte en 34,2857) conserva el 1 %: los enunciados no piden decimales.
+  const margen = exigeRedondeo(esperado, 2) ? toleranciaDe(esperado) : 0;
   // Precio y cantidad del modelo lineal son continuos (el modelo no cuenta helados uno a uno):
   // ningún valor es imposible por sí mismo dentro de la tolerancia.
-  const c = corregirNumero(usuario, esperado, { tolerancia: toleranciaDe(esperado), magnitud: 'real' });
+  const c = corregirNumero(usuario, esperado, { tolerancia: margen, magnitud: 'real' });
   if (c.motivoImposible) return { correcto: false, motivo: c.motivoImposible };
   if (c.estado === 'acierto') return { correcto: true, motivo: '¡Correcto!' };
 

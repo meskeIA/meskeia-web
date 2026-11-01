@@ -441,7 +441,9 @@ test.describe('simulador-oferta-demanda · casos para clase', () => {
     expect(toleranciaDe(20)).toBeCloseTo(0.2, 10);
     expect(toleranciaDe(0)).toBe(0.01);
     expect(comprobarRespuesta(20, 20, caso1.datos).correcto).toBe(true);
-    expect(comprobarRespuesta(20.2, 20, caso1.datos).correcto).toBe(true);
+    // Hasta el 01/11/2026 este test daba por bueno 20,2 para un precio EXACTO de 20, que no es
+    // ningún redondeo: consagraba el defecto del cabo C0267. Una respuesta exacta no tiene margen.
+    expect(comprobarRespuesta(20.2, 20, caso1.datos).correcto).toBe(false);
     expect(comprobarRespuesta(21, 20, caso1.datos).correcto).toBe(false);
     expect(comprobarRespuesta(NaN, 20, caso1.datos).motivo).toContain('Escribe un número');
     // El desajuste en negativo recibe un aviso propio
@@ -534,4 +536,29 @@ test.describe('simulador-oferta-demanda · la sección de casos en el navegador'
     await expect(page.locator('[role="status"]')).toHaveCount(1);
     await expect(seccion(page).locator('[class*="resultCard"]')).toHaveCount(0);
   });
+});
+
+/*
+ * Cabo C0267 (reparar 01/11/2026), la forma del hallazgo 3342: el 1 % aprobaba en un precio o una
+ * cantidad EXACTOS respuestas que no son ningún redondeo (59,5 para 60 unidades). Ahora una
+ * respuesta exacta a dos decimales no tiene margen, y la que exige redondear (34,2857 → 34,29)
+ * conserva el 1 %, porque los enunciados no piden decimales. Regla de bfccafa5.
+ */
+test('C0267 · un precio o una cantidad EXACTOS no tienen margen; los que exigen redondear conservan el 1 %', () => {
+  const numericos = CASOS.filter((c) => !esPrediccion(c.datos) && typeof c.respuesta === 'number');
+  const exactos = numericos.filter((c) => Math.abs((c.respuesta as number) * 100 - Math.round((c.respuesta as number) * 100)) < 1e-6);
+  expect(exactos.length, 'hay casos con respuesta exacta').toBeGreaterThan(0);
+  for (const c of numericos) {
+    const v = c.respuesta as number;
+    expect(comprobarRespuesta(v, v, c.datos).correcto, `caso ${c.id} con su clave`).toBe(true);
+  }
+  for (const c of exactos) {
+    const v = c.respuesta as number;
+    // Medio punto porcentual por debajo: dentro del 1 % de antes, y no es redondeo de v
+    expect(comprobarRespuesta(v * 0.995, v, c.datos).correcto, `caso ${c.id}: ${v * 0.995} para ${v}`).toBe(false);
+  }
+  for (let semilla = 1; semilla <= 500; semilla++) {
+    const e = generarEjercicioAleatorio(semilla);
+    expect(comprobarRespuesta(e.respuesta, e.respuesta, e.datos).correcto, `semilla ${semilla}`).toBe(true);
+  }
 });
