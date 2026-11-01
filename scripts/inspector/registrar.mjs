@@ -31,6 +31,15 @@
  *   ]
  * }
  *
+ * EL MODO (01/11/2026)
+ * ────────────────────
+ * "modo": "primera" | "cambio" | "cabo" | "rojo" | "firma" — el que trae la app en la cola
+ * (cabecera de `cola.mjs`, «LOS TRES MODOS»). Si falta, se deduce: `primera` si la app nunca se
+ * inspeccionó y `cambio` si ya. Una comprobación de `cabo` responde solo a la pregunta del cabo y
+ * por eso NO revalida la app: no toca `ultima_inspeccion`, la huella ni `validada`, y si la app
+ * había cambiado, su cambio sigue en la cola. Una app nunca vista no admite `cabo`: se inspecciona
+ * entera. La cola mide con el modo el rendimiento de cada uno.
+ *
  * LAS DOS REGLAS QUE SE HACEN CUMPLIR AQUÍ
  * ────────────────────────────────────────
  * 1. NINGÚN HALLAZGO SIN CASO REPRODUCIBLE. Un hallazgo cuyo `caso` no diga entrada,
@@ -48,6 +57,7 @@ import { abrir, ahora } from './db.mjs';
 const VEREDICTOS = ['ok', 'con_hallazgos', 'con_hallazgos_menores', 'no_inspeccionable'];
 const TIPOS = ['calculo', 'dato', 'operativa', 'accesibilidad', 'contenido'];
 const SEVERIDADES = ['critico', 'alto', 'medio', 'bajo'];
+const MODOS = ['primera', 'cambio', 'cabo', 'rojo', 'firma'];
 
 /**
  * El veredicto que se GUARDA sale de la severidad máxima encontrada, no de lo que opine
@@ -90,12 +100,17 @@ try {
 
 const actas = Array.isArray(acta) ? acta : [acta];
 const db = abrir();
-const existe = db.prepare('SELECT slug, hash_codigo, hash_deps FROM apps WHERE slug = ?');
+const existe = db.prepare('SELECT slug, hash_codigo, hash_deps, ultima_inspeccion FROM apps WHERE slug = ?');
 
 for (const [i, a] of actas.entries()) {
   const donde = `acta ${i + 1}${a.slug ? ` (${a.slug})` : ''}`;
   if (!a.slug) { errores.push(`${donde}: falta "slug"`); continue; }
-  if (!existe.get(a.slug)) errores.push(`${donde}: el slug no está en la base — ¿falta ejecutar inspector:sync?`);
+  const app = existe.get(a.slug);
+  if (!app) errores.push(`${donde}: el slug no está en la base — ¿falta ejecutar inspector:sync?`);
+  if (a.modo != null && !MODOS.includes(a.modo)) errores.push(`${donde}: modo "${a.modo}" no válido (${MODOS.join(' | ')})`);
+  if (app && a.modo == null) a.modo = app.ultima_inspeccion ? 'cambio' : 'primera';
+  if (app && !app.ultima_inspeccion && a.modo === 'cabo')
+    errores.push(`${donde}: modo "cabo" en una app nunca inspeccionada: se inspecciona entera (modo "primera"), con la pregunta del cabo dentro`);
   if (!VEREDICTOS.includes(a.veredicto)) errores.push(`${donde}: veredicto "${a.veredicto}" no válido (${VEREDICTOS.join(' | ')})`);
   if (!a.resumen || a.resumen.length < 20) errores.push(`${donde}: el resumen debe decir QUÉ se comprobó y con qué casos`);
 
@@ -129,14 +144,16 @@ if (errores.length) {
 }
 
 const hoy = new Date().toISOString().slice(0, 10);
-const insInsp = db.prepare(`INSERT INTO inspecciones (slug, fecha, modelo, veredicto, resumen, test_path, segundos)
-                            VALUES (?, ?, ?, ?, ?, ?, ?)`);
+const insInsp = db.prepare(`INSERT INTO inspecciones (slug, fecha, modelo, veredicto, resumen, test_path, segundos, modo)
+                            VALUES (?, ?, ?, ?, ?, ?, ?, ?)`);
 const insHall = db.prepare(`INSERT INTO hallazgos (inspeccion_id, slug, tipo, severidad, descripcion, caso, fecha)
                             VALUES (?, ?, ?, ?, ?, ?, ?)`);
 // `validada` con hora: es la referencia con la que `--revalidar-reparadas` decide si un
 // hallazgo se cerró DESPUÉS de esta inspección (ver la cabecera de cerrar.mjs)
 const actApp = db.prepare(`UPDATE apps SET ultima_inspeccion = ?, veredicto = ?, test_path = COALESCE(?, test_path),
                            hash_inspeccionado = hash_codigo || '|' || COALESCE(hash_deps, ''), validada = ? WHERE slug = ?`);
+// La comprobación de un cabo no revalida la app (ver «EL MODO» en la cabecera)
+const actAppCabo = db.prepare(`UPDATE apps SET veredicto = ?, test_path = COALESCE(?, test_path) WHERE slug = ?`);
 
 /**
  * El veredicto de la APP (apps.veredicto) sale de TODOS sus hallazgos abiertos, no solo de los
@@ -155,7 +172,7 @@ for (const a of actas) {
   if (veredicto !== a.veredicto) {
     console.log(`   ${a.slug}: veredicto "${a.veredicto}" → "${veredicto}" (por la severidad máxima encontrada)`);
   }
-  const r = insInsp.run(a.slug, hoy, a.modelo || null, veredicto, a.resumen, a.test_path || null, a.segundos || null);
+  const r = insInsp.run(a.slug, hoy, a.modelo || null, veredicto, a.resumen, a.test_path || null, a.segundos || null, a.modo);
   for (const h of a.hallazgos || []) {
     insHall.run(r.lastInsertRowid, a.slug, h.tipo, h.severidad, h.descripcion, h.caso, hoy);
     nH++;
@@ -166,7 +183,8 @@ for (const a of actas) {
   if (deLaApp !== veredicto) {
     console.log(`   ${a.slug}: la app queda en "${deLaApp}" por sus hallazgos abiertos de antes (esta acta: "${veredicto}")`);
   }
-  actApp.run(hoy, deLaApp, a.test_path || null, ahora(), a.slug);
+  if (a.modo === 'cabo') actAppCabo.run(deLaApp, a.test_path || null, a.slug);
+  else actApp.run(hoy, deLaApp, a.test_path || null, ahora(), a.slug);
 }
 
 console.log(`✓ ${actas.length} acta(s) registrada(s) · ${nH} hallazgo(s)`);
@@ -197,10 +215,17 @@ console.log(`✓ ${actas.length} acta(s) registrada(s) · ${nH} hallazgo(s)`);
  */
 const UMBRAL_RACHA = 5;
 
+/*
+ * Desde el 01/11/2026 hay modos (cabecera). Una comprobación de `cabo` no es un veredicto sobre la
+ * app y no entra en ninguna serie. Las de `cambio` miran solo el diff, así que un «ok» es lo
+ * esperado y no una alarma: forman su propia serie, que solo avisa si repite hallazgos GRAVES (la
+ * reparación no cierra). Las de antes, sin modo, se reparten como siempre, por `previas`.
+ */
 const historia = db.prepare(`
-  SELECT i.veredicto AS veredicto,
+  SELECT i.veredicto AS veredicto, i.modo AS modo,
          (SELECT COUNT(*) FROM inspecciones p WHERE p.slug = i.slug AND p.id < i.id) AS previas
   FROM inspecciones i
+  WHERE COALESCE(i.modo, '') <> 'cabo'
   ORDER BY i.id DESC
   LIMIT 200
 `).all();
@@ -213,13 +238,21 @@ function rachaDe(serie) {
   return { veredicto: serie[0], racha };
 }
 
-const primeras = rachaDe(historia.filter(f => f.previas === 0).map(f => f.veredicto));
-const reinspecciones = rachaDe(historia.filter(f => f.previas > 0).map(f => f.veredicto));
+const esPrimera = (f) => f.modo === 'primera' || (f.modo == null && f.previas === 0);
+const primeras = rachaDe(historia.filter(esPrimera).map(f => f.veredicto));
+const reinspecciones = rachaDe(historia.filter(f => !esPrimera(f) && f.modo !== 'cambio').map(f => f.veredicto));
+const cambios = rachaDe(historia.filter(f => f.modo === 'cambio').map(f => f.veredicto));
 
 if (primeras.racha > 1)
   console.log(`   (primeras inspecciones: ${primeras.racha} veredictos "${primeras.veredicto}" seguidos)`);
 if (reinspecciones.racha > 1)
   console.log(`   (re-inspecciones: ${reinspecciones.racha} veredictos "${reinspecciones.veredicto}" seguidos)`);
+if (cambios.racha > 1)
+  console.log(`   (inspecciones de un cambio: ${cambios.racha} veredictos "${cambios.veredicto}" seguidos)`);
+if (cambios.racha >= UMBRAL_RACHA && cambios.veredicto === 'con_hallazgos')
+  console.log(`\n⚠  ${cambios.racha} inspecciones de un CAMBIO seguidas encuentran hallazgos graves en lo cambiado.\n` +
+              `   Lo que no cierra es la REPARACIÓN: revisar si /reparar da por buenos hallazgos sin\n` +
+              `   verificar el caso reproducible de su ficha.`);
 
 /*
  * La comprobación depende de HACIA QUÉ LADO se repite (skill /inspector, «Racha de…»). Hasta

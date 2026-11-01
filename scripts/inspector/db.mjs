@@ -118,6 +118,10 @@ export function abrir() {
  * (`nivel`, `cambio` o las dos), la frase que la explica y el día en que empezó a saltar.
  * `firma_desde` es lo que decide si una app YA inspeccionada vuelve a la cola: solo si la
  * firma apareció después de su última inspección.
+ *
+ * `inspecciones.modo` (01/11/2026): `primera` · `cambio` · `cabo` · `rojo` · `firma` (cabecera de
+ * `cola.mjs`, «LOS TRES MODOS»). Nulo en las anteriores: la primera de cada app era entera y las
+ * demás, repeticiones enteras. La cola mide con él el rendimiento de cada modo.
  */
 const COLUMNAS_NUEVAS = [
   ['hallazgos', 'cerrado', 'TEXT'],
@@ -125,6 +129,7 @@ const COLUMNAS_NUEVAS = [
   ['apps', 'firma', 'TEXT'],
   ['apps', 'firma_detalle', 'TEXT'],
   ['apps', 'firma_desde', 'TEXT'],
+  ['inspecciones', 'modo', 'TEXT'],
 ];
 function migrar(db) {
   for (const [tabla, columna, tipo] of COLUMNAS_NUEVAS) {
