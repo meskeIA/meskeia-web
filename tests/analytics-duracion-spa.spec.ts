@@ -43,8 +43,11 @@
  * cambia, porque mira los envíos dentro del navegador, antes de la red.
  */
 import { test, expect, type Page } from '@playwright/test';
+import { PUERTO } from './apps/_puerto';
 
-const PORT = 3050;
+// El puerto del servidor de pruebas, no un 3050 fijo: en la copia de /reparar o del Inspector
+// (3053, 3052) el mapeo apuntaba al servidor del usuario o a nada (cabo C0549, 01/11/2026).
+const PORT = PUERTO;
 const ORIGEN = 'http://meskeia.com';
 const UA_REAL =
   'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/151.0.0.0 Safari/537.36';

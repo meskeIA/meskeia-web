@@ -3460,17 +3460,13 @@ test.describe('Inspector 28/09/2026 — hallazgos reparados', () => {
       page.getByRole('heading', { name: '¿Qué mide el test chi-cuadrado en la pestaña Población?', exact: true }),
     ).toHaveCount(1);
 
-    // Ningún encabezado DE LA APP (los de RelatedApps, ShareCard o la sección educativa son de
-    // components/ y van por su cuenta), guía abierta, lleva un emoji en su nombre accesible.
-    // De la app es el que tiene como clase más cercana una del módulo de la app. Se cuentan,
-    // para que una lista vacía no pase por buena.
+    // Ningún encabezado de la página, guía abierta, lleva un emoji en su nombre accesible. Se
+    // cuentan, para que una lista vacía no pase por buena.
+    // Hasta el 01/11/2026 se separaban los de la app por /SimuladorGenetica/ en la clase, que el
+    // build de producción no conserva: contra next start la lista salía vacía (cabo C0549, como
+    // C0457). Ahora entran todos, también los de components/, que tampoco deben anunciar emojis.
     const nombres = await page.getByRole('heading').evaluateAll((els) =>
       els
-        .filter((el) => {
-          let n: Element | null = el;
-          while (n && !(n.getAttribute('class') ?? '').trim()) n = n.parentElement;
-          return /SimuladorGenetica/.test(n?.getAttribute('class') ?? '');
-        })
         .map((el) => {
           const copia = el.cloneNode(true) as HTMLElement;
           copia.querySelectorAll('[aria-hidden="true"]').forEach((n) => n.remove());

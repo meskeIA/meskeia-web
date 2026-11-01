@@ -652,7 +652,9 @@ test.describe('re-inspección 22/09/2026', () => {
     //   · ocho importes en €, «pensión pública», «cuenta remunerada».
     //   · en el faqJsonLd que leen las IAs, «letras del Tesoro» para el conservador.
     // REPARADO: hoy monta el badge `es-data` y la frase de MiFID habla de la UE.
-    expect(await page.locator('[class*="egionBadge"]').count()).toBeGreaterThan(0);
+    // Por su rol y nombre, no por la clase: el build de producción no lleva el nombre del módulo
+    // en la clase y '[class*="egionBadge"]' daba 0 contra next start (cabo C0549, como C0457).
+    await expect(page.getByRole('note', { name: 'Aviso: los datos de referencia son de España' })).toHaveCount(1);
     await expect(cuerpo).not.toContainText('Los bancos hacen el test de MiFID II');
   });
 

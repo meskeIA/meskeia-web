@@ -3,7 +3,9 @@ import { test, expect, devices } from '@playwright/test';
 test.use({ ...devices['Pixel 5'] });
 
 test('logo homepage móvil - screenshot diagnóstico', async ({ page }) => {
-  await page.goto('http://localhost:3050', { waitUntil: 'networkidle' });
+  // Ruta relativa: la baseURL ya lleva el puerto de pruebas (3050 fijo daba error en la copia de
+  // /reparar o del Inspector; cabo C0549, 01/11/2026)
+  await page.goto('/', { waitUntil: 'networkidle' });
   
   // Screenshot completo de la zona del logo hero
   await page.screenshot({ path: 'tests/screenshots/logo-homepage-mobile.png', fullPage: false });

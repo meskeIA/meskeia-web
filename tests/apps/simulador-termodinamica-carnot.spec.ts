@@ -1,6 +1,7 @@
 import { test, expect, Locator, Page } from '@playwright/test';
 import { esperarHidratacion, sembrarValor } from './_hidratacion';
 import { activarTema } from '../contraste-text-muted-auxiliares';
+import { selectorDelModulo } from './_modulo-css';
 
 /**
  * Inspector — simulador-termodinamica-carnot (segmento cálculo, riesgo 3, 93 usos)
@@ -485,20 +486,25 @@ test('HALLAZGO B2 · el % de η va separado con espacio duro (U+00A0), también 
  * Nodos de texto que escribe ESTA app: aquellos cuyo antepasado más cercano con clase es de su
  * módulo CSS. Deja fuera Footer, ShareCard, RelatedApps… (con su propio módulo) aunque vivan
  * dentro del .container. Devuelve el texto y si está bajo aria-hidden.
+ *
+ * El módulo, por el PREFIJO de la clase del <h1> (`selectorDelModulo`). Hasta el 01/11/2026 era
+ * /SimuladorTermodinamicaCarnot/ en la clase, que el build de producción no conserva: contra
+ * next start no se recogía ningún nodo y el control de 15 emojis caía (cabo C0549, como C0457).
  */
 async function nodosDeLaApp(page: Page): Promise<{ t: string; oculto: boolean }[]> {
-  return page.evaluate(() => {
+  const mod = await selectorDelModulo(page.getByRole('heading', { level: 1 }), 'title');
+  return page.evaluate((mod) => {
     const salida: { t: string; oculto: boolean }[] = [];
     const recorrido = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
     for (let n = recorrido.nextNode(); n; n = recorrido.nextNode()) {
       // El payload de React (un <script> en el body) no es texto pintado (cabo C0175).
       if (n.parentElement?.closest('script, style')) continue;
       const conClase = n.parentElement?.closest('[class]');
-      if (!conClase || !/SimuladorTermodinamicaCarnot/.test(conClase.getAttribute('class') ?? '')) continue;
+      if (!conClase || !conClase.matches(mod)) continue;
       salida.push({ t: n.textContent ?? '', oculto: Boolean(n.parentElement?.closest('[aria-hidden="true"]')) });
     }
     return salida;
-  });
+  }, mod);
 }
 const textosDeLaApp = async (page: Page): Promise<string[]> => (await nodosDeLaApp(page)).map((n) => n.t);
 
