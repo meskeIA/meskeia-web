@@ -77,7 +77,8 @@ export default function CasosAula({ onCargar }: Props) {
     // parseSpanishNumber admite «11,97» y «11.97»; devuelve NaN con cualquier otra cosa, y de
     // ese NaN se encarga comprobarRespuesta con un mensaje propio (nunca «NaN» en pantalla).
     const valor = parseSpanishNumber(respuesta);
-    const r = comprobarRespuesta(valor, esperado);
+    // Con los datos de la pregunta: sin G ni masas, contra la cifra exacta (cabo C0267)
+    const r = comprobarRespuesta(valor, esperado, datos);
     setVeredicto({ correcto: r.correcto, motivo: r.motivo });
   }
 

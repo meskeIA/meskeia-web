@@ -63,7 +63,13 @@ import {
   cuerpoPorId,
   type CuerpoCentral,
 } from './motor';
-import { corregirNumero, redondearA, toleranciaRelativa } from '@/lib/calculadoras/correctorCasosAula';
+import {
+  corregirNumero,
+  redondearA,
+  textoDesviacion,
+  toleranciaDeRedondeo,
+  toleranciaRelativa,
+} from '@/lib/calculadoras/correctorCasosAula';
 
 /* ─────────────────────────── Datos de un caso ─────────────────────────── */
 
@@ -516,6 +522,9 @@ export function toleranciaDe(valor: number): number {
   return toleranciaRelativa(valor);
 }
 
+/** Las preguntas que pasan por G y una masa: los libros redondean 6,67 y 5,97. */
+const CON_G: ReadonlySet<Magnitud> = new Set<Magnitud>(['periodo', 'velocidadCircular', 'masaCentral']);
+
 export interface Veredicto {
   correcto: boolean;
   motivo: string;
@@ -523,12 +532,32 @@ export interface Veredicto {
   tolerancia: number;
 }
 
-/** Corrige la respuesta del alumno. Nunca lanza. */
-export function comprobarRespuesta(usuario: number, esperado: number): Veredicto {
+/**
+ * Corrige la respuesta del alumno. Nunca lanza.
+ *
+ * Con `datos` la tolerancia sale de la pregunta (cabo C0267, 01/11/2026). Si pasa por G y una
+ * masa, el 1 % de `toleranciaDe`, que absorbe los redondeos de los libros. Si no (proporciones,
+ * distancias extremas, excentricidad, √2), la respuesta es exacta o solo exige el redondeo final,
+ * y el 1 % aprobaba 24.800 km para los 25.000 exactos del apogeo del caso 7: se corrige contra la
+ * cifra SIN redondear con la política de redondeo, como 776a332a en movimiento-circular. Sin
+ * `datos`, la relativa de siempre.
+ */
+export function comprobarRespuesta(usuario: number, esperado: number, datos?: DatosCaso): Veredicto {
+  let objetivo = esperado;
+  let tolerancia = toleranciaDe(esperado);
+  let decimales = 2;
+  if (datos && !CON_G.has(datos.magnitud)) {
+    const r = resolverCaso(datos);
+    if (r.ok) {
+      decimales = datos.decimales ?? 2;
+      objetivo = r.valor;
+      tolerancia = toleranciaDeRedondeo(r.valor, decimales, redondear);
+    }
+  }
   // Magnitudes continuas: ningún valor es imposible por sí mismo dentro de la tolerancia
   // (sonda del 15/10/2026 sobre los 12 casos y 40 semillas del modo práctica).
-  const c = corregirNumero(usuario, esperado, { tolerancia: toleranciaDe(esperado), magnitud: 'real' });
-  const { diferencia, tolerancia } = c;
+  const c = corregirNumero(usuario, objetivo, { tolerancia, magnitud: 'real' });
+  const { diferencia } = c;
 
   if (c.estado === 'no-numerico') {
     return {
@@ -546,7 +575,8 @@ export function comprobarRespuesta(usuario: number, esperado: number): Veredicto
 
   return {
     correcto: false,
-    motivo: `No es correcto. Te has desviado ${numero(diferencia, 2)} de la respuesta.`,
+    // Con tolerancia 0, «25.000,4» para 25.000 no puede decir «Te has desviado 0» (hallazgo 3369)
+    motivo: `No es correcto. Te has desviado ${textoDesviacion(diferencia, decimales, numero)} de la respuesta.`,
     diferencia,
     tolerancia,
   };

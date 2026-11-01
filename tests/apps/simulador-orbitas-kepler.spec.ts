@@ -179,6 +179,40 @@ test.describe('simulador-orbitas-kepler · casos para clase', () => {
     expect(comprobarRespuesta(libro, 11.97).correcto).toBe(true);
   });
 
+  test('C0267 · sin G ni masas, la respuesta es exacta o solo exige el redondeo final: el 1 % ya no aprueba lo que no es ningún redondeo', async () => {
+    // Cabo C0267 (reparar 01/11/2026), la forma del hallazgo 3342. El 1 % se queda donde hay
+    // G y masas (los libros redondean 6,67 y 5,97, apartado (e) de arriba). Sin ellos, a mano:
+    //   caso 7 · r_apo = 20.000 · 1,25 = 25.000 km exactos      → 24.800 no es redondeo de nada
+    //   caso 9 · 26.600 · 0,26 − 6.371 = 545 km exactos          → 540 tampoco
+    //   caso 1 · 3 · 4^1,5 = 24 h exactas                        → 23,8 no
+    //   caso 8 · e = 35.000 / 49.000 = 0,7143 → 0,71             → 0,70 no (el suelo de 0,01 la aprobaba)
+    //   caso 6 · 7,5 · √2 = 10,607 → 10,61                       → 10,5 no
+    const caso = (id: number) => CASOS.find((c) => c.id === id)!;
+    const corrige = (usuario: number, id: number) =>
+      comprobarRespuesta(usuario, caso(id).respuesta, caso(id).datos).correcto;
+    expect(corrige(25000, 7)).toBe(true);
+    expect(corrige(24800, 7)).toBe(false);
+    expect(corrige(545, 9)).toBe(true);
+    expect(corrige(540, 9)).toBe(false);
+    expect(corrige(24, 1)).toBe(true);
+    expect(corrige(23.8, 1)).toBe(false);
+    expect(corrige(0.71, 8)).toBe(true);
+    expect(corrige(0.7, 8)).toBe(false);
+    expect(corrige(10.61, 6)).toBe(true);
+    expect(corrige(10.5, 6)).toBe(false);
+    // Con G y M sigue la relativa: los redondeos de los libros en el caso 3.
+    const libro = (2 * Math.PI * Math.sqrt(2.656e7 ** 3 / (6.67e-11 * 5.97e24))) / 3600;
+    expect(corrige(Number(libro.toFixed(2)), 3)).toBe(true);
+    // El motivo no dice «Te has desviado 0» con tolerancia 0 (hallazgo 3369).
+    expect(comprobarRespuesta(25000.4, 25000, caso(7).datos).motivo).not.toMatch(/desviado 0 /);
+    // Y la clave aprueba siempre: los 12 casos y 500 prácticas.
+    for (const c of CASOS) expect(comprobarRespuesta(c.respuesta, c.respuesta, c.datos).correcto, `caso ${c.id}`).toBe(true);
+    for (let semilla = 1; semilla <= 500; semilla++) {
+      const e = generarEjercicioAleatorio(semilla);
+      expect(comprobarRespuesta(e.respuesta, e.respuesta, e.datos).correcto, `semilla ${semilla}`).toBe(true);
+    }
+  });
+
   test('8 · corregir no lanza nunca, ni con entradas que no son números', async () => {
     expect(comprobarRespuesta(92.8, 92.8).correcto).toBe(true);
     expect(comprobarRespuesta(NaN, 24).correcto).toBe(false);
