@@ -210,6 +210,27 @@ test.describe('Corrección de la respuesta del alumno', () => {
   test('el acierto exacto se marca como acertado', () => {
     expect(comprobarRespuesta(5, 5).motivo).toBe('acertado');
   });
+
+  test('C0267 · una respuesta EXACTA no tiene margen; la que exige redondear conserva el 1 %', () => {
+    // Cabo C0267 (reparar 01/11/2026), la forma del hallazgo 3342. A mano:
+    //   caso 6  · √(90² + 120²) = 150 m exactos   → 148,5 no es redondeo de nada
+    //   caso 11 · √(20² + 21²) = 29 exactos       → 28,8 tampoco (y el enunciado pide «un número entero»)
+    //   caso 8  · √(41² − 9²) = 40 cm exactos     → 39,7 no
+    //   caso 10 · √(0,8² + 2,1²) = 2,2472 m       → exige redondear: 2,25 vale (2,2 ya no valía: 2 %)
+    //   caso 9  · √(60² + 25² + 20²) = 68,007 cm  → exige redondear: 68,01 y 68 valen
+    const caso = (id: number) => CASOS.find((c) => c.id === id)!;
+    const corrige = (usuario: number, id: number) => comprobarRespuesta(usuario, caso(id).respuesta).correcto;
+    expect(corrige(150, 6)).toBe(true);
+    expect(corrige(148.5, 6)).toBe(false);
+    expect(corrige(29, 11)).toBe(true);
+    expect(corrige(28.8, 11)).toBe(false);
+    expect(corrige(40, 8)).toBe(true);
+    expect(corrige(39.7, 8)).toBe(false);
+    expect(corrige(2.25, 10)).toBe(true);
+    expect(corrige(68.01, 9)).toBe(true);
+    expect(corrige(68, 9)).toBe(true);
+    for (const c of CASOS) expect(comprobarRespuesta(c.respuesta, c.respuesta).correcto, `caso ${c.id}`).toBe(true);
+  });
 });
 
 test.describe('Los 12 casos numerados (lo que el profesor asigna)', () => {

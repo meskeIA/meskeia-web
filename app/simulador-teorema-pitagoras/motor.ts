@@ -26,7 +26,7 @@
  */
 
 import { formatNumber } from '@/lib';
-import { corregirNumero, redondearA, toleranciaRelativa } from '@/lib/calculadoras/correctorCasosAula';
+import { corregirNumero, exigeRedondeo, redondearA, toleranciaRelativa } from '@/lib/calculadoras/correctorCasosAula';
 
 // ============================================================
 // TIPOS
@@ -382,11 +382,19 @@ export function toleranciaDe(valorEsperado: number): number {
   return toleranciaRelativa(valorEsperado);
 }
 
-/** Compara la respuesta tecleada con la esperada. NaN cuenta como «no numérico». */
+/**
+ * Compara la respuesta tecleada con la esperada SIN redondear. NaN cuenta como «no numérico».
+ *
+ * Una respuesta EXACTA a dos decimales no tiene margen (cabo C0267, 01/11/2026): el 1 % aprobaba
+ * 148,5 m para los 150 exactos del caso 6, y 28,8 para la terna 20-21-29, que no son redondeo de
+ * nada. La que exige redondear (√2, 2,2472 m) conserva `toleranciaDe`, porque los enunciados no
+ * piden decimales. Es la regla de bfccafa5 en simulador-fluidos-bernoulli.
+ */
 export function comprobarRespuesta(valorUsuario: number, valorEsperado: number): Comprobacion {
+  const margen = exigeRedondeo(valorEsperado, 2, redondear) ? toleranciaDe(valorEsperado) : 0;
   // Todas las respuestas de esta app son magnitudes continuas: ningún valor es imposible por sí
   // mismo dentro de la tolerancia (sonda del 15/10/2026 sobre los casos y el modo práctica).
-  const c = corregirNumero(valorUsuario, valorEsperado, { tolerancia: toleranciaDe(valorEsperado), magnitud: 'real' });
+  const c = corregirNumero(valorUsuario, valorEsperado, { tolerancia: margen, magnitud: 'real' });
   const { diferencia, tolerancia } = c;
   if (c.estado === 'no-numerico') return { correcto: false, motivo: 'no-numerico', diferencia, tolerancia };
   if (c.motivoImposible) return { correcto: false, motivo: 'fallado', diferencia, tolerancia, aviso: c.motivoImposible };
