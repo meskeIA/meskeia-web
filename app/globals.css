@@ -374,8 +374,11 @@ body {
   line-height: 1.6;
 }
 
+/* --primary-texto y no --primary: un enlace sin clase es texto pequeño sobre el fondo de la
+   página, y #2E86AB da 4,11:1 sobre blanco. Solo cambia meskeIA en claro (#26718F, 5,47:1): en
+   oscuro y en los portales los dos tokens valen lo mismo (cabo C0095, 01/11/2026). */
 a {
-  color: var(--primary);
+  color: var(--primary-texto);
   text-decoration: none;
   transition: color 0.2s ease;
 }
