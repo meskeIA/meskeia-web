@@ -340,8 +340,8 @@ export default function ConversorIEEE754Page() {
       <section className={styles.configSection}>
         <div className={styles.configRow}>
           <div className={styles.configGroup}>
-            <label className={styles.configLabel}>Dirección</label>
-            <div className={styles.modeSelector}>
+            <label id="direccion-label" className={styles.configLabel}>Dirección</label>
+            <div role="group" aria-labelledby="direccion-label" className={styles.modeSelector}>
               <button
                 type="button"
                 className={`${styles.modeBtn} ${mode === 'decimalToBinary' ? styles.modeBtnActive : ''}`}
@@ -362,8 +362,8 @@ export default function ConversorIEEE754Page() {
           </div>
 
           <div className={styles.configGroup}>
-            <label className={styles.configLabel}>Precisión</label>
-            <div className={styles.precisionSelector}>
+            <label id="precision-label" className={styles.configLabel}>Precisión</label>
+            <div role="group" aria-labelledby="precision-label" className={styles.precisionSelector}>
               <button
                 type="button"
                 className={`${styles.precisionBtn} ${precision === 'single' ? styles.precisionBtnActive : ''}`}

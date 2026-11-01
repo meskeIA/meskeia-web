@@ -153,8 +153,9 @@ export default function DetectorIdiomaPage() {
 
       <div className={styles.mainContent}>
         <div className={styles.inputSection}>
-          <label className={styles.label}>Texto a analizar</label>
+          <label htmlFor="texto-analizar" className={styles.label}>Texto a analizar</label>
           <textarea
+            id="texto-analizar"
             value={texto}
             onChange={(e) => setTexto(e.target.value)}
             placeholder="Pega aquí el texto del que quieres saber el idioma..."

@@ -179,8 +179,8 @@ Finalmente, medir los resultados es esencial. Analiza métricas como tiempo en p
           </div>
 
           <div className={styles.velocidadSection}>
-            <label className={styles.label}>Velocidad de lectura</label>
-            <div className={styles.velocidadOptions}>
+            <label id="velocidad-label" className={styles.label}>Velocidad de lectura</label>
+            <div role="group" aria-labelledby="velocidad-label" className={styles.velocidadOptions}>
               {Object.entries(VELOCIDADES).map(([key, value]) => (
                 <button
                   key={key}

@@ -1,7 +1,7 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect, useId } from 'react';
 import styles from './MecanikaFluidos.module.css';
 import {
   MeskeiaLogo,
@@ -563,14 +563,16 @@ interface SliderProps {
 }
 
 function Slider({ label, valor, min, max, step, unidad, descripcion, onChange }: SliderProps) {
+  const baseId = useId();
   const pct = ((valor - min) / (max - min)) * 100;
   return (
     <div className={styles.sliderGroup}>
-      <label className={styles.sliderLabel}>
+      <label htmlFor={baseId} className={styles.sliderLabel}>
         {label}
         <span className={styles.sliderValor}>{valor} {unidad}</span>
       </label>
       <input
+        id={baseId}
         type="range"
         min={min}
         max={max}

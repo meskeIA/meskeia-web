@@ -159,8 +159,8 @@ export default function CalculadoraHidratacionPage() {
           />
 
           <div className={styles.selectSection}>
-            <label className={styles.label}>Nivel de actividad física</label>
-            <div className={styles.opcionesGrid}>
+            <label id="nivel-actividad-label" className={styles.label}>Nivel de actividad física</label>
+            <div role="group" aria-labelledby="nivel-actividad-label" className={styles.opcionesGrid}>
               {(Object.entries(nivelesActividad) as [NivelActividad, FactorActividad][]).map(
                 ([key, valor]) => (
                   <button
@@ -180,8 +180,8 @@ export default function CalculadoraHidratacionPage() {
           </div>
 
           <div className={styles.selectSection}>
-            <label className={styles.label}>Clima habitual</label>
-            <div className={styles.climaGrid}>
+            <label id="clima-label" className={styles.label}>Clima habitual</label>
+            <div role="group" aria-labelledby="clima-label" className={styles.climaGrid}>
               {(Object.entries(tiposClima) as [Clima, FactorClima][]).map(([key, valor]) => (
                 <button
                   key={key}

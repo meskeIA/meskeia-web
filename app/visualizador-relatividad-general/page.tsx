@@ -216,11 +216,12 @@ export default function RelatividadGeneralPage(): React.ReactNode {
 
           {/* Control de masa */}
           <div className={styles.masaControl}>
-            <label className={styles.masaLabel}>
+            <label htmlFor="masa-objeto" className={styles.masaLabel}>
               Masa del objeto:{' '}
               <strong>{NOMBRES_MASA[masa - 1]}</strong>
             </label>
             <input
+              id="masa-objeto"
               type="range"
               min={1}
               max={8}

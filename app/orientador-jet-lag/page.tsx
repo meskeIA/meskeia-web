@@ -198,11 +198,12 @@ export default function SimuladorJetLagPage() {
           <h2 className={styles.panelTitle}>Configura tu vuelo</h2>
 
           <div className={styles.selectGroup}>
-            <label className={styles.selectLabel}>
+            <label htmlFor="ciudad-origen" className={styles.selectLabel}>
               <span className={styles.selectIcon}>🛫</span>
               Ciudad de origen
             </label>
             <select
+              id="ciudad-origen"
               className={styles.select}
               value={origenIdx}
               onChange={(e) => setOrigenIdx(Number(e.target.value))}
@@ -219,11 +220,12 @@ export default function SimuladorJetLagPage() {
           <div className={styles.flechaViaje} aria-hidden="true">✈️</div>
 
           <div className={styles.selectGroup}>
-            <label className={styles.selectLabel}>
+            <label htmlFor="ciudad-destino" className={styles.selectLabel}>
               <span className={styles.selectIcon}>🛬</span>
               Ciudad de destino
             </label>
             <select
+              id="ciudad-destino"
               className={styles.select}
               value={destinoIdx}
               onChange={(e) => setDestinoIdx(Number(e.target.value))}

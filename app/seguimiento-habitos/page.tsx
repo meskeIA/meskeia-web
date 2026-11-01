@@ -752,8 +752,9 @@ export default function SeguimientoHabitosPage() {
             </div>
 
             <div className={styles.formGroup}>
-              <label className={styles.formLabel}>Nombre del hábito *</label>
+              <label htmlFor="nombre-habito" className={styles.formLabel}>Nombre del hábito *</label>
               <input
+                id="nombre-habito"
                 type="text"
                 className={styles.formInput}
                 value={formNombre}
@@ -764,8 +765,8 @@ export default function SeguimientoHabitosPage() {
             </div>
 
             <div className={styles.formGroup}>
-              <label className={styles.formLabel}>Icono</label>
-              <div className={styles.iconosGrid}>
+              <label id="icono-label" className={styles.formLabel}>Icono</label>
+              <div role="group" aria-labelledby="icono-label" className={styles.iconosGrid}>
                 {ICONOS_SUGERIDOS.map(icono => (
                   <button
                     key={icono}
@@ -781,8 +782,8 @@ export default function SeguimientoHabitosPage() {
             </div>
 
             <div className={styles.formGroup}>
-              <label className={styles.formLabel}>Color</label>
-              <div className={styles.coloresGrid}>
+              <label id="color-label" className={styles.formLabel}>Color</label>
+              <div role="group" aria-labelledby="color-label" className={styles.coloresGrid}>
                 {COLORES.map(color => (
                   <button
                     key={color}
@@ -797,8 +798,8 @@ export default function SeguimientoHabitosPage() {
             </div>
 
             <div className={styles.formGroup}>
-              <label className={styles.formLabel}>Categoría</label>
-              <div className={styles.categoriasGrid}>
+              <label id="categoria-label" className={styles.formLabel}>Categoría</label>
+              <div role="group" aria-labelledby="categoria-label" className={styles.categoriasGrid}>
                 {CATEGORIAS.map(cat => (
                   <button
                     key={cat.id}
@@ -814,8 +815,8 @@ export default function SeguimientoHabitosPage() {
             </div>
 
             <div className={styles.formGroup}>
-              <label className={styles.formLabel}>Tipo de hábito</label>
-              <div className={styles.tipoGrid}>
+              <label id="tipo-habito-label" className={styles.formLabel}>Tipo de hábito</label>
+              <div role="group" aria-labelledby="tipo-habito-label" className={styles.tipoGrid}>
                 <button
                   type="button"
                   className={`${styles.tipoBtn} ${formTipo === 'construir' ? styles.tipoSeleccionado : ''}`}
@@ -838,8 +839,8 @@ export default function SeguimientoHabitosPage() {
             </div>
 
             <div className={styles.formGroup}>
-              <label className={styles.formLabel}>Frecuencia</label>
-              <div className={styles.frecuenciaGrid}>
+              <label id="frecuencia-label" className={styles.formLabel}>Frecuencia</label>
+              <div role="group" aria-labelledby="frecuencia-label" className={styles.frecuenciaGrid}>
                 <button
                   type="button"
                   className={`${styles.frecuenciaBtn} ${formFrecuencia === 'diario' ? styles.frecuenciaSeleccionada : ''}`}

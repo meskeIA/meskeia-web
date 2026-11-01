@@ -424,10 +424,11 @@ function SeccionRebano() {
       {/* Slider vacunación */}
       <div className={styles.sliderZona}>
         <div className={styles.sliderHeader}>
-          <label className={styles.sliderLabel}>Población vacunada</label>
+          <label htmlFor="poblacion-vacunada" className={styles.sliderLabel}>Población vacunada</label>
           <span className={styles.sliderValor}>{porcentajeVacunados}%</span>
         </div>
         <input
+          id="poblacion-vacunada"
           type="range"
           className={styles.slider}
           min={0}

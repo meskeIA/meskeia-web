@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useId } from 'react';
 import styles from './GeneradorActas.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard,
   DisclaimerCard,
@@ -111,6 +111,7 @@ export default function GeneradorActasPage() {
   const [history, setHistory] = useState<Acta[]>([]);
   const [showDrafts, setShowDrafts] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
+  const baseId = useId();
 
   // Refs
   const printRef = useRef<HTMLDivElement>(null);
@@ -439,8 +440,8 @@ export default function GeneradorActasPage() {
 
             {/* Selección de plantilla */}
             <div className={styles.templateSelector}>
-              <label className={styles.label}>Tipo de reunión</label>
-              <div className={styles.templateGrid}>
+              <label id="tipo-reunion-label" className={styles.label}>Tipo de reunión</label>
+              <div role="group" aria-labelledby="tipo-reunion-label" className={styles.templateGrid}>
                 {PLANTILLAS.map(plantilla => (
                   <button
                     key={plantilla.id}
@@ -458,8 +459,9 @@ export default function GeneradorActasPage() {
 
             <div className={styles.formGrid}>
               <div className={styles.inputGroup}>
-                <label className={styles.label}>Título del acta *</label>
+                <label htmlFor="titulo-acta" className={styles.label}>Título del acta *</label>
                 <input
+                  id="titulo-acta"
                   type="text"
                   value={acta.titulo}
                   onChange={(e) => setActa({ ...acta, titulo: e.target.value })}
@@ -469,8 +471,9 @@ export default function GeneradorActasPage() {
               </div>
 
               <div className={styles.inputGroup}>
-                <label className={styles.label}>Fecha *</label>
+                <label htmlFor="fecha-acta" className={styles.label}>Fecha *</label>
                 <input
+                  id="fecha-acta"
                   type="date"
                   value={acta.fecha}
                   onChange={(e) => setActa({ ...acta, fecha: e.target.value })}
@@ -479,8 +482,9 @@ export default function GeneradorActasPage() {
               </div>
 
               <div className={styles.inputGroup}>
-                <label className={styles.label}>Hora de inicio</label>
+                <label htmlFor="hora-inicio" className={styles.label}>Hora de inicio</label>
                 <input
+                  id="hora-inicio"
                   type="time"
                   value={acta.horaInicio}
                   onChange={(e) => setActa({ ...acta, horaInicio: e.target.value })}
@@ -489,8 +493,9 @@ export default function GeneradorActasPage() {
               </div>
 
               <div className={styles.inputGroup}>
-                <label className={styles.label}>Hora de fin</label>
+                <label htmlFor="hora-fin" className={styles.label}>Hora de fin</label>
                 <input
+                  id="hora-fin"
                   type="time"
                   value={acta.horaFin}
                   onChange={(e) => setActa({ ...acta, horaFin: e.target.value })}
@@ -499,8 +504,9 @@ export default function GeneradorActasPage() {
               </div>
 
               <div className={styles.inputGroup}>
-                <label className={styles.label}>Lugar / Enlace</label>
+                <label htmlFor="lugar" className={styles.label}>Lugar / Enlace</label>
                 <input
+                  id="lugar"
                   type="text"
                   value={acta.lugar}
                   onChange={(e) => setActa({ ...acta, lugar: e.target.value })}
@@ -510,8 +516,9 @@ export default function GeneradorActasPage() {
               </div>
 
               <div className={styles.inputGroup}>
-                <label className={styles.label}>Modalidad</label>
+                <label htmlFor="modalidad" className={styles.label}>Modalidad</label>
                 <select
+                  id="modalidad"
                   value={acta.modalidad}
                   onChange={(e) => setActa({ ...acta, modalidad: e.target.value as 'presencial' | 'virtual' | 'hibrida' })}
                   className={styles.select}
@@ -523,8 +530,9 @@ export default function GeneradorActasPage() {
               </div>
 
               <div className={styles.inputGroup}>
-                <label className={styles.label}>Convocante</label>
+                <label htmlFor="convocante" className={styles.label}>Convocante</label>
                 <input
+                  id="convocante"
                   type="text"
                   value={acta.convocante}
                   onChange={(e) => setActa({ ...acta, convocante: e.target.value })}
@@ -534,8 +542,9 @@ export default function GeneradorActasPage() {
               </div>
 
               <div className={styles.inputGroup}>
-                <label className={styles.label}>Secretario/a (redactor del acta)</label>
+                <label htmlFor="secretario" className={styles.label}>Secretario/a (redactor del acta)</label>
                 <input
+                  id="secretario"
                   type="text"
                   value={acta.secretario}
                   onChange={(e) => setActa({ ...acta, secretario: e.target.value })}
@@ -674,8 +683,9 @@ export default function GeneradorActasPage() {
                     </div>
                     <div className={styles.puntoFields}>
                       <div className={styles.inputGroup}>
-                        <label className={styles.label}>Título del punto *</label>
+                        <label htmlFor={`${baseId}-punto-titulo-${index}`} className={styles.label}>Título del punto *</label>
                         <input
+                          id={`${baseId}-punto-titulo-${index}`}
                           type="text"
                           value={punto.titulo}
                           onChange={(e) => updatePuntoOrdenDia(punto.id, 'titulo', e.target.value)}
@@ -684,8 +694,9 @@ export default function GeneradorActasPage() {
                         />
                       </div>
                       <div className={styles.inputGroup}>
-                        <label className={styles.label}>Descripción breve</label>
+                        <label htmlFor={`${baseId}-punto-descripcion-${index}`} className={styles.label}>Descripción breve</label>
                         <input
+                          id={`${baseId}-punto-descripcion-${index}`}
                           type="text"
                           value={punto.descripcion}
                           onChange={(e) => updatePuntoOrdenDia(punto.id, 'descripcion', e.target.value)}
@@ -694,8 +705,9 @@ export default function GeneradorActasPage() {
                         />
                       </div>
                       <div className={styles.inputGroup}>
-                        <label className={styles.label}>Desarrollo / Discusión</label>
+                        <label htmlFor={`${baseId}-punto-desarrollo-${index}`} className={styles.label}>Desarrollo / Discusión</label>
                         <textarea
+                          id={`${baseId}-punto-desarrollo-${index}`}
                           value={punto.desarrollo}
                           onChange={(e) => updatePuntoOrdenDia(punto.id, 'desarrollo', e.target.value)}
                           placeholder="Resumen de lo tratado, intervenciones relevantes..."
@@ -704,8 +716,9 @@ export default function GeneradorActasPage() {
                         />
                       </div>
                       <div className={styles.inputGroup}>
-                        <label className={styles.label}>Acuerdos / Decisiones</label>
+                        <label htmlFor={`${baseId}-punto-acuerdos-${index}`} className={styles.label}>Acuerdos / Decisiones</label>
                         <textarea
+                          id={`${baseId}-punto-acuerdos-${index}`}
                           value={punto.acuerdos}
                           onChange={(e) => updatePuntoOrdenDia(punto.id, 'acuerdos', e.target.value)}
                           placeholder="Decisiones tomadas, acuerdos alcanzados..."
@@ -770,8 +783,9 @@ export default function GeneradorActasPage() {
                     </div>
                     <div className={styles.tareaFields}>
                       <div className={styles.inputGroup}>
-                        <label className={styles.label}>Descripción de la tarea *</label>
+                        <label htmlFor={`${baseId}-tarea-descripcion-${index}`} className={styles.label}>Descripción de la tarea *</label>
                         <textarea
+                          id={`${baseId}-tarea-descripcion-${index}`}
                           value={tarea.descripcion}
                           onChange={(e) => updateTarea(tarea.id, 'descripcion', e.target.value)}
                           placeholder="Descripción detallada de la tarea..."
@@ -781,8 +795,9 @@ export default function GeneradorActasPage() {
                       </div>
                       <div className={styles.tareaRow}>
                         <div className={styles.inputGroup}>
-                          <label className={styles.label}>Responsable</label>
+                          <label htmlFor={`${baseId}-tarea-responsable-${index}`} className={styles.label}>Responsable</label>
                           <input
+                            id={`${baseId}-tarea-responsable-${index}`}
                             type="text"
                             value={tarea.responsable}
                             onChange={(e) => updateTarea(tarea.id, 'responsable', e.target.value)}
@@ -791,8 +806,9 @@ export default function GeneradorActasPage() {
                           />
                         </div>
                         <div className={styles.inputGroup}>
-                          <label className={styles.label}>Fecha límite</label>
+                          <label htmlFor={`${baseId}-tarea-fecha-limite-${index}`} className={styles.label}>Fecha límite</label>
                           <input
+                            id={`${baseId}-tarea-fecha-limite-${index}`}
                             type="date"
                             value={tarea.fechaLimite}
                             onChange={(e) => updateTarea(tarea.id, 'fechaLimite', e.target.value)}
@@ -800,8 +816,9 @@ export default function GeneradorActasPage() {
                           />
                         </div>
                         <div className={styles.inputGroup}>
-                          <label className={styles.label}>Prioridad</label>
+                          <label htmlFor={`${baseId}-tarea-prioridad-${index}`} className={styles.label}>Prioridad</label>
                           <select
+                            id={`${baseId}-tarea-prioridad-${index}`}
                             value={tarea.prioridad}
                             onChange={(e) => updateTarea(tarea.id, 'prioridad', e.target.value)}
                             className={styles.select}
@@ -821,8 +838,9 @@ export default function GeneradorActasPage() {
             {/* Observaciones y próxima reunión */}
             <div className={styles.extraFields}>
               <div className={styles.inputGroup}>
-                <label className={styles.label}>Observaciones generales</label>
+                <label htmlFor="observaciones" className={styles.label}>Observaciones generales</label>
                 <textarea
+                  id="observaciones"
                   value={acta.observaciones}
                   onChange={(e) => setActa({ ...acta, observaciones: e.target.value })}
                   placeholder="Notas adicionales, comentarios..."
@@ -831,8 +849,9 @@ export default function GeneradorActasPage() {
                 />
               </div>
               <div className={styles.inputGroup}>
-                <label className={styles.label}>Próxima reunión (fecha/hora tentativa)</label>
+                <label htmlFor="proxima-reunion" className={styles.label}>Próxima reunión (fecha/hora tentativa)</label>
                 <input
+                  id="proxima-reunion"
                   type="text"
                   value={acta.proximaReunion}
                   onChange={(e) => setActa({ ...acta, proximaReunion: e.target.value })}

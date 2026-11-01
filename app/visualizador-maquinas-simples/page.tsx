@@ -353,11 +353,12 @@ export default function VisualizadorMaquinasSimples() {
 
             <div className={styles.slidersPanel}>
               <div className={styles.sliderGroup}>
-                <label className={styles.sliderLabel}>
+                <label htmlFor="distancia-esfuerzo" className={styles.sliderLabel}>
                   <span>Distancia esfuerzo al fulcro</span>
                   <span className={styles.sliderValue}>{formatNumber(distEsfuerzo, 1)} m</span>
                 </label>
                 <input
+                  id="distancia-esfuerzo"
                   type="range"
                   min={1}
                   max={10}
@@ -369,11 +370,12 @@ export default function VisualizadorMaquinasSimples() {
                 />
               </div>
               <div className={styles.sliderGroup}>
-                <label className={styles.sliderLabel}>
+                <label htmlFor="distancia-carga" className={styles.sliderLabel}>
                   <span>Distancia carga al fulcro</span>
                   <span className={styles.sliderValue}>{formatNumber(distCarga, 1)} m</span>
                 </label>
                 <input
+                  id="distancia-carga"
                   type="range"
                   min={0.5}
                   max={5}
@@ -441,11 +443,12 @@ export default function VisualizadorMaquinasSimples() {
 
             <div className={styles.slidersPanel}>
               <div className={styles.sliderGroup}>
-                <label className={styles.sliderLabel}>
+                <label htmlFor="longitud-plano" className={styles.sliderLabel}>
                   <span>Longitud del plano</span>
                   <span className={styles.sliderValue}>{formatNumber(longPlano, 1)} m</span>
                 </label>
                 <input
+                  id="longitud-plano"
                   type="range"
                   min={2}
                   max={20}
@@ -457,11 +460,12 @@ export default function VisualizadorMaquinasSimples() {
                 />
               </div>
               <div className={styles.sliderGroup}>
-                <label className={styles.sliderLabel}>
+                <label htmlFor="altura-plano" className={styles.sliderLabel}>
                   <span>Altura</span>
                   <span className={styles.sliderValue}>{formatNumber(alturaPlano, 1)} m</span>
                 </label>
                 <input
+                  id="altura-plano"
                   type="range"
                   min={0.5}
                   max={5}

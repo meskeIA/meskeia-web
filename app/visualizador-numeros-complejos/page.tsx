@@ -266,16 +266,18 @@ function PlanoArgand() {
       {/* Sliders */}
       <div className={styles.slidersGrid}>
         <div className={styles.sliderItem}>
-          <label className={styles.sliderLabel}>Re(z₁): <strong>{re1.toFixed(1)}</strong></label>
+          <label htmlFor="re-z1" className={styles.sliderLabel}>Re(z₁): <strong>{re1.toFixed(1)}</strong></label>
           <input
+            id="re-z1"
             type="range" min={-4} max={4} step={0.5}
             value={re1} onChange={e => setRe1(Number(e.target.value))}
             aria-label="Parte real de z₁"
           />
         </div>
         <div className={styles.sliderItem}>
-          <label className={styles.sliderLabel}>Im(z₁): <strong>{im1.toFixed(1)}</strong></label>
+          <label htmlFor="im-z1" className={styles.sliderLabel}>Im(z₁): <strong>{im1.toFixed(1)}</strong></label>
           <input
+            id="im-z1"
             type="range" min={-4} max={4} step={0.5}
             value={im1} onChange={e => setIm1(Number(e.target.value))}
             aria-label="Parte imaginaria de z₁"
@@ -284,16 +286,18 @@ function PlanoArgand() {
         {operacion !== 'conjugado' && (
           <>
             <div className={styles.sliderItem}>
-              <label className={styles.sliderLabel}>Re(z₂): <strong>{re2.toFixed(1)}</strong></label>
+              <label htmlFor="re-z2" className={styles.sliderLabel}>Re(z₂): <strong>{re2.toFixed(1)}</strong></label>
               <input
+                id="re-z2"
                 type="range" min={-4} max={4} step={0.5}
                 value={re2} onChange={e => setRe2(Number(e.target.value))}
                 aria-label="Parte real de z₂"
               />
             </div>
             <div className={styles.sliderItem}>
-              <label className={styles.sliderLabel}>Im(z₂): <strong>{im2.toFixed(1)}</strong></label>
+              <label htmlFor="im-z2" className={styles.sliderLabel}>Im(z₂): <strong>{im2.toFixed(1)}</strong></label>
               <input
+                id="im-z2"
                 type="range" min={-4} max={4} step={0.5}
                 value={im2} onChange={e => setIm2(Number(e.target.value))}
                 aria-label="Parte imaginaria de z₂"
@@ -346,16 +350,18 @@ function FormaPolar() {
 
         <div className={styles.slidersGrid} style={{ marginTop: '16px' }}>
           <div className={styles.sliderItem}>
-            <label className={styles.sliderLabel}>Re(z): <strong>{re1.toFixed(1)}</strong></label>
+            <label htmlFor="re-z" className={styles.sliderLabel}>Re(z): <strong>{re1.toFixed(1)}</strong></label>
             <input
+              id="re-z"
               type="range" min={-4} max={4} step={0.5}
               value={re1} onChange={e => setRe1(Number(e.target.value))}
               aria-label="Parte real de z"
             />
           </div>
           <div className={styles.sliderItem}>
-            <label className={styles.sliderLabel}>Im(z): <strong>{im1.toFixed(1)}</strong></label>
+            <label htmlFor="im-z" className={styles.sliderLabel}>Im(z): <strong>{im1.toFixed(1)}</strong></label>
             <input
+              id="im-z"
               type="range" min={-4} max={4} step={0.5}
               value={im1} onChange={e => setIm1(Number(e.target.value))}
               aria-label="Parte imaginaria de z"
@@ -463,10 +469,11 @@ function CirculoEuler() {
       </div>
 
       <div className={styles.sliderItem} style={{ maxWidth: '400px', margin: '0 auto 16px' }}>
-        <label className={styles.sliderLabel}>
+        <label htmlFor="theta-euler" className={styles.sliderLabel}>
           θ = <strong>{thetaGrados.toFixed(0)}°</strong>
         </label>
         <input
+          id="theta-euler"
           type="range"
           min={0}
           max={Math.PI * 2}

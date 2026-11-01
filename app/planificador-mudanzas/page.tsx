@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useId } from 'react';
 import styles from './PlanificadorMudanzas.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection, DisclaimerCard } from '@/components';
 import { formatCurrency, formatNumber, formatDate } from '@/lib';
@@ -157,6 +157,7 @@ export default function PlanificadorMudanzasPage() {
   const [filtroFase, setFiltroFase] = useState<FaseTarea | 'todas'>('todas');
   const [filtroHabitacion, setFiltroHabitacion] = useState<HabitacionType | 'todas'>('todas');
   const [mostrarSoloLlevar, setMostrarSoloLlevar] = useState(false);
+  const baseId = useId();
 
   // ==================== EFECTOS ====================
 
@@ -481,8 +482,9 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
             )}
           </div>
           <div className={styles.fechaContainer}>
-            <label>Fecha de mudanza:</label>
+            <label htmlFor="fecha-mudanza">Fecha de mudanza:</label>
             <input
+              id="fecha-mudanza"
               type="date"
               value={datos.fechaMudanza}
               onChange={(e) => setDatos(prev => ({ ...prev, fechaMudanza: e.target.value }))}
@@ -867,8 +869,9 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
                   </div>
                   <div className={styles.gastoInputs}>
                     <div className={styles.gastoInputGroup}>
-                      <label>Estimado</label>
+                      <label htmlFor={`${baseId}-estimado-${gasto.id}`}>Estimado</label>
                       <input
+                        id={`${baseId}-estimado-${gasto.id}`}
                         type="number"
                         value={gasto.estimado || ''}
                         onChange={(e) => actualizarGasto(gasto.id, 'estimado', parseFloat(e.target.value) || 0)}
@@ -878,8 +881,9 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
                       />
                     </div>
                     <div className={styles.gastoInputGroup}>
-                      <label>Real</label>
+                      <label htmlFor={`${baseId}-real-${gasto.id}`}>Real</label>
                       <input
+                        id={`${baseId}-real-${gasto.id}`}
                         type="number"
                         value={gasto.real || ''}
                         onChange={(e) => actualizarGasto(gasto.id, 'real', parseFloat(e.target.value) || 0)}

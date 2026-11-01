@@ -156,8 +156,9 @@ export default function CalculadoraFondoEmergenciaPage() {
           />
 
           <div className={styles.selectGroup}>
-            <label className={styles.label}>Situación laboral</label>
+            <label htmlFor="situacion-laboral" className={styles.label}>Situación laboral</label>
             <select
+              id="situacion-laboral"
               value={situacionLaboral}
               onChange={(e) => setSituacionLaboral(e.target.value as SituacionLaboral)}
               className={styles.select}
@@ -170,8 +171,9 @@ export default function CalculadoraFondoEmergenciaPage() {
           </div>
 
           <div className={styles.selectGroup}>
-            <label className={styles.label}>Cargas familiares</label>
+            <label htmlFor="cargas-familiares" className={styles.label}>Cargas familiares</label>
             <select
+              id="cargas-familiares"
               value={cargasFamiliares}
               onChange={(e) => setCargasFamiliares(e.target.value as CargasFamiliares)}
               className={styles.select}

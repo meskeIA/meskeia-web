@@ -492,8 +492,8 @@ export default function TemporizadorPomodoroPage() {
 
               {/* Presets */}
               <div className={styles.presets}>
-                <label>Presets:</label>
-                <div className={styles.presetButtons}>
+                <label id="presets-label">Presets:</label>
+                <div role="group" aria-labelledby="presets-label" className={styles.presetButtons}>
                   {PRESETS.map(preset => (
                     <button
                       key={preset.name}

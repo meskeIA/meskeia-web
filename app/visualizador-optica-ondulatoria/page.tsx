@@ -173,11 +173,12 @@ function TabInterferencia() {
 
       <div className={styles.slidersGrid}>
         <div className={styles.sliderGroup}>
-          <label className={styles.sliderLabel}>
+          <label htmlFor="separacion-rendijas" className={styles.sliderLabel}>
             Separación rendijas <em>d</em>
             <span className={styles.sliderValor}>{d.toFixed(1)} mm</span>
           </label>
           <input
+            id="separacion-rendijas"
             type="range" min={0.1} max={2} step={0.1} value={d}
             onChange={e => setD(Number(e.target.value))}
             className={styles.sliderInput}
@@ -187,11 +188,12 @@ function TabInterferencia() {
           <span className={styles.sliderDesc}>Mayor d → franjas más juntas</span>
         </div>
         <div className={styles.sliderGroup}>
-          <label className={styles.sliderLabel}>
+          <label htmlFor="lambda-interferencia" className={styles.sliderLabel}>
             Longitud de onda <em>λ</em>
             <span className={styles.sliderValor} style={{ color }}>{lambda} nm ({nombreColor})</span>
           </label>
           <input
+            id="lambda-interferencia"
             type="range" min={380} max={780} step={10} value={lambda}
             onChange={e => setLambda(Number(e.target.value))}
             className={styles.sliderInputEspectro}
@@ -200,11 +202,12 @@ function TabInterferencia() {
           <span className={styles.sliderDesc}>380 nm = violeta · 780 nm = rojo</span>
         </div>
         <div className={styles.sliderGroup}>
-          <label className={styles.sliderLabel}>
+          <label htmlFor="distancia-pantalla" className={styles.sliderLabel}>
             Distancia pantalla <em>D</em>
             <span className={styles.sliderValor}>{D.toFixed(1)} m</span>
           </label>
           <input
+            id="distancia-pantalla"
             type="range" min={0.5} max={2} step={0.1} value={D}
             onChange={e => setD2(Number(e.target.value))}
             className={styles.sliderInput}
@@ -339,11 +342,12 @@ function TabDifraccion() {
 
       <div className={styles.slidersGrid}>
         <div className={styles.sliderGroup}>
-          <label className={styles.sliderLabel}>
+          <label htmlFor="apertura-rendija" className={styles.sliderLabel}>
             Apertura <em>a</em>
             <span className={styles.sliderValor}>{a.toFixed(1)} mm</span>
           </label>
           <input
+            id="apertura-rendija"
             type="range" min={0.1} max={2} step={0.1} value={a}
             onChange={e => setA(Number(e.target.value))}
             className={styles.sliderInput}
@@ -353,11 +357,12 @@ function TabDifraccion() {
           <span className={styles.sliderDesc}>Menor apertura → mayor difracción</span>
         </div>
         <div className={styles.sliderGroup}>
-          <label className={styles.sliderLabel}>
+          <label htmlFor="lambda-difraccion" className={styles.sliderLabel}>
             Longitud de onda <em>λ</em>
             <span className={styles.sliderValor} style={{ color }}>{lambda} nm ({nombreColor})</span>
           </label>
           <input
+            id="lambda-difraccion"
             type="range" min={380} max={780} step={10} value={lambda}
             onChange={e => setLambda(Number(e.target.value))}
             className={styles.sliderInputEspectro}
@@ -511,11 +516,12 @@ function TabPolarizacion() {
 
         <div className={styles.polarizacionControles}>
           <div className={styles.sliderGroup}>
-            <label className={styles.sliderLabel}>
+            <label htmlFor="angulo-analizador" className={styles.sliderLabel}>
               Ángulo analizador <em>θ</em>
               <span className={styles.sliderValor}>{angulo}°</span>
             </label>
             <input
+              id="angulo-analizador"
               type="range" min={0} max={360} step={5} value={angulo}
               onChange={e => setAngulo(Number(e.target.value))}
               className={styles.sliderInput}
@@ -632,11 +638,12 @@ function TabCoherencia() {
 
       <div className={styles.slidersGrid}>
         <div className={styles.sliderGroup} style={{ gridColumn: '1 / -1' }}>
-          <label className={styles.sliderLabel}>
+          <label htmlFor="longitud-coherencia" className={styles.sliderLabel}>
             Longitud de coherencia
             <span className={styles.sliderValor}>{longitudCoh < 1 ? `${(longitudCoh * 1000).toFixed(0)} μm` : longitudCoh < 1000 ? `${longitudCoh.toFixed(0)} mm` : `${(longitudCoh / 1000).toFixed(0)} m`}</span>
           </label>
           <input
+            id="longitud-coherencia"
             type="range" min={0.001} max={300000} step={1} value={longitudCoh}
             onChange={e => setLongitudCoh(Number(e.target.value))}
             className={styles.sliderInput}

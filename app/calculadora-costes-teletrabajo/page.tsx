@@ -104,12 +104,13 @@ export default function CalculadoraCostesTeletrabajoPage() {
           <h2 className={styles.sectionTitle}><span aria-hidden="true">🏠</span> Tu situación</h2>
 
           <div className={styles.field}>
-            <label className={styles.label}>
+            <label htmlFor="dias-teletrabajo" className={styles.label}>
               Días de teletrabajo a la semana: <strong>{diasTeletrabajo}</strong>
             </label>
             <div className={styles.sliderRow}>
               <span>0</span>
               <input
+                id="dias-teletrabajo"
                 type="range"
                 min={1}
                 max={5}
