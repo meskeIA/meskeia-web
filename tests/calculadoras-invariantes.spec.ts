@@ -1822,6 +1822,23 @@ test.describe('Golden — calcularPlusvaliasIRPF (Capa 1 · base del ahorro 2025
     expect(res.rentabilidadNetaImpuestos).toBeCloseTo(86.5, 2);
   });
 
+  test('GOLDEN-AQ: vender el MISMO día de la compra tributa igual (0 días); vender ANTES, no', () => {
+    // 01/11/2026: el motor exigía venta «posterior» y el golden C0187 (comparar_donacion_vs_herencia,
+    // que supone la compra el día 1 de su mes) caía el día 1 de cada mes. 3.700 € × 19 % = 703 €.
+    const res = calcularPlusvaliasIRPF({
+      precioCompra: 10000, precioVenta: 13700,
+      fechaCompra: '2025-03-01', fechaVenta: '2025-03-01',
+    });
+    expect(res.diasTranscurridos).toBe(0);
+    expect(res.esLargoPlazo).toBe(false);
+    expect(res.gananciaNeta).toBe(3700);
+    expect(res.cuotaIRPF).toBe(703);
+    expect(() => calcularPlusvaliasIRPF({
+      precioCompra: 10000, precioVenta: 13700,
+      fechaCompra: '2025-03-02', fechaVenta: '2025-03-01',
+    })).toThrow('no puede ser anterior');
+  });
+
 });
 
 // ────────────────────────────────────────────────────────────────────────────

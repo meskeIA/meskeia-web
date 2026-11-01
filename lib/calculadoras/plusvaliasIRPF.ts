@@ -100,7 +100,11 @@ export function calcularPlusvaliasIRPF(p: ParametrosPlusvaliasIRPF): ResultadoPl
   const fechaC = new Date(p.fechaCompra);
   const fechaV = new Date(p.fechaVenta);
   if (isNaN(fechaC.getTime()) || isNaN(fechaV.getTime())) throw new Error('Fechas no válidas. Usar formato YYYY-MM-DD.');
-  if (fechaV <= fechaC) throw new Error('La fecha de venta debe ser posterior a la de compra.');
+  // Vender el MISMO día de la compra es legítimo (intradía, o transmitir el día que se adquiere)
+  // y la ganancia no depende de las fechas. Hasta el 01/11/2026 se exigía «posterior», y
+  // compararDonacionHerencia, que supone la compra el día 1 de su mes, lanzaba este error el
+  // día 1 de cada mes con una compra del mes en curso (golden C0187).
+  if (fechaV < fechaC) throw new Error('La fecha de venta no puede ser anterior a la de compra.');
   const diasTranscurridos = Math.floor((fechaV.getTime() - fechaC.getTime()) / (1000 * 60 * 60 * 24));
   const esLargoPlazo = diasTranscurridos > 365;
 
