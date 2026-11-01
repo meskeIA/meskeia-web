@@ -205,6 +205,18 @@ import {
   ESCALA_RECARGO_EXTEMPORANEO,
 } from '../../data/fiscal';
 import { porcentajeRecargoExtemporaneo } from '../../lib/calculadoras/recargoPresentacionTardia';
+// Añadidos el 01/11/2026 (inspección de ese día): la Ley 5/2021 de Andalucía tal como la sirve
+// data/fiscal desde 219c88d0 y fd2d1281, y el motor COMPARTIDO de la plusvalía municipal, con su
+// lista de territorios forales, como oráculo de lo que la función propia de la página no hace.
+import {
+  MEJORAS_REDUCCIONES_CCAA_IS,
+  TARIFAS_PROPIAS_CCAA_ISD,
+} from '../../data/fiscal';
+import {
+  calcularPlusvaliaMunicipal as plusvaliaCompartida,
+  TERRITORIOS_IIVTNU_FORAL,
+  motivoPlusvaliaForal,
+} from '../../data/itp-ccaa';
 
 const RUTA = '/simulador-heredar-vivienda/';
 
@@ -1973,6 +1985,11 @@ test.describe('Simulador de heredar vivienda — re-inspección 02/09/2026', () 
 
     // c) La proporción de suelo se topa en 1: el método real no puede superar la ganancia
     //    total por el tipo (150.000 × 0,25 = 37.500,00 y NO 75.000,00)
+    //    ⚠️ 01/11/2026: este assert consagra el tope a 1, que el motor compartido de
+    //    data/itp-ccaa.ts dejó de aplicar con el hallazgo 900 (18/09/2026): con suelo > total
+    //    marca `parCatastralImposible` y no calcula el real. Es el hallazgo abierto ese día al
+    //    final del fichero («un suelo catastral mayor que el total…»): al repararlo, esta línea
+    //    tiene que cambiar con él. La cuota no se mueve aquí, porque gana el objetivo.
     expect(await linea(page, IIVTNU, 'Método real (suelo)')).toBe('37.500,00 €');
     // 200.000 × 0,09 × 25 % (hallazgo 1559)
     expect(await linea(page, IIVTNU, 'Método objetivo')).toBe('4500,00 €');
@@ -4136,8 +4153,8 @@ test.describe('Simulador de heredar vivienda — re-inspección 12/09/2026', () 
  * ─── Re-inspección del 14/09/2026 (la 9ª) ────────────────────────────────────
  *
  * Los siete hallazgos del 12/09 se dan por CERRADOS y quedan cercados por los tests
- * [778]-[784] de arriba; esta tanda los re-ejercita de paso y añade tres casos nuevos más
- * ocho hallazgos abiertos.
+ * [778]-[784] de arriba; esta tanda los re-ejercitó de paso, añadió tres casos nuevos y abrió
+ * ocho hallazgos, REPARADOS el 15/09/2026 (ver abajo).
  *
  * Los tres casos, resueltos A MANO antes de abrir el navegador (la aritmética completa va
  * en el comentario de cada uno), y ninguna cifra esperada de memoria: todas salen de
@@ -6166,5 +6183,319 @@ test.describe('Simulador de heredar vivienda — re-inspección 01/10/2026', () 
     expect(texto).not.toMatch(/beneficios|favorable|onerosa/i);
     // Sigue diciendo el hecho: se aplica la normativa de la comunidad del fallecido
     expect(texto).toContain('se aplica la normativa de Madrid');
+  });
+});
+
+/**
+ * ─── Inspección del 01/11/2026 ───────────────────────────────────────────────
+ *
+ * La app volvió a la cola INVALIDADA por la Ley 5/2021 de Andalucía (219c88d0 y fd2d1281: tarifa
+ * del art. 37, coeficientes del art. 38, reducciones del art. 28, vivienda habitual al 99 % con 3
+ * años del art. 27 y bonificación del 99 % del art. 39), las mejoras extremeñas (a8b28c14) y los
+ * lotes mecánicos C0296 y C0312. Todos los esperados se calcularon A MANO antes de abrir el
+ * navegador, con data/fiscal/sucesiones.ts (TARIFA_ANDALUCIA_ISD, COEFICIENTES_ANDALUCIA_ISD,
+ * MEJORAS_REDUCCIONES_CCAA_IS['andalucia'], BONIFICACIONES_CCAA_IS['andalucia']) cotejado ese día
+ * con el BOE consolidado (BOE-A-2021-17915, arts. 27, 28, 37, 38 y 39) y con el art. 20.2.c LISD
+ * (BOE-A-1987-28141: el tope de 122.606,47 € por sujeto pasivo, que el art. 27 andaluz no toca:
+ * solo cambia el porcentaje), y con data/fiscal/inmuebles.ts para el IIVTNU (`coeficienteIIVTNU`,
+ * tipo orientativo del 25 %) y la escala del ahorro.
+ *
+ * Los `test.fail()` de abajo son hallazgos ABIERTOS de esta inspección (el número lo asigna
+ * registrar.mjs): cuando se reparen pasarán a verde, y entonces hay que retirarles la marca y
+ * reescribir su comentario en pasado («REPARADO»).
+ */
+test.describe('Simulador de heredar vivienda — inspección 01/11/2026', () => {
+  /** Los datos andaluces de los que salen los esperados de los CASOS 1 y 2, tal como los da el BOE. */
+  test('data/fiscal — la Ley 5/2021 con la que se calcularon los casos de abajo', () => {
+    const mejora = MEJORAS_REDUCCIONES_CCAA_IS['andalucia'];
+    expect(mejora.parentesco.importes['II']).toBe(1000000); // art. 28.1.b
+    expect(mejora.parentesco.importes['III']).toBe(10000); // art. 28.1.c
+    expect(mejora.vivienda).toEqual({ norma: 'art. 27 Ley 5/2021 de Andalucía', porcentaje: 0.99, aniosMantenimiento: 3 });
+    const propia = TARIFAS_PROPIAS_CCAA_ISD['andalucia'];
+    expect(propia.coeficientes['II']).toEqual([1, 1, 1, 1]); // art. 38
+    expect(propia.coeficientes['III']).toEqual([1.5, 1.5, 1.5, 1.5]);
+    expect(propia.tarifa.find((t) => t.hasta === 400000)).toEqual({ hasta: 400000, cuota: 31620, tipo: 22 }); // art. 37
+    expect(propia.tarifa[propia.tarifa.length - 1]).toEqual({ hasta: Infinity, cuota: 171620, tipo: 26 });
+    expect(BONIFICACIONES_CCAA_IS['andalucia'].bonificaciones['II'].porcentaje).toBe(0.99); // art. 39
+    expect(BONIFICACIONES_CCAA_IS['andalucia'].bonificaciones['III'].porcentaje).toBe(0);
+    expect(REDUCCION_VIVIENDA_MAX_IS).toBe(122606.47); // art. 20.2.c LISD
+  });
+
+  /**
+   * CASO 1 (NORMAL) — el caso preconfigurado «Sobrino hereda piso 250k en Andalucía», la cadena
+   * entera: sobrino (Grupo III) de 40 años, 250.000 € de valor de referencia SIN vivienda habitual,
+   * compra del causante el 01/01/2005 por 120.000 €, suelo 75.000 € sobre 150.000 € de catastral
+   * total (proporción 0,5) y venta al año por 280.000 €. Patrimonio previo vacío (0 €).
+   *
+   * ISD (arts. 28, 37 y 38 de la Ley 5/2021):
+   *   250.000 + 3 % de ajuar (7.500)  = 257.500,00 de base imponible
+   *   − 10.000 (Grupo III, art. 28.1.c) = 247.500,00 de base liquidable
+   *   Tarifa andaluza, tramo que arranca en 200.000 (cuota 31.620, tipo 22 %):
+   *     31.620 + 47.500 × 22 % = 31.620 + 10.450 = 42.070,00
+   *   × 1,5 (Grupo III, art. 38, sin escalones por patrimonio) = 63.105,00
+   *   Andalucía no bonifica al Grupo III → 63.105,00 €
+   * IIVTNU de la herencia, del 01/01/2005 a hoy (≥ 20 años → 0,40):
+   *   objetivo 75.000 × 0,40 × 25 % = 7500,00 · real (250.000 − 120.000) × 0,5 × 25 % = 16.250,00
+   * Venta al año: IIVTNU 75.000 × 0,15 × 25 % = 2812,50 (real 30.000 × 0,5 × 25 % = 3750,00)
+   *   adquisición 250.000 + 63.105 + 7.500 = 320.605,00 · transmisión 280.000 − 2.812,50 = 277.187,50
+   *   → pérdida de 43.417,50 € y 0,00 € de IRPF
+   * TOTAL 63.105,00 + 7.500,00 + 2.812,50 = 73.417,50 € → 26,22 % de 280.000
+   */
+  test('CASO 1 (normal) — sobrino en Andalucía: tarifa y coeficiente propios, 63.105,00 € de ISD y 73.417,50 € en total', async ({ page }) => {
+    await abrir(page);
+    await page.getByRole('button', { name: 'Cargar caso: Sobrino hereda piso 250k en Andalucía' }).click();
+    await expect(page.locator('#ccaaSel')).toHaveValue('andalucia');
+    await expect(page.locator('#valorRef')).toHaveValue('250000');
+
+    expect(await linea(page, ISD, '= Base imponible')).toBe('257.500,00 €');
+    expect(await linea(page, ISD, '− Reducción parentesco')).toBe('−10.000,00 €');
+    expect(await linea(page, ISD, '= Base liquidable')).toBe('247.500,00 €');
+    expect(await linea(page, ISD, 'Cuota íntegra (tarifa)')).toBe('42.070,00 €');
+    expect(await linea(page, ISD, '× Coef. patrimonio (Grupo III)')).toBe('×1,5000');
+    expect(await linea(page, ISD, 'Tramo de patrimonio preexistente')).toBe('No influye en Andalucía');
+    expect(await linea(page, ISD, '= Cuota tributaria')).toBe('63.105,00 €');
+    expect(await linea(page, ISD, 'Cuota ISD final')).toBe('63.105,00 €');
+
+    expect(await page.locator('label[for="anioAdq"]').innerText()).toContain(`(${ANIO - 2005} años hasta hoy)`);
+    expect(await linea(page, IIVTNU, 'Coeficiente 20 o más años')).toBe('0,40');
+    expect(await linea(page, IIVTNU, 'Método objetivo')).toBe('7500,00 €');
+    expect(await linea(page, IIVTNU, 'Método real (suelo)')).toBe('16.250,00 €');
+    expect(await linea(page, IIVTNU, 'Cuota plusvalía municipal')).toBe('7500,00 €');
+
+    expect(await panel(page, IRPF)).toContain('coef. 0,15) −2812,50 €');
+    expect(await linea(page, IRPF, 'Valor adquisición fiscal*')).toBe('320.605,00 €');
+    expect(await linea(page, IRPF, '= Valor de transmisión**')).toBe('277.187,50 €');
+    expect(await linea(page, IRPF, 'Pérdida patrimonial')).toBe('−43.417,50 €');
+    expect(await linea(page, IRPF, 'Cuota IRPF venta')).toBe('0,00 €');
+
+    const total = await bloqueTotal(page);
+    expect(total).toContain('= TOTAL 73.417,50 €');
+    expect(total).toContain('26,22 %');
+  });
+
+  /**
+   * CASO 2 (LÍMITE) — hijo de 45 años que hereda la VIVIENDA HABITUAL en Andalucía por el máximo
+   * del deslizador (2.000.000 €): la base liquidable pasa de 800.000 € y entra en el tramo más alto
+   * de la tarifa andaluza (26 %, art. 37), y la venta cerca la frontera de los 3 años del art.
+   * 27.2.b. Resto de fábrica: compra del 01/01/1995 por 80.000 €, suelo 60.000 € sobre 120.000 €.
+   *
+   *   2.000.000 + 3 % de ajuar (60.000) = 2.060.000,00 de base imponible
+   *   − 1.000.000 (Grupo II, art. 28.1.b) − 122.606,47 (vivienda: el 99 % de 2.000.000 son
+   *     1.980.000, topados en los 122.606,47 € del art. 20.2.c LISD)
+   *   = 937.393,53 de base liquidable
+   *   Cuota íntegra: 171.620 + 137.393,53 × 26 % = 171.620 + 35.722,32 = 207.342,32
+   *   × 1,0 (art. 38) = 207.342,32 · bonificación del 99 % (art. 39) = 205.268,90 → 2073,42 €
+   *   IIVTNU (≥ 20 años, 0,40): 60.000 × 0,40 × 25 % = 6000,00 · TOTAL sin venta 8073,42 €
+   *
+   * Sin la reducción de vivienda: base liquidable 1.060.000,00 → 171.620 + 260.000 × 26 % =
+   *   239.220,00 → − 99 % (236.827,80) = 2392,20 €. Lo que la reducción ahorró: 318,78 €.
+   *   Venta a los 2 años (< 3) por 250.000 €: se regularizan 318,78 €; la plusvalía de la venta no
+   *   está sujeta (250.000 < 2.000.000) y hay pérdida → TOTAL 8392,20 € (3,36 % de 250.000).
+   *   Venta a los 3 años: ya no se pierde → TOTAL 8073,42 € (3,23 %).
+   */
+  test('CASO 2 (límite) — hijo con vivienda habitual de 2.000.000 € en Andalucía: tramo del 26 %, 2073,42 € y la frontera de los 3 años', async ({ page }) => {
+    await abrir(page);
+    await page.selectOption('#parentescoSel', 'hijo');
+    await page.selectOption('#ccaaSel', 'andalucia');
+    await casilla(page, 'viviendaHabitual', true);
+    await mover(page, 'edadHer', 45);
+    await mover(page, 'anioAdq', 1995);
+    await page.selectOption('#mesAdq', '1');
+    await page.selectOption('#diaAdq', '1');
+    await mover(page, 'valorAdq', 80000);
+    await mover(page, 'valorRef', 2000000);
+    await mover(page, 'valorSuelo', 60000);
+    await mover(page, 'valorCatastralTotal', 120000);
+    await mover(page, 'aniosVenta', 0);
+
+    const isd = await panel(page, ISD);
+    expect(isd).toContain('= Base imponible 2.060.000,00 €');
+    expect(isd).toContain('− Reducción parentesco −1.000.000,00 €');
+    expect(isd).toContain('− Reducción vivienda habitual (99 %) −122.606,47 €');
+    expect(isd).toContain('= Base liquidable 937.393,53 €');
+    expect(isd).toContain('Cuota íntegra (tarifa) 207.342,32 €');
+    expect(isd).toContain('× Coef. patrimonio (Grupo II) ×1,0000');
+    expect(isd).toContain('− Bonificación CCAA (99,0 %) −205.268,90 €');
+    expect(isd).toContain('Cuota ISD final 2073,42 €');
+    expect(await linea(page, IIVTNU, 'Cuota plusvalía municipal')).toBe('6000,00 €');
+    expect(await bloqueTotal(page)).toContain('= TOTAL 8073,42 €');
+
+    await mover(page, 'aniosVenta', 2);
+    await mover(page, 'valorVta', 250000);
+    const aviso = await panel(page, ISD);
+    expect(aviso).toContain('vendes a los 2 años y el art. 27 Ley 5/2021 de Andalucía exige mantenerla 3 años');
+    expect(aviso).toContain('ingresar los 318,78 €');
+    const dentro = await bloqueTotal(page);
+    expect(dentro).toContain('+ ISD regularizado (venta antes de 3 años) 318,78 €');
+    expect(dentro).toContain('= TOTAL 8392,20 €');
+    expect(dentro).toContain('3,36 %');
+
+    await mover(page, 'aniosVenta', 3);
+    expect(await panel(page, ISD)).not.toContain('Pierdes la reducción');
+    const fuera = await bloqueTotal(page);
+    expect(fuera).not.toContain('ISD regularizado');
+    expect(fuera).toContain('= TOTAL 8073,42 €');
+    expect(fuera).toContain('3,23 %');
+  });
+
+  /**
+   * CASO 3 (RECHAZO) — ✗ ABIERTO (inspección 01/11/2026, cabo C0192): en territorio foral la
+   * plusvalía municipal NO se liquida con el TRLRHL, y la app tiene que decir por qué.
+   *
+   * data/itp-ccaa.ts, `TERRITORIOS_IIVTNU_FORAL` = País Vasco y Navarra: el art. 1.2 TRLRHL deja
+   * a salvo sus regímenes forales, y el usuario decidió el 10/10/2026 (hallazgo 3071) que allí la
+   * plusvalía no se calcula y se dice el motivo (`motivoPlusvaliaForal`: «… se rige por la Ley
+   * Foral 2/1995 de Haciendas Locales de Navarra, que esta herramienta no aplica»). Con la casilla
+   * «Era vivienda habitual del fallecido» marcada, el piso está por fuerza en la comunidad donde
+   * residía el causante, que es la del selector.
+   *
+   * Hijo de 45 años, valores de fábrica (compra del 01/01/1995 por 80.000 €, suelo 60.000 € sobre
+   * 120.000 €, valor de referencia 200.000 €), sin venta: en Madrid la plusvalía es 60.000 × 0,40 ×
+   * 25 % = 6000,00 € —el control—, y en Navarra y en el País Vasco la página da LA MISMA cifra, con
+   * los coeficientes del art. 107.4 TRLRHL, en vez de abstenerse.
+   */
+  test.fail('CASO 3 (rechazo) — ABIERTO: en Navarra y el País Vasco la plusvalía municipal no se calcula con el TRLRHL, y se dice por qué', async ({ page }) => {
+    // Lo que declara data/itp-ccaa.ts (pasa hoy): esos son los territorios forales y su motivo.
+    expect([...TERRITORIOS_IIVTNU_FORAL].sort()).toEqual(['navarra', 'pais-vasco']);
+    expect(motivoPlusvaliaForal('navarra')).toContain('Ley Foral 2/1995');
+
+    await abrir(page);
+    await page.selectOption('#parentescoSel', 'hijo');
+    await casilla(page, 'viviendaHabitual', true);
+    await mover(page, 'edadHer', 45);
+    await mover(page, 'anioAdq', 1995);
+    await mover(page, 'valorAdq', 80000);
+    await mover(page, 'valorRef', 200000);
+    await mover(page, 'valorSuelo', 60000);
+    await mover(page, 'valorCatastralTotal', 120000);
+    await mover(page, 'aniosVenta', 0);
+    await page.selectOption('#ccaaSel', 'madrid');
+    expect(await linea(page, IIVTNU, 'Cuota plusvalía municipal')).toBe('6000,00 €');
+
+    await page.selectOption('#ccaaSel', 'navarra');
+    const navarra = (await page.locator('main').innerText()).replace(/\s+/g, ' ');
+    expect(navarra).toContain('Ley Foral 2/1995');
+    expect(navarra).not.toContain('Cuota plusvalía municipal 6000,00 €');
+    expect(navarra).not.toContain('Plusvalía municipal (herencia) 6000,00 €');
+
+    await page.selectOption('#ccaaSel', 'pais-vasco');
+    const vasco = (await page.locator('main').innerText()).replace(/\s+/g, ' ');
+    expect(vasco).toContain('territorio histórico');
+    expect(vasco).not.toContain('Cuota plusvalía municipal 6000,00 €');
+  });
+
+  /**
+   * ✗ ABIERTO (inspección 01/11/2026, cálculo, cabo C0192) — la función propia
+   * `calcularPlusvaliaMunicipal` de page.tsx no tiene la guarda del par catastral IMPOSIBLE que sí
+   * tiene la compartida de data/itp-ccaa.ts (hallazgo 900, 18/09/2026): el valor catastral total
+   * incluye el del suelo, así que un suelo MAYOR que el total no describe ningún inmueble —es el
+   * despiste de intercambiar dos campos seguidos del recibo del IBI—. La página lo convierte, con
+   * `Math.min(1, suelo / total)`, en «todo es suelo» y liquida el método real sin avisar.
+   *
+   * Madrid, suelo 100.000 € sobre 50.000 € de total, compra del 01/01/1995 por 190.000 €, valor de
+   * referencia 200.000 €: objetivo 100.000 × 0,40 × 25 % = 10.000,00 €; la página saca el real con
+   * proporción 1 —(200.000 − 190.000) × 1 × 25 % = 2500,00 €— y lo elige como «Real (menor)». El
+   * motor compartido, con los mismos datos, marca `parCatastralImposible`, no calcula el real y se
+   * queda en el objetivo. Lo esperado: el par se rechaza con un aviso y el real no se liquida con él.
+   */
+  test.fail('ABIERTO — un suelo catastral mayor que el total no se liquida por el método real como si todo fuera suelo', async ({ page }) => {
+    const oraculo = plusvaliaCompartida({
+      valorCatastralSuelo: 100000,
+      valorCatastralTotal: 50000,
+      aniosPropiedad: 20,
+      precioCompra: 190000,
+      precioVenta: 200000,
+    });
+    expect(oraculo.parCatastralImposible).toBe(true);
+    expect(oraculo.metodoRealDisponible).toBe(false);
+    expect(oraculo.recomendado).toBeCloseTo(10000, 2);
+
+    await abrir(page);
+    await page.selectOption('#ccaaSel', 'madrid');
+    await mover(page, 'anioAdq', 1995);
+    await mover(page, 'valorRef', 200000);
+    await mover(page, 'valorAdq', 190000);
+    await mover(page, 'valorSuelo', 100000);
+    await mover(page, 'valorCatastralTotal', 50000);
+    expect(await linea(page, IIVTNU, 'Método objetivo')).toBe('10.000,00 €');
+    expect(await linea(page, IIVTNU, 'Método elegido')).not.toBe('Real (menor)');
+    expect(await linea(page, IIVTNU, 'Cuota plusvalía municipal')).not.toBe('2500,00 €');
+  });
+
+  /**
+   * ✗ ABIERTO (inspección 01/11/2026, contenido, bajo) — «1 años». Con un año hasta la venta, que es
+   * lo que carga el caso preconfigurado de Andalucía, la página escribe el plural a pelo en cuatro
+   * sitios: «Años hasta la venta tras heredar: 1 años», «Venta a los 1 años», «(1 años, coef.
+   * 0,15)» y «son 1 años de tenencia». `textoTenencia` ya resuelve el singular para la tenencia del
+   * causante; las frases de la venta no lo usan.
+   */
+  test.fail('ABIERTO — con un año hasta la venta no se escribe «1 años»', async ({ page }) => {
+    await abrir(page);
+    await page.getByRole('button', { name: 'Cargar caso: Sobrino hereda piso 250k en Andalucía' }).click();
+    await expect(page.locator('#aniosVenta')).toHaveValue('1');
+    const principal = (await page.locator('main').innerText()).replace(/\s+/g, ' ');
+    expect(principal.match(/(^|[^\d])1 años/g) ?? []).toEqual([]);
+  });
+
+  /**
+   * ✗ ABIERTO (inspección 01/11/2026, contenido, bajo) — el faqJsonLd dice que el método objetivo
+   * es «valor catastral × coeficiente × tipo». La base es el valor catastral del SUELO: lo dice
+   * data/fiscal/inmuebles.ts junto a la tabla del art. 107.4 («Base imponible = Valor catastral del
+   * suelo × coeficiente»), la tabla educativa de la propia página («valor catastral suelo ×
+   * coef.») y el motor, que multiplica `valorCatastralSuelo`. Quien la aplique con el valor
+   * catastral del recibo entero —lo que entiende un asistente de IA con esa frase— la multiplica
+   * por el inverso de la proporción de suelo: con los valores de fábrica (60.000 de 120.000), el
+   * doble.
+   */
+  test.fail('ABIERTO — el faqJsonLd dice que el método objetivo va sobre el valor catastral del suelo', async ({ page }) => {
+    await abrir(page);
+    const pregunta = (await faqServida(page)).find((p) => p.name.startsWith('¿Cómo se calcula la plusvalía municipal'));
+    expect(pregunta, 'la pregunta sigue en el FAQPage').toBeDefined();
+    expect(pregunta?.acceptedAnswer.text ?? '').toMatch(/método objetivo \(valor catastral del (suelo|terreno)/);
+  });
+
+  /**
+   * ✗ ABIERTO (inspección 01/11/2026, contenido, bajo) — la tarjeta «Hijo hereda piso vivienda
+   * habitual del padre» da como LAS reducciones del hijo las estatales («Reducción de parentesco
+   * (15.956,87 €) + reducción vivienda habitual del 95 %») y en la frase siguiente pone a Andalucía
+   * y a Extremadura entre las comunidades donde «el ISD se queda en casi nada». En las dos la app
+   * aplica otra cosa: Andalucía 1.000.000 € y el 99 % (arts. 28 y 27 Ley 5/2021, CASO 2 de arriba),
+   * Extremadura 500.000 € (art. 17 DLeg 1/2018). Es la forma del hallazgo 1179 —una cifra estatal
+   * prometida como universal en texto fijo—, que la tarjeta de buenas prácticas resolvió diciendo
+   * «según el tope estatal, que cada comunidad autónoma puede mejorar».
+   */
+  test.fail('ABIERTO — la tarjeta del hijo no presenta las reducciones estatales como las de Andalucía', async ({ page }) => {
+    await abrir(page);
+    const tarjeta = page.locator('h4', { hasText: 'Hijo hereda piso vivienda habitual del padre' }).locator('xpath=..');
+    // `textContent` y no `innerText`: <EducationalSection> oculta su contenido por CSS
+    const texto = ((await tarjeta.textContent()) ?? '').replace(/\s+/g, ' ');
+    const citaAndalucia = texto.includes('Andalucía');
+    expect(
+      !citaAndalucia || /estatal|1\.000\.000/.test(texto),
+      'cita a Andalucía junto a las reducciones estatales, como si fueran las suyas',
+    ).toBe(true);
+  });
+
+  /**
+   * ✗ ABIERTO (inspección 01/11/2026, contenido, bajo, cabo C0102) — el `featureList` del
+   * WebApplication tiene 9 entradas (§1.ter: de 4 a 8). Dos no son características («Solo
+   * orientativo — consulta con notario y asesor fiscal» y «En español») y una cita como fuente de
+   * la plusvalía el RDL 26/2021, cuando data/fiscal sirve los coeficientes en la redacción del art.
+   * 24 del RDL 8/2023 (`PLUSVALIA_MUNICIPAL_META.baseNormativa`, hallazgos 1559 y 1560) y el pie
+   * de la propia página lo cita así.
+   */
+  test.fail('ABIERTO — el featureList tiene de 4 a 8 características y no da el RDL 26/2021 como fuente de la plusvalía', async ({ page }) => {
+    expect(PLUSVALIA_MUNICIPAL_META.baseNormativa).toContain('RDL 8/2023');
+    await abrir(page);
+    const lista = await page.evaluate(() => {
+      for (const s of document.querySelectorAll('script[type="application/ld+json"]')) {
+        const o = JSON.parse(s.textContent ?? '{}') as { '@type'?: string; featureList?: string[] };
+        if (o['@type'] === 'WebApplication') return o.featureList ?? [];
+      }
+      return [] as string[];
+    });
+    expect(lista.length).toBeGreaterThanOrEqual(4);
+    expect(lista.length).toBeLessThanOrEqual(8);
+    expect(lista.join(' | ')).not.toContain('RDL 26/2021');
   });
 });

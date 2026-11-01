@@ -548,7 +548,7 @@ async function contrasteDe(page: Page, selector: string): Promise<number> {
   });
 }
 
-test.describe('Inspección 24/09/2026 — casos para clase contra el modelo, límites y hallazgos abiertos', () => {
+test.describe('Inspección 24/09/2026 — casos para clase contra el modelo, límites y hallazgos 1607-1613 (reparados)', () => {
   const seccion = (page: Page) => page.locator('section[aria-labelledby="aula-titulo"]');
 
   test.beforeEach(async ({ page }) => {
@@ -1196,5 +1196,393 @@ test.describe('Inspector 30/09/2026 — móvil 390×844', () => {
     // fuera, el emoji 41 px fuera y «Águilas, halcones» y «5 ind. rel.» 2 px mordidos por el borde.
     // Ahora la pirámide mide 276 px y la cima el 52 %, 144 px.
     await comprobarPiramide(page);
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════════
+ * Inspector 01/11/2026 — RE-inspección por el cabo C0079 y por los cambios posteriores a
+ * 5262f423: 4fc83bcd (14/10: «Ver pista» y «Ver por qué pasa» en su <span>), 48639006 (C0312:
+ * el «+» del delta y « de la energía fijada» en un <span> siempre montado), 8d859faf (C0438, en
+ * DescubreVertical, que monta LegalNotice) y d114e3d8 (C0296: la viñeta ámbar de los errores
+ * frecuentes). Los tests de arriba siguen en verde: 1607-1613 y 2477-2482 están en pie, y los
+ * lotes no movieron una cifra ni tumban la página traducida (test «lotes» de abajo).
+ *
+ * Resuelto A MANO con las fórmulas de motor.ts ANTES de abrir el navegador
+ * (arriba f_i = 0,3 + 0,7 × f_{i−1}; abajo f_i = 1 + 0,7 × (1 − f_{i+1})):
+ *
+ *   CASO 1 (normal) · Sabana [100, 42, 16, 6] + Caza excesiva del depredador al 40 %
+ *     cambio = −0,7 × 0,4 = −0,28 en los carnívoros (nivel 2)
+ *       carnívoros   16 × 0,72                                  = 11,52   → «12 (-4)»
+ *       superdep.     6 × (0,3 + 0,7 × 0,72) = 6 × 0,804        =  4,824  → «5 (-1)»
+ *       herbívoros   42 × (1 + 0,7 × 0,28)  = 42 × 1,196       = 50,232  → «50 (+8)»
+ *       productores 100 × (1 + 0,7 × (1 − 1,196)) = 100 × 0,8628 = 86,28  → «86 (-14)»
+ *       panel: 13,72 → 14 % · 19,6 → 20 % · 28 % · 19,6 → 20 %
+ *
+ *   CASO 2 (límite, móvil 390 px, con el dedo) · Sabana + Caza al 100 % tocando el extremo
+ *     derecho del deslizador: cambio −0,7 → carnívoros 16 × 0,3 = 4,8 → SUELO max(5, …) = 5
+ *       superdep.     6 × (0,3 + 0,7 × 5/16)  = 6 × 0,51875    = 3,1125  → «3 (-3)»
+ *       herbívoros   42 × (1 + 0,7 × 11/16)   = 42 × 1,48125  = 62,2125 → «62 (+20)»
+ *       productores 100 × (1 + 0,7 × (1 − 1,48125))            = 66,3125 → «66 (-34)»
+ *       panel: 33,6875 → 34 % · 48,125 → 48 % · 68,75 → 69 % · 48,125 → 48 %
+ *     Sin el suelo (4,8) saldrían 63 herbívoros y un 49 %: el caso distingue que el suelo muerde.
+ *     Tocando el extremo izquierdo, 0 % → la Sabana de partida 100 · 42 · 16 · 6, sin deltas.
+ *
+ *   CASO 3 (debe rechazarse) · Caso 10 para clase: Océano [100, 38, 14, 5] + Caza al 70 %,
+ *     ¿productores o herbívoros? cambio −0,49 → carnívoros 14 × 0,51 = 7,14 «7» (−49 %);
+ *     herbívoros 38 × 1,343 = 51,034 «51» (+34,3 %); productores 100 × (1 − 0,7 × 0,343) = 75,99
+ *     «76» (−24,01 %); superdep. 5 × 0,657 = 3,285 «3» (−34,3 %). Cambian más los herbívoros: la
+ *     respuesta cercana «Los productores» se rechaza, y al cargarlo el panel da 24 · 34 · 49 · 34 %.
+ *
+ * Los tres dieron en el navegador exactamente lo calculado.
+ *
+ * CABO C0079: la tundra ya no tiene al oso polar (5262f423) y la pregunta 1 del FAQPage ya no
+ * cuenta a los descomponedores como nivel: los vigila el test «sospecha del 30/09». El paso 5
+ * («bosques templados más resilientes que la tundra ártica») sigue sin fuente, pero no contradice
+ * nada de la página y la propia frase da el porqué (reproducción, conectividad): no es hallazgo.
+ * Lo que queda de la parte 3 está en la página visible (hallazgo de los descomponedores, abajo).
+ *
+ * HALLAZGOS ABIERTOS el 01/11/2026, cada uno con test.fail() comprobado en rojo sin la marca:
+ *   · contenido, medio — en el bosque, los osos comen lobos, linces y búhos (pirámide y caso 5).
+ *   · contenido, bajo  — los descomponedores, «nivel trófico oculto» en la página y «no ocupan un
+ *     escalón» en el FAQPage.
+ *   · contenido, medio — dos preguntas del FAQPage repiten la FAQ visible con otra respuesta.
+ *   · accesibilidad, bajo — el deslizador anuncia «0.4», no «40 %».
+ *   · operativa, medio — página traducida: pirámide, barras y etiqueta con la cifra vieja.
+ *   · operativa, medio — página traducida: ficha, situación de partida y veredicto de los casos.
+ * ═══════════════════════════════════════════════════════════════════════════════════════════ */
+
+import { type Locator } from '@playwright/test';
+import { asentarAntesDeTraducir, esperarValorEnReact } from './_hidratacion';
+
+const enEscalon = (page: Page, i: number): Locator =>
+  page.locator('[role="list"][aria-label="Pirámide trófica"] [role="listitem"]').nth(i);
+
+/** Lo que se VE (innerText) de las cuatro cifras de las barras, de productores a superdepredadores. */
+async function cifrasVisibles(page: Page): Promise<string[]> {
+  return page.locator('[class*="barraValor"]').evaluateAll((es) => es.map((e) => (e as HTMLElement).innerText.trim()));
+}
+
+/** Lo que se VE de la población en cada escalón de la pirámide, de la cima a la base. */
+async function piramideVisible(page: Page): Promise<string[]> {
+  return page
+    .locator('[role="listitem"] [class*="nivelPob"]')
+    .evaluateAll((es) => es.map((e) => (e as HTMLElement).innerText.trim()));
+}
+
+test.describe('Inspector 01/11/2026 — escritorio', () => {
+  const seccion = (page: Page) => page.locator('section[aria-labelledby="aula-titulo"]');
+
+  test.beforeEach(async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['section[aria-labelledby="aula-titulo"] input[type="radio"]']);
+    await page.addStyleTag({ content: '*{transition:none !important}' });
+  });
+
+  test('CASO 1 · sabana + caza al 40 %: 86 / 50 / 12 / 5 y el panel 14 · 20 · 28 · 20 %', async ({ page }) => {
+    await ponerEscenario(page, 'Sabana', 'Caza excesiva del depredador', '0.4');
+    // Cabecera de este bloque, CASO 1: 86,28 · 50,232 · 11,52 · 4,824.
+    expect((await leerBarras(page)).map((b) => b.valor)).toEqual([86, 50, 12, 5]);
+    // innerText, no solo textContent: el «+» vive desde 48639006 en su propio <span> (C0312) y
+    // tiene que verse pegado a la cifra, «(+8)».
+    expect(await cifrasVisibles(page)).toEqual(['86 (-14)', '50 (+8)', '12 (-4)', '5 (-1)']);
+    expect(await piramideVisible(page)).toEqual(['5 ind. rel.', '12 ind. rel.', '50 ind. rel.', '86 ind. rel.']);
+    await expect(enEscalon(page, 0)).toContainText('Leones, cocodrilos');
+    await expect(page.locator('[role="status"]')).toContainText(
+      'La caza ilegal reduce la población de carnívoros. Los productores se han reducido un 14 %, los herbívoros han aumentado un 20 %, los carnívoros se han reducido un 28 % y los superdepredadores un 20 %.'
+    );
+    // La leyenda de la energía, tal como se ve (el « de la energía fijada» también va en su <span>).
+    // `\s` casa también con el espacio duro: se compara con los espacios normalizados.
+    const leyenda = await page
+      .locator('[class*="leyendaLinea"]')
+      .evaluateAll((es) => es.map((e) => (e as HTMLElement).innerText.replace(/\s+/g, ' ').trim()));
+    expect(leyenda).toEqual(['Productores: 100 % de la energía fijada', 'Herbívoros: 10 %', 'Carnívoros: 1 %', 'Superdepredadores: 0,1 %']);
+  });
+
+  test('CASO 3 · caso 10: «Los productores» se rechaza y, cargado, el panel da 24 % frente a 34 %', async ({ page }) => {
+    await seccion(page).getByRole('button', { name: /^Caso 10:/ }).click();
+    await seccion(page).getByRole('radio', { name: 'Los productores', exact: true }).check();
+    await seccion(page).getByRole('button', { name: 'Comprobar' }).click();
+    // Cabecera, CASO 3: productores −24,01 %, herbívoros +34,3 % → cambian más los herbívoros.
+    await expect(seccion(page).getByRole('alert')).toContainText(
+      'No. Predijiste «Los productores» y la respuesta es «Los herbívoros».'
+    );
+    await expect(page.locator('p', { hasText: 'Casos comprobados:' })).toContainText('1 de 12 · aciertos: 0');
+    await seccion(page).getByRole('button', { name: /Cargar en el simulador/ }).click();
+    await expect(page.locator('label[for="slider-intensidad"]')).toContainText('70 %');
+    expect((await leerBarras(page)).map((b) => b.texto)).toEqual(['76 (-24)', '51 (+13)', '7 (-7)', '3 (-2)']);
+    await expect(page.locator('[role="status"]')).toContainText(
+      'Los productores se han reducido un 24 %, los herbívoros han aumentado un 34 %, los carnívoros se han reducido un 49 % y los superdepredadores un 34 %.'
+    );
+  });
+
+  test('ABIERTO (contenido, medio) · en el bosque, los superdepredadores no comen a los lobos: la tabla los pone en la cima', async ({ page }) => {
+    test.fail();
+    // Hallazgo del 01/11/2026. Caso: Bosque Templado → la pirámide pone «Osos, águilas reales» como
+    // superdepredadores encima de «Lobos, linces, búhos», y el caso 5 lo explica así: «Los
+    // superdepredadores se alimentan de los carnívoros: con menos alimento, bajan de 4 a 3». La
+    // tabla comparativa de la misma página da el «Lobo gris» como depredador tope del bosque
+    // templado. Esperado: la cima de la pirámide del bosque es la de la tabla (el lobo) y nadie
+    // pone a los osos a comer lobos.
+    await page.getByRole('group', { name: 'Seleccionar ecosistema' }).getByRole('button', { name: 'Bosque Templado', exact: true }).click();
+    const tope = (await page.locator('table tr', { hasText: 'Bosque Templado' }).locator('td').nth(3).textContent()) ?? '';
+    expect(tope.trim()).toBe('Lobo gris');
+    const cima = (await enEscalon(page, 0).locator('[class*="nivelEjemplos"]').textContent()) ?? '';
+    expect(cima, 'superdepredadores del bosque').toContain('Lobo');
+    expect(cima, 'superdepredadores del bosque').not.toContain('Osos');
+  });
+
+  test('ABIERTO (contenido, bajo) · los descomponedores no son «el nivel trófico oculto» si no ocupan un escalón', async ({ page }) => {
+    test.fail();
+    // Hallazgo del 01/11/2026, lo que quedaba de la parte 3 del cabo C0079. El FAQPage (reparado el
+    // 30/09) dice «Los descomponedores (hongos y bacterias) no ocupan un escalón de la cadena», y la
+    // sección 1 define cuatro niveles sin ellos; la lista «5 errores frecuentes» dice «Bacterias,
+    // hongos y detritívoros son el «nivel trófico oculto»». Esperado: la página no los llama nivel
+    // trófico (o lo matiza como el FAQPage).
+    const faq = await page.evaluate(() =>
+      [...document.querySelectorAll('script[type="application/ld+json"]')].map((s) => s.textContent ?? '').join(' ')
+    );
+    expect(faq).toContain('no ocupan un escalón de la cadena');
+    expect(await laPaginaDice(page, 'son el «nivel trófico oculto»'), 'son el «nivel trófico oculto»').toBe(false);
+  });
+
+  test('ABIERTO (contenido, medio) · las preguntas del FAQPage que están en la FAQ visible dicen lo mismo', async ({ page }) => {
+    test.fail();
+    // Hallazgo del 01/11/2026. «¿Qué es una cascada trófica?» y «¿Qué es una especie clave?» están en
+    // la FAQ visible y en el FAQPage con respuestas distintas; la de la cascada, con otra definición
+    // («en los niveles no adyacentes» frente a «sobre los demás niveles»). Reparación: UNA constante
+    // en metadata.ts que importen las dos bocas (como app/simulador-gastos-compraventa-garaje).
+    const normal = (t: string): string => t.replace(/\s+/g, ' ').trim();
+    const preguntas = await page.evaluate(() => {
+      const bloque = [...document.querySelectorAll('script[type="application/ld+json"]')]
+        .map((s) => JSON.parse(s.textContent ?? '{}') as { '@type'?: string; mainEntity?: { name: string; acceptedAnswer: { text: string } }[] })
+        .find((j) => j['@type'] === 'FAQPage');
+      return (bloque?.mainEntity ?? []).map((q) => ({ nombre: q.name, respuesta: q.acceptedAnswer.text }));
+    });
+    for (const tema of ['cascada trófica', 'especie clave']) {
+      const enFaqPage = preguntas.find((q) => q.nombre.includes(tema));
+      expect(enFaqPage, `FAQPage: ${tema}`).toBeDefined();
+      const visible = (await page.locator('[class*="faqItem"]', { has: page.locator('h4', { hasText: tema }) }).locator('p').first().textContent()) ?? '';
+      expect(normal(enFaqPage?.respuesta ?? ''), tema).toBe(normal(visible));
+    }
+  });
+
+  test('ABIERTO (accesibilidad, bajo) · el deslizador anuncia su valor en %, como la etiqueta', async ({ page }) => {
+    test.fail();
+    // Hallazgo del 01/11/2026. Caza al 40 %: la etiqueta dice «Intensidad de la perturbación: 40 %»,
+    // pero el aria-label sustituye a la etiqueta y el input no lleva aria-valuetext, así que el
+    // lector de pantalla anuncia el valor crudo del rango 0-1 (Chromium: valuetext «0.4»).
+    await ponerEscenario(page, 'Pradera', 'Caza excesiva del depredador', '0.4');
+    await expect(page.locator('label[for="slider-intensidad"]')).toContainText('40 %');
+    await expect(page.locator('#slider-intensidad')).toHaveAttribute('aria-valuetext', /^40[\s ]%$/);
+  });
+});
+
+test.describe('Inspector 01/11/2026 — móvil 390×844 con el dedo', () => {
+  test.use({
+    viewport: { width: 390, height: 844 },
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36',
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test.beforeEach(async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['section[aria-labelledby="aula-titulo"] input[type="radio"]']);
+    await page.addStyleTag({ content: '*{transition:none !important}' });
+  });
+
+  test('CASO 2 · sabana + caza tocando el extremo del deslizador: al 100 % el suelo de 5 muerde (66 / 62 / 5 / 3); al 0 %, el equilibrio', async ({ page }) => {
+    await page.getByRole('group', { name: 'Seleccionar ecosistema' }).getByRole('button', { name: 'Sabana', exact: true }).tap();
+    const perturbaciones = page.getByRole('group', { name: 'Seleccionar perturbación' });
+    await perturbaciones.getByRole('button', { name: 'Caza excesiva del depredador', exact: true }).tap();
+    await expect(perturbaciones.getByRole('button', { name: 'Caza excesiva del depredador', exact: true })).toHaveAttribute('aria-pressed', 'true');
+
+    // El deslizador responde al TOQUE: el extremo derecho es el 100 %, el izquierdo el 0 %.
+    const deslizador = page.locator('#slider-intensidad');
+    await deslizador.scrollIntoViewIfNeeded();
+    const caja = await deslizador.boundingBox();
+    expect(caja).not.toBeNull();
+    const y = caja!.y + caja!.height / 2;
+    await page.touchscreen.tap(caja!.x + caja!.width - 1, y);
+    await esperarValorEnReact(page, '#slider-intensidad', '1');
+    await expect(page.locator('label[for="slider-intensidad"]')).toContainText('100 %');
+    // Cabecera, CASO 2: 66,3125 · 62,2125 · 5 (suelo; 4,8 sin él) · 3,1125.
+    expect((await leerBarras(page)).map((b) => b.texto)).toEqual(['66 (-34)', '62 (+20)', '5 (-11)', '3 (-3)']);
+    await expect(page.locator('[role="status"]')).toContainText(
+      'Los productores se han reducido un 34 %, los herbívoros han aumentado un 48 %, los carnívoros se han reducido un 69 % y los superdepredadores un 48 %.'
+    );
+
+    // La pirámide y las barras, enteras dentro de los 390 px y sin scroll horizontal.
+    const fuera = await page.evaluate(() =>
+      [...document.querySelectorAll('[role="list"][aria-label="Pirámide trófica"] [role="listitem"], [class*="barraTrack"]')]
+        .map((e) => e.getBoundingClientRect())
+        .filter((r) => r.left < 0 || r.right > window.innerWidth).length
+    );
+    expect(fuera).toBe(0);
+    expect(await fueraDeSuEscalon(page)).toEqual([]);
+    const ancho = await page.evaluate(() => ({ doc: document.documentElement.scrollWidth, vista: window.innerWidth }));
+    expect(ancho.doc).toBeLessThanOrEqual(ancho.vista);
+
+    await page.touchscreen.tap(caja!.x + 1, y);
+    await esperarValorEnReact(page, '#slider-intensidad', '0');
+    await expect(page.locator('label[for="slider-intensidad"]')).toContainText('0 %');
+    expect((await leerBarras(page)).map((b) => b.texto)).toEqual(['100', '42', '16', '6']);
+    await expect(page.locator('[role="status"]')).toContainText('Con una intensidad del 0 %, el impacto en las poblaciones es mínimo.');
+  });
+});
+
+/* Página traducida: el traductor simulado de tests/apps/generador-loteria.spec.ts (cada nodo de
+ * texto a <font><font>…), que además APUNTA cada nodo que retira con su valor. Si React escribe
+ * después en uno de esos nodos, el texto se ha quedado viejo en pantalla (forma del cabo C0243). */
+interface NodoApuntado {
+  nodo: Text;
+  valor: string | null;
+  avisado: boolean;
+}
+type VentanaConTraductor = Window & { __nodosTraducidos?: NodoApuntado[] };
+
+async function traducirPagina(page: Page): Promise<void> {
+  // Antes del primer <font>, la página entera asentada (cabo C0493: ver asentarAntesDeTraducir)
+  await asentarAntesDeTraducir(page);
+  await page.evaluate(() => {
+    const w = window as VentanaConTraductor;
+    const apuntados = (w.__nodosTraducidos = w.__nodosTraducidos ?? []);
+    const caminante = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+      acceptNode: (n) => {
+        const padre = n.parentElement;
+        if (!padre || !(n.nodeValue ?? '').trim()) return NodeFilter.FILTER_REJECT;
+        if (/^(SCRIPT|STYLE|OPTION|NOSCRIPT|FONT)$/.test(padre.tagName)) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      },
+    });
+    const nodos: Text[] = [];
+    while (caminante.nextNode()) nodos.push(caminante.currentNode as Text);
+    for (const nodo of nodos) {
+      const exterior = document.createElement('font');
+      const interior = document.createElement('font');
+      interior.textContent = nodo.nodeValue;
+      exterior.appendChild(interior);
+      apuntados.push({ nodo, valor: nodo.nodeValue, avisado: false });
+      nodo.parentNode?.replaceChild(exterior, nodo);
+    }
+  });
+}
+
+async function textoViejoEnPagina(page: Page): Promise<string[]> {
+  return page.evaluate(() => {
+    const r: string[] = [];
+    for (const t of (window as VentanaConTraductor).__nodosTraducidos ?? []) {
+      if (!t.avisado && t.nodo.nodeValue !== t.valor) {
+        t.avisado = true;
+        r.push(`«${t.valor}» → «${t.nodo.nodeValue}»`);
+      }
+    }
+    return r;
+  });
+}
+
+test.describe('Inspector 01/11/2026 — página traducida', () => {
+  const seccion = (page: Page) => page.locator('section[aria-labelledby="aula-titulo"]');
+  let errores: string[] = [];
+
+  test.beforeEach(async ({ page }) => {
+    errores = [];
+    page.on('pageerror', (e) => errores.push(e.message));
+    page.on('console', (m) => {
+      if (m.type() === 'error' && /NotFoundError|insertBefore|removeChild/.test(m.text())) errores.push(m.text());
+    });
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['section[aria-labelledby="aula-titulo"] input[type="radio"]']);
+  });
+
+  /** Traduce, hace el paso y lo apunta si dejó texto viejo. */
+  async function paso(page: Page, viejos: string[], nombre: string, accion: () => Promise<void>): Promise<void> {
+    await traducirPagina(page);
+    await accion();
+    await page.waitForTimeout(150); // el commit de React tras el paso
+    for (const v of await textoViejoEnPagina(page)) viejos.push(`${nombre}: ${v}`);
+    await expect(page.getByRole('heading', { name: 'Algo salió mal' }), nombre).toHaveCount(0);
+  }
+
+  test('lotes C0312, C0438 y 4fc83bcd · traducida, nada cae y los rótulos de ayuda siguen a su estado', async ({ page }) => {
+    const viejos: string[] = [];
+    await paso(page, viejos, 'Sabana', () =>
+      page.getByRole('group', { name: 'Seleccionar ecosistema' }).getByRole('button', { name: 'Sabana', exact: true }).click()
+    );
+    await paso(page, viejos, 'Caza', () => page.getByRole('button', { name: 'Caza excesiva del depredador', exact: true }).click());
+    await paso(page, viejos, 'Plaga', () => page.getByRole('button', { name: 'Plaga de herbívoros', exact: true }).click());
+    await paso(page, viejos, 'Sin perturbación', () => page.getByRole('button', { name: 'Sin perturbación', exact: true }).click());
+    // El panel es hijo único de su <p>: sigue a la perturbación aunque la página esté traducida.
+    await expect(page.locator('[role="status"]')).toContainText('El ecosistema está en equilibrio.');
+
+    await paso(page, viejos, 'Caso 3 · Ver pista', async () => {
+      await seccion(page).getByRole('button', { name: /^Caso 3:/ }).click();
+      await seccion(page).getByRole('button', { name: /Ver pista/ }).click();
+    });
+    await expect(seccion(page).locator('[aria-controls^="aula-pista"]')).toHaveAttribute('aria-expanded', 'true');
+    await expect(seccion(page).locator('[aria-controls^="aula-pista"]')).toContainText('Ocultar pista');
+    await paso(page, viejos, 'Caso 3 · comprobar y ver por qué', async () => {
+      await seccion(page).getByRole('radio', { name: 'Sube', exact: true }).check();
+      await seccion(page).getByRole('button', { name: 'Comprobar' }).click();
+      await seccion(page).getByRole('button', { name: /Ver por qué pasa/ }).click();
+    });
+    await expect(seccion(page).locator('[aria-controls^="aula-explicacion"]')).toContainText('Ocultar la explicación');
+    expect(errores).toEqual([]);
+  });
+
+  test('ABIERTO (operativa, medio) · traducida, la pirámide, las barras y la etiqueta del deslizador siguen a la perturbación', async ({ page }) => {
+    test.fail();
+    // Hallazgo del 01/11/2026 (forma del cabo C0243). page.tsx pinta la cifra junto a otro texto
+    // en el mismo elemento: «{cifra} ind. rel.» en la pirámide, «{cifra}<span delta>» en la barra,
+    // «({signo}{delta})» y «{n}&nbsp;%» en la etiqueta. React escribe en el nodo que el traductor
+    // ya cambió por <font> y en pantalla queda la cifra de antes. Lo que es hijo único (el panel,
+    // aria-valuenow, el signo del delta) sí cambia: en la plaga sale «(+-6)».
+    // Esperado: el estado final es el del CASO 1 (Sabana + caza al 40 %), sus mismas cifras.
+    const viejos: string[] = [];
+    await paso(page, viejos, 'Sabana', () =>
+      page.getByRole('group', { name: 'Seleccionar ecosistema' }).getByRole('button', { name: 'Sabana', exact: true }).click()
+    );
+    await paso(page, viejos, 'Caza', () => page.getByRole('button', { name: 'Caza excesiva del depredador', exact: true }).click());
+    await paso(page, viejos, '40 %', async () => {
+      await page.locator('#slider-intensidad').fill('0.4');
+      await esperarValorEnReact(page, '#slider-intensidad', '0.4');
+    });
+    expect((await leerBarras(page)).map((b) => b.valor)).toEqual([86, 50, 12, 5]);
+    expect(viejos, 'texto viejo').toEqual([]);
+    expect(await cifrasVisibles(page)).toEqual(['86 (-14)', '50 (+8)', '12 (-4)', '5 (-1)']);
+    expect(await piramideVisible(page)).toEqual(['5 ind. rel.', '12 ind. rel.', '50 ind. rel.', '86 ind. rel.']);
+    expect((await page.locator('label[for="slider-intensidad"]').innerText()).replace(/\s+/g, ' ').trim()).toBe(
+      'Intensidad de la perturbación: 40 %'
+    );
+  });
+
+  test('ABIERTO (operativa, medio) · traducida, la ficha, la situación de partida y el veredicto siguen al caso', async ({ page }) => {
+    test.fail();
+    // Hallazgo del 01/11/2026 (forma del cabo C0243, en CasosAula.tsx; 4fc83bcd solo arregló los
+    // rótulos de ayuda). Caso 1 acertado («Baja»), caso 10 fallado («Los productores»), traducir y
+    // volver al caso 1. Esperado: lo de la página sin traducir, «🌅 Sabana · Sequía · Intensidad:
+    // 50 %», la Sabana de partida y «✅ ¡Correcto! La respuesta es «Baja».». Obtenido el 01/11:
+    // «🌅 Océano» e «Intensidad: 70 %» (una sequía en el océano, que la app dice que no existe), la
+    // partida del océano y «✅ No. Predijiste «Los productores» y la respuesta es «Los herbívoros».».
+    await seccion(page).getByRole('button', { name: /^Caso 1:/ }).click();
+    await seccion(page).getByRole('radio', { name: 'Baja', exact: true }).check();
+    await seccion(page).getByRole('button', { name: 'Comprobar' }).click();
+    await seccion(page).getByRole('button', { name: /^Caso 10:/ }).click();
+    await seccion(page).getByRole('radio', { name: 'Los productores', exact: true }).check();
+    await seccion(page).getByRole('button', { name: 'Comprobar' }).click();
+    const viejos: string[] = [];
+    await paso(page, viejos, 'volver al caso 1', () => seccion(page).getByRole('button', { name: /^Caso 1:/ }).click());
+    const ficha = await seccion(page)
+      .locator('[class*="aulaFichaDato"]')
+      .evaluateAll((es) => es.map((e) => (e as HTMLElement).innerText.replace(/\s+/g, ' ').trim()));
+    expect(ficha).toEqual(['🌅 Sabana', 'Sequía', 'Intensidad: 50 %']);
+    const normal = (t: string): string => t.replace(/\s+/g, ' ').trim();
+    expect(normal(await seccion(page).locator('[class*="aulaPartida"]').innerText())).toBe(
+      'Situación de partida: productores 100 · herbívoros 42 · carnívoros 16 · superdepredadores 6'
+    );
+    expect(normal(await seccion(page).getByRole('alert').innerText())).toBe('✅ ¡Correcto! La respuesta es «Baja».');
+    expect(viejos, 'texto viejo').toEqual([]);
   });
 });

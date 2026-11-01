@@ -1,5 +1,5 @@
 import { test, expect, Page } from '@playwright/test';
-import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
+import { asentarAntesDeTraducir, esperarHidratacion, esperarValorEnReact } from './_hidratacion';
 
 /**
  * Inspector — generador-anagramas (segmento interactiva, 1.548 usos reales)
@@ -1430,7 +1430,9 @@ test.describe('generador-anagramas', () => {
       // Sin ninguna letra concreta el botón no deja buscar.
       const atril = page.locator('#anagram-atril');
       await expect(atril).toContainText('0 letras + 2 fichas blancas');
-      await expect(atril).toContainText('se ignoran 1 comodín(es) por encima del máximo de 2');
+      // La forma del verbo no es lo que se vigila aquí: «se ignoran 1 comodín(es)» es hallazgo
+      // abierto de concordancia (inspector 01/11/2026, abajo), y «se ignora 1 comodín» también vale.
+      await expect(atril).toContainText(/se ignoran? 1 comodín(\(es\))? por encima del máximo de 2/);
       // Oráculo: 95 lemas de 2 letras y ninguno de 1
       await expect(atril).toContainText('las 95 palabras de 2 letras o menos del diccionario');
       await expect(page.getByRole('button', { name: 'Buscar palabras' })).toBeDisabled();
@@ -2000,6 +2002,497 @@ test.describe('generador-anagramas', () => {
           await expect(page.locator('[class*="resultsHeader"]')).toBeInViewport({ ratio: 1 });
         },
       );
+    });
+  });
+});
+
+// ---------------------------------------------------------------------------------------------
+// OCTAVA PASADA — inspector 01/11/2026 · RE-INSPECCIÓN (segmento MOTOR, 4.257 usos)
+//
+// Vuelve a la cola invalidada por c8204991 (CH, LL y RR puntúan como UNA ficha, injugables al
+// final, ejemplos que buscan), su dependencia 4ca120d8 y el lote mecánico de página traducida
+// c1a69d37 (C0312: texto condicional en un <span> siempre presente). El de contraste C0296 no
+// tocó la app; sí 4488bd1d (C0070, marca como texto → --primary-texto), mirado en los dos temas.
+//
+// TODO SE RESOLVIÓ ANTES DE ABRIR EL NAVEGADOR con un oráculo propio en Node
+// (.inspector-trabajo/anagramas-oraculo.mjs de la copia del Inspector): lee
+// public/data/diccionario-es.txt, normaliza por NFD protegiendo la Ñ, reparte multiconjuntos con
+// blancas y puntúa con una tabla TECLEADA A MANO —A E O I S N R U L T 1 · D G 2 · C B M P 3 ·
+// H F V Y 4 · CH Q 5 · J LL Ñ RR X 8 · Z 10, sin K ni W— cortando CH, LL y RR como una ficha de
+// izquierda a derecha (art. 11 FISE: dos sueltas no forman el dígrafo). No importa nada de la app.
+//
+//   CASO 1 (normal)  «calle» 2..10 → 22: CALLE = C3+A1+LL8+E1 = 13 y CELLA 13, con LL · LLE 9 y
+//                    LL 8, con LL · ACLE, ALCE, CALE, CALÉ, CELA 6 · CAL, CEA 5 · LEAL 4 (sus dos
+//                    L no van juntas: no es dígrafo) · CA, CE 4 · ALE 3 · AL, ÁL, EA, EL, ÉL, LA, LE 2.
+//   CASO 2 (límite)  «carera?» 7..7 → 44, dígrafo + ficha blanca. CARRETA, CERRADA… piden la RR de
+//                    verdad (la blanca pone la T, la D…): 14 con RR. Pero CARRERA y CARREAR llevan
+//                    TRES R y el atril trae dos: con la blanca haciendo de RR (art. 10) y una R
+//                    suelta se juegan sin la ficha RR, C3+A1+0+E1+R1+A1 = 7. Hallazgo abierto abajo.
+//   CASO 3 (rechazo) «12+?» → 0 letras y 1 blanca: no se busca, y como el lema más corto tiene
+//                    2 letras (oráculo: 0 lemas de 1), el aviso dice que no cabe ninguna palabra.
+//                    «» → «0 letras», botón inerte · frase «7 8 9 !» → 0 letras a repartir, inerte.
+// ---------------------------------------------------------------------------------------------
+test.describe('inspector 01/11/2026', () => {
+  const abrir = async (page: Page) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#anagram-letters']);
+    await expect(page.getByText(/Diccionario cargado/)).toBeVisible({ timeout: 20000 });
+  };
+
+  /** Busca un atril con su rango y espera a que haya veredicto (cabecera o «no se encontraron»). */
+  const buscar = async (page: Page, atril: string, min: number, max: number) => {
+    await page.selectOption('#anagram-min', String(min));
+    await page.selectOption('#anagram-max', String(max));
+    await page.fill('#anagram-letters', atril);
+    await esperarValorEnReact(page, '#anagram-letters', atril);
+    await page.getByRole('button', { name: 'Buscar palabras' }).click();
+    await expect(
+      page.locator('[class*="resultsHeader"] h3, [class*="noResults"]').first(),
+    ).toBeVisible({ timeout: 60000 });
+  };
+
+  /** «lema=puntos(con RR)[b:letra de la blanca]» de cada chip, en el orden en que se pinta. */
+  const chips = (page: Page) =>
+    page.locator('[class*="wordChip"]').evaluateAll((nodos) =>
+      nodos.map((chip) => {
+        const lema = chip.querySelector('[class*="chipLema"]')?.textContent;
+        const puntos = chip.querySelector('[class$="chipPuntos"]');
+        const injugable = chip.querySelector('[class*="chipInjugable"] [aria-hidden="true"]');
+        const digrafo = chip.querySelector('[class*="chipDigrafo"]')?.textContent?.trim() ?? '';
+        const blanca = [...chip.querySelectorAll('[class*="letraComodin"]')]
+          .map((n) => n.textContent)
+          .join('');
+        const valor = puntos ? (puntos.childNodes[0]?.textContent ?? '') : (injugable?.textContent ?? '?');
+        return `${lema}=${valor}${digrafo ? `(${digrafo})` : ''}${blanca ? `[b:${blanca}]` : ''}`;
+      }),
+    );
+
+  test('CASO 1 · «calle»: CALLE y CELLA valen 13 con la ficha LL, LEAL 4 con dos L sueltas', async ({
+    page,
+  }) => {
+    await abrir(page);
+    await buscar(page, 'calle', 2, 10);
+    await expect(page.locator('[class*="resultsHeader"] h3')).toHaveText('Palabras encontradas: 22');
+    // Oráculo, orden por longitud (longitud descendente y alfabético español en cada grupo)
+    expect(await chips(page)).toEqual([
+      'calle=13(con LL)', 'cella=13(con LL)',
+      'acle=6', 'alce=6', 'cale=6', 'calé=6', 'cela=6', 'leal=4',
+      'ale=3', 'cal=5', 'cea=5', 'lle=9(con LL)',
+      'al=2', 'ál=2', 'ca=4', 'ce=4', 'ea=2', 'el=2', 'él=2', 'la=2', 'le=2', 'll=8(con LL)',
+    ]);
+    await expect(page.locator('[class*="groupTitle"]')).toHaveText([
+      '5 letras (2)', '4 letras (6)', '3 letras (4)', '2 letras (10)',
+    ]);
+    // El resumen separa la jugada con la ficha LL (13) de la mejor con letras sueltas (6)
+    await expect(page.locator('[class*="ordenMejor"]')).toHaveText(
+      'La más valiosa: 13 puntos con la ficha LL · con letras sueltas, 6 puntos',
+    );
+    // El texto para lectores que c1a69d37 metió en un <span> sigue diciendo lo que debe
+    const lectores = page.locator('[class*="wordChip"]').first().locator('[class*="soloLectores"]');
+    await expect(lectores).toHaveText('puntos, solo con la ficha LL');
+
+    // Por puntos: jugables de más a menos; a igual puntuación, las de letras sueltas y las largas
+    await page.getByRole('button', { name: 'Puntos', exact: true }).click();
+    await expect(page.locator('[class*="groupTitle"]').first()).toContainText('De más a menos puntos');
+    expect(await chips(page)).toEqual([
+      'calle=13(con LL)', 'cella=13(con LL)', 'lle=9(con LL)', 'll=8(con LL)',
+      'acle=6', 'alce=6', 'cale=6', 'calé=6', 'cela=6', 'cal=5', 'cea=5',
+      'leal=4', 'ca=4', 'ce=4', 'ale=3',
+      'al=2', 'ál=2', 'ea=2', 'el=2', 'él=2', 'la=2', 'le=2',
+    ]);
+  });
+
+  test('CASO 2 · LÍMITE · «carera?»: la blanca pone la letra que falta y la RR sigue pidiendo su ficha', async ({
+    page,
+  }) => {
+    await abrir(page);
+    await buscar(page, 'carera?', 7, 7);
+    await expect(page.locator('[class*="resultsHeader"] h3')).toHaveText('Palabras encontradas: 44');
+    const lista = await chips(page);
+    // Una sola lectura legal con este atril: la blanca pone la T (la D, la J…) y la RR ha de ser
+    // la ficha, C3+A1+RR8+E1+0+A1 = 14. Lo mismo CERRADA y CERRAJA; CEGARRA con la blanca en la G.
+    expect(lista).toContain('carreta=14(con RR)[b:t]');
+    expect(lista).toContain('cerrada=14(con RR)[b:d]');
+    expect(lista).toContain('cegarra=14(con RR)[b:g]');
+    // Sin dígrafo: CARTERA C3+A1+R1+T0+E1+R1+A1 = 8, la T con la blanca
+    expect(lista).toContain('cartera=8[b:t]');
+    await expect(page.locator('[class*="ordenMejor"]')).toHaveText(
+      'La más valiosa: 14 puntos con la ficha RR · con letras sueltas, 8 puntos',
+    );
+  });
+
+  test.fail(
+    'ABIERTO · CARRERA desde «carera?» se juega con la blanca de RR: no es «solo con la ficha RR»',
+    async ({ page }) => {
+      // HALLAZGO ABIERTO (inspector 01/11/2026, cálculo). posicionesDeComodin reparte la blanca
+      // de forma voraz —la primera R se lleva la ficha real, la última la blanca— y
+      // digrafosNecesarios mira solo ese reparto. CARRERA tiene tres R y el atril dos: el reparto
+      // voraz pone la blanca en la R final y deja la RR para las dos tecleadas, así que el chip
+      // dice 14 «con RR» y su title «Solo con la ficha RR: dos fichas sueltas no forman el
+      // dígrafo». Pero con dos R SUELTAS se juega igual: la blanca hace de RR (art. 10 FISE: el
+      // comodín sustituye a cualquier ficha, dígrafos incluidos) y la R suelta va al final,
+      // C3+A1+0+E1+R1+A1 = 7 — la lectura que el propio motor da por buena en «car?o» → CARRO 5.
+      // El oráculo cuenta 459 atriles (palabra de hasta 8 letras con una letra cambiada por la
+      // blanca) donde pasa lo mismo: «aburir?» → ABURRIR, «ahicar?» → ACHICAR (con CH)…
+      await abrir(page);
+      await buscar(page, 'carera?', 7, 7);
+      const carrera = page.locator('[class*="wordChip"]', {
+        has: page.locator('[class*="chipLema"]', { hasText: /^carrera$/ }),
+      });
+      await expect(carrera).toHaveCount(1);
+      await expect(carrera.locator('[class*="soloLectores"]')).not.toContainText('solo con la ficha RR');
+      expect(await carrera.locator('[class$="chipPuntos"]').getAttribute('title')).not.toMatch(
+        /^Solo con la ficha RR/,
+      );
+    },
+  );
+
+  test('CASO 3 · RECHAZO · sin ninguna letra no se busca, aunque haya cifras, signos o una blanca', async ({
+    page,
+  }) => {
+    await abrir(page);
+    const boton = page.getByRole('button', { name: 'Buscar palabras' });
+    await page.fill('#anagram-letters', '12+?');
+    await esperarValorEnReact(page, '#anagram-letters', '12+?');
+    // Las cifras y el «+» se descartan; el «?» es una blanca. Con 1 blanca y el lema más corto
+    // de 2 letras (oráculo: ningún lema de 1) no cabe nada, y el aviso lo dice con esa cifra.
+    await expect(page.locator('#anagram-atril')).toHaveText(
+      '0 letras + 1 ficha blanca — hace falta al menos una letra concreta: con 1 ficha blanca y ' +
+        'ninguna letra no cabe ninguna palabra, porque la más corta del diccionario tiene 2 letras',
+    );
+    await expect(boton).toBeDisabled();
+    await page.fill('#anagram-letters', '');
+    await esperarValorEnReact(page, '#anagram-letters', '');
+    await expect(page.locator('#anagram-atril')).toHaveText('0 letras');
+    await expect(boton).toBeDisabled();
+
+    await page.getByRole('button', { name: /Anagrama perfecto de una frase/ }).click();
+    await page.fill('#anagram-frase', '7 8 9 !');
+    await expect(page.locator('#anagram-frase-contador')).toHaveText('0 letras a repartir');
+    await expect(page.getByRole('button', { name: 'Buscar anagramas perfectos' })).toBeDisabled();
+  });
+
+  test('lote C0312 · el aviso de comodines de más aparece y se va; el ejemplo con blanca busca', async ({
+    page,
+  }) => {
+    await abrir(page);
+    // «casa???»: la tercera blanca pasa del tope de 2. El aviso, ahora en un <span> fijo, sale…
+    await page.fill('#anagram-letters', 'casa???');
+    await esperarValorEnReact(page, '#anagram-letters', 'casa???');
+    await expect(page.locator('#anagram-atril')).toContainText('4 letras + 2 fichas blancas');
+    await expect(page.locator('#anagram-atril')).toContainText('por encima del máximo de 2');
+    // …y se va al quitar la blanca sobrante, sin dejar nada detrás
+    await page.fill('#anagram-letters', 'casa??');
+    await esperarValorEnReact(page, '#anagram-letters', 'casa??');
+    await expect(page.locator('#anagram-atril')).toHaveText('4 letras + 2 fichas blancas');
+    // El ejemplo «casa? (con blanca)» rellena y busca en el mismo gesto: 176 (oráculo, 2..10)
+    await page.getByRole('button', { name: 'casa? (con blanca)' }).click();
+    await expect(page.locator('#anagram-letters')).toHaveValue('casa?');
+    await expect(page.locator('[class*="resultsHeader"] h3')).toHaveText('Palabras encontradas: 176');
+  });
+
+  // -------------------------------------------------------------------------------------------
+  // PÁGINA TRADUCIDA — la misma simulación que tests/apps/texto-condicional-traducido-familia.spec.ts
+  // (cada nodo de texto pasa a <font><font>, como hace el traductor de Chrome).
+  // -------------------------------------------------------------------------------------------
+  const traducir = async (page: Page) => {
+    await asentarAntesDeTraducir(page);
+    await page.evaluate(() => {
+      const caminante = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+        acceptNode: (n) => {
+          const padre = n.parentElement;
+          if (!padre || !(n.nodeValue ?? '').trim()) return NodeFilter.FILTER_REJECT;
+          if (/^(SCRIPT|STYLE|OPTION|NOSCRIPT|FONT)$/.test(padre.tagName)) return NodeFilter.FILTER_REJECT;
+          return NodeFilter.FILTER_ACCEPT;
+        },
+      });
+      const nodos: Text[] = [];
+      while (caminante.nextNode()) nodos.push(caminante.currentNode as Text);
+      for (const nodo of nodos) {
+        const exterior = document.createElement('font');
+        const interior = document.createElement('font');
+        interior.textContent = nodo.nodeValue;
+        exterior.appendChild(interior);
+        nodo.parentNode?.replaceChild(exterior, nodo);
+      }
+    });
+  };
+
+  /** Prepara, traduce, cambia y exige que la app siga en pie y sin NotFoundError. */
+  const sigueEnPie = async (
+    page: Page,
+    preparar: () => Promise<void>,
+    cambiar: () => Promise<void>,
+  ) => {
+    const errores: string[] = [];
+    page.on('pageerror', (e) => errores.push(e.message));
+    page.on('console', (m) => {
+      if (m.type() === 'error' && /NotFoundError|insertBefore|removeChild/.test(m.text())) errores.push(m.text());
+    });
+    await abrir(page);
+    await preparar();
+    await traducir(page);
+    await cambiar();
+    await page.waitForTimeout(400);
+    await expect(page.getByText('Algo salió mal')).toHaveCount(0);
+    expect(errores).toEqual([]);
+  };
+
+  test('lote C0312 · con la página traducida, quitar y volver a poner la blanca sobrante no tumba la app', async ({
+    page,
+  }) => {
+    // El aviso de comodines ignorados es el sitio del contador que c1a69d37 envolvió en un
+    // <span> siempre montado: React cambia su textContent y no retira ningún nodo de texto.
+    // (El otro, el «· con letras sueltas» del resumen, no cambia nunca en su sitio: teclear
+    // vacía los resultados y el resumen se monta de nuevo en cada búsqueda.)
+    await sigueEnPie(
+      page,
+      async () => {
+        await page.fill('#anagram-letters', 'casa???');
+        await expect(page.locator('#anagram-atril')).toContainText('por encima del máximo');
+      },
+      async () => {
+        await page.fill('#anagram-letters', 'casa??');
+        await page.waitForTimeout(200);
+        await page.fill('#anagram-letters', 'casa???');
+      },
+    );
+  });
+
+  // HALLAZGO ABIERTO (inspector 01/11/2026, operativa): cinco textos condicionales que el lote
+  // C0312 no tocó siguen tumbando la app con la página traducida («Algo salió mal», NotFoundError
+  // en removeChild). Ninguno lo ve check:ternario-traducido: el fragmento del contador lleva su
+  // texto en una expresión `{' + '}` y no en JSXText; el aviso de exceso es una CONCATENACIÓN
+  // (`{x && `…` + '…'}`); el de la frase, un `&&` anidado en la rama de un ternario; la
+  // explicación de solo blancas, una variable (fuera del candado a propósito); y el veredicto,
+  // dos <p> del mismo tipo sin key con hijos distintos (lo mide el testigo de familia, no el
+  // candado). Receta del lote: cada texto condicional en un <span> siempre montado.
+  test.fail('ABIERTO · traducida: quitar la «?» de «casa?» retira « + 1 ficha blanca» y cae', async ({ page }) => {
+    await sigueEnPie(
+      page,
+      async () => {
+        await page.fill('#anagram-letters', 'casa?');
+        await expect(page.locator('#anagram-atril')).toContainText('1 ficha blanca');
+      },
+      () => page.fill('#anagram-letters', 'casa'),
+    );
+  });
+
+  test.fail('ABIERTO · traducida: añadir una letra a «??» retira la explicación de solo blancas y cae', async ({
+    page,
+  }) => {
+    await sigueEnPie(
+      page,
+      async () => {
+        await page.fill('#anagram-letters', '??');
+        await expect(page.locator('#anagram-atril')).toContainText('hace falta al menos una letra concreta');
+      },
+      () => page.fill('#anagram-letters', 'a??'),
+    );
+  });
+
+  test.fail('ABIERTO · traducida: bajar de 16 a 15 fichas retira el aviso de exceso y cae', async ({ page }) => {
+    await sigueEnPie(
+      page,
+      async () => {
+        await page.fill('#anagram-letters', 'abcdefghijklmnop');
+        await expect(page.locator('#anagram-atril')).toContainText('pasa del máximo de 15 fichas');
+      },
+      () => page.fill('#anagram-letters', 'abcdefghijklmno'),
+    );
+  });
+
+  test.fail('ABIERTO · traducida: bajar la frase de 21 a 20 letras retira «con tantas letras…» y cae', async ({
+    page,
+  }) => {
+    await sigueEnPie(
+      page,
+      async () => {
+        await page.getByRole('button', { name: /Anagrama perfecto de una frase/ }).click();
+        await page.fill('#anagram-frase', 'abcdefghijabcdefghija');
+        await expect(page.locator('#anagram-frase-contador')).toContainText('con tantas letras');
+      },
+      () => page.fill('#anagram-frase', 'abcdefghijabcdefghij'),
+    );
+  });
+
+  test.fail('ABIERTO · traducida: corregir la propuesta del verificador hasta que sea anagrama cae', async ({
+    page,
+  }) => {
+    await sigueEnPie(
+      page,
+      async () => {
+        await page.getByRole('button', { name: /Verificar dos textos/ }).click();
+        await page.fill('#anagram-texto-a', 'roma');
+        await page.fill('#anagram-texto-b', 'amo');
+        await expect(page.locator('[class*="veredicto"]').first()).toContainText('No son anagramas exactos');
+      },
+      () => page.fill('#anagram-texto-b', 'amor'),
+    );
+  });
+
+  // -------------------------------------------------------------------------------------------
+  // CONTENIDO Y FORMATO
+  // -------------------------------------------------------------------------------------------
+  test.fail('ABIERTO · los contadores concuerdan en número con una sola letra o un solo comodín', async ({
+    page,
+  }) => {
+    // HALLAZGO ABIERTO (inspector 01/11/2026, contenido): el modo letras dice «1 letra», pero el
+    // de frase dice «1 letras a repartir», el verificador «las mismas 1 letras» y «El original
+    // tiene 1 letras», y el aviso de blancas «se ignoran 1 comodín(es)». Mismo defecto que el
+    // hallazgo 2604 («1 puntos»), en los contadores que aquella reparación no miró.
+    await abrir(page);
+    await page.fill('#anagram-letters', 'casa???');
+    await expect(page.locator('#anagram-atril')).toContainText('por encima del máximo');
+    await expect(page.locator('#anagram-atril')).not.toContainText('comodín(es)');
+    await expect(page.locator('#anagram-atril')).not.toContainText('se ignoran 1 ');
+
+    await page.getByRole('button', { name: /Anagrama perfecto de una frase/ }).click();
+    await page.fill('#anagram-frase', 'a');
+    await expect(page.locator('#anagram-frase-contador')).toHaveText('1 letra a repartir');
+
+    await page.getByRole('button', { name: /Verificar dos textos/ }).click();
+    await page.fill('#anagram-texto-a', 'a');
+    await page.fill('#anagram-texto-b', 'á');
+    const veredicto = page.locator('[class*="veredicto"]').first();
+    await expect(veredicto).toContainText('Son anagramas exactos');
+    await expect(veredicto).not.toContainText('1 letras');
+    await page.fill('#anagram-texto-b', 'b');
+    await expect(veredicto).toContainText('No son anagramas exactos');
+    await expect(veredicto).not.toContainText('1 letras');
+  });
+
+  test.fail('ABIERTO · una cifra de cinco dígitos lleva punto de miles: 18.647, no 18647', async ({ page }) => {
+    // HALLAZGO ABIERTO (inspector 01/11/2026, contenido): `{results.length}` se pinta crudo.
+    // Oráculo: «aeiorsntlcmdbg?» (14 letras + 1 blanca, dentro del tope de 15) con 2..15 da 18.647
+    // palabras; la cabecera dice «18647» (y «40239» con «aeiosrntlcdmu??»). Con cuatro cifras no
+    // se agrupa (RAE), con cinco sí: CLAUDE.md §2. Pintar esas listas congela la página 5-7 s.
+    test.setTimeout(120000);
+    await abrir(page);
+    await buscar(page, 'aeiorsntlcmdbg?', 2, 15);
+    await expect(page.locator('[class*="resultsHeader"] h3')).toHaveText('Palabras encontradas: 18.647');
+  });
+
+  test.fail('ABIERTO · «Debe contener» no descarta en silencio lo que no es letra', async ({ page }) => {
+    // HALLAZGO ABIERTO (inspector 01/11/2026, operativa): el filtro pasa por normalizarTexto, que
+    // tira cifras y signos, y una cadena vacía no filtra. «amor» + «Debe contener: 4» da las 16
+    // palabras de «amor» a secas (CASO 1 de la primera pasada) como si contuvieran un 4; «c?s»
+    // se busca como «cs». Ninguna palabra contiene un 4: lo esperado es 0, o un aviso.
+    await abrir(page);
+    await page.fill('#anagram-contain', '4');
+    await buscar(page, 'amor', 2, 10);
+    await expect(page.locator('[class*="wordChip"]')).toHaveCount(0);
+  });
+
+  test.fail('ABIERTO · la FAQ de la ficha blanca es UNA respuesta, la misma en pantalla y en el FAQPage', async ({
+    page,
+  }) => {
+    // HALLAZGO ABIERTO (inspector 01/11/2026, contenido): «Tengo una ficha blanca en el atril,
+    // ¿cómo la escribo?» (visible) y «¿Cómo se escribe una ficha blanca o comodín…?» (FAQPage)
+    // son la misma pregunta con dos textos: el visible dice que «un ATRIL de Scrabble en español
+    // trae dos blancas entre sus 100 fichas» (el atril lleva 7; las 100 son del juego) y calla
+    // «Hace falta al menos una letra concreta». Reparación: UNA constante en metadata.ts.
+    await abrir(page);
+    const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+    const faqPage = JSON.parse(bloques.find((b) => b.includes('FAQPage')) ?? '{}') as {
+      mainEntity?: { name: string; acceptedAnswer: { text: string } }[];
+    };
+    const enFicha = (faqPage.mainEntity ?? []).find((q) => /ficha blanca/i.test(q.name) && /escrib/i.test(q.name));
+    expect(enFicha, 'el FAQPage tiene la pregunta de cómo se escribe la ficha blanca').toBeTruthy();
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const visible = page.locator('details').filter({
+      has: page.locator('summary', { hasText: /ficha blanca/ }).filter({ hasText: /escrib/ }),
+    });
+    await expect(visible).toHaveCount(1);
+    await visible.locator('summary').click();
+    const textoVisible = (await visible.locator('p').innerText()).replace(/\s+/g, ' ').trim();
+    expect(textoVisible).toBe(enFicha!.acceptedAnswer.text.replace(/\s+/g, ' ').trim());
+  });
+
+  test.fail('ABIERTO · el FAQPage no cita como anagramas palabras que el diccionario no tiene', async ({
+    page,
+  }) => {
+    // HALLAZGO ABIERTO (inspector 01/11/2026, contenido): el FAQPage dice que «seta» es anagrama
+    // de «tase» o «aste», y lista «armo» y «pole». Ninguna de las cuatro está en el lemario
+    // (oráculo; «aste» ni siquiera es palabra). La app lo desmiente: «seta» 4..4 da solo SETA.
+    // Es el defecto del hallazgo 707, reparado en la FAQ visible y no en la de los buscadores.
+    await abrir(page);
+    await buscar(page, 'seta', 4, 4);
+    await expect(page.locator('[class*="chipLema"]')).toHaveText(['seta']);
+    const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+    const faqPage = JSON.parse(bloques.find((b) => b.includes('FAQPage')) ?? '{}') as {
+      mainEntity?: { acceptedAnswer: { text: string } }[];
+    };
+    const respuestas = (faqPage.mainEntity ?? []).map((q) => q.acceptedAnswer.text).join(' ');
+    expect(respuestas).not.toMatch(/"(aste|tase|armo|pole)"/i);
+  });
+
+  test.fail('ABIERTO · el bingo es por FICHAS, no por letras: CARRERA tiene 7 letras y 6 fichas', async ({
+    page,
+  }) => {
+    // HALLAZGO ABIERTO (inspector 01/11/2026, contenido): la tarjeta «Scrabble y Palabras
+    // Cruzadas» dice «Las palabras de 7+ letras dan bingo (+50 puntos)», y la FAQ del bingo de la
+    // misma página, que es «usar las 7 fichas del atril en una sola jugada». Con la regla de
+    // dígrafos que la app aplica desde c8204991, CARRERA son 7 letras y 6 fichas (C A RR E R A):
+    // no da bingo. Tampoco una palabra de 7 letras que aproveche una del tablero.
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const tarjeta = page.locator('[class*="eduEscenarioCard"]', { hasText: 'Scrabble y Palabras Cruzadas' });
+    await expect(tarjeta).toBeVisible();
+    await expect(tarjeta).not.toContainText('palabras de 7+ letras dan bingo');
+  });
+
+  test.fail('ABIERTO · los porcentajes de la tarjeta de frecuencias llevan espacio antes del %', async ({
+    page,
+  }) => {
+    // HALLAZGO ABIERTO (inspector 01/11/2026, contenido): «E (13,7%), A (12,5%)…» pega el signo.
+    // CLAUDE.md §2 (25/09/2026): «13,7 %» con espacio duro, y se corrige cuando pasa el Inspector.
+    await page.goto(RUTA);
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const tarjeta = page.locator('[class*="eduTipCard"]', { hasText: 'Frecuencia de letras en español' });
+    await expect(tarjeta).toBeVisible();
+    expect(await tarjeta.textContent()).not.toMatch(/\d%/);
+  });
+
+  // -------------------------------------------------------------------------------------------
+  // MÓVIL 390 px
+  // -------------------------------------------------------------------------------------------
+  test.describe('móvil · 390×844', () => {
+    test.use({
+      viewport: { width: 390, height: 844 },
+      userAgent:
+        'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Mobile Safari/537.36',
+      deviceScaleFactor: 3,
+      isMobile: true,
+      hasTouch: true,
+    });
+
+    test('MÓVIL 390 · los controles caben, Intro busca «calle» y el orden por puntos responde al toque', async ({
+      page,
+    }) => {
+      await abrir(page);
+      for (const selector of ['#anagram-letters', '#anagram-min', '#anagram-max', '#anagram-contain']) {
+        const caja = await page.locator(selector).boundingBox();
+        expect(caja, `${selector} no se pinta`).not.toBeNull();
+        expect(caja!.x, `${selector} se sale por la izquierda`).toBeGreaterThanOrEqual(0);
+        expect(caja!.x + caja!.width, `${selector} se sale por la derecha`).toBeLessThanOrEqual(390);
+      }
+      await page.locator('#anagram-letters').tap();
+      await page.fill('#anagram-letters', 'calle');
+      await esperarValorEnReact(page, '#anagram-letters', 'calle');
+      await page.locator('#anagram-letters').press('Enter');
+      await expect(page.locator('[class*="resultsHeader"] h3')).toHaveText('Palabras encontradas: 22');
+      await expect(page.locator('[class*="resultsHeader"]')).toBeInViewport({ ratio: 1 });
+      await page.getByRole('button', { name: 'Puntos', exact: true }).tap();
+      await expect(page.locator('[class*="groupTitle"]').first()).toContainText('De más a menos puntos');
+      expect((await chips(page)).slice(0, 4)).toEqual([
+        'calle=13(con LL)', 'cella=13(con LL)', 'lle=9(con LL)', 'll=8(con LL)',
+      ]);
+      const [ancho, visible] = await page.evaluate(() => [
+        document.documentElement.scrollWidth,
+        document.documentElement.clientWidth,
+      ]);
+      expect(ancho).toBeLessThanOrEqual(visible);
     });
   });
 });

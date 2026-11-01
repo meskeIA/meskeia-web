@@ -146,7 +146,10 @@ test.describe('generador-anagramas · fichas blancas', () => {
   test('por encima del tope de 2 se avisa en vez de ignorarlo en silencio', async ({ page }) => {
     await conDiccionario(page);
     await page.locator('#anagram-letters').fill('casa???');
-    await expect(page.locator('#anagram-atril')).toHaveText(/se ignoran 1 comodín/);
+    // «se ignoran?»: el aviso dice hoy «se ignoran 1 comodín(es)», sin concordancia, y el
+    // inspector del 01/11/2026 lo dejó como hallazgo abierto en generador-anagramas.spec.ts.
+    // Lo que vigila este caso es que AVISE, no la forma del verbo: vale también «se ignora».
+    await expect(page.locator('#anagram-atril')).toHaveText(/se ignoran? 1 comodín/);
 
     // Y la búsqueda usa 2, no 3: el oráculo da 1.244 con dos blancas
     await page.getByRole('button', { name: 'Buscar palabras' }).click();

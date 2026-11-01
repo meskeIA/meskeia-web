@@ -28,7 +28,11 @@ import { esperarHidratacion, sembrarValor } from './_hidratacion';
  *      28/09/2026: se les quitó la marca y quedan como guardián, igual que los anteriores.
  *  11. CASOS 20-22, móvil y HALLAZGOS 07/10 — la re-inspección del 07/10/2026 (la 11.ª), que
  *      reverifica 2388-2397 y coteja con el BOE las cinco sospechas que dejó la del 28/09. Sus
- *      hallazgos (tests H21-H28) van con `test.fail()`: ABIERTOS a esa fecha.
+ *      hallazgos (2985-2992, tests H21-H28) se escribieron con `test.fail()` y se REPARARON el
+ *      mismo 07/10/2026 (5060f57b): se les quitó la marca y quedan como guardián.
+ *  12. CASOS 23-25, móvil y HALLAZGOS 01/11 — la re-inspección del 01/11/2026, tras 5060f57b,
+ *      el desborde a 390 px (2487ae59) y los lotes de página traducida (C0312, C0438). Sus
+ *      hallazgos (tests H29-H31) van con `test.fail()`: ABIERTOS a esa fecha.
  *
  * Qué promete la app
  * ──────────────────
@@ -2364,7 +2368,9 @@ test.describe('Inspector 07/10/2026 — móvil (390 px)', () => {
 // ═════════════════════════════════════════════════════════════════════════════
 
 test.describe('Hallazgos del 07/10/2026 (REPARADOS ese mismo día)', () => {
-  // H21 (ALTO) — ABIERTO. Los arts. 8.3 y 8.5 del RD no llegan al veredicto. El 8.3, párr. 2.º:
+  // H21 (ALTO, hallazgo 2985) — REPARADO el 07/10/2026 (5060f57b) con el requisito imprescindible
+  // del art. 8.5. Lo que se vio entonces: los arts. 8.3 y 8.5 del RD no llegaban al veredicto. El
+  // 8.3, párr. 2.º:
   // «En todo caso, las personas beneficiarias deberán estar al corriente en el cumplimiento de las
   // obligaciones tributarias y frente a la Seguridad Social conforme a lo dispuesto en los
   // artículos 13 y 14 de la Ley 38/2003». El 8.5: «No podrán obtener la condición de persona
@@ -2387,7 +2393,8 @@ test.describe('Hallazgos del 07/10/2026 (REPARADOS ese mismo día)', () => {
     expect(`${checklist} ${veredicto}`).toMatch(/Seguridad Social|obligaciones tributarias|Ley 38\/2003|art\. 8\.[35]/);
   });
 
-  // H22 (BAJO) — ABIERTO. La FAQ «¿Se puede pedir el bono si ya tengo contrato firmado?» responde
+  // H22 (BAJO, hallazgo 2986) — REPARADO el 07/10/2026 (5060f57b). Lo que se vio entonces: la
+  // FAQ «¿Se puede pedir el bono si ya tengo contrato firmado?» respondía
   // «Sí, en la mayoría de las CCAA», cuando el art. 133.1.a pone en primer lugar, para toda
   // España, «Ser titular […] de un contrato de arrendamiento» (y además admite a quien esté «en
   // condiciones de suscribir» uno). La propia checklist lo pregunta así, citando el 133.1.a: la
@@ -2403,7 +2410,8 @@ test.describe('Hallazgos del 07/10/2026 (REPARADOS ese mismo día)', () => {
     expect(faq).toContain('133.1.a');
   });
 
-  // H23 (BAJO) — ABIERTO. Desde cuándo se cobra. La FAQ afirma «La ayuda suele ser retroactiva
+  // H23 (BAJO, hallazgo 2987) — REPARADO el 07/10/2026 (5060f57b), con la DA 1.ª. Lo que se vio
+  // entonces, sobre desde cuándo se cobra: la FAQ afirmaba «La ayuda suele ser retroactiva
   // desde la fecha de solicitud» y la advertencia «La retroactividad no está garantizada en todas
   // las CCAA: algunas pagan desde la fecha de solicitud, no desde el inicio del contrato», las dos
   // sin artículo. Lo único que el RD dice de los efectos es la disposición adicional primera:
@@ -2427,7 +2435,8 @@ test.describe('Hallazgos del 07/10/2026 (REPARADOS ese mismo día)', () => {
     expect(!hablaDeRetroactividad || daLaDA1).toBe(true);
   });
 
-  // H24 (BAJO) — ABIERTO. La FAQ «¿Cuánto tarda en resolverse la solicitud?» acaba con «las CCAA
+  // H24 (BAJO, hallazgo 2988) — REPARADO el 07/10/2026 (5060f57b), con el art. 8.4. Lo que se vio
+  // entonces: la FAQ «¿Cuánto tarda en resolverse la solicitud?» acababa con «las CCAA
   // resuelven por orden de entrada hasta agotar los fondos asignados», como regla de todas. El RD
   // no fija el orden de entrada; su art. 8.4 dice lo contrario de una regla única: «El órgano
   // competente […] reconocerá las ayudas […] teniendo en cuenta las preferencias que resulten de
@@ -2445,7 +2454,8 @@ test.describe('Hallazgos del 07/10/2026 (REPARADOS ese mismo día)', () => {
     expect(faq).not.toContain('resuelven por orden de entrada');
   });
 
-  // H25 (MEDIO) — ABIERTO. El FAQPage recorta dos condiciones que la página y el motor sí aplican,
+  // H25 (MEDIO, hallazgo 2989) — REPARADO el 07/10/2026 (5060f57b). Lo que se vio entonces: el
+  // FAQPage recortaba dos condiciones que la página y el motor sí aplican,
   // en el canal que leen ChatGPT, Perplexity y Bing Copilot sin el aviso de renta al lado:
   //   · «¿Hasta qué alquiler mensual puedo pedir el Bono Joven?» → «El art. 133.1.e […] fija la
   //     renta máxima del contrato en 1000 € al mes para una vivienda completa y 600 € al mes para
@@ -2470,7 +2480,8 @@ test.describe('Hallazgos del 07/10/2026 (REPARADOS ese mismo día)', () => {
     expect(ingresos?.text).toMatch(/violencia de género/);
   });
 
-  // H26 (MEDIO) — ABIERTO. La pregunta de ingresos, BLOQUEANTE, enuncia solo el umbral general:
+  // H26 (MEDIO, hallazgo 2990) — REPARADO el 07/10/2026 (5060f57b). Lo que se vio entonces: la
+  // pregunta de ingresos, BLOQUEANTE, enunciaba solo el umbral general:
   // «Tus rentas anuales no superan 5 veces el IPREM (42.000 €/año)». El art. 133.1.d lo sube a
   // 5,5 × (46.200 €) con discapacidad del 33 % o siendo hijo o hija de víctima de violencia de
   // género y a 6 × (50.400 €) con el 65 %, y añade: «A efectos de este cómputo de ingresos se
@@ -2495,7 +2506,8 @@ test.describe('Hallazgos del 07/10/2026 (REPARADOS ese mismo día)', () => {
     expect(`${pregunta} ${explicacion}`).toMatch(/dependencia/i);
   });
 
-  // H27 (MEDIO) — ABIERTO. La pregunta de residencia, BLOQUEANTE, va en presente: «La vivienda es
+  // H27 (MEDIO, hallazgo 2991) — REPARADO el 07/10/2026 (5060f57b). Lo que se vio entonces: la
+  // pregunta de residencia, BLOQUEANTE, iba en presente: «La vivienda es
   // tu residencia habitual y permanente». El art. 133.1.c pide que la vivienda «constituya o vaya
   // a constituir la residencia habitual y permanente», y su 2.º da a quien todavía va a alquilar
   // dos meses desde la concesión para aportar el empadronamiento. La reparación del 2390 (28/09)
@@ -2512,7 +2524,8 @@ test.describe('Hallazgos del 07/10/2026 (REPARADOS ese mismo día)', () => {
     expect(residencia).toMatch(/será|vaya a|vayas a|vas a vivir|irás a vivir/i);
   });
 
-  // H28 (BAJO) — ABIERTO. La pregunta del arrendador, BLOQUEANTE, excluye a secas a quien sea
+  // H28 (BAJO, hallazgo 2992) — REPARADO el 07/10/2026 (5060f57b). Lo que se vio entonces: la
+  // pregunta del arrendador, BLOQUEANTE, excluía a secas a quien sea
   // socio de quien le alquila; el art. 133.2.c exceptúa «que se trate de sociedades cooperativas,
   // incluidas en régimen de cesión en uso, ya sean de vivienda, de consumo o integrales de
   // vivienda y consumo y sin ánimo de lucro». La excepción solo está en la explicación, sin decir
@@ -2531,5 +2544,263 @@ test.describe('Hallazgos del 07/10/2026 (REPARADOS ese mismo día)', () => {
     const llegaALaPregunta = /salvo|excepci|cooperativa/i.test(pregunta);
     const diceComoResponder = /responde «Sí»/.test(explicacion);
     expect(llegaALaPregunta || diceComoResponder).toBe(true);
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// INSPECTOR 01/11/2026 — RE-INSPECCIÓN (segmento fiscal, RIESGO 1 CRÍTICO)
+// ═════════════════════════════════════════════════════════════════════════════
+//
+// Vuelve a la cola por 5060f57b (07/10, el art. 8.5 y las excepciones del art. 133), 2487ae59
+// (25/10, desborde a 390 px: `min-width: 0` en .checkInfo) y los lotes mecánicos de página
+// traducida (8d859faf, C0438: ramas del veredicto «casi» en <span key>; 48639006, C0312: texto
+// condicional del aviso de renta, del rechazo y de la FAQ del cambio de piso en <span> siempre
+// montado) y de contraste (4488bd1d: dos reglas sin uso en la página).
+//
+// Lo que se comprobó además de los casos:
+//   · Página traducida (traductor simulado con <font>, como texto-condicional-traducido-familia):
+//     apto → no apto con 1 causa → 2 causas → municipio pequeño sí/no → casi (comunidad «No»,
+//     renta vacía, «12abc», 600): 0 errores y la página sigue viva. Los lotes cumplen su fin.
+//   · El texto que los lotes envolvieron se lee igual que antes: «Para una habitación el tope es
+//     600,00 €/mes», «… que no cumples, así que una renta más baja no bastaría por sí sola.», «se
+//     firma sin interrupción temporal con el anterior; la cuantía se ajusta a la nueva renta y
+//     nunca puede superar la que venías cobrando». Sin espacios perdidos ni duplicados.
+//   · Contraste de los textos de la app en los dos temas: todo ≥ 4,5:1 (el más justo, el
+//     «hasta 300 €/mes» del selector, 4,69:1 en claro).
+//   · Pero a 390 px la columna de texto de la checklist mide 0 px (H30, abajo).
+//
+// Cotejo con la FUENTE (texto consolidado del BOE, BOE-A-2026-8872, leído hoy):
+//   · art. 133.1: «las personas físicas mayores de edad»; 133.1.b: «Tener menos de treinta y cinco
+//     años, incluida la edad de treinta y cinco años, en el momento de solicitar la ayuda».
+//   · art. 133.1.d: «rentas anuales iguales o inferiores a 5 veces el IPREM», 5,5 con discapacidad
+//     del 33 % (e hijos de víctimas de violencia de género) y 6 con el 65 %.
+//   · art. 133.1.e: vivienda «igual o inferior a 1.000 euros mensuales», habitación «igual o
+//     inferior a 600 euros mensuales», «500 y 250 euros mensuales respectivamente» en municipios o
+//     núcleos de 10.000 habitantes o menos. Art. 137: 300 € (vivienda) y 200 € (habitación), con el
+//     límite del 60 % de la renta. Art. 134: «por el plazo de dos años», prorrogable hasta otros dos.
+//   · art. 8.5, segunda frase: «Tampoco podrán obtener la condición de persona beneficiaria […]
+//     quienes hayan sido sujetos de una revocación […] de alguna de las ayudas contempladas en éste
+//     o el anterior plan estatal de vivienda por incumplimiento o causa imputable al solicitante».
+//     La reparación del 2985 llevó al veredicto la PRIMERA frase (art. 13 de la Ley 38/2003) y no
+//     esta: H29.
+//   Todas las cifras coinciden con `data/fiscal/vivienda-joven.ts` (sellado el 28/09/2026).
+//
+// CASOS NUEVOS (resueltos a mano ANTES de abrir el navegador)
+// ───────────────────────────────────────────────────────────
+//   CASO 23 (normal) — HABITACIÓN en municipio ≤ 10.000 hab. · 180 €/mes · los 10 a «Sí»
+//       tope de renta  180 ≤ 250 (rentaMaximaMensual.municipioPequeno.habitacion, art. 133.1.e)
+//       60 % (limiteSobreRenta) de 180 = 108 < 200 (ayudaMaximaMensual.habitacion, art. 137)
+//       ayuda          108,00 €   ← manda el porcentaje: con la nota del límite del 60 %
+//       pago real      180 − 108 = 72,00 €
+//       4 años         108 × 48 (plazo.totalMaximoMeses, art. 134) = 5.184 → «5184,00 €»
+//       veredicto      APTO citando 108,00 €/mes, «2 años prorrogables otros 2»
+//       checklist      «entre 18 y 35 años (inclusive)» (edad.minima / edad.maxima) y
+//                      5 × 8.400 (IPREM_2026.anual14) = 42.000 €/año
+//
+//   CASO 24 (límite) — VIVIENDA · «1.000» €/mes (el tope, inclusive) · los 10 a «Sí» y el del
+//       art. 8.5 a «No»
+//       con todo «Sí»: 1.000 ≤ 1.000 → APTO · mín(300; 600) = 300,00 €/mes
+//       con el 8.5 a «No»: NO APTO con UNA causa («Hay al menos un requisito imprescindible que
+//       no cumples.»), sin «Y además», sin aviso de renta y sin panel
+//       pasando a HABITACIÓN: 1.000 > 600 → DOS causas, en el orden del 854 y con la coletilla
+//       del 1169 («así que una renta más baja no bastaría por sí sola»); con el municipio pequeño
+//       el aviso da 250,00 €/mes
+//
+//   CASO 25 (rechazo) — VIVIENDA · 600 €/mes · persona a la que la comunidad autónoma revocó el
+//       Bono Alquiler Joven del plan anterior (RD 42/2022) por no comunicar un cambio, ya
+//       reintegrado: está al corriente y no tiene reintegros pendientes, así que responde «Sí» a
+//       los 10 con honestidad
+//       esperado: NO APTO por el art. 8.5, segunda frase, o una pregunta que la recoja
+//       obtenido: «¡Cumples todos los requisitos! … 300,00 €/mes» y 0 apariciones de «revoca» en
+//       la página, guía desplegada incluida → H29 (ABIERTO)
+// ═════════════════════════════════════════════════════════════════════════════
+
+/** El rechazo con las dos causas, tal como debe leerse (comprueba los <span> del lote C0312) */
+const DOS_CAUSAS_HABITACION =
+  'La renta que has introducido (1000,00 €/mes) supera el máximo de 600,00 €/mes que da derecho a ' +
+  'esta ayuda. Y además, hay al menos un requisito imprescindible que no cumples, así que una renta ' +
+  'más baja no bastaría por sí sola. El Bono Joven al Alquiler no estaría disponible para tu situación actual.';
+
+test.describe('Inspector 01/11/2026 — casos nuevos', () => {
+  test('CASO 23 (normal): habitación en municipio pequeño a 180 €/mes → 108,00 €, 72,00 € y 5184,00 €', async ({ page }) => {
+    await abrirHidratado(page);
+    await page.getByRole('button', { name: /Habitación \(piso compartido\)/ }).click();
+    const municipio = page.getByRole('button', { name: /El municipio tiene 10\.000 habitantes o menos/ });
+    await municipio.click();
+    await expect(municipio).toHaveAttribute('aria-pressed', 'true');
+    // rentaMaximaMensual.municipioPequeno.habitacion = 250 (art. 133.1.e)
+    await expect(municipio).toContainText('renta máxima 250,00 €/mes');
+    await sembrarValor(page, '#alquiler', '180');
+    await marcarTodoSi(page);
+
+    await expect(page.locator('[class*="avisoRenta"]')).toHaveCount(0);
+    const panel = await panelDeAhorro(page);
+    expect(panel[0]).toContain('108,00 €'); // 60 % de 180 = 108 < 200
+    expect(panel[1]).toContain('72,00 €'); // 180 − 108
+    expect(panel[2]).toContain('5184,00 €'); // 108 × 48 — es-ES no agrupa cuatro cifras
+    expect(panel[2]).toContain('Máximo en 4 años');
+    await expect(page.getByText(NOTA_LIMITE)).toHaveCount(1);
+
+    const veredicto = norm(await veredictoDe(page).innerText());
+    expect(veredicto).toContain('¡Cumples todos los requisitos!');
+    expect(veredicto).toContain('108,00 €/mes durante hasta 4 años');
+    expect(veredicto).toContain('2 años prorrogables otros 2, art. 134 RD 326/2026');
+    expect(veredicto).not.toContain('200,00 €');
+
+    // edad.minima / edad.maxima (art. 133.1 y 133.1.b) y 5 × IPREM_2026.anual14 (art. 133.1.d)
+    const edad = norm(await tarjetaCon(page, /133\.1\.b/).locator('[class*="checkPregunta"]').innerText());
+    expect(edad).toBe('Tienes entre 18 y 35 años (inclusive) al solicitar la ayuda');
+    const ingresos = norm(await tarjetaCon(page, /IPREM/).locator('[class*="checkPregunta"]').innerText());
+    expect(ingresos).toContain('5 veces el IPREM (42.000 €/año)');
+  });
+
+  test('CASO 24 (límite): «1.000» clavados con el art. 8.5 a «No» rechaza por UNA causa; como habitación, por DOS', async ({ page }) => {
+    await abrirHidratado(page);
+    await page.getByRole('button', { name: /Vivienda completa/ }).click();
+    // 1.000 = rentaMaximaMensual.vivienda (art. 133.1.e, «igual o inferior»)
+    await sembrarValor(page, '#alquiler', '1.000');
+    await marcarTodoSi(page);
+    let veredicto = norm(await veredictoDe(page).innerText());
+    expect(veredicto).toContain('¡Cumples todos los requisitos!');
+    expect(veredicto).toContain('300,00 €/mes'); // mín(300; 60 % de 1.000 = 600)
+
+    // El requisito del art. 8.5 (hallazgo 2985) bloquea el veredicto
+    const art85 = tarjetaCon(page, /Seguridad Social/);
+    await art85.getByRole('button', { name: 'No', exact: true }).click();
+    await expect(art85.getByRole('button', { name: 'No', exact: true })).toHaveAttribute('aria-pressed', 'true');
+    veredicto = norm(await veredictoDe(page).innerText());
+    expect(veredicto).toContain('No cumples los requisitos obligatorios');
+    expect(veredicto).toContain('Hay al menos un requisito imprescindible que no cumples. El Bono Joven');
+    expect(veredicto).not.toContain('Y además');
+    expect(veredicto).not.toContain('una renta más baja');
+    await expect(page.locator('[class*="avisoRenta"]')).toHaveCount(0);
+    expect(await panelDeAhorro(page)).toHaveLength(0);
+
+    // La misma renta como habitación: 1.000 > 600 = rentaMaximaMensual.habitacion → dos causas
+    await page.getByRole('button', { name: /Habitación \(piso compartido\)/ }).click();
+    const aviso = page.locator('[class*="avisoRenta"]');
+    expect(norm(await aviso.innerText())).toContain('Para una habitación el tope es 600,00 €/mes (RD 326/2026, art. 133.1.e) y has introducido 1000,00 €/mes.');
+    expect(norm(await veredictoDe(page).innerText())).toContain(DOS_CAUSAS_HABITACION);
+
+    // Y con el municipio pequeño, el tope de 250 € (rentaMaximaMensual.municipioPequeno.habitacion)
+    await page.getByRole('button', { name: /El municipio tiene 10\.000 habitantes o menos/ }).click();
+    expect(norm(await aviso.innerText())).toContain('Para una habitación en un municipio de 10.000 habitantes o menos el tope es 250,00 €/mes');
+    expect(norm(await veredictoDe(page).innerText())).toContain('supera el máximo de 250,00 €/mes');
+    expect(await panelDeAhorro(page)).toHaveLength(0);
+  });
+
+  // H29 (ALTO) — ABIERTO. La segunda frase del art. 8.5 no llega al veredicto. El RD: «Tampoco
+  // podrán obtener la condición de persona beneficiaria […] quienes hayan sido sujetos de una
+  // revocación […] de alguna de las ayudas contempladas en éste o el anterior plan estatal de
+  // vivienda por incumplimiento o causa imputable al solicitante». La reparación del 2985 (H21)
+  // añadió el requisito de la PRIMERA frase —el art. 13 de la Ley 38/2003— y su explicación
+  // presenta el art. 8.5 como si solo dijera eso; ningún requisito ni ninguna línea de la página
+  // menciona la revocación. El H21 la citaba, pero su aserción solo buscaba «Seguridad Social»,
+  // así que la reparación pasó el test sin cubrirla. Es la forma del 2388 y del 2985: una
+  // exclusión del RD que no llega al veredicto, en el sentido malo (aprobar de más).
+  // CASO 25: vivienda 600 €/mes, a quien su comunidad le revocó el Bono Alquiler Joven del plan
+  // 2022-2025 por incumplimiento y ya lo reintegró → responde «Sí» a los 10 con honestidad →
+  // esperado NO APTO (o una pregunta que recoja la revocación) · obtenido «¡Cumples todos los
+  // requisitos! … 300,00 €/mes» y 0 apariciones de «revoca» en la página.
+  test('CASO 25 (rechazo) · H29 — la revocación de una ayuda de este plan o del anterior (art. 8.5, 2.ª frase) debería llegar al veredicto', async ({ page }) => {
+    test.fail(); // H29 ABIERTO a 01/11/2026
+    await abrirHidratado(page);
+    await sembrarValor(page, '#alquiler', '600'); // 600 ≤ 1.000: la renta no es el problema
+    await marcarTodoSi(page);
+    await page.getByRole('button', { name: /Ver guía educativa/i }).click();
+    const pagina = norm(await page.locator('body').innerText());
+    // O la checklist la pregunta (y quien la sufrió responde «No»), o al menos la página la dice
+    expect(pagina).toMatch(/revoca/i);
+  });
+
+  // H31 (BAJO) — ABIERTO. La FAQ visible «¿Qué pasa si mis ingresos suben durante el cobro?» da
+  // un único umbral: «El umbral de ingresos lo fija el Estado en 5 veces el IPREM (art. 133.1.d)
+  // […]. Si dejas de cumplir ese umbral podrías perder la ayuda». El mismo art. 133.1.d lo sube a
+  // 5,5 veces con una discapacidad del 33 % (o siendo hijo o hija de víctima de violencia de
+  // género) y a 6 con el 65 %, y la tarjeta de ingresos de la checklist ya lo dice
+  // (UMBRAL_IPREM_VIVIENDA_JOVEN). Es la forma de los 2989 y 2990, en la tercera boca.
+  // CASO: beneficiaria con discapacidad del 33 % cuyas rentas suben a 44.000 €/año → la FAQ le
+  // dice que el umbral es 5 × IPREM (42.000 €) y que podría perder la ayuda · esperado: su umbral
+  // es 5,5 × 8.400 = 46.200 €/año y sigue dentro.
+  test('H31 — la FAQ de los ingresos que suben debería dar el umbral que corresponde a cada persona, no solo el general', async ({ page }) => {
+    test.fail(); // H31 ABIERTO a 01/11/2026
+    await abrirHidratado(page);
+    await page.getByRole('button', { name: /Ver guía educativa/i }).click();
+    const faq = await faqVisible(page, /ingresos suben/);
+    expect(faq).toContain('5 veces el IPREM');
+    expect(faq).toMatch(/5,5|discapacidad|que te corresponda/);
+  });
+});
+
+test.describe('Inspector 01/11/2026 — móvil (390 px)', () => {
+  test.use({
+    viewport: { width: 390, height: 844 },
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Mobile Safari/537.36',
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test('A 390 px los diez «Sí» se ven enteros, nada los tapa y responden al toque', async ({ page }) => {
+    await abrirHidratado(page);
+    const sis = await page.getByRole('button', { name: 'Sí', exact: true }).all();
+    expect(sis).toHaveLength(10);
+    for (const si of sis) {
+      await si.scrollIntoViewIfNeeded();
+      const caja = await si.boundingBox();
+      expect(caja && caja.x >= 0 && caja.x + caja.width <= 390).toBe(true);
+      // El punto central del botón es el propio botón: no lo tapa el distintivo ni el texto
+      const propio = await si.evaluate((el) => {
+        const q = el.getBoundingClientRect();
+        const arriba = document.elementFromPoint(q.x + q.width / 2, q.y + q.height / 2);
+        return arriba === el || el.contains(arriba);
+      });
+      expect(propio).toBe(true);
+      await si.tap();
+      await expect(si).toHaveAttribute('aria-pressed', 'true');
+    }
+    // Vivienda (el selector por defecto) a 600 €: mín(300; 360) = 300,00 €/mes
+    await sembrarValor(page, '#alquiler', '600');
+    const veredicto = norm(await veredictoDe(page).innerText());
+    expect(veredicto).toContain('¡Cumples todos los requisitos!');
+    expect(veredicto).toContain('300,00 €/mes');
+    const anchos = await page.evaluate(() => ({
+      scroll: document.documentElement.scrollWidth,
+      cliente: document.documentElement.clientWidth,
+    }));
+    expect(anchos.scroll).toBeLessThanOrEqual(anchos.cliente);
+  });
+
+  // H30 (CRÍTICO) — ABIERTO. Regresión de 2487ae59 (25/10/2026, cabo C0425). Para que el Sí/No
+  // no saliera 2 px por la derecha, `.checkInfo` pasó a `min-width: 0` con `flex: 1` (base 0),
+  // junto a un distintivo IMPRESCINDIBLE y un grupo Sí/No que no encogen: a 360, 390 y 412 px
+  // la columna de la pregunta y su explicación mide 0 px en 9 de las 10 tarjetas y el texto se
+  // pinta una letra por línea. La checklist pasa de 8.516 px de alto (con el `min-width` de
+  // antes, repuesto solo en el navegador) a 78.511 px; a 768 px mide 2.340. Los botones siguen
+  // pulsándose (el test de arriba), pero no se puede leer qué se está contestando, y el
+  // veredicto queda 78.000 px más abajo. El testigo `tests/apps/desborde-390.spec.ts` sigue en
+  // verde porque solo mide el desborde horizontal (scrollWidth 390 = clientWidth 390).
+  // CASO: 390 px, cualquier carga → esperado: cada columna de texto con ancho para leerse
+  // (≥ 150 px de los ~228 que deja la tarjeta tras el icono si el distintivo y el Sí/No bajan
+  // de línea; con 150 px la primera pregunta, de 59 caracteres, cabe en 4 líneas) · obtenido:
+  // 0 px en las nueve tarjetas con distintivo y la primera pregunta en 49 líneas.
+  test('H30 — a 390 px la pregunta y su explicación deberían leerse: la columna de texto de cada tarjeta no puede medir 0 px', async ({ page }) => {
+    test.fail(); // H30 ABIERTO a 01/11/2026
+    await abrirHidratado(page);
+    const medidas = await page.evaluate(() => {
+      const pregunta = document.querySelector('[class*="checkPregunta"]') as HTMLElement;
+      return {
+        columnas: Array.from(document.querySelectorAll('[class*="checkInfo"]')).map((e) =>
+          Math.round(e.getBoundingClientRect().width),
+        ),
+        lineasPrimera: Math.round(
+          pregunta.getBoundingClientRect().height / parseFloat(getComputedStyle(pregunta).lineHeight),
+        ),
+      };
+    });
+    expect(medidas.columnas).toHaveLength(10);
+    for (const ancho of medidas.columnas) expect(ancho).toBeGreaterThanOrEqual(150);
+    expect(medidas.lineasPrimera).toBeLessThanOrEqual(4);
   });
 });
