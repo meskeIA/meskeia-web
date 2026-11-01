@@ -9,7 +9,7 @@
  */
 
 import { useState } from 'react';
-import { parseSpanishNumber } from '@/lib';
+import { leerRespuestaAula } from '@/lib/calculadoras/correctorCasosAula';
 import styles from './SimuladorMovimientoCircular.module.css';
 import {
   CASOS,
@@ -60,7 +60,8 @@ export default function CasosAula() {
   function comprobar() {
     // parseSpanishNumber admite «9,42» y «9.42»; devuelve NaN con cualquier otra cosa, y de
     // ese NaN se encarga comprobarRespuesta con un mensaje propio (nunca «NaN» en pantalla).
-    const valor = parseSpanishNumber(respuesta);
+    // «2.493» es 2,493 o 2493: leerRespuestaAula se queda con la más cercana a la respuesta (C0558).
+    const valor = leerRespuestaAula(respuesta, esperado);
     const r = comprobarRespuesta(valor, exacto, decimales);
     setVeredicto({ correcto: r.correcto, motivo: r.motivo });
   }

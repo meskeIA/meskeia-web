@@ -8,7 +8,7 @@
  */
 
 import { useState } from 'react';
-import { parseSpanishNumber } from '@/lib';
+import { leerRespuestaAula } from '@/lib/calculadoras/correctorCasosAula';
 import styles from '../SimuladorGenetica.module.css';
 import {
   CASOS,
@@ -56,7 +56,8 @@ export default function CasosAula() {
   function comprobar() {
     // parseSpanishNumber admite «56,25» y «56.25»; devuelve NaN con cualquier otra cosa, y
     // de ese NaN se encarga comprobarRespuesta con un mensaje propio (nunca «NaN» en pantalla).
-    const valor = parseSpanishNumber(respuesta);
+    // «2.493» es 2,493 o 2493: leerRespuestaAula se queda con la más cercana a la respuesta (C0558).
+    const valor = leerRespuestaAula(respuesta, esperado);
     // La magnitud del enunciado decide qué respuestas son IMPOSIBLES, no solo imprecisas
     // (hallazgo 1207): un 101 % de la descendencia, o media planta.
     const r = comprobarRespuesta(valor, esperado, magnitud);

@@ -17,7 +17,7 @@
  */
 
 import { useState } from 'react';
-import { parseSpanishNumber } from '@/lib';
+import { leerRespuestaAula } from '@/lib/calculadoras/correctorCasosAula';
 import styles from './SimuladorModeloBohr.module.css';
 import {
   CASOS,
@@ -70,7 +70,8 @@ export default function CasosAula() {
   function comprobar() {
     // El menos tipográfico (−), el que pinta la app, no lo lee parseSpanishNumber: se cambia por
     // el guion antes de leer, para que copiar «−1,51» de la tarjeta funcione.
-    const valor = parseSpanishNumber(respuesta.trim().replace(/^[−–]/, '-'));
+    // «2.493» es 2,493 o 2493: leerRespuestaAula se queda con la más cercana a la respuesta (C0558).
+    const valor = leerRespuestaAula(respuesta.trim().replace(/^[−–]/, '-'), esperado);
     const r = comprobarRespuesta(valor, esperado, datos);
     setVeredicto({ correcto: r.correcto, motivo: r.motivo });
   }

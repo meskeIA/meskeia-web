@@ -9,7 +9,7 @@
  */
 
 import { useState } from 'react';
-import { parseSpanishNumber } from '@/lib';
+import { leerRespuestaAula } from '@/lib/calculadoras/correctorCasosAula';
 import styles from './SimuladorFotografia.module.css';
 import {
   CASOS,
@@ -59,7 +59,8 @@ export default function CasosAula() {
   function comprobar() {
     // parseSpanishNumber admite «−0,92» y «-0.92»; devuelve NaN con cualquier otra cosa, y de
     // ese NaN se encarga comprobarRespuesta con un mensaje propio (nunca «NaN» en pantalla).
-    const valor = parseSpanishNumber(respuesta);
+    // «2.493» es 2,493 o 2493: leerRespuestaAula se queda con la más cercana a la respuesta (C0558).
+    const valor = leerRespuestaAula(respuesta, esperado);
     // La pregunta decide la regla: ΔEV con tolerancia, y un puesto de la escala por igualdad (2408).
     const r = comprobarRespuesta(valor, esperado, pregunta);
     setVeredicto({ correcto: r.correcto, motivo: r.motivo });

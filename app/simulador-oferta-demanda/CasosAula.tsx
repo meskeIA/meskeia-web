@@ -17,7 +17,7 @@
  */
 
 import { useState } from 'react';
-import { parseSpanishNumber } from '@/lib';
+import { leerRespuestaAula } from '@/lib/calculadoras/correctorCasosAula';
 import styles from './SimuladorOfertaDemanda.module.css';
 import {
   CASOS,
@@ -82,7 +82,8 @@ export default function CasosAula() {
     // parseSpanishNumber admite «20» y «12,5»; devuelve NaN con cualquier otra cosa, y de ese
     // NaN se encarga comprobarRespuesta con un mensaje propio (nunca «NaN» en pantalla). El menos
     // tipográfico (−) pasa a guion, que es el único que lee el parser.
-    const valor = parseSpanishNumber(respuesta.trim().replace(/[−–]/g, '-'));
+    // «2.493» es 2,493 o 2493: leerRespuestaAula se queda con la más cercana a la respuesta (C0558).
+    const valor = leerRespuestaAula(respuesta.trim().replace(/[−–]/g, '-'), typeof esperado === 'number' ? esperado : NaN);
     const r = comprobarRespuesta(valor, esperado, datos);
     setVeredicto({ correcto: r.correcto, motivo: r.motivo });
   }

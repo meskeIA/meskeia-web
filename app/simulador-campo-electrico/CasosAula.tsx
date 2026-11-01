@@ -9,7 +9,7 @@
  */
 
 import { useState } from 'react';
-import { parseSpanishNumber } from '@/lib';
+import { leerRespuestaAula } from '@/lib/calculadoras/correctorCasosAula';
 import styles from './SimuladorCampoElectrico.module.css';
 import type { CargaPuntual } from './motor';
 import {
@@ -68,7 +68,8 @@ export default function CasosAula({ onCargarEnSimulador }: Props) {
     // El menos tipográfico (−) y la raya corta (–) que pegan algunos teclados se leen como
     // signo menos; parseSpanishNumber devuelve NaN con cualquier otra cosa, y de ese NaN se
     // encarga comprobarRespuesta con un mensaje propio (nunca «NaN» en pantalla).
-    const valor = parseSpanishNumber(respuesta.replace(/[−–]/g, '-'));
+    // «2.493» es 2,493 o 2493: leerRespuestaAula se queda con la más cercana a la respuesta (C0558).
+    const valor = leerRespuestaAula(respuesta.replace(/[−–]/g, '-'), esperado);
     const r = comprobarRespuesta(valor, esperado, datos.magnitud);
     setVeredicto({ correcto: r.correcto, motivo: r.motivo });
   }
