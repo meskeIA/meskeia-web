@@ -9,6 +9,8 @@
  *            npm run inspector:hallazgos -- --desde 2026-10-01
  *            npm run inspector:hallazgos -- --arreglado 12,13
  *            npm run inspector:hallazgos -- --descartado 27 --motivo "es correcto: lo confirma la ONCE"
+ *            npm run inspector:hallazgos -- --arreglado-otro 31 --motivo "el canónico es 2×2 al 25 %, no 1 celda"
+ *            npm run inspector:hallazgos -- --precision          (cuánto acierta el Inspector)
  *            npm run inspector:hallazgos -- --revalidar lupa-digital,conversor-braille
  *            npm run inspector:hallazgos -- --revalidar-reparadas   (solo las que tienen un
  *                                              hallazgo ARREGLADO después de darse por buenas)
@@ -35,6 +37,15 @@
  * El Inspector NO repara: deja los hallazgos abiertos y el usuario decide el lote. Falta
  * entonces la otra mitad del ciclo — cerrarlos cuando se arreglen. Sin esto, la base
  * acumula hallazgos ya resueltos y en dos meses su lista deja de significar nada.
+ *
+ * ── `--arreglado-otro`: el defecto era real, pero el esperado del Inspector NO (01/11/2026) ──
+ * Hasta ese día, cuando /reparar veía que el «esperado» del acta estaba mal, reparaba bien y cerraba
+ * como `arreglado`, así que la base no distinguía un acierto de una corrección: de 3.907 hallazgos
+ * solo 5 descartados (0,13 %), aunque la ronda del 22/09 tuvo el esperado mal en 5 de 43. Con el
+ * Inspector en xhigh y ~6 hallazgos por app, sin esa cifra no se podía saber cuánto era ruido.
+ * Cuenta como arreglado para todo lo demás (revalidar, cola) y además marca `esperado_errado = 1`
+ * con el motivo en la descripción. `--precision` lo cuenta desde el 01/11/2026 (auditoría de los
+ * procesos de revisión, punto 5). Exige `--motivo`: qué esperado era el correcto y de dónde sale.
  *
  * Un hallazgo se DESCARTA cuando resulta que no era un defecto (el modelo se equivocó, o
  * la app hacía bien lo que parecía mal). Exige `--motivo`: un descarte sin razón escrita
@@ -78,6 +89,10 @@ const valorDe = (n, d) => { const i = args.indexOf(`--${n}`); return i >= 0 && a
 const APP = valorDe('app', '');
 const ARREGLADO = valorDe('arreglado', '');
 const DESCARTADO = valorDe('descartado', '');
+const ARREGLADO_OTRO = valorDe('arreglado-otro', '');
+const PRECISION = args.includes('--precision');
+/** Desde cuándo distingue la base un esperado errado (antes, todo era `arreglado`). */
+const DESDE_PRECISION = '2026-11-01';
 /**
  * Devuelve un hallazgo a «abierto». Existe porque cerrar el id equivocado es un error
  * fácil y silencioso —pasó el mismo día que se estrenó esto— y sin vuelta atrás la base
@@ -129,15 +144,19 @@ const hoy = new Date().toISOString().slice(0, 10);
 
 // ─── Cerrar ───────────────────────────────────────────────────────────────────
 
-function cerrar(ids, estado) {
+function cerrar(ids, estado, otroEsperado = false) {
   const lista = ids.split(',').map(s => s.trim()).filter(Boolean);
+  if (otroEsperado && !MOTIVO) {
+    console.error('\n✗ --arreglado-otro exige --motivo: qué esperado era el correcto y de dónde sale.\n');
+    process.exit(1);
+  }
   if (estado === 'descartado' && !MOTIVO) {
     console.error('\n✗ Descartar exige --motivo. Un descarte sin razón escrita no se puede revisar después.\n');
     process.exit(1);
   }
   const leer = db.prepare('SELECT id, slug, severidad, descripcion, estado FROM hallazgos WHERE id = ?');
   // `cerrado` con hora: lo lee `--revalidar-reparadas` (ver la cabecera)
-  const upd = db.prepare('UPDATE hallazgos SET estado = ?, descripcion = ?, cerrado = ? WHERE id = ?');
+  const upd = db.prepare('UPDATE hallazgos SET estado = ?, descripcion = ?, cerrado = ?, esperado_errado = ? WHERE id = ?');
   let n = 0;
   for (const id of lista) {
     const h = leer.get(Number(id));
@@ -145,9 +164,11 @@ function cerrar(ids, estado) {
     if (h.estado !== 'abierto') { console.error(`  · id ${id}: ya estaba "${h.estado}"`); continue; }
     const nota = estado === 'descartado'
       ? `${h.descripcion} [DESCARTADO ${hoy}: ${MOTIVO}]`
-      : `${h.descripcion} [ARREGLADO ${hoy}]`;
-    upd.run(estado, nota, ahora(), h.id);
-    console.log(`  ✓ ${id} · ${h.slug} · ${estado}`);
+      : otroEsperado
+        ? `${h.descripcion} [ARREGLADO ${hoy} · OTRO ESPERADO: ${MOTIVO}]`
+        : `${h.descripcion} [ARREGLADO ${hoy}]`;
+    upd.run(estado, nota, ahora(), otroEsperado ? 1 : 0, h.id);
+    console.log(`  ✓ ${id} · ${h.slug} · ${estado}${otroEsperado ? ' con otro esperado' : ''}`);
     n++;
   }
   const quedan = db.prepare("SELECT COUNT(*) n FROM hallazgos WHERE estado = 'abierto'").get().n;
@@ -159,7 +180,7 @@ function cerrar(ids, estado) {
 
 if (REABRIR) {
   const leer = db.prepare('SELECT id, slug, estado, descripcion FROM hallazgos WHERE id = ?');
-  const upd = db.prepare("UPDATE hallazgos SET estado = 'abierto', descripcion = ?, cerrado = NULL WHERE id = ?");
+  const upd = db.prepare("UPDATE hallazgos SET estado = 'abierto', descripcion = ?, cerrado = NULL, esperado_errado = NULL WHERE id = ?");
   for (const id of REABRIR.split(',').map(s => s.trim()).filter(Boolean)) {
     const h = leer.get(Number(id));
     if (!h) { console.error(`  · id ${id}: no existe`); continue; }
@@ -318,7 +339,25 @@ if (REVALIDAR_REPARADAS) {
 }
 
 if (ARREGLADO) { cerrar(ARREGLADO, 'arreglado'); process.exit(0); }
+if (ARREGLADO_OTRO) { cerrar(ARREGLADO_OTRO, 'arreglado', true); process.exit(0); }
 if (DESCARTADO) { cerrar(DESCARTADO, 'descartado'); process.exit(0); }
+
+/**
+ * La precisión del Inspector: de los hallazgos cerrados desde DESDE_PRECISION, cuántos eran
+ * defectos con el esperado bien puesto. Un descartado no era defecto; uno con otro esperado era
+ * defecto, pero el Inspector se equivocó en lo que pedía. Una línea, para el listado y el parte.
+ */
+function lineaPrecision() {
+  // Solo los cerrados con este código, que siempre deja la marca (0 o 1): los de antes, nula
+  const r = db.prepare(`SELECT COUNT(*) n, SUM(estado = 'descartado') d, SUM(esperado_errado = 1) o
+    FROM hallazgos WHERE estado <> 'abierto' AND esperado_errado IS NOT NULL`).get();
+  const desdeES = DESDE_PRECISION.split('-').reverse().join('/');
+  if (!r.n) return `Precisión del Inspector: sin cierres desde el ${desdeES} (antes la base no la distinguía)`;
+  const pct = (x) => (100 * x / r.n).toLocaleString('es-ES', { maximumFractionDigits: 1 });
+  return `Precisión del Inspector desde el ${desdeES}: ${pct(r.n - r.d - r.o)} % de ${r.n} cerrados` +
+    ` (${r.d} descartados · ${r.o} con otro esperado)`;
+}
+if (PRECISION) { console.log(lineaPrecision()); process.exit(0); }
 
 // ─── Listar ───────────────────────────────────────────────────────────────────
 
@@ -365,6 +404,8 @@ console.log(`\nPor app: ${porApp.map(([slug, n]) => `${slug} (${n})`).join(' · 
 const restantes = db.prepare("SELECT COUNT(*) n FROM hallazgos WHERE estado = 'abierto'").get().n;
 if (desde && !TODOS && restantes > filas.length)
   console.log(`(fuera de este filtro quedan ${restantes - filas.length} abiertos más: sin --desde/--ultima se ven todos)`);
+console.log(`\n${lineaPrecision()}`);
 console.log(`\nCerrar:  npm run inspector:hallazgos -- --arreglado 1,2,3`);
+console.log(`         npm run inspector:hallazgos -- --arreglado-otro 5 --motivo "qué esperado era el correcto"`);
 console.log(`         npm run inspector:hallazgos -- --descartado 4 --motivo "por qué no era un defecto"`);
 console.log(`Tras reparar: npm run inspector:hallazgos -- --revalidar-reparadas\n`);

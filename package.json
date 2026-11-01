@@ -78,6 +78,7 @@
     "inspector:probar-cola-cabos": "node scripts/inspector/probar-cola-cabos.mjs",
     "inspector:probar-cola-reposo": "node scripts/inspector/probar-cola-reposo.mjs",
     "inspector:probar-cola-valor": "node scripts/inspector/probar-cola-valor.mjs",
+    "inspector:probar-precision": "node scripts/inspector/probar-precision.mjs",
     "inspector:orden": "node scripts/inspector/orden-del-dia.mjs",
     "inspector:probar-orden": "node scripts/inspector/probar-orden.mjs",
     "inspector:probar-revalidar": "node scripts/inspector/probar-revalidar.mjs",

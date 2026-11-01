@@ -122,6 +122,9 @@ export function abrir() {
  * `inspecciones.modo` (01/11/2026): `primera` · `cambio` · `cabo` · `rojo` · `firma` (cabecera de
  * `cola.mjs`, «LOS TRES MODOS»). Nulo en las anteriores: la primera de cada app era entera y las
  * demás, repeticiones enteras. La cola mide con él el rendimiento de cada modo.
+ *
+ * `hallazgos.esperado_errado` (01/11/2026): 1 si se cerró con `--arreglado-otro` (el defecto era
+ * real pero el esperado del Inspector no), 0 en un cierre normal, nulo antes de esa fecha o abierto.
  */
 const COLUMNAS_NUEVAS = [
   ['hallazgos', 'cerrado', 'TEXT'],
@@ -130,6 +133,7 @@ const COLUMNAS_NUEVAS = [
   ['apps', 'firma_detalle', 'TEXT'],
   ['apps', 'firma_desde', 'TEXT'],
   ['inspecciones', 'modo', 'TEXT'],
+  ['hallazgos', 'esperado_errado', 'INTEGER'],
 ];
 function migrar(db) {
   for (const [tabla, columna, tipo] of COLUMNAS_NUEVAS) {
