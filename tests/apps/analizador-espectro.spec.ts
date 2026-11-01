@@ -599,6 +599,23 @@ async function arrancarNivel(page: Page, hz: number, ganancia: number, tasa = 48
   expect(contexto).toEqual({ estado: 'running', tasa });
 }
 
+/**
+ * Espera a que la cifra en pantalla quede a 1 Hz de `objetivo`, sondeando hasta 10 s.
+ *
+ * Cabo C0492 (01/11/2026): tras los 2 s fijos de `arrancarNivel` se leía UNA vez, y en la suite
+ * (next start, 4 workers) dos casos fallaron y pasaban 3 de 3 aislados: con la CPU repartida, el
+ * suavizado de 0,8 del analizador aún arrastraba fotogramas anteriores. Si la app no converge
+ * nunca, el sondeo cae igual.
+ */
+async function esperarHercios(page: Page, objetivo: number): Promise<void> {
+  await expect
+    .poll(async () => Math.abs((await hercios(page)) - objetivo), {
+      timeout: 10000,
+      message: `la cifra no se asienta a 1 Hz de ${objetivo}`,
+    })
+    .toBeLessThanOrEqual(1);
+}
+
 /** Los cents de la nota: «A4+0 ¢» → 0 · «E0−26 ¢» → −26 · sin cents → NaN. */
 async function centsMostrados(page: Page): Promise<number> {
   const texto = (await nota(page).textContent()) ?? '';
@@ -615,7 +632,7 @@ const NIVEL_FUERTE = 0.5;
 test.describe('Re-inspección 01/10/2026 · lo que el motor compartido NO ha roto', () => {
   test('440 Hz a −26 dBFS: «440 Hz», A4 y menos de 4 ¢', async ({ page }) => {
     await arrancarNivel(page, 440, NIVEL_MODERADO);
-    expect(Math.abs((await hercios(page)) - 440)).toBeLessThanOrEqual(1);
+    await esperarHercios(page, 440);
     await expect(nota(page)).toContainText('A4');
     expect(Math.abs(await centsMostrados(page))).toBeLessThanOrEqual(4);
   });
@@ -623,14 +640,14 @@ test.describe('Re-inspección 01/10/2026 · lo que el motor compartido NO ha rot
   test('Mi2 (82,41 Hz) a −26 dBFS, sin saturar: «82 Hz», E2 a menos de 10 ¢', async ({ page }) => {
     // Testigo de que el sesgo del test de la meseta (abajo) depende del NIVEL y no del motor.
     await arrancarNivel(page, 82.41, NIVEL_MODERADO);
-    expect(Math.abs((await hercios(page)) - 82.41)).toBeLessThanOrEqual(1);
+    await esperarHercios(page, 82.41);
     await expect(nota(page)).toContainText('E2');
     expect(Math.abs(await centsMostrados(page))).toBeLessThanOrEqual(10);
   });
 
   test('21 Hz a 48 kHz se lee: la cima cae en el bin 4, ya dentro del rango', async ({ page }) => {
     await arrancarNivel(page, 21, NIVEL_MODERADO);
-    expect(Math.abs((await hercios(page)) - 21)).toBeLessThanOrEqual(1);
+    await esperarHercios(page, 21);
     await expect(nota(page)).toContainText('E0');
     expect(Math.abs((await centsMostrados(page)) - 33)).toBeLessThanOrEqual(6);
   });
@@ -684,7 +701,7 @@ test.describe('Re-inspección 01/10/2026 · hallazgos', () => {
       // que es lo que da el mismo tono sin saturar (test de arriba).
       await arrancarNivel(page, 82.41, NIVEL_FUERTE);
       expect(await page.evaluate(() => (window as VentanaEspia).__maxByte)).toBe(255);
-      expect(Math.abs((await hercios(page)) - 82.41)).toBeLessThanOrEqual(1);
+      await esperarHercios(page, 82.41);
       await expect(nota(page)).toContainText('E2');
       expect(Math.abs(await centsMostrados(page))).toBeLessThanOrEqual(10);
     },
@@ -700,7 +717,7 @@ test.describe('Re-inspección 01/10/2026 · hallazgos', () => {
       // el motor del 18/09 (floor, bin 3 dentro) los mismos bytes medidos (183, 216, 215)
       // daban 3,47 bins = 20,3 Hz. Zona muerta: 20,0–20,5 Hz a cualquier nivel.
       await arrancarNivel(page, 20.3, NIVEL_MODERADO);
-      expect(Math.abs((await hercios(page)) - 20.3)).toBeLessThanOrEqual(1);
+      await esperarHercios(page, 20.3);
       await expect(nota(page)).toContainText('E0');
       expect(Math.abs((await centsMostrados(page)) + 26)).toBeLessThanOrEqual(6);
     },
@@ -713,7 +730,7 @@ test.describe('Re-inspección 01/10/2026 · hallazgos', () => {
       // fuera del rango, así que ningún bin del rango es cima de su lóbulo: con un tono fuerte
       // la zona muerta llega hasta ~26 Hz (bin 4,5) a 48 kHz.
       await arrancarNivel(page, 25, NIVEL_FUERTE);
-      expect(Math.abs((await hercios(page)) - 25)).toBeLessThanOrEqual(1);
+      await esperarHercios(page, 25);
       await expect(nota(page)).toContainText('G0');
     },
   );
@@ -1013,7 +1030,7 @@ test.describe('Re-inspección 01/10/2026 · en un móvil (Pixel 7)', () => {
 
   test('un 440 Hz a −26 dBFS se lee igual que en escritorio', async ({ page }) => {
     await arrancarNivel(page, 440, NIVEL_MODERADO);
-    expect(Math.abs((await hercios(page)) - 440)).toBeLessThanOrEqual(1);
+    await esperarHercios(page, 440);
     await expect(nota(page)).toContainText('A4');
   });
 
