@@ -1340,6 +1340,10 @@ export default function ConversorCnaeIaePage() {
                   la clasificación anterior. Desde el {formatDate(parseISODateLocal(CNAE_VIGENCIA.desde))} rige la{' '}
                   {CNAE_VIGENCIA.vigente} ({CNAE_VIGENCIA.normaVigente}), y
                   estas son las clases actuales que recogen esa actividad
+                  {/* Span siempre montado (cabo C0548): la rama que aparece se añade dentro de
+                      él y no con insertBefore delante del «:», que con la página traducida ya
+                      es un <font> y tumbaba la app al pasar de 4711 a 2530 */}
+                  <span>
                   {homonimaEsOtraActividad && vigenteHomonima ? (
                     <span key="rama-1">
                       . <strong>Ojo</strong>: ese mismo número también es una clase VIGENTE
@@ -1353,6 +1357,7 @@ export default function ConversorCnaeIaePage() {
                       que conserva el mismo número en la clasificación nueva
                     </span>
                   ) : null}
+                  </span>
                   :
                 </p>
               </div>

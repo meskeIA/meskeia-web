@@ -1,6 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 import { SECCIONES_IAE, CNAE_VIGENCIA, FISCAL_CNAE_IAE_META } from '../../data/fiscal/cnae-iae';
-import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
+import { esperarHidratacion, esperarValorEnReact, asentarAntesDeTraducir } from './_hidratacion';
 
 /**
  * Buscador de códigos CNAE-2025 y epígrafes del IAE
@@ -4799,6 +4799,46 @@ test.describe('Buscador CNAE-IAE — el oficio encuentra en el IAE lo que encuen
     const codigos = await fichas(page).locator('[class*="codigoCnae"]').allInnerTexts();
     expect(codigos).toEqual(expect.arrayContaining(['419.1', '644.2']));
     expect(codigos.every((c) => c.startsWith('419') || c.startsWith('644'))).toBe(true);
+  });
+});
+
+test.describe('Cabo C0548 (reparar 01/11/2026) — el aviso de código antiguo con la página traducida', () => {
+  /*
+   * La frase del aviso termina en «:» y, justo delante, una de dos ramas (homónima que es otra
+   * actividad, u homónima que conserva el número) o nada. Al cambiar de rama, React insertaba el
+   * <span> nuevo con insertBefore delante del «:», que el traductor del navegador ya ha cambiado
+   * por un <font>: NotFoundError y «Algo salió mal». Ahora la condición vive dentro de un <span>
+   * siempre montado, y la rama se añade al final de él.
+   */
+  test('4711 → 2530 → 4711 con el traductor: el aviso cambia de rama y la app no cae', async ({ page }) => {
+    const errores: string[] = [];
+    page.on('pageerror', (e) => errores.push(String(e)));
+    await abrirHidratado(page);
+    await buscarCnaeVerificado(page, '4711');
+    await expect(avisoAntiguo(page)).toContainText('entre ellas 47.11');
+    await asentarAntesDeTraducir(page);
+    // Traductor simulado (receta de generador-loteria.spec.ts): cada texto pasa a <font><font>
+    await page.evaluate(() => {
+      const caminante = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+      const textos: Text[] = [];
+      for (let n = caminante.nextNode(); n; n = caminante.nextNode()) {
+        const t = n as Text;
+        if (t.textContent?.trim() && !t.parentElement?.closest('script, style, font')) textos.push(t);
+      }
+      for (const t of textos) {
+        const exterior = document.createElement('font');
+        const interior = document.createElement('font');
+        interior.textContent = t.textContent;
+        exterior.appendChild(interior);
+        t.parentNode?.replaceChild(exterior, t);
+      }
+    });
+    await buscarCnaeVerificado(page, '2530');
+    await expect(avisoAntiguo(page)).toContainText('clase VIGENTE distinta');
+    await buscarCnaeVerificado(page, '4711');
+    await expect(avisoAntiguo(page)).toContainText('que conserva el mismo número');
+    await expect(page.getByRole('heading', { name: 'Algo salió mal' })).toHaveCount(0);
+    expect(errores.filter((e) => /NotFoundError|insertBefore|removeChild/.test(e))).toEqual([]);
   });
 });
 
