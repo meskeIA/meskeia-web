@@ -877,6 +877,43 @@ test('HALLAZGO R1 (REPARADO) — un golpe de 250 Hz sobre el ruido de la sala no
  * salvo una cifra suelta («19.657 Hz · Leyendo…») justo a los 2 s, en la vuelta del fichero, que es
  * el chasquido del dispositivo falso que describe generador-tonos-medidor-grave.spec.ts.
  */
+/**
+ * Lo que vigila CASO R con un clic del entorno: ni estable, ni retenida, y ninguna cifra que se
+ * SOSTENGA (más de `MAX_PROVISIONAL_MS` seguidos).
+ *
+ * Por qué no `comprobarSinCifra` (cabo C0556, 01/11/2026): en la suite (next start, 4 workers) el
+ * caso de 20.050 Hz vio «19.961 Hz» además de «— Hz», y aislado pasaba 3 de 3. Reproducido aquí con
+ * un hueco de 10 ms fabricado en el tono (la pérdida de bloque del puente MediaStream de C0338):
+ * sale exactamente «19.961 Hz · Leyendo…» durante ~0,5 s, una vez por hueco, y nunca estable. Es
+ * lo que R1 admite de un clic. Junto al tono, así que la ventana de `comprobarSinLecturaDelTono`
+ * no sirve; lo que distingue al tono LEÍDO es que se sostiene: uno de 19.950 Hz, dentro del rango,
+ * pasa a «Lectura estable» a los ~0,4 s de la primera cifra y ya no la suelta.
+ */
+const MAX_PROVISIONAL_MS = 1000;
+
+async function comprobarSinLecturaSostenida(page: Page) {
+  const r = await registro(page);
+  const fin = await page.evaluate(() => performance.now());
+  const conMedidor = r.filter((x) => x.cifra !== '');
+  expect(conMedidor.length, 'el medidor tenía que estar a la vista').toBeGreaterThan(0);
+  expect(r.filter((x) => x.estado === 'Lectura estable').map((x) => x.cifra), 'ninguna «Lectura estable»').toEqual([]);
+  expect(r.filter((x) => x.retenida !== '').map((x) => x.retenida), 'sin «Última lectura estable»').toEqual([]);
+  // Tramos seguidos con una cifra que no es «— Hz» (el registro apunta solo los cambios)
+  let maxTramo = 0;
+  let desde: number | null = null;
+  r.forEach((x, i) => {
+    const conCifra = x.cifra !== '' && x.cifra !== '— Hz';
+    if (conCifra && desde === null) desde = x.t;
+    const siguiente = r[i + 1];
+    const cierra = !siguiente || siguiente.cifra === '' || siguiente.cifra === '— Hz';
+    if (desde !== null && cierra) {
+      maxTramo = Math.max(maxTramo, (siguiente?.t ?? fin) - desde);
+      desde = null;
+    }
+  });
+  expect(maxTramo, `ninguna cifra sostenida más de ${MAX_PROVISIONAL_MS} ms`).toBeLessThanOrEqual(MAX_PROVISIONAL_MS);
+}
+
 test.describe('Inspector 13/10/2026 — el medidor', () => {
   for (const hz of [21000, 20050]) {
     test(`CASO R — un tono de ${hz.toLocaleString('es-ES')} Hz, por encima del rango, no da ninguna cifra`, async ({ page }) => {
@@ -903,9 +940,22 @@ test.describe('Inspector 13/10/2026 — el medidor', () => {
       }, hz);
       expect(nivel, 'no se creó el analizador del medidor').not.toBeNull();
       expect(nivel ?? -Infinity, `el tono de ${hz} Hz tenía que llegar al analizador`).toBeGreaterThan(-40);
-      await comprobarSinCifra(page);
+      // Un clic del entorno puede dar una provisional suelta (cabo C0556): ver comprobarSinLecturaSostenida
+      await comprobarSinLecturaSostenida(page);
     });
   }
+
+  test('CASO R con el clic de la suite — 20.050 Hz con un hueco de 10 ms: una provisional suelta, nunca estable', async ({ page }) => {
+    await medirSintetico(page, {
+      segundos: 2,
+      componentes: [
+        { tipo: 'tono', hz: 20050, amp: 0.5, desde: 0, hasta: 1 },
+        { tipo: 'tono', hz: 20050, amp: 0.5, desde: 1.01, hasta: 2 },
+      ],
+    });
+    await esperarDesdeElMicrofono(page, 4500);
+    await comprobarSinLecturaSostenida(page);
+  });
 
   /**
    * HALLAZGO J4 [bajo · contenido] — REPARADO (3284, 18/10/2026). El bloque «Qué mide y qué no» decía que
