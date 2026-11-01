@@ -31,7 +31,13 @@
  * `resolverCaso` lo rechaza con un error legible en lugar de imprimir «∞» como resultado.
  */
 
-import { corregirNumero, redondearA, toleranciaRelativa } from '@/lib/calculadoras/correctorCasosAula';
+import {
+  corregirNumero,
+  exigeRedondeo,
+  redondearA,
+  textoDesviacion,
+  toleranciaRelativa,
+} from '@/lib/calculadoras/correctorCasosAula';
 
 /* ─────────────────────────── Datos físicos de la app ─────────────────────────── */
 
@@ -385,12 +391,25 @@ export interface Veredicto {
 /**
  * Corrige la respuesta del alumno. Nunca lanza: una entrada que no es número se responde con
  * un veredicto, no con una excepción que tumbaría el render.
+ *
+ * Con `datos`, una respuesta EXACTA a los decimales de la pregunta no tiene margen (cabo C0267,
+ * 01/11/2026): el 1 % aprobaba 872 Hz para los 880 exactos del cuarto armónico de 220 Hz, que no
+ * es ningún redondeo. La que exige redondear (73,0103 dB, 3,118 mm) conserva el 1 %, porque los
+ * enunciados no piden decimales y «73» con log₁₀ 2 ≈ 0,3 es una respuesta de libro. Es la regla
+ * de bfccafa5 en simulador-fluidos-bernoulli. Sin `datos`, la relativa de siempre.
  */
-export function comprobarRespuesta(usuario: number, esperado: number): Veredicto {
+export function comprobarRespuesta(usuario: number, esperado: number, datos?: DatosCaso): Veredicto {
+  let tolerancia = toleranciaDe(esperado);
+  let decimales = 2;
+  if (datos) {
+    const r = resolverCaso(datos);
+    decimales = datos.decimales ?? 2;
+    if (r.ok && !exigeRedondeo(r.valor, decimales, redondear)) tolerancia = 0;
+  }
   // Magnitudes continuas: ningún valor es imposible por sí mismo dentro de la tolerancia
   // (sonda del 15/10/2026 sobre los 12 casos y 40 semillas del modo práctica).
-  const c = corregirNumero(usuario, esperado, { tolerancia: toleranciaDe(esperado), magnitud: 'real' });
-  const { diferencia, tolerancia } = c;
+  const c = corregirNumero(usuario, esperado, { tolerancia, magnitud: 'real' });
+  const { diferencia } = c;
 
   if (c.estado === 'no-numerico') {
     return {
@@ -408,7 +427,8 @@ export function comprobarRespuesta(usuario: number, esperado: number): Veredicto
 
   return {
     correcto: false,
-    motivo: `No es correcto. Te has desviado ${numero(diferencia)} de la respuesta.`,
+    // Con tolerancia 0, «880,004» para 880 no puede decir «Te has desviado 0» (hallazgo 3369)
+    motivo: `No es correcto. Te has desviado ${textoDesviacion(diferencia, decimales, numero)} de la respuesta.`,
     diferencia,
     tolerancia,
   };

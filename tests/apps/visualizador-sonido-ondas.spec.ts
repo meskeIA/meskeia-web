@@ -251,6 +251,37 @@ test.describe('visualizador-sonido-ondas · casos para clase', () => {
     expect(v.motivo).not.toContain('NaN');
   });
 
+  test('C0267 · una respuesta EXACTA no tiene margen; la que exige redondear conserva el 1 %', async () => {
+    // Cabo C0267 (reparar 01/11/2026), la forma del hallazgo 3342. A mano:
+    //   caso 7 · 4.º armónico de 220 Hz = 880 Hz exactos   → 872 y 888 no son redondeo de nada
+    //   caso 3 · 1 / 0,0025 s = 400 Hz exactos              → 396 tampoco
+    //   caso 9 · 60 dB + 10·log₁₀(100) = 80 dB exactos      → 79,5 no
+    //   caso 10 · 70 + 10·log₁₀(2) = 73,0103 dB → exige redondear: 73,01 y 73 (log 2 ≈ 0,3) valen
+    //   caso 12 · 343 / 110.000 m = 3,118 mm → exige redondear: 3,12 y 3,1 valen
+    const caso = (id: number) => CASOS.find((c) => c.id === id)!;
+    const corrige = (usuario: number, id: number) =>
+      comprobarRespuesta(usuario, caso(id).respuesta, caso(id).datos).correcto;
+    expect(corrige(880, 7)).toBe(true);
+    expect(corrige(872, 7)).toBe(false);
+    expect(corrige(888, 7)).toBe(false);
+    expect(corrige(400, 3)).toBe(true);
+    expect(corrige(396, 3)).toBe(false);
+    expect(corrige(80, 9)).toBe(true);
+    expect(corrige(79.5, 9)).toBe(false);
+    expect(corrige(73.01, 10)).toBe(true);
+    expect(corrige(73, 10)).toBe(true);
+    expect(corrige(3.12, 12)).toBe(true);
+    expect(corrige(3.1, 12)).toBe(true);
+    // El motivo no dice «Te has desviado 0» con tolerancia 0 (hallazgo 3369).
+    expect(comprobarRespuesta(880.004, 880, caso(7).datos).motivo).not.toMatch(/desviado 0 /);
+    // Y la clave aprueba siempre: los 12 casos y 500 prácticas.
+    for (const c of CASOS) expect(comprobarRespuesta(c.respuesta, c.respuesta, c.datos).correcto, `caso ${c.id}`).toBe(true);
+    for (let semilla = 1; semilla <= 500; semilla++) {
+      const e = generarEjercicioAleatorio(semilla);
+      expect(comprobarRespuesta(e.respuesta, e.respuesta, e.datos).correcto, `semilla ${semilla}`).toBe(true);
+    }
+  });
+
   test('10 · la tabla de exposición que corrige es la misma que la app pinta', async () => {
     // `minutos` y `tiempo` son el mismo dato en dos formatos: si divergieran, el caso 6
     // corregiría con un número que la pantalla no dice en ninguna parte.

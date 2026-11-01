@@ -60,7 +60,8 @@ export default function CasosAula() {
     // parseSpanishNumber admite «0,5» y «0.5»; devuelve NaN con cualquier otra cosa, y de ese
     // NaN se encarga comprobarRespuesta con un mensaje propio (nunca «NaN» en pantalla).
     const valor = parseSpanishNumber(respuesta);
-    const r = comprobarRespuesta(valor, esperado);
+    // Con los datos de la pregunta: una respuesta exacta no tiene margen (cabo C0267)
+    const r = comprobarRespuesta(valor, esperado, practica ? practica.datos : caso.datos);
     setVeredicto({ correcto: r.correcto, motivo: r.motivo });
   }
 
