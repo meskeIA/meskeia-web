@@ -35,6 +35,24 @@ const COLORES = [
   '#64B5F6', '#F06292'
 ];
 
+/**
+ * Nombre de cada color para el lector de pantalla (cabo C0552): los botones de la paleta no
+ * tienen texto, y sin esto se anunciaban como «botón, pulsado» sin decir qué color era. Va
+ * aparte de `COLORES` porque los hábitos guardados en localStorage llevan el hexadecimal.
+ */
+const NOMBRE_COLOR: Record<string, string> = {
+  '#2E86AB': 'Azul',
+  '#48A9A6': 'Verde azulado',
+  '#E57373': 'Rojo',
+  '#FFB74D': 'Ámbar',
+  '#9575CD': 'Morado',
+  '#4DB6AC': 'Aguamarina',
+  '#FF8A65': 'Coral',
+  '#81C784': 'Verde',
+  '#64B5F6': 'Celeste',
+  '#F06292': 'Rosa',
+};
+
 // Categorías
 const CATEGORIAS = [
   { id: 'salud', nombre: 'Salud', icono: '💪' },
@@ -792,6 +810,8 @@ export default function SeguimientoHabitosPage() {
                     style={{ background: color }}
                     onClick={() => setFormColor(color)}
                     aria-pressed={formColor === color}
+                    aria-label={NOMBRE_COLOR[color]}
+                    title={NOMBRE_COLOR[color]}
                   />
                 ))}
               </div>
