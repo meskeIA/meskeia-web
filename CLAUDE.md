@@ -653,6 +653,17 @@ y buena parte del pasivo no valida el resultado. El pasivo lo drena el Inspector
 > Salió de `conversor-numeros-letras` (24/08/2026) y `calculadora-masa-madre` (25/08). Crónica y
 > pasivo: cabecera de `scripts/check-parser-numerico.mjs` · casos: `scripts/pruebas/parser-numerico.tsx`.
 
+### Candado de la respuesta de aula
+
+`npm run check:respuesta-aula` — en el build, y **rompe el build** si un `CasosAula.tsx` de `app/`
+lee la respuesta con `parseSpanishNumber(…)`, que toma «2.493» por 2493. Se lee con
+**`leerRespuestaAula(texto, esperado)`** de `@/lib/calculadoras/correctorCasosAula`: de las dos
+lecturas de un punto con tres cifras detrás se queda la más cercana a la respuesta.
+Barre todos los `CasosAula.tsx`, **sin pasivo** · Escape: `respuesta-aula-ok: <razón>`, razón obligatoria.
+⚠️ No ve una tarea de aula que lea en su `page.tsx` o en `casos.ts`.
+> Salió del hallazgo 3866 (simulador-estequiometria) y el cabo C0558: 27 copias. Crónica: cabecera
+> de `scripts/check-respuesta-aula.mjs` · pruebas: `npm run respuesta-aula:probar-candado`.
+
 ### Candado del reloj y el azar en el render
 
 `npm run check:reloj-azar` — en el build, y **rompe el build** si el commit escribe un `useState`
