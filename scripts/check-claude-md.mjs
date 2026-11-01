@@ -419,7 +419,8 @@ const OBLIGACIONES = [
   ]],
   ['Dónde vive una skill', [
     'Una skill de meskeIA se crea en .claude/skills/ del proyecto',
-    '/agenda, /log, /markets, /correo', 'No se versionan', 'salvo cuadre y trpc-meskeia',
+    '/agenda, /log, /markets, /correo', 'No van en este repositorio', 'salvo cuadre y trpc-meskeia',
+    'Sí tienen historial', 'skills:historial', 'HISTORIAL.md',
     'CRLF rompe el frontmatter en silencio', 'Guardar siempre en LF',
   ]],
   ['Agenda Operativa', [

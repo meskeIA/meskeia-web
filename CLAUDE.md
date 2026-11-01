@@ -991,10 +991,12 @@ los proyectos, y las 14 de meskeIA sumaban ~6 KB que pagaban XFinanzas, Genealog
 usarlos nunca. Es la misma razón por la que el CLAUDE.md global no duplica los estándares de
 meskeIA y por la que `/meskeia-dev-stack` se retiró el 10/09/2026.
 
-⚠️ **No se versionan**: 10 de las 14 citan rutas privadas (`_private/`, `digests/`, `semillas/`)
-y este repositorio es **público**. `.gitignore` las excluye salvo `cuadre` y `trpc-meskeia`, que
-no contienen nada privado. Consecuencia asumida: no viajan a otra máquina — igual que antes, que
-tampoco viajaban al no versionarse `~/.claude/`.
+⚠️ **No van en este repositorio**: 10 de las 14 citan rutas privadas (`_private/`, `digests/`,
+`semillas/`) y es **público**. `.gitignore` las excluye salvo `cuadre` y `trpc-meskeia`. **Sí tienen
+historial** (01/11/2026), en un repositorio local sin remoto: tras editar una skill,
+`npm run skills:historial -- commit "<qué y por qué>"`, que dice además el tamaño de cada
+SKILL.md. Lo de un día anterior lo barre `/parte`. La crónica de una regla va al `HISTORIAL.md` de
+la carpeta de su skill, que no se carga: en el SKILL.md, la regla y su caso de origen en una línea.
 
 ⚠️ **CRLF rompe el frontmatter en silencio**: la skill se carga igual, pero su `description:` no
 se lee y el modelo ve el título `# H1` en su lugar. `semilla-diaria` llevaba así desde su

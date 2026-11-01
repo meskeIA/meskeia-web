@@ -83,6 +83,7 @@
     "inspector:probar-revalidar-commits": "node scripts/inspector/probar-revalidar-commits.mjs",
     "cabos": "node scripts/cabos/cabos.mjs",
     "cabos:probar": "node scripts/cabos/probar-cabos.mjs",
+    "skills:historial": "node scripts/skills-historial.mjs",
     "ronda:probar": "node scripts/pruebas/probar-ronda-base.mjs",
     "check:tipos": "node scripts/check-tipos.mjs",
     "tipos:probar-candado": "node scripts/pruebas/probar-check-tipos.mjs",
