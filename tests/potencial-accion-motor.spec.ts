@@ -201,6 +201,18 @@ test.describe('Hallazgo 2954 — los refractarios duran lo que dice la FAQ de la
     expect(r.spikes).toHaveLength(1);
     expect(r.trayectoria[r.trayectoria.length - 1].v).toBeCloseTo(V_REPOSO, 1);
   });
+
+  test('hallazgo 3863: sin estímulo no hay disparo, aunque el umbral esté a 5 mV del reposo', () => {
+    // Umbral −65, pulso de 5 ms, I = 30: 1.er PA cuando 30·(1 − 0,98^k) > 5 → k = 10, t = 5,9 ms.
+    // El pulso acaba en 10,0. La carga que deja encima de la hiperpolarización decae con τ y la
+    // plantilla recupera de −85 a −70 en línea recta: la suma llegaba a −64,93 en 12,9 ms y
+    // disparaba un 2.º PA sin estímulo. En un integrador con fuga eso no puede pasar.
+    for (const intensidad of [28, 30, 40]) {
+      const r = correr({ umbral: -65, intensidad });
+      expect(r.spikes, `I = ${intensidad}`).toHaveLength(1);
+    }
+    expect(correr({ umbral: -65, intensidad: 30 }).spikes[0].inicio).toBeCloseTo(5.9, 6);
+  });
 });
 
 test.describe('El reposo y el estímulo nulo', () => {

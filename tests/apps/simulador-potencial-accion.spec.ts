@@ -263,10 +263,12 @@ test('caso límite: el periodo refractario impide un PA por pulso cuando los est
   // decae. A mano: el primer PA arranca en 5 + 5·ln(40/25) = 7,35 → 7,3 ms; espiga hasta 9,3.
   // El pulso de 10-12,5 ms deja u = 40·(1 − 0,98²⁵) = 15,86 sobre una plantilla de −75,7
   // (−59,8 mV, lejos del umbral de −52,7) y la hiperpolarización acaba en 14,3 sin disparo. El
-  // pulso de 15 ms parte de u ≈ 10 y cruza −55 en 15,9 ms. Intervalo 8,6 ms → 1000/8,6 = 116 Hz,
-  // y 5 PA (7,3 · 15,9 · 25,9 · 35,9 · 45,9) para 9 pulsos.
+  // pulso de 15 ms parte de u ≈ 10 y cruza −55 en 15,9 ms. 5 PA (7,3 · 15,9 · 25,9 · 35,9 · 45,9)
+  // para 9 pulsos. La tarjeta da la frecuencia MEDIA del tren (hallazgo 3865, 01/11/2026):
+  // 4 intervalos en 38,6 ms → 4000/38,6 = 103,6 → 104 Hz. Antes daba la del 1.er intervalo,
+  // 1000/8,6 = 116 Hz, que el resto del tren (10 ms) no tiene.
   await expect(tarjeta(page, 'Nº potenciales de acción')).toHaveText('5');
-  await expect(tarjeta(page, 'Frecuencia de disparo')).toHaveText('116 Hz');
+  await expect(tarjeta(page, 'Frecuencia de disparo')).toHaveText('104 Hz');
 
   // Con estímulo continuo (pulso de 5 ms cada 5 ms) el tren se aprieta y el 2.º PA llega EN la
   // hiperpolarización: u = 40·(1 − 0,98ⁿ) sobre −85 + 0,3·n cruza −55 + 15·e^(−0,06·n) en
@@ -678,7 +680,7 @@ test.describe('móvil 390×844, con el dedo', () => {
     await expect(page).toHaveURL(/\/simulador-potencial-accion\/$/);
   });
 
-  test('caso límite: con el dedo, «Estímulo sostenido» saca el intervalo y un tren de 5 PA a 102 Hz', async ({ page }) => {
+  test('caso límite: con el dedo, «Estímulo sostenido» saca el intervalo y un tren de 5 PA a 101 Hz', async ({ page }) => {
     await arrastrarConElDedo(page, INTENSIDAD, 'derecha');
     await expect(etiquetaControl(page, 'Intensidad del estímulo')).toContainText('40 u.a.');
     const boton = page.getByRole('button', { name: /Estímulo sostenido/ });
@@ -689,10 +691,11 @@ test.describe('móvil 390×844, con el dedo', () => {
     // A mano (pulso 5 ms cada 10 ms, I = 40; modelo del 24/10/2026, hallazgo 2954): 1.er PA en
     // 7,3 ms; espiga hasta 9,3. El pulso sigue hasta 10 ms: 6 pasos dejan u = 40·(1 − 0,98⁶) =
     // 4,57, que decae a 4,57·0,98⁵⁰ = 1,66 hasta las 15. El pulso de 15 ms cruza −55 cuando
-    // 40 − 38,34·0,98ⁿ > 15, n = 22 → 2.º PA en 17,1 ms (9,8 ms → 102 Hz). Los siguientes, en
-    // 27,0 · 37,0 · 47,0: 5 PA. Antes (absoluto de 8 ms) eran 4 a 89 Hz.
+    // 40 − 38,34·0,98ⁿ > 15, n = 22 → 2.º PA en 17,1 ms. Los siguientes, en 27,0 · 37,0 · 47,0:
+    // 5 PA. Antes (absoluto de 8 ms) eran 4 a 89 Hz. Frecuencia media del tren (hallazgo 3865):
+    // 4 intervalos en 39,7 ms → 4000/39,7 = 100,8 → 101 Hz (el 1.er intervalo solo, 9,8 ms, 102).
     await expect(tarjeta(page, 'Nº potenciales de acción')).toHaveText('5');
-    await expect(tarjeta(page, 'Frecuencia de disparo')).toHaveText('102 Hz');
+    await expect(tarjeta(page, 'Frecuencia de disparo')).toHaveText('101 Hz');
   });
 
   test('caso a rechazar: arrastrando la intensidad más allá del extremo izquierdo se queda en 0 u.a. y en reposo', async ({ page }) => {
@@ -1190,25 +1193,27 @@ test.describe('Inspector 01/11/2026 — escritorio', () => {
     expect(panel).not.toMatch(/NaN|Infinity|∞|undefined/);
   });
 
-  // ABIERTO, hallazgo (inspector 01/11/2026): en modo único el modelo dispara un 2.º PA cuando el
-  // estímulo ya ha terminado, y el botón promete «Un pulso. Verás 0 o 1 PA según intensidad».
+  // REPARADO, hallazgo 3863 (inspector 01/11/2026): en modo único el modelo disparaba un 2.º PA
+  // cuando el estímulo ya había terminado, y el botón promete «Un pulso. Verás 0 o 1 PA según
+  // intensidad». Ahora solo dispara un paso con estímulo aplicado (motor.ts): en el barrido de
+  // umbral × intensidad × duración del modo único, 0 de 10.660 combinaciones dan más de 1 PA.
   test('en modo único, «Verás 0 o 1 PA»: con umbral −65 mV, pulso de 5 ms e I = 30 sale UN potencial de acción', async ({ page }) => {
-    test.fail();
     await expect(page.getByRole('button', { name: /Estímulo único/ })).toContainText('Verás 0 o 1 PA');
     await sembrarValor(page, UMBRAL, -65);
     await sembrarValor(page, INTENSIDAD, 30);
     // A mano: 1.er PA cuando 30·(1 − 0,98^k) > 5 → k = 10 → t = 5,9 ms (latencia 0,90). El pulso
-    // acaba en 10,0 ms y desde ahí no entra nada: un pulso, un PA. El motor dispara otro en 12,9 ms,
-    // al cerrar la ventana relativa: el umbral elevado (+0,75 mV) cae de golpe al nominal con la
-    // membrana en −64,93 mV por el resto de carga del pulso, y la tarjeta anuncia «143 Hz».
+    // acaba en 10,0 ms y desde ahí no entra nada: un pulso, un PA. El motor disparaba otro en
+    // 12,9 ms, al cerrar la ventana relativa: el umbral elevado (+0,75 mV) caía de golpe al nominal
+    // con la membrana en −64,93 mV por el resto de carga del pulso, y la tarjeta anunciaba «143 Hz».
+    await expect(tarjeta(page, 'Nº potenciales de acción')).toHaveText('1');
+    await expect(page.locator('[class*="resultCard"]').filter({ hasText: 'Frecuencia de disparo' })).toHaveCount(0);
     await expect(tarjeta(page, 'Latencia')).toHaveText('0,90 ms');
     expect(await tarjeta(page, 'Nº potenciales de acción').innerText()).toBe('1');
   });
 
-  // ABIERTO, hallazgo (inspector 01/11/2026): «Frecuencia de disparo» y «X ms entre PAs» salen
-  // solo del PRIMER intervalo del tren.
+  // REPARADO, hallazgo 3865 (inspector 01/11/2026): «Frecuencia de disparo» y «X ms entre PAs»
+  // salían solo del PRIMER intervalo del tren. Ahora, la media del tren: (n − 1)/(t_n − t_1).
   test('la frecuencia anunciada es la del tren, no la del primer intervalo (sostenido 2,5 ms cada 5 ms, 40 u.a.)', async ({ page }) => {
-    test.fail();
     await page.getByRole('button', { name: /Estímulo sostenido/ }).click();
     await sembrarValor(page, INTERVALO, 5);
     await sembrarValor(page, DURACION, 2.5);

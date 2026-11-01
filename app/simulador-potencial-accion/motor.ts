@@ -229,7 +229,17 @@ export function simular(p: ParametrosSimulacion): ResultadoSimulacion {
         v = V_REPOSO + u;
       }
 
-      if (v > umbralAhora) {
+      /**
+       * ── Sin corriente no hay disparo (hallazgo 3863, 01/11/2026) ──────────────────────────
+       * En un integrador con fuga, sin estímulo la membrana solo relaja hacia el reposo, y un
+       * umbral por encima del reposo no se puede cruzar así. Aquí sí se cruzaba: la plantilla
+       * recupera la hiperpolarización en línea recta (de −85 a −70 en 5 ms), más deprisa de lo
+       * que decae con τ la carga que el pulso dejó encima, y la suma subía tras acabar el pulso.
+       * Con umbral −65, pulso de 5 ms e I = 30, el modo único («Verás 0 o 1 PA») daba un 2.º PA
+       * en 12,9 ms, 2,9 ms después del final del pulso, y anunciaba 143 Hz. Es un artefacto de la
+       * plantilla, así que solo dispara un paso con estímulo aplicado.
+       */
+      if (v > umbralAhora && estimuloActual > 0) {
         // El PA arranca EN el umbral que se acaba de cruzar, no en un −55 cableado.
         enPA = { paso: i, umbralDisparo: umbralAhora };
         spikes.push({ inicio: t, pico: t + T_SUBIDA });

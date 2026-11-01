@@ -74,7 +74,13 @@ export default function SimuladorPotencialAccionPage() {
   const disparo = sim.spikes.length > 0;
   const numSpikes = sim.spikes.length;
   const latencia = disparo ? sim.spikes[0].inicio - inicioEstimulo : null;
-  const frecuencia = numSpikes > 1 ? 1000 / (sim.spikes[1].inicio - sim.spikes[0].inicio) : null;
+  // Frecuencia MEDIA del tren, (n − 1) / (t_n − t_1). Hasta el 01/11/2026 salía solo del primer
+  // intervalo, que es transitorio cuando el 1.er PA arranca del reposo: con pulsos de 2,5 ms cada
+  // 5 ms el tren va a 10 ms y la tarjeta anunciaba «116 Hz · 8,6 ms entre PAs» (hallazgo 3865).
+  const frecuencia =
+    numSpikes > 1
+      ? ((numSpikes - 1) * 1000) / (sim.spikes[numSpikes - 1].inicio - sim.spikes[0].inicio)
+      : null;
 
   // ============================================
   // DIBUJO
@@ -453,7 +459,7 @@ export default function SimuladorPotencialAccionPage() {
             <div className={styles.resultCard}>
               <span className={styles.resultLabel}>Frecuencia de disparo</span>
               <span className={styles.resultValue}>{fmt(frecuencia, 0)} Hz</span>
-              <span className={styles.resultRange}>{fmt(1000 / frecuencia, 1)} ms entre PAs</span>
+              <span className={styles.resultRange}>media del tren: {fmt(1000 / frecuencia, 1)} ms entre PAs</span>
             </div>
           )}
           <div className={styles.resultCard}>
