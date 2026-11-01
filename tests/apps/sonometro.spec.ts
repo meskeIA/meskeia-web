@@ -881,11 +881,18 @@ const sesionDeJunio = (dia: number): SesionSembrada => ({
 const filasRegistro = (page: Page) => page.locator('[class*="tablaRegistro"] tbody tr');
 const avisoRegistro = (page: Page) => page.locator('[class*="avisoRegistro"]');
 
-/** Mide `segundos` con el micrófono ya inyectado y pulsa «Detener y guardar». */
+/**
+ * Mide `segundos` con el micrófono ya inyectado y pulsa «Detener y guardar».
+ *
+ * Los segundos son los del reloj de la APP (`esperarSegundosDeApp`), no los de pared. Cabo C0550
+ * (01/11/2026): con `waitForTimeout(4000)` y 8 workers, la app llegaba a analizar menos de los 3 s
+ * que exige el registro, no guardaba, y el test de las 60 mediciones caía con «la más antigua ha
+ * desaparecido del almacenamiento» sin que la app tuviera defecto.
+ */
 async function medirYGuardar(page: Page, segundos: number): Promise<void> {
   await page.getByRole('button', { name: /Iniciar medición/i }).click();
   await esperarLectura(page);
-  await page.waitForTimeout(segundos * 1000);
+  await esperarSegundosDeApp(page, segundos);
   await page.getByRole('button', { name: /Detener y guardar/i }).click();
   await page.waitForTimeout(300);
 }
