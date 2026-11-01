@@ -131,7 +131,8 @@
   min-width: 120px;
 }
 
-.inputGroup label {
+.inputGroup label,
+.inputGroup .etiqueta {
   display: block;
   margin-bottom: 8px;
   font-weight: 500;

@@ -299,7 +299,8 @@ export default function CalculadoraReglaDeTresPage() {
                 </div>
                 <span className={styles.flecha}>→</span>
                 <div className={styles.inputGroup}>
-                  <label>X (resultado)</label>
+                  {/* span y no label: el resultado es de solo lectura, no hay control que rotular (C0551) */}
+                  <span className={styles.etiqueta}>X (resultado)</span>
                   <div className={styles.resultadoX}>
                     {resultado ? formatNumber(resultado.valor, 2) : '?'}
                   </div>
@@ -398,7 +399,7 @@ export default function CalculadoraReglaDeTresPage() {
                   </div>
                   <span className={styles.flecha}>→</span>
                   <div className={styles.inputGroup}>
-                    <label>X</label>
+                    <span className={styles.etiqueta}>X</span>
                     <div className={styles.resultadoX}>
                       {resultado ? formatNumber(resultado.valor, 2) : '?'}
                     </div>
