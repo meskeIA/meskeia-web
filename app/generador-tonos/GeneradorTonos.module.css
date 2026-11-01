@@ -403,6 +403,12 @@
   color: var(--text-muted);
 }
 
+/* En oscuro, el fondo tintado del preset activo (#2D363A) dejaba la cifra gris a 4,45:1, por
+   debajo del 4,5:1 del texto de 12 px; el texto secundario del tema lo supera (hallazgo 3870). */
+[data-theme='dark'] .presetActivo .presetFrec {
+  color: var(--text-secondary);
+}
+
 /* Info */
 .infoSection {
   margin-bottom: 30px;
@@ -979,6 +985,12 @@
 }
 .medidaLimites li:last-child {
   margin-bottom: 0;
+}
+/* Los enlaces van dentro del texto: sin subrayado solo los distinguía el color, a 1,05:1 del texto
+   en claro (globals.css quita el subrayado a todo `a`). WCAG 1.4.1, hallazgo 3869. */
+.medidaLimites a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 [data-theme='dark'] .medidaAviso {

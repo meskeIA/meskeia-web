@@ -1417,15 +1417,17 @@ export default function GeneradorTonosPage() {
           <span className={styles.sliderLabel}>20 kHz</span>
         </div>
 
-        {/* Slider logarítmico visual */}
+        {/* Slider logarítmico visual. El nombre accesible EMPIEZA por lo que se ve («1k, ir a
+            1.000 Hz»): con «Ir a 1.000 Hz» a secas, quien usa control por voz decía «pulsa 1k» y no
+            encontraba el botón (WCAG 2.5.3, hallazgo 3868, cabo C0555). */}
         <div className={styles.escalaVisual}>
           <button type="button" onClick={() => elegirFrecuencia(20)} aria-label="Ir a 20 Hz">20</button>
           <button type="button" onClick={() => elegirFrecuencia(100)} aria-label="Ir a 100 Hz">100</button>
           <button type="button" onClick={() => elegirFrecuencia(500)} aria-label="Ir a 500 Hz">500</button>
-          <button type="button" onClick={() => elegirFrecuencia(1000)} aria-label="Ir a 1.000 Hz">1k</button>
-          <button type="button" onClick={() => elegirFrecuencia(5000)} aria-label="Ir a 5.000 Hz">5k</button>
-          <button type="button" onClick={() => elegirFrecuencia(10000)} aria-label="Ir a 10.000 Hz">10k</button>
-          <button type="button" onClick={() => elegirFrecuencia(20000)} aria-label="Ir a 20.000 Hz">20k</button>
+          <button type="button" onClick={() => elegirFrecuencia(1000)} aria-label="1k, ir a 1.000 Hz">1k</button>
+          <button type="button" onClick={() => elegirFrecuencia(5000)} aria-label="5k, ir a 5.000 Hz">5k</button>
+          <button type="button" onClick={() => elegirFrecuencia(10000)} aria-label="10k, ir a 10.000 Hz">10k</button>
+          <button type="button" onClick={() => elegirFrecuencia(20000)} aria-label="20k, ir a 20.000 Hz">20k</button>
         </div>
 
         {/* Botones de control */}
@@ -2025,7 +2027,7 @@ export default function GeneradorTonosPage() {
                   <td><strong>Medios</strong></td>
                   <td>500 Hz – 2 kHz</td>
                   <td>Inteligibilidad vocal máxima</td>
-                  <td>Voz humana, guitarra, violin</td>
+                  <td>Voz humana, guitarra, violín</td>
                   <td>Calibración PA, telefonía</td>
                 </tr>
                 <tr>
@@ -2094,7 +2096,7 @@ export default function GeneradorTonosPage() {
           <div className={styles.eduFaqList}>
             <details className={styles.eduFaqItem}>
               <summary className={styles.eduFaqPregunta}>¿Qué es la frecuencia y por qué se mide en Hz?</summary>
-              <p className={styles.eduFaqRespuesta}>La frecuencia es el número de oscilaciones completas por segundo de una onda sonora. El hercio (Hz), llamado así en honor al físico Heinrich Hertz, equivale a 1 ciclo por segundo. 440 Hz significa que el aire oscila 440 veces por segundo. A mayor frecuencia, más agudo es el sonido; a menor frecuencia, más grave. La velocidad del sonido en el aire (~343 m/s a 20&nbsp;°C) divide entre la frecuencia da la longitud de onda: a 440 Hz, λ ≈ 78 cm; a 20 Hz, λ ≈ 17 metros.</p>
+              <p className={styles.eduFaqRespuesta}>La frecuencia es el número de oscilaciones completas por segundo de una onda sonora. El hercio (Hz), llamado así en honor al físico Heinrich Hertz, equivale a 1 ciclo por segundo. 440 Hz significa que el aire oscila 440 veces por segundo. A mayor frecuencia, más agudo es el sonido; a menor frecuencia, más grave. La velocidad del sonido en el aire (~343 m/s a 20&nbsp;°C) dividida entre la frecuencia da la longitud de onda: a 440 Hz, λ ≈ 78 cm; a 20 Hz, λ ≈ 17 metros.</p>
             </details>
             <details className={styles.eduFaqItem}>
               {/* La misma pregunta y respuesta que el FAQPage: salen de metadata.ts (hallazgo 3283) */}
@@ -2167,7 +2169,7 @@ export default function GeneradorTonosPage() {
               <span className={styles.eduPasoNum}>5</span>
               <div>
                 <strong>Test comparativo oído izquierdo vs. derecho</strong>
-                <p>Tapa un oído con la palma de la mano y repite el test con el otro. Una diferencia notable entre oídos (&gt;2-3 kHz) justifica una consulta audiológica. La asimetría auditiva puede indicar patologías como la neurinoma del acústico, infección o trauma local.</p>
+                <p>Tapa un oído con la palma de la mano y repite el test con el otro. Una diferencia notable entre oídos (&gt;2-3 kHz) justifica una consulta audiológica. La asimetría auditiva puede indicar patologías como el neurinoma del acústico, infección o trauma local.</p>
               </div>
             </li>
             <li className={styles.eduPaso}>

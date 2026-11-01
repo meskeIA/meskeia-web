@@ -5035,7 +5035,8 @@ test.describe('Inspector 01/11/2026', () => {
   });
 
   /**
-   * HALLAZGO Q1 [medio · accesibilidad] — ABIERTO, hallazgo (inspector 01/11/2026). Es el cabo C0555, medido.
+   * HALLAZGO Q1 [medio · accesibilidad] — REPARADO, hallazgo 3868 (inspector 01/11/2026). Es el cabo C0555,
+   * medido. Ahora los cuatro de la «k» se nombran «1k, ir a 1.000 Hz»…, y los demás siguen igual.
    * Los siete saltos de frecuencia pintan «20», «100», «500», «1k», «5k», «10k» y «20k» y se nombran con
    * aria-label «Ir a 20 Hz» … «Ir a 20.000 Hz». En los cuatro de la «k» el texto visible no está en el
    * nombre accesible (WCAG 2.5.3, nivel A): quien usa control por voz dice «pulsa 1k» y no hay botón con
@@ -5050,7 +5051,6 @@ test.describe('Inspector 01/11/2026', () => {
    * 1.000 Hz» los deja en verde; retirar el aria-label obliga a cambiarlos.
    */
   test('HALLAZGO Q1 — el nombre accesible de cada salto de frecuencia contiene lo que el botón pinta', async ({ page }) => {
-    test.fail();
     await abrir(page);
     const saltos = page.locator('[class*="escalaVisual"] button');
     await expect(saltos).toHaveCount(7);
@@ -5073,7 +5073,8 @@ test.describe('Inspector 01/11/2026', () => {
   });
 
   /**
-   * HALLAZGO Q2 [medio · accesibilidad] — ABIERTO, hallazgo (inspector 01/11/2026).
+   * HALLAZGO Q2 [medio · accesibilidad] — REPARADO, hallazgo 3869 (inspector 01/11/2026): `.medidaLimites a`
+   * va subrayado en el módulo, como el enlace del hero.
    * Los tres enlaces de «Qué mide y qué no» (afinador, sonómetro, analizador de espectro) van dentro del
    * texto sin subrayado ni otra marca que el color (globals.css: `a { text-decoration: none }`), y ese
    * color apenas se separa del texto que los rodea: #26718F sobre texto #666666 = 1,05:1 en claro, y
@@ -5085,7 +5086,6 @@ test.describe('Inspector 01/11/2026', () => {
   test('HALLAZGO Q2 — los enlaces dentro del texto del medidor se distinguen sin depender del color, en claro y en oscuro', async ({
     page,
   }) => {
-    test.fail();
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await abrir(page);
     await expect(seccionMedidor(page).locator('[class*="medidaLimites"] a')).toHaveCount(3);
@@ -5097,7 +5097,8 @@ test.describe('Inspector 01/11/2026', () => {
   });
 
   /**
-   * HALLAZGO Q3 [bajo · accesibilidad] — ABIERTO, hallazgo (inspector 01/11/2026).
+   * HALLAZGO Q3 [bajo · accesibilidad] — REPARADO, hallazgo 3870 (inspector 01/11/2026): en oscuro, la cifra
+   * del preset activo pasa a `var(--text-secondary)`.
    * En oscuro, la cifra del preset ACTIVO no llega a 4,5:1. `.presetFrec` es `var(--text-muted)` (#9B9B9B)
    * a 12 px, y el activo pone de fondo rgba(46, 134, 171, 0,1) sobre la sección (#2D2D2D) = #2D363A:
    * 4,45:1 (WCAG 1.4.3, AA). Es el estado de partida: «La (A4)» nace activo con los 440 Hz por defecto.
@@ -5107,7 +5108,6 @@ test.describe('Inspector 01/11/2026', () => {
    *   obtenido  #9B9B9B sobre #2D363A = 4,45:1
    */
   test('HALLAZGO Q3 — la cifra del preset activo («440 Hz») llega a 4,5:1 sobre su fondo, en claro y en oscuro', async ({ page }) => {
-    test.fail();
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await abrir(page);
     const activo = page.getByRole('button', { name: /La \(A4\)/ });
@@ -5120,14 +5120,13 @@ test.describe('Inspector 01/11/2026', () => {
   });
 
   /**
-   * HALLAZGO Q4 [bajo · contenido] — ABIERTO, hallazgo (inspector 01/11/2026). Tres erratas de la guía:
+   * HALLAZGO Q4 [bajo · contenido] — REPARADO, hallazgo 3871 (inspector 01/11/2026). Tres erratas de la guía:
    *   · FAQ «¿Qué es la frecuencia…?»: «La velocidad del sonido […] divide entre la frecuencia da la
    *     longitud de onda» → «dividida entre la frecuencia».
    *   · Tabla de rangos, fila «Medios»: «Voz humana, guitarra, violin» → «violín».
    *   · Guía, paso 5: «patologías como la neurinoma del acústico» → «el neurinoma» (neurinoma es masculino).
    */
   test('HALLAZGO Q4 — la guía no lleva las erratas «divide entre la frecuencia», «violin» ni «la neurinoma»', async ({ page }) => {
-    test.fail();
     await abrir(page);
     // La guía nace plegada, pero su contenido está en el DOM (EducationalSection lo oculta con CSS)
     const texto = (await page.locator('body').textContent()) ?? '';
