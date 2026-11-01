@@ -215,7 +215,8 @@
   margin-top: 12px;
   font-size: 0.88rem;
   font-weight: 600;
-  color: var(--accent);
+  /* --accent (#7FB3D3) daba 2,26:1 en claro y 1,83:1 en oscuro (cabo C0297) */
+  color: var(--primary-texto);
   display: flex;
   align-items: center;
   gap: 6px;
