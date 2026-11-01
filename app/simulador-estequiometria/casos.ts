@@ -40,7 +40,7 @@
  * imposibles devuelven `{ ok: false, error }` y un NaN.
  */
 
-import { formatNumber } from '@/lib';
+import { formatNumber, parseSpanishNumber } from '@/lib';
 import {
   corregirNumero,
   dentroDeTolerancia,
@@ -95,6 +95,49 @@ export function unidadDe(pregunta: Pregunta): string {
   if (pregunta === 'moles') return 'mol';
   if (pregunta === 'rendimiento') return '%';
   return 'g';
+}
+
+/** Cómo se escribe en clase la unidad de cada pregunta, de la grafía más larga a la más corta. */
+const GRAFIAS_UNIDAD: Record<Pregunta, readonly string[]> = {
+  moles: ['moles', 'mol'],
+  'masa-necesaria': ['gramos', 'gramo', 'g'],
+  'masa-teorica': ['gramos', 'gramo', 'g'],
+  exceso: ['gramos', 'gramo', 'g'],
+  'masa-real': ['gramos', 'gramo', 'g'],
+  rendimiento: ['%'],
+};
+
+/**
+ * Lee la respuesta tecleada en «Casos para clase».
+ *
+ * ── Un punto SOLO es decimal (hallazgo 3866, 01/11/2026) ──────────────────────────────
+ * `parseSpanishNumber` resuelve «2.493» a favor del millar español —regla que salió de los
+ * IMPORTES, donde «1.500» son mil quinientos—, y el caso 1, el que sale por defecto, pide justo
+ * tres decimales: quien escribe con punto decimal (México y buena parte de Latinoamérica)
+ * recibía «Te has desviado 2490,507 mol» con la respuesta bien. Aquí ninguna respuesta llega a
+ * mil: los doce casos, 168,30 g como mucho, y las prácticas, por debajo de 400 g (lo mide el spec
+ * de la app en 5.000 semillas del generador); el rendimiento no pasa de 100. Así que «2.493» no
+ * puede querer decir 2493. Es la receta del hallazgo 2784 de simulador-plano-inclinado. Si un
+ * caso nuevo pudiera pasar de mil, esta lectura deja de valer: el spec lo avisa.
+ * Con coma, o con los dos separadores, manda el parser del proyecto sin cambios.
+ *
+ * ── La unidad de la pregunta se admite al final (hallazgo 3867) ───────────────────────
+ * La etiqueta dice «Masa, en g» y la solución escribe «18,31 g», pero «18,31 g» salía «no es un
+ * número» mientras «81,11 %» sí se leía. Se quita solo la unidad de ESA pregunta, como en el
+ * hallazgo 3374 de tabla-periodica: una letra cualquiera sigue sin ser un número.
+ */
+export function leerRespuesta(texto: string, pregunta: Pregunta): number {
+  let limpio = texto.trim().replace(/[−–]/g, '-');
+  for (const grafia of GRAFIAS_UNIDAD[pregunta]) {
+    const alFinal = new RegExp(`\\s*${grafia}\\.?$`, 'i');
+    if (alFinal.test(limpio)) {
+      limpio = limpio.replace(alFinal, '');
+      break;
+    }
+  }
+  // parser-ok: un punto solo, sin coma, es decimal porque ninguna respuesta llega a mil (arriba)
+  if (/^[+-]?\d*\.\d+$/.test(limpio)) return parseSpanishNumber(limpio.replace('.', ','));
+  return parseSpanishNumber(limpio);
 }
 
 /** Lo que se escribe en la casilla, con unidad. Derivado de la pregunta, nunca a mano. */

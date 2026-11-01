@@ -41,6 +41,7 @@ import {
   comprobarRespuesta,
   decimalesDe,
   generarEjercicioAleatorio,
+  leerRespuesta,
   resolverCaso,
   ventanaDe,
   type DatosCaso,
@@ -2047,20 +2048,20 @@ test.describe('inspección 01/11/2026 · corrector de los casos para clase', () 
     }
   });
 
-  // ABIERTO, hallazgo (inspector 01/11/2026, operativa) — un punto decimal con TRES cifras detrás se
-  // lee como separador de millares: `parseSpanishNumber('2.493')` = 2493. El caso 1 pide justo tres
-  // decimales, y quien escribe con punto decimal (México y buena parte de Latinoamérica, casi todo el
-  // público de la app) recibe «No es correcto. Te has desviado 2490,507 mol de la respuesta». Igual
+  // REPARADO, hallazgo 3866 (inspector 01/11/2026, operativa) — un punto decimal con TRES cifras
+  // detrás se leía como separador de millares: `parseSpanishNumber('2.493')` = 2493. El caso 1 pide
+  // justo tres decimales, y quien escribe con punto decimal (México y buena parte de Latinoamérica,
+  // casi todo el público de la app) recibía «No es correcto. Te has desviado 2490,507 mol». Igual
   // al copiar con punto las masas del panel, que salen con tres decimales: el caso 7 cargado en el
   // simulador dice «Sobran 18,306 g», y «18.306» suspende por 18.287,69 g. Ninguna respuesta de esta
   // app llega a mil (la mayor de los doce casos es 168,30 g; las prácticas, por debajo de 400 g y
   // de 6 mol), así que «2.493» no puede querer decir dos mil. Es la forma del hallazgo 2784 de
-  // simulador-plano-inclinado, reparado allí con `leerRespuesta` (un punto solo es decimal).
+  // simulador-plano-inclinado, reparado allí con `leerRespuesta` (un punto solo es decimal), que
+  // es la receta que usa ahora también esta app (casos.ts).
   //   caso 1: 2,4932993 → ventana [2,4803 ; 2,5130] (re-inspección del 25/10) → 2,493 dentro
   //   caso 7: 73 g HCl + 60 g NaOH → sobran 73 − 1,5001125 × 36,46 = 18,305898 g → 18,306 dentro de
   //   [18,1535 ; 18,4024]
   test('«2.493» (caso 1) y «18.306» (caso 7) con punto decimal se dan por buenos', async ({ page }) => {
-    test.fail();
     await abrir(page);
     await responder(page, 1, '2.493');
     await expect(veredicto(page), 'caso 1: «2.493»').toContainText('¡Correcto!');
@@ -2068,19 +2069,42 @@ test.describe('inspección 01/11/2026 · corrector de los casos para clase', () 
     await expect(veredicto(page), 'caso 7: «18.306»').toContainText('¡Correcto!');
   });
 
-  // ABIERTO, hallazgo (inspector 01/11/2026, operativa) — la respuesta con su unidad («18,31 g»,
-  // «2,493 mol») recibe «Escribe un número (puedes usar la coma decimal, por ejemplo 21,95)», cuando
-  // «81,11 %» sí se lee (test de arriba): la etiqueta de la casilla es «Masa, en g» y la solución
-  // escribe «Respuesta: 18,31 g». Es la forma del hallazgo 3374 de tabla-periodica (quitar la unidad
-  // de ESA pregunta, no cualquier letra).
+  // REPARADO, hallazgo 3867 (inspector 01/11/2026, operativa) — la respuesta con su unidad
+  // («18,31 g», «2,493 mol») recibía «Escribe un número (puedes usar la coma decimal, por ejemplo
+  // 21,95)», cuando «81,11 %» sí se lee (test de arriba): la etiqueta de la casilla es «Masa, en g»
+  // y la solución escribe «Respuesta: 18,31 g». Es la forma del hallazgo 3374 de tabla-periodica
+  // (quitar la unidad de ESA pregunta, no cualquier letra).
   //   caso 7: 18,305898 → 18,31 g dentro de [18,1535 ; 18,4024] · caso 1: 2,493 mol dentro de [2,4803 ; 2,5130]
   test('«18,31 g» (caso 7) y «2,493 mol» (caso 1) con su unidad se dan por buenos', async ({ page }) => {
-    test.fail();
     await abrir(page);
     await responder(page, 7, '18,31 g');
     await expect(veredicto(page), 'caso 7: «18,31 g»').toContainText('¡Correcto!');
     await responder(page, 1, '2,493 mol');
     await expect(veredicto(page), 'caso 1: «2,493 mol»').toContainText('¡Correcto!');
+    // Solo la unidad de ESA pregunta: «kg» en una masa sigue sin ser un número.
+    await responder(page, 7, '18,31 kg');
+    await expect(veredicto(page), 'caso 7: «18,31 kg»').toContainText('Escribe un número');
+  });
+
+  // La premisa de 3866: un punto solo es decimal porque NINGUNA respuesta llega a mil. Si un caso o
+  // el generador la rompen, este test lo dice antes de que «1.500» se lea como 1,5.
+  test('ninguna respuesta de los doce casos ni de 5.000 prácticas llega a 1.000, y leerRespuesta lee lo que se escribe en clase', () => {
+    const maxCasos = Math.max(...CASOS_AULA.map((c) => c.respuesta));
+    let maxPracticas = 0;
+    for (let s = 1; s <= 5000; s++) {
+      const r = generarEjercicioAleatorio(s).respuesta;
+      if (Number.isFinite(r)) maxPracticas = Math.max(maxPracticas, r);
+    }
+    expect(maxCasos).toBeLessThan(1000);
+    expect(maxPracticas).toBeLessThan(1000);
+    expect(leerRespuesta('2.493', 'moles')).toBeCloseTo(2.493, 9);
+    expect(leerRespuesta('2,493 mol', 'moles')).toBeCloseTo(2.493, 9);
+    expect(leerRespuesta('18.306 gramos', 'exceso')).toBeCloseTo(18.306, 9);
+    expect(leerRespuesta('18,31g', 'exceso')).toBeCloseTo(18.31, 9);
+    expect(leerRespuesta('81,11 %', 'rendimiento')).toBeCloseTo(81.11, 9);
+    expect(leerRespuesta('1.234,5', 'exceso')).toBeCloseTo(1234.5, 9);
+    expect(leerRespuesta('18,31 mol', 'exceso')).toBeNaN();
+    expect(leerRespuesta('abc', 'exceso')).toBeNaN();
   });
 });
 

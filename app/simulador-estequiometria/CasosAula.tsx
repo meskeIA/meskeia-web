@@ -15,7 +15,6 @@
  */
 
 import { useState } from 'react';
-import { parseSpanishNumber } from '@/lib';
 import styles from './SimuladorEstequiometria.module.css';
 import {
   CASOS,
@@ -23,6 +22,7 @@ import {
   comprobarRespuesta,
   configuracionDe,
   generarEjercicioAleatorio,
+  leerRespuesta,
   textoRespuesta,
   decimalesDe,
   type ConfiguracionSimulador,
@@ -75,9 +75,10 @@ export default function CasosAula({ onCargarEnSimulador }: Props) {
   }
 
   function comprobar() {
-    // parseSpanishNumber devuelve NaN con lo que no es un número, y de ese NaN se encarga
-    // comprobarRespuesta con un mensaje propio (nunca «NaN» en pantalla).
-    const valor = parseSpanishNumber(respuesta);
+    // leerRespuesta admite «2,493», «2.493» (punto decimal: ninguna respuesta llega a mil) y la
+    // unidad de la pregunta al final («18,31 g»), hallazgos 3866 y 3867. Lo que no es un número
+    // da NaN, y de ese NaN se encarga comprobarRespuesta con un mensaje propio.
+    const valor = leerRespuesta(respuesta, datos.pregunta);
     const r = comprobarRespuesta(valor, esperado, datos);
     setVeredicto({ correcto: r.correcto, motivo: r.motivo });
   }
