@@ -40,6 +40,8 @@
  * huella-de-copia: Math\.round\(valor \* factor\) / factor
  */
 
+import { parseSpanishNumber } from '../formatters';
+
 /**
  * Margen sobre la tolerancia para absorber el ±1 ulp de la resta (hallazgo 1211). Con esperado
  * 0,1 y tolerancia 0,01, «0,11» daba 0,009999999999999995 (dentro) y «0,09» daba
@@ -203,6 +205,39 @@ export function fueraDeDominio(valor: number, magnitud: Magnitud): string | null
 
 function mayuscula(texto: string): string {
   return texto.charAt(0).toUpperCase() + texto.slice(1);
+}
+
+/* ─────────────────────────────── Lectura ─────────────────────────────── */
+
+/**
+ * Lo que el alumno ha escrito en la casilla, como número. Es `parseSpanishNumber` salvo en la
+ * única forma que admite dos lecturas: un punto con una a tres cifras delante (la primera no es
+ * cero) y exactamente tres detrás. «2.493» es 2,493 con punto decimal —México y buena parte de
+ * Latinoamérica— o 2493 con punto de millares, y las dos están a mil veces una de otra: se queda
+ * la más cercana a `esperado`. Con empate o sin `esperado` numérico, la española, que es la de
+ * `parseSpanishNumber`.
+ *
+ * DE DÓNDE SALE (hallazgo 3866 y cabo C0558, 01/11/2026): el caso 1 de simulador-estequiometria
+ * pide 2,493 mol, y quien lo escribía con punto recibía «Te has desviado 2490,507 mol». La misma
+ * llamada estaba en 27 `CasosAula.tsx`. Elegir por cercanía, y no «un punto solo es decimal»,
+ * deja a cada app sin tener que comprobar su máximo: en simulador-contabilidad-basica «1.500»
+ * para 1500 € sigue siendo 1500, y en simulador-principio-pascal «302.430» sigue siendo 302430.
+ * Lo que se acepta a cambio: «1.500» para 1,5 se aprueba, porque la notación es ambigua de verdad.
+ *
+ * `check:respuesta-aula` rompe el build si un `CasosAula.tsx` vuelve a leer con `parseSpanishNumber`.
+ */
+export function leerRespuestaAula(texto: string, esperado: number): number {
+  const leido = parseSpanishNumber(texto);
+  if (!Number.isFinite(leido) || !Number.isFinite(esperado)) return leido;
+  // La misma limpieza que `partesNumericas`: espacios, signo tipográfico y símbolo pegado.
+  const cuerpo = texto
+    .replace(/[\s  ]/g, '')
+    .replace(/−/g, '-')
+    .replace(/^[€$£%]+|[€$£%]+$/g, '')
+    .replace(/^[+-]/, '');
+  if (!/^[1-9]\d{0,2}\.\d{3}$/.test(cuerpo)) return leido;
+  const decimal = Math.sign(leido) * Number(cuerpo);
+  return Math.abs(decimal - esperado) < Math.abs(leido - esperado) ? decimal : leido;
 }
 
 /* ─────────────────────────────── Corrector ─────────────────────────────── */

@@ -37,12 +37,14 @@ import {
   dentroDeTolerancia,
   exigeRedondeo,
   fueraDeDominio,
+  leerRespuestaAula,
   redondearA,
   textoDesviacion,
   toleranciaDeRedondeo,
   toleranciaRelativa,
   type Magnitud,
 } from '../lib/calculadoras/correctorCasosAula';
+import { parseSpanishNumber } from '../lib/formatters';
 
 import * as algebra from '../app/algebra-ecuaciones/casos';
 import * as estadistica from '../app/calculadora-estadistica/casos';
@@ -378,3 +380,50 @@ for (const [slug, preguntas] of Object.entries(APPS)) {
     expect(sondas, 'ninguna sonda de imposible: ¿se quedaron todas las magnitudes en real?').toBeGreaterThan(0);
   });
 }
+
+/*
+ * leerRespuestaAula — cabo C0558 (hallazgo 3866 de simulador-estequiometria, 01/11/2026).
+ * Valores a mano: «2.493» admite dos lecturas, 2,493 y 2493, a mil veces una de otra; la buena es
+ * la que queda más cerca de la respuesta esperada. Cualquier otra forma no es ambigua y tiene que
+ * dar exactamente lo mismo que parseSpanishNumber.
+ */
+test.describe('leerRespuestaAula', () => {
+  test('3866 — «2.493» para 2,493 mol se lee como 2,493, no como dos mil', () => {
+    expect(parseSpanishNumber('2.493')).toBe(2493); // lo que hacía el corrector
+    expect(leerRespuestaAula('2.493', 2.493)).toBe(2.493);
+    expect(leerRespuestaAula('2.493', 2493)).toBe(2493);
+  });
+
+  test('un millar escrito en español sigue siendo un millar donde la respuesta pasa de mil', () => {
+    expect(leerRespuestaAula('1.500', 1500)).toBe(1500); // simulador-contabilidad-basica, en euros
+    expect(leerRespuestaAula('302.430', 302430)).toBe(302430); // simulador-principio-pascal, en Pa
+    expect(leerRespuestaAula('302.430', 302.43)).toBe(302.43);
+    // La duda del cabo: «1.500» para 1,5 se aprueba, porque la otra lectura está a mil veces.
+    expect(leerRespuestaAula('1.500', 1.5)).toBe(1.5);
+  });
+
+  test('el signo y el símbolo pegado no cambian la elección', () => {
+    expect(leerRespuestaAula('-2.493', -2.493)).toBe(-2.493);
+    expect(leerRespuestaAula('−2.493', -2.493)).toBe(-2.493);
+    expect(leerRespuestaAula('-1.500', -1500)).toBe(-1500);
+    expect(leerRespuestaAula(' 2.493 % ', 2.493)).toBe(2.493);
+    expect(leerRespuestaAula('+2.493', 2.493)).toBe(2.493);
+  });
+
+  test('fuera de la forma ambigua devuelve lo mismo que parseSpanishNumber', () => {
+    const entradas = [
+      '2,493', '2.49', '2.4930', '0.493', '1.234.567', '1.234,5', '1,234.56', '1234.5', '12', '-7,25',
+      '0', '', '   ', 'abc', '1e3', '12abc', '1.2.3', '2,5,3', '1.5000', '1234.567',
+    ];
+    for (const e of entradas) {
+      for (const esperado of [2.493, 2493, 0, -5]) {
+        expect(Object.is(leerRespuestaAula(e, esperado), parseSpanishNumber(e)), `«${e}» con esperado ${esperado}`).toBe(true);
+      }
+    }
+  });
+
+  test('sin una respuesta esperada que sea número, no adivina', () => {
+    expect(leerRespuestaAula('2.493', NaN)).toBe(2493);
+    expect(leerRespuestaAula('2.493', Infinity)).toBe(2493);
+  });
+});
