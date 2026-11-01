@@ -47,6 +47,11 @@ import { PUERTO } from './_puerto';
  * sostenido, donde el rótulo «Estímulo» del lienzo cae sobre la última barra naranja. Casos
  * nuevos (umbral −60, los extremos de los controles, el estímulo continuo justo en la asíntota)
  * en el bloque «Inspector 08/10/2026», al final.
+ *
+ * REINSPECCIÓN DEL 01/11/2026, por la firma de rotura (71,5 % de visitas cortas y 5,5 % de
+ * recargas en 165 visitas) y tras el refractario de b9c6c329. Casos nuevos (umbral −50 con pulso
+ * de 4 ms, el tren más rápido que admiten los controles, el teclado en los extremos, móvil a
+ * 360 px) y tres hallazgos abiertos con `test.fail()` en el bloque «Inspector 01/11/2026».
  */
 
 const INTENSIDAD = '#estimulo-intensidad';
@@ -1041,5 +1046,239 @@ test.describe('Inspector 08/10/2026 — umbral −60, extremos de los controles 
     const hidratadas = await enlaces.evaluateAll((anclas) => anclas.map((a) => a.getAttribute('href') ?? ''));
     expect(hidratadas).toEqual(servidas);
     expect(errores.filter((e) => /hydrat|did not match|server rendered/i.test(e))).toEqual([]);
+  });
+});
+
+/* ══════════════════════════════════════════════════════════════════════════════
+   Inspector 01/11/2026 — umbral −50, el tren más rápido, el teclado y móvil a 360 px
+   ══════════════════════════════════════════════════════════════════════════════ */
+
+/** El «X ms entre PAs» del pie de la tarjeta de frecuencia. */
+async function intervaloAnunciado(page: Page): Promise<number> {
+  const pie = await page
+    .locator('[class*="resultCard"]')
+    .filter({ hasText: 'Frecuencia de disparo' })
+    .locator('[class*="resultRange"]')
+    .innerText();
+  const m = pie.match(/([\d.,]+)\s*ms entre PAs/);
+  if (!m) throw new Error(`La tarjeta de frecuencia no dice «ms entre PAs»: «${pie}»`);
+  return parseSpanishNumber(m[1]);
+}
+
+/** Un gesto del dedo (CDP, eventos táctiles reales) de `inicio` a `fin`, con radio de yema. */
+async function gestoDelDedo(
+  page: Page,
+  inicio: { x: number; y: number },
+  fin: { x: number; y: number },
+): Promise<void> {
+  const PASOS = 12;
+  const yema = { radiusX: 12, radiusY: 12 };
+  const cdp = await page.context().newCDPSession(page);
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ ...inicio, ...yema }] });
+  for (let k = 1; k <= PASOS; k++) {
+    await cdp.send('Input.dispatchTouchEvent', {
+      type: 'touchMove',
+      touchPoints: [
+        { x: inicio.x + ((fin.x - inicio.x) * k) / PASOS, y: inicio.y + ((fin.y - inicio.y) * k) / PASOS, ...yema },
+      ],
+    });
+  }
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+  await cdp.detach();
+}
+
+/** Centra un control en pantalla, lejos de la barra fija del logo, y devuelve su caja. */
+async function centrar(page: Page, selector: string): Promise<{ x: number; y: number; width: number; height: number }> {
+  await page.locator(selector).evaluate((el) => el.scrollIntoView({ block: 'center' }));
+  await expect.poll(async () => (await page.locator(selector).boundingBox())?.y ?? -1).toBeGreaterThan(100);
+  const caja = await page.locator(selector).boundingBox();
+  if (!caja) throw new Error(`${selector} no está en pantalla`);
+  return caja;
+}
+
+test.describe('Inspector 01/11/2026 — escritorio', () => {
+  test('caso normal: umbral −50 mV y pulso de 4 ms, I = 40 dispara a los 3,40 ms; I = 36 se queda a 0,05 mV', async ({ page }) => {
+    // Las tres siembras parten de la fábrica (umbral −55, 5 ms, 20 u.a.): las tres mueven algo.
+    await sembrarValor(page, UMBRAL, -50);
+    await sembrarValor(page, DURACION, 4);
+    await sembrarValor(page, INTENSIDAD, 40);
+    await expect(etiquetaControl(page, 'Duración del pulso')).toContainText('4,0 ms');
+
+    // A mano (τ = 5 ms, paso 0,1 ms, pulso de 40 pasos de 5,0 a 8,9 ms): u = 40·(1 − 0,98^k) supera
+    // los 20 mV que separan −70 de −50 en k = 35 (20,28; con k = 34, 19,87) → t = 8,4 ms, latencia
+    // 3,40 ms (analítica 5·ln 2 = 3,47 ms, que en la rejilla de 0,1 ms también cae en 3,4).
+    await expect(barraEstado(page)).toContainText('La neurona DISPARA. 1 potencial de acción registrado.');
+    await expect(tarjeta(page, 'Latencia')).toHaveText('3,40 ms');
+    await expect(tarjeta(page, 'V_m máximo alcanzado')).toHaveText('35,0 mV');
+    // Tarjeta del pulso, con el mismo integrador: 1 − 0,98^40 = 0,5543 → −70 + 40·0,5543 = −47,83
+    // mV, y harían falta 20/0,5543 = 36,08 u.a.
+    await expect(tarjeta(page, 'Despolarización del pulso')).toHaveText('-47,8 mV');
+    expect(await intensidadQueHaceFalta(page)).toBeCloseTo(36.1, 1);
+
+    // Un pelo por debajo de esos 36,08: con 36 u.a. el pulso llega a −70 + 36·0,5543 = −50,045 mV
+    // y NO cruza −50. La tarjeta y el veredicto tienen que decir lo mismo.
+    await sembrarValor(page, INTENSIDAD, 36);
+    await expect(barraEstado(page)).toContainText('SUBUMBRAL');
+    await expect(tarjeta(page, 'Nº potenciales de acción')).toHaveText('0');
+    await expect(tarjeta(page, 'V_m máximo alcanzado')).toHaveText('-50,0 mV');
+    await expect(tarjeta(page, 'Despolarización del pulso')).toHaveText('-50,0 mV');
+  });
+
+  test('caso límite: el tren más rápido de los controles (continuo, 40 u.a., umbral −60) da 9 PA a 196 Hz; la esquina opuesta, ninguno', async ({ page }) => {
+    await page.getByRole('button', { name: /Estímulo sostenido/ }).click();
+    // Pulso de 5 ms cada 5 ms = estímulo continuo desde 5 ms. Siembras desde 10 ms, −55 y 20 u.a.
+    await sembrarValor(page, INTERVALO, 5);
+    await sembrarValor(page, UMBRAL, -60);
+    await sembrarValor(page, INTENSIDAD, 40);
+
+    // A mano: 1.er PA cuando 40·(1 − 0,98^k) > 10 → k = 15 → t = 6,4 ms, latencia 1,40 ms. Tras la
+    // espiga (2 ms) el estímulo suma sobre la hiperpolarización, −85 + 0,3·m (m pasos desde el fin
+    // de la espiga), contra el umbral elevado −60 + 15·e^(−0,06·m): con m = 30 se queda 0,30 mV
+    // corto (24,70 de 25) y con m = 31 lo pasa (25,58) → 5,1 ms entre PA → 1000/5,1 = 196 Hz. Los
+    // PA caen en 6,4 · 11,5 · 16,6 · 21,7 · 26,8 · 31,9 · 37,0 · 42,1 · 47,2: 9 en 50 ms.
+    await expect(tarjeta(page, 'Nº potenciales de acción')).toHaveText('9');
+    await expect(tarjeta(page, 'Latencia')).toHaveText('1,40 ms');
+    await expect(tarjeta(page, 'Frecuencia de disparo')).toHaveText('196 Hz');
+    expect(await intervaloAnunciado(page)).toBe(5.1);
+    // Por debajo de los 500 Hz que fija el absoluto de 2 ms (la FAQ): el modelo no se los salta.
+    expect(await cifra(page, 'Frecuencia de disparo')).toBeLessThanOrEqual(500);
+    // Con estímulo continuo la carga llega a la asíntota, −70 + 40 = −30,0 mV, y bastan 10,0 u.a.
+    await expect(tarjeta(page, 'Despolarización del pulso')).toHaveText('-30,0 mV');
+    expect(await intensidadQueHaceFalta(page)).toBeCloseTo(10, 1);
+
+    // La esquina opuesta: un pulso de 0,5 ms cada 30 ms con el umbral más bajo (−65). A mano: 5
+    // pasos de 40 u.a. → −70 + 40·(1 − 0,98^5) = −66,16 mV; el 2.º pulso (35 ms) parte de lo que
+    // queda del 1.º, 3,84·0,98^295 = 0,01 mV, y llega a −66,148 → «-66,1 mV». Harían falta
+    // 5/0,09630 = 51,9 u.a., más que el tope del deslizador: ningún PA.
+    await sembrarValor(page, INTERVALO, 30);
+    await sembrarValor(page, DURACION, 0.5);
+    await sembrarValor(page, UMBRAL, -65);
+    await expect(barraEstado(page)).toContainText('SUBUMBRAL');
+    await expect(tarjeta(page, 'Nº potenciales de acción')).toHaveText('0');
+    await expect(tarjeta(page, 'V_m máximo alcanzado')).toHaveText('-66,1 mV');
+    await expect(tarjeta(page, 'Despolarización del pulso')).toHaveText('-66,1 mV');
+    expect(await intensidadQueHaceFalta(page)).toBeCloseTo(51.9, 1);
+  });
+
+  test('caso a rechazar: con el teclado la intensidad no pasa de 40 u.a. ni el pulso baja de 0,5 ms', async ({ page }) => {
+    const intensidad = page.locator(INTENSIDAD);
+    await intensidad.focus();
+    await page.keyboard.press('End');
+    await expect(etiquetaControl(page, 'Intensidad del estímulo')).toContainText('(40 u.a.)');
+    // Más allá del tope: el control rechaza las pulsaciones y se queda en 40.
+    await page.keyboard.press('ArrowRight');
+    await page.keyboard.press('PageUp');
+    await expect(intensidad).toHaveValue('40');
+    await expect(etiquetaControl(page, 'Intensidad del estímulo')).toContainText('(40 u.a.)');
+    // Fábrica (−55 mV, 5 ms) con 40 u.a.: 40·(1 − 0,98^k) > 15 → k = 24 → t = 7,3, latencia 2,30 ms.
+    await expect(tarjeta(page, 'Latencia')).toHaveText('2,30 ms');
+
+    const duracion = page.locator(DURACION);
+    await duracion.focus();
+    await page.keyboard.press('Home');
+    await expect(etiquetaControl(page, 'Duración del pulso')).toContainText('(0,5 ms)');
+    // Un pulso de 0 ms no existe: el control no baja del mínimo.
+    await page.keyboard.press('ArrowLeft');
+    await page.keyboard.press('PageDown');
+    await expect(duracion).toHaveValue('0.5');
+    // 0,5 ms con 40 u.a.: −70 + 40·(1 − 0,98^5) = −66,16 → «-66,2 mV», subumbral, y harían falta
+    // 15/0,09608 = 156,1 u.a.
+    await expect(barraEstado(page)).toContainText('SUBUMBRAL');
+    await expect(tarjeta(page, 'V_m máximo alcanzado')).toHaveText('-66,2 mV');
+    expect(await intensidadQueHaceFalta(page)).toBeCloseTo(156.1, 0);
+    const panel = await page.locator('[class*="resultsPanel"]').innerText();
+    expect(panel).not.toMatch(/NaN|Infinity|∞|undefined/);
+  });
+
+  // ABIERTO, hallazgo (inspector 01/11/2026): en modo único el modelo dispara un 2.º PA cuando el
+  // estímulo ya ha terminado, y el botón promete «Un pulso. Verás 0 o 1 PA según intensidad».
+  test('en modo único, «Verás 0 o 1 PA»: con umbral −65 mV, pulso de 5 ms e I = 30 sale UN potencial de acción', async ({ page }) => {
+    test.fail();
+    await expect(page.getByRole('button', { name: /Estímulo único/ })).toContainText('Verás 0 o 1 PA');
+    await sembrarValor(page, UMBRAL, -65);
+    await sembrarValor(page, INTENSIDAD, 30);
+    // A mano: 1.er PA cuando 30·(1 − 0,98^k) > 5 → k = 10 → t = 5,9 ms (latencia 0,90). El pulso
+    // acaba en 10,0 ms y desde ahí no entra nada: un pulso, un PA. El motor dispara otro en 12,9 ms,
+    // al cerrar la ventana relativa: el umbral elevado (+0,75 mV) cae de golpe al nominal con la
+    // membrana en −64,93 mV por el resto de carga del pulso, y la tarjeta anuncia «143 Hz».
+    await expect(tarjeta(page, 'Latencia')).toHaveText('0,90 ms');
+    expect(await tarjeta(page, 'Nº potenciales de acción').innerText()).toBe('1');
+  });
+
+  // ABIERTO, hallazgo (inspector 01/11/2026): «Frecuencia de disparo» y «X ms entre PAs» salen
+  // solo del PRIMER intervalo del tren.
+  test('la frecuencia anunciada es la del tren, no la del primer intervalo (sostenido 2,5 ms cada 5 ms, 40 u.a.)', async ({ page }) => {
+    test.fail();
+    await page.getByRole('button', { name: /Estímulo sostenido/ }).click();
+    await sembrarValor(page, INTERVALO, 5);
+    await sembrarValor(page, DURACION, 2.5);
+    await sembrarValor(page, INTENSIDAD, 40);
+    // A mano (los mismos PA que el caso límite del refractario, más arriba): 7,3 · 15,9 · 25,9 ·
+    // 35,9 · 45,9 ms. Intervalos 8,6 · 10,0 · 10,0 · 10,0: el tren va a 10 ms (100 Hz) y su media
+    // es 38,6/4 = 9,65 ms (104 Hz). La tarjeta dice «8,6 ms entre PAs» y 116 Hz, que solo vale
+    // para el primero. ±0,5 ms admite la media y el intervalo estable y caza el 8,6.
+    await expect(tarjeta(page, 'Nº potenciales de acción')).toHaveText('5');
+    expect(Math.abs((await intervaloAnunciado(page)) - 10)).toBeLessThanOrEqual(0.5);
+  });
+});
+
+/* ── Móvil 360×640 (el más estrecho de la firma), con el dedo ── */
+test.describe('Inspector 01/11/2026 — móvil 360×640, con el dedo', () => {
+  test.use({
+    viewport: { width: 360, height: 640 },
+    userAgent: UA_MOVIL,
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test('firma: a 360 px nada desborda, el lienzo pinta la respuesta de fábrica y el dedo mueve el deslizador aunque caiga sobre el pulgar fuera de la pista', async ({ page }) => {
+    expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(360);
+    // Fábrica: −70 + 20·(1 − 0,98^50) = −57,3 mV, dibujado (más el grosor del trazo).
+    const fabrica = await extremosDelTrazo(page, 0, 50);
+    expect(fabrica.cima).toBeGreaterThan(-60);
+    expect(fabrica.cima).toBeLessThan(-54);
+
+    // La pista mide 6 px y el pulgar 22: el dedo cae 8 px por encima del centro de la pista, sobre
+    // el pulgar visible (radio 11) y fuera de la caja del <input>, y arrastra hasta pasado el tope.
+    const caja = await centrar(page, INTENSIDAD);
+    expect(caja.height).toBeLessThan(10);
+    // Fábrica: 20 u.a. en un deslizador de 0 a 40, el centro del pulgar a mitad de su recorrido.
+    const x0 = caja.x + 11 + (20 / 40) * (caja.width - 22);
+    const y = caja.y + caja.height / 2 - 8;
+    await gestoDelDedo(page, { x: x0, y }, { x: caja.x + caja.width + 30, y });
+    // 40 u.a. con la fábrica: latencia 2,30 ms (5·ln(40/25) = 2,35 en la rejilla de 0,1 ms).
+    await expect(etiquetaControl(page, 'Intensidad del estímulo')).toContainText('(40 u.a.)');
+    await expect(barraEstado(page)).toContainText('La neurona DISPARA');
+    await expect(tarjeta(page, 'Latencia')).toHaveText('2,30 ms');
+
+    // Y el toque en «Estímulo sostenido» responde sin recargar la página.
+    const sostenido = page.getByRole('button', { name: /Estímulo sostenido/ });
+    await sostenido.evaluate((el) => el.scrollIntoView({ block: 'center' }));
+    await sostenido.tap();
+    await expect(sostenido).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.locator(INTERVALO)).toBeVisible();
+    expect(await page.evaluate(() => performance.getEntriesByType('navigation').length)).toBe(1);
+    await expect(page).toHaveURL(/\/simulador-potencial-accion\/$/);
+  });
+
+  // ABIERTO, hallazgo (inspector 01/11/2026): en móvil, desplazar la página con el dedo sobre un
+  // deslizador le cambia el valor, y la app no tiene forma de volver a fábrica salvo recargar.
+  test('desplazar la página con el dedo sobre el deslizador del umbral no cambia el umbral', async ({ page }) => {
+    test.fail();
+    await expect(etiquetaControl(page, 'Umbral de disparo')).toContainText('(-55 mV)');
+    const caja = await centrar(page, UMBRAL);
+    // El pulgar está en −55 mV, al 40 % de la pista; el dedo se apoya al 85 %, lejos de él, y sube
+    // 250 px en vertical para bajar la página, que es lo que hace quien va del control al lienzo.
+    const x = caja.x + caja.width * 0.85;
+    const y = caja.y + caja.height / 2;
+    const scrollAntes = await page.evaluate(() => window.scrollY);
+    await gestoDelDedo(page, { x, y }, { x, y: y - 250 });
+    // Precondición: fue un desplazamiento de verdad.
+    await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(scrollAntes + 100);
+    // Esperado: el umbral sigue en −55 mV. Obtenido el 01/11/2026: salta a −43 mV, al punto donde
+    // se apoyó el dedo, y con −43 mV ni la intensidad máxima dispara en modo único (−70 + 40·(1 −
+    // e^(−1)) = −44,7 mV).
+    expect(await etiquetaControl(page, 'Umbral de disparo').innerText()).toContain('(-55 mV)');
   });
 });

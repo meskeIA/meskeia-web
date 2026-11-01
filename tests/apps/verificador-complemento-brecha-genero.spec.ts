@@ -4929,9 +4929,10 @@ test.describe('Atrasos de la reclamación (S0211)', () => {
 //
 // Tres casos resueltos A MANO antes de abrir el navegador: coinciden los tres, en la web y, en
 // el importe mensual, por la tool del MCP (que no calcula atrasos ni lo promete). Cinco
-// hallazgos nuevos con test.fail(): la concurrencia del cabo C0285 (web y MCP), la cita de la
-// instrucción 1 bajo una respuesta que la contradice, la caída y los textos viejos con la
-// página traducida, y el sello del complemento.
+// hallazgos nuevos, que se marcaron con test.fail() y se REPARARON el 27/10/2026 (1a6cdcba;
+// hallazgos 3536-3540): la concurrencia del cabo C0285 (web y MCP), la cita de la instrucción 1
+// bajo una respuesta que la contradecía, la caída y los textos viejos con la página traducida, y
+// el sello del complemento. Sin test.fail(), sus testigos quedan como regresión.
 // ═════════════════════════════════════════════════════════════════════════════
 
 /** El «hoy» de los casos: el día de la inspección, a mediodía para no rozar el cambio de día. */
@@ -5361,5 +5362,216 @@ test.describe('inspector 26/10/2026 — móvil', () => {
     expect(x).toBeGreaterThanOrEqual(0);
     expect(x + width).toBeLessThanOrEqual(390);
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// INSPECTOR 01/11/2026 (Opus 5.5, xhigh)
+//
+// Vuelve a la cola tras 1a6cdcba (27/10: hallazgos 3536-3540) y tres lotes transversales que tocan
+// una línea cada uno (cdb074d0 y d34e9b8f, página traducida; 1ca1f3c5, contraste). Los cinco
+// reparados se sostienen: sus testigos, en el bloque «inspector 26/10/2026», pasan.
+//
+// FUENTES, leídas antes de abrir la app:
+//   · COMPLEMENTO_BRECHA_GENERO_2026 (data/fiscal/pensiones.ts): 36,90 €/mes por hijo, tope de 4
+//     hijos, 14 pagas, corte el 2021-02-04. La cuantía, cotejada el 01/11/2026 en el BOE
+//     (BOE-A-2026-6977, RD 241/2026, art. 12): «la cuantía del complemento para la reducción de la
+//     brecha de género queda establecida en 36,90 euros mensuales».
+//   · COMPLEMENTO_BRECHA_GENERO_SERIE: 2025 → 35,90 €/mes (RD 316/2025, art. 12).
+//   · EFECTOS_COMPLEMENTO_BRECHA_VARONES: Criterio interpretativo 11/2025, instrucción 1, releído el
+//     01/11/2026 en el PDF oficial de seg-social.es: «Cuando no medie solicitud o previo
+//     reconocimiento del CRBG en favor del otro progenitor […] El reconocimiento del CRBG
+//     retrotraerá sus efectos económicos hasta la fecha de efectos económicos de la pensión a la que
+//     complementa.» No dice nada de denegaciones previas al propio hombre ni de prescripción.
+//   · COMPLEMENTO_MATERNIDAD_DEROGADO: aplicable a pensiones causadas desde el 2016-01-01 y hasta el
+//     2021-02-03, con 2 o más hijos.
+//
+// Tres casos resueltos A MANO antes de ejecutar: coinciden los tres, en la web y por la tool del
+// MCP. Y el cabo C0543 (sospecha de que el `max` de la fecha de efectos se quedara con el día del
+// build), DESCARTADO midiendo: el campo no está en el HTML prerenderizado —solo se monta tras
+// «Verificar mi derecho», que es estado del cliente—, así que su `max` sale siempre del reloj del
+// navegador. Sin hallazgos nuevos.
+// ═════════════════════════════════════════════════════════════════════════════
+test.describe('inspector 01/11/2026', () => {
+  /**
+   * CASO 1 (NORMAL) — madre · incapacidad permanente · hecho causante desde el 4-feb-2021 · 3 hijos ·
+   * sin prorrata · sin exclusión del 60.3.b · sin otro progenitor · sin denegación propia.
+   *   hijosComputables = mín(3, maxHijos 4) = 3
+   *   mensual = 3 × 36,90 = 110,70 €/mes · anual = 110,70 × 14 = 1549,80 €/año (es-ES no agrupa 4 cifras)
+   *   A una mujer no se le ofrecen atrasos: la instrucción 1 del Criterio 11/2025 es la de los hombres.
+   * OBTENIDO el 01/11/2026: exactamente eso, y la tool del MCP da lo mismo.
+   */
+  test('caso 1 (01/11): madre, IP, 3 hijos y sin otro progenitor → 110,70 €/mes y 1549,80 €/año, también por el MCP', async ({
+    page,
+    request,
+  }) => {
+    await responder06(page, {
+      pension: 'Incapacidad permanente',
+      fecha: 'El 4-feb-2021 o después',
+      hijos: '3',
+      sexo: 'Mujer',
+      otroProgenitor: 'No procede (sin otro progenitor)',
+    });
+    const resultado = await textoResultado(page);
+    expect(resultado).toContain('+110,70 €/mes');
+    expect(resultado).toContain('Cumples los requisitos básicos');
+    expect(resultado).toContain('Hijos computables 3 (máx. 4)');
+    expect(resultado).toContain('Cuantía por hijo 36,90 €/mes');
+    expect(resultado).toContain('Mensual estimado 110,70 €/mes');
+    expect(resultado).toContain('Anual (14 pagas) 1549,80 €/año');
+    await expect(campoFechaEfectos(page)).toHaveCount(0);
+    await expect(page.getByText('Aquí no se calculan los atrasos')).toHaveCount(0);
+
+    const mcp = await porMcpDelegum(request, {
+      sexo: 'mujer',
+      num_hijos: 3,
+      tipo_pension: 'incapacidad_permanente',
+      fecha_hecho_causante: 'desde_2021',
+      otro_progenitor: 'no_aplica',
+      denegacion_propia: false,
+    });
+    expect(mcp).toContain('Tiene derecho al complemento');
+    expect(mcp).toContain('Hijos computables: 3 · 36,90 €/mes por hijo');
+    expect(mcp).toContain('110,70 €/mes (1549,80 €/año, 14 pagas)');
+  });
+
+  /**
+   * CASO 2 (LÍMITE) — el cambio de año en los atrasos, con el tope de hijos: padre · viudedad · desde
+   * el 4-feb-2021 · 4 hijos (maxHijos) · sin otro progenitor (instrucción 1) · hoy 01/01/2026 ·
+   * fecha de efectos el 31/12/2025, la víspera. Cada día cobra la cuantía de SU año (serie):
+   *   2025 → 35,90 × 4 × 14 / 12 = 167,5333 €/mes · 1 día de 31 → 5,4043 → 5,40 €
+   *   2026 → 36,90 × 4 × 14 / 12 = 172,20 €/mes · 1 día de 31 → 5,5548 → 5,55 €
+   *   Total = 10,95 € · cada mes más, 172,20 €
+   * Efectos el mismo 01/01/2026 (= hoy, el `max` del campo) → solo 2026: 5,55 €. El 02/01/2026 es
+   * posterior a hoy: aviso y ninguna cifra.
+   * Veredicto del mes: 4 × 36,90 = 147,60 €/mes (maxMensual) · × 14 = 2066,40 €/año (maxAnual).
+   * OBTENIDO el 01/11/2026: exactamente eso; el MCP da 147,60 €/mes y 2066,40 €/año.
+   */
+  test('caso 2 (01/11, límite): padre, viudedad, 4 hijos, hoy 01/01/2026 y efectos 31/12/2025 → 5,40 + 5,55 = 10,95 € con la cuantía de cada año', async ({
+    page,
+    request,
+  }) => {
+    expect(COMPLEMENTO_BRECHA_GENERO_SERIE.find((s) => s.anio === 2025)?.cuantiaPorHijoMensual).toBe(35.9);
+    await cargarConReloj(page, new Date('2026-01-01T12:00:00'));
+    await responder06(page, {
+      pension: 'Viudedad',
+      fecha: 'El 4-feb-2021 o después',
+      hijos: '4',
+      sexo: 'Hombre',
+      otroProgenitor: 'No procede (sin otro progenitor)',
+    });
+    const resultado = await textoResultado(page);
+    expect(resultado).toContain('+147,60 €/mes');
+    expect(resultado).toContain('Hijos computables 4 (máx. 4)');
+    expect(resultado).toContain('Anual (14 pagas) 2066,40 €/año');
+
+    await expect(campoFechaEfectos(page)).toHaveAttribute('max', '2026-01-01');
+    await campoFechaEfectos(page).fill('2025-12-31');
+    let t = await textoAtrasos(page);
+    // La columna «Meses» no se fija: un día son 0,03 meses y su redondeo es presentación
+    expect(t).toMatch(/2025 [\d,]+ 35,90 €\/mes 5,40 €/);
+    expect(t).toMatch(/2026 [\d,]+ 36,90 €\/mes 5,55 €/);
+    expect(t).toContain('Atrasos hasta hoy 10,95 €');
+    expect(t).toContain('Cada mes más que tarde la resolución +172,20 €');
+
+    await campoFechaEfectos(page).fill('2026-01-01');
+    t = await textoAtrasos(page);
+    expect(t).toMatch(/2026 [\d,]+ 36,90 €\/mes 5,55 €/);
+    expect(t).not.toMatch(/\b2025 [\d,]+ /);
+    expect(t).toContain('Atrasos hasta hoy 5,55 €');
+
+    await campoFechaEfectos(page).fill('2026-01-02');
+    t = await textoAtrasos(page);
+    expect(t).toContain('La fecha de efectos no puede ser posterior a hoy.');
+    expect(t).not.toContain('Atrasos hasta hoy');
+
+    const mcp = await porMcpDelegum(request, {
+      sexo: 'hombre',
+      num_hijos: 4,
+      tipo_pension: 'viudedad',
+      fecha_hecho_causante: 'desde_2021',
+      otro_progenitor: 'no_aplica',
+      denegacion_propia: false,
+    });
+    expect(mcp).toContain('147,60 €/mes (2066,40 €/año, 14 pagas)');
+  });
+
+  /**
+   * CASO 3 (RECHAZO) — padre · jubilación causada ANTES del 4-feb-2021 · 3 hijos · el otro
+   * progenitor no lo ha pedido · CON denegación propia. El corte de fechaMinimaHechoCausante manda
+   * antes que la denegación: no hay complemento por brecha, ni reclamación, ni cifra, ni atrasos
+   * (la instrucción 1 es para pensiones causadas desde el 4-feb-2021). El paso siguiente remite al
+   * de maternidad de COMPLEMENTO_MATERNIDAD_DEROGADO: del 1 de enero de 2016 al 3 de febrero de 2021,
+   * con 2 o más hijos.
+   * OBTENIDO el 01/11/2026: exactamente eso, y la tool del MCP igual.
+   */
+  test('caso 3 (01/11, rechazo): padre con pensión anterior al 4-feb-2021 y denegación propia → «No procede ahora», sin cifra, sin reclamación ni atrasos', async ({
+    page,
+    request,
+  }) => {
+    await responder06(page, {
+      pension: 'Jubilación (ordinaria o anticipada)',
+      fecha: 'Antes del 4-feb-2021',
+      hijos: '3',
+      sexo: 'Hombre',
+      otroProgenitor: 'No lo percibe ni lo ha solicitado',
+      denegacionPropia: true,
+    });
+    await expect(page.locator('[class*="resultImporte"]')).toHaveText('No procede ahora');
+    const resultado = await textoResultado(page);
+    expect(resultado).toContain('Tu pensión se causó antes del 4 de febrero de 2021');
+    expect(resultado).toContain('entre el 1 de enero de 2016 y el 3 de febrero de 2021 y tienes 2 o más hijos');
+    expect(resultado).not.toContain('€/mes');
+    expect(resultado).not.toContain('Posible reclamación retroactiva');
+    expect(resultado).not.toContain('Desglose');
+    await expect(campoFechaEfectos(page)).toHaveCount(0);
+    await expect(page.getByText('Aquí no se calculan los atrasos')).toHaveCount(0);
+
+    const mcp = await porMcpDelegum(request, {
+      sexo: 'hombre',
+      num_hijos: 3,
+      tipo_pension: 'jubilacion',
+      fecha_hecho_causante: 'antes_2021',
+      otro_progenitor: 'no_percibe',
+      denegacion_propia: true,
+    });
+    expect(mcp).toContain('No procede ahora');
+    expect(mcp).not.toContain('Posible reclamación retroactiva');
+    expect(mcp).not.toContain('€/mes');
+  });
+
+  /**
+   * CABO C0543 — DESCARTADO midiendo (01/11/2026). La sospecha: `max={hoyISO}` con hoyISO calculado
+   * en el render, como planificador-embarazo antes de e3ba909f, dejaría en el HTML prerenderizado el
+   * día del build, que React 19 no corrige al hidratar. Aquí no pasa, porque el campo NO está en ese
+   * HTML: vive en el bloque de atrasos, que solo se monta tras pulsar «Verificar mi derecho»
+   * (`evaluado`, estado del cliente), y para entonces el render ya es del navegador.
+   *   · HTML servido (next start de un build del 01/11/2026): sin `fecha-efectos` y sin ningún max de fecha.
+   *   · Reloj del navegador el 15/01/2027 (posterior al build): max = 2027-01-15; el 20/01/2027 lo
+   *     marca el navegador fuera de rango y la app dice «posterior a hoy».
+   *   · Reloj el 01/10/2026 (anterior al build): max = 2026-10-01; el 15/10/2026 tampoco se acepta.
+   * Las fechas que se asertan son las del reloj que fija el test, nunca la del build.
+   */
+  test('C0543 descartado (01/11): el tope de la fecha de efectos sigue al reloj del navegador, no al día del build', async ({
+    page,
+    request,
+  }) => {
+    const html = await (await request.get(RUTA)).text();
+    expect(html).toContain('Verificar mi derecho'); // control: es el HTML de la app
+    expect(html).not.toContain('id="fecha-efectos"');
+    expect(html).not.toMatch(/max="\d{4}-\d{2}-\d{2}"/);
+
+    for (const [reloj, hoy, posterior] of [
+      ['2027-01-15T10:00:00', '2027-01-15', '2027-01-20'],
+      ['2026-10-01T10:00:00', '2026-10-01', '2026-10-15'],
+    ] as const) {
+      await cargarConReloj(page, new Date(reloj));
+      await hombreConAtrasos(page);
+      await expect(campoFechaEfectos(page)).toHaveAttribute('max', hoy);
+      await campoFechaEfectos(page).fill(posterior);
+      expect(await campoFechaEfectos(page).evaluate((el) => (el as HTMLInputElement).validity.rangeOverflow)).toBe(true);
+      expect(await textoAtrasos(page)).toContain('La fecha de efectos no puede ser posterior a hoy.');
+      await expect(campoFechaEfectos(page)).toHaveAttribute('aria-invalid', 'true');
+    }
   });
 });

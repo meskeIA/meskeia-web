@@ -1,13 +1,20 @@
-import { test, expect, Page } from '@playwright/test';
-import { esperarHidratacion as esperarHidratacionReact, esperarValorEnReact } from './_hidratacion';
+import { test, expect, devices, Page } from '@playwright/test';
+import {
+  asentarAntesDeTraducir,
+  esperarHidratacion as esperarHidratacionReact,
+  esperarValorEnReact,
+} from './_hidratacion';
 import { acentuacionDe, analizarVerso, separarSilabas } from '../../app/contador-silabas/metrica';
 
 /**
  * Inspector — contador-silabas (segmento interactiva con motor lingüístico)
  *
+ * OCTAVA INSPECCIÓN: 01/11/2026, RE-INSPECCIÓN por el cambio de código del 27/10 y 9f57450f.
+ * Sus casos y sus hallazgos, ABIERTOS con test.fail(), en el último bloque del fichero.
  * SÉPTIMA INSPECCIÓN: 27/10/2026, RE-INSPECCIÓN por los cinco cabos de la medición del
- * 18/10/2026 (C0287-C0291, semilla S0212). Sus casos y sus hallazgos, ABIERTOS con
- * test.fail(), en el último bloque del fichero.
+ * 18/10/2026 (C0287-C0291, semilla S0212). Sus casos y sus hallazgos (3565-3573) se
+ * escribieron con test.fail(); se REPARARON el 27/10/2026 y quedan, ya sin la marca, en el
+ * penúltimo bloque del fichero.
  * SEXTA INSPECCIÓN: 30/09/2026, por la SOSPECHA del 29/09 sobre `acentuacionDe` y los
  * anglicismos en consonante + «y». Sus casos y sus TRES hallazgos, en su propio bloque al
  * final del fichero (el único que espera la hidratación con tests/apps/_hidratacion.ts).
@@ -2190,5 +2197,446 @@ test.describe('contador-silabas · Inspector 27/10/2026 (séptima inspección)',
       ['sub', 'ra', 'yar'],
       ['sub', 'ro', 'gar'],
     ]);
+  });
+});
+
+// =====================================================================================
+// OCTAVA INSPECCIÓN — Inspector 01/11/2026 (segmento cálculo, riesgo 3)
+//
+// RE-INSPECCIÓN por cambio de código: las reparaciones del 27/10 (5d5b45d6, b810954f,
+// f79be6b0, 9debcccd, e9578928), que vigila el bloque anterior, y 9f57450f, que solo anota
+// `const funde: boolean` en metrica.ts (comprobado con git show: una línea, el mismo
+// comportamiento). Aquí se busca lo que ningún caso anterior miraba.
+//
+// DE DÓNDE SALEN LAS REGLAS (no de lo que pinta la app):
+//   · Silabeo, h intercalada, diptongo y triptongo: RAE-ASALE, Ortografía de la lengua
+//     española (2010), cap. I. La h intercalada se silabea como si no estuviera. Triptongo =
+//     cerrada átona + ABIERTA + cerrada átona, que es también lo que dice la tabla de la
+//     propia app («Débil + fuerte + débil»). Abierta + cerrada + abierta (a-u-e, o-i-a) o
+//     cerrada + cerrada + abierta (i-u-e) NO es triptongo: la cerrada va con UNA de las dos
+//     vocales y la otra queda en su sílaba (a-hue-car, vi-hue-la, pa-ra-no-ia).
+//   · Tilde: OLE 2010 — las agudas acabadas en -s precedida de otra consonante no llevan tilde
+//     (robots, complots, chalets); sin tilde, por tanto, son AGUDAS.
+//   · Métrica: ley del acento final (aguda +1, llana ±0, esdrújula −1) y una sinalefa por
+//     contacto vocálico. Los adverbios en -mente llevan dos acentos y el último, el que
+//     decide el final del verso, es el de -mén-: tí-mi-da-MÉN-te es LLANO. La propia app define
+//     la esdrújula como «tónica en la antepenúltima», y la antepenúltima de «tímidamente» es
+//     «da», que no se acentúa en ninguna lectura.
+//
+// LOS TRES CASOS, RESUELTOS A MANO ANTES DE ABRIR EL NAVEGADOR (la cuenta, en cada test)
+//   CASO 1 (normal)  Calderón, «La vida es sueño», la décima «Apurar, cielos, pretendo»: diez
+//                    octosílabos abbaaccddc → «Décima espinela». La app ACIERTA.
+//   CASO 2 (límite)  la h intercalada que sí resuelve (ahu-ma-do, prohi-bi-do, re-hú-so), un
+//                    verso agudo (Espronceda) y uno esdrújulo (Bécquer) → la app ACIERTA. Y tres
+//                    hallazgos: el falso triptongo (ca-cahue-te), el adverbio en -mente con
+//                    tilde tomado por esdrújulo y el plural agudo en -ts tomado por llano.
+//   CASO 3 (gracia)  una cifra dentro de una palabra («COVID19») → la app ACIERTA; el mismo
+//                    texto pegado en Unicode descompuesto (NFD, el que sale de muchos PDF) →
+//                    HALLAZGO: inventa palabras.
+//   Y además: la página traducida por el navegador no tumba la app, y en 360 px no desborda.
+// =====================================================================================
+
+const DECIMA_CALDERON = `Apurar, cielos, pretendo,
+ya que me tratáis así,
+qué delito cometí
+contra vosotros naciendo;
+aunque si nací, ya entiendo
+qué delito he cometido.
+Bastante causa ha tenido
+vuestra justicia y rigor,
+pues el delito mayor
+del hombre es haber nacido.`;
+
+/** El traductor del navegador, simulado: cada nodo de texto pasa a <font><font>…</font></font>. */
+async function traducirPagina(page: Page): Promise<void> {
+  await asentarAntesDeTraducir(page);
+  await page.evaluate(() => {
+    const caminante = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+      acceptNode: (n) => {
+        const padre = n.parentElement;
+        if (!padre || !(n.nodeValue ?? '').trim()) return NodeFilter.FILTER_REJECT;
+        if (/^(SCRIPT|STYLE|OPTION|NOSCRIPT|FONT|TEXTAREA)$/.test(padre.tagName)) {
+          return NodeFilter.FILTER_REJECT;
+        }
+        return NodeFilter.FILTER_ACCEPT;
+      },
+    });
+    const nodos: Text[] = [];
+    while (caminante.nextNode()) nodos.push(caminante.currentNode as Text);
+    for (const nodo of nodos) {
+      const exterior = document.createElement('font');
+      const interior = document.createElement('font');
+      interior.textContent = nodo.nodeValue;
+      exterior.appendChild(interior);
+      nodo.parentNode?.replaceChild(exterior, nodo);
+    }
+  });
+}
+
+test.describe('contador-silabas · Inspector 01/11/2026 (octava inspección)', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacionReact(page, ['textarea']);
+  });
+
+  /** Limpia, escribe el texto comprobando que llega al ESTADO de React y pulsa «Analizar». */
+  async function analizarTexto(page: Page, texto: string): Promise<void> {
+    await page.getByRole('button', { name: 'Limpiar' }).click();
+    await esperarValorEnReact(page, 'textarea', '');
+    await page.fill('textarea', texto);
+    await esperarValorEnReact(page, 'textarea', texto);
+    await page.getByRole('button', { name: 'Analizar Sílabas' }).click();
+  }
+
+  /** Sílabas métricas y número de lazos de sinalefa de cada verso, una vez pintados los `n`. */
+  async function versos(page: Page, n: number): Promise<{ m: string; sinalefas: number }[]> {
+    await expect(page.locator('[class*="versoCard"]')).toHaveCount(n);
+    return page.locator('[class*="versoCard"]').evaluateAll((els) =>
+      els.map((el) => ({
+        m: (el.querySelector('[class*="versoSilabas"]')?.textContent ?? '').trim(),
+        sinalefas: el.querySelectorAll('[class*="sinalefaTag"]').length,
+      })),
+    );
+  }
+
+  /** «palabra: sí-la-bas [encuentros]» de cada tarjeta, una vez pintadas las `n`. */
+  async function tarjetas(page: Page, n: number): Promise<string[]> {
+    await expect(page.locator('[class*="palabraCard"]')).toHaveCount(n);
+    return page.locator('[class*="palabraCard"]').evaluateAll((els) =>
+      els.map((el) => {
+        const t = (x: Element | null) => (x?.textContent ?? '').replace(/\s+/g, ' ').trim();
+        const silabas = Array.from(el.querySelectorAll('[class*="palabraSilabas"] > span')).map(t);
+        return `${t(el.querySelector('[class*="palabraOriginal"]'))}: ${silabas.join('-')} [${t(
+          el.querySelector('[class*="palabraEncuentros"]'),
+        )}]`;
+      }),
+    );
+  }
+
+  /** El esquema de rima y el tipo («Consonante», «Asonante», «Verso libre»). */
+  async function rima(page: Page): Promise<{ esquema: string; tipo: string }> {
+    await expect(page.locator('[class*="rimaBloque"]')).toBeVisible();
+    const valores = await page
+      .locator('[class*="rimaValor"]')
+      .evaluateAll((els) => els.map((el) => (el.textContent ?? '').trim()));
+    return { esquema: valores[0] ?? '', tipo: valores[1] ?? '' };
+  }
+
+  test('CASO 1 (normal) · la décima de Calderón: diez octosílabos abbaaccddc, «Décima espinela»', async ({
+    page,
+  }) => {
+    // A mano, verso a verso (aun-que: «au» diptongo y «qu» un solo sonido; vues-tra y
+    // jus-ti-cia: de «str» solo «tr» abre sílaba, «ia» es diptongo):
+    //   1  A-pu-rar(3) cie-los(2) pre-ten-do(3) = 8, sin contactos, llana → 8
+    //   2  ya(1) que(1) me(1) tra-táis(2) a-sí(2) = 7, sin contactos, aguda +1 → 8
+    //   3  qué(1) de-li-to(3) co-me-tí(3) = 7, aguda +1 → 8
+    //   4  con-tra(2) vo-so-tros(3) na-cien-do(3) = 8, llana → 8
+    //   5  aun-que(2) si(1) na-cí(2) ya(1) en-tien-do(3) = 9 − ya_entiendo («nací ya» no: la
+    //      «y» de «ya» es consonante) = 8
+    //   6  qué(1) de-li-to(3) he(1) co-me-ti-do(4) = 9 − delito_he (h muda) = 8
+    //   7  bas-tan-te(3) cau-sa(2) ha(1) te-ni-do(3) = 9 − causa_ha = 8
+    //   8  vues-tra(2) jus-ti-cia(3) y(1) ri-gor(2) = 8 − justicia_y + 1 (aguda) = 8
+    //   9  pues(1) el(1) de-li-to(3) ma-yor(2) = 7, aguda +1 → 8
+    //   10 del(1) hom-bre(2) es(1) ha-ber(2) na-ci-do(3) = 9 − hombre_es = 8
+    // 81 sílabas en 40 palabras → 2,025 → «2,0». Rima: -endo -í -í -endo -endo -ido -ido -or
+    // -or -ido → abbaaccddc, consonante, en minúscula porque el octosílabo es de arte menor.
+    await analizarTexto(page, DECIMA_CALDERON);
+
+    await expect(page.locator('[class*="resumenValor"]').nth(0)).toHaveText('81');
+    await expect(page.locator('[class*="resumenValor"]').nth(1)).toHaveText('40');
+    await expect(page.locator('[class*="resumenValor"]').nth(2)).toHaveText('2,0');
+    await expect(silabasDe(page, 14)).toHaveText(['aun', 'que']);
+    await expect(silabasDe(page, 27)).toHaveText(['vues', 'tra']);
+    await expect(silabasDe(page, 28)).toHaveText(['jus', 'ti', 'cia']);
+
+    expect(await versos(page, 10)).toEqual([
+      { m: '8', sinalefas: 0 },
+      { m: '8', sinalefas: 0 },
+      { m: '8', sinalefas: 0 },
+      { m: '8', sinalefas: 0 },
+      { m: '8', sinalefas: 1 },
+      { m: '8', sinalefas: 1 },
+      { m: '8', sinalefas: 1 },
+      { m: '8', sinalefas: 1 },
+      { m: '8', sinalefas: 0 },
+      { m: '8', sinalefas: 1 },
+    ]);
+    expect(await rima(page)).toEqual({ esquema: 'abbaaccddc', tipo: 'Consonante' });
+    await expect(page.locator('[class*="estrofasLista"] li strong')).toHaveText(['Décima espinela']);
+  });
+
+  test('CASO 2 (límite) · la h intercalada que sí resuelve, un verso agudo y uno esdrújulo', async ({
+    page,
+  }) => {
+    // OLE 2010: la h entre vocales no impide el diptongo (ahu-ma-do, prohi-bi-do) y la tilde
+    // sobre la cerrada sí crea hiato, con h o sin ella (re-hú-so).
+    await analizarTexto(page, 'ahumado prohibido rehúso');
+    expect(await tarjetas(page, 3)).toEqual([
+      'ahumado: ahu-ma-do [Diptongo: au]',
+      'prohibido: prohi-bi-do [Diptongo: oi]',
+      'rehúso: re-hú-so [Hiato: e-ú]',
+    ]);
+
+    // Espronceda, «Canción del pirata»: un(1) ve-le-ro(3) ber-gan-tín(3) = 7, sin contactos,
+    //   aguda +1 → 8, octosílabo.
+    // Bécquer, Rima LXVI: ¿De(1) dón-de(2) ven-go(2)?… El(1) más(1) ho-rri-ble(3) y(1)
+    //   ás-pe-ro(3) = 14. Sinalefas: «vengo?… El» (con pausa) y «horrible y»; la conjunción
+    //   no funde por los dos lados, así que «y áspero» no resta. 14 − 2 − 1 (esdrújula) = 11.
+    await analizarTexto(page, 'un velero bergantín\n¿De dónde vengo?... El más horrible y áspero');
+    expect(await versos(page, 2)).toEqual([
+      { m: '8', sinalefas: 0 },
+      { m: '11', sinalefas: 2 },
+    ]);
+    await expect(desgloseDe(page, 0)).toContainText('7 fonéticas');
+    await expect(desgloseDe(page, 0)).toContainText('aguda');
+    await expect(desgloseDe(page, 1)).toContainText('14 fonéticas');
+    await expect(desgloseDe(page, 1)).toContainText('esdrújula');
+    await expect(nombreDe(page, 1)).toContainText('endecasílabo');
+    await expect(sinalefasDe(page, 1).first()).toContainText('con pausa');
+  });
+
+  test('HALLAZGO (inspector 01/11/2026) · un núcleo de tres vocales que no es triptongo: «cacahuete» sale ca-cahue-te', async ({
+    page,
+  }) => {
+    // ABIERTO, hallazgo (inspector 01/11/2026). silabeo.ts, `nucleos()`: encadena vocales
+    // mirando solo cada PAREJA (a+u diptongo, u+e diptongo → «aue») hasta tres, sin exigir la
+    // forma del triptongo, cerrada + ABIERTA + cerrada. Con la h intercalada, que se salta, el
+    // defecto alcanza palabras corrientes a los dos lados del Atlántico. El silabeador lo
+    // comparte diccionario-rimas. A mano (OLE 2010):
+    //   ca-ca-hue-te (4) · vi-hue-la (3) · a-hue-car (3) · al-ca-hue-te (4) · Chi-hua-hua (3) ·
+    //   re-huir (2: «ui» es diptongo ortográfico) · pa-ra-no-ia (4)
+    // y ninguna lleva triptongo. La app: ca-cahue-te, vihue-la, ahue-car, al-cahue-te,
+    // Chihua-hua, rehuir (1) y pa-ra-noia, con «Triptongo: aue / iue / eui / iua / oia».
+    // Y llega al verso: al(1) son(1) de(1) la(1) vi-hue-la(3) = 7, sin contactos, llana → 7,
+    // heptasílabo. La app: 6, hexasílabo.
+    test.fail();
+    await analizarTexto(page, 'cacahuete vihuela ahuecar alcahuete Chihuahua rehuir paranoia');
+    const palabras = await tarjetas(page, 7);
+    await analizarTexto(page, 'al son de la vihuela');
+    const verso = await versos(page, 1);
+
+    expect({
+      particiones: palabras.map((p) => p.replace(/ \[.*$/, '')),
+      triptongos: palabras.filter((p) => p.includes('Triptongo')),
+      verso,
+    }).toEqual({
+      particiones: [
+        'cacahuete: ca-ca-hue-te',
+        'vihuela: vi-hue-la',
+        'ahuecar: a-hue-car',
+        'alcahuete: al-ca-hue-te',
+        'Chihuahua: Chi-hua-hua',
+        'rehuir: re-huir',
+        'paranoia: pa-ra-no-ia',
+      ],
+      triptongos: [],
+      verso: [{ m: '7', sinalefas: 0 }],
+    });
+  });
+
+  test('HALLAZGO (inspector 01/11/2026) · un adverbio en -mente con tilde al final del verso se toma por esdrújulo', async ({
+    page,
+  }) => {
+    // ABIERTO, hallazgo (inspector 01/11/2026). metrica.ts, `acentuacionDe()` (compartida con
+    // diccionario-rimas): con tilde a dos o más sílabas del final devuelve 'esdrujula', y en
+    // «tímidamente» la tilde es la del adjetivo; el acento final es el de -mén-.
+    //   «me miraba tímidamente»  me(1) mi-ra-ba(3) tí-mi-da-men-te(5) = 9, sin contactos,
+    //       llana ±0 → 9, eneasílabo. La app: 9 − 1 «(última palabra esdrújula)» = 8.
+    //   «me miraba dulcemente»   me(1) mi-ra-ba(3) dul-ce-men-te(4) = 8, llana → 8. Esta sí.
+    // Las dos riman en consonante desde la tónica -mén-: «-ente» → esquema Aa (9 = arte mayor,
+    // 8 = arte menor). La app parte la rima de «tímidamente» en «da» («-amente»), no ve que
+    // rimen y da «--», «Verso libre».
+    test.fail();
+    await analizarTexto(page, 'me miraba tímidamente\nme miraba dulcemente');
+    const medidas = await versos(page, 2);
+    const llana = (await desgloseDe(page, 0).innerText()).includes('llana');
+    expect({ medidas, llana, rima: await rima(page) }).toEqual({
+      medidas: [
+        { m: '9', sinalefas: 0 },
+        { m: '8', sinalefas: 0 },
+      ],
+      llana: true,
+      rima: { esquema: 'Aa', tipo: 'Consonante' },
+    });
+  });
+
+  test('HALLAZGO (inspector 01/11/2026) · un plural agudo en consonante + s («robots», «complots») se toma por llano', async ({
+    page,
+  }) => {
+    // ABIERTO, hallazgo (inspector 01/11/2026). metrica.ts, `acentuacionDe()`: sin tilde,
+    // «acaba en -s → llana». La OLE 2010 exceptúa la -s precedida de otra consonante: esas
+    // agudas no llevan tilde (robots, complots, tictacs), así que sin tilde son AGUDAS.
+    //   «bailaban los robots»     bai-la-ban(3) los(1) ro-bots(2) = 6, aguda +1 → 7
+    //   «se unieron los complots» se(1) u-nie-ron(3) los(1) com-plots(2) = 7 − se_unieron
+    //                             = 6, aguda +1 → 7
+    // Riman en consonante desde la tónica final: «-ots» → aa. La app: 6 y 6, «llana».
+    test.fail();
+    await analizarTexto(page, 'bailaban los robots\nse unieron los complots');
+    const medidas = await versos(page, 2);
+    const agudas = [
+      (await desgloseDe(page, 0).innerText()).includes('aguda'),
+      (await desgloseDe(page, 1).innerText()).includes('aguda'),
+    ];
+    expect({ medidas, agudas, rima: await rima(page) }).toEqual({
+      medidas: [
+        { m: '7', sinalefas: 0 },
+        { m: '7', sinalefas: 1 },
+      ],
+      agudas: [true, true],
+      rima: { esquema: 'aa', tipo: 'Consonante' },
+    });
+  });
+
+  test('CASO 3 (gracia) · una cifra dentro de una palabra se ignora sin romper la palabra ni el verso', async ({
+    page,
+  }) => {
+    // Las cifras no se cuentan (limitación declarada): de «COVID19» queda «COVID», CO-VID.
+    // el(1) CO-VID(2) lle-gó(2) = 5 sílabas en 3 palabras → 1,66… → «1,7». Como verso: el «19»
+    // separa «COVID» de «llegó» (no hay contacto que valga) y «llegó» es aguda: 5 + 1 = 6.
+    await analizarTexto(page, 'el COVID19 llegó');
+    await expect(silabasDe(page, 1)).toHaveText(['CO', 'VID']);
+    await expect(page.locator('[class*="resumenValor"]').nth(0)).toHaveText('5');
+    await expect(page.locator('[class*="resumenValor"]').nth(1)).toHaveText('3');
+    await expect(page.locator('[class*="resumenValor"]').nth(2)).toHaveText('1,7');
+    expect(await versos(page, 1)).toEqual([{ m: '6', sinalefas: 0 }]);
+    await expect(nombreDe(page, 0)).toContainText('hexasílabo');
+  });
+
+  test('HALLAZGO (inspector 01/11/2026) · el texto pegado en Unicode descompuesto (NFD) inventa palabras', async ({
+    page,
+  }) => {
+    // ABIERTO, hallazgo (inspector 01/11/2026). metrica.ts: RE_PALABRAS = /\p{L}+/gu deja fuera
+    // las marcas combinantes (\p{M}). En NFD —lo que da copiar de muchos PDF— «ó» es «o» +
+    // U+0301, y la palabra se parte en dos: «corazón» → «corazo» + «n», una «sílaba» sin vocal.
+    // Es la misma forma del hallazgo 703 («vïuda» → «v» + «uda»), por otra puerta.
+    //   «corazón»: 1 palabra, co-ra-zón (3). La app: 2 palabras, co-ra-zo + n (4 sílabas).
+    //   «Volverán las oscuras golondrinas» (Bécquer, el ejemplo de la propia app): 11
+    //   fonéticas, sin contactos, llana → 11. La app, pegado en NFD: 12, «dodecasílabo».
+    test.fail();
+    await analizarTexto(page, 'corazón'.normalize('NFD'));
+    await expect(page.locator('[class*="resumenValor"]').nth(1)).toBeVisible();
+    const palabras = await page.locator('[class*="resumenValor"]').nth(1).innerText();
+    const corazon = (await silabasDe(page, 0).allTextContents()).join('-').normalize('NFC');
+    await analizarTexto(page, 'Volverán las oscuras golondrinas'.normalize('NFD'));
+    const verso = await versos(page, 1);
+    expect({ palabras, corazon, verso }).toEqual({
+      palabras: '1',
+      corazon: 'co-ra-zón',
+      verso: [{ m: '11', sinalefas: 0 }],
+    });
+  });
+
+  test('HALLAZGO (inspector 01/11/2026) · la guía escribe en mayúscula el esquema de la décima, que es de arte menor', async ({
+    page,
+  }) => {
+    // ABIERTO, hallazgo (inspector 01/11/2026). El paso 6 de la guía dice «décima espinela (10
+    // octosílabos, ABBAACCDDC)», y la propia app enseña que la mayúscula es para el arte mayor
+    // («Cómo se lee»: nueve sílabas o más) y escribe la décima en minúscula: «abbaaccddc».
+    test.fail();
+    await analizarTexto(page, DECIMA_CALDERON);
+    const { esquema } = await rima(page);
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const paso = (
+      await page.locator('li', { hasText: 'Reconoce la forma estrófica' }).innerText()
+    ).replace(/\s+/g, ' ');
+    expect({ esquema, guiaEnMinuscula: paso.includes('abbaaccddc') }).toEqual({
+      esquema: 'abbaaccddc',
+      guiaEnMinuscula: true,
+    });
+  });
+
+  test('HALLAZGO (inspector 01/11/2026) · la fila «Hiato» de la tabla da la tilde sobre la cerrada como hiato sin excepción', async ({
+    page,
+  }) => {
+    // ABIERTO, hallazgo (inspector 01/11/2026). Tercera copia de la regla de 698 y 3571: la
+    // fila dice «Dos vocales fuertes, dos débiles IGUALES, o débil tónica con tilde», sin el
+    // «junto a una abierta» que ya llevan la tarjeta de consejos y FAQ_HIATO. Leída al pie de
+    // la letra, «cuídate» sería cu-í-da-te; la app (y la OLE 2010) dicen cuí-da-te, diptongo.
+    test.fail();
+    await analizarTexto(page, 'cuídate');
+    const tarjeta = await tarjetas(page, 1);
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const regla = (
+      await page
+        .locator('tr', { hasText: 'Dos vocales en sílabas distintas' })
+        .locator('td')
+        .nth(2)
+        .innerText()
+    ).replace(/\s+/g, ' ');
+    expect({ tarjeta, reglaConExcepcion: /tilde[^.]*(abierta|fuerte)/i.test(regla) }).toEqual({
+      tarjeta: ['cuídate: cuí-da-te [Diptongo: uí]'],
+      reglaConExcepcion: true,
+    });
+  });
+
+  test('TESTIGO · con la página traducida por el navegador, analizar y componer no tumban la app', async ({
+    page,
+  }) => {
+    // Un ternario de texto suelto y JSX tumba la app al cambiar de rama si el traductor ya
+    // cambió el texto por <font> (hallazgo 3314, cabo C0262). Aquí se recorren los cambios de
+    // rama del panel: resultado con métrica, una palabra sola (sin métrica), el aviso de «no
+    // hay palabras», el modo composición y Limpiar, traduciendo antes de cada uno.
+    const errores: string[] = [];
+    page.on('pageerror', (e) => errores.push(e.message));
+    page.on('console', (m) => {
+      if (m.type() === 'error' && /NotFoundError|insertBefore|removeChild/.test(m.text())) {
+        errores.push(m.text());
+      }
+    });
+
+    await traducirPagina(page);
+    await analizarTexto(page, DECIMA_CALDERON);
+    await expect(page.locator('[class*="versoCard"]')).toHaveCount(10);
+    await expect(page.locator('[class*="resumenValor"]').nth(0)).toHaveText('81');
+
+    await traducirPagina(page);
+    await analizarTexto(page, 'murciélago');
+    await expect(page.locator('[class*="versoCard"]')).toHaveCount(0);
+    await expect(page.locator('[class*="palabraCard"]')).toHaveCount(1);
+
+    await traducirPagina(page);
+    await analizarTexto(page, '12345 ---');
+    await expect(page.getByText('No hay ninguna palabra que analizar')).toBeVisible();
+
+    await traducirPagina(page);
+    await page.getByRole('button', { name: 'octosílabo', exact: true }).click();
+    await page.fill('textarea', 'Ya no quiero estar aquí');
+    await expect(page.locator('[class*="medidorFila"]')).toContainText('justo');
+
+    await traducirPagina(page);
+    await page.getByRole('button', { name: 'Desactivar' }).click();
+    await expect(page.locator('[class*="medidorVivo"]')).toHaveCount(0);
+    await page.getByRole('button', { name: 'Limpiar' }).click();
+    await expect(page.getByText('Introduce un texto para analizar sus sílabas')).toBeVisible();
+
+    await expect(page.getByText('Algo salió mal')).toHaveCount(0);
+    expect(errores).toEqual([]);
+  });
+
+  test.describe('en un móvil de 360 px', () => {
+    test.use({
+      viewport: { width: 360, height: 760 },
+      userAgent: devices['Pixel 7'].userAgent,
+      deviceScaleFactor: 2,
+      isMobile: true,
+      hasTouch: true,
+    });
+
+    test('TESTIGO · la décima, una palabra de 10 sílabas y la guía abierta caben sin desbordar', async ({
+      page,
+    }) => {
+      // e-lec-tro-en-ce-fa-lo-gra-fis-ta (10) y tran-sat-lán-ti-co (5) son las tarjetas más
+      // anchas; la tabla de la guía va en su propio contenedor con desplazamiento.
+      await analizarTexto(page, `${DECIMA_CALDERON}\n\nelectroencefalografista transatlántico`);
+      expect(await versos(page, 11)).toHaveLength(11);
+      await expect(page.locator('[class*="estrofasLista"] li strong')).toHaveText(['Décima espinela']);
+      await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+      await expect(page.getByText('Reconoce la forma estrófica')).toBeVisible();
+      const anchos = await page.evaluate(() => ({
+        documento: document.documentElement.scrollWidth,
+        ventana: window.innerWidth,
+      }));
+      expect(anchos.documento).toBeLessThanOrEqual(anchos.ventana);
+    });
   });
 });

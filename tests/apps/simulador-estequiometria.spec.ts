@@ -1510,15 +1510,15 @@ test.describe('re-inspección 25/10/2026 · cálculo', () => {
     await expect(page.locator('#inputA')).toHaveValue('0.1');
   });
 
-  // ABIERTO (re-inspección del 25/10/2026, contenido) — la explicación de las barras dice «El que
-  // no llega al 100 % es el limitante; el que lo pasa, sobra», pero el porcentaje va redondeado a
-  // entero, y en dos de las seis reacciones con sus valores por defecto las DOS barras dicen «100 %»
-  // (texto y aria-valuetext), también la del limitante:
+  // Hallazgo 3485 (re-inspección del 25/10/2026, contenido; ya REPARADO, ver abajo) — la explicación
+  // de las barras decía «El que no llega al 100 % es el limitante; el que lo pasa, sobra», pero el
+  // porcentaje iba redondeado a entero, y en dos de las seis reacciones con sus valores por defecto
+  // las DOS barras decían «100 %» (texto y aria-valuetext), también la del limitante:
   //   combustión 16 g CH₄ + 64 g O₂: CH₄ 0,9973197 / 1,0000625 = 99,73 % → «(100 %)», limitante ·
   //     O₂ 2,0001250 / 1,9946394 = 100,28 % → «(100 %)»
   //   neutralización 36,5 g HCl + 40 g NaOH: NaOH 1,0000750 / 1,0010971 = 99,90 % → «(100 %)»,
   //     limitante · HCl 1,0010971 / 1,0000750 = 100,10 % → «(100 %)»
-  // Es lo primero que ve quien abre la app.
+  // Era lo primero que veía quien abría la app.
   // REPARADO el 25/10/2026 (/reparar, hallazgo 3485): porcentajeDeBarraLegible (motor.ts) redondea
   // con los decimales justos para no cruzar el 100: «99,7 %» y «100,3 %» en la combustión, «99,9 %»
   // y «100,1 %» en la neutralización; texto, aria-valuetext y aria-valuenow dicen lo mismo.
@@ -1888,16 +1888,16 @@ test.describe('re-inspección 25/10/2026 · móvil 390 × 844 (firma de rotura)'
 });
 
 test.describe('re-inspección 25/10/2026 · contenido', () => {
-  // ABIERTO (re-inspección del 25/10/2026, contenido) — el quinto «error frecuente» dice que el
-  // rendimiento «No reduce los moles del reactivo que reacciona (eso es conversión, no
-  // rendimiento)», pero la misma página llama rendimiento a lo que reacciona: el caso 11 («en cada
-  // pasada por el reactor solo se transforma el 15 % de lo posible», pista: «El 15 % es el
-  // rendimiento»), el escenario del Haber-Bosch («El rendimiento por paso es bajo (~15 %), pero el
-  // gas no reaccionado se recicla») y la definición («por pérdidas, reacciones secundarias o
-  // equilibrio incompleto»). Y «Cargar en el simulador» del caso 11 (28 g N₂, 12 g H₂, 15 %) pinta
-  // «Reactivo limitante: Nitrógeno» y «Sobran 5,955 g (2,9539 mol)» de H₂ como si todo el N₂ hubiera
-  // reaccionado, cuando con el 15 % transformado quedan 0,85 × 28 = 23,80 g de N₂ y
-  // 12 − 0,15 × 2,9985 × 2,016 = 11,093 g de H₂. Pasará a verde cuando la página use una sola noción.
+  // Hallazgo 3486 (re-inspección del 25/10/2026, contenido; ya REPARADO, ver abajo) — el quinto
+  // «error frecuente» decía que el rendimiento «No reduce los moles del reactivo que reacciona (eso
+  // es conversión, no rendimiento)», pero la misma página llamaba rendimiento a lo que reacciona: el
+  // caso 11 («en cada pasada por el reactor solo se transforma el 15 % de lo posible», pista: «El
+  // 15 % es el rendimiento»), el escenario del Haber-Bosch («El rendimiento por paso es bajo
+  // (~15 %), pero el gas no reaccionado se recicla») y la definición («por pérdidas, reacciones
+  // secundarias o equilibrio incompleto»). Y «Cargar en el simulador» del caso 11 (28 g N₂, 12 g H₂,
+  // 15 %) pintaba «Reactivo limitante: Nitrógeno» y «Sobran 5,955 g (2,9539 mol)» de H₂ como si todo
+  // el N₂ hubiera reaccionado, cuando con el 15 % transformado quedan 0,85 × 28 = 23,80 g de N₂ y
+  // 12 − 0,15 × 2,9985 × 2,016 = 11,093 g de H₂. Pasó a verde cuando la página usó una sola noción.
   // REPARADO el 25/10/2026 (/reparar, hallazgo 3486): el quinto error ya no separa «conversión» de
   // «rendimiento», dice que con una reacción incompleta el limitante tampoco se gasta entero, y la
   // tarjeta del exceso lo advierte con η < 100. La masa real (5,107 g) no cambia.
@@ -1911,5 +1911,235 @@ test.describe('re-inspección 25/10/2026 · contenido', () => {
     const llamaRendimientoALoQueReacciona =
       /solo se transforma el 15/.test(caso11.enunciado) || /gas no reaccionado se recicla/.test(escenario);
     expect(separaConversion && llamaRendimientoALoQueReacciona).toBe(false);
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════════════════════
+// INSPECCIÓN 01/11/2026 — firma de rotura (cambio): visitas cortas del 53,6 % al 76,9 % en los 14
+// días hasta el 31/10. Lo que la explica NO es la app: del 14/09 al 12/10 un aula de Bolivia (una
+// IP, 9-14 sesiones por día, de 6 a 25 minutos de media) puso 94 de las 181 visitas de la base con
+// solo un 29 % de cortas, y en la ventana reciente no aparece. Sin Bolivia, las cortas eran el
+// 80,5 % antes y el 76,5 % después, y las recargas tras visita corta son el 0,7 % (catálogo 2,5 %).
+// En escritorio y en móvil (360 y 390 px, toques reales) todo responde: lo de abajo lo fija.
+//
+// Masas atómicas: pesos atómicos estándar abreviados de la CIAAW (tabla de 2024, consultada en
+// www.ciaaw.org el 01/11/2026; iguales a los de 2021 que cita la app para estos elementos):
+// H 1,0080 · O 15,999 · N 14,007 · Fe 55,845 · Na 22,990 · Cl 35,45 · C 12,011. Masas molares con la
+// app (redondeadas al elemento menos preciso): Fe 55,845 · O₂ 31,998 · Fe₂O₃ 111,690 + 47,997 =
+// 159,687 · H₂ 2,016 · H₂O 18,015 · N₂ 28,014 · NH₃ 17,031 · HCl 36,46 · NaOH 39,997 · CH₄ 16,043.
+// ═════════════════════════════════════════════════════════════════════════════════════════════
+
+test.describe('inspección 01/11/2026 · cálculo', () => {
+  // NORMAL — oxidación del hierro, 50 g de Fe + 20 g de O₂, rendimiento 60 %
+  //   n(Fe) = 50 / 55,845 = 0,8953353 mol → razón /4 = 0,2238338
+  //   n(O₂) = 20 / 31,998 = 0,6250391 mol → razón /3 = 0,2083464 → O₂ LIMITANTE
+  //   Fe₂O₃ = 0,2083464 × 2 = 0,4166927 mol → «0,4167 mol» · × 159,687 = 66,540409 g → «66,540 g»
+  //   al 60 %: 66,540409 × 0,6 = 39,924245 → «39,924 g»
+  //   Fe gastado 0,2083464 × 4 = 0,8333854 mol (× 55,845 = 46,540409 g, que con los 20 g de O₂ da
+  //   los 66,540 g: Lavoisier) → sobran 50 − 46,540409 = 3,459591 g → «3,460 g», 0,0619499 → «0,0619 mol»
+  //   barras: Fe 0,8953 / (0,6250391 × 4/3 = 0,8334) = 107,4 % → «107 %» · O₂ 0,6250 / (0,8953353 ×
+  //   3/4 = 0,6715) = 93,1 % → «93 %», con la insignia «Limitante»
+  test('normal: 50 g Fe + 20 g O₂ al 60 % → O₂ limitante, 66,540 g de Fe₂O₃, 39,924 g reales, sobran 3,460 g de Fe', async ({ page }) => {
+    await abrir(page);
+    await elegir(page, /Oxidación del hierro/);
+    await escribir(page, '#inputA', '50'); // por defecto 100
+    await escribir(page, '#inputB', '20'); // y 50
+    await sembrarValor(page, '#sliderRendimiento', 60);
+    await expect(tarjeta(page, 'Reactivo limitante')).toContainText('Oxígeno');
+    const teorica = tarjeta(page, 'Masa teórica de Óxido de hierro (III) (Fe₂O₃)');
+    await expect(teorica).toContainText('66,540 g');
+    await expect(teorica).toContainText('0,4167 mol');
+    await expect(tarjeta(page, 'Masa real obtenida')).toContainText('rendimiento 60 %');
+    await expect(tarjeta(page, 'Masa real obtenida')).toContainText('39,924 g');
+    const exceso = tarjeta(page, 'Reactivo en exceso');
+    await expect(exceso).toContainText('Hierro');
+    await expect(exceso).toContainText('Sobran 3,460 g (0,0619 mol)');
+    await expect(barra(page, 'Hierro (Fe)')).toContainText('0,8953 mol disponibles / 0,8334 mol necesarios (107 %)');
+    const o2 = barra(page, 'Oxígeno (O₂)');
+    await expect(o2).toContainText('0,6250 mol disponibles / 0,6715 mol necesarios (93 %)');
+    await expect(o2.locator('[class*="limitanteBadge"]')).toHaveCount(1);
+    await expect(page.locator('[class*="limitanteResaltado"]')).toHaveText(/^O₂\s*$/);
+  });
+
+  // LÍMITE — síntesis del agua en proporción EXACTA, tecleada con COMA como lo haría un usuario
+  //   4,032 g H₂ = 4,032 / 2,016 = 2 mol (razón 2/2 = 1) · 31,998 g O₂ = 1 mol (razón 1/1 = 1)
+  //   → mezcla estequiométrica: sin limitante ni exceso; H₂O = 1 × 2 = 2 mol × 18,015 = «36,030 g»,
+  //   «2,0000 mol»; barras 2 / 2 y 1 / 1 = «100 %» exactos. Al 0 % de rendimiento, «0,000 g».
+  test('límite: «4,032» g de H₂ y «31,998» g de O₂ tecleados con coma → estequiométrica, 36,030 g de agua; al 0 %, 0,000 g', async ({ page }) => {
+    await abrir(page);
+    await elegir(page, /Síntesis del agua/);
+    for (const [sel, tecleado, canonico] of [['#inputA', '4,032', '4.032'], ['#inputB', '31,998', '31.998']] as const) {
+      await page.locator(sel).fill('');
+      await page.locator(sel).pressSequentially(tecleado);
+      await esperarValorEnReact(page, sel, canonico);
+    }
+    await expect(tarjeta(page, 'Reactivo limitante')).toContainText('Ninguno: se agotan los dos a la vez');
+    await expect(tarjeta(page, 'Reactivo en exceso')).toContainText('Ninguno (estequiométrico)');
+    const teorica = tarjeta(page, 'Masa teórica de Agua (H₂O)');
+    await expect(teorica).toContainText('36,030 g');
+    await expect(teorica).toContainText('2,0000 mol');
+    await expect(barra(page, 'Hidrógeno (H₂)')).toContainText('2,0000 mol disponibles / 2,0000 mol necesarios (100 %)');
+    await expect(barra(page, 'Oxígeno (O₂)')).toContainText('1,0000 mol disponibles / 1,0000 mol necesarios (100 %)');
+    await expect(page.locator('[class*="barsSection"] [class*="limitanteBadge"]')).toHaveCount(0);
+    await expect(tarjeta(page, 'Masa real obtenida')).toContainText('36,030 g');
+    await sembrarValor(page, '#sliderRendimiento', 0);
+    await expect(tarjeta(page, 'Masa real obtenida')).toContainText('rendimiento 0 %');
+    await expect(tarjeta(page, 'Masa real obtenida')).toContainText('0,000 g');
+    await expect(teorica).toContainText('36,030 g');
+  });
+
+  // RECHAZO — en la síntesis del agua: −3 g de O₂, el H₂ vacío, letras y 0 g. Ningún resultado, el
+  // aviso de la app y ningún «NaN»; al volver a un valor válido, el cálculo vuelve.
+  //   6 g H₂ + 32 g O₂: n(H₂) = 2,976190 (razón 1,488095) · n(O₂) = 32 / 31,998 = 1,000063 → O₂
+  //   limitante; H₂O = 1,000063 × 2 × 18,015 = 36,032252 → «36,032 g»
+  test('rechazo: −3 g de O₂, H₂ vacío, «abc» y 0 g no calculan; 6 g de H₂ vuelve a dar 36,032 g', async ({ page }) => {
+    await abrir(page);
+    await elegir(page, /Síntesis del agua/);
+    const mensaje = 'Introduce gramos válidos y positivos para ver los resultados.';
+    const sinResultado = async (que: string) => {
+      await expect(aviso(page), que).toHaveText(mensaje);
+      await expect(page.locator('[class*="resultadoCard"]'), que).toHaveCount(0);
+      await expect(page.locator('[role="progressbar"]'), que).toHaveCount(0);
+    };
+    await escribir(page, '#inputB', '-3');
+    await sinResultado('O₂ = −3');
+    await escribir(page, '#inputB', '32');
+    await escribir(page, '#inputA', '');
+    await sinResultado('H₂ vacío');
+    await page.locator('#inputA').pressSequentially('abc');
+    await esperarValorEnReact(page, '#inputA', '');
+    await sinResultado('H₂ = abc');
+    await escribir(page, '#inputA', '0');
+    await sinResultado('H₂ = 0');
+    await expect(page.locator('body')).not.toContainText('NaN');
+    await escribir(page, '#inputA', '6');
+    await expect(aviso(page)).toHaveCount(0);
+    await expect(tarjeta(page, 'Reactivo limitante')).toContainText('Oxígeno');
+    await expect(tarjeta(page, 'Masa teórica de Agua (H₂O)')).toContainText('36,032 g');
+  });
+});
+
+test.describe('inspección 01/11/2026 · corrector de los casos para clase', () => {
+  const seccion = (page: Page) => page.locator('section[aria-labelledby="casos-aula-titulo"]');
+  const veredicto = (page: Page) => seccion(page).locator('[role="alert"]');
+  async function responder(page: Page, caso: number, respuesta: string): Promise<void> {
+    await seccion(page).getByRole('button', { name: new RegExp(`^Caso ${caso}:`) }).click();
+    await seccion(page).locator('#casos-respuesta').fill(respuesta);
+    await seccion(page).getByRole('button', { name: 'Comprobar' }).click();
+    await expect(veredicto(page)).toBeVisible();
+  }
+
+  // Caso 1: 40 g CH₄ → 40 / 16,043 = 2,4932993 mol, «redondea a tres decimales» → 2,493.
+  // Caso 6: N₂ 70 / 28,014 = 2,4987506 (razón 2,4987506) · H₂ 30 / 2,016 = 14,880952 (razón /3 =
+  //   4,960317) → N₂ limitante; NH₃ = 2,4987506 × 2 × 17,031 = 85,112443 g → 85,11. Con masas de
+  //   libro 70 / 28 × 2 × 17 = 85,00. Ventana: [85,00 − m ; 85,112443 + m], m = 0,5 % × 85,112443 +
+  //   0,005 = 0,430562 → [84,5694 ; 85,5430]: 85,6 se desvía 85,6 − 85,11 = 0,49 g; 84,5, 0,61 g.
+  // Caso 12: 52 g de NaCl de 64,114 g teóricos → 81,11 %, que escrito con su «%» también se lee.
+  test('se aceptan «2,493», «2.49», «85.11» (punto con dos decimales), el libro (85) y «81,11 %»; 85,6 y 84,5 no', async ({ page }) => {
+    await abrir(page);
+    for (const [caso, respuesta] of [[1, '2,493'], [1, '2.49'], [6, '85,11'], [6, '85.11'], [6, '85'], [12, '81,11 %']] as const) {
+      await responder(page, caso, respuesta);
+      await expect(veredicto(page), `caso ${caso}: «${respuesta}»`).toContainText('¡Correcto!');
+    }
+    for (const [respuesta, desviacion] of [['85,6', '0,49 g'], ['84,5', '0,61 g']] as const) {
+      await responder(page, 6, respuesta);
+      await expect(veredicto(page), respuesta).toContainText(desviado(desviacion));
+    }
+  });
+
+  // ABIERTO, hallazgo (inspector 01/11/2026, operativa) — un punto decimal con TRES cifras detrás se
+  // lee como separador de millares: `parseSpanishNumber('2.493')` = 2493. El caso 1 pide justo tres
+  // decimales, y quien escribe con punto decimal (México y buena parte de Latinoamérica, casi todo el
+  // público de la app) recibe «No es correcto. Te has desviado 2490,507 mol de la respuesta». Igual
+  // al copiar con punto las masas del panel, que salen con tres decimales: el caso 7 cargado en el
+  // simulador dice «Sobran 18,306 g», y «18.306» suspende por 18.287,69 g. Ninguna respuesta de esta
+  // app llega a mil (la mayor de los doce casos es 168,30 g; las prácticas, por debajo de 400 g y
+  // de 6 mol), así que «2.493» no puede querer decir dos mil. Es la forma del hallazgo 2784 de
+  // simulador-plano-inclinado, reparado allí con `leerRespuesta` (un punto solo es decimal).
+  //   caso 1: 2,4932993 → ventana [2,4803 ; 2,5130] (re-inspección del 25/10) → 2,493 dentro
+  //   caso 7: 73 g HCl + 60 g NaOH → sobran 73 − 1,5001125 × 36,46 = 18,305898 g → 18,306 dentro de
+  //   [18,1535 ; 18,4024]
+  test('«2.493» (caso 1) y «18.306» (caso 7) con punto decimal se dan por buenos', async ({ page }) => {
+    test.fail();
+    await abrir(page);
+    await responder(page, 1, '2.493');
+    await expect(veredicto(page), 'caso 1: «2.493»').toContainText('¡Correcto!');
+    await responder(page, 7, '18.306');
+    await expect(veredicto(page), 'caso 7: «18.306»').toContainText('¡Correcto!');
+  });
+
+  // ABIERTO, hallazgo (inspector 01/11/2026, operativa) — la respuesta con su unidad («18,31 g»,
+  // «2,493 mol») recibe «Escribe un número (puedes usar la coma decimal, por ejemplo 21,95)», cuando
+  // «81,11 %» sí se lee (test de arriba): la etiqueta de la casilla es «Masa, en g» y la solución
+  // escribe «Respuesta: 18,31 g». Es la forma del hallazgo 3374 de tabla-periodica (quitar la unidad
+  // de ESA pregunta, no cualquier letra).
+  //   caso 7: 18,305898 → 18,31 g dentro de [18,1535 ; 18,4024] · caso 1: 2,493 mol dentro de [2,4803 ; 2,5130]
+  test('«18,31 g» (caso 7) y «2,493 mol» (caso 1) con su unidad se dan por buenos', async ({ page }) => {
+    test.fail();
+    await abrir(page);
+    await responder(page, 7, '18,31 g');
+    await expect(veredicto(page), 'caso 7: «18,31 g»').toContainText('¡Correcto!');
+    await responder(page, 1, '2,493 mol');
+    await expect(veredicto(page), 'caso 1: «2,493 mol»').toContainText('¡Correcto!');
+  });
+});
+
+test.describe('inspección 01/11/2026 · móvil 360 × 800 con toques (firma de rotura)', () => {
+  test.use({
+    viewport: { width: 360, height: 800 },
+    userAgent:
+      'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
+    deviceScaleFactor: 2.625,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  // Hierro por defecto (100 g Fe, 50 g O₂): «+» de Fe → 101 · «−» de O₂ → 49. Después, el caso
+  // normal de arriba tecleado al dedo (50 g Fe + 20 g O₂) y el deslizador tocado en su centro → 50 %:
+  //   masa real = 66,540409 × 0,5 = 33,270205 → «33,270 g» (teórica «66,540 g», sobran «3,460 g»)
+  // Caso 9: Fe 280 / 55,845 = 5,0138777 (razón 1,2534694) · O₂ 48 / 31,998 = 1,5000938 (razón /3 =
+  //   0,5000313) → O₂ limitante; Fe gastado 2,0001250; sobran 3,0137527 mol × 55,845 = 168,303019 g
+  //   → la respuesta 168,30 y, cargado en el simulador, «Sobran 168,303 g (3,0138 mol)».
+  test('al toque: reacción, ±, campos tecleados, deslizador y un caso cargado, sin recargar ni salirse de la pantalla', async ({ page }) => {
+    let cargas = 0;
+    page.on('load', () => (cargas += 1));
+    await abrir(page);
+    const cargasIniciales = cargas;
+    await page.getByRole('button', { name: /Oxidación del hierro/ }).tap();
+    await expect(page.locator('#inputA')).toHaveValue('100');
+    await expect(page.locator('#inputB')).toHaveValue('50');
+    await page.getByRole('button', { name: 'Aumentar gramos de reactivo A' }).tap();
+    await expect(page.locator('#inputA')).toHaveValue('101');
+    await page.getByRole('button', { name: 'Reducir gramos de reactivo B' }).tap();
+    await expect(page.locator('#inputB')).toHaveValue('49');
+    for (const [sel, valor] of [['#inputA', '50'], ['#inputB', '20']] as const) {
+      await page.locator(sel).tap();
+      await page.locator(sel).fill('');
+      await page.locator(sel).pressSequentially(valor);
+      await esperarValorEnReact(page, sel, valor);
+    }
+    const deslizador = page.locator('#sliderRendimiento');
+    await deslizador.scrollIntoViewIfNeeded();
+    const caja = (await deslizador.boundingBox())!;
+    await page.touchscreen.tap(caja.x + caja.width / 2, caja.y + caja.height / 2);
+    await expect(page.locator('label[for="sliderRendimiento"]')).toContainText('50 %');
+    await expect(tarjeta(page, 'Reactivo limitante')).toContainText('Oxígeno');
+    await expect(tarjeta(page, 'Masa teórica de Óxido de hierro (III)')).toContainText('66,540 g');
+    await expect(tarjeta(page, 'Masa real obtenida')).toContainText('33,270 g');
+    await expect(tarjeta(page, 'Reactivo en exceso')).toContainText('Sobran 3,460 g (0,0619 mol)');
+
+    const seccion = page.locator('section[aria-labelledby="casos-aula-titulo"]');
+    await seccion.getByRole('button', { name: /^Caso 9:/ }).tap();
+    await seccion.locator('#casos-respuesta').tap();
+    await seccion.locator('#casos-respuesta').pressSequentially('168,30');
+    await seccion.getByRole('button', { name: 'Comprobar' }).tap();
+    await expect(seccion.locator('[role="alert"]')).toContainText('¡Correcto!');
+    await seccion.getByRole('button', { name: 'Cargar en el simulador' }).tap();
+    await expect(page.locator('#inputA')).toHaveValue('280');
+    await expect(page.locator('#inputB')).toHaveValue('48');
+    await expect(page.locator('#inputA')).toBeInViewport();
+    await expect(tarjeta(page, 'Reactivo en exceso')).toContainText('Sobran 168,303 g (3,0138 mol)');
+    expect(await page.evaluate(() => document.documentElement.scrollWidth), 'ancho del documento').toBeLessThanOrEqual(360);
+    expect(cargas, 'recargas de la página durante el uso').toBe(cargasIniciales);
   });
 });

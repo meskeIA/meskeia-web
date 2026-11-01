@@ -1,4 +1,5 @@
-import { test, expect, devices, type Page } from '@playwright/test';
+import { test, expect, devices, type Locator, type Page } from '@playwright/test';
+import AxeBuilder from '@axe-core/playwright';
 import { esperarHidratacion, esperarValorEnReact, sembrarValor } from './_hidratacion';
 
 /**
@@ -100,6 +101,11 @@ import { esperarHidratacion, esperarValorEnReact, sembrarValor } from './_hidrat
  *      lectura estable escrita y aún sin pintar al pulsar «Llevar»; la guarda de las dos FAQ para TODAS
  *      las preguntas, y los hallazgos P1-P3, que nacieron ABIERTOS con `test.fail()` y fueron
  *      REPARADOS el mismo 22/10/2026 (hallazgos 3412-3414): hoy son regresión.
+ *  13. INSPECTOR 01/11/2026 (al final): un diapasón de 12.345 Hz por el micrófono, llevado al
+ *      generador y medido en el sonido (CASO 28); volumen 0 % en el techo de 20.000 Hz, en móvil de
+ *      390 px (CASO 29); «Desde» que no es un número y «Duración» por encima de 60 s (CASO 30). Y el
+ *      cabo C0555 medido: los botones «1k», «5k», «10k» y «20k» no llevan su texto en el nombre
+ *      accesible (hallazgo Q1, ABIERTO con `test.fail()`), con los Q2-Q4 de la misma inspección.
  */
 
 test.use({
@@ -4750,14 +4756,15 @@ test.describe('Inspector 22/10/2026', () => {
   });
 
   /**
-   * HALLAZGO P2 [medio · operativa] — ABIERTO. Con el barrido en marcha, los controles de frecuencia siguen
-   * activos y el barrido los pisa en el peldaño siguiente (≤ 50 ms): ni se para ni los ignora.
-   *   · «La (A4)»: 440 Hz suena 43 ms, el preset se marca y se desmarca, y el barrido sigue donde iba.
-   *   · El campo: cada tecla se escribe DETRÁS del peldaño que el barrido acaba de poner, y ese número se
-   *     emite. Tecleando «1234» con el barrido 1.000 → 3.000: el campo pasa por «1», «15502», «17003»,
-   *     «18504» y el oscilador emite 15.502, 17.003 y 18.504 Hz, 26-54 ms cada uno (medido dos veces);
-   *     1.234 no suena nunca. Ráfagas de 15-18 kHz en un barrido acotado a 3 kHz, en la franja que la
-   *     propia página pide explorar a volumen bajo y lejos de mascotas.
+   * HALLAZGO P2 [medio · operativa] — REPARADO el 22/10/2026 (hallazgo 3413). Era: con el barrido en
+   * marcha, los controles de frecuencia seguían activos y el barrido los pisaba en el peldaño siguiente
+   * (≤ 50 ms): ni se paraba ni los ignoraba.
+   *   · «La (A4)»: 440 Hz sonaba 43 ms, el preset se marcaba y se desmarcaba, y el barrido seguía donde iba.
+   *   · El campo: cada tecla se escribía DETRÁS del peldaño que el barrido acababa de poner, y ese número
+   *     se emitía. Tecleando «1234» con el barrido 1.000 → 3.000: el campo pasaba por «1», «15502»,
+   *     «17003», «18504» y el oscilador emitía 15.502, 17.003 y 18.504 Hz, 26-54 ms cada uno (medido dos
+   *     veces); 1.234 no sonaba nunca. Ráfagas de 15-18 kHz en un barrido acotado a 3 kHz, en la franja
+   *     que la propia página pide explorar a volumen bajo y lejos de mascotas.
    *   entrada   barrido 1.000 → 3.000 Hz en 2 s en marcha; teclear «1234» en el campo (una tecla cada 120 ms)
    *   esperado  suena 1.234 Hz (el barrido se para) o el campo no se deja editar mientras barre; nada fuera
    *             de 1.000–3.000 Hz salvo lo tecleado (123 y 1.234)
@@ -4818,11 +4825,12 @@ test.describe('Inspector 22/10/2026', () => {
   });
 
   /**
-   * HALLAZGO P3 [bajo · operativa] — ABIERTO. «Reproducir» (y «Iniciar barrido») siguen activos mientras se
-   * mide la respuesta, y el tono que arrancan sale por el mismo altavoz que la medida: la app lo sabe
-   * («El generador manual no puede seguir sonando: contaminaría su propia medida», `medirRespuesta`) y
-   * lo apaga si sonaba ANTES de medir, pero no impide arrancarlo DURANTE. El medidor de frecuencia sí
-   * queda bloqueado mientras se mide (`disabled={midiendo !== null}`); el generador, no.
+   * HALLAZGO P3 [bajo · operativa] — REPARADO el 22/10/2026 (hallazgo 3414). Era: «Reproducir» (y «Iniciar
+   * barrido») seguían activos mientras se medía la respuesta, y el tono que arrancaban salía por el mismo
+   * altavoz que la medida: la app lo sabía («El generador manual no puede seguir sonando: contaminaría su
+   * propia medida», `medirRespuesta`) y lo apagaba si sonaba ANTES de medir, pero no impedía arrancarlo
+   * DURANTE. El medidor de frecuencia sí quedaba bloqueado mientras se medía (`disabled={midiendo !== null}`);
+   * el generador, no.
    *   entrada   cadena plana (micrófono en bucle); 1.010 Hz y volumen al 100 % en el generador; «Medir A»
    *             y, con «Emitiendo 50 Hz (1 de 26)», «Reproducir»
    *   esperado  el tono no arranca mientras se mide (o la medida se descarta y lo dice); en una cadena
@@ -4860,5 +4868,336 @@ test.describe('Inspector 22/10/2026', () => {
       expect(a1000, 'A en 1.000 Hz (null = «sin medida»)').not.toBeNull();
       expect(Math.abs(a1000 as number), `tercio de 1.000 Hz de una cadena plana: ${a1000} dB rel.`).toBeLessThanOrEqual(1.5);
     }
+  });
+});
+
+// ============================================================
+// INSPECTOR 01/11/2026 — tres casos y el cabo C0555 medido
+// ============================================================
+
+/**
+ * Lleva la página al tema pedido con el botón del logo, espera a que `data-theme` lo diga y a que
+ * terminen las transiciones que el cambio dispara. Sin lo último se mide un color de paso: medido el
+ * 01/11/2026, justo tras el cambio a oscuro la cifra del preset ya era #9B9B9B y el fondo de la
+ * sección seguía blanco (2,47:1). Con `reducedMotion: 'reduce'` duran 0,01 ms, pero hasta el
+ * fotograma siguiente `getComputedStyle` sigue dando el valor de partida.
+ */
+async function ponerTema(page: Page, tema: 'light' | 'dark'): Promise<void> {
+  const actual = await page.evaluate(() => document.documentElement.getAttribute('data-theme'));
+  if ((actual === 'dark') !== (tema === 'dark')) {
+    await page.getByRole('button', { name: /^Cambiar a modo (oscuro|claro)$/ }).click();
+  }
+  await expect(page.locator('html')).toHaveAttribute('data-theme', tema);
+  await page.evaluate(async () => {
+    await new Promise<void>((r) => requestAnimationFrame(() => requestAnimationFrame(() => r())));
+    await Promise.all(document.getAnimations().map((a) => a.finished.catch(() => undefined)));
+  });
+}
+
+/**
+ * Contraste de la cifra de un preset («440 Hz») contra el fondo que tiene DEBAJO: el del botón, que en
+ * el activo es rgba(46, 134, 171, 0,1), compuesto sobre los de sus antepasados hasta uno opaco.
+ * Fórmula de WCAG 2.x (luminancia relativa con γ de sRGB). Se mide con `reducedMotion: 'reduce'`, que
+ * en globals.css deja las transiciones en 0,01 ms: a mitad del cambio de tema daría un color de paso.
+ */
+async function contrasteCifraPreset(preset: Locator): Promise<{ texto: string; fondo: string; contraste: number }> {
+  return preset.locator('[class*="presetFrec"]').evaluate((el) => {
+    const rgba = (c: string) => {
+      const p = (c.match(/rgba?\(([^)]+)\)/)?.[1] ?? '0,0,0,0').split(',').map((x) => Number(x.trim()));
+      return { r: p[0], g: p[1], b: p[2], a: p.length > 3 ? p[3] : 1 };
+    };
+    type Color = ReturnType<typeof rgba>;
+    const capas: Color[] = [];
+    for (let e: Element | null = el; e; e = e.parentElement) {
+      const c = rgba(getComputedStyle(e).backgroundColor);
+      if (c.a > 0) capas.push(c);
+      if (c.a >= 1) break;
+    }
+    let fondo: Color = { r: 255, g: 255, b: 255, a: 1 };
+    for (const c of capas.reverse()) {
+      fondo = { r: c.r * c.a + fondo.r * (1 - c.a), g: c.g * c.a + fondo.g * (1 - c.a), b: c.b * c.a + fondo.b * (1 - c.a), a: 1 };
+    }
+    const texto = rgba(getComputedStyle(el).color);
+    const lin = (v: number) => {
+      const s = v / 255;
+      return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+    };
+    const lum = (c: Color) => 0.2126 * lin(c.r) + 0.7152 * lin(c.g) + 0.0722 * lin(c.b);
+    const [claro, oscuro] = [lum(texto), lum(fondo)].sort((x, y) => y - x);
+    const hex = (c: Color) => '#' + [c.r, c.g, c.b].map((v) => Math.round(v).toString(16).padStart(2, '0')).join('');
+    return { texto: hex(texto), fondo: hex(fondo), contraste: (claro + 0.05) / (oscuro + 0.05) };
+  });
+}
+
+test.describe('Inspector 01/11/2026', () => {
+  /**
+   * CASO 28 — NORMAL (escritorio): un diapasón de 12.345 Hz por el micrófono (sintético, amplitud 0,3).
+   *   Nota, temperamento igual con La4 = 440 Hz: 12·log2(12.345/440) = 57,72 → 58 semitonos sobre La4,
+   *   que es Sol9 = 440·2^(58/12) = 12.543,85 Hz; desvío 1200·log2(12.345/12.543,85) = −27,66 → «−28
+   *   cents». Para que el redondeo diera −27 la cifra tendría que leerse en 12.346,14 Hz o más: un error
+   *   de 1,14 Hz, por encima del «menos de un hercio» que promete la FAQ. Por eso se exige −28 exacto.
+   *   Cifra: por encima de 100 Hz, sin decimales y con punto de millares → «12.345 Hz».
+   *   Franja de `getDescripcionFrecuencia`: 8.000 ≤ f < 16.000 → «Muy agudos - Aire».
+   *   Lo llevado al generador, a ±0,5 Hz (lo redondea a un decimal; la promesa es el hercio). El pico del
+   *   sonido emitido, a ±1 bin de la FFT del test (48.000/32.768 = 1,46 Hz; 1,35 Hz a 44,1 kHz): el
+   *   `picoHz` de `INSTRUMENTAR` es el centro del bin, sin afinar.
+   *   Medido el 01/11/2026: «12.345 Hz · Sol9 (−28 cents)», campo «12345» y pico en 12.345,70 Hz.
+   */
+  test('CASO 28 — un diapasón de 12.345 Hz por el micrófono: «12.345 Hz · Sol9 (−28 cents)», se lleva al generador y suena a 12.345 Hz', async ({
+    page,
+  }) => {
+    await microfonoSintetico(page, 4, [{ hz: 12345, amp: 0.3, desde: 0, hasta: 4 }]);
+    await arrancarMedidor(page);
+    await expect(seccionMedidor(page).getByText('Lectura estable', { exact: true })).toBeVisible({ timeout: 6000 });
+    const l = await lecturaMedidor(page);
+    expect(l.cifra).toBe('12.345 Hz');
+    expect(notaYCents(l.nota), `nota «${l.nota}»`).toEqual({ nota: 'Sol9', cents: -28 });
+    expect(l.retenida).toBe('Última lectura estable: 12.345 Hz · Sol9 (−28 cents)');
+
+    const llevado = await llevarAlGenerador(page);
+    expect(Math.abs(llevado.hz - 12345), `campo «${llevado.texto}»`).toBeLessThanOrEqual(0.5);
+    const aviso = sinEspacioDuro((await seccionMedidor(page).locator('[class*="medidaProgreso"]').textContent()) ?? '');
+    // En formato español, con punto de millares: «12.345», o «12.344,9» si la lectura cae un decimal abajo
+    expect(aviso).toMatch(/^Frecuencia puesta en el generador: 12\.34[45](,\d)? Hz\. Pulsa Reproducir para oírla\.$/);
+    expect(hzAnunciados(aviso), 'el aviso dice lo que se ha escrito en el campo').toBe(llevado.hz);
+    await expect(page.locator('[class*="descripcionFrecuencia"]')).toHaveText('Muy agudos - Aire');
+
+    await botonReproducir(page).click();
+    await expect.poll(async () => (await registros(page)).length, { timeout: 5000 }).toBe(1);
+    const r = (await registros(page))[0];
+    expect(r.frecuenciasAplicadas, 'el oscilador nace en lo llevado').toEqual([llevado.hz]);
+    expect(r.tipoAlArrancar).toBe('sine');
+    expect(r.estadoCtx).toBe('running');
+    await expect
+      .poll(
+        async () => {
+          const e = await espectro(page, []);
+          return e ? Math.abs(e.picoHz - 12345) <= e.anchoBin : false;
+        },
+        { timeout: 5000, message: 'el pico del sonido emitido no cae a ±1 bin de 12.345 Hz' },
+      )
+      .toBe(true);
+    await botonDetener(page).click();
+  });
+
+  /**
+   * CASO 30 — RECHAZO: «Desde» con «1,2,3» (dos comas: no es un número) y «Duración» con «61» (por encima
+   * del máximo de 60 s). Esperado, de `leerCampoBarrido`:
+   *   «Desde» → 20 Hz, el suelo (su `porDefecto`), con el aviso
+   *     «Desde» «1,2,3» no es un número: se usa 20 Hz.
+   *   «Duración» → 60 s, el techo, con el aviso
+   *     «Duración»: 61 s queda fuera del rango de 1 a 60 s; se ajusta a 60 s.
+   *   «Hasta», sin tocar: 2.000 Hz y sin aviso.
+   *   Barrido 20 → 2.000 Hz en 60 s: incremento (2000 − 20)/(60·20) = 1,65 Hz cada 50 ms, redondeado al
+   *   aplicarlo → 20 · 21,65→22 · 23,30→23 · 24,95→25 · 26,60→27 · 28,25→28 · 29,90→30.
+   *   (El 20 puede salir dos veces al arrancar: lo aplican el oscilador y el efecto de la frecuencia.)
+   */
+  test('CASO 30 — «Desde» «1,2,3» y «Duración» «61» se corrigen diciéndolo, y el barrido sube de 20 a 2.000 Hz en peldaños de 1,65 Hz', async ({
+    page,
+  }) => {
+    await abrir(page);
+    await esperarHidratacion(page, ['#sweep-min', '#sweep-max', '#sweep-dur']);
+    const teclear = async (selector: string, texto: string) => {
+      const campo = page.locator(selector);
+      await campo.click();
+      await campo.press('Control+a');
+      await campo.pressSequentially(texto, { delay: 30 });
+      await esperarValorEnReact(page, selector, texto);
+      await campo.blur();
+    };
+    await teclear('#sweep-min', '1,2,3');
+    await teclear('#sweep-dur', '61');
+
+    await expect(page.locator('#sweep-min')).toHaveValue('20');
+    await expect(page.locator('#sweep-min')).toHaveAttribute('aria-invalid', 'true');
+    await expect(page.locator('#sweep-min')).toHaveAttribute('aria-describedby', 'sweep-min-aviso');
+    await expect(page.locator('#sweep-min-aviso')).toContainText('«Desde» «1,2,3» no es un número: se usa 20 Hz.');
+    await expect(page.locator('#sweep-dur')).toHaveValue('60');
+    await expect(page.locator('#sweep-dur')).toHaveAttribute('aria-invalid', 'true');
+    await expect(page.locator('#sweep-dur-aviso')).toContainText('«Duración»: 61 s queda fuera del rango de 1 a 60 s; se ajusta a 60 s.');
+    await expect(page.locator('#sweep-max')).toHaveValue('2000');
+    await expect(page.locator('#sweep-max-aviso')).toHaveCount(0);
+    expect(await page.locator('#sweep-max').getAttribute('aria-invalid')).toBeNull();
+
+    await page.getByRole('button', { name: /Iniciar barrido/ }).click();
+    await expect
+      .poll(async () => new Set(await frecuenciasAplicadas(page)).size, { timeout: 5000, message: 'el barrido no avanza' })
+      .toBeGreaterThanOrEqual(8);
+    await page.getByRole('button', { name: /Detener barrido/ }).click();
+    const distintas = [...new Set(await frecuenciasAplicadas(page))];
+    expect(distintas.slice(0, 7)).toEqual([20, 22, 23, 25, 27, 28, 30]);
+    // Y ningún peldaño fuera de la escalera 20 + 1,65·k (±0,5 del redondeo)
+    for (const f of distintas) {
+      const k = Math.round((f - 20) / 1.65);
+      expect(Math.abs(f - (20 + 1.65 * k)), `${f} Hz fuera de la escalera de 1,65 Hz`).toBeLessThanOrEqual(0.5 + 1e-9);
+    }
+    await botonDetener(page).click();
+  });
+
+  /**
+   * HALLAZGO Q1 [medio · accesibilidad] — ABIERTO, hallazgo (inspector 01/11/2026). Es el cabo C0555, medido.
+   * Los siete saltos de frecuencia pintan «20», «100», «500», «1k», «5k», «10k» y «20k» y se nombran con
+   * aria-label «Ir a 20 Hz» … «Ir a 20.000 Hz». En los cuatro de la «k» el texto visible no está en el
+   * nombre accesible (WCAG 2.5.3, nivel A): quien usa control por voz dice «pulsa 1k» y no hay botón con
+   * ese nombre. Medido con el árbol de accesibilidad de Chromium y con axe-core 4.14
+   * (`label-content-name-mismatch`, impacto serious): fallan exactamente esos cuatro; «20», «100» y «500»
+   * pasan porque su cifra sí está en «Ir a 20 Hz».
+   *   entrada   la escala bajo el deslizador de frecuencia
+   *   esperado  el nombre de cada botón contiene su texto visible («1k, ir a 1.000 Hz»…)
+   *   obtenido  «1k» → «Ir a 1.000 Hz» · «5k» → «Ir a 5.000 Hz» · «10k» → «Ir a 10.000 Hz» · «20k» → «Ir a 20.000 Hz»
+   * ⚠️ Doce tests de este fichero localizan por `{ name: 'Ir a 1.000 Hz' }`, que Playwright casa como
+   * subcadena sin distinguir mayúsculas: un aria-label que EMPIECE por lo que se ve y siga con «ir a
+   * 1.000 Hz» los deja en verde; retirar el aria-label obliga a cambiarlos.
+   */
+  test('HALLAZGO Q1 — el nombre accesible de cada salto de frecuencia contiene lo que el botón pinta', async ({ page }) => {
+    test.fail();
+    await abrir(page);
+    const saltos = page.locator('[class*="escalaVisual"] button');
+    await expect(saltos).toHaveCount(7);
+    const vistos: { visible: string; nombre: string }[] = [];
+    for (let i = 0; i < 7; i++) {
+      const b = saltos.nth(i);
+      const visible = (await b.innerText()).trim();
+      // `- button "Ir a 1.000 Hz": 1k` → el nombre que calcula Chromium, entre comillas
+      const nombre = (await b.ariaSnapshot()).match(/^- button "((?:[^"\\]|\\.)*)"/)?.[1] ?? '';
+      vistos.push({ visible, nombre });
+    }
+    expect(vistos.map((v) => v.visible)).toEqual(['20', '100', '500', '1k', '5k', '10k', '20k']);
+    const sinSuTexto = vistos.filter((v) => !v.nombre.toLowerCase().includes(v.visible.toLowerCase()));
+    expect(sinSuTexto, `texto visible frente a nombre accesible: ${JSON.stringify(vistos)}`).toEqual([]);
+    const axe = await new AxeBuilder({ page })
+      .include('[class*="escalaVisual"]')
+      .withRules(['label-content-name-mismatch'])
+      .analyze();
+    expect(axe.violations.flatMap((v) => v.nodes.map((n) => n.html))).toEqual([]);
+  });
+
+  /**
+   * HALLAZGO Q2 [medio · accesibilidad] — ABIERTO, hallazgo (inspector 01/11/2026).
+   * Los tres enlaces de «Qué mide y qué no» (afinador, sonómetro, analizador de espectro) van dentro del
+   * texto sin subrayado ni otra marca que el color (globals.css: `a { text-decoration: none }`), y ese
+   * color apenas se separa del texto que los rodea: #26718F sobre texto #666666 = 1,05:1 en claro, y
+   * #3FA5D1 sobre #B0B0B0 = 1,28:1 en oscuro, frente al 3:1 que pide la técnica G183 si no hay otra marca
+   * (WCAG 1.4.1, nivel A). Quien no distingue ese azul no sabe que son enlaces. axe-core 4.14:
+   * `link-in-text-block`, serious, los tres nodos en los dos temas. El enlace del hero de esta misma app
+   * (`.heroMedidor a`) ya va subrayado.
+   */
+  test('HALLAZGO Q2 — los enlaces dentro del texto del medidor se distinguen sin depender del color, en claro y en oscuro', async ({
+    page,
+  }) => {
+    test.fail();
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await abrir(page);
+    await expect(seccionMedidor(page).locator('[class*="medidaLimites"] a')).toHaveCount(3);
+    for (const tema of ['light', 'dark'] as const) {
+      await ponerTema(page, tema);
+      const axe = await new AxeBuilder({ page }).include('#medir-frecuencia').withRules(['link-in-text-block']).analyze();
+      expect(axe.violations.flatMap((v) => v.nodes.map((n) => n.html)), `tema ${tema}`).toEqual([]);
+    }
+  });
+
+  /**
+   * HALLAZGO Q3 [bajo · accesibilidad] — ABIERTO, hallazgo (inspector 01/11/2026).
+   * En oscuro, la cifra del preset ACTIVO no llega a 4,5:1. `.presetFrec` es `var(--text-muted)` (#9B9B9B)
+   * a 12 px, y el activo pone de fondo rgba(46, 134, 171, 0,1) sobre la sección (#2D2D2D) = #2D363A:
+   * 4,45:1 (WCAG 1.4.3, AA). Es el estado de partida: «La (A4)» nace activo con los 440 Hz por defecto.
+   * Los inactivos (#1A1A1A) dan 6,26:1, y el activo en claro, 4,53:1.
+   *   entrada   tema oscuro, preset «La (A4)» activo
+   *   esperado  «440 Hz» a ≥ 4,5:1 sobre su fondo
+   *   obtenido  #9B9B9B sobre #2D363A = 4,45:1
+   */
+  test('HALLAZGO Q3 — la cifra del preset activo («440 Hz») llega a 4,5:1 sobre su fondo, en claro y en oscuro', async ({ page }) => {
+    test.fail();
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await abrir(page);
+    const activo = page.getByRole('button', { name: /La \(A4\)/ });
+    await expect(activo).toHaveAttribute('aria-pressed', 'true');
+    for (const tema of ['light', 'dark'] as const) {
+      await ponerTema(page, tema);
+      const m = await contrasteCifraPreset(activo);
+      expect(m.contraste, `tema ${tema}: ${m.texto} sobre ${m.fondo}`).toBeGreaterThanOrEqual(4.5);
+    }
+  });
+
+  /**
+   * HALLAZGO Q4 [bajo · contenido] — ABIERTO, hallazgo (inspector 01/11/2026). Tres erratas de la guía:
+   *   · FAQ «¿Qué es la frecuencia…?»: «La velocidad del sonido […] divide entre la frecuencia da la
+   *     longitud de onda» → «dividida entre la frecuencia».
+   *   · Tabla de rangos, fila «Medios»: «Voz humana, guitarra, violin» → «violín».
+   *   · Guía, paso 5: «patologías como la neurinoma del acústico» → «el neurinoma» (neurinoma es masculino).
+   */
+  test('HALLAZGO Q4 — la guía no lleva las erratas «divide entre la frecuencia», «violin» ni «la neurinoma»', async ({ page }) => {
+    test.fail();
+    await abrir(page);
+    // La guía nace plegada, pero su contenido está en el DOM (EducationalSection lo oculta con CSS)
+    const texto = (await page.locator('body').textContent()) ?? '';
+    expect(texto).toContain('λ ≈ 78 cm');
+    expect(texto).not.toContain('divide entre la frecuencia');
+    expect(texto).not.toMatch(/\bviolin\b/);
+    expect(texto).not.toContain('la neurinoma');
+  });
+});
+
+test.describe('Inspector 01/11/2026 — móvil de 390 px', () => {
+  test.use({
+    viewport: { width: 390, height: 844 },
+    userAgent: devices['Pixel 7'].userAgent,
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  /**
+   * CASO 29 — LÍMITE (móvil 390×844): el techo de 20.000 Hz con el volumen en el suelo, 0 %.
+   *   Esperado: el oscilador nace en 20.000 Hz (un solo `setValueAtTime`), el contexto en «running» y la
+   *   ganancia en 0 exacto (la rampa de entrada va de 0 a 0); el tono existe —el analizador del test,
+   *   que va ANTES de la ganancia, tiene su pico en 20.000 Hz— pero no sale nada. El rótulo y el
+   *   aria-valuetext dicen «0 %» con espacio duro (U+00A0). Una pulsación de flecha sube un paso del
+   *   deslizador (step 0,01): «1 %» y ganancia 0,01. «20» baja el MISMO oscilador a 20 Hz en caliente.
+   *   Franjas: f = 20.000 → «Umbral del ultrasonido - Inaudible para la mayoría»; f < 60 → «Subgraves -
+   *   Sentir más que oír».
+   */
+  test('CASO 29 — 20.000 Hz con el volumen a 0 %: el tono corre en silencio, una flecha lo sube a 0,01 y «20» lo baja en caliente', async ({
+    page,
+  }) => {
+    await abrir(page);
+    expect(page.viewportSize()?.width).toBe(390);
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 1),
+      'la app no desborda a lo ancho en 390 px',
+    ).toBe(false);
+
+    await page.getByRole('button', { name: 'Ir a 20.000 Hz' }).tap();
+    await expect(campoFrecuencia(page)).toHaveValue('20000');
+    // Punto de millares y espacio duro antes de «Hz» (el template de la app lleva U+00A0)
+    await expect(page.getByRole('slider', { name: 'Seleccionar frecuencia' })).toHaveAttribute('aria-valuetext', /^20\.000 Hz$/);
+    await expect(page.locator('[class*="descripcionFrecuencia"]')).toHaveText('Umbral del ultrasonido - Inaudible para la mayoría');
+
+    const volumen = page.getByRole('slider', { name: 'Volumen' });
+    await volumen.press('Home');
+    await expect(volumen).toHaveAttribute('aria-valuetext', '0 %');
+    await expect(page.locator('[class*="volumenValor"]')).toHaveText(/^0\s%$/);
+
+    await botonReproducir(page).tap();
+    await expect.poll(async () => (await registros(page)).length, { timeout: 5000 }).toBe(1);
+    expect((await registros(page))[0].frecuenciasAplicadas).toEqual([20000]);
+    expect((await registros(page))[0].estadoCtx).toBe('running');
+    await expect(botonDetener(page)).toHaveAttribute('aria-pressed', 'true');
+    await esperarFrecuencia(page, 20000, 0);
+    await esperarPicoEspectral(page, 20000);
+    await page.waitForTimeout(150); // más que la rampa de 50 ms
+    expect((await vivo(page))?.ganancia, 'a 0 % no sale nada').toBe(0);
+
+    await volumen.press('ArrowRight');
+    await expect(volumen).toHaveAttribute('aria-valuetext', '1 %');
+    await expect.poll(async () => (await vivo(page))?.ganancia ?? -1, { timeout: 5000 }).toBeCloseTo(0.01, 4);
+
+    await page.getByRole('button', { name: 'Ir a 20 Hz' }).tap();
+    await expect(campoFrecuencia(page)).toHaveValue('20');
+    await esperarFrecuencia(page, 20, 0);
+    await expect(page.locator('[class*="descripcionFrecuencia"]')).toHaveText('Subgraves - Sentir más que oír');
+    expect(await registros(page), 'el mismo oscilador, sin crear otro').toHaveLength(1);
+    expect((await registros(page))[0].frecuenciasAplicadas).toEqual([20000, 20]);
+    await botonDetener(page).tap();
   });
 });
