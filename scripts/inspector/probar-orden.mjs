@@ -19,6 +19,9 @@
  *   4. Sin altos, con la bandeja de cabos creciendo en la semana → 1 /reparar cabos.
  *   5. Sin altos, sin crecer, pero con más de 30 cabos → 1 /reparar cabos.
  *   6. Con un alto y los cabos creciendo → /reparar, luego /reparar cabos, luego /inspector.
+ *   7. Con cabos de destino `campana` (P003, 01/11/2026) → «en paralelo: /campana <el más
+ *      antiguo por fecha> (N abiertas)», sin quitarle el primer puesto a nadie; una cerrada no
+ *      cuenta, y sin ninguna abierta la línea no la menciona.
  *
  * Ninguna toca las bases reales: van por `INSPECTOR_DB` y `CABOS_DB`, creadas vacías.
  */
@@ -29,7 +32,7 @@ import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { DatabaseSync } from 'node:sqlite';
 import { fileURLToPath } from 'node:url';
-import { abrir as abrirCabos, alta, cerrar } from '../cabos/cabos.mjs';
+import { abrir as abrirCabos, alta, cerrar, codigo } from '../cabos/cabos.mjs';
 
 const AQUI = path.dirname(fileURLToPath(import.meta.url));
 const ORDEN = path.join(AQUI, 'orden-del-dia.mjs');
@@ -40,8 +43,12 @@ const ok = (b, msg) => { console.log(`  ${b ? '✓' : '✗'} ${msg}`); if (!b) f
 const haceDias = (n) => new Date(Date.now() - n * 86_400_000).toISOString().slice(0, 10);
 
 let n = 0;
-/** Bases nuevas para cada caso: `hallazgos` = [[slug, severidad, estado]], `cabos` = { viejos, nuevos, cerradosHoy } */
-function escenario({ hallazgos = [], cabos = {} }) {
+let campanaAntigua = null;
+/**
+ * Bases nuevas para cada caso: `hallazgos` = [[slug, severidad, estado]], `cabos` = { viejos, nuevos, cerradosHoy },
+ * `campanas` = [[días de antigüedad, abierta]] en orden de alta; deja en `campanaAntigua` el código de la abierta más vieja
+ */
+function escenario({ hallazgos = [], cabos = {}, campanas = [] }) {
   n += 1;
   const rutaIns = path.join(TMP, `inspector-${n}.db`);
   const rutaCabos = path.join(TMP, `cabos-${n}.db`);
@@ -58,6 +65,13 @@ function escenario({ hallazgos = [], cabos = {} }) {
   for (let i = 0; i < viejos; i++) dar(`v${i}`, haceDias(20));
   for (let i = 0; i < nuevos; i++) dar(`n${i}`, haceDias(1));
   for (let i = 0; i < cerradosHoy; i++) cerrar(cdb, dar(`c${i}`, haceDias(20)), { como: 'resuelto', motivo: 'prueba' });
+  campanaAntigua = null;
+  let diasAntigua = -1;
+  campanas.forEach(([dias, abierta = true], i) => {
+    const id = alta(cdb, { sujeto: `campana-${n}-${i}`, texto: 'prueba', origen: 'probar-orden', destino: 'campana', fecha: haceDias(dias) }).id;
+    if (!abierta) cerrar(cdb, id, { como: 'resuelto', motivo: 'prueba' });
+    else if (dias > diasAntigua) { diasAntigua = dias; campanaAntigua = codigo(id); }
+  });
   cdb.close();
   return execFileSync(process.execPath, [ORDEN], { encoding: 'utf8', env: { ...process.env, INSPECTOR_DB: rutaIns, CABOS_DB: rutaCabos } }).trim();
 }
@@ -94,6 +108,16 @@ ok(primero(l) === '/inspector', '  con 30 justos, no: empieza por /inspector');
 console.log('\n6 · Un alto y los cabos creciendo: reparar, cabos, inspector');
 l = escenario({ hallazgos: [['app-alto', 'alto']], cabos: { nuevos: 4 } });
 ok(/1 \/reparar \(.*2 \/reparar cabos \(.*3 \/inspector/.test(l), 'en ese orden');
+
+console.log('\n7 · Las campañas van en paralelo, con la más antigua (P003, 01/11/2026)');
+// La más antigua se da de alta DESPUÉS: tiene que ganar por fecha, no por id
+l = escenario({ hallazgos: [['app-a', 'bajo']], campanas: [[3], [12], [40, false]] });
+ok(l.includes(`· en paralelo: /campana ${campanaAntigua} (2 abiertas)`), `nombra la más antigua y cuenta solo las abiertas («${l.slice(0, 110)}…»)`);
+ok(primero(l) === '/inspector', '  no le quita el primer puesto a nadie');
+l = escenario({ hallazgos: [['app-alto', 'alto']], campanas: [[5]] });
+ok(primero(l) === '/reparar' && l.includes(`en paralelo: /campana ${campanaAntigua} (1 abierta)`), '  con un alto, /reparar primero y la campaña en paralelo, en singular');
+l = escenario({ campanas: [[5, false]] });
+ok(!l.includes('/campana'), '  sin ninguna abierta no la menciona');
 
 fs.rmSync(TMP, { recursive: true, force: true });
 console.log(fallos ? `\n✗ ${fallos} comprobaciones FALLAN` : '\n✓ todas las comprobaciones pasan');

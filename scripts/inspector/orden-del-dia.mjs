@@ -23,12 +23,21 @@
  *      últimos 7 días (entran más que salen) o pasa de UMBRAL_CABOS abiertos → /reparar cabos.
  *   3. Si no, /inspector: es el único que encuentra defectos nuevos. Después, /reparar solo si
  *      deja altos; los bajos y medios esperan a cuando venga bien (el reposo los deja esperar).
+ *   4. Los cabos de destino `campana` van APARTE, «en paralelo: /campana <el más antiguo>»
+ *      (01/11/2026, P003 del repaso de procesos): una campaña no choca con las tareas, que
+ *      trabajan en su copia, pero sí con un /push o con otra campaña, así que no ocupa puesto en
+ *      la fila. El 31/10 el usuario preguntó dos veces si lanzar ya una /campana, y esta línea
+ *      no las conocía.
+ *
+ * Desde el 01/11/2026 la imprimen también, como «Siguiente: …», el `cerrar` de las tareas del
+ * Inspector y de /reparar y el final de una /campana (`scripts/campana/limpiar.mjs`): el usuario
+ * lo preguntaba a lo largo del día, y la respuesta de memoria contradijo la regla (27/10).
  *
  * Prueba: `npm run inspector:probar-orden`.
  */
 
 import { abrir } from './db.mjs';
-import { abrir as abrirCabos, resumen } from '../cabos/cabos.mjs';
+import { abrir as abrirCabos, resumen, listar, codigo } from '../cabos/cabos.mjs';
 
 const UMBRAL_CABOS = 30;
 
@@ -44,6 +53,8 @@ function ordenDelDia() {
 
   const cdb = abrirCabos();
   const r = resumen(cdb);
+  const campanas = r.porDestino.campana ?? 0;
+  const campanaAntigua = campanas ? listar(cdb, { destino: 'campana' })[0] : null;
   cdb.close();
   const cabos = r.porDestino.reparar ?? 0;
   const { entran, salen } = r.semana.reparar ?? { entran: 0, salen: 0 };
@@ -71,7 +82,11 @@ function ordenDelDia() {
   if (!urgenCabos && cabos) notas.push(`/reparar cabos puede esperar (${deCabos})`);
   if (deMenores) notas.push(deMenores);
 
-  return `Orden sugerido: ${pasos.map((p, i) => `${i + 1} ${p}`).join(' · ')}` + (notas.length ? ` — ${notas.join(' · ')}` : '');
+  const enParalelo = campanaAntigua
+    ? ` · en paralelo: /campana ${codigo(campanaAntigua.id)} (${campanas} abierta${campanas === 1 ? '' : 's'})`
+    : '';
+
+  return `Orden sugerido: ${pasos.map((p, i) => `${i + 1} ${p}`).join(' · ')}${enParalelo}` + (notas.length ? ` — ${notas.join(' · ')}` : '');
 }
 
 console.log(ordenDelDia());

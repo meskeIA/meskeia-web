@@ -16,9 +16,16 @@
  * Se planta (salida 2, sin borrar nada) si el id no es un cabo (`C` y cuatro cifras), si la
  * subruta sale de la carpeta (`..`, absoluta) o si `scratch/` resuelve fuera del repositorio
  * (un enlace). Que la carpeta no exista no es un error: ya está limpia.
+ *
+ * Sin subruta es el final de la campaña, y termina con «Siguiente: Orden sugerido: …» de
+ * `scripts/inspector/orden-del-dia.mjs`, recalculado en ese momento (01/11/2026, P003 del repaso de
+ * procesos: el usuario preguntaba qué lanzar después). Por eso la skill cierra el cabo ANTES de
+ * llamarlo: abierto, la campaña recién hecha se recomendaría a sí misma. Si el cálculo falla, lo
+ * dice y sale con 0: lo borrado, borrado está.
  */
 import fs from 'node:fs';
 import path from 'node:path';
+import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 const RAIZ = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
@@ -48,4 +55,12 @@ if (!fs.existsSync(objetivo)) {
 } else {
   fs.rmSync(objetivo, { recursive: true, force: true });
   console.log(`✓ limpiar: ${legible} borrado.`);
+}
+
+if (!subruta) {
+  const r = spawnSync(process.execPath, [path.join(RAIZ, 'scripts', 'inspector', 'orden-del-dia.mjs')], { cwd: RAIZ, encoding: 'utf8' });
+  const linea = (r.stdout || '').trim();
+  const errores = (r.stderr || r.error?.message || 'sin salida').trim().split(/\r?\n/);
+  const error = errores.find((l) => /Error\b/.test(l)) ?? errores.pop();
+  console.log(r.status === 0 && linea ? `Siguiente: ${linea}` : `Siguiente: (no se pudo calcular: ${error})`);
 }
