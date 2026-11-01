@@ -687,6 +687,18 @@ el Inspector app por app, que comprueba qué hace la app.
 > Salió del cabo C0137 (etiqueta-dgt, 04/10/2026, reparado en a97f92ab). Crónica: cabecera de
 > `scripts/check-features-jsonld.mjs` · pruebas: `npm run features:probar-candado`.
 
+### Candado de la FAQ única
+
+`npm run check:faq-unica` — en el build, y **rompe el build** si el commit cambia el texto de la
+FAQ de una app (su `faqJsonLd` o la FAQ visible de `page.tsx`) y una pregunta que está en las dos
+sigue con la respuesta escrita dos veces: va en `PREGUNTAS_FRECUENTES` (§1.ter) o en una constante
+que importen las dos. Dos FAQ con preguntas distintas, lo normal, no rompen. Juzga **la FAQ cuyas
+líneas toca el commit**; un arreglo de accesibilidad no cuenta · `-- --desde <ref>` juzga también
+lo commiteado (la tarea de `/reparar`) · `-- --todo --lista` nombra el pasivo · Escape:
+`faq-ok: <razón>`, razón obligatoria.
+> Salió del hallazgo 624 de garaje (07/09/2026) y de la auditoría del 01/11/2026. Crónica: cabecera
+> de `scripts/check-faq-unica.mjs` · pruebas: `npm run faq-unica:probar-candado`.
+
 ### Candado del bailout en el prerender
 
 `npm run check:bailout` — en el build, **después** de `next build`, y **rompe el build** si un HTML
