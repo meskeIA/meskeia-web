@@ -757,3 +757,26 @@ test.describe('simulador-daltonismo · re-inspección 04/10/2026', () => {
     await expect.poll(() => colorSiHay(page, 'Visión tricromática', 0), { timeout: 5000 }).toEqual([0, 0, 255]);
   });
 });
+
+/*
+ * Cabo C0564 (reparar 01/11/2026): el enlace «Tabla original de los autores» va dentro de un
+ * párrafo de la guía, sin clase, y globals.css quitaba el subrayado a todo `a`: solo lo distinguía
+ * el color, a 3,18:1 del texto en claro y 2,28:1 en oscuro (WCAG 1.4.1 pide otra pista si no llega
+ * a 3:1). Ahora globals subraya `p a:not([class])` y `li a:not([class])`.
+ */
+for (const tema of ['claro', 'oscuro'] as const) {
+  test(`C0564 · el enlace a la tabla de los autores, dentro del texto de la guía, va subrayado (tema ${tema})`, async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['input[type="file"]']);
+    if (tema === 'oscuro') {
+      await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).click();
+      await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    }
+    await abrirGuia(page);
+    const enlace = page.getByRole('link', { name: 'Tabla original de los autores' });
+    await expect(enlace).toBeVisible();
+    expect(await enlace.evaluate((a) => getComputedStyle(a).textDecorationLine)).toContain('underline');
+  });
+}

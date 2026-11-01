@@ -387,6 +387,18 @@ a:hover {
   color: var(--primary-hover);
 }
 
+/* Un enlace sin clase dentro de un párrafo o de un punto de lista es un enlace de TEXTO, y sin
+   subrayado solo lo distingue el color: con el texto principal da 3,18:1 en claro y 2,28:1 en
+   oscuro, y con el texto secundario o apagado alrededor baja hasta ~1:1 (WCAG 1.4.1, nivel A).
+   Ningún tono de la marca llega a 3:1 frente al texto sin caer de 4,5:1 frente al fondo, así que
+   la salida es el subrayado. Los enlaces con clase (tarjetas, botones, pie) deciden su estilo en
+   su módulo (cabo C0564, 01/11/2026; caso de origen, hallazgo 3869 de generador-tonos). */
+p a:not([class]),
+li a:not([class]) {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
 /* Tipografía base — sin color explícito: heredan del padre (body o .hero) */
 h1, h2, h3, h4, h5, h6 {
   font-weight: 600;
