@@ -422,6 +422,31 @@ function actividadIaeDeOficio(consultaNormalizada: string): ActividadIae | null 
   return null;
 }
 
+/**
+ * La primera palabra de una consulta de VARIAS si nombra a una persona de las Tarifas del IAE
+ * (`PERSONAS_IAE`, en cualquier género y número) o a un oficio del puente, o null (cabo C0536).
+ *
+ * ⚠️ 01/11/2026 — la búsqueda pide la expresión entera por subcadena, y el calificativo del
+ * oficio casi nunca está en el literal de las Tarifas: medido sobre el catálogo sellado el
+ * 31/10/2026, 24 sinónimos de oficio del diccionario CNAE daban cero aunque su primera palabra
+ * encontrara («traductor jurado» 0 y «traductor» 1, «entrenador personal» 0 y «entrenador» 7,
+ * «profesor de guitarra» 0 y «profesor» 3, «diseñador gráfico», «médico de familia», «técnico
+ * de sistemas»…). Solo se usa cuando la expresión entera da cero, y el contador lo dice: así no
+ * se pierde nada de lo que ya encontraba, y quien lee sabe que se ha buscado algo más amplio.
+ * Acotado a personas por la misma razón que el 2226: «maquinaria agrícola a terceros» no debe
+ * caer a «maquinaria».
+ */
+function oficioDeLaPrimeraPalabra(consultaNormalizada: string): string | null {
+  const palabras = consultaNormalizada.split(' ');
+  if (palabras.length < 2) return null;
+  const primera = palabras[0];
+  const masculino = masculinoDePersonaIae(primera) ?? primera;
+  if (PERSONAS_IAE.has(pluralDe(masculino)) || actividadIaeDeOficio(primera) !== null) {
+    return primera;
+  }
+  return null;
+}
+
 /** Deja solo los dígitos: «47.11» → «4711». */
 function soloDigitos(texto: string): string {
   return texto.replace(/\D/g, '');
@@ -918,82 +943,98 @@ export default function ConversorCnaeIaePage() {
 
   const consultaIaeNormalizada = normalizarTexto(consultaIae);
   const digitosConsultaIae = digitosSiEsCodigo(consultaIae);
-  /** «abogada» se busca también como «abogado» (hallazgo 2222); null si no nombra profesión. */
-  const consultaIaeMasculina = consultaIaeEnMasculino(consultaIaeNormalizada);
-  /** «peluquero» se busca también como «peluquería»; null si no es un oficio del puente. */
-  const actividadDelOficio = useMemo(
-    () => actividadIaeDeOficio(consultaIaeNormalizada),
-    [consultaIaeNormalizada],
-  );
 
-  const resultadosIae = useMemo<IaeIndexada[]>(() => {
-    if (iaeIndexado.length === 0) return [];
+  const busquedaIae = useMemo<{
+    resultados: IaeIndexada[];
+    /** El oficio de la actividad que se ha buscado además (null si no es un oficio del puente). */
+    actividad: ActividadIae | null;
+    /** La primera palabra, si la expresión entera daba cero y se buscó solo ella (C0536). */
+    reducidaA: string | null;
+  }>(() => {
+    if (iaeIndexado.length === 0) return { resultados: [], actividad: null, reducidaA: null };
 
-    const terminosActividad = actividadDelOficio
-      ? (actividadDelOficio.buscar ?? [actividadDelOficio.actividad]).map(normalizarTexto)
-      : [];
+    const buscarIaeCon = (
+      consultaNormalizada: string,
+    ): { resultados: IaeIndexada[]; actividad: ActividadIae | null } => {
+      /** «abogada» se busca también como «abogado» (hallazgo 2222); null si no nombra profesión. */
+      const consultaIaeMasculina = consultaIaeEnMasculino(consultaNormalizada);
+      /** «peluquero» se busca también como «peluquería»; null si no es un oficio del puente. */
+      const actividadDelOficio = actividadIaeDeOficio(consultaNormalizada);
 
-    const relevanciaDe = (entrada: IaeIndexada, consulta: string): number => {
-      if (consulta.length === 0) return 0;
-      if (entrada.codigo === consultaIae.trim()) return 0;
-      if (digitosConsultaIae.length > 0 && entrada.codigoDigitos.startsWith(digitosConsultaIae)) {
-        return 1;
-      }
-      if (normalizarTexto(entrada.titulo).startsWith(consulta)) return 2;
-      if (coincidePalabraCompleta(entrada.textoBusqueda, consulta)) return 3;
-      return 4;
-    };
-    // El femenino de una profesión puntúa como su masculino: «médica» pone delante el 831
-    // «Médicos de Medicina General», igual que «médico» (hallazgo 2222). Y un oficio, como su
-    // actividad: «peluquero» ordena igual que «peluquería».
-    const consultas = [
-      consultaIaeNormalizada,
-      ...(consultaIaeMasculina === null ? [] : [consultaIaeMasculina]),
-      ...terminosActividad,
-    ];
-    const relevancia = (entrada: IaeIndexada): number =>
-      Math.min(...consultas.map((consulta) => relevanciaDe(entrada, consulta)));
+      const terminosActividad = actividadDelOficio
+        ? (actividadDelOficio.buscar ?? [actividadDelOficio.actividad]).map(normalizarTexto)
+        : [];
 
-    let base = iaeIndexado;
-
-    if (consultaIaeNormalizada.length > 0) {
-      // Hallazgo 3462: un código casa solo por el principio del código, como en la CNAE (3461):
-      // «47» casaba dentro de «747» y «047», y el representante de sección metía entre los diez
-      // visibles un grupo de otra sección con otra retención de IRPF.
-      base = base.filter((entrada) => {
-        if (digitosConsultaIae.length > 0) {
-          return entrada.codigoDigitos.startsWith(digitosConsultaIae);
+      const relevanciaDe = (entrada: IaeIndexada, consulta: string): number => {
+        if (consulta.length === 0) return 0;
+        if (entrada.codigo === consultaIae.trim()) return 0;
+        if (digitosConsultaIae.length > 0 && entrada.codigoDigitos.startsWith(digitosConsultaIae)) {
+          return 1;
         }
-        return consultas.some((consulta) => entrada.textoBusqueda.includes(consulta));
+        if (normalizarTexto(entrada.titulo).startsWith(consulta)) return 2;
+        if (coincidePalabraCompleta(entrada.textoBusqueda, consulta)) return 3;
+        return 4;
+      };
+      // El femenino de una profesión puntúa como su masculino: «médica» pone delante el 831
+      // «Médicos de Medicina General», igual que «médico» (hallazgo 2222). Y un oficio, como su
+      // actividad: «peluquero» ordena igual que «peluquería».
+      const consultas = [
+        consultaNormalizada,
+        ...(consultaIaeMasculina === null ? [] : [consultaIaeMasculina]),
+        ...terminosActividad,
+      ];
+      const relevancia = (entrada: IaeIndexada): number =>
+        Math.min(...consultas.map((consulta) => relevanciaDe(entrada, consulta)));
+
+      let base = iaeIndexado;
+
+      if (consultaNormalizada.length > 0) {
+        // Hallazgo 3462: un código casa solo por el principio del código, como en la CNAE (3461):
+        // «47» casaba dentro de «747» y «047», y el representante de sección metía entre los diez
+        // visibles un grupo de otra sección con otra retención de IRPF.
+        base = base.filter((entrada) => {
+          if (digitosConsultaIae.length > 0) {
+            return entrada.codigoDigitos.startsWith(digitosConsultaIae);
+          }
+          return consultas.some((consulta) => entrada.textoBusqueda.includes(consulta));
+        });
+      }
+
+      if (seccionIae !== 'todas') {
+        base = base.filter((entrada) => entrada.seccion === seccionIae);
+      }
+
+      const resultados = [...base].sort((a, b) => {
+        // La RELEVANCIA manda sobre el tipo de entrada. Al revés —que era como estaba—,
+        // una coincidencia accidental de la Sección 1.ª se colocaba por delante de la
+        // entrada correcta: «actores» devolvía primero «Construcción de tractores
+        // agrícolas» y solo después el 013 «Actores de cine y teatro», y la sección
+        // determina la retención de IRPF en factura (Inspector, 20/08/2026).
+        const porRelevancia = relevancia(a) - relevancia(b);
+        if (porRelevancia !== 0) return porRelevancia;
+        const porTipo = PESO_TIPO_IAE[a.tipo] - PESO_TIPO_IAE[b.tipo];
+        if (porTipo !== 0) return porTipo;
+        if (a.seccion !== b.seccion) return a.seccion.localeCompare(b.seccion, 'es');
+        return a.codigo.localeCompare(b.codigo, 'es', { numeric: true });
       });
-    }
+      return { resultados, actividad: actividadDelOficio };
+    };
 
-    if (seccionIae !== 'todas') {
-      base = base.filter((entrada) => entrada.seccion === seccionIae);
+    const completa = buscarIaeCon(consultaIaeNormalizada);
+    if (completa.resultados.length > 0 || digitosConsultaIae.length > 0) {
+      return { ...completa, reducidaA: null };
     }
-
-    return [...base].sort((a, b) => {
-      // La RELEVANCIA manda sobre el tipo de entrada. Al revés —que era como estaba—,
-      // una coincidencia accidental de la Sección 1.ª se colocaba por delante de la
-      // entrada correcta: «actores» devolvía primero «Construcción de tractores
-      // agrícolas» y solo después el 013 «Actores de cine y teatro», y la sección
-      // determina la retención de IRPF en factura (Inspector, 20/08/2026).
-      const porRelevancia = relevancia(a) - relevancia(b);
-      if (porRelevancia !== 0) return porRelevancia;
-      const porTipo = PESO_TIPO_IAE[a.tipo] - PESO_TIPO_IAE[b.tipo];
-      if (porTipo !== 0) return porTipo;
-      if (a.seccion !== b.seccion) return a.seccion.localeCompare(b.seccion, 'es');
-      return a.codigo.localeCompare(b.codigo, 'es', { numeric: true });
-    });
-  }, [
-    iaeIndexado,
-    consultaIae,
-    consultaIaeNormalizada,
-    consultaIaeMasculina,
-    actividadDelOficio,
-    digitosConsultaIae,
-    seccionIae,
-  ]);
+    // C0536: «traductor jurado» da cero porque «jurado» no está en el literal; se busca
+    // «traductor» y el contador lo dice.
+    const primera = oficioDeLaPrimeraPalabra(consultaIaeNormalizada);
+    if (primera === null) return { ...completa, reducidaA: null };
+    const reducida = buscarIaeCon(primera);
+    return reducida.resultados.length > 0
+      ? { ...reducida, reducidaA: primera }
+      : { ...completa, reducidaA: null };
+  }, [iaeIndexado, consultaIae, consultaIaeNormalizada, digitosConsultaIae, seccionIae]);
+  const resultadosIae = busquedaIae.resultados;
+  const actividadDelOficio = busquedaIae.actividad;
 
   const sinCriterioIae = consultaIaeNormalizada.length === 0 && seccionIae === 'todas';
   const iaeMostrados = sinCriterioIae
@@ -1493,6 +1534,15 @@ export default function ConversorCnaeIaePage() {
               <p className={styles.contador} role="status" aria-live="polite">
                 {formatNumber(resultadosIae.length, 0)}{' '}
                 {resultadosIae.length === 1 ? 'resultado' : 'resultados'}
+                {busquedaIae.reducidaA !== null && (
+                  // key: con la página traducida, un texto con variables junto a otros no se
+                  // actualiza si el nodo no se remonta (C0243)
+                  <span key={consultaIae.trim()}>
+                    {' '}
+                    · ninguno nombra «{consultaIae.trim()}»: se muestran los de «
+                    {consultaIae.trim().split(/\s+/)[0]}»
+                  </span>
+                )}
                 {actividadDelOficio && (
                   <span>
                     {' '}

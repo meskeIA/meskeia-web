@@ -4801,3 +4801,55 @@ test.describe('Buscador CNAE-IAE — el oficio encuentra en el IAE lo que encuen
     expect(codigos.every((c) => c.startsWith('419') || c.startsWith('644'))).toBe(true);
   });
 });
+
+test.describe('Cabo C0536 (reparar 01/11/2026) — un oficio de VARIAS palabras', () => {
+  /*
+   * Medido el 31/10/2026 sobre el catálogo sellado: 24 sinónimos de oficio del diccionario de la
+   * CNAE daban cero en el IAE aunque su primera palabra encontrara, porque el calificativo
+   * («jurado», «personal», «de guitarra») no está en el literal de las Tarifas. Ahora, si la
+   * expresión entera da cero y empieza por una persona de las Tarifas, se busca esa palabra y el
+   * contador lo dice. La referencia es la propia app: lo que da la primera palabra sola.
+   */
+  test('«traductor jurado», «entrenador personal», «profesor de guitarra»… dan lo de su primera palabra, y lo dicen', async ({
+    page,
+  }) => {
+    await abrirHidratado(page);
+    const parejas: Array<[string, string]> = [
+      ['traductor jurado', 'traductor'],
+      ['entrenador personal', 'entrenador'],
+      ['profesor de guitarra', 'profesor'],
+      ['diseñador gráfico', 'diseñador'],
+      ['diseñadora gráfica', 'diseñadora'],
+      ['médico de familia', 'médico'],
+      ['técnico de sistemas', 'técnico'],
+      ['peluquero canino', 'peluquero'],
+    ];
+    for (const [expresion, primera] of parejas) {
+      await buscarIaeVerificado(page, primera);
+      await expect(contador(page), primera).not.toHaveText(/^0 resultados/, { timeout: 2000 });
+      const esperado = (await contador(page).innerText()).match(/^[\d.]+ resultados?/)![0];
+      const codigos = await fichas(page).locator('[class*="codigoCnae"]').allInnerTexts();
+
+      await buscarIaeVerificado(page, expresion);
+      await expect(contador(page), expresion).toHaveText(new RegExp(`^${esperado}`), { timeout: 2000 });
+      await expect(fichas(page).locator('[class*="codigoCnae"]'), expresion).toHaveText(codigos);
+      await expect(contador(page), expresion).toContainText(`ninguno nombra «${expresion}»`);
+      await expect(contador(page), expresion).toContainText(`se muestran los de «${primera}»`);
+    }
+  });
+
+  test('lo que ya encontraba no cambia, y lo que no empieza por un oficio sigue en cero', async ({ page }) => {
+    await abrirHidratado(page);
+    // «Actores de cine» casa entera con el 013: no se reduce ni lleva el aviso.
+    await buscarIaeVerificado(page, 'Actores de cine');
+    await expect(contador(page)).toHaveText(/^1 resultado/, { timeout: 2000 });
+    await expect(contador(page)).not.toContainText('ninguno nombra');
+    // «tienda» no es una persona de las Tarifas: cero, como antes (hallazgo 2925).
+    await buscarIaeVerificado(page, 'tienda 24 horas');
+    await expect(contador(page)).toHaveText(/^0 resultados/, { timeout: 2000 });
+    await expect(contador(page)).not.toContainText('ninguno nombra');
+    // La primera palabra sola no se «reduce»: no hay nada que quitar.
+    await buscarIaeVerificado(page, 'zzqx');
+    await expect(contador(page)).toHaveText(/^0 resultados/, { timeout: 2000 });
+  });
+});
