@@ -929,14 +929,19 @@ function analizarP(palabra: string): AnalisisP | null {
   if (nuc.length === 0) return null;
   let it: number;
   const conTilde = nuc.findIndex((n) => n.some((x) => TILDE_P.includes(x.t)));
-  if (conTilde !== -1) it = conTilde;
+  // Adverbio en -mente: la tilde es la del adjetivo; el acento final, el de -mén- (OLE 2010).
+  // Y la -s tras otra consonante es de aguda sin tilde (robots, complots). Las dos, desde el
+  // 01/11/2026 (hallazgos 3873 y 3875 de contador-silabas, que comparte acentuacionDe).
+  if (nuc.length >= 3 && /mente$/.test(w)) it = nuc.length - 2;
+  else if (conTilde !== -1) it = conTilde;
   else if (nuc.length === 1) it = 0;
   else {
     const ultima = w[w.length - 1];
     // Consonante + «y» final: anglicismo crudo, llano en la pronunciación (party, whisky)
     const anglicismoEnY = /[^aeiouáéíóúüy]y$/.test(w);
+    const sTrasConsonante = /[^aeiouáéíóúü]s$/.test(w);
     it =
-      'aeiou'.includes(ultima) || ultima === 'n' || ultima === 's' || anglicismoEnY
+      !sTrasConsonante && ('aeiou'.includes(ultima) || ultima === 'n' || ultima === 's' || anglicismoEnY)
         ? nuc.length - 2
         : nuc.length - 1;
   }

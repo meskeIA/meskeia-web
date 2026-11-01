@@ -10,7 +10,12 @@
  * `contador-silabas/metrica.ts`, ya validados contra versos clásicos.
  */
 
-import { separarSilabas, acentuacionDe, type Acentuacion } from '../contador-silabas/metrica';
+import {
+  separarSilabas,
+  acentuacionDe,
+  indiceTonica as indiceTonicaDe,
+  type Acentuacion,
+} from '../contador-silabas/metrica';
 
 export type { Acentuacion };
 
@@ -65,8 +70,12 @@ export interface Escansion {
 }
 
 /** Lo que queda de la entrada tras quitar todo lo que no es una letra del español. */
+// El NFC recompone la tilde de un texto pegado en Unicode descompuesto: sin él, «corazón»
+// llegaba como «o» + U+0301, la marca se borraba y se rimaba «corazon», llana (hallazgo 3874
+// de contador-silabas, 01/11/2026).
 const limpiarEntrada = (texto: string): string =>
   texto
+    .normalize('NFC')
     .toLowerCase()
     .trim()
     .replace(/[^a-záéíóúüñ]/g, '');
@@ -134,14 +143,10 @@ export const escandirPalabra = (palabra: string): Escansion | null => {
   // regla, esAnglicismoEnY, retirada el 27/10/2026 (cabo C0088)
   const acentuacion = acentuacionDe(limpia, silabas);
 
-  // La tilde escrita manda sobre cualquier regla
-  const conTilde = silabas.findIndex((s) => TILDADAS.split('').some((t) => s.includes(t)));
-  let indiceTonica: number;
-  if (conTilde !== -1) indiceTonica = conTilde;
-  else if (silabas.length === 1) indiceTonica = 0;
-  else if (acentuacion === 'aguda') indiceTonica = silabas.length - 1;
-  else if (acentuacion === 'llana') indiceTonica = silabas.length - 2;
-  else indiceTonica = Math.max(0, silabas.length - 3);
+  // La tilde escrita manda, salvo en los adverbios en -mente, donde es la del adjetivo y la
+  // rima empieza en -mén- (hallazgo 3873, 01/11/2026). La regla vive en metrica.ts: aquí había
+  // una copia que empezaba siempre por la tilde y rimaba «rápidamente» desde «-ápidamente».
+  const indiceTonica = indiceTonicaDe(limpia, silabas);
 
   const silabaTonica = silabas[indiceTonica];
   const iv = indiceVocalNuclear(silabaTonica);

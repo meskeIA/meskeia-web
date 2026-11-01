@@ -10,7 +10,8 @@ import { acentuacionDe, analizarVerso, separarSilabas } from '../../app/contador
  * Inspector — contador-silabas (segmento interactiva con motor lingüístico)
  *
  * OCTAVA INSPECCIÓN: 01/11/2026, RE-INSPECCIÓN por el cambio de código del 27/10 y 9f57450f.
- * Sus casos y sus hallazgos, ABIERTOS con test.fail(), en el último bloque del fichero.
+ * Sus casos y sus hallazgos (3872-3877), en el último bloque del fichero: se escribieron con
+ * test.fail() y se REPARARON el 01/11/2026; quedan sin la marca, como regresión.
  * SÉPTIMA INSPECCIÓN: 27/10/2026, RE-INSPECCIÓN por los cinco cabos de la medición del
  * 18/10/2026 (C0287-C0291, semilla S0212). Sus casos y sus hallazgos (3565-3573) se
  * escribieron con test.fail(); se REPARARON el 27/10/2026 y quedan, ya sin la marca, en el
@@ -2433,19 +2434,18 @@ test.describe('contador-silabas · Inspector 01/11/2026 (octava inspección)', (
     });
   });
 
-  test('HALLAZGO (inspector 01/11/2026) · un adverbio en -mente con tilde al final del verso se toma por esdrújulo', async ({
+  test('HALLAZGO 3873 (reparado) · un adverbio en -mente con tilde al final del verso se toma por esdrújulo', async ({
     page,
   }) => {
-    // ABIERTO, hallazgo (inspector 01/11/2026). metrica.ts, `acentuacionDe()` (compartida con
-    // diccionario-rimas): con tilde a dos o más sílabas del final devuelve 'esdrujula', y en
+    // REPARADO, hallazgo 3873 (inspector 01/11/2026). metrica.ts, `acentuacionDe()` (compartida
+    // con diccionario-rimas): con tilde a dos o más sílabas del final devolvía 'esdrujula', y en
     // «tímidamente» la tilde es la del adjetivo; el acento final es el de -mén-.
     //   «me miraba tímidamente»  me(1) mi-ra-ba(3) tí-mi-da-men-te(5) = 9, sin contactos,
-    //       llana ±0 → 9, eneasílabo. La app: 9 − 1 «(última palabra esdrújula)» = 8.
+    //       llana ±0 → 9, eneasílabo. Salía 9 − 1 «(última palabra esdrújula)» = 8.
     //   «me miraba dulcemente»   me(1) mi-ra-ba(3) dul-ce-men-te(4) = 8, llana → 8. Esta sí.
     // Las dos riman en consonante desde la tónica -mén-: «-ente» → esquema Aa (9 = arte mayor,
-    // 8 = arte menor). La app parte la rima de «tímidamente» en «da» («-amente»), no ve que
-    // rimen y da «--», «Verso libre».
-    test.fail();
+    // 8 = arte menor). Partía la rima de «tímidamente» en «da» («-amente»), no veía que
+    // rimaran y daba «--», «Verso libre».
     await analizarTexto(page, 'me miraba tímidamente\nme miraba dulcemente');
     const medidas = await versos(page, 2);
     const llana = (await desgloseDe(page, 0).innerText()).includes('llana');
@@ -2459,17 +2459,16 @@ test.describe('contador-silabas · Inspector 01/11/2026 (octava inspección)', (
     });
   });
 
-  test('HALLAZGO (inspector 01/11/2026) · un plural agudo en consonante + s («robots», «complots») se toma por llano', async ({
+  test('HALLAZGO 3875 (reparado) · un plural agudo en consonante + s («robots», «complots») se toma por llano', async ({
     page,
   }) => {
-    // ABIERTO, hallazgo (inspector 01/11/2026). metrica.ts, `acentuacionDe()`: sin tilde,
+    // REPARADO, hallazgo 3875 (inspector 01/11/2026). metrica.ts, `acentuacionDe()`: sin tilde,
     // «acaba en -s → llana». La OLE 2010 exceptúa la -s precedida de otra consonante: esas
     // agudas no llevan tilde (robots, complots, tictacs), así que sin tilde son AGUDAS.
     //   «bailaban los robots»     bai-la-ban(3) los(1) ro-bots(2) = 6, aguda +1 → 7
     //   «se unieron los complots» se(1) u-nie-ron(3) los(1) com-plots(2) = 7 − se_unieron
     //                             = 6, aguda +1 → 7
-    // Riman en consonante desde la tónica final: «-ots» → aa. La app: 6 y 6, «llana».
-    test.fail();
+    // Riman en consonante desde la tónica final: «-ots» → aa. Salía 6 y 6, «llana».
     await analizarTexto(page, 'bailaban los robots\nse unieron los complots');
     const medidas = await versos(page, 2);
     const agudas = [
@@ -2501,17 +2500,17 @@ test.describe('contador-silabas · Inspector 01/11/2026 (octava inspección)', (
     await expect(nombreDe(page, 0)).toContainText('hexasílabo');
   });
 
-  test('HALLAZGO (inspector 01/11/2026) · el texto pegado en Unicode descompuesto (NFD) inventa palabras', async ({
+  test('HALLAZGO 3874 (reparado) · el texto pegado en Unicode descompuesto (NFD) inventa palabras', async ({
     page,
   }) => {
-    // ABIERTO, hallazgo (inspector 01/11/2026). metrica.ts: RE_PALABRAS = /\p{L}+/gu deja fuera
-    // las marcas combinantes (\p{M}). En NFD —lo que da copiar de muchos PDF— «ó» es «o» +
-    // U+0301, y la palabra se parte en dos: «corazón» → «corazo» + «n», una «sílaba» sin vocal.
+    // REPARADO, hallazgo 3874 (inspector 01/11/2026). metrica.ts: RE_PALABRAS = /\p{L}+/gu deja
+    // fuera las marcas combinantes (\p{M}). En NFD —lo que da copiar de muchos PDF— «ó» es «o» +
+    // U+0301, y la palabra se partía en dos: «corazón» → «corazo» + «n», una «sílaba» sin vocal.
     // Es la misma forma del hallazgo 703 («vïuda» → «v» + «uda»), por otra puerta.
-    //   «corazón»: 1 palabra, co-ra-zón (3). La app: 2 palabras, co-ra-zo + n (4 sílabas).
+    //   «corazón»: 1 palabra, co-ra-zón (3). Salían 2 palabras, co-ra-zo + n (4 sílabas).
     //   «Volverán las oscuras golondrinas» (Bécquer, el ejemplo de la propia app): 11
-    //   fonéticas, sin contactos, llana → 11. La app, pegado en NFD: 12, «dodecasílabo».
-    test.fail();
+    //   fonéticas, sin contactos, llana → 11. Salía, pegado en NFD: 12, «dodecasílabo».
+    // Ahora el motor pasa el texto a NFC antes de buscar palabras.
     await analizarTexto(page, 'corazón'.normalize('NFD'));
     await expect(page.locator('[class*="resumenValor"]').nth(1)).toBeVisible();
     const palabras = await page.locator('[class*="resumenValor"]').nth(1).innerText();
@@ -2525,13 +2524,12 @@ test.describe('contador-silabas · Inspector 01/11/2026 (octava inspección)', (
     });
   });
 
-  test('HALLAZGO (inspector 01/11/2026) · la guía escribe en mayúscula el esquema de la décima, que es de arte menor', async ({
+  test('HALLAZGO 3876 (reparado) · la guía escribe en mayúscula el esquema de la décima, que es de arte menor', async ({
     page,
   }) => {
-    // ABIERTO, hallazgo (inspector 01/11/2026). El paso 6 de la guía dice «décima espinela (10
-    // octosílabos, ABBAACCDDC)», y la propia app enseña que la mayúscula es para el arte mayor
-    // («Cómo se lee»: nueve sílabas o más) y escribe la décima en minúscula: «abbaaccddc».
-    test.fail();
+    // REPARADO, hallazgo 3876 (inspector 01/11/2026). El paso 6 de la guía decía «décima
+    // espinela (10 octosílabos, ABBAACCDDC)», y la propia app enseña que la mayúscula es para el
+    // arte mayor («Cómo se lee»: nueve sílabas o más) y escribe la décima en minúscula.
     await analizarTexto(page, DECIMA_CALDERON);
     const { esquema } = await rima(page);
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
@@ -2544,14 +2542,13 @@ test.describe('contador-silabas · Inspector 01/11/2026 (octava inspección)', (
     });
   });
 
-  test('HALLAZGO (inspector 01/11/2026) · la fila «Hiato» de la tabla da la tilde sobre la cerrada como hiato sin excepción', async ({
+  test('HALLAZGO 3877 (reparado) · la fila «Hiato» de la tabla da la tilde sobre la cerrada como hiato sin excepción', async ({
     page,
   }) => {
-    // ABIERTO, hallazgo (inspector 01/11/2026). Tercera copia de la regla de 698 y 3571: la
-    // fila dice «Dos vocales fuertes, dos débiles IGUALES, o débil tónica con tilde», sin el
+    // REPARADO, hallazgo 3877 (inspector 01/11/2026). Tercera copia de la regla de 698 y 3571:
+    // la fila decía «Dos vocales fuertes, dos débiles IGUALES, o débil tónica con tilde», sin el
     // «junto a una abierta» que ya llevan la tarjeta de consejos y FAQ_HIATO. Leída al pie de
     // la letra, «cuídate» sería cu-í-da-te; la app (y la OLE 2010) dicen cuí-da-te, diptongo.
-    test.fail();
     await analizarTexto(page, 'cuídate');
     const tarjeta = await tarjetas(page, 1);
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();

@@ -62,14 +62,21 @@ export type { EncuentrosVocalicos } from './silabeo';
  * ninguna vocal), «uda», «del», «rey»— y con ellas un recuento de palabras y una media
  * falsos. No era la limitación declarada de «una sílaba de diferencia», sino inventar
  * palabras (hallazgo 703, 10/09/2026). `\p{L}` no deja fuera ninguna letra.
+ *
+ * ── Pero la tilde puede no ser una letra (hallazgo 3874, 01/11/2026) ─────────────────────
+ * En Unicode descompuesto (NFD), que es lo que dan muchos PDF y macOS al copiar, «ó» llega
+ * como «o» + U+0301, una marca combinante (\p{M}) que `\p{L}` no recoge: «corazón» se partía
+ * en «corazo» y «n», y «Volverán las oscuras golondrinas» daba dodecasílabo. Por eso todo
+ * texto entra por `aNFC`, que recompone cada letra con su tilde antes de buscar palabras.
  */
 const RE_PALABRAS = /\p{L}+/gu;
+const aNFC = (texto: string): string => texto.normalize('NFC');
 
 export const contarSilabasTexto = (
   texto: string
 ): { palabra: string; silabas: string[]; total: number }[] => {
   // Extraer solo palabras (ignorar números y símbolos)
-  const palabras = texto.match(RE_PALABRAS) || [];
+  const palabras = aNFC(texto).match(RE_PALABRAS) || [];
 
   return palabras.map((palabra) => {
     const silabas = separarSilabas(palabra);
@@ -185,10 +192,23 @@ const hayTokenDescartado = (entreMedias: string): boolean => /[\p{L}\p{N}]/u.tes
  * Clasifica la acentuación de la última palabra del verso, que determina
  * el ajuste métrico final (aguda +1 · llana ±0 · esdrújula −1).
  */
+/**
+ * ── Los adverbios en -mente son LLANOS (hallazgo 3873, 01/11/2026) ──────────────────────
+ * Llevan dos acentos, el del adjetivo (que conserva su tilde: tí-mi-da-) y el de -mén-, y el
+ * que cierra el verso y abre la rima es el segundo: tí-mi-da-MEN-te es llana, y rima en
+ * «-ente» con «dulcemente». Antes la tilde del adjetivo mandaba, «tímidamente» salía
+ * esdrújula, el verso perdía una sílaba y la rima empezaba en «-amente». Hace falta la
+ * sílaba del adjetivo delante («mente», «demente» o «clemente» no son adverbios, pero sin
+ * tilde ya eran llanas).
+ */
+const esAdverbioEnMente = (palabra: string, silabas: string[]): boolean =>
+  silabas.length >= 3 && /mente$/i.test(palabra);
+
 export const acentuacionDe = (palabra: string, silabas: string[]): Acentuacion => {
   const p = palabra.toLowerCase();
   // Los monosílabos se computan como agudos
   if (silabas.length <= 1) return 'aguda';
+  if (esAdverbioEnMente(p, silabas)) return 'llana';
 
   // Si lleva tilde, la tilde manda: buscamos en qué sílaba cae
   // Con la /i: desde el hallazgo 616 las sílabas conservan las mayúsculas del original, y
@@ -216,6 +236,15 @@ export const acentuacionDe = (palabra: string, silabas: string[]): Acentuacion =
    * arregla para las dos apps, que comparten esta función.
    */
   if (/[^aeiouáéíóúüy]y$/.test(p)) return 'llana';
+
+  /**
+   * ── La -s tras otra consonante es de palabra AGUDA (hallazgo 3875, 01/11/2026) ─────────
+   * La OLE 2010 exceptúa de la regla de la -s a las palabras que la llevan detrás de otra
+   * consonante: las agudas de ese tipo se escriben sin tilde (robots, complots, tictacs,
+   * chalets) y las llanas la llevan (bíceps, cómics, fórceps). Sin tilde, por tanto, son
+   * agudas. Antes «bailaban los robots» medía 6 y rimaba desde la penúltima sílaba.
+   */
+  if (/[^aeiouáéíóúü]s$/.test(p)) return 'aguda';
 
   // Sin tilde: termina en vocal, «n» o «s» → llana; en cualquier otra letra → aguda
   const ultima = p[p.length - 1];
@@ -251,8 +280,13 @@ export const nombreDelVerso = (silabas: number): string =>
 const ajusteDe = (acentuacion: Acentuacion): number =>
   acentuacion === 'aguda' ? 1 : acentuacion === 'esdrujula' ? -1 : 0;
 
-/** Índice (desde el principio) de la sílaba tónica de una palabra. */
-const indiceTonica = (palabra: string, silabas: string[]): number => {
+/**
+ * Índice (desde el principio) de la sílaba tónica de una palabra: la de la tilde y, sin ella,
+ * la que da la acentuación. En un adverbio en -mente es -men-, no la tilde del adjetivo
+ * (hallazgo 3873). Lo usa también diccionario-rimas para empezar la rima.
+ */
+export const indiceTonica = (palabra: string, silabas: string[]): number => {
+  if (esAdverbioEnMente(palabra, silabas)) return silabas.length - 2;
   const indiceTilde = silabas.findIndex((s) => /[áéíóú]/i.test(s));
   if (indiceTilde !== -1) return indiceTilde;
   const acentuacion = acentuacionDe(palabra, silabas);
@@ -415,7 +449,8 @@ function buscarCesura(
  * Escansión de un verso: sílabas fonéticas − sinalefas + ajuste por acento final; en los
  * compuestos, la suma de los dos hemistiquios. Devuelve null si la línea no contiene palabras.
  */
-export const analizarVerso = (linea: string): AnalisisVerso | null => {
+export const analizarVerso = (lineaEscrita: string): AnalisisVerso | null => {
+  const linea = aNFC(lineaEscrita);
   const encontradas: PalabraLocalizada[] = Array.from(linea.matchAll(RE_PALABRAS)).map((m) => ({
     palabra: m[0],
     inicio: m.index,
