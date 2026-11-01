@@ -747,7 +747,10 @@ test.describe('Cuadro de Punnett · re-inspección 25/09/2026', () => {
     page,
   }) => {
     await page.goto('/simulador-genetica/');
-    const tarjeta = page.getByRole('link', { name: 'Ir a Cuadro de Punnett' });
+    // La tarjeta se nombra por su texto desde el 01/11/2026 (cabo C0549: antes, «Ir a …»)
+    const tarjeta = page
+      .locator('section[aria-label="Aplicaciones relacionadas"]')
+      .getByRole('link', { name: /^Cuadro de Punnett/ });
     await expect(tarjeta.first()).toBeVisible();
     await expect(tarjeta.first()).toContainText('educación media');
     await expect(tarjeta.first()).not.toContainText(/EBAU|Bachillerato/);

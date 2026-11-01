@@ -5094,11 +5094,15 @@ test.describe('Inspector 08/10/2026 — Aragón en cuatro tramos, el vendedor de
   // ══════════════════════════════════════════════════════════════════════════
   test('REPARADO 99e1ee7e — las cuatro relacionadas en el HTML servido y tras hidratar, sin error de hidratación', async ({ page, request }) => {
     const html = await (await request.get(RUTA)).text();
-    expect(html.match(/aria-label="Ir a [^"]+"/g)).toEqual([
-      'aria-label="Ir a Gastos Nave Industrial"',
-      'aria-label="Ir a Gastos Solar"',
-      'aria-label="Ir a Gastos Finca Rústica"',
-      'aria-label="Ir a Gastos Compraventa Vivienda"',
+    // Por el href de cada tarjeta: el aria-label «Ir a …» se retiró el 01/11/2026 (cabo C0549,
+    // WCAG 2.5.3) y la tarjeta se nombra ahora por su texto visible.
+    expect(
+      [...html.matchAll(/href="(\/[^"#]+)#from=related-simulador-gastos-compraventa-local-comercial"/g)].map((m) => m[1]),
+    ).toEqual([
+      '/simulador-gastos-compraventa-nave-industrial/',
+      '/simulador-gastos-compraventa-solar/',
+      '/simulador-gastos-compraventa-terreno-rustico/',
+      '/estimador-compraventa-inmueble/',
     ]);
     const errores = await abrir0810(page);
     const tarjetas = page.locator('section[aria-label="Aplicaciones relacionadas"] a');

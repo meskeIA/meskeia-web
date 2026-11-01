@@ -80,9 +80,18 @@ test.describe('Componentes compartidos · accesibilidad', () => {
     const total = await tarjetas.count();
     expect(total, 'la app debería mostrar apps relacionadas').toBeGreaterThan(0);
 
+    // Cabo C0549 (01/11/2026): el nombre era un aria-label «Ir a X» que dejaba fuera la
+    // descripción visible (WCAG 2.5.3, axe label-content-name-mismatch). Ahora sale del texto de
+    // la tarjeta: empieza por el nombre de la app, contiene lo que se ve y no lleva el emoji.
     for (let i = 0; i < total; i++) {
-      const etiqueta = await tarjetas.nth(i).getAttribute('aria-label');
-      expect(etiqueta, `tarjeta ${i} sin nombre accesible`).toMatch(/^Ir a /);
+      const tarjeta = tarjetas.nth(i);
+      expect(await tarjeta.getAttribute('aria-label'), `tarjeta ${i}: aria-label que tapa el texto`).toBeNull();
+      const nombre = (await tarjeta.locator('[class*="cardName"]').innerText()).trim();
+      const descripcion = (await tarjeta.locator('[class*="cardDesc"]').innerText()).trim();
+      const escapar = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      await expect(tarjeta, `tarjeta ${i}`).toHaveAccessibleName(
+        new RegExp(`^${escapar(nombre)}\\s+${escapar(descripcion)}$`),
+      );
     }
   });
 

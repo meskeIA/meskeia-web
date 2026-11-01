@@ -104,15 +104,13 @@ export default function RelatedApps({ title = 'Apps relacionadas', apps: appsPro
       </h3>
       <div className={styles.grid}>
         {displayApps.map((app) => (
-          <Link
-            key={app.url}
-            href={buildHref(app.url)}
-            className={styles.card}
-            aria-label={`Ir a ${app.name}`}
-          >
-            {/* El enlace ya se nombra con `aria-label={`Ir a ${app.name}`}`, así que el icono
-                de la app es decoración. Con cuatro tarjetas por app y 1.152 apps, es el emoji
-                suelto que más veces se leía en todo el catálogo. */}
+          // Sin aria-label: el enlace se nombra por su texto visible (nombre y descripción).
+          // Hasta el 01/11/2026 llevaba `Ir a ${app.name}`, que dejaba la descripción visible
+          // fuera del nombre accesible (WCAG 2.5.3, «Etiqueta en el nombre»): axe lo marcaba
+          // como label-content-name-mismatch en cada tarjeta de cada app (cabo C0549).
+          <Link key={app.url} href={buildHref(app.url)} className={styles.card}>
+            {/* El icono de la app es decoración: el nombre va al lado. Con cuatro tarjetas por
+                app y 1.152 apps, es el emoji suelto que más veces se leía en todo el catálogo. */}
             <span className={styles.cardIcon} aria-hidden="true">{app.icon}</span>
             <span className={styles.cardName}>{app.name}</span>
             <span className={styles.cardDesc}>{app.description}</span>
