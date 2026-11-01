@@ -7,6 +7,7 @@ import DynamicThemeColor from '@/components/DynamicThemeColor';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import RecentAppTracker from '@/components/RecentAppTracker';
 import TransparencyBanner from '@/components/TransparencyBanner';
+import GuardianDeslizadores from '@/lib/guardianDeslizadores';
 import { Providers } from './providers';
 import "./globals.css";
 
@@ -89,6 +90,7 @@ export default function RootLayout({
               <ServiceWorkerRegister />
               <RecentAppTracker />
               <AnclaInicial />
+              <GuardianDeslizadores />
               {children}
               <TransparencyBanner />
             </ErrorBoundary>

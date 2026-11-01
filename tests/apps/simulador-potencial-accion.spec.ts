@@ -1267,10 +1267,11 @@ test.describe('Inspector 01/11/2026 — móvil 360×640, con el dedo', () => {
     await expect(page).toHaveURL(/\/simulador-potencial-accion\/$/);
   });
 
-  // ABIERTO, hallazgo (inspector 01/11/2026): en móvil, desplazar la página con el dedo sobre un
-  // deslizador le cambia el valor, y la app no tiene forma de volver a fábrica salvo recargar.
+  // REPARADO (01/11/2026), hallazgo 3864: en móvil, desplazar la página con el dedo sobre un
+  // deslizador le cambiaba el valor, y la app no tenía forma de volver a fábrica salvo recargar.
+  // Lo corrige para todo el catálogo lib/guardianDeslizadores.ts, montado en app/layout.tsx
+  // (cabo C0559): si el gesto resulta vertical, devuelve al soltar el valor que tenía al tocar.
   test('desplazar la página con el dedo sobre el deslizador del umbral no cambia el umbral', async ({ page }) => {
-    test.fail();
     await expect(etiquetaControl(page, 'Umbral de disparo')).toContainText('(-55 mV)');
     const caja = await centrar(page, UMBRAL);
     // El pulgar está en −55 mV, al 40 % de la pista; el dedo se apoya al 85 %, lejos de él, y sube
@@ -1284,6 +1285,6 @@ test.describe('Inspector 01/11/2026 — móvil 360×640, con el dedo', () => {
     // Esperado: el umbral sigue en −55 mV. Obtenido el 01/11/2026: salta a −43 mV, al punto donde
     // se apoyó el dedo, y con −43 mV ni la intensidad máxima dispara en modo único (−70 + 40·(1 −
     // e^(−1)) = −44,7 mV).
-    expect(await etiquetaControl(page, 'Umbral de disparo').innerText()).toContain('(-55 mV)');
+    await expect(etiquetaControl(page, 'Umbral de disparo')).toContainText('(-55 mV)');
   });
 });
