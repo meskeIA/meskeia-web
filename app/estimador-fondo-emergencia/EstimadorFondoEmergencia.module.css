@@ -363,6 +363,9 @@
 }
 
 .tableWrapper {
+  /* Bloque de contención de los sr-only de la columna «Recomendado» (position: absolute): sin
+     él escapaban del recorte y ensanchaban el documento a 591 px en el móvil (cabo C0554) */
+  position: relative;
   overflow-x: auto;
   border-radius: var(--radius);
   box-shadow: var(--shadow-sm);

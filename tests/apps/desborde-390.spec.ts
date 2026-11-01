@@ -216,6 +216,29 @@ for (const ruta of ['/seguimiento-habitos/', '/conversor-binario/', '/codificado
   });
 }
 
+// C0554 (01/11/2026): forma F3 dentro de la guía. Los sr-only de la columna «Recomendado» de la
+// tabla comparativa (position: absolute) no tenían ancestro posicionado, escapaban de la caja con
+// overflow-x y el DOCUMENTO crecía a 591 px; el body seguía en 390. Solo con la guía abierta.
+test('/estimador-fondo-emergencia/ · a 390 px, con la guía abierta, ni el body ni el documento desbordan (C0554)', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/estimador-fondo-emergencia/');
+  await page.waitForLoadState('networkidle');
+  const guia = page.getByRole('button', { name: /guía|aprender más/i }).first();
+  await expect(async () => {
+    await guia.click();
+    await expect(guia).toHaveAttribute('aria-expanded', 'true', { timeout: 1000 });
+  }).toPass({ timeout: 15000 });
+  await expect(page.locator('table[class*="comparativaTable"]')).toBeVisible();
+  const r = await page.evaluate(() => ({
+    body: document.body.scrollWidth,
+    doc: document.documentElement.scrollWidth,
+  }));
+  expect(r.body, `body ${r.body} px`).toBeLessThanOrEqual(390);
+  expect(r.doc, `documento ${r.doc} px`).toBeLessThanOrEqual(390);
+});
+
 test('/calculadora-matematica/ · a 390 px ninguno de los cinco tipos desborda (C0201)', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('/calculadora-matematica/');
