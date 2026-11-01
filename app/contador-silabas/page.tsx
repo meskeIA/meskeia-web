@@ -686,7 +686,7 @@ sabañón garrafal, morado y frito.`,
                 <tr>
                   <td><strong>Hiato</strong></td>
                   <td>Dos vocales en sílabas distintas</td>
-                  <td>Dos vocales fuertes, dos débiles IGUALES, o débil tónica con tilde</td>
+                  <td>Dos vocales fuertes, dos débiles IGUALES, o débil tónica con tilde junto a una fuerte (a, e, o): cuí-da-te es diptongo</td>
                   <td>po-e-ta, pa-ís, Ma-rí-a, chi-i-ta</td>
                   <td>Aumenta el número de sílabas</td>
                 </tr>
@@ -823,7 +823,7 @@ sabañón garrafal, morado y frito.`,
               <span className={styles.eduPasoNum}>6</span>
               <div>
                 <strong>Reconoce la forma estrófica</strong>
-                <p>Combina el número de sílabas y el esquema de rima para identificar la forma: soneto (ABBA ABBA CDC DCD, 14 endecasílabos), romance (octosílabos, rima asonante pares), décima espinela (10 octosílabos, ABBAACCDDC), lira (7-11-7-7-11, aBabB). Cada forma tiene sus propias reglas históricas y estéticas.</p>
+                <p>Combina el número de sílabas y el esquema de rima para identificar la forma: soneto (ABBA ABBA CDC DCD, 14 endecasílabos), romance (octosílabos, rima asonante pares), décima espinela (10 octosílabos, abbaaccddc, en minúscula por ser de arte menor), lira (7-11-7-7-11, aBabB). Cada forma tiene sus propias reglas históricas y estéticas.</p>
               </div>
             </li>
           </ol>
