@@ -169,9 +169,28 @@ export interface NucleoSilabico {
 }
 
 /**
+ * La vocal que hay a continuación de la unidad `k`, saltando la h intercalada, o undefined.
+ */
+function vocalTrasUnidad(unidades: Unidad[], k: number): Unidad | undefined {
+  const saltoH = unidades[k + 1]?.tipo === 'H' ? 1 : 0;
+  const tras = unidades[k + 1 + saltoH];
+  return tras && tras.tipo === 'V' ? tras : undefined;
+}
+
+/**
  * Agrupa las vocales en núcleos silábicos. La h intercalada se absorbe dentro del núcleo
  * cuando las vocales que separa forman diptongo (ahu-mar, prohi-bir) y queda fuera cuando
  * hay hiato de verdad (bú-ho), que es exactamente lo que dice la regla.
+ *
+ * ── Una cerrada entre dos vocales va con la SEGUNDA (hallazgo 3872, 01/11/2026) ────────
+ * El núcleo crecía mirando solo cada PAREJA: a+u diptongo, u+e diptongo, y «aue» salía
+ * triptongo. Pero el triptongo es cerrada átona + ABIERTA + cerrada átona (OLE 2010, y la
+ * tabla de la propia app: «Débil + fuerte + débil»); en a-u-e, i-u-a, e-u-i u o-i-a la
+ * cerrada abre la sílaba de la vocal que la sigue: ca-ca-hue-te, Chi-hua-hua, re-huir,
+ * pa-ra-no-ia. Con la h saltada, el error tocaba palabras corrientes (vihue-la, ná-huatl
+ * de una sílaba) y llegaba al verso. Ahora una cerrada que tiene detrás una vocal con la
+ * que forma diptongo no se suma al núcleo en curso: empieza el siguiente. Así lo único
+ * que llega a tres vocales es la forma del triptongo (buey, guau, U-ru-guay, miau).
  */
 function nucleos(unidades: Unidad[]): NucleoSilabico[] {
   const resultado: NucleoSilabico[] = [];
@@ -193,6 +212,9 @@ function nucleos(unidades: Unidad[]): NucleoSilabico[] {
 
       const ultima = nucleo.vocales[nucleo.vocales.length - 1];
       if (!formanDiptongo(ultima, siguiente.texto)) break;
+      // Una cerrada con vocal detrás con la que hace diptongo abre la sílaba de esa vocal
+      const despues = vocalTrasUnidad(unidades, j + saltoH);
+      if (esDebil(siguiente.texto) && despues && formanDiptongo(siguiente.texto, despues.texto)) break;
       // Un núcleo admite como mucho tres vocales (triptongo: buey, guau, u-ru-guay)
       if (nucleo.vocales.length >= 3) break;
 
@@ -302,11 +324,16 @@ export function encuentrosVocalicos(palabra: string): EncuentrosVocalicos {
   const diptongos = nuc.filter((n) => n.vocales.length === 2).map((n) => n.vocales);
   const triptongos = nuc.filter((n) => n.vocales.length === 3).map((n) => n.vocales);
 
-  // Hiato = dos núcleos contiguos sin ninguna consonante en medio (la h no cuenta)
+  // Hiato = dos núcleos contiguos sin ninguna consonante en medio (la h no cuenta). No lo es
+  // la cerrada átona que abre un diptongo tras otra vocal (ca-ca-hue-te, pa-ra-no-ia,
+  // re-huir): ahí suena como consonante de su sílaba, no como vocal en contacto (3872).
   const hiatos: string[] = [];
   for (let n = 0; n < nuc.length - 1; n++) {
     const enMedio = unidades.slice(nuc[n].hasta + 1, nuc[n + 1].desde);
-    if (enMedio.every((u) => u.tipo === 'H')) {
+    const siguiente = nuc[n + 1].vocales;
+    const abreConSemiconsonante =
+      siguiente.length >= 2 && esDebil(siguiente[0]) && !DEBILES_TONICAS.includes(siguiente[0]);
+    if (enMedio.every((u) => u.tipo === 'H') && !abreConSemiconsonante) {
       const a = nuc[n].vocales[nuc[n].vocales.length - 1];
       const b = nuc[n + 1].vocales[0];
       hiatos.push(`${a}-${b}`);

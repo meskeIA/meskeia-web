@@ -891,6 +891,14 @@ function nucleosP(w: string): UnidadP[][] {
       const s = u[j + salto];
       if (!s || s.k !== 'V') break;
       if (!diptongoP(n[n.length - 1].t, s.t) || n.length >= 3) break;
+      // Una cerrada átona con vocal detrás con la que hace diptongo abre la sílaba de esa
+      // vocal: ca-ca-hue-ro, re-huir, pa-ra-no-ia. Triptongo solo es cerrada + ABIERTA +
+      // cerrada (OLE 2010). Hasta el 01/11/2026 este oráculo copiaba el defecto de la app
+      // (hallazgo 3872 de contador-silabas) y daba «cacahuero» por asonante a-o.
+      const salto2 = u[j + salto + 1]?.k === 'H' ? 1 : 0;
+      const tras = u[j + salto + 1 + salto2];
+      const debil = !FUERTE_P.includes(s.t) && s.t !== 'y';
+      if (debil && tras && tras.k === 'V' && diptongoP(s.t, tras.t)) break;
       n.push(s);
       j = j + salto + 1;
     }

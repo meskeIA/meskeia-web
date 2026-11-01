@@ -181,6 +181,32 @@ test.describe('separarSilabas — diptongos, triptongos e hiatos', () => {
     expect(sil('buey')).toBe('buey');
     expect(sil('averiguáis')).toBe('a-ve-ri-guáis');
     expect(sil('miau')).toBe('miau');
+    expect(sil('guau')).toBe('guau');
+  });
+
+  /**
+   * HALLAZGO 3872 (01/11/2026) — triptongo es cerrada átona + ABIERTA + cerrada átona (OLE
+   * 2010). En a-u-e, i-u-a, e-u-i u o-i-a la cerrada abre la sílaba de la vocal que la sigue,
+   * con h intercalada o sin ella. Antes salían ca-cahue-te, vihue-la, ná-huatl en una sílaba.
+   */
+  test('una cerrada entre dos vocales va con la segunda: no es triptongo', () => {
+    expect(sil('cacahuete')).toBe('ca-ca-hue-te');
+    expect(sil('cacahuate')).toBe('ca-ca-hua-te');
+    expect(sil('vihuela')).toBe('vi-hue-la');
+    expect(sil('ahuecar')).toBe('a-hue-car');
+    expect(sil('alcahuete')).toBe('al-ca-hue-te');
+    expect(sil('Chihuahua')).toBe('Chi-hua-hua');
+    expect(sil('rehuir')).toBe('re-huir');
+    expect(sil('paranoia')).toBe('pa-ra-no-ia');
+    expect(sil('náhuatl')).toBe('ná-huatl');
+    expect(sil('Anáhuac')).toBe('A-ná-huac');
+    expect(sil('parihuela')).toBe('pa-ri-hue-la');
+    expect(sil('Teotihuacán')).toBe('Te-o-ti-hua-cán');
+    for (const p of ['cacahuete', 'vihuela', 'Chihuahua', 'rehuir', 'paranoia']) {
+      const e = encuentrosVocalicos(p);
+      expect(e.triptongos, p).toEqual([]);
+      expect(e.hiatos, p).toEqual([]);
+    }
   });
 
   test('la «y» final funciona como vocal y la intervocálica como consonante', () => {

@@ -2395,21 +2395,20 @@ test.describe('contador-silabas · Inspector 01/11/2026 (octava inspección)', (
     await expect(sinalefasDe(page, 1).first()).toContainText('con pausa');
   });
 
-  test('HALLAZGO (inspector 01/11/2026) · un núcleo de tres vocales que no es triptongo: «cacahuete» sale ca-cahue-te', async ({
+  test('HALLAZGO 3872 (reparado) · un núcleo de tres vocales que no es triptongo: «cacahuete» sale ca-cahue-te', async ({
     page,
   }) => {
-    // ABIERTO, hallazgo (inspector 01/11/2026). silabeo.ts, `nucleos()`: encadena vocales
+    // REPARADO, hallazgo 3872 (inspector 01/11/2026). silabeo.ts, `nucleos()`: encadenaba vocales
     // mirando solo cada PAREJA (a+u diptongo, u+e diptongo → «aue») hasta tres, sin exigir la
     // forma del triptongo, cerrada + ABIERTA + cerrada. Con la h intercalada, que se salta, el
-    // defecto alcanza palabras corrientes a los dos lados del Atlántico. El silabeador lo
+    // defecto alcanzaba palabras corrientes a los dos lados del Atlántico. El silabeador lo
     // comparte diccionario-rimas. A mano (OLE 2010):
     //   ca-ca-hue-te (4) · vi-hue-la (3) · a-hue-car (3) · al-ca-hue-te (4) · Chi-hua-hua (3) ·
     //   re-huir (2: «ui» es diptongo ortográfico) · pa-ra-no-ia (4)
-    // y ninguna lleva triptongo. La app: ca-cahue-te, vihue-la, ahue-car, al-cahue-te,
+    // y ninguna lleva triptongo. Salía: ca-cahue-te, vihue-la, ahue-car, al-cahue-te,
     // Chihua-hua, rehuir (1) y pa-ra-noia, con «Triptongo: aue / iue / eui / iua / oia».
     // Y llega al verso: al(1) son(1) de(1) la(1) vi-hue-la(3) = 7, sin contactos, llana → 7,
-    // heptasílabo. La app: 6, hexasílabo.
-    test.fail();
+    // heptasílabo. Salía 6, hexasílabo. Ahora una cerrada con vocal detrás abre su sílaba.
     await analizarTexto(page, 'cacahuete vihuela ahuecar alcahuete Chihuahua rehuir paranoia');
     const palabras = await tarjetas(page, 7);
     await analizarTexto(page, 'al son de la vihuela');
