@@ -55,9 +55,12 @@ export default function CalculadoraCamaraLentaPage() {
     return fpsReproduccionCustom !== '' && val > 0 ? val : fpsReproduccion;
   }, [fpsReproduccion, fpsReproduccionCustom]);
 
+  // Los tres campos son type="number": el navegador entrega siempre el valor canónico con
+  // punto («23.976» aunque se teclee «23,976»), así que se leen con Number y no con
+  // parseSpanishNumber, que tomaría «23.976» por veintitrés mil novecientos setenta y seis.
   const duracionGrabacion = useMemo(() => {
-    const val = parseFloat(duracionStr.replace(',', '.'));
-    return !isNaN(val) && val > 0 ? val : undefined;
+    const val = Number(duracionStr);
+    return duracionStr !== '' && Number.isFinite(val) && val > 0 ? val : undefined;
   }, [duracionStr]);
 
   const resultado = useMemo(
