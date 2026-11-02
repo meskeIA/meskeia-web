@@ -321,6 +321,35 @@ test.describe('Corrección de la respuesta del alumno', () => {
     expect(comprobarRespuesta(23, 19, 'real').correcto).toBe(false);
   });
 
+  test('C0267: una respuesta exacta no tiene margen; el interés compuesto conserva el 1 %', () => {
+    // Resueltos a mano: 1) 4 + 19 · 7 = 137 · 2) 15 · (6 + 29 · 5) = 2265 · 3) 5050 ·
+    // 4) 100 − 14 · 6 = 16 · 5) 2 · 3⁷ = 4374 · 6) 5 · (2¹⁰ − 1) = 5115 · 7) razón 3 ·
+    // 8) 1000 · 1,05¹⁰ = 1628,89… · 9) 50 · 2¹² = 204.800 · 10) 12,5 · (36 + 48) = 1050 ·
+    // 11) 1,8 / 0,4 = 4,5 · 12) 1500 · 1,04⁹ = 1500 · 1,4233118 = 2134,97…
+    const r = CASOS.map((c) => c.respuesta);
+    for (const [i, v] of [137, 2265, 5050, 16, 4374, 5115, 3, NaN, 204800, 1050, 4.5, NaN].entries()) {
+      if (!Number.isNaN(v)) expect(r[i], `caso ${i + 1}`).toBeCloseTo(v, 9);
+    }
+    expect(r[7]).toBeCloseTo(1628.894627, 5);
+    expect(r[11]).toBeCloseTo(2134.9677, 3);
+    // Con el 1 % aprobaban; no son redondeo de nada.
+    expect(comprobarRespuesta(203000, r[8], 'real').correcto).toBe(false);
+    expect(comprobarRespuesta(5000, r[2], 'real').correcto).toBe(false);
+    expect(comprobarRespuesta(4.46, r[10], 'real').correcto).toBe(false);
+    expect(comprobarRespuesta(3.01, r[6], 'real').correcto).toBe(false);
+    // El interés compuesto exige redondear: 1,05¹⁰ ≈ 1,63 → 1630 sigue entrando.
+    expect(comprobarRespuesta(1630, r[7], 'real').correcto).toBe(true);
+    expect(comprobarRespuesta(1628.89, r[7], 'real').correcto).toBe(true);
+    // La clave a dos decimales aprueba en los 12 casos y en 500 prácticas.
+    for (const c of CASOS) {
+      expect(comprobarRespuesta(Math.round(c.respuesta * 100) / 100, c.respuesta, c.magnitud).correcto, `caso ${c.id}`).toBe(true);
+    }
+    for (let s = 1; s <= 500; s++) {
+      const e = generarEjercicioAleatorio(s);
+      expect(comprobarRespuesta(Math.round(e.respuesta * 100) / 100, e.respuesta, e.magnitud).correcto, `semilla ${s}`).toBe(true);
+    }
+  });
+
   test('una entrada no numérica se distingue de una respuesta equivocada', () => {
     const v = comprobarRespuesta(NaN, 19, 'real');
     expect(v.correcto).toBe(false);

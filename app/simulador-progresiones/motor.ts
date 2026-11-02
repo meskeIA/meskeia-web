@@ -38,7 +38,7 @@
  */
 
 import { formatNumber, parseSpanishNumber } from '@/lib';
-import { corregirNumero, redondearA, toleranciaRelativa, type Magnitud } from '@/lib/calculadoras/correctorCasosAula';
+import { corregirNumero, exigeRedondeo, redondearA, toleranciaRelativa, type Magnitud } from '@/lib/calculadoras/correctorCasosAula';
 
 // ============================================================
 // TIPOS
@@ -777,22 +777,29 @@ export function parsearListaNumeros(texto: string): ListaNumerica {
 /**
  * Tolerancia de corrección: la mayor entre ±0,01 y el 1 % del valor esperado.
  *
- * El mínimo absoluto evita castigar el redondeo en respuestas pequeñas (4,5 frente a
- * 4,49) y el porcentaje evita ser absurdamente estricto en respuestas grandes, donde
- * exigir el céntimo en 204.800 no mide si se entendió la progresión.
+ * Desde el 02/11/2026 (cabo C0267) solo se aplica a las respuestas que exigen redondear: el
+ * interés compuesto de los casos 8 y 12, donde absorbe el redondeo intermedio de 1,05ⁿ.
  */
 export function toleranciaDe(valorEsperado: number): number {
   return toleranciaRelativa(valorEsperado);
 }
 
-/** Compara la respuesta tecleada con la esperada. NaN cuenta como «no numérico». */
+/**
+ * Compara la respuesta tecleada con la esperada SIN redondear. NaN cuenta como «no numérico».
+ *
+ * Una respuesta EXACTA a dos decimales no tiene margen (cabo C0267, 02/11/2026): el 1 % aprobaba
+ * 203.000 para los 204.800 del caso 9, 5000 para el 5050 de Gauss y 4,46 para el 4,5 de la suma
+ * infinita, que no son redondeo de nada; 10 de los 12 casos son exactos. Regla de bfccafa5 y
+ * 51d7c223.
+ */
 export function comprobarRespuesta(
   valorUsuario: number,
   valorEsperado: number,
   /** Obligatoria: sin ella no se distingue una respuesta imprecisa de una imposible (hallazgo 1207). */
   magnitud: Magnitud,
 ): Comprobacion {
-  const c = corregirNumero(valorUsuario, valorEsperado, { tolerancia: toleranciaDe(valorEsperado), magnitud });
+  const margen = exigeRedondeo(valorEsperado, 2, redondear) ? toleranciaDe(valorEsperado) : 0;
+  const c = corregirNumero(valorUsuario, valorEsperado, { tolerancia: margen, magnitud });
   const { diferencia, tolerancia } = c;
   if (c.estado === 'no-numerico') return { correcto: false, motivo: 'no-numerico', diferencia, tolerancia };
   if (c.motivoImposible) return { correcto: false, motivo: 'fallado', diferencia, tolerancia, aviso: c.motivoImposible };
