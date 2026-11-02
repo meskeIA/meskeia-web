@@ -133,7 +133,9 @@ async function marcarTodosLosRequisitos(page: Page, salvo?: { indice: number; va
   // autónoma: los índices 0-5 no se han movido y la comunidad pasa del 6 al 8. El 07/10/2026 el
   // hallazgo 2985 añadió el del art. 8.5 (al corriente con Hacienda y la Seguridad Social, art.
   // 13 de la Ley 38/2003) antes de la nacionalidad: 9 bloqueantes + 1, la comunidad pasa al 9.
-  expect(total).toBe(10);
+  // El 02/11/2026 el hallazgo 3894 añadió la revocación (2.ª frase del art. 8.5) justo detrás del
+  // anterior: 10 bloqueantes + 1, la comunidad pasa al 10.
+  expect(total).toBe(11);
   for (let i = 0; i < total; i++) {
     const valor = salvo && salvo.indice === i ? salvo.valor : 'Sí';
     await grupos.nth(i).getByRole('button', { name: valor, exact: true }).click();
@@ -252,7 +254,8 @@ test.describe('simulador-bono-joven-alquiler', () => {
     // respondido «No» el veredicto no puede ser APTO, pero tampoco un rechazo tajante.
     // Fue el índice 6 desde que el hallazgo 686 insertó el del art. 136 en la quinta posición, y
     // es el 8 desde el 28/09/2026 (arrendador, hallazgo 2388, y nacionalidad, art. 8.2.a).
-    await marcarTodosLosRequisitos(page, { indice: 9, valor: 'No' }); // la comunidad autónoma
+    // El 10 desde el 02/11/2026 (revocación del art. 8.5, hallazgo 3894).
+    await marcarTodosLosRequisitos(page, { indice: 10, valor: 'No' }); // la comunidad autónoma
 
     const resultado = norm(await page.locator('[role="status"]').first().innerText());
     expect(resultado).toContain('Cumples los requisitos básicos');
@@ -2689,7 +2692,9 @@ test.describe('Inspector 01/11/2026 — casos nuevos', () => {
     expect(await panelDeAhorro(page)).toHaveLength(0);
   });
 
-  // H29 (ALTO) — ABIERTO. La segunda frase del art. 8.5 no llega al veredicto. El RD: «Tampoco
+  // H29 (ALTO) — REPARADO el 02/11/2026: tarjeta propia «No te han revocado ninguna ayuda…»
+  // (id sinRevocacion), bloqueante, con la 2.ª frase del art. 8.5 cotejada en el BOE ese día.
+  // Quien sufrió la revocación responde «No» a esa y «Sí» a las otras diez → NO APTO. La segunda frase del art. 8.5 no llega al veredicto. El RD: «Tampoco
   // podrán obtener la condición de persona beneficiaria […] quienes hayan sido sujetos de una
   // revocación […] de alguna de las ayudas contempladas en éste o el anterior plan estatal de
   // vivienda por incumplimiento o causa imputable al solicitante». La reparación del 2985 (H21)
@@ -2703,17 +2708,26 @@ test.describe('Inspector 01/11/2026 — casos nuevos', () => {
   // esperado NO APTO (o una pregunta que recoja la revocación) · obtenido «¡Cumples todos los
   // requisitos! … 300,00 €/mes» y 0 apariciones de «revoca» en la página.
   test('CASO 25 (rechazo) · H29 — la revocación de una ayuda de este plan o del anterior (art. 8.5, 2.ª frase) debería llegar al veredicto', async ({ page }) => {
-    test.fail(); // H29 ABIERTO a 01/11/2026
     await abrirHidratado(page);
     await sembrarValor(page, '#alquiler', '600'); // 600 ≤ 1.000: la renta no es el problema
     await marcarTodoSi(page);
-    await page.getByRole('button', { name: /Ver guía educativa/i }).click();
-    const pagina = norm(await page.locator('body').innerText());
-    // O la checklist la pregunta (y quien la sufrió responde «No»), o al menos la página la dice
-    expect(pagina).toMatch(/revoca/i);
+    expect(norm(await veredictoDe(page).innerText())).toContain('¡Cumples todos los requisitos!');
+
+    // La checklist la pregunta, y quien la sufrió responde «No» aunque ya lo reintegrara
+    const revocacion = tarjetaCon(page, /revocado/);
+    await expect(revocacion).toHaveCount(1);
+    expect(norm(await revocacion.innerText())).toContain('Plan Estatal de Vivienda anterior');
+    expect(norm(await revocacion.innerText())).toContain('Cuenta aunque ya hayas devuelto el dinero');
+    await expect(revocacion.getByText('IMPRESCINDIBLE')).toHaveCount(1);
+    await revocacion.getByRole('button', { name: 'No', exact: true }).click();
+    const veredicto = norm(await veredictoDe(page).innerText());
+    expect(veredicto).toContain('No cumples los requisitos obligatorios');
+    expect(veredicto).not.toContain('300,00 €/mes');
+    expect(await panelDeAhorro(page)).toHaveLength(0);
   });
 
-  // H31 (BAJO) — ABIERTO. La FAQ visible «¿Qué pasa si mis ingresos suben durante el cobro?» da
+  // H31 (BAJO) — REPARADO el 02/11/2026: la FAQ da los tres umbrales del módulo con su importe.
+  // La FAQ visible «¿Qué pasa si mis ingresos suben durante el cobro?» da
   // un único umbral: «El umbral de ingresos lo fija el Estado en 5 veces el IPREM (art. 133.1.d)
   // […]. Si dejas de cumplir ese umbral podrías perder la ayuda». El mismo art. 133.1.d lo sube a
   // 5,5 veces con una discapacidad del 33 % (o siendo hijo o hija de víctima de violencia de
@@ -2723,12 +2737,13 @@ test.describe('Inspector 01/11/2026 — casos nuevos', () => {
   // dice que el umbral es 5 × IPREM (42.000 €) y que podría perder la ayuda · esperado: su umbral
   // es 5,5 × 8.400 = 46.200 €/año y sigue dentro.
   test('H31 — la FAQ de los ingresos que suben debería dar el umbral que corresponde a cada persona, no solo el general', async ({ page }) => {
-    test.fail(); // H31 ABIERTO a 01/11/2026
     await abrirHidratado(page);
     await page.getByRole('button', { name: /Ver guía educativa/i }).click();
     const faq = await faqVisible(page, /ingresos suben/);
-    expect(faq).toContain('5 veces el IPREM');
-    expect(faq).toMatch(/5,5|discapacidad|que te corresponda/);
+    expect(faq).toContain('5 veces el IPREM (42.000 €/año)'); // 5 × 8.400 (IPREM_2026.anual14)
+    expect(faq).toContain('5,5 veces (46.200 €/año) con una discapacidad reconocida del 33 % o más'); // 5,5 × 8.400
+    expect(faq).toContain('6 veces (50.400 €/año) con una discapacidad del 65 % o más'); // 6 × 8.400
+    expect(faq).toContain('el umbral que te corresponde');
   });
 });
 
@@ -2742,10 +2757,10 @@ test.describe('Inspector 01/11/2026 — móvil (390 px)', () => {
     hasTouch: true,
   });
 
-  test('A 390 px los diez «Sí» se ven enteros, nada los tapa y responden al toque', async ({ page }) => {
+  test('A 390 px los once «Sí» se ven enteros, nada los tapa y responden al toque', async ({ page }) => {
     await abrirHidratado(page);
     const sis = await page.getByRole('button', { name: 'Sí', exact: true }).all();
-    expect(sis).toHaveLength(10);
+    expect(sis).toHaveLength(11); // 10 + la revocación del art. 8.5 (hallazgo 3894)
     for (const si of sis) {
       await si.scrollIntoViewIfNeeded();
       const caja = await si.boundingBox();
@@ -2799,7 +2814,7 @@ test.describe('Inspector 01/11/2026 — móvil (390 px)', () => {
         ),
       };
     });
-    expect(medidas.columnas).toHaveLength(10);
+    expect(medidas.columnas).toHaveLength(11);
     for (const ancho of medidas.columnas) expect(ancho).toBeGreaterThanOrEqual(150);
     expect(medidas.lineasPrimera).toBeLessThanOrEqual(4);
 

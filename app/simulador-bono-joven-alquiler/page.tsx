@@ -209,7 +209,20 @@ const REQUISITOS: Requisito[] = [
   {
     id: 'subvenciones',
     pregunta: 'Estás al corriente de tus obligaciones con Hacienda y con la Seguridad Social, y no tienes ninguna otra prohibición para recibir subvenciones',
-    explicacion: 'El art. 8.5 del RD 326/2026, común a todas las ayudas del Plan, impide ser persona beneficiaria a quien incurra en alguna de las circunstancias del art. 13 de la Ley 38/2003, General de Subvenciones. La más frecuente es no estar al corriente de las obligaciones tributarias o con la Seguridad Social; otras son, por ejemplo, haber sido sancionado con la pérdida del derecho a obtener subvenciones o tener pendiente el reintegro de una subvención. Si tienes una deuda pendiente, saldarla o aplazarla antes de solicitar puede cambiar la respuesta.',
+    explicacion: 'La primera frase del art. 8.5 del RD 326/2026, común a todas las ayudas del Plan, impide ser persona beneficiaria a quien incurra en alguna de las circunstancias del art. 13 de la Ley 38/2003, General de Subvenciones. La más frecuente es no estar al corriente de las obligaciones tributarias o con la Seguridad Social; otras son, por ejemplo, haber sido sancionado con la pérdida del derecho a obtener subvenciones o tener pendiente el reintegro de una subvención. Si tienes una deuda pendiente, saldarla o aplazarla antes de solicitar puede cambiar la respuesta.',
+    bloqueante: true,
+  },
+  /**
+   * ⚠️ 02/11/2026 (hallazgo 3894) — la SEGUNDA frase del art. 8.5 excluye además a quien haya
+   * sufrido la revocación de una ayuda de este plan o del anterior por incumplimiento o causa
+   * imputable a él. No es una circunstancia del art. 13 de la Ley 38/2003, así que quien ya
+   * reintegró contestaba «Sí» a la tarjeta de arriba con honestidad y salía apto: la forma del
+   * 2388 y del 2985 (BOE-A-2026-8872, leído el 02/11/2026).
+   */
+  {
+    id: 'sinRevocacion',
+    pregunta: 'No te han revocado ninguna ayuda de vivienda de este plan ni del anterior por un incumplimiento tuyo',
+    explicacion: 'La segunda frase del art. 8.5 del RD 326/2026 impide también ser persona beneficiaria a quien haya sido sujeto de una revocación, por la comunidad autónoma (o Ceuta o Melilla), de alguna de las ayudas de este plan o del Plan Estatal de Vivienda anterior (2022-2025, RD 42/2022, donde estaba el Bono Alquiler Joven) por incumplimiento o por causa imputable a quien la solicitó. Cuenta aunque ya hayas devuelto el dinero. Una ayuda que terminó por otro motivo, como cumplir la edad máxima o acabar el plazo, no es una revocación por incumplimiento.',
     bloqueante: true,
   },
   {
@@ -875,7 +888,10 @@ export default function SimuladorBonoJovenAlquilerPage() {
             </div>
             <div className={styles.faqItem}>
               <h3>¿Qué pasa si mis ingresos suben durante el cobro?</h3>
-              <p>El umbral de ingresos lo fija el Estado en {formatNumber(UMBRAL_IPREM_VIVIENDA_JOVEN.general, 0)} veces el IPREM (art. 133.1.d); lo que concreta cada Comunidad Autónoma es el cómputo y las comprobaciones periódicas durante el cobro. Si dejas de cumplir ese umbral podrías perder la ayuda, así que informa a tu CA de cualquier cambio relevante en tu situación económica.</p>
+              {/* ⚠️ 02/11/2026 (hallazgo 3895) — daba solo el umbral general: a quien tiene el de 5,5 o
+                  6 veces le decía que con 44.000 €/año podría perder la ayuda. Los tres, del módulo,
+                  como la tarjeta de ingresos (la forma de los 2989 y 2990) */}
+              <p>El umbral de ingresos lo fija el Estado (art. 133.1.d): {formatNumber(UMBRAL_IPREM_VIVIENDA_JOVEN.general, 0)} veces el IPREM ({topeIngresos(UMBRAL_IPREM_VIVIENDA_JOVEN.general)}/año) con carácter general, {formatNumber(UMBRAL_IPREM_VIVIENDA_JOVEN.discapacidad33, 1)} veces ({topeIngresos(UMBRAL_IPREM_VIVIENDA_JOVEN.discapacidad33)}/año) con una discapacidad reconocida del {conPorcentaje('33')} o más o si eres hijo o hija de víctima de violencia de género, y {formatNumber(UMBRAL_IPREM_VIVIENDA_JOVEN.discapacidad65, 0)} veces ({topeIngresos(UMBRAL_IPREM_VIVIENDA_JOVEN.discapacidad65)}/año) con una discapacidad del {conPorcentaje('65')} o más. Lo que concreta cada Comunidad Autónoma es el cómputo y las comprobaciones periódicas durante el cobro. Si dejas de cumplir el umbral que te corresponde podrías perder la ayuda, así que informa a tu CA de cualquier cambio relevante en tu situación económica.</p>
             </div>
           </div>
         </section>
