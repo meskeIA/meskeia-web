@@ -267,7 +267,7 @@ test.describe('casos para clase · en la página', () => {
     await page.getByRole('tab', { name: /Libro Mayor/ }).click();
     const clientes = page.locator('[class*="cuentaT"]').filter({ hasText: /^Clientes/ }).first();
     // 4200 − 2500 = 1700, con dos decimales y sin agrupar las cuatro cifras (es-ES)
-    await expect(clientes).toContainText('Saldo deudora: 1700,00');
+    await expect(clientes).toContainText('Saldo deudor: 1700,00');
     await expect(clientes).not.toContainText('€');
   });
 
@@ -301,7 +301,8 @@ test.describe('casos para clase · en la página', () => {
  *
  *   CASO 3 (rechazo) · Caja Debe «1.500» / Capital Haber «1.000» → «El asiento no cuadra: Debe
  *     1500,00 ≠ Haber 1000,00. La diferencia es 500,00.» y el diario sigue con 3 asientos.
- *     Y lo que también debería rechazar y hoy guarda (HALLAZGOS ABIERTOS):
+ *     Y lo que también debería rechazar y guardaba (hallazgos 3908 y 3909, REPARADOS el 02/11/2026;
+ *     los tests de abajo que dicen «antes» ya no llevan test.fail()):
  *       · tercera línea SIN cuenta con 50 al Debe (Caja D 100, Capital H 150): cuadra 150 = 150 en
  *         el formulario, pero el mayor descarta la línea y queda Caja 100 deudor / Capital 150
  *         acreedor: el mayor ya no cuadra.
@@ -430,11 +431,10 @@ test.describe('simulador · diario y mayor (Inspector 02/11/2026)', () => {
     await expect(diario(page)).toHaveCount(3);
   });
 
-  test('HALLAZGO (02/11/2026, ABIERTO) · una línea con importe y sin cuenta cuadra el asiento y el mayor la descarta', async ({ page }) => {
+  test('HALLAZGO (02/11/2026, REPARADO el mismo día; antes) · una línea con importe y sin cuenta cuadra el asiento y el mayor la descarta', async ({ page }) => {
     // Caja D 100 · Capital H 150 · tercera línea sin cuenta D 50. totalLineas suma las TRES líneas
     // (150 = 150) y calcularMayor salta la que no tiene cuenta: el mayor queda Caja 100 deudor y
     // Capital 150 acreedor, sin cuadrar. Esperado: no se guarda y avisa de la línea sin cuenta.
-    test.fail();
     await page.getByRole('button', { name: 'Limpiar todo' }).click();
     await registrar(page, 'Línea sin cuenta', [
       { cuenta: 'Caja', debe: '100' },
@@ -445,11 +445,10 @@ test.describe('simulador · diario y mayor (Inspector 02/11/2026)', () => {
     await expect(formulario(page).getByRole('alert')).toBeVisible();
   });
 
-  test('HALLAZGO (02/11/2026, ABIERTO) · «100 u.m.» no es un importe y el asiento se guarda a 0', async ({ page }) => {
+  test('HALLAZGO (02/11/2026, REPARADO el mismo día; antes) · «100 u.m.» no es un importe y el asiento se guarda a 0', async ({ page }) => {
     // parseSpanishNumber('100 u.m.') es NaN; totalLineas lo cuenta como 0 a los dos lados, 0 = 0 y
     // se guarda: el diario pinta «No definido» en el Debe y el Haber, con Total 0,00, y el mayor no
     // lo recoge. Esperado: no se guarda y dice qué importe no se entiende.
-    test.fail();
     await page.getByRole('button', { name: 'Limpiar todo' }).click();
     await registrar(page, 'Importe con unidad', [
       { cuenta: 'Caja', debe: '100 u.m.' },
@@ -459,21 +458,19 @@ test.describe('simulador · diario y mayor (Inspector 02/11/2026)', () => {
     await expect(formulario(page).getByRole('alert')).toBeVisible();
   });
 
-  test('HALLAZGO (02/11/2026, ABIERTO, el mismo de «100 u.m.») · un asiento sin ningún importe se guarda', async ({ page }) => {
+  test('HALLAZGO (02/11/2026, REPARADO el mismo día; antes, el mismo de «100 u.m.») · un asiento sin ningún importe se guarda', async ({ page }) => {
     // Caja y Capital sin importes: 0 = 0 y se guarda con Total 0,00 (el propio formulario no le pone
     // «Equilibrado», que exige un total mayor que 0). Esperado: no se guarda.
-    test.fail();
     await page.getByRole('button', { name: 'Limpiar todo' }).click();
     await registrar(page, 'Asiento sin importes', [{ cuenta: 'Caja' }, { cuenta: 'Capital' }]);
     await expect(diario(page)).toHaveCount(0);
     await expect(formulario(page).getByRole('alert')).toBeVisible();
   });
 
-  test('HALLAZGO (02/11/2026, ABIERTO, el mismo de «100 u.m.») · «-500» al Debe y al Haber se guarda y la cuenta T no lo enseña', async ({ page }) => {
+  test('HALLAZGO (02/11/2026, REPARADO el mismo día; antes, el mismo de «100 u.m.») · «-500» al Debe y al Haber se guarda y la cuenta T no lo enseña', async ({ page }) => {
     // −500 = −500 y se guarda. En el mayor, Caja tiene Total del Debe −500,00 sin ningún movimiento
     // a la vista (las columnas filtran > 0) y «Saldo acreedora: 500,00»; Capital, deudora.
     // Esperado: un importe del Debe o del Haber es positivo (el sentido lo da la columna): no se guarda.
-    test.fail();
     await page.getByRole('button', { name: 'Limpiar todo' }).click();
     await registrar(page, 'Importes negativos', [
       { cuenta: 'Caja', debe: '-500' },
@@ -483,12 +480,11 @@ test.describe('simulador · diario y mayor (Inspector 02/11/2026)', () => {
     await expect(formulario(page).getByRole('alert')).toBeVisible();
   });
 
-  test('HALLAZGO (02/11/2026, ABIERTO) · «Saldo deudora»: el saldo es masculino, y uno de 0,00 no es deudor', async ({ page }) => {
+  test('HALLAZGO (02/11/2026, REPARADO el mismo día; antes) · «Saldo deudora»: el saldo es masculino, y uno de 0,00 no es deudor', async ({ page }) => {
     // page.tsx L476 escribe «Saldo {naturaleza}:» con naturaleza en femenino (la de la cuenta).
     // Esperado «Saldo deudor: 9500,00» para Caja; y Caja a 0,00 (CASO 2) es una cuenta saldada:
     // calcularMayor la da por 'deudora' porque 0 >= 0. OJO: el test «se corrige el caso 5…» de
     // arriba fija hoy «Saldo deudora: 1700,00»; la reparación lo cambia a «Saldo deudor: 1700,00».
-    test.fail();
     await page.getByRole('tab', { name: /Libro Mayor/ }).click();
     await expect(cuentaT(page, 'Caja').locator('[class*="_cuentaTSaldo"]')).toHaveText('Saldo deudor: 9500,00');
     await expect(cuentaT(page, 'Capital').locator('[class*="_cuentaTSaldo"]')).toHaveText('Saldo acreedor: 10.000,00');
@@ -500,34 +496,35 @@ test.describe('simulador · diario y mayor (Inspector 02/11/2026)', () => {
     await expect(cuentaT(page, 'Caja').locator('[class*="_cuentaTSaldo"]')).not.toHaveText(/deudor|acreedor/);
   });
 
-  test('HALLAZGO (02/11/2026, ABIERTO) · el diario y el mayor escriben la fecha AAAA-MM-DD, no DD/MM/AAAA', async ({ page }) => {
+  test('HALLAZGO (02/11/2026, REPARADO el mismo día; antes) · el diario y el mayor escriben la fecha AAAA-MM-DD, no DD/MM/AAAA', async ({ page }) => {
     // El primer ejemplo es del 2025-01-10: en pantalla debe leerse 10/01/2025 (formato español).
-    test.fail();
     await expect(diario(page).first().locator('[class*="asientoFecha"]')).toHaveText('10/01/2025');
     await page.getByRole('tab', { name: /Libro Mayor/ }).click();
     await expect(cuentaT(page, 'Caja').locator('[class*="cuentaTFecha"]').first()).toHaveText('10/01/2025');
   });
 
-  test('HALLAZGO (02/11/2026, ABIERTO) · con teclado, «Nuevo asiento» deja el foco en <body> y el Tab siguiente cae en «Limpiar todo»', async ({ page }) => {
+  test('HALLAZGO (02/11/2026, REPARADO el mismo día; antes) · con teclado, «Nuevo asiento» deja el foco en <body> y el Tab siguiente cae en «Limpiar todo»', async ({ page }) => {
     // El botón desaparece al abrir el formulario y nadie mueve el foco: el formulario queda ARRIBA
     // del punto de foco y el siguiente Tab va a «Limpiar todo», que borra el diario sin confirmar.
     // Lo mismo al guardar. Esperado: el foco pasa a un campo del formulario (la fecha o el concepto).
-    test.fail();
     await page.getByRole('button', { name: 'Nuevo asiento' }).focus();
     await page.keyboard.press('Enter');
     await expect(page.getByLabel('Concepto')).toBeVisible();
-    const dentro = await page.evaluate(() => Boolean(document.activeElement?.closest('[class*="formularioCard"]')));
-    expect(dentro, 'el foco debería estar en el formulario recién abierto').toBe(true);
+    await expect(page.getByLabel('Fecha')).toBeFocused();
+
+    // Al cancelar, el foco vuelve a «Nuevo asiento», no a <body>
+    await page.getByRole('button', { name: 'Cancelar' }).focus();
+    await page.keyboard.press('Enter');
+    await expect(page.getByRole('button', { name: 'Nuevo asiento' })).toBeFocused();
   });
 });
 
 test.describe('C0542 · fecha propuesta en México por la tarde (Inspector 02/11/2026)', () => {
   test.use({ timezoneId: 'America/Mexico_City', locale: 'es-ES' });
 
-  test('HALLAZGO (02/11/2026, ABIERTO) · a las 20:30 del 02/11 propone el 03/11 (la fecha UTC)', async ({ page }) => {
+  test('HALLAZGO (02/11/2026, REPARADO el mismo día; antes) · a las 20:30 del 02/11 propone el 03/11 (la fecha UTC)', async ({ page }) => {
     // 2026-11-03T02:30Z = 02/11/2026 20:30 en Ciudad de México (UTC−6 todo el año desde 2022).
     // crearAsientoVacio usa new Date().toISOString(): da 2026-11-03, y el asiento se guarda con ella.
-    test.fail();
     await page.clock.setFixedTime(new Date('2026-11-03T02:30:00Z'));
     await page.goto('/simulador-contabilidad-basica/');
     await esperarHidratacion(page, ['#casos-respuesta']);
@@ -539,9 +536,8 @@ test.describe('C0542 · fecha propuesta en México por la tarde (Inspector 02/11
 test.describe('C0542 · fecha propuesta en España (Inspector 02/11/2026)', () => {
   test.use({ timezoneId: 'Europe/Madrid', locale: 'es-ES' });
 
-  test('HALLAZGO (02/11/2026, ABIERTO) · a las 00:30 del 02/11 propone el 01/11 (la fecha UTC)', async ({ page }) => {
+  test('HALLAZGO (02/11/2026, REPARADO el mismo día; antes) · a las 00:30 del 02/11 propone el 01/11 (la fecha UTC)', async ({ page }) => {
     // 2026-11-01T23:30Z = 02/11/2026 00:30 en Madrid (UTC+1 en noviembre): en UTC aún es el día 1.
-    test.fail();
     await page.clock.setFixedTime(new Date('2026-11-01T23:30:00Z'));
     await page.goto('/simulador-contabilidad-basica/');
     await esperarHidratacion(page, ['#casos-respuesta']);
@@ -570,23 +566,20 @@ test.describe('textos de la página y del JSON-LD (Inspector 02/11/2026)', () =>
   const pagina = readFileSync('app/simulador-contabilidad-basica/page.tsx', 'utf8');
   const metadatos = readFileSync('app/simulador-contabilidad-basica/metadata.ts', 'utf8');
 
-  test('HALLAZGO (02/11/2026, ABIERTO) · la FAQ dice que la contabilidad oficial «requiere software homologado» y un profesional', () => {
+  test('HALLAZGO (02/11/2026, REPARADO el mismo día; antes) · la FAQ dice que la contabilidad oficial «requiere software homologado» y un profesional', () => {
     // Código de Comercio (BOE-A-1885-6627), art. 25.2: «La contabilidad será llevada directamente
     // por los empresarios o por otras personas debidamente autorizadas»; art. 27.2: asientos «por
     // cualquier procedimiento idóneo». Ni software homologado ni supervisión obligatoria.
-    test.fail();
     expect(pagina).not.toContain('requiere software homologado');
     expect(pagina).not.toMatch(/la supervisión de un profesional/);
   });
 
-  test('HALLAZGO (02/11/2026, ABIERTO) · la guía dice que el banco «también va al Haber», cuando el gasto fue al Debe', () => {
-    test.fail();
+  test('HALLAZGO (02/11/2026, REPARADO el mismo día; antes) · la guía dice que el banco «también va al Haber», cuando el gasto fue al Debe', () => {
     expect(pagina).not.toContain('también va al Haber');
   });
 
-  test('HALLAZGO (02/11/2026, ABIERTO) · features del JSON-LD con «100%» pegado', () => {
+  test('HALLAZGO (02/11/2026, REPARADO el mismo día; antes) · features del JSON-LD con «100%» pegado', () => {
     // CLAUDE.md global §2: el % va separado con espacio duro («100 %»).
-    test.fail();
     expect(metadatos).not.toMatch(/\d%/);
   });
 

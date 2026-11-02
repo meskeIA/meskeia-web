@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useId } from 'react';
+import { useState, useId, useRef, useEffect } from 'react';
 import styles from './SimuladorContabilidadBasica.module.css';
 import {
   MeskeiaLogo,
@@ -11,7 +11,7 @@ import {
   DisclaimerCard,
   ShareCard,
 } from '@/components';
-import { formatNumber, parseSpanishNumber } from '@/lib';
+import { formatDate, formatNumber, hoyISOLocal, parseISODateLocal, parseSpanishNumber } from '@/lib';
 // El libro mayor se calcula en ./motor.ts, el mismo módulo con que se corrigen los casos para
 // clase (./casos.ts, 19/10/2026): el saldo que enseña la pestaña y el del corrector no pueden divergir.
 import { calcularMayor, totalLineas, type Asiento, type LineaAsiento } from './motor';
@@ -52,13 +52,27 @@ function crearLineaVacia(prefijo: string): LineaAsiento {
   return { id: `${prefijo}-${Date.now()}-${Math.random()}`, cuenta: '', descripcion: '', debe: '', haber: '' };
 }
 
-function crearAsientoVacio(): Omit<Asiento, 'id'> {
+/**
+ * Asiento en blanco. La fecha la pone quien abre el formulario, con `hoyISOLocal()`: hasta el
+ * 02/11/2026 salía de `toISOString()`, la fecha UTC, que por la tarde en América ya es mañana y en
+ * España, pasada la medianoche, aún es ayer (hallazgo 3910, cabo C0542).
+ */
+function crearAsientoVacio(fecha = ''): Omit<Asiento, 'id'> {
   const p = `nuevo-${Date.now()}`;
   return {
-    fecha: new Date().toISOString().split('T')[0],
+    fecha,
     concepto: '',
     lineas: [crearLineaVacia(`${p}-l1`), crearLineaVacia(`${p}-l2`)],
   };
+}
+
+/**
+ * «2025-01-10» → «10/01/2025». Se guarda en ISO (el valor del input de fecha) y se pinta en
+ * formato español, sin pasar por new Date('AAAA-MM-DD'), que en América da el día anterior
+ * (hallazgo 3913).
+ */
+function fechaEs(fechaISO: string): string {
+  return /^\d{4}-\d{2}-\d{2}$/.test(fechaISO) ? formatDate(parseISODateLocal(fechaISO)) : fechaISO;
 }
 
 // ─── Componente principal ────────────────────────────────────────────────────
@@ -117,6 +131,36 @@ export default function SimuladorContabilidadBasicaPage() {
       return;
     }
 
+    // Cada línea escrita ha de tener cuenta e importe, y cada importe ha de ser un número mayor
+    // que 0 (el sentido lo da la columna). Hasta el 02/11/2026 una línea con importe y sin cuenta
+    // contaba para el cuadre y el mayor la descartaba, y «100 u.m.», un vacío o «-500» se
+    // guardaban como 0 o en negativo (hallazgos 3908 y 3909).
+    for (let i = 0; i < nuevoAsiento.lineas.length; i++) {
+      const linea = nuevoAsiento.lineas[i];
+      const n = i + 1;
+      const tieneCuenta = linea.cuenta.trim() !== '';
+      const importes = (['debe', 'haber'] as const).filter(campo => linea[campo].trim() !== '');
+      if (!tieneCuenta && importes.length === 0) continue;
+      if (!tieneCuenta) {
+        setErrorValidacion(`La línea ${n} tiene importe pero no cuenta: escribe la cuenta o borra el importe.`);
+        return;
+      }
+      if (importes.length === 0) {
+        setErrorValidacion(`La línea ${n} (${linea.cuenta.trim()}) no tiene importe en el Debe ni en el Haber.`);
+        return;
+      }
+      for (const campo of importes) {
+        const valor = parseSpanishNumber(linea[campo]);
+        if (!(valor > 0)) {
+          const columna = campo === 'debe' ? 'Debe' : 'Haber';
+          setErrorValidacion(
+            `El importe del ${columna} de la línea ${n} («${linea[campo].trim()}») tiene que ser un número mayor que 0, sin unidades: el sentido ya lo da la columna.`
+          );
+          return;
+        }
+      }
+    }
+
     const lineasConDatos = nuevoAsiento.lineas.filter(l => l.cuenta.trim());
     if (lineasConDatos.length < 2) {
       setErrorValidacion('Necesitas al menos dos líneas con cuenta para formar un asiento.');
@@ -138,6 +182,32 @@ export default function SimuladorContabilidadBasicaPage() {
       { ...nuevoAsiento, id: `asiento-${Date.now()}` },
     ]);
     setNuevoAsiento(crearAsientoVacio());
+    cerrarFormulario();
+  }
+
+  // Al abrir el formulario el botón «Nuevo asiento» desaparece y el foco caía a <body>, con el
+  // formulario ANTES de ese punto: el Tab siguiente iba a «Limpiar todo» (hallazgo 3911). Ahora el
+  // foco va a la fecha al abrir y vuelve a «Nuevo asiento» al guardar o cancelar.
+  const refFecha = useRef<HTMLInputElement>(null);
+  const refNuevo = useRef<HTMLButtonElement>(null);
+  const focoPendiente = useRef<'formulario' | 'nuevo' | null>(null);
+
+  useEffect(() => {
+    if (focoPendiente.current === 'formulario') refFecha.current?.focus();
+    if (focoPendiente.current === 'nuevo') refNuevo.current?.focus();
+    focoPendiente.current = null;
+  }, [mostrarFormulario]);
+
+  function abrirFormulario() {
+    setNuevoAsiento(prev => (prev.fecha ? prev : { ...prev, fecha: hoyISOLocal() }));
+    setErrorValidacion('');
+    focoPendiente.current = 'formulario';
+    setMostrarFormulario(true);
+  }
+
+  function cerrarFormulario() {
+    setErrorValidacion('');
+    focoPendiente.current = 'nuevo';
     setMostrarFormulario(false);
   }
 
@@ -210,7 +280,7 @@ export default function SimuladorContabilidadBasicaPage() {
                 <article key={asiento.id} className={styles.asientoCard}>
                   <div className={styles.asientoHeader}>
                     <div>
-                      <span className={styles.asientoFecha}>{asiento.fecha}</span>
+                      <span className={styles.asientoFecha}>{fechaEs(asiento.fecha)}</span>
                       <span className={styles.asientoConcepto}>{asiento.concepto}</span>
                     </div>
                     <button
@@ -275,6 +345,7 @@ export default function SimuladorContabilidadBasicaPage() {
                   <label htmlFor={`${uid}-fecha`} className={styles.label}>Fecha</label>
                   <input
                     id={`${uid}-fecha`}
+                    ref={refFecha}
                     type="date"
                     className={styles.inputTexto}
                     value={nuevoAsiento.fecha}
@@ -385,7 +456,7 @@ export default function SimuladorContabilidadBasicaPage() {
                 <button
                   type="button"
                   className={styles.btnCancelar}
-                  onClick={() => { setMostrarFormulario(false); setErrorValidacion(''); }}
+                  onClick={cerrarFormulario}
                 >
                   Cancelar
                 </button>
@@ -396,7 +467,7 @@ export default function SimuladorContabilidadBasicaPage() {
           {/* Acciones */}
           <div className={styles.accionesBar}>
             {!mostrarFormulario && (
-              <button type="button" className={styles.btnPrimario} onClick={() => { setMostrarFormulario(true); setErrorValidacion(''); }}>
+              <button type="button" ref={refNuevo} className={styles.btnPrimario} onClick={abrirFormulario}>
                 <span aria-hidden="true">+</span> Nuevo asiento
               </button>
             )}
@@ -438,7 +509,7 @@ export default function SimuladorContabilidadBasicaPage() {
                         .filter(m => m.debe > 0)
                         .map((m, i) => (
                           <div key={i} className={styles.cuentaTLinea}>
-                            <span className={styles.cuentaTFecha}>{m.fecha}</span>
+                            <span className={styles.cuentaTFecha}>{fechaEs(m.fecha)}</span>
                             <span className={styles.cuentaTConcepto} title={m.concepto}>{m.concepto}</span>
                             <span className={styles.cuentaTImporte}>{formatNumber(m.debe, 2)}</span>
                           </div>
@@ -459,7 +530,7 @@ export default function SimuladorContabilidadBasicaPage() {
                         .filter(m => m.haber > 0)
                         .map((m, i) => (
                           <div key={i} className={styles.cuentaTLinea}>
-                            <span className={styles.cuentaTFecha}>{m.fecha}</span>
+                            <span className={styles.cuentaTFecha}>{fechaEs(m.fecha)}</span>
                             <span className={styles.cuentaTConcepto} title={m.concepto}>{m.concepto}</span>
                             <span className={styles.cuentaTImporte}>{formatNumber(m.haber, 2)}</span>
                           </div>
@@ -472,9 +543,19 @@ export default function SimuladorContabilidadBasicaPage() {
                   </div>
 
                   {/* Saldo */}
-                  <div className={`${styles.cuentaTSaldo} ${cuenta.naturaleza === 'deudora' ? styles.saldoDeudor : styles.saldoAcreedor}`}>
-                    Saldo {cuenta.naturaleza}: <strong>{formatNumber(cuenta.saldo, 2)}</strong>
-                  </div>
+                  {/* «Saldo deudor/acreedor»: el saldo es masculino (decía «Saldo deudora», la
+                      naturaleza de la cuenta), y una cuenta a cero está saldada (hallazgo 3912). */}
+                  {cuenta.saldo < 0.005 ? (
+                    <div className={styles.cuentaTSaldo}>
+                      <span key="saldada">Saldo: <strong>0,00</strong> (cuenta saldada)</span>
+                    </div>
+                  ) : (
+                    <div className={`${styles.cuentaTSaldo} ${cuenta.naturaleza === 'deudora' ? styles.saldoDeudor : styles.saldoAcreedor}`}>
+                      <span key="saldo">
+                        Saldo {cuenta.naturaleza === 'deudora' ? 'deudor' : 'acreedor'}: <strong>{formatNumber(cuenta.saldo, 2)}</strong>
+                      </span>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
@@ -588,7 +669,7 @@ export default function SimuladorContabilidadBasicaPage() {
             <div className={styles.faqItem}>
               <dt>¿Este simulador sirve para llevar la contabilidad real de una empresa?</dt>
               <dd>
-                No: es una herramienta educativa para comprender los principios. La contabilidad oficial de una empresa requiere software homologado, el cumplimiento del plan de cuentas oficial de cada país y la supervisión de un profesional (graduado en contabilidad o asesor fiscal).
+                No: es una herramienta educativa para comprender los principios. La contabilidad oficial de una empresa sigue la legislación mercantil y el plan de cuentas de cada país, con sus libros obligatorios, y conviene el consejo de un profesional.
               </dd>
             </div>
           </dl>
@@ -616,7 +697,7 @@ export default function SimuladorContabilidadBasicaPage() {
               <span className={styles.stepNumber}>3</span>
               <div className={styles.stepContent}>
                 <strong>Decide qué va al Debe y qué va al Haber</strong>
-                <p>El gasto aumenta → va al Debe. El banco disminuye → también va al Haber (las cuentas de activo bajan por el Haber).</p>
+                <p>El gasto aumenta → va al Debe. El banco disminuye → va al Haber (las cuentas de activo bajan por el Haber).</p>
               </div>
             </li>
             <li className={styles.step}>

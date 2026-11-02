@@ -47,7 +47,7 @@ export const jsonLd = generateWebAppSchema({
     'Libro mayor automático en formato de cuentas T',
     'Ejemplos precargados de asientos típicos',
     'Saldo acreedor y deudor calculado automáticamente por cuenta',
-    'Gratuito y sin registro, funciona 100% en el navegador',
+    'Gratuito y sin registro, funciona 100 % en el navegador',
     'Disponible en español con terminología contable estándar',
   ],
 });
