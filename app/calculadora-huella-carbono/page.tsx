@@ -411,6 +411,7 @@ export default function CalculadoraHuellaCarbono() {
                 />
                 <select
                   className={styles.select}
+                  aria-label="Tipo de coche"
                   value={transporte.tipoCoche}
                   onChange={(e) => setTransporte({ ...transporte, tipoCoche: e.target.value as DatosTransporte['tipoCoche'] })}
                 >
