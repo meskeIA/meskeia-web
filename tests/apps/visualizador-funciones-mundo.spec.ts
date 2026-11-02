@@ -8,6 +8,7 @@ import {
   primerCruceEntero,
   raizLineal,
   razonConstante,
+  redondear,
   tablaDe,
   toleranciaDe,
   verticeCuadratica,
@@ -214,6 +215,23 @@ test.describe('Corrección de la respuesta del alumno', () => {
   test('acepta el redondeo razonable del interés compuesto', () => {
     expect(comprobarRespuesta(3257.79, 3257.789253554883, 'real').correcto).toBe(true);
     expect(comprobarRespuesta(3258, 3257.789253554883, 'real').correcto).toBe(true);
+  });
+
+  test('C0267: una respuesta exacta no tiene margen; la que exige redondear conserva el 1 %', () => {
+    const porId = new Map(CASOS.map((c) => [c.id, c]));
+    // Con el 1 % aprobaban 55,5 para el 56 del caso 1, 9900 para el 10.000 del caso 9 y 7,95
+    // para el 8 del caso 11, que no son redondeo de nada.
+    expect(comprobarRespuesta(55.5, porId.get(1)!.respuesta, porId.get(1)!.magnitud).correcto).toBe(false);
+    expect(comprobarRespuesta(9900, porId.get(9)!.respuesta, porId.get(9)!.magnitud).correcto).toBe(false);
+    expect(comprobarRespuesta(7.95, porId.get(11)!.respuesta, porId.get(11)!.magnitud).correcto).toBe(false);
+    // La clave a dos decimales aprueba en los 12 casos y en 500 prácticas.
+    for (const c of CASOS) {
+      expect(comprobarRespuesta(redondear(c.respuesta, 2), c.respuesta, c.magnitud).correcto, `caso ${c.id}`).toBe(true);
+    }
+    for (let s = 1; s <= 500; s++) {
+      const e = generarEjercicioAleatorio(s);
+      expect(comprobarRespuesta(redondear(e.respuesta, 2), e.respuesta, e.magnitud).correcto, `semilla ${s}`).toBe(true);
+    }
   });
 
   test('confundir la exponencial con una lineal se marca como fallo', () => {

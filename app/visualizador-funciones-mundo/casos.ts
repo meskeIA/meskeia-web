@@ -44,7 +44,7 @@
  */
 
 import { formatNumber } from '@/lib';
-import { corregirNumero, redondearA, toleranciaRelativa, type Magnitud } from '@/lib/calculadoras/correctorCasosAula';
+import { corregirNumero, exigeRedondeo, redondearA, toleranciaRelativa, type Magnitud } from '@/lib/calculadoras/correctorCasosAula';
 
 // ============================================================
 // TIPOS
@@ -359,14 +359,22 @@ export function toleranciaDe(valorEsperado: number): number {
   return toleranciaRelativa(valorEsperado);
 }
 
-/** Compara la respuesta tecleada con la esperada. NaN cuenta como «no numérico». */
+/**
+ * Compara la respuesta tecleada con la esperada SIN redondear. NaN cuenta como «no numérico».
+ *
+ * Una respuesta EXACTA a dos decimales no tiene margen (cabo C0267, 02/11/2026): el 1 % aprobaba
+ * 55,5 para el 56 del caso 1 y 9900 para el 10.000 del caso 9, que no son redondeo de nada; 10 de
+ * los 12 casos son exactos. La que exige redondear (el interés compuesto del caso 6, el caso 10)
+ * conserva `toleranciaDe`. Regla de bfccafa5 y 51d7c223.
+ */
 export function comprobarRespuesta(
   valorUsuario: number,
   valorEsperado: number,
   /** Obligatoria: sin ella no se distingue una respuesta imprecisa de una imposible (hallazgo 1207). */
   magnitud: Magnitud,
 ): Comprobacion {
-  const c = corregirNumero(valorUsuario, valorEsperado, { tolerancia: toleranciaDe(valorEsperado), magnitud });
+  const margen = exigeRedondeo(valorEsperado, 2, redondear) ? toleranciaDe(valorEsperado) : 0;
+  const c = corregirNumero(valorUsuario, valorEsperado, { tolerancia: margen, magnitud });
   const { diferencia, tolerancia } = c;
   if (c.estado === 'no-numerico') return { correcto: false, motivo: 'no-numerico', diferencia, tolerancia };
   if (c.motivoImposible) return { correcto: false, motivo: 'fallado', diferencia, tolerancia, aviso: c.motivoImposible };
