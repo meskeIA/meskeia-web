@@ -5,6 +5,7 @@ import {
   calcularEstadisticas,
   comprobarRespuesta,
   generarEjercicioAleatorio,
+  magnitudDe,
   resolverCaso,
   toleranciaDe,
 } from '../../app/calculadora-estadistica/casos';
@@ -195,6 +196,23 @@ test.describe('Corrección de la respuesta del alumno', () => {
 
   test('acepta el redondeo a dos decimales cuando el caso lo pide', () => {
     expect(comprobarRespuesta(2.14, 2.13809, 'real').correcto).toBe(true);
+  });
+
+  test('C0267: una respuesta exacta no tiene margen; la que exige redondear conserva el 1 %', () => {
+    const porId = new Map(CASOS.map((c) => [c.id, c]));
+    // Con el 1 % aprobaban 6,93 para la media 7 del caso 1 y 14,4 para la mediana 14,5 del
+    // caso 3, y 1,98 para la σ = 2 del caso 7: no son redondeo de nada.
+    expect(comprobarRespuesta(6.93, porId.get(1)!.respuesta, magnitudDe(porId.get(1)!)).correcto).toBe(false);
+    expect(comprobarRespuesta(14.4, porId.get(3)!.respuesta, magnitudDe(porId.get(3)!)).correcto).toBe(false);
+    expect(comprobarRespuesta(1.98, porId.get(7)!.respuesta, magnitudDe(porId.get(7)!)).correcto).toBe(false);
+    // La clave a dos decimales aprueba en los 12 casos y en 500 prácticas.
+    for (const c of CASOS) {
+      expect(comprobarRespuesta(Math.round(c.respuesta * 100) / 100, c.respuesta, magnitudDe(c)).correcto, `caso ${c.id}`).toBe(true);
+    }
+    for (let s = 1; s <= 500; s++) {
+      const e = generarEjercicioAleatorio(s);
+      expect(comprobarRespuesta(Math.round(e.respuesta * 100) / 100, e.respuesta, magnitudDe(e)).correcto, `semilla ${s}`).toBe(true);
+    }
   });
 
   test('una entrada no numérica se distingue de una respuesta equivocada', () => {
