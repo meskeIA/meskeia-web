@@ -1215,8 +1215,14 @@
     flex-wrap: wrap;
   }
 
+  /* El nombre reserva 10rem y lo que no cabe a su lado (ROI y beneficio) baja de línea con el
+     flex-wrap. Con base 0 (`flex: 1` y `min-width: 0`, cabo C0409) el nombre era lo único que
+     encogía y a 412 px «Email Marketing» se quedaba en 10 px, una letra por línea (cabo C0565,
+     la forma del hallazgo 3893) */
   .rankingNombre {
+    flex: 1 1 10rem;
     min-width: 0;
+    overflow-wrap: break-word;
   }
 
   .rankingRoi,
