@@ -29,6 +29,12 @@
  * carpeta de cada skill, que no se carga, y en el SKILL.md queda la regla con su caso de origen en
  * una línea. `commit` imprime el tamaño de cada SKILL.md tocado y su variación, y avisa por encima
  * de UMBRAL_KB: no rompe nada, pero el número se ve cada vez que una skill crece.
+ *
+ * Una skill que ya pasó su crónica al HISTORIAL.md y sigue por encima entra en UMBRAL_ACEPTADO,
+ * con el tamaño medido y la razón: el aviso de los 25 KB dejaría de informar (siempre saldría y
+ * su consejo ya no aplica), pero el de su propio techo sigue cazando que vuelva a crecer. Por
+ * skill y no subiendo UMBRAL_KB: con 50 KB para todas callarían semilla-diaria (39,7 KB) y
+ * audit-meskeia (30,3 KB), que aún no han pasado por el HISTORIAL.md (02/11/2026).
  */
 
 import fs from 'node:fs';
@@ -40,6 +46,10 @@ const RAIZ = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const GIT_DIR = path.join(RAIZ, '_private', 'skills-git');
 const ARBOL = path.join(RAIZ, '.claude', 'skills');
 const UMBRAL_KB = 25;
+const UMBRAL_ACEPTADO = {
+  // 02/11/2026: crónica movida al HISTORIAL.md (54,8 → 44,6 KB); lo que queda es método y descartes.
+  'casos-aula-meskeia': 50,
+};
 
 const git = (...a) => execFileSync('git', [`--git-dir=${GIT_DIR}`, `--work-tree=${ARBOL}`, ...a], {
   encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'],
@@ -64,7 +74,10 @@ function informeTamanos(rutas) {
     const antes = tamanoEnHead(r);
     const delta = ahora - antes;
     const signo = delta > 0 ? '+' : delta < 0 ? '−' : '±';
-    const aviso = ahora > UMBRAL_KB * 1024 ? `  ⚠ pasa de ${UMBRAL_KB} KB: la crónica, al HISTORIAL.md de su carpeta` : '';
+    const aceptado = UMBRAL_ACEPTADO[r.split('/')[0]];
+    const aviso = aceptado
+      ? (ahora > aceptado * 1024 ? `  ⚠ pasa de su techo aceptado (${aceptado} KB): ha vuelto a crecer, ¿crónica en el SKILL.md?` : '')
+      : (ahora > UMBRAL_KB * 1024 ? `  ⚠ pasa de ${UMBRAL_KB} KB: la crónica, al HISTORIAL.md de su carpeta` : '');
     lineas.push(`${r}: ${kb(ahora)} KB (${signo}${kb(Math.abs(delta))} KB)${aviso}`);
   }
   return lineas;
