@@ -13,13 +13,14 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import styles from './CalculadoraMovimiento.module.css';
 import { formatNumber } from '@/lib';
+import { redondearA } from '@/lib/calculadoras/correctorCasosAula';
 import {
   marcasEje,
   muestrear,
   posicion,
   rangoPosicion,
   velocidad,
-  instanteParada,
+  paradaAntesDe,
   type MovimientoRectilineo,
 } from './motor';
 
@@ -45,9 +46,13 @@ function pasoDeslizador(T: number): number {
   return Math.pow(10, Math.floor(Math.log10(T / 100)));
 }
 
-/** Cifra con 2 decimales y sin «−0,00» cuando el valor es un cero con signo o casi. */
+/**
+ * Cifra con 2 decimales y sin «−0,00» cuando el valor es un cero con signo o casi. Redondea con
+ * `redondearA`, que limpia la coma flotante antes: 4,905 · 3² llega como 44,14499… y Intl lo
+ * dejaba en 44,14 cuando a mano es 44,145 → 44,15 (hallazgo 3946).
+ */
 function cifra(valor: number): string {
-  return formatNumber(Math.abs(valor) < 0.005 ? 0 : valor, 2);
+  return formatNumber(redondearA(valor, 2), 2);
 }
 
 /** Marca del eje: hasta 2 decimales, sin ceros de relleno tras la coma («2,5», no «2,50»). */
@@ -122,8 +127,8 @@ export default function SimuladorCinematica({ modo, v0, a, T }: Props) {
   const muestras = useMemo(() => muestrear(mov, T), [mov, T]);
   const xActual = posicion(mov, t);
   const vActual = velocidad(mov, t);
-  const tParada = instanteParada(mov);
-  const paradaDentro = tParada !== null && tParada < T;
+  const tParada = paradaAntesDe(mov, T);
+  const paradaDentro = tParada !== null;
 
   const nombreX = vertical ? 'y' : 'x';
   const etiquetaMovil = vertical ? 'objeto' : 'móvil';

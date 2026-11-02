@@ -1,9 +1,9 @@
 import { Metadata } from 'next';
 
-import { generateWebAppSchema, generateFAQSchema, combineSchemas } from '@/lib/schema-templates';
+import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Calculadora y simulador de MRU y MRUA (MRUV) con gráficas',
-  description: 'Resuelve MRU, MRUA (MRUV), caída libre y tiro parabólico y mira el movimiento: móvil animado con sus vectores y gráficas x-t, v-t y a-t sincronizadas. Distingue distancia recorrida y desplazamiento.',
+  description: 'Resuelve MRU, MRUA (MRUV), caída libre y tiro parabólico. En los tres rectilíneos, el móvil animado con sus vectores y las gráficas x-t, v-t y a-t sincronizadas. Distingue distancia recorrida y desplazamiento.',
   keywords: 'cinemática, física, MRU, MRUA, MRUV, simulador MRU, simulador MRUA, gráficas x-t v-t a-t, caída libre, tiro parabólico, velocidad, aceleración, desplazamiento, distancia recorrida',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     title: 'Calculadora y simulador de MRU y MRUA (MRUV)',
-    description: 'MRU, MRUA, caída libre y tiro parabólico con el móvil animado y las gráficas x-t, v-t y a-t sincronizadas.',
+    description: 'MRU, MRUA y caída libre con el móvil animado y las gráficas x-t, v-t y a-t sincronizadas; tiro parabólico con alcance, altura máxima y tiempo de vuelo.',
     url: 'https://meskeia.com/calculadora-movimiento/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
 
 const webAppSchema = generateWebAppSchema({
   name: "Calculadora y simulador de MRU y MRUA (MRUV)",
-  description: "Calculadora y simulador de cinemática: MRU, MRUA (MRUV), caída libre y tiro parabólico, con el móvil animado y las gráficas x-t, v-t y a-t sincronizadas.",
+  description: "Calculadora y simulador de cinemática: MRU, MRUA (MRUV) y caída libre con el móvil animado y las gráficas x-t, v-t y a-t sincronizadas, y tiro parabólico con alcance, altura máxima y tiempo de vuelo.",
   url: 'https://meskeia.com/calculadora-movimiento/',
   category: 'EducationalApplication',
   features: [
@@ -44,50 +44,69 @@ const webAppSchema = generateWebAppSchema({
   ],
 });
 
-const faqSchema = generateFAQSchema({
-  url: 'https://meskeia.com/calculadora-movimiento/',
-  mainEntity: [
-    {
-      question: '¿Cuál es la diferencia entre velocidad y aceleración?',
-      answer: 'La velocidad indica cuánto espacio recorre un objeto por unidad de tiempo (m/s). La aceleración mide cuánto cambia esa velocidad por unidad de tiempo (m/s²). Un objeto puede ir muy rápido pero con aceleración cero (MRU), o estar casi parado pero acelerando rápidamente.',
-    },
-    {
-      question: '¿Por qué el ángulo de 45° da el alcance máximo en tiro parabólico?',
-      answer: 'El alcance es R = v₀²·sin(2θ)/g. La función sin(2θ) tiene su valor máximo (= 1) cuando 2θ = 90°, es decir, θ = 45°. Para ese ángulo, la velocidad se reparte igual entre componente horizontal y vertical, logrando el equilibrio óptimo entre distancia y altura.',
-    },
-    {
-      question: '¿Qué pasa si la aceleración es negativa en MRUA?',
-      answer: 'Una aceleración negativa (desaceleración o frenado) significa que el objeto pierde velocidad. Si la velocidad inicial es positiva y la aceleración negativa, el objeto se frena hasta detenerse (v = 0) y, si continúa la aceleración, invierte su movimiento. Ejemplo: un coche frenando a −5 m/s² desde 20 m/s se detiene en t = 20/5 = 4 s.',
-    },
-    {
-      question: '¿La masa afecta a la caída libre? ¿Por qué?',
-      answer: 'No, en caída libre ideal (sin resistencia del aire) todos los objetos caen igual independientemente de su masa. Galileo lo demostró: la fuerza gravitacional es F = m·g, pero también F = m·a, por lo que a = g para cualquier masa. En la realidad, la resistencia del aire sí diferencia objetos según su forma y densidad.',
-    },
-    {
-      question: '¿Cómo se calcula la distancia de frenado de un coche a 120 km/h?',
-      answer: 'Primero convierte: 120 km/h ÷ 3,6 = 33,33 m/s. Con una deceleración típica de −7 m/s²: d = v²/(2·|a|) = 33,33²/(2·7) = 1.110,9/14 ≈ 79,4 m. A esto hay que sumar la distancia de reacción: d_reac = 33,33 × 0,7 s ≈ 23,3 m. Total: ≈ 102,7 m.',
-    },
-    {
-      question: '¿En qué se diferencia la caída libre del tiro parabólico?',
-      answer: 'En la caída libre el objeto solo tiene movimiento vertical (v₀ horizontal = 0). En el tiro parabólico hay además una velocidad horizontal inicial que se mantiene constante durante todo el vuelo. El resultado es una trayectoria curva (parábola) en lugar de una línea vertical.',
-    },
-    {
-      question: '¿Cómo convierto km/h a m/s?',
-      answer: 'Divide entre 3,6: m/s = km/h ÷ 3,6. La razón: 1 km = 1.000 m y 1 h = 3.600 s, por tanto 1 km/h = 1.000/3.600 m/s = 1/3,6 m/s. Ejemplos: 36 km/h → 10 m/s, 90 km/h → 25 m/s, 120 km/h → 33,33 m/s.',
-    },
-    {
-      question: '¿Qué errores son más frecuentes en los problemas de cinemática?',
-      answer: 'Los cinco fallos más comunes son: (1) no convertir unidades al SI antes de calcular, (2) olvidar el signo negativo en desaceleraciones, (3) confundir distancia con desplazamiento en MRUA, (4) no descomponer la velocidad inicial en tiro parabólico, y (5) usar g = 10 cuando el enunciado no lo especifica.',
-    },
-  ],
-});
+export const jsonLd = webAppSchema;
 
-export const jsonLd = combineSchemas(webAppSchema, faqSchema);
+/** Pregunta de la FAQ; `nota` se pinta aparte en la FAQ visible y va detrás de la respuesta en el JSON-LD. */
+interface PreguntaFrecuente {
+  question: string;
+  answer: string;
+  nota?: string;
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// FAQ — FUENTE ÚNICA: la FAQ visible de page.tsx pinta este array y el FAQPage de abajo lo
+// incluye. Hasta el 02/11/2026 la página emitía DOS FAQPage: estas 8 preguntas copiadas a mano en
+// el @graph de jsonLd (sin las notas de los ángulos complementarios ni del «Inverso») y otras 5
+// en faqJsonLd (hallazgo 3948).
+// ─────────────────────────────────────────────────────────────────────────
+export const PREGUNTAS_FRECUENTES: PreguntaFrecuente[] = [
+  {
+    question: '¿Cuál es la diferencia entre velocidad y aceleración?',
+    answer: 'La velocidad indica cuánto espacio recorre un objeto por unidad de tiempo (m/s). La aceleración mide cuánto cambia esa velocidad por unidad de tiempo (m/s²). Un objeto puede ir muy rápido pero con aceleración cero (MRU), o estar casi parado pero acelerando rápidamente.',
+  },
+  {
+    question: '¿Por qué el ángulo de 45° da el alcance máximo en tiro parabólico?',
+    answer: 'El alcance es R = v₀²·sin(2θ)/g. La función sin(2θ) tiene su valor máximo (= 1) cuando 2θ = 90°, es decir, θ = 45°. Para ese ángulo, la velocidad se reparte igual entre componente horizontal y vertical, logrando el equilibrio óptimo entre distancia y altura.',
+    nota: 'Nota: ángulos complementarios (30° y 60°) dan el mismo alcance pero distinta altura máxima.',
+  },
+  {
+    question: '¿Qué pasa si la aceleración es negativa en MRUA?',
+    answer: 'Una aceleración negativa (desaceleración o frenado) significa que el objeto pierde velocidad. Si la velocidad inicial es positiva y la aceleración negativa, el objeto se frena hasta detenerse (v = 0) y, si continúa la aceleración, invierte su movimiento. Ejemplo: un coche frenando a −5 m/s² desde 20 m/s se detiene en t = 20/5 = 4 s.',
+  },
+  {
+    // Hallazgo 3951: decía «Galileo lo demostró» con F = m·a, que es la segunda ley de Newton
+    // (Principia, 1687); Galileo murió en 1642.
+    question: '¿La masa afecta a la caída libre? ¿Por qué?',
+    answer: 'No, en caída libre ideal (sin resistencia del aire) todos los objetos caen igual independientemente de su masa. Galileo sostuvo que todos los cuerpos caen igual; la explicación con fuerzas llegó después, con la segunda ley de Newton (1687): la fuerza gravitatoria es F = m·g, pero también F = m·a, por lo que a = g para cualquier masa. En la realidad, la resistencia del aire sí diferencia objetos según su forma y densidad.',
+  },
+  {
+    question: '¿Cómo se calcula la distancia de frenado de un coche a 120 km/h?',
+    answer: 'Primero convierte: 120 km/h ÷ 3,6 = 33,33 m/s. Con una deceleración típica de −7 m/s²: d = v²/(2·|a|) = 33,33²/(2·7) = 1.110,9/14 ≈ 79,4 m. A esto hay que sumar la distancia de reacción: d_reac = 33,33 × 0,7 s ≈ 23,3 m. Total: ≈ 102,7 m.',
+  },
+  {
+    question: '¿En qué se diferencia la caída libre del tiro parabólico?',
+    answer: 'En la caída libre el objeto solo tiene movimiento vertical (v₀ horizontal = 0). En el tiro parabólico hay además una velocidad horizontal inicial que se mantiene constante durante todo el vuelo. El resultado es una trayectoria curva (parábola) en lugar de una línea vertical.',
+  },
+  {
+    question: '¿Cómo convierto km/h a m/s?',
+    answer: 'Divide entre 3,6: m/s = km/h ÷ 3,6. La razón: 1 km = 1.000 m y 1 h = 3.600 s, por tanto 1 km/h = 1.000/3.600 m/s = 1/3,6 m/s. Ejemplos: 36 km/h → 10 m/s, 90 km/h → 25 m/s, 120 km/h → 33,33 m/s.',
+    nota: 'Inverso: m/s × 3,6 = km/h.',
+  },
+  {
+    question: '¿Qué errores son más frecuentes en los problemas de cinemática?',
+    answer: 'Los cinco fallos más comunes son: (1) no convertir unidades al SI antes de calcular, (2) olvidar el signo negativo en desaceleraciones, (3) confundir distancia con desplazamiento en MRUA, (4) no descomponer la velocidad inicial en tiro parabólico, y (5) usar g = 10 cuando el enunciado no lo especifica.',
+  },
+];
 
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
   mainEntity: [
+    ...PREGUNTAS_FRECUENTES.map((f) => ({
+      '@type': 'Question',
+      name: f.question,
+      acceptedAnswer: { '@type': 'Answer', text: f.nota ? `${f.answer} ${f.nota}` : f.answer },
+    })),
     {
       '@type': 'Question',
       name: '¿Cuál es la diferencia entre MRU y MRUA en física?',
@@ -109,7 +128,7 @@ export const faqJsonLd = {
       name: '¿Cuánto tarda un objeto en caer desde determinada altura en caída libre?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'En caída libre (sin rozamiento del aire) la fórmula es t = √(2h/g), donde h es la altura en metros y g = 9,8 m/s². Desde 20 m: t = √(2·20/9,8) ≈ 2,02 s. Desde 45 m: t ≈ 3,03 s. La velocidad al impactar se obtiene con v = g·t. Recuerda convertir siempre las unidades al Sistema Internacional antes de calcular.',
+        text: 'En caída libre (sin rozamiento del aire) la fórmula es t = √(2h/g), donde h es la altura en metros y g = 9,81 m/s², la que usa la calculadora. Desde 20 m: t = √(2·20/9,81) ≈ 2,02 s. Desde 45 m: t ≈ 3,03 s. La velocidad al impactar se obtiene con v = g·t. Recuerda convertir siempre las unidades al Sistema Internacional antes de calcular.',
       },
     },
     {

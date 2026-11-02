@@ -23,7 +23,7 @@
  * Casos resueltos a mano en tests/cinematica-motor.spec.ts.
  */
 
-/** Gravedad estándar en la superficie terrestre, m/s². */
+/** Gravedad en la superficie terrestre, m/s²: el valor redondeado habitual en los problemas de clase. */
 export const G = 9.81;
 
 export interface MovimientoRectilineo {
@@ -55,15 +55,28 @@ export function instanteParada({ v0, a }: MovimientoRectilineo): number | null {
 }
 
 /**
+ * Instante de parada si cae DENTRO de (0, t), con margen para el error de coma flotante; null si
+ * no hay parada o si se para justo al final. Con v₀ = 0,6 y a = −0,2, −0,6/−0,2 da
+ * 2,9999999999999996, y comparar «< 3» a secas daba una vuelta que no existe (hallazgo 3945): la
+ * nota decía que la distancia (0,90 m) era mayor que el desplazamiento (0,90 m). Todo el que
+ * pregunte «¿se da la vuelta antes de t?» pasa por aquí: tarjetas, gráficas y simulador.
+ */
+export function paradaAntesDe(mov: MovimientoRectilineo, t: number): number | null {
+  const tp = instanteParada(mov);
+  if (tp === null) return null;
+  return tp < t - 1e-9 * Math.max(1, Math.abs(t)) ? tp : null;
+}
+
+/**
  * Distancia recorrida entre 0 y t: la longitud del camino, siempre ≥ 0.
  *
  * Si el móvil se para y retrocede dentro del intervalo, suma los dos tramos por separado.
  * Si se para EXACTAMENTE en t, no hay vuelta que sumar y coincide con |x(t)|.
  */
 export function distanciaRecorrida(mov: MovimientoRectilineo, t: number): number {
-  const tp = instanteParada(mov);
+  const tp = paradaAntesDe(mov, t);
   const xt = posicion(mov, t);
-  if (tp === null || tp >= t) return Math.abs(xt);
+  if (tp === null) return Math.abs(xt);
   const xp = posicion(mov, tp);
   return Math.abs(xp) + Math.abs(xt - xp);
 }
@@ -83,14 +96,16 @@ export interface ResultadoRectilineo {
 
 /** Resuelve un movimiento rectilíneo de aceleración constante hasta el instante t. */
 export function resolverRectilineo(mov: MovimientoRectilineo, t: number): ResultadoRectilineo {
-  const tp = instanteParada(mov);
-  const dentro = tp !== null && tp < t;
+  const tp = paradaAntesDe(mov, t);
+  const vt = velocidad(mov, t);
+  // Si se para justo en t, v(t) es un residuo de coma flotante (1e-16) que se pintaba «≈0»
+  const escala = Math.max(Math.abs(mov.v0), Math.abs(mov.a * t));
   return {
     desplazamiento: posicion(mov, t),
     distancia: distanciaRecorrida(mov, t),
-    velocidadFinal: velocidad(mov, t),
-    tParada: dentro ? tp : null,
-    xParada: dentro ? posicion(mov, tp) : null,
+    velocidadFinal: Math.abs(vt) <= 1e-9 * escala ? 0 : vt,
+    tParada: tp,
+    xParada: tp === null ? null : posicion(mov, tp),
   };
 }
 
@@ -112,8 +127,8 @@ export function muestrear(mov: MovimientoRectilineo, T: number, n = 120): Muestr
     const t = (T * i) / n;
     muestras.push({ t, x: posicion(mov, t), v: velocidad(mov, t) });
   }
-  const tp = instanteParada(mov);
-  if (tp !== null && tp < T) {
+  const tp = paradaAntesDe(mov, T);
+  if (tp !== null) {
     muestras.push({ t: tp, x: posicion(mov, tp), v: 0 });
     muestras.sort((m1, m2) => m1.t - m2.t);
   }
@@ -126,8 +141,8 @@ export function muestrear(mov: MovimientoRectilineo, T: number, n = 120): Muestr
  */
 export function rangoPosicion(mov: MovimientoRectilineo, T: number): [number, number] {
   const valores = [0, posicion(mov, T)];
-  const tp = instanteParada(mov);
-  if (tp !== null && tp < T) valores.push(posicion(mov, tp));
+  const tp = paradaAntesDe(mov, T);
+  if (tp !== null) valores.push(posicion(mov, tp));
   return [Math.min(...valores), Math.max(...valores)];
 }
 

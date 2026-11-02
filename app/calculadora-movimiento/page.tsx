@@ -6,9 +6,11 @@ import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { EducationalSection, RelatedApps, LegalNotice, ShareCard, DisclaimerCard } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
+import { redondearA } from '@/lib/calculadoras/correctorCasosAula';
 import { G, resolverRectilineo, resolverParabolico, type ResultadoRectilineo, type ResultadoParabolico } from './motor';
 import SimuladorCinematica from './SimuladorCinematica';
 import CasosAula from './CasosAula';
+import { PREGUNTAS_FRECUENTES } from './metadata';
 
 type TipoMovimiento = 'mru' | 'mrua' | 'caida' | 'parabolico';
 
@@ -22,13 +24,24 @@ interface ResultadoLineal extends ResultadoRectilineo {
 
 type Resultado = ResultadoLineal | (ResultadoParabolico & { tipo: 'parabolico' }) | null;
 
+/**
+ * Cifra de resultado con 2 decimales. Pasa por `redondearA`, que limpia la coma flotante antes de
+ * redondear: ½·9,81·3² llega como 44,14499… y Intl lo dejaba en 44,14, cuando a mano es 44,145 →
+ * 44,15; con t = 1, 5 o 7 el mismo empate sí subía (hallazgo 3946).
+ */
+function cifra(valor: number): string {
+  return formatNumber(redondearA(valor, 2), 2);
+}
+
+// El icono va aparte del nombre para pintarlo con aria-hidden: dentro del texto del botón, el
+// lector lo leía como parte del nombre («balón de fútbol, Pelota lanzada», hallazgo 3955).
 const EJEMPLOS = [
-  { nombre: '⚽ Pelota lanzada', tipo: 'parabolico' as TipoMovimiento, v0: '20', angulo: '45', t: '4' },
-  { nombre: '🚗 Coche frenando', tipo: 'mrua' as TipoMovimiento, v0: '30', a: '-5', t: '6' },
-  { nombre: '↩️ Frena y da la vuelta', tipo: 'mrua' as TipoMovimiento, v0: '20', a: '-5', t: '6' },
-  { nombre: '🚀 Cohete acelerando', tipo: 'mrua' as TipoMovimiento, v0: '0', a: '15', t: '10' },
-  { nombre: '📦 Objeto en caída', tipo: 'caida' as TipoMovimiento, v0: '0', t: '4,5' },
-  { nombre: '🏀 Lanzado hacia arriba', tipo: 'caida' as TipoMovimiento, v0: '-10', t: '3' },
+  { icono: '⚽', nombre: 'Pelota lanzada', tipo: 'parabolico' as TipoMovimiento, v0: '20', angulo: '45', t: '4' },
+  { icono: '🚗', nombre: 'Coche frenando', tipo: 'mrua' as TipoMovimiento, v0: '30', a: '-5', t: '6' },
+  { icono: '↩️', nombre: 'Frena y da la vuelta', tipo: 'mrua' as TipoMovimiento, v0: '20', a: '-5', t: '6' },
+  { icono: '🚀', nombre: 'Cohete acelerando', tipo: 'mrua' as TipoMovimiento, v0: '0', a: '15', t: '10' },
+  { icono: '📦', nombre: 'Objeto en caída', tipo: 'caida' as TipoMovimiento, v0: '0', t: '4,5' },
+  { icono: '🏀', nombre: 'Lanzado hacia arriba', tipo: 'caida' as TipoMovimiento, v0: '-10', t: '3' },
 ];
 
 export default function CalculadoraMovimientoPage() {
@@ -63,6 +76,20 @@ export default function CalculadoraMovimientoPage() {
     };
   }, [tipoMovimiento, velocidadInicial, aceleracion, tiempo, angulo]);
 
+  // Sin cifra, el aviso nombra lo que falta: en el MRUA con la aceleración vacía pedía la
+  // velocidad y el tiempo, que ya estaban puestos (hallazgo 3954).
+  const avisoSinCifra = (() => {
+    if (tipoMovimiento === 'parabolico') return 'Introduce una velocidad mayor que 0 y un ángulo entre 0° y 90°';
+    const faltaAceleracion = tipoMovimiento === 'mrua' && isNaN(parseSpanishNumber(aceleracion));
+    const v0 = parseSpanishNumber(velocidadInicial);
+    const t = parseSpanishNumber(tiempo);
+    const faltaBase = isNaN(v0) || isNaN(t) || t <= 0;
+    if (!faltaAceleracion) return 'Introduce la velocidad inicial y un tiempo mayor que 0';
+    return faltaBase
+      ? 'Introduce la velocidad inicial, la aceleración y un tiempo mayor que 0'
+      : 'Introduce la aceleración (negativa si el móvil frena)';
+  })();
+
   // Cargar ejemplo
   const cargarEjemplo = (ejemplo: typeof EJEMPLOS[0]) => {
     setTipoMovimiento(ejemplo.tipo);
@@ -95,8 +122,8 @@ export default function CalculadoraMovimientoPage() {
       <header className={styles.hero}>
         <h1 className={styles.title}><span aria-hidden="true">🚀</span> Calculadora y simulador de MRU y MRUA</h1>
         <p className={styles.subtitle}>
-          Cinemática con el móvil animado y sus gráficas x-t, v-t y a-t: MRU, MRUA (MRUV),
-          caída libre y tiro parabólico
+          Cinemática con el móvil animado y sus gráficas x-t, v-t y a-t en el MRU, el MRUA (MRUV)
+          y la caída libre, y alcance, altura y tiempo de vuelo del tiro parabólico
         </p>
       </header>
 
@@ -247,7 +274,7 @@ export default function CalculadoraMovimientoPage() {
                   className={styles.ejemploBtn}
                   onClick={() => cargarEjemplo(ej)}
                 >
-                  {ej.nombre}
+                  <span aria-hidden="true">{ej.icono}</span> {ej.nombre}
                 </button>
               ))}
             </div>
@@ -267,31 +294,31 @@ export default function CalculadoraMovimientoPage() {
                       <span className={styles.resultLabel}>
                         {resultado.tipo === 'mru' ? 'Velocidad' : 'Velocidad final'}
                       </span>
-                      <span className={styles.resultValue}>{formatNumber(resultado.velocidadFinal, 2)}</span>
+                      <span className={styles.resultValue}>{cifra(resultado.velocidadFinal)}</span>
                       <span className={styles.resultUnit}>m/s</span>
                     </div>
                     <div className={styles.resultCard}>
                       <span className={styles.resultLabel}>
                         {resultado.tipo === 'caida' ? 'Desplazamiento vertical (y)' : 'Desplazamiento (x)'}
                       </span>
-                      <span className={styles.resultValue}>{formatNumber(resultado.desplazamiento, 2)}</span>
+                      <span className={styles.resultValue}>{cifra(resultado.desplazamiento)}</span>
                       <span className={styles.resultUnit}>m</span>
                     </div>
                     <div className={styles.resultCard}>
                       <span className={styles.resultLabel}>Distancia recorrida</span>
-                      <span className={styles.resultValue}>{formatNumber(resultado.distancia, 2)}</span>
+                      <span className={styles.resultValue}>{cifra(resultado.distancia)}</span>
                       <span className={styles.resultUnit}>m</span>
                     </div>
                     {resultado.tipo !== 'mru' && (
                       <div className={styles.resultCard}>
                         <span className={styles.resultLabel}>Aceleración</span>
-                        <span className={styles.resultValue}>{formatNumber(resultado.aceleracion, 2)}</span>
+                        <span className={styles.resultValue}>{cifra(resultado.aceleracion)}</span>
                         <span className={styles.resultUnit}>m/s²</span>
                       </div>
                     )}
                     <div className={styles.resultCard}>
                       <span className={styles.resultLabel}>Tiempo</span>
-                      <span className={styles.resultValue}>{formatNumber(resultado.tiempo, 2)}</span>
+                      <span className={styles.resultValue}>{cifra(resultado.tiempo)}</span>
                       <span className={styles.resultUnit}>s</span>
                     </div>
                   </>
@@ -301,27 +328,27 @@ export default function CalculadoraMovimientoPage() {
                   <>
                     <div className={styles.resultCard}>
                       <span className={styles.resultLabel}>Altura Máxima</span>
-                      <span className={styles.resultValue}>{formatNumber(resultado.alturaMaxima, 2)}</span>
+                      <span className={styles.resultValue}>{cifra(resultado.alturaMaxima)}</span>
                       <span className={styles.resultUnit}>m</span>
                     </div>
                     <div className={styles.resultCard}>
                       <span className={styles.resultLabel}>Alcance</span>
-                      <span className={styles.resultValue}>{formatNumber(resultado.alcance, 2)}</span>
+                      <span className={styles.resultValue}>{cifra(resultado.alcance)}</span>
                       <span className={styles.resultUnit}>m</span>
                     </div>
                     <div className={styles.resultCard}>
                       <span className={styles.resultLabel}>Tiempo de Vuelo</span>
-                      <span className={styles.resultValue}>{formatNumber(resultado.tiempoVuelo, 2)}</span>
+                      <span className={styles.resultValue}>{cifra(resultado.tiempoVuelo)}</span>
                       <span className={styles.resultUnit}>s</span>
                     </div>
                     <div className={styles.resultCard}>
                       <span className={styles.resultLabel}>Velocidad X</span>
-                      <span className={styles.resultValue}>{formatNumber(resultado.velocidadX, 2)}</span>
+                      <span className={styles.resultValue}>{cifra(resultado.velocidadX)}</span>
                       <span className={styles.resultUnit}>m/s</span>
                     </div>
                     <div className={styles.resultCard}>
                       <span className={styles.resultLabel}>Velocidad Y inicial</span>
-                      <span className={styles.resultValue}>{formatNumber(resultado.velocidadY, 2)}</span>
+                      <span className={styles.resultValue}>{cifra(resultado.velocidadY)}</span>
                       <span className={styles.resultUnit}>m/s</span>
                     </div>
                   </>
@@ -330,9 +357,9 @@ export default function CalculadoraMovimientoPage() {
 
               {resultado.tipo !== 'parabolico' && resultado.tParada !== null && resultado.xParada !== null && (
                 <p className={styles.notaParada}>
-                  Se detiene en t = {formatNumber(resultado.tParada, 2)} s, a {formatNumber(resultado.xParada, 2)} m
-                  del origen, y vuelve: la distancia recorrida ({formatNumber(resultado.distancia, 2)} m) es mayor
-                  que el desplazamiento ({formatNumber(resultado.desplazamiento, 2)} m).
+                  Se detiene en t = {cifra(resultado.tParada)} s, a {cifra(resultado.xParada)} m
+                  del origen, y vuelve: la distancia recorrida ({cifra(resultado.distancia)} m) es mayor
+                  que el desplazamiento ({cifra(resultado.desplazamiento)} m).
                 </p>
               )}
 
@@ -351,11 +378,7 @@ export default function CalculadoraMovimientoPage() {
           ) : (
             <div className={styles.placeholder}>
               <span className={styles.placeholderIcon} aria-hidden="true">📐</span>
-              <p>
-                {tipoMovimiento === 'parabolico'
-                  ? 'Introduce una velocidad mayor que 0 y un ángulo entre 0° y 90°'
-                  : 'Introduce la velocidad inicial y un tiempo mayor que 0'}
-              </p>
+              <p>{avisoSinCifra}</p>
             </div>
           )}
         </div>
@@ -547,7 +570,7 @@ export default function CalculadoraMovimientoPage() {
                 <span className={styles.escenarioIcon} aria-hidden="true">🎓</span>
                 <h4>Estudiante de preparatoria</h4>
               </div>
-              <p>En el examen de admisión universitaria, el <strong>MRUA</strong> y el <strong>tiro parabólico</strong> acumulan más del 60 % de los problemas de cinemática. El MRU suele aparecer como paso previo o condición inicial.</p>
+              <p>En los problemas de cinemática de un examen de admisión universitaria, el <strong>MRUA</strong> y el <strong>tiro parabólico</strong> piden más pasos, y el MRU suele aparecer como paso previo o condición inicial.</p>
               <div className={styles.escenarioExample}>
                 <strong>Ejemplo tipo examen:</strong> Un coche parte del reposo y acelera a 3 m/s² durante 8 s. ¿Qué distancia recorre? → d = ½·a·t² = ½·3·64 = <strong>96 m</strong>
               </div>
@@ -561,7 +584,7 @@ export default function CalculadoraMovimientoPage() {
               </div>
               <p>El <strong>tiro parabólico</strong> explica el vuelo de un balón. Con ángulo de 45° se maximiza el alcance horizontal. Reducir el ángulo aumenta la velocidad horizontal a costa de menos altura.</p>
               <div className={styles.escenarioExample}>
-                <strong>Ejemplo:</strong> Un jugador lanza a 15 m/s y 30°. Alcance = v₀²·sin(60°)/g = 225·0,866/9,81 ≈ <strong>19,87 m</strong>
+                <strong>Ejemplo:</strong> Un jugador lanza a 15 m/s y 30°. Alcance = v₀²·sin(60°)/g = 225·0,866/9,81 ≈ <strong>19,86 m</strong>
               </div>
               <p className={styles.escenarioTip}><span aria-hidden="true">💡</span> Tip: para un pase rasante, usa ángulos entre 15° y 25°.</p>
             </div>
@@ -573,7 +596,7 @@ export default function CalculadoraMovimientoPage() {
               </div>
               <p>La <strong>caída libre</strong> es el experimento más sencillo para medir g. Se suelta un objeto desde una altura conocida y se mide el tiempo con un cronómetro o sensor.</p>
               <div className={styles.escenarioExample}>
-                <strong>Verificar g:</strong> Sueltas una bola desde h = 1,5 m. Mides t = 0,553 s. → g = 2·h/t² = 2·1,5/0,306 ≈ <strong>9,80 m/s²</strong>
+                <strong>Verificar g:</strong> Sueltas una bola desde h = 1,5 m. Mides t = 0,553 s. → g = 2·h/t² = 2·1,5/0,553² = 3/0,305809 ≈ <strong>9,81 m/s²</strong> (sin redondear t² antes de dividir)
               </div>
               <p className={styles.escenarioTip}><span aria-hidden="true">💡</span> Tip: repite el experimento 5 veces y promedia para reducir error.</p>
             </div>
@@ -596,40 +619,15 @@ export default function CalculadoraMovimientoPage() {
         <section className={styles.guideSection}>
           <h2><span aria-hidden="true">❓</span> Preguntas Frecuentes sobre Cinemática</h2>
           <div className={styles.faqList}>
-            <div className={styles.faqItem}>
-              <h4>¿Cuál es la diferencia entre velocidad y aceleración?</h4>
-              <p>La <strong>velocidad</strong> indica cuánto espacio recorre un objeto por unidad de tiempo (m/s). La <strong>aceleración</strong> mide cuánto cambia esa velocidad por unidad de tiempo (m/s²). Un objeto puede ir muy rápido pero con aceleración cero (MRU), o estar casi parado pero acelerando rápidamente.</p>
-            </div>
-            <div className={styles.faqItem}>
-              <h4>¿Por qué el ángulo de 45° da el alcance máximo en tiro parabólico?</h4>
-              <p>El alcance es R = v₀²·sin(2θ)/g. La función sin(2θ) tiene su valor máximo (= 1) cuando 2θ = 90°, es decir, θ = 45°. Para ese ángulo, la velocidad se reparte igual entre componente horizontal y vertical, logrando el equilibrio óptimo entre distancia y altura.</p>
-              <p className={styles.faqTip}><span aria-hidden="true">📐</span> Nota: ángulos complementarios (30° y 60°) dan el mismo alcance pero distinta altura máxima.</p>
-            </div>
-            <div className={styles.faqItem}>
-              <h4>¿Qué pasa si la aceleración es negativa en MRUA?</h4>
-              <p>Una aceleración negativa (desaceleración o frenado) significa que el objeto pierde velocidad. Si la velocidad inicial es positiva y la aceleración negativa, el objeto se frena hasta detenerse (v = 0) y, si continúa la aceleración, invierte su movimiento. Ejemplo: un coche frenando a −5 m/s² desde 20 m/s se detiene en t = 20/5 = 4 s.</p>
-            </div>
-            <div className={styles.faqItem}>
-              <h4>¿La masa afecta a la caída libre? ¿Por qué?</h4>
-              <p>No, en caída libre ideal (sin resistencia del aire) todos los objetos caen igual independientemente de su masa. Galileo lo demostró: la fuerza gravitacional es F = m·g, pero también F = m·a, por lo que a = g para cualquier masa. En la realidad, la resistencia del aire sí diferencia objetos según su forma y densidad.</p>
-            </div>
-            <div className={styles.faqItem}>
-              <h4>¿Cómo se calcula la distancia de frenado de un coche a 120 km/h?</h4>
-              <p>Primero convierte: 120 km/h ÷ 3,6 = 33,33 m/s. Con una deceleración típica de −7 m/s²: d = v²/(2·|a|) = 33,33²/(2·7) = 1.110,9/14 ≈ <strong>79,4 m</strong>. A esto hay que sumar la distancia de reacción: d_reac = 33,33 × 0,7 s ≈ 23,3 m. Total: ≈ 102,7 m.</p>
-            </div>
-            <div className={styles.faqItem}>
-              <h4>¿En qué se diferencia la caída libre del tiro parabólico?</h4>
-              <p>En la <strong>caída libre</strong> el objeto solo tiene movimiento vertical (v₀ horizontal = 0). En el <strong>tiro parabólico</strong> hay además una velocidad horizontal inicial que se mantiene constante durante todo el vuelo. El resultado es una trayectoria curva (parábola) en lugar de una línea vertical.</p>
-            </div>
-            <div className={styles.faqItem}>
-              <h4>¿Cómo convierto km/h a m/s?</h4>
-              <p>Divide entre 3,6: m/s = km/h ÷ 3,6. La razón: 1 km = 1.000 m y 1 h = 3.600 s, por tanto 1 km/h = 1.000/3.600 m/s = 1/3,6 m/s. Ejemplos: 36 km/h → 10 m/s, 90 km/h → 25 m/s, 120 km/h → 33,33 m/s.</p>
-              <p className={styles.faqTip}><span aria-hidden="true">📐</span> Inverso: m/s × 3,6 = km/h.</p>
-            </div>
-            <div className={styles.faqItem}>
-              <h4>¿Qué errores son más frecuentes en los problemas de cinemática?</h4>
-              <p>Los cinco fallos más comunes son: (1) no convertir unidades al SI antes de calcular, (2) olvidar el signo negativo en desaceleraciones, (3) confundir distancia con desplazamiento en MRUA, (4) no descomponer la velocidad inicial en tiro parabólico, y (5) usar g = 10 cuando el enunciado no lo especifica.</p>
-            </div>
+            {PREGUNTAS_FRECUENTES.map((f) => (
+              <div key={f.question} className={styles.faqItem}>
+                <h4>{f.question}</h4>
+                <p>{f.answer}</p>
+                {f.nota && (
+                  <p className={styles.faqTip}><span aria-hidden="true">📐</span> {f.nota}</p>
+                )}
+              </div>
+            ))}
           </div>
         </section>
 
@@ -735,7 +733,7 @@ export default function CalculadoraMovimientoPage() {
             </div>
             <ul className={styles.warningList}>
               <li>
-                <strong>Confundir velocidad media con velocidad instantánea.</strong> La velocidad media es v_m = Δx/Δt para todo el trayecto; la instantánea es el valor en un instante concreto. En MRUA solo coinciden si el intervalo es infinitesimalmente pequeño.
+                <strong>Confundir velocidad media con velocidad instantánea.</strong> La velocidad media es v_m = Δx/Δt para todo el trayecto; la instantánea es el valor en un instante concreto. En el MRUA, la media de un intervalo es la instantánea en su punto medio: v_m = (v₀ + v)/2 = v(t/2), dure lo que dure el intervalo, y no coincide con la de ningún otro instante.
               </li>
               <li>
                 <strong>Olvidar que en tiro parabólico Vx es constante.</strong> La componente horizontal de la velocidad NO cambia durante el vuelo (no hay aceleración horizontal). Solo Vy varía por efecto de la gravedad.
@@ -744,7 +742,7 @@ export default function CalculadoraMovimientoPage() {
                 <strong>No descomponer la velocidad inicial en el tiro parabólico.</strong> Usar v₀ directamente en las ecuaciones verticales u horizontales es incorrecto. Siempre Vx = v₀·cos(θ) y Vy₀ = v₀·sin(θ).
               </li>
               <li>
-                <strong>Usar g = 10 sin que el enunciado lo indique.</strong> El valor oficial es g = 9,81 m/s². Usar 10 puede introducir errores de hasta un 2 % que se penalizan. Solo usa g = 10 si el enunciado lo autoriza explícitamente.
+                <strong>Usar g = 10 sin que el enunciado lo indique.</strong> La app usa g = 9,81 m/s², el valor redondeado habitual. Usar 10 puede introducir errores de hasta un 2 % que se penalizan. Solo usa g = 10 si el enunciado lo autoriza explícitamente.
               </li>
               <li>
                 <strong>Confundir distancia recorrida con desplazamiento en MRUA.</strong> Si un objeto frena, para y retrocede, la distancia total recorrida es mayor que el desplazamiento neto. La fórmula d = v₀·t + ½·a·t² da el desplazamiento, no la distancia total.

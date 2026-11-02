@@ -160,7 +160,8 @@ test('un tiempo no válido no deja simulador colgado', async ({ page }) => {
  *     «Verlo en la calculadora» del caso 6: MRUA 30 / −6 / 8 → se para en t = 30/6 = 5 s a
  *       30·5 − 3·25 = 75 m · x(8) = 240 − 192 = 48 m · distancia 75 + 27 = 102 m · v = −18 m/s
  *
- *   HALLAZGOS que quedan ABIERTOS (test.fail(): pasan a fallar el día que se reparen)
+ *   HALLAZGOS 3945-3955, REPARADOS en /reparar del 02/11/2026 (sus tests ya no llevan test.fail();
+ *   el título dice lo que pasaba antes)
  *     · Se para JUSTO en t con decimales (0,6 m/s, −0,2 m/s², 3 s) y la app dice que vuelve.
  *     · El empate a la milésima se redondea según caiga la coma flotante: 44,145 → 44,14.
  *     · La guía dice «≈ 19,87 m» para el balón a 15 m/s y 30°; la propia app calcula 19,86.
@@ -332,15 +333,14 @@ test.describe('Inspector 02/11/2026 · casos resueltos a mano', () => {
   });
 });
 
-test.describe('Inspector 02/11/2026 · hallazgos abiertos', () => {
-  test('HALLAZGO (02/11/2026, ABIERTO) · se para justo en t = 3 s (0,6 m/s con −0,2 m/s²) y la app dice que «vuelve»', async ({ page }) => {
+test.describe('Inspector 02/11/2026 · hallazgos reparados', () => {
+  test('HALLAZGO (02/11/2026, REPARADO el mismo día) · antes,se para justo en t = 3 s (0,6 m/s con −0,2 m/s²) y la app dice que «vuelve»', async ({ page }) => {
     // t_parada = 0,6/0,2 = 3 s = t: no hay vuelta (motor.ts lo dice en distanciaRecorrida: «Si se
     // para EXACTAMENTE en t, no hay vuelta que sumar»). Pero en coma flotante −0,6/−0,2 =
     // 2,9999999999999996 < 3, así que resolverRectilineo marca la parada «dentro» y la página dice
     // «Se detiene en t = 3,00 s, a 0,90 m del origen, y vuelve: la distancia recorrida (0,90 m) es
     // mayor que el desplazamiento (0,90 m)»; el simulador, «después se mueve en sentido contrario».
     // La tarjeta «Velocidad final» sale «≈0» en vez de 0,00.
-    test.fail();
     await page.getByRole('button', { name: /MRUA/ }).click();
     await rellenar(page, 'mov-v0', '0,6');
     await rellenar(page, 'mov-a', '-0,2');
@@ -352,12 +352,11 @@ test.describe('Inspector 02/11/2026 · hallazgos abiertos', () => {
     expect(await tarjeta(page, 'Velocidad final').textContent()).toBe('0,00');
   });
 
-  test('HALLAZGO (02/11/2026, ABIERTO) · caída desde el reposo 3 s: y = 44,145 m sale 44,14 (y 4,905 sale 4,91)', async ({ page }) => {
+  test('HALLAZGO (02/11/2026, REPARADO el mismo día) · antes,caída desde el reposo 3 s: y = 44,145 m sale 44,14 (y 4,905 sale 4,91)', async ({ page }) => {
     // y = ½·9,81·3² = 44,145 m exactos. formatNumber redondea con el 5 hacia arriba (4,905 → 4,91,
     // 122,625 → 122,63: el CASO 2 de arriba), pero aquí recibe 44,14499… de la coma flotante y da
     // 44,14. Igual en el ejemplo «🏀 Lanzado hacia arriba» (v₀ = −10, t = 3): y = −30 + 44,145 =
     // 14,145 → la app 14,14. El mismo empate se redondea hacia un lado u otro según el binario.
-    test.fail();
     await page.getByRole('button', { name: /Caída/ }).click();
     await rellenar(page, 'mov-v0', '0');
     await rellenar(page, 'mov-t', '3');
@@ -369,18 +368,16 @@ test.describe('Inspector 02/11/2026 · hallazgos abiertos', () => {
     expect(await tarjeta(page, 'Desplazamiento vertical \\(y\\)').textContent()).toBe('14,15');
   });
 
-  test('HALLAZGO (02/11/2026, ABIERTO) · la guía da «≈ 19,87 m» al balón de 15 m/s y 30°, y la app calcula 19,86', async ({ page }) => {
+  test('HALLAZGO (02/11/2026, REPARADO el mismo día) · antes,la guía da «≈ 19,87 m» al balón de 15 m/s y 30°, y la app calcula 19,86', async ({ page }) => {
     // 225·sen 60°/9,81 = 194,856/9,81 = 19,863 → 19,86 (el CASO 1 de arriba lo comprueba en la
     // tarjeta «Alcance»). Con el 0,866 que escribe la propia guía: 194,85/9,81 = 19,862 → 19,86.
-    test.fail();
     expect(await textoGuia(page)).not.toContain('19,87');
   });
 
-  test('HALLAZGO (02/11/2026, ABIERTO) · dos FAQPage en la página, y la FAQ visible escrita dos veces', async ({ page }) => {
+  test('HALLAZGO (02/11/2026, REPARADO el mismo día) · antes,dos FAQPage en la página, y la FAQ visible escrita dos veces', async ({ page }) => {
     // metadata.ts monta un FAQPage de 8 preguntas dentro del @graph de `jsonLd` (las mismas de la FAQ
     // visible de page.tsx, copiadas, sin las notas «ángulos complementarios» ni «Inverso: m/s × 3,6»)
     // y otro de 5 en `faqJsonLd`. Esperado: uno solo, con la FAQ visible en una constante.
-    test.fail();
     let faqs = 0;
     const contar = (nodo: unknown): void => {
       if (Array.isArray(nodo)) return nodo.forEach(contar);
@@ -396,55 +393,48 @@ test.describe('Inspector 02/11/2026 · hallazgos abiertos', () => {
     expect(faqs).toBe(1);
   });
 
-  test('HALLAZGO (02/11/2026, ABIERTO) · el FAQPage calcula la caída con g = 9,8 y la guía llama «valor oficial» a 9,81', async ({ page }) => {
+  test('HALLAZGO (02/11/2026, REPARADO el mismo día) · antes,el FAQPage calcula la caída con g = 9,8 y la guía llama «valor oficial» a 9,81', async ({ page }) => {
     // La app calcula con g = 9,81 (motor.ts) y lo declara en el recuadro de la caída libre; el
     // FAQPage dice «g = 9,8 m/s²» y la guía, «El valor oficial es g = 9,81 m/s²», sin fuente.
-    test.fail();
     expect(await textoJsonLd(page)).not.toContain('g = 9,8 m/s²');
     expect(await textoGuia(page)).not.toContain('El valor oficial es g = 9,81');
   });
 
-  test('HALLAZGO (02/11/2026, ABIERTO) · «más del 60 % de los problemas de cinemática», sin fuente', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO (02/11/2026, REPARADO el mismo día) · antes,«más del 60 % de los problemas de cinemática», sin fuente', async ({ page }) => {
     expect(await textoGuia(page)).not.toMatch(/más del 60\s%/);
   });
 
-  test('HALLAZGO (02/11/2026, ABIERTO) · «Galileo lo demostró» con F = m·a, que es la segunda ley de Newton', async ({ page }) => {
+  test('HALLAZGO (02/11/2026, REPARADO el mismo día) · antes,«Galileo lo demostró» con F = m·a, que es la segunda ley de Newton', async ({ page }) => {
     // Galileo murió en 1642; F = m·a es de los Principia de Newton (1687). La respuesta está en la
     // FAQ visible y en el FAQPage del @graph.
-    test.fail();
     expect(await textoGuia(page)).not.toMatch(/Galileo lo demostró: la fuerza gravitacional es F = m·g, pero también F = m·a/);
   });
 
-  test('HALLAZGO (02/11/2026, ABIERTO) · «en MRUA solo coinciden si el intervalo es infinitesimalmente pequeño»', async ({ page }) => {
+  test('HALLAZGO (02/11/2026, REPARADO el mismo día) · antes,«en MRUA solo coinciden si el intervalo es infinitesimalmente pequeño»', async ({ page }) => {
     // En el MRUA la velocidad media de un intervalo es la instantánea en su punto medio, para
     // cualquier duración: de 0 a 4 s con a = 3, 24 m / 4 s = 6 m/s = v(2 s) (CASO 1 de arriba,
     // medido con el deslizador de la propia app).
-    test.fail();
     expect(await textoGuia(page)).not.toContain('solo coinciden si el intervalo es infinitesimalmente pequeño');
   });
 
-  test('HALLAZGO (02/11/2026, ABIERTO) · og:description promete el móvil animado también en el tiro parabólico', async ({ page }) => {
+  test('HALLAZGO (02/11/2026, REPARADO el mismo día) · antes,og:description promete el móvil animado también en el tiro parabólico', async ({ page }) => {
     // «MRU, MRUA, caída libre y tiro parabólico con el móvil animado y las gráficas x-t, v-t y a-t
     // sincronizadas». El parabólico no tiene simulador: enlaza a /simulador-proyectiles/ (test de
     // arriba «tiro parabólico: sin simulador propio»).
-    test.fail();
     const og = (await page.locator('meta[property="og:description"]').getAttribute('content')) ?? '';
     expect(og).not.toMatch(/tiro parabólico con el móvil animado/);
   });
 
-  test('HALLAZGO (02/11/2026, ABIERTO) · MRUA con la aceleración vacía: el aviso pide la velocidad y el tiempo, ya puestos', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO (02/11/2026, REPARADO el mismo día) · antes,MRUA con la aceleración vacía: el aviso pide la velocidad y el tiempo, ya puestos', async ({ page }) => {
     await page.getByRole('button', { name: /MRUA/ }).click();
     await rellenar(page, 'mov-a', '');
     await expect(page.locator('[class*="resultCard"]')).toHaveCount(0);
     expect((await avisoSinCifra(page).textContent()) ?? '').toMatch(/aceleración/i);
   });
 
-  test('HALLAZGO (02/11/2026, ABIERTO) · el emoji de cada Ejemplo Rápido entra en el nombre accesible del botón', async ({ page }) => {
+  test('HALLAZGO (02/11/2026, REPARADO el mismo día) · antes,el emoji de cada Ejemplo Rápido entra en el nombre accesible del botón', async ({ page }) => {
     // `{ej.nombre}` pinta «⚽ Pelota lanzada» como texto suelto: el lector dice «balón de fútbol,
     // Pelota lanzada». Regla del CLAUDE.md §5: el emoji junto a texto, en <span aria-hidden="true">.
-    test.fail();
     expect(await page.getByRole('button', { name: 'Pelota lanzada', exact: true }).count()).toBe(1);
     expect(await page.getByRole('button', { name: 'Lanzado hacia arriba', exact: true }).count()).toBe(1);
   });
