@@ -63,7 +63,7 @@ function ordenDelDia() {
 
   const nAltos = altos.reduce((s, a) => s + a.n, 0);
   const deAltos = `${nAltos} alto${nAltos === 1 ? '' : 's'} abierto${nAltos === 1 ? '' : 's'}: ${altos.slice(0, 3).map((a) => a.slug).join(', ')}${altos.length > 3 ? '…' : ''}`;
-  const deCabos = `${cabos} cabos técnicos; ${crecen ? 'la bandeja crece' : 'se vacían'}: ${entran} → ${salen} en 7 días`;
+  const deCabos = `${cabos} cabos técnicos; ${crecen ? 'la bandeja crece' : 'se vacían'}: en 7 días entran ${entran} y salen ${salen}`;
   const deMenores = menores ? `${menores} bajos y medios abiertos pueden esperar` : null;
 
   const pasos = [];
