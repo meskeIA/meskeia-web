@@ -59,7 +59,7 @@
  */
 
 import { formatNumber } from '@/lib';
-import { corregirNumero, redondearA, toleranciaRelativa, type Magnitud } from '@/lib/calculadoras/correctorCasosAula';
+import { corregirNumero, exigeRedondeo, redondearA, toleranciaRelativa, type Magnitud } from '@/lib/calculadoras/correctorCasosAula';
 
 // ============================================================
 // TIPOS
@@ -574,6 +574,11 @@ export function toleranciaDe(valorEsperado: number): number {
  * Compara lo tecleado con lo esperado. Lo que no es un número NO se corrige: se
  * distingue con el motivo `no-numerico`, para que la vista pueda decirlo con sus
  * palabras en vez de escribir «NaN» en pantalla.
+ *
+ * Una respuesta EXACTA a dos decimales no tiene margen (cabo C0267, 02/11/2026): el suelo de
+ * 0,01 aprobaba 0,49 para sen 30° = 0,5, −0,99 para cos 180° y 1,01 para tan 45°, que no son
+ * redondeo de nada. La irracional (0,7071, 0,8660…) conserva `toleranciaDe`: 0,71 por √2/2 es
+ * de libro y los enunciados no piden decimales. Regla de bfccafa5 y 51d7c223.
  */
 export function comprobarRespuesta(
   valorUsuario: number,
@@ -584,7 +589,8 @@ export function comprobarRespuesta(
   if (!Number.isFinite(valorEsperado)) {
     return { correcto: false, motivo: 'no-numerico', diferencia: NaN, tolerancia: toleranciaDe(valorEsperado) };
   }
-  const c = corregirNumero(valorUsuario, valorEsperado, { tolerancia: toleranciaDe(valorEsperado), magnitud });
+  const margen = exigeRedondeo(valorEsperado, 2, redondear) ? toleranciaDe(valorEsperado) : 0;
+  const c = corregirNumero(valorUsuario, valorEsperado, { tolerancia: margen, magnitud });
   const { diferencia, tolerancia } = c;
   if (c.estado === 'no-numerico') return { correcto: false, motivo: 'no-numerico', diferencia, tolerancia };
   if (c.motivoImposible) return { correcto: false, motivo: 'fallado', diferencia, tolerancia, aviso: c.motivoImposible };

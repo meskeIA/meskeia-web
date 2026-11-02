@@ -768,6 +768,26 @@ test.describe('Simulador del Círculo Trigonométrico · casos para clase', () =
     expect(comprobarRespuesta(Number.NaN, 0.5, 'seno-coseno').correcto).toBe(false);
     expect(comprobarRespuesta(Number.NaN, 0.5, 'seno-coseno').motivo).toBe('no-numerico');
   });
+
+  test('C0267: una respuesta exacta no tiene margen; la irracional conserva el 1 % con suelo de 0,01', () => {
+    const v = (angulo: number, magnitud: 'seno' | 'coseno' | 'tangente' | 'angulo-referencia') =>
+      resolverCaso({ angulo, magnitud }).valor;
+    // Exactas: sen 30° = 0,5 · cos 180° = −1 · tan 45° = 1 · referencia de 150° = 30°. Con el
+    // suelo de 0,01 aprobaban 0,49, −0,99, 1,01 y 29,7, que no son redondeo de nada.
+    expect(comprobarRespuesta(0.49, v(30, 'seno'), 'seno-coseno').correcto).toBe(false);
+    expect(comprobarRespuesta(-0.99, v(180, 'coseno'), 'seno-coseno').correcto).toBe(false);
+    expect(comprobarRespuesta(1.01, v(45, 'tangente'), 'real').correcto).toBe(false);
+    expect(comprobarRespuesta(29.7, v(150, 'angulo-referencia'), 'real').correcto).toBe(false);
+    expect(comprobarRespuesta(0.5, v(30, 'seno'), 'seno-coseno').correcto).toBe(true);
+    // Irracional: sen 45° = 0,7071 → 0,71 y 0,7 entran (suelo 0,01).
+    expect(comprobarRespuesta(0.71, v(45, 'seno'), 'seno-coseno').correcto).toBe(true);
+    expect(comprobarRespuesta(0.7, v(45, 'seno'), 'seno-coseno').correcto).toBe(true);
+    // La práctica: la clave a dos decimales aprueba en 500 ejercicios.
+    for (let s = 1; s <= 500; s++) {
+      const e = generarEjercicioAleatorio(s);
+      expect(comprobarRespuesta(redondear(e.respuesta, 2), e.respuesta, magnitudDe(e.datos)).correcto, `semilla ${s}`).toBe(true);
+    }
+  });
 });
 
 // ═════════════════════════════════════════════════════════════════════════════════════════
