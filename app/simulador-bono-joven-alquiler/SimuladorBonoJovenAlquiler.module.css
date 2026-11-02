@@ -154,14 +154,17 @@
   text-align: left;
   color: var(--text-primary);
   width: 100%;
+  flex-wrap: wrap;
 }
 .checkCard:hover { border-color: var(--primary); }
 .checkCardOk { border-color: var(--color-ok); background: rgba(16,185,129,0.07); }
 .checkCardFail { border-color: var(--color-fail); background: rgba(239,68,68,0.07); }
 
 .checkEstado { font-size: 1.1rem; flex-shrink: 0; margin-top: 0.1rem; }
-/* min-width: 0 deja que el texto se parta: sin él, el Sí/No salía 2 px por la derecha a 390 px (cabo C0425) */
-.checkInfo { flex: 1; min-width: 0; overflow-wrap: break-word; }
+/* El texto reserva 12rem y lo que no cabe a su lado (distintivo y Sí/No) baja de línea con el
+   flex-wrap de la tarjeta. Con base 0 (`flex: 1` y `min-width: 0`, cabo C0425) el texto era lo
+   único que encogía y a 390 px se quedaba en 0 px, una letra por línea (hallazgo 3893) */
+.checkInfo { flex: 1 1 12rem; min-width: 0; overflow-wrap: break-word; }
 .checkPregunta { font-size: 0.9rem; font-weight: 600; margin: 0 0 0.2rem; line-height: 1.4; }
 .checkExplicacion { font-size: 0.8rem; color: var(--text-secondary); margin: 0; line-height: 1.4; }
 

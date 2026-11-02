@@ -2772,7 +2772,8 @@ test.describe('Inspector 01/11/2026 — móvil (390 px)', () => {
     expect(anchos.scroll).toBeLessThanOrEqual(anchos.cliente);
   });
 
-  // H30 (CRÍTICO) — ABIERTO. Regresión de 2487ae59 (25/10/2026, cabo C0425). Para que el Sí/No
+  // H30 (CRÍTICO) — REPARADO el 02/11/2026: `.checkInfo` reserva 12rem (`flex: 1 1 12rem`) y la
+  // tarjeta hace `flex-wrap`, así que el distintivo y el Sí/No bajan de línea. Regresión de 2487ae59 (25/10/2026, cabo C0425). Para que el Sí/No
   // no saliera 2 px por la derecha, `.checkInfo` pasó a `min-width: 0` con `flex: 1` (base 0),
   // junto a un distintivo IMPRESCINDIBLE y un grupo Sí/No que no encogen: a 360, 390 y 412 px
   // la columna de la pregunta y su explicación mide 0 px en 9 de las 10 tarjetas y el texto se
@@ -2786,7 +2787,6 @@ test.describe('Inspector 01/11/2026 — móvil (390 px)', () => {
   // de línea; con 150 px la primera pregunta, de 59 caracteres, cabe en 4 líneas) · obtenido:
   // 0 px en las nueve tarjetas con distintivo y la primera pregunta en 49 líneas.
   test('H30 — a 390 px la pregunta y su explicación deberían leerse: la columna de texto de cada tarjeta no puede medir 0 px', async ({ page }) => {
-    test.fail(); // H30 ABIERTO a 01/11/2026
     await abrirHidratado(page);
     const medidas = await page.evaluate(() => {
       const pregunta = document.querySelector('[class*="checkPregunta"]') as HTMLElement;
@@ -2802,5 +2802,19 @@ test.describe('Inspector 01/11/2026 — móvil (390 px)', () => {
     expect(medidas.columnas).toHaveLength(10);
     for (const ancho of medidas.columnas) expect(ancho).toBeGreaterThanOrEqual(150);
     expect(medidas.lineasPrimera).toBeLessThanOrEqual(4);
+
+    // Igual a 360 y 412 px (el caso de la ficha), y sin desborde horizontal (C0425)
+    for (const ancho of [360, 412]) {
+      await page.setViewportSize({ width: ancho, height: 844 });
+      const otra = await page.evaluate(() => ({
+        columnas: Array.from(document.querySelectorAll('[class*="checkInfo"]')).map((e) =>
+          Math.round(e.getBoundingClientRect().width),
+        ),
+        scroll: document.documentElement.scrollWidth,
+        cliente: document.documentElement.clientWidth,
+      }));
+      for (const c of otra.columnas) expect(c).toBeGreaterThanOrEqual(150);
+      expect(otra.scroll).toBeLessThanOrEqual(otra.cliente);
+    }
   });
 });
