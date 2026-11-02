@@ -270,6 +270,42 @@
   opacity: 0.8;
 }
 
+/* Entrada de audio */
+.entradaAudio {
+  margin: 25px auto 0;
+  max-width: 420px;
+  text-align: left;
+}
+
+.entradaLabel {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+
+.entradaSelect {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.entradaSelect:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.entradaAyuda {
+  margin: 8px 0 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
 /* Secciones */
 .section {
   background: var(--bg-card);

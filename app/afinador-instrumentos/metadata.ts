@@ -42,6 +42,7 @@ export const jsonLd = generateWebAppSchema({
   category: 'EducationalApplication',
   features: [
     'Afinador cromático por micrófono con desviación en cents',
+    'Selector de entrada de audio: el micrófono o una interfaz con el instrumento conectado por cable',
     'Afinaciones al aire de guitarra, bajo, violín, viola, ukelele, bandurria, laúd español y vihuela mexicana',
     'Instrumentos de viento: trompeta, clarinete, saxo alto, saxo tenor, flauta y trombón',
     'Traducción de la nota que suena a la nota escrita en instrumentos transpositores',

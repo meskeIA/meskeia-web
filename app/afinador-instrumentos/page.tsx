@@ -27,6 +27,25 @@ const FAMILIAS: { id: FamiliaInstrumento; titulo: string; icono: string }[] = [
   { id: 'tecla', titulo: 'Tecla', icono: '🎹' },
 ];
 
+interface EntradaAudio {
+  id: string;
+  nombre: string;
+}
+
+// Sin el procesado de voz del navegador: la supresión de ruido toma una nota sostenida por
+// ruido de fondo y la apaga (cabo C0581, medido el 02/11/2026 con el micrófono simulado de
+// Chromium: un La3 constante cae de 0,12 a 0,025 de amplitud en dos segundos, y por debajo
+// de 0,01 el afinador da la señal por muda). Con una interfaz de audio, además, lo que entra
+// es el instrumento por cable: no hay voz ni eco que limpiar.
+function restriccionesAudio(entradaId: string): MediaTrackConstraints {
+  return {
+    ...(entradaId ? { deviceId: { exact: entradaId } } : {}),
+    echoCancellation: false,
+    noiseSuppression: false,
+    autoGainControl: false,
+  };
+}
+
 // Algoritmo de autocorrelación para detectar pitch
 function autoCorrelate(buffer: Float32Array, sampleRate: number): number {
   const SIZE = buffer.length;
@@ -80,6 +99,9 @@ export default function AfinadorInstrumentosPage() {
   const [instrumentoId, setInstrumentoId] = useState(AFINACIONES[0].id);
   const [a4Referencia, setA4Referencia] = useState(440);
   const [permisoMicrofono, setPermisoMicrofono] = useState<'granted' | 'denied' | 'prompt'>('prompt');
+  // '' = la entrada predeterminada del sistema
+  const [entradas, setEntradas] = useState<EntradaAudio[]>([]);
+  const [entradaId, setEntradaId] = useState('');
 
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
@@ -107,11 +129,46 @@ export default function AfinadorInstrumentosPage() {
     animationRef.current = requestAnimationFrame(detectarPitch);
   }, [a4Referencia]);
 
-  const iniciarEscucha = async () => {
+  // Los nombres de los dispositivos solo llegan con el permiso concedido: antes de eso el
+  // navegador devuelve entradas sin id ni nombre, y el selector no se pinta.
+  const actualizarEntradas = useCallback(async () => {
+    if (!navigator.mediaDevices?.enumerateDevices) return;
+    const dispositivos = await navigator.mediaDevices.enumerateDevices();
+    // Chrome añade en Windows dos alias, «default» y «communications», que repiten un
+    // dispositivo real: la primera opción del selector ya es la predeterminada del sistema.
+    const lista = dispositivos
+      .filter((d) => d.kind === 'audioinput' && d.deviceId && d.deviceId !== 'default' && d.deviceId !== 'communications')
+      .map((d, i) => ({ id: d.deviceId, nombre: d.label || `Entrada ${i + 1}` }));
+    setEntradas(lista);
+    setEntradaId((actual) => (actual && !lista.some((e) => e.id === actual) ? '' : actual));
+  }, []);
+
+  // Enchufar o quitar una interfaz con la página abierta la añade o la quita de la lista
+  useEffect(() => {
+    const dispositivos = navigator.mediaDevices;
+    if (!dispositivos?.addEventListener) return;
+    const alCambiar = () => {
+      void actualizarEntradas();
+    };
+    dispositivos.addEventListener('devicechange', alCambiar);
+    return () => dispositivos.removeEventListener('devicechange', alCambiar);
+  }, [actualizarEntradas]);
+
+  const iniciarEscucha = async (entrada: string = entradaId) => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      let stream: MediaStream;
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ audio: restriccionesAudio(entrada) });
+      } catch (error) {
+        // La entrada elegida ya no está (se desenchufó): se vuelve a la predeterminada
+        if (!entrada || (error instanceof DOMException && error.name === 'NotAllowedError')) throw error;
+        setEntradaId('');
+        stream = await navigator.mediaDevices.getUserMedia({ audio: restriccionesAudio('') });
+      }
       mediaStreamRef.current = stream;
       setPermisoMicrofono('granted');
+      // Si se desenchufa la entrada mientras escucha, su pista termina: se para limpio
+      stream.getAudioTracks()[0]?.addEventListener('ended', () => detenerEscucha());
 
       audioContextRef.current = new (window.AudioContext || (window as typeof window & { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
       analyserRef.current = audioContextRef.current.createAnalyser();
@@ -124,6 +181,7 @@ export default function AfinadorInstrumentosPage() {
 
       setEscuchando(true);
       detectarPitch();
+      void actualizarEntradas();
     } catch (error) {
       console.error('Error al acceder al micrófono:', error);
       setPermisoMicrofono('denied');
@@ -143,6 +201,15 @@ export default function AfinadorInstrumentosPage() {
     setEscuchando(false);
     setFrecuenciaDetectada(null);
     setNotaActual(null);
+  };
+
+  // Cambiar de entrada con el afinador en marcha lo reabre con la nueva, sin pulsar nada más
+  const cambiarEntrada = (id: string) => {
+    setEntradaId(id);
+    if (escuchando) {
+      detenerEscucha();
+      void iniciarEscucha(id);
+    }
   };
 
   useEffect(() => {
@@ -275,12 +342,34 @@ export default function AfinadorInstrumentosPage() {
           <button
             type="button"
             className={`${styles.btnEscuchar} ${escuchando ? styles.activo : ''}`}
-            onClick={escuchando ? detenerEscucha : iniciarEscucha}
+            onClick={escuchando ? detenerEscucha : () => iniciarEscucha()}
             aria-pressed={escuchando}
           >
             <span className={styles.btnIcono} aria-hidden="true">{escuchando ? '🎤' : '🎙️'}</span>
             <span>{escuchando ? 'Detener' : 'Iniciar afinador'}</span>
           </button>
+        )}
+
+        {/* Entrada de audio: el micrófono o una interfaz con el instrumento conectado por cable */}
+        {permisoMicrofono === 'granted' && entradas.length > 0 && (
+          <div className={styles.entradaAudio}>
+            <label htmlFor="entrada-audio" className={styles.entradaLabel}>Entrada de audio</label>
+            <select
+              id="entrada-audio"
+              className={styles.entradaSelect}
+              value={entradaId}
+              onChange={(e) => cambiarEntrada(e.target.value)}
+            >
+              <option value="">La predeterminada del sistema</option>
+              {entradas.map((entrada) => (
+                <option key={entrada.id} value={entrada.id}>{entrada.nombre}</option>
+              ))}
+            </select>
+            <p className={styles.entradaAyuda}>
+              ¿Tienes una interfaz de audio? Conecta el instrumento por cable y elígela aquí:
+              aparece en la lista en cuanto la enchufas.
+            </p>
+          </div>
         )}
       </div>
 
@@ -709,8 +798,8 @@ export default function AfinadorInstrumentosPage() {
             <p>Siempre repasa todas las cuerdas al final. La tensión añadida al afinar las cuerdas agudas puede afectar ligeramente a las graves. Una segunda pasada garantiza la precisión.</p>
           </div>
           <div className={styles.tipCard}>
-            <h3><span aria-hidden="true">📱</span> Usa interfaz de audio si tienes</h3>
-            <p>Una interfaz de audio (Focusrite Scarlett, Behringer UM2) conectada por cable ofrece detección mucho más limpia y precisa que el micrófono interno del portátil o móvil.</p>
+            <h3><span aria-hidden="true">🎛️</span> Conecta el instrumento por cable</h3>
+            <p>Con una interfaz de audio, el afinador escucha solo el instrumento y no el ruido de la sala, y la detección es mucho más limpia que con el micrófono del portátil o del móvil. Tras pulsar «Iniciar afinador», elige la interfaz en el selector «Entrada de audio» que aparece bajo el botón.</p>
           </div>
         </div>
 

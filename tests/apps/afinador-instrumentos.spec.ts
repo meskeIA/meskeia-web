@@ -159,6 +159,115 @@ test.describe('Lo que la página promete', () => {
 });
 
 /**
+ * Entrada de audio (S0245, 02/11/2026): la primera app de meskeIA que deja conectar un
+ * instrumento externo. Con el permiso concedido aparece un selector con las entradas del
+ * equipo; elegir una interfaz reabre el afinador con ese dispositivo sin pararlo, y enchufar
+ * una con la página abierta la añade a la lista.
+ *
+ * Y el procesado de voz del navegador, apagado (cabo C0581): con `audio: true` la supresión
+ * de ruido apagaba la nota sostenida —medido con el micrófono simulado de Chromium, un La3
+ * constante caía de 0,12 a 0,025 de amplitud en dos segundos—. Aquí se comprueba lo que la
+ * app PIDE al navegador, que es lo que puede volver atrás sin que nada lo vea.
+ *
+ * Los dispositivos son falsos: dos entradas, más los alias «default» y «communications» que
+ * Chrome añade en Windows y que el selector no debe repetir.
+ */
+test.describe('Entrada de audio', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => {
+      const w = window as unknown as {
+        __pedidas: MediaTrackConstraints[];
+        __enchufar: () => void;
+      };
+      w.__pedidas = [];
+      const dispositivos = [
+        { deviceId: 'default', kind: 'audioinput', label: 'Predeterminado - Micrófono interno', groupId: 'g1' },
+        { deviceId: 'communications', kind: 'audioinput', label: 'Comunicaciones - Micrófono interno', groupId: 'g1' },
+        { deviceId: 'mic-interno', kind: 'audioinput', label: 'Micrófono interno', groupId: 'g1' },
+        { deviceId: 'interfaz-usb', kind: 'audioinput', label: 'Interfaz de audio USB', groupId: 'g2' },
+        { deviceId: 'altavoz', kind: 'audiooutput', label: 'Altavoces', groupId: 'g3' },
+      ];
+      navigator.mediaDevices.enumerateDevices = async () => dispositivos.map((d) => ({ ...d, toJSON: () => d }) as MediaDeviceInfo);
+      navigator.mediaDevices.getUserMedia = async (r) => {
+        w.__pedidas.push((r?.audio ?? {}) as MediaTrackConstraints);
+        const ctx = new AudioContext();
+        const osc = ctx.createOscillator();
+        osc.frequency.value = 440;
+        const destino = ctx.createMediaStreamDestination();
+        osc.connect(destino);
+        osc.start();
+        return destino.stream;
+      };
+      w.__enchufar = () => {
+        dispositivos.push({ deviceId: 'grabadora-usb', kind: 'audioinput', label: 'Grabadora USB', groupId: 'g4' });
+        navigator.mediaDevices.dispatchEvent(new Event('devicechange'));
+      };
+    });
+  });
+
+  const pedidas = (page: Page) =>
+    page.evaluate(() => (window as unknown as { __pedidas: MediaTrackConstraints[] }).__pedidas);
+
+  test('no hay selector hasta conceder el micrófono', async ({ page }) => {
+    await page.goto(RUTA);
+    await seleccionarInstrumento(page, 'Guitarra estándar');
+    await expect(page.getByLabel('Entrada de audio')).toHaveCount(0);
+  });
+
+  test('abre el micrófono sin el procesado de voz del navegador', async ({ page }) => {
+    await page.goto(RUTA);
+    await seleccionarInstrumento(page, 'Guitarra estándar');
+    await page.getByRole('button', { name: /Iniciar afinador/i }).click();
+    await expect(page.getByRole('button', { name: /Detener/i })).toBeVisible();
+
+    const [primera] = await pedidas(page);
+    expect(primera).toMatchObject({ echoCancellation: false, noiseSuppression: false, autoGainControl: false });
+    expect(primera.deviceId).toBeUndefined(); // la predeterminada del sistema
+    await expect(page.locator('[class*="notaNombre"]')).toHaveText('La');
+  });
+
+  test('lista las entradas sin repetir los alias de Windows ni las salidas', async ({ page }) => {
+    await page.goto(RUTA);
+    await seleccionarInstrumento(page, 'Guitarra estándar');
+    await page.getByRole('button', { name: /Iniciar afinador/i }).click();
+
+    const selector = page.getByLabel('Entrada de audio');
+    await expect(selector.locator('option')).toHaveText([
+      'La predeterminada del sistema',
+      'Micrófono interno',
+      'Interfaz de audio USB',
+    ]);
+    await expect(selector).toHaveValue('');
+  });
+
+  test('elegir la interfaz reabre el afinador con ella, sin pararlo', async ({ page }) => {
+    await page.goto(RUTA);
+    await seleccionarInstrumento(page, 'Guitarra estándar');
+    await page.getByRole('button', { name: /Iniciar afinador/i }).click();
+
+    await page.getByLabel('Entrada de audio').selectOption('interfaz-usb');
+    await expect.poll(async () => (await pedidas(page)).length).toBe(2);
+    const segunda = (await pedidas(page))[1];
+    expect(segunda).toMatchObject({ deviceId: { exact: 'interfaz-usb' }, noiseSuppression: false });
+
+    await expect(page.getByRole('button', { name: /Detener/i })).toBeVisible();
+    await expect(page.locator('[class*="notaNombre"]')).toHaveText('La');
+  });
+
+  test('enchufar una entrada con la página abierta la añade a la lista', async ({ page }) => {
+    await page.goto(RUTA);
+    await seleccionarInstrumento(page, 'Guitarra estándar');
+    await page.getByRole('button', { name: /Iniciar afinador/i }).click();
+    const selector = page.getByLabel('Entrada de audio');
+    await expect(selector.locator('option')).toHaveCount(3);
+
+    await page.evaluate(() => (window as unknown as { __enchufar: () => void }).__enchufar());
+    await expect(selector.locator('option')).toHaveCount(4);
+    await expect(selector.locator('option').last()).toHaveText('Grabadora USB');
+  });
+});
+
+/**
  * Página traducida por el navegador (cabo C0233, 13/10/2026). El dump de errores reunía en
  * esta app 4 NotFoundError: el aviso «Subir / Bajar tensión / Afinado» eran tres textos
  * condicionales sueltos, hermanos en el mismo <div>. Un traductor sustituye cada nodo de
