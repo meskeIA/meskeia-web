@@ -41,7 +41,7 @@ import {
   type Escala,
   type Unidad,
 } from './motor';
-import { corregirNumero, leerRespuestaAula, toleranciaRelativa } from '@/lib/calculadoras/correctorCasosAula';
+import { corregirNumero, exigeRedondeo, leerRespuestaAula, toleranciaRelativa } from '@/lib/calculadoras/correctorCasosAula';
 
 // ============================================================
 // TIPOS
@@ -195,13 +195,18 @@ export function toleranciaDe(valorEsperado: number): number {
  * con el prefijo y tira el resto— y se suspendería una respuesta correcta escrita en el
  * formato del propio enunciado; y con `parseSpanishNumber` a secas «2.125» sería 2125 aunque
  * la respuesta fuera 2,125 (cabo C0569).
+ *
+ * Una respuesta EXACTA a dos decimales no tiene margen (cabo C0267, 02/11/2026): el 1 % aprobaba
+ * 49.500 para los 50.000 del caso 9 y 3,57 para los 3,6 m del caso 1, que no son redondeo de
+ * nada; los 12 casos son exactos. La que exige redondear (en la práctica, una medida con más de
+ * dos decimales) conserva `toleranciaDe`. Regla de bfccafa5 y 51d7c223.
  */
 export function comprobarRespuesta(respuestaUsuario: string, valorEsperado: number): Comprobacion {
   if (respuestaUsuario.trim() === '') return { correcto: false, motivo: 'vacia' };
   // Medidas, superficies y factores de escala son continuos: ningún valor es imposible por sí
   // mismo dentro de la tolerancia (sonda del 15/10/2026).
   const c = corregirNumero(leerRespuestaAula(respuestaUsuario, valorEsperado), valorEsperado, {
-    tolerancia: toleranciaDe(valorEsperado),
+    tolerancia: exigeRedondeo(valorEsperado, 2) ? toleranciaDe(valorEsperado) : 0,
     magnitud: 'real',
   });
   if (c.estado === 'no-numerico') return { correcto: false, motivo: 'no-numerico' };

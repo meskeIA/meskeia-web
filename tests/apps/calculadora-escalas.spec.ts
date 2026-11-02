@@ -435,6 +435,22 @@ test.describe('Calculadora de Escalas · casos para clase', () => {
     expect(comprobarRespuesta('3.125', 2.125).correcto).toBe(false);
   });
 
+  test('C0267: una respuesta exacta no tiene margen; la que exige redondear conserva el 1 %', () => {
+    // Los 12 son exactos (test de arriba). Con el 1 % aprobaban 49.500 para 50.000 y 3,57 para 3,6.
+    expect(comprobarRespuesta('49.500', CASOS[8].respuesta).correcto).toBe(false);
+    expect(comprobarRespuesta('3,57', CASOS[0].respuesta).correcto).toBe(false);
+    expect(comprobarRespuesta('50.000', CASOS[8].respuesta).correcto).toBe(true);
+    // 2,125 exige redondear a dos decimales: 2,13 y 2,12 entran.
+    expect(comprobarRespuesta('2,13', 2.125).correcto).toBe(true);
+    expect(comprobarRespuesta('2,12', 2.125).correcto).toBe(true);
+    // Lo que enseña la app como respuesta aprueba en los 12 casos y en 500 prácticas.
+    for (const c of CASOS) expect(comprobarRespuesta(c.respuestaTexto, c.respuesta).correcto, `caso ${c.id}`).toBe(true);
+    for (let s = 1; s <= 500; s++) {
+      const e = generarEjercicioAleatorio(s);
+      expect(comprobarRespuesta(e.respuestaTexto, e.respuesta).correcto, `semilla ${s}: ${e.respuestaTexto}`).toBe(true);
+    }
+  });
+
   test('una respuesta vacía o no numérica se distingue de un fallo', () => {
     expect(comprobarRespuesta('', 3.6).motivo).toBe('vacia');
     expect(comprobarRespuesta('  ', 3.6).motivo).toBe('vacia');
