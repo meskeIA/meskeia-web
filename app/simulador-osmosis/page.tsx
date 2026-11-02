@@ -31,6 +31,7 @@ import {
   type ResultadoCelula,
 } from './motor';
 import { PREGUNTAS_FRECUENTES } from './metadata';
+import CasosAula from './CasosAula';
 
 // ─── Constantes de la vista ──────────────────────────────────────────────────
 
@@ -551,6 +552,10 @@ export default function SimuladorOsmosisPage() {
             problemas de clase.
           </p>
         )}
+
+        {/* === Casos para clase (skill /casos-aula-meskeia, 02/11/2026): fuera de las dos
+            secciones del simulador, que el acta localiza por su h2 y su role="status" === */}
+        <CasosAula />
 
         {/* ── Sección educativa v2.0 ──────────────────────────────────────── */}
         <EducationalSection
