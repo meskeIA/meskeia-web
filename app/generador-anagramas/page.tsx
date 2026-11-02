@@ -4,6 +4,7 @@
 import { useState, useMemo, useEffect, useRef, Fragment, type FormEvent } from 'react';
 import styles from './GeneradorAnagramas.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
+import { formatNumber } from '@/lib';
 import {
   puntuarPalabra,
   letrasSinFicha,
@@ -697,6 +698,26 @@ export default function GeneradorAnagramasPage() {
     !isSearching &&
     dictStatus === 'ready';
 
+  /**
+   * Lo que «Debe contener» descarta por no ser letra (cifras, signos, la «?» del atril), para
+   * decirlo junto al campo en vez de filtrar en silencio por otra cosa (hallazgo 3892).
+   */
+  const descartadoContener = useMemo(() => {
+    const fuera: string[] = [];
+    for (const caracter of mustContain) {
+      if (caracter.trim() === '') continue;
+      const base = SIN_TILDE[caracter.toLowerCase()] ?? caracter.toLowerCase();
+      if (IDX_LETRA[base] === undefined && !fuera.includes(caracter)) fuera.push(caracter);
+    }
+    return fuera;
+  }, [mustContain]);
+  const avisoContener =
+    descartadoContener.length === 0
+      ? ''
+      : normalizarTexto(mustContain) === ''
+        ? `Solo admite letras: ninguna palabra contiene «${descartadoContener.join('')}», así que no saldrá ninguna.`
+        : `Solo admite letras: se busca «${normalizarTexto(mustContain)}» y no se tiene en cuenta «${descartadoContener.join('')}».`;
+
   /** La tecla de acción del teclado («Ir», «Buscar», Intro) busca igual que el botón. */
   const enviarLetras = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -735,12 +756,15 @@ export default function GeneradorAnagramasPage() {
 
       const found: ResultadoPalabra[] = [];
       const mustContainNorm = normalizarTexto(mustContain);
+      // Un filtro escrito que se queda sin letras («4») no deja pasar nada: antes no filtraba y
+      // enseñaba la lista entera como si fuera la filtrada (hallazgo 3892)
+      const filtroSinLetras = mustContain.trim() !== '' && mustContainNorm === '';
       const disponibles = contarLetras(letras);
 
       // Iterar solo sobre las longitudes válidas para acelerar
       for (let len = minLength; len <= maxLength; len++) {
         const bucket = wordsByLength[len];
-        if (!bucket) continue;
+        if (!bucket || filtroSinLetras) continue;
 
         for (const { original, normalizada } of bucket) {
           if (mustContainNorm && !normalizada.includes(mustContainNorm)) continue;
@@ -1085,27 +1109,35 @@ export default function GeneradorAnagramasPage() {
             id="anagram-atril"
             aria-live="polite"
           >
-            {atril.letras.length}{' '}
-            {atril.letras.length === 1 ? 'letra' : 'letras'}
-            {atril.comodines > 0 && (
-              <>
-                {' + '}
-                <strong>
-                  {atril.comodines} {atril.comodines === 1 ? 'ficha blanca' : 'fichas blancas'}
-                </strong>
-              </>
-            )}
-            <span>{atril.comodinesIgnorados > 0 &&
-              ` — se ignoran ${atril.comodinesIgnorados} comodín(es) por encima del máximo de ${MAX_COMODINES}`}</span>
+            {/*
+              * ⚠️ 02/11/2026 (hallazgo 3885) — cada trozo, en su <span> (o <strong>) siempre
+              * montado y como ÚNICO hijo: con la página traducida, el « + N fichas blancas» en
+              * fragmento, la explicación de solo blancas y el aviso de exceso como texto suelto
+              * hacían que React retirase un nodo que el traductor ya había cambiado y la app caía
+              * (NotFoundError en removeChild). Y el singular concuerda (hallazgo 3886).
+              */}
+            <span>{`${atril.letras.length} ${atril.letras.length === 1 ? 'letra' : 'letras'}`}</span>
+            <span>{atril.comodines > 0 ? ' + ' : ''}</span>
+            <strong>
+              {atril.comodines > 0
+                ? `${atril.comodines} ${atril.comodines === 1 ? 'ficha blanca' : 'fichas blancas'}`
+                : ''}
+            </strong>
+            <span>{atril.comodinesIgnorados === 0
+              ? ''
+              : atril.comodinesIgnorados === 1
+                ? ` — se ignora 1 comodín por encima del máximo de ${MAX_COMODINES}`
+                : ` — se ignoran ${atril.comodinesIgnorados} comodines por encima del máximo de ${MAX_COMODINES}`}</span>
             {/*
               * La cifra se CUENTA del lemario cargado, no se estima. Antes decía «medio
               * diccionario» y son 95 palabras sobre 86.973 —el 0,1 %— (hallazgo 460); y con
               * una sola blanca se contradecía (hallazgo 2280): ver explicacionSoloBlancas.
               */}
-            {explicacionSoloBlancas}
-            {atrilExcedido &&
-              ` — pasa del máximo de ${MAX_FICHAS_ATRIL} fichas de este modo, así que no se busca: ` +
-              'para el anagrama de un texto largo usa «Anagrama perfecto de una frase»'}
+            <span>{explicacionSoloBlancas}</span>
+            <span>{atrilExcedido
+              ? ` — pasa del máximo de ${MAX_FICHAS_ATRIL} fichas de este modo, así que no se busca: ` +
+                'para el anagrama de un texto largo usa «Anagrama perfecto de una frase»'
+              : ''}</span>
           </div>
           {atrilExcedido && (
             <button
@@ -1182,7 +1214,9 @@ export default function GeneradorAnagramasPage() {
               maxLength={3}
               autoComplete="off"
               enterKeyHint="search"
+              aria-describedby="anagram-contain-aviso"
             />
+            <span id="anagram-contain-aviso" className={styles.avisoContener} aria-live="polite">{avisoContener}</span>
           </div>
         </div>
 
@@ -1205,7 +1239,8 @@ export default function GeneradorAnagramasPage() {
         {results.length > 0 && (
           <div className={styles.resultsSection}>
             <div className={styles.resultsHeader} role="status" aria-live="polite">
-              <h3>Palabras encontradas: {results.length}</h3>
+              {/* Con cinco cifras, punto de miles (hallazgo 3891): «18.647», no «18647» */}
+              <h3>{`Palabras encontradas: ${formatNumber(results.length, 0)}`}</h3>
             </div>
 
             <div className={styles.ordenBarra}>
@@ -1264,7 +1299,7 @@ export default function GeneradorAnagramasPage() {
             {conComodin > 0 && (
               <p className={styles.leyendaComodin}>
                 <span className={styles.letraComodin}>A</span> = letra que pone una ficha
-                blanca. {conComodin} de las {results.length} necesitan gastarla; las que no,
+                blanca. {`${formatNumber(conComodin, 0)} de las ${formatNumber(results.length, 0)} ${conComodin === 1 ? 'necesita' : 'necesitan'} gastarla;`} las que no,
                 salen primero a igualdad de{' '}
                 {orden === 'puntos' ? 'puntuación' : 'longitud'}, porque conservar la blanca
                 vale más que una jugada corta. La blanca no suma puntos: por eso una palabra
@@ -1275,7 +1310,7 @@ export default function GeneradorAnagramasPage() {
             {orden === 'puntos' ? (
               <div className={styles.resultGroup}>
                 <h4 className={styles.groupTitle}>
-                  De más a menos puntos ({resultadosOrdenados.length})
+                  {`De más a menos puntos (${formatNumber(resultadosOrdenados.length, 0)})`}
                 </h4>
                 <div className={styles.wordsGrid}>
                   {resultadosOrdenados.map(resultado => (
@@ -1295,7 +1330,7 @@ export default function GeneradorAnagramasPage() {
                 .map(len => (
                   <div key={len} className={styles.resultGroup}>
                     <h4 className={styles.groupTitle}>
-                      {len} letras ({groupedResults[Number(len)].length})
+                      {`${len} letras (${formatNumber(groupedResults[Number(len)].length, 0)})`}
                     </h4>
                     <div className={styles.wordsGrid}>
                       {groupedResults[Number(len)].map(resultado => (
@@ -1364,10 +1399,13 @@ export default function GeneradorAnagramasPage() {
             id="anagram-frase-contador"
             aria-live="polite"
           >
-            {letrasFrase.length} letras a repartir
-            {fraseExcedida
+            {/* Cifra y aviso, cada uno en su <span> siempre montado (hallazgos 3885 y 3886) */}
+            <span>{`${letrasFrase.length} ${letrasFrase.length === 1 ? 'letra' : 'letras'} a repartir`}</span>
+            <span>{fraseExcedida
               ? ` — pasa del máximo de ${MAX_LETRAS_FRASE} letras, así que no se busca: acórtalo`
-              : letrasFrase.length > 20 && ' — con tantas letras la búsqueda puede quedarse a medias'}
+              : letrasFrase.length > 20
+                ? ' — con tantas letras la búsqueda puede quedarse a medias'
+                : ''}</span>
           </div>
           <div className={styles.examples}>
             <span className={styles.exampleLabel}>Probar:</span>
@@ -1527,29 +1565,36 @@ export default function GeneradorAnagramasPage() {
             <span className={styles.veredictoIcono} aria-hidden="true">
               {comparacion.sinLetras ? '💬' : comparacion.iguales ? '✅' : '❌'}
             </span>
+            {/*
+              * ⚠️ 02/11/2026 (hallazgo 3885) — cada veredicto en su <div key>: eran fragmentos sin
+              * key con un <p> de hijos distintos, y con la página traducida React reutilizaba el <p>
+              * y retiraba un nodo de texto que el traductor ya había cambiado (la app caía al pasar
+              * de «No son» a «Son anagramas»). Las cifras, en una sola cadena y concordadas (3886).
+              */}
             <div>
               {comparacion.sinLetras ? (
-                <>
+                <div key="sinLetras">
                   <strong>Todavía no hay nada que comparar.</strong>
                   <p>
                     Ninguno de los dos textos contiene letras: los anagramas se hacen con letras,
                     así que las cifras y los signos no cuentan. Escribe una palabra o una frase en
                     cada campo.
                   </p>
-                </>
+                </div>
               ) : comparacion.iguales ? (
-                <>
+                <div key="iguales">
                   <strong>Son anagramas exactos.</strong>
                   <p>
-                    Ambos textos usan las mismas {comparacion.totalA} letras, sin sobrar ni faltar
-                    ninguna.
+                    {comparacion.totalA === 1
+                      ? 'Ambos textos usan la misma letra, sin sobrar ni faltar ninguna.'
+                      : `Ambos textos usan las mismas ${comparacion.totalA} letras, sin sobrar ni faltar ninguna.`}
                   </p>
-                </>
+                </div>
               ) : (
-                <>
+                <div key="distintos">
                   <strong>No son anagramas exactos.</strong>
                   <p>
-                    El original tiene {comparacion.totalA} letras y la propuesta {comparacion.totalB}.
+                    {`El original tiene ${comparacion.totalA} ${comparacion.totalA === 1 ? 'letra' : 'letras'} y la propuesta ${comparacion.totalB}.`}
                   </p>
                   <ul className={styles.sobranList}>
                     {comparacion.sobranEnA.length > 0 && (
@@ -1565,7 +1610,7 @@ export default function GeneradorAnagramasPage() {
                       </li>
                     )}
                   </ul>
-                </>
+                </div>
               )}
             </div>
           </div>

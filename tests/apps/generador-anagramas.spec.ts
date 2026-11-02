@@ -2268,7 +2268,9 @@ test.describe('inspector 01/11/2026', () => {
     );
   });
 
-  // HALLAZGO ABIERTO (inspector 01/11/2026, operativa): cinco textos condicionales que el lote
+  // REPARADO el 02/11/2026 (hallazgo 3885): cada texto condicional en su <span> siempre montado
+  // y cada veredicto del verificador en su <div key>.
+  // HALLAZGO (inspector 01/11/2026, operativa): cinco textos condicionales que el lote
   // C0312 no tocó siguen tumbando la app con la página traducida («Algo salió mal», NotFoundError
   // en removeChild). Ninguno lo ve check:ternario-traducido: el fragmento del contador lleva su
   // texto en una expresión `{' + '}` y no en JSXText; el aviso de exceso es una CONCATENACIÓN
@@ -2276,7 +2278,7 @@ test.describe('inspector 01/11/2026', () => {
   // explicación de solo blancas, una variable (fuera del candado a propósito); y el veredicto,
   // dos <p> del mismo tipo sin key con hijos distintos (lo mide el testigo de familia, no el
   // candado). Receta del lote: cada texto condicional en un <span> siempre montado.
-  test.fail('ABIERTO · traducida: quitar la «?» de «casa?» retira « + 1 ficha blanca» y cae', async ({ page }) => {
+  test('REPARADO 3885 · traducida:quitar la «?» de «casa?» retira « + 1 ficha blanca» y cae', async ({ page }) => {
     await sigueEnPie(
       page,
       async () => {
@@ -2287,7 +2289,7 @@ test.describe('inspector 01/11/2026', () => {
     );
   });
 
-  test.fail('ABIERTO · traducida: añadir una letra a «??» retira la explicación de solo blancas y cae', async ({
+  test('REPARADO 3885 · traducida:añadir una letra a «??» retira la explicación de solo blancas y cae', async ({
     page,
   }) => {
     await sigueEnPie(
@@ -2300,7 +2302,7 @@ test.describe('inspector 01/11/2026', () => {
     );
   });
 
-  test.fail('ABIERTO · traducida: bajar de 16 a 15 fichas retira el aviso de exceso y cae', async ({ page }) => {
+  test('REPARADO 3885 · traducida:bajar de 16 a 15 fichas retira el aviso de exceso y cae', async ({ page }) => {
     await sigueEnPie(
       page,
       async () => {
@@ -2311,7 +2313,7 @@ test.describe('inspector 01/11/2026', () => {
     );
   });
 
-  test.fail('ABIERTO · traducida: bajar la frase de 21 a 20 letras retira «con tantas letras…» y cae', async ({
+  test('REPARADO 3885 · traducida:bajar la frase de 21 a 20 letras retira «con tantas letras…» y cae', async ({
     page,
   }) => {
     await sigueEnPie(
@@ -2325,7 +2327,7 @@ test.describe('inspector 01/11/2026', () => {
     );
   });
 
-  test.fail('ABIERTO · traducida: corregir la propuesta del verificador hasta que sea anagrama cae', async ({
+  test('REPARADO 3885 · traducida:corregir la propuesta del verificador hasta que sea anagrama cae', async ({
     page,
   }) => {
     await sigueEnPie(
@@ -2343,10 +2345,10 @@ test.describe('inspector 01/11/2026', () => {
   // -------------------------------------------------------------------------------------------
   // CONTENIDO Y FORMATO
   // -------------------------------------------------------------------------------------------
-  test.fail('ABIERTO · los contadores concuerdan en número con una sola letra o un solo comodín', async ({
+  test('REPARADO 3886 · los contadores concuerdan en número con una sola letra o un solo comodín', async ({
     page,
   }) => {
-    // HALLAZGO ABIERTO (inspector 01/11/2026, contenido): el modo letras dice «1 letra», pero el
+    // REPARADO el 02/11/2026. HALLAZGO (inspector 01/11/2026, contenido): el modo letras dice «1 letra», pero el
     // de frase dice «1 letras a repartir», el verificador «las mismas 1 letras» y «El original
     // tiene 1 letras», y el aviso de blancas «se ignoran 1 comodín(es)». Mismo defecto que el
     // hallazgo 2604 («1 puntos»), en los contadores que aquella reparación no miró.
@@ -2355,6 +2357,7 @@ test.describe('inspector 01/11/2026', () => {
     await expect(page.locator('#anagram-atril')).toContainText('por encima del máximo');
     await expect(page.locator('#anagram-atril')).not.toContainText('comodín(es)');
     await expect(page.locator('#anagram-atril')).not.toContainText('se ignoran 1 ');
+    await expect(page.locator('#anagram-atril')).toContainText('se ignora 1 comodín por encima del máximo de 2');
 
     await page.getByRole('button', { name: /Anagrama perfecto de una frase/ }).click();
     await page.fill('#anagram-frase', 'a');
@@ -2366,13 +2369,15 @@ test.describe('inspector 01/11/2026', () => {
     const veredicto = page.locator('[class*="veredicto"]').first();
     await expect(veredicto).toContainText('Son anagramas exactos');
     await expect(veredicto).not.toContainText('1 letras');
+    await expect(veredicto).toContainText('Ambos textos usan la misma letra');
     await page.fill('#anagram-texto-b', 'b');
     await expect(veredicto).toContainText('No son anagramas exactos');
     await expect(veredicto).not.toContainText('1 letras');
+    await expect(veredicto).toContainText('El original tiene 1 letra y la propuesta 1.');
   });
 
-  test.fail('ABIERTO · una cifra de cinco dígitos lleva punto de miles: 18.647, no 18647', async ({ page }) => {
-    // HALLAZGO ABIERTO (inspector 01/11/2026, contenido): `{results.length}` se pinta crudo.
+  test('REPARADO 3891 · una cifra de cinco dígitos lleva punto de miles: 18.647, no 18647', async ({ page }) => {
+    // REPARADO el 02/11/2026 con formatNumber. HALLAZGO (inspector 01/11/2026, contenido): `{results.length}` se pintaba crudo.
     // Oráculo: «aeiorsntlcmdbg?» (14 letras + 1 blanca, dentro del tope de 15) con 2..15 da 18.647
     // palabras; la cabecera dice «18647» (y «40239» con «aeiosrntlcdmu??»). Con cuatro cifras no
     // se agrupa (RAE), con cinco sí: CLAUDE.md §2. Pintar esas listas congela la página 5-7 s.
@@ -2382,8 +2387,9 @@ test.describe('inspector 01/11/2026', () => {
     await expect(page.locator('[class*="resultsHeader"] h3')).toHaveText('Palabras encontradas: 18.647');
   });
 
-  test.fail('ABIERTO · «Debe contener» no descarta en silencio lo que no es letra', async ({ page }) => {
-    // HALLAZGO ABIERTO (inspector 01/11/2026, operativa): el filtro pasa por normalizarTexto, que
+  test('REPARADO 3892 · «Debe contener» no descarta en silencio lo que no es letra', async ({ page }) => {
+    // REPARADO el 02/11/2026: un filtro sin letras no deja pasar nada y el campo lo dice.
+    // HALLAZGO (inspector 01/11/2026, operativa): el filtro pasa por normalizarTexto, que
     // tira cifras y signos, y una cadena vacía no filtra. «amor» + «Debe contener: 4» da las 16
     // palabras de «amor» a secas (CASO 1 de la primera pasada) como si contuvieran un 4; «c?s»
     // se busca como «cs». Ninguna palabra contiene un 4: lo esperado es 0, o un aviso.
@@ -2391,6 +2397,16 @@ test.describe('inspector 01/11/2026', () => {
     await page.fill('#anagram-contain', '4');
     await buscar(page, 'amor', 2, 10);
     await expect(page.locator('[class*="wordChip"]')).toHaveCount(0);
+    await expect(page.locator('#anagram-contain-aviso')).toHaveText(
+      'Solo admite letras: ninguna palabra contiene «4», así que no saldrá ninguna.',
+    );
+    // Con letras y un signo, se filtra por las letras y se dice qué se ignora
+    await page.fill('#anagram-contain', 'm?');
+    await expect(page.locator('#anagram-contain-aviso')).toHaveText(
+      'Solo admite letras: se busca «m» y no se tiene en cuenta «?».',
+    );
+    await page.fill('#anagram-contain', 'm');
+    await expect(page.locator('#anagram-contain-aviso')).toHaveText('');
   });
 
   test.fail('ABIERTO · la FAQ de la ficha blanca es UNA respuesta, la misma en pantalla y en el FAQPage', async ({

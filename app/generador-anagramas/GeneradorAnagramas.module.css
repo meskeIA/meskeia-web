@@ -147,6 +147,17 @@
   font-size: 0.9rem;
 }
 
+/* Lo que «Debe contener» no tiene en cuenta por no ser letra (hallazgo 3892). Vacío no ocupa */
+.avisoContener {
+  font-size: 0.8rem;
+  color: var(--text-primary);
+  max-width: 16rem;
+}
+
+.avisoContener:empty {
+  display: none;
+}
+
 .buttonRow {
   display: flex;
   gap: var(--spacing-md);
