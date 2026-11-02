@@ -36,8 +36,11 @@ export default function CalculadoraFovVideoPage() {
 
   const handleFocalChange = useCallback((val: string) => {
     setFocalInput(val);
-    const num = parseFloat(val.replace(',', '.'));
-    if (!isNaN(num) && num > 0) {
+    // El input es type="number": el navegador entrega siempre el valor canónico con punto
+    // («23.5» aunque se teclee «23,5»), así que se lee con Number y no con parseSpanishNumber,
+    // que tomaría «23.500» por veintitrés mil quinientos.
+    const num = Number(val);
+    if (val !== '' && Number.isFinite(num) && num > 0) {
       setFocal(num);
     }
   }, []);
@@ -70,7 +73,7 @@ export default function CalculadoraFovVideoPage() {
           {/* Selector de sensor */}
           <div className={styles.fieldGroup}>
             <label id="tipo-sensor-label" className={styles.fieldLabel}>Tipo de sensor</label>
-            <div aria-labelledby="tipo-sensor-label" className={styles.selectorSensor} role="group" aria-label="Seleccionar tipo de sensor">
+            <div aria-labelledby="tipo-sensor-label" className={styles.selectorSensor} role="group">
               {SENSORES_OPCIONES.map(op => (
                 <button
                   key={op.valor}
@@ -110,7 +113,7 @@ export default function CalculadoraFovVideoPage() {
           {/* Focales comunes */}
           <div className={styles.fieldGroup}>
             <label id="focales-comunes-label" className={styles.fieldLabel}>Focales comunes</label>
-            <div aria-labelledby="focales-comunes-label" className={styles.focalesGrid} role="group" aria-label="Acceso rápido a focales comunes">
+            <div aria-labelledby="focales-comunes-label" className={styles.focalesGrid} role="group">
               {FOCALES_COMUNES.map(f => (
                 <button
                   key={f}
