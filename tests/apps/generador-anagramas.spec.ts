@@ -2409,10 +2409,11 @@ test.describe('inspector 01/11/2026', () => {
     await expect(page.locator('#anagram-contain-aviso')).toHaveText('');
   });
 
-  test.fail('ABIERTO · la FAQ de la ficha blanca es UNA respuesta, la misma en pantalla y en el FAQPage', async ({
+  test('REPARADO 3887 · la FAQ de la ficha blanca es UNA respuesta, la misma en pantalla y en el FAQPage', async ({
     page,
   }) => {
-    // HALLAZGO ABIERTO (inspector 01/11/2026, contenido): «Tengo una ficha blanca en el atril,
+    // REPARADO el 02/11/2026: RESPUESTA_FICHA_BLANCA en metadata.ts, que importan las dos.
+    // HALLAZGO (inspector 01/11/2026, contenido): «Tengo una ficha blanca en el atril,
     // ¿cómo la escribo?» (visible) y «¿Cómo se escribe una ficha blanca o comodín…?» (FAQPage)
     // son la misma pregunta con dos textos: el visible dice que «un ATRIL de Scrabble en español
     // trae dos blancas entre sus 100 fichas» (el atril lleva 7; las 100 son del juego) y calla
@@ -2434,10 +2435,11 @@ test.describe('inspector 01/11/2026', () => {
     expect(textoVisible).toBe(enFicha!.acceptedAnswer.text.replace(/\s+/g, ' ').trim());
   });
 
-  test.fail('ABIERTO · el FAQPage no cita como anagramas palabras que el diccionario no tiene', async ({
+  test('REPARADO 3888 · el FAQPage no cita como anagramas palabras que el diccionario no tiene', async ({
     page,
   }) => {
-    // HALLAZGO ABIERTO (inspector 01/11/2026, contenido): el FAQPage dice que «seta» es anagrama
+    // REPARADO el 02/11/2026: pares que la app devuelve (rapto/trapo, asco/caso/cosa/saco) y
+    // sin «comprueba todas las permutaciones». HALLAZGO (inspector 01/11/2026, contenido): el FAQPage dice que «seta» es anagrama
     // de «tase» o «aste», y lista «armo» y «pole». Ninguna de las cuatro está en el lemario
     // (oráculo; «aste» ni siquiera es palabra). La app lo desmiente: «seta» 4..4 da solo SETA.
     // Es el defecto del hallazgo 707, reparado en la FAQ visible y no en la de los buscadores.
@@ -2450,12 +2452,16 @@ test.describe('inspector 01/11/2026', () => {
     };
     const respuestas = (faqPage.mainEntity ?? []).map((q) => q.acceptedAnswer.text).join(' ');
     expect(respuestas).not.toMatch(/"(aste|tase|armo|pole)"/i);
+    expect(respuestas).not.toMatch(/permutaciones contra el diccionario|de meskeIA/);
+    // Los pares que cita sí salen: RAPTO da TRAPO
+    await buscar(page, 'rapto', 5, 5);
+    await expect(page.locator('[class*="chipLema"]', { hasText: /^trapo$/ })).toHaveCount(1);
   });
 
-  test.fail('ABIERTO · el bingo es por FICHAS, no por letras: CARRERA tiene 7 letras y 6 fichas', async ({
+  test('REPARADO 3889 · el bingo es por FICHAS, no por letras: CARRERA tiene 7 letras y 6 fichas', async ({
     page,
   }) => {
-    // HALLAZGO ABIERTO (inspector 01/11/2026, contenido): la tarjeta «Scrabble y Palabras
+    // REPARADO el 02/11/2026. HALLAZGO (inspector 01/11/2026, contenido): la tarjeta «Scrabble y Palabras
     // Cruzadas» dice «Las palabras de 7+ letras dan bingo (+50 puntos)», y la FAQ del bingo de la
     // misma página, que es «usar las 7 fichas del atril en una sola jugada». Con la regla de
     // dígrafos que la app aplica desde c8204991, CARRERA son 7 letras y 6 fichas (C A RR E R A):
@@ -2465,18 +2471,20 @@ test.describe('inspector 01/11/2026', () => {
     const tarjeta = page.locator('[class*="eduEscenarioCard"]', { hasText: 'Scrabble y Palabras Cruzadas' });
     await expect(tarjeta).toBeVisible();
     await expect(tarjeta).not.toContainText('palabras de 7+ letras dan bingo');
+    await expect(tarjeta).toContainText('Colocar las 7 fichas del atril en una sola jugada da bingo');
   });
 
-  test.fail('ABIERTO · los porcentajes de la tarjeta de frecuencias llevan espacio antes del %', async ({
+  test('REPARADO 3890 · los porcentajes de la tarjeta de frecuencias llevan espacio antes del %', async ({
     page,
   }) => {
-    // HALLAZGO ABIERTO (inspector 01/11/2026, contenido): «E (13,7%), A (12,5%)…» pega el signo.
+    // REPARADO el 02/11/2026 con espacio duro. HALLAZGO (inspector 01/11/2026, contenido): «E (13,7%), A (12,5%)…» pega el signo.
     // CLAUDE.md §2 (25/09/2026): «13,7 %» con espacio duro, y se corrige cuando pasa el Inspector.
     await page.goto(RUTA);
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     const tarjeta = page.locator('[class*="eduTipCard"]', { hasText: 'Frecuencia de letras en español' });
     await expect(tarjeta).toBeVisible();
     expect(await tarjeta.textContent()).not.toMatch(/\d%/);
+    expect(await tarjeta.textContent()).toContain('E (13,7 %)');
   });
 
   // -------------------------------------------------------------------------------------------

@@ -5,6 +5,7 @@ import { useState, useMemo, useEffect, useRef, Fragment, type FormEvent } from '
 import styles from './GeneradorAnagramas.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { formatNumber } from '@/lib';
+import { RESPUESTA_FICHA_BLANCA } from './metadata';
 import {
   puntuarPalabra,
   letrasSinFicha,
@@ -1684,7 +1685,7 @@ export default function GeneradorAnagramasPage() {
             <div className={styles.eduEscenarioCard}>
               <span className={styles.eduEscenarioIcon} aria-hidden="true">🃏</span>
               <h4>Scrabble y Palabras Cruzadas</h4>
-              <p>Busca las palabras más largas posibles con las letras de tu atril; si tienes una ficha blanca, escríbela como <strong>?</strong> y verás resaltada la letra que pone. Las palabras de 7+ letras dan bingo (+50 puntos). Filtra por longitud mínima para encontrar jugadas de alto valor.</p>
+              <p>Busca las palabras más largas posibles con las letras de tu atril; si tienes una ficha blanca, escríbela como <strong>?</strong> y verás resaltada la letra que pone. Colocar las 7 fichas del atril en una sola jugada da bingo (+50 puntos); cuenta fichas, no letras, así que CARRERA, con la RR, son 6. Filtra por longitud mínima para encontrar jugadas de alto valor.</p>
             </div>
             <div className={styles.eduEscenarioCard}>
               <span className={styles.eduEscenarioIcon} aria-hidden="true">📚</span>
@@ -1732,7 +1733,8 @@ export default function GeneradorAnagramasPage() {
             </details>
             <details className={styles.eduFaqItem}>
               <summary className={styles.eduFaqQuestion}>Tengo una ficha blanca en el atril, ¿cómo la escribo?</summary>
-              <p className={styles.eduFaqAnswer}>Con un <strong>interrogante</strong>: escribe <strong>casa?</strong> y la herramienta busca palabras usando esas cuatro letras más una cualquiera. También se admiten el asterisco (<strong>*</strong>) y el guion bajo (<strong>_</strong>), y hasta {MAX_COMODINES} comodines a la vez, que son las blancas que trae el juego real. En los resultados, la letra que pone la blanca aparece <strong>resaltada</strong>, así que se ve de un vistazo dónde hay que colocarla en el tablero. Un atril de Scrabble en español trae dos blancas entre sus 100 fichas; en Apalabrados y en juegos parecidos, también dos.</p>
+              {/* La misma respuesta que el FAQPage, de una sola constante (hallazgo 3887) */}
+              <p className={styles.eduFaqAnswer}>{RESPUESTA_FICHA_BLANCA}</p>
             </details>
             <details className={styles.eduFaqItem}>
               <summary className={styles.eduFaqQuestion}>¿Conviene gastar la ficha blanca en cuanto se puede?</summary>
@@ -1801,7 +1803,7 @@ export default function GeneradorAnagramasPage() {
             <div className={styles.eduTipCard}>
               <span className={styles.eduTipIcon} aria-hidden="true">📊</span>
               <h4>Frecuencia de letras en español</h4>
-              <p>Las letras más frecuentes en español son: E (13,7%), A (12,5%), O (8,7%), S (7,9%), R (6,9%), N (6,7%), I (6,2%), D (5,9%). Prioriza palabras que usen estas letras.</p>
+              <p>Las letras más frecuentes en español son: E (13,7&nbsp;%), A (12,5&nbsp;%), O (8,7&nbsp;%), S (7,9&nbsp;%), R (6,9&nbsp;%), N (6,7&nbsp;%), I (6,2&nbsp;%), D (5,9&nbsp;%). Prioriza palabras que usen estas letras.</p>
             </div>
             <div className={styles.eduTipCard}>
               <span className={styles.eduTipIcon} aria-hidden="true">🎯</span>

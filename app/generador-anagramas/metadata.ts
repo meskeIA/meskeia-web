@@ -54,6 +54,15 @@ export const jsonLd = generateWebAppSchema({
   keywords: ['anagramas', 'anagrama de frase', 'anagrama de nombre', 'palabras', 'Wordle', 'Scrabble', 'crucigramas', 'juegos palabras'],
 });
 
+/**
+ * La respuesta de cómo se escribe la ficha blanca, UNA sola vez: la importan el FAQPage y la FAQ
+ * visible de page.tsx (hallazgo 3887, 02/11/2026). La visible decía que «un ATRIL de Scrabble
+ * trae dos blancas entre sus 100 fichas» (el atril lleva 7; las 100 son del juego) y callaba que
+ * hace falta al menos una letra concreta.
+ */
+export const RESPUESTA_FICHA_BLANCA =
+  'Con un interrogante, un asterisco o un guion bajo por cada ficha blanca: escribe «casa?» y el generador busca las palabras que se forman con esas cuatro letras más una cualquiera. Se admiten hasta dos comodines a la vez, que son las blancas que trae un juego de Scrabble en español entre sus 100 fichas (y también Apalabrados). En cada resultado aparece resaltada la letra que pone la blanca, así que se ve de un vistazo dónde hay que colocarla en el tablero. Hace falta al menos una letra concreta: un atril de solo comodines no acota nada.';
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -63,7 +72,7 @@ export const faqJsonLd = {
       name: '¿Qué es un anagrama y cómo se forma?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Un anagrama es una palabra o frase formada reordenando todas las letras de otra palabra o frase. Por ejemplo, "amor" es un anagrama de "roma", y "seta" lo es de "tase" o "aste". Los anagramas perfectos usan exactamente las mismas letras, sin añadir ni quitar ninguna. Son habituales en juegos de palabras, literatura, criptografía y entretenimiento. En español hay miles de pares de palabras anagramáticas.',
+        text: 'Un anagrama es una palabra o frase formada reordenando todas las letras de otra palabra o frase. Por ejemplo, "amor" es un anagrama de "roma", y "rapto" lo es de "trapo". Los anagramas perfectos usan exactamente las mismas letras, sin añadir ni quitar ninguna. Son habituales en juegos de palabras, literatura, criptografía y entretenimiento. En español hay miles de pares de palabras anagramáticas.',
       },
     },
     {
@@ -95,7 +104,7 @@ export const faqJsonLd = {
       name: '¿Cómo se escribe una ficha blanca o comodín en el generador de anagramas?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Con un interrogante, un asterisco o un guion bajo por cada ficha blanca: escribe «casa?» y el generador busca las palabras que se forman con esas cuatro letras más una cualquiera. Se admiten hasta dos comodines a la vez, que son las blancas que trae un juego de Scrabble en español entre sus 100 fichas (y también Apalabrados). En cada resultado aparece resaltada la letra que pone la blanca, así que se ve de un vistazo dónde hay que colocarla en el tablero. Hace falta al menos una letra concreta: un atril de solo comodines no acota nada.',
+        text: RESPUESTA_FICHA_BLANCA,
       },
     },
     {
@@ -103,7 +112,7 @@ export const faqJsonLd = {
       name: '¿Qué palabras se pueden formar con las letras A, E, R, M, O?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Con las letras A, E, R, M, O se pueden formar palabras como: MAREO (anagrama perfecto de las 5 letras), AMOR, ROMA, MORA, RAMO, MARO, OREA, MERO, REMO, entre otras. El número de combinaciones posibles depende del diccionario usado. El generador de anagramas de meskeIA comprueba automáticamente todas las permutaciones contra el diccionario español y muestra solo las palabras válidas.',
+        text: 'Con las letras A, E, R, M, O se pueden formar palabras como: MAREO (anagrama perfecto de las 5 letras), AMOR, ROMA, MORA, RAMO, MARO, OREA, MERO, REMO, entre otras. El número de combinaciones posibles depende del diccionario usado. El generador no prueba permutaciones: recorre el diccionario español y se queda con las palabras cuyas letras caben, contando cuántas veces aparece cada una, así que solo muestra palabras que existen.',
       },
     },
     {
@@ -119,7 +128,7 @@ export const faqJsonLd = {
       name: '¿Cuáles son los anagramas más famosos en español?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Algunos anagramas célebres en español: "Salvador Dalí" → "Avida Dollars" (el propio Dalí lo usó como apodo); "amor" ↔ "roma" ↔ "mora" ↔ "armo" ↔ "ramo"; "vida" ↔ "diva"; "pelo" ↔ "pole"; "seta" ↔ "tase" ↔ "aste". En nombres propios son populares para seudónimos literarios. En criptografía histórica se usaban como firma oculta en textos.',
+        text: 'Algunos anagramas célebres en español: "Salvador Dalí" → "Avida Dollars" (el propio Dalí lo usó como apodo); "amor" ↔ "roma" ↔ "mora" ↔ "ramo"; "vida" ↔ "diva"; "rapto" ↔ "trapo"; "asco" ↔ "caso" ↔ "cosa" ↔ "saco". En nombres propios son populares para seudónimos literarios. En criptografía histórica se usaban como firma oculta en textos.',
       },
     },
   ],
