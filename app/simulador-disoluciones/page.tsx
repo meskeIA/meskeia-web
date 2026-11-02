@@ -13,37 +13,20 @@ import {
 } from '@/components';
 import { formatNumber } from '@/lib';
 import styles from './SimuladorDisoluciones.module.css';
+// La lista de solutos y la aritmética de los dos modos viven en el motor: los «Casos para
+// clase» corrigen con las mismas funciones que pintan el panel (skill /casos-aula-meskeia).
+import {
+  SOLUTOS,
+  SOLUTO_PERSONALIZADO,
+  calcularPreparacion,
+  calcularDilucion,
+  type Soluto,
+} from './motor';
+import CasosAula from './CasosAula';
 
 // ============================================================
 //  DATOS
 // ============================================================
-
-interface Soluto {
-  id: string;
-  nombre: string;
-  formula: string;
-  masaMolar: number; // g/mol
-  color: [number, number, number]; // RGB base del soluto disuelto
-  incoloro: boolean;
-}
-
-const SOLUTOS: Soluto[] = [
-  { id: 'kmno4', nombre: 'Permanganato de potasio', formula: 'KMnO₄', masaMolar: 158.03, color: [123, 45, 142], incoloro: false },
-  { id: 'cuso4', nombre: 'Sulfato de cobre(II)', formula: 'CuSO₄', masaMolar: 159.61, color: [30, 111, 191], incoloro: false },
-  { id: 'k2cr2o7', nombre: 'Dicromato de potasio', formula: 'K₂Cr₂O₇', masaMolar: 294.18, color: [232, 115, 42], incoloro: false },
-  { id: 'nicl2', nombre: 'Cloruro de níquel(II)', formula: 'NiCl₂', masaMolar: 129.60, color: [63, 163, 77], incoloro: false },
-  { id: 'nacl', nombre: 'Sal común', formula: 'NaCl', masaMolar: 58.44, color: [200, 210, 220], incoloro: true },
-  { id: 'glucosa', nombre: 'Glucosa', formula: 'C₆H₁₂O₆', masaMolar: 180.16, color: [205, 200, 190], incoloro: true },
-];
-
-const SOLUTO_PERSONALIZADO: Soluto = {
-  id: 'custom',
-  nombre: 'Personalizado',
-  formula: '—',
-  masaMolar: 100,
-  color: [46, 134, 171],
-  incoloro: false,
-};
 
 type Modo = 'preparar' | 'diluir';
 
@@ -74,24 +57,13 @@ export default function SimuladorDisoluciones() {
   }, [solutoId, masaMolarCustom]);
 
   // Cálculos del modo preparar
-  const prep = useMemo(() => {
-    const litros = volumen / 1000;
-    const moles = soluto.masaMolar > 0 ? masa / soluto.masaMolar : 0;
-    const molaridad = litros > 0 ? moles / litros : 0;
-    const gPorLitro = litros > 0 ? masa / litros : 0;
-    const porcentajeMV = volumen > 0 ? (masa / volumen) * 100 : 0; // % m/v = g por 100 mL
-    const ppm = litros > 0 ? (masa * 1000) / litros : 0; // mg/L
-    return { litros, moles, molaridad, gPorLitro, porcentajeMV, ppm };
-  }, [masa, volumen, soluto]);
+  const prep = useMemo(
+    () => calcularPreparacion(masa, volumen, soluto.masaMolar),
+    [masa, volumen, soluto],
+  );
 
   // Cálculos del modo diluir
-  const dilucion = useMemo(() => {
-    const valido = c1 > 0 && c2 > 0 && v2 > 0 && c2 <= c1;
-    const v1 = valido ? (c2 * v2) / c1 : 0; // mL de madre
-    const disolvente = valido ? v2 - v1 : 0; // mL a añadir
-    const factor = c2 > 0 ? c1 / c2 : 0;
-    return { valido, v1, disolvente, factor };
-  }, [c1, c2, v2]);
+  const dilucion = useMemo(() => calcularDilucion(c1, c2, v2), [c1, c2, v2]);
 
   const handleSoluto = useCallback((id: string) => setSolutoId(id), []);
 
@@ -346,6 +318,9 @@ export default function SimuladorDisoluciones() {
             </section>
           </>
         )}
+
+        {/* Casos para clase: visibles en los dos modos (skill /casos-aula-meskeia) */}
+        <CasosAula />
       </main>
 
       <EducationalSection
