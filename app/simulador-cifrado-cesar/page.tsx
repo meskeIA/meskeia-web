@@ -12,25 +12,20 @@ import {
 } from '@/components';
 import { formatNumber } from '@/lib';
 import styles from './SimuladorCifradoCesar.module.css';
+import CasosAula from './CasosAula';
+import {
+  ALFABETO,
+  calcularFrecuencias,
+  detectarDesplazamiento,
+  procesarTexto,
+} from './motor';
 
 // ============================================================
 // Constantes
 // ============================================================
-const ALFABETO = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-
-// Frecuencias relativas de las letras en español (%), según Fletcher Pratt, «Secret and
-// Urgent: the Story of Codes and Ciphers» (Blue Ribbon Books, 1939), pp. 254-255: la tabla
-// que recoge Wikipedia en «Frecuencia de aparición de letras». La Ñ (0,31 %) no entra: está
-// fuera del alfabeto de 26 que cifra la app. Antes había aquí una tabla sin fuente, con la E
-// al 14,7 %, que sumaba 102 % y que el ataque ni siquiera usaba (hallazgos 1623 y 1624).
-const FREQS_ES: Record<string, number> = {
-  A: 12.53, B: 1.42, C: 4.68, D: 5.86, E: 13.68, F: 0.69, G: 1.01, H: 0.7,
-  I: 6.25, J: 0.44, K: 0.02, L: 4.97, M: 3.15, N: 6.71, O: 8.68, P: 2.51,
-  Q: 0.88, R: 6.87, S: 7.98, T: 4.63, U: 3.93, V: 0.9, W: 0.01, X: 0.22,
-  Y: 0.9, Z: 0.52,
-};
-const SUMA_FREQS_ES = Object.values(FREQS_ES).reduce((a, b) => a + b, 0);
-
+// El alfabeto, la tabla de frecuencias y el cifrado viven en ./motor.ts desde el 02/11/2026:
+// los comparte con los «Casos para clase» (./casos.ts), para que la corrección cuente igual
+// que la rueda.
 const TEXTOS_PREDEFINIDOS = [
   { id: 'cesar', label: 'Julio César', texto: 'Veni, vidi, vici' },
   {
@@ -51,78 +46,6 @@ const TEXTOS_PREDEFINIDOS = [
       'La criptografía es la práctica de técnicas para asegurar la comunicación ante la presencia de terceros. Históricamente se refería a la encriptación de mensajes para que solo el destinatario pudiera leerlos. En la actualidad, la criptografía moderna incluye confidencialidad, integridad, autenticación y no repudio.',
   },
 ];
-
-// ============================================================
-// Lógica de cifrado
-// ============================================================
-function cifrarLetra(letra: string, desplazamiento: number): string {
-  const esUpper = letra === letra.toUpperCase();
-  const base = esUpper ? 65 : 97;
-  const code = letra.charCodeAt(0) - base;
-  const cifrado = ((code + desplazamiento) % 26 + 26) % 26;
-  return String.fromCharCode(cifrado + base);
-}
-
-function procesarTexto(texto: string, desplazamiento: number, descifrar: boolean): string {
-  const desp = descifrar ? (26 - desplazamiento) % 26 : desplazamiento;
-  return texto
-    .split('')
-    .map((c) => {
-      const upper = c.toUpperCase();
-      if (upper >= 'A' && upper <= 'Z') return cifrarLetra(c, desp);
-      return c;
-    })
-    .join('');
-}
-
-function calcularFrecuencias(texto: string): Record<string, number> {
-  const counts: Record<string, number> = {};
-  let total = 0;
-  for (const ch of texto.toUpperCase()) {
-    if (ch >= 'A' && ch <= 'Z') {
-      counts[ch] = (counts[ch] ?? 0) + 1;
-      total++;
-    }
-  }
-  const freqs: Record<string, number> = {};
-  for (const letra of ALFABETO) {
-    freqs[letra] = total > 0 ? ((counts[letra] ?? 0) / total) * 100 : 0;
-  }
-  return freqs;
-}
-
-/**
- * Detecta la clave comparando el histograma del criptograma con la distribución del español:
- * para cada k posible se «descifra» el recuento y se mide su distancia χ² a FREQS_ES; gana la
- * k con menor χ². Suponer que la letra más frecuente es la E falla en cuanto la A la supera,
- * como en el preset «Párrafo largo» (39 A frente a 31 E: daba k = 25 en vez de 3, hallazgo 1623).
- */
-function detectarDesplazamiento(textoCifrado: string): number {
-  const counts = Array<number>(26).fill(0);
-  let total = 0;
-  for (const ch of textoCifrado.toUpperCase()) {
-    if (ch >= 'A' && ch <= 'Z') {
-      counts[ch.charCodeAt(0) - 65]++;
-      total++;
-    }
-  }
-  if (total === 0) return 0;
-  let mejorK = 0;
-  let mejorChi = Infinity;
-  for (let k = 0; k < 26; k++) {
-    let chi = 0;
-    for (let i = 0; i < 26; i++) {
-      const esperado = (total * FREQS_ES[ALFABETO[i]]) / SUMA_FREQS_ES;
-      const observado = counts[(i + k) % 26];
-      chi += ((observado - esperado) ** 2) / esperado;
-    }
-    if (chi < mejorChi) {
-      mejorChi = chi;
-      mejorK = k;
-    }
-  }
-  return mejorK;
-}
 
 // ============================================================
 // Componente principal
@@ -585,6 +508,9 @@ export default function SimuladorCifradoCesar() {
             <em>Secret and Urgent</em>, 1939).
           </p>
         </section>
+
+        {/* Casos para clase: la tarea asignable (skill /casos-aula-meskeia) */}
+        <CasosAula />
 
         {/* Sección educativa v2.0 */}
         <EducationalSection

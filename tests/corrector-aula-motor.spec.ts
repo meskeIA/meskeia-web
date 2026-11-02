@@ -69,6 +69,7 @@ import * as circuitos from '../app/simulador-circuitos-electricos/casos';
 import * as volumenes from '../app/visualizador-volumenes/casos';
 import * as contabilidad from '../app/simulador-contabilidad-basica/casos';
 import * as campo from '../app/simulador-campo-electrico/casos';
+import * as cesar from '../app/simulador-cifrado-cesar/casos';
 
 const CUADRANTE: Magnitud = { entero: true, minimo: 1, maximo: 4, que: 'el número de cuadrante' };
 
@@ -331,6 +332,15 @@ const APPS: Record<string, () => Pregunta[]> = {
         acierta: (v: number) => periodica.comprobarRespuesta(String(v).replace('.', ','), c).correcto,
       } satisfies Pregunta];
     }),
+  // Fuera, simulador-disoluciones y simulador-osmosis (02/11/2026): su única cota es «no negativo»
+  // (y V₁ ≤ V₂, factor ≥ 1), y ninguna respuesta suya queda a menos de una tolerancia de ella, así
+  // que esta sonda no encuentra nada que probar. Que rechacen un negativo con su motivo lo exigen
+  // sus specs (tests/apps/simulador-disoluciones.spec.ts y simulador-osmosis-casos.spec.ts).
+  // Solo las claves: los mensajes son texto y se comparan normalizados.
+  'simulador-cifrado-cesar': () =>
+    [...cesar.CASOS, ...SEMILLAS.map((s) => cesar.generarEjercicioAleatorio(s))]
+      .filter((o) => cesar.esTipoClave(o.datos.tipo) && typeof o.respuesta === 'number')
+      .map((o, i) => ({ origen: `clave ${i}`, esperado: o.respuesta as number, tolerancia: 0, magnitud: cesar.MAGNITUD_CLAVE[o.datos.tipo as cesar.TipoClave], acierta: (v: number) => cesar.comprobarRespuesta(v, o).correcto })),
 };
 
 function pregunta(

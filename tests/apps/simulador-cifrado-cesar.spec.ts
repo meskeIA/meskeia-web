@@ -6,6 +6,17 @@ import {
   sembrarValor,
   sembrarValorAcotado,
 } from './_hidratacion';
+import {
+  AVISO_ALFABETO_26,
+  CASOS,
+  TOTAL_CASOS,
+  comprobarRespuesta,
+  criptogramaDe,
+  generarEjercicioAleatorio,
+  resolverCaso,
+  type DatosCaso,
+} from '../../app/simulador-cifrado-cesar/casos';
+import { detectarDesplazamiento } from '../../app/simulador-cifrado-cesar/motor';
 
 /**
  * Cifrado César — Inspector, 25/09/2026 (PRIMERA inspección)
@@ -443,5 +454,298 @@ test.describe('Cifrado César — contenido y formato', () => {
   test('HALLAZGO I — el porcentaje de la barra L va en formato español', async ({ page }) => {
     await expect(resultado(page)).toHaveValue('Yhql, ylgl, ylfl');
     await expect(page.locator('[class*="histoBarInner"]').nth(11)).toHaveAttribute('title', 'L: 41,7 %');
+  });
+});
+
+// ============================================================
+// Casos para clase (skill /casos-aula-meskeia, 02/11/2026)
+// ============================================================
+/*
+ * Van detrás del acta, en su propio describe: el acta no tiene `beforeEach` de nivel superior,
+ * así que las invariantes sin navegador no pagan ninguna carga.
+ *
+ * EL CONVENIO: alfabeto de 26 letras, sin Ñ (el de la rueda); cifrar = avanzar k, con la vuelta
+ * de la Z a la A. Muchas aulas hispanas cuentan 27 letras, y entonces el resultado cambia en
+ * cuanto una letra cruza la N o da la vuelta. Este spec cifra con un César PROPIO, de 26 y de 27
+ * letras (`cesar` y `cesar27`, abajo), sin usar el motor de la app.
+ *
+ * LAS 12 RESPUESTAS, A MANO (A=0 … N=13, O=14 … Z=25; con Ñ: Ñ=14, O=15 … Z=26):
+ *    1  FUEGO + 3          F5→I8 U20→X23 E4→H7 G6→J9 O14→R17                    = IXHJR
+ *    2  LUNA + 4           L11→P15 U20→Y24 N13→R17 A0→E4                        = PYRE   (con Ñ: OYQE)
+ *    3  ZORRO + 6          Z25→31−26=5 F · O→U · R→X · R→X · O→U                 = FUXXU
+ *    4  DYBDEQK − 10       D3→−7+26=19 T · Y24→O · B1→R · D→T · E4→U · Q16→G · K10→A = TORTUGA
+ *    5  GATO → NHAV        G6→N13: 7 · A→H: 7 · T19→A(26): 7 · O14→V21: 7       = 7
+ *    6  deshacer k = 8     26 − 8                                               = 18
+ *    7  k = 15 y k = 17    32 − 26                                              = 6
+ *    8  ROT-13             ABF IRZBF RA RY CNGVB − 13                           = NOS VEMOS EN EL PATIO
+ *    9  TESORO → EPDZCZ    T19→E4: −15+26 · E4→P15 · S18→D3 · O14→Z25 · R17→C2  = 11 (con Ñ no hay una sola k)
+ *   10  VUELVE PRONTO + 1                                                       = WVFMWF QSPOUP
+ *   11  sin clave          la E sale 13 veces en el claro; la N, la más frecuente del criptograma: 13 − 4 = 9
+ *   12  sin clave          la E sale 9 veces; la V, la más frecuente: 21 − 4 = 17 → NOS VEMOS EN LA ENTRADA DEL MUSEO ANTES DE LAS SIETE
+ */
+const A_MANO_CASOS: Record<number, string | number> = {
+  1: 'IXHJR',
+  2: 'PYRE',
+  3: 'FUXXU',
+  4: 'TORTUGA',
+  5: 7,
+  6: 18,
+  7: 6,
+  8: 'NOS VEMOS EN EL PATIO',
+  9: 11,
+  10: 'WVFMWF QSPOUP',
+  11: 9,
+  12: 'NOS VEMOS EN LA ENTRADA DEL MUSEO ANTES DE LAS SIETE',
+};
+
+const A26 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+const A27 = 'ABCDEFGHIJKLMNÑOPQRSTUVWXYZ';
+const desplazar = (alfabeto: string, texto: string, k: number): string =>
+  [...texto]
+    .map((c) => {
+      const i = alfabeto.indexOf(c);
+      return i < 0 ? c : alfabeto[(((i + k) % alfabeto.length) + alfabeto.length) % alfabeto.length];
+    })
+    .join('');
+const cesar = (texto: string, k: number) => desplazar(A26, texto, k);
+const cesar27 = (texto: string, k: number) => desplazar(A27, texto, k);
+
+/** La letra más frecuente de un texto en mayúsculas; un empate deja sin respuesta única. */
+function masFrecuente(texto: string): string {
+  const cuenta = new Map<string, number>();
+  for (const c of texto) if (A26.includes(c)) cuenta.set(c, (cuenta.get(c) ?? 0) + 1);
+  const orden = [...cuenta.entries()].sort((a, b) => b[1] - a[1]);
+  return orden[0][1] > orden[1][1] ? orden[0][0] : '';
+}
+
+/** La respuesta de un caso recalculada con el César propio del spec, con 26 o con 27 letras. */
+function aMano(d: DatosCaso, alfabeto: string): string | number {
+  const n = alfabeto.length;
+  const mover = (t: string, k: number) => desplazar(alfabeto, t, k);
+  switch (d.tipo) {
+    case 'cifrar':
+      return mover(d.mensaje, d.clave);
+    case 'descifrar':
+    case 'sin-clave-texto':
+      // El criptograma es SIEMPRE el de la app (26 letras); quien cuenta 27 lo descifra mal.
+      return mover(cesar(d.mensaje, d.clave), -d.clave);
+    case 'hallar-clave': {
+      const claro = d.mensaje.replace(/ /g, '');
+      const cifrado = cesar(claro, d.clave);
+      const ks = new Set([...claro].map((x, i) => (alfabeto.indexOf(cifrado[i]) - alfabeto.indexOf(x) + n) % n));
+      return ks.size === 1 ? [...ks][0] : Number.NaN;
+    }
+    case 'clave-inversa':
+      return (n - d.clave) % n;
+    case 'composicion':
+      return (d.clave + (d.clave2 ?? 0)) % n;
+    case 'sin-clave-clave': {
+      const m = masFrecuente(cesar(d.mensaje, d.clave));
+      return (alfabeto.indexOf(m) - alfabeto.indexOf('E') + n) % n;
+    }
+  }
+}
+
+test.describe('Casos para clase — invariantes, sin navegador', () => {
+  test('1 · hay 12 casos con ids 1..12 sin huecos', () => {
+    expect(TOTAL_CASOS).toBe(12);
+    expect(CASOS.map((c) => c.id)).toEqual(Array.from({ length: 12 }, (_, i) => i + 1));
+  });
+
+  test('2 · son deterministas: dos lecturas dan lo mismo', () => {
+    for (const caso of CASOS) {
+      const a = resolverCaso(caso.datos);
+      const b = resolverCaso(caso.datos);
+      expect(b.valor, `caso ${caso.id}`).toBe(a.valor);
+      expect(b.pasos, `caso ${caso.id}`).toEqual(a.pasos);
+    }
+  });
+
+  test('3 · la respuesta declarada coincide con recalcularla desde los datos', () => {
+    for (const caso of CASOS) {
+      const r = resolverCaso(caso.datos);
+      expect(r.ok, `caso ${caso.id}: ${r.error ?? ''}`).toBe(true);
+      expect(r.valor, `caso ${caso.id}`).toBe(caso.respuesta);
+    }
+  });
+
+  test('4 · cada caso tiene enunciado, etiqueta, respuesta, desarrollo y pista', () => {
+    for (const caso of CASOS) {
+      expect(caso.enunciado.length, `caso ${caso.id}`).toBeGreaterThan(30);
+      expect(caso.etiquetaRespuesta.trim(), `caso ${caso.id}`).not.toBe('');
+      expect(String(caso.respuesta).trim(), `caso ${caso.id}`).not.toBe('');
+      expect(caso.pasos.length, `caso ${caso.id}`).toBeGreaterThanOrEqual(2);
+      expect(caso.pista.trim(), `caso ${caso.id}`).not.toBe('');
+      expect(/\bNaN\b|undefined/.test(caso.enunciado + caso.pasos.join(' ')), `caso ${caso.id}`).toBe(false);
+      expect(caso.enunciado, `caso ${caso.id}`).not.toMatch(/\b[Dd]e el\b/);
+    }
+  });
+
+  test('5 · ningún enunciado nombra un país, una ciudad o una moneda', () => {
+    const PROHIBIDO =
+      /\b(España|Espana|México|Mexico|Colombia|Argentina|Perú|Peru|Chile|Uruguay|Ecuador|Madrid|Barcelona|Bogotá|Lima|Quito|euros?|dólares?|pesos (mexicanos|colombianos|chilenos|argentinos|uruguayos)|Bachillerato|selectividad)\b/i;
+    for (const caso of CASOS) {
+      const texto = `${caso.titulo} ${caso.enunciado}`;
+      expect(PROHIBIDO.test(texto) || /\bESO\b/.test(texto), `caso ${caso.id}`).toBe(false);
+    }
+    for (let s = 1; s <= 40; s++) {
+      const e = generarEjercicioAleatorio(s);
+      expect(PROHIBIDO.test(e.enunciado) || /\bESO\b/.test(e.enunciado), `semilla ${s}`).toBe(false);
+    }
+  });
+
+  test('6 · el generador es reproducible, variado y usa la misma aritmética', () => {
+    const a = generarEjercicioAleatorio(12345);
+    const b = generarEjercicioAleatorio(12345);
+    expect(b.enunciado).toBe(a.enunciado);
+    expect(b.respuesta).toBe(a.respuesta);
+    const muestras = Array.from({ length: 40 }, (_, i) => generarEjercicioAleatorio(i + 1));
+    expect(new Set(muestras.map((m) => String(m.respuesta))).size).toBeGreaterThanOrEqual(3);
+    expect(new Set(muestras.map((m) => m.datos.tipo)).size).toBeGreaterThanOrEqual(3);
+    for (const m of muestras) {
+      const r = resolverCaso(m.datos);
+      expect(r.ok, m.enunciado).toBe(true);
+      expect(r.valor, m.enunciado).toBe(m.respuesta);
+      // Y la misma que el César propio del spec, no solo la del motor.
+      expect(aMano(m.datos, A26), m.enunciado).toBe(m.respuesta);
+      expect(comprobarRespuesta(String(m.respuesta), m).correcto, m.enunciado).toBe(true);
+      if (aMano(m.datos, A27) !== m.respuesta) expect(m.enunciado, m.enunciado).toContain(AVISO_ALFABETO_26);
+    }
+  });
+
+  test('7 · el convenio queda fijado: las doce respuestas son las de la tabla a mano', () => {
+    for (const caso of CASOS) {
+      expect(caso.respuesta, `caso ${caso.id} · ${caso.titulo}`).toBe(A_MANO_CASOS[caso.id]);
+      expect(aMano(caso.datos, A26), `caso ${caso.id}`).toBe(caso.respuesta);
+    }
+    // Las dos lecturas, a mano: con 26 letras de la N se pasa a la O.
+    expect(cesar('LUNA', 4)).toBe('PYRE');
+    expect(cesar27('LUNA', 4)).toBe('OYQE');
+  });
+
+  test('7.bis · el aviso de las 26 letras va justo donde la respuesta cambiaría con 27', () => {
+    for (const caso of CASOS) {
+      const cambia = aMano(caso.datos, A27) !== caso.respuesta;
+      // Se prueba EJECUTANDO con el otro alfabeto, no buscando la cadena (física, 14/09/2026).
+      if (cambia) expect(caso.enunciado, `caso ${caso.id}`).toContain(AVISO_ALFABETO_26);
+      else expect(caso.enunciado, `caso ${caso.id}`).not.toContain(AVISO_ALFABETO_26);
+    }
+  });
+
+  test('8 · el criptograma que enseña el enunciado es el cifrado de verdad del mensaje', () => {
+    for (const caso of CASOS) {
+      const cripto = cesar(caso.datos.mensaje, caso.datos.clave);
+      expect(criptogramaDe(caso.datos), `caso ${caso.id}`).toBe(cripto);
+      if (['descifrar', 'hallar-clave', 'sin-clave-texto', 'sin-clave-clave'].includes(caso.datos.tipo)) {
+        expect(caso.enunciado, `caso ${caso.id}`).toContain(cripto);
+      }
+      // Solo A–Z: la Ñ, las tildes y las cifras, que la app deja pasar, no influyen.
+      expect(caso.datos.mensaje, `caso ${caso.id}`).toMatch(/^[A-Z]+( [A-Z]+)*$/);
+    }
+  });
+
+  test('9 · sin clave: el análisis de frecuencias de la app y el de a mano dan la misma k', () => {
+    const sinClave = CASOS.filter((c) => c.datos.tipo.startsWith('sin-clave'));
+    expect(sinClave.length).toBeGreaterThan(0);
+    for (const caso of sinClave) {
+      const cripto = cesar(caso.datos.mensaje, caso.datos.clave);
+      expect(cripto.replace(/ /g, '').length, `caso ${caso.id}: con menos de 20 letras no es fiable`).toBeGreaterThanOrEqual(20);
+      expect(masFrecuente(caso.datos.mensaje), `caso ${caso.id}: la E manda en el claro`).toBe('E');
+      expect(detectarDesplazamiento(cripto), `caso ${caso.id}`).toBe(caso.datos.clave);
+      expect((A26.indexOf(masFrecuente(cripto)) - 4 + 26) % 26, `caso ${caso.id}`).toBe(caso.datos.clave);
+    }
+  });
+
+  test('10 · el corrector normaliza el texto y nombra los errores típicos', () => {
+    const corregir = (id: number, entrada: string) => comprobarRespuesta(entrada, CASOS[id - 1]);
+    // Normalización: minúsculas, espacios, signos y tildes no cuentan; la Ñ no vale por N.
+    expect(corregir(1, 'ixhjr').correcto).toBe(true);
+    expect(corregir(1, 'I X H J R').correcto).toBe(true);
+    expect(corregir(2, 'Pyré').correcto).toBe(true);
+    expect(corregir(8, 'nos vemos en el patio.').correcto).toBe(true);
+    expect(corregir(8, 'NOSVEMOSENELPATIO').correcto).toBe(true);
+    expect(corregir(4, 'TORTUGÑ').correcto).toBe(false);
+    // Las trampas con nombre propio.
+    expect(corregir(2, 'OYQE').motivo).toMatch(/Ñ/); // 27 letras
+    expect(corregir(2, 'HQJW').motivo).toMatch(/descifrar/i); // sentido contrario
+    expect(corregir(4, 'TORTUHA').motivo).toMatch(/Ñ/);
+    expect(corregir(5, '19').motivo).toMatch(/DESHACE/);
+    expect(corregir(7, '32').motivo).toMatch(/26/);
+    expect(corregir(6, '8').motivo).toMatch(/se cifró/);
+    // Claves: «k = 7» y «7,0» valen; 26 y 7,5 son imposibles, no un fallo cualquiera.
+    expect(corregir(5, 'k = 7').correcto).toBe(true);
+    expect(corregir(5, '7,0').correcto).toBe(true);
+    expect(corregir(5, '26').estado).toBe('imposible');
+    expect(corregir(5, '7,5').estado).toBe('imposible');
+    expect(corregir(5, '').estado).toBe('vacio');
+    expect(corregir(5, 'abc').motivo).not.toMatch(/NaN/);
+    // Una respuesta correcta nunca coincide con una de sus trampas (se filtran).
+    for (const c of CASOS) {
+      for (const t of c.trampas) expect(String(t.valor), `caso ${c.id}`).not.toBe(String(c.respuesta));
+    }
+  });
+
+  test('11 · ningún título choca con los localizadores del acta', () => {
+    // El acta busca sin `exact` «Ataque automático», «Párrafo largo», «Quijote» y «Ver guía
+    // educativa», y con `exact` «Cifrar» y «Descifrar». El botón de un caso es «Caso N: título».
+    for (const caso of CASOS) {
+      expect(caso.titulo, `caso ${caso.id}`).not.toMatch(/Ataque automático|Párrafo largo|Quijote|Ver guía educativa/);
+      expect(caso.titulo, `caso ${caso.id}`).not.toMatch(/^(Cifrar|Descifrar)$/);
+    }
+  });
+});
+
+test.describe('Casos para clase — en el navegador', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, [DESLIZADOR, '#casos-respuesta']);
+  });
+
+  const seccionCasos = (page: Page) => page.locator('section[aria-labelledby="casos-aula-titulo"]');
+
+  test('el caso 2 se corrige: OYQE recibe el motivo de la Ñ y PYRE vale', async ({ page }) => {
+    const boton = page.getByRole('button', { name: /^Caso 2: / });
+    await boton.click();
+    await expect(boton).toHaveAttribute('aria-pressed', 'true');
+    await expect(seccionCasos(page)).toContainText('LUNA');
+    const caja = page.locator('#casos-respuesta');
+    const veredicto = seccionCasos(page).getByRole('alert');
+
+    await caja.fill('OYQE');
+    await esperarValorEnReact(page, '#casos-respuesta', 'OYQE');
+    await seccionCasos(page).getByRole('button', { name: 'Comprobar' }).click();
+    await expect(veredicto).toContainText('Ñ');
+
+    await caja.fill('pyre');
+    await esperarValorEnReact(page, '#casos-respuesta', 'pyre');
+    await caja.press('Enter');
+    await expect(veredicto).toContainText('¡Correcto!');
+  });
+
+  test('la solución se despliega con aria-expanded y enseña la respuesta', async ({ page }) => {
+    await page.getByRole('button', { name: /^Caso 4: / }).click();
+    const boton = seccionCasos(page).getByRole('button', { name: 'Ver solución' });
+    await expect(boton).toHaveAttribute('aria-expanded', 'false');
+    await boton.click();
+    await expect(page.locator('#casos-solucion')).toContainText('TORTUGA');
+  });
+
+  test('Practicar trae un ejercicio, y una casilla vacía no pinta «NaN»', async ({ page }) => {
+    await seccionCasos(page).getByRole('button', { name: /Practicar/ }).click();
+    await expect(seccionCasos(page).getByRole('heading', { level: 3 })).toHaveText('Ejercicio de práctica');
+    await seccionCasos(page).getByRole('button', { name: 'Comprobar' }).click();
+    await expect(seccionCasos(page).getByRole('alert')).not.toContainText('NaN');
+  });
+
+  test('la sección no deja ambiguos los localizadores del acta', async ({ page }) => {
+    await expect(page.getByRole('button', { name: 'Cifrar', exact: true })).toHaveCount(1);
+    await expect(page.getByRole('button', { name: 'Descifrar', exact: true })).toHaveCount(1);
+    await expect(page.getByRole('button', { name: 'Ataque automático' })).toHaveCount(1);
+    await expect(page.getByRole('button', { name: 'Quijote' })).toHaveCount(1);
+    await expect(page.getByRole('button', { name: 'Párrafo largo' })).toHaveCount(1);
+    await expect(page.locator('canvas')).toHaveCount(1);
+    // El aviso del ataque solo se monta tras atacar: la sección no añade otro con esa clase.
+    await expect(page.locator('#casos-respuesta')).toBeVisible();
+    await expect(page.locator('section[aria-labelledby="casos-aula-titulo"] [class*="attackResult"], section[aria-labelledby="casos-aula-titulo"] [class*="histo"], section[aria-labelledby="casos-aula-titulo"] [class*="rot13"]')).toHaveCount(0);
   });
 });
