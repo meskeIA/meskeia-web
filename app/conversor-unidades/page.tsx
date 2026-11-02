@@ -440,6 +440,7 @@ export default function ConversorUnidadesPage() {
                 placeholder="Ingresa un valor"
               />
               <select
+                aria-label="Unidad de origen"
                 value={unidadOrigen}
                 onChange={(e) => setUnidadOrigen(e.target.value)}
                 className={styles.select}
@@ -459,11 +460,12 @@ export default function ConversorUnidadesPage() {
 
             {/* Destino */}
             <div className={styles.inputGroup}>
-              <label className={styles.label}>Resultado</label>
+              <span className={styles.label}>Resultado</span>
               <div className={styles.resultadoBox}>
                 {resultado !== null ? formatNumber(resultado, 6) : '-'}
               </div>
               <select
+                aria-label="Unidad de destino"
                 value={unidadDestino}
                 onChange={(e) => setUnidadDestino(e.target.value)}
                 className={styles.select}
