@@ -460,7 +460,7 @@ export default function VisualizadorEstadisticaInferencial() {
             <div className={styles.controles}>
               <div className={styles.controlRow}>
                 <label htmlFor="estadistico-z" className={styles.controlLabel}>
-                  <span>Estadístico z (valor del test)</span>
+                  <span id="estadistico-z-rotulo">Estadístico z (valor del test)</span>
                   <span className={styles.controlValor}>z = {estadistico.toFixed(2)}</span>
                 </label>
                 <input
@@ -472,7 +472,7 @@ export default function VisualizadorEstadisticaInferencial() {
                   step={0.05}
                   value={estadistico}
                   onChange={(e) => setEstadistico(parseFloat(e.target.value))}
-                  aria-label="Valor del estadístico z"
+                  aria-labelledby="estadistico-z-rotulo"
                 />
               </div>
             </div>
@@ -531,7 +531,7 @@ export default function VisualizadorEstadisticaInferencial() {
             <div className={styles.controles}>
               <div className={styles.controlRow}>
                 <label htmlFor="alpha-errores" className={styles.controlLabel}>
-                  <span>Nivel de significación α</span>
+                  <span id="alpha-errores-rotulo">Nivel de significación α</span>
                   <span className={styles.controlValor}>{alphaErr.toFixed(2)}</span>
                 </label>
                 <input
@@ -543,12 +543,12 @@ export default function VisualizadorEstadisticaInferencial() {
                   step={0.01}
                   value={alphaErr}
                   onChange={(e) => setAlphaErr(parseFloat(e.target.value))}
-                  aria-label="Nivel de significación alpha"
+                  aria-labelledby="alpha-errores-rotulo"
                 />
               </div>
               <div className={styles.controlRow}>
                 <label htmlFor="efecto-errores" className={styles.controlLabel}>
-                  <span>Tamaño del efecto (separación H₀/H₁)</span>
+                  <span id="efecto-errores-rotulo">Tamaño del efecto (separación H₀/H₁)</span>
                   <span className={styles.controlValor}>{efectoErr.toFixed(1)}</span>
                 </label>
                 <input
@@ -560,7 +560,7 @@ export default function VisualizadorEstadisticaInferencial() {
                   step={0.1}
                   value={efectoErr}
                   onChange={(e) => setEfectoErr(parseFloat(e.target.value))}
-                  aria-label="Tamaño del efecto"
+                  aria-labelledby="efecto-errores-rotulo"
                 />
               </div>
             </div>
@@ -620,7 +620,7 @@ export default function VisualizadorEstadisticaInferencial() {
             <div className={styles.controles}>
               <div className={styles.controlRow}>
                 <label htmlFor="n-intervalos" className={styles.controlLabel}>
-                  <span>Tamaño muestral n (por muestra)</span>
+                  <span id="n-intervalos-rotulo">Tamaño muestral n (por muestra)</span>
                   <span className={styles.controlValor}>{nIC}</span>
                 </label>
                 <input
@@ -632,7 +632,7 @@ export default function VisualizadorEstadisticaInferencial() {
                   step={5}
                   value={nIC}
                   onChange={(e) => { setNIC(parseInt(e.target.value)); setSimulado(false); setIntervalos([]); }}
-                  aria-label="Tamaño muestral"
+                  aria-labelledby="n-intervalos-rotulo"
                 />
               </div>
             </div>
@@ -721,7 +721,7 @@ export default function VisualizadorEstadisticaInferencial() {
             <div className={styles.controles}>
               <div className={styles.controlRow}>
                 <label htmlFor="n-potencia" className={styles.controlLabel}>
-                  <span>Tamaño muestral n</span>
+                  <span id="n-potencia-rotulo">Tamaño muestral n</span>
                   <span className={styles.controlValor}>{nPotencia}</span>
                 </label>
                 <input
@@ -733,12 +733,12 @@ export default function VisualizadorEstadisticaInferencial() {
                   step={5}
                   value={nPotencia}
                   onChange={(e) => setNPotencia(parseInt(e.target.value))}
-                  aria-label="Tamaño muestral para el cálculo de potencia"
+                  aria-labelledby="n-potencia-rotulo"
                 />
               </div>
               <div className={styles.controlRow}>
                 <label htmlFor="efecto-potencia" className={styles.controlLabel}>
-                  <span>Tamaño del efecto (Cohen d)</span>
+                  <span id="efecto-potencia-rotulo">Tamaño del efecto (Cohen d)</span>
                   <span className={styles.controlValor}>{efectoPotencia.toFixed(2)}</span>
                 </label>
                 <input
@@ -750,7 +750,7 @@ export default function VisualizadorEstadisticaInferencial() {
                   step={0.05}
                   value={efectoPotencia}
                   onChange={(e) => setEfectoPotencia(parseFloat(e.target.value))}
-                  aria-label="Tamaño del efecto Cohen d"
+                  aria-labelledby="efecto-potencia-rotulo"
                 />
               </div>
             </div>
