@@ -157,7 +157,7 @@ function SeccionHipoteca() {
           max={numCuotas}
           value={mes}
           onChange={(e) => setMes(parseInt(e.target.value))}
-          aria-label={`Mes ${mes} de la hipoteca`}
+          aria-valuetext={`Mes ${mes} de ${numCuotas} (año ${Math.ceil(mes / 12)})`}
         />
         <div className={styles.sliderExtremos}>
           <span>Mes 1</span>
@@ -359,7 +359,7 @@ function SeccionCompuesto() {
           max={40}
           value={anios}
           onChange={(e) => setAnios(parseInt(e.target.value))}
-          aria-label={`Horizonte de ${anios} años`}
+          aria-valuetext={`${anios} años`}
         />
         <div className={styles.sliderExtremos}>
           <span>5 años</span>
@@ -506,7 +506,7 @@ function SeccionInflacion() {
           max={30}
           value={anios}
           onChange={(e) => setAnios(parseInt(e.target.value))}
-          aria-label={`${anios} años en el futuro`}
+          aria-valuetext={`${anios} años`}
         />
         <div className={styles.sliderExtremos}>
           <span>5 años</span>
@@ -692,7 +692,7 @@ function SeccionAmortizar() {
           step={0.5}
           value={rentabilidadInversion}
           onChange={(e) => setRentabilidadInversion(parseFloat(e.target.value))}
-          aria-label={`Rentabilidad del ${rentabilidadInversion}%`}
+          aria-valuetext={`${formatNumber(rentabilidadInversion, 1)} % anual`}
         />
         <div className={styles.sliderExtremos}>
           <span>1% (depósito)</span>
