@@ -8,6 +8,7 @@ import {
   puntuarPalabra,
   letrasSinFicha,
   digrafosNecesarios,
+  fichasConDigrafos,
 } from '@/lib/calculadoras/puntuacionScrabble';
 
 /**
@@ -169,6 +170,52 @@ function posicionesDeComodin(
     if (cubiertas.length > comodines) return null;
   }
   return cubiertas;
+}
+
+/**
+ * El reparto de las blancas con el que la palabra pide MENOS fichas de dígrafo.
+ *
+ * ⚠️ 02/11/2026 (hallazgo 3884) — el reparto voraz de `posicionesDeComodin` basta para saber SI
+ * la palabra cabe, pero no para decir CÓMO se juega: con «carera?», CARRERA ponía la blanca en la
+ * R final y dejaba la RR a las dos R tecleadas, así que el chip decía «solo con la ficha RR».
+ * Con dos R sueltas se juega igual poniendo la blanca de RR (el comodín sustituye también a CH,
+ * LL y RR, art. 10 FISE): C3+A1+0+E1+R1+A1 = 7, la lectura que el motor ya daba en «car?o» →
+ * CARRO 5. Aquí se prueba a poner cada blanca sobre una ficha entera —un dígrafo cubre sus dos
+ * letras con una sola blanca— y se queda el reparto que menos dígrafos exige; a igualdad, el
+ * voraz. Solo corre si el voraz pide un dígrafo y hay blancas: es raro y son ≤ 2 blancas.
+ */
+function mejorReparto(palabra: string, disponibles: Uint8Array, comodines: number, voraz: number[]): number[] {
+  let mejor = voraz;
+  let exigidos = digrafosNecesarios(palabra, voraz).length;
+  if (comodines === 0 || exigidos === 0) return voraz;
+  const fichas = fichasConDigrafos(palabra);
+  const cabe = (cubiertas: Set<number>): boolean => {
+    const restante = Uint8Array.from(disponibles);
+    for (let f = 0; f < fichas.length; f++) {
+      if (cubiertas.has(f)) continue;
+      for (const p of fichas[f].posiciones) {
+        const letra = IDX_LETRA[palabra[p]];
+        if (restante[letra] === 0) return false;
+        restante[letra]--;
+      }
+    }
+    return true;
+  };
+  const probar = (cubiertas: Set<number>) => {
+    if (!cabe(cubiertas)) return;
+    // Una posición por blanca: la última letra de su ficha, como marca el voraz la RR de CARRO
+    const posiciones = [...cubiertas].sort((a, b) => a - b).map((f) => fichas[f].posiciones[fichas[f].posiciones.length - 1]);
+    const n = digrafosNecesarios(palabra, posiciones).length;
+    if (n < exigidos) {
+      mejor = posiciones;
+      exigidos = n;
+    }
+  };
+  for (let a = 0; a < fichas.length; a++) {
+    probar(new Set([a]));
+    if (comodines >= 2) for (let b = a + 1; b < fichas.length; b++) probar(new Set([a, b]));
+  }
+  return mejor;
 }
 
 interface ResultadoPalabra {
@@ -697,8 +744,9 @@ export default function GeneradorAnagramasPage() {
 
         for (const { original, normalizada } of bucket) {
           if (mustContainNorm && !normalizada.includes(mustContainNorm)) continue;
-          const posiciones = posicionesDeComodin(normalizada, disponibles, comodines);
-          if (posiciones) {
+          const voraz = posicionesDeComodin(normalizada, disponibles, comodines);
+          if (voraz) {
+            const posiciones = mejorReparto(normalizada, disponibles, comodines, voraz);
             found.push({
               palabra: original,
               normalizada,

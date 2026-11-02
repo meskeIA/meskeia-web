@@ -2121,10 +2121,12 @@ test.describe('inspector 01/11/2026', () => {
     );
   });
 
-  test.fail(
-    'ABIERTO · CARRERA desde «carera?» se juega con la blanca de RR: no es «solo con la ficha RR»',
+  test(
+    'CARRERA desde «carera?» se juega con la blanca de RR: no es «solo con la ficha RR»',
     async ({ page }) => {
-      // HALLAZGO ABIERTO (inspector 01/11/2026, cálculo). posicionesDeComodin reparte la blanca
+      // REPARADO el 02/11/2026 (hallazgo 3884): `mejorReparto` prueba la blanca sobre cada ficha
+      // entera y se queda con el reparto que menos dígrafos exige.
+      // HALLAZGO (inspector 01/11/2026, cálculo). posicionesDeComodin reparte la blanca
       // de forma voraz —la primera R se lleva la ficha real, la última la blanca— y
       // digrafosNecesarios mira solo ese reparto. CARRERA tiene tres R y el atril dos: el reparto
       // voraz pone la blanca en la R final y deja la RR para las dos tecleadas, así que el chip
@@ -2141,9 +2143,16 @@ test.describe('inspector 01/11/2026', () => {
       });
       await expect(carrera).toHaveCount(1);
       await expect(carrera.locator('[class*="soloLectores"]')).not.toContainText('solo con la ficha RR');
-      expect(await carrera.locator('[class$="chipPuntos"]').getAttribute('title')).not.toMatch(
+      // Sin dígrafo exigido, la insignia no lleva title (null)
+      expect((await carrera.locator('[class$="chipPuntos"]').getAttribute('title')) ?? '').not.toMatch(
         /^Solo con la ficha RR/,
       );
+      // C3+A1+0(RR)+E1+R1+A1 = 7, con la blanca en la RR
+      expect(await chips(page)).toContain('carrera=7[b:r]');
+
+      // ACHICAR desde «ahicar?»: la blanca hace de CH (A1+0+I1+C3+A1+R1 = 7), sin ficha CH
+      await buscar(page, 'ahicar?', 7, 7);
+      expect(await chips(page)).toContain('achicar=7[b:h]');
     },
   );
 
