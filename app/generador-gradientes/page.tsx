@@ -231,11 +231,12 @@ export default function GeneradorGradientesPage() {
           {/* Ángulo (para linear y conic) */}
           {(gradientType === 'linear' || gradientType === 'conic') && (
             <div className={styles.controlGroup}>
-              <label className={styles.label}>
+              <label htmlFor="angulo" className={styles.label}>
                 Ángulo: {angle}°
               </label>
               <div className={styles.angleControl}>
                 <input
+                  id="angulo"
                   type="range"
                   min="0"
                   max="360"
