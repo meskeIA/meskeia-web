@@ -12,7 +12,7 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
-import { leerRespuestaAula } from '@/lib/calculadoras/correctorCasosAula';
+import { leerRespuestaAula, textoDesviacion } from '@/lib/calculadoras/correctorCasosAula';
 import {
   CASOS,
   TOTAL_CASOS,
@@ -94,7 +94,9 @@ function redactarVeredicto(veredicto: Veredicto, unidad: string): string {
     case 'correcta':
       return `¡Correcto! La respuesta es ${mostrar(veredicto.esperado)} ${unidad}.`;
     case 'cerca':
-      return `Casi. Te separan ${mostrar(veredicto.desviacion)} ${unidad} del valor esperado: revisa si has redondeado demasiado pronto en un paso intermedio.`;
+      // textoDesviacion: con margen 0, «6,904» para 6,9 se desvía 0,004 y a dos decimales
+      // diría «Te separan 0,00» (hallazgo 3369).
+      return `Casi. Te separan ${textoDesviacion(veredicto.desviacion, 2, formatNumber)} ${unidad} del valor esperado: revisa si has redondeado demasiado pronto en un paso intermedio.`;
     case 'incorrecta':
       return 'No es correcto. Comprueba qué segmentos se corresponden entre sí antes de plantear la proporción, y en qué orden los colocas.';
     case 'sin-numero':

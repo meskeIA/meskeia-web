@@ -24,7 +24,7 @@
  */
 
 import { formatNumber } from '@/lib';
-import { corregirNumero, dentroDeTolerancia, redondearA, toleranciaRelativa } from '@/lib/calculadoras/correctorCasosAula';
+import { corregirNumero, dentroDeTolerancia, exigeRedondeo, redondearA, toleranciaRelativa } from '@/lib/calculadoras/correctorCasosAula';
 
 // ============================================
 // UTILIDADES BÁSICAS
@@ -778,17 +778,22 @@ export interface Veredicto {
 /**
  * Compara la respuesta del usuario con la esperada.
  *
- * El margen es el MAYOR entre ±0,01 y ±1 %: un resultado de 146 m no puede exigir
- * dos decimales exactos, y uno de 0,05 cm no puede aceptar un 1 % que sería
- * indistinguible de cualquier cosa. Devuelve el motivo en vez de un mensaje ya
- * redactado para que la vista lo formatee en español con `formatNumber`.
+ * Una respuesta EXACTA a dos decimales no tiene margen (cabo C0267, 02/11/2026): el 1 %
+ * aprobaba 6,85 m para los 6,9 exactos del caso 2 y 148,5 cm² para los 150 del caso 4, que no
+ * son redondeo de nada; los 12 casos tienen respuesta exacta. La que exige redondear (en la
+ * práctica aleatoria, un cuarto proporcional con cociente periódico) conserva el MAYOR entre
+ * ±0,01 y ±1 %, porque los enunciados no piden decimales. Es
+ * la regla de bfccafa5 (simulador-fluidos-bernoulli) y 51d7c223 (simulador-teorema-pitagoras).
+ * «Cerca» se mide siempre contra cinco veces el 1 %: es el aviso del redondeo intermedio.
+ * Devuelve el motivo en vez de un mensaje ya redactado para que la vista lo formatee en
+ * español con `formatNumber`.
  */
 export function comprobarRespuesta(valorUsuario: number, valorEsperado: number): Veredicto {
   if (!Number.isFinite(valorEsperado)) {
     return { correcta: false, motivo: 'sin-numero', esperado: valorEsperado, desviacion: NaN, margen: NaN };
   }
 
-  const margen = toleranciaRelativa(valorEsperado);
+  const margen = exigeRedondeo(valorEsperado, 2, redondear) ? toleranciaRelativa(valorEsperado) : 0;
   // Longitudes y áreas son continuas: ningún valor es imposible por sí mismo dentro del margen.
   const c = corregirNumero(valorUsuario, valorEsperado, { tolerancia: margen, magnitud: 'real' });
 
@@ -804,7 +809,7 @@ export function comprobarRespuesta(valorUsuario: number, valorEsperado: number):
 
   // «Cerca» abarca hasta cinco veces el margen: casi siempre es un redondeo
   // intermedio, y merece un aviso distinto al de haber planteado mal la proporción.
-  if (dentroDeTolerancia(valorUsuario, valorEsperado, margen * 5)) {
+  if (dentroDeTolerancia(valorUsuario, valorEsperado, toleranciaRelativa(valorEsperado) * 5)) {
     return { correcta: false, motivo: 'cerca', esperado: valorEsperado, desviacion, margen };
   }
 

@@ -210,9 +210,38 @@ test.describe('Los 12 casos numerados (lo que el profesor asigna)', () => {
 });
 
 test.describe('Corrección de la respuesta del alumno', () => {
-  test('el acierto exacto y el redondeo razonable se dan por correctos', () => {
+  test('el acierto exacto se da por correcto, y el redondeo razonable solo donde hay que redondear', () => {
     expect(comprobarRespuesta(10, 10).motivo).toBe('correcta');
-    expect(comprobarRespuesta(10.05, 10).motivo).toBe('correcta'); // margen = 1 % de 10
+    // Antes del 02/11/2026 (cabo C0267) 10,05 aprobaba para 10 exactos: el 1 % no distinguía
+    // una respuesta exacta. Ahora 10 no se redondea a dos decimales y no tiene margen.
+    expect(comprobarRespuesta(10.05, 10).motivo).toBe('cerca');
+    // 20/3 = 6,6667 sí exige redondear: conserva el mayor entre 0,01 y el 1 % (0,0667).
+    expect(comprobarRespuesta(6.67, 20 / 3).motivo).toBe('correcta');
+    expect(comprobarRespuesta(6.62, 20 / 3).motivo).toBe('correcta'); // 0,047 < 0,0667
+    expect(comprobarRespuesta(6.5, 20 / 3).motivo).toBe('cerca');
+  });
+
+  test('C0267: en los 12 casos, exactos, el 1 % ya no aprueba lo que no es redondeo de nada', () => {
+    // Resueltos a mano: 1) 9 · 8 / 6 = 12 · 2) 1,5 · 9,2 / 2 = 6,9 · 3) 7,4 · 50 = 370 cm = 3,7 m ·
+    // 4) Herón del 6-8-10 = 24, por 2,5² = 150 · 5) 7,5 · 6 / 4,5 = 10 · 6) 7 · 1,4 = 9,8 ·
+    // 7) 1,2 · 21 / 0,9 = 28 · 8) 450 / 200 = 2,25 · 9) 21 · 0,6 = 12,6 · 10) 4,8 · 5 / 3,2 = 7,5 ·
+    // 11) 6,8 · 25.000 = 170.000 cm = 1,7 km · 12) 2 · 219 / 3 = 146.
+    const esperadas = [12, 6.9, 3.7, 150, 10, 9.8, 28, 2.25, 12.6, 7.5, 1.7, 146];
+    expect(CASOS.map((c) => c.solucion)).toEqual(esperadas);
+    for (const c of CASOS) expect(comprobarRespuesta(c.solucion, c.solucion).correcta, `caso ${c.id}`).toBe(true);
+    // Con el 1 % aprobaban; ahora no.
+    expect(comprobarRespuesta(6.85, CASOS[1].solucion).correcta).toBe(false);
+    expect(comprobarRespuesta(148.5, CASOS[3].solucion).correcta).toBe(false);
+    expect(comprobarRespuesta(145, CASOS[11].solucion).correcta).toBe(false);
+    expect(comprobarRespuesta(2.23, CASOS[7].solucion).correcta).toBe(false);
+  });
+
+  test('C0267: la respuesta que enseña la app, a dos decimales, aprueba en 500 prácticas', () => {
+    for (let semilla = 1; semilla <= 500; semilla++) {
+      const { caso } = generarEjercicioAleatorio(semilla);
+      const clave = Math.round(caso.solucion * 100) / 100;
+      expect(comprobarRespuesta(clave, caso.solucion).correcta, `semilla ${semilla}: ${caso.solucion}`).toBe(true);
+    }
   });
 
   test('un fallo pequeño se marca «cerca», no «incorrecta»', () => {
