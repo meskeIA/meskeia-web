@@ -41,6 +41,19 @@ const RADIAL_POSITIONS = [
   'top left', 'top right', 'bottom left', 'bottom right'
 ] as const;
 
+// Nombre accesible de cada posición: el valor CSS va en inglés y se anunciaría tal cual
+const NOMBRES_POSICION: Record<typeof RADIAL_POSITIONS[number], string> = {
+  'center': 'Centro',
+  'top': 'Arriba',
+  'bottom': 'Abajo',
+  'left': 'Izquierda',
+  'right': 'Derecha',
+  'top left': 'Arriba a la izquierda',
+  'top right': 'Arriba a la derecha',
+  'bottom left': 'Abajo a la izquierda',
+  'bottom right': 'Abajo a la derecha',
+};
+
 export default function GeneradorGradientesPage() {
   const [gradientType, setGradientType] = useState<GradientType>('linear');
   const [angle, setAngle] = useState(135);
@@ -295,7 +308,7 @@ export default function GeneradorGradientesPage() {
                     className={`${styles.positionBtn} ${radialPosition === pos ? styles.positionActive : ''}`}
                     onClick={() => setRadialPosition(pos)}
                     aria-pressed={radialPosition === pos}
-                    aria-label={pos}
+                    aria-label={NOMBRES_POSICION[pos]}
                   >
                     <span aria-hidden="true">
                       {pos === 'center' ? '⊙' :
@@ -316,7 +329,7 @@ export default function GeneradorGradientesPage() {
           {/* Color Stops */}
           <div className={styles.controlGroup}>
             <div className={styles.stopsHeader}>
-              <label className={styles.label}>Colores ({colorStops.length}/10)</label>
+              <span className={styles.label}>Colores <span>{`(${colorStops.length}/10)`}</span></span>
               <div className={styles.stopsActions}>
                 <button
                   type="button"
