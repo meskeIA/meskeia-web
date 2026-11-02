@@ -8,6 +8,7 @@ import {
   fValor,
   frac,
   generarEjercicioAleatorio,
+  magnitudDe,
   resolverCaso,
   resolverCuadratica,
   resolverLineal,
@@ -249,6 +250,27 @@ test.describe('Corrección de la respuesta del alumno', () => {
 
   test('dar la solución menor cuando se pide la mayor se marca como fallo', () => {
     expect(comprobarRespuesta(2, 3, 'real').correcto).toBe(false);
+  });
+
+  test('C0267: una respuesta exacta no tiene margen; la que exige redondear conserva el 1 %', () => {
+    const porId = new Map(CASOS.map((c) => [c.id, c]));
+    // Los 12 casos son enteros (resueltos a mano arriba). Con el 1 % aprobaban 6,93 para el 7
+    // del caso 1, 11,9 para el 12 del caso 3, −15,85 para el −16 del caso 6 y 14,86 para el 15
+    // del caso 9, que no son redondeo de nada.
+    expect(comprobarRespuesta(6.93, porId.get(1)!.respuesta, 'real').correcto).toBe(false);
+    expect(comprobarRespuesta(11.9, porId.get(3)!.respuesta, 'real').correcto).toBe(false);
+    expect(comprobarRespuesta(-15.85, porId.get(6)!.respuesta, 'real').correcto).toBe(false);
+    expect(comprobarRespuesta(14.86, porId.get(9)!.respuesta, 'real').correcto).toBe(false);
+    // Una raíz irracional, √2 = 1,4142…, sí exige redondear: 1,41 entra (el 1 % es 0,0141).
+    expect(comprobarRespuesta(1.41, Math.SQRT2, 'real').correcto).toBe(true);
+    // La clave a dos decimales aprueba en los 12 casos y en 500 prácticas.
+    for (const c of CASOS) {
+      expect(comprobarRespuesta(Math.round(c.respuesta * 100) / 100, c.respuesta, magnitudDe(c.datos)).correcto, `caso ${c.id}`).toBe(true);
+    }
+    for (let semilla = 1; semilla <= 500; semilla++) {
+      const e = generarEjercicioAleatorio(semilla);
+      expect(comprobarRespuesta(Math.round(e.respuesta * 100) / 100, e.respuesta, magnitudDe(e.datos)).correcto, `semilla ${semilla}`).toBe(true);
+    }
   });
 
   test('una entrada no numérica se distingue de una respuesta equivocada', () => {

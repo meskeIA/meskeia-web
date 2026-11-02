@@ -31,7 +31,7 @@
  */
 
 import { formatNumber } from '@/lib';
-import { corregirNumero, redondearA, toleranciaRelativa, type Magnitud } from '@/lib/calculadoras/correctorCasosAula';
+import { corregirNumero, exigeRedondeo, redondearA, toleranciaRelativa, type Magnitud } from '@/lib/calculadoras/correctorCasosAula';
 
 // ============================================================
 // ARITMÉTICA RACIONAL EXACTA (compartida con la calculadora)
@@ -708,14 +708,22 @@ export function toleranciaDe(valorEsperado: number): number {
   return toleranciaRelativa(valorEsperado);
 }
 
-/** Compara la respuesta tecleada con la esperada. NaN cuenta como «no numérico». */
+/**
+ * Compara la respuesta tecleada con la esperada SIN redondear. NaN cuenta como «no numérico».
+ *
+ * Una respuesta EXACTA a dos decimales no tiene margen (cabo C0267, 02/11/2026): el 1 % con suelo
+ * de 0,01 aprobaba lo que no es redondeo de nada (ver el spec, «C0267»). La que exige redondear
+ * (una raíz irracional de una cuadrática) conserva `toleranciaDe`, porque los enunciados no piden
+ * decimales. Regla de bfccafa5 y 51d7c223.
+ */
 export function comprobarRespuesta(
   valorUsuario: number,
   valorEsperado: number,
   /** Obligatoria: sin ella no se distingue una respuesta imprecisa de una imposible (hallazgo 1207). */
   magnitud: Magnitud,
 ): Comprobacion {
-  const c = corregirNumero(valorUsuario, valorEsperado, { tolerancia: toleranciaDe(valorEsperado), magnitud });
+  const margen = exigeRedondeo(valorEsperado, 2, redondear) ? toleranciaDe(valorEsperado) : 0;
+  const c = corregirNumero(valorUsuario, valorEsperado, { tolerancia: margen, magnitud });
   const { diferencia, tolerancia } = c;
   if (c.estado === 'no-numerico') return { correcto: false, motivo: 'no-numerico', diferencia, tolerancia };
   if (c.motivoImposible) return { correcto: false, motivo: 'fallado', diferencia, tolerancia, aviso: c.motivoImposible };
