@@ -169,20 +169,23 @@
   background: #246d8c;
 }
 
+/* El blanco lo pone .opBtn: el fondo va con el token -boton, igual en los dos temas. Con
+   var(--secondary) daba 2,80:1 y el rojo translúcido 3,18:1 (hallazgo 3898 de la hermana
+   simulador-arboles-bst-avl, mismo bloque) */
 .opBtnSecondary {
-  background: var(--secondary);
+  background: var(--secondary-boton);
 }
 
 .opBtnSecondary:hover {
-  background: #3b8a87;
+  background: #2a6663; /* blanco encima: 6,6:1 */
 }
 
 .opBtnDanger {
-  background: rgba(239, 68, 68, 0.85);
+  background: #dc2626; /* blanco encima: 4,83:1 */
 }
 
 .opBtnDanger:hover {
-  background: rgb(220, 38, 38);
+  background: #b91c1c; /* blanco encima: 6,47:1 */
 }
 
 .opTextarea {

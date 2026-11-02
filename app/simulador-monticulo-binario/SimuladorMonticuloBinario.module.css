@@ -208,8 +208,10 @@
   outline-offset: 2px;
 }
 
+/* El blanco lo pone .opBtn: fondo con el token -boton (2,80:1 con var(--secondary); hallazgo
+   3898 de la hermana simulador-arboles-bst-avl, mismo bloque) */
 .opBtnSecondary {
-  background: var(--secondary);
+  background: var(--secondary-boton);
 }
 
 .opBtnDanger {
