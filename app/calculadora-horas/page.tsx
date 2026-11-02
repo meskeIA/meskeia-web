@@ -20,6 +20,7 @@ import {
   parsearTiempo,
   type Operacion,
 } from '@/lib/calculadoras/horas';
+import { PREGUNTA_MEDIANOCHE } from './metadata';
 
 // ─────────────────────────────────────────────────────────────
 // Tipos y constantes
@@ -95,19 +96,22 @@ function horaAMinutos(hora: string): number | null {
 
 /**
  * Duración de un turno. Si la salida es anterior a la entrada se entiende
- * que el turno cruza la medianoche y se le suman 24 horas.
+ * que el turno cruza la medianoche y se le suman 24 horas. Con las dos horas
+ * iguales se cuenta una guardia de 24 horas (un turno de 0 horas no se calcula),
+ * y la vista lo avisa: hasta el 02/11/2026 daba 0:00 sin aviso (hallazgo 3932).
  */
 function duracionTurno(
   entrada: string,
   salida: string,
   pausaMin: number,
-): { minutos: number; cruzaMedianoche: boolean } | null {
+): { minutos: number; cruzaMedianoche: boolean; diaCompleto: boolean } | null {
   const ini = horaAMinutos(entrada);
   const fin = horaAMinutos(salida);
   if (ini === null || fin === null) return null;
+  const diaCompleto = fin === ini;
   const cruzaMedianoche = fin < ini;
-  const bruto = cruzaMedianoche ? fin + 24 * 60 - ini : fin - ini;
-  return { minutos: bruto - pausaMin, cruzaMedianoche };
+  const bruto = cruzaMedianoche || diaCompleto ? fin + 24 * 60 - ini : fin - ini;
+  return { minutos: bruto - pausaMin, cruzaMedianoche, diaCompleto };
 }
 
 // ─────────────────────────────────────────────────────────────
@@ -179,6 +183,8 @@ export default function CalculadoraHorasPage() {
     .filter((x): x is { linea: Linea; minutos: number } => x.minutos !== null);
 
   const totalLista = lineasValidas.reduce((suma, x) => suma + x.minutos * x.linea.signo, 0);
+  // Las líneas llegan redondeadas al segundo; el total se pinta en h:mm:ss si le quedan segundos.
+  const totalSegundosLista = Math.round(totalLista * 60);
   const hayErrorLista = lineas.some((l) => l.texto.trim() !== '' && parsearTiempo(l.texto) === null);
   const mediaLista = lineasValidas.length > 0 ? totalLista / lineasValidas.length : 0;
 
@@ -385,8 +391,10 @@ export default function CalculadoraHorasPage() {
 
           <div className={styles.panel}>
             <h2 className={styles.panelTitle}>Total</h2>
-            <div className={styles.resultadoGrande}>{formatearHM(totalLista)}</div>
-            <p className={styles.resultadoPie}>horas : minutos</p>
+            <div className={styles.resultadoGrande}>{formatearHMS(totalSegundosLista)}</div>
+            <p className={styles.resultadoPie}>
+              {totalSegundosLista % 60 === 0 ? 'horas : minutos' : 'horas : minutos : segundos'}
+            </p>
 
             <div className={styles.resultadoSecundario}>
               <div>
@@ -396,7 +404,7 @@ export default function CalculadoraHorasPage() {
               <div>
                 <span className={styles.etiquetaResultado}>En minutos</span>
                 <strong className={styles.valorResultado}>
-                  {formatNumber(Math.round(totalLista), 0)} min
+                  {formatNumber(totalSegundosLista / 60, totalSegundosLista % 60 === 0 ? 0 : 2)} min
                 </strong>
               </div>
               <div>
@@ -444,7 +452,7 @@ export default function CalculadoraHorasPage() {
               <p className={styles.operarResultado} aria-live="polite">
                 {segundosOperados !== null && factorNumero !== null ? (
                   <span key="resultado">
-                    {formatearHM(totalLista)} {operacion === 'por' ? '×' : '÷'}{' '}
+                    {formatearHMS(totalSegundosLista)} {operacion === 'por' ? '×' : '÷'}{' '}
                     {formatNumber(factorNumero, Number.isInteger(factorNumero) ? 0 : 2)} ={' '}
                     <strong>{formatearHMS(segundosOperados)}</strong>
                     {segundosOperados % 60 !== 0 && <span> (horas:minutos:segundos)</span>}
@@ -533,7 +541,11 @@ export default function CalculadoraHorasPage() {
 
           <div className={styles.panel}>
             <h2 className={styles.panelTitle}>Resultado</h2>
-            {turno === null ? (
+            {!pausaValida ? (
+              <p className={styles.aviso} role="alert">
+                La pausa tiene que ser un número de minutos igual o mayor que 0.
+              </p>
+            ) : turno === null ? (
               <p className={styles.vacio}>Introduce la hora de entrada y la de salida.</p>
             ) : (
               <>
@@ -559,6 +571,13 @@ export default function CalculadoraHorasPage() {
                   <p className={styles.aviso}>
                     <span aria-hidden="true">🌙</span> El turno cruza la medianoche: la salida se ha
                     contado en el día siguiente.
+                  </p>
+                )}
+
+                {turno.diaCompleto && (
+                  <p className={styles.aviso}>
+                    La entrada y la salida son la misma hora: se ha contado una guardia de 24 horas.
+                    Si el turno no llegó a empezar, no hay horas que sumar.
                   </p>
                 )}
 
@@ -658,7 +677,9 @@ export default function CalculadoraHorasPage() {
           <div className={styles.panel}>
             <h2 className={styles.panelTitle}>Resumen de la semana</h2>
             <div className={styles.resultadoGrande}>{formatearHM(totalSemana)}</div>
-            <p className={styles.resultadoPie}>horas efectivas en {diasConDatos} días</p>
+            <p className={styles.resultadoPie}>
+              horas efectivas en <span>{diasConDatos === 1 ? '1 día' : `${diasConDatos} días`}</span>
+            </p>
 
             <label className={styles.campo}>
               <span className={styles.etiqueta}>Jornada pactada (horas por semana)</span>
@@ -910,21 +931,17 @@ export default function CalculadoraHorasPage() {
             <div className={styles.faqItem}>
               <h4>¿Por qué 20 minutos son 0,33 horas y no 0,20?</h4>
               <p>
-                Porque la fracción se calcula sobre sesenta, no sobre cien: 20 ÷ 60 = 0,333. Solo
-                coinciden los múltiplos de seis minutos, que dan décimas exactas (6 minutos = 0,1 h,
-                30 minutos = 0,5 h). En el resto de casos el decimal es periódico y se redondea, algo
-                que conviene tener presente cuando se factura al céntimo.
+                Porque la fracción se calcula sobre sesenta, no sobre cien: 20 ÷ 60 = 0,333. Dan un
+                decimal exacto los múltiplos de tres minutos: con una cifra los de seis (6 minutos =
+                0,1 h, 30 minutos = 0,5 h) y con dos los demás (15 minutos = 0,25 h, 45 minutos =
+                0,75 h). El resto da un decimal periódico que se redondea, algo que conviene tener
+                presente cuando se factura al céntimo.
               </p>
             </div>
 
             <div className={styles.faqItem}>
-              <h4>¿Qué pasa con los turnos que terminan de madrugada?</h4>
-              <p>
-                Si la hora de salida es menor que la de entrada, la herramienta entiende que el turno
-                ha cruzado la medianoche y suma veinticuatro horas antes de restar, avisándolo bajo
-                el resultado. Un turno de 23:30 a 07:30 son ocho horas. Lo que no hace es adivinar
-                turnos de más de un día: para eso conviene partir el cálculo en tramos.
-              </p>
+              <h4>{PREGUNTA_MEDIANOCHE.question}</h4>
+              <p>{PREGUNTA_MEDIANOCHE.answer}</p>
             </div>
 
             <div className={styles.faqItem}>

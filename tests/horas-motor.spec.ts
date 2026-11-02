@@ -36,7 +36,7 @@ test.describe('parsearTiempo — lo que ya leía no cambia', () => {
     ['7', 420],
     ['2h', 120],
     ['0:30', 30],
-    ['1:20:30', 81], // 80,5 minutos redondeados al minuto, como antes
+    ['1:20:30', 80.5], // 80 min y 30 s: se redondea al segundo, no al minuto (hallazgo 3931)
     ['-1:15', -75],
     ['45', 2700],
   ];
@@ -103,6 +103,34 @@ test.describe('parsearTiempo — lo que no se entiende', () => {
       expect(parsearTiempo(texto)).toBeNull();
     });
   }
+});
+
+/**
+ * Hallazgo 3931 (02/11/2026): cada línea se redondeaba al minuto antes de sumar. A mano:
+ *   0:00:30 + 0:00:30       = 30 + 30 s = 60 s = 0:01
+ *   1:20:30 + 1:20:30       = 80,5 + 80,5 = 161 min = 2:41 (el ejemplo de la FAQ)
+ *   4 × 0:03:30             = 4 × 210 s = 840 s = 14 min = 0:14
+ *   1:20:30 solo            = 4830 s = 1:20:30, que no se redondea a 1:21
+ */
+test.describe('parsearTiempo — los segundos se suman antes de redondear', () => {
+  const totalSegundos = (lineas: string[]): number =>
+    Math.round(lineas.reduce((suma, l) => suma + (parsearTiempo(l) ?? Number.NaN), 0) * 60);
+
+  test('0:00:30 + 0:00:30 = 0:01', () => {
+    expect(formatearHMS(totalSegundos(['0:00:30', '0:00:30']))).toBe('0:01');
+  });
+  test('1:20:30 + 1:20:30 = 2:41', () => {
+    expect(formatearHMS(totalSegundos(['1:20:30', '1:20:30']))).toBe('2:41');
+  });
+  test('cuatro pistas de 0:03:30 = 0:14', () => {
+    expect(formatearHMS(totalSegundos(['0:03:30', '0:03:30', '0:03:30', '0:03:30']))).toBe('0:14');
+  });
+  test('1:20:30 solo se queda en 1:20:30', () => {
+    expect(formatearHMS(totalSegundos(['1:20:30']))).toBe('1:20:30');
+  });
+  test('0:00:20 tres veces = 0:01, sin arrastrar el decimal periódico', () => {
+    expect(formatearHMS(totalSegundos(['0:00:20', '0:00:20', '0:00:20']))).toBe('0:01');
+  });
 });
 
 test('cifraSinUnidad: solo las cifras enteras sin unidad', () => {

@@ -4,8 +4,11 @@
  * Usada por: `app/calculadora-horas/` (la lista de sumar y restar y el multiplicar o repartir el
  * total). Lo comprueba `tests/horas-motor.spec.ts`, con casos resueltos a mano.
  *
- * Todo se cuenta en MINUTOS ENTEROS, como hasta ahora; solo multiplicar y repartir trabajan en
- * segundos, porque 15 minutos entre 4 son 3 min 45 s y redondear al minuto daría 0:04.
+ * Todo se cuenta en MINUTOS, con los segundos como fracción (1:20:30 = 80,5 min): cada línea se
+ * redondea al SEGUNDO, nunca al minuto, y el redondeo al minuto solo lo hace la vista al pintar un
+ * total sin segundos. Hasta el 02/11/2026 cada línea se redondeaba al minuto y 0:00:30 + 0:00:30
+ * daba 0:02 (hallazgo 3931). Multiplicar y repartir trabajan en segundos, porque 15 minutos entre
+ * 4 son 3 min 45 s y redondear al minuto daría 0:04.
  *
  * CÓMO SE LEE UNA CANTIDAD (S0224, 24/10/2026)
  * ────────────────────────────────────────────
@@ -81,8 +84,8 @@ function parsearConUnidad(texto: string): number | null {
 }
 
 /**
- * Convierte el texto de una línea a minutos enteros (con signo si empieza por «-»).
- * Devuelve null si no se entiende.
+ * Convierte el texto de una línea a minutos, redondeados al segundo (con signo si empieza por
+ * «-»): «1:20:30» son 80,5. Devuelve null si no se entiende.
  */
 export function parsearTiempo(entrada: string): number | null {
   const limpio = entrada.trim().toLowerCase();
@@ -98,7 +101,8 @@ export function parsearTiempo(entrada: string): number | null {
   const minutos = /^[\d:.,h]+$/.test(compacto) ? parsearSinUnidad(compacto) : parsearConUnidad(cuerpo);
 
   if (minutos === null || !Number.isFinite(minutos)) return null;
-  return Math.round(minutos) * (negativo ? -1 : 1);
+  const alSegundo = Math.round(minutos * 60) / 60;
+  return negativo ? -alSegundo : alSegundo;
 }
 
 /**

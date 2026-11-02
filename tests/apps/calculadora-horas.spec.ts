@@ -99,7 +99,7 @@ test.describe('calculadora-horas — minutos con unidad y operar el total', () =
  *     Entre dos horas · 09:00 → 10:00 con 90 min de pausa = −30 min, con su aviso
  *                     · sin hora de salida no hay cifra
  *
- *   HALLAZGOS que quedan ABIERTOS (test.fail(): pasan a fallar el día que se reparen)
+ *   HALLAZGOS 3931-3936, REPARADOS en /reparar del 02/11/2026 (sus tests ya no llevan test.fail())
  *     · Los segundos se redondean al minuto EN CADA LÍNEA (parsearTiempo hace Math.round):
  *       0:00:30 + 0:00:30 = 60 s = 0:01 → la app da 0:02 · 1:20:30 + 1:20:30 = 161 min = 2:41 →
  *       2:42 · cuatro pistas de 0:03:30 = 14 min → 0:16. La FAQ visible invita a «afinar» con
@@ -255,26 +255,29 @@ test.describe('Inspector 02/11/2026 · Sumar y restar', () => {
     await expect(page.locator('body')).not.toContainText(/NaN|Infinity|undefined/);
   });
 
-  test('HALLAZGO (02/11/2026, ABIERTO) · los segundos se redondean al minuto en cada línea', async ({ page }) => {
-    // parsearTiempo devuelve Math.round(minutos): 0:00:30 = 0,5 min → 1 en cada línea.
-    // 30 s + 30 s = 60 s = 0:01 (hoy 0:02) · 1:20:30 + 1:20:30 = 80,5 + 80,5 = 161 min = 2:41
-    // (hoy 2:42, con el ejemplo de la propia FAQ) · 4 × 0:03:30 = 14 min = 0:14 (hoy 0:16).
-    // Los tres esperados son minutos exactos: valen con o sin segundos en pantalla.
-    test.fail();
+  test('HALLAZGO 3931 (02/11/2026, REPARADO) · los segundos ya no se redondean al minuto en cada línea', async ({ page }) => {
+    // parsearTiempo devolvía Math.round(minutos): 0:00:30 = 0,5 min → 1 en cada línea.
+    // 30 s + 30 s = 60 s = 0:01 (daba 0:02) · 1:20:30 + 1:20:30 = 80,5 + 80,5 = 161 min = 2:41
+    // (daba 2:42, con el ejemplo de la propia FAQ) · 4 × 0:03:30 = 14 min = 0:14 (daba 0:16).
+    // Ahora cada línea se redondea al segundo y el total se pinta en h:mm:ss si le quedan.
+    await escribir(page, LINEA(1), '1:20:30');
+    await expect(TOTAL(page)).toHaveText('1:20:30');
+    await expect(valorDe(page, PANEL_LISTA, 'En minutos')).toHaveText('80,50 min');
+
     await escribir(page, LINEA(1), '0:00:30');
     await escribir(page, LINEA(2), '0:00:30');
-    expect(normal(await TOTAL(page).textContent())).toMatch(/^0:01(:00)?$/);
+    await expect(TOTAL(page)).toHaveText('0:01');
 
     await escribir(page, LINEA(1), '1:20:30');
     await escribir(page, LINEA(2), '1:20:30');
-    expect(normal(await TOTAL(page).textContent())).toMatch(/^2:41(:00)?$/);
+    await expect(TOTAL(page)).toHaveText('2:41');
 
     await escribir(page, LINEA(1), '0:03:30');
     await escribir(page, LINEA(2), '0:03:30');
     await escribir(page, LINEA(3), '0:03:30');
     await page.getByRole('button', { name: 'Añadir línea' }).click();
     await escribir(page, LINEA(4), '0:03:30');
-    expect(normal(await TOTAL(page).textContent())).toMatch(/^0:14(:00)?$/);
+    await expect(TOTAL(page)).toHaveText(/^0:14(:00)?$/);
   });
 });
 
@@ -317,24 +320,27 @@ test.describe('Inspector 02/11/2026 · Entre dos horas', () => {
     await expect(page.locator(`${PANEL_INTERVALO} [class*="resultadoGrande"]`)).toHaveCount(0);
   });
 
-  test('HALLAZGO (02/11/2026, ABIERTO) · una guardia de 24 h (08:00 → 08:00) sale 0:00 sin aviso', async ({ page }) => {
-    // fin < ini es falso con las dos horas iguales, así que el turno dura 0. La FAQ visible solo
+  test('HALLAZGO 3932 (02/11/2026, REPARADO) · una guardia de 24 h (08:00 → 08:00) sale 24:00 y lo avisa', async ({ page }) => {
+    // fin < ini era falso con las dos horas iguales, así que el turno duraba 0. La FAQ visible solo
     // excluye «turnos de más de un día», y la tarjeta «Turnos de noche» nombra sanidad y
-    // seguridad, donde la guardia de 24 h es habitual. Esperado: 24:00, o un aviso de que con
-    // las dos horas iguales no se sabe si es 0 o un día entero. Con 30 min de pausa la app dice
-    // hoy «−0:30» y «La pausa que has puesto es mayor que el turno completo».
-    test.fail();
+    // seguridad, donde la guardia de 24 h es habitual. Ahora: 24:00 con un aviso de que se ha
+    // contado un día entero. Con 30 min de pausa, 1440 − 30 = 1410 min = 23:30 (daba «−0:30» y
+    // «La pausa que has puesto es mayor que el turno completo»).
+    const grande = page.locator(`${PANEL_INTERVALO} [class*="resultadoGrande"]`);
     await turno(page, '08:00', '08:00');
-    const grande = normal(await page.locator(`${PANEL_INTERVALO} [class*="resultadoGrande"]`).textContent());
-    const avisos = await page.locator(`${PANEL_INTERVALO} [class*="aviso"]`).count();
-    expect(grande === '24:00' || avisos > 0).toBe(true);
+    await expect(grande).toHaveText('24:00');
+    await expect(page.locator(`${PANEL_INTERVALO} [class*="aviso"]`, { hasText: 'guardia de 24 horas' })).toBeVisible();
+
+    await escribirEn(page, page.getByLabel('Pausa a descontar (minutos)', { exact: true }), '30');
+    await expect(grande).toHaveText('23:30');
+    await expect(page.getByText('La pausa que has puesto es mayor que el turno completo.')).toHaveCount(0);
   });
 
-  test('HALLAZGO (02/11/2026, ABIERTO) · con una pausa negativa pide las dos horas que ya están puestas', async ({ page }) => {
-    // pausaValida es falso con −30 y el turno queda en null, que pinta el mensaje del campo vacío.
-    // Esperado: un aviso sobre la pausa, no «Introduce la hora de entrada y la de salida».
-    test.fail();
+  test('HALLAZGO 3935 (02/11/2026, REPARADO) · con una pausa negativa avisa de la pausa', async ({ page }) => {
+    // pausaValida es falso con −30 y el turno quedaba en null, que pintaba el mensaje del campo
+    // vacío. Ahora: un aviso sobre la pausa, no «Introduce la hora de entrada y la de salida».
     await turno(page, '09:00', '17:00', '-30');
+    await expect(page.getByRole('alert').filter({ hasText: /pausa/i })).toBeVisible();
     const resultado = normal(await page.locator(`${PANEL_INTERVALO} > div`).nth(1).textContent());
     expect(resultado).not.toContain('Introduce la hora de entrada y la de salida');
     expect(resultado).toMatch(/pausa/i);
@@ -372,14 +378,13 @@ test.describe('Inspector 02/11/2026 · Parte semanal', () => {
     await expect(grande).toHaveText('39:30');
   });
 
-  test('HALLAZGO (02/11/2026, ABIERTO) · con un solo día el pie dice «en 1 días»', async ({ page }) => {
-    // 09:00 → 17:00 = 8:00 en un día. Hoy: «horas efectivas en 1 días».
-    test.fail();
+  test('HALLAZGO 3936 (02/11/2026, REPARADO) · con un solo día el pie dice «en 1 día»', async ({ page }) => {
+    // 09:00 → 17:00 = 8:00 en un día. Decía «horas efectivas en 1 días».
     await dia(page, 'Lunes', '09:00', '17:00');
     await expect(page.locator(`${PANEL_SEMANA} [class*="resultadoGrande"]`)).toHaveText('8:00');
-    expect(normal(await page.locator(`${PANEL_SEMANA} [class*="resultadoPie"]`).textContent())).toBe(
-      'horas efectivas en 1 día',
-    );
+    await expect(page.locator(`${PANEL_SEMANA} [class*="resultadoPie"]`)).toHaveText('horas efectivas en 1 día');
+    await dia(page, 'Martes', '09:00', '17:00');
+    await expect(page.locator(`${PANEL_SEMANA} [class*="resultadoPie"]`)).toHaveText('horas efectivas en 2 días');
   });
 });
 
@@ -388,22 +393,20 @@ test.describe('Inspector 02/11/2026 · FAQ visible y FAQPage', () => {
     await page.goto('/calculadora-horas/');
   });
 
-  test('HALLAZGO (02/11/2026, ABIERTO) · la FAQ llama periódico a todo lo que no es múltiplo de 6 minutos', async ({ page }) => {
+  test('HALLAZGO 3934 (02/11/2026, REPARADO) · la FAQ ya no llama periódico a todo lo que no es múltiplo de 6 minutos', async ({ page }) => {
     // m ÷ 60 es decimal exacto si m es múltiplo de 3: 15 min = 0,25 h y 45 min = 0,75 h, como
-    // enseña la tabla de la propia app. La FAQ dice «En el resto de casos el decimal es periódico».
-    test.fail();
+    // enseña la tabla de la propia app. La FAQ decía «En el resto de casos el decimal es periódico».
     await expect(page.locator('[class*="equivalenciaItem"]').filter({ hasText: '15 min' })).toContainText('0,25 h');
     const respuesta = normal(await respuestaVisible(page, '¿Por qué 20 minutos son 0,33 horas').textContent());
     expect(respuesta).toContain('20 ÷ 60 = 0,333');
     expect(respuesta).not.toMatch(/resto de casos el decimal es periódico/);
   });
 
-  test('HALLAZGO (02/11/2026, ABIERTO) · la pregunta de la medianoche tiene dos respuestas y el FAQPage calla el límite', async ({ page }) => {
-    // FAQ visible «¿Qué pasa con los turnos que terminan de madrugada?»: termina con «Lo que no hace
+  test('HALLAZGO 3933 (02/11/2026, REPARADO) · la pregunta de la medianoche tiene una sola respuesta, con el límite', async ({ page }) => {
+    // FAQ visible «¿Qué pasa con los turnos que terminan de madrugada?»: terminaba con «Lo que no hace
     // es adivinar turnos de más de un día». FAQPage «¿Cómo calculo las horas trabajadas si el turno
     // pasa de medianoche?»: «basta con introducir las dos horas tal cual», sin el límite.
-    // Reparación: UNA constante que importen las dos (check:faq-unica).
-    test.fail();
+    // Ahora las dos salen de PREGUNTA_MEDIANOCHE (metadata.ts).
     const preguntas = await preguntasFaqLd(page);
     const ld = preguntas.find((p) => /medianoche|madrugada/i.test(p.name));
     expect(ld).toBeDefined();

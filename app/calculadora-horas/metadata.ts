@@ -59,6 +59,14 @@ export const jsonLd = generateWebAppSchema({
   ],
 });
 
+// La pregunta de la medianoche está en las dos FAQ: la visible de page.tsx la importa de aquí, para
+// que no vuelva a haber dos respuestas (la del FAQPage se callaba el límite, hallazgo 3933).
+export const PREGUNTA_MEDIANOCHE = {
+  question: '¿Cómo calculo las horas trabajadas si el turno pasa de medianoche?',
+  answer:
+    'Si la hora de salida es menor que la de entrada, la herramienta entiende que el turno ha cruzado la medianoche y suma veinticuatro horas antes de restar, avisándolo bajo el resultado: un turno de 22:00 a 06:00 dura 8 horas, no menos ocho. Si la entrada y la salida son la misma hora, lo cuenta como una guardia de 24 horas y también lo avisa. Lo que no hace es adivinar turnos de más de un día: para eso conviene partir el cálculo en tramos.',
+};
+
 // FAQPage JSON-LD — mejora visibilidad en Bing Copilot, ChatGPT, Perplexity y Gemini
 export const faqJsonLd = {
   '@context': 'https://schema.org',
@@ -82,11 +90,8 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Cómo calculo las horas trabajadas si el turno pasa de medianoche?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'Cuando la hora de salida es menor que la de entrada, el turno cruza a la madrugada del día siguiente y hay que sumar veinticuatro horas a la salida antes de restar. Un turno de 22:00 a 06:00 dura 8 horas, no menos ocho. La calculadora detecta ese caso sola y lo avisa, así que basta con introducir las dos horas tal cual figuran en el cuadrante.',
-      },
+      name: PREGUNTA_MEDIANOCHE.question,
+      acceptedAnswer: { '@type': 'Answer', text: PREGUNTA_MEDIANOCHE.answer },
     },
     {
       '@type': 'Question',
