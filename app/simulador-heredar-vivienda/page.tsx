@@ -38,7 +38,13 @@ import {
   PLAZO_IIVTNU,
   ESCALA_RECARGO_EXTEMPORANEO,
 } from '@/data/fiscal';
-import { TERRITORIOS_IIVTNU_FORAL, motivoPlusvaliaForal, type ComunidadAutonoma } from '@/data/itp-ccaa';
+import {
+  AVISO_IRPF_FORAL,
+  TERRITORIOS_IIVTNU_FORAL,
+  TERRITORIOS_IRPF_FORAL,
+  motivoPlusvaliaForal,
+  type ComunidadAutonoma,
+} from '@/data/itp-ccaa';
 
 /**
  * La escala de la base del ahorro, LEÍDA de data/fiscal. Iba escrita a mano dos veces en
@@ -759,6 +765,8 @@ export default function SimuladorHeredarViviendaPage() {
   const [parentesco, setParentesco] = useState<Parentesco>('hijo');
   const [edad, setEdad] = useState<number>(45);
   const [ccaa, setCcaa] = useState<string>('madrid');
+  // El IRPF del residente en estos territorios es foral, con su propia escala (hallazgo 3956)
+  const irpfForal = (TERRITORIOS_IRPF_FORAL as readonly string[]).includes(ccaa);
   const [anioAdquisicion, setAnioAdquisicion] = useState<number>(1995);
   // Enero por defecto: con él, «año actual − año» sigue siendo la tenencia de quien no lo toca.
   const [mesAdquisicion, setMesAdquisicion] = useState<number>(1);
@@ -1048,7 +1056,7 @@ export default function SimuladorHeredarViviendaPage() {
         fuente={GANANCIAS_PATRIMONIALES_META.fuente}
         verificado={GANANCIAS_PATRIMONIALES_META.verificado}
         urlOficial={GANANCIAS_PATRIMONIALES_META.urlOficial}
-        nota={GANANCIAS_PATRIMONIALES_META.nota}
+        nota={irpfForal ? `${GANANCIAS_PATRIMONIALES_META.nota} ${AVISO_IRPF_FORAL}` : GANANCIAS_PATRIMONIALES_META.nota}
       />
 
       <LegalNotice />
@@ -1794,6 +1802,12 @@ export default function SimuladorHeredarViviendaPage() {
                   <span>Cuota IRPF venta</span>
                   <strong>{formatCurrency(irpf.cuota)}</strong>
                 </div>
+                {/* Hallazgo 3956 (cabo C0582): con el causante en el País Vasco o Navarra la cuota
+                    salía de la escala estatal sin decirlo. No se sabe dónde reside el heredero, así
+                    que va la cifra con la salvedad, como en las apps de compraventa (hallazgo 3061). */}
+                {irpfForal && (
+                  <p className={styles.muted}>{AVISO_IRPF_FORAL}</p>
+                )}
                 <p className={styles.footnote}>
                   * Valor referencia ISD + cuota ISD + cuota plusvalía pagadas.
                 </p>

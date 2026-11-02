@@ -6629,14 +6629,12 @@ test.describe('Simulador de heredar vivienda — cabo C0582 (02/11/2026)', () =>
   });
 
   /**
-   * HALLAZGO ABIERTO (02/11/2026, cabo C0582) — en el País Vasco y Navarra la cuota del IRPF de la
-   * venta es la de la escala estatal del ahorro y la página no lo dice: ni junto a la cuota ni en el
-   * sello del IRPF. Pasa a verde cuando la cuota lleve la salvedad (AVISO_IRPF_FORAL, como las apps
-   * de compraventa que no saben dónde reside el vendedor) o cuando no se dé cifra; entonces se le
-   * retira el `test.fail()` y este comentario pasa a «REPARADO».
+   * HALLAZGO 3956 (02/11/2026, cabo C0582), REPARADO el mismo día — en el País Vasco y Navarra la
+   * cuota del IRPF de la venta es la de la escala estatal del ahorro y la página no lo decía: ni
+   * junto a la cuota ni en el sello del IRPF. Ahora la cuota lleva AVISO_IRPF_FORAL debajo, y el
+   * sello también (como las apps de compraventa, que no saben dónde reside el vendedor).
    */
   test('C0582 — con el País Vasco o Navarra, la cuota estatal del IRPF de la venta lleva la salvedad foral (o no se da)', async ({ page }) => {
-    test.fail();
     await casoC0582(page);
     const sello = page.getByRole('note').filter({ hasText: 'IRPF de la venta' }).first();
 
@@ -6652,6 +6650,8 @@ test.describe('Simulador de heredar vivienda — cabo C0582 (02/11/2026)', () =>
         cifra === null || salvedad,
         `${ccaa}: cuota ${cifra} con la escala estatal y sin salvedad foral. Panel: «${irpf}» · sello: «${textoSello}»`,
       ).toBe(true);
+      // Y la salvedad va junto a la cifra, no solo en el sello
+      expect(irpf).toContain(AVISO_IRPF_FORAL);
     }
   });
 });
