@@ -217,6 +217,10 @@ import {
   TERRITORIOS_IIVTNU_FORAL,
   motivoPlusvaliaForal,
 } from '../../data/itp-ccaa';
+// Añadidos el 02/11/2026 (cabo C0582): dónde el IRPF del residente es foral y la salvedad con la
+// que lo dicen las apps de compraventa, y la escala del ahorro de la que sale la cuota estatal.
+import { TERRITORIOS_IRPF_FORAL, AVISO_IRPF_FORAL } from '../../data/itp-ccaa';
+import { TRAMOS_GANANCIAS_PATRIMONIALES_2025 } from '../../data/fiscal';
 
 const RUTA = '/simulador-heredar-vivienda/';
 
@@ -6524,5 +6528,130 @@ test.describe('Simulador de heredar vivienda — inspección 01/11/2026', () => 
     expect(lista.length).toBeGreaterThanOrEqual(4);
     expect(lista.length).toBeLessThanOrEqual(8);
     expect(lista.join(' | ')).not.toContain('RDL 26/2021');
+  });
+});
+
+/**
+ * Inspector 02/11/2026, modo cabo — C0582: con el País Vasco o Navarra en el selector, ¿el IRPF de
+ * la venta se calcula con la escala estatal del ahorro sin salvedad foral? Visto al reparar el
+ * hallazgo 3878 (plusvalía foral), que no lo cubría.
+ *
+ * El patrón del propio catálogo, en data/itp-ccaa.ts: `TERRITORIOS_IRPF_FORAL` = País Vasco y
+ * Navarra (Concierto Económico, Ley 12/2002, art. 6.Uno, leído en el BOE el 08/10/2026: el IRPF es
+ * «un tributo concertado de normativa autónoma» que exacciona la Diputación Foral si el contribuyente
+ * reside allí; Convenio Económico de Navarra, Ley 28/1990), y data/fiscal no tiene esas escalas. Las
+ * apps de compraventa lo NOMBRAN: si saben que el vendedor reside allí (vende su vivienda habitual),
+ * no dan cifra (`avisoIrpfForalResidente`, hallazgo 3072); si no lo saben, dan la cuota estatal con
+ * `AVISO_IRPF_FORAL` junto a ella («Es la escala estatal: si resides en el País Vasco o en Navarra,
+ * tu IRPF es foral…»; lib/calculadoras/compraventa.ts y ventaInmueble.ts, hallazgo 3061). Esta app
+ * pregunta la CCAA donde residía el CAUSANTE, no la del heredero que vende: es el segundo caso.
+ *
+ * El caso, resuelto a mano con data/fiscal ANTES de abrir la app: hijo de 45 años (Grupo II),
+ * vivienda habitual del fallecido, compra del causante el 01/01/1995 por 80.000 €, valor de
+ * referencia 200.000 €, suelo 60.000 € sobre 120.000 € de catastral total, venta a los 5 años por
+ * 250.000 €, patrimonio previo vacío.
+ *
+ *   ISD (la app usa la tarifa del art. 21.2 LISD también en foral): 200.000 + 6.000 de ajuar =
+ *     206.000 − 15.956,87 − 122.606,47 = 67.436,66 → 6.789,79 + 3.531,04 × 14,45 % = 7300,03.
+ *     Madrid y País Vasco bonifican el 99 % (BONIFICACIONES_CCAA_IS) → 73,00 €; Navarra el 98 % →
+ *     146,00 €. Venta a los 5 años (< 10): sin la reducción, 190.043,13 → 23.063,25 + 30.408,30 ×
+ *     21,25 % = 29.525,01 → 295,25 € (99 %) o 590,50 € (98 %): se regularizan 222,25 € o 444,50 €.
+ *   IIVTNU: Madrid 60.000 × 0,40 × 25 % = 6000,00 (herencia) y 60.000 × 0,18 × 25 % = 2700,00
+ *     (venta). En foral, «No calculada» desde el hallazgo 3878: 0 en las dos.
+ *   IRPF, escala TRAMOS_GANANCIAS_PATRIMONIALES_2025 (19 % hasta 6.000, 21 % hasta 50.000…):
+ *     Madrid      200.000 + 73 + 222,25 + 6.000 = 206.295,25 · 250.000 − 2.700 = 247.300,00
+ *                 → 41.004,75 → 1.140 + 35.004,75 × 21 % = 8491,00 €
+ *     País Vasco  200.000 + 73 + 222,25 = 200.295,25 · 250.000 → 49.704,75
+ *                 → 1.140 + 43.704,75 × 21 % = 10.318,00 €
+ *     Navarra     200.000 + 146 + 444,50 = 200.590,50 · 250.000 → 49.409,50
+ *                 → 1.140 + 43.409,50 × 21 % = 10.255,995 (la app pinta 10.255,99 €)
+ *
+ * Lo esperado en foral: la cuota estatal CON la salvedad (o sin cifra). Lo obtenido: la cuota
+ * estatal con «Tramos: 19 % / 21 % / 23 % / 27 % / 30 %» y ninguna mención a que el IRPF del
+ * residente foral no es ese; el sello «IRPF de la venta» dice «Toda ganancia patrimonial por
+ * transmisión tributa con esta escala». Lo único foral del panel es el rótulo de la plusvalía de la
+ * venta, y la tarjeta «Régimen foral: consulta obligatoria» vive plegada en el bloque educativo y no
+ * nombra el IRPF.
+ */
+test.describe('Simulador de heredar vivienda — cabo C0582 (02/11/2026)', () => {
+  /** El caso del cabo, salvo la comunidad, que la elige cada test. */
+  async function casoC0582(page: Page): Promise<void> {
+    await abrir(page);
+    await page.selectOption('#parentescoSel', 'hijo');
+    await casilla(page, 'viviendaHabitual', true);
+    await mover(page, 'edadHer', 45);
+    await mover(page, 'anioAdq', 1995);
+    await page.selectOption('#mesAdq', '1');
+    await page.selectOption('#diaAdq', '1');
+    await mover(page, 'valorAdq', 80000);
+    await mover(page, 'valorRef', 200000);
+    await mover(page, 'valorSuelo', 60000);
+    await mover(page, 'valorCatastralTotal', 120000);
+    await mover(page, 'aniosVenta', 5);
+    await mover(page, 'valorVta', 250000);
+  }
+
+  /** El panel del IRPF sin el rótulo de la plusvalía de la venta, que ya dice «régimen foral». */
+  async function panelIrpfSinRotuloPlusvalia(page: Page): Promise<string> {
+    return (await panel(page, IRPF)).replace('Plusvalía municipal de la venta (régimen foral)', '');
+  }
+
+  test('C0582 — la cadena hasta la ganancia: Madrid 8491,00 € (control) y la escala estatal también en el País Vasco y Navarra', async ({ page }) => {
+    // Los datos de los que sale el caso (pasa hoy)
+    expect([...TERRITORIOS_IRPF_FORAL].sort()).toEqual(['navarra', 'pais-vasco']);
+    expect(AVISO_IRPF_FORAL).toContain('Es la escala estatal');
+    expect(TRAMOS_GANANCIAS_PATRIMONIALES_2025.map((t) => [t.hasta, t.tipo])).toEqual([
+      [6000, 19], [50000, 21], [200000, 23], [300000, 27], [Infinity, 30],
+    ]);
+    expect(BONIFICACIONES_CCAA_IS['pais-vasco'].bonificaciones['II'].porcentaje).toBe(0.99);
+    expect(BONIFICACIONES_CCAA_IS['navarra'].bonificaciones['II'].porcentaje).toBe(0.98);
+
+    await casoC0582(page);
+
+    await page.selectOption('#ccaaSel', 'madrid');
+    expect(await linea(page, IRPF, 'Valor adquisición fiscal*')).toBe('206.295,25 €');
+    expect(await linea(page, IRPF, '= Valor de transmisión**')).toBe('247.300,00 €');
+    expect(await linea(page, IRPF, 'Ganancia patrimonial')).toBe('41.004,75 €');
+    expect(await linea(page, IRPF, 'Cuota IRPF venta')).toBe('8491,00 €');
+    // Control: en territorio común el panel del IRPF no tiene nada foral que decir
+    expect(await panelIrpfSinRotuloPlusvalia(page)).not.toMatch(/foral/i);
+
+    await page.selectOption('#ccaaSel', 'pais-vasco');
+    expect(await linea(page, ISD, 'Cuota ISD final')).toBe('73,00 €');
+    expect(await linea(page, IRPF, 'Valor adquisición fiscal*')).toBe('200.295,25 €');
+    expect(await linea(page, IRPF, '= Valor de transmisión**')).toBe('250.000,00 €');
+    expect(await linea(page, IRPF, 'Ganancia patrimonial')).toBe('49.704,75 €');
+
+    await page.selectOption('#ccaaSel', 'navarra');
+    expect(await linea(page, ISD, 'Cuota ISD final')).toBe('146,00 €');
+    expect(await linea(page, IRPF, 'Valor adquisición fiscal*')).toBe('200.590,50 €');
+    expect(await linea(page, IRPF, 'Ganancia patrimonial')).toBe('49.409,50 €');
+  });
+
+  /**
+   * HALLAZGO ABIERTO (02/11/2026, cabo C0582) — en el País Vasco y Navarra la cuota del IRPF de la
+   * venta es la de la escala estatal del ahorro y la página no lo dice: ni junto a la cuota ni en el
+   * sello del IRPF. Pasa a verde cuando la cuota lleve la salvedad (AVISO_IRPF_FORAL, como las apps
+   * de compraventa que no saben dónde reside el vendedor) o cuando no se dé cifra; entonces se le
+   * retira el `test.fail()` y este comentario pasa a «REPARADO».
+   */
+  test('C0582 — con el País Vasco o Navarra, la cuota estatal del IRPF de la venta lleva la salvedad foral (o no se da)', async ({ page }) => {
+    test.fail();
+    await casoC0582(page);
+    const sello = page.getByRole('note').filter({ hasText: 'IRPF de la venta' }).first();
+
+    for (const ccaa of ['pais-vasco', 'navarra']) {
+      await page.selectOption('#ccaaSel', ccaa);
+      const irpf = await panelIrpfSinRotuloPlusvalia(page);
+      const cifra = irpf.match(/Cuota IRPF venta ([\d.]+,\d{2} €)/)?.[1] ?? null;
+      // Si se da cifra, es la de la escala estatal (hoy: 10.318,00 € en el País Vasco)
+      if (cifra !== null && ccaa === 'pais-vasco') expect(cifra).toBe('10.318,00 €');
+      const textoSello = ((await sello.textContent()) ?? '').replace(/\s+/g, ' ');
+      const salvedad = /foral/i.test(irpf) || /foral/i.test(textoSello);
+      expect(
+        cifra === null || salvedad,
+        `${ccaa}: cuota ${cifra} con la escala estatal y sin salvedad foral. Panel: «${irpf}» · sello: «${textoSello}»`,
+      ).toBe(true);
+    }
   });
 });

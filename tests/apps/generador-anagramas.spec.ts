@@ -2530,6 +2530,64 @@ test.describe('inspector 01/11/2026', () => {
   });
 });
 
+// ---------------------------------------------------------------------------------------------
+// NOVENA PASADA — inspector 02/11/2026 · CABO C0586 (segmento MOTOR, modo cabo)
+//
+// Solo la pregunta del cabo: ¿de dónde salen las cifras de la tarjeta «Frecuencia de letras en
+// español»? Entraron en 82a6da7d (08/03/2026, «profesionalizar 2 apps con EducationalSection
+// v2.0») sin fuente, y nada en la tarjeta, el resto del bloque educativo, la FAQ visible, el
+// FAQPage ni un comentario del código dice de dónde salen. Oráculo propio, resuelto ANTES de
+// abrir el navegador (.inspector-trabajo/anagramas-frecuencias-c0586.mjs de la copia del
+// Inspector; no importa nada de la app):
+//
+//   · Son las 8 primeras, en el mismo orden (E A O S R N I D), de la tabla que el catálogo ya
+//     atribuye a Fletcher Pratt, «Secret and Urgent» (1939), pp. 254-255, en
+//     app/simulador-cifrado-cesar/motor.ts (FREQS_ES), y suman 68,5 % como las 8 de esa tabla
+//     (68,56). Pero redondeada a una cifra (Intl es-ES) esa tabla da S 8,0 (7,98) e I 6,3 (6,25),
+//     y la tarjeta dice 7,9 y 6,2: atribuirlas a Pratt tal como están sería citar mal 2 de 8.
+//   · Las cifras dependen del corpus: en el lemario que usa este generador
+//     (public/data/diccionario-es.txt, 86.973 lemas, 759.640 letras, cada lema una vez) la más
+//     frecuente es la A (14,4 %), luego O 9,9, E 9,7, R 9,2, I 8,5, N 6,2…; la S baja al 4,2 % y
+//     la D no está entre las diez primeras.
+//   · Ninguna fuente de la red de la tarea las respalda: rae.es devuelve 403 (un intento) y los
+//     demás dominios (BOE, INE, IGN…) no publican frecuencias de letras.
+// ---------------------------------------------------------------------------------------------
+test.describe('inspector 02/11/2026 · cabo C0586', () => {
+  /**
+   * HALLAZGO ABIERTO (inspector 02/11/2026, cabo C0586, contenido) — la tarjeta da ocho
+   * porcentajes como un hecho («Las letras más frecuentes en español son: E (13,7 %)…») sin
+   * fuente ni año: regla 1 de neutralidad editorial (CLAUDE.md §1.quinquies). Pasa a verde
+   * cuando las cifras salgan, se maticen como aproximadas de un corpus de textos, o citen
+   * fuente y año (si es Pratt, con S 8,0 e I 6,3); entonces se le retira el `test.fail()` y este
+   * comentario pasa a «REPARADO». Si se retiran, el test «REPARADO 3890» de arriba, que exige
+   * «E (13,7 %)», se queda sin objeto y se reescribe con ellas.
+   */
+  test('C0586 · las cifras de la tarjeta de frecuencias citan fuente y año, se matizan o no están', async ({
+    page,
+  }) => {
+    test.fail();
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#anagram-letters']);
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const tarjeta = page.locator('[class*="eduTipCard"]', { hasText: /Frecuencia de letras/ });
+    await expect(tarjeta).toBeVisible();
+    // \s recoge también el espacio duro (U+00A0) que lleva el signo desde 5407ea26
+    const texto = (await tarjeta.innerText()).replace(/\s+/g, ' ').trim();
+    const cifras = texto.match(/\d+(,\d+)? ?%/g) ?? [];
+    const conFuente = /\b(1[89]\d\d|20\d\d)\b/.test(texto);
+    const matizada = /aproximad/i.test(texto) && /corpus|textos/i.test(texto);
+    expect(
+      cifras.length === 0 || conFuente || matizada,
+      `${cifras.length} porcentajes sin fuente, año ni matiz: «${texto}»`,
+    ).toBe(true);
+    // Si se atribuyen a Pratt, que casen con su tabla (FREQS_ES del motor del César, redondeada)
+    if (/Pratt/.test(texto)) {
+      expect(texto).toContain('S (8,0 %)');
+      expect(texto).toContain('I (6,3 %)');
+    }
+  });
+});
+
 /**
  * ¿Pisa alguna pieza de la barra fija del logo las LETRAS del h1? Copia de la de la Ronda,
  * salvo que sin barra o sin h1 devuelve `null` en vez de `false`: así un cambio de maquetación

@@ -1261,3 +1261,283 @@ test.describe('simulador-titulacion · testigos del motor', () => {
     expect(bajadas).toEqual([]);
   });
 });
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════════
+ * Inspector 02/11/2026 — CABO C0527: ¿la página traducida tumba la app?
+ *
+ * EL CABO: 3 caídas a «Algo salió mal» con `NotFoundError: Failed to execute 'removeChild' on
+ * 'Node'` en /simulador-titulacion/ el 29/10/2026 (13:19:03, :08 y :17 UTC), las tres de UNA
+ * sesión de Edge 156 a 1366×768 en un aula presencial de Colombia. La traducción del navegador
+ * es HIPÓTESIS: el registro no guarda el idioma. Candidatas, de leer el código:
+ *   (a) CasosAula.tsx:231 `{magnitud === 'pH' ? 'pH = ' : ''}` junto a otra expresión en el
+ *       <strong> de la solución. Desde cdb074d0 (31/10, lote 5 de C0312) va dentro de un <span>
+ *       siempre montado. Y ANTES de ese commit tampoco podía caer: `magnitud` solo cambia en
+ *       `irA` y `nuevaPractica`, que ponen `verSolucion` a false en el MISMO render, así que React
+ *       retira el <div> de la solución entero (un elemento, que el traductor no toca) y nunca
+ *       llega a retirar el nodo de texto suelto.
+ *   (b) page.tsx:498 'antes' / 'después' en mitad del aviso del indicador: es texto ↔ texto, y
+ *       React lo cambia con `nodeValue` sobre el nodo que el traductor retiró. No lanza: deja el
+ *       texto viejo en pantalla (la forma del hallazgo 3297, bajo), no una caída.
+ *
+ * CENSO de las formas que SÍ caen (retirar un nodo de texto, o insertar delante de uno), en
+ * page.tsx y CasosAula.tsx: ninguna. Todo lo condicional es un ELEMENTO (`{sirve && <span>}`
+ * delante de un <small>, el aviso <p>, el bloque de pKa/pKb, la polilínea, el círculo, el
+ * veredicto, la pista, la solución, el botón Cargar ↔ la nota), y ninguno tiene un texto como
+ * hermano siguiente; los rótulos que cambian solos (pH, fase, color del matraz, título y
+ * enunciado del caso, Ver/Ocultar) son hijo ÚNICO de su elemento y React los cambia con
+ * textContent. El componente de la app no tiene ErrorBoundary ni recarga sola: la «recarga a
+ * los 3 s» del registro es la persona (app/error.tsx solo ofrece «Intentar de nuevo»).
+ *
+ * MEDIDO el 02/11/2026 (.inspector-trabajo/tit-traducida.mjs, 196 pasos en 1366×768: las cuatro
+ * pestañas, los 16 pares tipo × indicador, los cinco deslizadores con flechas, Inicio, Fin,
+ * RePág y arrastre de ratón, la bureta hasta el tope en los cuatro tipos, ráfagas sin espera,
+ * los 12 casos con pista, solución, tres respuestas y «Cargar», cuatro prácticas, el aviso de
+ * transparencia, el tema, la guía y la tarjeta de compartir), con cuatro traductores: ninguno,
+ * uno que traduce una vez, uno CONTINUO que traduce también lo que React añade después (lo que
+ * hace el de verdad) y uno que traduce ANTES de hidratar (Edge con traducción automática en un PC
+ * lento): 0 caídas y 0 NotFoundError en los cuatro. El temprano da el React #418 de hidratación,
+ * que React recupera regenerando el árbol (C0493) y que no pasa por app/error.tsx.
+ * VEREDICTO: el cabo NO se confirma con el traductor simulado del proyecto. Lo que no se ha
+ * podido probar es el traductor REAL de Edge (Microsoft Translator), que no se puede lanzar aquí.
+ *
+ * Lo que SÍ hace el traductor, y no es una caída (forma del cabo C0243; registrado como HALLAZGO
+ * ABIERTO, con su test al final de este fichero): los textos con variable que no son hijo único de su
+ * elemento se quedan con el valor viejo. Medido (.inspector-trabajo/tit-texto-viejo.mjs y
+ * tit-antes-despues.mjs): tras 5 × «+ 1 mL», «Volumen añadido» sigue en «0,00 mL» (sin traducir,
+ * «5,00 mL») y «% completado» en «0,0 %» (20,0 %); con el volumen del analito a 35 mL, V_eq sigue
+ * en «25,00 mL» (35,00) y el rótulo del deslizador en «25 mL»; y en AD+BD, al pasar de Tornasol a
+ * Fenolftaleína, el aviso sigue diciendo «Tornasol … empieza a virar a 15,87 mL … cambiaría antes»
+ * (sin traducir, «Fenolftaleína … 27,17 mL … después»). El pH, la fase y el color sí se actualizan.
+ *
+ * Estos tests son la comprobación, en verde: si alguien escribe en la app una de las formas que
+ * caen, el de la batería se pone en rojo.
+ * ═══════════════════════════════════════════════════════════════════════════════════════════ */
+
+import { asentarAntesDeTraducir } from './_hidratacion';
+
+/**
+ * Traductor simulado (receta de texto-condicional-traducido-familia.spec.ts): cada nodo de texto
+ * con contenido pasa a <font><font>texto</font></font>. Con `continuo`, además, un
+ * MutationObserver traduce el texto que React añada después, como el traductor del navegador.
+ */
+async function traducirPagina(page: Page, continuo: boolean): Promise<void> {
+  await asentarAntesDeTraducir(page);
+  await page.evaluate((seguir) => {
+    const envolver = (raiz: Node) => {
+      const nodos: Text[] = [];
+      if (raiz.nodeType === Node.TEXT_NODE) nodos.push(raiz as Text);
+      else if (raiz.nodeType === Node.ELEMENT_NODE) {
+        const caminante = document.createTreeWalker(raiz, NodeFilter.SHOW_TEXT);
+        while (caminante.nextNode()) nodos.push(caminante.currentNode as Text);
+      }
+      for (const nodo of nodos) {
+        const padre = nodo.parentElement;
+        if (!padre || !(nodo.nodeValue ?? '').trim()) continue;
+        if (/^(SCRIPT|STYLE|OPTION|NOSCRIPT|FONT)$/.test(padre.tagName)) continue;
+        const exterior = document.createElement('font');
+        const interior = document.createElement('font');
+        interior.textContent = nodo.nodeValue;
+        exterior.appendChild(interior);
+        padre.replaceChild(exterior, nodo);
+      }
+    };
+    envolver(document.body);
+    if (seguir) {
+      new MutationObserver((cambios) => {
+        for (const c of cambios) c.addedNodes.forEach((n) => n.isConnected && envolver(n));
+      }).observe(document.body, { childList: true, subtree: true });
+    }
+  }, continuo);
+}
+
+/** Las caídas que busca el cabo: la excepción de React y la pantalla de app/error.tsx. */
+function vigilarCaidas(page: Page): string[] {
+  const errores: string[] = [];
+  page.on('pageerror', (e) => errores.push(e.message));
+  page.on('console', (m) => {
+    if (m.type() === 'error' && /NotFoundError|removeChild|insertBefore/.test(m.text())) errores.push(m.text());
+  });
+  return errores;
+}
+
+async function sigueViva(page: Page, errores: string[]): Promise<void> {
+  await page.waitForTimeout(300);
+  await expect(page.getByText('Algo salió mal')).toHaveCount(0);
+  expect(errores).toEqual([]);
+}
+
+test.describe('Cabo C0527 · la página traducida no tumba la app (Inspector 02/11/2026)', () => {
+  test.use({ viewport: { width: 1366, height: 768 } }); // la de la sesión del registro
+
+  test('(b) page.tsx:498 — el aviso pasa de «antes» a «después» sin desmontarse: sin traducir lo dice', async ({
+    page,
+  }) => {
+    // CONTROL. AD+BD de fábrica, equivalencia 7,01 a 25,00 mL; ningún indicador es apto.
+    // Tornasol (5,0–8,0): pH 5,0 ≈ pKa + log(n_A/n_HA) ⇒ n_A/n_HA = 10^0,24 = 1,74 ⇒ V ≈ 15,9 mL,
+    //   muy antes del 98 % de V_eq (24,50 mL) ⇒ «antes».
+    // Fenolftaleína (8,2–10,0): tras V_eq manda NH₃/NH₄⁺, pH = 9,26 − log(2,5/n_B) = 8,2 ⇒
+    //   n_B = 0,218 mmol ⇒ V ≈ 27,18 mL, pasado el 102 % (25,50 mL) ⇒ «después».
+    const errores = vigilarCaidas(page);
+    await esperarHidratacion(page, ['#vAnalito']);
+    await page.getByRole('button', { name: /Ácido débil \+ Base débil/ }).click();
+    const aviso = page.locator('[class*="indicatorAviso"]');
+    await page.getByRole('button', { name: /Tornasol/ }).click();
+    await expect(aviso).toContainText('cambiaría antes de');
+    await page.getByRole('button', { name: /Fenolftaleína/ }).click();
+    await expect(aviso).toContainText('cambiaría después de');
+    await sigueViva(page, errores);
+  });
+
+  test('(b) page.tsx:498 — con la página traducida, el mismo cambio de «antes» a «después» no tumba la app', async ({
+    page,
+  }) => {
+    const errores = vigilarCaidas(page);
+    await esperarHidratacion(page, ['#vAnalito']);
+    await page.getByRole('button', { name: /Ácido débil \+ Base débil/ }).click();
+    await page.getByRole('button', { name: /Tornasol/ }).click();
+    const aviso = page.locator('[class*="indicatorAviso"]');
+    await expect(aviso).toContainText('cambiaría antes de');
+    await traducirPagina(page, false);
+    // El aviso ya está traducido (cada nodo de texto es un <font>) cuando cambia de rama.
+    expect(await aviso.locator('font').count()).toBeGreaterThan(5);
+    await page.getByRole('button', { name: /Fenolftaleína/ }).click();
+    await expect(page.getByRole('button', { name: /Fenolftaleína/ })).toHaveAttribute('aria-pressed', 'true');
+    await expect(aviso).toHaveCount(1);
+    await sigueViva(page, errores);
+  });
+
+  test('(a) CasosAula.tsx:231 — abrir la solución de un caso de pH y pasar a uno de volumen y a «Practicar», traducida', async ({
+    page,
+  }) => {
+    const errores = vigilarCaidas(page);
+    const casos = casosAula(page);
+    await traducirPagina(page, true);
+    // Caso 7: pH inicial del acético 0,10 M ⇒ «pH = 2,88» en la solución.
+    await casos.getByRole('button', { name: /^Caso 7:/ }).click();
+    await casos.getByRole('button', { name: /solución/ }).click();
+    await expect(casos.locator('[class*="casoResultado"]')).toContainText('pH = 2,88');
+    // A un caso de volumen (sin «pH = ») y a la práctica, cada vez con la solución abierta.
+    await casos.getByRole('button', { name: /^Caso 1:/ }).click();
+    await casos.getByRole('button', { name: /solución/ }).click();
+    await expect(casos.locator('[class*="casoResultado"]')).toContainText('30,00');
+    await casos.getByRole('button', { name: /Practicar/ }).click();
+    await casos.getByRole('button', { name: /solución/ }).click();
+    await casos.getByRole('button', { name: /^Caso 10:/ }).click();
+    await sigueViva(page, errores);
+  });
+
+  for (const traducida of [false, true]) {
+    test(`batería del aula ${traducida ? 'con la página traducida (traductor continuo)' : 'sin traducir (control)'}: ni una caída`, async ({
+      page,
+    }) => {
+      test.setTimeout(90_000);
+      const errores = vigilarCaidas(page);
+      await esperarHidratacion(page, ['#vAnalito', '#casos-respuesta']);
+      if (traducida) await traducirPagina(page, true);
+
+      // Pestañas e indicadores: los 16 pares tipo × indicador ponen y quitan «· apto aquí» y el aviso.
+      for (const tipo of [/Ácido débil \+ Base fuerte/, /Ácido fuerte \+ Base débil/, /Ácido débil \+ Base débil/, /Ácido fuerte \+ Base fuerte/]) {
+        await page.getByRole('button', { name: tipo }).click();
+        for (const ind of [/Naranja de metilo/, /Azul de bromotimol/, /Tornasol/, /Fenolftaleína/]) {
+          await page.getByRole('button', { name: ind }).click();
+        }
+      }
+      // Los cinco deslizadores, en AD+BD (los cinco a la vista) con el aviso montado.
+      await page.getByRole('button', { name: /Ácido débil \+ Base débil/ }).click();
+      await page.getByRole('button', { name: /Naranja de metilo/ }).click();
+      for (const id of ['vAnalito', 'cAnalito', 'cTitulante', 'pKa', 'pKb']) {
+        await page.locator(`#${id}`).focus();
+        for (const tecla of ['End', 'Home', 'ArrowRight', 'ArrowRight', 'PageUp']) await page.keyboard.press(tecla);
+      }
+      // La bureta en fuerte con fuerte, con los deslizadores en un estado conocido (Inicio y Fin):
+      // 10 mL de HCl 1 M con NaOH 1 M, V_eq = 10 mL.
+      await page.getByRole('button', { name: /Ácido fuerte \+ Base fuerte/ }).click();
+      for (const [id, tecla] of [['vAnalito', 'Home'], ['cAnalito', 'End'], ['cTitulante', 'End']] as const) {
+        await page.locator(`#${id}`).focus();
+        await page.keyboard.press(tecla);
+      }
+      // Testigo de que los clics llegan a React con la página traducida (el pH es hijo único de
+      // su <span>, así que sale bien también traducido):
+      //   5 × «+ 1 mL»: quedan 10 − 5 = 5 mmol de H⁺ en 15 mL ⇒ [H⁺] 0,3333 ⇒ pH 0,4771 ⇒ «0,48»
+      //   3 gotas más: 4,7 mmol en 15,3 mL ⇒ [H⁺] 0,30719 ⇒ pH 0,5126 ⇒ «0,51»
+      await pulsar(mililitro(page), 5);
+      await expect(valorDe(page, 'pH actual')).toHaveText('0,48');
+      await pulsar(gota(page), 3);
+      await expect(valorDe(page, 'pH actual')).toHaveText('0,51');
+      await irAEquivalencia(page).click();
+      await expect(valorDe(page, 'pH actual')).toHaveText('7,00');
+      await reiniciar(page).click();
+
+      // Los casos para clase: cada caso, con pista y solución, una respuesta y «Cargar».
+      const casos = casosAula(page);
+      for (let n = 1; n <= 12; n++) {
+        await casos.getByRole('button', { name: new RegExp(`^Caso ${n}:`) }).click();
+        const pista = casos.getByRole('button', { name: /pista/ });
+        if (await pista.count()) await pista.click();
+        await casos.getByRole('button', { name: /solución/ }).click();
+        await casos.locator('#casos-respuesta').fill('7');
+        await casos.getByRole('button', { name: 'Comprobar' }).click();
+        await expect(casos.getByRole('alert')).toHaveCount(1);
+        const cargar = casos.getByRole('button', { name: 'Cargar en el simulador' });
+        if (await cargar.count()) await cargar.click();
+      }
+      for (let k = 0; k < 2; k++) {
+        await casos.getByRole('button', { name: /Practicar/ }).click();
+        await casos.getByRole('button', { name: /solución/ }).click();
+        await casos.locator('#casos-respuesta').fill('5');
+        await casos.getByRole('button', { name: 'Comprobar' }).click();
+      }
+
+      if (traducida) {
+        // Que se ha medido una página TRADUCIDA y no una que React regeneró (cabo C0493).
+        expect(await page.locator('h1 font').count()).toBeGreaterThan(0);
+      }
+      await sigueViva(page, errores);
+    });
+  }
+});
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════════
+ * Inspector 02/11/2026 — HALLAZGO ABIERTO [operativa/medio], visto al responder el cabo C0527
+ * (forma del cabo C0243: no tumba, miente en silencio).
+ *
+ * Con la página traducida, las cifras del panel «Estado actual» que van como nodo de texto junto
+ * a su unidad —page.tsx:697 `{formatNumber(V_titulante, 2)} mL`, :701 `{formatNumber(V_eq, 2)} mL`,
+ * :705 `{formatNumber(porcentaje, 1)}{' '}%`— y el rótulo de los deslizadores (:384, :403, :422,
+ * :440, :459) se quedan con el valor del momento de traducir: React escribe en el nodo de texto
+ * que el traductor retiró. El pH, la fase y el color, hijos ÚNICOS de su elemento, sí cambian, así
+ * que la pantalla queda incoherente (pH 1,18 con «0,00 mL» añadidos). Receta de C0243: cada cifra,
+ * hijo único de su propio elemento.
+ *
+ * ESPERADO, a mano: estado de fábrica, 25 mL de HCl 0,1 M con NaOH 0,1 M ⇒ V_eq = 0,1·25/0,1 =
+ * 25,00 mL. 5 × «+ 1 mL» ⇒ «Volumen añadido» 5,00 mL y 5/25 = «20,0 %». Luego V_analito de 25 a
+ * 35 mL (10 × flecha derecha, paso 1) ⇒ V_eq = 0,1·35/0,1 = 35,00 mL y el rótulo «35 mL».
+ * OBTENIDO traducida (.inspector-trabajo/tit-texto-viejo.mjs): «0,00 mL», «0,0 %», «25,00 mL»
+ * y «25 mL». El control sin traducir da lo esperado.
+ * ═══════════════════════════════════════════════════════════════════════════════════════════ */
+test.describe('Inspector 02/11/2026 · las cifras del panel siguen al estado con la página traducida', () => {
+  test.use({ viewport: { width: 1366, height: 768 } });
+
+  for (const traducida of [false, true]) {
+    test(`${traducida ? 'HALLAZGO ABIERTO — traducida' : 'control sin traducir'}: volumen, % completado, V_eq y rótulo del deslizador`, async ({
+      page,
+    }) => {
+      test.fail(traducida, 'HALLAZGO ABIERTO: con la página traducida las cifras junto a su unidad se quedan con el valor viejo');
+      await esperarHidratacion(page, ['#vAnalito']);
+      if (traducida) {
+        await traducirPagina(page, false);
+        expect(await page.locator('h1 font').count()).toBeGreaterThan(0);
+      }
+      await pulsar(mililitro(page), 5);
+      // Testigo de que los clics llegan a React: 2,5 − 0,5 = 2,0 mmol de H⁺ en 30 mL ⇒
+      // [H⁺] = 0,06667 ⇒ pH 1,176 ⇒ «1,18». Es hijo único de su <span>: cambia también traducido.
+      await expect(valorDe(page, 'pH actual')).toHaveText('1,18');
+      await expect(valorDe(page, 'Volumen añadido')).toHaveText('5,00 mL');
+      await expect(valorDe(page, '% completado')).toHaveText(/^20,0\s%$/);
+      await page.locator('#vAnalito').focus();
+      for (let k = 0; k < 10; k++) await page.keyboard.press('ArrowRight');
+      await expect(valorDe(page, 'Volumen de equivalencia (V_eq)')).toHaveText('35,00 mL');
+      await expect(page.locator('#vAnalito ~ [class*="sliderValue"]').first()).toHaveText('35 mL');
+    });
+  }
+});
