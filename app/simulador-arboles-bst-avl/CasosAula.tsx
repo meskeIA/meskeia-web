@@ -127,7 +127,9 @@ export default function CasosAula() {
         <p className={styles.casoModo}>
           <span aria-hidden="true">🌳</span> Modo{' '}
           <strong>{datos.modo === 'avl' ? 'AVL (con rebalanceo)' : 'BST (sin rebalanceo)'}</strong>{' '}
-          · inserciones: {listaDeValores(datos.inserciones)}
+          {/* La lista en su <span>, como único hijo: traducida, se quedaba la del caso anterior
+              junto al enunciado nuevo (hallazgo 3899) */}
+          <span>{`· inserciones: ${listaDeValores(datos.inserciones)}`}</span>
           <span>{datos.eliminaciones && datos.eliminaciones.length > 0
             ? ` · borrados: ${listaDeValores(datos.eliminaciones)}`
             : ''}</span>

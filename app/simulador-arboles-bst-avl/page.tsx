@@ -87,6 +87,19 @@ function leerValor(texto: string): number | null {
  */
 const AVISO_DECIMAL = 'Los nodos son números enteros y ese valor tiene decimales.';
 
+/**
+ * Tope de nodos del árbol.
+ *
+ * ⚠️ 02/11/2026 (hallazgo 3901) — no había ninguno: el rango deja 10.999 valores distintos, y el
+ * motor y el dibujo son recursivos, así que una cadena BST de varios miles de nodos (los valores
+ * en orden creciente) agotaba la pila y la página entera caía a «Algo salió mal». Medido en
+ * Chromium: 7.000 aguantaban, 8.500 unas veces sí y otras no, y 10.000 caían siempre. 3.000 es la
+ * cadena más larga que ya se probaba (CASO B del spec, altura 3000) y deja la recursión a menos de
+ * la mitad de lo que se midió seguro; para ver la diferencia entre BST y AVL bastan unas decenas.
+ */
+const MAX_NODOS = 3000;
+const AVISO_TOPE = `El árbol admite hasta ${formatNumber(MAX_NODOS, 0)} nodos: con más, el dibujo deja de leerse y el navegador se queda sin pila en un BST degenerado.`;
+
 const PRESETS: PresetArbol[] = [
   {
     id: 'ordenado',
@@ -234,6 +247,12 @@ export default function SimuladorArbolesBstAvl() {
   const [caminoActual, setCaminoActual] = useState<number[]>([]);
   const [resaltado, setResaltado] = useState<{ valor: number; tipo: EstadoNodo } | null>(null);
   const [velocidad, setVelocidad] = useState<number>(600);
+  /**
+   * Los valores del árbol en el ORDEN en que entraron. Pasar de BST a AVL reconstruye con este
+   * orden: con el inorden (creciente) salía el AVL de otra secuencia y el historial contaba
+   * rotaciones «insertando X» de inserciones que nadie hizo (hallazgo 3897, 02/11/2026).
+   */
+  const [ordenInsercion, setOrdenInsercion] = useState<number[]>([]);
   const timeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   // Limpiar timeouts al desmontar
@@ -247,6 +266,20 @@ export default function SimuladorArbolesBstAvl() {
     timeoutsRef.current.forEach((t) => clearTimeout(t));
     timeoutsRef.current = [];
   }, []);
+
+  /**
+   * Corta una búsqueda animada en curso y su resaltado.
+   *
+   * ⚠️ 02/11/2026 (hallazgo 3896) — solo «Limpiar todo» la cortaba: al eliminar, insertar o cargar
+   * un ejemplo mientras se animaba, su veredicto, calculado sobre el árbol de ANTES, llegaba al
+   * final y tapaba el mensaje nuevo («Encontrado 60» con el 60 ya borrado). Toda operación que
+   * cambia el árbol pasa por aquí.
+   */
+  const cancelarAnimacion = useCallback(() => {
+    limpiarTimeouts();
+    setCaminoActual([]);
+    setResaltado(null);
+  }, [limpiarTimeouts]);
 
   const handleInsertar = useCallback(
     (valor: number) => {
@@ -264,6 +297,11 @@ export default function SimuladorArbolesBstAvl() {
         setMensaje(`El valor ${valorEntero} ya está en el árbol (no se permiten duplicados).`);
         return;
       }
+      if (contarNodos(arbolPrev) >= MAX_NODOS) {
+        setMensaje(`No se ha insertado ${valorEntero}. ${AVISO_TOPE}`);
+        return;
+      }
+      cancelarAnimacion();
       const log: string[] = [];
       let nuevaRaiz: NodoArbol;
       if (tipo === 'bst') {
@@ -272,6 +310,7 @@ export default function SimuladorArbolesBstAvl() {
         nuevaRaiz = insertarAVLConLog(arbolPrev, valorEntero, log);
       }
       setRaiz(nuevaRaiz);
+      setOrdenInsercion((prev) => [...prev, valorEntero]);
       setRotaciones((prev) => [...prev, ...log]);
       setResaltado({ valor: valorEntero, tipo: 'nuevo' });
       setMensaje(
@@ -283,7 +322,7 @@ export default function SimuladorArbolesBstAvl() {
       const t = setTimeout(() => setResaltado(null), velocidad * 2);
       timeoutsRef.current.push(t);
     },
-    [raiz, tipo, velocidad]
+    [raiz, tipo, velocidad, cancelarAnimacion]
   );
 
   const handleEliminar = useCallback(
@@ -302,6 +341,7 @@ export default function SimuladorArbolesBstAvl() {
         setMensaje(`El valor ${valorEntero} no está en el árbol.`);
         return;
       }
+      cancelarAnimacion();
       const log: string[] = [];
       let nuevaRaiz: NodoArbol | null;
       if (tipo === 'bst') {
@@ -310,6 +350,7 @@ export default function SimuladorArbolesBstAvl() {
         nuevaRaiz = eliminarAVLConLog(arbolPrev, valorEntero, log);
       }
       setRaiz(nuevaRaiz);
+      setOrdenInsercion((prev) => prev.filter((v) => v !== valorEntero));
       setRotaciones((prev) => [...prev, ...log]);
       setMensaje(
         log.length > 0
@@ -317,7 +358,7 @@ export default function SimuladorArbolesBstAvl() {
           : `Eliminado ${valorEntero}.`
       );
     },
-    [raiz, tipo]
+    [raiz, tipo, cancelarAnimacion]
   );
 
   const handleBuscar = useCallback(
@@ -373,14 +414,19 @@ export default function SimuladorArbolesBstAvl() {
   );
 
   const handleInsertarVarios = useCallback(() => {
-    const leidos = valoresMultiples
+    const trozos = valoresMultiples
       .split(/[,;\s]+/)
       .map((s) => s.trim())
       .filter((s) => s.length > 0)
-      .map((texto) => ({ texto, n: Number(texto) }))
-      .filter(({ n }) => Number.isFinite(n));
+      .map((texto) => ({ texto, n: Number(texto) }));
+    const leidos = trozos.filter(({ n }) => Number.isFinite(n));
+    // Lo que no es un número se nombra, como los decimales del 2301: se quitaba antes de contar
+    // y «10, abc, 20» respondía «Insertados 2 de 2» (hallazgo 3900, 02/11/2026)
+    const noNumeros = trozos.filter(({ n }) => !Number.isFinite(n)).map(({ texto }) => `«${texto}»`);
+    const avisoNoNumeros =
+      noNumeros.length > 0 ? ` No son números enteros y se descartan: ${noNumeros.join(', ')}.` : '';
     if (leidos.length === 0) {
-      setMensaje('No se encontraron números válidos en el texto.');
+      setMensaje(`No se encontraron números válidos en el texto.${avisoNoNumeros}`);
       return;
     }
     // El MISMO rango que el botón «Insertar». Hasta el 25/08/2026 esta vía no lo aplicaba, así
@@ -401,40 +447,69 @@ export default function SimuladorArbolesBstAvl() {
         : '';
     if (numeros.length === 0) {
       setMensaje(
-        conDecimales.length === 0
+        conDecimales.length === 0 && noNumeros.length === 0
           ? `Todos los valores quedan fuera del rango ${VALOR_MIN} a ${VALOR_MAX}.`
-          : `No se ha insertado ningún valor.${avisoRango}${avisoDecimales}`
+          : `No se ha insertado ningún valor.${avisoRango}${avisoDecimales}${avisoNoNumeros}`
       );
       return;
     }
+    cancelarAnimacion();
     let arbol = clonar(raiz);
     const logTotal: string[] = [];
-    let insertados = 0;
+    const entrados: number[] = [];
+    const repetidos: number[] = [];
+    let nodos = contarNodos(arbol);
+    let sinSitio = 0;
     for (const valorEntero of numeros) {
-      if (existe(arbol, valorEntero)) continue;
+      if (existe(arbol, valorEntero)) {
+        if (!repetidos.includes(valorEntero)) repetidos.push(valorEntero);
+        continue;
+      }
+      if (nodos >= MAX_NODOS) {
+        sinSitio += 1;
+        continue;
+      }
       if (tipo === 'bst') {
         arbol = insertarBST(arbol, valorEntero);
       } else {
         arbol = insertarAVLConLog(arbol, valorEntero, logTotal);
       }
-      insertados += 1;
+      entrados.push(valorEntero);
+      nodos += 1;
     }
+    // Los repetidos (en el texto o ya en el árbol) se nombran: «10, 20, 10» decía «2 de 3» sin
+    // decir cuál faltó ni por qué (hallazgo 3900)
+    const avisoRepetidos =
+      repetidos.length > 0
+        ? ` Descartados por repetidos (no se admiten duplicados): ${repetidos.join(', ')}.`
+        : '';
+    const avisoSinSitio = sinSitio > 0 ? ` ${formatNumber(sinSitio, 0)} no entraron. ${AVISO_TOPE}` : '';
     setRaiz(arbol);
+    setOrdenInsercion((prev) => [...prev, ...entrados]);
     setRotaciones((prev) => [...prev, ...logTotal]);
     setMensaje(
-      `Insertados ${insertados} de ${leidos.length} valores. Rotaciones aplicadas: ${logTotal.length}.` +
+      `Insertados ${entrados.length} de ${trozos.length} valores. Rotaciones aplicadas: ${logTotal.length}.` +
         avisoRango +
-        avisoDecimales
+        avisoDecimales +
+        avisoNoNumeros +
+        avisoRepetidos +
+        avisoSinSitio
     );
     setValoresMultiples('');
-  }, [valoresMultiples, raiz, tipo]);
+  }, [valoresMultiples, raiz, tipo, cancelarAnimacion]);
 
   const handleAleatorios = useCallback(() => {
     let arbol = clonar(raiz);
+    const hueco = MAX_NODOS - contarNodos(arbol);
+    if (hueco <= 0) {
+      setMensaje(`No se ha insertado ningún valor. ${AVISO_TOPE}`);
+      return;
+    }
+    cancelarAnimacion();
     const logTotal: string[] = [];
     const generados = new Set<number>();
     let intentos = 0;
-    while (generados.size < 10 && intentos < 200) {
+    while (generados.size < Math.min(10, hueco) && intentos < 200) {
       const v = Math.floor(Math.random() * 99) + 1;
       if (!existe(arbol, v) && !generados.has(v)) {
         generados.add(v);
@@ -449,12 +524,14 @@ export default function SimuladorArbolesBstAvl() {
       }
     }
     setRaiz(arbol);
+    setOrdenInsercion((prev) => [...prev, ...generados]);
     setRotaciones((prev) => [...prev, ...logTotal]);
     setMensaje(`Se insertaron ${generados.size} valores aleatorios. Rotaciones: ${logTotal.length}.`);
-  }, [raiz, tipo]);
+  }, [raiz, tipo, cancelarAnimacion]);
 
   const handlePreset = useCallback(
     (preset: PresetArbol) => {
+      cancelarAnimacion();
       let arbol: NodoArbol | null = null;
       const logTotal: string[] = [];
       for (const v of preset.valores) {
@@ -465,19 +542,19 @@ export default function SimuladorArbolesBstAvl() {
         }
       }
       setRaiz(arbol);
+      setOrdenInsercion([...preset.valores]);
       setRotaciones(logTotal);
-      setCaminoActual([]);
-      setResaltado(null);
       setMensaje(
         `Cargado ejemplo "${preset.titulo}". Valores: ${preset.valores.join(', ')}. Rotaciones: ${logTotal.length}.`
       );
     },
-    [tipo]
+    [tipo, cancelarAnimacion]
   );
 
   const handleLimpiar = useCallback(() => {
     limpiarTimeouts();
     setRaiz(null);
+    setOrdenInsercion([]);
     setRotaciones([]);
     setCaminoActual([]);
     setResaltado(null);
@@ -487,25 +564,31 @@ export default function SimuladorArbolesBstAvl() {
   const handleCambiarTipo = useCallback(
     (nuevoTipo: TipoArbol) => {
       if (nuevoTipo === tipo) return;
+      cancelarAnimacion();
       setTipo(nuevoTipo);
-      // Si pasamos a AVL, rebalancear todos los nodos existentes
+      // Si pasamos a AVL, se reconstruye insertando en el ORDEN en que entraron los valores
+      // (hallazgo 3897): es el AVL de la misma secuencia, el que «Mejores prácticas» propone
+      // comparar con el BST. Los que no constan (no debería quedar ninguno) van detrás, crecientes.
       if (nuevoTipo === 'avl' && raiz) {
-        const valores = inorden(raiz, []);
+        const presentes = inorden(raiz, []);
+        const enOrden = ordenInsercion.filter((v) => presentes.includes(v));
+        const valores = [...enOrden, ...presentes.filter((v) => !enOrden.includes(v))];
         let arbol: NodoArbol | null = null;
         const logTotal: string[] = [];
         for (const v of valores) {
           arbol = insertarAVLConLog(arbol, v, logTotal);
         }
         setRaiz(arbol);
+        setOrdenInsercion(valores);
         setRotaciones(logTotal);
         setMensaje(
-          `Cambiado a AVL. Árbol reconstruido y equilibrado con ${logTotal.length} rotación(es).`
+          `Cambiado a AVL. Árbol reconstruido insertando los ${valores.length} valores en el orden en que entraron, con ${logTotal.length} rotación(es).`
         );
       } else {
         setMensaje(`Cambiado a ${nuevoTipo === 'bst' ? 'BST simple (sin balanceo)' : 'AVL auto-balanceado'}.`);
       }
     },
-    [tipo, raiz]
+    [tipo, raiz, ordenInsercion, cancelarAnimacion]
   );
 
   // Recorridos calculados
@@ -729,15 +812,18 @@ export default function SimuladorArbolesBstAvl() {
             value={velocidad}
             onChange={(e) => setVelocidad(Number(e.target.value))}
           />
+          {/* Cada texto con variable, en una sola cadena y como único hijo: con la página
+              traducida, React escribía en un nodo que el traductor ya había retirado y se
+              quedaba el valor viejo (hallazgo 3899, forma del cabo C0243) */}
           <span className={styles.speedValue}>
-            {formatNumber(velocidad, 0)} ms
+            {`${formatNumber(velocidad, 0)} ms`}
           </span>
         </div>
 
         {/* Mensaje de estado */}
         {mensaje && (
           <div className={styles.statusMessage} role="status" aria-live="polite">
-            <strong>Última operación:</strong> {mensaje}
+            <strong>Última operación:</strong> <span>{mensaje}</span>
           </div>
         )}
 
@@ -861,7 +947,7 @@ export default function SimuladorArbolesBstAvl() {
         {tipo === 'avl' && (
           <div className={styles.rotationLog}>
             <div className={styles.rotationLogTitle}>
-              Historial de rotaciones AVL ({rotaciones.length})
+              {`Historial de rotaciones AVL (${rotaciones.length})`}
             </div>
             {rotaciones.length === 0 ? (
               <div className={styles.rotationEmpty}>

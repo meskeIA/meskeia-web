@@ -357,7 +357,11 @@ test('CASO 2 · conmutar de BST degenerado a AVL reconstruye el mismo árbol de 
 
   await page.getByRole('button', { name: /^AVL/ }).click();
 
-  await expect(mensaje(page)).toContainText('Árbol reconstruido y equilibrado con 4 rotación(es).');
+  // Desde el 02/11/2026 (hallazgo 3897) se reconstruye en el orden de inserción, que aquí es el
+  // creciente (1..7): mismas 4 rotaciones, y el mensaje dice con qué orden
+  await expect(mensaje(page)).toContainText(
+    'Árbol reconstruido insertando los 7 valores en el orden en que entraron, con 4 rotación(es).',
+  );
   await expect(infoDe(page, 'Altura del árbol')).toHaveText('3');
   await expect(infoDe(page, 'Número de nodos')).toHaveText('7');
   await expect(recorrido(page, 'PREORDEN (NLR)')).toHaveText('4, 2, 1, 3, 6, 5, 7');
@@ -1521,7 +1525,9 @@ test.describe('inspector 01/11/2026', () => {
   // eliminar el 60 a los 0,3 s ⇒ «Eliminado 60.» y, a los 6 s, «Encontrado 60 tras 3
   // comparación(es). Profundidad: 2.» con el inorden 20, 30, 40, 50, 70, 80; lo mismo cargando
   // «Inserción ordenada» durante la animación (árbol 1..7 y «Encontrado 60»).
-  test.fail('[H1] ABIERTO — la búsqueda en curso no anuncia «Encontrado 60» después de borrar el 60', async ({
+  // REPARADO el 02/11/2026 (hallazgo 3896): toda operación que cambia el árbol pasa por
+  // `cancelarAnimacion`.
+  test('[H1] la búsqueda en curso no anuncia «Encontrado 60» después de borrar el 60', async ({
     page,
   }) => {
     await sembrarValor(page, '#vel-input', 1000); // 3 comparaciones ⇒ veredicto a los 3 s
@@ -1534,6 +1540,16 @@ test.describe('inspector 01/11/2026', () => {
     await page.waitForTimeout(3600);
     // Esperado: el árbol ya no tiene el 60 y ningún mensaje dice lo contrario
     expect(await mensaje(page).textContent()).not.toContain('Encontrado 60');
+    await expect(mensaje(page)).toContainText('Eliminado 60.');
+
+    // Lo mismo cargando un ejemplo durante la animación
+    await page.getByRole('button', { name: /Árbol balanceado/ }).click();
+    await escribir(page, '#search-input', '60');
+    await botonExacto(page, 'Buscar').click();
+    await page.getByRole('button', { name: /Inserción ordenada/ }).click();
+    await page.waitForTimeout(3600);
+    expect(await mensaje(page).textContent()).not.toContain('Encontrado 60');
+    await expect(mensaje(page)).toContainText('Cargado ejemplo "Inserción ordenada"');
   });
 
   // ABIERTO, hallazgo (inspector 01/11/2026) · operativa/medio — pasar de BST a AVL reconstruye
@@ -1545,7 +1561,9 @@ test.describe('inspector 01/11/2026', () => {
   // secuencia en AVL da raíz 30, 1 LL (en el 10) y preorden 30, 20, 5, 3, 10, 25, 40, 35, 50.
   // Si la reparación elige otra salida (decir que se reinserta en orden creciente), este test
   // se reescribe con ella.
-  test.fail('[H2] ABIERTO — conmutar de BST a AVL da el AVL de la MISMA secuencia, no el del orden creciente', async ({
+  // REPARADO el 02/11/2026 (hallazgo 3897): la página guarda el orden de inserción y reconstruye
+  // con él, y el mensaje lo dice.
+  test('[H2] conmutar de BST a AVL da el AVL de la MISMA secuencia, no el del orden creciente', async ({
     page,
   }) => {
     await page.getByRole('button', { name: /^BST/ }).click();
@@ -1559,6 +1577,10 @@ test.describe('inspector 01/11/2026', () => {
     await cargarVarios(page, '30, 20, 40, 10, 25, 35, 50, 5, 3');
     await page.getByRole('button', { name: /^AVL/ }).click();
     await expect(recorrido(page, 'PREORDEN (NLR)')).toHaveText('30, 20, 5, 3, 10, 25, 40, 35, 50');
+    // Una sola rotación, LL en el 10 (insertando 3), como la secuencia insertada en AVL
+    await expect(historialRotaciones(page)).toHaveCount(1);
+    await expect(historialRotaciones(page).nth(0)).toContainText('Rotación LL en nodo 10 (insertando 3)');
+    await expect(mensaje(page)).toContainText('en el orden en que entraron, con 1 rotación(es)');
   });
 
   // ABIERTO, hallazgo (inspector 01/11/2026) · accesibilidad/medio — texto blanco de 14,4 px
@@ -1567,7 +1589,9 @@ test.describe('inspector 01/11/2026', () => {
   // viene de `.opBtn` y el fondo de `.opBtnSecondary`, y la tanda 1 de C0070 solo pasó `.opBtn`
   // a --primary-boton. «Eliminar» y «Limpiar todo»: blanco sobre rgba(239, 68, 68, 0,85) =
   // 3,18:1 en claro (4,43:1 en oscuro).
-  test.fail('[H3] ABIERTO — los botones Buscar, Aleatorios, Eliminar y Limpiar todo llegan a 4,5:1', async ({
+  // REPARADO el 02/11/2026 (hallazgo 3898): --secondary-boton y #dc2626, también en las
+  // hermanas simulador-arboles-b y simulador-monticulo-binario.
+  test('[H3] los botones Buscar, Aleatorios, Eliminar y Limpiar todo llegan a 4,5:1', async ({
     page,
   }) => {
     for (const nombre of ['Buscar', 'Aleatorios (10)', 'Eliminar', 'Limpiar todo']) {
@@ -1582,7 +1606,8 @@ test.describe('inspector 01/11/2026', () => {
   // en «Casos para clase», la línea «· inserciones: {lista}», que tras pasar al caso 9 sigue
   // enseñando la secuencia del caso 1 (10, 20, 30, 40, 50, 60, 70) junto al enunciado del 9. No
   // cae nada: lo que es hijo único (contadores, recorridos, enunciado) sí se actualiza.
-  test.fail('[H4] ABIERTO — traducida, el mensaje, el contador de rotaciones, la velocidad y la secuencia del caso siguen a la app', async ({
+  // REPARADO el 02/11/2026 (hallazgo 3899): cada texto con variable, único hijo de su elemento.
+  test('[H4] traducida, el mensaje, el contador de rotaciones, la velocidad y la secuencia del caso siguen a la app', async ({
     page,
   }) => {
     await insertarUno(page, '10');
@@ -1607,13 +1632,17 @@ test.describe('inspector 01/11/2026', () => {
   // valores.» (el «abc» ni se cuenta) y «10, 20, 10» ⇒ «Insertados 2 de 3 valores.» sin decir
   // cuál faltó ni por qué. Desde el hallazgo 2301 la misma vía SÍ nombra los rechazados por
   // decimales («Rechazados por tener decimales…: «2.5».») y los de fuera de rango.
-  test.fail('[H5] ABIERTO — «Insertar varios» dice qué descarta por no ser número o estar repetido', async ({
+  // REPARADO el 02/11/2026 (hallazgo 3900): se cuentan y se nombran.
+  test('[H5] «Insertar varios» dice qué descarta por no ser número o estar repetido', async ({
     page,
   }) => {
     await cargarVarios(page, '10, abc, 20');
     await expect(mensaje(page)).toContainText('abc', { timeout: 2000 });
+    await expect(mensaje(page)).toContainText('Insertados 2 de 3 valores.');
+    await expect(mensaje(page)).toContainText('No son números enteros y se descartan: «abc».');
     await cargarVarios(page, '10, 20, 10');
     await expect(mensaje(page)).toContainText(/repetid|duplicad/, { timeout: 2000 });
+    await expect(mensaje(page)).toContainText('Descartados por repetidos (no se admiten duplicados): 10.');
   });
 
   // ABIERTO, hallazgo (inspector 01/11/2026) · operativa/bajo — sin tope de nodos y con
@@ -1623,13 +1652,20 @@ test.describe('inspector 01/11/2026', () => {
   // aguanta; 8.500 cayó en una carga y aguantó en otra (el umbral depende del estado del JIT);
   // 10.000 y el rango entero, −999..9999, caen. En AVL los 10.999 entran (altura 14). Se prueba
   // el rango entero, que es el máximo que la app admite y cae siempre.
-  test.fail('[H6] ABIERTO — el rango entero −999..9999 en orden creciente en BST no tumba la app', async ({
+  // REPARADO el 02/11/2026 (hallazgo 3901) con un TOPE de 3000 nodos (MAX_NODOS), la cadena más
+  // larga que ya probaba el CASO B, con aviso de lo que no entra. El test que esperaba los 10.999
+  // en el árbol se reescribe con esa salida, como preveía la ficha («o un aviso de tope»).
+  test('[H6] el rango entero −999..9999 en orden creciente en BST no tumba la app: entra hasta el tope y lo dice', async ({
     page,
   }) => {
     await page.getByRole('button', { name: /^BST/ }).click();
     await cargarVarios(page, Array.from({ length: 10999 }, (_, i) => i - 999).join(' '));
-    await expect(mensaje(page)).toContainText('Insertados 10999 de 10999 valores.', { timeout: 5000 });
-    await expect(infoDe(page, 'Número de nodos')).toHaveText('10.999');
+    await expect(mensaje(page)).toContainText('Insertados 3000 de 10999 valores.', { timeout: 10000 });
+    await expect(mensaje(page)).toContainText('7999 no entraron. El árbol admite hasta 3000 nodos');
+    await expect(infoDe(page, 'Número de nodos')).toHaveText('3000');
     await expect(page.getByRole('heading', { name: 'Algo salió mal' })).toHaveCount(0);
+    // Y con el árbol lleno, un nodo más tampoco entra, con el mismo aviso
+    await insertarUno(page, '9999');
+    await expect(mensaje(page)).toContainText('No se ha insertado 9999. El árbol admite hasta 3000 nodos');
   });
 });
