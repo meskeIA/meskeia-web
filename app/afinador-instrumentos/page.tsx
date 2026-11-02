@@ -5,6 +5,8 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './AfinadorInstrumentos.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { formatNumber } from '@/lib';
+import { abrirEntradaAudio, useEntradaAudio } from '@/lib/useEntradaAudio';
+import SelectorEntradaAudio from '@/components/SelectorEntradaAudio';
 import {
   AFINACIONES,
   NOTAS_ES,
@@ -26,25 +28,6 @@ const FAMILIAS: { id: FamiliaInstrumento; titulo: string; icono: string }[] = [
   { id: 'viento', titulo: 'Viento', icono: '🎺' },
   { id: 'tecla', titulo: 'Tecla', icono: '🎹' },
 ];
-
-interface EntradaAudio {
-  id: string;
-  nombre: string;
-}
-
-// Sin el procesado de voz del navegador: la supresión de ruido toma una nota sostenida por
-// ruido de fondo y la apaga (cabo C0581, medido el 02/11/2026 con el micrófono simulado de
-// Chromium: un La3 constante cae de 0,12 a 0,025 de amplitud en dos segundos, y por debajo
-// de 0,01 el afinador da la señal por muda). Con una interfaz de audio, además, lo que entra
-// es el instrumento por cable: no hay voz ni eco que limpiar.
-function restriccionesAudio(entradaId: string): MediaTrackConstraints {
-  return {
-    ...(entradaId ? { deviceId: { exact: entradaId } } : {}),
-    echoCancellation: false,
-    noiseSuppression: false,
-    autoGainControl: false,
-  };
-}
 
 // Algoritmo de autocorrelación para detectar pitch
 function autoCorrelate(buffer: Float32Array, sampleRate: number): number {
@@ -99,9 +82,8 @@ export default function AfinadorInstrumentosPage() {
   const [instrumentoId, setInstrumentoId] = useState(AFINACIONES[0].id);
   const [a4Referencia, setA4Referencia] = useState(440);
   const [permisoMicrofono, setPermisoMicrofono] = useState<'granted' | 'denied' | 'prompt'>('prompt');
-  // '' = la entrada predeterminada del sistema
-  const [entradas, setEntradas] = useState<EntradaAudio[]>([]);
-  const [entradaId, setEntradaId] = useState('');
+  // El micrófono o una interfaz con el instrumento por cable (S0245); '' = la predeterminada
+  const { entradas, entradaId, setEntradaId, actualizarEntradas } = useEntradaAudio();
 
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
@@ -129,42 +111,12 @@ export default function AfinadorInstrumentosPage() {
     animationRef.current = requestAnimationFrame(detectarPitch);
   }, [a4Referencia]);
 
-  // Los nombres de los dispositivos solo llegan con el permiso concedido: antes de eso el
-  // navegador devuelve entradas sin id ni nombre, y el selector no se pinta.
-  const actualizarEntradas = useCallback(async () => {
-    if (!navigator.mediaDevices?.enumerateDevices) return;
-    const dispositivos = await navigator.mediaDevices.enumerateDevices();
-    // Chrome añade en Windows dos alias, «default» y «communications», que repiten un
-    // dispositivo real: la primera opción del selector ya es la predeterminada del sistema.
-    const lista = dispositivos
-      .filter((d) => d.kind === 'audioinput' && d.deviceId && d.deviceId !== 'default' && d.deviceId !== 'communications')
-      .map((d, i) => ({ id: d.deviceId, nombre: d.label || `Entrada ${i + 1}` }));
-    setEntradas(lista);
-    setEntradaId((actual) => (actual && !lista.some((e) => e.id === actual) ? '' : actual));
-  }, []);
-
-  // Enchufar o quitar una interfaz con la página abierta la añade o la quita de la lista
-  useEffect(() => {
-    const dispositivos = navigator.mediaDevices;
-    if (!dispositivos?.addEventListener) return;
-    const alCambiar = () => {
-      void actualizarEntradas();
-    };
-    dispositivos.addEventListener('devicechange', alCambiar);
-    return () => dispositivos.removeEventListener('devicechange', alCambiar);
-  }, [actualizarEntradas]);
-
   const iniciarEscucha = async (entrada: string = entradaId) => {
     try {
-      let stream: MediaStream;
-      try {
-        stream = await navigator.mediaDevices.getUserMedia({ audio: restriccionesAudio(entrada) });
-      } catch (error) {
-        // La entrada elegida ya no está (se desenchufó): se vuelve a la predeterminada
-        if (!entrada || (error instanceof DOMException && error.name === 'NotAllowedError')) throw error;
-        setEntradaId('');
-        stream = await navigator.mediaDevices.getUserMedia({ audio: restriccionesAudio('') });
-      }
+      // Sin el procesado de voz del navegador, que apagaba la nota sostenida (cabo C0581)
+      const abierta = await abrirEntradaAudio(entrada);
+      const stream = abierta.stream;
+      setEntradaId(abierta.entradaId);
       mediaStreamRef.current = stream;
       setPermisoMicrofono('granted');
       // Si se desenchufa la entrada mientras escucha, su pista termina: se para limpio
@@ -351,25 +303,13 @@ export default function AfinadorInstrumentosPage() {
         )}
 
         {/* Entrada de audio: el micrófono o una interfaz con el instrumento conectado por cable */}
-        {permisoMicrofono === 'granted' && entradas.length > 0 && (
-          <div className={styles.entradaAudio}>
-            <label htmlFor="entrada-audio" className={styles.entradaLabel}>Entrada de audio</label>
-            <select
-              id="entrada-audio"
-              className={styles.entradaSelect}
-              value={entradaId}
-              onChange={(e) => cambiarEntrada(e.target.value)}
-            >
-              <option value="">La predeterminada del sistema</option>
-              {entradas.map((entrada) => (
-                <option key={entrada.id} value={entrada.id}>{entrada.nombre}</option>
-              ))}
-            </select>
-            <p className={styles.entradaAyuda}>
-              ¿Tienes una interfaz de audio? Conecta el instrumento por cable y elígela aquí:
-              aparece en la lista en cuanto la enchufas.
-            </p>
-          </div>
+        {permisoMicrofono === 'granted' && (
+          <SelectorEntradaAudio
+            entradas={entradas}
+            valor={entradaId}
+            onCambiar={cambiarEntrada}
+            ayuda="¿Tienes una interfaz de audio? Conecta el instrumento por cable y elígela aquí: aparece en la lista en cuanto la enchufas."
+          />
         )}
       </div>
 

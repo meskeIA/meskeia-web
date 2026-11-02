@@ -1,5 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 import { asentarAntesDeTraducir } from './_hidratacion';
+import { simularEntradasAudio, pedidas, enchufar, OPCIONES_ESPERADAS, SIN_PROCESADO } from './_entradaAudio';
 
 /**
  * Afinador de Instrumentos — test de regresión de la ampliación del 21/09/2026 (S0156)
@@ -174,39 +175,8 @@ test.describe('Lo que la página promete', () => {
  */
 test.describe('Entrada de audio', () => {
   test.beforeEach(async ({ page }) => {
-    await page.addInitScript(() => {
-      const w = window as unknown as {
-        __pedidas: MediaTrackConstraints[];
-        __enchufar: () => void;
-      };
-      w.__pedidas = [];
-      const dispositivos = [
-        { deviceId: 'default', kind: 'audioinput', label: 'Predeterminado - Micrófono interno', groupId: 'g1' },
-        { deviceId: 'communications', kind: 'audioinput', label: 'Comunicaciones - Micrófono interno', groupId: 'g1' },
-        { deviceId: 'mic-interno', kind: 'audioinput', label: 'Micrófono interno', groupId: 'g1' },
-        { deviceId: 'interfaz-usb', kind: 'audioinput', label: 'Interfaz de audio USB', groupId: 'g2' },
-        { deviceId: 'altavoz', kind: 'audiooutput', label: 'Altavoces', groupId: 'g3' },
-      ];
-      navigator.mediaDevices.enumerateDevices = async () => dispositivos.map((d) => ({ ...d, toJSON: () => d }) as MediaDeviceInfo);
-      navigator.mediaDevices.getUserMedia = async (r) => {
-        w.__pedidas.push((r?.audio ?? {}) as MediaTrackConstraints);
-        const ctx = new AudioContext();
-        const osc = ctx.createOscillator();
-        osc.frequency.value = 440;
-        const destino = ctx.createMediaStreamDestination();
-        osc.connect(destino);
-        osc.start();
-        return destino.stream;
-      };
-      w.__enchufar = () => {
-        dispositivos.push({ deviceId: 'grabadora-usb', kind: 'audioinput', label: 'Grabadora USB', groupId: 'g4' });
-        navigator.mediaDevices.dispatchEvent(new Event('devicechange'));
-      };
-    });
+    await simularEntradasAudio(page);
   });
-
-  const pedidas = (page: Page) =>
-    page.evaluate(() => (window as unknown as { __pedidas: MediaTrackConstraints[] }).__pedidas);
 
   test('no hay selector hasta conceder el micrófono', async ({ page }) => {
     await page.goto(RUTA);
@@ -221,7 +191,7 @@ test.describe('Entrada de audio', () => {
     await expect(page.getByRole('button', { name: /Detener/i })).toBeVisible();
 
     const [primera] = await pedidas(page);
-    expect(primera).toMatchObject({ echoCancellation: false, noiseSuppression: false, autoGainControl: false });
+    expect(primera).toMatchObject(SIN_PROCESADO);
     expect(primera.deviceId).toBeUndefined(); // la predeterminada del sistema
     await expect(page.locator('[class*="notaNombre"]')).toHaveText('La');
   });
@@ -232,11 +202,7 @@ test.describe('Entrada de audio', () => {
     await page.getByRole('button', { name: /Iniciar afinador/i }).click();
 
     const selector = page.getByLabel('Entrada de audio');
-    await expect(selector.locator('option')).toHaveText([
-      'La predeterminada del sistema',
-      'Micrófono interno',
-      'Interfaz de audio USB',
-    ]);
+    await expect(selector.locator('option')).toHaveText(OPCIONES_ESPERADAS);
     await expect(selector).toHaveValue('');
   });
 
@@ -261,7 +227,7 @@ test.describe('Entrada de audio', () => {
     const selector = page.getByLabel('Entrada de audio');
     await expect(selector.locator('option')).toHaveCount(3);
 
-    await page.evaluate(() => (window as unknown as { __enchufar: () => void }).__enchufar());
+    await enchufar(page);
     await expect(selector.locator('option')).toHaveCount(4);
     await expect(selector.locator('option').last()).toHaveText('Grabadora USB');
   });

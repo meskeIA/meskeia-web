@@ -1,0 +1,36 @@
+/* Selector «Entrada de audio» (lib/useEntradaAudio): los colores son tokens de globals.css,
+   que ya cambian con el tema, así que no necesita variante oscura propia */
+.entradaAudio {
+  margin: 20px auto 0;
+  max-width: 420px;
+  text-align: left;
+}
+
+.etiqueta {
+  display: block;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+
+.desplegable {
+  width: 100%;
+  padding: 10px 12px;
+  font-size: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.desplegable:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.ayuda {
+  margin: 8px 0 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}

@@ -38,6 +38,7 @@ export const jsonLd = generateWebAppSchema({
   category: 'UtilityApplication',
   features: [
     'Medición del nivel sonoro en tiempo real con el micrófono del dispositivo',
+    'Selector de entrada de audio para medir con un micrófono externo, como uno de medición USB',
     'LAeq (nivel continuo equivalente) calculado como promedio energético de la sesión',
     'Valores mínimo, máximo y duración acumulada de la medición',
     'Calibración manual ajustable (60-120 dB) que se recuerda en el navegador',

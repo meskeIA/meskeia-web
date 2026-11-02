@@ -4,6 +4,8 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './Sonometro.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, EducationalSection, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { formatNumber, formatDate, hoyISOLocal } from '@/lib';
+import { abrirEntradaAudio, useEntradaAudio } from '@/lib/useEntradaAudio';
+import SelectorEntradaAudio from '@/components/SelectorEntradaAudio';
 import { RESPUESTA_DECIBELIMETRO, RESPUESTA_PRECISION } from './metadata';
 
 // Niveles de referencia en dB.
@@ -224,6 +226,8 @@ export default function SonometroPage() {
   const [avisoSinSenal, setAvisoSinSenal] = useState<string | null>(null);
   /** Las estadísticas se reiniciaron al cambiar la calibración midiendo (hallazgo 3543) */
   const [reinicioPorCalibracion, setReinicioPorCalibracion] = useState(false);
+  // El micrófono del equipo o uno externo, p. ej. de medición por USB (S0245); '' = el predeterminado
+  const { entradas, entradaId, setEntradaId, actualizarEntradas } = useEntradaAudio();
 
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
@@ -545,18 +549,18 @@ export default function SonometroPage() {
   }, [calculateDb, correccionPonderacionA]);
 
   // Iniciar medición
-  const startMeasuring = async () => {
+  // `conservarAviso`: al cambiar de entrada midiendo, el aviso de que la medición anterior se
+  // guardó tiene que seguir en pantalla cuando arranca la nueva.
+  const startMeasuring = async (entrada: string = entradaId, conservarAviso = false) => {
     try {
       setError(null);
-      setAvisoRegistro(null);
+      if (!conservarAviso) setAvisoRegistro(null);
 
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: {
-          echoCancellation: false,
-          noiseSuppression: false,
-          autoGainControl: false
-        }
-      });
+      // Sin echoCancellation, noiseSuppression ni autoGainControl: con ellos el nivel no es el
+      // de la sala sino el que el navegador decide dejar pasar.
+      const abierta = await abrirEntradaAudio(entrada);
+      const stream = abierta.stream;
+      setEntradaId(abierta.entradaId);
 
       streamRef.current = stream;
       fotogramasSinSenalRef.current = 0;
@@ -604,6 +608,8 @@ export default function SonometroPage() {
       setHayMedicion(true);
       void solicitarWakeLock();
       measureLoop();
+      // Con el permiso concedido, los dispositivos ya traen nombre
+      void actualizarEntradas();
 
     } catch (err) {
       console.error('Error al acceder al micrófono:', err);
@@ -717,6 +723,18 @@ export default function SonometroPage() {
         ? `${aviso} La duración anotada no incluye ${formatDuracion(sinMedir)} en que la app no pudo tomar muestras (pantalla apagada, pestaña oculta o un diálogo abierto).`
         : aviso,
     );
+  };
+
+  /**
+   * Cambiar de entrada midiendo NO sigue la misma medición: un LAeq con dos micrófonos
+   * promediaría dos sensibilidades distintas. La medición en curso se cierra y se anota como
+   * con «Detener y guardar», y la nueva entrada empieza una propia.
+   */
+  const cambiarEntrada = (id: string) => {
+    setEntradaId(id);
+    if (!isActive) return;
+    detenerYRegistrar();
+    void startMeasuring(id, true);
   };
 
   /** Anotación de una fila: dónde se midió, con qué ventanas, qué se oía. */
@@ -898,7 +916,7 @@ export default function SonometroPage() {
             {/* Con key (hallazgo 3542): sin ella React reutilizaba el botón de iniciar como botón
                 de parar y, con la página traducida, este se quedaba rotulado «Iniciar medición» */}
             {!isActive ? (
-              <button key="iniciar" type="button" onClick={startMeasuring} className={styles.btnStart}>
+              <button key="iniciar" type="button" onClick={() => startMeasuring()} className={styles.btnStart}>
                 <span aria-hidden="true">🎤</span> Iniciar medición
               </button>
             ) : (
@@ -912,6 +930,16 @@ export default function SonometroPage() {
               </>
             )}
           </div>
+
+          {/* Entrada de audio: el micrófono del equipo o uno externo (S0245) */}
+          {permissionState === 'granted' && (
+            <SelectorEntradaAudio
+              entradas={entradas}
+              valor={entradaId}
+              onCambiar={cambiarEntrada}
+              ayuda="Con un micrófono de medición USB la lectura es más fiable que con el del móvil o el portátil. Cada micrófono necesita su propia calibración: ajústala tras cambiar de entrada. Cambiar de entrada midiendo guarda la medición en curso y empieza otra."
+            />
+          )}
 
           {/* Error */}
           {/* Es la ÚNICA señal de que no se está midiendo: el botón no cambia, el foco no se

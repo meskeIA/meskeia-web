@@ -229,6 +229,43 @@ español**, donde el decimal es coma y el separador es un salto de línea o un t
 
 ---
 
+### 8. **SelectorEntradaAudio** — elegir el micrófono o un dispositivo externo
+
+Desplegable «Entrada de audio» para las apps que escuchan por el micrófono: el del equipo, uno
+de medición USB o una interfaz de audio con el instrumento conectado por cable. La lógica va en
+el hook `useEntradaAudio` de `@/lib/useEntradaAudio`: lista de dispositivos sin los alias de
+Windows, refresco al enchufar y vuelta a la predeterminada si la elegida desaparece. Lo usan
+afinador-instrumentos, sonometro y analizador-espectro (S0245, 02/11/2026).
+
+```tsx
+import { abrirEntradaAudio, useEntradaAudio } from '@/lib/useEntradaAudio';
+import SelectorEntradaAudio from '@/components/SelectorEntradaAudio';
+
+const { entradas, entradaId, setEntradaId, actualizarEntradas } = useEntradaAudio();
+
+const iniciar = async (entrada: string = entradaId) => {
+  const abierta = await abrirEntradaAudio(entrada); // sin procesado de voz
+  setEntradaId(abierta.entradaId);                  // '' si volvió a la predeterminada
+  // … conectar abierta.stream al AudioContext …
+  void actualizarEntradas(); // con el permiso concedido, los dispositivos ya traen nombre
+};
+
+<button type="button" onClick={() => iniciar()}>Iniciar</button>  {/* no onClick={iniciar}: pasaría el evento */}
+{permiso === 'granted' && (
+  <SelectorEntradaAudio entradas={entradas} valor={entradaId} onCambiar={cambiarEntrada}
+    ayuda="Qué se gana con una entrada externa en esta app" />
+)}
+```
+
+⚠️ **No abras el micrófono con `getUserMedia({ audio: true })`** en una app que mide o afina:
+el procesado de voz del navegador apaga un sonido sostenido. Medido el 02/11/2026 (cabo C0581):
+un La3 constante caía de 0,12 a 0,025 de amplitud en dos segundos. `abrirEntradaAudio` ya lo
+desactiva. Al cambiar de entrada **con la app en marcha**, decide qué pasa con lo acumulado: el
+sonómetro cierra y anota la medición en curso, porque un LAeq con dos micrófonos mezclaría dos
+sensibilidades. Tests: `tests/apps/_entradaAudio.ts` simula los dispositivos.
+
+---
+
 ## 📚 Utilidades (lib/formatters.ts)
 
 ### Funciones de Formato Español

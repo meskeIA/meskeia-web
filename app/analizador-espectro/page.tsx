@@ -5,6 +5,8 @@ import styles from './AnalizadorEspectro.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, EducationalSection, LegalNotice, ShareCard } from '@/components';
 import { formatNumber } from '@/lib';
 import { picoDominante } from '@/lib/calculadoras/frecuenciaDominante';
+import { abrirEntradaAudio, useEntradaAudio } from '@/lib/useEntradaAudio';
+import SelectorEntradaAudio from '@/components/SelectorEntradaAudio';
 
 // Bandas de frecuencia para mostrar
 const FREQUENCY_BANDS = [
@@ -103,6 +105,8 @@ export default function AnalizadorEspectroPage() {
   const [viewMode, setViewMode] = useState<'bars' | 'line'>('bars');
   const [sensitivity, setSensitivity] = useState<number>(1);
   const [showPeaks, setShowPeaks] = useState(true);
+  // El micrófono del equipo, uno de medición o una interfaz con un instrumento (S0245)
+  const { entradas, entradaId, setEntradaId, actualizarEntradas } = useEntradaAudio();
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
@@ -416,20 +420,16 @@ export default function AnalizadorEspectroPage() {
   }, [getFrequencyColor]);
 
   // Iniciar análisis
-  const startAnalyzing = async () => {
+  const startAnalyzing = async (entrada: string = entradaId) => {
     // Una sola apertura a la vez, y ninguna si ya hay una captura en marcha (hallazgo 2569).
     if (abriendoRef.current || streamRef.current) return;
     abriendoRef.current = true;
     try {
       setError(null);
 
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: {
-          echoCancellation: false,
-          noiseSuppression: false,
-          autoGainControl: false
-        }
-      });
+      // Sin el procesado de voz del navegador, que recorta y aplana el espectro
+      const abierta = await abrirEntradaAudio(entrada);
+      const stream = abierta.stream;
 
       // Si la página se desmontó mientras se esperaba el permiso, nadie cerraría esta captura.
       if (!montadoRef.current) {
@@ -439,6 +439,9 @@ export default function AnalizadorEspectroPage() {
 
       streamRef.current = stream;
       setPermissionState('granted');
+      setEntradaId(abierta.entradaId);
+      // Con el permiso concedido, los dispositivos ya traen nombre
+      void actualizarEntradas();
 
       const audioContext = new AudioContext();
       audioContextRef.current = audioContext;
@@ -493,6 +496,14 @@ export default function AnalizadorEspectroPage() {
     setDominantNote('--');
     setDominantCents(null);
     lecturaRef.current = { hz: 0, nota: '--', cents: null };
+  };
+
+  // Cambiar de entrada con el análisis en marcha lo reabre con la nueva, sin pulsar nada más
+  const cambiarEntrada = (id: string) => {
+    setEntradaId(id);
+    if (!isActive) return;
+    stopAnalyzing();
+    void startAnalyzing(id);
   };
 
   // Ajustar canvas al tamaño del contenedor
@@ -615,7 +626,7 @@ export default function AnalizadorEspectroPage() {
           {/* Controles */}
           <div className={styles.controls}>
             {!isActive ? (
-              <button type="button" onClick={startAnalyzing} className={styles.btnStart}>
+              <button type="button" onClick={() => startAnalyzing()} className={styles.btnStart}>
                 <span aria-hidden="true">🎤</span> Iniciar análisis
               </button>
             ) : (
@@ -624,6 +635,16 @@ export default function AnalizadorEspectroPage() {
               </button>
             )}
           </div>
+
+          {/* Entrada de audio: el micrófono del equipo o uno externo (S0245) */}
+          {permissionState === 'granted' && (
+            <SelectorEntradaAudio
+              entradas={entradas}
+              valor={entradaId}
+              onCambiar={cambiarEntrada}
+              ayuda="Con un micrófono de medición, o con una interfaz de audio y el instrumento conectado por cable, el espectro recoge mejor los graves y menos ruido de la sala."
+            />
+          )}
 
           {/* Opciones de visualización */}
           <div className={styles.options}>

@@ -38,6 +38,7 @@ export const jsonLd = generateWebAppSchema({
   category: 'UtilityApplication',
   features: [
     'Análisis FFT en tiempo real con fftSize 8192 para alta resolución frecuencial',
+    'Selector de entrada de audio: micrófono del equipo, micrófono de medición o interfaz con un instrumento',
     'Visualización en modo barras o modo línea sobre escala logarítmica 20 Hz–20 kHz',
     'Detección de frecuencia dominante y nota musical más cercana (temperamento igual)',
     'Ocho bandas de frecuencia con color diferenciado: sub-graves, graves, medios, agudos y presencia',
