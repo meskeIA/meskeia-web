@@ -1,7 +1,7 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useId } from 'react';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard } from '@/components';
 import styles from './ConstructorPersonaje.module.css';
 
@@ -69,12 +69,14 @@ interface CampoProps {
 }
 
 function Campo({ label, ayuda, valor, onChange, multiline = false, placeholder = '' }: CampoProps) {
+  const baseId = useId();
   return (
     <div className={styles.campo}>
-      <label className={styles.campoLabel}>{label}</label>
+      <label htmlFor={baseId} className={styles.campoLabel}>{label}</label>
       <p className={styles.campoAyuda}>{ayuda}</p>
       {multiline ? (
         <textarea
+          id={baseId}
           className={styles.campoTextarea}
           value={valor}
           onChange={onChange}
@@ -83,6 +85,7 @@ function Campo({ label, ayuda, valor, onChange, multiline = false, placeholder =
         />
       ) : (
         <input
+          id={baseId}
           type="text"
           className={styles.campoInput}
           value={valor}

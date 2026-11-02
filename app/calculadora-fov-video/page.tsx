@@ -69,8 +69,8 @@ export default function CalculadoraFovVideoPage() {
 
           {/* Selector de sensor */}
           <div className={styles.fieldGroup}>
-            <label className={styles.fieldLabel}>Tipo de sensor</label>
-            <div className={styles.selectorSensor} role="group" aria-label="Seleccionar tipo de sensor">
+            <label id="tipo-sensor-label" className={styles.fieldLabel}>Tipo de sensor</label>
+            <div aria-labelledby="tipo-sensor-label" className={styles.selectorSensor} role="group" aria-label="Seleccionar tipo de sensor">
               {SENSORES_OPCIONES.map(op => (
                 <button
                   key={op.valor}
@@ -109,8 +109,8 @@ export default function CalculadoraFovVideoPage() {
 
           {/* Focales comunes */}
           <div className={styles.fieldGroup}>
-            <label className={styles.fieldLabel}>Focales comunes</label>
-            <div className={styles.focalesGrid} role="group" aria-label="Acceso rápido a focales comunes">
+            <label id="focales-comunes-label" className={styles.fieldLabel}>Focales comunes</label>
+            <div aria-labelledby="focales-comunes-label" className={styles.focalesGrid} role="group" aria-label="Acceso rápido a focales comunes">
               {FOCALES_COMUNES.map(f => (
                 <button
                   key={f}

@@ -99,11 +99,11 @@ export default function CalculadoraCamaraLentaPage() {
 
             {/* FPS de grabación */}
             <div className={styles.inputGroup}>
-              <label className={styles.inputLabel}>
+              <label id="fps-grabacion-label" className={styles.inputLabel}>
                 FPS de grabación
                 <span className={styles.valueBadge}>{fpsGrabacionEfectivo} fps</span>
               </label>
-              <div className={styles.selectorFps}>
+              <div role="group" aria-labelledby="fps-grabacion-label" className={styles.selectorFps}>
                 {FPS_GRABACION_OPCIONES.map((fps) => (
                   <button
                     key={fps}
@@ -135,11 +135,11 @@ export default function CalculadoraCamaraLentaPage() {
 
             {/* FPS de reproducción */}
             <div className={styles.inputGroup}>
-              <label className={styles.inputLabel}>
+              <label id="fps-reproduccion-label" className={styles.inputLabel}>
                 FPS de reproducción (timeline)
                 <span className={styles.valueBadge}>{fpsReproduccionEfectivo} fps</span>
               </label>
-              <div className={styles.selectorFps}>
+              <div role="group" aria-labelledby="fps-reproduccion-label" className={styles.selectorFps}>
                 {FPS_REPRODUCCION_OPCIONES.map((fps) => (
                   <button
                     key={fps}

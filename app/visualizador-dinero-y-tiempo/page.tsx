@@ -146,10 +146,11 @@ function SeccionHipoteca() {
 
       <div className={styles.sliderZona}>
         <div className={styles.sliderHeader}>
-          <label className={styles.sliderLabel}>Mes de la hipoteca</label>
+          <label htmlFor="mes-hipoteca" className={styles.sliderLabel}>Mes de la hipoteca</label>
           <span className={styles.sliderValor}>Mes {mes} de {numCuotas} <span className={styles.sliderAnio}>(año {Math.ceil(mes / 12)})</span></span>
         </div>
         <input
+          id="mes-hipoteca"
           type="range"
           className={styles.slider}
           min={1}
@@ -347,10 +348,11 @@ function SeccionCompuesto() {
 
       <div className={styles.sliderZona}>
         <div className={styles.sliderHeader}>
-          <label className={styles.sliderLabel}>Horizonte temporal</label>
+          <label htmlFor="horizonte-temporal" className={styles.sliderLabel}>Horizonte temporal</label>
           <span className={styles.sliderValor}>{anios} años</span>
         </div>
         <input
+          id="horizonte-temporal"
           type="range"
           className={styles.slider}
           min={5}
@@ -493,10 +495,11 @@ function SeccionInflacion() {
 
       <div className={styles.sliderZona}>
         <div className={styles.sliderHeader}>
-          <label className={styles.sliderLabel}>Años en el futuro</label>
+          <label htmlFor="anios-futuro" className={styles.sliderLabel}>Años en el futuro</label>
           <span className={styles.sliderValor}>{anios} años</span>
         </div>
         <input
+          id="anios-futuro"
           type="range"
           className={styles.slider}
           min={5}
@@ -677,10 +680,11 @@ function SeccionAmortizar() {
 
       <div className={styles.sliderZona}>
         <div className={styles.sliderHeader}>
-          <label className={styles.sliderLabel}>Rentabilidad esperada de la inversión</label>
+          <label htmlFor="rentabilidad-inversion" className={styles.sliderLabel}>Rentabilidad esperada de la inversión</label>
           <span className={styles.sliderValor}>{formatNumber(rentabilidadInversion, 1)}% anual</span>
         </div>
         <input
+          id="rentabilidad-inversion"
           type="range"
           className={styles.slider}
           min={1}

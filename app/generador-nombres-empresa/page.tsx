@@ -186,8 +186,8 @@ export default function GeneradorNombresEmpresaPage() {
 
           {/* Sector */}
           <div className={styles.configGroup}>
-            <label className={styles.configLabel}>Sector / Industria</label>
-            <div className={styles.sectorGrid}>
+            <label id="sector-label" className={styles.configLabel}>Sector / Industria</label>
+            <div role="group" aria-labelledby="sector-label" className={styles.sectorGrid}>
               {Object.keys(diccionarios).map((s) => (
                 <button
                   key={s}
@@ -212,8 +212,8 @@ export default function GeneradorNombresEmpresaPage() {
 
           {/* Estilo */}
           <div className={styles.configGroup}>
-            <label className={styles.configLabel}>Estilo del nombre</label>
-            <div className={styles.estiloGrid}>
+            <label id="estilo-label" className={styles.configLabel}>Estilo del nombre</label>
+            <div role="group" aria-labelledby="estilo-label" className={styles.estiloGrid}>
               {Object.entries(estilos).map(([key, value]) => (
                 <button
                   key={key}
@@ -231,8 +231,9 @@ export default function GeneradorNombresEmpresaPage() {
 
           {/* Palabra clave */}
           <div className={styles.configGroup}>
-            <label className={styles.configLabel}>Palabra clave (opcional)</label>
+            <label htmlFor="palabra-clave" className={styles.configLabel}>Palabra clave (opcional)</label>
             <input
+              id="palabra-clave"
               type="text"
               className={styles.inputTexto}
               value={palabraClave}
@@ -245,8 +246,9 @@ export default function GeneradorNombresEmpresaPage() {
 
           {/* Cantidad */}
           <div className={styles.configGroup}>
-            <label className={styles.configLabel}>Cantidad de nombres: {cantidad}</label>
+            <label htmlFor="cantidad-nombres" className={styles.configLabel}>Cantidad de nombres: {cantidad}</label>
             <input
+              id="cantidad-nombres"
               type="range"
               className={styles.slider}
               min={6}

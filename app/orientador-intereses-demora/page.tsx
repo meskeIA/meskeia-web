@@ -166,8 +166,8 @@ export default function OrientadorInteresesDemoraPage() {
           />
 
           <div className={styles.fieldGroup}>
-            <label className={styles.label}>Tipo de deuda</label>
-            <div className={styles.tipoSelector}>
+            <label id="tipo-deuda-label" className={styles.label}>Tipo de deuda</label>
+            <div role="group" aria-labelledby="tipo-deuda-label" className={styles.tipoSelector}>
               <button
                 type="button"
                 className={`${styles.tipoBtn} ${tipoDeuda === 'comercial' ? styles.tipoBtnActive : ''}`}

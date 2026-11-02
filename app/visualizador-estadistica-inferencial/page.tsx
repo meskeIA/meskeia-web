@@ -459,11 +459,12 @@ export default function VisualizadorEstadisticaInferencial() {
 
             <div className={styles.controles}>
               <div className={styles.controlRow}>
-                <label className={styles.controlLabel}>
+                <label htmlFor="estadistico-z" className={styles.controlLabel}>
                   <span>Estadístico z (valor del test)</span>
                   <span className={styles.controlValor}>z = {estadistico.toFixed(2)}</span>
                 </label>
                 <input
+                  id="estadistico-z"
                   type="range"
                   className={styles.slider}
                   min={-4}
@@ -529,11 +530,12 @@ export default function VisualizadorEstadisticaInferencial() {
 
             <div className={styles.controles}>
               <div className={styles.controlRow}>
-                <label className={styles.controlLabel}>
+                <label htmlFor="alpha-errores" className={styles.controlLabel}>
                   <span>Nivel de significación α</span>
                   <span className={styles.controlValor}>{alphaErr.toFixed(2)}</span>
                 </label>
                 <input
+                  id="alpha-errores"
                   type="range"
                   className={styles.slider}
                   min={0.01}
@@ -545,11 +547,12 @@ export default function VisualizadorEstadisticaInferencial() {
                 />
               </div>
               <div className={styles.controlRow}>
-                <label className={styles.controlLabel}>
+                <label htmlFor="efecto-errores" className={styles.controlLabel}>
                   <span>Tamaño del efecto (separación H₀/H₁)</span>
                   <span className={styles.controlValor}>{efectoErr.toFixed(1)}</span>
                 </label>
                 <input
+                  id="efecto-errores"
                   type="range"
                   className={styles.slider}
                   min={0.5}
@@ -616,11 +619,12 @@ export default function VisualizadorEstadisticaInferencial() {
 
             <div className={styles.controles}>
               <div className={styles.controlRow}>
-                <label className={styles.controlLabel}>
+                <label htmlFor="n-intervalos" className={styles.controlLabel}>
                   <span>Tamaño muestral n (por muestra)</span>
                   <span className={styles.controlValor}>{nIC}</span>
                 </label>
                 <input
+                  id="n-intervalos"
                   type="range"
                   className={styles.slider}
                   min={5}
@@ -716,11 +720,12 @@ export default function VisualizadorEstadisticaInferencial() {
 
             <div className={styles.controles}>
               <div className={styles.controlRow}>
-                <label className={styles.controlLabel}>
+                <label htmlFor="n-potencia" className={styles.controlLabel}>
                   <span>Tamaño muestral n</span>
                   <span className={styles.controlValor}>{nPotencia}</span>
                 </label>
                 <input
+                  id="n-potencia"
                   type="range"
                   className={styles.slider}
                   min={5}
@@ -732,11 +737,12 @@ export default function VisualizadorEstadisticaInferencial() {
                 />
               </div>
               <div className={styles.controlRow}>
-                <label className={styles.controlLabel}>
+                <label htmlFor="efecto-potencia" className={styles.controlLabel}>
                   <span>Tamaño del efecto (Cohen d)</span>
                   <span className={styles.controlValor}>{efectoPotencia.toFixed(2)}</span>
                 </label>
                 <input
+                  id="efecto-potencia"
                   type="range"
                   className={styles.slider}
                   min={0.1}

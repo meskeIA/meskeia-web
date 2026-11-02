@@ -267,8 +267,8 @@ export default function MetronomoPage() {
 
           {/* Compás */}
           <div className={styles.configRow}>
-            <label className={styles.configLabel}>Compás</label>
-            <div className={styles.timeSignatures}>
+            <label id="compas-label" className={styles.configLabel}>Compás</label>
+            <div role="group" aria-labelledby="compas-label" className={styles.timeSignatures}>
               {TIME_SIGNATURES.map((ts) => (
                 <button
                   type="button"
@@ -296,8 +296,9 @@ export default function MetronomoPage() {
 
           {/* Volumen */}
           <div className={styles.configRow}>
-            <label className={styles.configLabel}>Volumen</label>
+            <label htmlFor="volumen" className={styles.configLabel}>Volumen</label>
             <input
+              id="volumen"
               type="range"
               min="0"
               max="1"
@@ -310,8 +311,8 @@ export default function MetronomoPage() {
 
           {/* Presets de tempo */}
           <div className={styles.configRow}>
-            <label className={styles.configLabel}>Tempos rápidos</label>
-            <div className={styles.presets}>
+            <label id="tempos-rapidos-label" className={styles.configLabel}>Tempos rápidos</label>
+            <div role="group" aria-labelledby="tempos-rapidos-label" className={styles.presets}>
               {TEMPO_PRESETS.map((preset) => (
                 <button
                   type="button"

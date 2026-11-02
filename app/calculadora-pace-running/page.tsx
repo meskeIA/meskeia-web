@@ -87,8 +87,8 @@ export default function CalculadoraPaceRunningPage() {
           </div>
 
           <div className={styles.inputGroup}>
-            <label className={styles.label}>Tiempo</label>
-            <div className={styles.tiempoRow}>
+            <label id="tiempo-label" className={styles.label}>Tiempo</label>
+            <div role="group" aria-labelledby="tiempo-label" className={styles.tiempoRow}>
               <div className={styles.tiempoField}>
                 <input
                   type="number"

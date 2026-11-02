@@ -307,8 +307,9 @@ export default function CalculadoraInflacionPage() {
           <h2 className={styles.panelTitle}>Configura el cálculo</h2>
 
           <div className={styles.inputGroup}>
-            <label className={styles.label}>Cantidad en euros (€)</label>
+            <label htmlFor="cantidad" className={styles.label}>Cantidad en euros (€)</label>
             <input
+              id="cantidad"
               type="text"
               value={cantidad}
               onChange={(e) => setCantidad(e.target.value)}
@@ -319,8 +320,9 @@ export default function CalculadoraInflacionPage() {
 
           <div className={styles.yearSelectors}>
             <div className={styles.inputGroup}>
-              <label className={styles.label}>Año origen</label>
+              <label htmlFor="anio-origen" className={styles.label}>Año origen</label>
               <select
+                id="anio-origen"
                 value={añoOrigen}
                 onChange={(e) => setAñoOrigen(Number(e.target.value))}
                 className={styles.select}
@@ -342,8 +344,9 @@ export default function CalculadoraInflacionPage() {
             </button>
 
             <div className={styles.inputGroup}>
-              <label className={styles.label}>Año destino</label>
+              <label htmlFor="anio-destino" className={styles.label}>Año destino</label>
               <select
+                id="anio-destino"
                 value={añoDestino}
                 onChange={(e) => setAñoDestino(Number(e.target.value))}
                 className={styles.select}
@@ -471,8 +474,9 @@ export default function CalculadoraInflacionPage() {
             </div>
             <div className={styles.periodoInputs}>
               <div className={styles.inputGroup}>
-                <label className={styles.label}>Desde</label>
+                <label htmlFor="periodo1-desde" className={styles.label}>Desde</label>
                 <select
+                  id="periodo1-desde"
                   value={periodo1Inicio}
                   onChange={(e) => setPeriodo1Inicio(Number(e.target.value))}
                   className={styles.select}
@@ -484,8 +488,9 @@ export default function CalculadoraInflacionPage() {
                 </select>
               </div>
               <div className={styles.inputGroup}>
-                <label className={styles.label}>Hasta</label>
+                <label htmlFor="periodo1-hasta" className={styles.label}>Hasta</label>
                 <select
+                  id="periodo1-hasta"
                   value={periodo1Fin}
                   onChange={(e) => setPeriodo1Fin(Number(e.target.value))}
                   className={styles.select}
@@ -507,8 +512,9 @@ export default function CalculadoraInflacionPage() {
             </div>
             <div className={styles.periodoInputs}>
               <div className={styles.inputGroup}>
-                <label className={styles.label}>Desde</label>
+                <label htmlFor="periodo2-desde" className={styles.label}>Desde</label>
                 <select
+                  id="periodo2-desde"
                   value={periodo2Inicio}
                   onChange={(e) => setPeriodo2Inicio(Number(e.target.value))}
                   className={styles.select}
@@ -520,8 +526,9 @@ export default function CalculadoraInflacionPage() {
                 </select>
               </div>
               <div className={styles.inputGroup}>
-                <label className={styles.label}>Hasta</label>
+                <label htmlFor="periodo2-hasta" className={styles.label}>Hasta</label>
                 <select
+                  id="periodo2-hasta"
                   value={periodo2Fin}
                   onChange={(e) => setPeriodo2Fin(Number(e.target.value))}
                   className={styles.select}
@@ -543,8 +550,9 @@ export default function CalculadoraInflacionPage() {
             </div>
             <div className={styles.periodoInputs}>
               <div className={styles.inputGroup}>
-                <label className={styles.label}>Desde</label>
+                <label htmlFor="periodo3-desde" className={styles.label}>Desde</label>
                 <select
+                  id="periodo3-desde"
                   value={periodo3Inicio}
                   onChange={(e) => setPeriodo3Inicio(Number(e.target.value))}
                   className={styles.select}
@@ -556,8 +564,9 @@ export default function CalculadoraInflacionPage() {
                 </select>
               </div>
               <div className={styles.inputGroup}>
-                <label className={styles.label}>Hasta</label>
+                <label htmlFor="periodo3-hasta" className={styles.label}>Hasta</label>
                 <select
+                  id="periodo3-hasta"
                   value={periodo3Fin}
                   onChange={(e) => setPeriodo3Fin(Number(e.target.value))}
                   className={styles.select}

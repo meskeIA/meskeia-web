@@ -160,8 +160,8 @@ export default function CalculadoraTiemposRunningPage() {
           </div>
 
           <div className={styles.formGroup}>
-            <label className={styles.label}>Tiempo de referencia</label>
-            <div className={styles.timeInputs}>
+            <label id="tiempo-referencia-label" className={styles.label}>Tiempo de referencia</label>
+            <div role="group" aria-labelledby="tiempo-referencia-label" className={styles.timeInputs}>
               <div className={styles.timeField}>
                 <CampoNumerico
                   id="horas"

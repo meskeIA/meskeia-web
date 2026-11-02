@@ -199,8 +199,8 @@ export default function GeneradorGradientesPage() {
 
           {/* Tipo de gradiente */}
           <div className={styles.controlGroup}>
-            <label className={styles.label}>Tipo de Gradiente</label>
-            <div className={styles.typeTabs}>
+            <label id="tipo-gradiente-label" className={styles.label}>Tipo de Gradiente</label>
+            <div role="group" aria-labelledby="tipo-gradiente-label" className={styles.typeTabs}>
               <button
                 type="button"
                 className={`${styles.typeBtn} ${gradientType === 'linear' ? styles.typeActive : ''}`}
@@ -264,8 +264,8 @@ export default function GeneradorGradientesPage() {
           {gradientType === 'radial' && (
             <>
               <div className={styles.controlGroup}>
-                <label className={styles.label}>Forma</label>
-                <div className={styles.selectRow}>
+                <label id="forma-label" className={styles.label}>Forma</label>
+                <div role="group" aria-labelledby="forma-label" className={styles.selectRow}>
                   {RADIAL_SHAPES.map(shape => (
                     <button
                       type="button"
@@ -285,8 +285,8 @@ export default function GeneradorGradientesPage() {
           {/* Posición (para radial y conic) */}
           {(gradientType === 'radial' || gradientType === 'conic') && (
             <div className={styles.controlGroup}>
-              <label className={styles.label}>Posición</label>
-              <div className={styles.positionGrid}>
+              <label id="posicion-label" className={styles.label}>Posición</label>
+              <div role="group" aria-labelledby="posicion-label" className={styles.positionGrid}>
                 {RADIAL_POSITIONS.map(pos => (
                   <button
                     type="button"

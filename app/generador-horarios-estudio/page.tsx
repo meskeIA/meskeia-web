@@ -596,8 +596,9 @@ export default function GeneradorHorariosPage() {
               </h2>
 
               <div className={styles.preferenciaItem}>
-                <label className={styles.preferenciaLabel}>Duración de cada sesión</label>
+                <label htmlFor="duracion-sesion" className={styles.preferenciaLabel}>Duración de cada sesión</label>
                 <select
+                  id="duracion-sesion"
                   className={styles.select}
                   value={duracionSesion}
                   onChange={e => setDuracionSesion(parseInt(e.target.value))}
@@ -781,8 +782,9 @@ export default function GeneradorHorariosPage() {
 
               <div className={styles.formGrid}>
                 <div className={styles.formGroup}>
-                  <label>Título *</label>
+                  <label htmlFor="entrega-titulo">Título *</label>
                   <input
+                    id="entrega-titulo"
                     type="text"
                     className={styles.input}
                     value={formEntrega.titulo}
@@ -792,8 +794,9 @@ export default function GeneradorHorariosPage() {
                 </div>
 
                 <div className={styles.formGroup}>
-                  <label>Asignatura *</label>
+                  <label htmlFor="entrega-asignatura">Asignatura *</label>
                   <select
+                    id="entrega-asignatura"
                     className={styles.select}
                     value={formEntrega.asignaturaId}
                     onChange={e => setFormEntrega({ ...formEntrega, asignaturaId: e.target.value })}
@@ -806,8 +809,9 @@ export default function GeneradorHorariosPage() {
                 </div>
 
                 <div className={styles.formGroup}>
-                  <label>Tipo</label>
+                  <label htmlFor="entrega-tipo">Tipo</label>
                   <select
+                    id="entrega-tipo"
                     className={styles.select}
                     value={formEntrega.tipo}
                     onChange={e => setFormEntrega({ ...formEntrega, tipo: e.target.value as Entrega['tipo'] })}
@@ -819,8 +823,9 @@ export default function GeneradorHorariosPage() {
                 </div>
 
                 <div className={styles.formGroup}>
-                  <label>Fecha de entrega *</label>
+                  <label htmlFor="entrega-fecha">Fecha de entrega *</label>
                   <input
+                    id="entrega-fecha"
                     type="date"
                     className={styles.input}
                     value={formEntrega.fechaEntrega}
@@ -829,8 +834,9 @@ export default function GeneradorHorariosPage() {
                 </div>
 
                 <div className={styles.formGroupFull}>
-                  <label>Descripción (opcional)</label>
+                  <label htmlFor="entrega-descripcion">Descripción (opcional)</label>
                   <textarea
+                    id="entrega-descripcion"
                     className={styles.textarea}
                     value={formEntrega.descripcion}
                     onChange={e => setFormEntrega({ ...formEntrega, descripcion: e.target.value })}
@@ -840,8 +846,8 @@ export default function GeneradorHorariosPage() {
                 </div>
 
                 <div className={styles.formGroup}>
-                  <label>Importancia</label>
-                  <div className={styles.importanciaButtons}>
+                  <label id="importancia-label">Importancia</label>
+                  <div role="group" aria-labelledby="importancia-label" className={styles.importanciaButtons}>
                     {[1, 2, 3].map(n => (
                       <button
                         key={n}

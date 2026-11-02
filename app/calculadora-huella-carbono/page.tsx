@@ -398,9 +398,10 @@ export default function CalculadoraHuellaCarbono() {
             <h2 className={styles.seccionTitulo}><span aria-hidden="true">🚗</span> Transporte</h2>
 
             <div className={styles.inputGroup}>
-              <label className={styles.label}>Kilómetros en coche al año</label>
+              <label htmlFor="km-coche" className={styles.label}>Kilómetros en coche al año</label>
               <div className={styles.inputRow}>
                 <input
+                  id="km-coche"
                   type="text"
                   inputMode="decimal"
                   className={styles.input}
@@ -423,8 +424,9 @@ export default function CalculadoraHuellaCarbono() {
             </div>
 
             <div className={styles.inputGroup}>
-              <label className={styles.label}>Kilómetros en moto al año</label>
+              <label htmlFor="km-moto" className={styles.label}>Kilómetros en moto al año</label>
               <input
+                id="km-moto"
                 type="text"
                 inputMode="decimal"
                 className={styles.input}
@@ -436,8 +438,9 @@ export default function CalculadoraHuellaCarbono() {
 
             <div className={styles.inputGrid}>
               <div className={styles.inputGroup}>
-                <label className={styles.label}>Km en bus/año</label>
+                <label htmlFor="km-bus" className={styles.label}>Km en bus/año</label>
                 <input
+                  id="km-bus"
                   type="text"
                   inputMode="decimal"
                   className={styles.input}
@@ -447,8 +450,9 @@ export default function CalculadoraHuellaCarbono() {
                 />
               </div>
               <div className={styles.inputGroup}>
-                <label className={styles.label}>Km en metro/año</label>
+                <label htmlFor="km-metro" className={styles.label}>Km en metro/año</label>
                 <input
+                  id="km-metro"
                   type="text"
                   inputMode="decimal"
                   className={styles.input}
@@ -458,8 +462,9 @@ export default function CalculadoraHuellaCarbono() {
                 />
               </div>
               <div className={styles.inputGroup}>
-                <label className={styles.label}>Km en tren/año</label>
+                <label htmlFor="km-tren" className={styles.label}>Km en tren/año</label>
                 <input
+                  id="km-tren"
                   type="text"
                   inputMode="decimal"
                   className={styles.input}
@@ -473,8 +478,9 @@ export default function CalculadoraHuellaCarbono() {
             <h3 className={styles.subtitulo}><span aria-hidden="true">✈️</span> Vuelos (ida y vuelta)</h3>
             <div className={styles.inputGrid}>
               <div className={styles.inputGroup}>
-                <label className={styles.label}>Cortos (&lt;1500km)</label>
+                <label htmlFor="vuelos-cortos" className={styles.label}>Cortos (&lt;1500km)</label>
                 <input
+                  id="vuelos-cortos"
                   type="text"
                   inputMode="decimal"
                   className={styles.input}
@@ -484,8 +490,9 @@ export default function CalculadoraHuellaCarbono() {
                 />
               </div>
               <div className={styles.inputGroup}>
-                <label className={styles.label}>Medios (1500-4000km)</label>
+                <label htmlFor="vuelos-medios" className={styles.label}>Medios (1500-4000km)</label>
                 <input
+                  id="vuelos-medios"
                   type="text"
                   inputMode="decimal"
                   className={styles.input}
@@ -495,8 +502,9 @@ export default function CalculadoraHuellaCarbono() {
                 />
               </div>
               <div className={styles.inputGroup}>
-                <label className={styles.label}>Largos (&gt;4000km)</label>
+                <label htmlFor="vuelos-largos" className={styles.label}>Largos (&gt;4000km)</label>
                 <input
+                  id="vuelos-largos"
                   type="text"
                   inputMode="decimal"
                   className={styles.input}
@@ -515,8 +523,9 @@ export default function CalculadoraHuellaCarbono() {
             <h2 className={styles.seccionTitulo}><span aria-hidden="true">🏠</span> Hogar</h2>
 
             <div className={styles.inputGroup}>
-              <label className={styles.label}>Consumo eléctrico mensual (kWh)</label>
+              <label htmlFor="electricidad-mensual" className={styles.label}>Consumo eléctrico mensual (kWh)</label>
               <input
+                id="electricidad-mensual"
                 type="text"
                 inputMode="decimal"
                 className={styles.input}
@@ -528,8 +537,9 @@ export default function CalculadoraHuellaCarbono() {
             </div>
 
             <div className={styles.inputGroup}>
-              <label className={styles.label}>Gas natural mensual (m³)</label>
+              <label htmlFor="gas-natural" className={styles.label}>Gas natural mensual (m³)</label>
               <input
+                id="gas-natural"
                 type="text"
                 inputMode="decimal"
                 className={styles.input}
@@ -540,8 +550,9 @@ export default function CalculadoraHuellaCarbono() {
             </div>
 
             <div className={styles.inputGroup}>
-              <label className={styles.label}>Butano mensual (kg)</label>
+              <label htmlFor="butano-kg" className={styles.label}>Butano mensual (kg)</label>
               <input
+                id="butano-kg"
                 type="text"
                 inputMode="decimal"
                 className={styles.input}
@@ -553,8 +564,9 @@ export default function CalculadoraHuellaCarbono() {
             </div>
 
             <div className={styles.inputGroup}>
-              <label className={styles.label}>Personas en el hogar</label>
+              <label htmlFor="personas-hogar" className={styles.label}>Personas en el hogar</label>
               <select
+                id="personas-hogar"
                 className={styles.select}
                 value={hogar.personasHogar}
                 onChange={(e) => setHogar({ ...hogar, personasHogar: e.target.value })}
@@ -576,8 +588,9 @@ export default function CalculadoraHuellaCarbono() {
             <h2 className={styles.seccionTitulo}><span aria-hidden="true">🍽️</span> Alimentación</h2>
 
             <div className={styles.inputGroup}>
-              <label className={styles.label}>Tipo de dieta</label>
+              <label htmlFor="tipo-dieta" className={styles.label}>Tipo de dieta</label>
               <select
+                id="tipo-dieta"
                 className={styles.select}
                 value={alimentacion.tipoDieta}
                 onChange={(e) => setAlimentacion({ ...alimentacion, tipoDieta: e.target.value as DatosAlimentacion['tipoDieta'] })}
@@ -614,8 +627,9 @@ export default function CalculadoraHuellaCarbono() {
             <h2 className={styles.seccionTitulo}><span aria-hidden="true">🛒</span> Consumo</h2>
 
             <div className={styles.inputGroup}>
-              <label className={styles.label}>Prendas de ropa nuevas al año</label>
+              <label htmlFor="ropa-nueva" className={styles.label}>Prendas de ropa nuevas al año</label>
               <input
+                id="ropa-nueva"
                 type="text"
                 inputMode="decimal"
                 className={styles.input}
@@ -627,8 +641,9 @@ export default function CalculadoraHuellaCarbono() {
 
             <div className={styles.inputGrid}>
               <div className={styles.inputGroup}>
-                <label className={styles.label}>Móviles nuevos/año</label>
+                <label htmlFor="moviles-anio" className={styles.label}>Móviles nuevos/año</label>
                 <input
+                  id="moviles-anio"
                   type="text"
                   inputMode="decimal"
                   className={styles.input}
@@ -638,8 +653,9 @@ export default function CalculadoraHuellaCarbono() {
                 />
               </div>
               <div className={styles.inputGroup}>
-                <label className={styles.label}>Ordenadores nuevos/año</label>
+                <label htmlFor="ordenadores-anio" className={styles.label}>Ordenadores nuevos/año</label>
                 <input
+                  id="ordenadores-anio"
                   type="text"
                   inputMode="decimal"
                   className={styles.input}

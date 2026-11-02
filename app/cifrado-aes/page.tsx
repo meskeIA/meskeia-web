@@ -236,8 +236,8 @@ export default function CifradoAESPage() {
 
           {/* Selector de algoritmo */}
           <div className={styles.configItem}>
-            <label className={styles.label}>Modo de operación</label>
-            <div className={styles.algoritmoSelector}>
+            <label id="modo-operacion-label" className={styles.label}>Modo de operación</label>
+            <div role="group" aria-labelledby="modo-operacion-label" className={styles.algoritmoSelector}>
               <button
                 type="button"
                 className={`${styles.algoritmoBtn} ${algoritmo === 'AES-GCM' ? styles.active : ''}`}
@@ -261,9 +261,10 @@ export default function CifradoAESPage() {
 
           {/* Clave */}
           <div className={styles.configItem}>
-            <label className={styles.label}>Clave secreta</label>
+            <label htmlFor="clave-secreta" className={styles.label}>Clave secreta</label>
             <div className={styles.claveContainer}>
               <input
+                id="clave-secreta"
                 type={mostrarClave ? 'text' : 'password'}
                 value={clave}
                 onChange={(e) => setClave(e.target.value)}

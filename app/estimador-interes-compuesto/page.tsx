@@ -149,9 +149,10 @@ export default function InteresCompuestoPage() {
           <h2 className={styles.sectionTitle}><span aria-hidden="true">💰</span> Datos de la Inversión</h2>
 
           <div className={styles.inputGroup}>
-            <label className={styles.label}>Capital inicial</label>
+            <label htmlFor="capital-inicial" className={styles.label}>Capital inicial</label>
             <div className={styles.inputWrapper}>
               <input
+                id="capital-inicial"
                 type="text"
                 className={styles.input}
                 value={capitalInicial}
@@ -165,10 +166,11 @@ export default function InteresCompuestoPage() {
 
           <div className={styles.sliderGroup}>
             <div className={styles.sliderHeader}>
-              <label className={styles.label}>Rentabilidad anual esperada</label>
+              <label htmlFor="rentabilidad-anual" className={styles.label}>Rentabilidad anual esperada</label>
               <span className={styles.sliderValue}>{tasaInteres}%</span>
             </div>
             <input
+              id="rentabilidad-anual"
               type="range"
               className={styles.slider}
               min="1"
@@ -182,10 +184,11 @@ export default function InteresCompuestoPage() {
 
           <div className={styles.sliderGroup}>
             <div className={styles.sliderHeader}>
-              <label className={styles.label}>Horizonte temporal</label>
+              <label htmlFor="horizonte-temporal" className={styles.label}>Horizonte temporal</label>
               <span className={styles.sliderValue}>{anos} años</span>
             </div>
             <input
+              id="horizonte-temporal"
               type="range"
               className={styles.slider}
               min="1"
@@ -198,9 +201,10 @@ export default function InteresCompuestoPage() {
           <h2 className={styles.sectionTitle}><span aria-hidden="true">📥</span> Aportaciones Periódicas</h2>
 
           <div className={styles.inputGroup}>
-            <label className={styles.label}>Aportación</label>
+            <label htmlFor="aportacion-periodica" className={styles.label}>Aportación</label>
             <div className={styles.inputWrapper}>
               <input
+                id="aportacion-periodica"
                 type="text"
                 className={styles.input}
                 value={aportacionPeriodica}
@@ -212,8 +216,9 @@ export default function InteresCompuestoPage() {
           </div>
 
           <div className={styles.inputGroup}>
-            <label className={styles.label}>Frecuencia de aportación</label>
+            <label htmlFor="frecuencia-aportacion" className={styles.label}>Frecuencia de aportación</label>
             <select
+              id="frecuencia-aportacion"
               className={styles.select}
               value={frecuenciaAportacion}
               onChange={(e) => setFrecuenciaAportacion(e.target.value as FrecuenciaAportacion)}
@@ -226,8 +231,9 @@ export default function InteresCompuestoPage() {
           </div>
 
           <div className={styles.inputGroup}>
-            <label className={styles.label}>Capitalización de intereses</label>
+            <label htmlFor="capitalizacion-intereses" className={styles.label}>Capitalización de intereses</label>
             <select
+              id="capitalizacion-intereses"
               className={styles.select}
               value={frecuenciaCapitalizacion}
               onChange={(e) => setFrecuenciaCapitalizacion(e.target.value as FrecuenciaCapitalizacion)}

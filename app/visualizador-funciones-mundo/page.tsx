@@ -274,10 +274,10 @@ export default function VisualizadorFuncionesMundoPage() {
         {/* Slider de parámetro */}
         <div className={styles.sliderZona}>
           <div className={styles.sliderHeader}>
-            <label className={styles.sliderLabel}>{paramLabel}</label>
+            <label htmlFor="parametro" className={styles.sliderLabel}>{paramLabel}</label>
             <span className={styles.sliderValor}>{parametro}</span>
           </div>
-          <input type="range" className={styles.slider}
+          <input id="parametro" type="range" className={styles.slider}
             min={1} max={10} value={parametro}
             onChange={(e) => setParametro(parseInt(e.target.value))}
             aria-label={`${paramLabel}: ${parametro}`} />
