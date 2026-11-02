@@ -1926,9 +1926,13 @@ export default function SimuladorHeredarViviendaPage() {
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
             <h4>Hijo hereda piso vivienda habitual del padre</h4>
+            {/* 02/11/2026 (hallazgo 3882): daba las reducciones estatales como LAS del hijo y a renglón
+                seguido citaba a Andalucía y Extremadura, que aplican otras (la forma del 1179). */}
             <p>
-              Reducción de parentesco ({formatCurrency(REDUCCIONES_PARENTESCO_IS['II'] ?? 0)}) + reducción
-              vivienda habitual del {PORC_REDUCCION_VIVIENDA}&nbsp;% (hasta {formatCurrency(REDUCCION_VIVIENDA_MAX_IS)}). En las
+              Con las reducciones estatales, que cada comunidad autónoma puede mejorar: parentesco
+              ({formatCurrency(REDUCCIONES_PARENTESCO_IS['II'] ?? 0)}) + vivienda habitual del {PORC_REDUCCION_VIVIENDA}&nbsp;% (hasta{' '}
+              {formatCurrency(REDUCCION_VIVIENDA_MAX_IS)}). Varias las mejoran —Andalucía y Extremadura, entre
+              otras—, y el panel aplica las de la comunidad elegida. En las
               comunidades de régimen común que bonifican la cuota al 99&nbsp;% o más
               ({CCAA_BONIFICACION_CASI_TOTAL.join(', ')}) el ISD se queda en casi nada — Aragón, eso sí,
               deja de bonificar del todo por encima de 3.000.000 € de base liquidable. Ojo con las que

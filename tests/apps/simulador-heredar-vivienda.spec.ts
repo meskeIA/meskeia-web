@@ -6460,7 +6460,8 @@ test.describe('Simulador de heredar vivienda — inspección 01/11/2026', () => 
   });
 
   /**
-   * ✗ ABIERTO (inspección 01/11/2026, contenido, bajo) — el faqJsonLd dice que el método objetivo
+   * ✅ REPARADO el 02/11/2026 (hallazgo 3881): «valor catastral del suelo × coeficiente × tipo».
+   * Inspección 01/11/2026, contenido, bajo — el faqJsonLd dice que el método objetivo
    * es «valor catastral × coeficiente × tipo». La base es el valor catastral del SUELO: lo dice
    * data/fiscal/inmuebles.ts junto a la tabla del art. 107.4 («Base imponible = Valor catastral del
    * suelo × coeficiente»), la tabla educativa de la propia página («valor catastral suelo ×
@@ -6469,7 +6470,7 @@ test.describe('Simulador de heredar vivienda — inspección 01/11/2026', () => 
    * por el inverso de la proporción de suelo: con los valores de fábrica (60.000 de 120.000), el
    * doble.
    */
-  test.fail('ABIERTO — el faqJsonLd dice que el método objetivo va sobre el valor catastral del suelo', async ({ page }) => {
+  test('el faqJsonLd dice que el método objetivo va sobre el valor catastral del suelo', async ({ page }) => {
     await abrir(page);
     const pregunta = (await faqServida(page)).find((p) => p.name.startsWith('¿Cómo se calcula la plusvalía municipal'));
     expect(pregunta, 'la pregunta sigue en el FAQPage').toBeDefined();
@@ -6477,7 +6478,9 @@ test.describe('Simulador de heredar vivienda — inspección 01/11/2026', () => 
   });
 
   /**
-   * ✗ ABIERTO (inspección 01/11/2026, contenido, bajo) — la tarjeta «Hijo hereda piso vivienda
+   * ✅ REPARADO el 02/11/2026 (hallazgo 3882): «Con las reducciones estatales, que cada comunidad
+   * autónoma puede mejorar» y la salvedad de Andalucía y Extremadura.
+   * Inspección 01/11/2026, contenido, bajo — la tarjeta «Hijo hereda piso vivienda
    * habitual del padre» da como LAS reducciones del hijo las estatales («Reducción de parentesco
    * (15.956,87 €) + reducción vivienda habitual del 95 %») y en la frase siguiente pone a Andalucía
    * y a Extremadura entre las comunidades donde «el ISD se queda en casi nada». En las dos la app
@@ -6486,7 +6489,7 @@ test.describe('Simulador de heredar vivienda — inspección 01/11/2026', () => 
    * prometida como universal en texto fijo—, que la tarjeta de buenas prácticas resolvió diciendo
    * «según el tope estatal, que cada comunidad autónoma puede mejorar».
    */
-  test.fail('ABIERTO — la tarjeta del hijo no presenta las reducciones estatales como las de Andalucía', async ({ page }) => {
+  test('la tarjeta del hijo no presenta las reducciones estatales como las de Andalucía', async ({ page }) => {
     await abrir(page);
     const tarjeta = page.locator('h4', { hasText: 'Hijo hereda piso vivienda habitual del padre' }).locator('xpath=..');
     // `textContent` y no `innerText`: <EducationalSection> oculta su contenido por CSS
@@ -6496,17 +6499,19 @@ test.describe('Simulador de heredar vivienda — inspección 01/11/2026', () => 
       !citaAndalucia || /estatal|1\.000\.000/.test(texto),
       'cita a Andalucía junto a las reducciones estatales, como si fueran las suyas',
     ).toBe(true);
+    expect(texto).toContain('Con las reducciones estatales, que cada comunidad autónoma puede mejorar');
   });
 
   /**
-   * ✗ ABIERTO (inspección 01/11/2026, contenido, bajo, cabo C0102) — el `featureList` del
+   * ✅ REPARADO el 02/11/2026 (hallazgo 3883): siete características comprobadas en la app.
+   * Inspección 01/11/2026, contenido, bajo, cabo C0102 — el `featureList` del
    * WebApplication tiene 9 entradas (§1.ter: de 4 a 8). Dos no son características («Solo
    * orientativo — consulta con notario y asesor fiscal» y «En español») y una cita como fuente de
    * la plusvalía el RDL 26/2021, cuando data/fiscal sirve los coeficientes en la redacción del art.
    * 24 del RDL 8/2023 (`PLUSVALIA_MUNICIPAL_META.baseNormativa`, hallazgos 1559 y 1560) y el pie
    * de la propia página lo cita así.
    */
-  test.fail('ABIERTO — el featureList tiene de 4 a 8 características y no da el RDL 26/2021 como fuente de la plusvalía', async ({ page }) => {
+  test('el featureList tiene de 4 a 8 características y no da el RDL 26/2021 como fuente de la plusvalía', async ({ page }) => {
     expect(PLUSVALIA_MUNICIPAL_META.baseNormativa).toContain('RDL 8/2023');
     await abrir(page);
     const lista = await page.evaluate(() => {

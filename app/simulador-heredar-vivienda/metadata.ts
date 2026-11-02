@@ -110,16 +110,18 @@ export const jsonLd = generateWebAppSchema({
     'Calculadora orientativa del coste fiscal completo al heredar una vivienda y venderla en España: Impuesto de Sucesiones (ISD) según CCAA y parentesco, plusvalía municipal (IIVTNU) por método objetivo o real, e IRPF de la ganancia patrimonial al vender.',
   url: 'https://meskeia.com/simulador-heredar-vivienda/',
   category: 'FinanceApplication',
+  // 02/11/2026 (hallazgo 3883, cabo C0102): eran 9, dos no eran características («Solo
+  // orientativo…», «En español») y una daba el RDL 26/2021 como fuente de la plusvalía, cuando los
+  // coeficientes son los del RDL 8/2023 (PLUSVALIA_MUNICIPAL_META.baseNormativa). Cada una, comprobada
+  // en la app.
   features: [
-    'Cálculo en cadena de los 3 impuestos: ISD + IIVTNU + IRPF',
-    'Soporte 17 CCAA con bonificaciones específicas',
-    'Reducción por parentesco y vivienda habitual',
-    'Plusvalía municipal: método objetivo y real, elige el menor',
-    'Ganancia patrimonial al vender, ajustada por impuestos pagados',
-    '4 casos preconfigurados con CCAA distintas',
-    'Datos basados en Ley 29/1987 ISD y RDL 26/2021 plusvalía',
-    'Solo orientativo — consulta con notario y asesor fiscal',
-    'En español',
+    'ISD, plusvalía municipal de la herencia y de la venta e IRPF de la ganancia, encadenados en un coste total',
+    'Las 17 comunidades autónomas con su tarifa, sus reducciones y su bonificación (País Vasco y Navarra, orientativas y sin plusvalía municipal)',
+    'Reducciones por parentesco de los Grupos I a IV y por vivienda habitual, con su plazo de mantenimiento',
+    'Coeficiente por patrimonio preexistente del heredero con la corrección del salto de tramo (art. 22.2 LISD)',
+    'Plusvalía municipal por los métodos objetivo y real, con la tenencia contada de fecha a fecha',
+    'Aviso y regularización del ISD si se vende antes del plazo de mantenimiento',
+    '4 casos preconfigurados: Madrid, Cataluña, País Vasco y Andalucía',
   ],
   keywords: ['ISD', 'plusvalía municipal', 'IRPF herencia', 'heredar vivienda España'],
 });
@@ -141,7 +143,7 @@ export const faqJsonLd = {
       name: '¿Cómo se calcula la plusvalía municipal al heredar una vivienda?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La plusvalía municipal (IIVTNU) grava el incremento del valor del terreno urbano desde la última transmisión. Desde 2021 el contribuyente puede elegir entre el método objetivo (valor catastral × coeficiente × tipo) y el método real (diferencia entre valores de adquisición y transmisión × % del terreno). El ayuntamiento aplica el que resulte menor. Si no hay incremento real de valor, el impuesto NO se devenga (art. 104.5 TRLHL, redacción del RDL 26/2021): es un supuesto de no sujeción que se declara aportando las escrituras de adquisición y transmisión, sin necesidad de impugnar liquidación alguna.',
+        text: 'La plusvalía municipal (IIVTNU) grava el incremento del valor del terreno urbano desde la última transmisión. Desde 2021 el contribuyente puede elegir entre el método objetivo (valor catastral del suelo × coeficiente × tipo) y el método real (diferencia entre valores de adquisición y transmisión × % del terreno). El ayuntamiento aplica el que resulte menor. Si no hay incremento real de valor, el impuesto NO se devenga (art. 104.5 TRLHL, redacción del RDL 26/2021): es un supuesto de no sujeción que se declara aportando las escrituras de adquisición y transmisión, sin necesidad de impugnar liquidación alguna.',
       },
     },
     {
