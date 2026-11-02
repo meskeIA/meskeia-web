@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import styles from './OrientadorAyudasPersonasFamilias.module.css';
+import { PREGUNTAS_FRECUENTES } from './metadata';
 import {
   MeskeiaLogo,
   Footer,
@@ -343,54 +344,12 @@ export default function OrientadorAyudasPersonasFamiliasPage() {
         <section className={styles.guideSection}>
           <h2>Preguntas frecuentes</h2>
           <div className={styles.faqGrid}>
-            <div className={styles.faqItem}>
-              <h3>¿Qué es el Ingreso Mínimo Vital y quién puede solicitarlo?</h3>
-              <p>
-                El Ingreso Mínimo Vital (IMV) es una prestación mensual del INSS para hogares con ingresos y
-                patrimonio por debajo de determinados umbrales, que varían según el número de personas que conviven
-                en el hogar y su composición (menores, monoparentalidad, discapacidad...). No existe una cifra única:
-                cada solicitud se valora de forma individual. El simulador oficial en imv.seg-social.es permite hacer
-                una primera estimación con tus datos reales.
-              </p>
-            </div>
-            <div className={styles.faqItem}>
-              <h3>¿Cómo sé si tengo derecho a la prestación o al subsidio por desempleo?</h3>
-              <p>
-                La prestación contributiva exige haber cotizado un mínimo de días en los últimos años y encontrarte
-                en situación legal de desempleo (despido, fin de contrato, etc.). Si no cumples ese mínimo, existen
-                subsidios para colectivos concretos: mayores de 45 años con cargas familiares, quienes agotan la
-                prestación contributiva o quienes nunca llegaron al periodo mínimo cotizado. El SEPE dispone de un
-                simulador que calcula tu situación a partir de tu vida laboral.
-              </p>
-            </div>
-            <div className={styles.faqItem}>
-              <h3>¿Qué es el bono social eléctrico y cómo se solicita?</h3>
-              <p>
-                El bono social eléctrico es un descuento sobre el precio de la luz para hogares vulnerables, que se
-                solicita ante la comercializadora de referencia con contrato PVPC. El porcentaje de descuento depende
-                del nivel de renta del hogar (medido en múltiplos del IPREM) y de la composición familiar, con
-                condiciones reforzadas para familias numerosas, monoparentales o con personas con discapacidad o
-                dependencia.
-              </p>
-            </div>
-            <div className={styles.faqItem}>
-              <h3>¿Qué deducciones fiscales existen por tener hijos o familiares a cargo?</h3>
-              <p>
-                La Agencia Tributaria reconoce deducciones por familia numerosa, por ascendiente o descendiente con
-                discapacidad a cargo y por cada hijo menor de 3 años. Pueden cobrarse de forma anticipada cada mes
-                solicitando el modelo 143, o aplicarse directamente en la declaración de la Renta. Son compatibles
-                entre sí cuando se cumple más de un requisito a la vez.
-              </p>
-            </div>
-            <div className={styles.faqItem}>
-              <h3>¿Dónde puedo pedir ayuda si mi situación económica es urgente y no encajo en ninguna de estas categorías?</h3>
-              <p>
-                Los Servicios Sociales de tu ayuntamiento son el punto de partida recomendado para situaciones
-                urgentes: gestionan ayudas de emergencia social, suministros básicos, alquiler o comedor escolar, con
-                requisitos propios de cada municipio y comunidad autónoma. También puedes consultar el buscador
-                oficial BDNS (infosubvenciones.es) para ver qué convocatorias están abiertas en tu zona.
-              </p>
-            </div>
+            {PREGUNTAS_FRECUENTES.map((f) => (
+              <div key={f.question} className={styles.faqItem}>
+                <h3>{f.question}</h3>
+                <p>{f.answer}</p>
+              </div>
+            ))}
           </div>
         </section>
 

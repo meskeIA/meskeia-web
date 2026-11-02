@@ -59,6 +59,11 @@ export const jsonLd = generateWebAppSchema({
   ],
 });
 
+// La única pregunta que está también en la FAQ visible de page.tsx: una sola respuesta para
+// las dos (check:faq-unica, cabo C0570).
+export const RESPUESTA_FAQ_FRACCIONES =
+  'Cinco tipos: sumas y restas con el mismo denominador, sumas y restas con distinto denominador (el mínimo común múltiplo nunca pasa de 60), multiplicaciones y divisiones, simplificar hasta la fracción irreducible, y una mezcla de todos. El nivel fija el denominador máximo, de 6 en Iniciación a 15 en Experto. Las soluciones salen simplificadas y, si pasan de la unidad, también como número mixto.';
+
 // FAQPage JSON-LD — mejora visibilidad en Bing Copilot, ChatGPT, Perplexity y Gemini
 export const faqJsonLd = {
   '@context': 'https://schema.org',
@@ -101,7 +106,7 @@ export const faqJsonLd = {
       name: '¿Qué ejercicios de fracciones genera?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Cinco tipos: sumas y restas con el mismo denominador, sumas y restas con distinto denominador (el mínimo común múltiplo nunca pasa de 60), multiplicaciones y divisiones, simplificar hasta la fracción irreducible, y una mezcla de todos. El nivel fija el denominador máximo, de 6 en Iniciación a 15 en Experto. Las soluciones salen simplificadas y, si pasan de la unidad, también como número mixto.',
+        text: RESPUESTA_FAQ_FRACCIONES,
       },
     },
     {

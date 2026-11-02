@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import styles from './OrientadorBecasAyudasEstudio.module.css';
+import { PREGUNTAS_FRECUENTES } from './metadata';
 import {
   MeskeiaLogo,
   Footer,
@@ -344,54 +345,12 @@ export default function OrientadorBecasAyudasEstudioPage() {
         <section className={styles.guideSection}>
           <h2>Preguntas frecuentes</h2>
           <div className={styles.faqGrid}>
-            <div className={styles.faqItem}>
-              <h3>¿Qué es la Beca General de Estudios Postobligatorios y quién puede solicitarla?</h3>
-              <p>
-                Es la beca del Ministerio de Educación para Bachillerato, Formación Profesional, universidad y
-                enseñanzas artísticas superiores. Su concesión depende de tres tipos de requisitos publicados cada
-                curso: académico (nota media mínima), económico (la renta familiar debe estar por debajo de unos
-                umbrales que determinan los componentes que recibes) y patrimonial (límites sobre inmuebles y
-                rendimientos del capital). El comprobador oficial en becaseducacion.gob.es indica con tus datos reales
-                qué umbral te correspondería.
-              </p>
-            </div>
-            <div className={styles.faqItem}>
-              <h3>¿Qué son las ayudas NEAE y para quién son?</h3>
-              <p>
-                Las ayudas para alumnado con Necesidad Específica de Apoyo Educativo (NEAE) son una convocatoria
-                estatal para estudiantes de infantil, primaria, secundaria, bachillerato o FP con discapacidad,
-                trastorno del desarrollo, TDAH, trastorno grave de conducta o de la comunicación, o altas capacidades.
-                Según el caso, pueden cubrir refuerzo educativo, comedor, transporte, residencia y material específico,
-                sujetas también a umbrales de renta familiar.
-              </p>
-            </div>
-            <div className={styles.faqItem}>
-              <h3>¿Quién gestiona las ayudas de comedor, transporte y libros escolares?</h3>
-              <p>
-                A diferencia de la beca general (estatal), estas ayudas dependen casi siempre de la Comunidad
-                Autónoma, el ayuntamiento o el propio centro educativo, con requisitos, porcentajes de bonificación y
-                plazos propios de cada región. La secretaría de tu centro o la consejería de educación de tu Comunidad
-                Autónoma son la fuente más fiable para conocer el procedimiento exacto.
-              </p>
-            </div>
-            <div className={styles.faqItem}>
-              <h3>¿Las becas autonómicas son compatibles con la beca general del Ministerio?</h3>
-              <p>
-                En general sí, las convocatorias autonómicas (becas de excelencia, complementos, ayudas para material
-                o conectividad) suelen ser compatibles con la beca general estatal, salvo que las bases de alguna de
-                ellas indiquen lo contrario. Conviene revisar la compatibilidad en la convocatoria autonómica concreta
-                antes de solicitar varias ayudas a la vez.
-              </p>
-            </div>
-            <div className={styles.faqItem}>
-              <h3>¿Dónde puedo pedir ayuda si necesito apoyo urgente para gastos escolares y no sé qué beca me corresponde?</h3>
-              <p>
-                Los Servicios Sociales de tu ayuntamiento pueden orientarte sobre el conjunto de ayudas municipales,
-                autonómicas y estatales disponibles para tu situación, incluido apoyo para tramitar becas. También
-                puedes consultar el buscador oficial BDNS (infosubvenciones.es) para ver qué convocatorias de becas
-                están abiertas en tu zona.
-              </p>
-            </div>
+            {PREGUNTAS_FRECUENTES.map((f) => (
+              <div key={f.question} className={styles.faqItem}>
+                <h3>{f.question}</h3>
+                <p>{f.answer}</p>
+              </div>
+            ))}
           </div>
         </section>
 
