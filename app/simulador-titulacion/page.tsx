@@ -381,7 +381,7 @@ export default function SimuladorTitulacion() {
                   setVTitulante(0);
                 }}
               />
-              <span className={styles.sliderValue}>{formatNumber(V_analito, 0)} mL</span>
+              <span className={styles.sliderValue}>{`${formatNumber(V_analito, 0)} mL`}</span>
             </div>
 
             <div className={styles.inputGroup}>
@@ -400,7 +400,7 @@ export default function SimuladorTitulacion() {
                   setVTitulante(0);
                 }}
               />
-              <span className={styles.sliderValue}>{formatNumber(C_analito, 2)} M</span>
+              <span className={styles.sliderValue}>{`${formatNumber(C_analito, 2)} M`}</span>
             </div>
 
             <div className={styles.inputGroup}>
@@ -419,7 +419,7 @@ export default function SimuladorTitulacion() {
                   setVTitulante(0);
                 }}
               />
-              <span className={styles.sliderValue}>{formatNumber(C_titulante, 2)} M</span>
+              <span className={styles.sliderValue}>{`${formatNumber(C_titulante, 2)} M`}</span>
             </div>
 
             {muestraPKa && (
@@ -437,7 +437,7 @@ export default function SimuladorTitulacion() {
                     setVTitulante(0);
                   }}
                 />
-                <span className={styles.sliderValue}>pKa = {formatNumber(pKa, 2)}</span>
+                <span className={styles.sliderValue}>{`pKa = ${formatNumber(pKa, 2)}`}</span>
               </div>
             )}
 
@@ -456,7 +456,7 @@ export default function SimuladorTitulacion() {
                     setVTitulante(0);
                   }}
                 />
-                <span className={styles.sliderValue}>pKb = {formatNumber(pKb, 2)}</span>
+                <span className={styles.sliderValue}>{`pKb = ${formatNumber(pKb, 2)}`}</span>
               </div>
             )}
           </div>
@@ -491,12 +491,17 @@ export default function SimuladorTitulacion() {
               estaba conectado con este selector (hallazgo 344). */}
           {!indicadorAdecuado && (
             <p className={styles.indicatorAviso} role="status">
+              {/* Cada trozo variable va en su propio <span>, hijo único: con la página traducida,
+                  React escribía en el nodo de texto que el traductor ya había retirado y el aviso se
+                  quedaba con el indicador y los volúmenes de antes (hallazgo 3958). */}
               <strong>Este indicador no sirve para esta valoración.</strong> El punto de equivalencia
-              está en pH {textoPH(pHEquivalencia)} ({formatNumber(V_eq, 2)} mL) y {INDICADORES[indicador].nombre} vira entre{' '}
-              {formatNumber(INDICADORES[indicador].rango[0], 1)} y {formatNumber(INDICADORES[indicador].rango[1], 1)}:{' '}
-              {describirViraje(virajes[indicador].desde, virajes[indicador].hasta)}. El color cambiaría{' '}
-              {virajes[indicador].desde !== null && virajes[indicador].desde < V_eq * (1 - MARGEN_SALTO) ? 'antes' : 'después'} de
-              llegar a la equivalencia, fuera del margen del {formatNumber(MARGEN_SALTO * 100, 0)}{' '}% a cada lado de
+              está en pH <span>{textoPH(pHEquivalencia)}</span> (<span>{`${formatNumber(V_eq, 2)} mL`}</span>) y{' '}
+              <span>{INDICADORES[indicador].nombre}</span> vira entre{' '}
+              <span>{formatNumber(INDICADORES[indicador].rango[0], 1)}</span> y{' '}
+              <span>{formatNumber(INDICADORES[indicador].rango[1], 1)}</span>:{' '}
+              <span>{describirViraje(virajes[indicador].desde, virajes[indicador].hasta)}</span>. El color cambiaría{' '}
+              <span>{virajes[indicador].desde !== null && virajes[indicador].desde < V_eq * (1 - MARGEN_SALTO) ? 'antes' : 'después'}</span> de
+              llegar a la equivalencia, fuera del margen del <span>{`${formatNumber(MARGEN_SALTO * 100, 0)}\u00A0%`}</span> a cada lado de
               V_eq, así que el punto final leído sería erróneo. Es exactamente el error que la tabla de
               más abajo explica.
             </p>
@@ -694,15 +699,15 @@ export default function SimuladorTitulacion() {
             </div>
             <div className={styles.resultRow}>
               <span className={styles.resultLabel}>Volumen añadido</span>
-              <span className={styles.resultValue}>{formatNumber(V_titulante, 2)} mL</span>
+              <span className={styles.resultValue}>{`${formatNumber(V_titulante, 2)} mL`}</span>
             </div>
             <div className={styles.resultRow}>
               <span className={styles.resultLabel}>Volumen de equivalencia (V_eq)</span>
-              <span className={styles.resultValue}>{formatNumber(V_eq, 2)} mL</span>
+              <span className={styles.resultValue}>{`${formatNumber(V_eq, 2)} mL`}</span>
             </div>
             <div className={styles.resultRow}>
               <span className={styles.resultLabel}>% completado</span>
-              <span className={styles.resultValue}>{formatNumber(porcentaje, 1)}{' '}%</span>
+              <span className={styles.resultValue}>{`${formatNumber(porcentaje, 1)}\u00A0%`}</span>
             </div>
             <div className={styles.resultRow}>
               <span className={styles.resultLabel}>Fase</span>

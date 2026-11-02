@@ -1519,10 +1519,10 @@ test.describe('Inspector 02/11/2026 · las cifras del panel siguen al estado con
   test.use({ viewport: { width: 1366, height: 768 } });
 
   for (const traducida of [false, true]) {
-    test(`${traducida ? 'HALLAZGO ABIERTO — traducida' : 'control sin traducir'}: volumen, % completado, V_eq y rótulo del deslizador`, async ({
+    test(`${traducida ? 'HALLAZGO 3958 (REPARADO el 02/11/2026) — traducida' : 'control sin traducir'}: volumen, % completado, V_eq y rótulo del deslizador`, async ({
       page,
     }) => {
-      test.fail(traducida, 'HALLAZGO ABIERTO: con la página traducida las cifras junto a su unidad se quedan con el valor viejo');
+      // Reparado: cada cifra con su unidad es ahora UN texto, hijo único de su <span>.
       await esperarHidratacion(page, ['#vAnalito']);
       if (traducida) {
         await traducirPagina(page, false);
@@ -1538,6 +1538,23 @@ test.describe('Inspector 02/11/2026 · las cifras del panel siguen al estado con
       for (let k = 0; k < 10; k++) await page.keyboard.press('ArrowRight');
       await expect(valorDe(page, 'Volumen de equivalencia (V_eq)')).toHaveText('35,00 mL');
       await expect(page.locator('#vAnalito ~ [class*="sliderValue"]').first()).toHaveText('35 mL');
+    });
+
+    test(`${traducida ? 'HALLAZGO 3958 (REPARADO el 02/11/2026) — traducida' : 'control sin traducir'}: el aviso del indicador sigue al indicador elegido`, async ({
+      page,
+    }) => {
+      // AD+BD de fábrica: Tornasol vira «antes» (≈ 15,87 mL) y Fenolftaleína «después» (≈ 27,17 mL),
+      // los dos lejos de V_eq = 25,00 mL (cuentas en el test «(b) page.tsx:498» de arriba).
+      await esperarHidratacion(page, ['#vAnalito']);
+      await page.getByRole('button', { name: /Ácido débil \+ Base débil/ }).click();
+      await page.getByRole('button', { name: /Tornasol/ }).click();
+      const aviso = page.locator('[class*="indicatorAviso"]');
+      await expect(aviso).toContainText('cambiaría antes de');
+      if (traducida) await traducirPagina(page, false);
+      await page.getByRole('button', { name: /Fenolftaleína/ }).click();
+      await expect(aviso).toContainText('Fenolftaleína vira entre');
+      await expect(aviso).toContainText('cambiaría después de');
+      await expect(aviso).not.toContainText('Tornasol');
     });
   }
 });
