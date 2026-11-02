@@ -38,6 +38,7 @@ import {
   PLAZO_IIVTNU,
   ESCALA_RECARGO_EXTEMPORANEO,
 } from '@/data/fiscal';
+import { TERRITORIOS_IIVTNU_FORAL, motivoPlusvaliaForal, type ComunidadAutonoma } from '@/data/itp-ccaa';
 
 /**
  * La escala de la base del ahorro, LEÍDA de data/fiscal. Iba escrita a mano dos veces en
@@ -148,6 +149,13 @@ interface ResultadoPlusvalia {
   /** Meses completos de tenencia en total; decide el prorrateo por debajo del año */
   mesesTenencia: number;
   coeficiente: number;
+  /**
+   * El porqué de una plusvalía SIN calcular (territorio foral, hallazgo 3878), para encajar tras
+   * «No calculada: ». null si se ha calculado. Sin calcular, las cuotas valen 0 y no suman.
+   */
+  noCalculada: string | null;
+  /** El suelo declarado supera al catastral total, que lo incluye: el real no se calcula (hallazgo 3879). */
+  parCatastralImposible: boolean;
 }
 
 interface ResultadoIRPF {
@@ -355,6 +363,9 @@ function textoTenencia(meses: number): string {
   if (anios === 0) return m;
   return a;
 }
+
+/** «1 año», «5 años»: los años hasta la venta concuerdan en número (hallazgo 3880). */
+const textoAnios = (n: number): string => `${n} ${n === 1 ? 'año' : 'años'}`;
 
 /**
  * La cuota íntegra la calcula `calcularCuotaIntegraIS`, el mismo helper que usan
@@ -603,7 +614,8 @@ function calcularPlusvaliaMunicipal(
   valorAdquisicionOriginal: number,
   valorReferenciaActual: number,
   mesesTenencia: number,
-  valorCatastralTotal: number
+  valorCatastralTotal: number,
+  ccaa: string
 ): ResultadoPlusvalia {
   // Coeficiente según años (max 20). Desde el 24/09/2026 sale de `coeficienteIIVTNU`, que lee
   // la tabla vigente del art. 107.4 (RDL 8/2023) y prorratea por meses por debajo del año;
@@ -613,6 +625,24 @@ function calcularPlusvaliaMunicipal(
   const aniosClamp = Math.min(20, Math.floor(meses / 12));
   const coeficiente = coeficienteIIVTNU(aniosClamp, aniosClamp < 1 ? meses : undefined).coeficiente;
 
+  // ⚠️ 02/11/2026 (hallazgo 3878, cabo C0192) — en el País Vasco y Navarra el IIVTNU no es el del
+  // TRLRHL (su art. 1.2 deja a salvo los regímenes forales) y aquí se liquidaba con los
+  // coeficientes del art. 107.4, idéntico a Madrid. Como en las apps de compraventa, que leen
+  // lo mismo del motor compartido: allí no se calcula, se dice por qué y no suma al total.
+  if ((TERRITORIOS_IIVTNU_FORAL as readonly string[]).includes(ccaa)) {
+    return {
+      metodoObjetivo: 0,
+      metodoReal: 0,
+      metodoElegido: 'objetivo',
+      cuotaFinal: 0,
+      aniosTenencia: aniosClamp,
+      mesesTenencia: meses,
+      coeficiente,
+      noCalculada: motivoPlusvaliaForal(ccaa as ComunidadAutonoma),
+      parCatastralImposible: false,
+    };
+  }
+
   // Método objetivo: valor catastral del suelo × coef × tipo municipal (art. 107.4 TRLHL)
   const baseObjetiva = valorCatastralSuelo * coeficiente;
   const metodoObjetivo = baseObjetiva * TIPO_MUNICIPAL_PLUSVALIA;
@@ -620,10 +650,16 @@ function calcularPlusvaliaMunicipal(
   // Método real (art. 107.5 TRLHL): el incremento se reparte entre suelo y construcción
   // en la proporción CATASTRAL, no respecto al valor de mercado. Usar el valor de
   // referencia como denominador infravaloraba el suelo y con él la cuota.
+  //
+  // ⚠️ 02/11/2026 (hallazgo 3879, cabo C0192) — un suelo MAYOR que el catastral total, que lo
+  // incluye, no describe ningún inmueble (dos campos del recibo del IBI intercambiados). Un
+  // Math.min(1, …) lo liquidaba como si todo fuera suelo, sin avisar. Con el criterio del motor
+  // compartido (`parCatastralImposible` de data/itp-ccaa.ts, hallazgo 900): el real no se
+  // calcula y se queda el objetivo.
   const gananciaTotal = valorReferenciaActual - valorAdquisicionOriginal;
-  const proporcionSuelo = valorCatastralTotal > 0
-    ? Math.min(1, valorCatastralSuelo / valorCatastralTotal)
-    : 0;
+  const parCatastralImposible = valorCatastralTotal > 0 && valorCatastralSuelo > valorCatastralTotal;
+  const metodoRealDisponible = valorCatastralTotal > 0 && valorCatastralSuelo > 0 && !parCatastralImposible;
+  const proporcionSuelo = metodoRealDisponible ? valorCatastralSuelo / valorCatastralTotal : 0;
   const gananciaSuelo = Math.max(0, gananciaTotal * proporcionSuelo);
   const metodoReal = gananciaSuelo * TIPO_MUNICIPAL_PLUSVALIA;
 
@@ -637,12 +673,15 @@ function calcularPlusvaliaMunicipal(
       aniosTenencia: aniosClamp,
       mesesTenencia: meses,
       coeficiente,
+      noCalculada: null,
+      parCatastralImposible,
     };
   }
 
-  // Elegir el menor (RDL 26/2021)
-  const cuotaFinal = Math.min(metodoObjetivo, metodoReal);
-  const metodoElegido: 'objetivo' | 'real' = metodoObjetivo <= metodoReal ? 'objetivo' : 'real';
+  // Elegir el menor (RDL 26/2021); sin el real, el objetivo
+  const cuotaFinal = metodoRealDisponible ? Math.min(metodoObjetivo, metodoReal) : metodoObjetivo;
+  const metodoElegido: 'objetivo' | 'real' =
+    !metodoRealDisponible || metodoObjetivo <= metodoReal ? 'objetivo' : 'real';
 
   return {
     metodoObjetivo,
@@ -652,6 +691,8 @@ function calcularPlusvaliaMunicipal(
     aniosTenencia: aniosClamp,
     mesesTenencia: meses,
     coeficiente,
+    noCalculada: null,
+    parCatastralImposible,
   };
 }
 
@@ -802,9 +843,10 @@ export default function SimuladorHeredarViviendaPage() {
         valorAdquisicion,
         valorReferencia,
         mesesTenenciaCausante,
-        valorCatastralTotal
+        valorCatastralTotal,
+        ccaa
       ),
-    [valorCatastralSuelo, valorAdquisicion, valorReferencia, mesesTenenciaCausante, valorCatastralTotal]
+    [valorCatastralSuelo, valorAdquisicion, valorReferencia, mesesTenenciaCausante, valorCatastralTotal, ccaa]
   );
 
   /**
@@ -827,10 +869,11 @@ export default function SimuladorHeredarViviendaPage() {
             valorReferencia,
             valorVenta,
             aniosHastaVenta * 12,
-            valorCatastralTotal
+            valorCatastralTotal,
+            ccaa
           )
         : null,
-    [aniosHastaVenta, valorVenta, valorCatastralSuelo, valorReferencia, valorCatastralTotal]
+    [aniosHastaVenta, valorVenta, valorCatastralSuelo, valorReferencia, valorCatastralTotal, ccaa]
   );
 
   /**
@@ -1382,7 +1425,7 @@ export default function SimuladorHeredarViviendaPage() {
           <div className={styles.sliderGroup}>
             <label className={styles.sliderLabel} htmlFor="aniosVenta">
               Años hasta la venta tras heredar:{' '}
-              <span className={styles.sliderValue}>{aniosHastaVenta} años</span>
+              <span className={styles.sliderValue}>{textoAnios(aniosHastaVenta)}</span>
               {aniosHastaVenta === 0 && (
                 <span className={styles.muted}> (no se simula venta)</span>
               )}
@@ -1550,7 +1593,7 @@ export default function SimuladorHeredarViviendaPage() {
                     norma, o no se da la cifra.
                 */}
                 <span aria-hidden="true">⚠️</span> <strong>Pierdes la reducción por vivienda
-                habitual:</strong> vendes a los {aniosHastaVenta} años y{' '}
+                habitual:</strong> {`vendes a los ${textoAnios(aniosHastaVenta)} y`}{' '}
                 {`el ${reglaVivienda.norma} exige mantenerla ${aniosMantenimiento} años`}.{' '}
                 {/*
                   ⚠️ 21/09/2026 (hallazgo 1178) — este aviso exigía «presentar una autoliquidación
@@ -1596,6 +1639,16 @@ export default function SimuladorHeredarViviendaPage() {
               IIVTNU — {textoTenencia(plusvalia.mesesTenencia)} de tenencia
             </p>
 
+            {plusvalia.noCalculada !== null ? (
+              <div key="foral">
+                <p className={styles.muted}>{`No calculada: ${plusvalia.noCalculada}. No se suma al total ni al coste de adquisición del IRPF.`}</p>
+                <div className={styles.panelTotal}>
+                  <span>Cuota plusvalía municipal</span>
+                  <strong>No calculada</strong>
+                </div>
+              </div>
+            ) : (
+            <div key="calculada">
             <div className={styles.panelLine}>
               <span>Valor catastral suelo</span>
               <strong>{formatCurrency(valorCatastralSuelo)}</strong>
@@ -1633,14 +1686,23 @@ export default function SimuladorHeredarViviendaPage() {
                     el panel seguía diciendo lo contrario (hallazgo 866).
                   */
                   ? 'No sujeta (sin incremento)'
+                  : plusvalia.parCatastralImposible
+                  ? 'No calculado'
                   : formatCurrency(plusvalia.metodoReal)}
               </strong>
             </div>
+            {plusvalia.parCatastralImposible && (
+              <p className={styles.avisoMantenimiento} role="alert">
+                {`El valor catastral del suelo (${formatCurrency(valorCatastralSuelo)}) no puede superar al valor catastral total (${formatCurrency(valorCatastralTotal)}), que lo incluye: revisa los dos campos del recibo del IBI. Sin un reparto posible entre suelo y construcción, el método real no se calcula y se aplica el objetivo.`}
+              </p>
+            )}
             <div className={styles.panelLine}>
               <span>Método elegido</span>
               <strong>
                 {plusvalia.metodoElegido === 'exenta'
                   ? 'No sujeta'
+                  : plusvalia.parCatastralImposible
+                  ? 'Objetivo (el real no se calcula)'
                   : plusvalia.metodoElegido === 'objetivo'
                   ? 'Objetivo (menor)'
                   : 'Real (menor)'}
@@ -1650,6 +1712,8 @@ export default function SimuladorHeredarViviendaPage() {
               <span>Cuota plusvalía municipal</span>
               <strong>{formatCurrency(plusvalia.cuotaFinal)}</strong>
             </div>
+            </div>
+            )}
           </div>
 
           {/* Panel 3: IRPF */}
@@ -1658,7 +1722,7 @@ export default function SimuladorHeredarViviendaPage() {
             <p className={styles.panelHeaderSub}>
               {aniosHastaVenta === 0
                 ? 'Sin venta simulada'
-                : `Venta a los ${aniosHastaVenta} años`}
+                : `Venta a los ${textoAnios(aniosHastaVenta)}`}
             </p>
 
             {irpf === null ? (
@@ -1680,12 +1744,17 @@ export default function SimuladorHeredarViviendaPage() {
                   <>
                     <div className={styles.panelLine}>
                       <span>
-                        − Plusvalía municipal de la venta ({plusvaliaVenta.aniosTenencia < 1
-                          ? 'menos de 1 año, coef. máximo'
-                          : `${plusvaliaVenta.aniosTenencia} años, coef.`}{' '}
-                        {formatNumber(plusvaliaVenta.coeficiente, plusvaliaVenta.aniosTenencia < 1 ? 4 : 2)})
+                        {plusvaliaVenta.noCalculada !== null
+                          ? '− Plusvalía municipal de la venta (régimen foral)'
+                          : `− Plusvalía municipal de la venta (${plusvaliaVenta.aniosTenencia < 1
+                              ? 'menos de 1 año, coef. máximo'
+                              : `${textoAnios(plusvaliaVenta.aniosTenencia)}, coef.`} ${formatNumber(plusvaliaVenta.coeficiente, plusvaliaVenta.aniosTenencia < 1 ? 4 : 2)})`}
                       </span>
-                      <strong>−{formatCurrency(plusvaliaVenta.cuotaFinal)}</strong>
+                      <strong>
+                        {plusvaliaVenta.noCalculada !== null
+                          ? 'No calculada'
+                          : `−${formatCurrency(plusvaliaVenta.cuotaFinal)}`}
+                      </strong>
                     </div>
                     <div className={styles.panelLine}>
                       <span>= Valor de transmisión**</span>
@@ -1758,12 +1827,12 @@ export default function SimuladorHeredarViviendaPage() {
             )}
             <div className={styles.bloqueCard}>
               <span>+ Plusvalía municipal (herencia)</span>
-              <strong>{formatCurrency(plusvalia.cuotaFinal)}</strong>
+              <strong>{plusvalia.noCalculada !== null ? 'No calculada' : formatCurrency(plusvalia.cuotaFinal)}</strong>
             </div>
             {plusvaliaVenta && (
               <div className={styles.bloqueCard}>
                 <span>+ Plusvalía municipal (venta)</span>
-                <strong>{formatCurrency(plusvaliaVenta.cuotaFinal)}</strong>
+                <strong>{plusvaliaVenta.noCalculada !== null ? 'No calculada' : formatCurrency(plusvaliaVenta.cuotaFinal)}</strong>
               </div>
             )}
             <div className={styles.bloqueCard}>
@@ -1775,11 +1844,15 @@ export default function SimuladorHeredarViviendaPage() {
               <strong>{formatCurrency(totalImpuestos)}</strong>
             </div>
           </div>
-          {plusvaliaVenta && (
+          {plusvalia.noCalculada !== null && (
+            <p className={styles.bloqueNota}>
+              {`El total no incluye la plusvalía municipal: ${plusvalia.noCalculada}.`}
+            </p>
+          )}
+          {plusvaliaVenta && plusvaliaVenta.noCalculada === null && (
             <p className={styles.bloqueNota}>
               El IIVTNU se devenga en <strong>cada</strong> transmisión y en la venta lo paga el
-              vendedor, que aquí eres tú: son {aniosHastaVenta} años de tenencia sobre el mismo
-              valor catastral del suelo. Esa cuota se descuenta además del valor de transmisión
+              vendedor, que aquí eres tú: <span>{`son ${textoAnios(aniosHastaVenta)} de tenencia sobre el mismo valor catastral del suelo.`}</span> Esa cuota se descuenta además del valor de transmisión
               en el IRPF (art. 35.2 LIRPF), así que el total no sube en su importe entero.
             </p>
           )}

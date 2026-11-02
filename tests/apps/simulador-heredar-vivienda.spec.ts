@@ -1927,9 +1927,8 @@ test.describe('Simulador de heredar vivienda — re-inspección 02/09/2026', () 
    *
    *  c) Una proporción de suelo mayor que 1: se declara a propósito un suelo catastral
    *     (200.000 €) SUPERIOR al catastral total (100.000 €), que es imposible. El método
-   *     real del art. 107.5 TRLHL reparte la ganancia en proporción catastral, y sin el
-   *     `Math.min(1, …)` esa proporción valdría 2 y el método real cobraría el DOBLE de la
-   *     ganancia entera: 75.000 € en vez de 37.500 €.
+   *     real del art. 107.5 TRLHL reparte la ganancia en proporción catastral, que valdría 2.
+   *     Desde el 02/11/2026 (hallazgo 3879) el par se rechaza con aviso y el real no se calcula.
    *
    * ISD (Cataluña, hijo ≥21, 350.000 € de vivienda habitual del padre):
    *   ⚠️ Derivación rehecha el 15/09/2026 (hallazgo 867): faltaba el ajuar del art. 15 LISD.
@@ -1947,14 +1946,15 @@ test.describe('Simulador de heredar vivienda — re-inspección 02/09/2026', () 
    *
    * Plusvalía: 12 años → 0,09 (art. 107.4 vigente; era 0,08, hallazgo 1559)
    *            objetivo = 200.000 × 0,09 × 0,25 = 4.500,00 (el menor)
-   *            real    = (350.000 − 200.000) × mín(1; 200.000/100.000) × 0,25 = 37.500,00
+   *            real    = no se calcula: suelo 200.000 > total 100.000 (hallazgo 3879, 02/11/2026;
+   *                      antes se topaba la proporción en 1 y salían 37.500,00)
    *
    * Contraste: la MISMA herencia en Madrid sí tiene derecho a la reducción estatal:
    *   350.000 − 15.956,87 − 122.606,47 = 211.436,66 de base liquidable
    *   23.063,25 + (211.436,66 − 159.634,83) × 21,25 % = 34.071,13888  → «34.071,14 €»
    *   × 1,0000 − 99 % = 340,7113888                                 → «340,71 €»
    */
-  test('CASO 3 (rechazo) — Cataluña no aplica la reducción estatal al hijo, y la proporción de suelo se topa en 1', async ({
+  test('CASO 3 (rechazo) — Cataluña no aplica la reducción estatal al hijo, y un suelo mayor que el total no se liquida por el real', async ({
     page,
   }) => {
     await abrir(page);
@@ -1983,14 +1983,13 @@ test.describe('Simulador de heredar vivienda — re-inspección 02/09/2026', () 
     // b) La casilla del colateral no se ofrece fuera del Grupo III
     expect(await page.locator('#convivencia').count()).toBe(0);
 
-    // c) La proporción de suelo se topa en 1: el método real no puede superar la ganancia
-    //    total por el tipo (150.000 × 0,25 = 37.500,00 y NO 75.000,00)
-    //    ⚠️ 01/11/2026: este assert consagra el tope a 1, que el motor compartido de
-    //    data/itp-ccaa.ts dejó de aplicar con el hallazgo 900 (18/09/2026): con suelo > total
-    //    marca `parCatastralImposible` y no calcula el real. Es el hallazgo abierto ese día al
-    //    final del fichero («un suelo catastral mayor que el total…»): al repararlo, esta línea
-    //    tiene que cambiar con él. La cuota no se mueve aquí, porque gana el objetivo.
-    expect(await linea(page, IIVTNU, 'Método real (suelo)')).toBe('37.500,00 €');
+    // c) Suelo > total es un par IMPOSIBLE: el método real no se calcula (ni con proporción 2
+    //    ni topado en 1) y se avisa. Hasta el 02/11/2026 este assert consagraba el tope a 1
+    //    («37.500,00 €»), que el motor compartido de data/itp-ccaa.ts dejó de aplicar con el
+    //    hallazgo 900; lo cambió la reparación del hallazgo 3879. La cuota no se mueve, porque
+    //    ya ganaba el objetivo.
+    expect(await linea(page, IIVTNU, 'Método real (suelo)')).toBe('No calculado');
+    expect(await panel(page, IIVTNU)).toContain('no puede superar al valor catastral total');
     // 200.000 × 0,09 × 25 % (hallazgo 1559)
     expect(await linea(page, IIVTNU, 'Método objetivo')).toBe('4500,00 €');
     expect(await linea(page, IIVTNU, 'Cuota plusvalía municipal')).toBe('4500,00 €');
@@ -6339,7 +6338,9 @@ test.describe('Simulador de heredar vivienda — inspección 01/11/2026', () => 
   });
 
   /**
-   * CASO 3 (RECHAZO) — ✗ ABIERTO (inspección 01/11/2026, cabo C0192): en territorio foral la
+   * ✅ REPARADO el 02/11/2026 (hallazgo 3878): `calcularPlusvaliaMunicipal` de page.tsx no liquida
+   * en TERRITORIOS_IIVTNU_FORAL, pinta «No calculada: <motivo>» y no suma al total.
+   * CASO 3 (RECHAZO) — inspección 01/11/2026, cabo C0192: en territorio foral la
    * plusvalía municipal NO se liquida con el TRLRHL, y la app tiene que decir por qué.
    *
    * data/itp-ccaa.ts, `TERRITORIOS_IIVTNU_FORAL` = País Vasco y Navarra: el art. 1.2 TRLRHL deja
@@ -6354,7 +6355,7 @@ test.describe('Simulador de heredar vivienda — inspección 01/11/2026', () => 
    * 25 % = 6000,00 € —el control—, y en Navarra y en el País Vasco la página da LA MISMA cifra, con
    * los coeficientes del art. 107.4 TRLRHL, en vez de abstenerse.
    */
-  test.fail('CASO 3 (rechazo) — ABIERTO: en Navarra y el País Vasco la plusvalía municipal no se calcula con el TRLRHL, y se dice por qué', async ({ page }) => {
+  test('CASO 3 (rechazo) — en Navarra y el País Vasco la plusvalía municipal no se calcula con el TRLRHL, y se dice por qué', async ({ page }) => {
     // Lo que declara data/itp-ccaa.ts (pasa hoy): esos son los territorios forales y su motivo.
     expect([...TERRITORIOS_IIVTNU_FORAL].sort()).toEqual(['navarra', 'pais-vasco']);
     expect(motivoPlusvaliaForal('navarra')).toContain('Ley Foral 2/1995');
@@ -6378,14 +6379,28 @@ test.describe('Simulador de heredar vivienda — inspección 01/11/2026', () => 
     expect(navarra).not.toContain('Cuota plusvalía municipal 6000,00 €');
     expect(navarra).not.toContain('Plusvalía municipal (herencia) 6000,00 €');
 
+    expect(await linea(page, IIVTNU, 'Cuota plusvalía municipal')).toBe('No calculada');
+    // Y no entra en el total: ISD + 0 de plusvalía = el ISD solo
+    const isdNavarra = await linea(page, ISD, 'Cuota ISD final');
+    expect(await bloqueTotal(page)).toContain(`= TOTAL ${isdNavarra}`);
+
     await page.selectOption('#ccaaSel', 'pais-vasco');
     const vasco = (await page.locator('main').innerText()).replace(/\s+/g, ' ');
     expect(vasco).toContain('territorio histórico');
     expect(vasco).not.toContain('Cuota plusvalía municipal 6000,00 €');
+
+    // Con venta, tampoco la de la venta (era «Plusvalía municipal (venta) 2700,00 €»)
+    await mover(page, 'aniosVenta', 5);
+    await mover(page, 'valorVta', 250000);
+    const conVenta = await bloqueTotal(page);
+    expect(conVenta).not.toContain('2700,00 €');
+    expect(conVenta).toContain('Plusvalía municipal (venta) No calculada');
   });
 
   /**
-   * ✗ ABIERTO (inspección 01/11/2026, cálculo, cabo C0192) — la función propia
+   * ✅ REPARADO el 02/11/2026 (hallazgo 3879): con suelo > total la página marca el par como
+   * imposible, avisa y se queda en el objetivo, como el motor compartido.
+   * Inspección 01/11/2026, cálculo, cabo C0192 — la función propia
    * `calcularPlusvaliaMunicipal` de page.tsx no tiene la guarda del par catastral IMPOSIBLE que sí
    * tiene la compartida de data/itp-ccaa.ts (hallazgo 900, 18/09/2026): el valor catastral total
    * incluye el del suelo, así que un suelo MAYOR que el total no describe ningún inmueble —es el
@@ -6398,7 +6413,7 @@ test.describe('Simulador de heredar vivienda — inspección 01/11/2026', () => 
    * motor compartido, con los mismos datos, marca `parCatastralImposible`, no calcula el real y se
    * queda en el objetivo. Lo esperado: el par se rechaza con un aviso y el real no se liquida con él.
    */
-  test.fail('ABIERTO — un suelo catastral mayor que el total no se liquida por el método real como si todo fuera suelo', async ({ page }) => {
+  test('un suelo catastral mayor que el total no se liquida por el método real como si todo fuera suelo', async ({ page }) => {
     const oraculo = plusvaliaCompartida({
       valorCatastralSuelo: 100000,
       valorCatastralTotal: 50000,
@@ -6420,21 +6435,28 @@ test.describe('Simulador de heredar vivienda — inspección 01/11/2026', () => 
     expect(await linea(page, IIVTNU, 'Método objetivo')).toBe('10.000,00 €');
     expect(await linea(page, IIVTNU, 'Método elegido')).not.toBe('Real (menor)');
     expect(await linea(page, IIVTNU, 'Cuota plusvalía municipal')).not.toBe('2500,00 €');
+    // Lo mismo que el oráculo: el real sin calcular, el objetivo de 10.000,00 € y el aviso
+    expect(await linea(page, IIVTNU, 'Método real (suelo)')).toBe('No calculado');
+    expect(await linea(page, IIVTNU, 'Cuota plusvalía municipal')).toBe('10.000,00 €');
+    expect(await panel(page, IIVTNU)).toContain('no puede superar al valor catastral total');
   });
 
   /**
-   * ✗ ABIERTO (inspección 01/11/2026, contenido, bajo) — «1 años». Con un año hasta la venta, que es
+   * ✅ REPARADO el 02/11/2026 (hallazgo 3880): las cuatro frases usan `textoAnios`.
+   * Inspección 01/11/2026, contenido, bajo — «1 años». Con un año hasta la venta, que es
    * lo que carga el caso preconfigurado de Andalucía, la página escribe el plural a pelo en cuatro
    * sitios: «Años hasta la venta tras heredar: 1 años», «Venta a los 1 años», «(1 años, coef.
    * 0,15)» y «son 1 años de tenencia». `textoTenencia` ya resuelve el singular para la tenencia del
    * causante; las frases de la venta no lo usan.
    */
-  test.fail('ABIERTO — con un año hasta la venta no se escribe «1 años»', async ({ page }) => {
+  test('con un año hasta la venta no se escribe «1 años»', async ({ page }) => {
     await abrir(page);
     await page.getByRole('button', { name: 'Cargar caso: Sobrino hereda piso 250k en Andalucía' }).click();
     await expect(page.locator('#aniosVenta')).toHaveValue('1');
     const principal = (await page.locator('main').innerText()).replace(/\s+/g, ' ');
     expect(principal.match(/(^|[^\d])1 años/g) ?? []).toEqual([]);
+    expect(principal).toContain('Venta a los 1 año');
+    expect(principal).toContain('son 1 año de tenencia');
   });
 
   /**
