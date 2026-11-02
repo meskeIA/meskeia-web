@@ -225,12 +225,14 @@ export default function MetronomoPage() {
             <button
               type="button"
               className={styles.bpmAdjust}
+              aria-label="Bajar 1 BPM"
               onClick={() => setBpm(Math.max(40, bpm - 1))}
             >
               −
             </button>
             <input
               type="range"
+              aria-label="Tempo en BPM"
               min="40"
               max="220"
               value={bpm}
@@ -240,6 +242,7 @@ export default function MetronomoPage() {
             <button
               type="button"
               className={styles.bpmAdjust}
+              aria-label="Subir 1 BPM"
               onClick={() => setBpm(Math.min(220, bpm + 1))}
             >
               +
@@ -267,12 +270,13 @@ export default function MetronomoPage() {
 
           {/* Compás */}
           <div className={styles.configRow}>
-            <label id="compas-label" className={styles.configLabel}>Compás</label>
+            <span id="compas-label" className={styles.configLabel}>Compás</span>
             <div role="group" aria-labelledby="compas-label" className={styles.timeSignatures}>
               {TIME_SIGNATURES.map((ts) => (
                 <button
                   type="button"
                   key={ts.label}
+                  aria-pressed={timeSignature.label === ts.label}
                   className={`${styles.tsButton} ${timeSignature.label === ts.label ? styles.selected : ''}`}
                   onClick={() => setTimeSignature(ts)}
                 >
@@ -284,9 +288,11 @@ export default function MetronomoPage() {
 
           {/* Acento */}
           <div className={styles.configRow}>
-            <label className={styles.configLabel}>Acento en primer tiempo</label>
+            <span id="acento-label" className={styles.configLabel}>Acento en primer tiempo</span>
             <button
               type="button"
+              aria-labelledby="acento-label"
+              aria-pressed={accentFirst}
               className={`${styles.toggleButton} ${accentFirst ? styles.on : ''}`}
               onClick={() => setAccentFirst(!accentFirst)}
             >
