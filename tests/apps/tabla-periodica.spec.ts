@@ -968,12 +968,15 @@ test.describe('Tabla Periódica · fichas de búsqueda', () => {
     for (const forma of ['29', '65', 'cobre', '64,1', '64,18', '63', '63,6']) {
       expect(comprobarRespuesta(forma, ficha).correcto, `forma «${forma}»`).toBe(false);
     }
-    // ⚠️ «63.546» con PUNTO no vale, y no es un descuido: `parseSpanishNumber` es el parser
-    // canónico del catálogo y con un solo separador gana la lectura española, así que lee
-    // sesenta y tres mil quinientos cuarenta y seis. La ambigüedad es irreducible —«1.234» son
-    // mil doscientos treinta y cuatro para casi todo el público de este sitio— y la ficha
-    // muestra el dato como «63,546», que es la forma que se copia.
-    expect(comprobarRespuesta('63.546', ficha).correcto).toBe(false);
+    // «63.546» con PUNTO vale desde el 02/11/2026 (cabo C0569). Antes se leía con
+    // `parseSpanishNumber`, que con un solo separador da la lectura española (63 546), y este
+    // test lo daba por decisión. La regla de las tareas de aula cambió el 01/11/2026 (hallazgo
+    // 3866, C0558): `leerRespuestaAula` se queda, de las dos lecturas de un punto con tres
+    // cifras detrás, con la más cercana a la respuesta, porque el punto decimal es la norma en
+    // México y buena parte de Latinoamérica. 63,546 está a 0 de la respuesta y 63 546 a 63 482.
+    expect(comprobarRespuesta('63.546', ficha).correcto).toBe(true);
+    // La lectura cercana no regala nada: «63.540» se lee 63,54 y sigue siendo truncar.
+    expect(comprobarRespuesta('63.540', ficha).correcto).toBe(false);
   });
 
   test('ficha 5 · [Ar] 3d¹⁰ 4s¹ es el cobre, y la escritura sin espacios también lo encuentra', () => {
@@ -1135,7 +1138,8 @@ test.describe('Tabla Periódica · fichas de búsqueda', () => {
 //         el oganesón es uno de ellos (hallazgo 528).
 //
 //     Y el límite de la ficha numérica: la ficha 4 pide la masa del cobre, que en los
-//     datos es 63.546. `comprobarRespuesta` la compara con `parseSpanishNumber`, así
+//     datos es 63.546. `comprobarRespuesta` la leía con `parseSpanishNumber` (desde el
+//     02/11/2026 con `leerRespuestaAula`, cabo C0569), así
 //     que «63,546» con coma española debe entrar; y la propia app declaraba entonces un
 //     margen del 1 % —max(0,01; 0,63546) = 0,63546—, así que «63,5» (diferencia 0,046) entra y
 //     «29», el número atómico del cobre, que es el error que la pista nombra, no.
@@ -2815,10 +2819,9 @@ test.describe('hallazgos · 16/10/2026 (A, B, C, D y E reparados)', () => {
     expect(cuelan).toEqual([]); // antes del 17/10: ['Ar ← Ca', 'Ca ← Ar', 'Co ← Ni', 'Ni ← Co']
   });
 
-  // «63.546» con PUNTO en la ficha 4 sale «Todavía no» (parseSpanishNumber lo lee 63 546). NO
-  // es hallazgo: es una decisión escrita en el test «ficha 4 · la masa del cobre se compara con
-  // tolerancia» (la ficha muestra «63,546», que es lo que se copia). Con dos decimales
-  // («63.55») el punto ya se lee como decimal y entra.
+  // «63.546» con PUNTO en la ficha 4 salía «Todavía no» (parseSpanishNumber lo leía 63 546).
+  // Desde el 02/11/2026 (cabo C0569) entra: la respuesta se lee con leerRespuestaAula, que se
+  // queda con la lectura más cercana a la respuesta (test «ficha 4 · la masa del cobre…»).
 
   // REPARADO (hallazgo 3364, 18/10/2026): el FAQPage y el paso 1 nombran al helio y al paladio.
   test('D · el FAQPage da «grupo = mismos electrones en la capa exterior» y «período = número de capas» sin las excepciones de sus fichas', async ({ page }) => {
@@ -2886,11 +2889,13 @@ test.describe('hallazgos · 16/10/2026 (A, B, C, D y E reparados)', () => {
 //     unidad de la última cifra escrita (casos.ts, toleranciaDe).
 //       aciertos: «63,546» (3 dec, ±0,0005, dif 0) · «63,55» (±0,005, 0,004) · «63,5» (±0,05,
 //                 0,046) · «64» (±0,5, 0,454) · «63,5460» (4 dec, ±0,00005, 0) · «63.55» y
-//                 «63.5» (un punto con 1 o 2 cifras detrás es decimal) · « 63,55 » (espacios fuera)
+//                 «63.5» (un punto con 1 o 2 cifras detrás es decimal) · « 63,55 » (espacios fuera) ·
+//                 «63.546» (un punto con 3 cifras: de 63,546 y 63 546 gana la más cercana a la
+//                 respuesta, leerRespuestaAula, cabo C0569 del 02/11/2026; antes era fallo)
 //       fallos:   «63,54» (truncar no es redondear: 0,006 > 0,005) · «63,6» (0,054 > 0,05) ·
 //                 «64,0» (un decimal escrito promete el 63,5: 0,454 > 0,05) · «63» (0,546 > 0,5) ·
-//                 «63,5461» (decimales de más con otra cifra: 0,0001 > 0,00005) · «63.546» (un
-//                 punto con 3 cifras es millar: 63 546, decisión escrita en «ficha 4 · la masa…»)
+//                 «63,5461» (decimales de más con otra cifra: 0,0001 > 0,00005) · «63.540»
+//                 (se lee 63,54 con tres decimales: 0,006 > 0,0005)
 //     Y los primeros de cada serie del bloque f, por número:
 //       «57» → Lantano: 138,91 → «138,91 u» · período 6 · lantánidos · 180 pm (Z 57: fila Sb–Nd
 //              140, 136, 133, 131, 232, 196, 180) · χ 1,10 (tendencias 1,1) · [Xe] 5d¹ 6s²
@@ -2980,10 +2985,10 @@ test.describe('CASO 24 · límite: la regla de redondeo de la masa en sus bordes
   test('ficha 4 · vale el dato redondeado a los decimales escritos, con coma o punto, y nada más', async ({ page }) => {
     await abrirHidratada(page);
     // Cu = 63,546 · margen = media unidad de la última cifra escrita (toleranciaDe)
-    for (const r of ['63,546', '63,55', '63,5', '64', '63,5460', '63.55', '63.5', ' 63,55 ']) {
+    for (const r of ['63,546', '63,55', '63,5', '64', '63,5460', '63.55', '63.5', ' 63,55 ', '63.546']) {
       expect(await veredictoLimpio(page, 4, r), `ficha 4 «${r}»`).toContain(ACIERTO);
     }
-    for (const r of ['63,54', '63,6', '64,0', '63', '63,5461', '63.546']) {
+    for (const r of ['63,54', '63,6', '64,0', '63', '63,5461', '63.540']) {
       expect(await veredictoLimpio(page, 4, r), `ficha 4 «${r}»`).toContain(FALLO);
     }
   });

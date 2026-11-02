@@ -11,6 +11,7 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
+import { leerRespuestaAula } from '@/lib/calculadoras/correctorCasosAula';
 import styles from './SimuladorPlanificadorProcesos.module.css';
 
 type Algoritmo = 'fcfs' | 'sjf' | 'srtf' | 'rr' | 'priority';
@@ -698,7 +699,9 @@ function corregirRespuestas(metricas: MetricasProceso[], respuestas: RespuestasA
   for (const m of metricas) {
     for (const { campo } of CAMPOS_RESPUESTA) {
       const crudo = respuestas[m.pid]?.[campo] ?? '';
-      const valor = crudo.trim() === '' ? NaN : parseSpanishNumber(crudo);
+      // Un punto con tres cifras detrás («7.667») tiene dos lecturas: se queda la más cercana
+      // al valor correcto, la regla de las tareas de aula (cabo C0569).
+      const valor = crudo.trim() === '' ? NaN : leerRespuestaAula(crudo, m[campo]);
       const tuyo = Number.isFinite(valor) ? valor : null;
       // Se compara en centésimas: los tiempos del simulador son centésimas exactas, y un 7,6
       // tecleado no tiene por qué ser el mismo double que la división del motor.

@@ -5,6 +5,7 @@ import { useState, useMemo, useId } from 'react';
 import styles from './CalculadoraTrigonometria.module.css';
 import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
+import { leerRespuestaAula } from '@/lib/calculadoras/correctorCasosAula';
 // La aritmética de los casos vive en casos.ts; la de las cuatro calculadoras de arriba, en
 // motor.ts. Las dos fuera de la vista, porque el build compila esta página sin comprobar si
 // la trigonometría está bien: los dos módulos se prueban con casos resueltos a mano.
@@ -211,9 +212,9 @@ export default function CalculadoraTrigonometriaPage() {
   );
 
   const comprobarCaso = (id: number, esperado: number) => {
-    // parseSpanishNumber devuelve NaN con «doce» o «12 m»: comprobarRespuesta lo
+    // leerRespuestaAula devuelve NaN con «doce» o «12 m»: comprobarRespuesta lo
     // distingue de una respuesta equivocada y la vista lo dice con sus palabras.
-    const valor = parseSpanishNumber(respuestasCasos[id] ?? '');
+    const valor = leerRespuestaAula(respuestasCasos[id] ?? '', esperado);
     setVeredictosCasos((previos) => ({ ...previos, [id]: comprobarRespuesta(valor, esperado) }));
   };
 
@@ -239,7 +240,7 @@ export default function CalculadoraTrigonometriaPage() {
   const comprobarAleatorio = () => {
     if (!ejercicio) return;
     setVeredictoAleatorio(
-      comprobarRespuesta(parseSpanishNumber(respuestaAleatoria), ejercicio.respuesta)
+      comprobarRespuesta(leerRespuestaAula(respuestaAleatoria, ejercicio.respuesta), ejercicio.respuesta)
     );
   };
 

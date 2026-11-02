@@ -11,7 +11,7 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { formatNumber, parseSpanishNumber } from '@/lib';
+import { formatNumber } from '@/lib';
 import Chart from 'chart.js/auto';
 import {
   CASOS,
@@ -23,7 +23,7 @@ import {
   type EjercicioFuncion,
   type SugerenciaGrafica,
 } from './casos';
-import type { Magnitud } from '@/lib/calculadoras/correctorCasosAula';
+import { leerRespuestaAula, type Magnitud } from '@/lib/calculadoras/correctorCasosAula';
 
 // ─────────────────────────────────────────────
 // Funciones
@@ -182,9 +182,9 @@ export default function VisualizadorFuncionesMundoPage() {
   );
 
   const comprobarCaso = (id: number, esperado: number, magnitud: Magnitud) => {
-    // parseSpanishNumber admite coma o punto y devuelve NaN si no es un número:
+    // leerRespuestaAula admite coma o punto y devuelve NaN si no es un número:
     // por eso no hace falta validar antes, solo mirar el motivo del veredicto.
-    const valor = parseSpanishNumber(respuestas[id] ?? '');
+    const valor = leerRespuestaAula(respuestas[id] ?? '', esperado);
     setVeredictos(previos => ({ ...previos, [id]: comprobarRespuesta(valor, esperado, magnitud) }));
   };
 
@@ -223,7 +223,7 @@ export default function VisualizadorFuncionesMundoPage() {
   const comprobarAleatorio = () => {
     if (!ejercicio) return;
     setVeredictoAleatorio(
-      comprobarRespuesta(parseSpanishNumber(respuestaAleatoria), ejercicio.respuesta, ejercicio.magnitud),
+      comprobarRespuesta(leerRespuestaAula(respuestaAleatoria, ejercicio.respuesta), ejercicio.respuesta, ejercicio.magnitud),
     );
   };
 

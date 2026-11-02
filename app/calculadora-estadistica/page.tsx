@@ -3,7 +3,8 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import styles from './CalculadoraEstadistica.module.css';
 import { MeskeiaLogo, Footer, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard, LecturaSerie } from '@/components';
-import { formatNumber, parseSpanishNumber, parsearSerieNumerica, type ModoLectura } from '@/lib';
+import { formatNumber, parsearSerieNumerica, type ModoLectura } from '@/lib';
+import { leerRespuestaAula } from '@/lib/calculadoras/correctorCasosAula';
 import {
   CASOS,
   TOTAL_CASOS,
@@ -153,7 +154,7 @@ export default function CalculadoraEstadisticaPage() {
   // ---------------------------------------------------------- Casos para clase
 
   const comprobarCaso = (caso: CasoEstadistica) => {
-    const valor = parseSpanishNumber(respuestasCasos[caso.id] ?? '');
+    const valor = leerRespuestaAula(respuestasCasos[caso.id] ?? '', caso.respuesta);
     setVeredictos((previos) => ({
       ...previos,
       [caso.id]: comprobarRespuesta(valor, caso.respuesta, magnitudDe(caso)),
@@ -194,7 +195,7 @@ export default function CalculadoraEstadisticaPage() {
   const comprobarAleatorio = () => {
     if (!ejercicio) return;
     setVeredictoAleatorio(
-      comprobarRespuesta(parseSpanishNumber(respuestaAleatoria), ejercicio.respuesta, magnitudDe(ejercicio)),
+      comprobarRespuesta(leerRespuestaAula(respuestaAleatoria, ejercicio.respuesta), ejercicio.respuesta, magnitudDe(ejercicio)),
     );
   };
 

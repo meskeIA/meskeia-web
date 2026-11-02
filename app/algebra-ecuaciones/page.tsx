@@ -5,7 +5,8 @@ import styles from './AlgebraEcuaciones.module.css';
 import { Footer, MeskeiaLogo, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { Chart, ChartConfiguration, registerables } from 'chart.js';
 import * as Algebrite from 'algebrite';
-import { formatNumber as formatNumeroEs, parseSpanishNumber } from '@/lib';
+import { formatNumber as formatNumeroEs } from '@/lib';
+import { leerRespuestaAula } from '@/lib/calculadoras/correctorCasosAula';
 // La aritmética de fracciones y la división sintética viven en casos.ts: la usan por
 // igual la calculadora y los 12 casos numerados, y duplicarla dejaría que un arreglo en
 // Ruffini corrigiese una de las dos y dejase mintiendo a la otra.
@@ -103,7 +104,7 @@ export default function AlgebraEcuacionesPage() {
   const porcentajeCasos = (casosResueltos / TOTAL_CASOS) * 100;
 
   const comprobarCaso = (id: number, esperado: number, datos: DatosCaso) => {
-    const valor = parseSpanishNumber(respuestasCasos[id] ?? '');
+    const valor = leerRespuestaAula(respuestasCasos[id] ?? '', esperado);
     setVeredictosCasos((previos) => ({
       ...previos,
       [id]: comprobarRespuesta(valor, esperado, magnitudDe(datos)),
@@ -132,7 +133,7 @@ export default function AlgebraEcuacionesPage() {
 
   const comprobarAleatorio = () => {
     if (!ejercicioAleatorio) return;
-    const valor = parseSpanishNumber(respuestaAleatoria);
+    const valor = leerRespuestaAula(respuestaAleatoria, ejercicioAleatorio.respuesta);
     setVeredictoAleatorio(
       comprobarRespuesta(valor, ejercicioAleatorio.respuesta, magnitudDe(ejercicioAleatorio.datos)),
     );

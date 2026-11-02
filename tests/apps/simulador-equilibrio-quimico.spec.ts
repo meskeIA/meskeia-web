@@ -954,6 +954,14 @@ test.describe('Simulador de Equilibrio Químico · casos para clase', () => {
     expect(comprobarRespuesta('0,5', 0.02, 'real').correcto).toBe(false);
   });
 
+  test('un punto con tres cifras detrás se lee con la lectura más cercana a la respuesta (C0569)', () => {
+    // Antes, con parseSpanishNumber a secas, «1.333» era 1333 y se suspendía la respuesta 1,333.
+    expect(comprobarRespuesta('1.333', 1.333, 'real').correcto).toBe(true);
+    // Y donde la respuesta es mil y pico, el mismo texto sigue siendo millares.
+    expect(comprobarRespuesta('1.333', 1333, 'real').correcto).toBe(true);
+    expect(comprobarRespuesta('2.493', 1.333, 'real').correcto).toBe(false);
+  });
+
   test('una respuesta vacía o no numérica se distingue de un fallo', () => {
     expect(comprobarRespuesta('', 4, 'real').motivo).toBe('vacia');
     expect(comprobarRespuesta('   ', 4, 'real').motivo).toBe('vacia');

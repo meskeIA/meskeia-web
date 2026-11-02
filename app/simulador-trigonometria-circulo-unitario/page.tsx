@@ -6,6 +6,7 @@ import styles from './SimuladorTrigonometriaCirculoUnitario.module.css';
 import impresion from '@/styles/impresion.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { parseSpanishNumber } from '@/lib';
+import { leerRespuestaAula } from '@/lib/calculadoras/correctorCasosAula';
 // La aritmética de esta página vive en `casos.ts`, fuera de la vista: el build compila el
 // JSX sin comprobar si la trigonometría está bien. Las siete funciones de conversión,
 // redondeo, signo, cuadrante y tangente estaban aquí dentro y se mudaron allí SIN
@@ -484,12 +485,14 @@ export default function SimuladorTrigonometriaCirculoUnitario() {
   };
 
   /**
-   * Corrige lo escrito. `parseSpanishNumber` devuelve NaN con lo que no es un número
+   * Corrige lo escrito. `leerRespuestaAula` devuelve NaN con lo que no es un número
    * («no sé», «√3/2», una casilla vacía), y ese NaN NO llega a la pantalla: la
    * comprobación lo marca como `no-numerico` y el veredicto lo dice con sus palabras.
+   * Un punto con tres cifras detrás («1.732») se lee como decimal si es lo más cercano
+   * a la respuesta (cabo C0569).
    */
   const comprobarCasoActivo = () => {
-    const valor = parseSpanishNumber(respuestasCasos[casoActivo.id] ?? '');
+    const valor = leerRespuestaAula(respuestasCasos[casoActivo.id] ?? '', casoActivo.respuesta);
     setVeredictosCasos(previos => ({
       ...previos,
       [casoActivo.id]: comprobarRespuesta(valor, casoActivo.respuesta, magnitudDe(casoActivo.datos)),
@@ -540,7 +543,7 @@ export default function SimuladorTrigonometriaCirculoUnitario() {
   const comprobarPractica = () => {
     if (ejercicio === null) return;
     setVeredictoPractica(
-      comprobarRespuesta(parseSpanishNumber(respuestaPractica), ejercicio.respuesta, magnitudDe(ejercicio.datos)),
+      comprobarRespuesta(leerRespuestaAula(respuestaPractica, ejercicio.respuesta), ejercicio.respuesta, magnitudDe(ejercicio.datos)),
     );
   };
 

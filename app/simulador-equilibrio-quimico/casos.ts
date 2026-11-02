@@ -59,8 +59,7 @@
  * como consigna de clase.
  */
 
-import { parseSpanishNumber } from '@/lib';
-import { corregirNumero, toleranciaRelativa, type Magnitud } from '@/lib/calculadoras/correctorCasosAula';
+import { corregirNumero, leerRespuestaAula, toleranciaRelativa, type Magnitud } from '@/lib/calculadoras/correctorCasosAula';
 
 export type EstadoFisico = 'g' | 'l' | 's' | 'aq';
 export type DireccionDesplazamiento = 'derecha' | 'izquierda' | 'equilibrio';
@@ -694,9 +693,10 @@ export function toleranciaDe(valorEsperado: number): number {
 /**
  * Compara la respuesta numérica del alumno con la esperada.
  *
- * El parseo usa `parseSpanishNumber`, no `parseFloat`: con `parseFloat` la entrada «0,02»
+ * El parseo usa `leerRespuestaAula`, no `parseFloat`: con `parseFloat` la entrada «0,02»
  * se leería como 0 —se queda con el prefijo y tira el resto— y el alumno vería suspendida
- * una respuesta correcta escrita en el formato del propio enunciado.
+ * una respuesta correcta escrita en el formato del propio enunciado. Y no `parseSpanishNumber`
+ * a secas, que leería «1.333» como 1333 aunque la respuesta fuera 1,333 (cabo C0569).
  */
 export function comprobarRespuesta(
   respuestaUsuario: string,
@@ -705,7 +705,7 @@ export function comprobarRespuesta(
   magnitud: Magnitud,
 ): Comprobacion {
   if (respuestaUsuario.trim() === '') return { correcto: false, motivo: 'vacia' };
-  const c = corregirNumero(parseSpanishNumber(respuestaUsuario), valorEsperado, {
+  const c = corregirNumero(leerRespuestaAula(respuestaUsuario, valorEsperado), valorEsperado, {
     tolerancia: toleranciaDe(valorEsperado),
     magnitud,
   });

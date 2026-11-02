@@ -31,7 +31,6 @@
  * caso con la respuesta tecleada podría contradecir a la calculadora sin que nada se queje.
  */
 
-import { parseSpanishNumber } from '@/lib';
 import {
   convertirSuperficie,
   deducirEscala,
@@ -42,7 +41,7 @@ import {
   type Escala,
   type Unidad,
 } from './motor';
-import { corregirNumero, toleranciaRelativa } from '@/lib/calculadoras/correctorCasosAula';
+import { corregirNumero, leerRespuestaAula, toleranciaRelativa } from '@/lib/calculadoras/correctorCasosAula';
 
 // ============================================================
 // TIPOS
@@ -192,15 +191,16 @@ export function toleranciaDe(valorEsperado: number): number {
 /**
  * Compara la respuesta con la esperada.
  *
- * El parseo va por `parseSpanishNumber` a través del motor: con `parseFloat`, «3,6» se
- * leería como 3 —se queda con el prefijo y tira el resto— y se suspendería una respuesta
- * correcta escrita en el formato del propio enunciado.
+ * El parseo va por `leerRespuestaAula`: con `parseFloat`, «3,6» se leería como 3 —se queda
+ * con el prefijo y tira el resto— y se suspendería una respuesta correcta escrita en el
+ * formato del propio enunciado; y con `parseSpanishNumber` a secas «2.125» sería 2125 aunque
+ * la respuesta fuera 2,125 (cabo C0569).
  */
 export function comprobarRespuesta(respuestaUsuario: string, valorEsperado: number): Comprobacion {
   if (respuestaUsuario.trim() === '') return { correcto: false, motivo: 'vacia' };
   // Medidas, superficies y factores de escala son continuos: ningún valor es imposible por sí
   // mismo dentro de la tolerancia (sonda del 15/10/2026).
-  const c = corregirNumero(parseSpanishNumber(respuestaUsuario), valorEsperado, {
+  const c = corregirNumero(leerRespuestaAula(respuestaUsuario, valorEsperado), valorEsperado, {
     tolerancia: toleranciaDe(valorEsperado),
     magnitud: 'real',
   });

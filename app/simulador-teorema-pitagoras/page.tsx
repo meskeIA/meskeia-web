@@ -12,6 +12,7 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
+import { leerRespuestaAula } from '@/lib/calculadoras/correctorCasosAula';
 import {
   CASOS,
   TOTAL_CASOS,
@@ -321,7 +322,7 @@ export default function SimuladorTeoremaPitagorasPage() {
   // ---------------------------------------------------------- Casos
 
   const comprobarCaso = (id: number, esperado: number) => {
-    const valor = parseSpanishNumber(respuestas[id] ?? '');
+    const valor = leerRespuestaAula(respuestas[id] ?? '', esperado);
     setVeredictos((previos) => ({ ...previos, [id]: comprobarRespuesta(valor, esperado) }));
   };
 
@@ -346,7 +347,7 @@ export default function SimuladorTeoremaPitagorasPage() {
 
   const comprobarAleatorio = () => {
     if (!ejercicio) return;
-    const valor = parseSpanishNumber(respuestaAleatoria);
+    const valor = leerRespuestaAula(respuestaAleatoria, ejercicio.respuesta);
     setVeredictoAleatorio(comprobarRespuesta(valor, ejercicio.respuesta));
   };
 

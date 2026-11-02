@@ -36,7 +36,7 @@ import {
   type EjercicioAleatorio,
   type ResultadoIdentificacion,
 } from './motor';
-import type { Magnitud } from '@/lib/calculadoras/correctorCasosAula';
+import { leerRespuestaAula, type Magnitud } from '@/lib/calculadoras/correctorCasosAula';
 
 // ============================================================
 // TIPOS DE LA VISTA
@@ -328,7 +328,7 @@ export default function SimuladorProgresionesPage() {
   };
 
   const comprobarCaso = (id: number, esperado: number, magnitud: Magnitud) => {
-    const valor = parseSpanishNumber(respuestas[id] ?? '');
+    const valor = leerRespuestaAula(respuestas[id] ?? '', esperado);
     setVeredictos((previos) => ({ ...previos, [id]: comprobarRespuesta(valor, esperado, magnitud) }));
   };
 
@@ -351,7 +351,7 @@ export default function SimuladorProgresionesPage() {
 
   const comprobarAleatorio = () => {
     if (!ejercicio) return;
-    const valor = parseSpanishNumber(respuestaAleatoria);
+    const valor = leerRespuestaAula(respuestaAleatoria, ejercicio.respuesta);
     setVeredictoAleatorio(comprobarRespuesta(valor, ejercicio.respuesta, ejercicio.magnitud));
   };
 

@@ -53,7 +53,7 @@
  */
 
 import { formatNumber, parseSpanishNumber } from '@/lib';
-import { corregirNumero } from '@/lib/calculadoras/correctorCasosAula';
+import { corregirNumero, leerRespuestaAula } from '@/lib/calculadoras/correctorCasosAula';
 import { elementos, type Elemento } from './elementos-data';
 
 // ============================================================
@@ -508,7 +508,8 @@ export function toleranciaDe(decimalesEscritos: number): number {
 
 /**
  * Cuántos decimales lleva lo que escribió el alumno. «63,5» → 1, «64» → 0. Si el separador
- * se leyó como de millares («1.008» es 1008 para `parseSpanishNumber`), no hay decimales.
+ * se leyó como de millares («1.008» es 1008 si `leerRespuestaAula` se queda con esa lectura,
+ * la más cercana a la respuesta), no hay decimales.
  */
 export function decimalesEscritos(texto: string, valor: number): number {
   const limpio = texto.trim().replace(/\s/g, '').replace(/^[+-]/, '');
@@ -559,11 +560,14 @@ export function comprobarRespuesta(
   if (escrita === '') return { correcto: false, motivo: 'vacia' };
 
   if (caso.respuestaNumerica !== null) {
-    // `parseSpanishNumber` y no `Number` ni `parseFloat`: lo que llega aquí lo teclea un
+    // `leerRespuestaAula` y no `Number` ni `parseFloat`: lo que llega aquí lo teclea un
     // alumno, así que puede venir con coma decimal («63,546»), con punto, o no ser un número
     // en absoluto. `parseFloat` se quedaría con el prefijo de «63abc» y lo daría por bueno.
+    // Y no `parseSpanishNumber` a secas: «63.546» con punto decimal (México y buena parte de
+    // Latinoamérica) sería 63 546; leerRespuestaAula se queda con la lectura más cercana a la
+    // respuesta, la regla de todas las tareas de aula desde el 01/11/2026 (cabo C0569).
     const numerica = sinUnidad(respuestaUsuario, caso.unidad);
-    const valor = parseSpanishNumber(numerica);
+    const valor = leerRespuestaAula(numerica, caso.respuestaNumerica);
     if (!Number.isFinite(valor)) return { correcto: false, motivo: 'fallo' };
     /**
      * ⚠️ 27/09/2026 (hallazgo 2284) — el número atómico es un RECUENTO de protones, y se le

@@ -427,6 +427,14 @@ test.describe('Calculadora de Escalas · casos para clase', () => {
     expect(comprobarRespuesta('3', 3.6).correcto).toBe(false);
   });
 
+  test('un punto con tres cifras detrás se lee con la lectura más cercana a la respuesta (C0569)', () => {
+    // Antes, con parseSpanishNumber a secas, «2.125» era 2125 y se suspendía la respuesta 2,125.
+    expect(comprobarRespuesta('2.125', 2.125).correcto).toBe(true);
+    // Y donde la respuesta es de miles, el mismo texto sigue siendo millares.
+    expect(comprobarRespuesta('2.125', 2125).correcto).toBe(true);
+    expect(comprobarRespuesta('3.125', 2.125).correcto).toBe(false);
+  });
+
   test('una respuesta vacía o no numérica se distingue de un fallo', () => {
     expect(comprobarRespuesta('', 3.6).motivo).toBe('vacia');
     expect(comprobarRespuesta('  ', 3.6).motivo).toBe('vacia');

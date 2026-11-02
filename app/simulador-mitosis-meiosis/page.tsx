@@ -10,7 +10,8 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { parseSpanishNumber, trazarRectRedondeado } from '@/lib';
+import { trazarRectRedondeado } from '@/lib';
+import { leerRespuestaAula } from '@/lib/calculadoras/correctorCasosAula';
 import {
   cromatidasPorCromosoma,
   cromosomasPorPolo,
@@ -1041,9 +1042,9 @@ function SeccionCasosAula() {
   };
 
   const comprobar = () => {
-    // parseSpanishNumber admite «24» y «24,0»; devuelve NaN con cualquier otra cosa, y de ese
+    // leerRespuestaAula admite «24» y «24,0»; devuelve NaN con cualquier otra cosa, y de ese
     // NaN se encarga comprobarRespuesta con un mensaje propio: nunca sale «NaN» en pantalla.
-    const valor = parseSpanishNumber(respuesta);
+    const valor = leerRespuestaAula(respuesta, esperado);
     // Con el enunciado, el corrector explica el error propio de ESA pregunta (hallazgo 2152).
     const r = comprobarRespuesta(valor, esperado, datos);
     setVeredicto({ correcto: r.correcto, motivo: r.motivo });

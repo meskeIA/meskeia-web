@@ -12,6 +12,7 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
+import { leerRespuestaAula } from '@/lib/calculadoras/correctorCasosAula';
 import {
   CASOS,
   TOTAL_CASOS,
@@ -385,7 +386,7 @@ export default function SimuladorTeoremaTalesPage() {
   );
 
   const comprobarCaso = (caso: CasoTales) => {
-    const valor = parseSpanishNumber(respuestas[caso.id] ?? '');
+    const valor = leerRespuestaAula(respuestas[caso.id] ?? '', caso.solucion);
     setVeredictos((previos) => ({ ...previos, [caso.id]: comprobarRespuesta(valor, caso.solucion) }));
   };
 
@@ -402,7 +403,7 @@ export default function SimuladorTeoremaTalesPage() {
 
   const comprobarAleatorio = () => {
     if (!ejercicio) return;
-    setVeredictoAleatorio(comprobarRespuesta(parseSpanishNumber(respuestaAleatoria), ejercicio.caso.solucion));
+    setVeredictoAleatorio(comprobarRespuesta(leerRespuestaAula(respuestaAleatoria, ejercicio.caso.solucion), ejercicio.caso.solucion));
   };
 
   const claseMensaje = (veredicto: Veredicto): string => {

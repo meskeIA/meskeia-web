@@ -3,7 +3,8 @@
 
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard } from '@/components';
-import { formatNumber, parseSpanishNumber } from '@/lib';
+import { formatNumber } from '@/lib';
+import { leerRespuestaAula } from '@/lib/calculadoras/correctorCasosAula';
 import styles from './SimuladorTangenciasPotencia.module.css';
 import { PREGUNTAS_FRECUENTES } from './metadata';
 import {
@@ -441,9 +442,11 @@ function PanelMedidas({ medidas, soluciones }: { medidas: Medida[]; soluciones: 
 
 // ============== CASOS ==============
 
-function normalizarEntrada(texto: string): number {
+function normalizarEntrada(texto: string, esperado: number): number {
   // El menos tipográfico (−) no lo lee parseSpanishNumber; la potencia puede ser negativa.
-  return parseSpanishNumber(texto.trim().replace(/−/g, '-'));
+  // leerRespuestaAula: un punto con tres cifras detrás se lee con la lectura más cercana a la
+  // respuesta (cabo C0569).
+  return leerRespuestaAula(texto.trim().replace(/−/g, '-'), esperado);
 }
 
 function textoVeredicto(v: Veredicto, caso: CasoTangencias): string {
@@ -587,7 +590,7 @@ function PanelCasos() {
               respuesta={respuestaAleatoria}
               onRespuesta={setRespuestaAleatoria}
               veredicto={veredictoAleatorio}
-              onComprobar={() => setVeredictoAleatorio(comprobarRespuesta(normalizarEntrada(respuestaAleatoria), ejercicio.caso))}
+              onComprobar={() => setVeredictoAleatorio(comprobarRespuesta(normalizarEntrada(respuestaAleatoria, ejercicio.caso.respuesta), ejercicio.caso))}
               abierto={abiertoAleatorio}
               onAlternar={() => setAbiertoAleatorio((a) => !a)}
             />
@@ -607,7 +610,7 @@ function PanelCasos() {
             onRespuesta={(texto) => setRespuestas((prev) => ({ ...prev, [caso.id]: texto }))}
             veredicto={veredictos[caso.id]}
             onComprobar={() =>
-              setVeredictos((prev) => ({ ...prev, [caso.id]: comprobarRespuesta(normalizarEntrada(respuestas[caso.id] ?? ''), caso) }))
+              setVeredictos((prev) => ({ ...prev, [caso.id]: comprobarRespuesta(normalizarEntrada(respuestas[caso.id] ?? '', caso.respuesta), caso) }))
             }
             abierto={Boolean(abiertos[caso.id])}
             onAlternar={() => setAbiertos((prev) => ({ ...prev, [caso.id]: !prev[caso.id] }))}
