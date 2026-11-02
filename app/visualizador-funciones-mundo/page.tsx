@@ -279,8 +279,7 @@ export default function VisualizadorFuncionesMundoPage() {
           </div>
           <input id="parametro" type="range" className={styles.slider}
             min={1} max={10} value={parametro}
-            onChange={(e) => setParametro(parseInt(e.target.value))}
-            aria-label={`${paramLabel}: ${parametro}`} />
+            onChange={(e) => setParametro(parseInt(e.target.value))} />
         </div>
 
         {/* Gráfico */}
