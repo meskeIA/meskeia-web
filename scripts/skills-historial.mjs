@@ -33,8 +33,8 @@
  * Una skill que ya pasó su crónica al HISTORIAL.md y sigue por encima entra en UMBRAL_ACEPTADO,
  * con el tamaño medido y la razón: el aviso de los 25 KB dejaría de informar (siempre saldría y
  * su consejo ya no aplica), pero el de su propio techo sigue cazando que vuelva a crecer. Por
- * skill y no subiendo UMBRAL_KB: con 50 KB para todas callarían semilla-diaria (39,7 KB) y
- * audit-meskeia (30,3 KB), que aún no han pasado por el HISTORIAL.md (02/11/2026).
+ * skill y no subiendo UMBRAL_KB: con 50 KB para todas callaría audit-meskeia (30,3 KB), cuyo
+ * tamaño es procedimiento y no crónica, y que por eso no pasó por el HISTORIAL.md (02/11/2026).
  */
 
 import fs from 'node:fs';
@@ -49,6 +49,8 @@ const UMBRAL_KB = 25;
 const UMBRAL_ACEPTADO = {
   // 02/11/2026: crónica movida al HISTORIAL.md (54,8 → 44,6 KB); lo que queda es método y descartes.
   'casos-aula-meskeia': 50,
+  // 02/11/2026: casos de origen y Evolución al HISTORIAL.md (39,7 → 33,4 KB); queda kill-list y pasos.
+  'semilla-diaria': 40,
 };
 
 const git = (...a) => execFileSync('git', [`--git-dir=${GIT_DIR}`, `--work-tree=${ARBOL}`, ...a], {
