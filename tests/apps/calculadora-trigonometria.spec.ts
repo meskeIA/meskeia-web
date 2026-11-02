@@ -219,6 +219,28 @@ test.describe('Corrección de la respuesta del alumno', () => {
     expect(comprobarRespuesta(25, 31.2435).correcto).toBe(false);
   });
 
+  test('C0267: una respuesta exacta no tiene margen; la que exige redondear conserva el 1 %', () => {
+    const porId = new Map(CASOS.map((c) => [c.id, c]));
+    // Exactos (a mano): sen 30° = cos 60° = 1/2 · tan 45° = 1 · 10 · sen 30° = 5.
+    // Con el suelo de 0,01 aprobaban 0,49, 0,51, 0,99 y 4,95, que no son redondeo de nada.
+    expect(comprobarRespuesta(0.49, porId.get(1)!.respuesta).correcto).toBe(false);
+    expect(comprobarRespuesta(0.51, porId.get(2)!.respuesta).correcto).toBe(false);
+    expect(comprobarRespuesta(0.99, porId.get(3)!.respuesta).correcto).toBe(false);
+    expect(comprobarRespuesta(4.95, porId.get(4)!.respuesta).correcto).toBe(false);
+    // Y lo exacto bien escrito, también con el ruido binario de Math.sin (0,49999999999999994).
+    expect(comprobarRespuesta(0.5, porId.get(1)!.respuesta).correcto).toBe(true);
+    expect(comprobarRespuesta(5, porId.get(4)!.respuesta).correcto).toBe(true);
+    // Irracional: 20 · cos 55° = 11,4715… El redondeo a uno o dos decimales sigue entrando.
+    expect(comprobarRespuesta(11.47, porId.get(5)!.respuesta).correcto).toBe(true);
+    expect(comprobarRespuesta(11.5, porId.get(5)!.respuesta).correcto).toBe(true);
+    // La clave a dos decimales aprueba en los 12 casos y en 500 prácticas.
+    for (const c of CASOS) expect(comprobarRespuesta(Math.round(c.respuesta * 100) / 100, c.respuesta).correcto, `caso ${c.id}`).toBe(true);
+    for (let semilla = 1; semilla <= 500; semilla++) {
+      const e = generarEjercicioAleatorio(semilla);
+      expect(comprobarRespuesta(Math.round(e.respuesta * 100) / 100, e.respuesta).correcto, `semilla ${semilla}`).toBe(true);
+    }
+  });
+
   test('el error de trabajar en radianes se detecta como fallo', () => {
     // sen(30) en radianes da −0,988: si un alumno (o la app) lo hiciera mal, suspende.
     expect(comprobarRespuesta(Math.sin(30), 0.5).correcto).toBe(false);

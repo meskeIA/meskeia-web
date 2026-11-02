@@ -31,7 +31,7 @@
  */
 
 import { formatNumber } from '@/lib';
-import { corregirNumero, redondearA, toleranciaRelativa } from '@/lib/calculadoras/correctorCasosAula';
+import { corregirNumero, exigeRedondeo, redondearA, toleranciaRelativa } from '@/lib/calculadoras/correctorCasosAula';
 
 // ============================================================
 // TIPOS
@@ -473,11 +473,20 @@ export function toleranciaDe(valorEsperado: number): number {
   return toleranciaRelativa(valorEsperado);
 }
 
-/** Compara la respuesta tecleada con la esperada. NaN cuenta como «no numérico». */
+/**
+ * Compara la respuesta tecleada con la esperada SIN redondear. NaN cuenta como «no numérico».
+ *
+ * Una respuesta EXACTA a dos decimales no tiene margen (cabo C0267, 02/11/2026): el mínimo de
+ * 0,01 aprobaba 0,49 y 0,51 para sen 30° = 0,5 (casos 1 y 2), 0,99 para tan 45° = 1 (caso 3) y
+ * 4,95 m para los 5 m del caso 4, que no son redondeo de nada. La que exige redondear (cos 55°,
+ * arctan 5/12…) conserva `toleranciaDe`, porque los enunciados no piden decimales y 0,87 por
+ * 0,8660 es de libro. Regla de bfccafa5 y 51d7c223.
+ */
 export function comprobarRespuesta(valorUsuario: number, valorEsperado: number): ComprobacionTrig {
+  const margen = exigeRedondeo(valorEsperado, 2, redondear) ? toleranciaDe(valorEsperado) : 0;
   // Todas las respuestas de esta app son magnitudes continuas: ningún valor es imposible por sí
   // mismo dentro de la tolerancia (sonda del 15/10/2026 sobre los casos y el modo práctica).
-  const c = corregirNumero(valorUsuario, valorEsperado, { tolerancia: toleranciaDe(valorEsperado), magnitud: 'real' });
+  const c = corregirNumero(valorUsuario, valorEsperado, { tolerancia: margen, magnitud: 'real' });
   const { diferencia, tolerancia } = c;
   if (c.estado === 'no-numerico') return { correcto: false, motivo: 'no-numerico', diferencia, tolerancia };
   if (c.motivoImposible) return { correcto: false, motivo: 'fallado', diferencia, tolerancia, aviso: c.motivoImposible };
