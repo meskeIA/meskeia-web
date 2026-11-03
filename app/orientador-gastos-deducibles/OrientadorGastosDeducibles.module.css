@@ -486,7 +486,7 @@
 }
 
 .disclaimer h3 {
-  color: #DC2626;
+  color: var(--rojo-texto, #DC2626);
   font-size: 1.2rem;
   margin-bottom: var(--spacing-md);
 }

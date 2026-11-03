@@ -476,7 +476,7 @@
 }
 
 .emergenciaBox h3 {
-  color: #dc3545;
+  color: var(--rojo-texto, #dc3545);
   margin-bottom: 10px;
 }
 

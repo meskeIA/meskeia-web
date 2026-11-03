@@ -15,7 +15,11 @@
  * texto (`var(--error)` es #F44336: 3,68:1 sobre blanco). Lo mide contra el fondo que sabe:
  * el de la misma regla si lo declara (un `rgba()` compuesto sobre blanco, un `color-mix()`
  * compuesto con su base) y, si no, contra el
- * BLANCO, que es la cota alta (sobre #FAFAFA o un tinte el contraste real es menor). Umbral
+ * BLANCO, que es la cota alta (sobre #FAFAFA o un tinte el contraste real es menor). Desde el
+ * cabo C0592 (03/11/2026), si la regla no pone fondo y una clase ANTECESORA de su selector sí
+ * (`.aviso strong` con `.aviso { background: rgba(…) }`), contra ese: un tinte translúcido se
+ * compone sobre la página, #FAFAFA. Al nacer encendió 24 reglas en 20 hojas, migradas a la
+ * receta en el mismo commit. Umbral
  * 4,5:1, o 3:1 si la misma regla declara texto grande (≥ 24 px, o ≥ 18,66 px en negrita) o es
  * un `::before`/`::after`/`::marker` (iconos y viñetas: no-texto, WCAG 1.4.11).
  *
@@ -36,6 +40,8 @@
  *     los bloques de código, los héroes). Ahí oscurecer el texto lo empeora. Era el ruido
  *     conocido del censo del 19/10.
  *   · Un fondo que no sabe leer (degradado claro, `var()` que no resuelve, imagen).
+ *   · El fondo de un antecesor que solo existe en el DOM (`.warningList strong` dentro de un
+ *     `.warningBox` que pone el TSX): por la hoja no se sabe. Lo mide el píxel.
  *   · `var(--x, #lit)` con `--x` sin declarar en la hoja: lo pone el TSX en su `style`.
  *   · Los `style={{ color }}` de los `.tsx`, el `fill` de un SVG y el texto de un `<canvas>`.
  *   · Las apps congeladas (los cursos, 16/10/2026: publicados, sin drenar su pasivo).
@@ -182,6 +188,9 @@ export function analizarHoja(css) {
 
   // Clases que el módulo pinta con fondo oscuro
   const clasesOscuras = new Set();
+  // Y el fondo (claro u oscuro) que el módulo da a una clase en su regla BASE, `.clase` a secas:
+  // lo hereda a la vista el texto de `.clase strong` si su regla no pone fondo (C0592).
+  const fondoDeClase = new Map();
   for (const b of claros) {
     const f = ultimoFondo(b.decls);
     if (!f) continue;
@@ -189,7 +198,33 @@ export function analizarHoja(css) {
     if (r.hex && luminancia(r.hex) < LUM_OSCURO) {
       for (const p of b.selector.split(',')) for (const c of clasesDe(compuestos(p.trim()).at(-1) ?? '')) clasesOscuras.add(c);
     }
+    if (!r.hex) continue;
+    // Un tinte translúcido del antecesor está sobre la PÁGINA (--bg-primary, #FAFAFA), no sobre
+    // blanco: así se midió el 3940 por píxel (4,36:1), y contra blanco daba 4,55:1 y callaba.
+    const m = f.valor.trim().toLowerCase().match(/^rgba\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*([\d.]+)\s*\)$/);
+    const hex = m && +m[4] < 1
+      ? aHex6(...[1, 2, 3].map((i) => +m[i] * +m[4] + 250 * (1 - +m[4])))
+      : r.hex;
+    for (const p of b.selector.split(',')) if (/^\.[\w-]+$/.test(p.trim())) fondoDeClase.set(p.trim(), hex);
   }
+
+  /**
+   * El fondo que el texto hereda de una clase ANTECESORA de su selector (cabo C0592, 02/11/2026):
+   * `.avisoConstante strong` no pone fondo, pero `.avisoConstante` sí, un tinte naranja, y el
+   * naranja del texto se quedaba en 4,36:1 mientras el candado lo medía contra blanco (5,02:1).
+   * Hallazgo 3940 de tabla-integrales. De varias partes del selector, la de menor contraste; de
+   * varios antecesores, el más cercano. NO ve el antecesor que solo existe en el DOM (`.warningList
+   * strong` dentro de un `.warningBox` que pone el TSX): eso lo mide el píxel.
+   */
+  const fondoHeredado = (selector, hexTexto) => {
+    let peor = null;
+    for (const p of selector.split(',')) {
+      const antecesores = compuestos(p.trim()).slice(0, -1).reverse();
+      const hex = antecesores.flatMap((c) => clasesDe(c)).map((k) => fondoDeClase.get(k)).find(Boolean);
+      if (hex && (!peor || contraste(hexTexto, hex) < contraste(hexTexto, peor))) peor = hex;
+    }
+    return peor;
+  };
 
   const casos = [];
   for (const b of claros) {
@@ -222,7 +257,8 @@ export function analizarHoja(css) {
       const umbral = px >= 24 || (px >= 18.66 && negrita) || pseudo ? 3 : 4.5;
 
       const fDecl = ultimoFondo(b.decls);
-      const fondo = fDecl ? resolverFondo(fDecl.valor, tokens) : { tipo: 'ninguno' };
+      const heredado = fDecl ? null : fondoHeredado(b.selector, hex);
+      const fondo = fDecl ? resolverFondo(fDecl.valor, tokens) : heredado ? { hex: heredado, heredado: true } : { tipo: 'ninguno' };
       const hexFondo = fondo.hex ?? '#ffffff';
       const ratio = contraste(hex, hexFondo);
       if (ratio >= umbral) continue;

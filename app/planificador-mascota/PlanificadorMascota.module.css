@@ -858,7 +858,7 @@
 .errorCard strong {
   display: block;
   font-size: 0.95rem;
-  color: #dc3545;
+  color: var(--rojo-texto, #dc3545);
   margin-bottom: 8px;
 }
 
@@ -893,7 +893,7 @@
 .toxicoCard strong {
   display: block;
   font-size: 0.95rem;
-  color: #dc3545;
+  color: var(--rojo-texto, #dc3545);
   margin-bottom: 6px;
 }
 

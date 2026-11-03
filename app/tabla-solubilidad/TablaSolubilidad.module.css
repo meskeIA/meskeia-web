@@ -502,7 +502,7 @@
 }
 
 .excepcionesBox h3 {
-  color: #B45309;
+  color: var(--naranja-texto, #B45309);
 }
 
 .reaccionBox {

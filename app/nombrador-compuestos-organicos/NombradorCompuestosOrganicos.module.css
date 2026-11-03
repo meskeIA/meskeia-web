@@ -505,7 +505,7 @@
 .errorPanel h2 {
   font-size: 1.1rem;
   font-weight: 700;
-  color: #dc2626;
+  color: var(--rojo-texto, #dc2626);
   margin-bottom: 0.7rem;
 }
 
@@ -1000,7 +1000,7 @@
 .warningBox h2 {
   font-size: 1.15rem;
   font-weight: 700;
-  color: #b45309;
+  color: var(--naranja-texto, #b45309);
   margin-bottom: 0.9rem;
 }
 

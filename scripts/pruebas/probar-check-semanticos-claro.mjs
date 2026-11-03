@@ -35,6 +35,12 @@
  *  15. Un `rgba()` de fondo, que se compone sobre blanco y no se toma por oscuro.
  *  17. Un tinte `color-mix(in srgb, #2e7d32 12%, var(--bg-card))`, que se compone con su base.
  *
+ * Y el fondo que pone la regla del padre (cabo C0592, 03/11/2026):
+ *
+ *  18. tabla-integrales en 1ca1f3c5 (hallazgo 3940): el tinte de .avisoConstante. Debe FALLAR.
+ *  19. La receta sobre un tinte heredado. Debe CALLAR.
+ *  20. Un antecesor con fondo solo en :hover no cuenta. Debe CALLAR.
+ *
  * Y la manera de dar verde sin mirar, que debe PLANTARLO:
  *
  *  16. Un árbol sin ningún `.module.css`.
@@ -53,6 +59,7 @@ const CANDADO = path.join(RAIZ, 'scripts', 'check-semanticos-claro.mjs');
 const deGit = (rev, ruta) => execFileSync('git', ['show', `${rev}:${ruta}`], { cwd: RAIZ, encoding: 'utf8' });
 const MI_IP = 'app/mi-ip/MiIp.module.css';
 const ADAPT = 'app/adaptacion-hogar/AdaptacionHogar.module.css';
+const INTEGRALES = 'app/tabla-integrales/TablaIntegrales.module.css';
 
 const CASOS = [
   { n: 1, nombre: 'CASO DE ORIGEN · mi-ip antes de f9af2556', falla: true, css: deGit('f9af2556^', MI_IP) },
@@ -84,6 +91,18 @@ const CASOS = [
   {
     n: 17, nombre: 'tinte color-mix() de las insignias de Coquinum', falla: true,
     css: '.badgeBien { color: #2e7d32; background: color-mix(in srgb, #2e7d32 12%, var(--bg-card)); }\n',
+  },
+  // Cabo C0592 (03/11/2026): el tinte lo pone la regla del PADRE. Caso de origen, el hallazgo
+  // 3940 de tabla-integrales: .avisoConstante strong sobre el tinte de .avisoConstante, 4,36:1
+  // por píxel sobre la página (#FAFAFA); contra blanco el candado daba 5,02:1 y callaba.
+  { n: 18, nombre: 'CASO DE ORIGEN · tabla-integrales (hallazgo 3940), antes del cabo C0592', falla: true, css: deGit('1ca1f3c5', INTEGRALES) },
+  {
+    n: 19, nombre: 'el texto hereda un tinte claro de su clase antecesora, y la receta lo arregla', falla: false,
+    css: '.aviso { background: rgba(224, 122, 31, 0.1); }\n.aviso strong { color: var(--naranja-texto, #B45309); }\n',
+  },
+  {
+    n: 20, nombre: 'una pseudoclase del antecesor (.aviso:hover) no cuenta como su fondo', falla: false,
+    css: '.aviso:hover { background: rgba(224, 122, 31, 0.3); }\n.aviso strong { color: #B91C1C; }\n',
   },
 ];
 

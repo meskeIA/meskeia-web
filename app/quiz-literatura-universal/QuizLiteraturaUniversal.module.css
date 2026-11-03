@@ -95,7 +95,7 @@
 
 .opcionTexto { font-size: 0.9rem; line-height: 1.4; flex: 1; }
 .opcionMarca { font-size: 1rem; margin-left: auto; flex-shrink: 0; }
-.opcionCorrecta .opcionMarca { color: #15803d; }
+.opcionCorrecta .opcionMarca { color: var(--verde-texto, #15803d); }
 .opcionIncorrecta .opcionMarca { color: #b91c1c; }
 
 .explicacion { padding: 1rem 1.25rem; border-radius: 10px; margin-bottom: 1.25rem; border-left: 4px solid; }

@@ -843,7 +843,7 @@
 }
 
 .permitido .lineaRojaLabel { color: #1a7a46; }
-.moratoria .lineaRojaLabel { color: #9a6400; }
+.moratoria .lineaRojaLabel { color: var(--ambar-texto, #9a6400); }
 .prohibido .lineaRojaLabel { color: #c0392b; }
 
 [data-theme='dark'] .permitido .lineaRojaLabel { color: #2ecc71; }

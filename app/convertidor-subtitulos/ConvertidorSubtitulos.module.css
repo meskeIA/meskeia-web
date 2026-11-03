@@ -391,7 +391,7 @@
 }
 
 .warningBox h4 {
-  color: #dc3545;
+  color: var(--rojo-texto, #dc3545);
   margin: 0 0 var(--spacing-xs);
 }
 

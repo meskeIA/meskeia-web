@@ -726,7 +726,7 @@
 .warningBox h2 {
   font-size: 1.15rem;
   font-weight: 700;
-  color: #dc2626;
+  color: var(--rojo-texto, #dc2626);
   margin: 0 0 var(--spacing-lg);
   border-bottom: 2px solid rgba(239, 68, 68, 0.2);
   padding-bottom: 0.5rem;

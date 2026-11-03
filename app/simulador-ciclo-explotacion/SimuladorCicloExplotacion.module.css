@@ -530,7 +530,7 @@
 }
 
 .metricaCritica .metricaValor {
-  color: #dc2626;
+  color: var(--rojo-texto, #dc2626);
 }
 
 [data-theme='dark'] .metricaCritica {

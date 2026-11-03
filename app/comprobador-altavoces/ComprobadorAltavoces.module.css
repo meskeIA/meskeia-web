@@ -316,7 +316,7 @@
 }
 
 .resultadoAviso h3 {
-  color: #b45309;
+  color: var(--naranja-texto, #b45309);
 }
 
 [data-theme='dark'] .container .resultadoAviso h3 {

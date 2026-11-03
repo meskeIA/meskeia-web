@@ -197,7 +197,7 @@
 }
 
 .beladyAlert strong {
-  color: #b45309;
+  color: var(--naranja-texto, #b45309);
   display: block;
   margin-bottom: var(--spacing-xs);
   font-size: 1rem;
