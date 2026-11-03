@@ -13,6 +13,15 @@ import {
   resolverCaso,
   toleranciaDe,
 } from '../../app/simulador-distribucion-normal/casos';
+import { PUERTO } from './_puerto';
+
+/**
+ * stemum.com → el servidor local, para ver la app como la sirve el portal (el script del layout
+ * pone data-brand="stemum" según el host). Lo usa el cabo C0367, al final del fichero. Va al
+ * NIVEL DEL FICHERO porque `launchOptions` fuerza un worker nuevo (mismo patrón que
+ * simulador-mas-resorte.spec.ts); al resto de tests no les afecta: solo resuelve ese host.
+ */
+test.use({ launchOptions: { args: [`--host-resolver-rules=MAP stemum.com 127.0.0.1:${PUERTO}`] } });
 
 /**
  * Inspector — simulador-distribucion-normal (segmento cálculo, riesgo 3)
@@ -891,5 +900,231 @@ test.describe('re-inspección 29/09/2026 · sospechas (a) y (b) en lo nuevo: mid
       );
     }
     expect(fallos).toEqual([]);
+  });
+});
+
+/*
+ * ═════════════════════════════════════════════════════════════════════════════════════════
+ * CABO C0367 (03/11/2026) — los rgba(46, 134, 171, …) y el #2E86AB fijos, medidos en
+ * meskeia.com y bajo stemum.com, en claro y en oscuro, contra el fondo compuesto real.
+ *
+ * INVENTARIO (page.tsx y el .module.css; CasosAula.tsx no tiene ninguno)
+ *   lienzo · #2E86AB, trazo de la curva (2,5 px) · rgba(…, 0,35), área de la probabilidad ·
+ *            rgba(…, 0,15 / 0,30 / 0,50), las tres zonas de la regla 68-95-99,7. El color del
+ *            lienzo no depende de la marca: se pinta igual en los dos dominios.
+ *   CSS    · fondo de .modeBtnActive (0,1; 0,2 en oscuro), .problemaCard (0,08; 0,15),
+ *            .resultCardMain (0,1; 0,18) y de la fila de .tabla con el ratón (0,05; 0,12).
+ *
+ * MEDIDO
+ *   Texto sobre los tintes: el peor es la descripción del modo activo en claro, #666666 sobre
+ *     #E6EEF2 = 4,90:1. El valor grande del resultado (40 px/800, umbral 3): 4,85 claro y 4,04
+ *     oscuro en meskeia; 7,74 y 5,11 en stemum. El resto, de 5,10 a 16,40. Todo cumple.
+ *   Curva #2E86AB sobre el lienzo (#FAFAFA claro, #1A1A1A oscuro): 3,93:1 y 4,24:1 (≥ 3).
+ *   Área sombreada 1,53 / 1,58:1 y zonas de la regla 1,19-1,59:1 frente a su vecina: bajo 3:1,
+ *     pero no son objeto NECESARIO (1.4.11): la región la delimitan la curva y las líneas a/b
+ *     (o las de ±kσ), y lo que dice va en texto en el panel (P(−1,00 < X < 1,00) = 68,27 %; en
+ *     la regla, los tres porcentajes con su intervalo). No es hallazgo de contraste.
+ *   Fuera de marca bajo stemum.com: la curva (tono 198°), el área, las zonas y los cuatro
+ *     tintes (tono 194-200°) siguen en el azul de meskeIA, mientras los deslizadores, el botón
+ *     de tipo activo, los valores y el BORDE de esas mismas tarjetas van en violeta (#6B21A8
+ *     claro, #C99BF5 oscuro, tono 271-273°): una tarjeta azul con marco violeta y una gráfica
+ *     azul en una página violeta. Hallazgo contenido/bajo.
+ * ═════════════════════════════════════════════════════════════════════════════════════════
+ */
+
+const PORTALES_C0367 = [
+  ['meskeia.com', RUTA],
+  ['stemum.com', `http://stemum.com${RUTA}`],
+] as const;
+
+/** Abre la app en el portal y el tema pedidos, hidratada y con el lienzo ya repintado. */
+async function abrirC0367(page: Page, url: string, tema: 'light' | 'dark'): Promise<void> {
+  await page.goto(url);
+  await expect(page.locator('canvas')).toBeVisible();
+  await esperarHidratacion(page, DESLIZADORES);
+  await prepararParaMedir(page);
+  await activarTema(page, tema);
+  // El lienzo se repinta al cambiar data-theme (MutationObserver): dos fotogramas bastan.
+  await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+}
+
+/** Fondo compuesto (capas rgba de la caja y sus antepasados, hasta la primera opaca). */
+async function fondoC0367(page: Page, selector: string): Promise<number[]> {
+  return page
+    .locator(selector)
+    .first()
+    .evaluate((el) => {
+      const leer = (c: string): number[] => {
+        const m = c.match(/rgba?\(([^)]+)\)/);
+        if (!m) return [0, 0, 0, 0];
+        const p = m[1].split(/[ ,/]+/).filter(Boolean).map(Number);
+        return [p[0], p[1], p[2], p.length > 3 ? p[3] : 1];
+      };
+      const capas: number[][] = [];
+      for (let n: Element | null = el; n; n = n.parentElement) {
+        const k = leer(getComputedStyle(n).backgroundColor);
+        if (k[3] > 0) {
+          capas.push(k);
+          if (k[3] >= 1) break;
+        }
+      }
+      let fondo = [255, 255, 255];
+      for (let i = capas.length - 1; i >= 0; i--) {
+        const [r, g, b, a] = capas[i];
+        fondo = [r * a + fondo[0] * (1 - a), g * a + fondo[1] * (1 - a), b * a + fondo[2] * (1 - a)];
+      }
+      return fondo;
+    });
+}
+
+/**
+ * Tres muestras del lienzo con N(0, 1), el estado de partida, compuestas sobre su fondo real
+ * (el <canvas> es transparente). Geometría de `dibujar()`: márgenes 20/20/20/40 y rango
+ * μ ± 4,5σ = [−4,5; 4,5].
+ *   curva · el píxel más opaco de la columna x = −2,5 (lejos de a, b, μ y de las marcas del eje)
+ *   área  · x = −0,5, 10 px sobre el eje: dentro de P(−1 < X < 1), o de la zona ±1σ en la regla
+ */
+async function lienzoC0367(page: Page): Promise<{ fondo: number[]; curva: number[]; area: number[] }> {
+  return page.locator('canvas[aria-label="Gráfica de la distribución normal"]').evaluate((nodo) => {
+    const c = nodo as HTMLCanvasElement;
+    const leer = (s: string): number[] => {
+      const m = s.match(/rgba?\(([^)]+)\)/);
+      if (!m) return [0, 0, 0, 0];
+      const p = m[1].split(/[ ,/]+/).filter(Boolean).map(Number);
+      return [p[0], p[1], p[2], p.length > 3 ? p[3] : 1];
+    };
+    const capas: number[][] = [];
+    for (let n: Element | null = c; n; n = n.parentElement) {
+      const k = leer(getComputedStyle(n).backgroundColor);
+      if (k[3] > 0) {
+        capas.push(k);
+        if (k[3] >= 1) break;
+      }
+    }
+    let fondo = [255, 255, 255];
+    for (let i = capas.length - 1; i >= 0; i--) {
+      const [r, g, b, a] = capas[i];
+      fondo = [r * a + fondo[0] * (1 - a), g * a + fondo[1] * (1 - a), b * a + fondo[2] * (1 - a)];
+    }
+    const ctx = c.getContext('2d');
+    if (!ctx) return { fondo, curva: fondo, area: fondo };
+    const caja = c.getBoundingClientRect();
+    const k = c.width / caja.width;
+    const xPx = (x: number) => 20 + ((x + 4.5) / 9) * (caja.width - 40);
+    // getImageData devuelve el color SIN premultiplicar: se compone con su alfa sobre el fondo
+    const sobreFondo = (d: Uint8ClampedArray, i: number) => {
+      const a = d[i + 3] / 255;
+      return [d[i] * a + fondo[0] * (1 - a), d[i + 1] * a + fondo[1] * (1 - a), d[i + 2] * a + fondo[2] * (1 - a)];
+    };
+    const columna = ctx.getImageData(Math.round(xPx(-2.5) * k), 0, 1, Math.floor((caja.height - 45) * k)).data;
+    let mejor = 0;
+    for (let i = 0; i < columna.length; i += 4) if (columna[i + 3] > columna[mejor + 3]) mejor = i;
+    const punto = ctx.getImageData(Math.round(xPx(-0.5) * k), Math.round((caja.height - 50) * k), 1, 1).data;
+    return { fondo, curva: sobreFondo(columna, mejor), area: sobreFondo(punto, 0) };
+  });
+}
+
+function ratioC0367(x: number[], y: number[]): number {
+  const lineal = (v: number) => {
+    const s = v / 255;
+    return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+  };
+  const lum = (c: number[]) => 0.2126 * lineal(c[0]) + 0.7152 * lineal(c[1]) + 0.0722 * lineal(c[2]);
+  const l1 = lum(x);
+  const l2 = lum(y);
+  return Math.round(((Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05)) * 100) / 100;
+}
+
+/** Tono HSL en grados; null si el color es un gris (no lleva marca ninguna). */
+function tonoC0367(c: number[]): number | null {
+  const [r, g, b] = c.map((v) => v / 255);
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  if ((max - min) * 255 < 6) return null;
+  const d = max - min;
+  const h = max === r ? ((g - b) / d) % 6 : max === g ? (b - r) / d + 2 : (r - g) / d + 4;
+  return Math.round((h * 60 + 360) % 360);
+}
+
+/** El azul de meskeIA (#2E86AB, tono 198°) y sus tintes compuestos, que salen a 194-200°. */
+const esAzulMeskeia = (c: number[]) => {
+  const t = tonoC0367(c);
+  return t !== null && t >= 186 && t <= 210;
+};
+const hexC0367 = (c: number[]) => '#' + c.map((v) => Math.round(v).toString(16).padStart(2, '0')).join('');
+
+test.describe('cabo C0367 · los azules fijos, en meskeia.com y bajo stemum.com', () => {
+  test('ningún texto sobre los tintes ni la curva quedan por debajo de su umbral (dos dominios, dos temas)', async ({
+    page,
+  }) => {
+    test.setTimeout(120_000);
+    const fallos: string[] = [];
+    for (const [portal, url] of PORTALES_C0367) {
+      for (const tema of ['light', 'dark'] as const) {
+        await abrirC0367(page, url, tema);
+        // Guarda del test de abajo (test.fail no distingue por qué falla): aquí se comprueba que
+        // bajo stemum.com manda de verdad la marca, y que en meskeia.com no hay ninguna.
+        expect(await page.locator('html').getAttribute('data-brand'), portal).toBe(
+          portal === 'stemum.com' ? 'stemum' : null,
+        );
+        fallos.push(
+          ...(await suspensos(page, `${portal} ${tema}`, {
+            'nombre del modo activo': '[class*="modeBtnActive"] [class*="modeName"]',
+            'descripción del modo activo': '[class*="modeBtnActive"] [class*="modeDesc"]',
+            'enunciado de la probabilidad': '[class*="resultCardMain"] [class*="resultLabel"]',
+            'probabilidad (texto grande)': '[class*="resultValueLarge"]',
+            'probabilidad decimal': '[class*="resultDecimal"]',
+          })),
+        );
+        // La curva es el objeto gráfico necesario: 3:1 contra el fondo real del lienzo
+        // (medido 3,93:1 en claro y 4,24:1 en oscuro, igual en los dos portales).
+        const l = await lienzoC0367(page);
+        const r = ratioC0367(l.curva, l.fondo);
+        if (r < 3) fallos.push(`${portal} ${tema} · curva: ${hexC0367(l.curva)} sobre ${hexC0367(l.fondo)} = ${r}:1 < 3`);
+        await page.getByRole('button', { name: /^Problemas tipo/ }).click();
+        fallos.push(
+          ...(await suspensos(page, `${portal} ${tema}`, {
+            'contexto del problema': '[class*="problemaContexto"]',
+          })),
+        );
+      }
+    }
+    expect(fallos).toEqual([]);
+  });
+
+  test('bajo stemum.com la curva, el área, las zonas y los tintes ya no van en el azul de meskeIA', async ({
+    page,
+  }) => {
+    test.fail(); // HALLAZGO ABIERTO (cabo C0367, 03/11/2026) [contenido/bajo]
+    // ENTRADA stemum.com/simulador-distribucion-normal/, claro y oscuro: estado de partida
+    //         P(−1 < X < 1), luego «Regla 68-95-99.7» y luego «Problemas tipo»
+    // ESPERADO la curva, el área sombreada, las zonas de la regla y los fondos tintados en la
+    //          marca de la página (violeta: --primary #6B21A8 en claro, #C99BF5 en oscuro, el
+    //          mismo del borde de esas tarjetas) o neutros; ninguno en el azul de meskeIA
+    // OBTENIDO (claro / oscuro) curva #2E86AB · área #B3D2DF / #21404D · zona ±1σ #6BA7C3 /
+    //          #286480 · tarjeta del resultado #EAF3F7 / #2D3D44 · modo activo #E6EEF2 / #1E3037 ·
+    //          tarjeta del problema #EEF5F8 / #2D3A40: las doce muestras a tono 198-199°, con el
+    //          borde de esas tarjetas en violeta (tono 271-273°)
+    test.setTimeout(90_000);
+    const azules: string[] = [];
+    for (const tema of ['light', 'dark'] as const) {
+      await abrirC0367(page, `http://stemum.com${RUTA}`, tema);
+      const l = await lienzoC0367(page);
+      const muestras: Record<string, number[]> = {
+        curva: l.curva,
+        'área sombreada': l.area,
+        'tarjeta del resultado': await fondoC0367(page, '[class*="resultCardMain"]'),
+        'modo activo': await fondoC0367(page, '[class*="modeBtnActive"]'),
+      };
+      await page.getByRole('button', { name: /^Regla 68-95-99\.7/ }).click();
+      await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+      muestras['zona ±1σ de la regla'] = (await lienzoC0367(page)).area;
+      await page.getByRole('button', { name: /^Problemas tipo/ }).click();
+      muestras['tarjeta del problema'] = await fondoC0367(page, '[class*="problemaCard"]');
+      for (const [nombre, c] of Object.entries(muestras)) {
+        if (esAzulMeskeia(c)) azules.push(`${tema} · ${nombre}: ${hexC0367(c)} (tono ${tonoC0367(c)}°)`);
+      }
+    }
+    expect(azules).toEqual([]);
   });
 });

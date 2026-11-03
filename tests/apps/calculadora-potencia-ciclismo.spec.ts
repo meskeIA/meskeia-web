@@ -16,6 +16,8 @@ import { contrasteSobreFondoReal } from './_contraste';
  * los siete campos, en escritorio y en móvil, y del cambio 10b7eb5f del motor (solo SWOLF): su
  * bloque va detrás del de la cuarta. Sus 9 hallazgos (2738-2746) se REPARARON el mismo 03/10/2026:
  * quedan como regresión al final de ese bloque, y `contraste()` compone ya los tintes (2742).
+ * Sexta: 03/11/2026, comprobación puntual de los cabos C0115 (Ferrari, «fisiólogo») y C0132
+ * (cifras sin fuente de la guía y del aviso de la VAM): su bloque va al final del fichero.
  *
  * QUÉ PROMETE
  *   <h1>: «🚴 Calculadora de Vatios en Ciclismo»
@@ -1758,3 +1760,190 @@ async function flujoEstimadorAFtp(page: Page, movil: boolean): Promise<void> {
   await expect(cifra).toBeInViewport({ ratio: 1 });
   await expect.poll(() => entreBarras(page, cifra)).toBe(true);
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════
+ * Cabos C0115 y C0132 (comprobación puntual del 03/11/2026)
+ *
+ *   C0115 · «la guía llama fisiólogo a Michele Ferrari, sin fuente» → DESCARTADO: lo reparó
+ *           3c0ea09c el 03/10/2026 (lo vigila ya el test 2745). Hoy dice «el médico italiano»,
+ *           con la inhabilitación de por vida de la USADA (2012) y «la medida es solo
+ *           aritmética y no depende de quién la difundiera»; su regla se da como «estimación
+ *           orientativa». El caso de abajo queda como control.
+ *   C0132 · cuatro cifras sin fuente, en tres hallazgos ABIERTOS [contenido/bajo]:
+ *     1 · «Dormir 7–9 horas» y «semanas de descarga cada 3–4 semanas» (tarjeta del descanso)
+ *     2 · «2–3 kg … 1–2 min de diferencia por cada 500 m de desnivel»: con el modelo de fuerzas
+ *         de la propia página solo cuadra por debajo de ~2,4 W/kg; a su ciclista de referencia
+ *         (70 + 8 kg, 280 W) le ahorran 35 y 52 s (cálculo en el caso)
+ *     3 · «los mejores escaladores rondan los 1.800 m/h», en el aviso del motor por encima de
+ *         2000 m/h (lib/calculadoras/deporte.ts, también en la API de ChatGPT y en el MCP); el
+ *         comentario de VAM_MAX_M_H dice que la respalda la guía, que la retiró en 3c0ea09c
+ *
+ * Cada hallazgo va en dos tests: un control en verde (el texto vigente está en pantalla y, en
+ * el 2, el estimador da las VAM del cálculo) y el `test.fail()` con lo que DEBERÍA ocurrir. Así
+ * un `test.fail()` no puede pasar en falso porque se rompa su preparación: la rompería el control.
+ * ═══════════════════════════════════════════════════════════════════════════════════════ */
+
+/** Los 150 caracteres antes y 120 después de `ancla` en `texto`, o null si ya no está. */
+function entornoDe(texto: string, ancla: string): string | null {
+  const i = texto.indexOf(ancla);
+  return i < 0 ? null : texto.slice(Math.max(0, i - 150), i + ancla.length + 120);
+}
+
+/** Atribución: un año (no seguido de «m/h», para no tomar por año una VAM) o un «según». */
+const ATRIBUIDA = /\b(19[5-9]\d|20[0-2]\d)\b(?!\s*m\/h)|según/;
+
+test.describe('Cabos C0115 y C0132 (03/11/2026)', () => {
+  test.use({ locale: 'es-ES' });
+
+  test('C0115 · Ferrari sale como médico y con su contexto, no como «fisiólogo» ni como autoridad', async ({
+    page,
+  }) => {
+    // DESCARTADO: el texto vigente ya no tiene la palabra, y el contexto que pedía el cabo está.
+    await page.getByRole('button', { name: /Ver guía educativa/i }).click();
+    const guia = await page.locator('main').innerText();
+    expect(guia).not.toContain('fisiólogo');
+    expect(guia).toContain('el médico italiano Michele Ferrari');
+    expect(guia).toContain('(USADA) inhabilitó de por vida en 2012');
+    expect(guia).toContain('no depende de quién la difundiera');
+    // Su regla, atribuida y con matiz: (2 + 8/10) · 100 = 280 al 8 %, frente a 288 por fuerzas
+    expect(guia).toContain('Una regla empírica que difundió el propio Ferrari');
+    expect(guia).toContain('W/kg ≈ VAM / 280');
+    expect(guia).toContain('úsala como estimación orientativa');
+  });
+
+  test('C0132 · hallazgo 1, control: la tarjeta del descanso da «7–9 horas» y «cada 3–4 semanas»', async ({
+    page,
+  }) => {
+    // Lo que hay hoy (page.tsx:772), en verde: la preparación del test.fail de abajo
+    await page.getByRole('button', { name: /Ver guía educativa/i }).click();
+    const tarjeta = page
+      .locator('[class*="tipCard"]')
+      .filter({ hasText: 'El descanso es parte del entrenamiento' });
+    await expect(tarjeta).toHaveCount(1);
+    await expect(tarjeta).toContainText(
+      'Dormir 7–9 horas, incluir semanas de descarga cada 3–4 semanas y gestionar el estrés general',
+    );
+  });
+
+  test('C0132 · hallazgo 1: las horas de sueño y la cadencia de descarga, con su fuente o como práctica habitual', async ({
+    page,
+  }) => {
+    test.fail(); // HALLAZGO ABIERTO (cabo C0132, 03/11/2026) [contenido/bajo]
+    // ENTRADA abrir la guía, tarjeta «El descanso es parte del entrenamiento»
+    // ESPERADO cada cifra con su fuente (organismo o autor y año, y para quién: las horas de
+    //          sueño de referencia son de adultos), o rotulada como práctica habitual, como ya
+    //          hace la guía con «la costumbre habitual es repetir el test cada 6–8 semanas»
+    // OBTENIDO «Dormir 7–9 horas, incluir semanas de descarga cada 3–4 semanas y gestionar el
+    //          estrés general son factores que afectan al rendimiento tanto como las sesiones
+    //          de calidad», en imperativo y sin fuente
+    await page.getByRole('button', { name: /Ver guía educativa/i }).click();
+    const texto = await page
+      .locator('[class*="tipCard"]')
+      .filter({ hasText: 'El descanso es parte del entrenamiento' })
+      .innerText();
+    // Si la cifra sigue, con su fuente; si se retira, el caso se da por cumplido. Hoy no hay ni
+    // un año ni un «según» en toda la tarjeta, ni un «habitual»: fallan las dos.
+    const sueno = entornoDe(texto, '7–9 horas');
+    if (sueno !== null) expect(sueno).toMatch(ATRIBUIDA);
+    const descarga = entornoDe(texto, '3–4 semanas');
+    if (descarga !== null) {
+      expect(descarga).toMatch(new RegExp(`habitual|costumbre|suele|es frecuente|${ATRIBUIDA.source}`));
+    }
+  });
+
+  test('C0132 · hallazgo 2, control: con el estimador, 2 y 3 kg menos a 280 W y al 8 % ahorran 35 y 52 s por cada 500 m', async ({
+    page,
+  }) => {
+    // RESUELTO A MANO con el modelo de fuerzas de la página (g 9,80665 · Crr 0,005 · CdA 0,32 ·
+    // ρ 1,225 · η 0,975, θ = arctan 0,08: sen θ 0,0797453), a la misma potencia —280 W, el
+    // ciclista de 70 kg con bici de 8 del CASO 1b y de la guía— (.inspector-trabajo/
+    // calculadora-potencia-ciclismo-esperado.mjs, Newton sobre P·η = a·m·v + ½ρCdA·v³):
+    //   78 kg · 14,46 km/h → 280,03 W · VAM 4,016667 · 0,0797453 · 3600 = 1153,1 m/h
+    //   76 kg · 14,79 km/h → 280,03 W · VAM 4,108333 · 0,0797453 · 3600 = 1179,4 m/h
+    //   75 kg · 14,96 km/h → 280,03 W · VAM 4,155556 · 0,0797453 · 3600 = 1193,0 m/h
+    //   500 m de desnivel = 500 / VAM horas: 1561,0 s · 1526,2 s · 1508,8 s
+    //   ahorro: 2 kg → 34,8 s · 3 kg → 52,2 s. Ni el extremo alto llega al minuto.
+    // Por niveles (78 kg, 8 %): 2 W/kg → 74 y 111 s · 2,5 → 59 y 88 s · 3 → 48 y 72 s ·
+    // 3,5 → 41 y 61 s · 4 → 35 y 52 s · 5 → 27 y 40 s. Los «1–2 min» enteros solo salen entre
+    // ~1,8 y ~2,4 W/kg (VAM de ~540 a ~710 m/h): el tramo «Cicloturista» de la escala de W/kg.
+    const tarjeta = await abrirEstimador(page);
+    const vams: number[] = [];
+    for (const [masa, velocidad, vam] of [
+      ['78', '14,46', 1153],
+      ['76', '14,79', 1179],
+      ['75', '14,96', 1193],
+    ] as const) {
+      await estimar(page, { masa, velocidad, pendiente: '8' });
+      await expect(tarjeta).toContainText(`${vam} m/h de VAM`);
+      await expect(tarjeta).toContainText('Potencia estimada');
+      await expect(tarjeta).toContainText('280 W');
+      vams.push(vam);
+    }
+    // Con las VAM enteras que pinta la app: 1561,1 · 1526,7 · 1508,8 s → 34,4 y 52,3 s
+    const segundos = vams.map((v) => (500 / v) * 3600);
+    expect(segundos[0] - segundos[1]).toBeCloseTo(34.4, 0);
+    expect(segundos[0] - segundos[2]).toBeCloseTo(52.3, 0);
+
+    // Y lo que la guía afirma hoy (page.tsx:762)
+    await page.getByRole('button', { name: /Ver guía educativa/i }).click();
+    const tarjetaPeso = page
+      .locator('[class*="tipCard"]')
+      .filter({ hasText: 'El peso importa especialmente en subidas' });
+    await expect(tarjetaPeso).toContainText(
+      'Reducir 2–3 kg de peso corporal mejora el W/kg sin cambiar el FTP. En terreno llano este efecto ' +
+        'es menor; en subidas largas puede suponer 1–2 min de diferencia por cada 500 m de desnivel.',
+    );
+  });
+
+  test('C0132 · hallazgo 2: «1–2 min por cada 500 m» no se da como general, sin fuente y sin decir a qué nivel', async ({
+    page,
+  }) => {
+    test.fail(); // HALLAZGO ABIERTO (cabo C0132, 03/11/2026) [contenido/bajo]
+    // ENTRADA guía, tarjeta «El peso importa especialmente en subidas»
+    // ESPERADO una cifra atribuida, o que cuadre con el modelo de la página, o condicionada al
+    //          nivel: con 2–3 kg menos sobre 78 kg, a 4 W/kg (el ciclista de referencia de la
+    //          guía) son 35–52 s por cada 500 m; a 3 W/kg, 48–72 s; los «1–2 min» enteros solo
+    //          entre ~1,8 y ~2,4 W/kg (control de arriba)
+    // OBTENIDO «en subidas largas puede suponer 1–2 min de diferencia por cada 500 m de
+    //          desnivel», sin fuente ni nivel
+    await page.getByRole('button', { name: /Ver guía educativa/i }).click();
+    const texto = await page
+      .locator('[class*="tipCard"]')
+      .filter({ hasText: 'El peso importa especialmente en subidas' })
+      .innerText();
+    expect(texto).not.toContain(
+      'en subidas largas puede suponer 1–2 min de diferencia por cada 500 m de desnivel.',
+    );
+  });
+
+  test('C0132 · hallazgo 3, control: 1000 m en 25 min dan el aviso sin veredicto y con «1.800 m/h»', async ({
+    page,
+  }) => {
+    // ENTRADA 70 kg · FTP 280 W · desnivel 1000 m · 25 min
+    // ESPERADO 1000 · 60 / 25 = 2400 m/h > 2000 (VAM_MAX_M_H) → aviso, sin veredicto de VAM
+    await abrirVam(page);
+    await calcular(page, { peso: '70', ftp: '280', desnivel: '1000', tiempo: '25' });
+    await expect(resultados(page)).toContainText(
+      '1000 m en 25 min serían 2400 m/h de VAM, más de lo que se ha medido en las grandes subidas ' +
+        'del ciclismo profesional (los mejores escaladores rondan los 1.800 m/h)',
+    );
+    await expect(resultados(page)).not.toContainText('Élite / Profesional');
+  });
+
+  test('C0132 · hallazgo 3: el aviso de una VAM imposible no apoya su techo en «1.800 m/h» sin fuente', async ({
+    page,
+  }) => {
+    test.fail(); // HALLAZGO ABIERTO (cabo C0132, 03/11/2026) [contenido/bajo]
+    // ENTRADA la del control de arriba
+    // ESPERADO la cifra de referencia atribuida (subida, año y fuente), o un aviso que no se
+    //          apoye en ella (2000 m/h es un techo de plausibilidad de la herramienta, como dice
+    //          el propio comentario de VAM_MAX_M_H)
+    // OBTENIDO «… (los mejores escaladores rondan los 1.800 m/h)», sin fuente; el comentario
+    //          del motor la da por respaldada por la guía, que la retiró en 3c0ea09c (03/10/2026)
+    await abrirVam(page);
+    await calcular(page, { peso: '70', ftp: '280', desnivel: '1000', tiempo: '25' });
+    await expect(resultados(page)).toContainText('serían 2400 m/h de VAM');
+    const entorno = entornoDe(await resultados(page).innerText(), '1.800 m/h');
+    if (entorno !== null) expect(entorno).toMatch(ATRIBUIDA);
+  });
+});

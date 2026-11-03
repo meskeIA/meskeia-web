@@ -1727,3 +1727,152 @@ test.describe('Caso 9 — ley de Hooke en estático', () => {
     expect(Math.abs(f - (-k * x))).toBeLessThan(0.02 + k * 0.0005);
   });
 });
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════════
+ * CABO C0108 — comprobación puntual del 03/11/2026 (Inspector, modo cabo)
+ *
+ * Tres sospechas del 02/10/2026. Los dos escenarios de la guía (page.tsx:889-906) no han cambiado
+ * desde su creación (60f08d55, 10/05/2026).
+ *
+ * (a) «Cristal de cuarzo en relojes»: «una frecuencia estabilísima: error de 1 s por mes».
+ *     1 s/mes = 1/(30·86.400) = 3,9·10⁻⁷ = 0,39 ppm, presentado como la cifra del cuarzo sin más
+ *     y sin fuente. Lo que se cita para un reloj de cuarzo corriente es del orden de ±15 s/mes
+ *     (≈ 5,8 ppm); el orden del segundo al mes es de los de alta precisión termocompensados.
+ *     Ninguna fuente de la red de fuentes oficiales cubre la precisión de un reloj (NIST no está):
+ *     el hallazgo pide atribuir o matizar la cifra (regla 1 de §1.quinquies).
+ *
+ * (b) «Amortiguador de masa sintonizada»: «una masa gigante (hasta 800 t) suspendida con resortes
+ *     … cancelando las oscilaciones por viento o seísmos». El «cancelando» se puede comprobar sin
+ *     fuente: edificio y TMD como dos masa-resorte-amortiguador con la sintonía óptima de Den
+ *     Hartog (f = 1/(1+μ), ζ_d = √(3μ/(8(1+μ)³))), barrido de frecuencia de la fuerza:
+ *         ζ_edificio = 2 %, μ = 1 %: pico de |X|/(F/k) 25,01 → 9,73 (−61 %); RMS ante ruido
+ *         blanco × 0,699 · ζ = 1 %, μ = 0,5 %: 50,00 → 15,05 (−70 %), RMS × 0,627.
+ *     Reduce, no cancela (ni en la frecuencia del propio edificio: 8,23 con ζ = 2 % y μ = 1 %).
+ *     «Hasta 800 t» va como tope sin fuente, y ninguna de la red cubre los TMD. El caso no mira
+ *     «suspendida con resortes»: hay TMD de muelles, aunque el péndulo colgado de cables, el que
+ *     cita el cabo para Taipei 101, tiene ω₀ = √(g/L) y su masa no lo sintoniza.
+ *
+ * (c) El placeholder «Tu respuesta» de los casos para clase, medido (tema sembrado en la clave
+ *     «meskeia-theme», que aplica también el color-scheme de next-themes): #757575 en los dos
+ *     temas (el gris del navegador; el módulo no declara ::placeholder) · claro, sobre #ffffff:
+ *     4,61:1 · oscuro, sobre #2a2a2a: 3,12:1. A mano: L(#757575) = 0,1779 · L(#2a2a2a) = 0,0232
+ *     → 0,2279/0,0732 = 3,12:1. Por debajo de 4,5:1 en oscuro, pero NO es hallazgo: el label
+ *     visible al lado dice la magnitud y la unidad («ω₀ en rad/s», «T en s»…) y el placeholder
+ *     no añade nada que el label no diga. El test fija esa condición: o llega a 4,5:1, o es
+ *     redundante.
+ * ═══════════════════════════════════════════════════════════════════════════════════════════ */
+
+/** Texto de la tarjeta de un escenario real, localizada por su título <h4>. */
+async function textoEscenario(page: Page, titulo: string): Promise<string> {
+  await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+  const h4 = page.locator('h4', { hasText: titulo });
+  await expect(h4).toBeVisible();
+  return h4.locator('xpath=..').innerText();
+}
+
+test.describe('Cabo C0108 — escenarios de la guía y placeholder de los casos para clase', () => {
+  test('HALLAZGO ABIERTO C0108 (a) — el cuarzo no da «1 s por mes» como cifra general sin fuente', async ({
+    page,
+  }) => {
+    // HALLAZGO ABIERTO. page.tsx:902-904. Esperado: la precisión de un reloj de cuarzo corriente
+    // (del orden de ±15 s/mes) o la cifra atribuida/acotada a los de alta precisión. Obtenido:
+    // «error de 1 s por mes», como si fuera la de cualquier reloj de cuarzo y sin fuente.
+    test.fail();
+    const texto = await textoEscenario(page, 'Cristal de cuarzo en relojes');
+    expect(texto).toContain('32'); // la tarjeta es la del cuarzo de 32 768 Hz
+    const cifraGeneralSinFuente =
+      /1 s (por|al) mes/.test(texto) &&
+      !/alta precisi|termocompens|seg[uú]n|fabricante|fuente|NIST/i.test(texto);
+    expect(cifraGeneralSinFuente, texto).toBe(false);
+  });
+
+  test('HALLAZGO ABIERTO C0108 (b) — el TMD reduce las oscilaciones (no las cancela) y su masa máxima lleva fuente', async ({
+    page,
+  }) => {
+    // HALLAZGO ABIERTO. page.tsx:893-895. Esperado: «reduce/amortigua» (el modelo de dos masas
+    // de la cabecera da −52 % a −83 % en el pico, nunca cero) y la masa atribuida o sin un tope
+    // que no cita a nadie. Obtenido: «cancelando las oscilaciones» y «hasta 800 t» sin fuente.
+    test.fail();
+    const texto = await textoEscenario(page, 'Amortiguador de masa sintonizada');
+    const problemas: string[] = [];
+    if (/cancel/i.test(texto)) problemas.push('dice que cancela las oscilaciones');
+    if (/hasta \d[\d.]* ?t\b/.test(texto) && !/seg[uú]n|fuente|Taipei|Shanghai/i.test(texto)) {
+      problemas.push('da un tope de masa sin fuente');
+    }
+    expect(problemas, texto).toEqual([]);
+  });
+
+  test('C0108 (c) — el placeholder «Tu respuesta» llega a 4,5:1 o no dice nada que el label no diga', async ({
+    page,
+  }) => {
+    // Medido el 03/11/2026: #757575 sobre #ffffff = 4,61:1 (claro) y sobre #2a2a2a = 3,12:1
+    // (oscuro). Por debajo en oscuro, pero redundante: el label visible da magnitud y unidad.
+    const medidas: string[] = [];
+    for (const tema of ['light', 'dark'] as const) {
+      await page.evaluate((t) => localStorage.setItem('meskeia-theme', t), tema);
+      await page.reload();
+      await esperarHidratacion(page, ['#casos-respuesta']);
+      await expect(page.locator('html')).toHaveAttribute('data-theme', tema);
+      await page.evaluate(() => {
+        for (const a of document.getAnimations()) a.finish();
+      });
+      const m = await page.evaluate(() => {
+        const el = document.querySelector('#casos-respuesta') as HTMLInputElement;
+        const lienzo = document.createElement('canvas');
+        lienzo.width = lienzo.height = 1;
+        const ctx = lienzo.getContext('2d', { willReadFrequently: true })!;
+        const rgba = (css: string): number[] => {
+          ctx.clearRect(0, 0, 1, 1);
+          ctx.fillStyle = css;
+          ctx.fillRect(0, 0, 1, 1);
+          const d = ctx.getImageData(0, 0, 1, 1).data;
+          return [d[0], d[1], d[2], d[3] / 255];
+        };
+        const capas: number[][] = [];
+        for (let n: Element | null = el; n; n = n.parentElement) {
+          const c = rgba(getComputedStyle(n).backgroundColor);
+          if (c[3] > 0) capas.push(c);
+          if (c[3] === 1) break;
+        }
+        let fondo = [255, 255, 255];
+        for (let i = capas.length - 1; i >= 0; i--) {
+          const [r, g, b, a] = capas[i];
+          fondo = [r * a + fondo[0] * (1 - a), g * a + fondo[1] * (1 - a), b * a + fondo[2] * (1 - a)];
+        }
+        const ph = getComputedStyle(el, '::placeholder');
+        const [pr, pg, pb, pa] = rgba(ph.color);
+        const alfa = pa * Number(ph.opacity || '1');
+        const texto = [pr * alfa + fondo[0] * (1 - alfa), pg * alfa + fondo[1] * (1 - alfa), pb * alfa + fondo[2] * (1 - alfa)];
+        const lum = ([r, g, b]: number[]): number => {
+          const f = (v: number): number => {
+            const s = v / 255;
+            return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+          };
+          return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+        };
+        const l1 = lum(texto);
+        const l2 = lum(fondo);
+        const label = document.querySelector('label[for="casos-respuesta"]');
+        const caja = label?.getBoundingClientRect();
+        return {
+          ratio: (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05),
+          placeholder: el.getAttribute('placeholder') ?? '',
+          label: label?.textContent?.trim() ?? '',
+          labelVisible: !!caja && caja.height > 0 && getComputedStyle(label as Element).visibility !== 'hidden',
+        };
+      });
+      medidas.push(`${tema}: ${m.ratio.toFixed(2)}:1`);
+      if (m.ratio >= 4.5) continue;
+      // Por debajo de 4,5:1: solo vale si el placeholder es redundante con un label visible que
+      // ya dice la magnitud y la unidad. Un placeholder con cifras, unidades o formato
+      // («ej. 1,05», «en rad/s») sí informaría, y entonces tendría que llegar a 4,5:1.
+      expect(m.labelVisible, `${tema}: el label de la respuesta no está a la vista`).toBe(true);
+      expect(m.label, `${tema}: el label no dice la unidad`).toMatch(/ en \S/);
+      expect(m.placeholder, `${tema} (${m.ratio.toFixed(2)}:1): el placeholder informa`).not.toMatch(
+        /\d|ej\.|rad|Hz|N\/m|kg|\bJ\b|m\/s|N·s|\ben\b/,
+      );
+      expect(m.placeholder).toBe('Tu respuesta');
+    }
+    expect(medidas).toHaveLength(2);
+  });
+});
