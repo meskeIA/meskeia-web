@@ -470,11 +470,11 @@
 }
 
 .escalaApolar {
-  background: #48A9A6;
+  background: var(--secondary-boton);
 }
 
 .escalaPolar {
-  background: #2E86AB;
+  background: var(--primary-boton);
 }
 
 .escalaIonico {

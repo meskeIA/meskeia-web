@@ -803,7 +803,7 @@
 }
 
 .btnObservando {
-  background: var(--secondary);
+  background: var(--secondary-boton);
 }
 
 .btnObservando:hover {

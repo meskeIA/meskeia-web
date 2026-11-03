@@ -23,6 +23,10 @@
  * Los casos 20-22 (30/10/2026, cabo C0502) son la marca que llega por una variable propia del
  * módulo, con la insignia del hallazgo 3683 como caso de origen.
  *
+ * Los casos 23-27 (03/11/2026, cabo C0567) son el blanco en una clase y el fondo de marca en
+ * otra del mismo className, con simulador-arboles-bst-avl antes de e06bab0f (hallazgo 3898)
+ * como caso de origen.
+ *
  * Trabaja sobre mini-catálogos en directorios temporales: no escribe NADA en `app/`.
  */
 
@@ -30,13 +34,16 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { spawnSync } from 'node:child_process';
+import { spawnSync, execFileSync } from 'node:child_process';
 
 const RAIZ = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
 const CANDADO = path.join(RAIZ, 'scripts', 'check-contraste-marca.mjs');
 const CAMPANA = path.join(RAIZ, 'scripts', 'contraste-marca', 'campana.mjs');
 
 const css = (...l) => l.join('\n') + '\n';
+const deGit = (rev, ruta) => execFileSync('git', ['show', `${rev}:${ruta}`], { cwd: RAIZ, encoding: 'utf8' });
+const BST_TSX = 'app/simulador-arboles-bst-avl/page.tsx';
+const BST_CSS = 'app/simulador-arboles-bst-avl/SimuladorArbolesBstAvl.module.css';
 
 /** Cada caso: ficheros del mini-catálogo, tanda que se mira y si debe fallar. */
 const CASOS = [
@@ -284,6 +291,58 @@ const CASOS = [
       ),
     },
   },
+  // Cabo C0567 (03/11/2026): el blanco en una clase y el fondo de marca en otra, en el mismo
+  // className. Caso de origen: simulador-arboles-bst-avl antes de e06bab0f (hallazgo 3898).
+  {
+    n: 23,
+    nombre: 'CASO DE ORIGEN · arboles-bst-avl antes de e06bab0f: .opBtn blanco + .opBtnSecondary var(--secondary)',
+    tanda: 1,
+    debeFallar: true,
+    ficheros: {
+      [BST_TSX]: deGit('e06bab0f^', BST_TSX),
+      [BST_CSS]: deGit('e06bab0f^', BST_CSS),
+    },
+  },
+  {
+    n: 24,
+    nombre: 'EL MISMO, REPARADO en e06bab0f (--secondary-boton)',
+    tanda: 1,
+    debeFallar: false,
+    ficheros: {
+      [BST_TSX]: deGit('e06bab0f', BST_TSX),
+      [BST_CSS]: deGit('e06bab0f', BST_CSS),
+    },
+  },
+  {
+    n: 25,
+    nombre: 'dos clases, pero la de la marca va DESPUÉS y trae su propio color oscuro: calla',
+    tanda: 1,
+    debeFallar: false,
+    ficheros: {
+      'app/x/page.tsx': "import styles from './X.module.css';\nexport default function P() { return <button type=\"button\" className={`${styles.a} ${styles.b}`}>x</button>; }\n",
+      'app/x/X.module.css': css('.a { color: white; background: var(--primary-boton); }', '.b { background: var(--secondary); color: #1a1a1a; }'),
+    },
+  },
+  {
+    n: 26,
+    nombre: 'dos clases con condicional y styles[\'x\']: el blanco y el fondo de marca opaco se juntan: falla',
+    tanda: 1,
+    debeFallar: true,
+    ficheros: {
+      'app/x/page.tsx': "import styles from './X.module.css';\nexport default function P({ on }: { on: boolean }) { return <span className={`${styles['chip']} ${on ? styles.activo : ''}`}>x</span>; }\n",
+      'app/x/X.module.css': css('.chip { color: #fff; }', '.activo { background-color: #2E86AB; }'),
+    },
+  },
+  {
+    n: 27,
+    nombre: 'la marca va ANTES y la otra clase pone después su fondo -boton: gana el -boton, calla',
+    tanda: 1,
+    debeFallar: false,
+    ficheros: {
+      'app/x/page.tsx': "import styles from './X.module.css';\nexport default function P() { return <span className={`${styles.a} ${styles.b}`}>x</span>; }\n",
+      'app/x/X.module.css': css('.a { background: var(--primary); }', '.b { color: white; background: var(--primary-boton); }'),
+    },
+  },
 ];
 
 function montar(ficheros) {
@@ -314,7 +373,8 @@ for (const c of CASOS) {
 {
   // Fuera el 5 (sin sustituto), el 15 (escape sin razón), el 17 (impresión) y el 20 y el 21 (la
   // marca por una variable propia, que se corrige a mano en su valor): la campaña no los migra
-  const todos = Object.assign({}, ...CASOS.filter((c) => c.debeFallar && ![5, 15, 17, 20, 21].includes(c.n)).map((c, i) =>
+  // Y el 23 y el 26 (C0567): dos clases en un mismo className, que la campaña tampoco migra
+  const todos = Object.assign({}, ...CASOS.filter((c) => c.debeFallar && ![5, 15, 17, 20, 21, 23, 26].includes(c.n)).map((c, i) =>
     Object.fromEntries(Object.entries(c.ficheros).map(([r, t]) => [r.replace(/^app\/([^/]+)/, `app/$1-${i}`), t])),
   ));
   const dir = montar(todos);

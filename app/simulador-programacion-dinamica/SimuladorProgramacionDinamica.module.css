@@ -332,7 +332,7 @@
 }
 
 .ctrlBtnSecondary {
-  background: var(--secondary);
+  background: var(--secondary-boton);
 }
 
 .ctrlBtnSecondary:hover:not(:disabled) {

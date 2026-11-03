@@ -31,6 +31,11 @@
  *   quiz-complejidad-algoritmos, y cuatro casos más en tres apps que el censo encontró y se
  *   repararon en el mismo commit). Se corrige el VALOR de la variable, no la declaración que la usa.
  *
+ *   Y la tanda 1 cuando el blanco y el fondo de marca los ponen DOS CLASES del mismo `className`
+ *   (cabo C0567, 03/11/2026, hallazgo 3898): ver `clasesCompuestasConBlanco`. Al nacer encendió
+ *   14 clases en 12 apps, migradas a `-boton` en el mismo commit tras comprobar que ninguna de
+ *   esas clases de fondo se usaba sin la del blanco.
+ *
  * En `app/`, `components/` y `styles/`, hojas `.module.css` y `style={{…}}` de los `.tsx`. El
  * criterio NO vive aquí: lo importa de `scripts/contraste-marca/clasificar.mjs`, el mismo que
  * usa el script de la campaña, para que lo que se migra y lo que se vigila no diverjan.
@@ -94,7 +99,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { analizarCss, analizarTsx, conVariablesPropias, paletaPropia } from './contraste-marca/clasificar.mjs';
+import { analizarCss, analizarTsx, conVariablesPropias, paletaPropia, parsearCss, referencias, esBlanco } from './contraste-marca/clasificar.mjs';
 import { prefijosCongelados, esCongelado } from './contraste-marca/congelados.mjs';
 
 const arg = (n) => {
@@ -167,6 +172,88 @@ function textoMarcaEnImpresion(css) {
 }
 const appDe = (r) => (r.startsWith('app/') ? r.split('/').slice(0, 2).join('/') : r);
 
+/**
+ * Tanda 1 en CLASES COMPUESTAS (cabo C0567, 03/11/2026): el blanco lo pone una clase y el fondo
+ * de marca OTRA, y las dos van en el mismo `className`. Cada regla por separado está bien, así
+ * que el análisis por hoja no lo ve. Caso de origen, hallazgo 3898 de simulador-arboles-bst-avl:
+ * `.opBtn` pone `color: white` (y su fondo ya era `--primary-boton`) y `.opBtnSecondary` pone
+ * `background: var(--secondary)` sin color propio; «Buscar» y «Aleatorios (10)» daban 2,80:1
+ * en claro. Reparado en e06bab0f, con las dos hermanas (arboles-b, monticulo-binario).
+ *
+ * Se juzga el estado BASE (selector exacto `.clase`, sin pseudoclases ni tema oscuro): de las
+ * clases de un mismo elemento, el color lo pone la última regla que declara `color` y el fondo
+ * la última que declara `background`/`background-color`, como en la cascada. Rompe si el color
+ * es blanco, el fondo es la marca opaca y vienen de clases distintas (si son la misma, ya lo ve
+ * la pasada por hoja). Un elemento se reconoce por su `className={…}`: todas las `styles.x` (o
+ * `styles['x']`) de un mismo import dentro de esa expresión, también las condicionales.
+ */
+function clasesCompuestasConBlanco(tsx, leerModulo) {
+  const out = [];
+  const imports = new Map();
+  for (const m of tsx.matchAll(/import\s+(\w+)\s+from\s+['"](\.[^'"]+\.module\.css)['"]/g)) imports.set(m[1], m[2]);
+  if (!imports.size) return out;
+  const lineas = tsx.split('\n');
+  const reglasDe = new Map();
+  const reglas = (ident) => {
+    if (!reglasDe.has(ident)) {
+      const css = leerModulo(imports.get(ident));
+      const porClase = new Map();
+      if (css) {
+        parsearCss(css).forEach((b, orden) => {
+          if (b.contexto.oscuroMedia || /data-theme/.test(b.selector)) return;
+          for (const parte of b.selector.split(',')) {
+            const m = parte.trim().match(/^\.([\w-]+)$/);
+            if (!m) continue;
+            const lista = porClase.get(m[1]) ?? [];
+            lista.push({ orden, decls: b.decls, linea: b.linea });
+            porClase.set(m[1], lista);
+          }
+        });
+      }
+      reglasDe.set(ident, porClase);
+    }
+    return reglasDe.get(ident);
+  };
+  for (const m of tsx.matchAll(/className=\{/g)) {
+    // La expresión hasta su llave de cierre
+    let prof = 1;
+    let j = m.index + m[0].length;
+    while (j < tsx.length && prof > 0) { if (tsx[j] === '{') prof++; else if (tsx[j] === '}') prof--; j++; }
+    const expr = tsx.slice(m.index + m[0].length, j - 1);
+    for (const ident of imports.keys()) {
+      const re = new RegExp(String.raw`\b${ident}(?:\.([\w]+)|\[\s*['"]([\w-]+)['"]\s*\])`, 'g');
+      const clases = [...new Set([...expr.matchAll(re)].map((x) => x[1] ?? x[2]))];
+      if (clases.length < 2) continue;
+      const porClase = reglas(ident);
+      let color = null;
+      let fondo = null;
+      for (const c of clases) {
+        for (const r of porClase.get(c) ?? []) {
+          for (const d of r.decls) {
+            if (d.prop === 'color' && (!color || r.orden >= color.orden)) color = { orden: r.orden, clase: c, valor: d.valor };
+            if ((d.prop === 'background' || d.prop === 'background-color') && (!fondo || r.orden >= fondo.orden)) {
+              fondo = { orden: r.orden, clase: c, valor: d.valor };
+            }
+          }
+        }
+      }
+      if (!color || !fondo || color.clase === fondo.clase || !esBlanco(color.valor)) continue;
+      const marca = referencias(fondo.valor).find((x) => (x.token === 'primary' || x.token === 'secondary') && !x.tenida && x.alfa >= 0.5);
+      if (!marca || /gradient/i.test(fondo.valor)) continue;
+      const linea = tsx.slice(0, m.index).split('\n').length;
+      const cerca = lineas.slice(Math.max(0, linea - 4), linea).join('\n');
+      const mk = cerca.match(/marca-ok:([^\n]*)/);
+      const razon = mk ? mk[1].replace(/\*\/.*$/, '').replace(/[^\p{L}\p{N}\s]/gu, ' ').trim() : '';
+      out.push({
+        linea,
+        texto: `\`.${color.clase}\` pone \`color: ${color.valor}\` y \`.${fondo.clase}\` pone \`${fondo.valor}\`, en el mismo elemento: usa \`var(--${marca.token}-boton)\` en \`.${fondo.clase}\``,
+        escape: mk ? (/\p{L}{3,}/u.test(razon) ? 'firmado' : 'sin razón') : null,
+      });
+    }
+  }
+  return out;
+}
+
 const ficheros = ARBOLES.flatMap((a) => recorrer(path.join(RAIZ, a))).filter((f) => !esCongelado(rel(f), CONGELADOS));
 const textos = new Map(ficheros.map((f) => [f, fs.readFileSync(f, 'utf8')]));
 
@@ -206,6 +293,17 @@ for (const [f, t] of textos) {
         const que = h.tanda === 1 ? 'texto blanco sobre la marca' : 'la marca como color de texto';
         errores.push({ tanda: h.tanda, texto: `${r}:${h.linea} — \`${h.selector.slice(0, 80)}\` pone ${que} a través de la variable propia ${via.join(' y ') || 'del módulo'}: cambia el VALOR de la variable a \`${SUSTITUTO[h.tanda]}\` (o a un tono medido que llegue a 4,5:1).${porQue}` });
       }
+    }
+  }
+  if (TANDAS.includes(1) && f.endsWith('.tsx')) {
+    const leerModulo = (relativo) => {
+      const p = path.resolve(path.dirname(f), relativo);
+      return textos.get(p) ?? (fs.existsSync(p) ? fs.readFileSync(p, 'utf8') : '');
+    };
+    for (const h of clasesCompuestasConBlanco(t, leerModulo)) {
+      if (h.escape === 'firmado') { exentas.push(`${r}:${h.linea}`); continue; }
+      const porQue = h.escape === 'sin razón' ? ' — lleva `marca-ok:` SIN razón escrita' : '';
+      errores.push({ tanda: 1, texto: `${r}:${h.linea} — texto blanco sobre la marca con dos clases: ${h.texto}.${porQue}` });
     }
   }
   if (TANDAS.includes(2) && f.endsWith('.css')) {

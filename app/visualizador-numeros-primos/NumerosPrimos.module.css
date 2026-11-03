@@ -37,7 +37,7 @@
 .btnSimular:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .btnReset { padding: 0.5rem 1rem; background: var(--hover); color: var(--text-secondary); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; font-size: 0.85rem; }
 .btnReset:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
-.btnActivo { background: var(--secondary); }
+.btnActivo { background: var(--secondary-boton); }
 .btnActivo:hover { background: #3d918f; }
 
 /* Controles criba */

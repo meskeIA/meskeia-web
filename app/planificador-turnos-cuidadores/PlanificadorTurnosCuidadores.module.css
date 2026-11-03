@@ -241,7 +241,7 @@
 }
 
 .gridCorner {
-  background: var(--secondary);
+  background: var(--secondary-boton);
 }
 
 .gridRowHeader {

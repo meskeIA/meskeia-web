@@ -248,7 +248,7 @@
 }
 
 .puntoVertice {
-  background: var(--primary);
+  background: var(--primary-boton);
   width: 34px;
   height: 34px;
 }
