@@ -543,17 +543,45 @@ async function tFinGrafica(page: Page, A: number): Promise<number> {
   return g.puntos.length ? g.puntos[g.puntos.length - 1][0] : 0;
 }
 
-/** x de la traza en el instante t, por interpolación lineal entre las dos muestras vecinas. */
+/**
+ * x de la traza en el instante t, por la parábola que pasa por las tres muestras más cercanas.
+ *
+ * Era una recta entre las dos vecinas (cabo C0568). Junto a un máximo la cuerda se queda corta
+ * en A·ω²·Δt²/8, y con carga el bucle de animación pierde frames: con 8 workers las muestras
+ * llegaron a ~47 ms y x(2 s) salió 0,19928 frente a 0,199829 (0,00055 de error, fuera de la
+ * tolerancia de 0,0005). La parábola deja el error en el orden de Δt³.
+ */
 function xEn(puntos: [number, number][], t: number): number {
   for (let i = 1; i < puntos.length; i++) {
     const [t0, x0] = puntos[i - 1];
     const [t1, x1] = puntos[i];
-    if (t0 <= t && t1 >= t) return x0 + ((t - t0) / (t1 - t0)) * (x1 - x0);
+    if (!(t0 <= t && t1 >= t)) continue;
+    // El tercer punto: el vecino de fuera más cercano a t
+    const antes = i >= 2 ? puntos[i - 2] : null;
+    const despues = i + 1 < puntos.length ? puntos[i + 1] : null;
+    const tercero = antes && despues ? (t - antes[0] <= despues[0] - t ? antes : despues) : (antes ?? despues);
+    if (!tercero || t1 === t0 || tercero[0] === t0 || tercero[0] === t1) {
+      return x0 + ((t - t0) / (t1 - t0)) * (x1 - x0);
+    }
+    const [t2, x2] = tercero;
+    return (
+      (x0 * (t - t1) * (t - t2)) / ((t0 - t1) * (t0 - t2)) +
+      (x1 * (t - t0) * (t - t2)) / ((t1 - t0) * (t1 - t2)) +
+      (x2 * (t - t0) * (t - t1)) / ((t2 - t0) * (t2 - t1))
+    );
   }
   return NaN;
 }
 
-/** Extremos locales de la traza, afinados con la parábola que pasa por tres muestras. */
+/**
+ * Extremos locales de la traza, afinados con la parábola que pasa por tres muestras.
+ *
+ * Con las muestras a distancias DISTINTAS (cabo C0568): la versión anterior suponía el paso
+ * constante, h = (t2 − t0)/2 alrededor de t1, y con carga el bucle de animación pierde frames y
+ * los pasos dejan de ser iguales; el vértice se corría unos milisegundos (el primer máximo salió
+ * a 5,8 ms de T en una batería con --workers=8, y aislado pasaba 3 de 3). Ahora es el vértice de
+ * la parábola de Lagrange por los tres puntos, que con paso constante da lo mismo que antes.
+ */
 function extremos(puntos: [number, number][]): [number, number][] {
   const out: [number, number][] = [];
   for (let i = 1; i < puntos.length - 1; i++) {
@@ -561,10 +589,19 @@ function extremos(puntos: [number, number][]): [number, number][] {
     const [t1, x1] = puntos[i];
     const [t2, x2] = puntos[i + 1];
     if ((x1 > x0 && x1 >= x2) || (x1 < x0 && x1 <= x2)) {
-      const h = (t2 - t0) / 2;
-      const den = x0 - 2 * x1 + x2;
-      const d = den !== 0 ? (0.5 * (x0 - x2)) / den : 0;
-      out.push([t1 + d * h, x1 - 0.25 * (x0 - x2) * d]);
+      if (t0 === t1 || t1 === t2) {
+        out.push([t1, x1]); // dos muestras en el mismo instante: sin parábola
+        continue;
+      }
+      const num = (t1 - t0) ** 2 * (x1 - x2) - (t1 - t2) ** 2 * (x1 - x0);
+      const den = (t1 - t0) * (x1 - x2) - (t1 - t2) * (x1 - x0);
+      const tv = den !== 0 ? t1 - (0.5 * num) / den : t1;
+      // La parábola evaluada en su vértice (forma de Lagrange)
+      const xv =
+        (x0 * (tv - t1) * (tv - t2)) / ((t0 - t1) * (t0 - t2)) +
+        (x1 * (tv - t0) * (tv - t2)) / ((t1 - t0) * (t1 - t2)) +
+        (x2 * (tv - t0) * (tv - t1)) / ((t2 - t0) * (t2 - t1));
+      out.push([tv, xv]);
     }
   }
   return out;
