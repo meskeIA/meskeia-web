@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, DisclaimerCard, ShareCard } from '@/components';
 import { formatNumber } from '@/lib/formatters';
 import styles from './ComparadorCosteVida.module.css';
+import { RESPUESTA_FAQ_COSTE_COSTO } from './metadata';
 
 interface DatosCosteVida {
   ciudad: string;
@@ -513,7 +514,7 @@ export default function ComparadorCosteVida() {
             </div>
             <div className={styles.faqItem}>
               <dt>¿Es lo mismo «coste de vida» que «costo de vida»?</dt>
-              <dd>Sí, son lo mismo. «Coste de vida» es la forma habitual en España y «costo de vida» la más usada en Latinoamérica; ambas miden cuánto cuesta cubrir gastos básicos (vivienda o arriendo, alimentación, transporte y servicios) en una ciudad. Este comparador funciona igual escribas coste o costo.</dd>
+              <dd>{RESPUESTA_FAQ_COSTE_COSTO}</dd>
             </div>
             <div className={styles.faqItem}>
               <dt>¿Qué diferencia hay entre coste de vida y poder adquisitivo?</dt>

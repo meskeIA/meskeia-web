@@ -55,6 +55,12 @@ export const jsonLd = {
   },
 };
 
+// La pregunta que está también en la FAQ visible de page.tsx: una sola respuesta para las dos
+// (check:faq-unica, cabo C0570). Decían lo mismo; se quedó la visible, sin el «más de 55 ciudades»
+// del JSON-LD: un recuento escrito a mano envejece en cuanto cambia la lista.
+export const RESPUESTA_FAQ_COSTE_COSTO =
+  'Sí, son lo mismo. «Coste de vida» es la forma habitual en España y «costo de vida» la más usada en Latinoamérica; ambas miden cuánto cuesta cubrir gastos básicos (vivienda o arriendo, alimentación, transporte y servicios) en una ciudad. Este comparador funciona igual escribas coste o costo.';
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -104,7 +110,7 @@ export const faqJsonLd = {
       name: '¿Es lo mismo «coste de vida» que «costo de vida»?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Sí, son exactamente lo mismo. «Coste de vida» es la forma habitual en España y «costo de vida» la más usada en Latinoamérica; ambas designan cuánto cuesta cubrir gastos básicos (vivienda o arriendo, alimentación, transporte y servicios) en una ciudad. Este comparador funciona igual escribas coste o costo, y permite comparar más de 55 ciudades de Europa y América.',
+        text: RESPUESTA_FAQ_COSTE_COSTO,
       },
     },
   ],

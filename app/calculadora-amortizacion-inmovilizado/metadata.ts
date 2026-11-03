@@ -52,6 +52,11 @@ export const jsonLd = generateWebAppSchema({
   ],
 });
 
+// La pregunta que está también en la FAQ visible de page.tsx: una sola respuesta para las dos
+// (check:faq-unica, cabo C0570). Decían lo mismo; se quedó la del JSON-LD.
+export const RESPUESTA_FAQ_QUE_ES =
+  'Es el reparto del coste de un activo duradero (maquinaria, vehículos, equipos, edificios) a lo largo de los años en que se usa, en lugar de imputarlo todo en el año de compra. Refleja contablemente que el activo pierde valor con el tiempo y permite deducir ese gasto de forma escalonada. La base que se amortiza es el valor de adquisición menos el valor residual estimado al final de su vida útil.';
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -61,7 +66,7 @@ export const faqJsonLd = {
       name: '¿Qué es la amortización del inmovilizado?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Es el reparto del coste de un activo duradero (maquinaria, vehículos, equipos, edificios) a lo largo de los años en que se usa, en lugar de imputarlo todo en el año de compra. Refleja contablemente que el activo pierde valor con el tiempo y permite deducir ese gasto de forma escalonada. La base que se amortiza es el valor de adquisición menos el valor residual estimado al final de su vida útil.',
+        text: RESPUESTA_FAQ_QUE_ES,
       },
     },
     {

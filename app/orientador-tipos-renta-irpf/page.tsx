@@ -25,6 +25,7 @@ import {
   gravamenPremio,
   type TramoIRPF,
 } from '@/data/fiscal';
+import { RESPUESTA_FAQ_WALLAPOP } from './metadata';
 
 // Escala de la base del ahorro (capital mobiliario + ganancias por transmisión)
 const TRAMOS_AHORRO_IRPF_2025 = TRAMOS_GANANCIAS_PATRIMONIALES_2025;
@@ -588,11 +589,7 @@ export default function OrientadorTiposRentaIrpfPage() {
             </div>
             <div className={styles.faqItem}>
               <dt>¿Tengo que declarar lo que vendo en Wallapop?</dt>
-              <dd>
-                Normalmente no. Vender objetos usados por debajo de su precio de compra genera una <strong>pérdida que no se computa</strong>. Solo si
-                vendes algo por <strong>más</strong> de lo que te costó (un objeto revalorizado) hay ganancia patrimonial. Vender de forma habitual con
-                ánimo de lucro, en cambio, sería actividad económica.
-              </dd>
+              <dd>{RESPUESTA_FAQ_WALLAPOP}</dd>
             </div>
             <div className={styles.faqItem}>
               <dt>¿El premio de la lotería tributa en el IRPF normal?</dt>

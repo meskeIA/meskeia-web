@@ -21,6 +21,7 @@ import {
   FISCAL_AMORTIZACION_META,
   type TipoActivoAmortizable,
 } from '@/data/fiscal';
+import { RESPUESTA_FAQ_QUE_ES } from './metadata';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -559,7 +560,7 @@ export default function CalculadoraAmortizacionInmovilizado() {
           <dl className={styles.faqList}>
             <div className={styles.faqItem}>
               <dt>¿Qué es la amortización del inmovilizado?</dt>
-              <dd>Es el reparto del coste de un activo duradero (maquinaria, vehículos, equipos, edificios) a lo largo de los años en que se usa, en lugar de imputarlo todo de golpe en el año de compra. Refleja contablemente que el activo pierde valor con el tiempo y permite deducir ese gasto de forma escalonada. La base que se amortiza es el valor de adquisición menos el valor residual estimado.</dd>
+              <dd>{RESPUESTA_FAQ_QUE_ES}</dd>
             </div>
             <div className={styles.faqItem}>
               <dt>¿Qué método de amortización me conviene?</dt>

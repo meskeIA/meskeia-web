@@ -14,6 +14,7 @@ import {
   cuantiaMaximaPEVS,
 } from '@/data/fiscal';
 import { estimarBVD, type EstimacionBVD, type GradoBVD, type TipoApoyo } from './motor';
+import { RESPUESTA_FAQ_SOLICITUD } from './metadata';
 
 // ─── Datos ────────────────────────────────────────────────────────────────────
 
@@ -500,7 +501,7 @@ export default function OrientadorGradoDependencia() {
         <h3>Preguntas frecuentes sobre la dependencia</h3>
         <div className={styles.faqItem}>
           <strong>¿Cómo se solicita la valoración de dependencia?</strong>
-          <p>Se solicita en los Servicios Sociales de la CCAA (presencialmente, por correo o online). Un trabajador social o enfermero de la administración realiza la valoración en el domicilio.</p>
+          <p>{RESPUESTA_FAQ_SOLICITUD}</p>
         </div>
         <div className={styles.faqItem}>
           <strong>¿Cuánto tiempo tarda el reconocimiento?</strong>

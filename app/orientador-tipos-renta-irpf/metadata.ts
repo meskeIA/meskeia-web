@@ -60,6 +60,12 @@ export const jsonLd = generateWebAppSchema({
 });
 
 // FAQPage JSON-LD — mejora visibilidad en Bing Copilot, ChatGPT, Perplexity y Gemini
+// La pregunta que está también en la FAQ visible de page.tsx: una sola respuesta para las dos
+// (check:faq-unica, cabo C0570). Se juntaron: la base del ahorro del JSON-LD y la actividad
+// económica, que solo decía la visible. Ningún dato cambia.
+export const RESPUESTA_FAQ_WALLAPOP =
+  'Normalmente no. Vender objetos usados de segunda mano por debajo de su precio de compra genera una pérdida patrimonial que no se computa. Solo si vendes algo por más de lo que te costó (por ejemplo, un objeto de colección revalorizado) se genera una ganancia patrimonial, que tributa en la base del ahorro. Vender de forma habitual con ánimo de lucro, en cambio, sería actividad económica.';
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -101,7 +107,7 @@ export const faqJsonLd = {
       name: '¿Tengo que declarar lo que vendo en Wallapop?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Vender objetos usados de segunda mano por debajo de su precio de compra genera una pérdida patrimonial que no se computa, así que normalmente no hay que declararlo. Solo si vendes algo por más de lo que te costó (por ejemplo, un objeto de colección revalorizado) se genera una ganancia patrimonial que tributa en la base del ahorro.',
+        text: RESPUESTA_FAQ_WALLAPOP,
       },
     },
   ],
