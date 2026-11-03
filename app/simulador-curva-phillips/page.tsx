@@ -379,11 +379,12 @@ export default function SimuladorCurvaPhillipsPage() {
       {/* CONTROLES */}
       <div className={styles.slidersGrid}>
         <div className={styles.sliderGroup}>
-          <label className={styles.sliderLabel}>
+          <label htmlFor="tasa-desempleo" className={styles.sliderLabel}>
             Tasa de desempleo u
             <span className={styles.sliderValue}>{fmt(u, 1)} %</span>
           </label>
           <input
+            id="tasa-desempleo"
             type="range"
             min={0}
             max={20}
@@ -397,11 +398,12 @@ export default function SimuladorCurvaPhillipsPage() {
         </div>
 
         <div className={styles.sliderGroup}>
-          <label className={styles.sliderLabel}>
+          <label htmlFor="inflacion-esperada" className={styles.sliderLabel}>
             Inflación esperada π<sub>e</sub>
             <span className={styles.sliderValue}>{fmt(piE, 1)} %</span>
           </label>
           <input
+            id="inflacion-esperada"
             type="range"
             min={0}
             max={15}
@@ -415,13 +417,14 @@ export default function SimuladorCurvaPhillipsPage() {
         </div>
 
         <div className={styles.sliderGroup}>
-          <label className={styles.sliderLabel}>
+          <label htmlFor="shock-oferta" className={styles.sliderLabel}>
             Shock de oferta ε
             <span className={styles.sliderValue} style={{ color: shock > 0 ? '#C0392B' : shock < 0 ? '#27AE60' : undefined }}>
               <span>{shock >= 0 ? '+' : ''}</span>{fmt(shock, 1)} pp
             </span>
           </label>
           <input
+            id="shock-oferta"
             type="range"
             min={-5}
             max={5}

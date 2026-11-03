@@ -192,9 +192,10 @@ export default function CalculadoraTIRVANPage() {
           <h2 className={styles.sectionTitle}><span aria-hidden="true">💰</span> Datos del Proyecto</h2>
 
           <div className={styles.inputGroup}>
-            <label className={styles.label}>Inversión inicial</label>
+            <label htmlFor="inversion-inicial" className={styles.label}>Inversión inicial</label>
             <div className={styles.inputWrapper}>
               <input
+                id="inversion-inicial"
                 type="text"
                 className={styles.input}
                 value={inversionInicial}
@@ -207,9 +208,10 @@ export default function CalculadoraTIRVANPage() {
           </div>
 
           <div className={styles.inputGroup}>
-            <label className={styles.label}>Tasa de descuento (coste de oportunidad)</label>
+            <label htmlFor="tasa-descuento" className={styles.label}>Tasa de descuento (coste de oportunidad)</label>
             <div className={styles.inputWrapper}>
               <input
+                id="tasa-descuento"
                 type="text"
                 className={styles.input}
                 value={tasaDescuento}

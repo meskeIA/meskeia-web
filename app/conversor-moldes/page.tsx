@@ -1,7 +1,7 @@
 'use client';
 // @disclaimer: exempt
 
-import { useMemo, useState } from 'react';
+import { useId, useMemo, useState } from 'react';
 import styles from './ConversorMoldes.module.css';
 import {
   MeskeiaLogo,
@@ -29,12 +29,14 @@ function MoldeControl({
   molde: Molde;
   onChange: (m: Molde) => void;
 }) {
+  const baseId = useId();
   return (
     <div className={styles.moldeCard}>
       <h3 className={styles.moldeTitulo}>{titulo}</h3>
       <div className={styles.campo}>
-        <label className={styles.label}>Forma</label>
+        <label htmlFor={`${baseId}-forma`} className={styles.label}>Forma</label>
         <select
+          id={`${baseId}-forma`}
           className={styles.select}
           value={molde.forma}
           onChange={(e) => onChange({ ...molde, forma: e.target.value as FormaMolde })}
@@ -46,10 +48,11 @@ function MoldeControl({
       </div>
       <div className={styles.dimsFila}>
         <div className={styles.campo}>
-          <label className={styles.label}>
+          <label htmlFor={`${baseId}-dim1`} className={styles.label}>
             {molde.forma === 'redondo' ? 'Diámetro (cm)' : molde.forma === 'cuadrado' ? 'Lado (cm)' : 'Largo (cm)'}
           </label>
           <input
+            id={`${baseId}-dim1`}
             type="text"
             inputMode="decimal"
             className={styles.input}
@@ -59,8 +62,9 @@ function MoldeControl({
         </div>
         {molde.forma === 'rectangular' && (
           <div className={styles.campo}>
-            <label className={styles.label}>Ancho (cm)</label>
+            <label htmlFor={`${baseId}-dim2`} className={styles.label}>Ancho (cm)</label>
             <input
+              id={`${baseId}-dim2`}
               type="text"
               inputMode="decimal"
               className={styles.input}

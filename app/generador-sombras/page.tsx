@@ -221,8 +221,9 @@ export default function GeneradorSombrasPage() {
           {shadowType === 'box' && (
             <div className={styles.boxOptions}>
               <div className={styles.optionRow}>
-                <label>Color de fondo</label>
+                <label htmlFor="color-fondo">Color de fondo</label>
                 <input
+                  id="color-fondo"
                   type="color"
                   value={boxColor}
                   onChange={(e) => setBoxColor(e.target.value)}
@@ -230,8 +231,9 @@ export default function GeneradorSombrasPage() {
                 />
               </div>
               <div className={styles.optionRow}>
-                <label>Border radius: {boxRadius}px</label>
+                <label htmlFor="border-radius">Border radius: {boxRadius}px</label>
                 <input
+                  id="border-radius"
                   type="range"
                   min="0"
                   max="50"
@@ -283,8 +285,8 @@ export default function GeneradorSombrasPage() {
 
           {/* Tipo de sombra */}
           <div className={styles.controlGroup}>
-            <label className={styles.label}>Tipo de Sombra</label>
-            <div className={styles.typeTabs}>
+            <label id="tipo-sombra-label" className={styles.label}>Tipo de Sombra</label>
+            <div role="group" aria-labelledby="tipo-sombra-label" className={styles.typeTabs}>
               <button
                 type="button"
                 className={`${styles.typeBtn} ${shadowType === 'box' ? styles.typeActive : ''}`}
@@ -348,8 +350,9 @@ export default function GeneradorSombrasPage() {
             <div className={styles.layerControls}>
               {/* Offset X */}
               <div className={styles.sliderGroup}>
-                <label>Offset X: {currentLayer.offsetX}px</label>
+                <label htmlFor="offset-x">Offset X: {currentLayer.offsetX}px</label>
                 <input
+                  id="offset-x"
                   type="range"
                   min="-50"
                   max="50"
@@ -361,8 +364,9 @@ export default function GeneradorSombrasPage() {
 
               {/* Offset Y */}
               <div className={styles.sliderGroup}>
-                <label>Offset Y: {currentLayer.offsetY}px</label>
+                <label htmlFor="offset-y">Offset Y: {currentLayer.offsetY}px</label>
                 <input
+                  id="offset-y"
                   type="range"
                   min="-50"
                   max="50"
@@ -374,8 +378,9 @@ export default function GeneradorSombrasPage() {
 
               {/* Blur */}
               <div className={styles.sliderGroup}>
-                <label>Blur: {currentLayer.blur}px</label>
+                <label htmlFor="blur">Blur: {currentLayer.blur}px</label>
                 <input
+                  id="blur"
                   type="range"
                   min="0"
                   max="100"
@@ -388,8 +393,9 @@ export default function GeneradorSombrasPage() {
               {/* Spread (solo box-shadow) */}
               {shadowType === 'box' && (
                 <div className={styles.sliderGroup}>
-                  <label>Spread: {currentLayer.spread}px</label>
+                  <label htmlFor="spread">Spread: {currentLayer.spread}px</label>
                   <input
+                    id="spread"
                     type="range"
                     min="-50"
                     max="50"
@@ -403,8 +409,9 @@ export default function GeneradorSombrasPage() {
               {/* Color y Opacidad */}
               <div className={styles.colorRow}>
                 <div className={styles.colorGroup}>
-                  <label>Color</label>
+                  <label htmlFor="color-capa">Color</label>
                   <input
+                    id="color-capa"
                     type="color"
                     value={currentLayer.color}
                     onChange={(e) => updateLayer(currentLayer.id, 'color', e.target.value)}
@@ -412,8 +419,9 @@ export default function GeneradorSombrasPage() {
                   />
                 </div>
                 <div className={styles.opacityGroup}>
-                  <label>Opacidad: {Math.round(currentLayer.opacity * 100)}%</label>
+                  <label htmlFor="opacidad">Opacidad: {Math.round(currentLayer.opacity * 100)}%</label>
                   <input
+                    id="opacidad"
                     type="range"
                     min="0"
                     max="1"

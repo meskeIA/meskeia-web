@@ -179,13 +179,14 @@ export default function CifradoVigenerePage() {
 
         {/* Input de clave */}
         <div className={styles.inputGroup}>
-          <label className={styles.label}>
+          <label htmlFor="palabra-clave" className={styles.label}>
             <span aria-hidden="true">🔑</span> Palabra clave
             {claveNormalizada && (
               <span className={styles.clavePreview}> → {claveNormalizada}</span>
             )}
           </label>
           <input
+            id="palabra-clave"
             type="text"
             value={clave}
             onChange={(e) => setClave(e.target.value)}
@@ -227,10 +228,11 @@ export default function CifradoVigenerePage() {
 
         {/* Input de texto */}
         <div className={styles.inputGroup}>
-          <label className={styles.label}>
+          <label htmlFor="mensaje" className={styles.label}>
             {modo === 'cifrar' ? <><span aria-hidden="true">📝</span> Mensaje a cifrar</> : <><span aria-hidden="true">📝</span> Mensaje a descifrar</>}
           </label>
           <textarea
+            id="mensaje"
             value={texto}
             onChange={(e) => setTexto(e.target.value)}
             placeholder={modo === 'cifrar'

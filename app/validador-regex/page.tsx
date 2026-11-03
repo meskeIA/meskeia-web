@@ -183,8 +183,9 @@ export default function ValidadorRegexPage() {
           </div>
 
           <div className={styles.formGroup}>
-            <label className={styles.label}>Texto de prueba</label>
+            <label htmlFor="texto-prueba" className={styles.label}>Texto de prueba</label>
             <textarea
+              id="texto-prueba"
               className={styles.textarea}
               value={testText}
               onChange={(e) => setTestText(e.target.value)}

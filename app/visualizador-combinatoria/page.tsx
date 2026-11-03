@@ -1,7 +1,7 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useId } from 'react';
 import styles from './Combinatoria.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard, CampoNumerico } from '@/components';
 
@@ -197,6 +197,7 @@ export default function VisualizadorCombinatoriaPage() {
   const [newtonA, setNewtonA] = useState(1);
   const [newtonB, setNewtonB] = useState(1);
   const [newtonN, setNewtonN] = useState(3);
+  const baseId = useId();
 
   // ======== CÁLCULOS ========
   const pnk = useMemo(() => permutations(nVal, kVal), [nVal, kVal]);
@@ -302,10 +303,11 @@ export default function VisualizadorCombinatoriaPage() {
         {activeTab === 'permcomb' && (
           <div className={styles.tabPanel} role="tabpanel">
             <div className={styles.sliderGroup}>
-              <label className={styles.sliderLabel}>
+              <label htmlFor="n-total" className={styles.sliderLabel}>
                 n (total de elementos): <strong>{nVal}</strong>
               </label>
               <input
+                id="n-total"
                 type="range"
                 min={1}
                 max={10}
@@ -314,10 +316,11 @@ export default function VisualizadorCombinatoriaPage() {
                 className={styles.slider}
                 aria-label="Número total de elementos n"
               />
-              <label className={styles.sliderLabel}>
+              <label htmlFor="k-elegir" className={styles.sliderLabel}>
                 k (elementos a elegir): <strong>{kVal}</strong>
               </label>
               <input
+                id="k-elegir"
                 type="range"
                 min={0}
                 max={nVal}
@@ -421,10 +424,11 @@ export default function VisualizadorCombinatoriaPage() {
         {activeTab === 'pascal' && (
           <div className={styles.tabPanel} role="tabpanel">
             <div className={styles.sliderGroup}>
-              <label className={styles.sliderLabel}>
+              <label htmlFor="filas-triangulo" className={styles.sliderLabel}>
                 Filas del triángulo: <strong>{pascalRows + 1}</strong> (filas 0–{pascalRows})
               </label>
               <input
+                id="filas-triangulo"
                 type="range"
                 min={3}
                 max={12}
@@ -551,10 +555,11 @@ export default function VisualizadorCombinatoriaPage() {
               <div className={styles.multiplySteps}>
                 {multiplySteps.map((step, idx) => (
                   <div key={idx} className={styles.multiplyStep}>
-                    <label className={styles.stepLabel}>{step.label}</label>
+                    <label htmlFor={`${baseId}-${idx}`} className={styles.stepLabel}>{step.label}</label>
                     {/* Con `type="number"` y Number(v), vaciar el campo escribía «1» bajo el
                         cursor y teclear «5» daba «15» (cabo C0081) */}
                     <CampoNumerico
+                      id={`${baseId}-${idx}`}
                       min={1}
                       max={20}
                       decimales={0}
@@ -605,10 +610,11 @@ export default function VisualizadorCombinatoriaPage() {
 
               <div className={styles.newtonControls}>
                 <div className={styles.newtonSlider}>
-                  <label className={styles.sliderLabel}>
+                  <label htmlFor="newton-a" className={styles.sliderLabel}>
                     a = <strong>{newtonA}</strong>
                   </label>
                   <input
+                    id="newton-a"
                     type="range"
                     min={-3}
                     max={3}
@@ -619,10 +625,11 @@ export default function VisualizadorCombinatoriaPage() {
                   />
                 </div>
                 <div className={styles.newtonSlider}>
-                  <label className={styles.sliderLabel}>
+                  <label htmlFor="newton-b" className={styles.sliderLabel}>
                     b = <strong>{newtonB}</strong>
                   </label>
                   <input
+                    id="newton-b"
                     type="range"
                     min={-3}
                     max={3}
@@ -633,10 +640,11 @@ export default function VisualizadorCombinatoriaPage() {
                   />
                 </div>
                 <div className={styles.newtonSlider}>
-                  <label className={styles.sliderLabel}>
+                  <label htmlFor="newton-n" className={styles.sliderLabel}>
                     n = <strong>{newtonN}</strong>
                   </label>
                   <input
+                    id="newton-n"
                     type="range"
                     min={2}
                     max={6}

@@ -365,8 +365,8 @@ function TaylorTab() {
     <div className={styles.tabContent}>
       <div className={styles.controles}>
         <div className={styles.controlGroup}>
-          <label className={styles.label}>Función:</label>
-          <div className={styles.chipGroup}>
+          <label id="funcion-label" className={styles.label}>Función:</label>
+          <div role="group" aria-labelledby="funcion-label" className={styles.chipGroup}>
             {(Object.keys(FUNCIONES) as FuncionKey[]).map((k) => (
               <button
                 key={k}
@@ -382,10 +382,11 @@ function TaylorTab() {
         </div>
         <div className={styles.controlRow}>
           <div className={styles.controlGroup}>
-            <label className={styles.label}>
+            <label htmlFor="taylor-n-terminos" className={styles.label}>
               Número de términos N = <strong>{nTerminos}</strong>
             </label>
             <input
+              id="taylor-n-terminos"
               type="range"
               min={1}
               max={15}
@@ -395,10 +396,11 @@ function TaylorTab() {
             />
           </div>
           <div className={styles.controlGroup}>
-            <label className={styles.label}>
+            <label htmlFor="punto-expansion-x0" className={styles.label}>
               Punto de expansión x₀ = <strong>{x0.toFixed(1)}</strong>
             </label>
             <input
+              id="punto-expansion-x0"
               type="range"
               min={-2}
               max={2}
@@ -528,8 +530,8 @@ function CriteriosTab() {
     <div className={styles.tabContent}>
       <div className={styles.controles}>
         <div className={styles.controlGroup}>
-          <label className={styles.label}>Serie:</label>
-          <div className={styles.chipGroup}>
+          <label id="serie-label" className={styles.label}>Serie:</label>
+          <div role="group" aria-labelledby="serie-label" className={styles.chipGroup}>
             {(Object.keys(SERIES) as SerieKey[]).map((k) => (
               <button
                 key={k}
@@ -545,10 +547,11 @@ function CriteriosTab() {
         </div>
         {serie === 'geometrica' && (
           <div className={styles.controlGroup}>
-            <label className={styles.label}>
+            <label htmlFor="razon-r" className={styles.label}>
               Razón r = <strong>{rGeom.toFixed(2)}</strong>
             </label>
             <input
+              id="razon-r"
               type="range"
               min={-0.99}
               max={0.99}
@@ -671,10 +674,11 @@ function PiTab() {
     <div className={styles.tabContent}>
       <div className={styles.controles}>
         <div className={styles.controlGroup}>
-          <label className={styles.label}>
+          <label htmlFor="pi-n-terminos" className={styles.label}>
             Número de términos N = <strong>{nTerminos}</strong>
           </label>
           <input
+            id="pi-n-terminos"
             type="range"
             min={1}
             max={1000}

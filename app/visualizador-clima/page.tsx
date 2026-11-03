@@ -454,10 +454,11 @@ function SeccionCalentamiento({ nivelIdx, setNivelIdx }: { nivelIdx: number; set
       {/* Slider de temperatura */}
       <div className={styles.sliderZona}>
         <div className={styles.sliderHeader}>
-          <label className={styles.sliderLabel}>Nivel de calentamiento global</label>
+          <label htmlFor="nivel-calentamiento" className={styles.sliderLabel}>Nivel de calentamiento global</label>
           <span className={styles.sliderValor} style={{ color: nivel.color }}>+{nivel.grados}°C</span>
         </div>
         <input
+          id="nivel-calentamiento"
           type="range"
           className={styles.slider}
           min={0}

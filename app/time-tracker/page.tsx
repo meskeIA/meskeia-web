@@ -286,8 +286,8 @@ export default function TimeTrackerPage() {
             {/* Proyectos guardados */}
             {proyectos.length > 0 && !isTracking && (
               <div className={styles.proyectosGuardados}>
-                <label className={styles.label}>Proyectos recientes</label>
-                <div className={styles.proyectosTags}>
+                <label id="proyectos-recientes-label" className={styles.label}>Proyectos recientes</label>
+                <div role="group" aria-labelledby="proyectos-recientes-label" className={styles.proyectosTags}>
                   {proyectos.slice(0, 5).map(p => (
                     <button
                       key={p.nombre}
@@ -316,8 +316,9 @@ export default function TimeTrackerPage() {
               <>
                 <div className={styles.inputRow}>
                   <div className={styles.inputGroup}>
-                    <label className={styles.label}>Proyecto *</label>
+                    <label htmlFor="proyecto" className={styles.label}>Proyecto *</label>
                     <input
+                      id="proyecto"
                       type="text"
                       value={proyecto}
                       onChange={(e) => setProyecto(e.target.value)}
@@ -327,8 +328,9 @@ export default function TimeTrackerPage() {
                     />
                   </div>
                   <div className={styles.inputGroup}>
-                    <label className={styles.label}>Cliente</label>
+                    <label htmlFor="cliente" className={styles.label}>Cliente</label>
                     <input
+                      id="cliente"
                       type="text"
                       value={cliente}
                       onChange={(e) => setCliente(e.target.value)}
@@ -341,8 +343,9 @@ export default function TimeTrackerPage() {
 
                 <div className={styles.inputRow}>
                   <div className={styles.inputGroupFull}>
-                    <label className={styles.label}>Descripción (opcional)</label>
+                    <label htmlFor="descripcion" className={styles.label}>Descripción (opcional)</label>
                     <input
+                      id="descripcion"
                       type="text"
                       value={descripcion}
                       onChange={(e) => setDescripcion(e.target.value)}
@@ -351,8 +354,9 @@ export default function TimeTrackerPage() {
                     />
                   </div>
                   <div className={styles.inputGroupSmall}>
-                    <label className={styles.label}>€/hora</label>
+                    <label htmlFor="tarifa" className={styles.label}>€/hora</label>
                     <input
+                      id="tarifa"
                       type="number"
                       value={tarifa}
                       onChange={(e) => setTarifa(e.target.value)}

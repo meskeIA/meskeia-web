@@ -480,10 +480,10 @@ export default function VisualizadorFondoInversion() {
               </div>
 
               <div className={styles.sliderGroup}>
-                <label className={styles.sliderLabel}>
+                <label id="horizonte-temporal-label" className={styles.sliderLabel}>
                   Horizonte temporal: <strong>{sliderAnios} años</strong>
                 </label>
-                <div className={styles.aniosButtons} role="group" aria-label="Seleccionar horizonte temporal">
+                <div aria-labelledby="horizonte-temporal-label" className={styles.aniosButtons} role="group" aria-label="Seleccionar horizonte temporal">
                   {[10, 20, 30].map((a) => (
                     <button
                       key={a}

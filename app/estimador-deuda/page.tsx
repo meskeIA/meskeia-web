@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useId } from 'react';
 import styles from './EstimadorDeuda.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, EducationalSection, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
@@ -36,6 +36,7 @@ export default function CalculadoraDeudaPage() {
   ]);
   const [pagoExtraMensual, setPagoExtraMensual] = useState('200');
   const [mostrarResultados, setMostrarResultados] = useState(false);
+  const baseId = useId();
 
   const agregarDeuda = () => {
     setDeudas([
@@ -271,9 +272,10 @@ export default function CalculadoraDeudaPage() {
 
                   <div className={styles.deudaGrid}>
                     <div className={styles.formGroup}>
-                      <label>Saldo pendiente</label>
+                      <label htmlFor={`${baseId}-${index}-saldo`}>Saldo pendiente</label>
                       <div className={styles.inputWrapper}>
                         <input
+                          id={`${baseId}-${index}-saldo`}
                           type="text"
                           inputMode="decimal"
                           value={deuda.saldo}
@@ -285,9 +287,10 @@ export default function CalculadoraDeudaPage() {
                     </div>
 
                     <div className={styles.formGroup}>
-                      <label>Interés anual (TAE)</label>
+                      <label htmlFor={`${baseId}-${index}-interes`}>Interés anual (TAE)</label>
                       <div className={styles.inputWrapper}>
                         <input
+                          id={`${baseId}-${index}-interes`}
                           type="text"
                           inputMode="decimal"
                           value={deuda.tasaInteres}
@@ -299,9 +302,10 @@ export default function CalculadoraDeudaPage() {
                     </div>
 
                     <div className={styles.formGroup}>
-                      <label>Pago mínimo mensual</label>
+                      <label htmlFor={`${baseId}-${index}-pago-minimo`}>Pago mínimo mensual</label>
                       <div className={styles.inputWrapper}>
                         <input
+                          id={`${baseId}-${index}-pago-minimo`}
                           type="text"
                           inputMode="decimal"
                           value={deuda.pagoMinimo}

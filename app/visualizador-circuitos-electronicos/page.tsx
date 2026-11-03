@@ -456,11 +456,12 @@ export default function VisualizadorCircuitosElectronicos() {
 
               <div className={styles.slidersGrid}>
                 <div className={styles.sliderGroup}>
-                  <label className={styles.sliderLabel}>
+                  <label htmlFor="resistencia-r" className={styles.sliderLabel}>
                     Resistencia (R)
                     <span className={styles.sliderValor}>{formatR(rOhms)}</span>
                   </label>
                   <input
+                    id="resistencia-r"
                     type="range" min="0" max="100" step="1"
                     value={((Math.log10(rOhms) - Math.log10(100)) / (Math.log10(100000) - Math.log10(100)) * 100).toFixed(0)}
                     onChange={e => {
@@ -474,11 +475,12 @@ export default function VisualizadorCircuitosElectronicos() {
                   <span className={styles.sliderDesc}>100 Ω — 100 kΩ</span>
                 </div>
                 <div className={styles.sliderGroup}>
-                  <label className={styles.sliderLabel}>
+                  <label htmlFor="capacidad-c" className={styles.sliderLabel}>
                     Capacidad (C)
                     <span className={styles.sliderValor}>{formatC(cFarads)}</span>
                   </label>
                   <input
+                    id="capacidad-c"
                     type="range" min="0" max="100" step="1"
                     value={((Math.log10(cFarads) - Math.log10(1e-9)) / (Math.log10(1e-3) - Math.log10(1e-9)) * 100).toFixed(0)}
                     onChange={e => {
@@ -553,11 +555,12 @@ export default function VisualizadorCircuitosElectronicos() {
                 {modoTransistor === 'interruptor' && (
                   <div className={styles.modoContent}>
                     <div className={styles.sliderGroup}>
-                      <label className={styles.sliderLabel}>
+                      <label htmlFor="tension-vbe" className={styles.sliderLabel}>
                         Tensión base-emisor (V_BE)
                         <span className={styles.sliderValor}>{vBE.toFixed(2)} V</span>
                       </label>
                       <input
+                        id="tension-vbe"
                         type="range" min="0" max="100" step="1"
                         value={Math.round(vBE * 100)}
                         onChange={e => setVBE(Number(e.target.value) / 100)}
@@ -569,11 +572,12 @@ export default function VisualizadorCircuitosElectronicos() {
                     </div>
 
                     <div className={styles.sliderGroup}>
-                      <label className={styles.sliderLabel}>
+                      <label htmlFor="ganancia-beta" className={styles.sliderLabel}>
                         Ganancia de corriente (β / h_FE)
                         <span className={styles.sliderValor}>β = {beta}</span>
                       </label>
                       <input
+                        id="ganancia-beta"
                         type="range" min="50" max="300" step="10"
                         value={beta}
                         onChange={e => setBeta(Number(e.target.value))}
@@ -612,11 +616,12 @@ export default function VisualizadorCircuitosElectronicos() {
                 {modoTransistor === 'amplificador' && (
                   <div className={styles.modoContent}>
                     <div className={styles.sliderGroup}>
-                      <label className={styles.sliderLabel}>
+                      <label htmlFor="senal-entrada" className={styles.sliderLabel}>
                         Señal de entrada (V_in)
                         <span className={styles.sliderValor}>{senalEntradaMV} mV</span>
                       </label>
                       <input
+                        id="senal-entrada"
                         type="range" min="1" max="100" step="1"
                         value={senalEntradaMV}
                         onChange={e => setSenalEntradaMV(Number(e.target.value))}

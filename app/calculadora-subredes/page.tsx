@@ -191,8 +191,9 @@ export default function CalculadoraSubredesPage() {
 
           <div className={styles.inputRow}>
             <div className={styles.inputGroup}>
-              <label className={styles.label}>Dirección IP</label>
+              <label htmlFor="direccion-ip" className={styles.label}>Dirección IP</label>
               <input
+                id="direccion-ip"
                 type="text"
                 value={ipInput}
                 onChange={handleIpChange}
@@ -206,8 +207,9 @@ export default function CalculadoraSubredesPage() {
             </div>
 
             <div className={styles.inputGroup}>
-              <label className={styles.label}>Prefijo CIDR (/{cidr})</label>
+              <label htmlFor="prefijo-cidr" className={styles.label}>Prefijo CIDR (/{cidr})</label>
               <input
+                id="prefijo-cidr"
                 type="range"
                 min="0"
                 max="32"

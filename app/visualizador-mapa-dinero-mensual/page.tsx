@@ -116,10 +116,11 @@ export default function VisualizadorMapaDineroMensualPage() {
         {/* Slider sueldo */}
         <div className={styles.sliderZona}>
           <div className={styles.sliderHeader}>
-            <label className={styles.sliderLabel}>Tu sueldo neto mensual</label>
+            <label htmlFor="sueldo-neto" className={styles.sliderLabel}>Tu sueldo neto mensual</label>
             <span className={styles.sliderValor}>{formatCurrency(sueldoNeto)}</span>
           </div>
           <input
+            id="sueldo-neto"
             type="range"
             className={styles.slider}
             min={1000}

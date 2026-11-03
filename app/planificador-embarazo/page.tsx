@@ -444,8 +444,9 @@ export default function CalculadoraFechaPartoPage() {
             <h2 className={styles.panelTitle}><span aria-hidden="true">📅</span> Datos del embarazo</h2>
 
             <div className={styles.inputGroup}>
-              <label>Fecha de última regla (FUR)</label>
+              <label htmlFor="fecha-ultima-regla">Fecha de última regla (FUR)</label>
               <input
+                id="fecha-ultima-regla"
                 type="date"
                 value={fechaUltimaRegla}
                 onChange={(e) => setFechaUltimaRegla(e.target.value)}

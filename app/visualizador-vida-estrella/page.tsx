@@ -490,10 +490,11 @@ export default function VisualizadorVidaEstrellaPage() {
         {(seccionActiva === 'adulta' || seccionActiva === 'muerte') && (
           <div className={styles.sliderZona}>
             <div className={styles.sliderHeader}>
-              <label className={styles.sliderLabel}>Masa de la estrella</label>
+              <label htmlFor="masa-estrella" className={styles.sliderLabel}>Masa de la estrella</label>
               <span className={styles.sliderValor}>{formatNumber(masaSolar, 1)}x Sol</span>
             </div>
             <input
+              id="masa-estrella"
               type="range"
               className={styles.slider}
               min={5}
