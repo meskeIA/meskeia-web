@@ -1,0 +1,394 @@
+/*
+ * Práctica de verbos regulares (S0246). Usa los tokens que declara `.container` de
+ * QuizVerbosIrregulares.module.css (--bg-card, --border, --radius…), que ya tienen variante oscura.
+ * Las clases llevan el prefijo «reg» para no coincidir con los selectores por fragmento de clase de
+ * los tests del quiz de irregulares ([class*="resultado…"], [class*="opcionesGrid"]…).
+ */
+
+.regSeccion {
+  margin-bottom: var(--spacing-xl);
+  scroll-margin-top: 90px;
+}
+
+.regTitulo {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.4rem;
+}
+
+.regTitulo:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.regIntro {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  margin: 0 0 var(--spacing-md);
+}
+
+.regCaja {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+}
+
+.regCaja:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.regSubtitulo {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.6rem;
+}
+
+.regFila {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-bottom: var(--spacing-lg);
+}
+
+.regEleccion,
+.regTanda {
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  color: var(--text-secondary);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.2s, background 0.2s;
+  max-width: 100%;
+}
+
+.regEleccion {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.8rem 1rem;
+  flex: 1 1 200px;
+}
+
+.regTanda {
+  padding: 0.6rem 1rem;
+  font-weight: 600;
+}
+
+.regEleccion:hover,
+.regTanda:hover {
+  border-color: var(--primary);
+  color: var(--primary-texto);
+}
+
+.regEleccion.regElegido,
+.regTanda.regElegido {
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
+  color: white;
+}
+
+.regEleccionNombre {
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.regEleccionDesc {
+  font-size: 0.8rem;
+}
+
+.regBtnPrincipal,
+.regBtnSecundario {
+  display: block;
+  width: 100%;
+  padding: 0.9rem 1rem;
+  border-radius: var(--radius);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.regBtnPrincipal {
+  background: var(--primary-boton);
+  color: white;
+  border: none;
+}
+
+.regBtnPrincipal:hover {
+  background: #1E5A73;
+}
+
+.regBtnSecundario {
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border: 2px solid var(--border);
+}
+
+.regBtnSecundario:hover {
+  border-color: var(--primary);
+}
+
+.regFila .regBtnPrincipal,
+.regFila .regBtnSecundario {
+  flex: 1 1 200px;
+  width: auto;
+}
+
+.regEleccion:focus-visible,
+.regTanda:focus-visible,
+.regBtnPrincipal:focus-visible,
+.regBtnSecundario:focus-visible,
+.regTerminacion:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.regReglas {
+  margin-top: var(--spacing-lg);
+  padding-top: var(--spacing-md);
+  border-top: 1px solid var(--border);
+}
+
+.regReglasTitulo {
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.4rem;
+}
+
+.regReglasLista {
+  margin: 0;
+  padding-left: 1.2rem;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.regReglasLista li + li {
+  margin-top: 0.4rem;
+}
+
+/* Pregunta */
+.regMarcador {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin: 0 0 var(--spacing-md);
+}
+
+.regEnunciado {
+  text-align: center;
+  margin-bottom: var(--spacing-lg);
+  scroll-margin-top: 90px;
+}
+
+.regEnunciado:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 4px;
+  border-radius: var(--radius);
+}
+
+.regPregunta {
+  color: var(--text-secondary);
+  margin: 0 0 0.4rem;
+}
+
+.regVerbo {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.regSignificado {
+  color: var(--text-secondary);
+  font-style: italic;
+  margin: 0.3rem 0 0;
+}
+
+.regForm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-bottom: var(--spacing-md);
+}
+
+.regEtiqueta {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.regInput {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.8rem 1rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 1.1rem;
+  font-weight: 600;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+.regInput:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.regInputBien {
+  border-color: #48BB78;
+}
+
+.regInputMal {
+  border-color: #FC8181;
+}
+
+.regTerminaciones {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+  margin-bottom: var(--spacing-md);
+}
+
+.regTerminacion {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 1rem 0.5rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 1.3rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.regTerminacion:hover:not(:disabled) {
+  border-color: var(--primary);
+  color: var(--primary-texto);
+}
+
+.regTerminacion:disabled {
+  cursor: default;
+}
+
+.regTerminacionBuena {
+  border-color: #48BB78;
+  background: #F0FFF4;
+  color: var(--verde-texto, #276749);
+}
+
+.regTerminacionMala {
+  border-color: #FC8181;
+  background: #FFF5F5;
+  color: var(--rojo-texto, #C53030);
+}
+
+.regTerminacionApagada {
+  opacity: 0.45;
+}
+
+.regMarca {
+  font-size: 1.05rem;
+}
+
+/* Veredicto */
+.regVeredicto {
+  border-radius: var(--radius);
+  padding: var(--spacing-md) var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
+  text-align: center;
+}
+
+.regVeredictoBien {
+  background: #F0FFF4;
+  border: 1px solid #48BB78;
+  color: var(--verde-texto, #276749);
+}
+
+.regVeredictoMal {
+  background: #FFF5F5;
+  border: 1px solid #FC8181;
+  color: var(--rojo-texto, #C53030);
+}
+
+.regVeredictoTitulo {
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin: 0 0 0.4rem;
+}
+
+.regVeredictoForma {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin: 0 0 0.4rem;
+  overflow-wrap: anywhere;
+}
+
+.regVeredictoRegla {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.regNowrap {
+  white-space: nowrap;
+}
+
+/* Nota */
+.regNotaCifra {
+  font-size: 2rem;
+  font-weight: 700;
+  text-align: center;
+  color: var(--text-primary);
+  margin: 0 0 0.4rem;
+}
+
+.regNotaTexto {
+  text-align: center;
+  color: var(--text-secondary);
+  margin: 0 0 var(--spacing-md);
+}
+
+/* Modo oscuro: los tintes claros del veredicto pasan a transparencias, como en el quiz */
+[data-theme='dark'] .regVeredictoBien,
+[data-theme='dark'] .regTerminacionBuena {
+  background: rgba(39, 103, 73, 0.2);
+  color: #68D391;
+}
+
+[data-theme='dark'] .regVeredictoMal,
+[data-theme='dark'] .regTerminacionMala {
+  background: rgba(197, 48, 48, 0.2);
+  color: #FEB2B2;
+}
+
+@media (max-width: 600px) {
+  .regCaja {
+    padding: var(--spacing-lg);
+  }
+
+  .regVerbo {
+    font-size: 1.8rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .regEleccion,
+  .regTanda,
+  .regBtnPrincipal,
+  .regBtnSecundario {
+    transition: none;
+  }
+}

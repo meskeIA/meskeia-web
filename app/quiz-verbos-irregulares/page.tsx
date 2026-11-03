@@ -7,6 +7,7 @@ import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard } from '@/components';
 import EducationalSection from '@/components/EducationalSection';
+import PracticaRegulares from './PracticaRegulares';
 import { formatPercentage, enfocarSinCentrar, traerALaVista } from '@/lib';
 import { useGuardaRafaga } from '@/lib/useGuardaRafaga';
 import { verbosIrregulares, VerboIrregular } from '@/data/verbos-irregulares';
@@ -384,7 +385,7 @@ export default function QuizVerbosIrregularesPage() {
       <header className={styles.hero}>
         <h1 className={styles.title}>Quiz Verbos Irregulares <span aria-hidden="true">📝</span></h1>
         <p className={styles.subtitle}>
-          Practica el Past Simple y el Past Participle: elige la respuesta o escríbelas como en un examen · Niveles A1 a B2
+          Practica el Past Simple y el Past Participle: elige la respuesta o escríbelas como en un examen · Niveles A1 a B2 · Y los regulares: el pasado en -ed y cómo suena
         </p>
       </header>
 
@@ -452,6 +453,12 @@ export default function QuizVerbosIrregularesPage() {
               con más verbos o el nivel Completo.
             </p>
           )}
+
+          {/* S0246: llegan búsquedas de «examen de verbos en inglés» sin «irregulares», y la
+              práctica de los regulares va debajo del quiz; este enlace la hace visible. */}
+          <p className={styles.enlaceRegulares}>
+            ¿Te preguntan también los regulares? <a href="#verbos-regulares">Practica el pasado en -ed y su pronunciación</a>
+          </p>
 
           <button type="button" className={styles.btnIniciar} onClick={iniciarQuiz}>
             Empezar Quiz — {Math.min(numPreguntas, verbosDelNivel)} preguntas · Nivel {nivel === 'todos' ? 'Completo' : nivel}
@@ -730,6 +737,9 @@ export default function QuizVerbosIrregularesPage() {
           </div>
         </div>
       )}
+
+      {/* ── VERBOS REGULARES (S0246) ── */}
+      <PracticaRegulares />
 
       {/* ── SECCIÓN EDUCATIVA ── */}
       <EducationalSection

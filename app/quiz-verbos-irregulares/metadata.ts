@@ -10,7 +10,7 @@ const N = verbosIrregulares.filter((v) => !v.pastSimpleRegular).length;
 
 export const metadata: Metadata = {
   title: 'Quiz Verbos Irregulares en Inglés - Past Simple A1 a B2 | meskeIA',
-  description: `Quiz y examen de verbos irregulares en inglés: ${N} verbos de A1 a B2. Elige el Past Simple o escribe las dos formas como en un examen, y repasa los que fallas. Sin registro.`,
+  description: `Quiz y examen de verbos irregulares en inglés: ${N} verbos de A1 a B2. Elige el Past Simple o escribe las dos formas como en un examen, y repasa los que fallas. Incluye los regulares: el pasado en -ed y cómo suena. Sin registro.`,
   keywords: 'verbos irregulares ingles, quiz ingles, past simple ejercicios, past participle, aprender ingles, quiz verbos irregulares, inglés nivel A1 A2 B1 B2, ejercicios verbos irregulares',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
@@ -43,7 +43,7 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: "Quiz Verbos Irregulares Inglés",
-  description: `Quiz y examen de verbos irregulares en inglés: ${N} verbos clasificados por nivel MCER (A1-B2). Elige el Past Simple entre cuatro opciones o escribe el Past Simple y el Past Participle, con corrección casilla a casilla y una lista de repaso de los verbos fallados. Sin registro.`,
+  description: `Quiz y examen de verbos irregulares en inglés: ${N} verbos clasificados por nivel MCER (A1-B2). Elige el Past Simple entre cuatro opciones o escribe el Past Simple y el Past Participle, con corrección casilla a casilla y una lista de repaso de los verbos fallados. Incluye una práctica de verbos regulares: escribir el pasado en -ed y decir si la -ed suena /t/, /d/ o /ɪd/. Sin registro.`,
   url: "https://meskeia.com/quiz-verbos-irregulares/",
   category: 'EducationalApplication',
   features: [
@@ -53,6 +53,7 @@ export const jsonLd = generateWebAppSchema({
     'Admite las dos formas válidas cuando las hay (got/gotten, was/were)',
     'Lista de repaso de los verbos fallados, guardada en el navegador',
     'Conjugación completa tras cada respuesta',
+    'Verbos regulares: ortografía del pasado en -ed (studied, stopped, travelled) y pronunciación /t/, /d/ o /ɪd/, corregidas con su regla',
   ],
 });
 
