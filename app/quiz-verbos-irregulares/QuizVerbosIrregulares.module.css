@@ -254,6 +254,13 @@
   transition: width 0.4s ease;
 }
 
+/* La pantalla del quiz. NO es una tarjeta: la tarjeta es .preguntaCard, que va dentro. Su regla
+   solo llevaba el scroll-margin-top de la barra del logo, que cd462414 pasó al scroll-padding
+   global; al quedarse vacía desapareció del módulo y el div salía sin class (hallazgo 3619). */
+.quizPanel {
+  display: block;
+}
+
 /* Reciben el foco por programa (tabIndex=-1): no son controles, no se les pinta el anillo de
    foco (hallazgo 1834). */
 .preguntaCard:focus,

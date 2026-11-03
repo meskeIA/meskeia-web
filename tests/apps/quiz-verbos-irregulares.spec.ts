@@ -2100,14 +2100,16 @@ test.describe('Inspector 28/10/2026', () => {
   });
 
   /**
+   * HALLAZGO 3619 — REPARADO el 03/11/2026 (cabo C0603), con otro esperado: `.quizPanel` nunca fue
+   * una tarjeta (su regla solo llevaba el scroll-margin que cd462414 retiró; la tarjeta es
+   * .preguntaCard, que va dentro), así que se declara sin estilo visual en vez de anidar dos.
    * HALLAZGO bajo (Inspector 28/10/2026) · operativa — page.tsx pide `styles.quizPanel` y el
    * módulo no declara `.quizPanel`: el panel del quiz sale sin atributo class, sin la tarjeta
    * (fondo, borde de 1 px, 32 px de relleno y de margen inferior) que sí tienen la configuración y
    * el resultado. Es el pasivo de `check:clases-css`, que se drena app por app (cabo C0386).
    */
   test('hallazgo · toda clase que page.tsx pide al módulo CSS está declarada en él', () => {
-    // ABIERTO (Inspector 28/10/2026): mide las clases sin declarar (hoy, quizPanel).
-    test.fail();
+    // Mide las clases sin declarar (era quizPanel).
     const carpeta = join(process.cwd(), 'app', 'quiz-verbos-irregulares');
     const fuente = readFileSync(join(carpeta, 'page.tsx'), 'utf8');
     const css = readFileSync(join(carpeta, 'QuizVerbosIrregulares.module.css'), 'utf8');

@@ -270,12 +270,12 @@ export default function CalculadoraSuenoPage() {
 
       <DisclaimerCard variant="medical" severity="high" collapsible={false} context="calculadora-sueno">
         <p>Esta calculadora usa ciclos promedio de 90 minutos. <strong>Limitaciones importantes:</strong></p>
-        <ul className={styles.disclaimerList}>
+        <ul>
           <li><strong>Los ciclos varían individualmente</strong>: Pueden durar 80-110 minutos según edad, genética y estado de salud</li>
           <li><strong>No detecta trastornos del sueño</strong>: Insomnio, apnea, síndrome piernas inquietas o narcolepsia requieren estudio médico</li>
           <li><strong>Calidad vs cantidad</strong>: Dormir 8 horas con despertares frecuentes es peor que 6 horas continuas</li>
         </ul>
-        <p className={styles.highlight}><strong><span aria-hidden="true">⚕️</span> Si tienes insomnio crónico, somnolencia diurna excesiva o ronquidos intensos, consulta con un médico especialista en sueño.</strong></p>
+        <p><strong><span aria-hidden="true">⚕️</span> Si tienes insomnio crónico, somnolencia diurna excesiva o ronquidos intensos, consulta con un médico especialista en sueño.</strong></p>
         <p>meskeIA no asume ninguna responsabilidad por decisiones tomadas en base a los resultados de esta herramienta, ni por un uso inadecuado de la misma.</p>
       </DisclaimerCard>
 

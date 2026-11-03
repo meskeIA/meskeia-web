@@ -520,7 +520,7 @@ export default function TestTipoLector() {
                   <ul className={styles.repartoLista}>
                     {reparto.map(({ id, puntos: p }) => (
                       <li key={id} className={`${styles.repartoFila} ${CLASE_PERFIL[id]}`}>
-                        <span className={styles.repartoNombre}>{ARQUETIPOS[id].nombre}</span>
+                        <span>{ARQUETIPOS[id].nombre}</span>
                         <span className={styles.repartoBarra} aria-hidden="true">
                           <span className={styles.repartoRelleno} style={{ width: `${(p / PUNTOS_MAXIMOS) * 100}%` }} />
                         </span>
