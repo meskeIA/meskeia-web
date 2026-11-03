@@ -602,7 +602,9 @@
   align-items: center;
   gap: var(--spacing-sm);
   margin-bottom: var(--spacing-md);
-  color: #B45309;
+  /* Sobre el tinte de .warningBox, que pone el TSX como antecesor: 4,27:1 con el naranja a secas
+     (hallazgo 3940). check:semanticos-claro no ve ese antecesor; lo mide el spec por píxel. */
+  color: var(--naranja-texto, #B45309);
   font-size: 1.1rem;
 }
 
@@ -628,7 +630,7 @@
 }
 
 .warningList li strong {
-  color: #B45309;
+  color: var(--naranja-texto, #B45309);
 }
 
 /* ============================================
@@ -779,7 +781,7 @@
 }
 
 .avisoConstante strong {
-  color: #B45309;
+  color: var(--naranja-texto, #B45309);
 }
 
 [data-theme='dark'] .avisoConstante {

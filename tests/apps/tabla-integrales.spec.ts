@@ -284,10 +284,11 @@ test.describe('Buscador', () => {
     await expect(detalle).toContainText('∫ dx/(4 + x²) = (1/2)·arctg(x/2) + C');
     await expect(detalle).toContainText('(1/2)·(1/2)/(1 + x²/4) = 1/(4 + x²)');
 
-    // «1/x» es la única fila con esa expresión en su texto: el caso n = −1, ln|x| + C
+    // «1/x»: desde el buscador por palabras (hallazgo 3937) casan las filas que tienen «1» y «x»
+    // como palabras (4), pero la PRIMERA es la que lleva «1/x» seguido en su fórmula: el caso
+    // n = −1, ln|x| + C. Antes, por subcadena, era la única.
     await buscar(page, '1/x');
-    await expect(contador(page)).toHaveText('1 de 40 fórmulas');
-    expect(await nombresDeFilas(page)).toEqual(['Caso especial n = −1']);
+    expect((await nombresDeFilas(page))[0]).toBe('Caso especial n = −1');
     expect((await formulasDeFila(page, 'potencia-menos-uno')).primitiva).toBe('ln|x| + C');
   });
 
@@ -313,25 +314,23 @@ test.describe('Buscador', () => {
     await buscar(page, 'sin');
     expect(await nombresDeFilas(page)).toContain('Seno');
 
-    // «seno» en las 40: 16 (incluye coseno, arcoseno y las hiperbólicas). Con Trigonométricas, 9:
-    // Seno, Coseno, sec², cosec², Tangente, Cotangente, sen², cos² y Secante (no sec·tg ni cosec·cotg)
+    // «seno» en las 40: 8. Desde el hallazgo 3937 casa con las palabras que EMPIEZAN por «seno»,
+    // no con «coseno» por dentro (por subcadena eran 16: traía la tangente por «ln coseno» y la
+    // secante por «uno partido coseno»). Coseno sigue, porque su texto dice que «da seno». Con
+    // Trigonométricas, 5.
     await buscar(page, 'seno');
-    await expect(contador(page)).toHaveText('16 de 40 fórmulas');
+    await expect(contador(page)).toHaveText('8 de 40 fórmulas');
     // El emoji del filtro va con aria-hidden: el nombre accesible es solo el texto
     await filtro(page, 'Trigonométricas').click();
     await expect(filtro(page, 'Trigonométricas')).toHaveAttribute('aria-pressed', 'true');
     await expect(filtro(page, 'Todas')).toHaveAttribute('aria-pressed', 'false');
-    await expect(contador(page)).toHaveText('9 de 40 fórmulas');
+    await expect(contador(page)).toHaveText('5 de 40 fórmulas');
     expect(await nombresDeFilas(page)).toEqual([
       'Seno',
       'Coseno',
-      'Cuadrado de la secante',
       'Cuadrado de la cosecante',
-      'Tangente',
       'Cotangente',
       'Seno al cuadrado',
-      'Coseno al cuadrado',
-      'Secante',
     ]);
   });
 
@@ -430,13 +429,13 @@ test.describe('Contraste de la tabla en los dos temas', () => {
 });
 
 test.describe('Hallazgos de la inspección del 02/11/2026', () => {
-  test('HALLAZGO (02/11/2026, ABIERTO) · el buscador promete «fórmula» y no encuentra ninguna escrita como fórmula', async ({ page }) => {
+  test('REPARADO 3937 · el buscador encuentra una integral escrita como fórmula', async ({ page }) => {
     // La etiqueta dice «Busca una integral por nombre, fórmula o palabra suelta» y la feature del
-    // JSON-LD «por nombre, expresión y sinónimos». Pero cada fila casa la consulta ENTERA como
-    // subcadena de su nombre + texto de búsqueda, y ese texto no lleva notación: hoy «sen x»,
+    // JSON-LD «por nombre, expresión y sinónimos». Cada fila casaba la consulta ENTERA como
+    // subcadena de su nombre + texto de búsqueda, y ese texto no llevaba notación: «sen x»,
     // «e^x», «√x», «∫ sen x dx» (copiado de la propia tabla) y «arcotangente parametro» (palabras
-    // en otro orden) dan «0 de 40» y el aviso «No hay ninguna fórmula que coincida», que es falso.
-    test.fail();
+    // en otro orden) daban «0 de 40» y el aviso «No hay ninguna fórmula que coincida». Ahora casa
+    // palabra a palabra con el texto de la integral (la receta de tabla-derivadas, C0591).
     await cargar(page);
     const casos: [string, string][] = [
       ['sen x', 'Seno'],
@@ -451,10 +450,9 @@ test.describe('Hallazgos de la inspección del 02/11/2026', () => {
     }
   });
 
-  test('HALLAZGO (02/11/2026, ABIERTO) · «sin» y «tan» traen filas que no tienen seno ni tangente', async ({ page }) => {
-    // «sin» casa con «sin signo negativo» (Coseno, Coseno hiperbólico) y «sin valor absoluto»
-    // (Tangente hiperbólica); «tan» casa dentro de «constante». Hoy: «sin» → 6 filas, «tan» → 13.
-    test.fail();
+  test('REPARADO 3938 · «sin» y «tan» ya no traen filas que no tienen seno ni tangente', async ({ page }) => {
+    // «sin» casaba con «sin signo negativo» (Coseno, Coseno hiperbólico) y «sin valor absoluto»
+    // (Tangente hiperbólica); «tan» casaba dentro de «constante». Eran «sin» → 6 filas, «tan» → 13.
     await cargar(page);
     await buscar(page, 'sin');
     const conSin = await nombresDeFilas(page);
@@ -463,22 +461,22 @@ test.describe('Hallazgos de la inspección del 02/11/2026', () => {
     expect.soft(await nombresDeFilas(page), 'tan').not.toContain('Constante');
   });
 
-  test('HALLAZGO (02/11/2026, ABIERTO) · las fracciones no tienen lectura accesible: 2/3·x√x se anuncia «2 3 ·x√x»', async ({ page }) => {
-    // Frac pinta numerador y denominador en dos <span> apilados sin nada que diga «entre»: el nombre
-    // accesible de la fila (lo que lee el lector de pantalla) es hoy «… Primitiva 2 3 ·x√x + C»,
-    // «− 1 x + C» para −1/x y «1 2a ·ln| x − a x + a | + C» para (1/2a)·ln|(x − a)/(x + a)|.
-    test.fail();
+  test('REPARADO 3939 · las fracciones se leen con «entre»: 2/3·x√x ya no se anuncia «2 3 ·x√x»', async ({ page }) => {
+    // Frac pintaba numerador y denominador en dos <span> apilados sin nada que dijera «entre»: el
+    // nombre accesible de la fila era «… Primitiva 2 3 ·x√x + C», «− 1 x + C» para −1/x y
+    // «1 2a ·ln| x − a x + a | + C». Ahora lleva un «entre» oculto a la vista.
     await cargar(page);
     await expect.soft(filaDe(page, 'raiz-cuadrada')).toHaveAccessibleName(/2\s*(\/|entre|partido|sobre)\s*3|dos tercios/i);
     await expect.soft(filaDe(page, 'inversa-cuadrado')).toHaveAccessibleName(/1\s*(\/|entre|partido|sobre)\s*x/i);
     await expect.soft(filaDe(page, 'fraccion-diferencia-cuadrados')).toHaveAccessibleName(/1\s*(\/|entre|partido|sobre)\s*\(?\s*2\s*a/i);
   });
 
-  test('HALLAZGO (02/11/2026, ABIERTO) · el naranja #B45309 sobre su propio tinte no llega a 4,5:1 en claro', async ({ page }) => {
+  test('REPARADO 3940 (C0592) · el naranja sobre su propio tinte llega a 4,5:1 en claro', async ({ page }) => {
     // .avisoConstante strong («Toda primitiva lleva + C.», 16 px negrita) sobre rgba(224,122,31,.1):
     // 4,36:1 · .warningHeader («Errores comunes que cuestan puntos», 17,6 px a 600) y .warningList
-    // strong sobre rgba(224,122,31,.08): 4,27:1. Ninguno es texto grande: piden 4,5:1.
-    test.fail();
+    // strong sobre rgba(224,122,31,.08): 4,27:1. Ninguno es texto grande: piden 4,5:1. Los tres
+    // pasan a var(--naranja-texto, #B45309); el primero lo ve ya check:semanticos-claro (C0592),
+    // los otros dos dependen de un antecesor que solo existe en el DOM y los mide este test.
     await cargar(page);
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     for (const selector of ['[class*="avisoConstante"] strong', '[class*="warningHeader"] h3', '[class*="warningList"] li strong']) {
