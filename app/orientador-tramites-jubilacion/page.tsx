@@ -21,6 +21,7 @@ import {
   type NecesidadJubilacion,
   type PerfilJubilacion,
 } from '@/data/fiscal';
+import { PREGUNTAS_FRECUENTES } from './metadata';
 
 const SITUACIONES: { id: SituacionJubilacion; icono: string; titulo: string; subtitulo: string }[] = [
   { id: 'proximo-jubilarme', icono: '🚪', titulo: 'Voy a jubilarme próximamente', subtitulo: 'Quiero prepararlo con tiempo' },
@@ -342,57 +343,12 @@ export default function OrientadorTramitesJubilacionPage() {
         <section className={styles.guideSection}>
           <h2>Preguntas frecuentes</h2>
           <div className={styles.faqGrid}>
-            <div className={styles.faqItem}>
-              <h3>¿Cuándo y cómo debo solicitar la pensión de jubilación?</h3>
-              <p>
-                La pensión de jubilación hay que solicitarla, no se concede automáticamente. Se recomienda iniciar
-                el trámite con 1-3 meses de antelación a la fecha en la que dejarás de trabajar, ya que los efectos
-                económicos retroactivos suelen estar limitados a los meses previos a la solicitud. Puedes
-                solicitarla de forma telemática en la Sede Electrónica de la Seguridad Social (con certificado
-                digital, Cl@ve o usuario y contraseña) o mediante cita previa presencial.
-              </p>
-            </div>
-            <div className={styles.faqItem}>
-              <h3>¿Cómo sé cuánto voy a cobrar de pensión?</h3>
-              <p>
-                La cuantía depende de tu edad de jubilación, los años cotizados y tu base reguladora, calculada a
-                partir de tus últimas bases de cotización. El Simulador de Jubilación Pública de meskeIA da una
-                estimación orientativa con estos datos, incluyendo los coeficientes reductores de la jubilación
-                anticipada. Para una cifra oficial con tus datos reales, usa el simulador de &quot;Tu Seguridad
-                Social&quot; en la sede electrónica.
-              </p>
-            </div>
-            <div className={styles.faqItem}>
-              <h3>¿Qué son el complemento a mínimos y el complemento por brecha de género?</h3>
-              <p>
-                El complemento a mínimos eleva tu pensión hasta el importe mínimo garantizado si tu cuantía
-                calculada queda por debajo y el conjunto de tus rentas no supera ciertos límites anuales. El
-                complemento por brecha de género es un importe adicional por cada hijo o hija (hasta un máximo) para
-                compensar el impacto de la maternidad o paternidad en la cotización; tras la sentencia del TJUE de
-                2025 puede solicitarlo tanto la madre como el padre. Ambos son compatibles entre sí cuando se cumplen
-                los requisitos.
-              </p>
-            </div>
-            <div className={styles.faqItem}>
-              <h3>¿Cómo tributa la pensión en el IRPF?</h3>
-              <p>
-                Las pensiones públicas tributan como rendimientos del trabajo en el IRPF, pero existen un mínimo
-                personal incrementado a partir de los 65 y los 75 años, y la reducción general por rendimientos del
-                trabajo, que reducen la base imponible. El Estimador IRPF Pensionista de meskeIA calcula de forma
-                orientativa la retención y el IRPF anual aproximado a partir de tu pensión y tu edad.
-              </p>
-            </div>
-            <div className={styles.faqItem}>
-              <h3>¿Qué servicios existen para mayores que necesitan ayuda en el día a día?</h3>
-              <p>
-                Existen servicios como la teleasistencia, la ayuda a domicilio, los centros de día y las
-                prestaciones económicas del Sistema para la Autonomía y Atención a la Dependencia (SAAD), gestionados
-                por cada Comunidad Autónoma. La mayoría requieren el reconocimiento previo de un grado de dependencia
-                mediante el Baremo de Valoración de la Dependencia (BVD). Además, los pensionistas pueden acceder a
-                programas de turismo social del IMSERSO, la Tarjeta Dorada de Renfe y descuentos en museos y
-                transporte.
-              </p>
-            </div>
+            {PREGUNTAS_FRECUENTES.map((f) => (
+              <div key={f.question} className={styles.faqItem}>
+                <h3>{f.question}</h3>
+                <p>{f.answer}</p>
+              </div>
+            ))}
           </div>
         </section>
 
