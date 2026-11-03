@@ -18,7 +18,7 @@
  * Probado en `tests/apps/simulador-tangencias-potencia.spec.ts`.
  */
 
-import { corregirNumero, dentroDeTolerancia, redondearA, toleranciaRelativa } from '@/lib/calculadoras/correctorCasosAula';
+import { corregirNumero, dentroDeTolerancia, exigeRedondeo, redondearA, toleranciaRelativa } from '@/lib/calculadoras/correctorCasosAula';
 import { formatNumber } from '@/lib/formatters';
 import {
   anguloEntreTangentes,
@@ -526,13 +526,19 @@ const ES_LONGITUD: Record<TipoCaso, boolean> = {
 };
 
 /**
- * Compara lo que escribe el alumno con la respuesta del caso. La tolerancia es la relativa del
- * corrector compartido (el mayor entre 0,01 y el 1 %), y los errores típicos del tema se nombran
- * comparando con `dentroDeTolerancia`, nunca con una resta propia.
+ * Compara lo que escribe el alumno con la respuesta del caso. Los errores típicos del tema se
+ * nombran comparando con `dentroDeTolerancia`, nunca con una resta propia.
+ *
+ * Una respuesta EXACTA a dos decimales no tiene margen (cabo C0267, 03/11/2026): la tolerancia
+ * relativa del corrector (el mayor entre 0,01 y el 1 %) aprobaba 12,05 para los 12 cm exactos
+ * del caso 3, y 5,55 para el 5,6 del eje radical, que no son redondeo de nada. Aquí los datos se
+ * eligen para que TODAS las respuestas salgan exactas (cabecera), así que en la práctica el
+ * margen es 0; si un caso futuro exigiera redondear, conservaría el 1 %. Regla de bfccafa5 y
+ * 51d7c223.
  */
 export function comprobarRespuesta(usuario: number, caso: Pick<CasoTangencias, 'datos' | 'respuesta'>): Veredicto {
   const esperado = caso.respuesta;
-  const tolerancia = toleranciaRelativa(esperado);
+  const tolerancia = exigeRedondeo(esperado, 2) ? toleranciaRelativa(esperado) : 0;
   // La potencia puede ser negativa y la distancia al eje también (si el eje cae detrás del centro):
   // el dominio de la magnitud es el real, y el único imposible del tema, la longitud negativa, se
   // nombra aparte.

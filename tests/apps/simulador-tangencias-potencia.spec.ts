@@ -402,10 +402,30 @@ test.describe('Los 12 casos numerados (lo que el profesor asigna)', () => {
 });
 
 test.describe('Corrección de la respuesta del alumno', () => {
-  test('el acierto y el redondeo razonable valen', () => {
+  test('el acierto vale', () => {
     expect(comprobarRespuesta(12, CASOS[2]).estado).toBe('acierto');
-    expect(comprobarRespuesta(12.05, CASOS[2]).estado).toBe('acierto');
     expect(comprobarRespuesta(-16, CASOS[1]).estado).toBe('acierto');
+    expect(comprobarRespuesta(5.6, CASOS[7]).estado).toBe('acierto');
+  });
+
+  test('C0267 · una respuesta exacta no tiene margen: lo que no es ningún redondeo suspende', () => {
+    // Hasta el 03/11/2026 la tolerancia era el 1 % del corrector compartido, y este mismo test
+    // daba por buena 12,05 para los 12 cm EXACTOS del caso 3 («redondeo razonable»): no es el
+    // redondeo de nada. Los datos de la app se eligen para que todas las respuestas sean exactas.
+    expect(comprobarRespuesta(12.05, CASOS[2]).estado).toBe('fallo');
+    expect(comprobarRespuesta(11.9, CASOS[2]).estado).toBe('fallo');
+    expect(comprobarRespuesta(5.55, CASOS[7]).estado).toBe('fallo');
+    expect(comprobarRespuesta(-16.1, CASOS[1]).estado).toBe('fallo');
+  });
+
+  test('C0267 · la clave aprueba en los 12 casos y en 500 prácticas, y un 0,5 % de error suspende', () => {
+    const casos = [...CASOS, ...Array.from({ length: 500 }, (_, i) => generarEjercicioAleatorio(i + 1).caso)];
+    for (const caso of casos) {
+      expect(comprobarRespuesta(caso.respuesta, caso).estado, caso.enunciado).toBe('acierto');
+      if (Math.abs(caso.respuesta) >= 2) {
+        expect(comprobarRespuesta(caso.respuesta * 1.005, caso).estado, caso.enunciado).not.toBe('acierto');
+      }
+    }
   });
 
   test('los errores típicos del tema tienen nombre propio', () => {
