@@ -79,7 +79,8 @@ export default function CasosAula({ onCargarEnSimulador }: Props) {
     // comprobarRespuesta con un mensaje propio (nunca «NaN» en pantalla).
     // «2.493» es 2,493 o 2493: leerRespuestaAula se queda con la más cercana a la respuesta (C0558).
     const valor = leerRespuestaAula(respuesta, esperado);
-    const r = comprobarRespuesta(valor, esperado, magnitud);
+    // Con los datos, un volumen o una concentración exactos no tienen margen (cabo C0267).
+    const r = comprobarRespuesta(valor, esperado, magnitud, datos);
     setVeredicto({ correcto: r.correcto, motivo: r.motivo });
   }
 

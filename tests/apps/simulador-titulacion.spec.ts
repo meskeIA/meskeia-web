@@ -810,6 +810,35 @@ test.describe('simulador-titulacion · casos para clase', () => {
     expect(comprobarRespuesta(12.53, 12.52, 'pH').correcto).toBe(true);
   });
 
+  test('C0267 · con los datos, un volumen o una concentración exactos no tienen margen; el pH conserva sus 0,02', async () => {
+    // Cabo C0267 (reparar 03/11/2026), la forma del hallazgo 3342. A mano:
+    //   caso 1 · V_eq = 0,15·20/0,1 = 30 mL exactos    → 29,7 (dentro del 1 %) no es redondeo de nada
+    //   caso 2 · V_eq = 0,80·10/0,5 = 16 mL exactos    → 15,85 tampoco
+    //   caso 4 · C = 0,20·42,50/10 = 0,85 mol/L exacta → 0,851 tampoco
+    //   caso 5 · pH = −log(1/40) = 1,6021               → 1,61 sigue valiendo (0,02 absoluto)
+    const caso = (id: number) => CASOS_AULA.find((c) => c.id === id)!;
+    const corrige = (usuario: number, id: number) =>
+      comprobarRespuesta(usuario, caso(id).respuesta, caso(id).magnitud, caso(id).datos).correcto;
+    expect(corrige(30, 1)).toBe(true);
+    expect(corrige(29.7, 1)).toBe(false);
+    expect(corrige(16, 2)).toBe(true);
+    expect(corrige(15.85, 2)).toBe(false);
+    expect(corrige(0.85, 4)).toBe(true);
+    expect(corrige(0.851, 4)).toBe(false);
+    expect(corrige(1.61, 5)).toBe(true);
+    // Los dos avisos típicos siguen con margen 0.
+    expect(comprobarRespuesta(0.03, 30, 'volumen', caso(1).datos).motivo).toContain('mililitros');
+    expect(comprobarRespuesta(30.004, 30, 'volumen', caso(1).datos).motivo).not.toMatch(/desviado 0 /);
+    // La clave aprueba en los 12 casos y en 500 prácticas.
+    for (const c of CASOS_AULA) {
+      expect(comprobarRespuesta(c.respuesta, c.respuesta, c.magnitud, c.datos).correcto, `caso ${c.id}`).toBe(true);
+    }
+    for (let s = 1; s <= 500; s += 1) {
+      const e = generarEjercicioAleatorio(s);
+      expect(comprobarRespuesta(e.respuesta, e.respuesta, e.magnitud, e.datos).correcto, `semilla ${s}`).toBe(true);
+    }
+  });
+
   test('8 · corregir no lanza nunca y nombra los dos errores típicos', async () => {
     expect(comprobarRespuesta(NaN, 8.9, 'pH').correcto).toBe(false);
     expect(comprobarRespuesta(NaN, 8.9, 'pH').motivo).toContain('número');

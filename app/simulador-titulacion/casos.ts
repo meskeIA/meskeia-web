@@ -64,6 +64,7 @@ import {
   dentroDeTolerancia,
   exigeRedondeo,
   redondearA,
+  textoDesviacion,
   toleranciaRelativa,
 } from '@/lib/calculadoras/correctorCasosAula';
 
@@ -517,11 +518,29 @@ export interface Veredicto {
 /**
  * Corrige la respuesta del alumno. Nunca lanza: una entrada que no es número se responde con
  * un veredicto, no con una excepción que tumbaría el render.
+ *
+ * Con `datos`, un volumen o una concentración EXACTOS a sus decimales no tienen margen (cabo
+ * C0267, 03/11/2026). Salen de C·V = C·V sin constantes ni fórmulas de libro, y en esta app lo
+ * son siempre: los casos 1 a 4 (30, 16, 0,08 y 0,85) y el modo práctica, que solo admite un
+ * V_eq en centésimas y cuya concentración es la de la lista. El 1 % aprobaba 29,7 mL para los
+ * 30 del caso 1 y 15,85 para los 16 del caso 2. El pH conserva sus 0,02 absolutos: es un
+ * logaritmo, y absorbe la distancia entre la fórmula del libro y el balance de cargas del motor
+ * (cabecera). Sin `datos`, la tolerancia de siempre.
  */
-export function comprobarRespuesta(usuario: number, esperado: number, magnitud: Magnitud): Veredicto {
+export function comprobarRespuesta(
+  usuario: number,
+  esperado: number,
+  magnitud: Magnitud,
+  datos?: DatosCaso,
+): Veredicto {
+  let margen = toleranciaDe(esperado, magnitud);
+  if (magnitud !== 'pH' && datos) {
+    const r = resolverCaso(datos);
+    if (r.ok && !exigeRedondeo(r.valor, datos.decimales ?? 2)) margen = 0;
+  }
   // pH, volumen y concentración son magnitudes continuas: ninguna es imposible por sí misma
   // dentro de la tolerancia (sonda del 15/10/2026). Un pH negativo existe en ácidos fuertes.
-  const c = corregirNumero(usuario, esperado, { tolerancia: toleranciaDe(esperado, magnitud), magnitud: 'real' });
+  const c = corregirNumero(usuario, esperado, { tolerancia: margen, magnitud: 'real' });
   const { diferencia, tolerancia } = c;
 
   if (c.estado === 'no-numerico') {
@@ -558,7 +577,8 @@ export function comprobarRespuesta(usuario: number, esperado: number, magnitud: 
 
   return {
     correcto: false,
-    motivo: `No es correcto. Te has desviado ${cifra(diferencia, magnitud === 'concentracion' ? 4 : 2)} de la respuesta.`,
+    // Con tolerancia 0, «30,004» para 30 no puede decir «Te has desviado 0» (hallazgo 3369)
+    motivo: `No es correcto. Te has desviado ${textoDesviacion(diferencia, magnitud === 'concentracion' ? 4 : 2, cifra)} de la respuesta.`,
     diferencia,
     tolerancia,
   };
