@@ -691,8 +691,39 @@ test.describe('simulador-conservacion-energia · casos para clase', () => {
     expect(sinRozamiento.valor).toBeCloseTo(4, 10);
   });
 
+  test('C0267 · con los datos del caso, una respuesta exacta no tiene margen y una velocidad, media centésima', async () => {
+    // Cabo C0267 (reparar 03/11/2026), la forma del hallazgo 3342. Resuelto a mano:
+    //   caso 1  · 2·9,8·5 = 98 J exactos              → 97,1 (dentro del 1 %) no es redondeo de nada
+    //   caso 12 · 2·9,8·(6 − 2) = 78,4 J exactos      → 77,7 tampoco
+    //   caso 11 · (39,2 − 9,8)/9,8 = 3 m exactos       → 2,98 tampoco
+    //   caso 3  · √(2·9,8·5) = √98 = 9,8995 m/s        → pide dos decimales: 9,90 y 9,9 valen; 9,81 no
+    //   caso 9  · √(2·97,6/4) = √48,8 = 6,9857 m/s     → 6,99 vale; 6,92 (dentro del 1 %) no
+    const caso = (id: number) => CASOS.find((c) => c.id === id)!;
+    const corrige = (usuario: number, id: number) =>
+      comprobarRespuesta(usuario, caso(id).respuesta, caso(id).datos).correcto;
+    expect(corrige(98, 1)).toBe(true);
+    expect(corrige(97.1, 1)).toBe(false);
+    expect(corrige(78.4, 12)).toBe(true);
+    expect(corrige(77.7, 12)).toBe(false);
+    expect(corrige(3, 11)).toBe(true);
+    expect(corrige(2.98, 11)).toBe(false);
+    expect(corrige(9.9, 3)).toBe(true);
+    expect(corrige(9.81, 3)).toBe(false);
+    expect(corrige(6.99, 9)).toBe(true);
+    expect(corrige(6.92, 9)).toBe(false);
+    // Con tolerancia 0 la desviación no se lee «0» (hallazgo 3369).
+    expect(comprobarRespuesta(98.004, 98, caso(1).datos).motivo).not.toMatch(/desviado 0 /);
+    // La clave aprueba en los 12 casos y en 500 prácticas.
+    for (const c of CASOS) expect(comprobarRespuesta(c.respuesta, c.respuesta, c.datos).correcto, `caso ${c.id}`).toBe(true);
+    for (let s = 1; s <= 500; s += 1) {
+      const e = generarEjercicioAleatorio(s);
+      expect(comprobarRespuesta(e.respuesta, e.respuesta, e.datos).correcto, `semilla ${s}`).toBe(true);
+    }
+  });
+
   test('8 · corregir no lanza nunca, ni con entradas que no son números', async () => {
     expect(comprobarRespuesta(98, 98).correcto).toBe(true);
+    // Sin `datos`, la política relativa de siempre (con datos, C0267: ver el test anterior).
     expect(comprobarRespuesta(98.5, 98).correcto).toBe(true); // dentro del 1 %
     expect(comprobarRespuesta(120, 98).correcto).toBe(false);
     expect(comprobarRespuesta(NaN, 98).correcto).toBe(false);

@@ -59,7 +59,8 @@ export default function CasosAula() {
     // ese NaN se encarga comprobarRespuesta con un mensaje propio (nunca «NaN» en pantalla).
     // «2.493» es 2,493 o 2493: leerRespuestaAula se queda con la más cercana a la respuesta (C0558).
     const valor = leerRespuestaAula(respuesta, esperado);
-    const r = comprobarRespuesta(valor, esperado);
+    // Con los datos de la pregunta, contra la cifra sin redondear (cabo C0267)
+    const r = comprobarRespuesta(valor, esperado, practica ? practica.datos : caso.datos);
     setVeredicto({ correcto: r.correcto, motivo: r.motivo });
   }
 

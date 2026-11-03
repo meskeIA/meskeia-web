@@ -30,7 +30,13 @@
  */
 
 import { G_POR_DEFECTO, energiaCinetica, energiaPotencial, velocidadDesdeEnergiaCinetica } from './motor';
-import { corregirNumero, redondearA, toleranciaRelativa } from '@/lib/calculadoras/correctorCasosAula';
+import {
+  corregirNumero,
+  redondearA,
+  textoDesviacion,
+  toleranciaDeRedondeo,
+  toleranciaRelativa,
+} from '@/lib/calculadoras/correctorCasosAula';
 
 export { G_POR_DEFECTO } from './motor';
 
@@ -255,12 +261,34 @@ export interface Veredicto {
   tolerancia: number;
 }
 
-/** Corrige la respuesta del alumno. Nunca lanza. */
-export function comprobarRespuesta(usuario: number, esperado: number): Veredicto {
+/**
+ * Corrige la respuesta del alumno. Nunca lanza.
+ *
+ * Con `datos` se corrige contra la cifra SIN redondear con la política de redondeo (cabo C0267,
+ * 03/11/2026): media unidad del último decimal si hay que redondear y 0 si la respuesta es
+ * exacta. Aquí no hay ninguna constante de libro que justifique el 1 %: todos los enunciados
+ * fijan g = 9,8, y nueve de los doce casos dan una cifra exacta (98 J, 2,94 J, 2,5 m, 3 m…). El
+ * 1 % aprobaba 97,1 para los 98 J del caso 1, 77,7 para los 78,4 J del caso 12 y 9,81 para los
+ * 9,90 m/s del caso 3, que no son redondeo de nada. Las velocidades piden «redondea a dos
+ * decimales» y salen de una raíz de datos exactos, así que media centésima basta. Es la receta
+ * de 75a67c1f en simulador-gas-ideal. Sin `datos`, la relativa de siempre.
+ */
+export function comprobarRespuesta(usuario: number, esperado: number, datos?: DatosCaso): Veredicto {
+  let objetivo = esperado;
+  let tolerancia = toleranciaDe(esperado);
+  let decimales = 2;
+  if (datos) {
+    const r = resolverCaso(datos);
+    if (r.ok) {
+      decimales = datos.decimales ?? 2;
+      objetivo = r.valor;
+      tolerancia = toleranciaDeRedondeo(r.valor, decimales, redondear);
+    }
+  }
   // Magnitudes continuas: ningún valor es imposible por sí mismo dentro de la tolerancia
   // (sonda del 15/10/2026 sobre los 12 casos y 40 semillas del modo práctica).
-  const c = corregirNumero(usuario, esperado, { tolerancia: toleranciaDe(esperado), magnitud: 'real' });
-  const { diferencia, tolerancia } = c;
+  const c = corregirNumero(usuario, objetivo, { tolerancia, magnitud: 'real' });
+  const { diferencia } = c;
 
   if (c.estado === 'no-numerico') {
     return {
@@ -278,7 +306,8 @@ export function comprobarRespuesta(usuario: number, esperado: number): Veredicto
 
   return {
     correcto: false,
-    motivo: `No es correcto. Te has desviado ${numero(diferencia)} de la respuesta.`,
+    // Con tolerancia 0, «98,004» para 98 no puede decir «Te has desviado 0» (hallazgo 3369)
+    motivo: `No es correcto. Te has desviado ${textoDesviacion(diferencia, decimales, numero)} de la respuesta.`,
     diferencia,
     tolerancia,
   };
