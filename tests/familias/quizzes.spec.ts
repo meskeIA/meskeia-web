@@ -388,6 +388,31 @@ for (const h of HERMANAS) {
         if (esUltima || (await opciones.count()) === 0) {
           expect(despues, `paso ${paso}: la ráfaga no se come la nota (la pantalla del resultado sigue igual)`).toEqual(antes);
           expect(await opciones.count(), `paso ${paso}: la ráfaga no empieza otra partida`).toBe(0);
+
+          // C0501 (2), 03/11/2026: las SALIDAS del resultado («Jugar de nuevo», «Repasar fallos»,
+          // «Cambiar nivel», «Repetir quiz»…). El 2.º toque de la ráfaga no actúa sobre la pantalla
+          // a la que lleva el 1.º (pulsar «Empezar» en la configuración, contestar la primera
+          // pregunta). Cambian de una hermana a otra: se toman por su texto, y cada ancho prueba una
+          // distinta, así que los tres anchos cubren hasta tres salidas sin repetir la partida.
+          const SALIDA =
+            /jugar de nuevo|jugar otra vez|repasar|cambiar (de )?(nivel|modo|configuración|categoría|tema)|repetir|volver a (jugar|empezar)|volver al inicio|nueva partida|otra (partida|ronda)|intentar de nuevo|empezar de nuevo/i;
+          const salidas = page.locator('button:visible:enabled').filter({ hasText: SALIDA });
+          const cuantas = await salidas.count();
+          if (cuantas > 0) {
+            const salida = salidas.nth([360, 412, 768].indexOf(viewport.width) % cuantas);
+            const nombre = (await salida.innerText()).replace(/\s+/g, ' ').trim();
+            await page.waitForTimeout(350); // fuera de la ventana de ráfaga de «Ver resultado»
+            const enResultado = JSON.stringify(await botonesVisibles());
+            const tras = await dobleToque(
+              salida,
+              async () => JSON.stringify(await botonesVisibles()) !== enResultado,
+              `salida «${nombre}»`,
+            );
+            expect(tras.despues, `salida «${nombre}»: el 2.º toque de la ráfaga no actúa sobre la pantalla nueva`).toEqual(tras.antes);
+            if ((await opciones.count()) > 0) {
+              expect(await habilitadas(), `salida «${nombre}»: la ráfaga no contesta la primera pregunta`).toBe(await opciones.count());
+            }
+          }
           return;
         }
         expect(await habilitadas(), `paso ${paso}: la ráfaga no contesta la pregunta nueva`).toBe(await opciones.count());
