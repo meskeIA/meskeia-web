@@ -137,6 +137,15 @@ async function abrir(page: Page, config: ConfigDoble = { voces: VOCES_ES }): Pro
   await page.addInitScript(instalarDoble, config);
   await page.goto(RUTA);
   await esperarHidratacion(page, ['textarea']);
+  // Bajo `next dev`, StrictMode monta, desmonta y vuelve a montar los efectos: la limpieza del
+  // de las voces llama a cancel() al cargar (pila: disconnectPassiveEffect, medido el 03/11/2026)
+  // y en `next start` no. Las llamadas que mide cada caso son las de después de cargar. El
+  // selector de voz aparece tras ese efecto (setVoces), así que verlo garantiza que ya pasó.
+  if (!config.sinSoporte && config.voces.length > 0) await expect(page.locator('#selector-voz')).toBeVisible();
+  await page.evaluate(() => {
+    const w = window as unknown as { __llamadas?: Llamada[] };
+    if (w.__llamadas) w.__llamadas.length = 0;
+  });
 }
 
 async function escribir(page: Page, texto: string): Promise<void> {
@@ -144,7 +153,7 @@ async function escribir(page: Page, texto: string): Promise<void> {
   await esperarValorEnReact(page, 'textarea', texto);
 }
 
-const contador = (page: Page) => page.locator('p', { hasText: /· \d+ caracteres$/ });
+const contador = (page: Page) => page.locator('p', { hasText: /· [\d.]+ (caracteres|carácter)$/ });
 const botonLeer = (page: Page) => page.getByRole('button', { name: 'Iniciar lectura' });
 const resaltada = (page: Page) => page.locator('mark[aria-current="true"]');
 
@@ -239,20 +248,22 @@ test.describe('lector-texto-voz · contador, resaltado y controles', () => {
     await expect(botonLeer(page)).toBeDisabled();
   });
 
-  test('HALLAZGO (03/11/2026, ABIERTO) · el contador suma palabras fantasma con blancos al principio o al final', async ({
+  test('HALLAZGO 3960 (03/11/2026, REPARADO) · el contador no suma palabras fantasma con blancos al principio o al final', async ({
     page,
   }) => {
-    // texto.split(/(\s+)/) deja un «» vacío delante y otro detrás cuando el texto empieza o
-    // acaba en blanco, y cada «» cuenta como palabra. Esperado (a mano):
-    //   «» → 0 palabras · 0 caracteres (hoy 1)
-    //   «   » → 0 · 3 (hoy 2)
-    //   «Hola mundo\n» (lo normal al pegar un párrafo) → 2 · 11 (hoy 3)
-    //   «  Hola mundo» → 2 · 12 (hoy 3)
-    test.fail();
+    // texto.split(/(\s+)/) dejaba un «» vacío delante y otro detrás cuando el texto empieza o
+    // acaba en blanco, y cada «» contaba como palabra. Ahora los trozos vacíos se descartan.
+    // Esperado (a mano):
+    //   «» → 0 palabras · 0 caracteres (antes 1)
+    //   «   » → 0 · 3 (antes 2)
+    //   «\n\n  \n» → 0 · 5 (antes 2)
+    //   «Hola mundo\n» (lo normal al pegar un párrafo) → 2 · 11 (antes 3)
+    //   «  Hola mundo» → 2 · 12 (antes 3)
     await abrir(page);
     for (const [texto, esperado] of [
       ['', '0 palabras · 0 caracteres'],
       ['   ', '0 palabras · 3 caracteres'],
+      ['\n\n  \n', '0 palabras · 5 caracteres'],
       ['Hola mundo\n', '2 palabras · 11 caracteres'],
       ['  Hola mundo', '2 palabras · 12 caracteres'],
     ] as const) {
@@ -261,13 +272,12 @@ test.describe('lector-texto-voz · contador, resaltado y controles', () => {
     }
   });
 
-  test('HALLAZGO (03/11/2026, ABIERTO, el mismo del contador) · con blancos delante, la barra marca 33 % en la primera palabra', async ({
+  test('HALLAZGO 3960 (03/11/2026, REPARADO, el mismo del contador) · con blancos delante o detrás, la barra cuenta solo las palabras', async ({
     page,
   }) => {
     // «  Hola mundo»: Hola empieza en 2 y mundo en 7; total 2 palabras → 0 % y 50 %.
-    // Hoy la palabra fantasma del principio sube el índice y el total: 33 % y 67 %.
-    // «Hola mundo\n»: mundo (en 5) → 50 %; hoy 33 % por la fantasma del final.
-    test.fail();
+    // Antes la palabra fantasma del principio subía el índice y el total: 33 % y 67 %.
+    // «Hola mundo\n»: mundo (en 5) → 50 %; antes 33 % por la fantasma del final.
     await abrir(page);
     await escribir(page, '  Hola mundo');
     await botonLeer(page).click();
@@ -278,16 +288,25 @@ test.describe('lector-texto-voz · contador, resaltado y controles', () => {
     await boundary(page, 7);
     await expect(resaltada(page)).toHaveText('mundo');
     await expect(barra).toHaveAttribute('aria-valuenow', '50');
+    await page.getByRole('button', { name: 'Detener lectura' }).click();
+
+    await page.getByRole('tab', { name: /Editar texto/ }).click();
+    await escribir(page, 'Hola mundo\n');
+    await botonLeer(page).click();
+    await boundary(page, 5);
+    await expect(resaltada(page)).toHaveText('mundo');
+    await expect(page.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '50');
   });
 
-  test('HALLAZGO (03/11/2026, ABIERTO) · la FAQ promete elegir voz inglesa o francesa y el selector solo ofrece español', async ({
+  test('HALLAZGO 3961 (03/11/2026, REPARADO con otro esperado) · la FAQ ya no promete voces inglesas o francesas: dice lo que hace el selector', async ({
     page,
   }) => {
-    // FAQ visible: «Si pegas texto en inglés o francés, puedes seleccionar la voz correspondiente
-    // en el selector de voces». cargarVoces filtra a `lang` es-* en cuanto hay una sola voz
-    // española, y además fija utt.lang = 'es-ES' sea cual sea la voz. En Edge (03/11/2026)
-    // había 324 voces, 22 de ellas en-US o fr-FR, y el selector ofrecía 0 que no fueran es-*.
-    test.fail();
+    // La FAQ visible prometía «Si pegas texto en inglés o francés, puedes seleccionar la voz
+    // correspondiente en el selector de voces», y cargarVoces filtra a `lang` es-* en cuanto hay
+    // una sola voz española (en Edge, 03/11/2026: 324 voces, 22 en-US o fr-FR, y 0 ofrecidas).
+    // El acta pedía 3 opciones en el selector; ampliar la app a otros idiomas es decisión del
+    // usuario (frontera: «ampliar una app para cumplir su promesa»), así que se baja la promesa a
+    // lo que la app hace (frontera N2 «promesa»): FAQ y selector dicen ahora lo mismo.
     await abrir(page, {
       voces: [
         { name: 'Voz ES', lang: 'es-ES', localService: true, default: true, voiceURI: 'es' },
@@ -295,38 +314,49 @@ test.describe('lector-texto-voz · contador, resaltado y controles', () => {
         { name: 'Voix FR', lang: 'fr-FR', localService: true, default: false, voiceURI: 'fr' },
       ],
     });
-    const opciones = page.locator('#selector-voz option');
-    await expect(opciones).toHaveCount(3);
+    await expect(page.locator('#selector-voz option')).toHaveCount(1);
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const respuesta = page
+      .locator('dt', { hasText: '¿Puedo usar esta herramienta para textos en otros idiomas?' })
+      .locator('xpath=following-sibling::dd[1]');
+    await expect(respuesta).toContainText('pensada para textos en español');
+    await expect(respuesta).not.toContainText(/puedes seleccionar la voz correspondiente/);
   });
 
-  test('HALLAZGO (03/11/2026, ABIERTO) · privacidad: una voz de servicio remoto se usa sin aviso y la página dice que el texto nunca sale del dispositivo', async ({
+  test('HALLAZGO 3959 (03/11/2026, REPARADO) · privacidad: las voces en línea se separan, se avisan y no se eligen por defecto', async ({
     page,
   }) => {
     // SpeechSynthesisVoice.localService (W3C Web Speech API): true = síntesis local; false =
     // servicio remoto. Las «voces neuronales de mayor calidad» que la página recomienda en
     // Edge y Chrome son de las segundas (Edge, 03/11/2026: 45 de 48 voces es-* con
-    // localService=false, «Microsoft … Online (Natural)»). El selector las ofrece mezcladas,
-    // sin distinguirlas, y la app les manda el texto entero. Coherente sería: o no se ofrecen
-    // (o se avisan), o la página no promete «el texto nunca sale de tu dispositivo».
-    test.fail();
+    // localService=false, «Microsoft … Online (Natural)»). El selector las ofrecía mezcladas,
+    // sin distinguirlas, mientras la página decía «el texto nunca sale de tu dispositivo».
+    // Ahora: grupo propio «En línea», aviso visible al elegirlas, voz local por defecto aunque
+    // la remota venga primera en getVoices(), y la página explica qué voces procesan fuera.
     await abrir(page, {
       voces: [
-        { name: 'Voz local', lang: 'es-ES', localService: true, default: true, voiceURI: 'l' },
-        { name: 'Voz Online (Natural)', lang: 'es-ES', localService: false, default: false, voiceURI: 'r' },
+        { name: 'Voz Online (Natural)', lang: 'es-ES', localService: false, default: true, voiceURI: 'r' },
+        { name: 'Voz local', lang: 'es-ES', localService: true, default: false, voiceURI: 'l' },
       ],
     });
-    await expect(page.locator('#selector-voz option')).toHaveCount(2);
-    await page.locator('#selector-voz').selectOption('Voz Online (Natural)');
+    const selector = page.locator('#selector-voz');
+    await expect(selector.locator('option')).toHaveCount(2);
+    await expect(selector).toHaveValue('Voz local');
+    await expect(selector.locator('optgroup[label^="En línea"] option')).toHaveText(['Voz Online (Natural) (es-ES) · en línea']);
+    const aviso = page.locator('#aviso-voz');
+    await expect(aviso).toHaveText(/sin salir de tu ordenador o móvil/);
+
+    await selector.selectOption('Voz Online (Natural)');
+    await expect(aviso).toHaveText(/Voz en línea: el navegador envía el texto a su servicio de voz/);
+    await expect(selector).toHaveAttribute('aria-describedby', 'aviso-voz');
     await botonLeer(page).click();
     const [speak] = (await llamadas(page)).filter((l) => l.f === 'speak');
-    // Hoy: el texto de ejemplo entero va a la voz remota
-    const usoRemoto = speak?.local === false;
+    expect(speak?.local).toBe(false);
+
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     const textoPagina = (await page.locator('body').textContent()) ?? '';
-    const promete = /nunca sale de tu dispositivo|Ni el texto ni el audio salen|funciona sin conexión/.test(
-      textoPagina,
-    );
-    expect(usoRemoto && promete, 'voz remota usada sin aviso con la promesa de privacidad en pantalla').toBe(false);
+    expect(textoPagina).not.toMatch(/nunca sale de tu dispositivo|Ni el texto ni el audio salen|funciona sin conexión|privacidad al 100/);
+    expect(textoPagina).toContain('envían el texto a su servicio de voz');
   });
 
   test('accesibilidad · Leer con teclado deja el foco en Pausar', async ({ page }) => {
@@ -337,71 +367,64 @@ test.describe('lector-texto-voz · contador, resaltado y controles', () => {
     await expect(page.getByRole('button', { name: 'Pausar lectura' })).toBeFocused();
   });
 
-  test('HALLAZGO (03/11/2026, ABIERTO) · Detener con teclado manda el foco a <body>', async ({ page }) => {
+  test('HALLAZGO 3962 (03/11/2026, REPARADO) · Detener con teclado deja el foco en Leer', async ({ page }) => {
     // Al volver a «parado», React conserva el primer botón (Pausar → Leer) y DESMONTA Detener,
-    // que era el que tenía el foco. Un usuario de teclado o lector de pantalla vuelve al
-    // principio del documento. Esperado: el foco en un control de reproducción (Leer).
-    test.fail();
+    // que era el que tenía el foco: caía a <body> y el usuario de teclado o lector de pantalla
+    // volvía al principio del documento. Ahora el foco pasa al botón Leer.
     await abrir(page);
     await botonLeer(page).click();
     await page.getByRole('button', { name: 'Detener lectura' }).focus();
     await page.keyboard.press('Enter');
     await expect(botonLeer(page)).toBeVisible();
-    const enfocado = await page.evaluate(() => document.activeElement?.tagName ?? null);
-    expect(enfocado).not.toBe('BODY');
+    await expect(botonLeer(page)).toBeFocused();
   });
 
-  test('HALLAZGO (03/11/2026, ABIERTO) · la barra de progreso no tiene nombre accesible', async ({ page }) => {
-    // El aria-label «Progreso: N%» está en el <div> contenedor (genérico, donde aria-label no
-    // vale); el role="progressbar" interior no tiene aria-label ni aria-labelledby.
-    test.fail();
+  test('HALLAZGO 3965 (03/11/2026, REPARADO) · la barra de progreso tiene nombre accesible', async ({ page }) => {
+    // El aria-label «Progreso: N%» estaba en el <div> contenedor (genérico, donde aria-label no
+    // vale); ahora el role="progressbar" lleva su propio aria-label y el valor como texto.
     await abrir(page);
     await botonLeer(page).click();
     await expect(page.getByRole('progressbar', { name: /progreso/i })).toHaveCount(1);
+    await expect(page.getByRole('group', { name: 'Controles de reproducción' })).toHaveCount(1);
   });
 
-  test('HALLAZGO (03/11/2026, ABIERTO) · cada palabra se expone como «mark» (resaltada), no solo la que se lee', async ({
+  test('HALLAZGO 3966 (03/11/2026, REPARADO) · solo la palabra que se lee se expone como «mark»', async ({
     page,
   }) => {
-    // Cada palabra es un <mark>, que el árbol de accesibilidad publica con rol «mark»: con el
-    // texto de ejemplo, 60 palabras resaltadas para el lector de pantalla. La que se lee ya
-    // lleva aria-current. Esperado: como mucho un elemento con rol mark.
-    test.fail();
+    // Cada palabra era un <mark>, que el árbol de accesibilidad publica con rol «mark»: con el
+    // texto de ejemplo, 60 palabras resaltadas para el lector de pantalla. Ahora las demás son
+    // <span> y solo la actual (con aria-current) es <mark>.
     await abrir(page);
     await botonLeer(page).click();
     await boundary(page, 0);
     const arbol = await page.getByRole('status').filter({ hasText: 'La lectura en voz alta' }).ariaSnapshot();
     const marks = arbol.split('\n').filter((l) => /^\s*- mark\b/.test(l)).length;
-    expect(marks).toBeLessThanOrEqual(1);
+    expect(marks).toBe(1);
+    await expect(resaltada(page)).toHaveText('La');
   });
 
-  test('HALLAZGO (03/11/2026, ABIERTO) · en pausa, velocidad, tono y voz se pueden mover y no se aplican', async ({
+  test('HALLAZGO 3964 (03/11/2026, REPARADO) · en pausa, velocidad, tono y voz quedan fijos', async ({
     page,
   }) => {
-    // FAQ visible: «los sliders están desactivados durante la reproducción». Lo están solo con
-    // estado «reproduciendo»: en pausa se habilitan, la etiqueta cambia a 1.5× y al Reanudar
-    // la locución sigue con rate 1 (no hay speak nuevo). Vale cualquiera de las dos reparaciones.
-    test.fail();
+    // FAQ visible: los ajustes «están desactivados durante la reproducción». Lo estaban solo con
+    // estado «reproduciendo»: en pausa se habilitaban, la etiqueta cambiaba a 1.5× y al Reanudar
+    // la locución seguía con rate 1. Ahora también en pausa están deshabilitados.
     await abrir(page);
     await escribir(page, 'Hola mundo bonito');
     await botonLeer(page).click();
     await page.getByRole('button', { name: 'Pausar lectura' }).click();
-    const deslizador = page.locator('#slider-velocidad');
-    if (await deslizador.isEnabled()) {
-      await sembrarValor(page, '#slider-velocidad', '1.5');
-      await page.getByRole('button', { name: 'Reanudar lectura' }).click();
-      const speaks = (await llamadas(page)).filter((l) => l.f === 'speak');
-      expect(speaks.at(-1)?.rate).toBe(1.5);
-    } else {
-      await expect(deslizador).toBeDisabled();
-    }
+    await expect(page.getByRole('button', { name: 'Reanudar lectura' })).toBeVisible();
+    await expect(page.locator('#slider-velocidad')).toBeDisabled();
+    await expect(page.locator('#slider-tono')).toBeDisabled();
+    await expect(page.locator('#selector-voz')).toBeDisabled();
+    await page.getByRole('button', { name: 'Detener lectura' }).click();
+    await expect(page.locator('#slider-velocidad')).toBeEnabled();
   });
 
-  test('HALLAZGO (03/11/2026, ABIERTO) · el JSON-LD promete «ajuste de tono y volumen» y no hay control de volumen', async ({
+  test('HALLAZGO 3963 (03/11/2026, REPARADO) · el JSON-LD ya no promete «ajuste de tono y volumen»', async ({
     page,
   }) => {
     // La app tiene dos deslizadores, Velocidad y Tono; ninguna línea fija utt.volume.
-    test.fail();
     await abrir(page);
     await expect(page.locator('input[type="range"]')).toHaveCount(2);
     const scripts = await page.locator('script[type="application/ld+json"]').allTextContents();
@@ -413,12 +436,13 @@ test.describe('lector-texto-voz · contador, resaltado y controles', () => {
     expect(features.join(' · ')).not.toMatch(/volumen/i);
   });
 
-  test('HALLAZGO (03/11/2026, ABIERTO) · FAQPage y página recomiendan velocidades distintas para la dislexia', async ({
+  test('HALLAZGO 3967 (03/11/2026, REPARADO) · FAQPage y página recomiendan la misma velocidad para la dislexia, sin cifras sin fuente', async ({
     page,
   }) => {
-    // FAQPage (solo la leen buscadores e IA): «Las personas con dislexia… entre el 60% y el 80%».
-    // Página, paso 2: «Para personas con dislexia o mayores, empieza en 0.8× o 0.9×».
-    test.fail();
+    // FAQPage (solo la leen buscadores e IA) decía «Las personas con dislexia… entre el 60% y el
+    // 80%», «130-160 palabras por minuto» y «sin perder comprensión significativa». Página,
+    // paso 2: «Para personas con dislexia o mayores, empieza en 0,8× o 0,9×». Ahora la FAQPage
+    // dice lo mismo que la página, y que 1× no equivale a un ritmo fijo.
     await abrir(page);
     const scripts = await page.locator('script[type="application/ld+json"]').allTextContents();
     const faq = scripts
@@ -429,17 +453,21 @@ test.describe('lector-texto-voz · contador, resaltado y controles', () => {
     const paso2 = await page.locator('li', { hasText: 'Ajusta la velocidad' }).textContent();
     const dislexiaFaq60 = /dislexia[^.]*entre el 60\s?% y el 80\s?%/.test(respuestas);
     const paginaDice09 = /dislexia o mayores, empieza en 0[.,]8×? o 0[.,]9×/.test(paso2 ?? '');
-    expect(dislexiaFaq60 && paginaDice09).toBe(false);
+    expect(dislexiaFaq60).toBe(false);
+    expect(paginaDice09).toBe(true);
+    expect(respuestas).toMatch(/dislexia[^.]*0,8× o 0,9×/);
+    expect(respuestas).not.toMatch(/\d+\s*-\s*\d+ palabras por minuto|sin perder comprensión significativa/);
   });
 
-  test('HALLAZGO (03/11/2026, ABIERTO) · formato: «1.0×», «33%», «1 palabras» y «35999 caracteres»', async ({
+  test('HALLAZGO 3968 (03/11/2026, REPARADO) · formato: «1,0×», «33 %», «1 palabra» y «35.999 caracteres»', async ({
     page,
   }) => {
     // Formato español (CLAUDE.md global §2): coma decimal, «33 %» con espacio, punto de miles
-    // con cinco cifras; y el singular con una palabra.
-    test.fail();
+    // con cinco cifras (con cuatro no se agrupa); y el singular con una palabra.
     await abrir(page);
     await expect(page.locator('label[for="slider-velocidad"]')).toContainText('1,0×');
+    await expect(page.locator('label[for="slider-tono"]')).toContainText('Tono: 1,0');
+    await expect(page.locator('#slider-velocidad')).toHaveAttribute('aria-valuetext', '1,0 veces la velocidad normal');
     await escribir(page, 'Hola');
     await expect(contador(page)).toHaveText('1 palabra · 4 caracteres');
     // 4.000 × «estudiar» (8) + 3.999 espacios = 35.999 caracteres

@@ -37,13 +37,13 @@ export const jsonLd = generateWebAppSchema({
   url: 'https://meskeia.com/lector-texto-voz/',
   category: 'UtilityApplication',
   features: [
-    'Lectura en voz alta de texto en español',
-    'Resaltado de palabras en tiempo real',
-    'Control de velocidad de lectura ajustable',
-    'Ajuste de tono y volumen de la voz',
-    'Compatible con múltiples voces del sistema',
-    'Accesible para personas con discapacidad visual o dislexia',
-    'Sin registro ni instalación requerida',
+    'Lectura en voz alta con las voces del navegador',
+    'Resaltado de la palabra que se lee y barra de progreso',
+    'Velocidad de 0,5× a 2× y tono ajustables',
+    'Pausar, reanudar y detener la lectura',
+    'Contador de palabras y caracteres',
+    'Selector entre las voces en español del navegador, separando las de tu dispositivo de las en línea',
+    'Sin registro ni instalación',
   ],
 });
 
@@ -80,7 +80,7 @@ export const faqJsonLd = {
       name: '¿Cuál es la velocidad óptima de lectura para comprensión y aprendizaje?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La velocidad óptima de lectura TTS depende del objetivo y del perfil del usuario. Para comprensión profunda de textos complejos (académicos, técnicos o literarios), se recomienda una velocidad entre el 80% y el 100% de la velocidad normal de habla, equivalente a unas 130-160 palabras por minuto. Para revisión de textos conocidos o escucha de contenido ligero, velocidades del 150% al 200% permiten ahorrar tiempo sin perder comprensión significativa. Las personas con dislexia o dificultades de procesamiento auditivo suelen beneficiarse de velocidades más lentas, entre el 60% y el 80%. La recomendación general es comenzar a velocidad normal e ir ajustando progresivamente hasta encontrar el punto en que la comprensión se mantiene alta y la escucha resulta cómoda.',
+        text: 'No hay una velocidad única: depende del texto, de la persona y de la voz, porque la velocidad 1× no equivale a un número fijo de palabras por minuto y cada voz habla a su propio ritmo. Para textos difíciles, o para personas con dislexia o mayores, un buen punto de partida es 0,8× o 0,9×; para repasar textos conocidos, 1,3× a 1,5× puede resultar más cómodo. Lo recomendable es empezar en uno de esos valores e ir ajustando hasta que la escucha resulte cómoda y se siga entendiendo lo que se oye.',
       },
     },
     {

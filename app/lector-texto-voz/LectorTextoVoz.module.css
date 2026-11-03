@@ -137,6 +137,21 @@
   cursor: not-allowed;
 }
 
+/* Dónde se sintetiza el texto con la voz elegida (hallazgo 3959) */
+.notaVoz,
+.avisoVoz {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.avisoVoz {
+  padding-left: 0.6rem;
+  border-left: 3px solid #D97706;
+  color: var(--text-primary);
+}
+
 .slider {
   -webkit-appearance: none;
   appearance: none;

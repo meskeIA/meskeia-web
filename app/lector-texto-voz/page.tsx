@@ -11,14 +11,20 @@ import {
   ShareCard,
   DisclaimerCard,
 } from '@/components';
+import { formatNumber } from '@/lib';
 
 type EstadoLector = 'parado' | 'reproduciendo' | 'pausado';
 
 interface VozItem {
   nombre: string;
   lang: string;
+  /** SpeechSynthesisVoice.localService: false = la síntesis la hace un servicio remoto */
+  local: boolean;
   voz: SpeechSynthesisVoice;
 }
+
+/** «1,0»: velocidad y tono con coma decimal */
+const formatoFactor = (n: number) => formatNumber(n, 1);
 
 const TEXTO_EJEMPLO = `La lectura en voz alta es una herramienta poderosa para personas con discapacidad visual, dislexia, fatiga visual o simplemente para quienes aprenden mejor escuchando.
 
@@ -39,9 +45,12 @@ export default function LectorTextoVozPage() {
 
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
   const palabraResaltadaRef = useRef<HTMLElement | null>(null);
+  const botonLeerRef = useRef<HTMLButtonElement | null>(null);
+  const enfocarLeerRef = useRef(false);
 
-  // Tokenizar texto en palabras y espacios
-  const tokens = useMemo(() => texto.split(/(\s+)/), [texto]);
+  // Tokenizar texto en palabras y espacios. split(/(\s+)/) deja un trozo vacío delante si el
+  // texto empieza por un blanco y otro detrás si acaba en blanco: no son palabras (hallazgo 3960)
+  const tokens = useMemo(() => texto.split(/(\s+)/).filter(t => t !== ''), [texto]);
 
   // Pre-calcular índice de palabra para cada token
   const tokenConIndice = useMemo(() => {
@@ -76,16 +85,21 @@ export default function LectorTextoVozPage() {
 
     const cargarVoces = () => {
       const todas = window.speechSynthesis.getVoices();
-      const espanol = todas
-        .filter(v => v.lang.startsWith('es'))
-        .map(v => ({ nombre: v.name, lang: v.lang, voz: v }));
+      const aItem = (v: SpeechSynthesisVoice): VozItem => ({
+        nombre: v.name,
+        lang: v.lang,
+        local: v.localService !== false,
+        voz: v,
+      });
+      const espanol = todas.filter(v => v.lang.startsWith('es')).map(aItem);
 
-      const lista = espanol.length > 0
-        ? espanol
-        : todas.map(v => ({ nombre: v.name, lang: v.lang, voz: v }));
+      const lista = espanol.length > 0 ? espanol : todas.map(aItem);
 
       setVoces(lista);
-      if (lista.length > 0) setVozSeleccionada(lista[0].nombre);
+      // Por defecto, una voz que sintetiza en el dispositivo: las «en línea» envían el texto a
+      // un servicio remoto, y eso se elige a sabiendas (hallazgo 3959)
+      const porDefecto = lista.find(v => v.local) ?? lista[0];
+      if (porDefecto) setVozSeleccionada(porDefecto.nombre);
     };
 
     cargarVoces();
@@ -107,6 +121,19 @@ export default function LectorTextoVozPage() {
     setPalabraActual(-1);
   }, []);
 
+  // Detener desmonta su propio botón: el foco pasa a Leer en vez de caer a <body> (hallazgo 3962)
+  const detenerDesdeBoton = useCallback(() => {
+    enfocarLeerRef.current = true;
+    detener();
+  }, [detener]);
+
+  useEffect(() => {
+    if (estado === 'parado' && enfocarLeerRef.current) {
+      enfocarLeerRef.current = false;
+      botonLeerRef.current?.focus();
+    }
+  }, [estado]);
+
   // Resetear al cambiar el texto
   useEffect(() => {
     if (estado !== 'parado') detener();
@@ -120,9 +147,8 @@ export default function LectorTextoVozPage() {
     const utt = new SpeechSynthesisUtterance(texto);
     utt.rate = velocidad;
     utt.pitch = tono;
-    utt.lang = 'es-ES';
-
     const vozObj = voces.find(v => v.nombre === vozSeleccionada);
+    utt.lang = vozObj?.lang ?? 'es-ES';
     if (vozObj) utt.voice = vozObj.voz;
 
     utt.onboundary = (event: SpeechSynthesisEvent) => {
@@ -159,6 +185,16 @@ export default function LectorTextoVozPage() {
   const progreso = totalPalabras > 0 && palabraActual >= 0
     ? Math.round((palabraActual / totalPalabras) * 100)
     : 0;
+  const progresoTexto = `${progreso} %`;
+  const textoContador =
+    `${formatNumber(totalPalabras, 0)} ${totalPalabras === 1 ? 'palabra' : 'palabras'} · ` +
+    `${formatNumber(texto.length, 0)} ${texto.length === 1 ? 'carácter' : 'caracteres'}`;
+  const vozActual = voces.find(v => v.nombre === vozSeleccionada);
+  const vozEnLinea = vozActual !== undefined && !vozActual.local;
+  const vocesLocales = voces.filter(v => v.local);
+  const vocesEnLinea = voces.filter(v => !v.local);
+  // Velocidad, tono y voz solo se aplican al pulsar Leer: también en pausa quedan fijos (hallazgo 3964)
+  const ajustesBloqueados = estado !== 'parado';
 
   return (
     <div className={styles.container}>
@@ -198,22 +234,42 @@ export default function LectorTextoVozPage() {
               className={styles.selector}
               value={vozSeleccionada}
               onChange={e => setVozSeleccionada(e.target.value)}
-              disabled={estado === 'reproduciendo'}
+              disabled={ajustesBloqueados}
               aria-label="Seleccionar voz"
+              aria-describedby="aviso-voz"
             >
-              {voces.map(v => (
-                <option key={v.nombre} value={v.nombre}>
-                  {v.nombre} ({v.lang})
-                </option>
-              ))}
+              {vocesLocales.length > 0 && (
+                <optgroup label="En tu dispositivo">
+                  {vocesLocales.map(v => (
+                    <option key={v.nombre} value={v.nombre}>
+                      {`${v.nombre} (${v.lang})`}
+                    </option>
+                  ))}
+                </optgroup>
+              )}
+              {vocesEnLinea.length > 0 && (
+                <optgroup label="En línea: el texto se envía al servicio de voz">
+                  {vocesEnLinea.map(v => (
+                    <option key={v.nombre} value={v.nombre}>
+                      {`${v.nombre} (${v.lang}) · en línea`}
+                    </option>
+                  ))}
+                </optgroup>
+              )}
             </select>
+            {/* Siempre montado: solo cambia su texto (hallazgo 3959) */}
+            <p id="aviso-voz" className={vozEnLinea ? styles.avisoVoz : styles.notaVoz} aria-live="polite">
+              {vozEnLinea
+                ? 'Voz en línea: el navegador envía el texto a su servicio de voz para leerlo. Si prefieres que no salga de tu dispositivo, elige una voz del grupo «En tu dispositivo».'
+                : 'Voz de tu dispositivo: el texto se lee sin salir de tu ordenador o móvil.'}
+            </p>
           </div>
         )}
 
         {/* Velocidad */}
         <div className={styles.configGrupo}>
           <label className={styles.configLabel} htmlFor="slider-velocidad">
-            Velocidad: <strong>{velocidad.toFixed(1)}×</strong>
+            Velocidad: <strong>{`${formatoFactor(velocidad)}×`}</strong>
           </label>
           <input
             id="slider-velocidad"
@@ -224,8 +280,8 @@ export default function LectorTextoVozPage() {
             value={velocidad}
             onChange={e => setVelocidad(Number(e.target.value))}
             className={styles.slider}
-            disabled={estado === 'reproduciendo'}
-            aria-valuetext={`${velocidad.toFixed(1)} veces la velocidad normal`}
+            disabled={ajustesBloqueados}
+            aria-valuetext={`${formatoFactor(velocidad)} veces la velocidad normal`}
           />
           <div className={styles.sliderLabels}>
             <span>Lento</span>
@@ -236,7 +292,7 @@ export default function LectorTextoVozPage() {
         {/* Tono */}
         <div className={styles.configGrupo}>
           <label className={styles.configLabel} htmlFor="slider-tono">
-            Tono: <strong>{tono.toFixed(1)}</strong>
+            Tono: <strong>{formatoFactor(tono)}</strong>
           </label>
           <input
             id="slider-tono"
@@ -247,7 +303,8 @@ export default function LectorTextoVozPage() {
             value={tono}
             onChange={e => setTono(Number(e.target.value))}
             className={styles.slider}
-            disabled={estado === 'reproduciendo'}
+            disabled={ajustesBloqueados}
+            aria-valuetext={formatoFactor(tono)}
           />
           <div className={styles.sliderLabels}>
             <span>Grave</span>
@@ -296,9 +353,7 @@ export default function LectorTextoVozPage() {
             rows={10}
             aria-label="Texto a leer en voz alta"
           />
-          <p className={styles.contadorTexto}>
-            {totalPalabras} palabras · {texto.length} caracteres
-          </p>
+          <p className={styles.contadorTexto}>{textoContador}</p>
         </section>
       )}
 
@@ -322,15 +377,27 @@ export default function LectorTextoVozPage() {
                     return <span key={i}>{token}</span>;
                   }
                   const esActual = idxPalabra === palabraActual;
+                  // Solo la palabra que se lee es un <mark> (rol «resaltado»); las demás, <span>:
+                  // con todas en <mark> el lector de pantalla las daba todas por resaltadas (hallazgo 3966)
+                  if (esActual) {
+                    return (
+                      <mark
+                        key={i}
+                        ref={el => { palabraResaltadaRef.current = el; }}
+                        className={`${styles.palabra} ${styles.palabraActual}`}
+                        aria-current="true"
+                      >
+                        {token}
+                      </mark>
+                    );
+                  }
                   return (
-                    <mark
+                    <span
                       key={i}
-                      ref={esActual ? (el => { palabraResaltadaRef.current = el; }) : null}
-                      className={`${styles.palabra} ${esActual ? styles.palabraActual : ''} ${idxPalabra < palabraActual ? styles.palabraLeida : ''}`}
-                      aria-current={esActual ? 'true' : undefined}
+                      className={`${styles.palabra} ${idxPalabra < palabraActual ? styles.palabraLeida : ''}`}
                     >
                       {token}
-                    </mark>
+                    </span>
                   );
                 })
               : <em className={styles.placeholder}>El texto aparecerá aquí...</em>
@@ -341,24 +408,28 @@ export default function LectorTextoVozPage() {
 
       {/* Barra de progreso */}
       {estado !== 'parado' && (
-        <div className={styles.progreso} aria-label={`Progreso: ${progreso}%`}>
+        <div className={styles.progreso}>
+          {/* El nombre va en el propio progressbar: en el <div> genérico no se exponía (hallazgo 3965) */}
           <div
             className={styles.progresoBar}
             style={{ width: `${progreso}%` }}
             role="progressbar"
+            aria-label="Progreso de la lectura"
             aria-valuenow={progreso}
             aria-valuemin={0}
             aria-valuemax={100}
+            aria-valuetext={progresoTexto}
           />
-          <span className={styles.progresoTexto}>{progreso}%</span>
+          <span className={styles.progresoTexto}>{progresoTexto}</span>
         </div>
       )}
 
       {/* Controles principales */}
-      <div className={styles.controles} aria-label="Controles de reproducción">
+      <div className={styles.controles} role="group" aria-label="Controles de reproducción">
         {estado === 'parado' ? (
           <button
             type="button"
+            ref={botonLeerRef}
             className={`${styles.btnControl} ${styles.btnPlay}`}
             onClick={iniciar}
             disabled={!soportado || !texto.trim()}
@@ -379,7 +450,7 @@ export default function LectorTextoVozPage() {
             <button
               type="button"
               className={`${styles.btnControl} ${styles.btnStop}`}
-              onClick={detener}
+              onClick={detenerDesdeBoton}
               aria-label="Detener lectura"
             >
               <span aria-hidden="true">⏹</span> Detener
@@ -396,9 +467,12 @@ export default function LectorTextoVozPage() {
           <h2>¿Qué es la síntesis de voz?</h2>
           <p>
             La síntesis de voz (Text-to-Speech o TTS) convierte texto escrito en audio hablado
-            usando el motor de voz integrado en el navegador. Es completamente gratuita,
-            funciona sin conexión a internet y respeta tu privacidad al 100%: el texto
-            nunca sale de tu dispositivo.
+            usando las voces de tu navegador. Es gratuita y no necesita instalar nada. Dónde se
+            procesa el texto depende de la voz que elijas: con una voz del grupo «En tu
+            dispositivo» se sintetiza en tu ordenador o móvil, sin salir de él, y también sirve
+            sin conexión; las voces «en línea» (las neuronales que Google y Microsoft añaden en
+            Chrome y Edge) envían el texto a su servicio de voz. El selector las separa y avisa
+            cuando eliges una en línea.
           </p>
 
           <h2>¿A quién ayuda?</h2>
@@ -424,16 +498,16 @@ export default function LectorTextoVozPage() {
               el texto facilita la comprensión.
             </li>
             <li>
-              <strong>Aprendizaje de idiomas</strong>: Escuchar la pronunciación correcta
+              <strong>Aprendizaje del español</strong>: Escuchar la pronunciación
               mientras se lee el texto.
             </li>
           </ul>
 
           <h2>Consejos de uso</h2>
           <ul>
-            <li>Empieza con velocidad <strong>0.8×</strong> si el texto es difícil</li>
+            <li>Empieza con velocidad <strong>0,8×</strong> si el texto es difícil</li>
             <li>Usa la pestaña &quot;Seguir lectura&quot; para ver las palabras resaltadas</li>
-            <li>En Chrome y Edge las voces en español son de mayor calidad</li>
+            <li>En Chrome y Edge hay voces en español de mayor calidad, que funcionan en línea</li>
             <li>Puedes pausar en cualquier momento y reanudar donde lo dejaste</li>
             <li>Combínalo con el Adaptador de Dislexia para un texto más legible</li>
           </ul>
@@ -528,15 +602,15 @@ export default function LectorTextoVozPage() {
           <dl className={styles.faqList}>
             <div className={styles.faqItem}>
               <dt>¿Por qué en Firefox no hay voces en español?</dt>
-              <dd>Firefox usa el motor de síntesis de voz del sistema operativo, que en Windows a veces no incluye voces de alta calidad en español. En Chrome y Edge, Google y Microsoft añaden voces neuronales de mayor calidad. Si necesitas buena calidad de voz española, Chrome es la opción recomendada.</dd>
+              <dd>Firefox usa el motor de síntesis de voz del sistema operativo, que en Windows a veces no incluye voces de alta calidad en español. En Chrome y Edge, Google y Microsoft añaden voces neuronales de mayor calidad, que funcionan en línea: el texto se envía a su servicio de voz. Si necesitas buena calidad de voz española y no te importa que el texto salga del dispositivo, son la opción recomendada.</dd>
             </div>
             <div className={styles.faqItem}>
               <dt>¿El texto que pego se envía a algún servidor?</dt>
-              <dd>No. Toda la síntesis de voz ocurre en tu dispositivo usando la API nativa del navegador. Ni el texto ni el audio salen de tu ordenador o móvil. Tu privacidad está completamente protegida.</dd>
+              <dd>Depende de la voz. meskeIA no recibe ni guarda el texto: la lectura la hace tu navegador. Con una voz del grupo «En tu dispositivo», el texto no sale de tu ordenador o móvil. Las voces «en línea» —las neuronales de Google y Microsoft en Chrome y Edge— envían el texto a su servicio de voz para sintetizarlo; el selector las agrupa aparte y avisa al elegirlas.</dd>
             </div>
             <div className={styles.faqItem}>
               <dt>¿Puedo usar esta herramienta para textos en otros idiomas?</dt>
-              <dd>Sí. Aunque la app está configurada para español por defecto, las voces disponibles dependen de las instaladas en tu navegador/sistema. Si pegas texto en inglés o francés, puedes seleccionar la voz correspondiente en el selector de voces.</dd>
+              <dd>La app está pensada para textos en español: el selector ofrece las voces en español de tu navegador (solo si no tiene ninguna muestra las demás). Un texto en inglés o francés se leerá con una de esas voces y su pronunciación española.</dd>
             </div>
             <div className={styles.faqItem}>
               <dt>¿Por qué el resaltado de palabras no es exacto en algunas frases?</dt>
@@ -544,7 +618,7 @@ export default function LectorTextoVozPage() {
             </div>
             <div className={styles.faqItem}>
               <dt>¿Puedo ajustar la velocidad y el tono después de empezar?</dt>
-              <dd>No mientras se está leyendo: los sliders están desactivados durante la reproducción para evitar errores. Detén la lectura, ajusta los parámetros y vuelve a pulsar Leer para aplicar los cambios.</dd>
+              <dd>No mientras hay una lectura en curso: velocidad, tono y voz están desactivados durante la reproducción y la pausa, porque el navegador fija esos valores al empezar. Detén la lectura, ajusta los parámetros y vuelve a pulsar Leer para aplicar los cambios.</dd>
             </div>
             <div className={styles.faqItem}>
               <dt>¿Qué longitud máxima de texto puede procesar?</dt>
@@ -569,14 +643,14 @@ export default function LectorTextoVozPage() {
               <span className={styles.stepNumber}>1</span>
               <div>
                 <strong>Selecciona una voz en español</strong>
-                <p>En el selector de voz, elige la que empiece por &quot;es-ES&quot; o &quot;es&quot;. En Chrome las voces &quot;Google español&quot; o &quot;Microsoft Helena&quot; tienen buena naturalidad.</p>
+                <p>En el selector de voz, elige la que empiece por &quot;es-ES&quot; o &quot;es&quot;. Las del grupo «En tu dispositivo» (por ejemplo, &quot;Microsoft Helena&quot; en Windows) no envían el texto fuera; las de «En línea» (como &quot;Google español&quot; en Chrome) suenan más naturales, pero envían el texto al servicio de voz del navegador.</p>
               </div>
             </li>
             <li className={styles.step}>
               <span className={styles.stepNumber}>2</span>
               <div>
                 <strong>Ajusta la velocidad</strong>
-                <p>Para personas con dislexia o mayores, empieza en 0.8× o 0.9×. Para revisión rápida de textos conocidos, 1.3×-1.5× puede ser más cómodo.</p>
+                <p>Para personas con dislexia o mayores, empieza en 0,8× o 0,9×. Para revisión rápida de textos conocidos, 1,3×-1,5× puede ser más cómodo.</p>
               </div>
             </li>
             <li className={styles.step}>
@@ -611,7 +685,7 @@ export default function LectorTextoVozPage() {
               <span className={styles.stepNumber}>7</span>
               <div>
                 <strong>Experimenta con el tono</strong>
-                <p>Un tono más bajo (0.7-0.8) puede ser más cómodo para sesiones largas. Un tono alto (1.3+) puede ayudar a distinguir mejor las palabras en texto difícil.</p>
+                <p>Un tono más bajo (0,7-0,8) puede ser más cómodo para sesiones largas. Un tono alto (1,3 o más) puede ayudar a distinguir mejor las palabras en texto difícil.</p>
               </div>
             </li>
           </ol>
