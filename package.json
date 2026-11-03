@@ -77,6 +77,7 @@
     "inspector:probar-firma": "node scripts/inspector/probar-firma.mjs",
     "inspector:probar-contador": "node scripts/inspector/probar-contador.mjs",
     "inspector:probar-familias": "node scripts/inspector/probar-familias.mjs",
+    "inspector:validar-familias": "node scripts/inspector/validar-familias.mjs",
     "inspector:probar-cola-cabos": "node scripts/inspector/probar-cola-cabos.mjs",
     "inspector:probar-cola-reposo": "node scripts/inspector/probar-cola-reposo.mjs",
     "inspector:probar-cola-valor": "node scripts/inspector/probar-cola-valor.mjs",

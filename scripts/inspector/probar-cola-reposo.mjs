@@ -12,13 +12,14 @@
  * `estimador-compraventa-inmueble` llevaba 28 inspecciones sin un «ok», la familia se llevaba el
  * 25 % de las inspecciones y en octubre el 92 % eran repeticiones. Decidido por el usuario: los
  * altos se re-inspeccionan en cuanto se reparan; si la última vuelta solo dejó bajos o medios, la
- * app espera un mes. El rojo, la firma y los cabos no esperan. La familia reposa entera o no
- * reposa. Detalle y cifras: «EL REPOSO DE UN MES» en la cabecera de `cola.mjs`.
+ * app espera un mes. El rojo, la firma y los cabos no esperan. Hasta el 03/11/2026 la familia
+ * reposaba entera o no reposaba; desde entonces cada hermana reposa por su cuenta (cabecera de
+ * `cambio-familia.mjs`). Detalle y cifras: «EL REPOSO DE UN MES» en la cabecera de `cola.mjs`.
  *
  * LAS COMPROBACIONES
  * ──────────────────
  *   1. CASO DE ORIGEN: la familia, invalidada entera tras una vuelta de solo menores, NO sale.
- *   2. Si la última vuelta de una sola hermana dejó un alto, la familia sale ENTERA.
+ *   2. Si la última vuelta de una hermana dejó un alto, sale ELLA; las demás siguen en reposo.
  *   3. Una app suelta con menores hace 10 días espera; con menores hace 31 días, sale.
  *   4. Una app con un crítico en su última vuelta sale; una con «ok» hace 5 días espera.
  *   5. Cuenta solo la ÚLTIMA vuelta: un alto anterior ya reparado no la saca.
@@ -97,18 +98,21 @@ const tramoDe = (salida, titulo) => (salida.split(/\n(?=\S)/).find((b) => b.star
 console.log('\n1 · CASO DE ORIGEN: la familia, invalidada tras una vuelta de solo menores, no sale');
 ins.close();
 let cola = correr(['400']);
+// La lista de Claude: desde el 03/11/2026 una hermana en reposo puede salir en la sección del
+// testigo, que no gasta cupo ni Claude (cambio-familia.mjs)
+const paraClaude = (salida) => tramoDe(salida, 'Por valor esperado');
 ok(!cola.includes(`FAMILIA «${FAM.nombre}»`), `la familia «${FAM.nombre}» espera`);
-ok(FAM.slugs.every((s) => !sale(cola, s)), '  ninguna hermana sale suelta');
+ok(FAM.slugs.every((s) => !sale(paraClaude(cola), s)), '  ninguna hermana va a Claude');
 
-console.log('\n2 · Un alto en la última vuelta de una sola hermana saca la familia entera');
+console.log('\n2 · Un alto en la última vuelta de una hermana la saca a ella sola; las demás siguen en reposo (03/11/2026)');
 {
   const db = new DatabaseSync(rutaIns);
   const { lastInsertRowid: id } = db.prepare("INSERT INTO inspecciones (slug, fecha, veredicto) VALUES (?, ?, 'prueba')").run(FAM.slugs[0], haceDias(0));
   db.prepare("INSERT INTO hallazgos (inspeccion_id, slug, severidad, descripcion, caso, fecha) VALUES (?, ?, 'alto', 'prueba', 'prueba', ?)").run(id, FAM.slugs[0], haceDias(0));
   db.close();
   cola = correr(['400']);
-  ok(cola.includes(`FAMILIA «${FAM.nombre}»`), `la familia sale por el alto de ${FAM.slugs[0]}`);
-  ok(cola.includes(`(${FAM.slugs.length} de ${FAM.slugs.length} pendientes)`), `  con las ${FAM.slugs.length} hermanas pendientes, no solo la del alto`);
+  ok(sale(paraClaude(cola), FAM.slugs[0]), `${FAM.slugs[0]} sale por su alto`);
+  ok(FAM.slugs.slice(1).every((s) => !sale(paraClaude(cola), s)), `  sus ${FAM.slugs.length - 1} hermanas, sin alto, siguen en reposo`);
 }
 
 console.log('\n3 · Una app con menores espera un mes, no más');
@@ -129,8 +133,9 @@ ok(sale(cola, cabo) && cola.includes('· cabo C'), `${cabo} sale por su cabo`);
 
 console.log('\n7 · --resumen cuenta las que esperan');
 const m = correr(['--resumen']).match(/en reposo:\s+(\d+) invalidadas/);
-// menores10, sinHallazgos, altoAnterior y las tres que no esperan (reposan, pero salen igual)
-ok(m && Number(m[1]) === 6, `imprime «en reposo: 6 invalidadas» (sale ${m ? m[1] : 'nada'})`);
+// menores10, sinHallazgos, altoAnterior, las tres que no esperan (reposan, pero salen igual) y,
+// desde el 03/11/2026, las seis hermanas de compraventa sin alto, que reposan por su cuenta
+ok(m && Number(m[1]) === 12, `imprime «en reposo: 12 invalidadas» (sale ${m ? m[1] : 'nada'})`);
 
 fs.rmSync(TMP, { recursive: true, force: true });
 console.log(fallos ? `\n✗ ${fallos} comprobaciones FALLAN` : '\n✓ todas las comprobaciones pasan');

@@ -83,6 +83,7 @@ import path from 'path';
 import { abrir, ahora, RAIZ, SQL_INVALIDADA } from './db.mjs';
 import { crearHuella } from './huella.mjs';
 import { lectorEnElPasado } from './pasado.mjs';
+import { specsDelInforme } from './informe-playwright.mjs';
 
 const args = process.argv.slice(2);
 const valorDe = (n, d) => { const i = args.indexOf(`--${n}`); return i >= 0 && args[i + 1] ? args[i + 1] : d; };
@@ -245,31 +246,7 @@ if (REVALIDAR) {
   process.exit(0);
 }
 
-/**
- * Specs en verde según un informe JSON de Playwright: ruta absoluta del spec → ¿todo verde?
- * Verde = cada test `expected` o `skipped`. Un `flaky` (pasó al reintentar) no cuenta: aquí se
- * decide sacar una app de la cola sin mirarla, y ante la duda se queda.
- */
-function specsDelInforme(ruta) {
-  const j = JSON.parse(fs.readFileSync(ruta, 'utf8'));
-  const raizTests = j.config?.rootDir;
-  if (!raizTests) throw new Error(`${ruta} no parece un informe JSON de Playwright (falta config.rootDir)`);
-  // 'verde' | 'inestable' | 'rojo' por fichero; manda el peor de sus tests
-  const peso = { verde: 0, inestable: 1, rojo: 2 };
-  const verde = new Map();
-  const recorrer = (s) => {
-    for (const sp of s.specs ?? []) {
-      const f = path.resolve(raizTests, sp.file).toLowerCase();
-      for (const t of sp.tests) {
-        const e = t.status === 'expected' || t.status === 'skipped' ? 'verde' : t.status === 'flaky' ? 'inestable' : 'rojo';
-        if (peso[e] >= peso[verde.get(f) ?? 'verde']) verde.set(f, e);
-      }
-    }
-    for (const hija of s.suites ?? []) recorrer(hija);
-  };
-  for (const s of j.suites ?? []) recorrer(s);
-  return verde;
-}
+// Specs en verde según el informe: `informe-playwright.mjs` (lo comparte con validar-familias.mjs)
 
 if (REVALIDAR_COMMITS) {
   if (!INFORME) {

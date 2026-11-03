@@ -89,15 +89,20 @@
  * Sale de medir el bucle Inspector → Reparar → Inspector: `estimador-compraventa-inmueble` llevaba
  * 28 inspecciones sin un solo «ok», la familia de compraventa (7 apps) se llevaba el 25 % de las
  * inspecciones y en octubre el 92 % eran repeticiones. Decidido por el usuario ese día, con el mes.
- * Una FAMILIA reposa entera o no reposa: si una hermana no está en reposo, salen todas.
+ * Cada hermana de familia reposa por su cuenta desde el 03/11/2026 (abajo). Hasta entonces la
+ * familia reposaba entera o no reposaba, y las cinco nunca vistas de quizzes arrastraban a quince
+ * hermanas que reposaban.
  * Prueba: `npm run inspector:probar-cola-reposo`.
  *
- * LAS FAMILIAS SALEN JUNTAS
- * ─────────────────────────
- * Si una app pertenece a una familia declarada en `familias.mjs`, la cola saca el grupo
- * ENTERO y no la app suelta. Sale de haber medido (23/09/2026) que reparar en lote no
- * cierra el problema: el commit `cfe091a7` reparó el clúster de compraventa «en las SIETE
- * apps» y aun así dejó cuatro huecos. El detalle, en la cabecera de `familias.mjs`.
+ * LAS FAMILIAS: CADA HERMANA SALE SOLA, Y LO COMÚN LO VALIDA SU TESTIGO (03/11/2026)
+ * ──────────────────────────────────────────────────────────────────────────────────
+ * Del 23/09 al 03/11/2026 una familia salía ENTERA aunque solo cambiara una hermana (`cfe091a7`:
+ * reparar compraventa «en las SIETE apps» dejó cuatro huecos). El 03/11 eso pedía 21 apps con el
+ * cupo en 5, y el usuario no lo lanzó: agota el plan Max. Lo que aquella regla cubría lo cubren hoy
+ * el testigo de cada familia (en cada build, por `check:familias`) y el tipo `alcance` de `/reparar`.
+ * Ahora cada hermana va por valor como cualquier app, con su familia a la vista, y la que solo
+ * cambió por commits comunes (de familia o de campaña) sale en la sección del TESTIGO, fuera del
+ * cupo: la valida `validar-familias.mjs` sin Claude. Criterio y límite: `cambio-familia.mjs`.
  *
  * POR QUÉ EL USO PESA TANTO (medido el 14/08/2026 sobre el dump de Turso)
  * ──────────────────────────────────────────────────────────────────────
@@ -107,11 +112,10 @@
  */
 
 import fs from 'node:fs';
-import path from 'node:path';
-import { execFileSync } from 'node:child_process';
 import { DatabaseSync } from 'node:sqlite';
 import { abrir, SQL_INVALIDADA } from './db.mjs';
 import { FAMILIAS, familiaDe, slugsHuerfanos, appsDelSujeto } from './familias.mjs';
+import { clasificarHermana, baseDelCambio, rutasDeLaApp } from './cambio-familia.mjs';
 import { RAIZ, RUTA_BASE as RUTA_CABOS, codigo } from '../cabos/cabos.mjs';
 
 const args = process.argv.slice(2);
@@ -172,7 +176,7 @@ const SQL_CABO = `slug IN ${enSql(CABOS.keys())}`;
 
 /**
  * Apps en reposo: su última inspección tiene menos de DIAS_REPOSO días y no dejó ningún alto ni
- * crítico (ver «EL REPOSO DE UN MES»). Una familia reposa solo si reposan todas sus hermanas.
+ * crítico (ver «EL REPOSO DE UN MES»). Una hermana de familia reposa por su cuenta (03/11/2026).
  * Una comprobación puntual de cabo cuenta como última inspección: si encuentra un alto, la app
  * deja de reposar y su cambio vuelve a la lista.
  */
@@ -187,11 +191,7 @@ function enReposo() {
         WHERE h.severidad IN ('critico', 'alto')
           AND h.inspeccion_id = (SELECT i.id FROM inspecciones i WHERE i.slug = a.slug ORDER BY i.fecha DESC, i.id DESC LIMIT 1)
       )`).all();
-  const reposan = new Set(filas.map((f) => f.slug));
-  for (const f of FAMILIAS) {
-    if (!f.slugs.every((s) => reposan.has(s))) for (const s of f.slugs) reposan.delete(s);
-  }
-  return reposan;
+  return new Set(filas.map((f) => f.slug));
 }
 const REPOSO = enReposo();
 const SQL_REPOSO = `slug IN ${enSql(REPOSO)}`;
@@ -314,14 +314,8 @@ const ddmm = (iso) => (iso ? `${iso.slice(8, 10)}/${iso.slice(5, 7)}` : '');
  */
 function ordenDiff(f) {
   const desde = f.validada || `${f.ultima_inspeccion}T00:00:00Z`;
-  let base = null;
-  try {
-    base = execFileSync('git', ['-C', RAIZ, 'rev-list', '-1', `--before=${desde}`, 'HEAD'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim().slice(0, 8) || null;
-  } catch { /* sin git: se dice abajo */ }
-  const deps = JSON.parse(f.deps || '[]').map((d) => {
-    for (const c of [`${d}.ts`, `${d}.tsx`, `${d}.mjs`, d]) if (fs.existsSync(path.join(RAIZ, c))) return c;
-    return d;
-  });
+  const base = baseDelCambio(RAIZ, f);
+  const { deps } = rutasDeLaApp(RAIZ, f.slug, f.deps);
   if (!base) return `cambio desde ${ddmm(desde)} (base no encontrada: git log --since=${desde.slice(0, 10)} -- app/${f.slug}/)`;
   return `cambio desde ${ddmm(desde)}: git diff ${base} HEAD -- app/${f.slug}/${deps.length ? ' ' + deps.join(' ') : ''}`;
 }
@@ -329,10 +323,36 @@ function ordenDiff(f) {
 /** La etiqueta de modo que va al final de la línea de una app. */
 function etiqueta(f) {
   const cabos = CABOS.has(f.slug) ? ` · cabo ${CABOS.get(f.slug).join(', ')}` : '';
-  if (f.modo === 'cambio') return `  · ${ordenDiff(f)}${cabos}`;
+  // Una hermana que va a Claude lleva su familia (el bloque de la familia va debajo de la lista) y,
+  // en modo cambio, por qué no la valida el testigo
+  const fam = familiaDe(f.slug);
+  const deFamilia = fam && f.modo !== 'cabo'
+    ? ` · 👯 ${fam.id}${f.modo === 'cambio' && f.motivoFamilia ? ` (${f.motivoFamilia})` : ''}`
+    : '';
+  if (f.modo === 'cambio') return `  · ${ordenDiff(f)}${cabos}${deFamilia}`;
   if (f.modo === 'cabo') return `  · cabo ${(f.codigos ?? CABOS.get(f.slug)).join(', ')}: comprobación puntual`;
-  return `  · ${f.modo}${cabos}`;
+  return `  · ${f.modo}${cabos}${deFamilia}`;
 }
+
+/**
+ * Las hermanas ya inspeccionadas cuyo cambio es COMÚN a su familia, por familia: no van a Claude, las
+ * valida su testigo (`validar-familias.mjs`). Incluye las que reposan: validarlas no cuesta cupo, y
+ * así no vuelven a la lista cuando acaba su mes. slug → { familia, commits }.
+ */
+function cambiosComunes() {
+  const comunes = new Map();
+  const deFamilia = FAMILIAS.flatMap((f) => f.slugs);
+  const filas = db.prepare(`SELECT * FROM apps WHERE slug IN ${enSql(deFamilia)} AND ${SQL_INVALIDADA}`).all();
+  for (const f of filas) {
+    const c = clasificarHermana(db, RAIZ, f);
+    CLASIFICADAS.set(f.slug, c);
+    if (c.comun) comunes.set(f.slug, { familia: familiaDe(f.slug), commits: c.commits });
+  }
+  return comunes;
+}
+/** La clasificación de cada hermana invalidada, para no repetirla al pintar su motivo. */
+const CLASIFICADAS = new Map();
+const COMUNES = cambiosComunes();
 
 if (RESUMEN) {
   const t = db.prepare('SELECT COUNT(*) n FROM apps').get().n;
@@ -361,12 +381,13 @@ if (RESUMEN) {
   log(`  (es la cifra que importa, no el % de apps: el 80 % del uso está en 114 apps)`);
 
   const huerf = slugsHuerfanos(db);
-  log(`\n  familias declaradas: ${FAMILIAS.length} (salen JUNTAS de la cola)`);
+  log(`\n  familias declaradas: ${FAMILIAS.length} (cada hermana sale sola; su cambio común lo valida el testigo, sin Claude)`);
   for (const f of FAMILIAS) {
-    const pend = f.slugs.filter((s) => !!db.prepare(
+    const pend = f.slugs.filter((s) => !COMUNES.has(s) && !!db.prepare(
       `SELECT 1 x FROM apps WHERE slug = ? AND (test_estado = 'rojo' OR ${SQL_INVALIDADA_ACTIVA} OR ultima_inspeccion IS NULL)`,
     ).get(s)).length;
-    log(`    ${f.id.padEnd(14)} ${f.slugs.length} apps · ${pend} pendientes · ${f.testigo}`);
+    const comunes = f.slugs.filter((s) => COMUNES.has(s)).length;
+    log(`    ${f.id.padEnd(14)} ${f.slugs.length} apps · ${pend} para Claude · ${comunes} para el testigo · ${f.testigo}`);
   }
   if (huerf.length) {
     log(`  ⚠ ${huerf.length} slug(s) declarados que ya no existen — corrige familias.mjs:`);
@@ -393,18 +414,8 @@ function linea(f, sangria = '  ') {
   );
 }
 
-/**
- * En qué estado está una hermana de una familia que ya sale. Mira la INVALIDADA sin reposo: si la
- * familia sale, salen todas.
- */
-const SQL_ESTADO = db.prepare(`
-  SELECT *, ${PRIORIDAD} AS p,
-         CASE WHEN test_estado = 'rojo' THEN 'rojo'
-              WHEN ${SQL_FIRMA_NUEVA} AND NOT (${SQL_INVALIDADA}) THEN 'firma'
-              WHEN ultima_inspeccion IS NULL THEN 'primera'
-              WHEN ${SQL_INVALIDADA} THEN 'cambio'
-              ELSE 'al día' END AS estado
-  FROM apps WHERE slug = ?`);
+/** Una app por su slug, con su prioridad (para el carril de los cabos de familia). */
+const SQL_ESTADO = db.prepare(`SELECT *, ${PRIORIDAD} AS p FROM apps WHERE slug = ?`);
 
 const huerfanos = slugsHuerfanos(db);
 if (huerfanos.length) {
@@ -418,8 +429,8 @@ log(`  → una inspección en modo cambio suma ${PLUS.cambio.toFixed(1).replace(
 let quedan = CUANTAS;
 let mostradas = 0;
 const elegidosSlugs = new Set();
-const familiasYaSacadas = new Set();
-const familiasSacadas = [];
+/** Las familias con alguna hermana en la tanda: su bloque (testigo, referencia, invariante) va debajo. */
+const familiasEnTanda = new Map();
 
 for (const t of TRAMOS) {
   if (quedan <= 0) break;
@@ -427,47 +438,50 @@ for (const t of TRAMOS) {
 
   for (const f of t.filas()) {
     if (quedan <= 0) break;
+    // El cambio común de una hermana lo valida su testigo: va a su sección, fuera del cupo
+    if (f.modo === 'cambio' && COMUNES.has(f.slug)) continue;
     const fam = familiaDe(f.slug);
-
-    if (!fam) {
-      elegidas.push({ tipo: 'app', fila: f });
-      elegidosSlugs.add(f.slug);
-      quedan -= 1;
-      continue;
+    if (fam) {
+      familiasEnTanda.set(fam.id, fam);
+      if (f.modo === 'cambio') f.motivoFamilia = (CLASIFICADAS.get(f.slug) ?? clasificarHermana(db, RAIZ, f)).motivo;
     }
-    if (familiasYaSacadas.has(fam.id)) continue;   // ya salió entera más arriba
-
-    // La familia sale ENTERA: las pendientes cuentan contra el cupo; las que están al día se
-    // listan como contexto, porque el testigo las mide igualmente.
-    const miembros = fam.slugs.map((s) => SQL_ESTADO.get(s)).filter(Boolean)
-      .map((m) => ({ ...m, modo: m.estado === 'al día' ? 'al día' : m.estado, v: m.p + (PLUS[m.estado] ?? 0) }));
-    elegidas.push({ tipo: 'familia', familia: fam, miembros });
-    familiasYaSacadas.add(fam.id);
-    for (const m of miembros) elegidosSlugs.add(m.slug);
-    quedan -= miembros.filter((m) => m.estado !== 'al día').length;
+    elegidas.push(f);
+    elegidosSlugs.add(f.slug);
+    quedan -= 1;
   }
 
   if (!elegidas.length) continue;
   log(`\n${t.titulo}`);
+  for (const f of elegidas) log(linea(f));
+  mostradas += elegidas.length;
+}
 
-  for (const e of elegidas) {
-    if (e.tipo === 'app') {
-      log(linea(e.fila));
-      mostradas += 1;
-      continue;
+for (const fam of familiasEnTanda.values()) {
+  log(`\n  👯 familia «${fam.nombre}» — la hermana que sale va SOLA; esto es lo de su familia:`);
+  log(`     testigo:    ${fam.testigo}`);
+  log(`     referencia: ${fam.referencia} — el patrón correcto, no rediseñar`);
+  log(`     invariante: ${fam.invariante}`);
+}
+
+/**
+ * La sección del testigo: hermanas cuyo cambio solo lo explican commits de familia o de campaña. No
+ * gastan cupo ni Claude: la tarea las valida antes de llamar a Claude (`validar-familias.mjs`). Si
+ * siguen aquí cuando Claude lee la cola es que la validación no corrió (en conversación:
+ * `npm run inspector:validar-familias`); si falló, ya no salen aquí sino por valor, con el motivo.
+ */
+const porTestigo = new Map();
+for (const [slug, c] of COMUNES) {
+  if (!porTestigo.has(c.familia.id)) porTestigo.set(c.familia.id, { familia: c.familia, hermanas: [] });
+  porTestigo.get(c.familia.id).hermanas.push({ slug, commits: c.commits });
+}
+const nTestigo = [...porTestigo.values()].reduce((s, x) => s + x.hermanas.length, 0);
+if (nTestigo) {
+  log(`\nFamilia — cambio COMÚN: lo valida su testigo, sin Claude y aparte del cupo (${nTestigo} hermanas; npm run inspector:validar-familias)`);
+  for (const { familia, hermanas } of porTestigo.values()) {
+    log(`  👯 «${familia.nombre}» · testigo ${familia.testigo}`);
+    for (const h of hermanas) {
+      log(`       ${h.slug.padEnd(44)} ${h.commits.map((c) => `${c.sha} (${c.tipo})`).join(' · ')}`);
     }
-    const pendientes = e.miembros.filter((m) => m.estado !== 'al día').length;
-    log(`\n  👯 FAMILIA «${e.familia.nombre}» — se inspeccionan JUNTAS ` +
-                `(${pendientes} de ${e.miembros.length} pendientes)`);
-    log(`     testigo:    ${e.familia.testigo}`);
-    log(`     referencia: ${e.familia.referencia} — el patrón correcto, no rediseñar`);
-    log(`     invariante: ${e.familia.invariante}`);
-    if (CABOS_FAMILIA.has(e.familia.id)) log(`     cabo de la familia: ${CABOS_FAMILIA.get(e.familia.id).join(', ')}`);
-    for (const m of e.miembros) {
-      log(linea(m, '      '));
-    }
-    mostradas += pendientes;
-    familiasSacadas.push({ nombre: e.familia.nombre, pendientes, miembros: e.miembros.length });
   }
 }
 
@@ -479,7 +493,6 @@ const puntuales = [];
 {
   const yaVista = (slug) => !elegidosSlugs.has(slug);
   for (const [famId, codigos] of CABOS_FAMILIA) {
-    if (familiasYaSacadas.has(famId)) continue;
     const fam = FAMILIAS.find((f) => f.id === famId);
     // Una familia que nadie ha mirado lleva su cabo a su primera inspección, por valor
     if (!fam.slugs.some((s) => SQL_ESTADO.get(s)?.ultima_inspeccion)) continue;
@@ -510,9 +523,11 @@ if (puntualesTanda.length) {
 }
 
 if (JSON_SALIDA) {
-  console.log(JSON.stringify({ pedidas: CUANTAS, apps: mostradas, familias: familiasSacadas, cabos: puntualesTanda.length }));
+  // `familias` se queda vacío: `inspector-tarea.mjs lanzar` lo leía para avisar de una familia que
+  // desbordaba el cupo, y desde el 03/11/2026 ninguna sale entera
+  console.log(JSON.stringify({ pedidas: CUANTAS, apps: mostradas, familias: [], testigo: nTestigo, cabos: puntualesTanda.length }));
   process.exit(0);
 }
 
-if (!mostradas && !puntualesTanda.length) log('\nNada en cola: todo el catálogo está inspeccionado y sin cambios desde entonces.');
-else log(`\n${mostradas} apps${puntualesTanda.length ? ` + ${puntualesTanda.length} comprobaciones puntuales de cabo` : ''} · npm run inspector:cola -- --resumen para el estado global`);
+if (!mostradas && !puntualesTanda.length && !nTestigo) log('\nNada en cola: todo el catálogo está inspeccionado y sin cambios desde entonces.');
+else log(`\n${mostradas} apps${puntualesTanda.length ? ` + ${puntualesTanda.length} comprobaciones puntuales de cabo` : ''}${nTestigo ? ` + ${nTestigo} hermanas para el testigo (sin Claude)` : ''} · npm run inspector:cola -- --resumen para el estado global`);
