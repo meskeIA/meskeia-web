@@ -469,6 +469,43 @@ test.describe('casos para clase · lógica (sin navegador)', () => {
     }
   });
 
+  test('C0267 · el 1 % ya no aprueba cifras que no salen de ninguna tabla ni de ningún redondeo', () => {
+    // Cabo C0267 (reparar 03/11/2026), la forma del hallazgo 3451 de simulador-estequiometria.
+    // Medido: entre las masas de la app y las de libro hay del 0,05 % al 0,26 % en los doce casos.
+    //   caso 1 · 50 ÷ 100,087 = 0,4996 y 50 ÷ 100 = 0,5000         → 0,51 y 0,49 aprobaban (1 %)
+    //   caso 3 · 56 ÷ 28,014 · 2 · 17,031 = 68,09 y 68,00 con libro  → 69 y 67,5 aprobaban
+    //   caso 4 · 250 ÷ 100,087 · 56,077 = 140,07 y 140,00            → 141 y 139 aprobaban
+    // Y lo que SÍ es un redondeo intermedio sigue aprobando:
+    //   caso 3 · n(N₂) a tres decimales: 1,999 · 2 · 17,031 = 68,09; con M a una decimal, 68,0
+    //   caso 11 · moles a dos decimales: (1,50 − 1,00) · 40,00 = 20,00; a tres: 0,501 · 39,997 = 20,04
+    //   caso 12 · moles a dos: (3,00 − 2,00) · 26,982 = 26,98; a tres: 0,998 · 26,982 = 26,93
+    const caso = (id: number) => CASOS_AULA[id - 1];
+    const corrige = (usuario: number, id: number) => comprobarRespuesta(usuario, caso(id).respuesta, caso(id).datos).correcto;
+    expect(corrige(0.51, 1)).toBe(false);
+    expect(corrige(0.49, 1)).toBe(false);
+    expect(corrige(0.5, 1)).toBe(true);
+    expect(corrige(69, 3)).toBe(false);
+    expect(corrige(67.5, 3)).toBe(false);
+    expect(corrige(68.09, 3)).toBe(true);
+    expect(corrige(68, 3)).toBe(true);
+    expect(corrige(141, 4)).toBe(false);
+    expect(corrige(139, 4)).toBe(false);
+    expect(corrige(140, 4)).toBe(true);
+    expect(corrige(20, 11)).toBe(true);
+    expect(corrige(20.04, 11)).toBe(true);
+    expect(corrige(26.98, 12)).toBe(true);
+    expect(corrige(26.93, 12)).toBe(true);
+    expect(corrige(27, 12)).toBe(true);
+    // La clave aprueba en los 12 casos y en 500 prácticas (las masas de libro, en el test 7).
+    for (const c of CASOS_AULA) expect(comprobarRespuesta(c.respuesta, c.respuesta, c.datos).correcto, `caso ${c.id}`).toBe(true);
+    for (let s = 1; s <= 500; s += 1) {
+      const e = generarEjercicioAleatorio(s);
+      expect(comprobarRespuesta(e.respuesta, e.respuesta, e.datos).correcto, `semilla ${s}`).toBe(true);
+      const libro = redondearTest(estequiometriaPropia(e.datos, masasDeLibro).valor, decimalesDe(e.datos.pregunta));
+      expect(comprobarRespuesta(libro, e.respuesta, e.datos).correcto, `semilla ${s}: libro ${libro}`).toBe(true);
+    }
+  });
+
   test('7.bis · el corrector: errores típicos con nombre y lo que no es número', () => {
     const caso = (id: number) => CASOS_AULA[id - 1];
     // caso 1 multiplicando: 50 × 100,087 = 5004,35

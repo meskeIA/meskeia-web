@@ -23,8 +23,9 @@
  * los cuartiles (skill /casos-aula-meskeia): los datos de los doce casos dan, con las dos
  * tablas, el mismo limitante y una respuesta dentro de la tolerancia, con margen (la mayor
  * desviación es 0,26 veces la tolerancia). El generador aleatorio descarta lo que no cumpla lo
- * mismo (`coincideConLibro`). Por eso la tolerancia es la RELATIVA del corrector (el mayor entre
- * 0,01 y el 1 %), no la de redondeo.
+ * mismo (`coincideConLibro`). Por eso no se corrige con la tolerancia de redondeo sino con una
+ * VENTANA entre las dos tablas más un margen de redondeo (`ventanaDe`, desde el 03/11/2026; antes,
+ * el 1 % del corrector, cabo C0267).
  *
  * · Ningún caso pregunta por la masa de H₂: con 2 frente a 2,016 la diferencia es del 0,8 %, al
  *   borde de la tolerancia.
@@ -42,6 +43,7 @@ import {
   dentroDeTolerancia,
   exigeRedondeo,
   redondearA,
+  textoDesviacion,
   toleranciaRelativa,
   type Magnitud,
 } from '@/lib/calculadoras/correctorCasosAula';
@@ -262,9 +264,42 @@ export function magnitudDe(_pregunta: Pregunta): Magnitud {
   return 'real';
 }
 
-/** Tolerancia: la relativa del motor del corrector (el porqué, en la cabecera). */
+/**
+ * La relativa del motor del corrector. Ya NO es lo que aprueba una respuesta (eso es `ventanaDe`):
+ * la usan el filtro del modo práctica (`coincideConLibro`) y la detección de los errores típicos.
+ */
 export function toleranciaDe(esperado: number): number {
   return toleranciaRelativa(esperado);
+}
+
+/**
+ * Margen para los redondeos intermedios, sobre el intervalo entre las dos tablas: un 0,5 % de la
+ * respuesta. Es el de `simulador-estequiometria` (301b3e3d), medido allí con los moles a tres
+ * decimales y las masas a uno o dos; aquí lo vigila el test C0267 del spec.
+ */
+const MARGEN_REDONDEO = 0.005;
+
+/**
+ * Lo que se da por bueno: de la menor a la mayor de las dos respuestas exactas (masas de la app y
+ * masas de libro), más el margen de redondeo y media unidad del último decimal pedido. Se expresa
+ * como un centro y una tolerancia para el corrector compartido.
+ *
+ * Hasta el 03/11/2026 era el 1 % en todos los casos (cabo C0267, la forma del hallazgo 3451 de
+ * la hermana): justificado por las masas de libro, pero el hueco entre las dos tablas va del
+ * 0,05 % al 0,26 % en los doce casos, y el 1 % aprobaba cifras que no salen de ninguna tabla ni
+ * de ningún redondeo: 0,51 mol en el caso 1 (las dos dan 0,500), 141 g en el caso 4 (140,07 y
+ * 140,00) o 69 g en el caso 3 (68,09 y 68,00).
+ */
+export function ventanaDe(d: DatosCaso): { centro: number; tolerancia: number } {
+  const app = resolverCaso(d);
+  const r = reaccionPorId(d.reaccionId);
+  if (!app.ok || !r) return { centro: NaN, tolerancia: 0 };
+  const libro = resolverConReaccion(conMasasDeLibro(r), d).valor;
+  const otra = Number.isFinite(libro) ? libro : app.valor;
+  const menor = Math.min(app.valor, otra);
+  const mayor = Math.max(app.valor, otra);
+  const margen = MARGEN_REDONDEO * Math.abs(app.valor) + 10 ** -decimalesDe(d.pregunta) / 2;
+  return { centro: (menor + mayor) / 2, tolerancia: (mayor - menor) / 2 + margen };
 }
 
 export interface Veredicto {
@@ -332,9 +367,12 @@ export function erroresTipicos(d: DatosCaso): { valor: number; motivo: string }[
  * un veredicto, no con una excepción que tumbaría el render.
  */
 export function comprobarRespuesta(usuario: number, esperado: number, d: DatosCaso): Veredicto {
-  const tolerancia = toleranciaDe(esperado);
-  const c = corregirNumero(usuario, esperado, { tolerancia, magnitud: magnitudDe(d.pregunta) });
-  const { diferencia } = c;
+  const ventana = ventanaDe(d);
+  const centro = Number.isFinite(ventana.centro) ? ventana.centro : esperado;
+  const tolerancia = Number.isFinite(ventana.centro) ? ventana.tolerancia : toleranciaDe(esperado);
+  const c = corregirNumero(usuario, centro, { tolerancia, magnitud: magnitudDe(d.pregunta) });
+  // La desviación que se enseña es frente a la respuesta de la clave, no frente al centro.
+  const diferencia = Math.abs(usuario - esperado);
 
   if (c.estado === 'no-numerico') {
     return { correcto: false, motivo: 'Escribe un número (puedes usar la coma decimal, por ejemplo 36,03).', diferencia: NaN, tolerancia };
@@ -346,14 +384,14 @@ export function comprobarRespuesta(usuario: number, esperado: number, d: DatosCa
   }
 
   for (const e of erroresTipicos(d)) {
-    if (!dentroDeTolerancia(e.valor, esperado, tolerancia) && dentroDeTolerancia(usuario, e.valor, toleranciaDe(e.valor))) {
+    if (!dentroDeTolerancia(e.valor, centro, tolerancia) && dentroDeTolerancia(usuario, e.valor, toleranciaDe(e.valor))) {
       return { correcto: false, motivo: e.motivo, diferencia, tolerancia };
     }
   }
 
   return {
     correcto: false,
-    motivo: `No es correcto. Te has desviado ${cifra(diferencia, decimalesDe(d.pregunta))} ${unidadDe(d.pregunta)} de la respuesta.`,
+    motivo: `No es correcto. Te has desviado ${textoDesviacion(diferencia, decimalesDe(d.pregunta), cifra)} ${unidadDe(d.pregunta)} de la respuesta.`,
     diferencia,
     tolerancia,
   };
