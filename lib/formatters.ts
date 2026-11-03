@@ -25,12 +25,38 @@ export function formatNumber(num: number, decimals: number = 2): string {
   // El cero negativo se imprime CON signo: `(-0).toLocaleString('es-ES')` da «-0,00», y la
   // guarda de arriba no lo atrapa porque `-0 !== 0` es false. En JavaScript el -0 aparece
   // solo con hacer `-Math.log10(1)`, que es justo el pH de un HCl 1 M: el simulador de
-  // titulación mostraba «pH -0,00» (hallazgo 346). `num + 0` lo normaliza a 0 sin tocar
-  // ningún otro valor.
-  return (num + 0).toLocaleString('es-ES', {
+  // titulación mostraba «pH -0,00» (hallazgo 346). `redondearParaMostrar` lo normaliza a 0,
+  // y también el negativo que redondea a cero («-0,000» para -0,0004 con tres decimales).
+  return redondearParaMostrar(num, decimals).toLocaleString('es-ES', {
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals,
   });
+}
+
+/**
+ * Redondea `num` a `decimales` ALEJÁNDOSE DE CERO en el empate, después de limpiar el error de
+ * coma flotante, para que `toLocaleString` reciba ya la cifra que se va a escribir.
+ *
+ * Por qué (cabo C0594, 02/11/2026): `Intl` redondea el valor EXACTO del double, así que el
+ * empate de la cifra siguiente salía según cayera la coma flotante: con dos decimales 4,905
+ * daba 4,91 y 122,625 daba 122,63, pero 44,145 (½·9,81·3², que llega como 44,14499…) daba
+ * 44,14. Visto en calculadora-movimiento (hallazgo 3946, 121e5cbe). Es la regla de
+ * `redondearA` de lib/calculadoras/correctorCasosAula, con las cifras significativas de la
+ * limpieza ajustadas a la magnitud: 12 como allí, o las que hagan falta para no perder
+ * decimales pedidos de un número grande (hasta 15, el límite del double).
+ */
+function redondearParaMostrar(num: number, decimales: number): number {
+  const absoluto = Math.abs(num);
+  // Sin parte decimal representable, o nada que redondear: tal cual (y sin el -0).
+  if (absoluto === 0 || absoluto >= 1e15 || !Number.isFinite(num)) return num + 0;
+  const digitosEnteros = Math.floor(Math.log10(absoluto)) + 1;
+  const cifras = Math.min(15, Math.max(12, digitosEnteros + decimales + 1));
+  const limpio = Number(absoluto.toPrecision(cifras));
+  const factor = 10 ** decimales;
+  const escalado = Number((limpio * factor).toPrecision(cifras));
+  if (!Number.isFinite(escalado)) return num + 0;
+  const redondeado = Math.round(escalado) / factor;
+  return (num < 0 ? -redondeado : redondeado) + 0;
 }
 
 /**
@@ -61,7 +87,8 @@ export function formatCurrency(num: number): string {
   if (isNaN(num)) return 'No definido';
   if (!isFinite(num)) return num > 0 ? '∞ €' : '-∞ €';
 
-  return num.toLocaleString('es-ES', {
+  // El céntimo del empate, como en formatNumber (C0594): 1,005 € sale 1,01 €, no 1,00 €.
+  return redondearParaMostrar(num, 2).toLocaleString('es-ES', {
     style: 'currency',
     currency: 'EUR',
   });

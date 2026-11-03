@@ -361,6 +361,52 @@ test.describe('formatNumber · el cero negativo', () => {
     expect(formatNumber(-1.5, 2)).toBe('-1,50');
     expect(formatNumber(-0.01, 2)).toBe('-0,01');
   });
+
+  test('un negativo que redondea a cero tampoco lleva signo', () => {
+    // −0,0004 con tres decimales: la guarda de casi cero (0,0001) no lo atrapa.
+    expect(formatNumber(-0.0004, 3)).toBe('0,000');
+  });
+});
+
+test.describe('formatNumber · el empate se redondea alejándose de cero (C0594)', () => {
+  // De dónde sale: hallazgo 3946 de calculadora-movimiento (02/11/2026). `Intl` redondea el
+  // valor exacto del double, así que ½·9,81·3² (44,14499…) salía 44,14 mientras 4,905 salía
+  // 4,91: el mismo empate, dos sentidos según cayera la coma flotante.
+
+  test('el empate calculado sube, como el tecleado', () => {
+    expect(formatNumber(0.5 * 9.81 * 3 ** 2, 2)).toBe('44,15');
+    expect(formatNumber(44.145, 2)).toBe('44,15');
+    expect(formatNumber(4.905, 2)).toBe('4,91');
+    expect(formatNumber(122.625, 2)).toBe('122,63');
+    expect(formatNumber(1.005, 2)).toBe('1,01');
+    expect(formatNumber(2.675, 2)).toBe('2,68');
+  });
+
+  test('en los negativos se aleja de cero', () => {
+    expect(formatNumber(-44.145, 2)).toBe('-44,15');
+    expect(formatNumber(-9.375, 2)).toBe('-9,38');
+  });
+
+  test('lo que no es empate no cambia', () => {
+    expect(formatNumber(44.1449, 2)).toBe('44,14');
+    expect(formatNumber(44.1451, 2)).toBe('44,15');
+    expect(formatNumber(1 / 3, 4)).toBe('0,3333');
+    expect(formatNumber(2 / 3, 4)).toBe('0,6667');
+    expect(formatNumber(0.1 + 0.2, 2)).toBe('0,30');
+  });
+
+  test('un número grande no pierde los decimales pedidos', () => {
+    expect(formatNumber(1234567890.125, 2)).toBe('1.234.567.890,13');
+    expect(formatNumber(123456789012.34, 2)).toBe('123.456.789.012,34');
+    expect(formatNumber(9007199254740993, 0)).toBe('9.007.199.254.740.992');
+  });
+
+  test('formatCurrency redondea el céntimo del empate igual', () => {
+    expect(formatCurrency(1.005)).toMatch(/^1,01\s€$/);
+    // Con cuatro cifras enteras no se agrupa (RAE 2010, como Intl en es-ES).
+    expect(formatCurrency(1234.565)).toMatch(/^1234,57\s€$/);
+    expect(formatCurrency(12345.675)).toMatch(/^12\.345,68\s€$/);
+  });
 });
 
 test.describe('formatTipoNominal', () => {
