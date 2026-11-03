@@ -1371,6 +1371,13 @@ export const implementedAppsUrls = [
 
   // Medida de ángulos (2026-09)
   "/transportador-angulos/",           // Mide ángulos sobre una imagen plana arrastrando tres puntos, y transportador imprimible a escala real
+
+  // Inglés escolar (2026-11, S0248): cada tema tiene nombre que se teclea (sonda Bing ≥1.500 impresiones/6 meses)
+  "/tiempos-verbales-ingles/",         // 7 tiempos en afirmativa, negativa e interrogativa: ejercicios numerados y conjugador
+  "/condicionales-ingles/",            // Zero, first, second y third conditional (con unless): completar y reconocer el tipo
+  "/numeros-en-ingles/",               // Conversor cifra → palabras (US/UK), ordinales, años, decimales y ejercicios numerados
+  "/preposiciones-ingles/",            // in/on/at de tiempo y lugar, y los casos sin preposición, con la regla de cada frase
+  "/pronombres-ingles/",               // Tabla de los cinco tipos de pronombre y ejercicios numerados con las trampas típicas
 ];
 
 /**

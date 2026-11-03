@@ -124,6 +124,11 @@ export const FAMILIAS = [
       'quiz-reinos-naturaleza',
       'quiz-tipos-plantas',
       'quiz-mitos-ciencia',
+      'tiempos-verbales-ingles',
+      'condicionales-ingles',
+      'numeros-en-ingles',
+      'preposiciones-ingles',
+      'pronombres-ingles',
     ],
   },
 ];

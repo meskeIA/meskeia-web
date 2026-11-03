@@ -141,6 +141,31 @@ const HERMANAS: Hermana[] = [
     // Al contestar, Verdad/Mito desaparecen y la revelación dice con texto si era verdad o mito.
     marcaSinColor: { omitido: 'las respuestas desaparecen al contestar: no queda opción que marcar' },
   },
+  // Inglés escolar (03/11/2026, S0248). Nacen con la receta de la familia. Las tres primeras
+  // empiezan en el modo «escribir», que no tiene opciones: el arranque pasa antes a «elegir».
+  {
+    slug: 'tiempos-verbales-ingles',
+    arranque: [/Elegir entre 4 opciones/, EMPEZAR],
+  },
+  {
+    slug: 'condicionales-ingles',
+    arranque: [/Elegir entre 4 opciones/, EMPEZAR],
+  },
+  {
+    slug: 'numeros-en-ingles',
+    arranque: [/Elegir entre 4 opciones/, EMPEZAR],
+  },
+  {
+    slug: 'preposiciones-ingles',
+    arranque: [EMPEZAR],
+  },
+  {
+    slug: 'pronombres-ingles',
+    arranque: [EMPEZAR],
+    // La tabla interactiva sigue visible durante el quiz, y su botón «Adjetivo posesivo» (que sí
+    // conmuta, con aria-pressed) también empieza por «A»: la opción A es la letra seguida de otra cosa.
+    opcion: /^\s*A(?!djetivo)\S/,
+  },
 ];
 
 /**

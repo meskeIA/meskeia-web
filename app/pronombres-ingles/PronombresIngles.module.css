@@ -1,0 +1,1249 @@
+/* pronombres-ingles — tabla interactiva y ejercicios numerados */
+
+.container {
+  --bg-primary: #FAFAFA;
+  --bg-card: #FFFFFF;
+  --text-primary: #1A1A1A;
+  --text-secondary: #666666;
+  --border: #E5E5E5;
+  --hover: #F5F5F5;
+  --radius: 12px;
+  --radius-large: 16px;
+  --spacing-md: 1rem;
+  --spacing-lg: 1.5rem;
+  --spacing-xl: 2rem;
+
+  max-width: 900px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary);
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+[data-theme='dark'] .container {
+  --bg-primary: #1A1A1A;
+  --bg-card: #2A2A2A;
+  --text-primary: #E5E5E5;
+  --text-secondary: #B0B0B0;
+  --border: #404040;
+  --hover: #333333;
+}
+
+/* ── Hero ── */
+.hero {
+  text-align: center;
+  margin-bottom: var(--spacing-xl);
+  margin-top: 80px;
+  padding: var(--spacing-xl);
+  background: var(--hero-bg);
+  border-radius: var(--radius-large);
+  color: white;
+}
+
+.title {
+  font-size: 2.4rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem;
+}
+
+.subtitle {
+  font-size: 1.05rem;
+  opacity: 0.95;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ── Paneles ── */
+.tablaPanel,
+.configPanel,
+.quizPanel,
+.resultadoPanel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+}
+
+.panelTitulo {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem;
+}
+
+.panelIntro {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin: 0 0 var(--spacing-lg);
+}
+
+/* Reciben el foco por programa (tabIndex=-1): no son controles, sin anillo de foco */
+.panelTitulo:focus,
+.preguntaCard:focus,
+.resultadoPanel:focus {
+  outline: none;
+}
+
+/* ── Filtros de la tabla ── */
+.filtroBloque {
+  margin-bottom: var(--spacing-md);
+}
+
+.filtroEtiqueta {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 0.4rem;
+}
+
+.filtroFila {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.chip {
+  padding: 0.4rem 0.9rem;
+  border: 2px solid var(--border);
+  border-radius: 50px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.chip:hover {
+  border-color: var(--primary);
+}
+
+.chipActivo {
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
+  color: white;
+  font-weight: 600;
+}
+
+/* ── Tabla de pronombres ── */
+.tablaScroll {
+  overflow-x: auto;
+  max-width: 100%;
+  margin: var(--spacing-lg) 0;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.tablaScroll:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.tablaPronombres {
+  width: 100%;
+  min-width: 600px;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.tablaPronombres thead th {
+  background: var(--primary-boton);
+  color: white;
+  font-weight: 600;
+  font-size: 0.82rem;
+  padding: 0.6rem 0.5rem;
+  text-align: left;
+}
+
+.tablaPronombres thead th.colActiva {
+  background: var(--secondary-boton);
+}
+
+.tablaPronombres td,
+.tablaPronombres tbody th {
+  padding: 0.55rem 0.5rem;
+  border-top: 1px solid var(--border);
+  vertical-align: top;
+  text-align: left;
+}
+
+.celdaPersona {
+  background: var(--hover);
+  color: var(--text-primary);
+}
+
+.filaActiva .celdaPersona {
+  background: var(--primary-boton);
+  color: white;
+}
+
+.personaForma {
+  display: block;
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.personaDesc {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 400;
+  opacity: 0.9;
+}
+
+.celdaForma {
+  display: block;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.celdaTraduccion {
+  display: block;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.celdaActiva {
+  background: rgba(46, 134, 171, 0.1);
+}
+
+.celdaCruce {
+  background: rgba(46, 134, 171, 0.22);
+  box-shadow: inset 0 0 0 2px var(--primary);
+}
+
+[data-theme='dark'] .celdaActiva {
+  background: rgba(46, 134, 171, 0.2);
+}
+
+[data-theme='dark'] .celdaCruce {
+  background: rgba(46, 134, 171, 0.32);
+}
+
+/* ── Ficha de ejemplos ── */
+.ficha {
+  background: var(--hover);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+}
+
+.fichaTitulo {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.75rem;
+}
+
+.fichaVacia {
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.fichaLista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0.75rem;
+}
+
+.fichaItem {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.75rem 0.9rem;
+}
+
+.fichaCabecera {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem;
+  margin: 0 0 0.35rem;
+}
+
+.fichaForma {
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--primary-texto);
+}
+
+.fichaTipo {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.fichaEjemplo {
+  margin: 0 0 0.2rem;
+  color: var(--text-primary);
+  font-style: italic;
+}
+
+.fichaTraduccion {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.fichaNota {
+  margin: 0.4rem 0 0;
+  font-size: 0.8rem;
+  color: var(--text-primary);
+  border-left: 3px solid #CA8A04;
+  padding-left: 0.5rem;
+}
+
+/* ── Configuración ── */
+.configSubtitulo {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: var(--spacing-lg) 0 0.6rem;
+}
+
+.categoriasGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.6rem;
+}
+
+.categoriaBtn,
+.modoBtn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.75rem 0.6rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  cursor: pointer;
+  text-align: center;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.categoriaBtn:hover,
+.modoBtn:hover {
+  border-color: var(--primary);
+}
+
+.categoriaActiva,
+.modoActivo {
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
+  color: white;
+}
+
+.categoriaNombre,
+.modoNombre {
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.categoriaDesc,
+.categoriaEjemplo,
+.modoDesc {
+  font-size: 0.75rem;
+  opacity: 0.9;
+}
+
+.categoriaEjemplo {
+  font-style: italic;
+}
+
+.configNota {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin: 0.5rem 0 0;
+}
+
+.modoFila {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.6rem;
+}
+
+.cuantasFila {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.cuantasBtn {
+  padding: 0.5rem 1.2rem;
+  border: 2px solid var(--border);
+  border-radius: 50px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.cuantasBtn:hover {
+  border-color: var(--primary);
+}
+
+.cuantasActivo {
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
+  color: white;
+  font-weight: 600;
+}
+
+.aviso {
+  margin: var(--spacing-md) 0 0;
+  padding: 0.75rem 1rem;
+  background: rgba(202, 138, 4, 0.1);
+  border-left: 3px solid #CA8A04;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .aviso {
+  background: rgba(202, 138, 4, 0.18);
+}
+
+/* ── Botones ── */
+.btnPrincipal,
+.btnPrincipalCorto {
+  background: var(--primary-boton);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btnPrincipal {
+  display: block;
+  width: 100%;
+  margin-top: var(--spacing-lg);
+  padding: 0.95rem;
+  font-size: 1.05rem;
+}
+
+.btnPrincipalCorto {
+  padding: 0.7rem 1.3rem;
+  font-size: 0.95rem;
+}
+
+.btnPrincipal:hover,
+.btnPrincipalCorto:hover {
+  background: #1E5A73;
+}
+
+.btnSecundario {
+  background: var(--secondary-boton);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  padding: 0.7rem 1.2rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btnSecundario:hover {
+  filter: brightness(0.92);
+}
+
+.btnTerciario {
+  background: transparent;
+  color: var(--text-primary);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.6rem 1.2rem;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+.btnTerciario:hover {
+  border-color: var(--primary);
+}
+
+.chip:focus-visible,
+.categoriaBtn:focus-visible,
+.modoBtn:focus-visible,
+.cuantasBtn:focus-visible,
+.btnPrincipal:focus-visible,
+.btnPrincipalCorto:focus-visible,
+.btnSecundario:focus-visible,
+.btnTerciario:focus-visible,
+.opcion:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* ── Ejercicios por número ── */
+.numerosForm {
+  margin-top: var(--spacing-xl);
+  padding-top: var(--spacing-md);
+  border-top: 1px dashed var(--border);
+}
+
+.numerosAyuda {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0 0 0.75rem;
+}
+
+.numerosLabel {
+  display: block;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.35rem;
+}
+
+.numerosFila {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.numerosInput,
+.escrituraInput {
+  flex: 1 1 180px;
+  min-width: 0;
+  padding: 0.65rem 0.8rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 1rem;
+}
+
+.numerosInput:focus-visible,
+.escrituraInput:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 1px;
+  border-color: var(--primary);
+}
+
+.numerosError {
+  margin: 0.5rem 0 0;
+  font-size: 0.88rem;
+  color: var(--rojo-texto, #C53030);
+}
+
+.numerosError:empty {
+  display: none;
+}
+
+[data-theme='dark'] .numerosError {
+  color: #FEB2B2;
+}
+
+/* ── Partida ── */
+.hud {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.5rem;
+  margin-bottom: var(--spacing-md);
+}
+
+.hudItem {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: var(--hover);
+  border-radius: 10px;
+  padding: 0.5rem;
+}
+
+.hudValor {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--primary-texto);
+}
+
+.hudLabel {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.progreso {
+  height: 6px;
+  background: var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: var(--spacing-lg);
+}
+
+.progresoRelleno {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--secondary));
+  transition: width 0.3s ease;
+}
+
+.preguntaCard {
+  background: var(--hover);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+  text-align: center;
+}
+
+.preguntaContador {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin: 0 0 0.25rem;
+}
+
+.ejercicioNumero {
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--primary-texto);
+  margin: 0 0 0.75rem;
+}
+
+.enunciado {
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.5;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.hueco {
+  display: inline-block;
+  min-width: 3.5em;
+  border-bottom: 3px solid var(--primary);
+  color: transparent;
+  margin: 0 0.15em;
+}
+
+.pista {
+  margin: 0.75rem 0 0;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.opcionesGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.6rem;
+  margin-bottom: var(--spacing-lg);
+}
+
+.opcion {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.8rem 0.9rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 1.05rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.opcion:hover:not(:disabled) {
+  border-color: var(--primary);
+  background: rgba(46, 134, 171, 0.05);
+}
+
+.opcion:disabled {
+  cursor: default;
+}
+
+.opcionLetra {
+  flex: 0 0 auto;
+  width: 1.8rem;
+  height: 1.8rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--hover);
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.opcionTexto {
+  flex: 1 1 auto;
+  overflow-wrap: anywhere;
+}
+
+.opcionMarca {
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+
+.opcionCorrecta {
+  border-color: #48BB78;
+  background: #F0FFF4;
+  color: var(--verde-texto, #276749);
+}
+
+.opcionCorrecta .opcionLetra {
+  background: #276749;
+  color: white;
+}
+
+.opcionIncorrecta {
+  border-color: #FC8181;
+  background: #FFF5F5;
+  color: var(--rojo-texto, #C53030);
+}
+
+.opcionIncorrecta .opcionLetra {
+  background: #C53030;
+  color: white;
+}
+
+.opcionNeutra {
+  opacity: 0.5;
+}
+
+[data-theme='dark'] .opcionCorrecta {
+  background: rgba(39, 103, 73, 0.2);
+  color: #68D391;
+}
+
+[data-theme='dark'] .opcionIncorrecta {
+  background: rgba(197, 48, 48, 0.2);
+  color: #FEB2B2;
+}
+
+.escrituraForm {
+  margin-bottom: var(--spacing-lg);
+}
+
+.escrituraLabel {
+  display: block;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 0.35rem;
+}
+
+.escrituraFila {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.escrituraBien {
+  border-color: #48BB78;
+  background: #F0FFF4;
+  color: var(--verde-texto, #276749);
+}
+
+.escrituraMal {
+  border-color: #FC8181;
+  background: #FFF5F5;
+  color: var(--rojo-texto, #C53030);
+}
+
+[data-theme='dark'] .escrituraBien {
+  background: rgba(39, 103, 73, 0.2);
+  color: #68D391;
+}
+
+[data-theme='dark'] .escrituraMal {
+  background: rgba(197, 48, 48, 0.2);
+  color: #FEB2B2;
+}
+
+/* ── Veredicto ── */
+.feedback {
+  border-radius: var(--radius);
+  padding: var(--spacing-md) var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
+  border: 1px solid transparent;
+}
+
+.feedbackBien {
+  background: #F0FFF4;
+  border-color: #48BB78;
+  color: var(--verde-texto, #276749);
+}
+
+.feedbackMal {
+  background: #FFF5F5;
+  border-color: #FC8181;
+  color: var(--rojo-texto, #C53030);
+}
+
+[data-theme='dark'] .feedbackBien {
+  background: rgba(39, 103, 73, 0.2);
+  color: #68D391;
+}
+
+[data-theme='dark'] .feedbackMal {
+  background: rgba(197, 48, 48, 0.2);
+  color: #FEB2B2;
+}
+
+.feedbackTitulo {
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin: 0 0 0.4rem;
+}
+
+.feedbackDetalle {
+  margin: 0 0 0.35rem;
+  font-size: 0.92rem;
+}
+
+.feedbackForma {
+  margin: 0 0 0.35rem;
+  font-weight: 700;
+}
+
+.feedbackFrase {
+  margin: 0 0 0.5rem;
+  font-style: italic;
+  overflow-wrap: anywhere;
+}
+
+.feedbackRegla {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* ── Resultado ── */
+.resultadoPanel {
+  text-align: center;
+}
+
+.resultadoEmoji {
+  display: block;
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+}
+
+.resultadoTitulo {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem;
+}
+
+.resultadoCifra {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--primary-texto);
+  margin: 0;
+}
+
+.resultadoPorcentaje {
+  color: var(--text-secondary);
+  margin: 0.25rem 0 var(--spacing-lg);
+}
+
+.falladosCaja {
+  text-align: left;
+  background: var(--hover);
+  border-radius: var(--radius);
+  padding: var(--spacing-md) var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+}
+
+.falladosTitulo {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 0.5rem;
+}
+
+.falladosLista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.falladosLista li {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.6rem;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+.falladoNumero {
+  font-weight: 700;
+}
+
+.falladoFrase {
+  font-style: italic;
+  overflow-wrap: anywhere;
+}
+
+.sinFallos {
+  color: var(--text-secondary);
+  margin: 0 0 var(--spacing-lg);
+}
+
+.botonesResultado {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.6rem;
+}
+
+/* ── Sección educativa ── */
+.eduBloque {
+  margin-bottom: var(--spacing-xl);
+}
+
+.eduBloque:last-child {
+  margin-bottom: 0;
+}
+
+.eduTitulo {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-md);
+}
+
+.tableWrapper {
+  overflow-x: auto;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.comparativaTable th {
+  background: var(--primary-boton);
+  color: white;
+  font-weight: 600;
+  padding: 0.65rem 0.75rem;
+  text-align: left;
+}
+
+.comparativaTable td {
+  padding: 0.65rem 0.75rem;
+  border-top: 1px solid var(--border);
+  color: var(--text-primary);
+  vertical-align: top;
+}
+
+.comparativaTable tr:nth-child(even) td {
+  background: rgba(46, 134, 171, 0.04);
+}
+
+[data-theme='dark'] .comparativaTable tr:nth-child(even) td {
+  background: rgba(46, 134, 171, 0.08);
+}
+
+.comparativaTable td em {
+  color: var(--text-primary);
+}
+
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-md);
+}
+
+.escenarioCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-md) var(--spacing-lg);
+}
+
+.escenarioHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.escenarioIcon {
+  font-size: 1.4rem;
+}
+
+.escenarioHeader strong {
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}
+
+.escenarioExample {
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  line-height: 1.5;
+  margin: 0 0 0.5rem;
+}
+
+.escenarioTip {
+  color: var(--text-primary);
+  font-size: 0.88rem;
+  line-height: 1.5;
+  margin: 0;
+  padding-left: 0.6rem;
+  border-left: 3px solid var(--secondary);
+}
+
+.faqList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.faqItem {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-md) var(--spacing-lg);
+}
+
+.faqItem strong {
+  display: block;
+  color: var(--text-primary);
+  margin-bottom: 0.4rem;
+}
+
+.faqItem p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin: 0;
+}
+
+.stepGuide {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.step {
+  display: flex;
+  gap: var(--spacing-md);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+}
+
+.stepNumber {
+  flex: 0 0 auto;
+  width: 2rem;
+  height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--primary-boton);
+  color: white;
+  font-weight: 700;
+}
+
+.stepContent {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.stepContent strong {
+  display: block;
+  color: var(--text-primary);
+  margin-bottom: 0.25rem;
+}
+
+.stepContent p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.55;
+  margin: 0;
+}
+
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-md);
+}
+
+.tipCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-md) var(--spacing-lg);
+}
+
+.tipIcon {
+  display: block;
+  font-size: 1.5rem;
+  margin-bottom: 0.35rem;
+}
+
+.tipCard strong {
+  display: block;
+  color: var(--text-primary);
+  margin-bottom: 0.3rem;
+}
+
+.tipCard p {
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  line-height: 1.55;
+  margin: 0;
+}
+
+.warningBox {
+  background: rgba(237, 137, 54, 0.06);
+  border: 1px solid rgba(237, 137, 54, 0.35);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(237, 137, 54, 0.1);
+  border-color: rgba(237, 137, 54, 0.3);
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: var(--spacing-md);
+}
+
+.warningIcon {
+  font-size: 1.3rem;
+}
+
+.warningHeader strong {
+  color: var(--naranja-texto, #9C4221);
+  font-size: 1rem;
+}
+
+[data-theme='dark'] .warningHeader strong {
+  color: #F6AD55;
+}
+
+.warningList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.warningList li {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  padding-left: 0.9rem;
+  border-left: 3px solid rgba(237, 137, 54, 0.5);
+}
+
+.warningList li strong,
+.warningList li em {
+  color: var(--text-primary);
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .categoriasGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .escenariosGrid,
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .container {
+    padding: var(--spacing-lg) var(--spacing-md);
+  }
+
+  .hero {
+    padding: var(--spacing-lg) var(--spacing-md);
+  }
+
+  .title {
+    font-size: 1.7rem;
+  }
+
+  .tablaPanel,
+  .configPanel,
+  .quizPanel,
+  .resultadoPanel {
+    padding: var(--spacing-lg) var(--spacing-md);
+  }
+
+  .modoFila,
+  .opcionesGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .enunciado {
+    font-size: 1.15rem;
+  }
+
+  .step {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .comparativaTable th,
+  .comparativaTable td {
+    padding: 0.5rem;
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .categoriasGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .hudValor {
+    font-size: 1rem;
+  }
+
+  .botonesResultado > button {
+    flex: 1 1 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chip,
+  .categoriaBtn,
+  .modoBtn,
+  .cuantasBtn,
+  .btnPrincipal,
+  .btnPrincipalCorto,
+  .opcion,
+  .progresoRelleno {
+    transition: none;
+  }
+}
