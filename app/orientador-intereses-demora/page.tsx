@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import styles from './OrientadorInteresesDemora.module.css';
 import {
   MeskeiaLogo,
@@ -54,8 +54,15 @@ const ayer = (): string => {
 export default function OrientadorInteresesDemoraPage() {
   const [importe, setImporte] = useState('');
   const [tipoDeuda, setTipoDeuda] = useState<TipoDeuda>('comercial');
-  const [fechaInicio, setFechaInicio] = useState(ayer());
-  const [fechaFin, setFechaFin] = useState(hoy());
+  // Vacías en el render y propuestas al montar (cabo C0603, check:reloj-azar): con el reloj en el
+  // valor inicial, el HTML prerenderizado llevaba las fechas del día del build, y React 19 no
+  // corrige el atributo al hidratar. Si quien usa la app ya ha escrito una, no se pisa.
+  const [fechaInicio, setFechaInicio] = useState('');
+  const [fechaFin, setFechaFin] = useState('');
+  useEffect(() => {
+    setFechaInicio((previa) => previa || ayer());
+    setFechaFin((previa) => previa || hoy());
+  }, []);
 
   const [resultado, setResultado] = useState<Resultado | null>(null);
   const [errores, setErrores] = useState<string[]>([]);

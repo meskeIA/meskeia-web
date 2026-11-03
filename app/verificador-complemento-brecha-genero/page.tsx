@@ -1144,6 +1144,7 @@ export default function VerificadorComplementoBrechaGeneroPage() {
               className={`${styles.input} ${styles.inputFecha}`}
               value={fechaEfectos}
               min={COMPLEMENTO_BRECHA_GENERO_2026.fechaMinimaHechoCausante}
+              // reloj-ok: el input solo existe con atrasosAplica, que exige evaluado (nace false): nunca está en el HTML prerenderizado
               max={hoyISO}
               onChange={e => setFechaEfectos(e.target.value)}
               aria-describedby="fecha-efectos-ayuda"
