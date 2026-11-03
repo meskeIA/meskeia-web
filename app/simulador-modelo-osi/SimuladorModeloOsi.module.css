@@ -187,6 +187,10 @@
   color: var(--text-secondary);
   font-family: 'SF Mono', Monaco, monospace;
   text-align: right;
+  /* Con .capaInfo en flex: 1 (base 0) y min-width: 0, el nombre solo recibía lo que sobraba tras
+     la PDU entera: «Transporte» quedaba en 22 px a 360 de pantalla (cabo C0565). Con el tope,
+     «Segmento / Datagrama» salta de línea y deja sitio al nombre. */
+  max-width: 40%;
 }
 
 .medioCol {

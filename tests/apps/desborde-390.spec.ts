@@ -88,6 +88,82 @@ for (const ruta of RUTAS) {
   });
 }
 
+/*
+ * C0565 (03/11/2026) — que la página no desborde NO basta: el desborde horizontal desaparece
+ * también encogiendo una columna de texto hasta cero. 2487ae59 (C0425) dejó así la checklist de
+ * simulador-bono-joven-alquiler a 0 px (hallazgo 3893, 49 líneas para una pregunta) y este testigo
+ * siguió en verde. Se mide además, a 360, 390 y 412 px, que ningún bloque de texto quede más
+ * estrecho que su palabra más larga con el texto saliéndose de su caja (un break-all no cuenta), ni
+ * por debajo de 60 px con más de 20 caracteres. Fuera: SVG (su caja no limita el texto), elementos
+ * en línea (miden lo que mide su texto) y lo que va dentro de una caja que desplaza.
+ * Al añadir la regla salieron dos más de la misma receta: estimador-interes-compuesto (el desglose
+ * a repeat(3, minmax(0, 1fr)), «+79.086,03 €» en 51 px) y simulador-modelo-osi («Transporte» en
+ * 22 px junto a su PDU). El CONTROL de abajo comprueba que el instrumento ve una columna aplastada.
+ */
+async function columnasAplastadas(page: import('@playwright/test').Page): Promise<string[]> {
+  return page.evaluate(() => {
+    const fuera: string[] = [];
+    const lienzo = document.createElement('canvas').getContext('2d')!;
+    for (const el of Array.from(document.body.querySelectorAll<HTMLElement>('*'))) {
+      const propio = Array.from(el.childNodes)
+        .filter((n) => n.nodeType === Node.TEXT_NODE)
+        .map((n) => n.textContent ?? '')
+        .join('')
+        .replace(/\s+/g, ' ')
+        .trim();
+      if (propio.length < 4) continue;
+      const caja = el.getBoundingClientRect();
+      // 1 px o menos: oculto a la vista a propósito (sr-only), no aplastado
+      if (caja.width <= 1 || caja.height <= 1) continue;
+      const cs = getComputedStyle(el);
+      if (cs.visibility === 'hidden') continue;
+      if (el instanceof SVGElement || cs.display === 'inline' || cs.display === 'contents') continue;
+      let enScroll = false;
+      for (let p = el.parentElement; p && p !== document.body; p = p.parentElement) {
+        const o = getComputedStyle(p).overflowX;
+        if (o === 'auto' || o === 'scroll') { enScroll = true; break; }
+      }
+      if (enScroll) continue;
+      const palabra = propio.split(' ').reduce((a, b) => (b.length > a.length ? b : a), '');
+      lienzo.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+      const anchoPalabra = lienzo.measureText(palabra).width;
+      const util = caja.width - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+      const estrecho = util + 1 < anchoPalabra && palabra.length >= 4 && el.scrollWidth > el.clientWidth + 1;
+      const raquitico = util < 60 && propio.length > 20;
+      if (estrecho || raquitico) {
+        fuera.push(`${el.tagName.toLowerCase()}.${String(el.className).split(' ')[0]} ${Math.round(util)} px «${propio.slice(0, 40)}»`);
+      }
+    }
+    return fuera.slice(0, 6);
+  });
+}
+
+test('CONTROL C0565 · el instrumento ve una columna de texto aplastada junto a un hermano que no encoge', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/calculadora-mcd-mcm/');
+  await page.waitForLoadState('networkidle');
+  await page.evaluate(() => {
+    const d = document.createElement('div');
+    d.style.display = 'flex';
+    d.innerHTML =
+      '<span style="flex:1;min-width:0">¿Tienes contrato de alquiler firmado a tu nombre?</span>' +
+      '<span style="flex:none;width:380px">x</span>';
+    (document.querySelector('main') ?? document.body).prepend(d);
+  });
+  expect(await columnasAplastadas(page)).not.toEqual([]);
+});
+
+for (const ruta of RUTAS) {
+  test(`${ruta} · a 360, 390 y 412 px ninguna columna de texto queda aplastada (C0565)`, async ({ page }) => {
+    for (const ancho of [360, 390, 412]) {
+      await page.setViewportSize({ width: ancho, height: 844 });
+      await page.goto(ruta);
+      await page.waitForLoadState('networkidle');
+      expect(await columnasAplastadas(page), `a ${ancho} px`).toEqual([]);
+    }
+  });
+}
+
 // C0429, C0409 y C0406: el desborde solo salía al estrechar la ventana desde escritorio (la
 // secuencia de la Ronda), porque un lienzo conservaba su ancho de 1280 px y mantenía ancha su
 // pista `1fr`. creador-thumbnails desbordaba además en escritorio (C0358: 1452 px a 1280).

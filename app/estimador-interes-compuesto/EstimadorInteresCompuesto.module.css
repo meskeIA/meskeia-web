@@ -926,8 +926,11 @@
     font-size: 2rem;
   }
 
+  /* Las tarjetas saltan de fila cuando no caben, en vez de encogerse: con repeat(3, minmax(0, 1fr))
+     (6b77e70e) «+79.086,03 €» quedaba en una caja de 51 px a 360 y desbordaba la tarjeta (cabo
+     C0565). 10rem deja sitio a la cifra más larga del desglose con su relleno. */
   .desgloseGrid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr));
   }
 
   .desgloseValor {
