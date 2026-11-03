@@ -76,7 +76,10 @@ const args = process.argv.slice(2);
 const iRaiz = args.indexOf('--raiz');
 const RAIZ = iRaiz !== -1 ? path.resolve(args[iRaiz + 1]) : RAIZ_DEFECTO;
 const TODO = args.includes('--todo');
-const SUELTOS = args.filter((a, i) => !a.startsWith('--') && !(iRaiz !== -1 && i === iRaiz + 1));
+// `--desde <ref>`: lo añadido desde <ref>, commits incluidos (cabo C0571; el de check:faq-unica).
+const iDesde = args.indexOf('--desde');
+const BASE = iDesde !== -1 ? args[iDesde + 1] : 'HEAD';
+const SUELTOS = args.filter((a, i) => !a.startsWith('--') && !(iRaiz !== -1 && i === iRaiz + 1) && !(iDesde !== -1 && i === iDesde + 1));
 const TODAS = TODO || SUELTOS.length > 0;
 
 if (process.env.VERCEL) {
@@ -139,7 +142,7 @@ function resolverModulo(desde, especificador) {
 /** Líneas que el commit añade en un fichero, en su numeración ACTUAL; `null` = todas. */
 function lineasTocadas(f) {
   let diff;
-  try { diff = git(['diff', '--unified=0', '--no-color', 'HEAD', '--', f]); } catch { return null; }
+  try { diff = git(['diff', '--unified=0', '--no-color', BASE, '--', f]); } catch { return null; }
   if (!diff.length) return null;   // sin seguir: todo es nuevo
   const tocadas = new Set();
   for (const linea of diff) {
@@ -155,7 +158,7 @@ let cambiados = [];
 let nuevos = [];
 if (!TODAS) {
   try {
-    cambiados = git(['-c', 'core.quotepath=false', 'diff', '--name-only', '--diff-filter=ACM', 'HEAD']);
+    cambiados = git(['-c', 'core.quotepath=false', 'diff', '--name-only', '--diff-filter=ACM', BASE]);
     nuevos = git(['-c', 'core.quotepath=false', 'ls-files', '--others', '--exclude-standard']);
   } catch {
     console.log('✓ Clases CSS: omitido (no se pudo consultar git)');
@@ -170,7 +173,7 @@ if (!TODAS) {
 const desaparecidas = new Map();   // relCss → Set de clases
 for (const f of cambiados.filter((f) => f.endsWith('.module.css'))) {
   let antes;
-  try { antes = execFileSync('git', ['show', `HEAD:${f}`], { cwd: RAIZ, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }); }
+  try { antes = execFileSync('git', ['show', `${BASE}:${f}`], { cwd: RAIZ, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }); }
   catch { continue; }
   const ahora = clasesDelModulo(f) ?? new Set();
   const idas = [...clasesDe(antes)].filter((c) => !ahora.has(c));

@@ -68,7 +68,10 @@ const args = process.argv.slice(2);
 const iRaiz = args.indexOf('--raiz');
 const RAIZ = iRaiz !== -1 ? path.resolve(args[iRaiz + 1]) : RAIZ_DEFECTO;
 const TODO = args.includes('--todo');
-const SUELTOS = args.filter((a, i) => !a.startsWith('--') && args[i - 1] !== '--raiz');
+// `--desde <ref>`: lo añadido desde <ref>, commits incluidos (cabo C0571; el de check:faq-unica).
+const iDesde = args.indexOf('--desde');
+const BASE = iDesde !== -1 ? args[iDesde + 1] : 'HEAD';
+const SUELTOS = args.filter((a, i) => !a.startsWith('--') && args[i - 1] !== '--raiz' && args[i - 1] !== '--desde');
 
 // En Vercel no se ejecuta: el clon es shallow y `git diff HEAD` no significa lo mismo, y el
 // build local —que es donde manda el flujo del proyecto— ya lo ha pasado antes del push.
@@ -96,7 +99,7 @@ function git(argumentos) {
 function lineasTocadas(rel) {
   let diff;
   try {
-    diff = git(['diff', '--unified=0', '--no-color', 'HEAD', '--', rel]);
+    diff = git(['diff', '--unified=0', '--no-color', BASE, '--', rel]);
   } catch {
     return null;
   }
@@ -128,7 +131,7 @@ function objetivos() {
     return todos.filter(relevante);
   }
   try {
-    const cambiados = git(['diff', '--name-only', '--diff-filter=ACM', 'HEAD']);
+    const cambiados = git(['diff', '--name-only', '--diff-filter=ACM', BASE]);
     const nuevos = git(['ls-files', '--others', '--exclude-standard']);
     return [...new Set([...cambiados, ...nuevos])].filter(relevante);
   } catch {

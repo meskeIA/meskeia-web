@@ -49,7 +49,10 @@ const RAIZ_DEFECTO = path.resolve(path.dirname(fileURLToPath(import.meta.url)), 
 const iRaiz = process.argv.indexOf('--raiz');
 const RAIZ = iRaiz !== -1 ? path.resolve(process.argv[iRaiz + 1]) : RAIZ_DEFECTO;
 const TODO = process.argv.includes('--todo');
-const SUELTOS = process.argv.slice(2).filter((a, i, todos) => !a.startsWith('--') && todos[i - 1] !== '--raiz');
+// `--desde <ref>`: lo añadido desde <ref>, commits incluidos (cabo C0571; el de check:faq-unica).
+const iDesde = process.argv.indexOf('--desde');
+const BASE = iDesde !== -1 ? process.argv[iDesde + 1] : 'HEAD';
+const SUELTOS = process.argv.slice(2).filter((a, i, todos) => !a.startsWith('--') && todos[i - 1] !== '--raiz' && todos[i - 1] !== '--desde');
 
 const MINIMO = 4;
 // La razón, en la MISMA línea: con `\s*` el escape saltaba al renglón siguiente y tomaba la
@@ -79,7 +82,7 @@ function git(args) {
 function lineasTocadas(rel) {
   let diff;
   try {
-    diff = git(['diff', '--unified=0', '--no-color', 'HEAD', '--', rel]);
+    diff = git(['diff', '--unified=0', '--no-color', BASE, '--', rel]);
   } catch {
     return null;
   }
@@ -110,7 +113,7 @@ function objetivos() {
     return todos.filter(relevante);
   }
   try {
-    const cambiados = git(['diff', '--name-only', '--diff-filter=ACM', 'HEAD']);
+    const cambiados = git(['diff', '--name-only', '--diff-filter=ACM', BASE]);
     const nuevos = git(['ls-files', '--others', '--exclude-standard']);
     return [...new Set([...cambiados, ...nuevos])].filter(relevante);
   } catch {

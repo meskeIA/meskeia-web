@@ -89,7 +89,14 @@ const RAIZ = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const ts = createRequire(path.join(RAIZ, 'package.json'))('typescript');
 
 const TODO = process.argv.includes('--todo');
-const SUELTOS = process.argv.slice(2).filter(a => !a.startsWith('--'));
+/**
+ * `--desde <ref>`: juzga lo añadido desde <ref>, commits incluidos, y no solo lo pendiente de
+ * commitear (cabo C0571, 03/11/2026). Sin él se compara con HEAD, y en el build de /push y en la
+ * tarea de /reparar, que commitean antes, no queda nada que juzgar. Es el de check:faq-unica.
+ */
+const iDesde = process.argv.indexOf('--desde');
+const BASE = iDesde !== -1 ? process.argv[iDesde + 1] : 'HEAD';
+const SUELTOS = process.argv.slice(2).filter((a, i, todos) => !a.startsWith('--') && todos[i - 1] !== '--desde');
 
 // En Vercel no se ejecuta: allí el clon es shallow y `git diff HEAD` no significa lo mismo,
 // y el build local —que es donde manda el flujo del proyecto— ya lo ha pasado antes del push.
@@ -255,7 +262,7 @@ function git(args) {
 function lineasTocadas(rel) {
   let diff;
   try {
-    diff = git(['diff', '--unified=0', '--no-color', 'HEAD', '--', rel]);
+    diff = git(['diff', '--unified=0', '--no-color', BASE, '--', rel]);
   } catch { return null; }
   if (!diff.length) return null;   // sin seguir: todo es nuevo
   const tocadas = new Set();
@@ -285,7 +292,7 @@ function objetivos() {
     return todos;
   }
   try {
-    const cambiados = git(['diff', '--name-only', '--diff-filter=ACM', 'HEAD']);
+    const cambiados = git(['diff', '--name-only', '--diff-filter=ACM', BASE]);
     const nuevos = git(['ls-files', '--others', '--exclude-standard']);
     return [...new Set([...cambiados, ...nuevos])].filter(relevante);
   } catch {
