@@ -51,6 +51,13 @@
  *  27-31. Lo que NO debe encender: el hijo único, la receta (span siempre montado), el fragmento
  *      hecho span dentro de otro, la plantilla única de un <option> y una variable frente a vacío.
  *
+ * Y las tres variantes de generador-anagramas (cabo C0566, 03/11/2026):
+ *
+ *  32-33. generador-anagramas antes y después de 01b6e467 (hallazgo 3885). FALLAR / CALLAR.
+ *  34-38. Cada forma sola: texto del fragmento en una expresión, concatenación, && anidado en un
+ *      ternario (frente a texto y frente a un elemento). Deben FALLAR.
+ *  39-41. Lo que NO: concatenación como hijo único, una suma de números, la receta. CALLAR.
+ *
  * Trabaja sobre mini-catálogos en directorios temporales: no escribe NADA en `app/`.
  */
 
@@ -73,6 +80,7 @@ const RUSTICO = 'app/simulador-gastos-compraventa-terreno-rustico/page.tsx';
 const GERMINACION = 'app/visualizador-germinacion/page.tsx';
 const GITIGNORE = 'app/generador-gitignore/page.tsx';
 const GRAFOS = 'app/simulador-grafos/page.tsx';
+const ANAGRAMAS = 'app/generador-anagramas/page.tsx';
 
 const pagina = (cuerpo) => ({ 'app/prueba/page.tsx': `export default function P() {\n  return (\n    <div>\n${cuerpo}\n    </div>\n  );\n}\n` });
 
@@ -141,6 +149,18 @@ const CASOS = [
   { n: 29, nombre: 'la receta: el fragmento pasa a span, dentro de otro siempre montado', debeFallar: false, ficheros: pagina("      <p>Hola <span>{a && <span>y <b>adiós</b></span>}</span></p>") },
   { n: 30, nombre: 'la variante: todo en una plantilla (un <option>)', debeFallar: false, ficheros: pagina("      <select><option>{`${n} hijo${n > 1 ? 's' : ''}`}</option></select>") },
   { n: 31, nombre: 'una hoja que es una variable frente a vacío', debeFallar: false, ficheros: pagina("      <p>Hola {a ? resultado : ''}</p>") },
+  // Cabo C0566 (03/11/2026): las tres formas de generador-anagramas (hallazgo 3885) que el
+  // candado no veía. Cada una, sola, en su caso sintético; y el fichero real, antes y después.
+  { n: 32, nombre: 'CASO DE ORIGEN · generador-anagramas antes de 01b6e467 (hallazgo 3885)', debeFallar: true, ficheros: { [ANAGRAMAS]: deGit('01b6e467^', ANAGRAMAS) } },
+  { n: 33, nombre: 'CASO DE ORIGEN REPARADO · generador-anagramas en 01b6e467', debeFallar: false, ficheros: { [ANAGRAMAS]: deGit('01b6e467', ANAGRAMAS) } },
+  { n: 34, nombre: 'forma 1 · fragmento cuyo texto va en una expresión, junto a hermanos', debeFallar: true, ficheros: pagina("      <p>Letras: {n}{c > 0 && (<>{' + '}<strong>{c}</strong> comodines</>)}</p>") },
+  { n: 35, nombre: 'forma 1 · ...y solo con el texto en expresión, sin JsxText', debeFallar: true, ficheros: pagina("      <p>Letras {c > 0 && (<>{' + '}<strong>{c}</strong></>)}</p>") },
+  { n: 36, nombre: 'forma 2 · concatenación de texto que aparece y desaparece', debeFallar: true, ficheros: pagina("      <p>Atril {excedido && `Máximo ${m} letras` + ': se ignoran las demás'}</p>") },
+  { n: 37, nombre: 'forma 3 · && anidado en la rama de un ternario', debeFallar: true, ficheros: pagina("      <p>Frase {excedida ? `Máximo ${m}` : largo > 20 && 'Frase larga'}</p>") },
+  { n: 38, nombre: 'forma 3 · ...con un elemento en la otra rama', debeFallar: true, ficheros: pagina("      <p>{a ? 'Texto' : b && <b>ojo</b>}</p>") },
+  { n: 39, nombre: 'NO debe encender · concatenación como hijo único', debeFallar: false, ficheros: pagina("      <span>{x && 'Hola ' + nombre}</span>") },
+  { n: 40, nombre: 'NO debe encender · suma de números', debeFallar: false, ficheros: pagina("      <p>Total {a && n + 1}</p>") },
+  { n: 41, nombre: 'NO debe encender · la receta de 01b6e467: span siempre montado', debeFallar: false, ficheros: pagina("      <p>Letras: {n}<span>{c > 0 && <span>{' + '}<strong>{c}</strong></span>}</span></p>") },
 ];
 
 let fallos = 0;

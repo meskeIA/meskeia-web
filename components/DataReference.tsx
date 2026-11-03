@@ -72,20 +72,25 @@ export default function DataReference({
           <span className={styles.etiqueta}>Última verificación:</span>
           <span className={styles.valor}>
             {fechaFormateada}
-            {urlOficial && (
-              <>
-                {' · '}
-                <a
-                  href={urlOficial}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={styles.enlace}
-                  aria-label={`Fuente oficial: ${normativa} (abre en nueva pestaña)`}
-                >
-                  Fuente oficial →
-                </a>
-              </>
-            )}
+            {/* El enlace entra y sale en un span SIEMPRE montado, y su « · » va en otro span (C0566):
+                como fragmento con texto junto a la fecha, con la página traducida React lo retiraba o
+                insertaba junto a un nodo de texto que ya no está y la app caía. */}
+            <span>
+              {urlOficial && (
+                <span>
+                  {' · '}
+                  <a
+                    href={urlOficial}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={styles.enlace}
+                    aria-label={`Fuente oficial: ${normativa} (abre en nueva pestaña)`}
+                  >
+                    Fuente oficial →
+                  </a>
+                </span>
+              )}
+            </span>
           </span>
         </div>
 

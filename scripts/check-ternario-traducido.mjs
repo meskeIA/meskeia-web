@@ -50,6 +50,15 @@
  * `{`${n} hijo${n > 1 ? 's' : ''}`}`. ⚠️ `{x && <span>texto</span>}` NO basta: arregla retirar
  * pero no insertar (era la receta de dc07fd4d, y gitignore seguía cayendo al pasar de 1 a 2).
  *
+ * Y, desde el cabo C0566 (03/11/2026), tres variantes de lo anterior que no veía y que tumbaban
+ * generador-anagramas (hallazgo 3885, reparado en 01b6e467):
+ *   1. un fragmento cuyo texto va en una EXPRESIÓN: `{c > 0 && (<>{' + '}<strong>…</strong></>)}`;
+ *   2. una CONCATENACIÓN con un literal de texto: `{excedido && `…` + '…'}`;
+ *   3. un `&&` ANIDADO en la rama de un ternario: `{a ? `…` : largo > 20 && '…'}`, que son dos
+ *      hojas: lo que pinta y nada.
+ * Al nacer encendió una sola aparición, components/DataReference.tsx (el « · Fuente oficial »
+ * junto a la fecha), reparada en el mismo commit.
+ *
  * DE DÓNDE SALE
  * ─────────────
  * Del hallazgo 3314 (cabo C0233): Copiar de ShareCard y los cuatro pies de portal tumbaban la
@@ -118,23 +127,42 @@ function sinParentesis(n) {
   return n;
 }
 
+// Un `&&` dentro de una rama del ternario (`a ? 'x' : b && 'y'`) son dos hojas: lo que pinta y
+// NADA, un `false` sintético (C0566, forma 3).
 function hojas(n) {
   n = sinParentesis(n);
-  return ts.isConditionalExpression(n) ? [...hojas(n.whenTrue), ...hojas(n.whenFalse)] : [n];
+  if (ts.isConditionalExpression(n)) return [...hojas(n.whenTrue), ...hojas(n.whenFalse)];
+  if (ts.isBinaryExpression(n) && n.operatorToken.kind === ts.SyntaxKind.AmpersandAmpersandToken) {
+    return [...hojas(n.right), ts.factory.createFalse()];
+  }
+  return [n];
+}
+
+// Una concatenación con un literal de texto es texto (C0566, forma 2): `{x && `…` + '…'}`.
+function esConcatenacionDeTexto(n) {
+  n = sinParentesis(n);
+  if (!ts.isBinaryExpression(n) || n.operatorToken.kind !== ts.SyntaxKind.PlusToken) return false;
+  const lado = (m) => { m = sinParentesis(m); return clase(m) === 'texto' || esConcatenacionDeTexto(m); };
+  return lado(n.left) || lado(n.right);
 }
 
 function clase(n) {
   if (ts.isStringLiteral(n) || ts.isNoSubstitutionTemplateLiteral(n)) return n.text.trim() ? 'texto' : 'otro';
   if (ts.isTemplateExpression(n)) return 'texto';
   if (ts.isJsxElement(n) || ts.isJsxSelfClosingElement(n) || ts.isJsxFragment(n)) return 'jsx';
+  if (esConcatenacionDeTexto(n)) return 'texto';
   return 'otro';
 }
 
 // Un fragmento con texto suelto entre sus hijos directos (C0438). El fragmento no lleva `key` ni
 // etiqueta propia: al cambiar de rama React compara sus hijos por posición, y donde la otra rama
-// tiene otra cosa retira el nodo de texto, que con la página traducida ya es un <font>.
+// tiene otra cosa retira el nodo de texto, que con la página traducida ya es un <font>. Cuenta
+// también el texto escrito como expresión, `<>{' + '}<strong>…</strong></>` (C0566, forma 1):
+// es el mismo nodo de texto.
 function hijosConTexto(n) {
-  return ts.isJsxFragment(n) && n.children.some((h) => ts.isJsxText(h) && h.text.trim() !== '');
+  return ts.isJsxFragment(n) && n.children.some((h) =>
+    (ts.isJsxText(h) && h.text.trim() !== '')
+    || (ts.isJsxExpression(h) && h.expression && clase(sinParentesis(h.expression)) === 'texto'));
 }
 
 // La forma de los hijos de una rama: «T» por texto, la etiqueta por elemento, «{}» por
