@@ -6,6 +6,11 @@ import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, Disc
 import Link from 'next/link';
 import { PLAZO_ISD, PLAZO_IIVTNU, ESCALA_RECARGO_EXTEMPORANEO } from '@/data/fiscal';
 
+// La prórroga del ISD se pide DENTRO de los cinco primeros meses (art. 68.1 RISD). Tecleado,
+// esto decía «antes del mes 5» —que se lee como un mes menos— y «mientras aún no ha vencido el
+// plazo original», que da uno de más (C0063, la forma del hallazgo 2331 de la hermana).
+const PLAZO_PEDIR_PRORROGA = `dentro de los ${PLAZO_ISD.mesesParaPedirProrroga} primeros meses`;
+
 // ===== TIPOS =====
 interface Respuestas {
   testamento: 'si' | 'no' | 'nose' | '';
@@ -108,10 +113,10 @@ const PASOS_TIMELINE = [
   {
     numero: 5,
     titulo: 'Hacienda Autonómica',
-    tiempo: 'Antes de 6 meses',
+    tiempo: `Antes de ${PLAZO_ISD.mesesPresentacion} meses`,
     icono: '💰',
     descripcion: 'Impuesto de Sucesiones',
-    detalle: 'Liquidar el Impuesto de Sucesiones. Plazo: 6 meses desde fallecimiento (prorrogable 6 meses más).',
+    detalle: `Liquidar el Impuesto de Sucesiones. Plazo: ${PLAZO_ISD.mesesPresentacion} meses desde fallecimiento (prorrogable ${PLAZO_ISD.mesesProrroga} meses más si se pide ${PLAZO_PEDIR_PRORROGA}).`,
     critico: true,
     enlaces: [
       { texto: 'Estimador Impuesto de Sucesiones (17 CCAA)', url: '/estimador-impuesto-sucesiones/' },
@@ -560,9 +565,9 @@ export default function OrientacionTramitacionHerenciasPage() {
           <div className={`${styles.plazoCard} ${styles.plazoCriticoCard}`}>
             <div className={styles.plazoIcono} role="img" aria-label="Plazo crítico">🔴</div>
             <h4>Impuesto de Sucesiones</h4>
-            <p className={styles.plazoPeriodo}>6 MESES desde fallecimiento</p>
+            <p className={styles.plazoPeriodo}>{PLAZO_ISD.mesesPresentacion} MESES desde fallecimiento</p>
             <ul>
-              <li>Prórroga: 6 meses más (solicitar antes del 5.º mes)</li>
+              <li>Prórroga: {PLAZO_ISD.mesesProrroga} meses más (solicitarla {PLAZO_PEDIR_PRORROGA})</li>
               {/* Art. 27.2 LGT, redacción de la Ley 11/2021: la escala 5-20 % que había
                   aquí está DEROGADA. Se compone del motor, como el aviso de más abajo. */}
               <li>
@@ -959,7 +964,7 @@ export default function OrientacionTramitacionHerenciasPage() {
               <div className={styles.stepNumber}>6</div>
               <div className={styles.stepContent}>
                 <h4>Liquidar el Impuesto de Sucesiones — modelo 650</h4>
-                <p><strong>Plazo:</strong> 6 meses desde el fallecimiento. <strong>Prórroga:</strong> 6 meses adicionales sin recargo si se solicita antes de que transcurra el mes 5. <strong>Dónde:</strong> Hacienda autonómica de la Comunidad Autónoma donde residía habitualmente el fallecido. <strong>Coste:</strong> Variable según CCAA, grado de parentesco y base imponible; en Castilla y León o Madrid puede ser casi 0 para hijos; en otras CCAA puede ser significativo. Usa el estimador de meskeIA para calcularlo.</p>
+                <p><strong>Plazo:</strong> {PLAZO_ISD.mesesPresentacion} meses desde el fallecimiento. <strong>Prórroga:</strong> {PLAZO_ISD.mesesProrroga} meses adicionales sin recargo, pero con intereses de demora, si se solicita {PLAZO_PEDIR_PRORROGA}. <strong>Dónde:</strong> Hacienda autonómica de la Comunidad Autónoma donde residía habitualmente el fallecido. <strong>Coste:</strong> Variable según CCAA, grado de parentesco y base imponible; en Castilla y León o Madrid puede ser casi 0 para hijos; en otras CCAA puede ser significativo. Usa el estimador de meskeIA para calcularlo.</p>
               </div>
             </div>
 
@@ -981,8 +986,8 @@ export default function OrientacionTramitacionHerenciasPage() {
 
             <div className={styles.tipCard}>
               <span className={styles.tipIcon}>📅</span>
-              <h4>Solicita la prórroga del IS antes del mes 5</h4>
-              <p>Si no puedes liquidar el Impuesto de Sucesiones en 6 meses (por inventario incompleto, desacuerdos entre herederos o trámites pendientes), presenta la solicitud de prórroga antes de que se cumplan 5 meses desde el fallecimiento. Obtienes 6 meses adicionales sin el recargo por presentación extemporánea, pero CON intereses de demora desde que vencen los seis primeros (art. 68.3 del Reglamento del ISD). Pasado el mes 5, la prórroga ya no es posible.</p>
+              <h4>Solicita la prórroga del IS {PLAZO_PEDIR_PRORROGA}</h4>
+              <p>Si no puedes liquidar el Impuesto de Sucesiones en {PLAZO_ISD.mesesPresentacion} meses (por inventario incompleto, desacuerdos entre herederos o trámites pendientes), presenta la solicitud de prórroga antes de que se cumplan {PLAZO_ISD.mesesParaPedirProrroga} meses desde el fallecimiento. Obtienes {PLAZO_ISD.mesesProrroga} meses adicionales sin el recargo por presentación extemporánea, pero CON intereses de demora desde que vencen los {PLAZO_ISD.mesesPresentacion} primeros (art. 68.3 del Reglamento del ISD). Cumplidos esos {PLAZO_ISD.mesesParaPedirProrroga} meses, la prórroga ya no es posible.</p>
             </div>
 
             <div className={styles.tipCard}>
@@ -1031,8 +1036,8 @@ export default function OrientacionTramitacionHerenciasPage() {
                 Aunque seas heredero o estés autorizado, hacerlo antes de presentar la escritura de adjudicación y el justificante del IS puede dar lugar a responsabilidades civiles frente a los demás herederos y, en casos de mala fe, a consecuencias penales. El banco bloquea las cuentas en cuanto tiene constancia del fallecimiento.
               </li>
               <li>
-                <strong>No pedir prórroga del IS antes del mes 5.</strong>{' '}
-                La prórroga de 6 meses adicionales sin recargo solo puede solicitarse mientras aún no ha vencido el plazo original. Si esperas al mes 6 o dejas que venza, ya no podrás pedirla y se aplicará el recargo desde el primer día: un {ESCALA_RECARGO_EXTEMPORANEO.porcentajeBase} % de partida más otro {ESCALA_RECARGO_EXTEMPORANEO.porcentajePorMes} % por cada mes completo de retraso, y el {ESCALA_RECARGO_EXTEMPORANEO.porcentajeMas12Meses} % más intereses de demora una vez transcurridos {ESCALA_RECARGO_EXTEMPORANEO.mesesEscalaProporcional} meses ({ESCALA_RECARGO_EXTEMPORANEO.baseNormativa}).
+                <strong>No pedir la prórroga del IS {PLAZO_PEDIR_PRORROGA}.</strong>{' '}
+                La prórroga de {PLAZO_ISD.mesesProrroga} meses adicionales sin recargo solo puede solicitarse {PLAZO_PEDIR_PRORROGA} desde el fallecimiento, no hasta que vence el plazo original de {PLAZO_ISD.mesesPresentacion}. Si esperas más o dejas que venza, ya no podrás pedirla y se aplicará el recargo desde el primer día: un {ESCALA_RECARGO_EXTEMPORANEO.porcentajeBase} % de partida más otro {ESCALA_RECARGO_EXTEMPORANEO.porcentajePorMes} % por cada mes completo de retraso, y el {ESCALA_RECARGO_EXTEMPORANEO.porcentajeMas12Meses} % más intereses de demora una vez transcurridos {ESCALA_RECARGO_EXTEMPORANEO.mesesEscalaProporcional} meses ({ESCALA_RECARGO_EXTEMPORANEO.baseNormativa}).
               </li>
               <li>
                 <strong>Aceptar la herencia sin comprobar las deudas.</strong>{' '}

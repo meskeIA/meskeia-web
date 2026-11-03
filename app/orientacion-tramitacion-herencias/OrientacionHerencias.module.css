@@ -1,6 +1,6 @@
 .container {
-  --primary: #2E86AB;
-  --secondary: #48A9A6;
+  /* Sin --primary ni --secondary propios (C0063, forma del hallazgo 2326): fijados aquí
+     servían el azul del claro también en oscuro. Vienen de globals. */
   --bg-primary: #FAFAFA;
   --bg-card: #FFFFFF;
   --text-primary: #1A1A1A;

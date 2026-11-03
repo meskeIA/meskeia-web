@@ -51,10 +51,10 @@ export const faqJsonLd = {
         '@type': 'Answer',
         // ⚠️ Mismo defecto que el hallazgo 817 en `estimador-impuesto-sucesiones`, hallado al
         // grepear las hermanas: la prórroga se pide dentro de los CINCO primeros meses (art.
-        // 68.1 RISD), no «antes de que venza el plazo inicial». El cuerpo visible de esta
-        // misma app lo dice bien tres veces —«antes del mes 5», «Pasado el mes 5 ya no es
-        // posible»— y solo su JSON-LD, que es lo que citan ChatGPT, Bing Copilot y
-        // Perplexity sin el disclaimer al lado, daba un mes de más.
+        // 68.1 RISD), no «antes de que venza el plazo inicial». Su JSON-LD, que es lo que
+        // citan ChatGPT, Bing Copilot y Perplexity sin el disclaimer al lado, daba un mes de
+        // más. El cuerpo visible decía «antes del mes 5» (un mes de menos) y, en la lista de
+        // errores, el mismo mes de más: desde C0063 sale de PLAZO_ISD como aquí.
         text: `El plazo más crítico es el del Impuesto de Sucesiones: ${PLAZO_ISD.mesesPresentacion} meses desde la fecha del fallecimiento. Se puede solicitar una prórroga de otros ${PLAZO_ISD.mesesProrroga} meses, pero hay que pedirla dentro de los ${PLAZO_ISD.mesesParaPedirProrroga} primeros meses y devenga intereses de demora. Para la aceptación de la herencia no existe un plazo legal obligatorio, pero conviene actuar en ese período para evitar problemas con los bienes y las deudas del fallecido.`,
       },
     },

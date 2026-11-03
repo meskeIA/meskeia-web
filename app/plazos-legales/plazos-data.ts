@@ -1,6 +1,8 @@
 // Base de datos de plazos legales en España
 // Información orientativa - Verificar siempre con fuentes oficiales
 
+import { PLAZO_ISD } from '@/data/fiscal';
+
 export type PlazoCategory =
   | 'consumo'
   | 'deudas'
@@ -291,12 +293,13 @@ export const PLAZOS_LEGALES: PlazoLegal[] = [
   {
     id: 'impuesto-sucesiones',
     title: 'Pagar impuesto de sucesiones',
-    plazo: '6 meses',
-    plazoValue: 180,
+    // Derivado de PLAZO_ISD (C0063): estaba tecleado, como en la hermana del hallazgo 2331.
+    plazo: `${PLAZO_ISD.mesesPresentacion} meses`,
+    plazoValue: PLAZO_ISD.mesesPresentacion * 30,
     category: 'civil',
     description: 'Plazo para liquidar el impuesto de sucesiones.',
-    details: 'Desde el fallecimiento. Se puede pedir prórroga de 6 meses más dentro de los primeros 5 meses. Con prórroga se pagan intereses de demora.',
-    legalReference: 'Art. 67.1 Reglamento ISD',
+    details: `Desde el fallecimiento. Se puede pedir prórroga de ${PLAZO_ISD.mesesProrroga} meses más dentro de los ${PLAZO_ISD.mesesParaPedirProrroga} primeros meses. Con prórroga se pagan intereses de demora.`,
+    legalReference: 'Arts. 67.1 y 68 Reglamento ISD',
     important: true,
     keywords: ['sucesiones', 'herencia', 'impuesto', 'fallecimiento', 'hacienda'],
   },
