@@ -946,8 +946,13 @@
     grid-template-columns: 1fr;
   }
 
+  /* Sin tope de alto ni desplazamiento propio (cabo C0605): el max-height de arriba es para que
+     la columna pegue en escritorio; en el móvil, como es una columna flex, encogía la vista
+     previa hasta 188 px a 390 y 32 px (solo su relleno) a 360 */
   .previewCol {
     position: static;
+    max-height: none;
+    overflow: visible;
   }
 }
 

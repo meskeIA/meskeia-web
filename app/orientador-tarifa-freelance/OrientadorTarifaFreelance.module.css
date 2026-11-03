@@ -817,8 +817,13 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
+  /* Sin tope de alto ni desplazamiento propio (cabo C0605): el max-height y el overflow-y de
+     arriba son para que el panel pegue en escritorio; sin sticky solo lo convertían en una caja
+     con scroll dentro de la página, y con el dedo encima bajaba el panel y no la página */
   .resultsPanel {
     position: static;
+    max-height: none;
+    overflow: visible;
   }
 
   .tarifasPrincipales {
@@ -883,6 +888,16 @@
 
   .eduStep {
     flex-direction: column;
+  }
+}
+
+/* En papel, el panel entero: 100vh es el alto de la hoja, y el tope lo cortaba en 965 px con
+   1.739 dentro (fuera el IRPF estimado y el beneficio neto; cabo C0605) */
+@media print {
+  .resultsPanel {
+    position: static;
+    max-height: none;
+    overflow: visible;
   }
 }
 

@@ -3491,7 +3491,7 @@ for (const { ancho, alto } of [
       hasTouch: true,
     });
 
-    test('HALLAZGO (03/11/2026, ABIERTO) · con el dedo sobre el panel baja la página, y el importe no se esconde dentro de él', async ({
+    test('HALLAZGO 3969 (03/11/2026, REPARADO) · con el dedo sobre el panel baja la página, y el importe no se esconde dentro de él', async ({
       page,
     }) => {
       await page.goto(RUTA);
@@ -3513,10 +3513,8 @@ for (const { ancho, alto } of [
         ),
       ).toBe(true);
 
-      // ABIERTO (cabo C0383): hoy el primer arrastre mueve el panel (135 px a 390, 285 a 360) y la
-      // página 0. Cuando el panel deje de tener tope en el móvil, este caso «pasará» y Playwright lo
-      // marcará: entonces se quita el test.fail() y se escribe REPARADO.
-      test.fail();
+      // REPARADO (hallazgo 3969): el primer arrastre movía el panel (135 px a 390, 285 a 360) y la
+      // página 0. La regla de ≤ 1024 px le quita ahora también el max-height y el overflow-y.
       const pasos: { ventana: number; panel: number }[] = [];
       for (let i = 0; i < 4; i++) {
         const antes = await posicionC0383(page);
@@ -3552,7 +3550,7 @@ test.describe('Cabo C0383 — el panel de resultados en el papel (área imprimib
   // alto de la página (medido con page.pdf el 03/11/2026).
   test.use({ viewport: { width: 718, height: 1047 } });
 
-  test('HALLAZGO (03/11/2026, ABIERTO) · con la nuda propiedad, «Cuota a ingresar» sale en el papel', async ({
+  test('HALLAZGO 3970 (03/11/2026, REPARADO) · con la nuda propiedad, «Cuota a ingresar» sale en el papel', async ({
     page,
   }) => {
     await page.goto(RUTA);
@@ -3571,9 +3569,9 @@ test.describe('Cabo C0383 — el panel de resultados en el papel (área imprimib
     await page.emulateMedia({ media: 'print' });
     expect(await page.evaluate(() => matchMedia('print').matches)).toBe(true);
 
-    // ABIERTO (cabo C0383): hoy el panel mide 969 px con 1.061 dentro, y los 92 px que no caben
-    // —«Cuota tributaria» y «CUOTA A INGRESAR (estimada)»— no salen en la hoja.
-    test.fail();
+    // REPARADO (hallazgo 3970): el panel medía 969 px con 1.061 dentro, y los 92 px que no cabían
+    // —«Cuota tributaria» y «CUOTA A INGRESAR (estimada)»— no salían en la hoja. Ahora @media print
+    // le quita el tope.
     const medida = await panel.evaluate((p) => {
       const recorte = p.getBoundingClientRect().top + p.clientTop + p.clientHeight;
       const cuota = [...p.querySelectorAll('*')].filter(

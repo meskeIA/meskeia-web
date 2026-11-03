@@ -214,6 +214,55 @@ for (const c of STICKY_REALES) {
   });
 }
 
+/**
+ * Los seis paneles a los que 3978f382 dio `max-height` + desplazamiento interno para pegar en
+ * escritorio. Sin sticky (móvil) y en el papel ese tope los convertía en una caja con scroll
+ * propio dentro de la página: el dedo bajaba el panel y no la página, y la hoja cortaba lo de
+ * abajo (hallazgos 3431, 3969, 3970, 3971 y cabo C0605). `papel: false` donde el panel no lleva
+ * desplazamiento interno y el tope no se ha medido en impresión (gitignore).
+ */
+const PANELES_CON_TOPE = [
+  { slug: 'adaptador-dislexia', selector: '[class*="controlesPanel"]', papel: true },
+  { slug: 'estimador-impuesto-sucesiones', selector: '[class*="resultsPanel"]', papel: true },
+  { slug: 'estimador-impuesto-donaciones', selector: '[class*="resultsPanel"]', papel: true },
+  { slug: 'orientador-tarifa-freelance', selector: '[class*="resultsPanel"]', papel: true },
+  { slug: 'generador-curriculum', selector: '[class*="previewCol"]', papel: true },
+  { slug: 'generador-gitignore', selector: '[class*="previewPanel"]', papel: false },
+];
+
+/** Siembra 2.000 px dentro del panel y dice si el panel creció con ellos o los encerró en su caja. */
+async function panelCreceConSuContenido(page: Page, selector: string) {
+  return page.evaluate((sel) => {
+    const el = document.querySelector(sel) as HTMLElement;
+    const relleno = document.createElement('div');
+    relleno.style.cssText = 'height:2000px;flex:none';
+    el.appendChild(relleno);
+    const r = { dentro: el.scrollHeight, visible: el.clientHeight, rellenoVisible: relleno.getBoundingClientRect().height };
+    relleno.remove();
+    return r;
+  }, selector);
+}
+
+for (const c of PANELES_CON_TOPE) {
+  test(`C0605 · ${c.slug} a 390 px: el panel crece con su contenido, sin desplazamiento propio`, async ({ page }) => {
+    await cargar(page, `/${c.slug}/`, 390);
+    const r = await panelCreceConSuContenido(page, c.selector);
+    expect(r.dentro, JSON.stringify(r)).toBeLessThanOrEqual(r.visible + 1);
+    expect(r.rellenoVisible).toBe(2000);
+  });
+
+  if (c.papel) {
+    test(`C0605 · ${c.slug} en el papel (A4 con márgenes de 1 cm): el panel sale entero`, async ({ page }) => {
+      await page.setViewportSize({ width: 718, height: 1047 });
+      await page.goto(`/${c.slug}/`);
+      await page.waitForLoadState('networkidle');
+      await page.emulateMedia({ media: 'print' });
+      const r = await panelCreceConSuContenido(page, c.selector);
+      expect(r.dentro, JSON.stringify(r)).toBeLessThanOrEqual(r.visible + 1);
+    });
+  }
+}
+
 test('C0125 · a 390 px ningún sticky de las tres apps queda bajo la barra del logo', async ({ page }) => {
   for (const c of STICKY_REALES) {
     await cargar(page, `/${c.slug}/`, 390);

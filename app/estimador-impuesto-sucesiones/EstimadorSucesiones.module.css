@@ -899,8 +899,13 @@
     grid-template-columns: 1fr;
   }
 
+  /* Sin tope de alto ni desplazamiento propio (hallazgo 3969): el max-height y el overflow-y de
+     arriba son para que el panel pegue en escritorio; sin sticky solo lo convertían en una caja
+     con scroll dentro de la página, y con el dedo encima bajaba el panel y no la página */
   .resultsPanel {
     position: static;
+    max-height: none;
+    overflow: visible;
   }
 
   .conceptGrid {
@@ -944,6 +949,16 @@
 
   .faqItem dt {
     font-size: 0.92rem;
+  }
+}
+
+/* En papel, el panel entero: 100vh es el alto de la hoja, y con la nuda propiedad el tope
+   dejaba fuera «Cuota a ingresar» (hallazgo 3970) */
+@media print {
+  .resultsPanel {
+    position: static;
+    max-height: none;
+    overflow: visible;
   }
 }
 

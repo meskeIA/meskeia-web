@@ -1072,7 +1072,7 @@ for (const { ancho, alto } of [
       hasTouch: true,
     });
 
-    test('HALLAZGO (03/11/2026, ABIERTO) · con el dedo sobre el panel baja la página, y el importe no se esconde dentro de él', async ({
+    test('HALLAZGO 3971 (03/11/2026, REPARADO) · con el dedo sobre el panel baja la página, y el importe no se esconde dentro de él', async ({
       page,
     }) => {
       await rellenar(page, { ccaa: 'madrid', grupo: 'II', valor: '200000', cargas: '30000' });
@@ -1090,10 +1090,8 @@ for (const { ancho, alto } of [
         ),
       ).toBe(true);
 
-      // ABIERTO (cabo C0383): hoy el primer arrastre mueve el panel (34 px a 390, 208 a 360) y la
-      // página 0. Cuando el panel deje de tener tope en el móvil, este caso «pasará» y Playwright lo
-      // marcará: entonces se quita el test.fail() y se escribe REPARADO.
-      test.fail();
+      // REPARADO (hallazgo 3971): el primer arrastre movía el panel (34 px a 390, 208 a 360) y la
+      // página 0. La regla de ≤ 1024 px le quita ahora también el max-height y el overflow-y.
       const pasos: { ventana: number; panel: number }[] = [];
       for (let i = 0; i < 4; i++) {
         const antes = await posicionC0383(page);
