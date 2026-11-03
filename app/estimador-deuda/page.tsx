@@ -32,7 +32,11 @@ interface ResultadoMetodo {
 
 export default function CalculadoraDeudaPage() {
   const [deudas, setDeudas] = useState<Deuda[]>([
-    { id: crypto.randomUUID(), nombre: 'Tarjeta de crédito', saldo: '', tasaInteres: '20', pagoMinimo: '' },
+    // Id fijo para la deuda inicial (C0598): un crypto.randomUUID() aquí corre en el render del
+    // servidor y otra vez al hidratar, con dos valores distintos. Solo va a `key`, así que no
+    // desajustaba el HTML, pero es la forma que vigila check:reloj-azar. Las que se añaden
+    // después sí lo usan: corren en un manejador, no en el render.
+    { id: 'deuda-inicial', nombre: 'Tarjeta de crédito', saldo: '', tasaInteres: '20', pagoMinimo: '' },
   ]);
   const [pagoExtraMensual, setPagoExtraMensual] = useState('200');
   const [mostrarResultados, setMostrarResultados] = useState(false);
