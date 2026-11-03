@@ -1,7 +1,7 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useMemo, useRef, useEffect } from 'react';
+import { useState, useMemo, useRef, useEffect, isValidElement } from 'react';
 import type { ReactNode } from 'react';
 import styles from './TablaDerivadas.module.css';
 import {
@@ -18,11 +18,16 @@ import {
    del sitio está en modo enforcement y bloquearía MathJax/KaTeX).
 ──────────────────────────────────────────────────────────────── */
 
-/** Fracción legible construida con flexbox. */
+/**
+ * Fracción legible construida con flexbox. El «entre» oculto es para el lector de pantalla
+ * (cabo C0591, la forma del hallazgo 3939 de tabla-integrales): apilados sin nada en medio,
+ * 1 sobre x² se anunciaba «1 x²», que es otra fórmula.
+ */
 function Frac({ n, d }: { n: ReactNode; d: ReactNode }) {
   return (
     <span className={styles.frac}>
       <span className={styles.fracNum}>{n}</span>
+      <span className="sr-only"> entre </span>
       <span className={styles.fracDen}>{d}</span>
     </span>
   );
@@ -34,6 +39,41 @@ function normalizar(texto: string): string {
     .toLowerCase()
     .normalize('NFD')
     .replace(/[̀-ͯ]/g, '');
+}
+
+/** Texto plano de una fórmula: los exponentes como ^n y las fracciones como n/d. */
+function textoFormula(nodo: ReactNode): string {
+  if (nodo === null || nodo === undefined || typeof nodo === 'boolean') return '';
+  if (typeof nodo === 'string' || typeof nodo === 'number') return String(nodo);
+  if (Array.isArray(nodo)) return nodo.map(textoFormula).join('');
+  if (isValidElement(nodo)) {
+    const props = nodo.props as { children?: ReactNode; n?: ReactNode; d?: ReactNode };
+    if (nodo.type === Frac) return `${textoFormula(props.n)}/${textoFormula(props.d)}`;
+    const dentro = textoFormula(props.children);
+    return nodo.type === 'sup' ? `^${dentro}` : dentro;
+  }
+  return '';
+}
+
+const SUPERINDICES: Record<string, string> = {
+  '⁰': '0', '¹': '1', '²': '2', '³': '3', '⁴': '4', '⁵': '5', '⁶': '6', '⁷': '7', '⁸': '8',
+  '⁹': '9', 'ⁿ': 'n', '⁻': '-',
+};
+
+/** Texto normalizado para buscar: sin acentos, superíndices como ^n y √ como «raiz». */
+function prepararBusqueda(texto: string): string {
+  return normalizar(texto)
+    .replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹ⁿ⁻]+/g, (m) => `^${[...m].map((c) => SUPERINDICES[c]).join('')}`)
+    .replace(/√/g, ' raiz ')
+    .replace(/−/g, '-');
+}
+
+function palabrasDe(texto: string): string[] {
+  return prepararBusqueda(texto).split(/[^a-z0-9]+/).filter(Boolean);
+}
+
+function compactar(texto: string): string {
+  return prepararBusqueda(texto).replace(/[\s·*′']+/g, '');
 }
 
 /* ────────────────────────────────────────────────────────────────
@@ -678,7 +718,8 @@ const DERIVADAS: EntradaDerivada[] = [
     cadenaFuncion: <>cosh u</>,
     cadenaDerivada: <>senh u · u′</>,
     busqueda:
-      'coseno hiperbolico cosh ch derivada sin signo negativo catenaria cable colgante',
+      // «derivada sin signo negativo» hacía que «sin» (el seno en inglés) trajera esta fila.
+      'coseno hiperbolico cosh ch derivada con signo positivo catenaria cable colgante',
     justificacion:
       'cosh x = (eˣ + e⁻ˣ)/2 y al derivar queda (eˣ − e⁻ˣ)/2 = senh x. Aquí NO hay signo menos, justo al revés que en el coseno circular: es la confusión más habitual al mezclar ambas familias.',
     ejemploTitulo: 'Derivar f(x) = cosh(x²)',
@@ -928,6 +969,31 @@ const DERIVADAS: EntradaDerivada[] = [
 ];
 
 /* ────────────────────────────────────────────────────────────────
+   Índice del buscador (cabo C0591, la forma de los hallazgos 3937 y 3938 de tabla-integrales)
+
+   Antes la consulta entera se buscaba como UNA subcadena seguida en nombre + sinónimos, así que:
+   · una fórmula escrita como en la tabla («sen x», «e^x», «x²») o dos palabras en otro orden
+     daban 0 resultados y el aviso de que la fórmula no existe;
+   · «tan» casaba dentro de «constante» y «sin» (el seno en inglés) con la preposición «sin».
+   Ahora cada palabra de la consulta tiene que empezar una palabra de la entrada (una letra
+   sola, ser esa palabra), y la entrada incluye el texto de su fórmula. Lo que casa entero o
+   como fórmula seguida sube arriba.
+──────────────────────────────────────────────────────────────── */
+
+const INDICE_BUSQUEDA = new Map(
+  DERIVADAS.map((entrada) => {
+    const formulas = `${textoFormula(entrada.funcion)} ${textoFormula(entrada.cadenaFuncion)}`;
+    const texto = `${entrada.nombre} ${formulas} ${entrada.busqueda}`;
+    return [entrada.id, { palabras: palabrasDe(texto), compacto: compactar(texto) }] as const;
+  }),
+);
+
+/** ¿La palabra `q` de la consulta casa con la palabra `p` de la entrada? */
+function casa(q: string, p: string): boolean {
+  return q.length === 1 ? p === q : p.startsWith(q);
+}
+
+/* ────────────────────────────────────────────────────────────────
    Componente principal
 ──────────────────────────────────────────────────────────────── */
 
@@ -943,14 +1009,23 @@ export default function TablaDerivadasPage() {
   }, []);
 
   const resultados = useMemo(() => {
-    const termino = normalizar(consulta.trim());
-    return DERIVADAS.filter((entrada) => {
-      const coincideCategoria =
-        categoriaActiva === 'todas' || entrada.categoria === categoriaActiva;
-      if (!coincideCategoria) return false;
-      if (termino === '') return true;
-      return normalizar(`${entrada.nombre} ${entrada.busqueda}`).includes(termino);
-    });
+    const enCategoria = DERIVADAS.filter(
+      (entrada) => categoriaActiva === 'todas' || entrada.categoria === categoriaActiva,
+    );
+    const consultaPalabras = palabrasDe(consulta);
+    if (consultaPalabras.length === 0) return enCategoria;
+    const consultaCompacta = compactar(consulta);
+    return enCategoria
+      .map((entrada) => {
+        const indice = INDICE_BUSQUEDA.get(entrada.id)!;
+        const encaja = consultaPalabras.every((q) => indice.palabras.some((p) => casa(q, p)));
+        const exacta = consultaPalabras.every((q) => indice.palabras.includes(q));
+        const puntos = (indice.compacto.includes(consultaCompacta) ? 2 : 0) + (exacta ? 1 : 0);
+        return { entrada, encaja, puntos };
+      })
+      .filter((r) => r.encaja)
+      .sort((a, b) => b.puntos - a.puntos)
+      .map((r) => r.entrada);
   }, [consulta, categoriaActiva]);
 
   const alternarFila = (id: string) => {
