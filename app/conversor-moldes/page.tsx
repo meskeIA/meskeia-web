@@ -18,7 +18,7 @@ import {
   type FormaMolde,
   type Molde,
 } from '@/lib/calculadoras/conversorMoldes';
-import { formatNumber } from '@/lib/formatters';
+import { formatNumber, parseSpanishNumber } from '@/lib/formatters';
 
 function MoldeControl({
   titulo,
@@ -47,33 +47,76 @@ function MoldeControl({
         </select>
       </div>
       <div className={styles.dimsFila}>
-        <div className={styles.campo}>
-          <label htmlFor={`${baseId}-dim1`} className={styles.label}>
-            {molde.forma === 'redondo' ? 'Diámetro (cm)' : molde.forma === 'cuadrado' ? 'Lado (cm)' : 'Largo (cm)'}
-          </label>
-          <input
-            id={`${baseId}-dim1`}
-            type="text"
-            inputMode="decimal"
-            className={styles.input}
-            value={molde.dim1 || ''}
-            onChange={(e) => onChange({ ...molde, dim1: parseFloat(e.target.value.replace(',', '.')) || 0 })}
-          />
-        </div>
+        <CampoDimension
+          id={`${baseId}-dim1`}
+          etiqueta={molde.forma === 'redondo' ? 'Diámetro (cm)' : molde.forma === 'cuadrado' ? 'Lado (cm)' : 'Largo (cm)'}
+          valor={molde.dim1}
+          onValor={(n) => onChange({ ...molde, dim1: n })}
+        />
         {molde.forma === 'rectangular' && (
-          <div className={styles.campo}>
-            <label htmlFor={`${baseId}-dim2`} className={styles.label}>Ancho (cm)</label>
-            <input
-              id={`${baseId}-dim2`}
-              type="text"
-              inputMode="decimal"
-              className={styles.input}
-              value={molde.dim2 || ''}
-              onChange={(e) => onChange({ ...molde, dim2: parseFloat(e.target.value.replace(',', '.')) || 0 })}
-            />
-          </div>
+          <CampoDimension
+            id={`${baseId}-dim2`}
+            etiqueta="Ancho (cm)"
+            valor={molde.dim2 ?? 0}
+            onValor={(n) => onChange({ ...molde, dim2: n })}
+          />
         )}
       </div>
+    </div>
+  );
+}
+
+/** Una medida en cm: 0 si el texto no es un número mayor que 0. */
+function leerCm(texto: string): number {
+  const n = parseSpanishNumber(texto);
+  return Number.isFinite(n) && n > 0 ? n : 0;
+}
+
+function textoDeCm(n: number): string {
+  return n > 0 ? String(n).replace('.', ',') : '';
+}
+
+/**
+ * Campo de una dimensión del molde (cabo C0597). Se leía con el parseo casero (cambiar la coma
+ * por punto y pasarlo a parseFloat), que toma «1.500» por 1,5 y «12abc» por 12; y como el campo pintaba el número y no lo tecleado,
+ * la coma de «22,5» desaparecía al escribirla y no había forma de dar un decimal. Ahora guarda el
+ * texto, lo lee con parseSpanishNumber y avisa si no es un número mayor que 0.
+ */
+function CampoDimension({
+  id,
+  etiqueta,
+  valor,
+  onValor,
+}: {
+  id: string;
+  etiqueta: string;
+  valor: number;
+  onValor: (n: number) => void;
+}) {
+  const [texto, setTexto] = useState(() => textoDeCm(valor));
+  // Si el valor cambió desde fuera (un molde de la lista), se pinta ese; si es el que salió de
+  // lo tecleado, se respeta el texto para poder escribir «22,».
+  const mostrado = leerCm(texto) === valor ? texto : textoDeCm(valor);
+  const invalido = mostrado.trim() !== '' && leerCm(mostrado) === 0;
+  return (
+    <div className={styles.campo}>
+      <label htmlFor={id} className={styles.label}>{etiqueta}</label>
+      <input
+        id={id}
+        type="text"
+        inputMode="decimal"
+        className={styles.input}
+        value={mostrado}
+        aria-invalid={invalido}
+        aria-describedby={invalido ? `${id}-error` : undefined}
+        onChange={(e) => {
+          setTexto(e.target.value);
+          onValor(leerCm(e.target.value));
+        }}
+      />
+      <p id={`${id}-error`} className={styles.errorCampo} role="alert">
+        {invalido ? 'Escribe una medida en cm mayor que 0, p. ej. 22,5' : ''}
+      </p>
     </div>
   );
 }

@@ -20,6 +20,12 @@
 .input:focus, .select:focus { outline: none; border-color: var(--primary); }
 .select { cursor: pointer; }
 .dimsFila { display: flex; gap: 10px; }
+/* Aviso de una medida que no es un número (C0597). Vacío no ocupa sitio. */
+.errorCampo { margin: 0; font-size: 0.8rem; color: var(--rojo-texto, #B91C1C); }
+.errorCampo:empty { display: none; }
+.input[aria-invalid='true'] { border-color: var(--rojo-texto, #B91C1C); }
+[data-theme='dark'] .errorCampo { color: #FCA5A5; }
+[data-theme='dark'] .input[aria-invalid='true'] { border-color: #FCA5A5; }
 
 .presetSelect { width: 100%; margin-top: 8px; padding: 9px 12px; font-size: 0.85rem; border: 1px dashed var(--border); border-radius: 10px; background: transparent; color: var(--text-secondary); cursor: pointer; }
 .presetSelect:focus { outline: none; border-color: var(--primary); }
