@@ -537,11 +537,20 @@ async function medirSintetico(page: Page, senal: SenalSintetica) {
   await expect.poll(() => page.evaluate(() => (window as VentanaSenal).__senalPedida ?? 0)).toBeGreaterThan(0);
 }
 
-/** Espera hasta que el búfer lleve `ms` sonando (reloj de la página, desde que se pidió el micrófono). */
+/**
+ * Espera hasta que el búfer lleve `ms` sonando (reloj de la página, desde que se pidió el micrófono).
+ *
+ * El plazo del sondeo es holgado a propósito (cabo C0599, 03/11/2026): lo que se espera es a que la
+ * PÁGINA llegue a `ms`, no se mide su velocidad. En la suite entera del 03/11 el sondeo se rindió a
+ * los 9,3 s con la página a 4.175 ms: como performance.now() es reloj real, eso solo pasa si los
+ * page.evaluate dejan de volver con la renderizadora ahogada (esa suite acabó con un worker muerto).
+ * El plazo del test se alarga lo mismo, para que el sondeo no choque con los 30 s de la config.
+ */
 async function esperarDesdeElMicrofono(page: Page, ms: number) {
+  test.setTimeout(test.info().timeout + 15000);
   await expect
     .poll(() => page.evaluate(() => performance.now() - ((window as VentanaSenal).__senalPedida ?? Infinity)), {
-      timeout: ms + 5000,
+      timeout: ms + 20000,
     })
     .toBeGreaterThanOrEqual(ms);
 }
