@@ -480,6 +480,27 @@ test.describe('lector-texto-voz · contador, resaltado y controles', () => {
   });
 });
 
+test('HALLAZGO 3975 (03/11/2026, ABIERTO) · el porcentaje de la barra de progreso se ve en pantalla', async ({ page }) => {
+  // Visto en /reparar al reparar el 3968: .progresoTexto va con top: 14px dentro de .progreso,
+  // que mide 10 px y lleva overflow: hidden, así que «N %» queda entero bajo el recorte (a
+  // 1280×800: caja de 340,9 a 350,9 px, texto de 354,9 a 374,1). Cuando se repare, este caso
+  // pasará: se quita el test.fail() y se escribe REPARADO.
+  test.fail();
+  await abrir(page);
+  await botonLeer(page).click();
+  const medida = await page.locator('[class*="progresoTexto"]').evaluate((t) => {
+    const texto = t.getBoundingClientRect();
+    let visible = texto.height > 0;
+    for (let a = t.parentElement; a && visible; a = a.parentElement) {
+      if (getComputedStyle(a).overflow === 'visible') continue;
+      const c = a.getBoundingClientRect();
+      visible = texto.top >= c.top - 1 && texto.bottom <= c.bottom + 1;
+    }
+    return visible;
+  });
+  expect(medida).toBe(true);
+});
+
 const { viewport, userAgent, deviceScaleFactor, isMobile, hasTouch } = devices['Pixel 7'];
 
 test.describe('lector-texto-voz · móvil (Pixel 7)', () => {
