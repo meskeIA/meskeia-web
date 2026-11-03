@@ -6,6 +6,7 @@ import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard, EducationalSection, DisclaimerCard } from '@/components';
 import { formatCurrency, hoyISOLocal } from '@/lib';
+import { RESPUESTA_FAQ_CENTIMOS } from './metadata';
 
 // Tipos
 interface Persona {
@@ -905,7 +906,7 @@ export default function CalculadoraGastosCompartidosPage() {
           </div>
           <div className={styles.faqItem}>
             <h4>¿Cómo se reparten los céntimos cuando la división no es exacta?</h4>
-            <p>Repartir 10 € entre tres da 3,333… €. Si se redondea cada parte a 3,33 €, la suma son 9,99 € y falta un céntimo: es el error clásico de hacerlo a mano o en una hoja de cálculo. Aquí el cálculo se hace en céntimos enteros y el sobrante se asigna a una de las partes, rotando de un gasto a otro para que no recaiga siempre en la misma persona. La suma de las partes coincide siempre con el total exacto.</p>
+            <p>{RESPUESTA_FAQ_CENTIMOS}</p>
           </div>
           <div className={styles.faqItem}>
             <h4>¿Qué hago con un gasto en el que no participaron todos?</h4>

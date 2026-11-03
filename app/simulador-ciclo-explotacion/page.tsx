@@ -12,6 +12,7 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
+import { RESPUESTA_FAQ_PME_PMF, RESPUESTA_FAQ_REDUCIR_CICLO } from './metadata';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -597,12 +598,7 @@ export default function SimuladorCicloExplotacionPage() {
               </details>
               <details className={styles.faqItem}>
                 <summary>¿Cuál es la diferencia entre el PME y el PMF?</summary>
-                <p>
-                  El Período de Maduración Económico (PME) mide la duración total del ciclo operativo.
-                  El Período de Maduración Financiero (PMF) es el PME menos el PMP (plazo que dan los
-                  proveedores). El PMF mide los días que la empresa debe financiar con recursos propios
-                  o crédito bancario, porque esa parte del ciclo no está cubierta por los proveedores.
-                </p>
+                <p>{RESPUESTA_FAQ_PME_PMF}</p>
               </details>
               <details className={styles.faqItem}>
                 <summary>¿Cómo se calcula el Fondo de Maniobra necesario?</summary>
@@ -616,13 +612,7 @@ export default function SimuladorCicloExplotacionPage() {
               </details>
               <details className={styles.faqItem}>
                 <summary>¿Cómo puede una empresa reducir su ciclo de explotación?</summary>
-                <p>
-                  Las principales palancas son: reducir stock con gestión JIT o previsión de demanda;
-                  acortar la fabricación con mejoras de proceso; anticipar el cobro con factoring o
-                  descuentos por pronto pago; y alargar el pago a proveedores mediante confirming u
-                  otras fórmulas de financiación de la cadena de suministro. Cada día que se reduce
-                  el PMF libera capital equivalente al coste diario de la empresa.
-                </p>
+                <p>{RESPUESTA_FAQ_REDUCIR_CICLO}</p>
               </details>
               <details className={styles.faqItem}>
                 <summary>¿Qué pasa si el PMF es negativo o igual a cero?</summary>

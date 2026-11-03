@@ -12,6 +12,7 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
+import { RESPUESTA_FAQ_FIABLE_ESPANA, RESPUESTA_FAQ_QUE_ES } from './metadata';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -429,7 +430,7 @@ export default function CalculadoraZScoreAltman() {
           <dl className={styles.faqList}>
             <div className={styles.faqItem}>
               <dt>¿Qué es el Z-Score de Altman y para qué sirve?</dt>
-              <dd>Es un modelo estadístico creado por el profesor Edward Altman en 1968 que combina cinco ratios financieros del balance en una única puntuación para estimar la probabilidad de que una empresa entre en insolvencia en los dos años siguientes. Cuanto más alta es la puntuación, más sólida es la empresa. Se usa en banca, análisis de crédito y due diligence en todo el mundo.</dd>
+              <dd>{RESPUESTA_FAQ_QUE_ES}</dd>
             </div>
             <div className={styles.faqItem}>
               <dt>¿Qué modelo debo usar para mi empresa?</dt>
@@ -441,7 +442,7 @@ export default function CalculadoraZScoreAltman() {
             </div>
             <div className={styles.faqItem}>
               <dt>¿Es fiable el Z-Score para una empresa española?</dt>
-              <dd>El modelo fue calibrado con empresas estadounidenses de finales del siglo XX, así que sus umbrales no son una ley universal: pueden no ajustarse perfectamente a sectores muy intensivos en capital, empresas tecnológicas o realidades fiscales y contables distintas. Es una herramienta de cribado útil para detectar señales de alerta, no un veredicto. Debe complementarse con el análisis del flujo de caja, el sector y la calidad de la gestión.</dd>
+              <dd>{RESPUESTA_FAQ_FIABLE_ESPANA}</dd>
             </div>
             <div className={styles.faqItem}>
               <dt>¿De dónde saco los datos para calcularlo?</dt>

@@ -51,6 +51,12 @@ export const jsonLd = generateWebAppSchema({
   keywords: ['gastos compartidos', 'dividir gastos', 'quien debe a quien', 'viaje en grupo', 'piso compartido', 'liquidar cuentas'],
 });
 
+// La pregunta que está también en la FAQ visible de page.tsx: una sola respuesta para las dos
+// (check:faq-unica, cabo C0570). Decían lo mismo; se quedó la del JSON-LD, con que la calculadora
+// lo hace así, que solo decía la visible.
+export const RESPUESTA_FAQ_CENTIMOS =
+  'Repartir 10 € entre tres personas da 3,333… € por cabeza. Si se redondea cada parte a 3,33 €, la suma es 9,99 € y falta un céntimo: es el error habitual al hacerlo a mano o en una hoja de cálculo. La forma correcta, que es la de esta calculadora, es trabajar en céntimos enteros y asignar el sobrante a una de las partes, rotando de un gasto a otro para que no recaiga siempre en la misma persona. Así la suma de las partes coincide exactamente con el total.';
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -68,7 +74,7 @@ export const faqJsonLd = {
       name: '¿Cómo se reparten los céntimos cuando la división no es exacta?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Repartir 10 € entre tres personas da 3,333… € por cabeza. Si se redondea cada parte a 3,33 €, la suma es 9,99 € y falta un céntimo: es el error habitual al hacerlo a mano o en una hoja de cálculo. La forma correcta es trabajar en céntimos enteros y asignar el sobrante a una de las partes, rotando de un gasto a otro para que no recaiga siempre en la misma persona. Así la suma de las partes coincide exactamente con el total.',
+        text: RESPUESTA_FAQ_CENTIMOS,
       },
     },
     {

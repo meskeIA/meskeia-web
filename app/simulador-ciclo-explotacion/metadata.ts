@@ -52,6 +52,14 @@ export const jsonLd = generateWebAppSchema({
   ],
 });
 
+// Las dos preguntas que están también en la FAQ visible de page.tsx: una sola respuesta para las
+// dos (check:faq-unica, cabo C0570). Decían lo mismo; se quedaron las del JSON-LD, más completas,
+// y en las palancas el cierre de la visible, más claro.
+export const RESPUESTA_FAQ_PME_PMF =
+  'El Período de Maduración Económico (PME) es el tiempo total que tarda la empresa en completar su ciclo operativo: desde que entra la materia prima (o la mercancía) hasta que se cobra al cliente. El Período de Maduración Financiero (PMF) es el PME menos el Período Medio de Pago a proveedores (PMP). Es decir, el PMF es el número de días que la empresa debe financiar con recursos propios o préstamos, porque una parte del ciclo ya está financiada por los proveedores. Un PMF bajo o negativo indica una buena posición de tesorería.';
+export const RESPUESTA_FAQ_REDUCIR_CICLO =
+  'Las palancas principales son: reducir el stock de materias primas y de producto terminado mediante técnicas just-in-time o mejor previsión de demanda; acortar el tiempo de fabricación con mejoras de proceso; anticipar el cobro de clientes mediante factoring o descuentos por pronto pago; y alargar el pago a proveedores con confirming u otras fórmulas de financiación de la cadena de suministro. Cada día que se reduce el PMF libera capital circulante por el importe del coste diario de la empresa.';
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -69,7 +77,7 @@ export const faqJsonLd = {
       name: '¿Cuál es la diferencia entre el PME y el PMF?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El Período de Maduración Económico (PME) es el tiempo total que tarda la empresa en completar su ciclo operativo: desde que entra la materia prima (o la mercancía) hasta que se cobra al cliente. El Período de Maduración Financiero (PMF) es el PME menos el Período Medio de Pago a proveedores (PMP). Es decir, el PMF es el número de días que la empresa debe financiar con recursos propios o préstamos, porque una parte del ciclo ya está financiada por los proveedores. Un PMF bajo o negativo indica una buena posición de tesorería.',
+        text: RESPUESTA_FAQ_PME_PMF,
       },
     },
     {
@@ -93,7 +101,7 @@ export const faqJsonLd = {
       name: '¿Cómo puede una empresa reducir su ciclo de explotación?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Las palancas principales son: reducir el stock de materias primas y de producto terminado mediante técnicas just-in-time o mejor previsión de demanda; acortar el tiempo de fabricación con mejoras de proceso; anticipar el cobro de clientes mediante factoring o descuentos por pronto pago; y ampliar el plazo de pago a proveedores negociando confirming o aplazamientos. Cada día que se reduce el PMF equivale a liberar un importe equivalente al coste diario de la empresa en capital circulante.',
+        text: RESPUESTA_FAQ_REDUCIR_CICLO,
       },
     },
   ],

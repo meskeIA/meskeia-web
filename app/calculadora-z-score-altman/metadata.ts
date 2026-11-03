@@ -52,6 +52,14 @@ export const jsonLd = generateWebAppSchema({
   ],
 });
 
+// Las dos preguntas que están también en la FAQ visible de page.tsx: una sola respuesta para las
+// dos (check:faq-unica, cabo C0570). Se quedaron las del JSON-LD: la visible decía «calibrado con
+// empresas de finales del siglo XX», y el modelo de 1968 se calibró con quiebras anteriores.
+export const RESPUESTA_FAQ_QUE_ES =
+  'El Z-Score de Altman es un modelo estadístico creado por el profesor Edward Altman en 1968 que combina cinco ratios del balance en una única puntuación para estimar la probabilidad de que una empresa entre en insolvencia en los dos años siguientes. Cuanto más alta es la puntuación, más sólida es la empresa. Se usa en banca, análisis de crédito y due diligence en todo el mundo como señal de alerta temprana de dificultades financieras.';
+export const RESPUESTA_FAQ_FIABLE_ESPANA =
+  'El modelo fue calibrado con empresas estadounidenses del siglo XX, por lo que sus umbrales no son una ley universal: pueden no ajustarse a sectores muy intensivos en capital, empresas tecnológicas o realidades fiscales y contables distintas. Es una herramienta de cribado muy útil para detectar señales de alerta, pero no un veredicto. Debe complementarse con el análisis del flujo de caja, el sector y la calidad de la gestión.';
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -61,7 +69,7 @@ export const faqJsonLd = {
       name: '¿Qué es el Z-Score de Altman y para qué sirve?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El Z-Score de Altman es un modelo estadístico creado por el profesor Edward Altman en 1968 que combina cinco ratios del balance en una única puntuación para estimar la probabilidad de que una empresa entre en insolvencia en los dos años siguientes. Cuanto más alta es la puntuación, más sólida es la empresa. Se usa en banca, análisis de crédito y due diligence en todo el mundo como señal de alerta temprana de dificultades financieras.',
+        text: RESPUESTA_FAQ_QUE_ES,
       },
     },
     {
@@ -85,7 +93,7 @@ export const faqJsonLd = {
       name: '¿Es fiable el Z-Score para una empresa española?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El modelo fue calibrado con empresas estadounidenses del siglo XX, por lo que sus umbrales no son una ley universal: pueden no ajustarse a sectores muy intensivos en capital, empresas tecnológicas o realidades contables distintas. Es una herramienta de cribado muy útil para detectar señales de alerta, pero no un veredicto. Debe complementarse con el análisis del flujo de caja, el sector y la calidad de la gestión.',
+        text: RESPUESTA_FAQ_FIABLE_ESPANA,
       },
     },
     {
