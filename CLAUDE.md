@@ -281,9 +281,10 @@ o `BusinessApplication`) · `features` con 4-8 características reales · **`faq
 que un usuario escribiría de verdad, respuestas de 2-4 frases con datos concretos, sin mencionar
 "meskeIA", variadas (qué es, cómo funciona, para quién, diferencia con alternativas, dato clave).
 
-⚠️ **FAQPage es obligatorio desde 2026-05-30** aunque Google lo deprecara para rich snippets: Bing
-Copilot, ChatGPT, Perplexity y Gemini SÍ lo usan para grounding. Es la señal estructurada más
-directa para aparecer en respuestas de IAs.
+⚠️ **FAQPage es obligatorio desde 2026-05-30** aunque Google lo deprecara para rich snippets. Se
+mantiene porque sale gratis del template y la FAQ visible sirve al usuario. **No** por la cita de
+las IAs: los probes de citas del 03/11/2026 dieron 5/60 aun en el top 3 de Bing. Ese motivo no
+justifica un retrofit.
 
 **Verificación**: tras el build, que `.next/server/app/[slug].html` contenga `"@type":"WebApplication"`
 Y `"@type":"FAQPage"`. Para localizar apps viejas sin ello: `node scripts/faq-progress.mjs` (solo
