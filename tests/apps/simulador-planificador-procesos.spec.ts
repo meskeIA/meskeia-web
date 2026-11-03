@@ -968,3 +968,214 @@ test.describe('simulador-planificador-procesos · inspección 29/09/2026', () =>
     await expect(page.getByText('Correcto hasta aquí: 1 de 9 casillas')).toBeVisible();
   });
 });
+
+/* ════════════════════════════════════════════════════════════════════════════
+ * CABO C0078 · 03/11/2026 (Inspector, modo cabo) — el Gantt con llegadas decimales
+ *
+ * Pregunta del cabo: con llegadas decimales, un bloque de menos de 25 px (P1 [0; 0,4]) se dibuja
+ * sin rótulo y las marcas «0» y «0,4» pueden solaparse; «solo visual: tabla y marcas correctas».
+ *
+ * Cómo dibuja la app (page.tsx, el <svg> del Gantt): escala = max(40, min(80, 800 / total)) px por
+ * ut; cada bloque en x = inicio·escala + 20 con ancho (fin − inicio)·escala; el rótulo con el PID
+ * SOLO si el ancho es ≥ 25 px; ni <title> ni aria-label por bloque (el <svg> es UN role="img" con
+ * nombre genérico); una marca por bloque en su inicio (11 px, centrada) y la última también en su
+ * fin. El <svg> no se escala: en móvil se desplaza en horizontal, así que los px son los mismos.
+ *
+ * LOS TRES CASOS SE RESOLVIERON A MANO ANTES DE ABRIR EL NAVEGADOR (todos con SRTF):
+ *
+ *   CASO 1 (el del cabo) · P1(0; 8) · P2(0,4; 4) · P3(1; 1) → total 13 → escala 800/13 = 61,54
+ *     P1 [0; 0,4] 24,62 px SIN rótulo · P2 [0,4; 1] 36,92 · P3 [1; 2] 61,54 · P2 [2; 5,4] 209,23
+ *     · P1 [5,4; 13] 467,69 · marcas 0 · 0,4 · 1 · 2 · 5,4 · 13
+ *     «0» y «0,4» distan 24,6 px: con 11 px de monoespaciada no se tocan (medido: 12,5 px de aire).
+ *     Ese bloque se identifica por su color y por la tabla (P1 inicio 0): el cabo, tal cual, no
+ *     pierde información.
+ *
+ *   CASO 2 · P1(0; 20) · P2(0,1; 5) · P3(0,2; 1) → total 26 → escala 40
+ *     t=0 P1 · t=0,1 llega P2 (5) < resto P1 (19,9) → expulsa · t=0,2 llega P3 (1) < resto P2 (4,9)
+ *     → expulsa · t=1,2 P2 (4,9) < P1 (19,9) · t=6,1 P1
+ *     P1 [0; 0,1] 4 px · P2 [0,1; 0,2] 4 px · P3 [0,2; 1,2] 40 · P2 [1,2; 6,1] 196 · P1 [6,1; 26] 796
+ *     marcas 0 · 0,1 · 0,2 · 1,2 · 6,1 · 26 → «0», «0,1» y «0,2» con 4 px entre centros: SE PISAN
+ *     tabla P1 0|20|0|26|6|26|0 · P2 0,1|5|0,1|6,1|1|6|0 · P3 0,2|1|0,2|1,2|0|1|0
+ *
+ *   CASO 3 · P1(0; 20) · P2(1; 1) · P3(2,1; 1) → total 22 → escala 40
+ *     t=0 P1 · t=1 P2 (1) < P1 (19) → expulsa · t=2 P2 acaba; P3 aún no ha llegado → P1 vuelve
+ *     · t=2,1 llega P3 (1) < P1 (18,9) → expulsa · t=3,1 P1 hasta 22
+ *     P1 [0; 1] 40 · P2 [1; 2] 40 · P1 [2; 2,1] 4 px SIN rótulo · P3 [2,1; 3,1] 40 · P1 [3,1; 22] 756
+ *     marcas 0 · 1 · 2 · 2,1 · 3,1 · 22 → «2» y «2,1» SE PISAN
+ *     tabla P1 0|20|0|22|2|22|0 · P2 1|1|1|2|0|1|0 · P3 2,1|1|2,1|3,1|0|1|0
+ *     El tramo P1 [2; 2,1] no está en NINGUNA celda (la tabla da el primer inicio y el último
+ *     fin): en pantalla es una franja azul de 4 px entre P2 (teal) y P3 (naranja), sin rótulo,
+ *     sin <title> y con sus dos marcas pisadas. Es justo lo que enseña SRTF: P1 recupera la CPU
+ *     al acabar P2 y la pierde en cuanto llega P3.
+ *
+ * Medido (.inspector-trabajo/c0078-gantt-medir.mjs), igual en escritorio y a 390 px: los anchos y
+ * las marcas son los de la traza; solapes «0»/«0,1» 6,06 px, «0»/«0,2» 4,11, «0,1»/«0,2» 14,16 y
+ * «2»/«2,1» 6,06; ningún bloque lleva <title> ni aria-label.
+ *
+ * VEREDICTO: se confirma, con dos hallazgos ABIERTOS (los dos test.fail de abajo):
+ *   · accesibilidad/medio — el bloque estrecho no dice qué proceso es (solo el color, en 4 px), y
+ *     en el CASO 3 ese tramo no se repite en ningún otro sitio.
+ *   · operativa/bajo — las marcas del eje se pisan; sus valores sí están en la tabla.
+ * ════════════════════════════════════════════════════════════════════════════ */
+
+interface BloqueMedido {
+  ancho: number;
+  /** Lo que identifica el bloque: su rótulo visible, o un <title> / aria-label suyo */
+  identificacion: string;
+}
+
+interface MarcaMedida {
+  texto: string;
+  izq: number;
+  der: number;
+  arriba: number;
+  abajo: number;
+}
+
+async function medirGantt(page: Page): Promise<{ bloques: BloqueMedido[]; marcas: MarcaMedida[] }> {
+  return await page.evaluate(() => {
+    const svg = document.querySelector('svg[aria-label="Diagrama de Gantt de la planificación"]');
+    if (!svg) return { bloques: [], marcas: [] };
+    const bloques = Array.from(svg.querySelectorAll('g')).map((g) => {
+      const rect = g.querySelector('rect');
+      const rotulo = Array.from(g.querySelectorAll('text')).find((t) =>
+        (t.getAttribute('class') ?? '').includes('ganttLabel'),
+      );
+      const identificacion = [
+        rotulo?.textContent ?? '',
+        g.querySelector('title')?.textContent ?? '',
+        g.getAttribute('aria-label') ?? '',
+        rect?.getAttribute('aria-label') ?? '',
+      ]
+        .join(' ')
+        .trim();
+      return { ancho: Math.round((rect?.getBoundingClientRect().width ?? 0) * 100) / 100, identificacion };
+    });
+    const marcas = Array.from(svg.querySelectorAll('text'))
+      .filter((t) => (t.getAttribute('class') ?? '').includes('ganttTimestamp'))
+      .map((t) => {
+        const c = t.getBoundingClientRect();
+        return { texto: t.textContent ?? '', izq: c.left, der: c.right, arriba: c.top, abajo: c.bottom };
+      });
+    return { bloques, marcas };
+  });
+}
+
+/** Parejas de marcas cuyas cajas se cortan, con los px de solape en horizontal */
+function marcasQueSePisan(marcas: MarcaMedida[]): string[] {
+  const pisadas: string[] = [];
+  for (let i = 0; i < marcas.length; i++) {
+    for (let j = i + 1; j < marcas.length; j++) {
+      const a = marcas[i];
+      const b = marcas[j];
+      const h = Math.min(a.der, b.der) - Math.max(a.izq, b.izq);
+      const v = Math.min(a.abajo, b.abajo) - Math.max(a.arriba, b.arriba);
+      if (h > 0 && v > 0) pisadas.push(`«${a.texto}» y «${b.texto}» (${h.toFixed(2)} px)`);
+    }
+  }
+  return pisadas;
+}
+
+const CASOS_C0078 = {
+  caso1: {
+    procesos: [['P1', '0', '8'], ['P2', '0,4', '4'], ['P3', '1', '1']] as [string, string, string][],
+    marcas: ['0', '0,4', '1', '2', '5,4', '13'],
+    anchos: [24.62, 36.92, 61.54, 209.23, 467.69],
+  },
+  caso2: {
+    procesos: [['P1', '0', '20'], ['P2', '0,1', '5'], ['P3', '0,2', '1']] as [string, string, string][],
+    marcas: ['0', '0,1', '0,2', '1,2', '6,1', '26'],
+    anchos: [4, 4, 40, 196, 796],
+  },
+  caso3: {
+    procesos: [['P1', '0', '20'], ['P2', '1', '1'], ['P3', '2,1', '1']] as [string, string, string][],
+    marcas: ['0', '1', '2', '2,1', '3,1', '22'],
+    anchos: [40, 40, 4, 40, 756],
+  },
+};
+
+async function abrirConSrtf(page: Page, procesos: [string, string, string][], marcas: string[]): Promise<void> {
+  await abrirHidratada(page);
+  for (const [pid, llegada, rafaga] of procesos) await fijarProceso(page, pid, llegada, rafaga);
+  await page.getByRole('button', { name: BTN_SRTF }).click();
+  await expect.poll(() => marcasTiempo(page)).toEqual(marcas);
+}
+
+const PERFILES_C0078 = [
+  { nombre: 'escritorio', uso: { viewport: { width: 1280, height: 900 } } },
+  {
+    nombre: 'móvil 390 px',
+    uso: {
+      viewport: { width: 390, height: 844 },
+      userAgent:
+        'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
+      deviceScaleFactor: 3,
+      isMobile: true,
+      hasTouch: true,
+    },
+  },
+];
+
+for (const perfil of PERFILES_C0078) {
+  test.describe(`simulador-planificador-procesos · cabo C0078 · ${perfil.nombre}`, () => {
+    test.use(perfil.uso);
+
+    test('control · CASO 1 del cabo: P1 [0; 0,4] mide 24,62 px y va sin rótulo, pero «0» y «0,4» no se pisan', async ({
+      page,
+    }) => {
+      const { procesos, marcas, anchos } = CASOS_C0078.caso1;
+      await abrirConSrtf(page, procesos, marcas);
+      const medido = await medirGantt(page);
+      expect(medido.bloques.map((b) => b.ancho)).toEqual(anchos);
+      expect(medido.bloques[0].identificacion).toBe('');
+      expect(medido.bloques.slice(1).map((b) => b.identificacion)).toEqual(['P2', 'P3', 'P2', 'P1']);
+      expect(marcasQueSePisan(medido.marcas)).toEqual([]);
+    });
+
+    test('control · CASOS 2 y 3: la traza a mano sale tal cual (marcas, bloques de 4 px y tabla)', async ({ page }) => {
+      const { caso2, caso3 } = CASOS_C0078;
+      await abrirConSrtf(page, caso2.procesos, caso2.marcas);
+      expect((await medirGantt(page)).bloques.map((b) => b.ancho)).toEqual(caso2.anchos);
+      expect(await filaMetricas(page, 'P1')).toEqual(['P1', '0', '20', '0', '26', '6', '26', '0']);
+      expect(await filaMetricas(page, 'P2')).toEqual(['P2', '0,1', '5', '0,1', '6,1', '1', '6', '0']);
+      expect(await filaMetricas(page, 'P3')).toEqual(['P3', '0,2', '1', '0,2', '1,2', '0', '1', '0']);
+
+      await abrirConSrtf(page, caso3.procesos, caso3.marcas);
+      expect((await medirGantt(page)).bloques.map((b) => b.ancho)).toEqual(caso3.anchos);
+      // El tramo P1 [2; 2,1] no está en la tabla: P1 da su primer inicio (0) y su último fin (22)
+      expect(await filaMetricas(page, 'P1')).toEqual(['P1', '0', '20', '0', '22', '2', '22', '0']);
+      expect(await filaMetricas(page, 'P2')).toEqual(['P2', '1', '1', '1', '2', '0', '1', '0']);
+      expect(await filaMetricas(page, 'P3')).toEqual(['P3', '2,1', '1', '2,1', '3,1', '0', '1', '0']);
+    });
+
+    /**
+     * HALLAZGO ABIERTO (accesibilidad/medio) · CASO 3 — el bloque P1 [2; 2,1] mide 4 px y no lleva
+     * rótulo, ni <title>, ni aria-label: qué proceso ocupa ese tramo solo lo dice su color (WCAG
+     * 1.4.1), en una franja de 4 px pegada a P2, y ese tramo no está en la tabla.
+     * Esperado: el bloque se identifica como P1 (rótulo o <title> con su proceso y su intervalo).
+     * Obtenido: nada.
+     */
+    test('HALLAZGO · el tramo estrecho P1 [2; 2,1] dice qué proceso es', async ({ page }) => {
+      test.fail(); // ABIERTO: bloque de 4 px sin rótulo, sin <title> y sin aria-label
+      const { procesos, marcas } = CASOS_C0078.caso3;
+      await abrirConSrtf(page, procesos, marcas);
+      const tramo = (await medirGantt(page)).bloques[2];
+      expect(tramo.ancho).toBe(4);
+      expect(tramo.identificacion).toMatch(/P1/);
+    });
+
+    /**
+     * HALLAZGO ABIERTO (operativa/bajo) · CASO 2 — las marcas «0», «0,1» y «0,2» del eje se pisan
+     * (centros a 4 px, 11 px de monoespaciada): no se lee ninguna. Sus valores sí están en la
+     * tabla (inicios de P1, P2 y P3). En el CASO 3 pasa igual con «2» y «2,1».
+     * Esperado: ninguna pareja de marcas se corta. Obtenido: «0»/«0,1» 6,06 px, «0»/«0,2» 4,11 px
+     * y «0,1»/«0,2» 14,16 px.
+     */
+    test('HALLAZGO · las marcas del eje no se pisan con cortes a 0,1 ut', async ({ page }) => {
+      test.fail(); // ABIERTO: «0», «0,1» y «0,2» se dibujan unas encima de otras
+      const { procesos, marcas } = CASOS_C0078.caso2;
+      await abrirConSrtf(page, procesos, marcas);
+      expect(marcasQueSePisan((await medirGantt(page)).marcas)).toEqual([]);
+    });
+  });
+}

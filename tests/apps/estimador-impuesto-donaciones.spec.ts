@@ -53,7 +53,7 @@
 
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type CDPSession, type Page } from '@playwright/test';
 import { esperarHidratacion, sembrarValor } from './_hidratacion';
 import { parseSpanishNumber } from '../../lib/formatters';
 import { activarTema, prepararParaMedir } from '../contraste-text-muted-auxiliares';
@@ -986,5 +986,162 @@ test.describe('Estimador ISD donaciones — Extremadura (C0146)', () => {
     await abrir(page);
     const texto = await textoCompleto(page);
     expect(texto).toMatch(/Extremadura\s*99 % de la parte de base hasta 300\.000 €; 50 % de la parte de base de 300\.000 € a 600\.000 €; nada por encima de 600\.000 €/);
+  });
+});
+
+// ════════════════════════════════════════════════════════════════════════════
+// CABO C0383 (inspector 03/11/2026) — el panel de resultados en el móvil y en el papel
+// ════════════════════════════════════════════════════════════════════════════
+//
+// 3978f382 (13/10/2026, cabo C0125) dio a `.resultsPanel` `max-height: calc(100vh − barra −
+// píldora − 1rem)` y `overflow-y: auto` para que pegue en escritorio, y la regla de ≤ 1024 px solo
+// le quita el `sticky`: en el móvil el panel es una caja con desplazamiento propio. Es la forma del
+// hallazgo 3431 de adaptador-dislexia (CASO 17 de su spec, de donde sale el arrastre con eventos
+// táctiles reales de CDP).
+//
+// Medido el 03/11/2026 con 200.000 € de padre a hijo en Madrid y 30.000 € de cargas: el panel mide
+// 766 px con 800 dentro a 390×844, y 662 con 871 a 360×740. Con el panel a la vista bajo la barra y
+// el dedo sobre él, el primer arrastre de 300 px NO mueve la página: el panel se desplaza 34 px por
+// dentro a 390 y 208 a 360, y a 360 quedan por encima del recorte el titular «Impuesto estimado en
+// Comunidad de Madrid · 252,66 €», la bonificación y el tipo efectivo, que siguen escondidos al
+// volver a subir la página con el dedo fuera del panel. Con un piso con hipoteca en Castilla-La
+// Mancha y discapacidad del 33 %, 59 y 231 px. Contraprueba: con `max-height: none; overflow:
+// visible` inyectado, los cuatro arrastres bajan la página 285 px cada uno y el panel no se mueve.
+//
+// En el papel NO pasa: `100vh` es allí el alto de la página (medido con page.pdf), y en el área
+// imprimible de un A4 con márgenes de 1 cm el tope es de 969 px; el panel mide 738 en los dos casos.
+
+const RESULTADOS_C0383 = '[class*="resultsPanel"]';
+
+/** Un arrastre del dedo de abajo arriba de la pantalla (eventos táctiles reales de Chromium). */
+async function arrastrarConElDedoC0383(cdp: CDPSession, x: number, desde: number, hasta: number) {
+  const pasos = 12;
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x, y: desde }] });
+  for (let i = 1; i <= pasos; i++) {
+    await cdp.send('Input.dispatchTouchEvent', {
+      type: 'touchMove',
+      touchPoints: [{ x, y: desde + ((hasta - desde) * i) / pasos }],
+    });
+    await new Promise((r) => setTimeout(r, 16));
+  }
+  await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+}
+
+/** La ventana y el panel, en px de desplazamiento. */
+const posicionC0383 = (page: Page) =>
+  page.evaluate((s) => ({ ventana: scrollY, panel: document.querySelector(s)!.scrollTop }), RESULTADOS_C0383);
+
+/** Espera a que ni la ventana ni el panel se muevan (la inercia del arrastre ha terminado). */
+async function esperarQuietoC0383(page: Page) {
+  let anterior = '';
+  await expect
+    .poll(
+      async () => {
+        const p = await posicionC0383(page);
+        const ahora = `${p.ventana}|${p.panel}`;
+        const quieto = ahora === anterior;
+        anterior = ahora;
+        return quieto;
+      },
+      { intervals: [150], timeout: 4000 },
+    )
+    .toBe(true);
+}
+
+/** Lleva el borde superior del panel justo bajo la barra fija del logo (62 px en el móvil). */
+async function panelBajoLaBarraC0383(page: Page) {
+  await page.evaluate((s) => {
+    const p = document.querySelector(s)!;
+    window.scrollTo(0, p.getBoundingClientRect().top + window.scrollY - 70);
+  }, RESULTADOS_C0383);
+  await esperarQuietoC0383(page);
+}
+
+for (const { ancho, alto } of [
+  { ancho: 390, alto: 844 },
+  { ancho: 360, alto: 740 },
+]) {
+  test.describe(`Cabo C0383 — el panel de resultados en el móvil ${ancho}×${alto}`, () => {
+    // Enumerado en vez de `...devices['Pixel 7']`: un `devices` dentro de un describe forzaría un worker nuevo.
+    test.use({
+      viewport: { width: ancho, height: alto },
+      userAgent:
+        'Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
+      deviceScaleFactor: 3,
+      isMobile: true,
+      hasTouch: true,
+    });
+
+    test('HALLAZGO (03/11/2026, ABIERTO) · con el dedo sobre el panel baja la página, y el importe no se esconde dentro de él', async ({
+      page,
+    }) => {
+      await rellenar(page, { ccaa: 'madrid', grupo: 'II', valor: '200000', cargas: '30000' });
+      expect(await cuota(page)).toMatch(/^\d[\d.]*,\d\d €$/);
+
+      await panelBajoLaBarraC0383(page);
+      const cdp = await page.context().newCDPSession(page);
+      const x = Math.round(ancho / 2);
+      const desde = Math.round(alto * 0.75);
+      // Precondición, que no depende del defecto: el dedo empieza encima del panel
+      expect(
+        await page.evaluate(
+          ({ s, x, y }) => document.querySelector(s)!.contains(document.elementFromPoint(x, y)),
+          { s: RESULTADOS_C0383, x, y: desde },
+        ),
+      ).toBe(true);
+
+      // ABIERTO (cabo C0383): hoy el primer arrastre mueve el panel (34 px a 390, 208 a 360) y la
+      // página 0. Cuando el panel deje de tener tope en el móvil, este caso «pasará» y Playwright lo
+      // marcará: entonces se quita el test.fail() y se escribe REPARADO.
+      test.fail();
+      const pasos: { ventana: number; panel: number }[] = [];
+      for (let i = 0; i < 4; i++) {
+        const antes = await posicionC0383(page);
+        await arrastrarConElDedoC0383(cdp, x, desde, desde - 300);
+        await esperarQuietoC0383(page);
+        const despues = await posicionC0383(page);
+        pasos.push({
+          ventana: Math.round(despues.ventana - antes.ventana),
+          panel: Math.round(despues.panel - antes.panel),
+        });
+      }
+      // El dedo mueve la página, no una caja dentro de ella
+      expect(pasos.map((p) => p.panel)).toEqual([0, 0, 0, 0]);
+      expect(pasos.every((p) => p.ventana > 200), JSON.stringify(pasos)).toBe(true);
+
+      // Y al volver a subir, el titular con el importe está dentro del recorte del panel
+      await panelBajoLaBarraC0383(page);
+      const titularALaVista = await page.evaluate((s) => {
+        const p = document.querySelector(s)!;
+        const recorte = p.getBoundingClientRect();
+        const t = [...p.querySelectorAll('*')].find(
+          (e) => e.children.length === 0 && /^Impuesto estimado en/.test(e.textContent ?? ''),
+        )!;
+        return t.getBoundingClientRect().top >= recorte.top + p.clientTop - 1;
+      }, RESULTADOS_C0383);
+      expect(titularALaVista).toBe(true);
+    });
+  });
+}
+
+test.describe('Cabo C0383 — el panel de resultados en el papel (área imprimible de un A4)', () => {
+  // A4 (794×1123 px) con márgenes de 1 cm: la página de impresión es esta ventana, y su 100vh, el
+  // alto de la página (medido con page.pdf el 03/11/2026).
+  test.use({ viewport: { width: 718, height: 1047 } });
+
+  test('el panel sale entero en el papel: un piso con hipoteca a un hijo con discapacidad, en Castilla-La Mancha', async ({
+    page,
+  }) => {
+    await rellenar(page, { ccaa: 'castilla-mancha', grupo: 'II', valor: '200000', cargas: '30000' });
+    await page.getByRole('radio', { name: /Un inmueble/ }).check();
+    await ponerPatrimonio(page, '150000', '1');
+    await page.getByRole('radio', { name: /^Del 33\s*%\s*al 64\s*%$/ }).check();
+    const panelResultados = page.locator(RESULTADOS_C0383);
+    await expect(panelResultados).toContainText(/cuota a ingresar/i);
+    await page.emulateMedia({ media: 'print' });
+    expect(await page.evaluate(() => matchMedia('print').matches)).toBe(true);
+
+    const medida = await panelResultados.evaluate((p) => ({ dentro: p.scrollHeight, visible: p.clientHeight }));
+    expect(medida.dentro, JSON.stringify(medida)).toBeLessThanOrEqual(medida.visible + 1);
   });
 });

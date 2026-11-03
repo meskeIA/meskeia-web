@@ -84,14 +84,20 @@ import {
  *       Y la misma reacción en MOLES, 10 mol y 10 mol: cociente Zn = 10, cociente HCl = 5
  *       ⇒ limita HCl ⇒ 5 mol de ZnCl₂ = 5 · 136,286 = 681,430 g.
  *
- * HALLAZGOS ABIERTOS QUE ESTE FICHERO **NO** BLOQUEA (el Inspector no repara)
- *   · El toggle Gramos↔Moles no limpia ni recalcula el resultado ya pintado: cambiar la
- *     reacción o la sustancia SÍ lo limpia, la unidad no. Queda en pantalla una tabla con las
- *     cifras de la unidad anterior mientras la etiqueta del campo ya anuncia la nueva.
- *   · Tras pulsar Calcular no hay desplazamiento ni señal hacia el resultado, que se inserta
- *     debajo del botón; en móvil, con el botón al borde inferior, se ven ~7 px de la tabla.
- *   · En el empate 1:1 del CASO 2 la app rotula «⚠️ LÍMITE» al primer reactivo de la lista
- *     (desempate de Math.min/indexOf), cuando a mano no limita ninguno. Ver expect.soft abajo.
+ * HALLAZGOS DE LA PRIMERA INSPECCIÓN (21/08/2026), hoy REPARADOS
+ *   · REPARADO — El toggle Gramos↔Moles no limpiaba el resultado ya pintado. Hoy los dos
+ *     botones de unidad de las dos pestañas hacen `set…Resultado(null)` (visto en page.tsx el
+ *     03/11/2026).
+ *   · REPARADO (hallazgo 113) — Tras pulsar Calcular no había desplazamiento hacia el
+ *     resultado. Hoy `calcStoic` y `calcLimite` llaman a `irAlResultado`.
+ *   · REPARADO (hallazgo 118) — En el empate 1:1 del CASO 2 la app rotulaba «⚠️ LÍMITE» al
+ *     primer reactivo de la lista. Lo comprueba el CASO 2.
+ *
+ * ABIERTO — cabo C0127 (03/11/2026): el empate se detecta con tolerancia ABSOLUTA 1e-9 sobre
+ *   los cocientes (`calcularLimitante` en motor.ts), así que solo sale «ninguno limita» con
+ *   múltiplos exactos de las M de la app. Con los gramos que la PROPIA app muestra en la
+ *   pestaña Estequiometría (tres decimales) nombra un limitante y un sobrante «≈0». Ver los
+ *   tests «C0127» al final del bloque de casos.
  * ─────────────────────────────────────────────────────────────────────────────────────────
  */
 
@@ -272,6 +278,82 @@ test('CASO 4 (extra) — Zn + 2HCl: limita el HCl y sobra zinc', async ({ page }
   await expect(resultado(page)).toContainText('Reactivo limitante: HCl');
   await expect(fila(page, 2)).toContainText('5,0000 mol');
   await expect(fila(page, 2)).toContainText('681,430 g');
+});
+
+// ─────────────────────────────────────────────────────────────────────────────────────────────
+// CABO C0127 (03/11/2026) — ¿llega la pestaña Limitante a «ninguno limita» con masas de dato?
+//
+// Es la forma del hallazgo 2711 de simulador-estequiometria, que se reparó tolerando la
+// incertidumbre de redondeo de las masas molares: medio dígito del último decimal de cada M,
+// sumado para los dos reactivos (`incertidumbreRelativa` en app/simulador-estequiometria/motor.ts).
+// Aquí, con las M que tabula la app (todas con tres decimales en el catálogo: H₂ 2,016 ·
+// O₂ 32,000 · H₂O 18,015), esa tolerancia es 0,0005/2,016 + 0,0005/32,000 = 2,64·10⁻⁴ (0,026 %).
+//
+// Resueltos a mano ANTES de abrir el navegador · 2H₂ + O₂ → 2H₂O:
+//   A · 4,032 g de H₂ y 32 g de O₂ (múltiplos exactos de las M de la app)
+//       H₂ 4,032 ÷ 2,016 = 2,000 mol ÷ 2 = 1,000 · O₂ 32 ÷ 32,0 = 1,000 ÷ 1 = 1,000
+//       ⇒ empate exacto ⇒ «ninguno limita»; H₂O 2 mol × 18,015 = 36,030 g.
+//   B · 10 g de H₂ y 79,365 g de O₂, que es lo que la PROPIA pestaña Estequiometría muestra
+//       para 10 g de H₂: 10 ÷ 2,016 = 4,960317 mol ÷ 2 = 2,480159 mol de O₂ × 32 = 79,365079 g
+//       → «79,365 g». En Limitante: cociente H₂ = 2,4801587 · cociente O₂ = 79,365 ÷ 32 =
+//       2,4801563. Diferencia relativa 1,0·10⁻⁶, 264 veces MENOR que la tolerancia de arriba (y
+//       los 0,00008 g de redondeo de 79,365079 caben en el medio milésimo que muestra la app)
+//       ⇒ «ninguno limita», sin sobrante; H₂O 4,960317 mol × 18,015 = 89,360 g.
+//       ABIERTO (C0127): la app compara con tolerancia absoluta 1e-9 y la diferencia es
+//       2,48·10⁻⁶, así que da «Reactivo limitante: O₂» y «H₂ sobrante (exceso) ≈0 mol — ≈0 g».
+//   C · control, 4 g de H₂ y 32 g de O₂ (el problema de libro con M(H₂) = 2)
+//       cociente H₂ = 4 ÷ 2,016 ÷ 2 = 0,992063 · O₂ = 1,000. Diferencia 0,79 %, treinta veces
+//       la tolerancia ⇒ limita el H₂; sobra (1 − 0,992063) mol de O₂ = 0,0079 mol × 32 =
+//       0,254 g; H₂O 1,984127 mol × 18,015 = 35,744 g.
+// ─────────────────────────────────────────────────────────────────────────────────────────────
+
+async function limitanteAgua(page: Page, gramosH2: string, gramosO2: string): Promise<void> {
+  await abrirPestana(page, /Reactivo Límite/);
+  await page.locator('#limReaccion').selectOption('sintesis-agua');
+  await expect(page.getByText('2H₂ + O₂ → 2H₂O').first()).toBeVisible();
+  await page.getByRole('button', { name: 'Gramos' }).click();
+  const campos = page.locator('input[type="number"]');
+  await campos.nth(0).fill(gramosH2); // H₂
+  await campos.nth(1).fill(gramosO2); // O₂
+  await page.getByRole('button', { name: /Calcular reactivo limitante/ }).click();
+}
+
+test('C0127 · A — 4,032 g de H₂ con 32 g de O₂ (múltiplos exactos): ninguno limita', async ({ page }) => {
+  await limitanteAgua(page, '4.032', '32');
+  await expect(resultado(page)).toContainText('ninguno limita');
+  await expect(resultado(page)).not.toContainText('Reactivo limitante:');
+  await expect(resultado(page)).not.toContainText('sobrante');
+  await expect(fila(page, 2)).toContainText('36,030 g');
+});
+
+test('C0127 · C (control) — 4 g de H₂ con 32 g de O₂: limita el H₂ y sobran 0,254 g de O₂', async ({ page }) => {
+  await limitanteAgua(page, '4', '32');
+  await expect(resultado(page)).toContainText('Reactivo limitante: H₂');
+  await expect(resultado(page)).toContainText('O₂ sobrante (exceso)');
+  await expect(resultado(page)).toContainText('0,0079 mol — 0,254 g');
+  await expect(fila(page, 2)).toContainText('35,744 g');
+});
+
+test('C0127 · B — los 79,365 g de O₂ que la propia app da para 10 g de H₂: ninguno limita', async ({ page }) => {
+  // ABIERTO (cabo C0127): hoy sale «Reactivo limitante: O₂» con «H₂ sobrante (exceso) ≈0 mol
+  // — ≈0 g». `test.fail()` mantiene el spec en verde mientras siga abierto; cuando se repare,
+  // este test pasará a rojo («expected to fail»): quitar la marca y dejarlo como REPARADO.
+  test.fail();
+
+  // De dónde sale el dato: la pestaña Estequiometría con 10 g de H₂.
+  await abrirPestana(page, /Estequiometr/);
+  await page.locator('#stoicReaccion').selectOption('sintesis-agua');
+  await page.locator('#stoicSustancia').selectOption('0'); // H₂
+  await page.getByRole('button', { name: 'Gramos' }).click();
+  await page.locator('input[type="number"]').first().fill('10');
+  await page.getByRole('button', { name: 'Calcular', exact: true }).click();
+  await expect(fila(page, 1)).toContainText('79,365 g'); // O₂: 2,480159 mol × 32 = 79,365079 g
+
+  await limitanteAgua(page, '10', '79.365');
+  await expect(resultado(page)).toContainText('ninguno limita');
+  await expect(resultado(page)).not.toContainText('Reactivo limitante:');
+  await expect(resultado(page)).not.toContainText('sobrante');
+  await expect(fila(page, 2)).toContainText('89,360 g');
 });
 
 // ─────────────────────────────────────────────────────────────────────────────────────────────
