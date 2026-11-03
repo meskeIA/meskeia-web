@@ -11,6 +11,7 @@ import {
   deltaN,
   equilibrioDePartida,
   esExotermicaDe,
+  magnitudDe,
   nuevoEquilibrio,
   nuevoKcConTemperatura,
   resolverCasoNumerico,
@@ -950,8 +951,31 @@ test.describe('Simulador de Equilibrio Químico · casos para clase', () => {
     // Es lo que pasaría con parseFloat: se queda con el prefijo y tira el resto.
     expect(comprobarRespuesta('0,02', 0.02, 'real').correcto).toBe(true);
     expect(comprobarRespuesta('0.02', 0.02, 'real').correcto).toBe(true);
-    expect(comprobarRespuesta('0,021', 0.02, 'real').correcto).toBe(true); // dentro de 0,01
+    // 0,02 es EXACTA: «0,021» ya no aprueba por el mínimo de 0,01 (cabo C0267, test siguiente).
+    expect(comprobarRespuesta('0,021', 0.02, 'real').correcto).toBe(false);
     expect(comprobarRespuesta('0,5', 0.02, 'real').correcto).toBe(false);
+  });
+
+  test('C0267 · una respuesta EXACTA no tiene margen; van ’t Hoff, que exige redondear, conserva el 1 %', () => {
+    // Cabo C0267 (reparar 03/11/2026), la forma del hallazgo 3342. A mano:
+    //   caso 1 · Q = 0,4²/(1·2³) = 0,16/8 = 0,02 exacto → 0,01 y 0,03 aprobaban por el mínimo de 0,01
+    //   caso 2 · Q = 1/(0,5·0,5) = 4 exacto             → 3,96 aprobaba (1 %)
+    //   caso 5 · Q = 0,02/0,5 = 0,04 = Kc exacto         → 0,05 aprobaba, y diría que NO está en equilibrio
+    //   caso 6 · 0,04·e^5,2771 = 7,832                   → exige redondear: 7,83 y 7,8 (0,4 %) valen
+    const corrige = (texto: string, i: number) =>
+      comprobarRespuesta(texto, numericos[i].respuesta, magnitudDe(numericos[i].datos)).correcto;
+    expect(corrige('0,02', 0)).toBe(true);
+    expect(corrige('0,01', 0)).toBe(false);
+    expect(corrige('0,03', 0)).toBe(false);
+    expect(corrige('4', 1)).toBe(true);
+    expect(corrige('3,96', 1)).toBe(false);
+    expect(corrige('0,04', 4)).toBe(true);
+    expect(corrige('0,05', 4)).toBe(false);
+    expect(corrige('7,83', 5)).toBe(true);
+    expect(corrige('7,8', 5)).toBe(true);
+    expect(corrige('-1', 2)).toBe(true);
+    // La clave, escrita como la enseña la solución, aprueba en los seis numéricos.
+    numericos.forEach((c, i) => expect(corrige(c.respuestaTexto, i), `caso ${c.id}`).toBe(true));
   });
 
   test('un punto con tres cifras detrás se lee con la lectura más cercana a la respuesta (C0569)', () => {

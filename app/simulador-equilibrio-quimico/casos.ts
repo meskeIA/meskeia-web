@@ -59,7 +59,13 @@
  * como consigna de clase.
  */
 
-import { corregirNumero, leerRespuestaAula, toleranciaRelativa, type Magnitud } from '@/lib/calculadoras/correctorCasosAula';
+import {
+  corregirNumero,
+  exigeRedondeo,
+  leerRespuestaAula,
+  toleranciaRelativa,
+  type Magnitud,
+} from '@/lib/calculadoras/correctorCasosAula';
 
 export type EstadoFisico = 'g' | 'l' | 's' | 'aq';
 export type DireccionDesplazamiento = 'derecha' | 'izquierda' | 'equilibrio';
@@ -697,6 +703,14 @@ export function toleranciaDe(valorEsperado: number): number {
  * se leería como 0 —se queda con el prefijo y tira el resto— y el alumno vería suspendida
  * una respuesta correcta escrita en el formato del propio enunciado. Y no `parseSpanishNumber`
  * a secas, que leería «1.333» como 1333 aunque la respuesta fuera 1,333 (cabo C0569).
+ *
+ * `valorEsperado` llega SIN redondear (sale de `resolverCasoNumerico`). Una respuesta EXACTA a
+ * dos decimales no tiene margen (cabo C0267, 03/11/2026): con el mínimo de 0,01 del 1 %, el caso
+ * 1 (Q = 0,16/8 = 0,02) aprobaba 0,01 y 0,03, y el caso 5 (Q = 0,04 = Kc) aprobaba 0,05, que
+ * dice lo contrario de lo que el caso enseña: que el sistema YA está en equilibrio. El caso 2
+ * aprobaba 3,96 para Q = 4. La que exige redondear —van ’t Hoff del caso 6, con R y una
+ * exponencial cuyos pasos redondean los intermedios— conserva `toleranciaDe`. Regla de
+ * bfccafa5 y 51d7c223.
  */
 export function comprobarRespuesta(
   respuestaUsuario: string,
@@ -705,8 +719,9 @@ export function comprobarRespuesta(
   magnitud: Magnitud,
 ): Comprobacion {
   if (respuestaUsuario.trim() === '') return { correcto: false, motivo: 'vacia' };
+  const margen = exigeRedondeo(valorEsperado, 2) ? toleranciaDe(valorEsperado) : 0;
   const c = corregirNumero(leerRespuestaAula(respuestaUsuario, valorEsperado), valorEsperado, {
-    tolerancia: toleranciaDe(valorEsperado),
+    tolerancia: margen,
     magnitud,
   });
   if (c.estado === 'no-numerico') return { correcto: false, motivo: 'no-numerico' };
