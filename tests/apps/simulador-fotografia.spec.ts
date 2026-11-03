@@ -813,6 +813,38 @@ test.describe('casos para clase · simulador-fotografia', () => {
     expect(toleranciaDe(500)).toBe(5);
   });
 
+  test('C0267 · con los datos, un ΔEV exacto no tiene margen; los casos 9 y 10, que redondean un logaritmo, conservan el 1 %', async () => {
+    // Cabo C0267 (reparar 03/11/2026), la forma del hallazgo 3342. A mano:
+    //   caso 1 · −2·log₂(8/4) = −2 exacto            → −1,98 (dentro del 1 %) no es redondeo de nada
+    //   caso 7 · +2 − 2 = 0 exacto                    → +0,01 aprobaba, y el caso enseña que se cancelan
+    //   caso 8 · +2 − 4 = −2 exacto                   → −2,02 tampoco
+    //   caso 9 · −2·log₂(11/8) = −0,9188              → −0,92 vale; −0,93 (ln con dos decimales) también
+    //   caso 10 · log₂(60/125) = −1,0589              → −1,06 vale
+    const caso = (id: number) => CASOS.find((c) => c.id === id)!;
+    const corrige = (usuario: number, id: number) =>
+      comprobarRespuesta(usuario, caso(id).respuesta, caso(id).datos.pregunta, caso(id).datos).correcto;
+    expect(corrige(-2, 1)).toBe(true);
+    expect(corrige(-1.98, 1)).toBe(false);
+    expect(corrige(0, 7)).toBe(true);
+    expect(corrige(0.01, 7)).toBe(false);
+    expect(corrige(-2.02, 8)).toBe(false);
+    expect(corrige(-0.92, 9)).toBe(true);
+    expect(corrige(-0.93, 9)).toBe(true);
+    expect(corrige(-1.06, 10)).toBe(true);
+    // El signo cambiado sigue con su aviso propio sin margen.
+    expect(comprobarRespuesta(2, -2, 'deltaEV', caso(1).datos).motivo).toContain('signo');
+    // Con tolerancia 0 la desviación no se lee «0» (hallazgo 3369).
+    expect(comprobarRespuesta(-2.004, -2, 'deltaEV', caso(1).datos).motivo).not.toMatch(/desviado 0 /);
+    // La clave aprueba en los 12 casos y en 500 prácticas.
+    for (const c of CASOS) {
+      expect(comprobarRespuesta(c.respuesta, c.respuesta, c.datos.pregunta, c.datos).correcto, `caso ${c.id}`).toBe(true);
+    }
+    for (let s = 1; s <= 500; s += 1) {
+      const e = generarEjercicioAleatorio(s);
+      expect(comprobarRespuesta(e.respuesta, e.respuesta, e.datos.pregunta, e.datos).correcto, `semilla ${s}`).toBe(true);
+    }
+  });
+
   test('el signo invertido se corrige con un mensaje propio, no con un «te has desviado»', async () => {
     // Quien viene de la definición clásica EV = log₂(N²/t) invierte TODOS los signos, y
     // decirle solo «no es correcto» no le enseña dónde está el malentendido.

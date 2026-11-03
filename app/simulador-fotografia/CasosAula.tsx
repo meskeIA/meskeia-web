@@ -62,7 +62,8 @@ export default function CasosAula() {
     // «2.493» es 2,493 o 2493: leerRespuestaAula se queda con la más cercana a la respuesta (C0558).
     const valor = leerRespuestaAula(respuesta, esperado);
     // La pregunta decide la regla: ΔEV con tolerancia, y un puesto de la escala por igualdad (2408).
-    const r = comprobarRespuesta(valor, esperado, pregunta);
+    // Con los datos, un ΔEV exacto no tiene margen (cabo C0267).
+    const r = comprobarRespuesta(valor, esperado, pregunta, practica ? practica.datos : caso.datos);
     setVeredicto({ correcto: r.correcto, motivo: r.motivo });
   }
 

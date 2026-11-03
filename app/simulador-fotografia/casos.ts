@@ -31,7 +31,14 @@
  * justamente ese redondeo comercial, y lo dicen en el enunciado.
  */
 
-import { corregirNumero, dentroDeTolerancia, redondearA, toleranciaRelativa } from '@/lib/calculadoras/correctorCasosAula';
+import {
+  corregirNumero,
+  dentroDeTolerancia,
+  exigeRedondeo,
+  redondearA,
+  textoDesviacion,
+  toleranciaRelativa,
+} from '@/lib/calculadoras/correctorCasosAula';
 
 /* ─────────────────── Las escalas y la aritmética, compartidas con la vista ─────────────────── */
 
@@ -376,20 +383,30 @@ export function denominadorReal(den: number): number {
  *   razonado bien. En el diafragma no se admite la serie real porque son potencias de √2
  *   (11,314…), que no tienen forma exacta de teclearse; el rótulo con una decimal es lo que
  *   la etiqueta pide («escribe 2,8 para f/2,8»). En el ISO la serie rotulada ya es exacta.
+ *
+ * · ΔEV EXACTO (cabo C0267, 03/11/2026) — con `datos`, si el ΔEV sin redondear es exacto a dos
+ *   decimales, sin margen. Dentro de una familia todo salto es un número entero de stops (casos
+ *   1, 2, 3, 7 y 8 y todo el modo práctica), y el 1 % aprobaba −1,98 para los −2 del caso 1 y
+ *   +0,01 para el 0 del caso 7, cuando lo que el caso 7 enseña es que los cambios se cancelan.
+ *   Los casos 9 y 10, que exigen redondear un logaritmo, conservan el 1 %: quien pasa por ln con
+ *   dos decimales llega a −0,93. Regla de bfccafa5 y 51d7c223. Sin `datos`, el 1 % de siempre.
  */
 export function comprobarRespuesta(
   usuario: number,
   esperado: number,
   pregunta: Pregunta = 'deltaEV',
+  datos?: DatosCaso,
 ): Veredicto {
   const esEscala = pregunta !== 'deltaEV';
+  let margen = esEscala ? 0 : toleranciaDe(esperado);
+  if (!esEscala && datos) {
+    const r = resolverCaso(datos);
+    if (r.ok && !exigeRedondeo(r.valor, datos.decimales ?? 2, redondear)) margen = 0;
+  }
   // ΔEV es continuo y los puestos de la escala se corrigen por igualdad: ningún valor es
   // imposible por sí mismo dentro de la tolerancia (un ISO que no existe ya lo rechaza la
   // igualdad, y con su propio aviso, más abajo).
-  const c = corregirNumero(usuario, esperado, {
-    tolerancia: esEscala ? 0 : toleranciaDe(esperado),
-    magnitud: 'real',
-  });
+  const c = corregirNumero(usuario, esperado, { tolerancia: margen, magnitud: 'real' });
   const { diferencia, tolerancia } = c;
 
   if (c.estado === 'no-numerico') {
@@ -444,7 +461,8 @@ export function comprobarRespuesta(
 
   return {
     correcto: false,
-    motivo: `No es correcto. Te has desviado ${numero(diferencia)} de la respuesta.`,
+    // Con tolerancia 0, «−2,004» para −2 no puede decir «Te has desviado 0» (hallazgo 3369)
+    motivo: `No es correcto. Te has desviado ${textoDesviacion(diferencia, datos?.decimales ?? 2, numero)} de la respuesta.`,
     diferencia,
     tolerancia,
   };
