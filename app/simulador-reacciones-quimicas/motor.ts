@@ -321,6 +321,13 @@ export interface ResultadoLimitante {
 }
 
 /**
+ * Incertidumbre relativa de una masa molar del catálogo por su redondeo: medio dígito del
+ * milésimo (las masas se tabulan al milésimo; 32,0 es 32,000). H₂ 2,016 → 0,0005 ÷ 2,016 =
+ * 0,025 %; O₂ 32,000 → 0,0016 %.
+ */
+const incertidumbreMasaMolar = (s: SustanciaR): number => 0.0005 / s.masa;
+
+/**
  * Pestaña «Reactivo Límite»: con la cantidad de cada reactivo (en el orden de la ecuación),
  * cuál se agota primero y qué se forma.
  *   cociente_i = moles_i ÷ coef_i · limita el menor · exceso_i = cociente_i − mín
@@ -330,12 +337,24 @@ export function calcularLimitante(r: Reaccion, cantidades: readonly number[], un
   const molesReact = reactivos.map((s, i) => unidad === 'gramos' ? cantidades[i] / s.masa : cantidades[i]);
   const coefUnits = reactivos.map((s, i) => molesReact[i] / s.coef);
   const limiteCoefUnit = Math.min(...coefUnits);
+  const idxMin = coefUnits.indexOf(limiteCoefUnit);
   // Empate: si todos los cocientes coinciden, no hay reactivo limitante — se consumen
   // íntegros y no sobra ninguno. El desempate de indexOf señalaba al primero de la lista
-  // (hallazgo 118). Se compara con tolerancia porque los cocientes vienen de dividir.
-  const hayEmpate = coefUnits.every(cu => Math.abs(cu - limiteCoefUnit) < 1e-9);
-  const limiteIdx = hayEmpate ? -1 : coefUnits.indexOf(limiteCoefUnit);
-  const excesos = coefUnits.map(cu => cu - limiteCoefUnit);
+  // (hallazgo 118). En gramos, dos cocientes que difieren MENOS que la incertidumbre de
+  // redondeo de las masas molares (medio dígito del milésimo de cada M) no se distinguen con
+  // estos datos: con 1e-9 absoluto, los 79,365 g de O₂ que la pestaña Estequiometría da para
+  // 10 g de H₂ salían «limita el O₂, sobran ≈0 g de H₂» (hallazgo 3972; la misma receta que
+  // simulador-estequiometria aplicó en el 2711). En moles no hay masa molar de por medio.
+  const hayEmpate = coefUnits.every((cu, i) => {
+    if (!(limiteCoefUnit > 0)) return Math.abs(cu - limiteCoefUnit) < 1e-9;
+    const tolerancia = unidad === 'gramos'
+      ? incertidumbreMasaMolar(reactivos[i]) + incertidumbreMasaMolar(reactivos[idxMin])
+      : 1e-9;
+    return Math.abs(cu - limiteCoefUnit) / limiteCoefUnit <= tolerancia;
+  });
+  const limiteIdx = hayEmpate ? -1 : idxMin;
+  // En proporción exacta no sobra nada: sin esto quedaba una fila «sobrante ≈0 g»
+  const excesos = coefUnits.map(cu => (hayEmpate ? 0 : cu - limiteCoefUnit));
   const filas: FilaResultado[] = r.sustancias.map(s => {
     const moles = limiteCoefUnit * s.coef;
     const gramos = moles * s.masa;

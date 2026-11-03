@@ -334,11 +334,11 @@ test('C0127 · C (control) — 4 g de H₂ con 32 g de O₂: limita el H₂ y so
   await expect(fila(page, 2)).toContainText('35,744 g');
 });
 
-test('C0127 · B — los 79,365 g de O₂ que la propia app da para 10 g de H₂: ninguno limita', async ({ page }) => {
-  // ABIERTO (cabo C0127): hoy sale «Reactivo limitante: O₂» con «H₂ sobrante (exceso) ≈0 mol
-  // — ≈0 g». `test.fail()` mantiene el spec en verde mientras siga abierto; cuando se repare,
-  // este test pasará a rojo («expected to fail»): quitar la marca y dejarlo como REPARADO.
-  test.fail();
+test('C0127 · B — los 79,365 g de O₂ que la propia app da para 10 g de H₂: ninguno limita (hallazgo 3972, REPARADO)', async ({ page }) => {
+  // REPARADO (hallazgo 3972): salía «Reactivo limitante: O₂» con «H₂ sobrante (exceso) ≈0 mol
+  // — ≈0 g». Cocientes H₂ 10 ÷ 2,016 ÷ 2 = 2,4801587 y O₂ 79,365 ÷ 32 = 2,4801563: diferencia
+  // relativa 1,0·10⁻⁶, menor que la incertidumbre de las masas molares 0,0005/2,016 +
+  // 0,0005/32,000 = 2,64·10⁻⁴. El control C (4 g con 32 g, 1,6 % de diferencia) sigue limitando.
 
   // De dónde sale el dato: la pestaña Estequiometría con 10 g de H₂.
   await abrirPestana(page, /Estequiometr/);
