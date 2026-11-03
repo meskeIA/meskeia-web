@@ -585,10 +585,25 @@ test.describe('diccionario-rimas — reinspección 25/09/2026: rechazo y rendimi
     const ver = resultado(page).getByRole('button', { name: /^Ver las / });
     const total = Number((await ver.textContent())!.replace(/\D/g, ''));
     expect(total, 'cantar tiene miles de rimas en -ar').toBeGreaterThan(5000);
-    const t1 = Date.now();
+    // Lo que se vigila al pintarlas todas es que la página no se CONGELE: la tarea larga máxima del
+    // hilo principal, no el reloj de pared. Cabo C0588 (03/11/2026): con el tope de 5 s de reloj
+    // falló en la suite entera del 02/11 (5.672 ms) y pasaba 3 de 3 aislado; ese reloj cuenta
+    // también los sondeos de toHaveCount sobre más de 10.000 <li> y la carga del servidor.
+    await page.evaluate(() => {
+      const w = window as unknown as { __tareaMaxima: number };
+      w.__tareaMaxima = 0;
+      new PerformanceObserver((lista) => {
+        for (const e of lista.getEntries()) w.__tareaMaxima = Math.max(w.__tareaMaxima, e.duration);
+      }).observe({ type: 'longtask' });
+    });
     await ver.click();
     await expect(resultado(page).locator('li')).toHaveCount(total, { timeout: 15000 });
-    expect(Date.now() - t1, 'hasta pintar todas').toBeLessThan(5000);
+    const tareaMaxima = await page.evaluate(() => (window as unknown as { __tareaMaxima: number }).__tareaMaxima);
+    // El observador ve algo: pintar más de 10.000 <li> deja al menos una tarea de más de 50 ms
+    // (si no, un 0 aprobaría en falso).
+    expect(tareaMaxima, 'el observador de tareas largas no ha visto ninguna').toBeGreaterThan(0);
+    // 254 ms medidos el 25/09; el tope, 10 veces más holgado, como los de arriba.
+    expect(tareaMaxima, 'tarea larga máxima al pintarlas todas (ms)').toBeLessThan(2540);
   });
 });
 
