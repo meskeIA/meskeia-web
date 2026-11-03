@@ -45,7 +45,10 @@ test.describe('orientacion-tramitacion-herencias — C0063', () => {
     await page.evaluate(() => document.documentElement.setAttribute('data-theme', 'dark'));
     const valores = await page.evaluate(() => {
       const raiz = getComputedStyle(document.documentElement);
-      const cont = document.querySelector('[class*="OrientacionHerencias"][class*="container"]');
+      // El .container es el padre del <header> del h1. No se busca por el nombre de la clase:
+      // «OrientacionHerencias_container__…» solo existe en `next dev`; en producción Next lo
+      // reduce a un hash y el test fallaba contra el build (suite de /reparar del 03/11/2026).
+      const cont = document.querySelector('h1')?.closest('header')?.parentElement;
       if (!cont) throw new Error('no encuentro el .container del módulo');
       const c = getComputedStyle(cont);
       return {
