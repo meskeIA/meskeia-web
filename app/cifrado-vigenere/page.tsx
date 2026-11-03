@@ -261,7 +261,8 @@ export default function CifradoVigenerePage() {
         {/* Resultado */}
         {resultado && (
           <div className={styles.resultSection} role="status" aria-live="polite" aria-atomic="true">
-            <label className={styles.label}>Resultado:</label>
+            {/* Título del resultado, no rótulo de un control (C0596): era un <label> suelto. */}
+            <span className={styles.label}>Resultado:</span>
             <div className={styles.resultBox}>{resultado}</div>
             <button type="button" onClick={copiarResultado} className={styles.btnCopy}>
               {copiado ? <><span aria-hidden="true">✅</span> Copiado</> : <><span aria-hidden="true">📋</span> Copiar resultado</>}
