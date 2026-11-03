@@ -5,6 +5,7 @@ import { useState } from 'react';
 import styles from './CalculadoraCocina.module.css';
 import { MeskeiaLogo, Footer, ResultCard, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
+import { PREGUNTAS_FRECUENTES } from './metadata';
 
 type TabActiva = 'conversor' | 'escalador' | 'tiempos' | 'sustitutos';
 
@@ -986,47 +987,15 @@ export default function CalculadoraCocinaPage() {
           {/* ===== SECCIÓN 3: FAQ ===== */}
           <section className={styles.conceptoSection}>
             <h2>Preguntas frecuentes</h2>
+            {/* Sale de PREGUNTAS_FRECUENTES, como el único FAQPage (C0593). */}
             <ul className={styles.faqList}>
-              <li className={styles.faqItem}>
-                <strong>¿Cuántos gramos es 1 cup de harina?</strong>
-                <p>Entre 120 y 130 g, dependiendo de si la harina está tamizada o compactada. La variación puede llegar a 20 g, por eso siempre es mejor usar báscula en repostería.</p>
-                <span className={styles.faqTip}>Referencia: 1 cup tamizada = 120 g; 1 cup compactada = 130–140 g.</span>
-              </li>
-              <li className={styles.faqItem}>
-                <strong>¿Cuál es la diferencia entre la taza americana y la española?</strong>
-                <p>La taza americana (cup) tiene exactamente 240 ml. La taza española habitual de desayuno oscila entre 150 y 200 ml. No son equivalentes. Para recetas anglosajonas, usa siempre 240 ml.</p>
-                <span className={styles.faqTip}>Solución: mide con vaso medidor o usa la calculadora.</span>
-              </li>
-              <li className={styles.faqItem}>
-                <strong>¿Cómo convierto °F a °C en el horno?</strong>
-                <p>Aplica la fórmula: °C = (°F − 32) × 5/9. Así, 350°F = 177°C (≈ 180°C práctico). Las referencias más usadas: 325°F = 163°C, 375°F = 190°C, 400°F = 204°C.</p>
-                <span className={styles.faqTip}>Truco: divide °F entre 2 y resta 15 para una aproximación rápida.</span>
-              </li>
-              <li className={styles.faqItem}>
-                <strong>¿1 cucharada son siempre 15 ml?</strong>
-                <p>En el sistema culinario internacional (tablespoon / tbsp), sí: 1 cucharada = 15 ml = 3 cucharaditas. Sin embargo, en Australia la cucharada estándar es 20 ml. Si la receta es australiana, ten en cuenta esa diferencia.</p>
-                <span className={styles.faqTip}>España y EE.UU.: 1 cucharada = 15 ml. Australia: 1 cucharada = 20 ml.</span>
-              </li>
-              <li className={styles.faqItem}>
-                <strong>¿Cómo multiplico una receta para 8 personas si es para 4?</strong>
-                <p>Usa el escalador: introduce 4 en &quot;porciones originales&quot; y 8 en &quot;porciones deseadas&quot; (factor 2×). Todos los ingredientes se duplican. Excepciones: la levadura puede reducirse un 20-25% al escalar, y la sal conviene ajustar al gusto.</p>
-                <span className={styles.faqTip}>Regla general: factor = porciones deseadas ÷ porciones originales.</span>
-              </li>
-              <li className={styles.faqItem}>
-                <strong>¿El aceite pesa lo mismo que el agua?</strong>
-                <p>No. El agua tiene densidad 1 g/ml, por lo que 100 ml = 100 g. El aceite tiene densidad 0,92 g/ml, así que 100 ml de aceite = 92 g. Si una receta pide 100 g de aceite, necesitas aproximadamente 109 ml.</p>
-                <span className={styles.faqTip}>Densidades: agua 1,0 | leche 1,03 | aceite 0,92 | miel 1,42.</span>
-              </li>
-              <li className={styles.faqItem}>
-                <strong>¿Cómo medir ingredientes secos sin báscula?</strong>
-                <p>Usa medidas de referencia: 1 vaso estándar (200 ml) ≈ 110 g harina / 180 g azúcar / 180 g arroz. Una cuchara sopera ≈ 10 g harina / 15 g azúcar / 14 g aceite. Para máxima precisión, llena y rasas el recipiente sin compactar.</p>
-                <span className={styles.faqTip}>Siempre rasa los ingredientes secos con el dorso de un cuchillo.</span>
-              </li>
-              <li className={styles.faqItem}>
-                <strong>¿Temperatura de horneado con ventilador vs. horno convencional?</strong>
-                <p>El horno con ventilador (convección forzada) cocina un 15–20% más rápido. Reduce la temperatura indicada en la receta entre 15°C y 20°C, o reduce el tiempo en un 10–15%. Si la receta dice 180°C sin ventilador, usa 160–165°C con ventilador.</p>
-                <span className={styles.faqTip}>Regla práctica: resta 20°C al usar ventilador.</span>
-              </li>
+              {PREGUNTAS_FRECUENTES.map((f) => (
+                <li key={f.question} className={styles.faqItem}>
+                  <strong>{f.question}</strong>
+                  <p>{f.answer}</p>
+                  <span className={styles.faqTip}>{f.consejo}</span>
+                </li>
+              ))}
             </ul>
           </section>
 

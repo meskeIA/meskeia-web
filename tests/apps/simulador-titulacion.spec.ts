@@ -1,5 +1,6 @@
 import { test, expect, Page } from '@playwright/test';
 import { esperarHidratacion } from './_hidratacion';
+import { comprobarFaqPageUnico } from './_faqpage-unico';
 
 /**
  * Inspector — simulador-titulacion (segmento cálculo/química, riesgo 3, 224 usos reales)
@@ -1557,4 +1558,11 @@ test.describe('Inspector 02/11/2026 · las cifras del panel siguen al estado con
       await expect(aviso).not.toContainText('Tornasol');
     });
   }
+});
+
+test.describe('JSON-LD', () => {
+  test('C0593 · un solo FAQPage, con las preguntas de la FAQ visible', async ({ page }) => {
+    await page.goto(RUTA);
+    await comprobarFaqPageUnico(page);
+  });
 });

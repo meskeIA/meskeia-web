@@ -4,6 +4,7 @@ import { useState, useMemo, useEffect } from 'react';
 import styles from './CalculadoraNotas.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { formatNumber } from '@/lib';
+import { PREGUNTAS_FRECUENTES } from './metadata';
 
 // Tipos
 type TabType = 'media' | 'evau' | 'conversor';
@@ -1153,39 +1154,14 @@ export default function CalculadoraNotasPage() {
         {/* 3. FAQ */}
         <details className={styles.faqList}>
           <summary className={styles.faqItem} style={{listStyle:'none', cursor:'pointer', fontWeight:600, fontSize:'1.1rem', padding:'0.75rem 0'}}><span aria-hidden="true">❓</span> Preguntas Frecuentes sobre Calificaciones y Medias</summary>
+          {/* Sale de PREGUNTAS_FRECUENTES, como el único FAQPage (C0593). */}
           <div>
-            <div className={styles.faqItem}>
-              <div className={styles.faqPregunta}>¿Cómo se calcula la media ponderada?</div>
-              <div className={styles.faqRespuesta}>Se multiplica cada nota por su peso (créditos, horas o porcentaje), se suman todos los productos y se divide entre la suma total de los pesos. Por ejemplo: (7×6 + 5×3) / (6+3) = (42+15)/9 = 6,33. Es diferente a la media aritmética simple.</div>
-            </div>
-            <div className={styles.faqItem}>
-              <div className={styles.faqPregunta}>¿Qué nota necesito en el examen final para aprobar la asignatura?</div>
-              <div className={styles.faqRespuesta}>Depende del sistema de evaluación del profesor. Si el examen final vale un 60% y tienes un 4 en la evaluación continua (40%), necesitas: (nota_final × 0,6 + 4 × 0,4) ≥ 5 → nota_final ≥ (5 - 1,6) / 0,6 = 5,67. La calculadora puede resolver este cálculo automáticamente.</div>
-            </div>
-            <div className={styles.faqItem}>
-              <div className={styles.faqPregunta}>¿Qué es la Matrícula de Honor y cuándo se concede?</div>
-              <div className={styles.faqRespuesta}>Es la máxima calificación universitaria española, reservada a notas de 9,0 o superior. Tiene un límite cuantitativo: no puede concederse a más del 5% de los alumnos matriculados en la asignatura. Si el 5% da menos de 1 alumno, puede concederse a 1 como máximo. Distinciones equivalentes en otros países son el &quot;Summa Cum Laude&quot; (EEUU) o la &quot;Mención de Honor&quot; (varios países de Latinoamérica), aunque los requisitos exactos varían según la institución.</div>
-            </div>
-            <div className={styles.faqItem}>
-              <div className={styles.faqPregunta}>¿Cómo se convierte una nota española al sistema GPA americano?</div>
-              <div className={styles.faqRespuesta}>La conversión más usada: 9-10 → 4,0 (A), 7-8,9 → 3,0-3,9 (B), 5-6,9 → 2,0-2,9 (C), 3-4,9 → 1,0-1,9 (D), 0-2,9 → 0,0 (F). Sin embargo, no existe una fórmula oficial; cada institución americana puede aplicar su propia escala de conversión.</div>
-            </div>
-            <div className={styles.faqItem}>
-              <div className={styles.faqPregunta}>¿Las asignaturas suspensas cuentan en la media del expediente universitario?</div>
-              <div className={styles.faqRespuesta}>Según el RD 1125/2003 (Espacio Europeo de Educación Superior), solo se incluyen las asignaturas superadas en el cálculo del expediente oficial. Sin embargo, algunas universidades calculan una &quot;media bruta&quot; que sí incluye los suspensos. Consulta el reglamento de tu universidad.</div>
-            </div>
-            <div className={styles.faqItem}>
-              <div className={styles.faqPregunta}>¿Qué nota mínima exigen los másteres más competitivos en España?</div>
-              <div className={styles.faqRespuesta}>Los másteres de alta demanda (MBA de escuelas de negocios, másteres en IA, Derecho en universidades top) suelen pedir entre 7,0 y 8,0 de expediente. Los másteres habilitantes (Medicina, Arquitectura) pueden bajar a 6,5. Siempre consulta los requisitos específicos de cada programa.</div>
-            </div>
-            <div className={styles.faqItem}>
-              <div className={styles.faqPregunta}>¿Cómo funciona la nota de acceso a la universidad (EVAU/Selectividad)?</div>
-              <div className={styles.faqRespuesta}>La nota de acceso = 0,6 × nota media de Bachillerato + 0,4 × nota de la EVAU. La nota de admisión puede subir hasta 14 puntos incluyendo las dos materias de fase específica (máximo +2 por materia con coeficiente ponderador). No todas las carreras usan las mismas materias de ponderación.</div>
-            </div>
-            <div className={styles.faqItem}>
-              <div className={styles.faqPregunta}>¿Cuánto afecta una asignatura suspensa a la nota media final?</div>
-              <div className={styles.faqRespuesta}>En bachillerato, una asignatura suspensa (por ejemplo un 4) en una materia de 4 horas semanales, frente a una media de 7 en el resto, puede bajar la media total entre 0,3 y 0,6 puntos dependiendo del número de asignaturas. La ponderación y el número total de materias determinan el impacto real.</div>
-            </div>
+            {PREGUNTAS_FRECUENTES.map((f) => (
+              <div key={f.question} className={styles.faqItem}>
+                <div className={styles.faqPregunta}>{f.question}</div>
+                <div className={styles.faqRespuesta}>{f.answer}</div>
+              </div>
+            ))}
           </div>
         </details>
 

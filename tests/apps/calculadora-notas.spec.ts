@@ -1,5 +1,6 @@
 import { test, expect, Page } from '@playwright/test';
 import { esperarHidratacion } from './_hidratacion';
+import { comprobarFaqPageUnico } from './_faqpage-unico';
 
 /**
  * Inspector — calculadora-notas (segmento interactiva, riesgo 3, 459 usos reales)
@@ -467,5 +468,12 @@ test.describe('Formato español y accesibilidad', () => {
       expect(await boton.getAttribute('type')).toBe('button');
       expect(await boton.getAttribute('aria-pressed')).not.toBeNull();
     }
+  });
+});
+
+test.describe('JSON-LD', () => {
+  test('C0593 · un solo FAQPage, con las preguntas de la FAQ visible', async ({ page }) => {
+    await page.goto(RUTA);
+    await comprobarFaqPageUnico(page);
   });
 });

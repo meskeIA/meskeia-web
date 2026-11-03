@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { generateWebAppSchema, generateFAQSchema, combineSchemas } from '@/lib/schema-templates';
+import { generateWebAppSchema, generateFAQSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Simulador de Titulación Ácido-Base | meskeIA',
@@ -45,81 +45,54 @@ const webAppSchema = generateWebAppSchema({
   keywords: ['titulación', 'valoración', 'pH', 'química secundaria'],
 });
 
-const faqSchema = generateFAQSchema({
+export const jsonLd = webAppSchema;
+
+/** Pregunta de la FAQ; `consejo` se pinta aparte en la FAQ visible y va detrás de la respuesta en el JSON-LD. */
+export interface PreguntaFrecuente {
+  question: string;
+  answer: string;
+  consejo?: string;
+}
+
+// ─────────────────────────────────────────────────────────────────────────
+// UNA sola FAQ (cabo C0593, la forma del hallazgo 3948 de calculadora-movimiento): la página
+// emitía DOS FAQPage, uno dentro del @graph de jsonLd (una copia de la FAQ visible con frases
+// de más) y otro, faqJsonLd, con cinco preguntas redactadas otra vez, tres de ellas que la
+// página no muestra. Ahora la FAQ visible y el único FAQPage salen de esta lista: lo que dice
+// el FAQPage es lo que dice la página.
+// ─────────────────────────────────────────────────────────────────────────
+export const PREGUNTAS_FRECUENTES: PreguntaFrecuente[] = [
+  {
+    question: '¿Cuál es la diferencia entre punto de equivalencia y punto final?',
+    answer: 'El punto de equivalencia es el punto teórico donde los moles de ácido y base son iguales. El punto final es el punto experimental donde el indicador cambia de color.',
+    consejo: 'Tip: elige un indicador cuyo rango de viraje coincida con el pH del punto de equivalencia para minimizar el error.',
+  },
+  {
+    question: '¿Por qué el punto de equivalencia no es pH=7 en ácido débil + base fuerte?',
+    answer: 'Porque la sal formada (ej. acetato de sodio) sufre hidrólisis: el ion acetato es básico y eleva el pH por encima de 7.',
+  },
+  {
+    question: '¿Qué es la zona tampón en una titulación?',
+    answer: 'Es la región plana antes de la equivalencia (en titulaciones de ácido débil) donde coexisten ácido y su base conjugada. El pH cambia poco al añadir titulante; en el punto medio, pH = pKa.',
+  },
+  {
+    question: '¿Cómo elijo el indicador correcto?',
+    answer: 'El rango de viraje del indicador debe quedar dentro del salto vertical de la curva. Si la curva tiene salto entre pH 4 y 10 (AF+BF), casi cualquier indicador funciona; si el salto es estrecho (AD+BD), la elección es crítica. El simulador marca un indicador como «apto aquí» cuando todo su viraje ocurre entre el 98 % y el 102 % del volumen de equivalencia.',
+  },
+  {
+    question: '¿Por qué la curva tiene un salto brusco?',
+    answer: 'Cerca de la equivalencia hay muy poco ácido o base sin reaccionar, por lo que añadir una gota más cambia drásticamente el pH. El salto es mayor cuando ambos reactivos son fuertes y concentrados.',
+  },
+  {
+    question: '¿Por qué se sigue añadiendo titulante después de la equivalencia?',
+    answer: 'Para confirmar que hemos pasado el punto final y observar el plateau característico. En la práctica, basta con detectar el cambio de color y registrar el volumen.',
+  },
+];
+
+export const faqJsonLd = generateFAQSchema({
   url: 'https://meskeia.com/simulador-titulacion/',
-  mainEntity: [
-    {
-      question: '¿Cuál es la diferencia entre punto de equivalencia y punto final?',
-      answer: 'El punto de equivalencia es el punto teórico donde los moles de ácido y base son iguales. El punto final es el punto experimental donde el indicador cambia de color. La diferencia entre ambos es el error de titulación; un indicador bien elegido los hace prácticamente coincidentes.',
-    },
-    {
-      question: '¿Por qué el punto de equivalencia no es pH=7 en ácido débil + base fuerte?',
-      answer: 'Porque la sal formada (ej. acetato de sodio) sufre hidrólisis: el ion acetato es básico y eleva el pH por encima de 7. En cambio, en ácido fuerte + base débil la sal es ácida y el punto de equivalencia queda por debajo de 7.',
-    },
-    {
-      question: '¿Qué es la zona tampón en una titulación?',
-      answer: 'Es la región plana antes de la equivalencia (en titulaciones de ácido débil) donde coexisten ácido y su base conjugada. El pH cambia poco al añadir titulante; en el punto medio, pH = pKa. Esta zona se rige por la ecuación de Henderson-Hasselbalch.',
-    },
-    {
-      question: '¿Cómo elijo el indicador correcto?',
-      answer: 'El rango de viraje del indicador debe quedar dentro del salto vertical de la curva. Si la curva tiene salto entre pH 4 y 10 (AF+BF), casi cualquier indicador funciona; si el salto es estrecho (AD+BD), hay que elegir uno cuyo viraje caiga en el rango exacto.',
-    },
-    {
-      question: '¿Por qué la curva tiene un salto brusco?',
-      answer: 'Cerca de la equivalencia hay muy poco ácido o base sin reaccionar, por lo que añadir una gota más cambia drásticamente el pH. El salto es mayor cuando ambos reactivos son fuertes y concentrados, y menor en titulaciones de débiles diluidos.',
-    },
-    {
-      question: '¿Por qué se sigue añadiendo titulante después de la equivalencia?',
-      answer: 'Para confirmar que hemos pasado el punto final y observar el plateau característico. En la práctica, basta con detectar el cambio de color y registrar el volumen.',
-    },
-  ],
+  mainEntity: PREGUNTAS_FRECUENTES.map((f) => ({
+    question: f.question,
+    answer: f.consejo ? `${f.answer} ${f.consejo}` : f.answer,
+  })),
 });
-
-export const jsonLd = combineSchemas(webAppSchema, faqSchema);
-
-export const faqJsonLd = {
-  '@context': 'https://schema.org',
-  '@type': 'FAQPage',
-  mainEntity: [
-    {
-      '@type': 'Question',
-      name: '¿Qué es una titulación ácido-base y para qué sirve?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'Una titulación ácido-base (o valoración) es una técnica analítica que consiste en añadir una solución de concentración conocida (titulante) a otra de concentración desconocida (analito) hasta alcanzar el punto de equivalencia. Permite determinar la concentración exacta de un ácido o una base, calcular el pKa de ácidos débiles y comprender la química del pH en soluciones tampón.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: '¿Cuál es la diferencia entre punto de equivalencia y punto final en una valoración?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'El punto de equivalencia es el punto teórico donde los moles de ácido y base son estequiométricamente iguales. El punto final es el punto experimental donde el indicador cambia de color. Un buen indicador hace que ambos puntos coincidan prácticamente; si no, se produce un pequeño error de titulación.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: '¿Por qué el pH en el punto de equivalencia no es siempre 7?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'Solo es 7 cuando se titulan un ácido fuerte y una base fuerte, porque la sal resultante no se hidroliza. Si se titula un ácido débil con base fuerte, la sal formada es básica y el pH de equivalencia supera 7. Si es ácido fuerte con base débil, la sal es ácida y el pH queda por debajo de 7.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: '¿Qué indicador debo usar en una titulación ácido débil - base fuerte?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'El indicador debe tener su rango de viraje dentro del salto vertical de la curva de pH. En titulaciones ácido débil + base fuerte el punto de equivalencia queda entre pH 8 y 10, por lo que la fenolftaleína (viraje pH 8,2–10) es la opción clásica. El naranja de metilo, que vira entre 3 y 4, daría un error importante en estas titulaciones.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: '¿Qué es la ecuación de Henderson-Hasselbalch y cuándo se aplica?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'La ecuación pH = pKa + log([A⁻]/[HA]) describe el pH de una solución tampón formada por un ácido débil y su base conjugada. Se aplica en la zona tampón de una curva de titulación, antes de la equivalencia. En el punto donde se ha añadido exactamente la mitad del volumen de equivalencia, [A⁻] = [HA] y pH = pKa, lo que permite determinar experimentalmente el pKa del ácido.',
-      },
-    },
-  ],
-};

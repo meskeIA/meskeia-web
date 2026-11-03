@@ -12,6 +12,7 @@ import {
 } from '@/components';
 import { formatNumber } from '@/lib';
 import styles from './SimuladorTitulacion.module.css';
+import { PREGUNTAS_FRECUENTES } from './metadata';
 // El pH y el volumen de equivalencia viven en `./motor.ts`, que comparten el simulador y la
 // corrección de los casos para clase: una sola implementación (skill /casos-aula-meskeia).
 import { calcularPH, volumenEquivalencia, volumenParaPH, type TipoTitulacion } from './motor';
@@ -805,55 +806,15 @@ export default function SimuladorTitulacion() {
           </div>
 
           <h3>Preguntas Frecuentes</h3>
+          {/* Sale de PREGUNTAS_FRECUENTES, como el único FAQPage (C0593). */}
           <div className={styles.faqList}>
-            <div className={styles.faqItem}>
-              <strong>¿Cuál es la diferencia entre punto de equivalencia y punto final?</strong>
-              <p>
-                El <em>punto de equivalencia</em> es el punto teórico donde los moles de ácido y base son iguales.
-                El <em>punto final</em> es el punto experimental donde el indicador cambia de color.
-              </p>
-              <p className={styles.faqTip}>
-                Tip: elige un indicador cuyo rango de viraje coincida con el pH del punto de equivalencia para
-                minimizar el error.
-              </p>
-            </div>
-            <div className={styles.faqItem}>
-              <strong>¿Por qué el punto de equivalencia no es pH=7 en ácido débil + base fuerte?</strong>
-              <p>
-                Porque la sal formada (ej. acetato de sodio) sufre hidrólisis: el ion acetato es básico y eleva el
-                pH por encima de 7.
-              </p>
-            </div>
-            <div className={styles.faqItem}>
-              <strong>¿Qué es la zona tampón en una titulación?</strong>
-              <p>
-                Es la región plana antes de la equivalencia (en titulaciones de ácido débil) donde coexisten ácido
-                y su base conjugada. El pH cambia poco al añadir titulante; en el punto medio, pH = pKa.
-              </p>
-            </div>
-            <div className={styles.faqItem}>
-              <strong>¿Cómo elijo el indicador correcto?</strong>
-              <p>
-                El rango de viraje del indicador debe quedar dentro del salto vertical de la curva. Si la curva
-                tiene salto entre pH 4 y 10 (AF+BF), casi cualquier indicador funciona; si el salto es estrecho
-                (AD+BD), la elección es crítica. El simulador marca un indicador como «apto aquí» cuando todo su
-                viraje ocurre entre el 98{' '}% y el 102{' '}% del volumen de equivalencia.
-              </p>
-            </div>
-            <div className={styles.faqItem}>
-              <strong>¿Por qué la curva tiene un salto brusco?</strong>
-              <p>
-                Cerca de la equivalencia hay muy poco ácido o base sin reaccionar, por lo que añadir una gota más
-                cambia drásticamente el pH. El salto es mayor cuando ambos reactivos son fuertes y concentrados.
-              </p>
-            </div>
-            <div className={styles.faqItem}>
-              <strong>¿Por qué se sigue añadiendo titulante después de la equivalencia?</strong>
-              <p>
-                Para confirmar que hemos pasado el punto final y observar el plateau característico. En la
-                práctica, basta con detectar el cambio de color y registrar el volumen.
-              </p>
-            </div>
+            {PREGUNTAS_FRECUENTES.map((f) => (
+              <div key={f.question} className={styles.faqItem}>
+                <strong>{f.question}</strong>
+                <p>{f.answer}</p>
+                {f.consejo && <p className={styles.faqTip}>{f.consejo}</p>}
+              </div>
+            ))}
           </div>
 
           <h3>Cómo Realizar una Titulación — Paso a Paso</h3>

@@ -1,5 +1,6 @@
 import { test, expect, Page } from '@playwright/test';
 import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
+import { comprobarFaqPageUnico } from './_faqpage-unico';
 import { activarTema, prepararParaMedir } from '../contraste-text-muted-auxiliares';
 
 /**
@@ -810,15 +811,15 @@ test.describe('Re-inspección 30/10/2026 — bloque educativo y FAQPage', () => 
     for (const p of preguntas) expect(p.respuesta).not.toMatch(colmadas);
   });
 
-  test('HALLAZGO (30/10/2026, ABIERTO) · dos FAQPage y dos cifras distintas para reducir la levadura', async ({
+  test('REPARADO 3854 (C0593) · un solo FAQPage y una sola cifra para reducir la levadura', async ({
     page,
   }) => {
-    // La FAQ se escribe tres veces (page.tsx, faqSchema del @graph y faqJsonLd) y la página
-    // emite DOS FAQPage. «¿Cómo multiplico una receta para 8 personas si es para 4?» (visible y
-    // @graph) dice «la levadura puede reducirse un 20-25 %»; «¿Cómo se escala una receta para
-    // más comensales?» (faqJsonLd) dice «reducirla un 15-20 %». La tarjeta de consejos da
-    // 1,75× para ×2 y 2,5× para ×3 (12,5 % y 16,7 %).
-    test.fail();
+    // La FAQ se escribía tres veces (page.tsx, faqSchema del @graph y faqJsonLd) y la página
+    // emitía DOS FAQPage. «¿Cómo multiplico una receta para 8 personas si es para 4?» (visible y
+    // @graph) decía «la levadura puede reducirse un 20-25 %»; «¿Cómo se escala una receta para
+    // más comensales?» (faqJsonLd) decía «reducirla un 15-20 %». Desde C0593, la FAQ visible y
+    // el único FAQPage salen de PREGUNTAS_FRECUENTES (metadata.ts). Que el 20-25 % cuadre con
+    // la tarjeta de consejos (1,75× para ×2, 12,5 %) no lo mide este test.
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     const { bloques, preguntas } = await faqPagesJsonLd(page);
     const visible = await page.locator('li', { hasText: 'multiplico una receta' }).innerText();
@@ -830,12 +831,15 @@ test.describe('Re-inspección 30/10/2026 — bloque educativo y FAQPage', () => 
     expect(bloques).toBe(1);
   });
 
-  test('HALLAZGO (30/10/2026, ABIERTO) · el FAQPage da otro tiempo y otra temperatura para la pechuga al horno que la tabla', async ({
+  test('REPARADO 3855 (C0593) · el FAQPage ya no da otro tiempo y otra temperatura para la pechuga al horno que la tabla', async ({
     page,
   }) => {
     // Tabla de la app: «Pechuga de pollo · Horno · 25-30 min · 200°C».
-    // faqJsonLd: «20-25 minutos a 180 °C»: menos tiempo a menos temperatura.
-    test.fail();
+    // faqJsonLd decía «20-25 minutos a 180 °C»: menos tiempo a menos temperatura. Era una de
+    // las cinco preguntas que solo vivían en el JSON-LD; con un solo FAQPage, el de la FAQ
+    // visible, se retiró. Si vuelve, tiene que decir lo mismo que la tabla.
+    const { preguntas: todas } = await faqPagesJsonLd(page);
+    expect(todas.some((p) => /pechuga/i.test(p.pregunta))).toBe(false);
     await page.getByRole('button', { name: 'Tiempos', exact: true }).click();
     const fila = await page
       .locator('[class*="tablaRow"]')
@@ -954,5 +958,12 @@ test.describe('Re-inspección 30/10/2026 — contraste de los colores escritos a
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     const m = await contrasteDe(page, '[class*="escenarioTip"]');
     expect(m.ratio, `${m.color} sobre ${m.fondo}`).toBeGreaterThanOrEqual(4.5);
+  });
+});
+
+test.describe('JSON-LD', () => {
+  test('C0593 · un solo FAQPage, con las preguntas de la FAQ visible', async ({ page }) => {
+    await page.goto(RUTA);
+    await comprobarFaqPageUnico(page);
   });
 });
