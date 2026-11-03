@@ -46,6 +46,11 @@ export const jsonLd = generateWebAppSchema({
   keywords: ['condensador', 'capacitor', 'capacidad', 'dieléctrico', 'circuito RC', 'constante de tiempo', 'simulador de física'],
 });
 
+// La pregunta que está también en la FAQ visible de page.tsx: una sola respuesta para las dos
+// (check:faq-unica, cabo C0570). Se quedó la del JSON-LD, que dice además qué es el componente.
+export const RESPUESTA_FAQ_CAPACITOR =
+  'Sí. «Condensador» es el término habitual en España y «capacitor» el más usado en buena parte de Latinoamérica y en inglés; nombran el mismo componente, dos conductores separados por un aislante que almacenan carga. De forma parecida, la magnitud se llama capacidad o capacitancia, y se mide en faradios (F).';
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -63,7 +68,7 @@ export const faqJsonLd = {
       name: '¿Condensador y capacitor son lo mismo?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Sí. «Condensador» es el término habitual en España y «capacitor» el más usado en buena parte de Latinoamérica y en inglés; nombran el mismo componente, dos conductores separados por un aislante que almacenan carga. De forma parecida, la magnitud se llama capacidad o capacitancia, y se mide en faradios (F).',
+        text: RESPUESTA_FAQ_CAPACITOR,
       },
     },
     {

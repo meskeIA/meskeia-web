@@ -47,6 +47,14 @@ export const jsonLd = generateWebAppSchema({
   keywords: ['principio de Arquímedes', 'empuje', 'flotabilidad', 'densidad', 'calculadora de densidad', 'peso aparente', 'simulador de física'],
 });
 
+// Las dos preguntas que están también en la FAQ visible de page.tsx: una sola respuesta para las
+// dos (check:faq-unica, cabo C0570). Se juntaron: las cifras del JSON-LD y lo que solo decía la
+// visible (la piedra en el agua; que la calculadora de la página despeja las tres magnitudes).
+export const RESPUESTA_FAQ_PESO_APARENTE =
+  'Es lo que marca un dinamómetro cuando el cuerpo cuelga sumergido en un líquido: el peso real menos el empuje, P − E. Una pieza de hierro de 100 cm³ pesa 7,72 N en el aire, recibe 0,98 N de empuje en agua y marca un peso aparente de 6,74 N. Es la razón de que una piedra parezca más ligera dentro del agua y de que en una piscina se pueda levantar a otra persona con menos esfuerzo.';
+export const RESPUESTA_FAQ_DENSIDAD =
+  'Dividiendo su masa entre su volumen: ρ = m/V. Una pieza de 270 g que ocupa 100 cm³ tiene una densidad de 2,7 g/cm³, es decir, 2700 kg/m³, la del aluminio. De la misma fórmula salen la masa (m = ρ·V) y el volumen (V = m/ρ), y la calculadora de densidad de esta página despeja cualquiera de los tres. Para pasar de g/cm³ a kg/m³ se multiplica por 1000.';
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -80,7 +88,7 @@ export const faqJsonLd = {
       name: '¿Qué es el peso aparente?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Es lo que marca un dinamómetro cuando el cuerpo cuelga sumergido en un líquido: el peso real menos el empuje, P − E. Una pieza de hierro de 100 cm³ pesa 7,72 N en el aire, recibe 0,98 N de empuje en agua y marca un peso aparente de 6,74 N.',
+        text: RESPUESTA_FAQ_PESO_APARENTE,
       },
     },
     {
@@ -88,7 +96,7 @@ export const faqJsonLd = {
       name: '¿Cómo se calcula la densidad de un objeto?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Dividiendo su masa entre su volumen: ρ = m/V. Una pieza de 270 g que ocupa 100 cm³ tiene una densidad de 2,7 g/cm³, es decir, 2700 kg/m³, la del aluminio. De la misma fórmula salen la masa (m = ρ·V) y el volumen (V = m/ρ). Para pasar de g/cm³ a kg/m³ se multiplica por 1000.',
+        text: RESPUESTA_FAQ_DENSIDAD,
       },
     },
     {

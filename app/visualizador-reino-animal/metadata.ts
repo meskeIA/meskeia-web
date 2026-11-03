@@ -65,6 +65,12 @@ export const jsonLd = generateWebAppSchema({
   features: [],
 });
 
+// La pregunta que está también en la FAQ visible de page.tsx: una sola respuesta para las dos
+// (check:faq-unica, cabo C0570). Se juntaron las dos: los esqueletos del JSON-LD y, de la visible,
+// el subfilo Vertebrata y que «invertebrado» no es un grupo natural (decía «cartílago u hueso»).
+export const RESPUESTA_FAQ_VERTEBRADOS =
+  'Los vertebrados poseen un esqueleto interno de cartílago o hueso con columna vertebral (notocordio en las fases embrionarias) y cráneo que protege el encéfalo, y forman el subfilo Vertebrata dentro del filo Chordata. Los invertebrados son todos los demás animales: algunos tienen exoesqueleto (artrópodos), concha (moluscos), espículas (esponjas) o endoesqueleto calcáreo (equinodermos). El término «invertebrado» es descriptivo, no un grupo filogenético natural, y reúne la inmensa mayoría de la diversidad animal.';
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -82,7 +88,7 @@ export const faqJsonLd = {
       name: '¿Cuál es la diferencia entre vertebrados e invertebrados?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Los vertebrados poseen un esqueleto interno con columna vertebral (notocordio en las fases embrionarias) y cráneo que protege el encéfalo. Los invertebrados carecen de esta estructura; algunos tienen exoesqueleto (artrópodos), concha (moluscos), espículas (esponjas) o endoesqueleto calcáreo (equinodermos). Aunque los vertebrados son los más estudiados, los invertebrados representan la inmensa mayoría de la diversidad animal y ocupan prácticamente todos los ecosistemas del planeta.',
+        text: RESPUESTA_FAQ_VERTEBRADOS,
       },
     },
     {

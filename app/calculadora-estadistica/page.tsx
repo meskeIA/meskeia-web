@@ -16,6 +16,7 @@ import {
   type Comprobacion,
   type EjercicioEstadistica,
 } from './casos';
+import { RESPUESTA_FAQ_MEDIDAS } from './metadata';
 
 /**
  * El historial de series analizadas se guarda en el navegador del usuario.
@@ -993,11 +994,7 @@ Ejemplo: 5, 7, 8, 6, 9   ·   con decimales: 1,5 2,3 4,7 o bien 1.5 2.3 4.7"
             <li className={styles.faqItem}>
               <div className={styles.faqPregunta}>¿Qué son las medidas descriptivas?</div>
               <div className={styles.faqRespuesta}>
-                Las <strong>medidas descriptivas</strong> resumen un conjunto de datos en pocos números: las de
-                <strong> tendencia central</strong> (media, mediana, moda) indican el valor típico, y las de
-                <strong> dispersión</strong> (rango, varianza, desviación típica, desviación media y coeficiente de
-                variación) indican cuánto varían los datos. Los cuartiles y percentiles describen la posición de los
-                valores. Esta calculadora las obtiene todas a la vez pegando tus datos.
+                {RESPUESTA_FAQ_MEDIDAS}
               </div>
             </li>
             <li className={styles.faqItem}>

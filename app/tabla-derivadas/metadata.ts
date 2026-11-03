@@ -62,6 +62,13 @@ export const jsonLd = generateWebAppSchema({
   keywords: ['tabla de derivadas', 'derivadas', 'regla de la cadena', 'cálculo diferencial'],
 });
 
+// Las dos preguntas que están también en la FAQ visible de page.tsx: una sola respuesta para las
+// dos (check:faq-unica, cabo C0570). Decían lo mismo; se quedaron las del JSON-LD.
+export const RESPUESTA_FAQ_PRODUCTO =
+  'Porque al variar x cambian los dos factores a la vez y el resultado recoge ambas contribuciones: (f·g)′ = f′·g + f·g′. La comprobación es inmediata con f = g = x: el atajo incorrecto daría 1·1 = 1, cuando la derivada de x² es 2x. La regla correcta devuelve 1·x + x·1 = 2x.';
+export const RESPUESTA_FAQ_NO_DERIVABLE =
+  'En tres casos típicos: cuando hay un pico o esquina y las pendientes laterales no coinciden (por ejemplo |x| en x = 0), cuando la tangente es vertical (√x en x = 0) y cuando la función no es continua en ese punto. Toda función derivable es continua, pero lo contrario no se cumple: la continuidad es necesaria y no suficiente.';
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -79,7 +86,7 @@ export const faqJsonLd = {
       name: '¿Por qué la derivada de un producto no es el producto de las derivadas?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Porque al variar x cambian los dos factores a la vez y el resultado recoge ambas contribuciones: (f·g)′ = f′·g + f·g′. La comprobación es inmediata con f = g = x: el atajo incorrecto daría 1·1 = 1, cuando la derivada de x² es 2x. La regla correcta devuelve 1·x + x·1 = 2x.',
+        text: RESPUESTA_FAQ_PRODUCTO,
       },
     },
     {
@@ -95,7 +102,7 @@ export const faqJsonLd = {
       name: '¿Cuándo una función no es derivable en un punto?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'En tres casos típicos: cuando hay un pico o esquina y las pendientes laterales no coinciden (por ejemplo |x| en x = 0), cuando la tangente es vertical (√x en x = 0) y cuando la función no es continua en ese punto. Toda función derivable es continua, pero lo contrario no se cumple: la continuidad es necesaria y no suficiente.',
+        text: RESPUESTA_FAQ_NO_DERIVABLE,
       },
     },
     {

@@ -26,6 +26,7 @@ import {
   type ModoRC,
 } from './motor';
 import CasosAula from './CasosAula';
+import { RESPUESTA_FAQ_CAPACITOR } from './metadata';
 
 // ─── Presentación de cifras ──────────────────────────────────────────────────
 
@@ -864,10 +865,7 @@ export default function SimuladorCondensadoresPage() {
           <div className={styles.faqList}>
             <div className={styles.faqItem}>
               <strong>¿Condensador y capacitor son lo mismo?</strong>
-              <p>
-                Sí. «Condensador» es lo habitual en España y «capacitor» en muchos países de Latinoamérica y en
-                inglés. Igual pasa con la magnitud: capacidad o capacitancia, siempre en faradios.
-              </p>
+              <p>{RESPUESTA_FAQ_CAPACITOR}</p>
             </div>
             <div className={styles.faqItem}>
               <strong>¿Por qué un dieléctrico aumenta la capacidad?</strong>

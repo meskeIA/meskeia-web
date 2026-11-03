@@ -11,6 +11,7 @@ import {
   ShareCard,
 } from '@/components';
 import styles from './ReinoAnimal.module.css';
+import { RESPUESTA_FAQ_VERTEBRADOS } from './metadata';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -876,7 +877,7 @@ export default function VisualizadorReinoAnimalPage() {
               <div className={styles.faqItem}>
                 <dt className={styles.faqPregunta}>¿Cuál es la diferencia entre vertebrados e invertebrados?</dt>
                 <dd className={styles.faqRespuesta}>
-                  Los vertebrados poseen columna vertebral (endoesqueleto de cartílago u hueso) y forman el subfilo Vertebrata dentro del filo Chordata. Los invertebrados son todos los demás animales —sin columna vertebral— e incluyen desde esponjas hasta cefalópodos y artrópodos. El término «invertebrado» es descriptivo, no un grupo filogenético natural.
+                  <span>{RESPUESTA_FAQ_VERTEBRADOS}</span>
                   <span className={styles.faqTip}><span aria-hidden="true">💡</span> Los vertebrados son solo el 5% de las especies animales; el 95% restante son invertebrados.</span>
                 </dd>
               </div>

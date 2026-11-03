@@ -61,6 +61,16 @@ export const jsonLd = generateWebAppSchema({
   ],
 });
 
+// Las tres preguntas que están también en la FAQ visible de page.tsx: una sola respuesta para las
+// dos (check:faq-unica, cabo C0570). Decían lo mismo; se quedaron las del JSON-LD, más completas,
+// y en las proporciones la frase del trihíbrido que solo traía la visible.
+export const RESPUESTA_FAQ_PASO_A_PASO =
+  'Primero determina el genotipo de cada progenitor (por ejemplo Aa × Aa) y escribe sus gametos posibles. En un monohíbrido, coloca los gametos de un progenitor en las filas (A, a) y los del otro en las columnas (A, a). Rellena cada celda combinando el gameto de su fila con el de su columna, ordenando la mayúscula primero (AA, Aa, aa). Por último cuenta los genotipos y agrúpalos por fenotipo para obtener las proporciones. Esta calculadora dibuja la tabla de Punnett online y hace el recuento automáticamente.';
+export const RESPUESTA_FAQ_PROPORCIONES =
+  'Un cruce monohíbrido Aa × Aa da en la F2 una proporción fenotípica de 3:1 (3 dominantes por cada recesivo) y una proporción genotípica 1:2:1 (1 AA : 2 Aa : 1 aa). Un cruce dihíbrido AaBb × AaBb da la proporción fenotípica clásica 9:3:3:1 en sus 16 celdas: 9 doble dominante, 3 dominante-recesivo, 3 recesivo-dominante y 1 doble recesivo. Un trihíbrido AaBbCc × AaBbCc implica 8 × 8 = 64 combinaciones y produce la razón 27:9:9:9:3:3:3:1. Estas razones son la base de las leyes de Mendel.';
+export const RESPUESTA_FAQ_GENOTIPO_FENOTIPO =
+  'El fenotipo se deduce del genotipo aplicando la relación de dominancia entre alelos. En dominancia completa, basta con que el genotipo tenga un alelo dominante para expresar el fenotipo dominante: AA y Aa muestran el mismo carácter, y solo el homocigoto recesivo aa muestra el fenotipo recesivo. Por eso la proporción genotípica 1:2:1 se convierte en una proporción fenotípica 3:1. En dominancia incompleta o codominancia, en cambio, el heterocigoto Aa presenta su propio fenotipo intermedio o mixto.';
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -110,7 +120,7 @@ export const faqJsonLd = {
       name: '¿Cómo se hace un cuadro de Punnett paso a paso?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Primero determina el genotipo de cada progenitor (por ejemplo Aa × Aa) y escribe sus gametos posibles. En un monohíbrido, coloca los gametos de un progenitor en las filas (A, a) y los del otro en las columnas (A, a). Rellena cada celda combinando el gameto de su fila con el de su columna, ordenando la mayúscula primero (AA, Aa, aa). Por último cuenta los genotipos y agrúpalos por fenotipo para obtener las proporciones. Esta calculadora dibuja la tabla de Punnett online y hace el recuento automáticamente.',
+        text: RESPUESTA_FAQ_PASO_A_PASO,
       },
     },
     {
@@ -118,7 +128,7 @@ export const faqJsonLd = {
       name: '¿Qué proporciones da un cruce monohíbrido (3:1) y uno dihíbrido (9:3:3:1)?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Un cruce monohíbrido Aa × Aa da en la F2 una proporción fenotípica de 3:1 (3 dominantes por cada recesivo) y una proporción genotípica 1:2:1 (1 AA : 2 Aa : 1 aa). Un cruce dihíbrido AaBb × AaBb da la proporción fenotípica clásica 9:3:3:1 en sus 16 celdas: 9 doble dominante, 3 dominante-recesivo, 3 recesivo-dominante y 1 doble recesivo. Estas razones son la base de las leyes de Mendel.',
+        text: RESPUESTA_FAQ_PROPORCIONES,
       },
     },
     {
@@ -134,7 +144,7 @@ export const faqJsonLd = {
       name: '¿Cómo se pasa de genotipo a fenotipo?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El fenotipo se deduce del genotipo aplicando la relación de dominancia entre alelos. En dominancia completa, basta con que el genotipo tenga un alelo dominante para expresar el fenotipo dominante: AA y Aa muestran el mismo carácter, y solo el homocigoto recesivo aa muestra el fenotipo recesivo. Por eso la proporción genotípica 1:2:1 se convierte en una proporción fenotípica 3:1. En dominancia incompleta o codominancia, en cambio, el heterocigoto Aa presenta su propio fenotipo intermedio o mixto.',
+        text: RESPUESTA_FAQ_GENOTIPO_FENOTIPO,
       },
     },
   ],

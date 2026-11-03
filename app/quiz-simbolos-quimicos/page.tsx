@@ -7,6 +7,7 @@ import { MeskeiaLogo, Footer, EducationalSection, ShareCard, LegalNotice, Relate
 import { formatPercentage, enfocarSinCentrar, traerALaVista } from '@/lib';
 import { useGuardaRafaga } from '@/lib/useGuardaRafaga';
 import { ELEMENTOS, TOTAL_ELEMENTOS, type Elemento } from '@/data/elementos-quimicos';
+import { RESPUESTA_FAQ_CUANTOS } from './metadata';
 
 type Modo = 'simbolo-nombre' | 'nombre-simbolo';
 type Dificultad = 'facil' | 'medio' | 'dificil';
@@ -525,7 +526,7 @@ export default function QuizSimbolosQuimicosPage() {
             </div>
             <div className={styles.faqItem}>
               <h3>¿Cuántos elementos tiene la tabla periódica?</h3>
-              <p>Actualmente la tabla periódica oficial de la IUPAC tiene 118 elementos, del hidrógeno (Z=1) al oganesón (Z=118). Los elementos del 1 al 94 se encuentran en la naturaleza; los restantes son artificiales.</p>
+              <p>{RESPUESTA_FAQ_CUANTOS}</p>
             </div>
             <div className={styles.faqItem}>
               {/* La pregunta era «¿Por qué el wolframio se llama así en español pero su símbolo es W?»,

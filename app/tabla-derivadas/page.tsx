@@ -4,6 +4,7 @@
 import { useState, useMemo, useRef, useEffect, isValidElement } from 'react';
 import type { ReactNode } from 'react';
 import styles from './TablaDerivadas.module.css';
+import { RESPUESTA_FAQ_NO_DERIVABLE, RESPUESTA_FAQ_PRODUCTO } from './metadata';
 import {
   MeskeiaLogo,
   Footer,
@@ -1349,12 +1350,7 @@ export default function TablaDerivadasPage() {
           <div className={styles.faqList}>
             <div className={styles.faqItem}>
               <h4>¿Por qué la derivada de un producto no es el producto de las derivadas?</h4>
-              <p>
-                Porque cuando x cambia, cambian los dos factores a la vez, y el efecto total tiene
-                dos contribuciones. La comprobación es inmediata: si (f·g)′ fuese f′·g′, la derivada
-                de x·x sería 1·1 = 1, cuando en realidad la derivada de x² es 2x. La regla correcta,
-                f′g + fg′, sí devuelve 1·x + x·1 = 2x.
-              </p>
+              <p>{RESPUESTA_FAQ_PRODUCTO}</p>
               <p className={styles.faqTip}>
                 <span aria-hidden="true">💡</span> Truco de repaso: prueba siempre una regla dudosa
                 con un caso que ya conozcas. Si falla ahí, la regla está mal.
@@ -1362,13 +1358,7 @@ export default function TablaDerivadasPage() {
             </div>
             <div className={styles.faqItem}>
               <h4>¿Cuándo una función no es derivable en un punto?</h4>
-              <p>
-                En tres situaciones típicas: cuando hay un pico o esquina (como |x| en x = 0, donde
-                las pendientes por la izquierda y por la derecha no coinciden), cuando la tangente
-                es vertical (como √x en x = 0) y cuando la función ni siquiera es continua. La
-                continuidad es necesaria pero no suficiente: toda función derivable es continua,
-                pero no al revés.
-              </p>
+              <p>{RESPUESTA_FAQ_NO_DERIVABLE}</p>
               <p className={styles.faqTip}>
                 <span aria-hidden="true">💡</span> Antes de derivar una función definida a trozos,
                 comprueba qué pasa exactamente en los puntos de unión.

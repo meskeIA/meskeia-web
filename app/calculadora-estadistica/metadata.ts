@@ -50,6 +50,11 @@ export const jsonLd = generateWebAppSchema({
   keywords: ['medidas descriptivas', 'estadística descriptiva', 'cuasidesviación típica', 'media mediana moda', 'desviación típica', 'coeficiente de variación', 'análisis descriptivo de datos'],
 });
 
+// La pregunta que está también en la FAQ visible de page.tsx: una sola respuesta para las dos
+// (check:faq-unica, cabo C0570). Decían lo mismo; se quedó la del JSON-LD.
+export const RESPUESTA_FAQ_MEDIDAS =
+  'Las medidas descriptivas son los valores que resumen un conjunto de datos en pocos números. Se agrupan en medidas de tendencia central (media, mediana y moda), que indican el valor típico, y medidas de dispersión (rango, varianza, desviación típica, desviación media y coeficiente de variación), que indican cuánto varían los datos. Los cuartiles y percentiles completan el resumen describiendo la posición de los valores. Esta calculadora las obtiene todas a la vez pegando tus datos.';
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -99,7 +104,7 @@ export const faqJsonLd = {
       name: '¿Qué son las medidas descriptivas?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Las medidas descriptivas son los valores que resumen un conjunto de datos en pocos números. Se agrupan en medidas de tendencia central (media, mediana y moda), que indican el valor típico, y medidas de dispersión (rango, varianza, desviación típica, desviación media y coeficiente de variación), que indican cuánto varían los datos. Los cuartiles y percentiles completan el resumen describiendo la posición de los valores. Esta calculadora las obtiene todas a la vez pegando tus datos.',
+        text: RESPUESTA_FAQ_MEDIDAS,
       },
     },
     {

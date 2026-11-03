@@ -24,6 +24,7 @@ import {
 import { MATERIALES, LIQUIDOS } from './materiales';
 import CasosAula from './CasosAula';
 import CalculadoraDensidad from './CalculadoraDensidad';
+import { RESPUESTA_FAQ_DENSIDAD, RESPUESTA_FAQ_PESO_APARENTE } from './metadata';
 
 // ─── Sustancias de referencia ────────────────────────────────────────────────
 // Las listas MATERIALES y LIQUIDOS viven en ./materiales.ts: las leen también los «Casos
@@ -746,11 +747,7 @@ export default function SimuladorFlotabilidadPage() {
             </div>
             <div className={styles.faqItem}>
               <strong>¿Qué es el peso aparente?</strong>
-              <p>
-                Lo que marca un dinamómetro con el cuerpo colgado y sumergido: P − E. Es la razón de
-                que una piedra parezca más ligera dentro del agua y de que en una piscina se pueda
-                levantar a otra persona con menos esfuerzo.
-              </p>
+              <p>{RESPUESTA_FAQ_PESO_APARENTE}</p>
               <p className={styles.faqTip}>
                 <span aria-hidden="true">💡</span> Midiendo el peso en el aire y el aparente en agua
                 se obtiene la densidad del cuerpo: ρc = ρagua · P / (P − P_aparente).
@@ -758,12 +755,7 @@ export default function SimuladorFlotabilidadPage() {
             </div>
             <div className={styles.faqItem}>
               <strong>¿Cómo se calcula la densidad de un objeto?</strong>
-              <p>
-                Dividiendo su masa entre su volumen: ρ = m/V. Una pieza de 270 g que ocupa 100 cm³
-                tiene 2,7 g/cm³, o 2700 kg/m³: la densidad del aluminio. De la misma fórmula salen
-                la masa (m = ρ·V) y el volumen (V = m/ρ); la calculadora de densidad de esta página
-                despeja cualquiera de los tres.
-              </p>
+              <p>{RESPUESTA_FAQ_DENSIDAD}</p>
             </div>
             <div className={styles.faqItem}>
               <strong>¿Es cierta la anécdota de la corona y el «¡eureka!»?</strong>

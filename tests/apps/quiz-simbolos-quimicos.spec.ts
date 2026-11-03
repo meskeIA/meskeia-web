@@ -1777,7 +1777,8 @@ test.describe('Inspector 28/10/2026 · hallazgos', () => {
   }
 
   /**
-   * HALLAZGO bajo (Inspector 28/10/2026) · contenido — ABIERTO. «¿Cuántos elementos tiene la
+   * HALLAZGO 3625 bajo (Inspector 28/10/2026) · contenido — REPARADO el 03/11/2026 (cabo C0570):
+   * las dos bocas leen RESPUESTA_FAQ_CUANTOS de metadata.ts. «¿Cuántos elementos tiene la
    * tabla periódica?» está en la FAQ visible y en el FAQPage con DOS respuestas: la visible es un
    * resumen de la del JSON-LD (la del JSON-LD añade que los 95-118 son sintéticos y sus semividas,
    * con el curio-247). Dos textos de la misma respuesta divergen con cada reparación (ya le pasó a
@@ -1786,7 +1787,6 @@ test.describe('Inspector 28/10/2026 · hallazgos', () => {
    * Mide: el texto visible de esa respuesta es el mismo que el del FAQPage.
    */
   test('hallazgo · «¿Cuántos elementos tiene la tabla periódica?» tiene una sola respuesta', async ({ page }) => {
-    test.fail(); // ABIERTO (Inspector 28/10/2026)
     const PREGUNTA = '¿Cuántos elementos tiene la tabla periódica?';
     await abrirGuia(page);
     const ld = (await faqLd(page)).find((q) => q.name === PREGUNTA);

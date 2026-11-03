@@ -50,6 +50,11 @@ export const jsonLd = generateWebAppSchema({
   ],
 });
 
+// La pregunta que está también en la FAQ visible de page.tsx: una sola respuesta para las dos
+// (check:faq-unica, cabo C0570). Se quedó la del JSON-LD, más completa, con la IUPAC de la visible.
+export const RESPUESTA_FAQ_CUANTOS =
+  'La tabla periódica oficial de la IUPAC tiene 118 elementos confirmados, del hidrógeno (H, número atómico 1) al oganesón (Og, número atómico 118). Los elementos del 1 al 94 se encuentran en la naturaleza; los del 95 al 118 son sintéticos, producidos en reactores o aceleradores de partículas. Sus semividas (periodos de semidesintegración) van de millones de años en los primeros de ese tramo (el curio-247, unos 15,6 millones de años) a fracciones de segundo en los más pesados.';
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -67,7 +72,7 @@ export const faqJsonLd = {
       name: '¿Cuántos elementos tiene la tabla periódica?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La tabla periódica actual tiene 118 elementos confirmados, del hidrógeno (H, número atómico 1) al oganesón (Og, número atómico 118). Los elementos del 1 al 94 se encuentran en la naturaleza; los elementos del 95 al 118 son sintéticos, producidos en reactores o aceleradores de partículas. Sus semividas (periodos de semidesintegración) van de millones de años en los primeros de ese tramo (el curio-247, unos 15,6 millones de años) a fracciones de segundo en los más pesados.',
+        text: RESPUESTA_FAQ_CUANTOS,
       },
     },
     {

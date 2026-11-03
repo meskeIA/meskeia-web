@@ -28,6 +28,7 @@ import {
   type TipoHerencia,
 } from './casos';
 import CasosAula from './CasosAula';
+import { RESPUESTA_FAQ_GENOTIPO_FENOTIPO, RESPUESTA_FAQ_PASO_A_PASO, RESPUESTA_FAQ_PROPORCIONES } from './metadata';
 
 // ============================================================
 // TIPOS
@@ -609,33 +610,15 @@ export default function SimuladorPunnettPage() {
           <ul className={styles.faqList} aria-label="Preguntas frecuentes sobre genética">
             <li className={styles.faqItem}>
               <strong>¿Cómo se hace un cuadro de Punnett paso a paso?</strong>
-              <p className={styles.faqTip}>
-                Escribe el genotipo de cada progenitor (ej: Aa × Aa) y sus gametos posibles.
-                Coloca los de un progenitor en las <strong>filas</strong> y los del otro en las
-                <strong> columnas</strong>, rellena cada celda combinando ambos gametos (ordenando
-                la mayúscula primero) y cuenta los genotipos para agruparlos por fenotipo. Esta
-                <strong> tabla de Punnett online</strong> dibuja el cuadro y hace el recuento
-                automáticamente al elegir los genotipos.
-              </p>
+              <p className={styles.faqTip}>{RESPUESTA_FAQ_PASO_A_PASO}</p>
             </li>
             <li className={styles.faqItem}>
               <strong>¿Qué proporciones da un cruce monohíbrido (3:1) y uno dihíbrido (9:3:3:1)?</strong>
-              <p className={styles.faqTip}>
-                Un <strong>cruce monohíbrido</strong> Aa × Aa da una proporción fenotípica
-                <strong> 3:1</strong> (y genotípica 1:2:1). Un <strong>cruce dihíbrido</strong>
-                {' '}AaBb × AaBb da la proporción fenotípica clásica <strong>9:3:3:1</strong> en sus
-                16 celdas. Un <strong>trihíbrido</strong> (3 genes) AaBbCc × AaBbCc implica 8 × 8 = 64
-                combinaciones y produce la razón 27:9:9:9:3:3:3:1.
-              </p>
+              <p className={styles.faqTip}>{RESPUESTA_FAQ_PROPORCIONES}</p>
             </li>
             <li className={styles.faqItem}>
               <strong>¿Cómo se pasa de genotipo a fenotipo?</strong>
-              <p className={styles.faqTip}>
-                En dominancia completa basta un alelo dominante para expresar el fenotipo dominante:
-                AA y Aa muestran el mismo carácter y solo aa muestra el recesivo. Por eso la
-                proporción genotípica 1:2:1 se convierte en la fenotípica 3:1. En dominancia
-                incompleta o codominancia, el heterocigoto Aa presenta su propio fenotipo intermedio o mixto.
-              </p>
+              <p className={styles.faqTip}>{RESPUESTA_FAQ_GENOTIPO_FENOTIPO}</p>
             </li>
             <li className={styles.faqItem}>
               <strong>¿Qué diferencia hay entre genotipo y fenotipo?</strong>
