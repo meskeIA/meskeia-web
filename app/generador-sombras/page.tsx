@@ -285,7 +285,7 @@ export default function GeneradorSombrasPage() {
 
           {/* Tipo de sombra */}
           <div className={styles.controlGroup}>
-            <label id="tipo-sombra-label" className={styles.label}>Tipo de Sombra</label>
+            <span id="tipo-sombra-label" className={styles.label}>Tipo de Sombra</span>
             <div role="group" aria-labelledby="tipo-sombra-label" className={styles.typeTabs}>
               <button
                 type="button"
@@ -309,7 +309,8 @@ export default function GeneradorSombrasPage() {
           {/* Capas */}
           <div className={styles.controlGroup}>
             <div className={styles.layersHeader}>
-              <label className={styles.label}>Capas ({layers.length}/5)</label>
+              {/* Rótulo del grupo de pestañas, no de un control: <span> y aria-labelledby (C0595). */}
+              <span id="capas-titulo" className={styles.label}>Capas ({layers.length}/5)</span>
               <button
                 type="button"
                 onClick={addLayer}
@@ -320,22 +321,28 @@ export default function GeneradorSombrasPage() {
               </button>
             </div>
 
-            <div className={styles.layerTabs}>
+            {/* Cada capa se elige con un <button> (C0595): eran <div onClick>, sin rol ni foco,
+                y con teclado no había forma de pasar a otra capa. */}
+            <div className={styles.layerTabs} role="group" aria-labelledby="capas-titulo">
               {layers.map((layer, index) => (
                 <div
                   key={layer.id}
                   className={`${styles.layerTab} ${activeLayer === layer.id ? styles.layerActive : ''}`}
-                  onClick={() => setActiveLayer(layer.id)}
                 >
-                  <span>Capa {index + 1}</span>
+                  <button
+                    type="button"
+                    className={styles.layerSelectBtn}
+                    aria-pressed={activeLayer === layer.id}
+                    onClick={() => setActiveLayer(layer.id)}
+                  >
+                    Capa {index + 1}
+                  </button>
                   {layers.length > 1 && (
                     <button
                       type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        removeLayer(layer.id);
-                      }}
+                      onClick={() => removeLayer(layer.id)}
                       className={styles.removeLayerBtn}
+                      aria-label={`Eliminar capa ${index + 1}`}
                     >
                       ×
                     </button>
