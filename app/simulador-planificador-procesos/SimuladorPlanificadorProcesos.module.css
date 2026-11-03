@@ -366,6 +366,14 @@
   fill: #cbd5e1;
 }
 
+/* Los tramos del Gantt en texto: un bloque estrecho no lleva rótulo (hallazgo 3973) */
+.ganttSecuencia {
+  margin: var(--spacing-sm, 0.5rem) 0 0;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
 [data-theme='dark'] .ganttIdle {
   fill: #475569;
 }

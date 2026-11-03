@@ -1120,15 +1120,21 @@ for (const perfil of PERFILES_C0078) {
   test.describe(`simulador-planificador-procesos · cabo C0078 · ${perfil.nombre}`, () => {
     test.use(perfil.uso);
 
-    test('control · CASO 1 del cabo: P1 [0; 0,4] mide 24,62 px y va sin rótulo, pero «0» y «0,4» no se pisan', async ({
+    test('control · CASO 1 del cabo: P1 [0; 0,4] mide 24,62 px y va sin rótulo pero con su <title>, y «0» y «0,4» no se pisan', async ({
       page,
     }) => {
       const { procesos, marcas, anchos } = CASOS_C0078.caso1;
       await abrirConSrtf(page, procesos, marcas);
       const medido = await medirGantt(page);
       expect(medido.bloques.map((b) => b.ancho)).toEqual(anchos);
-      expect(medido.bloques[0].identificacion).toBe('');
-      expect(medido.bloques.slice(1).map((b) => b.identificacion)).toEqual(['P2', 'P3', 'P2', 'P1']);
+      // Sin rótulo visible (< 25 px), identificado solo por su <title> (hallazgo 3973)
+      expect(medido.bloques[0].identificacion).toBe('P1 [0; 0,4]');
+      expect(medido.bloques.slice(1).map((b) => b.identificacion)).toEqual([
+        'P2 P2 [0,4; 1]',
+        'P3 P3 [1; 2]',
+        'P2 P2 [2; 5,4]',
+        'P1 P1 [5,4; 13]',
+      ]);
       expect(marcasQueSePisan(medido.marcas)).toEqual([]);
     });
 
@@ -1149,32 +1155,42 @@ for (const perfil of PERFILES_C0078) {
     });
 
     /**
-     * HALLAZGO ABIERTO (accesibilidad/medio) · CASO 3 — el bloque P1 [2; 2,1] mide 4 px y no lleva
-     * rótulo, ni <title>, ni aria-label: qué proceso ocupa ese tramo solo lo dice su color (WCAG
-     * 1.4.1), en una franja de 4 px pegada a P2, y ese tramo no está en la tabla.
-     * Esperado: el bloque se identifica como P1 (rótulo o <title> con su proceso y su intervalo).
-     * Obtenido: nada.
+     * HALLAZGO 3973 (accesibilidad/medio, REPARADO) · CASO 3 — el bloque P1 [2; 2,1] mide 4 px y
+     * no llevaba rótulo, ni <title>, ni aria-label: qué proceso ocupa ese tramo solo lo decía su
+     * color (WCAG 1.4.1), y ese tramo no está en la tabla. Ahora cada bloque lleva un <title> con
+     * su proceso y su intervalo, y bajo el diagrama sale la secuencia en texto (aria-describedby).
      */
-    test('HALLAZGO · el tramo estrecho P1 [2; 2,1] dice qué proceso es', async ({ page }) => {
-      test.fail(); // ABIERTO: bloque de 4 px sin rótulo, sin <title> y sin aria-label
+    test('HALLAZGO 3973 (REPARADO) · el tramo estrecho P1 [2; 2,1] dice qué proceso es', async ({ page }) => {
       const { procesos, marcas } = CASOS_C0078.caso3;
       await abrirConSrtf(page, procesos, marcas);
       const tramo = (await medirGantt(page)).bloques[2];
       expect(tramo.ancho).toBe(4);
-      expect(tramo.identificacion).toMatch(/P1/);
+      expect(tramo.identificacion).toBe('P1 [2; 2,1]');
+      const secuencia = page.locator('#gantt-secuencia');
+      await expect(secuencia).toHaveText(
+        'Secuencia en la CPU: P1 [0; 1] · P2 [1; 2] · P1 [2; 2,1] · P3 [2,1; 3,1] · P1 [3,1; 22]',
+      );
+      await expect(page.locator('svg[aria-label="Diagrama de Gantt de la planificación"]')).toHaveAttribute(
+        'aria-describedby',
+        'gantt-secuencia',
+      );
     });
 
     /**
-     * HALLAZGO ABIERTO (operativa/bajo) · CASO 2 — las marcas «0», «0,1» y «0,2» del eje se pisan
-     * (centros a 4 px, 11 px de monoespaciada): no se lee ninguna. Sus valores sí están en la
-     * tabla (inicios de P1, P2 y P3). En el CASO 3 pasa igual con «2» y «2,1».
-     * Esperado: ninguna pareja de marcas se corta. Obtenido: «0»/«0,1» 6,06 px, «0»/«0,2» 4,11 px
-     * y «0,1»/«0,2» 14,16 px.
+     * HALLAZGO 3974 (operativa/bajo, REPARADO) · CASO 2 — las marcas «0», «0,1» y «0,2» del eje se
+     * pisaban (centros a 4 px): no se leía ninguna. En el CASO 3, «2» y «2,1». Ahora cada marca va
+     * en la primera fila del eje donde no pisa a otra.
      */
-    test('HALLAZGO · las marcas del eje no se pisan con cortes a 0,1 ut', async ({ page }) => {
-      test.fail(); // ABIERTO: «0», «0,1» y «0,2» se dibujan unas encima de otras
-      const { procesos, marcas } = CASOS_C0078.caso2;
-      await abrirConSrtf(page, procesos, marcas);
+    test('HALLAZGO 3974 (REPARADO) · las marcas del eje no se pisan con cortes a 0,1 ut', async ({ page }) => {
+      const { caso2, caso3 } = CASOS_C0078;
+      await abrirConSrtf(page, caso2.procesos, caso2.marcas);
+      const medido2 = await medirGantt(page);
+      expect(marcasQueSePisan(medido2.marcas)).toEqual([]);
+      // Ninguna marca se sale del dibujo
+      const caja = await page.locator('svg[aria-label="Diagrama de Gantt de la planificación"]').boundingBox();
+      for (const m of medido2.marcas) expect(m.abajo, m.texto).toBeLessThanOrEqual((caja?.y ?? 0) + (caja?.height ?? 0) + 1);
+
+      await abrirConSrtf(page, caso3.procesos, caso3.marcas);
       expect(marcasQueSePisan((await medirGantt(page)).marcas)).toEqual([]);
     });
   });

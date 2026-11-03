@@ -839,12 +839,42 @@ export default function SimuladorPlanificadorProcesos() {
   }, []);
 
   // Gantt SVG dimensions
-  const ganttHeight = 90;
   const ganttPaddingTop = 10;
   const ganttBlockHeight = 50;
   const tiempoTotal = resultado.tiempoTotal;
   const escalaPx = tiempoTotal > 0 ? Math.max(40, Math.min(80, 800 / tiempoTotal)) : 50;
   const ganttWidth = Math.max(600, tiempoTotal * escalaPx + 40);
+
+  // Marcas del eje en filas: dos cortes a 0,1-0,3 ut (4-12 px) se dibujaban una encima de otra
+  // y no se leía ninguna (hallazgo 3974). Cada marca va en la primera fila donde no pisa a la
+  // anterior; el ancho se estima por lo alto (11 px de monoespaciada ≈ 7 px por carácter).
+  const ANCHO_CARACTER_MARCA = 7;
+  const HUECO_MARCAS = 3;
+  const ALTO_FILA_MARCAS = 13;
+  const bloquesVisibles = resultado.bloques.filter((b) => b.fin - b.inicio > 0);
+  const marcasEje = [
+    ...bloquesVisibles.map((b) => ({ x: b.inicio * escalaPx + 20, texto: formatTiempo(b.inicio) })),
+    ...(bloquesVisibles.length > 0
+      ? [{ x: bloquesVisibles[bloquesVisibles.length - 1].fin * escalaPx + 20, texto: formatTiempo(bloquesVisibles[bloquesVisibles.length - 1].fin) }]
+      : []),
+  ];
+  const finDeFila: number[] = [];
+  const filaDeMarca = marcasEje.map(({ x, texto }) => {
+    const medio = (texto.length * ANCHO_CARACTER_MARCA) / 2;
+    let fila = finDeFila.findIndex((fin) => x - medio >= fin + HUECO_MARCAS);
+    if (fila === -1) fila = finDeFila.length;
+    finDeFila[fila] = x + medio;
+    return fila;
+  });
+  const filasMarcas = Math.max(1, finDeFila.length);
+  const yMarca = (fila: number) => ganttPaddingTop + ganttBlockHeight + 18 + fila * ALTO_FILA_MARCAS;
+  const ganttHeight = 90 + (filasMarcas - 1) * ALTO_FILA_MARCAS;
+
+  // Qué proceso ocupa cada tramo, en texto: un bloque de menos de 25 px va sin rótulo y solo lo
+  // decía su color, y un tramo intermedio de un proceso apropiado no está en la tabla (hallazgo 3973)
+  const nombreTramo = (b: { pid: string; inicio: number; fin: number }) =>
+    `${b.pid === 'idle' ? 'CPU ociosa' : b.pid} [${formatTiempo(b.inicio)}; ${formatTiempo(b.fin)}]`;
+  const secuenciaGantt = `Secuencia en la CPU: ${bloquesVisibles.map(nombreTramo).join(' · ')}`;
 
   return (
     <div className={styles.container}>
@@ -1100,58 +1130,55 @@ export default function SimuladorPlanificadorProcesos() {
           {resultado.bloques.length === 0 ? (
             <p style={{ color: 'var(--text-secondary)' }}>Añade procesos para ver el resultado.</p>
           ) : (
-            <svg
-              className={styles.ganttSvg}
-              width={ganttWidth}
-              height={ganttHeight}
-              viewBox={`0 0 ${ganttWidth} ${ganttHeight}`}
-              role="img"
-              aria-label="Diagrama de Gantt de la planificación"
-            >
-              {resultado.bloques.map((b, i) => {
-                const x = b.inicio * escalaPx + 20;
-                const w = (b.fin - b.inicio) * escalaPx;
-                if (w <= 0) return null;
-                return (
-                  <g key={`${b.pid}-${i}`}>
-                    <rect
-                      x={x}
-                      y={ganttPaddingTop}
-                      width={w}
-                      height={ganttBlockHeight}
-                      fill={b.color}
-                      className={b.pid === 'idle' ? styles.ganttIdle : styles.ganttBlock}
-                    />
-                    {w >= 25 && (
-                      <text
-                        x={x + w / 2}
-                        y={ganttPaddingTop + ganttBlockHeight / 2 + 5}
-                        className={styles.ganttLabel}
-                        fill={b.pid === 'idle' ? 'var(--text-secondary)' : 'white'}
-                      >
-                        {b.pid === 'idle' ? '—' : b.pid}
+            <>
+              <svg
+                className={styles.ganttSvg}
+                width={ganttWidth}
+                height={ganttHeight}
+                viewBox={`0 0 ${ganttWidth} ${ganttHeight}`}
+                role="img"
+                aria-label="Diagrama de Gantt de la planificación"
+                aria-describedby="gantt-secuencia"
+              >
+                {bloquesVisibles.map((b, i) => {
+                  const x = b.inicio * escalaPx + 20;
+                  const w = (b.fin - b.inicio) * escalaPx;
+                  const ultimo = i === bloquesVisibles.length - 1;
+                  return (
+                    <g key={`${b.pid}-${i}`}>
+                      <title>{nombreTramo(b)}</title>
+                      <rect
+                        x={x}
+                        y={ganttPaddingTop}
+                        width={w}
+                        height={ganttBlockHeight}
+                        fill={b.color}
+                        className={b.pid === 'idle' ? styles.ganttIdle : styles.ganttBlock}
+                      />
+                      {w >= 25 && (
+                        <text
+                          x={x + w / 2}
+                          y={ganttPaddingTop + ganttBlockHeight / 2 + 5}
+                          className={styles.ganttLabel}
+                          fill={b.pid === 'idle' ? 'var(--text-secondary)' : 'white'}
+                        >
+                          {b.pid === 'idle' ? '—' : b.pid}
+                        </text>
+                      )}
+                      <text x={x} y={yMarca(filaDeMarca[i])} className={styles.ganttTimestamp}>
+                        {formatTiempo(b.inicio)}
                       </text>
-                    )}
-                    <text
-                      x={x}
-                      y={ganttPaddingTop + ganttBlockHeight + 18}
-                      className={styles.ganttTimestamp}
-                    >
-                      {formatTiempo(b.inicio)}
-                    </text>
-                    {i === resultado.bloques.length - 1 && (
-                      <text
-                        x={x + w}
-                        y={ganttPaddingTop + ganttBlockHeight + 18}
-                        className={styles.ganttTimestamp}
-                      >
-                        {formatTiempo(b.fin)}
-                      </text>
-                    )}
-                  </g>
-                );
-              })}
-            </svg>
+                      {ultimo && (
+                        <text x={x + w} y={yMarca(filaDeMarca[i + 1])} className={styles.ganttTimestamp}>
+                          {formatTiempo(b.fin)}
+                        </text>
+                      )}
+                    </g>
+                  );
+                })}
+              </svg>
+              <p id="gantt-secuencia" className={styles.ganttSecuencia}>{secuenciaGantt}</p>
+            </>
           )}
         </div>
 
