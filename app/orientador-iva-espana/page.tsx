@@ -22,6 +22,7 @@ import {
   UMBRAL_OSS,
   FISCAL_IVA_META,
 } from '@/data/fiscal';
+import { RESPUESTA_FAQ_EXPORTACIONES, RESPUESTA_FAQ_INVERSION, RESPUESTA_FAQ_UE } from './metadata';
 
 // ─── Tipos del selector ────────────────────────────────────────────────────────
 
@@ -932,29 +933,15 @@ export default function OrientadorIvaEspanaPage() {
             </div>
             <div className={styles.faqItem}>
               <dt>¿Tengo que poner IVA si facturo a una empresa de otro país de la UE?</dt>
-              <dd>
-                No, si se cumplen los requisitos. En una entrega intracomunitaria de bienes o un servicio B2B facturas sin IVA y el cliente
-                autorrepercute en su país (inversión del sujeto pasivo). El cliente debe tener un <strong>NIF-IVA válido en VIES</strong>, tú debes
-                estar en el <strong>ROI</strong> y presentar el <strong>modelo 349</strong>.
-              </dd>
+              <dd>{RESPUESTA_FAQ_UE}</dd>
             </div>
             <div className={styles.faqItem}>
               <dt>¿Las exportaciones llevan IVA?</dt>
-              <dd>
-                No. Las exportaciones de bienes fuera de la UE están exentas (art. 21 LIVA). Es una exención <strong>plena</strong>: facturas sin
-                IVA pero conservas el derecho a deducir el IVA soportado. Necesitas el DUA que pruebe la salida. Enviar bienes a Canarias, Ceuta o
-                Melilla también cuenta como exportación; prestarles servicios, no: a un particular de allí se le factura, en general, con IVA
-                español (art. 69 LIVA). Salvo los servicios electrónicos, de telecomunicaciones y de radiodifusión, que no llevan IVA español si
-                el particular reside allí (art. 70.Uno.4.º LIVA): en Canarias tributan por IGIC (art. 17 Ley 20/1991).
-              </dd>
+              <dd>{RESPUESTA_FAQ_EXPORTACIONES}</dd>
             </div>
             <div className={styles.faqItem}>
               <dt>¿Qué es la inversión del sujeto pasivo?</dt>
-              <dd>
-                Es cuando quien declara el IVA no es el vendedor, sino el comprador. El vendedor factura sin IVA y el comprador lo "autorrepercute":
-                lo declara a la vez como IVA devengado y soportado, con efecto neto cero si es deducible. Aparece en adquisiciones intracomunitarias,
-                servicios recibidos del extranjero y operaciones interiores como ejecuciones de obra inmobiliaria o entrega de chatarra.
-              </dd>
+              <dd>{RESPUESTA_FAQ_INVERSION}</dd>
             </div>
             <div className={styles.faqItem}>
               <dt>¿Quién está exento de aplicar IVA?</dt>

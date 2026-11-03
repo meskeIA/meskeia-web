@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { generateWebAppSchema } from '@/lib/schema-templates';
+import { generateWebAppSchema, type FAQItem } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Orientador de Ayudas para Autónomos y Pymes — Subvenciones y Financiación | meskeIA',
@@ -56,49 +56,38 @@ export const jsonLd = generateWebAppSchema({
   keywords: ['ayudas autónomos', 'subvenciones pymes', 'financiación emprendedores', 'Kit Digital', 'avales ICO', 'BDNS'],
 });
 
+// Una sola fuente para el FAQPage y la FAQ visible de page.tsx (check:faq-unica, cabo C0570,
+// 03/11/2026). Las dos copias decían lo mismo; se quedó el texto del JSON-LD, que añadía «o de
+// Seguridad Social» y «la duración o cuantía». Ningún dato cambia.
+export const PREGUNTAS_FRECUENTES: FAQItem[] = [
+  {
+    question: '¿Qué ayudas existen para quien se da de alta como autónomo por primera vez?',
+    answer: 'Las más habituales son la tarifa plana en la cuota de autónomos (con extensiones según tu perfil), la capitalización de la prestación por desempleo si la tenías reconocida, y el asesoramiento gratuito de las Cámaras de Comercio. Mujeres, jóvenes, mayores de 45, personas con discapacidad o residentes en zonas rurales pueden acceder a duraciones o cuantías ampliadas en varias de estas ayudas.',
+  },
+  {
+    question: '¿Dónde puedo consultar las convocatorias de subvenciones activas en España?',
+    answer: 'La Base de Datos Nacional de Subvenciones (BDNS), en infosubvenciones.es, es el registro oficial donde se publican todas las convocatorias activas de cualquier administración: estatal, autonómica y local. Permite filtrar por tipo de beneficiario, sector y fecha, y es la fuente más fiable porque las convocatorias cambian varias veces al año.',
+  },
+  {
+    question: '¿Qué diferencia hay entre una subvención, un préstamo, un aval y una bonificación?',
+    answer: 'Una subvención suele cubrir parte del coste de un proyecto sin devolución. Un préstamo (como los de ENISA) hay que devolverlo, aunque en condiciones más favorables que un banco. Un aval (como el de ICO) no es dinero: es una garantía que facilita que el banco te conceda financiación. Una bonificación reduce lo que pagas (por ejemplo, tu cuota de autónomo o de Seguridad Social) y una deducción fiscal reduce el impuesto que pagas en tu declaración.',
+  },
+  {
+    question: '¿Hay ayudas específicas para mujeres, jóvenes o personas con discapacidad que emprenden?',
+    answer: 'Sí. Existen programas como el PAEM (Programa de Apoyo Empresarial a las Mujeres) gestionado por las Cámaras de Comercio, líneas de ENISA orientadas a jóvenes emprendedores, y financiación específica de Fundación ONCE para personas con discapacidad. Además, varios de estos colectivos acceden a extensiones en la duración o cuantía de la tarifa plana de autónomos y a bonificaciones reforzadas en la contratación.',
+  },
+  {
+    question: '¿Las ayudas autonómicas son compatibles con las ayudas estatales o europeas?',
+    answer: 'En muchos casos sí, pero depende de las bases reguladoras de cada convocatoria, que pueden establecer límites de acumulación o exigir que el conjunto de ayudas no supere un determinado porcentaje de la inversión. Antes de solicitar varias ayudas a la vez, conviene revisar las condiciones de compatibilidad de cada una en su convocatoria oficial.',
+  },
+];
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
-  mainEntity: [
-    {
-      '@type': 'Question',
-      name: '¿Qué ayudas existen para quien se da de alta como autónomo por primera vez?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'Las más habituales son la tarifa plana en la cuota de autónomos (con extensiones según tu perfil), la capitalización de la prestación por desempleo si la tenías reconocida, y el asesoramiento gratuito de las Cámaras de Comercio. Mujeres, jóvenes, mayores de 45, personas con discapacidad o residentes en zonas rurales pueden acceder a duraciones o cuantías ampliadas en varias de estas ayudas.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: '¿Dónde puedo consultar las convocatorias de subvenciones activas en España?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'La Base de Datos Nacional de Subvenciones (BDNS), en infosubvenciones.es, es el registro oficial donde se publican todas las convocatorias activas de cualquier administración: estatal, autonómica y local. Permite filtrar por tipo de beneficiario, sector y fecha, y es la fuente más fiable porque las convocatorias cambian varias veces al año.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: '¿Qué diferencia hay entre una subvención, un préstamo, un aval y una bonificación?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'Una subvención suele cubrir parte del coste de un proyecto sin devolución. Un préstamo (como los de ENISA) hay que devolverlo, aunque en condiciones más favorables que un banco. Un aval (como el de ICO) no es dinero: es una garantía que facilita que el banco te conceda financiación. Una bonificación reduce lo que pagas (por ejemplo, tu cuota de autónomo o de Seguridad Social) y una deducción fiscal reduce el impuesto que pagas en tu declaración.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: '¿Hay ayudas específicas para mujeres, jóvenes o personas con discapacidad que emprenden?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'Sí. Existen programas como el PAEM (Programa de Apoyo Empresarial a las Mujeres) gestionado por las Cámaras de Comercio, líneas de ENISA orientadas a jóvenes emprendedores, y financiación específica de Fundación ONCE para personas con discapacidad. Además, varios de estos colectivos acceden a extensiones en la duración o cuantía de la tarifa plana de autónomos y a bonificaciones reforzadas en la contratación.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: '¿Las ayudas autonómicas son compatibles con las ayudas estatales o europeas?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'En muchos casos sí, pero depende de las bases reguladoras de cada convocatoria, que pueden establecer límites de acumulación o exigir que el conjunto de ayudas no supere un determinado porcentaje de la inversión. Antes de solicitar varias ayudas a la vez, conviene revisar las condiciones de compatibilidad de cada una en su convocatoria oficial.',
-      },
-    },
-  ],
+  mainEntity: PREGUNTAS_FRECUENTES.map((f) => ({
+    '@type': 'Question',
+    name: f.question,
+    acceptedAnswer: { '@type': 'Answer', text: f.answer },
+  })),
 };

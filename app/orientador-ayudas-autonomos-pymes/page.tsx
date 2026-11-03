@@ -20,6 +20,7 @@ import {
   type ObjetivoAyuda,
   type PerfilAyuda,
 } from '@/data/fiscal';
+import { PREGUNTAS_FRECUENTES } from './metadata';
 
 const FIGURAS: { id: FiguraNegocio; icono: string; titulo: string; subtitulo: string }[] = [
   { id: 'nueva', icono: '🌱', titulo: 'Voy a empezar', subtitulo: 'Alta nueva o menos de 1 año de actividad' },
@@ -334,52 +335,12 @@ export default function OrientadorAyudasAutonomosPymesPage() {
         <section className={styles.guideSection}>
           <h2>Preguntas frecuentes</h2>
           <div className={styles.faqGrid}>
-            <div className={styles.faqItem}>
-              <h3>¿Qué ayudas existen para quien se da de alta como autónomo por primera vez?</h3>
-              <p>
-                Las más habituales son la tarifa plana en la cuota de autónomos (con extensiones según tu perfil), la
-                capitalización de la prestación por desempleo si la tenías reconocida, y el asesoramiento gratuito de
-                las Cámaras de Comercio. Mujeres, jóvenes, mayores de 45, personas con discapacidad o residentes en
-                zonas rurales pueden acceder a duraciones o cuantías ampliadas en varias de estas ayudas.
-              </p>
-            </div>
-            <div className={styles.faqItem}>
-              <h3>¿Dónde puedo consultar las convocatorias de subvenciones activas en España?</h3>
-              <p>
-                La Base de Datos Nacional de Subvenciones (BDNS), en infosubvenciones.es, es el registro oficial donde
-                se publican todas las convocatorias activas de cualquier administración: estatal, autonómica y local.
-                Permite filtrar por tipo de beneficiario, sector y fecha, y es la fuente más fiable porque las
-                convocatorias cambian varias veces al año.
-              </p>
-            </div>
-            <div className={styles.faqItem}>
-              <h3>¿Qué diferencia hay entre una subvención, un préstamo, un aval y una bonificación?</h3>
-              <p>
-                Una subvención suele cubrir parte del coste de un proyecto sin devolución. Un préstamo (como los de
-                ENISA) hay que devolverlo, aunque en condiciones más favorables que un banco. Un aval (como el de ICO)
-                no es dinero: es una garantía que facilita que el banco te conceda financiación. Una bonificación reduce
-                lo que pagas (por ejemplo, tu cuota de autónomo) y una deducción fiscal reduce el impuesto que pagas en
-                tu declaración.
-              </p>
-            </div>
-            <div className={styles.faqItem}>
-              <h3>¿Hay ayudas específicas para mujeres, jóvenes o personas con discapacidad que emprenden?</h3>
-              <p>
-                Sí. Existen programas como el PAEM (Programa de Apoyo Empresarial a las Mujeres) gestionado por las
-                Cámaras de Comercio, líneas de ENISA orientadas a jóvenes emprendedores, y financiación específica de
-                Fundación ONCE para personas con discapacidad. Además, varios de estos colectivos acceden a extensiones
-                en la tarifa plana de autónomos y a bonificaciones reforzadas en la contratación.
-              </p>
-            </div>
-            <div className={styles.faqItem}>
-              <h3>¿Las ayudas autonómicas son compatibles con las ayudas estatales o europeas?</h3>
-              <p>
-                En muchos casos sí, pero depende de las bases reguladoras de cada convocatoria, que pueden establecer
-                límites de acumulación o exigir que el conjunto de ayudas no supere un determinado porcentaje de la
-                inversión. Antes de solicitar varias ayudas a la vez, conviene revisar las condiciones de
-                compatibilidad de cada una en su convocatoria oficial.
-              </p>
-            </div>
+            {PREGUNTAS_FRECUENTES.map((f) => (
+              <div key={f.question} className={styles.faqItem}>
+                <h3>{f.question}</h3>
+                <p>{f.answer}</p>
+              </div>
+            ))}
           </div>
         </section>
 
