@@ -12,6 +12,7 @@ import {
   type Mineral,
   type MineralCategoria,
 } from '@/data/minerals';
+import { RESPUESTA_FAQ_ABUNDANTES } from './metadata';
 
 export default function MineralesDelMundoPage() {
   const [busqueda, setBusqueda] = useState('');
@@ -560,7 +561,7 @@ export default function MineralesDelMundoPage() {
             </li>
             <li className={styles.faqItem}>
               <strong>¿Cuáles son los minerales más abundantes en la corteza terrestre?</strong>
-              <p>Los silicatos dominan con ~90 % de la corteza. Dentro de ellos, los <strong>feldespatos</strong> (ortosa, plagioclasa) son los más comunes (~60 % de la corteza), seguidos del <strong>cuarzo</strong> (~12 %), las <strong>micas</strong> y los <strong>piroxenos/anfíboles</strong>. Fuera de los silicatos, la <strong>calcita</strong> y la <strong>dolomita</strong> forman la mayor parte de las rocas sedimentarias carbonatadas.</p>
+              <p>{RESPUESTA_FAQ_ABUNDANTES}</p>
             </li>
             <li className={styles.faqItem}>
               <strong>¿Cuál es la diferencia entre mineral y cristal?</strong>

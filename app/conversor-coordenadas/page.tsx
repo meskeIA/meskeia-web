@@ -12,6 +12,7 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
+import { RESPUESTA_FAQ_DATUM } from './metadata';
 import {
   aUTM,
   aMGRS,
@@ -489,13 +490,7 @@ export default function ConversorCoordenadasPage() {
         <div className={styles.faqList}>
           <details className={styles.faqItem}>
             <summary>¿Por qué mis coordenadas antiguas no coinciden con las del GPS?</summary>
-            <p>
-              Casi siempre es el datum. La cartografía española anterior a 2007 usa ED50 y la actual
-              usa ETRS89, que a efectos prácticos coincide con el WGS84 de los GPS. El mismo punto
-              tiene coordenadas distintas en cada sistema y la diferencia ronda los 200 metros en la
-              Península. Esta herramienta trabaja en ETRS89/WGS84: si tu fuente es ED50, hay que
-              transformarla antes con los parámetros oficiales del IGN.
-            </p>
+            <p>{RESPUESTA_FAQ_DATUM}</p>
           </details>
           <details className={styles.faqItem}>
             <summary>¿Qué precisión tiene cada número de decimales?</summary>

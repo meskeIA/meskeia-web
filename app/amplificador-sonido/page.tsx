@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './AmplificadorSonido.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, EducationalSection, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { formatNumber } from '@/lib';
+import { RESPUESTA_FAQ_SEGURO_OIDO } from './metadata';
 
 // Parámetros del amplificador
 const GAIN_MAX = 12;        // ganancia máxima (×12 sobre la señal del micrófono)
@@ -497,11 +498,7 @@ export default function AmplificadorSonidoPage() {
             </li>
             <li className={styles.faqItem}>
               <strong>¿Es seguro para el oído?</strong>
-              <p>
-                Siempre que mantengas el volumen moderado. Una amplificación alta y prolongada puede
-                dañar la audición, igual que la música muy fuerte. Empieza con la ganancia baja y
-                súbela poco a poco hasta oír con comodidad.
-              </p>
+              <p>{RESPUESTA_FAQ_SEGURO_OIDO}</p>
             </li>
             <li className={styles.faqItem}>
               <strong>¿Funciona sin conexión a internet?</strong>

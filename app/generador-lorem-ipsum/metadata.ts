@@ -39,6 +39,12 @@ export const jsonLd = generateWebAppSchema({
   features: [],
 });
 
+// La pregunta que está también en la FAQ visible de page.tsx: una sola respuesta para las dos
+// (check:faq-unica, cabo C0570). Se quedó la visible, con la cita traducida, y la obra de la que
+// sale, que solo nombraba el JSON-LD.
+export const RESPUESTA_FAQ_SIGNIFICADO =
+  'Sí, aunque está alterado. Sale de «De Finibus Bonorum et Malorum», el tratado de Cicerón sobre el placer y el dolor como criterios del bien y del mal. El texto original dice aproximadamente «Ningún hombre sabio ama el dolor por sí mismo, lo busca ni lo quiere simplemente porque sea dolor, sino porque a veces llegan circunstancias en que trabajo y dolor pueden procurarle algún placer muy grande». La versión Lorem Ipsum está barajada y mutilada, por lo que resulta incomprensible en latín, que es exactamente la intención: texto que parezca real pero no lo sea.';
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -80,7 +86,7 @@ export const faqJsonLd = {
       name: '¿El Lorem Ipsum tiene algún significado en latín?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El Lorem Ipsum estándar comienza con "Lorem ipsum dolor sit amet, consectetur adipiscing elit..." y es una versión deliberadamente alterada de un texto de Cicerón, con palabras cambiadas para que no tenga un sentido completo y no distraiga. El fragmento original latino, con sentido filosófico, proviene del libro "De Finibus Bonorum et Malorum" y habla sobre el placer y el dolor como criterios del bien y el mal.',
+        text: RESPUESTA_FAQ_SIGNIFICADO,
       },
     },
   ],

@@ -6,6 +6,7 @@ import styles from './Juego2048.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
+import { RESPUESTA_FAQ_ESTRATEGIA } from './metadata';
 
 type Tablero = number[][];
 type Direccion = 'up' | 'down' | 'left' | 'right';
@@ -479,13 +480,7 @@ export default function Juego2048Page() {
             <li className={styles.faqItem}>
               <details>
                 <summary>¿Cuál es la estrategia más efectiva para llegar a 2048?</summary>
-                <p>
-                  La estrategia de la &quot;esquina fija&quot; es la más fiable: elige una esquina
-                  (por ejemplo, inferior izquierda) y nunca muevas la ficha mayor fuera de
-                  ella. Desde esa esquina construye una cadena descendente de fichas a lo
-                  largo del borde: 1024 → 512 → 256 → 128 → 64 → … Evita mover hacia la
-                  dirección que saca la ficha mayor de su esquina.
-                </p>
+                <p>{RESPUESTA_FAQ_ESTRATEGIA}</p>
                 <p className={styles.faqTip}>
                   Dato: dentro de la comunidad de jugadores se considera la estrategia
                   más fiable para alcanzar 2048 en la variante 4×4 clásica.

@@ -5,6 +5,7 @@ import styles from './GeneradorLoremIpsum.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard,
   DisclaimerCard,
 } from '@/components';
+import { RESPUESTA_FAQ_SIGNIFICADO } from './metadata';
 
 // Párrafos de Lorem Ipsum clásicos
 const loremIpsumParrafos = [
@@ -296,7 +297,7 @@ export default function GeneradorLoremIpsumPage() {
             <div className={styles.faqList}>
               <details className={styles.faqItem}>
                 <summary className={styles.faqQuestion}>¿El Lorem Ipsum tiene algún significado en latín?</summary>
-                <p className={styles.faqAnswer}>Sí, aunque está alterado. El texto original de Cicerón dice aproximadamente &quot;Ningún hombre sabio ama el dolor por sí mismo, lo busca ni lo quiere simplemente porque sea dolor, sino porque a veces llegan circunstancias en que trabajo y dolor pueden procurarle algún placer muy grande&quot;. La versión Lorem Ipsum está barajada y mutilada, por lo que resulta incomprensible en latín, que es exactamente la intención: texto que parezca real pero no lo sea.</p>
+                <p className={styles.faqAnswer}>{RESPUESTA_FAQ_SIGNIFICADO}</p>
               </details>
               <details className={styles.faqItem}>
                 <summary className={styles.faqQuestion}>¿Por qué el texto empieza por &quot;Lorem ipsum&quot; y no por el inicio del fragmento de Cicerón?</summary>

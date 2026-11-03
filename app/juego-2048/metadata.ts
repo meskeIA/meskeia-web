@@ -39,6 +39,12 @@ export const jsonLd = generateWebAppSchema({
   features: [],
 });
 
+// La pregunta que está también en la FAQ visible de page.tsx: una sola respuesta para las dos
+// (check:faq-unica, cabo C0570). Se quedó la visible, con el ejemplo de la cadena, y la frase de
+// las fusiones del JSON-LD.
+export const RESPUESTA_FAQ_ESTRATEGIA =
+  'La estrategia de la «esquina fija» es la más fiable: elige una esquina (por ejemplo, inferior izquierda) y nunca muevas la ficha mayor fuera de ella. Desde esa esquina construye una cadena descendente de fichas a lo largo del borde: 1024 → 512 → 256 → 128 → 64 → … Evita mover hacia la dirección que saca la ficha mayor de su esquina. Así se encadenan las fusiones y queda espacio libre en el centro del tablero.';
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -51,7 +57,7 @@ export const faqJsonLd = {
     {
       '@type': 'Question',
       name: '¿Cuál es la estrategia más efectiva para llegar a 2048?',
-      acceptedAnswer: { '@type': 'Answer', text: 'La estrategia más reconocida es mantener la ficha de mayor valor en una esquina y construir una cadena decreciente de fichas a lo largo de los bordes, evitando deslizar en la dirección contraria a esa esquina. Esto maximiza las fusiones y libera espacio en el centro del tablero.' },
+      acceptedAnswer: { '@type': 'Answer', text: RESPUESTA_FAQ_ESTRATEGIA },
     },
     {
       '@type': 'Question',

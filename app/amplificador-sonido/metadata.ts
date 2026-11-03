@@ -57,6 +57,11 @@ export const jsonLd = generateWebAppSchema({
   ],
 });
 
+// La única pregunta que está también en la FAQ visible de page.tsx: una sola respuesta para
+// las dos (check:faq-unica, cabo C0570). Se quedó la del JSON-LD, que añadía qué hacer si molesta.
+export const RESPUESTA_FAQ_SEGURO_OIDO =
+  'Siempre que mantengas el volumen moderado. Una amplificación excesiva y prolongada puede dañar la audición, igual que escuchar música muy alta. Empieza con la ganancia baja y súbela poco a poco hasta oír con comodidad; si notas molestia o pitidos, baja el volumen.';
+
 // FAQPage JSON-LD — visibilidad en Bing Copilot, ChatGPT, Perplexity y Gemini
 export const faqJsonLd = {
   '@context': 'https://schema.org',
@@ -99,7 +104,7 @@ export const faqJsonLd = {
       name: '¿Es seguro para el oído?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Siempre que mantengas el volumen moderado. Una amplificación excesiva y prolongada puede dañar la audición, igual que escuchar música muy alta. Empieza con la ganancia baja y súbela poco a poco hasta oír con comodidad; si notas molestia o pitidos, baja el volumen.',
+        text: RESPUESTA_FAQ_SEGURO_OIDO,
       },
     },
   ],

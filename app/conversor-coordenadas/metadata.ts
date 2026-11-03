@@ -51,6 +51,12 @@ export const jsonLd = generateWebAppSchema({
   ],
 });
 
+// La única pregunta que está también en la FAQ visible de page.tsx: una sola respuesta para las
+// dos (check:faq-unica, cabo C0570). Se quedó la visible, que dice que la herramienta trabaja en
+// ETRS89/WGS84 y no transforma ED50 (el JSON-LD lo callaba), con el consejo de la leyenda del JSON-LD.
+export const RESPUESTA_FAQ_DATUM =
+  'Casi siempre es el datum. La cartografía española anterior a 2007 usa ED50 y la actual usa ETRS89, que a efectos prácticos coincide con el WGS84 de los GPS. El mismo punto tiene coordenadas distintas en cada sistema y la diferencia ronda los 200 metros en la Península. Esta herramienta trabaja en ETRS89/WGS84: si tu fuente es ED50, hay que transformarla antes con los parámetros oficiales del IGN. El datum de un mapa suele venir en su leyenda.';
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -84,7 +90,7 @@ export const faqJsonLd = {
       name: '¿Por qué mis coordenadas antiguas no coinciden con las del GPS?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Casi siempre es un cambio de datum. La cartografía española anterior a 2007 usa ED50 y la actual usa ETRS89, compatible con el WGS84 de los GPS. El mismo punto tiene coordenadas distintas en cada sistema: la diferencia ronda los 200 metros en la Península. Antes de convertir conviene mirar en la leyenda del mapa qué datum emplea.',
+        text: RESPUESTA_FAQ_DATUM,
       },
     },
     {

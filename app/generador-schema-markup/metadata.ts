@@ -39,6 +39,11 @@ export const jsonLd = generateWebAppSchema({
   features: [],
 });
 
+// La pregunta que está también en la FAQ visible de page.tsx: una sola respuesta para las dos
+// (check:faq-unica, cabo C0570). Se quedó la del JSON-LD, con la recomendación final de la visible.
+export const RESPUESTA_FAQ_FORMATOS =
+  'Los tres son formatos para implementar datos estructurados, pero JSON-LD es el recomendado por Google porque se coloca en un bloque separado del HTML (dentro de una etiqueta script) y no interfiere con el código de presentación. Microdata y RDFa requieren anotar directamente los elementos HTML, lo que complica el mantenimiento. La mayoría de los CMS modernos y generadores de sitios estáticos ya soportan JSON-LD de forma nativa: para un proyecto nuevo es la opción más sencilla.';
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -56,7 +61,7 @@ export const faqJsonLd = {
       name: '¿Cuál es la diferencia entre JSON-LD, Microdata y RDFa?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Los tres son formatos para implementar datos estructurados, pero JSON-LD es el recomendado por Google porque se coloca en un bloque separado del HTML (dentro de una etiqueta script) y no interfiere con el código de presentación. Microdata y RDFa requieren anotar directamente los elementos HTML, lo que complica el mantenimiento. La mayoría de los CMS modernos y generadores de sitios estáticos ya soportan JSON-LD de forma nativa.',
+        text: RESPUESTA_FAQ_FORMATOS,
       },
     },
     {

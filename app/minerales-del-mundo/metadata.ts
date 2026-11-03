@@ -42,6 +42,13 @@ export const jsonLd = generateWebAppSchema({
   features: [],
 });
 
+// La pregunta que está también en la FAQ visible de page.tsx: una sola respuesta para las dos
+// (check:faq-unica, cabo C0570). Se quedó la visible: el JSON-LD ponía carbonatos, óxidos y
+// sulfuros como los siguientes en abundancia, y detrás de los feldespatos y el cuarzo vienen
+// las micas, los piroxenos y los anfíboles, que también son silicatos.
+export const RESPUESTA_FAQ_ABUNDANTES =
+  'Los silicatos dominan con ~90 % de la corteza. Dentro de ellos, los feldespatos (ortosa, plagioclasa) son los más comunes (~60 % de la corteza), seguidos del cuarzo (~12 %), las micas y los piroxenos y anfíboles. Fuera de los silicatos, la calcita y la dolomita forman la mayor parte de las rocas sedimentarias carbonatadas.';
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -67,7 +74,7 @@ export const faqJsonLd = {
       name: '¿Cuáles son los minerales más abundantes en la corteza terrestre?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Los silicatos son el grupo más abundante y representan aproximadamente el 90% de la corteza terrestre. Dentro de ellos destacan los feldespatos (oligoclasa, ortoclasa) y el cuarzo. Les siguen en abundancia los carbonatos (calcita, dolomita), los óxidos (magnetita, hematita) y los sulfuros (pirita, galena).',
+        text: RESPUESTA_FAQ_ABUNDANTES,
       },
     },
     {

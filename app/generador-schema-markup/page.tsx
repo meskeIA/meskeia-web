@@ -8,6 +8,7 @@ import { EducationalSection, RelatedApps, LegalNotice, ShareCard,
   DisclaimerCard,
 } from '@/components';
 import { hoyISOLocal } from '@/lib';
+import { RESPUESTA_FAQ_FORMATOS } from './metadata';
 
 type SchemaType = 'article' | 'product' | 'faq' | 'localbusiness' | 'recipe';
 
@@ -1007,14 +1008,7 @@ export default function GeneradorSchemaMarkupPage() {
 
               <li className={styles.faqItem}>
                 <strong className={styles.faqQuestion}>¿Cuál es la diferencia entre JSON-LD, Microdata y RDFa?</strong>
-                <p>
-                  Los tres son formatos para añadir datos estructurados, pero funcionan de manera diferente.
-                  <strong> JSON-LD</strong> es un bloque JavaScript en el &lt;head&gt; o &lt;body&gt; separado del HTML visible —
-                  Google lo recomienda oficialmente desde 2016 por ser más fácil de mantener y no mezclar
-                  lógica con contenido. <strong>Microdata</strong> y <strong>RDFa</strong> se insertan como atributos dentro del
-                  propio HTML, lo que los hace más difíciles de gestionar y actualizar. Para proyectos
-                  nuevos, usa siempre JSON-LD.
-                </p>
+                <p>{RESPUESTA_FAQ_FORMATOS}</p>
                 <div className={styles.faqTip}>
                   Google recomienda JSON-LD oficialmente desde 2016. Es el formato más sencillo de implementar y depurar.
                 </div>
