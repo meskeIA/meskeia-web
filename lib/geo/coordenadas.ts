@@ -7,8 +7,12 @@
  *   DD    grados decimales            40,416775  ·  -3,703790
  *   DMS   grados, minutos, segundos   40°25'00,4"N  3°42'13,6"O
  *   DDM   grados y minutos decimales  40°25,006'N  3°42,227'O   (náutica y aviación)
- *   UTM   proyección transversa       30 T 440252 4474202
- *   MGRS  cuadrícula militar          30T VK 40252 74202        (montaña y rescate)
+ *   UTM   proyección transversa       30 T 440291 4474254
+ *   MGRS  cuadrícula militar          30T VK 40291 74254        (montaña y rescate)
+ *
+ * (La Puerta del Sol, 40,416775 · -3,703790. La UTM y el MGRS son los que fija el golden de
+ * tests/coordenadas.spec.ts, 30 T 440291,28 4474254,60; hasta el 04/11/2026 este ejemplo decía
+ * 440252 4474202, unos 66 m al lado: cabo C0609.)
  *
  * ELIPSOIDE: WGS84. Para España, ETRS89 (el datum oficial desde el RD 1071/2007)
  * es compatible con WGS84 a efectos prácticos: la diferencia entre ambos es
@@ -574,7 +578,7 @@ export function interpretarCoordenada(entrada: string): ResultadoInterpretacion 
     }
   }
 
-  // UTM: 30 T 440252 4474202  ·  30N 440252 4474202
+  // UTM: 30 T 440291 4474254  ·  30N 440291 4474254
   const utm = texto.match(/^(\d{1,2})\s*([C-HJ-NP-XNS])?\s+(-?[\d.,]+)\s*[,;\s]\s*(-?[\d.,]+)$/i);
   if (utm) {
     const zona = parseInt(utm[1], 10);
