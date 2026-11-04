@@ -1,4 +1,4 @@
-import { test, expect, devices, type Page } from '@playwright/test';
+import { test, expect, devices, type Locator, type Page } from '@playwright/test';
 import { calcularResultado, CLAVES, ORDEN_PRIMA, PREGUNTAS, RESULTADOS, type Modalidad } from '../../app/selector-seguro-coche/motor';
 
 /**
@@ -776,7 +776,7 @@ test.describe('Re-inspección 10/10/2026 — teclado, foco, doble toque, móvil 
     await expect(page.getByRole('button', { name: 'Ver guía educativa' })).toHaveCount(1);
   });
 
-  // ── Hallazgos ABIERTOS (inspector 10/10/2026) ───────────────────────────────
+  // ── Hallazgos del inspector 10/10/2026, todos REPARADOS (19 y 24/10/2026) ───
 
   test('teclado de radios (APG): las flechas mueven y marcan, y el grupo es UNA parada de Tab', async ({ page }) => {
     // REPARADO el 19/10/2026 (3132). C0016. Forma del 1681 de selector-smartphone (b0f31109:
@@ -1085,6 +1085,191 @@ test.describe('Re-inspección 10/10/2026 — teclado, foco, doble toque, móvil 
       await page.waitForTimeout(400);
       // Obtenido el 10/10/2026: «Pregunta 6 de 10».
       await expect(page.getByText('Pregunta 7 de 10')).toBeVisible({ timeout: 1_000 });
+    });
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Comprobación puntual del 04/11/2026: «Anterior» y la respuesta marcada (vista de paso al medir
+// el cabo de familia C0479 en las hermanas, sin ráfaga de por medio).
+//
+// Marcar una opción solo cambia `opcionSeleccionada` (handleSeleccionarOpcion); la respuesta se
+// escribe en `respuestas` al pulsar «Siguiente» (handleSiguiente). «Anterior» (handleAnterior,
+// page.tsx l. 190-196) pone en pantalla la respuesta GUARDADA de la pregunta anterior sin guardar
+// la que había marcada, y al volver con «Siguiente» se repone lo guardado (l. 180-184): nada si la
+// pregunta no se había pasado nunca, o la respuesta VIEJA si se había corregido. La referencia de
+// la familia, selector-smartphone, guarda al marcar (`seleccionarOpcion`) y su «Anterior» solo
+// cambia de paso: con las mismas secuencias conserva la marcada y la corregida (medido el
+// 04/11/2026 con clics a 1280 px y con toques a 390 px, igual en las dos apps).
+// ─────────────────────────────────────────────────────────────────────────────
+
+test.describe('Comprobación 04/11/2026 — «Anterior» y la respuesta marcada', () => {
+  const radios = (page: Page) => page.locator('[role="radiogroup"] [role="radio"]');
+  const titulo = (page: Page) => page.locator('[class*="resultadoTitulo"]');
+  const SIGUIENTE = 'Ir a la siguiente pregunta';
+  const ANTERIOR = 'Volver a la pregunta anterior';
+
+  /** Lo que la pregunta en pantalla tiene marcado, y si se puede seguir. */
+  async function estado(page: Page): Promise<{ pregunta: string; marcada: string[]; siguiente: boolean }> {
+    return {
+      pregunta: (await page.locator('[class*="progresoTexto"]').innerText()).trim(),
+      marcada: await page.locator('[role="radiogroup"] [aria-checked="true"] [class*="opcionTexto"]').allInnerTexts(),
+      siguiente: await page.locator('[class*="btnPrimary"]').isEnabled(),
+    };
+  }
+
+  /** Clic o toque suelto (detail 1): espera entre uno y otro para que no cuente como ráfaga. */
+  async function pulsar(page: Page, movil: boolean, objetivo: Locator): Promise<void> {
+    await page.waitForTimeout(movil ? 500 : 0);
+    if (movil) await objetivo.tap();
+    else await objetivo.click();
+  }
+
+  /** P1 «Entre 2 y 5 años» → P2 «Más de 25.000 €» → P3 «No, es de mi propiedad total» → Anterior. */
+  async function marcarP3YVolver(page: Page, movil: boolean): Promise<void> {
+    const boton = (nombre: string) => page.getByRole('button', { name: nombre, exact: true });
+    await pulsar(page, movil, radios(page).nth(1));
+    await pulsar(page, movil, boton(SIGUIENTE));
+    await expect(page.getByText('Pregunta 2 de 10')).toBeVisible();
+    await pulsar(page, movil, radios(page).nth(0));
+    await pulsar(page, movil, boton(SIGUIENTE));
+    await expect(page.getByText('Pregunta 3 de 10')).toBeVisible();
+    await pulsar(page, movil, radios(page).nth(1));
+    await expect.poll(() => estado(page)).toEqual({ pregunta: 'Pregunta 3 de 10', marcada: ['No, es de mi propiedad total'], siguiente: true });
+    await pulsar(page, movil, boton(ANTERIOR));
+    await expect(page.getByText('Pregunta 2 de 10')).toBeVisible();
+  }
+
+  // ── Lo que está bien ────────────────────────────────────────────────────────
+
+  test('la P2 ya pasada conserva su respuesta al volver con «Anterior», con «Siguiente» habilitado', async ({ page }) => {
+    // Medido el 04/11/2026: «Más de 25.000 €» marcada y «Siguiente» habilitado. Vale antes y después
+    // de reparar el caso de abajo: la P2 se guardó al pulsar «Siguiente».
+    await abrirTest(page);
+    await marcarP3YVolver(page, false);
+    await expect.poll(() => estado(page)).toEqual({ pregunta: 'Pregunta 2 de 10', marcada: ['Más de 25.000 €'], siguiente: true });
+  });
+
+  test('motor: el perfil de la corrección de abajo da TR con franquicia con la P3 corregida y TR sin franquicia con la vieja', () => {
+    // Las sumas a mano, en el comentario del caso ABIERTO de la corrección. Aparte y en verde para
+    // que un cambio de pesos no quede tapado por su test.fail().
+    expect(calcularResultado([0, 0, 1, 0, 0, 0, 0, 0, 1, 1]).puntos).toEqual({
+      terceros_basico: 5, terceros_ampliado: 5, todo_riesgo_franquicia: 10, todo_riesgo_sin_franquicia: 9,
+    });
+    expect(calcularResultado([0, 0, 0, 0, 0, 0, 0, 0, 1, 1]).puntos).toEqual({
+      terceros_basico: 4, terceros_ampliado: 4, todo_riesgo_franquicia: 10, todo_riesgo_sin_franquicia: 12,
+    });
+    expect(calcularResultado([0, 0, 1, 0, 0, 0, 0, 0, 1, 1]).modalidad).toBe('todo_riesgo_franquicia');
+    expect(calcularResultado([0, 0, 0, 0, 0, 0, 0, 0, 1, 1]).modalidad).toBe('todo_riesgo_sin_franquicia');
+  });
+
+  test('tras «Anterior» y «Siguiente» en la P10, «Ver resultado» solo se habilita con una opción marcada, y sin ella no hay resultado', async ({ page }) => {
+    // La forma más grave que podría tener el defecto de abajo: llegar al resultado con una
+    // respuesta que falta. No pasa: sin la marcada, «Ver resultado» queda deshabilitado
+    // (opcionSeleccionada === null) y handleSiguiente no calcula. Vale antes y después de reparar.
+    await abrirTest(page);
+    for (let i = 0; i < 9; i++) {
+      await radios(page).nth(0).click();
+      await page.getByRole('button', { name: SIGUIENTE }).click();
+    }
+    await expect(page.getByText('Pregunta 10 de 10')).toBeVisible();
+    await radios(page).nth(0).click();
+    await page.getByRole('button', { name: ANTERIOR }).click();
+    await expect(page.getByText('Pregunta 9 de 10')).toBeVisible();
+    await page.getByRole('button', { name: SIGUIENTE }).click();
+    await expect(page.getByText('Pregunta 10 de 10')).toBeVisible();
+    const { marcada, siguiente } = await estado(page);
+    expect(siguiente, `marcada: ${JSON.stringify(marcada)}`).toBe(marcada.length === 1);
+    const ver = page.getByRole('button', { name: 'Ver resultado' });
+    if (!siguiente) {
+      await ver.click({ force: true });
+      await page.waitForTimeout(300);
+      await expect(titulo(page)).toHaveCount(0);
+      await expect(page.getByText('Pregunta 10 de 10')).toBeVisible();
+    }
+  });
+
+  // ── Hallazgo ABIERTO (comprobación 04/11/2026) ──────────────────────────────
+
+  test('ABIERTO: la P3 marcada y dejada con «Anterior» vuelve marcada con «Siguiente» (escritorio)', async ({ page }) => {
+    // ABIERTO (04/11/2026). P1 «Entre 2 y 5 años» → Siguiente → P2 «Más de 25.000 €» → Siguiente →
+    // P3 «No, es de mi propiedad total» → Anterior → Siguiente. Esperado, como en
+    // selector-smartphone: la P3 conserva «No, es de mi propiedad total» y «Siguiente» sigue
+    // habilitado. Obtenido: la P3 sin ninguna marcada y «Siguiente» deshabilitado (hay que volver a
+    // contestarla).
+    test.fail();
+    await abrirTest(page);
+    await marcarP3YVolver(page, false);
+    await page.getByRole('button', { name: SIGUIENTE }).click();
+    await expect(page.getByText('Pregunta 3 de 10')).toBeVisible();
+    await expect
+      .poll(() => estado(page), { timeout: 2_000 })
+      .toEqual({ pregunta: 'Pregunta 3 de 10', marcada: ['No, es de mi propiedad total'], siguiente: true });
+  });
+
+  test('ABIERTO: la P3 corregida y dejada con «Anterior» no vuelve a la respuesta vieja, y el resultado sale con la corregida', async ({ page }) => {
+    // ABIERTO (04/11/2026), la variante que cambia el resultado. P1 «Menos de 2 años» → P2 «Más de
+    // 25.000 €» → P3 «Sí, sigue con financiación activa» → Siguiente → (P4) Anterior → P3 corrige a
+    // «No, es de mi propiedad total» → Anterior → (P2) Siguiente → P3 → Siguiente sin tocarla →
+    // P4 novel · P5 ninguno · P6 ocasional · P7 ciudad · P8 garaje siempre · P9 «Podría asumir
+    // parte» · P10 «Sí, esporádicamente».
+    // A mano con los pesos de motor.ts (básico, ampliado, TRf, TRsf), con la corregida:
+    // P1 (0,0,0,3) P2 (0,0,0,6) P3 (1,1,1,6) P4 (1,1,3,8) P5 (2,2,3,8) P6 (4,3,3,8) P7 (4,3,5,9)
+    // P8 (5,4,5,9) P9 (5,4,8,9) P10 (5,5,10,9) → Todo Riesgo con Franquicia 10 frente a 9.
+    // Con la vieja (financiada: TRsf 3, TRf 1): P3 (0,0,1,9) … P10 (4,4,10,12) → TR sin franquicia 12.
+    // Obtenido el 04/11/2026: la P3 vuelve con «Sí, sigue con financiación activa» marcada y el
+    // resultado es «Todo Riesgo sin Franquicia», sin ninguna nota que cite la financiación (solo
+    // «conductor-joven»). Enumerado con el motor: de los 46.656 perfiles con «No, es de mi propiedad
+    // total», en 12.488 la modalidad cambia si la P3 vale «Sí, sigue con financiación activa».
+    test.fail();
+    await abrirTest(page);
+    const siguiente = () => page.getByRole('button', { name: /^(Ir a la siguiente pregunta|Ver resultado)$/ });
+    for (const i of [0, 0, 0]) {
+      await radios(page).nth(i).click();
+      await siguiente().click();
+    }
+    await expect(page.getByText('Pregunta 4 de 10')).toBeVisible();
+    await page.getByRole('button', { name: ANTERIOR }).click();
+    await expect(page.getByText('Pregunta 3 de 10')).toBeVisible();
+    await radios(page).nth(1).click();
+    await page.getByRole('button', { name: ANTERIOR }).click();
+    await expect(page.getByText('Pregunta 2 de 10')).toBeVisible();
+    await siguiente().click();
+    await expect(page.getByText('Pregunta 3 de 10')).toBeVisible();
+    const p3 = (await estado(page)).marcada;
+    await siguiente().click();
+    for (const i of [0, 0, 0, 0, 0, 1, 1]) {
+      await radios(page).nth(i).click();
+      await siguiente().click();
+    }
+    await titulo(page).waitFor();
+    expect({ p3, titulo: await titulo(page).innerText() }).toEqual({
+      p3: ['No, es de mi propiedad total'],
+      titulo: 'Todo Riesgo con Franquicia',
+    });
+  });
+
+  test.describe('móvil 390 px', () => {
+    test.use({
+      viewport: { width: 390, height: 844 },
+      userAgent: devices['Pixel 7'].userAgent,
+      deviceScaleFactor: 3,
+      isMobile: true,
+      hasTouch: true,
+    });
+
+    test('ABIERTO: con toques sueltos, la P3 marcada y dejada con «Anterior» vuelve marcada con «Siguiente»', async ({ page }) => {
+      // ABIERTO (04/11/2026). La misma secuencia que en escritorio, con toques separados 500 ms
+      // (detail 1: la guarda de ráfaga no interviene). Obtenido: la P3 sin marcar y «Siguiente»
+      // deshabilitado, como en escritorio.
+      test.fail();
+      await abrirTest(page);
+      await marcarP3YVolver(page, true);
+      await pulsar(page, true, page.getByRole('button', { name: SIGUIENTE, exact: true }));
+      await expect(page.getByText('Pregunta 3 de 10')).toBeVisible();
+      await expect
+        .poll(() => estado(page), { timeout: 2_000 })
+        .toEqual({ pregunta: 'Pregunta 3 de 10', marcada: ['No, es de mi propiedad total'], siguiente: true });
     });
   });
 });

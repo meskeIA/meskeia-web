@@ -1,4 +1,4 @@
-import { test, expect, Page, devices } from '@playwright/test';
+import { test, expect, Page, Locator, devices } from '@playwright/test';
 import {
   calcularResultado,
   COMPROMISO_ACTUALIZACIONES_IOS,
@@ -1441,3 +1441,146 @@ test('REPARADO (C0029): el emoji de las características y los consejos no llega
   // Y en pantalla siguen viéndose: el emoji solo se oculta al lector.
   expect(audibles.some(({ visible }) => /🔋/u.test(visible))).toBe(true);
 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Cabo C0479 (inspector 04/11/2026): doble toque con ratón real en CADA botón de fase
+// ─────────────────────────────────────────────────────────────────────────────
+//
+// El testigo de familia (tests/familias/selectores.spec.ts) mide el 2.º clic de la ráfaga solo en
+// «Siguiente» hacia una pregunta SIN responder, con el botón donde lo deje scrollIntoViewIfNeeded
+// y a 390×844. Aquí, los que no cubre: «Empezar el test», «Anterior», «Siguiente» hacia una
+// pregunta YA respondida (tras «Anterior» el botón sigue habilitado bajo el dedo), «Ver resultado»
+// y «Repetir el test», con el botón arriba, en medio y abajo de la pantalla (18 %, 50 % y 85 % del
+// alto), a 360×740 y 390×844, con 60, 150 y 300 ms entre los dos toques. Y la otra mitad: que la
+// guarda no se coma lo legítimo, un clic suelto (`detail` 1) en OTRA opción a 200 ms, tanto tras
+// otra opción como justo tras «Siguiente».
+//
+// Lo esperado sale de lo que hace UN clic en cada botón (un toque = una acción): «Empezar» deja la
+// P1 sin marcar; «Anterior» desde la P3 lleva a la P2 con su respuesta; «Siguiente» desde la P2 ya
+// respondida lleva a la P3 con la suya; «Ver resultado» deja el resultado; «Repetir» deja la intro.
+// Siempre en /selector-smartphone/ y sin abrir otra pestaña (relacionadas, Delegum).
+//
+// En verde el 04/11/2026 en las 16 hermanas (3.906 dobles toques y 576 toques legítimos, 0 fallos;
+// .inspector-trabajo/selectores-dobletoque.mjs). Control de que la medida discrimina: la misma
+// pasada SIN la guarda (descartando los oyentes de click/mousedown en captura sobre window) da 15
+// fallos en esta app: «Empezar» contesta la P1 con «Fotografía y vídeo» a 390×844 con el botón en
+// medio; con el botón abajo, «Anterior» retrocede dos preguntas y «Siguiente» desde la P2 salta la
+// P3. Los tres, a 60, 150 y 300 ms.
+
+/** Deja el centro del botón a la altura pedida (lo que permita el documento) y devuelve el punto. */
+async function colocarEnAltura(page: Page, boton: Locator, y: number): Promise<{ x: number; y: number }> {
+  await boton.evaluate((el, alto) => {
+    const r = el.getBoundingClientRect();
+    window.scrollBy(0, r.top + r.height / 2 - alto);
+  }, y);
+  await page.waitForTimeout(60);
+  const caja = (await boton.boundingBox())!;
+  return { x: caja.x + caja.width / 2, y: caja.y + caja.height / 2 };
+}
+
+/** Ratón de verdad: el 2.º clic, en el mismo punto, llega con `detail` 2 (como en el testigo). */
+async function dobleToqueRaton(page: Page, punto: { x: number; y: number }, intervalo: number): Promise<void> {
+  await page.mouse.move(punto.x, punto.y);
+  await page.mouse.down({ clickCount: 1 });
+  await page.mouse.up({ clickCount: 1 });
+  await page.waitForTimeout(intervalo);
+  await page.mouse.down({ clickCount: 2 });
+  await page.mouse.up({ clickCount: 2 });
+  await page.waitForTimeout(400);
+}
+
+/** Clic suelto (`detail` 1) en el centro de un elemento ya a la vista. */
+async function clicSuelto(page: Page, el: Locator): Promise<void> {
+  const caja = (await el.boundingBox())!;
+  await page.mouse.click(caja.x + caja.width / 2, caja.y + caja.height / 2);
+}
+
+const radioMarcado = (page: Page) => page.locator('[role="radiogroup"] [role="radio"][aria-checked="true"]');
+
+for (const vp of [{ width: 360, height: 740 }, { width: 390, height: 844 }]) {
+  test.describe(`C0479 · doble toque en cada botón de fase · ${vp.width}×${vp.height}`, () => {
+    test.use({ viewport: vp });
+
+    for (const [altura, fraccion] of [['arriba', 0.18], ['en medio', 0.5], ['abajo', 0.85]] as const) {
+      test(`con el botón ${altura}: el 2.º toque no contesta, no retrocede ni avanza otra vez, no reinicia ni saca de la app`, async ({ page, context }) => {
+        test.setTimeout(120_000);
+        const y = Math.round(vp.height * fraccion);
+        const enLaApp = () => {
+          expect(new URL(page.url()).pathname, 'la ráfaga no saca de la app').toBe('/selector-smartphone/');
+          expect(context.pages(), 'ni abre otra pestaña').toHaveLength(1);
+        };
+        for (const intervalo of [60, 150, 300]) {
+          const paso = `${intervalo} ms`;
+          await page.goto('/selector-smartphone/');
+          await esperarHidratacionBotones(page);
+
+          // Empezar el test → la P1, sin marcar
+          await dobleToqueRaton(page, await colocarEnAltura(page, page.getByRole('button', { name: /Empezar el test/ }), y), intervalo);
+          await expect(page.getByText('Pregunta 1 de 10').first(), `${paso}: «Empezar» lleva a la P1`).toBeVisible();
+          await expect(radioMarcado(page), `${paso}: «Empezar» no contesta la P1`).toHaveCount(0);
+          enLaApp();
+
+          // Legítimo: un clic suelto en OTRA opción a 200 ms cambia la marca
+          const radiosP1 = page.locator('[role="radiogroup"] [role="radio"]');
+          await radiosP1.nth(0).evaluate((e) => e.scrollIntoView({ block: 'center' }));
+          await clicSuelto(page, radiosP1.nth(1));
+          await page.waitForTimeout(200);
+          await clicSuelto(page, radiosP1.nth(0));
+          await expect(radiosP1.nth(0), `${paso}: la otra opción a 200 ms se marca`).toHaveAttribute('aria-checked', 'true');
+          await expect(radioMarcado(page)).toHaveCount(1);
+          await page.getByRole('button', { name: 'Siguiente pregunta' }).click();
+          await expect(page.getByText('Pregunta 2 de 10').first()).toBeVisible();
+
+          // P2 respondida y, tras «Siguiente» (clic suelto), una opción de la P3 a 200 ms: se marca
+          await page.locator('[role="radiogroup"] [role="radio"]').nth(0).click();
+          const respuestaP2 = (await radioMarcado(page).textContent()) ?? '';
+          const siguiente = page.getByRole('button', { name: 'Siguiente pregunta' });
+          await siguiente.scrollIntoViewIfNeeded();
+          const t0 = Date.now();
+          await clicSuelto(page, siguiente);
+          await expect(page.getByText('Pregunta 3 de 10').first()).toBeVisible();
+          // La primera opción de la P3 que quede a la vista y por debajo de la barra del logo
+          const indiceP3 = await page.locator('[role="radiogroup"] [role="radio"]').evaluateAll((rs) =>
+            rs.findIndex((r) => { const c = r.getBoundingClientRect(); return c.top > 80 && c.bottom < window.innerHeight - 10; }));
+          expect(indiceP3, `${paso}: hay una opción de la P3 a la vista`).toBeGreaterThanOrEqual(0);
+          const opcionP3 = page.locator('[role="radiogroup"] [role="radio"]').nth(indiceP3);
+          await page.waitForTimeout(Math.max(0, 200 - (Date.now() - t0)));
+          await clicSuelto(page, opcionP3);
+          await expect(opcionP3, `${paso}: el primer clic tras «Siguiente» no se lo come la guarda`).toHaveAttribute('aria-checked', 'true');
+          const respuestaP3 = (await radioMarcado(page).textContent()) ?? '';
+
+          // Anterior desde la P3 → la P2 con su respuesta (no la P1)
+          await dobleToqueRaton(page, await colocarEnAltura(page, page.getByRole('button', { name: 'Pregunta anterior' }), y), intervalo);
+          await expect(page.getByText('Pregunta 2 de 10').first(), `${paso}: «Anterior» retrocede UNA pregunta`).toBeVisible();
+          await expect(radioMarcado(page), `${paso}: la P2 conserva su respuesta`).toHaveText(respuestaP2);
+          enLaApp();
+
+          // Siguiente desde la P2 ya respondida → la P3 con la suya (no la P4)
+          await dobleToqueRaton(page, await colocarEnAltura(page, siguiente, y), intervalo);
+          await expect(page.getByText('Pregunta 3 de 10').first(), `${paso}: «Siguiente» hacia una respondida avanza UNA`).toBeVisible();
+          await expect(radioMarcado(page), `${paso}: la P3 conserva su respuesta`).toHaveText(respuestaP3);
+          enLaApp();
+
+          // Hasta la P10 con clics sueltos
+          for (let n = 3; n < 10; n++) {
+            if ((await radioMarcado(page).count()) === 0) await page.locator('[role="radiogroup"] [role="radio"]').nth(0).click();
+            await page.getByRole('button', { name: 'Siguiente pregunta' }).click();
+            await expect(page.getByText(`Pregunta ${n + 1} de 10`).first()).toBeVisible();
+          }
+          await page.locator('[role="radiogroup"] [role="radio"]').nth(0).click();
+
+          // Ver resultado → el resultado, sin salir ni reiniciar
+          await dobleToqueRaton(page, await colocarEnAltura(page, page.getByRole('button', { name: 'Ver resultado' }), y), intervalo);
+          await expect(page.getByRole('heading', { name: 'Tu smartphone ideal' }), `${paso}: «Ver resultado» deja el resultado`).toBeVisible();
+          enLaApp();
+
+          // Repetir el test → la intro, sin empezar otra vez
+          await dobleToqueRaton(page, await colocarEnAltura(page, page.getByRole('button', { name: 'Repetir el test' }), y), intervalo);
+          await expect(page.getByRole('button', { name: /Empezar el test/ }), `${paso}: «Repetir» deja la intro`).toBeVisible();
+          await expect(page.locator('[role="radiogroup"]'), `${paso}: y no empieza el test`).toHaveCount(0);
+          enLaApp();
+        }
+      });
+    }
+  });
+}

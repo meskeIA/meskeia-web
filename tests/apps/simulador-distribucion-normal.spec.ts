@@ -1128,3 +1128,161 @@ test.describe('cabo C0367 · los azules fijos, en meskeia.com y bajo stemum.com'
     expect(azules).toEqual([]);
   });
 });
+
+/*
+ * ═════════════════════════════════════════════════════════════════════════════════════════
+ * CABO C0610 (04/11/2026) — las líneas de los límites a y b del lienzo y sus letras «a»/«b»
+ *
+ * DE DÓNDE SALE EL COLOR — page.tsx, dibujar(): `ctx.strokeStyle = '#E07A1F'` (línea 439, trazo
+ *   de 2 px) y `ctx.fillStyle = '#E07A1F'` con `ctx.font = 'bold 13px system-ui'` (446-447). Es
+ *   un literal y es el MISMO en los dos temas: no lee ningún token ni mira `isDark` (la curva
+ *   N(0,1) de referencia sí: `colorEstandar`, línea 279, pasa a #FFB347 en oscuro).
+ *
+ * ESPERADO A MANO (luminancia relativa sRGB, antes de abrir el navegador)
+ *   #E07A1F: L = 0,2986 · #FAFAFA (--bg-primary claro): L = 0,9560 → 1,0060 / 0,3486 = 2,89:1
+ *   área sombreada en claro, rgba(46, 134, 171, 0,35) sobre #FAFAFA = #B3D2DF: L = 0,6101 → 1,89:1
+ *   #1A1A1A (--bg-primary oscuro): L = 0,0103 → 5,78:1 · área en oscuro #21404D: L = 0,0453 → 3,66:1
+ *   Umbrales: las letras son texto de 13 px en negrita (grande sería 18,66 px en negrita) → 4,5:1
+ *   (WCAG 1.4.3); la línea es objeto gráfico → 3:1 (1.4.11) contra lo que tiene a cada lado: el
+ *   fondo por fuera del intervalo y, por debajo de la curva, el área sombreada por dentro. Las
+ *   letras van por encima del área de trazado (y = top − 4): solo tienen el fondo al lado.
+ *
+ * MEDIDO (getImageData: el píxel más opaco y más naranja del trazo y de la letra, compuesto
+ *   sobre el fondo REAL del lienzo, que es transparente; igual con deviceScaleFactor 1 y 2)
+ *   claro  · línea y letras #E07A1F (rgba 224,122,31,255) sobre #FAFAFA = 2,89:1; la línea junto
+ *            al área #B3D2DF = 1,89:1 → NO cumple ni 4,5 ni 3
+ *   oscuro · sobre #1A1A1A = 5,78:1; junto al área #21404D = 3,66:1 → cumple
+ * ═════════════════════════════════════════════════════════════════════════════════════════
+ */
+
+type MuestraC0610 = { color: number[]; alfa: number };
+
+/**
+ * Estado de partida N(0, 1), P(−1 < X < 1): rango [−4,5; 4,5], márgenes 20/20/20/40 de `dibujar()`.
+ * Para cada límite (a = −1, b = 1): el trazo en un tramo alto (fondo liso a los dos lados) y en
+ * uno bajo (área sombreada por dentro), la letra en su caja sobre el área de trazado, y los
+ * fondos de al lado. El píxel del trazo y de la letra es el más naranja de la caja (R − B por su
+ * alfa): así no se toma un borde mezclado por el antialiasing.
+ */
+async function lienzoC0610(page: Page): Promise<{
+  fondo: number[];
+  limites: { nombre: string; alto: MuestraC0610; bajo: MuestraC0610; letra: MuestraC0610; area: number[] }[];
+}> {
+  return page.locator('canvas[aria-label="Gráfica de la distribución normal"]').evaluate((nodo) => {
+    const c = nodo as HTMLCanvasElement;
+    const leer = (s: string): number[] => {
+      const m = s.match(/rgba?\(([^)]+)\)/);
+      if (!m) return [0, 0, 0, 0];
+      const p = m[1].split(/[ ,/]+/).filter(Boolean).map(Number);
+      return [p[0], p[1], p[2], p.length > 3 ? p[3] : 1];
+    };
+    const capas: number[][] = [];
+    for (let n: Element | null = c; n; n = n.parentElement) {
+      const k = leer(getComputedStyle(n).backgroundColor);
+      if (k[3] > 0) {
+        capas.push(k);
+        if (k[3] >= 1) break;
+      }
+    }
+    let fondo = [255, 255, 255];
+    for (let i = capas.length - 1; i >= 0; i--) {
+      const [r, g, b, a] = capas[i];
+      fondo = [r * a + fondo[0] * (1 - a), g * a + fondo[1] * (1 - a), b * a + fondo[2] * (1 - a)];
+    }
+    const ctx = c.getContext('2d');
+    if (!ctx) return { fondo, limites: [] };
+    const caja = c.getBoundingClientRect();
+    const k = c.width / caja.width;
+    const xPx = (x: number) => 20 + ((x + 4.5) / 9) * (caja.width - 40);
+    const sobreFondo = (d: Uint8ClampedArray, i: number) => {
+      const a = d[i + 3] / 255;
+      return [d[i] * a + fondo[0] * (1 - a), d[i + 1] * a + fondo[1] * (1 - a), d[i + 2] * a + fondo[2] * (1 - a)];
+    };
+    const masNaranja = (x0: number, y0: number, w: number, h: number) => {
+      const d = ctx.getImageData(Math.round(x0 * k), Math.round(y0 * k), Math.round(w * k), Math.round(h * k)).data;
+      let mejor = 0;
+      let puntos = -Infinity;
+      for (let i = 0; i < d.length; i += 4) {
+        const comp = sobreFondo(d, i);
+        const p = (comp[0] - comp[2]) * (d[i + 3] / 255);
+        if (p > puntos) {
+          puntos = p;
+          mejor = i;
+        }
+      }
+      return { color: sobreFondo(d, mejor), alfa: d[mejor + 3] };
+    };
+    const yAlto = 50; // por encima de la curva en x = ±1 (y ≈ 155 con 360 px; ≈ 119 con 280 px)
+    const yBajo = caja.height - 70; // por debajo de la curva, sobre el eje
+    return {
+      fondo,
+      limites: ([['a', -1], ['b', 1]] as const).map(([nombre, x]) => {
+        const px = xPx(x);
+        const dentro = nombre === 'a' ? px + 6 : px - 6;
+        const d = ctx.getImageData(Math.round(dentro * k), Math.round(yBajo * k), 1, 1).data;
+        return {
+          nombre,
+          alto: masNaranja(px - 4, yAlto, 8, 1),
+          bajo: masNaranja(px - 4, yBajo, 8, 1),
+          letra: masNaranja(px - 8, 1, 16, 18),
+          area: sobreFondo(d, 0),
+        };
+      }),
+    };
+  });
+}
+
+/** Lo que no llega a su umbral: letra 4,5:1 contra el fondo; línea 3:1 contra el fondo y el área. */
+function suspensosC0610(tema: string, l: Awaited<ReturnType<typeof lienzoC0610>>): string[] {
+  const fallos: string[] = [];
+  const f = hexC0367(l.fondo);
+  for (const m of l.limites) {
+    const letra = ratioC0367(m.letra.color, l.fondo);
+    if (letra < 4.5) fallos.push(`${tema} · letra «${m.nombre}»: ${hexC0367(m.letra.color)} sobre ${f} = ${letra}:1 < 4,5`);
+    const alto = ratioC0367(m.alto.color, l.fondo);
+    if (alto < 3) fallos.push(`${tema} · línea ${m.nombre}: ${hexC0367(m.alto.color)} sobre ${f} = ${alto}:1 < 3`);
+    const area = ratioC0367(m.bajo.color, m.area);
+    if (area < 3) {
+      fallos.push(`${tema} · línea ${m.nombre} junto al área: ${hexC0367(m.bajo.color)} sobre ${hexC0367(m.area)} = ${area}:1 < 3`);
+    }
+  }
+  return fallos;
+}
+
+test.describe('cabo C0610 · las líneas a/b del lienzo y sus letras', () => {
+  test('guarda: el lienzo pinta las dos líneas y sus letras opacas, y en oscuro ya cumplen', async ({ page }) => {
+    // Guarda del test de abajo (test.fail no distingue por qué falla): que la medida encuentra de
+    // verdad el trazo y la letra (píxel opaco) en los dos temas, y que el oscuro, que hoy cumple
+    // (5,78:1 y 3,66:1), no se rompa al reparar el claro.
+    test.setTimeout(60_000);
+    for (const tema of ['light', 'dark'] as const) {
+      await abrirC0367(page, RUTA, tema);
+      const l = await lienzoC0610(page);
+      expect(l.limites, tema).toHaveLength(2);
+      for (const m of l.limites) {
+        expect(m.alto.alfa, `${tema} · línea ${m.nombre}`).toBe(255);
+        expect(m.bajo.alfa, `${tema} · línea ${m.nombre}, tramo bajo`).toBe(255);
+        expect(m.letra.alfa, `${tema} · letra ${m.nombre}`).toBe(255);
+      }
+      if (tema === 'dark') expect(suspensosC0610(tema, l)).toEqual([]);
+    }
+  });
+
+  test('en claro las letras «a»/«b» llegan a 4,5:1 y sus líneas a 3:1 contra el fondo y el área sombreada', async ({
+    page,
+  }) => {
+    test.fail(); // HALLAZGO ABIERTO (cabo C0610, 04/11/2026) [accesibilidad/medio]
+    // ENTRADA  estado de partida N(0, 1), P(−1 < X < 1), tema claro y tema oscuro
+    // ESPERADO letras «a»/«b» (negrita 13 px) ≥ 4,5:1 contra el fondo del lienzo; líneas a/b
+    //          ≥ 3:1 contra el fondo y contra el área sombreada que tienen al lado
+    // OBTENIDO claro: #E07A1F sobre #FAFAFA = 2,89:1 (letras y líneas) y junto al área #B3D2DF
+    //          = 1,89:1 · oscuro: 5,78:1 y 3,66:1, cumple
+    test.setTimeout(60_000);
+    const fallos: string[] = [];
+    for (const tema of ['light', 'dark'] as const) {
+      await abrirC0367(page, RUTA, tema);
+      fallos.push(...suspensosC0610(tema, await lienzoC0610(page)));
+    }
+    expect(fallos).toEqual([]);
+  });
+});

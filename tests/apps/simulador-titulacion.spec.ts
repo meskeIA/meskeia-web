@@ -1595,3 +1595,144 @@ test.describe('JSON-LD', () => {
     await comprobarFaqPageUnico(page);
   });
 });
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════════
+ * Inspector 04/11/2026 — MODO CAMBIO (desde la validación del 02/11, 911b7cee). Sin hallazgos.
+ *
+ * Qué cambió: bcf84241 (cabo C0267) quita el margen del 1 % a un volumen o una concentración
+ * EXACTOS cuando `comprobarRespuesta` recibe los datos del caso, que `CasosAula` ahora le pasa;
+ * el pH sigue con ±0,02 y el motivo de fallo usa `textoDesviacion` (3369). ff344392 (cabo C0593)
+ * deja un único FAQPage que sale de PREGUNTAS_FRECUENTES, la misma lista que pinta la FAQ visible.
+ * `correctorCasosAula.ts` no cambió.
+ *
+ * ESPERADOS, resueltos a mano ANTES de abrir la app (C·V = C·V, en mmol):
+ *   caso 1 · 0,15·20 = 3 mmol / 0,10 = 30 mL exactos ⇒ margen 0
+ *            «30,00», «30.00» y «30» aprueban; «30.000» (punto decimal con tres cifras) es 30 y
+ *            aprueba; «29,7» desviado 0,3 (el 1 % lo aprobaba); «30,01» desviado 0,01;
+ *            «30,004» desviado 0,004; «0,03» es la misma cifra en litros ⇒ el aviso de litros
+ *   caso 2 · 0,80·10 = 8 mmol / 0,50 = 16 mL ⇒ «16» aprueba; «15,85» desviado 0,15; «16,1» 0,1
+ *   caso 3 · 0,10·20,00 = 2 mmol / 25 = 0,08 mol/L ⇒ «0,08», «0.08» y «0,080» aprueban;
+ *            «0,0805» desviado 0,0005 (antes dentro de 0,0008); «0,079» desviado 0,001;
+ *            «8.000» se lee 8 (la lectura más cercana a 0,08) ⇒ desviado 7,92
+ *   caso 4 · 0,20·42,50 = 8,5 mmol / 10 = 0,85 mol/L ⇒ «0,85» y «0.850» aprueban; «0,851» y
+ *            «0,849» desviados 0,001; «8.500» se lee 8,5 ⇒ desviado 7,65
+ *   caso 5 · pH (sin cambio) −log(1/40) = 1,6021 → 1,60 ⇒ 1,58 y 1,62 aprueban (borde exacto
+ *            de ±0,02), 1,63 desviado 0,03
+ *   práctica · el V_eq o la C se recalculan desde el enunciado que pinta la app; exacto aprueba
+ *            y una centésima más da «desviado 0,01». Un V_eq con dos decimales (0,15·25/0,20 =
+ *            18,75 mL) se pide exacto: 18,8 da «desviado 0,05», la política de redondeo del
+ *            catálogo para una respuesta exacta (hallazgo 751).
+ * OBTENIDO (.inspector-trabajo/titul-cambio.mjs): todo lo esperado. La FAQ visible y el FAQPage
+ * dicen lo mismo, pregunta a pregunta y respuesta a respuesta (el «Tip» va tras la primera).
+ * ═══════════════════════════════════════════════════════════════════════════════════════════ */
+test.describe('Inspector 04/11/2026 · modo cambio: margen 0 en lo exacto (C0267) y FAQ única (C0593)', () => {
+  test.beforeEach(async ({ page }) => {
+    await esperarHidratacion(page, ['#vAnalito', '#casos-respuesta']);
+  });
+
+  const irACaso = (page: Page, n: number) =>
+    casosAula(page).getByRole('button', { name: new RegExp(`^Caso ${n}:`) }).click();
+
+  test('casos 1 a 5 en el navegador: lo exacto sin margen, el pH con ±0,02', async ({ page }) => {
+    await irACaso(page, 1);
+    for (const ok of ['30,00', '30.00', '30', '30.000']) expect(await responder(page, ok), ok).toContain('Correcto');
+    expect(await responder(page, '29,7')).toContain('Te has desviado 0,3 de');
+    expect(await responder(page, '30,01')).toContain('Te has desviado 0,01 de');
+    expect(await responder(page, '30,004')).toContain('Te has desviado 0,004 de');
+    expect(await responder(page, '0,03')).toContain('en litros');
+
+    await irACaso(page, 2);
+    expect(await responder(page, '16')).toContain('Correcto');
+    expect(await responder(page, '15,85')).toContain('Te has desviado 0,15 de');
+    expect(await responder(page, '16,1')).toContain('Te has desviado 0,1 de');
+
+    await irACaso(page, 3);
+    for (const ok of ['0,08', '0.08', '0,080']) expect(await responder(page, ok), ok).toContain('Correcto');
+    expect(await responder(page, '0,0805')).toContain('Te has desviado 0,0005 de');
+    expect(await responder(page, '0,079')).toContain('Te has desviado 0,001 de');
+    expect(await responder(page, '8.000')).toContain('Te has desviado 7,92 de');
+
+    await irACaso(page, 4);
+    for (const ok of ['0,85', '0.850']) expect(await responder(page, ok), ok).toContain('Correcto');
+    expect(await responder(page, '0,851')).toContain('Te has desviado 0,001 de');
+    expect(await responder(page, '0,849')).toContain('Te has desviado 0,001 de');
+    expect(await responder(page, '8.500')).toContain('Te has desviado 7,65 de');
+
+    await irACaso(page, 5);
+    for (const ok of ['1,60', '1,58', '1,62']) expect(await responder(page, ok), ok).toContain('Correcto');
+    expect(await responder(page, '1,63')).toContain('Te has desviado 0,03 de');
+  });
+
+  test('práctica en el navegador: volumen y concentración, recalculados desde el enunciado, sin margen', async ({ page }) => {
+    const num = (s: string) => Number(s.replace(',', '.'));
+    let vistos = 0;
+    for (let i = 0; i < 60 && vistos < 3; i++) {
+      await casosAula(page).getByRole('button', { name: /Practicar/ }).click();
+      const enunciado = (await casosAula(page).locator('p[aria-live="polite"]').innerText()).replace(/\s+/g, ' ');
+      const etiqueta = await casosAula(page).locator('label[for="casos-respuesta"]').innerText();
+      const m = enunciado.match(/Se titulan (\d+) mL de .*? (?:(\d+,\d+) M )?(?:\(pKa = [\d,]+\) )?con \S+ (\d+,\d+) M/);
+      if (!m) continue;
+      const Va = num(m[1]);
+      const Ct = num(m[3]);
+      const mv = enunciado.match(/se han añadido ([\d,]+) mL de base/);
+      let exacto: number | null = null;
+      if (/Volumen de base/.test(etiqueta) && m[2]) exacto = (num(m[2]) * Va) / Ct; // V_eq = C_a·V_a/C_t
+      else if (/Concentración/.test(etiqueta) && mv) exacto = (Ct * num(mv[1])) / Va; // C_a = C_t·V_eq/V_a
+      if (exacto === null) continue;
+      const centesimas = Math.round(exacto * 100);
+      expect(Math.abs(exacto * 100 - centesimas), `${enunciado}: es exacto a dos decimales`).toBeLessThan(1e-6);
+      const texto = (n: number) => (n / 100).toFixed(2).replace('.', ',');
+      expect(await responder(page, texto(centesimas)), enunciado).toContain('Correcto');
+      expect(await responder(page, texto(centesimas + 1)), enunciado).toContain('Te has desviado 0,01 de');
+      vistos += 1;
+    }
+    expect(vistos, 'al menos tres ejercicios de volumen o concentración en 60 intentos').toBe(3);
+  });
+
+  test('práctica (motor): en 3000 semillas, volumen y concentración tienen margen 0 y la clave aprueba', async () => {
+    let conDosDecimales = 0;
+    for (let s = 1; s <= 3000; s += 1) {
+      const e = generarEjercicioAleatorio(s);
+      if (e.magnitud === 'pH') continue;
+      const r = comprobarRespuesta(e.respuesta, e.respuesta, e.magnitud, e.datos);
+      expect(r.correcto, `semilla ${s}`).toBe(true);
+      expect(r.tolerancia, `semilla ${s}: lo exacto no tiene margen`).toBe(0);
+      expect(comprobarRespuesta(e.respuesta + 0.01, e.respuesta, e.magnitud, e.datos).correcto, `semilla ${s}`).toBe(false);
+      // Un V_eq de la forma x,y5 (18,75 = 0,15·25/0,20): redondeado a décimas ya no aprueba.
+      if (e.magnitud === 'volumen' && Math.abs(e.respuesta * 10 - Math.round(e.respuesta * 10)) > 1e-6) {
+        conDosDecimales += 1;
+        const decimas = Math.round(e.respuesta * 10) / 10;
+        const v = comprobarRespuesta(decimas, e.respuesta, e.magnitud, e.datos);
+        expect(v.correcto, `semilla ${s}: ${decimas} para ${e.respuesta}`).toBe(false);
+        expect(v.motivo, `semilla ${s}`).toContain('Te has desviado 0,05 de');
+      }
+    }
+    expect(conDosDecimales, 'el generador produce V_eq con dos decimales').toBeGreaterThan(0);
+  });
+
+  test('C0593 · cada respuesta del FAQPage es la de la FAQ visible (con su «Tip» detrás)', async ({ page }) => {
+    const { ld, visibles } = await page.evaluate(() => {
+      const ld: { q: string; a: string }[] = [];
+      for (const s of Array.from(document.querySelectorAll('script[type="application/ld+json"]'))) {
+        const j = JSON.parse(s.textContent ?? '{}') as Record<string, unknown>;
+        const nodos = (j['@graph'] as Record<string, unknown>[] | undefined) ?? [j];
+        for (const n of nodos) {
+          if (n['@type'] !== 'FAQPage') continue;
+          for (const q of n.mainEntity as { name: string; acceptedAnswer: { text: string } }[]) {
+            ld.push({ q: q.name, a: q.acceptedAnswer.text });
+          }
+        }
+      }
+      const visibles = Array.from(document.querySelectorAll('[class*="faqItem"]')).map((d) => ({
+        q: (d.querySelector('strong')?.textContent ?? '').trim(),
+        // Sin normalizar espacios: `\s` también casa con el U+00A0 de «98 %», que el FAQPage conserva.
+        a: Array.from(d.querySelectorAll('p'))
+          .map((p) => (p.textContent ?? '').trim())
+          .join(' '),
+      }));
+      return { ld, visibles };
+    });
+    expect(visibles.length).toBe(6);
+    expect(ld).toEqual(visibles);
+  });
+});
