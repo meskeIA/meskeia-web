@@ -97,6 +97,33 @@
   line-height: 1.4;
 }
 
+/* Avisos de entrada (hallazgos 4015-4017): texto en el color normal y el ámbar solo en el
+   borde, así el contraste no depende del tinte */
+.avisos:empty { display: none; }
+
+.avisos {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.aviso {
+  margin: 0;
+  padding: 12px 16px;
+  border-left: 4px solid #d97706;
+  border-radius: 8px;
+  background: color-mix(in srgb, #f59e0b 8%, var(--bg-card));
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+[data-theme='dark'] .aviso {
+  background: color-mix(in srgb, #f59e0b 10%, var(--bg-card));
+  color: var(--text-primary);
+}
+
 .placeholder {
   margin-top: 24px;
   font-size: 0.95rem;

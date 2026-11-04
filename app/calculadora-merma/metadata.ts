@@ -47,7 +47,9 @@ export const jsonLd = generateWebAppSchema({
     'Calcula el peso neto aprovechable de un alimento tras la limpieza (pelar, deshuesar, limpiar) y la cocción (pérdida de agua), el porcentaje de merma y rendimiento, el factor de corrección y el coste real por kilo de producto útil a partir del precio de compra.',
   url: 'https://meskeia.com/calculadora-merma/',
   features: [
-    'Peso limpio y peso neto tras limpieza y cocción',
+    // Decía «Peso limpio y peso neto…», y la página no pinta el peso limpio (hallazgo 4018):
+    // la promesa se baja a lo que la app hace (tipo `promesa` de la frontera).
+    'Peso neto aprovechable tras limpieza y cocción',
     'Porcentaje de merma y de rendimiento',
     'Factor de corrección (bruto / neto)',
     'Coste real por kilo útil a partir del precio de compra',
@@ -82,7 +84,7 @@ export const faqJsonLd = {
       name: '¿Cuánta merma tiene un pescado entero?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Un pescado entero puede perder entre el 40 y el 60% de su peso al quitarle cabeza, espina, piel y vísceras, según la especie y el tipo de corte. Por eso un filete limpio cuesta bastante más por kilo que el pescado entero: hay que tener en cuenta esa merma al calcular el coste real.',
+        text: 'Un pescado entero puede perder entre el 40 y el 60 % de su peso al quitarle cabeza, espina, piel y vísceras, según la especie y el tipo de corte. Por eso un filete limpio cuesta bastante más por kilo que el pescado entero: hay que tener en cuenta esa merma al calcular el coste real.',
       },
     },
     {
@@ -98,7 +100,7 @@ export const faqJsonLd = {
       name: '¿La merma de cocción también cuenta?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Sí. Muchos alimentos pierden peso al cocinarse, sobre todo las carnes, que sueltan agua y grasa y pueden reducirse entre un 20 y un 30%. Si vendes raciones por peso cocinado, esa merma también encarece el producto y conviene incluirla en el cálculo del coste.',
+        text: 'Sí. Muchos alimentos pierden peso al cocinarse, sobre todo las carnes, que sueltan agua y grasa y pueden reducirse entre un 20 y un 30 %. Si vendes raciones por peso cocinado, esa merma también encarece el producto y conviene incluirla en el cálculo del coste.',
       },
     },
   ],

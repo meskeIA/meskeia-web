@@ -48,8 +48,9 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  *       debe presentar un resultado como si lo fueran.
  *       Peso «-500», «abc» o vacío → sin resultado (esto sí lo hace).
  *
- * HALLAZGOS del 03/11/2026 — ABIERTOS. Sus casos van con test.fail(): afirman lo CORRECTO y hoy
- * fallan. Al repararse pasarán, y entonces se quita el test.fail() y se escribe REPARADO.
+ * HALLAZGOS del 03/11/2026 — REPARADOS el 04/11/2026 (/reparar): A (4015), B (4016), C (4017),
+ * D (4018, bajando la promesa) y E (4020). Sus tests afirman lo correcto y ya no llevan test.fail().
+ * (Desde la reparación las mermas fuera de 0-100 se rechazan con aviso y el factor del 100 % es nulo.)
  *   A. Parser casero: «2.000» g → 1 g útil (lee 2 g); «12abc» % → 12 %; «abc» % → 0 %.
  *   B. Merma negativa o mayor que 100 se recorta en silencio (−10 → 0 %, 150 → 100 %), y un
  *      precio negativo o ilegible hace desaparecer la tarjeta de coste sin aviso.
@@ -195,53 +196,71 @@ test.describe('calculadora-merma · lo que promete el <h1>', () => {
     }
   });
 
-  test('HALLAZGO A (03/11/2026, ABIERTO) · «2.000» g es dos mil: 1200 g útiles, no 1 g', async ({ page }) => {
-    // `parseFloat('2.000')` = 2 → 2 × 0,75 × 0,8 = 1,2 → «1 g». El rendimiento, el factor y el
-    // coste no cambian (dependen solo de los porcentajes), así que el error queda en el peso.
-    test.fail();
+  test('HALLAZGO A (REPARADO, 4015) · «2.000» g es dos mil: 1200 g útiles, no 1 g', async ({ page }) => {
+    // Antes `parseFloat('2.000')` = 2 → 2 × 0,75 × 0,8 = 1,2 → «1 g». Ahora parseSpanishNumber.
     await ponerTodo(page, '2.000', '25', '20', '12');
+    expect((await tarjetas(page))[0]).toBe('1200 g peso neto aprovechable');
+    await poner(page, BRUTO, '1.500');
+    await poner(page, LIMPIEZA, '20');
+    await poner(page, COCCION, '0');
     expect((await tarjetas(page))[0]).toBe('1200 g peso neto aprovechable');
   });
 
-  test('HALLAZGO A (03/11/2026, ABIERTO) · una merma ilegible no se toma por 0 % ni por su prefijo', async ({ page }) => {
-    // Hoy «abc» → 0 % (por el `|| 0`) y «12abc» → 12 % (parseFloat se queda con el prefijo),
-    // y en los dos se presenta un resultado completo como si la merma fuera válida.
-    test.fail();
+  test('HALLAZGO A (REPARADO, 4015) · una merma ilegible no se toma por 0 % ni por su prefijo', async ({ page }) => {
+    // Antes «abc» → 0 % (por el `|| 0`) y «12abc» → 12 % (parseFloat se queda con el prefijo).
     await ponerTodo(page, '1000', '20', '0', '8');
     for (const basura of ['abc', '12abc']) {
       await poner(page, LIMPIEZA, basura);
       await expect(page.locator('[class*="resCard"]'), `merma «${basura}»`).toHaveCount(0);
+      await expect(page.locator('main [role="alert"]')).toContainText('La merma de limpieza tiene que ser un porcentaje entre 0 y 100');
     }
   });
 
-  test('HALLAZGO B (03/11/2026, ABIERTO) · una merma negativa o mayor que 100 % no se recorta en silencio', async ({ page }) => {
-    // Hoy «-10» se calcula como 0 % (1000 g, 100,0 %, 8,00 €), «150» como 100 % y una cocción
-    // de «-20» como 0 %: un resultado con aspecto de válido para una merma imposible.
-    test.fail();
+  test('HALLAZGO B (REPARADO, 4016) · una merma negativa o mayor que 100 % no se recorta en silencio', async ({ page }) => {
+    // Antes «-10» se calculaba como 0 % (1000 g, 100,0 %, 8,00 €), «150» como 100 % y una
+    // cocción de «-20» como 0 %: un resultado con aspecto de válido para una merma imposible.
     await ponerTodo(page, '1000', '20', '0', '8');
-    for (const [campo, valor] of [[LIMPIEZA, '-10'], [LIMPIEZA, '150'], [COCCION, '-20']] as const) {
+    for (const [campo, valor, texto] of [
+      [LIMPIEZA, '-10', 'limpieza'],
+      [LIMPIEZA, '150', 'limpieza'],
+      [COCCION, '-20', 'cocción'],
+    ] as const) {
       await poner(page, LIMPIEZA, '20');
       await poner(page, COCCION, '0');
       await poner(page, campo, valor);
       await expect(page.locator('[class*="resCard"]'), `${campo} = «${valor}»`).toHaveCount(0);
+      await expect(page.locator('main [role="alert"]')).toContainText(`La merma de ${texto} tiene que ser un porcentaje`);
     }
   });
 
-  test('HALLAZGO C (03/11/2026, ABIERTO) · con una merma total del 100 % el factor no puede ser ×0,00', async ({ page }) => {
+  test('HALLAZGO B (REPARADO, 4016) · un precio negativo o ilegible se avisa, no hace desaparecer el coste sin más', async ({ page }) => {
+    for (const precio of ['-5', 'abc']) {
+      await ponerTodo(page, '1000', '20', '0', precio);
+      await expect(page.locator('main [role="alert"]')).toContainText('El precio no es válido');
+      expect(await tarjetas(page)).toEqual([
+        '800 g peso neto aprovechable',
+        '80,0% rendimiento (20,0% de merma)',
+        '×1,25 factor de corrección (bruto / neto)',
+      ]);
+    }
+  });
+
+  test('HALLAZGO C (REPARADO, 4017) · con una merma total del 100 % no hay factor ni coste, y se dice', async ({ page }) => {
     // Con 0 g útiles, bruto / neto es una división por cero: no hay factor (tiende a infinito).
-    // «×0,00» diría que no hace falta comprar nada, y la tarjeta de coste desaparece sin decir por qué.
-    test.fail();
+    // Antes «×0,00», que diría que no hace falta comprar nada, y el coste desaparecía sin decir por qué.
     await ponerTodo(page, '1000', '100', '0', '8');
     expect(await resultadoOEspera(page)).not.toContain('×0,00');
+    await expect(page.locator('main [role="alert"]')).toContainText('no queda producto aprovechable');
+    expect(await tarjetas(page)).toEqual(['0 g peso neto aprovechable', '0,0% rendimiento (100,0% de merma)']);
     await poner(page, LIMPIEZA, '0');
     await poner(page, COCCION, '100');
     expect(await resultadoOEspera(page)).not.toContain('×0,00');
+    await expect(page.locator('main [role="alert"]')).toContainText('no queda producto aprovechable');
   });
 
-  test('HALLAZGO D (03/11/2026, ABIERTO) · lo que promete el JSON-LD («peso limpio») se ve en la página', async ({ page }) => {
-    // features[0] = «Peso limpio y peso neto tras limpieza y cocción». El motor calcula
-    // pesoLimpio, pero ninguna tarjeta lo muestra. Se cumple mostrándolo o retirando la promesa.
-    test.fail();
+  test('HALLAZGO D (REPARADO, 4018) · lo que promete el JSON-LD («peso limpio») se ve en la página', async ({ page }) => {
+    // features[0] decía «Peso limpio y peso neto tras limpieza y cocción» y ninguna tarjeta
+    // mostraba el peso limpio. Se bajó la promesa a lo que la app hace (tipo `promesa`).
     const features = await page.$$eval('script[type="application/ld+json"]', (nodos) =>
       nodos
         .map((n) => JSON.parse(n.textContent || '{}') as { featureList?: unknown; features?: unknown })
@@ -255,11 +274,17 @@ test.describe('calculadora-merma · lo que promete el <h1>', () => {
     expect(prometePesoLimpio && !muestraPesoLimpio, 'promete el peso limpio y no lo muestra').toBe(false);
   });
 
-  test('HALLAZGO E (03/11/2026, ABIERTO) · el «%» va separado de la cifra con espacio duro', async ({ page }) => {
-    // CLAUDE.md global §2 (decidido el 25/09/2026): «15 %», con U+00A0. Hoy sale «60,0%».
-    test.fail();
+  test('HALLAZGO E (REPARADO, 4020) · el «%» va separado de la cifra con espacio duro', async ({ page }) => {
+    // CLAUDE.md global §2 (decidido el 25/09/2026): «15 %», con U+00A0. Antes salía «60,0%».
     await ponerTodo(page, '2000', '25', '20', '12');
     const rendimiento = await page.locator('[class*="resCardDestacado"]').innerText();
+    expect(rendimiento).toMatch(/60,0 %/);
+    expect(rendimiento).toMatch(/40,0 %/);
+    const referencias = await page.locator('[class*="refRango"]').allTextContents();
+    expect(referencias.length).toBe(6);
+    for (const r of referencias) expect(r).toMatch(/\d %$/);
+    const scripts = await page.locator('script[type="application/ld+json"]').allTextContents();
+    expect(scripts.join(' ')).not.toMatch(/\d%/);
     expect(rendimiento).toContain('60,0 %');
     expect(rendimiento).toContain('40,0 %');
   });

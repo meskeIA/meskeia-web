@@ -11,8 +11,11 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { calcularMerma, REFERENCIAS_MERMA } from '@/lib/calculadoras/merma';
-import { formatNumber, formatCurrency } from '@/lib/formatters';
+import { calcularMerma, esMermaValida, REFERENCIAS_MERMA } from '@/lib/calculadoras/merma';
+import { formatNumber, formatCurrency, formatPercentage, parseSpanishNumber } from '@/lib/formatters';
+
+/** El «%» con espacio duro, como manda el formato español (hallazgo 4020). */
+const pct = (valor: number) => formatPercentage(valor / 100, 1);
 
 export default function CalculadoraMermaPage() {
   const [pesoBruto, setPesoBruto] = useState('1000');
@@ -20,18 +23,33 @@ export default function CalculadoraMermaPage() {
   const [mermaCoccion, setMermaCoccion] = useState('0');
   const [precio, setPrecio] = useState('');
 
-  const num = (v: string) => parseFloat(v.replace(',', '.')) || 0;
+  // parseSpanishNumber y no el `parseFloat(v.replace(',', '.')) || 0` de antes, que leía
+  // «2.000» g como 2, «12abc» % como 12 y «abc» como 0 en silencio (hallazgo 4015). Lo ilegible
+  // es NaN y se dice, no se toma por cero.
+  const entrada = useMemo(() => {
+    const bruto = parseSpanishNumber(pesoBruto);
+    const limpieza = parseSpanishNumber(mermaLimpieza);
+    const coccion = parseSpanishNumber(mermaCoccion);
+    const precioTexto = precio.trim();
+    const precioNum = precioTexto ? parseSpanishNumber(precioTexto) : null;
+
+    const avisos: string[] = [];
+    if (!esMermaValida(limpieza)) avisos.push('La merma de limpieza tiene que ser un porcentaje entre 0 y 100.');
+    if (!esMermaValida(coccion)) avisos.push('La merma de cocción tiene que ser un porcentaje entre 0 y 100.');
+    const precioValido = precioNum === null || (Number.isFinite(precioNum) && precioNum >= 0);
+
+    return { bruto, limpieza, coccion, precioNum: precioValido ? precioNum : null, precioValido, avisos };
+  }, [pesoBruto, mermaLimpieza, mermaCoccion, precio]);
 
   const resultado = useMemo(
     () =>
-      calcularMerma(
-        num(pesoBruto),
-        num(mermaLimpieza),
-        num(mermaCoccion),
-        precio.trim() ? num(precio) : null,
-      ),
-    [pesoBruto, mermaLimpieza, mermaCoccion, precio],
+      entrada.avisos.length > 0
+        ? null
+        : calcularMerma(entrada.bruto, entrada.limpieza, entrada.coccion, entrada.precioNum),
+    [entrada],
   );
+
+  const pesoValido = entrada.bruto > 0;
 
   return (
     <div className={styles.container}>
@@ -73,6 +91,31 @@ export default function CalculadoraMermaPage() {
           </div>
         </section>
 
+        {/* Avisos de entrada: una merma imposible no da resultado (hallazgos 4015 y 4016) */}
+        <div role="alert" aria-live="polite" className={styles.avisos}>
+          {pesoValido &&
+            entrada.avisos.map((aviso) => (
+              <p key={aviso} className={styles.aviso}>
+                <span aria-hidden="true">⚠️</span> <span>{aviso}</span>
+              </p>
+            ))}
+          {pesoValido && entrada.avisos.length === 0 && !entrada.precioValido && (
+            <p className={styles.aviso}>
+              <span aria-hidden="true">⚠️</span>{' '}
+              <span>El precio no es válido: escribe un importe positivo, o déjalo vacío.</span>
+            </p>
+          )}
+          {resultado && resultado.factorCorreccion === null && (
+            <p className={styles.aviso}>
+              <span aria-hidden="true">⚠️</span>{' '}
+              <span>
+                Con una merma total del 100&nbsp;% no queda producto aprovechable: no hay factor de
+                corrección (sería dividir entre cero) ni coste por kilo útil.
+              </span>
+            </p>
+          )}
+        </div>
+
         {/* Resultado */}
         {resultado ? (
           <section className={styles.resultadoGrid} aria-live="polite">
@@ -81,13 +124,15 @@ export default function CalculadoraMermaPage() {
               <span className={styles.resLabel}>peso neto aprovechable</span>
             </div>
             <div className={`${styles.resCard} ${styles.resCardDestacado}`}>
-              <span className={styles.resValor}>{formatNumber(resultado.rendimientoPct, 1)}%</span>
-              <span className={styles.resLabel}>rendimiento ({formatNumber(resultado.mermaTotalPct, 1)}% de merma)</span>
+              <span className={styles.resValor}>{pct(resultado.rendimientoPct)}</span>
+              <span className={styles.resLabel}>rendimiento ({pct(resultado.mermaTotalPct)} de merma)</span>
             </div>
-            <div className={styles.resCard}>
-              <span className={styles.resValor}>×{formatNumber(resultado.factorCorreccion, 2)}</span>
-              <span className={styles.resLabel}>factor de corrección (bruto / neto)</span>
-            </div>
+            {resultado.factorCorreccion !== null && (
+              <div className={styles.resCard}>
+                <span className={styles.resValor}>×{formatNumber(resultado.factorCorreccion, 2)}</span>
+                <span className={styles.resLabel}>factor de corrección (bruto / neto)</span>
+              </div>
+            )}
             {resultado.costeRealPorKg !== null && (
               <div className={styles.resCard}>
                 <span className={styles.resValor}>{formatCurrency(resultado.costeRealPorKg)}</span>
@@ -96,7 +141,9 @@ export default function CalculadoraMermaPage() {
             )}
           </section>
         ) : (
-          <p className={styles.placeholder}>Introduce un peso bruto para calcular la merma.</p>
+          !(pesoValido && entrada.avisos.length > 0) && (
+            <p className={styles.placeholder}>Introduce un peso bruto para calcular la merma.</p>
+          )
         )}
 
         {/* Referencias */}
@@ -132,7 +179,7 @@ export default function CalculadoraMermaPage() {
             <div className={styles.conceptoSection}>
               <h2>Lo que compras no es lo que sirves</h2>
               <p>
-                Casi ningún alimento se aprovecha al 100%. Al limpiarlo se pierde lo no comestible
+                Casi ningún alimento se aprovecha al 100&nbsp;%. Al limpiarlo se pierde lo no comestible
                 —piel, hueso, espina, grasa, hojas exteriores— y al cocinarlo se pierde agua y
                 volumen. Ese desperdicio se llama merma, y lo que de verdad llega al plato es el
                 peso neto. La diferencia importa porque el precio de compra se paga por el peso
