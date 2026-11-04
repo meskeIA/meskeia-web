@@ -57,7 +57,7 @@ export const jsonLd = generateWebAppSchema({
     'Métricas automáticas: R₀, pico infectados, día del pico, % población afectada',
     'Comparativa de 5 enfermedades reales: gripe, COVID-19, sarampión, Ébola, viruela',
     'Historia de los modelos: Ross (1911), Kermack-McKendrick (1927)',
-    'Integración numérica Euler en el navegador — sin librerías externas',
+    'Integración numérica Runge-Kutta de orden 4 (paso de 0,1 días) en el navegador — sin librerías externas',
     'Gratuito, sin registro, disponible en español',
   ],
 });
@@ -87,7 +87,7 @@ export const faqJsonLd = {
       name: '¿Qué significa "aplanar la curva" en términos matemáticos?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Aplanar la curva consiste en reducir β (tasa de transmisión) mediante medidas de control: distanciamiento, mascarillas o vacunación. Al reducir β, el pico de infectados I(t) disminuye y se desplaza en el tiempo, aunque el área total bajo la curva cambia si la proporción vacunada supera el umbral de inmunidad colectiva. El simulador permite ajustar β en tiempo real para visualizar este efecto.',
+        text: 'Aplanar la curva consiste en reducir β (tasa de transmisión) mediante medidas de control: distanciamiento, mascarillas o vacunación. Al reducir β, el pico de infectados I(t) disminuye y se desplaza en el tiempo, y en el modelo SIR también baja el total de personas que llegan a infectarse, sin necesidad de vacunar a nadie: con γ = 0,1, pasar β de 0,3 a 0,15 (R₀ de 3 a 1,5) reduce la población afectada al final de alrededor del 94 % a alrededor del 59 %. El simulador permite ajustar β en tiempo real para visualizar este efecto.',
       },
     },
     {

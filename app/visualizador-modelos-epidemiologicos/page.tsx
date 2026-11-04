@@ -11,7 +11,7 @@ import {
   ShareCard,
   DisclaimerCard,
 } from '@/components';
-import { jsonLd } from './metadata';
+import { formatNumber, formatPercentage } from '@/lib';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -116,33 +116,57 @@ const ENFERMEDADES: EnfermedadPreset[] = [
 ];
 
 // ─────────────────────────────────────────────
-// Lógica de simulación numérica (método de Euler)
+// Lógica de simulación numérica (Runge-Kutta de orden 4)
 // ─────────────────────────────────────────────
+
+/**
+ * Subpasos por día de la integración. Hasta el 04/11/2026 era Euler explícito con paso de 1 día,
+ * que sobrestimaba el pico del SIR continuo de la página entre un 4 % y un 11 % (314 frente a
+ * 302,1 con los valores iniciales; hallazgo 4032). RK4 a 0,1 día coincide con la fórmula cerrada
+ * a la décima. Se guarda un punto por día para las curvas.
+ *
+ * Sin recortes: el «E < 0,5 → 0» del SEIR borraba cada día los expuestos que entraban (0,4975
+ * con β 0,10) y la epidemia no arrancaba nunca con R₀ = 2; además restaba población y rompía
+ * S + E + I + R = N (hallazgo 4030). RK4 conserva la suma porque las derivadas suman cero.
+ */
+const PASOS_POR_DIA = 10;
+
+const integrarRK4 = (
+  derivada: (y: number[]) => number[],
+  y0: number[],
+  dias: number
+): number[][] => {
+  const h = 1 / PASOS_POR_DIA;
+  const muestras: number[][] = [y0];
+  let y = y0;
+  const sumar = (a: number[], b: number[], f: number) => a.map((v, k) => v + f * b[k]);
+  for (let dia = 1; dia <= dias; dia++) {
+    for (let p = 0; p < PASOS_POR_DIA; p++) {
+      const k1 = derivada(y);
+      const k2 = derivada(sumar(y, k1, h / 2));
+      const k3 = derivada(sumar(y, k2, h / 2));
+      const k4 = derivada(sumar(y, k3, h));
+      y = y.map((v, k) => v + (h / 6) * (k1[k] + 2 * k2[k] + 2 * k3[k] + k4[k]));
+    }
+    muestras.push(y);
+  }
+  return muestras;
+};
 
 const simularSIR = (
   beta: number,
   gamma: number,
   i0: number,
   dias: number
-): PuntoSIR[] => {
-  const puntos: PuntoSIR[] = [];
-  let S = N_POBLACION - i0;
-  let I = i0;
-  let R = 0;
-  for (let t = 0; t <= dias; t++) {
-    puntos.push({ s: S, i: I, r: R });
-    const dS = -(beta * S * I) / N_POBLACION;
-    const dI = (beta * S * I) / N_POBLACION - gamma * I;
-    const dR = gamma * I;
-    S += dS;
-    I += dI;
-    R += dR;
-    if (I < 0.5) { I = 0; }
-    if (S < 0) { S = 0; }
-    if (R > N_POBLACION) { R = N_POBLACION; }
-  }
-  return puntos;
-};
+): PuntoSIR[] =>
+  integrarRK4(
+    ([S, I]) => {
+      const contagios = (beta * S * I) / N_POBLACION;
+      return [-contagios, contagios - gamma * I, gamma * I];
+    },
+    [N_POBLACION - i0, i0, 0],
+    dias
+  ).map(([s, i, r]) => ({ s, i, r }));
 
 const simularSEIR = (
   beta: number,
@@ -150,28 +174,41 @@ const simularSEIR = (
   sigma: number,
   i0: number,
   dias: number
-): PuntoSEIR[] => {
-  const puntos: PuntoSEIR[] = [];
-  let S = N_POBLACION - i0;
-  let E = 0;
-  let I = i0;
-  let R = 0;
-  for (let t = 0; t <= dias; t++) {
-    puntos.push({ s: S, e: E, i: I, r: R });
-    const dS = -(beta * S * I) / N_POBLACION;
-    const dE = (beta * S * I) / N_POBLACION - sigma * E;
-    const dI = sigma * E - gamma * I;
-    const dR = gamma * I;
-    S += dS;
-    E += dE;
-    I += dI;
-    R += dR;
-    if (I < 0.5) { I = 0; }
-    if (E < 0.5) { E = 0; }
-    if (S < 0) { S = 0; }
-  }
-  return puntos;
-};
+): PuntoSEIR[] =>
+  integrarRK4(
+    ([S, E, I]) => {
+      const contagios = (beta * S * I) / N_POBLACION;
+      return [-contagios, contagios - sigma * E, sigma * E - gamma * I, gamma * I];
+    },
+    [N_POBLACION - i0, 0, i0, 0],
+    dias
+  ).map(([s, e, i, r]) => ({ s, e, i, r }));
+
+/** Rango de los deslizadores del SIR y del SEIR (un preset que se sale se recorta a ellos). */
+const RANGO = {
+  beta: { min: 0.1, max: 0.8 },
+  gamma: { min: 0.05, max: 0.5 },
+  sigma: { min: 0.05, max: 0.5 },
+} as const;
+
+const acotar = (v: number, r: { min: number; max: number }) => Math.min(r.max, Math.max(r.min, v));
+
+interface ParametrosSIR {
+  beta: number;
+  gamma: number;
+  i0: number;
+}
+
+interface ParametrosSEIR {
+  beta: number;
+  gamma: number;
+  sigma: number;
+}
+
+interface PresetCargado {
+  enfermedad: EnfermedadPreset;
+  betaRecortada: boolean;
+}
 
 // ─────────────────────────────────────────────
 // Utilidades SVG
@@ -197,10 +234,18 @@ const puntosAPolyline = (
     .join(' ');
 };
 
-const formatNum = (n: number): string => {
-  if (n >= 1000) return n.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-  return n.toFixed(n < 10 ? 1 : 0);
-};
+/** Personas: con un decimal por debajo de 10 («1,0»), enteras por encima, en formato español. */
+const formatNum = (n: number): string => formatNumber(n, n < 10 ? 1 : 0);
+
+/** Una cifra de la tabla o de un preset sin ceros de relleno: 1,3 · 15 · 0,26. */
+const cifra = (n: number): string => n.toLocaleString('es-ES', { maximumFractionDigits: 3 });
+
+/** Fracción 0..1 → «67 %» con espacio duro. */
+const pctEntero = (fraccion: number): string => formatPercentage(fraccion, 0);
+
+/** Retraso con su signo: «+28 d», «−3 d», «0 d». */
+const conSigno = (dias: number): string =>
+  `${dias > 0 ? '+' : dias < 0 ? '−' : ''}${Math.abs(dias)} d`;
 
 // ─────────────────────────────────────────────
 // Ejes SVG reutilizables
@@ -256,10 +301,69 @@ const EjesSvg = ({ maxVal, totalDias }: { maxVal: number; totalDias: number }) =
 // Sección 1: Simulador SIR
 // ─────────────────────────────────────────────
 
-const SeccionSIR = () => {
-  const [beta, setBeta] = useState(0.3);
-  const [gamma, setGamma] = useState(0.1);
-  const [i0, setI0] = useState(5);
+/**
+ * Deslizador con su etiqueta visible como nombre accesible. Hasta el 04/11/2026 llevaba un
+ * aria-label con el valor en formato inglés («Tasa de transmisión: 0.3») que tapaba la etiqueta,
+ * y el valor visible salía de toFixed(2) («0.30», «5.00»; cabos C0485 y C0511, hallazgos 4033 y
+ * 4034). Ahora la etiqueta rotula el control y el valor va en formato español, también en
+ * aria-valuetext.
+ */
+const Deslizador = ({
+  id,
+  etiqueta,
+  simbolo,
+  desc,
+  valor,
+  min,
+  max,
+  paso,
+  onChange,
+}: {
+  id: string;
+  etiqueta: string;
+  simbolo: string;
+  desc: string;
+  valor: number;
+  min: number;
+  max: number;
+  paso: number;
+  onChange: (v: number) => void;
+}) => {
+  const pct = ((valor - min) / (max - min)) * 100;
+  const texto = formatNumber(valor, paso >= 1 ? 0 : 2);
+  return (
+    <div className={styles.sliderGroup}>
+      <label htmlFor={id} className={styles.sliderLabel}>
+        <span>{simbolo} {etiqueta}</span>
+        <span className={styles.sliderValor}>{texto}</span>
+      </label>
+      <input
+        id={id}
+        type="range"
+        className={styles.sliderInput}
+        style={{ ['--pct' as string]: `${pct}%` }}
+        min={min}
+        max={max}
+        step={paso}
+        value={valor}
+        onChange={(e) => onChange(Number(e.target.value))}
+        aria-valuetext={texto}
+      />
+      <span className={styles.sliderDesc}>{desc}</span>
+    </div>
+  );
+};
+
+const SeccionSIR = ({
+  parametros,
+  onCambiar,
+  preset,
+}: {
+  parametros: ParametrosSIR;
+  onCambiar: (p: ParametrosSIR) => void;
+  preset: PresetCargado | null;
+}) => {
+  const { beta, gamma, i0 } = parametros;
 
   const puntos = useMemo(() => simularSIR(beta, gamma, i0, DIAS_SIMULACION), [beta, gamma, i0]);
 
@@ -267,7 +371,7 @@ const SeccionSIR = () => {
   const picoI = Math.max(...puntos.map(p => p.i));
   const diaPico = puntos.findIndex(p => p.i === picoI);
   const totalAfectados = puntos[DIAS_SIMULACION].r + puntos[DIAS_SIMULACION].i;
-  const pctAfectados = (totalAfectados / N_POBLACION) * 100;
+  const fraccionAfectados = totalAfectados / N_POBLACION;
 
   const maxVal = N_POBLACION;
   const sPolyline = puntosAPolyline(puntos.map(p => p.s), DIAS_SIMULACION, maxVal);
@@ -277,42 +381,6 @@ const SeccionSIR = () => {
   const epidemia = r0 > 1;
 
   const idBase = useId();
-  const crearSlider = useCallback(
-    (
-      etiqueta: string,
-      simbolo: string,
-      desc: string,
-      valor: number,
-      min: number,
-      max: number,
-      paso: number,
-      setter: (v: number) => void
-    ) => {
-      const pct = ((valor - min) / (max - min)) * 100;
-      return (
-        <div className={styles.sliderGroup}>
-          <label htmlFor={`${idBase}-${simbolo}`} className={styles.sliderLabel}>
-            <span>{simbolo} {etiqueta}</span>
-            <span className={styles.sliderValor}>{valor.toFixed(2)}</span>
-          </label>
-          <input
-            id={`${idBase}-${simbolo}`}
-            type="range"
-            className={styles.sliderInput}
-            style={{ ['--pct' as string]: `${pct}%` }}
-            min={min}
-            max={max}
-            step={paso}
-            value={valor}
-            onChange={(e) => setter(parseFloat(e.target.value))}
-            aria-label={`${etiqueta}: ${valor}`}
-          />
-          <span className={styles.sliderDesc}>{desc}</span>
-        </div>
-      );
-    },
-    [idBase]
-  );
 
   return (
     <div className={styles.seccion}>
@@ -323,10 +391,26 @@ const SeccionSIR = () => {
         (inmunes). Ajusta los parámetros con los sliders y observa cómo cambian las curvas.
       </p>
 
+      {preset && (
+        <div className={styles.infoIncubacion} role="status">
+          <p className={styles.infoIncubacionTitle}>
+            <span aria-hidden="true">{preset.enfermedad.emoji}</span> {preset.enfermedad.nombre} — cargada en el Simulador SIR
+          </p>
+          <p>
+            β = {cifra(beta)}, γ = {cifra(gamma)}, I₀ = {i0}: R₀ = {formatNumber(r0, 2)}.
+            <span>
+              {preset.betaRecortada
+                ? ` Su β de ${cifra(preset.enfermedad.beta)} (R₀ ${cifra(preset.enfermedad.r0)}) supera el máximo del deslizador y se ha recortado a ${cifra(RANGO.beta.max)}.`
+                : ''}
+            </span>
+          </p>
+        </div>
+      )}
+
       <div className={styles.slidersGrid}>
-        {crearSlider('Tasa de transmisión', 'β', 'Probabilidad diaria de contagio × contactos. A mayor β, más rápido se extiende la infección.', beta, 0.1, 0.8, 0.01, setBeta)}
-        {crearSlider('Tasa de recuperación', 'γ', 'Fracción de infectados que se recuperan por día. 1/γ = duración media de la infección.', gamma, 0.05, 0.5, 0.01, setGamma)}
-        {crearSlider('Infectados iniciales', 'I₀', 'Número de casos al inicio de la simulación.', i0, 1, 20, 1, setI0)}
+        <Deslizador id={`${idBase}-beta`} etiqueta="Tasa de transmisión" simbolo="β" desc="Probabilidad diaria de contagio × contactos. A mayor β, más rápido se extiende la infección." valor={beta} min={RANGO.beta.min} max={RANGO.beta.max} paso={0.01} onChange={(v) => onCambiar({ ...parametros, beta: v })} />
+        <Deslizador id={`${idBase}-gamma`} etiqueta="Tasa de recuperación" simbolo="γ" desc="Fracción de infectados que se recuperan por día. 1/γ = duración media de la infección." valor={gamma} min={RANGO.gamma.min} max={RANGO.gamma.max} paso={0.01} onChange={(v) => onCambiar({ ...parametros, gamma: v })} />
+        <Deslizador id={`${idBase}-i0`} etiqueta="Infectados iniciales" simbolo="I₀" desc="Número de casos al inicio de la simulación." valor={i0} min={1} max={20} paso={1} onChange={(v) => onCambiar({ ...parametros, i0: v })} />
         <div className={styles.sliderGroup} style={{ justifyContent: 'center', paddingTop: '0.5rem' }}>
           <span className={styles.sliderDesc} style={{ fontStyle: 'italic' }}>
             Población fija: <strong>N = 1.000 personas</strong>
@@ -337,12 +421,12 @@ const SeccionSIR = () => {
       {/* R0 destacado */}
       <div className={`${styles.r0Box} ${epidemia ? styles.r0BoxAlerta : styles.r0BoxOk}`}>
         <div className={`${styles.r0Valor} ${epidemia ? styles.r0ValorAlerta : styles.r0ValorOk}`} aria-live="polite">
-          R₀ = {r0.toFixed(2)}
+          R₀ = {formatNumber(r0, 2)}
         </div>
         <p className={styles.r0Texto}>
           {epidemia
-            ? <span key="rama-1"><strong>Epidemia</strong>: R₀ &gt; 1 significa que cada infectado contagia a más de una persona — la infección se expande. El umbral de inmunidad colectiva es {(100 * (1 - 1 / r0)).toFixed(0)}%.</span>
-            : <span key="rama-2"><strong>Extinción</strong>: R₀ &lt; 1 significa que cada infectado contagia a menos de una persona — la infección desaparece sola. No hay epidemia sostenida.</span>
+            ? <span key="rama-1"><strong>Epidemia</strong>: R₀ &gt; 1 significa que cada infectado contagia a más de una persona — la infección se expande. El umbral de inmunidad colectiva es {pctEntero(1 - 1 / r0)}.</span>
+            : <span key="rama-2"><strong>Extinción</strong>: R₀ ≤ 1 significa que cada infectado contagia de media a una persona o menos — y como no toda la población sigue siendo susceptible, a menos de una: la infección desaparece sola. No hay epidemia sostenida.</span>
           }
         </p>
       </div>
@@ -350,7 +434,7 @@ const SeccionSIR = () => {
       {/* Métricas */}
       <div className={styles.metricasGrid}>
         <div className={`${styles.metricaCard} ${epidemia ? styles.metricaAlerta : styles.metricaOk}`}>
-          <div className={styles.metricaValor}>{r0.toFixed(2)}</div>
+          <div className={styles.metricaValor}>{formatNumber(r0, 2)}</div>
           <div className={styles.metricaLabel}>Número reproductivo básico R₀</div>
         </div>
         <div className={styles.metricaCard}>
@@ -361,8 +445,8 @@ const SeccionSIR = () => {
           <div className={styles.metricaValor}>{diaPico}</div>
           <div className={styles.metricaLabel}>Día del pico de infección</div>
         </div>
-        <div className={`${styles.metricaCard} ${pctAfectados > 50 ? styles.metricaAlerta : ''}`}>
-          <div className={styles.metricaValor}>{pctAfectados.toFixed(0)}%</div>
+        <div className={`${styles.metricaCard} ${fraccionAfectados > 0.5 ? styles.metricaAlerta : ''}`}>
+          <div className={styles.metricaValor}>{pctEntero(fraccionAfectados)}</div>
           <div className={styles.metricaLabel}>% población afectada al final</div>
         </div>
       </div>
@@ -389,7 +473,7 @@ const SeccionSIR = () => {
           viewBox={`0 0 ${VB_W} ${VB_H}`}
           className={styles.graficaSvg}
           role="img"
-          aria-label={`Curvas SIR: pico de infectados ${formatNum(picoI)} personas el día ${diaPico}, R₀ = ${r0.toFixed(2)}`}
+          aria-label={`Curvas SIR: pico de infectados ${formatNum(picoI)} personas el día ${diaPico}, R₀ = ${formatNumber(r0, 2)}`}
         >
           {/* Zona sombreada R₀ > 1 vs R₀ ≤ 1 */}
           {epidemia && (
@@ -435,10 +519,14 @@ const SeccionSIR = () => {
 // Sección 2: Modelo SEIR vs SIR
 // ─────────────────────────────────────────────
 
-const SeccionSEIR = () => {
-  const [beta, setBeta] = useState(0.3);
-  const [gamma, setGamma] = useState(0.1);
-  const [sigma, setSigma] = useState(0.2);
+const SeccionSEIR = ({
+  parametros,
+  onCambiar,
+}: {
+  parametros: ParametrosSEIR;
+  onCambiar: (p: ParametrosSEIR) => void;
+}) => {
+  const { beta, gamma, sigma } = parametros;
   const [mostrar, setMostrar] = useState<'ambos' | 'sir' | 'seir'>('ambos');
 
   const ptosSIR = useMemo(() => simularSIR(beta, gamma, 5, DIAS_SIMULACION), [beta, gamma]);
@@ -456,39 +544,6 @@ const SeccionSEIR = () => {
   const diaSEIR = ptosSEIR.findIndex(p => p.i === picoSEIR);
 
   const idBase = useId();
-  const crearSlider = useCallback(
-    (
-      etiqueta: string,
-      simbolo: string,
-      desc: string,
-      valor: number,
-      min: number,
-      max: number,
-      paso: number,
-      setter: (v: number) => void
-    ) => {
-      const pct = ((valor - min) / (max - min)) * 100;
-      return (
-        <div className={styles.sliderGroup}>
-          <label htmlFor={`${idBase}-${simbolo}`} className={styles.sliderLabel}>
-            <span>{simbolo} {etiqueta}</span>
-            <span className={styles.sliderValor}>{valor.toFixed(2)}</span>
-          </label>
-          <input
-            id={`${idBase}-${simbolo}`}
-            type="range"
-            className={styles.sliderInput}
-            style={{ ['--pct' as string]: `${pct}%` }}
-            min={min} max={max} step={paso} value={valor}
-            onChange={(e) => setter(parseFloat(e.target.value))}
-            aria-label={`${etiqueta}: ${valor}`}
-          />
-          <span className={styles.sliderDesc}>{desc}</span>
-        </div>
-      );
-    },
-    [idBase]
-  );
 
   return (
     <div className={styles.seccion}>
@@ -504,18 +559,18 @@ const SeccionSEIR = () => {
         <p>
           Las personas pasan de S → E al exponerse al virus, y de E → I tras el periodo de incubación
           (1/σ días). A mayor σ, más corto el periodo de incubación y más se parece al SIR.
-          COVID-19: σ ≈ 0.2 (≈ 5 días de incubación). Gripe: σ ≈ 0.5 (≈ 2 días).
+          COVID-19: σ ≈ 0,2 (≈ 5 días de incubación). Gripe: σ ≈ 0,33 (≈ 3 días).
         </p>
       </div>
 
       <div className={styles.slidersGrid}>
-        {crearSlider('Tasa de transmisión', 'β', 'Prob. diaria de contagio × contactos.', beta, 0.1, 0.8, 0.01, setBeta)}
-        {crearSlider('Tasa de recuperación', 'γ', '1/γ = duración media infección en días.', gamma, 0.05, 0.5, 0.01, setGamma)}
-        {crearSlider('Progresión E→I (σ)', 'σ', '1/σ = duración del periodo de incubación.', sigma, 0.05, 0.5, 0.01, setSigma)}
+        <Deslizador id={`${idBase}-beta`} etiqueta="Tasa de transmisión" simbolo="β" desc="Prob. diaria de contagio × contactos." valor={beta} min={RANGO.beta.min} max={RANGO.beta.max} paso={0.01} onChange={(v) => onCambiar({ ...parametros, beta: v })} />
+        <Deslizador id={`${idBase}-gamma`} etiqueta="Tasa de recuperación" simbolo="γ" desc="1/γ = duración media infección en días." valor={gamma} min={RANGO.gamma.min} max={RANGO.gamma.max} paso={0.01} onChange={(v) => onCambiar({ ...parametros, gamma: v })} />
+        <Deslizador id={`${idBase}-sigma`} etiqueta="Progresión E→I (σ)" simbolo="σ" desc="1/σ = duración del periodo de incubación." valor={sigma} min={RANGO.sigma.min} max={RANGO.sigma.max} paso={0.01} onChange={(v) => onCambiar({ ...parametros, sigma: v })} />
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', justifyContent: 'flex-end' }}>
           <span className={styles.sliderDesc} style={{ fontStyle: 'italic' }}>
-            COVID-19: β=0.3, γ=0.1, σ=0.2 → R₀≈3<br />
-            Gripe: β=0.26, γ=0.2, σ=0.33 → R₀≈1.3
+            COVID-19: β = 0,3, γ = 0,1, σ = 0,2 → R₀ ≈ 3<br />
+            Gripe: β = 0,26, γ = 0,2, σ = 0,33 → R₀ ≈ 1,3
           </span>
         </div>
       </div>
@@ -538,7 +593,7 @@ const SeccionSEIR = () => {
       {/* Métricas comparativas */}
       <div className={styles.metricasGrid}>
         <div className={styles.metricaCard}>
-          <div className={styles.metricaValor}>{(beta / gamma).toFixed(2)}</div>
+          <div className={styles.metricaValor}>{formatNumber(beta / gamma, 2)}</div>
           <div className={styles.metricaLabel}>R₀ (ambos modelos)</div>
         </div>
         <div className={styles.metricaCard}>
@@ -550,7 +605,7 @@ const SeccionSEIR = () => {
           <div className={styles.metricaLabel}>Pico SEIR (día {diaSEIR})</div>
         </div>
         <div className={styles.metricaCard}>
-          <div className={styles.metricaValor}>+{diaSEIR - diaSIR}d</div>
+          <div className={styles.metricaValor}>{conSigno(diaSEIR - diaSIR)}</div>
           <div className={styles.metricaLabel}>Retraso del pico por incubación</div>
         </div>
       </div>
@@ -627,9 +682,9 @@ const SeccionRt = () => {
 
   const marcaRt1Y = escalarY(1, maxRt);
 
-  const umbralInmunidad = control > 0
-    ? Math.max(0, (1 - 1 / r0efectivo) * 100)
-    : (1 - 1 / r0) * 100;
+  // Con R₀ efectivo ≤ 1 no hace falta inmunidad alguna: 0 %. Hasta el 04/11/2026 la rama sin
+  // control no acotaba y con R₀ 0,2 pintaba «-400%» (hallazgo 4031).
+  const umbralInmunidad = Math.max(0, 1 - 1 / r0efectivo);
 
   const pct = ((control - 0) / 90) * 100;
 
@@ -646,46 +701,46 @@ const SeccionRt = () => {
         <div className={styles.sliderGroup}>
           <label htmlFor="rt-beta" className={styles.sliderLabel}>
             <span>β Tasa de transmisión</span>
-            <span className={styles.sliderValor}>{beta.toFixed(2)}</span>
+            <span className={styles.sliderValor}>{formatNumber(beta, 2)}</span>
           </label>
           <input id="rt-beta" type="range" className={styles.sliderInput}
             style={{ ['--pct' as string]: `${((beta - 0.1) / 0.7) * 100}%` }}
             min={0.1} max={0.8} step={0.01} value={beta}
-            onChange={(e) => setBeta(parseFloat(e.target.value))}
-            aria-label={`Beta tasa transmisión: ${beta}`}
+            onChange={(e) => setBeta(Number(e.target.value))}
+            aria-valuetext={formatNumber(beta, 2)}
           />
-          <span className={styles.sliderDesc}>R₀ = β/γ = <strong>{r0.toFixed(2)}</strong></span>
+          <span className={styles.sliderDesc}>R₀ = β/γ = <strong>{formatNumber(r0, 2)}</strong></span>
         </div>
         <div className={styles.sliderGroup}>
           <label htmlFor="rt-gamma" className={styles.sliderLabel}>
             <span>γ Tasa de recuperación</span>
-            <span className={styles.sliderValor}>{gamma.toFixed(2)}</span>
+            <span className={styles.sliderValor}>{formatNumber(gamma, 2)}</span>
           </label>
           <input id="rt-gamma" type="range" className={styles.sliderInput}
             style={{ ['--pct' as string]: `${((gamma - 0.05) / 0.45) * 100}%` }}
             min={0.05} max={0.5} step={0.01} value={gamma}
-            onChange={(e) => setGamma(parseFloat(e.target.value))}
-            aria-label={`Gamma tasa recuperación: ${gamma}`}
+            onChange={(e) => setGamma(Number(e.target.value))}
+            aria-valuetext={formatNumber(gamma, 2)}
           />
-          <span className={styles.sliderDesc}>1/γ ≈ {(1 / gamma).toFixed(1)} días de infección</span>
+          <span className={styles.sliderDesc}>1/γ ≈ {formatNumber(1 / gamma, 1)} días de infección</span>
         </div>
         <div className={styles.sliderGroup}>
           <label htmlFor="rt-control" className={styles.sliderLabel}>
             <span><span aria-hidden="true">🎛️</span> Medidas de control</span>
-            <span className={styles.sliderValor}>{control}%</span>
+            <span className={styles.sliderValor}>{pctEntero(control / 100)}</span>
           </label>
           <input id="rt-control" type="range" className={styles.sliderInput}
             style={{ ['--pct' as string]: `${pct}%` }}
             min={0} max={90} step={5} value={control}
-            onChange={(e) => setControl(parseInt(e.target.value))}
-            aria-label={`Reducción transmisión por medidas de control: ${control}%`}
+            onChange={(e) => setControl(Number(e.target.value))}
+            aria-valuetext={`${pctEntero(control / 100)} menos de transmisión`}
           />
           <span className={styles.sliderDesc}>
-            Reduce β en {control}% → β efectiva = {betaEfectiva.toFixed(3)} → R₀ efectivo = {r0efectivo.toFixed(2)}
+            Reduce β en {pctEntero(control / 100)} → β efectiva = {formatNumber(betaEfectiva, 3)} → R₀ efectivo = {formatNumber(r0efectivo, 2)}
           </span>
         </div>
         <div className={styles.metricaCard} style={{ alignSelf: 'center' }}>
-          <div className={styles.metricaValor}>{umbralInmunidad.toFixed(0)}%</div>
+          <div className={styles.metricaValor}>{pctEntero(umbralInmunidad)}</div>
           <div className={styles.metricaLabel}>Umbral inmunidad colectiva necesario</div>
         </div>
       </div>
@@ -712,7 +767,7 @@ const SeccionRt = () => {
           viewBox={`0 0 ${VB_W} ${VB_H}`}
           className={styles.graficaSvg}
           role="img"
-          aria-label={`Curva de número reproductivo efectivo Rₜ. R₀ = ${r0.toFixed(2)}, control ${control}%, R₀ efectivo ${r0efectivo.toFixed(2)}`}
+          aria-label={`Curva de número reproductivo efectivo Rₜ. R₀ = ${formatNumber(r0, 2)}, control ${pctEntero(control / 100)}, R₀ efectivo ${formatNumber(r0efectivo, 2)}`}
         >
           <EjesSvg maxVal={maxRt} totalDias={DIAS_SIMULACION} />
 
@@ -756,10 +811,7 @@ const SeccionRt = () => {
 // ─────────────────────────────────────────────
 
 const SeccionComparativa = ({ onSeleccionar }: { onSeleccionar: (e: EnfermedadPreset) => void }) => {
-  const [seleccionada, setSeleccionada] = useState<number | null>(null);
-
   const handleSeleccionar = (idx: number) => {
-    setSeleccionada(idx);
     onSeleccionar(ENFERMEDADES[idx]);
   };
 
@@ -774,7 +826,8 @@ const SeccionComparativa = ({ onSeleccionar }: { onSeleccionar: (e: EnfermedadPr
       <h2 className={styles.seccionTitulo}>Comparativa de enfermedades reales</h2>
       <p className={styles.seccionDesc}>
         Parámetros reales de enfermedades conocidas. Pulsa &quot;Simular&quot; en cualquier fila para
-        cargar automáticamente sus parámetros en el Simulador SIR.
+        cargar automáticamente sus parámetros en el Simulador SIR (y su σ en el Modelo SEIR). Si
+        una β pasa del máximo del deslizador, se recorta a {cifra(RANGO.beta.max)} y se avisa.
       </p>
 
       <div className={styles.tablaScroll}>
@@ -792,10 +845,10 @@ const SeccionComparativa = ({ onSeleccionar }: { onSeleccionar: (e: EnfermedadPr
           </thead>
           <tbody>
             {ENFERMEDADES.map((e, idx) => (
-              <tr key={e.nombre} className={seleccionada === idx ? styles.filaSeleccionada : ''}>
+              <tr key={e.nombre}>
                 <td><strong><span aria-hidden="true">{e.emoji}</span> {e.nombre}</strong></td>
                 <td>
-                  <span className={`${styles.r0Badge} ${badgeClass(e.r0)}`}>{e.r0}</span>
+                  <span className={`${styles.r0Badge} ${badgeClass(e.r0)}`}>{cifra(e.r0)}</span>
                 </td>
                 <td>{e.mortalidad}</td>
                 <td>{e.periodoInfeccioso}</td>
@@ -806,7 +859,7 @@ const SeccionComparativa = ({ onSeleccionar }: { onSeleccionar: (e: EnfermedadPr
                     type="button"
                     className={styles.btnSeleccionar}
                     onClick={() => handleSeleccionar(idx)}
-                    aria-label={`Simular ${e.nombre} con R₀ ${e.r0}`}
+                    aria-label={`Simular ${e.nombre} con R₀ ${cifra(e.r0)}`}
                   >
                     Simular
                   </button>
@@ -816,20 +869,6 @@ const SeccionComparativa = ({ onSeleccionar }: { onSeleccionar: (e: EnfermedadPr
           </tbody>
         </table>
       </div>
-
-      {seleccionada !== null && (
-        <div className={`${styles.infoIncubacion} ${styles.fadeIn}`}>
-          <p className={styles.infoIncubacionTitle}>
-            <span aria-hidden="true">{ENFERMEDADES[seleccionada].emoji}</span> {ENFERMEDADES[seleccionada].nombre} — cargada en el Simulador SIR
-          </p>
-          <p>
-            β = {ENFERMEDADES[seleccionada].beta}, γ = {ENFERMEDADES[seleccionada].gamma},
-            R₀ = {ENFERMEDADES[seleccionada].r0}.
-            Ve a la pestaña <strong>Simulador SIR</strong> o <strong>SEIR</strong> para ver las curvas con estos parámetros.
-            (Nota: en el simulador SIR los sliders se fijan a los límites del rango disponible.)
-          </p>
-        </div>
-      )}
     </div>
   );
 };
@@ -840,10 +879,25 @@ const SeccionComparativa = ({ onSeleccionar }: { onSeleccionar: (e: EnfermedadPr
 
 export default function VisualizadorModelosEpidemiologicos() {
   const [seccion, setSeccion] = useState<SeccionActiva>('sir');
+  // Los parámetros viven aquí y no en cada pestaña: así «Simular» de la tabla los carga. Hasta el
+  // 04/11/2026 cada pestaña tenía su useState y el botón solo cambiaba de pestaña, que se volvía
+  // a montar con 0,3 / 0,1 / 5 para cualquier enfermedad (hallazgo 4029).
+  const [parametrosSIR, setParametrosSIR] = useState<ParametrosSIR>({ beta: 0.3, gamma: 0.1, i0: 5 });
+  const [parametrosSEIR, setParametrosSEIR] = useState<ParametrosSEIR>({ beta: 0.3, gamma: 0.1, sigma: 0.2 });
+  const [preset, setPreset] = useState<PresetCargado | null>(null);
 
-  const handleSeleccionarEnfermedad = useCallback((_e: EnfermedadPreset) => {
-    // Simplemente redirige al usuario a la pestaña SIR para que vea el contexto
+  const handleSeleccionarEnfermedad = useCallback((e: EnfermedadPreset) => {
+    const beta = acotar(e.beta, RANGO.beta);
+    const gamma = acotar(e.gamma, RANGO.gamma);
+    setParametrosSIR({ beta, gamma, i0: 5 });
+    setParametrosSEIR({ beta, gamma, sigma: acotar(e.sigma, RANGO.sigma) });
+    setPreset({ enfermedad: e, betaRecortada: beta !== e.beta });
     setSeccion('sir');
+  }, []);
+
+  const cambiarSIR = useCallback((p: ParametrosSIR) => {
+    setParametrosSIR(p);
+    setPreset(null); // ya no son los de la enfermedad cargada
   }, []);
 
   const SECCIONES: { id: SeccionActiva; icon: string; label: string }[] = [
@@ -855,10 +909,8 @@ export default function VisualizadorModelosEpidemiologicos() {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      {/* El JSON-LD (WebApplication y FAQPage) lo inyecta layout.tsx: repetirlo aquí servía dos
+          WebApplication (hallazgo 4037). */}
       <div className={styles.container}>
         <MeskeiaLogo />
 
@@ -892,8 +944,8 @@ export default function VisualizadorModelosEpidemiologicos() {
 
         {/* Contenido por sección */}
         <main>
-          {seccion === 'sir' && <SeccionSIR />}
-          {seccion === 'seir' && <SeccionSEIR />}
+          {seccion === 'sir' && <SeccionSIR parametros={parametrosSIR} onCambiar={cambiarSIR} preset={preset} />}
+          {seccion === 'seir' && <SeccionSEIR parametros={parametrosSEIR} onCambiar={setParametrosSEIR} />}
           {seccion === 'rt' && <SeccionRt />}
           {seccion === 'comparativa' && <SeccionComparativa onSeleccionar={handleSeleccionarEnfermedad} />}
         </main>
@@ -950,8 +1002,8 @@ export default function VisualizadorModelosEpidemiologicos() {
             <h3>El umbral de inmunidad colectiva</h3>
             <p>
               La epidemia se extingue cuando S(t)/N cae por debajo de 1/R₀ — es decir, cuando al menos
-              (1 − 1/R₀) × 100% de la población es inmune. Para sarampión (R₀≈15) se necesita el 93%;
-              para gripe estacional (R₀≈1.3) basta el 23%. Este umbral puede alcanzarse por infección
+              (1 − 1/R₀) × 100 % de la población es inmune. Para sarampión (R₀ ≈ 15) se necesita el
+              93 %; para gripe estacional (R₀ ≈ 1,3) basta el 23 %. Este umbral puede alcanzarse por infección
               natural o por vacunación — pero la infección natural conlleva el coste de la mortalidad.
             </p>
           </section>

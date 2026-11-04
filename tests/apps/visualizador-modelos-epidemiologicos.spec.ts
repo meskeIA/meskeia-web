@@ -42,9 +42,13 @@ import { esperarHidratacion, sembrarValor, sembrarValorAcotado } from './_hidrat
  *   · C0485 (aria-label con el valor sin formato español, que tapa la etiqueta): CONFIRMADO.
  *   · C0511 (valor visible del deslizador con toFixed(2): «0.30», «5.00»): CONFIRMADO.
  *
- * Los casos con test.fail() son hallazgos ABIERTOS de esta inspección: cuando se reparen,
- * Playwright marcará el «fallo esperado» como inesperado; entonces se quita el test.fail() y el
- * comentario pasa a REPARADO.
+ * REPARACIÓN del 04/11/2026 (/reparar, hallazgos 4029-4039): RK4 con 10 subpasos por día y sin
+ * recortes, parámetros del SIR y del SEIR en el componente principal para que «Simular» de la
+ * tabla los cargue (β acotada a 0,8, con aviso), umbral acotado a 0 %, deslizadores sin
+ * aria-label y con el valor en formato español, formato español en resultados y textos, un solo
+ * WebApplication, FAQ «aplanar la curva» corregida, «R₀ ≤ 1» y el mismo σ para la gripe. Los
+ * casos que eran test.fail() pasan a REPARADO. Con RK4, los valores del SIR son los de la columna
+ * «cerrado/RK4» de la tabla de arriba.
  */
 
 const URL_APP = '/visualizador-modelos-epidemiologicos/';
@@ -198,24 +202,25 @@ test.describe('Simulador SIR — casos resueltos a mano', () => {
     expect(despues).toBeLessThanOrEqual(59);
   });
 
-  test('ABIERTO · el pico es el del modelo SIR continuo que enseña la página (302 ± 3), no el de Euler a 1 día', async ({ page }) => {
-    // Hallazgo de esta inspección: Euler con paso de 1 día sobrestima el pico del SIR continuo
-    // de las ecuaciones de la página. Fórmula cerrada con β 0,3, γ 0,1, S₀ 995, I₀ 5:
-    // I_max = 1000 − (1000/3)·(1 + ln(2,985)) = 302,1. La app da 314 (+4 %); en el rango de los
-    // deslizadores llega al +11 % (β 0,8 γ 0,25: 362 frente a 325,6). Con paso 0,1 día el mismo
-    // Euler da 303,1: la tolerancia de ±3 (1 %) la cumple cualquier integración razonable.
-    test.fail();
+  test('REPARADO (4032) · el pico es el del modelo SIR continuo que enseña la página (302 ± 3), no el de Euler a 1 día', async ({ page }) => {
+    // REPARADO el 04/11/2026: RK4 a 0,1 día. Euler con paso de 1 día sobrestimaba el pico del SIR
+    // continuo de las ecuaciones de la página. Fórmula cerrada con β 0,3, γ 0,1, S₀ 995, I₀ 5:
+    // I_max = 1000 − (1000/3)·(1 + ln(2,985)) = 302,1. La app daba 314 (+4 %); en el rango de los
+    // deslizadores llegaba al +11 % (β 0,8 γ 0,25: 362 frente a 325,6).
     const pico = await leer(metrica(page, PICO_SIR));
     expect(Math.abs(pico - 302.1)).toBeLessThanOrEqual(3);
+    await fijarSIR(page, 0.8, 0.25, 5);
+    // Peor caso del rango con Euler: con R₀ 3,2, S₀ 995: 1000 − (1000/3,2)·(1 + ln(3,184)) = 325,6
+    expect(Math.abs((await leer(metrica(page, PICO_SIR))) - 325.6)).toBeLessThanOrEqual(3);
   });
 
-  test('ABIERTO · con R₀ = 1,00 no dice «R₀ < 1»', async ({ page }) => {
-    // β 0,10 γ 0,10 → R₀ = 1 exacto. No hay epidemia (S < N ⇒ dI/dt < 0), pero el texto de la
-    // rama «Extinción» afirma «R₀ < 1» con un R₀ = 1.00 encima. (γ ya vale 0,10 al cargar.)
+  test('REPARADO (4038) · con R₀ = 1,00 no dice «R₀ < 1»', async ({ page }) => {
+    // β 0,10 γ 0,10 → R₀ = 1 exacto. No hay epidemia (S < N ⇒ dI/dt < 0); el texto de la rama
+    // «Extinción» afirmaba «R₀ < 1» con un R₀ = 1.00 encima. Ahora «R₀ ≤ 1». (γ ya vale 0,10.)
     await sembrarValor(page, deslizador(page, 0), 0.1);
     expect(await leer(metrica(page, R0_SIR))).toBeCloseTo(1, 2);
-    test.fail();
     await expect(page.locator('main [class*="r0Box"]')).not.toContainText('R₀ < 1');
+    await expect(page.locator('main [class*="r0Box"]')).toContainText('R₀ ≤ 1');
   });
 });
 
@@ -241,16 +246,15 @@ test.describe('Modelo SEIR', () => {
     expect(retraso).toBeLessThanOrEqual(29);
   });
 
-  test('ABIERTO · β 0,10 γ 0,05 (R₀ 2): el SEIR también despega, y el retraso no sale negativo', async ({ page }) => {
-    // Hallazgo de esta inspección: el recorte «E < 0,5 → 0» borra los expuestos del primer día
-    // (0,1·995·5/1000 = 0,4975 < 0,5) y de todos los siguientes: la epidemia SEIR no arranca
-    // nunca aunque R₀ = 2, y la app pinta «Pico SEIR (día 0) 5.0» y «+-104d». Esperado (RK4):
-    // pico SEIR 124,3 el día 143,2; el mismo Euler sin ese recorte, 125,5 el día 145. El SIR de
-    // al lado: 157,8 el día 104 → retraso ≈ +41 días.
+  test('REPARADO (4030) · β 0,10 γ 0,05 (R₀ 2): el SEIR también despega, y el retraso no sale negativo', async ({ page }) => {
+    // REPARADO el 04/11/2026 (sin recortes, RK4). El recorte «E < 0,5 → 0» borraba los expuestos
+    // del primer día (0,1·995·5/1000 = 0,4975 < 0,5) y de todos los siguientes: la epidemia SEIR
+    // no arrancaba nunca aunque R₀ = 2, y la app pintaba «Pico SEIR (día 0) 5.0» y «+-104d».
+    // Esperado (RK4): pico SEIR 124,3 el día 143,2; el SIR de al lado: 157,8 el día 104 →
+    // retraso ≈ +39 días (el ≈ +41 del acta era el del Euler a 1 día sin el recorte).
     await sembrarValor(page, deslizador(page, 0), 0.1);
     await sembrarValor(page, deslizador(page, 1), 0.05);
     expect(await leer(metrica(page, 'R₀ (ambos modelos)'))).toBeCloseTo(2, 2);
-    test.fail();
     const picoSEIR = await leer(metrica(page, /^Pico SEIR/));
     expect(picoSEIR).toBeGreaterThanOrEqual(120);
     expect(picoSEIR).toBeLessThanOrEqual(130);
@@ -258,11 +262,10 @@ test.describe('Modelo SEIR', () => {
     expect(await leer(metrica(page, 'Retraso del pico por incubación'))).toBeGreaterThanOrEqual(30);
   });
 
-  test('ABIERTO · la gripe lleva el mismo σ en los dos textos de la pestaña', async ({ page }) => {
-    // Hallazgo de esta inspección: el recuadro «Compartimento E» dice «Gripe: σ ≈ 0.5 (≈ 2
-    // días)» y la nota de los deslizadores «Gripe: β=0.26, γ=0.2, σ=0.33» (el preset de la
-    // tabla): dos periodos de incubación distintos para la misma enfermedad.
-    test.fail();
+  test('REPARADO (4039) · la gripe lleva el mismo σ en los dos textos de la pestaña', async ({ page }) => {
+    // REPARADO el 04/11/2026: el recuadro «Compartimento E» decía «Gripe: σ ≈ 0.5 (≈ 2 días)» y
+    // la nota de los deslizadores «Gripe: β=0.26, γ=0.2, σ=0.33» (el preset de la tabla). Ahora
+    // los dos dicen 0,33 (≈ 3 días), el valor del preset que se simula.
     const texto = (await page.locator('main').textContent()) ?? '';
     const sigmas = [...texto.matchAll(/Gripe:[^\n]*?σ\s*[=≈]\s*(\d+[.,]\d+)/g)].map((m) => aNumero(m[1]));
     expect(sigmas.length).toBeGreaterThanOrEqual(2);
@@ -288,35 +291,51 @@ test.describe('Rₜ y medidas de control', () => {
     expect(await leer(metrica(page, 'Umbral inmunidad colectiva necesario'))).toBe(33);
   });
 
-  test('ABIERTO · con R₀ 0,2 y sin control el umbral de inmunidad es 0 %, no −400 %', async ({ page }) => {
-    // Hallazgo de esta inspección: con control = 0 la app calcula (1 − 1/R₀)·100 sin acotar,
-    // y con β 0,10 γ 0,50 (R₀ 0,2) pinta «-400%». Con R₀ ≤ 1 no hace falta inmunidad alguna:
-    // 0 %, que es lo que ya da la rama con control > 0 (Math.max(0, …)).
+  test('REPARADO (4031) · con R₀ 0,2 y sin control el umbral de inmunidad es 0 %, no −400 %', async ({ page }) => {
+    // REPARADO el 04/11/2026: con control = 0 la app calculaba (1 − 1/R₀)·100 sin acotar, y con
+    // β 0,10 γ 0,50 (R₀ 0,2) pintaba «-400%». Con R₀ ≤ 1 no hace falta inmunidad alguna: 0 %.
     await sembrarValor(page, '#rt-beta', 0.1);
     await sembrarValor(page, '#rt-gamma', 0.5);
-    test.fail();
+    await expect(metrica(page, 'Umbral inmunidad colectiva necesario')).not.toContainText('-');
     expect(await leer(metrica(page, 'Umbral inmunidad colectiva necesario'))).toBe(0);
   });
 });
 
 test.describe('Comparativa de enfermedades', () => {
-  test('ABIERTO · «Simular» gripe carga β 0,26 y γ 0,20 en el Simulador SIR (R₀ 1,3)', async ({ page }) => {
-    // Hallazgo de esta inspección: la página promete «Pulsa "Simular" en cualquier fila para
-    // cargar automáticamente sus parámetros en el Simulador SIR» (y la FAQ, «parámetros
-    // preconfigurados para cinco enfermedades»), pero handleSeleccionarEnfermedad ignora la
-    // enfermedad y solo cambia de pestaña: el SIR se monta con sus valores iniciales y da
+  test('REPARADO (4029) · «Simular» gripe carga β 0,26 y γ 0,20 en el Simulador SIR (R₀ 1,3)', async ({ page }) => {
+    // REPARADO el 04/11/2026. La página promete «Pulsa "Simular" en cualquier fila para cargar
+    // automáticamente sus parámetros en el Simulador SIR» (y la FAQ, «parámetros
+    // preconfigurados para cinco enfermedades»), pero handleSeleccionarEnfermedad ignoraba la
+    // enfermedad y solo cambiaba de pestaña: el SIR se montaba con sus valores iniciales y daba
     // R₀ = 3.00 para la gripe. Esperado con β 0,26 γ 0,20 I₀ 5: R₀ 1,30, umbral 23 %, pico
-    // 32,8 (Euler 33,4) el día 51,6 (Euler 53), afectados 43,4 % (Euler 43,6 %).
+    // 32,8 el día 51,6, afectados 43,4 %.
     await abrir(page);
     await irAPestana(page, /Enfermedades/);
     await page.getByRole('button', { name: /^Simular Gripe estacional/ }).click();
     await esperarHidratacion(page, [DESLIZADORES]);
-    test.fail();
+    await expect(page.locator('main [role="status"]')).toContainText('Gripe estacional — cargada en el Simulador SIR');
     expect(await leer(metrica(page, R0_SIR))).toBeCloseTo(1.3, 2);
     await expect(page.locator('main [class*="r0Box"]')).toContainText(/inmunidad colectiva es 23\s?%/);
     const pico = await leer(metrica(page, PICO_SIR));
     expect(pico).toBeGreaterThanOrEqual(32);
     expect(pico).toBeLessThanOrEqual(34);
+    const dia = await leer(metrica(page, DIA_SIR));
+    expect(dia).toBeGreaterThanOrEqual(51);
+    expect(dia).toBeLessThanOrEqual(53);
+    expect(await leer(metrica(page, AFECTADOS_SIR))).toBe(43);
+  });
+
+  test('REPARADO (4029) · «Simular» sarampión recorta β a 0,8 (R₀ 8) y lo avisa; el SEIR recibe su σ', async ({ page }) => {
+    // Sarampión β 1,5, γ 0,1, σ 0,25: β pasa del máximo del deslizador (0,8) → R₀ = 0,8/0,1 = 8.
+    await abrir(page);
+    await irAPestana(page, /Enfermedades/);
+    await page.getByRole('button', { name: /^Simular Sarampión/ }).click();
+    await esperarHidratacion(page, [DESLIZADORES]);
+    expect(await leer(metrica(page, R0_SIR))).toBeCloseTo(8, 2);
+    await expect(page.locator('main [role="status"]')).toContainText('se ha recortado a 0,8');
+    await irAPestana(page, /Modelo SEIR/);
+    await esperarHidratacion(page, [DESLIZADORES]);
+    await expect(page.locator('main [class*="sliderValor"]').nth(2)).toHaveText('0,25');
   });
 });
 
@@ -341,13 +360,14 @@ test.describe('Cabos C0484, C0485 y C0511 — deslizadores', () => {
     await expect(deslizador(page, 2)).toBeFocused();
   });
 
-  test('ABIERTO · C0485 · el nombre accesible no lleva el valor en formato inglés y contiene la etiqueta visible', async ({ page }) => {
-    // Hoy el aria-label tapa la etiqueta: el lector anuncia «Tasa de transmisión: 0.3» (y otra
-    // vez «0.3» como valor del control). En Rₜ, «Beta tasa transmisión: 0.3» no contiene la
-    // etiqueta visible «Tasa de transmisión» (WCAG 2.5.3), y «…de control: 50%» pega el %.
-    // Los valores visibles de Rₜ salen de beta.toFixed(2) / gamma.toFixed(2): «0.30», «0.10».
-    test.fail();
+  test('REPARADO (4033) · C0485 · el nombre accesible no lleva el valor en formato inglés y contiene la etiqueta visible', async ({ page }) => {
+    // REPARADO el 04/11/2026: el aria-label tapaba la etiqueta: el lector anunciaba «Tasa de
+    // transmisión: 0.3» (y otra vez «0.3» como valor). En Rₜ, «Beta tasa transmisión: 0.3» no
+    // contenía la etiqueta visible «Tasa de transmisión» (WCAG 2.5.3), y «…de control: 50%» pegaba
+    // el %. Ahora nombra la etiqueta, y aria-valuetext lleva el valor en formato español.
     await expect(deslizador(page, 0)).not.toHaveAccessibleName(/\d\.\d/);
+    await expect(deslizador(page, 0)).toHaveAccessibleName(/β Tasa de transmisión/);
+    await expect(deslizador(page, 0)).toHaveAttribute('aria-valuetext', '0,30');
     await irAPestana(page, /Rₜ y Control/);
     await esperarHidratacion(page, ['#rt-beta', '#rt-control']);
     await expect(page.locator('#rt-beta')).toHaveAccessibleName(/Tasa de transmisión/);
@@ -359,9 +379,8 @@ test.describe('Cabos C0484, C0485 y C0511 — deslizadores', () => {
     await expect(page.locator('label[for="rt-gamma"] [class*="sliderValor"]')).toHaveText('0,10');
   });
 
-  test('ABIERTO · C0511 · el valor visible del deslizador va en formato español y sin decimales en I₀', async ({ page }) => {
-    // valor.toFixed(2) pinta «0.30», «0.10» y «5.00» (infectados iniciales, paso 1).
-    test.fail();
+  test('REPARADO (4034) · C0511 · el valor visible del deslizador va en formato español y sin decimales en I₀', async ({ page }) => {
+    // REPARADO el 04/11/2026: valor.toFixed(2) pintaba «0.30», «0.10» y «5.00» (paso 1).
     const valores = page.locator('main [class*="sliderValor"]');
     await expect(valores.nth(0)).toHaveText('0,30');
     await expect(valores.nth(1)).toHaveText('0,10');
@@ -370,22 +389,26 @@ test.describe('Cabos C0484, C0485 y C0511 — deslizadores', () => {
 });
 
 test.describe('Formato de los resultados y datos estructurados', () => {
-  test('ABIERTO · R₀, porcentajes y tabla en formato español', async ({ page }) => {
-    // Hallazgo de esta inspección: «R₀ = 3.00», «3.00», «95%», «inmunidad colectiva es 67%»,
+  test('REPARADO (4035) · R₀, porcentajes y tabla en formato español', async ({ page }) => {
+    // REPARADO el 04/11/2026: «R₀ = 3.00», «3.00», «95%», «inmunidad colectiva es 67%»,
     // pico «1.0» con R₀ < 1, «1/γ ≈ 10.0», «β efectiva = 0.300», tabla «R₀ 1.3». CLAUDE.md §2:
     // coma decimal y «67 %» con espacio duro.
     await abrir(page);
-    test.fail();
     await expect(metrica(page, R0_SIR)).toHaveText('3,00');
     await expect(metrica(page, AFECTADOS_SIR)).toHaveText(/^\d+ %$/);
     await expect(page.locator('main [class*="r0Box"]')).toContainText('67 %');
+    await irAPestana(page, /Modelo SEIR/);
+    await expect(metrica(page, 'Retraso del pico por incubación')).toHaveText('+28 d');
+    await irAPestana(page, /Rₜ y Control/);
+    await expect(page.locator('main [class*="sliderDesc"]').nth(1)).toHaveText('1/γ ≈ 10,0 días de infección');
     await irAPestana(page, /Enfermedades/);
     await expect(page.locator('main table tbody tr').first().locator('td').nth(1)).toHaveText('1,3');
+    await expect(page.getByRole('button', { name: 'Simular Gripe estacional con R₀ 1,3' })).toHaveCount(1);
   });
 
-  test('ABIERTO · un solo WebApplication en el JSON-LD', async ({ page }) => {
-    // Hallazgo de esta inspección: layout.tsx ya inyecta jsonLd y faqJsonLd, y page.tsx vuelve a
-    // inyectar jsonLd: la página sirve dos WebApplication idénticos.
+  test('REPARADO (4037) · un solo WebApplication en el JSON-LD', async ({ page }) => {
+    // REPARADO el 04/11/2026: layout.tsx ya inyecta jsonLd y faqJsonLd, y page.tsx volvía a
+    // inyectar jsonLd: la página servía dos WebApplication idénticos.
     await page.goto(URL_APP);
     const tipos = await page.locator('script[type="application/ld+json"]').evaluateAll((ss) =>
       ss.map((s) => {
@@ -397,13 +420,12 @@ test.describe('Formato de los resultados y datos estructurados', () => {
       }),
     );
     expect(tipos.filter((t) => t === 'FAQPage')).toHaveLength(1);
-    test.fail();
     expect(tipos.filter((t) => t === 'WebApplication')).toHaveLength(1);
   });
 
-  test('ABIERTO · la FAQ «aplanar la curva» no condiciona a la vacunación que el área cambie', async ({ page }) => {
-    // Hallazgo de esta inspección: la respuesta dice que el área total bajo la curva «cambia si
-    // la proporción vacunada supera el umbral de inmunidad colectiva». En el SIR el área bajo
+  test('REPARADO (4036) · la FAQ «aplanar la curva» no condiciona a la vacunación que el área cambie', async ({ page }) => {
+    // REPARADO el 04/11/2026: la respuesta decía que el área total bajo la curva «cambia si la
+    // proporción vacunada supera el umbral de inmunidad colectiva». En el SIR el área bajo
     // I(t) es R∞/γ y baja con β sin vacunar a nadie: el caso de arriba lo mide en la propia app
     // (95 % → 58-59 % al pasar β de 0,30 a 0,15).
     await page.goto(URL_APP);
@@ -420,7 +442,7 @@ test.describe('Formato de los resultados y datos estructurados', () => {
       return '';
     });
     expect(respuesta).not.toBe('');
-    test.fail();
     expect(respuesta).not.toMatch(/cambia si la proporción vacunada/);
+    expect(respuesta).toMatch(/sin necesidad de vacunar/);
   });
 });
