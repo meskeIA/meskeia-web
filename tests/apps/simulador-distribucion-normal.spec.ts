@@ -1271,12 +1271,13 @@ test.describe('cabo C0610 · las líneas a/b del lienzo y sus letras', () => {
   test('en claro las letras «a»/«b» llegan a 4,5:1 y sus líneas a 3:1 contra el fondo y el área sombreada', async ({
     page,
   }) => {
-    test.fail(); // HALLAZGO ABIERTO (cabo C0610, 04/11/2026) [accesibilidad/medio]
+    // REPARADO (hallazgo 4070, cabo C0610, 04/11/2026): el color sale de --naranja-texto, con
+    // #E07A1F de reserva para el oscuro, donde el token es `initial`.
     // ENTRADA  estado de partida N(0, 1), P(−1 < X < 1), tema claro y tema oscuro
     // ESPERADO letras «a»/«b» (negrita 13 px) ≥ 4,5:1 contra el fondo del lienzo; líneas a/b
     //          ≥ 3:1 contra el fondo y contra el área sombreada que tienen al lado
-    // OBTENIDO claro: #E07A1F sobre #FAFAFA = 2,89:1 (letras y líneas) y junto al área #B3D2DF
-    //          = 1,89:1 · oscuro: 5,78:1 y 3,66:1, cumple
+    // OBTENIDO antes, claro: #E07A1F sobre #FAFAFA = 2,89:1 (letras y líneas) y junto al área
+    //          #B3D2DF = 1,89:1 · oscuro: 5,78:1 y 3,66:1, cumple. Ahora, claro: #B93E0B, 5,36:1 y 3,49:1
     test.setTimeout(60_000);
     const fallos: string[] = [];
     for (const tema of ['light', 'dark'] as const) {

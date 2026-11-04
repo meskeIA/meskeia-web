@@ -277,6 +277,11 @@ export default function SimuladorDistribucionNormalPage() {
     const colorMu = '#48A9A6';
     const colorSigma = isDark ? '#7FB3D3' : '#5a9bc4';
     const colorEstandar = isDark ? '#FFB347' : '#E07A1F';
+    // Límites a y b: en claro, --naranja-texto (#B93E0B: 5,36:1 sobre #FAFAFA y 3,49:1 junto al
+    // área); en oscuro el token es `initial` y se queda la reserva #E07A1F (5,78:1 y 3,67:1).
+    // Hasta el 04/11/2026 era #E07A1F en los dos temas, y en claro daba 2,89:1 en las letras
+    // de 13 px y 1,89:1 junto al área (hallazgo 4070, cabo C0610).
+    const colorLimite = getComputedStyle(canvas).getPropertyValue('--naranja-texto').trim() || '#E07A1F';
 
     ctx.clearRect(0, 0, W, H);
 
@@ -436,14 +441,14 @@ export default function SimuladorDistribucionNormalPage() {
 
     // === LÍNEAS EN a (y b si aplica) ===
     if (mode !== 'regla68') {
-      ctx.strokeStyle = '#E07A1F';
+      ctx.strokeStyle = colorLimite;
       ctx.lineWidth = 2;
       ctx.beginPath();
       ctx.moveTo(xToPx(a), pad.top);
       ctx.lineTo(xToPx(a), pad.top + plotH);
       ctx.stroke();
 
-      ctx.fillStyle = '#E07A1F';
+      ctx.fillStyle = colorLimite;
       ctx.font = 'bold 13px system-ui';
       ctx.textAlign = 'center';
       ctx.fillText('a', xToPx(a), pad.top - 4);
