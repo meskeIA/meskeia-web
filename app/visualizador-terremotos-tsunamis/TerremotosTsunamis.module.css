@@ -897,7 +897,7 @@
 .reglaTitulo {
   font-size: 1.05rem;
   font-weight: 700;
-  color: #D62839;
+  color: var(--rojo-texto, #D62839);
   margin: 0 0 0.5rem;
 }
 

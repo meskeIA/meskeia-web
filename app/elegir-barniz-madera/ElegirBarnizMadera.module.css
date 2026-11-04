@@ -447,7 +447,7 @@
 }
 
 .warningHeader h2 {
-  color: #c83c3c;
+  color: var(--rojo-texto, #c83c3c);
   margin: 0;
   font-size: 1.25rem;
 }

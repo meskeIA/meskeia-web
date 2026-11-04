@@ -614,7 +614,7 @@
 
 .warningHeader strong {
   font-size: 1rem;
-  color: #DC2626;
+  color: var(--rojo-texto, #DC2626);
 }
 
 .warningIcon {

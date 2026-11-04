@@ -474,7 +474,7 @@
   gap: 0.5rem;
   font-weight: 700;
   font-size: 0.95rem;
-  color: #dc3545;
+  color: var(--rojo-texto, #dc3545);
   margin-bottom: 0.75rem;
 }
 

@@ -432,7 +432,7 @@
 
 .btnReset:hover {
   border-color: #dc3545;
-  color: #dc3545;
+  color: var(--rojo-texto, #dc3545);
 }
 
 .moneda {

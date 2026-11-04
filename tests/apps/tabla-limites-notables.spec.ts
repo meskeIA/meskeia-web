@@ -25,8 +25,8 @@ import { contrasteSobreFondoReal } from './_contraste';
  *     serie de e, el error de √1,02 ≈ 1,01);
  *   · «tres casos con el mismo denominador» que no lo tienen, y dos etiquetas de tendencia o
  *     condición que dicen otra cosa;
- *   · el naranja #B45309 de «Errores comunes» se queda en 4,27:1 sobre su tinte, y con el ratón
- *     encima de una fila su texto baja a 4,23-4,44:1;
+ *   · el naranja #B45309 de «Errores comunes» se queda en 4,27:1 sobre su tinte (REPARADO el
+ *     04/11/2026, hallazgo 3992), y con el ratón encima de una fila su texto baja a 4,23-4,44:1;
  *   · la pregunta de las equivalencias está escrita dos veces (FAQ visible y JSON-LD);
  *   · el % pegado («100%») o con espacio normal en vez de duro.
  * ════════════════════════════════════════════════════════════════════════════════════════════ */
@@ -563,11 +563,12 @@ test.describe('Hallazgos de la inspección del 03/11/2026', () => {
     expect.soft((await fila(page, 'ind-inf-0')).tendencia).not.toBe('x → ∞');
   });
 
-  test('HALLAZGO (03/11/2026, ABIERTO) · el naranja de «Errores comunes» se queda en 4,27:1 sobre su tinte en claro', async ({ page }) => {
+  test('HALLAZGO 3992 (03/11/2026, REPARADO) · el naranja de «Errores comunes» se queda en 4,27:1 sobre su tinte en claro', async ({ page }) => {
     // .warningHeader (h3 de 17,6 px a 600) y .warningList li strong (16 px negrita) llevan #B45309
     // literal sobre rgba(224,122,31,.08): 4,27:1, y ninguno es texto grande. check:semanticos-claro
-    // no lo ve: el tinte lo pone .warningBox, un antecesor que solo existe en el DOM.
-    test.fail();
+    // no lo veía: el tinte lo pone .warningBox, un antecesor que solo existe en el DOM.
+    // REPARADO el 04/11/2026 (reparar, cabo C0608): el candado lee ahora el anidamiento del TSX, y
+    // las dos reglas pasan a var(--naranja-texto, #b45309), con las mismas en otras nueve tablas.
     await cargar(page);
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     for (const selector of ['[class*="warningHeader"] h3', '[class*="warningList"] li strong']) {

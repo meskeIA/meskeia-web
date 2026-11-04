@@ -19,7 +19,10 @@
  * cabo C0592 (03/11/2026), si la regla no pone fondo y una clase ANTECESORA de su selector sí
  * (`.aviso strong` con `.aviso { background: rgba(…) }`), contra ese: un tinte translúcido se
  * compone sobre la página, #FAFAFA. Al nacer encendió 24 reglas en 20 hojas, migradas a la
- * receta en el mismo commit. Umbral
+ * receta en el mismo commit. Desde el cabo C0608 (04/11/2026), si ni la regla ni su selector
+ * ponen fondo, contra el de la antecesora más cercana EN EL DOM, que lee del JSX de los `.tsx`
+ * que importan la hoja (`.warningList li strong` dentro de un `.warningBox` que pinta el TSX,
+ * hallazgos 3940 y 3992): encendió 38 reglas en 26 hojas, migradas en el mismo commit. Umbral
  * 4,5:1, o 3:1 si la misma regla declara texto grande (≥ 24 px, o ≥ 18,66 px en negrita) o es
  * un `::before`/`::after`/`::marker` (iconos y viñetas: no-texto, WCAG 1.4.11).
  *
@@ -40,8 +43,9 @@
  *     los bloques de código, los héroes). Ahí oscurecer el texto lo empeora. Era el ruido
  *     conocido del censo del 19/10.
  *   · Un fondo que no sabe leer (degradado claro, `var()` que no resuelve, imagen).
- *   · El fondo de un antecesor que solo existe en el DOM (`.warningList strong` dentro de un
- *     `.warningBox` que pone el TSX): por la hoja no se sabe. Lo mide el píxel.
+ *   · El fondo de un antecesor que el JSX del mismo fichero no deja ver: un hijo pintado por
+ *     OTRO componente (otro fichero), un `className` que no es `styles.x` ni `styles['x']`, o
+ *     un fondo de la antecesora que no está en su regla base (`.x` a secas). Lo mide el píxel.
  *   · `var(--x, #lit)` con `--x` sin declarar en la hoja: lo pone el TSX en su `style`.
  *   · Los `style={{ color }}` de los `.tsx`, el `fill` de un SVG y el texto de un `<canvas>`.
  *   · Las apps congeladas (los cursos, 16/10/2026: publicados, sin drenar su pasivo).
@@ -162,6 +166,68 @@ function resolverFondo(valor, tokens) {
   return h ? { hex: h } : { tipo: 'otro' };
 }
 
+/**
+ * Las clases ANTECESORAS en el DOM de cada clase de un módulo, leídas del JSX de los `.tsx` que lo
+ * importan (cabo C0608, 04/11/2026): `.warningList li strong` no nombra a `.warningBox` en su
+ * selector, pero el TSX pinta la lista DENTRO de la caja, y el tinte de la caja es su fondo.
+ * Devuelve Map<'.clase', Array<Array<'.clase'>>>: por cada aparición de la clase, sus antecesoras
+ * de la más cercana a la más lejana. `ident` es el nombre del import (`styles`, casi siempre).
+ *
+ * Es una lectura de TEXTO, no un parser de TSX: busca las etiquetas por su `<Nombre`, salta el
+ * interior de las llaves del atributo para encontrar el `>` que cierra, y cierra una etiqueta con
+ * su `</Nombre>`. Un `i<n` o un `useState<number>` se toman por etiquetas sin clases y no aportan
+ * nada; un cierre que no encuentra su apertura se ignora. Lo que se pinta en otro componente (un
+ * hijo en otro fichero) no se ve: lo mide el píxel.
+ */
+export function anidamientoDeTsx(fuentes) {
+  const mapa = new Map();
+  for (const { texto, ident } of fuentes) {
+    const src = texto.replace(/\/\*[\s\S]*?\*\//g, (m) => ' '.repeat(m.length));
+    const reClase = new RegExp(`\\b${ident}\\.([A-Za-z_][\\w]*)|\\b${ident}\\[\\s*['"]([\\w-]+)['"]\\s*\\]`, 'g');
+    const pila = [];
+    const reEtiqueta = /<(\/?)([A-Za-z][\w.]*)/g;
+    let m;
+    while ((m = reEtiqueta.exec(src))) {
+      const nombre = m[2];
+      // Una etiqueta va tras `(`, `>`, `}`, `?`, `:`, `&&`, `||`, `=`, `,`, `[`, `{` o un `return`;
+      // `i<n`, `a < b` o `useState<number>` llevan un identificador delante y no lo son. Y tras
+      // el nombre, un espacio, `>` o `/`. Un cierre `</x>` va tras texto y no se confunde.
+      if (!/[\s>/]/.test(src[reEtiqueta.lastIndex] ?? '')) continue;
+      const antes = src.slice(Math.max(0, m.index - 12), m.index).trimEnd();
+      if (!m[1] && antes && !/[(>}?:&|=,[{;]$|\breturn$/.test(antes)) continue;
+      if (m[1]) {
+        const i = pila.map((e) => e.nombre).lastIndexOf(nombre);
+        if (i >= 0) pila.length = i;
+        continue;
+      }
+      // Fin de la etiqueta de apertura: el primer `>` fuera de llaves y de comillas
+      let j = reEtiqueta.lastIndex;
+      let llaves = 0;
+      let comilla = null;
+      for (; j < src.length; j++) {
+        const ch = src[j];
+        if (comilla) { if (ch === comilla && src[j - 1] !== '\\') comilla = null; continue; }
+        if (ch === '"' || ch === "'" || ch === '`') comilla = ch;
+        else if (ch === '{') llaves++;
+        else if (ch === '}') llaves--;
+        else if (ch === '>' && llaves <= 0) break;
+        else if (ch === '<' && llaves <= 0) { j = -1; break; } // no era una etiqueta
+      }
+      if (j < 0 || j >= src.length) continue;
+      const atributos = src.slice(reEtiqueta.lastIndex, j);
+      const clases = [...atributos.matchAll(reClase)].map((x) => `.${x[1] ?? x[2]}`);
+      const antecesoras = pila.slice().reverse().flatMap((e) => e.clases);
+      for (const c of clases) {
+        if (!mapa.has(c)) mapa.set(c, []);
+        mapa.get(c).push(antecesoras);
+      }
+      if (src[j - 1] !== '/') pila.push({ nombre, clases });
+      reEtiqueta.lastIndex = j + 1;
+    }
+  }
+  return mapa;
+}
+
 const ultimoFondo = (decls) => decls.filter((d) => /^background(-color)?$/.test(d.prop)).at(-1);
 /** Los compuestos de un selector (`.a > .b .c` → ['.a', '.b', '.c']). */
 const compuestos = (sel) => sel.replace(/\s*[>+~]\s*/g, ' ').trim().split(/\s+/);
@@ -173,7 +239,7 @@ const clasesDe = (comp) => (comp.match(/\.[A-Za-z0-9_-]+/g) ?? []);
  * 'sin-reserva' (el token de texto usado sin el color del oscuro detrás), y `escape` si su
  * línea lo lleva.
  */
-export function analizarHoja(css) {
+export function analizarHoja(css, { dom = null } = {}) {
   const bloques = parsearCss(css);
   const lineas = css.split('\n');
   const claros = bloques.filter((b) => !b.contexto.oscuroMedia && !RE_OSCURO.test(b.selector));
@@ -213,15 +279,23 @@ export function analizarHoja(css) {
    * `.avisoConstante strong` no pone fondo, pero `.avisoConstante` sí, un tinte naranja, y el
    * naranja del texto se quedaba en 4,36:1 mientras el candado lo medía contra blanco (5,02:1).
    * Hallazgo 3940 de tabla-integrales. De varias partes del selector, la de menor contraste; de
-   * varios antecesores, el más cercano. NO ve el antecesor que solo existe en el DOM (`.warningList
-   * strong` dentro de un `.warningBox` que pone el TSX): eso lo mide el píxel.
+   * varios antecesores, el más cercano. Si el selector no da ninguno, el antecesor que solo
+   * existe en el DOM (`.warningList strong` dentro de un `.warningBox` que pone el TSX), por
+   * `dom`, el anidamiento que lee anidamientoDeTsx (C0608).
    */
   const fondoHeredado = (selector, hexTexto) => {
     let peor = null;
+    const anotar = (hex) => { if (hex && (!peor || contraste(hexTexto, hex) < contraste(hexTexto, peor))) peor = hex; };
     for (const p of selector.split(',')) {
-      const antecesores = compuestos(p.trim()).slice(0, -1).reverse();
+      const comps = compuestos(p.trim());
+      const antecesores = comps.slice(0, -1).reverse();
       const hex = antecesores.flatMap((c) => clasesDe(c)).map((k) => fondoDeClase.get(k)).find(Boolean);
-      if (hex && (!peor || contraste(hexTexto, hex) < contraste(hexTexto, peor))) peor = hex;
+      if (hex) { anotar(hex); continue; }
+      // Ni la regla ni el selector ponen fondo: el de la antecesora más cercana EN EL DOM de la
+      // clase más interna del selector, según el TSX (C0608). De varias apariciones, la peor.
+      if (!dom) continue;
+      const k = comps.slice().reverse().flatMap((c) => clasesDe(c)).find((c) => dom.has(c));
+      for (const lista of k ? dom.get(k) : []) anotar(lista.map((a) => fondoDeClase.get(a)).find(Boolean));
     }
     return peor;
   };
@@ -297,6 +371,35 @@ function recorrer(dir, acc = []) {
   return acc;
 }
 
+function recorrerTsx(dir, acc = [], recursivo = true) {
+  let es;
+  try { es = fs.readdirSync(dir, { withFileTypes: true }); } catch { return acc; }
+  for (const e of es) {
+    if (['node_modules', '.next', '.git'].includes(e.name)) continue;
+    const p = path.join(dir, e.name);
+    if (e.isDirectory()) { if (recursivo) recorrerTsx(p, acc); }
+    else if (e.name.endsWith('.tsx')) acc.push(p);
+  }
+  return acc;
+}
+
+/**
+ * Qué `.tsx` importa cada hoja, y con qué nombre: Map<ruta absoluta de la hoja, [{ texto, ident }]>.
+ * Una sola pasada por los TSX de `dirs`, para no releer `components/` por cada una de sus hojas.
+ */
+export function indiceTsx(raiz, dirs, recursivo = true) {
+  const indice = new Map();
+  for (const f of dirs.flatMap((d) => recorrerTsx(path.resolve(raiz, d), [], recursivo))) {
+    const texto = fs.readFileSync(f, 'utf8');
+    for (const m of texto.matchAll(/import\s+(\w+)\s+from\s+['"]([^'"]+\.module\.css)['"]/g)) {
+      const hoja = m[2].startsWith('@/') ? path.join(raiz, m[2].slice(2)) : path.resolve(path.dirname(f), m[2]);
+      if (!indice.has(hoja)) indice.set(hoja, []);
+      indice.get(hoja).push({ texto, ident: m[1] });
+    }
+  }
+  return indice;
+}
+
 const RE_PORTAL = /^app\/(coquinum|cronicum|delegum|stemum)\/|^components\/(Coquinum|Cronicum|Delegum|Stemum)[A-Za-z]*\.module\.css$/;
 
 /** Las hojas que barre el candado: app/, components/ y styles/, sin congeladas ni portales. */
@@ -324,9 +427,15 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   const rompen = [];
   const sinRazon = [];
   const aparte = [];
+  // Los TSX que importan cada hoja (C0608): del árbol, o del directorio de cada hoja suelta
+  const indice = sueltas.length
+    ? indiceTsx(RAIZ, [...new Set(hojas.map((h) => path.dirname(h)))], false)
+    : indiceTsx(RAIZ, ['app', 'components']);
   for (const h of hojas) {
     const rel = path.relative(RAIZ, h).replace(/\\/g, '/');
-    for (const c of analizarHoja(fs.readFileSync(h, 'utf8'))) {
+    const fuentes = indice.get(path.resolve(h));
+    const dom = fuentes ? anidamientoDeTsx(fuentes) : null;
+    for (const c of analizarHoja(fs.readFileSync(h, 'utf8'), { dom })) {
       if (c.escape === '') sinRazon.push({ rel, ...c });
       else if (c.escape) continue;
       else if (c.accion === 'aparte') aparte.push({ rel, ...c });

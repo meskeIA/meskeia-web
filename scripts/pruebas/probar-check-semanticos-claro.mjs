@@ -41,6 +41,16 @@
  *  19. La receta sobre un tinte heredado. Debe CALLAR.
  *  20. Un antecesor con fondo solo en :hover no cuenta. Debe CALLAR.
  *
+ * Y el fondo de un antecesor que solo existe en el DOM, leído del TSX (cabo C0608, 04/11/2026):
+ *
+ *  21. tabla-limites-notables antes de la reparación (hallazgo 3992), con su page.tsx. Debe FALLAR.
+ *  22. La misma hoja SIN el TSX: sin anidamiento no hay antecesor. Debe CALLAR.
+ *  23. La misma, reparada con la receta. Debe CALLAR.
+ *  24. Una hermana con fondo cerrada en la misma línea (`comunes</div>`) no es antecesora, y un
+ *      `i<n` del código no es una etiqueta. Debe CALLAR.
+ *  25. El texto dentro de una caja con tinte, con className compuesto y un `>` en una flecha
+ *      del atributo. Debe FALLAR.
+ *
  * Y la manera de dar verde sin mirar, que debe PLANTARLO:
  *
  *  16. Un árbol sin ningún `.module.css`.
@@ -60,6 +70,8 @@ const deGit = (rev, ruta) => execFileSync('git', ['show', `${rev}:${ruta}`], { c
 const MI_IP = 'app/mi-ip/MiIp.module.css';
 const ADAPT = 'app/adaptacion-hogar/AdaptacionHogar.module.css';
 const INTEGRALES = 'app/tabla-integrales/TablaIntegrales.module.css';
+const LIMITES = 'app/tabla-limites-notables/TablaLimitesNotables.module.css';
+const LIMITES_TSX = 'app/tabla-limites-notables/page.tsx';
 
 const CASOS = [
   { n: 1, nombre: 'CASO DE ORIGEN · mi-ip antes de f9af2556', falla: true, css: deGit('f9af2556^', MI_IP) },
@@ -104,14 +116,51 @@ const CASOS = [
     n: 20, nombre: 'una pseudoclase del antecesor (.aviso:hover) no cuenta como su fondo', falla: false,
     css: '.aviso:hover { background: rgba(224, 122, 31, 0.3); }\n.aviso strong { color: #B91C1C; }\n',
   },
+  // Cabo C0608 (04/11/2026): el tinte lo pone un antecesor que solo existe en el DOM. Caso de
+  // origen, el hallazgo 3992 de tabla-limites-notables: .warningHeader y .warningList li strong en
+  // #b45309 dentro de un .warningBox que pone el TSX, 4,27:1 por píxel. Su hoja y su page.tsx de
+  // antes de la reparación (a146bd74, el último commit que no la tocaba).
+  {
+    n: 21, nombre: 'CASO DE ORIGEN · tabla-limites-notables (hallazgo 3992) con su page.tsx', falla: true,
+    css: deGit('a146bd74', LIMITES), tsx: deGit('a146bd74', LIMITES_TSX),
+  },
+  {
+    n: 22, nombre: 'el mismo, SIN el TSX: sin anidamiento no hay antecesor que ver (el límite de antes)', falla: false,
+    css: deGit('a146bd74', LIMITES),
+  },
+  {
+    n: 23, nombre: 'CASO DE ORIGEN REPARADO · tabla-limites-notables con la receta', falla: false,
+    css: fs.readFileSync(path.join(RAIZ, LIMITES), 'utf8'), tsx: fs.readFileSync(path.join(RAIZ, LIMITES_TSX), 'utf8'),
+  },
+  {
+    // La primera versión tomaba por antecesora la cabecera roja de conjugador-verbos, hermana de
+    // los .errorItem: no veía el `</div>` que va pegado al texto («comunes</div>»)
+    n: 24, nombre: 'una hermana con fondo cerrada en la misma línea no es antecesora', falla: false,
+    css: '.cabecera { background: #EF4444; color: white; }\n.item::before { content: "✗"; color: #EF4444; }\n',
+    tsx: 'export default function X() {\n  const n = 3;\n  for (let i = 0; i<n; i++) {}\n  return (\n    <div>\n      <div className={styles.cabecera}>✗ Errores comunes</div>\n      <div className={styles.item}>Uno</div>\n    </div>\n  );\n}\n',
+  },
+  {
+    n: 25, nombre: 'el texto dentro de una caja con tinte en el TSX, con la caja en className compuesto', falla: true,
+    css: '.caja { background: rgba(220, 38, 38, 0.12); }\n.titulo { color: #dc2626; }\n',
+    tsx: 'export default function X({ a }: { a: boolean }) {\n  return (\n    <section className={`${styles.caja} ${a ? styles.otra : \'\'}`} onClick={() => a > false}>\n      {a && <h3 className={styles.titulo}>Aviso</h3>}\n    </section>\n  );\n}\n',
+  },
 ];
 
 const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'semanticos-claro-'));
 let mal = 0;
 const ejecutar = (args) => spawnSync(process.execPath, [CANDADO, ...args], { cwd: RAIZ, encoding: 'utf8' });
 for (const c of CASOS) {
-  const f = path.join(tmp, `Caso${c.n}.module.css`);
+  // Cada caso en su directorio: el candado lee los .tsx del directorio de una hoja suelta
+  const dir = path.join(tmp, `caso${c.n}`);
+  fs.mkdirSync(dir);
+  const f = path.join(dir, `Caso${c.n}.module.css`);
   fs.writeFileSync(f, c.css);
+  if (c.tsx) {
+    const tsx = /import\s+\w+\s+from\s+['"][^'"]+\.module\.css['"]/.test(c.tsx)
+      ? c.tsx.replace(/(import\s+\w+\s+from\s+['"])[^'"]+\.module\.css(['"])/, `$1./Caso${c.n}.module.css$2`)
+      : `import styles from './Caso${c.n}.module.css';\n${c.tsx}`;
+    fs.writeFileSync(path.join(dir, `Caso${c.n}.tsx`), tsx);
+  }
   const r = ejecutar([f]);
   const fallo = r.status !== 0;
   const bien = fallo === c.falla;

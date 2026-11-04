@@ -1212,7 +1212,7 @@
   margin: 0;
   font-size: 1rem;
   font-weight: 700;
-  color: #DC3545;
+  color: var(--rojo-texto, #DC3545);
 }
 
 [data-theme='dark'] .warningHeader h3 {

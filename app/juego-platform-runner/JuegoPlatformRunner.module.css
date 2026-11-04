@@ -784,7 +784,7 @@
   content: '•';
   position: absolute;
   left: 0;
-  color: #d97706;
+  color: var(--ambar-texto, #d97706);
   font-weight: 700;
 }
 

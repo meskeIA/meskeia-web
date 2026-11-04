@@ -630,7 +630,7 @@
   align-items: center;
   gap: var(--spacing-sm);
   margin-bottom: var(--spacing-md);
-  color: #b45309;
+  color: var(--naranja-texto, #b45309);
   font-size: 1.1rem;
 }
 
@@ -656,7 +656,7 @@
 }
 
 .warningList li strong {
-  color: #b45309;
+  color: var(--naranja-texto, #b45309);
 }
 
 /* ============================================

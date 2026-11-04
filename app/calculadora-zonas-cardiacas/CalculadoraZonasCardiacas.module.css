@@ -175,7 +175,7 @@
 }
 
 .errorMsg {
-  color: #dc2626;
+  color: var(--rojo-texto, #dc2626);
   font-size: 0.9rem;
   margin: 0;
 }

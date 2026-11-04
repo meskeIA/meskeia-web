@@ -967,7 +967,7 @@
 
 .warningHeader strong {
   font-size: 0.95rem;
-  color: #c0452a;
+  color: var(--rojo-texto, #c0452a);
 }
 
 .warningIcon {
@@ -991,7 +991,7 @@
 }
 
 .warningList li strong {
-  color: #c0452a;
+  color: var(--rojo-texto, #c0452a);
 }
 
 /* Dark mode v2.0 */

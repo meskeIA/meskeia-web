@@ -539,7 +539,7 @@
 }
 
 .riesgoMuyAlto {
-  color: #dc2626;
+  color: var(--rojo-texto, #dc2626);
   font-weight: 700;
 }
 

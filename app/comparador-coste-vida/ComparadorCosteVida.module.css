@@ -218,7 +218,7 @@
 
 /* Colores de ventaja/desventaja */
 .ventaja {
-  color: #1e8449;
+  color: var(--verde-texto, #1e8449);
 }
 
 [data-theme='dark'] .ventaja {
@@ -242,7 +242,7 @@
 }
 
 .diffNeg {
-  color: #1e8449;
+  color: var(--verde-texto, #1e8449);
 }
 
 [data-theme='dark'] .diffNeg {
