@@ -294,7 +294,7 @@ export default function GeneradorHashesPage() {
 
         {/* Selector de algoritmo */}
         <div className={styles.algoritmoSection}>
-          <label id="algoritmo-label" className={styles.label}>Algoritmo de hash</label>
+          <span id="algoritmo-label" className={styles.label}>Algoritmo de hash</span>
           <div role="group" aria-labelledby="algoritmo-label" className={styles.algoritmoGrid}>
             {(Object.keys(algoritmosInfo) as AlgoritmoType[]).map((algo) => (
               <button
@@ -331,7 +331,9 @@ export default function GeneradorHashesPage() {
                 className={styles.btnPrimary}
                 disabled={!texto.trim() || procesando}
               >
-                {procesando ? <><span aria-hidden="true">⏳</span> Procesando...</> : <><span aria-hidden="true">🔐</span> Generar Hash</>}
+                {procesando
+                  ? <span key="procesando"><span aria-hidden="true">⏳</span> Procesando...</span>
+                  : <span key="generar"><span aria-hidden="true">🔐</span> Generar Hash</span>}
               </button>
               <button type="button" onClick={limpiar} className={styles.btnSecondary}>
                 Limpiar
@@ -343,7 +345,7 @@ export default function GeneradorHashesPage() {
         {/* Modo Archivo */}
         {modo === 'archivo' && (
           <div className={styles.inputSection}>
-            <label className={styles.label}>Selecciona un archivo</label>
+            <span className={styles.label}>Selecciona un archivo</span>
             <div className={styles.fileDropZone}>
               <input
                 type="file"
@@ -352,7 +354,7 @@ export default function GeneradorHashesPage() {
                 id="fileInput"
               />
               <label htmlFor="fileInput" className={styles.fileLabel}>
-                <span className={styles.fileIcon}>📁</span>
+                <span className={styles.fileIcon} aria-hidden="true">📁</span>
                 <span className={styles.fileText}>
                   {nombreArchivo || 'Haz clic o arrastra un archivo aquí'}
                 </span>
@@ -416,15 +418,17 @@ export default function GeneradorHashesPage() {
         {hashActual && (
           <div className={styles.resultSection}>
             <div className={styles.resultHeader}>
-              <label className={styles.label}>
-                Hash {algoritmo} ({algoritmosInfo[algoritmo].longitud} caracteres)
-              </label>
+              <span className={styles.label}>
+                {`Hash ${algoritmo} (${algoritmosInfo[algoritmo].longitud} caracteres)`}
+              </span>
               <button
                 type="button"
                 onClick={() => copiarHash(hashActual, 'hash')}
                 className={styles.btnCopy}
               >
-                {copiado === 'hash' ? <><span aria-hidden="true">✅</span> Copiado</> : <><span aria-hidden="true">📋</span> Copiar</>}
+                {copiado === 'hash'
+                  ? <span key="copiado"><span aria-hidden="true">✅</span> Copiado</span>
+                  : <span key="copiar"><span aria-hidden="true">📋</span> Copiar</span>}
               </button>
             </div>
             <div className={styles.resultBox}>

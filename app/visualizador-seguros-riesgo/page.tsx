@@ -9,6 +9,7 @@ import LegalNotice from '@/components/LegalNotice';
 import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
+import { formatNumber } from '@/lib/formatters';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -268,7 +269,7 @@ function TabPrima(): React.ReactNode {
         <div className={styles.sliderGroup}>
           <label htmlFor="probabilidad-siniestro" className={styles.sliderLabel}>
             Probabilidad de siniestro
-            <span className={styles.sliderValue}>{probabilidad.toFixed(1)} %</span>
+            <span className={styles.sliderValue}>{`${formatNumber(probabilidad, 1)} %`}</span>
           </label>
           <input
             id="probabilidad-siniestro"
@@ -278,7 +279,6 @@ function TabPrima(): React.ReactNode {
             step={0.1}
             value={probabilidad}
             onChange={(e) => setProbabilidad(parseFloat(e.target.value))}
-            aria-label="Probabilidad de siniestro"
           />
         </div>
 
@@ -295,14 +295,13 @@ function TabPrima(): React.ReactNode {
             step={500}
             value={costeMedio}
             onChange={(e) => setCosteMedio(parseFloat(e.target.value))}
-            aria-label="Coste medio del siniestro"
           />
         </div>
 
         <div className={styles.sliderGroup}>
           <label htmlFor="gastos-administrativos" className={styles.sliderLabel}>
             Gastos administrativos
-            <span className={styles.sliderValue}>{gastos} %</span>
+            <span className={styles.sliderValue}>{`${gastos} %`}</span>
           </label>
           <input
             id="gastos-administrativos"
@@ -312,14 +311,13 @@ function TabPrima(): React.ReactNode {
             step={1}
             value={gastos}
             onChange={(e) => setGastos(parseInt(e.target.value))}
-            aria-label="Porcentaje de gastos"
           />
         </div>
 
         <div className={styles.sliderGroup}>
           <label htmlFor="margen-beneficio" className={styles.sliderLabel}>
             Margen de beneficio
-            <span className={styles.sliderValue}>{margen} %</span>
+            <span className={styles.sliderValue}>{`${margen} %`}</span>
           </label>
           <input
             id="margen-beneficio"
@@ -329,7 +327,6 @@ function TabPrima(): React.ReactNode {
             step={1}
             value={margen}
             onChange={(e) => setMargen(parseInt(e.target.value))}
-            aria-label="Margen de beneficio"
           />
         </div>
       </div>
@@ -431,7 +428,6 @@ function TabPool(): React.ReactNode {
           step={10}
           value={asegurados}
           onChange={(e) => setAsegurados(parseInt(e.target.value))}
-          aria-label="Número de asegurados"
         />
       </div>
 

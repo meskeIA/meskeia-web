@@ -550,6 +550,7 @@ export default function ConversorUnidadesRFPage() {
                 value={unidadOrigen}
                 onChange={(e) => setUnidadOrigen(e.target.value)}
                 className={styles.select}
+                aria-label="Unidad de entrada"
               >
                 {unidadesActuales.map((unidad) => (
                   <option key={unidad.id} value={unidad.id}>

@@ -294,12 +294,12 @@
   gap: 2px;
 }
 
-.lineaSubtotal label {
+.lineaSubtotal .lineaSubtotalTitulo {
   font-size: 0.75rem;
   color: var(--text-muted);
 }
 
-.lineaSubtotal span {
+.lineaSubtotal .lineaSubtotalValor {
   font-size: 1rem;
   font-weight: 600;
   color: var(--primary-texto);
@@ -906,12 +906,12 @@
     margin-top: var(--spacing-xs);
   }
 
-  .lineaSubtotal label {
+  .lineaSubtotal .lineaSubtotalTitulo {
     font-size: 0.9rem;
     font-weight: 500;
   }
 
-  .lineaSubtotal span {
+  .lineaSubtotal .lineaSubtotalValor {
     font-size: 1.1rem;
   }
 

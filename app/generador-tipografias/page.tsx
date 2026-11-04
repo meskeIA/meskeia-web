@@ -277,7 +277,7 @@ text-align: ${textAlign};`;
 
           {/* Font Weight */}
           <div className={styles.controlGroup}>
-            <label id="peso-label" className={styles.label}>Peso: {fontWeight}</label>
+            <span id="peso-label" className={styles.label}>{`Peso: ${fontWeight}`}</span>
             <div role="group" aria-labelledby="peso-label" className={styles.weightGrid}>
               {selectedFont.weights.map(w => (
                 <button
@@ -305,7 +305,7 @@ text-align: ${textAlign};`;
               onChange={(e) => setFontSize(parseInt(e.target.value))}
               className={styles.slider}
             />
-            <div className={styles.sizePresets}>
+            <div className={styles.sizePresets} role="group" aria-label="Tamaños rápidos, en píxeles">
               {[16, 24, 32, 48, 64].map(s => (
                 <button
                   key={s}

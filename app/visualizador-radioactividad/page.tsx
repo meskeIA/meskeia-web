@@ -11,7 +11,11 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
+import { formatNumber } from '@/lib/formatters';
 import { jsonLd } from './metadata';
+
+// Porcentaje con el espacio duro de la Ortografía de la RAE (2010), en un solo nodo de texto
+const pctTexto = (valor: number, decimales: number): string => `${formatNumber(valor, decimales)} %`;
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -527,7 +531,7 @@ const TabDesintegracion = () => {
       <div className={styles.sliderGroup}>
         <label htmlFor="tiempo-vidas" className={styles.sliderLabel}>
           <span>Tiempo transcurrido (en periodos de semidesintegración t½)</span>
-          <span className={styles.sliderValor}>{tiempoVidas.toFixed(1)} t½</span>
+          <span className={styles.sliderValor}>{`${formatNumber(tiempoVidas, 1)} t½`}</span>
         </label>
         <input
           id="tiempo-vidas"
@@ -539,25 +543,24 @@ const TabDesintegracion = () => {
           step={0.1}
           value={tiempoVidas}
           onChange={(e) => setTiempoVidas(parseFloat(e.target.value))}
-          aria-label={`Tiempo: ${tiempoVidas} periodos de semidesintegración`}
         />
         <span className={styles.sliderDesc}>
-          λ = {lambda.toFixed(4)} (por t½) — Actividad restante: {actividadPct.toFixed(2)}%
+          {`λ = ${formatNumber(lambda, 4)} (por t½) — Actividad restante: ${pctTexto(actividadPct, 2)}`}
         </span>
       </div>
 
       {/* Display de resultado */}
       <div className={styles.displayGrid}>
         <div className={styles.displayBox}>
-          <div className={styles.displayValor}>{actividadPct.toFixed(2)}%</div>
+          <div className={styles.displayValor}>{pctTexto(actividadPct, 2)}</div>
           <div className={styles.displayLabel}>N(t)/N₀ — Núcleos restantes</div>
         </div>
         <div className={styles.displayBox}>
-          <div className={styles.displayValor}>{tiempoVidas.toFixed(1)}</div>
+          <div className={styles.displayValor}>{formatNumber(tiempoVidas, 1)}</div>
           <div className={styles.displayLabel}>Vidas medias transcurridas</div>
         </div>
         <div className={styles.displayBox}>
-          <div className={styles.displayValor}>{(100 - actividadPct).toFixed(2)}%</div>
+          <div className={styles.displayValor}>{pctTexto(100 - actividadPct, 2)}</div>
           <div className={styles.displayLabel}>N₀ − N(t) — Núcleos desintegrados</div>
         </div>
       </div>
@@ -565,7 +568,7 @@ const TabDesintegracion = () => {
       {/* Gráfica */}
       <div className={styles.graficaBox}>
         <GraficaDesintegracion fracciones={fracciones} />
-        <p className={styles.graficaCaption}>Las líneas discontinuas marcan t½ (50%), 2t½ (25%) y 3t½ (12,5%)</p>
+        <p className={styles.graficaCaption}>Las líneas discontinuas marcan t½ (50&nbsp;%), 2t½ (25&nbsp;%) y 3t½ (12,5&nbsp;%)</p>
       </div>
 
       {/* Tabla de referencia */}
@@ -583,7 +586,7 @@ const TabDesintegracion = () => {
               <tr key={n} className={tiempoVidas >= n && tiempoVidas < n + 1 ? styles.filaDestacada : ''}>
                 <td>{n} t½</td>
                 <td>1/{Math.pow(2, n) === 1 ? '1' : Math.pow(2, n)}</td>
-                <td>{(100 / Math.pow(2, n)).toFixed(3)}%</td>
+                <td>{pctTexto(100 / Math.pow(2, n), 3)}</td>
               </tr>
             ))}
           </tbody>
@@ -605,7 +608,7 @@ const TabCarbono14 = () => {
 
   const formatearEdad = (anios: number): string => {
     if (anios < 1000) return `${Math.round(anios)} años`;
-    return `${(anios / 1000).toFixed(1).replace('.', ',')} ka (${Math.round(anios).toLocaleString('es-ES')} años)`;
+    return `${formatNumber(anios / 1000, 1)} ka (${Math.round(anios).toLocaleString('es-ES')} años)`;
   };
 
   const limiteMetodo = actividadPct < 3;
@@ -633,10 +636,10 @@ const TabCarbono14 = () => {
             type="button"
             className={`${styles.isotopoBtn} ${Math.abs(actividadPct - ej.actividadPct) < 0.1 ? styles.isotopoBtnActive : ''}`}
             onClick={() => setActividadPct(ej.actividadPct)}
-            aria-label={`${ej.nombre}: actividad ${ej.actividadPct}%`}
+            aria-label={`${ej.nombre}: actividad ${pctTexto(ej.actividadPct, 1)}`}
             aria-pressed={Math.abs(actividadPct - ej.actividadPct) < 0.1}
           >
-            <span className={styles.isotopoSimbolo}>{ej.actividadPct}%</span>
+            <span className={styles.isotopoSimbolo}>{pctTexto(ej.actividadPct, 1)}</span>
             <span className={styles.isotopoVida}>{ej.nombre}</span>
           </button>
         ))}
@@ -646,7 +649,7 @@ const TabCarbono14 = () => {
       <div className={styles.sliderGroup}>
         <label htmlFor="actividad-pct" className={styles.sliderLabel}>
           <span>Actividad medida (% del estándar moderno)</span>
-          <span className={styles.sliderValor}>{actividadPct.toFixed(1)}%</span>
+          <span className={styles.sliderValor}>{pctTexto(actividadPct, 1)}</span>
         </label>
         <input
           id="actividad-pct"
@@ -658,7 +661,6 @@ const TabCarbono14 = () => {
           step={0.1}
           value={actividadPct}
           onChange={(e) => setActividadPct(parseFloat(e.target.value))}
-          aria-label={`Actividad de C-14: ${actividadPct}%`}
         />
         <span className={styles.sliderDesc}>
           100% = actividad actual de organismo vivo. Cuanto menor es la actividad, más antigua es la muestra.
@@ -672,11 +674,11 @@ const TabCarbono14 = () => {
           <div className={styles.displayLabel}>Edad calculada</div>
         </div>
         <div className={styles.displayBox}>
-          <div className={styles.displayValor}>{actividadPct.toFixed(1)}%</div>
+          <div className={styles.displayValor}>{pctTexto(actividadPct, 1)}</div>
           <div className={styles.displayLabel}>¹⁴C residual</div>
         </div>
         <div className={styles.displayBox}>
-          <div className={styles.displayValor}>{(Math.log(actividadPct / 100) / -Math.LN2).toFixed(2)} t½</div>
+          <div className={styles.displayValor}>{`${formatNumber(Math.log(actividadPct / 100) / -Math.LN2, 2)} t½`}</div>
           <div className={styles.displayLabel}>Vidas medias transcurridas</div>
         </div>
       </div>
@@ -784,7 +786,7 @@ const TabDosis = () => {
         <p className={styles.infoBoxTitulo}>Fondo natural de radiación</p>
         <p>
           La dosis media natural mundial es de <strong>~2,4 mSv/año</strong> (varía entre 1 y 13 mSv/año según la ubicación).
-          El {((dosisNatural / 2.4) * 100).toFixed(0)}% de esas {dosisNatural.toFixed(2)} mSv/año provienen de fuentes listadas abajo.
+          {`El ${pctTexto((dosisNatural / 2.4) * 100, 0)} de esas ${formatNumber(dosisNatural, 2)} mSv/año provienen`} de fuentes listadas abajo.
           El radón intradomiciliario es la mayor fuente individual (~48% del total en zonas de granito).
         </p>
       </div>

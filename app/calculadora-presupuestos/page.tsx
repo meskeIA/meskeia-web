@@ -470,10 +470,11 @@ export default function CalculadoraPresupuestosPage() {
                     value={config.tipoIva}
                     onChange={(e) => setConfig({ ...config, tipoIva: e.target.value })}
                     className={styles.taxSelect}
+                    aria-label="Tipo de IVA"
                   >
-                    <option value="21">21%</option>
-                    <option value="10">10%</option>
-                    <option value="4">4%</option>
+                    <option value="21">21&nbsp;%</option>
+                    <option value="10">10&nbsp;%</option>
+                    <option value="4">4&nbsp;%</option>
                   </select>
                 )}
               </div>
@@ -492,9 +493,10 @@ export default function CalculadoraPresupuestosPage() {
                     value={config.tipoIrpf}
                     onChange={(e) => setConfig({ ...config, tipoIrpf: e.target.value })}
                     className={styles.taxSelect}
+                    aria-label="Tipo de retención de IRPF"
                   >
-                    <option value="15">15%</option>
-                    <option value="7">7%</option>
+                    <option value="15">15&nbsp;%</option>
+                    <option value="7">7&nbsp;%</option>
                   </select>
                 )}
               </div>
@@ -545,6 +547,7 @@ export default function CalculadoraPresupuestosPage() {
                         onClick={() => eliminarLinea(linea.id)}
                         className={styles.deleteBtn}
                         title="Eliminar línea"
+                        aria-label={`Eliminar línea ${index + 1}`}
                       >
                         ✕
                       </button>
@@ -556,6 +559,7 @@ export default function CalculadoraPresupuestosPage() {
                         type="text"
                         value={linea.descripcion}
                         onChange={(e) => actualizarLinea(linea.id, 'descripcion', e.target.value)}
+                        aria-label={`Descripción de la línea ${index + 1}`}
                         placeholder={
                           linea.tipo === 'servicio'
                             ? 'Descripción del servicio'
@@ -597,8 +601,8 @@ export default function CalculadoraPresupuestosPage() {
                         />
                       </div>
                       <div className={styles.lineaSubtotal}>
-                        <label>Subtotal</label>
-                        <span>{formatCurrency(calcularSubtotalLinea(linea))}</span>
+                        <span className={styles.lineaSubtotalTitulo}>Subtotal</span>
+                        <span className={styles.lineaSubtotalValor}>{formatCurrency(calcularSubtotalLinea(linea))}</span>
                       </div>
                     </div>
                   </div>

@@ -638,6 +638,7 @@ export default function GeneradorAvataresPage() {
                   value={backgroundColor}
                   onChange={(e) => setBackgroundColor(e.target.value)}
                   className={styles.colorPicker}
+                  aria-label="Color de fondo"
                 />
               )}
             </div>

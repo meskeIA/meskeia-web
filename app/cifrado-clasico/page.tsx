@@ -306,8 +306,10 @@ export default function CifradoClasicoPage() {
         <div className={styles.buttonRow}>
           <button type="button" onClick={procesar} className={styles.btnPrimary} disabled={!texto.trim()}>
             {esMetodoSimetrico
-              ? <><span aria-hidden="true">🔐</span> Procesar texto</>
-              : modo === 'cifrar' ? <><span aria-hidden="true">🔒</span> Cifrar mensaje</> : <><span aria-hidden="true">🔓</span> Descifrar mensaje</>}
+              ? <span key="procesar"><span aria-hidden="true">🔐</span> Procesar texto</span>
+              : modo === 'cifrar'
+                ? <span key="cifrar"><span aria-hidden="true">🔒</span> Cifrar mensaje</span>
+                : <span key="descifrar"><span aria-hidden="true">🔓</span> Descifrar mensaje</span>}
           </button>
           <button type="button" onClick={limpiar} className={styles.btnSecondary}>
             Limpiar
@@ -317,10 +319,12 @@ export default function CifradoClasicoPage() {
         {/* Resultado */}
         {resultado && (
           <div className={styles.resultSection}>
-            <label className={styles.label}>Resultado:</label>
-            <div className={styles.resultBox} role="status" aria-live="polite" aria-atomic="true">{resultado}</div>
+            <span id="cifrado-resultado-titulo" className={styles.label}>Resultado:</span>
+            <div className={styles.resultBox} role="status" aria-live="polite" aria-atomic="true" aria-labelledby="cifrado-resultado-titulo">{resultado}</div>
             <button type="button" onClick={copiarResultado} className={styles.btnCopy}>
-              {copiado ? <><span aria-hidden="true">✅</span> Copiado</> : <><span aria-hidden="true">📋</span> Copiar resultado</>}
+              {copiado
+                ? <span key="copiado"><span aria-hidden="true">✅</span> Copiado</span>
+                : <span key="copiar"><span aria-hidden="true">📋</span> Copiar resultado</span>}
             </button>
           </div>
         )}

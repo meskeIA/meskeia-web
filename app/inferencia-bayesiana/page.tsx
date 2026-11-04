@@ -458,6 +458,7 @@ export default function InferenciaBayesianaPage() {
                       onChange={e => updateHypothesis(i, 'name', e.target.value)}
                       className={styles.inputSmall}
                       placeholder="Nombre"
+                      aria-label={`Nombre de la hipótesis ${i + 1}`}
                     />
                     <div className={styles.hypothesisInputs}>
                       <div>
@@ -486,7 +487,7 @@ export default function InferenciaBayesianaPage() {
                       </div>
                     </div>
                     {hypotheses.length > 2 && (
-                      <button type="button" onClick={() => removeHypothesis(i)} className={styles.btnRemove}>
+                      <button type="button" onClick={() => removeHypothesis(i)} className={styles.btnRemove} aria-label={`Eliminar la hipótesis ${i + 1}`}>
                         ✕
                       </button>
                     )}
