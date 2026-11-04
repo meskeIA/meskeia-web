@@ -141,11 +141,12 @@ test('la emulación es fiel: el contexto de la app, reanudado desde fuera, mide'
 });
 
 test(
-  'ABIERTO, cabo C0096 (inspector 04/11/2026): con un AudioContext que nace en «suspended» (EMULACIÓN de Safari) la app no lo reanuda ni avisa, y no mide nada',
+  'REPARADO (hallazgo 4071, cabo C0096): con un AudioContext que nace en «suspended» (EMULACIÓN de Safari) la app lo reanuda y mide, o avisa',
   async ({ page }) => {
-    test.fail();
+    // REPARADO el 04/11/2026: startAnalyzing llama a resume() al crear el contexto y cada vez que
+    // deja de correr (statechange), y avisa si no arranca.
     // Esperado: la app llama a resume() y mide (contexto 'running', bytes > 20, cifra en Hz), o
-    // avisa de que el audio no arranca. Obtenido el 04/11/2026 en Chromium con la envoltura
+    // avisa de que el audio no arranca. Obtenido antes, el 04/11/2026 en Chromium con la envoltura
     // (Pixel 7, 4 s tras el toque): contexto 'suspended', 0 llamadas a resume(), byte máximo 0
     // en 241 lecturas del bucle, «-- Hz» y «--», región viva «Sin frecuencia dominante», botón
     // «Detener» y ningún aviso. Sin la envoltura, el mismo flujo da 'running', byte 252 y «398 Hz».
@@ -162,6 +163,7 @@ test(
       )
       .toBe(true);
     const l = await lectura(page);
+    expect(l.resumes, 'la app llama a resume()').toBeGreaterThan(0);
     if (l.avisos.length === 0) {
       await expect.poll(async () => (await lectura(page)).maxByte, { timeout: 5000 }).toBeGreaterThan(20);
       await expect(frecuencia(page)).toHaveText(CIFRA_HZ, { timeout: 5000 });

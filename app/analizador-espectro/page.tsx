@@ -446,6 +446,37 @@ export default function AnalizadorEspectroPage() {
       const audioContext = new AudioContext();
       audioContextRef.current = audioContext;
 
+      /*
+       * Un contexto creado después del `await` de getUserMedia puede nacer en 'suspended' (la
+       * política de Safari en iOS: fuera del gesto del usuario) o quedarse 'interrupted' tras una
+       * llamada. Sin reanudarlo el analizador lee ceros y la pantalla es la de una sala en
+       * silencio, sin aviso. Hasta el 04/11/2026 no se llamaba nunca a resume() (hallazgo 4071,
+       * cabo C0096). Ahora se reanuda al crearlo y cada vez que deja de correr, y si no arranca
+       * se dice.
+       */
+      const reanudar = async () => {
+        if (audioContext.state !== 'running') {
+          try {
+            await audioContext.resume();
+          } catch {
+            // se avisa abajo
+          }
+        }
+        if (audioContextRef.current !== audioContext) return;
+        setError(
+          audioContext.state === 'running'
+            ? null
+            : 'El navegador no ha arrancado el audio, así que no llega sonido al analizador. Pulsa «Detener» y vuelve a «Iniciar análisis».'
+        );
+      };
+      audioContext.onstatechange = () => {
+        if (audioContextRef.current !== audioContext) return;
+        if (audioContext.state === 'running') setError(null);
+        else if (audioContext.state !== 'closed') void reanudar();
+      };
+      await reanudar();
+      if (audioContextRef.current !== audioContext) return;
+
       const source = audioContext.createMediaStreamSource(stream);
       const analyser = audioContext.createAnalyser();
       analyser.fftSize = 8192; // Alta resolución para mejor detalle de frecuencias
