@@ -161,6 +161,39 @@ export default function RecortadorAudioPage() {
     }
   }, [audioUrl, processedUrl, getAudioContext]);
 
+  /**
+   * Mínimo y máximo de cada columna del lienzo, calculados UNA vez por audio y ancho (cabo C0622,
+   * 04/11/2026). Antes se recorrían todas las muestras del canal en cada fotograma de la
+   * reproducción: el cursor cambia currentTime, eso redibuja, y una canción de 3 min a 44,1 kHz
+   * son ~8 millones de muestras por fotograma. Una columna sin muestras (audio más corto que el
+   * lienzo) queda en 0 y no pinta una barra de arriba abajo, como hacía con min 1 y max −1.
+   */
+  const picosRef = useRef<{ buffer: AudioBuffer; ancho: number; min: Float32Array; max: Float32Array } | null>(null);
+  const picosDe = useCallback((buffer: AudioBuffer, ancho: number) => {
+    const cache = picosRef.current;
+    if (cache && cache.buffer === buffer && cache.ancho === ancho) return cache;
+    const data = buffer.getChannelData(0);
+    const step = Math.ceil(data.length / ancho);
+    const min = new Float32Array(ancho);
+    const max = new Float32Array(ancho);
+    for (let i = 0; i < ancho; i++) {
+      const desde = i * step;
+      const hasta = Math.min(desde + step, data.length);
+      if (desde >= hasta) continue;
+      let mn = 1.0;
+      let mx = -1.0;
+      for (let j = desde; j < hasta; j++) {
+        const datum = data[j];
+        if (datum < mn) mn = datum;
+        if (datum > mx) mx = datum;
+      }
+      min[i] = mn;
+      max[i] = mx;
+    }
+    picosRef.current = { buffer, ancho, min, max };
+    return picosRef.current;
+  }, []);
+
   // Dibujar waveform
   const drawWaveform = useCallback((buffer: AudioBuffer) => {
     const canvas = canvasRef.current;
@@ -171,8 +204,7 @@ export default function RecortadorAudioPage() {
 
     const width = canvas.width;
     const height = canvas.height;
-    const data = buffer.getChannelData(0);
-    const step = Math.ceil(data.length / width);
+    const picos = picosDe(buffer, width);
 
     ctx.clearRect(0, 0, width, height);
 
@@ -189,21 +221,12 @@ export default function RecortadorAudioPage() {
     const amplitude = height / 2 - 10;
 
     for (let i = 0; i < width; i++) {
-      let min = 1.0;
-      let max = -1.0;
-
-      for (let j = 0; j < step; j++) {
-        const datum = data[i * step + j];
-        if (datum < min) min = datum;
-        if (datum > max) max = datum;
-      }
-
-      ctx.moveTo(i, centerY + min * amplitude);
-      ctx.lineTo(i, centerY + max * amplitude);
+      ctx.moveTo(i, centerY + picos.min[i] * amplitude);
+      ctx.lineTo(i, centerY + picos.max[i] * amplitude);
     }
 
     ctx.stroke();
-  }, []);
+  }, [picosDe]);
 
   // Actualizar selección visual en el canvas
   const updateSelection = useCallback(() => {
@@ -610,7 +633,9 @@ export default function RecortadorAudioPage() {
                 className={styles.playBtn}
                 aria-pressed={isPlaying}
               >
-                {isPlaying ? <><span aria-hidden="true">⏹️</span> Detener</> : <><span aria-hidden="true">▶️</span> Reproducir selección</>}
+                {isPlaying
+                  ? <span key="detener"><span aria-hidden="true">⏹️</span> Detener</span>
+                  : <span key="reproducir"><span aria-hidden="true">▶️</span> Reproducir selección</span>}
               </button>
               <span className={styles.currentTime}>
                 {formatTime(currentTime)} / {formatTime(selectedDuration)}

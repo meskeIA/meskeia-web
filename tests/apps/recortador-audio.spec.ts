@@ -207,6 +207,40 @@ function paginasOgg(bytes: number[]): { granule: number; crcOk: boolean; tipo: n
   return paginas;
 }
 
+/**
+ * Cabo C0622 (reparar 04/11/2026): durante la reproducción la onda se recalculaba entera en cada
+ * fotograma (el cursor cambia currentTime, eso redibuja, y el dibujo recorría todas las muestras
+ * del canal 0). Se mide por las lecturas de getChannelData(0): con los picos calculados una vez
+ * por audio y ancho, reproducir 1,5 s no lee el canal ni una vez más; antes, una por fotograma.
+ */
+test.describe('recortador-audio · la onda no se recalcula al reproducir', () => {
+  test('reproducir 1,5 s no vuelve a recorrer las muestras, y el cursor avanza', async ({ page }) => {
+    await page.addInitScript(() => {
+      const w = window as unknown as { __lecturasCanal: number };
+      w.__lecturasCanal = 0;
+      const original = AudioBuffer.prototype.getChannelData;
+      AudioBuffer.prototype.getChannelData = function (this: AudioBuffer, canal: number) {
+        w.__lecturasCanal++;
+        return original.call(this, canal);
+      };
+    });
+    await page.goto(URL_APP);
+    await esperarHidratacion(page, ['input[type="file"]']);
+    await cargar(page, wavSeno(3, 44_100, 2));
+    const lecturas = () => page.evaluate(() => (window as unknown as { __lecturasCanal: number }).__lecturasCanal);
+    await expect.poll(lecturas).toBeGreaterThan(0);
+    const antes = await lecturas();
+    const reloj = page.locator('[class*="currentTime"]');
+    const textoAntes = await reloj.innerText();
+    await page.getByRole('button', { name: /Reproducir selección/ }).click();
+    await page.waitForTimeout(1500);
+    // El cursor avanzó (la animación corre de verdad) y la onda no se recalculó
+    await expect(reloj).not.toHaveText(textoAntes);
+    expect(await lecturas()).toBe(antes);
+    await page.getByRole('button', { name: /Detener/ }).click();
+  });
+});
+
 test.describe('recortador-audio · OGG (Opus)', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto(URL_APP);
