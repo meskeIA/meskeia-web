@@ -46,7 +46,7 @@ export const jsonLd = generateWebAppSchema({
     'Referencia MGRS con precisión ajustable de 1 km a 1 m',
     'Distancia y rumbo entre dos puntos por la fórmula de Vincenty',
     'Excepciones de zona de Noruega y Svalbard contempladas',
-    'Funciona 100% en el navegador, sin registro ni instalación',
+    'Funciona 100 % en el navegador, sin registro ni instalación',
     'Gratuito y sin publicidad',
   ],
 });

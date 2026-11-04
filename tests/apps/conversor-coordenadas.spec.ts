@@ -38,8 +38,10 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  *               (0,0) → (0,5, 179,5), casi antípodas: 19.936,289 km · 25,7° NNE · 154,3° SSE
  *   3 (rechazo) latitud 91 · longitud 181 · minutos 60 · texto «abc» → aviso y ningún resultado
  *
- * HALLAZGOS del 03/11/2026 — ABIERTOS. Sus casos van con test.fail(): afirman lo CORRECTO y hoy
- * fallan. Al repararse pasarán, y entonces se quita el test.fail() y se escribe REPARADO.
+ * HALLAZGOS del 03/11/2026. REPARADOS el 04/11/2026 (/reparar): A (4007), B (4008), C (4009),
+ * E (4010), F (4012), G (4013) y H (4014). Sigue ABIERTO el D (4011), con su test.fail(): afirma
+ * lo CORRECTO y hoy falla; necesita una inversa geodésica que no dependa de Vincenty cerca de las
+ * antípodas.
  *   A. Grados «-0» con minutos pierden el signo: «39 28 11, -0 22 34» (Valencia) sale 0,376111 E y
  *      «-0°13'47" -78°31'29"» (Quito) sale en el hemisferio norte. parseFloat('-0') < 0 es false.
  *   B. UTM con punto decimal: «30 T 440291.38 4474255.12» quita los puntos como si fueran de
@@ -195,32 +197,39 @@ test.describe('conversor-coordenadas · conversión de formatos', () => {
     }
   });
 
-  test('HALLAZGO A (ABIERTO) · grados «-0» con minutos: el signo no se pierde', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO A (REPARADO, 4007) · grados «-0» con minutos: el signo no se pierde', async ({ page }) => {
     // Valencia 39° 28' 11" N 0° 22' 34" O: 22/60 + 34/3600 = 0,376111 → longitud -0,376111
     expect((await convertir(page, '39 28 11, -0 22 34')).decimal).toBe('39,469722, -0,376111');
     // Quito-centro 0° 13' 47" S 78° 31' 29" O: 0,229722 → latitud -0,229722
     expect((await convertir(page, `-0°13'47" -78°31'29"`)).decimal).toBe('-0,229722, -78,524722');
   });
 
-  test('HALLAZGO B (ABIERTO) · UTM con punto decimal (el de un SIG o un GPS) se lee como decimal', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO B (REPARADO, 4008) · UTM con punto decimal (el de un SIG o un GPS) se lee como decimal', async ({ page }) => {
     // Mismo punto que «30 T 440.291,38 4.474.255,12» → 40,416780, -3,703789
     const r = await convertir(page, '30 T 440291.38 4474255.12');
     expect(r.decimal).toBe('40,416780, -3,703789');
     expect(r.utm).toBe('30 T 440.291,38 4.474.255,12');
   });
 
-  test('HALLAZGO C (ABIERTO) · «19 S 500000 8500000» (zona 19 Sur) no se va al Ártico', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO C (REPARADO, 4009) · «19 S 500000 8500000» (zona 19 Sur) no se va al Ártico', async ({ page }) => {
     // Snyder inversa con falso norte de 10.000 km: φ -13,568451° · λ -69° (Perú-Bolivia).
     // Leída como banda S (32-40° N) sería incoherente con el norte: 8.500.000 m está en la banda X.
     const r = await convertir(page, '19 S 500000 8500000');
     expect(r.decimal).toBe('-13,568451, -69,000000');
+    // Y cuando sí cuadra, la S sigue siendo la banda (MGRS): 4.400.000 m al norte en la zona 30 es
+    // 39,74° N, dentro de la banda S (32°-40° N). Leída como Sur saldría a unos -50°.
+    expect((await convertir(page, '30 S 400000 4400000')).decimal).toMatch(/^39,74\d{4}, -4,16\d{4}$/);
   });
 
-  test('HALLAZGO E (ABIERTO) · el MGRS de una UTM en metros redondos no salta a la casilla de al lado', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO C (REPARADO, 4009) · una banda que no cuadra con el norte no se convierte: se avisa', async ({ page }) => {
+    // 1.000.000 m al norte en la zona 30 es ~9° N (banda P), no la banda T (40°-48° N)
+    await poner(page, ENTRADA, '30 T 440291 1000000');
+    await expect(avisoConversion(page)).toBeVisible();
+    await expect(avisoConversion(page)).toContainText('letra de banda');
+    await expect(page.getByRole('button', { name: 'Copiar UTM', exact: true })).toHaveCount(0);
+  });
+
+  test('HALLAZGO E (REPARADO, 4010) · el MGRS de una UTM en metros redondos no salta a la casilla de al lado', async ({ page }) => {
     // Truncar 440.300 / 4.474.300 a 100 m da 403 / 743
     await poner(page, ENTRADA, '30 T 440300 4474300');
     await precision(page, '100 m');
@@ -242,17 +251,18 @@ test.describe('conversor-coordenadas · conversión de formatos', () => {
     expect(r.utm.startsWith('31 T ')).toBe(true);
   });
 
-  test('HALLAZGO F (ABIERTO) · el bloque educativo no dice que Madrid sin el menos cae en Turquía', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO F (REPARADO, 4012) · el bloque educativo no dice que Madrid sin el menos cae en Turquía', async ({ page }) => {
     // Turquía empieza hacia los 26° E; Madrid sin el signo queda en 3,70° E (caso anterior).
-    await expect(page.locator('li', { hasText: 'Perder el signo de la longitud' })).not.toContainText('Turquía', { timeout: 1000 });
+    const item = page.locator('li', { hasText: 'Perder el signo de la longitud' });
+    await expect(item).not.toContainText('Turquía', { timeout: 1000 });
+    await expect(item).toContainText('3,70° E');
   });
 
-  test('HALLAZGO G (ABIERTO) · el JSON-LD escribe el porcentaje separado («100 %»)', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO G (REPARADO, 4013) · el JSON-LD escribe el porcentaje separado («100 %»)', async ({ page }) => {
     const scripts = await page.locator('script[type="application/ld+json"]').allTextContents();
     const webApp = scripts.find((s) => s.includes('"WebApplication"')) ?? '';
     expect(webApp).not.toMatch(/\d%/);
+    expect(webApp).toContain('100 %');
   });
 
   test('CASO 1 (normal) · copiar grados decimales deja el valor con punto, como promete el paso 3', async ({ page }) => {
@@ -264,14 +274,17 @@ test.describe('conversor-coordenadas · conversión de formatos', () => {
     expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('40.416775, -3.703790');
   });
 
-  test('HALLAZGO H (ABIERTO) · copiar anuncia «Copiado» también al lector de pantalla', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO H (REPARADO, 4014) · copiar anuncia «Copiado» también al lector de pantalla', async ({ page }) => {
     await page.context().grantPermissions(['clipboard-read', 'clipboard-write']);
     await poner(page, ENTRADA, '40,416775, -3,7037900');
+    // Antes el texto visible pasaba a «✓ Copiado», pero el nombre accesible era el aria-label fijo
+    // «Copiar Grados decimales» y no había región viva. Ahora lo anuncia una región de estado,
+    // montada desde antes del clic (una región que nace con el mensaje no se anuncia).
+    const estado = page.locator('#anuncio-copiado[role="status"]');
+    await expect(estado).toHaveCount(1);
+    await expect(estado).toHaveText('');
     await page.getByRole('button', { name: 'Copiar Grados decimales', exact: true }).click();
-    // Hoy el texto visible pasa a «✓ Copiado», pero el nombre accesible es el aria-label fijo
-    // «Copiar Grados decimales» y no hay región viva: el lector no se entera.
-    await expect(page.getByRole('button', { name: /Copiado/ })).toHaveCount(1, { timeout: 1000 });
+    await expect(estado).toHaveText('Grados decimales copiado al portapapeles');
   });
 });
 

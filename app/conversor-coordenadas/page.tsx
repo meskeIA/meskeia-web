@@ -138,6 +138,9 @@ export default function ConversorCoordenadasPage() {
       ]
     : [];
 
+  const filaCopiada = filas.find((f) => f.clave === copiado);
+  const mensajeCopiado = filaCopiada ? `${filaCopiada.etiqueta} copiado al portapapeles` : '';
+
   return (
     <div className={styles.container}>
       <MeskeiaLogo />
@@ -216,9 +219,10 @@ export default function ConversorCoordenadasPage() {
               <div>
                 <strong>No se reconoce esa coordenada.</strong>
                 <p>
-                  Revisa que la latitud esté entre -90 y 90, la longitud entre -180 y 180, y que los
-                  minutos y segundos no lleguen a 60. Si vienen de un mapa antiguo, comprueba antes
-                  el datum: ED50 y ETRS89 no son intercambiables.
+                  Revisa que la latitud esté entre -90 y 90, la longitud entre -180 y 180, que los
+                  minutos y segundos no lleguen a 60 y, en UTM, que la letra de banda cuadre con el
+                  norte. Si vienen de un mapa antiguo, comprueba antes el datum: ED50 y ETRS89 no
+                  son intercambiables.
                 </p>
               </div>
             </div>
@@ -251,6 +255,12 @@ export default function ConversorCoordenadasPage() {
                   </div>
                 ))}
               </div>
+
+              {/* El aria-label fijo del botón tapa su «✓ Copiado»: esta región lo anuncia
+                  (hallazgo 4014). Siempre montada, para que el lector la tenga registrada. */}
+              <span id="anuncio-copiado" className="sr-only" role="status" aria-live="polite">
+                {mensajeCopiado}
+              </span>
 
               {conversiones.avisoPolar && (
                 <p className={styles.avisoPolar} role="note">
@@ -652,7 +662,8 @@ export default function ConversorCoordenadasPage() {
             </li>
             <li>
               <strong>Perder el signo de la longitud.</strong> En el mundo hispanohablante casi todas son negativas
-              (oeste). Sin el menos, Madrid se planta en Turquía.
+              (oeste). Sin el menos, Madrid salta a 3,70° E y cae en el Mediterráneo, al norte de
+              Menorca.
             </li>
             <li>
               <strong>Dar UTM sin la zona.</strong> El este y el norte por sí solos son ambiguos: la

@@ -32,6 +32,8 @@
  *   - ETRS89 como sistema oficial en España: RD 1071/2007
  */
 
+import { parseSpanishNumber } from '../formatters';
+
 // ─── Elipsoide WGS84 ───────────────────────────────────────────────────────────
 
 const A_WGS84 = 6378137;                 // semieje mayor (m)
@@ -311,15 +313,23 @@ const FILAS_100K = ['ABCDEFGHJKLMNPQRSTUV', 'FGHJKLMNPQRSTUVABCDE'];
 export function aMGRS(utm: CoordenadaUTM, digitos: 1 | 2 | 3 | 4 | 5 = 5): string {
   if (!utm.banda) throw new Error('MGRS no cubre las regiones polares (fuera de 80°S a 84°N).');
 
-  const columna = Math.floor(utm.este / 100000);
+  // El MGRS TRUNCA, así que el ruido de coma flotante decide la casilla: la ida y vuelta
+  // UTM → geográficas → UTM devuelve 440.299,9999999… en vez de 440.300, y truncar eso daba la
+  // casilla de al lado (hallazgo 4010: «30 T 440300 4474300» salía 403 742, y en el límite de
+  // 100 km cambiaban hasta las letras). Se redondea a la micra antes de truncar: el ruido de la
+  // ida y vuelta es del orden del nanómetro y ninguna precisión del MGRS baja del metro.
+  const esteMGRS = Math.round(utm.este * 1e6) / 1e6;
+  const norteMGRS = Math.round(utm.norte * 1e6) / 1e6;
+
+  const columna = Math.floor(esteMGRS / 100000);
   const letraColumna = COLUMNAS_100K[(utm.zona - 1) % 3].charAt(columna - 1);
 
-  const fila = Math.floor(utm.norte / 100000) % 20;
+  const fila = Math.floor(norteMGRS / 100000) % 20;
   const letraFila = FILAS_100K[(utm.zona - 1) % 2].charAt(fila);
 
   const divisor = Math.pow(10, 5 - digitos);
-  const este = Math.floor((utm.este % 100000) / divisor);
-  const norte = Math.floor((utm.norte % 100000) / divisor);
+  const este = Math.floor((esteMGRS % 100000) / divisor);
+  const norte = Math.floor((norteMGRS % 100000) / divisor);
 
   const pad = (v: number) => String(v).padStart(digitos, '0');
   return `${utm.zona}${utm.banda} ${letraColumna}${letraFila} ${pad(este)} ${pad(norte)}`;
@@ -501,6 +511,51 @@ function normalizarTexto(texto: string): string {
     .replace(/\s+/g, ' ');
 }
 
+/** Margen para dar por buena la banda declarada en un punto pegado a su límite (≈ 11 km) */
+const TOLERANCIA_BANDA = 0.1;
+
+/** Latitud de una UTM leída en el hemisferio dado, o null si cae fuera de la proyección */
+function latitudUTM(zona: number, hemisferio: Hemisferio, este: number, norte: number): PuntoGeografico | null {
+  try {
+    const punto = desdeUTM({ zona, banda: '', hemisferio, este, norte });
+    return Number.isFinite(punto.latitud) && Number.isFinite(punto.longitud) ? punto : null;
+  } catch {
+    return null;
+  }
+}
+
+function cabeEnBanda(latitud: number, banda: string): boolean {
+  const indice = BANDAS_LATITUD.indexOf(banda);
+  if (indice < 0) return false;
+  const minima = indice * 8 - 80;
+  const maxima = banda === 'X' ? 84 : minima + 8;
+  return latitud >= minima - TOLERANCIA_BANDA && latitud <= maxima + TOLERANCIA_BANDA;
+}
+
+/**
+ * La letra que sigue a la zona puede ser una banda MGRS (C..X) o el hemisferio (N/S), y la N y
+ * la S son las dos cosas: «19S» es la banda S (32°-40° N) para el MGRS y la zona 19 Sur para EPSG
+ * y QGIS, que es como se escribe la UTM en Perú, Bolivia o Chile. Lo deshace el norte: se toma
+ * como banda si el punto cae dentro de ella y, si no, como hemisferio (hallazgo 4009: «19 S 500000
+ * 8500000» salía a 76,58° N, en el Ártico, en vez de -13,57°). Una banda de otra letra que no cuadra
+ * con el norte no se convierte: es un error de transcripción, y convertirla daba un punto a miles de
+ * kilómetros sin avisar («30 T 440291 1000000» salía a 9° N).
+ */
+function interpretarUTM(zona: number, letra: string, este: number, norte: number): ResultadoInterpretacion | null {
+  const esBanda = /^[C-HJ-NP-X]$/.test(letra);
+
+  if (esBanda) {
+    const hemisferioBanda: Hemisferio = letra >= 'N' ? 'N' : 'S';
+    const punto = latitudUTM(zona, hemisferioBanda, este, norte);
+    if (punto && cabeEnBanda(punto.latitud, letra)) return { punto, formato: 'utm' };
+    if (letra !== 'N' && letra !== 'S') return null;
+  }
+
+  // N o S como hemisferio (o sin letra, que se lee como norte)
+  const punto = latitudUTM(zona, letra === 'S' ? 'S' : 'N', este, norte);
+  return punto ? { punto, formato: 'utm' } : null;
+}
+
 /**
  * Interpreta una coordenada escrita de cualquiera de las formas habituales.
  * Devuelve null si no reconoce nada, para que la interfaz pueda decirlo sin romperse.
@@ -524,16 +579,13 @@ export function interpretarCoordenada(entrada: string): ResultadoInterpretacion 
   if (utm) {
     const zona = parseInt(utm[1], 10);
     const letra = (utm[2] ?? 'N').toUpperCase();
-    const este = parseFloat(utm[3].replace(/\./g, '').replace(',', '.'));
-    const norte = parseFloat(utm[4].replace(/\./g, '').replace(',', '.'));
+    // parseSpanishNumber y no «quitar todos los puntos»: el punto decimal que exportan los SIG,
+    // los GPS y Google Earth (440291.38) se leía como millar, 44.029.138 m, y el punto salía en el
+    // Índico (hallazgo 4008). El punto solo agrupa millares si parte el número en grupos de tres.
+    const este = parseSpanishNumber(utm[3]);
+    const norte = parseSpanishNumber(utm[4]);
     if (Number.isFinite(este) && Number.isFinite(norte) && zona >= 1 && zona <= 60) {
-      const banda = /^[C-HJ-NP-X]$/.test(letra) ? letra : '';
-      const hemisferio: Hemisferio = banda ? (banda >= 'N' ? 'N' : 'S') : letra === 'S' ? 'S' : 'N';
-      try {
-        return { punto: desdeUTM({ zona, banda, hemisferio, este, norte }), formato: 'utm' };
-      } catch {
-        return null;
-      }
+      return interpretarUTM(zona, letra, este, norte);
     }
   }
 
@@ -545,10 +597,12 @@ export function interpretarCoordenada(entrada: string): ResultadoInterpretacion 
     const num = (v: string | undefined) => (v === undefined ? 0 : parseFloat(v.replace(',', '.')));
     const gLat = num(sexagesimal[1]), mLat = num(sexagesimal[2]), sLat = num(sexagesimal[3]);
     const gLon = num(sexagesimal[5]), mLon = num(sexagesimal[6]), sLon = num(sexagesimal[7]);
-    const hLat = sexagesimal[4] ?? (gLat < 0 ? 'S' : 'N');
-    const hLon = sexagesimal[8] ?? (gLon < 0 ? 'O' : 'E');
+    // El signo se lee del TEXTO y no del número: parseFloat('-0') da -0, que no es menor que 0,
+    // así que «-0 22 34» perdía el menos y Valencia o Quito cambiaban de hemisferio (hallazgo 4007).
+    const hLat = sexagesimal[4] ?? (sexagesimal[1].startsWith('-') ? 'S' : 'N');
+    const hLon = sexagesimal[8] ?? (sexagesimal[5].startsWith('-') ? 'O' : 'E');
 
-    const latitud = desdeSexagesimal(gLat, mLat, sLat, hLat) * (gLat < 0 && !sexagesimal[4] ? 1 : 1);
+    const latitud = desdeSexagesimal(gLat, mLat, sLat, hLat);
     const longitud = desdeSexagesimal(gLon, mLon, sLon, hLon);
 
     if (!esLatitudValida(latitud) || !esLongitudValida(longitud)) return null;
