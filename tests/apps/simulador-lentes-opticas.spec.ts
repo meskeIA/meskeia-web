@@ -1284,3 +1284,197 @@ test.describe('simulador-lentes-opticas · re-inspección 03/10/2026 · móvil 3
     expect(comprobar?.height ?? 0).toBeGreaterThanOrEqual(44);
   });
 });
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════════
+ * Cabos C0114 y C0131 (inspector, modo cabo, 04/11/2026)
+ * ═══════════════════════════════════════════════════════════════════════════════════════════ */
+
+test.describe('simulador-lentes-opticas · cabo C0114 · la tarjeta de la convención de signos', () => {
+  test('dice el convenio que aplica el motor y no se lo atribuye a un examen (C0114, REPARADO en a55974b2)', async ({
+    page,
+  }) => {
+    await page.goto('/simulador-lentes-opticas/');
+    await esperarHidratacion(page, [SLIDER_F]);
+    // El panel aplica «real es positivo» (motor.ts): estado de fábrica f = +8, s = 15
+    //   1/s' = 1/f − 1/s = 1/8 − 1/15 = 7/120 → s' = 17,142… → «17,14 cm»
+    //   M = −s'/s = −17,142…/15 = −1,1428… → «−1,143»
+    // En DIN (s = −15): 1/s' = 1/f' + 1/s = 1/8 − 1/15 = 7/120, la MISMA s', y M = s'/s = −1,143:
+    // lo que dice la tarjeta («los dos dan la misma s', el mismo aumento y la misma altura»).
+    await expect(valorDe(page, "Distancia imagen (s')")).toHaveText('17,14 cm');
+    await expect(valorDe(page, "Aumento (M = −s'/s)")).toHaveText('−1,143');
+
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const tarjeta = page.locator('[class*="tipCard"]').filter({ hasText: 'Recuerda la convención de signos' });
+    await expect(tarjeta).toHaveCount(1);
+    // Antes (hasta a55974b2, 03/10/2026) atribuía a la EBAU el convenio «s > 0 a la izquierda»,
+    // cuando la cabecera de casos.ts reconoce que en España se enseña además el DIN.
+    await expect(tarjeta).toContainText('Este simulador usa la de «real es positivo»');
+    await expect(tarjeta).toContainText("1/s' − 1/s = 1/f'");
+    await expect(tarjeta).not.toContainText(/EBAU|EvAU|PAU|selectividad/);
+  });
+});
+
+/** Términos de nivel educativo exclusivos de España (CLAUDE.md §1.bis) y su pareja Latam. */
+const NIVEL_ES = /EBAU|EvAU|selectividad|Bachillerato/;
+const NIVEL_LATAM = /preparatoria|secundaria|examen de admisión universitaria/;
+
+test.describe('simulador-lentes-opticas · cabo C0131 (a) · EBAU y Bachillerato en la metadata', () => {
+  test('ninguno en el title, la description ni el texto visible; en keywords y JSON-LD, siempre con su pareja Latam', async ({
+    page,
+  }) => {
+    // El patrón aditivo de 79fd66d0 (30/06/2026: «términos España conservados») y el precedente
+    // del retrofit del 01/09/2026 (18ffdbcb): una mención España-only se corrige si va SIN su
+    // equivalente Latam en el mismo texto. Este caso guarda ese patrón, no lo cambia.
+    const html = await (await page.request.get('/simulador-lentes-opticas/')).text();
+    const titulo = html.match(/<title>([^<]*)<\/title>/)?.[1] ?? '';
+    const descripcion = html.match(/<meta name="description" content="([^"]*)"/)?.[1] ?? '';
+    expect(titulo).toBe('Simulador de Lentes Ópticas: Trazado de Rayos | meskeIA');
+    expect(descripcion).not.toMatch(NIVEL_ES);
+
+    const campos: { donde: string; texto: string }[] = [
+      { donde: 'meta keywords', texto: html.match(/<meta name="keywords" content="([^"]*)"/)?.[1] ?? '' },
+    ];
+    const bloques = [...html.matchAll(/<script type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g)].map(
+      (m) => JSON.parse(m[1]) as Record<string, unknown>,
+    );
+    const app = bloques.find((b) => b['@type'] === 'WebApplication');
+    const faq = bloques.find((b) => b['@type'] === 'FAQPage') as
+      | { mainEntity: { name: string; acceptedAnswer: { text: string } }[] }
+      | undefined;
+    expect(app, 'WebApplication en el HTML servido').toBeTruthy();
+    expect(faq, 'FAQPage en el HTML servido').toBeTruthy();
+    campos.push({ donde: 'WebApplication.description', texto: String(app?.description ?? '') });
+    campos.push({ donde: 'WebApplication.keywords', texto: String(app?.keywords ?? '') });
+    for (const [i, f] of ((app?.featureList as string[] | undefined) ?? []).entries()) {
+      campos.push({ donde: `WebApplication.featureList[${i}]`, texto: f });
+    }
+    for (const q of faq?.mainEntity ?? []) campos.push({ donde: `FAQ «${q.name}»`, texto: q.acceptedAnswer.text });
+
+    const sinPareja = campos.filter((c) => NIVEL_ES.test(c.texto) && !NIVEL_LATAM.test(c.texto)).map((c) => c.donde);
+    expect(sinPareja).toEqual([]);
+    // Las cinco que hay hoy (04/11/2026), todas con pareja: meta keywords, description,
+    // featureList[6], keywords del WebApplication y la 5.ª pregunta de la FAQ.
+    expect(campos.filter((c) => NIVEL_ES.test(c.texto)).length).toBe(5);
+
+    await page.goto('/simulador-lentes-opticas/');
+    await esperarHidratacion(page, [SLIDER_F]);
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    // innerText y no textContent: el cuerpo lleva el JSON-LD y la carga RSC, que sí los nombran.
+    await expect(page.locator('body')).not.toContainText(NIVEL_ES, { useInnerText: true });
+  });
+});
+
+/**
+ * El pulgar del deslizador de la focal, medido POR PÍXEL: getComputedStyle no lee
+ * ::-webkit-slider-thumb. Captura la franja del control, la decodifica en un <canvas> de la
+ * propia página, busca los píxeles del relleno (el color computado de var(--secondary), que es
+ * el que pone la regla `.slider::-webkit-slider-thumb` del módulo) y lee, desde su centro hacia
+ * arriba, el anillo del borde de 2 px (a 10 px del centro). El fondo es el de la tarjeta
+ * `.mainContent`, liso, que sí lee getComputedStyle.
+ */
+async function pulgarDeLaFocal(page: Page): Promise<{ relleno: Rgb; anillo: Rgb; tarjeta: Rgb; pixeles: number }> {
+  await esperarQuietud(page);
+  const slider = page.locator(SLIDER_F);
+  await slider.scrollIntoViewIfNeeded();
+  const colores = await slider.evaluate((el) => {
+    const sonda = document.createElement('span');
+    sonda.style.background = 'var(--secondary)';
+    el.parentElement!.appendChild(sonda);
+    const secundario = getComputedStyle(sonda).backgroundColor;
+    sonda.remove();
+    const tarjeta = el.closest('[class*="mainContent"]');
+    return { secundario, tarjeta: tarjeta ? getComputedStyle(tarjeta).backgroundColor : 'rgb(0, 0, 0)' };
+  });
+  const caja = await slider.boundingBox();
+  if (!caja) throw new Error('el deslizador de la focal no tiene caja');
+  const png = await page.screenshot({
+    clip: { x: Math.floor(caja.x - 4), y: Math.floor(caja.y - 24), width: Math.ceil(caja.width + 8), height: Math.ceil(caja.height + 48) },
+  });
+  const objetivo = colorDe(colores.secundario).rgb;
+  const medida = await page.evaluate(
+    async ({ b64, obj }) => {
+      const img = new Image();
+      img.src = `data:image/png;base64,${b64}`;
+      await img.decode();
+      const cv = document.createElement('canvas');
+      cv.width = img.width;
+      cv.height = img.height;
+      const cx = cv.getContext('2d')!;
+      cx.drawImage(img, 0, 0);
+      const d = cx.getImageData(0, 0, cv.width, cv.height).data;
+      const px = (x: number, y: number): [number, number, number] => {
+        const i = (y * cv.width + x) * 4;
+        return [d[i], d[i + 1], d[i + 2]];
+      };
+      let n = 0;
+      let sx = 0;
+      let sy = 0;
+      for (let y = 0; y < cv.height; y++) {
+        for (let x = 0; x < cv.width; x++) {
+          const c = px(x, y);
+          if (Math.abs(c[0] - obj[0]) + Math.abs(c[1] - obj[1]) + Math.abs(c[2] - obj[2]) <= 9) {
+            n++;
+            sx += x;
+            sy += y;
+          }
+        }
+      }
+      if (!n) return { n, relleno: [0, 0, 0] as [number, number, number], anillo: [0, 0, 0] as [number, number, number] };
+      const cxm = Math.round(sx / n);
+      const cym = Math.round(sy / n);
+      const dpr = window.devicePixelRatio || 1;
+      return { n, relleno: px(cxm, cym), anillo: px(cxm, cym - Math.round(10 * dpr)) };
+    },
+    { b64: png.toString('base64'), obj: objetivo },
+  );
+  return { relleno: medida.relleno, anillo: medida.anillo, tarjeta: colorDe(colores.tarjeta).rgb, pixeles: medida.n };
+}
+
+/** Lo que identifica al pulgar es su relleno contra lo que lo rodea: el anillo y la tarjeta. */
+function contrasteDelPulgar(m: { relleno: Rgb; anillo: Rgb; tarjeta: Rgb; pixeles: number }): number {
+  expect(m.pixeles, 'píxeles del relleno del pulgar en la captura').toBeGreaterThan(100);
+  return Math.min(contraste(m.relleno, m.anillo), contraste(m.relleno, m.tarjeta));
+}
+
+test.describe('simulador-lentes-opticas · cabo C0131 (b) · el pulgar de los deslizadores (WCAG 1.4.11)', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/simulador-lentes-opticas/');
+    await esperarHidratacion(page, [SLIDER_F, SLIDER_S, SLIDER_H]);
+  });
+
+  test('HALLAZGO (04/11/2026, ABIERTO, cabo C0131) · en claro el pulgar no llega a 3:1 contra su anillo y la tarjeta blancos', async ({
+    page,
+  }) => {
+    // Medido el 04/11/2026: relleno #48A9A6 (var(--secondary)), anillo #FFFFFF (border: 2px solid
+    // white) y tarjeta #FFFFFF → 2,80:1. El anillo blanco no lo separa de nada: es del color de la
+    // tarjeta. Pide 3:1 (componente de interfaz).
+    test.fail();
+    await activarTema(page, 'light');
+    expect(contrasteDelPulgar(await pulgarDeLaFocal(page))).toBeGreaterThanOrEqual(3);
+  });
+
+  test('en oscuro el pulgar pasa de 3:1 contra su anillo y la tarjeta', async ({ page }) => {
+    // Medido el 04/11/2026: relleno #5ABDB9, anillo #2A2A2A/#292929 y tarjeta #2D2D2D → 6,17:1 el
+    // peor. Si se repara el claro, este caso guarda que el oscuro no caiga.
+    await activarTema(page, 'dark');
+    expect(contrasteDelPulgar(await pulgarDeLaFocal(page))).toBeGreaterThanOrEqual(3);
+  });
+});
+
+test.describe('simulador-lentes-opticas · cabo C0131 (b) · el pulgar bajo stemum.com', () => {
+  test.beforeEach(async ({ page }) => {
+    test.setTimeout(90000);
+    await page.goto('http://stemum.com/simulador-lentes-opticas/');
+    await esperarHidratacion(page, [SLIDER_F]);
+    await expect(page.locator('html')).toHaveAttribute('data-brand', 'stemum');
+  });
+
+  for (const tema of ['light', 'dark'] as const) {
+    test(`tema ${tema === 'light' ? 'claro' : 'oscuro'}: el pulgar violeta pasa de 3:1`, async ({ page }) => {
+      // Medido el 04/11/2026: relleno #A855F7 (--secondary de Stemum en los dos temas). Claro:
+      // anillo y tarjeta #FFFFFF → 3,96:1. Oscuro: anillo #292929 3,68:1, tarjeta #2D2D2D 3,48:1.
+      await activarTema(page, tema);
+      expect(contrasteDelPulgar(await pulgarDeLaFocal(page))).toBeGreaterThanOrEqual(3);
+    });
+  }
+});

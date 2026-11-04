@@ -1,5 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 import { esperarHidratacion, esperarValorEnReact, sembrarValor } from './_hidratacion';
+import { contrasteSobreFondoReal } from './_contraste';
 
 /**
  * simulador-planificador-procesos — modo «corrígeme» · 05/09/2026 (semilla S0121)
@@ -1012,10 +1013,11 @@ test.describe('simulador-planificador-procesos · inspección 29/09/2026', () =>
  * las marcas son los de la traza; solapes «0»/«0,1» 6,06 px, «0»/«0,2» 4,11, «0,1»/«0,2» 14,16 y
  * «2»/«2,1» 6,06; ningún bloque lleva <title> ni aria-label.
  *
- * VEREDICTO: se confirma, con dos hallazgos ABIERTOS (los dos test.fail de abajo):
- *   · accesibilidad/medio — el bloque estrecho no dice qué proceso es (solo el color, en 4 px), y
- *     en el CASO 3 ese tramo no se repite en ningún otro sitio.
- *   · operativa/bajo — las marcas del eje se pisan; sus valores sí están en la tabla.
+ * VEREDICTO: se confirmó, con dos hallazgos, los dos REPARADOS en 15136685 (03/11/2026; sus
+ * test.fail se retiraron y la reparación la revalidó el Inspector el 04/11/2026, al final del fichero):
+ *   · 3973 accesibilidad/medio — el bloque estrecho no decía qué proceso es (solo el color, en
+ *     4 px), y en el CASO 3 ese tramo no se repite en ningún otro sitio.
+ *   · 3974 operativa/bajo — las marcas del eje se pisaban; sus valores sí están en la tabla.
  * ════════════════════════════════════════════════════════════════════════════ */
 
 interface BloqueMedido {
@@ -1195,3 +1197,172 @@ for (const perfil of PERFILES_C0078) {
     });
   });
 }
+
+/* ════════════════════════════════════════════════════════════════════════════
+ * CAMBIO 15136685 · Inspector, 04/11/2026 (modo cambio)
+ *
+ * El commit 15136685 (hallazgos 3973 y 3974) añadió al Gantt un <title> por tramo, la secuencia
+ * en texto bajo el diagrama (enlazada con aria-describedby) y las marcas del eje en filas. La
+ * secuencia es la solución escrita: tiene que decir lo mismo que la traza del algoritmo, nombrar
+ * la CPU ociosa y retirarse en el modo práctica. Las filas de marcas no pueden cortarse ni
+ * salirse del dibujo.
+ *
+ * LOS TRES CASOS SE RESOLVIERON A MANO ANTES DE ABRIR LA APP:
+ *
+ *   CASO D · FCFS con CPU ociosa · P1(0; 3) · P2(5; 2) · P3(6; 4) → total 11 → escala 800/11 = 72,73
+ *     P1 [0; 3] · en t=3 no ha llegado nadie → CPU ociosa [3; 5] · P2 [5; 7] · P3 [7; 11]
+ *     marcas 0 · 3 · 5 · 7 · 11, a ≥ 145 px unas de otras: todas en la primera fila
+ *     (y = 10 + 50 + 18 = 78) y el dibujo conserva su alto de siempre, 90
+ *
+ *   CASO E · Round Robin q=2 · ejemplo «Round Robin equilibrado» de la propia app
+ *     P1(0; 5) · P2(1; 4) · P3(2; 6) · P4(3; 3) · P5(4; 5); el recién llegado entra en la cola
+ *     antes que el reincorporado:
+ *     P1 [0;2] P2 [2;4] P3 [4;6] P1 [6;8] P4 [8;10] P5 [10;12] P2 [12;14] P3 [14;16] P1 [16;17]
+ *     P4 [17;18] P5 [18;20] P3 [20;22] P5 [22;23] → total 23 = 5+4+6+3+5 → escala max(40, 800/23) = 40
+ *     14 marcas a ≥ 40 px: una sola fila, alto 90
+ *
+ *   CASO F · SRTF con cortes a 0,05 ut · P1(0; 8) · P2(0,05; 4) · P3(0,1; 1) → total 13 → escala 61,54
+ *     t=0,05 llega P2 (4) < resto de P1 (7,95) → expulsa · t=0,1 llega P3 (1) < resto de P2 (3,95)
+ *     → expulsa · t=1,1 P2 (3,95) < P1 (7,95) · t=5,05 P1 hasta 13
+ *     marcas en x = 20 + t·61,54: «0» 20 · «0,05» 23,08 · «0,1» 26,15 · «1,1» 87,69 · «5,05» 330,77 · «13» 820
+ *     regla de la app (7 px por carácter, 3 px de hueco, primera fila donde quepa):
+ *       «0» → fila 0, acaba en 23,5 · «0,05» empieza en 9,08 < 26,5 → fila 1, acaba en 37,08
+ *       · «0,1» empieza en 15,65: no cabe en la 0 ni en la 1 → fila 2 · «1,1» empieza en 77,19
+ *       → fila 0, y «5,05» y «13» también
+ *     → y = 78 · 91 · 104 · 78 · 78 · 78 y alto 90 + 2·13 = 116
+ *
+ * Medido (.inspector-trabajo/spp-explorar.mjs), igual en escritorio y a 390 px: todo sale tal cual
+ * la traza; en el modo práctica la secuencia y el diagrama no se ven. Contraste de la secuencia
+ * sobre su fondo: 5,50:1 en claro (#666666 sobre #FAFAFA) y 8,03:1 en oscuro (#B0B0B0 sobre
+ * #1A1A1A), medido con la transición del fondo ya terminada.
+ * VEREDICTO: ok, sin hallazgos.
+ * ════════════════════════════════════════════════════════════════════════════ */
+
+const SEL_GANTT = 'svg[aria-label="Diagrama de Gantt de la planificación"]';
+
+/** Los <title> de los tramos del Gantt, en orden */
+async function titulosGantt(page: Page): Promise<string[]> {
+  return await page.evaluate(
+    (sel) => Array.from(document.querySelectorAll(`${sel} g > title`)).map((t) => t.textContent ?? ''),
+    SEL_GANTT,
+  );
+}
+
+/** Alto declarado del <svg>, la «y» de cada marca y las marcas que se salen de su caja */
+async function geometriaMarcas(page: Page): Promise<{ alto: string | null; y: number[]; fuera: string[] }> {
+  return await page.evaluate((sel) => {
+    const svg = document.querySelector(sel);
+    if (!svg) return { alto: null, y: [], fuera: [] };
+    const caja = svg.getBoundingClientRect();
+    const marcas = Array.from(svg.querySelectorAll('text')).filter((t) =>
+      (t.getAttribute('class') ?? '').includes('ganttTimestamp'),
+    );
+    return {
+      alto: svg.getAttribute('height'),
+      y: marcas.map((t) => Number(t.getAttribute('y'))),
+      fuera: marcas
+        .filter((t) => {
+          const c = t.getBoundingClientRect();
+          return c.bottom > caja.bottom + 1 || c.top < caja.top - 1;
+        })
+        .map((t) => t.textContent ?? ''),
+    };
+  }, SEL_GANTT);
+}
+
+test.describe('simulador-planificador-procesos · cambio 15136685 · secuencia y marcas del Gantt', () => {
+  test('CASO D · FCFS con CPU ociosa: la secuencia y los <title> dicen los tramos de la traza', async ({ page }) => {
+    await abrirHidratada(page);
+    await fijarProceso(page, 'P1', '0', '3');
+    await fijarProceso(page, 'P2', '5', '2');
+    await fijarProceso(page, 'P3', '6', '4');
+    await page.getByRole('button', { name: BTN_FCFS }).click();
+    await expect.poll(() => marcasTiempo(page)).toEqual(['0', '3', '5', '7', '11']);
+
+    await expect(page.locator('#gantt-secuencia')).toHaveText(
+      'Secuencia en la CPU: P1 [0; 3] · CPU ociosa [3; 5] · P2 [5; 7] · P3 [7; 11]',
+    );
+    expect(await titulosGantt(page)).toEqual(['P1 [0; 3]', 'CPU ociosa [3; 5]', 'P2 [5; 7]', 'P3 [7; 11]']);
+    // El rótulo visible de la ociosa sigue siendo «—»; la secuencia la nombra
+    expect(await bloquesGantt(page)).toEqual(['P1', '—', 'P2', 'P3']);
+    // 3·72,73 · 2·72,73 · 2·72,73 · 4·72,73
+    expect((await medirGantt(page)).bloques.map((b) => b.ancho)).toEqual([218.18, 145.45, 145.45, 290.91]);
+    const geo = await geometriaMarcas(page);
+    expect(geo.alto).toBe('90');
+    expect(geo.y).toEqual([78, 78, 78, 78, 78]);
+  });
+
+  test('CASO E · Round Robin equilibrado (q=2): la secuencia repite los 13 turnos de la cola', async ({ page }) => {
+    await abrirHidratada(page);
+    await page.getByRole('button', { name: /Round Robin equilibrado/ }).click();
+    await expect(page.locator('[class*="quantumValue"]')).toHaveText('2');
+    await expect
+      .poll(() => marcasTiempo(page))
+      .toEqual(['0', '2', '4', '6', '8', '10', '12', '14', '16', '17', '18', '20', '22', '23']);
+
+    await expect(page.locator('#gantt-secuencia')).toHaveText(
+      'Secuencia en la CPU: P1 [0; 2] · P2 [2; 4] · P3 [4; 6] · P1 [6; 8] · P4 [8; 10] · P5 [10; 12] · ' +
+        'P2 [12; 14] · P3 [14; 16] · P1 [16; 17] · P4 [17; 18] · P5 [18; 20] · P3 [20; 22] · P5 [22; 23]',
+    );
+    expect(await bloquesGantt(page)).toEqual(['P1', 'P2', 'P3', 'P1', 'P4', 'P5', 'P2', 'P3', 'P1', 'P4', 'P5', 'P3', 'P5']);
+    const geo = await geometriaMarcas(page);
+    expect(geo.alto).toBe('90');
+    expect(geo.y).toEqual(Array(14).fill(78));
+    expect(marcasQueSePisan((await medirGantt(page)).marcas)).toEqual([]);
+  });
+
+  test('CASO F · SRTF con cortes a 0,05: tres filas de marcas, ninguna pisada ni fuera, y el modo práctica retira la secuencia', async ({
+    page,
+  }) => {
+    await abrirHidratada(page);
+    await fijarProceso(page, 'P1', '0', '8');
+    await fijarProceso(page, 'P2', '0,05', '4');
+    await fijarProceso(page, 'P3', '0,1', '1');
+    await page.getByRole('button', { name: BTN_SRTF }).click();
+    await expect.poll(() => marcasTiempo(page)).toEqual(['0', '0,05', '0,1', '1,1', '5,05', '13']);
+
+    const secuencia = page.locator('#gantt-secuencia');
+    await expect(secuencia).toHaveText(
+      'Secuencia en la CPU: P1 [0; 0,05] · P2 [0,05; 0,1] · P3 [0,1; 1,1] · P2 [1,1; 5,05] · P1 [5,05; 13]',
+    );
+    expect(await titulosGantt(page)).toEqual([
+      'P1 [0; 0,05]',
+      'P2 [0,05; 0,1]',
+      'P3 [0,1; 1,1]',
+      'P2 [1,1; 5,05]',
+      'P1 [5,05; 13]',
+    ]);
+    // 0,05·61,54 = 3,08 px: los dos primeros tramos van sin rótulo, solo con su <title>
+    const medido = await medirGantt(page);
+    expect(medido.bloques.map((b) => b.ancho)).toEqual([3.08, 3.08, 61.54, 243.08, 489.23]);
+    expect(medido.bloques[0].identificacion).toBe('P1 [0; 0,05]');
+    expect(medido.bloques[1].identificacion).toBe('P2 [0,05; 0,1]');
+
+    const geo = await geometriaMarcas(page);
+    expect(geo.y).toEqual([78, 91, 104, 78, 78, 78]);
+    expect(geo.alto).toBe('116');
+    expect(geo.fuera).toEqual([]);
+    expect(marcasQueSePisan(medido.marcas)).toEqual([]);
+
+    // La secuencia es la solución en texto: en el modo práctica no puede quedar a la vista
+    const toggle = page.getByRole('button', { name: /Modo práctica/ });
+    await toggle.click();
+    await expect(toggle).toHaveAttribute('aria-pressed', 'true');
+    await expect(secuencia).toBeHidden();
+    await expect(page.locator(SEL_GANTT)).toBeHidden();
+    await toggle.click();
+    await expect(secuencia).toBeVisible();
+  });
+
+  test('la secuencia se lee a 4,5:1 en los dos temas (medido 5,50 en claro y 8,03 en oscuro)', async ({ page }) => {
+    // Sin transición del fondo (0,3 s): a mitad de camino el oscuro da 3,49:1 y no es lo que se ve
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await abrirHidratada(page);
+    const secuencia = page.locator('#gantt-secuencia');
+    await expect(secuencia).toBeVisible();
+    for (const tema of ['light', 'dark']) {
+      await page.evaluate((t) => document.documentElement.setAttribute('data-theme', t), tema);
+      await expect.poll(() => contrasteSobreFondoReal(secuencia), { message: `tema ${tema}` }).toBeGreaterThanOrEqual(4.5);
+    }
+  });
+});

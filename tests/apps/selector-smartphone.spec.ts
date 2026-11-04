@@ -567,6 +567,7 @@ test.describe('re-inspección 25/09/2026 · casos resueltos a mano', () => {
       '🔋 Batería ≥ 4.500 mAh con carga rápida ≥ 30 W',
       '📷 Cámara principal con estabilización óptica si la encuentras: en este tramo no hay teleobjetivo, y el zoom será digital',
       '⚡ El procesador más potente que encuentres en este tramo; para juegos exigentes tendrás que bajar la calidad gráfica',
+      // Cabo C0107, ABIERTO (04/11/2026): esta línea es el hallazgo del bloque final; al repararla, cambiarla aquí también.
       '🖥️ Pantalla de 90 Hz si la hay: los 120 Hz empiezan en la gama media',
       "📐 Pantalla ≥ 6,5'' con tecnología AMOLED o equivalente",
       '📡 NFC para pagos sin contacto (verifica disponibilidad en tu región)',
@@ -1160,6 +1161,8 @@ test.describe('re-inspección 02/10/2026 · casos resueltos a mano', () => {
       .evaluateAll((els) => els.map((e) => e.textContent ?? '').join(' ')));
     // Antes: ['espacio normal' (30-40 %), 'pegado' (20-30%)]. Correcto: ninguno distinto de U+00A0.
     expect(texto).toContain('30-40\u00A0%');
+    // Cabo C0384, ABIERTO (04/11/2026): el \u00AB20-30 %\u00BB de la gu\u00EDa es hallazgo de contenido (cifra sin
+    // fuente, bloque final). Si la reparaci\u00F3n lo retira, esta l\u00EDnea se quita con ella.
     expect(texto).toContain('20-30\u00A0%');
     const separadores = [...texto.matchAll(/\d([\s ]?)%/g)].map((m) => (m[1] === ' ' ? 'U+00A0' : m[1] === '' ? 'pegado' : 'espacio normal'));
     expect(separadores.filter((s) => s !== 'U+00A0')).toEqual([]);
@@ -1298,6 +1301,7 @@ test.describe('re-inspección 02/10/2026 · móvil 360 px', () => {
       '🔋 Batería ≥ 5.000 mAh con carga rápida ≥ 45 W', // más de 7 h
       '📷 Cámara principal con estabilización óptica si la encuentras: en este tramo no hay teleobjetivo, y el zoom será digital',
       '⚡ El procesador más potente que encuentres en este tramo; para juegos exigentes tendrás que bajar la calidad gráfica',
+      // Cabo C0107, ABIERTO (04/11/2026): esta línea es el hallazgo del bloque final; al repararla, cambiarla aquí también.
       '🖥️ Pantalla de 90 Hz si la hay: los 120 Hz empiezan en la gama media',
       '💧 Certificación IP67 como mínimo: en este tramo es lo que se encuentra, y muchos modelos solo declaran IP54',
       '📡 NFC para pagos sin contacto (verifica disponibilidad en tu región)',
@@ -1584,3 +1588,65 @@ for (const vp of [{ width: 360, height: 740 }, { width: 390, height: 844 }]) {
     }
   });
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Cabos C0107 y C0384 (inspector 04/11/2026, modo cabo): afirmaciones de mercado sin fuente
+// ─────────────────────────────────────────────────────────────────────────────
+//
+// Criterio del 30/10/2026 (C0203): una afirmación de mercado perecedera que la app no puede sostener
+// con una fuente permitida es hallazgo de contenido, y se propone matizarla o retirarla. Las webs de
+// los fabricantes no son fuente oficial (decisión del usuario del 04/11/2026: «Apple y Google NO»), y
+// ningún dominio de la lista (BOE, CNMC, INE…) da tasas de refresco ni rebajas de precio por modelo.
+// Los dos casos van con test.fail(): exigen lo CORRECTO y hoy fallan. Al repararse, quitar el
+// test.fail() y cambiar ABIERTO por REPARADO.
+
+// P1 «Uso básico» 0 · P2 «Gaming intenso» +2 · P3 < 2 h 0 · P6 batería 0 · P7 2-3 años 0 = 2 → media
+// por uso; tope de «Hasta 250 €» = básica → recorte a básica (esEntrada). P4 «No, ninguno» 0 y P5
+// Windows −1 → Android. Con P2 «intenso» en la entrada, motor.ts escribe la línea de pantalla del
+// tramo básico.
+const GAMING_250: Perfil = [
+  'Uso básico', 'Gaming intenso', 'Menos de 2 horas', 'No, ninguno', 'Windows',
+  'Batería larga', '2 – 3 años', 'Me da igual', 'Precio mínimo', 'Sí, con garantía',
+];
+
+/** La frase de `texto` que casa con `patron` (una frase acaba en «.» seguido de mayúscula), o null. */
+function fraseCon(texto: string, patron: RegExp): string | null {
+  return texto.split(/(?<=\.)\s+(?=[A-ZÁÉÍÓÚÑ¿¡«])/).find((f) => patron.test(f)) ?? null;
+}
+
+test('ABIERTO (cabo C0107): el pliego de gama básica con gaming no afirma sin fuente dónde empiezan los 120 Hz', async ({ page }) => {
+  // ABIERTO, hallazgo de contenido del acta del 04/11/2026 (cabo C0107). motor.ts:309 escribe
+  // «Pantalla de 90 Hz si la hay: los 120 Hz empiezan en la gama media» para la gama básica con
+  // «Gaming intenso» o «Rendimiento fluido»: 64.512 de los 589.824 perfiles (todos los de «Hasta
+  // 250 €» con una de esas dos respuestas; barrido del motor, 04/11/2026). Es una afirmación de
+  // mercado que caduca y que ninguna fuente permitida sostiene (el cabo intentó anclarla en mi.com/es
+  // el 02/10/2026, que no es fuente oficial). Correcto: seguir pidiendo 90 Hz o más sin afirmar en
+  // qué gama empiezan los 120 Hz (p. ej. «busca 90 Hz o más; algunos modelos básicos ya llegan a
+  // 120 Hz»).
+  test.fail();
+  await abrirTest(page);
+  await responder(page, GAMING_250);
+  await leerResultado(page);
+  expect(await textos(page, 'recomendacionValor')).toEqual(['Android', 'Gama básica']);
+  const pliego = await textos(page, 'caracteristicaItem');
+  expect(pliego.some((l) => /90 Hz/.test(l)), 'el pliego sigue pidiendo una tasa de refresco').toBe(true);
+  expect(pliego.filter((l) => l.includes('los 120 Hz empiezan en la gama media'))).toEqual([]);
+});
+
+test('ABIERTO (cabo C0384): la guía no da sin fuente el «ahorro del 20-30 %» del modelo del año anterior', async ({ page }) => {
+  // ABIERTO, hallazgo de contenido del acta del 04/11/2026 (cabo C0384, parte smartphone). La guía
+  // («Cuándo y dónde comprar», recuadro «Mejores momentos para comprar», page.tsx:642) dice «Comprar
+  // el modelo del año anterior tras el lanzamiento del nuevo puede suponer un ahorro del 20-30 %.»,
+  // sin fuente (regla de neutralidad 1). Correcto: la frase sin cifra, o con su fuente entre
+  // paréntesis con año, como hace la app con sus otras citas.
+  test.fail();
+  await page.goto('/selector-smartphone/');
+  await esperarHidratacionBotones(page);
+  await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+  const recuadro = page.locator('[class*="guiaContainer"] [class*="warningBox"]', { hasText: 'Mejores momentos para comprar' });
+  await expect(recuadro).toBeVisible();
+  const texto = (await recuadro.innerText()).replace(/\s+/g, ' ');
+  expect(texto).toContain('cuando se lanza la generación siguiente del modelo que te interesa');
+  const frase = fraseCon(texto, /\d+\s?-\s?\d+\s?%/);
+  expect(frase === null || /\([^()]*\d{4}\)/.test(frase), `cifra sin fuente: «${frase}»`).toBe(true);
+});

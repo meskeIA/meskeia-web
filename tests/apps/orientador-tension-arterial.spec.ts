@@ -1230,3 +1230,110 @@ async function comprobarResultadoLibreDeBarra(page: Page): Promise<void> {
   expect(m.recArriba, 'la recomendación empieza bajo la barra fija').toBeGreaterThanOrEqual(m.finBarra);
   expect(m.recAbajo, 'la recomendación cabe en pantalla').toBeLessThanOrEqual(m.alto + 1);
 }
+
+// ═════════════════════════════════════════════════════════════════════════════════════════
+// CABO C0103 · 04/11/2026 — la conducta ante el grado 3, cotejada con la OMS
+// ═════════════════════════════════════════════════════════════════════════════════════════
+/**
+ * El cabo: la conducta ante el grado 3 cita a van den Born et al. (ESC Council on Hypertension,
+ * 2019) porque el texto completo de la ESH 2023 no fue accesible; «cotejar con su apartado de
+ * urgencias si se consigue». La ESH 2023 (LWW) y la ESC 2024 (OUP) siguen fuera de las fuentes
+ * que puede leer la tarea, así que el cotejo se hizo con la OMS.
+ *
+ * LA FUENTE DEL COTEJO — OMS, ficha «Hypertension» (www.who.int/news-room/fact-sheets/detail/
+ * hypertension, fechada el 25/09/2025, leída el 04/11/2026), literal:
+ *   «People with very high blood pressure (usually 180/120 or higher) can experience symptoms
+ *   including: severe headaches · chest pain · dizziness · difficulty breathing · nausea ·
+ *   vomiting · blurred vision or other vision changes · anxiety · confusion · buzzing in the ears
+ *   · nosebleeds · abnormal heart rhythm.»
+ *   «If you are experiencing any of these symptoms and a high blood pressure, seek care
+ *   immediately.»
+ *
+ * LO QUE CUADRA (primer test, en verde):
+ *   · El corte. La OMS habla de «usually 180/120 or higher»; la app aplica el grado 3 de la ESH
+ *     (≥ 180 y/o ≥ 110), que contiene toda lectura ≥ 180/120: 180/120 es grado 3. 179/109 es
+ *     grado 2 y no lleva la instrucción del 112.
+ *   · Con síntomas, la OMS dice «seek care immediately» y la app «llama al 112 o acude a
+ *     urgencias ahora».
+ *   · La conducta es una sola (CONDUCTA_GRADO_3) en el resultado, la tabla de criterios
+ *     propios, la FAQ visible y el FAQPage, y la fuente es identificable: autores, revista y
+ *     año (van den Born et al., Eur Heart J Cardiovasc Pharmacother 2019).
+ *
+ * LO QUE NO CUADRA (segundo test, ABIERTO): la lista de síntomas de la app (la de van den Born,
+ * tal como la resume motor.ts) deja fuera siete de los doce de la OMS —mareo, náuseas, vómitos,
+ * ansiedad, zumbido en los oídos, sangrado por la nariz y ritmo cardiaco anormal—, y la rama
+ * «Si no tienes ninguno de esos síntomas» manda a quien los tenga a reposar 5 minutos, volver a
+ * medirse y llamar al médico «hoy mismo», donde la OMS dice buscar atención de inmediato.
+ */
+test.describe('Cabo C0103 · 04/11/2026', () => {
+  test('CABO C0103 · grado 3 desde 180/110 (contiene el 180/120 de la OMS), una sola conducta y fuente identificable', async ({ page }) => {
+    // Un punto por debajo del corte ESH en las dos cifras: grado 2, sin la instrucción del 112.
+    await medirHidratado(page, '179', '109');
+    await expect(categoria(page)).toHaveText('HTA Grado 2');
+    await expect(recomendacion(page)).not.toContainText('112');
+
+    // Las dos lecturas del corte: el de la ESH (180/110) y el «usually 180/120» de la OMS.
+    // [S, D] — las dos son grado 3 de la ESH (S ≥ 180) y llevan la conducta partida por síntomas.
+    for (const [sis, dia] of [['180', '110'], ['180', '120'], ['185', '112']] as const) {
+      await medirHidratado(page, sis, dia);
+      await expect(categoria(page), `${sis}/${dia}`).toHaveText('HTA Grado 3');
+      await expect(urgencia(page), `${sis}/${dia}`).toContainText('Muy urgente');
+      const ramas = recomendacion(page).locator('li');
+      await expect(ramas, `${sis}/${dia}`).toHaveCount(2);
+      // Con síntomas: lo que la OMS llama «seek care immediately».
+      await expect(ramas.nth(0), `${sis}/${dia}`).toContainText('llama al 112 o acude a urgencias ahora');
+      // Sin síntomas: repetir en reposo y médico en el día, con la salida al 112 si aparecen.
+      await expect(ramas.nth(1), `${sis}/${dia}`).toContainText('descansa 5 minutos y vuelve a medirte');
+      await expect(ramas.nth(1), `${sis}/${dia}`).toContainText('contacta hoy mismo con tu médico');
+      await expect(ramas.nth(1), `${sis}/${dia}`).toContainText('llama al 112');
+    }
+
+    // La fuente que se cita, con autores, revista y año, en el resultado y en el FAQPage.
+    const cita = 'van den Born et al., Eur Heart J Cardiovasc Pharmacother 2019';
+    await expect(page.locator('[class*="resultadoCriterio"]')).toContainText(cita);
+    const textoLd = (await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ');
+    expect(textoLd, 'FAQPage').toContain(cita);
+    expect(textoLd, 'FAQPage').toContain('sistólica ≥ 180 y/o diastólica ≥ 110 mmHg');
+
+    // Y la misma conducta, literal, en la FAQ visible, el FAQPage y la tabla de criterios propios.
+    const textoFaq = (await page.locator('[class*="faqItem"]', { hasText: '¿Cuándo debo ir a urgencias' }).textContent()) ?? '';
+    await page.getByRole('button', { name: /tabla de clasificación/i }).click();
+    const textoPropios = (await page.locator('[class*="criteriosPropios"]').first().textContent()) ?? '';
+    for (const rama of [CONDUCTA_GRADO_3.conSintomas, CONDUCTA_GRADO_3.sinSintomas]) {
+      expect(textoFaq, 'FAQ visible').toContain(rama);
+      expect(textoLd, 'FAQPage').toContain(rama);
+      expect(textoPropios, 'tabla · criterios propios').toContain(rama);
+    }
+    expect(textoFaq).toContain('sistólica ≥ 180 y/o diastólica ≥ 110 mmHg');
+    expect(textoFaq).toContain(cita);
+  });
+
+  // ABIERTO (04/11/2026), cabo C0103: la OMS manda buscar atención de inmediato con cualquiera de
+  // los doce síntomas de su ficha; la app solo cuenta cinco, y con los otros siete la rama que
+  // aplica es «Si no tienes ninguno de esos síntomas … contacta hoy mismo con tu médico».
+  test('HALLAZGO (04/11/2026, ABIERTO, cabo C0103) · con un síntoma de la lista de la OMS fuera de la de la app, la conducta de grado 3 no manda a atención inmediata', async ({ page }) => {
+    test.fail();
+    await medirHidratado(page, '185', '112');
+    // Control: es grado 3 y la primera rama es la del 112 (si esto fallara, el test.fail
+    // pasaría por otra razón).
+    await expect(categoria(page)).toHaveText('HTA Grado 3');
+    const inmediata = recomendacion(page).locator('li').first();
+    await expect(inmediata).toContainText('112');
+    const texto = (await inmediata.textContent()) ?? '';
+
+    // Los siete síntomas de la ficha de la OMS que la app no nombra. Vale nombrarlos o cubrirlos
+    // con «cualquier (otro) síntoma»: lo que no vale es que caigan en la rama «sin síntomas».
+    const sintomasOms: Array<[string, RegExp]> = [
+      ['dizziness', /mareo/i],
+      ['nausea', /náusea/i],
+      ['vomiting', /vómito/i],
+      ['anxiety', /ansiedad/i],
+      ['buzzing in the ears', /oído|zumbido|acúfeno/i],
+      ['nosebleeds', /nariz|nasal|epistaxis/i],
+      ['abnormal heart rhythm', /ritmo card[ií]aco|palpitaci|latido/i],
+    ];
+    const comodin = /cualquier (otro )?síntoma/i.test(texto);
+    const fuera = comodin ? [] : sintomasOms.filter(([, patron]) => !patron.test(texto)).map(([oms]) => oms);
+    expect(fuera, 'síntomas de la OMS que llevan a «contacta hoy mismo con tu médico» en vez de a atención inmediata').toEqual([]);
+  });
+});

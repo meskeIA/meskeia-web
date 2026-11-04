@@ -868,6 +868,8 @@ test.describe('re-inspección 02/10/2026 · escritorio', () => {
     // Ni pegados ni con un espacio normal: «15 %» lleva U+00A0.
     const mal = textos.flatMap((s) => [...s.matchAll(/.{0,15}\d[ ]?%/g)].map((m) => m[0]));
     expect(mal).toEqual([]);
+    // Cabo C0384, ABIERTO (04/11/2026): esa frase de la gu\u00eda es hallazgo de contenido (cifra sin
+    // fuente, bloque final). Si la reparaci\u00f3n la retira, esta l\u00ednea se quita con ella.
     expect(textos.join(' ')).toContain('al 70\u00a0% de tu capacidad');
   });
 
@@ -1035,5 +1037,117 @@ test.describe('re-inspección 02/10/2026 · móvil 390 px', () => {
       if (m.tapado || m.top < m.barra || m.bottom > 844) fuera.push(`P${i + 1}: enunciado en y ${m.top}-${m.bottom}, barra hasta ${m.barra}`);
     }
     expect(fuera).toEqual([]);
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// Cabo C0384 (inspector 04/11/2026, modo cabo): cifras sin fuente (regla de neutralidad 1)
+// ═════════════════════════════════════════════════════════════════════════════
+//
+// La reparación del 02/10/2026 (2692) solo les puso el espacio duro. Siguen vigentes el 04/11/2026:
+// tres consejos de las fichas (motor.ts) y una frase de la guía (page.tsx:416, no motor.ts). Ninguno
+// lleva fuente, y la OMS (who.int, ficha «Physical activity», consultada el 04/11/2026) no da
+// ninguna de las cuatro: solo los 150 min semanales y que «all physical activity counts». Correcto:
+// la cifra atribuida (fuente entre paréntesis con año, como Saragiotto et al., 2014 en la ficha de
+// running) o la frase matizada sin cifra; nunca una fuente inventada.
+// Los cuatro casos van con test.fail(): exigen lo CORRECTO y hoy fallan. Al repararse, quitar el
+// test.fail() y cambiar ABIERTO por REPARADO.
+
+/** ¿Lleva una cita «(…año)»? Es la forma en que la app atribuye sus cifras. */
+const atribuida = (s: string) => /\([^()]*\d{4}\)/.test(s);
+
+/** La frase de `texto` que casa con `patron` (una frase acaba en «.» seguido de mayúscula), o null. */
+function fraseCon(texto: string, patron: RegExp): string | null {
+  return texto.split(/(?<=\.)\s+(?=[A-ZÁÉÍÓÚÑ¿¡«])/).find((f) => patron.test(f)) ?? null;
+}
+
+// Perfil de fuerza del caso normal de 1378-1388: gimnasio 29, sin empate ni filtro.
+const FUERZA_INSTALACION = [1, 1, 2, 2, 2, 2, 0, 0, 1, 1] as const;
+// Cardio · 30-60 min · Solo · Al aire libre · Hasta 20 € · Muy buena · Ninguna · Progreso medible ·
+// Individual · Eficacia. Pesos (gim, run, nat, cic, yoga, casa), pregunta a pregunta:
+//   1,3,3,3,1,1 + 2,3,2,2,3,3 + 2,3,3,2,2,3 + 0,3,1,3,1,0 + 1,3,1,2,2,3 + 3,3,3,3,2,1 +
+//   3,3,3,3,3,3 + 3,3,2,3,1,2 + 1,3,3,3,2,2 + 3,2,2,2,1,2
+//   = gimnasio 19 · running 29 · natación 23 · ciclismo 26 · yoga 18 · casa 20. Sin limitación ni
+// prioridad de bajo impacto; el gimnasio (cuota 25 €) no cabe en «Hasta 20 €», pero iba detrás → running.
+const CARDIO_EXTERIOR = [2, 1, 0, 1, 1, 3, 0, 2, 2, 1] as const;
+// BIENESTAR_INSTALACION con «Menos de 30 minutos»: todos bajan 1 salvo casa (3 en los dos tramos) →
+// gimnasio 20 · running 18 · natación 19 · ciclismo 20 · yoga 23 · casa 14. Con el límite ABIERTO de
+// <30 min no caben yoga (30), natación (30), gimnasio (45) ni ciclismo (60): queda running (20), que
+// gana, y el yoga, que iba primero, se aparta con su aviso.
+const BIENESTAR_POCO_TIEMPO = [3, 0, 1, 2, 3, 1, 0, 3, 3, 2] as const;
+
+test.describe('cabo C0384 · cifras sin fuente', () => {
+  const consejos = (page: Page) => page.locator('[class*="consejoItem"]').allInnerTexts();
+
+  test('ABIERTO (cabo C0384): el yoga no aconseja «20 min diarios» contra su propia ficha de 30-60 min, ni sin fuente', async ({ page }) => {
+    // ABIERTO, hallazgo de contenido (medio) del acta del 04/11/2026. La ficha de yoga dice
+    // «3-5 días/semana, sesiones de 30-60 min», y por esa ficha el filtro de tiempo la aparta a quien
+    // dice «Menos de 30 minutos». En la MISMA tarjeta, su consejo dice «La constancia importa más que
+    // la intensidad: 20 min diarios superan a 90 min una vez por semana», sin fuente. Lo ven los
+    // 400.817 de 1.376.256 perfiles a los que se recomienda yoga o pilates (barrido del motor).
+    test.fail();
+    test.setTimeout(60_000);
+    // 1) La app dice que una sesión de menos de 30 min no es de yoga…
+    await abrirTest(page);
+    await responder(page, BIENESTAR_POCO_TIEMPO);
+    await expect(page.locator('[class*="recomendacionValor"]')).toHaveText('Running y Carrera');
+    await expect(page.locator('[class*="avisoRecorte"][role="note"]')).toContainText(
+      'Por puntos iba por delante el yoga o el pilates, pero su ficha habla de sesiones de 30-60 min y has indicado «Menos de 30 minutos».',
+    );
+    // 2) …y a quien sí se le recomienda, le aconseja sesiones de 20.
+    await abrirTest(page);
+    await responder(page, BIENESTAR_INSTALACION);
+    await expect(page.locator('[class*="recomendacionValor"]')).toHaveText('Yoga y Pilates');
+    await expect(page.locator('[class*="statValor"]').first()).toHaveText('3-5 días/semana, sesiones de 30-60 min');
+    const lista = await consejos(page);
+    expect(lista).toHaveLength(4);
+    const minutos = lista.flatMap((c) => [...c.matchAll(/(\d+)\s?min\b/g)].map((m) => Number(m[1])));
+    expect(minutos.filter((n) => n < EJERCICIOS['yoga-pilates'].sesionMinima), 'minutos por debajo de la sesión mínima de la ficha').toEqual([]);
+    const comparacion = lista.find((c) => /superan? a \d+ min/.test(c));
+    expect(comparacion === undefined || atribuida(comparacion), `cifra sin fuente: «${comparacion}»`).toBe(true);
+  });
+
+  test('ABIERTO (cabo C0384): el gimnasio no da sin fuente la regla de «no subas más del 10 % de carga por semana»', async ({ page }) => {
+    // ABIERTO, hallazgo de contenido (bajo) del acta del 04/11/2026. Consejo de la ficha de gimnasio
+    // (motor.ts:247): «La progresión debe ser gradual: no subas más del 10 % de carga por semana».
+    test.fail();
+    await abrirTest(page);
+    await responder(page, FUERZA_INSTALACION);
+    await expect(page.locator('[class*="recomendacionValor"]')).toHaveText('Gimnasio y Entrenamiento de Fuerza');
+    const lista = await consejos(page);
+    expect(lista).toContain('Empieza con pesos bajos para aprender la técnica');
+    const sinFuente = lista.filter((c) => /\d\s?%/.test(c) && !atribuida(c));
+    expect(sinFuente).toEqual([]);
+  });
+
+  test('ABIERTO (cabo C0384): el running no da sin fuente que «el 80 %» del entrenamiento debe ser a ritmo conversacional', async ({ page }) => {
+    // ABIERTO, hallazgo de contenido (bajo) del acta del 04/11/2026. Consejo de la ficha de running
+    // (motor.ts:266): «El 80 % de tu entrenamiento debe ser a ritmo conversacional (test: puedes
+    // hablar)». El último consejo de la misma ficha sí cita (Correia et al., 2024; Saragiotto et al., 2014).
+    test.fail();
+    await abrirTest(page);
+    await responder(page, CARDIO_EXTERIOR);
+    await expect(page.locator('[class*="recomendacionValor"]')).toHaveText('Running y Carrera');
+    const lista = await consejos(page);
+    expect(lista.some((c) => c.includes('(Saragiotto et al., 2014)'))).toBe(true);
+    const sinFuente = lista.filter((c) => /\d\s?%/.test(c) && !atribuida(c));
+    expect(sinFuente).toEqual([]);
+  });
+
+  test('ABIERTO (cabo C0384): la guía no afirma sin fuente que el 70 % cinco días supera al 100 % un día', async ({ page }) => {
+    // ABIERTO, hallazgo de contenido (bajo) del acta del 04/11/2026. Guía, «Por qué la constancia
+    // importa más que la intensidad» (page.tsx:416-417): «Entrenar al 70 % de tu capacidad cinco días
+    // a la semana produce adaptaciones fisiológicas superiores a entrenar al 100 % una vez por
+    // semana.» La frase siguiente del mismo párrafo sí cita (Saragiotto et al., 2014).
+    test.fail();
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto('/selector-ejercicio/');
+    await esperarHidratacionBotones(page);
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const parrafo = page.locator('[class*="guiaContainer"] p', { hasText: 'Saragiotto et al., 2014' });
+    await expect(parrafo).toBeVisible();
+    const texto = (await parrafo.innerText()).replace(/\s+/g, ' ');
+    const frase = fraseCon(texto, /\d\s?%/);
+    expect(frase === null || atribuida(frase), `cifra sin fuente: «${frase}»`).toBe(true);
   });
 });
