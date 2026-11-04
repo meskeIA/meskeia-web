@@ -227,8 +227,9 @@ export default function AnalizadorTitulosSeoPage() {
           </div>
 
           <div className={styles.inputGroup}>
-            <label className={styles.label}>URL de ejemplo (para vista previa)</label>
+            <label htmlFor="url-ejemplo" className={styles.label}>URL de ejemplo (para vista previa)</label>
             <input
+              id="url-ejemplo"
               type="text"
               className={styles.input}
               placeholder="https://tudominio.com/pagina/"

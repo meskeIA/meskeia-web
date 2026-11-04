@@ -525,11 +525,12 @@ const TabDesintegracion = () => {
 
       {/* Slider de tiempo */}
       <div className={styles.sliderGroup}>
-        <label className={styles.sliderLabel}>
+        <label htmlFor="tiempo-vidas" className={styles.sliderLabel}>
           <span>Tiempo transcurrido (en periodos de semidesintegración t½)</span>
           <span className={styles.sliderValor}>{tiempoVidas.toFixed(1)} t½</span>
         </label>
         <input
+          id="tiempo-vidas"
           type="range"
           className={styles.sliderInput}
           style={{ ['--pct' as string]: `${pct}%` }}
@@ -643,11 +644,12 @@ const TabCarbono14 = () => {
 
       {/* Slider */}
       <div className={styles.sliderGroup}>
-        <label className={styles.sliderLabel}>
+        <label htmlFor="actividad-pct" className={styles.sliderLabel}>
           <span>Actividad medida (% del estándar moderno)</span>
           <span className={styles.sliderValor}>{actividadPct.toFixed(1)}%</span>
         </label>
         <input
+          id="actividad-pct"
           type="range"
           className={styles.sliderInput}
           style={{ ['--pct' as string]: `${pct}%` }}

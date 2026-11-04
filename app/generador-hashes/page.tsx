@@ -294,8 +294,8 @@ export default function GeneradorHashesPage() {
 
         {/* Selector de algoritmo */}
         <div className={styles.algoritmoSection}>
-          <label className={styles.label}>Algoritmo de hash</label>
-          <div className={styles.algoritmoGrid}>
+          <label id="algoritmo-label" className={styles.label}>Algoritmo de hash</label>
+          <div role="group" aria-labelledby="algoritmo-label" className={styles.algoritmoGrid}>
             {(Object.keys(algoritmosInfo) as AlgoritmoType[]).map((algo) => (
               <button
                 key={algo}
@@ -315,8 +315,9 @@ export default function GeneradorHashesPage() {
         {/* Modo Texto */}
         {modo === 'texto' && (
           <div className={styles.inputSection}>
-            <label className={styles.label}>Texto a hashear</label>
+            <label htmlFor="texto-hashear" className={styles.label}>Texto a hashear</label>
             <textarea
+              id="texto-hashear"
               value={texto}
               onChange={(e) => setTexto(e.target.value)}
               placeholder="Escribe o pega el texto aquí..."
@@ -375,8 +376,9 @@ export default function GeneradorHashesPage() {
             <p className={styles.instrucciones}>
               Primero genera un hash en la pestaña Texto o Archivo, luego compáralo aquí.
             </p>
-            <label className={styles.label}>Hash a comparar</label>
+            <label htmlFor="hash-comparar" className={styles.label}>Hash a comparar</label>
             <input
+              id="hash-comparar"
               type="text"
               value={hashComparar}
               onChange={(e) => setHashComparar(e.target.value)}

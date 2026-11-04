@@ -449,10 +449,11 @@ export default function AnalizadorGeoPage() {
         {/* Panel de entrada */}
         <div className={styles.inputPanel}>
           <div className={styles.inputGroup}>
-            <label className={styles.label}>
+            <label htmlFor="titulo-contenido" className={styles.label}>
               Título del contenido <span className={styles.optional}>(opcional)</span>
             </label>
             <input
+              id="titulo-contenido"
               type="text"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
@@ -462,10 +463,11 @@ export default function AnalizadorGeoPage() {
           </div>
 
           <div className={styles.inputGroup}>
-            <label className={styles.label}>
+            <label htmlFor="meta-description" className={styles.label}>
               Meta description <span className={styles.optional}>(opcional)</span>
             </label>
             <input
+              id="meta-description"
               type="text"
               value={metaDescription}
               onChange={(e) => setMetaDescription(e.target.value)}
@@ -477,10 +479,11 @@ export default function AnalizadorGeoPage() {
           </div>
 
           <div className={styles.inputGroup}>
-            <label className={styles.label}>
+            <label htmlFor="contenido-analizar" className={styles.label}>
               Contenido a analizar <span className={styles.required}>*</span>
             </label>
             <textarea
+              id="contenido-analizar"
               value={content}
               onChange={(e) => setContent(e.target.value)}
               placeholder="Pega aquí el contenido de tu artículo, página web o documento...

@@ -277,8 +277,8 @@ text-align: ${textAlign};`;
 
           {/* Font Weight */}
           <div className={styles.controlGroup}>
-            <label className={styles.label}>Peso: {fontWeight}</label>
-            <div className={styles.weightGrid}>
+            <label id="peso-label" className={styles.label}>Peso: {fontWeight}</label>
+            <div role="group" aria-labelledby="peso-label" className={styles.weightGrid}>
               {selectedFont.weights.map(w => (
                 <button
                   key={w}
@@ -295,8 +295,9 @@ text-align: ${textAlign};`;
 
           {/* Font Size */}
           <div className={styles.controlGroup}>
-            <label className={styles.label}>Tamaño: {fontSize}px</label>
+            <label htmlFor="tamano" className={styles.label}>Tamaño: {fontSize}px</label>
             <input
+              id="tamano"
               type="range"
               min="12"
               max="96"
@@ -321,8 +322,9 @@ text-align: ${textAlign};`;
 
           {/* Line Height */}
           <div className={styles.controlGroup}>
-            <label className={styles.label}>Interlineado: {lineHeight}</label>
+            <label htmlFor="interlineado" className={styles.label}>Interlineado: {lineHeight}</label>
             <input
+              id="interlineado"
               type="range"
               min="0.8"
               max="3"
@@ -335,8 +337,9 @@ text-align: ${textAlign};`;
 
           {/* Letter Spacing */}
           <div className={styles.controlGroup}>
-            <label className={styles.label}>Espaciado: {letterSpacing}px</label>
+            <label htmlFor="espaciado" className={styles.label}>Espaciado: {letterSpacing}px</label>
             <input
+              id="espaciado"
               type="range"
               min="-5"
               max="20"
@@ -349,8 +352,8 @@ text-align: ${textAlign};`;
 
           {/* Text Align */}
           <div className={styles.controlGroup}>
-            <label className={styles.label}>Alineación</label>
-            <div className={styles.alignGrid}>
+            <label id="alineacion-label" className={styles.label}>Alineación</label>
+            <div role="group" aria-labelledby="alineacion-label" className={styles.alignGrid}>
               {(['left', 'center', 'right', 'justify'] as const).map(align => (
                 <button
                   key={align}
@@ -368,8 +371,9 @@ text-align: ${textAlign};`;
 
           {/* Compare */}
           <div className={styles.controlGroup}>
-            <label className={styles.label}>Comparar con:</label>
+            <label htmlFor="comparar-con" className={styles.label}>Comparar con:</label>
             <select
+              id="comparar-con"
               value={compareFont?.name || ''}
               onChange={(e) => {
                 const font = FONTS.find(f => f.name === e.target.value);

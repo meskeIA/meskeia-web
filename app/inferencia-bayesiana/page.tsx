@@ -1,7 +1,7 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useId } from 'react';
 import styles from './InferenciaBayesiana.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { formatNumber } from '@/lib';
@@ -16,6 +16,7 @@ interface Hypothesis {
 
 export default function InferenciaBayesianaPage() {
   const [activeTab, setActiveTab] = useState<TabType>('simple');
+  const baseId = useId();
 
   // Simple Bayes
   const [priorA, setPriorA] = useState('0,01');
@@ -299,8 +300,9 @@ export default function InferenciaBayesianaPage() {
               <p className={styles.formula}>P(A|B) = P(B|A) × P(A) / P(B)</p>
 
               <div className={styles.inputGroup}>
-                <label className={styles.label}>P(A) - Prior (probabilidad inicial)</label>
+                <label htmlFor="prior-a" className={styles.label}>P(A) - Prior (probabilidad inicial)</label>
                 <input
+                  id="prior-a"
                   type="text"
                   inputMode="decimal"
                   value={priorA}
@@ -312,8 +314,9 @@ export default function InferenciaBayesianaPage() {
               </div>
 
               <div className={styles.inputGroup}>
-                <label className={styles.label}>P(B|A) - Likelihood (verosimilitud)</label>
+                <label htmlFor="likelihood-b-a" className={styles.label}>P(B|A) - Likelihood (verosimilitud)</label>
                 <input
+                  id="likelihood-b-a"
                   type="text"
                   inputMode="decimal"
                   value={likelihoodBA}
@@ -325,8 +328,9 @@ export default function InferenciaBayesianaPage() {
               </div>
 
               <div className={styles.inputGroup}>
-                <label className={styles.label}>P(B|¬A) - Falso positivo</label>
+                <label htmlFor="likelihood-b-no-a" className={styles.label}>P(B|¬A) - Falso positivo</label>
                 <input
+                  id="likelihood-b-no-a"
                   type="text"
                   inputMode="decimal"
                   value={likelihoodBNotA}
@@ -457,8 +461,9 @@ export default function InferenciaBayesianaPage() {
                     />
                     <div className={styles.hypothesisInputs}>
                       <div>
-                        <label className={styles.miniLabel}>Prior</label>
+                        <label htmlFor={`${baseId}-prior-${i}`} className={styles.miniLabel}>Prior</label>
                         <input
+                          id={`${baseId}-prior-${i}`}
                           type="text"
                           inputMode="decimal"
                           value={h.prior}
@@ -468,8 +473,9 @@ export default function InferenciaBayesianaPage() {
                         />
                       </div>
                       <div>
-                        <label className={styles.miniLabel}>P(E|H)</label>
+                        <label htmlFor={`${baseId}-likelihood-${i}`} className={styles.miniLabel}>P(E|H)</label>
                         <input
+                          id={`${baseId}-likelihood-${i}`}
                           type="text"
                           inputMode="decimal"
                           value={h.likelihood}
@@ -579,8 +585,9 @@ export default function InferenciaBayesianaPage() {
               </p>
 
               <div className={styles.inputGroup}>
-                <label className={styles.label}>Prior inicial P(H)</label>
+                <label htmlFor="seq-prior" className={styles.label}>Prior inicial P(H)</label>
                 <input
+                  id="seq-prior"
                   type="text"
                   inputMode="decimal"
                   value={seqPrior}
@@ -591,8 +598,9 @@ export default function InferenciaBayesianaPage() {
               </div>
 
               <div className={styles.inputGroup}>
-                <label className={styles.label}>P(Obs+|H) - Prob. de obs. positiva si H es cierta</label>
+                <label htmlFor="seq-likelihood" className={styles.label}>P(Obs+|H) - Prob. de obs. positiva si H es cierta</label>
                 <input
+                  id="seq-likelihood"
                   type="text"
                   inputMode="decimal"
                   value={seqLikelihood}
@@ -603,8 +611,9 @@ export default function InferenciaBayesianaPage() {
               </div>
 
               <div className={styles.inputGroup}>
-                <label className={styles.label}>P(Obs+|¬H) - Prob. de obs. positiva si H es falsa</label>
+                <label htmlFor="seq-likelihood-neg" className={styles.label}>P(Obs+|¬H) - Prob. de obs. positiva si H es falsa</label>
                 <input
+                  id="seq-likelihood-neg"
                   type="text"
                   inputMode="decimal"
                   value={seqLikelihoodNeg}
@@ -615,8 +624,8 @@ export default function InferenciaBayesianaPage() {
               </div>
 
               <div className={styles.observationsSection}>
-                <label className={styles.label}>Observaciones (click para cambiar)</label>
-                <div className={styles.observationButtons}>
+                <label id="observaciones-label" className={styles.label}>Observaciones (click para cambiar)</label>
+                <div role="group" aria-labelledby="observaciones-label" className={styles.observationButtons}>
                   {seqObservations.map((obs, i) => (
                     <button
                       key={i}
@@ -717,8 +726,9 @@ export default function InferenciaBayesianaPage() {
               </p>
 
               <div className={styles.inputGroup}>
-                <label className={styles.label}>Prevalencia (%)</label>
+                <label htmlFor="prevalencia" className={styles.label}>Prevalencia (%)</label>
                 <input
+                  id="prevalencia"
                   type="text"
                   inputMode="decimal"
                   value={prevalence}
@@ -730,8 +740,9 @@ export default function InferenciaBayesianaPage() {
               </div>
 
               <div className={styles.inputGroup}>
-                <label className={styles.label}>Sensibilidad (%)</label>
+                <label htmlFor="sensibilidad" className={styles.label}>Sensibilidad (%)</label>
                 <input
+                  id="sensibilidad"
                   type="text"
                   inputMode="decimal"
                   value={sensitivity}
@@ -743,8 +754,9 @@ export default function InferenciaBayesianaPage() {
               </div>
 
               <div className={styles.inputGroup}>
-                <label className={styles.label}>Especificidad (%)</label>
+                <label htmlFor="especificidad" className={styles.label}>Especificidad (%)</label>
                 <input
+                  id="especificidad"
                   type="text"
                   inputMode="decimal"
                   value={specificity}

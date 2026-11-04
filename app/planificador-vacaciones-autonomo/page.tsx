@@ -252,10 +252,10 @@ export default function PlanificadorVacacionesAutonomoPage() {
 
             {/* Nivel de producción */}
             <div className={styles.formGroup}>
-              <label className={styles.label}>
+              <label id="produccion-label" className={styles.label}>
                 ¿Puedes trabajar a medio gas en vacaciones?
               </label>
-              <div className={styles.radioGroup}>
+              <div role="group" aria-labelledby="produccion-label" className={styles.radioGroup}>
                 {NIVELES_PRODUCCION.map((nivel) => (
                   <label key={nivel.id} className={styles.radioLabel}>
                     <input

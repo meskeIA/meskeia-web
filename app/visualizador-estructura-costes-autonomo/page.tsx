@@ -258,10 +258,11 @@ export default function VisualizadorEstructuraCostesAutonomo() {
       <div className={styles.slidersZona}>
         <div className={styles.sliderBloque}>
           <div className={styles.sliderHeader}>
-            <label className={styles.sliderLabel}>Facturación mensual (sin IVA)</label>
+            <label htmlFor="facturacion-mensual" className={styles.sliderLabel}>Facturación mensual (sin IVA)</label>
             <span className={styles.sliderValor}>{formatCurrency(facturacionMensual)}</span>
           </div>
           <input
+            id="facturacion-mensual"
             type="range"
             className={styles.slider}
             min={1000}
@@ -279,10 +280,11 @@ export default function VisualizadorEstructuraCostesAutonomo() {
 
         <div className={styles.sliderBloque}>
           <div className={styles.sliderHeader}>
-            <label className={styles.sliderLabel}>Gastos profesionales</label>
+            <label htmlFor="gastos-profesionales" className={styles.sliderLabel}>Gastos profesionales</label>
             <span className={styles.sliderValor}>{formatNumber(pctGastosPro, 0)}%</span>
           </div>
           <input
+            id="gastos-profesionales"
             type="range"
             className={styles.slider}
             min={10}
@@ -300,10 +302,11 @@ export default function VisualizadorEstructuraCostesAutonomo() {
 
         <div className={styles.sliderBloque}>
           <div className={styles.sliderHeader}>
-            <label className={styles.sliderLabel}>Gastos personales mensuales</label>
+            <label htmlFor="gastos-personales" className={styles.sliderLabel}>Gastos personales mensuales</label>
             <span className={styles.sliderValor}>{formatCurrency(gastosPersonalesMes)}</span>
           </div>
           <input
+            id="gastos-personales"
             type="range"
             className={styles.slider}
             min={500}

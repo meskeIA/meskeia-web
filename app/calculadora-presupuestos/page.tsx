@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useId } from 'react';
 import styles from './CalculadoraPresupuestos.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
@@ -112,6 +112,7 @@ export default function CalculadoraPresupuestosPage() {
 
   // Ref para la vista previa
   const previewRef = useRef<HTMLDivElement>(null);
+  const baseId = useId();
 
   // Cargar datos guardados
   useEffect(() => {
@@ -287,8 +288,9 @@ export default function CalculadoraPresupuestosPage() {
             <h2 className={styles.sectionTitle}><span aria-hidden="true">👤</span> Tus Datos (Freelance)</h2>
             <div className={styles.formGrid}>
               <div className={styles.formGroup}>
-                <label>Nombre / Razón Social</label>
+                <label htmlFor="freelance-nombre">Nombre / Razón Social</label>
                 <input
+                  id="freelance-nombre"
                   type="text"
                   value={datosFreelance.nombre}
                   onChange={(e) => setDatosFreelance({ ...datosFreelance, nombre: e.target.value })}
@@ -296,8 +298,9 @@ export default function CalculadoraPresupuestosPage() {
                 />
               </div>
               <div className={styles.formGroup}>
-                <label>NIF/CIF</label>
+                <label htmlFor="freelance-nif">NIF/CIF</label>
                 <input
+                  id="freelance-nif"
                   type="text"
                   value={datosFreelance.nif}
                   onChange={(e) => setDatosFreelance({ ...datosFreelance, nif: e.target.value })}
@@ -305,8 +308,9 @@ export default function CalculadoraPresupuestosPage() {
                 />
               </div>
               <div className={styles.formGroup}>
-                <label>Email</label>
+                <label htmlFor="freelance-email">Email</label>
                 <input
+                  id="freelance-email"
                   type="email"
                   value={datosFreelance.email}
                   onChange={(e) => setDatosFreelance({ ...datosFreelance, email: e.target.value })}
@@ -314,8 +318,9 @@ export default function CalculadoraPresupuestosPage() {
                 />
               </div>
               <div className={styles.formGroup}>
-                <label>Teléfono</label>
+                <label htmlFor="freelance-telefono">Teléfono</label>
                 <input
+                  id="freelance-telefono"
                   type="tel"
                   value={datosFreelance.telefono}
                   onChange={(e) => setDatosFreelance({ ...datosFreelance, telefono: e.target.value })}
@@ -323,8 +328,9 @@ export default function CalculadoraPresupuestosPage() {
                 />
               </div>
               <div className={styles.formGroupFull}>
-                <label>Dirección</label>
+                <label htmlFor="freelance-direccion">Dirección</label>
                 <input
+                  id="freelance-direccion"
                   type="text"
                   value={datosFreelance.direccion}
                   onChange={(e) => setDatosFreelance({ ...datosFreelance, direccion: e.target.value })}
@@ -332,8 +338,9 @@ export default function CalculadoraPresupuestosPage() {
                 />
               </div>
               <div className={styles.formGroup}>
-                <label>Web (opcional)</label>
+                <label htmlFor="freelance-web">Web (opcional)</label>
                 <input
+                  id="freelance-web"
                   type="text"
                   value={datosFreelance.web}
                   onChange={(e) => setDatosFreelance({ ...datosFreelance, web: e.target.value })}
@@ -348,8 +355,9 @@ export default function CalculadoraPresupuestosPage() {
             <h2 className={styles.sectionTitle}><span aria-hidden="true">🏢</span> Datos del Cliente</h2>
             <div className={styles.formGrid}>
               <div className={styles.formGroup}>
-                <label>Nombre de contacto</label>
+                <label htmlFor="cliente-nombre">Nombre de contacto</label>
                 <input
+                  id="cliente-nombre"
                   type="text"
                   value={datosCliente.nombre}
                   onChange={(e) => setDatosCliente({ ...datosCliente, nombre: e.target.value })}
@@ -357,8 +365,9 @@ export default function CalculadoraPresupuestosPage() {
                 />
               </div>
               <div className={styles.formGroup}>
-                <label>Empresa</label>
+                <label htmlFor="cliente-empresa">Empresa</label>
                 <input
+                  id="cliente-empresa"
                   type="text"
                   value={datosCliente.empresa}
                   onChange={(e) => setDatosCliente({ ...datosCliente, empresa: e.target.value })}
@@ -366,8 +375,9 @@ export default function CalculadoraPresupuestosPage() {
                 />
               </div>
               <div className={styles.formGroup}>
-                <label>Email</label>
+                <label htmlFor="cliente-email">Email</label>
                 <input
+                  id="cliente-email"
                   type="email"
                   value={datosCliente.email}
                   onChange={(e) => setDatosCliente({ ...datosCliente, email: e.target.value })}
@@ -375,8 +385,9 @@ export default function CalculadoraPresupuestosPage() {
                 />
               </div>
               <div className={styles.formGroup}>
-                <label>Teléfono</label>
+                <label htmlFor="cliente-telefono">Teléfono</label>
                 <input
+                  id="cliente-telefono"
                   type="tel"
                   value={datosCliente.telefono}
                   onChange={(e) => setDatosCliente({ ...datosCliente, telefono: e.target.value })}
@@ -384,8 +395,9 @@ export default function CalculadoraPresupuestosPage() {
                 />
               </div>
               <div className={styles.formGroupFull}>
-                <label>Dirección (opcional)</label>
+                <label htmlFor="cliente-direccion">Dirección (opcional)</label>
                 <input
+                  id="cliente-direccion"
                   type="text"
                   value={datosCliente.direccion}
                   onChange={(e) => setDatosCliente({ ...datosCliente, direccion: e.target.value })}
@@ -400,24 +412,27 @@ export default function CalculadoraPresupuestosPage() {
             <h2 className={styles.sectionTitle}><span aria-hidden="true">⚙️</span> Configuración</h2>
             <div className={styles.formGrid}>
               <div className={styles.formGroup}>
-                <label>Nº Presupuesto</label>
+                <label htmlFor="presupuesto-numero">Nº Presupuesto</label>
                 <input
+                  id="presupuesto-numero"
                   type="text"
                   value={config.numero}
                   onChange={(e) => setConfig({ ...config, numero: e.target.value })}
                 />
               </div>
               <div className={styles.formGroup}>
-                <label>Fecha</label>
+                <label htmlFor="presupuesto-fecha">Fecha</label>
                 <input
+                  id="presupuesto-fecha"
                   type="date"
                   value={config.fecha}
                   onChange={(e) => setConfig({ ...config, fecha: e.target.value })}
                 />
               </div>
               <div className={styles.formGroup}>
-                <label>Validez (días)</label>
+                <label htmlFor="validez-dias">Validez (días)</label>
                 <input
+                  id="validez-dias"
                   type="number"
                   value={config.validezDias}
                   onChange={(e) => setConfig({ ...config, validezDias: e.target.value })}
@@ -425,8 +440,9 @@ export default function CalculadoraPresupuestosPage() {
                 />
               </div>
               <div className={styles.formGroup}>
-                <label>Condiciones de pago</label>
+                <label htmlFor="condiciones-pago">Condiciones de pago</label>
                 <select
+                  id="condiciones-pago"
                   value={config.condicionesPago}
                   onChange={(e) => setConfig({ ...config, condicionesPago: e.target.value })}
                 >
@@ -489,8 +505,9 @@ export default function CalculadoraPresupuestosPage() {
           <section className={styles.section}>
             <h2 className={styles.sectionTitle}><span aria-hidden="true">📝</span> Proyecto</h2>
             <div className={styles.formGroupFull}>
-              <label>Título del proyecto / servicio</label>
+              <label htmlFor="titulo-proyecto">Título del proyecto / servicio</label>
               <input
+                id="titulo-proyecto"
                 type="text"
                 value={tituloProyecto}
                 onChange={(e) => setTituloProyecto(e.target.value)}
@@ -550,8 +567,9 @@ export default function CalculadoraPresupuestosPage() {
                     </div>
                     <div className={styles.lineaNumeros}>
                       <div className={styles.lineaField}>
-                        <label>{linea.tipo === 'hora' ? 'Horas' : 'Cantidad'}</label>
+                        <label htmlFor={`${baseId}-cantidad-${index}`}>{linea.tipo === 'hora' ? 'Horas' : 'Cantidad'}</label>
                         <input
+                          id={`${baseId}-cantidad-${index}`}
                           type="text"
                           value={linea.cantidad}
                           onChange={(e) => actualizarLinea(linea.id, 'cantidad', e.target.value)}
@@ -559,8 +577,9 @@ export default function CalculadoraPresupuestosPage() {
                         />
                       </div>
                       <div className={styles.lineaField}>
-                        <label>{linea.tipo === 'hora' ? '€/hora' : 'Precio €'}</label>
+                        <label htmlFor={`${baseId}-precio-${index}`}>{linea.tipo === 'hora' ? '€/hora' : 'Precio €'}</label>
                         <input
+                          id={`${baseId}-precio-${index}`}
                           type="text"
                           value={linea.precioUnitario}
                           onChange={(e) => actualizarLinea(linea.id, 'precioUnitario', e.target.value)}
@@ -568,8 +587,9 @@ export default function CalculadoraPresupuestosPage() {
                         />
                       </div>
                       <div className={styles.lineaField}>
-                        <label>Dto. %</label>
+                        <label htmlFor={`${baseId}-descuento-${index}`}>Dto. %</label>
                         <input
+                          id={`${baseId}-descuento-${index}`}
                           type="text"
                           value={linea.descuento}
                           onChange={(e) => actualizarLinea(linea.id, 'descuento', e.target.value)}

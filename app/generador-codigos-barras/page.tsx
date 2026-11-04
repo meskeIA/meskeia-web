@@ -394,13 +394,14 @@ export default function GeneradorCodigosBarrasPage() {
           {/* Entrada de datos */}
           <div className={styles.entradaDatos}>
             <div className={styles.formGroup}>
-              <label>
+              <label htmlFor="valor-codigo">
                 Valor del código
                 <span className={styles.hint}>
                   {tipoActual?.desc}
                 </span>
               </label>
               <input
+                id="valor-codigo"
                 type="text"
                 value={config.valor}
                 onChange={(e) => setConfig({ ...config, valor: e.target.value })}
@@ -425,8 +426,9 @@ export default function GeneradorCodigosBarrasPage() {
 
             <div className={styles.opcionesGrid}>
               <div className={styles.formGroup}>
-                <label>Alto de barras</label>
+                <label htmlFor="alto-barras">Alto de barras</label>
                 <select
+                  id="alto-barras"
                   value={config.alto}
                   onChange={(e) => setConfig({ ...config, alto: Number(e.target.value) })}
                   className={styles.select}
@@ -439,8 +441,9 @@ export default function GeneradorCodigosBarrasPage() {
               </div>
 
               <div className={styles.formGroup}>
-                <label>Ancho de barras</label>
+                <label htmlFor="ancho-barras">Ancho de barras</label>
                 <select
+                  id="ancho-barras"
                   value={config.ancho}
                   onChange={(e) => setConfig({ ...config, ancho: Number(e.target.value) })}
                   className={styles.select}

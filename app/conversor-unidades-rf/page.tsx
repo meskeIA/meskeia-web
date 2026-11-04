@@ -537,8 +537,9 @@ export default function ConversorUnidadesRFPage() {
           <div className={styles.conversionBox}>
             {/* Input */}
             <div className={styles.inputGroup}>
-              <label className={styles.label}>Valor de entrada</label>
+              <label htmlFor="valor-entrada" className={styles.label}>Valor de entrada</label>
               <input
+                id="valor-entrada"
                 type="text"
                 value={valor}
                 onChange={(e) => setValor(e.target.value)}

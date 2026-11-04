@@ -585,8 +585,8 @@ export default function GeneradorAvataresPage() {
           </div>
 
           <div className={styles.inputGroup}>
-            <label className={styles.label}>Estilo de avatar</label>
-            <div className={styles.styleGrid}>
+            <label id="estilo-avatar-label" className={styles.label}>Estilo de avatar</label>
+            <div role="group" aria-labelledby="estilo-avatar-label" className={styles.styleGrid}>
               {avatarStyles.map((style) => (
                 <button
                   key={style.id}
@@ -604,8 +604,8 @@ export default function GeneradorAvataresPage() {
           </div>
 
           <div className={styles.inputGroup}>
-            <label className={styles.label}>Tamaño</label>
-            <div className={styles.sizeOptions}>
+            <label id="tamano-label" className={styles.label}>Tamaño</label>
+            <div role="group" aria-labelledby="tamano-label" className={styles.sizeOptions}>
               {sizes.map((s) => (
                 <button
                   key={s}
@@ -621,8 +621,8 @@ export default function GeneradorAvataresPage() {
           </div>
 
           <div className={styles.inputGroup}>
-            <label className={styles.label}>Fondo</label>
-            <div className={styles.backgroundOptions}>
+            <label id="fondo-label" className={styles.label}>Fondo</label>
+            <div role="group" aria-labelledby="fondo-label" className={styles.backgroundOptions}>
               <label className={styles.checkboxLabel}>
                 <input
                   type="checkbox"

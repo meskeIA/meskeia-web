@@ -266,11 +266,12 @@ function TabPrima(): React.ReactNode {
 
       <div className={styles.slidersWrap}>
         <div className={styles.sliderGroup}>
-          <label className={styles.sliderLabel}>
+          <label htmlFor="probabilidad-siniestro" className={styles.sliderLabel}>
             Probabilidad de siniestro
             <span className={styles.sliderValue}>{probabilidad.toFixed(1)} %</span>
           </label>
           <input
+            id="probabilidad-siniestro"
             type="range"
             min={0.1}
             max={10}
@@ -282,11 +283,12 @@ function TabPrima(): React.ReactNode {
         </div>
 
         <div className={styles.sliderGroup}>
-          <label className={styles.sliderLabel}>
+          <label htmlFor="coste-medio" className={styles.sliderLabel}>
             Coste medio del siniestro
             <span className={styles.sliderValue}>{formatEur(costeMedio)}</span>
           </label>
           <input
+            id="coste-medio"
             type="range"
             min={1000}
             max={50000}
@@ -298,11 +300,12 @@ function TabPrima(): React.ReactNode {
         </div>
 
         <div className={styles.sliderGroup}>
-          <label className={styles.sliderLabel}>
+          <label htmlFor="gastos-administrativos" className={styles.sliderLabel}>
             Gastos administrativos
             <span className={styles.sliderValue}>{gastos} %</span>
           </label>
           <input
+            id="gastos-administrativos"
             type="range"
             min={10}
             max={30}
@@ -314,11 +317,12 @@ function TabPrima(): React.ReactNode {
         </div>
 
         <div className={styles.sliderGroup}>
-          <label className={styles.sliderLabel}>
+          <label htmlFor="margen-beneficio" className={styles.sliderLabel}>
             Margen de beneficio
             <span className={styles.sliderValue}>{margen} %</span>
           </label>
           <input
+            id="margen-beneficio"
             type="range"
             min={5}
             max={20}
@@ -415,11 +419,12 @@ function TabPool(): React.ReactNode {
       </div>
 
       <div className={styles.sliderGroup}>
-        <label className={styles.sliderLabel}>
+        <label htmlFor="asegurados-pool" className={styles.sliderLabel}>
           Asegurados en el pool
           <span className={styles.sliderValue}>{asegurados.toLocaleString('es-ES')}</span>
         </label>
         <input
+          id="asegurados-pool"
           type="range"
           min={10}
           max={10000}

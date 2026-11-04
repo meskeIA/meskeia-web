@@ -157,8 +157,8 @@ export default function CodificadorBase64Page() {
           <>
             {/* Selector de formato */}
             <div className={styles.formatSelector}>
-              <label className={styles.label}>Formato de codificación</label>
-              <div className={styles.formatButtons}>
+              <label id="formato-label" className={styles.label}>Formato de codificación</label>
+              <div role="group" aria-labelledby="formato-label" className={styles.formatButtons}>
                 <button
                   type="button"
                   className={`${styles.formatBtn} ${formato === 'base64' ? styles.active : ''}`}

@@ -146,10 +146,11 @@ export default function ConversorNumerosRomanosPage() {
 
         <div className={styles.converterBox}>
           <div className={styles.inputSection}>
-            <label className={styles.label}>
+            <label htmlFor="numero-entrada" className={styles.label}>
               {modo === 'arabigo-romano' ? 'Número arábigo (1-3999)' : 'Número romano'}
             </label>
             <input
+              id="numero-entrada"
               type="text"
               value={entrada}
               onChange={(e) => setEntrada(e.target.value)}

@@ -1,7 +1,7 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useId } from 'react';
 import styles from './TeoriaInformacion.module.css';
 import {
   MeskeiaLogo,
@@ -88,6 +88,7 @@ function TabEntropia({
   setProbB: (v: number) => void;
   setProbC: (v: number) => void;
 }) {
+  const baseId = useId();
   const probD = Math.max(0, 1 - probA - probB - probC);
   const probs = [probA, probB, probC, probD];
   const etiquetas = ['A', 'B', 'C', 'D'];
@@ -131,10 +132,11 @@ function TabEntropia({
           { etiqueta: 'C', valor: probC, setter: setProbC, color: colores[2] },
         ].map(({ etiqueta, valor, setter, color }) => (
           <div key={etiqueta} className={styles.sliderFila}>
-            <label className={styles.sliderLabel} style={{ color }}>
+            <label htmlFor={`${baseId}-${etiqueta}`} className={styles.sliderLabel} style={{ color }}>
               <strong>P({etiqueta})</strong> = {valor.toFixed(2)}
             </label>
             <input
+              id={`${baseId}-${etiqueta}`}
               type="range"
               min={0}
               max={0.97}
@@ -501,10 +503,11 @@ function TabCanal({
       {/* Sliders */}
       <div className={styles.slidersGrid}>
         <div className={styles.sliderFila}>
-          <label className={styles.sliderLabel}>
+          <label htmlFor="ancho-banda" className={styles.sliderLabel}>
             <strong>Ancho de banda B</strong> = {anchoBanda} MHz
           </label>
           <input
+            id="ancho-banda"
             type="range" min={1} max={100} step={1} value={anchoBanda}
             onChange={(e) => setAnchoBanda(Number(e.target.value))}
             className={styles.slider}
@@ -513,11 +516,12 @@ function TabCanal({
           />
         </div>
         <div className={styles.sliderFila}>
-          <label className={styles.sliderLabel}>
+          <label htmlFor="snr-db" className={styles.sliderLabel}>
             <strong>SNR (relación señal/ruido)</strong> = {snrDb} dB
             <small className={styles.derivado}> ({Math.pow(10, snrDb / 10).toFixed(0)}:1 lineal)</small>
           </label>
           <input
+            id="snr-db"
             type="range" min={0} max={40} step={1} value={snrDb}
             onChange={(e) => setSnrDb(Number(e.target.value))}
             className={styles.slider}
@@ -645,10 +649,11 @@ function TabCompresion() {
 
       {/* Slider JPEG */}
       <div className={styles.sliderFila}>
-        <label className={styles.sliderLabel}>
+        <label htmlFor="calidad-jpeg" className={styles.sliderLabel}>
           <strong>Calidad JPEG</strong>: {calidadJpeg}% → Tamaño estimado: {formatoMB(tamJpeg)}
         </label>
         <input
+          id="calidad-jpeg"
           type="range" min={1} max={100} step={1} value={calidadJpeg}
           onChange={(e) => setCalidadJpeg(Number(e.target.value))}
           className={styles.slider}

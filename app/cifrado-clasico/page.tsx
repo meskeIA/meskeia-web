@@ -243,8 +243,9 @@ export default function CifradoClasicoPage() {
         {/* Control de desplazamiento (solo César) */}
         {metodo === 'cesar' && (
           <div className={styles.shiftSection}>
-            <label className={styles.label}>Desplazamiento: {desplazamiento}</label>
+            <label htmlFor="desplazamiento" className={styles.label}>Desplazamiento: {desplazamiento}</label>
             <input
+              id="desplazamiento"
               type="range"
               min="1"
               max="25"
@@ -282,12 +283,13 @@ export default function CifradoClasicoPage() {
 
         {/* Input de texto */}
         <div className={styles.inputSection}>
-          <label className={styles.label}>
+          <label htmlFor="texto-entrada" className={styles.label}>
             {esMetodoSimetrico
               ? 'Texto a procesar'
               : modo === 'cifrar' ? 'Mensaje a cifrar' : 'Mensaje a descifrar'}
           </label>
           <textarea
+            id="texto-entrada"
             value={texto}
             onChange={(e) => setTexto(e.target.value)}
             placeholder={esMetodoSimetrico

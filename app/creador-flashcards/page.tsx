@@ -596,8 +596,9 @@ export default function CreadorFlashcardsPage() {
             </h3>
 
             <div className={styles.formGroup}>
-              <label className={styles.label}>Nombre del mazo</label>
+              <label htmlFor="nombre-mazo" className={styles.label}>Nombre del mazo</label>
               <input
+                id="nombre-mazo"
                 type="text"
                 className={styles.input}
                 value={formMazo.nombre}
@@ -608,8 +609,9 @@ export default function CreadorFlashcardsPage() {
             </div>
 
             <div className={styles.formGroup}>
-              <label className={styles.label}>Categoría</label>
+              <label htmlFor="categoria-mazo" className={styles.label}>Categoría</label>
               <select
+                id="categoria-mazo"
                 className={styles.select}
                 value={formMazo.categoria}
                 onChange={e => setFormMazo({ ...formMazo, categoria: e.target.value })}
@@ -621,8 +623,8 @@ export default function CreadorFlashcardsPage() {
             </div>
 
             <div className={styles.formGroup}>
-              <label className={styles.label}>Color</label>
-              <div className={styles.colorPicker}>
+              <label id="color-mazo-label" className={styles.label}>Color</label>
+              <div role="group" aria-labelledby="color-mazo-label" className={styles.colorPicker}>
                 {COLORES_MAZO.map(color => (
                   <button
                     key={color}
@@ -658,8 +660,9 @@ export default function CreadorFlashcardsPage() {
             </h3>
 
             <div className={styles.formGroup}>
-              <label className={styles.label}>Frente (Pregunta)</label>
+              <label htmlFor="frente-tarjeta" className={styles.label}>Frente (Pregunta)</label>
               <textarea
+                id="frente-tarjeta"
                 className={styles.textarea}
                 value={formTarjeta.frente}
                 onChange={e => setFormTarjeta({ ...formTarjeta, frente: e.target.value })}
@@ -669,8 +672,9 @@ export default function CreadorFlashcardsPage() {
             </div>
 
             <div className={styles.formGroup}>
-              <label className={styles.label}>Reverso (Respuesta)</label>
+              <label htmlFor="reverso-tarjeta" className={styles.label}>Reverso (Respuesta)</label>
               <textarea
+                id="reverso-tarjeta"
                 className={styles.textarea}
                 value={formTarjeta.reverso}
                 onChange={e => setFormTarjeta({ ...formTarjeta, reverso: e.target.value })}
