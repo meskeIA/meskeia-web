@@ -247,10 +247,12 @@ export const DESNIVEL_MAX_M = 3000;
 export const TIEMPO_MIN_MIN = 1;
 export const TIEMPO_MAX_MIN = 600;
 /**
- * VAM por encima de la cual no se emite veredicto. La guía de la app da como tope que «los
- * mejores escaladores han superado los 1.800 m/h» en las grandes subidas; 2.000 m/h deja
- * margen sobre esa cifra y sigue por debajo de lo que da cualquier error de tecleo típico
- * (1000 m en 10 min son 6000 m/h y la app los clasificaba «Élite / Profesional»).
+ * VAM por encima de la cual no se emite veredicto. Es un techo de PLAUSIBILIDAD de la
+ * herramienta, como WKG_MAX, no una cifra de la literatura: queda por debajo de lo que da
+ * cualquier error de tecleo típico (1000 m en 10 min son 6000 m/h y la app los clasificaba
+ * «Élite / Profesional»). Hasta el 04/11/2026 este comentario decía que lo respaldaba la guía
+ * con «los mejores escaladores han superado los 1.800 m/h», pero la guía retiró esa frase el
+ * 03/10/2026 por no tener fuente (3c0ea09c), y el aviso la seguía citando (hallazgo 4025).
  */
 export const VAM_MAX_M_H = 2000;
 
@@ -311,8 +313,10 @@ export function calcularPotenciaCiclismo(
   if (wattsKg > WKG_MAX) {
     throw new Error(
       `${ftp_w} W con ${peso_kg} kg son ${wattsKg.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} W/kg, ` +
-      `por encima del techo de ${WKG_MAX.toLocaleString('es-ES')} W/kg que admite la herramienta, más de lo que se atribuye a los mejores ` +
-      `escaladores profesionales: revisa el peso y el FTP.`,
+      // Sin comparar con «los mejores escaladores profesionales»: esa cifra no tiene fuente desde
+      // que se retiró de la guía (hallazgo 2745), y el techo es de la herramienta (cabo C0611).
+      `por encima del techo de ${WKG_MAX.toLocaleString('es-ES')} W/kg que admite la herramienta, y por encima de él no da ` +
+      `veredicto: revisa el peso y el FTP.`,
     );
   }
 
@@ -345,9 +349,11 @@ export function calcularPotenciaCiclismo(
       // subida que no es tal (caso del hallazgo 2741).
       avisoVam = `${desnivel_m} m en ${tiempo_min} min no llegan a 1 m/h de VAM: no es una subida que se pueda clasificar. Revisa el desnivel y el tiempo.`;
     } else if (vamCalculada > VAM_MAX_M_H) {
+      // Sin «los mejores escaladores rondan los 1.800 m/h»: la guía retiró esa cifra por no tener
+      // fuente (3c0ea09c) y aquí quedaba sin apoyo; el aviso se apoya solo en el techo (hallazgo 4025).
       avisoVam =
-        `${desnivel_m} m en ${tiempo_min} min serían ${vamCalculada.toLocaleString('es-ES')} m/h de VAM, más de lo que se ha medido ` +
-        `en las grandes subidas del ciclismo profesional (los mejores escaladores rondan los 1.800 m/h): revisa el desnivel y el tiempo. ` +
+        `${desnivel_m} m en ${tiempo_min} min serían ${vamCalculada.toLocaleString('es-ES')} m/h de VAM, por encima del techo de ` +
+        `${VAM_MAX_M_H.toLocaleString('es-ES')} m/h hasta el que la herramienta clasifica una subida: revisa el desnivel y el tiempo. ` +
         `En un repecho de pocos minutos la VAM se dispara, y esta escala, pensada para subidas largas, no se le aplica.`;
     } else {
       vam = vamCalculada;

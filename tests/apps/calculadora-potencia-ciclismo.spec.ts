@@ -1776,7 +1776,8 @@ async function flujoEstimadorAFtp(page: Page, movil: boolean): Promise<void> {
  *         (70 + 8 kg, 280 W) le ahorran 35 y 52 s (cálculo en el caso)
  *     3 · «los mejores escaladores rondan los 1.800 m/h», en el aviso del motor por encima de
  *         2000 m/h (lib/calculadoras/deporte.ts, también en la API de ChatGPT y en el MCP); el
- *         comentario de VAM_MAX_M_H dice que la respalda la guía, que la retiró en 3c0ea09c
+ *         comentario de VAM_MAX_M_H dice que la respalda la guía, que la retiró en 3c0ea09c.
+ *         REPARADO el 04/11/2026 (hallazgo 4025), con su hermano del techo de 7,5 W/kg (C0611)
  *
  * Cada hallazgo va en dos tests: un control en verde (el texto vigente está en pantalla y, en
  * el 2, el estimador da las VAM del cálculo) y el `test.fail()` con lo que DEBERÍA ocurrir. Así
@@ -1916,7 +1917,7 @@ test.describe('Cabos C0115 y C0132 (03/11/2026)', () => {
     );
   });
 
-  test('C0132 · hallazgo 3, control: 1000 m en 25 min dan el aviso sin veredicto y con «1.800 m/h»', async ({
+  test('C0132 · hallazgo 3, control: 1000 m en 25 min dan el aviso sin veredicto, apoyado en el techo de la herramienta', async ({
     page,
   }) => {
     // ENTRADA 70 kg · FTP 280 W · desnivel 1000 m · 25 min
@@ -1924,8 +1925,8 @@ test.describe('Cabos C0115 y C0132 (03/11/2026)', () => {
     await abrirVam(page);
     await calcular(page, { peso: '70', ftp: '280', desnivel: '1000', tiempo: '25' });
     await expect(resultados(page)).toContainText(
-      '1000 m en 25 min serían 2400 m/h de VAM, más de lo que se ha medido en las grandes subidas ' +
-        'del ciclismo profesional (los mejores escaladores rondan los 1.800 m/h)',
+      '1000 m en 25 min serían 2400 m/h de VAM, por encima del techo de 2000 m/h hasta el que la ' +
+        'herramienta clasifica una subida',
     );
     await expect(resultados(page)).not.toContainText('Élite / Profesional');
   });
@@ -1933,17 +1934,30 @@ test.describe('Cabos C0115 y C0132 (03/11/2026)', () => {
   test('C0132 · hallazgo 3: el aviso de una VAM imposible no apoya su techo en «1.800 m/h» sin fuente', async ({
     page,
   }) => {
-    test.fail(); // HALLAZGO ABIERTO (cabo C0132, 03/11/2026) [contenido/bajo]
+    // REPARADO el 04/11/2026 (hallazgo 4025, reparar en tarea): el aviso se apoya solo en el
+    // techo de plausibilidad de la herramienta (VAM_MAX_M_H, 2000 m/h), y el comentario del motor
+    // ya no la da por respaldada por la guía. Lo mismo con el techo de 7,5 W/kg (cabo C0611).
     // ENTRADA la del control de arriba
     // ESPERADO la cifra de referencia atribuida (subida, año y fuente), o un aviso que no se
     //          apoye en ella (2000 m/h es un techo de plausibilidad de la herramienta, como dice
     //          el propio comentario de VAM_MAX_M_H)
-    // OBTENIDO «… (los mejores escaladores rondan los 1.800 m/h)», sin fuente; el comentario
-    //          del motor la da por respaldada por la guía, que la retiró en 3c0ea09c (03/10/2026)
+    // OBTENIDO (antes) «… (los mejores escaladores rondan los 1.800 m/h)», sin fuente
     await abrirVam(page);
     await calcular(page, { peso: '70', ftp: '280', desnivel: '1000', tiempo: '25' });
     await expect(resultados(page)).toContainText('serían 2400 m/h de VAM');
-    const entorno = entornoDe(await resultados(page).innerText(), '1.800 m/h');
+    const texto = await resultados(page).innerText();
+    const entorno = entornoDe(texto, '1.800 m/h');
     if (entorno !== null) expect(entorno).toMatch(ATRIBUIDA);
+    expect(texto).not.toMatch(/mejores escaladores|ciclismo profesional/);
+  });
+
+  test('C0611 · el aviso por encima de 7,5 W/kg no se compara con «los mejores escaladores profesionales» sin fuente', async ({
+    page,
+  }) => {
+    // REPARADO el 04/11/2026 (cabo C0611): 60 kg y 451 W son 7,52 W/kg > WKG_MAX
+    await calcular(page, { peso: '60', ftp: '451' });
+    const alerta = page.locator('p[role="alert"]');
+    await expect(alerta).toContainText('7,52 W/kg, por encima del techo de 7,5 W/kg que admite la herramienta');
+    await expect(alerta).not.toContainText('escaladores');
   });
 });
