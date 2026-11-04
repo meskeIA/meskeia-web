@@ -342,7 +342,7 @@ const DEFINICIONES: readonly DefinicionCaso[] = [
       'La escala H0 reduce 87 veces, así que se divide entre 87.',
       '26,1 m = 2.610 cm.',
       '2.610 cm ÷ 87 = 30 cm.',
-      'El 87 no es un número redondo por capricho: viene de que el ancho de vía H0 es la mitad del de la escala 1, que es 1:43,5.',
+      'El 87 no es un número redondo por capricho: H0 es «media 0», la mitad de la escala 0, que es 1:43,5. A mitad de tamaño el denominador se dobla: 2 × 43,5 = 87.',
     ],
     pista: 'Pasa los metros a centímetros antes de dividir y el resultado sale redondo.',
   },

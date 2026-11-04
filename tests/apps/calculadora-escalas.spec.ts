@@ -294,7 +294,11 @@ test.describe('Calculadora de Escalas · el motor', () => {
   test('el formato es español y no rellena de ceros', () => {
     expect(formatearNumero(3.6)).toBe('3,6');
     expect(formatearNumero(50)).toBe('50');
-    expect(formatearNumero(50000)).toBe('50000'); // una escala no lleva separador de millares
+    // Millar con punto a partir de cinco cifras, como el IGN («1:50.000») y la RAE; con cuatro,
+    // sin agrupar (hallazgo 3982: antes no agrupaba nunca).
+    expect(formatearNumero(50000)).toBe('50.000');
+    expect(formatearNumero(5000)).toBe('5000');
+    expect(formatearNumero(250000.5)).toBe('250.000,5');
     expect(formatearNumero(8.4)).toBe('8,4');
     expect(formatearNumero(NaN)).toBe('—');
   });
@@ -399,8 +403,8 @@ test.describe('Calculadora de Escalas · casos para clase', () => {
 
   test('convenio · las superficies van con el CUADRADO del factor', () => {
     expect(CASOS[6].respuesta).toBeCloseTo(6, 10);
-    // Y no con el factor lineal, que habría dado 0,48 m².
-    expect(CASOS[6].respuesta).not.toBeCloseTo(0.48, 2);
+    // Y no con el factor lineal, que habría dado 0,12 m² (24 × 50 = 1.200 cm²).
+    expect(CASOS[6].respuesta).not.toBeCloseTo(0.12, 2);
   });
 
   // ----------------------------------------------------------------
@@ -462,8 +466,8 @@ test.describe('Calculadora de Escalas · casos para clase', () => {
   });
 
   test('el error clásico del caso 7 se marca como fallo, no se cuela por tolerancia', () => {
-    // Aplicar el factor lineal a una superficie da 0,48 m² en vez de 6 m².
-    expect(comprobarRespuesta('0,48', CASOS[6].respuesta).correcto).toBe(false);
+    // Aplicar el factor lineal a una superficie da 0,12 m² en vez de 6 m².
+    expect(comprobarRespuesta('0,12', CASOS[6].respuesta).correcto).toBe(false);
   });
 
   // ----------------------------------------------------------------
@@ -504,7 +508,8 @@ test.describe('Calculadora de Escalas · casos para clase', () => {
  *     · deducir con 0 en el dibujo → «Las dos medidas tienen que ser mayores que cero»
  *     · escala de destino «abc» → «La escala debe llevar dos números, como 1:50»
  *
- * Los HALLAZGO (ABIERTO) llevan test.fail(): pasan mientras el defecto siga ahí.
+ * Los HALLAZGO del 03/11/2026 (3976-3983) se REPARARON el 04/11/2026 (/reparar): ya no llevan
+ * test.fail() y afirman lo correcto.
  */
 
 const PANEL_CONVERTIR = '#panel-convertir';
@@ -655,66 +660,75 @@ test.describe('Calculadora de Escalas · en el navegador (inspector 03/11/2026)'
     );
   });
 
-  test('HALLAZGO (03/11/2026, ABIERTO) · con una escala inválida arriba, las herramientas calculan con 1:50 sin decirlo', async ({
+  test('HALLAZGO 3976 (REPARADO) · con una escala inválida arriba, las herramientas no dan ninguna cifra', async ({
     page,
   }) => {
-    // `escala = lecturaEscala.escala ?? { 1, 50 }` (page.tsx): si la casilla no se lee, todo
-    // sigue calculando con 1:50. «1:25 000» (millar con espacio) da el aviso arriba y, debajo,
-    // «10 cm de plano × 50 = 5 m» (a 1:25.000 serían 2.500 m); con «1:0», «7,2 cm … = 3,6 m»,
-    // y el chip «1:50» sale pulsado. Esperado: ninguna cifra mientras la escala no sea válida.
-    test.fail();
+    // Antes `escala = lecturaEscala.escala ?? { 1, 50 }` (page.tsx): si la casilla no se leía,
+    // todo seguía calculando con 1:50 bajo el aviso, con el chip «1:50» pulsado.
+    const panel = page.locator(PANEL_CONVERTIR);
+    const aviso = page.locator('section[aria-labelledby="escala-activa"]').getByRole('alert');
+    await escribir(page, '#medida', '7,2');
+    await escribir(page, '#escala', '1:0');
+    await expect(aviso).toBeVisible();
+    await expect(panel).not.toContainText('de plano ×', { timeout: 2000 });
+    await expect(panel.getByRole('alert')).toContainText('Corrige la escala de arriba');
+    await expect(page.locator('[aria-pressed="true"]', { hasText: '1:50' })).toHaveCount(0);
+    for (const pestana of ['Superficies', 'Lista de medidas', 'Escala gráfica']) {
+      await abrirPestana(page, pestana);
+      await expect(page.locator('[role="tabpanel"]:not([hidden])').getByRole('alert')).toContainText(
+        'Corrige la escala de arriba',
+      );
+    }
+    await expect(page.locator('#panel-lista table')).toHaveCount(0);
+    await expect(page.locator('#panel-grafica svg')).toHaveCount(0);
+  });
+
+  test('HALLAZGO 3976 (REPARADO, otro esperado) · «1:25 000», el millar con espacio de la RAE, se lee como 1:25.000', async ({
+    page,
+  }) => {
+    // El acta esperaba aviso y ninguna cifra para «1:25 000». Pero es una escala bien escrita
+    // (Ortografía de la RAE, 2010: el millar puede separarse con espacio): lo correcto es leerla.
+    // 10 cm de plano × 25.000 = 250.000 cm = 2.500 m.
     const panel = page.locator(PANEL_CONVERTIR);
     await escribir(page, '#medida', '10');
     await escribir(page, '#escala', '1:25 000');
-    await expect(
-      page.locator('section[aria-labelledby="escala-activa"]').getByRole('alert'),
-    ).toBeVisible();
-    await expect(panel).not.toContainText('de plano ×', { timeout: 2000 });
-    await escribir(page, '#escala', '1:0');
-    await expect(panel).not.toContainText('de plano ×', { timeout: 2000 });
+    await expect(page.getByText('1:25.000 · el dibujo es 25.000 veces más pequeño que la realidad')).toBeVisible();
+    await expect(panel).toContainText('10 cm de plano × 25.000 = 2500 m');
   });
 
-  test('HALLAZGO (03/11/2026, ABIERTO) · un bloque de dos columnas pegado en la lista funde cada fila en un número', async ({
+  test('HALLAZGO 3977 (REPARADO) · un bloque de dos columnas pegado en la lista da cada medida en su fila', async ({
     page,
   }) => {
-    // partirLista parte por salto de línea y parseSpanishNumber quita los espacios y tabuladores
-    // de cada trozo: «420⇥310» se lee 420310. A 1:50 (cm → m): 420 → 210 m, 310 → 155 m,
-    // 250 → 125 m, 180 → 90 m. Hoy salen dos filas: 210155 m y 125090 m, sin aviso. La misma fila
-    // sola («420⇥310⇥250⇥180», sin salto de línea) sí da las cuatro medidas.
-    test.fail();
+    // Antes partirLista partía solo por salto de línea y parseSpanishNumber quitaba el tabulador
+    // de cada trozo: «420⇥310» se leía 420310. A 1:50 (cm → m): 420 → 210 m, 310 → 155 m,
+    // 250 → 125 m, 180 → 90 m.
     await abrirPestana(page, 'Lista de medidas');
     await page.locator('#lista-medidas').fill('420\t310\n250\t180');
     await esperarValorEnReact(page, '#lista-medidas', '420\t310\n250\t180');
     const tabla = page.locator('#panel-lista table');
-    await expect(tabla.locator('caption')).toContainText('a escala 1:50');
-    await expect(tabla).not.toContainText('210155', { timeout: 2000 });
-    await expect(tabla).not.toContainText('125090', { timeout: 2000 });
+    await expect(tabla.locator('caption')).toHaveText('4 medidas convertidas a escala 1:50');
+    await expect(tabla.locator('tbody td:nth-child(1)')).toHaveText(['420', '310', '250', '180']);
+    await expect(tabla.locator('tbody td:nth-child(2)')).toHaveText(['210', '155', '125', '90']);
   });
 
-  test('HALLAZGO (03/11/2026, ABIERTO) · la escala gráfica redondea los rótulos a 4 decimales y repite marcas', async ({
+  test('HALLAZGO 3983 (REPARADO) · la escala gráfica rotula con los decimales del paso y no repite marcas', async ({
     page,
   }) => {
-    // 1:2 en kilómetros, barra de 100 mm: 200 mm = 0,0002 km, paso 0,00005 km. Esperado:
-    // 0 · 0,00005 · 0,0001 · 0,00015 · 0,0002. Hoy: 0 · 0,0001 · 0,0001 · 0,0001 · 0,0002
-    // (formatearNumero con 4 decimales): tres marcas distintas con el mismo rótulo.
-    test.fail();
+    // 1:2 en kilómetros, barra de 100 mm: 200 mm = 0,0002 km, paso 0,00005 km →
+    // 0 · 0,00005 · 0,0001 · 0,00015 · 0,0002. Antes: 0 · 0,0001 · 0,0001 · 0,0001 · 0,0002.
     await escribir(page, '#escala', '1:2');
     await abrirPestana(page, 'Escala gráfica');
     await page.selectOption('#unidad-grafica', 'km');
     await expect(page.locator('#panel-grafica')).toContainText('escala 1:2');
     const rotulos = (await page.locator('#panel-grafica svg text').allTextContents()).slice(0, -1);
-    expect(rotulos.length).toBe(5);
-    expect(new Set(rotulos).size).toBe(rotulos.length);
+    expect(rotulos).toEqual(['0', '0,00005', '0,0001', '0,00015', '0,0002']);
   });
 
-  test('HALLAZGO (03/11/2026, ABIERTO) · formato: «1:50000», «250000 cm» y «Resultado: 50000» sin punto de millar', async ({
+  test('HALLAZGO 3982 (REPARADO) · formato: «1:50.000», «250.000 cm» y «Resultado: 50.000» con punto de millar', async ({
     page,
   }) => {
     // CLAUDE.md §2: a partir de cinco cifras se agrupa (50.000). El IGN rotula «1:25.000» y
-    // «1:50.000», y la propia app escribe «1:25.000» en la FAQ y «1 : 50.000» en los pasos del
-    // caso 9, cuyo «Resultado» dice «50000». formatearNumero no agrupa nunca.
-    // 2 cm ↔ 1 km = 100.000 cm → 1:50.000 · 10 cm a 1:25.000 = 250.000 cm.
-    test.fail();
+    // «1:50.000». 2 cm ↔ 1 km = 100.000 cm → 1:50.000 · 10 cm a 1:25.000 = 250.000 cm.
     await abrirPestana(page, 'Deducir la escala');
     await escribir(page, '#medida-dibujo', '2');
     await escribir(page, '#medida-real-deducir', '1');
@@ -731,53 +745,50 @@ test.describe('Calculadora de Escalas · en el navegador (inspector 03/11/2026)'
     await expect(page.locator('#solucion-caso-9')).toContainText('Resultado: 50.000', { timeout: 2000 });
   });
 
-  test('HALLAZGO (03/11/2026, ABIERTO) · la FAQ da 0,48 m² como el error del factor lineal, y es 0,12 m²', async ({
+  test('HALLAZGO 3979 (REPARADO) · la FAQ da 0,12 m² como el error del factor lineal, no 0,48', async ({
     page,
   }) => {
-    // 24 cm² × 50 (factor lineal) = 1.200 cm² = 0,12 m², como dice el paso 4 del caso 7. Las dos
-    // FAQ (la visible y la del FAQPage) dicen «6 m² reales, no 0,48». 0,48 no sale de ningún
-    // camino del error clásico. (Los comentarios de los tests «convenio · las superficies…» y
-    // «el error clásico del caso 7…» de arriba repiten el 0,48.)
-    test.fail();
+    // 24 cm² × 50 (factor lineal) = 1.200 cm² = 0,12 m², como dice el paso 4 del caso 7.
     const cuerpo = await textoDePagina(page);
-    expect(cuerpo).not.toContain('no 0,48');
+    expect(cuerpo).not.toContain('0,48');
+    expect(cuerpo).toContain('no 0,12 m²');
     expect(JSON.stringify(jsonLd)).not.toContain('0,48');
   });
 
-  test('HALLAZGO (03/11/2026, ABIERTO) · H0: «la mitad de 43,5 es 87» y la escala 1 no es 1:43,5', async ({
+  test('HALLAZGO 3978 (REPARADO) · H0 es la mitad de la escala 0 y el denominador se dobla: 2 × 43,5 = 87', async ({
     page,
   }) => {
     // 43,5 ÷ 2 = 21,75. Un modelo a la MITAD de tamaño tiene el denominador DOBLE: 2 × 43,5 = 87.
-    // Y H0 es «medio 0»: la mitad de la escala 0, no de la escala 1. Está en la FAQ visible, en el
-    // FAQPage y en el paso 4 del caso 5 de aula.
-    test.fail();
+    // Y H0 es «medio 0»: la mitad de la escala 0, no de la escala 1. Estaba en la FAQ visible, en
+    // el FAQPage y en el paso 4 del caso 5 de aula.
     const cuerpo = await textoDePagina(page);
     expect(cuerpo).not.toContain('la mitad de 43,5 es 87');
     expect(cuerpo).not.toContain('escala 1, que es 1:43,5');
+    expect(cuerpo).toContain('2 × 43,5 = 87');
     expect(JSON.stringify(jsonLd)).not.toContain('escala 1, que es 1:43,5');
     expect(CASOS[4].pasos.join(' ')).not.toContain('escala 1, que es 1:43,5');
+    expect(CASOS[4].pasos.join(' ')).toContain('2 × 43,5 = 87');
   });
 
-  test('HALLAZGO (03/11/2026, ABIERTO) · «36 m o 3,6 cm = has invertido la operación», y invertir da 1,44 mm', async ({
+  test('HALLAZGO 3981 (REPARADO) · 36 m o 3,6 cm es un error de unidad; invertir da 1,44 mm', async ({
     page,
   }) => {
     // A 1:50, 7,2 cm de plano son 3,6 m. Invertir (÷ 50 en vez de × 50) da 0,144 cm = 1,44 mm,
     // como dice la propia lista de «Los errores más frecuentes». 36 m (×10) y 3,6 cm (÷100) son
     // errores de unidad, no de sentido.
-    test.fail();
     const cuerpo = await textoDePagina(page);
     expect(cuerpo).toContain('un muro de 3,6 m sale de 1,44 mm');
     expect(cuerpo).not.toContain('te sale de 36 metros o de 3,6 centímetros, has invertido la operación');
+    expect(cuerpo).toContain('has perdido un factor 10 o 100 al cambiar de unidad');
   });
 
-  test('HALLAZGO (03/11/2026, ABIERTO) · cuatro preguntas están en las dos FAQ con respuestas distintas', async ({
+  test('HALLAZGO 3980 (REPARADO) · la FAQ visible y el FAQPage salen de la misma constante', async ({
     page,
   }) => {
-    // FAQPage «¿Qué significa la escala 1:50 de un plano?» ↔ visible «¿Qué significa exactamente
-    // la escala 1:50?», y lo mismo con la escala de un plano sin indicar, las superficies y H0.
-    // La reparación es UNA constante que importen las dos (check:faq-unica): entonces cada
-    // pregunta del FAQPage aparece, con su respuesta, en la página.
-    test.fail();
+    // Antes: FAQPage «¿Qué significa la escala 1:50 de un plano?» ↔ visible «¿Qué significa
+    // exactamente la escala 1:50?», y lo mismo con la escala sin indicar, las superficies y H0.
+    // Ahora las dos salen de PREGUNTAS_FRECUENTES: cada pregunta del FAQPage aparece, con su
+    // respuesta, en la página (el texto se normaliza igual: \s incluye el espacio duro del «%»).
     const cuerpo = await textoDePagina(page);
     interface NodoFaq {
       '@type': string;
@@ -788,7 +799,7 @@ test.describe('Calculadora de Escalas · en el navegador (inspector 03/11/2026)'
     expect(faq?.mainEntity?.length ?? 0).toBeGreaterThan(0);
     for (const p of faq?.mainEntity ?? []) {
       expect(cuerpo, p.name).toContain(p.name);
-      expect(cuerpo, p.name).toContain(p.acceptedAnswer.text);
+      expect(cuerpo, p.name).toContain(p.acceptedAnswer.text.replace(/\s+/g, ' '));
     }
   });
 });

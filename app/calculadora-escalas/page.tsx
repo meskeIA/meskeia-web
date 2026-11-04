@@ -39,8 +39,12 @@ import {
   type EjercicioEscala,
 } from './casos';
 import { parseSpanishNumber } from '@/lib';
+import { PREGUNTAS_FRECUENTES } from './metadata';
 
 type Pestana = 'convertir' | 'deducir' | 'cambiar' | 'superficie' | 'lista' | 'grafica';
+
+/** Lo que dicen las herramientas cuando la escala de arriba no se puede leer: ninguna cifra. */
+const SIN_ESCALA = 'Corrige la escala de arriba: sin una escala válida no se puede calcular.';
 
 const PESTANAS: readonly { id: Pestana; etiqueta: string }[] = [
   { id: 'convertir', etiqueta: 'Convertir medidas' },
@@ -57,7 +61,11 @@ export default function CalculadoraEscalasPage() {
   // ---- Escala activa, compartida por casi todas las pestañas
   const [textoEscala, setTextoEscala] = useState<string>('1:50');
   const lecturaEscala = useMemo(() => parsearEscala(textoEscala), [textoEscala]);
-  const escala: Escala = lecturaEscala.escala ?? { numerador: 1, denominador: 50 };
+  // Sin escala válida no hay escala: antes se caía en silencio a 1:50 y todas las herramientas
+  // daban cifras de 1:50 bajo el aviso de arriba, con el chip «1:50» pulsado (hallazgo 3976).
+  const escala: Escala | null = lecturaEscala.escala;
+  const textoEscalaActiva = escala ? textoDeEscala(escala) : '';
+  const divisorEscala = escala ? 1 / factorDe(escala) : NaN;
 
   // ---- Convertir medidas
   const [sentido, setSentido] = useState<'plano-a-real' | 'real-a-plano'>('plano-a-real');
@@ -66,6 +74,7 @@ export default function CalculadoraEscalasPage() {
   const [unidadSalida, setUnidadSalida] = useState<Unidad>('m');
 
   const conversion = useMemo(() => {
+    if (!escala) return { ok: false, valor: NaN, milimetros: NaN, error: SIN_ESCALA };
     const valor = parseSpanishNumber(medida);
     if (!Number.isFinite(valor)) {
       return { ok: false, valor: NaN, milimetros: NaN, error: 'Escribe una medida, por ejemplo 7,2' };
@@ -112,6 +121,7 @@ export default function CalculadoraEscalasPage() {
   );
 
   const conversionSuperficie = useMemo(() => {
+    if (!escala) return { ok: false, valor: NaN, milimetros: NaN, error: SIN_ESCALA };
     const valor = parseSpanishNumber(superficie);
     if (!Number.isFinite(valor)) {
       return { ok: false, valor: NaN, milimetros: NaN, error: 'Escribe una superficie' };
@@ -132,7 +142,8 @@ export default function CalculadoraEscalasPage() {
   const [unidadListaSalida, setUnidadListaSalida] = useState<Unidad>('m');
 
   const filasLista = useMemo(
-    () => convertirLista(listaTexto, unidadListaEntrada, escala, unidadListaSalida, sentidoLista),
+    () =>
+      escala ? convertirLista(listaTexto, unidadListaEntrada, escala, unidadListaSalida, sentidoLista) : [],
     [listaTexto, unidadListaEntrada, unidadListaSalida, sentidoLista, escala],
   );
 
@@ -140,7 +151,18 @@ export default function CalculadoraEscalasPage() {
   const [unidadGrafica, setUnidadGrafica] = useState<Unidad>('m');
   const [anchoBarra, setAnchoBarra] = useState<number>(100);
   const grafica = useMemo(
-    () => construirEscalaGrafica(escala, unidadGrafica, anchoBarra),
+    () =>
+      escala
+        ? construirEscalaGrafica(escala, unidadGrafica, anchoBarra)
+        : {
+            ok: false,
+            divisiones: [],
+            unidad: unidadGrafica,
+            longitudPapelMm: 0,
+            totalReal: 0,
+            decimalesRotulo: 0,
+            error: SIN_ESCALA,
+          },
     [escala, unidadGrafica, anchoBarra],
   );
 
@@ -185,7 +207,7 @@ export default function CalculadoraEscalasPage() {
     setTextoEscala(textoDeEscala(etiquetaEscala));
   };
 
-  const tipo = lecturaEscala.ok ? tipoDeEscala(escala) : null;
+  const tipo = escala ? tipoDeEscala(escala) : null;
 
   return (
     <div className={styles.container}>
@@ -227,11 +249,11 @@ export default function CalculadoraEscalasPage() {
             </p>
           </div>
 
-          {lecturaEscala.ok ? (
+          {escala ? (
             <p className={styles.escalaResumen}>
-              <strong>{textoDeEscala(escala)}</strong> ·{' '}
+              <strong>{textoEscalaActiva}</strong> ·{' '}
               {tipo === 'reduccion'
-                ? `el dibujo es ${formatearNumero(1 / factorDe(escala))} veces más pequeño que la realidad`
+                ? `el dibujo es ${formatearNumero(divisorEscala)} veces más pequeño que la realidad`
                 : tipo === 'ampliacion'
                   ? `el dibujo es ${formatearNumero(factorDe(escala))} veces más grande que la realidad`
                   : 'tamaño natural: el dibujo mide lo mismo que la realidad'}
@@ -250,7 +272,7 @@ export default function CalculadoraEscalasPage() {
                   key={conocida.etiqueta}
                   type="button"
                   className={styles.escalaChip}
-                  aria-pressed={textoDeEscala(escala) === textoDeEscala(conocida.escala)}
+                  aria-pressed={textoEscalaActiva === textoDeEscala(conocida.escala)}
                   onClick={() => usarEscalaConocida(conocida.escala)}
                 >
                   <span className={styles.escalaChipNombre}>{conocida.etiqueta}</span>
@@ -381,8 +403,8 @@ export default function CalculadoraEscalasPage() {
                 </p>
                 <p className={styles.resultadoDetalle}>
                   {sentido === 'plano-a-real'
-                    ? `${medida} ${unidadEntrada} de plano × ${formatearNumero(1 / factorDe(escala))} = ${formatearNumero(conversion.valor, 4)} ${unidadSalida}`
-                    : `${medida} ${unidadEntrada} reales ÷ ${formatearNumero(1 / factorDe(escala))} = ${formatearNumero(conversion.valor, 4)} ${unidadSalida}`}
+                    ? `${medida} ${unidadEntrada} de plano × ${formatearNumero(divisorEscala)} = ${formatearNumero(conversion.valor, 4)} ${unidadSalida}`
+                    : `${medida} ${unidadEntrada} reales ÷ ${formatearNumero(divisorEscala)} = ${formatearNumero(conversion.valor, 4)} ${unidadSalida}`}
                 </p>
               </div>
             ) : (
@@ -522,7 +544,7 @@ export default function CalculadoraEscalasPage() {
             {lecturaDestino.ok && Number.isFinite(factorCambio) ? (
               <div className={styles.resultado} aria-live="polite">
                 <p className={styles.resultadoEtiqueta}>
-                  De {textoDeEscala(escala)} a {textoDeEscala(lecturaDestino.escala as Escala)}
+                  De {textoEscalaActiva} a {textoDeEscala(lecturaDestino.escala as Escala)}
                 </p>
                 <p className={styles.resultadoValor}>
                   × {formatearNumero(factorCambio, 4)}
@@ -537,7 +559,7 @@ export default function CalculadoraEscalasPage() {
               </div>
             ) : (
               <p className={styles.error} role="alert" aria-live="polite">
-                <span aria-hidden="true">⚠️</span> {lecturaDestino.error ?? 'Escala no válida'}
+                <span aria-hidden="true">⚠️</span> {lecturaDestino.error ?? (escala ? 'Escala no válida' : SIN_ESCALA)}
               </p>
             )}
           </div>
@@ -644,8 +666,8 @@ export default function CalculadoraEscalasPage() {
                   <span>{unidadSuperficieSalida}²</span>
                 </p>
                 <p className={styles.resultadoDetalle}>
-                  Factor aplicado: {formatearNumero(1 / factorDe(escala))}² ={' '}
-                  {formatearNumero(Math.pow(1 / factorDe(escala), 2))}
+                  Factor aplicado: {formatearNumero(divisorEscala)}² ={' '}
+                  {formatearNumero(Math.pow(divisorEscala, 2))}
                 </p>
               </div>
             ) : (
@@ -747,12 +769,18 @@ export default function CalculadoraEscalasPage() {
               </div>
             </div>
 
+            {!escala && (
+              <p className={styles.error} role="alert" aria-live="polite">
+                <span aria-hidden="true">⚠️</span> {SIN_ESCALA}
+              </p>
+            )}
+
             {filasLista.length > 0 && (
               <div className={styles.tablaContenedor}>
                 <table className={styles.tabla}>
                   <caption className={styles.tablaCaption}>
                     {filasLista.length} medida<span>{filasLista.length === 1 ? '' : 's'}</span> convertida
-                    <span>{filasLista.length === 1 ? '' : 's'}</span> a escala {textoDeEscala(escala)}
+                    <span>{filasLista.length === 1 ? '' : 's'}</span> a escala {textoEscalaActiva}
                   </caption>
                   <thead>
                     <tr>
@@ -845,7 +873,7 @@ export default function CalculadoraEscalasPage() {
                     height="18mm"
                     viewBox={`0 0 ${grafica.longitudPapelMm} 18`}
                     role="img"
-                    aria-label={`Escala gráfica para ${textoDeEscala(escala)}: la barra completa representa ${formatearNumero(grafica.totalReal)} ${unidadGrafica} y mide ${formatearNumero(grafica.longitudPapelMm, 1)} milímetros sobre el papel`}
+                    aria-label={`Escala gráfica para ${textoEscalaActiva}: la barra completa representa ${formatearNumero(grafica.totalReal)} ${unidadGrafica} y mide ${formatearNumero(grafica.longitudPapelMm, 1)} milímetros sobre el papel`}
                   >
                     {/* Barra alterna en blanco y negro, como las escalas gráficas de siempre */}
                     {grafica.divisiones.slice(0, -1).map((division, indice) => {
@@ -876,12 +904,12 @@ export default function CalculadoraEscalasPage() {
                           textAnchor="middle"
                           className={styles.rotulo}
                         >
-                          {formatearNumero(division.valorReal)}
+                          {formatearNumero(division.valorReal, Math.max(4, grafica.decimalesRotulo))}
                         </text>
                       </g>
                     ))}
                     <text x={grafica.longitudPapelMm / 2} y={17.5} textAnchor="middle" className={styles.rotuloUnidad}>
-                      {NOMBRE_UNIDAD[grafica.unidad]} · escala {textoDeEscala(escala)}
+                      {NOMBRE_UNIDAD[grafica.unidad]} · escala {textoEscalaActiva}
                     </text>
                   </svg>
                 </div>
@@ -1227,63 +1255,19 @@ export default function CalculadoraEscalasPage() {
           </div>
 
           <h3>Preguntas frecuentes</h3>
+          {/* Una sola fuente con el FAQPage del JSON-LD: PREGUNTAS_FRECUENTES (hallazgo 3980) */}
           <div className={styles.faqList}>
-            <div className={styles.faqItem}>
-              <h4>¿Qué significa exactamente la escala 1:50?</h4>
-              <p>
-                Que el dibujo es 50 veces más pequeño que la realidad: 1 cm sobre el papel son 50
-                cm reales, es decir, medio metro. Para ir del plano a la realidad se multiplica
-                por 50 y para ir de la realidad al plano se divide entre 50.
-              </p>
-            </div>
-            <div className={styles.faqItem}>
-              <h4>¿Cómo averiguo la escala de un plano que no la indica?</h4>
-              <p>
-                Mide sobre el dibujo algo cuya medida real conozcas y divide las dos cantidades
-                puestas en la misma unidad. Si 3 cm del papel son 6 m reales, esos 6 m son 600 cm
-                y la razón 3:600 se simplifica a 1:200. La pestaña «Deducir la escala» lo hace
-                sola.
-              </p>
-            </div>
-            <div className={styles.faqItem}>
-              <h4>¿Por qué una superficie no se convierte igual que una longitud?</h4>
-              <p>
-                Porque el área tiene dos dimensiones y escala con el cuadrado del factor. En 1:50
-                las longitudes se dividen entre 50, pero las áreas entre 2.500. Un salón de 24 cm²
-                sobre el papel son 6 m² reales, no 0,48.
-              </p>
-              <p className={styles.faqTip}>
-                <span aria-hidden="true">💡</span> Compruébalo con un cuadrado de 1 cm de lado: a
-                1:50 pasa a medir 50 cm de lado, y su área pasa de 1 cm² a 2.500 cm².
-              </p>
-            </div>
-            <div className={styles.faqItem}>
-              <h4>¿Qué es una escala de ampliación?</h4>
-              <p>
-                Una en la que el dibujo es más grande que el objeto, como 2:1 o 5:1. Se usa para
-                acotar piezas pequeñas que a tamaño natural no se verían. Se reconoce porque el
-                primer número es mayor que el segundo, y en ella se multiplica para ir al dibujo
-                en vez de dividir.
-              </p>
-            </div>
-            <div className={styles.faqItem}>
-              <h4>¿Por qué la escala H0 es 1:87 y no un número redondo?</h4>
-              <p>
-                Porque se definió a partir del ancho de vía, no del tamaño del tren: el ancho H0
-                es la mitad del de la escala 1, que es 1:43,5, y la mitad de 43,5 es 87. Es un
-                número heredado de una convención del siglo pasado que se mantuvo por
-                compatibilidad.
-              </p>
-            </div>
-            <div className={styles.faqItem}>
-              <h4>¿Puedo fiarme de una escala gráfica impresa?</h4>
-              <p>
-                Solo si se imprime al 100 %, sin la opción de ajustar a la página. Su ventaja es
-                justo esa: si el plano entero se amplía o se reduce, la barra se deforma con él y
-                sigue midiendo bien, cosa que la escala numérica no hace. Comprueba con una regla
-                que la barra mide lo que la app dice antes de usarla.
-              </p>
-            </div>
+            {PREGUNTAS_FRECUENTES.map((pregunta) => (
+              <div key={pregunta.question} className={styles.faqItem}>
+                <h4>{pregunta.question}</h4>
+                <p>{pregunta.answer}</p>
+                {pregunta.consejo && (
+                  <p className={styles.faqTip}>
+                    <span aria-hidden="true">💡</span> <span>{pregunta.consejo}</span>
+                  </p>
+                )}
+              </div>
+            ))}
           </div>
 
           <h3>Cómo usar la calculadora paso a paso</h3>
@@ -1358,9 +1342,10 @@ export default function CalculadoraEscalasPage() {
               </span>
               <h4>Comprueba el orden de magnitud antes de dar el número por bueno</h4>
               <p>
-                Si un muro de vivienda te sale de 36 metros o de 3,6 centímetros, has invertido la
-                operación. El resultado equivocado siempre es un múltiplo o un submúltiplo del
-                bueno.
+                Si un muro de vivienda que mide 3,6 m te sale de 36 metros o de 3,6 centímetros,
+                has perdido un factor 10 o 100 al cambiar de unidad; si te sale de 1,44 mm, has
+                invertido la operación. El resultado equivocado siempre es un múltiplo o un
+                submúltiplo del bueno.
               </p>
             </div>
             <div className={styles.tipCard}>

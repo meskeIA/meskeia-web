@@ -114,12 +114,17 @@ export function textoDeEscala(escala: Escala): string {
  *
  * Las cantidades pasan por `parseSpanishNumber`, así que «1:2,5» se lee como uno a dos coma
  * cinco y no como uno a veinticinco.
+ *
+ * Si hay dos puntos o barra, SOLO ellos separan los términos, y un espacio dentro de un término
+ * es el millar que recomienda la RAE («1:25 000», hallazgo 3976): partir también por espacios
+ * rechazaba esa escala. El espacio solo separa cuando no hay ni dos puntos ni barra («1 50»).
  */
 export function parsearEscala(texto: string): ResultadoEscala {
   const limpio = texto.trim();
   if (limpio === '') return { ok: false, escala: null, error: 'Escribe una escala, por ejemplo 1:50' };
 
-  const partes = limpio.split(/[:/\s]+/).filter((p) => p !== '');
+  const separador = /[:/]/.test(limpio) ? /\s*[:/]\s*/ : /\s+/;
+  const partes = limpio.split(separador).filter((p) => p !== '');
 
   let numerador: number;
   let denominador: number;
@@ -301,6 +306,8 @@ export interface EscalaGrafica {
   longitudPapelMm: number;
   /** Qué distancia real abarca la barra entera. */
   totalReal: number;
+  /** Decimales con los que hay que rotular las marcas para que no se repitan ni salgan a 0. */
+  decimalesRotulo: number;
   error: string | null;
 }
 
@@ -327,6 +334,7 @@ export function construirEscalaGrafica(
     unidad,
     longitudPapelMm: 0,
     totalReal: 0,
+    decimalesRotulo: 0,
     error: null,
   };
 
@@ -354,10 +362,14 @@ export function construirEscalaGrafica(
     return { ...vacia, error: 'Con esa escala no se puede construir una barra legible' };
   }
 
+  // Decimales que necesita el rótulo: los del paso (1, 2 o 5 × 10^k → −k si k < 0). Con los 4
+  // fijos de antes, un paso de 0,00005 km rotulaba 0 · 0,0001 · 0,0001 · 0,0001 (hallazgo 3983).
+  const decimalesRotulo = Math.max(0, -Math.floor(Math.log10(paso) + 1e-9));
+
   const divisiones: DivisionEscalaGrafica[] = [];
   const numeroDivisiones = Math.max(1, Math.floor(realTotal / paso));
   for (let i = 0; i <= numeroDivisiones; i++) {
-    const valorReal = redondear(i * paso, 6);
+    const valorReal = redondear(i * paso, Math.max(6, decimalesRotulo + 2));
     divisiones.push({
       valorReal,
       milimetrosEnPapel: aMilimetros(valorReal, unidad) * factor,
@@ -371,6 +383,7 @@ export function construirEscalaGrafica(
     unidad,
     longitudPapelMm: ultima.milimetrosEnPapel,
     totalReal: ultima.valorReal,
+    decimalesRotulo,
     error: null,
   };
 }
@@ -391,23 +404,25 @@ export interface MedidaDeLista {
 /**
  * Convierte de golpe una lista de medidas pegada por quien la tenga en una tabla.
  *
- * ⚠️ Los separadores se prueban POR ORDEN —salto de línea, punto y coma, tabulador— y la
- * coma NO es uno de ellos: en español la coma es el separador decimal, así que partir por
+ * ⚠️ Separan el salto de línea, el punto y coma y el tabulador, LOS TRES A LA VEZ, y la coma
+ * NO es uno de ellos: en español la coma es el separador decimal, así que partir por
  * comas convertiría «1,5 3 4,5» en los trozos «1», «5 3 4» y «5», y el segundo se leería
  * como 534 sin que nada avise. Si no aparece ninguno de los tres separadores admitidos, se
- * cae al espacio, que solo es ambiguo si alguien escribe «1 500» queriendo decir mil
- * quinientos, y eso ya lo resuelve `parseSpanishNumber` en cada trozo por separado.
+ * cae al espacio.
+ *
+ * Antes se probaban por orden y el primero que apareciera era el único: un bloque de dos
+ * columnas pegado de una hoja de cálculo («420⇥310↵250⇥180») se partía por líneas y cada fila
+ * se leía como un solo número, 420310, porque `parseSpanishNumber` quita el tabulador
+ * (hallazgo 3977).
  */
 export function partirLista(texto: string): string[] {
   const limpio = texto.trim();
   if (limpio === '') return [];
-  for (const separador of ['\n', ';', '\t']) {
-    if (limpio.includes(separador)) {
-      return limpio
-        .split(separador)
-        .map((t) => t.trim())
-        .filter((t) => t !== '');
-    }
+  if (/[\n;\t]/.test(limpio)) {
+    return limpio
+      .split(/[\n;\t]+/)
+      .map((t) => t.trim())
+      .filter((t) => t !== '');
   }
   return limpio
     .split(/\s+/)
@@ -457,8 +472,8 @@ export interface EscalaConocida {
  * Las escalas normalizadas que alguien va a querer con un clic.
  *
  * Las de dibujo técnico son las de la serie normalizada (múltiplos de 1, 2 y 5). Las de
- * maquetismo NO son redondas y esa es justo su gracia: 1:87 sale de que el ancho de vía H0
- * es la mitad del de la escala 1 (1:43,5), y por eso se conserva un número tan raro.
+ * maquetismo NO son redondas y esa es justo su gracia: H0 es «media 0», la mitad de la
+ * escala 0 (1:43,5), y a mitad de tamaño el denominador se dobla: 2 × 43,5 = 87.
  */
 export const ESCALAS_CONOCIDAS: readonly EscalaConocida[] = [
   { escala: { numerador: 1, denominador: 1 }, etiqueta: '1:1', uso: 'Tamaño natural', familia: 'dibujo' },
@@ -475,8 +490,8 @@ export const ESCALAS_CONOCIDAS: readonly EscalaConocida[] = [
   { escala: { numerador: 1, denominador: 500 }, etiqueta: '1:500', uso: 'Parcelas y urbanización', familia: 'dibujo' },
   { escala: { numerador: 1, denominador: 1000 }, etiqueta: '1:1000', uso: 'Planeamiento urbano', familia: 'mapa' },
   { escala: { numerador: 1, denominador: 5000 }, etiqueta: '1:5000', uso: 'Cartografía de detalle', familia: 'mapa' },
-  { escala: { numerador: 1, denominador: 25000 }, etiqueta: '1:25000', uso: 'Mapa topográfico y senderismo', familia: 'mapa' },
-  { escala: { numerador: 1, denominador: 50000 }, etiqueta: '1:50000', uso: 'Mapa topográfico general', familia: 'mapa' },
+  { escala: { numerador: 1, denominador: 25000 }, etiqueta: '1:25.000', uso: 'Mapa topográfico y senderismo', familia: 'mapa' },
+  { escala: { numerador: 1, denominador: 50000 }, etiqueta: '1:50.000', uso: 'Mapa topográfico general', familia: 'mapa' },
   { escala: { numerador: 1, denominador: 12 }, etiqueta: '1:12', uso: 'Casas de muñecas y dioramas', familia: 'maqueta' },
   { escala: { numerador: 1, denominador: 18 }, etiqueta: '1:18', uso: 'Automóvil de colección grande', familia: 'maqueta' },
   { escala: { numerador: 1, denominador: 24 }, etiqueta: '1:24', uso: 'Maqueta de automóvil', familia: 'maqueta' },
@@ -501,12 +516,24 @@ export function redondear(valor: number, decimales: number): number {
  * Formato español, con los decimales que el número necesite hasta un máximo.
  *
  * No se usa `toFixed` a secas porque rellena de ceros: una escala 1:50 se rotularía «1:50,00».
- * Y no se usa `formatNumber` de `@/lib` en los denominadores porque ahí el separador de
- * millares estorba: «1:50000» es una escala, «1:50.000» parece un número con decimales.
+ *
+ * Con punto de millar a partir de cinco cifras, como manda la RAE y hace `Intl` en es-ES
+ * (`1:50.000`, `250.000 cm`; `1:5000` queda sin agrupar). Hasta el 04/11/2026 no agrupaba
+ * nunca, con el argumento de que «1:50.000 parece un número con decimales»; pero así rotula
+ * el IGN sus mapas («1:25.000», «1:50.000»), y lo exige el formato del proyecto (hallazgo 3982).
  */
+const FORMATOS_ES = new Map<number, Intl.NumberFormat>();
+
 export function formatearNumero(valor: number, maxDecimales = 4): string {
   if (!Number.isFinite(valor)) return '—';
+  let formato = FORMATOS_ES.get(maxDecimales);
+  if (!formato) {
+    // Sin `useGrouping: true`: con él Intl agrupa SIEMPRE («5.000»); por defecto aplica el mínimo
+    // de dos cifras de es-ES y la de cuatro queda sin agrupar, que es lo que pide la RAE.
+    formato = new Intl.NumberFormat('es-ES', { maximumFractionDigits: maxDecimales });
+    FORMATOS_ES.set(maxDecimales, formato);
+  }
+  // Sin «-0»: un redondeo a cero de un negativo minúsculo se rotula 0
   const redondeado = redondear(valor, maxDecimales);
-  if (Number.isInteger(redondeado)) return String(redondeado);
-  return String(redondeado).replace('.', ',');
+  return formato.format(redondeado === 0 ? 0 : redondeado);
 }

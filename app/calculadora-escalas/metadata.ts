@@ -68,40 +68,62 @@ const webAppSchema = generateWebAppSchema({
   ],
 });
 
+export interface PreguntaFrecuente {
+  question: string;
+  answer: string;
+  /** Consejo que solo se pinta en la FAQ visible, debajo de la respuesta. */
+  consejo?: string;
+}
+
+/**
+ * La FAQ de la app, en UNA sola fuente: la pintan `page.tsx` y el FAQPage de abajo. Hasta el
+ * 04/11/2026 cada una tenía su redacción de cuatro de las preguntas (hallazgo 3980), y una
+ * corrección en una no llegaba a la otra: el 0,48 m² del error del factor lineal (3979, son
+ * 0,12) y la cuenta falsa de H0 (3978) estaban en las dos.
+ */
+export const PREGUNTAS_FRECUENTES: PreguntaFrecuente[] = [
+  {
+    question: '¿Qué significa la escala 1:50 de un plano?',
+    answer:
+      'Significa que el dibujo es 50 veces más pequeño que la realidad: 1 centímetro sobre el papel equivale a 50 centímetros reales, es decir, medio metro. Para pasar del plano a la realidad se multiplica por 50, y de la realidad al plano se divide entre 50. Es la escala más habitual en la planta de una vivienda.',
+  },
+  {
+    question: '¿Cómo se calcula la escala de un plano si no viene indicada?',
+    answer:
+      'Se mide sobre el dibujo un elemento del que se conozca la medida real y se dividen las dos cantidades expresadas en la misma unidad. Si una distancia de 3 cm en el papel corresponde a 6 metros reales, se pasan los 6 metros a 600 centímetros y la razón 3:600 se simplifica a 1:200. Esa es la escala del plano, y la pestaña «Deducir la escala» la calcula sola.',
+  },
+  {
+    question: '¿Por qué una superficie no se convierte con el mismo número que una longitud?',
+    answer:
+      'Porque el área depende de dos dimensiones, así que escala con el cuadrado del factor. En un plano 1:50 las longitudes se dividen entre 50, pero las superficies entre 2.500, que es 50 al cuadrado. Un salón que ocupa 24 cm² sobre el papel mide 6 m² reales, no 0,12 m², que es lo que sale al multiplicar solo por 50. Es el error más repetido del tema porque el resultado equivocado también parece un número normal.',
+    consejo:
+      'Compruébalo con un cuadrado de 1 cm de lado: a 1:50 pasa a medir 50 cm de lado, y su área pasa de 1 cm² a 2.500 cm².',
+  },
+  {
+    question: '¿Qué es una escala de ampliación?',
+    answer:
+      'Una en la que el dibujo es más grande que el objeto, como 2:1 o 5:1. Se usa para acotar piezas pequeñas que a tamaño natural no se verían. Se reconoce porque el primer número es mayor que el segundo, y en ella se multiplica para ir al dibujo en vez de dividir.',
+  },
+  {
+    question: '¿Qué escala es la 1:87 y por qué es un número tan raro?',
+    answer:
+      'Es la escala H0, la más extendida en modelismo ferroviario. Su nombre viene de «media 0»: se definió como la mitad de la escala 0, que es 1:43,5, y a mitad de tamaño el denominador se dobla: 2 × 43,5 = 87. Un vagón real de 26,1 metros mide 30 centímetros en H0.',
+  },
+  {
+    question: '¿Cómo se pasa un plano de una escala a otra?',
+    answer:
+      'Se dividen los dos factores entre sí, sin que intervenga ninguna medida real. Para redibujar un plano de 1:200 a 1:50 se calcula 200 dividido entre 50, que da 4: todas las medidas del dibujo se multiplican por 4. Si el resultado es menor que 1 el dibujo nuevo es más pequeño que el original.',
+  },
+  {
+    question: '¿Para qué sirve una escala gráfica y cómo se usa?',
+    answer:
+      'Es una regla dibujada junto al plano que permite medir distancias reales directamente, sin calcular nada: se apoya la medida tomada del plano sobre la barra y se lee la cifra. Tiene una ventaja sobre la escala numérica y es que sigue siendo válida aunque el plano se amplíe o se reduzca al fotocopiarlo, porque la barra cambia de tamaño con él. Al imprimirla hay que hacerlo al 100 %, sin ajustar a la página, y comprobar con una regla que la barra mide lo que dice.',
+  },
+];
+
 const faqSchema = generateFAQSchema({
   url: 'https://meskeia.com/calculadora-escalas/',
-  mainEntity: [
-    {
-      question: '¿Qué significa la escala 1:50 de un plano?',
-      answer:
-        'Significa que el dibujo es 50 veces más pequeño que la realidad: 1 centímetro sobre el papel equivale a 50 centímetros reales, es decir, medio metro. Para pasar del plano a la realidad se multiplica por 50, y de la realidad al plano se divide entre 50. Es la escala más habitual en la planta de una vivienda.',
-    },
-    {
-      question: '¿Cómo se calcula la escala de un plano si no viene indicada?',
-      answer:
-        'Se mide sobre el dibujo un elemento del que se conozca la medida real y se dividen las dos cantidades expresadas en la misma unidad. Si una distancia de 3 cm en el papel corresponde a 6 metros reales, se pasan los 6 metros a 600 centímetros y la razón 3:600 se simplifica a 1:200. Esa es la escala del plano.',
-    },
-    {
-      question: '¿Por qué una superficie no se convierte con el mismo número que una longitud?',
-      answer:
-        'Porque el área depende de dos dimensiones, así que escala con el cuadrado del factor. En un plano 1:50 las longitudes se dividen entre 50, pero las superficies entre 2.500, que es 50 al cuadrado. Un salón que ocupa 24 cm² sobre el papel mide 6 m² reales, no 0,48 m². Es el error más repetido del tema porque el resultado equivocado también parece plausible.',
-    },
-    {
-      question: '¿Qué escala es la 1:87 y por qué es un número tan raro?',
-      answer:
-        'Es la escala H0, la más extendida en modelismo ferroviario. El número viene de que el ancho de vía H0 se definió como la mitad del de la escala 1, que es 1:43,5, y la mitad de 43,5 es 87. Un vagón real de 26,1 metros mide 30 centímetros en H0.',
-    },
-    {
-      question: '¿Cómo se pasa un plano de una escala a otra?',
-      answer:
-        'Se dividen los dos factores entre sí, sin que intervenga ninguna medida real. Para redibujar un plano de 1:200 a 1:50 se calcula 200 dividido entre 50, que da 4: todas las medidas del dibujo se multiplican por 4. Si el resultado es menor que 1 el dibujo nuevo es más pequeño que el original.',
-    },
-    {
-      question: '¿Para qué sirve una escala gráfica y cómo se usa?',
-      answer:
-        'Es una regla dibujada junto al plano que permite medir distancias reales directamente, sin calcular nada: se apoya la medida tomada del plano sobre la barra y se lee la cifra. Tiene una ventaja sobre la escala numérica y es que sigue siendo válida aunque el plano se amplíe o se reduzca al fotocopiarlo, porque la barra cambia de tamaño con él. Al imprimirla hay que hacerlo al 100 %, sin ajustar a la página.',
-    },
-  ],
+  mainEntity: PREGUNTAS_FRECUENTES.map(({ question, answer }) => ({ question, answer })),
 });
 
 export const jsonLd = combineSchemas(webAppSchema, faqSchema);
