@@ -1189,15 +1189,13 @@ test.describe('Comprobación 04/11/2026 — «Anterior» y la respuesta marcada'
     }
   });
 
-  // ── Hallazgo ABIERTO (comprobación 04/11/2026) ──────────────────────────────
+  // ── Hallazgo 4072, REPARADO el 04/11/2026: handleAnterior guarda la marcada antes de volver ──
 
-  test('ABIERTO: la P3 marcada y dejada con «Anterior» vuelve marcada con «Siguiente» (escritorio)', async ({ page }) => {
-    // ABIERTO (04/11/2026). P1 «Entre 2 y 5 años» → Siguiente → P2 «Más de 25.000 €» → Siguiente →
+  test('REPARADO (4072): la P3 marcada y dejada con «Anterior» vuelve marcada con «Siguiente» (escritorio)', async ({ page }) => {
+    // REPARADO (04/11/2026). P1 «Entre 2 y 5 años» → Siguiente → P2 «Más de 25.000 €» → Siguiente →
     // P3 «No, es de mi propiedad total» → Anterior → Siguiente. Esperado, como en
     // selector-smartphone: la P3 conserva «No, es de mi propiedad total» y «Siguiente» sigue
-    // habilitado. Obtenido: la P3 sin ninguna marcada y «Siguiente» deshabilitado (hay que volver a
-    // contestarla).
-    test.fail();
+    // habilitado. Obtenido antes: la P3 sin ninguna marcada y «Siguiente» deshabilitado.
     await abrirTest(page);
     await marcarP3YVolver(page, false);
     await page.getByRole('button', { name: SIGUIENTE }).click();
@@ -1207,8 +1205,8 @@ test.describe('Comprobación 04/11/2026 — «Anterior» y la respuesta marcada'
       .toEqual({ pregunta: 'Pregunta 3 de 10', marcada: ['No, es de mi propiedad total'], siguiente: true });
   });
 
-  test('ABIERTO: la P3 corregida y dejada con «Anterior» no vuelve a la respuesta vieja, y el resultado sale con la corregida', async ({ page }) => {
-    // ABIERTO (04/11/2026), la variante que cambia el resultado. P1 «Menos de 2 años» → P2 «Más de
+  test('REPARADO (4072): la P3 corregida y dejada con «Anterior» no vuelve a la respuesta vieja, y el resultado sale con la corregida', async ({ page }) => {
+    // REPARADO (04/11/2026), la variante que cambiaba el resultado. P1 «Menos de 2 años» → P2 «Más de
     // 25.000 €» → P3 «Sí, sigue con financiación activa» → Siguiente → (P4) Anterior → P3 corrige a
     // «No, es de mi propiedad total» → Anterior → (P2) Siguiente → P3 → Siguiente sin tocarla →
     // P4 novel · P5 ninguno · P6 ocasional · P7 ciudad · P8 garaje siempre · P9 «Podría asumir
@@ -1221,7 +1219,6 @@ test.describe('Comprobación 04/11/2026 — «Anterior» y la respuesta marcada'
     // resultado es «Todo Riesgo sin Franquicia», sin ninguna nota que cite la financiación (solo
     // «conductor-joven»). Enumerado con el motor: de los 46.656 perfiles con «No, es de mi propiedad
     // total», en 12.488 la modalidad cambia si la P3 vale «Sí, sigue con financiación activa».
-    test.fail();
     await abrirTest(page);
     const siguiente = () => page.getByRole('button', { name: /^(Ir a la siguiente pregunta|Ver resultado)$/ });
     for (const i of [0, 0, 0]) {
@@ -1258,11 +1255,10 @@ test.describe('Comprobación 04/11/2026 — «Anterior» y la respuesta marcada'
       hasTouch: true,
     });
 
-    test('ABIERTO: con toques sueltos, la P3 marcada y dejada con «Anterior» vuelve marcada con «Siguiente»', async ({ page }) => {
-      // ABIERTO (04/11/2026). La misma secuencia que en escritorio, con toques separados 500 ms
-      // (detail 1: la guarda de ráfaga no interviene). Obtenido: la P3 sin marcar y «Siguiente»
-      // deshabilitado, como en escritorio.
-      test.fail();
+    test('REPARADO (4072): con toques sueltos, la P3 marcada y dejada con «Anterior» vuelve marcada con «Siguiente»', async ({ page }) => {
+      // REPARADO (04/11/2026). La misma secuencia que en escritorio, con toques separados 500 ms
+      // (detail 1: la guarda de ráfaga no interviene). Obtenido antes: la P3 sin marcar y
+      // «Siguiente» deshabilitado, como en escritorio.
       await abrirTest(page);
       await marcarP3YVolver(page, true);
       await pulsar(page, true, page.getByRole('button', { name: SIGUIENTE, exact: true }));

@@ -77,7 +77,7 @@ interface Hermana {
   /** La app abre con una pantalla de presentación y un botón «Empezar el test». */
   empezar: boolean;
   /** Las tres recetas que el invariante de radios no ve (cabo C0196), con su hueco si sigue abierto. */
-  recetas?: { foco?: Hueco; teclado?: Hueco; dobleToque?: Hueco | Omitido };
+  recetas?: { foco?: Hueco; teclado?: Hueco; dobleToque?: Hueco | Omitido; anteriorConserva?: Hueco };
 }
 
 const HERMANAS: Hermana[] = [
@@ -292,6 +292,31 @@ for (const h of HERMANAS) {
       await esperarFocoEnTitulo(page, 'tras «Siguiente»');
       await page.getByRole('button', { name: /anterior/i }).first().click();
       await esperarFocoEnTitulo(page, 'tras «Anterior»');
+    });
+
+    /**
+     * Hallazgo 4072 (selector-seguro-coche, 04/11/2026): la opción marcada solo se guardaba al
+     * pulsar «Siguiente», así que «Anterior» la perdía y al volver la pregunta salía sin marcar (o
+     * con la respuesta vieja, y el resultado con ella). La referencia, selector-smartphone, guarda
+     * al marcar. Se mide en todas: marcar en la P2, volver con «Anterior» y avanzar otra vez.
+     */
+    test('«Anterior» no pierde la opción marcada: al volver a avanzar, la pregunta la conserva', async ({ page }) => {
+      if (h.recetas?.anteriorConserva?.falla) test.fail();
+      const grupo = await abrirTest(page, h);
+      await grupo.locator('button').first().click();
+      await botonSiguiente(page).click();
+      await esperarFocoEnTitulo(page, 'tras «Siguiente»');
+      const opcionesP2 = page.locator('[role="radiogroup"]').first().locator('[role="radio"]');
+      await opcionesP2.nth(1).click();
+      await expect(opcionesP2.nth(1)).toHaveAttribute('aria-checked', 'true');
+      // Ya marcada: en formacion-postgrado la opción marcada lleva un «✓» que entra en el texto.
+      const textoP2 = await page.locator('[role="radiogroup"]').first().innerText();
+      await page.getByRole('button', { name: /anterior/i }).first().click();
+      await expect.poll(() => page.locator('[role="radiogroup"]').first().innerText(), { message: 'vuelve a la P1' }).not.toBe(textoP2);
+      await botonSiguiente(page).click();
+      await expect.poll(() => page.locator('[role="radiogroup"]').first().innerText(), { message: 'de nuevo en la P2' }).toBe(textoP2);
+      await expect(opcionesP2.nth(1), 'la P2 conserva la opción marcada').toHaveAttribute('aria-checked', 'true');
+      await expect(botonSiguiente(page), 'y se puede seguir').toBeEnabled();
     });
 
     test('teclado del patrón de radios: una sola parada de Tab y las flechas mueven foco y marca', async ({ page }) => {

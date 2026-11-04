@@ -187,12 +187,21 @@ export default function SelectorSeguroCochePage() {
     }
   };
 
+  /**
+   * Guarda la opción marcada en la pregunta que se deja antes de volver. Hasta el 04/11/2026 solo
+   * guardaba «Siguiente»: al volver con «Anterior» la marca se perdía (la pregunta aparecía sin
+   * marcar, o con la respuesta vieja si se había corregido, y el resultado salía con ella;
+   * hallazgo 4072). Como selector-smartphone, que guarda al marcar.
+   */
   const handleAnterior = () => {
     if (preguntaActual === 0) return;
     cambiaPantalla();
+    const nuevasRespuestas = [...respuestas];
+    if (opcionSeleccionada !== null) nuevasRespuestas[preguntaActual] = opcionSeleccionada;
+    setRespuestas(nuevasRespuestas);
     const anterior = preguntaActual - 1;
     setPreguntaActual(anterior);
-    setOpcionSeleccionada(respuestas[anterior] !== undefined ? respuestas[anterior] : null);
+    setOpcionSeleccionada(nuevasRespuestas[anterior] !== undefined ? nuevasRespuestas[anterior] : null);
   };
 
   const handleReiniciar = () => {
