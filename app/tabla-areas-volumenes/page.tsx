@@ -18,11 +18,16 @@ import {
    está en modo enforcement y bloquearía MathJax o KaTeX).
 ──────────────────────────────────────────────────────────────── */
 
-/** Fracción legible construida con flexbox. */
+/**
+ * Fracción legible construida con flexbox. El «entre» oculto es para el lector de pantalla
+ * (hallazgo 4001, la receta del 3939 de tabla-integrales): apilados sin nada en medio,
+ * π·r²·h/3 se anunciaba «π·r²·h 3».
+ */
 function Frac({ n, d }: { n: ReactNode; d: ReactNode }) {
   return (
     <span className={styles.frac}>
       <span className={styles.fracNum}>{n}</span>
+      <span className="sr-only"> entre </span>
       <span className={styles.fracDen}>{d}</span>
     </span>
   );
@@ -1317,8 +1322,12 @@ const FIGURAS: Figura[] = [
   {
     id: 'piramide',
     categoria: 'poliedros',
-    nombre: 'Pirámide recta (base cualquiera)',
-    dimensiones: 'A_b = área de la base; P_b = perímetro de la base; ap = apotema de la pirámide; h = altura',
+    // Se llamaba «Pirámide recta (base cualquiera)», pero A_lat = P_b·ap/2 y ap = √(h² + ap_base²)
+    // solo valen si todas las caras tienen la misma apotema, es decir, con base regular
+    // (hallazgo 3998). El volumen A_b·h/3 sí vale para cualquier base, y se dice.
+    nombre: 'Pirámide regular',
+    dimensiones:
+      'A_b = área de la base; P_b = perímetro de la base; ap = apotema de la pirámide (altura de cada cara lateral); ap_base = apotema de la base; h = altura. El volumen vale con cualquier base; el área lateral y la apotema, solo con base regular',
     principalEtq: 'Volumen',
     principal: <Frac n={<>A_b·h</>} d="3" />,
     secundariaEtq: 'Área lateral',
@@ -1361,13 +1370,17 @@ const FIGURAS: Figura[] = [
       </Fig>
     ),
     busqueda:
-      'piramide recta volumen un tercio del area de la base por la altura apotema de la piramide area lateral',
-    ejemploTitulo: 'Pirámide de base pentagonal (A_b = 43 cm², P_b = 30 cm) con h = 9 cm y ap = 10 cm',
+      'piramide recta regular volumen un tercio del area de la base por la altura apotema de la piramide area lateral',
+    // El ejemplo de antes mezclaba dos bases: A_b = 43 cm² es el pentágono de lado 5 y P_b = 30 cm
+    // el de lado 6, y ap = 10 no cuadraba con su propia fórmula (hallazgo 3997). Ahora todo es el
+    // pentágono regular de lado 6: ap_base = 6 / (2 · tan 36°) = 4,129 cm.
+    ejemploTitulo: 'Pirámide pentagonal regular de lado 6 cm (A_b = 61,94 cm², P_b = 30 cm) con h = 9 cm y ap = 9,90 cm',
     ejemploPasos: [
-      'A_lat = (30 · 10) / 2 = 150 cm²',
-      'A_tot = 150 + 43 = 193 cm²',
-      'V = (43 · 9) / 3',
-      'V = 129 cm³',
+      'ap_base = 6 / (2 · tg 36°) = 4,129 cm, y A_b = (P_b · ap_base) / 2 = (30 · 4,129) / 2 = 61,94 cm²',
+      'ap = √(9² + 4,129²) = √98,05 = 9,90 cm',
+      'A_lat = (30 · 9,902) / 2 = 148,53 cm²',
+      'A_tot = 148,53 + 61,94 = 210,47 cm²',
+      'V = (61,94 · 9) / 3 = 185,81 cm³',
     ],
     usoReal:
       'El factor 1/3 explica por qué un montón cónico o piramidal de grava ocupa mucho menos de lo que aparenta comparado con la caja que lo envuelve.',
@@ -2044,12 +2057,15 @@ const FIGURAS: Figura[] = [
     ),
     busqueda:
       'zona esferica franja esferica segmento de dos bases superficie curva arquimedes deposito esferico parcial',
-    ejemploTitulo: 'Franja de 5 cm entre círculos de 8 cm y 6 cm en una esfera de 10 cm',
+    // Hasta el 04/11/2026 el ejemplo ponía h = 5 con a = 8 y b = 6 en una esfera de 10, que es
+    // imposible: esos círculos distan 6 y 8 cm del centro, así que h vale 2 o 14 (hallazgo 3996).
+    ejemploTitulo: 'Franja entre los círculos de 8 cm y 6 cm de una esfera de 10 cm, del mismo lado del centro',
     ejemploPasos: [
-      'r = 10 cm, h = 5 cm, a = 8 cm, b = 6 cm',
-      'A_curva = 2 · π · 10 · 5 = 314,16 cm²',
-      'V = (π · 5 / 6) · (192 + 108 + 25) = (π · 5 / 6) · 325',
-      'V = 850,85 cm³',
+      'r = 10 cm, h = 2 cm, a = 8 cm, b = 6 cm',
+      'Los círculos distan del centro √(100 − 64) = 6 cm y √(100 − 36) = 8 cm, así que h = 8 − 6 = 2 cm',
+      'A_curva = 2 · π · 10 · 2 = 125,66 cm²',
+      'V = (π · 2 / 6) · (192 + 108 + 4) = (π / 3) · 304',
+      'V = 318,35 cm³',
     ],
     usoReal:
       'Se usa para calcular el nivel de llenado de un tanque esférico de gas o agua entre dos alturas, y en cartografía para la superficie de una banda de latitud.',
@@ -2553,6 +2569,50 @@ const FIGURAS: Figura[] = [
 ];
 
 /* ────────────────────────────────────────────────────────────────
+   Índice del buscador (hallazgo 4000; la receta de tabla-integrales, 3937, y tabla-derivadas,
+   C0591)
+
+   Antes la consulta ENTERA se buscaba como una subcadena seguida de nombre + sinónimos +
+   dimensiones: «volumen del cono», «área de la esfera» o «volumen del cilindro», tres palabras
+   clave de la propia metadata, daban «0 de 48», y «cono volumen» casaba pero «volumen cono» no.
+   Ahora cada palabra de la consulta tiene que empezar una palabra de la figura (una letra sola,
+   ser esa palabra), sin importar el orden, y el índice incluye las etiquetas de sus fórmulas
+   («Volumen», «Área lateral»…). Los resultados salen en el orden de la tabla.
+──────────────────────────────────────────────────────────────── */
+
+const PALABRAS_VACIAS = new Set([
+  'de', 'del', 'la', 'las', 'el', 'los', 'lo', 'un', 'una', 'unos', 'unas', 'y', 'e', 'o', 'u',
+  'en', 'con', 'por', 'para', 'al', 'a', 'que', 'como', 'se', 'su', 'sus', 'mi', 'calcular',
+  'calculo', 'formula', 'formulas',
+]);
+
+function palabrasDe(texto: string): string[] {
+  return normalizar(texto).split(/[^a-z0-9]+/).filter(Boolean);
+}
+
+const INDICE_BUSQUEDA = new Map(
+  FIGURAS.map((figura) => {
+    const etiquetas = [figura.principalEtq, figura.secundariaEtq ?? '', ...figura.formulas.map((f) => f.etq)];
+    const texto = `${figura.nombre} ${figura.busqueda} ${figura.dimensiones} ${etiquetas.join(' ')}`;
+    return [figura.id, palabrasDe(texto)] as const;
+  }),
+);
+
+/**
+ * En los cuerpos, el «área» se rotula «Superficie» (la esfera, el cilindro…), y quien busca
+ * «área de la esfera» busca esa fila: las dos palabras valen la una por la otra.
+ */
+const SINONIMOS: Record<string, string[]> = {
+  area: ['superficie'],
+  superficie: ['area'],
+};
+
+/** ¿La palabra `q` de la consulta casa con la palabra `p` de la figura? */
+function casa(q: string, p: string): boolean {
+  return [q, ...(SINONIMOS[q] ?? [])].some((v) => (v.length === 1 ? p === v : p.startsWith(v)));
+}
+
+/* ────────────────────────────────────────────────────────────────
    Componente principal
 ──────────────────────────────────────────────────────────────── */
 
@@ -2568,14 +2628,19 @@ export default function TablaAreasVolumenesPage() {
   }, []);
 
   const resultados = useMemo(() => {
-    const termino = normalizar(consulta.trim());
-    return FIGURAS.filter((figura) => {
-      const coincideCategoria = categoriaActiva === 'todas' || figura.categoria === categoriaActiva;
-      if (!coincideCategoria) return false;
-      if (termino === '') return true;
-      return normalizar(`${figura.nombre} ${figura.busqueda} ${figura.dimensiones}`).includes(
-        termino,
-      );
+    const enCategoria = FIGURAS.filter(
+      (figura) => categoriaActiva === 'todas' || figura.categoria === categoriaActiva,
+    );
+    const todas = palabrasDe(consulta);
+    if (todas.length === 0) return enCategoria;
+    // Las palabras vacías («del», «de la») se ignoran, salvo que la consulta no tenga otra
+    // cosa: «a» es también el lado de muchas figuras.
+    const significativas = todas.filter((p) => !PALABRAS_VACIAS.has(p));
+    const consultaPalabras = significativas.length > 0 ? significativas : todas;
+    // En el orden de la tabla, como antes: agrupa las figuras por familia
+    return enCategoria.filter((figura) => {
+      const palabras = INDICE_BUSQUEDA.get(figura.id) ?? [];
+      return consultaPalabras.every((q) => palabras.some((p) => casa(q, p)));
     });
   }, [consulta, categoriaActiva]);
 

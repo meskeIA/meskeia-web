@@ -15,6 +15,9 @@ import { contrasteSobreFondoReal } from './_contraste';
  * de la pirámide, solo con base regular); el test «las 48 figuras» fija lo que se pinta para que un
  * cambio de signo o de factor no pase en silencio.
  *
+ * El 04/11/2026 (/reparar) se repararon la zona esférica (3996), la pirámide (3997 y 3998), el
+ * buscador (4000) y las fracciones (4001): sus tests ya no llevan test.fail().
+ *
  * Lo que la inspección encontró mal (tests HALLAZGO, con test.fail() mientras sigan abiertos):
  *   · tronco de cono: A_lat = π·8·√40 = 158,95 cm² y el ejemplo dice 158,90;
  *   · zona esférica: con r = 10, a = 8 y b = 6 los planos distan 2 o 14 cm, nunca los 5 del ejemplo;
@@ -378,13 +381,15 @@ test.describe('Hallazgos de la inspección del 03/11/2026', () => {
     expect(await pasosDe(page, 'tronco-cono').innerText()).toContain(`= ${esperado} cm²`);
   });
 
-  test('HALLAZGO (03/11/2026, ABIERTO) · zona esférica: con r = 10, a = 8 y b = 6 la franja mide 2 o 14 cm, no 5', async ({ page }) => {
+  test('HALLAZGO 3996 (REPARADO) · zona esférica: con r = 10, a = 8 y b = 6 la franja mide 2 o 14 cm, no 5', async ({ page }) => {
     // Un círculo de radio a en una esfera de radio r está a √(r² − a²) del centro: 6 cm el de 8 y
     // 8 cm el de 6. Los planos distan 8 − 6 = 2 (mismo lado) u 8 + 6 = 14 (lados opuestos). Con
     // h = 2 la franja da A = 40π = 125,66 cm² y V = (2π/6)·304 = 318,35 cm³ (= π∫₆⁸(100 − z²)dz).
-    test.fail();
     await cargar(page);
     await filaDe(page, 'zona-esferica').click();
+    const pasos = await pasosDe(page, 'zona-esferica').innerText();
+    expect(pasos).toContain(`= ${fmt2(2 * Math.PI * 10 * 2)} cm²`);
+    expect(pasos).toContain(`V = ${fmt2((Math.PI * 2 / 6) * (3 * 64 + 3 * 36 + 4))} cm³`);
     const linea = await page.locator('#detalle-zona-esferica ol li').first().innerText();
     const dato = (letra: string): number => numeroEs(linea.match(new RegExp(`\\b${letra} = ([\\d,]+)`))?.[1] ?? 'NaN');
     const [r, h, a, b] = ['r', 'h', 'a', 'b'].map(dato);
@@ -394,11 +399,11 @@ test.describe('Hallazgos de la inspección del 03/11/2026', () => {
     expect(posibles.some((p) => Math.abs(p - h) < 0.01), `h = ${h}; posibles: ${posibles.join(' o ')}`).toBe(true);
   });
 
-  test('HALLAZGO (03/11/2026, ABIERTO) · pirámide: A_b = 43 y P_b = 30 no son de la misma base, y con h = 9 la apotema no vale 10', async ({ page }) => {
+  test('HALLAZGO 3997 (REPARADO) · pirámide: A_b, P_b, h y ap son de la misma base regular', async ({ page }) => {
     // A_lat = P_b·ap/2 con UNA apotema exige base regular (o con incírculo centrado en el pie de la
-    // altura): entonces ap_base = 2·A_b/P_b = 2,87 y ap = √(9² + 2,87²) = 9,45, no 10. El pentágono
-    // regular de perímetro 30 (lado 6) tiene A = 61,94 cm²; 43,01 cm² es el de lado 5 (P = 25).
-    test.fail();
+    // altura): ap_base = 2·A_b/P_b y ap = √(h² + ap_base²). Antes: A_b = 43 (pentágono de lado 5)
+    // con P_b = 30 (el de lado 6) y ap = 10, que no cuadra. Ahora, pentágono regular de lado 6:
+    // A = 61,94 cm², ap = √(81 + 4,129²) = 9,90, A_lat = 148,53 cm², V = 185,81 cm³.
     await cargar(page);
     await filaDe(page, 'piramide').click();
     const titulo = await page.locator('#detalle-piramide h3').filter({ hasText: 'Ejemplo resuelto' }).innerText();
@@ -415,18 +420,24 @@ test.describe('Hallazgos de la inspección del 03/11/2026', () => {
       const areaRegular = (5 * lado * lado) / (4 * Math.tan(Math.PI / 5));
       expect.soft(Math.abs(areaRegular - Ab), `pentágono regular de P = ${Pb}: A = ${areaRegular}`).toBeLessThan(0.5);
     }
+    expect(Number.isFinite(Ab) && Number.isFinite(ap)).toBe(true);
+    const pasos = await pasosDe(page, 'piramide').innerText();
+    expect(pasos).toContain('A_lat = (30 · 9,902) / 2 = 148,53 cm²');
+    expect(pasos).toContain('V = (61,94 · 9) / 3 = 185,81 cm³');
   });
 
-  test('HALLAZGO (03/11/2026, ABIERTO) · «Pirámide recta (base cualquiera)» con un área lateral que solo vale para base regular', async ({ page }) => {
+  test('HALLAZGO 3998 (REPARADO) · la fila es «Pirámide regular»: su área lateral solo vale para base regular', async ({ page }) => {
     // Base rectangular 6 × 4, h = 4: las caras sobre los lados de 6 tienen apotema √(16 + 4) = 4,47
     // y las de 4, √(16 + 9) = 5. A_lat = 6·4,47 + 4·5 = 46,83 m²; P_b·ap/2 no tiene una «ap» que
     // poner (con 5 daría 50; con 4,47, 44,72). El volumen A_b·h/3 sí vale para cualquier base.
-    test.fail();
     await cargar(page);
     await filaDe(page, 'piramide').click();
-    const nombre = (await nombresDeFilas(page)).find((n) => n.startsWith('Pirámide recta')) ?? '';
+    const nombres = await nombresDeFilas(page);
+    expect(nombres).not.toContain('Pirámide recta (base cualquiera)');
+    expect(nombres).toContain('Pirámide regular');
     const detalle = await page.locator('#detalle-piramide').innerText();
-    expect(/base cualquiera/.test(nombre) && !/regular/i.test(detalle)).toBe(false);
+    expect(detalle).toMatch(/ap_base = apotema de la base/);
+    expect(detalle).toMatch(/volumen vale con cualquier base/);
   });
 
   test('HALLAZGO (03/11/2026, ABIERTO) · pirámide cuadrangular: la apotema de la cara no es una «arista»', async ({ page }) => {
@@ -438,11 +449,10 @@ test.describe('Hallazgos de la inspección del 03/11/2026', () => {
     expect(await page.locator('#detalle-piramide-cuadrangular [class*="piePlano"]').innerText()).not.toMatch(/arista/i);
   });
 
-  test('HALLAZGO (03/11/2026, ABIERTO) · el buscador no encuentra «volumen del cono» ni «área de la esfera», palabras clave de su metadata', async ({ page }) => {
-    // La fila casa la consulta ENTERA como subcadena: «cono volumen» da 2 filas y «volumen cono», 0.
-    // «volumen del cilindro», «area de la esfera» y «volumen del cono» están en metadata.keywords y
-    // dan «0 de 48» con el aviso «No hay ninguna figura que coincida».
-    test.fail();
+  test('HALLAZGO 4000 (REPARADO) · el buscador encuentra «volumen del cono» y «área de la esfera», palabras clave de su metadata', async ({ page }) => {
+    // Antes la fila casaba la consulta ENTERA como subcadena: «cono volumen» daba 2 filas y
+    // «volumen cono», 0; «volumen del cilindro», «area de la esfera» y «volumen del cono» (de
+    // metadata.keywords) daban «0 de 48». Ahora palabra a palabra, sin orden y sin «del»/«de la».
     await cargar(page);
     const casos: [string, string][] = [
       ['volumen del cono', 'Cono'],
@@ -457,11 +467,10 @@ test.describe('Hallazgos de la inspección del 03/11/2026', () => {
     }
   });
 
-  test('HALLAZGO (03/11/2026, ABIERTO) · las fracciones no tienen lectura accesible: V del cono se anuncia «π·r²·h 3»', async ({ page }) => {
-    // Frac pinta numerador y denominador en dos <span> apilados sin nada que diga «entre». El nombre
-    // accesible de la fila es «… Volumen π·r²·h 3 …», «Área D·d 2» (rombo) y «Volumen 4 3 ·π·r³»
-    // (esfera). tabla-integrales lo reparó (hallazgo 3939) con un «entre» oculto a la vista.
-    test.fail();
+  test('HALLAZGO 4001 (REPARADO) · las fracciones se leen con «entre»: V del cono es «π·r²·h entre 3»', async ({ page }) => {
+    // Frac pintaba numerador y denominador en dos <span> apilados sin nada que dijera «entre», y el
+    // nombre accesible de la fila era «… Volumen π·r²·h 3 …». Ahora lleva un «entre» oculto a la
+    // vista, la receta del hallazgo 3939 de tabla-integrales.
     await cargar(page);
     const lee = /\s*(\/|entre|partido|sobre)\s*/.source;
     await expect.soft(filaDe(page, 'cono')).toHaveAccessibleName(new RegExp(`h${lee}3`), { timeout: 1000 });
