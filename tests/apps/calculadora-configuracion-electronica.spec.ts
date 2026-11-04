@@ -42,7 +42,8 @@ import { esperarHidratacion } from './_hidratacion';
  *     apartan de Madelung, y los veinte llevan el aviso de excepción. Pasa el 04/11/2026.
  *     (Con todas las cargas, 1.264 combinaciones: 130 abreviadas no suman; hallazgo A.)
  *
- * HALLAZGOS ABIERTOS el 04/11/2026, con `test.fail()` y el comentario «ABIERTO»:
+ * HALLAZGOS del 04/11/2026 (4040-4047), REPARADOS el mismo día en /reparar (el barrido de las
+ * 1.264 combinaciones vive ahora en tests/configuracion-electronica-motor.spec.ts):
  *   A · cationes del bloque f: la abreviada vacía el 5p/6p del núcleo y no suma
  *   B · Og⁻, Og²⁻, Og³⁻, Ts²⁻, Ts³⁻ y Lv³⁻ dejan la página en blanco
  *   C · cabo C0275: «tungs» y «tungsteno» no encuentran el W
@@ -233,7 +234,7 @@ test('barrido · solo las veinte excepciones que publica la FAQ se apartan de Ma
   // La lista que la propia app publica en «¿Cuántas excepciones hay realmente?»
   const EXCEPCIONES_FAQ = ['Cr', 'Cu', 'Nb', 'Mo', 'Ru', 'Rh', 'Pd', 'Ag', 'La', 'Ce', 'Gd', 'Pt', 'Au', 'Ac', 'Th', 'Pa', 'U', 'Np', 'Cm', 'Lr'];
   await expect(page.locator('h4', { hasText: '¿Cuántas excepciones hay realmente?' }).locator('xpath=following-sibling::p[1]')).toContainText(
-    'cromo, cobre, niobio, molibdeno, rutenio, rodio, paladio, plata, lantano, cerio, gadolinio, platino, oro, actinio, torio, protactinio, uranio, neptunio, curio y laurencio',
+    'cromo, cobre, niobio, molibdeno, rutenio, rodio, paladio, plata, lantano, cerio, gadolinio, platino, oro, actinio, torio, protactinio, uranio, neptunio, curio y lawrencio',
   );
   const etiquetas = await page
     .locator('[aria-label="Tabla periódica"] button')
@@ -256,10 +257,11 @@ test('barrido · solo las veinte excepciones que publica la FAQ se apartan de Ma
 });
 
 // ═══════════════════════════════════════════════════════════════════════════════════════════
-// HALLAZGOS ABIERTOS (04/11/2026)
+// HALLAZGOS del 04/11/2026 — REPARADOS
 // ═══════════════════════════════════════════════════════════════════════════════════════════
 
-// A · ABIERTO, hallazgo (inspector 04/11/2026). Al ionizar, el motor quita siempre del n más
+// A · REPARADO (hallazgo 4040). ionizar() vacía ahora primero lo que queda fuera del núcleo de
+// gas noble (6s → 5d → 4f) y solo después el núcleo. Lo que hacía: quitaba siempre del n más
 // alto, y en el bloque f eso vacía el 5p (n = 5) o el 6p (n = 6), que están DENTRO del núcleo
 // [Xe] o [Rn], antes que el 4f (n = 4) o el 5f (n = 5). La abreviada sale entonces con el
 // núcleo entero MÁS un 5p/6p suelto, y no suma: Eu³⁺ tiene 63 − 3 = 60 electrones y la app
@@ -267,8 +269,7 @@ test('barrido · solo las veinte excepciones que publica la FAQ se apartan de Ma
 // ofrece la app, 130 no suman (todas de Ce a Sg). Esperado: tras el 6s (y el 5d/6d) salen
 // electrones del 4f/5f, y el núcleo de gas noble queda intacto:
 //   Eu³⁺ (60 e⁻) = [Xe] 4f⁶ · Ce⁴⁺ (54 e⁻) = [Xe] · U⁴⁺ (88 e⁻) = [Rn] 5f² · U⁶⁺ (86 e⁻) = [Rn]
-test('A · ABIERTO: los cationes del bloque f conservan el núcleo de gas noble y la abreviada suma', async ({ page }) => {
-  test.fail();
+test('A · REPARADO: los cationes del bloque f conservan el núcleo de gas noble y la abreviada suma', async ({ page }) => {
   await abrir(page);
   const casos: [string, string, number, string, string, number][] = [
     ['Europio', 'Eu', 63, 'Eu³⁺', '[Xe] 4f⁶', 60],
@@ -284,41 +285,49 @@ test('A · ABIERTO: los cationes del bloque f conservan el núcleo de gas noble 
   }
 });
 
-// B · ABIERTO, hallazgo (inspector 04/11/2026). La app ofrece cargas negativas a los tres
+// B · REPARADO (hallazgo 4041): los botones solo ofrecen cargas con 1 a 118 electrones, al
+// elegir un elemento con una carga que no cabe la carga vuelve a neutro, y si aun así llegara
+// una, la página muestra el neutro en vez de quedarse en blanco. Lo que hacía: ofrecía cargas negativas a los tres
 // últimos elementos, pero el motor no admite más de 118 electrones: analizar() devuelve null
 // y la página entera devuelve null (`if (!resultado) return null;`). Og⁻, Og²⁻, Og³⁻, Ts²⁻,
 // Ts³⁻ y Lv³⁻ dejan la pantalla en blanco, sin logo, sin buscador y sin forma de volver salvo
 // recargando. También se llega sin pulsar la carga: el ejemplo «O²⁻» deja la carga en −2 y al
 // elegir después el Og (118 + 2 = 120 electrones) la página desaparece.
 // Esperado: el h1 y el buscador siguen ahí (el botón no se ofrece o se avisa).
-test.describe('B · ABIERTO: una carga de más de 118 electrones no deja la página en blanco', () => {
-  test('Og⁻', async ({ page }) => {
-    test.fail();
+test.describe('B · REPARADO: una carga de más de 118 electrones no deja la página en blanco', () => {
+  test('el Og no ofrece aniones; el Ts solo Ts⁻ y el Lv hasta Lv²⁻', async ({ page }) => {
     await abrir(page);
+    const botones = page.getByRole('group', { name: 'Carga del ion' }).getByRole('button');
     await elegir(page, 'Oganesón', 'Og', 118);
-    await carga(page, 'Og⁻');
-    await expect(page.locator('h1')).toHaveText('Configuración electrónica', { timeout: 3000 });
-    await expect(page.locator('#buscador')).toBeVisible({ timeout: 3000 });
+    await expect(botones.first()).toHaveText('Neutro');
+    await expect(botones.filter({ hasText: '⁻' })).toHaveCount(0);
+    await elegir(page, 'Teneso', 'Ts', 117);
+    await expect(botones.filter({ hasText: '⁻' })).toHaveText(['Ts⁻']);
+    await elegir(page, 'Livermorio', 'Lv', 116);
+    await expect(botones.filter({ hasText: '⁻' })).toHaveText(['Lv²⁻', 'Lv⁻']);
+    await expect(page.locator('h1')).toHaveText('Configuración electrónica');
   });
 
-  test('el ejemplo O²⁻ y después el oganesón', async ({ page }) => {
-    test.fail();
+  test('el ejemplo O²⁻ y después el oganesón: vuelve a neutro y la página sigue en pie', async ({ page }) => {
     await abrir(page);
     await page.getByRole('button', { name: /O²⁻/ }).click();
     await expect(page.locator('#titulo-resultado')).toHaveText('Ion Oxígeno 2−');
     await elegir(page, 'Oganesón', 'Og', 118);
     await expect(page.locator('h1')).toHaveText('Configuración electrónica', { timeout: 3000 });
+    await expect(page.locator('#buscador')).toBeVisible();
+    await expect(page.locator('#titulo-resultado')).toHaveText('Oganesón');
+    await expect(page.locator('#titulo-resultado').locator('xpath=following-sibling::p[1]')).toContainText('118 electrones');
   });
 });
 
-// C · ABIERTO, hallazgo (inspector 04/11/2026) — cabo C0275. El commit 21b793a0 (30/10/2026,
+// C · REPARADO (hallazgo 4042) — cabo C0275: `otrosNombres: ['Tungsteno']` en el motor y el
+// buscador mira también los otros nombres. Lo que pasaba: el commit 21b793a0 (30/10/2026,
 // C0504) cambió el nombre del W a «Wolframio» sin el alias, y el buscador compara con
 // nombre.startsWith: «tungs» y «tungsteno» ya no encuentran nada. tabla-periodica lo resolvió
 // en 490be061 con `otrosNombres: ['Tungsteno']` y la búsqueda sobre ellos; su comentario ancla
 // el nombre preferente: «wolframio» (acuerdo RAC-RAE-RSEQ-Fundéu, An. Quím. 113, 2017, 65-67)
 // y «tungsteno», que recoge el DLE. Esperado: una sugerencia, el W.
-test('C · ABIERTO (cabo C0275): «tungs» y «tungsteno» encuentran el wolframio', async ({ page }) => {
-  test.fail();
+test('C · REPARADO (cabo C0275): «tungs» y «tungsteno» encuentran el wolframio', async ({ page }) => {
   await abrir(page);
   for (const q of ['tungs', 'tungsteno']) {
     await page.fill('#buscador', q);
@@ -327,13 +336,13 @@ test('C · ABIERTO (cabo C0275): «tungs» y «tungsteno» encuentran el wolfram
   }
 });
 
-// D · ABIERTO, hallazgo (inspector 04/11/2026). El buscador compara con toLowerCase().startsWith
+// D · REPARADO (hallazgo 4043): el buscador normaliza (minúsculas, sin tildes) la consulta y los
+// nombres, como tabla-periodica. Lo que pasaba: el buscador comparaba con toLowerCase().startsWith
 // sin quitar tildes: «oxigeno», «nitrogeno» e «hidrogeno» no dan ninguna sugerencia y Enter no
 // hace nada, sin aviso. Afecta a los 14 nombres con tilde (Hidrógeno, Nitrógeno, Oxígeno,
 // Flúor, Neón, Fósforo, Argón, Níquel, Arsénico, Kriptón, Xenón, Tántalo, Radón, Oganesón).
 // tabla-periodica normaliza el texto antes de comparar. Esperado: una sugerencia cada uno.
-test('D · ABIERTO: el buscador encuentra los nombres escritos sin tilde', async ({ page }) => {
-  test.fail();
+test('D · REPARADO: el buscador encuentra los nombres escritos sin tilde', async ({ page }) => {
   await abrir(page);
   for (const [q, nombre] of [
     ['oxigeno', 'Oxígeno'],
@@ -346,53 +355,61 @@ test('D · ABIERTO: el buscador encuentra los nombres escritos sin tilde', async
   }
 });
 
-// E · ABIERTO, hallazgo (inspector 04/11/2026). El elemento 103 se llama «Lawrencio» en la ficha,
+// E · REPARADO (hallazgo 4044): «lawrencio» en toda la app, como tabla-periodica y
+// simulador-tabla-periodica-tendencias, y «Laurencio» como alias del buscador. Lo que pasaba: el elemento 103 se llamaba «Lawrencio» en la ficha,
 // la tabla y el buscador, pero «laurencio» en la FAQ visible y en el texto de su propio aviso de
 // excepción («En el laurencio los efectos relativistas…»); buscar «laurencio» no da nada.
 // Esperado: el aviso de excepción del Lr nombra el elemento como lo nombra su ficha.
-test('E · ABIERTO: el Lr se llama igual en su ficha y en su aviso de excepción', async ({ page }) => {
-  test.fail();
+test('E · REPARADO: el Lr se llama igual en su ficha y en su aviso de excepción', async ({ page }) => {
   await abrir(page);
   await elegir(page, 'Lawrencio', 'Lr', 103);
   const nombre = ((await page.locator('#titulo-resultado').textContent()) ?? '').trim().toLowerCase();
   const aviso = page.locator('h3', { hasText: 'Este elemento es una excepción' }).locator('xpath=..');
   expect(((await aviso.textContent()) ?? '').toLowerCase()).toContain(`en el ${nombre}`);
+  // y la otra forma sigue encontrándolo
+  await page.fill('#buscador', 'laurencio');
+  await expect(sugerencias(page)).toHaveCount(1, { timeout: 3000 });
+  await expect(sugerencias(page).first()).toContainText('Lawrencio');
 });
 
-// F · ABIERTO, hallazgo (inspector 04/11/2026). El aria-label de los tres botones «Copiar» es
+// F · REPARADO (hallazgo 4045): `Copiar la configuración ${titulo}`. Lo que pasaba: el aria-label de los tres botones «Copiar» es
 // `Copiar la configuración en orden ${titulo}`, y el título ya trae su propia frase: un lector
 // de pantalla oye «Copiar la configuración en orden en orden de llenado», «… en orden ordenada
 // por niveles» y «… en orden abreviada con gas noble». Esperado: ninguno repite «en orden».
-test('F · ABIERTO: los botones de copiar tienen un nombre accesible gramatical', async ({ page }) => {
-  test.fail();
+test('F · REPARADO: los botones de copiar tienen un nombre accesible gramatical', async ({ page }) => {
   await abrir(page);
   const nombres = await page
     .locator('button', { hasText: /^Copiar$/ })
     .evaluateAll((bs) => bs.map((b) => b.getAttribute('aria-label') ?? ''));
-  expect(nombres).toHaveLength(3);
-  for (const n of nombres) expect(n).not.toMatch(/en orden (en orden|ordenada|abreviada)/);
+  expect(nombres).toEqual([
+    'Copiar la configuración en orden de llenado',
+    'Copiar la configuración ordenada por niveles',
+    'Copiar la configuración abreviada con gas noble',
+  ]);
 });
 
-// G · ABIERTO, hallazgo (inspector 04/11/2026). La tarjeta «Repaso antes de un examen» afirma
+// G · REPARADO (hallazgo 4046): la tarjeta dice ya sin cifra por qué conviene practicarlos. Lo que pasaba: la tarjeta «Repaso antes de un examen» afirma
 // que las excepciones y los aniones «son el 20 % de las preguntas», sin fuente ni contexto
 // (neutralidad editorial, regla 1: cifras sin fuente). Esperado: la cifra con su fuente, o sin cifra.
-test('G · ABIERTO: la guía no da el «20 % de las preguntas» sin fuente', async ({ page }) => {
-  test.fail();
+test('G · REPARADO: la guía no da el «20 % de las preguntas» sin fuente', async ({ page }) => {
   await abrir(page);
   await expect(page.locator('main')).not.toContainText('son el 20 % de las preguntas');
+  await expect(page.locator('main')).not.toContainText(/\d+\s?% de las preguntas/);
 });
 
-// H · ABIERTO, hallazgo (inspector 04/11/2026). Los desapareados deciden el magnetismo del ÁTOMO
+// H · REPARADO (hallazgo 4047): guía, ficha y FAQPage hablan del átomo aislado y avisan de que la
+// sustancia puede ser diamagnética (Cu metálico, N₂, Cl₂). Lo que pasaba: los desapareados deciden el magnetismo del ÁTOMO
 // aislado, pero la guía («Si queda algún electrón sin pareja, la sustancia es paramagnética») y
 // el FAQPage («la sustancia es paramagnética y es atraída por un imán… el hierro, con cuatro
 // desapareados, responde a un campo magnético») lo trasladan a la sustancia. Con el Cu la ficha
 // dice «Paramagnético · Es atraído por un campo magnético»; el cobre metálico, el N₂ o el Cl₂
 // son diamagnéticos aunque sus átomos tengan electrones sin pareja, y lo que hace al hierro
 // responder a un imán es el ferromagnetismo del metal. Esperado: la guía habla del átomo.
-test('H · ABIERTO: la guía no atribuye a la sustancia el magnetismo del átomo aislado', async ({ page }) => {
-  test.fail();
+test('H · REPARADO: la guía no atribuye a la sustancia el magnetismo del átomo aislado', async ({ page }) => {
   await abrir(page);
   await expect(page.locator('main')).not.toContainText('la sustancia es paramagnética');
   const faq = await page.locator('script[type="application/ld+json"]').allTextContents();
   expect(faq.join('\n')).not.toContain('la sustancia es paramagnética');
+  await elegir(page, 'Cobre', 'Cu', 29);
+  await expect(dato(page, 'Comportamiento magnético').locator('xpath=following-sibling::*[1]')).toContainText('átomo aislado');
 });

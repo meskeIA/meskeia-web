@@ -26,6 +26,8 @@ export interface ElementoCE {
   z: number;
   simbolo: string;
   nombre: string;
+  /** Otras formas aceptadas del nombre, para el buscador (las mismas que app/tabla-periodica) */
+  otrosNombres?: readonly string[];
 }
 
 export const ELEMENTOS: ElementoCE[] = [
@@ -58,7 +60,7 @@ export const ELEMENTOS: ElementoCE[] = [
   { z: 27, simbolo: 'Co', nombre: 'Cobalto' },
   { z: 28, simbolo: 'Ni', nombre: 'Níquel' },
   { z: 29, simbolo: 'Cu', nombre: 'Cobre' },
-  { z: 30, simbolo: 'Zn', nombre: 'Zinc' },
+  { z: 30, simbolo: 'Zn', nombre: 'Zinc', otrosNombres: ['Cinc'] },
   { z: 31, simbolo: 'Ga', nombre: 'Galio' },
   { z: 32, simbolo: 'Ge', nombre: 'Germanio' },
   { z: 33, simbolo: 'As', nombre: 'Arsénico' },
@@ -102,7 +104,7 @@ export const ELEMENTOS: ElementoCE[] = [
   { z: 71, simbolo: 'Lu', nombre: 'Lutecio' },
   { z: 72, simbolo: 'Hf', nombre: 'Hafnio' },
   { z: 73, simbolo: 'Ta', nombre: 'Tántalo' },
-  { z: 74, simbolo: 'W', nombre: 'Wolframio' },
+  { z: 74, simbolo: 'W', nombre: 'Wolframio', otrosNombres: ['Tungsteno'] },
   { z: 75, simbolo: 'Re', nombre: 'Renio' },
   { z: 76, simbolo: 'Os', nombre: 'Osmio' },
   { z: 77, simbolo: 'Ir', nombre: 'Iridio' },
@@ -131,7 +133,7 @@ export const ELEMENTOS: ElementoCE[] = [
   { z: 100, simbolo: 'Fm', nombre: 'Fermio' },
   { z: 101, simbolo: 'Md', nombre: 'Mendelevio' },
   { z: 102, simbolo: 'No', nombre: 'Nobelio' },
-  { z: 103, simbolo: 'Lr', nombre: 'Lawrencio' },
+  { z: 103, simbolo: 'Lr', nombre: 'Lawrencio', otrosNombres: ['Laurencio'] },
   { z: 104, simbolo: 'Rf', nombre: 'Rutherfordio' },
   { z: 105, simbolo: 'Db', nombre: 'Dubnio' },
   { z: 106, simbolo: 'Sg', nombre: 'Seaborgio' },
@@ -236,7 +238,7 @@ export const EXCEPCIONES: Record<number, Excepcion> = {
   92: { desde: { n: 5, l: 3 }, hacia: { n: 6, l: 2 }, cuantos: 1, motivo: INICIO_F },
   93: { desde: { n: 5, l: 3 }, hacia: { n: 6, l: 2 }, cuantos: 1, motivo: INICIO_F },
   96: { desde: { n: 5, l: 3 }, hacia: { n: 6, l: 2 }, cuantos: 1, motivo: 'El curio conserva el 5f semilleno (5f⁷) y coloca el electrón siguiente en el 6d.' },
-  103: { desde: { n: 6, l: 2 }, hacia: { n: 7, l: 1 }, cuantos: 1, motivo: 'En el laurencio los efectos relativistas hunden el 7p por debajo del 6d, y el último electrón entra ahí.' },
+  103: { desde: { n: 6, l: 2 }, hacia: { n: 7, l: 1 }, cuantos: 1, motivo: 'En el lawrencio los efectos relativistas hunden el 7p por debajo del 6d, y el último electrón entra ahí.' },
 };
 
 /** A partir de aquí las configuraciones publicadas son predicciones, no medidas */
@@ -311,17 +313,30 @@ export interface CambioIon {
  * n más alto (y dentro de él, el de l mayor). Es la diferencia entre el orden en
  * que los electrones ENTRAN y el orden en que SALEN, y la razón de que el hierro
  * pierda antes los electrones del 4s que los del 3d.
+ *
+ * Ese orden se aplica PRIMERO a los subniveles de fuera del núcleo de gas noble
+ * y solo después al núcleo. En el bloque f el 5p (o el 6p) es del núcleo [Xe]
+ * (o [Rn]) y tiene un n mayor que el 4f (o el 5f): con la regla a secas salía
+ * antes que el 4f y el Eu³⁺ quedaba «[Xe] 4f⁷ 5p⁵», que no suma sus 60
+ * electrones. Lo correcto es 6s → 5d → 4f: Eu³⁺ = [Xe] 4f⁶, Ce⁴⁺ = [Xe],
+ * U⁴⁺ = [Rn] 5f² (hallazgo 4040, 04/11/2026).
  */
 export function ionizar(neutro: Subnivel[], carga: number): { subniveles: Subnivel[]; cambios: CambioIon[] } {
   const copia = neutro.map((s) => ({ ...s }));
   const cambios: CambioIon[] = [];
 
   if (carga > 0) {
+    const z = neutro.reduce((suma, s) => suma + s.electrones, 0);
+    const gas = GASES_NOBLES.filter((g) => g < z).pop();
+    const nucleo = gas ? llenadoMadelung(gas) : [];
+    const delNucleo = (s: Orbital) => nucleo.some((x) => x.n === s.n && x.l === s.l);
     let porQuitar = carga;
     while (porQuitar > 0) {
       const ocupados = copia.filter((s) => s.electrones > 0);
       if (ocupados.length === 0) break;
-      const externo = ocupados.sort((a, b) => b.n - a.n || b.l - a.l)[0];
+      const externo = ocupados.sort(
+        (a, b) => Number(delNucleo(a)) - Number(delNucleo(b)) || b.n - a.n || b.l - a.l
+      )[0];
       const quita = Math.min(externo.electrones, porQuitar);
       externo.electrones -= quita;
       porQuitar -= quita;

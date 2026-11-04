@@ -73,6 +73,13 @@ const EJEMPLOS: { z: number; carga: number; nota: string }[] = [
 
 const CARGAS = [-3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7];
 
+/** El motor resuelve especies de 1 a 118 electrones: Og⁻ (119) no tiene configuración que dar. */
+const MAX_ELECTRONES = 118;
+const cargaPosible = (z: number, c: number) => z - c >= 1 && z - c <= MAX_ELECTRONES;
+
+/** Minúsculas y sin tildes, para que «oxigeno» encuentre el Oxígeno (como app/tabla-periodica). */
+const normalizar = (s: string) => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+
 const NOMBRE_SERIE: Record<'lantanidos' | 'actinidos', string> = {
   lantanidos: 'serie de los lantánidos',
   actinidos: 'serie de los actínidos',
@@ -84,15 +91,19 @@ export default function CalculadoraConfiguracionElectronica() {
   const [busqueda, setBusqueda] = useState('');
   const [copiado, setCopiado] = useState('');
 
-  const resultado = useMemo(() => analizar(z, carga), [z, carga]);
+  // Si la carga no cabe (no debería: los botones y elegirElemento lo impiden), se muestra el
+  // neutro en vez de dejar la página en blanco (hallazgo 4041).
+  const resultado = useMemo(() => analizar(z, carga) ?? analizar(z, 0), [z, carga]);
+  const cargaMostrada = resultado?.carga ?? 0;
 
   const sugerencias = useMemo(() => {
-    const q = busqueda.trim().toLowerCase();
+    const q = normalizar(busqueda.trim());
     if (!q) return [];
     return ELEMENTOS.filter(
       (e) =>
         e.simbolo.toLowerCase() === q ||
-        e.nombre.toLowerCase().startsWith(q) ||
+        normalizar(e.nombre).startsWith(q) ||
+        (e.otrosNombres ?? []).some((n) => normalizar(n).startsWith(q)) ||
         String(e.z) === q ||
         e.simbolo.toLowerCase().startsWith(q)
     ).slice(0, 8);
@@ -110,14 +121,14 @@ export default function CalculadoraConfiguracionElectronica() {
 
   const elegirElemento = (nuevoZ: number) => {
     setZ(nuevoZ);
-    if (nuevoZ - carga < 1) setCarga(0);
+    if (!cargaPosible(nuevoZ, carga)) setCarga(0);
     setBusqueda('');
   };
 
   if (!resultado) return null;
 
-  const especie = textoEspecie(resultado.elemento.simbolo, carga);
-  const nombreLargo = nombreEspecie(resultado.elemento.nombre, carga);
+  const especie = textoEspecie(resultado.elemento.simbolo, cargaMostrada);
+  const nombreLargo = nombreEspecie(resultado.elemento.nombre, cargaMostrada);
 
   return (
     <div className={styles.container}>
@@ -218,12 +229,12 @@ export default function CalculadoraConfiguracionElectronica() {
             <span aria-hidden="true">⚡</span> ¿Átomo neutro o ion?
           </h2>
           <div className={styles.cargasGrid} role="group" aria-label="Carga del ion">
-            {CARGAS.filter((c) => z - c >= 1).map((c) => (
+            {CARGAS.filter((c) => cargaPosible(z, c)).map((c) => (
               <button
                 key={c}
                 type="button"
-                className={`${styles.cargaBtn} ${c === carga ? styles.cargaBtnActiva : ''}`}
-                aria-pressed={c === carga}
+                className={`${styles.cargaBtn} ${c === cargaMostrada ? styles.cargaBtnActiva : ''}`}
+                aria-pressed={c === cargaMostrada}
                 onClick={() => setCarga(c)}
               >
                 {c === 0 ? 'Neutro' : textoEspecie(resultado.elemento.simbolo, c)}
@@ -312,16 +323,16 @@ export default function CalculadoraConfiguracionElectronica() {
           )}
 
           {/* Aviso de ionización */}
-          {carga !== 0 && resultado.cambiosIon.length > 0 && (
+          {cargaMostrada !== 0 && resultado.cambiosIon.length > 0 && (
             <div className={styles.avisoIon}>
               <h3 className={styles.avisoTitulo}>
                 <span aria-hidden="true">🔁</span>{' '}
-                {carga > 0 ? 'De dónde salen los electrones' : 'Dónde entran los electrones'}
+                {cargaMostrada > 0 ? 'De dónde salen los electrones' : 'Dónde entran los electrones'}
               </h3>
               <ul className={styles.listaCambios}>
                 {resultado.cambiosIon.map((c, i) => (
                   <li key={`${c.n}-${c.l}-${i}`}>
-                    {carga > 0 ? 'Salen' : 'Entran'} {c.cuantos}{' '}
+                    {cargaMostrada > 0 ? 'Salen' : 'Entran'} {c.cuantos}{' '}
                     {c.cuantos === 1 ? 'electrón' : 'electrones'} del{' '}
                     <strong>
                       {c.n}
@@ -330,11 +341,12 @@ export default function CalculadoraConfiguracionElectronica() {
                   </li>
                 ))}
               </ul>
-              {carga > 0 && (
+              {cargaMostrada > 0 && (
                 <p className={styles.avisoNota}>
-                  Los electrones salen del nivel n más alto, no del último subnivel escrito. Es el
-                  error clásico con los metales de transición: el 4s se llena antes que el 3d, pero
-                  se vacía antes también.
+                  Los electrones salen del nivel n más alto de los que quedan fuera del núcleo de gas
+                  noble, no del último subnivel escrito. Es el error clásico con los metales de
+                  transición: el 4s se llena antes que el 3d, pero se vacía antes también. En los
+                  lantánidos y actínidos, tras el s y el d sale el f.
                 </p>
               )}
             </div>
@@ -385,8 +397,8 @@ export default function CalculadoraConfiguracionElectronica() {
                 valor={resultado.paramagnetico ? 'Paramagnético' : 'Diamagnético'}
                 nota={
                   resultado.paramagnetico
-                    ? 'Es atraído por un campo magnético'
-                    : 'No es atraído: no le quedan electrones sueltos'
+                    ? 'El átomo aislado (en fase gaseosa) es atraído por un campo magnético'
+                    : 'El átomo aislado no es atraído: no le quedan electrones sueltos'
                 }
               />
               <Dato
@@ -469,7 +481,7 @@ export default function CalculadoraConfiguracionElectronica() {
             <p className={styles.subAyuda}>
               Cada diagonal recorre los subniveles con la misma suma n+l. Se sigue una diagonal
               entera de arriba abajo y se pasa a la siguiente. En verde, los que este{' '}
-              {carga === 0 ? 'átomo' : 'ion'} llega a ocupar.
+              {cargaMostrada === 0 ? 'átomo' : 'ion'} llega a ocupar.
             </p>
             <DiagramaMoller ocupados={resultado.porNivel} />
           </div>
@@ -636,9 +648,8 @@ export default function CalculadoraConfiguracionElectronica() {
             <div className={styles.escenarioCard}>
               <h4>Repaso antes de un examen</h4>
               <p>
-                Conviene practicar con las excepciones y con los aniones: son el 20 % de las
-                preguntas y donde se pierden más puntos, porque la regla general no basta y hay que
-                haberlas visto antes.
+                Conviene practicar con las excepciones y con los iones: es donde la regla general
+                no basta y hay que haberlos visto antes.
               </p>
             </div>
           </div>
@@ -681,8 +692,10 @@ export default function CalculadoraConfiguracionElectronica() {
               </span>
               <div className={styles.stepContent}>
                 <strong>Si es un catión, quita los electrones del final.</strong> Del nivel n más
-                alto hacia dentro, no del último subnivel que escribiste. Es el paso donde se
-                concentran casi todos los errores con metales de transición.
+                alto hacia dentro, no del último subnivel que escribiste, y sin tocar el núcleo de
+                gas noble mientras quede algo fuera de él (en el Eu³⁺, el 6s y luego el 4f, nunca
+                el 5p del [Xe]). Es el paso donde se concentran casi todos los errores con metales
+                de transición.
               </div>
             </li>
             <li className={styles.step}>
@@ -701,8 +714,8 @@ export default function CalculadoraConfiguracionElectronica() {
               </span>
               <div className={styles.stepContent}>
                 <strong>Dibuja las cajas si te piden desapareados.</strong> Un subnivel a medias es
-                el único que aporta electrones sin pareja, y de ahí sale si la sustancia es
-                paramagnética.
+                el único que aporta electrones sin pareja, y de ahí sale si el átomo aislado es
+                paramagnético.
               </div>
             </li>
           </ol>
@@ -728,7 +741,7 @@ export default function CalculadoraConfiguracionElectronica() {
               <p>
                 Veinte entre los elementos cuyo comportamiento se ha podido medir: cromo, cobre,
                 niobio, molibdeno, rutenio, rodio, paladio, plata, lantano, cerio, gadolinio,
-                platino, oro, actinio, torio, protactinio, uranio, neptunio, curio y laurencio. La
+                platino, oro, actinio, torio, protactinio, uranio, neptunio, curio y lawrencio. La
                 más llamativa es el paladio, único elemento que deja su capa más externa vacía.
               </p>
             </div>
@@ -811,8 +824,11 @@ export default function CalculadoraConfiguracionElectronica() {
               <div>
                 <strong>Asocia desapareados y magnetismo</strong>
                 <p>
-                  Si queda algún electrón sin pareja, la sustancia es paramagnética. Recordarlo así
-                  ahorra memorizar listas: el dato sale de las cajas que acabas de dibujar.
+                  Si queda algún electrón sin pareja, el átomo aislado es paramagnético. Recordarlo
+                  así ahorra memorizar listas: el dato sale de las cajas que acabas de dibujar. La
+                  sustancia puede comportarse de otro modo: el cobre metálico, el N₂ o el Cl₂ son
+                  diamagnéticos aunque sus átomos sueltos tengan electrones sin pareja, porque al
+                  enlazarse los emparejan.
                 </p>
               </div>
             </div>
@@ -927,7 +943,7 @@ function ConfigLinea({
           type="button"
           className={styles.copiarBtn}
           onClick={() => copiar(texto, titulo)}
-          aria-label={`Copiar la configuración en orden ${titulo.toLowerCase()}`}
+          aria-label={`Copiar la configuración ${titulo.toLowerCase()}`}
         >
           {copiado === titulo ? 'Copiado' : 'Copiar'}
         </button>

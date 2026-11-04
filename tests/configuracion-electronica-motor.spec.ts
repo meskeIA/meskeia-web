@@ -79,6 +79,35 @@ test.describe('Configuración de los 118 elementos neutros', () => {
     }
   });
 
+  test('la ABREVIADA suma los electrones de la especie en las 1.264 combinaciones que ofrece la app (hallazgo 4040)', () => {
+    // La regla que enseña la guía: «los superíndices tienen que sumar exactamente el número de
+    // electrones de la especie». Núcleo: [He] 2 · [Ne] 10 · [Ar] 18 · [Kr] 36 · [Xe] 54 · [Rn] 86.
+    // Hasta el 04/11/2026 fallaban 130 (Ce⁴⁺ a Sg⁷⁺): el catión del bloque f vaciaba el 5p/6p del
+    // núcleo antes que el 4f/5f y salía «[Xe] 4f⁷ 5p⁵» para el Eu³⁺.
+    const NUCLEO: Record<string, number> = { He: 2, Ne: 10, Ar: 18, Kr: 36, Xe: 54, Rn: 86, Og: 118 };
+    const SUP = '⁰¹²³⁴⁵⁶⁷⁸⁹';
+    const fallos: string[] = [];
+    let combinaciones = 0;
+    for (const e of ELEMENTOS) {
+      for (const carga of [-3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7]) {
+        const electrones = e.z - carga;
+        if (electrones < 1 || electrones > 118) continue; // la app no ofrece esos botones
+        combinaciones++;
+        const r = analizar(e.z, carga)!;
+        const texto = textoAbreviado(r);
+        const nucleo = texto.match(/^\[(\w+)\]/)?.[1];
+        const cola = [...texto.matchAll(/\d[spdf]([⁰¹²³⁴⁵⁶⁷⁸⁹]+)/g)].reduce(
+          (suma, m) => suma + Number([...m[1]].map((c) => SUP.indexOf(c)).join('')),
+          0,
+        );
+        const suma = (nucleo ? NUCLEO[nucleo] : 0) + cola;
+        if (suma !== electrones) fallos.push(`${textoEspecie(e.simbolo, carga)}: «${texto}» = ${suma} ≠ ${electrones}`);
+      }
+    }
+    expect(combinaciones).toBe(1264);
+    expect(fallos, fallos.slice(0, 10).join('\n')).toEqual([]);
+  });
+
   test('una carga imposible no devuelve una configuración vacía', () => {
     expect(analizar(1, 1)).toBeNull(); // H⁺ no tiene electrones
     expect(analizar(2, 3)).toBeNull(); // no se pueden quitar 3 electrones a 2
@@ -105,6 +134,15 @@ test.describe('Iones', () => {
     ['Cl⁻', 17, -1, '[Ne] 3s² 3p⁶'],
     ['N³⁻', 7, -3, '[He] 2s² 2p⁶'],
     ['H⁻ no tiene gas noble anterior', 1, -1, '1s²'],
+    // Bloque f (hallazgo 4040): tras el 6s/7s y el 5d/6d sale el 4f/5f, nunca el p del núcleo
+    ['Eu³⁺ vacía el 6s y luego el 4f, no el 5p del [Xe]', 63, 3, '[Xe] 4f⁶'],
+    ['Ce⁴⁺ queda como el xenón', 58, 4, '[Xe]'],
+    ['Gd³⁺ conserva el 4f semilleno', 64, 3, '[Xe] 4f⁷'],
+    ['Yb³⁺', 70, 3, '[Xe] 4f¹³'],
+    ['U⁴⁺', 92, 4, '[Rn] 5f²'],
+    ['U⁶⁺ queda como el radón', 92, 6, '[Rn]'],
+    ['Pu⁴⁺', 94, 4, '[Rn] 5f⁴'],
+    ['Am³⁺', 95, 3, '[Rn] 5f⁶'],
   ];
 
   for (const [nombre, z, carga, esperado] of casos) {
