@@ -1286,4 +1286,45 @@ test.describe('cabo C0610 · las líneas a/b del lienzo y sus letras', () => {
     }
     expect(fallos).toEqual([]);
   });
+
+  test('cabo C0627 · con «Comparar con N(0,1)», el rótulo de la curva de referencia llega a 4,5:1 en los dos temas', async ({
+    page,
+  }) => {
+    // REPARADO (04/11/2026): en claro colorEstandar era #E07A1F (2,89:1 sobre #FAFAFA para texto
+    // de 11 px, que exige 4,5:1). Ahora es --naranja-texto, como los límites (#B93E0B, 5,36:1);
+    // en oscuro sigue #FFB347 sobre #1A1A1A (≈ 10:1). Se mide el píxel más naranja y opaco de la
+    // caja del rótulo «N(0,1) referencia» (pad.left + 8, pad.top + 14), compuesto sobre el fondo.
+    test.setTimeout(60_000);
+    const fallos: string[] = [];
+    for (const tema of ['light', 'dark'] as const) {
+      await abrirC0367(page, RUTA, tema);
+      await page.getByLabel(/Comparar con N\(0,1\)/).check();
+      await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+      const { fondo } = await lienzoC0610(page);
+      const rotulo = await page.locator('canvas[aria-label="Gráfica de la distribución normal"]').evaluate((nodo, f) => {
+        const c = nodo as HTMLCanvasElement;
+        const ctx = c.getContext('2d')!;
+        const k = c.width / c.getBoundingClientRect().width;
+        const d = ctx.getImageData(Math.round(26 * k), Math.round(24 * k), Math.round(100 * k), Math.round(14 * k)).data;
+        let mejor = [0, 0, 0];
+        let puntos = -Infinity;
+        let alfa = 0;
+        for (let i = 0; i < d.length; i += 4) {
+          const a = d[i + 3] / 255;
+          const comp = [d[i] * a + f[0] * (1 - a), d[i + 1] * a + f[1] * (1 - a), d[i + 2] * a + f[2] * (1 - a)];
+          const p = (comp[0] - comp[2]) * a;
+          if (p > puntos) {
+            puntos = p;
+            mejor = comp;
+            alfa = d[i + 3];
+          }
+        }
+        return { color: mejor, alfa };
+      }, fondo);
+      expect(rotulo.alfa, `${tema}: el rótulo se pinta`).toBeGreaterThan(200);
+      const r = ratioC0367(rotulo.color, fondo);
+      if (r < 4.5) fallos.push(`${tema} · rótulo N(0,1): ${hexC0367(rotulo.color)} sobre ${hexC0367(fondo)} = ${r}:1 < 4,5`);
+    }
+    expect(fallos).toEqual([]);
+  });
 });
