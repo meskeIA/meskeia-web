@@ -49,7 +49,16 @@ import { esperarHidratacion, esperarValorEnReact, esperarPaginaAsentada } from '
  *       H.264 45 × 25/30 = 37,5 Mbps → 37,5 × 3600 / 8 = 16.875 MB ≈ 16,9 GB
  *       H.265 20,6 Mbps → 9270 MB ≈ 9,3 GB · ProRes 375 Mbps → 168,75 GB · RAW 1500 → 675 GB
  *
- * HALLAZGOS del 04/11/2026 — ABIERTOS (test.fail):
+ * REPARACIÓN del 04/11/2026 (/reparar, hallazgos 4048-4056): el motor escala ProRes y RAW con
+ * los píxeles desde su referencia en 4K a 30 fps (ProRes 450 · RAW 1.800 Mbps), 2K vale 12,8 Mbps
+ * en H.264, los tamaños van en unidades SI (1 GB = 1000 MB, y TB por encima de 1000 GB) y todo
+ * sale en formato español. Con eso cambian las cifras de los CASOS 1 y 2 en ProRes y RAW:
+ *   CASO 1 — 1080p · 25 fps: ProRes 450 × ¼ × 25/30 = 93,75 → 93,8 Mbps · RAW 1800 × ¼ × 25/30 = 375
+ *   CASO 2 — 8K · 120 fps: ProRes 450 × 4 × 4 = 7200 · RAW 1800 × 4 × 4 = 28.800 Mbps
+ *            → 28.800 × 36.000 s / 8 = 129.600.000 MB = 129,6 TB
+ *   (lo de arriba es la cuenta del Inspector con el modelo viejo, que se conserva como crónica).
+ *
+ * HALLAZGOS del 04/11/2026 — REPARADOS:
  *   A. «GB» = MB decimales ÷ 1024: CASO 1 da «1.81 GB» por 1,86 GB (−2,4 %).
  *   B. Formato no español en resultados, tabla, descripción y encabezado: «3.30 GB»,
  *      «24.8 Mbps», «16000 Mbps», «70312.50 GB», «1.5 min».
@@ -176,40 +185,41 @@ test.describe('Bitrate: el modelo del motor (regresión)', () => {
     await configurar(page, RE_1080, '25 fps', 'H.265', '45');
     expect(leerMbps((await resultados(page).textContent()) ?? '')).toBeCloseTo(5.5, 5);
     expect((await filaCodec(page, 'H.264')).mbps).toBeCloseTo(10, 5); // 12 × 25/30
-    expect((await filaCodec(page, 'ProRes 422')).mbps).toBeCloseTo(100, 5); // × 10
-    expect((await filaCodec(page, 'RAW')).mbps).toBeCloseTo(400, 5); // × 40
+    expect((await filaCodec(page, 'ProRes 422')).mbps).toBeCloseTo(93.8, 5); // 450 × ¼ × 25/30
+    expect((await filaCodec(page, 'RAW')).mbps).toBeCloseTo(375, 5); // 1800 × ¼ × 25/30
   });
 
-  test('CASO 2 — 8K · 120 fps · RAW · 600 min: 100 × 4 × 40 = 16.000 Mbps', async ({ page }) => {
+  test('CASO 2 — 8K · 120 fps · RAW · 600 min: 1800 × 4 (píxeles) × 4 (fps) = 28.800 Mbps', async ({ page }) => {
     await configurar(page, RE_8K, '120 fps', 'RAW', '600');
-    expect(leerMbps((await resultados(page).textContent()) ?? '')).toBe(16000);
+    expect(leerMbps((await resultados(page).textContent()) ?? '')).toBe(28800);
     expect((await filaCodec(page, 'H.264')).mbps).toBe(400);
     expect((await filaCodec(page, 'H.265')).mbps).toBe(220);
-    expect((await filaCodec(page, 'ProRes 422')).mbps).toBe(4000);
+    expect((await filaCodec(page, 'ProRes 422')).mbps).toBe(7200);
   });
 });
 
 test.describe('Tamaño del fichero', () => {
-  test('HALLAZGO ABIERTO A — CASO 1: 1856,25 MB son 1,86 GB, no «1.81 GB» (MB decimales ÷ 1024)', async ({
+  test('REPARADO A (4050) — CASO 1: 1856,25 MB son 1,86 GB, no «1.81 GB» (MB decimales ÷ 1024)', async ({
     page,
   }) => {
-    // HALLAZGO ABIERTO. lib/calculadoras/videografia.ts:219-220: tamano_gb = tamano_mb / 1024 con
-    // tamano_mb en MB DECIMALES (bitrate en 10^6 bit/s ÷ 8). Esperado 5,5 × 2700 / 8 = 1856,25 MB
-    // = 1,856·10^9 B (1,86 GB, o 1,73 GiB si se rotula GiB). Obtenido «1.81 GB» = −2,4 %.
+    // REPARADO el 04/11/2026. lib/calculadoras/videografia.ts dividía tamano_mb (MB DECIMALES)
+    // entre 1024. Esperado 5,5 × 2700 / 8 = 1856,25 MB = 1,856·10^9 B (1,86 GB). Antes «1.81 GB».
     // Tolerancia 1 %: la mitad del defecto, y holgada para el redondeo a dos decimales (0,27 %).
-    test.fail();
     await configurar(page, RE_1080, '25 fps', 'H.265', '45');
     const tamano = (await resultados(page).locator('[class*="resultadoValor"]').nth(1).textContent()) ?? '';
     const bytes = leerBytes(tamano);
     expect(Math.abs(bytes / 1.85625e9 - 1), `«${tamano}»`).toBeLessThan(0.01);
   });
 
-  test('HALLAZGO ABIERTO A — CASO 2: 72.000.000 MB son 72.000 GB (72 TB), no «70312.50 GB»', async ({ page }) => {
-    // HALLAZGO ABIERTO. Mismo defecto en el tramo más alto: 16.000 × 36.000 / 8 = 72·10^6 MB.
-    test.fail();
+  test('REPARADO A (4050) — CASO 2: 129.600.000 MB son 129,6 TB (unidades SI, y TB por encima de 1000 GB)', async ({
+    page,
+  }) => {
+    // REPARADO el 04/11/2026. Con el modelo reparado (hallazgo 4048) 8K RAW 120 fps = 28.800 Mbps:
+    // 28.800 × 36.000 / 8 = 129,6·10^6 MB = 129,6 TB. Se presenta en TB.
     await configurar(page, RE_8K, '120 fps', 'RAW', '600');
     const tamano = (await resultados(page).locator('[class*="resultadoValor"]').nth(1).textContent()) ?? '';
-    expect(Math.abs(leerBytes(tamano) / 72e12 - 1), `«${tamano}»`).toBeLessThan(0.01);
+    expect(tamano).toContain('TB');
+    expect(Math.abs(leerBytes(tamano) / 129.6e12 - 1), `«${tamano}»`).toBeLessThan(0.01);
   });
 
   test('el tamaño es proporcional a la duración (45 → 90 min duplica el tamaño)', async ({ page }) => {
@@ -222,41 +232,42 @@ test.describe('Tamaño del fichero', () => {
 });
 
 test.describe('Formato español', () => {
-  test('HALLAZGO ABIERTO B — resultados, tabla y encabezado en formato español (CASO 2 y 1,5 min)', async ({
+  test('REPARADO B (4053) — resultados, tabla y encabezado en formato español (CASO 2 y 1,5 min)', async ({
     page,
   }) => {
-    // HALLAZGO ABIERTO. videografia.ts:223 usa toFixed(2) y la página interpola el número
-    // (`${resultado.bitrate_mbps} Mbps`, `{duracionNum} min`). Esperado «16.000 Mbps»,
-    // «70.312,50 GB» (o su valor corregido), «1,5 min». Obtenido «16000 Mbps», «70312.50 GB»,
-    // «1.5 min». Patrones prohibidos: un punto decimal (\d.\d{1,2}) o 5+ cifras sin agrupar.
-    test.fail();
+    // REPARADO el 04/11/2026. El motor usaba toFixed(2) y la página interpolaba el número y el id
+    // de la resolución («16000 Mbps», «70312.50 GB», «1.5 min», «4k»). Ahora «28.800 Mbps»,
+    // «129,60 TB», «1,5 min», «8K». Patrones prohibidos: un punto decimal (\d.\d{1,2}) o 5+
+    // cifras sin agrupar.
     await configurar(page, RE_8K, '120 fps', 'RAW', '600');
-    const texto8k = `${await resultados(page).textContent()} ${await comparativa(page).textContent()}`;
+    // innerText y no textContent: separa las celdas («H.264» y «400 Mbps» no se funden en «264400»).
+    const texto8k = `${await resultados(page).innerText()} ${await comparativa(page).innerText()}`;
+    expect(texto8k).toContain('28.800 Mbps');
     await ponerDuracion(page, '1.5');
-    const texto15 = `${await resultados(page).textContent()} ${await comparativa(page).locator('h2').textContent()}`;
-    const texto = `${texto8k} ${texto15}`;
+    const h2 = (await comparativa(page).locator('h2').textContent()) ?? '';
+    expect(h2).toContain('8K · 120 fps · 1,5 min');
+    const texto = `${texto8k} ${await resultados(page).innerText()} ${h2}`;
     expect(texto.match(/\d\.\d{1,2}(?!\d)/g) ?? [], texto).toEqual([]);
     expect(texto.match(/\d{5,}/g) ?? [], texto).toEqual([]);
   });
 
-  test('HALLAZGO ABIERTO G — la guía no escribe «3,375 MB» (en español, tres megas) por 3375 MB', async ({
+  test('REPARADO G (4054) — la guía no escribe «3,375 MB» (en español, tres megas) por 3375 MB', async ({
     page,
   }) => {
-    // HALLAZGO ABIERTO. page.tsx:233: «(45 × 600 ÷ 8) = 3,375 MB ≈ 3,3 GB». 45 × 600 / 8 = 3375 MB
-    // (cuatro cifras, sin agrupar, RAE 2010) = 3,375 GB. Con la coma, un lector español lee 3 MB.
-    test.fail();
+    // REPARADO el 04/11/2026. Decía «(45 × 600 ÷ 8) = 3,375 MB ≈ 3,3 GB». 45 × 600 / 8 = 3375 MB
+    // (cuatro cifras, sin agrupar, RAE 2010) = 3,375 GB ≈ 3,4 GB.
     const guia = (await page.getByText('El tamaño final del archivo', { exact: false }).textContent()) ?? '';
     expect(guia).not.toContain('3,375 MB');
+    expect(guia).toContain('3375 MB ≈ 3,4 GB');
   });
 });
 
 test.describe('Escala con la resolución', () => {
-  test('HALLAZGO ABIERTO C — ProRes y RAW de 8K: ≈ 4 veces los de 4K (4 veces los píxeles)', async ({ page }) => {
-    // HALLAZGO ABIERTO. El motor multiplica una base H.264 (8K 100, 4K 45: ×2,22) por un factor
-    // fijo, también en los códecs intra-frame. Esperado: cociente de bitrates = cociente de
-    // píxeles (7680×4320 / 3840×2160 = 4), ±10 %. Obtenido: 1000/450 = 4000/1800 = 2,22 (a 30 fps):
-    // RAW 8K a 4,0 bits por fotosito frente a 7,2 en 4K, y el almacenamiento de 8K, −44 %.
-    test.fail();
+  test('REPARADO C (4048) — ProRes y RAW de 8K: ≈ 4 veces los de 4K (4 veces los píxeles)', async ({ page }) => {
+    // REPARADO el 04/11/2026. El motor multiplicaba una base H.264 (8K 100, 4K 45: ×2,22) por un
+    // factor fijo, también en los códecs intra-frame. Esperado: cociente de bitrates = cociente de
+    // píxeles (7680×4320 / 3840×2160 = 4), ±10 %. Antes: 1000/450 = 4000/1800 = 2,22 (a 30 fps).
+    // Ahora ProRes y RAW escalan por píxeles desde su referencia en 4K: 1800 y 7200 Mbps.
     const cocientePixeles = (await pixelesDe(page, RE_8K)) / (await pixelesDe(page, RE_4K));
     expect(cocientePixeles).toBe(4);
     await configurar(page, RE_4K, '30 fps', 'H.264', '10');
@@ -269,15 +280,12 @@ test.describe('Escala con la resolución', () => {
     expect(raw8k / raw4k / cocientePixeles, `RAW ${raw4k} → ${raw8k}`).toBeGreaterThan(0.9);
   });
 
-  test('HALLAZGO ABIERTO D — 2K (2048×1080) no dobla el bitrate de 1080p con un 6,7 % más de píxeles', async ({
+  test('REPARADO D (4049) — 2K (2048×1080) no dobla el bitrate de 1080p con un 6,7 % más de píxeles', async ({
     page,
   }) => {
-    // HALLAZGO ABIERTO. BITRATE_BASE_H264: 1080p 12 Mbps, 2K 25 Mbps (×2,08) para
-    // 2.211.840 / 2.073.600 = 1,067 veces los píxeles; en RAW, 15,1 bits por fotosito en 2K
-    // frente a 7,7 en 1080p. Esperado: cociente de bitrates / cociente de píxeles entre 0,75 y
-    // 1,35 (margen para cualquier códec y para un 2K rotulado con otras dimensiones).
-    // Obtenido: 2,08 / 1,067 = 1,95.
-    test.fail();
+    // REPARADO el 04/11/2026. BITRATE_BASE_H264 daba 1080p 12 Mbps y 2K 25 Mbps (×2,08) para
+    // 2.211.840 / 2.073.600 = 1,067 veces los píxeles. Esperado: cociente de bitrates / cociente
+    // de píxeles entre 0,75 y 1,35. Ahora 2K = 12,8 Mbps (12 × 1,067): relación 1,00.
     const cocientePixeles = (await pixelesDe(page, RE_2K)) / (await pixelesDe(page, RE_1080));
     await configurar(page, RE_1080, '30 fps', 'H.264', '10');
     const h264_1080 = (await filaCodec(page, 'H.264')).mbps;
@@ -291,31 +299,37 @@ test.describe('Escala con la resolución', () => {
 
 test.describe('CASO 3 — duraciones que no existen', () => {
   for (const valor of ['0', '-5', '']) {
-    test(`HALLAZGO ABIERTO E — duración «${valor}»: aviso, no el resultado de 1 minuto en silencio`, async ({
+    test(`REPARADO E (4051) — duración «${valor}»: aviso, no el resultado de 1 minuto en silencio`, async ({
       page,
     }) => {
-      // HALLAZGO ABIERTO. page.tsx:48-51: `isNaN(v) || v <= 0 ? 1 : v`. Esperado: un aviso
-      // (role="alert" dentro de <main>, no el anunciador de rutas de Next) y ningún tamaño
-      // presentado como si fuera de esa duración. Obtenido: «4k · 30 fps · 1 min», 45 Mbps
-      // → 338 MB, sin aviso.
-      test.fail();
+      // REPARADO el 04/11/2026. page.tsx hacía `isNaN(v) || v <= 0 ? 1 : v` y presentaba «4k · 30
+      // fps · 1 min», 45 Mbps → 338 MB, sin aviso. Ahora: aviso en role="alert" dentro de <main>
+      // (no el anunciador de rutas de Next), ningún tamaño y el encabezado sin duración.
       await ponerDuracion(page, valor);
       const h2 = (await comparativa(page).locator('h2').textContent()) ?? '';
-      const avisos = await page.locator('main [role="alert"]').count();
-      const calculaUnMinutoEnSilencio = /·\s*1 min/.test(h2) && avisos === 0;
-      expect(calculaUnMinutoEnSilencio, h2).toBe(false);
+      expect(h2).not.toMatch(/min/);
+      await expect(page.locator('main [role="alert"]')).toContainText('duración mayor que 0');
+      await expect(resultados(page)).not.toContainText(/\d\s*(KB|MB|GB|TB)\b/);
+      await expect(comparativa(page)).not.toContainText(/\d\s*(KB|MB|GB|TB)\b/);
+      // El bitrate no depende de la duración y se sigue mostrando.
+      expect(leerMbps((await resultados(page).textContent()) ?? '')).toBe(45);
     });
   }
+
+  test('con una duración válida el aviso está vacío', async ({ page }) => {
+    await ponerDuracion(page, '10');
+    await expect(page.locator('main [role="alert"]')).toHaveText('');
+    await expect(page.locator(DURACION)).toHaveAttribute('aria-invalid', 'false');
+  });
 });
 
 test.describe('FAQPage frente al motor', () => {
-  test('HALLAZGO ABIERTO F — «¿Cuánto espacio ocupa un vídeo 4K?»: las cifras del FAQPage son las de la app (±15 %)', async ({
+  test('REPARADO F (4052) — «¿Cuánto espacio ocupa un vídeo 4K?»: las cifras del FAQPage son las de la app (±15 %)', async ({
     page,
   }) => {
-    // HALLAZGO ABIERTO. metadata.ts:78. Esperado (motor, 4K 25 fps 60 min): H.264 16.875 MB,
-    // H.265 9270 MB, ProRes 168.750 MB, RAW 675.000 MB. FAQPage: 13 / 7 / 270 / 1.100 GB.
-    // Solo se compara la cifra que el FAQPage siga dando para cada códec.
-    test.fail();
+    // REPARADO el 04/11/2026. metadata.ts. Esperado (motor, 4K 25 fps 60 min): H.264 16.875 MB,
+    // H.265 9270 MB, ProRes 168.750 MB, RAW 675.000 MB. El FAQPage daba 13 / 7 / 270 / 1.100 GB;
+    // ahora 17 / 9 / 169 / 675 GB. Solo se compara la cifra que el FAQPage dé para cada códec.
     const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
     let respuesta = '';
     for (const b of bloques) {
@@ -357,14 +371,16 @@ test.describe('Accesibilidad', () => {
     return (l1 + 0.05) / (l2 + 0.05);
   }
 
-  test('HALLAZGO ABIERTO H — el texto blanco sobre el color de cada códec llega a 4,5:1 (tabla y botón activo)', async ({
+  for (const tema of ['light', 'dark'] as const) {
+  test(`REPARADO H (4055) — el texto blanco sobre el color de cada códec llega a 4,5:1 (tabla y botón activo, tema ${tema})`, async ({
     page,
   }) => {
-    // HALLAZGO ABIERTO. page.tsx:33-38 (CODECS[].color) por style={{ backgroundColor }} y
+    // REPARADO el 04/11/2026. page.tsx (CODECS[].color) por style={{ backgroundColor }} y
     // `color: white` en .codecBadge / .codecBtnActive. Texto de 12,8 px (badge) y 15,2 px (botón):
-    // 4,5:1. Obtenido en claro y oscuro: H.264 4,11 · H.265 2,80 · ProRes 2,26 · RAW 8,33.
-    test.fail();
+    // 4,5:1. Antes, en claro y oscuro: H.264 4,11 · H.265 2,80 · ProRes 2,26 · RAW 8,33. Ahora
+    // --primary-boton, --secondary-boton, #4A5A6A y --hero-bg.
     await esperarPaginaAsentada(page);
+    await page.evaluate((t) => document.documentElement.setAttribute('data-theme', t), tema);
     const bajos: string[] = [];
     const badges = await comparativa(page).locator('[class*="codecBadge"]').evaluateAll((els) =>
       els.map((e) => ({ t: e.textContent ?? '', c: getComputedStyle(e).color, f: getComputedStyle(e).backgroundColor })),
@@ -382,28 +398,26 @@ test.describe('Accesibilidad', () => {
     }
     expect(bajos).toEqual([]);
   });
+  }
 
-  test('HALLAZGO ABIERTO I — el nombre accesible del campo contiene su etiqueta visible', async ({ page }) => {
-    // HALLAZGO ABIERTO. page.tsx:157: aria-label «Duración del vídeo en minutos» sustituye a la
+  test('REPARADO I (4056) — el nombre accesible del campo contiene su etiqueta visible', async ({ page }) => {
+    // REPARADO el 04/11/2026. El aria-label «Duración del vídeo en minutos» sustituía a la
     // etiqueta visible «Duración del vídeo (minutos)» (WCAG 2.5.3, la etiqueta en el nombre).
-    test.fail();
     await expect(page.locator(DURACION)).toHaveAccessibleName(/Duración del vídeo \(minutos\)/, { timeout: 1000 });
   });
 
-  test('HALLAZGO ABIERTO I — los títulos de grupo no son <label> sin control', async ({ page }) => {
-    // HALLAZGO ABIERTO. page.tsx:87, 107 y 125: <label id=…> que no rotula ningún control
-    // (Resolución, Fotogramas por segundo, Códec); el grupo ya se nombra con aria-labelledby.
-    test.fail();
+  test('REPARADO I (4056) — los títulos de grupo no son <label> sin control', async ({ page }) => {
+    // REPARADO el 04/11/2026. <label id=…> que no rotulaba ningún control (Resolución,
+    // Fotogramas por segundo, Códec); el grupo ya se nombra con aria-labelledby. Ahora <span id>.
     const sinControl = await page
       .locator('main label')
       .evaluateAll((els) => els.filter((l) => !(l as HTMLLabelElement).control).map((l) => l.textContent));
     expect(sinControl).toEqual([]);
   });
 
-  test('HALLAZGO ABIERTO I — una sola región viva para el resultado (no dos anidadas)', async ({ page }) => {
-    // HALLAZGO ABIERTO. page.tsx:163 y 176: <section role="status" aria-live> contiene un
-    // <p role="status" aria-live>: el lector puede anunciar la descripción dos veces.
-    test.fail();
+  test('REPARADO I (4056) — una sola región viva para el resultado (no dos anidadas)', async ({ page }) => {
+    // REPARADO el 04/11/2026. <section role="status" aria-live> contenía un
+    // <p role="status" aria-live>: el lector podía anunciar la descripción dos veces.
     expect(await page.locator('[role="status"] [role="status"], [aria-live] [aria-live]').count()).toBe(0);
   });
 });

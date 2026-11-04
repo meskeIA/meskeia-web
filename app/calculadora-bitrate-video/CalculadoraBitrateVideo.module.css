@@ -227,6 +227,29 @@
   border-color: var(--primary);
 }
 
+.duracionInput[aria-invalid='true'] {
+  border-color: var(--rojo-texto, #b91c1c);
+}
+
+.avisoDuracion {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--rojo-texto, #b91c1c);
+}
+
+.avisoDuracion:empty {
+  display: none;
+}
+
+[data-theme='dark'] .duracionInput[aria-invalid='true'] {
+  border-color: #fca5a5;
+}
+
+[data-theme='dark'] .avisoDuracion {
+  color: #fca5a5;
+}
+
 /* ── Resultados destacados ───────────────────────────────────────────────────── */
 .resultadosPanel {
   background: var(--bg-card);

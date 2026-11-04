@@ -181,20 +181,46 @@ export interface ResultadoBitrateVideo {
   descripcion: string;
 }
 
+/** Dimensiones de cada resolución, las mismas que rotula la app (2K = DCI 2048×1080). */
+export const PIXELES_RESOLUCION: Record<TipoResolucionVideo, { ancho: number; alto: number; etiqueta: string }> = {
+  '8k':    { ancho: 7680, alto: 4320, etiqueta: '8K' },
+  '4k':    { ancho: 3840, alto: 2160, etiqueta: '4K' },
+  '2k':    { ancho: 2048, alto: 1080, etiqueta: '2K' },
+  '1080p': { ancho: 1920, alto: 1080, etiqueta: '1080p' },
+  '720p':  { ancho: 1280, alto: 720,  etiqueta: '720p' },
+  '480p':  { ancho: 854,  alto: 480,  etiqueta: '480p' },
+};
+
+const pixeles = (r: TipoResolucionVideo): number => PIXELES_RESOLUCION[r].ancho * PIXELES_RESOLUCION[r].alto;
+
+/**
+ * Códecs inter-frame (H.264, H.265): bitrate medio de referencia en H.264 a 30 fps. Crece menos
+ * que los píxeles porque la predicción entre fotogramas aprovecha más la redundancia a más
+ * resolución. 2K (2048×1080) tiene un 6,7 % más de píxeles que 1080p: 12 × 1,067 ≈ 12,8 Mbps.
+ * Hasta el 04/11/2026 valía 25, la cifra de un 2K de consumo (2560×1440) que la app no
+ * rotula (hallazgo 4049).
+ */
 const BITRATE_BASE_H264: Record<TipoResolucionVideo, number> = {
   '8k':    100,
   '4k':    45,
-  '2k':    25,
+  '2k':    12.8,
   '1080p': 12,
   '720p':  7,
   '480p':  3,
 };
 
-const CODEC_FACTOR: Record<TipoCodecVideo, number> = {
-  'h264':     1,
-  'h265':     0.55,
-  'prores422': 10,
-  'raw':      40,
+const FACTOR_H265 = 0.55;
+
+/**
+ * Códecs intra-frame (ProRes 422) y datos crudos (RAW): cada fotograma se codifica por separado,
+ * así que el bitrate es proporcional al número de fotositos. Referencia en 4K UHD a 30 fps (la de
+ * la FAQ visible: ProRes 422 ≈ 450 Mbps; RAW ≈ 1.800 Mbps, estimación) y se escala por píxeles.
+ * Hasta el 04/11/2026 se multiplicaba la base H.264 por un factor fijo, y 8K daba 2,22 veces 4K
+ * con 4 veces sus píxeles (hallazgo 4048).
+ */
+const REFERENCIA_INTRA_4K_30FPS: Record<'prores422' | 'raw', number> = {
+  'prores422': 450,
+  'raw':       1800,
 };
 
 const CODEC_NOMBRE: Record<TipoCodecVideo, string> = {
@@ -204,25 +230,40 @@ const CODEC_NOMBRE: Record<TipoCodecVideo, string> = {
   'raw':      'RAW (estimación)',
 };
 
+/** Cifra en formato español con hasta `decimales` decimales («16.000», «24,8», «1,5»). */
+function cifra(n: number, decimales: number): string {
+  return n.toLocaleString('es-ES', { maximumFractionDigits: decimales });
+}
+
+/** Cifra en formato español con exactamente dos decimales («1,86», «72,00»). */
+function cifra2(n: number): string {
+  return n.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
 export function calcularBitrateVideo(
   resolucion: TipoResolucionVideo,
   fps: number,
   duracion_min: number,
   codec: TipoCodecVideo,
 ): ResultadoBitrateVideo {
-  const bitrate_base = BITRATE_BASE_H264[resolucion];
-  const factor_fps   = fps / 30;
-  const factor_codec = CODEC_FACTOR[codec];
-  const bitrate_mbps = Math.round(bitrate_base * factor_fps * factor_codec * 10) / 10;
+  const factor_fps = fps / 30;
+  const bitrate_30fps =
+    codec === 'h264' ? BITRATE_BASE_H264[resolucion]
+    : codec === 'h265' ? BITRATE_BASE_H264[resolucion] * FACTOR_H265
+    : REFERENCIA_INTRA_4K_30FPS[codec] * (pixeles(resolucion) / pixeles('4k'));
+  const bitrate_mbps = Math.round(bitrate_30fps * factor_fps * 10) / 10;
 
-  const duracion_s   = duracion_min * 60;
-  const tamano_mb    = (bitrate_mbps * duracion_s) / 8;
-  const tamano_gb    = tamano_mb / 1024;
+  // Unidades decimales del SI, como las rotulan Windows y macOS para los discos: 1 MB = 10^6 B,
+  // 1 GB = 10^9 B. Hasta el 04/11/2026 los GB salían de MB decimales ÷ 1024 (hallazgo 4050).
+  const duracion_s = duracion_min * 60;
+  const tamano_mb  = (bitrate_mbps * duracion_s) / 8;
+  const tamano_gb  = tamano_mb / 1000;
 
   let tamano_formateado: string;
-  if      (tamano_gb >= 1)    tamano_formateado = `${tamano_gb.toFixed(2)} GB`;
-  else if (tamano_mb >= 1)    tamano_formateado = `${Math.round(tamano_mb)} MB`;
-  else                        tamano_formateado = `${Math.round(tamano_mb * 1024)} KB`;
+  if      (tamano_gb >= 1000) tamano_formateado = `${cifra2(tamano_gb / 1000)} TB`;
+  else if (tamano_gb >= 1)    tamano_formateado = `${cifra2(tamano_gb)} GB`;
+  else if (tamano_mb >= 1)    tamano_formateado = `${cifra(Math.round(tamano_mb), 0)} MB`;
+  else                        tamano_formateado = `${cifra(Math.round(tamano_mb * 1000), 0)} KB`;
 
   return {
     resolucion,
@@ -232,8 +273,15 @@ export function calcularBitrateVideo(
     bitrate_mbps,
     tamano_gb: Math.round(tamano_gb * 100) / 100,
     tamano_formateado,
-    descripcion: `${resolucion} a ${fps} fps en ${CODEC_NOMBRE[codec]}: ≈${bitrate_mbps} Mbps → ${tamano_formateado} por cada ${duracion_min} min de vídeo.`,
+    descripcion:
+      `${PIXELES_RESOLUCION[resolucion].etiqueta} a ${cifra(fps, 2)} fps en ${CODEC_NOMBRE[codec]}: ` +
+      `≈${cifra(bitrate_mbps, 1)} Mbps → ${tamano_formateado} por cada ${cifra(duracion_min, 2)} min de vídeo.`,
   };
+}
+
+/** Bitrate en formato español para presentarlo («16.000», «24,8»). */
+export function formatearMbps(mbps: number): string {
+  return cifra(mbps, 1);
 }
 
 // ─── 5. Ángulo de campo (FOV) para vídeo ─────────────────────────────────────

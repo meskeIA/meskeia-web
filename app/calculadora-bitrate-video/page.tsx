@@ -10,8 +10,11 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
+import { parseSpanishNumber } from '@/lib';
 import {
   calcularBitrateVideo,
+  formatearMbps,
+  PIXELES_RESOLUCION,
   type TipoResolucionVideo,
   type TipoCodecVideo,
 } from '@/lib/calculadoras/videografia';
@@ -30,12 +33,23 @@ const RESOLUCIONES: { id: TipoResolucionVideo; etiqueta: string; pixels: string 
 
 const FPS_OPCIONES: number[] = [24, 25, 30, 50, 60, 120];
 
+// Fondo de la insignia y del botón activo, con texto blanco encima: todos ≥ 4,5:1 en los dos
+// temas. Hasta el 04/11/2026 eran los colores de marca puros (#2E86AB 4,11:1, #48A9A6 2,80:1,
+// #7FB3D3 2,26:1; hallazgo 4055).
 const CODECS: { id: TipoCodecVideo; etiqueta: string; color: string }[] = [
-  { id: 'h264',     etiqueta: 'H.264',     color: '#2E86AB' },
-  { id: 'h265',     etiqueta: 'H.265',     color: '#48A9A6' },
-  { id: 'prores422', etiqueta: 'ProRes 422', color: '#7FB3D3' },
-  { id: 'raw',      etiqueta: 'RAW',        color: '#1a5278' },
+  { id: 'h264',     etiqueta: 'H.264',     color: 'var(--primary-boton)' },   // 5,47:1
+  { id: 'h265',     etiqueta: 'H.265',     color: 'var(--secondary-boton)' }, // 5,15:1
+  { id: 'prores422', etiqueta: 'ProRes 422', color: '#4A5A6A' },              // 7,09:1
+  { id: 'raw',      etiqueta: 'RAW',        color: 'var(--hero-bg)' },        // 8,33:1
 ];
+
+/** Duración en minutos, o null si no es un número mayor que 0. */
+function leerDuracion(texto: string): number | null {
+  const v = parseSpanishNumber(texto);
+  return Number.isFinite(v) && v > 0 ? v : null;
+}
+
+const formatearMinutos = (min: number): string => min.toLocaleString('es-ES', { maximumFractionDigits: 2 });
 
 // ─── Componente principal ─────────────────────────────────────────────────────
 
@@ -45,15 +59,16 @@ export default function CalculadoraBitrateVideoPage() {
   const [codec, setCodec] = useState<TipoCodecVideo>('h264');
   const [duracion, setDuracion] = useState<string>('10');
 
-  const duracionNum = useMemo(() => {
-    const v = parseFloat(duracion.replace(',', '.'));
-    return isNaN(v) || v <= 0 ? 1 : v;
-  }, [duracion]);
+  // Hasta el 04/11/2026 una duración 0, negativa o vacía se sustituía en silencio por 1 minuto
+  // (hallazgo 4051). Ahora no hay tamaño hasta que la duración es válida; el bitrate no depende
+  // de ella y se sigue mostrando.
+  const duracionNum = useMemo(() => leerDuracion(duracion), [duracion]);
+  const duracionCalculo = duracionNum ?? 1;
 
   // Resultado para los parámetros seleccionados
   const resultado = useMemo(
-    () => calcularBitrateVideo(resolucion, fps, duracionNum, codec),
-    [resolucion, fps, duracionNum, codec],
+    () => calcularBitrateVideo(resolucion, fps, duracionCalculo, codec),
+    [resolucion, fps, duracionCalculo, codec],
   );
 
   // Comparativa de los 4 codecs con los mismos parámetros
@@ -61,10 +76,16 @@ export default function CalculadoraBitrateVideoPage() {
     () =>
       CODECS.map((c) => ({
         ...c,
-        resultado: calcularBitrateVideo(resolucion, fps, duracionNum, c.id),
+        resultado: calcularBitrateVideo(resolucion, fps, duracionCalculo, c.id),
       })),
-    [resolucion, fps, duracionNum],
+    [resolucion, fps, duracionCalculo],
   );
+
+  const etiquetaResolucion = PIXELES_RESOLUCION[resolucion].etiqueta;
+  const tituloComparativa =
+    duracionNum === null
+      ? `Comparativa de códecs para ${etiquetaResolucion} · ${fps} fps`
+      : `Comparativa de códecs para ${etiquetaResolucion} · ${fps} fps · ${formatearMinutos(duracionNum)} min`;
 
   return (
     <div className={styles.container}>
@@ -84,7 +105,7 @@ export default function CalculadoraBitrateVideoPage() {
         <section className={styles.configPanel} aria-label="Parámetros de vídeo">
           {/* Resolución */}
           <div className={styles.configGroup}>
-            <label id="resolucion-label" className={styles.configLabel}>Resolución</label>
+            <span id="resolucion-label" className={styles.configLabel}>Resolución</span>
             <div className={styles.selectorResolucion} role="group" aria-labelledby="resolucion-label">
               {RESOLUCIONES.map((r) => (
                 <button
@@ -104,7 +125,7 @@ export default function CalculadoraBitrateVideoPage() {
 
           {/* FPS */}
           <div className={styles.configGroup}>
-            <label id="fps-label" className={styles.configLabel}>Fotogramas por segundo (fps)</label>
+            <span id="fps-label" className={styles.configLabel}>Fotogramas por segundo (fps)</span>
             <div className={styles.selectorFps} role="group" aria-labelledby="fps-label">
               {FPS_OPCIONES.map((f) => (
                 <button
@@ -122,7 +143,7 @@ export default function CalculadoraBitrateVideoPage() {
 
           {/* Códec */}
           <div className={styles.configGroup}>
-            <label id="codec-label" className={styles.configLabel}>Códec</label>
+            <span id="codec-label" className={styles.configLabel}>Códec</span>
             <div className={styles.selectorCodec} role="group" aria-labelledby="codec-label">
               {CODECS.map((c) => (
                 <button
@@ -148,14 +169,17 @@ export default function CalculadoraBitrateVideoPage() {
               id="duracion-input"
               type="number"
               min={0.1}
-              max={600}
               step={0.5}
               value={duracion}
               onChange={(e) => setDuracion(e.target.value)}
               className={styles.duracionInput}
               inputMode="decimal"
-              aria-label="Duración del vídeo en minutos"
+              aria-invalid={duracionNum === null}
+              aria-describedby="duracion-aviso"
             />
+            <p id="duracion-aviso" className={styles.avisoDuracion} role="alert">
+              {duracionNum === null ? 'Introduce una duración mayor que 0 minutos para calcular el tamaño del archivo.' : ''}
+            </p>
           </div>
         </section>
 
@@ -164,23 +188,23 @@ export default function CalculadoraBitrateVideoPage() {
           <div className={styles.resultadoDestacadoGrid}>
             <div className={styles.resultadoDestacado}>
               <span className={styles.resultadoIcono} aria-hidden="true">📡</span>
-              <span className={styles.resultadoValor}>{resultado.bitrate_mbps} Mbps</span>
+              <span className={styles.resultadoValor}>{`${formatearMbps(resultado.bitrate_mbps)} Mbps`}</span>
               <span className={styles.resultadoEtiqueta}>Bitrate estimado</span>
             </div>
             <div className={styles.resultadoDestacado}>
               <span className={styles.resultadoIcono} aria-hidden="true">💾</span>
-              <span className={styles.resultadoValor}>{resultado.tamano_formateado}</span>
+              <span className={styles.resultadoValor}>{duracionNum === null ? '—' : resultado.tamano_formateado}</span>
               <span className={styles.resultadoEtiqueta}>Tamaño de archivo</span>
             </div>
           </div>
-          <p className={styles.resultadoDescripcion} role="status" aria-live="polite">
-            {resultado.descripcion}
+          <p className={styles.resultadoDescripcion}>
+            {duracionNum === null ? 'Sin duración válida no hay tamaño que calcular.' : resultado.descripcion}
           </p>
         </section>
 
         {/* ── Comparativa de códecs ── */}
         <section className={styles.comparativaSection} aria-label="Comparativa entre códecs">
-          <h2 className={styles.sectionTitle}>Comparativa de códecs para {resolucion} · {fps} fps · {duracionNum} min</h2>
+          <h2 className={styles.sectionTitle}>{tituloComparativa}</h2>
           <div className={styles.tablaComparativaWrapper}>
             <table className={styles.tablaComparativa}>
               <thead>
@@ -206,8 +230,8 @@ export default function CalculadoraBitrateVideoPage() {
                         {c.etiqueta}
                       </span>
                     </td>
-                    <td className={styles.celdaNumero}>{c.resultado.bitrate_mbps} Mbps</td>
-                    <td className={styles.celdaNumero}>{c.resultado.tamano_formateado}</td>
+                    <td className={styles.celdaNumero}>{`${formatearMbps(c.resultado.bitrate_mbps)} Mbps`}</td>
+                    <td className={styles.celdaNumero}>{duracionNum === null ? '—' : c.resultado.tamano_formateado}</td>
                     <td className={styles.celdaUso}>{usoTipico(c.id)}</td>
                   </tr>
                 ))}
@@ -230,7 +254,8 @@ export default function CalculadoraBitrateVideoPage() {
           </p>
           <p className={styles.eduParrafo}>
             El <strong>tamaño final del archivo</strong> depende del bitrate y de la duración: si grabas
-            a 45 Mbps durante 10 minutos, necesitas aproximadamente (45 × 600 ÷ 8) = 3,375 MB ≈ 3,3 GB.
+            a 45 Mbps durante 10 minutos, necesitas aproximadamente (45 × 600 ÷ 8) = 3375 MB ≈ 3,4 GB
+            (1 GB = 1000 MB, como lo cuentan Windows y macOS para los discos).
             Esta calculadora aplica esa fórmula teniendo en cuenta el efecto del fps y el factor de
             compresión de cada códec.
           </p>
@@ -264,14 +289,14 @@ export default function CalculadoraBitrateVideoPage() {
                 </tr>
                 <tr>
                   <td><strong>ProRes 422</strong></td>
-                  <td>Baja (≈×10 vs H.264)</td>
+                  <td>Baja (≈×10 vs H.264 en 4K; crece con los píxeles)</td>
                   <td>Alta; conserva mucho rango dinámico</td>
                   <td>Fluido en edición sin proxies</td>
                   <td>Producción profesional, documentales, posproducción</td>
                 </tr>
                 <tr>
                   <td><strong>RAW</strong></td>
-                  <td>Mínima (≈×40 vs H.264)</td>
+                  <td>Mínima (≈×40 vs H.264 en 4K; crece con los píxeles)</td>
                   <td>Máxima; datos crudos del sensor</td>
                   <td>Pesado; requiere software dedicado y hardware potente</td>
                   <td>Cine, efectos visuales, máxima flexibilidad en color</td>
