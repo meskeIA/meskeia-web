@@ -498,7 +498,9 @@ async function contrasteDe(elemento: Locator, propiedad: 'color' | 'fill'): Prom
   }, propiedad);
 }
 
-// ABIERTO (accesibilidad, medio) — rótulos y cifras de color por debajo de 4,5:1 (texto de 12-18 px).
+// HALLAZGO 4139 — REPARADO el 05/11/2026 (/reparar): los rótulos van con los tokens -texto
+// (textoDeTrazo) y el rojo de det(A), con --rojo-texto en claro y #ef9a9a en oscuro.
+// Lo que decía el caso (accesibilidad, medio) — rótulos y cifras de color por debajo de 4,5:1 (texto de 12-18 px).
 // Ningún candado lo ve: check:contraste-marca no mira el fill de un SVG, check:semanticos-claro solo
 // el claro y solo los .module.css (el naranja va en style={{}}), y el rojo literal de .metricaRoja
 // no es un token, así que check:token-oscuro tampoco lo mira en oscuro.
@@ -508,7 +510,6 @@ async function contrasteDe(elemento: Locator, propiedad: 'color' | 'fill'): Prom
 //       azules del SVG 3,87:1 · esperado ≥ 4,5:1 en todos.
 test.describe('Contraste de rótulos y cifras', () => {
   test('claro: rótulos del dibujo de Vectores y Transformaciones ≥ 4,5:1', async ({ page }) => {
-    test.fail(); // ABIERTO (inspector 05/11/2026) [accesibilidad/medio]
     await abrir(page);
     await esperarPaginaAsentada(page);
     const svg = page.locator('[role="tabpanel"] svg');
@@ -518,13 +519,24 @@ test.describe('Contraste de rótulos y cifras', () => {
       'u+v': await contrasteDe(svg.locator('text').filter({ hasText: 'u+v' }), 'fill'),
     };
     await pestana(page, 'Transformaciones', T_A);
+    medidas['Ae₁'] = await contrasteDe(page.locator('[role="tabpanel"] svg text').filter({ hasText: 'Ae₁' }), 'fill');
     medidas['Ae₂'] = await contrasteDe(page.locator('[role="tabpanel"] svg text').filter({ hasText: 'Ae₂' }), 'fill');
     const bajos = Object.entries(medidas).filter(([, r]) => r < 4.5);
     expect(bajos).toEqual([]);
   });
 
+  test('oscuro: rótulos del dibujo de Vectores ≥ 4,5:1', async ({ page }) => {
+    await page.addInitScript(() => window.localStorage.setItem('meskeia-theme', 'dark'));
+    await abrir(page);
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    await esperarPaginaAsentada(page);
+    const svg = page.locator('[role="tabpanel"] svg');
+    for (const rotulo of [/^u$/, /^v$/, /^u\+v$/]) {
+      expect(await contrasteDe(svg.locator('text').filter({ hasText: rotulo }), 'fill'), String(rotulo)).toBeGreaterThanOrEqual(4.5);
+    }
+  });
+
   test('oscuro: det(A) negativo en rojo ≥ 4,5:1', async ({ page }) => {
-    test.fail(); // ABIERTO (inspector 05/11/2026) [accesibilidad/medio]
     // La preferencia se guarda ANTES de cargar: sembrar data-theme tras el goto es una carrera.
     await page.addInitScript(() => window.localStorage.setItem('meskeia-theme', 'dark'));
     await abrir(page);

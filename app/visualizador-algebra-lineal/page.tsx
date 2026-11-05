@@ -211,6 +211,20 @@ interface FlechaVectorProps {
   dasharray?: string;
 }
 
+/**
+ * Color de TEXTO para el rótulo de una flecha del color de trazo dado. El trazo puede ir en el
+ * color de marca (es un gráfico, 3:1), pero el rótulo es texto de 12-13 px y pide 4,5:1: con el
+ * mismo fill, «v» y «Ae₂» daban 2,80:1, «u+v» 2,85:1 y «u» 4,11:1 sobre blanco (hallazgo 4139).
+ * Los tokens -texto cambian con el tema; el naranja solo existe en claro y en oscuro manda la
+ * reserva, que sobre el fondo oscuro ya cumple.
+ */
+const TEXTO_DE_TRAZO: Record<string, string> = {
+  '#2E86AB': 'var(--primary-texto)',
+  '#48A9A6': 'var(--secondary-texto)',
+  '#E67E22': 'var(--naranja-texto, #E67E22)',
+};
+const textoDeTrazo = (color: string): string => TEXTO_DE_TRAZO[color] ?? color;
+
 function FlechaVector({ desde, hasta, color, etiqueta, dasharray }: FlechaVectorProps) {
   const x1 = toSvgX(desde.x);
   const y1 = toSvgY(desde.y);
@@ -239,7 +253,7 @@ function FlechaVector({ desde, hasta, color, etiqueta, dasharray }: FlechaVector
         strokeDasharray={dasharray} />
       <polygon points={`${x2},${y2} ${ax1},${ay1} ${ax2},${ay2}`} fill={color} />
       {etiqueta && (
-        <text x={mx} y={my} fontSize="13" fontWeight="700" fill={color}>{etiqueta}</text>
+        <text x={mx} y={my} fontSize="13" fontWeight="700" style={{ fill: textoDeTrazo(color) }}>{etiqueta}</text>
       )}
     </g>
   );
@@ -341,7 +355,7 @@ function TabVectores() {
             <FlechaVector desde={{ x: 0, y: 0 }} hasta={suma} color="#E67E22" etiqueta="u+v" />
           </svg>
           <p className={styles.svgNota}>
-            La regla del paralelogramo: <strong style={{ color: '#E67E22' }}>u+v</strong> es la diagonal del paralelogramo formado por <strong style={{ color: 'var(--primary-texto)' }}>u</strong> y <strong style={{ color: 'var(--secondary-texto)' }}>v</strong>.
+            La regla del paralelogramo: <strong style={{ color: textoDeTrazo('#E67E22') }}>u+v</strong> es la diagonal del paralelogramo formado por <strong style={{ color: 'var(--primary-texto)' }}>u</strong> y <strong style={{ color: 'var(--secondary-texto)' }}>v</strong>.
           </p>
         </div>
       </div>
@@ -459,9 +473,9 @@ function TabTransformaciones() {
               x2={toSvgX(e2t.x)} y2={toSvgY(e2t.y)}
               stroke="#48A9A6" strokeWidth="2.5" />
             <text x={toSvgX(e1t.x) + 4} y={toSvgY(e1t.y) - 4}
-              fontSize="12" fontWeight="700" fill="#2E86AB">Ae₁</text>
+              fontSize="12" fontWeight="700" style={{ fill: textoDeTrazo('#2E86AB') }}>Ae₁</text>
             <text x={toSvgX(e2t.x) + 4} y={toSvgY(e2t.y) - 4}
-              fontSize="12" fontWeight="700" fill="#48A9A6">Ae₂</text>
+              fontSize="12" fontWeight="700" style={{ fill: textoDeTrazo('#48A9A6') }}>Ae₂</text>
           </svg>
           <p className={styles.svgNota}>
             La cuadrícula transformada revela cómo A estira/rota el plano. El <strong style={{ color: 'var(--primary-texto)' }}>azul</strong> y <strong style={{ color: 'var(--secondary-texto)' }}>teal</strong> son los vectores base transformados.
@@ -575,7 +589,7 @@ function TabDeterminante() {
             {/* Etiqueta de área */}
             <text x={toSvgX((v1.x + v2.x) / 2) - 10} y={toSvgY((v1.y + v2.y) / 2) + 5}
               fontSize="13" fontWeight="700"
-              fill={det < 0 ? '#c0392b' : '#2E86AB'}>
+              style={{ fill: det < 0 ? 'var(--rojo-texto, #EF9A9A)' : textoDeTrazo('#2E86AB') }}>
               Área = {cifra(area, 2)}
             </text>
           </svg>
@@ -696,7 +710,7 @@ function TabEigenvalores() {
               color="#E67E22" dasharray="5 3" etiqueta="Av₂" />
           </svg>
           <p className={styles.svgNota}>
-            Los eigenvectores <strong style={{ color: 'var(--primary-texto)' }}>v₁</strong> y <strong style={{ color: 'var(--secondary-texto)' }}>v₂</strong> no cambian de dirección. La transformación <strong style={{ color: '#E67E22' }}>Av</strong> (naranja punteado) queda siempre sobre el mismo eje.
+            Los eigenvectores <strong style={{ color: 'var(--primary-texto)' }}>v₁</strong> y <strong style={{ color: 'var(--secondary-texto)' }}>v₂</strong> no cambian de dirección. La transformación <strong style={{ color: textoDeTrazo('#E67E22') }}>Av</strong> (naranja punteado) queda siempre sobre el mismo eje.
           </p>
         </div>
       </div>

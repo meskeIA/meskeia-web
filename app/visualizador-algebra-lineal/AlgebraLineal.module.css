@@ -248,7 +248,10 @@
   font-family: 'Courier New', monospace;
 }
 
-.metricaRoja .metricaValor { color: #c0392b; }
+/* Rojo de texto: el token en claro; en oscuro, uno claro (con #c0392b daba 2,20:1 sobre
+   #373737, hallazgo 4139). */
+.metricaRoja .metricaValor { color: var(--rojo-texto, #c0392b); }
+[data-theme='dark'] .metricaRoja .metricaValor { color: #ef9a9a; }
 .metricaAmarilla .metricaValor { color: var(--naranja-texto, #e67e22); }
 
 /* ── Formula box ── */
