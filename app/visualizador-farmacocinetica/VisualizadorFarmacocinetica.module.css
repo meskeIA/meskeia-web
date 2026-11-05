@@ -424,6 +424,12 @@
   font-weight: 500;
 }
 
+/* Insignia AUC: el color de texto, aquí y no en línea, para darle su variante oscura */
+.curvaBadgeAuc {
+  background: rgba(46, 134, 171, 0.12);
+  color: var(--primary-texto);
+}
+
 /* ── Calculadora vida media ── */
 .calculadoraBox {
   background: rgba(46, 134, 171, 0.05);
@@ -465,9 +471,9 @@
   text-align: center;
 }
 
+/* Sin opacidad: blanco al 85 % y al 75 % sobre --primary-boton daba 4,45 y 3,85:1 (hallazgo 4127) */
 .calcResultadoLabel {
   font-size: 0.82rem;
-  opacity: 0.85;
 }
 
 .calcResultadoValor {
@@ -478,7 +484,6 @@
 
 .calcResultadoSub {
   font-size: 0.8rem;
-  opacity: 0.75;
 }
 
 /* ── CYP450 ── */
@@ -677,14 +682,27 @@
   background: rgba(46, 134, 171, 0.18);
 }
 
+/*
+ * Hallazgo 4127 (05/11/2026): en oscuro las insignias de inductor e inhibidor (#d4a017 y #e57373)
+ * daban de 3,63 a 4,42:1, la «fuente» de cada tarjeta CYP 4,35:1 y la insignia AUC 4,33:1.
+ * Ahora, tonos más claros y el texto secundario, que pasan de 4,5:1 sobre su tinte.
+ */
 [data-theme='dark'] .cypBadgeInductor {
   background: rgba(255, 193, 7, 0.12);
-  color: #d4a017;
+  color: #f0c75e;
 }
 
 [data-theme='dark'] .cypBadgeInhibidor {
   background: rgba(220, 53, 69, 0.12);
-  color: #e57373;
+  color: #f4a3a3;
+}
+
+[data-theme='dark'] .cypFuente {
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .curvaBadgeAuc {
+  color: #8ccbe8;
 }
 
 [data-theme='dark'] .cypCardInductor {
@@ -696,11 +714,11 @@
 }
 
 [data-theme='dark'] .cypTipoInductor {
-  color: #d4a017;
+  color: #f0c75e;
 }
 
 [data-theme='dark'] .cypTipoInhibidor {
-  color: #e57373;
+  color: #f4a3a3;
 }
 
 /* ── Responsive ── */

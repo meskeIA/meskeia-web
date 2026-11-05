@@ -92,6 +92,13 @@ const VD_EJEMPLOS = [
   { farmaco: 'Cloroquina', vd: '200–800 L/kg', tipo: 'Extremo', descripcion: 'Acumulación masiva en tejidos profundos', color: '#7FB3D3' },
 ];
 
+/** Color de texto para la cifra de Vd según el color (de marca) del borde de su tarjeta. */
+const TEXTO_VD: Record<string, string> = {
+  '#2E86AB': 'var(--primary-texto)',
+  '#48A9A6': 'var(--secondary-texto)',
+  '#7FB3D3': 'var(--text-primary)',
+};
+
 const FARMACOS_VIDA_MEDIA: FarmacoVidaMedia[] = [
   { nombre: 'Ibuprofeno', vidaMedia: '~2 h', categoria: 'AINE', nota: 'Eliminación rápida, dosificación 3-4 veces al día', horas: 2 },
   { nombre: 'Paracetamol', vidaMedia: '2–3 h', categoria: 'Analgésico', nota: 't½ se alarga en insuficiencia hepática', horas: 2.5 },
@@ -305,7 +312,9 @@ export default function VisualizadorFarmacocinetica() {
                   <div key={v.farmaco} className={styles.vdCard} style={{ borderLeftColor: v.color }}>
                     <div className={styles.vdTop}>
                       <span className={styles.vdFarmaco}>{v.farmaco}</span>
-                      <span className={styles.vdValor} style={{ color: v.color }}>{v.vd}</span>
+                      {/* La cifra va en un color de TEXTO: el de la tarjeta (borde) es de marca y daba
+                          de 2,26 a 4,11:1 (hallazgo 4127). */}
+                      <span className={styles.vdValor} style={{ color: TEXTO_VD[v.color] ?? 'var(--text-primary)' }}>{v.vd}</span>
                     </div>
                     <span className={styles.vdTipo}>{v.tipo}</span>
                     <p className={styles.vdDesc}>{v.descripcion}</p>
@@ -525,7 +534,7 @@ export default function VisualizadorFarmacocinetica() {
                 </p>
 
                 <div className={styles.curvaBadges}>
-                  <span className={styles.curvaBadge} style={{ background: 'rgba(46,134,171,0.12)', color: 'var(--primary-texto)' }}>
+                  <span className={`${styles.curvaBadge} ${styles.curvaBadgeAuc}`}>
                     AUC — Área bajo la curva (exposición total)
                   </span>
                   <span className={styles.curvaBadge} style={{ background: 'rgba(72,169,166,0.12)', color: 'var(--secondary-texto)' }}>

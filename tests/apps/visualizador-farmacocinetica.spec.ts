@@ -353,8 +353,9 @@ test.describe('visualizador-farmacocinetica', () => {
 
   // ------------------------------------------------------------------ accesibilidad
 
-  test('HALLAZGO ABIERTO [accesibilidad/medio]: los valores de Vd no llegan a 4,5:1 en claro', async ({ page }) => {
-    test.fail(); // HALLAZGO ABIERTO (inspector 05/11/2026) [accesibilidad/medio]
+  // HALLAZGO 4127 — REPARADO el 05/11/2026 (/reparar): cifras de Vd y rótulos Cmax/Tmax con los
+  // tokens de texto, el resultado sin opacidad y, en oscuro, insignias y «fuente» más claras.
+  test('HALLAZGO 4127 (REPARADO) [accesibilidad/medio]: los valores de Vd llegan a 4,5:1 en claro', async ({ page }) => {
     // ENTRADA  sección «D — Distribución», tema claro
     // ESPERADO texto de 14,4 px en negrita ≥ 4,5:1 (WCAG 1.4.3)
     // OBTENIDO #2E86AB 4,11:1 (heparina, warfarina), #48A9A6 2,80:1 (paracetamol, diazepam) y
@@ -369,17 +370,41 @@ test.describe('visualizador-farmacocinetica', () => {
     }
   });
 
-  test('HALLAZGO ABIERTO [accesibilidad/medio]: «Cmax», «Tmax» y el pie del resultado no llegan a 4,5:1', async ({ page }) => {
-    test.fail(); // HALLAZGO ABIERTO (inspector 05/11/2026) [accesibilidad/medio], el mismo que el anterior
+  test('HALLAZGO 4127 (REPARADO) [accesibilidad/medio]: «Cmax», «Tmax» y el pie del resultado llegan a 4,5:1', async ({ page }) => {
     // ENTRADA  curva C-T y resultado de la calculadora, tema claro
     // ESPERADO ≥ 4,5:1
     // OBTENIDO «Cmax»/«Tmax» con fill #48A9A6 sobre #FAFAFA: 2,68:1; «(95% del fármaco · …)» blanco
     //          al 75 % de opacidad sobre --primary-boton: 3,85:1; «Tiempo estimado…» al 85 %: 4,45:1
     const cmax = page.getByRole('img', { name: /Curva concentración/ }).locator('text', { hasText: 'Cmax' });
     expect(await contrasteDe(cmax)).toBeGreaterThanOrEqual(4.5);
+    const tmax = page.getByRole('img', { name: /Curva concentración/ }).locator('text', { hasText: 'Tmax' });
+    expect(await contrasteDe(tmax)).toBeGreaterThanOrEqual(4.5);
     await irAVidaMedia(page);
     const pie = panelResultado(page).locator('span').last();
     expect(await contrasteDe(pie)).toBeGreaterThanOrEqual(4.5);
+    const rotulo = panelResultado(page).locator('span').first();
+    expect(await contrasteDe(rotulo)).toBeGreaterThanOrEqual(4.5);
+  });
+
+  test('HALLAZGO 4127 (REPARADO) [accesibilidad/medio]: en oscuro, AUC, insignias CYP, «fuente» y Vd llegan a 4,5:1', async ({ page }) => {
+    // La preferencia se guarda ANTES de cargar: sembrar data-theme tras el goto es una carrera.
+    await page.addInitScript(() => window.localStorage.setItem('meskeia-theme', 'dark'));
+    await page.goto(URL_APP);
+    await esperarHidratacion(page, ['#slider-bio', '#slider-t12']);
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    const auc = page.locator('[class*="curvaBadgeAuc"]');
+    expect(await contrasteDe(auc), 'AUC').toBeGreaterThanOrEqual(4.5);
+    await page.getByRole('tab', { name: /CYP450/ }).click();
+    for (const sel of ['[class*="cypBadgeInductor"]', '[class*="cypBadgeInhibidor"]', '[class*="cypTipoInductor"]', '[class*="cypTipoInhibidor"]', '[class*="cypFuente"]']) {
+      const loc = page.locator(sel).first();
+      await expect(loc, sel).toBeVisible();
+      expect(await contrasteDe(loc), sel).toBeGreaterThanOrEqual(4.5);
+    }
+    await page.getByRole('button', { name: 'D Distribución' }).click();
+    const valores = page.locator('[class*="vdValor"]');
+    for (let i = 0; i < 6; i++) {
+      expect(await contrasteDe(valores.nth(i)), await valores.nth(i).innerText()).toBeGreaterThanOrEqual(4.5);
+    }
   });
 
   test('HALLAZGO ABIERTO [accesibilidad/bajo]: las pestañas declaran role="tab" sin el patrón de pestañas', async ({ page }) => {
