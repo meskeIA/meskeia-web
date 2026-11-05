@@ -1851,7 +1851,7 @@ export default function GeneradorAnagramasPage() {
               <strong>Sobre el diccionario utilizado</strong>
               <ul>
                 <li><strong>Fuente</strong>: Lemario General del Español de Ismael Olea (<a href="https://github.com/olea/lemarios" target="_blank" rel="noopener noreferrer">github.com/olea/lemarios</a>), distribuido en dominio público. Aproximadamente 87.000 lemas del español estándar.</li>
-                <li><strong>Lemas, no flexiones completas</strong>: El diccionario contiene formas base y flexiones frecuentes, pero puede no incluir todas las conjugaciones verbales raras o regionalismos muy específicos.</li>
+                <li><strong>Solo formas base</strong>: el diccionario recoge lemas, la forma con que una palabra entra en el diccionario, sin plurales ni verbos conjugados. MESA y CANTAR aparecen, pero MESAS y CANTABAS no. Tampoco recoge todos los regionalismos.</li>
                 <li><strong>No es árbitro oficial</strong>: Para partidas competitivas de Scrabble, usa siempre el diccionario oficial de la FISE. Este generador es una herramienta de práctica y aprendizaje.</li>
                 <li><strong>Tildes</strong>: da igual escribirlas o no. Las letras se comparan sin acentos en los tres modos, así que «corazon» encuentra «corazón» y al revés.</li>
               </ul>
