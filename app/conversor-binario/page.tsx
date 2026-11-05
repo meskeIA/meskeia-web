@@ -184,9 +184,9 @@ export default function ConversorBinarioPage() {
 
         {resultado && (
           <div className={styles.resultSection} role="status" aria-live="polite" aria-atomic="true">
-            <label className={styles.label}>
+            <span className={styles.label}>
               {modo === 'texto-binario' ? 'Código binario:' : 'Texto:'}
-            </label>
+            </span>
             <div className={styles.resultBox}>{resultado}</div>
             <button type="button" onClick={copiarResultado} className={styles.btnCopy}>
               <span aria-hidden="true">📋</span> Copiar
