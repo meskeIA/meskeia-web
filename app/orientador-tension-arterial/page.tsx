@@ -397,8 +397,10 @@ export default function CalculadoraTensionArterial() {
             sobre tu salud cardiovascular, <strong>consulta siempre a tu médico o especialista</strong>.
           </p>
           <p>
-            Ante síntomas graves (dolor en el pecho, dificultad para respirar, visión borrosa,
-            dolor de cabeza intenso, confusión, debilidad o dificultad para hablar),{' '}
+            Ante síntomas graves con la tensión alta (dolor en el pecho, dificultad para respirar,
+            dolor de cabeza intenso, visión borrosa, confusión, debilidad o dificultad para hablar,
+            mareo, náuseas o vómitos, ansiedad, zumbido en los oídos, sangrado por la nariz o
+            latidos irregulares),{' '}
             <strong>acude a urgencias o llama al 112</strong>. Una lectura muy elevada (grado 3) sin
             esos síntomas se repite en reposo y se consulta con tu médico <strong>ese mismo día</strong>.
           </p>

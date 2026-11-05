@@ -1308,11 +1308,12 @@ test.describe('Cabo C0103 · 04/11/2026', () => {
     expect(textoFaq).toContain(cita);
   });
 
-  // ABIERTO (04/11/2026), cabo C0103: la OMS manda buscar atención de inmediato con cualquiera de
-  // los doce síntomas de su ficha; la app solo cuenta cinco, y con los otros siete la rama que
-  // aplica es «Si no tienes ninguno de esos síntomas … contacta hoy mismo con tu médico».
-  test('HALLAZGO (04/11/2026, ABIERTO, cabo C0103) · con un síntoma de la lista de la OMS fuera de la de la app, la conducta de grado 3 no manda a atención inmediata', async ({ page }) => {
-    test.fail();
+  // REPARADO (05/11/2026), hallazgo 4115, cabo C0103: la OMS manda buscar atención de inmediato
+  // con cualquiera de los doce síntomas de su ficha; la app solo contaba cinco, y con los otros
+  // siete la rama que aplicaba era «Si no tienes ninguno de esos síntomas … contacta hoy mismo
+  // con tu médico». El usuario decidió el 04/11/2026 (cabo C0636) ampliar la lista con los siete
+  // de la OMS, citándola junto a van den Born.
+  test('HALLAZGO 4115 (04/11/2026, REPARADO, cabo C0103) · con un síntoma de la lista de la OMS fuera de la de la app, la conducta de grado 3 no mandaba a atención inmediata', async ({ page }) => {
     await medirHidratado(page, '185', '112');
     // Control: es grado 3 y la primera rama es la del 112 (si esto fallara, el test.fail
     // pasaría por otra razón).
@@ -1335,5 +1336,10 @@ test.describe('Cabo C0103 · 04/11/2026', () => {
     const comodin = /cualquier (otro )?síntoma/i.test(texto);
     const fuera = comodin ? [] : sintomasOms.filter(([, patron]) => !patron.test(texto)).map(([oms]) => oms);
     expect(fuera, 'síntomas de la OMS que llevan a «contacta hoy mismo con tu médico» en vez de a atención inmediata').toEqual([]);
+    // La OMS se cita junto a van den Born
+    await expect(page.locator('[class*="resultadoCriterio"]')).toContainText('OMS, ficha «Hypertension» (25/09/2025)');
+    // Y el aviso médico no colapsable nombra los mismos
+    const aviso = (await page.locator('body').textContent()) ?? '';
+    expect(aviso).toContain('sangrado por la nariz o latidos irregulares),');
   });
 });

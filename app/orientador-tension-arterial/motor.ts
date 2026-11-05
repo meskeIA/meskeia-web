@@ -78,13 +78,23 @@ export interface Clasificacion {
 // ─── Conducta ante una lectura de grado 3 (hallazgo 2564) ────────────────────
 
 /**
- * Síntomas de alarma: los «emergency symptoms» del documento de posición de la ESC Council on
- * Hypertension (van den Born et al., 2019): cefalea, alteraciones visuales, dolor torácico,
- * disnea y síntomas neurológicos focales o generales.
+ * Síntomas de alarma, unión de dos fuentes:
+ *   · Los «emergency symptoms» del documento de posición de la ESC Council on Hypertension
+ *     (van den Born et al., 2019): cefalea, alteraciones visuales, dolor torácico, disnea y
+ *     síntomas neurológicos focales o generales.
+ *   · Los de la ficha «Hypertension» de la OMS (25/09/2025, leída el 05/11/2026): «severe
+ *     headaches, chest pain, dizziness, difficulty breathing, nausea, vomiting, blurred vision
+ *     or other vision changes, anxiety, confusion, buzzing in the ears, nosebleeds, abnormal
+ *     heart rhythm» y «If you are experiencing any of these symptoms and a high blood pressure,
+ *     seek care immediately».
+ * Hasta el 05/11/2026 solo estaban los de van den Born, y quien tuviera náuseas, mareo o
+ * sangrado por la nariz con una lectura de grado 3 leía la rama «sin síntomas» (hallazgo 4115,
+ * cabo C0103; decisión del usuario del 04/11/2026, cabo C0636: ampliar con los siete de la OMS).
  */
 export const SINTOMAS_ALARMA =
   'dolor en el pecho, dificultad para respirar, dolor de cabeza intenso, visión borrosa o ' +
-  'alterada, confusión, o debilidad, hormigueo o dificultad para hablar';
+  'alterada, confusión, debilidad, hormigueo o dificultad para hablar, mareo, náuseas o ' +
+  'vómitos, ansiedad, zumbido en los oídos, sangrado por la nariz o latidos irregulares';
 
 /**
  * La conducta ante una lectura de grado 3 (≥ 180 y/o ≥ 110). Es el ÚNICO texto que dicen el
@@ -92,7 +102,7 @@ export const SINTOMAS_ALARMA =
  * instrucciones distintas para la misma lectura.
  */
 export const CONDUCTA_GRADO_3 = {
-  conSintomas: `Si tienes ${SINTOMAS_ALARMA}, llama al 112 o acude a urgencias ahora.`,
+  conSintomas: `Si tienes alguno de estos síntomas: ${SINTOMAS_ALARMA}, llama al 112 o acude a urgencias ahora.`,
   sinSintomas:
     'Si no tienes ninguno de esos síntomas, siéntate, descansa 5 minutos y vuelve a medirte, ' +
     'y contacta hoy mismo con tu médico o tu centro de salud. Si mientras tanto aparece ' +
@@ -102,7 +112,8 @@ export const CONDUCTA_GRADO_3 = {
 /** Fuente de la conducta, para citarla allí donde se dé. */
 export const FUENTE_CONDUCTA_GRADO_3 =
   'ESC Council on Hypertension, documento de posición sobre emergencias hipertensivas ' +
-  '(van den Born et al., Eur Heart J Cardiovasc Pharmacother 2019)';
+  '(van den Born et al., Eur Heart J Cardiovasc Pharmacother 2019), y OMS, ficha ' +
+  '«Hypertension» (25/09/2025) para la lista de síntomas';
 
 // ─── Clasificaciones ESH 2023 ────────────────────────────────────────────────
 
