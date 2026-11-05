@@ -544,7 +544,8 @@ export default function VisualizadorFarmacocinetica() {
             <div className={styles.tabContenido}>
               <p className={styles.subtitulo}>
                 La <strong>vida media (t½)</strong> es el tiempo necesario para que la concentración del fármaco en plasma
-                se reduzca a la mitad. Determina la frecuencia de dosificación y cuánto tarda en eliminarse el fármaco.
+                se reduzca a la mitad. Dice cuánto tarda en eliminarse el fármaco; la frecuencia de dosificación no
+                depende solo de ella, sino también del margen terapéutico y de la formulación.
                 El <strong>estado estacionario</strong> (concentración estable) se alcanza tras aproximadamente 5 vidas medias.
               </p>
 

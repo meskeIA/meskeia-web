@@ -51,7 +51,7 @@ export const faqJsonLd = {
       name: '¿Qué es la vida media de un fármaco?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La vida media (t½) es el tiempo que tarda la concentración plasmática de un fármaco en reducirse a la mitad. Determina con qué frecuencia hay que tomar la medicación: un fármaco con vida media de 24 horas se puede tomar una vez al día. Después de aproximadamente 4-5 vidas medias, un fármaco se considera prácticamente eliminado del organismo.',
+        text: 'La vida media (t½) es el tiempo que tarda la concentración plasmática de un fármaco en reducirse a la mitad. Indica cuánto tarda en eliminarse y en alcanzar una concentración estable, pero no decide por sí sola cada cuánto se toma: la pauta depende de la curva terapéutica completa, del margen terapéutico y de la formulación (una de liberación prolongada puede tomarse una vez al día aunque su t½ sea corta), y la fija la ficha técnica o el profesional sanitario. Después de aproximadamente 4-5 vidas medias, un fármaco se considera prácticamente eliminado del organismo.',
       },
     },
     {

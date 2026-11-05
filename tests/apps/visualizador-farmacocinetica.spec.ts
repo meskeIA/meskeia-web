@@ -307,8 +307,9 @@ test.describe('visualizador-farmacocinetica', () => {
     await expect(page.locator('label[for="slider-bio"]')).toContainText('70 %', { timeout: 2000 });
   });
 
-  test('HALLAZGO ABIERTO [contenido/medio]: el FAQPage da una regla de dosificación que la página desmiente', async ({ page }) => {
-    test.fail(); // HALLAZGO ABIERTO (inspector 05/11/2026) [contenido/medio]
+  // HALLAZGO 4125 — REPARADO el 05/11/2026 (/reparar): la respuesta del FAQPage y la frase de la
+  // pestaña «Vida media» dicen ya lo mismo que «Errores comunes».
+  test('HALLAZGO 4125 (REPARADO) [contenido/medio]: el FAQPage ya no da una regla de dosificación que la página desmiente', async ({ page }) => {
     // ENTRADA  FAQPage, «¿Qué es la vida media de un fármaco?»
     // ESPERADO lo que dice la página en «Errores comunes»: «La dosificación depende de la curva
     //          terapéutica completa y del índice terapéutico, no solo de la t½»
@@ -316,6 +317,9 @@ test.describe('visualizador-farmacocinetica', () => {
     //          de 24 horas se puede tomar una vez al día»
     const [faq] = await jsonLdDe(page, 'FAQPage');
     expect(JSON.stringify(faq)).not.toContain('se puede tomar una vez al día');
+    expect(JSON.stringify(faq)).toContain('no decide por sí sola cada cuánto se toma');
+    await irAVidaMedia(page);
+    await expect(page.locator('[class*="tabContenido"]')).not.toContainText('Determina la frecuencia de dosificación');
   });
 
   test('HALLAZGO ABIERTO [contenido/bajo]: la guía del paracetamol llama «completa» a la eliminación de 5 t½ y da 12-15 h', async ({ page }) => {
