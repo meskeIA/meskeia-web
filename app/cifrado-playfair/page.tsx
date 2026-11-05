@@ -224,8 +224,9 @@ export default function CifradoPlayfairPage() {
           </div>
 
           <div className={styles.configItem}>
-            <label className={styles.label}>Palabra clave</label>
+            <label htmlFor="palabra-clave" className={styles.label}>Palabra clave</label>
             <input
+              id="palabra-clave"
               type="text"
               value={clave}
               onChange={(e) => setClave(e.target.value.toUpperCase())}

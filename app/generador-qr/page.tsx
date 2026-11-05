@@ -531,8 +531,9 @@ export default function GeneradorQRPage() {
               <div className={styles.formulario}>
                 {tipoQR === 'url' && (
                   <div className={styles.formGroup}>
-                    <label>URL del sitio web</label>
+                    <label htmlFor="url-input">URL del sitio web</label>
                     <input
+                      id="url-input"
                       type="url"
                       value={urlInput}
                       onChange={(e) => setUrlInput(e.target.value)}
@@ -544,8 +545,9 @@ export default function GeneradorQRPage() {
 
                 {tipoQR === 'texto' && (
                   <div className={styles.formGroup}>
-                    <label>Texto libre</label>
+                    <label htmlFor="texto-libre">Texto libre</label>
                     <textarea
+                      id="texto-libre"
                       value={texto}
                       onChange={(e) => setTexto(e.target.value)}
                       placeholder="Escribe cualquier texto..."
@@ -558,8 +560,9 @@ export default function GeneradorQRPage() {
 
                 {tipoQR === 'telefono' && (
                   <div className={styles.formGroup}>
-                    <label>Número de teléfono</label>
+                    <label htmlFor="telefono-input">Número de teléfono</label>
                     <input
+                      id="telefono-input"
                       type="tel"
                       value={telefonoInput}
                       onChange={(e) => setTelefonoInput(e.target.value)}
@@ -572,8 +575,9 @@ export default function GeneradorQRPage() {
                 {tipoQR === 'wifi' && (
                   <>
                     <div className={styles.formGroup}>
-                      <label>Nombre de la red (SSID)</label>
+                      <label htmlFor="wifi-ssid">Nombre de la red (SSID)</label>
                       <input
+                        id="wifi-ssid"
                         type="text"
                         value={configWifi.ssid}
                         onChange={(e) => setConfigWifi({ ...configWifi, ssid: e.target.value })}
@@ -582,8 +586,9 @@ export default function GeneradorQRPage() {
                       />
                     </div>
                     <div className={styles.formGroup}>
-                      <label>Contraseña</label>
+                      <label htmlFor="wifi-password">Contraseña</label>
                       <input
+                        id="wifi-password"
                         type="text"
                         value={configWifi.password}
                         onChange={(e) => setConfigWifi({ ...configWifi, password: e.target.value })}
@@ -593,8 +598,9 @@ export default function GeneradorQRPage() {
                     </div>
                     <div className={styles.formRow}>
                       <div className={styles.formGroup}>
-                        <label>Seguridad</label>
+                        <label htmlFor="wifi-seguridad">Seguridad</label>
                         <select
+                          id="wifi-seguridad"
                           value={configWifi.seguridad}
                           onChange={(e) => setConfigWifi({ ...configWifi, seguridad: e.target.value as 'WPA' | 'WEP' | 'nopass' })}
                           className={styles.select}
@@ -622,8 +628,9 @@ export default function GeneradorQRPage() {
                   <>
                     <div className={styles.formRow}>
                       <div className={styles.formGroup}>
-                        <label>Nombre completo</label>
+                        <label htmlFor="contacto-nombre">Nombre completo</label>
                         <input
+                          id="contacto-nombre"
                           type="text"
                           value={configContacto.nombre}
                           onChange={(e) => setConfigContacto({ ...configContacto, nombre: e.target.value })}
@@ -632,8 +639,9 @@ export default function GeneradorQRPage() {
                         />
                       </div>
                       <div className={styles.formGroup}>
-                        <label>Teléfono</label>
+                        <label htmlFor="contacto-telefono">Teléfono</label>
                         <input
+                          id="contacto-telefono"
                           type="tel"
                           value={configContacto.telefono}
                           onChange={(e) => setConfigContacto({ ...configContacto, telefono: e.target.value })}
@@ -643,8 +651,9 @@ export default function GeneradorQRPage() {
                       </div>
                     </div>
                     <div className={styles.formGroup}>
-                      <label>Email</label>
+                      <label htmlFor="contacto-email">Email</label>
                       <input
+                        id="contacto-email"
                         type="email"
                         value={configContacto.email}
                         onChange={(e) => setConfigContacto({ ...configContacto, email: e.target.value })}
@@ -654,8 +663,9 @@ export default function GeneradorQRPage() {
                     </div>
                     <div className={styles.formRow}>
                       <div className={styles.formGroup}>
-                        <label>Empresa</label>
+                        <label htmlFor="contacto-empresa">Empresa</label>
                         <input
+                          id="contacto-empresa"
                           type="text"
                           value={configContacto.empresa}
                           onChange={(e) => setConfigContacto({ ...configContacto, empresa: e.target.value })}
@@ -664,8 +674,9 @@ export default function GeneradorQRPage() {
                         />
                       </div>
                       <div className={styles.formGroup}>
-                        <label>Cargo</label>
+                        <label htmlFor="contacto-cargo">Cargo</label>
                         <input
+                          id="contacto-cargo"
                           type="text"
                           value={configContacto.cargo}
                           onChange={(e) => setConfigContacto({ ...configContacto, cargo: e.target.value })}
@@ -675,8 +686,9 @@ export default function GeneradorQRPage() {
                       </div>
                     </div>
                     <div className={styles.formGroup}>
-                      <label>Dirección</label>
+                      <label htmlFor="contacto-direccion">Dirección</label>
                       <input
+                        id="contacto-direccion"
                         type="text"
                         value={configContacto.direccion}
                         onChange={(e) => setConfigContacto({ ...configContacto, direccion: e.target.value })}
@@ -685,8 +697,9 @@ export default function GeneradorQRPage() {
                       />
                     </div>
                     <div className={styles.formGroup}>
-                      <label>Página web</label>
+                      <label htmlFor="contacto-web">Página web</label>
                       <input
+                        id="contacto-web"
                         type="url"
                         value={configContacto.web}
                         onChange={(e) => setConfigContacto({ ...configContacto, web: e.target.value })}
@@ -700,8 +713,9 @@ export default function GeneradorQRPage() {
                 {tipoQR === 'email' && (
                   <>
                     <div className={styles.formGroup}>
-                      <label>Destinatario</label>
+                      <label htmlFor="email-destinatario">Destinatario</label>
                       <input
+                        id="email-destinatario"
                         type="email"
                         value={configEmail.destinatario}
                         onChange={(e) => setConfigEmail({ ...configEmail, destinatario: e.target.value })}
@@ -710,8 +724,9 @@ export default function GeneradorQRPage() {
                       />
                     </div>
                     <div className={styles.formGroup}>
-                      <label>Asunto</label>
+                      <label htmlFor="email-asunto">Asunto</label>
                       <input
+                        id="email-asunto"
                         type="text"
                         value={configEmail.asunto}
                         onChange={(e) => setConfigEmail({ ...configEmail, asunto: e.target.value })}
@@ -720,8 +735,9 @@ export default function GeneradorQRPage() {
                       />
                     </div>
                     <div className={styles.formGroup}>
-                      <label>Mensaje (opcional)</label>
+                      <label htmlFor="email-cuerpo">Mensaje (opcional)</label>
                       <textarea
+                        id="email-cuerpo"
                         value={configEmail.cuerpo}
                         onChange={(e) => setConfigEmail({ ...configEmail, cuerpo: e.target.value })}
                         placeholder="Contenido del email..."
@@ -742,8 +758,9 @@ export default function GeneradorQRPage() {
 
               {/* Tamaño */}
               <div className={styles.formGroup}>
-                <label>Tamaño del QR</label>
+                <label htmlFor="tamano-qr">Tamaño del QR</label>
                 <select
+                  id="tamano-qr"
                   value={tamano}
                   onChange={(e) => setTamano(Number(e.target.value))}
                   className={styles.select}
@@ -757,8 +774,9 @@ export default function GeneradorQRPage() {
 
               {/* Nivel de corrección */}
               <div className={styles.formGroup}>
-                <label>Nivel de corrección de errores</label>
+                <label htmlFor="nivel-correccion">Nivel de corrección de errores</label>
                 <select
+                  id="nivel-correccion"
                   value={nivelCorreccion}
                   onChange={(e) => setNivelCorreccion(e.target.value as NivelCorreccion)}
                   className={styles.select}
@@ -776,8 +794,8 @@ export default function GeneradorQRPage() {
 
               {/* Forma de los puntos */}
               <div className={styles.formGroup}>
-                <label>Forma de los puntos</label>
-                <div className={styles.estilosGrid}>
+                <label id="forma-puntos-label">Forma de los puntos</label>
+                <div role="group" aria-labelledby="forma-puntos-label" className={styles.estilosGrid}>
                   {estilosPuntos.map((estilo) => (
                     <button
                       key={estilo.id}
@@ -794,8 +812,8 @@ export default function GeneradorQRPage() {
 
               {/* Forma de las esquinas */}
               <div className={styles.formGroup}>
-                <label>Forma de las esquinas</label>
-                <div className={styles.estilosGrid}>
+                <label id="forma-esquinas-label">Forma de las esquinas</label>
+                <div role="group" aria-labelledby="forma-esquinas-label" className={styles.estilosGrid}>
                   {estilosEsquinas.map((estilo) => (
                     <button
                       key={estilo.id}
@@ -828,9 +846,10 @@ export default function GeneradorQRPage() {
                 {configEstilo.usarGradiente ? (
                   <div className={styles.formRow}>
                     <div className={styles.formGroup}>
-                      <label>Color inicial</label>
+                      <label htmlFor="color-gradiente-1">Color inicial</label>
                       <div className={styles.colorPicker}>
                         <input
+                          id="color-gradiente-1"
                           type="color"
                           value={configEstilo.colorGradiente1}
                           onChange={(e) => setConfigEstilo({ ...configEstilo, colorGradiente1: e.target.value })}
@@ -840,9 +859,10 @@ export default function GeneradorQRPage() {
                       </div>
                     </div>
                     <div className={styles.formGroup}>
-                      <label>Color final</label>
+                      <label htmlFor="color-gradiente-2">Color final</label>
                       <div className={styles.colorPicker}>
                         <input
+                          id="color-gradiente-2"
                           type="color"
                           value={configEstilo.colorGradiente2}
                           onChange={(e) => setConfigEstilo({ ...configEstilo, colorGradiente2: e.target.value })}
@@ -854,9 +874,10 @@ export default function GeneradorQRPage() {
                   </div>
                 ) : (
                   <div className={styles.formGroup}>
-                    <label>Color de los puntos</label>
+                    <label htmlFor="color-puntos">Color de los puntos</label>
                     <div className={styles.colorPicker}>
                       <input
+                        id="color-puntos"
                         type="color"
                         value={configEstilo.colorPuntos}
                         onChange={(e) => setConfigEstilo({ ...configEstilo, colorPuntos: e.target.value })}
@@ -869,9 +890,10 @@ export default function GeneradorQRPage() {
 
                 <div className={styles.formRow}>
                   <div className={styles.formGroup}>
-                    <label>Color de fondo</label>
+                    <label htmlFor="color-fondo">Color de fondo</label>
                     <div className={styles.colorPicker}>
                       <input
+                        id="color-fondo"
                         type="color"
                         value={configEstilo.colorFondo}
                         onChange={(e) => setConfigEstilo({ ...configEstilo, colorFondo: e.target.value })}
@@ -881,9 +903,10 @@ export default function GeneradorQRPage() {
                     </div>
                   </div>
                   <div className={styles.formGroup}>
-                    <label>Color de esquinas</label>
+                    <label htmlFor="color-esquinas">Color de esquinas</label>
                     <div className={styles.colorPicker}>
                       <input
+                        id="color-esquinas"
                         type="color"
                         value={configEstilo.colorEsquinas}
                         onChange={(e) => setConfigEstilo({ ...configEstilo, colorEsquinas: e.target.value })}
@@ -931,8 +954,9 @@ export default function GeneradorQRPage() {
               {logoUrl && (
                 <>
                   <div className={styles.formGroup}>
-                    <label>Tamaño del logo: {Math.round(tamanoLogo * 100)}%</label>
+                    <label htmlFor="tamano-logo">Tamaño del logo: {Math.round(tamanoLogo * 100)}%</label>
                     <input
+                      id="tamano-logo"
                       type="range"
                       min="0.1"
                       max="0.5"
@@ -947,8 +971,9 @@ export default function GeneradorQRPage() {
                   </div>
 
                   <div className={styles.formGroup}>
-                    <label>Margen del logo: {margenLogo}px</label>
+                    <label htmlFor="margen-logo">Margen del logo: {margenLogo}px</label>
                     <input
+                      id="margen-logo"
                       type="range"
                       min="0"
                       max="20"

@@ -125,8 +125,8 @@ export default function GeneradorLoremIpsumPage() {
           <div className={styles.configGrid}>
             {/* Formato */}
             <div className={styles.configItem}>
-              <label className={styles.label}>Formato</label>
-              <div className={styles.formatoButtons}>
+              <label id="formato-label" className={styles.label}>Formato</label>
+              <div role="group" aria-labelledby="formato-label" className={styles.formatoButtons}>
                 <button
                   type="button"
                   aria-pressed={formato === 'parrafos'}
@@ -156,10 +156,11 @@ export default function GeneradorLoremIpsumPage() {
 
             {/* Cantidad */}
             <div className={styles.configItem}>
-              <label className={styles.label}>
+              <label htmlFor="cantidad" className={styles.label}>
                 Cantidad: <strong>{cantidad}</strong> {formato}
               </label>
               <input
+                id="cantidad"
                 type="range"
                 min={1}
                 max={getLimite()}

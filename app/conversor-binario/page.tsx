@@ -146,10 +146,11 @@ export default function ConversorBinarioPage() {
         </div>
 
         <div className={styles.inputSection}>
-          <label className={styles.label}>
+          <label htmlFor="entrada" className={styles.label}>
             {modo === 'texto-binario' ? 'Texto' : 'Código binario'}
           </label>
           <textarea
+            id="entrada"
             value={entrada}
             onChange={(e) => setEntrada(e.target.value)}
             placeholder={modo === 'texto-binario'

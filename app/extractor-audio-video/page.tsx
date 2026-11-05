@@ -318,11 +318,12 @@ export default function ExtractorAudioVideoPage() {
 
             <div className={styles.selectorTiempo}>
               <div className={styles.campoTiempo}>
-                <label className={styles.etiqueta}>
+                <label htmlFor="tiempo-inicio" className={styles.etiqueta}>
                   Inicio
                   <span className={styles.displayTiempo}>{formatearTiempo(inicio)}</span>
                 </label>
                 <input
+                  id="tiempo-inicio"
                   type="range"
                   min={0}
                   max={duracion || 3600}
@@ -336,11 +337,12 @@ export default function ExtractorAudioVideoPage() {
               </div>
 
               <div className={styles.campoTiempo}>
-                <label className={styles.etiqueta}>
+                <label htmlFor="tiempo-fin" className={styles.etiqueta}>
                   Fin
                   <span className={styles.displayTiempo}>{formatearTiempo(fin)}</span>
                 </label>
                 <input
+                  id="tiempo-fin"
                   type="range"
                   min={0}
                   max={duracion || 3600}

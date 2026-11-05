@@ -265,8 +265,9 @@ export default function ConversorImagenesPage() {
                 <h3>Dimensiones</h3>
                 <div className={styles.dimensionInputs}>
                   <div className={styles.inputGroup}>
-                    <label>Ancho</label>
+                    <label htmlFor="imagen-ancho">Ancho</label>
                     <input
+                      id="imagen-ancho"
                       type="number"
                       value={width}
                       onChange={(e) => handleWidthChange(e.target.value ? parseInt(e.target.value) : '')}
@@ -276,8 +277,9 @@ export default function ConversorImagenesPage() {
                   </div>
                   <span className={styles.dimensionX}>×</span>
                   <div className={styles.inputGroup}>
-                    <label>Alto</label>
+                    <label htmlFor="imagen-alto">Alto</label>
                     <input
+                      id="imagen-alto"
                       type="number"
                       value={height}
                       onChange={(e) => handleHeightChange(e.target.value ? parseInt(e.target.value) : '')}

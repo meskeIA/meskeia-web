@@ -504,8 +504,9 @@ export default function PlanificadorTurnosPage() {
               <h3>{editandoEmpleado ? 'Editar empleado' : 'Nuevo empleado'}</h3>
               <div className={styles.formGrid}>
                 <div className={styles.formGroup}>
-                  <label>Nombre</label>
+                  <label htmlFor="empleado-nombre">Nombre</label>
                   <input
+                    id="empleado-nombre"
                     type="text"
                     value={formEmpleado.nombre}
                     onChange={e => setFormEmpleado({ ...formEmpleado, nombre: e.target.value })}
@@ -514,8 +515,9 @@ export default function PlanificadorTurnosPage() {
                   />
                 </div>
                 <div className={styles.formGroup}>
-                  <label>Horas máx/semana</label>
+                  <label htmlFor="empleado-horas-max">Horas máx/semana</label>
                   <input
+                    id="empleado-horas-max"
                     type="number"
                     value={formEmpleado.horasMaxSemana}
                     onChange={e => setFormEmpleado({ ...formEmpleado, horasMaxSemana: e.target.value })}
@@ -663,8 +665,9 @@ export default function PlanificadorTurnosPage() {
               <h3>{editandoFranja ? 'Editar franja' : 'Nueva franja horaria'}</h3>
               <div className={styles.formGrid}>
                 <div className={styles.formGroup}>
-                  <label>Nombre</label>
+                  <label htmlFor="franja-nombre">Nombre</label>
                   <input
+                    id="franja-nombre"
                     type="text"
                     value={formFranja.nombre}
                     onChange={e => setFormFranja({ ...formFranja, nombre: e.target.value })}
@@ -673,8 +676,9 @@ export default function PlanificadorTurnosPage() {
                   />
                 </div>
                 <div className={styles.formGroup}>
-                  <label>Hora inicio</label>
+                  <label htmlFor="franja-hora-inicio">Hora inicio</label>
                   <input
+                    id="franja-hora-inicio"
                     type="time"
                     value={formFranja.horaInicio}
                     onChange={e => setFormFranja({ ...formFranja, horaInicio: e.target.value })}
@@ -682,8 +686,9 @@ export default function PlanificadorTurnosPage() {
                   />
                 </div>
                 <div className={styles.formGroup}>
-                  <label>Hora fin</label>
+                  <label htmlFor="franja-hora-fin">Hora fin</label>
                   <input
+                    id="franja-hora-fin"
                     type="time"
                     value={formFranja.horaFin}
                     onChange={e => setFormFranja({ ...formFranja, horaFin: e.target.value })}

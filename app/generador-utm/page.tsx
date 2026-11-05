@@ -203,10 +203,11 @@ export default function GeneradorUTMPage() {
           <h2 className={styles.panelTitle}>Configuración UTM</h2>
 
           <div className={styles.formGroup}>
-            <label className={styles.label}>
+            <label htmlFor="url-destino" className={styles.label}>
               URL de destino <span className={styles.required}>*</span>
             </label>
             <input
+              id="url-destino"
               type="text"
               className={styles.input}
               value={params.url}
@@ -266,10 +267,11 @@ export default function GeneradorUTMPage() {
           </div>
 
           <div className={styles.formGroup}>
-            <label className={styles.label}>
+            <label htmlFor="utm-campaign" className={styles.label}>
               utm_campaign <span className={styles.required}>*</span>
             </label>
             <input
+              id="utm-campaign"
               type="text"
               className={styles.input}
               value={params.campaign}
@@ -281,8 +283,9 @@ export default function GeneradorUTMPage() {
 
           <div className={styles.formRow}>
             <div className={styles.formGroup}>
-              <label className={styles.label}>utm_term (opcional)</label>
+              <label htmlFor="utm-term" className={styles.label}>utm_term (opcional)</label>
               <input
+                id="utm-term"
                 type="text"
                 className={styles.input}
                 value={params.term}
@@ -293,8 +296,9 @@ export default function GeneradorUTMPage() {
             </div>
 
             <div className={styles.formGroup}>
-              <label className={styles.label}>utm_content (opcional)</label>
+              <label htmlFor="utm-content" className={styles.label}>utm_content (opcional)</label>
               <input
+                id="utm-content"
                 type="text"
                 className={styles.input}
                 value={params.content}

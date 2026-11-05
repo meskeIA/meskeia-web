@@ -228,8 +228,8 @@ export default function GeneradorPalabrasClavePage() {
           </div>
 
           <div className={styles.categoriesSection}>
-            <label className={styles.sectionLabel}>Tipos de keywords a generar:</label>
-            <div className={styles.categoriesGrid}>
+            <label id="tipos-keywords-label" className={styles.sectionLabel}>Tipos de keywords a generar:</label>
+            <div role="group" aria-labelledby="tipos-keywords-label" className={styles.categoriesGrid}>
               {Object.entries({
                 preguntas: { label: 'Preguntas (qué, cómo, por qué...)', icon: '❓' },
                 comparativas: { label: 'Comparativas (vs, mejor que...)', icon: '⚖️' },

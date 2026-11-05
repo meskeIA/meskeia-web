@@ -822,8 +822,9 @@ export default function CreadorThumbnailsPage() {
 
                 {background.type === 'color' && (
                   <div className={styles.colorSection}>
-                    <label>Color de fondo</label>
+                    <label htmlFor="color-fondo">Color de fondo</label>
                     <input
+                      id="color-fondo"
                       type="color"
                       value={background.color}
                       onChange={(e) => setBackground(prev => ({ ...prev, color: e.target.value }))}
@@ -869,16 +870,18 @@ export default function CreadorThumbnailsPage() {
 
                 {selectedElement?.type === 'text' && (
                   <div className={styles.textProps}>
-                    <label>Texto</label>
+                    <label htmlFor="texto-elemento">Texto</label>
                     <input
+                      id="texto-elemento"
                       type="text"
                       value={selectedElement.text || ''}
                       onChange={(e) => updateSelected({ text: e.target.value })}
                       className={styles.input}
                     />
 
-                    <label>Fuente</label>
+                    <label htmlFor="fuente-texto">Fuente</label>
                     <select
+                      id="fuente-texto"
                       value={selectedElement.fontFamily}
                       onChange={(e) => updateSelected({ fontFamily: e.target.value })}
                       className={styles.select}
@@ -888,8 +891,9 @@ export default function CreadorThumbnailsPage() {
                       ))}
                     </select>
 
-                    <label>Tamaño: {selectedElement.fontSize}px</label>
+                    <label htmlFor="tamano-texto">Tamaño: {selectedElement.fontSize}px</label>
                     <input
+                      id="tamano-texto"
                       type="range"
                       min="24"
                       max="200"
@@ -899,8 +903,9 @@ export default function CreadorThumbnailsPage() {
                     />
 
                     <div className={styles.row}>
-                      <label>Color</label>
+                      <label htmlFor="color-texto">Color</label>
                       <input
+                        id="color-texto"
                         type="color"
                         value={selectedElement.color || '#FFFFFF'}
                         onChange={(e) => updateSelected({ color: e.target.value })}
@@ -1001,8 +1006,9 @@ export default function CreadorThumbnailsPage() {
 
                 {selectedElement?.type === 'image' && (
                   <div className={styles.imageProps}>
-                    <label>Ancho: {Math.round(selectedElement.width)}px</label>
+                    <label htmlFor="ancho-imagen">Ancho: {Math.round(selectedElement.width)}px</label>
                     <input
+                      id="ancho-imagen"
                       type="range"
                       min="50"
                       max="1000"
@@ -1041,8 +1047,9 @@ export default function CreadorThumbnailsPage() {
                 {selectedElement?.type === 'shape' && (
                   <div className={styles.shapeProps}>
                     <div className={styles.row}>
-                      <label>Color relleno</label>
+                      <label htmlFor="color-relleno">Color relleno</label>
                       <input
+                        id="color-relleno"
                         type="color"
                         value={selectedElement.fill || '#2E86AB'}
                         onChange={(e) => updateSelected({ fill: e.target.value })}
@@ -1050,8 +1057,9 @@ export default function CreadorThumbnailsPage() {
                       />
                     </div>
 
-                    <label>Tamaño: {Math.round(selectedElement.width)}px</label>
+                    <label htmlFor="tamano-forma">Tamaño: {Math.round(selectedElement.width)}px</label>
                     <input
+                      id="tamano-forma"
                       type="range"
                       min="30"
                       max="400"
@@ -1062,8 +1070,9 @@ export default function CreadorThumbnailsPage() {
 
                     {selectedElement.shapeType === 'badge' && (
                       <>
-                        <label>Texto del badge</label>
+                        <label htmlFor="texto-badge">Texto del badge</label>
                         <input
+                          id="texto-badge"
                           type="text"
                           value={selectedElement.badgeText || ''}
                           onChange={(e) => updateSelected({ badgeText: e.target.value })}
@@ -1096,8 +1105,9 @@ export default function CreadorThumbnailsPage() {
 
                 {selectedElement?.type === 'emoji' && (
                   <div className={styles.emojiProps}>
-                    <label>Tamaño: {selectedElement.fontSize}px</label>
+                    <label htmlFor="tamano-emoji">Tamaño: {selectedElement.fontSize}px</label>
                     <input
+                      id="tamano-emoji"
                       type="range"
                       min="32"
                       max="200"

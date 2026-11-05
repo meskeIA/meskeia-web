@@ -321,8 +321,9 @@ export default function GeneradorSchemaMarkupPage() {
             {schemaType === 'article' && (
               <div className={styles.formGrid}>
                 <div className={styles.inputGroup}>
-                  <label>Título del artículo *</label>
+                  <label htmlFor="article-headline">Título del artículo *</label>
                   <input
+                    id="article-headline"
                     type="text"
                     value={articleData.headline}
                     onChange={(e) => setArticleData({ ...articleData, headline: e.target.value })}
@@ -330,8 +331,9 @@ export default function GeneradorSchemaMarkupPage() {
                   />
                 </div>
                 <div className={styles.inputGroupFull}>
-                  <label>Descripción</label>
+                  <label htmlFor="article-description">Descripción</label>
                   <textarea
+                    id="article-description"
                     value={articleData.description}
                     onChange={(e) => setArticleData({ ...articleData, description: e.target.value })}
                     placeholder="Resumen del artículo..."
@@ -339,8 +341,9 @@ export default function GeneradorSchemaMarkupPage() {
                   />
                 </div>
                 <div className={styles.inputGroup}>
-                  <label>URL de la imagen</label>
+                  <label htmlFor="article-image">URL de la imagen</label>
                   <input
+                    id="article-image"
                     type="url"
                     value={articleData.image}
                     onChange={(e) => setArticleData({ ...articleData, image: e.target.value })}
@@ -348,8 +351,9 @@ export default function GeneradorSchemaMarkupPage() {
                   />
                 </div>
                 <div className={styles.inputGroup}>
-                  <label>Nombre del autor</label>
+                  <label htmlFor="article-author-name">Nombre del autor</label>
                   <input
+                    id="article-author-name"
                     type="text"
                     value={articleData.authorName}
                     onChange={(e) => setArticleData({ ...articleData, authorName: e.target.value })}
@@ -357,8 +361,9 @@ export default function GeneradorSchemaMarkupPage() {
                   />
                 </div>
                 <div className={styles.inputGroup}>
-                  <label>Nombre del sitio</label>
+                  <label htmlFor="article-publisher-name">Nombre del sitio</label>
                   <input
+                    id="article-publisher-name"
                     type="text"
                     value={articleData.publisherName}
                     onChange={(e) => setArticleData({ ...articleData, publisherName: e.target.value })}
@@ -366,8 +371,9 @@ export default function GeneradorSchemaMarkupPage() {
                   />
                 </div>
                 <div className={styles.inputGroup}>
-                  <label>Logo del sitio (URL)</label>
+                  <label htmlFor="article-publisher-logo">Logo del sitio (URL)</label>
                   <input
+                    id="article-publisher-logo"
                     type="url"
                     value={articleData.publisherLogo}
                     onChange={(e) => setArticleData({ ...articleData, publisherLogo: e.target.value })}
@@ -375,24 +381,27 @@ export default function GeneradorSchemaMarkupPage() {
                   />
                 </div>
                 <div className={styles.inputGroup}>
-                  <label>Fecha publicación</label>
+                  <label htmlFor="article-date-published">Fecha publicación</label>
                   <input
+                    id="article-date-published"
                     type="date"
                     value={articleData.datePublished}
                     onChange={(e) => setArticleData({ ...articleData, datePublished: e.target.value })}
                   />
                 </div>
                 <div className={styles.inputGroup}>
-                  <label>Fecha modificación</label>
+                  <label htmlFor="article-date-modified">Fecha modificación</label>
                   <input
+                    id="article-date-modified"
                     type="date"
                     value={articleData.dateModified}
                     onChange={(e) => setArticleData({ ...articleData, dateModified: e.target.value })}
                   />
                 </div>
                 <div className={styles.inputGroupFull}>
-                  <label>URL del artículo</label>
+                  <label htmlFor="article-url">URL del artículo</label>
                   <input
+                    id="article-url"
                     type="url"
                     value={articleData.url}
                     onChange={(e) => setArticleData({ ...articleData, url: e.target.value })}
@@ -406,8 +415,9 @@ export default function GeneradorSchemaMarkupPage() {
             {schemaType === 'product' && (
               <div className={styles.formGrid}>
                 <div className={styles.inputGroup}>
-                  <label>Nombre del producto *</label>
+                  <label htmlFor="product-name">Nombre del producto *</label>
                   <input
+                    id="product-name"
                     type="text"
                     value={productData.name}
                     onChange={(e) => setProductData({ ...productData, name: e.target.value })}
@@ -415,8 +425,9 @@ export default function GeneradorSchemaMarkupPage() {
                   />
                 </div>
                 <div className={styles.inputGroup}>
-                  <label>Marca</label>
+                  <label htmlFor="product-brand">Marca</label>
                   <input
+                    id="product-brand"
                     type="text"
                     value={productData.brand}
                     onChange={(e) => setProductData({ ...productData, brand: e.target.value })}
@@ -424,8 +435,9 @@ export default function GeneradorSchemaMarkupPage() {
                   />
                 </div>
                 <div className={styles.inputGroupFull}>
-                  <label>Descripción</label>
+                  <label htmlFor="product-description">Descripción</label>
                   <textarea
+                    id="product-description"
                     value={productData.description}
                     onChange={(e) => setProductData({ ...productData, description: e.target.value })}
                     placeholder="Descripción del producto..."
@@ -433,8 +445,9 @@ export default function GeneradorSchemaMarkupPage() {
                   />
                 </div>
                 <div className={styles.inputGroup}>
-                  <label>Precio</label>
+                  <label htmlFor="product-price">Precio</label>
                   <input
+                    id="product-price"
                     type="text"
                     value={productData.price}
                     onChange={(e) => setProductData({ ...productData, price: e.target.value })}
@@ -442,8 +455,9 @@ export default function GeneradorSchemaMarkupPage() {
                   />
                 </div>
                 <div className={styles.inputGroup}>
-                  <label>Moneda</label>
+                  <label htmlFor="product-currency">Moneda</label>
                   <select
+                    id="product-currency"
                     value={productData.currency}
                     onChange={(e) => setProductData({ ...productData, currency: e.target.value })}
                   >
@@ -453,8 +467,9 @@ export default function GeneradorSchemaMarkupPage() {
                   </select>
                 </div>
                 <div className={styles.inputGroup}>
-                  <label>Disponibilidad</label>
+                  <label htmlFor="product-availability">Disponibilidad</label>
                   <select
+                    id="product-availability"
                     value={productData.availability}
                     onChange={(e) => setProductData({ ...productData, availability: e.target.value })}
                   >
@@ -464,8 +479,9 @@ export default function GeneradorSchemaMarkupPage() {
                   </select>
                 </div>
                 <div className={styles.inputGroup}>
-                  <label>SKU</label>
+                  <label htmlFor="product-sku">SKU</label>
                   <input
+                    id="product-sku"
                     type="text"
                     value={productData.sku}
                     onChange={(e) => setProductData({ ...productData, sku: e.target.value })}
@@ -473,8 +489,9 @@ export default function GeneradorSchemaMarkupPage() {
                   />
                 </div>
                 <div className={styles.inputGroup}>
-                  <label>URL imagen</label>
+                  <label htmlFor="product-image">URL imagen</label>
                   <input
+                    id="product-image"
                     type="url"
                     value={productData.image}
                     onChange={(e) => setProductData({ ...productData, image: e.target.value })}
@@ -482,8 +499,9 @@ export default function GeneradorSchemaMarkupPage() {
                   />
                 </div>
                 <div className={styles.inputGroup}>
-                  <label>URL producto</label>
+                  <label htmlFor="product-url">URL producto</label>
                   <input
+                    id="product-url"
                     type="url"
                     value={productData.url}
                     onChange={(e) => setProductData({ ...productData, url: e.target.value })}
@@ -491,8 +509,9 @@ export default function GeneradorSchemaMarkupPage() {
                   />
                 </div>
                 <div className={styles.inputGroup}>
-                  <label>Rating (1-5)</label>
+                  <label htmlFor="product-rating-value">Rating (1-5)</label>
                   <input
+                    id="product-rating-value"
                     type="text"
                     value={productData.ratingValue}
                     onChange={(e) => setProductData({ ...productData, ratingValue: e.target.value })}
@@ -500,8 +519,9 @@ export default function GeneradorSchemaMarkupPage() {
                   />
                 </div>
                 <div className={styles.inputGroup}>
-                  <label>Nº de reseñas</label>
+                  <label htmlFor="product-review-count">Nº de reseñas</label>
                   <input
+                    id="product-review-count"
                     type="text"
                     value={productData.reviewCount}
                     onChange={(e) => setProductData({ ...productData, reviewCount: e.target.value })}
@@ -552,8 +572,9 @@ export default function GeneradorSchemaMarkupPage() {
             {schemaType === 'localbusiness' && (
               <div className={styles.formGrid}>
                 <div className={styles.inputGroup}>
-                  <label>Nombre del negocio *</label>
+                  <label htmlFor="business-name">Nombre del negocio *</label>
                   <input
+                    id="business-name"
                     type="text"
                     value={businessData.name}
                     onChange={(e) => setBusinessData({ ...businessData, name: e.target.value })}
@@ -561,8 +582,9 @@ export default function GeneradorSchemaMarkupPage() {
                   />
                 </div>
                 <div className={styles.inputGroup}>
-                  <label>Teléfono</label>
+                  <label htmlFor="business-telephone">Teléfono</label>
                   <input
+                    id="business-telephone"
                     type="tel"
                     value={businessData.telephone}
                     onChange={(e) => setBusinessData({ ...businessData, telephone: e.target.value })}
@@ -570,8 +592,9 @@ export default function GeneradorSchemaMarkupPage() {
                   />
                 </div>
                 <div className={styles.inputGroupFull}>
-                  <label>Descripción</label>
+                  <label htmlFor="business-description">Descripción</label>
                   <textarea
+                    id="business-description"
                     value={businessData.description}
                     onChange={(e) => setBusinessData({ ...businessData, description: e.target.value })}
                     placeholder="Descripción del negocio..."
@@ -579,8 +602,9 @@ export default function GeneradorSchemaMarkupPage() {
                   />
                 </div>
                 <div className={styles.inputGroup}>
-                  <label>Dirección</label>
+                  <label htmlFor="business-street-address">Dirección</label>
                   <input
+                    id="business-street-address"
                     type="text"
                     value={businessData.streetAddress}
                     onChange={(e) => setBusinessData({ ...businessData, streetAddress: e.target.value })}
@@ -588,8 +612,9 @@ export default function GeneradorSchemaMarkupPage() {
                   />
                 </div>
                 <div className={styles.inputGroup}>
-                  <label>Ciudad</label>
+                  <label htmlFor="business-city">Ciudad</label>
                   <input
+                    id="business-city"
                     type="text"
                     value={businessData.city}
                     onChange={(e) => setBusinessData({ ...businessData, city: e.target.value })}
@@ -597,8 +622,9 @@ export default function GeneradorSchemaMarkupPage() {
                   />
                 </div>
                 <div className={styles.inputGroup}>
-                  <label>Código postal</label>
+                  <label htmlFor="business-postal-code">Código postal</label>
                   <input
+                    id="business-postal-code"
                     type="text"
                     value={businessData.postalCode}
                     onChange={(e) => setBusinessData({ ...businessData, postalCode: e.target.value })}
@@ -606,8 +632,9 @@ export default function GeneradorSchemaMarkupPage() {
                   />
                 </div>
                 <div className={styles.inputGroup}>
-                  <label>País</label>
+                  <label htmlFor="business-country">País</label>
                   <select
+                    id="business-country"
                     value={businessData.country}
                     onChange={(e) => setBusinessData({ ...businessData, country: e.target.value })}
                   >
@@ -618,8 +645,9 @@ export default function GeneradorSchemaMarkupPage() {
                   </select>
                 </div>
                 <div className={styles.inputGroup}>
-                  <label>Rango de precios</label>
+                  <label htmlFor="business-price-range">Rango de precios</label>
                   <select
+                    id="business-price-range"
                     value={businessData.priceRange}
                     onChange={(e) => setBusinessData({ ...businessData, priceRange: e.target.value })}
                   >
@@ -630,8 +658,9 @@ export default function GeneradorSchemaMarkupPage() {
                   </select>
                 </div>
                 <div className={styles.inputGroup}>
-                  <label>Email</label>
+                  <label htmlFor="business-email">Email</label>
                   <input
+                    id="business-email"
                     type="email"
                     value={businessData.email}
                     onChange={(e) => setBusinessData({ ...businessData, email: e.target.value })}
@@ -639,8 +668,9 @@ export default function GeneradorSchemaMarkupPage() {
                   />
                 </div>
                 <div className={styles.inputGroup}>
-                  <label>Web</label>
+                  <label htmlFor="business-url">Web</label>
                   <input
+                    id="business-url"
                     type="url"
                     value={businessData.url}
                     onChange={(e) => setBusinessData({ ...businessData, url: e.target.value })}
@@ -648,8 +678,9 @@ export default function GeneradorSchemaMarkupPage() {
                   />
                 </div>
                 <div className={styles.inputGroupFull}>
-                  <label>Horario de apertura</label>
+                  <label htmlFor="business-opening-hours">Horario de apertura</label>
                   <input
+                    id="business-opening-hours"
                     type="text"
                     value={businessData.openingHours}
                     onChange={(e) => setBusinessData({ ...businessData, openingHours: e.target.value })}
@@ -663,8 +694,9 @@ export default function GeneradorSchemaMarkupPage() {
             {schemaType === 'recipe' && (
               <div className={styles.formGrid}>
                 <div className={styles.inputGroup}>
-                  <label>Nombre de la receta *</label>
+                  <label htmlFor="recipe-name">Nombre de la receta *</label>
                   <input
+                    id="recipe-name"
                     type="text"
                     value={recipeData.name}
                     onChange={(e) => setRecipeData({ ...recipeData, name: e.target.value })}
@@ -672,8 +704,9 @@ export default function GeneradorSchemaMarkupPage() {
                   />
                 </div>
                 <div className={styles.inputGroup}>
-                  <label>Autor</label>
+                  <label htmlFor="recipe-author-name">Autor</label>
                   <input
+                    id="recipe-author-name"
                     type="text"
                     value={recipeData.authorName}
                     onChange={(e) => setRecipeData({ ...recipeData, authorName: e.target.value })}
@@ -681,8 +714,9 @@ export default function GeneradorSchemaMarkupPage() {
                   />
                 </div>
                 <div className={styles.inputGroupFull}>
-                  <label>Descripción</label>
+                  <label htmlFor="recipe-description">Descripción</label>
                   <textarea
+                    id="recipe-description"
                     value={recipeData.description}
                     onChange={(e) => setRecipeData({ ...recipeData, description: e.target.value })}
                     placeholder="Descripción de la receta..."
@@ -690,40 +724,45 @@ export default function GeneradorSchemaMarkupPage() {
                   />
                 </div>
                 <div className={styles.inputGroup}>
-                  <label>Prep. (min)</label>
+                  <label htmlFor="recipe-prep-time">Prep. (min)</label>
                   <input
+                    id="recipe-prep-time"
                     type="number"
                     value={recipeData.prepTime}
                     onChange={(e) => setRecipeData({ ...recipeData, prepTime: e.target.value })}
                   />
                 </div>
                 <div className={styles.inputGroup}>
-                  <label>Cocción (min)</label>
+                  <label htmlFor="recipe-cook-time">Cocción (min)</label>
                   <input
+                    id="recipe-cook-time"
                     type="number"
                     value={recipeData.cookTime}
                     onChange={(e) => setRecipeData({ ...recipeData, cookTime: e.target.value })}
                   />
                 </div>
                 <div className={styles.inputGroup}>
-                  <label>Total (min)</label>
+                  <label htmlFor="recipe-total-time">Total (min)</label>
                   <input
+                    id="recipe-total-time"
                     type="number"
                     value={recipeData.totalTime}
                     onChange={(e) => setRecipeData({ ...recipeData, totalTime: e.target.value })}
                   />
                 </div>
                 <div className={styles.inputGroup}>
-                  <label>Porciones</label>
+                  <label htmlFor="recipe-servings">Porciones</label>
                   <input
+                    id="recipe-servings"
                     type="number"
                     value={recipeData.servings}
                     onChange={(e) => setRecipeData({ ...recipeData, servings: e.target.value })}
                   />
                 </div>
                 <div className={styles.inputGroup}>
-                  <label>Calorías</label>
+                  <label htmlFor="recipe-calories">Calorías</label>
                   <input
+                    id="recipe-calories"
                     type="number"
                     value={recipeData.calories}
                     onChange={(e) => setRecipeData({ ...recipeData, calories: e.target.value })}
@@ -731,8 +770,9 @@ export default function GeneradorSchemaMarkupPage() {
                   />
                 </div>
                 <div className={styles.inputGroup}>
-                  <label>URL imagen</label>
+                  <label htmlFor="recipe-image">URL imagen</label>
                   <input
+                    id="recipe-image"
                     type="url"
                     value={recipeData.image}
                     onChange={(e) => setRecipeData({ ...recipeData, image: e.target.value })}
@@ -740,8 +780,9 @@ export default function GeneradorSchemaMarkupPage() {
                   />
                 </div>
                 <div className={styles.inputGroupFull}>
-                  <label>Ingredientes (uno por línea)</label>
+                  <label htmlFor="recipe-ingredients">Ingredientes (uno por línea)</label>
                   <textarea
+                    id="recipe-ingredients"
                     value={recipeData.ingredients}
                     onChange={(e) => setRecipeData({ ...recipeData, ingredients: e.target.value })}
                     placeholder="200g de arroz&#10;1 pollo troceado&#10;100g de judías verdes"
@@ -749,8 +790,9 @@ export default function GeneradorSchemaMarkupPage() {
                   />
                 </div>
                 <div className={styles.inputGroupFull}>
-                  <label>Instrucciones (un paso por línea)</label>
+                  <label htmlFor="recipe-instructions">Instrucciones (un paso por línea)</label>
                   <textarea
+                    id="recipe-instructions"
                     value={recipeData.instructions}
                     onChange={(e) => setRecipeData({ ...recipeData, instructions: e.target.value })}
                     placeholder="Calentar el aceite en la paella&#10;Añadir el pollo y dorar&#10;Agregar las verduras"

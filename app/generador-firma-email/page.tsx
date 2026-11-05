@@ -207,8 +207,9 @@ export default function GeneradorFirmaEmailPage() {
           <h3 className={styles.sectionTitle}>Datos personales</h3>
 
           <div className={styles.formGroup}>
-            <label>Nombre completo *</label>
+            <label htmlFor="firma-nombre">Nombre completo *</label>
             <input
+              id="firma-nombre"
               type="text"
               value={formData.name}
               onChange={(e) => updateField('name', e.target.value)}
@@ -217,8 +218,9 @@ export default function GeneradorFirmaEmailPage() {
           </div>
 
           <div className={styles.formGroup}>
-            <label>Cargo / Puesto</label>
+            <label htmlFor="firma-cargo">Cargo / Puesto</label>
             <input
+              id="firma-cargo"
               type="text"
               value={formData.title}
               onChange={(e) => updateField('title', e.target.value)}
@@ -227,8 +229,9 @@ export default function GeneradorFirmaEmailPage() {
           </div>
 
           <div className={styles.formGroup}>
-            <label>Empresa</label>
+            <label htmlFor="firma-empresa">Empresa</label>
             <input
+              id="firma-empresa"
               type="text"
               value={formData.company}
               onChange={(e) => updateField('company', e.target.value)}
@@ -238,8 +241,9 @@ export default function GeneradorFirmaEmailPage() {
 
           <div className={styles.formRow}>
             <div className={styles.formGroup}>
-              <label>Teléfono</label>
+              <label htmlFor="firma-telefono">Teléfono</label>
               <input
+                id="firma-telefono"
                 type="tel"
                 value={formData.phone}
                 onChange={(e) => updateField('phone', e.target.value)}
@@ -248,8 +252,9 @@ export default function GeneradorFirmaEmailPage() {
             </div>
 
             <div className={styles.formGroup}>
-              <label>Email *</label>
+              <label htmlFor="firma-email">Email *</label>
               <input
+                id="firma-email"
                 type="email"
                 value={formData.email}
                 onChange={(e) => updateField('email', e.target.value)}
@@ -259,8 +264,9 @@ export default function GeneradorFirmaEmailPage() {
           </div>
 
           <div className={styles.formGroup}>
-            <label>Sitio web</label>
+            <label htmlFor="firma-sitio-web">Sitio web</label>
             <input
+              id="firma-sitio-web"
               type="text"
               value={formData.website}
               onChange={(e) => updateField('website', e.target.value)}
@@ -272,8 +278,9 @@ export default function GeneradorFirmaEmailPage() {
 
           <div className={styles.formRow}>
             <div className={styles.formGroup}>
-              <label>LinkedIn</label>
+              <label htmlFor="firma-linkedin">LinkedIn</label>
               <input
+                id="firma-linkedin"
                 type="text"
                 value={formData.linkedin}
                 onChange={(e) => updateField('linkedin', e.target.value)}
@@ -282,8 +289,9 @@ export default function GeneradorFirmaEmailPage() {
             </div>
 
             <div className={styles.formGroup}>
-              <label>Twitter/X</label>
+              <label htmlFor="firma-twitter">Twitter/X</label>
               <input
+                id="firma-twitter"
                 type="text"
                 value={formData.twitter}
                 onChange={(e) => updateField('twitter', e.target.value)}
@@ -293,8 +301,9 @@ export default function GeneradorFirmaEmailPage() {
           </div>
 
           <div className={styles.formGroup}>
-            <label>Instagram</label>
+            <label htmlFor="firma-instagram">Instagram</label>
             <input
+              id="firma-instagram"
               type="text"
               value={formData.instagram}
               onChange={(e) => updateField('instagram', e.target.value)}
@@ -306,8 +315,9 @@ export default function GeneradorFirmaEmailPage() {
 
           <div className={styles.formRow}>
             <div className={styles.formGroup}>
-              <label>URL imagen de perfil</label>
+              <label htmlFor="firma-imagen-url">URL imagen de perfil</label>
               <input
+                id="firma-imagen-url"
                 type="url"
                 value={formData.imageUrl}
                 onChange={(e) => updateField('imageUrl', e.target.value)}
@@ -316,8 +326,9 @@ export default function GeneradorFirmaEmailPage() {
             </div>
 
             <div className={styles.formGroup}>
-              <label>Color principal</label>
+              <label htmlFor="firma-color-principal">Color principal</label>
               <input
+                id="firma-color-principal"
                 type="color"
                 value={formData.primaryColor}
                 onChange={(e) => updateField('primaryColor', e.target.value)}

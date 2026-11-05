@@ -170,7 +170,7 @@ export default function TiradorDadosPage() {
 
           <div className={styles.optionsRow}>
             <div className={styles.optionGroup}>
-              <label className={styles.optionLabel}>Cantidad de dados</label>
+              <label htmlFor="cantidad-dados" className={styles.optionLabel}>Cantidad de dados</label>
               <div className={styles.quantityControl}>
                 <button
                   type="button"
@@ -183,6 +183,7 @@ export default function TiradorDadosPage() {
                 {/* Con `type="number"` y `|| 1`, vaciar el campo escribía «1» bajo el cursor y
                     teclear «5» daba «15»; el modificador no dejaba teclear «-» (cabo C0081) */}
                 <CampoNumerico
+                  id="cantidad-dados"
                   valor={quantity}
                   onCambio={setQuantity}
                   className={styles.quantityInput}
@@ -203,7 +204,7 @@ export default function TiradorDadosPage() {
             </div>
 
             <div className={styles.optionGroup}>
-              <label className={styles.optionLabel}>Modificador</label>
+              <label htmlFor="modificador" className={styles.optionLabel}>Modificador</label>
               <div className={styles.quantityControl}>
                 <button
                   type="button"
@@ -213,6 +214,7 @@ export default function TiradorDadosPage() {
                   −
                 </button>
                 <CampoNumerico
+                  id="modificador"
                   valor={modifier}
                   onCambio={setModifier}
                   className={styles.quantityInput}

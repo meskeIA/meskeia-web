@@ -221,8 +221,8 @@ export default function GeneradorMetaDescripcionesPage() {
 
           {/* Plantillas */}
           <div className={styles.templatesSection}>
-            <label className={styles.label}>Plantillas rápidas</label>
-            <div className={styles.templatesGrid}>
+            <label id="plantillas-label" className={styles.label}>Plantillas rápidas</label>
+            <div role="group" aria-labelledby="plantillas-label" className={styles.templatesGrid}>
               {Object.entries(PLANTILLAS).map(([key, plantilla]) => (
                 <button
                   key={key}
@@ -240,10 +240,11 @@ export default function GeneradorMetaDescripcionesPage() {
 
           {/* Título (opcional) */}
           <div className={styles.inputGroup}>
-            <label className={styles.label}>
+            <label htmlFor="titulo" className={styles.label}>
               Título de la página (para vista previa)
             </label>
             <input
+              id="titulo"
               type="text"
               value={titulo}
               onChange={(e) => setTitulo(e.target.value)}
@@ -256,8 +257,9 @@ export default function GeneradorMetaDescripcionesPage() {
 
           {/* URL (opcional) */}
           <div className={styles.inputGroup}>
-            <label className={styles.label}>URL (para vista previa)</label>
+            <label htmlFor="url" className={styles.label}>URL (para vista previa)</label>
             <input
+              id="url"
               type="text"
               value={url}
               onChange={(e) => setUrl(e.target.value)}
@@ -268,8 +270,9 @@ export default function GeneradorMetaDescripcionesPage() {
 
           {/* Meta descripción */}
           <div className={styles.inputGroup}>
-            <label className={styles.label}>Meta Descripción</label>
+            <label htmlFor="meta-descripcion" className={styles.label}>Meta Descripción</label>
             <textarea
+              id="meta-descripcion"
               value={descripcion}
               onChange={(e) => {
                 setDescripcion(e.target.value);

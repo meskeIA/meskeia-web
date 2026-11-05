@@ -215,8 +215,9 @@ export default function AnalizadorDensidadSeoPage() {
           <h2 className={styles.panelTitle}><span aria-hidden="true">✏️</span> Tu contenido</h2>
 
           <div className={styles.inputGroup}>
-            <label className={styles.label}>Palabra clave objetivo (opcional)</label>
+            <label htmlFor="keyword-objetivo" className={styles.label}>Palabra clave objetivo (opcional)</label>
             <input
+              id="keyword-objetivo"
               type="text"
               value={keywordObjetivo}
               onChange={(e) => setKeywordObjetivo(e.target.value)}
@@ -226,8 +227,9 @@ export default function AnalizadorDensidadSeoPage() {
           </div>
 
           <div className={styles.inputGroup}>
-            <label className={styles.label}>Texto a analizar</label>
+            <label htmlFor="texto-analizar" className={styles.label}>Texto a analizar</label>
             <textarea
+              id="texto-analizar"
               value={texto}
               onChange={(e) => setTexto(e.target.value)}
               placeholder="Pega aquí el contenido de tu artículo, página web o texto que quieras analizar..."
@@ -247,8 +249,9 @@ export default function AnalizadorDensidadSeoPage() {
             </label>
 
             <div className={styles.minCharsOption}>
-              <label>Mínimo caracteres:</label>
+              <label htmlFor="min-caracteres">Mínimo caracteres:</label>
               <select
+                id="min-caracteres"
                 value={minCaracteres}
                 onChange={(e) => setMinCaracteres(Number(e.target.value))}
                 className={styles.selectSmall}

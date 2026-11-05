@@ -652,8 +652,8 @@ export default function GeneradorOGImagesPage() {
             {/* Fondo */}
             {activeTab === 'background' && (
               <div className={styles.controlGroup}>
-                <label className={styles.label}>Tipo de fondo</label>
-                <div className={styles.bgTypeSelector}>
+                <label id="tipo-fondo-label" className={styles.label}>Tipo de fondo</label>
+                <div role="group" aria-labelledby="tipo-fondo-label" className={styles.bgTypeSelector}>
                   {['color', 'gradient', 'image'].map(type => (
                     <button
                       key={type}
@@ -670,8 +670,9 @@ export default function GeneradorOGImagesPage() {
 
                 {design.background.type === 'color' && (
                   <div className={styles.inputRow}>
-                    <label>Color:</label>
+                    <label htmlFor="fondo-color">Color:</label>
                     <input
+                      id="fondo-color"
                       type="color"
                       value={design.background.color}
                       onChange={e => updateBackground({ color: e.target.value })}
@@ -727,8 +728,9 @@ export default function GeneradorOGImagesPage() {
                         </div>
                         {design.background.overlay && (
                           <div className={styles.inputRow}>
-                            <label>Opacidad: {Math.round(design.background.overlayOpacity * 100)}%</label>
+                            <label htmlFor="overlay-opacidad">Opacidad: {Math.round(design.background.overlayOpacity * 100)}%</label>
                             <input
+                              id="overlay-opacidad"
                               type="range"
                               min="0"
                               max="1"
@@ -750,8 +752,9 @@ export default function GeneradorOGImagesPage() {
             {activeTab === 'title' && (
               <div className={styles.controlGroup}>
                 <div className={styles.inputRow}>
-                  <label>Texto:</label>
+                  <label htmlFor="titulo-texto">Texto:</label>
                   <textarea
+                    id="titulo-texto"
                     value={design.title.text}
                     onChange={e => updateTitle({ text: e.target.value })}
                     className={styles.textarea}
@@ -761,8 +764,9 @@ export default function GeneradorOGImagesPage() {
                 </div>
 
                 <div className={styles.inputRow}>
-                  <label>Fuente:</label>
+                  <label htmlFor="titulo-fuente">Fuente:</label>
                   <select
+                    id="titulo-fuente"
                     value={design.title.fontFamily}
                     onChange={e => updateTitle({ fontFamily: e.target.value })}
                     className={styles.select}
@@ -774,8 +778,9 @@ export default function GeneradorOGImagesPage() {
                 </div>
 
                 <div className={styles.inputRow}>
-                  <label>Tamaño: {design.title.fontSize}px</label>
+                  <label htmlFor="titulo-tamano">Tamaño: {design.title.fontSize}px</label>
                   <input
+                    id="titulo-tamano"
                     type="range"
                     min="32"
                     max="120"
@@ -786,8 +791,9 @@ export default function GeneradorOGImagesPage() {
                 </div>
 
                 <div className={styles.inputRow}>
-                  <label>Color:</label>
+                  <label htmlFor="titulo-color">Color:</label>
                   <input
+                    id="titulo-color"
                     type="color"
                     value={design.title.color}
                     onChange={e => updateTitle({ color: e.target.value })}
@@ -796,8 +802,9 @@ export default function GeneradorOGImagesPage() {
                 </div>
 
                 <div className={styles.inputRow}>
-                  <label>Posición Y: {design.title.y}px</label>
+                  <label htmlFor="titulo-posicion-y">Posición Y: {design.title.y}px</label>
                   <input
+                    id="titulo-posicion-y"
                     type="range"
                     min="100"
                     max="450"
@@ -837,8 +844,9 @@ export default function GeneradorOGImagesPage() {
                 {design.subtitle.visible && (
                   <>
                     <div className={styles.inputRow}>
-                      <label>Texto:</label>
+                      <label htmlFor="subtitulo-texto">Texto:</label>
                       <input
+                        id="subtitulo-texto"
                         type="text"
                         value={design.subtitle.text}
                         onChange={e => updateSubtitle({ text: e.target.value })}
@@ -848,8 +856,9 @@ export default function GeneradorOGImagesPage() {
                     </div>
 
                     <div className={styles.inputRow}>
-                      <label>Fuente:</label>
+                      <label htmlFor="subtitulo-fuente">Fuente:</label>
                       <select
+                        id="subtitulo-fuente"
                         value={design.subtitle.fontFamily}
                         onChange={e => updateSubtitle({ fontFamily: e.target.value })}
                         className={styles.select}
@@ -861,8 +870,9 @@ export default function GeneradorOGImagesPage() {
                     </div>
 
                     <div className={styles.inputRow}>
-                      <label>Tamaño: {design.subtitle.fontSize}px</label>
+                      <label htmlFor="subtitulo-tamano">Tamaño: {design.subtitle.fontSize}px</label>
                       <input
+                        id="subtitulo-tamano"
                         type="range"
                         min="16"
                         max="48"
@@ -873,8 +883,9 @@ export default function GeneradorOGImagesPage() {
                     </div>
 
                     <div className={styles.inputRow}>
-                      <label>Color:</label>
+                      <label htmlFor="subtitulo-color">Color:</label>
                       <input
+                        id="subtitulo-color"
                         type="color"
                         value={design.subtitle.color}
                         onChange={e => updateSubtitle({ color: e.target.value })}
@@ -903,8 +914,9 @@ export default function GeneradorOGImagesPage() {
                 {design.branding.visible && (
                   <>
                     <div className={styles.inputRow}>
-                      <label>Texto:</label>
+                      <label htmlFor="marca-texto">Texto:</label>
                       <input
+                        id="marca-texto"
                         type="text"
                         value={design.branding.text}
                         onChange={e => updateBranding({ text: e.target.value })}
@@ -914,8 +926,9 @@ export default function GeneradorOGImagesPage() {
                     </div>
 
                     <div className={styles.inputRow}>
-                      <label>Posición:</label>
+                      <label htmlFor="marca-posicion">Posición:</label>
                       <select
+                        id="marca-posicion"
                         value={design.branding.position}
                         onChange={e => updateBranding({ position: e.target.value as 'bottom-left' | 'bottom-right' | 'bottom-center' })}
                         className={styles.select}
@@ -927,8 +940,9 @@ export default function GeneradorOGImagesPage() {
                     </div>
 
                     <div className={styles.inputRow}>
-                      <label>Tamaño: {design.branding.fontSize}px</label>
+                      <label htmlFor="marca-tamano">Tamaño: {design.branding.fontSize}px</label>
                       <input
+                        id="marca-tamano"
                         type="range"
                         min="16"
                         max="36"
@@ -939,8 +953,9 @@ export default function GeneradorOGImagesPage() {
                     </div>
 
                     <div className={styles.inputRow}>
-                      <label>Color:</label>
+                      <label htmlFor="marca-color">Color:</label>
                       <input
+                        id="marca-color"
                         type="color"
                         value={design.branding.color}
                         onChange={e => updateBranding({ color: e.target.value })}
@@ -969,8 +984,9 @@ export default function GeneradorOGImagesPage() {
                 {design.badge.visible && (
                   <>
                     <div className={styles.inputRow}>
-                      <label>Texto:</label>
+                      <label htmlFor="badge-texto">Texto:</label>
                       <input
+                        id="badge-texto"
                         type="text"
                         value={design.badge.text}
                         onChange={e => updateBadge({ text: e.target.value })}
@@ -994,8 +1010,9 @@ export default function GeneradorOGImagesPage() {
                     </div>
 
                     <div className={styles.inputRow}>
-                      <label>Color fondo:</label>
+                      <label htmlFor="badge-color-fondo">Color fondo:</label>
                       <input
+                        id="badge-color-fondo"
                         type="color"
                         value={design.badge.bgColor}
                         onChange={e => updateBadge({ bgColor: e.target.value })}
@@ -1004,8 +1021,9 @@ export default function GeneradorOGImagesPage() {
                     </div>
 
                     <div className={styles.inputRow}>
-                      <label>Color texto:</label>
+                      <label htmlFor="badge-color-texto">Color texto:</label>
                       <input
+                        id="badge-color-texto"
                         type="color"
                         value={design.badge.textColor}
                         onChange={e => updateBadge({ textColor: e.target.value })}
@@ -1048,8 +1066,9 @@ export default function GeneradorOGImagesPage() {
                     </div>
 
                     <div className={styles.inputRow}>
-                      <label>O escribe emoji:</label>
+                      <label htmlFor="icono-emoji">O escribe emoji:</label>
                       <input
+                        id="icono-emoji"
                         type="text"
                         value={design.icon.emoji}
                         onChange={e => updateIcon({ emoji: e.target.value })}
@@ -1059,8 +1078,9 @@ export default function GeneradorOGImagesPage() {
                     </div>
 
                     <div className={styles.inputRow}>
-                      <label>Tamaño: {design.icon.size}px</label>
+                      <label htmlFor="icono-tamano">Tamaño: {design.icon.size}px</label>
                       <input
+                        id="icono-tamano"
                         type="range"
                         min="40"
                         max="150"
@@ -1126,8 +1146,9 @@ export default function GeneradorOGImagesPage() {
                     {design.logo.visible && (
                       <>
                         <div className={styles.inputRow}>
-                          <label>Tamaño: {design.logo.size}px</label>
+                          <label htmlFor="logo-tamano">Tamaño: {design.logo.size}px</label>
                           <input
+                            id="logo-tamano"
                             type="range"
                             min="40"
                             max="200"
@@ -1138,8 +1159,9 @@ export default function GeneradorOGImagesPage() {
                         </div>
 
                         <div className={styles.inputRow}>
-                          <label>Posición:</label>
+                          <label htmlFor="logo-posicion">Posición:</label>
                           <select
+                            id="logo-posicion"
                             value={design.logo.position}
                             onChange={e => updateLogo({ position: e.target.value as typeof design.logo.position })}
                             className={styles.select}

@@ -193,10 +193,11 @@ function SeccionDhondt() {
       {/* Selector de ronda */}
       <div className={styles.sliderZona}>
         <div className={styles.sliderHeader}>
-          <label className={styles.sliderLabel}>Ronda de asignación</label>
+          <label htmlFor="ronda-asignacion" className={styles.sliderLabel}>Ronda de asignación</label>
           <span className={styles.sliderValor}>{rondaActiva} de {ESCANOS}</span>
         </div>
         <input
+          id="ronda-asignacion"
           type="range"
           className={styles.slider}
           min={1}
