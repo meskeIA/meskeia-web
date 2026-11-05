@@ -329,8 +329,9 @@ test.describe('Eigenvalores — matriz simétrica [a b; b d]', () => {
 // HALLAZGOS ABIERTOS (inspector 05/11/2026)
 // ═══════════════════════════════════════════════════════════════════════════
 
-// ABIERTO (contenido, medio) — cabo C0252 CONFIRMADO. Todas las cifras salen con toFixed(): punto
-// decimal en las cuatro pestañas. Con la matriz identidad (estado inicial de «Transformaciones»)
+// HALLAZGO 4135 — REPARADO el 05/11/2026 (/reparar): las cifras pasan por formatNumber y los
+// vectores separan sus componentes con «;». Lo que decía el caso (contenido, medio) — cabo C0252
+// CONFIRMADO. Todas las cifras salían con toFixed(): punto decimal en las cuatro pestañas. Con la matriz identidad (estado inicial de «Transformaciones»)
 // det(A) se lee «1.000», que en español es MIL; en el [2 −1; 1 1,5], «4.000».
 // Caso: Transformaciones, identidad → esperado «1,000» · obtenido «1.000». Mismo defecto en u·v,
 // |u|, |v|, el ángulo y la fórmula (L260-279), las etiquetas de los deslizadores (L228-254, L351,
@@ -339,7 +340,6 @@ test.describe('Eigenvalores — matriz simétrica [a b; b d]', () => {
 // componentes: «(0,71; −0,71)»), y el «95%» del bloque educativo sin espacio (L878).
 test.describe('Formato español (cabo C0252)', () => {
   test('ninguna cifra de las cuatro pestañas lleva punto decimal, y el porcentaje va con espacio', async ({ page }) => {
-    test.fail(); // ABIERTO (inspector 05/11/2026) [contenido/medio]
     await abrir(page);
     // Texto de la página (también el bloque educativo, que está en el DOM aunque nazca plegado),
     // sin <script> ni <style>: «95%» → esperado «95 %».
@@ -373,10 +373,16 @@ test.describe('Formato español (cabo C0252)', () => {
     await recoger();
     const conPunto = textos.map((t) => t.replace(/\s+/g, ' ').trim()).filter((t) => /\d\.\d/.test(t));
     expect({ conPunto, porcentajesPegados }).toEqual({ conPunto: [], porcentajesPegados: [] });
+    // Y lo que el caso nombraba, con su forma española: det(A) de la identidad «1,000».
+    await pestana(page, 'Transformaciones', T_A);
+    await expect(valorDe(page, 'det(A)')).toHaveText('1,000');
+    await pestana(page, 'Eigenvalores', E_A);
+    await expect(page.locator('[role="tabpanel"] [class*="eigenVec"]').last()).toHaveText('v₂ = (0,71; -0,71)');
   });
 });
 
-// ABIERTO (calculo, medio) — det(A) se compara con 0 exacto en coma flotante. En el 9,7 % de las
+// HALLAZGO 4136 — REPARADO el 05/11/2026 (/reparar): `limpiarCero` lleva a 0 un |det| < 10⁻⁹.
+// Lo que decía el caso (calculo, medio) — det(A) se comparaba con 0 exacto en coma flotante. En el 9,7 % de las
 // matrices singulares que dan los deslizadores (4.128 de 42.721) a·d − b·c deja un residuo de
 // ±1,4·10⁻¹⁷ y la app dice lo contrario de «no invertible». Pasar el valor por formatNumber (la
 // receta del cabo C0252) no lo arregla: saldría «≈0» con el mismo mensaje.
@@ -386,7 +392,6 @@ test.describe('Formato español (cabo C0252)', () => {
 //       preserva».
 test.describe('Transformaciones — una matriz singular es singular aunque la coma flotante deje residuo', () => {
   test('[0,3 0,1; 0,9 0,3] y [0,1 0,3; 0,3 0,9]: det = 0 y «no invertible»', async ({ page }) => {
-    test.fail(); // ABIERTO (inspector 05/11/2026) [calculo/medio]
     await abrir(page);
     await pestana(page, 'Transformaciones', T_A);
     await sembrarValor(page, T_A, 0.3);
@@ -400,24 +405,32 @@ test.describe('Transformaciones — una matriz singular es singular aunque la co
     await sembrarValor(page, T_D, 0.9);
     const segunda = await mensajeDet(page).textContent();
     expect([primera, segunda].map((m) => (m ?? '').includes('det = 0'))).toEqual([true, true]);
+    await expect(valorDe(page, 'det(A)')).toHaveText('0,000');
+    // La rejilla no se pinta en rojo («orientación invertida») con un det que es cero.
+    await expect(page.locator('[role="tabpanel"] svg > path').last()).toHaveAttribute('stroke', 'rgba(46,134,171,0.5)');
   });
 });
 
-// ABIERTO (calculo, bajo) — con un vector nulo el ángulo no está definido (cos θ = 0/0), pero
-// anguloEntreVectores devuelve 0 y la app afirma «0.0°», como si u y v apuntaran igual.
+// HALLAZGO 4138 — REPARADO el 05/11/2026 (/reparar): anguloEntreVectores devuelve null y la app
+// dice «No definido», también en la fórmula. Lo que decía el caso (calculo, bajo) — con un vector
+// nulo el ángulo no está definido (cos θ = 0/0), pero anguloEntreVectores devolvía 0 y la app
+// afirmaba «0.0°», como si u y v apuntaran igual.
 // Caso: u = (0, 0), v = (1, 3) → esperado ángulo «no definido» (o «—») · obtenido «0.0°» y la
 //       fórmula «0.00 = 0.00 × 3.16 × cos(0.0°)».
 test.describe('Vectores — ángulo con un vector nulo', () => {
   test('u = (0, 0): el ángulo no es una cifra', async ({ page }) => {
-    test.fail(); // ABIERTO (inspector 05/11/2026) [calculo/bajo]
     await abrir(page);
     await sembrarValor(page, U_X, 0);
     await sembrarValor(page, U_Y, 0);
     expect(Number.isFinite(await leer(valorDe(page, 'Ángulo')))).toBe(false);
+    await expect(valorDe(page, 'Ángulo')).toHaveText('No definido');
+    await expect(page.locator('[role="tabpanel"] [class*="formulaBox"]')).toContainText('con θ no definido');
   });
 });
 
-// ABIERTO (calculo, medio) — con b = 0 y a = d (A = a·I) calcularEigenvector devuelve (1, 0)
+// HALLAZGO 4137 — REPARADO el 05/11/2026 (/reparar): con A = a·I se muestran (1; 0) y (0; 1)
+// y una nota dice que todo vector es propio. Lo que decía el caso:
+// (calculo, medio) — con b = 0 y a = d (A = a·I) calcularEigenvector devuelve (1, 0)
 // para los DOS eigenvalores: la app pinta v₁ = v₂ y las dos flechas se superponen, justo debajo
 // de «Las matrices simétricas siempre tienen eigenvalores reales y eigenvectores ortogonales».
 // Se llega desde el estado inicial [2 1; 1 2] moviendo solo b a 0.
@@ -425,7 +438,6 @@ test.describe('Vectores — ángulo con un vector nulo', () => {
 //       (0, 1) · obtenido v₁ = (1.00, 0.00) y v₂ = (1.00, 0.00). Igual con la matriz nula.
 test.describe('Eigenvalores — matriz escalar', () => {
   test('[2 0; 0 2]: los dos eigenvectores mostrados son ortogonales', async ({ page }) => {
-    test.fail(); // ABIERTO (inspector 05/11/2026) [calculo/medio]
     await abrir(page);
     await pestana(page, 'Eigenvalores', E_A);
     await sembrarValor(page, E_B, 0); // a = d = 2 del estado inicial
@@ -433,6 +445,17 @@ test.describe('Eigenvalores — matriz escalar', () => {
     expect(e.l1).toBeCloseTo(2, 3);
     expect(e.l2).toBeCloseTo(2, 3);
     expect(Math.abs(e.v1[0] * e.v2[0] + e.v1[1] * e.v2[1])).toBeLessThan(0.01);
+    await expect(page.getByTestId('nota-matriz-escalar')).toContainText('todo vector es propio');
+    // Y la matriz nula, el otro caso del acta: λ = 0 doble, también (1; 0) y (0; 1).
+    await sembrarValor(page, E_A, 0);
+    await sembrarValor(page, E_D, 0);
+    const n = await eigen(page);
+    expect(n.v1).toEqual([1, 0]);
+    expect(n.v2).toEqual([0, 1]);
+    // Fuera del caso escalar no hay nota: [3 0; 0 −1].
+    await sembrarValor(page, E_A, 3);
+    await sembrarValor(page, E_D, -1);
+    await expect(page.getByTestId('nota-matriz-escalar')).toHaveCount(0);
   });
 });
 

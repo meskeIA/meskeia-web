@@ -11,6 +11,7 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
+import { formatNumber } from '@/lib';
 import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
@@ -66,6 +67,26 @@ function toSvgY(y: number): number {
   return ORIGEN_Y - y * ESCALA;
 }
 
+/**
+ * Cifras en formato español (CLAUDE.md global §2). Hasta el 05/11/2026 todo salía con toFixed()
+ * y punto decimal: det(A) = 1 se leía «1.000», que en español es MIL (hallazgo 4135, cabo C0252).
+ */
+const cifra = (x: number, decimales: number): string => formatNumber(x, decimales);
+/** Valor de un deslizador de paso 0,5: «3», «−2,5». */
+const cifraPaso = (x: number): string => formatNumber(x, Number.isInteger(x) ? 0 : 1);
+/** Vector con coma decimal: las componentes se separan con «;» («(0,71; −0,71)»). */
+const cifraVector = (v: Vector2D): string => `(${cifra(v.x, 2)}; ${cifra(v.y, 2)})`;
+
+/**
+ * Lleva a 0 el residuo de coma flotante de un producto de deslizadores: con paso 0,1,
+ * 0,3·0,3 − 0,1·0,9 da −1,39·10⁻¹⁷ y la matriz singular salía «orientación invertida» (hallazgo
+ * 4136: 4.128 de las 42.721 matrices singulares alcanzables). Los valores de los deslizadores
+ * tienen como mucho dos decimales, así que un |det| < 10⁻⁹ solo puede ser un cero.
+ */
+function limpiarCero(x: number): number {
+  return Math.abs(x) < 1e-9 ? 0 : x;
+}
+
 function modulo(v: Vector2D): number {
   return Math.sqrt(v.x * v.x + v.y * v.y);
 }
@@ -74,16 +95,21 @@ function productoEscalar(u: Vector2D, v: Vector2D): number {
   return u.x * v.x + u.y * v.y;
 }
 
-function anguloEntreVectores(u: Vector2D, v: Vector2D): number {
+/**
+ * Ángulo entre dos vectores, en grados; null si uno es nulo, porque entonces cos θ = 0/0 y el
+ * ángulo no está definido. Hasta el 05/11/2026 devolvía 0 y la app afirmaba «0.0°», como si los
+ * dos apuntaran igual (hallazgo 4138).
+ */
+function anguloEntreVectores(u: Vector2D, v: Vector2D): number | null {
   const mu = modulo(u);
   const mv = modulo(v);
-  if (mu === 0 || mv === 0) return 0;
+  if (mu === 0 || mv === 0) return null;
   const cos = Math.max(-1, Math.min(1, productoEscalar(u, v) / (mu * mv)));
   return (Math.acos(cos) * 180) / Math.PI;
 }
 
 function determinante(m: Matriz2x2): number {
-  return m.a * m.d - m.b * m.c;
+  return limpiarCero(m.a * m.d - m.b * m.c);
 }
 
 function aplicarMatriz(m: Matriz2x2, v: Vector2D): Vector2D {
@@ -122,6 +148,22 @@ function calcularEigenvector(m: MatrizSimetrica2x2, lambda: number): Vector2D {
   // diagonal: eigenvectores son (1,0) y (0,1)
   if (Math.abs(m.a - lambda) < 1e-9) return { x: 1, y: 0 };
   return { x: 0, y: 1 };
+}
+
+/**
+ * Los dos eigenvectores que se muestran. Con A = a·I (b = 0 y a = d) TODO vector es propio y
+ * calcularEigenvector daba (1, 0) para los dos eigenvalores: las dos flechas se superponían
+ * bajo «eigenvectores ortogonales» (hallazgo 4137). Ahora se muestran (1, 0) y (0, 1) y se dice.
+ */
+function calcularEigenvectores(
+  m: MatrizSimetrica2x2,
+  lambda1: number,
+  lambda2: number,
+): { v1: Vector2D; v2: Vector2D; escalar: boolean } {
+  if (Math.abs(m.b) < 1e-9 && Math.abs(m.a - m.d) < 1e-9) {
+    return { v1: { x: 1, y: 0 }, v2: { x: 0, y: 1 }, escalar: true };
+  }
+  return { v1: calcularEigenvector(m, lambda1), v2: calcularEigenvector(m, lambda2), escalar: false };
 }
 
 // ─────────────────────────────────────────────
@@ -225,13 +267,13 @@ function TabVectores() {
           <div className={styles.vectorGroup}>
             <h4 className={styles.vectorLabel} style={{ color: 'var(--primary-texto)' }}>Vector u</h4>
             <label className={styles.sliderLabel}>
-              u<sub>x</sub> = {u.x}
+              u<sub>x</sub> = {cifraPaso(u.x)}
               <input type="range" min="-5" max="5" step="0.5" value={u.x}
                 onChange={(e) => setU((prev) => ({ ...prev, x: parseFloat(e.target.value) }))}
                 className={styles.slider} aria-label="Componente x del vector u" />
             </label>
             <label className={styles.sliderLabel}>
-              u<sub>y</sub> = {u.y}
+              u<sub>y</sub> = {cifraPaso(u.y)}
               <input type="range" min="-5" max="5" step="0.5" value={u.y}
                 onChange={(e) => setU((prev) => ({ ...prev, y: parseFloat(e.target.value) }))}
                 className={styles.slider} aria-label="Componente y del vector u" />
@@ -241,13 +283,13 @@ function TabVectores() {
           <div className={styles.vectorGroup}>
             <h4 className={styles.vectorLabel} style={{ color: 'var(--secondary-texto)' }}>Vector v</h4>
             <label className={styles.sliderLabel}>
-              v<sub>x</sub> = {v.x}
+              v<sub>x</sub> = {cifraPaso(v.x)}
               <input type="range" min="-5" max="5" step="0.5" value={v.x}
                 onChange={(e) => setV((prev) => ({ ...prev, x: parseFloat(e.target.value) }))}
                 className={styles.slider} aria-label="Componente x del vector v" />
             </label>
             <label className={styles.sliderLabel}>
-              v<sub>y</sub> = {v.y}
+              v<sub>y</sub> = {cifraPaso(v.y)}
               <input type="range" min="-5" max="5" step="0.5" value={v.y}
                 onChange={(e) => setV((prev) => ({ ...prev, y: parseFloat(e.target.value) }))}
                 className={styles.slider} aria-label="Componente y del vector v" />
@@ -257,26 +299,30 @@ function TabVectores() {
           <div className={styles.metricas}>
             <div className={styles.metrica}>
               <span className={styles.metricaNombre}>u · v</span>
-              <span className={styles.metricaValor}>{pe.toFixed(2)}</span>
+              <span className={styles.metricaValor}>{cifra(pe, 2)}</span>
             </div>
             <div className={styles.metrica}>
               <span className={styles.metricaNombre}>|u|</span>
-              <span className={styles.metricaValor}>{modU.toFixed(2)}</span>
+              <span className={styles.metricaValor}>{cifra(modU, 2)}</span>
             </div>
             <div className={styles.metrica}>
               <span className={styles.metricaNombre}>|v|</span>
-              <span className={styles.metricaValor}>{modV.toFixed(2)}</span>
+              <span className={styles.metricaValor}>{cifra(modV, 2)}</span>
             </div>
             <div className={styles.metrica}>
               <span className={styles.metricaNombre}>Ángulo</span>
-              <span className={styles.metricaValor}>{angulo.toFixed(1)}°</span>
+              <span className={styles.metricaValor}>{angulo === null ? 'No definido' : `${cifra(angulo, 1)}°`}</span>
             </div>
           </div>
 
           <div className={styles.formulaBox}>
             <strong>u · v = |u||v|cos(θ)</strong>
             <br />
-            {pe.toFixed(2)} = {modU.toFixed(2)} × {modV.toFixed(2)} × cos({angulo.toFixed(1)}°)
+            <span>
+              {angulo === null
+                ? `${cifra(pe, 2)} = ${cifra(modU, 2)} × ${cifra(modV, 2)} × cos(θ), con θ no definido: un vector nulo no tiene dirección`
+                : `${cifra(pe, 2)} = ${cifra(modU, 2)} × ${cifra(modV, 2)} × cos(${cifra(angulo, 1)}°)`}
+            </span>
           </div>
         </div>
 
@@ -348,7 +394,7 @@ function TabTransformaciones() {
           <div className={styles.matrizSliders}>
             {(['a', 'b', 'c', 'd'] as (keyof Matriz2x2)[]).map((key) => (
               <label key={key} className={styles.sliderLabel}>
-                {key} = {matriz[key].toFixed(2)}
+                {key} = {cifra(matriz[key], 2)}
                 <input type="range" min="-3" max="3" step="0.1"
                   value={matriz[key]}
                   onChange={(e) => setMatriz((prev) => ({ ...prev, [key]: parseFloat(e.target.value) }))}
@@ -361,10 +407,10 @@ function TabTransformaciones() {
           <div className={styles.matrizVisual}>
             <span className={styles.matrizBracket}>[</span>
             <div className={styles.matrizCeldas}>
-              <span>{matriz.a.toFixed(2)}</span>
-              <span>{matriz.b.toFixed(2)}</span>
-              <span>{matriz.c.toFixed(2)}</span>
-              <span>{matriz.d.toFixed(2)}</span>
+              <span>{cifra(matriz.a, 2)}</span>
+              <span>{cifra(matriz.b, 2)}</span>
+              <span>{cifra(matriz.c, 2)}</span>
+              <span>{cifra(matriz.d, 2)}</span>
             </div>
             <span className={styles.matrizBracket}>]</span>
           </div>
@@ -372,7 +418,7 @@ function TabTransformaciones() {
           <div className={styles.metricas}>
             <div className={`${styles.metrica} ${det < 0 ? styles.metricaRoja : det === 0 ? styles.metricaAmarilla : ''}`}>
               <span className={styles.metricaNombre}>det(A)</span>
-              <span className={styles.metricaValor}>{det.toFixed(3)}</span>
+              <span className={styles.metricaValor}>{cifra(det, 3)}</span>
             </div>
           </div>
 
@@ -438,7 +484,7 @@ function TabDeterminante() {
 
   const v1: Vector2D = { x: a, y: c }; // primera columna
   const v2: Vector2D = { x: b, y: d }; // segunda columna
-  const det = a * d - b * c;
+  const det = limpiarCero(a * d - b * c);
   const area = Math.abs(det);
 
   // Vértices del paralelogramo: O, v1, v1+v2, v2
@@ -463,13 +509,13 @@ function TabDeterminante() {
           <div className={styles.vectorGroup}>
             <h5 className={styles.vectorSubLabel} style={{ color: 'var(--primary-texto)' }}>v₁ = (a, c)</h5>
             <label className={styles.sliderLabel}>
-              a = {a}
+              a = {cifraPaso(a)}
               <input type="range" min="-5" max="5" step="0.5" value={a}
                 onChange={(e) => setA(parseFloat(e.target.value))}
                 className={styles.slider} aria-label="Componente a" />
             </label>
             <label className={styles.sliderLabel}>
-              c = {c}
+              c = {cifraPaso(c)}
               <input type="range" min="-5" max="5" step="0.5" value={c}
                 onChange={(e) => setC(parseFloat(e.target.value))}
                 className={styles.slider} aria-label="Componente c" />
@@ -479,13 +525,13 @@ function TabDeterminante() {
           <div className={styles.vectorGroup}>
             <h5 className={styles.vectorSubLabel} style={{ color: 'var(--secondary-texto)' }}>v₂ = (b, d)</h5>
             <label className={styles.sliderLabel}>
-              b = {b}
+              b = {cifraPaso(b)}
               <input type="range" min="-5" max="5" step="0.5" value={b}
                 onChange={(e) => setB(parseFloat(e.target.value))}
                 className={styles.slider} aria-label="Componente b" />
             </label>
             <label className={styles.sliderLabel}>
-              d = {d}
+              d = {cifraPaso(d)}
               <input type="range" min="-5" max="5" step="0.5" value={d}
                 onChange={(e) => setD(parseFloat(e.target.value))}
                 className={styles.slider} aria-label="Componente d" />
@@ -495,11 +541,11 @@ function TabDeterminante() {
           <div className={styles.metricas}>
             <div className={styles.metrica}>
               <span className={styles.metricaNombre}>det(A) = ad − bc</span>
-              <span className={styles.metricaValor}>{det.toFixed(2)}</span>
+              <span className={styles.metricaValor}>{cifra(det, 2)}</span>
             </div>
             <div className={styles.metrica}>
               <span className={styles.metricaNombre}>Área = |det|</span>
-              <span className={styles.metricaValor}>{area.toFixed(2)}</span>
+              <span className={styles.metricaValor}>{cifra(area, 2)}</span>
             </div>
           </div>
 
@@ -530,7 +576,7 @@ function TabDeterminante() {
             <text x={toSvgX((v1.x + v2.x) / 2) - 10} y={toSvgY((v1.y + v2.y) / 2) + 5}
               fontSize="13" fontWeight="700"
               fill={det < 0 ? '#c0392b' : '#2E86AB'}>
-              Área = {area.toFixed(2)}
+              Área = {cifra(area, 2)}
             </text>
           </svg>
           <p className={styles.svgNota}>
@@ -551,8 +597,7 @@ function TabEigenvalores() {
 
   const mat: Matriz2x2 = { a: ms.a, b: ms.b, c: ms.b, d: ms.d };
   const { lambda1, lambda2 } = calcularEigenvalores(ms);
-  const ev1 = calcularEigenvector(ms, lambda1);
-  const ev2 = calcularEigenvector(ms, lambda2);
+  const { v1: ev1, v2: ev2, escalar } = calcularEigenvectores(ms, lambda1, lambda2);
 
   // Aplicar la matriz a los eigenvectores: resultado = λ·v
   const av1 = aplicarMatriz(mat, ev1); // = lambda1 * ev1
@@ -571,19 +616,19 @@ function TabEigenvalores() {
           </p>
 
           <label className={styles.sliderLabel}>
-            a = {ms.a}
+            a = {cifraPaso(ms.a)}
             <input type="range" min="-3" max="3" step="0.5" value={ms.a}
               onChange={(e) => setMs((prev) => ({ ...prev, a: parseFloat(e.target.value) }))}
               className={styles.slider} aria-label="Componente a de la matriz simétrica" />
           </label>
           <label className={styles.sliderLabel}>
-            b = {ms.b}
+            b = {cifraPaso(ms.b)}
             <input type="range" min="-3" max="3" step="0.5" value={ms.b}
               onChange={(e) => setMs((prev) => ({ ...prev, b: parseFloat(e.target.value) }))}
               className={styles.slider} aria-label="Componente b (off-diagonal) de la matriz simétrica" />
           </label>
           <label className={styles.sliderLabel}>
-            d = {ms.d}
+            d = {cifraPaso(ms.d)}
             <input type="range" min="-3" max="3" step="0.5" value={ms.d}
               onChange={(e) => setMs((prev) => ({ ...prev, d: parseFloat(e.target.value) }))}
               className={styles.slider} aria-label="Componente d de la matriz simétrica" />
@@ -592,22 +637,29 @@ function TabEigenvalores() {
           <div className={styles.eigenResultados}>
             <div className={styles.eigenFila}>
               <span className={styles.eigenIcon} style={{ color: 'var(--primary-texto)' }}>λ₁</span>
-              <span className={styles.eigenValor}>{lambda1.toFixed(3)}</span>
-              <span className={styles.eigenVec}>v₁ = ({ev1.x.toFixed(2)}, {ev1.y.toFixed(2)})</span>
+              <span className={styles.eigenValor}>{cifra(lambda1, 3)}</span>
+              <span className={styles.eigenVec}>v₁ = {cifraVector(ev1)}</span>
             </div>
             <div className={styles.eigenFila}>
               <span className={styles.eigenIcon} style={{ color: 'var(--secondary-texto)' }}>λ₂</span>
-              <span className={styles.eigenValor}>{lambda2.toFixed(3)}</span>
-              <span className={styles.eigenVec}>v₂ = ({ev2.x.toFixed(2)}, {ev2.y.toFixed(2)})</span>
+              <span className={styles.eigenValor}>{cifra(lambda2, 3)}</span>
+              <span className={styles.eigenVec}>v₂ = {cifraVector(ev2)}</span>
             </div>
           </div>
+
+          {escalar && (
+            <p className={styles.sliderDescripcion} data-testid="nota-matriz-escalar">
+              A = {cifraPaso(ms.a)}·I es una matriz escalar: estira igual en todas las direcciones, así
+              que todo vector es propio. Se muestran dos ortogonales, (1; 0) y (0; 1).
+            </p>
+          )}
 
           <div className={styles.formulaBox}>
             <strong>Av = λv</strong>
             <br />
-            El eigenvector <span style={{ color: 'var(--primary-texto)' }}>v₁</span> solo escala: A·v₁ = {lambda1.toFixed(2)}·v₁
+            El eigenvector <span style={{ color: 'var(--primary-texto)' }}>v₁</span> solo escala: A·v₁ = {cifra(lambda1, 2)}·v₁
             <br />
-            El eigenvector <span style={{ color: 'var(--secondary-texto)' }}>v₂</span> solo escala: A·v₂ = {lambda2.toFixed(2)}·v₂
+            El eigenvector <span style={{ color: 'var(--secondary-texto)' }}>v₂</span> solo escala: A·v₂ = {cifra(lambda2, 2)}·v₂
           </div>
         </div>
 
@@ -875,7 +927,7 @@ export default function VisualizadorAlgebraLineal() {
               <h3>Científico de Datos</h3>
             </div>
             <p>PCA (Análisis de Componentes Principales) usa eigenvalores para encontrar las direcciones de mayor varianza y reducir dimensiones preservando la información relevante.</p>
-            <p className={styles.escenarioTip}>Con eigenvalores puedes comprimir un dataset de 1000 variables a 10 componentes que explican el 95% de la varianza.</p>
+            <p className={styles.escenarioTip}>Con eigenvalores puedes comprimir un dataset de 1000 variables a 10 componentes que explican el 95{' '}% de la varianza.</p>
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
