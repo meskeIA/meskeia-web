@@ -35,7 +35,10 @@
  *     (tabindex="-1", el enunciado o el título del resultado), no en <body>.
  *   · TECLADO (APG): un solo radio con tabindex 0; ArrowDown y Fin mueven foco y marca.
  *   · DOBLE TOQUE: ratón real, el 2.º clic de la ráfaga (`detail` 2) en el mismo punto cuando la
- *     pantalla nueva ya está pintada, en cada «Siguiente» hasta el resultado, a 390×844.
+ *     pantalla nueva ya está pintada, en cada «Siguiente» hasta el resultado, a 390×844. Desde
+ *     el 05/11/2026 (cabo C0624) la pregunta puede ser de casillas y el resultado se exige sin
+ *     «Siguiente» a la vista; y un clic SUELTO a 200 ms tiene que contar (la otra mitad).
+ *     Sin medir aún: «Empezar», «Anterior», «Repetir» y la posición del botón, ni a 360×740.
  * La guarda NO se fija por su forma: hay tres variantes en la familia (por botón, en captura
  * sobre el contenedor y en captura sobre window, la de seguro-hogar) y se acepta cualquiera que
  * pase el caso. La de window es la única que cubre un ENLACE ajeno bajo el dedo (Apps
@@ -237,6 +240,13 @@ async function comprobarBarra(page: Page, momento: string): Promise<number> {
 const botonSiguiente = (page: Page) =>
   page.getByRole('button', { name: /siguiente|ver (mi )?resultado/i }).first();
 
+/**
+ * La pregunta en pantalla: un grupo de radios o, en una pregunta de varias respuestas, un grupo de
+ * casillas. Cabo C0624 (04/11/2026): solo con radiogroup, el bucle del doble toque tomaba la P6 de
+ * selector-mascota (casillas) por el resultado y no medía de la P6 a la P10 ni «Ver resultado».
+ */
+const GRUPO_PREGUNTA = '[role="radiogroup"], [role="group"]:has([role="checkbox"])';
+
 // ─────────────────────────────────────────────────────────────────────────────
 // El invariante, en cada hermana
 // ─────────────────────────────────────────────────────────────────────────────
@@ -354,8 +364,8 @@ for (const h of HERMANAS) {
       await abrirTest(page, h);
       const url = page.url();
       for (let paso = 1; paso <= 30; paso++) {
-        await page.locator('[role="radiogroup"]').first().locator('button').first().click(); // suelto: cierra la ráfaga
-        const opcionesDe = () => page.locator('[role="radiogroup"]').first().innerText();
+        await page.locator(GRUPO_PREGUNTA).first().locator('button').first().click(); // suelto: cierra la ráfaga
+        const opcionesDe = () => page.locator(GRUPO_PREGUNTA).first().innerText();
         const antes = await opcionesDe();
         await botonSiguiente(page).scrollIntoViewIfNeeded();
         await page.waitForTimeout(100);
@@ -367,7 +377,7 @@ for (const h of HERMANAS) {
         // El 2.º toque cae sobre la pantalla NUEVA: se espera a que esté pintada (y a que el foco
         // la desplace), no un tiempo fijo, que daba un resultado u otro según la carga.
         await expect
-          .poll(async () => ((await page.locator('[role="radiogroup"]').count()) === 0 ? 'fin' : await opcionesDe()), {
+          .poll(async () => ((await page.locator(GRUPO_PREGUNTA).count()) === 0 ? 'fin' : await opcionesDe()), {
             intervals: [20],
             timeout: 3000,
           })
@@ -377,13 +387,41 @@ for (const h of HERMANAS) {
         await page.mouse.up({ clickCount: 2 });
         await page.waitForTimeout(400);
         expect(page.url(), `paso ${paso}: la ráfaga no saca de la app`).toBe(url);
-        const grupos = page.locator('[role="radiogroup"]');
-        if ((await grupos.count()) === 0) return; // resultado
+        const grupos = page.locator(GRUPO_PREGUNTA);
+        if ((await grupos.count()) === 0) {
+          // Resultado de verdad, no una pregunta que el localizador no reconoce (C0624): sin
+          // pregunta en pantalla tampoco queda un «Siguiente» ni un «Ver resultado»
+          await expect(botonSiguiente(page), `paso ${paso}: sin pregunta reconocible y aún con «Siguiente»`).toHaveCount(0);
+          return;
+        }
         // Las opciones cambian de pregunta a pregunta (la barra no sirve: alguna cuenta respondidas)
         expect(await opcionesDe(), `paso ${paso}: el primer clic avanzó`).not.toBe(antes);
         await expect(grupos.first().locator('[aria-checked="true"]'), `paso ${paso}: la ráfaga no contesta la pregunta nueva`).toHaveCount(0);
       }
       throw new Error('30 pasos sin llegar al resultado');
+    });
+
+    /**
+     * La otra mitad de la guarda (cabo C0624, 04/11/2026): un clic SUELTO (detail 1) es una
+     * intención nueva aunque llegue deprisa. Cambiar de opción a los 200 ms, y elegir en la
+     * pregunta nueva a los 200 ms de «Siguiente», tiene que mover la marca. Una guarda escrita con
+     * un temporizador se lo comería; la de useGuardaRafaga, que mira `detail`, no.
+     */
+    test('un clic suelto a 200 ms sí cuenta: cambia la marca, también justo tras «Siguiente»', async ({ page }) => {
+      const grupo = await abrirTest(page, h);
+      const opciones = grupo.locator('button');
+      await opciones.nth(0).click();
+      await page.waitForTimeout(200);
+      await opciones.nth(1).click();
+      await expect(opciones.nth(1), 'a los 200 ms de la primera, la segunda opción queda marcada').toHaveAttribute('aria-checked', 'true');
+      await expect(opciones.nth(0)).toHaveAttribute('aria-checked', 'false');
+      const antes = await page.locator(GRUPO_PREGUNTA).first().innerText();
+      await botonSiguiente(page).click();
+      await expect.poll(() => page.locator(GRUPO_PREGUNTA).first().innerText(), { message: 'llega la P2' }).not.toBe(antes);
+      await page.waitForTimeout(200);
+      const p2 = page.locator(GRUPO_PREGUNTA).first().locator('button');
+      await p2.nth(1).click();
+      await expect(p2.nth(1), 'a los 200 ms de «Siguiente», la opción de la P2 queda marcada').toHaveAttribute('aria-checked', 'true');
     });
   });
 }
