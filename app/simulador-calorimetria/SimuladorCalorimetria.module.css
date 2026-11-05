@@ -242,6 +242,38 @@
   line-height: 1.55;
 }
 
+/* Fase en la temperatura justa de un cambio de estado */
+.selectorFase {
+  margin-top: 0.9rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--text-primary);
+}
+
+.faseBtn {
+  background: var(--bg-card);
+  border: 1.5px solid #6b7280;
+  border-radius: 999px;
+  padding: 0.35rem 0.85rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  color: var(--text-primary);
+}
+
+.faseBtn:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.faseBtnActivo {
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
+  color: #ffffff;
+}
+
 /* Presets */
 .presetsGrid {
   display: flex;
@@ -750,6 +782,18 @@
 
 [data-theme='dark'] .presetBtn:hover {
   background: #1e3a5f;
+}
+
+[data-theme='dark'] .faseBtn {
+  background: #2a2a2a;
+  color: var(--text-primary);
+  border-color: #6b7280;
+}
+
+[data-theme='dark'] .faseBtnActivo {
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
+  color: #ffffff;
 }
 
 [data-theme='dark'] .aviso {

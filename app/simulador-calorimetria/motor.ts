@@ -224,6 +224,53 @@ export function sustanciaPorId(id: string): Sustancia {
 }
 
 /**
+ * Fase en la temperatura justa de un cambio de estado: 'inferior' es la de abajo (sólido en la
+ * fusión, líquido en la ebullición) y 'superior' la de arriba. Fuera de un punto de cambio no
+ * significa nada.
+ *
+ * CONVENCIÓN, la misma en los dos modos (hallazgos 4092 y 4093, 05/11/2026): un cuerpo que
+ * EMPIEZA justo en un punto de cambio está por defecto en la fase de abajo (hielo a 0 °C, agua
+ * líquida a 100 °C), y la vista deja elegir la otra; uno que TERMINA en él se queda, por
+ * defecto, en la fase a la que llega sin cruzarlo. Hasta esa fecha el modo calentar tomaba el
+ * agua a 0 °C como líquida y la mezcla como hielo, y la mezcla contaba la fusión en el
+ * equilibrio pero no en el desglose (Q_A ≠ −Q_B).
+ */
+export type Lado = 'inferior' | 'superior';
+
+/** La temperatura es la de un cambio de estado de la sustancia */
+export function puntoDeCambio(
+  s: Sustancia,
+  t: number,
+): { tipo: 'fusion' | 'ebullicion'; abajo: string; arriba: string } | null {
+  if (s.tFusion !== undefined && Math.abs(t - s.tFusion) < 1e-9) {
+    return { tipo: 'fusion', abajo: s.nombreSolido, arriba: s.nombreLiquido };
+  }
+  if (s.tEbullicion !== undefined && Math.abs(t - s.tEbullicion) < 1e-9) {
+    return { tipo: 'ebullicion', abajo: s.nombreLiquido, arriba: s.nombreGas };
+  }
+  return null;
+}
+
+/** Fase por defecto del punto de llegada: la que se alcanza sin cruzar el cambio de estado */
+export function ladoLlegada(t0: number, lado0: Lado, t1: number): Lado {
+  if (t1 > t0) return 'inferior';
+  if (t1 < t0) return 'superior';
+  return lado0;
+}
+
+/** El estado (t, lado) está por debajo de la meseta de temperatura tm, o en su fase inferior */
+function porDebajo(t: number, lado: Lado, tm: number): boolean {
+  return t < tm || (Math.abs(t - tm) < 1e-9 && lado === 'inferior');
+}
+
+/** Calor específico de la fase en que está la sustancia a 20 °C (el que se enseña en su botón) */
+export function cAmbiente(s: Sustancia, t = 20): number {
+  if (s.tFusion === undefined || t < s.tFusion) return s.cSolido ?? s.cLiquido ?? 0;
+  if (s.tEbullicion === undefined || t <= s.tEbullicion) return s.cLiquido ?? s.cSolido ?? 0;
+  return s.cGas ?? s.cLiquido ?? 0;
+}
+
+/**
  * Entalpía específica en J/kg, con el cero puesto en el punto de fusión justo
  * antes de fundir. La referencia es arbitraria porque solo se usan diferencias
  * dentro de una misma sustancia.
@@ -276,12 +323,26 @@ export function rangoSustancia(s: Sustancia): { min: number; max: number } {
  * tramos salen en orden inverso, con el calor negativo y los cambios de estado
  * nombrados al revés (solidificación en vez de fusión).
  */
-export function calcularTramos(s: Sustancia, masaKg: number, t0: number, t1: number): Tramo[] {
-  if (masaKg <= 0 || t0 === t1) return [];
+export function calcularTramos(
+  s: Sustancia,
+  masaKg: number,
+  t0: number,
+  t1: number,
+  lado0: Lado = 'inferior',
+  lado1: Lado = ladoLlegada(t0, lado0, t1),
+): Tramo[] {
+  if (masaKg <= 0) return [];
+  if (t0 === t1 && lado0 === lado1) return [];
 
-  const enfriando = t1 < t0;
-  const desde = Math.min(t0, t1);
-  const hasta = Math.max(t0, t1);
+  // Se recorre siempre hacia arriba, de (desde, ladoDesde) a (hasta, ladoHasta)
+  const enfriando = t1 < t0 || (t1 === t0 && lado0 === 'superior');
+  const desde = enfriando ? t1 : t0;
+  const hasta = enfriando ? t0 : t1;
+  const ladoDesde = enfriando ? lado1 : lado0;
+  const ladoHasta = enfriando ? lado0 : lado1;
+  // Una meseta se cruza entera si se parte de su fase de abajo (o de más abajo) y se llega a
+  // la de arriba (o más arriba)
+  const cruza = (tm: number) => porDebajo(desde, ladoDesde, tm) && !porDebajo(hasta, ladoHasta, tm);
   const tramos: Tramo[] = [];
 
   const sensible = (c: number, ta: number, tb: number, nombreFase: string) => {
@@ -313,36 +374,28 @@ export function calcularTramos(s: Sustancia, masaKg: number, t0: number, t1: num
     });
   };
 
-  let t = desde;
+  if (s.tFusion === undefined) {
+    // Sin cambios de estado modelados (vidrio): un solo tramo sensible
+    sensible(s.cSolido ?? 0, desde, hasta, s.nombreSolido);
+  } else {
+    const tF = s.tFusion;
+    const tE = s.tEbullicion;
 
-  // Fase sólida y fusión
-  if (s.tFusion !== undefined && t < s.tFusion) {
-    sensible(s.cSolido ?? 0, t, Math.min(hasta, s.tFusion), s.nombreSolido);
-    t = Math.min(hasta, s.tFusion);
-    if (hasta > s.tFusion) {
-      latente(s.lFusion ?? 0, s.tFusion, 'fusion', s.nombreSolido);
+    // Fase sólida y fusión
+    if (desde < tF) sensible(s.cSolido ?? 0, desde, Math.min(hasta, tF), s.nombreSolido);
+    if (cruza(tF)) latente(s.lFusion ?? 0, tF, 'fusion', s.nombreSolido);
+
+    // Fase líquida y vaporización
+    const techo = tE !== undefined ? Math.min(hasta, tE) : hasta;
+    sensible(s.cLiquido ?? 0, Math.max(desde, tF), techo, s.nombreLiquido);
+    if (tE !== undefined && cruza(tE)) {
+      latente(s.lVaporizacion ?? 0, tE, 'vaporizacion', s.nombreLiquido);
     }
-  }
 
-  // Fase líquida y vaporización
-  if (t < hasta) {
-    const techo = s.tEbullicion !== undefined ? Math.min(hasta, s.tEbullicion) : hasta;
-    const sinFases = s.tFusion === undefined;
-    sensible(
-      sinFases ? (s.cSolido ?? 0) : (s.cLiquido ?? 0),
-      t,
-      techo,
-      sinFases ? s.nombreSolido : s.nombreLiquido,
-    );
-    t = Math.max(t, techo);
-    if (s.tEbullicion !== undefined && hasta > s.tEbullicion) {
-      latente(s.lVaporizacion ?? 0, s.tEbullicion, 'vaporizacion', s.nombreLiquido);
+    // Fase gaseosa
+    if (tE !== undefined && s.cGas !== undefined) {
+      sensible(s.cGas, Math.max(desde, tE), hasta, s.nombreGas);
     }
-  }
-
-  // Fase gaseosa
-  if (t < hasta && s.cGas !== undefined) {
-    sensible(s.cGas, t, hasta, s.nombreGas);
   }
 
   if (!enfriando) return tramos;
@@ -414,10 +467,13 @@ export function resolverMezcla(
   sb: Sustancia,
   mb: number,
   tb: number,
+  ladoA: Lado = 'inferior',
+  ladoB: Lado = 'inferior',
 ): ResultadoMezcla {
+  const hIniA = entalpiaEspecifica(sa, ta, ladoA);
+  const hIniB = entalpiaEspecifica(sb, tb, ladoB);
   const balance = (t: number) =>
-    ma * (entalpiaEspecifica(sa, t) - entalpiaEspecifica(sa, ta)) +
-    mb * (entalpiaEspecifica(sb, t) - entalpiaEspecifica(sb, tb));
+    ma * (entalpiaEspecifica(sa, t) - hIniA) + mb * (entalpiaEspecifica(sb, t) - hIniB);
 
   let lo = Math.min(ta, tb);
   let hi = Math.max(ta, tb);
@@ -429,8 +485,8 @@ export function resolverMezcla(
   let tEquilibrio = (lo + hi) / 2;
 
   const cuerpos = [
-    { cuerpo: 'A' as const, s: sa, m: ma, tIni: ta, otro: { s: sb, m: mb, tIni: tb } },
-    { cuerpo: 'B' as const, s: sb, m: mb, tIni: tb, otro: { s: sa, m: ma, tIni: ta } },
+    { cuerpo: 'A' as const, s: sa, m: ma, tIni: ta, lado: ladoA, otro: { s: sb, m: mb, tIni: tb, lado: ladoB } },
+    { cuerpo: 'B' as const, s: sb, m: mb, tIni: tb, lado: ladoB, otro: { s: sa, m: ma, tIni: ta, lado: ladoA } },
   ];
 
   let parcial: CambioParcial | null = null;
@@ -439,17 +495,17 @@ export function resolverMezcla(
     for (const meseta of mesetasDe(c.s)) {
       if (Math.abs(tEquilibrio - meseta.t) > 1e-6) continue;
 
-      const subiendo = c.tIni <= meseta.t;
+      const subiendo = porDebajo(c.tIni, c.lado, meseta.t);
       // Cada cuerpo llega a la meseta por el lado del que viene: el que sube la
       // alcanza en la fase inferior y el que baja en la superior.
-      const hBorde = (x: { s: Sustancia; tIni: number }) =>
-        entalpiaEspecifica(x.s, meseta.t, x.tIni <= meseta.t ? 'inferior' : 'superior');
+      const hBorde = (x: { s: Sustancia; tIni: number; lado: Lado }) =>
+        entalpiaEspecifica(x.s, meseta.t, porDebajo(x.tIni, x.lado, meseta.t) ? 'inferior' : 'superior');
 
       // Residuo del balance si ambos llegan a la meseta sin llegar a cruzarla:
       // lo que falte o sobre es justo lo que paga el cambio de estado a medias.
       const residuo =
-        c.m * (hBorde(c) - entalpiaEspecifica(c.s, c.tIni)) +
-        c.otro.m * (hBorde(c.otro) - entalpiaEspecifica(c.otro.s, c.otro.tIni));
+        c.m * (hBorde(c) - entalpiaEspecifica(c.s, c.tIni, c.lado)) +
+        c.otro.m * (hBorde(c.otro) - entalpiaEspecifica(c.otro.s, c.otro.tIni, c.otro.lado));
       const fraccion = (subiendo ? -residuo : residuo) / (c.m * meseta.latente);
 
       if (fraccion > 1e-9 && fraccion < 1 - 1e-9) {
@@ -473,8 +529,13 @@ export function resolverMezcla(
   // ninguna, así que se clava en el punto exacto.
   if (parcial) tEquilibrio = parcial.temperatura;
 
-  const tramosA = calcularTramos(sa, ma, ta, tEquilibrio);
-  const tramosB = calcularTramos(sb, mb, tb, tEquilibrio);
+  // Cada cuerpo parte de SU fase (la misma con que se ha resuelto el balance) y llega al
+  // equilibrio por su lado: así el desglose cuenta la fusión del hielo a 0 °C que el
+  // equilibrio ya contaba (hallazgo 4092)
+  const llegada = (t: number, lado: Lado): Lado =>
+    tEquilibrio === t ? lado : porDebajo(t, lado, tEquilibrio) ? 'inferior' : 'superior';
+  const tramosA = calcularTramos(sa, ma, ta, tEquilibrio, ladoA, llegada(ta, ladoA));
+  const tramosB = calcularTramos(sb, mb, tb, tEquilibrio, ladoB, llegada(tb, ladoB));
 
   // El cambio de estado a medias no lo genera calcularTramos (que solo cuenta
   // mesetas cruzadas por completo), así que se añade aquí con su fracción.
@@ -483,9 +544,10 @@ export function resolverMezcla(
     const s = esA ? sa : sb;
     const m = esA ? ma : mb;
     const tIni = esA ? ta : tb;
+    const lado = esA ? ladoA : ladoB;
     const meseta = mesetasDe(s).find((x) => Math.abs(x.t - tEquilibrio) < 1e-6);
     if (meseta) {
-      const signo = tIni <= meseta.t ? 1 : -1;
+      const signo = porDebajo(tIni, lado, meseta.t) ? 1 : -1;
       const tramo: Tramo = {
         tipo: 'latente',
         proceso: parcial.proceso,

@@ -240,8 +240,9 @@ test.describe('simulador-calorimetria', () => {
 
   // ------------------------------------------------------------------ hallazgos abiertos
 
-  test('HALLAZGO ABIERTO [calculo/alto]: hielo a 0 °C en agua a 50 °C, el balance del desglose no cierra', async ({ page }) => {
-    test.fail(); // HALLAZGO ABIERTO (inspector 04/11/2026) [calculo/alto]
+  test('HALLAZGO 4092 REPARADO [calculo/alto]: hielo a 0 °C en agua a 50 °C, el balance del desglose no cerraba', async ({ page }) => {
+    // REPARADO el 05/11/2026: cada cuerpo parte en el desglose de la misma fase con que se
+    // resuelve el equilibrio (convención Lado de motor.ts).
     // ENTRADA  A agua 100 g a 0 °C · B agua 1.000 g a 50 °C
     // ESPERADO lo que A absorbe es lo que B cede (Q_A + Q_B = 0). Con el hielo a 0 °C que la
     //          propia app supone al dar 38,19 °C: A = 0,1·334.000 + 0,1·4.180·38,19 = 49,36 kJ,
@@ -255,10 +256,18 @@ test.describe('simulador-calorimetria', () => {
     const qb = await calorDe(page, 'B');
     expect(Math.abs(qa + qb), 'Q_A + Q_B = 0 (tolerancia: el redondeo de la pantalla)').toBeLessThan(20);
     await expect(panelResultado(page)).not.toContainText('suman 33,40 kJ');
+    await expect(panelResultado(page)).toContainText('38,19 °C');
+    expect(qa).toBeCloseTo(49_360, -1);
+    await expect(bloqueCuerpo(page, 'A')).toContainText('Fundir a 0,0 °C');
+    await expect(bloqueCuerpo(page, 'A')).toContainText('33,40 kJ');
+    // Con «agua» elegida a 0 °C es la media ponderada: (0,1·0 + 1·50)/1,1 = 45,45 °C
+    await page.getByRole('group', { name: 'Está a 0,0 °C' }).getByRole('button', { name: 'agua', exact: true }).click();
+    await expect(panelResultado(page)).toContainText('45,45 °C');
+    await expect(bloqueCuerpo(page, 'A')).not.toContainText('Fundir');
   });
 
-  test('HALLAZGO ABIERTO [calculo/alto]: etanol en su punto de fusión, el desglose se salta la fusión', async ({ page }) => {
-    test.fail(); // HALLAZGO ABIERTO (inspector 04/11/2026) [calculo/alto], misma raíz que el anterior
+  test('HALLAZGO 4092 REPARADO [calculo/alto]: etanol en su punto de fusión, el desglose se saltaba la fusión', async ({ page }) => {
+    // REPARADO el 05/11/2026, misma raíz que el anterior
     // ENTRADA  A etanol 100 g a −114,1 °C (su fusión, el mínimo del rango) · B agua 1.000 g a 20 °C
     // ESPERADO Teq = 10,16 °C supone el etanol sólido: A = 0,1·108.000 + 0,1·2.440·124,26 = 41,12 kJ
     //          (con «Fundir» de 10,80 kJ) y B cede 1·4.180·9,84 = 41,12 kJ
@@ -269,10 +278,13 @@ test.describe('simulador-calorimetria', () => {
     const qa = await calorDe(page, 'A');
     const qb = await calorDe(page, 'B');
     expect(Math.abs(qa + qb)).toBeLessThan(20);
+    await expect(panelResultado(page)).toContainText('10,16 °C');
+    expect(qa).toBeCloseTo(41_120, -1);
   });
 
-  test('HALLAZGO ABIERTO [calculo/medio]: «hielo a 0 °C» no se puede fundir en el modo calentar', async ({ page }) => {
-    test.fail(); // HALLAZGO ABIERTO (inspector 04/11/2026) [calculo/medio]
+  test('HALLAZGO 4093 REPARADO [calculo/medio]: «hielo a 0 °C» no se podía fundir en el modo calentar', async ({ page }) => {
+    // REPARADO el 05/11/2026: la misma convención que la mezcla (empieza en la fase de abajo) y
+    // un selector de fase en la temperatura justa de un cambio de estado.
     // ENTRADA  agua 200 g de 0 °C a 20 °C (el problema de libro «fundir 200 g de hielo a 0 °C y
     //          llevarlos a 20 °C»; el modo mezcla lee el agua a 0 °C como hielo, ver CASO D2)
     // ESPERADO 0,2·334.000 + 0,2·4.180·20 = 66.800 + 16.720 = 83.520 J → «83,52 kJ», con
@@ -284,13 +296,28 @@ test.describe('simulador-calorimetria', () => {
     const panel = panelResultado(page);
     await expect(panel).toContainText('83,52 kJ', { timeout: 2000 });
     await expect(panel).toContainText('Fundir a 0,0 °C', { timeout: 2000 });
+    // Eligiendo agua líquida a 0 °C: 0,2·4.180·20 = 16.720 J, sin fundir
+    const inicio = page.getByRole('group', { name: 'Empieza a 0,0 °C' });
+    await inicio.getByRole('button', { name: 'agua', exact: true }).click();
+    await expect(panel).toContainText('16,72 kJ');
+    await expect(panel).not.toContainText('Fundir');
+    // Congelar 200 g de agua a 0 °C: de 0 (agua) a 0 (hielo) → −66,80 kJ, «Solidificar a 0,0 °C»
+    await escribir(page, '#t-final', '0');
+    await inicio.getByRole('button', { name: 'agua', exact: true }).click();
+    await page.getByRole('group', { name: 'Termina a 0,0 °C' }).getByRole('button', { name: 'hielo', exact: true }).click();
+    await expect(panel).toContainText('Calor total cedido');
+    await expect(panel).toContainText('66,80 kJ');
+    await expect(panel).toContainText('Solidificar a 0,0 °C');
+    // Y de 100 a 120 °C partiendo de agua líquida (por defecto) sí evapora, como antes
+    await escribir(page, '#t-inicial', '100');
+    await escribir(page, '#t-final', '120');
+    await expect(panel).toContainText('Evaporar a 100,0 °C');
   });
 
-  test('CASO D2: el modo mezcla lee el agua a 0 °C como hielo (lo contrario que el modo calentar)', async ({ page }) => {
-    // Documenta la mitad «mezcla» del hallazgo anterior: hoy pasa. Agua 100 g a 0 °C + agua
-    // 100 g a 50 °C → con hielo: 0,1·4.180·50 = 20.900 J < 33.400 → 0 °C con f = 62,6 %;
-    // con agua líquida sería (0 + 50)/2 = 25 °C. Si la reparación cambia la convención, este
-    // caso cambia con ella.
+  test('CASO D2: el modo mezcla lee el agua a 0 °C como hielo, igual que el modo calentar', async ({ page }) => {
+    // Agua 100 g a 0 °C + agua 100 g a 50 °C → con hielo: 0,1·4.180·50 = 20.900 J < 33.400 →
+    // 0 °C con f = 62,6 %; con agua líquida sería (0 + 50)/2 = 25 °C. Desde el 05/11/2026 es la
+    // convención de los dos modos (hallazgo 4093).
     await aMezcla(page);
     await cuerpo(page, 'a', 'agua', '100', '0');
     await cuerpo(page, 'b', 'agua', '100', '50');
@@ -299,8 +326,7 @@ test.describe('simulador-calorimetria', () => {
     await expect(panel.locator('[role="status"]')).toContainText('62,6 g pasan a agua y quedan 37,4 g de hielo');
   });
 
-  test('HALLAZGO ABIERTO [dato/medio]: el botón del hierro enseña c = 820, el del hierro FUNDIDO', async ({ page }) => {
-    test.fail(); // HALLAZGO ABIERTO (inspector 04/11/2026) [dato/medio]
+  test('HALLAZGO 4094 REPARADO [dato/medio]: el botón del hierro enseñaba c = 820, el del hierro FUNDIDO', async ({ page }) => {
     // ENTRADA  modo calentar, rejilla de sustancias
     // ESPERADO el calor específico del hierro tal como está a temperatura ambiente: 450 J/(kg·K)
     //          (columna «c sólido» de la tabla, FAQ «hierro (450)», nota «se calienta nueve veces
@@ -309,10 +335,15 @@ test.describe('simulador-calorimetria', () => {
     // OBTENIDO «c = 820 J/(kg·K)» (cLiquido ?? cSolido); 1180, 495, 138 y 283 en los otros
     await expect(page.getByRole('button', { name: /Hierro/ })).toContainText('450', { timeout: 2000 });
     await expect(page.getByRole('button', { name: /Aluminio/ })).toContainText('897', { timeout: 2000 });
+    await expect(page.getByRole('button', { name: /Cobre/ })).toContainText('385');
+    await expect(page.getByRole('button', { name: /Plomo/ })).toContainText('129');
+    await expect(page.getByRole('button', { name: /Plata/ })).toContainText('235');
+    // Los líquidos a 20 °C siguen con su c líquido
+    await expect(page.getByRole('button', { name: /Agua/ })).toContainText('4180');
+    await expect(page.getByRole('button', { name: /Mercurio/ })).toContainText('140');
   });
 
-  test('HALLAZGO ABIERTO [calculo/bajo]: el tiempo sale «4 min 60 s»', async ({ page }) => {
-    test.fail(); // HALLAZGO ABIERTO (inspector 04/11/2026) [calculo/bajo]
+  test('HALLAZGO 4095 REPARADO [calculo/bajo]: el tiempo salía «4 min 60 s»', async ({ page }) => {
     // ENTRADA  estado inicial (614.020 J) a 2.049 W
     // ESPERADO 614.020/2.049 = 299,67 s → a segundos enteros, 300 s = «5 min 0 s»
     // OBTENIDO «4 min 60 s» (Math.round de los 59,67 s sobrantes, sin acarrear el minuto)
@@ -323,8 +354,7 @@ test.describe('simulador-calorimetria', () => {
     await expect(panel).toContainText('5 min 0 s', { timeout: 2000 });
   });
 
-  test('HALLAZGO ABIERTO [operativa/bajo]: con masa 0 dice que las temperaturas son iguales', async ({ page }) => {
-    test.fail(); // HALLAZGO ABIERTO (inspector 04/11/2026) [operativa/bajo]
+  test('HALLAZGO 4096 REPARADO [operativa/bajo]: con masa 0 decía que las temperaturas eran iguales', async ({ page }) => {
     // ENTRADA  masa 0 g, de −10 a 120 °C
     // ESPERADO un aviso sobre la masa (como el modo mezcla: «Indica una masa mayor que cero»)
     // OBTENIDO «Con la temperatura inicial igual a la final no hay intercambio de calor. Cambia
@@ -336,8 +366,7 @@ test.describe('simulador-calorimetria', () => {
     await expect(panel).toContainText(/masa/i, { timeout: 2000 });
   });
 
-  test('HALLAZGO ABIERTO [operativa/bajo]: la mezcla recorta la temperatura al rango sin avisar', async ({ page }) => {
-    test.fail(); // HALLAZGO ABIERTO (inspector 04/11/2026) [operativa/bajo]
+  test('HALLAZGO 4097 REPARADO [operativa/bajo]: la mezcla recortaba la temperatura al rango sin avisar', async ({ page }) => {
     // ENTRADA  mezcla: A mercurio 100 g a 400 °C · B agua 1.000 g a 20 °C
     // ESPERADO el aviso que da el modo calentar («Temperatura ajustada al rango con datos»):
     //          el cálculo parte de 356,7 °C y el campo sigue diciendo 400
@@ -349,20 +378,23 @@ test.describe('simulador-calorimetria', () => {
     await expect(page.locator('main').getByText(/ajustada al rango/)).toHaveCount(1, { timeout: 2000 });
   });
 
-  test('HALLAZGO ABIERTO [operativa/bajo]: el rango anunciado redondea el máximo (357 °C) y 357 se recorta', async ({ page }) => {
-    test.fail(); // HALLAZGO ABIERTO (inspector 04/11/2026) [operativa/bajo], mismo hallazgo
-    // ENTRADA  calentar mercurio de 20 °C a 357 °C, el máximo que anuncia la pista
+  test('HALLAZGO 4097 REPARADO [operativa/bajo]: el rango anunciado redondeaba el máximo (357 °C) y 357 se recortaba', async ({ page }) => {
+    // ENTRADA  calentar mercurio de 20 °C a 357 °C, el máximo que anunciaba la pista
     // ESPERADO sin aviso de recorte: 357 está dentro de «entre -38,8 °C y 357 °C»; o la pista
     //          anuncia el máximo real, 356,7 °C
-    // OBTENIDO aviso «Temperatura ajustada al rango» que repite «entre -38,8 °C y 357 °C»
+    // REPARADO el 05/11/2026 por la segunda vía, la que el acta también admitía: la pista
+    // anuncia 356,7 °C (el dato con que calcula). Teclear ese máximo ya no dispara el aviso;
+    // 357 sí, porque está fuera del rango con datos.
     await page.getByRole('button', { name: /Mercurio/ }).click();
+    await expect(page.getByText('Con datos entre -38,8 °C y 356,7 °C')).toBeVisible();
     await escribir(page, '#t-inicial', '20');
-    await escribir(page, '#t-final', '357');
+    await escribir(page, '#t-final', '356,7');
     await expect(page.locator('main [role="alert"]')).toHaveCount(0, { timeout: 2000 });
+    await escribir(page, '#t-final', '357');
+    await expect(page.locator('main [role="alert"]')).toContainText('entre -38,8 °C y 356,7 °C');
   });
 
-  test('HALLAZGO ABIERTO [contenido/bajo]: la tabla redondea L de fusión y calla el c del vapor', async ({ page }) => {
-    test.fail(); // HALLAZGO ABIERTO (inspector 04/11/2026) [contenido/bajo]
+  test('HALLAZGO 4098 REPARADO [contenido/bajo]: la tabla redondeaba L de fusión y callaba el c del vapor', async ({ page }) => {
     // ENTRADA  tabla «Datos de las sustancias»
     // ESPERADO los valores con que calcula: mercurio 11,4 kJ/kg, plomo 23,2 kJ/kg, y el c del
     //          vapor de agua (2.010) y del etanol (1.430), que usa en cuanto se pasa de la ebullición

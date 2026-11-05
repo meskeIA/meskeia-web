@@ -18,6 +18,11 @@ import {
   rangoSustancia,
   calcularTramos,
   resolverMezcla,
+  puntoDeCambio,
+  ladoLlegada,
+  cAmbiente,
+  type Sustancia,
+  type Lado,
   type Tramo,
   type ProcesoTramo,
 } from './motor';
@@ -27,6 +32,22 @@ interface Cuerpo {
   sustanciaId: string;
   masaG: number;
   temperatura: number;
+  /** Fase si la temperatura es justo la de un cambio de estado (por defecto, la de abajo) */
+  lado?: Lado;
+}
+
+/**
+ * Límite del rango con los decimales que tiene: «356,7 °C» y no «357 °C», que se recortaba al
+ * teclearlo (hallazgo 4097); «-273,15» y no «-273,2»
+ */
+function fmtLimite(v: number): string {
+  const decimales = Number.isInteger(v) ? 0 : Math.abs(v * 10 - Math.round(v * 10)) < 1e-9 ? 1 : 2;
+  return formatNumber(v, decimales);
+}
+
+/** Calor latente en kJ/kg con los decimales que tiene el dato (11,4 y no 11; hallazgo 4098) */
+function fmtLatente(jPorKg: number): string {
+  return fmtLimite(jPorKg / 1000);
 }
 
 const NOMBRE_PROCESO: Record<ProcesoTramo, string> = {
@@ -86,15 +107,15 @@ function formatCalor(j: number): string {
   return `${formatNumber(j, 1)} J`;
 }
 
+// Se redondea ANTES de partir en minutos y segundos: redondear el resto escribía «4 min 60 s»
+// con 299,67 s (hallazgo 4095), y «1 h 60 min» con 7.170 s
 function formatTiempo(segundos: number): string {
   if (!isFinite(segundos) || segundos <= 0) return '—';
-  if (segundos < 60) return `${formatNumber(segundos, 1)} s`;
-  if (segundos < 3600) {
-    const min = Math.floor(segundos / 60);
-    return `${min} min ${Math.round(segundos - min * 60)} s`;
-  }
-  const h = Math.floor(segundos / 3600);
-  return `${h} h ${Math.round((segundos - h * 3600) / 60)} min`;
+  if (segundos < 59.95) return `${formatNumber(segundos, 1)} s`;
+  const enteros = Math.round(segundos);
+  if (enteros < 3600) return `${Math.floor(enteros / 60)} min ${enteros % 60} s`;
+  const minutos = Math.round(segundos / 60);
+  return `${Math.floor(minutos / 60)} h ${minutos % 60} min`;
 }
 
 // ============================================================
@@ -148,6 +169,9 @@ export default function SimuladorCalorimetria() {
   const [tInicial, setTInicial] = useState(-10);
   const [tFinal, setTFinal] = useState(120);
   const [potencia, setPotencia] = useState(2000);
+  // Fase en la temperatura justa de un cambio de estado (convención en Lado, motor.ts)
+  const [ladoIni, setLadoIni] = useState<Lado>('inferior');
+  const [ladoFinElegido, setLadoFinElegido] = useState<Lado | null>(null);
 
   // Modo mezcla
   const [cuerpoA, setCuerpoA] = useState<Cuerpo>({ sustanciaId: 'agua', masaG: 30, temperatura: -5 });
@@ -160,10 +184,26 @@ export default function SimuladorCalorimetria() {
   const t1Valido = Math.min(Math.max(tFinal, rango.min), rango.max);
   const fueraDeRango = t0Valido !== tInicial || t1Valido !== tFinal;
 
+  const ladoFin = ladoFinElegido ?? ladoLlegada(t0Valido, ladoIni, t1Valido);
   const tramos = useMemo(
-    () => calcularTramos(sustancia, masaG / 1000, t0Valido, t1Valido),
-    [sustancia, masaG, t0Valido, t1Valido],
+    () => calcularTramos(sustancia, masaG / 1000, t0Valido, t1Valido, ladoIni, ladoFin),
+    [sustancia, masaG, t0Valido, t1Valido, ladoIni, ladoFin],
   );
+
+  // Al cambiar de sustancia o de temperatura, la fase elegida en un punto de cambio caduca
+  const cambiarSustancia = (id: string) => {
+    setSustanciaId(id);
+    setLadoIni('inferior');
+    setLadoFinElegido(null);
+  };
+  const cambiarTInicial = (v: number) => {
+    setTInicial(v);
+    setLadoIni('inferior');
+  };
+  const cambiarTFinal = (v: number) => {
+    setTFinal(v);
+    setLadoFinElegido(null);
+  };
 
   const calorTotal = useMemo(() => tramos.reduce((acc, t) => acc + t.calor, 0), [tramos]);
   const calorLatente = useMemo(
@@ -179,7 +219,22 @@ export default function SimuladorCalorimetria() {
     const ta = Math.min(Math.max(cuerpoA.temperatura, ra.min), ra.max);
     const tb = Math.min(Math.max(cuerpoB.temperatura, rb.min), rb.max);
     if (cuerpoA.masaG <= 0 || cuerpoB.masaG <= 0) return null;
-    return { sa, sb, ta, tb, ...resolverMezcla(sa, cuerpoA.masaG / 1000, ta, sb, cuerpoB.masaG / 1000, tb) };
+    return {
+      sa,
+      sb,
+      ta,
+      tb,
+      ...resolverMezcla(
+        sa,
+        cuerpoA.masaG / 1000,
+        ta,
+        sb,
+        cuerpoB.masaG / 1000,
+        tb,
+        cuerpoA.lado ?? 'inferior',
+        cuerpoB.lado ?? 'inferior',
+      ),
+    };
   }, [cuerpoA, cuerpoB]);
 
   // Curva de temperatura frente a calor acumulado
@@ -210,10 +265,49 @@ export default function SimuladorCalorimetria() {
   }, [tramos, t0Valido]);
 
   const handlePresetCalentar = (p: (typeof PRESETS_CALENTAR)[number]) => {
-    setSustanciaId(p.sustanciaId);
+    cambiarSustancia(p.sustanciaId);
     setMasaG(p.masaG);
     setTInicial(p.t0);
     setTFinal(p.t1);
+  };
+
+  /**
+   * Botones para elegir la fase cuando la temperatura es justo la de un cambio de estado. Sin
+   * ellos no había forma de plantear «fundir hielo a 0 °C» ni «congelar agua a 0 °C»
+   * (hallazgo 4093).
+   */
+  const selectorFase = (
+    s: Sustancia,
+    t: number,
+    lado: Lado,
+    onLado: (l: Lado) => void,
+    texto: string,
+  ) => {
+    const punto = puntoDeCambio(s, t);
+    if (!punto) return null;
+    return (
+      <div className={styles.selectorFase} role="group" aria-label={`${texto} ${formatNumber(t, 1)} °C`}>
+        <span>
+          {texto} {formatNumber(t, 1)} °C ({punto.tipo === 'fusion' ? 'su fusión' : 'su ebullición'}):
+        </span>
+        <button
+          type="button"
+          className={`${styles.faseBtn} ${lado === 'inferior' ? styles.faseBtnActivo : ''}`}
+          aria-pressed={lado === 'inferior'}
+          onClick={() => onLado('inferior')}
+        >
+          {punto.abajo}
+        </button>
+        <button
+          type="button"
+          className={`${styles.faseBtn} ${lado === 'superior' ? styles.faseBtnActivo : ''}`}
+          aria-pressed={lado === 'superior'}
+          onClick={() => onLado('superior')}
+        >
+          {punto.arriba}
+        </button>
+      </div>
+    );
   };
 
   const handlePresetMezcla = (p: (typeof PRESETS_MEZCLA)[number]) => {
@@ -224,6 +318,7 @@ export default function SimuladorCalorimetria() {
   const editorCuerpo = (etiqueta: string, cuerpo: Cuerpo, setCuerpo: (c: Cuerpo) => void, idBase: string) => {
     const s = sustanciaPorId(cuerpo.sustanciaId);
     const r = rangoSustancia(s);
+    const tValida = Math.min(Math.max(cuerpo.temperatura, r.min), r.max);
     return (
       <div className={styles.cuerpoCard}>
         <h3 className={styles.cuerpoTitulo}>{etiqueta}</h3>
@@ -233,7 +328,7 @@ export default function SimuladorCalorimetria() {
             id={`${idBase}-sustancia`}
             className={styles.select}
             value={cuerpo.sustanciaId}
-            onChange={(ev) => setCuerpo({ ...cuerpo, sustanciaId: ev.target.value })}
+            onChange={(ev) => setCuerpo({ ...cuerpo, sustanciaId: ev.target.value, lado: undefined })}
           >
             {SUSTANCIAS.map((x) => (
               <option key={x.id} value={x.id}>
@@ -260,12 +355,23 @@ export default function SimuladorCalorimetria() {
             id={`${idBase}-temp`}
             className={styles.numberInput}
             valor={cuerpo.temperatura}
-            onCambio={(v) => setCuerpo({ ...cuerpo, temperatura: v })}
+            onCambio={(v) => setCuerpo({ ...cuerpo, temperatura: v, lado: undefined })}
           />
           <span className={styles.inputHint}>
-            Con datos entre {formatNumber(r.min, 1)} °C y {formatNumber(r.max, 0)} °C
+            Con datos entre {fmtLimite(r.min)} °C y {fmtLimite(r.max)} °C
           </span>
         </div>
+        {selectorFase(s, tValida, cuerpo.lado ?? 'inferior', (l) => setCuerpo({ ...cuerpo, lado: l }), 'Está a')}
+        {/* Como en el modo calentar: la mezcla recortaba en silencio (hallazgo 4097) */}
+        {tValida !== cuerpo.temperatura && (
+          <div className={styles.aviso} role="alert" aria-live="polite">
+            <strong>Temperatura ajustada al rango con datos.</strong>
+            <span>
+              {s.nombre} se modela entre {fmtLimite(r.min)} °C y {fmtLimite(r.max)} °C: el cálculo
+              parte de {fmtLimite(tValida)} °C.
+            </span>
+          </div>
+        )}
       </div>
     );
   };
@@ -343,14 +449,16 @@ export default function SimuladorCalorimetria() {
                     type="button"
                     className={`${styles.sustanciaBtn} ${s.id === sustanciaId ? styles.sustanciaBtnActivo : ''}`}
                     aria-pressed={s.id === sustanciaId}
-                    onClick={() => setSustanciaId(s.id)}
+                    onClick={() => cambiarSustancia(s.id)}
                   >
                     <span className={styles.sustanciaIcono} aria-hidden="true">
                       {s.icono}
                     </span>
                     <span className={styles.sustanciaNombre}>{s.nombre}</span>
+                    {/* El c de la fase en que está a 20 °C: los metales enseñaban el del metal
+                        FUNDIDO (hierro 820 en vez de 450; hallazgo 4094) */}
                     <span className={styles.sustanciaDato}>
-                      c = {formatNumber(s.cLiquido ?? s.cSolido ?? 0, 0)} J/(kg·K)
+                      c = {formatNumber(cAmbiente(s), 0)} J/(kg·K)
                     </span>
                   </button>
                 ))}
@@ -381,10 +489,10 @@ export default function SimuladorCalorimetria() {
                     id="t-inicial"
                     className={styles.numberInput}
                     valor={tInicial}
-                    onCambio={setTInicial}
+                    onCambio={cambiarTInicial}
                   />
                   <span className={styles.inputHint}>
-                    Con datos entre {formatNumber(rango.min, 1)} °C y {formatNumber(rango.max, 0)} °C
+                    Con datos entre {fmtLimite(rango.min)} °C y {fmtLimite(rango.max)} °C
                   </span>
                 </div>
 
@@ -394,7 +502,7 @@ export default function SimuladorCalorimetria() {
                     id="t-final"
                     className={styles.numberInput}
                     valor={tFinal}
-                    onCambio={setTFinal}
+                    onCambio={cambiarTFinal}
                   />
                   <span className={styles.inputHint}>
                     {sustancia.tFusion !== undefined
@@ -426,12 +534,15 @@ export default function SimuladorCalorimetria() {
                 </div>
               </div>
 
+              {selectorFase(sustancia, t0Valido, ladoIni, setLadoIni, 'Empieza a')}
+              {selectorFase(sustancia, t1Valido, ladoFin, setLadoFinElegido, 'Termina a')}
+
               {fueraDeRango && (
                 <div className={styles.aviso} role="alert" aria-live="polite">
                   <strong>Temperatura ajustada al rango con datos.</strong>
                   <span>
-                    {sustancia.nombre} se modela entre {formatNumber(rango.min, 1)} °C y{' '}
-                    {formatNumber(rango.max, 0)} °C
+                    {sustancia.nombre} se modela entre {fmtLimite(rango.min)} °C y{' '}
+                    {fmtLimite(rango.max)} °C
                     {sustancia.cGas === undefined && sustancia.tEbullicion !== undefined
                       ? ': no se incluyen valores de su fase gaseosa, así que el cálculo se detiene al hervir.'
                       : '. El cálculo usa los valores recortados a ese intervalo.'}
@@ -476,8 +587,10 @@ export default function SimuladorCalorimetria() {
 
               {tramos.length === 0 ? (
                 <p className={styles.resultNota}>
-                  Con la temperatura inicial igual a la final no hay intercambio de calor. Cambia una
-                  de las dos para ver el desglose.
+                  {/* Con masa 0 la explicación era la de las temperaturas iguales (hallazgo 4096) */}
+                  {masaG <= 0
+                    ? 'Indica una masa mayor que cero para calcular el calor.'
+                    : 'Con la temperatura inicial igual a la final, y en la misma fase, no hay intercambio de calor. Cambia una de las dos para ver el desglose.'}
                 </p>
               ) : (
                 <>
@@ -647,6 +760,7 @@ export default function SimuladorCalorimetria() {
                   <th>Sustancia</th>
                   <th>c sólido</th>
                   <th>c líquido</th>
+                  <th>c gas</th>
                   <th>Funde a</th>
                   <th>L fusión</th>
                   <th>Hierve a</th>
@@ -661,10 +775,11 @@ export default function SimuladorCalorimetria() {
                     </td>
                     <td>{s.cSolido !== undefined ? formatNumber(s.cSolido, 0) : '—'}</td>
                     <td>{s.cLiquido !== undefined ? formatNumber(s.cLiquido, 0) : '—'}</td>
+                    <td>{s.cGas !== undefined ? formatNumber(s.cGas, 0) : '—'}</td>
                     <td>{s.tFusion !== undefined ? `${formatNumber(s.tFusion, 1)} °C` : '—'}</td>
-                    <td>{s.lFusion !== undefined ? `${formatNumber(s.lFusion / 1000, 0)} kJ/kg` : '—'}</td>
+                    <td>{s.lFusion !== undefined ? `${fmtLatente(s.lFusion)} kJ/kg` : '—'}</td>
                     <td>{s.tEbullicion !== undefined ? `${formatNumber(s.tEbullicion, 1)} °C` : '—'}</td>
-                    <td>{s.lVaporizacion !== undefined ? `${formatNumber(s.lVaporizacion / 1000, 0)} kJ/kg` : '—'}</td>
+                    <td>{s.lVaporizacion !== undefined ? `${fmtLatente(s.lVaporizacion)} kJ/kg` : '—'}</td>
                   </tr>
                 ))}
               </tbody>
@@ -674,7 +789,9 @@ export default function SimuladorCalorimetria() {
             Calores específicos en J/(kg·K) a presión atmosférica normal. Fuente:{' '}
             <em>CRC Handbook of Chemistry and Physics</em>, 97.ª edición, con los redondeos habituales
             de los libros de texto. Un guion significa que esa fase no se modela por no haber un valor
-            de manual suficientemente asentado.
+            de manual suficientemente asentado. En la temperatura justa de un cambio de estado, el
+            cuerpo empieza en la fase de abajo (hielo a 0 °C, agua líquida a 100 °C) salvo que elijas
+            la otra con los botones que aparecen junto a los datos.
           </p>
         </section>
 
