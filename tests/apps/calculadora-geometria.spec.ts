@@ -462,14 +462,14 @@ test.describe('Cabo C0386 (05/11/2026) · las 15 clases del bloque educativo sin
     ).toBeVisible();
   });
 
-  test('HALLAZGO (05/11/2026, ABIERTO) · C0386 · la tabla 2D/3D sale apilada sin columnas y la FAQ sin separación', async ({
+  test('HALLAZGO 4147 (05/11/2026, REPARADO) · C0386 · la tabla 2D/3D sale en tres columnas y la FAQ con separación', async ({
     page,
   }) => {
     // Esperado: maquetado como el resto del catálogo (cada fila una rejilla de tres columnas,
-    // cada pregunta separada de la anterior). Obtenido hoy: 90 div/ul sin class, la celda 2D y
-    // la 3D de «Dimensiones» una debajo de otra (y = 699 y 725, x = 57 las dos) y 0 px entre
-    // la última viñeta de una pregunta y la siguiente.
-    test.fail();
+    // cada pregunta separada de la anterior). Obtenido el 05/11/2026: 90 div/ul sin class, la
+    // celda 2D y la 3D de «Dimensiones» una debajo de otra (y = 699 y 725, x = 57 las dos) y 0 px
+    // entre la última viñeta de una pregunta y la siguiente. REPARADO el mismo día en /reparar:
+    // las 15 clases declaradas en CalculadoraGeometria.module.css.
     const guia = await abrirGuia(page);
 
     // 1. Ningún <div> ni <ul> de la guía sin class (hoy 90: 80 div y 10 ul).
@@ -489,5 +489,24 @@ test.describe('Cabo C0386 (05/11/2026) · las 15 clases del bloque educativo sin
       .getByRole('heading', { name: '¿Cuándo uso π = 3,14 y cuándo dejo π sin aproximar?' })
       .boundingBox();
     expect.soft((h4?.y ?? 0) - ((li?.y ?? 0) + (li?.height ?? 0)), 'hueco entre preguntas de la FAQ').toBeGreaterThanOrEqual(8);
+
+    // 4. Las tarjetas de «Errores comunes» con borde y relleno, como las .contentCard.
+    const tarjetaError = guia.locator('h4', { hasText: 'Confundir Perímetro con Área' }).locator('xpath=..');
+    const estilo = await tarjetaError.evaluate((el) => {
+      const cs = getComputedStyle(el);
+      return { borde: parseFloat(cs.borderLeftWidth), relleno: parseFloat(cs.paddingLeft) };
+    });
+    expect.soft(estilo.borde, 'borde de la tarjeta de error').toBeGreaterThanOrEqual(1);
+    expect.soft(estilo.relleno, 'relleno de la tarjeta de error').toBeGreaterThanOrEqual(8);
+  });
+
+  test('HALLAZGO 4147 · a 390 px la tabla sigue en tres columnas sin desbordar', async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    const guia = await abrirGuia(page);
+    const c2d = await guia.getByText('Longitud y anchura (plano)', { exact: true }).boundingBox();
+    const c3d = await guia.getByText('Longitud, anchura y altura (espacio)', { exact: true }).boundingBox();
+    expect(Math.abs((c2d?.y ?? 0) - (c3d?.y ?? 9999))).toBeLessThanOrEqual(2);
+    const anchoDoc = await page.evaluate(() => document.documentElement.scrollWidth);
+    expect(anchoDoc).toBeLessThanOrEqual(390);
   });
 });
