@@ -23,6 +23,8 @@
  *      por delante (ningún coste escrito a mano).
  *   6. `registrar` sin modo deduce primera o cambio; con modo `cabo` NO revalida la app.
  *   7. `registrar` rechaza `cabo` en una app nunca vista.
+ *   8. Cabo C0633: con `validada` posterior al commit del cambio, la base sale de la huella
+ *      inspeccionada y no de la hora; si nada la explica, la cola avisa del diff vacío.
  *
  * Ninguna toca las bases reales: van por `INSPECTOR_DB` y `CABOS_DB`.
  */
@@ -35,6 +37,9 @@ import { DatabaseSync } from 'node:sqlite';
 import { fileURLToPath } from 'node:url';
 import { RUTA_BASE } from './db.mjs';
 import { FAMILIAS } from './familias.mjs';
+import { rutasDeLaApp } from './cambio-familia.mjs';
+import { crearHuella } from './huella.mjs';
+import { lectorEnElPasado } from './pasado.mjs';
 
 const AQUI = path.dirname(fileURLToPath(import.meta.url));
 const COLA = path.join(AQUI, 'cola.mjs');
@@ -47,7 +52,8 @@ const ok = (b, msg) => { console.log(`  ${b ? '✓' : '✗'} ${msg}`); if (!b) f
 
 // ── Montaje: todo el catálogo visto hace dos meses, sin historial, y cuatro apps elegidas ────
 const rutaIns = path.join(TMP, 'inspector.db');
-fs.copyFileSync(RUTA_BASE, rutaIns);
+// INSPECTOR_DB si está: en la copia de /reparar la base vive en meskeia-web. Solo se copia
+fs.copyFileSync(process.env.INSPECTOR_DB || RUTA_BASE, rutaIns);
 let ins = new DatabaseSync(rutaIns);
 ins.prepare('DELETE FROM hallazgos').run();
 ins.prepare('DELETE FROM inspecciones').run();
@@ -132,6 +138,35 @@ console.log('\n7 · registrar rechaza un cabo en una app nunca vista');
 {
   const r = registrar({ ...base, slug: nuevaMucho, modo: 'cabo' });
   ok(r.status !== 0 && /nunca inspeccionada/.test(r.stderr), `${nuevaMucho}: acta rechazada`);
+}
+
+console.log('\n8 · CASO C0633: con «validada» posterior al commit del cambio, la base es la de ANTES del cambio');
+{
+  // simulador-planificador-procesos, 04/11/2026: 15136685 (03/11 15:07) era el cambio y su
+  // `validada` era posterior, así que la cola imprimía «git diff 15136685 HEAD» y salía vacío.
+  // Se reconstruye: huella inspeccionada = la de antes de 15136685 (y de lo que la tocó después),
+  // `validada` = ahora. La base tiene que ser el padre de 15136685, y sin aviso de diff vacío.
+  const SLUG = 'simulador-planificador-procesos';
+  const CAMBIO = '15136685';
+  const REPO = path.resolve(AQUI, '..', '..');
+  const db = new DatabaseSync(rutaIns);
+  const fila = db.prepare('SELECT deps FROM apps WHERE slug = ?').get(SLUG);
+  const { carpeta, deps } = rutasDeLaApp(REPO, SLUG, fila?.deps);
+  const lista = execFileSync('git', ['-C', REPO, 'log', '--first-parent', '--format=%H', `${CAMBIO}^..HEAD`, '--', carpeta, ...deps], { encoding: 'utf8' })
+    .split('\n').filter(Boolean);
+  const antes = crearHuella({ raiz: REPO, fsv: lectorEnElPasado(REPO, lista).fsv }).analizarApp(SLUG);
+  db.prepare('UPDATE apps SET hash_inspeccionado = ?, validada = ? WHERE slug = ?')
+    .run(`${antes.hash_codigo}|${antes.hash_deps || ''}`, new Date().toISOString(), SLUG);
+  db.close();
+  const padre = execFileSync('git', ['-C', REPO, 'rev-parse', '--short=8', `${CAMBIO}^`], { encoding: 'utf8' }).trim();
+  const linea = lineaDe(correr(['900']), SLUG);
+  ok(linea.includes(`git diff ${padre} HEAD -- app/${SLUG}/`), `«git diff ${padre} HEAD» (el padre de ${CAMBIO}), no la base de «validada»`);
+  ok(!/DIFF VACÍO/.test(linea), '  y sin el aviso de diff vacío');
+  // Y si ningún commit explica la huella, la cola lo dice en vez de mandar a mirar un diff vacío
+  const db2 = new DatabaseSync(rutaIns);
+  db2.prepare("UPDATE apps SET hash_inspeccionado = 'ninguno-la-explica' WHERE slug = ?").run(SLUG);
+  db2.close();
+  ok(/DIFF VACÍO/.test(lineaDe(correr(['900']), SLUG)), '  sin commit que explique la huella: «⚠️ DIFF VACÍO»');
 }
 
 fs.rmSync(TMP, { recursive: true, force: true });

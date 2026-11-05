@@ -80,7 +80,8 @@ const COMUNES_ESPERADAS = ['quiz-literatura-universal', 'quiz-metrica-estrofas',
 
 // ── Montaje: catálogo al día y sin historial; las 20 hermanas como estaban el 03/11/2026 ──────
 const rutaIns = path.join(TMP, 'inspector.db');
-fs.copyFileSync(RUTA_BASE, rutaIns);
+// INSPECTOR_DB si está: en la copia de /reparar la base vive en meskeia-web. Solo se copia
+fs.copyFileSync(process.env.INSPECTOR_DB || RUTA_BASE, rutaIns);
 {
   const db = new DatabaseSync(rutaIns);
   db.prepare('DELETE FROM hallazgos').run();

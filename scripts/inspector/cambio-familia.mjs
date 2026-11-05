@@ -48,6 +48,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { FAMILIAS, familiaDe } from './familias.mjs';
+import { crearHuella } from './huella.mjs';
+import { lectorEnElPasado } from './pasado.mjs';
 
 export const MIN_HERMANAS = 3;
 export const MAX_APPS_SIN_CAMPANA = 20;
@@ -69,16 +71,56 @@ export function rutasDeLaApp(raiz, slug, depsJson) {
   return { carpeta: `app/${slug}/`, deps };
 }
 
+/** Cuántos commits de la app, hacia atrás desde la base, se prueban para dar con su huella. */
+export const MAX_RETROCESO = 10;
+
 /**
  * El último commit anterior a la última validación de la app (o, sin ella, al día de su última
  * inspección): desde ahí se mide su cambio. null si git no lo encuentra.
+ *
+ * ⚠️ `validada` es la HORA del registro, no el código que se miró (cabo C0633, 04/11/2026): la cola
+ * sacó simulador-planificador-procesos con «git diff 15136685 HEAD», VACÍO, porque 15136685 (el
+ * cambio, 03/11 15:07) era anterior a su `validada` y la huella inspeccionada era la de antes de
+ * él. Pasa si entre lo que se inspeccionó y el registro entra un commit, o si el sync iba atrasado
+ * al registrar. Así que, cuando NINGÚN commit desde esa base toca la app (el síntoma: un diff vacío
+ * de una app invalidada), se retrocede por sus commits, hasta MAX_RETROCESO, rehaciendo la huella
+ * como estaba antes de ellos (`pasado.mjs`), y la base es el padre del primero que la explica. Si
+ * ninguno la explica, se queda la de siempre y `diffVacio` lo dice en la cola.
+ * Solo con el diff vacío: rehacer la huella de todas las invalidadas costaría segundos por app.
+ * Prueba: `npm run inspector:probar-cola-valor` (comprobación 8).
  */
 export function baseDelCambio(raiz, fila, ref = REF) {
   const desde = fila.validada || `${fila.ultima_inspeccion}T00:00:00Z`;
+  let base;
   try {
-    return git(raiz, ['rev-list', '-1', `--before=${desde}`, ref]).trim().slice(0, 8) || null;
+    base = git(raiz, ['rev-list', '-1', `--before=${desde}`, ref]).trim().slice(0, 8) || null;
   } catch {
     return null;
+  }
+  if (!base || ref !== 'HEAD' || !fila.hash_inspeccionado) return base;
+  try {
+    const { carpeta, deps } = rutasDeLaApp(raiz, fila.slug, fila.deps);
+    if (git(raiz, ['log', '--format=%H', `${base}..HEAD`, '--', carpeta, ...deps]).trim()) return base;
+    const anteriores = git(raiz, ['log', '--first-parent', '--format=%H', `-${MAX_RETROCESO}`, base, '--', carpeta, ...deps])
+      .split('\n').filter(Boolean);
+    for (let i = 0; i < anteriores.length; i++) {
+      const pasado = lectorEnElPasado(raiz, anteriores.slice(0, i + 1));
+      const a = crearHuella({ raiz, fsv: pasado.fsv }).analizarApp(fila.slug);
+      if (a && `${a.hash_codigo}|${a.hash_deps || ''}` === fila.hash_inspeccionado) return pasado.base.slice(0, 8);
+    }
+  } catch {
+    // sin poder rehacer la huella, la base de siempre
+  }
+  return base;
+}
+
+/** ¿No cambia nada la app entre `base` y HEAD? Una app invalidada con el diff vacío: base mal. */
+export function diffVacio(raiz, base, { carpeta, deps }) {
+  try {
+    git(raiz, ['diff', '--quiet', base, 'HEAD', '--', carpeta, ...deps]);
+    return true;
+  } catch {
+    return false;
   }
 }
 

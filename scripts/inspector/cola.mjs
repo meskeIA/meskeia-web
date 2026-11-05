@@ -115,7 +115,7 @@ import fs from 'node:fs';
 import { DatabaseSync } from 'node:sqlite';
 import { abrir, SQL_INVALIDADA } from './db.mjs';
 import { FAMILIAS, familiaDe, slugsHuerfanos, appsDelSujeto } from './familias.mjs';
-import { clasificarHermana, baseDelCambio, rutasDeLaApp } from './cambio-familia.mjs';
+import { clasificarHermana, baseDelCambio, rutasDeLaApp, diffVacio } from './cambio-familia.mjs';
 import { RAIZ, RUTA_BASE as RUTA_CABOS, codigo } from '../cabos/cabos.mjs';
 
 const args = process.argv.slice(2);
@@ -317,7 +317,11 @@ function ordenDiff(f) {
   const base = baseDelCambio(RAIZ, f);
   const { deps } = rutasDeLaApp(RAIZ, f.slug, f.deps);
   if (!base) return `cambio desde ${ddmm(desde)} (base no encontrada: git log --since=${desde.slice(0, 10)} -- app/${f.slug}/)`;
-  return `cambio desde ${ddmm(desde)}: git diff ${base} HEAD -- app/${f.slug}/${deps.length ? ' ' + deps.join(' ') : ''}`;
+  // Un diff vacío de una app invalidada no es «nada que mirar»: la base no explica el cambio (C0633)
+  const vacio = diffVacio(RAIZ, base, { carpeta: `app/${f.slug}/`, deps })
+    ? ` ⚠️ DIFF VACÍO: la base no explica el cambio, mira git log -- app/${f.slug}/`
+    : '';
+  return `cambio desde ${ddmm(desde)}: git diff ${base} HEAD -- app/${f.slug}/${deps.length ? ' ' + deps.join(' ') : ''}${vacio}`;
 }
 
 /** La etiqueta de modo que va al final de la línea de una app. */
