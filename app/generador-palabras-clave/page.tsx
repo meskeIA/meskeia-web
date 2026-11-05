@@ -246,7 +246,7 @@ export default function GeneradorPalabrasClavePage() {
                     checked={categorias[key as keyof typeof categorias]}
                     onChange={(e) => setCategorias({ ...categorias, [key]: e.target.checked })}
                   />
-                  <span className={styles.categoryIcon}>{icon}</span>
+                  <span className={styles.categoryIcon} aria-hidden="true">{icon}</span>
                   <span>{label}</span>
                 </label>
               ))}
