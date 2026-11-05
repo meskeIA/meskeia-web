@@ -26,8 +26,12 @@
  *     S caída = √3·30·33,96179·0,85/(44·20) = 1.500,000/880 = 1,70455 → 2,5
  *     (√3·30·I·0,85 = 30·20.000/400 = 1.500 exactos: el cos φ y el √3 se cancelan)
  *     Iz (C, XLPE, 3 → columna 8): 18 · 25 · 34 → 4 mm² (34 A). Recomendada 4, intensidad.
- *   CASO 6 — nota 1) «a partir de 25 mm²»: G con PVC y F con XLPE no bajan de 25 mm²
- *     aunque la corriente sea 10 A (columna 9 a 25 → 116 A; columna 10 a 25 → 123 A).
+ *   CASO 6 — nota 1) «a partir de 25 mm²»: G con PVC y F con XLPE solo tienen valores desde
+ *     25 mm² (columna 9 a 25 → 116 A; columna 10 a 25 → 123 A). Con 10 A la tabla NO dice que
+ *     una sección menor se caliente: no hay sección recomendada, solo la de caída (hallazgo
+ *     4105, 05/11/2026; hasta entonces este caso fijaba 25 mm² como «mínima por intensidad»).
+ *   CASO 6b — G con PVC, tri 400 V, 100 A, 200 m, 5 %: S caída = √3·200·100/(48·20) =
+ *     34.641,02/960 = 36,08439 → 50 mm² ≥ 25 tabulados (116 A ≥ 100) → recomendada 50, la caída.
  *   CASO 7 — modo caída con 1,5 mm² instalados y 40 A (caso 1): Iz 15 A → NO cumple;
  *     la caída sí: ΔV = 400/(48·1,5) = 5,55556 V (2,41546 %).
  *
@@ -141,18 +145,37 @@ test.describe('Sección recomendada: la mayor de los dos criterios', () => {
     expect(r.seccionRecomendada).toBe(4);
   });
 
-  test('CASO 6 — la nota 1) de la tabla: G con PVC y F con XLPE desde 25 mm²', () => {
+  test('CASO 6 — la nota 1) de la tabla: G con PVC y F con XLPE solo tabulan desde 25 mm²', () => {
     const tri = { ...BASE, sistema: 'trifasico' as const, tension: 400, corrienteManual: 10 };
-    expect(calcularLinea({ ...tri, metodo: 'G', aislamiento: 'PVC' }).intensidad).toEqual({
-      estado: 'ok',
-      seccion: 25,
-      iz: 116,
+    const g = calcularLinea({ ...tri, metodo: 'G', aislamiento: 'PVC' });
+    expect(g.intensidad).toEqual({ estado: 'bajo-tabla', desde: 25, iz: 116 });
+    const f = calcularLinea({ ...tri, metodo: 'F', aislamiento: 'XLPE' });
+    expect(f.intensidad).toEqual({ estado: 'bajo-tabla', desde: 25, iz: 123 });
+    // Sin valor de tabla para 1,5 mm²: ni recomendada ni «no cumple»
+    expect(f.seccionPorCaida).toBe(1.5);
+    expect(f.seccionRecomendada).toBeNull();
+    expect(calcularLinea({ ...tri, metodo: 'F', aislamiento: 'XLPE', modo: 'caida' }).cumpleIntensidad).toBeNull();
+    // Con 25 mm² instalados sí se puede decir
+    expect(
+      calcularLinea({ ...tri, metodo: 'F', aislamiento: 'XLPE', modo: 'caida', seccionElegida: 25 })
+        .cumpleIntensidad,
+    ).toBe(true);
+  });
+
+  test('CASO 6b — G con PVC y la caída ya pide 50 mm²: recomendada 50, la manda la caída', () => {
+    const r = calcularLinea({
+      ...BASE,
+      sistema: 'trifasico',
+      tension: 400,
+      corrienteManual: 100,
+      longitud: 200,
+      metodo: 'G',
     });
-    expect(calcularLinea({ ...tri, metodo: 'F', aislamiento: 'XLPE' }).intensidad).toEqual({
-      estado: 'ok',
-      seccion: 25,
-      iz: 123,
-    });
+    expect(r.seccionTeorica).toBeCloseTo(36.08439, 4);
+    expect(r.intensidad).toEqual({ estado: 'bajo-tabla', desde: 25, iz: 116 });
+    expect(r.seccionRecomendada).toBe(50);
+    expect(r.criterioDominante).toBe('caida');
+    expect(r.cumpleIntensidad).toBe(true);
   });
 });
 

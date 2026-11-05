@@ -57,8 +57,14 @@ export interface Entrada {
 /** Por qué no se puede aplicar el criterio de intensidad admisible */
 export type MotivoSinTabla = 'aluminio' | 'metodo' | 'excede';
 
+/**
+ * `bajo-tabla`: la columna solo da valores «a partir de» una sección (nota 1 de la Tabla 1:
+ * F con XLPE y G con PVC, desde 25 mm²) y esa primera sección ya aguanta la corriente. La
+ * tabla no dice nada de las menores: ni que aguanten ni que se calienten (hallazgo 4105).
+ */
 export type CriterioIntensidad =
   | { estado: 'ok'; seccion: number; iz: number }
+  | { estado: 'bajo-tabla'; desde: number; iz: number }
   | { estado: 'sin-tabla'; motivo: MotivoSinTabla; izMaxima: number | null };
 
 export interface Resultado {
@@ -117,6 +123,11 @@ function criterioIntensidad(
   if (!primera) {
     return { estado: 'sin-tabla', motivo: 'excede', izMaxima: valores[valores.length - 1].iz };
   }
+  // La primera sección con valor aguanta, pero la columna empieza más arriba que la tabla:
+  // las menores no están tabuladas para este método, no «se calientan»
+  if (primera === valores[0] && primera.seccion > SECCIONES_TABLA_ITC_BT_19[0]) {
+    return { estado: 'bajo-tabla', desde: primera.seccion, iz: primera.iz };
+  }
   return { estado: 'ok', seccion: primera.seccion, iz: primera.iz };
 }
 
@@ -166,6 +177,14 @@ export function calcularLinea(e: Entrada): Resultado {
         : seccionPorCaida > intensidad.seccion
           ? 'caida'
           : 'intensidad';
+  } else if (
+    intensidad.estado === 'bajo-tabla' &&
+    seccionPorCaida !== null &&
+    seccionPorCaida >= intensidad.desde
+  ) {
+    // La caída ya pide una sección tabulada, y la Iz crece con la sección
+    seccionRecomendada = seccionPorCaida;
+    criterioDominante = 'caida';
   }
 
   // En modo "caída" manda la sección que elige el usuario
@@ -188,7 +207,11 @@ export function calcularLinea(e: Entrada): Resultado {
   const cumpleIntensidad =
     intensidad.estado === 'ok'
       ? seccionUsada >= intensidad.seccion
-      : intensidad.motivo === 'excede'
+      : intensidad.estado === 'bajo-tabla'
+        ? seccionUsada >= intensidad.desde
+          ? true
+          : null
+        : intensidad.motivo === 'excede'
         ? false
         : null;
 

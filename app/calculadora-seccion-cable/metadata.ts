@@ -46,7 +46,7 @@ export const jsonLd = generateWebAppSchema({
     'Cobre y aluminio con la conductividad a la temperatura de servicio del aislamiento',
     'Entrada por potencia en vatios o por corriente en amperios',
     'Pérdidas por efecto Joule y densidad de corriente del conductor',
-    'Límites de caída habituales: alumbrado, fuerza y derivación individual',
+    'Límites de caída del REBT: vivienda, alumbrado y otros usos, y los tres casos de la derivación individual',
     'En español',
   ],
   keywords: ['sección de cable', 'caída de tensión', 'monofásico', 'trifásico', 'instalación eléctrica'],
@@ -69,7 +69,7 @@ export const faqJsonLd = {
       name: '¿Cuánta caída de tensión se admite en una instalación?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'En España el REBT fija, para instalaciones alimentadas desde una estación transformadora de abonado, un máximo del 3 % en circuitos de alumbrado y del 5 % en los demás usos, medidos desde el origen de la instalación interior. La derivación individual tiene su propio límite, del orden del 1 % al 1,5 % según cómo estén dispuestos los contadores. Fuera de España el criterio de cálculo es idéntico, pero los porcentajes los fija la normativa local.',
+        text: 'En España, la ITC-BT-19 del REBT fija la caída desde el origen de la instalación interior: menos del 3 % en cualquier circuito interior de una vivienda; en otras instalaciones interiores o receptoras, el 3 % en alumbrado y el 5 % en los demás usos, y si se alimentan de un transformador propio, el 4,5 % y el 6,5 %. La derivación individual tiene su propio límite en la ITC-BT-15: 0,5 % con contadores concentrados en más de un lugar, 1 % con todos los contadores concentrados y 1,5 % en el suministro a un único usuario sin línea general de alimentación. Fuera de España el criterio de cálculo es idéntico, pero los porcentajes los fija la normativa local.',
       },
     },
     {

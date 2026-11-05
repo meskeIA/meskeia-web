@@ -10,9 +10,10 @@ import {
   DisclaimerCard,
   ShareCard,
   CampoNumerico,
+  RegionBadge,
 } from '@/components';
 import DataReference from '@/components/DataReference';
-import { formatNumber } from '@/lib';
+import { formatNumber, formatPercentage } from '@/lib';
 import {
   INTENSIDADES_ITC_BT_19_META,
   METODOS_ITC_BT_19,
@@ -59,10 +60,25 @@ const AISLAMIENTOS: { id: Aislamiento; nombre: string }[] = [
 // Secciones e intensidades de tabla sin decimales forzados: «10 mm²», «50 A», pero «2,5 mm²»
 const fmtValor = (v: number) => formatNumber(v, Number.isInteger(v) ? 0 : 1);
 
+// Porcentaje con el espacio duro delante del «%» (formatPercentage recibe la fracción)
+const fmtPct = (v: number, decimales: number) => formatPercentage(v / 100, decimales);
+
+// Límites del REBT (BOE-A-2002-18099, consultado el 05/11/2026):
+//   · ITC-BT-19, 2.2.2: menos del 3 % en cualquier circuito interior de VIVIENDA; en otras
+//     instalaciones interiores o receptoras, 3 % alumbrado y 5 % demás usos (4,5 % y 6,5 %
+//     si se alimentan de un transformador propio).
+//   · ITC-BT-15, 3: derivación individual 0,5 % con contadores concentrados en más de un lugar,
+//     1 % con contadores totalmente concentrados y 1,5 % para un único usuario sin línea
+//     general de alimentación.
+// Hasta el 05/11/2026 no había criterio de vivienda (las tomas salían con el 5 %) y la
+// derivación individual con centralización llevaba el 1,5 % (hallazgos 4102 y 4103).
 const LIMITES: LimiteCaida[] = [
-  { id: 'alumbrado', nombre: 'Alumbrado', porcentaje: 3, detalle: 'Circuitos de alumbrado en instalación interior' },
-  { id: 'fuerza', nombre: 'Otros usos', porcentaje: 5, detalle: 'Tomas de corriente y receptores de fuerza' },
-  { id: 'derivacion', nombre: 'Derivación individual', porcentaje: 1.5, detalle: 'Tramo entre la centralización de contadores y el cuadro' },
+  { id: 'vivienda', nombre: 'Vivienda', porcentaje: 3, detalle: 'Cualquier circuito interior de una vivienda, alumbrado o tomas (ITC-BT-19, 2.2.2)' },
+  { id: 'alumbrado', nombre: 'Alumbrado', porcentaje: 3, detalle: 'Circuitos de alumbrado en instalaciones que no son vivienda: locales, oficinas, industria' },
+  { id: 'fuerza', nombre: 'Otros usos', porcentaje: 5, detalle: 'Tomas y receptores de fuerza en instalaciones que no son vivienda: locales, oficinas, industria' },
+  { id: 'di-concentrados', nombre: 'Derivación individual, contadores en un solo lugar', porcentaje: 1, detalle: 'Tramo de la centralización de contadores al cuadro, con todos los contadores concentrados (ITC-BT-15, 3)' },
+  { id: 'di-varios', nombre: 'Derivación individual, contadores en varios lugares', porcentaje: 0.5, detalle: 'Tramo de la centralización al cuadro cuando los contadores están concentrados en más de un lugar (ITC-BT-15, 3)' },
+  { id: 'di-unico', nombre: 'Derivación individual, único usuario', porcentaje: 1.5, detalle: 'Suministro para un único usuario sin línea general de alimentación, como una vivienda unifamiliar (ITC-BT-15, 3)' },
   { id: 'libre', nombre: 'Personalizado', porcentaje: 0, detalle: 'Introduce tu propio criterio de cálculo' },
 ];
 
@@ -78,7 +94,7 @@ export default function CalculadoraSeccionCable() {
   const [materialId, setMaterialId] = useState<MaterialId>('cobre');
   const [aislamiento, setAislamiento] = useState<Aislamiento>('PVC');
   const [metodoId, setMetodoId] = useState<MetodoInstalacion>('B');
-  const [limiteId, setLimiteId] = useState('fuerza');
+  const [limiteId, setLimiteId] = useState('vivienda');
   const [limitePersonalizado, setLimitePersonalizado] = useState(5);
   const [seccionElegida, setSeccionElegida] = useState(2.5);
 
@@ -91,7 +107,7 @@ export default function CalculadoraSeccionCable() {
   const metodoTabla = METODOS_ITC_BT_19.find((m) => m.id === metodo);
 
   const limite = useMemo(() => {
-    const encontrado = LIMITES.find((l) => l.id === limiteId) ?? LIMITES[1];
+    const encontrado = LIMITES.find((l) => l.id === limiteId) ?? LIMITES[0];
     if (encontrado.id === 'libre') {
       return { ...encontrado, porcentaje: limitePersonalizado };
     }
@@ -143,7 +159,9 @@ export default function CalculadoraSeccionCable() {
   const amperios = `${fmtValor(resultado.corriente)} A`;
   const instalacion = `método ${metodo} con aislamiento ${aislamiento === 'PVC' ? 'de PVC' : 'XLPE o EPR'}`;
   const textoSinTabla =
-    intensidad.estado === 'sin-tabla'
+    intensidad.estado === 'bajo-tabla'
+      ? `Con el ${instalacion}, la Tabla 1 de la ITC-BT-19 solo da valores a partir de ${fmtValor(intensidad.desde)} mm² (su nota 1), que admiten ${fmtValor(intensidad.iz)} A. No dice si una sección menor aguanta ${amperios}: compruébalo con la UNE 20460-5-523.`
+      : intensidad.estado === 'sin-tabla'
       ? intensidad.motivo === 'aluminio'
         ? 'La tabla de intensidades admisibles del REBT (ITC-BT-19, Tabla 1) solo recoge conductores de cobre, así que falta comprobar que el aluminio no se calienta con esa corriente: consulta la UNE 20460-5-523.'
         : intensidad.motivo === 'metodo'
@@ -160,15 +178,19 @@ export default function CalculadoraSeccionCable() {
       veredictoTitulo = 'La sección necesaria supera las secciones comerciales habituales';
       veredictoDetalle = `La caída de tensión pide ${formatNumber(resultado.seccionTeorica, 1)} mm². Conviene reducir la longitud, subir la tensión o repartir la carga en varias líneas.`;
     } else if (resultado.seccionRecomendada !== null && intensidad.estado === 'ok') {
-      const caida = formatNumber(resultado.caidaPorcentaje, 2);
+      const caida = fmtPct(resultado.caidaPorcentaje, 2);
       veredictoTono = 'ok';
       veredictoTitulo = `Sección recomendada: ${fmtValor(resultado.seccionRecomendada)} mm²`;
       veredictoDetalle =
         resultado.criterioDominante === 'intensidad'
-          ? `Por caída de tensión bastarían ${fmtValor(resultado.seccionPorCaida)} mm², pero con ${amperios} el cable se calentaría: con el ${instalacion}, la primera sección que admite esa corriente es ${fmtValor(intensidad.seccion)} mm² (${fmtValor(intensidad.iz)} A). La caída queda en el ${caida} %.`
+          ? `Por caída de tensión bastarían ${fmtValor(resultado.seccionPorCaida)} mm², pero con ${amperios} el cable se calentaría: con el ${instalacion}, la primera sección que admite esa corriente es ${fmtValor(intensidad.seccion)} mm² (${fmtValor(intensidad.iz)} A). La caída queda en el ${caida}.`
           : resultado.criterioDominante === 'caida'
-            ? `Por calentamiento bastarían ${fmtValor(intensidad.seccion)} mm² (admiten ${fmtValor(intensidad.iz)} A), pero la caída de tensión pide ${fmtValor(resultado.seccionRecomendada)} mm²: el cálculo teórico da ${formatNumber(resultado.seccionTeorica, 2)} mm² y con la sección comercial la caída queda en el ${caida} %.`
-            : `Los dos criterios piden la misma sección: admite ${fmtValor(intensidad.iz)} A con el ${instalacion} y la caída queda en el ${caida} %.`;
+            ? `Por calentamiento bastarían ${fmtValor(intensidad.seccion)} mm² (admiten ${fmtValor(intensidad.iz)} A), pero la caída de tensión pide ${fmtValor(resultado.seccionRecomendada)} mm²: el cálculo teórico da ${formatNumber(resultado.seccionTeorica, 2)} mm² y con la sección comercial la caída queda en el ${caida}.`
+            : `Los dos criterios piden la misma sección: admite ${fmtValor(intensidad.iz)} A con el ${instalacion} y la caída queda en el ${caida}.`;
+    } else if (resultado.seccionRecomendada !== null && intensidad.estado === 'bajo-tabla') {
+      veredictoTono = 'ok';
+      veredictoTitulo = `Sección recomendada: ${fmtValor(resultado.seccionRecomendada)} mm²`;
+      veredictoDetalle = `La caída de tensión pide ${fmtValor(resultado.seccionRecomendada)} mm² (el cálculo teórico da ${formatNumber(resultado.seccionTeorica, 2)} mm²) y la caída queda en el ${fmtPct(resultado.caidaPorcentaje, 2)}. Con el ${instalacion} la tabla empieza en ${fmtValor(intensidad.desde)} mm², que ya admiten ${fmtValor(intensidad.iz)} A frente a los ${amperios}.`;
     } else if (intensidad.estado === 'sin-tabla' && intensidad.motivo === 'excede') {
       veredictoTono = 'error';
       veredictoTitulo = 'La corriente supera la tabla de intensidades admisibles';
@@ -192,15 +214,15 @@ export default function CalculadoraSeccionCable() {
           : textoSinTabla;
     } else if (!resultado.cumpleCaida) {
       veredictoTono = 'error';
-      veredictoTitulo = `Caída del ${formatNumber(resultado.caidaPorcentaje, 2)} %: supera el ${formatNumber(limite.porcentaje, 1)} % admisible`;
+      veredictoTitulo = `Caída del ${fmtPct(resultado.caidaPorcentaje, 2)}: supera el ${fmtPct(limite.porcentaje, 1)} admisible`;
       veredictoDetalle = `Con ${seccion} la línea ${caidaTexto}.`;
     } else if (resultado.cumpleIntensidad === null) {
       veredictoTono = 'aviso';
-      veredictoTitulo = `Caída del ${formatNumber(resultado.caidaPorcentaje, 2)} %: dentro del límite`;
+      veredictoTitulo = `Caída del ${fmtPct(resultado.caidaPorcentaje, 2)}: dentro del límite`;
       veredictoDetalle = `Con ${seccion} la línea ${caidaTexto}. ${textoSinTabla}`;
     } else {
       veredictoTono = 'ok';
-      veredictoTitulo = `Caída del ${formatNumber(resultado.caidaPorcentaje, 2)} % y ${fmtValor(resultado.izSeccionUsada ?? 0)} A admisibles: la sección cumple`;
+      veredictoTitulo = `Caída del ${fmtPct(resultado.caidaPorcentaje, 2)} y ${fmtValor(resultado.izSeccionUsada ?? 0)} A admisibles: la sección cumple`;
       veredictoDetalle = `Con ${seccion} la línea ${caidaTexto}, y el cable admite ${fmtValor(resultado.izSeccionUsada ?? 0)} A con el ${instalacion} frente a los ${amperios} que circulan.`;
     }
   }
@@ -219,6 +241,8 @@ export default function CalculadoraSeccionCable() {
         <h1>Calculadora de Sección de Cable y Caída de Tensión</h1>
         <p>Cuántos mm² necesita la línea y cuánta tensión se pierde por el camino</p>
       </header>
+
+      <RegionBadge variant="es-data" />
 
       <LegalNotice />
 
@@ -550,7 +574,7 @@ export default function CalculadoraSeccionCable() {
                   onClick={() => setLimiteId(l.id)}
                 >
                   {l.nombre}
-                  <span>{l.id !== 'libre' && ` · ${formatNumber(l.porcentaje, 1)} %`}</span>
+                  <span>{l.id !== 'libre' && ` · ${fmtPct(l.porcentaje, 1)}`}</span>
                 </button>
               ))}
             </div>
@@ -563,7 +587,7 @@ export default function CalculadoraSeccionCable() {
             <div className={styles.inputGroup}>
               <label htmlFor="limitelibre">
                 Caída máxima
-                <span className={styles.valueBadge}>{formatNumber(limitePersonalizado, 1)} %</span>
+                <span className={styles.valueBadge}>{fmtPct(limitePersonalizado, 1)}</span>
               </label>
               <input
                 id="limitelibre"
@@ -601,7 +625,9 @@ export default function CalculadoraSeccionCable() {
                 <span className={styles.resultValue}>
                   {intensidad.estado === 'ok'
                     ? `${fmtValor(intensidad.seccion)} mm²`
-                    : 'Sin tabla'}
+                    : intensidad.estado === 'bajo-tabla'
+                      ? `Sin tabla bajo ${fmtValor(intensidad.desde)} mm²`
+                      : 'Sin tabla'}
                 </span>
               </div>
               <div className={styles.resultRow}>
@@ -643,11 +669,11 @@ export default function CalculadoraSeccionCable() {
               <div className={styles.resultRow}>
                 <span className={styles.resultLabel}>Sobre la tensión nominal</span>
                 <span className={styles.resultValue}>
-                  {formatNumber(resultado.caidaPorcentaje, 2)} %
+                  {fmtPct(resultado.caidaPorcentaje, 2)}
                 </span>
               </div>
               <div className={styles.resultRow}>
-                <span className={styles.resultLabel}>Admisible ({formatNumber(limite.porcentaje, 1)} %)</span>
+                <span className={styles.resultLabel}>Admisible ({fmtPct(limite.porcentaje, 1)})</span>
                 <span className={styles.resultValue}>
                   {formatNumber(resultado.caidaAdmisibleV, 2)} V
                 </span>
@@ -809,9 +835,11 @@ export default function CalculadoraSeccionCable() {
             <div className={styles.escenarioCard}>
               <h4>Línea de alumbrado</h4>
               <p>
-                Límite más estricto, del 3 %, porque la caída se nota directamente en el nivel de
-                iluminación. Con tecnología LED el consumo es bajo y rara vez es un problema, pero el
-                criterio sigue vigente.
+                Fuera de las viviendas, el alumbrado tiene un límite más estricto que el resto de
+                usos (3&nbsp;% frente a 5&nbsp;%), porque la caída se nota directamente en el nivel
+                de iluminación; en una vivienda el 3&nbsp;% vale para todos los circuitos. Con
+                tecnología LED el consumo es bajo y rara vez es un problema, pero el criterio sigue
+                vigente.
               </p>
             </div>
           </div>
@@ -889,7 +917,11 @@ export default function CalculadoraSeccionCable() {
               <div className={styles.stepNumber}>3</div>
               <div className={styles.stepContent}>
                 <strong>Fija el límite de caída que te aplica</strong>
-                <p>Alumbrado, otros usos o derivación individual, según el tramo y la normativa vigente.</p>
+                <p>
+                  En una vivienda, el 3&nbsp;% en cualquier circuito; fuera de ella, alumbrado u otros
+                  usos; y en la derivación individual, según dónde estén los contadores. Lo fija la
+                  normativa vigente para cada tramo.
+                </p>
               </div>
             </div>
             <div className={styles.step}>
@@ -919,7 +951,7 @@ export default function CalculadoraSeccionCable() {
               <span className={styles.tipIcon} aria-hidden="true">🌡️</span>
               <div>
                 <strong>Calcula en caliente</strong>
-                <p>Usa la conductividad de la temperatura de servicio, no la de 20 °C: la diferencia ronda el 15 %.</p>
+                <p>Usa la conductividad de la temperatura de servicio, no la de 20 °C: la diferencia ronda el 15&nbsp;%.</p>
               </div>
             </div>
             <div className={styles.tipCard}>

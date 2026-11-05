@@ -54,6 +54,9 @@ test.describe('calculadora-seccion-cable — intensidad admisible', () => {
 
   test('aluminio: sin tabla no hay sección recomendada', async ({ page }) => {
     await caso40A5m(page);
+    // Con el 5 % de otros usos (desde el 05/11/2026 el inicial es el 3 % de vivienda, que en
+    // aluminio pide 2,5 mm²: 400/(30·6,9) = 1,93)
+    await page.getByRole('button', { name: /^Otros usos/ }).click();
     await page.getByRole('button', { name: 'Aluminio', exact: true }).click();
     await expect(veredicto(page).locator('strong')).toHaveText(
       'Sección por caída de tensión: 1,5 mm²',
@@ -186,6 +189,8 @@ test.describe('calculadora-seccion-cable — inspección 04/11/2026', () => {
     await page.getByRole('button', { name: 'Corriente (A)' }).click();
     await sembrarValor(page, '#corriente', 360);
     await sembrarValor(page, '#longitud', 10);
+    // Resuelto con el 5 %: desde el 05/11/2026 el criterio inicial es el 3 % de vivienda
+    await panelCriterio(page).getByRole('button', { name: /^Otros usos/ }).click();
     await expect(veredicto(page).locator('strong')).toHaveText('Sección recomendada: 300 mm²');
     await expect(veredicto(page)).toContainText('bastarían 10 mm²');
     await expect(veredicto(page)).toContainText('es 300 mm² (360 A)');
@@ -206,6 +211,8 @@ test.describe('calculadora-seccion-cable — inspección 04/11/2026', () => {
     await sembrarValor(page, '#potencia', '20.000');
     await sembrarValor(page, '#cosphi', 0.8);
     await sembrarValor(page, '#longitud', 60);
+    // Resuelto con el 5 %: desde el 05/11/2026 el criterio inicial es el 3 % de vivienda
+    await panelCriterio(page).getByRole('button', { name: /^Otros usos/ }).click();
     await page.getByRole('button', { name: 'Aluminio', exact: true }).click();
     await page.getByRole('button', { name: 'XLPE o EPR' }).click();
     await expect(page.getByText('Conductividad aplicada: 28 m/(Ω·mm²)')).toBeVisible();
@@ -232,34 +239,38 @@ test.describe('calculadora-seccion-cable — inspección 04/11/2026', () => {
     await expect(fila(page, /^Corriente de cálculo/)).toContainText('6,52 A');
   });
 
-  test('HALLAZGO (04/11/2026, ABIERTO) · vivienda: el REBT pide el 3 % en cualquier circuito y la app ofrece el 5 % «para tomas»', async ({
+  test('HALLAZGO 4102 (04/11/2026, REPARADO) · vivienda: el REBT pide el 3 % en cualquier circuito y la app ofrecía el 5 % «para tomas»', async ({
     page,
   }) => {
+    // REPARADO el 05/11/2026: criterio «Vivienda · 3 %», que además es el inicial.
     // ITC-BT-19 2.2.2 (y ITC-BT-25): «menor del 3 % … para cualquier circuito interior de
     // viviendas». La app solo tiene «Alumbrado · 3 %» y «Otros usos · 5 %», que describe como
     // «Tomas de corriente y receptores de fuerza» y es el criterio inicial. Una toma de vivienda
     // de 3.680 W a 40 m sale con 2,5 mm² y cae el 4,64 % (CASO 1b); el REBT pide 4 mm²
     // (S = 1.280/(48·6,9) = 3,86473). Ni compensando con toda la derivación individual de un
     // único usuario (3 + 1,5 = 4,5 %) cabe el 4,64 %.
-    test.fail();
     await sembrarValor(page, '#potencia', '3680');
     await sembrarValor(page, '#longitud', 40);
     const vivienda = panelCriterio(page).getByRole('button', { name: /vivienda[^%]*\b3(,0)?\s%/i });
     await expect(vivienda.first()).toBeVisible();
+    // Es el criterio inicial
+    await expect(vivienda.first()).toHaveAttribute('aria-pressed', 'true');
+    await expect(veredicto(page).locator('strong')).toHaveText('Sección recomendada: 4 mm²');
     await vivienda.first().click();
     await expect(veredicto(page).locator('strong')).toHaveText('Sección recomendada: 4 mm²');
   });
 
-  test('HALLAZGO (04/11/2026, ABIERTO) · derivación individual: con contadores centralizados la ITC-BT-15 pide el 1 %, no el 1,5 %', async ({
+  test('HALLAZGO 4103 (04/11/2026, REPARADO) · derivación individual: con contadores centralizados la ITC-BT-15 pide el 1 %, no el 1,5 %', async ({
     page,
   }) => {
+    // REPARADO el 05/11/2026: los tres casos de la ITC-BT-15 como criterios separados.
     // La app ofrece «Derivación individual · 1,5 %» con la ayuda «Tramo entre la centralización
     // de contadores y el cuadro». ITC-BT-15, 3: 1 % con contadores totalmente concentrados,
     // 0,5 % si están concentrados en más de un lugar; el 1,5 % es para un único usuario SIN
     // línea general de alimentación, donde no hay centralización.
     // Mono 230 V, 40 A, 20 m, cobre PVC, B: con el 1,5 % → 3,45 V → 1.600/165,6 = 9,66184 →
     // 10 mm² (cae 1,45 %); con el 1 % → 2,3 V → 1.600/110,4 = 14,49275 → 16 mm² (Iz 66 A).
-    test.fail();
+    // Con el 0,5 % → 1,15 V → 1.600/55,2 = 28,98551 → 35 mm².
     await page.getByRole('button', { name: 'Corriente (A)' }).click();
     await sembrarValor(page, '#corriente', 40);
     await sembrarValor(page, '#longitud', 20);
@@ -269,32 +280,39 @@ test.describe('calculadora-seccion-cable — inspección 04/11/2026', () => {
     await expect(di.first()).toBeVisible();
     await di.first().click();
     await expect(veredicto(page).locator('strong')).toHaveText('Sección recomendada: 16 mm²');
+    await panelCriterio(page).getByRole('button', { name: /varios lugares/ }).click();
+    await expect(veredicto(page).locator('strong')).toHaveText('Sección recomendada: 35 mm²');
+    await panelCriterio(page).getByRole('button', { name: /único usuario/ }).click();
+    await expect(veredicto(page).locator('strong')).toHaveText('Sección recomendada: 10 mm²');
+    await expect(panelCriterio(page)).toContainText('sin línea general de alimentación');
   });
 
-  test('HALLAZGO (04/11/2026, ABIERTO) · el FAQPage da a la estación transformadora de abonado el 3 % y el 5 % y calla el 3 % de las viviendas', async ({
+  test('HALLAZGO 4104 (04/11/2026, REPARADO) · el FAQPage daba a la estación transformadora de abonado el 3 % y el 5 % y callaba el 3 % de las viviendas', async ({
     page,
   }) => {
+    // REPARADO el 05/11/2026: la respuesta da los porcentajes de la ITC-BT-19 2.2.2 y la ITC-BT-15 3.
     // FAQPage: «para instalaciones alimentadas desde una estación transformadora de abonado, un
     // máximo del 3 % en circuitos de alumbrado y del 5 % en los demás usos». ITC-BT-19 2.2.2:
     // con transformador propio son el 4,5 % y el 6,5 %; el 3/5 % es de las demás instalaciones
     // que no son vivienda, y en vivienda es el 3 % en cualquier circuito.
-    test.fail();
     const faq = await faqJsonLd(page);
     const caida = faq.find((q) => /caída de tensión se admite/i.test(q.pregunta));
     expect(caida, 'la pregunta sobre la caída admisible').toBeDefined();
     expect(caida?.respuesta).not.toMatch(/transformadora de abonado[^.]*del 3\s%/);
     expect(caida?.respuesta).toMatch(/vivienda/i);
+    expect(caida?.respuesta).toMatch(/transformador propio, el 4,5\s% y el 6,5\s%/);
+    expect(caida?.respuesta).toMatch(/0,5\s% con contadores concentrados en más de un lugar/);
   });
 
-  test('HALLAZGO (04/11/2026, ABIERTO) · F con XLPE y 10 A: la tabla no da valores bajo 25 mm² y la app dice que 1,5 mm² «se calentaría»', async ({
+  test('HALLAZGO 4105 (04/11/2026, REPARADO) · F con XLPE y 10 A: la tabla no da valores bajo 25 mm² y la app decía que 1,5 mm² «se calentaría»', async ({
     page,
   }) => {
+    // REPARADO el 05/11/2026: estado «bajo-tabla» en el motor; sin recomendada, como el aluminio.
     // Nota 1) de la Tabla 1: la columna 10 vale para F-XLPE «a partir de 25 mm² de sección»
     // (igual que la 9 para G-PVC). Por debajo la tabla no da valor para ese método: no dice que
     // 1,5 mm² se caliente con 10 A. La app recomienda 25 mm² (123 A) para
     // 10 A y afirma «con 10 A el cable se calentaría»; en modo caída, «2,5 mm² no aguanta 10 A:
     // el cable se calienta». Con el aluminio y los métodos sin columna dice «sin tabla».
-    test.fail();
     await page.getByRole('button', { name: 'Trifásico' }).click();
     await page.getByRole('button', { name: 'Corriente (A)' }).click();
     await sembrarValor(page, '#corriente', 10);
@@ -306,29 +324,29 @@ test.describe('calculadora-seccion-cable — inspección 04/11/2026', () => {
       'true',
     );
     await expect(veredicto(page)).not.toContainText('se calentaría');
+    await expect(veredicto(page).locator('strong')).toHaveText('Sección por caída de tensión: 1,5 mm²');
+    await expect(veredicto(page)).toContainText('solo da valores a partir de 25 mm²');
     await page.getByRole('button', { name: /La caída de tensión/ }).click();
     await page.getByRole('button', { name: '2,5 mm²', exact: true }).click();
     await expect(veredicto(page)).not.toContainText('se calienta');
   });
 
-  test('HALLAZGO (04/11/2026, ABIERTO) · datos del REBT sin el RegionBadge «es-data» tras el hero', async ({
+  test('HALLAZGO 4106 (04/11/2026, REPARADO) · datos del REBT sin el RegionBadge «es-data» tras el hero', async ({
     page,
   }) => {
     // CLAUDE.md §1.bis: datos de referencia de España con metodología universal → RegionBadge
-    // «es-data». La app usa la tabla y los porcentajes del REBT y solo lo dice dentro del aviso.
-    test.fail();
+    // «es-data». La app usa la tabla y los porcentajes del REBT y solo lo decía dentro del aviso.
     await expect(
       page.getByRole('note', { name: 'Aviso: los datos de referencia son de España' }),
     ).toHaveCount(1);
   });
 
-  test('HALLAZGO (04/11/2026, ABIERTO) · el «%» va tras un espacio normal y no tras el duro (U+00A0)', async ({
+  test('HALLAZGO 4107 (04/11/2026, REPARADO) · el «%» iba tras un espacio normal y no tras el duro (U+00A0)', async ({
     page,
   }) => {
     // CLAUDE.md global §2 (25/09/2026): «15 %» con espacio duro, para que el «%» no salte solo
     // de línea. El veredicto («la caída queda en el 2,76 %.»), la fila «Sobre la tensión
-    // nominal» y los botones del criterio llevan U+0020.
-    test.fail();
+    // nominal» y los botones del criterio llevaban U+0020; ahora formatPercentage.
     const textos = [
       (await veredicto(page).textContent()) ?? '',
       (await fila(page, /^Sobre la tensión nominal/).textContent()) ?? '',
