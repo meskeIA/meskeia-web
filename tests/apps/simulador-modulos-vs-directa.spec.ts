@@ -1486,14 +1486,15 @@ test.describe('Simulador Módulos vs Estimación Directa — inspección de camb
    * la otra columna, y sin el argumento con que se dio por bajo («el importe se suma igual en las dos
    * columnas»): aquí lo que cambia es justo la diferencia.
    *
-   * Se escribe con `test.fail()`: pasa hoy porque la app falla. La reparación puede ser un aviso que
-   * nombre la mínima de módulos (401,47 €) o un coste de módulos con esa cuota (≥ 10.478,64 €); el
-   * caso acepta las dos. Al repararlo, quitar el `test.fail()` y pasar el comentario a REPARADO.
+   * REPARADO (05/11/2026, /reparar): la página contrasta la cuota también con el computable de
+   * módulos (`contrastarCuotaRetaModulos`) y, como en la directa, AVISA sin corregir: el aviso bajo
+   * la columna nombra el tramo 6 de la general y su mínima, 401,47 €, con el déficit de
+   * (401,47 − 227) × 12 = 2.093,64 €, y la caja de la diferencia dice que el coste de módulos sería
+   * al menos eso mayor. La directa sigue sin aviso (su tramo 2 de la reducida admite 227 €).
    */
-  test('HALLAZGO (05/11/2026, ABIERTO) — 30.000/20.000/227 con «30.000»: la columna de módulos no avisa de que 227 € está por debajo de su mínima (401,47 €)', async ({
+  test('HALLAZGO 4133 (05/11/2026, REPARADO) — 30.000/20.000/227 con «30.000»: la columna de módulos avisa de que 227 € está por debajo de su mínima (401,47 €)', async ({
     page,
   }) => {
-    test.fail();
     await deslizar(page, 'ingresos', 30000);
     await deslizar(page, 'gastos', 20000);
     await deslizar(page, 'reta', 227);
@@ -1508,6 +1509,23 @@ test.describe('Simulador Módulos vs Estimación Directa — inspección de camb
       textoPrincipal.includes('401,47') || costeModulos >= 10478.64,
       `coste de módulos ${costeModulos} € sin aviso de la cuota mínima de módulos (401,47 €/mes)`,
     ).toBe(true);
+    const aviso = page.getByTestId('aviso-reta-modulos');
+    await expect(aviso).toContainText('2325,00 €/mes, tabla general, tramo 6');
+    await expect(aviso).toContainText('401,47 €/mes');
+    await expect(aviso).toContainText('2093,64 €');
+    await expect(estado(page)).toContainText('al menos 2093,64 € mayor');
+    await sinAvisoReta(page);
+  });
+
+  test('HALLAZGO 4133 — con una cuota que cabe en el tramo de módulos (402 €), la columna de módulos no avisa', async ({
+    page,
+  }) => {
+    await deslizar(page, 'ingresos', 30000);
+    await deslizar(page, 'gastos', 20000);
+    await deslizar(page, 'reta', 402);
+    await escribirModulos(page, '30.000');
+    await expect(page.locator('h3', { hasText: MOD })).toHaveCount(1);
+    await expect(page.getByTestId('aviso-reta-modulos')).toHaveCount(0);
   });
 
   /**

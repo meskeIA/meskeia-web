@@ -127,6 +127,34 @@ function contrastarCuotaReta(retaMensual: number, ed: ResultadoRegimenED): Coher
     cuotasAnuales: ed.cuotaRetaDeducida,
     metodo: 'directa',
   });
+  return contrastarConComputable(retaMensual, rendimientoMensual);
+}
+
+/**
+ * El mismo contraste para la columna de MÓDULOS (hallazgo 4133, 05/11/2026). Con la cotización
+ * por ingresos reales, el tramo depende del computable de CADA régimen: en estimación objetiva,
+ * «el rendimiento neto previo» con el 7 % (art. 308.1.c, reglas 1.ª y 2.ª, LGSS), sin devolver
+ * cuotas, porque en módulos no se deducen. Hasta hoy solo se contrastaba la directa, y con
+ * 30.000 / 20.000 / 227 € y 30.000 de módulos la columna de módulos publicaba un coste
+ * 2.093,64 € por debajo del mínimo posible en ese régimen, sin aviso.
+ *
+ * Como neto previo se toma el dato que escribe el usuario (antes de la reducción general):
+ * coincide cuando la actividad no tiene índices correctores; con ellos, el previo es algo
+ * mayor y el aviso, si sale, se queda corto, nunca de más.
+ */
+function contrastarCuotaRetaModulos(
+  retaMensual: number,
+  rendimientoNetoModulos: number
+): CoherenciaReta | null {
+  const rendimientoMensual = rendimientoComputableMensualRETA({
+    rendimientoNetoAnual: rendimientoNetoModulos,
+    cuotasAnuales: 0,
+    metodo: 'objetiva',
+  });
+  return contrastarConComputable(retaMensual, rendimientoMensual);
+}
+
+function contrastarConComputable(retaMensual: number, rendimientoMensual: number): CoherenciaReta | null {
   if (rendimientoMensual <= 0) return null;
   // Ya es el computable (con su 7 %): se pasa como tal para que la calculadora no lo reste otra vez.
   const { cuotaEfectiva } = calcularCuotaAutonomo({ rendimientoComputableMensual: rendimientoMensual });
@@ -198,6 +226,11 @@ export default function SimuladorModulosVsDirectaPage() {
   const coherenciaReta = useMemo(
     () => contrastarCuotaReta(comunes.retaMensual, resED),
     [comunes.retaMensual, resED]
+  );
+  // Y con el tramo que le toca en MÓDULOS, que se busca con su propio computable (hallazgo 4133).
+  const coherenciaRetaModulos = useMemo(
+    () => (resModulos ? contrastarCuotaRetaModulos(comunes.retaMensual, resModulos.rendimientoNetoModulos) : null),
+    [comunes.retaMensual, resModulos]
   );
 
   return (
@@ -570,6 +603,22 @@ export default function SimuladorModulosVsDirectaPage() {
                     <span>Coste fiscal anual total</span>
                     <strong>{formatCurrency(resModulos.costeAnualTotal)}</strong>
                   </div>
+                  {coherenciaRetaModulos && (
+                    <p className={styles.avisoReta} data-testid="aviso-reta-modulos">
+                      <span aria-hidden="true">⚠️</span> En módulos el tramo del RETA se busca con
+                      tu rendimiento neto de módulos menos el{' '}
+                      {formatNumber(GASTOS_GENERICOS_RETA.general * 100, 0)}{' '}% de gastos
+                      genéricos ({GASTOS_GENERICOS_RETA.norma}), sin sumar cuotas:{' '}
+                      {formatCurrency(coherenciaRetaModulos.rendimientoMensual)}/mes, tabla{' '}
+                      {coherenciaRetaModulos.tabla}, tramo {coherenciaRetaModulos.numeroTramo}, cuya
+                      cuota mínima es{' '}
+                      <strong>{formatCurrency(coherenciaRetaModulos.cuotaMinimaTramo)}/mes</strong>. Con{' '}
+                      {formatCurrency(comunes.retaMensual)}, el coste de esta columna queda{' '}
+                      {formatCurrency(coherenciaRetaModulos.deficitAnual)} por debajo del mínimo
+                      posible en módulos, y la diferencia con la directa no recoge ese cambio de
+                      cuota, salvo tarifa plana, pluriactividad o un alta a mitad de año.
+                    </p>
+                  )}
                 </>
               ) : superaLimites ? (
                 <p className={styles.avisoNoApta}>
@@ -604,6 +653,14 @@ export default function SimuladorModulosVsDirectaPage() {
                 <span className={styles.diferenciaDetalle}>
                   Directa: {formatCurrency(resED.costeAnualTotal)} · Módulos: {formatCurrency(resModulos.costeAnualTotal)}
                 </span>
+                {coherenciaRetaModulos && (
+                  <span className={styles.diferenciaDetalle}>
+                    La cuota RETA que has puesto queda por debajo de la mínima de tu tramo en
+                    módulos ({formatCurrency(coherenciaRetaModulos.cuotaMinimaTramo)}/mes): con
+                    ella, el coste en módulos sería al menos{' '}
+                    {formatCurrency(coherenciaRetaModulos.deficitAnual)} mayor.
+                  </span>
+                )}
               </>
             ) : superaLimites ? (
               <span className={styles.diferenciaTitulo}>
