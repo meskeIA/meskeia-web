@@ -616,16 +616,23 @@ export type NivelSWOLF = 'elite' | 'avanzado' | 'intermedio' | 'principiante';
 export const CORTES_SWOLF_25 = { elite: 25, avanzado: 30, intermedio: 38 } as const;
 
 /**
- * Rangos admitidos POR CADA 25 m de largo; en 50 m se multiplican por 2. Un largo de 25 m en
- * menos de 5 s (5 m/s, por encima del récord mundial) o con 0 brazadas no describe a nadie,
- * y hasta el 02/10/2026 recibía «Élite» (hallazgo 2632).
+ * Rangos admitidos POR CADA 25 m de largo; en 50 m se multiplican por 2. Un largo más rápido
+ * que el récord mundial o con 0 brazadas no describe a nadie, y hasta el 02/10/2026 recibía
+ * «Élite» (hallazgo 2632).
  *
- * ⚠️ El mínimo de TIEMPO es EXCLUSIVO: 5 s por 25 m SON ya 5 m/s, la velocidad que esta misma
- * nota declara imposible. Hasta el 05/11/2026 el borde era inclusivo y 25 m · 5 s · 1 brazada
- * salía «Élite · 0:20 min/100 m» en la app, la API de ChatGPT y la tool del MCP (hallazgo 4145).
- * Lo comprueba `tiempoSwolfAdmitido`, que usa también la página. El de brazadas sigue inclusivo.
+ * ANCLA DEL SUELO — el récord mundial de 50 m libre en piscina de 25 m: 19,90 s, Jordan Crooks,
+ * Budapest, 14/12/2024 (Guinness World Records; consultado el 05/11/2026), 2,51 m/s de media
+ * con salida de poyete. El suelo es 9 s por 25 m (2,78 m/s), un 10 % más rápido que esa media:
+ * todo lo que no pasa de ahí es más rápido que el récord. Cabo C0649, decidido por el usuario
+ * el 05/11/2026. Si el récord baja de ~18,1 s, el suelo deja de quedar por encima y hay que
+ * revisarlo. Hasta ese día el suelo era 5 s (5 m/s), y entre el récord y 5 m/s un largo de
+ * 25 m en 6 s salía «Élite · 0:24 min/100 m».
+ *
+ * ⚠️ El mínimo de TIEMPO es EXCLUSIVO: 9 s por 25 m ya son más rápidos que el récord. Hasta el
+ * 05/11/2026 el borde era inclusivo (hallazgo 4145). Lo comprueba `tiempoSwolfAdmitido`, que
+ * usan también la página, la API de ChatGPT y la tool del MCP. El de brazadas sigue inclusivo.
  */
-export const RANGO_TIEMPO_SWOLF_POR_25 = { min: 5, max: 300 } as const;
+export const RANGO_TIEMPO_SWOLF_POR_25 = { min: 9, max: 300 } as const;
 export const RANGO_BRAZADAS_SWOLF_POR_25 = { min: 1, max: 100 } as const;
 
 /** ¿Tiempo por largo admitido en esa piscina? Más del mínimo (exclusivo) y hasta el máximo. */
@@ -643,7 +650,7 @@ export function mensajeTiempoSwolfFueraDeRango(metros_largo: number): string {
   const factor = metros_largo / 25;
   const tMin = RANGO_TIEMPO_SWOLF_POR_25.min * factor;
   const tMax = RANGO_TIEMPO_SWOLF_POR_25.max * factor;
-  return `En piscina de ${metros_largo} m, el tiempo por largo debe estar entre ${tMin} y ${tMax} segundos, y por encima de ${tMin}: ${tMin} s ya son 5 m/s, por encima del récord mundial.`;
+  return `En piscina de ${metros_largo} m, el tiempo por largo debe estar entre ${tMin} y ${tMax} segundos, y por encima de ${tMin}: ${tMin} s ya son más rápidos que el récord mundial (50 m libre en 19,90 s).`;
 }
 
 /** Longitudes de piscina admitidas. */

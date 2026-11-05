@@ -74,7 +74,8 @@ export default function CalculadoraSwolfNatacionPage() {
   // Cuántos largos de 25 m caben en uno de esta piscina
   const factor = metrosPiscina / 25;
 
-  // El mínimo de tiempo es EXCLUSIVO: 5 s por 25 m ya son 5 m/s (hallazgo 4145). La regla y el
+  // El mínimo de tiempo es EXCLUSIVO: 9 s por 25 m ya son más rápidos que el récord mundial
+  // (hallazgo 4145, cabo C0649; el ancla, en RANGO_TIEMPO_SWOLF_POR_25). La regla y el
   // mensaje son los del motor, que comparten la API y el MCP.
   const tiempo = leerCampo(
     tiempoTexto,
