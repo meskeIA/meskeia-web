@@ -1,0 +1,821 @@
+/* Buscador de emojis por intención — usa los tokens de app/globals.css (no los redeclara) */
+
+.container {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: var(--spacing-xl) var(--spacing-lg);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+}
+
+/* Los emojis, con la fuente de color del sistema en cualquier navegador */
+.emojiGrande,
+.cuidadoEmoji,
+.avisoEmoji,
+.pegadoEmoji,
+.celdaEmoji {
+  font-family: 'Apple Color Emoji', 'Segoe UI Emoji', 'Noto Color Emoji', sans-serif;
+  line-height: 1;
+}
+
+/* Hero */
+.hero {
+  text-align: center;
+  margin: 80px 0 var(--spacing-xl);
+  padding: var(--spacing-xl);
+  background: var(--hero-bg);
+  border-radius: var(--radius-large);
+  color: #ffffff;
+}
+
+.title {
+  font-size: 2.1rem;
+  font-weight: 700;
+  margin: 0 0 var(--spacing-md);
+}
+
+.subtitle {
+  font-size: 1.05rem;
+  opacity: 0.95;
+  max-width: 640px;
+  margin: 0 auto;
+  line-height: 1.5;
+}
+
+/* Tarjetas de trabajo */
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+}
+
+.cardTitulo {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0 0 var(--spacing-md);
+  color: var(--text-primary);
+}
+
+.cardIntro {
+  color: var(--text-secondary);
+  margin: 0 0 var(--spacing-md);
+  line-height: 1.6;
+}
+
+.etiqueta {
+  display: block;
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  margin-bottom: var(--spacing-sm);
+}
+
+.campo {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.9rem 1rem;
+  font-size: 1.15rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.campo:focus-visible,
+.mensaje:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+  border-color: var(--primary);
+}
+
+/* Ejemplos y chips */
+.ejemplos {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+}
+
+.ejemplosEtiqueta {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+}
+
+.chip,
+.chipAviso {
+  padding: 0.4rem 0.8rem;
+  font-size: 0.88rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.chip:hover {
+  background: var(--hover);
+  border-color: var(--primary);
+}
+
+.chipAviso {
+  border-color: rgba(220, 38, 38, 0.4);
+}
+
+.chipAviso:hover {
+  background: rgba(220, 38, 38, 0.08);
+}
+
+.chip:focus-visible,
+.chipAviso:focus-visible,
+.tema:focus-visible,
+.emojiBtn:focus-visible,
+.anadirBtn:focus-visible,
+.btnPrimario:focus-visible,
+.btnSecundario:focus-visible,
+.avisosResumen:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* Temas */
+.temasTitulo {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: var(--spacing-lg) 0 var(--spacing-sm);
+  color: var(--text-primary);
+}
+
+.temas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+.tema {
+  padding: 0.45rem 0.85rem;
+  font-size: 0.88rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.tema:hover {
+  background: var(--hover);
+}
+
+.temaActivo,
+.temaActivo:hover {
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
+  color: #ffffff;
+}
+
+/* Emojis pegados */
+.pegados {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-xl);
+}
+
+.pegado {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--secondary);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+}
+
+.pegadoCabecera {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
+}
+
+.pegadoCabecera h3 {
+  font-size: 1.05rem;
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.pegadoEmoji {
+  font-size: 2.6rem;
+}
+
+.pegado p {
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0 0 var(--spacing-sm);
+}
+
+.pegadoBloque h4 {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin: var(--spacing-sm) 0 6px;
+}
+
+.pegadoChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+/* Resultados */
+.resultados {
+  margin-bottom: var(--spacing-xl);
+}
+
+.resultadosTitulo {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin: 0 0 var(--spacing-md);
+  color: var(--text-primary);
+  overflow-wrap: anywhere;
+}
+
+.sinResultados {
+  background: var(--bg-card);
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-md);
+}
+
+.sinResultados p {
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+.intenciones {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-md);
+}
+
+.intencion {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.intencionCabecera {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+.intencionCabecera h3 {
+  font-size: 1.08rem;
+  font-weight: 700;
+  margin: 0;
+  color: var(--text-primary);
+}
+
+.intencionGrupo {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.emojis {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.emojiItem {
+  display: flex;
+  gap: 6px;
+}
+
+.emojiBtn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.emojiBtn:hover {
+  background: var(--hover);
+  border-color: var(--primary);
+}
+
+.emojiGrande {
+  font-size: 1.9rem;
+  min-width: 2.4rem;
+  text-align: center;
+}
+
+.emojiNota {
+  font-size: 0.9rem;
+  line-height: 1.35;
+  color: var(--text-secondary);
+}
+
+.anadirBtn {
+  width: 2.6rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 1.3rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.anadirBtn:hover {
+  background: var(--hover);
+  border-color: var(--primary);
+}
+
+/* Cuidado con */
+.cuidado {
+  background: rgba(245, 158, 11, 0.08);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+}
+
+[data-theme='dark'] .cuidado {
+  background: rgba(245, 158, 11, 0.1);
+  border-color: rgba(252, 211, 77, 0.35);
+}
+
+.cuidadoTitulo {
+  font-size: 0.9rem;
+  font-weight: 700;
+  margin: 0 0 var(--spacing-sm);
+  color: var(--ambar-texto, #fcd34d);
+}
+
+[data-theme='dark'] .cuidadoTitulo {
+  color: #fcd34d;
+}
+
+.cuidadoLista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.cuidadoLista li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--spacing-sm);
+  font-size: 0.88rem;
+  line-height: 1.4;
+  color: var(--text-primary);
+}
+
+.cuidadoEmoji {
+  font-size: 1.35rem;
+  min-width: 1.8rem;
+  text-align: center;
+}
+
+/* Mensaje */
+.mensaje {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.8rem 1rem;
+  font-size: 1.05rem;
+  font-family: inherit;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  resize: vertical;
+}
+
+.mensajeAcciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+}
+
+.btnPrimario,
+.btnSecundario {
+  padding: 0.7rem 1.3rem;
+  font-size: 0.98rem;
+  font-weight: 600;
+  border-radius: var(--radius);
+  cursor: pointer;
+}
+
+.btnPrimario {
+  border: none;
+  background: var(--primary-boton);
+  color: #ffffff;
+}
+
+.btnPrimario:hover:not(:disabled) {
+  background: var(--primary-hover);
+}
+
+.btnSecundario {
+  border: 1px solid var(--border);
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+.btnSecundario:hover:not(:disabled) {
+  background: var(--hover);
+}
+
+.btnPrimario:disabled,
+.btnSecundario:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* Aviso de copiado: fijo abajo, siempre montado para el lector de pantalla */
+.estadoCopia {
+  position: fixed;
+  left: 50%;
+  bottom: calc(var(--alto-pildora-pie, 0px) + 20px);
+  transform: translateX(-50%);
+  margin: 0;
+  max-width: calc(100% - 32px);
+  padding: 0;
+  border-radius: 999px;
+  background: var(--text-primary);
+  color: var(--bg-primary);
+  font-size: 0.95rem;
+  font-weight: 600;
+  z-index: 50;
+  pointer-events: none;
+}
+
+.estadoCopia:not(:empty) {
+  padding: 0.6rem 1.2rem;
+  box-shadow: var(--shadow-md);
+}
+
+/* Emojis que se malinterpretan */
+.avisosDetalle {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.avisosResumen {
+  padding: var(--spacing-md);
+  font-weight: 600;
+  cursor: pointer;
+  color: var(--primary-texto);
+}
+
+.avisosGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-sm);
+  padding: 0 var(--spacing-md) var(--spacing-md);
+}
+
+.aviso {
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: flex-start;
+  padding: var(--spacing-md);
+  border-radius: var(--radius);
+  background: var(--bg-primary);
+}
+
+.avisoEmoji {
+  font-size: 2rem;
+  min-width: 2.4rem;
+  text-align: center;
+}
+
+.avisoNombre {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 0 0 4px;
+  color: var(--text-primary);
+}
+
+.avisoLecturas {
+  font-size: 0.88rem;
+  line-height: 1.5;
+  margin: 0;
+  color: var(--text-secondary);
+}
+
+/* ─── Sección educativa (patrón v2.0) ─── */
+.guideSection {
+  margin-bottom: var(--spacing-xl);
+}
+
+.guideSection h2 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-md);
+}
+
+.guideSection p {
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin: 0 0 var(--spacing-md);
+}
+
+.tableWrapper {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: var(--spacing-md);
+}
+
+.comparativaTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.comparativaTable th {
+  background: var(--primary-boton);
+  color: #ffffff;
+  padding: 0.7rem 0.9rem;
+  text-align: left;
+  font-weight: 600;
+}
+
+.comparativaTable td {
+  padding: 0.55rem 0.9rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-primary);
+  vertical-align: top;
+}
+
+.comparativaTable tr:last-child td {
+  border-bottom: none;
+}
+
+.comparativaTable tr:nth-child(even) td {
+  background: var(--hover);
+}
+
+.celdaEmoji {
+  font-size: 1.6rem;
+  text-align: center;
+}
+
+.escenariosGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-md);
+}
+
+.escenarioCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+}
+
+.escenarioIcon {
+  font-size: 1.8rem;
+  margin-bottom: var(--spacing-sm);
+}
+
+.escenarioCard h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-sm);
+}
+
+.escenarioCard p {
+  font-size: 0.9rem;
+  line-height: 1.55;
+  margin: 0;
+}
+
+.stepGuide {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.step {
+  display: flex;
+  gap: var(--spacing-md);
+  align-items: flex-start;
+}
+
+.stepNumber {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--primary-boton);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stepContent {
+  color: var(--text-secondary);
+  line-height: 1.6;
+  padding-top: 4px;
+}
+
+.faqList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.faqItem {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+}
+
+.faqItem h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-sm);
+}
+
+.faqItem p {
+  margin: 0;
+  font-size: 0.92rem;
+}
+
+.tipsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-md);
+}
+
+.tipCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--secondary);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+}
+
+.tipIcon {
+  font-size: 1.5rem;
+  margin-bottom: var(--spacing-sm);
+}
+
+.tipCard h3 {
+  font-size: 0.98rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-sm);
+}
+
+.tipCard p {
+  font-size: 0.88rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.warningBox {
+  background: rgba(220, 38, 38, 0.06);
+  border: 1px solid rgba(220, 38, 38, 0.25);
+  border-radius: var(--radius);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+[data-theme='dark'] .warningBox {
+  background: rgba(220, 38, 38, 0.1);
+  border-color: rgba(248, 113, 113, 0.35);
+}
+
+.warningHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  font-weight: 700;
+  margin-bottom: var(--spacing-md);
+  color: var(--rojo-texto, #ff8a80);
+}
+
+[data-theme='dark'] .warningHeader {
+  color: #ff8a80;
+}
+
+.warningIcon {
+  font-size: 1.2rem;
+}
+
+.warningList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.warningList li {
+  position: relative;
+  padding-left: 1.5rem;
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.warningList li::before {
+  content: '✗';
+  position: absolute;
+  left: 0;
+  font-weight: 700;
+  color: var(--rojo-texto, #ff8a80);
+}
+
+[data-theme='dark'] .warningList li::before {
+  color: #ff8a80;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    padding: var(--spacing-lg) var(--spacing-md);
+  }
+
+  .hero {
+    margin-top: 60px;
+    padding: var(--spacing-lg);
+  }
+
+  .title {
+    font-size: 1.6rem;
+  }
+
+  .card {
+    padding: var(--spacing-lg) var(--spacing-md);
+  }
+
+  /* En el móvil, ejemplos y temas en una fila deslizable: si no, los 19 temas ocupan casi una
+     pantalla y empujan los resultados fuera de la vista. */
+  .ejemplos,
+  .temas {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 6px;
+    scrollbar-width: thin;
+  }
+
+  .chip,
+  .tema,
+  .ejemplosEtiqueta {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
+  .intenciones,
+  .avisosGrid,
+  .escenariosGrid,
+  .tipsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chip,
+  .chipAviso,
+  .tema,
+  .emojiBtn {
+    transition: none;
+  }
+}

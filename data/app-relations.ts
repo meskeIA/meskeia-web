@@ -1050,7 +1050,14 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-precio-real-cosas/', icon: '⏰', name: 'El Precio Real de las Cosas', description: 'Horas de trabajo por compra' },
     { url: '/estimador-hipoteca/', icon: '🏠', name: 'Estimador Hipoteca', description: 'Calcula tu cuota mensual' },
   ],
+  'buscador-emojis': [
+    { url: '/visualizador-historia-escritura/', icon: '✍️', name: 'La Evolución de la Escritura', description: 'De los pictogramas a los emojis' },
+    { url: '/diario-emocional/', icon: '📔', name: 'Diario Emocional', description: 'Registra cómo te sientes cada día' },
+    { url: '/tablero-comunicacion/', icon: '💬', name: 'Tablero Comunicación', description: 'Símbolos AAC con voz' },
+    { url: '/conversor-texto/', icon: '📝', name: 'Conversor de Texto', description: 'Mayúsculas, minúsculas y más' },
+  ],
   'visualizador-historia-escritura': [
+    { url: '/buscador-emojis/', icon: '😊', name: 'Buscador de Emojis', description: 'El emoji para lo que quieres decir' },
     { url: '/visualizador-historia-dinero/', icon: '🪙', name: 'La Evolución del Dinero', description: 'Del trueque al bitcoin' },
     { url: '/visualizador-historia-reloj/', icon: '🕐', name: 'Historia en un Reloj', description: '300.000 años en 24 horas' },
     { url: '/visualizador-idiomas-mundo/', icon: '🗣️', name: 'El Mapa de los Idiomas', description: 'Familias lingüísticas' },
@@ -4164,6 +4171,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/planificador-ahorro-jubilacion/', icon: '💹', name: 'Planificador de Ahorro', description: 'Brecha, ahorro y plan de pensiones' },
   ],
   'diario-emocional': [
+    { url: '/buscador-emojis/', icon: '😊', name: 'Buscador de Emojis', description: 'El emoji para lo que quieres decir' },
     { url: '/test-bienestar-who5/', icon: '🌱', name: 'Test Bienestar WHO-5', description: 'Evalúa tu bienestar en 5 preguntas' },
     { url: '/semaforo-emocional/', icon: '🚦', name: 'Semáforo Emocional', description: 'Regulación emocional visual' },
     { url: '/selector-gestion-estres/', icon: '🧘', name: 'Gestión del Estrés', description: 'Encuentra tu método anti-estrés' },

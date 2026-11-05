@@ -238,6 +238,7 @@ export const implementedAppsUrls = [
   // Texto y Documentos (14 implementadas)
   "/contador-palabras/",
   "/conversor-texto/",
+  "/buscador-emojis/",   // Emojis por lo que se quiere decir, con los que se leen al revés (05/11/2026)
   "/limpiador-texto/",
   "/comparador-textos/",
   "/conversor-markdown-html/",
