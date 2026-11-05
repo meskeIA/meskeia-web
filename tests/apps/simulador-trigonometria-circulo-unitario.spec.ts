@@ -95,8 +95,9 @@ import { test, expect, Page } from '@playwright/test';
  *     (cos a la derecha en I y IV, a la izquierda en II y III; sen arriba en I y II, abajo en
  *     III y IV). También en móvil de 390 px y en modo oscuro.
  *
- * HALLAZGOS ABIERTOS — al final del fichero, en tests que HOY FALLAN a propósito (convención
- * del proyecto: el test se escribe contra lo que DEBERÍA ocurrir, no contra lo que ocurre):
+ * HALLAZGOS — REPARADOS el 25/08/2026 (350-356); al final del fichero, como tests de regresión.
+ * Cuando se escribieron fallaban a propósito (convención del proyecto: el test se escribe contra
+ * lo que DEBERÍA ocurrir, no contra lo que ocurre):
  *   · H1 (cálculo, medio) · Cero negativo en los ejes: tan 180° = «−0,0000», cos 270° =
  *     «−0,0000», sen 360° y tan 360° = «−0,0000». Los cuatro valen CERO EXACTO y la propia
  *     tabla del bloque educativo de la app dice «tan 180° = 0», «cos 270° = 0», «sen 360° =
@@ -1308,5 +1309,271 @@ test.describe('S0232 · círculo trigonométrico completo', () => {
       return 0.2126 * r + 0.7152 * g + 0.0722 * b;
     };
     await expect.poll(luminancia, { timeout: 2000, message: 'rótulo claro sobre fondo oscuro' }).toBeGreaterThan(160);
+  });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════════════════
+// INSPECCIÓN EN MODO CAMBIO · 05/11/2026 · 973 usos · riesgo 3
+// ═════════════════════════════════════════════════════════════════════════════════════════
+
+/**
+ * QUÉ CAMBIÓ DESDE LA ÚLTIMA VALIDACIÓN (ac046fdc, 08/10/2026) Y QUÉ SE HA MIRADO
+ *
+ *   1. S0232 (55f3535d, 062457cc, adc639e7) · el círculo completo con los 16 notables y la hoja
+ *      para imprimir en blanco con su solucionario. La tabla de abajo se resolvió A MANO antes de
+ *      abrir la app: los triángulos 30-60-90 (lados 1, √3, 2) y 45-45-90 (1, 1, √2) dan los
+ *      valores absolutos del primer cuadrante, y cada cuadrante les pone su signo a (cos θ, sen θ):
+ *      I (+, +) · II (−, +) · III (−, −) · IV (+, −). Los radianes, de 180° = π.
+ *      Cotejados los 16 en pantalla (rótulos de cada <g> y posición del punto), en el aria-label,
+ *      en la tabla resuelta del solucionario impreso y en el círculo del solucionario: los 16
+ *      cuadran. La hoja en blanco no lleva ni un √, π ni coordenada, y sus casillas miden 9 mm.
+ *
+ *   2. C0267 (5dc06e3a) · una respuesta EXACTA a dos decimales ya no tiene margen; la que exige
+ *      redondear conserva el mayor entre 0,01 y el 1 % (receta de 51d7c223). Resuelto a mano:
+ *        · caso 1, sen 30° = 1/2 = 0,5 exacto → margen 0: «0,5» y «0.5» aprueban; «0,49» y «0,51»
+ *          suspenden con «te has quedado a 0,0100 y se admite hasta 0,0000»; «1,5» es imposible.
+ *        · caso 6, 225° = 5π/4 = 3,92699… → clave 3,927, margen max(0,01; 0,03927) = 0,0393:
+ *          «3,88» suspende (0,047). Caso 11, 20 · sen 390° = 10 exacto: «9,9» suspende (con el 1 %
+ *          aprobaba). Caso 12, 8 · cos 240° = −4 exacto: «−3,96» suspende (con el 1 % aprobaba).
+ *        · práctica, semilla 401 (generador replicado aparte): sen 60° = √3/2 = 0,866025… → clave
+ *          0,866, pide redondeo → margen max(0,01; 0,00866) = 0,01: «0,87» aprueba, «0,88» (0,014)
+ *          suspende y «1,73» es imposible para un seno.
+ *
+ *   3. leerRespuestaAula (cd6270a9, 866963e1) · un punto con tres cifras detrás tiene dos
+ *      lecturas y se queda la más cercana a la respuesta: «17.320» en el caso 9 (30 · tan 30° =
+ *      10√3 = 17,3205) es 17,32 y no 17.320; «3.927» en el caso 6 es 3,927; «3.665» en la
+ *      práctica de 210° (7π/6 = 3,6652) es 3,665. Ninguna respuesta de la app pasa de 1.000, así
+ *      que la lectura de millares nunca es la buena aquí.
+ *
+ *   HALLAZGO (operativa, medio, ABIERTO) · en papel Carta la hoja en blanco no cabe en una página:
+ *   título 7,3 mm + instrucciones 12,4 mm + círculo 140 mm + tabla 79,3 mm + rellenos = 260,0 mm,
+ *   y el alto útil de la Carta con el margen de @page (10 mm) es 279,4 − 20 = 259,4 mm. Como
+ *   `.ccTablas` lleva `break-inside: avoid`, la tabla salta ENTERA a la página 2 y el solucionario
+ *   a la 3. adc639e7 la diseñó para que «círculo y tabla caben juntos en la página» y se midió en
+ *   A4, que tiene 17 mm de holgura; `styles/impresion.module.css` no fija el tamaño justamente
+ *   para no penalizar a quien imprime en Carta, el papel de México y Colombia.
+ */
+
+/** Los 16 notables, resueltos a mano (ver la cabecera del bloque). */
+const CIRCULO_A_MANO: ReadonlyArray<{ grados: number; radianes: string; cos: string; sen: string }> = [
+  { grados: 0, radianes: '0', cos: '1', sen: '0' },
+  { grados: 30, radianes: 'π/6', cos: '√3/2', sen: '1/2' },
+  { grados: 45, radianes: 'π/4', cos: '√2/2', sen: '√2/2' },
+  { grados: 60, radianes: 'π/3', cos: '1/2', sen: '√3/2' },
+  { grados: 90, radianes: 'π/2', cos: '0', sen: '1' },
+  { grados: 120, radianes: '2π/3', cos: '−1/2', sen: '√3/2' },
+  { grados: 135, radianes: '3π/4', cos: '−√2/2', sen: '√2/2' },
+  { grados: 150, radianes: '5π/6', cos: '−√3/2', sen: '1/2' },
+  { grados: 180, radianes: 'π', cos: '−1', sen: '0' },
+  { grados: 210, radianes: '7π/6', cos: '−√3/2', sen: '−1/2' },
+  { grados: 225, radianes: '5π/4', cos: '−√2/2', sen: '−√2/2' },
+  { grados: 240, radianes: '4π/3', cos: '−1/2', sen: '−√3/2' },
+  { grados: 270, radianes: '3π/2', cos: '0', sen: '−1' },
+  { grados: 300, radianes: '5π/3', cos: '1/2', sen: '−√3/2' },
+  { grados: 315, radianes: '7π/4', cos: '√2/2', sen: '−√2/2' },
+  { grados: 330, radianes: '11π/6', cos: '√3/2', sen: '−1/2' },
+];
+
+/** 9 mm a 96 ppp: 9 · 96 / 25,4 = 34,0157 px. */
+const NUEVE_MM_PX = (9 * 96) / 25.4;
+
+/** Páginas de un PDF de Chromium: cada página es un diccionario «/Type /Page» sin comprimir. */
+function paginasDelPdf(pdf: Buffer): number {
+  return (pdf.toString('latin1').match(/\/Type\s*\/Page[^s]/g) ?? []).length;
+}
+
+/** Imprime a PDF con la hoja en el modo pedido; usa los márgenes de @page, como el diálogo del navegador. */
+async function imprimirHoja(page: Page, modo: 'Con los valores' | 'En blanco, para rellenar', formato: 'A4' | 'Letter') {
+  // Los botones viven en la parte que no se imprime: con la media «print» están ocultos
+  await page.emulateMedia({ media: 'screen' });
+  await page.locator('section[aria-labelledby="titulo-completo"]').getByRole('button', { name: modo }).click();
+  await page.emulateMedia({ media: 'print' });
+  await page.evaluate(() => document.fonts.ready.then(() => true));
+  return paginasDelPdf(await page.pdf({ format: formato }));
+}
+
+test.describe('Inspección 05/11/2026 · círculo completo (S0232)', () => {
+  test('los 16 puntos llevan su radián y su (cos θ, sen θ) exactos, cada uno en su sitio', async ({ page }) => {
+    await page.goto(RUTA);
+    const svg = page.locator('section[aria-labelledby="titulo-completo"] svg[role="img"]');
+    const grupos = await svg.locator(':scope > g').evaluateAll(gs =>
+      gs.map(g => ({
+        cx: Number(g.querySelector('circle')?.getAttribute('cx')),
+        cy: Number(g.querySelector('circle')?.getAttribute('cy')),
+        textos: [...g.querySelectorAll('text')].map(t => t.textContent),
+      })),
+    );
+    expect(grupos).toHaveLength(16);
+    for (const [i, n] of CIRCULO_A_MANO.entries()) {
+      expect(grupos[i].textos, `${n.grados}°`).toEqual([`${n.grados}°`, n.radianes, `(${n.cos}, ${n.sen})`]);
+      // El punto en el viewBox de radio 200, con la Y hacia abajo: (200 · cos θ, −200 · sen θ),
+      // que la app redondea a centésimas. Un signo cambiado lo movería 200 unidades o más.
+      const rad = (n.grados * Math.PI) / 180;
+      expect(Math.abs(grupos[i].cx - 200 * Math.cos(rad)), `x del punto de ${n.grados}°`).toBeLessThan(0.02);
+      expect(Math.abs(grupos[i].cy + 200 * Math.sin(rad)), `y del punto de ${n.grados}°`).toBeLessThan(0.02);
+    }
+    // El lector de pantalla recibe los mismos 16, con su radián y sus coordenadas
+    const descripcion = `Círculo trigonométrico completo. ${CIRCULO_A_MANO.map(
+      n => `${n.grados}°, ${n.radianes} radianes: (${n.cos}, ${n.sen})`,
+    ).join('; ')}.`;
+    await expect(svg).toHaveAttribute('aria-label', descripcion);
+    // Y los signos de cada cuadrante, (cos, sen)
+    await expect(svg.locator('tspan')).toHaveText(['I', '(+, +)', 'II', '(−, +)', 'III', '(−, −)', 'IV', '(+, −)']);
+  });
+
+  test('al imprimir en blanco: la hoja sin soluciones, casillas de 9 mm y el solucionario igual que la tabla a mano', async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#slider-angulo']);
+    await page.locator('section[aria-labelledby="titulo-completo"]').getByRole('button', { name: 'En blanco, para rellenar' }).click();
+    await page.emulateMedia({ media: 'print' });
+    const hoja = page.locator('[data-hoja-circulo]');
+    await expect(hoja.locator('h2')).toHaveText(['Círculo trigonométrico: complétalo', 'Círculo trigonométrico: solucionario']);
+
+    // Página 1: el círculo solo con los grados y los números de cuadrante, nada que resuelva
+    await expect(hoja.locator('svg').nth(0).locator('text')).toHaveText([
+      ...CIRCULO_A_MANO.map(n => `${n.grados}°`),
+      'I', 'II', 'III', 'IV',
+    ]);
+    const enBlanco = await hoja.locator('[data-tabla-circulo="blanco"] tbody tr').evaluateAll(trs =>
+      trs.map(tr => [...tr.querySelectorAll('th, td')].map(c => c.textContent)),
+    );
+    expect(enBlanco).toEqual(CIRCULO_A_MANO.map(n => [`${n.grados}°`, '', '', '']));
+
+    // Las casillas para escribir, 9 mm de alto (adc639e7). El defecto que vigila es la primera
+    // hoja, con huecos de 3-4 mm (11-15 px), o la altura de pantalla (2,4rem = 38,4 px).
+    const alto = await hoja.locator('[data-tabla-circulo="blanco"] tbody td').first().evaluate(td => td.getBoundingClientRect().height);
+    expect(alto).toBeCloseTo(NUEVE_MM_PX, 0);
+
+    // Página 2: el solucionario, fila a fila igual que la tabla a mano, y su círculo con valores
+    const resuelta = await hoja.locator('[data-tabla-circulo="resuelta"] tbody tr').evaluateAll(trs =>
+      trs.map(tr => [...tr.querySelectorAll('th, td')].map(c => c.textContent)),
+    );
+    expect(resuelta).toEqual(CIRCULO_A_MANO.map(n => [`${n.grados}°`, n.radianes, n.cos, n.sen]));
+    await expect(hoja.locator('svg').nth(1).locator(':scope > g')).toHaveText(
+      CIRCULO_A_MANO.map(n => `${n.grados}°${n.radianes}(${n.cos}, ${n.sen})`),
+    );
+  });
+
+  test('con valores se imprime una sola hoja, sin tabla ni solucionario (A4 y Carta)', async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#slider-angulo']);
+    const seccion = page.locator('section[aria-labelledby="titulo-completo"]');
+    await expect(seccion.getByRole('button', { name: /Imprimir/ })).toHaveText('🖨️ Imprimir el círculo');
+    expect(await imprimirHoja(page, 'Con los valores', 'A4'), 'páginas en A4').toBe(1);
+    expect(await imprimirHoja(page, 'Con los valores', 'Letter'), 'páginas en Carta').toBe(1);
+    const hoja = page.locator('[data-hoja-circulo]');
+    await expect(hoja.locator('h2')).toHaveText(['Círculo trigonométrico completo']);
+    await expect(hoja.locator('svg')).toHaveCount(1);
+    await expect(hoja.locator('[data-tabla-circulo]')).toHaveCount(0);
+  });
+
+  test('en A4 la hoja en blanco y su solucionario salen en 2 páginas', async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#slider-angulo']);
+    expect(await imprimirHoja(page, 'En blanco, para rellenar', 'A4')).toBe(2);
+  });
+
+  test('HALLAZGO (05/11/2026, ABIERTO) · en Carta la hoja en blanco no cabe en una página y salen 3', async ({ page }) => {
+    // DEBERÍA: 2 páginas, como en A4 (círculo y tabla juntos, y el solucionario aparte).
+    // HOY: 3. La primera página de la hoja mide 260,0 mm y la Carta deja 259,4 mm útiles con el
+    // margen de @page; la tabla (break-inside: avoid) se va sola a la página 2 y el solucionario
+    // a la 3. Ver la cabecera de este bloque.
+    test.fail();
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#slider-angulo']);
+    expect(await imprimirHoja(page, 'En blanco, para rellenar', 'Letter')).toBe(2);
+  });
+});
+
+test.describe('Inspección 05/11/2026 · corrector tras C0267 y leerRespuestaAula', () => {
+  test('caso 1, sen 30° = 0,5 exacto: «0,5» y «0.5» aprueban; «0,49» y «0,51» ya no', async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#respuesta-caso-1']);
+    const panel = page.locator('#panel-casos');
+    const veredicto = panel.locator('article p[role="alert"]');
+    const comprobar = panel.getByRole('button', { name: 'Comprobar', exact: true });
+    await panel.getByRole('button', { name: /^Caso 1:/ }).click();
+    // Alternando aprobado y suspenso, para que un veredicto viejo no pase por el nuevo
+    const pasos: Array<[string, string]> = [
+      ['0,49', 'Todavía no. La respuesta es 0,5; te has quedado a 0,0100 y se admite hasta 0,0000.'],
+      ['0,5', 'Correcto: 0,5.'],
+      ['0,51', 'Todavía no. La respuesta es 0,5; te has quedado a 0,0100 y se admite hasta 0,0000.'],
+      ['0.5', 'Correcto: 0,5.'],
+      ['1,5', 'Un seno o un coseno nunca vale más de 1 ni menos de −1. La respuesta es 0,5.'],
+    ];
+    for (const [tecleado, texto] of pasos) {
+      await sembrarValor(page, '#respuesta-caso-1', tecleado);
+      await comprobar.click();
+      await expect(veredicto, `«${tecleado}»`).toContainText(texto);
+    }
+  });
+
+  test('exactas sin margen, irracionales con el suyo, y el punto con tres cifras leído como decimal', async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#respuesta-caso-1']);
+    const panel = page.locator('#panel-casos');
+    const veredicto = panel.locator('article p[role="alert"]');
+    const comprobar = panel.getByRole('button', { name: 'Comprobar', exact: true });
+    const casos: Array<[number, string, string]> = [
+      // Caso 4: el cuadrante de 200° es el 3, un entero de 1 a 4
+      [4, '3,03', 'El número de cuadrante es un número entero. La respuesta es cuadrante 3.'],
+      // Caso 6: 5π/4 = 3,92699…; «3.927» es la lectura decimal (3927 está mil veces más lejos)
+      [6, '3.927', 'Correcto: 3,93 (sin redondear, 3,927) rad.'],
+      [6, '3,88', 'te has quedado a 0,0470 y se admite hasta 0,0393'],
+      // Caso 9: 30 · tan 30° = 10√3 = 17,3205…; «17.320» es 17,32
+      [9, '17.320', 'Correcto: 17,32 (sin redondear, 17,3205) m.'],
+      [9, '17,5', 'te has quedado a 0,1795 y se admite hasta 0,1732'],
+      // Caso 11: 20 · sen 390° = 10 exacto. Con el 1 % de antes, 9,9 aprobaba
+      [11, '9,9', 'te has quedado a 0,1000 y se admite hasta 0,0000'],
+      [11, '10', 'Correcto: 10 m.'],
+      // Caso 12: 8 · cos 240° = −4 exacto. Con el 1 % de antes, −3,96 aprobaba
+      [12, '-3,96', 'te has quedado a 0,0400 y se admite hasta 0,0000'],
+      [12, '-4.000', 'Correcto: -4 cm.'],
+    ];
+    for (const [id, tecleado, texto] of casos) {
+      await panel.getByRole('button', { name: new RegExp(`^Caso ${id}:`) }).click();
+      await sembrarValor(page, `#respuesta-caso-${id}`, tecleado);
+      await comprobar.click();
+      await expect(veredicto, `caso ${id}, «${tecleado}»`).toContainText(texto);
+    }
+  });
+
+  test('práctica: sen 60° admite su redondeo y lo que dice su margen; 210° en rad lee «3.665» como decimal', async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#respuesta-caso-1']);
+    await page.getByRole('tab', { name: 'Práctica sin final' }).click();
+    const tarjeta = page.locator('#panel-practica article');
+    const veredicto = tarjeta.locator('p[role="alert"]');
+    const comprobar = tarjeta.getByRole('button', { name: 'Comprobar', exact: true });
+    const generar = async (semilla: string, enunciado: string) => {
+      await sembrarValor(page, '#semilla-practica', semilla);
+      await page.getByRole('button', { name: 'Generar', exact: true }).click();
+      await expect(tarjeta.locator('p').first()).toHaveText(enunciado);
+    };
+
+    // Semilla 401, encontrada con una réplica aparte del generador (splitmix32 + xorshift32)
+    await generar('401', '¿Cuánto vale sen 60°? Redondea a 2 decimales y no olvides el signo.');
+    const sen60: Array<[string, string]> = [
+      ['0,88', 'te has quedado a 0,0140 y se admite hasta 0,0100'],
+      ['0,87', 'Correcto: 0,87 (sin redondear, 0,866).'],
+      ['1,73', 'Un seno o un coseno nunca vale más de 1 ni menos de −1.'],
+      ['0.87', 'Correcto: 0,87 (sin redondear, 0,866).'],
+      ['0,85', 'te has quedado a 0,0160 y se admite hasta 0,0100'],
+      ['0,866', 'Correcto: 0,87 (sin redondear, 0,866).'],
+    ];
+    for (const [tecleado, texto] of sen60) {
+      await sembrarValor(page, '#respuesta-practica', tecleado);
+      await comprobar.click();
+      await expect(veredicto, `sen 60°, «${tecleado}»`).toContainText(texto);
+    }
+
+    // Semilla 36: 210° = 7π/6 = 3,66519… → clave 3,6652, margen 0,0367
+    await generar('36', 'Expresa 210° en radianes. Escribe el valor decimal redondeado a 2 decimales.');
+    await sembrarValor(page, '#respuesta-practica', '3,62');
+    await comprobar.click();
+    await expect(veredicto).toContainText('te has quedado a 0,0452 y se admite hasta 0,0367');
+    await sembrarValor(page, '#respuesta-practica', '3.665');
+    await comprobar.click();
+    await expect(veredicto).toContainText('Correcto: 3,67 (sin redondear, 3,6652) rad.');
   });
 });

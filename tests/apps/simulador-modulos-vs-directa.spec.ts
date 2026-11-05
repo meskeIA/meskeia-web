@@ -109,7 +109,7 @@
  * desde 5 (20.376,20 €), como manda la RAE. El signo de resta de la plantilla es «−» (U+2212).
  */
 import { test, expect, Page } from '@playwright/test';
-import { esperarHidratacion, sembrarValor, sembrarValorAcotado } from './_hidratacion';
+import { asentarAntesDeTraducir, esperarHidratacion, sembrarValor, sembrarValorAcotado } from './_hidratacion';
 
 const RUTA = '/simulador-modulos-vs-directa/';
 
@@ -1332,3 +1332,276 @@ test.describe('Simulador Módulos vs Estimación Directa — re-inspección del 
     expect(misma, 'el aviso llegó a otro nodo, no a la región viva que ya existía').toBe(true);
   });
 });
+
+/**
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Inspección de CAMBIO del 05/11/2026 (git diff 2bf5cecb..HEAD)
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Qué cambió: el aviso de la cuota RETA pasa a `calcularCuotaAutonomo({ rendimientoComputableMensual })`
+ * (C0105, 8a63781e: la calculadora resta ya el 7 % por su cuenta, y si la página le siguiera
+ * pasando su computable como `rendimientoNetoMensual` lo restaría DOS veces); C0294 (ffc8338b) hace
+ * que el régimen de la directa decida el tramo, y la app es de directa SIMPLIFICADA; el sello de los
+ * gastos de difícil justificación se re-sella contra el BOE (dbc1868e); el rótulo de la diferencia
+ * cambia de rama en un <span key> (C0262, página traducida); las relacionadas llegan del layout.
+ *
+ * Cómo se calcula el esperado (a mano, ANTES de mirar la app):
+ *   · Computable del art. 308.1.c LGSS en la simplificada (cabecera de
+ *     `cotizacionRETADesdeActividad`, data/fiscal/autonomos.ts): (ingresos − gastos − 5 % de
+ *     (ingresos − gastos − cuota × 12), tope 2.000 €) × 0,93 / 12. La app usa la cuota que teclea el
+ *     usuario para ese 5 %, que es la que de verdad resta el IRPF.
+ *   · 5 % y 2.000 €: `GASTOS_DIFICIL_JUSTIFICACION_EDS`, cotejado el 05/11/2026 con el art. 30,
+ *     regla 2.ª, del RIRPF en el BOE (BOE-A-2007-6820): «5 por ciento sobre el rendimiento neto» y
+ *     sin «superar 2.000 euros anuales».
+ *   · Tramos y cuotas mínimas: `TRAMOS_RETA_2025` (general 4: > 1.700 y ≤ 1.850, 360,29 € · 5: ≤ 2.030,
+ *     380,88 € · 10: > 3.620 y ≤ 4.050, 504,41 € · 11: ≤ 6.000, 545,59 €).
+ *   · Cada caso se elige en una frontera donde la NORMAL (sin el 5 %), la simplificada SIN TOPE o el
+ *     7 % restado dos veces darían otro tramo: así el caso cae si la app vuelve a cualquiera de ellos.
+ */
+test.describe('Simulador Módulos vs Estimación Directa — inspección de cambio del 05/11/2026', () => {
+  /**
+   * 30.000 / 5.500 / 360 €/mes (deslizador):
+   *   ED: 24.500 − 4.320 = 20.180 · 5 % = 1.009 → 19.171 = base (rentas > 12.000: sin art. 32.2.3.º)
+   *     escala(19.171) = 2.365,50 + 6.721 × 24 % = 3.978,54 · IRPF 2.924,04 · coste 7.244,04 €
+   *   Aviso: (24.500 − 1.009) × 0,93 / 12 = 23.491 × 0,0775 = 1.820,5525 → 1.820,55 €/mes → tabla
+   *     general, tramo 4, mínima 360,29 € → faltan (360,29 − 360) × 12 = 3,48 €.
+   *     Con la NORMAL: 24.500 × 0,0775 = 1.898,75 → tramo 5, 380,88 € (déficit 250,56 €).
+   *     Con el 7 % dos veces: el tramo bajaría al 3 general (302,65 €) y 360 € no avisaría.
+   * Con 360,29 € en la casilla exacta: 24.500 − 4.323,48 = 20.176,52 · 5 % = 1.008,83 → 19.167,69;
+   *   escala 2.365,50 + 6.717,69 × 24 % = 3.977,75 · IRPF 2.923,25 · coste 7.246,73 €; computable
+   *   (24.500 − 1.008,83) × 0,0775 = 1.820,57 → mismo tramo y 360,29 ≥ 360,29: sin aviso.
+   */
+  test('C0294 — 30.000/5.500/360: el aviso busca el tramo con la SIMPLIFICADA (1820,55 €/mes, tramo 4, 360,29 €), no con la normal (tramo 5, 380,88 €)', async ({
+    page,
+  }) => {
+    await deslizar(page, 'ingresos', 30000);
+    await deslizar(page, 'gastos', 5500);
+    await deslizar(page, 'reta', 360);
+
+    expect(await linea(page, ED, '= Rendimiento neto previo')).toBe('20.180,00 €');
+    expect(await lineaQueEmpiezaPor(page, ED, '− Reducción 5')).toBe('−1009,00 €');
+    expect(await linea(page, ED, '= Base liquidable (el mínimo va dentro)')).toBe('19.171,00 €');
+    expect(await linea(page, ED, 'Escala general sobre la base completa')).toBe('3978,54 €');
+    expect(await linea(page, ED, '= IRPF')).toBe('2924,04 €');
+    expect(await linea(page, ED, 'Coste fiscal anual total')).toBe('7244,04 €');
+
+    await expect(avisoReta(page)).toContainText('1820,55 €/mes');
+    await expect(avisoReta(page)).toContainText('tabla general, tramo 4,');
+    await expect(avisoReta(page)).toContainText('360,29 €/mes');
+    await expect(avisoReta(page)).toContainText('queda 3,48 € por debajo');
+    await expect(avisoReta(page)).not.toContainText('380,88');
+
+    await escribirRetaExacta(page, '360,29');
+    expect(await linea(page, ED, '− Cuota RETA × 12 (gasto deducible del titular)')).toBe('−4323,48 €');
+    expect(await lineaQueEmpiezaPor(page, ED, '− Reducción 5')).toBe('−1008,83 €');
+    expect(await linea(page, ED, '= IRPF')).toBe('2923,25 €');
+    expect(await linea(page, ED, 'Coste fiscal anual total')).toBe('7246,73 €');
+    await sinAvisoReta(page);
+  });
+
+  /**
+   * 60.000 / 7.000 / 504 €/mes — simplificada con el tope de 2.000 €:
+   *   ED: 53.000 − 6.048 = 46.952 · 5 % = 2.347,60 > tope → 2.000 → 44.952 = base
+   *     escala(44.952) = 8.725,50 + 9.752 × 37 % = 12.333,74 · IRPF 11.279,24 · coste 17.327,24 €
+   *   Aviso: (53.000 − 2.000) × 0,0775 = 3.952,50 €/mes → tabla general, tramo 10, mínima 504,41 €
+   *     → faltan (504,41 − 504) × 12 = 4,92 €. Con la NORMAL: 53.000 × 0,0775 = 4.107,50 → tramo 11,
+   *     545,59 €, y con 505 € avisaría de 487,08 €.
+   *   Con 505 €: el 5 % sigue topado → mismo computable, y 505 ≥ 504,41: sin aviso.
+   */
+  test('tope de 2.000 € — 60.000/7.000/504: 3952,50 €/mes, tramo 10 (504,41 €), 4,92 € por debajo; con 505 € sin aviso', async ({
+    page,
+  }) => {
+    await deslizar(page, 'ingresos', 60000);
+    await deslizar(page, 'gastos', 7000);
+    await deslizar(page, 'reta', 504);
+
+    expect(await linea(page, ED, '= Rendimiento neto previo')).toBe('46.952,00 €');
+    expect(await lineaQueEmpiezaPor(page, ED, '− Reducción 5')).toBe('−2000,00 €');
+    expect(await linea(page, ED, '= IRPF')).toBe('11.279,24 €');
+    expect(await linea(page, ED, 'Coste fiscal anual total')).toBe('17.327,24 €');
+
+    await expect(avisoReta(page)).toContainText('3952,50 €/mes');
+    await expect(avisoReta(page)).toContainText('tabla general, tramo 10,');
+    await expect(avisoReta(page)).toContainText('504,41 €/mes');
+    await expect(avisoReta(page)).toContainText('queda 4,92 € por debajo');
+
+    await deslizar(page, 'reta', 505);
+    await sinAvisoReta(page);
+  });
+
+  /**
+   * 60.000 / 5.500 / 545 €/mes — aquí el TOPE decide el tramo:
+   *   5 % de 54.500 − 6.540 = 47.960 → 2.398 > tope → 2.000 · (54.500 − 2.000) × 0,0775 = 4.068,75
+   *   €/mes → tabla general, tramo 11, mínima 545,59 € → faltan (545,59 − 545) × 12 = 7,08 €.
+   *   Sin el tope serían (54.500 − 2.398) × 0,0775 = 4.037,91 €/mes, tramo 10 (504,41 €), y 545 € no
+   *   avisaría. Con 546 €: sin aviso.
+   */
+  test('tope de 2.000 € decide el tramo — 60.000/5.500/545: 4068,75 €/mes, tramo 11 (545,59 €), 7,08 € por debajo; con 546 € sin aviso', async ({
+    page,
+  }) => {
+    await deslizar(page, 'ingresos', 60000);
+    await deslizar(page, 'gastos', 5500);
+    await deslizar(page, 'reta', 545);
+
+    await expect(avisoReta(page)).toContainText('4068,75 €/mes');
+    await expect(avisoReta(page)).toContainText('tabla general, tramo 11,');
+    await expect(avisoReta(page)).toContainText('545,59 €/mes');
+    await expect(avisoReta(page)).toContainText('queda 7,08 € por debajo');
+
+    await deslizar(page, 'reta', 546);
+    await sinAvisoReta(page);
+  });
+
+  /**
+   * Lo que SÍ es correcto del caso del hallazgo abierto de abajo (30.000/20.000/227 con «30.000»):
+   *   ED: 10.000 − 2.724 = 7.276 · 5 % = 363,80 → 6.912,20 (≤ 8.000) · − 1.620 → 5.292,20 < mínimo
+   *     → IRPF 0,00 · coste 2.724,00 €. Aviso: (10.000 − 363,80) × 0,0775 = 746,81 €/mes → tabla
+   *     reducida, tramo 2, mínima 226,47 ≤ 227 → sin aviso.
+   *   Módulos: 30.000 − 1.500 = 28.500 · escala 4.225,50 + 8.300 × 30 % = 6.715,50 · IRPF 5.661,00.
+   */
+  test('30.000/20.000/227 con «30.000» de módulos: la directa (2724,00 €, sin aviso) y el IRPF de módulos (5661,00 €)', async ({
+    page,
+  }) => {
+    await deslizar(page, 'ingresos', 30000);
+    await deslizar(page, 'gastos', 20000);
+    await deslizar(page, 'reta', 227);
+    await escribirModulos(page, '30.000');
+
+    expect(await linea(page, ED, 'Coste fiscal anual total')).toBe('2724,00 €');
+    await sinAvisoReta(page);
+    expect(await lineaQueEmpiezaPor(page, MOD, '− Reducción general')).toBe('−1500,00 €');
+    expect(await linea(page, MOD, '= IRPF')).toBe('5661,00 €');
+  });
+
+  /**
+   * HALLAZGO (inspector 05/11/2026, ABIERTO) — la columna de módulos no busca su tramo del RETA.
+   *
+   * La cuota es UNA para las dos columnas y el aviso solo la contrasta con el computable de la
+   * DIRECTA. En estimación objetiva el computable es otro: «el rendimiento neto previo» (art. 308.1.c,
+   * regla 1.ª, LGSS, según la cabecera de `rendimientoComputableMensualRETA`, data/fiscal/autonomos.ts)
+   * con su 7 % (regla 2.ª). Con una actividad sin minoraciones ni índices correctores, el previo es
+   * el rendimiento tecleado: 30.000 × 0,93 / 12 = 2.325,00 €/mes → tabla general, tramo 6
+   * (> 2.030 y ≤ 2.330), mínima 401,47 €. Con 227 €/mes la columna de módulos publica una cuota de
+   * 2.724,00 € al año, 2.093,64 € por debajo del mínimo posible en ese régimen (401,47 × 12 =
+   * 4.817,64), y la diferencia sale 5.661,00 € en vez de al menos 7.754,64 €. Es el hallazgo 812 en
+   * la otra columna, y sin el argumento con que se dio por bajo («el importe se suma igual en las dos
+   * columnas»): aquí lo que cambia es justo la diferencia.
+   *
+   * Se escribe con `test.fail()`: pasa hoy porque la app falla. La reparación puede ser un aviso que
+   * nombre la mínima de módulos (401,47 €) o un coste de módulos con esa cuota (≥ 10.478,64 €); el
+   * caso acepta las dos. Al repararlo, quitar el `test.fail()` y pasar el comentario a REPARADO.
+   */
+  test('HALLAZGO (05/11/2026, ABIERTO) — 30.000/20.000/227 con «30.000»: la columna de módulos no avisa de que 227 € está por debajo de su mínima (401,47 €)', async ({
+    page,
+  }) => {
+    test.fail();
+    await deslizar(page, 'ingresos', 30000);
+    await deslizar(page, 'gastos', 20000);
+    await deslizar(page, 'reta', 227);
+    await escribirModulos(page, '30.000');
+    await expect(page.locator('h3', { hasText: MOD })).toHaveCount(1);
+
+    const costeModulos = Number(
+      (await linea(page, MOD, 'Coste fiscal anual total')).replace(/[^\d,]/g, '').replace(',', '.'),
+    );
+    const textoPrincipal = (await page.locator('main').innerText()).replace(/\s+/g, ' ');
+    expect(
+      textoPrincipal.includes('401,47') || costeModulos >= 10478.64,
+      `coste de módulos ${costeModulos} € sin aviso de la cuota mínima de módulos (401,47 €/mes)`,
+    ).toBe(true);
+  });
+
+  /**
+   * C0262 — el rótulo de la diferencia cambia de rama («es el mismo» ↔ «es X mayor/menor») y desde
+   * c41692d9 cada rama va en su <span key>. Con el texto suelto de antes, el traductor del navegador
+   * cambiaba ese nodo por <font> y React, al retirarlo, caía con NotFoundError (cabecera de
+   * tests/apps/ternario-traducido-familia.spec.ts; el traductor se simula igual que allí).
+   *   30.000/5.000/320 con «21.160»: ED 25.000 − 3.840 = 21.160 · 5 % 1.058 → 20.102; módulos 21.160
+   *   − 1.058 = 20.102 → mismo IRPF (3.147,48) y misma cuota → coste 6.987,48 € en los dos: «es el
+   *   mismo». Con «21.161»: 20.102,95 → 0,95 × 24 % = 0,23 € más en módulos → «es 0,23 € menor».
+   */
+  test('C0262 — con la página traducida, pasar de «el coste es el mismo» a «0,23 € menor» y volver no tumba la app', async ({
+    page,
+  }) => {
+    test.setTimeout(60_000);
+    const errores: string[] = [];
+    page.on('pageerror', (e) => errores.push(e.message));
+    page.on('console', (m) => {
+      if (m.type() === 'error' && /NotFoundError|insertBefore|removeChild/.test(m.text())) errores.push(m.text());
+    });
+
+    await deslizar(page, 'ingresos', 30000);
+    await deslizar(page, 'gastos', 5000);
+    await escribirModulos(page, '21.160');
+    await expect(estado(page)).toContainText('el coste anual es el mismo en los dos regímenes');
+    await expect(estado(page)).toContainText('Directa: 6987,48 € · Módulos: 6987,48 €');
+
+    await traducirPagina(page);
+    await escribirModulos(page, '21.161');
+    await expect(estado(page)).toContainText('es 0,23 € menor que en módulos');
+
+    await traducirPagina(page);
+    await escribirModulos(page, '21.160');
+    await expect(estado(page)).toContainText('el coste anual es el mismo en los dos regímenes');
+    await expect(page.getByText('Algo salió mal')).toHaveCount(0);
+    expect(errores).toEqual([]);
+  });
+
+  /**
+   * dbc1868e — el sello de la directa simplificada, re-sellado contra el BOE: fuente «art. 30, regla
+   * 2.ª» del RIRPF con el tope del art. 30.2.4.ª LIRPF, verificado el 20/10/2026
+   * (`FISCAL_ESTIMACION_DIRECTA_META`), y el enlace al BOE consolidado (BOE-A-2007-6820#a30). Los
+   * valores no cambian: 5 % y 2.000 €, que el BOE confirma (cotejado el 05/11/2026).
+   */
+  test('dbc1868e — el sello de la directa simplificada cita el art. 30, regla 2.ª, del RIRPF, verificado el 20/10/2026, con enlace al BOE', async ({
+    page,
+  }) => {
+    const sello = page.locator('[aria-label="Datos de referencia normativos"]').nth(2);
+    await expect(sello).toContainText('Estimación directa simplificada');
+    await expect(sello).toContainText('Reglamento del IRPF (RD 439/2007), art. 30, regla 2.ª');
+    await expect(sello).toContainText('tope en el art. 30.2.4.ª LIRPF');
+    await expect(sello).toContainText('20/10/2026');
+    await expect(sello).toContainText('aplica el 5 % de provisiones y gastos de difícil justificación');
+    await expect(sello).toContainText('2000,00 € al año');
+    await expect(sello.locator('a[href="https://www.boe.es/buscar/act.php?id=BOE-A-2007-6820#a30"]')).toHaveCount(1);
+  });
+
+  /**
+   * 99e1ee7e — las relacionadas llegan del layout (<ConRelacionadas>) y la página pinta
+   * <RelatedApps /> sin prop: siguen siendo las cuatro de `app-relations.ts`.
+   */
+  test('las relacionadas siguen siendo las cuatro de app-relations.ts', async ({ page }) => {
+    const enlaces = page.locator('a[href$="#from=related-simulador-modulos-vs-directa"]');
+    await expect(enlaces).toHaveCount(4);
+    const destinos = await enlaces.evaluateAll((as) => as.map((a) => a.getAttribute('href')?.split('#')[0]));
+    expect(destinos).toEqual([
+      '/comparador-autonomo-vs-sl/',
+      '/estimador-cuota-autonomo/',
+      '/calculadora-iva/',
+      '/simulador-irpf-tramos/',
+    ]);
+  });
+});
+
+/** Traductor simulado (el de tests/apps/ternario-traducido-familia.spec.ts): cada texto, a <font><font>. */
+async function traducirPagina(page: Page): Promise<void> {
+  await asentarAntesDeTraducir(page);
+  await page.evaluate(() => {
+    const caminante = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+      acceptNode: (n) => {
+        const padre = n.parentElement;
+        if (!padre || !(n.nodeValue ?? '').trim()) return NodeFilter.FILTER_REJECT;
+        if (/^(SCRIPT|STYLE|OPTION|NOSCRIPT|FONT)$/.test(padre.tagName)) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      },
+    });
+    const nodos: Text[] = [];
+    while (caminante.nextNode()) nodos.push(caminante.currentNode as Text);
+    for (const nodo of nodos) {
+      const exterior = document.createElement('font');
+      const interior = document.createElement('font');
+      interior.textContent = nodo.nodeValue;
+      exterior.appendChild(interior);
+      nodo.parentNode?.replaceChild(exterior, nodo);
+    }
+  });
+}

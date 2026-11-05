@@ -56,8 +56,14 @@ import { esperarHidratacion, sembrarValor, sembrarValorAcotado } from './_hidrat
  *     baja visión moderada o grave» → 217/7.700 = 2,8 %. La cifra no cuadra ni con la
  *     fuente ni consigo misma: parece «2,2 mil millones» con la unidad cambiada.
  *   · ⚠️ Miopía severa «~30% de la población (algún grado)» — el 30 % es la miopía DE
- *     CUALQUIER GRADO (Holden et al., Ophthalmology 2016: 28,3 % en 2020). La miopía alta,
+ *     CUALQUIER GRADO (Holden et al., Ophthalmology 2016: 28,3 %). La miopía alta,
  *     que es la que el botón llama «severa», está en el 4,0 %. Siete veces menos.
+ *     ⚠️ CORREGIDO el 05/11/2026 (cabo C0133): aquí ponía «28,3 % en 2020», y ese año no
+ *     consta en ninguna fuente que la tarea pueda leer. Holden es una serie de 2000 a 2050
+ *     cuyo resumen solo da 2000 y 2050; el cabo sitúa el 28,3 % y el 4,0 % en 2010, pero
+ *     PubMed y la revista no están en la red de fuentes oficiales, y el PDF del Informe
+ *     mundial sobre la visión de la OMS (2019) vive en iris.who.int, que tampoco. Las páginas
+ *     de www.who.int consultadas no dan esas cifras. Ver el caso del cabo C0133, al final.
  *
  * EL FILTRO DE DALTONISMO, CALCULADO A MANO
  *   Las tres matrices del page.tsx son las que circulan en la literatura de accesibilidad
@@ -1024,5 +1030,43 @@ test.describe('Caso 8 · contenido y datos', () => {
     // desde el 28/06/2025, art. 2.2: comercio electrónico, banca, transporte…).
     await expect(respuesta).toContainText('Ley 11/2023');
     await expect(respuesta).not.toContainText(/mínimo legal en España/i);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CABO C0133 · 05/11/2026 — la cifra de miopía alta de Holden, sin el año del dato
+// ─────────────────────────────────────────────────────────────────────────────
+test.describe('Cabo C0133 · el año de la cifra de Holden', () => {
+  test('hallazgo · la miopía severa dice de qué año es el «4 %» de Holden, o no da cifra', async ({ page }) => {
+    // ABIERTO (inspector 05/11/2026, cabo C0133).
+    // La ficha dice «~4 % de la población (miopía alta; Holden et al., Ophthalmology 2016)» y
+    // la tabla de la guía «4 % (miopía alta)», con la fuente «Holden et al. (2016)». 2016 es el
+    // año de PUBLICACIÓN: el estudio es una serie, «Global Prevalence of Myopia and High Myopia
+    // and Temporal Trends from 2000 through 2050» (Ophthalmology 2016;123(5):1036-1042), así que
+    // su prevalencia cambia con el año y ni la ficha ni la tabla dicen de cuál es. La de baja
+    // visión de esta misma app sí lo dice («… 2015», caso 1).
+    // Esperado: el año al que corresponde la cifra (el cabo lo sitúa en 2010; ninguna fuente
+    // que la tarea pueda leer lo ancla: PubMed y la revista no están en la red de fuentes, y el
+    // PDF del Informe mundial sobre la visión de la OMS vive en iris.who.int) o, si no se puede
+    // anclar, quitar la cifra y matizarla (criterio C0203, decisión del usuario del 30/10/2026).
+    // Obtenido: la cifra sin año. Se borra todo «2016» antes de buscar el año del dato, para que
+    // el de la publicación no cuente; las páginas del artículo (1036-1042) no casan con 20[0-5]d.
+    test.fail();
+    await abrir(page);
+    const tieneCifra = (texto: string): boolean => /\d[  ]?%/.test(texto);
+    const tieneAnioDelDato = (texto: string): boolean => /\b20[0-5]\d\b/.test(texto.replace(/2016/g, ''));
+
+    await elegirCondicion(page, 'Miopía severa');
+    const ficha = await page.locator('[class*="infoPrevalencia"]').innerText();
+    expect(!tieneCifra(ficha) || tieneAnioDelDato(ficha), `ficha: «${ficha}»`).toBe(true);
+
+    // La tabla: el año puede ir en la fila o en el tramo de la miopía alta del párrafo de fuentes.
+    const fila =
+      (await page.locator('[class*="tabla"] tbody tr').filter({ hasText: 'Miopía severa' }).textContent()) ?? '';
+    const fuentes = (await page.locator('[class*="fuenteDato"]').textContent()) ?? '';
+    const tramo = fuentes.match(/miopía alta, Holden[^;]*/)?.[0] ?? '';
+    expect(!tieneCifra(fila) || tieneAnioDelDato(`${fila} ${tramo}`), `tabla: «${fila}» · fuente: «${tramo}»`).toBe(
+      true,
+    );
   });
 });

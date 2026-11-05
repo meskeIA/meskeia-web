@@ -282,6 +282,8 @@ test.describe('CASO 2b (límite) — piscina de 50 m con los valores MÍNIMOS de
   test('SWOLF 12, nivel Élite y velocidad 0:20 min/100 m', async ({ page }) => {
     // Ejercita metros_largo=50 desde la UI con los mínimos de 50 m: el doble de los de 25 m
     // (5 s y 1 brazada por cada 25 m). Un 12 es Élite con cualquier escala.
+    // ABIERTO — cabo C0138 (05/11/2026): 10 s en 50 m siguen siendo 5 m/s, el ritmo que el motor
+    // declara «por encima del récord mundial»: este caso fija como válido el suelo. Ver el bloque C0138.
     await elegirPiscina(page, 50);
     await rellenar(page, { tiempo: '10', brazadas: '2' });
 
@@ -875,6 +877,8 @@ test.describe('CASO 5 (límite) — bordes inclusivos y décimas en 25 m', () =>
     ['15,1', '10', '25,1', 'Avanzado', '1:00 min/100 m'], // 25,1 > 25 · 60,4 → 60 s
     ['22,04', '16', '38', 'Intermedio', '1:28 min/100 m'], // 38,04 → 38,0 ≤ 38 · 88,16 → 88 s
     ['22,06', '16', '38,1', 'Principiante', '1:28 min/100 m'], // 38,06 → 38,1 > 38 · 88,24 → 88 s
+    // ABIERTO — cabo C0138 (05/11/2026): esta fila fija como correcto el suelo, y 5 s en 25 m son
+    // 5 m/s, que el propio motor declara «por encima del récord mundial». Ver el bloque C0138.
     ['5', '1', '6', 'Élite', '0:20 min/100 m'], // los mínimos que admite: 5 s y 1 brazada · 20 s
   ];
   for (const [t, b, swolf, nivel, ritmo] of filas) {
@@ -1080,5 +1084,86 @@ test.describe('REPARADO — HALLAZGO J: cifras sin fuente en la guía', () => {
     await expect(tarjeta).toHaveCount(1);
     const texto = await tarjeta.innerText();
     expect(cifraSinFuente(texto, /segundos?/), texto).toBe(false);
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════
+ * ABIERTO — cabo C0138 (comprobación del 05/11/2026, calculo/medio): el suelo de tiempo que
+ * dejó la reparación del 2632 admite, y clasifica «Élite», un ritmo que el propio motor
+ * declara por encima del récord mundial.
+ *
+ * El ANCLA es el propio motor, no una cifra de récord: lib/calculadoras/deporte.ts justifica
+ * RANGO_TIEMPO_SWOLF_POR_25 = { min: 5 } así: «Un largo de 25 m en menos de 5 s (5 m/s, por
+ * encima del récord mundial) […] no describe a nadie». Pero el borde es INCLUSIVO (leerCampo
+ * rechaza solo n < min, y el motor solo tiempo < tMin), así que justo esos 5 m/s se aceptan:
+ *   · 25 m · 5 s · 1 brazada  → SWOLF 6 · 6 ≤ 25 → «Élite» · «Excelente» · «Eficiencia propia
+ *     de nadadores de competición» · 5 · 100 / 25 = 20 s → «0:20 min/100 m», sin aviso.
+ *   · 50 m · 10 s · 2 brazadas → SWOLF 12 · 12 / 2 = 6 ≤ 25 → «Élite» · 10 · 100 / 50 = 20 s →
+ *     «0:20 min/100 m», sin aviso (en 50 m el suelo escala a 10 s: los mismos 5 m/s).
+ * Esperado, por la justificación del propio motor: aviso y ningún nivel, como con 4,9 s.
+ * Medido en el navegador el 05/11/2026: sale lo de arriba, tal cual.
+ *
+ * Y entre el récord real y 5 m/s queda una franja que también recibe «Élite»: los dos casos del
+ * cabo caen en ella (25 m · 6 s · 1 brazada → 7 · Élite · «0:24 min/100 m», 4,17 m/s; y 50 m con
+ * los valores por defecto, 20 s y 18 brazadas → 38 · 38 / 2 = 19 → Élite · «0:40 min/100 m»,
+ * 2,5 m/s, nada más pulsar «50 m»). Que sean imposibles depende de la cifra del récord, y no hay
+ * fuente de récords de natación en el repositorio ni en la red de fuentes oficiales de la tarea
+ * (World Aquatics y la RFEN no están): SIN ANCLAR. La reparación necesita anclar el suelo en una
+ * fuente citable de récords; el bloque de abajo deja lo que da hoy, para ver qué se mueve.
+ * El CASO 5 (fila «5 s y 1 brazada») y el CASO 2b fijan hoy como válido el suelo: cambiarán con
+ * la reparación.
+ * ═══════════════════════════════════════════════════════════════════════════════════════ */
+
+test.describe('ABIERTO — cabo C0138: el suelo de 5 m/s que el motor llama «por encima del récord mundial» recibe «Élite»', () => {
+  test('25 m · 5 s · 1 brazada (5 m/s): debería avisar y no dar nivel', async ({ page }) => {
+    await caso(page, 25, '5', '1');
+    // Precondición (antes de test.fail, para que un fallo aquí sea rojo de verdad): la entrada
+    // llegó a la app y la piscina es la de 25 m.
+    await expect(tiempoInput(page)).toHaveValue('5');
+    await expect(brazadasInput(page)).toHaveValue('1');
+    await expect(page.getByRole('button', { name: '25 m', exact: true })).toHaveAttribute('aria-pressed', 'true');
+    // Hoy: SWOLF 6 · «Élite» · «0:20 min/100 m» y aviso vacío.
+    test.fail();
+    await expect(aviso(page)).not.toHaveText('', { timeout: 2000 });
+    await expect(nivelBadge(page)).toHaveCount(0, { timeout: 2000 });
+  });
+
+  test('50 m · 10 s · 2 brazadas (los mismos 5 m/s): debería avisar y no dar nivel', async ({ page }) => {
+    await caso(page, 50, '10', '2');
+    await expect(tiempoInput(page)).toHaveValue('10');
+    await expect(brazadasInput(page)).toHaveValue('2');
+    await expect(page.getByRole('button', { name: '50 m', exact: true })).toHaveAttribute('aria-pressed', 'true');
+    // Hoy: SWOLF 12 · «Élite» · «0:20 min/100 m» y aviso vacío.
+    test.fail();
+    await expect(aviso(page)).not.toHaveText('', { timeout: 2000 });
+    await expect(nivelBadge(page)).toHaveCount(0, { timeout: 2000 });
+  });
+
+  test('el motor (que comparten la API de ChatGPT y la tool del MCP) debería rechazar 5 m/s', () => {
+    // Hoy calcularSWOLF(5, 1, 25) devuelve nivel 'elite' y velocidadMedia_m_s 5 sin lanzar.
+    test.fail();
+    expect(() => calcularSWOLF(5, 1, 25)).toThrow(RangeError);
+    expect(() => calcularSWOLF(10, 2, 50)).toThrow(RangeError);
+  });
+
+  test('SIN ANCLAR — los dos casos del cabo, lo que da hoy (no es un visto bueno)', async ({ page }) => {
+    // 25 m · 6 s · 1 brazada: 6 + 1 = 7 ≤ 25 → Élite · 6 · 100 / 25 = 24 s → «0:24 min/100 m».
+    await caso(page, 25, '6', '1');
+    await expect(swolfScore(page)).toHaveText('7');
+    await expect(nivelBadge(page)).toContainText('Élite');
+    await expect(detalle(page, 1)).toHaveText('0:24 min/100 m');
+    await expect(aviso(page)).toHaveText('');
+
+    // 50 m con los valores por defecto (20 s y 18 brazadas, sin tocar los campos): 38 / 2 = 19
+    // ≤ 25 → Élite · 20 · 100 / 50 = 40 s → «0:40 min/100 m».
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#tiempo-input', '#brazadas-input']);
+    await expect(tiempoInput(page)).toHaveValue('20');
+    await expect(brazadasInput(page)).toHaveValue('18');
+    await elegirPiscina(page, 50);
+    await expect(swolfScore(page)).toHaveText('38');
+    await expect(nivelBadge(page)).toContainText('Élite');
+    await expect(detalle(page, 1)).toHaveText('0:40 min/100 m');
+    await expect(aviso(page)).toHaveText('');
   });
 });

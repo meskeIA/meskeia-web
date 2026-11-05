@@ -74,6 +74,10 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  * mismo día. El de fondo es el del triángulo: con base y altura el área está determinada pero
  * el perímetro NO —hay infinitos triángulos con esas dos medidas—, así que o se declara el
  * supuesto o se pide el dato que falta. Ahora hace las dos cosas según lo que se teclee.
+ *
+ * CABO C0386 (05/11/2026), al final: las 15 clases del bloque educativo que el .module.css no
+ * declara. Un hallazgo ABIERTO, con test.fail() y un caso hermano en verde que garantiza que
+ * los localizadores siguen encontrando lo que mide.
  */
 
 /** Texto de un nodo, con el espacio duro de Intl normalizado. */
@@ -410,5 +414,80 @@ test.describe('Los 5 hallazgos del 18/09/2026, reparados el mismo día', () => {
     );
     expect(sinTipo).toEqual([]);
     await expect(page.locator('h1 span[aria-hidden="true"]')).toHaveCount(1);
+  });
+});
+
+test.describe('Cabo C0386 (05/11/2026) · las 15 clases del bloque educativo sin declarar', () => {
+  // page.tsx usa 15 clases que CalculadoraGeometria.module.css no declara, todas dentro de
+  // <EducationalSection>: comparisonTable (l. 642), tableRow (643-715, 10 filas), tableHeader
+  // (644-646), tableCell (650-716, 27 celdas), faqList (670, 684 y una por pregunta), faqItem,
+  // faqQuestion y faqAnswer (798-894, 8 preguntas), stepByStep (915), step, stepNumber y
+  // stepContent (916-985, 7 pasos), warningBox (1059), warningIntro (1061) y warningCard
+  // (1067-1148, 8 tarjetas). `styles.x` vale undefined y React no escribe el atributo class:
+  // 80 <div> y 10 <ul> de la guía salen sin class, y el reset global (* { margin: 0; padding: 0 })
+  // les quita además los márgenes.
+  //
+  // Lo que se VE, medido el 05/11/2026 a 1280 y 390 px, en claro y en oscuro:
+  //   · La «Comparación Completa» 2D/3D deja de ser una tabla: 30 líneas de 16 px apiladas a
+  //     todo el ancho, sin columnas, sin bordes y con 0 px entre filas. «Característica»,
+  //     «Figuras 2D» y «Sólidos 3D» salen como tres líneas de texto normal (peso 400), y en la
+  //     fila «Fórmula de Área» se leen seguidos los cuatro casos de 2D y «No aplica (usan
+  //     volumen)», que es de la columna 3D: qué valor es de qué columna solo se saca contando.
+  //     Es lo único que pierde información; lo demás es estético.
+  //   · La FAQ: cada pregunta, a 16 px como el texto, va pegada (0 px) a la última viñeta de la
+  //     anterior, sin separación entre las ocho.
+  //   · Los pasos: el «1»…«7» es un número suelto en su propia línea, sin el círculo del patrón.
+  //   · «Errores comunes»: sin caja de aviso, y las 8 tarjetas sin fondo, borde ni relleno, frente
+  //     a las .contentCard de la misma página (fondo, borde izquierdo de 3 px y 16 px de relleno).
+  // No desborda a 390 px (lo apilado no puede) ni se vuelve ilegible en oscuro: el texto hereda
+  // el color del body, 10,77:1 sobre el #303030 de la guía (15,96:1 en claro).
+
+  async function abrirGuia(page: Page): Promise<Locator> {
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const guia = page.locator('[data-guia-educativa]');
+    await expect(guia.getByText('Característica', { exact: true })).toBeVisible();
+    return guia;
+  }
+
+  test('C0386 · lo que mide el caso ABIERTO está en la guía y se ve', async ({ page }) => {
+    // Caso hermano, en verde antes y después de reparar: si el texto de la guía cambia, el caso
+    // ABIERTO fallaría por no encontrar sus anclas y test.fail() lo daría por bueno. Esto lo impide.
+    const guia = await abrirGuia(page);
+    await expect(guia.getByText('Figuras 2D', { exact: true })).toBeVisible();
+    await expect(guia.getByText('Longitud y anchura (plano)', { exact: true })).toBeVisible();
+    await expect(guia.getByText('Longitud, anchura y altura (espacio)', { exact: true })).toBeVisible();
+    await expect(guia.locator('li', { hasText: 'Flashcards:' })).toBeVisible();
+    await expect(
+      guia.getByRole('heading', { name: '¿Cuándo uso π = 3,14 y cuándo dejo π sin aproximar?' }),
+    ).toBeVisible();
+  });
+
+  test('HALLAZGO (05/11/2026, ABIERTO) · C0386 · la tabla 2D/3D sale apilada sin columnas y la FAQ sin separación', async ({
+    page,
+  }) => {
+    // Esperado: maquetado como el resto del catálogo (cada fila una rejilla de tres columnas,
+    // cada pregunta separada de la anterior). Obtenido hoy: 90 div/ul sin class, la celda 2D y
+    // la 3D de «Dimensiones» una debajo de otra (y = 699 y 725, x = 57 las dos) y 0 px entre
+    // la última viñeta de una pregunta y la siguiente.
+    test.fail();
+    const guia = await abrirGuia(page);
+
+    // 1. Ningún <div> ni <ul> de la guía sin class (hoy 90: 80 div y 10 ul).
+    const sinClase = await guia.locator('div:not([class]), div[class=""], ul:not([class]), ul[class=""]').count();
+    expect.soft(sinClase, 'div/ul de la guía sin atributo class').toBe(0);
+
+    // 2. Las dos celdas de la fila «Dimensiones» en la misma línea, la 3D a la derecha de la 2D
+    //    (viewport de escritorio, 1280 px).
+    const c2d = await guia.getByText('Longitud y anchura (plano)', { exact: true }).boundingBox();
+    const c3d = await guia.getByText('Longitud, anchura y altura (espacio)', { exact: true }).boundingBox();
+    expect.soft(Math.abs((c2d?.y ?? 0) - (c3d?.y ?? 9999)), 'celdas 2D y 3D en la misma fila').toBeLessThanOrEqual(2);
+    expect.soft((c3d?.x ?? 0) - (c2d?.x ?? 0), 'la celda 3D, en su columna a la derecha').toBeGreaterThan(50);
+
+    // 3. Separación visible entre una pregunta de la FAQ y la anterior (hoy 0 px).
+    const li = await guia.locator('li', { hasText: 'Flashcards:' }).boundingBox();
+    const h4 = await guia
+      .getByRole('heading', { name: '¿Cuándo uso π = 3,14 y cuándo dejo π sin aproximar?' })
+      .boundingBox();
+    expect.soft((h4?.y ?? 0) - ((li?.y ?? 0) + (li?.height ?? 0)), 'hueco entre preguntas de la FAQ').toBeGreaterThanOrEqual(8);
   });
 });
