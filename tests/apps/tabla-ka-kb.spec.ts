@@ -203,11 +203,16 @@ test.describe('Inspección del 05/11/2026', () => {
     await expect(cifra(panel)).toHaveText('12,30');
     await expect(subtitulo(panel)).toHaveText('pOH = 1,70 · [OH⁻] = 2,00×10⁻² M');
 
+    // Desde el 05/11/2026 (hallazgo 4119) la cifra del tampón es la del balance de cargas de la
+    // mezcla y Henderson-Hasselbalch queda en «Sustitución». Con 1/0,01, h² + (Cb + Ka)·h − Ka·Ca = 0
+    // → h = 1,5554×10⁻³ → pH 2,8082 «2,81»; HH da 2,74 y se aparta más de 0,05, así que avisa.
     const tampon = panelTampon(page);
     await calcularTampon(page, 'acetico', '1', '0,01');
-    await expect(cifra(tampon)).toHaveText('2,74');
+    await expect(cifra(tampon)).toHaveText('2,81');
+    await expect(dato(tampon, 'Sustitución')).toHaveText('pH = 4,74 + log(0,01) = 2,74');
     await expect(subtitulo(tampon)).toHaveText('pKa = 4,74 · proporción base/ácido = 0,01');
     await expect(tampon).toContainText('Fuera del rango útil.');
+    await expect(tampon).toContainText('Henderson-Hasselbalch no sirve aquí.');
 
     await calcularTampon(page, 'acetico', '0,01', '0,1');
     await expect(cifra(tampon)).toHaveText('5,74');
@@ -228,18 +233,17 @@ test.describe('Inspección del 05/11/2026', () => {
   });
 
   /* ═══════════════════════════════════════════════════════════════════════════════════════
-   * HALLAZGOS ABIERTOS (05/11/2026). Con test.fail() mientras sigan abiertos: el esperado
-   * escrito es el CORRECTO; hoy fallan y el spec queda en verde. Cuando se reparen, Playwright
-   * avisará de que «pasan» y hay que quitar el test.fail() y marcarlos REPARADO.
+   * HALLAZGOS DEL 05/11/2026 (4116-4123), REPARADOS el mismo día en /reparar. calcularPh y el
+   * tampón resuelven ahora el balance de cargas con Kw y con todas las constantes de la familia
+   * (app/tabla-ka-kb/motor.ts); los esperados de cada test son los del Inspector, resueltos aparte.
    * ═══════════════════════════════════════════════════════════════════════════════════════ */
 
-  test('HALLAZGO (05/11/2026, ABIERTO) · cabo C0086: sin Kw, un ácido da pH > 7 y una base pH < 7', async ({ page }) => {
-    // calcularPh resuelve x² + K·x − K·C = 0 (y en los fuertes [H₃O⁺] = C) sin el agua. Medido el
-    // 05/11/2026 → lo que pinta hoy / lo correcto con Kw (balance de cargas, ver cabecera):
+  test('HALLAZGO 4116 (REPARADO) · cabo C0086: con Kw, ningún ácido da pH > 7 ni ninguna base pH < 7', async ({ page }) => {
+    // Antes calcularPh resolvía x² + K·x − K·C = 0 (y en los fuertes [H₃O⁺] = C) sin el agua.
+    // Lo que pintaba / lo correcto con Kw (balance de cargas, ver cabecera):
     //   HCl 10⁻⁸ M → 8,00 / 6,98 · HCl 10⁻⁷ M → 7,00 / 6,79 · fenol 10⁻⁵ M → 7,50 / 6,98
     //   fenol 10⁻⁶ M → 8,00 / 7,00 · urea 0,1 M → 6,59 / 7,03 · NaOH 10⁻⁸ M → 6,00 / 7,02
-    // Tolerancia 0,05: el defecto es de 0,2 a 1 unidad de pH y la pantalla redondea a 0,005.
-    test.fail();
+    // Tolerancia 0,05: el defecto era de 0,2 a 1 unidad de pH y la pantalla redondea a 0,005.
     const casos: [string, string, number, 'acido' | 'base'][] = [
       ['hcl', '0,00000001', 6.9783, 'acido'],
       ['hcl', '0,0000001', 6.791, 'acido'],
@@ -256,18 +260,25 @@ test.describe('Inspección del 05/11/2026', () => {
       else expect.soft(ph, `${id} ${conc}: una base`).toBeGreaterThanOrEqual(7);
       expect.soft(ph, `${id} ${conc}`).toBeCloseTo(esperado, 1);
     }
+    // Y el aviso ya no dice que el modelo no incluye el agua: dice que la incluye.
+    await calcularPh(page, 'hcl', '0,00000001');
+    await expect(panelPh(page)).toContainText('El cálculo los incluye');
+    await expect(panelPh(page)).not.toContainText('no los incluye');
+    // El fenol 10⁻⁵ M ya no se da por «Aproximación válida»: √(Ka·C) = 3,16×10⁻⁸ frente a 1,05×10⁻⁷.
+    await calcularPh(page, 'fenol', '0,00001');
+    await expect(panelPh(page)).not.toContainText('Aproximación válida.');
+    await expect(panelPh(page)).toContainText('los del agua pesan tanto como ella');
   });
 
-  test('HALLAZGO (05/11/2026, ABIERTO) · un anión anfótero se calcula como si solo fuera ácido', async ({ page }) => {
-    // El pH «de la disolución» de HCO₃⁻, H₂PO₄⁻ o HPO₄²⁻ sale de su Ka sola, sin su
-    // comportamiento básico. Con las constantes de la propia tabla y el balance de cargas de la
-    // sal sódica (Na⁺ + H⁺ = Σ aniones + OH⁻): NaHCO₃ 0,1 M → 8,35 (½(pKa₁+pKa₂) = 8,347) y la
-    // app 5,66, aunque la nota de esa misma fila dice que «una disolución de bicarbonato de sodio
-    // es básica»; la fila «HCO₃⁻ como base» da 9,68. NaH₂PO₄ 0,1 M → 4,68 (app 4,10);
-    // Na₂HPO₄ 0,1 M → 9,72 (app 6,66).
-    test.fail();
+  test('HALLAZGO 4117 (REPARADO) · un anión anfótero se calcula con sus dos constantes', async ({ page }) => {
+    // Antes, el pH de HCO₃⁻, H₂PO₄⁻ o HPO₄²⁻ salía de su Ka sola, sin su comportamiento básico.
+    // Con las constantes de la propia tabla y el balance de cargas de la sal sódica
+    // (Na⁺ + H⁺ = Σ aniones + OH⁻): NaHCO₃ 0,1 M → 8,35 (½(pKa₁+pKa₂) = 8,347; la app daba 5,66
+    // y 9,68 en la fila «HCO₃⁻ como base», que ahora da lo mismo: es la misma disolución).
+    // NaH₂PO₄ 0,1 M → 4,68 (daba 4,10); Na₂HPO₄ 0,1 M → 9,72 (daba 6,66).
     const casos: [string, number][] = [
       ['h2co3-2', 8.347],
+      ['bicarbonato-base', 8.347],
       ['h3po4-2', 4.682],
       ['h3po4-3', 9.722],
     ];
@@ -276,13 +287,19 @@ test.describe('Inspección del 05/11/2026', () => {
       await expect(cifra(panelPh(page))).toBeVisible();
       expect.soft(await phEnPantalla(page), id).toBeCloseTo(esperado, 1);
     }
+    await calcularPh(page, 'h2co3-2', '0,1');
+    await expect(dato(panelPh(page), 'pH con la aproximación ½(pKa₁ + pKa₂)')).toHaveText('8,35');
+    // HS⁻: Ka₂ = 10⁻¹⁹ y ½(pKa₁ + pKa₂) = 13,03 no sirve; el balance de cargas da 10,03
+    // ([OH⁻] ≈ √(Kw/Ka₁ · C) = 1,06×10⁻⁴), y la app lo dice.
+    await calcularPh(page, 'h2s-2', '0,1');
+    await expect(cifra(panelPh(page))).toHaveText('10,03');
+    await expect(panelPh(page)).toContainText('no sirve aquí');
   });
 
-  test('HALLAZGO (05/11/2026, ABIERTO) · el H₂SO₄ ignora la segunda disociación que su fila dice que «sí hay que tener en cuenta»', async ({ page }) => {
+  test('HALLAZGO 4118 (REPARADO) · el H₂SO₄ cuenta la segunda disociación que su fila dice que «sí hay que tener en cuenta»', async ({ page }) => {
     // [H⁺] = C + [SO₄²⁻] con Ka₂ = 1,2×10⁻² (la de la fila HSO₄⁻): x² + (C + Ka₂)·x − Ka₂·C = 0.
-    // 0,01 M → x = 4,524×10⁻³, [H⁺] = 1,4524×10⁻² → pH 1,8379 «1,84» (la app: 2,00).
-    // 0,1 M → 0,9592 «0,96» (la app: 1,00) · 0,001 M → 2,7292 «2,73» (la app: 3,00).
-    test.fail();
+    // 0,01 M → x = 4,524×10⁻³, [H⁺] = 1,4524×10⁻² → pH 1,8379 «1,84» (la app daba 2,00).
+    // 0,1 M → 0,9592 «0,96» (daba 1,00) · 0,001 M → 2,7292 «2,73» (daba 3,00).
     for (const [conc, esperado] of [
       ['0,01', 1.8379],
       ['0,001', 2.7292],
@@ -293,42 +310,50 @@ test.describe('Inspección del 05/11/2026', () => {
     }
   });
 
-  test('HALLAZGO (05/11/2026, ABIERTO) · el tampón en proporción 1/10 exacta sale «fuera del rango útil»', async ({ page }) => {
-    // 0,01/0,1 da 0,09999999999999999 en coma flotante y no pasa el `proporcion >= 0.1`, así que
-    // [ácido] 0,1 y [base] 0,01 pintan pH 3,74 —el extremo inferior del «de 3,74 a 5,74» que
-    // muestra al lado— con «Fuera del rango útil», mientras que el extremo de arriba (0,01/0,1,
-    // proporción 10) sale «Dentro». Esperado: dentro, como el borde de arriba.
-    test.fail();
+  test('HALLAZGO 4120 (REPARADO) · el tampón en proporción 1/10 exacta sale «dentro del rango útil»', async ({ page }) => {
+    // 0,01/0,1 da 0,09999999999999999 en coma flotante y no pasaba el `proporcion >= 0.1`, así que
+    // [ácido] 0,1 y [base] 0,01 salían «Fuera del rango útil», mientras que el extremo de arriba
+    // (0,01/0,1, proporción 10) salía «Dentro». Ahora se compara |log₁₀(proporción)| ≤ 1 con
+    // tolerancia. Desde el hallazgo 4119 la cifra grande es la del balance de cargas (3,7531
+    // «3,75»); la de Henderson-Hasselbalch, el extremo del rango (3,74), queda en «Sustitución».
     const tampon = panelTampon(page);
     await calcularTampon(page, 'acetico', '0,1', '0,01');
-    await expect(cifra(tampon)).toHaveText('3,74');
+    await expect(cifra(tampon)).toHaveText('3,75');
+    await expect(dato(tampon, 'Sustitución')).toHaveText('pH = 4,74 + log(0,10) = 3,74');
     await expect(dato(tampon, 'Rango útil')).toHaveText('de 3,74 a 5,74');
+    await expect(tampon).toContainText('Dentro del rango útil.', { timeout: 2000 });
+    await calcularTampon(page, 'acetico', '0,2', '0,02');
     await expect(tampon).toContainText('Dentro del rango útil.', { timeout: 2000 });
   });
 
-  test('HALLAZGO (05/11/2026, ABIERTO) · el tampón aplica Henderson-Hasselbalch a ácidos de Ka grande y la nota lo da por «razonable»', async ({ page }) => {
+  test('HALLAZGO 4119 (REPARADO) · el tampón ya no aplica Henderson-Hasselbalch a ácidos de Ka grande: da el pH real y avisa', async ({ page }) => {
     // Mezcla HA (Ca) + NaA (Cb), balance de cargas Cb + [H⁺] = (Ca + Cb)·Ka/([H⁺] + Ka) + Kw/[H⁺]
     // (.inspector-trabajo/tabla-ka-kb-tampon.mjs), con la Ka de la tabla:
-    //   tricloroacético 0,1/0,1 → 1,2353 «1,24» (la app: 0,66, «Dentro del rango útil»)
-    //   HSO₄⁻ 0,01/0,01 → 2,3445 «2,34» (la app: 1,92) · oxálico Ka₁ 0,1/0,1 → 1,5080 (la app: 1,23)
-    // La nota de debajo dice que suponer [HA] y [A⁻] ≫ lo disociado es «razonable en tampones por
-    // encima de 0,01 M»; con el TCA a 0,1 M se disocian 0,058 M. Tolerancia 0,05 frente a 0,4-0,6.
-    test.fail();
+    //   tricloroacético 0,1/0,1 → 1,2353 «1,24» (la app daba 0,66, «Dentro del rango útil»)
+    //   HSO₄⁻ 0,01/0,01 → 2,3445 «2,34» (daba 1,92) · oxálico Ka₁ 0,1/0,1 → 1,5080 (daba 1,23)
+    // La nota de debajo ya no da Henderson-Hasselbalch por «razonable» por encima de 0,01 M.
     const tampon = panelTampon(page);
     for (const [id, c, esperado] of [
       ['tricloroacetico', '0,1', 1.2353],
       ['hso4', '0,01', 2.3445],
+      ['oxalico-1', '0,1', 1.508],
     ] as const) {
       await calcularTampon(page, id, c, c);
       await expect(cifra(tampon)).toBeVisible();
       expect.soft(leerNumero((await cifra(tampon).textContent()) ?? ''), `${id} ${c}`).toBeCloseTo(esperado, 1);
+      await expect.soft(tampon, id).toContainText('Henderson-Hasselbalch no sirve aquí.');
     }
+    await expect(tampon).not.toContainText('razonable en tampones por encima de 0,01 M');
+    // Y en un tampón normal (acético 0,1/0,1) Henderson-Hasselbalch vale y no se avisa.
+    await calcularTampon(page, 'acetico', '0,1', '0,1');
+    await expect(cifra(tampon)).toHaveText('4,74');
+    await expect(tampon).not.toContainText('Henderson-Hasselbalch no sirve aquí.');
   });
 
-  test('HALLAZGO (05/11/2026, ABIERTO) · «Aproximación válida… coincide con el exacto en las cifras que se muestran» y no coinciden', async ({ page }) => {
+  test('HALLAZGO 4121 (REPARADO) · «Aproximación válida» ya no dice que coincide con el exacto en las cifras que se muestran', async ({ page }) => {
     // Acético 0,1 M: exacto 1,332671×10⁻³ «1,33×10⁻³ M» y √(Ka·C) = 1,341641×10⁻³ «1,34×10⁻³ M»,
-    // los dos en el mismo panel (y en pH, 2,88 frente a 2,87). Lo mismo con el amoníaco 0,1 M.
-    test.fail();
+    // los dos en el mismo panel (y en pH, 2,88 frente a 2,87). La nota dice ahora que la
+    // diferencia es menor que el 5 % de la regla y puede tocar la última cifra.
     const panel = panelPh(page);
     await calcularPh(page, 'amoniaco', '0,1');
     await calcularPh(page, 'acetico', '0,1');
@@ -338,17 +363,25 @@ test.describe('Inspección del 05/11/2026', () => {
     const aproximado = plano(await dato(panel, 'Valor con la aproximación').textContent()).replace(/ M$/, '');
     expect(exacto).toBe('1,33×10⁻³');
     expect(aproximado).toBe('1,34×10⁻³');
-    if ((await panel.textContent())?.includes('coincide con el exacto en las cifras que se muestran')) {
-      expect(aproximado).toBe(exacto);
-    }
+    await expect(panel).toContainText('Aproximación válida.');
+    await expect(panel).not.toContainText('coincide con el exacto en las cifras que se muestran');
+    await expect(panel).toContainText('puede diferir en la última cifra que se muestra');
   });
 
-  test('HALLAZGO (05/11/2026, ABIERTO) · tres notas comparativas no cuadran con las constantes de la propia tabla', async ({ page }) => {
+  test('HALLAZGO 4122 (REPARADO) · las tres notas comparativas cuadran con las constantes de la propia tabla', async ({ page }) => {
     // Con las Ka/Kb de la tabla: metilamina/anilina = 4,4×10⁻⁴ / 3,8×10⁻¹⁰ = 1,16×10⁶ (no «casi
     // cien mil»; frente al amoníaco, 4,7×10⁴) · láctico/propanoico = 1,4×10⁻⁴ / 1,3×10⁻⁵ = 10,8
     // (no «unas ocho veces») · fórmico pKa 3,74 frente a acético 4,74, propanoico 4,89 y
     // butanoico 4,82: diez veces más ácido, no «pKa muy parecidos» (lo dice la nota del fórmico).
-    test.fail();
+    for (const [id, frase] of [
+      ['anilina', 'alrededor de un millón de veces menos básica que la metilamina'],
+      ['lactico', 'unas diez veces más ácido que el propanoico'],
+      ['butanoico', 'El fórmico, sin grupo alquilo, se separa de ellos: es unas diez veces más ácido.'],
+    ] as const) {
+      await page.locator(`li button[aria-controls="detalle-${id}"]`).click();
+      await expect.soft(page.locator(`#detalle-${id}`), id).toContainText(frase);
+      await page.locator(`li button[aria-controls="detalle-${id}"]`).click();
+    }
     for (const [id, frase] of [
       ['anilina', 'casi cien mil veces menos básica que la metilamina'],
       ['lactico', 'unas ocho veces más ácido que el propanoico'],
@@ -360,11 +393,14 @@ test.describe('Inspección del 05/11/2026', () => {
     }
   });
 
-  test('HALLAZGO (05/11/2026, ABIERTO) · el «%» va con espacio normal, no con espacio duro', async ({ page }) => {
+  test('HALLAZGO 4123 (REPARADO) · el «%» va con espacio duro, no con espacio normal', async ({ page }) => {
     // CLAUDE.md §2: «15 %» con U+00A0. Hoy U+0020 en el «Grado de disociación» («1,33 %»), en
     // las features del JSON-LD («del 5 %», «Funciona 100 %») y en la FAQPage («el 5 %», «al 100 %»).
-    test.fail();
+    // REPARADO el 05/11/2026 (/reparar): U+00A0 en page.tsx y metadata.ts. Las dos regex llevan
+    // el espacio duro literal en «1,33 %» y el espacio normal en «\d %»; abajo, además, el cuerpo
+    // entero de la página sin «cifra + espacio normal + %».
     await calcularPh(page, 'amoniaco', '0,1');
+    expect.soft((await page.locator('body').textContent()) ?? '').not.toMatch(/\d\x20%/);
     expect.soft((await dato(panelPh(page), 'Grado de disociación').textContent()) ?? '').toMatch(/1,33 %/);
     const jsonLd = await page.evaluate(() =>
       Array.from(document.querySelectorAll('script[type="application/ld+json"]'))

@@ -12,11 +12,9 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
+// Kw (producto iónico del agua a 25 °C) y el balance de cargas viven en el motor.
+import { KW, resolverH, phDeTampon, proporcionEnRangoUtil } from './motor';
 
-/* ────────────────────────────────────────────────────────────────
-   Constante del producto iónico del agua a 25 °C
-──────────────────────────────────────────────────────────────── */
-const KW = 1.0e-14;
 const PKW = 14;
 
 /* ────────────────────────────────────────────────────────────────
@@ -100,7 +98,7 @@ interface Especie {
   equilibrio: string;
   /** 'acido' → la constante es Ka; 'base' → la constante es Kb */
   tipo: 'acido' | 'base';
-  /** Electrolito fuerte: se disocia prácticamente al 100 % en agua */
+  /** Electrolito fuerte: se disocia prácticamente al 100 % en agua */
   fuerte: boolean;
   /** Ka (si tipo = 'acido') o Kb (si tipo = 'base'). null en electrolitos fuertes */
   constante: number | null;
@@ -274,7 +272,7 @@ const ESPECIES: Especie[] = [
     constante: 1.2e-2,
     conjugadaFormula: 'SO₄²⁻',
     conjugadaNombre: 'Ion sulfato',
-    nota: 'Es la segunda disociación del ácido sulfúrico. Con Ka del orden de 10⁻², está en la frontera entre débil y fuerte: la aproximación del 5 % casi nunca sirve.',
+    nota: 'Es la segunda disociación del ácido sulfúrico. Con Ka del orden de 10⁻², está en la frontera entre débil y fuerte: la aproximación del 5 % casi nunca sirve.',
     busqueda:
       'hidrogenosulfato bisulfato hso4 sulfato segunda disociacion del sulfurico ka2 acido debil',
   },
@@ -468,7 +466,7 @@ const ESPECIES: Especie[] = [
     constante: 1.4e-4,
     conjugadaFormula: 'CH₃CH(OH)COO⁻',
     conjugadaNombre: 'Ion lactato',
-    nota: 'El grupo −OH vecino al carboxilo lo hace unas ocho veces más ácido que el propanoico, que solo se diferencia en ese detalle.',
+    nota: 'El grupo −OH vecino al carboxilo lo hace unas diez veces más ácido que el propanoico, que solo se diferencia en ese detalle.',
     aplicacion: 'Es el ácido que producen las bacterias en la fermentación del yogur y del chucrut.',
     busqueda:
       'lactico ch3ch(oh)cooh lactato yogur fermentacion hidroxiacido leche acido alfa hidroxi',
@@ -500,7 +498,7 @@ const ESPECIES: Especie[] = [
     constante: 1.5e-5,
     conjugadaFormula: 'CH₃CH₂CH₂COO⁻',
     conjugadaNombre: 'Ion butanoato',
-    nota: 'Fórmico, acético, propanoico y butanoico tienen pKa muy parecidos: alargar la cadena apenas cambia la acidez.',
+    nota: 'Acético, propanoico y butanoico tienen pKa muy parecidos: alargar la cadena apenas cambia la acidez. El fórmico, sin grupo alquilo, se separa de ellos: es unas diez veces más ácido.',
     aplicacion: 'Es el responsable del olor característico de la mantequilla rancia.',
     busqueda:
       'butanoico butirico ch3ch2ch2cooh butanoato mantequilla rancia serie homologa acido graso',
@@ -517,7 +515,7 @@ const ESPECIES: Especie[] = [
     conjugadaFormula: 'CH₃COO⁻',
     conjugadaNombre: 'Ion acetato',
     nota: 'El ácido débil de referencia en cualquier curso: pKa 4,74. Con acetato forma el tampón más usado en el laboratorio, útil entre pH 3,7 y 5,7.',
-    aplicacion: 'Es el ácido del vinagre, que contiene entre un 4 % y un 8 % en masa.',
+    aplicacion: 'Es el ácido del vinagre, que contiene entre un 4 % y un 8 % en masa.',
     busqueda:
       'acetico etanoico ch3cooh vinagre acetato tampon buffer acido debil ejemplo clasico pka 4,74',
   },
@@ -1016,7 +1014,7 @@ const ESPECIES: Especie[] = [
     constante: 3.8e-10,
     conjugadaFormula: 'C₆H₅NH₃⁺',
     conjugadaNombre: 'Ion anilinio',
-    nota: 'El par libre del nitrógeno se deslocaliza dentro del anillo bencénico y deja de estar disponible: la anilina es casi cien mil veces menos básica que la metilamina.',
+    nota: 'El par libre del nitrógeno se deslocaliza dentro del anillo bencénico y deja de estar disponible: la anilina es alrededor de un millón de veces menos básica que la metilamina.',
     aplicacion: 'Materia prima histórica de los colorantes sintéticos.',
     busqueda:
       'anilina c6h5nh2 amina aromatica base muy debil kb anilinio resonancia colorante fenilamina',
@@ -1186,93 +1184,186 @@ function nivelFuerza(pk: number, tipo: 'acido' | 'base'): NivelFuerza {
   return { etiqueta: `${sustantivo} extremadamente débil`, porcentaje };
 }
 
+/**
+ * Familias polipróticas: la especie y las constantes de su familia, en orden (Ka₁, Ka₂…), y el
+ * nivel q de la especie (protones ya cedidos). Las constantes salen de las filas de la tabla, no
+ * se copian. Lo que no está aquí es monoprótico: un ácido es [Ka] con q = 0 y una base, [Kw/Kb]
+ * (la de su ácido conjugado) con q = 1. Por qué así: cabecera de ./motor.ts.
+ */
+const FAMILIAS: Record<string, { ids: string[]; q: number }> = {
+  'oxalico-1': { ids: ['oxalico-1', 'oxalico-2'], q: 0 },
+  'oxalico-2': { ids: ['oxalico-1', 'oxalico-2'], q: 1 },
+  'h2so3-1': { ids: ['h2so3-1', 'h2so3-2'], q: 0 },
+  'h2so3-2': { ids: ['h2so3-1', 'h2so3-2'], q: 1 },
+  'h3po4-1': { ids: ['h3po4-1', 'h3po4-2', 'h3po4-3'], q: 0 },
+  'h3po4-2': { ids: ['h3po4-1', 'h3po4-2', 'h3po4-3'], q: 1 },
+  'h3po4-3': { ids: ['h3po4-1', 'h3po4-2', 'h3po4-3'], q: 2 },
+  fosfato: { ids: ['h3po4-1', 'h3po4-2', 'h3po4-3'], q: 3 },
+  'citrico-1': { ids: ['citrico-1', 'citrico-2', 'citrico-3'], q: 0 },
+  'citrico-2': { ids: ['citrico-1', 'citrico-2', 'citrico-3'], q: 1 },
+  'citrico-3': { ids: ['citrico-1', 'citrico-2', 'citrico-3'], q: 2 },
+  'tartarico-1': { ids: ['tartarico-1', 'tartarico-2'], q: 0 },
+  'tartarico-2': { ids: ['tartarico-1', 'tartarico-2'], q: 1 },
+  'ascorbico-1': { ids: ['ascorbico-1', 'ascorbico-2'], q: 0 },
+  'ascorbico-2': { ids: ['ascorbico-1', 'ascorbico-2'], q: 1 },
+  'h2co3-1': { ids: ['h2co3-1', 'h2co3-2'], q: 0 },
+  'h2co3-2': { ids: ['h2co3-1', 'h2co3-2'], q: 1 },
+  'bicarbonato-base': { ids: ['h2co3-1', 'h2co3-2'], q: 1 },
+  carbonato: { ids: ['h2co3-1', 'h2co3-2'], q: 2 },
+  'h2s-1': { ids: ['h2s-1', 'h2s-2'], q: 0 },
+  'h2s-2': { ids: ['h2s-1', 'h2s-2'], q: 1 },
+};
+
+/** Ka de una fila ácida de la tabla. */
+function kaDeFila(id: string): number {
+  const fila = ESPECIES.find((especie) => especie.id === id);
+  if (!fila || fila.constante === null || fila.tipo !== 'acido') {
+    throw new Error(`La fila ${id} no es un ácido con Ka`);
+  }
+  return fila.constante;
+}
+
+interface Sistema {
+  /** Ka₁, Ka₂… de la familia (vacía para un electrolito fuerte). */
+  kas: number[];
+  /** Protones cedidos por la especie disuelta respecto a la más protonada de la familia. */
+  q: number;
+  /** Cede y acepta protones: un intermedio de un poliprótico (HCO₃⁻, H₂PO₄⁻…). */
+  anfotero: boolean;
+}
+
+/** Sistema ácido-base que se forma al disolver la especie (ver ./motor.ts). */
+function sistemaDe(especie: Especie): Sistema {
+  if (especie.id === 'h2so4-fuerte') {
+    // 1.ª disociación completa; la 2.ª, con la Ka₂ de la fila HSO₄⁻ (hallazgo 4118).
+    return { kas: [kaDeFila('hso4')], q: -1, anfotero: false };
+  }
+  if (especie.fuerte) {
+    return especie.tipo === 'acido'
+      ? { kas: [], q: -1, anfotero: false }
+      : { kas: [], q: especie.ionesOH ?? 1, anfotero: false };
+  }
+  const familia = FAMILIAS[especie.id];
+  if (familia) {
+    const kas = familia.ids.map(kaDeFila);
+    return { kas, q: familia.q, anfotero: familia.q >= 1 && familia.q < kas.length };
+  }
+  const k = especie.constante ?? 0;
+  return especie.tipo === 'acido'
+    ? { kas: [k], q: 0, anfotero: false }
+    : { kas: [KW / k], q: 1, anfotero: false };
+}
+
+/** Subíndice tipográfico de una constante: 2 → «₂». */
+const SUBINDICES = ['₀', '₁', '₂', '₃', '₄'];
+
+type Aproximacion = 'valida' | 'disociacion' | 'agua';
+
 interface ResultadoPh {
   ph: number;
   poh: number;
-  /** Concentración de H₃O⁺ (ácidos) o de OH⁻ (bases) obtenida sin aproximar */
+  /** Concentración de H₃O⁺ (ácidos) o de OH⁻ (bases), con el agua incluida */
   concentracionIon: number;
-  /** Valor que daría la aproximación √(K·C); null en electrolitos fuertes */
+  /** Valor que daría la aproximación √(K·C); null en fuertes y anfóteros */
   valorAproximado: number | null;
   porcentajeDisociacion: number | null;
-  aproximacionValida: boolean | null;
+  /** Si la aproximación √(K·C) era admisible y, si no, por qué; null donde no se aplica */
+  aproximacion: Aproximacion | null;
+  /** Anfóteros: pH con la aproximación habitual ½(pKaₙ + pKaₙ₊₁) */
+  phAnfotero: number | null;
+  /** Rótulo de la aproximación del anfótero: «½(pKa₁ + pKa₂)» */
+  rotuloAnfotero: string | null;
   formulaUsada: string;
-  avisoDilucion: boolean;
+  /** Los iones del agua ya pesan en el resultado (la especie aporta muy pocos) */
+  avisoAgua: boolean;
 }
 
 /**
- * Calcula el pH resolviendo el equilibrio exacto (ecuación de segundo grado)
- * y compara con la aproximación √(K·C) para aplicar la regla del 5 %.
+ * Calcula el pH con el balance de cargas completo, Kw incluida (./motor.ts), y, en los ácidos
+ * y bases débiles, compara con la aproximación √(K·C) para aplicar la regla del 5 %.
+ *
+ * ⚠️ 05/11/2026 — hasta hoy resolvía x² + K·x − K·C = 0 sin el agua y cada fila con su
+ * constante sola: HCl 10⁻⁸ M daba pH 8,00, NaHCO₃ 0,1 M daba 5,66 y H₂SO₄ 0,01 M, 2,00
+ * (hallazgos 4116, 4117 y 4118).
  */
 function calcularPh(especie: Especie, concentracion: number): ResultadoPh | null {
   if (!Number.isFinite(concentracion) || concentracion <= 0) return null;
 
-  // Electrolitos fuertes: disociación completa, no hay equilibrio que resolver
-  if (especie.fuerte) {
-    if (especie.tipo === 'acido') {
-      const h = concentracion;
-      const ph = -Math.log10(h);
-      return {
-        ph,
-        poh: PKW - ph,
-        concentracionIon: h,
-        valorAproximado: null,
-        porcentajeDisociacion: 100,
-        aproximacionValida: null,
-        formulaUsada: 'Disociación completa: [H₃O⁺] = C  →  pH = −log C',
-        avisoDilucion: concentracion < 1e-6,
-      };
-    }
-    const factor = especie.ionesOH ?? 1;
-    const oh = concentracion * factor;
-    const poh = -Math.log10(oh);
+  const sistema = sistemaDe(especie);
+  const h = resolverH(sistema.kas, [{ concentracion, q: sistema.q }]);
+  const oh = KW / h;
+  const ph = -Math.log10(h);
+  const ion = especie.tipo === 'acido' ? h : oh;
+  // El agua aporta tantos iones del otro signo como Kw/ion: por debajo de 10⁻⁶ M ya es ≥ 1 %.
+  const avisoAgua = ion < 1e-6;
+  const base = {
+    ph,
+    poh: PKW - ph,
+    concentracionIon: ion,
+    avisoAgua,
+    phAnfotero: null,
+    rotuloAnfotero: null,
+  };
+
+  if (especie.id === 'h2so4-fuerte') {
     return {
-      ph: PKW - poh,
-      poh,
-      concentracionIon: oh,
+      ...base,
+      valorAproximado: null,
+      porcentajeDisociacion: null,
+      aproximacion: null,
+      formulaUsada: `1.ª disociación completa y 2.ª con Ka₂ = ${notacionCientifica(sistema.kas[0])} (fila HSO₄⁻): [H₃O⁺] = C + x, con x² + (C + Ka₂)·x − Ka₂·C = 0`,
+    };
+  }
+
+  if (especie.fuerte) {
+    const factor = especie.ionesOH ?? 1;
+    return {
+      ...base,
       valorAproximado: null,
       porcentajeDisociacion: 100,
-      aproximacionValida: null,
+      aproximacion: null,
       formulaUsada:
-        factor === 1
-          ? 'Disociación completa: [OH⁻] = C  →  pOH = −log C  →  pH = 14 − pOH'
-          : `Disociación completa con ${factor} OH⁻ por unidad: [OH⁻] = ${factor}·C  →  pH = 14 + log(${factor}·C)`,
-      avisoDilucion: concentracion < 1e-6,
+        especie.tipo === 'acido'
+          ? 'Disociación completa: [H₃O⁺] = C; con los iones del agua, [H₃O⁺] = (C + √(C² + 4·Kw))/2 y pH = −log [H₃O⁺]'
+          : factor === 1
+            ? 'Disociación completa: [OH⁻] = C; con los iones del agua, [OH⁻] = (C + √(C² + 4·Kw))/2 y pH = 14 − pOH'
+            : `Disociación completa con ${factor} OH⁻ por unidad: [OH⁻] = ${factor}·C; con los iones del agua, [OH⁻] = (${factor}·C + √((${factor}·C)² + 4·Kw))/2`,
+    };
+  }
+
+  if (sistema.anfotero) {
+    const n = sistema.q;
+    const rotulo = `½(pKa${SUBINDICES[n]} + pKa${SUBINDICES[n + 1]})`;
+    return {
+      ...base,
+      valorAproximado: null,
+      porcentajeDisociacion: null,
+      aproximacion: null,
+      phAnfotero: (pK(sistema.kas[n - 1]) + pK(sistema.kas[n])) / 2,
+      rotuloAnfotero: rotulo,
+      formulaUsada: `Anfótero: cede un protón (Ka${SUBINDICES[n + 1]}) y acepta otro (Kb = Kw/Ka${SUBINDICES[n]}). Balance de cargas de su sal con todas las constantes de la familia y Kw`,
     };
   }
 
   const constantes = constantesDe(especie);
   if (!constantes) return null;
   const k = especie.tipo === 'acido' ? constantes.ka : constantes.kb;
-
-  // Raíz positiva de x² + K·x − K·C = 0
-  const exacto = (-k + Math.sqrt(k * k + 4 * k * concentracion)) / 2;
   const aproximado = Math.sqrt(k * concentracion);
   const porcentaje = (aproximado / concentracion) * 100;
-
-  if (especie.tipo === 'acido') {
-    const ph = -Math.log10(exacto);
-    return {
-      ph,
-      poh: PKW - ph,
-      concentracionIon: exacto,
-      valorAproximado: aproximado,
-      porcentajeDisociacion: (exacto / concentracion) * 100,
-      aproximacionValida: porcentaje <= 5,
-      formulaUsada: 'Ka = x² / (C − x), con x = [H₃O⁺] y pH = −log x',
-      avisoDilucion: exacto < 1e-6,
-    };
-  }
-
-  const poh = -Math.log10(exacto);
+  // Lo que aporta la propia especie: el ion total menos el que pone el agua.
+  const aporte = Math.max(0, ion - KW / ion);
+  const aproximacion: Aproximacion =
+    porcentaje > 5 ? 'disociacion' : Math.abs(aproximado - ion) / ion > 0.05 ? 'agua' : 'valida';
+  const notaFamilia = sistema.kas.length > 1 ? '; las demás disociaciones de la familia también entran' : '';
   return {
-    ph: PKW - poh,
-    poh,
-    concentracionIon: exacto,
+    ...base,
     valorAproximado: aproximado,
-    porcentajeDisociacion: (exacto / concentracion) * 100,
-    aproximacionValida: porcentaje <= 5,
-    formulaUsada: 'Kb = x² / (C − x), con x = [OH⁻], pOH = −log x y pH = 14 − pOH',
-    avisoDilucion: exacto < 1e-6,
+    porcentajeDisociacion: (aporte / concentracion) * 100,
+    aproximacion,
+    formulaUsada:
+      especie.tipo === 'acido'
+        ? `Ka = x² / (C − x), con x = [H₃O⁺], resuelto con el balance de cargas, que incluye el agua: [H₃O⁺] = Ka·C/([H₃O⁺] + Ka) + Kw/[H₃O⁺]${notaFamilia}`
+        : `Kb = x² / (C − x), con x = [OH⁻], resuelto con el balance de cargas, que incluye el agua: [OH⁻] = Kb·C/([OH⁻] + Kb) + Kw/[OH⁻]; pH = 14 − pOH${notaFamilia}`,
   };
 }
 
@@ -1341,12 +1432,19 @@ export default function TablaKaKbPage() {
     const base = parseSpanishNumber(concBaseTexto);
     if (!Number.isFinite(acido) || !Number.isFinite(base) || acido <= 0 || base <= 0) return null;
     const proporcion = base / acido;
-    const ph = constantes.pka + Math.log10(proporcion);
+    // Henderson-Hasselbalch es la aproximación; el pH que se da es el del balance de cargas de
+    // la mezcla (hallazgo 4119: con el TCA 0,1/0,1, 0,66 frente a 1,24).
+    const phHenderson = constantes.pka + Math.log10(proporcion);
+    const sistema = sistemaDe(especieTampon);
+    const ph = phDeTampon(sistema.kas, sistema.q, acido, base);
     return {
       pka: constantes.pka,
       proporcion,
       ph,
-      dentroDeRango: proporcion >= 0.1 && proporcion <= 10,
+      phHenderson,
+      // Más de 0,05 de diferencia ya cambia la cifra que se pinta con dos decimales.
+      hendersonNoSirve: Math.abs(ph - phHenderson) > 0.05,
+      dentroDeRango: proporcionEnRangoUtil(proporcion),
       minimo: constantes.pka - 1,
       maximo: constantes.pka + 1,
     };
@@ -1385,7 +1483,7 @@ export default function TablaKaKbPage() {
         </h1>
         <p className={styles.subtitle}>
           {ESPECIES.length} entradas a 25 °C con su equilibrio escrito, Ka, pKa, la especie
-          conjugada y su Kb. Incluye calculadora de pH con control de la aproximación del 5 % y
+          conjugada y su Kb. Incluye calculadora de pH con control de la aproximación del 5 % y
           calculadora de disolución reguladora con Henderson-Hasselbalch.
         </p>
       </header>
@@ -1605,7 +1703,7 @@ export default function TablaKaKbPage() {
                       <div className={styles.avisoFuerte}>
                         <p>
                           <strong>Electrolito fuerte.</strong> En agua se disocia prácticamente al
-                          100 %, así que su constante no tiene sentido práctico: el disolvente
+                          100 %, así que su constante no tiene sentido práctico: el disolvente
                           «nivela» a todos estos ácidos al ion H₃O⁺ y no permite distinguirlos.
                           <span>{typeof especie.pkaNominal === 'number' && (
                             <span>
@@ -1653,8 +1751,9 @@ export default function TablaKaKbPage() {
         </h2>
         <p className={styles.calcIntro}>
           Elige una especie de la tabla e introduce su concentración molar. El cálculo resuelve el
-          equilibrio completo y comprueba si la aproximación habitual, x = √(K·C), era admisible
-          según la regla del 5 %.
+          equilibrio completo, con la autoionización del agua y, en los polipróticos, todas las
+          constantes de la familia, y comprueba si la aproximación habitual, x = √(K·C), era
+          admisible según la regla del 5 %.
         </p>
 
         <div className={styles.calcGrid}>
@@ -1714,7 +1813,7 @@ export default function TablaKaKbPage() {
                 {resultadoPh.porcentajeDisociacion !== null && (
                   <div>
                     <dt>Grado de disociación</dt>
-                    <dd>{formatNumber(resultadoPh.porcentajeDisociacion, 2)} %</dd>
+                    <dd>{formatNumber(resultadoPh.porcentajeDisociacion, 2)} %</dd>
                   </div>
                 )}
                 {resultadoPh.valorAproximado !== null && (
@@ -1723,30 +1822,55 @@ export default function TablaKaKbPage() {
                     <dd>{notacionCientifica(resultadoPh.valorAproximado, 2)} M</dd>
                   </div>
                 )}
+                {resultadoPh.phAnfotero !== null && (
+                  <div>
+                    <dt>pH con la aproximación {resultadoPh.rotuloAnfotero}</dt>
+                    <dd>{formatNumber(resultadoPh.phAnfotero, 2)}</dd>
+                  </div>
+                )}
               </dl>
 
-              {resultadoPh.aproximacionValida === true && (
+              {resultadoPh.aproximacion === 'valida' && (
                 <p className={styles.notaOk}>
                   <span aria-hidden="true">✅</span> <strong>Aproximación válida.</strong> La
-                  especie disociada representa menos del 5 % de la concentración inicial, así que
-                  suponer C − x ≈ C es correcto y el resultado coincide con el exacto en las cifras
-                  que se muestran.
+                  especie disociada representa menos del 5{' '}% de la concentración inicial,
+                  así que suponer C − x ≈ C es admisible: el valor aproximado se aparta del exacto
+                  menos de un 5{' '}%, el margen que acepta la regla, y por eso puede diferir
+                  en la última cifra que se muestra.
                 </p>
               )}
-              {resultadoPh.aproximacionValida === false && (
+              {resultadoPh.aproximacion === 'disociacion' && (
                 <p className={styles.notaAviso}>
                   <span aria-hidden="true">⚠️</span> <strong>Aproximación no válida.</strong> La
-                  disociación supera el 5 %, así que no puede suponerse C − x ≈ C. Hay que resolver
-                  la ecuación de segundo grado x² + K·x − K·C = 0 y tomar la raíz positiva: es
-                  justo lo que hace el valor de pH mostrado arriba. En un examen, indícalo
-                  expresamente y desarrolla la ecuación completa.
+                  disociación supera el 5{' '}%, así que no puede suponerse C − x ≈ C. Hay que
+                  resolver la ecuación de segundo grado x² + K·x − K·C = 0 y tomar la raíz
+                  positiva: el pH mostrado arriba sale de ese cálculo completo. En un examen,
+                  indícalo expresamente y desarrolla la ecuación completa.
                 </p>
               )}
-              {resultadoPh.avisoDilucion && (
+              {resultadoPh.aproximacion === 'agua' && (
                 <p className={styles.notaAviso}>
-                  <span aria-hidden="true">⚠️</span> A concentraciones tan bajas, los iones
-                  procedentes de la propia autoionización del agua (10⁻⁷ M) dejan de ser
-                  despreciables y el pH real se acerca a 7. El modelo empleado aquí no los incluye.
+                  <span aria-hidden="true">⚠️</span> <strong>Aproximación no válida.</strong> La
+                  especie se disocia poco, pero aporta tan pocos iones que los del agua pesan tanto
+                  como ella: √(K·C) se queda lejos del valor real. Hay que plantear el balance de
+                  cargas con Kw, que es de donde sale el pH mostrado arriba.
+                </p>
+              )}
+              {resultadoPh.phAnfotero !== null &&
+                Math.abs(resultadoPh.phAnfotero - resultadoPh.ph) > 0.05 && (
+                  <p className={styles.notaAviso}>
+                    <span aria-hidden="true">⚠️</span> La aproximación {resultadoPh.rotuloAnfotero}{' '}
+                    no sirve aquí: solo vale cuando la concentración es mucho mayor que las dos
+                    constantes y que Kw entre la segunda. El pH mostrado arriba sale del balance de
+                    cargas completo.
+                  </p>
+                )}
+              {resultadoPh.avisoAgua && (
+                <p className={styles.notaAviso}>
+                  <span aria-hidden="true">⚠️</span> La especie aporta tan pocos iones que los de
+                  la autoionización del agua (10⁻⁷ M) ya no son despreciables. El cálculo los
+                  incluye (balance de cargas con Kw): por eso el pH se queda cerca de 7 y nunca
+                  cruza al otro lado de la neutralidad.
                 </p>
               )}
             </>
@@ -1761,8 +1885,9 @@ export default function TablaKaKbPage() {
         </h2>
         <p className={styles.calcIntro}>
           Una disolución reguladora contiene a la vez un ácido débil y su base conjugada, y
-          mantiene el pH casi constante frente a pequeñas adiciones de ácido o de base. Se calcula
-          con la ecuación de Henderson-Hasselbalch:
+          mantiene el pH casi constante frente a pequeñas adiciones de ácido o de base. La app
+          resuelve el balance de cargas de la mezcla y lo compara con la ecuación de
+          Henderson-Hasselbalch, su aproximación habitual:
         </p>
         <div className={styles.formulaBox}>pH = pKa + log ( [base conjugada] / [ácido] )</div>
 
@@ -1833,7 +1958,7 @@ export default function TablaKaKbPage() {
                   <dd>
                     pH = {formatNumber(resultadoTampon.pka, 2)} + log(
                     {formatNumber(resultadoTampon.proporcion, 2)}) ={' '}
-                    {formatNumber(resultadoTampon.ph, 2)}
+                    {formatNumber(resultadoTampon.phHenderson, 2)}
                   </dd>
                 </div>
                 <div>
@@ -1860,10 +1985,22 @@ export default function TablaKaKbPage() {
                   otro par conjugado cuyo pKa esté más cerca del valor deseado.
                 </p>
               )}
+              {resultadoTampon.hendersonNoSirve && (
+                <p className={styles.notaAviso}>
+                  <span aria-hidden="true">⚠️</span> <strong>Henderson-Hasselbalch no sirve
+                  aquí.</strong> Con estas concentraciones, el ácido se disocia (o la base se
+                  protona) en una cantidad comparable a la que hay en la mezcla, y la ecuación da{' '}
+                  {formatNumber(resultadoTampon.phHenderson, 2)} en vez de{' '}
+                  {formatNumber(resultadoTampon.ph, 2)}. Pasa con los ácidos de Ka grande y con los
+                  tampones muy diluidos o muy desequilibrados.
+                </p>
+              )}
               <p className={styles.notaNeutra}>
-                La ecuación usa concentraciones en el equilibrio y supone que ambas son bastante
-                mayores que la cantidad disociada, algo razonable en tampones por encima de 0,01 M.
-                Tampoco tiene en cuenta la fuerza iónica, que en disoluciones concentradas desplaza
+                El pH del tampón sale del balance de cargas de la mezcla, sin aproximar.
+                Henderson-Hasselbalch supone que las concentraciones de ácido y base apenas cambian
+                al disociarse, algo que se cumple cuando las dos son bastante mayores que la
+                cantidad disociada; si no, se aparta del valor real y la app lo avisa. Ninguno de
+                los dos tiene en cuenta la fuerza iónica, que en disoluciones concentradas desplaza
                 el pH unas décimas.
               </p>
             </>
@@ -2041,7 +2178,7 @@ export default function TablaKaKbPage() {
             <div className={styles.faqItem}>
               <h4>¿Cuándo puedo usar la fórmula rápida pH = ½(pKa − log C)?</h4>
               <p>
-                Solo cuando la aproximación del 5 % es válida, es decir, cuando la cantidad
+                Solo cuando la aproximación del 5 % es válida, es decir, cuando la cantidad
                 disociada es pequeña frente a la concentración inicial. Esa expresión no es más que
                 x = √(Ka·C) escrita en forma logarítmica. Falla con ácidos relativamente fuertes
                 (Ka del orden de 10⁻² o mayor) y con disoluciones muy diluidas; la calculadora de
@@ -2049,7 +2186,7 @@ export default function TablaKaKbPage() {
               </p>
               <p className={styles.faqTip}>
                 <span aria-hidden="true">💡</span> Comprueba siempre el porcentaje después de
-                calcular: si supera el 5 %, resuelve la ecuación de segundo grado.
+                calcular: si supera el 5 %, resuelve la ecuación de segundo grado.
               </p>
             </div>
             <div className={styles.faqItem}>
@@ -2134,10 +2271,10 @@ export default function TablaKaKbPage() {
             <div className={styles.step}>
               <div className={styles.stepNumber}>4</div>
               <div className={styles.stepContent}>
-                <strong>Aproxima y comprueba la regla del 5 %</strong>
+                <strong>Aproxima y comprueba la regla del 5 %</strong>
                 <p>
                   Supón C − x ≈ C, calcula x = √(Ka·C) y mira qué porcentaje de C representa. Si es
-                  menor o igual al 5 %, la aproximación se acepta. Si no, resuelve x² + Ka·x − Ka·C
+                  menor o igual al 5 %, la aproximación se acepta. Si no, resuelve x² + Ka·x − Ka·C
                   = 0 con la fórmula cuadrática y quédate con la raíz positiva.
                 </p>
               </div>

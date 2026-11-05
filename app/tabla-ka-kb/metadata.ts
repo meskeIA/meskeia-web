@@ -46,7 +46,7 @@ export const metadata: Metadata = {
 export const jsonLd = generateWebAppSchema({
   name: 'Tabla de Constantes de Acidez y Basicidad (Ka, Kb, pKa, pKb)',
   description:
-    'Tabla de consulta con las constantes de acidez y basicidad a 25 °C de ácidos fuertes, ácidos débiles inorgánicos y orgánicos, ácidos polipróticos con sus constantes sucesivas, bases fuertes, bases débiles y bases conjugadas. Cada entrada incluye el equilibrio de disociación escrito, Ka, pKa, la especie conjugada con su Kb y pKb, y la comprobación numérica de la relación Ka·Kb = Kw. Incorpora una calculadora de pH con control de la aproximación del 5 % y una calculadora de disolución reguladora con la ecuación de Henderson-Hasselbalch.',
+    'Tabla de consulta con las constantes de acidez y basicidad a 25 °C de ácidos fuertes, ácidos débiles inorgánicos y orgánicos, ácidos polipróticos con sus constantes sucesivas, bases fuertes, bases débiles y bases conjugadas. Cada entrada incluye el equilibrio de disociación escrito, Ka, pKa, la especie conjugada con su Kb y pKb, y la comprobación numérica de la relación Ka·Kb = Kw. Incorpora una calculadora de pH con control de la aproximación del 5 % y una calculadora de disolución reguladora con la ecuación de Henderson-Hasselbalch.',
   url: 'https://meskeia.com/tabla-ka-kb/',
   category: 'EducationalApplication',
   features: [
@@ -54,10 +54,10 @@ export const jsonLd = generateWebAppSchema({
     'Constantes a 25 °C organizadas en 7 categorías filtrables',
     'Equilibrio de disociación escrito en cada entrada',
     'Par conjugado con su Kb y pKb, y comprobación de Ka·Kb = Kw',
-    'Calculadora de pH con aproximación del 5 % y aviso cuando no es válida',
+    'Calculadora de pH con aproximación del 5 % y aviso cuando no es válida',
     'Calculadora de disolución reguladora con Henderson-Hasselbalch y rango útil pKa ± 1',
     'Indicador de fuerza en escala de pKa legible sin depender del color',
-    'Funciona 100 % en el navegador, sin registro ni instalación',
+    'Funciona 100 % en el navegador, sin registro ni instalación',
   ],
   keywords: ['tabla ka kb', 'constante de acidez', 'pka', 'henderson-hasselbalch', 'pH'],
 });
@@ -79,7 +79,7 @@ export const faqJsonLd = {
       name: '¿Cómo se calcula el pH de un ácido débil conociendo su Ka?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Para un ácido monoprótico HA de concentración C se plantea Ka = x²/(C − x), donde x es [H₃O⁺]. Si la disociación es pequeña se aproxima C − x ≈ C y queda x = √(Ka·C), con pH = −log x. La aproximación se acepta cuando x resulta menor que el 5 % de C; si lo supera, hay que resolver la ecuación de segundo grado x² + Ka·x − Ka·C = 0 y quedarse con la raíz positiva.',
+        text: 'Para un ácido monoprótico HA de concentración C se plantea Ka = x²/(C − x), donde x es [H₃O⁺]. Si la disociación es pequeña se aproxima C − x ≈ C y queda x = √(Ka·C), con pH = −log x. La aproximación se acepta cuando x resulta menor que el 5 % de C; si lo supera, hay que resolver la ecuación de segundo grado x² + Ka·x − Ka·C = 0 y quedarse con la raíz positiva.',
       },
     },
     {
@@ -87,7 +87,7 @@ export const faqJsonLd = {
       name: '¿Por qué los ácidos fuertes no tienen un valor de Ka útil en agua?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Porque HCl, HBr, HI, HNO₃, HClO₄ y la primera disociación del H₂SO₄ se disocian prácticamente al 100 %, de modo que en disolución acuosa todos quedan convertidos en H₃O⁺ y no se distinguen entre sí. Es el efecto nivelador del disolvente: el agua no puede diferenciar ácidos más fuertes que el ion hidronio. Sus Ka aparecen tabuladas como valores muy grandes y aproximados, medidos en disolventes menos básicos que el agua.',
+        text: 'Porque HCl, HBr, HI, HNO₃, HClO₄ y la primera disociación del H₂SO₄ se disocian prácticamente al 100 %, de modo que en disolución acuosa todos quedan convertidos en H₃O⁺ y no se distinguen entre sí. Es el efecto nivelador del disolvente: el agua no puede diferenciar ácidos más fuertes que el ion hidronio. Sus Ka aparecen tabuladas como valores muy grandes y aproximados, medidos en disolventes menos básicos que el agua.',
       },
     },
     {
