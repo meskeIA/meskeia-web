@@ -279,6 +279,46 @@ export function calcularBitrateVideo(
   };
 }
 
+export const RESOLUCIONES_VIDEO: TipoResolucionVideo[] = ['8k', '4k', '2k', '1080p', '720p', '480p'];
+export const CODECS_VIDEO: TipoCodecVideo[] = ['h264', 'h265', 'prores422', 'raw'];
+
+export type ParametrosBitrateValidados =
+  | { ok: true; resolucion: TipoResolucionVideo; fps: number; duracion_min: number; codec: TipoCodecVideo }
+  | { ok: false; error: string };
+
+const esPositivo = (v: unknown): v is number => typeof v === 'number' && Number.isFinite(v) && v > 0;
+
+/**
+ * Valida la entrada de la ruta app/api/chatgpt/bitrate-video, con el mismo criterio que la tool MCP
+ * calcular_bitrate_video (z.number().positive()). Hasta el 05/11/2026 la ruta solo rechazaba fps o
+ * duración nulos: un 0 lo paraba por falsy, pero −10 min daba tamaños negativos y «abc» un NaN
+ * (cabo C0626).
+ */
+export function validarParametrosBitrate(body: unknown): ParametrosBitrateValidados {
+  const b = (body && typeof body === 'object' ? body : {}) as Record<string, unknown>;
+  const { resolucion, fps, duracion_min } = b;
+  const codec = b.codec ?? 'h264';
+
+  if (resolucion === undefined || fps === undefined || duracion_min === undefined)
+    return { ok: false, error: 'Faltan parámetros: resolucion, fps y duracion_min son obligatorios.' };
+  if (typeof resolucion !== 'string' || !RESOLUCIONES_VIDEO.includes(resolucion as TipoResolucionVideo))
+    return { ok: false, error: `resolucion debe ser: ${RESOLUCIONES_VIDEO.join(', ')}` };
+  if (typeof codec !== 'string' || !CODECS_VIDEO.includes(codec as TipoCodecVideo))
+    return { ok: false, error: `codec debe ser: ${CODECS_VIDEO.join(', ')}` };
+  if (!esPositivo(fps))
+    return { ok: false, error: 'fps debe ser un número mayor que 0.' };
+  if (!esPositivo(duracion_min))
+    return { ok: false, error: 'duracion_min debe ser un número mayor que 0.' };
+
+  return {
+    ok: true,
+    resolucion: resolucion as TipoResolucionVideo,
+    fps,
+    duracion_min,
+    codec: codec as TipoCodecVideo,
+  };
+}
+
 /** Bitrate en formato español para presentarlo («16.000», «24,8»). */
 export function formatearMbps(mbps: number): string {
   return cifra(mbps, 1);

@@ -1,5 +1,6 @@
 import { test, expect, Page, Locator } from '@playwright/test';
 import { esperarHidratacion, esperarValorEnReact, esperarPaginaAsentada } from './_hidratacion';
+import { validarParametrosBitrate, calcularBitrateVideo } from '../../lib/calculadoras/videografia';
 
 /**
  * Inspector — calculadora-bitrate-video (segmento motor · riesgo 3)
@@ -438,3 +439,51 @@ for (const nombre of ['Resolución', 'Fotogramas por segundo (fps)', 'Códec']) 
     await expect(grupo).not.toHaveAttribute('aria-label');
   });
 }
+
+/**
+ * Cabo C0626 (inspector 04/11/2026) — la API de ChatGPT (app/api/chatgpt/bitrate-video/route.ts)
+ * solo rechazaba fps o duración NULOS: «!fps» paraba el 0, pero −10 min pasaba y el motor daba un
+ * tamaño negativo, y «abc» daba NaN. La tool MCP ya exigía z.number().positive(). Desde el
+ * 05/11/2026 la ruta valida con validarParametrosBitrate, del motor, con el mismo criterio que la
+ * tool. Se prueba la función y no la ruta: cada petición a la ruta inserta una fila en Turso.
+ */
+test.describe('C0626 · validación de la API de ChatGPT (sin navegador)', () => {
+  const valido = { resolucion: '1080p', fps: 25, duracion_min: 45, codec: 'h265' };
+
+  test('una entrada válida pasa, y sin códec toma H.264', () => {
+    expect(validarParametrosBitrate(valido)).toEqual({ ok: true, ...valido });
+    const { codec: _sin, ...sinCodec } = valido;
+    void _sin;
+    const r = validarParametrosBitrate(sinCodec);
+    expect(r.ok && r.codec).toBe('h264');
+  });
+
+  for (const [campo, valor] of [
+    ['duracion_min', -10], ['duracion_min', 0], ['duracion_min', 'abc'], ['duracion_min', '45'],
+    ['duracion_min', Number.POSITIVE_INFINITY], ['fps', -30], ['fps', 0], ['fps', null],
+  ] as const) {
+    test(`${campo} = ${String(valor)}: se rechaza con un error que nombra el campo`, () => {
+      const r = validarParametrosBitrate({ ...valido, [campo]: valor });
+      expect(r.ok).toBe(false);
+      expect(!r.ok && r.error).toContain(campo);
+    });
+  }
+
+  test('falta un parámetro, resolución o códec desconocidos: error', () => {
+    const { fps: _f, ...sinFps } = valido;
+    void _f;
+    expect(validarParametrosBitrate(sinFps).ok).toBe(false);
+    expect(validarParametrosBitrate({ ...valido, resolucion: '1440p' }).ok).toBe(false);
+    expect(validarParametrosBitrate({ ...valido, codec: 'vp9' }).ok).toBe(false);
+    expect(validarParametrosBitrate(null).ok).toBe(false);
+  });
+
+  test('lo que la validación deja pasar no da nunca un tamaño negativo ni NaN', () => {
+    const r = validarParametrosBitrate({ ...valido, duracion_min: 0.01, fps: 1 });
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    const c = calcularBitrateVideo(r.resolucion, r.fps, r.duracion_min, r.codec);
+    expect(Number.isFinite(c.tamano_gb) && c.tamano_gb >= 0).toBe(true);
+    expect(c.tamano_formateado).not.toMatch(/-|NaN/);
+  });
+});

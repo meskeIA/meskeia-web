@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { calcularBitrateVideo, type TipoResolucionVideo, type TipoCodecVideo } from '@/lib/calculadoras/videografia';
+import { calcularBitrateVideo, validarParametrosBitrate, CODECS_VIDEO } from '@/lib/calculadoras/videografia';
 import { getTursoClient, initializeDatabase } from '@/lib/turso';
 
 const ALLOWED_ORIGINS = ['https://chat.openai.com', 'https://chatgpt.com'];
@@ -16,24 +16,15 @@ export async function OPTIONS(req: NextRequest) {
 export async function POST(req: NextRequest) {
   const origin = req.headers.get('origin');
   try {
-    const body = await req.json();
-    const resolucion: TipoResolucionVideo = body.resolucion;
-    const fps: number = body.fps;
-    const duracion_min: number = body.duracion_min;
-    const codec: TipoCodecVideo = body.codec ?? 'h264';
-
-    if (!resolucion || !fps || !duracion_min)
-      return NextResponse.json({ error: 'Faltan parámetros: resolucion, fps y duracion_min son obligatorios.' }, { status: 400, headers: corsHeaders(origin) });
-
-    const validResolutions: TipoResolucionVideo[] = ['8k', '4k', '2k', '1080p', '720p', '480p'];
-    const validCodecs: TipoCodecVideo[] = ['h264', 'h265', 'prores422', 'raw'];
-    if (!validResolutions.includes(resolucion))
-      return NextResponse.json({ error: `resolucion debe ser: ${validResolutions.join(', ')}` }, { status: 400, headers: corsHeaders(origin) });
-    if (!validCodecs.includes(codec))
-      return NextResponse.json({ error: `codec debe ser: ${validCodecs.join(', ')}` }, { status: 400, headers: corsHeaders(origin) });
+    const body: unknown = await req.json();
+    // La validación vive en el motor para poder probarla sin llamar a la ruta (cabo C0626)
+    const v = validarParametrosBitrate(body);
+    if (!v.ok)
+      return NextResponse.json({ error: v.error }, { status: 400, headers: corsHeaders(origin) });
+    const { resolucion, fps, duracion_min, codec } = v;
 
     const r = calcularBitrateVideo(resolucion, fps, duracion_min, codec);
-    const comparativa = validCodecs.map(c => {
+    const comparativa = CODECS_VIDEO.map(c => {
       const rc = calcularBitrateVideo(resolucion, fps, duracion_min, c);
       return { codec: c, bitrate_mbps: rc.bitrate_mbps, tamano: rc.tamano_formateado };
     });
