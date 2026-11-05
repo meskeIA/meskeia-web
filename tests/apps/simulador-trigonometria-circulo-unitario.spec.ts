@@ -1345,7 +1345,8 @@ test.describe('S0232 · círculo trigonométrico completo', () => {
  *      práctica de 210° (7π/6 = 3,6652) es 3,665. Ninguna respuesta de la app pasa de 1.000, así
  *      que la lectura de millares nunca es la buena aquí.
  *
- *   HALLAZGO (operativa, medio, ABIERTO) · en papel Carta la hoja en blanco no cabe en una página:
+ *   HALLAZGO 4134 (operativa, medio, REPARADO el 05/11/2026: el círculo en blanco baja a 134 mm)
+ *   · en papel Carta la hoja en blanco no cabía en una página:
  *   título 7,3 mm + instrucciones 12,4 mm + círculo 140 mm + tabla 79,3 mm + rellenos = 260,0 mm,
  *   y el alto útil de la Carta con el margen de @page (10 mm) es 279,4 − 20 = 259,4 mm. Como
  *   `.ccTablas` lleva `break-inside: avoid`, la tabla salta ENTERA a la página 2 y el solucionario
@@ -1473,12 +1474,11 @@ test.describe('Inspección 05/11/2026 · círculo completo (S0232)', () => {
     expect(await imprimirHoja(page, 'En blanco, para rellenar', 'A4')).toBe(2);
   });
 
-  test('HALLAZGO (05/11/2026, ABIERTO) · en Carta la hoja en blanco no cabe en una página y salen 3', async ({ page }) => {
-    // DEBERÍA: 2 páginas, como en A4 (círculo y tabla juntos, y el solucionario aparte).
-    // HOY: 3. La primera página de la hoja mide 260,0 mm y la Carta deja 259,4 mm útiles con el
-    // margen de @page; la tabla (break-inside: avoid) se va sola a la página 2 y el solucionario
-    // a la 3. Ver la cabecera de este bloque.
-    test.fail();
+  test('HALLAZGO 4134 (05/11/2026, REPARADO) · en Carta la hoja en blanco y su solucionario salen en 2 páginas', async ({ page }) => {
+    // 2 páginas, como en A4 (círculo y tabla juntos, y el solucionario aparte). Antes, 3: la
+    // primera página medía 260,0 mm y la Carta deja 259,4 mm útiles con el margen de @page; la
+    // tabla (break-inside: avoid) se iba sola a la página 2 y el solucionario a la 3. Reparado
+    // bajando el círculo en blanco de 140 a 134 mm (cabecera de este bloque).
     await page.goto(RUTA);
     await esperarHidratacion(page, ['#slider-angulo']);
     expect(await imprimirHoja(page, 'En blanco, para rellenar', 'Letter')).toBe(2);

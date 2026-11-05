@@ -1637,10 +1637,15 @@
     fill: #000000 !important;
   }
 
-  /* Círculo y tabla caben juntos en la página: 140 + 81 mm, más el título */
+  /*
+   * Círculo y tabla caben juntos en la página, también en Carta: 134 + 79 mm, más título e
+   * instrucciones, suman unos 254 mm, y la Carta deja 279,4 − 20 = 259,4 mm útiles con el margen
+   * de @page. Con 140 mm sumaban 260,0: en Carta la tabla (break-inside: avoid) saltaba entera a
+   * la página 2 y el solucionario a la 3 (hallazgo 4134, 05/11/2026; en A4 sobraban 17 mm).
+   */
   .hojaCirculo .completoSvgBlanco {
     max-width: none;
-    max-height: 140mm;
+    max-height: 134mm;
   }
 
   .hojaCirculo .ccTablas {
