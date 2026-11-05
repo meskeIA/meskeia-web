@@ -336,6 +336,9 @@ const APPS: Record<string, () => Pregunta[]> = {
   // (y V₁ ≤ V₂, factor ≥ 1), y ninguna respuesta suya queda a menos de una tolerancia de ella, así
   // que esta sonda no encuentra nada que probar. Que rechacen un negativo con su motivo lo exigen
   // sus specs (tests/apps/simulador-disoluciones.spec.ts y simulador-osmosis-casos.spec.ts).
+  // Fuera también codigo-colores-resistencias (05/11/2026): todas sus respuestas son exactas
+  // (tolerancia 0), así que ningún imposible puede caer dentro del margen. Que rechace un 101 %
+  // de tolerancia y 2,5 ceros lo exige tests/apps/codigo-colores-resistencias.spec.ts.
   // Solo las claves: los mensajes son texto y se comparan normalizados.
   'simulador-cifrado-cesar': () =>
     [...cesar.CASOS, ...SEMILLAS.map((s) => cesar.generarEjercicioAleatorio(s))]

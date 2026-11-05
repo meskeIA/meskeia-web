@@ -33,6 +33,7 @@ import {
   type PapelBanda,
 } from '@/lib/calculadoras/codigoColoresResistencias';
 import { PREGUNTAS_FRECUENTES } from './metadata';
+import CasosAula from './CasosAula';
 
 const NBSP = ' ';
 
@@ -473,6 +474,8 @@ export default function CodigoColoresResistenciasPage() {
           )}
         </section>
       )}
+
+      <CasosAula />
 
       <EducationalSection
         title="El código de colores, explicado"

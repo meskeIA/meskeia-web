@@ -463,6 +463,179 @@
   white-space: nowrap;
 }
 
+/* ─── Casos para clase ─── */
+.casosSection {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+  margin-bottom: var(--spacing-xl);
+}
+
+.casosTitulo {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0 0 var(--spacing-sm);
+  color: var(--text-primary);
+}
+
+.casosIntro {
+  margin: 0 0 var(--spacing-md);
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.casosNav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: var(--spacing-lg);
+}
+
+.casoBoton {
+  min-width: 40px;
+  padding: 0.45rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.casoBoton:hover {
+  border-color: var(--primary);
+}
+
+.casoBotonPractica {
+  padding: 0.45rem 0.9rem;
+}
+
+.casoBotonActivo,
+.casoBotonActivo:hover {
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
+  color: #ffffff;
+}
+
+.casoCuerpo {
+  padding: var(--spacing-lg);
+  border-radius: var(--radius);
+  background: var(--hover);
+}
+
+.casoTitulo {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin: 0 0 var(--spacing-sm);
+  color: var(--text-primary);
+}
+
+.casoEnunciado {
+  margin: 0 0 var(--spacing-md);
+  line-height: 1.6;
+  color: var(--text-primary);
+}
+
+.casoRespuesta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: var(--spacing-md);
+}
+
+.casoFila {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+.casoComprobar {
+  padding: 0.7rem 1.2rem;
+  border: none;
+  border-radius: var(--radius);
+  background: var(--primary-boton);
+  color: #ffffff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.casoVeredicto {
+  margin: 0 0 var(--spacing-md);
+  padding: var(--spacing-md);
+  border-radius: var(--radius);
+  font-weight: 600;
+}
+
+.casoOk {
+  background: rgba(22, 163, 74, 0.1);
+  border: 1px solid rgba(22, 163, 74, 0.4);
+  color: var(--verde-texto, #6ee7a0);
+}
+
+.casoKo {
+  background: rgba(220, 38, 38, 0.08);
+  border: 1px solid rgba(220, 38, 38, 0.4);
+  color: var(--rojo-texto, #ff8a80);
+}
+
+[data-theme='dark'] .casoOk {
+  color: #6ee7a0;
+}
+
+[data-theme='dark'] .casoKo {
+  color: #ff8a80;
+}
+
+.casoAyudas {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-sm);
+}
+
+.casoAyudaBoton {
+  padding: 0.45rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 0.88rem;
+  cursor: pointer;
+}
+
+.casoPista,
+.casoSolucion {
+  margin: var(--spacing-sm) 0 0;
+  padding: var(--spacing-md);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  line-height: 1.6;
+}
+
+.casoPasos {
+  margin: 0 0 var(--spacing-sm);
+  padding-left: 1.3rem;
+}
+
+.casoPasos li + li {
+  margin-top: 4px;
+}
+
+.casoResultado {
+  margin: 0;
+}
+
+.casoBoton:focus-visible,
+.casoComprobar:focus-visible,
+.casoAyudaBoton:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
 /* ─── Sección educativa (patrón v2.0) ─── */
 .guideSection {
   margin-bottom: var(--spacing-xl);
@@ -746,6 +919,10 @@
 
   .itemBanda {
     flex-wrap: wrap;
+  }
+
+  .casosSection {
+    padding: var(--spacing-lg) var(--spacing-md);
   }
 }
 
