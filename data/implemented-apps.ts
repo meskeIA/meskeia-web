@@ -355,7 +355,8 @@ export const implementedAppsUrls = [
   "/calculadora-movimiento/",
   "/simulador-fisica/",            // Simulador visual: caída libre, péndulo, proyectiles, ondas, resorte
   "/calculadora-electricidad/",
-  "/calculadora-resistencias-led/",  // Decodificador código de colores (4/5 bandas) + calculadora LED con E12
+  "/calculadora-resistencias-led/",  // Resistencia limitadora de un LED, valor E12 y sus colores
+  "/codigo-colores-resistencias/",   // Código de colores de 3, 4, 5 y 6 bandas, y del valor a los colores (S0251)
   "/glosario-fisica-quimica/",
   "/tabla-periodica/",
 

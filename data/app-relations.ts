@@ -3167,23 +3167,31 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'simulador-fisica': [{ url: '/calculadora-movimiento/', icon: '🚀', name: 'Calculadora Movimiento', description: 'MRU, MRUA, caída libre' }, { url: '/simulador-circuitos-electricos/', icon: '🔋', name: 'Circuitos Eléctricos', description: 'Serie, paralelo, Ohm, potencia' }, { url: '/calculadora-electricidad/', icon: '⚡', name: 'Electricidad', description: 'Ley de Ohm, potencia' }, { url: '/tabla-periodica/', icon: '⚗️', name: 'Tabla Periódica', description: 'Elementos químicos' }],
   'simulador-circuitos-electricos': [
     { url: '/calculadora-electricidad/', icon: '⚡', name: 'Electricidad', description: 'Ley de Ohm y potencia básica' },
-    { url: '/calculadora-resistencias-led/', icon: '🔴', name: 'Resistencias y LED', description: 'Código de colores y circuito LED' },
+    { url: '/codigo-colores-resistencias/', icon: '🌈', name: 'Código de Colores', description: 'El valor de una resistencia por sus bandas, y al revés' },
     { url: '/simulador-campo-electrico/', icon: '🧲', name: 'Campo Eléctrico', description: 'Cargas, líneas y equipotenciales' },
     { url: '/simulador-puertas-logicas/', icon: '🔌', name: 'Puertas Lógicas', description: 'Circuitos digitales y álgebra booleana' },
     { url: '/calculadora-seccion-cable/', icon: '🔌', name: 'Sección de Cable', description: 'La resistencia del conductor llevada al dimensionado real de una línea' },
   ],
   'calculadora-electricidad': [
-    { url: '/calculadora-resistencias-led/', icon: '🔴', name: 'Resistencias y LED', description: 'Código de colores y circuitos LED' },
+    { url: '/codigo-colores-resistencias/', icon: '🌈', name: 'Código de Colores', description: 'Lee resistencias de 3 a 6 bandas' },
+    { url: '/calculadora-resistencias-led/', icon: '💡', name: 'Resistencia para LED', description: 'Qué resistencia lleva un LED y sus colores' },
     { url: '/simulador-circuitos-electricos/', icon: '🔋', name: 'Circuitos Eléctricos', description: 'Serie, paralelo, hasta 6 resistencias' },
     { url: '/simulador-fisica/', icon: '🔬', name: 'Simulador Física', description: 'Simulaciones visuales' },
     { url: '/calculadora-gasto-energetico/', icon: '⚡', name: 'Gasto Energético', description: 'Consumo eléctrico' },
     { url: '/calculadora-seccion-cable/', icon: '🔌', name: 'Sección de Cable', description: 'Qué sección en mm² necesita la línea y cuánta tensión pierde por el camino' },
   ],
   'calculadora-resistencias-led': [
+    { url: '/codigo-colores-resistencias/', icon: '🌈', name: 'Código de Colores', description: 'Lee cualquier resistencia por sus bandas, y al revés' },
     { url: '/calculadora-electricidad/', icon: '⚡', name: 'Calculadora Electricidad', description: 'Ley de Ohm, potencia y circuitos' },
     { url: '/simulador-circuitos-electricos/', icon: '🔋', name: 'Circuitos Eléctricos', description: 'Serie, paralelo, hasta 6 resistencias' },
     { url: '/calculadora-sistemas-numericos/', icon: '🔢', name: 'Sistemas Numéricos', description: 'Binario, hex, octal y bit a bit' },
     { url: '/calculadora-seccion-cable/', icon: '🔌', name: 'Sección de Cable', description: 'El mismo cálculo de caídas de tensión, a escala de instalación eléctrica' },
+  ],
+  'codigo-colores-resistencias': [
+    { url: '/calculadora-resistencias-led/', icon: '💡', name: 'Resistencia para LED', description: 'Qué resistencia lleva un LED, con sus colores' },
+    { url: '/simulador-circuitos-electricos/', icon: '🔋', name: 'Circuitos Eléctricos', description: 'Resistencias en serie y en paralelo' },
+    { url: '/calculadora-electricidad/', icon: '⚡', name: 'Calculadora de Electricidad', description: 'Ley de Ohm y potencia' },
+    { url: '/calculadora-seccion-cable/', icon: '🔌', name: 'Sección de Cable', description: 'La resistencia del conductor en una instalación real' },
   ],
   'calculadora-configuracion-electronica': [
     { url: '/tabla-periodica/', icon: '🧪', name: 'Tabla Periódica Interactiva', description: 'Los 118 elementos con sus propiedades, uno a uno' },

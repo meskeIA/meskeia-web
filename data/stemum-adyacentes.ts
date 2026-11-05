@@ -35,6 +35,7 @@ export const STEMUM_ADYACENTES: Record<string, string> = {
   // ── Física ──
   'calculadora-electricidad': 'fisica',
   'calculadora-resistencias-led': 'fisica',
+  'codigo-colores-resistencias': 'fisica',
   'conversor-unidades-rf': 'fisica',
   'generador-ondas': 'fisica',
   'generador-tonos': 'fisica',
