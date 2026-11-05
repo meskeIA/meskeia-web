@@ -218,10 +218,11 @@ export default function GeneradorUTMPage() {
 
           <div className={styles.formRow}>
             <div className={styles.formGroup}>
-              <label className={styles.label}>
+              <label htmlFor="utm-source" className={styles.label}>
                 utm_source <span className={styles.required}>*</span>
               </label>
               <select
+                id="utm-source"
                 className={styles.select}
                 value={params.source}
                 onChange={(e) => updateParam('source', e.target.value)}
@@ -242,10 +243,11 @@ export default function GeneradorUTMPage() {
             </div>
 
             <div className={styles.formGroup}>
-              <label className={styles.label}>
+              <label htmlFor="utm-medium" className={styles.label}>
                 utm_medium <span className={styles.required}>*</span>
               </label>
               <select
+                id="utm-medium"
                 className={styles.select}
                 value={params.medium}
                 onChange={(e) => updateParam('medium', e.target.value)}
