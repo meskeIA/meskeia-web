@@ -96,7 +96,7 @@ async function pestana(page: Page, nombre: string, testigo: string): Promise<voi
 /** La cifra de la tarjeta cuyo rótulo es exactamente `nombre`, en la pestaña visible. */
 function valorDe(page: Page, nombre: string): Locator {
   return page
-    .locator('[role="tabpanel"]')
+    .locator('[role="tabpanel"]:not([hidden])')
     .getByText(nombre, { exact: true })
     .locator('xpath=following-sibling::*[1]');
 }
@@ -109,13 +109,13 @@ async function punta(loc: Locator): Promise<[number, number]> {
   return [Number(await loc.getAttribute('x2')), Number(await loc.getAttribute('y2'))];
 }
 
-const mensajeDet = (page: Page): Locator => page.locator('[role="tabpanel"] [class*="detMensaje"]');
-const ae1 = (page: Page): Locator => page.locator('[role="tabpanel"] svg > line[stroke="#2E86AB"]');
-const ae2 = (page: Page): Locator => page.locator('[role="tabpanel"] svg > line[stroke="#48A9A6"]');
+const mensajeDet = (page: Page): Locator => page.locator('[role="tabpanel"]:not([hidden]) [class*="detMensaje"]');
+const ae1 = (page: Page): Locator => page.locator('[role="tabpanel"]:not([hidden]) svg > line[stroke="#2E86AB"]');
+const ae2 = (page: Page): Locator => page.locator('[role="tabpanel"]:not([hidden]) svg > line[stroke="#48A9A6"]');
 
 async function eigen(page: Page): Promise<{ l1: number; l2: number; v1: number[]; v2: number[] }> {
-  const valores = await page.locator('[role="tabpanel"] [class*="eigenValor"]').allTextContents();
-  const vectores = await page.locator('[role="tabpanel"] [class*="eigenVec"]').allTextContents();
+  const valores = await page.locator('[role="tabpanel"]:not([hidden]) [class*="eigenValor"]').allTextContents();
+  const vectores = await page.locator('[role="tabpanel"]:not([hidden]) [class*="eigenVec"]').allTextContents();
   return { l1: aNumero(valores[0]), l2: aNumero(valores[1]), v1: aVector(vectores[0]), v2: aVector(vectores[1]) };
 }
 
@@ -166,7 +166,7 @@ test.describe('Vectores 2D — producto escalar, módulos y ángulo', () => {
     expect(await leer(valorDe(page, 'u · v'))).toBeCloseTo(5, 2);
     expect(await leer(valorDe(page, '|u|'))).toBeCloseTo(5, 2);
     expect(await leer(valorDe(page, 'Ángulo'))).toBeCloseTo(71.6, 1);
-    await expect(page.locator('[role="tabpanel"]')).not.toContainText('NaN');
+    await expect(page.locator('[role="tabpanel"]:not([hidden])')).not.toContainText('NaN');
   });
 });
 
@@ -214,7 +214,7 @@ test.describe('Transformaciones — det(A) y vectores base transformados', () =>
     expect(await leer(valorDe(page, 'det(A)'))).toBeCloseTo(-1, 3);
     const [x2, y2] = await punta(ae2(page));
     expect([x2, y2]).toEqual([175, 205]);
-    await expect(page.locator('[role="tabpanel"] svg > path').last()).toHaveAttribute('stroke', 'rgba(231,76,60,0.5)');
+    await expect(page.locator('[role="tabpanel"]:not([hidden]) svg > path').last()).toHaveAttribute('stroke', 'rgba(231,76,60,0.5)');
   });
 
   test('singular [1 2; 0,5 1]: det 0 y el aviso de «no es invertible»', async ({ page }) => {
@@ -231,7 +231,7 @@ test.describe('Transformaciones — det(A) y vectores base transformados', () =>
     expect(await sembrarValorAcotado(page, T_A, 10)).toBe('3');
     expect(await sembrarValorAcotado(page, T_B, 'abc')).toBe('0');
     expect(await leer(valorDe(page, 'det(A)'))).toBeCloseTo(3, 3);
-    await expect(page.locator('[role="tabpanel"]')).not.toContainText('NaN');
+    await expect(page.locator('[role="tabpanel"]:not([hidden])')).not.toContainText('NaN');
   });
 });
 
@@ -248,7 +248,7 @@ test.describe('Determinante — el paralelogramo de las columnas', () => {
   test('inicial [2 1; 0 2]: det 4, área 4 y vértices (175,175) (235,175) (265,115) (205,115)', async ({ page }) => {
     expect(await leer(valorDe(page, 'det(A) = ad − bc'))).toBeCloseTo(4, 2);
     expect(await leer(valorDe(page, 'Área = |det|'))).toBeCloseTo(4, 2);
-    await expect(page.locator('[role="tabpanel"] svg > polygon')).toHaveAttribute(
+    await expect(page.locator('[role="tabpanel"]:not([hidden]) svg > polygon')).toHaveAttribute(
       'points',
       '175,175 235,175 265,115 205,115',
     );
@@ -262,7 +262,7 @@ test.describe('Determinante — el paralelogramo de las columnas', () => {
     expect(await leer(valorDe(page, 'det(A) = ad − bc'))).toBeCloseTo(-5, 2);
     expect(await leer(valorDe(page, 'Área = |det|'))).toBeCloseTo(5, 2);
     // v₁ = (1, 2) → (205, 115) · v₁ + v₂ = (4, 3) → (295, 85) · v₂ = (3, 1) → (265, 145)
-    const poligono = page.locator('[role="tabpanel"] svg > polygon');
+    const poligono = page.locator('[role="tabpanel"]:not([hidden]) svg > polygon');
     await expect(poligono).toHaveAttribute('points', '175,175 205,115 295,85 265,145');
     await expect(poligono).toHaveAttribute('fill', 'rgba(231,76,60,0.18)');
   });
@@ -292,7 +292,7 @@ test.describe('Eigenvalores — matriz simétrica [a b; b d]', () => {
     expect(e.v1[1]).toBeCloseTo(0.71, 2);
     expect(e.v2[0]).toBeCloseTo(0.71, 2);
     expect(e.v2[1]).toBeCloseTo(-0.71, 2);
-    const [x, y] = await punta(page.locator('[role="tabpanel"] svg g line[stroke="#E67E22"]').first());
+    const [x, y] = await punta(page.locator('[role="tabpanel"]:not([hidden]) svg g line[stroke="#E67E22"]').first());
     expect(x).toBeCloseTo(238.64, 1);
     expect(y).toBeCloseTo(111.36, 1);
   });
@@ -308,7 +308,7 @@ test.describe('Eigenvalores — matriz simétrica [a b; b d]', () => {
     expect(e.v1[1]).toBeCloseTo(0.45, 2);
     expect(e.v2[0]).toBeCloseTo(0.45, 2);
     expect(e.v2[1]).toBeCloseTo(-0.89, 2);
-    const [x, y] = await punta(page.locator('[role="tabpanel"] svg g line[stroke="#E67E22"]').last());
+    const [x, y] = await punta(page.locator('[role="tabpanel"]:not([hidden]) svg g line[stroke="#E67E22"]').last());
     expect(x).toBeCloseTo(134.75, 1);
     expect(y).toBeCloseTo(94.5, 1);
   });
@@ -355,7 +355,7 @@ test.describe('Formato español (cabo C0252)', () => {
     });
     const textos: string[] = [];
     const recoger = async (): Promise<void> => {
-      const panel = page.locator('[role="tabpanel"]');
+      const panel = page.locator('[role="tabpanel"]:not([hidden])');
       textos.push(
         ...(await panel.locator('[class*="metricaValor"], [class*="formulaBox"], [class*="eigenValor"], [class*="eigenVec"], [class*="matrizCeldas"] span').allTextContents()),
         ...(await panel.locator('label').allTextContents()),
@@ -377,7 +377,7 @@ test.describe('Formato español (cabo C0252)', () => {
     await pestana(page, 'Transformaciones', T_A);
     await expect(valorDe(page, 'det(A)')).toHaveText('1,000');
     await pestana(page, 'Eigenvalores', E_A);
-    await expect(page.locator('[role="tabpanel"] [class*="eigenVec"]').last()).toHaveText('v₂ = (0,71; -0,71)');
+    await expect(page.locator('[role="tabpanel"]:not([hidden]) [class*="eigenVec"]').last()).toHaveText('v₂ = (0,71; -0,71)');
   });
 });
 
@@ -407,7 +407,7 @@ test.describe('Transformaciones — una matriz singular es singular aunque la co
     expect([primera, segunda].map((m) => (m ?? '').includes('det = 0'))).toEqual([true, true]);
     await expect(valorDe(page, 'det(A)')).toHaveText('0,000');
     // La rejilla no se pinta en rojo («orientación invertida») con un det que es cero.
-    await expect(page.locator('[role="tabpanel"] svg > path').last()).toHaveAttribute('stroke', 'rgba(46,134,171,0.5)');
+    await expect(page.locator('[role="tabpanel"]:not([hidden]) svg > path').last()).toHaveAttribute('stroke', 'rgba(46,134,171,0.5)');
   });
 });
 
@@ -424,7 +424,7 @@ test.describe('Vectores — ángulo con un vector nulo', () => {
     await sembrarValor(page, U_Y, 0);
     expect(Number.isFinite(await leer(valorDe(page, 'Ángulo')))).toBe(false);
     await expect(valorDe(page, 'Ángulo')).toHaveText('No definido');
-    await expect(page.locator('[role="tabpanel"] [class*="formulaBox"]')).toContainText('con θ no definido');
+    await expect(page.locator('[role="tabpanel"]:not([hidden]) [class*="formulaBox"]')).toContainText('con θ no definido');
   });
 });
 
@@ -512,15 +512,15 @@ test.describe('Contraste de rótulos y cifras', () => {
   test('claro: rótulos del dibujo de Vectores y Transformaciones ≥ 4,5:1', async ({ page }) => {
     await abrir(page);
     await esperarPaginaAsentada(page);
-    const svg = page.locator('[role="tabpanel"] svg');
+    const svg = page.locator('[role="tabpanel"]:not([hidden]) svg');
     const medidas: Record<string, number> = {
       u: await contrasteDe(svg.locator('text').filter({ hasText: /^u$/ }), 'fill'),
       v: await contrasteDe(svg.locator('text').filter({ hasText: /^v$/ }), 'fill'),
       'u+v': await contrasteDe(svg.locator('text').filter({ hasText: 'u+v' }), 'fill'),
     };
     await pestana(page, 'Transformaciones', T_A);
-    medidas['Ae₁'] = await contrasteDe(page.locator('[role="tabpanel"] svg text').filter({ hasText: 'Ae₁' }), 'fill');
-    medidas['Ae₂'] = await contrasteDe(page.locator('[role="tabpanel"] svg text').filter({ hasText: 'Ae₂' }), 'fill');
+    medidas['Ae₁'] = await contrasteDe(page.locator('[role="tabpanel"]:not([hidden]) svg text').filter({ hasText: 'Ae₁' }), 'fill');
+    medidas['Ae₂'] = await contrasteDe(page.locator('[role="tabpanel"]:not([hidden]) svg text').filter({ hasText: 'Ae₂' }), 'fill');
     const bajos = Object.entries(medidas).filter(([, r]) => r < 4.5);
     expect(bajos).toEqual([]);
   });
@@ -530,7 +530,7 @@ test.describe('Contraste de rótulos y cifras', () => {
     await abrir(page);
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
     await esperarPaginaAsentada(page);
-    const svg = page.locator('[role="tabpanel"] svg');
+    const svg = page.locator('[role="tabpanel"]:not([hidden]) svg');
     for (const rotulo of [/^u$/, /^v$/, /^u\+v$/]) {
       expect(await contrasteDe(svg.locator('text').filter({ hasText: rotulo }), 'fill'), String(rotulo)).toBeGreaterThanOrEqual(4.5);
     }
@@ -544,7 +544,7 @@ test.describe('Contraste de rótulos y cifras', () => {
     await esperarPaginaAsentada(page);
     await pestana(page, 'Transformaciones', T_A);
     await page.getByRole('button', { name: 'Reflexión', exact: true }).click();
-    const cifra = page.locator('[role="tabpanel"] [class*="metricaRoja"] [class*="metricaValor"]');
+    const cifra = page.locator('[role="tabpanel"]:not([hidden]) [class*="metricaRoja"] [class*="metricaValor"]');
     await expect(cifra).toBeVisible();
     expect(await contrasteDe(cifra, 'color')).toBeGreaterThanOrEqual(4.5);
   });
@@ -572,7 +572,7 @@ test.describe('Promesa de animación', () => {
     const fotogramas = await page.evaluate(async () => {
       const boton = Array.from(document.querySelectorAll('button')).find((b) => b.textContent?.trim() === 'Cizalla');
       const rejilla = (): string => {
-        const ps = document.querySelectorAll('[role="tabpanel"] svg > path');
+        const ps = document.querySelectorAll('[role="tabpanel"]:not([hidden]) svg > path');
         return ps[ps.length - 1]?.getAttribute('d') ?? '';
       };
       const vistos: string[] = [];
@@ -642,17 +642,32 @@ test.describe('JSON-LD', () => {
 // Caso: foco en «Vectores 2D» y flecha derecha → esperado «Transformaciones» seleccionada y cada
 //       tab con aria-controls · obtenido la selección no se mueve y no hay aria-controls.
 test.describe('Pestañas — patrón WAI-ARIA', () => {
+  // HALLAZGO 4143 — REPARADO el 05/11/2026 (/reparar): aria-controls, tabpanel con
+  // aria-labelledby, flechas/Inicio/Fin y tabindex itinerante.
   test('la flecha derecha pasa a la pestaña siguiente y cada tab apunta a su panel', async ({ page }) => {
-    test.fail(); // ABIERTO (inspector 05/11/2026) [accesibilidad/bajo]
     await abrir(page);
     await page.getByRole('tab', { name: 'Vectores 2D', exact: true }).focus();
     await page.keyboard.press('ArrowRight');
-    await expect(page.getByRole('tab', { name: 'Transformaciones', exact: true })).toHaveAttribute(
-      'aria-selected',
-      'true',
-      { timeout: 2000 },
-    );
+    const transf = page.getByRole('tab', { name: 'Transformaciones', exact: true });
+    await expect(transf).toHaveAttribute('aria-selected', 'true', { timeout: 2000 });
+    await expect(transf).toBeFocused();
     await expect(page.getByRole('tab', { name: 'Vectores 2D', exact: true })).toHaveAttribute('aria-controls', /.+/);
+    // El panel visible es el que controla la pestaña activa y se nombra con ella.
+    const panelId = await transf.getAttribute('aria-controls');
+    const panel = page.locator(`#${panelId}`);
+    await expect(panel).toHaveAttribute('role', 'tabpanel');
+    await expect(panel).toBeVisible();
+    await expect(page.getByRole('tabpanel', { name: 'Transformaciones' })).toBeVisible();
+    await expect(page.locator(T_A)).toBeVisible();
+    // Fin y Inicio; la flecha izquierda desde la primera vuelve a la última.
+    await page.keyboard.press('End');
+    await expect(page.getByRole('tab', { name: 'Eigenvalores', exact: true })).toHaveAttribute('aria-selected', 'true');
+    await page.keyboard.press('Home');
+    await expect(page.getByRole('tab', { name: 'Vectores 2D', exact: true })).toHaveAttribute('aria-selected', 'true');
+    await page.keyboard.press('ArrowLeft');
+    await expect(page.getByRole('tab', { name: 'Eigenvalores', exact: true })).toHaveAttribute('aria-selected', 'true');
+    // Solo la activa entra en el orden de tabulación.
+    await expect(page.locator('[role="tab"][tabindex="0"]')).toHaveCount(1);
   });
 });
 
@@ -676,8 +691,8 @@ test.describe('Móvil 360 px — las cuatro pestañas a la vista', () => {
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(360);
   });
 
+  // HALLAZGO 4144 — REPARADO el 05/11/2026 (/reparar): por debajo de 480 px, dos filas de dos.
   test('ninguna pestaña queda fuera de la tira', async ({ page }) => {
-    test.fail(); // ABIERTO (inspector 05/11/2026) [operativa/bajo]
     await abrir(page);
     const fuera = await page.evaluate(() => {
       const lista = document.querySelector('[role="tablist"]');

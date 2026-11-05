@@ -417,8 +417,10 @@
 @media (max-width: 480px) {
   .titulo { font-size: 1.7rem; }
   .subtitulo { font-size: 0.95rem; }
-  .tabs { flex-wrap: nowrap; }
-  .tab { font-size: 0.8rem; padding: 0.7rem 0.6rem; }
+  /* Dos filas de dos: a 360 px las cuatro pestañas pedían 480 px (min-width 120) en una tira de
+     310, con la barra oculta, y «Eigenvalores» quedaba entera fuera de la vista (hallazgo 4144). */
+  .tabs { flex-wrap: wrap; overflow-x: visible; }
+  .tab { flex: 1 1 45%; min-width: 0; font-size: 0.8rem; padding: 0.7rem 0.6rem; }
   .matrizSliders { grid-template-columns: 1fr; }
   .metricas { grid-template-columns: 1fr 1fr; }
   .tabPanel { padding: var(--spacing-md); }

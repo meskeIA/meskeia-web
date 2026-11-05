@@ -2,6 +2,7 @@
 // @disclaimer: exempt
 
 import { useState, useMemo, useCallback } from 'react';
+import type { KeyboardEvent } from 'react';
 import styles from './AlgebraLineal.module.css';
 import {
   MeskeiaLogo,
@@ -733,6 +734,21 @@ export default function VisualizadorAlgebraLineal() {
     { id: 'eigenvalores', label: 'Eigenvalores' },
   ];
 
+  /** Flechas, Inicio y Fin entre pestañas: seleccionan y llevan el foco (activación automática). */
+  const moverConTeclado = (evento: KeyboardEvent<HTMLDivElement>) => {
+    const actual = tabs.findIndex((t) => t.id === tabActivo);
+    let destino: number;
+    if (evento.key === 'ArrowRight') destino = (actual + 1) % tabs.length;
+    else if (evento.key === 'ArrowLeft') destino = (actual - 1 + tabs.length) % tabs.length;
+    else if (evento.key === 'Home') destino = 0;
+    else if (evento.key === 'End') destino = tabs.length - 1;
+    else return;
+    evento.preventDefault();
+    const id = tabs[destino].id;
+    setTabActivo(id);
+    document.getElementById(`tab-${id}`)?.focus();
+  };
+
   return (
     <div className={styles.container}>
       <MeskeiaLogo />
@@ -751,15 +767,24 @@ export default function VisualizadorAlgebraLineal() {
 
       <LegalNotice />
 
-      {/* Tabs */}
+      {/*
+        Pestañas con el patrón WAI-ARIA (hallazgo 4143, 05/11/2026): cada tab apunta a su panel
+        (aria-controls) y cada panel se nombra con su tab (aria-labelledby); las flechas, Inicio y
+        Fin mueven la selección y el foco, y solo la activa está en el orden de tabulación. Los
+        cuatro paneles existen siempre; los inactivos van ocultos y vacíos, así que cada modo
+        sigue arrancando desde su estado inicial al volver a él.
+      */}
       <div className={styles.tabsWrap}>
-        <div className={styles.tabs} role="tablist" aria-label="Modos del visualizador">
+        <div className={styles.tabs} role="tablist" aria-label="Modos del visualizador" onKeyDown={moverConTeclado}>
           {tabs.map((tab) => (
             <button
               key={tab.id}
+              id={`tab-${tab.id}`}
               type="button"
               role="tab"
               aria-selected={tabActivo === tab.id}
+              aria-controls={`panel-${tab.id}`}
+              tabIndex={tabActivo === tab.id ? 0 : -1}
               className={`${styles.tab} ${tabActivo === tab.id ? styles.tabActivo : ''}`}
               onClick={() => setTabActivo(tab.id)}
             >
@@ -768,12 +793,21 @@ export default function VisualizadorAlgebraLineal() {
           ))}
         </div>
 
-        <div className={styles.tabPanel} role="tabpanel">
-          {tabActivo === 'vectores' && <TabVectores />}
-          {tabActivo === 'transformaciones' && <TabTransformaciones />}
-          {tabActivo === 'determinante' && <TabDeterminante />}
-          {tabActivo === 'eigenvalores' && <TabEigenvalores />}
-        </div>
+        {tabs.map((tab) => (
+          <div
+            key={tab.id}
+            id={`panel-${tab.id}`}
+            className={styles.tabPanel}
+            role="tabpanel"
+            aria-labelledby={`tab-${tab.id}`}
+            hidden={tabActivo !== tab.id}
+          >
+            {tabActivo === tab.id && tab.id === 'vectores' && <TabVectores />}
+            {tabActivo === tab.id && tab.id === 'transformaciones' && <TabTransformaciones />}
+            {tabActivo === tab.id && tab.id === 'determinante' && <TabDeterminante />}
+            {tabActivo === tab.id && tab.id === 'eigenvalores' && <TabEigenvalores />}
+          </div>
+        ))}
       </div>
 
       <EducationalSection
