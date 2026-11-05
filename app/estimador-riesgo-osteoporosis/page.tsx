@@ -11,27 +11,46 @@ interface Pregunta {
   texto: string;
   puntos: number;
   soloMujeres?: boolean;
+  /**
+   * Factor que la propia página califica de riesgo alto (tabla comparativa: edad, menopausia,
+   * antecedentes familiares, corticoides) o con densitometría indicada (FAQ: corticoides
+   * crónicos, fractura por fragilidad). Uno solo basta para no dar «Riesgo bajo».
+   */
+  mayor?: boolean;
 }
 
+/**
+ * Los pesos y los cortes son PROPIOS de esta app: una suma orientativa a partir de factores
+ * que recogen FRAX y el One-Minute Test de la IOF, que no puntúan así. Hasta el 05/11/2026 la
+ * página los presentaba como «validados» y no los enseñaba (hallazgo 4076), y un factor mayor
+ * solo (corticoides 3, edad 2, padres 2) quedaba en «Riesgo bajo · No acumulas factores
+ * significativos» contra lo que dice la propia página (hallazgo 4073).
+ */
 const PREGUNTAS: Pregunta[] = [
-  { id: 'q1',  texto: 'Tengo 65 años o más', puntos: 2 },
-  { id: 'q2',  texto: 'Tengo 75 años o más (marca además la anterior si procede)', puntos: 2 },
-  { id: 'q3',  texto: 'He sufrido una fractura de hueso tras un golpe leve (caída desde mi propia altura) después de los 40 años', puntos: 4 },
-  { id: 'q4',  texto: 'Alguno de mis padres tuvo fractura de cadera o pronunciada curvatura de la espalda', puntos: 2 },
+  { id: 'q1',  texto: 'Tengo 65 años o más', puntos: 2, mayor: true },
+  { id: 'q2',  texto: 'Tengo 75 años o más', puntos: 2, mayor: true },
+  { id: 'q3',  texto: 'He sufrido una fractura de hueso tras un golpe leve (caída desde mi propia altura) después de los 40 años', puntos: 4, mayor: true },
+  { id: 'q4',  texto: 'Alguno de mis padres tuvo fractura de cadera o pronunciada curvatura de la espalda', puntos: 2, mayor: true },
   { id: 'q5',  texto: 'Peso menos de 57 kg', puntos: 2 },
-  { id: 'q6',  texto: 'Tuve la menopausia antes de los 45 años, o me extirparon los ovarios sin tomar terapia hormonal sustitutiva', puntos: 2, soloMujeres: true },
-  { id: 'q7',  texto: 'He tomado pastillas de cortisona u otros corticoides durante más de 3 meses en total', puntos: 3 },
+  { id: 'q6',  texto: 'Tuve la menopausia antes de los 45 años, o me extirparon los ovarios sin tomar terapia hormonal sustitutiva', puntos: 2, soloMujeres: true, mayor: true },
+  { id: 'q7',  texto: 'He tomado pastillas de cortisona u otros corticoides durante más de 3 meses en total', puntos: 3, mayor: true },
   { id: 'q8',  texto: 'Tengo artritis reumatoide u otra enfermedad reumática inflamatoria diagnosticada', puntos: 2 },
   { id: 'q9',  texto: 'Fumo actualmente', puntos: 1 },
   { id: 'q10', texto: 'Bebo más de 2 bebidas alcohólicas al día de forma habitual', puntos: 1 },
-  { id: 'q11', texto: 'Hago menos de 30 minutos de actividad física moderada (caminar, nadar, bicicleta) menos de 3 días a la semana', puntos: 1 },
+  { id: 'q11', texto: 'No llego a 30 minutos de actividad física moderada (caminar, nadar, bicicleta) al menos 3 días a la semana', puntos: 1 },
   { id: 'q12', texto: 'Mi dieta habitualmente es baja en lácteos, queso, yogur y otros alimentos ricos en calcio', puntos: 1 },
 ];
+
+/** Cortes de la suma: hasta 3 bajo, de 4 a 7 moderado, desde 8 alto */
+const CORTE_MODERADO = 4;
+const CORTE_ALTO = 8;
 
 type NivelRiesgo = 'bajo' | 'moderado' | 'alto';
 
 interface Resultado {
   puntuacion: number;
+  /** Algún factor mayor ha subido el nivel que daba la suma */
+  subidoPorFactorMayor: boolean;
   nivel: NivelRiesgo;
   titulo: string;
   icono: string;
@@ -42,9 +61,13 @@ interface Resultado {
 // ─── Lógica ───────────────────────────────────────────────────────────────────
 
 function calcularRiesgo(respuestasPositivas: Set<string>): Resultado {
-  const puntuacion = PREGUNTAS
-    .filter(p => respuestasPositivas.has(p.id))
-    .reduce((s, p) => s + p.puntos, 0);
+  // Quien tiene 75 tiene 65: la casilla de 75 cuenta también la de 65 (hallazgo 4075)
+  const marcadas = new Set(respuestasPositivas);
+  if (marcadas.has('q2')) marcadas.add('q1');
+  const positivas = PREGUNTAS.filter(p => marcadas.has(p.id));
+  const puntuacion = positivas.reduce((s, p) => s + p.puntos, 0);
+  const hayFactorMayor = positivas.some(p => p.mayor);
+  const subidoPorFactorMayor = hayFactorMayor && puntuacion < CORTE_MODERADO;
 
   let nivel: NivelRiesgo;
   let titulo: string;
@@ -52,7 +75,7 @@ function calcularRiesgo(respuestasPositivas: Set<string>): Resultado {
   let descripcion: string;
   let recomendaciones: { icono: string; texto: string }[];
 
-  if (puntuacion <= 3) {
+  if (puntuacion < CORTE_MODERADO && !hayFactorMayor) {
     nivel = 'bajo';
     icono = '🟢';
     titulo = 'Riesgo bajo';
@@ -63,11 +86,13 @@ function calcularRiesgo(respuestasPositivas: Set<string>): Resultado {
       { icono: '🏃', texto: 'El ejercicio de impacto moderado (caminar, bailar) fortalece los huesos. Sigue manteniéndolo.' },
       { icono: '🔁', texto: 'Repite este test cada 2-3 años o si aparece algún factor nuevo.' },
     ];
-  } else if (puntuacion <= 7) {
+  } else if (puntuacion < CORTE_ALTO) {
     nivel = 'moderado';
     icono = '🟡';
     titulo = 'Riesgo moderado';
-    descripcion = 'Tienes algunos factores de riesgo. Es recomendable una valoración médica y medidas preventivas activas.';
+    descripcion = subidoPorFactorMayor
+      ? 'Has marcado un factor que por sí solo justifica hablarlo con tu médico (edad, fractura previa, antecedentes familiares, menopausia precoz o corticoides). Es recomendable una valoración médica y medidas preventivas activas.'
+      : 'Tienes algunos factores de riesgo. Es recomendable una valoración médica y medidas preventivas activas.';
     recomendaciones = [
       { icono: '🩺', texto: 'Comenta estos resultados con tu médico de cabecera. Puede valorar si necesitas una densitometría ósea (DEXA).' },
       { icono: '🥛', texto: 'Revisa tu ingesta de calcio y vitamina D. Tu médico puede recomendar suplementación si es necesario.' },
@@ -90,7 +115,7 @@ function calcularRiesgo(respuestasPositivas: Set<string>): Resultado {
     ];
   }
 
-  return { puntuacion, nivel, titulo, icono, descripcion, recomendaciones };
+  return { puntuacion, subidoPorFactorMayor, nivel, titulo, icono, descripcion, recomendaciones };
 }
 
 // ─── Componente ───────────────────────────────────────────────────────────────
@@ -103,11 +128,20 @@ export default function EstimadorRiesgoOsteoporosis() {
   function toggleRespuesta(id: string) {
     setRespuestas(prev => {
       const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
+      if (next.has(id)) {
+        next.delete(id);
+        // Sin 65 no hay 75
+        if (id === 'q1') next.delete('q2');
+      } else {
+        next.add(id);
+        // Quien tiene 75 tiene 65 (hallazgo 4075)
+        if (id === 'q2') next.add('q1');
+      }
       return next;
     });
     setResultado(null);
+    // El aviso de «ningún factor» ya no vale en cuanto se marca uno (hallazgo 4079)
+    setConfirmadoSinFactores(false);
   }
 
   /**
@@ -140,14 +174,14 @@ export default function EstimadorRiesgoOsteoporosis() {
       <header className={styles.hero}>
         <span className={styles.heroIcon} aria-hidden="true">🦴</span>
         <h1 className={styles.title}>Estimador de Riesgo de Osteoporosis</h1>
-        <p className={styles.subtitle}>Test de factores de riesgo validados (FRAX/IOF) · Orientación preventiva</p>
+        <p className={styles.subtitle}>Suma orientativa de factores de riesgo conocidos · Orientación preventiva</p>
       </header>
 
       <LegalNotice />
       <DisclaimerCard variant="medical"
         severity="critical">
         <span>
-          Este test es <strong>SOLO orientativo</strong> basado en factores de riesgo validados internacionalmente (FRAX / IOF One-Minute Test).
+          Este test es <strong>SOLO orientativo</strong>: una suma de puntos propia de esta herramienta a partir de factores de riesgo que también recogen FRAX y el One-Minute Test de la IOF, que no puntúan así. No es ninguno de esos dos instrumentos ni da una probabilidad de fractura.
           <br /><strong>No es</strong> un diagnóstico médico de osteoporosis. El diagnóstico requiere densitometría ósea (DEXA) interpretada por un médico.
           <br /><strong>Consulta siempre con tu médico</strong> si tienes dudas sobre tu salud ósea o si experimentas dolor de espalda repentino o fracturas.
           <br /><em>meskeIA no se responsabiliza de decisiones de salud basadas en este test orientativo.</em>
@@ -198,7 +232,7 @@ export default function EstimadorRiesgoOsteoporosis() {
             </div>
           ))}
 
-          <button type="button" className={styles.btn} onClick={evaluar} aria-label="Evaluar riesgo de osteoporosis">
+          <button type="button" className={styles.btn} onClick={evaluar}>
             Evaluar mi riesgo
           </button>
 
@@ -237,6 +271,18 @@ export default function EstimadorRiesgoOsteoporosis() {
                 <span>Factores de riesgo marcados</span>
                 <strong>{contadorSi} de {PREGUNTAS.length}</strong>
               </div>
+              <div className={styles.puntuacionRow}>
+                <span>Puntuación</span>
+                <strong>{resultado.puntuacion} puntos</strong>
+              </div>
+              <p className={styles.notaPuntuacion}>
+                Cómo se cuenta (escala propia de esta herramienta, sin validar): cada factor suma
+                de 1 a 4 puntos, según lo que pesa en la tabla de abajo. Hasta {CORTE_MODERADO - 1}{' '}
+                puntos es riesgo bajo, de {CORTE_MODERADO} a {CORTE_ALTO - 1} moderado y desde{' '}
+                {CORTE_ALTO} alto. La edad, una fractura previa, los antecedentes familiares, la
+                menopausia precoz o los corticoides, aunque sumen menos, dan como mínimo riesgo
+                moderado.
+              </p>
 
               <div>
                 <div className={styles.cardSubtitle}>Recomendaciones preventivas</div>
@@ -255,7 +301,7 @@ export default function EstimadorRiesgoOsteoporosis() {
       </div>
 
       <EducationalSection title="¿Qué es la osteoporosis y por qué prevenirla?" subtitle="Factores de riesgo, diagnóstico y tratamiento">
-        <p>La osteoporosis es una enfermedad que debilita los huesos haciéndolos más frágiles y susceptibles a fracturas. En España afecta a más de 3 millones de personas, principalmente mujeres posmenopáusicas y personas mayores.</p>
+        <p>La osteoporosis es una enfermedad que debilita los huesos haciéndolos más frágiles y susceptibles a fracturas. Afecta sobre todo a mujeres posmenopáusicas y a personas mayores.</p>
         <h3>¿Por qué es importante detectarla pronto?</h3>
         <p>La osteoporosis es silenciosa: no duele hasta que se produce una fractura. Las fracturas de cadera, vértebra y muñeca son las más frecuentes y pueden tener consecuencias graves en la calidad de vida y la independencia.</p>
         <h3>Diagnóstico: la densitometría ósea (DEXA)</h3>
@@ -267,7 +313,7 @@ export default function EstimadorRiesgoOsteoporosis() {
           <li><strong>Ejercicio</strong>: el ejercicio de impacto (caminar, bailar) y el de fuerza son los más eficaces para mantener la densidad ósea.</li>
         </ul>
         <h3>Tratamiento si se diagnostica</h3>
-        <p>Existen medicamentos eficaces (bifosfonatos, denosumab, ranelato de estroncio) que reducen significativamente el riesgo de fractura. Siempre bajo prescripción y seguimiento médico.</p>
+        <p>Existen medicamentos (por ejemplo, los bifosfonatos) que reducen el riesgo de fractura. Cuál conviene y si conviene lo decide el médico, con prescripción y seguimiento.</p>
 
       {/* === SECCIONES PROFESIONALES v2.0 === */}
 
@@ -291,8 +337,8 @@ export default function EstimadorRiesgoOsteoporosis() {
               <td>Cribado DEXA periódico</td>
             </tr>
             <tr>
-              <td>Sexo femenino + menopausia</td>
-              <td>Muy alto</td>
+              <td>Menopausia antes de los 45 años u ovarios extirpados</td>
+              <td>Alto</td>
               <td>No</td>
               <td>Valorar THS con médico</td>
             </tr>
@@ -337,7 +383,7 @@ export default function EstimadorRiesgoOsteoporosis() {
             <span className={styles.escenarioIcon} aria-hidden="true">👩</span>
             <strong>Mujer posmenopáusica de 55 años</strong>
           </div>
-          <p>Menopausia precoz a los 48, madre con fractura de cadera. Riesgo alto. La densitometría DEXA es esencial para evaluar el estado óseo actual.</p>
+          <p>Menopausia a los 48 (no cuenta como precoz, que es antes de los 45) y madre con fractura de cadera. El antecedente familiar basta en este estimador para un riesgo moderado: conviene comentarlo con el médico, que valorará si pide una densitometría DEXA.</p>
           <div className={styles.escenarioExample}>Puntuación T-score: si &lt;-2,5 → diagnóstico osteoporosis establecida</div>
           <div className={styles.escenarioTip}><span aria-hidden="true">💡</span> En mujeres posmenopáusicas con factores de riesgo, la DEXA está cubierta por la Seguridad Social.</div>
         </div>
@@ -366,7 +412,7 @@ export default function EstimadorRiesgoOsteoporosis() {
           </div>
           <p>Sin lácteos, la ingesta de calcio puede ser insuficiente. Alternativas: sardinas con espina, almendras, brócoli y bebidas vegetales fortificadas.</p>
           <div className={styles.escenarioExample}>Necesidades: 1.000-1.200 mg calcio/día. Sin lácteos, suplementación puede ser necesaria.</div>
-          <div className={styles.escenarioTip}><span aria-hidden="true">💡</span> La vitamina D mejora la absorción del calcio. Sin exposición solar suficiente, suplementar con 1.000-2.000 UI/día.</div>
+          <div className={styles.escenarioTip}><span aria-hidden="true">💡</span> La vitamina D mejora la absorción del calcio. Si tomas poco el sol, pregunta a tu médico si necesitas un suplemento y en qué dosis.</div>
         </div>
       </div>
 
@@ -395,7 +441,7 @@ export default function EstimadorRiesgoOsteoporosis() {
         </div>
         <div className={styles.faqItem}>
           <strong>¿Se puede revertir la osteoporosis con tratamiento?</strong>
-          <p>Los tratamientos pueden aumentar la densidad ósea entre un 3-10% y reducir el riesgo de fracturas significativamente. La mejora completa no es posible, pero la progresión sí puede frenarse.</p>
+          <p>Los tratamientos pueden aumentar la densidad ósea y reducir el riesgo de fracturas. La mejora completa no es posible, pero la progresión sí puede frenarse.</p>
         </div>
         <div className={styles.faqItem}>
           <strong>¿Es peligroso caer con osteoporosis?</strong>
@@ -460,12 +506,12 @@ export default function EstimadorRiesgoOsteoporosis() {
         <div className={styles.tipCard}>
           <div className={styles.tipIcon} aria-hidden="true">☀️</div>
           <strong>Exposición solar diaria moderada</strong>
-          <p>15-20 minutos de sol en brazos y piernas entre las 10h-14h sintetiza vitamina D suficiente en verano. En invierno, suplementación puede ser necesaria.</p>
+          <p>El sol en la piel es la principal fuente de vitamina D. Cuánto hace falta depende de la estación, la latitud y el tipo de piel; en invierno puede no bastar, y el médico valorará si necesitas un suplemento.</p>
         </div>
         <div className={styles.tipCard}>
           <div className={styles.tipIcon} aria-hidden="true">🥗</div>
           <strong>Dieta rica en calcio variada</strong>
-          <p>No solo lácteos: sardinas (espina), brocoli, almendras, tofu y bebidas vegetales con calcio añadido son excelentes fuentes alternativas.</p>
+          <p>No solo lácteos: sardinas (espina), brócoli, almendras, tofu y bebidas vegetales con calcio añadido son excelentes fuentes alternativas.</p>
         </div>
         <div className={styles.tipCard}>
           <div className={styles.tipIcon} aria-hidden="true">🏋️</div>
@@ -496,10 +542,10 @@ export default function EstimadorRiesgoOsteoporosis() {
           <strong>Errores frecuentes en la prevención y tratamiento de la osteoporosis</strong>
         </div>
         <ul className={styles.warningList}>
-          <li><strong>Pensar que la osteoporosis es solo un problema femenino</strong>: Los hombres también la padecen. El 20% de los casos de fractura de cadera son en varones, con mayor mortalidad asociada.</li>
+          <li><strong>Pensar que la osteoporosis es solo un problema femenino</strong>: Los hombres también la padecen y también sufren fracturas de cadera.</li>
           <li><strong>Creer que el dolor de espalda es el primer síntoma</strong>: La osteoporosis es asintomática hasta la fractura. El dolor de espalda puede indicar fractura vertebral que ha ocurrido silenciosamente.</li>
           <li><strong>Confiar solo en el calcio</strong>: Tomar calcio sin vitamina D, sin ejercicio y sin control médico es insuficiente. El abordaje debe ser multifactorial.</li>
-          <li><strong>Tomar suplementos de calcio en dosis excesivas</strong>: Más de 2.000 mg/día puede aumentar el riesgo de cálculos renales. La dosis óptima es lo que falta para llegar a 1.200 mg desde la dieta.</li>
+          <li><strong>Tomar suplementos de calcio en dosis excesivas</strong>: las dosis altas pueden aumentar el riesgo de cálculos renales. Si hace falta suplemento, la dosis la ajusta el médico según lo que ya aporta la dieta.</li>
           <li><strong>No comunicar al médico todos los medicamentos</strong>: Antiácidos, anticonvulsivos, antidepresivos y corticoides afectan la densidad ósea. El médico necesita saber todo para un tratamiento óptimo.</li>
           <li><strong>Evitar el ejercicio por miedo a fracturas</strong>: El ejercicio moderado y adecuado es preventivo. El sedentarismo acelera la pérdida ósea. Un fisioterapeuta puede diseñar un programa seguro.</li>
         </ul>

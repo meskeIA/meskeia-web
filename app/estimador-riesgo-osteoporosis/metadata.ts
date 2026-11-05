@@ -2,8 +2,8 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Estimador de Riesgo de Osteoporosis - Test de factores validados | meskeIA',
-  description: 'Test de 12 preguntas basado en factores de riesgo validados (FRAX e IOF) para estimar el riesgo de osteoporosis y recibir recomendaciones preventivas personalizadas.',
+  title: 'Estimador de Riesgo de Osteoporosis - Test de factores de riesgo | meskeIA',
+  description: 'Test orientativo de 12 preguntas sobre factores de riesgo de osteoporosis que también recogen FRAX y la IOF, con una suma de puntos propia y recomendaciones preventivas según el nivel.',
   keywords: 'riesgo osteoporosis, test osteoporosis, frax osteoporosis, fractura osea riesgo, prevencion osteoporosis, osteoporosis factores riesgo, test iof osteoporosis',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     title: 'Estimador de Riesgo de Osteoporosis | meskeIA',
-    description: 'Test de factores de riesgo validados para osteoporosis con recomendaciones preventivas.',
+    description: 'Test orientativo de factores de riesgo de osteoporosis con recomendaciones preventivas.',
     url: 'https://meskeia.com/estimador-riesgo-osteoporosis/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Estimador de Riesgo de Osteoporosis | meskeIA',
-    description: 'Test validado de riesgo de osteoporosis y recomendaciones preventivas',
+    description: 'Test orientativo de riesgo de osteoporosis y recomendaciones preventivas',
     images: ['https://meskeia.com/og-image.png']
   },
   other: {
@@ -36,10 +36,17 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: "Estimador de Riesgo de Osteoporosis",
-  description: "Test de 12 preguntas basado en factores de riesgo validados (FRAX e IOF) para estimar el riesgo de osteoporosis y recibir recomendaciones preventivas personalizadas.",
+  description: "Test orientativo de 12 preguntas sobre factores de riesgo de osteoporosis que también recogen FRAX y la IOF, con una suma de puntos propia (no validada) y recomendaciones preventivas según el nivel.",
   url: "https://meskeia.com/estimador-riesgo-osteoporosis/",
-  category: 'FinanceApplication',
-  features: [],
+  category: 'HealthApplication',
+  features: [
+    'Cuestionario de 12 factores de riesgo de osteoporosis: edad, fractura por fragilidad, antecedentes familiares, peso, menopausia precoz, corticoides, artritis reumatoide, tabaco, alcohol, actividad física y calcio',
+    'Orientación en tres niveles, riesgo bajo, moderado o alto, con la puntuación y los cortes a la vista',
+    'Un factor mayor (edad, fractura previa, antecedentes familiares, menopausia precoz o corticoides) nunca da riesgo bajo',
+    'Recomendaciones preventivas según el nivel: calcio, vitamina D, ejercicio, prevención de caídas y consulta médica',
+    'Aviso antes de dar resultado si no se ha marcado ningún factor',
+    'Sección educativa sobre densitometría, prevención y tratamiento',
+  ],
 });
 
 export const faqJsonLd = {
@@ -51,7 +58,7 @@ export const faqJsonLd = {
       name: '¿Qué es la osteoporosis y cuáles son sus principales factores de riesgo?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La osteoporosis es una enfermedad que reduce la densidad y resistencia ósea, aumentando el riesgo de fracturas. Los principales factores de riesgo incluyen el sexo femenino, la edad avanzada, antecedentes familiares de fracturas, bajo peso corporal, tabaquismo, consumo elevado de alcohol, uso prolongado de corticoides y déficit de calcio o vitamina D. Se estima que afecta a más del 30% de las mujeres mayores de 50 años en España.',
+        text: 'La osteoporosis es una enfermedad que reduce la densidad y resistencia ósea, aumentando el riesgo de fracturas. Los principales factores de riesgo incluyen el sexo femenino, la edad avanzada, antecedentes familiares de fracturas, bajo peso corporal, tabaquismo, consumo elevado de alcohol, uso prolongado de corticoides y déficit de calcio o vitamina D.',
       },
     },
     {
@@ -75,7 +82,7 @@ export const faqJsonLd = {
       name: '¿Qué diferencia hay entre un test de riesgo de osteoporosis y una densitometría ósea?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La densitometría ósea (DXA) mide directamente la densidad mineral del hueso y proporciona el valor T-score, que es el diagnóstico clínico definitivo de osteoporosis u osteopenia. Un test de factores de riesgo, como el basado en FRAX o los criterios IOF, estima la probabilidad de fractura a partir de variables clínicas sin necesidad de prueba de imagen. El test es una herramienta de cribado orientativa; la densitometría confirma el diagnóstico.',
+        text: 'La densitometría ósea (DXA) mide directamente la densidad mineral del hueso y proporciona el valor T-score, que es el diagnóstico clínico definitivo de osteoporosis u osteopenia. Un test de factores de riesgo no mide el hueso: FRAX estima la probabilidad de fractura a 10 años a partir de variables clínicas, y un cuestionario como el de esta herramienta, que suma puntos propios sin dar ninguna probabilidad, solo orienta sobre si conviene consultar. La densitometría confirma el diagnóstico.',
       },
     },
     {

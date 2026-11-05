@@ -25,20 +25,20 @@ import { esperarHidratacion } from './_hidratacion';
  *          menopausia <45 2 · corticoides >3 meses 3 · artritis 2 · tabaco 1 · alcohol 1 ·
  *          sedentarismo 1 · dieta pobre en calcio 1   (suma de los 12 = 23)
  *   cortes ≤ 3 «Riesgo bajo» · 4-7 «Riesgo moderado» · ≥ 8 «Riesgo alto»
- * Los casos «HALLAZGO … ABIERTO» llevan test.fail(): afirman lo que la app DEBERÍA hacer según
- * su propio texto, y hoy no hace.
+ * ── Reparación del 05/11/2026 (hallazgos 4073-4083) ──────────────────────────────────────
+ * Los pesos y cortes siguen, y ahora se enseñan como escala propia. Regla nueva: un factor
+ * MAYOR (los que la tabla de la página califica de alto, o con DEXA indicada en su FAQ: 65+,
+ * 75+, fractura por fragilidad, padres, menopausia <45, corticoides) da como mínimo «moderado»
+ * aunque sume ≤ 3. Y la casilla de 75 cuenta la de 65 (la marca sola).
  */
 
 const RUTA = '/estimador-riesgo-osteoporosis/';
 
-// El nombre accesible sale hoy del aria-label («Evaluar riesgo de osteoporosis») y no del texto
-// visible («Evaluar mi riesgo»): el regex vale con los dos, para que el hallazgo del nombre se
-// pueda reparar sin romper los casos que solo necesitan pulsar el botón.
-const botonEvaluar = (page: Page) =>
-  page.getByRole('button', { name: /^Evaluar (mi riesgo|riesgo de osteoporosis)/ });
+const botonEvaluar = (page: Page) => page.getByRole('button', { name: 'Evaluar mi riesgo' });
 const veredicto = (page: Page) => page.locator('[role="status"]');
 const avisoSinFactores = (page: Page) => page.locator('[class*="avisoSinFactores"]');
-const filaFactores = (page: Page) => page.locator('[class*="puntuacionRow"]');
+const filaFactores = (page: Page) =>
+  page.locator('[class*="puntuacionRow"]').filter({ hasText: 'Factores de riesgo marcados' });
 
 /** Comienzo del nombre accesible de cada casilla (sale de su <span> por aria-labelledby). */
 const FACTOR = {
@@ -52,7 +52,7 @@ const FACTOR = {
   artritis: 'Tengo artritis reumatoide',
   tabaco: 'Fumo actualmente',
   alcohol: 'Bebo más de 2 bebidas alcohólicas',
-  sedentarismo: 'Hago menos de 30 minutos de actividad física',
+  sedentarismo: 'No llego a 30 minutos de actividad física',
   calcio: 'Mi dieta habitualmente es baja en lácteos',
 } as const;
 type Factor = keyof typeof FACTOR;
@@ -138,8 +138,12 @@ test.describe('inspección del 04/11/2026 · la suma de puntos y sus cortes', ()
   test('CASO 2 (umbral) · 3 puntos es «bajo», 4 es «moderado», 7 es «moderado» y 8 es «alto»', async ({
     page,
   }) => {
-    // corticoides 3 → ≤ 3
-    expect(await evaluar(page, ['corticoides'])).toContain('Riesgo bajo');
+    // Sin factores mayores: peso 2 + tabaco 1 = 3 → ≤ 3 (antes: corticoides 3, que desde el
+    // 05/11/2026 es factor mayor y da moderado)
+    expect(await evaluar(page, ['peso', 'tabaco'])).toContain('Riesgo bajo');
+    await expect(page.locator('[class*="puntuacionRow"]').filter({ hasText: 'Puntuación' })).toContainText('3 puntos');
+    // peso 2 + artritis 2 = 4 → 4-7
+    expect(await evaluar(page, ['peso', 'artritis'])).toContain('Riesgo moderado');
     // corticoides 3 + tabaco 1 = 4 → 4-7
     expect(await evaluar(page, ['corticoides', 'tabaco'])).toContain('Riesgo moderado');
     // 65+ 2 + fractura 4 + tabaco 1 = 7 → 4-7 ; + calcio 1 = 8 → ≥ 8
@@ -155,29 +159,32 @@ test.describe('inspección del 04/11/2026 · la suma de puntos y sus cortes', ()
     await expect(page.getByText('Solicita a tu médico una densitometría ósea (DEXA)')).toBeVisible();
   });
 
-  test('HALLAZGO (04/11/2026, ABIERTO) · da «Riesgo bajo · No acumulas factores significativos» a perfiles que la propia página califica de riesgo alto', async ({
+  test('HALLAZGO 4073 (04/11/2026, REPARADO) · daba «Riesgo bajo · No acumulas factores significativos» a perfiles que la propia página califica de riesgo alto', async ({
     page,
   }) => {
+    // REPARADO el 05/11/2026: un factor mayor da como mínimo «Riesgo moderado», que manda
+    // comentarlo con el médico.
     // La tabla comparativa de la página dice «Corticoides crónicos — Alto», «Edad >65 años —
     // Alto — Cribado DEXA periódico» y «Antecedentes familiares fractura — Alto»; el escenario
     // de corticoterapia, «>3 meses → indicación de densitometría»; la FAQ, que la DEXA está
     // indicada en «personas con corticoides crónicos». Con esos factores SOLOS la app suma 3, 2
     // y 2 puntos, todos ≤ 3, y contesta «🟢 Riesgo bajo · No acumulas factores de riesgo
     // significativos… Repite este test cada 2-3 años».
-    test.fail();
-    for (const f of ['corticoides', 'edad65', 'padres'] as const) {
+    for (const f of ['corticoides', 'edad65', 'padres', 'fractura', 'menopausia'] as const) {
       const texto = await evaluar(page, [f]);
       expect(texto, `solo «${FACTOR[f]}»`).not.toContain('No acumulas factores de riesgo significativos');
+      expect(texto, `solo «${FACTOR[f]}»`).toContain('Riesgo moderado');
     }
   });
 
-  test('HALLAZGO (04/11/2026, ABIERTO) · el escenario «Mujer posmenopáusica de 55 años» dice «Riesgo alto» y la app le da otro nivel', async ({
+  test('HALLAZGO 4074 (04/11/2026, REPARADO) · el escenario «Mujer posmenopáusica de 55 años» decía «Riesgo alto» y la app le daba otro nivel', async ({
     page,
   }) => {
     // «Menopausia precoz a los 48, madre con fractura de cadera. Riesgo alto.» La casilla de
     // menopausia pide «antes de los 45», así que a los 48 no cuenta: solo los padres, 2 puntos
     // → «Riesgo bajo». Aun contándola, 2 + 2 = 4 → «Riesgo moderado». Nunca «alto».
-    test.fail();
+    // REPARADO el 05/11/2026: el escenario dice «riesgo moderado» y ya no llama precoz a los
+    // 48; los padres, factor mayor, dan moderado.
     await abrir(page);
     const escenario = page.locator('[class*="escenarioCard"]').filter({ hasText: 'Mujer posmenopáusica de 55 años' });
     const nivelEscenario = ((await escenario.textContent()) ?? '').match(/Riesgo (alto|moderado|bajo)/i)?.[0] ?? '(ninguno)';
@@ -185,22 +192,25 @@ test.describe('inspección del 04/11/2026 · la suma de puntos y sus cortes', ()
     expect(texto.toLowerCase()).toContain(nivelEscenario.toLowerCase());
   });
 
-  test('HALLAZGO (04/11/2026, ABIERTO) · marcar solo «75 años o más» puntúa como si no se tuviera 65', async ({
+  test('HALLAZGO 4075 (04/11/2026, REPARADO) · marcar solo «75 años o más» puntuaba como si no se tuviera 65', async ({
     page,
   }) => {
     // Quien tiene 75 tiene 65: por la regla de la app, 2 + 2 = 4 → «Riesgo moderado», lo mismo
-    // que marcando las dos. Con solo la de 75 suma 2 → «Riesgo bajo · No acumulas…». El texto
-    // «(marca además la anterior si procede)» deja en el usuario algo que siempre procede.
-    test.fail();
+    // que marcando las dos. Con solo la de 75 sumaba 2 → «Riesgo bajo · No acumulas…».
+    // REPARADO el 05/11/2026: marcar la de 75 marca la de 65, y desmarcar la de 65 quita la de 75.
     const conLasDos = await evaluar(page, ['edad65', 'edad75']);
     expect(conLasDos).toContain('Riesgo moderado');
     const soloLa75 = await evaluar(page, ['edad75']);
     expect(soloLa75).toBe(conLasDos);
+    await expect(casilla(page, 'edad65')).toBeChecked();
+    await expect(page.locator('[class*="puntuacionRow"]').filter({ hasText: 'Puntuación' })).toContainText('4 puntos');
+    await casilla(page, 'edad65').uncheck();
+    await expect(casilla(page, 'edad75')).not.toBeChecked();
   });
 });
 
 test.describe('inspección del 04/11/2026 · aviso, nombre del botón y metadatos', () => {
-  test('HALLAZGO (04/11/2026, ABIERTO) · el aviso «No has marcado ningún factor» sigue en pantalla después de marcar uno', async ({
+  test('HALLAZGO 4079 (04/11/2026, REPARADO) · el aviso «No has marcado ningún factor» seguía en pantalla después de marcar uno', async ({
     page,
   }) => {
     await abrir(page);
@@ -208,29 +218,44 @@ test.describe('inspección del 04/11/2026 · aviso, nombre del botón y metadato
     await expect(avisoSinFactores(page)).toBeVisible();
     await casilla(page, 'edad65').check();
     await expect(page.locator('[class*="contadorRespuestas"]')).toHaveText('1 factor marcado');
-    test.fail();
     await expect(avisoSinFactores(page)).toHaveCount(0, { timeout: 2000 });
   });
 
-  test('HALLAZGO (04/11/2026, ABIERTO) · el botón no se llama como se lee: «Evaluar mi riesgo» frente a «Evaluar riesgo de osteoporosis» (WCAG 2.5.3)', async ({
+  test('HALLAZGO 4080 (04/11/2026, REPARADO) · el botón no se llamaba como se lee: «Evaluar mi riesgo» frente a «Evaluar riesgo de osteoporosis» (WCAG 2.5.3)', async ({
     page,
   }) => {
     await abrir(page);
-    test.fail();
     await expect(page.getByRole('button', { name: 'Evaluar mi riesgo' })).toHaveCount(1, { timeout: 2000 });
   });
 
-  test('HALLAZGO (04/11/2026, ABIERTO) · la tarjeta de Twitter promete un «Test validado» y los pesos y cortes no tienen fuente', async ({
+  test('HALLAZGO 4076 (04/11/2026, REPARADO) · la tarjeta de Twitter prometía un «Test validado» y los pesos y cortes no tenían fuente ni se enseñaban', async ({
     page,
   }) => {
     await abrir(page);
-    test.fail();
     await expect(page.locator('meta[name="twitter:description"]')).not.toHaveAttribute('content', /validado/i, {
       timeout: 2000,
     });
+    await expect(page.locator('meta[name="description"]')).not.toHaveAttribute('content', /validad/i);
+    await expect(page.locator('h1 + p, header p').first()).not.toContainText(/validad/i);
+    // La escala se declara propia y la puntuación se ve con sus cortes
+    await expect(page.getByText(/suma de puntos propia de esta herramienta/)).toBeVisible();
+    await casilla(page, 'fractura').check();
+    await botonEvaluar(page).click();
+    await expect(page.locator('[class*="puntuacionRow"]').filter({ hasText: 'Puntuación' })).toContainText('4 puntos');
+    await expect(page.locator('[class*="notaPuntuacion"]')).toContainText('Hasta 3 puntos es riesgo bajo, de 4 a 7 moderado y desde 8 alto');
   });
 
-  test('HALLAZGO (04/11/2026, ABIERTO) · el WebApplication va sin características y como FinanceApplication', async ({
+  test('HALLAZGO 4077 y 4083 (04/11/2026, REPARADOS) · cifras clínicas sin fuente, % pegado, «10h-14h» y «brocoli»', async ({
+    page,
+  }) => {
+    await abrir(page);
+    const html = await page.content();
+    for (const cifra of ['3 millones', 'El 20%', '3-10%', '2.000 mg/día', '1.000-2.000 UI', '10h-14h', '15-20 minutos', 'más del 30%', 'ranelato', 'brocoli']) {
+      expect(html, cifra).not.toContain(cifra);
+    }
+  });
+
+  test('HALLAZGO 4081 y 4082 (04/11/2026, REPARADOS) · el WebApplication iba sin características y como FinanceApplication', async ({
     page,
   }) => {
     await abrir(page);
@@ -242,7 +267,6 @@ test.describe('inspección del 04/11/2026 · aviso, nombre del botón y metadato
       return null;
     });
     expect(app).not.toBeNull();
-    test.fail();
     expect((app?.featureList as unknown[] | undefined)?.length ?? 0).toBeGreaterThanOrEqual(4);
     expect(app?.applicationCategory).toBe('HealthApplication');
   });

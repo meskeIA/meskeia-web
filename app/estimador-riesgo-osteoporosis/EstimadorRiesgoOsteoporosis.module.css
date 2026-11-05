@@ -155,6 +155,14 @@
   background: rgba(248, 113, 113, 0.12);
 }
 
+/* Cómo se cuenta la puntuación: usa tokens del contenedor, que ya tienen su variante oscura */
+.notaPuntuacion {
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
 .contadorRespuestas {
   text-align: center;
   font-size: 0.85rem;

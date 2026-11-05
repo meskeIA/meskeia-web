@@ -4293,7 +4293,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
   'selector-actividades-movilidad': [
     { url: '/test-fragilidad/', icon: '🧓', name: 'Test de Fragilidad', description: 'Escala FRAIL: ¿eres frágil o pre-frágil?' },
-    { url: '/estimador-riesgo-osteoporosis/', icon: '🦴', name: 'Riesgo Osteoporosis', description: 'Test FRAX/IOF de riesgo óseo' },
+    { url: '/estimador-riesgo-osteoporosis/', icon: '🦴', name: 'Riesgo Osteoporosis', description: 'Test orientativo de factores de riesgo óseo' },
     { url: '/orientador-grado-dependencia/', icon: '📋', name: 'Grado de Dependencia', description: 'Baremo BVD orientativo' },
     { url: '/adaptacion-hogar/', icon: '🏠', name: 'Adaptación del Hogar', description: 'Accesibilidad y seguridad en casa' },
   ],
