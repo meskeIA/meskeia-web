@@ -237,6 +237,7 @@ export default function GeneradorUTMPage() {
                 className={styles.inputSmall}
                 value={params.source}
                 onChange={(e) => updateParam('source', e.target.value)}
+                aria-label="utm_source personalizado"
                 placeholder="O escribe personalizado"
               />
               <span className={styles.hint}>Origen del tráfico (google, facebook...)</span>
@@ -262,6 +263,7 @@ export default function GeneradorUTMPage() {
                 className={styles.inputSmall}
                 value={params.medium}
                 onChange={(e) => updateParam('medium', e.target.value)}
+                aria-label="utm_medium personalizado"
                 placeholder="O escribe personalizado"
               />
               <span className={styles.hint}>Tipo de canal (cpc, email, social...)</span>
