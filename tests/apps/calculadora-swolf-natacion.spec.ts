@@ -278,21 +278,21 @@ test.describe('CASO 2 (límite) — 25 m · 300 s · 100 brazadas, los máximos 
   });
 });
 
-test.describe('CASO 2b (límite) — piscina de 50 m con los valores MÍNIMOS de 50 m (10 s, 2 brazadas)', () => {
-  test('SWOLF 12, nivel Élite y velocidad 0:20 min/100 m', async ({ page }) => {
-    // Ejercita metros_largo=50 desde la UI con los mínimos de 50 m: el doble de los de 25 m
-    // (5 s y 1 brazada por cada 25 m). Un 12 es Élite con cualquier escala.
-    // ABIERTO — cabo C0138 (05/11/2026): 10 s en 50 m siguen siendo 5 m/s, el ritmo que el motor
-    // declara «por encima del récord mundial»: este caso fija como válido el suelo. Ver el bloque C0138.
+test.describe('CASO 2b (límite) — piscina de 50 m justo por encima del suelo de 50 m (10,5 s, 2 brazadas)', () => {
+  test('SWOLF 12,5, nivel Élite y velocidad 0:21 min/100 m', async ({ page }) => {
+    // Ejercita metros_largo=50 desde la UI justo por encima del suelo de 50 m: el doble del de
+    // 25 m. Hasta el 05/11/2026 el caso usaba 10 s, el suelo mismo, que son 5 m/s, el ritmo que
+    // el motor declara «por encima del récord mundial»; desde el hallazgo 4145 el suelo es
+    // exclusivo y 10 s avisa (bloque «hallazgo 4145» al final). Un 12,5 es Élite con cualquier escala.
     await elegirPiscina(page, 50);
-    await rellenar(page, { tiempo: '10', brazadas: '2' });
+    await rellenar(page, { tiempo: '10,5', brazadas: '2' });
 
-    // swolf = 10 + 2 = 12
-    await expect(swolfScore(page)).toHaveText('12');
+    // swolf = 10,5 + 2 = 12,5
+    await expect(swolfScore(page)).toHaveText('12,5');
     await expect(nivelBadge(page)).toContainText('Élite');
     await expect(detalle(page, 0)).toHaveText('Excelente');
-    // 100 · 10 / 50 = 20 s por 100 m → «0:20 min/100 m»
-    await expect(detalle(page, 1)).toHaveText('0:20 min/100 m');
+    // 100 · 10,5 / 50 = 21 s por 100 m → «0:21 min/100 m»
+    await expect(detalle(page, 1)).toHaveText('0:21 min/100 m');
     await expect(detalle(page, 2)).toHaveText('Eficiencia propia de nadadores de competición');
   });
 
@@ -877,9 +877,9 @@ test.describe('CASO 5 (límite) — bordes inclusivos y décimas en 25 m', () =>
     ['15,1', '10', '25,1', 'Avanzado', '1:00 min/100 m'], // 25,1 > 25 · 60,4 → 60 s
     ['22,04', '16', '38', 'Intermedio', '1:28 min/100 m'], // 38,04 → 38,0 ≤ 38 · 88,16 → 88 s
     ['22,06', '16', '38,1', 'Principiante', '1:28 min/100 m'], // 38,06 → 38,1 > 38 · 88,24 → 88 s
-    // ABIERTO — cabo C0138 (05/11/2026): esta fila fija como correcto el suelo, y 5 s en 25 m son
-    // 5 m/s, que el propio motor declara «por encima del récord mundial». Ver el bloque C0138.
-    ['5', '1', '6', 'Élite', '0:20 min/100 m'], // los mínimos que admite: 5 s y 1 brazada · 20 s
+    // Hasta el 05/11/2026 esta fila era 5 s y 1 brazada, el suelo mismo, que son 5 m/s (hallazgo
+    // 4145): ahora el suelo es exclusivo y la fila es lo primero que admite por encima de él.
+    ['5,1', '1', '6,1', 'Élite', '0:20 min/100 m'], // justo por encima del suelo · 20,4 s → 0:20
   ];
   for (const [t, b, swolf, nivel, ritmo] of filas) {
     test(`${t} s + ${b} brazadas → ${swolf} · ${nivel} · ${ritmo}`, async ({ page }) => {
@@ -925,7 +925,8 @@ test.describe('CASO 6 (límite) — piscina de 50 m y tiempos de más de un minu
 
   test('al pasar a 50 m, las pistas de los campos rotulan los rangos de 50 m', async ({ page }) => {
     await elegirPiscina(page, 50);
-    await expect(page.locator('#tiempo-hint')).toContainText('entre 10 y 600 s en 50 m');
+    // Desde el hallazgo 4145 el suelo de tiempo es exclusivo: «más de 10 y hasta 600 s».
+    await expect(page.locator('#tiempo-hint')).toContainText('más de 10 y hasta 600 s en 50 m');
     await expect(page.locator('#brazadas-hint')).toContainText('entre 2 y 200 en 50 m');
   });
 });
@@ -1088,9 +1089,14 @@ test.describe('REPARADO — HALLAZGO J: cifras sin fuente en la guía', () => {
 });
 
 /* ═══════════════════════════════════════════════════════════════════════════════════════
- * ABIERTO — cabo C0138 (comprobación del 05/11/2026, calculo/medio): el suelo de tiempo que
- * dejó la reparación del 2632 admite, y clasifica «Élite», un ritmo que el propio motor
- * declara por encima del récord mundial.
+ * HALLAZGO 4145 (de C0138, comprobación del 05/11/2026, calculo/medio), REPARADO el mismo día
+ * en /reparar en lo que mide su caso: el suelo de 5 m/s es ahora EXCLUSIVO en el motor
+ * (`tiempoSwolfAdmitido`), que comparten la app, la API de ChatGPT y la tool del MCP. La franja
+ * entre el récord real y 5 m/s sigue SIN ANCLAR (último test): pide una fuente de récords que
+ * la red de fuentes oficiales no tiene, y añadir el dominio lo decide el usuario (cabo aparte).
+ *
+ * Lo que decía el caso: el suelo de tiempo que dejó la reparación del 2632 admitía, y
+ * clasificaba «Élite», un ritmo que el propio motor declara por encima del récord mundial.
  *
  * El ANCLA es el propio motor, no una cifra de récord: lib/calculadoras/deporte.ts justifica
  * RANGO_TIEMPO_SWOLF_POR_25 = { min: 5 } así: «Un largo de 25 m en menos de 5 s (5 m/s, por
@@ -1114,36 +1120,35 @@ test.describe('REPARADO — HALLAZGO J: cifras sin fuente en la guía', () => {
  * la reparación.
  * ═══════════════════════════════════════════════════════════════════════════════════════ */
 
-test.describe('ABIERTO — cabo C0138: el suelo de 5 m/s que el motor llama «por encima del récord mundial» recibe «Élite»', () => {
-  test('25 m · 5 s · 1 brazada (5 m/s): debería avisar y no dar nivel', async ({ page }) => {
+test.describe('HALLAZGO 4145 (REPARADO) — el suelo de 5 m/s que el motor llama «por encima del récord mundial» ya no recibe nivel', () => {
+  test('25 m · 5 s · 1 brazada (5 m/s): avisa y no da nivel', async ({ page }) => {
     await caso(page, 25, '5', '1');
-    // Precondición (antes de test.fail, para que un fallo aquí sea rojo de verdad): la entrada
-    // llegó a la app y la piscina es la de 25 m.
+    // La entrada llegó a la app y la piscina es la de 25 m.
     await expect(tiempoInput(page)).toHaveValue('5');
     await expect(brazadasInput(page)).toHaveValue('1');
     await expect(page.getByRole('button', { name: '25 m', exact: true })).toHaveAttribute('aria-pressed', 'true');
-    // Hoy: SWOLF 6 · «Élite» · «0:20 min/100 m» y aviso vacío.
-    test.fail();
-    await expect(aviso(page)).not.toHaveText('', { timeout: 2000 });
-    await expect(nivelBadge(page)).toHaveCount(0, { timeout: 2000 });
+    // Antes: SWOLF 6 · «Élite» · «0:20 min/100 m» y aviso vacío.
+    await expect(aviso(page)).toContainText('por encima de 5: 5 s ya son 5 m/s');
+    await expect(nivelBadge(page)).toHaveCount(0);
+    await expect(swolfScore(page)).toHaveText('—');
   });
 
-  test('50 m · 10 s · 2 brazadas (los mismos 5 m/s): debería avisar y no dar nivel', async ({ page }) => {
+  test('50 m · 10 s · 2 brazadas (los mismos 5 m/s): avisa y no da nivel', async ({ page }) => {
     await caso(page, 50, '10', '2');
     await expect(tiempoInput(page)).toHaveValue('10');
     await expect(brazadasInput(page)).toHaveValue('2');
     await expect(page.getByRole('button', { name: '50 m', exact: true })).toHaveAttribute('aria-pressed', 'true');
-    // Hoy: SWOLF 12 · «Élite» · «0:20 min/100 m» y aviso vacío.
-    test.fail();
-    await expect(aviso(page)).not.toHaveText('', { timeout: 2000 });
-    await expect(nivelBadge(page)).toHaveCount(0, { timeout: 2000 });
+    // Antes: SWOLF 12 · «Élite» · «0:20 min/100 m» y aviso vacío.
+    await expect(aviso(page)).toContainText('por encima de 10: 10 s ya son 5 m/s');
+    await expect(nivelBadge(page)).toHaveCount(0);
   });
 
-  test('el motor (que comparten la API de ChatGPT y la tool del MCP) debería rechazar 5 m/s', () => {
-    // Hoy calcularSWOLF(5, 1, 25) devuelve nivel 'elite' y velocidadMedia_m_s 5 sin lanzar.
-    test.fail();
+  test('el motor (que comparten la API de ChatGPT y la tool del MCP) rechaza 5 m/s y admite lo de encima', () => {
+    // Antes calcularSWOLF(5, 1, 25) devolvía nivel 'elite' y velocidadMedia_m_s 5 sin lanzar.
     expect(() => calcularSWOLF(5, 1, 25)).toThrow(RangeError);
     expect(() => calcularSWOLF(10, 2, 50)).toThrow(RangeError);
+    expect(calcularSWOLF(5.1, 1, 25).nivel).toBe('elite');
+    expect(calcularSWOLF(10.5, 2, 50).nivel).toBe('elite');
   });
 
   test('SIN ANCLAR — los dos casos del cabo, lo que da hoy (no es un visto bueno)', async ({ page }) => {

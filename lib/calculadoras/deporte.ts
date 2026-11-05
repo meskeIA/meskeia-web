@@ -619,9 +619,32 @@ export const CORTES_SWOLF_25 = { elite: 25, avanzado: 30, intermedio: 38 } as co
  * Rangos admitidos POR CADA 25 m de largo; en 50 m se multiplican por 2. Un largo de 25 m en
  * menos de 5 s (5 m/s, por encima del récord mundial) o con 0 brazadas no describe a nadie,
  * y hasta el 02/10/2026 recibía «Élite» (hallazgo 2632).
+ *
+ * ⚠️ El mínimo de TIEMPO es EXCLUSIVO: 5 s por 25 m SON ya 5 m/s, la velocidad que esta misma
+ * nota declara imposible. Hasta el 05/11/2026 el borde era inclusivo y 25 m · 5 s · 1 brazada
+ * salía «Élite · 0:20 min/100 m» en la app, la API de ChatGPT y la tool del MCP (hallazgo 4145).
+ * Lo comprueba `tiempoSwolfAdmitido`, que usa también la página. El de brazadas sigue inclusivo.
  */
 export const RANGO_TIEMPO_SWOLF_POR_25 = { min: 5, max: 300 } as const;
 export const RANGO_BRAZADAS_SWOLF_POR_25 = { min: 1, max: 100 } as const;
+
+/** ¿Tiempo por largo admitido en esa piscina? Más del mínimo (exclusivo) y hasta el máximo. */
+export function tiempoSwolfAdmitido(tiempo_s_largo: number, metros_largo: number): boolean {
+  const factor = metros_largo / 25;
+  return (
+    Number.isFinite(tiempo_s_largo) &&
+    tiempo_s_largo > RANGO_TIEMPO_SWOLF_POR_25.min * factor &&
+    tiempo_s_largo <= RANGO_TIEMPO_SWOLF_POR_25.max * factor
+  );
+}
+
+/** Mensaje del tiempo fuera de rango: el mismo en la app, la API y el MCP. */
+export function mensajeTiempoSwolfFueraDeRango(metros_largo: number): string {
+  const factor = metros_largo / 25;
+  const tMin = RANGO_TIEMPO_SWOLF_POR_25.min * factor;
+  const tMax = RANGO_TIEMPO_SWOLF_POR_25.max * factor;
+  return `En piscina de ${metros_largo} m, el tiempo por largo debe estar entre ${tMin} y ${tMax} segundos, y por encima de ${tMin}: ${tMin} s ya son 5 m/s, por encima del récord mundial.`;
+}
 
 /** Longitudes de piscina admitidas. */
 export const PISCINAS_SWOLF = [25, 50] as const;
@@ -663,12 +686,10 @@ export function calcularSWOLF(
     throw new RangeError('La piscina debe ser de 25 o de 50 metros.');
   }
   const factor = metros_largo / 25;
-  const tMin = RANGO_TIEMPO_SWOLF_POR_25.min * factor;
-  const tMax = RANGO_TIEMPO_SWOLF_POR_25.max * factor;
   const bMin = RANGO_BRAZADAS_SWOLF_POR_25.min * factor;
   const bMax = RANGO_BRAZADAS_SWOLF_POR_25.max * factor;
-  if (!Number.isFinite(tiempo_s_largo) || tiempo_s_largo < tMin || tiempo_s_largo > tMax) {
-    throw new RangeError(`En piscina de ${metros_largo} m, el tiempo por largo debe estar entre ${tMin} y ${tMax} segundos.`);
+  if (!tiempoSwolfAdmitido(tiempo_s_largo, metros_largo)) {
+    throw new RangeError(mensajeTiempoSwolfFueraDeRango(metros_largo));
   }
   if (!Number.isFinite(brazadas_largo) || brazadas_largo < bMin || brazadas_largo > bMax) {
     throw new RangeError(`En piscina de ${metros_largo} m, las brazadas por largo deben estar entre ${bMin} y ${bMax}.`);

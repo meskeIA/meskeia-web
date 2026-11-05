@@ -16,6 +16,8 @@ import {
   CORTES_SWOLF_25,
   RANGO_TIEMPO_SWOLF_POR_25,
   RANGO_BRAZADAS_SWOLF_POR_25,
+  tiempoSwolfAdmitido,
+  mensajeTiempoSwolfFueraDeRango,
 } from '@/lib/calculadoras/deporte';
 import type { ResultadoSWOLF } from '@/lib/calculadoras/deporte';
 import styles from './CalculadoraSwolfNatacion.module.css';
@@ -49,13 +51,13 @@ interface Lectura {
  */
 function leerCampo(
   texto: string,
-  rango: { min: number; max: number },
+  admitido: (n: number) => boolean,
   textos: { falta: string; noNumero: string; fueraDeRango: string },
 ): Lectura {
   if (texto.trim() === '') return { valor: null, aviso: textos.falta };
   const n = parseSpanishNumber(texto);
   if (!Number.isFinite(n)) return { valor: null, aviso: textos.noNumero };
-  if (n < rango.min || n > rango.max) return { valor: null, aviso: textos.fueraDeRango };
+  if (!admitido(n)) return { valor: null, aviso: textos.fueraDeRango };
   return { valor: n, aviso: null };
 }
 
@@ -72,18 +74,20 @@ export default function CalculadoraSwolfNatacionPage() {
   // Cuántos largos de 25 m caben en uno de esta piscina
   const factor = metrosPiscina / 25;
 
+  // El mínimo de tiempo es EXCLUSIVO: 5 s por 25 m ya son 5 m/s (hallazgo 4145). La regla y el
+  // mensaje son los del motor, que comparten la API y el MCP.
   const tiempo = leerCampo(
     tiempoTexto,
-    { min: TIEMPO_POR_25.min * factor, max: TIEMPO_POR_25.max * factor },
+    (n) => tiempoSwolfAdmitido(n, metrosPiscina),
     {
       falta: 'Escribe el tiempo del largo en segundos.',
       noNumero: 'El tiempo debe ser un número de segundos (por ejemplo, 22 o 22,5).',
-      fueraDeRango: `En piscina de ${metrosPiscina} m, el tiempo por largo debe estar entre ${TIEMPO_POR_25.min * factor} y ${TIEMPO_POR_25.max * factor} segundos.`,
+      fueraDeRango: mensajeTiempoSwolfFueraDeRango(metrosPiscina),
     },
   );
   const brazadas = leerCampo(
     brazadasTexto,
-    { min: BRAZADAS_POR_25.min * factor, max: BRAZADAS_POR_25.max * factor },
+    (n) => n >= BRAZADAS_POR_25.min * factor && n <= BRAZADAS_POR_25.max * factor,
     {
       falta: 'Escribe las brazadas por largo.',
       noNumero: 'Las brazadas deben ser un número (por ejemplo, 16, o 16,5 si es la media de varios largos).',
@@ -183,8 +187,8 @@ export default function CalculadoraSwolfNatacionPage() {
               <span className={styles.inputUnit}>seg / largo</span>
             </div>
             <span id="tiempo-hint" className={styles.inputHint}>
-              Desde el impulso del muro hasta tocar el siguiente (entre {TIEMPO_POR_25.min * factor} y{' '}
-              {TIEMPO_POR_25.max * factor} s en {metrosPiscina} m)
+              Desde el impulso del muro hasta tocar el siguiente (más de {TIEMPO_POR_25.min * factor} y
+              hasta {TIEMPO_POR_25.max * factor} s en {metrosPiscina} m)
             </span>
           </div>
 
