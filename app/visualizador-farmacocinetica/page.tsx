@@ -8,6 +8,7 @@ import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
 import DisclaimerCard from '@/components/DisclaimerCard';
+import { formatNumber } from '@/lib';
 
 // ── Tipos ──────────────────────────────────────────────────────────────────
 type SeccionAdme = 'A' | 'D' | 'M' | 'E';
@@ -144,24 +145,37 @@ export default function VisualizadorFarmacocinetica() {
     return `~${dias.toFixed(1)} días`;
   }, [hFarmaco, porcentajeEliminar]);
 
-  // Datos curva concentración-tiempo (simplificada)
-  const puntosCtCurva = useMemo(() => {
+  /*
+   * Curva concentración-tiempo (modelo simplificado: absorción de primer orden con ka = 1,5 h⁻¹ y
+   * eliminación monoexponencial): c(t) = F · (1 − e^(−ka·t)) · e^(−ke·t), ke = ln 2 / t½.
+   *
+   * ⚠️ 05/11/2026 — hallazgo 4124. Hasta hoy el eje Y se escalaba al máximo de CADA curva y la
+   * concentración es proporcional a F, así que el deslizador de F dibujaba siempre la misma curva;
+   * ningún eje tenía marcas, y la rejilla de t½/4 ponía Tmax en 6 h con t½ 24 h cuando el máximo
+   * del modelo está en 2,65 h. Ahora el eje Y es fijo para cada t½ (el 100 % es el máximo que daría
+   * la misma dosis con F = 100 %), los dos ejes llevan marcas, la rejilla es de t½/20 y el punto
+   * de Tmax, el analítico: t = ln((ka + ke)/ke) / ka.
+   */
+  const KA = 1.5;
+  const curva = useMemo(() => {
     const ke = Math.log(2) / vidaMediaSlider;
     const f = biodisponibilidad / 100;
+    const conc = (t: number, fraccion: number) => fraccion * (1 - Math.exp(-KA * t)) * Math.exp(-ke * t);
+    const tMax = Math.log((KA + ke) / ke) / KA;
     const puntos: { t: number; c: number }[] = [];
-    for (let t = 0; t <= vidaMediaSlider * 6; t += vidaMediaSlider * 0.25) {
-      // Modelo bicompartimental simplificado: absorción rápida, eliminación monoexponencial
-      const absorcion = 1 - Math.exp(-1.5 * t);
-      const eliminacion = Math.exp(-ke * t);
-      const c = f * absorcion * eliminacion;
-      puntos.push({ t: Math.round(t * 10) / 10, c: Math.round(c * 1000) / 1000 });
+    const paso = vidaMediaSlider / 20;
+    for (let i = 0; i <= 120; i++) {
+      const t = i * paso;
+      // El punto analítico de Tmax entra en su sitio, para que el trazo pase por el máximo real
+      if (puntos.length > 0 && puntos[puntos.length - 1].t < tMax && t > tMax) {
+        puntos.push({ t: tMax, c: conc(tMax, f) });
+      }
+      puntos.push({ t, c: conc(t, f) });
     }
-    return puntos;
+    return { puntos, cmax: { t: tMax, c: conc(tMax, f) }, cmaxReferencia: conc(tMax, 1) };
   }, [biodisponibilidad, vidaMediaSlider]);
-
-  const cmaxPunto = useMemo(() => {
-    return puntosCtCurva.reduce((max, p) => (p.c > max.c ? p : max), puntosCtCurva[0]);
-  }, [puntosCtCurva]);
+  const puntosCtCurva = curva.puntos;
+  const cmaxPunto = curva.cmax;
 
   // SVG de curva C-T
   const ANCHO_SVG = 360;
@@ -170,11 +184,15 @@ export default function VisualizadorFarmacocinetica() {
   const plotW = ANCHO_SVG - MARGIN.left - MARGIN.right;
   const plotH = ALTO_SVG - MARGIN.top - MARGIN.bottom;
 
-  const maxT = puntosCtCurva[puntosCtCurva.length - 1]?.t ?? 1;
-  const maxC = Math.max(...puntosCtCurva.map((p) => p.c));
+  const maxT = vidaMediaSlider * 6;
 
   const toX = (t: number) => MARGIN.left + (t / maxT) * plotW;
-  const toY = (c: number) => MARGIN.top + plotH - (c / (maxC || 1)) * plotH;
+  // Eje Y fijo: 100 % = Cmax de la misma dosis con F = 100 %, así que F mueve la curva.
+  const toY = (c: number) => MARGIN.top + plotH - (c / curva.cmaxReferencia) * plotH;
+  const MARCAS_Y = [0, 25, 50, 75, 100];
+  // Una marca por vida media en el eje X, en horas
+  const marcasX = [0, 1, 2, 3, 4, 5, 6].map((k) => k * vidaMediaSlider);
+  const horas = (h: number) => formatNumber(h, Number.isInteger(h) ? 0 : 1);
 
   const pathD = puntosCtCurva
     .map((p, i) => `${i === 0 ? 'M' : 'L'} ${toX(p.t).toFixed(1)} ${toY(p.c).toFixed(1)}`)
@@ -410,9 +428,10 @@ export default function VisualizadorFarmacocinetica() {
                     className={styles.slider}
                     aria-label={`Biodisponibilidad: ${biodisponibilidad}%`}
                   />
+                  {/* La pista decía «100% (IV)», pero el modelo conserva la absorción oral (hallazgo 4124). */}
                   <div className={styles.sliderHints}>
                     <span>10% (efecto 1er paso alto)</span>
-                    <span>100% (IV)</span>
+                    <span>100{' '}% (llega toda la dosis)</span>
                   </div>
                 </div>
                 <div className={styles.sliderGroup}>
@@ -448,10 +467,29 @@ export default function VisualizadorFarmacocinetica() {
                   <line x1={MARGIN.left} y1={MARGIN.top} x2={MARGIN.left} y2={MARGIN.top + plotH} stroke="var(--text-muted)" strokeWidth="1" />
                   <line x1={MARGIN.left} y1={MARGIN.top + plotH} x2={MARGIN.left + plotW} y2={MARGIN.top + plotH} stroke="var(--text-muted)" strokeWidth="1" />
 
+                  {/* Marcas del eje Y: % de la Cmax con F = 100 % */}
+                  {MARCAS_Y.map((m) => (
+                    <g key={`y${m}`}>
+                      <line x1={MARGIN.left - 3} y1={toY((m / 100) * curva.cmaxReferencia)} x2={MARGIN.left} y2={toY((m / 100) * curva.cmaxReferencia)} stroke="var(--text-muted)" strokeWidth="1" />
+                      <text x={MARGIN.left - 5} y={toY((m / 100) * curva.cmaxReferencia) + 3} textAnchor="end" fontSize="8" fill="var(--text-secondary)">
+                        {m}
+                      </text>
+                    </g>
+                  ))}
+                  {/* Marcas del eje X: una por vida media, en horas */}
+                  {marcasX.map((t) => (
+                    <g key={`x${t}`}>
+                      <line x1={toX(t)} y1={MARGIN.top + plotH} x2={toX(t)} y2={MARGIN.top + plotH + 3} stroke="var(--text-muted)" strokeWidth="1" />
+                      <text x={toX(t)} y={MARGIN.top + plotH + 12} textAnchor="middle" fontSize="8" fill="var(--text-secondary)">
+                        {horas(t)}
+                      </text>
+                    </g>
+                  ))}
+
                   {/* Etiquetas ejes */}
-                  <text x={MARGIN.left - 8} y={MARGIN.top + plotH / 2} textAnchor="middle" fontSize="9" fill="var(--text-secondary)"
-                    transform={`rotate(-90, ${MARGIN.left - 8}, ${MARGIN.top + plotH / 2})`}>
-                    Concentración
+                  <text x={10} y={MARGIN.top + plotH / 2} textAnchor="middle" fontSize="9" fill="var(--text-secondary)"
+                    transform={`rotate(-90, 10, ${MARGIN.top + plotH / 2})`}>
+                    Concentración (%)
                   </text>
                   <text x={MARGIN.left + plotW / 2} y={ALTO_SVG - 4} textAnchor="middle" fontSize="9" fill="var(--text-secondary)">
                     Tiempo (h)
@@ -477,9 +515,14 @@ export default function VisualizadorFarmacocinetica() {
                     strokeDasharray="4 3"
                   />
                   <circle cx={toX(cmaxPunto.t)} cy={toY(cmaxPunto.c)} r="4" fill="#48A9A6" />
-                  <text x={toX(cmaxPunto.t) + 5} y={toY(cmaxPunto.c) - 4} fontSize="9" fill="#48A9A6" fontWeight="600">Cmax</text>
-                  <text x={toX(cmaxPunto.t) + 5} y={MARGIN.top + plotH + 14} fontSize="9" fill="#48A9A6">Tmax</text>
+                  {/* Rótulos con el token de TEXTO: con fill #48A9A6 daban 2,68:1 (hallazgo 4127) */}
+                  <text x={toX(cmaxPunto.t) + 5} y={toY(cmaxPunto.c) - 4} fontSize="9" style={{ fill: 'var(--secondary-texto)' }} fontWeight="600">Cmax</text>
+                  <text x={toX(cmaxPunto.t) + 5} y={MARGIN.top + plotH + 24} fontSize="9" style={{ fill: 'var(--secondary-texto)' }}>Tmax ≈ {horas(Math.round(cmaxPunto.t * 10) / 10)} h</text>
                 </svg>
+                <p className={styles.curvaNota}>
+                  Eje vertical: concentración en % de la máxima que daría la misma dosis si llegara
+                  entera a la sangre (F = 100{' '}%). Eje horizontal: horas, con una marca cada vida media.
+                </p>
 
                 <div className={styles.curvaBadges}>
                   <span className={styles.curvaBadge} style={{ background: 'rgba(46,134,171,0.12)', color: 'var(--primary-texto)' }}>

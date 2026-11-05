@@ -408,6 +408,15 @@
   gap: 0.5rem;
 }
 
+/* Qué miden los ejes de la curva (hallazgo 4124) */
+.curvaNota {
+  margin: 0 auto;
+  max-width: 480px;
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
 .curvaBadge {
   padding: 0.3rem 0.75rem;
   border-radius: 999px;

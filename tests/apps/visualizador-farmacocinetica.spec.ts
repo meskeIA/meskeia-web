@@ -213,32 +213,46 @@ test.describe('visualizador-farmacocinetica', () => {
 
   // ------------------------------------------------------------------ curva concentración-tiempo
 
-  test('CASO 4: con t½ 4 h el máximo muestreado cae a las 2 h y cada t½ divide C por 2', async ({ page }) => {
+  /*
+   * CASO 4, rehecho el 05/11/2026 con la reparación del hallazgo 4124: la rejilla pasa de t½/4 a
+   * t½/20 (121 puntos) más el punto analítico de Tmax, t = ln((ka + ke)/ke)/ka con ka = 1,5.
+   *   t½ 4 h, F 70 %: ke = 0,17329 → Tmax = ln(1,67329/0,17329)/1,5 = 1,5117 h ·
+   *     Cmax = 0,7 · (1 − e^−2,2676) · e^−0,26197 = 0,7 · 0,89644 · 0,76953 = 0,48288 ·
+   *     c(24) = 0,7 · 2⁻⁶ = 0,0109375 → 2,27 % del máximo · c(12)/c(8) = 0,5000.
+   *   t½ 24 h: ke = 0,028881 → Tmax = ln(1,528881/0,028881)/1,5 = 2,6457 h (antes, 6 h por la
+   *     rejilla) · Cmax = 0,7 · 0,98111 · 0,92646 = 0,63627 · c(144)/Cmax = 0,0109375/0,63627 = 1,72 %.
+   */
+  test('CASO 4: con t½ 4 h el máximo cae en Tmax = 1,51 h y cada t½ divide C por 2; con 24 h, en 2,65 h', async ({ page }) => {
     const c = await leerCurva(page);
-    expect(c.xs).toHaveLength(25);
+    expect(c.xs).toHaveLength(122);
     const h = alturas(c);
-    const ancho = c.xs[c.xs.length - 1] - c.xs[0];
-    // Cmax en t = 2 h de un eje de 24 h (2/24 del ancho), y el marcador está en ese punto
+    const x0 = c.xs[0];
+    const ancho = c.xs[c.xs.length - 1] - x0;
+    const alturaEn = (curva: Curva, alt: number[], t: number, total: number): number => {
+      const x = curva.xs[0] + (t / total) * (curva.xs[curva.xs.length - 1] - curva.xs[0]);
+      const i = curva.xs.reduce((mejor, xx, k) => (Math.abs(xx - x) < Math.abs(curva.xs[mejor] - x) ? k : mejor), 0);
+      return alt[i];
+    };
     const iMax = h.indexOf(Math.max(...h));
-    expect((c.xs[iMax] - c.xs[0]) / ancho).toBeCloseTo(2 / 24, 3);
+    expect((c.xs[iMax] - x0) / ancho).toBeCloseTo(1.5117 / 24, 3);
     expect(c.cx).toBeCloseTo(c.xs[iMax], 1);
-    // Eliminación: c(12 h)/c(8 h) = 0,503 (puntos 12 y 8, rejilla de t½/4 = 1 h)
-    expect(h[12] / h[8]).toBeCloseTo(0.503, 1);
-    // A las 24 h (6 t½, el último punto) queda el 2,3 % del máximo
-    expect(h[h.length - 1] / h[iMax]).toBeCloseTo(0.0234, 2);
+    expect(alturaEn(c, h, 12, 24) / alturaEn(c, h, 8, 24)).toBeCloseTo(0.5, 2);
+    expect(h[h.length - 1] / h[iMax]).toBeCloseTo(0.0227, 2);
+    await expect(page.getByRole('img', { name: /Curva concentración/ })).toContainText('Tmax ≈ 1,5 h');
 
-    // t½ 24 h: al final (144 h = 6 t½) queda el 1,9 % del máximo. No se fija dónde cae Tmax: con
-    // la rejilla de 6 h el marcador va a t = 6 h y el máximo del propio modelo está en 2,65 h
-    // (parte del hallazgo de la curva, abajo); si la rejilla se afina, ese punto se mueve.
     await sembrarValor(page, '#slider-t12', 24);
     const c24 = await leerCurva(page);
     const h24 = alturas(c24);
     const iMax24 = h24.indexOf(Math.max(...h24));
-    expect(h24[h24.length - 1] / h24[iMax24]).toBeCloseTo(0.0187, 2);
+    const ancho24 = c24.xs[c24.xs.length - 1] - c24.xs[0];
+    expect((c24.xs[iMax24] - c24.xs[0]) / ancho24).toBeCloseTo(2.6457 / 144, 3);
+    expect(h24[h24.length - 1] / h24[iMax24]).toBeCloseTo(0.0172, 2);
+    await expect(page.getByRole('img', { name: /Curva concentración/ })).toContainText('Tmax ≈ 2,6 h');
   });
 
-  test('HALLAZGO ABIERTO [operativa/medio]: mover la biodisponibilidad no cambia la curva', async ({ page }) => {
-    test.fail(); // HALLAZGO ABIERTO (inspector 05/11/2026) [operativa/medio]
+  // HALLAZGO 4124 — REPARADO el 05/11/2026 (/reparar): eje Y fijo (100 % = Cmax con F = 100 %)
+  // y marcas en los dos ejes. Los dos tests de abajo afirmaban lo correcto; ahora pasan.
+  test('HALLAZGO 4124 (REPARADO) [operativa/medio]: mover la biodisponibilidad cambia la curva', async ({ page }) => {
     // ENTRADA  t½ 4 h; F 100 % y luego F 10 % («10 % (efecto 1er paso alto)»)
     // ESPERADO C(t) = (D·F/Vd)·…: con F 10 % la concentración es la décima parte en todo punto,
     //          así que Cmax baja al 10 % (≈ 115 px más abajo en un eje fijo de 128 px) o, si el eje
@@ -252,10 +266,12 @@ test.describe('visualizador-farmacocinetica', () => {
     const difMax = Math.max(...f100.ys.map((y, i) => Math.abs(y - f10.ys[i])));
     const textosCambian = f100.textos.join('|') !== f10.textos.join('|');
     expect(difMax > 30 || textosCambian, `Δy máx ${difMax} px; textos ${f10.textos.join(' | ')}`).toBe(true);
+    // Con el eje fijo de 128 px: F 100 % pone Cmax arriba (y = 16) y F 10 %, al 10 % (y = 131,2).
+    expect(f100.cy).toBeCloseTo(16, 0);
+    expect(f10.cy).toBeCloseTo(16 + 128 * 0.9, 0);
   });
 
-  test('HALLAZGO ABIERTO [operativa/medio]: los ejes de la curva no tienen ninguna marca numérica', async ({ page }) => {
-    test.fail(); // HALLAZGO ABIERTO (inspector 05/11/2026) [operativa/medio], el mismo que el anterior
+  test('HALLAZGO 4124 (REPARADO) [operativa/medio]: los ejes de la curva tienen marcas numéricas', async ({ page }) => {
     // ENTRADA  pestaña «Curva C-T», t½ 2 h y luego 24 h
     // ESPERADO poder leer en el eje «Tiempo (h)» cuánto dura el fármaco: con t½ 2 h a las 12 h
     //          queda el 2,8 % de Cmax y con t½ 24 h, el 78 %
@@ -264,6 +280,10 @@ test.describe('visualizador-farmacocinetica', () => {
     await sembrarValor(page, '#slider-t12', 2);
     const c = await leerCurva(page);
     expect(c.textos.some((t) => /\d/.test(t)), c.textos.join(' | ')).toBe(true);
+    // Una marca por vida media en horas (0 a 12 con t½ 2 h) y el eje Y de 0 a 100.
+    for (const marca of ['0', '2', '4', '6', '8', '10', '12', '25', '50', '75', '100']) {
+      expect(c.textos, marca).toContain(marca);
+    }
   });
 
   // ------------------------------------------------------------------ formato y textos
