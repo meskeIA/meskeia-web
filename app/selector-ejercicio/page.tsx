@@ -410,11 +410,11 @@ export default function SelectorEjercicio() {
 
           <h3>Por qué la constancia importa más que la intensidad</h3>
           {/* «La sobreexigencia al inicio es la principal causa de abandono y lesión» se retiró: no
-              tenía fuente y contradecía las que cita la ficha de running (hallazgo 2693). */}
+              tenía fuente y contradecía las que cita la ficha de running (hallazgo 2693). Y «Entrenar al
+              70 % cinco días supera al 100 % un día», también sin fuente (hallazgo 4113, 05/11/2026). */}
           <p>
             El cuerpo humano responde mucho mejor a estímulos regulares y moderados que a esfuerzos esporádicos
-            y extremos. Entrenar al 70 % de tu capacidad cinco días a la semana produce adaptaciones fisiológicas
-            superiores a entrenar al 100 % una vez por semana. Si vienes de una lesión, la prudencia del
+            y extremos. Si vienes de una lesión, la prudencia del
             principio cuenta todavía más: en la carrera, haber tenido otra lesión en los últimos 12 meses es el
             factor de riesgo que más se repite en los estudios de seguimiento (Saragiotto et al., 2014).
           </p>

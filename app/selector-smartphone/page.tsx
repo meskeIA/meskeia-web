@@ -638,8 +638,8 @@ export default function SelectorSmartphone() {
             <strong>Mejores momentos para comprar:</strong> el precio de los smartphones baja considerablemente en las
             campañas de descuentos de cada país (el Black Friday de noviembre y el Prime Day de julio están
             extendidos en buena parte del mundo hispanohablante, y en México se suma el Buen Fin) y, sobre todo,
-            cuando se lanza la generación siguiente del modelo que te interesa. Comprar el modelo del año anterior
-            tras el lanzamiento del nuevo puede suponer un ahorro del 20-30&nbsp;%.
+            cuando se lanza la generación siguiente del modelo que te interesa: el modelo del año anterior
+            suele bajar de precio entonces.
           </div>
           <p>
             Los canales más habituales son las tiendas oficiales de cada marca, las grandes superficies de

@@ -868,9 +868,8 @@ test.describe('re-inspección 02/10/2026 · escritorio', () => {
     // Ni pegados ni con un espacio normal: «15 %» lleva U+00A0.
     const mal = textos.flatMap((s) => [...s.matchAll(/.{0,15}\d[ ]?%/g)].map((m) => m[0]));
     expect(mal).toEqual([]);
-    // Cabo C0384, ABIERTO (04/11/2026): esa frase de la gu\u00eda es hallazgo de contenido (cifra sin
-    // fuente, bloque final). Si la reparaci\u00f3n la retira, esta l\u00ednea se quita con ella.
-    expect(textos.join(' ')).toContain('al 70\u00a0% de tu capacidad');
+    // Cabo C0384, REPARADO (05/11/2026, hallazgo 4113): esa frase de la gu\u00eda se retir\u00f3 (cifra sin fuente).
+    expect(textos.join(' ')).not.toContain('de tu capacidad');
   });
 
   test('HALLAZGO: la guía no da la sobreexigencia como «la principal causa de abandono y lesión» sin fuente', async ({ page }) => {
@@ -1050,8 +1049,8 @@ test.describe('re-inspección 02/10/2026 · móvil 390 px', () => {
 // ninguna de las cuatro: solo los 150 min semanales y que «all physical activity counts». Correcto:
 // la cifra atribuida (fuente entre paréntesis con año, como Saragiotto et al., 2014 en la ficha de
 // running) o la frase matizada sin cifra; nunca una fuente inventada.
-// Los cuatro casos van con test.fail(): exigen lo CORRECTO y hoy fallan. Al repararse, quitar el
-// test.fail() y cambiar ABIERTO por REPARADO.
+// Los cuatro casos exigen lo CORRECTO; fueron con test.fail() hasta su reparación del 05/11/2026
+// (hallazgos 4110-4113): las cuatro frases, matizadas sin cifra (criterio C0203).
 
 /** ¿Lleva una cita «(…año)»? Es la forma en que la app atribuye sus cifras. */
 const atribuida = (s: string) => /\([^()]*\d{4}\)/.test(s);
@@ -1079,13 +1078,13 @@ const BIENESTAR_POCO_TIEMPO = [3, 0, 1, 2, 3, 1, 0, 3, 3, 2] as const;
 test.describe('cabo C0384 · cifras sin fuente', () => {
   const consejos = (page: Page) => page.locator('[class*="consejoItem"]').allInnerTexts();
 
-  test('ABIERTO (cabo C0384): el yoga no aconseja «20 min diarios» contra su propia ficha de 30-60 min, ni sin fuente', async ({ page }) => {
-    // ABIERTO, hallazgo de contenido (medio) del acta del 04/11/2026. La ficha de yoga dice
+  test('REPARADO (cabo C0384, hallazgo 4110): el yoga no aconseja «20 min diarios» contra su propia ficha de 30-60 min, ni sin fuente', async ({ page }) => {
+    // REPARADO el 05/11/2026: «varias sesiones a la semana suelen sentar mejor que una sola muy larga».
+    // Hallazgo de contenido (medio) del acta del 04/11/2026. La ficha de yoga dice
     // «3-5 días/semana, sesiones de 30-60 min», y por esa ficha el filtro de tiempo la aparta a quien
     // dice «Menos de 30 minutos». En la MISMA tarjeta, su consejo dice «La constancia importa más que
     // la intensidad: 20 min diarios superan a 90 min una vez por semana», sin fuente. Lo ven los
     // 400.817 de 1.376.256 perfiles a los que se recomienda yoga o pilates (barrido del motor).
-    test.fail();
     test.setTimeout(60_000);
     // 1) La app dice que una sesión de menos de 30 min no es de yoga…
     await abrirTest(page);
@@ -1107,10 +1106,10 @@ test.describe('cabo C0384 · cifras sin fuente', () => {
     expect(comparacion === undefined || atribuida(comparacion), `cifra sin fuente: «${comparacion}»`).toBe(true);
   });
 
-  test('ABIERTO (cabo C0384): el gimnasio no da sin fuente la regla de «no subas más del 10 % de carga por semana»', async ({ page }) => {
-    // ABIERTO, hallazgo de contenido (bajo) del acta del 04/11/2026. Consejo de la ficha de gimnasio
+  test('REPARADO (cabo C0384, hallazgo 4111): el gimnasio no da sin fuente la regla de «no subas más del 10 % de carga por semana»', async ({ page }) => {
+    // REPARADO el 05/11/2026: «sube la carga poco a poco y solo cuando domines la técnica».
+    // Hallazgo de contenido (bajo) del acta del 04/11/2026. Consejo de la ficha de gimnasio
     // (motor.ts:247): «La progresión debe ser gradual: no subas más del 10 % de carga por semana».
-    test.fail();
     await abrirTest(page);
     await responder(page, FUERZA_INSTALACION);
     await expect(page.locator('[class*="recomendacionValor"]')).toHaveText('Gimnasio y Entrenamiento de Fuerza');
@@ -1120,11 +1119,11 @@ test.describe('cabo C0384 · cifras sin fuente', () => {
     expect(sinFuente).toEqual([]);
   });
 
-  test('ABIERTO (cabo C0384): el running no da sin fuente que «el 80 %» del entrenamiento debe ser a ritmo conversacional', async ({ page }) => {
-    // ABIERTO, hallazgo de contenido (bajo) del acta del 04/11/2026. Consejo de la ficha de running
+  test('REPARADO (cabo C0384, hallazgo 4112): el running no da sin fuente que «el 80 %» del entrenamiento debe ser a ritmo conversacional', async ({ page }) => {
+    // REPARADO el 05/11/2026: «Haz la mayor parte de tus salidas a un ritmo que te deje hablar».
+    // Hallazgo de contenido (bajo) del acta del 04/11/2026. Consejo de la ficha de running
     // (motor.ts:266): «El 80 % de tu entrenamiento debe ser a ritmo conversacional (test: puedes
     // hablar)». El último consejo de la misma ficha sí cita (Correia et al., 2024; Saragiotto et al., 2014).
-    test.fail();
     await abrirTest(page);
     await responder(page, CARDIO_EXTERIOR);
     await expect(page.locator('[class*="recomendacionValor"]')).toHaveText('Running y Carrera');
@@ -1134,12 +1133,12 @@ test.describe('cabo C0384 · cifras sin fuente', () => {
     expect(sinFuente).toEqual([]);
   });
 
-  test('ABIERTO (cabo C0384): la guía no afirma sin fuente que el 70 % cinco días supera al 100 % un día', async ({ page }) => {
-    // ABIERTO, hallazgo de contenido (bajo) del acta del 04/11/2026. Guía, «Por qué la constancia
+  test('REPARADO (cabo C0384, hallazgo 4113): la guía no afirma sin fuente que el 70 % cinco días supera al 100 % un día', async ({ page }) => {
+    // REPARADO el 05/11/2026: la frase se retiró; la anterior ya dice lo mismo sin cifras.
+    // Hallazgo de contenido (bajo) del acta del 04/11/2026. Guía, «Por qué la constancia
     // importa más que la intensidad» (page.tsx:416-417): «Entrenar al 70 % de tu capacidad cinco días
     // a la semana produce adaptaciones fisiológicas superiores a entrenar al 100 % una vez por
     // semana.» La frase siguiente del mismo párrafo sí cita (Saragiotto et al., 2014).
-    test.fail();
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await page.goto('/selector-ejercicio/');
     await esperarHidratacionBotones(page);

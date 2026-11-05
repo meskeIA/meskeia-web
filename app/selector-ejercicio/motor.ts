@@ -244,7 +244,7 @@ export const EJERCICIOS: Record<EjercicioKey, EjercicioInfo> = {
     sesionMinima: 45,
     beneficios: ['Mejora de fuerza y masa muscular demostrable', 'Control total de cargas y progresión', 'Acceso a todos los grupos musculares', 'Protección articular a largo plazo si entrenas bien', 'Independiente del clima'],
     equipo: ['Zapatillas de entrenamiento (no de running)', 'Ropa cómoda y transpirable', 'Toalla y candado para taquilla', 'Botella de agua reutilizable', 'Opcional: guantes, cinturón, straps'],
-    consejos: ['Empieza con pesos bajos para aprender la técnica', 'El descanso entre sesiones es tan importante como entrenar', 'La progresión debe ser gradual: no subas más del 10 % de carga por semana', 'Come proteína suficiente (1,6-2 g por kg de peso al día) si quieres ganar músculo'],
+    consejos: ['Empieza con pesos bajos para aprender la técnica', 'El descanso entre sesiones es tan importante como entrenar', 'La progresión debe ser gradual: sube la carga poco a poco y solo cuando domines la técnica', 'Si quieres ganar músculo, la proteína de tu dieta cuenta: cuánta necesitas depende de tu peso, tu edad y tu entrenamiento, y un profesional de la nutrición puede ajustártela'],
   },
   running: {
     icono: '🏃',
@@ -263,7 +263,7 @@ export const EJERCICIOS: Record<EjercicioKey, EjercicioInfo> = {
     sesionMinima: 20,
     beneficios: ['Mejora cardiovascular muy rápida', 'Quema calórica alta por sesión', 'Libera endorfinas y reduce el estrés', 'Puedes hacerlo en cualquier lugar del mundo', 'Comunidad muy amplia y accesible'],
     equipo: ['Zapatillas de running específicas (imprescindible)', 'Ropa técnica transpirable', 'Reloj o app para medir ritmo y distancia', 'Si usas sujetador, uno deportivo de sujeción alta', 'Opcional: auriculares inalámbricos'],
-    consejos: ['El 80 % de tu entrenamiento debe ser a ritmo conversacional (test: puedes hablar)', 'Descansa al menos un día entre sesiones al principio', 'Estira y fortalece el core para prevenir lesiones', 'Las lesiones del corredor tienen varias causas a la vez: el entrenamiento, la salud y los hábitos, la morfología y la biomecánica (Correia et al., 2024). El factor de riesgo que más se repite en los estudios de seguimiento es haber tenido otra lesión en los últimos 12 meses (Saragiotto et al., 2014): si vienes de una, empieza con más prudencia'],
+    consejos: ['Haz la mayor parte de tus salidas a un ritmo que te deje hablar (test: puedes mantener una conversación)', 'Descansa al menos un día entre sesiones al principio', 'Estira y fortalece el core para prevenir lesiones', 'Las lesiones del corredor tienen varias causas a la vez: el entrenamiento, la salud y los hábitos, la morfología y la biomecánica (Correia et al., 2024). El factor de riesgo que más se repite en los estudios de seguimiento es haber tenido otra lesión en los últimos 12 meses (Saragiotto et al., 2014): si vienes de una, empieza con más prudencia'],
   },
   natacion: {
     icono: '🏊',
@@ -320,7 +320,7 @@ export const EJERCICIOS: Record<EjercicioKey, EjercicioInfo> = {
     sesionMinima: 30,
     beneficios: ['Reducción del estrés y la ansiedad demostrada', 'Mejora de postura y consciencia corporal', 'Flexibilidad y movilidad articular', 'Fortalecimiento del core y músculos estabilizadores', 'Puede practicarse en casa sin equipamiento'],
     equipo: ['Esterilla antideslizante (imprescindible)', 'Ropa cómoda y elástica', 'Opcional: bloque y correa de yoga', 'Espacio despejado de 2 × 1 metros'],
-    consejos: ['No fuerces las posturas — el dolor es una señal, no un objetivo', 'La constancia importa más que la intensidad: 20 min diarios superan a 90 min una vez por semana', 'Yoga y pilates son complementarios, no rivales — combínalos si puedes', 'El yoga online de calidad es excelente y gratuito en YouTube'],
+    consejos: ['No fuerces las posturas — el dolor es una señal, no un objetivo', 'La constancia importa más que la intensidad: varias sesiones a la semana suelen sentar mejor que una sola muy larga', 'Yoga y pilates son complementarios, no rivales — combínalos si puedes', 'El yoga online de calidad es excelente y gratuito en YouTube'],
   },
   'entrenamiento-casa': {
     icono: '🏠',
@@ -339,7 +339,7 @@ export const EJERCICIOS: Record<EjercicioKey, EjercicioInfo> = {
     sesionMinima: 20,
     beneficios: ['Sin desplazamiento ni cuota de instalación', 'Horario totalmente libre', 'Ideal para empezar sin vergüenza social', 'Muy efectivo con programas bien diseñados', 'Puedes combinar distintos estilos (HIIT, fuerza, yoga...)'],
     equipo: ['Espacio despejado de al menos 2 × 2 metros', 'Esterilla', 'Opcional: mancuernas ajustables, bandas elásticas, barra de dominadas', 'Dispositivo para seguir el entrenamiento'],
-    consejos: ['La autodisciplina es el mayor reto: fija un horario fijo como si fuera una cita', 'Sigue programas estructurados, no hagas ejercicios al azar', 'El HIIT de 20-30 min puede ser tan efectivo como 1 h en el gimnasio', 'La ventilación del espacio importa: evita sitios cerrados y sin aire'],
+    consejos: ['La autodisciplina es el mayor reto: fija un horario fijo como si fuera una cita', 'Sigue programas estructurados, no hagas ejercicios al azar', 'Si tienes poco tiempo, una sesión corta de HIIT (20-30 min) es una opción para entrenar en casa', 'La ventilación del espacio importa: evita sitios cerrados y sin aire'],
   },
 };
 

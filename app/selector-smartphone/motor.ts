@@ -244,7 +244,9 @@ export function calcularResultado(respuestas: Record<number, string>): Resultado
 
   // ─ Consejos ─
   if (respuestas[10] === 'si' || respuestas[10] === 'quizas') {
-    consejos.push('💡 Un dispositivo reacondicionado certificado puede ahorrarte un 30-40 % con garantía incluida; comprueba el estado de la batería antes de comprar.');
+    // Hasta el 05/11/2026 prometía «ahorrarte un 30-40 %», cifra sin fuente (cabo C0634, criterio
+    // C0203 del 30/10/2026: matizar sin cifra)
+    consejos.push('💡 Un dispositivo reacondicionado certificado suele costar menos que el mismo modelo nuevo y trae garantía; comprueba el estado de la batería antes de comprar.');
   }
   if (recortadaPorPresupuesto && respuestas[10] === 'no') {
     consejos.push('♻️ Un reacondicionado certificado de la gama que pedía tu uso suele costar lo mismo que uno nuevo del tramo que has elegido: es la vía más directa para no renunciar a nada.');
@@ -306,7 +308,9 @@ export function calcularResultado(respuestas: Record<number, string>): Resultado
   if (respuestas[2] === 'intenso' || respuestas[6] === 'rendimiento') {
     if (esEntrada) {
       caracteristicas.push('⚡ El procesador más potente que encuentres en este tramo; para juegos exigentes tendrás que bajar la calidad gráfica');
-      caracteristicas.push('🖥️ Pantalla de 90 Hz si la hay: los 120 Hz empiezan en la gama media');
+      // Hasta el 05/11/2026 añadía «los 120 Hz empiezan en la gama media», afirmación de mercado
+      // sin fuente consultable (hallazgo 4108, criterio C0203: matizar o retirar)
+      caracteristicas.push('🖥️ Pantalla de 90 Hz o más, si la hay');
     } else {
       caracteristicas.push('⚡ Procesador de gama alta de la generación más reciente disponible');
       caracteristicas.push('🖥️ Pantalla con tasa de refresco ≥ 120 Hz');
