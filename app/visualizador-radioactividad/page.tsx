@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib/formatters';
-import { jsonLd } from './metadata';
 
 // Porcentaje con el espacio duro de la Ortografía de la RAE (2010), en un solo nodo de texto
 const pctTexto = (valor: number, decimales: number): string => `${formatNumber(valor, decimales)} %`;
@@ -876,10 +875,6 @@ export default function VisualizadorRadioactividad() {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
       <div className={styles.container}>
         <MeskeiaLogo />
 

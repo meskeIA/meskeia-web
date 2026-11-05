@@ -13,7 +13,6 @@ import {
   NumberInput,
 } from '@/components';
 import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
-import { jsonLd } from './metadata';
 
 // Consumo medio en España: 133 L/persona/día (INE 2023)
 const CONSUMO_MEDIO_DIARIO = 133;
@@ -201,11 +200,6 @@ export default function EstimacionAhorroHidricoPage() {
 
   return (
     <>
-      {/* Schema.org JSON-LD */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
 
       <div className={styles.container}>
         <MeskeiaLogo />

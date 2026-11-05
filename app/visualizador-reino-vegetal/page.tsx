@@ -1,7 +1,7 @@
 'use client';
 // @disclaimer: exempt
 import React, { useState } from 'react';
-import { metadata, jsonLd } from './metadata';
+import { metadata } from './metadata';
 import {
   MeskeiaLogo,
   Footer,
@@ -777,11 +777,6 @@ export default function VisualizadorReinoVegetal() {
 
   return (
     <div className={styles.container}>
-      {/* JSON-LD */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
 
       <MeskeiaLogo />
 

@@ -11,7 +11,6 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { generateJsonLd } from './metadata';
 
 type Tab = 'polimerizacion' | 'propiedades' | 'clasificacion' | 'sostenibilidad';
 
@@ -189,7 +188,6 @@ export default function VisualizadorPolimerosMateriales() {
   const [gradoPolimerizacion, setGradoPolimerizacion] = useState(5);
   const [polimeroSeleccionado, setPolimeroSeleccionado] = useState<PropiedadesPolimero>(POLIMEROS[0]);
   const [nodoActivo, setNodoActivo] = useState<NodoId | null>(null);
-  const jsonLd = generateJsonLd();
 
   const tabs: { id: Tab; label: string }[] = [
     { id: 'polimerizacion', label: 'Polimerización' },
@@ -202,10 +200,6 @@ export default function VisualizadorPolimerosMateriales() {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
       <div className={styles.container}>
         <MeskeiaLogo />
 

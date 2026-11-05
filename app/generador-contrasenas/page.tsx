@@ -6,7 +6,6 @@ import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import ResultCard from '@/components/ResultCard';
-import { jsonLd } from './metadata';
 import styles from './GeneradorContrasenas.module.css';
 
 // Tipos de caracteres para generar contraseñas
@@ -260,11 +259,6 @@ export default function GeneradorContrasenas() {
 
   return (
     <>
-      {/* Schema.org JSON-LD */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
 
       {/* Header meskeIA */}
       <MeskeiaLogo />

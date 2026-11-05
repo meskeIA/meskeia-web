@@ -559,10 +559,13 @@ test.describe('Contraste de rótulos y cifras', () => {
 //       el primer requestAnimationFrame y sin cambios en los 6 siguientes.
 // Este caso pasa si la promesa se retira del HTML o si la animación existe.
 test.describe('Promesa de animación', () => {
+  // HALLAZGO 4140 — REPARADO el 05/11/2026 (/reparar, tipo promesa): description, features y FAQ
+  // dicen ahora que la cuadrícula se redibuja al mover los valores. El caso pasa por la rama de
+  // «no promete»; si alguien vuelve a escribir «animada», exige la animación.
   test('si el HTML promete animación, un preset muestra fotogramas intermedios', async ({ page, request }) => {
-    test.fail(); // ABIERTO (inspector 05/11/2026) [contenido/bajo]
     const html = await (await request.get(URL_APP)).text();
     const promete = /animad|anima esa deformaci/i.test(html);
+    expect(html).toContain('redibuja la cuadrícula deformada');
     if (!promete) return;
     await abrir(page);
     await pestana(page, 'Transformaciones', T_A);
@@ -600,8 +603,8 @@ test.describe('Promesa de animación', () => {
 //     explican el 95% de la varianza»: cifra que depende por completo de los datos, dicha como
 //     capacidad general (neutralidad editorial §1).
 test.describe('Contenido — imprecisiones del bloque educativo', () => {
+  // HALLAZGO 4141 — REPARADO el 05/11/2026 (/reparar): las cinco frases reescritas.
   test('las cinco frases ya no están en el HTML servido', async ({ request }) => {
-    test.fail(); // ABIERTO (inspector 05/11/2026) [contenido/bajo]
     const html = await (await request.get(URL_APP)).text();
     const frases = [
       'Si es positivo, apuntan en la misma dirección',
@@ -611,6 +614,9 @@ test.describe('Contenido — imprecisiones del bloque educativo', () => {
       'puedes comprimir un dataset de 1000 variables a 10 componentes',
     ];
     expect(frases.filter((f) => html.includes(f))).toEqual([]);
+    // Y lo que dicen ahora, coherente con la app: u·v > 0 ⇔ ángulo agudo, y los giros de 0° y 180°.
+    expect(html).toContain('el ángulo entre ellos es');
+    expect(html).toContain('salvo los giros de 0° y de 180°');
   });
 });
 
@@ -619,8 +625,8 @@ test.describe('Contenido — imprecisiones del bloque educativo', () => {
 // `JSON.stringify(jsonLd)` en su page.tsx.
 // Caso: HTML servido → esperado 1 bloque «"@type":"WebApplication"» · obtenido 2.
 test.describe('JSON-LD', () => {
+  // HALLAZGO 4142 — REPARADO el 05/11/2026 (/reparar): page.tsx ya no repite el jsonLd.
   test('el WebApplication se declara una sola vez', async ({ request }) => {
-    test.fail(); // ABIERTO (inspector 05/11/2026) [contenido/bajo]
     const html = await (await request.get(URL_APP)).text();
     expect((html.match(/"@type":"WebApplication"/g) ?? []).length).toBe(1);
   });

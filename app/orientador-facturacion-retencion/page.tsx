@@ -11,7 +11,7 @@ import EducationalSection from '@/components/EducationalSection';
 import DataReference from '@/components/DataReference';
 import RegionBadge from '@/components/RegionBadge';
 import styles from './OrientadorFacturacionRetencion.module.css';
-import { metadata, jsonLd } from './metadata';
+import { metadata } from './metadata';
 
 // ============================================================================
 // Tipos
@@ -208,10 +208,6 @@ export default function OrientadorFacturacionRetencionPage() {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
       <div className={styles.container}>
         <MeskeiaLogo />
 

@@ -10,7 +10,6 @@ import {
   ShareCard,
 } from '@/components';
 import DisclaimerCard from '@/components/DisclaimerCard';
-import { jsonLd } from './metadata';
 import styles from './VisualizadorTiposActivos.module.css';
 
 // ─────────────────────────────────────────────
@@ -401,11 +400,6 @@ export default function VisualizadorTiposActivosPage() {
 
   return (
     <>
-      {/* Schema.org JSON-LD */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
 
       <div className={styles.container}>
         <MeskeiaLogo />

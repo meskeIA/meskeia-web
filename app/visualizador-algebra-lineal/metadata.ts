@@ -3,7 +3,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Visualizador de Álgebra Lineal — Vectores, Transformaciones y Eigenvalores | meskeIA',
-  description: 'Explora álgebra lineal geométricamente: vectores 2D con producto escalar, transformaciones lineales animadas (rotación, escala, cizalla), determinante como área del paralelogramo y eigenvalores/eigenvectores como ejes invariantes.',
+  description: 'Explora álgebra lineal geométricamente: vectores 2D con producto escalar, transformaciones lineales (rotación, escala, cizalla) con la cuadrícula redibujada al mover cada valor, determinante como área del paralelogramo y eigenvalores/eigenvectores como ejes invariantes.',
   keywords: 'álgebra lineal, vectores, transformaciones lineales, determinante, eigenvalores, eigenvectores, matrices 2x2, producto escalar, PCA, geometría lineal, matemáticas, visualizador',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
@@ -34,11 +34,14 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: 'Visualizador de Álgebra Lineal',
-  description: 'Visualizador interactivo de álgebra lineal geométrica: vectores 2D con producto escalar y ángulo, transformaciones lineales con cuadrícula animada, determinante como área del paralelogramo y eigenvalores/eigenvectores con visualización de ejes invariantes.',
+  description: 'Visualizador interactivo de álgebra lineal geométrica: vectores 2D con producto escalar y ángulo, transformaciones lineales con la cuadrícula transformada en tiempo real, determinante como área del paralelogramo y eigenvalores/eigenvectores con visualización de ejes invariantes.',
   url: 'https://meskeia.com/visualizador-algebra-lineal/',
+  // Hasta el 05/11/2026 description, features y FAQ prometían una cuadrícula «animada» que no
+  // existe: un preset salta al estado final. Lo que sí hace es redibujarla en tiempo real al mover
+  // los deslizadores (hallazgo 4140, tipo promesa).
   features: [
     'Vectores 2D interactivos: suma, producto escalar, ángulo entre vectores',
-    'Transformaciones lineales 2×2 con cuadrícula transformada animada',
+    'Transformaciones lineales 2×2 con la cuadrícula transformada redibujada al mover cada valor',
     'Presets: rotación, escala, cizalla, reflexión, identidad',
     'Determinante como área del paralelogramo visualizada',
     'Eigenvalores y eigenvectores para matrices simétricas 2×2',
@@ -56,7 +59,7 @@ export const faqJsonLd = {
       name: '¿Qué es una transformación lineal y cómo se visualiza?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Una transformación lineal es una función que convierte vectores en vectores conservando la suma y la multiplicación por escalar. Geométricamente, "deforma" el espacio: estira, rota, refleja o aplana una cuadrícula sin romper las líneas rectas ni desplazar el origen. Este visualizador anima esa deformación de la cuadrícula al cambiar los valores de la matriz 2×2.',
+        text: 'Una transformación lineal es una función que convierte vectores en vectores conservando la suma y la multiplicación por escalar. Geométricamente, "deforma" el espacio: estira, rota, refleja o aplana una cuadrícula sin romper las líneas rectas ni desplazar el origen. Este visualizador redibuja la cuadrícula deformada a medida que cambias los valores de la matriz 2×2.',
       },
     },
     {

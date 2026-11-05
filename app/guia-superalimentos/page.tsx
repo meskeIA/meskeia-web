@@ -11,7 +11,6 @@ import {
   LegalNotice,
 } from '@/components';
 import ShareCard from '@/components/ShareCard';
-import { jsonLd } from './metadata';
 
 // ============================================================
 // TIPOS
@@ -573,11 +572,6 @@ export default function GuiaSuperalimentosPage() {
 
   return (
     <div className={styles.container}>
-      {/* JSON-LD */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
 
       <MeskeiaLogo />
 

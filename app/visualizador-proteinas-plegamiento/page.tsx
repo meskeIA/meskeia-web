@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -362,10 +361,6 @@ export default function VisualizadorProteinasPlegamiento() {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
       <div className={styles.container}>
         <MeskeiaLogo />
 

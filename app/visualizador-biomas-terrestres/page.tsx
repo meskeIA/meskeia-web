@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { generateJsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -672,7 +671,6 @@ function DiagramaLatitudes({
 // ─────────────────────────────────────────────
 
 export default function VisualizadorBiomasTerrestres() {
-  const jsonLd = generateJsonLd();
   const [tab, setTab] = useState<
     'selector' | 'clima' | 'mapa' | 'amenazas'
   >('selector');
@@ -683,10 +681,6 @@ export default function VisualizadorBiomasTerrestres() {
 
   return (
     <div className={styles.container}>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
       <MeskeiaLogo />
 
       <header className={styles.hero}>

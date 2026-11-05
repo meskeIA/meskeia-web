@@ -12,7 +12,8 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { jsonLd } from './metadata';
+// El JSON-LD (WebApplication y FAQPage) lo inyecta layout.tsx: hasta el 05/11/2026 esta página
+// repetía el WebApplication y salía dos veces en el HTML (hallazgo 4142).
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -734,7 +735,6 @@ export default function VisualizadorAlgebraLineal() {
 
   return (
     <div className={styles.container}>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <MeskeiaLogo />
 
       <header className={styles.hero}>
@@ -801,8 +801,9 @@ export default function VisualizadorAlgebraLineal() {
         </p>
         <p>
           El <strong>producto escalar</strong> u·v = |u||v|cos(θ) captura la «similitud de dirección»
-          entre dos vectores. Si es 0, son perpendiculares. Si es positivo, apuntan en la misma dirección.
-          Si es negativo, apuntan en sentidos opuestos.
+          entre dos vectores. Si es 0, son perpendiculares. Si es positivo, el ángulo entre ellos es
+          agudo (menos de 90°): apuntan hacia un mismo lado. Si es negativo, el ángulo es obtuso
+          (más de 90°). Solo con 0° apuntan en la misma dirección, y solo con 180°, en sentidos opuestos.
         </p>
 
         <h3>Matrices como transformaciones del espacio</h3>
@@ -941,14 +942,14 @@ export default function VisualizadorAlgebraLineal() {
               <h3>Científico de Datos</h3>
             </div>
             <p>PCA (Análisis de Componentes Principales) usa eigenvalores para encontrar las direcciones de mayor varianza y reducir dimensiones preservando la información relevante.</p>
-            <p className={styles.escenarioTip}>Con eigenvalores puedes comprimir un dataset de 1000 variables a 10 componentes que explican el 95{' '}% de la varianza.</p>
+            <p className={styles.escenarioTip}>Cada eigenvalor dice cuánta varianza recoge su componente: si los primeros concentran casi toda, se pueden descartar los demás perdiendo poca información. Cuántos hacen falta depende por completo de los datos.</p>
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
               <span className={styles.escenarioIcon} aria-hidden="true">🧑‍🔬</span>
               <h3>Físico Cuántico</h3>
             </div>
-            <p>Los estados cuánticos son vectores en espacio de Hilbert. Los observables físicos (posición, momento, energía) son matrices simétricas llamadas operadores hermitianos.</p>
+            <p>Los estados cuánticos son vectores en espacio de Hilbert. Los observables físicos (posición, momento, energía) son operadores hermíticos, la generalización compleja de las matrices simétricas. En sistemas con un número finito de estados, como el espín, son matrices; la posición y el momento, en cambio, solo admiten operadores de dimensión infinita.</p>
             <p className={styles.escenarioTip}>El principio de incertidumbre de Heisenberg se expresa directamente en términos de conmutadores matriciales: AB − BA ≠ 0.</p>
           </div>
         </div>
@@ -963,7 +964,7 @@ export default function VisualizadorAlgebraLineal() {
           </div>
           <div className={styles.faqItem}>
             <h4>¿Qué significa que una transformación lineal «preserva la estructura»?</h4>
-            <p>Una transformación T es lineal si: T(u + v) = T(u) + T(v) y T(αv) = αT(v). En términos geométricos: el origen no se mueve, las líneas rectas siguen siendo rectas, y las líneas paralelas siguen paralelas. La escala y la proporción se preservan.</p>
+            <p>Una transformación T es lineal si: T(u + v) = T(u) + T(v) y T(αv) = αT(v). En términos geométricos: el origen no se mueve, las líneas rectas siguen siendo rectas, y las líneas paralelas siguen paralelas. Se conserva la proporción entre segmentos paralelos (el punto medio sigue siendo el punto medio), pero no las longitudes, los ángulos ni las áreas: la escala puede cambiar.</p>
             <p className={styles.faqTip}>Lo que NO puede hacer una transformación lineal: curvar líneas, desplazar el origen, o crear nuevas intersecciones.</p>
           </div>
           <div className={styles.faqItem}>
@@ -973,7 +974,7 @@ export default function VisualizadorAlgebraLineal() {
           </div>
           <div className={styles.faqItem}>
             <h4>¿Cuándo tiene una matriz eigenvalores complejos?</h4>
-            <p>Cuando el discriminante del polinomio característico es negativo: (traza/2)² - det &lt; 0. Las matrices de rotación pura (sin reflexión ni escala) siempre tienen eigenvalores complejos, porque no hay ninguna dirección real que «solo se estire». En el visualizador solo mostramos matrices simétricas, que garantizan eigenvalores reales.</p>
+            <p>Cuando el discriminante del polinomio característico es negativo: (traza/2)² - det &lt; 0. Las matrices de rotación pura (sin reflexión ni escala) tienen eigenvalores complejos salvo los giros de 0° y de 180° (λ = 1 y λ = −1), porque en cualquier otro giro no hay ninguna dirección real que «solo se estire». En el visualizador solo mostramos matrices simétricas, que garantizan eigenvalores reales.</p>
             <p className={styles.faqTip}>Los eigenvalores complejos aparecen en sistemas de oscilación y control — representan rotaciones en el espacio de estados del sistema.</p>
           </div>
           <div className={styles.faqItem}>

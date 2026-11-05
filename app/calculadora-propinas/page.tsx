@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import { MeskeiaLogo, Footer, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, DataReference, LegalNotice, ShareCard, CampoNumerico } from '@/components';
 import { formatCurrency } from '@/lib/formatters';
-import { jsonLd } from './metadata';
 import styles from './CalculadoraPropinas.module.css';
 import { SMI_2026, FISCAL_SMI_META } from '@/data/fiscal';
 
@@ -81,11 +80,6 @@ export default function CalculadoraPropinas() {
 
   return (
     <>
-      {/* Schema.org JSON-LD */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
 
       {/* Logo meskeIA */}
       <MeskeiaLogo />

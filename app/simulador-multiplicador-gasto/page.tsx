@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { jsonLd } from './metadata';
 
 // ============================================================
 // TIPOS
@@ -109,11 +108,6 @@ export default function SimuladorMultiplicadorGastoPage() {
 
   return (
     <>
-      {/* Schema.org JSON-LD */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
 
       <div className={styles.container}>
         <MeskeiaLogo />

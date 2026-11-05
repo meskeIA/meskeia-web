@@ -12,7 +12,6 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
-import { jsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -564,10 +563,6 @@ export default function VisualizadorTablaPeriodInteractiva() {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
 
       <div className={styles.container}>
         <MeskeiaLogo />
