@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './EjerciciosVocalizacion.module.css';
+import { mantenerAudioEnMarcha } from '@/lib/useEntradaAudio';
 import {
   MeskeiaLogo,
   Footer,
@@ -148,6 +149,19 @@ export default function EjerciciosVocalizacionPage() {
       streamRef.current = stream;
       const ctx = new AudioContext();
       audioCtxRef.current = ctx;
+      // Creado tras el await de getUserMedia puede nacer suspendido (Safari en iOS) y marcar
+      // «Silencio» aunque se hable: se reanuda, y si no arranca se avisa (cabo C0629)
+      await mantenerAudioEnMarcha(
+        ctx,
+        (enMarcha) =>
+          setErrorMic(
+            enMarcha
+              ? null
+              : 'El navegador no ha arrancado el audio, así que no llega tu voz al medidor. Pulsa «Desactivar micrófono» y vuelve a «Activar micrófono».'
+          ),
+        () => audioCtxRef.current === ctx,
+      );
+      if (audioCtxRef.current !== ctx) return;
       const source = ctx.createMediaStreamSource(stream);
       const analyser = ctx.createAnalyser();
       analyser.fftSize = 256;
@@ -185,6 +199,7 @@ export default function EjerciciosVocalizacionPage() {
     setMicActivo(false);
     setVolumenActual(0);
     setEnEjercicio(false);
+    setErrorMic(null);
   }, []);
 
   // Limpiar al desmontar
@@ -357,6 +372,12 @@ export default function EjerciciosVocalizacionPage() {
           </div>
         ) : (
           <div className={styles.micActivo}>
+            {/* Con el micrófono abierto solo puede fallar el arranque del audio (cabo C0629) */}
+            {errorMic && (
+              <div className={styles.errorMic} role="alert">
+                <span aria-hidden="true">⚠️</span> <span>{errorMic}</span>
+              </div>
+            )}
             {/* Medidor de volumen */}
             <div className={styles.medidorWrapper} aria-label={`Volumen de voz: ${volumenActual}%`}>
               <div className={styles.medidorLabel}>Nivel de voz</div>

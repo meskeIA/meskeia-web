@@ -5,7 +5,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './AfinadorInstrumentos.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { formatNumber } from '@/lib';
-import { abrirEntradaAudio, useEntradaAudio } from '@/lib/useEntradaAudio';
+import { abrirEntradaAudio, mantenerAudioEnMarcha, useEntradaAudio } from '@/lib/useEntradaAudio';
 import SelectorEntradaAudio from '@/components/SelectorEntradaAudio';
 import {
   AFINACIONES,
@@ -22,6 +22,9 @@ import {
 // conversión nota↔frecuencia viven en el motor, probado aparte: un signo al revés en la
 // transposición da una nota igual de plausible en pantalla y no se ve sin un instrumento
 // delante. Aquí solo queda la captura de audio, que sí necesita navegador.
+
+const AVISO_AUDIO_SIN_ARRANCAR =
+  'El navegador no ha arrancado el audio, así que no llega sonido al afinador. Pulsa «Detener» y vuelve a «Iniciar afinador».';
 
 const FAMILIAS: { id: FamiliaInstrumento; titulo: string; icono: string }[] = [
   { id: 'cuerda', titulo: 'Cuerda', icono: '🎸' },
@@ -82,6 +85,7 @@ export default function AfinadorInstrumentosPage() {
   const [instrumentoId, setInstrumentoId] = useState(AFINACIONES[0].id);
   const [a4Referencia, setA4Referencia] = useState(440);
   const [permisoMicrofono, setPermisoMicrofono] = useState<'granted' | 'denied' | 'prompt'>('prompt');
+  const [avisoAudio, setAvisoAudio] = useState<string | null>(null);
   // El micrófono o una interfaz con el instrumento por cable (S0245); '' = la predeterminada
   const { entradas, entradaId, setEntradaId, actualizarEntradas } = useEntradaAudio();
 
@@ -92,10 +96,10 @@ export default function AfinadorInstrumentosPage() {
   const bufferRef = useRef<Float32Array | null>(null);
 
   const detectarPitch = useCallback(() => {
-    if (!analyserRef.current || !bufferRef.current) return;
+    if (!analyserRef.current || !bufferRef.current || !audioContextRef.current) return;
 
     analyserRef.current.getFloatTimeDomainData(bufferRef.current as Float32Array<ArrayBuffer>);
-    const frecuencia = autoCorrelate(bufferRef.current, audioContextRef.current!.sampleRate);
+    const frecuencia = autoCorrelate(bufferRef.current, audioContextRef.current.sampleRate);
 
     // Hasta 2.500 Hz: el registro agudo de la flauta (Do7 = 2.093 Hz) y las teclas altas
     // del piano se salian del limite anterior de 2.000 Hz y la pantalla se quedaba muda.
@@ -122,7 +126,16 @@ export default function AfinadorInstrumentosPage() {
       // Si se desenchufa la entrada mientras escucha, su pista termina: se para limpio
       stream.getAudioTracks()[0]?.addEventListener('ended', () => detenerEscucha());
 
-      audioContextRef.current = new (window.AudioContext || (window as typeof window & { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
+      const contexto = new (window.AudioContext || (window as typeof window & { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
+      audioContextRef.current = contexto;
+      // Creado tras el await de getUserMedia puede nacer suspendido (Safari en iOS) y escuchar
+      // ceros sin decirlo: se reanuda, y si no arranca se avisa (cabo C0629)
+      await mantenerAudioEnMarcha(
+        contexto,
+        (enMarcha) => setAvisoAudio(enMarcha ? null : AVISO_AUDIO_SIN_ARRANCAR),
+        () => audioContextRef.current === contexto,
+      );
+      if (audioContextRef.current !== contexto) return;
       analyserRef.current = audioContextRef.current.createAnalyser();
       analyserRef.current.fftSize = 2048;
 
@@ -149,7 +162,9 @@ export default function AfinadorInstrumentosPage() {
     }
     if (audioContextRef.current) {
       audioContextRef.current.close();
+      audioContextRef.current = null;
     }
+    setAvisoAudio(null);
     setEscuchando(false);
     setFrecuenciaDetectada(null);
     setNotaActual(null);
@@ -301,6 +316,9 @@ export default function AfinadorInstrumentosPage() {
             <span>{escuchando ? 'Detener' : 'Iniciar afinador'}</span>
           </button>
         )}
+
+        {/* Siempre montado: vacío no ocupa ni se anuncia (cabo C0629) */}
+        <p className={styles.avisoAudio} role="alert">{avisoAudio}</p>
 
         {/* Entrada de audio: el micrófono o una interfaz con el instrumento conectado por cable */}
         {permisoMicrofono === 'granted' && (

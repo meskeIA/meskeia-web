@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './Sonometro.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, EducationalSection, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { formatNumber, formatDate, hoyISOLocal } from '@/lib';
-import { abrirEntradaAudio, useEntradaAudio } from '@/lib/useEntradaAudio';
+import { abrirEntradaAudio, mantenerAudioEnMarcha, useEntradaAudio } from '@/lib/useEntradaAudio';
 import SelectorEntradaAudio from '@/components/SelectorEntradaAudio';
 import { RESPUESTA_DECIBELIMETRO, RESPUESTA_PRECISION } from './metadata';
 
@@ -569,6 +569,19 @@ export default function SonometroPage() {
 
       const audioContext = new AudioContext();
       audioContextRef.current = audioContext;
+      // Creado tras el await de getUserMedia puede nacer suspendido (Safari en iOS) y medir
+      // ceros como si la sala callara: se reanuda, y si no arranca se avisa (cabo C0629)
+      await mantenerAudioEnMarcha(
+        audioContext,
+        (enMarcha) =>
+          setError(
+            enMarcha
+              ? null
+              : 'El navegador no ha arrancado el audio, así que no llega sonido al sonómetro. Pulsa «Detener y guardar» y vuelve a «Iniciar medición».'
+          ),
+        () => audioContextRef.current === audioContext,
+      );
+      if (audioContextRef.current !== audioContext) return;
 
       const source = audioContext.createMediaStreamSource(stream);
       const analyser = audioContext.createAnalyser();

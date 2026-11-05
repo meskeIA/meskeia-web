@@ -263,6 +263,21 @@
   font-weight: 600;
 }
 
+/* Aviso de que el navegador no arrancó el audio (cabo C0629) */
+.avisoAudio {
+  margin: 12px 0 0;
+  padding: 12px 16px;
+  background: rgba(239, 68, 68, 0.1);
+  border-radius: 12px;
+  color: var(--rojo-texto, #DC2626);
+  font-weight: 600;
+  text-align: center;
+}
+
+.avisoAudio:empty {
+  display: none;
+}
+
 .errorSubtexto {
   font-size: 0.85rem;
   font-weight: 400 !important;
@@ -450,6 +465,11 @@
 
 [data-theme='dark'] .estadoAfinacion.bajo {
   background: rgba(239, 68, 68, 0.2);
+}
+
+[data-theme='dark'] .avisoAudio {
+  background: rgba(239, 68, 68, 0.15);
+  color: #fca5a5;
 }
 
 [data-theme='dark'] .estadoAfinacion.alto {

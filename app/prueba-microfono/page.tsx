@@ -4,6 +4,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import styles from './PruebaMicrofono.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
+import { mantenerAudioEnMarcha } from '@/lib/useEntradaAudio';
 
 interface MicrophoneInfo {
   deviceId: string;
@@ -159,8 +160,22 @@ export default function PruebaMicrofonoPage() {
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
       streamRef.current = stream;
 
-      // Crear contexto de audio
-      audioContextRef.current = new AudioContext();
+      // Crear contexto de audio. Creado tras el await de getUserMedia puede nacer suspendido
+      // (Safari en iOS) y dibujar una línea plana como si el micrófono no captara nada: se
+      // reanuda, y si no arranca se avisa (cabo C0629)
+      const contexto = new AudioContext();
+      audioContextRef.current = contexto;
+      await mantenerAudioEnMarcha(
+        contexto,
+        (enMarcha) =>
+          setError(
+            enMarcha
+              ? null
+              : 'El navegador no ha arrancado el audio, así que no llega sonido a la prueba. Pulsa «Detener» y vuelve a «Iniciar Micrófono».'
+          ),
+        () => audioContextRef.current === contexto,
+      );
+      if (audioContextRef.current !== contexto) return;
       analyserRef.current = audioContextRef.current.createAnalyser();
       analyserRef.current.fftSize = 256;
 
@@ -376,8 +391,8 @@ export default function PruebaMicrofonoPage() {
                   </div>
                 )}
                 {error && (
-                  <div className={styles.errorOverlay}>
-                    <span className={styles.errorIcon}>❌</span>
+                  <div className={styles.errorOverlay} role="alert">
+                    <span className={styles.errorIcon} aria-hidden="true">❌</span>
                     <p>{error}</p>
                   </div>
                 )}

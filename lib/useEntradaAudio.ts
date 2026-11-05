@@ -58,6 +58,44 @@ export async function abrirEntradaAudio(entradaId: string): Promise<{ stream: Me
   }
 }
 
+/**
+ * Mantiene en marcha el AudioContext que recibe el micrófono, y dice si lo está.
+ *
+ * Un contexto creado después del `await` de getUserMedia puede nacer en 'suspended' (la política
+ * de Safari en iOS: fuera del gesto del usuario) o quedarse 'interrupted' tras una llamada. Sin
+ * reanudarlo, el analizador lee ceros y la pantalla es la de una sala en silencio, sin aviso.
+ * Receta de analizador-espectro (hallazgo 4071, f0d02be3), traída aquí al ver que sonometro,
+ * afinador-instrumentos, prueba-microfono y ejercicios-vocalizacion tampoco llamaban a resume()
+ * (cabo C0629, 05/11/2026): se reanuda al crearlo y cada vez que deja de correr, y la app avisa
+ * mientras no corra. Testigo: tests/familias/entrada-microfono.spec.ts.
+ *
+ * `alCambiar(true)` cuando corre y `alCambiar(false)` cuando no ha podido arrancarlo; nada se
+ * llama si `sigueVigente()` devuelve false (la app ya lo cerró o abrió otro).
+ */
+export async function mantenerAudioEnMarcha(
+  contexto: AudioContext,
+  alCambiar: (enMarcha: boolean) => void,
+  sigueVigente: () => boolean = () => true,
+): Promise<void> {
+  const reanudar = async () => {
+    if (contexto.state !== 'running') {
+      try {
+        await contexto.resume();
+      } catch {
+        // se avisa abajo
+      }
+    }
+    if (!sigueVigente()) return;
+    alCambiar(contexto.state === 'running');
+  };
+  contexto.onstatechange = () => {
+    if (!sigueVigente()) return;
+    if (contexto.state === 'running') alCambiar(true);
+    else if (contexto.state !== 'closed') void reanudar();
+  };
+  await reanudar();
+}
+
 export function useEntradaAudio(): {
   entradas: EntradaAudio[];
   entradaId: string;

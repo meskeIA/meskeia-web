@@ -5,7 +5,7 @@ import styles from './AnalizadorEspectro.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, EducationalSection, LegalNotice, ShareCard } from '@/components';
 import { formatNumber } from '@/lib';
 import { picoDominante } from '@/lib/calculadoras/frecuenciaDominante';
-import { abrirEntradaAudio, useEntradaAudio } from '@/lib/useEntradaAudio';
+import { abrirEntradaAudio, mantenerAudioEnMarcha, useEntradaAudio } from '@/lib/useEntradaAudio';
 import SelectorEntradaAudio from '@/components/SelectorEntradaAudio';
 
 // Bandas de frecuencia para mostrar
@@ -452,29 +452,18 @@ export default function AnalizadorEspectroPage() {
        * llamada. Sin reanudarlo el analizador lee ceros y la pantalla es la de una sala en
        * silencio, sin aviso. Hasta el 04/11/2026 no se llamaba nunca a resume() (hallazgo 4071,
        * cabo C0096). Ahora se reanuda al crearlo y cada vez que deja de correr, y si no arranca
-       * se dice.
+       * se dice. La receta vive en lib/useEntradaAudio.ts desde el 05/11/2026 (cabo C0629).
        */
-      const reanudar = async () => {
-        if (audioContext.state !== 'running') {
-          try {
-            await audioContext.resume();
-          } catch {
-            // se avisa abajo
-          }
-        }
-        if (audioContextRef.current !== audioContext) return;
-        setError(
-          audioContext.state === 'running'
-            ? null
-            : 'El navegador no ha arrancado el audio, así que no llega sonido al analizador. Pulsa «Detener» y vuelve a «Iniciar análisis».'
-        );
-      };
-      audioContext.onstatechange = () => {
-        if (audioContextRef.current !== audioContext) return;
-        if (audioContext.state === 'running') setError(null);
-        else if (audioContext.state !== 'closed') void reanudar();
-      };
-      await reanudar();
+      await mantenerAudioEnMarcha(
+        audioContext,
+        (enMarcha) =>
+          setError(
+            enMarcha
+              ? null
+              : 'El navegador no ha arrancado el audio, así que no llega sonido al analizador. Pulsa «Detener» y vuelve a «Iniciar análisis».'
+          ),
+        () => audioContextRef.current === audioContext,
+      );
       if (audioContextRef.current !== audioContext) return;
 
       const source = audioContext.createMediaStreamSource(stream);
