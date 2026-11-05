@@ -177,6 +177,7 @@ export default function TiradorDadosPage() {
                   className={styles.quantityBtn}
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
                   disabled={quantity <= 1}
+                  aria-label="Quitar un dado"
                 >
                   −
                 </button>
@@ -197,6 +198,7 @@ export default function TiradorDadosPage() {
                   className={styles.quantityBtn}
                   onClick={() => setQuantity(Math.min(20, quantity + 1))}
                   disabled={quantity >= 20}
+                  aria-label="Añadir un dado"
                 >
                   +
                 </button>
@@ -210,6 +212,7 @@ export default function TiradorDadosPage() {
                   type="button"
                   className={styles.quantityBtn}
                   onClick={() => setModifier(modifier - 1)}
+                  aria-label="Restar al modificador"
                 >
                   −
                 </button>
@@ -225,6 +228,7 @@ export default function TiradorDadosPage() {
                   type="button"
                   className={styles.quantityBtn}
                   onClick={() => setModifier(modifier + 1)}
+                  aria-label="Sumar al modificador"
                 >
                   +
                 </button>
