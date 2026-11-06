@@ -243,40 +243,20 @@ async function manometros(page: Page, xs: number[]): Promise<number[]> {
 }
 
 /**
- * Perfil horizontal de las partículas (#2E86AB = rgb 46,134,171): cuántas hay en cada columna
- * de píxeles, mirando solo por debajo de y = 150 para no contar los manómetros ni sus textos.
+ * Desplazamiento horizontal en px (0 a 150) que mejor superpone dos capturas de las partículas
+ * (#2E86AB = rgb 46,134,171, por debajo de y = 150 para no contar los manómetros ni sus textos),
+ * dadas como índices y·ancho + x: el que hace coincidir más píxeles en la MISMA fila. Sustituye a
+ * la correlación del perfil por columnas, que con 30-90 píxeles daba desplazamientos falsos (C0606).
  */
-async function perfilParticulas(page: Page): Promise<number[]> {
-  return page.evaluate(() => {
-    const c = document.querySelector('canvas') as HTMLCanvasElement;
-    const dpr = c.width / c.getBoundingClientRect().width;
-    const img = c.getContext('2d')!.getImageData(0, 0, c.width, c.height);
-    const cols = new Array<number>(c.width).fill(0);
-    for (let x = 0; x < c.width; x++) {
-      for (let y = Math.round(150 * dpr); y < c.height; y++) {
-        const i = (y * c.width + x) * 4;
-        if (
-          Math.abs(img.data[i] - 46) < 25 &&
-          Math.abs(img.data[i + 1] - 134) < 25 &&
-          Math.abs(img.data[i + 2] - 171) < 25
-        ) {
-          cols[x]++;
-        }
-      }
-    }
-    return cols;
-  });
-}
-
-/** Desplazamiento en px que mejor alinea dos perfiles de partículas (correlación cruzada). */
-function desplazamiento(a: number[], b: number[]): number {
+function desplazamiento2D(a: number[], b: number[], ancho: number): number {
+  const enB = new Set(b);
   let mejor = 0;
   let maximo = -1;
   for (let s = 0; s <= 150; s++) {
-    let acc = 0;
-    for (let x = 0; x + s < a.length; x++) acc += a[x] * b[x + s];
-    if (acc > maximo) {
-      maximo = acc;
+    let coinciden = 0;
+    for (const i of a) if ((i % ancho) + s < ancho && enB.has(i + s)) coinciden++;
+    if (coinciden > maximo) {
+      maximo = coinciden;
       mejor = s;
     }
   }
@@ -561,12 +541,54 @@ test('HALLAZGO C · el dibujo del tubo distingue un desnivel de 1 m de uno de 10
 test('HALLAZGO D · las partículas se mueven más deprisa cuando sube el caudal', async ({
   page,
 }) => {
+  // Cabo C0606 (03/11/2026): falló en la suite entera y pasaba 3 de 3 aislado; el 06/11 salió
+  // 1 de 30 con 8 workers. Medido con un diagnóstico en el propio test: los fotogramas avanzan
+  // (a 10 L/s el desplazamiento real es de ~38 px en 6 fotogramas), pero la correlación del
+  // PERFIL por columnas —30 a 90 píxeles de partícula en todo el lienzo— se quedaba a veces con
+  // un desplazamiento falso (1, 6, 17 u 87 px). Ahora se correlaciona la IMAGEN: cada partícula
+  // conserva su altura mientras avanza, así que una coincidencia casual en otro desplazamiento
+  // tiene que acertar también la fila. Y las dos capturas van en el MISMO evaluate, separadas por
+  // 6 fotogramas exactos, contados con el mismo requestAnimationFrame que anima la app (que
+  // avanza por fotograma, con su dt acotado a 0,05 s): entre 0,1 s a 60 fps y 0,3 s con el equipo
+  // cargado, a 10 L/s 38-115 px, dentro de los 150 que se buscan. Con dos evaluate y un
+  // waitForTimeout(150), el reloj entre las capturas se estiraba sin control.
   const medir = async (q: number): Promise<number> => {
     await poner(page, 'Caudal', q);
     await page.waitForTimeout(700);
-    const a = await perfilParticulas(page);
-    await page.waitForTimeout(150);
-    return desplazamiento(a, await perfilParticulas(page));
+    const [a, b, ancho] = await page.evaluate(
+      () =>
+        new Promise<[number[], number[], number]>((listo) => {
+          /** Píxeles de partícula (#2E86AB) por debajo de y = 150, como índice y·ancho + x. */
+          const pixeles = (): number[] => {
+            const c = document.querySelector('canvas') as HTMLCanvasElement;
+            const dpr = c.width / c.getBoundingClientRect().width;
+            const img = c.getContext('2d')!.getImageData(0, 0, c.width, c.height);
+            const lista: number[] = [];
+            for (let y = Math.round(150 * dpr); y < c.height; y++) {
+              for (let x = 0; x < c.width; x++) {
+                const i = (y * c.width + x) * 4;
+                if (
+                  Math.abs(img.data[i] - 46) < 25 &&
+                  Math.abs(img.data[i + 1] - 134) < 25 &&
+                  Math.abs(img.data[i + 2] - 171) < 25
+                ) {
+                  lista.push(y * c.width + x);
+                }
+              }
+            }
+            return lista;
+          };
+          const primero = pixeles();
+          let fotogramas = 0;
+          const paso = (): void => {
+            fotogramas += 1;
+            if (fotogramas >= 6) listo([primero, pixeles(), document.querySelector('canvas')!.width]);
+            else requestAnimationFrame(paso);
+          };
+          requestAnimationFrame(paso);
+        }),
+    );
+    return desplazamiento2D(a, b, ancho);
   };
   const lento = await medir(0.1); // v₁ = 0,0127 m/s
   const rapido = await medir(10); // v₁ = 1,2732 m/s, cien veces más
