@@ -84,13 +84,18 @@ export function compactar(texto: string): string {
 
 /**
  * El índice de una entrada. Con apóstrofo guarda las dos lecturas: «L’Hôpital» casa con
- * «lhopital» y con «hopital».
+ * «lhopital» y con «hopital». Y el exponente también pegado a su base, porque con teclado se
+ * escribe «m/s2» o «x2»: «s²» casa con «s», «2» y «s2».
  */
 export function indexar(texto: string): IndiceBusqueda {
   const preparado = prepararBusqueda(texto);
   const unidas = trocear(preparado.replace(APOSTROFOS, ''));
   const separadas = trocear(preparado);
-  return { palabras: [...new Set([...unidas, ...separadas])], compacto: compactar(texto) };
+  const exponentePegado = trocear(preparado.replace(APOSTROFOS, '').replace(/\^/g, ''));
+  return {
+    palabras: [...new Set([...unidas, ...separadas, ...exponentePegado])],
+    compacto: compactar(texto),
+  };
 }
 
 /**

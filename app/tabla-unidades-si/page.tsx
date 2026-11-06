@@ -12,16 +12,7 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-
-/* ────────────────────────────────────────────────────────────────
-   Normaliza texto para buscar sin acentos ni mayúsculas.
-──────────────────────────────────────────────────────────────── */
-function normalizar(texto: string): string {
-  return texto
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '');
-}
+import { buscarEnTabla, indexar, textoFormula } from '@/lib/buscadorTablas';
 
 /* ────────────────────────────────────────────────────────────────
    Modelo de datos
@@ -629,6 +620,24 @@ const UNIDADES: EntradaUnidad[] = [
 ];
 
 /* ────────────────────────────────────────────────────────────────
+   Índice del buscador (cabo C0607; la receta de tabla-derivadas en lib/buscadorTablas.ts)
+
+   Antes la consulta entera se buscaba como UNA subcadena seguida, así que el símbolo de una
+   letra casaba dentro de cualquier palabra («m» daba 62 de 65 entradas y «s» 56) y una
+   expresión escrita como en la fila («kg·m/s²») daba 0. Ahora cada palabra de la consulta
+   tiene que empezar una palabra de la entrada (una letra sola, ser ese símbolo), y la entrada
+   incluye su símbolo y su expresión en SI.
+──────────────────────────────────────────────────────────────── */
+
+const INDICE_BUSQUEDA = new Map(
+  UNIDADES.map((entrada) => {
+    const formulas = `${textoFormula(entrada.simbolo)} ${textoFormula(entrada.expr)}`;
+    const texto = `${entrada.nombre} ${entrada.magnitud} ${formulas} ${entrada.busqueda}`;
+    return [entrada.id, indexar(texto)] as const;
+  }),
+);
+
+/* ────────────────────────────────────────────────────────────────
    Componente principal
 ──────────────────────────────────────────────────────────────── */
 
@@ -644,16 +653,10 @@ export default function TablaUnidadesSiPage() {
   }, []);
 
   const resultados = useMemo(() => {
-    const termino = normalizar(consulta.trim());
-    return UNIDADES.filter((entrada) => {
-      const coincideCategoria =
-        categoriaActiva === 'todas' || entrada.categoria === categoriaActiva;
-      if (!coincideCategoria) return false;
-      if (termino === '') return true;
-      return normalizar(`${entrada.nombre} ${entrada.magnitud} ${entrada.busqueda}`).includes(
-        termino,
-      );
-    });
+    const enCategoria = UNIDADES.filter(
+      (entrada) => categoriaActiva === 'todas' || entrada.categoria === categoriaActiva,
+    );
+    return buscarEnTabla(enCategoria, consulta, (entrada) => INDICE_BUSQUEDA.get(entrada.id)!);
   }, [consulta, categoriaActiva]);
 
   const alternarFila = (id: string) => {
