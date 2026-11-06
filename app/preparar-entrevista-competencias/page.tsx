@@ -487,7 +487,7 @@ export default function PrepararEntrevistaCompetenciasPage() {
             onClick={() => setMostrarEjemplo((v) => !v)}
           >
             <span aria-hidden="true">💡</span>{' '}
-            {mostrarEjemplo ? 'Ocultar ejemplo' : 'Ver un ejemplo completo'}
+            <span>{mostrarEjemplo ? 'Ocultar ejemplo' : 'Ver un ejemplo completo'}</span>
           </button>
         </div>
 

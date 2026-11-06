@@ -561,7 +561,7 @@ export default function GeneradorSudokusPage() {
 
             <button type="button" className={styles.btnPrimary} onClick={generar} disabled={generando}>
               <span aria-hidden="true">{generando ? '⏳' : '✨'}</span>{' '}
-              {generando ? 'Generando y comprobando unicidad…' : 'Generar sudokus'}
+              <span>{generando ? 'Generando y comprobando unicidad…' : 'Generar sudokus'}</span>
             </button>
 
             <p className={styles.pista}>
@@ -613,7 +613,7 @@ export default function GeneradorSudokusPage() {
                     onClick={() => setMostrarSoluciones(!mostrarSoluciones)}
                   >
                     <span aria-hidden="true">{mostrarSoluciones ? '🙈' : '💡'}</span>{' '}
-                    {mostrarSoluciones ? 'Ocultar soluciones' : 'Ver soluciones'}
+                    <span>{mostrarSoluciones ? 'Ocultar soluciones' : 'Ver soluciones'}</span>
                   </button>
 
                   <button type="button" className={styles.btnSecundario} onClick={() => window.print()}>

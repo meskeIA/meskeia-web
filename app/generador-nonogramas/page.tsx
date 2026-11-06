@@ -472,7 +472,7 @@ export default function GeneradorNonogramasPage() {
 
             <button type="button" className={styles.btnPrimary} onClick={comprobar} disabled={comprobando}>
               <span aria-hidden="true">{comprobando ? '⏳' : '🧠'}</span>{' '}
-              {comprobando ? 'Resolviendo por lógica…' : 'Comprobar el nonograma'}
+              <span>{comprobando ? 'Resolviendo por lógica…' : 'Comprobar el nonograma'}</span>
             </button>
 
             {verificacion && (
@@ -538,7 +538,7 @@ export default function GeneradorNonogramasPage() {
                 onClick={() => setMostrarSolucion(!mostrarSolucion)}
               >
                 <span aria-hidden="true">{mostrarSolucion ? '🙈' : '💡'}</span>{' '}
-                {mostrarSolucion ? 'Ocultar solución' : 'Ver solución'}
+                <span>{mostrarSolucion ? 'Ocultar solución' : 'Ver solución'}</span>
               </button>
               <button type="button" className={styles.btnSecundario} onClick={() => window.print()}>
                 <span aria-hidden="true">🖨️</span> Imprimir esta vista

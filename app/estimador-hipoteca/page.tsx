@@ -690,7 +690,7 @@ export default function SimuladorHipotecaPage() {
               aria-controls="codigo-html-widget"
             >
               <span aria-hidden="true">{htmlExpanded ? '▼' : '▶'}</span>{' '}
-              {htmlExpanded ? 'Ocultar código' : 'Ver código HTML'}
+              <span>{htmlExpanded ? 'Ocultar código' : 'Ver código HTML'}</span>
             </button>
           </div>
 
@@ -701,7 +701,7 @@ export default function SimuladorHipotecaPage() {
               </pre>
               <button type="button" onClick={copiarCodigoHTML} className={styles.btnCopyCode}>
                 <span aria-hidden="true">{copiado ? '✅' : '📋'}</span>{' '}
-                {copiado ? 'Copiado' : 'Copiar código'}
+                <span>{copiado ? 'Copiado' : 'Copiar código'}</span>
               </button>
             </div>
           )}

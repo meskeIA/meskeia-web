@@ -504,7 +504,7 @@ export default function GeneradorFichasCalculoPage() {
                     onClick={() => setMostrarSoluciones(!mostrarSoluciones)}
                   >
                     <span aria-hidden="true">{mostrarSoluciones ? '🙈' : '💡'}</span>{' '}
-                    {mostrarSoluciones ? 'Ocultar soluciones' : 'Ver soluciones'}
+                    <span>{mostrarSoluciones ? 'Ocultar soluciones' : 'Ver soluciones'}</span>
                   </button>
 
                   <button type="button" className={styles.btnSecundario} onClick={() => window.print()}>

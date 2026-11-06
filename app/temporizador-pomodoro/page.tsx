@@ -453,7 +453,7 @@ export default function TemporizadorPomodoroPage() {
             className={styles.configToggle}
             aria-pressed={showConfig}
           >
-            <span aria-hidden="true">⚙️</span> {showConfig ? 'Ocultar' : 'Configuración'}
+            <span aria-hidden="true">⚙️</span> <span>{showConfig ? 'Ocultar' : 'Configuración'}</span>
           </button>
         </div>
 

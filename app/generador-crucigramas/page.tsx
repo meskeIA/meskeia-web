@@ -513,7 +513,7 @@ export default function GeneradorCrucigramasPage() {
                     onClick={() => setMostrarSolucion(!mostrarSolucion)}
                   >
                     <span aria-hidden="true">{mostrarSolucion ? '🙈' : '💡'}</span>{' '}
-                    {mostrarSolucion ? 'Ocultar solución' : 'Ver solución'}
+                    <span>{mostrarSolucion ? 'Ocultar solución' : 'Ver solución'}</span>
                   </button>
 
                   <button type="button" className={styles.btnSecundario} onClick={() => window.print()}>
