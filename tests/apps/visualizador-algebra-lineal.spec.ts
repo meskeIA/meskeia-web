@@ -618,6 +618,18 @@ test.describe('Contenido — imprecisiones del bloque educativo', () => {
     expect(html).toContain('el ángulo entre ellos es');
     expect(html).toContain('salvo los giros de 0° y de 180°');
   });
+
+  // Cabo C0650 — REPARADO el 06/11/2026 (/reparar): «Rotar y luego escalar ≠ escalar y luego
+  // rotar» es falso con una escala uniforme, que es la del preset «Escala ×2»: R·(k·I) = (k·I)·R.
+  // El ejemplo vale con una escala no uniforme: R90·diag(2, 1) = [[0, −1], [2, 0]] y
+  // diag(2, 1)·R90 = [[0, −2], [1, 0]].
+  test('el ejemplo de AB ≠ BA no usa una escala uniforme', async ({ request }) => {
+    const html = await (await request.get(URL_APP)).text();
+    expect(html).not.toContain('Rotar y luego escalar ≠ escalar y luego rotar');
+    expect(html).not.toContain('Rotar 90° y luego escalar ≠ escalar y luego rotar');
+    expect(html).toContain('estirar solo en x');
+    expect(html).toContain('k·I conmuta con cualquier matriz');
+  });
 });
 
 // ABIERTO (contenido, bajo) — el WebApplication del JSON-LD sale DOS veces: layout.tsx ya lo

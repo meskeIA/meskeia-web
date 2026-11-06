@@ -1074,7 +1074,7 @@ export default function VisualizadorAlgebraLineal() {
           <div className={styles.tipCard}>
             <span className={styles.tipIcon} aria-hidden="true">📐</span>
             <h4>El orden importa</h4>
-            <p>La composición A∘B se calcula como AB, pero AB ≠ BA en general. Rotar y luego escalar ≠ escalar y luego rotar.</p>
+            <p>La composición A∘B se calcula como AB, pero AB ≠ BA en general. Rotar y luego estirar solo en x ≠ estirar solo en x y luego rotar. Con una escala uniforme, como «Escala ×2», el orden no cambia nada: k·I conmuta con cualquier matriz.</p>
           </div>
           <div className={styles.tipCard}>
             <span className={styles.tipIcon} aria-hidden="true">🔄</span>
@@ -1105,7 +1105,7 @@ export default function VisualizadorAlgebraLineal() {
             <h3>Errores Comunes en Álgebra Lineal</h3>
           </div>
           <ul className={styles.warningList}>
-            <li><strong><span aria-hidden="true">❌</span> Pensar que AB = BA:</strong> La multiplicación matricial NO es conmutativa en general. Rotar 90° y luego escalar ≠ escalar y luego rotar.</li>
+            <li><strong><span aria-hidden="true">❌</span> Pensar que AB = BA:</strong> La multiplicación matricial NO es conmutativa en general. Rotar 90° y luego estirar solo en x ≠ estirar solo en x y luego rotar 90° (con una escala uniforme sí da lo mismo).</li>
             <li><strong><span aria-hidden="true">❌</span> Confundir matriz inversa con transpuesta:</strong> A⁻¹ existe solo si det(A) ≠ 0. La transpuesta Aᵀ siempre existe y tiene filas y columnas intercambiadas.</li>
             <li><strong><span aria-hidden="true">❌</span> Buscar eigenvalores de matrices no cuadradas:</strong> Los eigenvalores solo se definen para matrices cuadradas n×n.</li>
             <li><strong><span aria-hidden="true">❌</span> Olvidar que det(AB) = det(A)·det(B):</strong> El determinante de un producto es el producto de los determinantes.</li>
