@@ -6,6 +6,19 @@
  *   node scripts/vercel-estado.mjs 25           → últimos 25
  *   node scripts/vercel-estado.mjs --logs       → logs de ejecución del último
  *   node scripts/vercel-estado.mjs --logs <id>  → logs de un despliegue concreto
+ *   node scripts/vercel-estado.mjs --esperar    → espera a que termine el despliegue de lo
+ *                                                 subido (origin/main) y sale con su veredicto
+ *   node scripts/vercel-estado.mjs --esperar <sha> [--max <segundos>]
+ *
+ * --esperar (06/11/2026): el paso 5 de /push decía «esperar y repetir» sin herramienta, y
+ * cada sesión improvisaba un bucle `until … | tail -1 | grep …`. El listado acababa con una
+ * línea EN BLANCO, así que `tail -1` leía "" y el bucle se daba por terminado al primer
+ * intento («terminó antes de tiempo por una lectura vacía»). Ahora la espera vive aquí, con
+ * su temporizador, y el veredicto va en el CÓDIGO DE SALIDA, no en el texto:
+ *   0 = READY · 1 = ERROR o CANCELED · 2 = tiempo agotado · 3 = no se puede esperar.
+ * Espera al SHA de origin/main (lo que se subió), no a HEAD: otra conversación puede
+ * commitear entre el push y la espera, y ese commit no lo va a desplegar nadie.
+ * Un fallo de red o de la API durante la espera se reintenta; no la corta.
  *
  * ⚠️ ESTADO DE --logs (probado el 19/08/2026, el mismo día de apagar Observability
  * Plus): el endpoint responde 200 pero NO emite un solo evento, ni siquiera con
@@ -30,6 +43,10 @@ import { fileURLToPath } from 'node:url';
 const RAIZ = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const MAX_LINEAS_LOG = 200;   // techo de entradas que imprimimos
 const ESPERA_LOGS_MS = 20000; // el flujo no termina solo; ver verLogs()
+// Builds medidos 01-06/11/2026: 1 min 36 s a 3 min 20 s, más la cola. 8 min deja margen
+// a un build frío sin quedarse colgado si el push nunca llega a Vercel.
+const ESPERA_DEPLOY_S = 480;
+const INTERVALO_DEPLOY_S = 15;
 
 // ─── Credenciales e identificadores ───────────────────────────────────────────
 
@@ -71,14 +88,12 @@ function identificadores() {
 const { projectId, teamId } = identificadores();
 const cabeceras = { Authorization: `Bearer ${TOKEN}` };
 
+// Lanza en vez de salir: la espera reintenta un fallo pasajero; el listado lo convierte en salida 1
 async function api(ruta) {
   const union = ruta.includes('?') ? '&' : '?';
   const r = await fetch(`https://api.vercel.com${ruta}${union}teamId=${teamId}`, { headers: cabeceras });
   const cuerpo = await r.json();
-  if (cuerpo.error) {
-    console.error(`✗ La API respondió ${r.status}: ${cuerpo.error.code} — ${cuerpo.error.message}`);
-    process.exit(1);
-  }
+  if (cuerpo.error) throw new Error(`La API respondió ${r.status}: ${cuerpo.error.code} — ${cuerpo.error.message}`);
   return cuerpo;
 }
 
@@ -126,7 +141,49 @@ async function listarDespliegues(limite = 10) {
     else if (delHead.state === 'READY') console.log(`✅ HEAD (${head.slice(0, 7)}) desplegado.`);
     else console.log(`${SEMAFORO[delHead.state] || '·'} HEAD (${head.slice(0, 7)}) en estado ${delHead.state}.`);
   }
-  console.log('');
+  // Sin línea en blanco final: la del SHA tiene que ser la ÚLTIMA (ver cabecera, --esperar)
+}
+
+const ESTADOS_FINALES = { READY: 0, ERROR: 1, CANCELED: 1 };
+
+async function esperarDespliegue(shaDado, maxSegundos) {
+  let sha = shaDado;
+  if (!sha) {
+    try {
+      sha = execFileSync('git', ['rev-parse', 'origin/main'], { cwd: RAIZ, encoding: 'utf8' }).trim();
+    } catch {
+      console.log('✗ No puedo leer origin/main. Pasa el SHA: --esperar <sha>.');
+      process.exitCode = 3;
+      return;
+    }
+  }
+  const corto = sha.slice(0, 7);
+  const inicio = Date.now();
+  let ultimo = 'sin lectura';
+  console.log(`Esperando al despliegue de ${corto} (máximo ${maxSegundos} s, cada ${INTERVALO_DEPLOY_S} s)…`);
+
+  while ((Date.now() - inicio) / 1000 < maxSegundos) {
+    try {
+      const { deployments = [] } = await api(`/v6/deployments?projectId=${projectId}&limit=20`);
+      // Prefijo, para admitir un SHA corto; manda el más reciente (un redespliegue tapa el error)
+      const d = deployments.find((x) => (x.meta?.githubCommitSha || '').startsWith(sha));
+      if (d && d.state in ESTADOS_FINALES) {
+        const s = Math.round((Date.now() - inicio) / 1000);
+        const duracion = d.ready && d.buildingAt ? `, build de ${Math.round((d.ready - d.buildingAt) / 1000)} s` : '';
+        console.log(`${SEMAFORO[d.state]} ${corto} ${d.state === 'READY' ? 'desplegado' : `en estado ${d.state}`} (esperado ${s} s${duracion}) · ${d.uid}`);
+        // exitCode y no exit(): en Windows, salir con un fetch recién cerrado aborta Node
+        // (`Assertion failed: !(handle->flags & UV_HANDLE_CLOSING)`, salida 127 en vez de 0)
+        process.exitCode = ESTADOS_FINALES[d.state];
+        return;
+      }
+      ultimo = d ? d.state : 'aún no aparece en Vercel';
+    } catch (e) {
+      ultimo = `lectura fallida, se reintenta (${e.message})`;
+    }
+    await new Promise((r) => setTimeout(r, INTERVALO_DEPLOY_S * 1000));
+  }
+  console.log(`⏳ ${corto}: tiempo agotado tras ${maxSegundos} s. Último estado: ${ultimo}. No darlo por bueno.`);
+  process.exitCode = 2;
 }
 
 async function verLogs(idDado) {
@@ -198,8 +255,19 @@ async function verLogs(idDado) {
 // ─── Entrada ──────────────────────────────────────────────────────────────────
 
 const args = process.argv.slice(2);
-if (args.includes('--logs')) {
-  await verLogs(args[args.indexOf('--logs') + 1]);
-} else {
-  await listarDespliegues(Number(args[0]) || 10);
+const valorTras = (opcion) => {
+  const v = args[args.indexOf(opcion) + 1];
+  return v && !v.startsWith('--') ? v : undefined;
+};
+try {
+  if (args.includes('--esperar')) {
+    await esperarDespliegue(valorTras('--esperar'), Number(valorTras('--max')) || ESPERA_DEPLOY_S);
+  } else if (args.includes('--logs')) {
+    await verLogs(valorTras('--logs'));
+  } else {
+    await listarDespliegues(Number(args[0]) || 10);
+  }
+} catch (e) {
+  console.error(`✗ ${e.message}`);
+  process.exitCode = 1;
 }
