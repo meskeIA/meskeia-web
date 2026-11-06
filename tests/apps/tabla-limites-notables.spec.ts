@@ -494,11 +494,12 @@ test.describe('Hallazgos de la inspección del 03/11/2026', () => {
     }
   });
 
-  test('HALLAZGO (03/11/2026, ABIERTO) · las fracciones y el «=» no se leen: «sen x / x = 1» se anuncia «lím sen x x 1»', async ({ page }) => {
+  test('HALLAZGO 3986 (REPARADO el 06/11/2026) · las fracciones y el «=» se leen: «sen x / x = 1» ya no se anuncia «lím sen x x 1»', async ({ page }) => {
     // Frac apila numerador y denominador en dos <span> sin nada que diga «entre», y el «=» de la
     // fila va con aria-hidden. Nombre accesible medido el 03/11/2026:
     // «Seno partido por x Trigonométricos x → 0 x en radianes lím sen x x 1».
-    test.fail();
+    // REPARADO (/reparar, cabo C0607): Frac lleva « entre » solo para el lector, como sus hermanas
+    // tabla-derivadas, tabla-integrales y tabla-areas-volumenes, y el «=» ya no va oculto.
     await cargar(page);
     await expect.soft(filaDe(page, 'sen-x-entre-x')).toHaveAccessibleName(/sen x\s*(\/|entre|partido|sobre)\s*x/i);
     await expect.soft(filaDe(page, 'sen-x-entre-x')).toHaveAccessibleName(/(=|igual|vale)\s*1/i);

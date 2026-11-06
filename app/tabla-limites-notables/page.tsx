@@ -23,6 +23,8 @@ function Frac({ n, d }: { n: ReactNode; d: ReactNode }) {
   return (
     <span className={styles.frac}>
       <span className={styles.fracNum}>{n}</span>
+      {/* Sin esto, «sen x / x» se anunciaba «sen x x» (hallazgo 3986; receta de tabla-integrales) */}
+      <span className="sr-only"> entre </span>
       <span className={styles.fracDen}>{d}</span>
     </span>
   );
@@ -1631,9 +1633,8 @@ export default function TablaLimitesNotablesPage() {
                       <span className={styles.etq}>lím</span>
                       <span className={styles.expr}>{entrada.expresion}</span>
                     </span>
-                    <span className={styles.flecha} aria-hidden="true">
-                      =
-                    </span>
+                    {/* El «=» se lee: con aria-hidden la fila se anunciaba «lím sen x x 1» (hallazgo 3986) */}
+                    <span className={styles.flecha}>=</span>
                     <span className={styles.par}>
                       <span className={`${styles.expr} ${styles.exprValor}`}>{entrada.valor}</span>
                     </span>
