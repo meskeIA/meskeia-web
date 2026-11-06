@@ -266,6 +266,11 @@ export default function SimuladorOfertaDemandaPage() {
     const colorShadeD = isDark ? 'rgba(46,134,171,0.2)' : 'rgba(46,134,171,0.15)';
     const colorShadeO = isDark ? 'rgba(224,122,31,0.2)' : 'rgba(224,122,31,0.15)';
     const colorControl = '#D94F4F';
+    // Tonos de TEXTO de esos colores, por tema (cabo C0297, 06/11/2026): con el color de la
+    // curva, «D» quedaba a 3,93:1 en claro y 3,50 en oscuro, «O» a 2,89 y P_max/P_min a 3,9 y 3,5
+    const textoD = isDark ? '#3FA5D1' : '#26718F';
+    const textoO = isDark ? '#E07A1F' : '#B4530A';
+    const textoControl = isDark ? '#F07070' : '#B02E2E';
 
     ctx.clearRect(0, 0, W, H);
 
@@ -359,7 +364,7 @@ export default function SimuladorOfertaDemandaPage() {
     const qLabelD = Q_MAX * 0.85;
     const pLabelD = pDemanda(qLabelD);
     if (pLabelD >= 0 && pLabelD <= P_MAX) {
-      ctx.fillStyle = colorD;
+      ctx.fillStyle = textoD;
       ctx.font = 'bold 14px system-ui, sans-serif';
       ctx.textAlign = 'left';
       ctx.fillText('D', toX(qLabelD) + 4, toY(pLabelD) - 4);
@@ -386,7 +391,7 @@ export default function SimuladorOfertaDemandaPage() {
     const qLabelO = Q_MAX * 0.85;
     const pLabelO = pOferta(qLabelO);
     if (pLabelO >= 0 && pLabelO <= P_MAX) {
-      ctx.fillStyle = colorO;
+      ctx.fillStyle = textoO;
       ctx.font = 'bold 14px system-ui, sans-serif';
       ctx.textAlign = 'left';
       ctx.fillText('O', toX(qLabelO) + 4, toY(pLabelO) + 14);
@@ -404,7 +409,7 @@ export default function SimuladorOfertaDemandaPage() {
       ctx.stroke();
       ctx.setLineDash([]);
 
-      ctx.fillStyle = colorControl;
+      ctx.fillStyle = textoControl;
       ctx.font = 'bold 12px system-ui, sans-serif';
       ctx.textAlign = 'right';
       const labelCtrl = modo === 'maximo' ? `P_max = ${fmt(precioFijado)}` : `P_min = ${fmt(precioFijado)}`;
@@ -420,7 +425,7 @@ export default function SimuladorOfertaDemandaPage() {
         ctx.lineTo(toX(qDemandaControlada), pad.top + plotH);
         ctx.stroke();
         ctx.setLineDash([]);
-        ctx.fillStyle = colorD;
+        ctx.fillStyle = textoD;
         ctx.font = '11px system-ui, sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText(`Qd`, toX(qDemandaControlada), pad.top + plotH + 14);
@@ -434,7 +439,7 @@ export default function SimuladorOfertaDemandaPage() {
         ctx.lineTo(toX(qOfertaControlada), pad.top + plotH);
         ctx.stroke();
         ctx.setLineDash([]);
-        ctx.fillStyle = colorO;
+        ctx.fillStyle = textoO;
         ctx.font = '11px system-ui, sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText(`Qo`, toX(qOfertaControlada), pad.top + plotH + 26);

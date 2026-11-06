@@ -186,6 +186,11 @@ export default function SimuladorCineticaArrheniusPage() {
     const colorEa = '#A82E68';
     const colorReactivasT1 = 'rgba(46, 134, 171, 0.55)';
     const colorReactivasT2 = 'rgba(224, 122, 31, 0.55)';
+    // Tonos de TEXTO por tema (cabo C0297, 06/11/2026): con el color de la curva, T₁ quedaba a
+    // 3,93:1 en claro y 4,24 en oscuro, T₂ a 2,89 en claro y la Ea a 2,70 en oscuro
+    const textoT1 = isDark ? '#3FA5D1' : '#26718F';
+    const textoT2 = isDark ? '#E07A1F' : '#B4530A';
+    const textoEa = isDark ? '#E06AA0' : '#A82E68';
 
     ctx.clearRect(0, 0, W, H);
 
@@ -312,18 +317,18 @@ export default function SimuladorCineticaArrheniusPage() {
     ctx.lineTo(xToPx(ea * 1000), pad.top + plotH);
     ctx.stroke();
 
-    ctx.fillStyle = colorEa;
+    ctx.fillStyle = textoEa;
     ctx.font = 'bold 12px system-ui';
     ctx.textAlign = 'center';
     ctx.fillText(`Ea = ${ea} kJ/mol`, xToPx(ea * 1000), pad.top + 12);
 
     // Etiqueta T1, T2
-    ctx.fillStyle = colorT1;
+    ctx.fillStyle = textoT1;
     ctx.font = '11px system-ui';
     ctx.textAlign = 'left';
     ctx.fillText(`T₁ = ${T1} K`, pad.left + 8, pad.top + 14);
     if (comparar && T2 !== T1) {
-      ctx.fillStyle = colorT2;
+      ctx.fillStyle = textoT2;
       ctx.fillText(`T₂ = ${T2} K`, pad.left + 8, pad.top + 28);
     }
   }, [T1, T2, ea, comparar]);
@@ -356,6 +361,9 @@ export default function SimuladorCineticaArrheniusPage() {
     const colorLine = '#2E86AB';
     const colorPunto1 = '#2E86AB';
     const colorPunto2 = '#E07A1F';
+    // Rótulo de cada punto en su tono de texto (cabo C0297)
+    const textoPunto1 = isDark ? '#3FA5D1' : '#26718F';
+    const textoPunto2 = isDark ? '#E07A1F' : '#B4530A';
 
     ctx.clearRect(0, 0, W, H);
 
@@ -430,7 +438,7 @@ export default function SimuladorCineticaArrheniusPage() {
     ctx.stroke();
 
     // Puntos T1 y T2
-    const drawPunto = (T: number, color: string, label: string) => {
+    const drawPunto = (T: number, color: string, colorRotulo: string, label: string) => {
       const invT = 1 / T;
       const lnK = Math.log(kArrhenius(ea, A, T));
       ctx.fillStyle = color;
@@ -441,13 +449,13 @@ export default function SimuladorCineticaArrheniusPage() {
       ctx.fill();
       ctx.stroke();
 
-      ctx.fillStyle = color;
+      ctx.fillStyle = colorRotulo;
       ctx.font = 'bold 11px system-ui';
       ctx.textAlign = 'left';
       ctx.fillText(label, xToPx(invT) + 10, yToPx(lnK) + 4);
     };
-    drawPunto(T1, colorPunto1, `T₁ = ${T1} K`);
-    if (comparar && T2 !== T1) drawPunto(T2, colorPunto2, `T₂ = ${T2} K`);
+    drawPunto(T1, colorPunto1, textoPunto1, `T₁ = ${T1} K`);
+    if (comparar && T2 !== T1) drawPunto(T2, colorPunto2, textoPunto2, `T₂ = ${T2} K`);
 
     // Pendiente etiqueta
     ctx.fillStyle = colorText;

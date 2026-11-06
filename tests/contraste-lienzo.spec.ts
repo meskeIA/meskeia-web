@@ -53,6 +53,25 @@ const APPS: readonly AppLienzo[] = [
       await page.getByRole('button', { name: /Diagrama de árbol/ }).click();
     },
   },
+  // «D» en la marca (3,93:1 en claro, 3,50 en oscuro), «O» y Qo en naranja (2,89) y
+  // P_max/P_min en rojo (3,9 y 3,5)
+  { slug: 'simulador-oferta-demanda' },
+  {
+    slug: 'simulador-oferta-demanda',
+    estado: 'precio máximo',
+    preparar: async (page) => {
+      await page.getByRole('button', { name: /Precio máximo/ }).click();
+    },
+  },
+  // La «m» en blanco sobre el bloque en la marca (4,11:1) y «x=…m» en naranja (2,88 en claro;
+  // el primer arreglo, un naranja oscuro fijo, daba 2,93 sobre el lienzo oscuro)
+  { slug: 'simulador-mas-resorte' },
+  // T₁ en la marca (3,93:1 en claro, 4,24 en oscuro), T₂ en naranja (2,89) y la Ea en
+  // granate en oscuro (2,70), en los dos lienzos
+  { slug: 'simulador-cinetica-arrhenius' },
+  // μ₀ y H₀ en la marca (3,93:1 en claro, 4,24 en oscuro), μ₁ y H₁ en naranja (2,89) y X̄ en
+  // violeta en oscuro (3,05)
+  { slug: 'simulador-test-hipotesis' },
   // Cabeceras CLIENTE y SERVIDOR en blanco sobre la marca (4,11 y 2,80:1); etiquetas de las
   // flechas FIN y ACK y de las bandas de estado en su color (2,4-3,9:1)
   {

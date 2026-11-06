@@ -217,9 +217,10 @@ export default function SimuladorMasResortePage() {
           ctx.lineWidth = 2;
           dibujarResorte(ctx, cx, resorteDesde, cx, resorteHasta, 11, 11);
 
-          // Bloque masa
+          // Bloque masa: con la «m» en blanco, el azul de marca daba 4,11:1; el del botón
+          // (--primary-boton), 5,47 (cabo C0297, 06/11/2026).
           const bw = 50;
-          ctx.fillStyle = '#2E86AB';
+          ctx.fillStyle = '#26718F';
           ctx.strokeStyle = '#1a5278';
           ctx.lineWidth = 1.5;
           ctx.beginPath();
@@ -252,8 +253,10 @@ export default function SimuladorMasResortePage() {
             ctx.closePath();
             ctx.fillStyle = '#E07A1F';
             ctx.fill();
-            // etiqueta x
-            ctx.fillStyle = '#E07A1F';
+            // etiqueta x: el naranja de la flecha daba 2,88:1 sobre el fondo claro; en oscuro el
+            // lienzo va sobre #1E2937 y ahí el naranja sí llega (4,89:1) (C0297)
+            ctx.fillStyle =
+              document.documentElement.getAttribute('data-theme') === 'dark' ? '#E07A1F' : '#B4530A';
             ctx.font = 'bold 12px system-ui, sans-serif';
             ctx.textAlign = 'left';
             ctx.fillText(`x=${formatNumber(x, 2)}m`, flechaX + 8, (equilibrioY + bloqueY) / 2);

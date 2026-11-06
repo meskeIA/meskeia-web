@@ -198,6 +198,11 @@ export default function SimuladorTestHipotesisPage() {
     const colorBeta = 'rgba(224, 122, 31, 0.32)';
     const colorPVal = 'rgba(46, 134, 171, 0.40)';
     const colorObs = '#7C3AED';
+    // Tonos de TEXTO por tema (cabo C0297, 06/11/2026): con el color de su curva, μ₀ y H₀
+    // quedaban a 3,93:1 en claro y 4,24 en oscuro, μ₁ y H₁ a 2,89 en claro y X̄ a 3,05 en oscuro
+    const textoH0 = isDark ? '#3FA5D1' : '#26718F';
+    const textoH1 = isDark ? '#E07A1F' : '#B4530A';
+    const textoObs = isDark ? '#A78BFA' : colorObs;
 
     ctx.clearRect(0, 0, W, H);
 
@@ -354,13 +359,13 @@ export default function SimuladorTestHipotesisPage() {
     ctx.setLineDash([]);
 
     // === ETIQUETAS μ ===
-    ctx.fillStyle = colorH0;
+    ctx.fillStyle = textoH0;
     ctx.font = 'bold 11px system-ui';
     ctx.textAlign = 'center';
     ctx.fillText(`μ₀ = ${fmt(mu0, 1)}`, xToPx(mu0), pad.top - 12);
 
     if (mostrarH1) {
-      ctx.fillStyle = colorH1;
+      ctx.fillStyle = textoH1;
       ctx.fillText(`μ₁ = ${fmt(mu1, 1)}`, xToPx(mu1), pad.top - 2);
     }
 
@@ -388,7 +393,7 @@ export default function SimuladorTestHipotesisPage() {
     ctx.lineTo(xToPx(xBar), pad.top + plotH);
     ctx.stroke();
 
-    ctx.fillStyle = colorObs;
+    ctx.fillStyle = textoObs;
     ctx.font = 'bold 12px system-ui';
     ctx.textAlign = 'center';
     ctx.fillText(`X̄ = ${fmt(xBar, 1)}`, xToPx(xBar), pad.top + plotH + 30);
@@ -396,10 +401,10 @@ export default function SimuladorTestHipotesisPage() {
     // === LEYENDA INTERIOR (etiquetas H0/H1) ===
     ctx.font = '11px system-ui';
     ctx.textAlign = 'left';
-    ctx.fillStyle = colorH0;
+    ctx.fillStyle = textoH0;
     ctx.fillText('H₀: distribución de X̄ si μ = μ₀', pad.left + 8, pad.top + 14);
     if (mostrarH1) {
-      ctx.fillStyle = colorH1;
+      ctx.fillStyle = textoH1;
       ctx.fillText('H₁: distribución de X̄ si μ = μ₁', pad.left + 8, pad.top + 28);
     }
   }, [tipo, mu0, mu1, ee, criticosX, xBar, mostrarH1]);
