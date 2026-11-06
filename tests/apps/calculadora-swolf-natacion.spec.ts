@@ -1161,15 +1161,32 @@ test.describe('HALLAZGO 4145 y C0649 (REPARADOS) — más rápido que el récord
     expect(calcularSWOLF(18.5, 2, 50).nivel).toBe('elite');
   });
 
-  test('FUERA DEL SUELO — 50 m con los valores por defecto, lo que da hoy (no es un visto bueno)', async ({ page }) => {
-    // 20 s y 18 brazadas sin tocar los campos: 20 > 18 entra; 38 / 2 = 19 ≤ 25 → Élite ·
-    // 20 · 100 / 50 = 40 s → «0:40 min/100 m». Es el valor por defecto sin reescalar (cabo aparte).
+  // Cabo C0652 — REPARADO el 06/11/2026 (/reparar). Antes: 20 s y 18 brazadas sin tocar y «50 m»
+  // daban 38 / 2 = 19 ≤ 25 → «Élite · 0:40 min/100 m», un ritmo de récord para quien no había
+  // escrito nada. Ahora los valores de partida SIN TOCAR pasan a los de la otra piscina:
+  // 40 s y 36 brazadas → SWOLF 76, 38 por 25 m ≤ 38 → Intermedio, igual que 20 y 18 en 25 m ·
+  // 40 · 100 / 50 = 80 s → «1:20 min/100 m». Y lo que el usuario escribe no se toca.
+  test('C0652 — 50 m con los valores de partida sin tocar: 40 s y 36 brazadas, el mismo nivel que en 25 m', async ({ page }) => {
     await expect(tiempoInput(page)).toHaveValue('20');
     await expect(brazadasInput(page)).toHaveValue('18');
+    await expect(nivelBadge(page)).toContainText('Intermedio');
     await elegirPiscina(page, 50);
-    await expect(swolfScore(page)).toHaveText('38');
-    await expect(nivelBadge(page)).toContainText('Élite');
-    await expect(detalle(page, 1)).toHaveText('0:40 min/100 m');
-    await expect(aviso(page)).toHaveText('');
+    await expect(tiempoInput(page)).toHaveValue('40');
+    await expect(brazadasInput(page)).toHaveValue('36');
+    await expect(swolfScore(page)).toHaveText('76');
+    await expect(nivelBadge(page)).toContainText('Intermedio');
+    await expect(detalle(page, 1)).toHaveText('1:20 min/100 m');
+    await expect(page.locator('main')).not.toContainText('Élite ·');
+    // Y de vuelta a 25 m, los de partida otra vez.
+    await elegirPiscina(page, 25);
+    await expect(tiempoInput(page)).toHaveValue('20');
+    await expect(brazadasInput(page)).toHaveValue('18');
+  });
+
+  test('C0652 — un valor escrito por el usuario no se reescala al cambiar de piscina', async ({ page }) => {
+    await caso(page, 25, '22', '16');
+    await elegirPiscina(page, 50);
+    await expect(tiempoInput(page)).toHaveValue('22');
+    await expect(brazadasInput(page)).toHaveValue('16');
   });
 });

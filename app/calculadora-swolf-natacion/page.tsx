@@ -61,18 +61,38 @@ function leerCampo(
   return { valor: n, aviso: null };
 }
 
+/** Valores de partida, por cada 25 m: en 50 m son el doble (ver `elegirPiscina`). */
+const TIEMPO_INICIAL_POR_25 = 20;
+const BRAZADAS_INICIALES_POR_25 = 18;
+
 /** SWOLF a la décima, sin decimales si es entero («38», «38,5»). */
 function formatearSwolf(x: number): string {
   return formatNumber(x, Number.isInteger(x) ? 0 : 1);
 }
 
 export default function CalculadoraSwolfNatacionPage() {
-  const [tiempoTexto, setTiempoTexto] = useState<string>('20');
-  const [brazadasTexto, setBrazadasTexto] = useState<string>('18');
+  const [tiempoTexto, setTiempoTexto] = useState<string>(String(TIEMPO_INICIAL_POR_25));
+  const [brazadasTexto, setBrazadasTexto] = useState<string>(String(BRAZADAS_INICIALES_POR_25));
   const [metrosPiscina, setMetrosPiscina] = useState<MetrosPiscina>(25);
 
   // Cuántos largos de 25 m caben en uno de esta piscina
   const factor = metrosPiscina / 25;
+
+  /**
+   * Cambiar de piscina con los valores de partida SIN TOCAR los lleva a los de la otra piscina
+   * (20 s y 18 brazadas por 25 m: 40 s y 36 en 50 m). Hasta el 06/11/2026 se quedaban en 20 y 18,
+   * y al pulsar «50 m» la app daba «Élite · 0:40 min/100 m», un ritmo de récord, a quien no había
+   * escrito nada (cabo C0652). Lo que el usuario haya escrito no se toca.
+   */
+  function elegirPiscina(nueva: MetrosPiscina) {
+    const deAntes = metrosPiscina / 25;
+    const deAhora = nueva / 25;
+    if (tiempoTexto === String(TIEMPO_INICIAL_POR_25 * deAntes) && brazadasTexto === String(BRAZADAS_INICIALES_POR_25 * deAntes)) {
+      setTiempoTexto(String(TIEMPO_INICIAL_POR_25 * deAhora));
+      setBrazadasTexto(String(BRAZADAS_INICIALES_POR_25 * deAhora));
+    }
+    setMetrosPiscina(nueva);
+  }
 
   // El mínimo de tiempo es EXCLUSIVO: 9 s por 25 m ya son más rápidos que el récord mundial
   // (hallazgo 4145, cabo C0649; el ancla, en RANGO_TIEMPO_SWOLF_POR_25). La regla y el
@@ -152,7 +172,7 @@ export default function CalculadoraSwolfNatacionPage() {
               <button
                 type="button"
                 className={`${styles.piscinaBtn} ${metrosPiscina === 25 ? styles.piscinaBtnActive : ''}`}
-                onClick={() => setMetrosPiscina(25)}
+                onClick={() => elegirPiscina(25)}
                 aria-pressed={metrosPiscina === 25}
               >
                 25 m
@@ -160,7 +180,7 @@ export default function CalculadoraSwolfNatacionPage() {
               <button
                 type="button"
                 className={`${styles.piscinaBtn} ${metrosPiscina === 50 ? styles.piscinaBtnActive : ''}`}
-                onClick={() => setMetrosPiscina(50)}
+                onClick={() => elegirPiscina(50)}
                 aria-pressed={metrosPiscina === 50}
               >
                 50 m
