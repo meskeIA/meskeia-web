@@ -89,6 +89,29 @@ for (const ruta of RUTAS) {
 }
 
 /*
+ * C0630 (06/11/2026) — el caso de arriba mide tras networkidle, sin esperar a la hidratación, y
+ * con el equipo cargado puede medir el HTML SERVIDO: creador-thumbnails salió en la suite entera
+ * del 04/11 a 835 px (y a 1.310 en 1.280), las cifras exactas de su HTML servido, que pintaba el
+ * lienzo a 1.280 px hasta que un efecto medía la columna; aislado pasaba siempre. Se mide aquí el
+ * HTML servido a propósito, sin JS: lo que ve un móvil lento hasta que llega el JS, y lo que el
+ * caso de arriba solo ve a veces. Medido el 06/11 en las 43 rutas: solo desbordaba esa.
+ */
+for (const ruta of RUTAS) {
+  test(`${ruta} · el HTML servido, sin JS, ya cabe en 390 px (C0630)`, async ({ browser }) => {
+    const contexto = await browser.newContext({ javaScriptEnabled: false, viewport: { width: 390, height: 844 } });
+    const page = await contexto.newPage();
+    await page.goto(ruta);
+    const r = await page.evaluate(() => ({
+      body: document.body.scrollWidth,
+      doc: document.documentElement.scrollWidth,
+    }));
+    await contexto.close();
+    expect(r.body, `body ${r.body} px sin JS`).toBeLessThanOrEqual(390);
+    expect(r.doc, `documento ${r.doc} px sin JS`).toBeLessThanOrEqual(390);
+  });
+}
+
+/*
  * C0565 (03/11/2026) — que la página no desborde NO basta: el desborde horizontal desaparece
  * también encogiendo una columna de texto hasta cero. 2487ae59 (C0425) dejó así la checklist de
  * simulador-bono-joven-alquiler a 0 px (hallazgo 3893, 49 líneas para una pregunta) y este testigo
