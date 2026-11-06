@@ -644,6 +644,11 @@
   background: rgba(255, 255, 255, 0.06);
 }
 
+/* En oscuro el #3FA5D1 sobre ese tinte daba 4,29:1 (cabo C0278, como el hallazgo 3580) */
+[data-theme='dark'] .escenarioExample code {
+  color: var(--text-primary);
+}
+
 .escenarioTip {
   font-size: 0.82rem !important;
   color: var(--text-muted) !important;
