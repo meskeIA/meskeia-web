@@ -101,6 +101,10 @@ const APPS: readonly AppLienzo[] = [
     },
   },
   { slug: 'simulador-teorema-central-limite' },
+  // «+10 €» en el verde '#28a745' (3,13:1 sobre blanco)
+  { slug: 'simulador-elasticidad-precio' },
+  // Las marcas del eje en negro al 40 % (2,83:1); el lienzo pinta su propio fondo claro
+  { slug: 'visualizador-calculo-visual', sinTema: true },
   // Cabeceras CLIENTE y SERVIDOR en blanco sobre la marca (4,11 y 2,80:1); etiquetas de las
   // flechas FIN y ACK y de las bandas de estado en su color (2,4-3,9:1)
   {

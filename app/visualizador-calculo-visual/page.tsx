@@ -96,7 +96,8 @@ export default function CalculoVisualPage() {
     ctx.beginPath(); ctx.moveTo(cx(0), 0); ctx.lineTo(cx(0), H); ctx.stroke();
 
     // Etiquetas de ejes
-    ctx.fillStyle = 'rgba(0,0,0,0.4)';
+    // El negro al 40 % daba un gris de 2,83:1 sobre el fondo del lienzo (cabo C0297)
+    ctx.fillStyle = '#5F6368';
     ctx.font = '11px system-ui';
     ctx.textAlign = 'center';
     for (let gx = -4; gx <= 4; gx += 2) {

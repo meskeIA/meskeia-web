@@ -280,7 +280,11 @@ function dibujarGrafico(
   // Etiqueta variación IT
   const deltaIT = resultado.deltaIT;
   const etiquetaIT = deltaIT >= 0 ? `+${formatNumber(deltaIT, 0)} €` : `${formatNumber(deltaIT, 0)} €`;
-  const colorLabel = Math.abs(deltaIT) < 1 ? colorTexto : deltaIT > 0 ? '#28a745' : '#dc3545';
+  // Verde y rojo de TEXTO por tema (cabo C0297, 06/11/2026): '#28a745' daba 3,13:1 sobre el
+  // blanco y '#dc3545' 3,17 sobre el fondo oscuro. En claro, los de --verde-texto y --rojo-texto
+  const verde = isDark ? '#28a745' : '#136E35';
+  const rojo = isDark ? '#F07070' : '#B91C1C';
+  const colorLabel = Math.abs(deltaIT) < 1 ? colorTexto : deltaIT > 0 ? verde : rojo;
   ctx.fillStyle = colorLabel;
   ctx.font = 'bold 13px -apple-system, sans-serif';
   ctx.textAlign = 'center';
