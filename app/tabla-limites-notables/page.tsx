@@ -12,6 +12,7 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
+import { buscarEnTabla, indexar, textoFormula } from '@/lib/buscadorTablas';
 
 /* ────────────────────────────────────────────────────────────────
    Utilidades de render de fórmulas (sin librerías externas: la CSP
@@ -28,14 +29,6 @@ function Frac({ n, d }: { n: ReactNode; d: ReactNode }) {
       <span className={styles.fracDen}>{d}</span>
     </span>
   );
-}
-
-/** Normaliza texto para buscar sin acentos ni mayúsculas. */
-function normalizar(texto: string): string {
-  return texto
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '');
 }
 
 /* ────────────────────────────────────────────────────────────────
@@ -1478,6 +1471,25 @@ const LIMITES: EntradaLimite[] = [
 ];
 
 /* ────────────────────────────────────────────────────────────────
+   Índice del buscador (hallazgos 3984 y 3985, cabo C0607; la receta de tabla-derivadas, C0591,
+   ahora en lib/buscadorTablas.ts)
+
+   Antes la consulta entera se buscaba como UNA subcadena seguida en nombre + sinónimos, así que
+   la notación de la propia tabla («1^∞», «∞/∞», «1 − cos x»), «L’Hôpital», dos palabras en otro
+   orden o el nombre de una categoría daban «0 de 59»; y «coseno» casaba dentro de «arcoseno»,
+   «sin» dentro de «asíntota». Ahora cada palabra de la consulta tiene que empezar una palabra de
+   la entrada, y la entrada incluye su expresión y el nombre de su categoría.
+──────────────────────────────────────────────────────────────── */
+
+const INDICE_BUSQUEDA = new Map(
+  LIMITES.map((entrada) => {
+    const expresion = textoFormula(entrada.expresion, Frac);
+    const texto = `${entrada.nombre} ${expresion} ${NOMBRE_CATEGORIA[entrada.categoria]} ${entrada.busqueda}`;
+    return [entrada.id, indexar(texto)] as const;
+  }),
+);
+
+/* ────────────────────────────────────────────────────────────────
    Componente principal
 ──────────────────────────────────────────────────────────────── */
 
@@ -1493,14 +1505,10 @@ export default function TablaLimitesNotablesPage() {
   }, []);
 
   const resultados = useMemo(() => {
-    const termino = normalizar(consulta.trim());
-    return LIMITES.filter((entrada) => {
-      const coincideCategoria =
-        categoriaActiva === 'todas' || entrada.categoria === categoriaActiva;
-      if (!coincideCategoria) return false;
-      if (termino === '') return true;
-      return normalizar(`${entrada.nombre} ${entrada.busqueda}`).includes(termino);
-    });
+    const enCategoria = LIMITES.filter(
+      (entrada) => categoriaActiva === 'todas' || entrada.categoria === categoriaActiva,
+    );
+    return buscarEnTabla(enCategoria, consulta, (entrada) => INDICE_BUSQUEDA.get(entrada.id)!);
   }, [consulta, categoriaActiva]);
 
   const alternarFila = (id: string) => {

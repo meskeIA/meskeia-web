@@ -329,11 +329,17 @@ test.describe('Buscador', () => {
     expect(await nombresDeFilas(page)).toContain('x por logaritmo de x');
     expect(await fila(page, 'x-ln-x')).toMatchObject({ tendencia: 'x → 0⁺', condiciones: 'solo por la derecha (x > 0)', valor: '0' });
 
-    // «número e» está en el nombre de 4 entradas y en el texto de búsqueda de 2 (eˣ − 1 e 1^∞)
+    // «número e» está en el nombre de 4 entradas y en el texto de búsqueda de 2 (eˣ − 1 e 1^∞).
+    // Desde el 06/11/2026 (hallazgo 3984) el índice lleva el nombre de la categoría, así que salen
+    // también las tres de «El número e» que no lo nombran: (1 + k/x)^x → e^k, (1 − 1/x)^x → 1/e y
+    // la fórmula general de 1^∞, e^(lím g·(f − 1)). Las tres son límites de e: es lo que se busca.
     const conE = [
       'Exponencial menos uno partido por x',
       'Definición del número e',
       'El número e con x tendiendo a cero',
+      'Potencia (1 + k/x) elevado a x',
+      'Potencia (1 − 1/x) elevado a x',
+      'Fórmula general para 1 elevado a infinito',
       'El número e como suma de inversos de factoriales',
       'Indeterminación uno elevado a infinito',
       'El número e como sucesión',
@@ -447,14 +453,15 @@ test.describe('Contraste de la tabla en los dos temas', () => {
 });
 
 test.describe('Hallazgos de la inspección del 03/11/2026', () => {
-  test('HALLAZGO (03/11/2026, ABIERTO) · el buscador no encuentra un límite escrito como fórmula, ni «L’Hôpital», ni dos palabras en otro orden, ni una categoría', async ({ page }) => {
+  test('HALLAZGO 3984 (REPARADO el 06/11/2026) · el buscador encuentra un límite escrito como fórmula, «L’Hôpital», dos palabras en otro orden y una categoría', async ({ page }) => {
     // La etiqueta dice «Busca un límite por nombre, fórmula o palabra suelta» y la feature del
-    // JSON-LD «por nombre, expresión y sinónimos». Cada fila casa la consulta ENTERA como subcadena
+    // JSON-LD «por nombre, expresión y sinónimos». Cada fila casaba la consulta ENTERA como subcadena
     // de su nombre + texto de búsqueda, y ese texto no lleva la notación que pinta la tabla
     // («1^∞», «∞/∞», «1 − cos x» con el signo menos de la fila o con espacios), ni el nombre de su
-    // categoría. «L’Hôpital», como lo escribe la página siete veces y la keyword de metadata, da
+    // categoría. «L’Hôpital», como lo escribe la página siete veces y la keyword de metadata, daba
     // 0 de 59, y «lhopital» 6. Medido el 03/11/2026: los siete términos de abajo daban 0 filas.
-    test.fail();
+    // REPARADO (/reparar, cabo C0607): lib/buscadorTablas.ts, palabra a palabra con la expresión
+    // de la fila y el nombre de su categoría en el índice.
     await cargar(page);
     const casos: [string, string][] = [
       ['L’Hôpital', 'Indeterminación cero partido por cero'],
@@ -473,13 +480,13 @@ test.describe('Hallazgos de la inspección del 03/11/2026', () => {
     }
   });
 
-  test('HALLAZGO (03/11/2026, ABIERTO) · la búsqueda por subcadena casa dentro de otras palabras', async ({ page }) => {
-    // «coseno» casa dentro de «arcoseno», «sin» (sinónimo declarado del seno) dentro de «asíntota»,
+  test('HALLAZGO 3985 (REPARADO el 06/11/2026) · la búsqueda ya no casa dentro de otras palabras', async ({ page }) => {
+    // «coseno» casaba dentro de «arcoseno», «sin» (sinónimo declarado del seno) dentro de «asíntota»,
     // «tan» dentro de «constante» y «seno» dentro de «coseno». Medido el 03/11/2026:
     // coseno → 6 (con Arcoseno partido por x y Arcoseno equivalente a x) · sin → 6 (con Cociente de
     // polinomios en el infinito y Arcotangente en el infinito) · tan → 8 (con Raíz n-ésima de una
     // constante) · seno → 14 (con las tres filas de 1 − cos x).
-    test.fail();
+    // REPARADO (/reparar, cabo C0607): cada palabra de la consulta tiene que EMPEZAR una palabra.
     await cargar(page);
     const ajenas: [string, string[]][] = [
       ['coseno', ['Arcoseno partido por x', 'Arcoseno equivalente a x']],
@@ -487,10 +494,20 @@ test.describe('Hallazgos de la inspección del 03/11/2026', () => {
       ['tan', ['Raíz n-ésima de una constante']],
       ['seno', ['Uno menos coseno partido por x²', 'Uno menos coseno partido por x']],
     ];
+    // Y las suyas siguen saliendo: sin esto, un buscador que no encontrase nada pasaría el caso.
+    const propias: [string, string[]][] = [
+      ['coseno', ['Uno menos coseno partido por x²', 'Tangente partida por x']],
+      ['sin', ['Seno partido por x']],
+      ['tan', ['Tangente partida por x']],
+      ['seno', ['Seno partido por x']],
+    ];
     for (const [termino, filasAjenas] of ajenas) {
       await buscar(page, termino);
       const nombres = await nombresDeFilas(page);
       for (const ajena of filasAjenas) expect.soft(nombres, termino).not.toContain(ajena);
+      for (const propia of propias.find(([t]) => t === termino)![1]) {
+        expect.soft(nombres, termino).toContain(propia);
+      }
     }
   });
 

@@ -1,7 +1,7 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useMemo, useRef, useEffect, isValidElement } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import styles from './TablaIntegrales.module.css';
 import impresion from '@/styles/impresion.module.css';
@@ -13,6 +13,7 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
+import { buscarEnTabla, indexar, textoFormula } from '@/lib/buscadorTablas';
 
 /* ────────────────────────────────────────────────────────────────
    Utilidades de render de fórmulas (sin librerías externas: la CSP
@@ -31,49 +32,6 @@ function Frac({ n, d }: { n: ReactNode; d: ReactNode }) {
       <span className={styles.fracDen}>{d}</span>
     </span>
   );
-}
-
-/** Normaliza texto para buscar sin acentos ni mayúsculas. */
-function normalizar(texto: string): string {
-  return texto
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '');
-}
-
-/** Texto plano de una fórmula: los exponentes como ^n y las fracciones como n/d. */
-function textoFormula(nodo: ReactNode): string {
-  if (nodo === null || nodo === undefined || typeof nodo === 'boolean') return '';
-  if (typeof nodo === 'string' || typeof nodo === 'number') return String(nodo);
-  if (Array.isArray(nodo)) return nodo.map(textoFormula).join('');
-  if (isValidElement(nodo)) {
-    const props = nodo.props as { children?: ReactNode; n?: ReactNode; d?: ReactNode };
-    if (nodo.type === Frac) return `${textoFormula(props.n)}/${textoFormula(props.d)}`;
-    const dentro = textoFormula(props.children);
-    return nodo.type === 'sup' ? `^${dentro}` : dentro;
-  }
-  return '';
-}
-
-const SUPERINDICES: Record<string, string> = {
-  '⁰': '0', '¹': '1', '²': '2', '³': '3', '⁴': '4', '⁵': '5', '⁶': '6', '⁷': '7', '⁸': '8',
-  '⁹': '9', 'ⁿ': 'n', '⁻': '-', 'ˣ': 'x',
-};
-
-/** Texto normalizado para buscar: sin acentos, superíndices como ^n y √ como «raiz». */
-function prepararBusqueda(texto: string): string {
-  return normalizar(texto)
-    .replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹ⁿ⁻ˣ]+/g, (m) => `^${[...m].map((c) => SUPERINDICES[c]).join('')}`)
-    .replace(/√/g, ' raiz ')
-    .replace(/−/g, '-');
-}
-
-function palabrasDe(texto: string): string[] {
-  return prepararBusqueda(texto).split(/[^a-z0-9]+/).filter(Boolean);
-}
-
-function compactar(texto: string): string {
-  return prepararBusqueda(texto).replace(/[\s·*′'∫]+/g, '');
 }
 
 /* ────────────────────────────────────────────────────────────────
@@ -1156,21 +1114,17 @@ function HojaFormulario({ enBlanco }: { enBlanco: boolean }) {
    orden daban «0 de 40» y el aviso de que no existe; y «tan» casaba dentro de «constante» y
    «sin» con la preposición. Ahora cada palabra de la consulta tiene que empezar una palabra de
    la entrada (una letra sola, ser esa palabra), y la entrada incluye el texto de su integral.
-   Lo que casa entero o como fórmula seguida sube arriba.
+   Lo que casa entero o como fórmula seguida sube arriba. La receta vive en lib/buscadorTablas.ts
+   desde el 06/11/2026 (cabo C0607), compartida con tabla-derivadas y tabla-limites-notables.
 ──────────────────────────────────────────────────────────────── */
 
 const INDICE_BUSQUEDA = new Map(
   INTEGRALES.map((entrada) => {
-    const formulas = [entrada.integral, entrada.cadenaIntegral].map(textoFormula).join(' ');
+    const formulas = [entrada.integral, entrada.cadenaIntegral].map((f) => textoFormula(f, Frac)).join(' ');
     const texto = `${entrada.nombre} ${formulas} ${entrada.busqueda}`;
-    return [entrada.id, { palabras: palabrasDe(texto), compacto: compactar(texto) }] as const;
+    return [entrada.id, indexar(texto)] as const;
   }),
 );
-
-/** ¿La palabra `q` de la consulta casa con la palabra `p` de la entrada? */
-function casa(q: string, p: string): boolean {
-  return q.length === 1 ? p === q : p.startsWith(q);
-}
 
 /* ────────────────────────────────────────────────────────────────
    Componente principal
@@ -1192,20 +1146,7 @@ export default function TablaIntegralesPage() {
     const enCategoria = INTEGRALES.filter(
       (entrada) => categoriaActiva === 'todas' || entrada.categoria === categoriaActiva,
     );
-    const consultaPalabras = palabrasDe(consulta);
-    if (consultaPalabras.length === 0) return enCategoria;
-    const consultaCompacta = compactar(consulta);
-    return enCategoria
-      .map((entrada) => {
-        const indice = INDICE_BUSQUEDA.get(entrada.id)!;
-        const encaja = consultaPalabras.every((q) => indice.palabras.some((p) => casa(q, p)));
-        const exacta = consultaPalabras.every((q) => indice.palabras.includes(q));
-        const puntos = (indice.compacto.includes(consultaCompacta) ? 2 : 0) + (exacta ? 1 : 0);
-        return { entrada, encaja, puntos };
-      })
-      .filter((r) => r.encaja)
-      .sort((a, b) => b.puntos - a.puntos)
-      .map((r) => r.entrada);
+    return buscarEnTabla(enCategoria, consulta, (entrada) => INDICE_BUSQUEDA.get(entrada.id)!);
   }, [consulta, categoriaActiva]);
 
   const alternarFila = (id: string) => {
