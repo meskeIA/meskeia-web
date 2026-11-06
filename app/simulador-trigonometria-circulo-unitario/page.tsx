@@ -189,7 +189,14 @@ export default function SimuladorTrigonometriaCirculoUnitario() {
     const colorFondo = isDark ? '#1A1A1A' : '#FAFAFA';
     const colorEje = isDark ? '#555' : '#CCC';
     const colorTexto = isDark ? '#E5E5E5' : '#333';
-    const colorTextoSecundario = isDark ? '#888' : '#999';
+    // Los textos del lienzo caen sobre el fondo y sobre el relleno del círculo (#E8F4F8 / #3a3a3a,
+    // el más exigente): con #999, los colores de los trazos y los cuadrantes al 8-15 % quedaban
+    // entre 1,2 y 2,8:1 (cabo C0297). Los trazos siguen en la marca; los rótulos, en tonos de texto
+    const colorTextoSecundario = isDark ? '#AAA' : '#666';
+    const colorCuadrante = isDark ? '#8A8A8A' : '#808080';
+    const textoRadio = isDark ? '#6BB8DB' : '#26718F';
+    const textoCos = isDark ? '#5ABDB9' : '#327874';
+    const textoSin = isDark ? '#F0954A' : '#A04A08';
     const colorCirculo = isDark ? '#3a3a3a' : '#E8F4F8';
     const colorCirculoBorde = isDark ? '#444' : '#C5DDE8';
     const colorRadio = '#2E86AB';
@@ -244,7 +251,7 @@ export default function SimuladorTrigonometriaCirculoUnitario() {
     // === ETIQUETAS DE CUADRANTES ===
     const qFont = Math.round(radio * 0.12);
     ctx.font = `bold ${qFont}px system-ui`;
-    ctx.fillStyle = isDark ? 'rgba(200,200,200,0.15)' : 'rgba(0,0,0,0.08)';
+    ctx.fillStyle = colorCuadrante;
     ctx.textAlign = 'center';
     const qOffset = radio * 0.55;
     ctx.fillText('I', cx + qOffset, cy - qOffset);
@@ -324,7 +331,7 @@ export default function SimuladorTrigonometriaCirculoUnitario() {
     const thetaR = arcRadio + 12;
     const thetaX = cx + thetaR * Math.cos(thetaAngle);
     const thetaY = cy + thetaR * Math.sin(thetaAngle);
-    ctx.fillStyle = colorRadio;
+    ctx.fillStyle = textoRadio;
     ctx.font = `bold ${Math.round(radio * 0.1)}px system-ui`;
     ctx.textAlign = 'center';
     ctx.fillText('θ', thetaX, thetaY);
@@ -334,14 +341,14 @@ export default function SimuladorTrigonometriaCirculoUnitario() {
     ctx.font = `bold ${labelFont}px system-ui`;
 
     // Etiqueta cos (en el punto de proyección sobre el eje X)
-    ctx.fillStyle = colorCos;
+    ctx.fillStyle = textoCos;
     ctx.textAlign = 'center';
     const cosLabelX = px;
     const cosLabelY = cy + (sinVal >= 0 ? 16 : -8);
     ctx.fillText('cos', cosLabelX, cosLabelY);
 
     // Etiqueta sin (en el punto de proyección sobre el eje Y)
-    ctx.fillStyle = colorSin;
+    ctx.fillStyle = textoSin;
     ctx.textAlign = cosVal >= 0 ? 'right' : 'left';
     const sinLabelX = cx + (cosVal >= 0 ? -8 : 8);
     const sinLabelY = py;

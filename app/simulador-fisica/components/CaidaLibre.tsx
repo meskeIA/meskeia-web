@@ -110,8 +110,8 @@ export default function CaidaLibre({ isPlaying, onReset }: CaidaLibreProps) {
     ctx.lineTo(50, height - 50);
     ctx.stroke();
 
-    // Marcas de altura
-    ctx.fillStyle = '#6a6a8e';
+    // Marcas de altura (#6a6a8e daba 3,3:1 sobre el lienzo; cabo C0297)
+    ctx.fillStyle = '#8a8aae';
     ctx.font = '12px sans-serif';
     ctx.textAlign = 'right';
     for (let h = 0; h <= params.altura; h += params.altura / 5) {

@@ -121,7 +121,7 @@ export default function Ondas({ isPlaying, onReset }: OndasProps) {
       ctx.stroke();
 
       if (y !== 0) {
-        ctx.fillStyle = '#6a6a8e';
+        ctx.fillStyle = '#8a8aae';
         ctx.font = '11px sans-serif';
         ctx.textAlign = 'right';
         ctx.fillText(`${y > 0 ? '+' : ''}${y}A`, margenX - 5, py + 4);
@@ -156,7 +156,7 @@ export default function Ondas({ isPlaying, onReset }: OndasProps) {
         ctx.stroke();
         ctx.setLineDash([]);
 
-        ctx.fillStyle = '#6a6a8e';
+        ctx.fillStyle = '#8a8aae';
         ctx.font = '10px sans-serif';
         ctx.textAlign = 'center';
         ctx.fillText(`${i}λ`, x, centroY + params.amplitud * 1.8);

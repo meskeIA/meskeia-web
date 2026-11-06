@@ -174,7 +174,7 @@ export default function Resorte({ isPlaying, onReset }: ResorteProps) {
     ctx.stroke();
     ctx.setLineDash([]);
 
-    ctx.fillStyle = '#6a6a8e';
+    ctx.fillStyle = '#8a8aae';
     ctx.font = '11px sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText('x = 0', centroX, centroY + 95);
@@ -300,7 +300,7 @@ export default function Resorte({ isPlaying, onReset }: ResorteProps) {
       ctx.stroke();
 
       // Etiquetas
-      ctx.fillStyle = '#6a6a8e';
+      ctx.fillStyle = '#8a8aae';
       ctx.font = '10px sans-serif';
       ctx.textAlign = 'right';
       ctx.fillText('x', grafX - 5, grafY + grafHeight / 2 + 4);

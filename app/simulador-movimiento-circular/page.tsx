@@ -150,6 +150,11 @@ export default function SimuladorMovimientoCircularPage() {
       const velColor = '#48A9A6';
       const acColor = '#E07A1F';
       const atColor = '#DC2626';
+      // El rótulo de cada flecha, en un tono de texto por tema: con el color de la flecha, «v»
+      // daba 2,68:1 y «a_c» 2,88:1 sobre el fondo claro, y «a_t» 3,6:1 en oscuro (cabo C0297)
+      const velTexto = isDark ? '#5ABDB9' : '#327874';
+      const acTexto = isDark ? '#E07A1F' : '#B4530A';
+      const atTexto = isDark ? '#F87171' : '#B91C1C';
 
       ctx.clearRect(0, 0, w, h);
       ctx.fillStyle = bgColor;
@@ -224,10 +229,14 @@ export default function SimuladorMovimientoCircularPage() {
         const vy2 = py + vLen * (-ty); // invertir y para canvas
         drawArrow(ctx, px, py, vx2, vy2, velColor, 2);
 
-        ctx.fillStyle = velColor;
+        // Más allá de la punta, en la dirección de la flecha: a 4 px arriba a la derecha, la
+        // punta caía encima del rótulo en la mitad de los ángulos
+        ctx.fillStyle = velTexto;
         ctx.font = `bold ${Math.round(w * 0.028)}px system-ui`;
-        ctx.textAlign = 'left';
-        ctx.fillText('v', vx2 + 4, vy2 - 4);
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('v', vx2 + tx * 12, vy2 - ty * 12);
+        ctx.textBaseline = 'alphabetic';
       }
 
       // Vector aceleración centrípeta (apuntando hacia el centro)
@@ -243,10 +252,12 @@ export default function SimuladorMovimientoCircularPage() {
         const acy2 = py + (dy / dNorm) * acLen;
         drawArrow(ctx, px, py, acx2, acy2, acColor, 2);
 
-        ctx.fillStyle = acColor;
+        ctx.fillStyle = acTexto;
         ctx.font = `bold ${Math.round(w * 0.028)}px system-ui`;
         ctx.textAlign = 'center';
-        ctx.fillText('a_c', acx2, acy2 - 8);
+        ctx.textBaseline = 'middle';
+        ctx.fillText('a_c', acx2 + (dx / dNorm) * 16, acy2 + (dy / dNorm) * 16);
+        ctx.textBaseline = 'alphabetic';
       }
 
       // Vector aceleración tangencial (misma dirección que v, magnitud α·r constante).
@@ -262,7 +273,7 @@ export default function SimuladorMovimientoCircularPage() {
         const aty2 = py + atLen * (-ty);
         drawArrow(ctx, px, py, atx2, aty2, atColor, 2);
 
-        ctx.fillStyle = atColor;
+        ctx.fillStyle = atTexto;
         ctx.font = `bold ${Math.round(w * 0.028)}px system-ui`;
         ctx.textAlign = 'left';
         ctx.fillText('a_t', atx2 + 4, aty2 + 14);

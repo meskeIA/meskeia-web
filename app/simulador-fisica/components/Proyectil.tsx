@@ -27,6 +27,27 @@ interface Params {
 
 const G = 9.81;
 
+/** Fondo del lienzo, que es oscuro en los dos temas */
+const FONDO_LIENZO = '#1a1a2e';
+
+/**
+ * Rótulo de un vector sobre una placa del color del lienzo. La bola sale del cañón y del suelo:
+ * sin placa, «Vx» caía sobre el césped (3,24:1) y «Vy» sobre el cañón (3,76:1) al cargar
+ * (cabo C0297). Respeta el textAlign y el textBaseline que lleve el contexto.
+ */
+function rotuloConPlaca(ctx: CanvasRenderingContext2D, texto: string, x: number, y: number, color: string): void {
+  const m = ctx.measureText(texto);
+  ctx.fillStyle = FONDO_LIENZO;
+  ctx.fillRect(
+    x - m.actualBoundingBoxLeft - 3,
+    y - m.actualBoundingBoxAscent - 2,
+    m.actualBoundingBoxLeft + m.actualBoundingBoxRight + 6,
+    m.actualBoundingBoxAscent + m.actualBoundingBoxDescent + 4,
+  );
+  ctx.fillStyle = color;
+  ctx.fillText(texto, x, y);
+}
+
 export default function Proyectil({ isPlaying, onReset }: ProyectilProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number>(0);
@@ -131,7 +152,7 @@ export default function Proyectil({ isPlaying, onReset }: ProyectilProps) {
       ctx.lineTo(px, margen);
       ctx.stroke();
 
-      ctx.fillStyle = '#6a6a8e';
+      ctx.fillStyle = '#8a8aae';
       ctx.font = '11px sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText(`${Math.round(x)}m`, px, origenY + 15);
@@ -147,7 +168,7 @@ export default function Proyectil({ isPlaying, onReset }: ProyectilProps) {
       ctx.stroke();
 
       if (y > 0) {
-        ctx.fillStyle = '#6a6a8e';
+        ctx.fillStyle = '#8a8aae';
         ctx.font = '11px sans-serif';
         ctx.textAlign = 'right';
         ctx.fillText(`${Math.round(y)}m`, origenX - 5, py + 4);
@@ -278,8 +299,14 @@ export default function Proyectil({ isPlaying, onReset }: ProyectilProps) {
           ctx.closePath();
           ctx.fill();
 
+          // Los rótulos, fuera de la bola, del cañón y de su propia flecha: «Vx» a mitad de la
+          // flecha caía sobre el cañón al salir (2,65:1) y «Vy», alineado a la derecha por los
+          // rótulos del eje, encima de su línea verde (cabo C0297)
           ctx.font = '11px sans-serif';
-          ctx.fillText(`Vx`, proyX + estado.velX * vectorScale / 2, proyY - 8);
+          ctx.textAlign = estado.velX >= 0 ? 'left' : 'right';
+          ctx.textBaseline = 'middle';
+          rotuloConPlaca(ctx, 'Vx', proyX + estado.velX * vectorScale + Math.sign(estado.velX) * 12, proyY, '#4dabf7');
+          ctx.textBaseline = 'alphabetic';
         }
 
         // Vector Vy
@@ -300,9 +327,9 @@ export default function Proyectil({ isPlaying, onReset }: ProyectilProps) {
         ctx.closePath();
         ctx.fill();
 
-        ctx.fillStyle = '#69db7c';
         ctx.font = '11px sans-serif';
-        ctx.fillText(`Vy`, proyX + 10, proyY - estado.velY * vectorScale / 2);
+        ctx.textAlign = 'left';
+        rotuloConPlaca(ctx, 'Vy', proyX + 16, proyY - estado.velY * vectorScale / 2, '#69db7c');
       }
 
       // Guardar posición para estela
@@ -332,6 +359,8 @@ export default function Proyectil({ isPlaying, onReset }: ProyectilProps) {
     ctx.fill();
 
     ctx.font = '11px sans-serif';
+    // Explícito: heredaba la alineación del último rótulo pintado («right» de los del eje)
+    ctx.textAlign = 'left';
     ctx.fillText(`H_max = ${formatNumber(yMax, 1)}m`, pxMax + 10, pyMax - 5);
 
     // Alcance

@@ -128,22 +128,32 @@ function dibujarImagenDemo(ctx: CanvasRenderingContext2D, w: number, h: number) 
     ctx.fillStyle = c;
     ctx.fillRect(i * bandaW, 0, bandaW, 110);
   });
-  ctx.fillStyle = '#FFFFFF';
+  // El nombre de cada banda, sobre una pastilla blanca: en blanco sobre la banda quedaba entre
+  // 2,39:1 (amarillo) y 4,27:1 (rosa), y en el rojo y el azul ni el blanco ni el negro llegan a
+  // 4,5 (cabo C0297). La pastilla no tapa el color: la banda sigue viéndose arriba y abajo.
   ctx.font = 'bold 13px sans-serif';
   ctx.textAlign = 'center';
+  ctx.textBaseline = 'alphabetic';
   nombres.forEach((t, i) => {
-    ctx.fillText(t, i * bandaW + bandaW / 2, 60);
+    const xc = i * bandaW + bandaW / 2;
+    const ancho = Math.min(bandaW - 6, ctx.measureText(t).width + 12);
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillRect(xc - ancho / 2, 44, ancho, 22);
+    ctx.fillStyle = '#1A1A1A';
+    ctx.fillText(t, xc, 60, bandaW - 8);
   });
 
-  // 2. Botones UI éxito vs error
-  ctx.fillStyle = '#38A169';
+  // 2. Botones UI éxito vs error. Verde y rojo de botón (#2F855A, #C53030): con los de la
+  // paleta, el texto blanco quedaba a 3,25:1 y 4,13:1. Siguen siendo el par rojo-verde que
+  // la simulación tiene que enseñar confundido
+  ctx.fillStyle = '#2F855A';
   ctx.fillRect(40, 140, 180, 56);
   ctx.fillStyle = '#FFFFFF';
   ctx.font = 'bold 18px sans-serif';
   ctx.textAlign = 'center';
   ctx.fillText('Éxito', 130, 175);
 
-  ctx.fillStyle = '#E53E3E';
+  ctx.fillStyle = '#C53030';
   ctx.fillRect(w - 220, 140, 180, 56);
   ctx.fillStyle = '#FFFFFF';
   ctx.fillText('Error', w - 130, 175);

@@ -111,7 +111,8 @@ export default function SimuladorCifradoCesar() {
     ctx.scale(dpr, dpr);
 
     // Fondo
-    ctx.fillStyle = isDark ? '#1e2533' : '#f8fafc';
+    const fondo = isDark ? '#1e2533' : '#f8fafc';
+    ctx.fillStyle = fondo;
     ctx.beginPath();
     ctx.arc(cx, cy, Math.min(W, H) / 2 - 4, 0, Math.PI * 2);
     ctx.fill();
@@ -121,6 +122,21 @@ export default function SimuladorCifradoCesar() {
 
     // Ángulo animado actual
     const anguloBase = anguloActualRef.current;
+
+    // Cada letra va montada sobre el trazo de su anillo: sin un halo del color del fondo, una
+    // letra fina como la I quedaba encima del teal a 2,24:1. La activa lleva un disco de oro y
+    // tinta oscura (el oro como TEXTO daba 1,44:1 sobre el fondo claro). Cabo C0297.
+    const letra = (texto: string, x: number, y: number, activa: boolean, tinta: string) => {
+      ctx.beginPath();
+      ctx.arc(x, y, activa ? 10 : 8, 0, Math.PI * 2);
+      ctx.fillStyle = activa ? '#F4D03F' : fondo;
+      ctx.fill();
+      ctx.font = `${activa ? 700 : 500} ${activa ? 13 : 11}px system-ui, sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillStyle = activa ? '#1A1A1A' : tinta;
+      ctx.fillText(texto, x, y);
+    };
 
     // ---- Círculo exterior (cifrado) ----
     ctx.strokeStyle = '#48A9A6';
@@ -142,11 +158,7 @@ export default function SimuladorCifradoCesar() {
 
       // Resaltar la letra que queda frente a la A (posición 0, línea amarilla)
       const esActiva = i === desplazamiento;
-      ctx.font = `${esActiva ? 700 : 500} ${esActiva ? 13 : 11}px system-ui, sans-serif`;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillStyle = esActiva ? '#F4D03F' : (isDark ? '#48A9A6' : '#1a6b68');
-      ctx.fillText(letraCifrada, x, y);
+      letra(letraCifrada, x, y, esActiva, isDark ? '#48A9A6' : '#1a6b68');
     }
 
     // ---- Círculo interior (original, fijo) ----
@@ -161,12 +173,7 @@ export default function SimuladorCifradoCesar() {
       const x = cx + radioInt * Math.cos(ang);
       const y = cy + radioInt * Math.sin(ang);
 
-      const esActiva = i === 0;
-      ctx.font = `${esActiva ? 700 : 500} ${esActiva ? 13 : 11}px system-ui, sans-serif`;
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillStyle = esActiva ? '#F4D03F' : (isDark ? '#7FB3D3' : '#1a5278');
-      ctx.fillText(ALFABETO[i], x, y);
+      letra(ALFABETO[i], x, y, i === 0, isDark ? '#7FB3D3' : '#1a5278');
     }
 
     // Línea de referencia (arriba, posición 0)

@@ -25,6 +25,12 @@ interface Lectura {
   fondo: string;
   ratio: number;
   umbral: number;
+  /**
+   * El tema con que se pintó. Un lienzo animado sigue pintando en claro entre vaciar las
+   * lecturas y pulsar el botón del tema: sin esto, sus fotogramas claros contaban como oscuros
+   * (simulador-movimiento-circular, 06/11/2026).
+   */
+  oscuro: boolean;
 }
 
 interface AppLienzo {
@@ -120,6 +126,29 @@ const APPS: readonly AppLienzo[] = [
       await expect(siguiente).toBeDisabled();
     },
   },
+  { slug: 'simulador-cifrado-cesar' },
+  { slug: 'simulador-daltonismo', sinTema: true },
+  // Lienzo siempre oscuro (#1a1a2e): los rótulos de los ejes en #6a6a8e, 3,3:1
+  { slug: 'simulador-fisica' },
+  ...['Péndulo', 'Proyectil', 'Ondas', 'Resorte'].map((pestana) => ({
+    slug: 'simulador-fisica',
+    estado: pestana,
+    sinTema: true as const,
+    preparar: async (page: Page) => {
+      await page.getByRole('button', { name: pestana, exact: false }).first().click();
+    },
+  })),
+  // «v» en el teal (2,68:1 en claro) y «a_c» en el naranja de su flecha (2,88), y la punta de
+  // la flecha encima del rótulo según el ángulo; en MCNU, «a_t» en rojo a 3,6 en oscuro
+  { slug: 'simulador-movimiento-circular' },
+  {
+    slug: 'simulador-movimiento-circular',
+    estado: 'MCNU',
+    preparar: async (page) => {
+      await page.getByRole('button', { name: /MCNU/ }).click();
+    },
+  },
+  { slug: 'simulador-trigonometria-circulo-unitario' },
 ];
 
 async function espiarLienzos(page: Page): Promise<void> {
@@ -192,6 +221,7 @@ async function espiarLienzos(page: Page): Promise<void> {
               fondo: `rgb(${fondo.join(',')})`,
               ratio: Math.round(ratio * 100) / 100,
               umbral: grande ? 3 : 4.5,
+              oscuro: document.documentElement.getAttribute('data-theme') === 'dark',
             });
           }
         }
@@ -204,8 +234,10 @@ async function espiarLienzos(page: Page): Promise<void> {
 }
 
 /** Lo que no llega a su umbral, una vez por texto y color (el peor de sus dibujos). */
-async function suspensos(page: Page): Promise<Lectura[]> {
-  const lecturas = await page.evaluate(() => (window as unknown as { __lienzoTextos: Lectura[] }).__lienzoTextos);
+async function suspensos(page: Page, oscuro: boolean): Promise<Lectura[]> {
+  const lecturas = (
+    await page.evaluate(() => (window as unknown as { __lienzoTextos: Lectura[] }).__lienzoTextos)
+  ).filter((l) => l.oscuro === oscuro);
   const peor = new Map<string, Lectura>();
   for (const l of lecturas) {
     const k = `${l.t}|${l.color}`;
@@ -221,8 +253,11 @@ async function vaciar(page: Page): Promise<void> {
   });
 }
 
-async function medidos(page: Page): Promise<number> {
-  return page.evaluate(() => (window as unknown as { __lienzoTextos: Lectura[] }).__lienzoTextos.length);
+async function medidos(page: Page, oscuro: boolean): Promise<number> {
+  return page.evaluate(
+    (o) => (window as unknown as { __lienzoTextos: Lectura[] }).__lienzoTextos.filter((l) => l.oscuro === o).length,
+    oscuro,
+  );
 }
 
 for (const { slug, estado, preparar, sinTema } of APPS) {
@@ -239,13 +274,13 @@ for (const { slug, estado, preparar, sinTema } of APPS) {
     await page.waitForTimeout(1500);
     const describir = (l: Lectura): string => `«${l.t}» ${l.color} sobre ${l.fondo}: ${l.ratio}:1 (pide ${l.umbral})`;
     // Sin lecturas no hay medida: el control de que el espía ve el lienzo
-    expect(await medidos(page), 'textos pintados en claro').toBeGreaterThan(0);
-    expect.soft((await suspensos(page)).map(describir), 'claro').toEqual([]);
+    expect(await medidos(page, false), 'textos pintados en claro').toBeGreaterThan(0);
+    expect.soft((await suspensos(page, false)).map(describir), 'claro').toEqual([]);
     if (sinTema) return;
     await vaciar(page);
     await activarTemaOscuro(page);
     await page.waitForTimeout(1500);
-    expect(await medidos(page), 'textos pintados en oscuro (¿redibuja al cambiar de tema?)').toBeGreaterThan(0);
-    expect.soft((await suspensos(page)).map(describir), 'oscuro').toEqual([]);
+    expect(await medidos(page, true), 'textos pintados en oscuro (¿redibuja al cambiar de tema?)').toBeGreaterThan(0);
+    expect.soft((await suspensos(page, true)).map(describir), 'oscuro').toEqual([]);
   });
 }
