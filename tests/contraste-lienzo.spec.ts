@@ -33,6 +33,11 @@ interface AppLienzo {
   estado?: string;
   /** Lo que hay que hacer para que el lienzo pinte ese estado */
   preparar?: (page: Page) => Promise<void>;
+  /**
+   * Todo su texto va sobre rellenos propios, iguales en los dos temas (la ruleta): no redibuja
+   * al cambiar de tema, y no tiene por qué. Se mide solo en claro.
+   */
+  sinTema?: true;
 }
 
 /**
@@ -72,6 +77,30 @@ const APPS: readonly AppLienzo[] = [
   // μ₀ y H₀ en la marca (3,93:1 en claro, 4,24 en oscuro), μ₁ y H₁ en naranja (2,89) y X̄ en
   // violeta en oscuro (3,05)
   { slug: 'simulador-test-hipotesis' },
+  // Texto blanco sobre cada sector: la marca 4,11:1, el teal 2,80, el naranja 2,63… Con
+  // «Números 1-10» salen los diez colores de la paleta
+  { slug: 'ruleta-aleatoria', sinTema: true },
+  {
+    slug: 'ruleta-aleatoria',
+    estado: 'los diez colores de la paleta',
+    sinTema: true,
+    preparar: async (page) => {
+      await page.getByRole('button', { name: 'Números 1-10' }).click();
+    },
+  },
+  // Un rótulo en el naranja de su línea (#E07A1F, 2,89:1 en claro): h_max, los límites a y b,
+  // μ verdadera y la normal teórica; en intervalos-confianza, además, X̄ en la marca
+  { slug: 'simulador-conservacion-energia' },
+  { slug: 'simulador-integral-area' },
+  { slug: 'simulador-intervalos-confianza' },
+  {
+    slug: 'simulador-intervalos-confianza',
+    estado: 'modo calculadora',
+    preparar: async (page) => {
+      await page.getByRole('button', { name: /Modo calculadora/ }).click();
+    },
+  },
+  { slug: 'simulador-teorema-central-limite' },
   // Cabeceras CLIENTE y SERVIDOR en blanco sobre la marca (4,11 y 2,80:1); etiquetas de las
   // flechas FIN y ACK y de las bandas de estado en su color (2,4-3,9:1)
   {
@@ -192,8 +221,9 @@ async function medidos(page: Page): Promise<number> {
   return page.evaluate(() => (window as unknown as { __lienzoTextos: Lectura[] }).__lienzoTextos.length);
 }
 
-for (const { slug, estado, preparar } of APPS) {
-  test(`${slug}${estado ? ` (${estado})` : ''}: el texto de sus lienzos se lee en claro y en oscuro (C0297)`, async ({ page }) => {
+for (const { slug, estado, preparar, sinTema } of APPS) {
+  const temas = sinTema ? 'sobre sus propios rellenos' : 'en claro y en oscuro';
+  test(`${slug}${estado ? ` (${estado})` : ''}: el texto de sus lienzos se lee ${temas} (C0297)`, async ({ page }) => {
     test.setTimeout(60_000);
     await espiarLienzos(page);
     await page.goto(`/${slug}/`);
@@ -203,16 +233,15 @@ for (const { slug, estado, preparar } of APPS) {
     // que se ve (y lo de la carga ya lo mide la entrada sin `preparar`, que es más corta)
     if (preparar) await preparar(page);
     await page.waitForTimeout(1500);
+    const describir = (l: Lectura): string => `«${l.t}» ${l.color} sobre ${l.fondo}: ${l.ratio}:1 (pide ${l.umbral})`;
     // Sin lecturas no hay medida: el control de que el espía ve el lienzo
     expect(await medidos(page), 'textos pintados en claro').toBeGreaterThan(0);
-    const claro = await suspensos(page);
+    expect.soft((await suspensos(page)).map(describir), 'claro').toEqual([]);
+    if (sinTema) return;
     await vaciar(page);
     await activarTemaOscuro(page);
     await page.waitForTimeout(1500);
     expect(await medidos(page), 'textos pintados en oscuro (¿redibuja al cambiar de tema?)').toBeGreaterThan(0);
-    const oscuro = await suspensos(page);
-    const describir = (l: Lectura): string => `«${l.t}» ${l.color} sobre ${l.fondo}: ${l.ratio}:1 (pide ${l.umbral})`;
-    expect.soft(claro.map(describir), 'claro').toEqual([]);
-    expect.soft(oscuro.map(describir), 'oscuro').toEqual([]);
+    expect.soft((await suspensos(page)).map(describir), 'oscuro').toEqual([]);
   });
 }

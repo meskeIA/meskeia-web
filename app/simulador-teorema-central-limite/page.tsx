@@ -468,7 +468,8 @@ export default function SimuladorTeoremaCentralLimitePage() {
     ctx.stroke();
     ctx.setLineDash([]);
 
-    ctx.fillStyle = colorMu;
+    // El rótulo, en un naranja de texto: el de la línea daba 2,89:1 en claro (cabo C0297)
+    ctx.fillStyle = isDark ? colorMu : '#B4530A';
     ctx.font = 'bold 11px system-ui';
     ctx.textAlign = 'left';
     ctx.fillText(`μ = ${fmt(dist.mu, 2)}`, xToPx(dist.mu) + 4, pad.top + 12);
@@ -603,7 +604,8 @@ export default function SimuladorTeoremaCentralLimitePage() {
 
       // Etiqueta. Los dos parámetros van separados por punto y coma: con coma decimal,
       // «N(0,00, 0,660)» se lee como cuatro números (hallazgo 2468, 30/09/2026).
-      ctx.fillStyle = colorNormal;
+      // Ídem el rótulo de la normal teórica (2,89:1 en claro, C0297)
+      ctx.fillStyle = isDark ? colorNormal : '#B4530A';
       ctx.font = '11px system-ui';
       ctx.textAlign = 'left';
       const rotuloNormal = `N(${fmt(dist.mu, 2)}; ${fmt(sigmaTeorico, 3)}) teórica`;

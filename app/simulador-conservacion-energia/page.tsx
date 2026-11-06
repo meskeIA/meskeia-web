@@ -248,7 +248,8 @@ export default function SimuladorConservacionEnergiaPage() {
     ctx.stroke();
     ctx.setLineDash([]);
 
-    ctx.fillStyle = colorMaxAlt;
+    // El rótulo, en un naranja de texto: el de la línea daba 2,89:1 en claro (cabo C0297)
+    ctx.fillStyle = isDark ? colorMaxAlt : '#B4530A';
     ctx.font = '11px system-ui';
     ctx.textAlign = 'left';
     ctx.fillText(`h_max = ${fmt(yInicial, 1)} m`, pad.left + 8, yToPx(yInicial) - 4);
@@ -508,7 +509,7 @@ export default function SimuladorConservacionEnergiaPage() {
           <div className={styles.energyBar}>
             <div className={styles.energyBarLabel}>
               <span>∑ Mecánica (E_c + E_p)</span>
-              <span className={styles.energyBarValue} style={{ color: '#E07A1F' }}>{fmt(data.eTotal, 2)} J</span>
+              <span className={styles.energyBarValue} style={{ color: 'var(--naranja-texto, #E07A1F)' }}>{fmt(data.eTotal, 2)} J</span>
             </div>
             <div className={styles.energyBarTrack}>
               <div

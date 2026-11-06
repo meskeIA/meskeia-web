@@ -4,6 +4,7 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import styles from './RuletaAleatoria.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
+import { tintaSobre, TINTA_CLARA } from '@/lib/tintaLegible';
 
 interface WheelItem {
   id: string;
@@ -11,8 +12,10 @@ interface WheelItem {
   color: string;
 }
 
+// El primero era el azul de marca (#2E86AB), con el que ninguna tinta llega a 4,5:1; es el
+// del botón (--primary-boton). Cabo C0297, 06/11/2026.
 const DEFAULT_COLORS = [
-  '#2E86AB', '#48A9A6', '#E94F37', '#F77F00', '#FCBF49',
+  '#26718F', '#48A9A6', '#E94F37', '#F77F00', '#FCBF49',
   '#7B2CBF', '#3A86FF', '#06D6A0', '#EF476F', '#FFD166'
 ];
 
@@ -77,10 +80,15 @@ export default function RuletaAleatoriaPage() {
       ctx.translate(center, center);
       ctx.rotate(startAngle + sliceAngle / 2);
       ctx.textAlign = 'right';
-      ctx.fillStyle = '#ffffff';
+      // La tinta, según el sector: en blanco, el teal, el naranja, el amarillo y el rojo de la
+      // paleta quedaban a 2,6-3,7:1 (cabo C0297). La sombra solo ayuda bajo la tinta blanca.
+      const tinta = tintaSobre(item.color);
+      ctx.fillStyle = tinta;
       ctx.font = `bold ${Math.min(16, 200 / items.length)}px sans-serif`;
-      ctx.shadowColor = 'rgba(0,0,0,0.5)';
-      ctx.shadowBlur = 3;
+      if (tinta === TINTA_CLARA) {
+        ctx.shadowColor = 'rgba(0,0,0,0.5)';
+        ctx.shadowBlur = 3;
+      }
 
       const text = item.text.length > 15 ? item.text.substring(0, 12) + '...' : item.text;
       ctx.fillText(text, radius - 20, 5);

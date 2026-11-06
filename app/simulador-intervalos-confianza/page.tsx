@@ -220,6 +220,12 @@ export default function SimuladorIntervalosConfianzaPage() {
     const colorBad = '#A82E68';
     const colorMu = '#E07A1F';
     const colorPrimary = '#2E86AB';
+    // Tonos de TEXTO por tema (cabo C0297, 06/11/2026): con el color de su línea, «μ = …»
+    // quedaba a 2,89:1 en claro, «X̄ = …» en la marca a 3,93 en claro y 4,24 en oscuro y los
+    // extremos del intervalo en teal a 2,68 en claro
+    const textoMu = isDark ? colorMu : '#B4530A';
+    const textoPrimario = isDark ? '#3FA5D1' : '#26718F';
+    const textoOk = isDark ? '#5ABDB9' : '#327874';
 
     ctx.clearRect(0, 0, W, H);
 
@@ -260,7 +266,7 @@ export default function SimuladorIntervalosConfianzaPage() {
       ctx.lineTo(xToPx(muPob), pad.top + plotH);
       ctx.stroke();
 
-      ctx.fillStyle = colorMu;
+      ctx.fillStyle = textoMu;
       ctx.font = 'bold 12px system-ui';
       ctx.textAlign = 'center';
       ctx.fillText(`μ = ${fmt(muPob, 1)}`, xToPx(muPob), pad.top - 8);
@@ -369,10 +375,10 @@ export default function SimuladorIntervalosConfianzaPage() {
       ctx.stroke();
       ctx.setLineDash([]);
 
-      ctx.fillStyle = colorPrimary;
+      ctx.fillStyle = textoPrimario;
       ctx.font = 'bold 12px system-ui';
       ctx.textAlign = 'center';
-      ctx.fillText(`X̄ = ${fmt(xBarCalc, 2)}`, xToPx(xBarCalc), pad.top - 6);
+      ctx.fillText(`X̄ =${fmt(xBarCalc, 2)}`, xToPx(xBarCalc), pad.top - 6);
 
       // Líneas verticales en límites IC
       ctx.strokeStyle = colorOk;
@@ -388,7 +394,7 @@ export default function SimuladorIntervalosConfianzaPage() {
       ctx.stroke();
 
       // Etiquetas IC
-      ctx.fillStyle = colorOk;
+      ctx.fillStyle = textoOk;
       ctx.font = 'bold 11px system-ui';
       ctx.textAlign = 'center';
       ctx.fillText(fmt(calcResultado.inferior, 2), xToPx(calcResultado.inferior), pad.top + plotH + 16);

@@ -418,7 +418,8 @@ export default function SimuladorIntegralAreaPage() {
     ctx.lineTo(xToPx(b), pad.top + plotH);
     ctx.stroke();
 
-    ctx.fillStyle = colorLimits;
+    // Los rótulos a y b, en un naranja de texto: el de la línea daba 2,89:1 en claro (C0297)
+    ctx.fillStyle = isDark ? colorLimits : '#B4530A';
     ctx.font = 'bold 13px system-ui';
     ctx.textAlign = 'center';
     ctx.fillText('a', xToPx(a), pad.top - 4);
