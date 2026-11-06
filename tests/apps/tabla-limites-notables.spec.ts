@@ -581,12 +581,13 @@ test.describe('Hallazgos de la inspección del 03/11/2026', () => {
   });
 
   for (const tema of ['claro', 'oscuro'] as const) {
-    test(`HALLAZGO (03/11/2026, ABIERTO) · con el ratón encima de una fila, su texto baja de 4,5:1 en ${tema}`, async ({ page }) => {
+    test(`HALLAZGO 3993 (REPARADO el 06/11/2026) · con el ratón encima de una fila, su texto no baja de 4,5:1 en ${tema}`, async ({ page }) => {
       // .filaBtn:hover pone rgba(46,134,171,.06) en claro y .14 en oscuro bajo un texto que ya iba
       // justo. Medido el 03/11/2026 en «Seno partido por x»:
       //   claro  · tendencia 4,74 → 4,44:1
       //   oscuro · fórmula 4,93 → 4,23:1 · tendencia 4,87 → 4,24:1 · categoría 4,96 → 4,25:1
-      test.fail();
+      // REPARADO (/reparar, cabo C0607): el hover oscuro baja al 5 % en las diez tablas y la insignia
+      // de tendencia del 12 al 6 % en claro. Testigo de las hermanas: tests/apps/tablas-hover-familia.spec.ts.
       await cargar(page);
       if (tema === 'oscuro') {
         await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).click();
