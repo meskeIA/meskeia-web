@@ -38,7 +38,11 @@
  *     pantalla nueva ya está pintada, en cada «Siguiente» hasta el resultado, a 390×844. Desde
  *     el 05/11/2026 (cabo C0624) la pregunta puede ser de casillas y el resultado se exige sin
  *     «Siguiente» a la vista; y un clic SUELTO a 200 ms tiene que contar (la otra mitad).
- *     Sin medir aún: «Empezar», «Anterior», «Repetir» y la posición del botón, ni a 360×740.
+ *     Desde el 06/11/2026 (C0624, hueco 1), también a 360×740: «Empezar» con el botón en medio, y
+ *     «Anterior» desde la P3 y «Siguiente» hacia una respondida con el botón abajo. La matriz
+ *     entera (alturas, intervalos, «Ver resultado», «Repetir») vive en el bloque C0479 de
+ *     tests/apps/selector-smartphone.spec.ts: aquí cada caso cuesta una carga por hermana en
+ *     check:familias. Control: anulando los oyentes en captura sobre window caen 11 de 16.
  * La guarda NO se fija por su forma: hay tres variantes en la familia (por botón, en captura
  * sobre el contenedor y en captura sobre window, la de seguro-hogar) y se acepta cualquiera que
  * pase el caso. La de window es la única que cubre un ENLACE ajeno bajo el dedo (Apps
@@ -423,7 +427,109 @@ for (const h of HERMANAS) {
       await p2.nth(1).click();
       await expect(p2.nth(1), 'a los 200 ms de «Siguiente», la opción de la P2 queda marcada').toHaveAttribute('aria-checked', 'true');
     });
+
+    /**
+     * Cabo C0624, hueco 1 (06/11/2026): el caso de arriba solo toca «Siguiente» hacia una pregunta
+     * SIN responder, con el botón donde lo deja scrollIntoViewIfNeeded y a 390×844. Aquí, a
+     * 360×740 y en una sola carga, los toques que el control sin guarda hizo caer en la referencia
+     * (tests/apps/selector-smartphone.spec.ts, bloque C0479): «Empezar» con el botón en medio
+     * (contestaba la P1), y con el botón abajo «Anterior» desde la P3 (retrocedía dos) y
+     * «Siguiente» desde la P2 ya respondida (saltaba la P3). La matriz entera (tres alturas, tres
+     * intervalos, «Ver resultado», «Repetir» y 390×844) vive en ese spec: aquí cada caso suma una
+     * carga por hermana a check:familias, y se quedan los que discriminan.
+     * Lo esperado es lo que hace UN toque: Empezar → P1 sin marcar; Anterior → la P2 con su
+     * respuesta; Siguiente → la P3 con la suya. Sin salir de la app ni abrir otra pestaña.
+     */
+    test('doble toque en Empezar, Anterior y Siguiente hacia una respondida, a 360×740 con el botón en medio y abajo', async ({ page, context }) => {
+      test.skip(Boolean(h.recetas?.dobleToque?.omitido), h.recetas?.dobleToque?.omitido);
+      if (h.recetas?.dobleToque?.falla) test.fail();
+      test.setTimeout(60_000);
+      await page.setViewportSize({ width: 360, height: 740 });
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+      await page.goto(`/${h.slug}/`);
+      const ruta = new URL(page.url()).pathname;
+      const enLaApp = (momento: string) => {
+        expect(new URL(page.url()).pathname, `${momento}: la ráfaga no saca de la app`).toBe(ruta);
+        expect(context.pages(), `${momento}: ni abre otra pestaña`).toHaveLength(1);
+      };
+      const grupo = () => page.locator('[role="radiogroup"]').first();
+      const marcada = () => grupo().locator('[aria-checked="true"]');
+
+      if (h.empezar) {
+        await esperarHidratacionBotones(page, 'button', EMPEZAR);
+        const empezar = page.getByRole('button', { name: new RegExp(EMPEZAR) }).first();
+        await dobleToqueRaton(page, await colocarEnAltura(page, empezar, 370));
+        await grupo().waitFor();
+        await expect(marcada(), '«Empezar» no contesta la P1').toHaveCount(0);
+        enLaApp('Empezar');
+      } else {
+        await grupo().waitFor();
+      }
+      await esperarHidratacionBotones(page, '[role="radiogroup"] button');
+
+      // P1 → P2 → P3 con clics sueltos, contestando la primera opción
+      const textos: string[] = [];
+      for (let n = 1; n <= 3; n++) {
+        textos.push(await grupo().innerText());
+        await grupo().locator('[role="radio"]').first().click();
+        if (n < 3) {
+          await botonSiguiente(page).click();
+          await expect.poll(() => grupo().innerText(), { message: `llega la P${n + 1}` }).not.toBe(textos[n - 1]);
+        }
+      }
+      const [, textoP2, textoP3] = textos;
+      // Ya marcada: en formacion-postgrado la opción marcada lleva un «✓» que entra en el texto
+      const marcadaP3 = await grupo().innerText();
+
+      // «Anterior» desde la P3, con el botón abajo → la P2 con su respuesta (no la P1)
+      const anterior = page.getByRole('button', { name: /anterior/i }).first();
+      await dobleToqueRaton(page, await colocarEnAltura(page, anterior, 630));
+      await expect.poll(() => grupo().innerText(), { message: '«Anterior» retrocede UNA pregunta' }).not.toBe(marcadaP3);
+      const enP2 = await grupo().innerText();
+      expect(sinMarca(enP2), '«Anterior» deja la P2, no la P1').toBe(sinMarca(textoP2));
+      await expect(marcada(), 'la P2 conserva su respuesta').toHaveCount(1);
+      await expect(grupo().locator('[role="radio"]').first(), 'la de antes').toHaveAttribute('aria-checked', 'true');
+      enLaApp('Anterior');
+
+      // «Siguiente» desde la P2 ya respondida, con el botón abajo → la P3 con la suya (no la P4)
+      await dobleToqueRaton(page, await colocarEnAltura(page, botonSiguiente(page), 630));
+      await expect.poll(() => grupo().innerText(), { message: '«Siguiente» avanza' }).not.toBe(enP2);
+      expect(sinMarca(await grupo().innerText()), '«Siguiente» hacia una respondida avanza UNA').toBe(sinMarca(textoP3));
+      await expect(marcada(), 'la P3 conserva su respuesta').toHaveCount(1);
+      await expect(grupo().locator('[role="radio"]').first()).toHaveAttribute('aria-checked', 'true');
+      enLaApp('Siguiente');
+    });
   });
+}
+
+/** El texto de una pregunta sin la marca de la opción elegida (el «✓» de formacion-postgrado) ni saltos. */
+function sinMarca(texto: string): string {
+  return texto.replace(/✓/g, '').replace(/\s+/g, ' ').trim();
+}
+
+/** Deja el centro del botón a la altura pedida (lo que permita el documento) y devuelve el punto. */
+async function colocarEnAltura(page: Page, boton: Locator, y: number): Promise<{ x: number; y: number }> {
+  await boton.evaluate((el, alto) => {
+    const r = el.getBoundingClientRect();
+    window.scrollBy(0, r.top + r.height / 2 - alto);
+  }, y);
+  await page.waitForTimeout(60);
+  const caja = (await boton.boundingBox())!;
+  return { x: caja.x + caja.width / 2, y: caja.y + caja.height / 2 };
+}
+
+/**
+ * Ratón de verdad, como el caso de «Siguiente»: el 2.º clic, en el mismo punto y a 150 ms (dentro
+ * del intervalo de un doble toque), llega con `detail` 2 sobre lo que haya debajo entonces.
+ */
+async function dobleToqueRaton(page: Page, punto: { x: number; y: number }): Promise<void> {
+  await page.mouse.move(punto.x, punto.y);
+  await page.mouse.down({ clickCount: 1 });
+  await page.mouse.up({ clickCount: 1 });
+  await page.waitForTimeout(150);
+  await page.mouse.down({ clickCount: 2 });
+  await page.mouse.up({ clickCount: 2 });
+  await page.waitForTimeout(400);
 }
 
 /**
