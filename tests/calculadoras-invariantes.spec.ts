@@ -5418,6 +5418,39 @@ test.describe('modulosVsDirecta — rendimiento de módulos aportado, diferencia
     expect(r).not.toHaveProperty('ganaED');
   });
 
+  // Cabo C0648 (06/11/2026): el contraste de la cuota RETA con el tramo de cada régimen pasó de
+  // la página al motor para que la tool del MCP avise igual. Goldens a mano con TRAMOS_RETA_2025
+  // y el 7 % de gastos genéricos del art. 308.1.c LGSS:
+  //   directa 30.000 / 4.500 / 370 (el caso del hallazgo 2607): cuota anual 4.440 · previo
+  //     21.060 · 5 % = 1.053 · neto 20.007 · computable (20.007 + 4.440) × 0,93 / 12 = 1.894,64
+  //     → general tramo 5 (1.850-2.030), mínima 380,88 · déficit (380,88 − 370) × 12 = 130,56
+  //   módulos 30.000 / 20.000 / 227 con 30.000 de módulos (el del hallazgo 4133): computable
+  //     30.000 × 0,93 / 12 = 2.325 → general tramo 6 (2.030-2.330), mínima 401,47 · déficit
+  //     174,47 × 12 = 2.093,64. Su directa: previo 7.276 · 5 % 363,80 · computable
+  //     (6.912,20 + 2.724) × 0,93 / 12 = 746,81 → reducida tramo 2, mínima 226,47 ≤ 227: sin aviso.
+  test('cuota RETA bajo la mínima del tramo: cada régimen trae su aviso (C0648)', () => {
+    const d = compararModulosVsDirecta({ ingresos: 30000, gastos: 4500, retaMensual: 370 });
+    const cd = d.estimacionDirecta.retaBajoMinimo!;
+    expect(cd).not.toBe(null);
+    expect(cd.rendimientoMensual).toBeCloseTo(1894.64, 2);
+    expect([cd.tabla, cd.numeroTramo]).toEqual(['general', 5]);
+    expect(cd.cuotaMinimaTramo).toBeCloseTo(380.88, 2);
+    expect(cd.deficitAnual).toBeCloseTo(130.56, 2);
+
+    const m = compararModulosVsDirecta({ ingresos: 30000, gastos: 20000, retaMensual: 227, rendimientoNetoModulos: 30000 });
+    expect(m.estimacionDirecta.retaBajoMinimo).toBe(null);
+    const cm = m.modulos!.retaBajoMinimo!;
+    expect(cm.rendimientoMensual).toBeCloseTo(2325, 2);
+    expect([cm.tabla, cm.numeroTramo]).toEqual(['general', 6]);
+    expect(cm.cuotaMinimaTramo).toBeCloseTo(401.47, 2);
+    expect(cm.deficitAnual).toBeCloseTo(2093.64, 2);
+
+    // Con la cuota de su tramo, ninguno avisa.
+    const ok = compararModulosVsDirecta({ ingresos: 30000, gastos: 20000, retaMensual: 401.47, rendimientoNetoModulos: 30000 });
+    expect(ok.estimacionDirecta.retaBajoMinimo).toBe(null);
+    expect(ok.modulos!.retaBajoMinimo).toBe(null);
+  });
+
   test('sin dato: solo directa, módulos null con motivo «sin_dato» y sin diferencia', () => {
     const r = compararModulosVsDirecta(BAR);
     expect(r.modulos).toBe(null);

@@ -26,13 +26,8 @@ import {
   TRAMOS_RETA_2025,
   GASTOS_GENERICOS_RETA,
   REDUCCION_ACTIVIDADES_RENTAS_BAJAS,
-  rendimientoComputableMensualRETA,
-  nombreTramoRETA,
-  tramoRETA,
 } from '@/data/fiscal';
-import type { ResultadoRegimenED } from '@/lib/calculadoras/modulosVsDirecta';
 import { compararModulosVsDirecta } from '@/lib/calculadoras/modulosVsDirecta';
-import { calcularCuotaAutonomo } from '@/lib/calculadoras/cuotaAutonomo';
 import styles from './SimuladorModulosVsDirecta.module.css';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
@@ -86,88 +81,9 @@ const NOMBRE_TABLA_RETA = ORDEN_COTIZACION_RETA
   ? `tabla de tramos del RETA de la ${ORDEN_COTIZACION_RETA}`
   : `tabla de tramos del RETA de ${FISCAL_AUTONOMOS_META.vigencia}`;
 
-interface CoherenciaReta {
-  /** Tramo de la tabla tal como lo numera la Orden: tabla reducida 1-3 o general 1-12. */
-  tabla: 'reducida' | 'general';
-  numeroTramo: number;
-  /** Cuota mensual mínima de ese tramo, en €. */
-  cuotaMinimaTramo: number;
-  /** Rendimiento computable mensual (art. 308.1.c LGSS) con el que se ha buscado el tramo, en €. */
-  rendimientoMensual: number;
-  /** Cuánto queda por debajo del mínimo el coste anual publicado, en €. */
-  deficitAnual: number;
-}
-
-/**
- * Contrasta la cuota RETA introducida con el tramo que le toca por rendimiento.
- *
- * El tramo lo decide el rendimiento COMPUTABLE del art. 308.1.c LGSS, no el neto del IRPF:
- * en directa, el rendimiento neto (que ya lleva restados la cuota y el 5 % de difícil
- * justificación) MÁS las cuotas, y a eso un 7 % menos de gastos genéricos
- * (`rendimientoComputableMensualRETA`). Por debajo de la cuota mínima de ese tramo, el «coste
- * fiscal anual total» que la app publica queda por debajo del mínimo legalmente posible
- * (hallazgo 812).
- *
- * ⚠️ 02/10/2026 — hallazgo 2607: hasta hoy buscaba el tramo con (ingresos − gastos − cuota)/12,
- * atribuyéndolo al art. 308.1. Con 100.000 / 21.000 / 560 avisaba de un déficit de 568,20 €
- * que no existe, y con 30.000 / 4.500 / 370 callaba uno de 130,56 €. Y nombraba el tramo por el
- * id correlativo de la tabla (1-15), que la Orden no usa (hallazgo 2611).
- *
- * Se AVISA, no se corrige: la app no sabe si hay tarifa plana, pluriactividad, base
- * elegida por encima de la mínima o un alta a mitad de año.
- *
- * @returns null cuando la cuota es coherente con el tramo (o no hay rendimiento positivo).
- */
-function contrastarCuotaReta(retaMensual: number, ed: ResultadoRegimenED): CoherenciaReta | null {
-  // Con pérdidas, el rendimiento neto REAL es negativo y así entra en el art. 308.1.c: el
-  // `rendimientoNeto` del motor está acotado a 0 para el IRPF, que es otra cosa.
-  const rendimientoNetoReal = ed.ingresos - ed.gastos - ed.cuotaRetaDeducida - ed.reduccion5pc;
-  const rendimientoMensual = rendimientoComputableMensualRETA({
-    rendimientoNetoAnual: rendimientoNetoReal,
-    cuotasAnuales: ed.cuotaRetaDeducida,
-    metodo: 'directa',
-  });
-  return contrastarConComputable(retaMensual, rendimientoMensual);
-}
-
-/**
- * El mismo contraste para la columna de MÓDULOS (hallazgo 4133, 05/11/2026). Con la cotización
- * por ingresos reales, el tramo depende del computable de CADA régimen: en estimación objetiva,
- * «el rendimiento neto previo» con el 7 % (art. 308.1.c, reglas 1.ª y 2.ª, LGSS), sin devolver
- * cuotas, porque en módulos no se deducen. Hasta hoy solo se contrastaba la directa, y con
- * 30.000 / 20.000 / 227 € y 30.000 de módulos la columna de módulos publicaba un coste
- * 2.093,64 € por debajo del mínimo posible en ese régimen, sin aviso.
- *
- * Como neto previo se toma el dato que escribe el usuario (antes de la reducción general):
- * coincide cuando la actividad no tiene índices correctores; con ellos, el previo es algo
- * mayor y el aviso, si sale, se queda corto, nunca de más.
- */
-function contrastarCuotaRetaModulos(
-  retaMensual: number,
-  rendimientoNetoModulos: number
-): CoherenciaReta | null {
-  const rendimientoMensual = rendimientoComputableMensualRETA({
-    rendimientoNetoAnual: rendimientoNetoModulos,
-    cuotasAnuales: 0,
-    metodo: 'objetiva',
-  });
-  return contrastarConComputable(retaMensual, rendimientoMensual);
-}
-
-function contrastarConComputable(retaMensual: number, rendimientoMensual: number): CoherenciaReta | null {
-  if (rendimientoMensual <= 0) return null;
-  // Ya es el computable (con su 7 %): se pasa como tal para que la calculadora no lo reste otra vez.
-  const { cuotaEfectiva } = calcularCuotaAutonomo({ rendimientoComputableMensual: rendimientoMensual });
-  if (retaMensual >= cuotaEfectiva) return null;
-  const { tabla, numero } = nombreTramoRETA(tramoRETA(rendimientoMensual));
-  return {
-    tabla,
-    numeroTramo: numero,
-    cuotaMinimaTramo: cuotaEfectiva,
-    rendimientoMensual,
-    deficitAnual: (cuotaEfectiva - retaMensual) * 12,
-  };
-}
+// El contraste de la cuota RETA con el tramo de cada régimen (hallazgos 812, 2607, 2611 y 4133)
+// vive en el motor desde el 06/11/2026 (cabo C0648), para que la tool del MCP avise igual: cada
+// columna trae su `retaBajoMinimo`. El porqué de cada regla, en la cabecera del motor.
 
 /**
  * Lee el campo de texto del rendimiento neto de módulos. Vacío = sin dato (solo se calcula
@@ -223,15 +139,9 @@ export default function SimuladorModulosVsDirectaPage() {
   const superaLimites = comparativa.motivoSinModulos === 'supera_limites';
 
   // Coherencia de la cuota RETA con el tramo que le toca por rendimiento computable.
-  const coherenciaReta = useMemo(
-    () => contrastarCuotaReta(comunes.retaMensual, resED),
-    [comunes.retaMensual, resED]
-  );
+  const coherenciaReta = resED.retaBajoMinimo;
   // Y con el tramo que le toca en MÓDULOS, que se busca con su propio computable (hallazgo 4133).
-  const coherenciaRetaModulos = useMemo(
-    () => (resModulos ? contrastarCuotaRetaModulos(comunes.retaMensual, resModulos.rendimientoNetoModulos) : null),
-    [comunes.retaMensual, resModulos]
-  );
+  const coherenciaRetaModulos = resModulos?.retaBajoMinimo ?? null;
 
   return (
     <div className={styles.container}>

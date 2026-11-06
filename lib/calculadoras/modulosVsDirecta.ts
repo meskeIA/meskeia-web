@@ -38,6 +38,9 @@
  *    La del art. 32.2.1.º (cliente único, TRADE) no se modela: exige datos que no se piden.
  *    Y «rendimiento neto reducido» vuelve a significar lo que significa en el IRPF: lo que
  *    queda DESPUÉS de las reducciones del art. 32, no tras el 5 % de difícil justificación.
+ *  · 06/11/2026 (cabo C0648) — el contraste de la cuota RETA con el tramo de cada columna
+ *    (hallazgos 812 y 4133) vivía en la página, así que la tool del MCP publicaba un coste por
+ *    debajo del mínimo legal sin aviso. Ahora cada régimen trae `retaBajoMinimo`.
  */
 import {
   MINIMOS_IRPF_2025,
@@ -47,6 +50,25 @@ import {
 } from '@/data/fiscal/irpf';
 import { LIMITES_EXCLUSION_MODULOS_2025, reduccionGeneralModulos } from '@/data/fiscal/modulos-irpf';
 import { reduccionGastosDificilJustificacion } from '@/data/fiscal/estimacion-directa';
+import { nombreTramoRETA, rendimientoComputableMensualRETA, tramoRETA } from '@/data/fiscal/autonomos';
+import { calcularCuotaAutonomo } from '@/lib/calculadoras/cuotaAutonomo';
+
+/**
+ * La cuota RETA tecleada queda por debajo de la mínima del tramo que le toca por rendimiento
+ * computable (art. 308.1.c LGSS). Se AVISA, no se corrige: el motor no sabe si hay tarifa
+ * plana, pluriactividad, base elegida por encima de la mínima o un alta a mitad de año.
+ */
+export interface CoherenciaReta {
+  /** Tramo de la tabla tal como lo numera la Orden: tabla reducida 1-3 o general 1-12. */
+  tabla: 'reducida' | 'general';
+  numeroTramo: number;
+  /** Cuota mensual mínima de ese tramo, en €. */
+  cuotaMinimaTramo: number;
+  /** Rendimiento computable mensual (art. 308.1.c LGSS) con el que se ha buscado el tramo, en €. */
+  rendimientoMensual: number;
+  /** Cuánto queda por debajo del mínimo el coste anual publicado, en €. */
+  deficitAnual: number;
+}
 
 /**
  * Por qué no hay columna de módulos:
@@ -96,6 +118,8 @@ export interface ResultadoRegimenED {
   irpf: number;
   cuotaReta: number;
   costeAnualTotal: number;
+  /** null si la cuota es coherente con el tramo de la directa (o no hay rendimiento positivo). */
+  retaBajoMinimo: CoherenciaReta | null;
 }
 
 export interface ResultadoRegimenModulos {
@@ -121,6 +145,8 @@ export interface ResultadoRegimenModulos {
   /** Cuota RETA anual: en módulos NO reduce el rendimiento, solo se suma al coste. */
   cuotaReta: number;
   costeAnualTotal: number;
+  /** null si la cuota es coherente con el tramo de módulos (o no hay rendimiento positivo). */
+  retaBajoMinimo: CoherenciaReta | null;
 }
 
 export interface ResultadoModulosVsDirecta {
@@ -163,6 +189,58 @@ function calcularIRPF(baseLiquidableGeneral: number): {
   };
 }
 
+/**
+ * El contraste común: el tramo que toca al computable y si la cuota llega a su mínima.
+ * @returns null cuando la cuota es coherente con el tramo o el computable no es positivo.
+ */
+function contrastarConComputable(retaMensual: number, rendimientoMensual: number): CoherenciaReta | null {
+  if (rendimientoMensual <= 0) return null;
+  // Ya es el computable (con su 7 %): se pasa como tal para que la calculadora no lo reste otra vez.
+  const { cuotaEfectiva } = calcularCuotaAutonomo({ rendimientoComputableMensual: rendimientoMensual });
+  if (retaMensual >= cuotaEfectiva) return null;
+  const { tabla, numero } = nombreTramoRETA(tramoRETA(rendimientoMensual));
+  return {
+    tabla,
+    numeroTramo: numero,
+    cuotaMinimaTramo: cuotaEfectiva,
+    rendimientoMensual,
+    deficitAnual: (cuotaEfectiva - retaMensual) * 12,
+  };
+}
+
+/**
+ * Directa (hallazgos 812 y 2607): el tramo lo decide el rendimiento COMPUTABLE del art. 308.1.c
+ * LGSS, no el neto del IRPF: el rendimiento neto (que ya lleva restados la cuota y el 5 % de
+ * difícil justificación) MÁS las cuotas, y a eso un 7 % menos de gastos genéricos. Con pérdidas,
+ * el neto REAL es negativo y así entra: el `rendimientoNeto` del IRPF está acotado a 0.
+ */
+function contrastarCuotaRetaDirecta(
+  ingresos: number,
+  gastos: number,
+  cuotaRetaAnual: number,
+  reduccion5pc: number,
+  retaMensual: number
+): CoherenciaReta | null {
+  const rendimientoNetoReal = ingresos - gastos - cuotaRetaAnual - reduccion5pc;
+  return contrastarConComputable(
+    retaMensual,
+    rendimientoComputableMensualRETA({ rendimientoNetoAnual: rendimientoNetoReal, cuotasAnuales: cuotaRetaAnual, metodo: 'directa' })
+  );
+}
+
+/**
+ * Módulos (hallazgo 4133): en estimación objetiva, «el rendimiento neto previo» con el 7 %
+ * (art. 308.1.c, reglas 1.ª y 2.ª, LGSS), sin devolver cuotas, porque en módulos no se deducen.
+ * Como neto previo se toma el dato aportado (antes de la reducción general): coincide sin
+ * índices correctores; con ellos el previo es algo mayor y el aviso se queda corto, nunca de más.
+ */
+function contrastarCuotaRetaModulos(rendimientoNetoModulos: number, retaMensual: number): CoherenciaReta | null {
+  return contrastarConComputable(
+    retaMensual,
+    rendimientoComputableMensualRETA({ rendimientoNetoAnual: rendimientoNetoModulos, cuotasAnuales: 0, metodo: 'objetiva' })
+  );
+}
+
 function calcularED(ingresos: number, gastos: number, retaMensual: number): ResultadoRegimenED {
   const cuotaReta = retaMensual * 12;
   // Las cotizaciones del titular al RETA son gasto deducible en directa (Manual práctico de
@@ -191,6 +269,7 @@ function calcularED(ingresos: number, gastos: number, retaMensual: number): Resu
     irpf,
     cuotaReta,
     costeAnualTotal: irpf + cuotaReta,
+    retaBajoMinimo: contrastarCuotaRetaDirecta(ingresos, gastos, cuotaReta, reduccion5pc, retaMensual),
   };
 }
 
@@ -216,6 +295,7 @@ function calcularModulos(rendimientoNetoModulos: number, retaMensual: number): R
     irpf,
     cuotaReta,
     costeAnualTotal: irpf + cuotaReta,
+    retaBajoMinimo: contrastarCuotaRetaModulos(rendimientoNetoModulos, retaMensual),
   };
 }
 

@@ -129,7 +129,7 @@ import {
   type RolPensionDivorcio,
   type PosHipotecaDivorcio,
 } from '@/lib/calculadoras/impuestosDivorcio';
-import { compararModulosVsDirecta } from '@/lib/calculadoras/modulosVsDirecta';
+import { compararModulosVsDirecta, type CoherenciaReta } from '@/lib/calculadoras/modulosVsDirecta';
 import { LIMITES_EXCLUSION_MODULOS_2025, ORDEN_MODULOS_VIGENTE } from '@/data/fiscal/modulos-irpf';
 
 // ---------------------------------------------------------------------------
@@ -3218,15 +3218,30 @@ function crearServidorDelegum(): McpServer {
             (ed.reduccionRentasBajas > 0 ? ` · reducido por rentas bajas (art. 32.2.3.º LIRPF, actividad como única renta): ${fmt(ed.rendimientoNetoReducido)} €` : '') +
             ` · IRPF: ${fmt(ed.irpf)} € · RETA: ${fmt(ed.cuotaReta)} €`,
         ];
+        // Cabo C0648 (06/11/2026): la app avisa desde los hallazgos 812 y 4133 cuando la cuota
+        // tecleada no llega a la mínima del tramo de cada régimen; la tool callaba y publicaba
+        // un coste por debajo del mínimo legal. El contraste vive ahora en el motor.
+        const avisoReta = (c: CoherenciaReta, regimen: string): string =>
+          `  ⚠️ La cuota RETA indicada (${fmt(a.cuota_reta_mensual)} €/mes) no llega a la mínima del tramo que corresponde ${regimen}: ` +
+          `rendimiento computable ${fmt(c.rendimientoMensual)} €/mes (art. 308.1.c LGSS, con el 7 % de gastos genéricos), ` +
+          `tabla ${c.tabla}, tramo ${c.numeroTramo}, cuota mínima ${fmt(c.cuotaMinimaTramo)} €/mes. ` +
+          `El coste de esta columna queda ${fmt(c.deficitAnual)} € por debajo del mínimo posible, salvo tarifa plana, pluriactividad, autónomo societario o alta a mitad de año.`;
+        if (ed.retaBajoMinimo) lineas.push(avisoReta(ed.retaBajoMinimo, 'en Estimación Directa'));
         if (r.modulos) {
           const m = r.modulos;
           lineas.push(
             `🅱️ **Estimación Objetiva (módulos): ${fmt(m.costeAnualTotal)} €/año**`,
             `  • Rendimiento neto de módulos aportado: ${fmt(m.rendimientoNetoModulos)} € · tras la reducción general del 5\u00A0% sin tope: ${fmt(m.rendimientoNeto)} €` +
               (m.reduccionRentasBajas > 0 ? ` · reducido por rentas bajas (art. 32.2.3.º LIRPF): ${fmt(m.rendimientoNetoReducido)} €` : '') +
-              ` · IRPF: ${fmt(m.irpf)} € · RETA: ${fmt(m.cuotaReta)} € (en módulos no se deduce)`,
-            ''
+              ` · IRPF: ${fmt(m.irpf)} € · RETA: ${fmt(m.cuotaReta)} € (en módulos no se deduce)`
           );
+          if (m.retaBajoMinimo) {
+            lineas.push(
+              avisoReta(m.retaBajoMinimo, 'en módulos (rendimiento neto de módulos, sin sumar cuotas)') +
+                ' La diferencia de abajo no recoge ese cambio de cuota.'
+            );
+          }
+          lineas.push('');
           const dif = r.diferencia ?? 0;
           lineas.push(
             dif === 0

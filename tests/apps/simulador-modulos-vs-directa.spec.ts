@@ -1529,6 +1529,39 @@ test.describe('Simulador Módulos vs Estimación Directa — inspección de camb
   });
 
   /**
+   * Cabo C0648 (06/11/2026) — la tool `comparar_modulos_vs_directa` del MCP de Delegum no hacía este
+   * contraste: con el caso del 4133 devolvía el coste de módulos 2.093,64 € por debajo del mínimo sin
+   * aviso. REPARADO: el contraste pasó de la página al motor y la tool lo dice en cada columna. Con
+   * 30.000/4.500/370 (el caso del hallazgo 2607) avisa en la directa: computable 1.894,64 €/mes,
+   * tramo 5 de la general, mínima 380,88 €, déficit 130,56 €. Goldens a mano en
+   * tests/calculadoras-invariantes.spec.ts.
+   */
+  test('C0648 — la tool del MCP avisa de la cuota bajo la mínima, en módulos y en la directa', async ({ request }) => {
+    const llamar = async (argumentos: Record<string, unknown>): Promise<string> => {
+      const r = await request.post('/api/mcp/delegum/', {
+        headers: { Accept: 'application/json, text/event-stream' },
+        data: { jsonrpc: '2.0', id: 1, method: 'tools/call', params: { name: 'comparar_modulos_vs_directa', arguments: argumentos } },
+      });
+      expect(r.ok()).toBeTruthy();
+      return ((await r.json()).result.content[0].text as string).replace(/\s+/g, ' ');
+    };
+    const modulos = await llamar({ ingresos_anuales: 30000, gastos_anuales: 20000, cuota_reta_mensual: 227, rendimiento_neto_modulos: 30000 });
+    expect(modulos).toContain('corresponde en módulos');
+    expect(modulos).toContain('rendimiento computable 2325,00 €/mes');
+    expect(modulos).toContain('tabla general, tramo 6, cuota mínima 401,47 €/mes');
+    expect(modulos).toContain('queda 2093,64 € por debajo del mínimo posible');
+    expect(modulos).not.toContain('corresponde en Estimación Directa');
+
+    const directa = await llamar({ ingresos_anuales: 30000, gastos_anuales: 4500, cuota_reta_mensual: 370 });
+    expect(directa).toContain('corresponde en Estimación Directa');
+    expect(directa).toContain('tabla general, tramo 5, cuota mínima 380,88 €/mes');
+    expect(directa).toContain('queda 130,56 € por debajo del mínimo posible');
+
+    const sinAviso = await llamar({ ingresos_anuales: 30000, gastos_anuales: 20000, cuota_reta_mensual: 402, rendimiento_neto_modulos: 30000 });
+    expect(sinAviso).not.toContain('no llega a la mínima');
+  });
+
+  /**
    * C0262 — el rótulo de la diferencia cambia de rama («es el mismo» ↔ «es X mayor/menor») y desde
    * c41692d9 cada rama va en su <span key>. Con el texto suelto de antes, el traductor del navegador
    * cambiaba ese nodo por <font> y React, al retirarlo, caía con NotFoundError (cabecera de
