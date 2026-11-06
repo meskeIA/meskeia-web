@@ -176,9 +176,9 @@ test.describe('diccionario-rimas — caso 2: «u» muda de «gue» e hiato de «
     await buscar(page, 'pliegue');
     await pestana(page, 'asonante');
     await expect(resultado(page)).toContainText('que riman en asonante con');
-    // Asonantes de pliegue: ~3.850, más que las 300 que se pintan de golpe; se piden todas
-    await resultado(page).getByRole('button', { name: /^Ver las / }).click();
-    const lista = await palabrasVisibles(page);
+    // Asonantes de pliegue: ~3.850, más que las 300 que se pintan de golpe; se piden todas y se
+    // espera a la última tanda (desde C0631 «Ver las» las añade de 1.000 en 1.000)
+    const lista = await todasLasPalabras(page);
     for (const w of ['hereje', 'eje', 'fleje']) expect(lista, `falta ${w} (e-e)`).toContain(w);
   });
 
@@ -589,20 +589,56 @@ test.describe('diccionario-rimas — reinspección 25/09/2026: rechazo y rendimi
     // hilo principal, no el reloj de pared. Cabo C0588 (03/11/2026): con el tope de 5 s de reloj
     // falló en la suite entera del 02/11 (5.672 ms) y pasaba 3 de 3 aislado; ese reloj cuenta
     // también los sondeos de toHaveCount sobre más de 10.000 <li> y la carga del servidor.
+    type Medidas = { __tareaMaxima: number; __tandas: number };
     await page.evaluate(() => {
-      const w = window as unknown as { __tareaMaxima: number };
+      const w = window as unknown as Medidas;
       w.__tareaMaxima = 0;
       new PerformanceObserver((lista) => {
         for (const e of lista.getEntries()) w.__tareaMaxima = Math.max(w.__tareaMaxima, e.duration);
       }).observe({ type: 'longtask' });
     });
+    // Control positivo del observador: una tarea sintética de 120 ms tiene que verse. Antes se
+    // exigía que pintar la lista dejara alguna tarea larga, y con las tandas de C0631 un build de
+    // producción puede no dejar ninguna: el 0 sería el resultado bueno, no un observador ciego.
+    await page.evaluate(() => {
+      setTimeout(() => {
+        const fin = performance.now() + 120;
+        while (performance.now() < fin) {
+          /* ocupa el hilo principal */
+        }
+      }, 0);
+    });
+    await expect
+      .poll(() => page.evaluate(() => (window as unknown as Medidas).__tareaMaxima), {
+        message: 'el observador de tareas largas no ve una tarea sintética de 120 ms',
+      })
+      .toBeGreaterThan(0);
+    // Cuántas veces se añaden <li> a la lista tras el clic: una sola vez es la lista de golpe.
+    await resultado(page)
+      .locator('li')
+      .first()
+      .evaluate((li) => {
+        const w = window as unknown as Medidas;
+        w.__tareaMaxima = 0;
+        w.__tandas = 0;
+        new MutationObserver((cambios) => {
+          if (cambios.some((c) => [...c.addedNodes].some((n) => n.nodeName === 'LI'))) w.__tandas += 1;
+        }).observe(li.parentElement!, { childList: true });
+      });
     await ver.click();
     await expect(resultado(page).locator('li')).toHaveCount(total, { timeout: 15000 });
-    const tareaMaxima = await page.evaluate(() => (window as unknown as { __tareaMaxima: number }).__tareaMaxima);
-    // El observador ve algo: pintar más de 10.000 <li> deja al menos una tarea de más de 50 ms
-    // (si no, un 0 aprobaría en falso).
-    expect(tareaMaxima, 'el observador de tareas largas no ha visto ninguna').toBeGreaterThan(0);
-    // 254 ms medidos el 25/09; el tope, 10 veces más holgado, como los de arriba.
+    const { tareaMaxima, tandas } = await page.evaluate(() => {
+      const w = window as unknown as Medidas;
+      return { tareaMaxima: w.__tareaMaxima, tandas: w.__tandas };
+    });
+    // Cabo C0631 (06/11/2026): la tarea larga llegó a 3.739 ms en la suite entera dos veces
+    // (04/11 y 06/11) y pasaba 3 de 3 aislado. No era el test: era UNA tarea con los 10.114 <li>,
+    // que con el equipo cargado congela la página igual que en un móvil modesto (con la CPU a 6x,
+    // 1.007-1.278 ms). Desde entonces «Ver las» las añade en tandas de 1.000, una por vuelta del
+    // navegador y sin volver a pintar las ya puestas: a 6x, 243-387 ms y antes en total.
+    // Esto es lo que distingue las dos versiones aislado; el tope de abajo solo no lo haría.
+    expect(tandas, 'veces que se añaden <li> tras «Ver las» (1 = todas de golpe)').toBeGreaterThanOrEqual(5);
+    // 254 ms medidos el 25/09 pintándolas de golpe; el tope, 10 veces más holgado, como los de arriba.
     expect(tareaMaxima, 'tarea larga máxima al pintarlas todas (ms)').toBeLessThan(2540);
   });
 });

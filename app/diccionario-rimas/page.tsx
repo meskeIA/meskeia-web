@@ -1,7 +1,7 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useEffect, useMemo, useRef, useCallback, type FormEvent } from 'react';
+import { memo, useState, useEffect, useMemo, useRef, useCallback, type FormEvent } from 'react';
 import styles from './DiccionarioRimas.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
@@ -30,6 +30,39 @@ const TAMANO_BLOQUE = 8000;
 
 /** Resultados que se pintan de golpe; el resto, bajo petición */
 const LIMITE_VISIBLE = 300;
+
+/**
+ * Con «Ver las N», las que faltan se añaden en tandas de este tamaño, una por vuelta del
+ * navegador. Pintar las 10.114 de «cantar» de golpe era UNA tarea de 254 ms en este PC y de
+ * 3,7 s con el equipo cargado (cabo C0631, 06/11/2026): en un móvil modesto, la página congelada.
+ */
+const TANDA_PINTADO = 1000;
+
+interface PropsTanda {
+  palabras: EntradaRima[];
+}
+
+/** Una tanda de la lista. Con memo, añadir la siguiente no vuelve a pintar esta. */
+const TandaPalabras = memo(function TandaPalabras({ palabras }: PropsTanda) {
+  return (
+    <>
+      {palabras.map((p) => (
+        <li key={p.palabra} className={styles.palabra}>
+          <span className={styles.palabraInicio}>
+            {p.palabra.slice(0, p.palabra.length - p.nucleo.length)}
+          </span>
+          <span className={styles.palabraRima}>{p.nucleo}</span>
+          <span className={styles.palabraSilabas} aria-hidden="true">
+            {p.silabas}
+          </span>
+          <span className={styles.visualmenteOculto}>
+            , {p.silabas} {p.silabas === 1 ? 'sílaba' : 'sílabas'}
+          </span>
+        </li>
+      ))}
+    </>
+  );
+});
 
 /** Pausa de tecleo tras la que la consulta se da por escrita */
 const ESPERA_ASENTADA_MS = 800;
@@ -191,10 +224,28 @@ export default function DiccionarioRimasPage() {
 
   // Lista plana: el orden ya viene por calidad de rima desde el motor, y
   // agruparlo por sílabas enterraría las mejores debajo de los monosílabos.
-  const visibles = useMemo<EntradaRima[]>(() => {
+  // El resultado, partido en tandas: las 300 primeras y luego de TANDA_PINTADO en TANDA_PINTADO.
+  // Cada tanda es el MISMO array mientras no cambie el resultado, así que <TandaPalabras> (memo)
+  // no vuelve a pintar las ya puestas al añadir la siguiente.
+  const tandas = useMemo<EntradaRima[][]>(() => {
     if (!resultado) return [];
-    return verTodas ? resultado.palabras : resultado.palabras.slice(0, LIMITE_VISIBLE);
-  }, [resultado, verTodas]);
+    const p = resultado.palabras;
+    const lista = [p.slice(0, LIMITE_VISIBLE)];
+    for (let i = LIMITE_VISIBLE; i < p.length; i += TANDA_PINTADO) lista.push(p.slice(i, i + TANDA_PINTADO));
+    return lista;
+  }, [resultado]);
+
+  // Cuántas tandas lleva puestas «Ver las N» para ESTE resultado: si el resultado cambia (otra
+  // pestaña, otro filtro), la cuenta vuelve a empezar sin un render intermedio con la lista entera.
+  const [puestas, setPuestas] = useState<{ de: typeof resultado; n: number }>({ de: null, n: 1 });
+  const nPuestas = puestas.de === resultado ? puestas.n : 1;
+  useEffect(() => {
+    if (!verTodas || !resultado || nPuestas >= tandas.length) return;
+    const t = setTimeout(() => setPuestas({ de: resultado, n: nPuestas + 1 }), 0);
+    return () => clearTimeout(t);
+  }, [verTodas, resultado, nPuestas, tandas.length]);
+
+  const tandasVisibles = verTodas ? tandas.slice(0, nPuestas) : tandas.slice(0, 1);
 
   // Cada búsqueda nueva empieza sin filtros heredados ni lista desplegada
   const cambiarConsulta = useCallback((valor: string) => {
@@ -516,19 +567,8 @@ export default function DiccionarioRimasPage() {
               </p>
 
               <ul className={styles.listaPalabras}>
-                {visibles.map((p) => (
-                  <li key={p.palabra} className={styles.palabra}>
-                    <span className={styles.palabraInicio}>
-                      {p.palabra.slice(0, p.palabra.length - p.nucleo.length)}
-                    </span>
-                    <span className={styles.palabraRima}>{p.nucleo}</span>
-                    <span className={styles.palabraSilabas} aria-hidden="true">
-                      {p.silabas}
-                    </span>
-                    <span className={styles.visualmenteOculto}>
-                      , {p.silabas} {p.silabas === 1 ? 'sílaba' : 'sílabas'}
-                    </span>
-                  </li>
+                {tandasVisibles.map((tanda, i) => (
+                  <TandaPalabras key={i} palabras={tanda} />
                 ))}
               </ul>
 
