@@ -4,6 +4,7 @@
 import { useState, useMemo, useRef, useEffect, useCallback } from 'react';
 import styles from './SimuladorTeoremaBayes.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { tintaSobre } from '@/lib/tintaLegible';
 
 // ============================================
 // TIPOS
@@ -153,7 +154,8 @@ export default function SimuladorTeoremaBayesPage() {
 
     const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
     const colorText = isDark ? '#E5E5E5' : '#333';
-    const colorAxis = isDark ? '#666' : '#999';
+    // Leyenda del árbol: '#999' / '#666' daban 2,8 y 2,7:1 (cabo C0297, 06/11/2026)
+    const colorAxis = isDark ? '#A0A0A0' : '#666';
     const colorTP = '#48A9A6'; // verde teal: TP
     const colorFN = '#A82E68'; // rosa oscuro: FN
     const colorFP = '#E07A1F'; // naranja: FP
@@ -218,13 +220,14 @@ export default function SimuladorTeoremaBayesPage() {
       ctx.stroke();
       ctx.setLineDash([]);
 
-      // Etiquetas
-      ctx.fillStyle = 'white';
+      // Etiquetas: la tinta, según su celda (en blanco, el TN azul claro daba 2,26:1, el FP
+      // naranja 2,63 y el TP teal 2,80; cabo C0297)
       ctx.font = 'bold 12px system-ui';
       ctx.textAlign = 'center';
 
       // TP
       if (dH > 18 && tpW > 30) {
+        ctx.fillStyle = tintaSobre(colorTP);
         ctx.fillText('TP', rectX + tpW / 2, rectY + dH / 2 - 2);
         ctx.font = '10px system-ui';
         ctx.fillText(`${fmt(calculo.truePos, 1)}`, rectX + tpW / 2, rectY + dH / 2 + 14);
@@ -232,6 +235,7 @@ export default function SimuladorTeoremaBayesPage() {
       }
       // FN
       if (dH > 18 && fnW > 30) {
+        ctx.fillStyle = tintaSobre(colorFN);
         ctx.fillText('FN', rectX + tpW + fnW / 2, rectY + dH / 2 - 2);
         ctx.font = '10px system-ui';
         ctx.fillText(`${fmt(calculo.falseNeg, 1)}`, rectX + tpW + fnW / 2, rectY + dH / 2 + 14);
@@ -239,6 +243,7 @@ export default function SimuladorTeoremaBayesPage() {
       }
       // FP
       if (noDH > 18 && fpW > 30) {
+        ctx.fillStyle = tintaSobre(colorFP);
         ctx.fillText('FP', rectX + fpW / 2, rectY + dH + noDH / 2 - 2);
         ctx.font = '10px system-ui';
         ctx.fillText(`${fmt(calculo.falsePos, 1)}`, rectX + fpW / 2, rectY + dH + noDH / 2 + 14);
@@ -246,6 +251,7 @@ export default function SimuladorTeoremaBayesPage() {
       }
       // TN
       if (noDH > 18 && tnW > 30) {
+        ctx.fillStyle = tintaSobre(colorTN);
         ctx.fillText('TN', rectX + fpW + tnW / 2, rectY + dH + noDH / 2 - 2);
         ctx.font = '10px system-ui';
         ctx.fillText(`${fmt(calculo.trueNeg, 1)}`, rectX + fpW + tnW / 2, rectY + dH + noDH / 2 + 14);
@@ -305,8 +311,9 @@ export default function SimuladorTeoremaBayesPage() {
         ctx.moveTo(x1, y1);
         ctx.lineTo(x2, y2);
         ctx.stroke();
-        // Etiqueta
-        ctx.fillStyle = color;
+        // Etiqueta: en el color del enlace, el azul claro, el teal y el naranja no llegaban a
+        // 3:1 sobre el fondo; la rama ya la colorea la línea (cabo C0297)
+        ctx.fillStyle = colorText;
         ctx.font = 'bold 11px system-ui';
         ctx.textAlign = 'center';
         ctx.fillText(etiqueta, (x1 + x2) / 2, (y1 + y2) / 2 - 4);
@@ -329,7 +336,7 @@ export default function SimuladorTeoremaBayesPage() {
         ctx.lineWidth = 2;
         ctx.stroke();
 
-        ctx.fillStyle = 'white';
+        ctx.fillStyle = tintaSobre(color);
         ctx.font = 'bold 11px system-ui';
         ctx.textAlign = 'center';
         ctx.fillText(label, x, y - 2);
@@ -337,7 +344,8 @@ export default function SimuladorTeoremaBayesPage() {
         ctx.fillText(valor, x, y + 12);
       };
 
-      drawNode(rootX, rootY, 'Total', '1000', '#2E86AB', 28);
+      // El azul de marca no llega a 4,5:1 con ninguna tinta: el del botón (--primary-boton)
+      drawNode(rootX, rootY, 'Total', '1000', '#26718F', 28);
       drawNode(lvl1X1, lvl1Y, 'D', fmt(calculo.D, 0), '#A82E68', 28);
       drawNode(lvl1X2, lvl1Y, '¬D', fmt(calculo.noD, 0), '#7FB3D3', 28);
 

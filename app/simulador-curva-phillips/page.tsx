@@ -103,6 +103,12 @@ export default function SimuladorCurvaPhillipsPage() {
     const colorGrid = isDark ? '#333' : '#EEE';
     const colorBg = isDark ? '#1A1A1A' : '#FAFAFA';
     const colorCardBg = isDark ? '#2A2A2A' : '#FFFFFF';
+    // Texto del lienzo (cabo C0297, 06/11/2026): la marca y los grises claros de los rótulos
+    // daban 2,3-4,3:1 contra el fondo. Los tonos de texto de la marca son los de globals.css
+    // (--primary-texto, --secondary-texto); las líneas siguen con la marca.
+    const textoPrimario = isDark ? '#3FA5D1' : '#26718F';
+    const textoSecundario = isDark ? '#5ABDB9' : '#327874';
+    const textoTenue = isDark ? '#A0A0A0' : '#666';
 
     // Definición de ejes: X = desempleo 0-20%, Y = inflación -5 a +20%
     const xMin = 0;
@@ -192,7 +198,7 @@ export default function SimuladorCurvaPhillipsPage() {
     ctx.stroke();
     ctx.setLineDash([]);
 
-    ctx.fillStyle = isDark ? '#AAA' : '#777';
+    ctx.fillStyle = textoTenue;
     ctx.font = '10px system-ui';
     ctx.textAlign = 'left';
     ctx.fillText('Objetivo 2%', pad.left + 4, yObj2 - 4);
@@ -207,7 +213,7 @@ export default function SimuladorCurvaPhillipsPage() {
     ctx.stroke();
     ctx.setLineDash([]);
 
-    ctx.fillStyle = '#48A9A6';
+    ctx.fillStyle = textoSecundario;
     ctx.font = 'bold 10px system-ui';
     ctx.textAlign = 'center';
     ctx.fillText('NAIRU = 5%', xNairu, pad.top - 6);
@@ -230,7 +236,7 @@ export default function SimuladorCurvaPhillipsPage() {
     // Etiqueta CP₀
     const piMidCP0 = calcularInflacion(10, piE, 0);
     if (piMidCP0 >= yMin && piMidCP0 <= yMax) {
-      ctx.fillStyle = '#2E86AB';
+      ctx.fillStyle = textoPrimario;
       ctx.font = 'bold 11px system-ui';
       ctx.textAlign = 'left';
       ctx.fillText('CP₀', toX(10) + 4, toY(piMidCP0) - 4);
@@ -256,7 +262,7 @@ export default function SimuladorCurvaPhillipsPage() {
 
       const piMidCP1 = calcularInflacion(10, piE, shock);
       if (piMidCP1 >= yMin && piMidCP1 <= yMax) {
-        ctx.fillStyle = '#2E86AB';
+        ctx.fillStyle = textoPrimario;
         ctx.font = 'bold 11px system-ui';
         ctx.textAlign = 'left';
         ctx.fillText('CP₁', toX(10) + 4, toY(piMidCP1) - 4);
@@ -272,7 +278,7 @@ export default function SimuladorCurvaPhillipsPage() {
       ctx.lineTo(xNairu, toY(yMin + 0.5));
       ctx.stroke();
 
-      ctx.fillStyle = '#48A9A6';
+      ctx.fillStyle = textoSecundario;
       ctx.font = 'bold 10px system-ui';
       ctx.textAlign = 'left';
       ctx.fillText('Curva Phillips LP', xNairu + 4, toY(15));
@@ -318,7 +324,7 @@ export default function SimuladorCurvaPhillipsPage() {
     }
 
     // Título de ejes
-    ctx.fillStyle = colorAxis;
+    ctx.fillStyle = textoTenue;
     ctx.font = '12px system-ui';
     ctx.textAlign = 'center';
     ctx.fillText('Tasa de desempleo u (%)', pad.left + plotW / 2, H - 10);
@@ -331,11 +337,12 @@ export default function SimuladorCurvaPhillipsPage() {
 
     // Etiquetas de zonas
     ctx.font = '9px system-ui';
-    ctx.fillStyle = isDark ? 'rgba(220, 80, 80, 0.7)' : 'rgba(160, 40, 40, 0.6)';
+    // Opacos: con alfa se quedaban en 2,7-3,7:1 sobre el sombreado de su zona
+    ctx.fillStyle = isDark ? '#E87A7A' : '#A12828';
     ctx.textAlign = 'center';
     ctx.fillText('ESTANFLACIÓN', toX(13), toY(12));
 
-    ctx.fillStyle = isDark ? 'rgba(72, 169, 166, 0.8)' : 'rgba(40, 120, 116, 0.7)';
+    ctx.fillStyle = isDark ? '#5ABDB9' : '#2A6663';
     ctx.fillText('EQUILIBRIO', toX(U_NATURAL), toY(2));
   }, [u, piE, shock, verLP, piActual]);
 

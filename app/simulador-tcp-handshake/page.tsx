@@ -32,14 +32,37 @@ interface Paso {
 // ============================================
 // COLORES DEL CANVAS
 // ============================================
-const COLOR_CLIENTE = '#2E86AB';
-const COLOR_SERVIDOR = '#48A9A6';
 const COLOR_SYN = '#2E86AB';
 const COLOR_SYN_ACK = '#48A9A6';
 const COLOR_ACK = '#28A745';
 const COLOR_FIN = '#FD7E14';
 const COLOR_ESTABLECIDA = '#28A745';
 const COLOR_CERRADA = '#6C757D';
+
+/**
+ * Tono de TEXTO de cada color del lienzo, por tema (cabo C0297, 06/11/2026). La flecha y la
+ * banda siguen con su color; la etiqueta, con uno que llega a 4,5:1 sobre el fondo y sobre el
+ * tinte de la banda. Con el color de la línea, el FIN naranja daba 2,4:1 en claro, el ACK
+ * verde 3,1 y la banda gris de cierre 3,9.
+ */
+const TEXTO_CLARO: Record<string, string> = {
+  [COLOR_SYN]: '#26718F',
+  [COLOR_SYN_ACK]: '#327874',
+  [COLOR_ACK]: '#1E7B34',
+  [COLOR_FIN]: '#B4530A',
+  [COLOR_CERRADA]: '#4F565C',
+};
+const TEXTO_OSCURO: Record<string, string> = {
+  [COLOR_SYN]: '#3FA5D1',
+  [COLOR_SYN_ACK]: '#5ABDB9',
+  [COLOR_ACK]: '#3DC25E',
+  [COLOR_FIN]: '#FD7E14',
+  [COLOR_CERRADA]: '#A0A8B0',
+};
+
+/** Relleno de las cabeceras, con texto blanco: el de los botones (--primary-boton, --secondary-boton) */
+const CABECERA_CLIENTE = '#26718F';
+const CABECERA_SERVIDOR = '#327874';
 
 function getColorFlecha(tipo: TipoPaquete): string {
   if (tipo === 'SYN') return COLOR_SYN;
@@ -209,8 +232,10 @@ function dibujarCanvas(canvas: HTMLCanvasElement, opts: OpcionesRender) {
     ctx.fillText(label, x, 28);
   };
 
-  dibujarColumna(xC, 'CLIENTE', COLOR_CLIENTE);
-  dibujarColumna(xS, 'SERVIDOR', COLOR_SERVIDOR);
+  // Blanco sobre la marca daba 4,11 y 2,80:1
+  dibujarColumna(xC, 'CLIENTE', CABECERA_CLIENTE);
+  dibujarColumna(xS, 'SERVIDOR', CABECERA_SERVIDOR);
+  const textoDe = (color: string): string => (isDark ? TEXTO_OSCURO : TEXTO_CLARO)[color] ?? textColor;
 
   // Líneas de tiempo verticales (punteadas)
   const yLineaInicio = ALTO_CABECERA;
@@ -274,7 +299,7 @@ function dibujarCanvas(canvas: HTMLCanvasElement, opts: OpcionesRender) {
       const ackLabel = paso.ack > 0 ? `, ack=${paso.ack}` : '';
       const etiqueta = `${flagsLabel} (${seqLabel}${ackLabel})`;
 
-      ctx.fillStyle = color;
+      ctx.fillStyle = textoDe(color);
       ctx.font = 'bold 11px system-ui, sans-serif';
       ctx.textAlign = 'center';
       ctx.textBaseline = 'bottom';
@@ -291,7 +316,7 @@ function dibujarCanvas(canvas: HTMLCanvasElement, opts: OpcionesRender) {
     ctx.strokeStyle = color;
     ctx.lineWidth = 1;
     ctx.strokeRect(xIni, y - 10, ancho, 20);
-    ctx.fillStyle = color;
+    ctx.fillStyle = textoDe(color);
     ctx.font = 'bold 11px system-ui, sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
@@ -352,11 +377,16 @@ export default function SimuladorTcpHandshakePage() {
 
   const pasos = generarPasos(isnCliente, isnServidor, modo);
   const isDarkRef = useRef<boolean>(false);
+  // El ref solo lo leía el siguiente dibujo: al cambiar de tema el lienzo se quedaba con el
+  // fondo y los colores del tema anterior hasta pulsar algo (cabo C0297, 06/11/2026). El
+  // estado provoca el redibujado.
+  const [temaOscuro, setTemaOscuro] = useState<boolean>(false);
 
   // Detectar dark mode
   useEffect(() => {
     const checkDark = () => {
       isDarkRef.current = document.documentElement.getAttribute('data-theme') === 'dark';
+      setTemaOscuro(isDarkRef.current);
     };
     checkDark();
     const observer = new MutationObserver(checkDark);
@@ -380,7 +410,7 @@ export default function SimuladorTcpHandshakePage() {
   // Efecto: redibujar cuando cambian parámetros o estado
   useEffect(() => {
     redibujar(pasoActivo, progresoActual);
-  }, [redibujar, pasoActivo, progresoActual, isnCliente, isnServidor, modo]);
+  }, [redibujar, pasoActivo, progresoActual, isnCliente, isnServidor, modo, temaOscuro]);
 
   // Actualizar estado de conexión según paso
   const actualizarEstado = useCallback((idx: number) => {
