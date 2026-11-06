@@ -7,7 +7,23 @@ import LegalNotice from '@/components/LegalNotice';
 import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
+import { formatNumber } from '@/lib';
+import { tintaSobre } from '@/lib/tintaLegible';
 import styles from './VisualizadorEnergiaNuclear.module.css';
+
+/**
+ * El color de un dato pinta el borde; su TEXTO va en el tono de texto del tema. Con el color
+ * del dato como texto, el estado del reactor quedaba a 4,11:1 en claro y 3,35:1 en oscuro, y
+ * «Baja actividad» a 2,67:1 (cabo C0645). Rojo y naranja: los tokens solo existen en claro; en
+ * oscuro manda la reserva.
+ */
+const TEXTO_DE: Record<string, string> = {
+  '#2E86AB': 'var(--primary-texto)',
+  '#48A9A6': 'var(--secondary-texto)',
+  '#E85D4A': 'var(--rojo-texto, #F08A7C)',
+  '#B03A2E': 'var(--rojo-texto, #F08A7C)',
+  '#E8834A': 'var(--naranja-texto, #E8834A)',
+};
 
 type Seccion = 'fision' | 'fusion' | 'reactores' | 'comparativa';
 type TipoReactor = 'PWR' | 'BWR' | 'CANDU' | 'GenIV';
@@ -145,10 +161,11 @@ export default function VisualizadorEnergiaNuclear() {
                 </div>
                 <div className={styles.flechaFision} aria-hidden="true">💥</div>
                 <div className={styles.productosDiv}>
-                  <div className={styles.fragmento} style={{ background: '#2E86AB' }}>
+                  {/* Rellenos de botón bajo el texto blanco: con la marca, 4,11 y 2,80:1 */}
+                  <div className={styles.fragmento} style={{ background: 'var(--primary-boton)' }}>
                     <span>Kr-92</span>
                   </div>
-                  <div className={styles.fragmento} style={{ background: '#48A9A6' }}>
+                  <div className={styles.fragmento} style={{ background: 'var(--secondary-boton)' }}>
                     <span>Ba-141</span>
                   </div>
                   <div className={styles.neutronesSalientes}>
@@ -181,10 +198,12 @@ export default function VisualizadorEnergiaNuclear() {
 
             {/* Control del factor k */}
             <div className={styles.controlK}>
-              <h3>Factor de multiplicación k = {factorK.toFixed(2)}</h3>
+              {/* formatNumber (toFixed daba «1.00») y la cifra como hijo único de su span: con la
+                  página traducida, el nodo suelto se quedaba con el valor viejo (cabo C0243) */}
+              <h3>Factor de multiplicación k = <span>{formatNumber(factorK, 2)}</span></h3>
               <div
                 className={styles.estadoK}
-                style={{ borderColor: colorEstado, color: colorEstado }}
+                style={{ borderColor: colorEstado, color: TEXTO_DE[colorEstado] }}
               >
                 Estado del reactor: <strong>{estadoReactor}</strong>
               </div>
@@ -237,11 +256,14 @@ export default function VisualizadorEnergiaNuclear() {
                   { nivel: 3, tipo: 'Incidente grave', color: '#48A9A6', ejemplo: 'Contaminación localizada' },
                   { nivel: 4, tipo: 'Accidente local', color: '#F5A623', ejemplo: 'Exposición letal en instalación' },
                   { nivel: 5, tipo: 'Accidente mayor', color: '#E8834A', ejemplo: 'Three Mile Island (1979)' },
-                  { nivel: 6, tipo: 'Accidente grave', color: '#D45B3E', ejemplo: 'Dispersión importante' },
+                  // #C24E33 y no #D45B3E: con este, ni el blanco (3,91:1) ni la tinta oscura (4,4) llegaban
+                  { nivel: 6, tipo: 'Accidente grave', color: '#C24E33', ejemplo: 'Dispersión importante' },
                   { nivel: 7, tipo: 'Accidente mayor', color: '#B03A2E', ejemplo: 'Chernóbil (1986), Fukushima (2011)' },
                 ].map((item) => (
                   <div key={item.nivel} className={styles.inesItem} style={{ borderLeftColor: item.color }}>
-                    <span className={styles.inesNivel} style={{ background: item.color }}>
+                    {/* La tinta, blanca o casi negra según el relleno: en blanco, los niveles 1 a 6
+                        quedaban entre 2,03 y 3,91:1 (cabo C0645) */}
+                    <span className={styles.inesNivel} style={{ background: item.color, color: tintaSobre(item.color) }}>
                       {item.nivel}
                     </span>
                     <div>
@@ -268,22 +290,24 @@ export default function VisualizadorEnergiaNuclear() {
             <div className={styles.diagramaFusion}>
               <h3>Reacción principal: Deuterio + Tritio</h3>
               <div className={styles.reaccionFusion}>
-                <div className={styles.nucleoFusion} style={{ background: '#2E86AB' }}>
+                {/* Blanco sobre la marca de botón; tinta oscura sobre el acento y el ámbar, donde
+                    el blanco daba 2,26 y 2,03:1 */}
+                <div className={styles.nucleoFusion} style={{ background: 'var(--primary-boton)' }}>
                   <span>²H</span>
                   <span className={styles.nucleoSubLabel}>Deuterio</span>
                 </div>
                 <span className={styles.masSymbol} aria-hidden="true">+</span>
-                <div className={styles.nucleoFusion} style={{ background: '#48A9A6' }}>
+                <div className={styles.nucleoFusion} style={{ background: 'var(--secondary-boton)' }}>
                   <span>³H</span>
                   <span className={styles.nucleoSubLabel}>Tritio</span>
                 </div>
                 <span className={styles.masSymbol} aria-hidden="true">→</span>
-                <div className={styles.nucleoFusion} style={{ background: '#7FB3D3' }}>
+                <div className={styles.nucleoFusion} style={{ background: '#7FB3D3', color: tintaSobre('#7FB3D3') }}>
                   <span>⁴He</span>
                   <span className={styles.nucleoSubLabel}>Helio-4</span>
                 </div>
                 <span className={styles.masSymbol} aria-hidden="true">+</span>
-                <div className={styles.nucleoFusion} style={{ background: '#F5A623' }}>
+                <div className={styles.nucleoFusion} style={{ background: '#F5A623', color: tintaSobre('#F5A623') }}>
                   <span>n</span>
                   <span className={styles.nucleoSubLabel}>Neutrón</span>
                 </div>
@@ -591,7 +615,7 @@ export default function VisualizadorEnergiaNuclear() {
                 ].map((r) => (
                   <div key={r.tipo} className={styles.residuoCard} style={{ borderLeftColor: r.color }}>
                     <div className={styles.residuoHeader}>
-                      <span className={styles.residuoTipo} style={{ color: r.color }}>
+                      <span className={styles.residuoTipo} style={{ color: TEXTO_DE[r.color] }}>
                         {r.tipo}
                       </span>
                       <span className={styles.residuoPorcentaje}>{r.porcentaje} del volumen total</span>
