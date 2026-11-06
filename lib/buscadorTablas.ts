@@ -14,9 +14,12 @@
  * Ahora cada palabra de la consulta tiene que EMPEZAR una palabra de la entrada (una letra o
  * cifra sola tiene que SER esa palabra), y lo que casa entero o como fórmula seguida sube arriba.
  *
- * ⚠️ Pensado para tablas de matemáticas y física, donde la unidad de búsqueda es la palabra. En
- * una tabla de fórmulas químicas («Cl» dentro de «NaCl») el inicio de palabra puede no ser lo
- * que busca el usuario: medir antes de llevarlo allí.
+ * Dos modos, porque la unidad de búsqueda no es la misma en todas las tablas:
+ *   · `indexar` (matemáticas y física): inicio de palabra, lo de arriba.
+ *   · `indexarFormulas` (química): cada palabra de la consulta puede ir DENTRO de otra, porque
+ *     «Cl» tiene que encontrar HClO y NaCl, y «acetico» el tricloroacético. Arregla el orden
+ *     («acetico acido») y la notación (NH3 = NH₃, Cu2+ = Cu²⁺), que la forma vieja no veía.
+ *     Medido el 06/11/2026 en tabla-ka-kb, potenciales-redox y solubilidad.
  */
 import { isValidElement } from 'react';
 import type { ReactNode } from 'react';
@@ -25,6 +28,8 @@ import type { ReactNode } from 'react';
 export interface IndiceBusqueda {
   palabras: string[];
   compacto: string;
+  /** Lo construyó `indexarFormulas`: cada palabra de la consulta se busca como subcadena. */
+  formulas?: boolean;
 }
 
 const SUPERINDICES: Record<string, string> = {
@@ -40,12 +45,13 @@ const SUBINDICES: Record<string, string> = {
 /** Apóstrofos y primas: «L’Hôpital», «L'Hôpital», «f′(x)». */
 const APOSTROFOS = /[’'′‘]/g;
 
-/** Sin acentos ni mayúsculas. */
+/** Sin acentos ni mayúsculas (el signo de micra, como la mu griega). */
 export function normalizarBusqueda(texto: string): string {
   return texto
     .toLowerCase()
     .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '');
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/µ/g, 'μ');
 }
 
 /**
@@ -61,8 +67,9 @@ export function prepararBusqueda(texto: string): string {
     .replace(/[−–]/g, '-');
 }
 
+/** Las letras griegas son parte de la palabra: «α», «ħ», «ε0» son símbolos que se buscan. */
 function trocear(texto: string): string[] {
-  return texto.split(/[^a-z0-9]+/).filter(Boolean);
+  return texto.split(/[^a-z0-9α-ωħ]+/).filter(Boolean);
 }
 
 /** Las palabras de una CONSULTA: el apóstrofo une («L’Hôpital» → «lhopital»). */
@@ -111,15 +118,52 @@ export function casa(q: string, p: string): boolean {
   return q.length === 1 ? p === q : p.startsWith(q);
 }
 
+/* ── Modo fórmulas (química) ─────────────────────────────────────── */
+
+const PLANOS: Record<string, string> = { ...SUPERINDICES, ...SUBINDICES };
+
 /**
- * Las entradas que casan con la consulta, las mejores primero (fórmula seguida: 2 puntos;
- * todas las palabras enteras: 1). Sin palabras en la consulta, todas en su orden.
+ * Texto de química plano: sin acentos, índices y cargas como caracteres normales
+ * (Cu²⁺ → cu2+, NH₃ → nh3), sin «^» y con el menos tipográfico como guion.
+ */
+export function prepararFormulas(texto: string): string {
+  return normalizarBusqueda(texto)
+    .replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹ⁿ⁻⁺ˣ₀₁₂₃₄₅₆₇₈₉ₙ]/g, (c) => PLANOS[c])
+    .replace(/\^/g, '')
+    .replace(/[−–]/g, '-')
+    .replace(/\s+/g, ' ');
+}
+
+/** Las palabras de una consulta en modo fórmulas: lo que separan los espacios. */
+export function tokensFormulas(consulta: string): string[] {
+  return prepararFormulas(consulta).split(' ').filter(Boolean);
+}
+
+/** El índice de una entrada en modo fórmulas: todo su texto como UNA palabra. */
+export function indexarFormulas(texto: string): IndiceBusqueda {
+  const plano = prepararFormulas(texto);
+  return { palabras: [plano], compacto: plano.replace(/[\s·*]+/g, ''), formulas: true };
+}
+
+/**
+ * Las entradas que casan con la consulta. Sin palabras en la consulta, todas en su orden. El
+ * modo lo decide el índice:
+ *   · `indexar` (inicio de palabra): las mejores primero (fórmula seguida: 2 puntos; todas las
+ *     palabras enteras: 1);
+ *   · `indexarFormulas` (subcadena): en el orden de la tabla, porque en química el orden ES
+ *     contenido (de mayor a menor potencial, de más a menos ácido).
  */
 export function buscarEnTabla<T>(
   entradas: readonly T[],
   consulta: string,
   indiceDe: (entrada: T) => IndiceBusqueda,
 ): T[] {
+  const primera = entradas[0];
+  if (primera !== undefined && indiceDe(primera).formulas === true) {
+    const tokens = tokensFormulas(consulta);
+    if (tokens.length === 0) return [...entradas];
+    return entradas.filter((entrada) => tokens.every((q) => indiceDe(entrada).palabras[0].includes(q)));
+  }
   const consultaPalabras = palabrasDe(consulta);
   if (consultaPalabras.length === 0) return [...entradas];
   const consultaCompacta = compactar(consulta);

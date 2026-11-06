@@ -289,6 +289,26 @@ test('el buscador encuentra por símbolo, por nombre, sin acento y en mayúscula
   await expect(estadosVisibles(page)).toHaveText(['+5', '+3', '−3']);
 });
 
+test('cabo C0607 · una fórmula sin subíndices es la misma que con ellos, y dos palabras van en cualquier orden', async ({
+  page,
+}) => {
+  // Medido el 06/11/2026 antes de reparar: «Fe₂O₃» daba el hierro y «Fe2O3» 0 de 51, porque
+  // los subíndices de los ejemplos no se pasaban a cifras y la consulta escrita en teclado no
+  // tiene subíndices.
+  const cabecera = page.locator(`${LISTA} article button[aria-expanded]`).first();
+  for (const termino of ['Fe₂O₃', 'Fe2O3', 'fe2o3']) {
+    await buscar(page, termino);
+    await expect(fichas(page), termino).toHaveCount(1);
+    await expect(cabecera, termino).toContainText('Hierro');
+  }
+  // Dos palabras: cada una se busca por separado (el nombre y su forma tradicional).
+  for (const termino of ['hierro ferroso', 'ferroso hierro']) {
+    await buscar(page, termino);
+    await expect(fichas(page), termino).toHaveCount(1);
+    await expect(cabecera, termino).toContainText('Hierro');
+  }
+});
+
 test('una búsqueda sin coincidencias lo dice, en vez de dejar la tabla vacía en silencio', async ({
   page,
 }) => {

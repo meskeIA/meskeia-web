@@ -12,18 +12,11 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib/formatters';
+import { buscarEnTabla, indexarFormulas } from '@/lib/buscadorTablas';
 
 /* ────────────────────────────────────────────────────────────────
    Utilidades
 ──────────────────────────────────────────────────────────────── */
-
-/** Normaliza texto para buscar sin acentos ni mayúsculas. */
-function normalizar(texto: string): string {
-  return texto
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '');
-}
 
 /** Formatea un potencial en voltios con signo explícito y coma decimal. */
 function formatearPotencial(valor: number): string {
@@ -1230,6 +1223,19 @@ function calcularPila(a: ParRedox, b: ParRedox): ResultadoPila {
 }
 
 /* ────────────────────────────────────────────────────────────────
+   Índice del buscador (cabo C0607, modo fórmulas de lib/buscadorTablas.ts)
+
+   Antes la consulta entera se buscaba como UNA subcadena seguida, así que «zinc cobre» o
+   «permanganato acido» daban 0 filas, y «Cu2+» 0 mientras «Cu²⁺» daba 3. Ahora cada palabra se
+   busca por separado y los índices y cargas se comparan como caracteres planos. Sigue casando
+   dentro de una palabra («Cl» encuentra el clorato) y el resultado conserva el orden por E°.
+──────────────────────────────────────────────────────────────── */
+
+const INDICE_BUSQUEDA = new Map(
+  PARES.map((par) => [par.id, indexarFormulas(`${par.nombre} ${par.busqueda} ${par.aplicacion}`)]),
+);
+
+/* ────────────────────────────────────────────────────────────────
    Componente principal
 ──────────────────────────────────────────────────────────────── */
 
@@ -1250,13 +1256,10 @@ export default function TablaPotencialesRedoxPage() {
   const paresOrdenados = useMemo(() => [...PARES].sort((x, y) => y.e0 - x.e0), []);
 
   const resultados = useMemo(() => {
-    const termino = normalizar(consulta.trim());
-    return paresOrdenados.filter((par) => {
-      const coincideCategoria = categoriaActiva === 'todas' || par.categoria === categoriaActiva;
-      if (!coincideCategoria) return false;
-      if (termino === '') return true;
-      return normalizar(`${par.nombre} ${par.busqueda} ${par.aplicacion}`).includes(termino);
-    });
+    const enCategoria = paresOrdenados.filter(
+      (par) => categoriaActiva === 'todas' || par.categoria === categoriaActiva,
+    );
+    return buscarEnTabla(enCategoria, consulta, (par) => INDICE_BUSQUEDA.get(par.id)!);
   }, [consulta, categoriaActiva, paresOrdenados]);
 
   const serieActividad = useMemo(

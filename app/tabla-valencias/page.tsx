@@ -21,6 +21,7 @@ import {
   generarPreguntaAleatoria,
 } from './casos';
 import { formatNumber } from '@/lib';
+import { prepararFormulas, tokensFormulas } from '@/lib/buscadorTablas';
 
 // ═══════════════════════════════════════════════════════════════════════
 // CATEGORÍAS
@@ -108,10 +109,24 @@ function mcd(a: number, b: number): number {
   return b === 0 ? a : mcd(b, a % b);
 }
 
-/** Quita acentos y pasa a minúsculas, para un buscador tolerante */
-function normalizar(texto: string): string {
-  return texto.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-}
+/**
+ * Índice del buscador (cabo C0607, modo fórmulas de lib/buscadorTablas.ts). Antes la consulta
+ * entera se comparaba como una subcadena y sin pasar los subíndices a cifras, así que «Fe2O3»
+ * daba 0 elementos mientras «Fe₂O₃» daba el hierro. Ahora cada palabra se busca por separado
+ * (el símbolo por su inicio, como antes; nombre, sinónimos y ejemplos por subcadena) y los
+ * índices y cargas se comparan como caracteres planos.
+ */
+const INDICE_ELEMENTOS = new Map(
+  ELEMENTOS.map((el) => [
+    el.simbolo,
+    {
+      simbolo: prepararFormulas(el.simbolo),
+      texto: prepararFormulas(
+        [el.nombre, ...el.sinonimos, ...el.estados.map((e) => e.ejemplo)].join(' · '),
+      ),
+    },
+  ]),
+);
 
 /** Formatea un número de oxidación con su signo (usando el signo menos tipográfico) */
 function formatearEstado(valor: number): string {
@@ -272,16 +287,12 @@ export default function TablaValenciasPage() {
   }, []);
 
   const elementosFiltrados = useMemo(() => {
-    const q = normalizar(busqueda.trim());
+    const tokens = tokensFormulas(busqueda);
     return ELEMENTOS.filter((el) => {
       if (categoria !== 'todas' && el.categoria !== categoria) return false;
-      if (!q) return true;
-      if (normalizar(el.simbolo) === q) return true;
-      if (normalizar(el.simbolo).startsWith(q)) return true;
-      if (normalizar(el.nombre).includes(q)) return true;
-      if (el.sinonimos.some((s) => normalizar(s).includes(q))) return true;
-      if (el.estados.some((e) => normalizar(e.ejemplo).includes(q))) return true;
-      return false;
+      if (tokens.length === 0) return true;
+      const indice = INDICE_ELEMENTOS.get(el.simbolo)!;
+      return tokens.every((q) => indice.simbolo.startsWith(q) || indice.texto.includes(q));
     });
   }, [busqueda, categoria]);
 

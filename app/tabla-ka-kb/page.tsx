@@ -12,6 +12,7 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
+import { buscarEnTabla, indexarFormulas } from '@/lib/buscadorTablas';
 // Kw (producto iónico del agua a 25 °C) y el balance de cargas viven en el motor.
 import { KW, resolverH, phDeTampon, proporcionEnRangoUtil } from './motor';
 
@@ -20,14 +21,6 @@ const PKW = 14;
 /* ────────────────────────────────────────────────────────────────
    Utilidades de formato y búsqueda
 ──────────────────────────────────────────────────────────────── */
-
-/** Normaliza texto para buscar sin acentos ni mayúsculas. */
-function normalizar(texto: string): string {
-  return texto
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '');
-}
 
 const SUPERINDICES: Record<string, string> = {
   '0': '⁰',
@@ -1368,6 +1361,25 @@ function calcularPh(especie: Especie, concentracion: number): ResultadoPh | null
 }
 
 /* ────────────────────────────────────────────────────────────────
+   Índice del buscador (cabo C0607, modo fórmulas de lib/buscadorTablas.ts)
+
+   Antes la consulta entera se buscaba como UNA subcadena seguida, así que «acetico acido» daba
+   0 de 64 (y «acido acetico» 2), y «NH3» daba 1 fila mientras «NH₃» daba 6. Ahora cada palabra
+   de la consulta se busca por separado, en cualquier orden, y los índices y cargas se comparan
+   como caracteres planos. Sigue casando DENTRO de una palabra, a propósito: «Cl» tiene que
+   encontrar HClO y «acetico» el tricloroacético.
+──────────────────────────────────────────────────────────────── */
+
+const INDICE_BUSQUEDA = new Map(
+  ESPECIES.map((especie) => [
+    especie.id,
+    indexarFormulas(
+      `${especie.formula} ${especie.nombre} ${especie.conjugadaFormula} ${especie.conjugadaNombre} ${especie.busqueda}`,
+    ),
+  ]),
+);
+
+/* ────────────────────────────────────────────────────────────────
    Componente principal
 ──────────────────────────────────────────────────────────────── */
 
@@ -1392,16 +1404,10 @@ export default function TablaKaKbPage() {
   }, []);
 
   const resultados = useMemo(() => {
-    const termino = normalizar(consulta.trim());
-    return ESPECIES.filter((especie) => {
-      const coincideCategoria =
-        categoriaActiva === 'todas' || especie.categoria === categoriaActiva;
-      if (!coincideCategoria) return false;
-      if (termino === '') return true;
-      return normalizar(
-        `${especie.formula} ${especie.nombre} ${especie.conjugadaFormula} ${especie.conjugadaNombre} ${especie.busqueda}`,
-      ).includes(termino);
-    });
+    const enCategoria = ESPECIES.filter(
+      (especie) => categoriaActiva === 'todas' || especie.categoria === categoriaActiva,
+    );
+    return buscarEnTabla(enCategoria, consulta, (especie) => INDICE_BUSQUEDA.get(especie.id)!);
   }, [consulta, categoriaActiva]);
 
   const especieSeleccionada = useMemo(

@@ -159,8 +159,20 @@ test.describe('Inspección del 05/11/2026', () => {
     await expect(contador).toHaveText('1 de 64 especies');
     await buscar(page, 'lejia'); // sin tilde: «lejía» está en el campo de búsqueda del hipocloroso
     expect(await idsVisibles(page)).toEqual(['hclo']);
-    await buscar(page, 'CH3COOH');
-    expect(await idsVisibles(page)).toEqual(['acetico']);
+    // Desde el 06/11/2026 (cabo C0607) la fórmula sin subíndices es la misma que con ellos: antes
+    // «CH3COOH» solo casaba con el texto de búsqueda del acético y «CH₃COOH» traía además el
+    // acetato, cuyo ácido conjugado es CH₃COOH. Ahora las dos dan las dos filas, el ácido primero.
+    for (const formula of ['CH3COOH', 'CH₃COOH']) {
+      await buscar(page, formula);
+      expect(await idsVisibles(page), formula).toEqual(['acetico', 'acetato']);
+    }
+    // Y dos palabras en cualquier orden: antes «acetico acido» daba 0 y «acido acetico» 2.
+    await buscar(page, 'acetico acido');
+    expect(await idsVisibles(page)).toContain('acetico');
+    await buscar(page, 'NH3');
+    const conNH3 = await idsVisibles(page);
+    await buscar(page, 'NH₃');
+    expect(await idsVisibles(page)).toEqual(conNH3);
     await buscar(page, 'zzzz');
     await expect(contador).toHaveText('0 de 64 especies');
     await expect(page.getByText('No hay ninguna especie que coincida con «zzzz')).toBeVisible();

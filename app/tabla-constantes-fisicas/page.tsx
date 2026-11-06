@@ -11,18 +11,7 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-
-/* ────────────────────────────────────────────────────────────────
-   Utilidades
-──────────────────────────────────────────────────────────────── */
-
-/** Normaliza texto para buscar sin acentos ni mayúsculas. */
-function normalizar(texto: string): string {
-  return texto
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '');
-}
+import { buscarEnTabla, indexar } from '@/lib/buscadorTablas';
 
 /* ────────────────────────────────────────────────────────────────
    Modelo de datos
@@ -1149,6 +1138,24 @@ const CONSTANTES: Constante[] = [
 ];
 
 /* ────────────────────────────────────────────────────────────────
+   Índice del buscador (cabo C0607; la receta de tabla-derivadas en lib/buscadorTablas.ts)
+
+   Antes la consulta entera se buscaba como UNA subcadena seguida, así que «c» daba las 52
+   constantes (y «h» 23, «tan» 21: casaban dentro de «constante»), y «masa protón», «carga
+   electron» o «planck constante» daban 0. Ahora cada palabra de la consulta tiene que empezar
+   una palabra de la entrada (una letra sola, ser ese símbolo), en cualquier orden. El símbolo
+   va también sin el guion bajo («k_B» y «kB») y la categoría entra en el índice.
+──────────────────────────────────────────────────────────────── */
+
+const INDICE_BUSQUEDA = new Map(
+  CONSTANTES.map((entrada) => {
+    const simbolos = `${entrada.simbolo} ${entrada.simbolo.replace(/_/g, '')}`;
+    const texto = `${entrada.nombre} ${simbolos} ${entrada.valor} ${NOMBRE_CATEGORIA[entrada.categoria]} ${entrada.busqueda}`;
+    return [entrada.id, indexar(texto)] as const;
+  }),
+);
+
+/* ────────────────────────────────────────────────────────────────
    Componente principal
 ──────────────────────────────────────────────────────────────── */
 
@@ -1164,16 +1171,10 @@ export default function TablaConstantesFisicasPage() {
   }, []);
 
   const resultados = useMemo(() => {
-    const termino = normalizar(consulta.trim());
-    return CONSTANTES.filter((entrada) => {
-      const coincideCategoria =
-        categoriaActiva === 'todas' || entrada.categoria === categoriaActiva;
-      if (!coincideCategoria) return false;
-      if (termino === '') return true;
-      return normalizar(
-        `${entrada.nombre} ${entrada.simbolo} ${entrada.valor} ${entrada.busqueda}`,
-      ).includes(termino);
-    });
+    const enCategoria = CONSTANTES.filter(
+      (entrada) => categoriaActiva === 'todas' || entrada.categoria === categoriaActiva,
+    );
+    return buscarEnTabla(enCategoria, consulta, (entrada) => INDICE_BUSQUEDA.get(entrada.id)!);
   }, [consulta, categoriaActiva]);
 
   const alternarFila = (id: string) => {

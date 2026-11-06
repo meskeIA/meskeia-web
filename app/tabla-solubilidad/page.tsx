@@ -11,18 +11,11 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
+import { buscarEnTabla, indexarFormulas } from '@/lib/buscadorTablas';
 
 /* ────────────────────────────────────────────────────────────────
    Utilidades
 ──────────────────────────────────────────────────────────────── */
-
-/** Normaliza texto para buscar sin acentos ni mayúsculas. */
-function normalizar(texto: string): string {
-  return texto
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '');
-}
 
 const SUBINDICES = ['₀', '₁', '₂', '₃', '₄', '₅', '₆', '₇', '₈', '₉'];
 
@@ -1715,6 +1708,37 @@ function ecuacionMolecular(cation: IonComprobador, anion: IonComprobador): strin
 }
 
 /* ────────────────────────────────────────────────────────────────
+   Índices del buscador (cabo C0607, modo fórmulas de lib/buscadorTablas.ts)
+
+   Antes la consulta entera se buscaba como UNA subcadena seguida, así que «carbonato calcio»
+   daba 0 fichas aunque «carbonato de calcio» es la ficha del CaCO₃, y una consulta con dos
+   palabras solo casaba si iban seguidas y en ese orden. Ahora cada palabra se busca por
+   separado y los subíndices y cargas se comparan como caracteres planos (CaCO3 = CaCO₃). Sigue
+   casando dentro de una palabra: «Cl» encuentra AgCl y los cloruros.
+──────────────────────────────────────────────────────────────── */
+
+const INDICE_REGLAS = new Map(
+  REGLAS.map((regla) => [
+    regla,
+    indexarFormulas(`${regla.titulo} ${regla.ion} ${regla.ejemplos} ${regla.busqueda}`),
+  ]),
+);
+
+const INDICE_IONES = new Map(
+  IONES.map((ion) => [
+    ion,
+    indexarFormulas(`${ion.formula} ${ion.nombreIupac} ${ion.nombreTradicional} ${ion.busqueda}`),
+  ]),
+);
+
+const INDICE_KPS = new Map(
+  KPS.map((compuesto) => [
+    compuesto,
+    indexarFormulas(`${compuesto.formula} ${compuesto.nombre} ${compuesto.busqueda}`),
+  ]),
+);
+
+/* ────────────────────────────────────────────────────────────────
    Componente principal
 ──────────────────────────────────────────────────────────────── */
 
@@ -1746,40 +1770,20 @@ export default function TablaSolubilidadPage() {
     };
   }, [cationSeleccionado, anionSeleccionado]);
 
-  const termino = normalizar(consulta.trim());
-
   const reglasFiltradas = useMemo(() => {
     if (bloqueActivo !== 'todas' && bloqueActivo !== 'reglas') return [];
-    return REGLAS.filter((regla) =>
-      termino === ''
-        ? true
-        : normalizar(`${regla.titulo} ${regla.ion} ${regla.ejemplos} ${regla.busqueda}`).includes(
-            termino,
-          ),
-    );
-  }, [termino, bloqueActivo]);
+    return buscarEnTabla(REGLAS, consulta, (regla) => INDICE_REGLAS.get(regla)!);
+  }, [consulta, bloqueActivo]);
 
   const ionesFiltrados = useMemo(() => {
     if (bloqueActivo !== 'todas' && bloqueActivo !== 'iones') return [];
-    return IONES.filter((ion) =>
-      termino === ''
-        ? true
-        : normalizar(
-            `${ion.formula} ${ion.nombreIupac} ${ion.nombreTradicional} ${ion.busqueda}`,
-          ).includes(termino),
-    );
-  }, [termino, bloqueActivo]);
+    return buscarEnTabla(IONES, consulta, (ion) => INDICE_IONES.get(ion)!);
+  }, [consulta, bloqueActivo]);
 
   const kpsFiltrados = useMemo(() => {
     if (bloqueActivo !== 'todas' && bloqueActivo !== 'kps') return [];
-    return KPS.filter((compuesto) =>
-      termino === ''
-        ? true
-        : normalizar(
-            `${compuesto.formula} ${compuesto.nombre} ${compuesto.busqueda}`,
-          ).includes(termino),
-    );
-  }, [termino, bloqueActivo]);
+    return buscarEnTabla(KPS, consulta, (compuesto) => INDICE_KPS.get(compuesto)!);
+  }, [consulta, bloqueActivo]);
 
   const totalResultados =
     reglasFiltradas.length + ionesFiltrados.length + kpsFiltrados.length;
