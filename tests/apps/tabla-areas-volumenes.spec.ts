@@ -467,6 +467,25 @@ test.describe('Hallazgos de la inspección del 03/11/2026', () => {
     }
   });
 
+  test('CABO C0654 · el buscador es el de lib/buscadorTablas.ts: letras griegas y subíndices de las dimensiones se encuentran', async ({ page }) => {
+    // Con la copia local, el índice partía por [^a-z0-9]: «θ» y «α» desaparecían (la consulta se
+    // quedaba sin palabras y daba las 48 filas) y «h₁» se indexaba como «h». El módulo guarda las
+    // letras griegas y lee el subíndice como cifra, así que «θ» da las dos filas que lo usan
+    // (sector y segmento circular) y «h1» las que tienen h₁ (trapezoide y silo).
+    await cargar(page);
+    await buscar(page, 'θ');
+    const conTheta = await nombresDeFilas(page);
+    expect(conTheta).toEqual(expect.arrayContaining(['Sector circular', 'Segmento circular']));
+    expect(conTheta.length).toBeLessThan(TOTAL);
+    await buscar(page, 'h1');
+    const conH1 = await nombresDeFilas(page);
+    expect(conH1).toEqual(expect.arrayContaining(['Trapezoide (cuadrilátero irregular)', 'Silo (cilindro + cono)']));
+    expect(conH1).not.toContain('Cubo (hexaedro regular)');
+    // Y lo de la tabla se conserva: «área de la esfera» casa con «Superficie» y sale en su orden
+    await buscar(page, 'area de la esfera');
+    expect(await nombresDeFilas(page)).toContain('Esfera');
+  });
+
   test('HALLAZGO 4001 (REPARADO) · las fracciones se leen con «entre»: V del cono es «π·r²·h entre 3»', async ({ page }) => {
     // Frac pintaba numerador y denominador en dos <span> apilados sin nada que dijera «entre», y el
     // nombre accesible de la fila era «… Volumen π·r²·h 3 …». Ahora lleva un «entre» oculto a la

@@ -151,10 +151,32 @@ export function indexarFormulas(texto: string): IndiceBusqueda {
 }
 
 /**
+ * Lo que una tabla añade al modo `indexar` (cabo C0654, 06/11/2026: tabla-areas-volumenes era la
+ * última copia del buscador fuera de este módulo, y se quedó fuera por estas tres cosas).
+ */
+export interface OpcionesBusqueda {
+  /**
+   * Palabras de la consulta que valen por otras, ya normalizadas: en los cuerpos el «área» se
+   * rotula «Superficie», y quien busca «área de la esfera» busca esa fila.
+   */
+  sinonimos?: Readonly<Record<string, readonly string[]>>;
+  /**
+   * Palabras de la consulta que se ignoran («del», «de la»), salvo que la consulta no tenga
+   * otra cosa: «a» es también el lado de muchas figuras.
+   */
+  palabrasVacias?: ReadonlySet<string>;
+  /**
+   * `'tabla'`: las que casan, en el orden de la tabla (agrupa por familia). Por defecto
+   * `'relevancia'`: las mejores primero.
+   */
+  orden?: 'relevancia' | 'tabla';
+}
+
+/**
  * Las entradas que casan con la consulta. Sin palabras en la consulta, todas en su orden. El
  * modo lo decide el índice:
  *   · `indexar` (inicio de palabra): las mejores primero (fórmula seguida: 2 puntos; todas las
- *     palabras enteras: 1);
+ *     palabras enteras: 1), salvo `orden: 'tabla'`;
  *   · `indexarFormulas` (subcadena): en el orden de la tabla, porque en química el orden ES
  *     contenido (de mayor a menor potencial, de más a menos ácido).
  */
@@ -162,6 +184,7 @@ export function buscarEnTabla<T>(
   entradas: readonly T[],
   consulta: string,
   indiceDe: (entrada: T) => IndiceBusqueda,
+  opciones: OpcionesBusqueda = {},
 ): T[] {
   const primera = entradas[0];
   if (primera !== undefined && indiceDe(primera).formulas === true) {
@@ -169,18 +192,24 @@ export function buscarEnTabla<T>(
     if (tokens.length === 0) return [...entradas];
     return entradas.filter((entrada) => tokens.every((q) => indiceDe(entrada).palabras[0].includes(q)));
   }
-  const consultaPalabras = palabrasDe(consulta);
-  if (consultaPalabras.length === 0) return [...entradas];
+  const todas = palabrasDe(consulta);
+  if (todas.length === 0) return [...entradas];
+  const vacias = opciones.palabrasVacias;
+  const significativas = vacias === undefined ? todas : todas.filter((q) => !vacias.has(q));
+  const consultaPalabras = significativas.length > 0 ? significativas : todas;
+  const variantes = (q: string): readonly string[] => [q, ...(opciones.sinonimos?.[q] ?? [])];
   const consultaCompacta = compactar(consulta);
-  return entradas
+  const puntuadas = entradas
     .map((entrada) => {
       const indice = indiceDe(entrada);
-      const encaja = consultaPalabras.every((q) => indice.palabras.some((p) => casa(q, p)));
+      const encaja = consultaPalabras.every((q) =>
+        variantes(q).some((v) => indice.palabras.some((p) => casa(v, p))),
+      );
       const exacta = consultaPalabras.every((q) => indice.palabras.includes(q));
       const puntos = (indice.compacto.includes(consultaCompacta) ? 2 : 0) + (exacta ? 1 : 0);
       return { entrada, encaja, puntos };
     })
-    .filter((r) => r.encaja)
-    .sort((a, b) => b.puntos - a.puntos)
-    .map((r) => r.entrada);
+    .filter((r) => r.encaja);
+  if (opciones.orden !== 'tabla') puntuadas.sort((a, b) => b.puntos - a.puntos);
+  return puntuadas.map((r) => r.entrada);
 }

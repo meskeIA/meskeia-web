@@ -12,6 +12,8 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
+import { buscarEnTabla, indexar } from '@/lib/buscadorTablas';
+import type { OpcionesBusqueda } from '@/lib/buscadorTablas';
 
 /* ────────────────────────────────────────────────────────────────
    Utilidades de render (sin librerías externas: la CSP del sitio
@@ -66,14 +68,6 @@ function Etq({
       {children}
     </text>
   );
-}
-
-/** Normaliza texto para buscar sin acentos ni mayúsculas. */
-function normalizar(texto: string): string {
-  return texto
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '');
 }
 
 /* ────────────────────────────────────────────────────────────────
@@ -2578,39 +2572,37 @@ const FIGURAS: Figura[] = [
    Ahora cada palabra de la consulta tiene que empezar una palabra de la figura (una letra sola,
    ser esa palabra), sin importar el orden, y el índice incluye las etiquetas de sus fórmulas
    («Volumen», «Área lateral»…). Los resultados salen en el orden de la tabla.
+
+   La receta vive en lib/buscadorTablas.ts desde el cabo C0654 (06/11/2026): esta tabla era la
+   última copia, y se quedó fuera por los sinónimos, las palabras vacías y el orden de la tabla,
+   que ahora son opciones del módulo. De paso gana lo que el módulo aprendió después (exponente
+   pegado, «m2» por «m²»; apóstrofos; letras griegas).
 ──────────────────────────────────────────────────────────────── */
-
-const PALABRAS_VACIAS = new Set([
-  'de', 'del', 'la', 'las', 'el', 'los', 'lo', 'un', 'una', 'unos', 'unas', 'y', 'e', 'o', 'u',
-  'en', 'con', 'por', 'para', 'al', 'a', 'que', 'como', 'se', 'su', 'sus', 'mi', 'calcular',
-  'calculo', 'formula', 'formulas',
-]);
-
-function palabrasDe(texto: string): string[] {
-  return normalizar(texto).split(/[^a-z0-9]+/).filter(Boolean);
-}
 
 const INDICE_BUSQUEDA = new Map(
   FIGURAS.map((figura) => {
     const etiquetas = [figura.principalEtq, figura.secundariaEtq ?? '', ...figura.formulas.map((f) => f.etq)];
-    const texto = `${figura.nombre} ${figura.busqueda} ${figura.dimensiones} ${etiquetas.join(' ')}`;
-    return [figura.id, palabrasDe(texto)] as const;
+    return [
+      figura.id,
+      indexar(`${figura.nombre} ${figura.busqueda} ${figura.dimensiones} ${etiquetas.join(' ')}`),
+    ] as const;
   }),
 );
 
-/**
- * En los cuerpos, el «área» se rotula «Superficie» (la esfera, el cilindro…), y quien busca
- * «área de la esfera» busca esa fila: las dos palabras valen la una por la otra.
- */
-const SINONIMOS: Record<string, string[]> = {
-  area: ['superficie'],
-  superficie: ['area'],
+const OPCIONES_BUSQUEDA: OpcionesBusqueda = {
+  /**
+   * En los cuerpos, el «área» se rotula «Superficie» (la esfera, el cilindro…), y quien busca
+   * «área de la esfera» busca esa fila: las dos palabras valen la una por la otra.
+   */
+  sinonimos: { area: ['superficie'], superficie: ['area'] },
+  palabrasVacias: new Set([
+    'de', 'del', 'la', 'las', 'el', 'los', 'lo', 'un', 'una', 'unos', 'unas', 'y', 'e', 'o', 'u',
+    'en', 'con', 'por', 'para', 'al', 'a', 'que', 'como', 'se', 'su', 'sus', 'mi', 'calcular',
+    'calculo', 'formula', 'formulas',
+  ]),
+  // En el orden de la tabla, como antes: agrupa las figuras por familia
+  orden: 'tabla',
 };
-
-/** ¿La palabra `q` de la consulta casa con la palabra `p` de la figura? */
-function casa(q: string, p: string): boolean {
-  return [q, ...(SINONIMOS[q] ?? [])].some((v) => (v.length === 1 ? p === v : p.startsWith(v)));
-}
 
 /* ────────────────────────────────────────────────────────────────
    Componente principal
@@ -2631,17 +2623,7 @@ export default function TablaAreasVolumenesPage() {
     const enCategoria = FIGURAS.filter(
       (figura) => categoriaActiva === 'todas' || figura.categoria === categoriaActiva,
     );
-    const todas = palabrasDe(consulta);
-    if (todas.length === 0) return enCategoria;
-    // Las palabras vacías («del», «de la») se ignoran, salvo que la consulta no tenga otra
-    // cosa: «a» es también el lado de muchas figuras.
-    const significativas = todas.filter((p) => !PALABRAS_VACIAS.has(p));
-    const consultaPalabras = significativas.length > 0 ? significativas : todas;
-    // En el orden de la tabla, como antes: agrupa las figuras por familia
-    return enCategoria.filter((figura) => {
-      const palabras = INDICE_BUSQUEDA.get(figura.id) ?? [];
-      return consultaPalabras.every((q) => palabras.some((p) => casa(q, p)));
-    });
+    return buscarEnTabla(enCategoria, consulta, (figura) => INDICE_BUSQUEDA.get(figura.id)!, OPCIONES_BUSQUEDA);
   }, [consulta, categoriaActiva]);
 
   const alternarFila = (id: string) => {
