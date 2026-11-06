@@ -879,9 +879,11 @@
   line-height: 1.65;
 }
 
+/* Tinte al 5 % y no al 10: con él, --primary-texto quedaba a 4,48:1 (C0278, receta de ec3a8adb:
+   se cambia el fondo, no el texto) */
 .faqTip {
   display: inline-block;
-  background: rgba(46, 134, 171, 0.1);
+  background: rgba(46, 134, 171, 0.05);
   color: var(--primary-texto);
   font-size: 0.73rem;
   font-weight: 600;
@@ -1036,8 +1038,9 @@
   border-color: rgba(255, 255, 255, 0.06);
 }
 
+/* Al 18 %, 3,89:1 en oscuro; al 3 %, 4,6 */
 [data-theme='dark'] .faqTip {
-  background: rgba(46, 134, 171, 0.18);
+  background: rgba(46, 134, 171, 0.03);
 }
 
 [data-theme='dark'] .step {

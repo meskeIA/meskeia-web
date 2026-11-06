@@ -1139,8 +1139,9 @@
   background: var(--bg-card);
 }
 
+/* Al 15 %, --primary-texto quedaba a 4,18:1 en oscuro (C0278: se cambia el fondo, no el texto) */
 [data-theme='dark'] .faqTip {
-  background: rgba(46, 134, 171, 0.15);
+  background: rgba(46, 134, 171, 0.04);
 }
 
 [data-theme='dark'] .step {

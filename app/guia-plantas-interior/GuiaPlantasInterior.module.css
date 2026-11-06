@@ -678,6 +678,12 @@
   border-color: #3a3a3a;
 }
 
+/* El tinte del claro (9 %) dejaba --primary-texto a 4,48:1 sobre la tarjeta oscura; al 4 %, 4,7
+   (C0278: se cambia el fondo, no el texto) */
+[data-theme='dark'] .faqTip {
+  background: rgba(46, 134, 171, 0.04);
+}
+
 [data-theme='dark'] .buscador {
   background: #1e1e1e;
   border-color: #3a3a3a;

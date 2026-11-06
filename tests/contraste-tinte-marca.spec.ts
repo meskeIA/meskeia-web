@@ -31,10 +31,24 @@ async function peorSobreTinte(page: Page): Promise<Medida['tinte']> {
  *     estaba en --text-primary). Receta de ec3a8adb, cambiar el FONDO: 5 % en claro (4,74:1) y sin
  *     tinte en oscuro, donde el 5 % aún daba 4,48:1.
  * Las 29 hermanas del censo sin texto de marca en esas reglas no están: no hay nada que medir.
+ *   · `.faqTip` (06/11/2026, /reparar, visto en visualizador-farmacocinetica por C0645): 22
+ *     módulos ponen --primary-texto o --secondary-texto sobre un tinte de marca. Por píxel fallaban
+ *     4: farmacocinetica 4,48:1 en claro (tinte 10 %) y 3,89 en oscuro (18 %), generador-og-images
+ *     4,35 y asistente-constitucion-asociacion 4,18 en oscuro (15 %) y guia-plantas-interior 4,48
+ *     en oscuro (el 9 % del claro, sin regla oscura). Misma receta: tinte al 3-5 %.
  */
+const FAQ_TIP = [
+  'visualizador-farmacocinetica', 'calculadora-presupuestos', 'visualizador-teoria-informacion', 'visualizador-sistemas-operativos',
+  'planificador-cashflow', 'guia-tejidos-fibras', 'guia-hierbas-aromaticas', 'guia-especias', 'glosario-fisica-quimica',
+  'generador-og-images', 'generador-contrasenas', 'estimador-tir-van', 'control-gastos', 'asistente-constitucion-asociacion',
+  'aditivos-e-alimentarios', 'calculadora-legibilidad', 'guia-plantas-interior', 'estimacion-deduccion-discapacidad',
+  'estimacion-deduccion-maternidad', 'calculadora-teoria-numeros', 'calculadora-calorias-ejercicio', 'estimador-irpf',
+];
+
 const PLANTILLA: { slug: string; sel: string }[] = [
   ...['calculadora-iban', 'comparador-vehiculos', 'conversor-pesetas-euros', 'estimador-inflacion', 'generador-citas-apa', 'generador-facturas', 'validador-regex'].map((slug) => ({ slug, sel: '[class*="escenarioExample"] code' })),
   ...['lector-texto-voz', 'visualizador-estratificacion-social', 'tablero-comunicacion', 'planificador-rutinas', 'identificador-color-camara', 'generador-tarjetas-comunicacion', 'ejercicios-vocalizacion', 'daf-retroalimentacion-auditiva', 'visualizador-logica-proposicional', 'guia-respiracion', 'conversor-numeros-letras'].map((slug) => ({ slug, sel: '[class*="comparativaTable"] th' })),
+  ...FAQ_TIP.map((slug) => ({ slug, sel: '[class*="faqTip"]' })),
 ];
 
 for (const { slug, sel } of PLANTILLA) {
