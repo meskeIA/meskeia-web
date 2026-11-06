@@ -437,7 +437,13 @@
   align-items: center;
 }
 
+/* La vista previa ocupa su columna hasta 900 px, en 16:9, y la dimensiona el CSS: también en el
+   HTML servido, antes de que llegue el JS. Con el tamaño en un estado de React que valía 1 hasta
+   medir la columna, el lienzo salía a 1280 px y la página medía 835 a 390 (cabo C0630). */
 .canvasWrapper {
+  width: 100%;
+  max-width: 900px;
+  aspect-ratio: 1280 / 720;
   background: #E0E0E0;
   border-radius: var(--radius);
   overflow: hidden;
@@ -446,6 +452,8 @@
 
 .canvas {
   display: block;
+  width: 100%;
+  height: 100%;
   cursor: crosshair;
 }
 

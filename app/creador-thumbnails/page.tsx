@@ -13,6 +13,19 @@ import { trazarRectRedondeado } from '@/lib';
 const CANVAS_WIDTH = 1280;
 const CANVAS_HEIGHT = 720;
 
+/**
+ * Punto del ratón en coordenadas del lienzo (1280 × 720), con la escala a la que se ve AHORA.
+ * La vista previa la dimensiona el CSS (el ancho de su columna, hasta 900 px, en 16:9), así que
+ * la escala se lee del propio lienzo. Antes salía de un estado `scale` que valía 1 hasta que un
+ * efecto medía la columna: el HTML servido pintaba el lienzo a 1280 px, y la página medía 835 px a
+ * 390 y 1.310 a 1.280 hasta que llegaba el JS (cabo C0630, 06/11/2026).
+ */
+function puntoEnLienzo(canvas: HTMLCanvasElement, e: React.MouseEvent<HTMLCanvasElement>): { x: number; y: number } {
+  const rect = canvas.getBoundingClientRect();
+  const escala = rect.width / CANVAS_WIDTH || 1;
+  return { x: (e.clientX - rect.left) / escala, y: (e.clientY - rect.top) / escala };
+}
+
 // Tipos
 type BackgroundType = 'color' | 'gradient' | 'image';
 type ElementType = 'text' | 'image' | 'shape' | 'emoji';
@@ -105,7 +118,6 @@ const generateId = () => Math.random().toString(36).substr(2, 9);
 export default function CreadorThumbnailsPage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
-  const canvasContainerRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const bgFileInputRef = useRef<HTMLInputElement>(null);
 
@@ -122,26 +134,12 @@ export default function CreadorThumbnailsPage() {
   const [activeTab, setActiveTab] = useState<'background' | 'text' | 'image' | 'shapes' | 'emoji'>('background');
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
-  const [scale, setScale] = useState(1);
 
   // Obtener elemento seleccionado
   const selectedElement = elements.find(el => el.id === selectedId);
 
-  // Calcular escala para preview: se mide la columna del lienzo, no la ventana. Con
-  // `innerWidth - 400` la escala salía negativa en móvil y el lienzo se quedaba en 1280 px,
-  // y en escritorio no descontaba los dos paneles laterales (cabos C0406 y C0358)
-  useEffect(() => {
-    const contenedor = canvasContainerRef.current;
-    if (!contenedor) return;
-    const updateScale = () => {
-      const containerWidth = Math.min(contenedor.clientWidth, 900);
-      if (containerWidth > 0) setScale(containerWidth / CANVAS_WIDTH);
-    };
-    updateScale();
-    const observador = new ResizeObserver(updateScale);
-    observador.observe(contenedor);
-    return () => observador.disconnect();
-  }, []);
+  // La vista previa ocupa su columna (no la ventana: cabos C0406 y C0358) hasta 900 px, y la
+  // dimensiona el CSS, también en el HTML servido (C0630). La escala del ratón, en puntoEnLienzo.
 
   // Dibujar canvas
   const drawCanvas = useCallback((ctx: CanvasRenderingContext2D, forExport = false) => {
@@ -385,9 +383,7 @@ export default function CreadorThumbnailsPage() {
     const canvas = previewCanvasRef.current;
     if (!canvas) return;
 
-    const rect = canvas.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / scale;
-    const y = (e.clientY - rect.top) / scale;
+    const { x, y } = puntoEnLienzo(canvas, e);
 
     // Buscar elemento clickeado (de arriba a abajo)
     const clickedElement = [...elements].reverse().find(el =>
@@ -411,9 +407,7 @@ export default function CreadorThumbnailsPage() {
     const canvas = previewCanvasRef.current;
     if (!canvas) return;
 
-    const rect = canvas.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / scale;
-    const y = (e.clientY - rect.top) / scale;
+    const { x, y } = puntoEnLienzo(canvas, e);
 
     setElements(prev => prev.map(el =>
       el.id === selectedId
@@ -1123,14 +1117,13 @@ export default function CreadorThumbnailsPage() {
         </div>
 
         {/* Canvas central */}
-        <div ref={canvasContainerRef} className={styles.canvasContainer}>
-          <div className={styles.canvasWrapper} style={{ width: CANVAS_WIDTH * scale, height: CANVAS_HEIGHT * scale }}>
+        <div className={styles.canvasContainer}>
+          <div className={styles.canvasWrapper}>
             <canvas
               ref={previewCanvasRef}
               width={CANVAS_WIDTH}
               height={CANVAS_HEIGHT}
               className={styles.canvas}
-              style={{ width: CANVAS_WIDTH * scale, height: CANVAS_HEIGHT * scale }}
               onMouseDown={handleCanvasMouseDown}
               onMouseMove={handleCanvasMouseMove}
               onMouseUp={handleCanvasMouseUp}
