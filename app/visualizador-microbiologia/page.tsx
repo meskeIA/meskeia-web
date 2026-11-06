@@ -11,7 +11,6 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
-import { generateJsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -368,8 +367,6 @@ export default function VisualizadorMicrobiologia() {
 
   const morfActual = useMemo(() => MORFOLOGIAS.find((m) => m.id === morfologiaActiva) ?? MORFOLOGIAS[0], [morfologiaActiva]);
 
-  const jsonLdData = generateJsonLd();
-
   const numBacterias = useMemo(() => {
     const n0 = 10;
     const horas = 8;
@@ -387,7 +384,6 @@ export default function VisualizadorMicrobiologia() {
 
   return (
     <div className={styles.container}>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLdData) }} />
       <MeskeiaLogo />
 
       <header className={styles.hero}>

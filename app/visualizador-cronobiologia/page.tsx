@@ -11,7 +11,6 @@ import {
   DisclaimerCard,
   ShareCard,
 } from '@/components';
-import { generateJsonLd } from './metadata';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -832,11 +831,6 @@ export default function VisualizadorCronobiologiaPage() {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(generateJsonLd()) }}
-      />
-
       <div className={styles.container}>
         <MeskeiaLogo />
 

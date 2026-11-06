@@ -30,6 +30,7 @@ export function generateJsonLd() {
     name: TITLE,
     description: DESCRIPTION,
     url: URL,
+    category: 'EducationalApplication',
     features: [
       'Reloj molecular CLOCK/BMAL1/PER/CRY interactivo',
       'Slider de hora del día con fase circadiana activa',
@@ -40,13 +41,9 @@ export function generateJsonLd() {
   });
 }
 
-export const jsonLd = generateWebAppSchema({
-  name: "Cronobiología: Relojes Circadianos, Cronotipos y Cronofarmacología",
-  description: "Visualizador interactivo de cronobiología. Reloj molecular CLOCK/BMAL1/PER/CRY con SVG circular y slider hora, 5 sincronizadores Zeitgebers (luz, alimentación, ejercicio, temperatura, social), cronoti",
-  url: "https://meskeia.com/visualizador-cronobiologia/",
-  category: 'EducationalApplication',
-  features: [],
-});
+// Un solo WebApplication: lo inyecta layout.tsx. page.tsx inyectaba además generateJsonLd() y el
+// HTML servido llevaba dos (cabo C0646, 06/11/2026); este, el que tenía las características.
+export const jsonLd = generateJsonLd();
 
 export const faqJsonLd = {
   '@context': 'https://schema.org',

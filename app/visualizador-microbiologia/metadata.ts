@@ -35,13 +35,9 @@ export function generateJsonLd() {
   });
 }
 
-export const jsonLd = generateWebAppSchema({
-  name: "Microbiología: Bacterias, Crecimiento y Tres Dominios de la Vida",
-  description: "Visualizador interactivo de microbiología. Morfologías bacterianas clicables (cocos, bacilos, espirilos) con estructura interna detallada, curva de crecimiento logístico con sliders β y K, Gram+/Gram-",
-  url: "https://meskeia.com/visualizador-microbiologia/",
-  category: 'EducationalApplication',
-  features: [],
-});
+// Un solo WebApplication: lo inyecta layout.tsx. page.tsx inyectaba además generateJsonLd() y el
+// HTML servido llevaba dos (cabo C0646, 06/11/2026); este, el que tenía las características.
+export const jsonLd = generateJsonLd();
 
 export const faqJsonLd = {
   '@context': 'https://schema.org',

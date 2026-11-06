@@ -27,6 +27,10 @@ const FAMILIA: ReadonlyArray<[slug: string, tipo: string]> = [
   ['orientador-facturacion-retencion', 'WebApplication'],
   ['guia-superalimentos', 'WebApplication'],
   ['estimacion-ahorro-hidrico', 'WebApplication'],
+  // Cabo C0646 (06/11/2026): la misma forma por otra vía. page.tsx inyectaba `generateJsonLd()`
+  // de su metadata.ts, que construye el mismo WebApplication que el `jsonLd` del layout.
+  ['visualizador-cronobiologia', 'WebApplication'],
+  ['visualizador-microbiologia', 'WebApplication'],
 ];
 
 for (const [slug, tipo] of FAMILIA) {
