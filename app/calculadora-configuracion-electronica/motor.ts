@@ -245,6 +245,50 @@ export const EXCEPCIONES: Record<number, Excepcion> = {
 export const PRIMER_Z_PREDICHO = 104;
 
 // ============================================================
+// Iones que se reordenan
+// ============================================================
+
+/** Estado fundamental medido de un ion: los subniveles de detrás de su gas noble */
+export interface ReordenIon {
+  trasNucleo: Subnivel[];
+  motivo: string;
+}
+
+const REORDEN_S_A_D =
+  'En el ion libre el s y el d de debajo quedan casi a la misma energía, y el electrón que la regla deja en el s baja al d.';
+const REORDEN_D_A_F =
+  'Al perder los electrones de fuera, el f se hunde por debajo del d, y el electrón que la regla deja en el d baja al f.';
+
+/**
+ * Iones cuyo estado fundamental NO sale de vaciar el átomo neutro con la regla de `ionizar`:
+ * una vez ionizado, el ion libre se reordena. Valores de la NIST Atomic Spectra Database
+ * (Ionization Energies, columna «Ground Shells»), consultada el 07/11/2026: V II [Ar].3d4,
+ * Co II [Ar].3d8, Ni II [Ar].3d9, Y II [Kr].5s2, Ce III [Xe].4f2, Th III [Rn].5f.6d,
+ * Th IV [Rn].5f, U III [Rn].5f4. Son los ocho que no cuadraban de los 46 cotejados por el
+ * Inspector (hallazgo 4183, cabo C0632); los demás iones siguen la regla.
+ * Clave: `${z}:${carga}`.
+ */
+export const REORDENES_ION: Record<string, ReordenIon> = {
+  '23:1': { trasNucleo: [{ n: 3, l: 2, electrones: 4 }], motivo: REORDEN_S_A_D },
+  '27:1': { trasNucleo: [{ n: 3, l: 2, electrones: 8 }], motivo: REORDEN_S_A_D },
+  '28:1': { trasNucleo: [{ n: 3, l: 2, electrones: 9 }], motivo: REORDEN_S_A_D },
+  '39:1': {
+    trasNucleo: [{ n: 5, l: 0, electrones: 2 }],
+    motivo: 'En el Y⁺ es al revés que en los metales de transición de su fila: el electrón del 4d sube al 5s y el ion queda con el 5s completo.',
+  },
+  '58:2': { trasNucleo: [{ n: 4, l: 3, electrones: 2 }], motivo: REORDEN_D_A_F },
+  '90:2': {
+    trasNucleo: [
+      { n: 5, l: 3, electrones: 1 },
+      { n: 6, l: 2, electrones: 1 },
+    ],
+    motivo: REORDEN_D_A_F,
+  },
+  '90:3': { trasNucleo: [{ n: 5, l: 3, electrones: 1 }], motivo: REORDEN_D_A_F },
+  '92:2': { trasNucleo: [{ n: 5, l: 3, electrones: 4 }], motivo: REORDEN_D_A_F },
+};
+
+// ============================================================
 // Gases nobles (para la notación abreviada)
 // ============================================================
 
@@ -426,6 +470,10 @@ export interface Resultado {
   /** Configuración de Madelung antes de aplicar la excepción, para poder compararlas */
   segunMadelung: Subnivel[] | null;
   cambiosIon: CambioIon[];
+  /** Si el ion se reordena: lo que daría la regla de `ionizar` y el porqué del cambio */
+  reordenIon: { segunRegla: Subnivel[]; motivo: string } | null;
+  /** Configuración real del átomo NEUTRO, la que compara el aviso de excepción */
+  neutroReal: Subnivel[];
   esPrediccion: boolean;
 }
 
@@ -505,7 +553,14 @@ export function analizar(z: number, carga: number): Resultado | null {
   if (electrones < 1 || electrones > 118) return null;
 
   const neutro = configuracionNeutro(z);
-  const { subniveles, cambios } = ionizar(neutro, carga);
+  const ionizado = ionizar(neutro, carga);
+  const cambios = ionizado.cambios;
+  let subniveles = ionizado.subniveles;
+  const reorden = REORDENES_ION[`${z}:${carga}`];
+  const gasDelIon = GASES_NOBLES.filter((g) => g < z).pop();
+  if (reorden && gasDelIon) {
+    subniveles = [...llenadoMadelung(gasDelIon), ...reorden.trasNucleo.map((s) => ({ ...s }))];
+  }
 
   // El bloque, el periodo y el grupo son propiedades del ELEMENTO: se leen
   // siempre del átomo neutro, aunque en pantalla se muestre un ion.
@@ -551,6 +606,11 @@ export function analizar(z: number, carga: number): Resultado | null {
     excepcion: EXCEPCIONES[z] ?? null,
     segunMadelung: EXCEPCIONES[z] ? ordenarPorNivel(madelung) : null,
     cambiosIon: cambios,
+    reordenIon:
+      reorden && gasDelIon
+        ? { segunRegla: ordenarPorNivel(ionizado.subniveles), motivo: reorden.motivo }
+        : null,
+    neutroReal: ordenarPorNivel(neutro),
     esPrediccion: z >= PRIMER_Z_PREDICHO,
   };
 }

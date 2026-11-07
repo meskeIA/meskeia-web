@@ -309,10 +309,12 @@ export default function CalculadoraConfiguracionElectronica() {
                 <span aria-hidden="true">🚩</span> Este elemento es una excepción a la regla
               </h3>
               <p>
-                El diagrama de Möller predice{' '}
+                {/* La del átomo NEUTRO: con un ion en pantalla esto enseñaba la del ion como «lo que
+                    se mide» (hallazgo 4183) */}
+                <span>{cargaMostrada !== 0 ? 'En el átomo neutro, el' : 'El'}</span> diagrama de Möller predice{' '}
                 <code className={styles.codigo}>{textoCompleto(resultado.segunMadelung)}</code>, pero
                 lo que se mide en el laboratorio es{' '}
-                <code className={styles.codigo}>{textoCompleto(resultado.porNivel)}</code>:{' '}
+                <code className={styles.codigo}>{textoCompleto(resultado.neutroReal)}</code>:{' '}
                 {resultado.excepcion.cuantos === 1 ? 'un electrón pasa' : `${resultado.excepcion.cuantos} electrones pasan`}{' '}
                 del {resultado.excepcion.desde.n}
                 {LETRA_L[resultado.excepcion.desde.l]} al {resultado.excepcion.hacia.n}
@@ -346,7 +348,18 @@ export default function CalculadoraConfiguracionElectronica() {
                   Los electrones salen del nivel n más alto de los que quedan fuera del núcleo de gas
                   noble, no del último subnivel escrito. Es el error clásico con los metales de
                   transición: el 4s se llena antes que el 3d, pero se vacía antes también. En los
-                  lantánidos y actínidos, tras el s y el d sale el f.
+                  lantánidos y actínidos, tras el s y el d sale el f. Unos pocos iones se reordenan
+                  después de perderlos; en los cotejados con la base de datos atómica de la NIST, la
+                  calculadora da la configuración medida.
+                </p>
+              )}
+              {resultado.reordenIon && (
+                <p className={styles.avisoNota}>
+                  <strong>Este ion se reordena.</strong> Quitando los electrones por esa regla quedaría{' '}
+                  <code className={styles.codigo}>{textoCompleto(resultado.reordenIon.segunRegla)}</code>,
+                  pero el estado fundamental que mide la NIST es{' '}
+                  <code className={styles.codigo}>{textoCompleto(resultado.porNivel)}</code>.{' '}
+                  {resultado.reordenIon.motivo}
                 </p>
               )}
             </div>
@@ -755,7 +768,8 @@ export default function CalculadoraConfiguracionElectronica() {
               </p>
               <p className={styles.faqTip}>
                 <span aria-hidden="true">💡</span> Regla práctica para cationes: el electrón que sale
-                es siempre el del número n más grande.
+                es el del número n más grande. Algunos iones se reordenan después: el V⁺ queda
+                [Ar] 3d⁴ y no 3d³ 4s¹, y el Ce²⁺, [Xe] 4f² y no 4f¹ 5d¹.
               </p>
             </div>
             <div className={styles.faqItem}>

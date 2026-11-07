@@ -510,7 +510,10 @@ test('C0632 · los iones que toca ionizar() coinciden con la NIST ASD', async ({
   }
 });
 
-// HALLAZGO (07/11/2026, ABIERTO) · cabo C0632. ionizar() quita siempre los electrones del n más
+// HALLAZGO 4183 (07/11/2026, REPARADO) · cabo C0632. REPARADO: el motor lleva la tabla
+// REORDENES_ION con estos ocho estados fundamentales, cotejados de nuevo en la NIST ASD el
+// 07/11/2026, y el aviso de excepción compara ahora la configuración del átomo NEUTRO.
+// Lo que se vio: ionizar() quita siempre los electrones del n más
 // alto de fuera del núcleo y deja quietos los demás, pero el estado fundamental del ion libre que
 // mide la NIST no siempre sale de vaciar el neutro: en ocho de los 46 iones cotejados el ion se
 // reordena (el s o el d que queda pasa al d o al f). No es del cambio de 445eae05: con la regla
@@ -525,8 +528,7 @@ test('C0632 · los iones que toca ionizar() coinciden con la NIST ASD', async ({
 //   Th³⁺ (Th IV)  NIST [Rn].5f      · app [Rn] 6d¹
 //   U²⁺  (U III)  NIST [Rn].5f4     · app [Rn] 5f³ 6d¹
 // Esperado: la configuración del estado fundamental que publica la NIST ASD.
-test('HALLAZGO (07/11/2026, ABIERTO) · cabo C0632: ocho iones no dan el estado fundamental de la NIST', async ({ page }) => {
-  test.fail();
+test('HALLAZGO 4183 (07/11/2026, REPARADO) · cabo C0632: ocho iones no daban el estado fundamental de la NIST', async ({ page }) => {
   await abrir(page);
   const casos: [string, string, number, string, string, string][] = [
     ['Vanadio', 'V', 23, 'V⁺', '[Ar] 3d⁴', 'V II · [Ar].3d4'],
@@ -541,6 +543,17 @@ test('HALLAZGO (07/11/2026, ABIERTO) · cabo C0632: ocho iones no dan el estado 
   for (const [nombre, simbolo, z, especie, abreviada, nist] of casos) {
     await elegir(page, nombre, simbolo, z);
     await carga(page, especie);
-    await expect.soft(linea(page, 'Abreviada con gas noble'), nist).toHaveText(abreviada, { timeout: 2000 });
+    await expect(linea(page, 'Abreviada con gas noble'), nist).toHaveText(abreviada);
+    await expect(page.getByText('Este ion se reordena.'), nist).toBeVisible();
   }
+  // El aviso de excepción del Ce²⁺ compara la del átomo NEUTRO, no la del ion
+  await elegir(page, 'Cerio', 'Ce', 58);
+  await carga(page, 'Ce²⁺');
+  const excepcion = page.locator('div', { has: page.locator('h3', { hasText: 'Este elemento es una excepción' }) }).last();
+  await expect(excepcion).toContainText('En el átomo neutro');
+  await expect(excepcion).toContainText('6s²');
+  // Y un ion que sigue la regla no dice que se reordena
+  await elegir(page, 'Hierro', 'Fe', 26);
+  await carga(page, 'Fe²⁺');
+  await expect(page.getByText('Este ion se reordena.')).toHaveCount(0);
 });
