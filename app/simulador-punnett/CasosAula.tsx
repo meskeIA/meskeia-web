@@ -15,7 +15,7 @@
  */
 
 import { useState } from 'react';
-import { parseSpanishNumber } from '@/lib';
+import { leerRespuestaAula } from '@/lib/calculadoras/correctorCasosAula';
 import styles from './SimuladorPunnett.module.css';
 import {
   CASOS,
@@ -67,8 +67,10 @@ export default function CasosAula() {
   function comprobar() {
     // leerRespuesta admite «75», «75 %», «56,25» y la fracción «3/4» en los porcentajes; con
     // cualquier otra cosa devuelve NaN, y de ese NaN se encarga comprobarRespuesta con un
-    // mensaje propio (nunca «NaN» en pantalla).
-    const valor = leerRespuesta(respuesta, datos, parseSpanishNumber);
+    // mensaje propio (nunca «NaN» en pantalla). El número lo lee leerRespuestaAula, que de las
+    // dos lecturas de «6.250» (6,25 o 6250) se queda con la más cercana a la respuesta: con
+    // parseSpanishNumber era 6250 y se rechazaba por «pasar del 100 %» (hallazgo 4161).
+    const valor = leerRespuesta(respuesta, datos, (s) => leerRespuestaAula(s, esperado));
     const r = comprobarRespuesta(valor, esperado, datos);
     setVeredicto({ correcto: r.correcto, motivo: r.motivo });
   }

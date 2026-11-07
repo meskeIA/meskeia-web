@@ -446,8 +446,9 @@ export function toleranciaDe(): number {
  * la fracción («3/4» vale 75 %), que es como se razona el cuadro de Punnett. Devuelve NaN con
  * cualquier otra cosa; el NaN lo convierte `comprobarRespuesta` en un mensaje propio.
  *
- * `parseNumero` se inyecta (es `parseSpanishNumber` en la vista y en el test) para que este
- * módulo no duplique la lógica del parser.
+ * `parseNumero` se inyecta para que este módulo no duplique la lógica del parser. En la vista es
+ * `leerRespuestaAula(s, esperado)`, que resuelve «6.250» por cercanía a la respuesta (hallazgo
+ * 4161); un `parseSpanishNumber` a secas lee ahí 6250.
  */
 export function leerRespuesta(texto: string, datos: DatosCaso, parseNumero: (s: string) => number): number {
   const limpio = texto.trim().replace(/\s*%\s*$/, '').replace(/[−–]/g, '-');

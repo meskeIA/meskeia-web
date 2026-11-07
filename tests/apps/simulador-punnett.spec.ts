@@ -2,6 +2,7 @@ import { test, expect, devices, type Locator, type Page } from '@playwright/test
 import { esperarPaginaAsentada, esperarValorEnReact } from './_hidratacion';
 import { readFileSync } from 'node:fs';
 import { parseSpanishNumber } from '../../lib/formatters';
+import { leerRespuestaAula } from '../../lib/calculadoras/correctorCasosAula';
 import { PUERTO } from './_puerto';
 import {
   CASOS,
@@ -1686,7 +1687,8 @@ test.describe('Cuadro de Punnett · la sección de casos en el navegador', () =>
  *     del trihíbrido 27:9:9:9:3:3:3:1 suma 64 = 8 × 8 (3³ · 3 × 3² · 3 × 3 · 1).
  *   · Relacionadas: 4 tarjetas, ahora montadas por el layout.
  *
- * HALLAZGO abierto en esta re-inspección (test.fail de abajo): «6.250» para un 6,25 % —punto
+ * HALLAZGO 4161 de esta re-inspección, REPARADO el 07/11/2026 (la vista lee con
+ *   leerRespuestaAula): «6.250» para un 6,25 % —punto
  *   decimal con tres cifras, la forma que resuelve leerRespuestaAula desde C0558— se lee como
  *   6250 y la app contesta «Un porcentaje no puede pasar del 100 %: repasa la cuenta», cuando
  *   «6.25» y «6,250» se aceptan. `leerRespuesta` de casos.ts delega en parseSpanishNumber; la
@@ -1793,15 +1795,20 @@ test.describe('Cuadro de Punnett · re-inspección 07/11/2026 (casos para clase)
     expect(await responder(page, '6')).toContain('no redondees');
   });
 
-  test.fail('ABIERTO (07/11/2026) — «6.250» para un 6,25 % se lee como 6250 y se rechaza por pasar del 100 %', async ({ page }) => {
+  test('HALLAZGO 4161 (07/11/2026, REPARADO) — «6.250» para un 6,25 % se leía como 6250 y se rechazaba por pasar del 100 %', async ({ page }) => {
     // Obtenido el 07/11/2026: «Un porcentaje no puede pasar del 100 %: repasa la cuenta.» (y
-    // lo mismo con «37.500» en el caso 12). «6.25» y «6,250» dan «¡Correcto!». Esperado: la
-    // lectura más cercana a la respuesta, la de leerRespuestaAula (C0558).
-    expect(leerRespuesta('6.250', CASOS[7].datos, parseSpanishNumber)).toBe(6.25);
+    // lo mismo con «37.500» en el caso 12). «6.25» y «6,250» daban «¡Correcto!». Ahora la vista
+    // lee con la lectura más cercana a la respuesta, la de leerRespuestaAula (C0558).
+    expect(leerRespuesta('6.250', CASOS[7].datos, (s) => leerRespuestaAula(s, 6.25))).toBe(6.25);
     await irACaso(page, 8);
     expect(await responder(page, '6.250')).toContain('¡Correcto!');
     await irACaso(page, 12);
     expect(await responder(page, '37.500')).toContain('¡Correcto!');
+    await irACaso(page, 7);
+    expect(await responder(page, '56.250')).toContain('¡Correcto!');
+    // Y un recuento con punto de millares sigue siendo un recuento (caso 5: 150 semillas)
+    await irACaso(page, 5);
+    expect(await responder(page, '150')).toContain('¡Correcto!');
   });
 
   test('práctica: la solución que pinta coincide con un Mendel independiente leído del enunciado, y se corrige', async ({ page }) => {

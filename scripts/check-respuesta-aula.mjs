@@ -10,9 +10,10 @@
  * Que un `CasosAula.tsx` de `app/` lea la respuesta del alumno con `parseSpanishNumber(…)`. Se
  * lee con `leerRespuestaAula(texto, esperado)` de `lib/calculadoras/correctorCasosAula.ts`, que
  * resuelve la única forma ambigua («2.493»: 2,493 o 2493) quedándose con la lectura más cercana
- * a la respuesta esperada. Pasar `parseSpanishNumber` como ARGUMENTO (simulador-punnett:
- * `leerRespuesta(respuesta, datos, parseSpanishNumber)`) no lo enciende: allí el `casos.ts` de
- * la app ya decide que un punto solo es decimal.
+ * a la respuesta esperada. Pasar `parseSpanishNumber` como ARGUMENTO no lo enciende, y así se
+ * escapó simulador-punnett (`leerRespuesta(respuesta, datos, parseSpanishNumber)`): se creyó que
+ * su `casos.ts` ya decidía que un punto solo es decimal, y no lo decidía; «6.250» para un 6,25 %
+ * se leía 6250 (hallazgo 4161, 07/11/2026). Hoy le pasa `(s) => leerRespuestaAula(s, esperado)`.
  *
  * DE DÓNDE SALE
  * ─────────────
