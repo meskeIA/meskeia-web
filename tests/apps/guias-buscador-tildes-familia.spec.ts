@@ -49,6 +49,12 @@ const FILAS: Fila[] = [
   { slug: 'guia-vinagres-mundo', palabra: 'Balsámico' },
   // Fuera de las guías, el mismo filtro y la misma receta (hallazgo 4189, /reparar 07/11/2026)
   { slug: 'calculadora-caducidad', palabra: 'Plátano' },
+  // Las cinco guías que C0658 no cubrió (cabo C0668, /reparar 07/11/2026)
+  { slug: 'guia-estilos-cerveza', palabra: 'Bélgica' },
+  { slug: 'guia-cocteles', palabra: 'Perú' },
+  { slug: 'guia-razas-perros', palabra: 'Dálmata' },
+  { slug: 'guia-infusiones', palabra: 'Lúpulo' },
+  { slug: 'guia-tipos-pasta', palabra: 'Nápoles' },
 ];
 
 const SELECTOR = 'input[type="search"], input[placeholder*="usca" i], input[aria-label*="usca" i]';

@@ -11,6 +11,7 @@ import {
   DisclaimerCard,
 } from '@/components';
 import styles from './GuiaCocteles.module.css';
+import { normalizarBusqueda } from '@/lib/buscadorTablas';
 
 type FamiliaCoctel = 'Sour' | 'Highball' | 'Martini' | 'Tropical' | 'Spritz / Aperitivo' | 'Cremoso / Caliente' | 'Sin alcohol';
 type BaseAlcohol = 'Gin' | 'Vodka' | 'Ron' | 'Whisky / Bourbon' | 'Tequila / Mezcal' | 'Champán / Cava' | 'Vermut / Aperol' | 'Coñac / Brandy' | 'Sin alcohol';
@@ -709,17 +710,17 @@ export default function GuiaCocteles() {
   const [base, setBase] = useState<BaseAlcohol | 'Todas'>('Todas');
 
   const coctelesFiltrados = useMemo(() => {
-    const t = busqueda.toLowerCase().trim();
+    const t = normalizarBusqueda(busqueda).trim();
     return COCTELES.filter((c) => {
       const matchFamilia = familia === 'Todas' || c.familia === familia;
       const matchBase = base === 'Todas' || c.base === base;
       const matchBusqueda =
         !t ||
-        c.nombre.toLowerCase().includes(t) ||
-        c.origen.toLowerCase().includes(t) ||
-        c.ingredientes.some((i) => i.toLowerCase().includes(t)) ||
-        c.perfil.some((p) => p.toLowerCase().includes(t)) ||
-        c.descripcion.toLowerCase().includes(t);
+        normalizarBusqueda(c.nombre).includes(t) ||
+        normalizarBusqueda(c.origen).includes(t) ||
+        c.ingredientes.some((i) => normalizarBusqueda(i).includes(t)) ||
+        c.perfil.some((p) => normalizarBusqueda(p).includes(t)) ||
+        normalizarBusqueda(c.descripcion).includes(t);
       return matchFamilia && matchBase && matchBusqueda;
     });
   }, [busqueda, familia, base]);

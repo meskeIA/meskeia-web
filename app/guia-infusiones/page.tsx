@@ -11,6 +11,7 @@ import {
   ShareCard,
 } from '@/components';
 import styles from './GuiaInfusiones.module.css';
+import { normalizarBusqueda } from '@/lib/buscadorTablas';
 
 type Familia =
   | 'Digestiva'
@@ -704,15 +705,15 @@ export default function GuiaInfusiones() {
   const [familiaActiva, setFamiliaActiva] = useState<Familia | 'Todas'>('Todas');
 
   const infusionesFiltradas = useMemo(() => {
-    const termino = busqueda.toLowerCase().trim();
+    const termino = normalizarBusqueda(busqueda).trim();
     return INFUSIONES.filter((inf) => {
       const coincideFamilia = familiaActiva === 'Todas' || inf.familia === familiaActiva;
       const coincideBusqueda =
         !termino ||
-        inf.nombre.toLowerCase().includes(termino) ||
-        inf.nombreCientifico.toLowerCase().includes(termino) ||
-        inf.usosTradicionales.some((u) => u.toLowerCase().includes(termino)) ||
-        inf.descripcion.toLowerCase().includes(termino);
+        normalizarBusqueda(inf.nombre).includes(termino) ||
+        normalizarBusqueda(inf.nombreCientifico).includes(termino) ||
+        inf.usosTradicionales.some((u) => normalizarBusqueda(u).includes(termino)) ||
+        normalizarBusqueda(inf.descripcion).includes(termino);
       return coincideFamilia && coincideBusqueda;
     });
   }, [busqueda, familiaActiva]);

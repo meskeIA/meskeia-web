@@ -11,6 +11,7 @@ import {
   ShareCard,
 } from '@/components';
 import styles from './GuiaRazasPerros.module.css';
+import { normalizarBusqueda } from '@/lib/buscadorTablas';
 
 type GrupoFCI =
   | 'Pastoreo'
@@ -955,7 +956,7 @@ export default function GuiaRazasPerrosPage() {
   const [soloNinos, setSoloNinos] = useState(false);
 
   const razasFiltradas = useMemo(() => {
-    const t = busqueda.toLowerCase().trim();
+    const t = normalizarBusqueda(busqueda).trim();
     return RAZAS.filter((r) => {
       const matchTamano = tamanoSelec === 'Todos' || r.tamano === tamanoSelec;
       const matchEnergia = energiaSelec === 'Todos' || r.energia === energiaSelec;
@@ -963,10 +964,10 @@ export default function GuiaRazasPerrosPage() {
       const matchNinos = !soloNinos || r.aptoNinos;
       const matchBusqueda =
         !t ||
-        r.nombre.toLowerCase().includes(t) ||
-        r.nombreIngles.toLowerCase().includes(t) ||
-        r.origen.toLowerCase().includes(t) ||
-        r.grupo.toLowerCase().includes(t);
+        normalizarBusqueda(r.nombre).includes(t) ||
+        normalizarBusqueda(r.nombreIngles).includes(t) ||
+        normalizarBusqueda(r.origen).includes(t) ||
+        normalizarBusqueda(r.grupo).includes(t);
       return matchTamano && matchEnergia && matchApartamento && matchNinos && matchBusqueda;
     });
   }, [busqueda, tamanoSelec, energiaSelec, soloApartamento, soloNinos]);

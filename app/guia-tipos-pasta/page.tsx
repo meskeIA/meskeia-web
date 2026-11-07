@@ -11,6 +11,7 @@ import {
   EducationalSection,
 } from '@/components';
 import styles from './GuiaTiposPasta.module.css';
+import { normalizarBusqueda } from '@/lib/buscadorTablas';
 
 type FormaPasta = 'Larga' | 'Corta' | 'Rellena' | 'Lámina' | 'Sopa' | 'Especial';
 type SalsaIdeal =
@@ -730,14 +731,14 @@ export default function GuiaTiposPastaPage() {
     return pastas.filter((pasta) => {
       // Búsqueda por texto
       if (busqueda.trim()) {
-        const texto = busqueda.toLowerCase().trim();
+        const texto = normalizarBusqueda(busqueda).trim();
         const coincide =
-          pasta.nombre.toLowerCase().includes(texto) ||
-          pasta.nombreOriginal.toLowerCase().includes(texto) ||
-          pasta.salsasIdeales.some((s) => s.toLowerCase().includes(texto)) ||
-          pasta.platosClasicos.some((p) => p.toLowerCase().includes(texto)) ||
-          pasta.descripcion.toLowerCase().includes(texto) ||
-          pasta.origen.toLowerCase().includes(texto);
+          normalizarBusqueda(pasta.nombre).includes(texto) ||
+          normalizarBusqueda(pasta.nombreOriginal).includes(texto) ||
+          pasta.salsasIdeales.some((s) => normalizarBusqueda(s).includes(texto)) ||
+          pasta.platosClasicos.some((p) => normalizarBusqueda(p).includes(texto)) ||
+          normalizarBusqueda(pasta.descripcion).includes(texto) ||
+          normalizarBusqueda(pasta.origen).includes(texto);
         if (!coincide) return false;
       }
 

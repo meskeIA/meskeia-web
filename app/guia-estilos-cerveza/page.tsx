@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, ShareCard, EducationalSection, DisclaimerCard } from '@/components';
 import styles from './GuiaEstilosCerveza.module.css';
+import { normalizarBusqueda } from '@/lib/buscadorTablas';
 
 type TipoCerveza = 'Ale' | 'Lager' | 'Híbrida' | 'Silvestre';
 type ColorEBC = 'Amarillo pálido' | 'Dorado' | 'Ámbar' | 'Cobre' | 'Caoba' | 'Marrón' | 'Negro';
@@ -819,7 +820,7 @@ export default function GuiaEstilosCerveza() {
   const [filtroAmargor, setFiltroAmargor] = useState<NivelAmargor | ''>('');
 
   const estilosFiltrados = useMemo(() => {
-    const termino = busqueda.toLowerCase();
+    const termino = normalizarBusqueda(busqueda);
     return ESTILOS.filter((e) => {
       if (filtroTipo && e.tipo !== filtroTipo) return false;
       if (filtroColor && e.colorEBC !== filtroColor) return false;
@@ -827,12 +828,12 @@ export default function GuiaEstilosCerveza() {
       if (filtroAmargor && e.amargor !== filtroAmargor) return false;
       if (termino) {
         const coincide =
-          e.nombre.toLowerCase().includes(termino) ||
-          e.nombreOriginal.toLowerCase().includes(termino) ||
-          e.pais.toLowerCase().includes(termino) ||
-          e.notasDeSabor.some((n) => n.toLowerCase().includes(termino)) ||
-          e.maridaje.some((m) => m.toLowerCase().includes(termino)) ||
-          e.descripcion.toLowerCase().includes(termino);
+          normalizarBusqueda(e.nombre).includes(termino) ||
+          normalizarBusqueda(e.nombreOriginal).includes(termino) ||
+          normalizarBusqueda(e.pais).includes(termino) ||
+          e.notasDeSabor.some((n) => normalizarBusqueda(n).includes(termino)) ||
+          e.maridaje.some((m) => normalizarBusqueda(m).includes(termino)) ||
+          normalizarBusqueda(e.descripcion).includes(termino);
         if (!coincide) return false;
       }
       return true;
