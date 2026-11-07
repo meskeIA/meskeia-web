@@ -47,7 +47,7 @@ export const jsonLd = generateWebAppSchema({
     'Tiempos en nevera, congelador y despensa por alimento',
     'Buscador y filtro por categoría',
     'Carnes, pescados, lácteos, frutas, verduras, sobras y despensa',
-    'Basado en guías de seguridad alimentaria (USDA/FDA)',
+    'Basado en guías de seguridad alimentaria (USDA/FDA y AESAN)',
     'Funciona en el navegador, sin registro',
     'Gratuito, sin publicidad y en español',
   ],

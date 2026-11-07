@@ -7,6 +7,10 @@
 //
 // Fuente: FoodSafety.gov (USDA/FDA) "Cold Food Storage Chart" y guías de
 // seguridad alimentaria. Verificado: 2026-06.
+// Huevos con cáscara: AESAN, «Huevos y ovoproductos» (aesan.gob.es/seguridad-alimentaria/
+// higiene-alimentos/huevos-ovoproductos, leído el 07/11/2026): «la "fecha de duración mínima",
+// se fijará en un máximo de 28 días a partir de la puesta». El «3–5 sem.» de USDA (huevo lavado)
+// pasaba una semana de esa fecha (hallazgo 4190, cabo C0669).
 
 export interface MetaCaducidad {
   fuente: string;
@@ -15,7 +19,7 @@ export interface MetaCaducidad {
 }
 
 export const CADUCIDAD_META: MetaCaducidad = {
-  fuente: 'FoodSafety.gov (USDA/FDA) — Cold Food Storage Chart',
+  fuente: 'FoodSafety.gov (USDA/FDA) — Cold Food Storage Chart; huevos con cáscara: AESAN, «Huevos y ovoproductos» (11/2026)',
   urlOficial: 'https://www.foodsafety.gov/food-safety-charts/cold-food-storage-charts',
   verificado: '2026-06',
 };
@@ -60,7 +64,7 @@ export const ALIMENTOS_CADUCIDAD: AlimentoCaducidad[] = [
   { nombre: 'Yogur', emoji: '🥄', categoria: 'lacteos-huevos', nevera: '1–2 sem.', congelador: '1–2 meses', despensa: NA },
   { nombre: 'Queso fresco', emoji: '🧀', categoria: 'lacteos-huevos', nevera: '1 semana', congelador: 'No recomendado', despensa: NA },
   { nombre: 'Queso curado', emoji: '🧀', categoria: 'lacteos-huevos', nevera: '3–4 sem.', congelador: '6–8 meses', despensa: NA },
-  { nombre: 'Huevos (con cáscara)', emoji: '🥚', categoria: 'lacteos-huevos', nevera: '3–5 sem.', congelador: 'No con cáscara', despensa: NA },
+  { nombre: 'Huevos (con cáscara)', emoji: '🥚', categoria: 'lacteos-huevos', nevera: 'Hasta la fecha de la etiqueta (máx. 28 días desde la puesta)', congelador: 'No con cáscara', despensa: NA },
   { nombre: 'Mantequilla', emoji: '🧈', categoria: 'lacteos-huevos', nevera: '1–3 meses', congelador: '6–9 meses', despensa: NA },
 
   // Frutas y verduras

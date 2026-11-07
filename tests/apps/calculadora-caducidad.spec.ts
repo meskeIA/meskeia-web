@@ -165,7 +165,7 @@ test.describe('calculadora-caducidad · tabla de conservación de alimentos', ()
     }
   });
 
-  test('HALLAZGO (07/11/2026, ABIERTO) · huevos: «3–5 sem.» en nevera pasa del máximo de 28 días desde la puesta (AESAN)', async ({
+  test('HALLAZGO 4190 (07/11/2026, REPARADO) · huevos: «3–5 sem.» en nevera pasaba del máximo de 28 días desde la puesta (AESAN)', async ({
     page,
   }) => {
     // AESAN, «Huevos y ovoproductos»: la fecha de duración mínima de los huevos de gallina «se
@@ -174,11 +174,13 @@ test.describe('calculadora-caducidad · tabla de conservación de alimentos', ()
     // más allá de la fecha más larga que puede llevar la etiqueta. El plazo viene de USDA,
     // pensado para huevo lavado y refrigerado desde el origen.
     // Esperado: el tope del plazo no pasa de 28 días (o remite a la fecha de la etiqueta).
-    // Hoy: «3–5 sem.» → 35 días.
-    test.fail();
+    // Antes: «3–5 sem.» → 35 días. REPARADO el 07/11/2026 (decidido por el usuario en /reparar,
+    // cabo C0669): «Hasta la fecha de la etiqueta (máx. 28 días desde la puesta)».
     await buscar(page, 'huevo');
     const [fila] = await filas(page);
     expect(fila[0]).toBe('Huevos (con cáscara)');
+    // Sin esto, una celda sin cifra daría 0 días y pasaría sin mirar nada.
+    expect(fila[1]).toContain('fecha de la etiqueta');
     const m = fila[1].match(/(\d+)(?:\s*[–-]\s*(\d+))?\s*(sem|d[ií]a)/);
     const dias = m ? Number(m[2] ?? m[1]) * (m[3] === 'sem' ? 7 : 1) : 0;
     expect(dias, `nevera «${fila[1]}»`).toBeLessThanOrEqual(28);
