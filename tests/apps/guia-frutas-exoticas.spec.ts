@@ -29,16 +29,23 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  *   «perú» / «Perú» ................. 6  las seis con Perú entre sus países de origen
  *   «xyz123» ........................ 0  y el aviso «No se han encontrado frutas con esos filtros.»
  *
- * HALLAZGOS ABIERTOS: al final, con `test.fail()` — afirman lo que debería pasar y hoy fallan a
- * propósito. Cuando se reparen se pondrán en verde: quitar entonces el `test.fail()` y quedan
- * como regresión.
+ * REPARADOS el 07/11/2026: el buscador quita los diacríticos de los dos lados (4171), y se
+ * retiraron las fichas repetidas «Mangostino blanco» y «Chirimoya peruana» (4172). Sobre las 37
+ * de ahora, Sudeste Asiático + Verano son 7 y «peru» con o sin tilde da 5: las cinco con Perú
+ * entre sus países (la sexta casaba solo por el nombre de la ficha retirada).
+ *
+ * Los HALLAZGOS del final eran `test.fail()`; reparados, quedan como regresión.
  */
 
 const RUTA = '/guia-frutas-exoticas/';
 const BUSCADOR = 'input[aria-label="Buscar fruta exótica"]';
 
-/** Los 39 objetos del array `frutas` de page.tsx (contados uno a uno; la página promete 40). */
-const TOTAL = 39;
+/**
+ * Los objetos del array `frutas` de page.tsx: 39 en la inspección (la página prometía 40). El
+ * 07/11/2026 se retiraron dos fichas repetidas de especies que ya tenían la suya, «Mangostino
+ * blanco» y «Chirimoya peruana» (hallazgo 4172): quedan 37, y la página ya saca la cifra del array.
+ */
+const TOTAL = 37;
 
 async function abrir(page: Page): Promise<void> {
   await page.goto(RUTA);
@@ -76,13 +83,11 @@ const SUDESTE_VERANO = [
   'Longan / Ojo de dragón',
   'Salak / Fruta serpiente',
   'Jackfruit / Yaca',
-  'Mangostino blanco',
 ];
 
 const CON_PERU = [
   'Cherimoya',
   'Maracuyá / Fruta de la pasión',
-  'Chirimoya peruana',
   'Pitahaya amarilla',
   'Granadilla',
   'Capulí / Cereza andina',
@@ -235,25 +240,19 @@ test.describe('hallazgos abiertos', () => {
     await abrir(page);
   });
 
-  test('HALLAZGO (07/11/2026, ABIERTO) [contenido/bajo] · promete 40 frutas y el array tiene 39', async ({
+  test('HALLAZGO 4175 (07/11/2026, REPARADO) [contenido/bajo] · promete 40 frutas y el array tiene 39', async ({
     page,
-  }) => {
-    test.fail();
-    // El contador, que sale de `frutas.length`, ya dice 39: el texto del hero tiene que decir lo mismo.
+  }) => {    // El contador, que sale de `frutas.length`, ya dice 39: el texto del hero tiene que decir lo mismo.
     await expect(contador(page)).toHaveText(`Mostrando ${TOTAL} de ${TOTAL} frutas`);
     await expect(page.locator('header p').first()).toContainText(`${TOTAL} frutas`);
-    await expect(page.locator('meta[name="description"]')).toHaveAttribute(
-      'content',
-      new RegExp(`${TOTAL} frutas`),
-    );
+    // La meta description ya no lleva cifra: la que sale del array solo puede vivir en la página
+    await expect(page.locator('meta[name="description"]')).not.toHaveAttribute('content', /\d+ frutas/);
     await expect(page.getByText(/40 frutas/)).toHaveCount(0);
   });
 
-  test('HALLAZGO (07/11/2026, ABIERTO) [operativa/medio] · sin tilde no encuentra: «rambutan», «maracuya», «peru»', async ({
+  test('HALLAZGO 4171 (07/11/2026, REPARADO) [operativa/medio] · sin tilde no encuentra: «rambutan», «maracuya», «peru»', async ({
     page,
-  }) => {
-    test.fail();
-    // Las palabras clave de la propia metadata van sin tilde («rambutan», «maracuya»).
+  }) => {    // Las palabras clave de la propia metadata van sin tilde («rambutan», «maracuya»).
     await buscar(page, 'rambutan');
     await expect(fichas(page)).toHaveText(['Rambután']); // hoy: 0 fichas
     await buscar(page, 'maracuya');
@@ -262,11 +261,9 @@ test.describe('hallazgos abiertos', () => {
     await expect(fichas(page)).toHaveText(CON_PERU); // hoy: solo «Chirimoya peruana», por su nombre
   });
 
-  test('HALLAZGO (07/11/2026, ABIERTO) [operativa/bajo] · el sabor «Aromático» no devuelve nunca nada', async ({
+  test('HALLAZGO 4176 (07/11/2026, REPARADO) [operativa/bajo] · el sabor «Aromático» no devuelve nunca nada', async ({
     page,
-  }) => {
-    test.fail();
-    // Ninguna de las 39 lleva sabor 'Aromático' (el yuzu, «extremadamente aromático», es 'Ácido').
+  }) => {    // Ninguna de las 39 lleva sabor 'Aromático' (el yuzu, «extremadamente aromático», es 'Ácido').
     const opciones = (await page.getByLabel('Sabor').locator('option').allTextContents()).filter(
       (t) => t !== 'Todos',
     );
@@ -276,11 +273,9 @@ test.describe('hallazgos abiertos', () => {
     }
   });
 
-  test('HALLAZGO (07/11/2026, ABIERTO) [contenido/medio] · dos fichas por especie: Annona muricata y Garcinia mangostana', async ({
+  test('HALLAZGO 4172 (07/11/2026, REPARADO) [contenido/medio] · dos fichas por especie: Annona muricata y Garcinia mangostana', async ({
     page,
-  }) => {
-    test.fail();
-    // La app llama Annona muricata a la Guanábana y Annona cherimola a la Cherimoya; la
+  }) => {    // La app llama Annona muricata a la Guanábana y Annona cherimola a la Cherimoya; la
     // «Chirimoya peruana» lleva el binomio de la guanábana con otro sabor (Cremoso frente a Dulce-ácido).
     await buscar(page, 'muricata');
     await expect(fichas(page)).toHaveCount(1); // hoy: Chirimoya peruana + Guanábana / Soursop
@@ -289,71 +284,63 @@ test.describe('hallazgos abiertos', () => {
     await expect(fichas(page)).toHaveCount(1); // hoy: Mangostán + Mangostino blanco
   });
 
-  test('HALLAZGO (07/11/2026, ABIERTO) [contenido/medio] · carambola y pomelo sin aviso de interacción con medicamentos', async ({
+  test('HALLAZGO 4173 (07/11/2026, REPARADO) [contenido/medio] · carambola y pomelo sin aviso de interacción con medicamentos', async ({
     page,
-  }) => {
-    test.fail();
-    // Ficha técnica de Venclyxto (venetoclax) en CIMA-AEMPS, secciones 4.2 y 4.5: «Los productos
+  }) => {    // Ficha técnica de Venclyxto (venetoclax) en CIMA-AEMPS, secciones 4.2 y 4.5: «Los productos
     // que contengan pomelo, las naranjas amargas y la carambola (fruta estrella)» se deben evitar
     // durante el tratamiento, porque contienen inhibidores del CYP3A.
     await expect(ficha(page, 'Carambola / Star fruit')).toContainText(/medicament/i);
     await expect(ficha(page, 'Pomelo / Pummelo')).toContainText(/medicament/i);
   });
 
-  test('HALLAZGO (07/11/2026, ABIERTO) [contenido/medio] · exenta de disclaimer y con los avisos de salud plegados', async ({
+  test('HALLAZGO 4174 (07/11/2026, REPARADO) [contenido/medio] · exenta de disclaimer y con los avisos de salud plegados', async ({
     page,
-  }) => {
-    test.fail();
-    // Suite «salud» → nivel 2 (_private/DISCLAIMER-POLICY.md §3): DisclaimerCard severity="high",
+  }) => {    // Suite «salud» → nivel 2 (_private/DISCLAIMER-POLICY.md §3): DisclaimerCard severity="high",
     // no plegable. Hoy la página lleva `// @disclaimer: exempt` y no hay ninguno.
-    await expect(page.getByRole('note').filter({ hasText: /profesional sanitario/i })).toBeVisible();
-    // Y la alergia cruzada látex-fruta solo existe dentro de la guía educativa, que nace plegada.
-    await expect(page.getByText(/síndrome látex-fruta/)).toBeVisible();
+    const aviso = page.getByRole('note').filter({ hasText: /profesional sanitario/i });
+    await expect(aviso).toBeVisible();
+    // La alergia cruzada látex-fruta solo existía dentro de la guía educativa, que nace plegada;
+    // ahora va también en el aviso, visible sin abrir nada (y con la carambola y los medicamentos).
+    await expect(aviso.getByText(/síndrome látex-fruta/)).toBeVisible();
+    await expect(aviso).toContainText('insuficiencia renal');
+    await expect(aviso).toContainText('medicamentos');
+    // No vive dentro de la guía educativa
+    expect(await aviso.evaluate((el) => Boolean(el.closest('[class*="contentHidden"]')))).toBe(false);
   });
 
-  test('HALLAZGO (07/11/2026, ABIERTO) [contenido/bajo] · el jsonLd sale con featureList vacía', async ({
+  test('HALLAZGO 4177 (07/11/2026, REPARADO) [contenido/bajo] · el jsonLd sale con featureList vacía', async ({
     page,
-  }) => {
-    test.fail();
-    const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+  }) => {    const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
     const app = bloques.map((t) => JSON.parse(t)).find((j) => j['@type'] === 'WebApplication');
     expect((app?.featureList ?? []).length).toBeGreaterThanOrEqual(4); // hoy: []
   });
 
-  test('HALLAZGO (07/11/2026, ABIERTO) [contenido/bajo] · cifras populares sin fuente (§1.quinquies.1)', async ({
+  test('HALLAZGO 4178 (07/11/2026, REPARADO) [contenido/bajo] · cifras populares sin fuente (§1.quinquies.1)', async ({
     page,
-  }) => {
-    test.fail();
-    await expect(page.getByText(/6\.000 años/)).toHaveCount(0); // baobab
+  }) => {    await expect(page.getByText(/6\.000 años/)).toHaveCount(0); // baobab
     await expect(page.getByText(/a 7 km de distancia/)).toHaveCount(0); // elefantes y marula
     await expect(page.getByText(/menos de 100 toneladas al año/)).toHaveCount(0); // mangostino blanco
     await expect(page.getByText('Calcio 2x leche', { exact: true })).toHaveCount(0); // baobab en polvo vs leche
   });
 
-  test('HALLAZGO (07/11/2026, ABIERTO) [contenido/bajo] · propiedades de salud sin respaldo: antiinflamatorio, anticancerígenas', async ({
+  test('HALLAZGO 4179 (07/11/2026, REPARADO) [contenido/bajo] · propiedades de salud sin respaldo: antiinflamatorio, anticancerígenas', async ({
     page,
-  }) => {
-    test.fail();
-    await expect(ficha(page, 'Mangostán').getByText('Antiinflamatorio', { exact: true })).toHaveCount(0);
+  }) => {    await expect(ficha(page, 'Mangostán').getByText('Antiinflamatorio', { exact: true })).toHaveCount(0);
     await expect(ficha(page, 'Guanábana / Soursop')).not.toContainText('anticancerígenas');
   });
 
-  test('HALLAZGO (07/11/2026, ABIERTO) [contenido/bajo] · la tabla por región contradice la disponibilidad de las fichas', async ({
+  test('HALLAZGO 4180 (07/11/2026, REPARADO) [contenido/bajo] · la tabla por región contradice la disponibilidad de las fichas', async ({
     page,
-  }) => {
-    test.fail();
-    await abrirGuia(page);
+  }) => {    await abrirGuia(page);
     const tabla = page.getByRole('table');
     // Kiwano (África) es «Especialidades»; Lichi, Carambola y Pomelo (Sudeste Asiático) son «Común».
     await expect(tabla.getByRole('row').filter({ hasText: 'África' })).toContainText('Especialidades');
     await expect(tabla.getByRole('row').filter({ hasText: 'Sudeste Asiático' })).toContainText('Común');
   });
 
-  test('HALLAZGO (07/11/2026, ABIERTO) [accesibilidad/bajo] · el borde del buscador y de los desplegables da 1,04:1 con la tarjeta', async ({
+  test('HALLAZGO 4181 (07/11/2026, REPARADO) [accesibilidad/bajo] · el borde del buscador y de los desplegables da 1,04:1 con la tarjeta', async ({
     page,
-  }) => {
-    test.fail();
-    // WCAG 1.4.11: el límite de un control necesita 3:1 contra lo que tiene al lado.
+  }) => {    // WCAG 1.4.11: el límite de un control necesita 3:1 contra lo que tiene al lado.
     const medir = (sel: string) =>
       page.locator(sel).evaluate((el) => {
         const rgb = (s: string) => (s.match(/[\d.]+/g) ?? []).slice(0, 3).map(Number);
@@ -373,11 +360,9 @@ test.describe('hallazgos abiertos', () => {
     expect(await medir('#region')).toBeGreaterThanOrEqual(3); // hoy: 1,04
   });
 
-  test('HALLAZGO (07/11/2026, ABIERTO) [contenido/bajo] · el FAQPage dice «El pitahaya (pitaya) roja»', async ({
+  test('HALLAZGO 4182 (07/11/2026, REPARADO) [contenido/bajo] · el FAQPage dice «El pitahaya (pitaya) roja»', async ({
     page,
-  }) => {
-    test.fail();
-    const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+  }) => {    const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
     expect(bloques.join('\n')).not.toContain('El pitahaya');
   });
 });

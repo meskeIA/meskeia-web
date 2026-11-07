@@ -1,5 +1,4 @@
 'use client';
-// @disclaimer: exempt
 
 import { useMemo, useState } from 'react';
 import {
@@ -9,6 +8,7 @@ import {
   RelatedApps,
   ShareCard,
   EducationalSection,
+  DisclaimerCard,
 } from '@/components';
 import styles from './GuiaFrutasExoticas.module.css';
 
@@ -51,6 +51,8 @@ interface FrutaExotica {
   formaConsumo: string[];
   descripcion: string;
   curiosidad: string;
+  /** Aviso de salud que va visible en la ficha */
+  aviso?: string;
 }
 
 const frutas: FrutaExotica[] = [
@@ -64,7 +66,7 @@ const frutas: FrutaExotica[] = [
     sabor: 'Cremoso',
     disponibilidad: 'Especialidades',
     comoComer: 'Abrir la corteza espinosa y comer la pulpa amarilla',
-    beneficios: ['Rico en triptófano', 'Energético', 'Vitamina C'],
+    beneficios: ['Vitamina C', 'Potasio'],
     formaConsumo: ['Crudo', 'Helado', 'Pasta de durian'],
     descripcion:
       "El 'rey de las frutas' en el sudeste asiático. Olor extremadamente intenso y polarizante. Pulpa cremosa y dulce con notas a almendra y queso azul.",
@@ -80,7 +82,7 @@ const frutas: FrutaExotica[] = [
     sabor: 'Dulce-ácido',
     disponibilidad: 'Especialidades',
     comoComer: 'Cortar la corteza púrpura por la mitad y extraer los gajos blancos',
-    beneficios: ['Antioxidantes', 'Antiinflamatorio', 'Vitamina C'],
+    beneficios: ['Antioxidantes', 'Fibra', 'Vitamina C'],
     formaConsumo: ['Cruda', 'Zumo', 'Postre'],
     descripcion:
       "Conocida como la 'reina de las frutas'. Pulpa blanca y jugosa con sabor a litchi mezclado con melocotón. Su corteza es difícil de abrir y mancha permanentemente.",
@@ -149,7 +151,7 @@ const frutas: FrutaExotica[] = [
     descripcion:
       'Fruta de cactus con piel rosa intenso y pulpa blanca o roja con semillas negras. Sabor suave entre kiwi y pera.',
     curiosidad:
-      'Originaria de México pero Vietnam es hoy el mayor productor mundial: 1 millón de toneladas al año',
+      'Originaria de América, hoy se cultiva a gran escala en Asia, sobre todo en Vietnam',
   },
   {
     nombre: 'Carambola / Star fruit',
@@ -166,6 +168,11 @@ const frutas: FrutaExotica[] = [
       'Fruta amarilla con cinco aristas que al cortarla forma estrellas perfectas. Sabor entre manzana, pera y uva.',
     curiosidad:
       'Está contraindicada para personas con problemas renales — contiene neurotoxinas que solo afectan en insuficiencia renal',
+    // Ficha técnica de Venclyxto (venetoclax) en CIMA-AEMPS, secciones 4.2 y 4.5, consultada el
+    // 07/11/2026: «Los productos que contengan pomelo, las naranjas amargas y la carambola (fruta
+    // estrella)» se deben evitar, «porque contienen inhibidores del CYP3A» (hallazgo 4173)
+    aviso:
+      'Puede interactuar con medicamentos: la ficha técnica de algunos fármacos (por ejemplo, el venetoclax, según la AEMPS) manda evitar la carambola durante el tratamiento porque contiene inhibidores del CYP3A, la enzima que elimina muchos medicamentos. Si tomas medicación, pregunta a tu farmacéutico antes de comerla.',
   },
   {
     nombre: 'Salak / Fruta serpiente',
@@ -199,22 +206,10 @@ const frutas: FrutaExotica[] = [
     curiosidad:
       'Es la fruta nacional de Bangladesh — un solo árbol puede producir 250 frutas al año',
   },
-  {
-    nombre: 'Mangostino blanco',
-    nombreCientifico: 'Garcinia mangostana',
-    region: 'Sudeste Asiático',
-    paisesOrigen: ['Indonesia', 'Tailandia'],
-    temporada: 'Verano',
-    sabor: 'Dulce-ácido',
-    disponibilidad: 'Rara',
-    comoComer: 'Abrir la corteza dura y comer los gajos blancos',
-    beneficios: ['Antioxidantes', 'Vitamina C', 'Manganeso'],
-    formaConsumo: ['Cruda', 'Postre', 'Zumo'],
-    descripcion:
-      'Variedad clara del mangostán tradicional. Pulpa más jugosa y dulce, con menos acidez. Muy difícil de encontrar fuera del sudeste asiático.',
-    curiosidad:
-      'Solo se cultiva en pequeñas plantaciones de Java — menos de 100 toneladas al año',
-  },
+  // «Mangostino blanco» (Garcinia mangostana, la especie del Mangostán, con una producción sin
+  // fuente) y «Chirimoya peruana» (con el binomio de la Guanábana, cuando la chirimoya peruana es
+  // la Cherimoya) eran fichas repetidas de especies que ya tienen la suya: retiradas el
+  // 07/11/2026 (hallazgo 4172)
   {
     nombre: 'Pomelo / Pummelo',
     nombreCientifico: 'Citrus maxima',
@@ -230,6 +225,10 @@ const frutas: FrutaExotica[] = [
       "El 'abuelo' del pomelo y la naranja. Frutas de hasta 2 kg con cáscara muy gruesa y pulpa rosada o blanca menos ácida que el pomelo común.",
     curiosidad:
       'Es uno de los antepasados naturales del pomelo moderno y la mandarina dulce',
+    // Misma fuente que la carambola: las fichas técnicas hablan del pomelo (Citrus × paradisi),
+    // descendiente de esta especie; de ahí la redacción con el matiz (hallazgo 4173)
+    aviso:
+      'Puede interactuar con medicamentos: la ficha técnica de algunos fármacos (por ejemplo, el venetoclax, según la AEMPS) manda evitar el pomelo durante el tratamiento porque contiene inhibidores del CYP3A. Ese pomelo es Citrus × paradisi, descendiente de esta especie: si tomas medicación, pregunta a tu farmacéutico antes de comer pummelo.',
   },
   {
     nombre: 'Cherimoya',
@@ -291,28 +290,12 @@ const frutas: FrutaExotica[] = [
     disponibilidad: 'Común',
     comoComer:
       'Cortar por la mitad, retirar semillas y comer con cuchara o trocear',
-    beneficios: ['Papaína (digestiva)', 'Vitamina C', 'Vitamina A'],
+    beneficios: ['Vitamina C', 'Vitamina A', 'Fibra'],
     formaConsumo: ['Cruda', 'Smoothie', 'Ensalada thai'],
     descripcion:
       'Fruta tropical con cáscara naranja y pulpa naranja-rosada con muchas semillas negras comestibles. Sabor suave y dulce, ligeramente terroso.',
     curiosidad:
       "Los pueblos tainos y caribes la cultivaban desde mucho antes de 1492. Cristóbal Colón, al probarla, dejó escrito que era 'la fruta de los ángeles' — uno de los primeros registros europeos de esta fruta americana",
-  },
-  {
-    nombre: 'Chirimoya peruana',
-    nombreCientifico: 'Annona muricata',
-    region: 'América Tropical',
-    paisesOrigen: ['Perú', 'Brasil', 'Colombia'],
-    temporada: 'Verano',
-    sabor: 'Cremoso',
-    disponibilidad: 'Especialidades',
-    comoComer: 'Cortar por la mitad y comer con cuchara la pulpa blanca',
-    beneficios: ['Vitamina C', 'Vitamina B1', 'Hierro'],
-    formaConsumo: ['Cruda', 'Helado', 'Zumo'],
-    descripcion:
-      'Fruta de la familia de las anonáceas, similar a la cherimoya pero más grande y con sabor más intenso. Usada en repostería peruana.',
-    curiosidad:
-      "Los incas llamaban a esta familia 'mama-mocha', considerándola fruta sagrada de los Andes",
   },
   {
     nombre: 'Guanábana / Soursop',
@@ -328,7 +311,7 @@ const frutas: FrutaExotica[] = [
     descripcion:
       'Fruta grande con cáscara verde espinosa y pulpa blanca jugosa. Sabor ácido entre piña, fresa y cítricos. Muy aromática.',
     curiosidad:
-      'Investigaciones preliminares sugieren propiedades anticancerígenas — pero falta evidencia clínica',
+      'Sus semillas no deben masticarse ni comerse: como las de otras anonáceas, contienen alcaloides',
   },
   {
     nombre: 'Pitahaya amarilla',
@@ -392,7 +375,7 @@ const frutas: FrutaExotica[] = [
     descripcion:
       'Fruta colombiana con cáscara naranja peluda y pulpa verde gelatinosa. Sabor entre piña, fresa y kiwi. Casi siempre se consume en zumo.',
     curiosidad:
-      'El zumo de lulo es la bebida más popular de Colombia — más que la limonada',
+      'En Colombia y Ecuador el jugo de lulo es de los más habituales en casas y restaurantes',
   },
   {
     nombre: 'Capulí / Cereza andina',
@@ -421,16 +404,12 @@ const frutas: FrutaExotica[] = [
     sabor: 'Dulce-ácido',
     disponibilidad: 'Rara',
     comoComer: 'Pelar y comer cruda o usar para licor (Amarula)',
-    beneficios: [
-      'Vitamina C 4x naranja',
-      'Antioxidantes',
-      'Aceite cosmético',
-    ],
+    beneficios: ['Vitamina C', 'Antioxidantes', 'Aceite cosmético'],
     formaConsumo: ['Cruda', 'Licor Amarula', 'Aceite'],
     descripcion:
-      "Fruta africana sagrada con piel amarilla y pulpa blanca aromática. Famosa como base del licor crema Amarula. Los elefantes se 'emborrachan' al comerla fermentada.",
+      'Fruta africana sagrada con piel amarilla y pulpa blanca aromática. Famosa como base del licor crema Amarula.',
     curiosidad:
-      'Los elefantes pueden detectar marulas maduras a 7 km de distancia — caminan días para encontrarlas',
+      'Los elefantes buscan las marulas caídas; que se «emborrachen» con la fruta fermentada es una idea popular, pero discutida',
   },
   {
     nombre: 'Baobab',
@@ -441,12 +420,12 @@ const frutas: FrutaExotica[] = [
     sabor: 'Ácido',
     disponibilidad: 'Rara',
     comoComer: 'Pulpa seca: triturar o disolver en agua',
-    beneficios: ['Vitamina C 6x naranja', 'Calcio 2x leche', 'Fibra prebiótica'],
+    beneficios: ['Vitamina C', 'Calcio', 'Fibra'],
     formaConsumo: ['Polvo', 'Bebidas', 'Smoothies'],
     descripcion:
       "Fruta del 'árbol de la vida' africano. Pulpa naturalmente seca y polvo blanco con sabor ácido a sorbete de cítrico. Superalimento emergente en Europa.",
     curiosidad:
-      'El árbol del baobab puede vivir 6.000 años — los más antiguos son contemporáneos de las pirámides',
+      'El árbol del baobab guarda agua en su tronco para resistir la estación seca',
   },
   {
     nombre: 'Kiwano / Melón cornudo',
@@ -558,12 +537,12 @@ const frutas: FrutaExotica[] = [
     sabor: 'Ácido',
     disponibilidad: 'Especialidades',
     comoComer: 'No se come en gajos — solo zumo y ralladura',
-    beneficios: ['Vitamina C 3x limón', 'Antioxidantes', 'Aceites esenciales'],
+    beneficios: ['Vitamina C', 'Antioxidantes', 'Aceites esenciales'],
     formaConsumo: ['Zumo', 'Ralladura', 'Salsa ponzu'],
     descripcion:
       'Cítrico japonés extremadamente aromático. Cruce natural entre mandarina y limón ichang. Solo se usan zumo y piel — la pulpa es demasiado ácida para comer.',
     curiosidad:
-      'Una pequeña botella de yuzu fresco puede costar 50€ en restaurantes japoneses europeos',
+      'Fuera de Japón es caro y difícil de encontrar fresco: suele llegar como zumo embotellado en formatos pequeños',
   },
   {
     nombre: 'Kumquat',
@@ -706,32 +685,42 @@ const REGIONES: (RegionFruta | 'Todas')[] = [
   'Asia',
 ];
 
+// Las opciones de cada desplegable salen del array, en este orden: una opción que ninguna ficha
+// lleva daba siempre 0 («Aromático», hallazgo 4176)
+const presentes = <T extends string>(orden: T[], campo: (f: FrutaExotica) => T): T[] =>
+  orden.filter((v) => frutas.some((f) => campo(f) === v));
+
 const TEMPORADAS: (TemporadaFruta | 'Todas')[] = [
   'Todas',
-  'Primavera',
-  'Verano',
-  'Otoño',
-  'Invierno',
-  'Todo el año',
+  ...presentes<TemporadaFruta>(['Primavera', 'Verano', 'Otoño', 'Invierno', 'Todo el año'], (f) => f.temporada),
 ];
 
 const SABORES: (PerfilSabor | 'Todos')[] = [
   'Todos',
-  'Dulce',
-  'Ácido',
-  'Dulce-ácido',
-  'Tropical',
-  'Cremoso',
-  'Aromático',
-  'Astringente',
+  ...presentes<PerfilSabor>(
+    ['Dulce', 'Ácido', 'Dulce-ácido', 'Tropical', 'Cremoso', 'Aromático', 'Astringente'],
+    (f) => f.sabor,
+  ),
 ];
+
+const ORDEN_DISPONIBILIDAD: Disponibilidad[] = ['Común', 'Especialidades', 'Rara'];
 
 const DISPONIBILIDADES: (Disponibilidad | 'Todas')[] = [
   'Todas',
-  'Común',
-  'Especialidades',
-  'Rara',
+  ...presentes<Disponibilidad>(ORDEN_DISPONIBILIDAD, (f) => f.disponibilidad),
 ];
+
+/** La disponibilidad en Europa de una región, sacada de sus fichas (hallazgo 4180). */
+const disponibilidadDeRegion = (region: RegionFruta): string =>
+  ORDEN_DISPONIBILIDAD.filter((d) =>
+    frutas.some((f) => f.region === region && f.disponibilidad === d),
+  ).join(' / ');
+
+/** Minúsculas y sin diacríticos: «Perú» y «peru» casan igual (hallazgo 4171). */
+const normalizar = (texto: string): string =>
+  texto.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+
+const TOTAL_FRUTAS = frutas.length;
 
 export default function GuiaFrutasExoticasPage() {
   const [busqueda, setBusqueda] = useState('');
@@ -743,15 +732,13 @@ export default function GuiaFrutasExoticasPage() {
   >('Todas');
 
   const frutasFiltradas = useMemo(() => {
-    const termino = busqueda.trim().toLowerCase();
+    const termino = normalizar(busqueda.trim());
     return frutas.filter((f) => {
       if (termino) {
-        const enNombre = f.nombre.toLowerCase().includes(termino);
-        const enCientifico = f.nombreCientifico
-          .toLowerCase()
-          .includes(termino);
+        const enNombre = normalizar(f.nombre).includes(termino);
+        const enCientifico = normalizar(f.nombreCientifico).includes(termino);
         const enPaises = f.paisesOrigen.some((p) =>
-          p.toLowerCase().includes(termino)
+          normalizar(p).includes(termino)
         );
         if (!enNombre && !enCientifico && !enPaises) return false;
       }
@@ -779,7 +766,7 @@ export default function GuiaFrutasExoticasPage() {
       <header className={styles.hero}>
         <h1>Guía de Frutas Tropicales y Subtropicales del Mundo</h1>
         <p>
-          40 frutas con su origen, temporada, sabor y formas de consumo. Algunas
+          {`${TOTAL_FRUTAS} frutas con su origen, temporada, sabor y formas de consumo.`} Algunas
           son cotidianas en sus regiones de origen y poco conocidas en Europa;
           otras viajan hoy globalmente.
         </p>
@@ -880,7 +867,7 @@ export default function GuiaFrutasExoticasPage() {
 
         <div className={styles.contador} role="status" aria-live="polite">
           Mostrando <strong>{frutasFiltradas.length}</strong> de{' '}
-          <strong>{frutas.length}</strong> frutas
+          <strong>{TOTAL_FRUTAS}</strong> frutas
         </div>
       </section>
 
@@ -931,7 +918,7 @@ export default function GuiaFrutasExoticasPage() {
               </div>
 
               <div className={styles.cardSection}>
-                <strong>Beneficios:</strong>
+                <strong>Destaca por:</strong>
                 <div className={styles.pills}>
                   {f.beneficios.map((b) => (
                     <span key={b} className={styles.pill}>
@@ -953,14 +940,46 @@ export default function GuiaFrutasExoticasPage() {
               <div className={styles.curiosidad}>
                 <strong>Curiosidad:</strong> {f.curiosidad}
               </div>
+
+              {f.aviso && (
+                <div className={styles.avisoFicha} role="note">
+                  <strong>Aviso:</strong> {f.aviso}
+                </div>
+              )}
             </article>
           ))
         )}
       </section>
 
+      {/* Nivel 2 de la suite salud (_private/DISCLAIMER-POLICY.md): visible y no plegable, tras
+          los resultados. Hasta el 07/11/2026 la app iba exenta y estos avisos solo vivían dentro
+          de la guía educativa, que nace plegada (hallazgo 4174) */}
+      <div className={styles.avisosSalud}>
+        <DisclaimerCard variant="medical" severity="high" title="Aviso de salud">
+          <p>
+            Esta guía es divulgativa y no sustituye el consejo de un médico, un dietista-nutricionista
+            o un profesional sanitario. Antes de probar una fruta nueva, ten en cuenta:
+          </p>
+          <ul>
+            <li>
+              <strong>Alergias cruzadas:</strong> las personas alérgicas al látex pueden reaccionar
+              al mango, el plátano, el kiwi, la papaya o el aguacate (síndrome látex-fruta).
+            </li>
+            <li>
+              <strong>Riñón:</strong> la carambola contiene caramboxina, una neurotoxina peligrosa
+              para quien tiene insuficiencia renal.
+            </li>
+            <li>
+              <strong>Medicamentos:</strong> el pomelo y la carambola pueden interactuar con algunos
+              medicamentos; si tomas medicación, consulta a tu farmacéutico.
+            </li>
+          </ul>
+        </DisclaimerCard>
+      </div>
+
       <EducationalSection
         title="Guía de Frutas Exóticas del Mundo"
-        subtitle="Descubre 40 frutas tropicales y raras: origen, temporada, beneficios y cómo disfrutarlas"
+        subtitle={`Descubre ${TOTAL_FRUTAS} frutas tropicales y raras: origen, temporada, nutrientes y cómo disfrutarlas`}
       >
         <h3>Introducción</h3>
         <p>
@@ -970,9 +989,8 @@ export default function GuiaFrutasExoticasPage() {
           durian en Manila. La etiqueta "exótico" depende siempre de la
           perspectiva. Desde el durian del Sudeste Asiático, prohibido en
           aviones, hasta el yuzu japonés que perfuma la alta cocina, cada una
-          tiene una historia botánica, cultural y nutricional propia. Esta guía
-          reúne 40 frutas representativas de seis grandes regiones del mundo,
-          con información práctica para identificarlas, comprarlas y disfrutarlas.
+          tiene una historia botánica, cultural y nutricional propia.{' '}
+          {`Esta guía reúne ${TOTAL_FRUTAS} frutas representativas de seis grandes regiones del mundo, con información práctica para identificarlas, comprarlas y disfrutarlas.`}
         </p>
 
         <h3>Tabla comparativa por región</h3>
@@ -991,37 +1009,37 @@ export default function GuiaFrutasExoticasPage() {
                 <td>Sudeste Asiático</td>
                 <td>Durian, mangostán, rambután, lichi</td>
                 <td>Cremoso y dulce-ácido</td>
-                <td>Especialidades / Rara</td>
+                <td>{disponibilidadDeRegion('Sudeste Asiático')}</td>
               </tr>
               <tr>
                 <td>América Tropical</td>
                 <td>Maracuyá, guayaba, papaya, cherimoya</td>
                 <td>Dulce y ácido</td>
-                <td>Común / Especialidades</td>
+                <td>{disponibilidadDeRegion('América Tropical')}</td>
               </tr>
               <tr>
                 <td>África</td>
                 <td>Marula, baobab, kiwano</td>
                 <td>Ácido y aromático</td>
-                <td>Rara</td>
+                <td>{disponibilidadDeRegion('África')}</td>
               </tr>
               <tr>
                 <td>Mediterráneo</td>
                 <td>Granada, higo chumbo, persimón, membrillo</td>
                 <td>Dulce y astringente</td>
-                <td>Común</td>
+                <td>{disponibilidadDeRegion('Mediterráneo')}</td>
               </tr>
               <tr>
                 <td>Asia (extra)</td>
                 <td>Yuzu, kumquat, mango Alphonso, níspero</td>
                 <td>Ácido y dulce</td>
-                <td>Común / Especialidades</td>
+                <td>{disponibilidadDeRegion('Asia')}</td>
               </tr>
               <tr>
                 <td>Oceanía</td>
                 <td>Feijoa</td>
                 <td>Tropical aromático</td>
-                <td>Especialidades</td>
+                <td>{disponibilidadDeRegion('Oceanía')}</td>
               </tr>
             </tbody>
           </table>
@@ -1144,10 +1162,10 @@ export default function GuiaFrutasExoticasPage() {
         <details>
           <summary>¿Las frutas exóticas son más nutritivas?</summary>
           <p>
-            No necesariamente más, pero sí <strong>diferentes</strong>. La
-            guayaba tiene 4× más vitamina C que la naranja; el baobab tiene 6×
-            más vitamina C y 2× más calcio que la leche. Sin embargo, una
-            manzana o una naranja españolas siguen siendo perfectamente sanas.
+            No necesariamente más, pero sí <strong>diferentes</strong>: la
+            guayaba o el polvo de baobab, por ejemplo, son fuentes concentradas de
+            vitamina C. Sin embargo, una manzana o una naranja de tu mercado siguen
+            siendo perfectamente sanas.
           </p>
         </details>
         <details>
@@ -1156,7 +1174,9 @@ export default function GuiaFrutasExoticasPage() {
             La <strong>carambola</strong> está contraindicada en personas con
             insuficiencia renal (contiene neurotoxinas). El <strong>ackee</strong>{' '}
             jamaicano sin madurar es tóxico. Algunas anonáceas (chirimoya,
-            guanábana) tienen alcaloides en semillas que no deben masticarse.
+            guanábana) tienen alcaloides en semillas que no deben masticarse. Y el
+            pomelo y la carambola pueden interactuar con algunos medicamentos: sus
+            fichas técnicas mandan evitarlos durante el tratamiento.
           </p>
         </details>
         <details>
@@ -1208,8 +1228,9 @@ export default function GuiaFrutasExoticasPage() {
         <p>
           Las frutas tropicales que llegan a Europa tienen costes ecológicos y
           sociales que no aparecen en la etiqueta: transporte (durian malasio en
-          avión = mucha huella de CO₂/kg fruta), agua (1 kg de aguacate consume
-          ~2.000 litros), comercio (precios al productor son fracción del precio
+          avión = mucha huella de CO₂/kg fruta), agua (el aguacate o el mango
+          necesitan mucho riego, a menudo en zonas donde escasea), comercio
+          (precios al productor son fracción del precio
           final). Buscar etiquetas de comercio justo y consumir frutas tropicales
           cultivadas en España (cherimoya de Granada, mango y aguacate de Málaga,
           persimón de Valencia) cuando estén disponibles reduce considerablemente

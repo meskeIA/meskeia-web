@@ -3,8 +3,9 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Guía de Frutas Exóticas del Mundo | meskeIA',
+  // Sin la cifra: prometía 40 y el array tenía 39 (hallazgo 4175); la página la saca del array
   description:
-    'Guía de 40 frutas exóticas: durian, mangostán, rambután, pitaya, lichi, baobab, yuzu y más. Origen, temporada, sabor y forma de consumo.',
+    'Guía de frutas exóticas: durian, mangostán, rambután, pitaya, lichi, baobab, yuzu y más. Origen, temporada, sabor y forma de consumo.',
   keywords: [
     'frutas exoticas',
     'frutas tropicales',
@@ -16,7 +17,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Guía de Frutas Exóticas del Mundo | meskeIA',
     description:
-      'Descubre 40 frutas tropicales y raras del mundo: origen, temporada, beneficios, formas de consumo y curiosidades.',
+      'Descubre frutas tropicales y raras del mundo: origen, temporada, formas de consumo y curiosidades.',
     type: 'website',
     url: 'https://meskeia.com/guia-frutas-exoticas/',
     locale: 'es_ES',
@@ -32,7 +33,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Guía de Frutas Exóticas del Mundo | meskeIA',
     description:
-      'Descubre 40 frutas tropicales y raras del mundo: origen, temporada, beneficios y curiosidades.',
+      'Descubre frutas tropicales y raras del mundo: origen, temporada y curiosidades.',
     images: ['https://meskeia.com/coquinum/og-image.png']
   },
   alternates: {
@@ -42,10 +43,19 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: "Guía de Frutas Exóticas",
-  description: "Guía de 40 frutas exóticas: durian, mangostán, rambután, pitaya, lichi, baobab, yuzu y más. Origen, temporada, sabor y forma de consumo.",
+  description: "Guía de frutas exóticas: durian, mangostán, rambután, pitaya, lichi, baobab, yuzu y más. Origen, temporada, sabor y forma de consumo.",
   url: "https://meskeia.com/guia-frutas-exoticas/",
   category: 'EducationalApplication',
-  features: [],
+  features: [
+    'Buscador por nombre común, nombre científico o país de origen, con o sin tildes',
+    'Filtro por región de origen',
+    'Filtro por temporada',
+    'Filtro por perfil de sabor',
+    'Filtro por disponibilidad en Europa',
+    'Ficha de cada fruta con cómo comerla, formas de consumo y una curiosidad',
+    'Avisos de salud: alergia látex-fruta, carambola y riñón, e interacciones con medicamentos',
+    'Contador de resultados y botón para limpiar los filtros',
+  ],
 });
 
 export const faqJsonLd = {
@@ -81,7 +91,7 @@ export const faqJsonLd = {
       name: '¿Qué frutas exóticas son más fáciles de encontrar en Europa?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Las frutas exóticas más accesibles en Europa son el mango, la papaya, el lichi, la maracuyá (fruta de la pasión), la guayaba y la carambola. En grandes superficies es habitual encontrar mangos de diferentes variedades todo el año. El lichi fresco aparece en temporada entre junio y agosto. El pitahaya (pitaya) roja ya está presente en muchos supermercados por su creciente popularidad.',
+        text: 'Las frutas exóticas más accesibles en Europa son el mango, la papaya, el lichi, la maracuyá (fruta de la pasión), la guayaba y la carambola. En grandes superficies es habitual encontrar mangos de diferentes variedades todo el año. El lichi fresco aparece en temporada entre junio y agosto. La pitahaya (pitaya) roja ya está presente en muchos supermercados por su creciente popularidad.',
       },
     },
     {

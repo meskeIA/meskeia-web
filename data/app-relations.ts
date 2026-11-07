@@ -6130,7 +6130,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/aditivos-e-alimentarios/', icon: '🏷️', name: 'Guía Aditivos E', description: 'Qué significan los códigos E de las etiquetas alimentarias' },
   ],
   'guia-superalimentos': [
-    { url: '/guia-frutas-exoticas/', icon: '🍑', name: 'Guía de Frutas Exóticas', description: '40 frutas exóticas: origen, sabor, temporada y cómo consumirlas' },
+    { url: '/guia-frutas-exoticas/', icon: '🍑', name: 'Guía de Frutas Exóticas', description: 'Frutas exóticas: origen, sabor, temporada y cómo consumirlas' },
     { url: '/guia-hierbas-aromaticas/', icon: '🌿', name: 'Guía de Hierbas Aromáticas', description: 'Hierbas aromáticas: familia, origen, aroma, cultivo y usos culinarios y medicinales' },
     { url: '/guia-especias/', icon: '🫚', name: 'Guía de Especias', description: 'Perfil de sabor, usos y conservación de 65 especias culinarias del mundo' },
     { url: '/aditivos-e-alimentarios/', icon: '🏷️', name: 'Guía Aditivos E', description: 'Qué significan los códigos E de las etiquetas alimentarias' },
@@ -6196,7 +6196,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/guia-especias/', icon: '🫚', name: 'Guía de Especias', description: 'Perfil de sabor, usos y conservación de 65 especias culinarias del mundo' },
   ],
   'guia-frutos-secos': [
-    { url: '/guia-frutas-exoticas/', icon: '🍑', name: 'Guía de Frutas Exóticas', description: '40 frutas exóticas: origen, sabor, temporada y cómo consumirlas' },
+    { url: '/guia-frutas-exoticas/', icon: '🍑', name: 'Guía de Frutas Exóticas', description: 'Frutas exóticas: origen, sabor, temporada y cómo consumirlas' },
     { url: '/guia-superalimentos/', icon: '🥗', name: 'Guía de Superalimentos', description: '40 superalimentos: nutrientes, beneficios, cómo consumirlos y contraindicaciones' },
     { url: '/guia-hierbas-aromaticas/', icon: '🌿', name: 'Guía de Hierbas Aromáticas', description: 'Hierbas aromáticas: familia, origen, aroma, cultivo y usos culinarios y medicinales' },
     { url: '/guia-especias/', icon: '🫚', name: 'Guía de Especias', description: 'Perfil de sabor, usos y conservación de 65 especias culinarias del mundo' },

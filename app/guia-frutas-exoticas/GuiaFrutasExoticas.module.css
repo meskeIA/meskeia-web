@@ -51,7 +51,9 @@
   flex: 1;
   min-width: 240px;
   padding: 0.75rem 1rem;
-  border: 2px solid var(--bg-primary);
+  /* Límite del control a 4,5:1 sobre la tarjeta blanca (WCAG 1.4.11 pide 3:1). Con el borde
+     del color del fondo daba 1,04:1 y en el móvil el campo era una franja invisible (hallazgo 4181) */
+  border: 2px solid #767676;
   border-radius: 0.5rem;
   font-size: 1rem;
   background: var(--bg-primary);
@@ -111,7 +113,7 @@
 
 .filterGroup select {
   padding: 0.6rem 0.75rem;
-  border: 2px solid var(--bg-primary);
+  border: 2px solid #767676;
   border-radius: 0.5rem;
   font-size: 0.95rem;
   background: var(--bg-primary);
@@ -282,6 +284,34 @@
   margin-bottom: 0.25rem;
 }
 
+/* Aviso de salud en la ficha (carambola, pomelo) y bloque de avisos de la página */
+.avisoFicha {
+  margin-top: 0.25rem;
+  padding: 0.75rem;
+  background: rgba(255, 193, 7, 0.1);
+  border-left: 3px solid #ffc107;
+  border-radius: 0.4rem;
+  font-size: 0.88rem;
+  line-height: 1.45;
+  color: var(--text-primary);
+}
+
+.avisosSalud {
+  max-width: 1200px;
+  width: calc(100% - 3rem);
+  margin: 0 auto 1.5rem;
+}
+
+.avisosSalud ul {
+  margin: 0.5rem 0 0;
+  padding-left: 1.25rem;
+}
+
+.avisosSalud li {
+  margin-bottom: 0.4rem;
+  line-height: 1.5;
+}
+
 /* Tabla comparativa */
 .tablaWrapper {
   overflow-x: auto;
@@ -348,7 +378,8 @@
 [data-theme='dark'] .searchInput,
 [data-theme='dark'] .filterGroup select {
   background: #1a1a1a;
-  border-color: #333;
+  /* 4:1 sobre la tarjeta oscura rgb(45,45,45); el #333 de antes daba 1,09:1 */
+  border-color: #8a8a8a;
   color: var(--text-primary);
 }
 
