@@ -17,6 +17,7 @@ import {
   nombreNota,
   type FamiliaInstrumento,
 } from '@/lib/calculadoras/afinacionInstrumentos';
+import { detectarTono, tamanoVentana } from '@/lib/calculadoras/deteccionTono';
 
 // Las afinaciones, la transposición de los instrumentos que no suenan donde leen y la
 // conversión nota↔frecuencia viven en el motor, probado aparte: un signo al revés en la
@@ -32,51 +33,9 @@ const FAMILIAS: { id: FamiliaInstrumento; titulo: string; icono: string }[] = [
   { id: 'tecla', titulo: 'Tecla', icono: '🎹' },
 ];
 
-// Algoritmo de autocorrelación para detectar pitch
-function autoCorrelate(buffer: Float32Array, sampleRate: number): number {
-  const SIZE = buffer.length;
-  const MAX_SAMPLES = Math.floor(SIZE / 2);
-  let bestOffset = -1;
-  let bestCorrelation = 0;
-  let foundGoodCorrelation = false;
-  const correlations = new Array(MAX_SAMPLES);
-
-  // Verificar si hay suficiente señal
-  let rms = 0;
-  for (let i = 0; i < SIZE; i++) {
-    rms += buffer[i] * buffer[i];
-  }
-  rms = Math.sqrt(rms / SIZE);
-  if (rms < 0.01) return -1;
-
-  let lastCorrelation = 1;
-  for (let offset = 0; offset < MAX_SAMPLES; offset++) {
-    let correlation = 0;
-
-    for (let i = 0; i < MAX_SAMPLES; i++) {
-      correlation += Math.abs(buffer[i] - buffer[i + offset]);
-    }
-    correlation = 1 - (correlation / MAX_SAMPLES);
-    correlations[offset] = correlation;
-
-    if ((correlation > 0.9) && (correlation > lastCorrelation)) {
-      foundGoodCorrelation = true;
-      if (correlation > bestCorrelation) {
-        bestCorrelation = correlation;
-        bestOffset = offset;
-      }
-    } else if (foundGoodCorrelation) {
-      const shift = (correlations[bestOffset + 1] - correlations[bestOffset - 1]) / correlations[bestOffset];
-      return sampleRate / (bestOffset + (8 * shift));
-    }
-    lastCorrelation = correlation;
-  }
-
-  if (bestCorrelation > 0.01) {
-    return sampleRate / bestOffset;
-  }
-  return -1;
-}
+// La detección de tono vive en lib/calculadoras/deteccionTono.ts (método de McLeod), probada con
+// tonos sintéticos en test:calc. El autoCorrelate que había aquí daba −6 cents a un La5 afinado,
+// no llegaba al Mi1 del bajo e inventaba notas con el ruido grave (hallazgos 4197, 4198 y 4200).
 
 export default function AfinadorInstrumentosPage() {
   const [escuchando, setEscuchando] = useState(false);
@@ -94,26 +53,32 @@ export default function AfinadorInstrumentosPage() {
   const mediaStreamRef = useRef<MediaStream | null>(null);
   const animationRef = useRef<number | null>(null);
   const bufferRef = useRef<Float32Array | null>(null);
+  // El bucle de requestAnimationFrame se reprograma a sí mismo con la función del arranque: si
+  // leyera el La4 del estado, cambiarlo con el afinador en marcha no movería la aguja hasta pulsar
+  // Detener e Iniciar (hallazgo 4199). Por eso lo lee de un ref.
+  const a4Ref = useRef(a4Referencia);
+  useEffect(() => {
+    a4Ref.current = a4Referencia;
+  }, [a4Referencia]);
 
   const detectarPitch = useCallback(() => {
     if (!analyserRef.current || !bufferRef.current || !audioContextRef.current) return;
 
     analyserRef.current.getFloatTimeDomainData(bufferRef.current as Float32Array<ArrayBuffer>);
-    const frecuencia = autoCorrelate(bufferRef.current, audioContextRef.current.sampleRate);
+    // De FRECUENCIA_MINIMA (27 Hz, por debajo del Si0) a FRECUENCIA_MAXIMA (2.500 Hz, por
+    // encima del Do7 de la flauta); fuera de ese rango, o sin una señal periódica, null
+    const tono = detectarTono(bufferRef.current, audioContextRef.current.sampleRate);
 
-    // Hasta 2.500 Hz: el registro agudo de la flauta (Do7 = 2.093 Hz) y las teclas altas
-    // del piano se salian del limite anterior de 2.000 Hz y la pantalla se quedaba muda.
-    if (frecuencia > 0 && frecuencia < 2500) {
-      setFrecuenciaDetectada(frecuencia);
-      const info = notaMasCercana(frecuencia, a4Referencia);
-      setNotaActual(info);
+    if (tono) {
+      setFrecuenciaDetectada(tono.frecuencia);
+      setNotaActual(notaMasCercana(tono.frecuencia, a4Ref.current));
     } else {
       setFrecuenciaDetectada(null);
       setNotaActual(null);
     }
 
     animationRef.current = requestAnimationFrame(detectarPitch);
-  }, [a4Referencia]);
+  }, []);
 
   const iniciarEscucha = async (entrada: string = entradaId) => {
     try {
@@ -137,7 +102,9 @@ export default function AfinadorInstrumentosPage() {
       );
       if (audioContextRef.current !== contexto) return;
       analyserRef.current = audioContextRef.current.createAnalyser();
-      analyserRef.current.fftSize = 2048;
+      // 4.096 muestras a 44,1 y 48 kHz: con 2.048 el periodo más largo que cabía era el de
+      // 46,9 Hz y el Mi1 del bajo (41,2 Hz) no se podía afinar (hallazgo 4198)
+      analyserRef.current.fftSize = tamanoVentana(audioContextRef.current.sampleRate);
 
       const source = audioContextRef.current.createMediaStreamSource(stream);
       source.connect(analyserRef.current);
@@ -410,6 +377,7 @@ export default function AfinadorInstrumentosPage() {
             type="button"
             className={styles.btnReferencia}
             onClick={() => setA4Referencia(Math.max(420, a4Referencia - 1))}
+            aria-label="Bajar el La de referencia 1 Hz"
           >
             −
           </button>
@@ -418,6 +386,7 @@ export default function AfinadorInstrumentosPage() {
             type="button"
             className={styles.btnReferencia}
             onClick={() => setA4Referencia(Math.min(460, a4Referencia + 1))}
+            aria-label="Subir el La de referencia 1 Hz"
           >
             +
           </button>
@@ -527,7 +496,7 @@ export default function AfinadorInstrumentosPage() {
               <tr>
                 <td><strong>Banjo 5 cuerdas</strong></td>
                 <td>Sol4, Re3, Sol3, Si3, Re4</td>
-                <td>196 – 392 Hz</td>
+                <td>147 – 392 Hz</td>
                 <td><span aria-hidden="true">⭐⭐</span> Media</td>
                 <td>La 5ª cuerda corta (Sol4) es la más aguda</td>
               </tr>

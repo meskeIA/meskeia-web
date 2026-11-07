@@ -61,7 +61,7 @@ export const faqJsonLd = {
       name: '¿Cómo funciona un afinador cromático online?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El afinador captura el sonido con el micrófono del dispositivo y busca el periodo que se repite en la onda (autocorrelación en el dominio del tiempo) para deducir la frecuencia fundamental. Después la compara con la nota temperada más cercana y muestra la desviación en cents, que son centésimas de semitono: por debajo de 5 cents se considera afinado. El La de referencia es ajustable entre 420 y 460 Hz, así que sirve tanto para los 440 Hz estándar como para los 442 Hz habituales en orquesta.',
+        text: 'El afinador captura el sonido con el micrófono del dispositivo y busca el periodo que se repite en la onda (autocorrelación normalizada en el dominio del tiempo, el método de McLeod) para deducir la frecuencia fundamental. Después la compara con la nota temperada más cercana y muestra la desviación en cents, que son centésimas de semitono: hasta ±5 cents en pantalla se considera afinado. El La de referencia es ajustable entre 420 y 460 Hz, así que sirve tanto para los 440 Hz estándar como para los 442 Hz habituales en orquesta.',
       },
     },
     {

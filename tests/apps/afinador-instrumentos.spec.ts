@@ -370,7 +370,8 @@ test.describe('Página traducida por el navegador', () => {
  * comentario de arriba lo daba por cubierto por el sonómetro y el analizador, pero la detección
  * del afinador es SUYA (autoCorrelate, en page.tsx) y no la comparte nadie. El micrófono se
  * sustituye por una fuente de Web Audio conocida (seno, silencio o ruido) que entra por el camino
- * real de la app: MediaStreamSource → AnalyserNode (fftSize 2048) → autoCorrelate → notaMasCercana.
+ * real de la app: MediaStreamSource → AnalyserNode → detectarTono → notaMasCercana (hasta el
+ * /reparar del 07/11/2026, fftSize 2048 → autoCorrelate, que vivía en page.tsx).
  * El AudioContext se fija a 48 kHz: la app lo crea sin sampleRate y Chromium arranca a 44,1 o a
  * 48 kHz según el equipo, y el error del detector depende de esa tasa (medido el 07/11/2026: los
  * dos caminos, WAV por el micrófono falso y oscilador, dieron la misma cifra a 48 kHz).
@@ -563,40 +564,67 @@ test.describe('Detección de tono — INSPECTOR 07/11/2026', () => {
 });
 
 /**
- * HALLAZGOS ABIERTOS del Inspector (07/11/2026). Cada test afirma lo CORRECTO y lleva
- * test.fail(): cuando se repare, «pasará» y Playwright lo marcará en rojo para quitar la marca.
+ * Hallazgos del Inspector (07/11/2026), REPARADOS el mismo día en /reparar: la detección pasó a
+ * lib/calculadoras/deteccionTono.ts (método de McLeod: función normalizada, interpolación
+ * parabólica y ventana de 4.096 muestras), y el bucle lee el La4 de un ref. Cada test afirma lo
+ * CORRECTO; ya sin test.fail().
  */
 test.describe('Hallazgos de la detección — INSPECTOR 07/11/2026', () => {
-  test('ABIERTO · el La5 de la bandurria (880 Hz) bien afinado se lee afinado', async ({ page }) => {
-    // ABIERTO (calculo, alto). 880 Hz → esperado La5, 0 cents, «✓ Afinado» · obtenido La5 −6 cents,
-    // «↓ Subir tensión», «877,0 Hz» (con 0,05 de amplitud, −14 cents; en diente de sierra, −10).
-    // La interpolación de autoCorrelate (`bestOffset + 8 * shift`, page.tsx:70) corrige el periodo
-    // con un factor que depende de la amplitud: el error llega a ±866/P cents (P = muestras por
-    // periodo), y la FAQ visible promete «±1-2 cents» en condiciones ideales.
-    test.fail();
+  test('REPARADO · el La5 de la bandurria (880 Hz) bien afinado se lee afinado', async ({ page }) => {
+    // REPARADO (4197, calculo, alto). 880 Hz → esperado La5, 0 cents, «✓ Afinado» · obtenido antes
+    // La5 −6 cents, «↓ Subir tensión», «877,0 Hz» (con 0,05 de amplitud, −14 cents; en diente de
+    // sierra, −10). La «interpolación» de autoCorrelate (`bestOffset + 8 * shift`) dependía de la
+    // amplitud; la FAQ visible promete «±1-2 cents» en condiciones ideales.
     await afinarCon(page, { tipo: 'seno', hz: 880 });
     await expect.poll(() => notaLeida(page)).toBe('La5');
     await expect.poll(() => desvioCents(page, 0)).toBeLessThanOrEqual(2);
     await expect(pantalla(page).estado).toHaveText('✓ Afinado');
   });
 
-  test('ABIERTO · la 4ª del bajo, Mi1 = 41,20 Hz, se lee Mi1', async ({ page }) => {
-    // ABIERTO (calculo, alto). 41,20 Hz con «Bajo 4 cuerdas» → esperado Mi1, 0 cents · obtenido
-    // «Fa#1 +25 cents», «46,9 Hz», «↑ Bajar tensión» (con amplitud 0,5, «--»). El detector busca
-    // el periodo hasta fftSize/2 − 1 = 1.023 muestras: por debajo de 48.000/1.023 = 46,9 Hz no hay
-    // periodo que encontrar, y devuelve ese tope. Mi1, Fa1 y Fa#1 no se pueden afinar, ni por cable.
-    test.fail();
+  test('REPARADO · el La5 con señal floja (0,05 de pico) tampoco se desvía', async ({ page }) => {
+    // REPARADO (4197). El error dependía de la amplitud: con 0,05 de pico salía −14 cents.
+    await afinarCon(page, { tipo: 'seno', hz: 880, ganancia: 0.05 });
+    await expect.poll(() => notaLeida(page)).toBe('La5');
+    await expect.poll(() => desvioCents(page, 0)).toBeLessThanOrEqual(2);
+  });
+
+  test('REPARADO · el Re7 de 2.349,3 Hz se lee a menos de 2 cents', async ({ page }) => {
+    // REPARADO (4197). Cuanto más aguda la nota, menos muestras por periodo y más error: salía −22.
+    await afinarCon(page, { tipo: 'seno', hz: 2349.3181 }, { instrumento: 'Flauta travesera' });
+    await expect.poll(() => notaLeida(page)).toBe('Re7');
+    await expect.poll(() => desvioCents(page, 0)).toBeLessThanOrEqual(2);
+  });
+
+  test('REPARADO · la 4ª del bajo, Mi1 = 41,20 Hz, se lee Mi1', async ({ page }) => {
+    // REPARADO (4198, calculo, alto). 41,20 Hz con «Bajo 4 cuerdas» → esperado Mi1, 0 cents ·
+    // obtenido antes «Fa#1 +25 cents», «46,9 Hz», «↑ Bajar tensión» (con amplitud 0,5, «--»). El
+    // detector buscaba el periodo hasta fftSize/2 − 1 = 1.023 muestras: por debajo de
+    // 48.000/1.023 = 46,9 Hz no había periodo que encontrar.
     await afinarCon(page, { tipo: 'seno', hz: 41.2034, ganancia: 0.05 }, { instrumento: 'Bajo 4 cuerdas' });
     await expect.poll(() => notaLeida(page)).toBe('Mi1');
     await expect.poll(() => desvioCents(page, 0)).toBeLessThanOrEqual(2);
   });
 
-  test('ABIERTO · cambiar el La de referencia con el afinador EN MARCHA cambia la lectura', async ({ page }) => {
-    // ABIERTO (calculo, alto). 440 Hz, arranca con La4 = 440 (La4 +1) y se pulsa «442 Hz
-    // (Orquesta)» → esperado La4 −7,85 cents, «↓ Subir tensión» · obtenido La4 +1, «✓ Afinado»,
-    // con «442 Hz» marcado y la tabla de cuerdas ya en 442 (Mi2 = 82,8 Hz). El bucle de
-    // requestAnimationFrame se queda con el detectarPitch del arranque, y con él con su La4.
-    test.fail();
+  test('REPARADO · el Mi1 con señal fuerte (0,5 de pico) también se lee', async ({ page }) => {
+    // REPARADO (4198). Con 0,5 de pico el detector de antes no pintaba nada («--»).
+    await afinarCon(page, { tipo: 'seno', hz: 41.2034, ganancia: 0.5 }, { instrumento: 'Bajo 4 cuerdas' });
+    await expect.poll(() => notaLeida(page)).toBe('Mi1');
+    await expect.poll(() => desvioCents(page, 0)).toBeLessThanOrEqual(2);
+  });
+
+  test('REPARADO · el Si0 del bajo de 5 cuerdas (30,87 Hz) se lee Si0', async ({ page }) => {
+    // REPARADO (4198). La nota más grave que nombra la página (tabla educativa, «Bajo 5 cuerdas»;
+    // el selector no lo trae, pero el afinador es cromático): periodo de 1.555 muestras a 48 kHz.
+    await afinarCon(page, { tipo: 'seno', hz: 30.8677, ganancia: 0.3 }, { instrumento: 'Bajo 4 cuerdas' });
+    await expect.poll(() => notaLeida(page)).toBe('Si0');
+    await expect.poll(() => desvioCents(page, 0)).toBeLessThanOrEqual(2);
+  });
+
+  test('REPARADO · cambiar el La de referencia con el afinador EN MARCHA cambia la lectura', async ({ page }) => {
+    // REPARADO (4199, calculo, alto). 440 Hz, arranca con La4 = 440 y se pulsa «442 Hz
+    // (Orquesta)» → esperado La4 −7,85 cents, «↓ Subir tensión» · obtenido antes La4 +1,
+    // «✓ Afinado», con «442 Hz» marcado. El bucle de requestAnimationFrame se quedaba con el
+    // detectarPitch del arranque, y con él con su La4.
     await afinarCon(page, { tipo: 'seno', hz: 440 });
     await expect.poll(() => desvioCents(page, 0)).toBeLessThanOrEqual(2);
     await page.getByRole('button', { name: /442 Hz/ }).click();
@@ -605,29 +633,27 @@ test.describe('Hallazgos de la detección — INSPECTOR 07/11/2026', () => {
     await expect(pantalla(page).estado).toHaveText('↓ Subir tensión');
   });
 
-  test('ABIERTO · el ruido grave de una sala no inventa notas', async ({ page }) => {
-    // ABIERTO (operativa, medio). Ruido marrón (paso bajo) de 0,05 de pico, sin ningún tono →
-    // esperado «--» todo el rato · obtenido una nota distinta casi en cada lectura (Mi5 −28, Fa#4
-    // +37, La5 +17…, 17 de 20), alguna con «✓ Afinado». El listón de 0,9 de autoCorrelate se mide
-    // sobre la diferencia media absoluta, que escala con la amplitud: una señal floja lo pasa
-    // siempre, sea periódica o no.
-    test.fail();
-    await afinarCon(page, { tipo: 'grave', ganancia: 0.05 });
-    const lecturas: string[] = [];
-    for (let i = 0; i < 15; i++) {
-      lecturas.push(await notaLeida(page));
-      await page.waitForTimeout(100);
-    }
-    expect(new Set(lecturas)).toEqual(new Set(['--']));
-  });
+  for (const ganancia of [0.05, 0.3]) {
+    test(`REPARADO · el ruido grave de una sala (${String(ganancia).replace('.', ',')} de pico) no inventa notas`, async ({ page }) => {
+      // REPARADO (4200, operativa, medio). Ruido marrón (paso bajo) sin ningún tono → esperado
+      // «--» todo el rato · obtenido antes una nota distinta casi en cada lectura (Mi5 −28, Fa#4
+      // +37, La5 +17…, 17 de 20; con 0,3, Re#5 +3 y Fa#5 −4 «✓ Afinado»). El listón de 0,9 de
+      // autoCorrelate se medía sobre la diferencia media absoluta, que escala con la amplitud.
+      await afinarCon(page, { tipo: 'grave', ganancia });
+      const lecturas: string[] = [];
+      for (let i = 0; i < 15; i++) {
+        lecturas.push(await notaLeida(page));
+        await page.waitForTimeout(100);
+      }
+      expect(new Set(lecturas)).toEqual(new Set(['--']));
+    });
+  }
 
-  test('ABIERTO · el umbral de «✓ Afinado» y la FAQPage dicen lo mismo', async ({ page }) => {
-    // ABIERTO (contenido, bajo). La FAQPage dice «por debajo de 5 cents se considera afinado»; la
-    // app da por afinado |cents redondeados| ≤ 5 (page.tsx:191), que llega a 5,49. Tono de
-    // 48.000/109 = 440,367 Hz (periodo entero a 48 kHz: el detector lo clava) con La4 = 439 →
-    // 1200·log2(440,367/439) = +5,38 cents → la app pinta «+5 cents ✓ Afinado». Se repara
-    // cambiando el texto o el umbral: el test pasa con cualquiera de los dos.
-    test.fail();
+  test('REPARADO · el umbral de «✓ Afinado» y la FAQPage dicen lo mismo', async ({ page }) => {
+    // REPARADO (4201, contenido, bajo). La FAQPage decía «por debajo de 5 cents se considera
+    // afinado»; la app da por afinado |cents redondeados| ≤ 5, que llega a 5,49. Tono de
+    // 48.000/109 = 440,367 Hz con La4 = 439 → 1200·log2(440,367/439) = +5,38 cents → la app pinta
+    // «+5 cents ✓ Afinado». Se reparó el texto: «hasta ±5 cents en pantalla», como la FAQ visible.
     await afinarCon(page, { tipo: 'seno', hz: 48000 / 109 }, { bajarReferencia: 1 });
     await expect(page.locator('[class*="referenciaValor"]')).toHaveText('439 Hz');
     await expect(pantalla(page).cents).toHaveText('+5 cents');
@@ -637,13 +663,13 @@ test.describe('Hallazgos de la detección — INSPECTOR 07/11/2026', () => {
     const faq = (await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ');
     const faqDiceDebajoDe5 = /por debajo de 5 cents se considera afinado/.test(faq);
     expect(afinadoEnPantalla && faqDiceDebajoDe5, '+5,38 cents en «Afinado» y la FAQ dice «por debajo de 5»').toBe(false);
+    expect(faq).toContain('hasta ±5 cents en pantalla se considera afinado');
   });
 
-  test('ABIERTO · la tabla educativa da el rango del banjo desde su Re3 (146,8 Hz)', async ({ page }) => {
-    // ABIERTO (contenido, bajo). Banjo 5 cuerdas Sol4-Re3-Sol3-Si3-Re4: la nota más grave es
-    // Re3 = 440·2^((50−69)/12) = 146,83 Hz → esperado «147 – 392 Hz» · obtenido «196 – 392 Hz»
-    // (196 Hz es el Sol3, la 4ª cuerda).
-    test.fail();
+  test('REPARADO · la tabla educativa da el rango del banjo desde su Re3 (146,8 Hz)', async ({ page }) => {
+    // REPARADO (4202, contenido, bajo). Banjo 5 cuerdas Sol4-Re3-Sol3-Si3-Re4: la nota más grave
+    // es Re3 = 440·2^((50−69)/12) = 146,83 Hz → esperado «147 – 392 Hz» · obtenido antes
+    // «196 – 392 Hz» (196 Hz es el Sol3, la 4ª cuerda).
     await page.goto(RUTA);
     // La guía educativa nace plegada (oculta por clase, pero en el DOM): se lee la fila por CSS
     const fila = page.locator('tr', { hasText: 'Banjo 5 cuerdas' });
@@ -651,10 +677,9 @@ test.describe('Hallazgos de la detección — INSPECTOR 07/11/2026', () => {
     await expect(fila).toContainText('147');
   });
 
-  test('ABIERTO · los botones − y + de la referencia dicen qué cambian', async ({ page }) => {
-    // ABIERTO (accesibilidad, bajo). Su nombre accesible es solo «−» y «+» (sin aria-label): un
-    // lector de pantalla oye «menos, botón» sin saber que baja el La de referencia 1 Hz.
-    test.fail();
+  test('REPARADO · los botones − y + de la referencia dicen qué cambian', async ({ page }) => {
+    // REPARADO (4203, accesibilidad, bajo). Su nombre accesible era solo «−» y «+» (sin
+    // aria-label): un lector de pantalla oía «menos, botón» sin saber que baja el La de referencia.
     await page.goto(RUTA);
     const botones = page.locator('[class*="referenciaControl"] button');
     await expect(botones).toHaveCount(2);

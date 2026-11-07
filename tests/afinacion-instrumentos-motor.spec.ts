@@ -31,6 +31,7 @@ import {
   nombreNota,
   aSemitonoAbsoluto,
 } from '../lib/calculadoras/afinacionInstrumentos';
+import { detectarTono, tamanoVentana, FRECUENCIA_MINIMA } from '../lib/calculadoras/deteccionTono';
 
 /** Frecuencia de la cuerda `i` (0 = primera) de un instrumento, con el La4 indicado. */
 function frecuenciaCuerda(id: string, i: number, a4 = 440): number {
@@ -167,6 +168,92 @@ test.describe('Catálogo de afinaciones', () => {
       expect(tiene, a.nombre).toBeGreaterThan(0);
       if (a.familia === 'cuerda') expect(a.cuerdas?.length ?? 0, a.nombre).toBeGreaterThan(0);
       else expect(a.referencias?.length ?? 0, a.nombre).toBeGreaterThan(0);
+    }
+  });
+});
+
+/**
+ * Detección de tono (lib/calculadoras/deteccionTono.ts, /reparar del 07/11/2026). Tonos sintéticos
+ * de frecuencia conocida, con 20 fases de arranque distintas en la ventana; el esperado es la propia
+ * frecuencia del tono y la tolerancia, la que promete la FAQ visible «en condiciones ideales»:
+ * ±1-2 cents. Los casos de origen son los hallazgos 4197 (La5 a −6 cents, −14 con señal floja),
+ * 4198 (Mi1 del bajo fuera de alcance) y 4200 (ruido grave que inventaba notas).
+ */
+test.describe('Detección de tono', () => {
+  type Forma = 'seno' | 'sierra';
+  function tono(forma: Forma, hz: number, amplitud: number, tasa: number, n: number, fase: number): Float32Array {
+    const x = new Float32Array(n);
+    for (let i = 0; i < n; i++) {
+      const t = (i + fase) / tasa;
+      x[i] = forma === 'seno'
+        ? amplitud * Math.sin(2 * Math.PI * hz * t)
+        : amplitud * (2 * ((hz * t) % 1) - 1);
+    }
+    return x;
+  }
+  const cents = (f: number, ref: number) => 1200 * Math.log2(f / ref);
+
+  /** Peor desvío en cents de 20 ventanas; Infinity si alguna no da nota. */
+  function peorDesvio(forma: Forma, hz: number, amplitud: number, tasa: number): number {
+    const n = tamanoVentana(tasa);
+    let peor = 0;
+    for (let k = 0; k < 20; k++) {
+      const r = detectarTono(tono(forma, hz, amplitud, tasa, n, k * 137.3), tasa);
+      if (!r) return Infinity;
+      peor = Math.max(peor, Math.abs(cents(r.frecuencia, hz)));
+    }
+    return peor;
+  }
+
+  test('la ventana guarda dos periodos y pico de la nota más grave', () => {
+    expect(tamanoVentana(48000)).toBe(4096);
+    expect(tamanoVentana(44100)).toBe(4096);
+    expect(tamanoVentana(96000)).toBe(8192);
+    for (const tasa of [44100, 48000, 96000]) {
+      expect(tamanoVentana(tasa)).toBeGreaterThanOrEqual((2 * tasa) / FRECUENCIA_MINIMA);
+    }
+  });
+
+  for (const tasa of [44100, 48000]) {
+    test(`a ${tasa} Hz, del Si0 al Re7, a menos de 2 cents y sin depender del volumen`, () => {
+      // Si0 30,87 · Mi1 41,20 · La1 55 · Mi2 82,41 · Mi4 329,63 · La4 440 · La5 880 · Re7 2.349,32
+      for (const hz of [30.8677, 41.2034, 55, 82.4069, 329.6276, 440, 880, 2349.3181]) {
+        for (const amplitud of [0.05, 0.5]) {
+          expect(peorDesvio('seno', hz, amplitud, tasa), `${hz} Hz con ${amplitud} de pico`).toBeLessThanOrEqual(2);
+        }
+      }
+      // Diente de sierra: armónicos fuertes, sin tomar una octava por otra
+      for (const hz of [41.2034, 110, 880]) {
+        expect(peorDesvio('sierra', hz, 0.5, tasa), `sierra de ${hz} Hz`).toBeLessThanOrEqual(2);
+      }
+    });
+  }
+
+  test('el silencio y el ruido no dan nota', () => {
+    const tasa = 48000;
+    const n = tamanoVentana(tasa);
+    let semilla = 12345;
+    const azar = () => ((semilla = (semilla * 16807) % 2147483647) / 2147483647) * 2 - 1;
+    expect(detectarTono(new Float32Array(n), tasa)).toBeNull();
+    for (const coef of [0, 0.9, 0.98, 0.995]) {
+      // coef 0 = ruido blanco; el resto, ruido marrón (paso bajo de un polo), como el del spec de la app
+      const d = new Float32Array(tasa * 2);
+      let v = 0;
+      for (let i = 0; i < d.length; i++) {
+        v = coef * v + 0.2 * azar();
+        d[i] = v;
+      }
+      let pico = 0;
+      for (const s of d) pico = Math.max(pico, Math.abs(s));
+      for (const amplitud of [0.05, 0.3, 1]) {
+        let notas = 0;
+        for (let k = 0; k < 40; k++) {
+          const ini = (k * 2311) % (d.length - n);
+          const ventana = d.slice(ini, ini + n).map((s) => (s / pico) * amplitud);
+          if (detectarTono(ventana, tasa)) notas++;
+        }
+        expect(notas, `ruido con paso bajo ${coef} y ${amplitud} de pico`).toBe(0);
+      }
     }
   });
 });
