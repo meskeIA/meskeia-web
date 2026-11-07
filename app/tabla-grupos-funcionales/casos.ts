@@ -165,6 +165,12 @@ function nombreEnFrase(g: GrupoFuncional): string {
   return sinParentesis(g.nombre).replace(/^Grupo\s+/, '').toLowerCase();
 }
 
+/** El nombre sin paréntesis ni «Grupo» delante, con su mayúscula: «Grupo nitro» → «Nitro» */
+function nombreSinGrupo(g: GrupoFuncional): string {
+  const n = sinParentesis(g.nombre).replace(/^Grupo\s+/, '');
+  return n.charAt(0).toUpperCase() + n.slice(1);
+}
+
 /** Grafías del nombre de un grupo: con y sin paréntesis, el alias, y el plural si es una palabra */
 function grafiasDeGrupo(g: GrupoFuncional): string[] {
   const limpio = sinParentesis(g.nombre);
@@ -286,11 +292,15 @@ export function resolverCaso(datos: DatosCaso): Resolucion {
       const prefijo = prefijoSimple(g);
       if (!prefijo) return fallo(`El prefijo de ${g.nombre} no es una sola palabra: la pregunta admitiría varias grafías.`);
       const sufijo = sufijoSimple(g);
+      // Un «solo prefijo» no cede nada: se nombra SIEMPRE así (hallazgo 4195)
+      const cuando = g.prioridad === null
+        ? `Este grupo es ${etiquetaPrioridad(g)}: nunca da la terminación, así que se nombra siempre con su prefijo.`
+        : 'Es como se nombra el grupo cuando no da la terminación del nombre y va como sustituyente.';
       return listo(prefijo, [], [
         pasoBuscar(g),
         'Cada fila enseña tres datos a la derecha del nombre: «Grupo», «Sufijo» y «Prefijo».',
-        `Lee la columna «Prefijo»: ${prefijo}. Es como se nombra el grupo cuando otro con más prioridad se queda el sufijo.`,
-      ], sufijo ? [{ grafias: [sufijo], motivo: 'Eso es el SUFIJO, la terminación que se usa cuando este grupo manda. Se pide el prefijo, el que lleva cuando cede.' }] : []);
+        `Lee la columna «Prefijo»: ${prefijo}. ${cuando}`,
+      ], sufijo ? [{ grafias: [sufijo], motivo: 'Eso es el SUFIJO, la terminación que se usa cuando este grupo manda. Se pide el prefijo, el que lleva cuando va como sustituyente.' }] : []);
     }
 
     case 'prioridad': {
@@ -347,6 +357,15 @@ export function resolverCaso(datos: DatosCaso): Resolucion {
         return fallo(`El ejemplo de ${g.nombre} trae dos nombres separados por una raya: la pregunta admitiría los dos.`);
       }
       const sistematico = sinParentesis(g.ejemploNombre);
+      // Si el nombre del ejemplo es el FUNCIONAL («Peróxido de dimetilo», «Sulfóxido de dimetilo»,
+      // «Isocianato de metilo», «Sulfona de dimetilo»…), pedirlo como «sistemático» rechaza el
+      // sustitutivo que la ficha enseña a construir, al revés que en el éter (hallazgo 4196). Es la
+      // misma ambigüedad que la raya del tioéter, sin la raya que la delata: no se pregunta.
+      const nombreFuncional = /nomenclatura funcional/i.test(g.sufijo)
+        || g.comoSeNombra.some((p) => /^nomenclatura funcional/i.test(p) && normalizar(p).includes(normalizar(sistematico)));
+      if (nombreFuncional) {
+        return fallo(`El ejemplo de ${g.nombre} lleva su nombre funcional: la pregunta rechazaría el sustitutivo.`);
+      }
       const alias = parentesis(g.ejemploNombre);
       // El alias puede ser el nombre entero («acetona») o solo la palabra que cambia
       // («Ácido etanoico (acético)» → «ácido acético»).
@@ -384,6 +403,12 @@ export function resolverCaso(datos: DatosCaso): Resolucion {
         return fallo(`Entre ${a.nombre} y ${b.nombre} no decide la escalera de prioridad, sino la elección de la cadena principal.`);
       }
       const [manda, cede] = rango(a) < rango(b) ? [a, b] : [b, a];
+      // El éter tiene número en la escalera (15) pero no tiene sufijo: frente a un hidrocarburo,
+      // la terminación la pone el hidrocarburo (CH₃–O–CH₃ es metoximetano, el ejemplo de su propia
+      // ficha). Comparar solo el número daba «Éter» (hallazgo 4193): esos pares no se preguntan.
+      if (/^—/.test(manda.sufijo.trim())) {
+        return fallo(`${manda.nombre} no tiene sufijo («${manda.sufijo}»): aunque su número sea más bajo, no puede dar la terminación.`);
+      }
       return listo(manda.nombre, grafiasDeGrupo(manda), [
         'Pulsa «Ordenar por: Prioridad IUPAC»: la tabla se ordena del grupo que manda sobre todos al que nunca da el sufijo.',
         `Localiza las dos filas: ${a.nombre} lleva ${etiquetaPrioridad(a)} y ${b.nombre} lleva ${etiquetaPrioridad(b)}.`,
@@ -671,7 +696,9 @@ function enunciadoPractica(datos: DatosCaso): string {
     case 'sufijo':
       return `¿Qué sufijo recibe un compuesto cuyo grupo principal es «${g ? sinParentesis(g.nombre) : ''}»? Búscalo en la tabla y escribe la terminación.`;
     case 'prefijo':
-      return `Cuando el grupo «${g ? sinParentesis(g.nombre) : ''}» cede el sufijo a otro con más prioridad, ¿con qué prefijo se nombra?`;
+      // Sin dar por hecho que el grupo cede el sufijo: el ácido carboxílico es «Prioridad 1» y los
+      // «Solo prefijo» no lo tienen nunca. Y sin «el grupo «Grupo nitro»» (hallazgo 4195).
+      return `¿Con qué prefijo se nombra el grupo «${g ? nombreSinGrupo(g) : ''}» cuando no da la terminación del nombre y va como sustituyente?`;
     case 'prioridad':
       return `¿Qué número de prioridad le da esta tabla al grupo «${g ? sinParentesis(g.nombre) : ''}»? (El 1 es el que manda sobre todos.)`;
     case 'grupo-desde-sufijo':

@@ -597,10 +597,17 @@ async function practicaEnSemilla(page: Page, semilla: number): Promise<void> {
   await expect(seccion.getByText(`semilla ${semilla}`, { exact: true })).toBeVisible();
 }
 
-/** El grupo de la tabla que una pregunta de práctica nombra entre comillas «…» */
+/**
+ * El grupo de la tabla que una pregunta de práctica nombra entre comillas «…». Desde el 07/11/2026
+ * la pregunta de prefijo escribe «Nitro» en vez de «Grupo nitro» (hallazgo 4195): se casan las dos.
+ */
 function gruposNombrados(enunciado: string) {
+  const sinGrupo = (n: string) => n.replace(/^Grupo\s+/i, '').toLowerCase();
   return [...enunciado.matchAll(/«([^»]+)»/g)].map((m) =>
-    GRUPOS.find((g) => g.nombre.replace(/\s*\([^)]*\)\s*/g, ' ').trim() === m[1]),
+    GRUPOS.find((g) => {
+      const limpio = g.nombre.replace(/\s*\([^)]*\)\s*/g, ' ').trim();
+      return limpio === m[1] || sinGrupo(limpio) === sinGrupo(m[1]);
+    }),
   );
 }
 
@@ -651,7 +658,9 @@ test.describe('Inspector 07/11/2026 · la práctica al azar (modo cambio)', () =
     expect(ids.indexOf('nitro') - ids.indexOf('nitrilo')).toBe(1);
   });
 
-  test('HALLAZGO (07/11/2026, ABIERTO) · la práctica da el ÉTER como el que pone la terminación frente a un hidrocarburo', async () => {
+  test('HALLAZGO 4193 (07/11/2026, REPARADO) · la práctica daba el ÉTER como el que pone la terminación frente a un hidrocarburo', async () => {
+    // REPARADO en /reparar el 07/11/2026: resolverCaso no resuelve un par cuyo «manda» no tiene
+    // sufijo, así que esos cuatro pares ya no se preguntan.
     // `resolverCaso('manda-de-dos')` compara solo el número de prioridad: éter 15 frente a
     // alqueno/alquino 16 y alcano/areno 17 → «Éter». Pero el éter no tiene sufijo (su propia
     // fila: «— (nunca es sufijo…)»): CH₃–O–CH₃ es metoximetano, CH₂=CH–O–CH₃ metoxieteno y
@@ -661,7 +670,6 @@ test.describe('Inspector 07/11/2026 · la práctica al azar (modo cambio)', () =
     // que CEDE el sufijo […] en el nombre va como prefijo»; «Dónde mirar» → «Éter da el sufijo y
     // Alcano pasa a prefijo». Lo mismo con las semillas 298 (areno), 1394 (alquino) y 1804
     // (alqueno): 327 de las 99.999 semillas de «Otra pregunta».
-    test.fail();
     const malas: string[] = [];
     for (const h of ['alcano', 'alqueno', 'alquino', 'areno']) {
       const r = resolverCaso({ campo: 'manda-de-dos', grupos: ['eter', h] });
@@ -676,17 +684,20 @@ test.describe('Inspector 07/11/2026 · la práctica al azar (modo cambio)', () =
       if (conEter && conHidrocarburo && p.respuesta === 'Éter') malas.push(`semilla ${s}`);
     }
     expect(malas, 'el éter nunca da la terminación: la da el hidrocarburo').toEqual([]);
+    // Y los pares del éter con un grupo que SÍ tiene sufijo siguen preguntándose bien
+    const conAlcohol = resolverCaso({ campo: 'manda-de-dos', grupos: ['eter', 'alcohol'] });
+    expect(conAlcohol.ok && conAlcohol.valor).toBe('Alcohol');
   });
 
-  test('HALLAZGO (07/11/2026, ABIERTO) · «si la dictas en voz alta, toda la clase trabaja sobre la misma», y no hay dónde escribir la semilla', async ({
+  test('HALLAZGO 4194 (07/11/2026, REPARADO) · «si la dictas en voz alta, toda la clase trabaja sobre la misma», y no había dónde escribir la semilla', async ({
     page,
   }) => {
+    // REPARADO en /reparar el 07/11/2026: campo «Semilla dictada» con «Cargar semilla».
     // La nota del panel de práctica promete que dictar la semilla pone a toda la clase en la
     // misma pregunta, pero el panel solo tiene la casilla de la respuesta y «Otra pregunta»
     // sortea con Math.random; ni la URL la acepta (?semilla=298 sigue en «semilla 1»).
     // Esperado: o un control para escribir la semilla, o una URL que la fije, o la nota deja
-    // de prometerlo. Hoy: ninguna de las tres.
-    test.fail();
+    // de prometerlo. Antes: ninguna de las tres.
     const seccion = page.locator('#casos-aula');
     await seccion.getByRole('tab', { name: 'Práctica al azar' }).click();
     const panel = page.locator('#aula-panel-practica');
@@ -702,9 +713,33 @@ test.describe('Inspector 07/11/2026 · la práctica al azar (modo cambio)', () =
       !promete || casillaSemilla > 0 || porUrl > 0,
       'la semilla dictada no se puede introducir en ningún sitio',
     ).toBe(true);
+
+    // Y la casilla funciona: la semilla 298 dictada pinta la pregunta de la 298, y «12.345» (como
+    // la escribe la pantalla, con su punto de miles) es la 12345
+    const panelUrl = page.locator('#aula-panel-practica');
+    const campo = panelUrl.getByLabel('Semilla dictada');
+    await campo.fill('298');
+    await esperarValorEnReact(page, '#aula-semilla', '298');
+    await panelUrl.getByRole('button', { name: 'Cargar semilla' }).click();
+    await expect(page.locator('#casos-aula').getByText('semilla 298', { exact: true })).toBeVisible();
+    await expect(panelUrl).toContainText(generarPreguntaAleatoria(298).enunciado);
+
+    await campo.fill('12.345');
+    await esperarValorEnReact(page, '#aula-semilla', '12.345');
+    await campo.press('Enter');
+    await expect(page.locator('#casos-aula').getByText('semilla 12.345', { exact: true })).toBeVisible();
+    await expect(panelUrl).toContainText(generarPreguntaAleatoria(12345).enunciado);
+
+    await campo.fill('abc');
+    await esperarValorEnReact(page, '#aula-semilla', 'abc');
+    await panelUrl.getByRole('button', { name: 'Cargar semilla' }).click();
+    await expect(panelUrl.locator('#aula-semilla-error')).toContainText('un número entero del 1 al 99.999');
+    await expect(page.locator('#casos-aula').getByText('semilla 12.345', { exact: true })).toBeVisible();
   });
 
-  test('HALLAZGO (07/11/2026, ABIERTO) · «cuando el grupo X cede el sufijo a otro con más prioridad» con X = ácido carboxílico o un «solo prefijo»', async () => {
+  test('HALLAZGO 4195 (07/11/2026, REPARADO) · «cuando el grupo X cede el sufijo a otro con más prioridad» con X = ácido carboxílico o un «solo prefijo»', async () => {
+    // REPARADO en /reparar el 07/11/2026: la plantilla ya no da por hecho que el grupo cede el
+    // sufijo («cuando no da la terminación del nombre y va como sustituyente») ni escribe «Grupo».
     // La plantilla de la pregunta de prefijo da por hecho que el grupo podría llevar el sufijo y
     // lo cede. Es falso para el ácido carboxílico («Prioridad 1»: según la tabla no hay otro con
     // más prioridad) y para los seis «Solo prefijo» que la práctica pregunta (epóxido, azo,
@@ -713,22 +748,28 @@ test.describe('Inspector 07/11/2026 · la práctica al azar (modo cambio)', () =
     // Hoy: semilla 54 → «Cuando el grupo «Ácido carboxílico» cede el sufijo a otro con más
     // prioridad, ¿con qué prefijo se nombra?»; semilla 118 → «Cuando el grupo «Grupo nitro» cede
     // el sufijo a otro con más prioridad…». La respuesta (carboxi-, nitro-) sí es la correcta.
-    test.fail();
     const malas: string[] = [];
+    let preguntasDePrefijo = 0;
     for (let s = 1; s <= 2000; s += 1) {
       const p = generarPreguntaAleatoria(s);
       if (p.campo !== 'prefijo') continue;
+      preguntasDePrefijo += 1;
       const [g] = gruposNombrados(p.enunciado);
+      // La prueba solo vale si reconoce el grupo de cada pregunta
+      if (g === undefined) malas.push(`semilla ${s}: no se reconoce el grupo de «${p.enunciado}»`);
       const premisaImposible =
         g !== undefined &&
         (g.prioridad === null || g.prioridad === 1) &&
         /cede el sufijo a otro con más prioridad/.test(p.enunciado);
       if (premisaImposible || /grupo «Grupo /.test(p.enunciado)) malas.push(`semilla ${s}: ${p.enunciado}`);
     }
+    expect(preguntasDePrefijo).toBeGreaterThan(50);
     expect(malas).toEqual([]);
   });
 
-  test('HALLAZGO (07/11/2026, ABIERTO) · el ejemplo del peróxido exige el nombre FUNCIONAL como «sistemático», al revés que el éter', async () => {
+  test('HALLAZGO 4196 (07/11/2026, REPARADO) · el ejemplo del peróxido exigía el nombre FUNCIONAL como «sistemático», al revés que el éter', async () => {
+    // REPARADO en /reparar el 07/11/2026: la pregunta no se hace cuando el nombre del ejemplo es
+    // el funcional (peróxido, sulfóxido, sulfona, isocianato, organometálico); el éter sigue.
     // En el éter, el funcional «éter dimetílico» se rechaza como «nombre tradicional» y se pide
     // el sustitutivo «metoximetano». En el peróxido la práctica exige el funcional «Peróxido de
     // dimetilo» como «Nombre sistemático (IUPAC)» («La ficha solo da el nombre sistemático»),
@@ -737,7 +778,11 @@ test.describe('Inspector 07/11/2026 · la práctica al azar (modo cambio)', () =
     // es (metilperoxi)metano. Hoy, semilla 52: «(metilperoxi)metano» → «No es lo que dice la
     // tabla». Esperado: o se acepta, o la pregunta no se hace (como el tioéter, que trae dos
     // nombres y `resolverCaso` lo excluye). Mismo patrón en sulfóxido, sulfona e isocianato.
-    test.fail();
+    for (const id of ['sulfoxido', 'sulfona', 'isocianato']) {
+      expect(resolverCaso({ campo: 'nombre-ejemplo', grupo: id }).ok, id).toBe(false);
+    }
+    const eter = resolverCaso({ campo: 'nombre-ejemplo', grupo: 'eter' });
+    expect(eter.ok && eter.valor).toBe('Metoximetano');
     const r = resolverCaso({ campo: 'nombre-ejemplo', grupo: 'peroxido' });
     const pregunta: Pregunta = {
       semilla: 0,

@@ -1230,6 +1230,27 @@
   border-top: 1px solid var(--border);
 }
 
+/* Semilla dictada (hallazgo 4194) */
+.aulaSemillaFila {
+  display: flex;
+  gap: 0.6rem;
+  align-items: stretch;
+}
+
+.aulaSemillaFila .aulaInput {
+  max-width: 12rem;
+}
+
+.aulaSemillaError {
+  margin: 0;
+  font-size: 0.86rem;
+  color: var(--text-primary);
+}
+
+.aulaSemillaError:empty {
+  display: none;
+}
+
 .aulaNota {
   margin-top: 1rem;
   font-size: 0.86rem;

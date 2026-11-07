@@ -29,7 +29,7 @@ import {
   comprobarRespuesta,
   generarPreguntaAleatoria,
 } from './casos';
-import { formatNumber } from '@/lib';
+import { formatNumber, parseSpanishNumber } from '@/lib';
 
 /* ────────────────────────────────────────────────────────────────
    Diagramas esquemáticos (SVG inline, sin librerías externas:
@@ -330,11 +330,27 @@ export default function TablaGruposFuncionalesPage() {
   const comprobarPractica = () =>
     setVeredictoPractica(comprobarRespuesta(respuestaPractica, preguntaPractica));
 
-  const otraPregunta = () => {
-    setSemillaPractica(Math.floor(Math.random() * 99999) + 1);
+  const irASemilla = (semilla: number) => {
+    setSemillaPractica(semilla);
     setRespuestaPractica('');
     setVeredictoPractica(null);
     setPasosPracticaAbiertos(false);
+  };
+
+  const otraPregunta = () => irASemilla(Math.floor(Math.random() * 99999) + 1);
+
+  // La nota promete que dictar la semilla pone a toda la clase en la misma pregunta: hace falta
+  // dónde escribirla (hallazgo 4194). Se lee como la pinta la pantalla, «12.345» incluido.
+  const [semillaEscrita, setSemillaEscrita] = useState('');
+  const [errorSemilla, setErrorSemilla] = useState('');
+  const cargarSemilla = () => {
+    const n = parseSpanishNumber(semillaEscrita);
+    if (!Number.isInteger(n) || n < 1 || n > 99999) {
+      setErrorSemilla('Escribe la semilla que te han dictado: un número entero del 1 al 99.999.');
+      return;
+    }
+    setErrorSemilla('');
+    irASemilla(n);
   };
 
   return (
@@ -797,9 +813,37 @@ export default function TablaGruposFuncionalesPage() {
               )}
             </div>
 
+            <div className={styles.aulaCampo}>
+              <label htmlFor="aula-semilla" className={styles.aulaLabel}>
+                Semilla dictada
+              </label>
+              <div className={styles.aulaSemillaFila}>
+                <input
+                  id="aula-semilla"
+                  type="text"
+                  inputMode="numeric"
+                  autoComplete="off"
+                  className={styles.aulaInput}
+                  value={semillaEscrita}
+                  placeholder="Ej.: 298"
+                  aria-describedby="aula-semilla-error"
+                  onChange={(e) => setSemillaEscrita(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') cargarSemilla();
+                  }}
+                />
+                <button type="button" className={styles.btnAulaSecundario} onClick={cargarSemilla}>
+                  Cargar semilla
+                </button>
+              </div>
+              {/* Siempre montado: vacío no ocupa ni se anuncia */}
+              <p id="aula-semilla-error" className={styles.aulaSemillaError} role="status">{errorSemilla}</p>
+            </div>
+
             <p className={styles.aulaNota}>
               Cada semilla da siempre la misma pregunta: si la dictas en voz alta, toda la clase
-              trabaja sobre la misma. Los datos salen de esta tabla, no de una lista aparte.
+              la escribe en «Semilla dictada» y trabaja sobre la misma. Los datos salen de esta
+              tabla, no de una lista aparte.
             </p>
           </div>
         )}
