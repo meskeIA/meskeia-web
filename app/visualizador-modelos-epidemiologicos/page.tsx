@@ -58,7 +58,9 @@ const ENFERMEDADES: EnfermedadPreset[] = [
     emoji: '🤧',
     beta: 0.26,
     gamma: 0.2,
-    sigma: 0.33,
+    // Incubación media de 2 días (OMS, ficha «Influenza (seasonal)»; ECDC, «Factsheet about
+    // seasonal influenza»): σ = 1/2. Fue 0,33 (3 días) hasta el 07/11/2026 (hallazgo 4187)
+    sigma: 0.5,
     r0: 1.3,
     mortalidad: '0,1 %',
     periodoInfeccioso: '4-5 días',
@@ -72,7 +74,10 @@ const ENFERMEDADES: EnfermedadPreset[] = [
     gamma: 0.1,
     sigma: 0.2,
     r0: 3.0,
-    mortalidad: '1-3 %',
+    // Letalidad por INFECCIÓN (IFR) de la OMS, resumen científico del 04/08/2020: «estimates of
+    // IFR converging at approximately 0.5 - 1%». La letalidad sobre casos varió del 0,1 % a más
+    // del 25 % según el país, así que no da un rango. Antes «1-3 %», sin medida (hallazgo 4185)
+    mortalidad: '0,5-1 % (IFR)',
     periodoInfeccioso: '8-14 días',
     umbralVacunacion: '67 %',
     descripcion: 'R₀ moderado-alto, periodo de incubación 5 días',
@@ -96,10 +101,13 @@ const ENFERMEDADES: EnfermedadPreset[] = [
     gamma: 0.15,
     sigma: 0.17,
     r0: 2.0,
-    mortalidad: '50-90 %',
+    // OMS, «Ebola outbreak 2014-2016 - West Africa»: «More than 28 600 people had been infected
+    // and 11 325 people had died» → 39,6 % como máximo. Antes «50-90 %», que no contiene ni esa
+    // cifra ni el 25-90 % general de la OMS (hallazgo 4184)
+    mortalidad: '40 %',
     periodoInfeccioso: '6-12 días',
     umbralVacunacion: '50 %',
-    descripcion: 'R₀ moderado pero mortalidad altísima',
+    descripcion: 'R₀ moderado pero letalidad altísima: media del 50 % según la OMS, del 25 al 90 % según el brote',
   },
   {
     nombre: 'Viruela (erradicada)',
@@ -559,7 +567,7 @@ const SeccionSEIR = ({
         <p>
           Las personas pasan de S → E al exponerse al virus, y de E → I tras el periodo de incubación
           (1/σ días). A mayor σ, más corto el periodo de incubación y más se parece al SIR.
-          COVID-19: σ ≈ 0,2 (≈ 5 días de incubación). Gripe: σ ≈ 0,33 (≈ 3 días).
+          COVID-19: σ ≈ 0,2 (≈ 5 días de incubación). Gripe: σ ≈ 0,5 (≈ 2 días).
         </p>
       </div>
 
@@ -570,7 +578,7 @@ const SeccionSEIR = ({
         <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem', justifyContent: 'flex-end' }}>
           <span className={styles.sliderDesc} style={{ fontStyle: 'italic' }}>
             COVID-19: β = 0,3, γ = 0,1, σ = 0,2 → R₀ ≈ 3<br />
-            Gripe: β = 0,26, γ = 0,2, σ = 0,33 → R₀ ≈ 1,3
+            Gripe: β = 0,26, γ = 0,2, σ = 0,5 → R₀ ≈ 1,3
           </span>
         </div>
       </div>
@@ -836,7 +844,7 @@ const SeccionComparativa = ({ onSeleccionar }: { onSeleccionar: (e: EnfermedadPr
             <tr>
               <th>Enfermedad</th>
               <th>R₀</th>
-              <th>Mortalidad</th>
+              <th>Letalidad</th>
               <th>Período infeccioso</th>
               <th>Vacunación para erradicación</th>
               <th>Descripción</th>
@@ -869,6 +877,14 @@ const SeccionComparativa = ({ onSeleccionar }: { onSeleccionar: (e: EnfermedadPr
           </tbody>
         </table>
       </div>
+      <p className={styles.seccionDesc}>
+        <strong>Letalidad</strong>: proporción de los casos que mueren por la enfermedad, lo que la OMS
+        llama «tasa de letalidad»; la mortalidad, en cambio, se mide sobre toda la población. En el
+        Ébola, la del brote de 2014-2016 en África occidental (11.325 muertes en más de 28.600 casos,
+        según la OMS). En la COVID-19 se da la letalidad por infección (IFR) que estimó la OMS en
+        agosto de 2020, porque la letalidad sobre los casos confirmados varió entre países del 0,1 %
+        a más del 25 %.
+      </p>
     </div>
   );
 };

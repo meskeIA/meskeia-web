@@ -274,7 +274,8 @@ test.describe('Modelo SEIR', () => {
   test('REPARADO (4039) · la gripe lleva el mismo σ en los dos textos de la pestaña', async ({ page }) => {
     // REPARADO el 04/11/2026: el recuadro «Compartimento E» decía «Gripe: σ ≈ 0.5 (≈ 2 días)» y
     // la nota de los deslizadores «Gripe: β=0.26, γ=0.2, σ=0.33» (el preset de la tabla). Ahora
-    // los dos dicen 0,33 (≈ 3 días), el valor del preset que se simula.
+    // los dos dicen 0,33 (≈ 3 días), el valor del preset que se simula. Desde el 07/11/2026 los
+    // dos dicen 0,5 (≈ 2 días), el de la OMS y el ECDC (hallazgo 4187, más abajo).
     const texto = (await page.locator('main').textContent()) ?? '';
     const sigmas = [...texto.matchAll(/Gripe:[^\n]*?σ\s*[=≈]\s*(\d+[.,]\d+)/g)].map((m) => aNumero(m[1]));
     expect(sigmas.length).toBeGreaterThanOrEqual(2);
@@ -487,49 +488,49 @@ test.describe('Cabo C0632 — letalidades y σ de la gripe contra la OMS y el EC
     expect(alto).toBeLessThanOrEqual(0.3);
   });
 
-  test('HALLAZGO (07/11/2026, ABIERTO) · Ébola «brote 2014»: la letalidad de ese brote no llega al 50 %', async ({ page }) => {
+  test('HALLAZGO 4184 (07/11/2026, REPARADO) · Ébola «brote 2014»: la letalidad de ese brote no llega al 50 %', async ({ page }) => {
     // OMS, «Ebola outbreak 2014-2016 - West Africa» (https://www.who.int/emergencies/situations/
     // ebola-outbreak-2014-2016-West-Africa): «More than 28 600 people had been infected and
     // 11 325 people had died» → 11.325 / 28.600 = 39,6 % como máximo. Y la ficha de la OMS
     // (https://www.who.int/news-room/fact-sheets/detail/ebola-disease, 24/04/2025): «The average
     // Ebola disease case fatality rate is around 50%. Case fatality rates have varied from 25–90%
-    // in past outbreaks.» Hoy la fila «Ébola (brote 2014)» dice «50-90 %»: ni el brote de 2014
-    // (≈ 40 %) ni el rango general (25-90 %) caben en él. Esperado: un valor o rango que contenga
-    // el ≈ 40 % del brote que nombra la fila.
-    test.fail();
+    // in past outbreaks.» La fila «Ébola (brote 2014)» decía «50-90 %»: ni el brote de 2014
+    // (≈ 40 %) ni el rango general (25-90 %) cabían en él. Ahora «40 %», con la media y el rango
+    // general en la descripción.
     await irAPestana(page, /Enfermedades/);
     const [bajo, alto] = rangoPorcentaje(await celdaEnfermedad(page, 'Ébola', 2));
     expect(bajo).toBeLessThanOrEqual(40);
     expect(alto).toBeGreaterThanOrEqual(39);
   });
 
-  test('HALLAZGO (07/11/2026, ABIERTO) · COVID-19 «1-3 %» no es la IFR de la OMS ni un rango de CFR que sostenga', async ({ page }) => {
+  test('HALLAZGO 4185 (07/11/2026, REPARADO) · COVID-19 «1-3 %» no era la IFR de la OMS ni un rango de CFR que sostenga', async ({ page }) => {
     // OMS, «Estimating mortality from COVID-19», resumen científico del 04/08/2020
     // (https://www.who.int/news-room/commentaries/detail/estimating-mortality-from-covid-19):
     // IFR «converging at approximately 0.5 - 1%» y CFR «from less than 0.1% to over 25%» según el
-    // país. La IFR es la única cifra acotada: esperado un rango dentro del 0,5-1 % (o la medida
-    // dicha con su fuente). Hoy: «1-3 %», sin decir si es CFR o IFR.
-    test.fail();
+    // país. La IFR es la única cifra acotada. Decía «1-3 %», sin decir si era CFR o IFR; ahora
+    // «0,5-1 % (IFR)», con la medida explicada bajo la tabla.
     await irAPestana(page, /Enfermedades/);
-    const [bajo, alto] = rangoPorcentaje(await celdaEnfermedad(page, 'COVID-19', 2));
+    const celda = await celdaEnfermedad(page, 'COVID-19', 2);
+    const [bajo, alto] = rangoPorcentaje(celda);
     expect(bajo).toBeGreaterThanOrEqual(0.5);
     expect(alto).toBeLessThanOrEqual(1);
+    expect(celda).toContain('IFR');
   });
 
-  test('HALLAZGO (07/11/2026, ABIERTO) · la columna dice «Mortalidad» y sus cifras son letalidades', async ({ page }) => {
+  test('HALLAZGO 4186 (07/11/2026, REPARADO) · la columna decía «Mortalidad» y sus cifras son letalidades', async ({ page }) => {
     // OMS en español, ficha del Ébola (https://www.who.int/es/news-room/fact-sheets/detail/
     // ebola-disease, 24/04/2025): «La tasa media de letalidad ronda el 50 %. En brotes
     // anteriores, esta tasa ha oscilado entre el 25 % y el 90 %.» Es la proporción de casos que
     // mueren (la CFR del resumen de la OMS de 04/08/2020: «the proportion of individuals
     // diagnosed with a disease who die from that disease»). La mortalidad se mide sobre la
-    // población, no sobre los casos. Hoy la cabecera es «Mortalidad» y la página no dice
+    // población, no sobre los casos. La cabecera era «Mortalidad» y la página no decía
     // «letalidad» en ningún sitio.
-    test.fail();
     await irAPestana(page, /Enfermedades/);
     await expect(page.locator('main table thead th').nth(2)).toHaveText(/Letalidad/);
+    await expect(page.locator('main').getByText('tasa de letalidad')).toBeVisible();
   });
 
-  test('HALLAZGO (07/11/2026, ABIERTO) · la gripe incuba 2 días de media, no 3 (σ ≈ 0,5, no 0,33)', async ({ page }) => {
+  test('HALLAZGO 4187 (07/11/2026, REPARADO) · la gripe incuba 2 días de media, no 3 (σ ≈ 0,5, no 0,33)', async ({ page }) => {
     // OMS, «Influenza (seasonal)» (https://www.who.int/news-room/fact-sheets/detail/
     // influenza-(seasonal), 28/02/2025): «the incubation period, is about 2 days, but ranges from
     // 1–4 days». ECDC, «Factsheet about seasonal influenza» (https://www.ecdc.europa.eu/en/
@@ -537,9 +538,8 @@ test.describe('Cabo C0632 — letalidades y σ de la gripe contra la OMS y el EC
     // seasonal influenza is two days, but ranges from one to four days», y contagia «between one
     // day before symptom onset and five-to-seven days after onset» (el E del SEIR, que la página
     // define como «todavía no son contagiosas», dura menos aún). Con 1/σ = 2 días, σ = 0,5 (el
-    // máximo del deslizador). Hoy: «Gripe: σ ≈ 0,33 (≈ 3 días)», y «Simular» gripe carga 0,33.
+    // máximo del deslizador). Decía «Gripe: σ ≈ 0,33 (≈ 3 días)», y «Simular» gripe cargaba 0,33.
     // Hasta la reparación de 4039 (04/11/2026) el recuadro decía «σ ≈ 0.5 (≈ 2 días)».
-    test.fail();
     await irAPestana(page, /Modelo SEIR/);
     await esperarHidratacion(page, [DESLIZADORES]);
     const texto = (await page.locator('main').textContent()) ?? '';
