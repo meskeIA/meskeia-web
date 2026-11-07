@@ -1,7 +1,7 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import styles from './ContadorSilabas.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
@@ -39,6 +39,11 @@ export default function ContadorSilabasPage() {
     bloques: number[][];
     rima: AnalisisRima | null;
   } | null>(null);
+  // Cuántos análisis van: es la key del resultado, para que cada análisis pinte nodos NUEVOS.
+  // Con la página traducida por el navegador, el traductor cambia cada nodo de texto por un
+  // <font>, y un texto con variable junto a otro texto («arte {v.arte}», «{n} fonéticas») que
+  // React reutiliza se quedaba con el verso anterior (cabo C0243).
+  const [analisisN, setAnalisisN] = useState(0);
 
   // Modo composición: mide en vivo mientras se escribe, contra un metro elegido
   const [metroObjetivo, setMetroObjetivo] = useState<number | null>(null);
@@ -62,6 +67,7 @@ export default function ContadorSilabasPage() {
       // La rima solo tiene sentido a partir de dos versos
       rima: versos.length >= 2 ? analizarRimas(versos, bloques) : null,
     });
+    setAnalisisN((n) => n + 1);
   };
 
   const limpiar = () => {
@@ -285,8 +291,9 @@ sabañón garrafal, morado y frito.`,
               <div className={styles.medidorVivo} role="status" aria-live="polite">
                 {versosEnVivo.length === 0 ? (
                   <p className={styles.medidorPista}>
-                    Escribe un verso por línea: te iré diciendo cuántas sílabas te faltan o te
-                    sobran para el {nombreDelVerso(metroObjetivo)}.
+                    {/* Una sola cadena, hijo único del <p>: con la página traducida, un nodo de
+                        texto con hermanos se quedaba con el metro anterior (cabo C0243). */}
+                    {`Escribe un verso por línea: te iré diciendo cuántas sílabas te faltan o te sobran para el ${nombreDelVerso(metroObjetivo)}.`}
                   </p>
                 ) : (
                   versosEnVivo.map((v, i) => {
@@ -304,7 +311,7 @@ sabañón garrafal, morado y frito.`,
                           />
                         </span>
                         <span className={styles.medidorCuenta}>
-                          {v.silabasMetricas}/{metroObjetivo}
+                          {`${v.silabasMetricas}/${metroObjetivo}`}
                         </span>
                         <span className={styles.medidorMensaje}>
                           {diferencia === 0
@@ -344,7 +351,7 @@ sabañón garrafal, morado y frito.`,
               </p>
             </div>
           ) : resultado ? (
-            <>
+            <Fragment key={analisisN}>
               {/* Resumen */}
               <div className={styles.resumen}>
                 <div className={styles.resumenItem}>
@@ -599,7 +606,7 @@ sabañón garrafal, morado y frito.`,
                   ))}
                 </div>
               </div>
-            </>
+            </Fragment>
           ) : (
             <div className={styles.placeholder}>
               <span className={styles.placeholderIcon} aria-hidden="true">📝</span>

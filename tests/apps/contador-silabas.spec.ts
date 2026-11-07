@@ -2609,6 +2609,52 @@ test.describe('contador-silabas · Inspector 01/11/2026 (octava inspección)', (
     expect(errores).toEqual([]);
   });
 
+  test('C0243 · con la página traducida, el segundo análisis y el medidor no se quedan con el texto anterior', async ({
+    page,
+  }) => {
+    // Un texto con variable junto a otro texto en el mismo elemento («arte {v.arte}»,
+    // «{n} fonéticas», «{a}/{b}») es un nodo con hermanos: el traductor lo cambia por un <font>,
+    // React escribe en el nodo que ya no está y en pantalla sigue el anterior. Medido el
+    // 01/11/2026 en el medidor (8/8 que no cambiaba mientras «faltan 1» sí). Reparado el
+    // 07/11/2026: el resultado lleva key por análisis y el medidor, cada texto como hijo único.
+    // Detector: el panel traducido tiene que decir lo mismo que el mismo análisis sin traducir.
+    const panel = page.locator('[class*="resultsPanel"]');
+    const SEGUNDO = 'La princesa está triste, ¿qué tendrá la princesa?';
+
+    await analizarTexto(page, 'Volverán las oscuras golondrinas');
+    await traducirPagina(page);
+    await analizarTexto(page, SEGUNDO);
+    await expect(page.locator('[class*="versoCard"]')).toHaveCount(1);
+    const traducido = (await panel.innerText()).replace(/\s+/g, ' ');
+
+    await page.reload();
+    await esperarHidratacionReact(page, ['textarea']);
+    await analizarTexto(page, SEGUNDO);
+    const referencia = (await panel.innerText()).replace(/\s+/g, ' ');
+    expect(referencia).toContain('arte mayor');
+    expect(traducido).toBe(referencia);
+
+    // El medidor del modo composición: misma fila (índice 0), otro verso
+    await page.getByRole('button', { name: 'Limpiar' }).click();
+    await page.getByRole('button', { name: 'octosílabo', exact: true }).click();
+    const pista = page.locator('[class*="medidorPista"]');
+    await expect(pista).toContainText('octosílabo');
+    await traducirPagina(page);
+    await page.getByRole('button', { name: 'heptasílabo', exact: true }).click();
+    await expect(pista).toContainText('heptasílabo');
+    await expect(pista).not.toContainText('octosílabo');
+
+    await page.getByRole('button', { name: 'octosílabo', exact: true }).click();
+    await page.fill('textarea', 'Ya no quiero estar aquí');
+    const fila = page.locator('[class*="medidorFila"]').first();
+    await expect(fila).toContainText('8/8');
+    await traducirPagina(page);
+    await page.fill('textarea', 'Qué descansada vida');
+    await expect(fila).toContainText('faltan 1');
+    await expect(fila).toContainText('7/8');
+    await expect(fila).not.toContainText('8/8');
+  });
+
   test.describe('en un móvil de 360 px', () => {
     test.use({
       viewport: { width: 360, height: 760 },
