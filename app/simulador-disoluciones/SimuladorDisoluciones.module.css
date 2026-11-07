@@ -271,6 +271,29 @@
   color: var(--primary-texto);
 }
 
+/* Aviso de disolución saturada (hallazgo 4204): vacío no ocupa */
+.avisoSaturacion {
+  margin: 0 0 var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.45);
+  border-left-width: 4px;
+  border-radius: var(--radius);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.avisoSaturacion:empty {
+  display: none;
+}
+
+[data-theme='dark'] .avisoSaturacion {
+  background: rgba(245, 158, 11, 0.1);
+  border-color: rgba(245, 158, 11, 0.4);
+  color: var(--text-primary);
+}
+
 /* Dilución */
 .dilucionFila {
   display: flex;

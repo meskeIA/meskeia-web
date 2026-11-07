@@ -45,6 +45,22 @@ export const SOLUTO_PERSONALIZADO: Soluto = {
   incoloro: false,
 };
 
+/**
+ * Concentración másica orientativa (g/L) por encima de la cual el soluto ya no se disuelve:
+ * solubilidad en agua a temperatura ambiente, redondeada a la baja. La usan el modo práctica,
+ * para no pedir una disolución que no se puede hacer, y el panel «Preparar», para avisar de que
+ * la masa elegida no se disuelve entera (hallazgo 4204: 100 g de KMnO₄ en 50 mL salían como
+ * «12,656 mol/L» sin ningún aviso). El soluto personalizado no tiene cifra: no se avisa.
+ */
+export const SOLUBILIDAD_ORIENTATIVA_G_L: Readonly<Record<string, number>> = {
+  kmno4: 60,
+  cuso4: 200,
+  k2cr2o7: 120,
+  nicl2: 600,
+  nacl: 350,
+  glucosa: 900,
+};
+
 /** El soluto de la lista con ese id, o undefined. */
 export function solutoPorId(id: string): Soluto | undefined {
   return SOLUTOS.find((s) => s.id === id);

@@ -64,6 +64,7 @@ import {
   masaParaPorcentaje,
   molaridadDesdeGPorLitro,
   solutoPorId,
+  SOLUBILIDAD_ORIENTATIVA_G_L,
 } from './motor';
 
 /* ─────────────────────────── Qué se pregunta ─────────────────────────── */
@@ -994,17 +995,10 @@ function entero(desde: number, hasta: number, rnd: () => number): number {
 
 /**
  * Concentración másica orientativa por encima de la cual el modo práctica no propone una
- * disolución (solubilidad en agua a temperatura ambiente, redondeada a la baja). La app no
- * limita la masa disuelta; el ejercicio, sí, para no pedir una disolución que no se puede hacer.
+ * disolución. Vive en el motor desde el 07/11/2026: el panel «Preparar» avisa con la misma
+ * cifra (hallazgo 4204).
  */
-const MAXIMO_G_POR_LITRO: Readonly<Record<string, number>> = {
-  kmno4: 60,
-  cuso4: 200,
-  k2cr2o7: 120,
-  nicl2: 600,
-  nacl: 350,
-  glucosa: 900,
-};
+const MAXIMO_G_POR_LITRO = SOLUBILIDAD_ORIENTATIVA_G_L;
 
 /** Concentración másica (g/L) de la disolución de la que habla el ejercicio, si la hay. */
 function gPorLitroDelEjercicio(d: DatosCaso): number | undefined {

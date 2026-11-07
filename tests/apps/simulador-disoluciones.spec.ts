@@ -358,7 +358,8 @@ test.describe('Casos para clase — en el navegador', () => {
  *      M/1,2 = 0,1582; 30 g → 0,379675 y 0,3164: el doble, como la concentración
  *   S  KMnO₄ 100 g en 50 mL = 2000 g/L → M = 100/158,03/0,05 = 12,656. La propia app cifra la
  *      solubilidad del KMnO₄ en 60 g/L (MAXIMO_G_POR_LITRO de casos.ts, «para no pedir una
- *      disolución que no se puede hacer») → ABIERTO: el panel la pinta como disolución sin aviso
+ *      disolución que no se puede hacer») → el panel la pintaba como disolución sin aviso;
+ *      REPARADO el 07/11/2026 (hallazgo 4204): avisa de que no se disuelve entera
  * ══════════════════════════════════════════════════════════════════════════════════════════ */
 
 /** Pesos atómicos estándar abreviados 2024 de la CIAAW: [valor, incertidumbre]. */
@@ -547,19 +548,20 @@ test.describe('Inspector 07/11/2026 — panel Preparar y Diluir en el navegador'
   // ABIERTO (Inspector 07/11/2026): la descripción del JSON-LD dice «el volumen de disolvente»,
   // y la app calcula con el volumen de DISOLUCIÓN (su deslizador se llama así) y avisa de que
   // usar el de disolvente es el primer error frecuente. Lo leen buscadores y asistentes de IA.
-  test('J2 · ABIERTO: la descripción del JSON-LD habla del volumen de disolución, no de disolvente', async ({ page }) => {
-    test.fail(true, 'ABIERTO: metadata.ts dice «el volumen de disolvente» en la description del jsonLd');
+  // REPARADO el 07/11/2026 en /reparar (hallazgo 4205): ahora dice «el volumen de disolución».
+  test('J2 · REPARADO: la descripción del JSON-LD habla del volumen de disolución, no de disolvente', async ({ page }) => {
     const bloques = (await page.locator('script[type="application/ld+json"]').allTextContents()).map(
       (b) => JSON.parse(b) as Record<string, unknown>,
     );
     const app = bloques.find((b) => b['@type'] === 'WebApplication' && String(b.name).includes('Disoluciones'));
     expect(String(app?.description ?? '')).not.toMatch(/volumen de disolvente/i);
+    expect(String(app?.description ?? '')).toContain('el volumen de disolución');
   });
 
   // ABIERTO (Inspector 07/11/2026): el % del panel va tras un espacio NORMAL («5,80 <small>% m/v»),
   // y el % se separa con espacio duro (U+00A0) para que no salte solo de línea. casos.ts ya lo hace.
-  test('F · ABIERTO: el % m/v del panel va separado con espacio duro', async ({ page }) => {
-    test.fail(true, 'ABIERTO: page.tsx escribe «{cifra} <small>% m/v</small>» con un espacio normal');
+  // REPARADO el 07/11/2026 en /reparar (hallazgo 4206): {' '} entre la cifra y el <small>.
+  test('F · REPARADO: el % m/v del panel va separado con espacio duro', async ({ page }) => {
     await page.getByRole('button', { name: /C₆H₁₂O₆/ }).first().click();
     await sembrarValor(page, '#masa-input', 25);
     const valor = tarjeta(page, '% masa / volumen').locator('[class*="resultValor"]');
@@ -570,13 +572,29 @@ test.describe('Inspector 07/11/2026 — panel Preparar y Diluir en el navegador'
   // ABIERTO (Inspector 07/11/2026): 100 g de KMnO₄ en 50 mL son 2000 g/L, 33 veces la solubilidad
   // que la propia app le da (60 g/L en MAXIMO_G_POR_LITRO de casos.ts), y el panel los pinta como
   // una disolución de 12,656 mol/L, sin ningún aviso. La aritmética sí es la del caso S.
-  test('S · ABIERTO: una disolución por encima de la solubilidad se avisa', async ({ page }) => {
-    test.fail(true, 'ABIERTO: el panel no conoce la solubilidad y pinta como disolución lo que no se disuelve');
+  // REPARADO el 07/11/2026 en /reparar (hallazgo 4204): la cifra pasó a SOLUBILIDAD_ORIENTATIVA_G_L
+  // de motor.ts, que leen el modo práctica y el aviso de saturación del panel.
+  test('S · REPARADO: una disolución por encima de la solubilidad se avisa', async ({ page }) => {
     await page.getByRole('button', { name: /KMnO₄/ }).first().click();
     await sembrarValor(page, '#masa-input', 100);
     await sembrarValor(page, '#vol-input', 50);
     await expect(page.locator('main section:not(#casos-aula)').filter({ hasText: /solubilidad|saturad|no se disuelve/i })).not.toHaveCount(0, {
       timeout: 3000,
     });
+    const aviso = page.locator('[class*="avisoSaturacion"]');
+    await expect(aviso).toContainText('no se disuelve entera');
+    await expect(aviso).toContainText('2000,00 g/L');
+    await expect(aviso).toContainText('60 g/L');
+  });
+
+  test('S2 · el borde: 10 g de KMnO₄ en 150 mL (66,67 g/L) se avisa y en 500 mL (20 g/L) no', async ({ page }) => {
+    await page.getByRole('button', { name: /KMnO₄/ }).first().click();
+    const aviso = page.locator('[class*="avisoSaturacion"]');
+    await sembrarValor(page, '#masa-input', 10);
+    await sembrarValor(page, '#vol-input', 150);
+    await expect(aviso).toContainText('66,67 g/L');
+    await sembrarValor(page, '#vol-input', 500);
+    await expect(aviso).toHaveText('');
+    await expect(aviso).toBeHidden();
   });
 });

@@ -34,7 +34,7 @@ export const metadata: Metadata = {
 export const jsonLd = generateWebAppSchema({
   name: 'Simulador de Disoluciones (Molaridad y Dilución)',
   description:
-    'Simulador interactivo de disoluciones químicas. Permite preparar una disolución ajustando la masa de soluto y el volumen de disolvente y ver en tiempo real la molaridad, los gramos por litro, el porcentaje masa/volumen y las ppm, con el color del vaso variando según la concentración. Incluye un modo de dilución basado en C₁·V₁ = C₂·V₂ que calcula el volumen de disolución madre y el disolvente a añadir.',
+    'Simulador interactivo de disoluciones químicas. Permite preparar una disolución ajustando la masa de soluto y el volumen de disolución y ver en tiempo real la molaridad, los gramos por litro, el porcentaje masa/volumen y las ppm, con el color del vaso variando según la concentración. Incluye un modo de dilución basado en C₁·V₁ = C₂·V₂ que calcula el volumen de disolución madre y el disolvente a añadir.',
   url: 'https://meskeia.com/simulador-disoluciones/',
   category: 'EducationalApplication',
   features: [

@@ -20,6 +20,7 @@ import {
   SOLUTO_PERSONALIZADO,
   calcularPreparacion,
   calcularDilucion,
+  SOLUBILIDAD_ORIENTATIVA_G_L,
   type Soluto,
 } from './motor';
 import CasosAula from './CasosAula';
@@ -61,6 +62,13 @@ export default function SimuladorDisoluciones() {
     () => calcularPreparacion(masa, volumen, soluto.masaMolar),
     [masa, volumen, soluto],
   );
+
+  // Por encima de la solubilidad orientativa, la masa elegida no se disuelve entera (hallazgo
+  // 4204). Siempre montado: vacío no se ve ni se anuncia.
+  const solubilidad = SOLUBILIDAD_ORIENTATIVA_G_L[solutoId];
+  const avisoSaturacion = solubilidad !== undefined && prep.gPorLitro > solubilidad
+    ? `Con ${formatNumber(prep.gPorLitro, 2)} g/L esta masa no se disuelve entera: en agua a temperatura ambiente se disuelven unos ${formatNumber(solubilidad, 0)} g/L de ${soluto.nombre.toLowerCase()} como mucho. El resto quedaría en el fondo, la disolución estaría saturada y su concentración real no pasaría de esa cifra: las de abajo son las que tendría si se disolviera todo.`
+    : '';
 
   // Cálculos del modo diluir
   const dilucion = useMemo(() => calcularDilucion(c1, c2, v2), [c1, c2, v2]);
@@ -203,6 +211,7 @@ export default function SimuladorDisoluciones() {
             </section>
 
             <section className={styles.panel}>
+              <p className={styles.avisoSaturacion} role="status">{avisoSaturacion}</p>
               <div className={styles.vasoLayout}>
                 {/* Vaso */}
                 <div className={styles.vasoWrap}>
@@ -235,7 +244,7 @@ export default function SimuladorDisoluciones() {
                   </div>
                   <div className={styles.resultCard}>
                     <span className={styles.resultLabel}>% masa / volumen</span>
-                    <span className={styles.resultValor}>{formatNumber(prep.porcentajeMV, 2)} <small>% m/v</small></span>
+                    <span className={styles.resultValor}>{formatNumber(prep.porcentajeMV, 2)}{' '}<small>% m/v</small></span>
                   </div>
                   <div className={styles.resultCard}>
                     <span className={styles.resultLabel}>ppm (≈ mg/L)</span>
@@ -370,7 +379,7 @@ export default function SimuladorDisoluciones() {
               Los sueros, las dosis intravenosas y los jarabes se expresan en % m/v o mg/mL, y muchas
               veces se preparan diluyendo un concentrado con suero fisiológico.
             </div>
-            <div className={styles.escenarioTip}>Tip: un suero glucosado al 5 % m/v lleva 5 g de glucosa por 100 mL.</div>
+            <div className={styles.escenarioTip}>Tip: un suero glucosado al 5&nbsp;% m/v lleva 5 g de glucosa por 100 mL.</div>
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
