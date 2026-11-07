@@ -172,11 +172,12 @@ import { esperarHidratacion, esperarValorEnReact, sembrarValor } from './_hidrat
  *         en 2026, 50 + 49 × 0,21 + 131 × 0,19 = 85,18 %; dual 2026 1.200 × 302/352,33 = 1.028,58
  *           (gana a la clásica 1.028,57) → 876,15 €/mes, 12.266,04 €/año.
  *         en 2027, 50 + 180 × 0,19 = 84,20 %; la clásica gana a la dual 304/354,67 → 866,06 €/mes.
- *       La app no pregunta el mes y da a todo 1960 lo de marzo a diciembre. CASO 22, ABIERTO;
- *       el 22.bis es el contraste: lo que da hoy, que es lo correcto de marzo a diciembre.
- *       (La misma aproximación da a quien nació de enero a abril de 1959 «66 y 10 en 2026», cuando
- *       cumple los 66a8m que pide 2025 entre septiembre y diciembre de 2025: el CASO 14 vigila esa
- *       fila con la aproximación por años y habrá que adaptarlo con la reparación.)
+ *       La app no preguntaba el mes y daba a todo 1960 lo de marzo a diciembre. CASO 22, REPARADO
+ *       el 07/11/2026 (hallazgo 4207) con un «Mes de nacimiento (opcional)»; sin mes se supone
+ *       diciembre y se avisa (22.quater). El 22.bis es el contraste de marzo.
+ *       (La misma aproximación daba a quien nació de enero a abril de 1959 «66 y 10 en 2026», cuando
+ *       cumple los 66a8m que pide 2025 entre septiembre y diciembre de 2025: el CASO 14 sigue
+ *       vigilando la suposición sin mes, y el 14.ter el caso de enero.)
  */
 
 const RUTA = '/simulador-jubilacion-publica/';
@@ -724,11 +725,11 @@ test('CASO 20 · las cifras normativas de la guía y del FAQPage salen de data/f
 // ── Cabo C0139 (inspector 07/11/2026) · cálculos a mano en la cabecera ──────────────────────
 
 test('CASO 21 · cabo C0139 (a) · «retenciones del 8-15 %» no casa con la pensión mínima (0 %) ni con la máxima (23,11 %)', async ({ page }) => {
-  // ABIERTO (inspector 07/11/2026, cabo C0139). La cifra está tecleada en page.tsx sin fuente y
-  // data/fiscal no tiene módulo de retenciones. Esperado con el RIRPF (arts. 81, 83.3, 84, 85.1 y
+  // REPARADO (/reparar 07/11/2026, hallazgo 4208). La cifra estaba tecleada en page.tsx sin fuente
+  // y data/fiscal no tiene módulo de retenciones. Esperado con el RIRPF (arts. 81, 83.3, 84, 85.1 y
   // 86.1, BOE-A-2007-6820) y data/fiscal: mínima unipersonal 2026, 13.106,80 €/año ≤ 16.476 € del
   // art. 81 → 0 %; máxima 2026, 47.034,40 €/año → 23,11 % (65-74 años). Ninguna en el 8-15 %.
-  test.fail();
+  // Se retiró el intervalo: el consejo dice ahora lo que sí vale en los dos extremos.
   await page.getByRole('button', { name: 'Ver guía educativa' }).click();
   const consejo = page.locator('li').filter({ hasText: 'Ignorar el impacto del IRPF' });
   // Preparación: el consejo existe y habla de retenciones.
@@ -736,6 +737,7 @@ test('CASO 21 · cabo C0139 (a) · «retenciones del 8-15 %» no casa con la pen
   await expect(consejo).toContainText('rendimientos del trabajo');
   // Lo que debe pasar: no se da un intervalo que excluye a los dos extremos de la pensión pública.
   await expect(consejo).not.toContainText(/8\s*-\s*15/);
+  await expect(consejo).toContainText('las pensiones más bajas no llevan ninguna');
 });
 
 /**
@@ -758,12 +760,13 @@ async function simular1960(page: Page, mes: string): Promise<boolean> {
 }
 
 test('CASO 22 · cabo C0139 (b) · nacido en enero de 1960 sin la cotización de los 65: 66 años y 10 meses en 2026, escala de 2026', async ({ page }) => {
-  // ABIERTO (inspector 07/11/2026, cabo C0139). TABLA_EDAD_JUBILACION: 2026 pide 66a10m y el nacido
-  // el 15/01/1960 los cumple el 15/11/2026 (el de febrero, el 15/12/2026). La app no pregunta el mes
-  // y le da «67 años · Te jubilarías en 2027» con la escala de 2027: 84,20 % y 866,06 €/mes en vez
-  // de 85,18 % y 876,15 €/mes (30 años, 1.200 €; cuentas en la cabecera).
-  test.fail();
+  // REPARADO (/reparar 07/11/2026, hallazgo 4207). TABLA_EDAD_JUBILACION: 2026 pide 66a10m y el
+  // nacido el 15/01/1960 los cumple el 15/11/2026 (el de febrero, el 15/12/2026). La app no
+  // preguntaba el mes y le daba «67 años · Te jubilarías en 2027» con la escala de 2027: 84,20 % y
+  // 866,06 €/mes en vez de 85,18 % y 876,15 €/mes (30 años, 1.200 €; cuentas en la cabecera).
+  // Ahora hay un «Mes de nacimiento (opcional)».
   const hayMes = await simular1960(page, '1');
+  expect(hayMes, 'la app pregunta el mes de nacimiento').toBe(true);
   const estado = page.getByRole('status').first();
   // Preparación: el cálculo se hizo y no llegaba a los 38a3m de los 65.
   await expect(estado).toContainText('no alcanzas el umbral de 38 años y 3 meses');
@@ -780,7 +783,7 @@ test('CASO 22 · cabo C0139 (b) · nacido en enero de 1960 sin la cotización de
 
 test('CASO 22.bis · contraste del cabo C0139: de marzo a diciembre de 1960 sí son 67 años en 2027, 84,20 % y 866,06 €', async ({ page }) => {
   // El nacido el 15/03/1960 cumple 66a10m el 15/01/2027, cuando TABLA_EDAD_JUBILACION ya pide 67:
-  // se jubila el 15/03/2027. Es lo que la app da hoy a todo 1960.
+  // se jubila el 15/03/2027. Es lo que la app daba antes a todo 1960.
   await simular1960(page, '3');
   const estado = page.getByRole('status').first();
   await expect(estado).toContainText('67 años');
@@ -788,4 +791,40 @@ test('CASO 22.bis · contraste del cabo C0139: de marzo a diciembre de 1960 sí 
   // 50 + 180 × 0,19 (escala de 2027); la clásica 1.028,5714 gana a la dual 304/354,67.
   await expect(valorDe(page, 'Porcentaje por años cotizados')).toHaveText(pct('84,20'));
   expect(await importeDe(page, 'Pensión mensual estimada (bruta)')).toBeCloseTo(866.06, 2);
+  // Con el mes indicado no hay aviso de que dependa del mes
+  await expect(estado).not.toContainText('dependen del mes en que naciste');
+});
+
+test('CASO 22.ter · nacido en febrero de 1960: también 66 años y 10 meses en 2026 (los cumple el 15/12/2026)', async ({ page }) => {
+  await simular1960(page, '2');
+  const estado = page.getByRole('status').first();
+  await expect(estado).toContainText('66 años y 10 meses');
+  await expect(estado).toContainText('Te jubilarías en 2026');
+  await expect(valorDe(page, 'Porcentaje por años cotizados')).toHaveText(pct('85,18'));
+});
+
+test('CASO 22.quater · sin indicar el mes, 1960 supone diciembre y lo avisa', async ({ page }) => {
+  // Sin mes, la app hace la suposición de siempre (67 años en 2027, lo correcto de marzo a
+  // diciembre), pero ahora dice que el resultado depende del mes.
+  await simular(page, 1960, 30, 1200);
+  const estado = page.getByRole('status').first();
+  await expect(estado).toContainText('67 años');
+  await expect(estado).toContainText('Te jubilarías en 2027');
+  await expect(estado).toContainText('dependen del mes en que naciste');
+});
+
+test('CASO 14.ter · nacida en enero de 1959 sin la cotización de los 65: 66 años y 8 meses en 2025', async ({ page }) => {
+  // TABLA_EDAD_JUBILACION: 2025 pide 66a8m. Nacida el 15/01/1959, los cumple el 15/09/2025 → 2025.
+  // (De mayo a diciembre de 1959 los 66a8m caen ya en 2026, que pide 66a10m: 66 y 10 en 2026, el
+  // CASO 14.) La escala del porcentaje de 2025 y 2026 es la misma: 73,78 % con 25 años.
+  await page.selectOption(SEL.anio, '1959');
+  await page.getByLabel(/mes de nacimiento/i).selectOption('1');
+  await sembrarValor(page, SEL.anos, 25);
+  await sembrarValor(page, SEL.base, 2000);
+  await page.locator(SEL.btnCalcular).click();
+  const estado = page.getByRole('status').first();
+  await expect(estado).toContainText('66 años y 8 meses');
+  await expect(estado).toContainText('Te jubilarías en 2025');
+  await expect(valorDe(page, 'Edad ordinaria de jubilación')).toHaveText('66 años y 8 meses');
+  await expect(valorDe(page, 'Porcentaje por años cotizados')).toHaveText(pct('73,78'));
 });

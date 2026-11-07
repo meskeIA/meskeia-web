@@ -73,6 +73,11 @@ interface ResultadoEdad {
    * 1955 (hallazgo 2874). Entonces no se da edad ni año: o se calcula o no hay cifra.
    */
   fueraDeTabla: boolean;
+  /**
+   * No se indicó el mes de nacimiento y la edad o el año de jubilación cambian según el mes
+   * (hallazgo 4207): el resultado supone diciembre y hay que decirlo.
+   */
+  dependeDelMes: boolean;
 }
 
 interface ResultadoFormula {
@@ -135,27 +140,47 @@ interface ResultadoParcial {
 /** Primer año de TABLA_EDAD_JUBILACION: antes, getEdadJubilacion devuelve la fila de 2027. */
 const PRIMER_ANIO_TABLA = TABLA_EDAD_JUBILACION[0].anio;
 
+/** Mes que se supone cuando no se indica: diciembre, el que lleva más lejos la fecha de la edad. */
+const MES_POR_DEFECTO = 12;
+
+const NOMBRES_MES = [
+  'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+  'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre',
+];
+
 /**
  * Edad ordinaria sin la cotización para los 65: el primer año en que se tiene la edad de la
- * fila de ESE año (con meses, se supone el año siguiente al cumpleaños: no se pregunta el mes).
- * Devuelve la edad y el año de la MISMA fila. Antes devolvía como año `nacimiento + edad.anios`,
- * que con meses es el año anterior al de la fila: 1959 salía «66 años y 10 meses» (la fila de
- * 2026) «en 2025», y la fila «Edad ordinaria», calculada con 2025, decía 66 y 8 (hallazgo 2874).
+ * fila de ESE año. Devuelve la edad y el año de la MISMA fila (hallazgo 2874: antes salía
+ * «66 años y 10 meses» de la fila de 2026 «en 2025»).
+ *
+ * La edad (a años y m meses) se cumple en el año `nacimiento + a`, o en el siguiente si el mes de
+ * nacimiento más los m meses pasa de diciembre. Por eso depende del MES (hallazgo 4207): el nacido
+ * en enero o febrero de 1960 cumple los 66 y 10 que pide 2026 en noviembre o diciembre de 2026 y se
+ * jubila ese año; el de marzo los cumple en enero de 2027, cuando ya se piden 67. Sin mes, se
+ * supone diciembre, que es lo que la app hacía antes para todo el año.
  */
-function edadOrdinariaSinCotizacion(anioNacimiento: number): { edad: { anios: number; meses: number }; anio: number } {
+function edadOrdinariaSinCotizacion(
+  anioNacimiento: number,
+  mesNacimiento: number = MES_POR_DEFECTO,
+): { edad: { anios: number; meses: number }; anio: number } {
   for (let anioJub = anioNacimiento + 65; anioJub <= anioNacimiento + 70; anioJub++) {
     const edad = getEdadJubilacion(anioJub).edadSinCotizacion;
-    if (anioJub >= anioNacimiento + edad.anios + (edad.meses > 0 ? 1 : 0)) return { edad, anio: anioJub };
+    const anioQueSeCumple = anioNacimiento + edad.anios + Math.floor((mesNacimiento - 1 + edad.meses) / 12);
+    if (anioJub >= anioQueSeCumple) return { edad, anio: anioJub };
   }
   return { edad: { anios: 67, meses: 0 }, anio: anioNacimiento + 67 };
 }
 
-function calcularEdadJubilacion(anioNacimiento: number, anosCotizados: number): ResultadoEdad {
+function calcularEdadJubilacion(anioNacimiento: number, anosCotizados: number, mesNacimiento?: number): ResultadoEdad {
   const mesesCotizados = Math.round(anosCotizados * 12);
   // A los 65 se llega en un solo año: el umbral de cotización es el de esa fila.
   const fila65 = getEdadJubilacion(anioNacimiento + 65);
   const cotMin = fila65.cotizacionPara65.anios * 12 + fila65.cotizacionPara65.meses;
-  const ordinaria = edadOrdinariaSinCotizacion(anioNacimiento);
+  const ordinaria = edadOrdinariaSinCotizacion(anioNacimiento, mesNacimiento);
+  // Sin mes, ¿habría salido otra edad u otro año naciendo en enero?
+  const enEnero = edadOrdinariaSinCotizacion(anioNacimiento, 1);
+  const ordinariaDependeDelMes = mesNacimiento === undefined
+    && (enEnero.anio !== ordinaria.anio || enEnero.edad.anios !== ordinaria.edad.anios || enEnero.edad.meses !== ordinaria.edad.meses);
 
   if (mesesCotizados >= cotMin) {
     return {
@@ -167,6 +192,7 @@ function calcularEdadJubilacion(anioNacimiento: number, anosCotizados: number): 
       edadAlternativa: ordinaria.edad,
       anioAlternativo: ordinaria.anio,
       fueraDeTabla: anioNacimiento + 65 < PRIMER_ANIO_TABLA || ordinaria.anio < PRIMER_ANIO_TABLA,
+      dependeDelMes: false,
     };
   }
 
@@ -179,6 +205,7 @@ function calcularEdadJubilacion(anioNacimiento: number, anosCotizados: number): 
     edadAlternativa: ordinaria.edad,
     anioAlternativo: ordinaria.anio,
     fueraDeTabla: anioNacimiento + 65 < PRIMER_ANIO_TABLA || ordinaria.anio < PRIMER_ANIO_TABLA,
+    dependeDelMes: ordinariaDependeDelMes,
   };
 }
 
@@ -393,6 +420,8 @@ const ESCALA_VERIFICADA = formatDate(parseISODateLocal(ESCALA_PORCENTAJE_PENSION
 export default function SimuladorJubilacionPublicaPage() {
   // Datos básicos compartidos
   const [anioNacimiento, setAnioNacimiento] = useState('');
+  /** '' = sin indicar (se supone diciembre y, si cambia algo, se avisa) */
+  const [mesNacimiento, setMesNacimiento] = useState('');
   const [anosCotizados, setAnosCotizados] = useState('');
   const [baseMensual, setBaseMensual] = useState('');
   const [error, setError] = useState('');
@@ -470,7 +499,8 @@ export default function SimuladorJubilacionPublicaPage() {
       setError(`Se necesitan al menos ${COTIZACION_MINIMA.anosMinimosAcceso} años cotizados para acceder a pensión.`); return;
     }
 
-    const edad = calcularEdadJubilacion(anio, anos);
+    const mes = mesNacimiento ? parseInt(mesNacimiento) : undefined;
+    const edad = calcularEdadJubilacion(anio, anos, mes);
     setAnosCalculados(anos);
     setResultadoEdad(edad);
     setResultadoPension(estimarPension(base, anos, edad.anioJubilacion));
@@ -580,6 +610,21 @@ export default function SimuladorJubilacionPublicaPage() {
             </select>
           </div>
 
+          <div className={styles.formGroup}>
+            <label className={styles.label} htmlFor="mesNacimiento">Mes de nacimiento (opcional)</label>
+            <select
+              id="mesNacimiento"
+              className={styles.select}
+              value={mesNacimiento}
+              onChange={e => setMesNacimiento(e.target.value)}
+            >
+              <option value="">Sin indicar</option>
+              {NOMBRES_MES.map((nombre, i) => (
+                <option key={nombre} value={i + 1}>{nombre.charAt(0).toUpperCase() + nombre.slice(1)}</option>
+              ))}
+            </select>
+          </div>
+
           <NumberInput
             value={anosCotizados}
             onChange={setAnosCotizados}
@@ -652,6 +697,13 @@ export default function SimuladorJubilacionPublicaPage() {
                 </span>
               )}
             </p>
+
+            {resultadoEdad.dependeDelMes && (
+              <div className={styles.resultAgeAlt}>
+                <span aria-hidden="true">📅</span> Tu edad y tu año de jubilación dependen del mes en que naciste. Sin
+                indicarlo, el cálculo supone que naciste en diciembre: elige el mes arriba y vuelve a simular.
+              </div>
+            )}
 
             {resultadoEdad.cotizacionSuficiente && (
               <div className={styles.resultAgeAlt}>
@@ -1212,7 +1264,7 @@ export default function SimuladorJubilacionPublicaPage() {
               <li><strong>No verificar la vida laboral:</strong> Muchas personas descubren lagunas o errores solo al solicitar la pensión.</li>
               <li><strong>Confundir años cotizados con años trabajados:</strong> El paro sin prestación no cotiza y genera lagunas.</li>
               <li><strong>Calcular sobre sueldo bruto:</strong> Horas extra y complementos no siempre cotizan igual que el salario base.</li>
-              <li><strong>Ignorar el impacto del IRPF:</strong> Las pensiones tributan como rendimientos del trabajo (retenciones del 8-15&nbsp;%).</li>
+              <li><strong>Ignorar el impacto del IRPF:</strong> Las pensiones tributan como rendimientos del trabajo. La retención depende de la cuantía anual y de tu situación personal: las pensiones más bajas no llevan ninguna y el tipo sube con la pensión según la escala del IRPF, así que lo que cobras al mes puede quedar por debajo de la pensión bruta que da este simulador.</li>
               <li><strong>Dar por hecho el complemento a mínimos:</strong> quedar por debajo de la pensión mínima no lo concede solo. Hay que no superar unos límites de renta y la cuantía cambia según con quién convivas.</li>
               <li><strong>No agotar desempleo antes de anticipar:</strong> A veces es más rentable cobrar el desempleo completo primero.</li>
             </ul>
