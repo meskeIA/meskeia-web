@@ -17,6 +17,14 @@ import {
   unicoPorEstadoYFamilia,
 } from '../../app/tabla-periodica/casos';
 import { elementos } from '../../app/tabla-periodica/elementos-data';
+import {
+  TOTAL_CON_VALENCIAS,
+  etiquetaValencias,
+  filasFicha,
+  lineasCasilla,
+  valenciasDe,
+} from '../../app/tabla-periodica/valencias';
+import { ELEMENTOS as ELEMENTOS_FORMULADOR } from '../../app/formulador-compuestos-inorganicos/motor';
 import { ELEMENTOS as ELEMENTOS_TENDENCIAS } from '../../app/simulador-tabla-periodica-tendencias/datos';
 import { RADIO_COVALENTE_PM, RADIO_SOLO_TEORICO_DESDE_Z } from '../../data/radios-atomicos';
 import { ELECTRONEGATIVIDAD_PAULING } from '../../data/electronegatividad';
@@ -2229,7 +2237,9 @@ test.describe('hallazgos reparados · 27/09/2026', () => {
         return dialogo !== null && dialogo.contains(document.activeElement);
       });
 
-    for (const tecla of ['Tab', 'Tab', 'Shift+Tab', 'Shift+Tab', 'Shift+Tab']) {
+    // Desde el 07/11/2026 (S0256) la ficha tiene DOS controles: «✕» y el enlace al formulador
+    // del bloque de valencias. Un número par de pulsaciones vuelve a «✕».
+    for (const tecla of ['Tab', 'Tab', 'Shift+Tab', 'Shift+Tab', 'Shift+Tab', 'Tab']) {
       await page.keyboard.press(tecla);
       expect(await focoDentro(), `tras ${tecla}`).toBe(true);
     }
@@ -2240,7 +2250,7 @@ test.describe('hallazgos reparados · 27/09/2026', () => {
       .evaluate((el) => el.closest('[inert]') !== null);
     expect(reiniciarInerte).toBe(true);
 
-    // El único control de la ficha es «✕»: el Enter la cierra, y no toca nada de detrás.
+    // Con el foco en «✕», el Enter la cierra, y no toca nada de detrás.
     await expect(cerrar).toBeFocused();
     await page.keyboard.press('Enter');
     await expect(page.getByRole('dialog')).toHaveCount(0);
@@ -2634,8 +2644,15 @@ test.describe('verificación 16/10/2026 · los commits posteriores a la inspecci
     await expect(page.locator('#titulo-ficha-elemento')).toHaveText('Hierro');
     const cerrarHierro = page.getByRole('button', { name: 'Cerrar la ficha de Hierro' });
     await expect(cerrarHierro).toBeFocused();
+    // Dos controles desde S0256 (07/11/2026): «✕» y el enlace al formulador. El Tab va de uno
+    // al otro y no sale de la ficha.
+    const formuladorHierro = page.getByRole('dialog').getByRole('link', { name: 'formulador de compuestos inorgánicos' });
     await page.keyboard.press('Tab');
-    await expect(cerrarHierro).toBeFocused(); // es el único control: el Tab no sale
+    await expect(formuladorHierro).toBeFocused();
+    await page.keyboard.press('Tab');
+    await expect(cerrarHierro).toBeFocused();
+    await page.keyboard.press('Shift+Tab');
+    await expect(formuladorHierro).toBeFocused();
     await page.keyboard.press('Shift+Tab');
     await expect(cerrarHierro).toBeFocused();
     await page.keyboard.press('Escape');
@@ -3416,8 +3433,15 @@ test.describe('CASO 28 · límite: el radón, el primero que pasó a N/D, abiert
     for (const dato of ['Electronegatividad: N/D', 'Radio covalente: 142 pm', 'Masa atómica: [222] u', 'Grupo: 18', 'Período: 6']) {
       expect(texto, dato).toContain(dato);
     }
+    // Dos controles desde S0256 (07/11/2026): «✕» y el enlace al formulador, también en una
+    // ficha sin valencias como la del radón.
+    const formulador = dialogo.getByRole('link', { name: 'formulador de compuestos inorgánicos' });
+    await page.keyboard.press('Tab');
+    await expect(formulador).toBeFocused();
     await page.keyboard.press('Tab');
     await expect(cerrar).toBeFocused();
+    await page.keyboard.press('Shift+Tab');
+    await expect(formulador).toBeFocused();
     await page.keyboard.press('Shift+Tab');
     await expect(cerrar).toBeFocused();
     await page.keyboard.press('Escape');
@@ -3682,5 +3706,130 @@ test.describe('hallazgos · 27/10/2026 (reparados)', () => {
     const region = page.locator('[role="status"]').filter({ has: total });
     await expect(region).toHaveCount(1);
     await expect(region.locator('table')).toHaveCount(0);
+  });
+});
+
+/**
+ * VALENCIAS (S0256, 07/11/2026) — la vista «Valencias» y su bloque en la ficha.
+ *
+ * Las cifras esperadas están escritas A MANO desde la tabla escolar de formulación, no
+ * leídas del motor: si alguien cambia una valencia en el formulador, estos casos tienen que
+ * caer y obligar a decidir si la tabla periódica debe cambiar con él. El caso que importa es
+ * el del manganeso y el cromo: sus +6 y +7 solo están en ANIONES_OXO, y una vista que leyera
+ * solo `positivas` diría «Mn +2, 3», que cualquier libro desmiente.
+ */
+test.describe('VALENCIAS · S0256', () => {
+  const ESPERADAS: [string, string, string][] = [
+    // símbolo, línea de positivas, línea de la negativa
+    ['H', '+1', '−1'],
+    ['Na', '+1', ''],
+    ['Fe', '+2, 3', ''],
+    ['Cu', '+1, 2', ''],
+    ['Cr', '+2, 3, 6', ''],
+    ['Mn', '+2, 3, 6, 7', ''],
+    ['Cl', '+1, 3, 5, 7', '−1'],
+    ['S', '+2, 4, 6', '−2'],
+    ['N', '+1, 3, 5', '−3'],
+    ['C', '+2, 4', '−4'],
+    ['O', '', '−2'],
+    ['F', '', '−1'],
+    ['He', '', ''],
+    ['U', '', ''],
+  ];
+
+  test('cada casilla lleva las valencias de la tabla escolar, con las de los oxoaniones', () => {
+    for (const [simbolo, positivas, negativa] of ESPERADAS) {
+      expect(lineasCasilla(simbolo), simbolo).toEqual({ positivas, negativa });
+    }
+  });
+
+  test('todos los elementos del formulador están en la tabla, y ninguno más lleva valencias', () => {
+    const conValencias = elementos.filter((e) => valenciasDe(e.simbolo) !== null).map((e) => e.simbolo);
+    expect(conValencias.length).toBe(TOTAL_CON_VALENCIAS);
+    expect(new Set(conValencias)).toEqual(new Set(ELEMENTOS_FORMULADOR.map((e) => e.simbolo)));
+  });
+
+  test('la ficha dice de dónde sale cada número', () => {
+    expect(filasFicha('Mn')).toEqual([
+      { rotulo: 'Positivas', valor: '+2, 3' },
+      { rotulo: 'Además, en oxoaniones', valor: '+6 (manganato) · +7 (permanganato)' },
+    ]);
+    expect(filasFicha('Cr')).toContainEqual({ rotulo: 'Además, en oxoaniones', valor: '+6 (cromato, dicromato)' });
+    expect(filasFicha('O')).toEqual([
+      { rotulo: 'Negativa', valor: '−2' },
+      { rotulo: 'En los peróxidos', valor: '−1 (H₂O₂, Na₂O₂)' },
+    ]);
+    expect(filasFicha('Na')).toEqual([{ rotulo: 'Positiva', valor: '+1' }]);
+    expect(filasFicha('He')).toEqual([{ rotulo: 'Valencias', valor: 'no entra en la formulación de secundaria' }]);
+  });
+
+  test('el lector de pantalla oye singular o plural según cuántas haya', () => {
+    expect(etiquetaValencias('Na')).toBe('valencia +1');
+    expect(etiquetaValencias('O')).toBe('valencia −2');
+    expect(etiquetaValencias('F')).toBe('valencia −1');
+    expect(etiquetaValencias('Cl')).toBe('valencias +1, 3, 5, 7 y −1');
+    expect(etiquetaValencias('He')).toBe('sin valencias de formulación de secundaria');
+  });
+
+  test('en la página: el botón cambia la masa por las valencias y vuelve', async ({ page }) => {
+    await abrirHidratada(page);
+    const masa = page.getByRole('button', { name: 'Masa atómica', exact: true });
+    const valencias = page.getByRole('button', { name: 'Valencias', exact: true });
+    await expect(masa).toHaveAttribute('aria-pressed', 'true');
+    await expect(valencias).toHaveAttribute('aria-pressed', 'false');
+
+    // innerText y no textContent: la vista OCULTA los nodos, no los retira (C0243), así que
+    // el texto oculto sigue en el DOM y solo innerText dice lo que se ve.
+    const visto = async (titulo: string) =>
+      (await page.locator(`[title="${titulo}"]`).innerText()).replace(/\s+/g, ' ').trim();
+    const MASA_FE = formatNumber(elementos.find((e) => e.simbolo === 'Fe')!.masa, 2);
+
+    expect(await visto('Hierro (Fe)')).toContain(MASA_FE);
+    expect(await visto('Hierro (Fe)')).not.toContain('+2, 3');
+
+    await valencias.click();
+    await expect(valencias).toHaveAttribute('aria-pressed', 'true');
+    await expect.poll(() => visto('Hierro (Fe)')).toBe('26 Fe +2, 3');
+    await expect(page.locator('[title="Hierro (Fe)"]')).toHaveAttribute('aria-label', /valencias \+2, 3$/);
+    expect(await visto('Cloro (Cl)')).toBe('17 Cl +1, 3, 5, 7 −1');
+    // El helio no tiene: ni masa ni valencias bajo el símbolo
+    expect(await visto('Helio (He)')).toBe('2 He');
+
+    await masa.click();
+    await expect.poll(() => visto('Hierro (Fe)')).toContain(MASA_FE);
+    expect(await visto('Hierro (Fe)')).not.toContain('+2, 3');
+  });
+
+  test('en la página: la ficha del manganeso trae las valencias y el enlace al formulador', async ({ page }) => {
+    await abrirHidratada(page);
+    const mn = await fichaDe(page, 'Manganeso (Mn)');
+    expect(mn).toContain('Valencias en formulación');
+    expect(mn).toContain('Positivas: +2, 3');
+    expect(mn).toContain('Además, en oxoaniones: +6 (manganato) · +7 (permanganato)');
+    await expect(page.locator(MODAL).first().locator('a[href="/formulador-compuestos-inorganicos/"]')).toBeVisible();
+    await cerrarFicha(page);
+    const he = await fichaDe(page, 'Helio (He)');
+    expect(he).toContain('Valencias: no entra en la formulación de secundaria');
+  });
+
+  test('en un móvil de 360 px las valencias se ven, aunque la masa se oculte', async ({ browser }) => {
+    const contexto = await browser.newContext({ viewport: { width: 360, height: 780 }, isMobile: true, hasTouch: true });
+    const page = await contexto.newPage();
+    await abrirHidratada(page);
+    await page.getByRole('button', { name: 'Valencias', exact: true }).click();
+    const linea = page.locator('[title="Hierro (Fe)"] [class*="_valenciaCasilla"]').first();
+    await expect(linea).toBeVisible();
+    await expect(linea).toHaveText('+2, 3');
+    // Que quepa: la línea no se sale de su casilla
+    const [caja, celda] = await Promise.all([
+      linea.boundingBox(),
+      page.locator('[title="Manganeso (Mn)"]').boundingBox(),
+    ]);
+    const lineaMn = await page.locator('[title="Manganeso (Mn)"] [class*="_valenciaCasilla"]').first().boundingBox();
+    expect(caja).not.toBeNull();
+    expect(celda).not.toBeNull();
+    expect(lineaMn).not.toBeNull();
+    if (celda && lineaMn) expect(lineaMn.width).toBeLessThanOrEqual(celda.width);
+    await contexto.close();
   });
 });

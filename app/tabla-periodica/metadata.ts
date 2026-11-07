@@ -2,9 +2,9 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Tabla Periódica Interactiva - 118 Elementos con Propiedades | meskeIA',
-  description: 'Tabla periódica interactiva con los 118 elementos químicos: masa atómica, configuración electrónica, electronegatividad de Pauling donde está medida y calculadora de masa molar. Filtros por familia y estado. Gratis.',
-  keywords: 'tabla periodica, elementos quimicos, quimica, masa molar, masas molares, propiedades elementos, taula periòdica, metales, no metales, gases nobles, lantanidos, actinidos, educacion, bachillerato, preparatoria, secundaria, educacion media',
+  title: 'Tabla Periódica Interactiva con Valencias - 118 Elementos | meskeIA',
+  description: 'Tabla periódica interactiva con los 118 elementos químicos y sus valencias de formulación: masa atómica, configuración electrónica, electronegatividad de Pauling donde está medida y calculadora de masa molar. Filtros por familia y estado. Gratis.',
+  keywords: 'tabla periodica, tabla periodica con valencias, valencias, numeros de oxidacion, elementos quimicos, quimica, masa molar, masas molares, propiedades elementos, taula periòdica, metales, no metales, gases nobles, lantanidos, actinidos, educacion, bachillerato, preparatoria, secundaria, educacion media',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -14,8 +14,8 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: 'website',
-    title: 'Tabla Periódica Interactiva | meskeIA',
-    description: 'Explora los 118 elementos químicos de forma interactiva. Filtros, información detallada y calculadora de masa molar incluida.',
+    title: 'Tabla Periódica Interactiva con Valencias | meskeIA',
+    description: 'Explora los 118 elementos químicos de forma interactiva, con sus valencias de formulación. Filtros, información detallada y calculadora de masa molar incluida.',
     url: 'https://meskeia.com/tabla-periodica/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -83,11 +83,12 @@ export const faqJsonLd = {
 
 export const jsonLd = generateWebAppSchema({
   name: 'Tabla Periódica Interactiva',
-  description: 'Tabla periódica interactiva con los 118 elementos químicos. Filtros por familia y estado, información detallada de cada elemento y calculadora de masa molar integrada.',
+  description: 'Tabla periódica interactiva con los 118 elementos químicos y sus valencias de formulación. Filtros por familia y estado, información detallada de cada elemento y calculadora de masa molar integrada.',
   url: 'https://meskeia.com/tabla-periodica/',
   category: 'EducationalApplication',
   features: [
     'Visualización completa de los 118 elementos químicos',
+    'Vista de valencias de formulación en cada casilla, con su origen en la ficha',
     'Filtros por familia (metales, no metales, gases nobles, etc.)',
     'Filtros por estado físico (sólido, líquido, gaseoso)',
     'Información detallada de cada elemento al hacer clic',

@@ -18,6 +18,14 @@ import {
   type ComprobacionBusqueda,
   type EjercicioBusqueda,
 } from './casos';
+import { TOTAL_CON_VALENCIAS, etiquetaValencias, filasFicha, lineasCasilla } from './valencias';
+
+type VistaCasilla = 'masa' | 'valencias';
+
+/** Las dos líneas de valencias de cada casilla, calculadas una vez: no cambian nunca. */
+const LINEAS_VALENCIAS = Object.fromEntries(
+  elementos.map((e) => [e.simbolo, lineasCasilla(e.simbolo)]),
+) as Record<string, { positivas: string; negativa: string }>;
 
 /** Minúsculas sin diacríticos, para que buscar «oxigeno» sin tilde encuentre «Oxígeno»
  *  (hallazgo 528: 14 de 118 elementos eran inalcanzables sin la tilde exacta). */
@@ -70,6 +78,9 @@ export default function TablaPerodicaPage() {
   const [filtroEstado, setFiltroEstado] = useState<string>('todos');
   const [busqueda, setBusqueda] = useState<string>('');
   const [elementoSeleccionado, setElementoSeleccionado] = useState<Elemento | null>(null);
+  // Qué lleva cada casilla bajo el símbolo (S0256): la masa, o las valencias de formulación.
+  const [vista, setVista] = useState<VistaCasilla>('masa');
+  const conValencias = vista === 'valencias';
   const [formulaMolar, setFormulaMolar] = useState<string>('');
   const [resultadoMasa, setResultadoMasa] = useState<{
     formula: string;
@@ -302,7 +313,7 @@ export default function TablaPerodicaPage() {
       <header className={styles.hero}>
         <h1 className={styles.title}><span aria-hidden="true">⚛️</span> Tabla Periódica Interactiva</h1>
         <p className={styles.subtitle}>
-          Explora los 118 elementos químicos con información detallada y calculadora de masa molar
+          Explora los 118 elementos químicos con sus valencias, información detallada y calculadora de masa molar
         </p>
       </header>
 
@@ -363,6 +374,34 @@ export default function TablaPerodicaPage() {
         </p>
       </div>
 
+      {/* Qué muestra cada casilla (S0256) */}
+      <div className={styles.vistaPanel}>
+        <div className={styles.vistaCasillas} role="group" aria-label="Qué muestra cada casilla">
+          <span className={styles.vistaRotulo} aria-hidden="true">En cada casilla:</span>
+          <button
+            type="button"
+            aria-pressed={!conValencias}
+            className={`${styles.vistaBoton} ${!conValencias ? styles.vistaActiva : ''}`}
+            onClick={() => setVista('masa')}
+          >
+            Masa atómica
+          </button>
+          <button
+            type="button"
+            aria-pressed={conValencias}
+            className={`${styles.vistaBoton} ${conValencias ? styles.vistaActiva : ''}`}
+            onClick={() => setVista('valencias')}
+          >
+            Valencias
+          </button>
+        </div>
+        <p className={styles.vistaNota}>
+          Las valencias son las de la formulación de secundaria, en los {TOTAL_CON_VALENCIAS} elementos
+          que se usan en ella; el resto de casillas se queda sin ellas. Toca una para ver de dónde sale
+          cada número.
+        </p>
+      </div>
+
       {/* Tabla Periódica */}
       <div className={styles.tablaContainer}>
         <div className={styles.tablaPeriodica}>
@@ -387,13 +426,22 @@ export default function TablaPerodicaPage() {
                 // Los filtrados salen del orden de tabulación en vez de quedar como trampas
                 // silenciosas: siguen visibles, atenuados, pero no reciben foco.
                 disabled={estaFiltrado}
-                aria-label={`${elemento.nombre} (${elemento.simbolo}), número atómico ${elemento.numero}`}
+                aria-label={
+                  conValencias
+                    ? `${elemento.nombre} (${elemento.simbolo}), número atómico ${elemento.numero}, ${etiquetaValencias(elemento.simbolo)}`
+                    : `${elemento.nombre} (${elemento.simbolo}), número atómico ${elemento.numero}`
+                }
                 title={`${elemento.nombre} (${elemento.simbolo})`}
               >
+                {/* Los seis nodos se montan siempre y la vista solo los oculta: con la página
+                    traducida, retirar un nodo de texto que el traductor ya cambió tumba la app
+                    (C0243). */}
                 <span className={styles.numeroAtomico}>{elemento.numero}</span>
                 <span className={styles.simbolo}>{elemento.simbolo}</span>
-                <span className={styles.nombre}>{elemento.nombre}</span>
-                <span className={styles.masa}>{formatNumber(elemento.masa, elemento.masa % 1 === 0 ? 0 : 2)}</span>
+                <span className={`${styles.nombre} ${conValencias ? styles.oculto : ''}`}>{elemento.nombre}</span>
+                <span className={`${styles.masa} ${conValencias ? styles.oculto : ''}`}>{formatNumber(elemento.masa, elemento.masa % 1 === 0 ? 0 : 2)}</span>
+                <span className={`${styles.valenciaCasilla} ${conValencias ? '' : styles.oculto}`}>{LINEAS_VALENCIAS[elemento.simbolo].positivas}</span>
+                <span className={`${styles.valenciaCasilla} ${conValencias ? '' : styles.oculto}`}>{LINEAS_VALENCIAS[elemento.simbolo].negativa}</span>
               </button>
             );
           })}
@@ -636,6 +684,28 @@ export default function TablaPerodicaPage() {
                 donde ninguna de esas fuentes le da valor: los gases nobles salvo el kriptón y el
                 xenón, el lawrencio y desde el rutherfordio (Z&nbsp;≥&nbsp;104).
               </p>
+
+              {/* S0256: las valencias salen de la tabla del formulador (valencias.ts), no de una
+                  lista propia, para que las dos apps no puedan contradecirse. */}
+              <div className={styles.valenciasFicha}>
+                <h3>Valencias en formulación</h3>
+                <div className={styles.propiedadesGrid}>
+                  {filasFicha(elementoSeleccionado.simbolo).map((fila) => (
+                    <div key={fila.rotulo} className={styles.propiedad}>
+                      <strong>{fila.rotulo}:</strong>
+                      <span>{fila.valor}</span>
+                    </div>
+                  ))}
+                </div>
+                <p className={styles.fuenteRadio}>
+                  Las de la formulación de secundaria, que esta tabla da a {TOTAL_CON_VALENCIAS} elementos:
+                  no es la lista completa de estados de oxidación de la IUPAC, y los libros no coinciden
+                  del todo entre sí, sobre todo en los metales de transición (algunos añaden el +4 del
+                  manganeso, el del MnO₂). Son las mismas que usa
+                  el <a href="/formulador-compuestos-inorganicos/">formulador de compuestos inorgánicos</a>,
+                  que nombra una fórmula y razona su número de oxidación.
+                </p>
+              </div>
 
               <div className={styles.configuracion}>
                 <strong>Configuración electrónica:</strong>
@@ -1090,6 +1160,13 @@ export default function TablaPerodicaPage() {
           <h2><span aria-hidden="true">❓</span> Preguntas frecuentes sobre la tabla periódica</h2>
 
           <div className={styles.faqGrid}>
+            <div className={styles.faqItem}>
+              <h3 className={styles.faqQuestion}>¿Qué valencias tiene cada elemento y por qué no coinciden todas las tablas?</h3>
+              <p className={styles.faqAnswer}>
+                La valencia es el número de oxidación con que un elemento entra en un compuesto: el hierro se combina con +2 (FeO) o +3 (Fe₂O₃), y el cloro con −1 en los cloruros y +1, +3, +5 o +7 en sus oxoácidos. Pulsa «Valencias» encima de la tabla para verlas en cada casilla. Son las de la formulación de secundaria; las tablas de cada libro difieren algo, sobre todo en los metales de transición, porque cada una elige qué compuestos enseña: unas añaden el +4 del manganeso (MnO₂), y otras separan las valencias con que el cromo y el manganeso actúan como metales (+2, +3) de las que tienen en sus oxoaniones (+6 en el cromato, +7 en el permanganato).
+              </p>
+            </div>
+
             <div className={styles.faqItem}>
               <h3 className={styles.faqQuestion}>¿Por qué la electronegatividad aumenta hacia la derecha y arriba en la tabla?</h3>
               <p className={styles.faqAnswer}>
