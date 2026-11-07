@@ -3204,7 +3204,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/quiz-tabla-periodica/', icon: '🧪', name: 'Quiz Tabla Periódica', description: 'Pon a prueba tus conocimientos de química' },
     { url: '/calculadora-configuracion-electronica/', icon: '⚛️', name: 'Configuración Electrónica', description: 'El llenado de orbitales de cualquier elemento o ion, paso a paso' },
     { url: '/simulador-estequiometria/', icon: '⚗️', name: 'Estequiometría', description: 'Reacciones, masas molares y reactivo limitante' },
-    { url: '/simulador-equilibrio-quimico/', icon: '⚖️', name: 'Equilibrio Químico', description: 'Le Chatelier y constante Kc' },
+    { url: '/tabla-valencias/', icon: '⚗️', name: 'Tabla de Valencias', description: 'Los números de oxidación de cada elemento, con un compuesto de ejemplo' },
   ],
   'glosario-fisica-quimica': [{ url: '/tabla-periodica/', icon: '⚗️', name: 'Tabla Periódica', description: 'Elementos químicos' }, { url: '/simulador-fisica/', icon: '🔬', name: 'Simulador Física', description: 'Simulaciones visuales' }, ...matematicasBasicasApps.slice(0, 1)],
 
