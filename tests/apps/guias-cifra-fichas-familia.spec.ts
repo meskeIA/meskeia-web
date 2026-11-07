@@ -22,7 +22,7 @@ import { test, expect } from '@playwright/test';
 
 interface Fila {
   slug: string;
-  /** Final de la clase de módulo de cada ficha (`…__card`) */
+  /** Nombre local de la clase de cada ficha (`card` → «…__card» en dev, «hash_card» en el build) */
   ficha: string;
   /** La guía escribe la cifra en el hero */
   heroConCifra: boolean;
@@ -45,14 +45,19 @@ test.describe('guías-directorio · la cifra prometida es la que se pinta (C0658
     test(`${f.slug}: hero y metadata cuadran con las fichas`, async ({ page }) => {
       await page.goto(`/${f.slug}/`);
       const fichas = await page.evaluate((fin) => {
-        const re = new RegExp(`__${fin}$`);
-        // Fuera las tarjetas de los componentes compartidos (RelatedApps, ShareCard…), que
-        // también terminan en __card
-        return [...document.querySelectorAll('[class]')].filter(
-          (e) =>
-            (e.getAttribute('class') || '').split(/\s+/).some((c) => re.test(c) && !/^(RelatedApps|ShareCard|Footer|ResultCard)/.test(c)) &&
-            !e.closest('footer, nav, [class*="elated" i], [class*="share" i]'),
-        ).length;
+        // La clase compilada es «page-module__hash__card» en `next dev` y «hash_card» en el
+        // build (C0457, tests/apps/_modulo-css.ts): se casa el final «_card» y se agrupa por
+        // clase completa, que separa el módulo de la guía de los componentes compartidos
+        // (RelatedApps, ShareCard…) que usan el mismo nombre local. Las fichas son el grupo
+        // mayor: las compartidas no pasan de 4. La primera versión buscaba «__card» y en el
+        // build contaba 0 (suite de la tanda de reparar del 07/11/2026).
+        const grupos = new Map<string, number>();
+        for (const e of document.querySelectorAll('[class]')) {
+          for (const c of e.classList) {
+            if (c.endsWith(`_${fin}`)) grupos.set(c, (grupos.get(c) ?? 0) + 1);
+          }
+        }
+        return Math.max(0, ...grupos.values());
       }, f.ficha);
       expect(fichas, 'la guía pinta sus fichas').toBeGreaterThan(5);
 
