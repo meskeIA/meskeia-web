@@ -461,3 +461,89 @@ test('el contenido educativo y el JSON-LD dicen la astronomía correcta', async 
   // 1246: lo que promete el JSON-LD se publica (altura y azimut).
   expect(todo).toContain('altura y azimut');
 });
+
+// ─────────────────────────────────────────────────────────────────────────────────────────
+// CABO C0538 (Inspector, 07/11/2026, modo cabo) — DESCARTADO; el caso queda como regresión.
+// Sospecha (campaña C0074, `check:reloj-azar --todo`): `useState<string>(hoyLocal)` mete en el
+// HTML prerenderizado la fecha del BUILD, y si React 19 no corrigiera el atributo al hidratar,
+// el campo enseñaría el día del build mientras la app calcula el de hoy (la forma de
+// simulador-kmeans: lo que se ve no es lo que se calcula).
+// Medido contra el build del 07/11/2026 (HTML servido: value="2026-11-07"): con el reloj del
+// navegador fijado al 21/06/2026 y al 21/12/2026, 12:00 en Madrid, el campo enseña ESE día en la
+// propiedad, el atributo y el estado de React, y las horas son las de ese día. React 19 reescribe
+// el `defaultValue` del input al hidratar y, con el campo sin tocar, eso mueve lo que se ve.
+// ⚠️ El día fijado va en el AÑO DEL BUILD: con otro año cambia el «© AAAA» de LegalNotice, React
+//   da el error 418 (texto distinto), REGENERA el árbol en el cliente y el campo sale bien por
+//   eso, sin haber hidratado. Por eso el caso exige además que no haya error de hidratación.
+// NOAA (implementación propia, como la cabecera; Madrid 40,4168 N 3,7038 O):
+//   21/06/2026 (UTC+2) orto 06:44:45 · ocaso 21:48:31 · día 903,8 min = 15h 4min
+//   21/12/2026 (UTC+1) orto 08:34:20 · ocaso 17:51:26 · día 557,1 min = 9h 17min
+//   07/11/2026 (UTC+1, día del build medido) orto 07:51:24 · ocaso 18:05:00 · día 10h 14min
+//   De un año a otro cambian menos de 1 min (21/06/2027: 06:44:42 y 21:48:28): cabe en ±2 min.
+// ─────────────────────────────────────────────────────────────────────────────────────────
+const DIAS_CABO_C0538 = {
+  junio: { mesDia: '06-21', hora12: 'T10:00:00Z', orto: '06:45', ocaso: '21:48', diaMin: 903.8 },
+  diciembre: { mesDia: '12-21', hora12: 'T11:00:00Z', orto: '08:34', ocaso: '17:51', diaMin: 557.1 },
+} as const;
+
+test('el campo de fecha y las horas son del día del navegador, no del build (cabo C0538)', async ({
+  browser,
+  request,
+}) => {
+  // a) Lo que trae el HTML servido: la fecha del build y el año del «©».
+  const html = await (await request.get('/golden-hour/')).text();
+  const etiqueta = html.match(/<input[^>]*id="gh-fecha"[^>]*>/)?.[0] ?? '';
+  const fechaServida = etiqueta.match(/value="([^"]*)"/)?.[1] ?? '';
+  const anioCopyright = html.match(/©\s*(?:<!-- -->)?\s*(\d{4})/)?.[1];
+  const anio = Number(anioCopyright ?? fechaServida.slice(0, 4)) || new Date().getFullYear();
+  // El solsticio más lejano del build, para que sus horas no se parezcan a las del día servido.
+  const mesBuild = Number(fechaServida.slice(5, 7)) || new Date().getMonth() + 1;
+  const dia = mesBuild >= 3 && mesBuild <= 8 ? DIAS_CABO_C0538.diciembre : DIAS_CABO_C0538.junio;
+  const diaFijado = `${anio}-${dia.mesDia}`;
+  expect(fechaServida, 'premisa: el HTML servido NO lleva ya el día que se fija').not.toBe(diaFijado);
+
+  const contexto = await browser.newContext({
+    timezoneId: 'Europe/Madrid',
+    locale: 'es-ES',
+    serviceWorkers: 'block',
+    geolocation: { latitude: 40.4168, longitude: -3.7038 },
+    permissions: ['geolocation'],
+  });
+  try {
+    const page = await contexto.newPage();
+    // Solo los errores con los que React REGENERA el árbol (418 y familia; en producción llegan
+    // como pageerror). El aviso de `next dev` «some attributes of the server rendered HTML didn't
+    // match» NO entra: es justo el atributo value que React corrige al hidratar, y sale en dev
+    // porque allí el HTML se pinta en cada petición con la fecha del servidor.
+    const erroresHidratacion: string[] = [];
+    page.on('pageerror', (e) => erroresHidratacion.push(String(e).slice(0, 200)));
+    page.on('console', (m) => {
+      if (m.type() === 'error' && /Hydration failed|error #4(18|19|22|23|25)\b/.test(m.text())) {
+        erroresHidratacion.push(m.text().slice(0, 200));
+      }
+    });
+    await simularNominatim(page);
+    // b) Reloj del navegador a las 12:00 de Madrid de otro día del mismo año que el build.
+    await page.clock.setFixedTime(new Date(`${diaFijado}${dia.hora12}`));
+    await page.goto('/golden-hour/');
+    await esperarHidratacion(page, [FECHA]);
+
+    const campo = page.locator(FECHA);
+    const servido = `HTML servido: «${fechaServida}»`;
+    expect(await campo.inputValue(), `lo que enseña el campo (${servido})`).toBe(diaFijado);
+    expect(await campo.getAttribute('value'), `atributo value (${servido})`).toBe(diaFijado);
+    expect(await leerValorEnReact(page, FECHA), 'estado de React').toBe(diaFijado);
+    expect(erroresHidratacion, 'sin error de hidratación: si lo hay, React regeneró y no midió nada').toEqual([]);
+
+    // c) Las horas son las del MISMO día que enseña el campo, no las del día del build.
+    await page.getByRole('button', { name: /Usar mi ubicación/ }).click();
+    await expect(page.getByRole('heading', { name: /Detalle completo/ })).toBeVisible();
+    await esperarHora(page, 'Mañana', 'Amanecer', dia.orto, 2);
+    await esperarHora(page, 'Tarde', 'Atardecer', dia.ocaso, 2);
+    const duracion = await duracionDia(page);
+    expect(Math.abs(duracion.min - dia.diaMin), `duración: ${duracion.texto}`).toBeLessThanOrEqual(2);
+    expect(await campo.inputValue(), 'el campo sigue en el día calculado').toBe(diaFijado);
+  } finally {
+    await contexto.close();
+  }
+});

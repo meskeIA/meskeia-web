@@ -1,5 +1,5 @@
-import { test, expect } from '@playwright/test';
-import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
+import { test, expect, type Page } from '@playwright/test';
+import { esperarHidratacion, esperarValorEnReact, sembrarValor } from './_hidratacion';
 import {
   CASOS,
   FICHAS,
@@ -323,5 +323,260 @@ test.describe('Casos para clase — en el navegador', () => {
     await esperarValorEnReact(page, caja, 'abc');
     await page.locator('#casos-comprobar').click();
     await expect(page.locator('#casos-veredicto')).toContainText('Escribe un número');
+  });
+});
+
+/* ══════════════════════════════════════════════════════════════════════════════════════════
+ * Inspector, 07/11/2026 — primera inspección, la app entera (panel Preparar, panel Diluir,
+ * masas molares, JSON-LD). Esperados resueltos a mano ANTES de mirar la app.
+ *
+ * MASAS MOLARES: tabla abreviada de pesos atómicos estándar 2024 de la CIAAW
+ * (www.ciaaw.org/abridged-atomic-weights.htm, consultada el 07/11/2026), con su incertidumbre:
+ *   KMnO₄    39,098 + 54,938 + 4·15,999           = 158,032 ± 0,006   (app 158,03)
+ *   CuSO₄    63,546 + 32,06 + 4·15,999            = 159,602 ± 0,027   (app 159,61, dentro)
+ *   K₂Cr₂O₇  2·39,098 + 2·51,996 + 7·15,999       = 294,181 ± 0,011   (app 294,18)
+ *   NiCl₂    58,693 + 2·35,45                     = 129,593 ± 0,021   (app 129,60, dentro)
+ *   NaCl     22,990 + 35,45                       =  58,440 ± 0,011   (app 58,44)
+ *   C₆H₁₂O₆  6·12,011 + 12·1,0080 + 6·15,999      = 180,156 ± 0,020   (app 180,16)
+ *
+ * LOS CASOS DEL PANEL:
+ *   A  NaCl 14,5 g en 250 mL: n = 14,5/58,44 = 0,248118 mol → 0,2481 · M = n/0,25 = 0,99247 → 0,992
+ *      · 14,5/0,25 = 58,00 g/L · 14,5/250·100 = 5,80 % m/v · 14 500 mg/0,25 L = 58.000 ppm
+ *   A2 K₂Cr₂O₇ 29,5 g en 750 mL: n = 29,5/294,18 = 0,100279 → 0,1003 · M = n/0,75 = 0,133705 → 0,134
+ *      · 39,333 → 39,33 g/L · 3,9333 → 3,93 % m/v · 39.333,3 → 39.333 ppm
+ *   L  glucosa 0,5 g en 1000 mL (los dos topes del deslizador): n = 0,5/180,16 = 0,0027753 → 0,0028
+ *      · M → 0,003 · 0,50 g/L · 0,05 % m/v · 500 ppm
+ *   P  personalizado 98,08 g/mol tecleado con coma, 49 g en 250 mL: n = 0,4995922 → 0,4996
+ *      · M = n/0,25 = 1,998369 → 1,998. «0» como masa molar dividiría entre cero: el campo lo acota
+ *      a su mínimo (1 g/mol, CampoNumerico min 1), lo marca aria-invalid y al salir enseña «1»;
+ *      M = 49/1/0,25 = 196,000
+ *   B  Diluir 1,5 → 0,35 mol/L, V₂ 330 mL: V₁ = 0,35·330/1,5 = 77,0 mL · agua 330 − 77 = 253,0 mL
+ *      · factor 1,5/0,35 = 4,2857 → 4,3×
+ *   C  Diluir 0,8 → 0,8 mol/L, V₂ 400 mL (el límite C₂ = C₁): V₁ 400,0 · disolvente 0,0 · factor 1,0×
+ *   R  Diluir 1 → 1,5 mol/L: concentrar diluyendo es imposible → aviso y ningún resultado
+ *   V  Color del vaso (feature del JSON-LD): KMnO₄ en 500 mL, 15 g → M = 0,189837 y opacidad
+ *      M/1,2 = 0,1582; 30 g → 0,379675 y 0,3164: el doble, como la concentración
+ *   S  KMnO₄ 100 g en 50 mL = 2000 g/L → M = 100/158,03/0,05 = 12,656. La propia app cifra la
+ *      solubilidad del KMnO₄ en 60 g/L (MAXIMO_G_POR_LITRO de casos.ts, «para no pedir una
+ *      disolución que no se puede hacer») → ABIERTO: el panel la pinta como disolución sin aviso
+ * ══════════════════════════════════════════════════════════════════════════════════════════ */
+
+/** Pesos atómicos estándar abreviados 2024 de la CIAAW: [valor, incertidumbre]. */
+const CIAAW_2024: Record<string, [number, number]> = {
+  H: [1.008, 0.0002],
+  C: [12.011, 0.002],
+  O: [15.999, 0.001],
+  Na: [22.99, 0.001],
+  S: [32.06, 0.02],
+  Cl: [35.45, 0.01],
+  K: [39.098, 0.001],
+  Cr: [51.996, 0.001],
+  Mn: [54.938, 0.001],
+  Ni: [58.693, 0.001],
+  Cu: [63.546, 0.003],
+};
+
+/** Fórmula de cada soluto de la lista, átomo a átomo. */
+const COMPOSICION: Record<string, Record<string, number>> = {
+  kmno4: { K: 1, Mn: 1, O: 4 },
+  cuso4: { Cu: 1, S: 1, O: 4 },
+  k2cr2o7: { K: 2, Cr: 2, O: 7 },
+  nicl2: { Ni: 1, Cl: 2 },
+  nacl: { Na: 1, Cl: 1 },
+  glucosa: { C: 6, H: 12, O: 6 },
+};
+
+/** Masa molar CIAAW y su incertidumbre propagada (suma de n·U, el peor caso). */
+function masaMolarCiaaw(id: string): { valor: number; incertidumbre: number } {
+  const formula = COMPOSICION[id];
+  let valor = 0;
+  let incertidumbre = 0;
+  for (const [elemento, n] of Object.entries(formula)) {
+    const [ar, u] = CIAAW_2024[elemento];
+    valor += n * ar;
+    incertidumbre += n * u;
+  }
+  return { valor, incertidumbre };
+}
+
+/** La tarjeta de resultado por su rótulo («Molaridad», «Disolvente a añadir»…). */
+const tarjeta = (page: Page, rotulo: string) => page.locator('[class*="resultCard"]').filter({ hasText: rotulo });
+
+test.describe('Inspector 07/11/2026 — masas molares contra la CIAAW, sin navegador', () => {
+  test('cada soluto de la lista tiene la masa molar de los pesos atómicos estándar 2024', () => {
+    expect(SOLUTOS.map((s) => s.id).sort()).toEqual(Object.keys(COMPOSICION).sort());
+    for (const s of SOLUTOS) {
+      const { valor, incertidumbre } = masaMolarCiaaw(s.id);
+      // Margen: la incertidumbre propagada más el redondeo a dos decimales de la lista. Un
+      // error de tecleo (158,3 por 158,03) se sale por mucho.
+      expect(Math.abs(s.masaMolar - valor), `${s.formula}: app ${s.masaMolar} · CIAAW ${valor.toFixed(3)} ± ${incertidumbre.toFixed(3)}`).toBeLessThanOrEqual(
+        incertidumbre + 0.005,
+      );
+    }
+  });
+});
+
+test.describe('Inspector 07/11/2026 — panel Preparar y Diluir en el navegador', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/simulador-disoluciones/');
+    await esperarHidratacion(page, ['#masa-input', '#casos-respuesta']);
+  });
+
+  test('las masas molares que enseña cada botón casan con la CIAAW', async ({ page }) => {
+    for (const s of SOLUTOS) {
+      await page.getByRole('button', { name: new RegExp(s.formula) }).first().click();
+      const texto = await page.locator('[class*="masaMolarNota"]').textContent();
+      const m = (texto ?? '').match(/Masa molar:\s*([\d.]+,\d{2})\s*g\/mol/);
+      expect(m, `${s.formula}: «${texto}»`).not.toBeNull();
+      const enPantalla = Number(m![1].replace(/\./g, '').replace(',', '.'));
+      const { valor, incertidumbre } = masaMolarCiaaw(s.id);
+      expect(Math.abs(enPantalla - valor), `${s.formula}: ${enPantalla}`).toBeLessThanOrEqual(incertidumbre + 0.005);
+    }
+  });
+
+  test('A · NaCl, 14,5 g en 250 mL: 0,992 mol/L · 0,2481 mol · 58,00 g/L · 5,80 % m/v · 58.000 ppm', async ({ page }) => {
+    await page.getByRole('button', { name: /NaCl/ }).first().click();
+    await sembrarValor(page, '#masa-input', 14.5);
+    await sembrarValor(page, '#vol-input', 250);
+    await expect(tarjeta(page, 'Molaridad')).toContainText('0,992 mol/L');
+    await expect(tarjeta(page, 'Moles de soluto')).toContainText('0,2481 mol');
+    await expect(tarjeta(page, 'Concentración másica')).toContainText('58,00 g/L');
+    await expect(tarjeta(page, '% masa / volumen')).toContainText('5,80 % m/v');
+    await expect(tarjeta(page, 'ppm')).toContainText('58.000 ppm');
+    await expect(page.locator('[class*="formulaNota"]')).toContainText('(14,5 g ÷ 58,44 g/mol) ÷ 0,250 L = 0,992 mol/L');
+  });
+
+  test('A2 · K₂Cr₂O₇, 29,5 g en 750 mL: 0,134 mol/L · 0,1003 mol · 39,33 g/L · 3,93 % m/v · 39.333 ppm', async ({ page }) => {
+    await page.getByRole('button', { name: /K₂Cr₂O₇/ }).first().click();
+    await sembrarValor(page, '#masa-input', 29.5);
+    await sembrarValor(page, '#vol-input', 750);
+    await expect(tarjeta(page, 'Molaridad')).toContainText('0,134 mol/L');
+    await expect(tarjeta(page, 'Moles de soluto')).toContainText('0,1003 mol');
+    await expect(tarjeta(page, 'Concentración másica')).toContainText('39,33 g/L');
+    await expect(tarjeta(page, '% masa / volumen')).toContainText('3,93 % m/v');
+    await expect(tarjeta(page, 'ppm')).toContainText('39.333 ppm');
+  });
+
+  test('L · los topes del deslizador: 0,5 g de glucosa en 1000 mL', async ({ page }) => {
+    await page.getByRole('button', { name: /C₆H₁₂O₆/ }).first().click();
+    await sembrarValor(page, '#masa-input', 0.5);
+    await sembrarValor(page, '#vol-input', 1000);
+    await expect(tarjeta(page, 'Molaridad')).toContainText('0,003 mol/L');
+    await expect(tarjeta(page, 'Moles de soluto')).toContainText('0,0028 mol');
+    await expect(tarjeta(page, 'Concentración másica')).toContainText('0,50 g/L');
+    await expect(tarjeta(page, '% masa / volumen')).toContainText('0,05 % m/v');
+    await expect(tarjeta(page, 'ppm')).toContainText('500 ppm');
+  });
+
+  test('P · masa molar personalizada: 98,08 con coma vale; «0» se acota a 1 g/mol y se marca inválido', async ({ page }) => {
+    await page.getByRole('button', { name: /Personalizado/ }).click();
+    const campo = page.getByRole('spinbutton', { name: 'Masa molar personalizada en g/mol' });
+    await campo.fill('98,08');
+    await esperarValorEnReact(page, campo, '98,08');
+    await expect(page.locator('[class*="masaMolarNota"]')).toContainText('98,08 g/mol');
+    await sembrarValor(page, '#masa-input', 49);
+    await sembrarValor(page, '#vol-input', 250);
+    await expect(tarjeta(page, 'Moles de soluto')).toContainText('0,4996 mol');
+    await expect(tarjeta(page, 'Molaridad')).toContainText('1,998 mol/L');
+
+    // Rechazo: una masa molar de 0 dividiría entre cero. No se usa: se aplica el mínimo.
+    await campo.fill('0');
+    await expect(campo).toHaveAttribute('aria-invalid', 'true');
+    await campo.press('Tab');
+    await expect(campo).toHaveValue('1');
+    await expect(page.locator('[class*="masaMolarNota"]')).toContainText('1,00 g/mol');
+    await expect(tarjeta(page, 'Molaridad')).toContainText('196,000 mol/L');
+  });
+
+  test('B · Diluir de 1,5 a 0,35 mol/L hasta 330 mL: V₁ 77,0 mL · agua 253,0 mL · factor 4,3×', async ({ page }) => {
+    await page.getByRole('button', { name: /Diluir/ }).click();
+    await sembrarValor(page, '#c1-input', 1.5);
+    await sembrarValor(page, '#c2-input', 0.35);
+    await sembrarValor(page, '#v2-input', 330);
+    await expect(tarjeta(page, 'Volumen de madre')).toContainText('77,0 mL');
+    await expect(tarjeta(page, 'Disolvente a añadir')).toContainText('253,0 mL');
+    await expect(tarjeta(page, 'Factor de dilución')).toContainText('4,3×');
+    await expect(page.locator('[class*="formulaNota"]')).toContainText('(0,35 × 330) ÷ 1,50 = 77,0 mL');
+  });
+
+  test('C · el límite C₂ = C₁ (0,8 mol/L, 400 mL): toda la madre, 0,0 mL de agua y factor 1,0×', async ({ page }) => {
+    await page.getByRole('button', { name: /Diluir/ }).click();
+    await sembrarValor(page, '#c1-input', 0.8);
+    await sembrarValor(page, '#c2-input', 0.8);
+    await sembrarValor(page, '#v2-input', 400);
+    await expect(tarjeta(page, 'Volumen de madre')).toContainText('400,0 mL');
+    await expect(tarjeta(page, 'Disolvente a añadir')).toContainText('0,0 mL');
+    await expect(tarjeta(page, 'Factor de dilución')).toContainText('1,0×');
+  });
+
+  test('R · Diluir de 1 a 1,5 mol/L se rechaza con aviso y sin resultados', async ({ page }) => {
+    await page.getByRole('button', { name: /Diluir/ }).click();
+    await sembrarValor(page, '#c1-input', 1);
+    await sembrarValor(page, '#c2-input', 1.5);
+    // Acotado al aviso de la app: getByRole('alert') también casa con el anunciador de rutas de Next.
+    await expect(page.getByRole('alert').filter({ hasText: 'menor o igual' })).toBeVisible();
+    await expect(tarjeta(page, 'Volumen de madre')).toHaveCount(0);
+  });
+
+  test('V · el color del vaso sigue a la concentración: doble molaridad, doble opacidad', async ({ page }) => {
+    const liquido = page.locator('svg[aria-label="Vaso de precipitados con la disolución"] rect');
+    const opacidad = async () => {
+      const fill = (await liquido.getAttribute('fill')) ?? '';
+      const m = fill.match(/rgba\([^)]*,\s*([\d.]+)\)/);
+      return m ? Number(m[1]) : Number.NaN;
+    };
+    await page.getByRole('button', { name: /KMnO₄/ }).first().click();
+    await expect(page.locator('label[for="vol-input"]')).toContainText('500 mL');
+    await sembrarValor(page, '#masa-input', 15);
+    await expect.poll(opacidad).toBeCloseTo(0.1582, 3);
+    await sembrarValor(page, '#masa-input', 30);
+    await expect.poll(opacidad).toBeCloseTo(0.3164, 3);
+  });
+
+  test('J · el JSON-LD existe, con al menos 4 características y 5 preguntas', async ({ page }) => {
+    const bloques = (await page.locator('script[type="application/ld+json"]').allTextContents()).map(
+      (b) => JSON.parse(b) as Record<string, unknown>,
+    );
+    const app = bloques.find((b) => b['@type'] === 'WebApplication' && String(b.name).includes('Disoluciones'));
+    expect(app).toBeDefined();
+    expect((app!.featureList as string[]).length).toBeGreaterThanOrEqual(4);
+    const faq = bloques.find((b) => b['@type'] === 'FAQPage');
+    expect((faq!.mainEntity as unknown[]).length).toBe(5);
+  });
+
+  // ABIERTO (Inspector 07/11/2026): la descripción del JSON-LD dice «el volumen de disolvente»,
+  // y la app calcula con el volumen de DISOLUCIÓN (su deslizador se llama así) y avisa de que
+  // usar el de disolvente es el primer error frecuente. Lo leen buscadores y asistentes de IA.
+  test('J2 · ABIERTO: la descripción del JSON-LD habla del volumen de disolución, no de disolvente', async ({ page }) => {
+    test.fail(true, 'ABIERTO: metadata.ts dice «el volumen de disolvente» en la description del jsonLd');
+    const bloques = (await page.locator('script[type="application/ld+json"]').allTextContents()).map(
+      (b) => JSON.parse(b) as Record<string, unknown>,
+    );
+    const app = bloques.find((b) => b['@type'] === 'WebApplication' && String(b.name).includes('Disoluciones'));
+    expect(String(app?.description ?? '')).not.toMatch(/volumen de disolvente/i);
+  });
+
+  // ABIERTO (Inspector 07/11/2026): el % del panel va tras un espacio NORMAL («5,80 <small>% m/v»),
+  // y el % se separa con espacio duro (U+00A0) para que no salte solo de línea. casos.ts ya lo hace.
+  test('F · ABIERTO: el % m/v del panel va separado con espacio duro', async ({ page }) => {
+    test.fail(true, 'ABIERTO: page.tsx escribe «{cifra} <small>% m/v</small>» con un espacio normal');
+    await page.getByRole('button', { name: /C₆H₁₂O₆/ }).first().click();
+    await sembrarValor(page, '#masa-input', 25);
+    const valor = tarjeta(page, '% masa / volumen').locator('[class*="resultValor"]');
+    await expect(valor).toContainText('5,00');
+    expect(await valor.textContent()).toMatch(/5,00 %/);
+  });
+
+  // ABIERTO (Inspector 07/11/2026): 100 g de KMnO₄ en 50 mL son 2000 g/L, 33 veces la solubilidad
+  // que la propia app le da (60 g/L en MAXIMO_G_POR_LITRO de casos.ts), y el panel los pinta como
+  // una disolución de 12,656 mol/L, sin ningún aviso. La aritmética sí es la del caso S.
+  test('S · ABIERTO: una disolución por encima de la solubilidad se avisa', async ({ page }) => {
+    test.fail(true, 'ABIERTO: el panel no conoce la solubilidad y pinta como disolución lo que no se disuelve');
+    await page.getByRole('button', { name: /KMnO₄/ }).first().click();
+    await sembrarValor(page, '#masa-input', 100);
+    await sembrarValor(page, '#vol-input', 50);
+    await expect(page.locator('main section:not(#casos-aula)').filter({ hasText: /solubilidad|saturad|no se disuelve/i })).not.toHaveCount(0, {
+      timeout: 3000,
+    });
   });
 });

@@ -144,8 +144,39 @@ import { esperarHidratacion, esperarValorEnReact, sembrarValor } from './_hidrat
  *       = 891,00 €/mes, que queda 2,30 € POR ENCIMA de 888,70: sin aviso de mínimos.
  *
  *   CASOS 13-18 documentaban hallazgos del 04/10/2026. REPARADOS ese día los 13, 15, 16, 17 y 18
- *   (2871, 2872, 2875, 2876, 2877); el 14 (2874) sigue ABIERTO con su test.fail.
+ *   (2871, 2872, 2875, 2876, 2877), y el 14 (2874) el 24/10/2026.
  *   CASO 19 comprueba que título, JSON-LD y DataReference dicen el mismo año.
+ *
+ * ── CABO C0139 (inspector 07/11/2026, modo cabo) · resuelto a mano ANTES de abrir la app ──
+ *   (a) «retenciones del 8-15 %» de «Errores frecuentes». data/fiscal no tiene módulo de
+ *       retenciones: el procedimiento sale del Reglamento del IRPF (RD 439/2007, BOE-A-2007-6820,
+ *       leído en el BOE el 07/11/2026) y sus importes, de data/fiscal donde los hay:
+ *       · art. 81: no hay obligación de retener hasta 15.876 € (situación 3.ª, sin descendientes),
+ *         «se incrementarán en 600 euros en el caso de pensiones» de la SS → 16.476 €/año.
+ *       · art. 83.3: base = cuantía − 2.000 (art. 19.2.f, GASTOS_DEDUCIBLES_TRABAJO_2025) − reducción
+ *         del art. 20 (REDUCCION_RENDIMIENTOS_TRABAJO_2025; 0 desde 19.747,5) − 600 por pensión.
+ *       · art. 84 → mínimo del título V LIRPF: MINIMOS_IRPF_2025.personal_65 = 6.700 (8.100 desde 75).
+ *       · art. 85.1: escala 19 / 24 / 30 / 37 / 45 / 47 % con límites 12.450 / 20.200 / 35.200 /
+ *         60.000 / 300.000; menos la misma escala sobre el mínimo. art. 86.1: cuota / cuantía × 100.
+ *       Pensión mínima unipersonal 2026 (LIMITES_PENSION_2026.minimaSolo): 936,20 × 14 = 13.106,80 €
+ *         ≤ 16.476 → retención 0 %.
+ *       Pensión máxima 2026: 3.359,60 × 14 = 47.034,40 € → base 44.434,40 → 8.725,50 + 9.234,40 × 37 %
+ *         = 12.142,23 − 6.700 × 19 % (1.273,00) = 10.869,23 → 23,11 % (22,54 % desde los 75).
+ *       Ni el suelo ni el techo caen en el 8-15 %. CASO 21, ABIERTO.
+ *   (b) TABLA_EDAD_JUBILACION va por el AÑO en que se produce la jubilación: 2025 → 66a8m,
+ *       2026 → 66a10m, 2027 → 67a. Con 30 años (menos de los 38a3m que en 2025 dan los 65):
+ *       · nacido el 15/01/1960: cumple 66a10m el 15/11/2026 → jubilación en 2026 a los 66 y 10.
+ *       · nacido el 15/02/1960: los cumple el 15/12/2026 → también 2026, 66 y 10.
+ *       · nacido el 15/03/1960: los cumple el 15/01/2027, cuando ya se piden 67 → 15/03/2027, 67.
+ *       30 años = 360 meses · base 1.200 €:
+ *         en 2026, 50 + 49 × 0,21 + 131 × 0,19 = 85,18 %; dual 2026 1.200 × 302/352,33 = 1.028,58
+ *           (gana a la clásica 1.028,57) → 876,15 €/mes, 12.266,04 €/año.
+ *         en 2027, 50 + 180 × 0,19 = 84,20 %; la clásica gana a la dual 304/354,67 → 866,06 €/mes.
+ *       La app no pregunta el mes y da a todo 1960 lo de marzo a diciembre. CASO 22, ABIERTO;
+ *       el 22.bis es el contraste: lo que da hoy, que es lo correcto de marzo a diciembre.
+ *       (La misma aproximación da a quien nació de enero a abril de 1959 «66 y 10 en 2026», cuando
+ *       cumple los 66a8m que pide 2025 entre septiembre y diciembre de 2025: el CASO 14 vigila esa
+ *       fila con la aproximación por años y habrá que adaptarlo con la reparación.)
  */
 
 const RUTA = '/simulador-jubilacion-publica/';
@@ -688,4 +719,73 @@ test('CASO 20 · las cifras normativas de la guía y del FAQPage salen de data/f
   expect(guia).toContain('2 años son 8 trimestres → 16,00 % permanente');
   expect(guia).toContain('así que el mínimo son 63 años y 10 meses');
   await expect(page.locator('[class*="tablaHighlight"]')).toContainText('2026');
+});
+
+// ── Cabo C0139 (inspector 07/11/2026) · cálculos a mano en la cabecera ──────────────────────
+
+test('CASO 21 · cabo C0139 (a) · «retenciones del 8-15 %» no casa con la pensión mínima (0 %) ni con la máxima (23,11 %)', async ({ page }) => {
+  // ABIERTO (inspector 07/11/2026, cabo C0139). La cifra está tecleada en page.tsx sin fuente y
+  // data/fiscal no tiene módulo de retenciones. Esperado con el RIRPF (arts. 81, 83.3, 84, 85.1 y
+  // 86.1, BOE-A-2007-6820) y data/fiscal: mínima unipersonal 2026, 13.106,80 €/año ≤ 16.476 € del
+  // art. 81 → 0 %; máxima 2026, 47.034,40 €/año → 23,11 % (65-74 años). Ninguna en el 8-15 %.
+  test.fail();
+  await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+  const consejo = page.locator('li').filter({ hasText: 'Ignorar el impacto del IRPF' });
+  // Preparación: el consejo existe y habla de retenciones.
+  await expect(consejo).toHaveCount(1);
+  await expect(consejo).toContainText('rendimientos del trabajo');
+  // Lo que debe pasar: no se da un intervalo que excluye a los dos extremos de la pensión pública.
+  await expect(consejo).not.toContainText(/8\s*-\s*15/);
+});
+
+/**
+ * Si la reparación añade el mes de nacimiento, el caso lo elige; si no, el resultado de 1960 tiene
+ * que contar, al menos, lo que corresponde a quien nació en enero o febrero.
+ */
+async function simular1960(page: Page, mes: string): Promise<boolean> {
+  const control = page.getByLabel(/mes de nacimiento/i);
+  const hayMes = (await control.count()) > 0;
+  if (!hayMes) {
+    await simular(page, 1960, 30, 1200);
+    return false;
+  }
+  await page.selectOption(SEL.anio, '1960');
+  await control.selectOption(mes);
+  await sembrarValor(page, SEL.anos, 30);
+  await sembrarValor(page, SEL.base, 1200);
+  await page.locator(SEL.btnCalcular).click();
+  return true;
+}
+
+test('CASO 22 · cabo C0139 (b) · nacido en enero de 1960 sin la cotización de los 65: 66 años y 10 meses en 2026, escala de 2026', async ({ page }) => {
+  // ABIERTO (inspector 07/11/2026, cabo C0139). TABLA_EDAD_JUBILACION: 2026 pide 66a10m y el nacido
+  // el 15/01/1960 los cumple el 15/11/2026 (el de febrero, el 15/12/2026). La app no pregunta el mes
+  // y le da «67 años · Te jubilarías en 2027» con la escala de 2027: 84,20 % y 866,06 €/mes en vez
+  // de 85,18 % y 876,15 €/mes (30 años, 1.200 €; cuentas en la cabecera).
+  test.fail();
+  const hayMes = await simular1960(page, '1');
+  const estado = page.getByRole('status').first();
+  // Preparación: el cálculo se hizo y no llegaba a los 38a3m de los 65.
+  await expect(estado).toContainText('no alcanzas el umbral de 38 años y 3 meses');
+  // Lo que debe pasar: la edad y el año de quien nació en enero o febrero de 1960.
+  await expect(estado).toContainText('66 años y 10 meses');
+  await expect(estado).toContainText('2026');
+  if (hayMes) {
+    await expect(estado).toContainText('Te jubilarías en 2026');
+    // 50 + 49 × 0,21 + 131 × 0,19 (escala 2023-2026) · dual 2026 302/352,33 → 876,15
+    await expect(valorDe(page, 'Porcentaje por años cotizados')).toHaveText(pct('85,18'));
+    expect(await importeDe(page, 'Pensión mensual estimada (bruta)')).toBeCloseTo(876.15, 2);
+  }
+});
+
+test('CASO 22.bis · contraste del cabo C0139: de marzo a diciembre de 1960 sí son 67 años en 2027, 84,20 % y 866,06 €', async ({ page }) => {
+  // El nacido el 15/03/1960 cumple 66a10m el 15/01/2027, cuando TABLA_EDAD_JUBILACION ya pide 67:
+  // se jubila el 15/03/2027. Es lo que la app da hoy a todo 1960.
+  await simular1960(page, '3');
+  const estado = page.getByRole('status').first();
+  await expect(estado).toContainText('67 años');
+  await expect(estado).toContainText('Te jubilarías en 2027');
+  // 50 + 180 × 0,19 (escala de 2027); la clásica 1.028,5714 gana a la dual 304/354,67.
+  await expect(valorDe(page, 'Porcentaje por años cotizados')).toHaveText(pct('84,20'));
+  expect(await importeDe(page, 'Pensión mensual estimada (bruta)')).toBeCloseTo(866.06, 2);
 });

@@ -9,6 +9,10 @@ import { acentuacionDe, analizarVerso, separarSilabas } from '../../app/contador
 /**
  * Inspector — contador-silabas (segmento interactiva con motor lingüístico)
  *
+ * NOVENA INSPECCIÓN: 07/11/2026, modo CAMBIO por b9d7ff45 (cabo C0243: key por análisis en el
+ * resultado y medidor con hijo único). Sus tres casos con la página traducida y un detector de
+ * texto viejo de toda la página, en el último bloque del fichero: la reparación se sostiene. Un
+ * hallazgo bajo ABIERTO (la pista del metro 20, «para el veinte sílabas»), con test.fail().
  * OCTAVA INSPECCIÓN: 01/11/2026, RE-INSPECCIÓN por el cambio de código del 27/10 y 9f57450f.
  * Sus casos y sus hallazgos (3872-3877), en el último bloque del fichero: se escribieron con
  * test.fail() y se REPARARON el 01/11/2026; quedan sin la marca, como regresión.
@@ -2685,5 +2689,292 @@ test.describe('contador-silabas · Inspector 01/11/2026 (octava inspección)', (
       }));
       expect(anchos.documento).toBeLessThanOrEqual(anchos.ventana);
     });
+  });
+});
+
+// =====================================================================================
+// NOVENA INSPECCIÓN — 07/11/2026, modo CAMBIO (b9d7ff45 y 1b358d17, cabo C0243)
+//
+// QUÉ CAMBIÓ (git diff fb0679bd HEAD -- app/contador-silabas/): solo page.tsx. El bloque de
+// resultado lleva key por análisis (`<Fragment key={analisisN}>`), para que cada «Analizar»
+// pinte nodos NUEVOS, y en el medidor del modo composición la pista y la cuenta «{a}/{b}» pasan
+// a ser el ÚNICO hijo de su elemento (React usa entonces setTextContent y se lleva el <font>).
+// El motor (silabeo.ts, metrica.ts, rima.ts) no se tocó.
+//
+// QUÉ SE MIDE: con la página traducida (traductor simulado), que NINGÚN nodo de texto de la
+// página se quede con el valor anterior, no solo los que el test de C0243 nombra. Detector, el
+// de tests/apps/generador-loteria.spec.ts: el traductor apunta cada nodo que retira con su
+// valor; si React vuelve a escribir en uno de ellos, en pantalla sigue el <font> viejo. Lleva
+// su control positivo (último test del bloque).
+//
+// LOS TRES CASOS, RESUELTOS A MANO ANTES DE ABRIR EL NAVEGADOR
+//   CASO 1 (normal) Sor Juana → Quevedo, traducida y SIN Limpiar.
+//     «Hombres necios que acusáis»: Hom-bres(2) ne-cios(2) que(1) a-cu-sáis(3) = 8 fonéticas,
+//       − 1 (que ⌣ acusáis), + 1 (aguda) = 8, octosílabo, arte menor.
+//     «Érase un hombre a una nariz pegado»: É-ra-se(3) un(1) hom-bre(2) a(1) u-na(2) na-riz(2)
+//       pe-ga-do(3) = 14 en 7 palabras (media 2,0); − 3 (Érase ⌣ un, hombre ⌣ a, a ⌣ una),
+//       ± 0 (llana) = 11, endecasílabo, arte mayor.
+//     Cambian de valor, en nodos de texto con hermanos, el «arte», las «fonéticas», «1 sinalefa»
+//     → «3 sinalefas» y el ajuste «+ 1 (… aguda)» → «± 0 (… llana)»: lo que el test de C0243
+//     no cubre (su primer verso, el de Bécquer, no tiene sinalefas).
+//   CASO 2 (límite) la redondilla de Sor Juana → dos versos de Bécquer, traducida y sin Limpiar.
+//     Redondilla: 8 − 1 + 1 · a(1) la(1) mu-jer(2) sin(1) ra-zón(2) = 7 + 1 · sin ver que sois
+//       la o-ca-sión = 8 − 1 (la ⌣ ocasión) + 1 · de lo mis-mo que cul-páis = 7 + 1 → 8, 8, 8, 8;
+//       -áis / -ón / -ón / -áis → abba, Consonante.
+//     Bécquer: Vol-ve-rán las os-cu-ras go-lon-dri-nas = 11, sin contactos, llana → 11; en tu
+//       bal-cón sus ni-dos a col-gar = 10, sin contactos, aguda + 1 → 11. «-inas» y «-ar» no
+//       riman: «--» (dos versos sueltos de arte mayor), «Verso libre». El panel pasa de cuatro
+//       tarjetas a dos y la rima pierde su estrofa.
+//   CASO 3 (medidor) octosílabo con «Hombres necios que acusáis» → 8/8 «✓ justo»; con
+//     «Volverán las oscuras golondrinas» → 11/8 «sobran 3»; endecasílabo → 11/11 «✓ justo»;
+//     fijar 12 → 11/12 «faltan 1»; vaciar el verso → la pista acaba «para el dodecasílabo.».
+//     Traduciendo antes de cada paso.
+//
+// RESULTADO: la reparación SE SOSTIENE en los tres (0 nodos viejos, 0 errores, y el panel
+// traducido dice lo mismo que el mismo análisis sin traducir). Un hallazgo bajo, ABIERTO, en
+// la línea de la pista que reescribió el cambio: con el metro en 20 dice «para el veinte sílabas».
+// =====================================================================================
+
+interface NodoApuntado {
+  nodo: Text;
+  valor: string | null;
+  avisado: boolean;
+}
+type VentanaApuntada = Window & { __nodosApuntados?: NodoApuntado[] };
+
+/** El traductor simulado de `traducirPagina`, que además apunta cada nodo que retira y su valor. */
+async function traducirApuntando(page: Page): Promise<void> {
+  await asentarAntesDeTraducir(page);
+  await page.evaluate(() => {
+    const w = window as VentanaApuntada;
+    const apuntados = (w.__nodosApuntados = w.__nodosApuntados ?? []);
+    const caminante = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+      acceptNode: (n) => {
+        const padre = n.parentElement;
+        if (!padre || !(n.nodeValue ?? '').trim()) return NodeFilter.FILTER_REJECT;
+        if (/^(SCRIPT|STYLE|OPTION|NOSCRIPT|FONT|TEXTAREA)$/.test(padre.tagName)) {
+          return NodeFilter.FILTER_REJECT;
+        }
+        return NodeFilter.FILTER_ACCEPT;
+      },
+    });
+    const nodos: Text[] = [];
+    while (caminante.nextNode()) nodos.push(caminante.currentNode as Text);
+    for (const nodo of nodos) {
+      const exterior = document.createElement('font');
+      const interior = document.createElement('font');
+      interior.textContent = nodo.nodeValue;
+      exterior.appendChild(interior);
+      apuntados.push({ nodo, valor: nodo.nodeValue, avisado: false });
+      nodo.parentNode?.replaceChild(exterior, nodo);
+    }
+  });
+}
+
+/** Nodos que el traductor retiró y en los que React ha vuelto a escribir: texto viejo en pantalla. */
+async function textoViejo(page: Page): Promise<string[]> {
+  return page.evaluate(() => {
+    const r: string[] = [];
+    for (const t of (window as VentanaApuntada).__nodosApuntados ?? []) {
+      if (!t.avisado && t.nodo.nodeValue !== t.valor) {
+        t.avisado = true;
+        r.push(`«${t.valor}» → «${t.nodo.nodeValue}»`);
+      }
+    }
+    return r;
+  });
+}
+
+test.describe('contador-silabas · Inspector 07/11/2026 (novena inspección, modo cambio)', () => {
+  const QUEVEDO = 'Érase un hombre a una nariz pegado';
+  const REDONDILLA = `Hombres necios que acusáis
+a la mujer sin razón,
+sin ver que sois la ocasión
+de lo mismo que culpáis`;
+  const BECQUER = `Volverán las oscuras golondrinas
+en tu balcón sus nidos a colgar`;
+
+  test.beforeEach(async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacionReact(page, ['textarea']);
+  });
+
+  function escucharErrores(page: Page): string[] {
+    const errores: string[] = [];
+    page.on('pageerror', (e) => errores.push(e.message));
+    page.on('console', (m) => {
+      if (m.type() === 'error' && /NotFoundError|insertBefore|removeChild/.test(m.text())) {
+        errores.push(m.text());
+      }
+    });
+    return errores;
+  }
+
+  /** Escribe el texto SIN Limpiar (lo que reutiliza los nodos) y pulsa «Analizar». */
+  async function escribirYAnalizar(page: Page, texto: string): Promise<void> {
+    await page.fill('textarea', texto);
+    await esperarValorEnReact(page, 'textarea', texto);
+    await page.getByRole('button', { name: 'Analizar Sílabas' }).click();
+  }
+
+  async function panelDe(page: Page): Promise<string> {
+    return (await page.locator('[class*="resultsPanel"]').innerText()).replace(/\s+/g, ' ').trim();
+  }
+
+  /** El mismo análisis en otra pestaña, sin traducir: lo que el panel traducido tiene que decir. */
+  async function panelDeReferencia(page: Page, texto: string): Promise<string> {
+    const ref = await page.context().newPage();
+    await ref.goto(RUTA);
+    await esperarHidratacionReact(ref, ['textarea']);
+    await escribirYAnalizar(ref, texto);
+    await expect(ref.locator('[class*="palabraCard"]').first()).toBeVisible();
+    const panel = await panelDe(ref);
+    await ref.close();
+    return panel;
+  }
+
+  test('CASO 1 (normal) · traducida y sin Limpiar, del octosílabo de Sor Juana al endecasílabo de Quevedo', async ({
+    page,
+  }) => {
+    const errores = escucharErrores(page);
+    await escribirYAnalizar(page, 'Hombres necios que acusáis');
+    await expect(page.locator('[class*="versoSilabas"]')).toHaveText(['8']);
+    await expect(page.locator('[class*="versoNombre"]')).toContainText('arte menor');
+    await expect(page.locator('[class*="versoDesglose"]')).toContainText('1 sinalefa');
+    await expect(page.locator('[class*="versoDesglose"]')).toContainText('+ 1 (última palabra aguda)');
+
+    await traducirApuntando(page);
+    await escribirYAnalizar(page, QUEVEDO);
+    await expect(page.locator('[class*="resumenValor"]')).toHaveText(['14', '7', '2,0']);
+    await expect(page.locator('[class*="versoSilabas"]')).toHaveText(['11']);
+    await expect(page.locator('[class*="sinalefaTag"]')).toHaveText([
+      'Érase ⌣ un',
+      'hombre ⌣ a',
+      'a ⌣ una',
+    ]);
+    const nombre = await page.locator('[class*="versoNombre"]').innerText();
+    const desglose = (await page.locator('[class*="versoDesglose"]').innerText()).replace(/\s+/g, ' ');
+    expect({
+      endecasilabo: nombre.includes('endecasílabo'),
+      arteMayor: nombre.includes('arte mayor'),
+      arteMenor: nombre.includes('arte menor'),
+      foneticas: desglose.includes('14 fonéticas'),
+      sinalefas: desglose.includes('− 3 sinalefas'),
+      llana: desglose.includes('± 0 (última palabra llana)'),
+      aguda: desglose.includes('aguda'),
+    }).toEqual({
+      endecasilabo: true,
+      arteMayor: true,
+      arteMenor: false,
+      foneticas: true,
+      sinalefas: true,
+      llana: true,
+      aguda: false,
+    });
+    expect(await textoViejo(page)).toEqual([]);
+    expect(await panelDe(page)).toBe(await panelDeReferencia(page, QUEVEDO));
+    expect(errores).toEqual([]);
+  });
+
+  test('CASO 2 (límite) · traducida y sin Limpiar, de una redondilla con rima a dos versos sueltos', async ({
+    page,
+  }) => {
+    const errores = escucharErrores(page);
+    await escribirYAnalizar(page, REDONDILLA);
+    await expect(page.locator('[class*="versoSilabas"]')).toHaveText(['8', '8', '8', '8']);
+    await expect(page.locator('[class*="rimaValor"]')).toHaveText(['abba', 'Consonante']);
+    await expect(page.locator('[class*="rimaBloque"]')).toContainText('Redondilla');
+
+    await traducirApuntando(page);
+    await escribirYAnalizar(page, BECQUER);
+    await expect(page.locator('[class*="versoSilabas"]')).toHaveText(['11', '11']);
+    await expect(page.locator('[class*="rimaValor"]')).toHaveText(['--', 'Verso libre']);
+    await expect(page.locator('[class*="rimaMedida"]')).toHaveText(['11', '11']);
+    expect(await textoViejo(page)).toEqual([]);
+    const traducido = await panelDe(page);
+    expect(traducido).not.toContain('Redondilla');
+    expect(traducido).toBe(await panelDeReferencia(page, BECQUER));
+    expect(errores).toEqual([]);
+  });
+
+  test('CASO 3 (medidor) · traducida antes de cada paso, la cuenta, el mensaje y la pista siguen al verso y al metro', async ({
+    page,
+  }) => {
+    const errores = escucharErrores(page);
+    const viejos: string[] = [];
+    const cuenta = page.locator('[class*="medidorCuenta"]');
+    const mensaje = page.locator('[class*="medidorMensaje"]');
+    const pista = page.locator('[class*="medidorPista"]');
+    await page.getByRole('button', { name: 'octosílabo', exact: true }).click();
+    await expect(pista).toContainText('para el octosílabo.');
+
+    await traducirApuntando(page);
+    await page.fill('textarea', 'Hombres necios que acusáis');
+    await expect(cuenta).toHaveText(['8/8']);
+    await expect(mensaje).toHaveText(['✓ justo']);
+    viejos.push(...(await textoViejo(page)));
+
+    await traducirApuntando(page);
+    await page.fill('textarea', 'Volverán las oscuras golondrinas');
+    await expect(cuenta).toHaveText(['11/8']);
+    await expect(mensaje).toHaveText(['sobran 3']);
+    viejos.push(...(await textoViejo(page)));
+
+    await traducirApuntando(page);
+    await page.getByRole('button', { name: 'endecasílabo', exact: true }).click();
+    await expect(cuenta).toHaveText(['11/11']);
+    await expect(mensaje).toHaveText(['✓ justo']);
+    viejos.push(...(await textoViejo(page)));
+
+    await traducirApuntando(page);
+    await page.fill('#metro-personalizado', '12');
+    await esperarValorEnReact(page, '#metro-personalizado', '12');
+    await page.getByRole('button', { name: 'Fijar' }).click();
+    await expect(cuenta).toHaveText(['11/12']);
+    await expect(mensaje).toHaveText(['faltan 1']);
+    viejos.push(...(await textoViejo(page)));
+
+    await traducirApuntando(page);
+    await page.fill('textarea', '');
+    await expect(pista).toHaveText(
+      'Escribe un verso por línea: te iré diciendo cuántas sílabas te faltan o te sobran para el dodecasílabo.',
+    );
+    viejos.push(...(await textoViejo(page)));
+
+    expect(viejos).toEqual([]);
+    expect(errores).toEqual([]);
+  });
+
+  test('HALLAZGO (ABIERTO, inspector 07/11/2026) · con el metro fijado en 20, la pista dice «para el veinte sílabas»', async ({
+    page,
+  }) => {
+    // ABIERTO. page.tsx, la pista del medidor (la línea que reescribió b9d7ff45): «…te faltan o
+    // te sobran para el ${nombreDelVerso(metroObjetivo)}.». nombreDelVerso(20) devuelve
+    // «veinte sílabas» (metrica.ts, NOMBRES_VERSO), y «el» no concierta con «sílabas». Del 2 al
+    // 19 sale un nombre masculino singular («para el dodecasílabo.») y concierta. Se escribe con
+    // test.fail(), afirmando lo que DEBERÍA ocurrir: la pista nombra los 20 sin «el veinte sílabas».
+    test.fail();
+    await page.fill('#metro-personalizado', '20');
+    await esperarValorEnReact(page, '#metro-personalizado', '20');
+    await page.getByRole('button', { name: 'Fijar' }).click();
+    const pista = page.locator('[class*="medidorPista"]');
+    await expect(pista).toContainText(/veinte|20/);
+    expect((await pista.innerText()).trim()).not.toContain('el veinte sílabas');
+  });
+
+  test('CONTROL · el detector de texto viejo ve un nodo retirado en el que se vuelve a escribir', async ({
+    page,
+  }) => {
+    // Sin esto, los «0 nodos viejos» de arriba podrían salir de un detector que no mira nada.
+    await escribirYAnalizar(page, 'Hombres necios que acusáis');
+    await expect(page.locator('[class*="versoSilabas"]')).toHaveText(['8']);
+    await traducirApuntando(page);
+    await page.evaluate(() => {
+      const t = (window as VentanaApuntada).__nodosApuntados?.find((x) =>
+        (x.valor ?? '').includes('fonéticas'),
+      );
+      if (t) t.nodo.nodeValue = '99 fonéticas';
+    });
+    expect(await textoViejo(page)).toHaveLength(1);
   });
 });

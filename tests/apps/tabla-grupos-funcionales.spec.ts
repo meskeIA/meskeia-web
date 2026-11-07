@@ -22,6 +22,8 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  *   buscador (`resultados`, línea 1581) normaliza con `normalizar()` —minúsculas + NFD sin
  *   diacríticos— y busca por subcadena sobre nombre + fórmula + sufijo + prefijo + ejemplo +
  *   campo `busqueda` (sinónimos). No hay motor de cálculo separado porque no hay cálculo.
+ *   ⚠️ Desde el 12/10/2026 (4669d7de3) `GRUPOS`, `normalizar` y `coincideConLaBusqueda` viven en
+ *   `app/tabla-grupos-funcionales/datos.ts`, y la ficha de aula los lee desde `casos.ts`.
  *
  * LOS TRES CASOS, RESUELTOS A MANO ANTES DE ABRIR EL NAVEGADOR
  *
@@ -272,6 +274,7 @@ import {
   comprobarRespuesta,
   generarPreguntaAleatoria,
 } from '../../app/tabla-grupos-funcionales/casos';
+import type { Pregunta } from '../../app/tabla-grupos-funcionales/casos';
 import { GRUPOS, coincideConLaBusqueda, normalizar } from '../../app/tabla-grupos-funcionales/datos';
 
 /**
@@ -542,5 +545,210 @@ test.describe('Tabla de Grupos Funcionales · ficha de búsqueda para el aula', 
     await seccion.getByRole('button', { name: 'Otra pregunta' }).click();
     await expect(seccion.getByRole('alert')).toHaveCount(0);
     await expect(page.locator('#aula-respuesta-practica')).toHaveValue('');
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// INSPECTOR 07/11/2026 · MODO CAMBIO
+// ═══════════════════════════════════════════════════════════════════════════════
+
+/**
+ * Diff inspeccionado: `git diff b3b316cc HEAD -- app/tabla-grupos-funcionales/`
+ *   0f4a5f0ae  buscador por prefijo de palabra en las palabras clave + ficha del peróxido
+ *   4669d7de3  datos a `datos.ts` (los 31 grupos SIN cambios: cotejado blob a blob con el
+ *              page.tsx anterior, solo cambian los `export`) + ficha de aula (`casos.ts`)
+ *   dfaf84a29 · 4488bd1da · 68e83c8a5 · a7813b151 · 7901ca80a  contraste (campañas del catálogo)
+ *   99e1ee7e7  relacionadas desde el layout
+ *
+ * Lo nuevo con verdad comprobable es la PRÁCTICA AL AZAR: genera preguntas leyendo la tabla y
+ * corrige al alumno. Las 12 preguntas fijas ya las blindan los casos 1-7 de arriba (las resolví
+ * a mano antes de leer `A_MANO` y coinciden: -ona, hidroxi-, aldehído, 6, etanoato de etilo,
+ * aldehído, nitrilo, nitro, ácido carboxílico, oxo-, areno, ácido etanoico).
+ *
+ * RESUELTO A MANO ANTES DE ABRIR LA APP — «quién da la terminación», éter frente a hidrocarburo:
+ *   · CH₃–O–CH₃       = metoximetano  → la terminación «-ano» es del ALCANO; el éter es «metoxi-».
+ *                       Es el propio ejemplo de la ficha del éter.
+ *   · CH₂=CH–O–CH₃    = metoxieteno   → la terminación «-eno» es del ALQUENO.
+ *   · C₆H₅–O–CH₃      = metoxibenceno (anisol) → el nombre acaba en el ARENO, «benceno».
+ *   La fila del éter lo dice en su columna «Sufijo»: «— (nunca es sufijo en la nomenclatura
+ *   sustitutiva)». Esperado: la práctica nunca da «Éter» como el que pone la terminación frente a
+ *   un hidrocarburo (o no hace esa pregunta). Obtenido: «Éter», y al alumno que escribe «alcano»
+ *   le dice «Ese es el que CEDE el sufijo […] en el nombre va como prefijo».
+ *
+ * Cómo se llega a una semilla concreta en la página: «Otra pregunta» hace
+ * `Math.floor(Math.random() * 99999) + 1`; fijando Math.random a (s − 0,5) / 99999 solo durante
+ * el clic sale la semilla s. No hay otra forma (ver el hallazgo de la semilla, abajo).
+ */
+
+/** Pulsa «Otra pregunta» con Math.random fijado para que salga ESA semilla (< 10.000). */
+async function practicaEnSemilla(page: Page, semilla: number): Promise<void> {
+  const seccion = page.locator('#casos-aula');
+  await page.evaluate((s) => {
+    const w = window as unknown as { __randomOriginal?: () => number };
+    w.__randomOriginal = Math.random;
+    Math.random = () => (s - 0.5) / 99999;
+  }, semilla);
+  await seccion.getByRole('button', { name: 'Otra pregunta' }).click();
+  await page.evaluate(() => {
+    const w = window as unknown as { __randomOriginal?: () => number };
+    if (w.__randomOriginal) Math.random = w.__randomOriginal;
+  });
+  // formatNumber no agrupa con cuatro cifras: «semilla 1285» (RAE 2010)
+  await expect(seccion.getByText(`semilla ${semilla}`, { exact: true })).toBeVisible();
+}
+
+/** El grupo de la tabla que una pregunta de práctica nombra entre comillas «…» */
+function gruposNombrados(enunciado: string) {
+  return [...enunciado.matchAll(/«([^»]+)»/g)].map((m) =>
+    GRUPOS.find((g) => g.nombre.replace(/\s*\([^)]*\)\s*/g, ' ').trim() === m[1]),
+  );
+}
+
+test.describe('Inspector 07/11/2026 · la práctica al azar (modo cambio)', () => {
+  test('la pestaña cambia aria-selected y «Otra pregunta» pinta la pregunta de SU semilla', async ({ page }) => {
+    const seccion = page.locator('#casos-aula');
+    const pestana = seccion.getByRole('tab', { name: 'Práctica al azar' });
+    await expect(pestana).toHaveAttribute('aria-selected', 'false');
+    await pestana.click();
+    await expect(pestana).toHaveAttribute('aria-selected', 'true');
+    await expect(seccion.getByRole('tab', { name: /preguntas$/ })).toHaveAttribute('aria-selected', 'false');
+
+    // Semilla 1285: la página pinta exactamente lo que da generarPreguntaAleatoria(1285)
+    await practicaEnSemilla(page, 1285);
+    const esperada = generarPreguntaAleatoria(1285);
+    await expect(page.locator('#aula-panel-practica')).toContainText(esperada.enunciado);
+    await page.fill('#aula-respuesta-practica', esperada.respuesta);
+    await esperarValorEnReact(page, '#aula-respuesta-practica', esperada.respuesta);
+    await seccion.getByRole('button', { name: 'Comprobar' }).click();
+    await expect(seccion.getByRole('alert')).toContainText('Correcto');
+
+    // Lo que la TABLA dice del éter, de donde sale el esperado del hallazgo de abajo: en su
+    // propio ejemplo, CH₃–O–CH₃ = metoximetano, el éter es el prefijo «metoxi-».
+    await buscar(page, 'eter');
+    const filaEter = page.locator('li button[aria-controls="detalle-eter"]');
+    await expect(filaEter).toContainText('— (nunca es sufijo en la nomenclatura sustitutiva)');
+    await filaEter.click();
+    await expect(page.locator('#detalle-eter')).toContainText('Metoximetano');
+    await expect(page.locator('#detalle-eter')).toContainText('CH₃–O– es metoxi-');
+  });
+
+  test('la pista de la pregunta 8 («Busca «nitr» y quedan los dos juntos») se cumple', async ({ page }) => {
+    // Esperado leído de datos.ts: «nitr» casa por subcadena con Nitrilo y Grupo nitro, y por
+    // prefijo de palabra con «nitrogeno» en las palabras clave de las tres aminas, la amida, la
+    // imina y el azo: 8 filas, con nitrilo y nitro seguidas (orden por categoría).
+    await buscar(page, 'nitr');
+    const ids = await idsVisibles(page);
+    expect(ids).toEqual([
+      'amina-primaria',
+      'amina-secundaria',
+      'amina-terciaria',
+      'amida',
+      'nitrilo',
+      'nitro',
+      'imina',
+      'azo',
+    ]);
+    expect(ids.indexOf('nitro') - ids.indexOf('nitrilo')).toBe(1);
+  });
+
+  test('HALLAZGO (07/11/2026, ABIERTO) · la práctica da el ÉTER como el que pone la terminación frente a un hidrocarburo', async () => {
+    // `resolverCaso('manda-de-dos')` compara solo el número de prioridad: éter 15 frente a
+    // alqueno/alquino 16 y alcano/areno 17 → «Éter». Pero el éter no tiene sufijo (su propia
+    // fila: «— (nunca es sufijo…)»): CH₃–O–CH₃ es metoximetano, CH₂=CH–O–CH₃ metoxieteno y
+    // C₆H₅–O–CH₃ metoxibenceno; la terminación es siempre del hidrocarburo.
+    // Hoy, semilla 1285: «Una molécula tiene a la vez un grupo «Alcano» y un grupo «Éter».
+    // ¿Cuál de los dos da la terminación del nombre?» → respuesta «Éter»; «alcano» → «Ese es el
+    // que CEDE el sufijo […] en el nombre va como prefijo»; «Dónde mirar» → «Éter da el sufijo y
+    // Alcano pasa a prefijo». Lo mismo con las semillas 298 (areno), 1394 (alquino) y 1804
+    // (alqueno): 327 de las 99.999 semillas de «Otra pregunta».
+    test.fail();
+    const malas: string[] = [];
+    for (const h of ['alcano', 'alqueno', 'alquino', 'areno']) {
+      const r = resolverCaso({ campo: 'manda-de-dos', grupos: ['eter', h] });
+      if (r.ok && r.valor === 'Éter') malas.push(`resolverCaso(eter, ${h}) → Éter`);
+    }
+    for (let s = 1; s <= 3000; s += 1) {
+      const p = generarPreguntaAleatoria(s);
+      if (p.campo !== 'manda-de-dos') continue;
+      const grupos = gruposNombrados(p.enunciado);
+      const conEter = grupos.some((g) => g?.id === 'eter');
+      const conHidrocarburo = grupos.some((g) => g?.categoria === 'hidrocarburos');
+      if (conEter && conHidrocarburo && p.respuesta === 'Éter') malas.push(`semilla ${s}`);
+    }
+    expect(malas, 'el éter nunca da la terminación: la da el hidrocarburo').toEqual([]);
+  });
+
+  test('HALLAZGO (07/11/2026, ABIERTO) · «si la dictas en voz alta, toda la clase trabaja sobre la misma», y no hay dónde escribir la semilla', async ({
+    page,
+  }) => {
+    // La nota del panel de práctica promete que dictar la semilla pone a toda la clase en la
+    // misma pregunta, pero el panel solo tiene la casilla de la respuesta y «Otra pregunta»
+    // sortea con Math.random; ni la URL la acepta (?semilla=298 sigue en «semilla 1»).
+    // Esperado: o un control para escribir la semilla, o una URL que la fije, o la nota deja
+    // de prometerlo. Hoy: ninguna de las tres.
+    test.fail();
+    const seccion = page.locator('#casos-aula');
+    await seccion.getByRole('tab', { name: 'Práctica al azar' }).click();
+    const panel = page.locator('#aula-panel-practica');
+    const promete = (await panel.innerText()).includes('si la dictas en voz alta');
+    const casillaSemilla = await panel.getByLabel(/semilla/i).count();
+
+    await page.goto(`${RUTA}?semilla=298`);
+    await esperarHidratacion(page, [BUSCADOR]);
+    await page.locator('#casos-aula').getByRole('tab', { name: 'Práctica al azar' }).click();
+    const porUrl = await page.locator('#casos-aula').getByText('semilla 298', { exact: true }).count();
+
+    expect(
+      !promete || casillaSemilla > 0 || porUrl > 0,
+      'la semilla dictada no se puede introducir en ningún sitio',
+    ).toBe(true);
+  });
+
+  test('HALLAZGO (07/11/2026, ABIERTO) · «cuando el grupo X cede el sufijo a otro con más prioridad» con X = ácido carboxílico o un «solo prefijo»', async () => {
+    // La plantilla de la pregunta de prefijo da por hecho que el grupo podría llevar el sufijo y
+    // lo cede. Es falso para el ácido carboxílico («Prioridad 1»: según la tabla no hay otro con
+    // más prioridad) y para los seis «Solo prefijo» que la práctica pregunta (epóxido, azo,
+    // sulfona, isocianato, sulfóxido, nitro), que no dan sufijo nunca: justo lo que enseña la
+    // pregunta 8. Además escribe «el grupo «Grupo nitro»» y «el grupo «Grupo azo»».
+    // Hoy: semilla 54 → «Cuando el grupo «Ácido carboxílico» cede el sufijo a otro con más
+    // prioridad, ¿con qué prefijo se nombra?»; semilla 118 → «Cuando el grupo «Grupo nitro» cede
+    // el sufijo a otro con más prioridad…». La respuesta (carboxi-, nitro-) sí es la correcta.
+    test.fail();
+    const malas: string[] = [];
+    for (let s = 1; s <= 2000; s += 1) {
+      const p = generarPreguntaAleatoria(s);
+      if (p.campo !== 'prefijo') continue;
+      const [g] = gruposNombrados(p.enunciado);
+      const premisaImposible =
+        g !== undefined &&
+        (g.prioridad === null || g.prioridad === 1) &&
+        /cede el sufijo a otro con más prioridad/.test(p.enunciado);
+      if (premisaImposible || /grupo «Grupo /.test(p.enunciado)) malas.push(`semilla ${s}: ${p.enunciado}`);
+    }
+    expect(malas).toEqual([]);
+  });
+
+  test('HALLAZGO (07/11/2026, ABIERTO) · el ejemplo del peróxido exige el nombre FUNCIONAL como «sistemático», al revés que el éter', async () => {
+    // En el éter, el funcional «éter dimetílico» se rechaza como «nombre tradicional» y se pide
+    // el sustitutivo «metoximetano». En el peróxido la práctica exige el funcional «Peróxido de
+    // dimetilo» como «Nombre sistemático (IUPAC)» («La ficha solo da el nombre sistemático»),
+    // aunque la ficha lo rotula «Nomenclatura funcional» y da la regla del sustitutivo: «Como
+    // sustituyente se usa el prefijo peroxi-: (metilperoxi)etano». Con esa regla, CH₃–O–O–CH₃
+    // es (metilperoxi)metano. Hoy, semilla 52: «(metilperoxi)metano» → «No es lo que dice la
+    // tabla». Esperado: o se acepta, o la pregunta no se hace (como el tioéter, que trae dos
+    // nombres y `resolverCaso` lo excluye). Mismo patrón en sulfóxido, sulfona e isocianato.
+    test.fail();
+    const r = resolverCaso({ campo: 'nombre-ejemplo', grupo: 'peroxido' });
+    const pregunta: Pregunta = {
+      semilla: 0,
+      campo: 'nombre-ejemplo',
+      enunciado: '',
+      etiquetaRespuesta: 'Nombre sistemático (IUPAC)',
+      respuesta: r.valor,
+      sinonimos: r.sinonimos,
+      trampas: r.trampas,
+      pasos: r.pasos,
+    };
+    expect(!r.ok || comprobarRespuesta('(metilperoxi)metano', pregunta).correcto).toBe(true);
   });
 });

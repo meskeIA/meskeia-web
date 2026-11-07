@@ -1371,3 +1371,72 @@ test.describe('Re-inspección 29/09/2026 — cuota tras 8a6fb75b, frontera del a
     }
   });
 });
+
+// ═════════════════════════════════════════════════════════════════════════════
+// Cabo C0077 (07/11/2026) — rango de la tarifa de primas de AT/EP y separador del % en el FAQPage
+// ═════════════════════════════════════════════════════════════════════════════
+/**
+ * Las dos preguntas del cabo, anotado al reparar el 29/09/2026 (SOSPECHAS.md):
+ *   (1) el rango «entre 0,90 % y 7,15 %» de las contingencias profesionales no estaba cotejado con
+ *       la tarifa de primas;
+ *   (2) el helper `pct` de metadata.ts pone un espacio normal ante el %, en un texto que no se ve.
+ *
+ * (1) Esperado, resuelto en el BOE ANTES de mirar la app (data/fiscal no trae la tarifa: solo la
+ *     nombra el comentario de COTIZACION_EMPRESA_2026). La tarifa vigente es la de la DA 61.ª LGSS,
+ *     que introdujo el RDL 3/2026, de 3 de febrero, disposición final primera, apartado Tres
+ *     (BOE-A-2026-2548), con efectos desde el 01/01/2026. La Orden PJC/297/2026 (BOE-A-2026-7296),
+ *     art. 4.b, remite a ella y dice «siendo las primas resultantes a cargo exclusivo de la empresa»:
+ *     la app acierta en que cotiza solo la empresa.
+ *       · Total MÍNIMO: 1,50 (IT 0,80 + IMS 0,70), p. ej. CNAE 1391, 14 y 55 del cuadro I y la
+ *         ocupación a) «Personal en trabajos exclusivos de oficina» del cuadro II. Ningún total baja
+ *         de 1,50.
+ *       · Total MÁXIMO: 7,15 (IT 3,45 + IMS 3,70): «y» «Trabajos habituales en interior de minas»
+ *         y CNAE 0811 «Extracción de piedra ornamental, piedra caliza, yeso, pizarra y otras piedras».
+ *       · El 0,90 solo está en la tarifa como UNA de las dos columnas (IT de los CNAE 73 y 74, IMS de
+ *         los 107 y 108, con totales de 1,70 a 1,95), nunca como total.
+ *     Esperado «entre 1,50 % y 7,15 %» · obtenido «entre 0,90 % y 7,15 %» (page.tsx:917, la FAQ
+ *     visible «¿Qué diferencia hay entre contingencias comunes y profesionales?»; el FAQPage no trae
+ *     el rango). No mueve ninguna cifra calculada: el motor deja fuera AT/EP (TIPO_SS_EMPRESA).
+ *
+ * (2) Esperado: espacio duro U+00A0 ante cada % (CLAUDE.md global §2, regla del 25/09/2026), como
+ *     ya hace la página visible (49 de 49 con la guía abierta, test del 2459). Obtenido en el
+ *     FAQPage servido: los 19 «%» llevan U+0020 — 15 del helper `pct` de metadata.ts:13
+ *     (`${formatNumber(n, 2)} %`) y 4 literales («el 0 %», «el 47 %», «el 15 %», «el 35 %»).
+ */
+test.describe('Cabo C0077 (07/11/2026) — tarifa de primas de AT/EP y separador del % en el FAQPage', () => {
+  /** Tipos de un texto («4,70 %», «0,90 %»…) como números, sea cual sea el blanco ante el %. */
+  const tipos = (texto: string): number[] =>
+    [...texto.matchAll(/(\d+(?:,\d+)?)\s*%/g)].map((m) => parseSpanishNumber(m[1]));
+
+  /**
+   * HALLAZGO ABIERTO (dato) · el suelo de la tarifa de primas es 1,50 %, no 0,90 %.
+   * Se mira el tramo del párrafo que habla de las contingencias PROFESIONALES (el anterior trae el
+   * 4,70 % de las comunes): sus tipos tienen que ir de 1,50 a 7,15, sin ninguno por debajo de 1,50.
+   */
+  test('HALLAZGO ABIERTO · la FAQ visible da el rango de AT/EP de la DA 61.ª LGSS: de 1,50 % a 7,15 %', async ({ page }) => {
+    test.fail(); // ABIERTO — cabo C0077 (1): la app dice «entre 0,90 % y 7,15 %»
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const pregunta = page.getByRole('heading', { level: 4, name: '¿Qué diferencia hay entre contingencias comunes y profesionales?' });
+    const parrafo = limpiar(await pregunta.locator('xpath=following-sibling::p[1]').innerText());
+    const desde = parrafo.indexOf('contingencias profesionales');
+    expect(desde, 'el párrafo nombra las contingencias profesionales').toBeGreaterThan(-1);
+    const rango = tipos(parrafo.slice(desde));
+    expect(rango.length, `tipos de AT/EP en «${parrafo.slice(desde)}»`).toBeGreaterThanOrEqual(2);
+    expect(Math.min(...rango), 'suelo de la tarifa: 1,50 (IT 0,80 + IMS 0,70)').toBe(1.5);
+    expect(Math.max(...rango), 'techo de la tarifa: 7,15 (IT 3,45 + IMS 3,70)').toBe(7.15);
+  });
+
+  /**
+   * HALLAZGO ABIERTO (contenido) · en el FAQPage servido ningún % puede ir tras un espacio normal.
+   * Se lee el JSON-LD tal y como lo pinta el layout (`JSON.stringify` no toca el U+00A0).
+   */
+  test('HALLAZGO ABIERTO · el FAQPage separa los % con espacio duro (U+00A0), como la página', async ({ page }) => {
+    test.fail(); // ABIERTO — cabo C0077 (2): los 19 «%» del FAQPage van tras U+0020
+    const faq = await faqJsonLd(page);
+    const total = (faq.match(/%/g) ?? []).length;
+    expect(total, 'el FAQPage trae cifras con %').toBeGreaterThan(0);
+    const conEspacioNormal = [...faq.matchAll(/.{0,12}\d %/g)].map((m) => m[0]);
+    expect(conEspacioNormal, '% tras un espacio normal en el FAQPage').toEqual([]);
+    expect((faq.match(/\d %/g) ?? []).length, 'todos los % tras U+00A0').toBe(total);
+  });
+});
