@@ -10,7 +10,8 @@ import { calcularBrutoANeto, TIPO_SS_TRABAJADOR, TIPO_SS_EMPRESA, COTIZACION_EMP
  */
 const EJERCICIO = FISCAL_IRPF_META.vigencia;
 
-const pct = (n: number) => `${formatNumber(n, 2)} %`;
+// Espacio duro antes del % (CLAUDE.md global §2, 25/09/2026), como la página (hallazgo 4210)
+const pct = (n: number) => `${formatNumber(n, 2)} %`;
 
 /**
  * Tipo efectivo de IRPF (cuota / bruto) de un soltero sin hijos, con el MISMO motor que la
@@ -70,7 +71,7 @@ export const faqJsonLd = {
       acceptedAnswer: {
         '@type': 'Answer',
         // Hallazgo 1655: decía «aproximadamente el 6,35 %», sin el MEI. Sale de COTIZACIONES_SS_2026.
-        text: `Para pasar del salario bruto al neto hay que restar dos retenciones principales: la cotización a la Seguridad Social del trabajador (el ${pct(TIPO_SS_TRABAJADOR)} de la base de cotización en ${EJERCICIO}: ${pct(COTIZACIONES_SS_2026.contingenciasComunes)} contingencias comunes + ${pct(COTIZACIONES_SS_2026.desempleo)} desempleo + ${pct(COTIZACIONES_SS_2026.formacionProfesional)} formación profesional + ${pct(COTIZACIONES_SS_2026.mef)} Mecanismo de Equidad Intergeneracional) y la retención de IRPF, cuyo porcentaje varía según el salario anual y la situación personal (entre el 0 % para sueldos bajos y el 47 % para los tramos más altos). El resultado es el salario neto que te queda en el año una vez pagado el IRPF que te corresponde. Lo que ves cada mes en la nómina puede diferir un poco, porque la empresa retiene con el procedimiento del Reglamento del IRPF y la diferencia se regulariza en la declaración de la renta.`,
+        text: `Para pasar del salario bruto al neto hay que restar dos retenciones principales: la cotización a la Seguridad Social del trabajador (el ${pct(TIPO_SS_TRABAJADOR)} de la base de cotización en ${EJERCICIO}: ${pct(COTIZACIONES_SS_2026.contingenciasComunes)} contingencias comunes + ${pct(COTIZACIONES_SS_2026.desempleo)} desempleo + ${pct(COTIZACIONES_SS_2026.formacionProfesional)} formación profesional + ${pct(COTIZACIONES_SS_2026.mef)} Mecanismo de Equidad Intergeneracional) y la retención de IRPF, cuyo porcentaje varía según el salario anual y la situación personal (entre el 0 % para sueldos bajos y el 47 % para los tramos más altos). El resultado es el salario neto que te queda en el año una vez pagado el IRPF que te corresponde. Lo que ves cada mes en la nómina puede diferir un poco, porque la empresa retiene con el procedimiento del Reglamento del IRPF y la diferencia se regulariza en la declaración de la renta.`,
       },
     },
     {
@@ -86,7 +87,7 @@ export const faqJsonLd = {
       name: '¿Qué diferencia hay entre salario bruto y salario neto?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El salario bruto es el importe pactado en el contrato antes de cualquier deducción. El salario neto es lo que el trabajador recibe realmente en su cuenta bancaria, tras descontar la cotización a la Seguridad Social a cargo del trabajador y la retención a cuenta del IRPF. La diferencia entre ambos puede suponer entre el 15 % y el 35 % del bruto, dependiendo del nivel salarial y las circunstancias personales.',
+        text: 'El salario bruto es el importe pactado en el contrato antes de cualquier deducción. El salario neto es lo que el trabajador recibe realmente en su cuenta bancaria, tras descontar la cotización a la Seguridad Social a cargo del trabajador y la retención a cuenta del IRPF. La diferencia entre ambos puede suponer entre el 15 % y el 35 % del bruto, dependiendo del nivel salarial y las circunstancias personales.',
       },
     },
     {

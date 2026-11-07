@@ -1430,8 +1430,9 @@ test.describe('Cabo C0077 (07/11/2026) — tarifa de primas de AT/EP y separador
    * HALLAZGO ABIERTO (contenido) · en el FAQPage servido ningún % puede ir tras un espacio normal.
    * Se lee el JSON-LD tal y como lo pinta el layout (`JSON.stringify` no toca el U+00A0).
    */
-  test('HALLAZGO ABIERTO · el FAQPage separa los % con espacio duro (U+00A0), como la página', async ({ page }) => {
-    test.fail(); // ABIERTO — cabo C0077 (2): los 19 «%» del FAQPage van tras U+0020
+  test('HALLAZGO 4210 REPARADO · el FAQPage separa los % con espacio duro (U+00A0), como la página', async ({ page }) => {
+    // REPARADO en /reparar el 07/11/2026 — cabo C0077 (2): los 19 «%» del FAQPage iban tras U+0020;
+    // ahora el helper pct de metadata.ts y los cuatro literales llevan U+00A0.
     const faq = await faqJsonLd(page);
     const total = (faq.match(/%/g) ?? []).length;
     expect(total, 'el FAQPage trae cifras con %').toBeGreaterThan(0);
