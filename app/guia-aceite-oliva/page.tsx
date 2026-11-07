@@ -56,7 +56,9 @@ interface VariedadAceite {
 
 const INTENSIDAD_NIVEL: Record<Intensidad, number> = { Suave: 1, Medio: 2, Intenso: 3 };
 
-const PAISES: PaisOrigen[] = [
+// Los filtros se derivan de las fichas (más abajo, tras VARIEDADES): «Marruecos» y «Picante
+// intenso» no los llevaba ninguna y su botón dejaba la guía vacía (cabo C0658, defecto D).
+const PAISES_ORDEN: readonly PaisOrigen[] = [
   'España',
   'Italia',
   'Grecia',
@@ -69,7 +71,7 @@ const PAISES: PaisOrigen[] = [
   'Australia',
 ];
 
-const PERFILES: PerfilSabor[] = [
+const PERFILES_ORDEN: readonly PerfilSabor[] = [
   'Frutado verde intenso',
   'Frutado verde suave',
   'Frutado maduro',
@@ -678,6 +680,9 @@ const VARIEDADES: VariedadAceite[] = [
     curiosidad: 'Australia fue uno de los impulsores del sistema de certificación "Certified Australian EVOO" (CAEVO), el más estricto del mundo, que verifica el origen, la variedad y la composición química de cada botella. Fue creado como respuesta directa al escándalo mundial del fraude en aceites de oliva "extra virgen" italianos.',
   },
 ];
+
+const PAISES: PaisOrigen[] = PAISES_ORDEN.filter((p) => VARIEDADES.some((v) => v.pais === p));
+const PERFILES: PerfilSabor[] = PERFILES_ORDEN.filter((p) => VARIEDADES.some((v) => v.perfil === p));
 
 export default function GuiaAceiteOliva() {
   const [busqueda, setBusqueda] = useState('');

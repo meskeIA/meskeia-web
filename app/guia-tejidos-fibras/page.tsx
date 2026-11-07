@@ -57,7 +57,10 @@ interface TejidoFibra {
   sostenibilidad: 'Alta' | 'Media' | 'Baja';
 }
 
-const ORIGENES: OrigenFibra[] = [
+// El filtro y la cifra de «tipos de origen» se derivan de las fichas (tras TEJIDOS):
+// «Natural-Mineral» no lo llevaba ninguna, su botón dejaba la guía vacía y contaba como un
+// tipo más (cabo C0658, defecto D).
+const ORIGENES_ORDEN: readonly OrigenFibra[] = [
   'Natural-Vegetal',
   'Natural-Animal',
   'Natural-Mineral',
@@ -541,6 +544,8 @@ const TEJIDOS: TejidoFibra[] = [
     sostenibilidad: 'Baja',
   },
 ];
+
+const ORIGENES: OrigenFibra[] = ORIGENES_ORDEN.filter((o) => TEJIDOS.some((t) => t.origen === o));
 
 // ============================================================
 // COMPONENTE PRINCIPAL

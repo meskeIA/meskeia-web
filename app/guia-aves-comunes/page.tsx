@@ -752,7 +752,11 @@ const AVES: Ave[] = [
 ];
 
 const HABITATS: HabitatAve[] = ['Urbano', 'Bosque', 'Campo', 'Humedal', 'Costa', 'Montaña', 'Jardín'];
-const PRESENCIAS: Presencia[] = ['Residente', 'Estival', 'Invernante', 'Migratoria', 'Ocasional'];
+// Solo las presencias que tiene alguna ficha: «Migratoria» y «Ocasional» no las llevaba ninguna
+// y su botón dejaba la guía vacía (cabo C0658, defecto D).
+const PRESENCIAS: Presencia[] = (
+  ['Residente', 'Estival', 'Invernante', 'Migratoria', 'Ocasional'] as const
+).filter((p) => AVES.some((a) => a.presencia === p));
 const ORDENES: OrdenAve[] = [
   'Paseriformes', 'Falconiformes', 'Strigiformes', 'Anseriformes',
   'Ciconiiformes', 'Columbiformes', 'Piciformes', 'Coraciiformes',

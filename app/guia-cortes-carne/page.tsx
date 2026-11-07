@@ -37,7 +37,9 @@ interface CorteCarne {
 // ─────────────────────────────────────────────
 
 const ANIMALES: Animal[] = ['Vacuno', 'Cerdo', 'Cordero', 'Pollo', 'Ternera'];
-const METODOS: MetodoCoccion[] = ['Plancha', 'Horno', 'Parrilla', 'Estofado', 'Fritura', 'Crudo', 'Guiso'];
+// El filtro se deriva de las fichas (tras CORTES): «Crudo» no lo llevaba ninguna y su botón
+// dejaba la guía vacía (cabo C0658, defecto D).
+const METODOS_ORDEN: readonly MetodoCoccion[] = ['Plancha', 'Horno', 'Parrilla', 'Estofado', 'Fritura', 'Crudo', 'Guiso'];
 
 const ANIMAL_CLASS: Record<Animal, string> = {
   Vacuno: styles.badgeVacuno,
@@ -370,6 +372,8 @@ const CORTES: CorteCarne[] = [
     curiosidad: 'El vitello tonnato (redondo de ternera frío con salsa de atún y alcaparras) es uno de los platos más sorprendentes de la cocina italiana: la combinación de carne de ternera y salsa de atún suena extraña pero es una receta piamontesa del siglo XVIII que encandila a quienes lo prueban por primera vez.',
   },
 ];
+
+const METODOS: MetodoCoccion[] = METODOS_ORDEN.filter((m) => CORTES.some((c) => c.metodosCoccion.includes(m)));
 
 // ─────────────────────────────────────────────
 // Componente principal

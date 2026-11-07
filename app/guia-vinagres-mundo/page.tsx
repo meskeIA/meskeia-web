@@ -81,7 +81,9 @@ const REGIONES: RegionVinagre[] = [
   'Internacional',
 ];
 
-const ACIDEZES: Acidez[] = ['Baja', 'Media', 'Alta', 'Muy alta'];
+// El filtro se deriva de las fichas (tras VINAGRES): «Muy alta» no la llevaba ninguna y su
+// opción dejaba la guía vacía (cabo C0658, defecto D).
+const ACIDEZES_ORDEN: readonly Acidez[] = ['Baja', 'Media', 'Alta', 'Muy alta'];
 
 const INTENSIDADES: IntensidadSabor[] = [
   'Suave',
@@ -769,6 +771,8 @@ const VINAGRES: Vinagre[] = [
       'Se vende en botellas pequeñas de 250ml — más caro que muchos vinos de Jerez de larga crianza.',
   },
 ];
+
+const ACIDEZES: Acidez[] = ACIDEZES_ORDEN.filter((a) => VINAGRES.some((v) => v.acidez === a));
 
 export default function GuiaVinagresMundo() {
   const [busqueda, setBusqueda] = useState('');
