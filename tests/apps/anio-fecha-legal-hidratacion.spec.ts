@@ -1,4 +1,5 @@
 import { test, expect, type Browser } from '@playwright/test';
+import { esperarPaginaAsentada } from './_hidratacion';
 
 // ─────────────────────────────────────────────────────────────────────────────────────────
 // CABO C0666 (Inspector, 07/11/2026, de golden-hour al descartar C0538) — REPARADO.
@@ -30,8 +31,12 @@ async function medir(browser: Browser, ruta: string, opciones: { timezoneId: str
       }
     });
     await page.goto(ruta);
-    await page.waitForLoadState('networkidle');
-    await page.waitForTimeout(500);
+    // Hidratación confirmada y DOM quieto, NO 'networkidle': en producción (next start) los
+    // <Link> de las portadas de portal prefetchean /?_rsc=, /fisica/?_rsc=… y alguno queda
+    // colgado en localhost, así que 'networkidle' no llega nunca y el test se agotaba a los 30 s
+    // en las cuatro portadas (suite de la tanda de /reparar del 07/11/2026, 0 de 3 aislado). En
+    // next dev no hay prefetch y pasaba. El error 418 sale durante la hidratación: esta espera lo ve.
+    await esperarPaginaAsentada(page);
     const copyright = (await page.locator('[class*="copyright"]').allTextContents()).join(' | ');
     const actualizado = (await page.locator('[class*="lastUpdatedFull"]').allTextContents()).join(' | ');
     return { errores, copyright, actualizado };
