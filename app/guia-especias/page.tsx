@@ -12,6 +12,7 @@ import {
   ShareCard,
 } from '@/components';
 
+import { normalizarBusqueda } from '@/lib/buscadorTablas';
 // ============================================================
 // TIPOS Y DATOS
 // ============================================================
@@ -767,16 +768,16 @@ export default function GuiaEspeciasPage() {
   const [familiaActiva, setFamiliaActiva] = useState<Familia | 'Todas'>('Todas');
 
   const especiasFiltradas = useMemo(() => {
-    const q = busqueda.toLowerCase().trim();
+    const q = normalizarBusqueda(busqueda).trim();
     return ESPECIAS.filter((e) => {
       const coincideFamilia = familiaActiva === 'Todas' || e.familia === familiaActiva;
       const coincideBusqueda =
         !q ||
-        e.nombre.toLowerCase().includes(q) ||
-        e.nombreCientifico.toLowerCase().includes(q) ||
-        e.usos.some((u) => u.toLowerCase().includes(q)) ||
-        e.origen.toLowerCase().includes(q) ||
-        e.combinaCon.some((c) => c.toLowerCase().includes(q));
+        normalizarBusqueda(e.nombre).includes(q) ||
+        normalizarBusqueda(e.nombreCientifico).includes(q) ||
+        e.usos.some((u) => normalizarBusqueda(u).includes(q)) ||
+        normalizarBusqueda(e.origen).includes(q) ||
+        e.combinaCon.some((c) => normalizarBusqueda(c).includes(q));
       return coincideFamilia && coincideBusqueda;
     });
   }, [busqueda, familiaActiva]);

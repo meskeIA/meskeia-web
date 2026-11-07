@@ -5,6 +5,7 @@ import { useState, useMemo } from 'react';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard } from '@/components';
 import styles from './GuiaQuesos.module.css';
 
+import { normalizarBusqueda } from '@/lib/buscadorTablas';
 type TipoLeche = 'Vaca' | 'Oveja' | 'Cabra' | 'Mezcla' | 'Búfala';
 type TipoQueso = 'Fresco' | 'Tierno' | 'Semicurado' | 'Curado' | 'Añejo' | 'Azul' | 'Pasta blanda';
 type Continente = 'España' | 'Francia' | 'Italia' | 'Reino Unido' | 'Resto de Europa' | 'América' | 'Otros';
@@ -533,18 +534,18 @@ export default function GuiaQuesos() {
   const [tipo, setTipo] = useState<TipoQueso | 'Todos'>('Todos');
 
   const quesosFiltered = useMemo(() => {
-    const t = busqueda.toLowerCase().trim();
+    const t = normalizarBusqueda(busqueda).trim();
     return QUESOS.filter((q) => {
       if (continente !== 'Todos' && q.continente !== continente) return false;
       if (leche !== 'Todas' && q.leche !== leche) return false;
       if (tipo !== 'Todos' && q.tipo !== tipo) return false;
       if (!t) return true;
       return (
-        q.nombre.toLowerCase().includes(t) ||
-        q.pais.toLowerCase().includes(t) ||
-        q.region.toLowerCase().includes(t) ||
-        q.notasDeSabor.some((n) => n.toLowerCase().includes(t)) ||
-        q.descripcion.toLowerCase().includes(t)
+        normalizarBusqueda(q.nombre).includes(t) ||
+        normalizarBusqueda(q.pais).includes(t) ||
+        normalizarBusqueda(q.region).includes(t) ||
+        q.notasDeSabor.some((n) => normalizarBusqueda(n).includes(t)) ||
+        normalizarBusqueda(q.descripcion).includes(t)
       );
     });
   }, [busqueda, continente, leche, tipo]);

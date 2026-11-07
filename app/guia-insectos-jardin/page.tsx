@@ -12,6 +12,7 @@ import {
   ShareCard,
 } from '@/components';
 
+import { normalizarBusqueda } from '@/lib/buscadorTablas';
 // ============================================================
 // TIPOS
 // ============================================================
@@ -654,8 +655,8 @@ export default function GuiaInsectosJardinPage() {
     return INSECTOS.filter((insecto) => {
       const coincideBusqueda =
         busqueda.trim() === '' ||
-        insecto.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
-        insecto.nombreCientifico.toLowerCase().includes(busqueda.toLowerCase());
+        normalizarBusqueda(insecto.nombre).includes(normalizarBusqueda(busqueda)) ||
+        normalizarBusqueda(insecto.nombreCientifico).includes(normalizarBusqueda(busqueda));
 
       const coincideRol = filtroRol === 'Todos' || insecto.rol === filtroRol;
       const coincideZona = filtroZona === 'Todas' || insecto.zona.includes(filtroZona as ZonaJardin);

@@ -5,6 +5,7 @@ import { useState, useMemo } from 'react';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, ShareCard, EducationalSection } from '@/components';
 import styles from './GuiaTiposPan.module.css';
 
+import { normalizarBusqueda } from '@/lib/buscadorTablas';
 type RegionPan = 'Europa' | 'América' | 'Asia' | 'Oriente Medio' | 'África';
 type TipoHarina = 'Trigo' | 'Centeno' | 'Maíz' | 'Arroz' | 'Cebada' | 'Mezcla';
 type TipoFermentacion = 'Masa madre' | 'Levadura comercial' | 'Sin fermentar' | 'Bicarbonato';
@@ -368,13 +369,13 @@ export default function GuiaTiposPan() {
 
   const panesFiltrados = useMemo(() => {
     return PANES.filter((pan) => {
-      const termino = busqueda.toLowerCase();
+      const termino = normalizarBusqueda(busqueda);
       const coincideBusqueda =
         !busqueda ||
-        pan.nombre.toLowerCase().includes(termino) ||
-        pan.nombreOriginal.toLowerCase().includes(termino) ||
-        pan.pais.toLowerCase().includes(termino) ||
-        pan.region.toLowerCase().includes(termino);
+        normalizarBusqueda(pan.nombre).includes(termino) ||
+        normalizarBusqueda(pan.nombreOriginal).includes(termino) ||
+        normalizarBusqueda(pan.pais).includes(termino) ||
+        normalizarBusqueda(pan.region).includes(termino);
 
       const coincideRegion = !regionFiltro || pan.region === regionFiltro;
       const coincideHarina = !harinaFiltro || pan.harina === harinaFiltro;

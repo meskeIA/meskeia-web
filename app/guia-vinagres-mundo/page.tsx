@@ -12,6 +12,7 @@ import {
 } from '@/components';
 import styles from './GuiaVinagresMundo.module.css';
 
+import { normalizarBusqueda } from '@/lib/buscadorTablas';
 type OrigenVinagre =
   | 'Vino'
   | 'Manzana'
@@ -780,7 +781,7 @@ export default function GuiaVinagresMundo() {
   const [uso, setUso] = useState<UsoVinagre | 'Todos'>('Todos');
 
   const vinagresFiltrados = useMemo(() => {
-    const t = busqueda.toLowerCase().trim();
+    const t = normalizarBusqueda(busqueda).trim();
     return VINAGRES.filter((v) => {
       const matchOrigen = origen === 'Todos' || v.origenMateriaPrima === origen;
       const matchRegion = region === 'Todos' || v.region === region;
@@ -790,12 +791,12 @@ export default function GuiaVinagresMundo() {
       const matchUso = uso === 'Todos' || v.usosIdeales.includes(uso);
       const matchBusqueda =
         !t ||
-        v.nombre.toLowerCase().includes(t) ||
-        v.nombreOriginal.toLowerCase().includes(t) ||
-        v.paisOrigen.toLowerCase().includes(t) ||
-        v.notasDeSabor.some((n) => n.toLowerCase().includes(t)) ||
-        v.maridaje.some((m) => m.toLowerCase().includes(t)) ||
-        v.descripcion.toLowerCase().includes(t);
+        normalizarBusqueda(v.nombre).includes(t) ||
+        normalizarBusqueda(v.nombreOriginal).includes(t) ||
+        normalizarBusqueda(v.paisOrigen).includes(t) ||
+        v.notasDeSabor.some((n) => normalizarBusqueda(n).includes(t)) ||
+        v.maridaje.some((m) => normalizarBusqueda(m).includes(t)) ||
+        normalizarBusqueda(v.descripcion).includes(t);
       return (
         matchOrigen &&
         matchRegion &&

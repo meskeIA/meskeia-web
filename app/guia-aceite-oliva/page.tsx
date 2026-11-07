@@ -12,6 +12,7 @@ import {
 } from '@/components';
 import styles from './GuiaAceiteOliva.module.css';
 
+import { normalizarBusqueda } from '@/lib/buscadorTablas';
 type PaisOrigen =
   | 'España'
   | 'Italia'
@@ -684,17 +685,17 @@ export default function GuiaAceiteOliva() {
   const [perfil, setPerfil] = useState<PerfilSabor | 'Todos'>('Todos');
 
   const variedadesFiltradas = useMemo(() => {
-    const t = busqueda.toLowerCase().trim();
+    const t = normalizarBusqueda(busqueda).trim();
     return VARIEDADES.filter((v) => {
       const matchPais = pais === 'Todos' || v.pais === pais;
       const matchPerfil = perfil === 'Todos' || v.perfil === perfil;
       const matchBusqueda =
         !t ||
-        v.nombre.toLowerCase().includes(t) ||
-        v.regionesPrincipales.some((r) => r.toLowerCase().includes(t)) ||
-        v.aromas.some((a) => a.toLowerCase().includes(t)) ||
-        v.notasDeSabor.some((n) => n.toLowerCase().includes(t)) ||
-        v.descripcion.toLowerCase().includes(t);
+        normalizarBusqueda(v.nombre).includes(t) ||
+        v.regionesPrincipales.some((r) => normalizarBusqueda(r).includes(t)) ||
+        v.aromas.some((a) => normalizarBusqueda(a).includes(t)) ||
+        v.notasDeSabor.some((n) => normalizarBusqueda(n).includes(t)) ||
+        normalizarBusqueda(v.descripcion).includes(t);
       return matchPais && matchPerfil && matchBusqueda;
     });
   }, [busqueda, pais, perfil]);

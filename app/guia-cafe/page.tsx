@@ -12,6 +12,7 @@ import {
 } from '@/components';
 import styles from './GuiaCafe.module.css';
 
+import { normalizarBusqueda } from '@/lib/buscadorTablas';
 type Continente = 'América' | 'África' | 'Asia / Oceanía';
 type Especie = 'Arábica' | 'Robusta' | 'Libérica';
 type Acidez = 'Baja' | 'Media' | 'Alta' | 'Muy alta';
@@ -535,16 +536,16 @@ export default function GuiaCafe() {
   const [tabRef, setTabRef] = useState<TabRef>('especies');
 
   const origenesFiltrados = useMemo(() => {
-    const t = busqueda.toLowerCase().trim();
+    const t = normalizarBusqueda(busqueda).trim();
     return ORIGENES.filter((o) => {
       const matchContinente = continente === 'Todos' || o.continente === continente;
       const matchBusqueda =
         !t ||
-        o.nombre.toLowerCase().includes(t) ||
-        o.pais.toLowerCase().includes(t) ||
-        o.region.toLowerCase().includes(t) ||
-        o.notasDeSabor.some((n) => n.toLowerCase().includes(t)) ||
-        o.descripcion.toLowerCase().includes(t);
+        normalizarBusqueda(o.nombre).includes(t) ||
+        normalizarBusqueda(o.pais).includes(t) ||
+        normalizarBusqueda(o.region).includes(t) ||
+        o.notasDeSabor.some((n) => normalizarBusqueda(n).includes(t)) ||
+        normalizarBusqueda(o.descripcion).includes(t);
       return matchContinente && matchBusqueda;
     });
   }, [busqueda, continente]);

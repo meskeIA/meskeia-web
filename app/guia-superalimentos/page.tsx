@@ -12,6 +12,7 @@ import {
 } from '@/components';
 import ShareCard from '@/components/ShareCard';
 
+import { normalizarBusqueda } from '@/lib/buscadorTablas';
 // ============================================================
 // TIPOS
 // ============================================================
@@ -555,17 +556,17 @@ export default function GuiaSuperalimentosPage() {
   const [busqueda, setBusqueda] = useState('');
 
   const superalimentosFiltrados = useMemo(() => {
-    const busquedaLower = busqueda.toLowerCase().trim();
+    const busquedaLower = normalizarBusqueda(busqueda).trim();
     return SUPERALIMENTOS.filter((s) => {
       const coincideCategoria = categoria === 'Todas' || s.categoria === categoria;
       if (!busquedaLower) return coincideCategoria;
       const coincideBusqueda =
-        s.nombre.toLowerCase().includes(busquedaLower) ||
-        (s.nombreCientifico?.toLowerCase().includes(busquedaLower) ?? false) ||
-        s.origen.toLowerCase().includes(busquedaLower) ||
-        s.descripcion.toLowerCase().includes(busquedaLower) ||
-        s.nutrientesDestacados.some((n) => n.toLowerCase().includes(busquedaLower)) ||
-        s.beneficiosTradicionales.some((b) => b.toLowerCase().includes(busquedaLower));
+        normalizarBusqueda(s.nombre).includes(busquedaLower) ||
+        normalizarBusqueda(s.nombreCientifico ?? '').includes(busquedaLower) ||
+        normalizarBusqueda(s.origen).includes(busquedaLower) ||
+        normalizarBusqueda(s.descripcion).includes(busquedaLower) ||
+        s.nutrientesDestacados.some((n) => normalizarBusqueda(n).includes(busquedaLower)) ||
+        s.beneficiosTradicionales.some((b) => normalizarBusqueda(b).includes(busquedaLower));
       return coincideCategoria && coincideBusqueda;
     });
   }, [categoria, busqueda]);

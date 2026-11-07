@@ -12,6 +12,7 @@ import {
 } from '@/components';
 import ShareCard from '@/components/ShareCard';
 
+import { normalizarBusqueda } from '@/lib/buscadorTablas';
 // ============================================================
 // TIPOS
 // ============================================================
@@ -837,7 +838,7 @@ export default function GuiaFrutosSecosPage() {
   const [busqueda, setBusqueda] = useState('');
 
   const frutosFiltrados = useMemo(() => {
-    const busquedaLower = busqueda.toLowerCase().trim();
+    const busquedaLower = normalizarBusqueda(busqueda).trim();
     return FRUTOS_SECOS.filter((f) => {
       const coincideCategoria = categoria === 'Todas' || f.categoria === categoria;
       const coincideRegion = region === 'Todas' || f.region === region;
@@ -845,7 +846,7 @@ export default function GuiaFrutosSecosPage() {
       const coincidePerfil =
         perfil === 'Todos' ||
         f.destacanEn.some((d) =>
-          d.toLowerCase().includes(perfil.toLowerCase()),
+          normalizarBusqueda(d).includes(normalizarBusqueda(perfil)),
         );
 
       if (!busquedaLower) {
@@ -855,14 +856,14 @@ export default function GuiaFrutosSecosPage() {
       }
 
       const coincideBusqueda =
-        f.nombre.toLowerCase().includes(busquedaLower) ||
-        f.nombreCientifico.toLowerCase().includes(busquedaLower) ||
+        normalizarBusqueda(f.nombre).includes(busquedaLower) ||
+        normalizarBusqueda(f.nombreCientifico).includes(busquedaLower) ||
         f.paisesPrincipales.some((p) =>
-          p.toLowerCase().includes(busquedaLower),
+          normalizarBusqueda(p).includes(busquedaLower),
         ) ||
-        f.descripcion.toLowerCase().includes(busquedaLower) ||
-        f.destacanEn.some((d) => d.toLowerCase().includes(busquedaLower)) ||
-        f.beneficios.some((b) => b.toLowerCase().includes(busquedaLower));
+        normalizarBusqueda(f.descripcion).includes(busquedaLower) ||
+        f.destacanEn.some((d) => normalizarBusqueda(d).includes(busquedaLower)) ||
+        f.beneficios.some((b) => normalizarBusqueda(b).includes(busquedaLower));
 
       return (
         coincideCategoria &&

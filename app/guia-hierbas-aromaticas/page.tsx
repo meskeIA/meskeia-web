@@ -12,6 +12,7 @@ import {
   ShareCard,
 } from '@/components';
 
+import { normalizarBusqueda } from '@/lib/buscadorTablas';
 // ============================================================
 // TIPOS
 // ============================================================
@@ -642,7 +643,7 @@ export default function GuiaHierbasAromaticasPage() {
   const [dificultadActiva, setDificultadActiva] = useState<DificultadCultivo | 'Todas'>('Todas');
 
   const hierbasFiltradas = useMemo(() => {
-    const q = busqueda.toLowerCase().trim();
+    const q = normalizarBusqueda(busqueda).trim();
     return HIERBAS.filter((h) => {
       const coincideFamilia = familiaActiva === 'Todas' || h.familia === familiaActiva;
       const coincideOrigen = origenActivo === 'Todos' || h.origen === origenActivo;
@@ -654,12 +655,12 @@ export default function GuiaHierbasAromaticasPage() {
 
       const coincideBusqueda =
         !q ||
-        h.nombre.toLowerCase().includes(q) ||
-        h.nombreCientifico.toLowerCase().includes(q) ||
-        h.perfilSabor.some((s) => s.toLowerCase().includes(q)) ||
-        h.maridajeIdeal.some((m) => m.toLowerCase().includes(q)) ||
-        h.cocinasTipicas.some((c) => c.toLowerCase().includes(q)) ||
-        h.paisesAsociados.some((p) => p.toLowerCase().includes(q));
+        normalizarBusqueda(h.nombre).includes(q) ||
+        normalizarBusqueda(h.nombreCientifico).includes(q) ||
+        h.perfilSabor.some((s) => normalizarBusqueda(s).includes(q)) ||
+        h.maridajeIdeal.some((m) => normalizarBusqueda(m).includes(q)) ||
+        h.cocinasTipicas.some((c) => normalizarBusqueda(c).includes(q)) ||
+        h.paisesAsociados.some((p) => normalizarBusqueda(p).includes(q));
 
       return (
         coincideFamilia &&

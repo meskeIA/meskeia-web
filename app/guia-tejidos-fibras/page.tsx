@@ -12,6 +12,7 @@ import {
   ShareCard,
 } from '@/components';
 
+import { normalizarBusqueda } from '@/lib/buscadorTablas';
 // ============================================================
 // TIPOS Y DATOS
 // ============================================================
@@ -602,16 +603,16 @@ export default function GuiaTejidosFibrasPage() {
   const [sostenibilidadActiva, setSostenibilidadActiva] = useState<'Alta' | 'Media' | 'Baja' | 'Todas'>('Todas');
 
   const tejidosFiltrados = useMemo(() => {
-    const q = busqueda.toLowerCase().trim();
+    const q = normalizarBusqueda(busqueda).trim();
     return TEJIDOS.filter((t) => {
       const coincideOrigen = origenActivo === 'Todos' || t.origen === origenActivo;
       const coincideSostenibilidad = sostenibilidadActiva === 'Todas' || t.sostenibilidad === sostenibilidadActiva;
       const coincideBusqueda =
         !q ||
-        t.nombre.toLowerCase().includes(q) ||
-        t.nombreTecnico.toLowerCase().includes(q) ||
-        t.usosPrincipales.some((u) => u.toLowerCase().includes(q)) ||
-        t.propiedades.some((p) => p.toLowerCase().includes(q));
+        normalizarBusqueda(t.nombre).includes(q) ||
+        normalizarBusqueda(t.nombreTecnico).includes(q) ||
+        t.usosPrincipales.some((u) => normalizarBusqueda(u).includes(q)) ||
+        t.propiedades.some((p) => normalizarBusqueda(p).includes(q));
       return coincideOrigen && coincideSostenibilidad && coincideBusqueda;
     });
   }, [busqueda, origenActivo, sostenibilidadActiva]);

@@ -12,6 +12,7 @@ import {
   ShareCard,
 } from '@/components';
 
+import { normalizarBusqueda } from '@/lib/buscadorTablas';
 // --- Tipos ---
 
 type TipoMadera = 'Frondosa' | 'Conífera' | 'Tropical' | 'Exótica' | 'Reconst.';
@@ -724,8 +725,8 @@ export default function GuiaMaderasPage() {
     return MADERAS.filter((m) => {
       const coincideBusqueda =
         busqueda === '' ||
-        m.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
-        m.nombreCientifico.toLowerCase().includes(busqueda.toLowerCase());
+        normalizarBusqueda(m.nombre).includes(normalizarBusqueda(busqueda)) ||
+        normalizarBusqueda(m.nombreCientifico).includes(normalizarBusqueda(busqueda));
       const coincideTipo = filtroTipo === '' || m.tipo === filtroTipo;
       const coincideDificultad = filtroDificultad === '' || m.dificultad === filtroDificultad;
       const coincideSostenibilidad = filtroSostenibilidad === '' || m.sostenibilidad === filtroSostenibilidad;

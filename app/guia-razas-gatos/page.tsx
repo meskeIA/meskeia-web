@@ -12,6 +12,7 @@ import {
 } from '@/components';
 import styles from './GuiaRazasGatos.module.css';
 
+import { normalizarBusqueda } from '@/lib/buscadorTablas';
 // ── Tipos ──────────────────────────────────────────────────────────────────
 
 type TipoPeloGato = 'Corto' | 'Medio' | 'Largo' | 'Sin pelo' | 'Rizado';
@@ -944,8 +945,8 @@ export default function GuiaRazasGatosPage() {
     return RAZAS.filter((r) => {
       if (
         filtros.busqueda &&
-        !r.nombre.toLowerCase().includes(filtros.busqueda.toLowerCase()) &&
-        !r.nombreIngles.toLowerCase().includes(filtros.busqueda.toLowerCase())
+        !normalizarBusqueda(r.nombre).includes(normalizarBusqueda(filtros.busqueda)) &&
+        !normalizarBusqueda(r.nombreIngles).includes(normalizarBusqueda(filtros.busqueda))
       ) {
         return false;
       }

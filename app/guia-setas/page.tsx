@@ -12,6 +12,7 @@ import {
 import ShareCard from '@/components/ShareCard';
 import DisclaimerCard from '@/components/DisclaimerCard';
 
+import { normalizarBusqueda } from '@/lib/buscadorTablas';
 // ============================================================
 // TIPOS
 // ============================================================
@@ -632,17 +633,17 @@ export default function GuiaSetasPage() {
   const [busqueda, setBusqueda] = useState('');
 
   const setasFiltradas = useMemo(() => {
-    const q = busqueda.toLowerCase().trim();
+    const q = normalizarBusqueda(busqueda).trim();
     return SETAS.filter((s) => {
       const matchC = comestibilidad === 'Todas' || s.comestibilidad === comestibilidad;
       const matchH = habitat === 'Todos' || s.habitat.includes(habitat as Habitat);
       const matchB = !q || (
-        s.nombre.toLowerCase().includes(q) ||
-        s.nombreCientifico.toLowerCase().includes(q) ||
-        s.familia.toLowerCase().includes(q) ||
-        s.descripcion.toLowerCase().includes(q) ||
-        s.habitat.some((h) => h.toLowerCase().includes(q)) ||
-        s.temporada.some((t) => t.toLowerCase().includes(q))
+        normalizarBusqueda(s.nombre).includes(q) ||
+        normalizarBusqueda(s.nombreCientifico).includes(q) ||
+        normalizarBusqueda(s.familia).includes(q) ||
+        normalizarBusqueda(s.descripcion).includes(q) ||
+        s.habitat.some((h) => normalizarBusqueda(h).includes(q)) ||
+        s.temporada.some((t) => normalizarBusqueda(t).includes(q))
       );
       return matchC && matchH && matchB;
     });

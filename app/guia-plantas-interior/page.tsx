@@ -5,6 +5,7 @@ import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection } fro
 import ShareCard from '@/components/ShareCard';
 import styles from './GuiaPlantasInterior.module.css';
 
+import { normalizarBusqueda } from '@/lib/buscadorTablas';
 // ==============================
 // TIPOS
 // ==============================
@@ -134,9 +135,9 @@ export default function GuiaPlantas() {
       const matchAptas = !soloAptas || p.toxicidadMascotas === 'No tóxica';
       const matchBusqueda =
         busqueda === '' ||
-        p.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
-        p.nombreCientifico.toLowerCase().includes(busqueda.toLowerCase()) ||
-        p.origen.toLowerCase().includes(busqueda.toLowerCase());
+        normalizarBusqueda(p.nombre).includes(normalizarBusqueda(busqueda)) ||
+        normalizarBusqueda(p.nombreCientifico).includes(normalizarBusqueda(busqueda)) ||
+        normalizarBusqueda(p.origen).includes(normalizarBusqueda(busqueda));
       return matchLuz && matchDif && matchAptas && matchBusqueda;
     });
   }, [luz, dificultad, soloAptas, busqueda]);

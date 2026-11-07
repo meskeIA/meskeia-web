@@ -12,6 +12,7 @@ import {
 } from '@/components';
 import styles from './GuiaAvesComunes.module.css';
 
+import { normalizarBusqueda } from '@/lib/buscadorTablas';
 type OrdenAve =
   | 'Paseriformes'
   | 'Falconiformes'
@@ -805,17 +806,17 @@ export default function GuiaAvesComunesPage() {
   const [ordenSelec, setOrdenSelec] = useState<OrdenAve | 'Todos'>('Todos');
 
   const avesFiltradas = useMemo(() => {
-    const t = busqueda.toLowerCase().trim();
+    const t = normalizarBusqueda(busqueda).trim();
     return AVES.filter((a) => {
       const matchHabitat = habitatSelec === 'Todos' || a.habitat.includes(habitatSelec);
       const matchPresencia = presenciaSelec === 'Todos' || a.presencia === presenciaSelec;
       const matchOrden = ordenSelec === 'Todos' || a.orden === ordenSelec;
       const matchBusqueda =
         !t ||
-        a.nombre.toLowerCase().includes(t) ||
-        a.nombreCientifico.toLowerCase().includes(t) ||
-        a.nombreIngles.toLowerCase().includes(t) ||
-        a.descripcion.toLowerCase().includes(t);
+        normalizarBusqueda(a.nombre).includes(t) ||
+        normalizarBusqueda(a.nombreCientifico).includes(t) ||
+        normalizarBusqueda(a.nombreIngles).includes(t) ||
+        normalizarBusqueda(a.descripcion).includes(t);
       return matchHabitat && matchPresencia && matchOrden && matchBusqueda;
     });
   }, [busqueda, habitatSelec, presenciaSelec, ordenSelec]);

@@ -12,6 +12,7 @@ import {
 } from '@/components';
 import styles from './GuiaTe.module.css';
 
+import { normalizarBusqueda } from '@/lib/buscadorTablas';
 type FamiliaTe = 'Verde' | 'Negro' | 'Oolong' | 'Blanco' | 'Pu-erh' | 'Amarillo' | 'Rooibos';
 type NivelCafeina = 'Sin cafeína' | 'Baja' | 'Media' | 'Alta';
 
@@ -620,17 +621,17 @@ export default function GuiaTe() {
   const [familia, setFamilia] = useState<FamiliaTe | 'Todas'>('Todas');
 
   const variedadesFiltradas = useMemo(() => {
-    const t = busqueda.toLowerCase().trim();
+    const t = normalizarBusqueda(busqueda).trim();
     return VARIEDADES.filter((v) => {
       const matchFamilia = familia === 'Todas' || v.familia === familia;
       const matchBusqueda =
         !t ||
-        v.nombre.toLowerCase().includes(t) ||
-        v.nombreOriginal.toLowerCase().includes(t) ||
-        v.pais.toLowerCase().includes(t) ||
-        v.region.toLowerCase().includes(t) ||
-        v.notasDeSabor.some((n) => n.toLowerCase().includes(t)) ||
-        v.descripcion.toLowerCase().includes(t);
+        normalizarBusqueda(v.nombre).includes(t) ||
+        normalizarBusqueda(v.nombreOriginal).includes(t) ||
+        normalizarBusqueda(v.pais).includes(t) ||
+        normalizarBusqueda(v.region).includes(t) ||
+        v.notasDeSabor.some((n) => normalizarBusqueda(n).includes(t)) ||
+        normalizarBusqueda(v.descripcion).includes(t);
       return matchFamilia && matchBusqueda;
     });
   }, [busqueda, familia]);

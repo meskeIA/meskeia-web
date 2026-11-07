@@ -12,6 +12,7 @@ import {
 } from '@/components';
 import styles from './GuiaVarietalesVino.module.css';
 
+import { normalizarBusqueda } from '@/lib/buscadorTablas';
 // ── Tipos ───────────────────────────────────────────────────────────────────
 
 type TipoUva = 'Tinto' | 'Blanco' | 'Rosado' | 'Espumoso' | 'Generoso';
@@ -623,17 +624,17 @@ export default function GuiaVarietalesVinoPage() {
   const [busqueda, setBusqueda] = useState('');
 
   const varietalesFiltrados = useMemo(() => {
-    const termino = busqueda.toLowerCase().trim();
+    const termino = normalizarBusqueda(busqueda).trim();
     return VARIETALES.filter((v) => {
       const coincideTipo = tipo === 'Todos' || v.tipo === tipo;
       if (!coincideTipo) return false;
       if (!termino) return true;
       return (
-        v.nombre.toLowerCase().includes(termino) ||
-        v.origen.toLowerCase().includes(termino) ||
-        v.notasDeSabor.some((n) => n.toLowerCase().includes(termino)) ||
-        v.zonasPrincipales.some((z) => z.toLowerCase().includes(termino)) ||
-        v.maridaje.some((m) => m.toLowerCase().includes(termino))
+        normalizarBusqueda(v.nombre).includes(termino) ||
+        normalizarBusqueda(v.origen).includes(termino) ||
+        v.notasDeSabor.some((n) => normalizarBusqueda(n).includes(termino)) ||
+        v.zonasPrincipales.some((z) => normalizarBusqueda(z).includes(termino)) ||
+        v.maridaje.some((m) => normalizarBusqueda(m).includes(termino))
       );
     });
   }, [tipo, busqueda]);

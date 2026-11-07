@@ -5,6 +5,7 @@ import { useState, useMemo } from 'react';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard } from '@/components';
 import styles from './GuiaCortesCarne.module.css';
 
+import { normalizarBusqueda } from '@/lib/buscadorTablas';
 // ─────────────────────────────────────────────
 // Tipos
 // ─────────────────────────────────────────────
@@ -384,9 +385,9 @@ export default function GuiaCortesCarne() {
       const matchAnimal = animal === 'Todos' || c.animal === animal;
       const matchMetodo = metodo === 'Todos' || c.metodosCoccion.includes(metodo as MetodoCoccion);
       const matchBusqueda = busqueda === '' ||
-        c.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
-        c.nombreAlternativo.toLowerCase().includes(busqueda.toLowerCase()) ||
-        c.parte.toLowerCase().includes(busqueda.toLowerCase());
+        normalizarBusqueda(c.nombre).includes(normalizarBusqueda(busqueda)) ||
+        normalizarBusqueda(c.nombreAlternativo).includes(normalizarBusqueda(busqueda)) ||
+        normalizarBusqueda(c.parte).includes(normalizarBusqueda(busqueda));
       return matchAnimal && matchMetodo && matchBusqueda;
     });
   }, [animal, metodo, busqueda]);
