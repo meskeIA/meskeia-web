@@ -1186,12 +1186,6 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-estados-materia/', icon: '🧊', name: 'Estados de la Materia', description: 'Sólido, líquido, gas, plasma' },
     { url: '/simulador-orbitas-kepler/', icon: '🛰️', name: 'Órbitas y Leyes de Kepler', description: 'La gravitación universal aplicada: de ΣF = m·a a las tres leyes de Kepler' },
   ],
-  'visualizador-tabla-periodica-interactiva': [
-    { url: '/visualizador-tabla-periodica/', icon: '🧪', name: 'Tabla Periódica Visual', description: 'Elementos interactivos' },
-    { url: '/visualizador-reacciones-quimicas/', icon: '⚗️', name: 'Reacciones Químicas', description: 'Átomos que se reordenan' },
-    { url: '/visualizador-estados-materia/', icon: '🧊', name: 'Estados de la Materia', description: 'Sólido, líquido, gas, plasma' },
-    { url: '/visualizador-adn-numeros/', icon: '🧬', name: 'Tu ADN en Números', description: 'Cifras del genoma' },
-  ],
   'visualizador-optica': [
     { url: '/visualizador-colores-cielo/', icon: '🌈', name: 'Colores del Cielo', description: 'La dispersión de Rayleigh y Mie explica cada fase del cielo' },
     { url: '/visualizador-leyes-newton/', icon: '🍎', name: 'Leyes de Newton', description: 'Las 3 leyes de la física' },
@@ -1200,7 +1194,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   ],
   'visualizador-estados-materia': [
     { url: '/visualizador-reacciones-quimicas/', icon: '⚗️', name: 'Reacciones Químicas', description: 'Átomos que se reordenan' },
-    { url: '/visualizador-tabla-periodica-interactiva/', icon: '🧪', name: 'Tendencias Tabla Periódica', description: 'Mapas de calor' },
+    { url: '/simulador-tabla-periodica-tendencias/', icon: '🧪', name: 'Tendencias Periódicas', description: 'Mapas de calor' },
     { url: '/visualizador-leyes-newton/', icon: '🍎', name: 'Leyes de Newton', description: 'Las 3 leyes de la física' },
     { url: '/visualizador-celula/', icon: '🔬', name: 'La Célula por Dentro', description: 'Animal vs vegetal' },
   ],
@@ -1337,7 +1331,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-metamorfosis/', icon: '🦋', name: 'Metamorfosis', description: 'Transformación radical' },
   ],
   'visualizador-enlaces-quimicos': [
-    { url: '/visualizador-tabla-periodica-interactiva/', icon: '🧪', name: 'Tendencias Tabla Periódica', description: 'Mapas de calor' },
+    { url: '/simulador-tabla-periodica-tendencias/', icon: '🧪', name: 'Tendencias Periódicas', description: 'Mapas de calor' },
     { url: '/visualizador-reacciones-quimicas/', icon: '⚗️', name: 'Reacciones Químicas', description: 'Átomos que se reordenan' },
     { url: '/visualizador-estados-materia/', icon: '🧊', name: 'Estados de la Materia', description: 'Sólido, líquido, gas, plasma' },
     { url: '/visualizador-biomoleculas/', icon: '🧪', name: 'Biomoléculas', description: 'Los 4 ingredientes de la vida' },
@@ -1377,7 +1371,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'visualizador-ph-acidos-bases': [
     { url: '/visualizador-reacciones-quimicas/', icon: '⚗️', name: 'Reacciones Químicas', description: 'Tipos y balanceo' },
     { url: '/visualizador-biomoleculas/', icon: '🧪', name: 'Biomoléculas', description: 'Los 4 ingredientes de la vida' },
-    { url: '/visualizador-tabla-periodica-interactiva/', icon: '🔬', name: 'Tabla Periódica', description: 'Tendencias y propiedades' },
+    { url: '/simulador-tabla-periodica-tendencias/', icon: '⚗️', name: 'Tendencias Periódicas', description: 'Tendencias y propiedades' },
     { url: '/visualizador-enlaces-quimicos/', icon: '⚛️', name: 'Enlaces Químicos', description: 'Iónico, covalente, metálico' },
   ],
   'visualizador-estaciones-ano': [
@@ -1438,7 +1432,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-estructuras-cristalinas/', icon: '🔮', name: 'Estructuras Cristalinas 3D', description: 'Celdas unitarias rotables' },
     { url: '/visualizador-tipos-rocas/', icon: '🪨', name: 'Tipos de Rocas', description: 'Ígneas, sedimentarias, metamórficas' },
     { url: '/visualizador-capas-tierra/', icon: '🌎', name: 'Capas de la Tierra', description: 'De la corteza al núcleo' },
-    { url: '/visualizador-tabla-periodica-interactiva/', icon: '🔬', name: 'Tabla Periódica', description: 'Elementos que forman minerales' },
+    { url: '/tabla-periodica/', icon: '🔬', name: 'Tabla Periódica', description: 'Elementos que forman minerales' },
   ],
   'visualizador-estructuras-cristalinas': [
     { url: '/visualizador-minerales-gemas/', icon: '💎', name: 'Minerales y Gemas', description: 'Escala de Mohs y piedras preciosas' },
@@ -1453,7 +1447,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/simulador-efecto-fotoelectrico/', icon: '💡', name: 'Efecto Fotoeléctrico', description: 'La luz como fotones: frecuencia umbral y energía de los electrones' },
   ],
   'visualizador-estructura-atomo': [
-    { url: '/visualizador-tabla-periodica-interactiva/', icon: '🔬', name: 'Tabla Periódica', description: 'Tendencias y propiedades' },
+    { url: '/simulador-tabla-periodica-tendencias/', icon: '⚗️', name: 'Tendencias Periódicas', description: 'Tendencias y propiedades' },
     { url: '/visualizador-enlaces-quimicos/', icon: '⚛️', name: 'Enlaces Químicos', description: 'Cómo se unen los átomos' },
     { url: '/simulador-modelo-bohr/', icon: '⚛️', name: 'Modelo Atómico de Bohr', description: 'Saltos del electrón entre niveles y el espectro del hidrógeno' },
     { url: '/calculadora-configuracion-electronica/', icon: '⚛️', name: 'Configuración Electrónica', description: 'En qué orbital entra cada electrón, con las reglas de Aufbau, Hund y Pauli' },
@@ -1835,25 +1829,25 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/visualizador-adrenalina/', icon: '⚡', name: 'Adrenalina', description: 'El antagonista funcional: simpático vs parasimpático' },
   ],
   'visualizador-carbono': [
-    { url: '/visualizador-tabla-periodica-interactiva/', icon: '🧪', name: 'Tabla Periódica', description: 'El carbono (C, nº 6) en el contexto de todos los elementos' },
+    { url: '/tabla-periodica/', icon: '🧪', name: 'Tabla Periódica', description: 'El carbono (C, nº 6) en el contexto de todos los elementos' },
     { url: '/visualizador-silicio/', icon: '💻', name: 'Silicio', description: 'El semiconductor que comparte grupo con el carbono' },
     { url: '/visualizador-cambio-climatico-tipping-points/', icon: '🌡️', name: 'Cambio Climático', description: 'El ciclo del carbono perturbado: el motor del calentamiento global' },
     { url: '/tabla-grupos-funcionales/', icon: '⚛️', name: 'Tabla de Grupos Funcionales', description: 'Los grupos de la química del carbono, con prioridad IUPAC' },
   ],
   'visualizador-silicio': [
-    { url: '/visualizador-tabla-periodica-interactiva/', icon: '🧪', name: 'Tabla Periódica', description: 'El silicio (Si, nº 14) en el contexto de todos los elementos' },
+    { url: '/tabla-periodica/', icon: '🧪', name: 'Tabla Periódica', description: 'El silicio (Si, nº 14) en el contexto de todos los elementos' },
     { url: '/visualizador-carbono/', icon: '⚛️', name: 'Carbono', description: 'El grafeno de carbono como semiconductor del futuro' },
     { url: '/visualizador-computacion-cuantica/', icon: '⚛️', name: 'Computación Cuántica', description: 'Los límites del silicio y el siguiente paradigma computacional' },
     { url: '/visualizador-criptografia/', icon: '🔐', name: 'Criptografía', description: 'Los chips de silicio que hacen posible el cifrado moderno' },
   ],
   'visualizador-hidrogeno': [
-    { url: '/visualizador-tabla-periodica-interactiva/', icon: '🧪', name: 'Tabla Periódica', description: 'El hidrógeno (H, nº 1) en el contexto de todos los elementos' },
+    { url: '/tabla-periodica/', icon: '🧪', name: 'Tabla Periódica', description: 'El hidrógeno (H, nº 1) en el contexto de todos los elementos' },
     { url: '/visualizador-carbono/', icon: '⚛️', name: 'Carbono', description: 'El otro elemento clave en energía: combustibles fósiles vs H₂ verde' },
     { url: '/visualizador-energia-nuclear/', icon: '☢️', name: 'Energía Nuclear', description: 'Fusión (H) vs fisión (U): las dos fuentes sin CO₂' },
     { url: '/visualizador-cambio-climatico-tipping-points/', icon: '🌡️', name: 'Cambio Climático', description: 'El hidrógeno verde como solución de descarbonización' },
   ],
   'visualizador-oro': [
-    { url: '/visualizador-tabla-periodica-interactiva/', icon: '🧪', name: 'Tabla Periódica', description: 'El oro (Au, nº 79) en el contexto de todos los elementos' },
+    { url: '/tabla-periodica/', icon: '🧪', name: 'Tabla Periódica', description: 'El oro (Au, nº 79) en el contexto de todos los elementos' },
     { url: '/visualizador-relatividad-especial/', icon: '💫', name: 'Relatividad Especial', description: 'La teoría de Einstein que explica por qué el oro es amarillo' },
     { url: '/visualizador-silicio/', icon: '💻', name: 'Silicio', description: 'Los chips que el oro conecta: semiconductores y circuitos integrados' },
     { url: '/visualizador-criptografia/', icon: '🔐', name: 'Criptografía', description: 'Bitcoin vs oro físico: los dos "valores refugio" comparados' },
@@ -2999,7 +2993,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
   'quiz-tabla-periodica': [
     { url: '/quiz-simbolos-quimicos/', icon: '⚗️', name: 'Quiz Símbolos Químicos', description: 'Símbolo ↔ nombre de los elementos' },
     { url: '/tabla-periodica/', icon: '🧪', name: 'Tabla Periódica', description: 'Consulta los 118 elementos' },
-    { url: '/visualizador-tabla-periodica-interactiva/', icon: '🔬', name: 'Tendencias Periódicas', description: 'Mapas de calor y propiedades' },
+    { url: '/simulador-tabla-periodica-tendencias/', icon: '🔬', name: 'Tendencias Periódicas', description: 'Mapas de calor y propiedades' },
   ],
   'quiz-simbolos-quimicos': [
     { url: '/quiz-tabla-periodica/', icon: '🧪', name: 'Quiz Tabla Periódica', description: 'Grupos, períodos y propiedades' },

@@ -21,7 +21,6 @@ const FAMILIA: ReadonlyArray<[slug: string, tipo: string]> = [
   ['generador-contrasenas', 'WebApplication'],
   ['visualizador-polimeros-materiales', 'WebApplication'],
   ['visualizador-tipos-activos', 'WebApplication'],
-  ['visualizador-tabla-periodica-interactiva', 'WebApplication'],
   ['visualizador-cerebro-emociones', 'LearningResource'],
   ['visualizador-biomas-terrestres', 'WebApplication'],
   ['orientador-facturacion-retencion', 'WebApplication'],

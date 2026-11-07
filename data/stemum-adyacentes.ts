@@ -28,7 +28,6 @@ export const STEMUM_ADYACENTES: Record<string, string> = {
   'visualizador-oro': 'quimica',
   'visualizador-ph-acidos-bases': 'quimica',
   'visualizador-tabla-periodica': 'quimica',
-  'visualizador-tabla-periodica-interactiva': 'quimica',
   'visualizador-estructuras-cristalinas': 'quimica',
   'visualizador-polimeros-materiales': 'quimica',
   'visualizador-hidrogeno': 'quimica',

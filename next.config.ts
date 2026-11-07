@@ -247,6 +247,13 @@ const nextConfig: NextConfig = {
       // simulador absorbió lo único que no tenía: la distinción entre movimiento a lo largo de
       // la curva y desplazamiento de la curva, y la explicación de elasticidad.
       { source: '/visualizador-oferta-demanda', has, destination: '/simulador-oferta-demanda/', permanent: true },
+      // Dos apps con el mismo nombre, «Tendencias de la Tabla Periódica» (07/11/2026, S0257).
+      // El visualizador (abril, 36 elementos y 3 propiedades) era un subconjunto del simulador
+      // (mayo, 118 elementos y 5 propiedades, con las excepciones y la explicación de las
+      // tendencias que el visualizador traía): 125 impresiones en 90 días frente a 54, y la
+      // consulta «tendencias tabla periodica» apenas existe, así que no había demanda que repartir.
+      // Nada que absorber antes de retirarlo.
+      { source: '/visualizador-tabla-periodica-interactiva', has, destination: '/simulador-tabla-periodica-tendencias/', permanent: true },
     ];
   },
 
