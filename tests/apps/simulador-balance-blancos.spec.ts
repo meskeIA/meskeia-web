@@ -12,13 +12,16 @@ import { esperarHidratacion, sembrarValor, sembrarValorAcotado, leerValorEnReact
  *   · Diferencia = WB elegido − WB correcto de la escena (la app no declara otra fórmula).
  *   · Dirección (física y bloque educativo de la propia app): WB POR ENCIMA de la luz real → la
  *     cámara cree que la luz es más azul de lo que es, añade naranja → foto cálida; POR DEBAJO → azul.
- *   · Cortes que declara el código (clasificarBalance y la «Lectura de la imagen»):
- *     |Δ| ≤ 200 neutro · etiqueta «Ligeramente» hasta 1500 y «Demasiado» por encima ·
- *     intensidad Suave ≤ 800, Notable ≤ 2000, Muy fuerte > 2000 · recuperable fácil ≤ 1500,
- *     «En RAW sí; en JPEG con pérdida» ≤ 3000, «Solo en RAW y con esfuerzo» > 3000.
- *   · Velo de la escena: opacidad = min(0,55, |Δ|/3500 × 0,55), naranja #fb923c o azul #3b82f6.
  *   · Mired = 10⁶ / K: la escala en la que un mismo salto se percibe igual (por eso los filtros
- *     CTO/CTB se gradúan en mireds y no en kelvin).
+ *     CTO/CTB se gradúan en mireds y no en kelvin). Desvío = 10⁶/luz − 10⁶/WB.
+ *   · REPARADO el 07/11/2026 (hallazgos 4162, 4165, 4166): la app clasificaba en kelvin con
+ *     cortes distintos para la etiqueta y la intensidad. Ahora UNA escala en mireds para todo:
+ *     |desvío| ≤ 20 neutro / Imperceptible · ≤ 40 «Ligeramente…» / Suave · ≤ 80 «Cálido (naranja)»
+ *     o «Frío (azul)» / Notable · > 80 «Demasiado…» / Muy fuerte (un octavo de CTO/CTB ronda los
+ *     20 mired, un cuarto los 40 y medio los 80) · recuperable fácil ≤ 80, «En RAW sí; en JPEG
+ *     con pérdida» ≤ 160, «Solo en RAW y con esfuerzo» > 160.
+ *   · Velo de la escena: opacidad = min(0,55, |desvío|/160 × 0,55), naranja #fb923c o azul #3b82f6.
+ *   · Barra de desvío: centro = WB correcto; marcador al 50 + min(1, desvío/160) × 50 %.
  *   · es-ES no agrupa cuatro cifras («2300 K») y sí cinco («10.000 K»).
  *
  * Los `test.fail()` son hallazgos ABIERTOS de esta inspección: afirman lo correcto y hoy fallan.
@@ -90,9 +93,9 @@ test.describe('Simulador de balance de blancos · escritorio', () => {
 
   test('CASO 1 (normal) · tungsteno con el preset Luz día: +2300 K, naranja muy fuerte', async ({ page }) => {
     // Luz 3200 K, WB 5500 K → Δ = 5500 − 3200 = +2300 K. WB por encima → naranja.
-    // 2300 > 1500 → «Demasiado cálido» · 2300 > 2000 → «Muy fuerte» · 1500 < 2300 ≤ 3000 →
-    // «En RAW sí; en JPEG con pérdida». Lo mismo que dice la FAQ visible («la diferencia de
-    // 2300K genera un dominante naranja muy fuerte»).
+    // 10⁶/3200 − 10⁶/5500 = 312,5 − 181,82 = 130,68 mired: > 80 → «Demasiado cálido» y «Muy
+    // fuerte» · 80 < 130,68 ≤ 160 → «En RAW sí; en JPEG con pérdida». Lo mismo que dice la FAQ
+    // («un dominante naranja muy fuerte»).
     await esperarLectura(page, { valor: '3200 K', diferencia: '0 K', ...NEUTRA });
     await page.getByRole('button', { name: /^Luz día/ }).click();
     await esperarLectura(page, {
@@ -104,27 +107,28 @@ test.describe('Simulador de balance de blancos · escritorio', () => {
       blanco: 'Blanco amarillento',
       recuperable: 'En RAW sí; en JPEG con pérdida',
     });
-    // Velo: 2300/3500 × 0,55 = 0,36143, naranja
+    await expect(page.locator('[class*="balanceMired"]')).toHaveText('Desvío percibido: +131 mired');
+    // Velo: 130,68/160 × 0,55 = 0,44922, naranja
     await expect(velo(page)).toHaveCount(1);
     await expect(velo(page)).toHaveAttribute('fill', '#fb923c');
-    expect(Number(await velo(page).getAttribute('opacity'))).toBeCloseTo(0.36143, 3);
-    // Marcadores: (5500 − 2500)/7500 = 40 % · correcto (3200 − 2500)/7500 = 9,333 %
+    expect(Number(await velo(page).getAttribute('opacity'))).toBeCloseTo(0.44922, 3);
+    // Barra de desvío: 50 + 130,68/160 × 50 = 90,838 % · el correcto, en el centro
     const pos = await page.evaluate(() => ({
       actual: parseFloat((document.querySelector('[class*="balanceMarker"]') as HTMLElement).style.left),
       correcto: parseFloat((document.querySelector('[class*="balanceTarget"]') as HTMLElement).style.left),
     }));
-    expect(pos.actual).toBeCloseTo(40, 2);
-    expect(pos.correcto).toBeCloseTo(9.333, 2);
+    expect(pos.actual).toBeCloseTo(90.838, 2);
+    expect(pos.correcto).toBeCloseTo(50, 2);
   });
 
-  test('CASO 2 (límite) · neutro exacto, extremo inferior y el corte de ±200 K', async ({ page }) => {
+  test('CASO 2 (límite) · neutro exacto, extremo inferior y el corte de 20 mired', async ({ page }) => {
     // Nublado: al cambiar de escena el WB vuelve al correcto (6500 K) → Δ = 0, sin velo
     await page.getByRole('tab', { name: /Día nublado/ }).click();
     await esperarLectura(page, { valor: '6500 K', diferencia: '0 K', ...NEUTRA });
     await expect(velo(page)).toHaveCount(0);
 
     // Inicio del deslizador con el teclado: 2500 K → Δ = 2500 − 6500 = −4000 K, azul.
-    // 4000 > 3000 → «Solo en RAW y con esfuerzo». Velo: 4000/3500 > 1 → tope 0,55
+    // 153,85 − 400 = −246,15 mired: > 160 → «Solo en RAW y con esfuerzo». Velo: tope 0,55
     await page.locator(DESLIZADOR).focus();
     await page.keyboard.press('Home');
     await esperarLectura(page, {
@@ -139,7 +143,8 @@ test.describe('Simulador de balance de blancos · escritorio', () => {
     await expect(velo(page)).toHaveAttribute('fill', '#3b82f6');
     expect(Number(await velo(page).getAttribute('opacity'))).toBeCloseTo(0.55, 3);
 
-    // Corte de ±200 K en tungsteno: 3400 (Δ +200) sigue neutro; 3500 (Δ +300) ya es cálido suave
+    // Corte de 20 mired en tungsteno: 3400 (312,5 − 294,12 = 18,38) sigue neutro; 3500
+    // (312,5 − 285,71 = 26,79) ya es cálido suave
     await page.getByRole('tab', { name: /Interior tungsteno/ }).click();
     await sembrarValor(page, DESLIZADOR, 3400);
     await esperarLectura(page, { valor: '3400 K', diferencia: '+200 K', ...NEUTRA });
@@ -179,16 +184,18 @@ test.describe('Simulador de balance de blancos · escritorio', () => {
     await expect(insignia(page)).toHaveText('10.000 K');
     expect(await leerValorEnReact(page, DESLIZADOR)).toBe('10000');
 
-    // 1000 → 2500: Δ = 2500 − 3200 = −700 → «Ligeramente frío», Suave
+    // 1000 → 2500: Δ = 2500 − 3200 = −700 K, pero 312,5 − 400 = −87,5 mired: > 80 → «Demasiado
+    // frío», Muy fuerte, y ≤ 160 → «En RAW sí; en JPEG con pérdida» (antes, en kelvin, salía
+    // «Ligeramente frío / Suave»: hallazgo 4162)
     expect(await sembrarValorAcotado(page, DESLIZADOR, 1000)).toBe('2500');
     await esperarLectura(page, {
       valor: '2500 K',
       diferencia: '-700 K',
-      etiqueta: 'Ligeramente frío',
+      etiqueta: 'Demasiado frío (muy azul)',
       tinte: 'Azul / frío',
-      intensidad: 'Suave',
+      intensidad: 'Muy fuerte',
       blanco: 'Blanco azulado',
-      recuperable: 'Sí, fácilmente (sobre todo en RAW)',
+      recuperable: 'En RAW sí; en JPEG con pérdida',
     });
     // 2550 → 2600: Δ = −600
     expect(await sembrarValorAcotado(page, DESLIZADOR, 2550)).toBe('2600');
@@ -200,14 +207,15 @@ test.describe('Simulador de balance de blancos · escritorio', () => {
   }) => {
     await page.getByRole('tab', { name: /Atardecer/ }).click();
     await esperarLectura(page, { valor: '3500 K', diferencia: '0 K', ...NEUTRA });
-    // 4500 → Δ +1000: cálido; 5500 → Δ +2000: «Demasiado cálido»; 3000 → Δ −500: frío
+    // 4500 → 285,71 − 222,22 = +63,49 mired: cálido notable; 5500 → +103,9: «Demasiado
+    // cálido»; 3000 → 285,71 − 333,33 = −47,62: frío notable
     await sembrarValor(page, DESLIZADOR, 4500);
-    await expect(etiqueta(page)).toHaveText('Ligeramente cálido');
+    await expect(etiqueta(page)).toHaveText('Cálido (naranja)');
     await expect(fila(page, 'Tinte dominante')).toHaveText('Naranja / cálido');
     await sembrarValor(page, DESLIZADOR, 5500);
     await expect(etiqueta(page)).toHaveText('Demasiado cálido (muy naranja)');
     await sembrarValor(page, DESLIZADOR, 3000);
-    await expect(etiqueta(page)).toHaveText('Ligeramente frío');
+    await expect(etiqueta(page)).toHaveText('Frío (azul)');
     await expect(fila(page, 'Tinte dominante')).toHaveText('Azul / frío');
     // El consejo del hallazgo existe y se ve al abrir la guía
     await page.getByRole('button', { name: /Ver guía educativa/ }).click();
@@ -226,16 +234,14 @@ test.describe('Simulador de balance de blancos · escritorio', () => {
     await expect(page.getByRole('button', { name: /Volver al WB correcto \(3500 K\)/ })).toBeVisible();
   });
 
-  test('HALLAZGO (07/11/2026, ABIERTO) · la intensidad se juzga en kelvin y no en mireds: 54 mired salen «Muy fuerte» y 56 o 87 mired, «Suave»', async ({
+  test('HALLAZGO 4162 (07/11/2026, REPARADO) · la intensidad se juzga en kelvin y no en mireds: 54 mired salen «Muy fuerte» y 56 o 87 mired, «Suave»', async ({
     page,
   }) => {
     // Nublado 6500 K con WB 10.000 K: 10⁶/6500 − 10⁶/10000 = 153,85 − 100 = 53,85 mired
     // Tungsteno 3200 K con WB 3900 K: 10⁶/3200 − 10⁶/3900 = 312,50 − 256,41 = 56,09 mired
     // Tungsteno 3200 K con WB 2500 K: 10⁶/2500 − 10⁶/3200 = 400 − 312,5 = 87,5 mired
     // Un desvío igual o mayor en mireds no puede salir con MENOS intensidad. Hoy: nublado →
-    // «Muy fuerte» (Δ 3500 K); tungsteno → «Suave» las dos veces (Δ ±700 K).
-    test.fail();
-    const GRADO: Record<string, number> = { Imperceptible: 0, Suave: 1, Notable: 2, 'Muy fuerte': 3 };
+    // «Muy fuerte» (Δ 3500 K); tungsteno → «Suave» las dos veces (Δ ±700 K).    const GRADO: Record<string, number> = { Imperceptible: 0, Suave: 1, Notable: 2, 'Muy fuerte': 3 };
     await page.getByRole('tab', { name: /Día nublado/ }).click();
     await sembrarValor(page, DESLIZADOR, 10000);
     const nublado = GRADO[(await fila(page, 'Intensidad del tinte').textContent()) ?? ''];
@@ -248,58 +254,55 @@ test.describe('Simulador de balance de blancos · escritorio', () => {
     expect(tungstenoFrio).toBeGreaterThanOrEqual(nublado);
   });
 
-  test('HALLAZGO (07/11/2026, ABIERTO) · el consejo «Sube el WB ligeramente solo si está fuera de control» va al revés', async ({
+  test('HALLAZGO 4163 (07/11/2026, REPARADO) · el consejo «Sube el WB ligeramente solo si está fuera de control» va al revés', async ({
     page,
   }) => {
     // CASO 4 comprueba que en la propia app subir el WB del atardecer CALIENTA la foto: para domar
-    // un cálido fuera de control hay que bajarlo hacia 3500 K, no subirlo.
-    test.fail();
-    const consejo = page.locator('[class*="tipCard"]').filter({ hasText: 'El atardecer no se neutraliza' });
+    // un cálido fuera de control hay que bajarlo hacia 3500 K, no subirlo.    const consejo = page.locator('[class*="tipCard"]').filter({ hasText: 'El atardecer no se neutraliza' });
     expect(await consejo.textContent()).not.toContain('Sube el WB ligeramente solo si está fuera de control');
+    expect(await consejo.textContent()).toContain('baja el WB hacia la temperatura de la luz');
+    // Y la FAQ de la hora dorada ya no promete «suavizar» el cálido subiendo a 4500-5500 K
+    const faq = page.locator('[class*="faqItem"]').filter({ hasText: 'hora dorada se beneficia' });
+    expect(await faq.textContent()).not.toContain('suavizándolo');
+    expect(await faq.textContent()).toContain('baja el WB hacia los 3500 K');
   });
 
-  test('HALLAZGO (07/11/2026, ABIERTO) · la escena tungsteno llama «luz día» a 6500 K; el preset y la tabla dicen 5500 K', async ({
+  test('HALLAZGO 4164 (07/11/2026, REPARADO) · la escena tungsteno llama «luz día» a 6500 K; el preset y la tabla dicen 5500 K', async ({
     page,
   }) => {
     // Preset «Luz día» = 5500 K, tabla «Luz día ~5500 K», y 6500 K es «Nublado» en los dos sitios.
-    await expect(page.getByRole('button', { name: /^Luz día/ })).toContainText('5500 K');
-    test.fail();
-    expect(await page.locator('[class*="escenaInfo"]').textContent()).not.toContain('6500K (luz día)');
+    await expect(page.getByRole('button', { name: /^Luz día/ })).toContainText('5500 K');    expect(await page.locator('[class*="escenaInfo"]').textContent()).not.toContain('6500K (luz día)');
   });
 
-  test('HALLAZGO (07/11/2026, ABIERTO) · la vela: «unos 1.800K» en el FAQPage y «~1900 K» en la tabla', async ({
+  test('HALLAZGO 4164 (07/11/2026, REPARADO) · la vela: «unos 1.800K» en el FAQPage y «~1900 K» en la tabla', async ({
     page,
   }) => {
     const filaVela = page.locator('[class*="comparativaTable"] tr').filter({ hasText: 'Vela' }).locator('td').nth(1);
     const tabla = Number(((await filaVela.textContent()) ?? '').replace(/\D/g, ''));
-    expect(tabla).toBe(1900); // ancla: la fila existe
-    test.fail();
-    const respuesta = (await faqPage(page)).map((p) => p.acceptedAnswer.text).join(' ');
+    expect(tabla).toBe(1900); // ancla: la fila existe    const respuesta = (await faqPage(page)).map((p) => p.acceptedAnswer.text).join(' ');
     const vela = respuesta.match(/vela emite unos ([\d.]+)\s?K/i);
     if (vela) expect(Number(vela[1].replace(/\./g, ''))).toBe(tabla);
   });
 
-  test('HALLAZGO (07/11/2026, ABIERTO) · «Demasiado cálido (muy naranja)» con intensidad «Notable»: la etiqueta y la intensidad cortan en sitios distintos', async ({
+  test('HALLAZGO 4165 (07/11/2026, REPARADO) · «Demasiado cálido (muy naranja)» con intensidad «Notable»: la etiqueta y la intensidad cortan en sitios distintos', async ({
     page,
   }) => {
     // Atardecer 3500 K con WB 5500 K: Δ = +2000. Etiqueta: > 1500 → «Demasiado…»; intensidad:
     // ≤ 2000 → «Notable». Lo mismo para todo |Δ| de 1600 a 2000 K.
     await page.getByRole('tab', { name: /Atardecer/ }).click();
     await sembrarValor(page, DESLIZADOR, 5500);
-    await expect(diferencia(page)).toHaveText('Diferencia con el WB correcto: +2000 K');
-    test.fail();
-    const muy = ((await etiqueta(page).textContent()) ?? '').startsWith('Demasiado');
+    await expect(diferencia(page)).toHaveText('Diferencia con el WB correcto: +2000 K');    const muy = ((await etiqueta(page).textContent()) ?? '').startsWith('Demasiado');
     const muyFuerte = (await fila(page, 'Intensidad del tinte').textContent()) === 'Muy fuerte';
     expect(muy).toBe(muyFuerte);
   });
 
-  test('HALLAZGO (07/11/2026, ABIERTO) · la barra del resultado pone el marcador en el azul cuando la foto sale naranja', async ({
+  test('HALLAZGO 4166 (07/11/2026, REPARADO) · la barra del resultado pone el marcador en el azul cuando la foto sale naranja', async ({
     page,
   }) => {
-    // Tungsteno con el preset Sombra (7500 K): marcador al (7500 − 2500)/7500 = 66,7 % de un
-    // degradado naranja → blanco (50 %) → azul. Bajo el marcador, ≈ rgb(173, 211, 253), azul claro,
-    // mientras la etiqueta dice «Demasiado cálido (muy naranja)». La barra pinta el color de la
-    // LUZ de cada kelvin, que es el contrario del tinte que deja ese WB.
+    // Tungsteno con el preset Sombra (7500 K): el marcador iba al (7500 − 2500)/7500 = 66,7 % de
+    // un degradado naranja → blanco (50 %) → azul, ≈ rgb(173, 211, 253), azul claro, mientras la
+    // etiqueta decía «Demasiado cálido (muy naranja)»: la barra pintaba el color de la LUZ. Ahora
+    // es la barra del desvío: 312,5 − 133,33 = +179,2 mired → tope, 100 %, sobre el naranja.
     await page.getByRole('button', { name: /^Sombra/ }).click();
     await expect(etiqueta(page)).toHaveText('Demasiado cálido (muy naranja)');
     const color = await page.evaluate(() => {
@@ -316,12 +319,10 @@ test.describe('Simulador de balance de blancos · escritorio', () => {
       return { p, paradas: paradas.length, r: a.r + (z.r - a.r) * t, b: a.b + (z.b - a.b) * t };
     });
     expect(color.paradas).toBeGreaterThanOrEqual(2); // ancla: la barra tiene su degradado
-    expect(color.p).toBeCloseTo(66.667, 2);
-    test.fail();
-    expect(color.r).toBeGreaterThan(color.b);
+    expect(color.p).toBeCloseTo(100, 2);    expect(color.r).toBeGreaterThan(color.b);
   });
 
-  test('HALLAZGO (07/11/2026, ABIERTO) · dos preguntas del FAQPage repiten las de la FAQ visible con otra respuesta', async ({
+  test('HALLAZGO 4167 (07/11/2026, REPARADO) · dos preguntas del FAQPage repiten las de la FAQ visible con otra respuesta', async ({
     page,
   }) => {
     const ld = await faqPage(page);
@@ -336,43 +337,35 @@ test.describe('Simulador de balance de blancos · escritorio', () => {
     const ldIncorrecto = ld.find((p) => /incorrecto/i.test(p.name));
     const visIncorrecto = visibles.find((p) => /incorrecto/i.test(p.pregunta));
     // anclas: las cuatro existen
-    expect(ldNaranja && visNaranja && ldIncorrecto && visIncorrecto).toBeTruthy();
-    test.fail();
-    // Una sola constante (PREGUNTAS_FRECUENTES): mismo enunciado y misma respuesta
+    expect(ldNaranja && visNaranja && ldIncorrecto && visIncorrecto).toBeTruthy();    // Una sola constante (PREGUNTAS_FRECUENTES): mismo enunciado y misma respuesta
     expect(visNaranja!.pregunta).toBe(ldNaranja!.name);
     expect(visNaranja!.respuesta).toBe(ldNaranja!.acceptedAnswer.text);
     expect(visIncorrecto!.pregunta).toBe(ldIncorrecto!.name);
     expect(visIncorrecto!.respuesta).toBe(ldIncorrecto!.acceptedAnswer.text);
   });
 
-  test('HALLAZGO (07/11/2026, ABIERTO) · emojis leídos por el lector: «💡 Interior tungsteno:» y «✅ Balance correcto»', async ({
+  test('HALLAZGO 4168 (07/11/2026, REPARADO) · emojis leídos por el lector: «💡 Interior tungsteno:» y «✅ Balance correcto»', async ({
     page,
   }) => {
-    await expect(etiqueta(page)).toHaveText('✅ Balance correcto');
-    test.fail();
-    expect(await page.locator('[class*="escenaInfo"]').ariaSnapshot()).not.toContain('💡');
+    await expect(etiqueta(page)).toHaveText('✅ Balance correcto');    expect(await page.locator('[class*="escenaInfo"]').ariaSnapshot()).not.toContain('💡');
     expect(await page.locator('[class*="balanceMeter"]').ariaSnapshot()).not.toContain('✅');
   });
 
-  test('HALLAZGO (07/11/2026, ABIERTO) · las pestañas de escena no responden a las flechas ni apuntan a su panel', async ({
+  test('HALLAZGO 4169 (07/11/2026, REPARADO) · las pestañas de escena no responden a las flechas ni apuntan a su panel', async ({
     page,
   }) => {
     const pestanas = page.getByRole('tab');
-    await expect(pestanas).toHaveCount(3);
-    test.fail();
-    await page.getByRole('tab', { name: /Interior tungsteno/ }).focus();
+    await expect(pestanas).toHaveCount(3);    await page.getByRole('tab', { name: /Interior tungsteno/ }).focus();
     await page.keyboard.press('ArrowRight');
     await expect(page.getByRole('tab', { name: /Día nublado/ })).toBeFocused({ timeout: 1000 });
     await expect(pestanas.first()).toHaveAttribute('aria-controls', /.+/, { timeout: 1000 });
   });
 
-  test('HALLAZGO (07/11/2026, ABIERTO) · formato: «10 000 K» en la escala y «10 000K» en la nota, frente a «10.000 K» de la insignia', async ({
+  test('HALLAZGO 4170 (07/11/2026, REPARADO) · formato: «10 000 K» en la escala y «10 000K» en la nota, frente a «10.000 K» de la insignia', async ({
     page,
   }) => {
     expect(await sembrarValorAcotado(page, DESLIZADOR, 10000)).toBe('10000');
-    await expect(insignia(page)).toHaveText('10.000 K');
-    test.fail();
-    expect(await page.locator('[class*="scaleRow"] span').last().textContent()).toBe('10.000 K');
+    await expect(insignia(page)).toHaveText('10.000 K');    expect(await page.locator('[class*="scaleRow"] span').last().textContent()).toBe('10.000 K');
     expect(await page.locator('[class*="unitLabel"]').textContent()).not.toMatch(/10 000/);
   });
 });

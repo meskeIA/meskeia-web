@@ -1,7 +1,7 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import {
   MeskeiaLogo,
   Footer,
@@ -12,6 +12,7 @@ import {
 } from '@/components';
 import { formatNumber } from '@/lib';
 import styles from './SimuladorBalanceBlancos.module.css';
+import { PREGUNTAS_FRECUENTES } from './metadata';
 
 type EscenaId = 'tungsteno' | 'nublado' | 'atardecer';
 
@@ -32,7 +33,7 @@ const ESCENAS: EscenaConfig[] = [
     tempLuzK: 3200,
     wbCorrectoK: 3200,
     descripcion:
-      'Habitación iluminada con bombillas incandescentes (~3200K, luz muy cálida). El WB correcto está bajo en la escala Kelvin: si subes a 6500K (luz día), la imagen se ve naranja fluorescente.',
+      'Habitación iluminada con bombillas incandescentes (~3200 K, luz muy cálida). El WB correcto está bajo en la escala Kelvin: si subes a 5500 K (luz día), la imagen se ve naranja fluorescente.',
   },
   {
     id: 'nublado',
@@ -41,7 +42,7 @@ const ESCENAS: EscenaConfig[] = [
     tempLuzK: 6500,
     wbCorrectoK: 6500,
     descripcion:
-      'Exterior con cielo cubierto (~6500K, luz neutra-fría). El WB correcto está en la mitad de la escala. Si dejas el WB de tungsteno (3200K), todo se ve muy azul.',
+      'Exterior con cielo cubierto (~6500 K, luz neutra-fría). El WB correcto está en la mitad de la escala. Si dejas el WB de tungsteno (3200 K), todo se ve muy azul.',
   },
   {
     id: 'atardecer',
@@ -50,7 +51,7 @@ const ESCENAS: EscenaConfig[] = [
     tempLuzK: 3500,
     wbCorrectoK: 3500,
     descripcion:
-      'Hora dorada al aire libre (~3500K, luz naranja cálida natural). Aquí muchos fotógrafos suben el WB un poco por encima del valor "técnico" para preservar el tono cálido que da personalidad al atardecer.',
+      'Hora dorada al aire libre (~3500 K, luz naranja cálida natural). Aquí muchos fotógrafos suben el WB un poco por encima del valor "técnico" para preservar el tono cálido que da personalidad al atardecer.',
   },
 ];
 
@@ -72,28 +73,71 @@ interface OverlayColor {
   opacity: number;
 }
 
-function calcularOverlay(deltaK: number): OverlayColor {
-  // delta positivo = el WB ajustado es mayor que la luz real → la cámara compensa
-  // sumando cálido → la imagen final se ve naranja
-  // delta negativo = la cámara compensa sumando frío → la imagen final se ve azul
-  const factor = Math.max(-1, Math.min(1, deltaK / 3500));
-  if (Math.abs(factor) < 0.04) return { fill: 'transparent', opacity: 0 };
-  if (factor > 0) {
-    return { fill: '#fb923c', opacity: Math.min(0.55, factor * 0.55) };
-  }
-  return { fill: '#3b82f6', opacity: Math.min(0.55, -factor * 0.55) };
+/**
+ * Desvío del WB en MIREDS (10⁶ / K): la escala en la que un mismo salto se percibe igual, y por
+ * eso los filtros de corrección CTO/CTB se gradúan en mireds. Positivo = WB por encima de la luz
+ * → la cámara añade naranja; negativo → añade azul. Hasta el 07/11/2026 la app juzgaba la
+ * diferencia en kelvin, y el mismo error pesaba unas 4 veces más con tungsteno que con luz
+ * nublada (hallazgo 4162): 54 mired salían «Muy fuerte» en nublado y 87 «Suave» en tungsteno.
+ */
+function desvioMired(wbK: number, luzK: number): number {
+  return 1e6 / luzK - 1e6 / wbK;
 }
 
-function clasificarBalance(deltaK: number): {
+/**
+ * UNA escala para la etiqueta, la intensidad y la recuperación (antes cortaban en sitios
+ * distintos: «Demasiado cálido» junto a «Notable», hallazgo 4165). Cortes en mireds, a la medida
+ * de los filtros de corrección habituales: un octavo de CTO/CTB ronda los 20, un cuarto los 40 y
+ * medio los 80.
+ */
+const MIRED_NEUTRO = 20;
+const MIRED_SUAVE = 40;
+const MIRED_NOTABLE = 80;
+const MIRED_JPEG = 160; // a partir de aquí, solo RAW y con esfuerzo
+const MIRED_ESCALA = 160; // tope del velo y de la barra de desvío
+
+type Nivel = 0 | 1 | 2 | 3;
+
+function nivelDesvio(mired: number): Nivel {
+  const abs = Math.abs(mired);
+  if (abs <= MIRED_NEUTRO) return 0;
+  if (abs <= MIRED_SUAVE) return 1;
+  if (abs <= MIRED_NOTABLE) return 2;
+  return 3;
+}
+
+function calcularOverlay(mired: number): OverlayColor {
+  const factor = Math.max(-1, Math.min(1, mired / MIRED_ESCALA));
+  if (Math.abs(mired) < 5) return { fill: 'transparent', opacity: 0 };
+  if (factor > 0) {
+    return { fill: '#fb923c', opacity: factor * 0.55 };
+  }
+  return { fill: '#3b82f6', opacity: -factor * 0.55 };
+}
+
+const ETIQUETAS_CALIDO = ['Balance correcto', 'Ligeramente cálido', 'Cálido (naranja)', 'Demasiado cálido (muy naranja)'];
+const ETIQUETAS_FRIO = ['Balance correcto', 'Ligeramente frío', 'Frío (azul)', 'Demasiado frío (muy azul)'];
+const CLASES_NIVEL = ['expOk', 'expWarn', 'expWarn', 'expBad'] as const;
+const INTENSIDADES = ['Imperceptible', 'Suave', 'Notable', 'Muy fuerte'];
+
+function clasificarBalance(mired: number): {
+  icono: string;
   label: string;
-  className: string;
+  className: (typeof CLASES_NIVEL)[number];
 } {
-  const abs = Math.abs(deltaK);
-  if (abs <= 200) return { label: '✅ Balance correcto', className: 'expOk' };
-  if (deltaK > 200 && deltaK <= 1500) return { label: 'Ligeramente cálido', className: 'expWarn' };
-  if (deltaK > 1500) return { label: 'Demasiado cálido (muy naranja)', className: 'expBad' };
-  if (deltaK < -200 && deltaK >= -1500) return { label: 'Ligeramente frío', className: 'expWarn' };
-  return { label: 'Demasiado frío (muy azul)', className: 'expBad' };
+  const nivel = nivelDesvio(mired);
+  return {
+    icono: nivel === 0 ? '✅ ' : '',
+    label: (mired > 0 ? ETIQUETAS_CALIDO : ETIQUETAS_FRIO)[nivel],
+    className: CLASES_NIVEL[nivel],
+  };
+}
+
+function recuperable(mired: number): string {
+  const abs = Math.abs(mired);
+  if (abs <= MIRED_NOTABLE) return 'Sí, fácilmente (sobre todo en RAW)';
+  if (abs <= MIRED_JPEG) return 'En RAW sí; en JPEG con pérdida';
+  return 'Solo en RAW y con esfuerzo';
 }
 
 export default function SimuladorBalanceBlancosPage() {
@@ -109,12 +153,34 @@ export default function SimuladorBalanceBlancosPage() {
   };
 
   const deltaK = tempWB - escena.wbCorrectoK;
-  const overlay = useMemo(() => calcularOverlay(deltaK), [deltaK]);
-  const balance = clasificarBalance(deltaK);
+  const mired = desvioMired(tempWB, escena.tempLuzK);
+  const nivel = nivelDesvio(mired);
+  const overlay = useMemo(() => calcularOverlay(mired), [mired]);
+  const balance = clasificarBalance(mired);
 
-  // Posición del marcador "correcto" en la barra: porcentaje entre TEMP_MIN y TEMP_MAX
+  // Posición del marcador "correcto" sobre el deslizador de kelvin
   const posCorrecto = ((escena.wbCorrectoK - TEMP_MIN) / (TEMP_MAX - TEMP_MIN)) * 100;
-  const posActual = ((tempWB - TEMP_MIN) / (TEMP_MAX - TEMP_MIN)) * 100;
+  // Barra de desvío: el centro es el WB correcto, la izquierda el azul y la derecha el naranja.
+  // Antes repetía el degradado de la LUZ con el marcador en el WB absoluto, y bajo el marcador
+  // salía el color contrario al tinte de la foto (hallazgo 4166)
+  const posDesvio = 50 + Math.max(-1, Math.min(1, mired / MIRED_ESCALA)) * 50;
+  const miredTexto = `${mired > 0 ? '+' : mired < 0 ? '−' : ''}${formatNumber(Math.abs(mired), 0)} mired`;
+  const sentidoDesvio = nivel === 0 ? 'sin dominante' : mired > 0 ? 'hacia el naranja' : 'hacia el azul';
+
+  const pestanas = useRef<(HTMLButtonElement | null)[]>([]);
+  const teclaPestana = (e: React.KeyboardEvent<HTMLButtonElement>, idx: number) => {
+    const ultimo = ESCENAS.length - 1;
+    const destino =
+      e.key === 'ArrowRight' ? (idx === ultimo ? 0 : idx + 1)
+        : e.key === 'ArrowLeft' ? (idx === 0 ? ultimo : idx - 1)
+          : e.key === 'Home' ? 0
+            : e.key === 'End' ? ultimo
+              : null;
+    if (destino === null) return;
+    e.preventDefault();
+    cambiarEscena(ESCENAS[destino].id);
+    pestanas.current[destino]?.focus();
+  };
 
   return (
     <div className={styles.container}>
@@ -132,23 +198,31 @@ export default function SimuladorBalanceBlancosPage() {
         <LegalNotice />
 
         <div className={styles.tabBar} role="tablist" aria-label="Selección de escena">
-          {ESCENAS.map((esc) => (
+          {ESCENAS.map((esc, idx) => (
             <button
               type="button"
               key={esc.id}
+              id={`pestana-${esc.id}`}
+              ref={(el) => {
+                pestanas.current[idx] = el;
+              }}
               role="tab"
               aria-selected={escenaId === esc.id}
+              aria-controls="panel-escena"
+              tabIndex={escenaId === esc.id ? 0 : -1}
               className={`${styles.tabBtn} ${escenaId === esc.id ? styles.tabActive : ''}`}
               onClick={() => cambiarEscena(esc.id)}
+              onKeyDown={(e) => teclaPestana(e, idx)}
             >
               <span aria-hidden="true">{esc.emoji}</span> {esc.nombre}
             </button>
           ))}
         </div>
 
+        <div role="tabpanel" id="panel-escena" aria-labelledby={`pestana-${escena.id}`}>
         <div className={styles.escenaInfo}>
           <strong>
-            {escena.emoji} {escena.nombre}:
+            <span aria-hidden="true">{escena.emoji}</span> {escena.nombre}:
           </strong>{' '}
           {escena.descripcion}
         </div>
@@ -192,10 +266,10 @@ export default function SimuladorBalanceBlancosPage() {
                 <span>5500</span>
                 <span>7000</span>
                 <span>8500</span>
-                <span>10 000 K</span>
+                <span>10.000 K</span>
               </div>
               <span className={styles.unitLabel}>
-                Bajo (2500K) = cámara espera luz muy cálida (tungsteno). Alto (10 000K) = cámara
+                Bajo (2500 K) = cámara espera luz muy cálida (tungsteno). Alto (10.000 K) = cámara
                 espera luz muy fría (sombra azul). Si te equivocas en la dirección contraria a la
                 luz real, la imagen se tiñe.
               </span>
@@ -236,20 +310,29 @@ export default function SimuladorBalanceBlancosPage() {
                 Diferencia con el WB correcto: <span>{deltaK > 0 ? '+' : ''}</span>
                 {formatNumber(deltaK, 0)} K
               </p>
-              <div className={styles.balanceBar}>
+              <p className={styles.balanceMired}>
+                Desvío percibido: <span>{miredTexto}</span>
+              </p>
+              <div
+                className={styles.balanceBar}
+                role="img"
+                aria-label={`Desvío del WB: ${miredTexto}, ${sentidoDesvio}`}
+              >
                 <div
                   className={styles.balanceMarker}
-                  style={{ left: `${posActual}%` }}
-                  aria-label="WB actual"
+                  style={{ left: `${posDesvio}%` }}
+                  aria-hidden="true"
                 />
-                <div
-                  className={styles.balanceTarget}
-                  style={{ left: `${posCorrecto}%` }}
-                  aria-label="WB correcto"
-                />
+                <div className={styles.balanceTarget} style={{ left: '50%' }} aria-hidden="true" />
+              </div>
+              <div className={styles.balanceEscala} aria-hidden="true">
+                <span>Más azul</span>
+                <span>Correcto</span>
+                <span>Más naranja</span>
               </div>
               <p className={`${styles.balanceLabel} ${styles[balance.className]}`} aria-live="polite">
-                {balance.label}
+                <span aria-hidden="true">{balance.icono}</span>
+                <span>{balance.label}</span>
               </p>
             </div>
 
@@ -258,54 +341,43 @@ export default function SimuladorBalanceBlancosPage() {
               <div className={styles.resultRow}>
                 <span className={styles.resultLabel}>Tinte dominante</span>
                 <span className={styles.resultValue}>
-                  {Math.abs(deltaK) <= 200
+                  {nivel === 0
                     ? 'Neutro (sin dominante)'
-                    : deltaK > 0
+                    : mired > 0
                       ? 'Naranja / cálido'
                       : 'Azul / frío'}
                 </span>
               </div>
               <div className={styles.resultRow}>
                 <span className={styles.resultLabel}>Intensidad del tinte</span>
-                <span className={styles.resultValue}>
-                  {Math.abs(deltaK) <= 200
-                    ? 'Imperceptible'
-                    : Math.abs(deltaK) <= 800
-                      ? 'Suave'
-                      : Math.abs(deltaK) <= 2000
-                        ? 'Notable'
-                        : 'Muy fuerte'}
-                </span>
+                <span className={styles.resultValue}>{INTENSIDADES[nivel]}</span>
               </div>
               <div className={styles.resultRow}>
                 <span className={styles.resultLabel}>Aspecto del blanco</span>
                 <span className={styles.resultValue}>
-                  {Math.abs(deltaK) <= 200
+                  {nivel === 0
                     ? 'Blanco neutro'
-                    : deltaK > 0
+                    : mired > 0
                       ? 'Blanco amarillento'
                       : 'Blanco azulado'}
                 </span>
               </div>
               <div className={styles.resultRow}>
                 <span className={styles.resultLabel}>¿Recuperable en edición?</span>
-                <span className={styles.resultValue}>
-                  {Math.abs(deltaK) <= 1500
-                    ? 'Sí, fácilmente (sobre todo en RAW)'
-                    : Math.abs(deltaK) <= 3000
-                      ? 'En RAW sí; en JPEG con pérdida'
-                      : 'Solo en RAW y con esfuerzo'}
-                </span>
+                <span className={styles.resultValue}>{recuperable(mired)}</span>
               </div>
             </div>
 
             <div className={styles.formulaBox}>
-              <p className={styles.formulaTex}>K = temperatura de color (Kelvin)</p>
+              <p className={styles.formulaTex}>mired = 1.000.000 / K</p>
               <p className={styles.formulaCaption}>
-                Cuanto más alta la K, más fría es la luz que tu cámara espera compensar
+                El tinte se juzga en mireds y no en kelvin: el mismo salto de kelvin tiñe mucho más
+                con luz cálida (de 3200 a 3900 K son 56 mired) que con luz fría (de 6500 a 10.000 K,
+                54 mired). Por eso los filtros de corrección se gradúan en mireds.
               </p>
             </div>
           </div>
+        </div>
         </div>
 
         <EducationalSection
@@ -376,7 +448,7 @@ export default function SimuladorBalanceBlancosPage() {
                 </tr>
                 <tr>
                   <td>Cielo azul</td>
-                  <td>~10 000 K</td>
+                  <td>~10.000 K</td>
                   <td>Cielo despejado de alta montaña</td>
                   <td>Paisaje invernal a 3000 m, fotografía polar</td>
                 </tr>
@@ -391,7 +463,7 @@ export default function SimuladorBalanceBlancosPage() {
           </p>
           <p className={styles.guideParagraph}>
             En <strong>RAW</strong> la información del sensor se guarda sin procesar: el balance es
-            solo una etiqueta. Puedes cambiarlo a 6500K o 3200K en posproducción sin penalización,
+            solo una etiqueta. Puedes cambiarlo a 6500 K o 3200 K en posproducción sin penalización,
             como si lo hubieras configurado bien al disparar.
           </p>
           <p className={styles.guideParagraph}>
@@ -405,14 +477,14 @@ export default function SimuladorBalanceBlancosPage() {
               <h4>El número Kelvin va al revés del color</h4>
               <p>
                 Kelvin bajo (2500-3500) = luz roja/naranja cálida (una vela, una bombilla). Kelvin
-                alto (6500-10 000) = luz azul fría (cielo, sombra). Es la escala física, pero
+                alto (6500-10.000) = luz azul fría (cielo, sombra). Es la escala física, pero
                 visualmente parece &quot;el revés&quot;.
               </p>
             </div>
             <div className={styles.escenarioCard}>
               <h4>El WB no compensa, predice</h4>
               <p>
-                Ajustar el WB a 3200K significa &quot;voy a fotografiar luz de 3200K&quot;. La
+                Ajustar el WB a 3200 K significa &quot;voy a fotografiar luz de 3200 K&quot;. La
                 cámara entonces resta esa cantidad de naranja para que el blanco salga blanco. Si
                 te equivocas, suma o resta tinte.
               </p>
@@ -437,62 +509,26 @@ export default function SimuladorBalanceBlancosPage() {
 
           <h3 className={styles.eduSubtitle}>Preguntas frecuentes</h3>
           <div className={styles.faqList}>
-            <div className={styles.faqItem}>
-              <strong>¿Por qué mis fotos de interior con bombillas salen naranjas?</strong>
-              <p>
-                Porque tu cámara probablemente está en AWB o Luz Día (5500K) y la luz real es
-                tungsteno (3200K). La diferencia de 2300K genera un dominante naranja muy fuerte.
-                Pasa el WB a 3200K (preset tungsteno) y la foto recupera color natural.
-              </p>
-              <p className={styles.faqTip}>
-                <span aria-hidden="true">💡</span> O dispara en RAW y arréglalo después con un solo deslizador en Lightroom.
-              </p>
-            </div>
-            <div className={styles.faqItem}>
-              <strong>¿Cuándo es útil un WB &quot;incorrecto&quot; a propósito?</strong>
-              <p>
-                Para preservar atmósfera: un atardecer ajustado al WB &quot;correcto&quot; pierde
-                el tono naranja icónico. Una escena nocturna con WB ajustado pierde el frío. A
-                veces el ambiente es el objetivo y el WB se elige creativamente.
-              </p>
-            </div>
-            <div className={styles.faqItem}>
-              <strong>¿AWB (Auto) es fiable?</strong>
-              <p>
-                Para luz mixta o cambiante, sí — sobre todo en cámaras modernas. Para escenas con
-                un color dominante (atardecer, luz cálida intencional, fuego), no. En esos casos
-                manual o preset evita que la cámara &quot;mate&quot; el ambiente.
-              </p>
-            </div>
-            <div className={styles.faqItem}>
-              <strong>¿Qué es una tarjeta gris y para qué sirve?</strong>
-              <p>
-                Una cartulina gris al 18 % colocada en la escena. Disparas una foto con ella y en
-                edición usas el cuentagotas para indicar al programa &quot;esto es gris&quot;. El
-                software ajusta el WB perfecto para toda la sesión. Muy útil en bodas, producto,
-                catálogo.
-              </p>
-            </div>
-            <div className={styles.faqItem}>
-              <strong>¿La hora dorada se beneficia del balance neutro?</strong>
-              <p>
-                Casi nunca. La hora dorada (~3500K, naranja-rosa) es estéticamente apreciada por su
-                tinte. Si la &quot;corriges&quot; con WB de 3500K, queda neutra y pierde la magia.
-                Mejor 4500-5500K para mantener el cálido suavizándolo un poco.
-              </p>
-              <p className={styles.faqTip}>
-                <span aria-hidden="true">💡</span> Combina con el <a href="/golden-hour/">calculador de hora dorada</a> para saber
-                cuándo dispararla.
-              </p>
-            </div>
-            <div className={styles.faqItem}>
-              <strong>¿Cómo afecta el balance al retrato?</strong>
-              <p>
-                Mucho a los tonos de piel. WB demasiado cálido = piel amarillenta o enrojecida. WB
-                demasiado frío = piel pálida, casi cadavérica. Por eso muchos retratistas calibran
-                el WB con una tarjeta antes de empezar la sesión.
-              </p>
-            </div>
+            {PREGUNTAS_FRECUENTES.map((f) => (
+              <div key={f.question} className={styles.faqItem}>
+                <strong>{f.question}</strong>
+                <p>{f.answer}</p>
+                {f.consejo && (
+                  <p className={styles.faqTip}>
+                    <span aria-hidden="true">💡</span>{' '}
+                    {f.enlace ? (
+                      <span>
+                        {f.consejo.split(f.enlace.texto)[0]}
+                        <a href={f.enlace.href}>{f.enlace.texto}</a>
+                        {f.consejo.split(f.enlace.texto)[1]}
+                      </span>
+                    ) : (
+                      <span>{f.consejo}</span>
+                    )}
+                  </p>
+                )}
+              </div>
+            ))}
           </div>
 
           <h3 className={styles.eduSubtitle}>Cómo elegir el balance en cada situación</h3>
@@ -577,7 +613,7 @@ export default function SimuladorBalanceBlancosPage() {
               <span className={styles.tipIcon} aria-hidden="true">🌅</span>
               <div>
                 <strong>El atardecer no se neutraliza</strong>
-                <p>El tinte cálido es parte del encanto. Sube el WB ligeramente solo si está fuera de control.</p>
+                <p>El tinte cálido es parte del encanto. Si se va de las manos, baja el WB hacia la temperatura de la luz (unos 3500 K): subirlo añade todavía más naranja.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
@@ -613,7 +649,7 @@ export default function SimuladorBalanceBlancosPage() {
               </li>
               <li>
                 Pasar de tungsteno a exterior sin cambiar el WB: salir a la calle con preset
-                Tungsteno (3200K) tiñe todo de azul intenso.
+                Tungsteno (3200 K) tiñe todo de azul intenso.
               </li>
               <li>
                 Disparar en JPEG con WB equivocado y descubrirlo en casa: la corrección masiva en
