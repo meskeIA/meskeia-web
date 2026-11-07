@@ -2,9 +2,9 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Cuánto dura cada alimento en la nevera y el congelador | meskeIA',
+  title: 'Cuánto duran los alimentos habituales en la nevera y el congelador | meskeIA',
   description:
-    'Consulta cuántos días o meses aguanta cada alimento en la nevera, el congelador y la despensa: carnes, pescados, lácteos, verduras y sobras. Datos orientativos de seguridad alimentaria. Gratis y en español.',
+    'Consulta cuántos días o meses aguantan los alimentos habituales en la nevera, el congelador y la despensa: carnes, pescados, lácteos, verduras y sobras. Datos orientativos de seguridad alimentaria. Gratis y en español.',
   keywords:
     'cuanto dura en la nevera, caducidad alimentos, conservacion alimentos congelador, cuanto aguanta la carne en la nevera, tiempo conservacion sobras, congelar alimentos cuanto duran, despensa caducidad',
   authors: [{ name: 'meskeIA' }],
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   robots: 'index, follow',
   openGraph: {
     type: 'website',
-    title: 'Cuánto dura cada alimento en nevera, congelador y despensa',
+    title: 'Cuánto duran los alimentos habituales en nevera, congelador y despensa',
     description:
       'Tiempos de conservación orientativos por alimento en nevera, congelador y despensa.',
     url: 'https://meskeia.com/calculadora-caducidad',
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Cuánto dura cada alimento',
+    title: 'Cuánto duran los alimentos habituales',
     description: 'Tiempos de conservación en nevera, congelador y despensa, por alimento.',
     images: ['https://meskeia.com/coquinum/og-image.png'],
   },
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
 };
 
 export const jsonLd = generateWebAppSchema({
-  name: 'Cuánto dura cada alimento (nevera, congelador y despensa)',
+  name: 'Cuánto duran los alimentos habituales (nevera, congelador y despensa)',
   description:
     'Tabla de tiempos de conservación orientativos para alimentos habituales en nevera, congelador y despensa: carnes, pescados, lácteos, huevos, frutas, verduras, cocinados y productos de despensa, con filtro por categoría y buscador.',
   url: 'https://meskeia.com/calculadora-caducidad/',

@@ -145,14 +145,15 @@ test.describe('calculadora-caducidad · tabla de conservación de alimentos', ()
     expect(fila('Sobras de comida cocinada')?.slice(1, 3)).toEqual(['3–4 días', '2–3 meses']);
   });
 
-  test('HALLAZGO (07/11/2026, ABIERTO) · el buscador no encuentra sin tilde: «platano», «jamon» y «cascara» dan 0 filas', async ({
+  test('HALLAZGO 4189 (07/11/2026, REPARADO) · el buscador no encontraba sin tilde: «platano», «jamon» y «cascara» daban 0 filas', async ({
     page,
   }) => {
-    // El filtro compara con toLowerCase (page.tsx), así que «platano» no casa con «Plátano».
+    // El filtro comparaba con toLowerCase (page.tsx), así que «platano» no casaba con «Plátano».
     // Es la clase de defecto del cabo C0658 de las guías-directorio (fe67977b2): la receta es
     // normalizarBusqueda de lib/buscadorTablas en las dos partes de la comparación.
-    // Hoy: las tres búsquedas sin tilde dan «Ningún alimento coincide con la búsqueda.»
-    test.fail();
+    // REPARADO en /reparar el 07/11/2026 con esa receta. Y con tilde sigue encontrando:
+    await buscar(page, 'plátano');
+    expect((await filas(page)).map((f) => f[0])).toEqual(['Plátano']);
     const casos: [string, string][] = [
       ['platano', 'Plátano'],
       ['jamon', 'Jamón cocido (abierto)'],
@@ -183,24 +184,23 @@ test.describe('calculadora-caducidad · tabla de conservación de alimentos', ()
     expect(dias, `nevera «${fila[1]}»`).toBeLessThanOrEqual(28);
   });
 
-  test('HALLAZGO (07/11/2026, ABIERTO) · la nota de la fuente escribe la fecha en ISO: «Verificado 2026-06»', async ({
+  test('HALLAZGO 4191 (07/11/2026, REPARADO) · la nota de la fuente escribía la fecha en ISO: «Verificado 2026-06»', async ({
     page,
   }) => {
     // Formato español de fechas (CLAUDE.md global §2): «06/2026» o «junio de 2026».
-    // Hoy: «Verificado 2026-06.» (CADUCIDAD_META.verificado pintado tal cual)
-    test.fail();
+    // Antes: «Verificado 2026-06.» (CADUCIDAD_META.verificado pintado tal cual). REPARADO el 07/11/2026.
     const nota = page.locator('p', { hasText: 'Tiempos orientativos' });
     await expect(nota).toContainText('Verificado');
     const texto = await nota.innerText();
     expect(texto).not.toMatch(/\b\d{4}-\d{2}\b/);
+    expect(texto).toContain('Verificado 06/2026.');
   });
 
-  test('HALLAZGO (07/11/2026, ABIERTO) · promete «cada alimento» y no tiene marisco ni salchichas', async ({ page }) => {
+  test('HALLAZGO 4192 (07/11/2026, REPARADO) · prometía «cada alimento» y no tiene marisco ni salchichas', async ({ page }) => {
     // El h1 («¿Cuánto dura cada alimento?») y la description («cuántos días o meses aguanta cada
-    // alimento») prometen todos; la tabla tiene 26 alimentos, y el propio JSON-LD los llama
-    // «alimentos habituales». Esperado: o la promesa se ajusta a lo que hay, o lo buscado sale.
-    // Hoy: «marisco» y «salchichas» → «Ningún alimento coincide con la búsqueda.»
-    test.fail();
+    // alimento») prometían todos; la tabla tiene 26 alimentos, y el propio JSON-LD los llama
+    // «alimentos habituales». REPARADO el 07/11/2026 (frontera:promesa, nivel 2): la promesa se
+    // ajusta a lo que hay («los alimentos habituales»).
     const h1 = await page.locator('h1').first().innerText();
     const descripcion = (await page.locator('meta[name="description"]').first().getAttribute('content')) ?? '';
     const promete = /cada alimento/i.test(h1) || /cada alimento/i.test(descripcion);
@@ -209,5 +209,8 @@ test.describe('calculadora-caducidad · tabla de conservación de alimentos', ()
       const vacio = JSON.stringify(await filas(page)) === JSON.stringify([[SIN_RESULTADOS]]);
       expect(promete && vacio, `promete «cada alimento» y «${consulta}» no sale`).toBe(false);
     }
+    expect(h1).toBe('¿Cuánto duran los alimentos habituales?');
+    expect(descripcion).toContain('los alimentos habituales');
+    expect(await page.title()).not.toMatch(/cada alimento/i);
   });
 });

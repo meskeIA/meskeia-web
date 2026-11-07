@@ -17,19 +17,29 @@ import {
   CADUCIDAD_META,
   type CategoriaCaducidad,
 } from '@/lib/calculadoras/caducidadAlimentos';
+import { normalizarBusqueda } from '@/lib/buscadorTablas';
 
 const CATEGORIAS = Object.keys(CATEGORIAS_CADUCIDAD) as CategoriaCaducidad[];
+
+/** «2026-06» → «06/2026»; «2026-06-15» → «15/06/2026» (formato español, hallazgo 4191) */
+function fechaVerificado(iso: string): string {
+  const [anio, mes, dia] = iso.split('-');
+  if (dia) return `${dia}/${mes}/${anio}`;
+  return mes ? `${mes}/${anio}` : iso;
+}
 
 export default function CalculadoraCaducidadPage() {
   const [filtro, setFiltro] = useState<CategoriaCaducidad | null>(null);
   const [busqueda, setBusqueda] = useState('');
 
+  // Las dos partes, sin tildes ni mayúsculas: «platano» encuentra «Plátano» (hallazgo 4189,
+  // misma receta que las guías-directorio del cabo C0658)
   const lista = useMemo(() => {
-    const q = busqueda.trim().toLowerCase();
+    const q = normalizarBusqueda(busqueda.trim());
     return ALIMENTOS_CADUCIDAD.filter(
       (a) =>
         (!filtro || a.categoria === filtro) &&
-        (!q || a.nombre.toLowerCase().includes(q)),
+        (!q || normalizarBusqueda(a.nombre).includes(q)),
     );
   }, [filtro, busqueda]);
 
@@ -38,7 +48,7 @@ export default function CalculadoraCaducidadPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>¿Cuánto dura cada alimento?</h1>
+        <h1 className={styles.title}>¿Cuánto duran los alimentos habituales?</h1>
         <p className={styles.subtitle}>
           Tiempos de conservación en nevera, congelador y despensa para que nada se eche a perder
           (ni te juegues un disgusto)
@@ -98,7 +108,7 @@ export default function CalculadoraCaducidadPage() {
             </table>
           </div>
           <p className={styles.fuenteNota}>
-            Tiempos orientativos. Fuente: {CADUCIDAD_META.fuente}. Verificado {CADUCIDAD_META.verificado}.
+            Tiempos orientativos. Fuente: {CADUCIDAD_META.fuente}. Verificado {fechaVerificado(CADUCIDAD_META.verificado)}.
             Ante cualquier signo de deterioro (olor, color, moho), desecha el alimento.
           </p>
         </section>
