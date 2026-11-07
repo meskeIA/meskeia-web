@@ -6,7 +6,7 @@ import { MeskeiaLogo, LegalNotice, Footer, NumberInput, ResultCard, EducationalS
   DataReference, RegionBadge
 } from '@/components';
 import { formatNumber, formatCurrency, formatPercentage, formatDate, parseISODateLocal, parseSpanishNumber } from '@/lib';
-import { FISCAL_IRPF_META, FISCAL_SS_CUENTA_AJENA_META, TRAMOS_IRPF_2025, calcularCuotaIntegraGeneral, desglosarEscalaGeneral, cuotaEscalaGeneral, COTIZACIONES_SS_2026, BASES_SS_2026, MINIMOS_IRPF_2025, OBLIGACION_DECLARAR_2025, SMI_2026, LIMITES_PLAN_PENSIONES_2025, DEDUCCION_MATERNIDAD_IRPF, REDUCCION_TRIBUTACION_CONJUNTA_2025, COMEDOR_FORMULAS_INDIRECTAS, TRANSPORTE_COLECTIVO_EXENTO, SEGURO_ENFERMEDAD_EXENTO, DIETAS_MANUTENCION_EXENTAS } from '@/data/fiscal';
+import { FISCAL_IRPF_META, FISCAL_SS_CUENTA_AJENA_META, TRAMOS_IRPF_2025, calcularCuotaIntegraGeneral, desglosarEscalaGeneral, cuotaEscalaGeneral, COTIZACIONES_SS_2026, TARIFA_AT_EP_2026, BASES_SS_2026, MINIMOS_IRPF_2025, OBLIGACION_DECLARAR_2025, SMI_2026, LIMITES_PLAN_PENSIONES_2025, DEDUCCION_MATERNIDAD_IRPF, REDUCCION_TRIBUTACION_CONJUNTA_2025, COMEDOR_FORMULAS_INDIRECTAS, TRANSPORTE_COLECTIVO_EXENTO, SEGURO_ENFERMEDAD_EXENTO, DIETAS_MANUTENCION_EXENTAS } from '@/data/fiscal';
 import { calcularBrutoANeto, calcularNetoABruto, tipoMarginal, TIPO_SS_TRABAJADOR, COTIZACION_EMPRESA_2026, TIPO_SS_EMPRESA, type SituacionFamiliar } from './motor';
 
 // Tipos de cálculo
@@ -914,7 +914,7 @@ export default function EstimadorSueldoNetoPage() {
             <div className={styles.faqItemPro}>
               <h4>¿Qué diferencia hay entre contingencias comunes y profesionales?</h4>
               <p>
-                Las <strong>contingencias comunes</strong> ({pct(COTIZACIONES_SS_2026.contingenciasComunes)} trabajador) cubren enfermedad común, maternidad, paternidad y jubilación. Las <strong>contingencias profesionales</strong> (variable, cotiza solo la empresa, entre 0,90&nbsp;% y 7,15&nbsp;% según actividad) cubren accidentes de trabajo y enfermedades profesionales. El trabajador no paga directamente por contingencias profesionales; es un coste exclusivamente empresarial.
+                Las <strong>contingencias comunes</strong> ({pct(COTIZACIONES_SS_2026.contingenciasComunes)} trabajador) cubren enfermedad común, maternidad, paternidad y jubilación. Las <strong>contingencias profesionales</strong> (variable, cotiza solo la empresa, entre {pct(TARIFA_AT_EP_2026.totalMinimo)} y {pct(TARIFA_AT_EP_2026.totalMaximo)} según actividad) cubren accidentes de trabajo y enfermedades profesionales. El trabajador no paga directamente por contingencias profesionales; es un coste exclusivamente empresarial.
               </p>
             </div>
 

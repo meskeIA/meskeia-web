@@ -307,6 +307,30 @@ export const COTIZACION_EMPRESA_2026 = {
   mei:                   0.75,
 };
 
+/**
+ * Rango de la tarifa de primas por accidentes de trabajo y enfermedades profesionales (AT/EP),
+ * columna «Total» (IT + IMS), en % de la base de contingencias profesionales. Lo paga solo la
+ * empresa y depende de la actividad (cuadro I, CNAE-2025) o de la ocupación (cuadro II).
+ *
+ * Fuente: DA 61.ª LGSS, «Tarifa de primas para la cotización a la Seguridad Social por
+ * accidentes de trabajo y enfermedades profesionales», en la redacción de la disposición final
+ * 1.ª, apartado Tres, del RDL 3/2026 (BOE-A-2026-2548), leída en el BOE el 07/11/2026:
+ *   · mínimo: «85 Educación.» IT 0,80 · IMS 0,70 · Total 1,50 (y la ocupación «a Personal en
+ *     trabajos exclusivos de oficina.», también 1,50);
+ *   · máximo: «0811 Extracción de piedra ornamental, piedra caliza, yeso, pizarra y otras
+ *     piedras.» y «y Trabajos habituales en interior de minas.», IT 3,45 · IMS 3,70 · Total 7,15.
+ * Ninguna fila de la tarifa tiene un Total por debajo de 1,50 ni por encima de 7,15.
+ * Hasta el 07/11/2026 la FAQ de estimador-sueldo-neto decía «0,90», que solo existe como
+ * columna IT o IMS, nunca como total (hallazgo 4209, cabo C0670).
+ */
+export const TARIFA_AT_EP_2026 = {
+  totalMinimo: 1.50,
+  totalMaximo: 7.15,
+  fuente: 'DA 61.ª LGSS (RDL 3/2026, disposición final 1.ª, apartado Tres)',
+  urlOficial: 'https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-2548',
+  verificado: '2026-11-07',
+} as const;
+
 // Bases de cotización 2025 (mensuales) — Orden PJC/178/2025, vigentes desde el 01-ene-2025
 export const BASES_SS_2025 = {
   minima: 1381.20,

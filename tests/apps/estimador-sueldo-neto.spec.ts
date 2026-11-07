@@ -1415,8 +1415,9 @@ test.describe('Cabo C0077 (07/11/2026) — tarifa de primas de AT/EP y separador
    * Se mira el tramo del párrafo que habla de las contingencias PROFESIONALES (el anterior trae el
    * 4,70 % de las comunes): sus tipos tienen que ir de 1,50 a 7,15, sin ninguno por debajo de 1,50.
    */
-  test('HALLAZGO ABIERTO · la FAQ visible da el rango de AT/EP de la DA 61.ª LGSS: de 1,50 % a 7,15 %', async ({ page }) => {
-    test.fail(); // ABIERTO — cabo C0077 (1): la app dice «entre 0,90 % y 7,15 %»
+  test('HALLAZGO 4209 REPARADO · la FAQ visible da el rango de AT/EP de la DA 61.ª LGSS: de 1,50 % a 7,15 %', async ({ page }) => {
+    // REPARADO el 07/11/2026 (decidido por el usuario en /reparar, cabo C0670): decía «entre 0,90 % y
+    // 7,15 %»; ahora el rango sale de TARIFA_AT_EP_2026 (data/fiscal/irpf.ts), cotejado en el BOE.
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     const pregunta = page.getByRole('heading', { level: 4, name: '¿Qué diferencia hay entre contingencias comunes y profesionales?' });
     const parrafo = limpiar(await pregunta.locator('xpath=following-sibling::p[1]').innerText());
