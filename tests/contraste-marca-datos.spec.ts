@@ -39,6 +39,10 @@ const APPS: App[] = [
   // claro (tensión superficial, gravedad, fricción, presión) y 3,07-4,40 en oscuro (inercia,
   // gravedad, tensión). Las cinco fuerzas del acordeón, abiertas una a una
   { slug: 'visualizador-fuerzas-invisibles', todo: true, secciones: "button[class*='fuerzaCabecera']" },
+  // Reservorios, balance, destinos y potencial de cada solución en su color de datos (2,19-4,20:1
+  // en claro, 2,39-3,96 en oscuro), el «Punto crítico» en #C0392B (2,88 en oscuro) y las
+  // «Limitaciones» en --text-muted sobre su velo oscuro (4,40). Las cuatro pestañas
+  { slug: 'visualizador-ciclo-carbono-completo', todo: true, secciones: "[role='tab']" },
 ];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {

@@ -18,6 +18,21 @@ import {
 
 type TabId = 'reservorios' | 'flujos' | 'perturbacion' | 'soluciones';
 
+// El color de cada dato sirve para bordes, barras y puntos; como TEXTO daba 2,19-4,20:1 en claro
+// y 2,39-3,96 en oscuro (cabo C0645). Su tono de texto, que cambia con el tema: los -texto de
+// globals (naranja, ámbar, verde y rojo solo existen en claro: en oscuro manda la reserva) y los
+// tres del módulo para lo que globals no tiene.
+const TONO_TEXTO: Record<string, string> = {
+  '#2E86AB': 'var(--primary-texto)',
+  '#1A6E8A': 'var(--oceano-texto)',
+  '#27AE60': 'var(--verde-texto, #5FD08A)',
+  '#8E6BBF': 'var(--violeta-texto)',
+  '#7F8C8D': 'var(--gris-texto)',
+  '#F39C12': 'var(--ambar-texto, #F5B041)',
+  '#E74C3C': 'var(--rojo-texto, #F87171)',
+};
+const tonoTexto = (color: string): string => TONO_TEXTO[color.toUpperCase()] ?? 'var(--text-primary)';
+
 interface TabInfo {
   id: TabId;
   titulo: string;
@@ -415,7 +430,7 @@ export default function VisualizadorCicloCarbonoCompleto() {
                     </span>
                     <div className={styles.reservoirInfo}>
                       <span className={styles.reservoirName}>{r.nombre}</span>
-                      <span className={styles.reservoirAmount} style={{ color: r.color }}>
+                      <span className={styles.reservoirAmount} style={{ color: tonoTexto(r.color) }}>
                         {r.cantidad} {r.unidad}
                       </span>
                     </div>
@@ -469,14 +484,14 @@ export default function VisualizadorCicloCarbonoCompleto() {
           {/* Balance global visual */}
           <div className={styles.balanceGlobal}>
             <div className={styles.balanceItem}>
-              <span className={styles.balanceVal} style={{ color: '#27AE60' }}>
+              <span className={styles.balanceVal} style={{ color: tonoTexto('#27AE60') }}>
                 −180 Gt C/año
               </span>
               <span className={styles.balanceLabel}>Entradas a biota + océanos</span>
             </div>
             <div className={styles.balanceSep} aria-hidden="true">≈</div>
             <div className={styles.balanceItem}>
-              <span className={styles.balanceVal} style={{ color: '#E74C3C' }}>
+              <span className={styles.balanceVal} style={{ color: tonoTexto('#E74C3C') }}>
                 +180 Gt C/año
               </span>
               <span className={styles.balanceLabel}>Salidas a atmósfera (natural)</span>
@@ -593,7 +608,7 @@ export default function VisualizadorCicloCarbonoCompleto() {
                   </span>
                   <div className={styles.destinoInfo}>
                     <span className={styles.destinoNombre}>{d.destino}</span>
-                    <span className={styles.destinoValor} style={{ color: d.color }}>
+                    <span className={styles.destinoValor} style={{ color: tonoTexto(d.color) }}>
                       {d.gtCAnio} Gt C/año ({d.porcentaje}%)
                     </span>
                   </div>
@@ -713,7 +728,7 @@ export default function VisualizadorCicloCarbonoCompleto() {
                   </span>
                   <div>
                     <h3 className={styles.solucionNombre}>{sol.nombre}</h3>
-                    <span className={styles.solucionPotencial} style={{ color: sol.color }}>
+                    <span className={styles.solucionPotencial} style={{ color: tonoTexto(sol.color) }}>
                       Potencial: {sol.potencial}
                     </span>
                   </div>

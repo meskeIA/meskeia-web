@@ -7,6 +7,18 @@
   min-height: 100vh;
   background-color: var(--bg-primary);
   color: var(--text-primary);
+  /* Tonos de TEXTO de los colores de datos sin token propio en globals (cabo C0645): el océano
+     #1A6E8A, el violeta #8E6BBF y el gris #7F8C8D, que como texto daban 2,39-4,20:1. Medidos
+     sobre el blanco y sobre las tarjetas oscuras (#2D2D2D y #353535). */
+  --oceano-texto: #1A6E8A;   /* 5,77:1 */
+  --violeta-texto: #6B4C9A;  /* 6,72:1 */
+  --gris-texto: #5F6A6B;     /* 5,58:1 */
+}
+
+[data-theme='dark'] .container {
+  --oceano-texto: #5AB8DC;   /* 6,12 · 5,45 */
+  --violeta-texto: #B9A0E0;  /* 6,01 · 5,35 */
+  --gris-texto: #AEB8B9;     /* 6,79 · 6,05 */
 }
 
 /* ─────────────────────────────────────────────
@@ -293,7 +305,8 @@
 }
 
 .warningBox strong {
-  color: #C0392B;
+  /* En oscuro, #C0392B sobre su tinte daba 2,88:1 (C0645); --rojo-texto solo existe en claro */
+  color: var(--rojo-texto, #F87171);
 }
 
 /* ─────────────────────────────────────────────
@@ -915,6 +928,8 @@
 
 [data-theme='dark'] .solucionLimit {
   background: rgba(255, 255, 255, 0.04);
+  /* Con --text-muted daba 4,40:1 sobre la tarjeta con este velo (C0645) */
+  color: var(--text-secondary);
 }
 
 [data-theme='dark'] .reservoirDetail {
