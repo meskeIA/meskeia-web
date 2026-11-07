@@ -3,6 +3,7 @@
 
 import { useState, useMemo, useRef, useEffect } from 'react';
 import styles from './TablaPeriodica.module.css';
+import impresion from '@/styles/impresion.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { formatNumber } from '@/lib';
 import { elementos, elementosPorSimbolo, FAMILIAS, ESTADOS, Elemento } from './elementos-data';
@@ -18,6 +19,14 @@ import {
   type ComprobacionBusqueda,
   type EjercicioBusqueda,
 } from './casos';
+import {
+  CAMPOS_HOJA,
+  CAMPOS_HOJA_INICIALES,
+  llevaSolucionario,
+  resumenHoja,
+  type CampoHoja,
+  type CamposHoja,
+} from './hoja-muda';
 
 /** Minúsculas sin diacríticos, para que buscar «oxigeno» sin tilde encuentre «Oxígeno»
  *  (hallazgo 528: 14 de 118 elementos eran inalcanzables sin la tilde exacta). */
@@ -64,6 +73,58 @@ const getPosicion = (elemento: Elemento): { fila: number; columna: number } => {
   return { fila: elemento.periodo, columna: elemento.grupo };
 };
 
+// ---------------------------------------------------------- Tabla muda para imprimir (S0259)
+
+/**
+ * La rejilla de la hoja: una columna para los números de período y 18 de grupos, una fila
+ * para los números de grupo, siete de períodos, un hueco y las dos series del bloque f.
+ * Las cuatro líneas de la casilla se montan siempre y solo cambia su texto.
+ */
+function HojaTabla({ campos }: { campos: CamposHoja }) {
+  return (
+    <div className={styles.hojaRejilla}>
+      {Array.from({ length: 18 }, (_, i) => (
+        <span key={`g${i}`} className={styles.hojaRotulo} style={{ gridColumn: i + 2, gridRow: 1 }}>
+          {i + 1}
+        </span>
+      ))}
+      {Array.from({ length: 7 }, (_, i) => (
+        <span key={`p${i}`} className={styles.hojaRotulo} style={{ gridColumn: 1, gridRow: i + 2 }}>
+          {i + 1}
+        </span>
+      ))}
+      {elementos.map((e) => {
+        const pos = getPosicion(e);
+        return (
+          <div
+            key={e.numero}
+            className={styles.hojaCasilla}
+            style={{ gridColumn: pos.columna + 1, gridRow: pos.fila >= 8 ? pos.fila + 2 : pos.fila + 1 }}
+          >
+            <span className={styles.hojaZ}>{campos.numero ? e.numero : ''}</span>
+            <span className={styles.hojaSimbolo}>{campos.simbolo ? e.simbolo : ''}</span>
+            <span className={styles.hojaNombre}>{campos.nombre ? e.nombre : ''}</span>
+            {/* Como la ficha (cabo C0490, hallazgo 530): sin peso estándar, entre corchetes; con
+                él, sus decimales de la CIAAW hasta un máximo de dos, sin ceros que la IUPAC no da
+                («207,2» y no «207,20»). */}
+            <span className={styles.hojaMasa}>
+              {campos.masa
+                ? e.decimalesMasa === null
+                  ? `[${e.masa}]`
+                  : formatNumber(e.masa, Math.min(2, e.decimalesMasa))
+                : ''}
+            </span>
+          </div>
+        );
+      })}
+      <span className={styles.hojaSerieHueco} style={{ gridColumn: 4, gridRow: 7 }}>57-71</span>
+      <span className={styles.hojaSerieHueco} style={{ gridColumn: 4, gridRow: 8 }}>89-103</span>
+      <span className={styles.hojaSerieNombre} style={{ gridColumn: '1 / 4', gridRow: 10 }}>Lantánidos</span>
+      <span className={styles.hojaSerieNombre} style={{ gridColumn: '1 / 4', gridRow: 11 }}>Actínidos</span>
+    </div>
+  );
+}
+
 export default function TablaPerodicaPage() {
   // Estados
   const [filtroFamilia, setFiltroFamilia] = useState<string>('todos');
@@ -77,6 +138,11 @@ export default function TablaPerodicaPage() {
     desglose: { simbolo: string; cantidad: number; masa: number }[];
   } | null>(null);
   const [errorMasa, setErrorMasa] = useState<string>('');
+  // Qué lleva cada casilla de la tabla muda impresa (S0259)
+  const [camposHoja, setCamposHoja] = useState<CamposHoja>(CAMPOS_HOJA_INICIALES);
+  const conSolucionario = llevaSolucionario(camposHoja);
+  const alternarCampoHoja = (clave: CampoHoja) =>
+    setCamposHoja((previos) => ({ ...previos, [clave]: !previos[clave] }));
 
   // Fichas de búsqueda para clase. La corrección vive en `casos.ts`, fuera de la vista.
   const [respuestasFichas, setRespuestasFichas] = useState<Record<number, string>>({});
@@ -296,13 +362,16 @@ export default function TablaPerodicaPage() {
   };
 
   return (
-    <div className={styles.container}>
+    <div className={`${styles.container} ${impresion.lienzo}`}>
+      {/* Al imprimir solo sale la hoja de abajo (styles/impresion.module.css). El modal sigue
+          dentro de este envoltorio: el `inert` de la ficha se aplica a sus hermanos. */}
+      <div className={impresion.noImprimir}>
       <MeskeiaLogo />
 
       <header className={styles.hero}>
         <h1 className={styles.title}><span aria-hidden="true">⚛️</span> Tabla Periódica Interactiva</h1>
         <p className={styles.subtitle}>
-          Explora los 118 elementos químicos con información detallada y calculadora de masa molar
+          Explora los 118 elementos químicos con información detallada, calculadora de masa molar y tabla muda para imprimir
         </p>
       </header>
 
@@ -420,6 +489,37 @@ export default function TablaPerodicaPage() {
           ))}
         </div>
       </div>
+
+      {/* Tabla muda para imprimir (S0259) */}
+      <section className={styles.mudaBox} aria-labelledby="titulo-muda">
+        <h2 id="titulo-muda">
+          <span aria-hidden="true">🖨️</span> Tabla periódica muda para imprimir
+        </h2>
+        <p className={styles.mudaDesc}>
+          Elige qué datos salen en cada casilla y deja el resto en blanco para completarlo a mano.
+          Si dejas algo en blanco, la tabla completa sale detrás como solucionario, en una página
+          aparte, para poder repartir la hoja. Está preparada para salir en horizontal, en A4 o
+          Carta, y en tinta negra.
+        </p>
+        <fieldset className={styles.mudaCampos}>
+          <legend>Qué aparece en cada casilla</legend>
+          {CAMPOS_HOJA.map(({ clave, etiqueta }) => (
+            <label key={clave} className={styles.mudaCampo}>
+              <input
+                type="checkbox"
+                checked={camposHoja[clave]}
+                onChange={() => alternarCampoHoja(clave)}
+              />
+              <span>{etiqueta}</span>
+            </label>
+          ))}
+        </fieldset>
+        <p className={styles.mudaResumen} aria-live="polite">{resumenHoja(camposHoja)}</p>
+        <button type="button" className={styles.mudaBoton} onClick={() => window.print()}>
+          <span aria-hidden="true">🖨️</span>{' '}
+          <span>{conSolucionario ? 'Imprimir la tabla muda y el solucionario' : 'Imprimir la tabla completa'}</span>
+        </button>
+      </section>
 
       {/* Calculadora de Masa Molar */}
       <div className={styles.calculadoraPanel}>
@@ -1341,6 +1441,30 @@ export default function TablaPerodicaPage() {
 
       <ShareCard appName="tabla-periodica" />
       <Footer appName="tabla-periodica" />
+      </div>
+
+      {/* Única parte que sale por la impresora. Con algo en blanco lleva detrás el
+          solucionario, en página aparte, para poder repartir la hoja. */}
+      <div className={`${styles.hojaMuda} ${impresion.hoja}`} data-hoja-muda="">
+        <div className={styles.hojaPagina}>
+          <h2 className={styles.hojaTitulo}>
+            <span>{conSolucionario ? 'Tabla periódica muda' : 'Tabla periódica de los elementos'}</span>
+          </h2>
+          <p className={styles.hojaDatos}>
+            <span>
+              {conSolucionario
+                ? 'Completa las casillas. Los números de arriba son los grupos y los de la izquierda, los períodos.'
+                : 'Número atómico, símbolo, nombre y masa atómica. Arriba, los grupos; a la izquierda, los períodos.'}
+            </span>
+          </p>
+          <HojaTabla campos={camposHoja} />
+        </div>
+        <div className={`${styles.hojaPagina} ${styles.hojaSolucionario} ${conSolucionario ? '' : styles.hojaOculta}`}>
+          <h2 className={styles.hojaTitulo}>Tabla periódica: solucionario</h2>
+          <p className={styles.hojaDatos}>Número atómico, símbolo, nombre y masa atómica de cada elemento.</p>
+          <HojaTabla campos={{ numero: true, simbolo: true, nombre: true, masa: true }} />
+        </div>
+      </div>
     </div>
   );
 }

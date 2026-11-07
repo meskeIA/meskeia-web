@@ -1501,3 +1501,232 @@
   }
 
 }
+
+/* ============================================================
+   TABLA MUDA PARA IMPRIMIR (S0259, 07/11/2026)
+   En pantalla, un panel con las opciones; la hoja solo existe
+   en papel. Base común: styles/impresion.module.css.
+   ============================================================ */
+
+.mudaBox {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--primary);
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+[data-theme='dark'] .mudaBox {
+  background: var(--bg-card);
+  border-color: var(--border);
+  border-left-color: var(--primary);
+}
+
+.mudaBox h2 {
+  color: var(--primary-texto);
+  font-size: 1.3rem;
+  margin: 0 0 0.5rem;
+}
+
+.mudaDesc {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin: 0 0 1rem;
+}
+
+.mudaCampos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  margin: 0 0 0.75rem;
+}
+
+.mudaCampos legend {
+  padding: 0 0.375rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.mudaCampo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.mudaCampo input {
+  width: 1.15rem;
+  height: 1.15rem;
+  accent-color: var(--primary-boton);
+  cursor: pointer;
+}
+
+.mudaResumen {
+  margin: 0 0 1rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+[data-theme='dark'] .mudaResumen {
+  color: var(--text-muted);
+}
+
+.mudaBoton {
+  padding: 0.7rem 1.2rem;
+  min-height: 44px;
+  background: var(--primary-boton);
+  border: 2px solid var(--primary-boton);
+  border-radius: 8px;
+  color: #ffffff;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.mudaBoton:hover {
+  filter: brightness(1.1);
+}
+
+.mudaBoton:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+/* La hoja no se ve en pantalla */
+.hojaMuda {
+  display: none;
+}
+
+/* Página con nombre: el apaisado se aplica SOLO a la hoja que la pide. Un @page sin nombre
+   seguiría cargado si el visitante pasa después a otra app imprimible sin recargar (el CSS de
+   las rutas visitadas no se descarga) y le giraría su hoja. Sin soporte de páginas con nombre,
+   la hoja sale en vertical y sigue cabiendo: la rejilla se mide en fracciones del ancho. */
+@page tablaMuda {
+  size: landscape;
+}
+
+@media print {
+  .hojaMuda {
+    display: block !important;
+    page: tablaMuda;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+
+  .hojaPagina {
+    display: block;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
+  .hojaSolucionario {
+    break-before: page;
+    page-break-before: always;
+  }
+
+  .hojaOculta {
+    display: none !important;
+  }
+
+  .hojaTitulo {
+    font-size: 15pt;
+    font-weight: 700;
+    margin: 0 0 1mm;
+    text-align: center;
+    color: #000000;
+  }
+
+  .hojaDatos {
+    font-size: 9pt;
+    margin: 0 0 3mm;
+    text-align: center;
+    color: #000000;
+  }
+
+  /* Una columna estrecha para los números de período y 18 iguales. Las filas de casilla miden
+     15 mm: en A4 apaisado (174 mm útiles de alto) caben las nueve —siete períodos y las dos
+     series— con su título en una página, ~150 mm, y dejan sitio para escribir el símbolo y el
+     nombre a lápiz (la base pide 9 mm). Comprobado en PDF A4 y Carta, 07/11/2026. */
+  .hojaRejilla {
+    display: grid;
+    grid-template-columns: 5mm repeat(18, minmax(0, 1fr));
+    grid-template-rows: 5mm repeat(7, 15mm) 3mm repeat(2, 15mm);
+    gap: 0.5mm;
+    width: 100%;
+  }
+
+  .hojaRotulo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 7pt;
+    font-weight: 700;
+    color: #000000;
+  }
+
+  .hojaCasilla {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: var(--linea, 0.35mm) solid #000000;
+    padding: 0.5mm;
+    color: #000000;
+  }
+
+  .hojaZ {
+    position: absolute;
+    top: 0.4mm;
+    left: 0.8mm;
+    font-size: 5.5pt;
+    line-height: 1;
+  }
+
+  .hojaSimbolo {
+    font-size: 11pt;
+    font-weight: 700;
+    line-height: 1.05;
+  }
+
+  .hojaNombre {
+    font-size: 4.8pt;
+    line-height: 1.1;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .hojaMasa {
+    font-size: 4.8pt;
+    line-height: 1.1;
+  }
+
+  .hojaSerieHueco {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: var(--linea, 0.35mm) dashed #000000;
+    font-size: 6pt;
+    color: #000000;
+  }
+
+  .hojaSerieNombre {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 1.5mm;
+    font-size: 7pt;
+    font-weight: 700;
+    color: #000000;
+  }
+}

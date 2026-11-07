@@ -17,6 +17,7 @@ import {
   unicoPorEstadoYFamilia,
 } from '../../app/tabla-periodica/casos';
 import { elementos } from '../../app/tabla-periodica/elementos-data';
+import { CAMPOS_HOJA_INICIALES, llevaSolucionario, resumenHoja } from '../../app/tabla-periodica/hoja-muda';
 import { ELEMENTOS as ELEMENTOS_TENDENCIAS } from '../../app/simulador-tabla-periodica-tendencias/datos';
 import { RADIO_COVALENTE_PM, RADIO_SOLO_TEORICO_DESDE_Z } from '../../data/radios-atomicos';
 import { ELECTRONEGATIVIDAD_PAULING } from '../../data/electronegatividad';
@@ -3712,5 +3713,82 @@ test.describe('VALENCIAS · la ficha enlaza a la tabla de valencias', () => {
     const fe = await fichaDe(page, 'Hierro (Fe)');
     await expect(page.locator(MODAL).first().locator('a[href="/tabla-valencias/"]')).toBeVisible();
     expect(fe).not.toMatch(/Valencias en formulación|Positivas:/);
+  });
+});
+
+/**
+ * TABLA MUDA PARA IMPRIMIR (S0259, 07/11/2026). La hoja solo existe en papel, así que los
+ * casos del navegador emulan `media: print`: en pantalla no se ve, y al imprimir no se ve
+ * nada más. Las frases esperadas están escritas a mano.
+ */
+test.describe('TABLA MUDA · S0259', () => {
+  const NADA = { numero: false, simbolo: false, nombre: false, masa: false };
+  const TODO = { numero: true, simbolo: true, nombre: true, masa: true };
+
+  test('la frase dice qué hoja va a salir, y el solucionario solo si falta algo', () => {
+    expect(resumenHoja(CAMPOS_HOJA_INICIALES)).toBe(
+      'Saldrá cada casilla con el número atómico y el resto en blanco, y detrás el solucionario.',
+    );
+    expect(resumenHoja({ ...NADA, simbolo: true, masa: true })).toBe(
+      'Saldrá cada casilla con el símbolo y la masa atómica y el resto en blanco, y detrás el solucionario.',
+    );
+    expect(resumenHoja({ ...TODO, masa: false })).toBe(
+      'Saldrá cada casilla con el número atómico, el símbolo y el nombre y el resto en blanco, y detrás el solucionario.',
+    );
+    expect(resumenHoja(NADA)).toMatch(/^Saldrá la tabla vacía/);
+    expect(resumenHoja(TODO)).toMatch(/^Saldrá la tabla completa/);
+    expect(llevaSolucionario(TODO)).toBe(false);
+    expect(llevaSolucionario(CAMPOS_HOJA_INICIALES)).toBe(true);
+  });
+
+  test('en pantalla la hoja no se ve; al imprimir solo se ve la hoja', async ({ page }) => {
+    await abrirHidratada(page);
+    const hoja = page.locator('[data-hoja-muda]');
+    await expect(hoja).toBeHidden();
+    await page.emulateMedia({ media: 'print' });
+    await expect(hoja).toBeVisible();
+    await expect(page.locator('#titulo-muda')).toBeHidden();
+    await expect(page.locator('h1')).toBeHidden();
+    await expect(page.locator('[class*="_tablaContainer"]')).toBeHidden();
+  });
+
+  test('la muda por defecto lleva solo el número atómico, y detrás el solucionario completo', async ({ page }) => {
+    await abrirHidratada(page);
+    await page.emulateMedia({ media: 'print' });
+    const [muda, solucion] = [page.locator('[data-hoja-muda] > div').nth(0), page.locator('[data-hoja-muda] > div').nth(1)];
+    await expect(muda.locator('h2')).toHaveText('Tabla periódica muda');
+    const casillas = muda.locator('[class*="_hojaCasilla"]');
+    await expect(casillas).toHaveCount(118);
+    const hierro = (await casillas.nth(25).innerText()).replace(/\s+/g, ' ').trim();
+    expect(hierro).toBe('26');
+    await expect(solucion).toBeVisible();
+    const hierroSol = (await solucion.locator('[class*="_hojaCasilla"]').nth(25).innerText()).replace(/\s+/g, ' ').trim();
+    expect(hierroSol).toBe(`26 Fe Hierro ${formatNumber(55.845, 2)}`);
+  });
+
+  test('marcar los cuatro datos da la tabla completa y quita el solucionario', async ({ page }) => {
+    await abrirHidratada(page);
+    for (const nombre of ['Símbolo', 'Nombre', 'Masa atómica']) {
+      await page.getByRole('checkbox', { name: nombre, exact: true }).check();
+    }
+    await expect(page.getByRole('button', { name: /Imprimir la tabla completa/ })).toBeVisible();
+    await expect(page.locator('[aria-live="polite"]').filter({ hasText: 'Saldrá' })).toHaveText(/^Saldrá la tabla completa/);
+    await page.emulateMedia({ media: 'print' });
+    await expect(page.locator('[data-hoja-muda] h2').first()).toHaveText('Tabla periódica de los elementos');
+    await expect(page.locator('[data-hoja-muda] > div').nth(1)).toBeHidden();
+    // Y quitar el número atómico deja esa casilla sin él
+    await page.emulateMedia({ media: 'screen' });
+    await page.getByRole('checkbox', { name: 'Número atómico', exact: true }).uncheck();
+    await page.emulateMedia({ media: 'print' });
+    const oro = (await page.locator('[data-hoja-muda] > div').nth(0).locator('[class*="_hojaCasilla"]').nth(78).innerText()).replace(/\s+/g, ' ').trim();
+    expect(oro).toBe(`Au Oro ${formatNumber(196.97, 2)}`);
+  });
+
+  test('la hoja cabe en una página apaisada y el solucionario en la segunda', async ({ page }) => {
+    await abrirHidratada(page);
+    await page.emulateMedia({ media: 'print' });
+    const pdf = await page.pdf({ preferCSSPageSize: true, printBackground: false });
+    const paginas = (pdf.toString('latin1').match(/\/Type\s*\/Page[^s]/g) ?? []).length;
+    expect(paginas).toBe(2);
   });
 });

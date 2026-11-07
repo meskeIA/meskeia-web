@@ -2,9 +2,9 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Tabla Periódica Interactiva - 118 Elementos con Propiedades | meskeIA',
-  description: 'Tabla periódica interactiva con los 118 elementos químicos: masa atómica, configuración electrónica, electronegatividad de Pauling donde está medida y calculadora de masa molar. Filtros por familia y estado. Gratis.',
-  keywords: 'tabla periodica, elementos quimicos, quimica, masa molar, masas molares, propiedades elementos, taula periòdica, metales, no metales, gases nobles, lantanidos, actinidos, educacion, bachillerato, preparatoria, secundaria, educacion media',
+  title: 'Tabla Periódica Interactiva y Muda para Imprimir - 118 Elementos | meskeIA',
+  description: 'Tabla periódica interactiva con los 118 elementos químicos: masa atómica, configuración electrónica, electronegatividad de Pauling donde está medida y calculadora de masa molar. Filtros por familia y estado, y tabla muda para imprimir con solucionario. Gratis.',
+  keywords: 'tabla periodica, tabla periodica muda, tabla periodica para imprimir, tabla periodica en blanco, tabla periodica vacia, elementos quimicos, quimica, masa molar, masas molares, propiedades elementos, taula periòdica, metales, no metales, gases nobles, lantanidos, actinidos, educacion, bachillerato, preparatoria, secundaria, educacion media',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     title: 'Tabla Periódica Interactiva | meskeIA',
-    description: 'Explora los 118 elementos químicos de forma interactiva. Filtros, información detallada y calculadora de masa molar incluida.',
+    description: 'Explora los 118 elementos químicos de forma interactiva. Filtros, información detallada, calculadora de masa molar y tabla muda para imprimir.',
     url: 'https://meskeia.com/tabla-periodica/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -92,6 +92,7 @@ export const jsonLd = generateWebAppSchema({
     'Filtros por estado físico (sólido, líquido, gaseoso)',
     'Información detallada de cada elemento al hacer clic',
     'Calculadora de masa molar integrada',
+    'Tabla periódica muda para imprimir: eliges qué dato sale en cada casilla, con solucionario aparte',
     'Búsqueda por nombre, símbolo o número atómico',
     'En español',
   ],
