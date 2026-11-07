@@ -81,6 +81,15 @@ const COLORES = {
   capital: '#C0392B',
 };
 
+// El nombre de la vía en el veredicto es TEXTO: con los colores de arriba (bordes y barras) la
+// marca daba 4,11:1 en claro y 3,50 en oscuro, y el rojo 2,64 en oscuro (cabo C0645). Tonos de
+// texto por tema; --rojo-texto solo existe en claro, en oscuro manda la reserva (5,2:1 sobre #2A2A2A).
+const COLORES_TEXTO: Record<ResultadoVia['id'], string> = {
+  prestamo: 'var(--primary-texto)',
+  leasing: 'var(--secondary-texto)',
+  capital: 'var(--rojo-texto, #F87171)',
+};
+
 // ─── Datos de ejemplo ───────────────────────────────────────────────────────────
 
 const DATOS_EJEMPLO: InputData = {
@@ -439,13 +448,13 @@ export default function SimuladorFinanciacionEmpresarial() {
           <div className={styles.veredictoItem}>
             <span className={styles.veredictoIcon} aria-hidden="true">💰</span>
             <span className={styles.veredictoPrio}>Menor coste total</span>
-            <span className={styles.veredictoVia} style={{ color: menorCoste.color }}>{menorCoste.nombre}</span>
+            <span className={styles.veredictoVia} style={{ color: COLORES_TEXTO[menorCoste.id] }}>{menorCoste.nombre}</span>
             <span className={styles.veredictoDato}>{fmtEur(menorCoste.costeNeto)} de coste neto</span>
           </div>
           <div className={styles.veredictoItem}>
             <span className={styles.veredictoIcon} aria-hidden="true">💧</span>
             <span className={styles.veredictoPrio}>Proteger la tesorería</span>
-            <span className={styles.veredictoVia} style={{ color: mejorTesoreria.color }}>{mejorTesoreria.nombre}</span>
+            <span className={styles.veredictoVia} style={{ color: COLORES_TEXTO[mejorTesoreria.id] }}>{mejorTesoreria.nombre}</span>
             <span className={styles.veredictoDato}>
               {mejorTesoreria.salidaCajaPlazo > 0 ? `${fmtEur(mejorTesoreria.salidaCajaPlazo)} de desembolso` : 'Sin salida de caja'}
             </span>
@@ -453,7 +462,7 @@ export default function SimuladorFinanciacionEmpresarial() {
           <div className={styles.veredictoItem}>
             <span className={styles.veredictoIcon} aria-hidden="true">🛡️</span>
             <span className={styles.veredictoPrio}>No perder control</span>
-            <span className={styles.veredictoVia} style={{ color: mejorControl.color }}>{mejorControl.nombre}</span>
+            <span className={styles.veredictoVia} style={{ color: COLORES_TEXTO[mejorControl.id] }}>{mejorControl.nombre}</span>
             <span className={styles.veredictoDato}>0% de dilución</span>
           </div>
         </div>
