@@ -12,7 +12,7 @@ import { acentuacionDe, analizarVerso, separarSilabas } from '../../app/contador
  * NOVENA INSPECCIÓN: 07/11/2026, modo CAMBIO por b9d7ff45 (cabo C0243: key por análisis en el
  * resultado y medidor con hijo único). Sus tres casos con la página traducida y un detector de
  * texto viejo de toda la página, en el último bloque del fichero: la reparación se sostiene. Un
- * hallazgo bajo ABIERTO (la pista del metro 20, «para el veinte sílabas»), con test.fail().
+ * hallazgo bajo (4188, la pista del metro 20, «para el veinte sílabas»), REPARADO el 07/11/2026.
  * OCTAVA INSPECCIÓN: 01/11/2026, RE-INSPECCIÓN por el cambio de código del 27/10 y 9f57450f.
  * Sus casos y sus hallazgos (3872-3877), en el último bloque del fichero: se escribieron con
  * test.fail() y se REPARARON el 01/11/2026; quedan sin la marca, como regresión.
@@ -2945,21 +2945,26 @@ en tu balcón sus nidos a colgar`;
     expect(errores).toEqual([]);
   });
 
-  test('HALLAZGO (ABIERTO, inspector 07/11/2026) · con el metro fijado en 20, la pista dice «para el veinte sílabas»', async ({
+  test('HALLAZGO 4188 (REPARADO, /reparar 07/11/2026) · con el metro fijado en 20, la pista decía «para el veinte sílabas»', async ({
     page,
   }) => {
-    // ABIERTO. page.tsx, la pista del medidor (la línea que reescribió b9d7ff45): «…te faltan o
-    // te sobran para el ${nombreDelVerso(metroObjetivo)}.». nombreDelVerso(20) devuelve
-    // «veinte sílabas» (metrica.ts, NOMBRES_VERSO), y «el» no concierta con «sílabas». Del 2 al
-    // 19 sale un nombre masculino singular («para el dodecasílabo.») y concierta. Se escribe con
-    // test.fail(), afirmando lo que DEBERÍA ocurrir: la pista nombra los 20 sin «el veinte sílabas».
-    test.fail();
+    // page.tsx, la pista del medidor (la línea que reescribió b9d7ff45): «…te faltan o te sobran
+    // para el ${nombreDelVerso(metroObjetivo)}.». nombreDelVerso(20) devuelve «veinte sílabas»
+    // (metrica.ts, NOMBRES_VERSO), y «el» no concertaba con «sílabas». Del 2 al 19 sale un nombre
+    // masculino singular («para el dodecasílabo.») y concierta. REPARADO con versoEnFrase de
+    // metrica.ts: «para el verso de veinte sílabas.»; el 12 sigue «para el dodecasílabo.».
     await page.fill('#metro-personalizado', '20');
     await esperarValorEnReact(page, '#metro-personalizado', '20');
     await page.getByRole('button', { name: 'Fijar' }).click();
     const pista = page.locator('[class*="medidorPista"]');
     await expect(pista).toContainText(/veinte|20/);
     expect((await pista.innerText()).trim()).not.toContain('el veinte sílabas');
+    await expect(pista).toContainText('para el verso de veinte sílabas.');
+
+    await page.fill('#metro-personalizado', '12');
+    await esperarValorEnReact(page, '#metro-personalizado', '12');
+    await page.getByRole('button', { name: 'Fijar' }).click();
+    await expect(pista).toContainText('para el dodecasílabo.');
   });
 
   test('CONTROL · el detector de texto viejo ve un nodo retirado en el que se vuelve a escribir', async ({

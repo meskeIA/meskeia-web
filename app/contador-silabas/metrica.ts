@@ -277,6 +277,16 @@ const NOMBRES_VERSO: Record<number, string> = {
 export const nombreDelVerso = (silabas: number): string =>
   NOMBRES_VERSO[silabas] || `${silabas} sílabas`;
 
+/**
+ * El verso con su artículo, para meterlo en una frase: «el dodecasílabo», pero «el verso de veinte
+ * sílabas» (y no «el veinte sílabas», hallazgo 4188), porque del 20 en adelante el nombre no es un
+ * sustantivo masculino sino una cuenta.
+ */
+export const versoEnFrase = (silabas: number): string => {
+  const nombre = nombreDelVerso(silabas);
+  return /sílabas$/.test(nombre) ? `el verso de ${nombre}` : `el ${nombre}`;
+};
+
 const ajusteDe = (acentuacion: Acentuacion): number =>
   acentuacion === 'aguda' ? 1 : acentuacion === 'esdrujula' ? -1 : 0;
 

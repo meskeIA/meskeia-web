@@ -17,6 +17,7 @@ import {
   contarSilabasTexto,
   encuentrosVocalicos,
   nombreDelVerso,
+  versoEnFrase,
 } from './metrica';
 import {
   type AnalisisRima,
@@ -293,7 +294,7 @@ sabañón garrafal, morado y frito.`,
                   <p className={styles.medidorPista}>
                     {/* Una sola cadena, hijo único del <p>: con la página traducida, un nodo de
                         texto con hermanos se quedaba con el metro anterior (cabo C0243). */}
-                    {`Escribe un verso por línea: te iré diciendo cuántas sílabas te faltan o te sobran para el ${nombreDelVerso(metroObjetivo)}.`}
+                    {`Escribe un verso por línea: te iré diciendo cuántas sílabas te faltan o te sobran para ${versoEnFrase(metroObjetivo)}.`}
                   </p>
                 ) : (
                   versosEnVivo.map((v, i) => {
