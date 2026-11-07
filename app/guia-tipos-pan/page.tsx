@@ -403,7 +403,7 @@ export default function GuiaTiposPan() {
       <header className={styles.hero}>
         <div className={styles.heroIcono} aria-hidden="true">🍞</div>
         <h1>Guía de Tipos de Pan del Mundo</h1>
-        <p>35 tipos de pan: historia, fermentación, harina y maridaje. Fichas de panadería de Europa, Asia, América, Oriente Medio y África.</p>
+        <p>{`${PANES.length} tipos de pan: historia, fermentación, harina y maridaje. Fichas de panadería de Europa, Asia, América, Oriente Medio y África.`}</p>
       </header>
 
       <LegalNotice />

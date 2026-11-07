@@ -541,7 +541,7 @@ export default function QueCervezaElegir() {
         <p>
           Elegir una cerveza se reduce a tres preguntas: <strong>¿qué voy a comer?</strong>,
           <strong>¿qué intensidad quiero?</strong> y <strong>¿cuánto quiero gastar?</strong>.
-          Esta herramienta te orienta entre los 47 estilos de la guía meskeIA, pero los matices
+          Esta herramienta te orienta entre los estilos de la guía meskeIA, pero los matices
           finales (cervecería concreta, frescura, lote) los marca el bar o la tienda.
         </p>
 

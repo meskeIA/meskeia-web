@@ -149,8 +149,7 @@ export default function GuiaPlantas() {
       <header className={styles.hero}>
         <h1>Guía de Plantas de Interior</h1>
         <p>
-          40 plantas con nivel de luz, frecuencia de riego, humedad, toxicidad para mascotas
-          y consejos de cuidado específicos. Filtra por lo que necesitas.
+          {`${PLANTAS.length} plantas con nivel de luz, frecuencia de riego, humedad, toxicidad para mascotas y consejos de cuidado específicos. Filtra por lo que necesitas.`}
         </p>
       </header>
 

@@ -845,7 +845,7 @@ export default function GuiaEstilosCerveza() {
 
       <header className={styles.hero}>
         <h1>Guia de Estilos de Cerveza</h1>
-        <p>47 estilos del mundo con IBU, ABV, temperatura de servicio y maridaje</p>
+        <p>{`${ESTILOS.length} estilos del mundo con IBU, ABV, temperatura de servicio y maridaje`}</p>
       </header>
 
       <LegalNotice />

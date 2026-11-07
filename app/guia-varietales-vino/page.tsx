@@ -63,7 +63,7 @@ const ACIDEZ_NIVEL: Record<Acidez, number> = {
 
 const TIPOS: Array<TipoUva | 'Todos'> = ['Todos', 'Tinto', 'Blanco', 'Espumoso', 'Generoso'];
 
-// ── Datos: 40 varietales ─────────────────────────────────────────────────────
+// ── Datos: varietales ───────────────────────────────────────────────────────────
 
 const VARIETALES: Varietal[] = [
   // ── TINTOS (20) ──

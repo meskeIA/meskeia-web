@@ -656,10 +656,10 @@ export default function GuiaSetasPage() {
         <header className={styles.hero}>
           <h1 className={styles.title}>Guía de Setas</h1>
           <p className={styles.subtitle}>
-            40 setas silvestres con ficha completa: comestibilidad, hábitat, temporada, morfología, especies confusas y avisos de seguridad.
+            {`${SETAS.length} setas silvestres con ficha completa: comestibilidad, hábitat, temporada, morfología, especies confusas y avisos de seguridad.`}
           </p>
           <div className={styles.heroStats}>
-            <span className={styles.stat}><strong>40</strong> setas</span>
+            <span className={styles.stat}><strong>{SETAS.length}</strong> setas</span>
             <span className={styles.statDivider}>·</span>
             <span className={styles.stat}><strong>5</strong> niveles comestibilidad</span>
             <span className={styles.statDivider}>·</span>

@@ -579,8 +579,7 @@ export default function GuiaSuperalimentosPage() {
       <header className={styles.hero}>
         <h1 className={styles.heroTitle}>Guia de Superalimentos</h1>
         <p className={styles.heroSubtitle}>
-          40 alimentos del mundo con densidad nutricional extraordinaria: propiedades, beneficios
-          tradicionales, como consumirlos y curiosidades historicas y cientificas.
+          {`${SUPERALIMENTOS.length} alimentos del mundo con densidad nutricional extraordinaria: propiedades, beneficios tradicionales, cómo consumirlos y curiosidades históricas y científicas.`}
         </p>
       </header>
 

@@ -3,7 +3,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Guía de Quesos - Variedades del mundo, maridaje y D.O. | meskeIA',
-  description: '55 quesos del mundo: tipo de leche, maduración, notas de sabor, maridaje y denominación de origen. España, Francia, Italia, Reino Unido y más. Filtros por país, leche y tipo.',
+  description: 'Quesos del mundo: tipo de leche, maduración, notas de sabor, maridaje y denominación de origen. España, Francia, Italia, Reino Unido y más. Filtros por país, leche y tipo.',
   keywords: 'guia quesos mundo, manchego, camembert, parmigiano, cheddar, quesos espana, denominacion origen queso, maridaje queso vino, tipos queso, quesos azules, quesos curados',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     title: 'Guía de Quesos | meskeIA',
-    description: '55 quesos del mundo: tipo de leche, maduración, notas de sabor, maridaje y denominación de origen.',
+    description: 'Quesos del mundo: tipo de leche, maduración, notas de sabor, maridaje y denominación de origen.',
     url: 'https://meskeia.com/guia-quesos/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Guía de Quesos | meskeIA',
-    description: '55 quesos del mundo: tipo de leche, maduración, notas de sabor y maridaje.',
+    description: 'Quesos del mundo: tipo de leche, maduración, notas de sabor y maridaje.',
     images: ['https://meskeia.com/coquinum/og-image.png']
   },
   other: {
@@ -36,10 +36,10 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: 'Guía de Quesos',
-  description: 'Directorio de 55 quesos del mundo con tipo de leche, maduración, textura, corteza, notas de sabor, maridaje y denominación de origen. Incluye quesos de España, Francia, Italia, Reino Unido, Resto de Europa y América. Filtros por continente/país, tipo de leche y tipo de queso.',
+  description: 'Directorio de quesos del mundo con tipo de leche, maduración, textura, corteza, notas de sabor, maridaje y denominación de origen. Incluye quesos de España, Francia, Italia, Reino Unido, Resto de Europa y América. Filtros por continente/país, tipo de leche y tipo de queso.',
   url: 'https://meskeia.com/guia-quesos/',
   features: [
-    '55 quesos con perfil completo',
+    'Quesos con perfil completo',
     'Filtros por país/región, tipo de leche y tipo de queso',
     'Búsqueda por nombre, país, región, notas o descripción',
     'Maridaje con vinos y acompañamientos específicos',

@@ -403,7 +403,7 @@ export default function GuiaCortesCarne() {
 
       <header className={styles.hero}>
         <h1>Guía de Cortes de Carne</h1>
-        <p>45 cortes de vacuno, cerdo, cordero, pollo y ternera: técnicas, temperaturas y consejos</p>
+        <p>{`${CORTES.length} cortes de vacuno, cerdo, cordero, pollo y ternera: técnicas, temperaturas y consejos`}</p>
       </header>
 
       <LegalNotice />

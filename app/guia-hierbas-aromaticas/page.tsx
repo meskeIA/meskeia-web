@@ -58,7 +58,7 @@ const FAMILIA_ESTILOS: Record<FamiliaHierba, string> = {
 };
 
 // ============================================================
-// DATOS — 35 hierbas aromáticas
+// DATOS — hierbas aromáticas (la cifra que se enseña sale de HIERBAS.length)
 // ============================================================
 
 const HIERBAS: HierbaAromatica[] = [
@@ -993,7 +993,7 @@ export default function GuiaHierbasAromaticasPage() {
         ============================================================ */}
         <EducationalSection
           title="Guía de Hierbas Aromáticas"
-          subtitle="Descubre 35 hierbas aromáticas: sabor, usos, cultivo y maridaje. Eleva tus platos con la hierba correcta"
+          subtitle={`Descubre ${HIERBAS.length} hierbas aromáticas: sabor, usos, cultivo y maridaje. Eleva tus platos con la hierba correcta`}
         >
           {/* 1. Tabla comparativa */}
           <section className={styles.guideSection}>

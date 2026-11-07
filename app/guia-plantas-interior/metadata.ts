@@ -3,7 +3,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Guía de Plantas de Interior - Cuidados, luz y toxicidad | meskeIA',
-  description: '40 plantas de interior: nivel de luz, frecuencia de riego, humedad, toxicidad para mascotas y cuidados específicos. Filtros por luz, dificultad y aptitud para mascotas.',
+  description: 'Plantas de interior: nivel de luz, frecuencia de riego, humedad, toxicidad para mascotas y cuidados específicos. Filtros por luz, dificultad y aptitud para mascotas.',
   keywords: 'plantas de interior, cuidado de plantas, luz para plantas, riego plantas interior, plantas aptas mascotas, plantas tóxicas gatos, plantas fáciles, decoración con plantas, plantas para principiantes',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     title: 'Guía de Plantas de Interior - meskeIA',
-    description: '40 plantas de interior con cuidados detallados, toxicidad para mascotas y filtros por luz y dificultad.',
+    description: 'Plantas de interior con cuidados detallados, toxicidad para mascotas y filtros por luz y dificultad.',
     url: 'https://meskeia.com/guia-plantas-interior/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Guía de Plantas de Interior',
-    description: '40 plantas con nivel de luz, riego, toxicidad para mascotas y consejos de cuidado.',
+    description: 'Plantas con nivel de luz, riego, toxicidad para mascotas y consejos de cuidado.',
     images: ['https://meskeia.com/og-image.png']
   },
   alternates: {
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: "Guía de Plantas de Interior",
-  description: "40 plantas de interior: nivel de luz, frecuencia de riego, humedad, toxicidad para mascotas y cuidados específicos. Filtros por luz, dificultad y aptitud para mascotas.",
+  description: "Plantas de interior: nivel de luz, frecuencia de riego, humedad, toxicidad para mascotas y cuidados específicos. Filtros por luz, dificultad y aptitud para mascotas.",
   url: "https://meskeia.com/guia-plantas-interior/",
   category: 'EducationalApplication',
   features: [],

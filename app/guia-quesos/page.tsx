@@ -556,7 +556,7 @@ export default function GuiaQuesos() {
 
       <header className={styles.hero}>
         <h1>Guía de Quesos</h1>
-        <p>55 quesos: amplia selección europea y referencias del mundo. Leche, maduración, notas de sabor y maridaje</p>
+        <p>{`${QUESOS.length} quesos: amplia selección europea y referencias del mundo. Leche, maduración, notas de sabor y maridaje`}</p>
       </header>
 
       <LegalNotice />

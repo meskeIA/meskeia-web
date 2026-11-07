@@ -1103,22 +1103,22 @@ export const implementedAppsUrls = [
 
   // Apps específicas de referencia (2026-05-03)
   "/aditivos-e-alimentarios/",                     // Guía 90 aditivos E: código, categoría, origen, función, alimentos
-  "/guia-especias/",                               // Directorio 65 especias: sabor, intensidad, usos, origen, combinaciones, conservación
+  "/guia-especias/",                               // Directorio de especias: sabor, intensidad, usos, origen, combinaciones, conservación
   "/guia-infusiones/",                             // Directorio 55 plantas para infusión: usos tradicionales, preparación, contraindicaciones
   "/guia-cafe/",                                   // Directorio 38 orígenes de café: especie, altitud, notas de sabor, procesado, cosecha y preparación
   "/guia-te/",                                     // Directorio 40 variedades de té: familia, origen, temperatura, tiempo de infusión y nivel de cafeína
-  "/guia-quesos/",                                 // Directorio 55 quesos del mundo: tipo de leche, maduración, notas de sabor, maridaje y D.O.
+  "/guia-quesos/",                                 // Directorio de quesos del mundo: tipo de leche, maduración, notas de sabor, maridaje y D.O.
   "/guia-aceite-oliva/",                           // Directorio 32 variedades de aceite de oliva: país, perfil, intensidad, usos y D.O.
   "/guia-cocteles/",                               // Directorio 45 cócteles clásicos: ingredientes, método, copa, graduación y origen
-  "/guia-plantas-interior/",                       // Directorio 40 plantas de interior: luz, riego, toxicidad para mascotas y cuidados
-  "/guia-setas/",                                  // Directorio 40 setas: comestibilidad, hábitat, temporada, identificación y avisos de seguridad
-  "/guia-superalimentos/",                         // Directorio 40 superalimentos: nutrientes, beneficios, cómo consumirlos y contraindicaciones
-  "/guia-cortes-carne/",                           // Directorio 45 cortes de carne: animal, terneza, método de cocción y temperatura ideal
+  "/guia-plantas-interior/",                       // Directorio de plantas de interior: luz, riego, toxicidad para mascotas y cuidados
+  "/guia-setas/",                                  // Directorio de setas: comestibilidad, hábitat, temporada, identificación y avisos de seguridad
+  "/guia-superalimentos/",                         // Directorio de superalimentos: nutrientes, beneficios, cómo consumirlos y contraindicaciones
+  "/guia-cortes-carne/",                           // Directorio de cortes de carne: animal, terneza, método de cocción y temperatura ideal
   "/guia-varietales-vino/",                        // Directorio 45 varietales de uva: tipo, cuerpo, taninos, acidez, temperatura, maridaje. Incluye uvas LATAM y generosos
   "/que-vino-elegir/",                             // Asistente situacional para elegir vino: cena, regalo, restaurante, ocasión, explorar
-  "/guia-estilos-cerveza/",                        // Directorio 47 estilos de cerveza: IBU, ABV, color EBC, fermentación, temperatura, maridaje. Incluye NEIPA, Quadrupel, Mexican Lager
+  "/guia-estilos-cerveza/",                        // Directorio de estilos de cerveza: IBU, ABV, color EBC, fermentación, temperatura, maridaje. Incluye NEIPA, Quadrupel, Mexican Lager
   "/que-cerveza-elegir/",                          // Asistente situacional para elegir cerveza: comida, regalo, bar, ocasión, explorar
-  "/guia-tipos-pan/",                              // Directorio 35 tipos de pan del mundo: harina, fermentación, textura, acompañamientos y curiosidades
+  "/guia-tipos-pan/",                              // Directorio de tipos de pan del mundo: harina, fermentación, textura, acompañamientos y curiosidades
   "/guia-tipos-pasta/",                            // Directorio 40 tipos de pasta italianos: forma, región, tiempo de cocción y salsa ideal
   "/guia-tipos-arroz/",                            // Directorio 27 variedades de arroz del mundo: tipo de grano, almidón, región y uso culinario
   "/guia-vinagres-mundo/",                         // Directorio 25 vinagres del mundo: origen, acidez, intensidad y maridaje
