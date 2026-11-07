@@ -2623,8 +2623,13 @@ test.describe('contador-silabas · Inspector 01/11/2026 (octava inspección)', (
 
     await analizarTexto(page, 'Volverán las oscuras golondrinas');
     await traducirPagina(page);
-    await analizarTexto(page, SEGUNDO);
+    // Sin «Limpiar»: corregir el verso y volver a analizar, que es lo que reutiliza los nodos
+    // (Limpiar desmonta el panel y el segundo análisis nace limpio).
+    await page.fill('textarea', SEGUNDO);
+    await esperarValorEnReact(page, 'textarea', SEGUNDO);
+    await page.getByRole('button', { name: 'Analizar Sílabas' }).click();
     await expect(page.locator('[class*="versoCard"]')).toHaveCount(1);
+    await expect(page.locator('[class*="versoTexto"]')).toHaveText(SEGUNDO);
     const traducido = (await panel.innerText()).replace(/\s+/g, ' ');
 
     await page.reload();
