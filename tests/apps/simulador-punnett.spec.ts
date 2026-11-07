@@ -1,5 +1,5 @@
 import { test, expect, devices, type Locator, type Page } from '@playwright/test';
-import { esperarPaginaAsentada } from './_hidratacion';
+import { esperarPaginaAsentada, esperarValorEnReact } from './_hidratacion';
 import { readFileSync } from 'node:fs';
 import { parseSpanishNumber } from '../../lib/formatters';
 import { PUERTO } from './_puerto';
@@ -11,6 +11,8 @@ import {
   leerRespuesta,
   resolverCaso,
   type DatosCaso,
+  type Fenotipo,
+  type Pregunta,
 } from '../../app/simulador-punnett/casos';
 
 /**
@@ -70,6 +72,9 @@ test.use({ launchOptions: { args: [`--host-resolver-rules=MAP stemum.com 127.0.0
  *
  * RE-INSPECCIÓN 01/10/2026 (invalidada por 586a4d61 y a1d72a9c, el hueco del hero bajo el logo
  * fijo): bloque del final del fichero, con sus casos a mano, el hero medido y el contraste.
+ *
+ * RE-INSPECCIÓN 07/11/2026 (modo cambio: casos para clase, corrector compartido, FAQ única y
+ * relacionadas desde el layout): último bloque del fichero.
  */
 
 const RUTA = '/simulador-punnett/';
@@ -1657,5 +1662,240 @@ test.describe('Cuadro de Punnett · la sección de casos en el navegador', () =>
     // El cuadro sigue en su estado por defecto tras usar los casos
     await seccion(page).getByRole('button', { name: /^Caso 12:/ }).click();
     await expect(page.locator(`${CUADRO} thead th`)).toHaveText(['P1 \\ P2', 'A', 'a']);
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════
+ * RE-INSPECCIÓN 07/11/2026 (modo cambio) — vuelve a la cola por los commits desde ffc46288:
+ *   89780240b casos para clase (12 cruces y práctica; el motor del cuadro se muda a casos.ts),
+ *   99e1ee7e7 relacionadas desde el layout (<ConRelacionadas>), 4fc83bcd8 rótulos Ver/Ocultar en
+ *   su <span>, 2221d3155 · 03ec46007 · e27fbb163 · 3b92acef6 · cd6270a91 el corrector compartido
+ *   (lib/calculadoras/correctorCasosAula.ts) y 3aaa90e38 la FAQ única (tres respuestas en
+ *   constantes de metadata.ts que importan el FAQPage y la FAQ visible).
+ *
+ * Casos resueltos A MANO antes de abrir el navegador (leyes de Mendel):
+ *   · Los doce casos (tabla ESPERADOS_CASOS: 25, 50, 100, 50, 150, 0, 56,25, 6,25, 9, 2, 80 y
+ *     37,5), tecleados como los escribe un alumno en es-ES: «¡Correcto!» y la solución con la
+ *     misma cifra, coma decimal y « %» con espacio duro (U+00A0).
+ *   · Corrección: «56.25» (punto decimal con dos cifras) = 56,25 → correcto · «0.375» en el caso
+ *     12 es 37,5 en tanto por uno → aviso de unidad · «101» en el caso 3 pasa del 100 % →
+ *     imposible · «150,5» semillas → un recuento no lleva decimales · «6» para 6,25 → redondeo.
+ *   · Práctica: el cruce y la pregunta se leen del ENUNCIADO y se resuelven con
+ *     `mendelIndependiente`, sin el motor de la app.
+ *   · FAQ: las tres preguntas compartidas dicen lo mismo en el FAQPage y en la visible; la razón
+ *     del trihíbrido 27:9:9:9:3:3:3:1 suma 64 = 8 × 8 (3³ · 3 × 3² · 3 × 3 · 1).
+ *   · Relacionadas: 4 tarjetas, ahora montadas por el layout.
+ *
+ * HALLAZGO abierto en esta re-inspección (test.fail de abajo): «6.250» para un 6,25 % —punto
+ *   decimal con tres cifras, la forma que resuelve leerRespuestaAula desde C0558— se lee como
+ *   6250 y la app contesta «Un porcentaje no puede pasar del 100 %: repasa la cuenta», cuando
+ *   «6.25» y «6,250» se aceptan. `leerRespuesta` de casos.ts delega en parseSpanishNumber; la
+ *   cabecera de check:respuesta-aula da esta app por exenta porque «su casos.ts ya decide que un
+ *   punto solo es decimal», y no lo decide.
+ * ═══════════════════════════════════════════════════════════════════════════════════════ */
+
+/** La respuesta resuelta a mano de cada caso, tecleada como en es-ES. */
+const TECLEADAS: Record<number, string> = {
+  1: '25', 2: '50', 3: '100', 4: '50', 5: '150', 6: '0', 7: '56,25', 8: '6,25', 9: '9', 10: '2', 11: '80', 12: '37,5',
+};
+
+/** La misma cifra como debe imprimirla la solución: coma decimal y «%» tras un U+00A0. */
+const SOLUCIONES: Record<number, string> = {
+  1: '25 %', 2: '50 %', 3: '100 %', 4: '50 %', 5: '150 semillas', 6: '0 %',
+  7: '56,25 %', 8: '6,25 %', 9: '9', 10: '2', 11: '80 semillas', 12: '37,5 %',
+};
+
+/** El fenotipo tal como lo nombra el enunciado de la práctica, con su clave en el motor. */
+const FENOTIPOS_EN_TEXTO: Array<[RegExp, Fenotipo]> = [
+  [/dominante en los dos caracteres \(A_B_\)/, 'dominante-dominante'],
+  [/recesivo en los dos caracteres \(aabb\)/, 'recesivo-recesivo'],
+  [/dominante en A y recesivo en B \(A_bb\)/, 'dominante-recesivo'],
+  [/recesivo en A y dominante en B \(aaB_\)/, 'recesivo-dominante'],
+  [/fenotipo dominante \(A_\)/, 'dominante'],
+  [/fenotipo recesivo \(aa\)/, 'recesivo'],
+];
+
+/** Reconstruye el cruce y la pregunta desde el texto que lee el alumno (no desde el estado). */
+function datosDesdeEnunciado(e: string): DatosCaso {
+  const fenotipo = (): Fenotipo => {
+    const f = FENOTIPOS_EN_TEXTO.find(([re]) => re.test(e));
+    if (!f) throw new Error(`fenotipo no reconocido: ${e}`);
+    return f[1];
+  };
+  let pregunta: Pregunta;
+  const genotipo = e.match(/tendrá el genotipo (\w+)\?/);
+  const nacen = e.match(/Si nacen (\d+) descendientes/);
+  if (genotipo) pregunta = { que: 'porcentaje-genotipo', genotipo: genotipo[1] };
+  else if (nacen) pregunta = { que: 'individuos-fenotipo', fenotipo: fenotipo(), poblacion: Number(nacen[1]) };
+  else if (/¿Qué porcentaje de la descendencia mostrará/.test(e)) pregunta = { que: 'porcentaje-fenotipo', fenotipo: fenotipo() };
+  else if (/genotipos distintos/.test(e)) pregunta = { que: 'genotipos-distintos' };
+  else throw new Error(`pregunta no reconocida: ${e}`);
+
+  const di = e.match(/^Se cruzan (AA|Aa|aa)(BB|Bb|bb) × (AA|Aa|aa)(BB|Bb|bb),/);
+  if (di) {
+    return {
+      tipo: 'dihibrido',
+      p1A: di[1] as 'AA' | 'Aa' | 'aa', p1B: di[2] as 'BB' | 'Bb' | 'bb',
+      p2A: di[3] as 'AA' | 'Aa' | 'aa', p2B: di[4] as 'BB' | 'Bb' | 'bb',
+      pregunta,
+    };
+  }
+  const mono = e.match(/^Se cruzan (AA|Aa|aa) × (AA|Aa|aa),/);
+  if (!mono) throw new Error(`cruce no reconocido: ${e}`);
+  return { tipo: 'monohibrido', p1: mono[1] as 'AA' | 'Aa' | 'aa', p2: mono[2] as 'AA' | 'Aa' | 'aa', pregunta };
+}
+
+test.describe('Cuadro de Punnett · re-inspección 07/11/2026 (casos para clase)', () => {
+  const seccion = (page: Page) => page.locator('section[aria-labelledby="casos-aula-titulo"]');
+
+  /** Teclea en la casilla, espera a que React lo tenga y devuelve el aviso de la app (no el de Next). */
+  async function responder(page: Page, texto: string): Promise<string> {
+    const casilla = seccion(page).locator('#casos-respuesta');
+    await casilla.fill(texto);
+    await esperarValorEnReact(page, casilla, texto);
+    await seccion(page).getByRole('button', { name: 'Comprobar' }).click();
+    const aviso = seccion(page).getByRole('alert');
+    await expect(aviso).toBeVisible();
+    return ((await aviso.textContent()) ?? '').trim();
+  }
+
+  async function irACaso(page: Page, id: number): Promise<void> {
+    await seccion(page).getByRole('button', { name: new RegExp(`^Caso ${id}:`) }).click();
+    await expect(seccion(page).locator('h3')).toHaveText(new RegExp(`^Caso ${id} · `));
+  }
+
+  test.beforeEach(async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarPaginaAsentada(page);
+  });
+
+  test('los doce casos, con la respuesta resuelta a mano en es-ES: «¡Correcto!» y la solución exacta', async ({ page }) => {
+    for (let id = 1; id <= 12; id++) {
+      await irACaso(page, id);
+      expect(await responder(page, TECLEADAS[id]), `caso ${id}`).toContain('¡Correcto!');
+      await seccion(page).getByRole('button', { name: 'Ver solución' }).click();
+      // textContent y toBe, no toHaveText: este normaliza el U+00A0 y no vería un espacio normal
+      expect(await seccion(page).locator('#casos-solucion strong').textContent(), `caso ${id}`).toBe(SOLUCIONES[id]);
+    }
+  });
+
+  test('corrección: punto decimal, tanto por uno, imposibles y redondeo, cada uno con su aviso', async ({ page }) => {
+    await irACaso(page, 7);
+    expect(await responder(page, '56.25')).toContain('¡Correcto!'); // punto decimal de México
+    await irACaso(page, 12);
+    expect(await responder(page, '0.375')).toContain('has escrito la proporción en tanto por uno');
+    await irACaso(page, 3);
+    expect(await responder(page, '101')).toContain('Un porcentaje no puede pasar del 100 %: repasa la cuenta.');
+    await irACaso(page, 5);
+    expect(await responder(page, '150,5')).toContain('Es un recuento: la respuesta es un número entero, sin decimales.');
+    expect(await responder(page, '1/4')).toContain('Escribe un número entero.');
+    await irACaso(page, 8);
+    expect(await responder(page, '6')).toContain('no redondees');
+  });
+
+  test.fail('ABIERTO (07/11/2026) — «6.250» para un 6,25 % se lee como 6250 y se rechaza por pasar del 100 %', async ({ page }) => {
+    // Obtenido el 07/11/2026: «Un porcentaje no puede pasar del 100 %: repasa la cuenta.» (y
+    // lo mismo con «37.500» en el caso 12). «6.25» y «6,250» dan «¡Correcto!». Esperado: la
+    // lectura más cercana a la respuesta, la de leerRespuestaAula (C0558).
+    expect(leerRespuesta('6.250', CASOS[7].datos, parseSpanishNumber)).toBe(6.25);
+    await irACaso(page, 8);
+    expect(await responder(page, '6.250')).toContain('¡Correcto!');
+    await irACaso(page, 12);
+    expect(await responder(page, '37.500')).toContain('¡Correcto!');
+  });
+
+  test('práctica: la solución que pinta coincide con un Mendel independiente leído del enunciado, y se corrige', async ({ page }) => {
+    const practicar = seccion(page).getByRole('button', { name: /Practicar/ });
+    for (let i = 0; i < 12; i++) {
+      await practicar.click();
+      await expect(practicar).toHaveAttribute('aria-pressed', 'true');
+      await expect(seccion(page).locator('h3')).toHaveText('Ejercicio de práctica');
+      await expect(seccion(page).getByRole('button', { name: /pista/ })).toHaveCount(0);
+      const enunciado = (await seccion(page).locator('p[aria-live]').textContent()) ?? '';
+      const esperado = mendelIndependiente(datosDesdeEnunciado(enunciado));
+      await seccion(page).getByRole('button', { name: 'Ver solución' }).click();
+      const cifra = ((await seccion(page).locator('#casos-solucion strong').textContent()) ?? '').replace(
+        /\s*(%|descendientes)$/,
+        '',
+      );
+      expect(parseSpanishNumber(cifra), enunciado).toBeCloseTo(esperado, 10);
+      expect(await responder(page, String(esperado).replace('.', ',')), enunciado).toContain('¡Correcto!');
+    }
+  });
+
+  test('FAQ única: las tres preguntas compartidas dicen lo mismo en el FAQPage y en la visible', async ({ page }) => {
+    interface Faq {
+      '@type': string;
+      mainEntity?: Array<{ name: string; acceptedAnswer: { text: string } }>;
+    }
+    const bloques = (await page.locator('script[type="application/ld+json"]').allTextContents()).map(
+      (t) => JSON.parse(t) as Faq,
+    );
+    const faq = bloques.find((b) => b['@type'] === 'FAQPage');
+    expect(faq?.mainEntity).toHaveLength(9);
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const visibles = await page.locator(clase('faqItem')).evaluateAll((els) =>
+      els.map((li) => ({
+        q: li.querySelector('strong')?.textContent?.trim() ?? '',
+        a: li.querySelector('p')?.textContent?.trim() ?? '',
+      })),
+    );
+    const compartidas = (faq?.mainEntity ?? []).filter((q) => visibles.some((v) => v.q === q.name));
+    expect(compartidas.map((q) => q.name)).toEqual([
+      '¿Cómo se hace un cuadro de Punnett paso a paso?',
+      '¿Qué proporciones da un cruce monohíbrido (3:1) y uno dihíbrido (9:3:3:1)?',
+      '¿Cómo se pasa de genotipo a fenotipo?',
+    ]);
+    for (const q of compartidas) {
+      expect(visibles.find((v) => v.q === q.name)?.a, q.name).toBe(q.acceptedAnswer.text);
+    }
+    // La frase del trihíbrido que la unificación pasó al FAQPage: a mano, 27+9+9+9+3+3+3+1 = 64 = 8 × 8
+    const proporciones = compartidas[1].acceptedAnswer.text;
+    expect(proporciones).toContain('8 × 8 = 64 combinaciones y produce la razón 27:9:9:9:3:3:3:1');
+    expect('27:9:9:9:3:3:3:1'.split(':').reduce((s, n) => s + Number(n), 0)).toBe(64);
+  });
+
+  test('relacionadas: el layout monta las 4 tarjetas', async ({ page }) => {
+    await expect(page.locator('section[aria-label="Aplicaciones relacionadas"] a')).toHaveCount(4);
+  });
+
+  test('contraste: el texto de la sección llega a 4,5:1 en claro y en oscuro', async ({ page }) => {
+    await page.addStyleTag({ content: SIN_TRANSICIONES });
+    // Medido el 07/11/2026 (76 medidas en los dos temas, meskeia.com y stemum.com): mínimo 4,50:1,
+    // «Ver pista» en oscuro (--primary-texto sobre el fondo de la sección).
+    const fallan: string[] = [];
+    for (const tema of ['claro', 'oscuro']) {
+      if (tema === 'oscuro') await aOscuro(page);
+      await irACaso(page, 3);
+      await page.mouse.move(0, 0);
+      const medir = async (nombre: string, loc: Locator) => {
+        const r = await contrasteReal(loc);
+        if (r < 4.5) fallan.push(`${tema} · ${nombre} ${r}:1`);
+      };
+      await medir('h3 del caso', seccion(page).locator('h3'));
+      await medir('botón del caso activo', seccion(page).getByRole('button', { name: /^Caso 3:/ }));
+      await medir('Comprobar', seccion(page).getByRole('button', { name: 'Comprobar' }));
+      await medir('Ver pista', seccion(page).getByRole('button', { name: 'Ver pista' }));
+      await responder(page, '100');
+      await medir('veredicto correcto', seccion(page).getByRole('alert'));
+      await responder(page, '7');
+      await medir('veredicto incorrecto', seccion(page).getByRole('alert'));
+      await seccion(page).getByRole('button', { name: 'Ver solución' }).click();
+      await medir('paso 1 de la solución', seccion(page).locator('#casos-solucion li').first());
+      await irACaso(page, 4);
+    }
+    expect(fallan).toEqual([]);
+  });
+
+  test('móvil (360 px): con la solución más larga abierta la página no se desborda', async ({ page }) => {
+    await page.setViewportSize({ width: 360, height: 800 });
+    await irACaso(page, 7);
+    await seccion(page).getByRole('button', { name: 'Ver solución' }).click();
+    await expect(seccion(page).locator('#casos-solucion li')).toHaveCount(4);
+    const anchos = await page.evaluate(() => ({
+      pagina: document.documentElement.scrollWidth,
+      ventana: window.innerWidth,
+    }));
+    expect(anchos.pagina).toBeLessThanOrEqual(anchos.ventana);
   });
 });

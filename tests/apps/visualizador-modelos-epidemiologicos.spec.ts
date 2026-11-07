@@ -49,6 +49,15 @@ import { esperarHidratacion, sembrarValor, sembrarValorAcotado } from './_hidrat
  * WebApplication, FAQ «aplanar la curva» corregida, «R₀ ≤ 1» y el mismo σ para la gripe. Los
  * casos que eran test.fail() pasan a REPARADO. Con RK4, los valores del SIR son los de la columna
  * «cerrado/RK4» de la tabla de arriba.
+ *
+ * CABO C0632 (Inspector, 07/11/2026, modo cabo): las letalidades de la tabla de enfermedades y la
+ * σ de la gripe, cotejadas con la OMS y el ECDC (en la red de fuentes oficiales desde el
+ * 04/11/2026). Las citas literales y sus URL van en cada caso del bloque final. Anclado:
+ * sarampión «0,2 %» (dentro del 1-3 por 1.000 del ECDC). Hallazgos (test.fail): Ébola «brote
+ * 2014» «50-90 %» (la OMS: 11.325 muertes en más de 28.600 casos, ≤ 39,6 %), COVID-19 «1-3 %»
+ * (la OMS: IFR 0,5-1 %; CFR de < 0,1 % a > 25 % según el país), la columna «Mortalidad» para
+ * cifras que la OMS llama «tasa de letalidad», y la gripe «σ ≈ 0,33 (≈ 3 días)» (OMS y ECDC:
+ * incubación de 2 días de media, de 1 a 4).
  */
 
 const URL_APP = '/visualizador-modelos-epidemiologicos/';
@@ -444,5 +453,104 @@ test.describe('Formato de los resultados y datos estructurados', () => {
     expect(respuesta).not.toBe('');
     expect(respuesta).not.toMatch(/cambia si la proporción vacunada/);
     expect(respuesta).toMatch(/sin necesidad de vacunar/);
+  });
+});
+
+/** «50-90 %» → [50, 90] · «0,2 %» → [0,2, 0,2]. NaN si la celda no es un porcentaje. */
+function rangoPorcentaje(texto: string): [number, number] {
+  const m = /^\s*([\d.,]+)\s*(?:[-–]\s*([\d.,]+))?\s*%/.exec(texto);
+  if (!m) return [NaN, NaN];
+  const bajo = aNumero(m[1]);
+  return [bajo, m[2] ? aNumero(m[2]) : bajo];
+}
+
+/** La celda de la columna `columna` (0 = Enfermedad) en la fila cuyo nombre contiene `nombre`. */
+async function celdaEnfermedad(page: Page, nombre: string, columna: number): Promise<string> {
+  const fila = page.locator('main table tbody tr').filter({ hasText: nombre });
+  return ((await fila.locator('td').nth(columna).textContent()) ?? '').trim();
+}
+
+test.describe('Cabo C0632 — letalidades y σ de la gripe contra la OMS y el ECDC', () => {
+  test.beforeEach(async ({ page }) => {
+    await abrir(page);
+  });
+
+  test('anclado · sarampión «0,2 %» cae dentro del 1-3 por 1.000 del ECDC', async ({ page }) => {
+    // ECDC, «Factsheet about measles» (https://www.ecdc.europa.eu/en/measles/facts, actualizada
+    // el 28/11/2023): «Case fatality is 1–3 per 1000 cases and highest in those younger than five
+    // years of age» → 0,1-0,3 %. La ficha de la OMS (https://www.who.int/news-room/fact-sheets/
+    // detail/measles, 15/07/2026) no da letalidad: 95.000 muertes en 2024, sobre todo en países de
+    // renta baja y en niños malnutridos.
+    await irAPestana(page, /Enfermedades/);
+    const [bajo, alto] = rangoPorcentaje(await celdaEnfermedad(page, 'Sarampión', 2));
+    expect(bajo).toBeGreaterThanOrEqual(0.1);
+    expect(alto).toBeLessThanOrEqual(0.3);
+  });
+
+  test('HALLAZGO (07/11/2026, ABIERTO) · Ébola «brote 2014»: la letalidad de ese brote no llega al 50 %', async ({ page }) => {
+    // OMS, «Ebola outbreak 2014-2016 - West Africa» (https://www.who.int/emergencies/situations/
+    // ebola-outbreak-2014-2016-West-Africa): «More than 28 600 people had been infected and
+    // 11 325 people had died» → 11.325 / 28.600 = 39,6 % como máximo. Y la ficha de la OMS
+    // (https://www.who.int/news-room/fact-sheets/detail/ebola-disease, 24/04/2025): «The average
+    // Ebola disease case fatality rate is around 50%. Case fatality rates have varied from 25–90%
+    // in past outbreaks.» Hoy la fila «Ébola (brote 2014)» dice «50-90 %»: ni el brote de 2014
+    // (≈ 40 %) ni el rango general (25-90 %) caben en él. Esperado: un valor o rango que contenga
+    // el ≈ 40 % del brote que nombra la fila.
+    test.fail();
+    await irAPestana(page, /Enfermedades/);
+    const [bajo, alto] = rangoPorcentaje(await celdaEnfermedad(page, 'Ébola', 2));
+    expect(bajo).toBeLessThanOrEqual(40);
+    expect(alto).toBeGreaterThanOrEqual(39);
+  });
+
+  test('HALLAZGO (07/11/2026, ABIERTO) · COVID-19 «1-3 %» no es la IFR de la OMS ni un rango de CFR que sostenga', async ({ page }) => {
+    // OMS, «Estimating mortality from COVID-19», resumen científico del 04/08/2020
+    // (https://www.who.int/news-room/commentaries/detail/estimating-mortality-from-covid-19):
+    // IFR «converging at approximately 0.5 - 1%» y CFR «from less than 0.1% to over 25%» según el
+    // país. La IFR es la única cifra acotada: esperado un rango dentro del 0,5-1 % (o la medida
+    // dicha con su fuente). Hoy: «1-3 %», sin decir si es CFR o IFR.
+    test.fail();
+    await irAPestana(page, /Enfermedades/);
+    const [bajo, alto] = rangoPorcentaje(await celdaEnfermedad(page, 'COVID-19', 2));
+    expect(bajo).toBeGreaterThanOrEqual(0.5);
+    expect(alto).toBeLessThanOrEqual(1);
+  });
+
+  test('HALLAZGO (07/11/2026, ABIERTO) · la columna dice «Mortalidad» y sus cifras son letalidades', async ({ page }) => {
+    // OMS en español, ficha del Ébola (https://www.who.int/es/news-room/fact-sheets/detail/
+    // ebola-disease, 24/04/2025): «La tasa media de letalidad ronda el 50 %. En brotes
+    // anteriores, esta tasa ha oscilado entre el 25 % y el 90 %.» Es la proporción de casos que
+    // mueren (la CFR del resumen de la OMS de 04/08/2020: «the proportion of individuals
+    // diagnosed with a disease who die from that disease»). La mortalidad se mide sobre la
+    // población, no sobre los casos. Hoy la cabecera es «Mortalidad» y la página no dice
+    // «letalidad» en ningún sitio.
+    test.fail();
+    await irAPestana(page, /Enfermedades/);
+    await expect(page.locator('main table thead th').nth(2)).toHaveText(/Letalidad/);
+  });
+
+  test('HALLAZGO (07/11/2026, ABIERTO) · la gripe incuba 2 días de media, no 3 (σ ≈ 0,5, no 0,33)', async ({ page }) => {
+    // OMS, «Influenza (seasonal)» (https://www.who.int/news-room/fact-sheets/detail/
+    // influenza-(seasonal), 28/02/2025): «the incubation period, is about 2 days, but ranges from
+    // 1–4 days». ECDC, «Factsheet about seasonal influenza» (https://www.ecdc.europa.eu/en/
+    // seasonal-influenza/facts/factsheet, 12/04/2022): «On average, the incubation period for
+    // seasonal influenza is two days, but ranges from one to four days», y contagia «between one
+    // day before symptom onset and five-to-seven days after onset» (el E del SEIR, que la página
+    // define como «todavía no son contagiosas», dura menos aún). Con 1/σ = 2 días, σ = 0,5 (el
+    // máximo del deslizador). Hoy: «Gripe: σ ≈ 0,33 (≈ 3 días)», y «Simular» gripe carga 0,33.
+    // Hasta la reparación de 4039 (04/11/2026) el recuadro decía «σ ≈ 0.5 (≈ 2 días)».
+    test.fail();
+    await irAPestana(page, /Modelo SEIR/);
+    await esperarHidratacion(page, [DESLIZADORES]);
+    const texto = (await page.locator('main').textContent()) ?? '';
+    const dias = /Gripe:\s*σ\s*≈\s*[\d.,]+\s*\(≈\s*(\d+(?:[.,]\d+)?)\s*días\)/.exec(texto)?.[1];
+    expect(dias, 'el recuadro «Compartimento E» da la incubación de la gripe').toBeDefined();
+    expect(aNumero(dias ?? 'NaN')).toBeCloseTo(2, 1);
+    await irAPestana(page, /Enfermedades/);
+    await page.getByRole('button', { name: /^Simular Gripe estacional/ }).click();
+    await irAPestana(page, /Modelo SEIR/);
+    await esperarHidratacion(page, [DESLIZADORES]);
+    const sigma = aNumero((await page.locator('main [class*="sliderValor"]').nth(2).textContent()) ?? '');
+    expect(1 / sigma).toBeLessThanOrEqual(2.5);
   });
 });

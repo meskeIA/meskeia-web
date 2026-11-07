@@ -77,6 +77,16 @@ import { esperarHidratacion, esperarValorEnReact, sembrarValor } from './_hidrat
  *   6. Bubble: el panel dice «Mejor O(n)» pero la versión animada no tiene salida temprana.
  *   7. «▶️ Reiniciar» aparece siempre DESHABILITADO al terminar; y en la comparativa, volver a pulsar
  *      «Empezar carrera» tras la meta hace avanzar el contador más allá del total (46 / 45).
+ *
+ * CABO C0544 (07/11/2026, comprobación puntual, sin hallazgo): `check:reloj-azar --todo` marcaba el
+ *   `useState(() => generateRandomArray(25))` de page.tsx, con Math.random, por la forma del
+ *   hallazgo alto de simulador-kmeans (a59e60ca): React 19 deja lo pintado por el servidor y el
+ *   algoritmo trabaja con otro array. Aquí NO pasa, medido en `next start`: el array solo existe
+ *   dibujado en el <canvas>, que se pinta en un efecto con el estado del cliente, y la etiqueta con
+ *   los valores espera a montar (SortingCanvas, `montado`). Lo servido es un lienzo vacío con
+ *   «Array de 25 valores» sin cifras; tras hidratar, los píxeles, la etiqueta y el estado de React
+ *   son el mismo array, el primer «Paso» compara sus dos primeras barras y no hay aviso de
+ *   hidratación. El caso de abajo lo deja como regresión.
  */
 
 const RUTA = '/visualizador-algoritmos/';
@@ -444,6 +454,86 @@ test.describe('Pseudocódigo resaltado, comparativa y controles', () => {
       expect(await metrica(page, 'Movimientos').textContent()).toBe('11');
     });
   });
+});
+
+// ─── Cabo C0544: lo pintado al cargar es lo que ordena el algoritmo ─────────────────────────
+
+/**
+ * Valores que DIBUJA el lienzo, leídos de sus píxeles: en la columna central de cada barra, la
+ * primera fila con el color de una barra (normal #2E86AB o comparando #FBBF24), convertida con la
+ * escala de SortingCanvas (relleno de 20 px, altura útil = alto − 40, valor = altura / útil ×
+ * maxValue). Las cifras blancas de encima no tienen ese color. Precisión ±1: en el lienzo de
+ * 300 px de alto, una unidad son 2,6 px.
+ */
+async function leerPintado(page: Page, n: number, maxValue: number): Promise<(number | null)[]> {
+  await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+  return page.evaluate(
+    ({ n, maxValue }) => {
+      const c = document.querySelector('canvas') as HTMLCanvasElement;
+      const ctx = c.getContext('2d') as CanvasRenderingContext2D;
+      const dpr = window.devicePixelRatio || 1;
+      const rect = c.getBoundingClientRect();
+      const relleno = 20;
+      const anchoBarra = (rect.width - relleno * 2) / n;
+      const util = rect.height - relleno * 2;
+      const datos = ctx.getImageData(0, 0, c.width, c.height).data;
+      const colores = [[0x2e, 0x86, 0xab], [0xfb, 0xbf, 0x24]];
+      const esBarra = (k: number) =>
+        colores.some(([r, g, b]) => Math.abs(datos[k] - r) + Math.abs(datos[k + 1] - g) + Math.abs(datos[k + 2] - b) < 30);
+      const valores: (number | null)[] = [];
+      for (let i = 0; i < n; i++) {
+        const x = Math.round((relleno + i * anchoBarra + anchoBarra / 2) * dpr);
+        let valor: number | null = null;
+        for (let y = 0; y < c.height; y++) {
+          if (esBarra((y * c.width + x) * 4)) {
+            valor = ((rect.height - relleno - y / dpr) / util) * maxValue;
+            break;
+          }
+        }
+        valores.push(valor);
+      }
+      return valores;
+    },
+    { n, maxValue },
+  );
+}
+
+test('CABO C0544 — las barras que se ven al cargar son el array que ordena el algoritmo, sin aviso de hidratación', async ({ page, request }) => {
+  // 1. Lo SERVIDO no lleva el array del prerender: lienzo vacío y etiqueta sin cifras (cabo C0544)
+  const html = await (await request.get(RUTA)).text();
+  expect(html).toMatch(/<canvas[^>]*aria-label="Array de 25 valores"[^>]*>Array de 25 valores<\/canvas>/);
+  expect(html).not.toMatch(/Array de \d+ valores: \d/);
+
+  // 2. Carga nueva escuchando la consola desde el principio
+  const avisos: string[] = [];
+  page.on('console', (m) => {
+    if (/hydrat|did not match|#418|#423|#425/i.test(m.text())) avisos.push(m.text());
+  });
+  page.on('pageerror', (e) => avisos.push(e.message));
+  await page.goto(RUTA);
+  await esperarHidratacion(page, ['#array-propio', '#speed-slider']);
+  const lienzo = page.getByRole('img', { name: /^Array de 25 valores: \d/ });
+  await expect(lienzo).toBeVisible();
+
+  // Estado de React = etiqueta = píxeles: el mismo array de 25
+  const estado = await leerBarras(page);
+  expect(estado).toHaveLength(25);
+  const etiqueta = (await lienzo.getAttribute('aria-label')) ?? '';
+  expect(etiqueta.split(': ')[1].split(', ').map(Number)).toEqual(estado);
+  const maxValue = Math.max(...estado, 100);
+  const pintado = await leerPintado(page, 25, maxValue);
+  pintado.forEach((v, i) => expect(Math.abs((v ?? -100) - estado[i]), `barra ${i}: pintada ${v}, estado ${estado[i]}`).toBeLessThanOrEqual(1));
+
+  // 3. El primer «Paso» de Bubble compara las dos primeras barras PINTADAS, y el gráfico no cambia
+  await page.getByRole('button', { name: /Paso$/ }).click();
+  await expect(contadorPasos(page)).toHaveText(/^Paso 1 de \d+$/);
+  await expect(page.locator('[class*="stepDescription"] p')).toHaveText(`Comparando ${estado[0]} con ${estado[1]}`);
+  expect(await leerBarras(page)).toEqual(estado);
+  const tras = await leerPintado(page, 25, maxValue);
+  tras.forEach((v, i) => expect(Math.abs((v ?? -100) - estado[i]), `barra ${i} tras el paso: pintada ${v}`).toBeLessThanOrEqual(1));
+
+  // 4. Ninguna advertencia de hidratación
+  expect(avisos).toEqual([]);
 });
 
 // ─── Contenido (1302-1305, 1307) ────────────────────────────────────────────────────────────

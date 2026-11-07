@@ -14,10 +14,10 @@ import { esperarHidratacion } from './_hidratacion';
  *   noble de Z menor (He 2, Ne 10, Ar 18, Kr 36, Xe 54, Rn 86); y la comprobación que enseña la
  *   propia guía de la app: «Los superíndices tienen que sumar exactamente el número de electrones
  *   de la especie». Las excepciones ancladas son las del encargo (Cr, Cu, Pd) y sus análogas de
- *   grupo (Mo, Ag, Au). La NIST Atomic Spectra Database no está en la lista de fuentes de la
- *   tarea, así que las otras catorce excepciones que declara la app (Nb, Ru, Rh, La, Ce, Gd, Pt,
- *   Ac, Th, Pa, U, Np, Cm, Lr) no se cotejan con una fuente: solo que la página es coherente con
- *   la lista que ella misma publica en su FAQ.
+ *   grupo (Mo, Ag, Au). Las otras catorce excepciones que declara la app (Nb, Ru, Rh, La, Ce, Gd,
+ *   Pt, Ac, Th, Pa, U, Np, Cm, Lr) quedaron sin fuente el 04/11/2026 (la NIST no estaba aún en la
+ *   red de la tarea); el cabo C0632 (07/11/2026) las ancla en la NIST Atomic Spectra Database,
+ *   junto con los iones, al final de este fichero.
  *
  *   CASO 1 · NORMAL — Fe, Z = 26, neutro (el elemento con el que abre la app)
  *     Madelung: 1s² 2s² 2p⁶ 3s² 3p⁶ 4s² 3d⁶ (2+2+6+2+6+2+6 = 26)
@@ -52,6 +52,10 @@ import { esperarHidratacion } from './_hidratacion';
  *   F · los botones de copiar se anuncian «en orden en orden de llenado»
  *   G · la guía da «el 20 % de las preguntas» sin fuente
  *   H · el magnetismo del átomo aislado se presenta como el de «la sustancia»
+ *
+ * CABO C0632 (07/11/2026): las catorce excepciones y 38 iones, contra la NIST ASD, coinciden.
+ * HALLAZGO ABIERTO: ocho iones (V⁺, Co⁺, Ni⁺, Y⁺, Ce²⁺, Th²⁺, Th³⁺, U²⁺) no dan el estado
+ * fundamental que publica la NIST (al final del fichero).
  */
 
 const RUTA = '/calculadora-configuracion-electronica/';
@@ -412,4 +416,131 @@ test('H · REPARADO: la guía no atribuye a la sustancia el magnetismo del átom
   expect(faq.join('\n')).not.toContain('la sustancia es paramagnética');
   await elegir(page, 'Cobre', 'Cu', 29);
   await expect(dato(page, 'Comportamiento magnético').locator('xpath=following-sibling::*[1]')).toContainText('átomo aislado');
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════════════════
+// CABO C0632 (07/11/2026) · las catorce excepciones y los iones contra la NIST ASD
+// ═══════════════════════════════════════════════════════════════════════════════════════════
+//
+// Fuente: NIST Atomic Spectra Database, «Ionization Energies Data», columnas «Ground Shells» y
+// «Ground Config.» (formulario https://physics.nist.gov/PhysRefData/ASD/ionEnergy.html), con las
+// consultas
+//   https://physics.nist.gov/cgi-bin/ASD/ie.pl?spectra=H-Lr+I&shells_out=on&conf_out=on&level_out=on
+//   https://physics.nist.gov/cgi-bin/ASD/ie.pl?spectra=La-Lr+I  (· Nb-Rh+I · Sc-Zn+II; Y-Cd+II ·
+//   La-Lu+IV · Fe+III; Cu+II; Eu+IV; Ce+III-V; Gd+III-IV; U+III-V; U+VII; Th+III-IV; La+III-IV)
+// leídas el 07/11/2026. Los núcleos, como los define la nota (a) de la propia NIST:
+// [Ar] = 1s2.2s2.2p6.3s2.3p6 · [Kr] = [Ar].3d10.4s2.4p6 · [Xe] = [Kr].4d10.5s2.5p6 ·
+// [Rn] = [Xe].4f14.5d10.6s2.6p6 ([Cd].5p6 = [Xe]; [Hg].6p6 = [Rn]). Ninguna de las catorce lleva
+// interrogante ni marca de asignación tentativa en la ASD. Los superíndices se comparan por
+// subnivel: «4d4.5s» de la NIST es el «4d⁴ 5s¹» de la app.
+
+test('C0632 · las catorce excepciones sin anclar coinciden con la NIST ASD', async ({ page }) => {
+  await abrir(page);
+  // [nombre, símbolo, Z, abreviada esperada, Ground Shells de la NIST tal cual]
+  const casos: [string, string, number, string, string][] = [
+    ['Niobio', 'Nb', 41, '[Kr] 4d⁴ 5s¹', 'Nb I · [Kr].4d4.5s'],
+    ['Rutenio', 'Ru', 44, '[Kr] 4d⁷ 5s¹', 'Ru I · [Kr].4d7.5s'],
+    ['Rodio', 'Rh', 45, '[Kr] 4d⁸ 5s¹', 'Rh I · [Kr].4d8.5s'],
+    ['Lantano', 'La', 57, '[Xe] 5d¹ 6s²', 'La I · [Xe].5d.6s2'],
+    ['Cerio', 'Ce', 58, '[Xe] 4f¹ 5d¹ 6s²', 'Ce I · [Xe].4f.5d.6s2'],
+    ['Gadolinio', 'Gd', 64, '[Xe] 4f⁷ 5d¹ 6s²', 'Gd I · [Xe].4f7.5d.6s2'],
+    ['Platino', 'Pt', 78, '[Xe] 4f¹⁴ 5d⁹ 6s¹', 'Pt I · [Xe].4f14.5d9.6s'],
+    ['Actinio', 'Ac', 89, '[Rn] 6d¹ 7s²', 'Ac I · [Rn].6d.7s2'],
+    ['Torio', 'Th', 90, '[Rn] 6d² 7s²', 'Th I · [Rn].6d2.7s2'],
+    ['Protactinio', 'Pa', 91, '[Rn] 5f² 6d¹ 7s²', 'Pa I · [Rn].5f2.6d.7s2'],
+    ['Uranio', 'U', 92, '[Rn] 5f³ 6d¹ 7s²', 'U I · [Rn].5f3.6d.7s2'],
+    ['Neptunio', 'Np', 93, '[Rn] 5f⁴ 6d¹ 7s²', 'Np I · [Rn].5f4.6d.7s2'],
+    ['Curio', 'Cm', 96, '[Rn] 5f⁷ 6d¹ 7s²', 'Cm I · [Rn].5f7.6d.7s2'],
+    ['Lawrencio', 'Lr', 103, '[Rn] 5f¹⁴ 7s² 7p¹', 'Lr I · [Rn].5f14.7s2.7p'],
+  ];
+  for (const [nombre, simbolo, z, abreviada, nist] of casos) {
+    await elegir(page, nombre, simbolo, z);
+    await expect(linea(page, 'Abreviada con gas noble'), nist).toHaveText(abreviada);
+    await expect(page.locator('h3', { hasText: 'Este elemento es una excepción' }), nist).toHaveCount(1);
+  }
+});
+
+// Iones: los que toca el cambio de ionizar() de 445eae05 (tras el s y el d sale el f, sin tocar
+// el núcleo: toda la serie Ln³⁺ y U³⁺; Eu³⁺, Ce⁴⁺, U⁴⁺ y U⁶⁺ ya están en el caso A) y los que
+// pierden antes el ns (Fe²⁺, Cu⁺ y los cationes monovalentes del bloque d que la NIST no
+// reordena). Coinciden todos con la NIST; con los cuatro del caso A son 38 de los 46 cotejados.
+test('C0632 · los iones que toca ionizar() coinciden con la NIST ASD', async ({ page }) => {
+  await abrir(page);
+  // [nombre, símbolo, Z, especie, abreviada esperada, espectro y Ground Shells de la NIST]
+  const casos: [string, string, number, string, string, string][] = [
+    ['Hierro', 'Fe', 26, 'Fe²⁺', '[Ar] 3d⁶', 'Fe III · [Ar].3d6'],
+    ['Cobre', 'Cu', 29, 'Cu⁺', '[Ar] 3d¹⁰', 'Cu II · [Ar].3d10'],
+    ['Hierro', 'Fe', 26, 'Fe⁺', '[Ar] 3d⁶ 4s¹', 'Fe II · [Ar].3d6.4s'],
+    ['Cromo', 'Cr', 24, 'Cr⁺', '[Ar] 3d⁵', 'Cr II · [Ar].3d5'],
+    ['Escandio', 'Sc', 21, 'Sc⁺', '[Ar] 3d¹ 4s¹', 'Sc II · [Ar].3d.4s'],
+    ['Titanio', 'Ti', 22, 'Ti⁺', '[Ar] 3d² 4s¹', 'Ti II · [Ar].3d2.4s'],
+    ['Manganeso', 'Mn', 25, 'Mn⁺', '[Ar] 3d⁵ 4s¹', 'Mn II · [Ar].3d5.4s'],
+    ['Zinc', 'Zn', 30, 'Zn⁺', '[Ar] 3d¹⁰ 4s¹', 'Zn II · [Ar].3d10.4s'],
+    ['Circonio', 'Zr', 40, 'Zr⁺', '[Kr] 4d² 5s¹', 'Zr II · [Kr].4d2.5s'],
+    ['Molibdeno', 'Mo', 42, 'Mo⁺', '[Kr] 4d⁵', 'Mo II · [Kr].4d5'],
+    ['Tecnecio', 'Tc', 43, 'Tc⁺', '[Kr] 4d⁵ 5s¹', 'Tc II · [Kr].4d5.5s'],
+    ['Cadmio', 'Cd', 48, 'Cd⁺', '[Kr] 4d¹⁰ 5s¹', 'Cd II · [Kr].4d10.5s'],
+    ['Niobio', 'Nb', 41, 'Nb⁺', '[Kr] 4d⁴', 'Nb II · [Kr].4d4'],
+    ['Rutenio', 'Ru', 44, 'Ru⁺', '[Kr] 4d⁷', 'Ru II · [Kr].4d7'],
+    ['Rodio', 'Rh', 45, 'Rh⁺', '[Kr] 4d⁸', 'Rh II · [Kr].4d8'],
+    ['Paladio', 'Pd', 46, 'Pd⁺', '[Kr] 4d⁹', 'Pd II · [Kr].4d9'],
+    ['Plata', 'Ag', 47, 'Ag⁺', '[Kr] 4d¹⁰', 'Ag II · [Kr].4d10'],
+    ['Lantano', 'La', 57, 'La²⁺', '[Xe] 5d¹', 'La III · [Xe].5d'],
+    ['Lantano', 'La', 57, 'La³⁺', '[Xe]', 'La IV · [Cd].5p6'],
+    ['Cerio', 'Ce', 58, 'Ce³⁺', '[Xe] 4f¹', 'Ce IV · [Xe].4f'],
+    ['Praseodimio', 'Pr', 59, 'Pr³⁺', '[Xe] 4f²', 'Pr IV · [Xe].4f2'],
+    ['Neodimio', 'Nd', 60, 'Nd³⁺', '[Xe] 4f³', 'Nd IV · [Xe].4f3'],
+    ['Prometio', 'Pm', 61, 'Pm³⁺', '[Xe] 4f⁴', 'Pm IV · [Xe].4f4'],
+    ['Samario', 'Sm', 62, 'Sm³⁺', '[Xe] 4f⁵', 'Sm IV · [Xe].4f5'],
+    ['Gadolinio', 'Gd', 64, 'Gd²⁺', '[Xe] 4f⁷ 5d¹', 'Gd III · [Xe].4f7.5d'],
+    ['Gadolinio', 'Gd', 64, 'Gd³⁺', '[Xe] 4f⁷', 'Gd IV · [Xe].4f7'],
+    ['Terbio', 'Tb', 65, 'Tb³⁺', '[Xe] 4f⁸', 'Tb IV · [Xe].4f8'],
+    ['Disprosio', 'Dy', 66, 'Dy³⁺', '[Xe] 4f⁹', 'Dy IV · [Xe].4f9'],
+    ['Holmio', 'Ho', 67, 'Ho³⁺', '[Xe] 4f¹⁰', 'Ho IV · [Xe].4f10'],
+    ['Erbio', 'Er', 68, 'Er³⁺', '[Xe] 4f¹¹', 'Er IV · [Xe].4f11'],
+    ['Tulio', 'Tm', 69, 'Tm³⁺', '[Xe] 4f¹²', 'Tm IV · [Xe].4f12'],
+    ['Iterbio', 'Yb', 70, 'Yb³⁺', '[Xe] 4f¹³', 'Yb IV · [Xe].4f13'],
+    ['Lutecio', 'Lu', 71, 'Lu³⁺', '[Xe] 4f¹⁴', 'Lu IV · [Xe].4f14'],
+    ['Uranio', 'U', 92, 'U³⁺', '[Rn] 5f³', 'U IV · [Rn].5f3'],
+  ];
+  for (const [nombre, simbolo, z, especie, abreviada, nist] of casos) {
+    await elegir(page, nombre, simbolo, z);
+    await carga(page, especie);
+    await expect(linea(page, 'Abreviada con gas noble'), nist).toHaveText(abreviada);
+  }
+});
+
+// HALLAZGO (07/11/2026, ABIERTO) · cabo C0632. ionizar() quita siempre los electrones del n más
+// alto de fuera del núcleo y deja quietos los demás, pero el estado fundamental del ion libre que
+// mide la NIST no siempre sale de vaciar el neutro: en ocho de los 46 iones cotejados el ion se
+// reordena (el s o el d que queda pasa al d o al f). No es del cambio de 445eae05: con la regla
+// anterior salían igual. En el Ce²⁺, Th²⁺, Th³⁺ y U²⁺, además, el aviso de excepción presenta la
+// configuración de la app como «lo que se mide en el laboratorio».
+//   V⁺  (V II)   NIST [Ar].3d4      · app [Ar] 3d³ 4s¹
+//   Co⁺ (Co II)  NIST [Ar].3d8      · app [Ar] 3d⁷ 4s¹
+//   Ni⁺ (Ni II)  NIST [Ar].3d9      · app [Ar] 3d⁸ 4s¹
+//   Y⁺  (Y II)   NIST [Kr].5s2      · app [Kr] 4d¹ 5s¹
+//   Ce²⁺ (Ce III) NIST [Xe].4f2     · app [Xe] 4f¹ 5d¹
+//   Th²⁺ (Th III) NIST [Rn].5f.6d   · app [Rn] 6d²
+//   Th³⁺ (Th IV)  NIST [Rn].5f      · app [Rn] 6d¹
+//   U²⁺  (U III)  NIST [Rn].5f4     · app [Rn] 5f³ 6d¹
+// Esperado: la configuración del estado fundamental que publica la NIST ASD.
+test('HALLAZGO (07/11/2026, ABIERTO) · cabo C0632: ocho iones no dan el estado fundamental de la NIST', async ({ page }) => {
+  test.fail();
+  await abrir(page);
+  const casos: [string, string, number, string, string, string][] = [
+    ['Vanadio', 'V', 23, 'V⁺', '[Ar] 3d⁴', 'V II · [Ar].3d4'],
+    ['Cobalto', 'Co', 27, 'Co⁺', '[Ar] 3d⁸', 'Co II · [Ar].3d8'],
+    ['Níquel', 'Ni', 28, 'Ni⁺', '[Ar] 3d⁹', 'Ni II · [Ar].3d9'],
+    ['Itrio', 'Y', 39, 'Y⁺', '[Kr] 5s²', 'Y II · [Kr].5s2'],
+    ['Cerio', 'Ce', 58, 'Ce²⁺', '[Xe] 4f²', 'Ce III · [Xe].4f2'],
+    ['Torio', 'Th', 90, 'Th²⁺', '[Rn] 5f¹ 6d¹', 'Th III · [Rn].5f.6d'],
+    ['Torio', 'Th', 90, 'Th³⁺', '[Rn] 5f¹', 'Th IV · [Rn].5f'],
+    ['Uranio', 'U', 92, 'U²⁺', '[Rn] 5f⁴', 'U III · [Rn].5f4'],
+  ];
+  for (const [nombre, simbolo, z, especie, abreviada, nist] of casos) {
+    await elegir(page, nombre, simbolo, z);
+    await carga(page, especie);
+    await expect.soft(linea(page, 'Abreviada con gas noble'), nist).toHaveText(abreviada, { timeout: 2000 });
+  }
 });

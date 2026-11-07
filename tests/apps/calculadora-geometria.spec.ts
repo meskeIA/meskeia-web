@@ -1,4 +1,4 @@
-import { test, expect, Locator, Page } from '@playwright/test';
+import { test, expect, devices, Locator, Page } from '@playwright/test';
 import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
 
 /**
@@ -76,8 +76,9 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  * supuesto o se pide el dato que falta. Ahora hace las dos cosas según lo que se teclee.
  *
  * CABO C0386 (05/11/2026), al final: las 15 clases del bloque educativo que el .module.css no
- * declara. Un hallazgo ABIERTO, con test.fail() y un caso hermano en verde que garantiza que
- * los localizadores siguen encontrando lo que mide.
+ * declaraba. Hallazgo 4147, REPARADO en e6fbd112 el mismo día, con un caso hermano que
+ * garantiza que los localizadores siguen encontrando lo que miden. Comprobado de nuevo el
+ * 07/11/2026 (cabo C0386, modo cabo): escritorio y Pixel 7, claro y oscuro, en el último bloque.
  */
 
 /** Texto de un nodo, con el espacio duro de Intl normalizado. */
@@ -418,7 +419,10 @@ test.describe('Los 5 hallazgos del 18/09/2026, reparados el mismo día', () => {
 });
 
 test.describe('Cabo C0386 (05/11/2026) · las 15 clases del bloque educativo sin declarar', () => {
-  // page.tsx usa 15 clases que CalculadoraGeometria.module.css no declara, todas dentro de
+  // REPARADO (hallazgo 4147, e6fbd112, 05/11/2026): las 15 clases ya están declaradas en el
+  // módulo. Lo que sigue describe lo que se midió ANTES de reparar.
+  //
+  // page.tsx usaba 15 clases que CalculadoraGeometria.module.css no declaraba, todas dentro de
   // <EducationalSection>: comparisonTable (l. 642), tableRow (643-715, 10 filas), tableHeader
   // (644-646), tableCell (650-716, 27 celdas), faqList (670, 684 y una por pregunta), faqItem,
   // faqQuestion y faqAnswer (798-894, 8 preguntas), stepByStep (915), step, stepNumber y
@@ -449,9 +453,10 @@ test.describe('Cabo C0386 (05/11/2026) · las 15 clases del bloque educativo sin
     return guia;
   }
 
-  test('C0386 · lo que mide el caso ABIERTO está en la guía y se ve', async ({ page }) => {
-    // Caso hermano, en verde antes y después de reparar: si el texto de la guía cambia, el caso
-    // ABIERTO fallaría por no encontrar sus anclas y test.fail() lo daría por bueno. Esto lo impide.
+  test('C0386 · lo que mide el caso del 4147 (REPARADO) está en la guía y se ve', async ({ page }) => {
+    // Caso hermano, en verde antes y después de reparar. Nació para que test.fail() no diera
+    // por bueno un caso que fallase por perder sus anclas; con el 4147 REPARADO sigue sirviendo:
+    // si el texto de la guía cambia, el fallo dice que cambió la guía, no la maqueta.
     const guia = await abrirGuia(page);
     await expect(guia.getByText('Figuras 2D', { exact: true })).toBeVisible();
     await expect(guia.getByText('Longitud y anchura (plano)', { exact: true })).toBeVisible();
@@ -509,4 +514,210 @@ test.describe('Cabo C0386 (05/11/2026) · las 15 clases del bloque educativo sin
     const anchoDoc = await page.evaluate(() => document.documentElement.scrollWidth);
     expect(anchoDoc).toBeLessThanOrEqual(390);
   });
+});
+
+// ───────────────────────────────────────────────────────────────────────────────
+// Cabo C0386, hallazgo 4147 · comprobación puntual del 07/11/2026: ¿se sostiene e6fbd112?
+// ───────────────────────────────────────────────────────────────────────────────
+/**
+ * Esperado, de la estructura de page.tsx (l. 642-720 y 795-897) y de la propia reparación:
+ *   · La «Comparación Completa» lleva class y tiene 10 filas (cabecera + 9), cada una con class
+ *     y TRES celdas que comparten la misma coordenada vertical, con la x creciendo de izquierda
+ *     a derecha. Antes de reparar, la 2D y la 3D de «Dimensiones» estaban una debajo de otra.
+ *   · 0 <div>/<ul> sin class en la guía (eran 80 div y 10 ul). Lo que queda sin class son h2,
+ *     h3, h4, p y li, que el módulo pinta por selector descendiente (.contentCard p…).
+ *   · Las 10 listas de la guía (2 de la tabla y 8 de la FAQ) con su sangría, y las 8 preguntas
+ *     de la FAQ en tarjeta con borde y separadas de la siguiente.
+ *   · Contraste del texto de la tabla ≥ 4,5:1 (WCAG 2.x, texto pequeño), calculado a mano antes
+ *     de medir:
+ *       claro  — celda #666666 sobre la fila alterna #F5F5F5: 5,27:1 (sobre #FFFFFF, 5,74:1);
+ *                cabecera #FFFFFF sobre --primary-boton #26718F: 5,47:1.
+ *       oscuro — celda #B0B0B0 sobre la fila alterna: con el --hover #383838 de globals saldría
+ *                5,41:1, pero el módulo lo redeclara #333333 en oscuro → 5,83:1 (sobre el
+ *                #2D2D2D de la tabla, 6,36:1); cabecera, 5,47:1 igual.
+ * Medido el 07/11/2026, igual a 1280 px y en Pixel 7: mínimo 5,27 en claro y 5,47 en oscuro.
+ */
+interface MedidaGuia {
+  claseTabla: string;
+  filas: { clase: string; n: number; tops: number[]; lefts: number[] }[];
+  divUlSinClase: number;
+  listas: { clase: string; sangria: number }[];
+  preguntas: { clase: string; borde: number }[];
+  huecosFaq: number[];
+  contrasteMin: { texto: string; ratio: number };
+  anchoDoc: number;
+}
+
+async function medirGuia(page: Page): Promise<MedidaGuia> {
+  return page.locator('[data-guia-educativa]').evaluate((guia): MedidaGuia => {
+    const leer = (c: string): number[] => {
+      const m = c.match(/rgba?\(([^)]+)\)/);
+      if (!m) return [0, 0, 0, 0];
+      const p = m[1].split(/[ ,/]+/).filter(Boolean).map(Number);
+      return [p[0], p[1], p[2], p.length > 3 ? p[3] : 1];
+    };
+    const sobre = (a: number[], b: number[]): number[] =>
+      [0, 1, 2].map((i) => a[i] * a[3] + b[i] * (1 - a[3])).concat(1);
+    const fondo = (el: Element): number[] => {
+      const capas: number[][] = [];
+      for (let e: Element | null = el; e; e = e.parentElement) {
+        const c = leer(getComputedStyle(e).backgroundColor);
+        if (c[3] > 0) capas.push(c);
+        if (c[3] >= 1) break;
+      }
+      return capas.reverse().reduce((res, capa) => sobre(capa, res), [255, 255, 255, 1]);
+    };
+    const lum = (c: number[]): number => {
+      const f = (v: number): number => {
+        const s = v / 255;
+        return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+      };
+      return 0.2126 * f(c[0]) + 0.7152 * f(c[1]) + 0.0722 * f(c[2]);
+    };
+    const ratio = (el: Element): number => {
+      const bg = fondo(el);
+      const fg = sobre(leer(getComputedStyle(el).color), bg);
+      const [hi, lo] = [lum(fg), lum(bg)].sort((x, y) => y - x);
+      return Math.round(((hi + 0.05) / (lo + 0.05)) * 100) / 100;
+    };
+
+    // La tabla se busca por su texto, no por su class: si la class volviera a faltar, la
+    // medida tiene que decirlo en vez de no encontrar nada.
+    const cabecera = [...guia.querySelectorAll('div')].find((d) => (d.textContent ?? '').trim() === 'Característica');
+    const tabla = cabecera?.parentElement?.parentElement;
+    if (!tabla) throw new Error('no encuentro la tabla 2D/3D (celda «Característica»)');
+    const filas = [...tabla.children].map((f) => {
+      const rects = [...f.children].map((c) => c.getBoundingClientRect());
+      return {
+        clase: f.getAttribute('class') ?? '',
+        n: rects.length,
+        tops: rects.map((r) => Math.round(r.top)),
+        lefts: rects.map((r) => Math.round(r.left)),
+      };
+    });
+    const divUlSinClase = [...guia.querySelectorAll('div, ul')].filter((e) => !(e.getAttribute('class') ?? '').trim()).length;
+    const listas = [...guia.querySelectorAll('ul')].map((u) => ({
+      clase: u.getAttribute('class') ?? '',
+      sangria: parseFloat(getComputedStyle(u).paddingLeft),
+    }));
+    const tarjetas = [...guia.querySelectorAll('h4')]
+      .filter((h) => (h.textContent ?? '').trim().startsWith('¿'))
+      .map((h) => h.parentElement as HTMLElement);
+    const preguntas = tarjetas.map((t) => ({
+      clase: t.getAttribute('class') ?? '',
+      borde: parseFloat(getComputedStyle(t).borderTopWidth),
+    }));
+    const huecosFaq = tarjetas
+      .slice(1)
+      .map((t, i) => Math.round(t.getBoundingClientRect().top - tarjetas[i].getBoundingClientRect().bottom));
+    let contrasteMin = { texto: '', ratio: 99 };
+    for (const e of tabla.querySelectorAll('*')) {
+      const tieneTexto = [...e.childNodes].some((n) => n.nodeType === Node.TEXT_NODE && (n.textContent ?? '').trim());
+      if (!tieneTexto) continue;
+      const r = ratio(e);
+      if (r < contrasteMin.ratio) contrasteMin = { texto: (e.textContent ?? '').trim().slice(0, 40), ratio: r };
+    }
+    return {
+      claseTabla: tabla.getAttribute('class') ?? '',
+      filas,
+      divUlSinClase,
+      listas,
+      preguntas,
+      huecosFaq,
+      contrasteMin,
+      anchoDoc: document.documentElement.scrollWidth,
+    };
+  });
+}
+
+/** Sin overlay de Next ni transiciones, y dos lecturas seguidas iguales (receta de simulador-puertas-logicas). */
+async function medirGuiaEstable(page: Page): Promise<MedidaGuia> {
+  await page.addStyleTag({
+    content: 'nextjs-portal { display: none !important; } *, *::before, *::after { animation: none !important; transition: none !important; }',
+  });
+  let previa = await medirGuia(page);
+  for (let i = 0; i < 20; i++) {
+    await page.waitForTimeout(150);
+    const actual = await medirGuia(page);
+    if (JSON.stringify(actual) === JSON.stringify(previa)) return actual;
+    previa = actual;
+  }
+  throw new Error('la medida de la guía no se estabiliza');
+}
+
+/** Tema oscuro con el conmutador de la propia web, no sembrando data-theme (el gestor lo pisa). */
+async function ponerTema(page: Page, tema: 'claro' | 'oscuro'): Promise<void> {
+  const html = page.locator('html');
+  if (tema === 'claro') {
+    await expect(html).not.toHaveAttribute('data-theme', 'dark');
+    return;
+  }
+  await page.emulateMedia({ colorScheme: 'dark' });
+  await expect(async () => {
+    if ((await html.getAttribute('data-theme')) !== 'dark') {
+      await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).click({ timeout: 1000 });
+    }
+    await expect(html).toHaveAttribute('data-theme', 'dark', { timeout: 1000 });
+  }).toPass({ timeout: 15000 });
+}
+
+async function comprobarGuiaMaquetada(page: Page, tema: 'claro' | 'oscuro'): Promise<void> {
+  await ponerTema(page, tema);
+  await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+  await expect(page.locator('[data-guia-educativa]').getByText('Característica', { exact: true })).toBeVisible();
+  const m = await medirGuiaEstable(page);
+  const anchoVista = page.viewportSize()?.width ?? 0;
+
+  expect(m.claseTabla, 'la tabla 2D/3D lleva class').toMatch(/comparisonTable/);
+  expect(m.filas, 'cabecera + 9 filas').toHaveLength(10);
+  for (const [i, f] of m.filas.entries()) {
+    expect.soft(f.clase, `fila ${i}: class`).toMatch(/tableRow/);
+    expect.soft(f.n, `fila ${i}: tres celdas`).toBe(3);
+    expect.soft(Math.max(...f.tops) - Math.min(...f.tops), `fila ${i}: las tres celdas a la misma altura (${f.tops.join(', ')})`).toBeLessThanOrEqual(1);
+    expect.soft(f.lefts[0] < f.lefts[1] && f.lefts[1] < f.lefts[2], `fila ${i}: columnas de izquierda a derecha (${f.lefts.join(', ')})`).toBe(true);
+  }
+  expect.soft(m.divUlSinClase, '<div>/<ul> de la guía sin class (eran 80 + 10)').toBe(0);
+  expect.soft(m.listas, 'las 10 listas de la guía').toHaveLength(10);
+  for (const [i, l] of m.listas.entries()) {
+    expect.soft(l.clase, `lista ${i}: class`).toMatch(/faqList/);
+    expect.soft(l.sangria, `lista ${i}: sangría`).toBeGreaterThanOrEqual(16);
+  }
+  expect.soft(m.preguntas, 'las 8 preguntas de la FAQ').toHaveLength(8);
+  for (const [i, p] of m.preguntas.entries()) {
+    expect.soft(p.clase, `pregunta ${i}: class`).toMatch(/faqItem/);
+    expect.soft(p.borde, `pregunta ${i}: borde de la tarjeta`).toBeGreaterThanOrEqual(1);
+  }
+  for (const [i, h] of m.huecosFaq.entries()) {
+    expect.soft(h, `hueco entre la pregunta ${i} y la ${i + 1}`).toBeGreaterThanOrEqual(8);
+  }
+  expect
+    .soft(m.contrasteMin.ratio, `contraste mínimo del texto de la tabla en ${tema} («${m.contrasteMin.texto}»)`)
+    .toBeGreaterThanOrEqual(4.5);
+  expect.soft(m.anchoDoc, 'sin desbordamiento horizontal').toBeLessThanOrEqual(anchoVista);
+}
+
+test.describe('Cabo C0386, hallazgo 4147 (07/11/2026) · escritorio: la reparación se sostiene', () => {
+  test.use({ viewport: { width: 1280, height: 800 } });
+  for (const tema of ['claro', 'oscuro'] as const) {
+    test(`4147 · ${tema}: tabla 2D/3D en tres columnas, FAQ en tarjetas y texto de la tabla ≥ 4,5:1`, async ({ page }) => {
+      await comprobarGuiaMaquetada(page, tema);
+    });
+  }
+});
+
+test.describe('Cabo C0386, hallazgo 4147 (07/11/2026) · Pixel 7: la reparación se sostiene', () => {
+  // Enumerado y no `...devices['Pixel 7']`: este arrastra defaultBrowserType, que es de worker.
+  const pixel7 = devices['Pixel 7'];
+  test.use({
+    viewport: pixel7.viewport,
+    userAgent: pixel7.userAgent,
+    deviceScaleFactor: pixel7.deviceScaleFactor,
+    isMobile: pixel7.isMobile,
+    hasTouch: pixel7.hasTouch,
+  });
+  for (const tema of ['claro', 'oscuro'] as const) {
+    test(`4147 · ${tema}: tabla 2D/3D en tres columnas, FAQ en tarjetas y texto de la tabla ≥ 4,5:1`, async ({ page }) => {
+      await comprobarGuiaMaquetada(page, tema);
+    });
+  }
 });

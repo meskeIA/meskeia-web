@@ -1452,7 +1452,7 @@ test.describe('Simulador Módulos vs Estimación Directa — inspección de camb
   });
 
   /**
-   * Lo que SÍ es correcto del caso del hallazgo abierto de abajo (30.000/20.000/227 con «30.000»):
+   * Lo que ya era correcto en el caso del hallazgo 4133 de abajo (REPARADO el 05/11/2026; 30.000/20.000/227 con «30.000»):
    *   ED: 10.000 − 2.724 = 7.276 · 5 % = 363,80 → 6.912,20 (≤ 8.000) · − 1.620 → 5.292,20 < mínimo
    *     → IRPF 0,00 · coste 2.724,00 €. Aviso: (10.000 − 363,80) × 0,0775 = 746,81 €/mes → tabla
    *     reducida, tramo 2, mínima 226,47 ≤ 227 → sin aviso.
@@ -1473,7 +1473,7 @@ test.describe('Simulador Módulos vs Estimación Directa — inspección de camb
   });
 
   /**
-   * HALLAZGO (inspector 05/11/2026, ABIERTO) — la columna de módulos no busca su tramo del RETA.
+   * HALLAZGO 4133 (inspector 05/11/2026, REPARADO el mismo día) — la columna de módulos no buscaba su tramo del RETA.
    *
    * La cuota es UNA para las dos columnas y el aviso solo la contrasta con el computable de la
    * DIRECTA. En estimación objetiva el computable es otro: «el rendimiento neto previo» (art. 308.1.c,
@@ -1630,6 +1630,133 @@ test.describe('Simulador Módulos vs Estimación Directa — inspección de camb
       '/calculadora-iva/',
       '/simulador-irpf-tramos/',
     ]);
+  });
+});
+
+/**
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Inspección de CAMBIO del 07/11/2026 (git diff c0d14a75..HEAD)
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Qué cambió: e9195380 (cabo C0648) traslada el contraste de la cuota RETA con el tramo de cada
+ * régimen de la página al motor `lib/calculadoras/modulosVsDirecta.ts`, para que la tool del MCP
+ * avise igual. Cada columna trae su `retaBajoMinimo` y la página solo lo pinta. Leído el diff, la
+ * lógica es la misma: el motor pasa `retaMensual × 12`, que es lo que valía `cuotaRetaDeducida`.
+ *
+ * Los casos ejercitan lo que los anteriores no tocaban: las DOS columnas avisando a la vez, cada una
+ * con su tramo, y la columna de módulos en la tabla REDUCIDA justo en una frontera.
+ *
+ * Cómo se calcula el esperado (a mano, ANTES de mirar la app):
+ *   · Computable del art. 308.1.c LGSS (`rendimientoComputableMensualRETA`, data/fiscal/autonomos.ts):
+ *     directa = (rendimiento neto + cuotas) × 0,93 / 12, es decir (ingresos − gastos − 5 % con tope)
+ *     × 0,0775; módulos = rendimiento neto previo × 0,93 / 12, sin sumar cuotas, con el dato
+ *     tecleado como previo.
+ *   · Tramos y bases mínimas: `TRAMOS_RETA_2025` (copia del art. 18 de la Orden PJC/297/2026). La
+ *     cuota mínima es la base mínima × 31,50 % (`TIPO_COTIZACION_RETA`), redondeada al céntimo:
+ *     reducida 1 (≤ 670) 653,59 → 205,88 € · reducida 2 (> 670 y ≤ 900) 718,95 → 226,47 € ·
+ *     general 5 (> 1.850 y ≤ 2.030) 1.209,15 → 380,88 € · general 8 (> 2.760 y ≤ 3.190)
+ *     1.437,91 → 452,94 €.
+ *   · Escala `TRAMOS_IRPF_2025` y mínimo personal 5.550 € (data/fiscal/irpf.ts); 5 % con tope de
+ *     2.000 € en directa (`GASTOS_DIFICIL_JUSTIFICACION_EDS`) y 5 % sin tope en módulos
+ *     (`REDUCCION_GENERAL_MODULOS`); art. 32.2.3.º (`REDUCCION_ACTIVIDADES_RENTAS_BAJAS`): 1.620 €
+ *     con rentas ≤ 8.000 €, 1.620 − 0,405 × (rentas − 8.000) hasta 12.000 €.
+ */
+test.describe('Simulador Módulos vs Estimación Directa — inspección de cambio del 07/11/2026', () => {
+  /**
+   * 30.000 / 4.500 / 370 €/mes con «40.000» de módulos: avisan LAS DOS columnas, cada una con su
+   * tramo.
+   *   Directa: 25.500 − 4.440 = 21.060 · 5 % = 1.053 → 20.007 = base (rentas > 12.000)
+   *     escala(20.007) = 2.365,50 + 7.557 × 24 % = 2.365,50 + 1.813,68 = 4.179,18
+   *     IRPF 4.179,18 − 1.054,50 = 3.124,68 · coste 3.124,68 + 4.440 = 7.564,68 €
+   *     Aviso: (25.500 − 1.053) × 0,0775 = 1.894,6425 → 1.894,64 €/mes → tabla general, tramo 5,
+   *     mínima 380,88 € → (380,88 − 370) × 12 = 130,56 €.
+   *   Módulos: 40.000 − 2.000 = 38.000 = base
+   *     escala(38.000) = 8.725,50 + 2.800 × 37 % = 8.725,50 + 1.036 = 9.761,50
+   *     IRPF 8.707,00 · coste 8.707,00 + 4.440 = 13.147,00 €
+   *     Aviso: 40.000 × 0,0775 = 3.100,00 €/mes → tabla general, tramo 8, mínima 452,94 € →
+   *     (452,94 − 370) × 12 = 995,28 €.
+   *     Si sumara las cuotas como en la directa ((40.000 + 4.440) × 0,0775 = 3.444,10 €/mes) daría
+   *     el tramo 9 (478,68 €), y si tomara la cuota de la directa, 380,88 €. (Con el rendimiento tras
+   *     el 5 %, 38.000 × 0,0775 = 2.945 €/mes, el tramo seguiría siendo el 8: eso lo discrimina el
+   *     caso de la tabla reducida, más abajo.)
+   *   Diferencia 7.564,68 − 13.147,00 = −5.582,32 → «5582,32 € menor que en módulos», y la caja
+   *   añade que en módulos el coste sería al menos 995,28 € mayor.
+   */
+  test('las dos columnas avisan a la vez — 30.000/4.500/370 con «40.000»: directa tramo 5 (380,88 €, 130,56 €) y módulos tramo 8 (452,94 €, 995,28 €)', async ({
+    page,
+  }) => {
+    await deslizar(page, 'ingresos', 30000);
+    await deslizar(page, 'gastos', 4500);
+    await deslizar(page, 'reta', 370);
+    await escribirModulos(page, '40.000');
+
+    expect(await linea(page, ED, '= Base liquidable (el mínimo va dentro)')).toBe('20.007,00 €');
+    expect(await linea(page, ED, 'Escala general sobre la base completa')).toBe('4179,18 €');
+    expect(await linea(page, ED, '= IRPF')).toBe('3124,68 €');
+    expect(await linea(page, ED, 'Coste fiscal anual total')).toBe('7564,68 €');
+    expect(await linea(page, MOD, '= Base liquidable (el mínimo va dentro)')).toBe('38.000,00 €');
+    expect(await linea(page, MOD, 'Escala general sobre la base completa')).toBe('9761,50 €');
+    expect(await linea(page, MOD, '= IRPF')).toBe('8707,00 €');
+    expect(await linea(page, MOD, 'Coste fiscal anual total')).toBe('13.147,00 €');
+
+    await expect(avisoReta(page)).toContainText('1894,64 €/mes');
+    await expect(avisoReta(page)).toContainText('tabla general, tramo 5,');
+    await expect(avisoReta(page)).toContainText('380,88 €/mes');
+    await expect(avisoReta(page)).toContainText('130,56 €');
+    await expect(avisoReta(page)).not.toContainText('452,94');
+
+    const aviso = page.getByTestId('aviso-reta-modulos');
+    await expect(aviso).toContainText('3100,00 €/mes, tabla general, tramo 8');
+    await expect(aviso).toContainText('452,94 €/mes');
+    await expect(aviso).toContainText('queda 995,28 € por debajo del mínimo posible en módulos');
+    await expect(aviso).not.toContainText('380,88');
+
+    await expect(estado(page)).toContainText('5582,32 €');
+    await expect(estado(page)).toContainText('menor que en módulos');
+    await expect(estado(page)).toContainText('(452,94 €/mes)');
+    await expect(estado(page)).toContainText('al menos 995,28 € mayor');
+  });
+
+  /**
+   * Columna de módulos en la tabla REDUCIDA, en la frontera de 670 €/mes. 20.000 / 12.000 / 226 €/mes.
+   *   Directa: 8.000 − 2.712 = 5.288 · 5 % = 264,40 → 5.023,60 (≤ 8.000) · − 1.620 → 3.403,60
+   *     < mínimo → IRPF 0,00 · coste 2.712,00 €. Aviso: (8.000 − 264,40) × 0,0775 = 599,51 €/mes →
+   *     tabla reducida, tramo 1, mínima 205,88 ≤ 226 → SIN aviso en ninguno de los dos pasos.
+   *   «8.645,16»: 8.645,16 × 0,0775 = 669,9999 €/mes ≤ 670 → reducida, tramo 1, 205,88 ≤ 226 → sin
+   *     aviso de módulos.
+   *   «8.645,17»: 8.645,17 × 0,0775 = 670,0007 €/mes > 670 → reducida, tramo 2, mínima 226,47 € →
+   *     (226,47 − 226) × 12 = 5,64 €. La pantalla redondea el computable a 670,00 €/mes.
+   *     IRPF de módulos: 8.645,17 − 432,2585 = 8.212,9115 · art. 32.2.3.º: 1.620 − 0,405 × 212,9115 =
+   *     1.533,7708 → 6.679,1407 = base · escala × 19 % = 1.269,0367 · IRPF 214,5367 → 214,54 ·
+   *     coste 214,5367 + 2.712 = 2.926,54 € · diferencia 2.712 − 2.926,5367 → «214,54 € menor».
+   *   Si el motor usara el rendimiento tras el 5 % (8.212,91 × 0,0775 = 636,50) no avisaría, y si
+   *   cerrara la frontera por abajo avisaría ya con «8.645,16».
+   */
+  test('módulos en la tabla reducida — 20.000/12.000/226: «8.645,16» sin aviso (tramo 1) y «8.645,17» con aviso (tramo 2, 226,47 €, 5,64 €)', async ({
+    page,
+  }) => {
+    await deslizar(page, 'ingresos', 20000);
+    await deslizar(page, 'gastos', 12000);
+    await deslizar(page, 'reta', 226);
+
+    await escribirModulos(page, '8.645,16');
+    expect(await linea(page, ED, 'Coste fiscal anual total')).toBe('2712,00 €');
+    expect(await linea(page, MOD, 'Rendimiento neto de módulos (tu dato)')).toBe('8645,16 €');
+    await expect(page.getByTestId('aviso-reta-modulos')).toHaveCount(0);
+    await expect(estado(page)).not.toContainText('por debajo de la mínima');
+    await sinAvisoReta(page);
+
+    await escribirModulos(page, '8.645,17');
+    expect(await linea(page, MOD, 'Rendimiento neto de módulos (tu dato)')).toBe('8645,17 €');
+    expect(await linea(page, MOD, '= IRPF')).toBe('214,54 €');
+    expect(await linea(page, MOD, 'Coste fiscal anual total')).toBe('2926,54 €');
+    const aviso = page.getByTestId('aviso-reta-modulos');
+    await expect(aviso).toContainText('670,00 €/mes, tabla reducida, tramo 2');
+    await expect(aviso).toContainText('226,47 €/mes');
+    await expect(aviso).toContainText('queda 5,64 € por debajo');
+    await expect(estado(page)).toContainText('214,54 €');
+    await expect(estado(page)).toContainText('menor que en módulos');
+    await expect(estado(page)).toContainText('al menos 5,64 € mayor');
+    await sinAvisoReta(page);
   });
 });
 
