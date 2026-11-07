@@ -18,7 +18,6 @@
  * Lo que NO debe encender:
  *
  *   5. `parseSpanishNumber(` citado en un comentario.
- *   6. `parseSpanishNumber` pasado como argumento (simulador-punnett: su casos.ts decide).
  *   7. `respuesta-aula-ok: <razón>` con razón escrita.
  *   8. `parseSpanishNumber(` en un `page.tsx`: fuera del alcance del candado.
  *
@@ -27,6 +26,10 @@
  *   9. El CasosAula en `components/` de su app (simulador-genetica lo tiene ahí).
  *  10. `respuesta-aula-ok:` a secas, sin razón.
  *  11. SE PLANTA · ningún CasosAula.tsx que leer.
+ *   6. `parseSpanishNumber` pasado como ARGUMENTO a un lector. Hasta el 07/11/2026 debía callar,
+ *      y por ahí se escapó simulador-punnett (hallazgo 4161, cabo C0656).
+ *  12. El caso de origen de C0656, el CasosAula de simulador-punnett antes de 0ac123f6. FALLAR.
+ *  13. El mismo, reparado con leerRespuestaAula. CALLAR.
  *
  * Trabaja sobre mini-catálogos en directorios temporales: no escribe NADA en `app/`.
  */
@@ -46,6 +49,9 @@ const DESPUES = '447183de';
 const REACCIONES = 'app/simulador-reacciones-quimicas/CasosAula.tsx';
 const NORMAL = 'app/simulador-distribucion-normal/CasosAula.tsx';
 const AULA = 'app/prueba/CasosAula.tsx';
+const PUNNETT = 'app/simulador-punnett/CasosAula.tsx';
+const PUNNETT_ANTES = '0ac123f66~1';
+const PUNNETT_DESPUES = '0ac123f66';
 
 const componente = (cuerpo, ruta = AULA) => ({ [ruta]: `export default function C() {\n${cuerpo}\n}\n` });
 
@@ -59,9 +65,11 @@ const CASOS = [
     ficheros: componente('  /** antes: `parseSpanishNumber(respuesta)` */\n  // parseSpanishNumber(respuesta) leía «2.493» como 2493\n  const valor = leerRespuestaAula(respuesta, esperado);\n  return <div />;'),
   },
   {
-    n: 6, nombre: 'parseSpanishNumber pasado como argumento (simulador-punnett)', debeFallar: false,
+    n: 6, nombre: 'parseSpanishNumber pasado como argumento (forma de simulador-punnett)', debeFallar: true,
     ficheros: componente('  const valor = leerRespuesta(respuesta, datos, parseSpanishNumber);\n  return <div />;'),
   },
+  { n: 12, nombre: 'CASO DE ORIGEN C0656 · simulador-punnett antes de 0ac123f6 (argumento)', debeFallar: true, ficheros: { [PUNNETT]: deGit(PUNNETT_ANTES, PUNNETT) } },
+  { n: 13, nombre: 'CASO DE ORIGEN C0656 REPARADO · simulador-punnett con leerRespuestaAula', debeFallar: false, ficheros: { [PUNNETT]: deGit(PUNNETT_DESPUES, PUNNETT) } },
   {
     n: 7, nombre: 'respuesta-aula-ok: con razón escrita', debeFallar: false,
     ficheros: componente('  // respuesta-aula-ok: lee el número de filas del enunciado, no la respuesta\n  const filas = parseSpanishNumber(enunciado.filas);\n  return <div />;'),

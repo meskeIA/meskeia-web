@@ -10,10 +10,12 @@
  * Que un `CasosAula.tsx` de `app/` lea la respuesta del alumno con `parseSpanishNumber(…)`. Se
  * lee con `leerRespuestaAula(texto, esperado)` de `lib/calculadoras/correctorCasosAula.ts`, que
  * resuelve la única forma ambigua («2.493»: 2,493 o 2493) quedándose con la lectura más cercana
- * a la respuesta esperada. Pasar `parseSpanishNumber` como ARGUMENTO no lo enciende, y así se
- * escapó simulador-punnett (`leerRespuesta(respuesta, datos, parseSpanishNumber)`): se creyó que
- * su `casos.ts` ya decidía que un punto solo es decimal, y no lo decidía; «6.250» para un 6,25 %
- * se leía 6250 (hallazgo 4161, 07/11/2026). Hoy le pasa `(s) => leerRespuestaAula(s, esperado)`.
+ * a la respuesta esperada. Hasta el 07/11/2026 solo miraba la LLAMADA (`parseSpanishNumber(`), y
+ * pasarlo como ARGUMENTO no lo encendía: así se escapó simulador-punnett
+ * (`leerRespuesta(respuesta, datos, parseSpanishNumber)`), porque se creyó que su `casos.ts` ya
+ * decidía que un punto solo es decimal, y no lo decidía; «6.250» para un 6,25 % se leía 6250
+ * (hallazgo 4161). Hoy le pasa `(s) => leerRespuestaAula(s, esperado)`, y el candado enciende
+ * con cualquier mención fuera de un comentario: llamada, import o argumento (cabo C0656).
  *
  * DE DÓNDE SALE
  * ─────────────
@@ -78,7 +80,10 @@ function escapeEn(lineas, n) {
   return /\p{L}{3,}/u.test(razon) ? 'firmado' : 'sin razón';
 }
 
-const LLAMADA = /\bparseSpanishNumber\s*\(/g;
+// Cualquier mención fuera de un comentario: la llamada, el import y el nombre pasado como
+// ARGUMENTO a un lector (la forma por la que se escapó simulador-punnett, C0656). En un
+// CasosAula.tsx no hay otra lectura que la de la respuesta, así que no tiene pasivo.
+const LLAMADA = /\bparseSpanishNumber\b/g;
 
 const errores = [];
 const exentos = [];
@@ -93,7 +98,7 @@ for (const ruta of rutas) {
     const escape = escapeEn(lineas, linea);
     if (escape === 'firmado') { exentos.push(`${rel}:${linea}`); continue; }
     const porQue = escape === 'sin razón' ? ' — lleva `respuesta-aula-ok:` SIN razón escrita' : '';
-    errores.push(`${rel}:${linea} — la respuesta se lee con parseSpanishNumber, que toma «2.493» por dos mil cuatrocientos noventa y tres. Usa \`leerRespuestaAula(texto, esperado)\` de @/lib/calculadoras/correctorCasosAula.${porQue}`);
+    errores.push(`${rel}:${linea} — la respuesta se lee con parseSpanishNumber (llamado, importado o pasado a un lector), que toma «2.493» por dos mil cuatrocientos noventa y tres. Usa \`leerRespuestaAula(texto, esperado)\` de @/lib/calculadoras/correctorCasosAula.${porQue}`);
   }
 }
 
