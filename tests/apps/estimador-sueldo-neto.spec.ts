@@ -699,8 +699,9 @@ test.describe('Hallazgos 1651-1660 (reparados) — re-inspección del 25/09/2026
   test('FAQPage — la cotización del trabajador no es el 6,35 % sin MEI', async ({ page }) => {
     const faq = await faqJsonLd(page);
     expect.soft(faq).not.toContain('6,35');
-    // Reparado: sale de COTIZACIONES_SS_2026 (4,70 + 1,55 + 0,10 + 0,15).
-    expect.soft(faq).toContain('el 6,50 % de la base de cotización');
+    // Reparado: sale de COTIZACIONES_SS_2026 (4,70 + 1,55 + 0,10 + 0,15). Desde el hallazgo 4210
+    // (64d8c2d5c) el % va tras U+00A0, como en la página: se escribe con el escape.
+    expect.soft(faq).toContain('el 6,50 % de la base de cotización');
   });
 
   /**
@@ -710,11 +711,12 @@ test.describe('Hallazgos 1651-1660 (reparados) — re-inspección del 25/09/2026
    */
   test('FAQPage — las horquillas de retención contienen lo que calcula la propia app', async ({ page }) => {
     const faq = await faqJsonLd(page);
-    expect.soft(faq).not.toMatch(/30\.000 €, el 12-15 %/);
-    expect.soft(faq).not.toMatch(/50\.000 €, el 20-22 %/);
+    // Las negativas admiten los dos espacios: con U+00A0 (4210) dejarían de mirar si no.
+    expect.soft(faq).not.toMatch(/30\.000 €, el 12-15[  ]%/);
+    expect.soft(faq).not.toMatch(/50\.000 €, el 20-22[  ]%/);
     // Reparado: las cifras las da el mismo motor que la calculadora (CASO 1 y el de 50.000 €).
-    expect.soft(faq).toContain('con 30.000 €, el 16,42 %');
-    expect.soft(faq).toContain('con 50.000 €, el 22,41 %');
+    expect.soft(faq).toContain('con 30.000 €, el 16,42 %');
+    expect.soft(faq).toContain('con 50.000 €, el 22,41 %');
   });
 
   /**
@@ -954,7 +956,7 @@ test.describe('Re-inspección 25/09/2026 (2.ª) — reducción del art. 20, mín
     expect.soft(cuerpo).toContain('18.570,00 €');
     expect.soft(cuerpo).toContain('2779,80 €');
     expect.soft(cuerpo).toContain('17.790,20 €');
-    expect.soft(await faqJsonLd(page)).toContain('con 20.000 € brutos/año, el 10,17 %');
+    expect.soft(await faqJsonLd(page)).toContain('con 20.000 € brutos/año, el 10,17 %'); // U+00A0 desde el 4210
   });
 
   /**
