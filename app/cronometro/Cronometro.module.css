@@ -239,13 +239,31 @@
   border: none;
   border-radius: 12px;
   background: #f59e0b;
-  color: white;
+  /* Texto oscuro sobre el ámbar: 8,1:1, y 5,5:1 en el hover. Con blanco daba 2,15:1 y 3,19:1
+     (hallazgo 4150); igual en los dos temas, porque el fondo no cambia */
+  color: #1a1a1a;
   cursor: pointer;
   transition: all 0.2s;
 }
 
 .btnPausar:hover {
   background: #d97706;
+}
+
+/* Aviso de un tiempo no válido (hallazgo 4156) */
+.avisoTemporizador {
+  margin: 0 0 12px;
+  font-size: 0.95rem;
+  text-align: center;
+  color: var(--rojo-texto, #b91c1c);
+}
+
+.avisoTemporizador:empty {
+  margin: 0;
+}
+
+[data-theme='dark'] .avisoTemporizador {
+  color: #fca5a5;
 }
 
 .btnSecundario {

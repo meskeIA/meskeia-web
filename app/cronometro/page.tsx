@@ -5,6 +5,7 @@ import styles from './Cronometro.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection,
   DisclaimerCard,
 } from '@/components';
+import { PREGUNTAS_FRECUENTES } from './metadata';
 
 // ==================== TIPOS ====================
 
@@ -14,6 +15,83 @@ interface Vuelta {
   numero: number;
   tiempo: number;
   diferencia: number;
+}
+
+// ==================== UTILIDADES PURAS ====================
+
+const dos = (n: number): string => n.toString().padStart(2, '0');
+
+/** Reloj con centésimas y coma decimal (§2 del CLAUDE.md): 65.430 ms → «01:05,43». */
+function formatearCronometro(ms: number): string {
+  const totalSegundos = Math.floor(ms / 1000);
+  const horas = Math.floor(totalSegundos / 3600);
+  const minutos = Math.floor((totalSegundos % 3600) / 60);
+  const segundos = totalSegundos % 60;
+  const centesimas = Math.floor((ms % 1000) / 10);
+  return horas > 0
+    ? `${horas}:${dos(minutos)}:${dos(segundos)},${dos(centesimas)}`
+    : `${dos(minutos)}:${dos(segundos)},${dos(centesimas)}`;
+}
+
+/**
+ * Cuenta atrás en segundos ENTEROS POR ARRIBA: mientras quede algo de tiempo no marca 00:00
+ * (con 0,5 s por delante dice 00:01) y el primer segundo dura un segundo (hallazgo 4154).
+ */
+function formatearCuentaAtras(ms: number): string {
+  const totalSegundos = Math.max(0, Math.ceil(ms / 1000));
+  const horas = Math.floor(totalSegundos / 3600);
+  const minutos = Math.floor((totalSegundos % 3600) / 60);
+  const segundos = totalSegundos % 60;
+  return horas > 0
+    ? `${horas}:${dos(minutos)}:${dos(segundos)}`
+    : `${dos(minutos)}:${dos(segundos)}`;
+}
+
+/** Un campo de tiempo: vacío cuenta como 0; un negativo, un decimal o un texto, NaN. */
+function leerEntero(valor: string, maximo: number): number {
+  if (valor.trim() === '') return 0;
+  const n = Number(valor);
+  return Number.isInteger(n) && n >= 0 && n <= maximo ? n : NaN;
+}
+
+/**
+ * Alarma: tres pitidos de 880 Hz (0,15 s cada uno, separados 0,1 s) y medio segundo de silencio,
+ * 1 s de WAV de 8 bits a 8.000 Hz que se repite en bucle hasta cerrar el aviso de fin. El WAV
+ * anterior estaba truncado: declaraba 0,193 s y traía 0,023 s, un chasquido (hallazgo 4148).
+ */
+function crearAlarmaWav(): string {
+  const muestreo = 8000;
+  const n = muestreo; // 1 s
+  const bytes = new Uint8Array(44 + n);
+  const vista = new DataView(bytes.buffer);
+  const texto = (pos: number, t: string) => {
+    for (let i = 0; i < t.length; i++) bytes[pos + i] = t.charCodeAt(i);
+  };
+  texto(0, 'RIFF');
+  vista.setUint32(4, 36 + n, true);
+  texto(8, 'WAVE');
+  texto(12, 'fmt ');
+  vista.setUint32(16, 16, true); // tamaño del bloque fmt
+  vista.setUint16(20, 1, true); // PCM
+  vista.setUint16(22, 1, true); // mono
+  vista.setUint32(24, muestreo, true);
+  vista.setUint32(28, muestreo, true); // bytes por segundo
+  vista.setUint16(32, 1, true); // bytes por muestra
+  vista.setUint16(34, 8, true); // bits por muestra
+  texto(36, 'data');
+  vista.setUint32(40, n, true);
+  const inicios = [0, 0.25, 0.5];
+  const largo = 0.15;
+  const rampa = 0.005; // sin chasquido al abrir y cerrar cada pitido
+  for (let i = 0; i < n; i++) {
+    const t = i / muestreo;
+    const ini = inicios.find((s) => t >= s && t < s + largo);
+    const envolvente = ini === undefined ? 0 : Math.min(1, (t - ini) / rampa, (ini + largo - t) / rampa);
+    bytes[44 + i] = Math.round(128 + 100 * envolvente * Math.sin(2 * Math.PI * 880 * t));
+  }
+  let binario = '';
+  for (let i = 0; i < bytes.length; i++) binario += String.fromCharCode(bytes[i]);
+  return `data:audio/wav;base64,${btoa(binario)}`;
 }
 
 // ==================== COMPONENTE PRINCIPAL ====================
@@ -33,10 +111,15 @@ export default function CronometroPage() {
   const [inputHoras, setInputHoras] = useState('0');
   const [inputMinutos, setInputMinutos] = useState('5');
   const [inputSegundos, setInputSegundos] = useState('0');
+  const [avisoTemporizador, setAvisoTemporizador] = useState('');
 
   // Referencias
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  // Date.now() menos lo acumulado al arrancar el cronómetro, y la hora de fin de la cuenta atrás:
+  // pausar y marcar vuelta leen la hora del clic, no el último tic (hallazgo 4153)
+  const inicioCronometroRef = useRef(0);
+  const finTemporizadorRef = useRef(0);
 
   // Limpiar intervalo al desmontar
   useEffect(() => {
@@ -50,8 +133,13 @@ export default function CronometroPage() {
   // Crear audio para alarma (solo en cliente)
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      audioRef.current = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2teleC4SP5DY7752Jg88ntznvnMqFEie2+W3cSkWRqLe5rRsJxZHpODksGknF0em4eGtZiYYSKjh4KtkJhlJqeHfqWMlGkmq4d6nYiUaSqzh3aVhJRtLreHcpGAkG0yu4dulXyQcTa/g26RfIx1OsODapF8jHU6w4NqkXyMdTrDg2qRfIx1OsODapF4jHk+x4NmjXiMeT7Hg2aNeIx5PseA=');
+      const audio = new Audio(crearAlarmaWav());
+      audio.loop = true;
+      audioRef.current = audio;
     }
+    return () => {
+      audioRef.current?.pause();
+    };
   }, []);
 
   // ==================== CRONÓMETRO ====================
@@ -59,9 +147,9 @@ export default function CronometroPage() {
   const iniciarCronometro = useCallback(() => {
     if (corriendo) return;
     setCorriendo(true);
-    const startTime = Date.now() - tiempoCronometro;
+    inicioCronometroRef.current = Date.now() - tiempoCronometro;
     intervalRef.current = setInterval(() => {
-      setTiempoCronometro(Date.now() - startTime);
+      setTiempoCronometro(Date.now() - inicioCronometroRef.current);
     }, 10);
   }, [corriendo, tiempoCronometro]);
 
@@ -70,6 +158,8 @@ export default function CronometroPage() {
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
+      // Lo marchado desde el último tic también cuenta
+      setTiempoCronometro(Date.now() - inicioCronometroRef.current);
     }
   }, []);
 
@@ -80,36 +170,75 @@ export default function CronometroPage() {
   }, [pausarCronometro]);
 
   const registrarVuelta = useCallback(() => {
+    const ahora = corriendo ? Date.now() - inicioCronometroRef.current : tiempoCronometro;
+    if (corriendo) setTiempoCronometro(ahora);
     const ultimaVuelta = vueltas.length > 0 ? vueltas[0].tiempo : 0;
     const nuevaVuelta: Vuelta = {
       numero: vueltas.length + 1,
-      tiempo: tiempoCronometro,
-      diferencia: tiempoCronometro - ultimaVuelta,
+      tiempo: ahora,
+      diferencia: ahora - ultimaVuelta,
     };
     setVueltas([nuevaVuelta, ...vueltas]);
-  }, [tiempoCronometro, vueltas]);
+  }, [corriendo, tiempoCronometro, vueltas]);
 
   // ==================== TEMPORIZADOR ====================
+
+  const horasElegidas = leerEntero(inputHoras, 23);
+  const minutosElegidos = leerEntero(inputMinutos, 59);
+  const segundosElegidos = leerEntero(inputSegundos, 59);
+  const tiempoElegido = (horasElegidas * 3600 + minutosElegidos * 60 + segundosElegidos) * 1000;
+  // En reposo: sin cuenta en marcha, ni en pausa, ni acabando
+  const enReposo = !corriendo && tiempoTemporizador === 0 && tiempoInicial === 0;
+
+  const sonarAlarma = useCallback(() => {
+    const audio = audioRef.current;
+    let avisado = false;
+    const avisar = () => {
+      if (avisado) return;
+      avisado = true;
+      // El aviso bloquea la página mientras la alarma suena en bucle; al cerrarlo, se calla y el
+      // temporizador vuelve al tiempo elegido, listo para repetir
+      alert('¡Tiempo terminado!');
+      if (audio) {
+        audio.pause();
+        audio.currentTime = 0;
+      }
+      setTiempoInicial(0);
+    };
+    if (!audio) {
+      avisar();
+      return;
+    }
+    audio.currentTime = 0;
+    audio.play().then(avisar, avisar);
+  }, []);
 
   const iniciarTemporizador = useCallback(() => {
     if (corriendo) return;
 
     let tiempo = tiempoTemporizador;
     if (tiempo === 0) {
-      const horas = parseInt(inputHoras) || 0;
-      const minutos = parseInt(inputMinutos) || 0;
-      const segundos = parseInt(inputSegundos) || 0;
-      tiempo = (horas * 3600 + minutos * 60 + segundos) * 1000;
-      if (tiempo <= 0) return;
+      if ([horasElegidas, minutosElegidos, segundosElegidos].some(Number.isNaN)) {
+        setAvisoTemporizador(
+          'Revisa el tiempo: las horas van de 0 a 23, y los minutos y los segundos de 0 a 59, sin decimales ni negativos.',
+        );
+        return;
+      }
+      if (tiempoElegido <= 0) {
+        setAvisoTemporizador('Elige un tiempo mayor que cero para empezar la cuenta atrás.');
+        return;
+      }
+      tiempo = tiempoElegido;
       setTiempoTemporizador(tiempo);
       setTiempoInicial(tiempo);
     }
+    setAvisoTemporizador('');
 
     setCorriendo(true);
-    const endTime = Date.now() + tiempo;
+    finTemporizadorRef.current = Date.now() + tiempo;
 
     intervalRef.current = setInterval(() => {
-      const remaining = endTime - Date.now();
+      const remaining = finTemporizadorRef.current - Date.now();
       if (remaining <= 0) {
         setTiempoTemporizador(0);
         setCorriendo(false);
@@ -117,22 +246,19 @@ export default function CronometroPage() {
           clearInterval(intervalRef.current);
           intervalRef.current = null;
         }
-        // Reproducir alarma
-        if (audioRef.current) {
-          audioRef.current.play().catch(() => {});
-        }
-        alert('¡Tiempo terminado!');
+        sonarAlarma();
       } else {
         setTiempoTemporizador(remaining);
       }
     }, 100);
-  }, [corriendo, tiempoTemporizador, inputHoras, inputMinutos, inputSegundos]);
+  }, [corriendo, tiempoTemporizador, horasElegidas, minutosElegidos, segundosElegidos, tiempoElegido, sonarAlarma]);
 
   const pausarTemporizador = useCallback(() => {
     setCorriendo(false);
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
       intervalRef.current = null;
+      setTiempoTemporizador(Math.max(1, finTemporizadorRef.current - Date.now()));
     }
   }, []);
 
@@ -142,23 +268,9 @@ export default function CronometroPage() {
     setTiempoInicial(0);
   }, [pausarTemporizador]);
 
-  // ==================== UTILIDADES ====================
-
-  const formatearTiempo = (ms: number, mostrarMs: boolean = true): string => {
-    const totalSegundos = Math.floor(ms / 1000);
-    const horas = Math.floor(totalSegundos / 3600);
-    const minutos = Math.floor((totalSegundos % 3600) / 60);
-    const segundos = totalSegundos % 60;
-    const milisegundos = Math.floor((ms % 1000) / 10);
-
-    if (horas > 0) {
-      return mostrarMs
-        ? `${horas}:${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}.${milisegundos.toString().padStart(2, '0')}`
-        : `${horas}:${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
-    }
-    return mostrarMs
-      ? `${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}.${milisegundos.toString().padStart(2, '0')}`
-      : `${minutos.toString().padStart(2, '0')}:${segundos.toString().padStart(2, '0')}`;
+  const cambiarCampo = (fijar: (v: string) => void) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    fijar(e.target.value);
+    setAvisoTemporizador('');
   };
 
   // Cambiar de modo
@@ -183,10 +295,16 @@ export default function CronometroPage() {
     setInputMinutos((minutos % 60).toString());
     setInputSegundos('0');
     setTiempoTemporizador(0);
+    setTiempoInicial(0);
+    setAvisoTemporizador('');
   };
 
   // Calcular progreso del temporizador
   const progreso = tiempoInicial > 0 ? ((tiempoInicial - tiempoTemporizador) / tiempoInicial) * 100 : 0;
+  // En reposo el marcador enseña el tiempo elegido, no un 00:00 (hallazgo 4155)
+  const marcadorTemporizador = enReposo
+    ? formatearCuentaAtras(Number.isNaN(tiempoElegido) ? 0 : tiempoElegido)
+    : formatearCuentaAtras(tiempoTemporizador);
 
   return (
     <div className={styles.container}>
@@ -200,13 +318,6 @@ export default function CronometroPage() {
       </header>
 
       <LegalNotice />
-
-      <DisclaimerCard
-        variant="general"
-        severity="medium"
-        collapsible={true}
-        context="cronometro-disclaimer"
-      />
 
       {/* Tabs de modo */}
       <div className={styles.tabs}>
@@ -236,7 +347,7 @@ export default function CronometroPage() {
           <>
             <section className={styles.displayPanel}>
               <div className={styles.tiempoDisplay}>
-                {formatearTiempo(tiempoCronometro)}
+                {formatearCronometro(tiempoCronometro)}
               </div>
               <div className={styles.controles}>
                 {!corriendo ? (
@@ -262,7 +373,7 @@ export default function CronometroPage() {
                   className={styles.btnSecundario}
                   disabled={tiempoCronometro === 0}
                 >
-                  ↺ Reiniciar
+                  <span aria-hidden="true">↺</span> Reiniciar
                 </button>
               </div>
             </section>
@@ -275,9 +386,9 @@ export default function CronometroPage() {
                   {vueltas.map((vuelta) => (
                     <div key={vuelta.numero} className={styles.vueltaItem}>
                       <span className={styles.vueltaNumero}>#{vuelta.numero}</span>
-                      <span className={styles.vueltaTiempo}>{formatearTiempo(vuelta.tiempo)}</span>
+                      <span className={styles.vueltaTiempo}>{formatearCronometro(vuelta.tiempo)}</span>
                       <span className={styles.vueltaDiferencia}>
-                        +{formatearTiempo(vuelta.diferencia)}
+                        {`+${formatearCronometro(vuelta.diferencia)}`}
                       </span>
                     </div>
                   ))}
@@ -310,53 +421,70 @@ export default function CronometroPage() {
                   />
                 </svg>
                 <div className={styles.tiempoDisplayTemporizador}>
-                  {formatearTiempo(tiempoTemporizador, false)}
+                  {marcadorTemporizador}
                 </div>
               </div>
 
-              {/* Inputs de tiempo (solo cuando no está corriendo y tiempo es 0) */}
-              {!corriendo && tiempoTemporizador === 0 && (
+              {/* Inputs de tiempo (solo en reposo) */}
+              {enReposo && (
                 <div className={styles.inputsTiempo}>
                   <div className={styles.inputGrupo}>
                     <input
+                      id="crono-horas"
                       type="number"
                       min="0"
                       max="23"
+                      step="1"
+                      inputMode="numeric"
+                      aria-label="Horas"
                       value={inputHoras}
-                      onChange={(e) => setInputHoras(e.target.value)}
+                      onChange={cambiarCampo(setInputHoras)}
                       className={styles.inputTiempo}
                     />
-                    <span className={styles.inputLabel}>horas</span>
+                    <label htmlFor="crono-horas" className={styles.inputLabel}>horas</label>
                   </div>
-                  <span className={styles.inputSeparador}>:</span>
+                  <span className={styles.inputSeparador} aria-hidden="true">:</span>
                   <div className={styles.inputGrupo}>
                     <input
+                      id="crono-minutos"
                       type="number"
                       min="0"
                       max="59"
+                      step="1"
+                      inputMode="numeric"
+                      aria-label="Minutos"
                       value={inputMinutos}
-                      onChange={(e) => setInputMinutos(e.target.value)}
+                      onChange={cambiarCampo(setInputMinutos)}
                       className={styles.inputTiempo}
                     />
-                    <span className={styles.inputLabel}>min</span>
+                    <label htmlFor="crono-minutos" className={styles.inputLabel}>min</label>
                   </div>
-                  <span className={styles.inputSeparador}>:</span>
+                  <span className={styles.inputSeparador} aria-hidden="true">:</span>
                   <div className={styles.inputGrupo}>
                     <input
+                      id="crono-segundos"
                       type="number"
                       min="0"
                       max="59"
+                      step="1"
+                      inputMode="numeric"
+                      aria-label="Segundos"
                       value={inputSegundos}
-                      onChange={(e) => setInputSegundos(e.target.value)}
+                      onChange={cambiarCampo(setInputSegundos)}
                       className={styles.inputTiempo}
                     />
-                    <span className={styles.inputLabel}>seg</span>
+                    <label htmlFor="crono-segundos" className={styles.inputLabel}>seg</label>
                   </div>
                 </div>
               )}
 
+              {/* Siempre montado: el texto cambia dentro y el lector lo anuncia */}
+              <p className={styles.avisoTemporizador} role="alert">
+                {avisoTemporizador}
+              </p>
+
               {/* Presets */}
-              {!corriendo && tiempoTemporizador === 0 && (
+              {enReposo && (
                 <div className={styles.presets}>
                   {presets.map((preset) => (
                     <button
@@ -385,15 +513,24 @@ export default function CronometroPage() {
                   type="button"
                   onClick={resetearTemporizador}
                   className={styles.btnSecundario}
-                  disabled={tiempoTemporizador === 0 && !corriendo}
+                  disabled={enReposo}
                 >
-                  ↺ Reiniciar
+                  <span aria-hidden="true">↺</span> Reiniciar
                 </button>
               </div>
             </section>
           </>
         )}
       </div>
+
+      {/* Tras la herramienta y sus resultados (posición 6 de la estructura estándar): delante
+          dejaba Vuelta y Reiniciar bajo el pliegue en el móvil (hallazgo 4149) */}
+      <DisclaimerCard
+        variant="general"
+        severity="medium"
+        collapsible={true}
+        context="cronometro-disclaimer"
+      />
 
       {/* Info panel */}
       <section className={styles.infoPanel}>
@@ -508,7 +645,7 @@ export default function CronometroPage() {
               </div>
               <p className={styles.escenarioExample}>
                 Activa el cronómetro al empezar a estudiar y lo pausa a los 25 minutos para un descanso de 5.
-                Repite el ciclo 4 veces y luego descansa 20-30 minutos.
+                Repite el ciclo 4 veces y luego descansa 15-30 minutos.
               </p>
               <p className={styles.escenarioTip}>
                 Consejo: anota cuántos pomodoros completas al día para ver tu progreso semanal y ajustar la carga de estudio.
@@ -535,58 +672,14 @@ export default function CronometroPage() {
         <section className={styles.guideSection}>
           <h2>Preguntas frecuentes</h2>
           <ul className={styles.faqList}>
-            <li className={styles.faqItem}>
-              <details>
-                <summary>¿Qué precisión tiene el cronómetro digital?</summary>
-                <p>
-                  Este cronómetro usa <code>Date.now()</code>, que en navegadores modernos ofrece
-                  precisión de milisegundos (se muestra en centésimas). Es más que suficiente para
-                  deportes, cocina o productividad. Para competiciones oficiales se requiere un
-                  dispositivo certificado por la federación correspondiente.
-                </p>
-                <p className={styles.faqTip}>
-                  Nota: la precisión real depende también de la carga del dispositivo. En condiciones
-                  normales el error es inferior a 10 ms.
-                </p>
-              </details>
-            </li>
-            <li className={styles.faqItem}>
-              <details>
-                <summary>¿Puedo usar vueltas para medir intervalos?</summary>
-                <p>
-                  Sí. El botón <strong>Vuelta</strong> registra el tiempo acumulado en ese instante
-                  y calcula automáticamente la diferencia respecto a la vuelta anterior. Así puedes
-                  ver tanto el tiempo total transcurrido como el tiempo de cada intervalo por separado.
-                </p>
-              </details>
-            </li>
-            <li className={styles.faqItem}>
-              <details>
-                <summary>¿Se para si cambio de pestaña?</summary>
-                <p>
-                  No se detiene, pero algunos navegadores reducen la frecuencia de actualización de
-                  pestañas en segundo plano (throttling). El tiempo final sigue siendo correcto porque
-                  se basa en <code>Date.now()</code>, no en el número de ticks del intervalo. La
-                  pantalla puede dejar de actualizarse, pero el cálculo es preciso al volver. En el
-                  móvil (celular) ocurre lo mismo si bloqueas la pantalla durante una medición larga.
-                </p>
-              </details>
-            </li>
-            <li className={styles.faqItem}>
-              <details>
-                <summary>¿Cómo uso el cronómetro para la técnica Pomodoro?</summary>
-                <p>
-                  Inicia el cronómetro al empezar tu bloque de trabajo. Cuando llegues a los 25 minutos,
-                  pausa y toma 5 minutos de descanso. Tras el descanso, reinicia y repite. Después de
-                  4 ciclos, haz una pausa larga de 20-30 minutos. El historial de vueltas te permite
-                  llevar la cuenta de cuántos ciclos has completado.
-                </p>
-                <p className={styles.faqTip}>
-                  Tip: si prefieres que suene una alarma automática, usa el modo <strong>Temporizador</strong>
-                  con 25 minutos configurados.
-                </p>
-              </details>
-            </li>
+            {PREGUNTAS_FRECUENTES.map((f) => (
+              <li key={f.question} className={styles.faqItem}>
+                <details>
+                  <summary>{f.question}</summary>
+                  <p>{f.answer}</p>
+                </details>
+              </li>
+            ))}
           </ul>
         </section>
 
@@ -632,7 +725,7 @@ export default function CronometroPage() {
                 <strong>Copia o anota el tiempo final</strong>
                 <p>
                   Al terminar, consulta el tiempo total y la lista de vueltas. Anota los datos que
-                  necesites antes de pulsar <strong>↺ Reiniciar</strong>, ya que al hacerlo se
+                  necesites antes de pulsar <strong><span aria-hidden="true">↺</span> Reiniciar</strong>, ya que al hacerlo se
                   borrarán todos los registros.
                 </p>
               </div>

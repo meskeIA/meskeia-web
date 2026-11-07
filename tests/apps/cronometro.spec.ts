@@ -174,7 +174,7 @@ test.describe('Cronómetro y Temporizador — escritorio', () => {
     await expect(page.locator(DISPLAY)).toHaveText(/^00:00[.,]00$/); // no sigue contando
   });
 
-  test('CASO 3 (rechazo) · temporizador a 0 h 0 min 0 s: no arranca', async ({ page }) => {
+  test('CASO 3 (rechazo) · temporizador a 0 h 0 min 0 s: no arranca y dice por qué', async ({ page }) => {
     const dialogos: string[] = [];
     page.on('dialog', async (d) => {
       dialogos.push(d.message());
@@ -188,6 +188,8 @@ test.describe('Cronómetro y Temporizador — escritorio', () => {
     await expect(boton(page, /Iniciar/)).toBeVisible();
     await expect(boton(page, /Pausar/)).toHaveCount(0);
     expect(dialogos).toEqual([]);
+    // REPARADO (hallazgo 4156): antes no pasaba nada y no se decía por qué
+    await expect(page.getByRole('alert').filter({ hasText: 'mayor que cero' })).toBeVisible();
   });
 
   test('CASO 4 (normal) · temporizador 1 min 30 s: 01:00 a los 30 s, pausa, 00:40 y alarma a los 90 s de marcha', async ({
@@ -222,7 +224,13 @@ test.describe('Cronómetro y Temporizador — escritorio', () => {
 
     await page.clock.runFor(40000);
     await expect.poll(() => dialogos).toEqual(['¡Tiempo terminado!']);
-    await expect(page.locator(DISPLAY_TEMP)).toHaveText('00:00');
+    // Cerrado el aviso, vuelve al tiempo elegido con el círculo vacío, listo para repetir
+    // (hallazgo 4155: antes se quedaba en 00:00 con el círculo lleno hasta el siguiente arranque)
+    await expect(page.locator(DISPLAY_TEMP)).toHaveText('01:30');
+    await expect(page.locator('[class*="circuloRelleno"]')).toHaveAttribute(
+      'stroke-dashoffset',
+      String(2 * Math.PI * 45),
+    );
     await expect(boton(page, /Iniciar/)).toBeVisible();
   });
 
@@ -239,29 +247,28 @@ test.describe('Cronómetro y Temporizador — escritorio', () => {
     await boton(page, /Iniciar/).click();
     await page.clock.fastForward(120000);
     await expect.poll(() => dialogos).toEqual(['¡Tiempo terminado!']);
-    await expect(page.locator(DISPLAY_TEMP)).toHaveText('00:00');
+    await expect(page.locator(DISPLAY_TEMP)).toHaveText('01:30');
   });
 
-  test('HALLAZGO (07/11/2026, ABIERTO) · formato español: 65,43 s se leen «01:05,43», con coma decimal', async ({
+  test('HALLAZGO 4157 (07/11/2026, REPARADO) · formato español: 65,43 s se leen «01:05,43», con coma decimal', async ({
     page,
   }) => {
-    // CLAUDE.md §2: la coma es el separador decimal. Hoy: «01:05.43» (formatearTiempo,
-    // page.tsx:156 y 160, pega los centésimos con un punto). Afecta al marcador y a cada vuelta.
-    test.fail();
+    // CLAUDE.md §2: la coma es el separador decimal. Antes: «01:05.43» (formatearTiempo pegaba
+    // los centésimos con un punto), en el marcador y en cada vuelta.
     await pararReloj(page);
     await boton(page, /Iniciar/).click();
     await page.clock.fastForward(65430);
-    await expect(page.locator(DISPLAY)).toHaveText(/^01:05[.,]43$/); // la cifra, bien
-    await expect(page.locator(DISPLAY)).toHaveText('01:05,43'); // el separador, no
+    await expect(page.locator(DISPLAY)).toHaveText('01:05,43');
+    await boton(page, /Vuelta/).click();
+    expect(await vueltas(page)).toEqual([['#1', '01:05,43', '+01:05,43']]);
   });
 
-  test('HALLAZGO (07/11/2026, ABIERTO) · cada pausa tira lo marchado desde el último tic: 4 × 1,005 s = 4,02 s', async ({
+  test('HALLAZGO 4153 (07/11/2026, REPARADO) · cada pausa tiraba lo marchado desde el último tic: 4 × 1,005 s = 4,02 s', async ({
     page,
   }) => {
-    // pausarCronometro (page.tsx:68) se queda con el valor del último tic de 10 ms y
-    // iniciarCronometro (page.tsx:62) reanuda desde ahí: lo marchado entre ese tic y el clic se
-    // pierde en cada pausa (hasta 10 ms, más si el hilo va cargado). Hoy: «00:04.00».
-    test.fail();
+    // pausarCronometro se quedaba con el valor del último tic de 10 ms e iniciarCronometro
+    // reanudaba desde ahí: lo marchado entre ese tic y el clic se perdía en cada pausa. Antes:
+    // «00:04.00». Ahora la pausa lee Date.now() en el clic.
     await pararReloj(page);
     for (let i = 0; i < 4; i++) {
       await boton(page, /Iniciar/).click();
@@ -272,58 +279,71 @@ test.describe('Cronómetro y Temporizador — escritorio', () => {
     await expect(page.locator(DISPLAY)).toHaveText(/^00:04[.,]02$/);
   });
 
-  test('HALLAZGO (07/11/2026, ABIERTO) · cuenta atrás de 3 s: a los 2,5 s quedan 0,5 s y debe marcar 00:01, no 00:00', async ({
+  test('HALLAZGO 4154 (07/11/2026, REPARADO) · cuenta atrás de 3 s: a los 2,5 s quedan 0,5 s y marca 00:01, no 00:00', async ({
     page,
   }) => {
-    // formatearTiempo redondea hacia abajo (Math.floor, page.tsx:148): el último segundo se ve
-    // «00:00» con la cuenta en marcha y la alarma aún por sonar, y el primero dura 100 ms.
-    test.fail();
+    // formatearTiempo redondeaba hacia abajo: el último segundo se veía «00:00» con la cuenta en
+    // marcha y la alarma aún por sonar, y el primero duraba 100 ms. Ahora redondea por arriba.
     await abrirTemporizador(page, '0', '0', '3');
     await pararReloj(page);
     await boton(page, /Iniciar/).click();
-    await page.clock.runFor(2500);
+    await page.clock.runFor(100);
+    await expect(page.locator(DISPLAY_TEMP)).toHaveText('00:03'); // el primer segundo dura 1 s
+    await page.clock.runFor(2400);
     await expect(boton(page, /Pausar/)).toBeVisible(); // sigue en marcha
     await expect(page.locator(DISPLAY_TEMP)).toHaveText('00:01');
   });
 
-  test('HALLAZGO (07/11/2026, ABIERTO) · el marcador del temporizador no muestra el tiempo elegido: atajo «10 min» → 10:00', async ({
+  test('HALLAZGO 4155 (07/11/2026, REPARADO) · el marcador del temporizador muestra el tiempo elegido: 05:00 de fábrica, atajo «10 min» → 10:00', async ({
     page,
   }) => {
-    // El círculo pinta tiempoTemporizador, que vale 0 hasta pulsar Iniciar (page.tsx:313): con
-    // 5 min por defecto o con un atajo elegido, el número grande sigue en «00:00».
-    test.fail();
+    // El círculo pintaba tiempoTemporizador, que vale 0 hasta pulsar Iniciar: con 5 min por
+    // defecto o con un atajo elegido, el número grande seguía en «00:00».
     await boton(page, /Temporizador/).click();
+    await expect(page.locator(DISPLAY_TEMP)).toHaveText('05:00');
     await page.getByRole('button', { name: '10 min', exact: true }).click();
     await expect(page.getByRole('spinbutton').nth(1)).toHaveValue('10'); // el atajo sí llega
     await expect(page.locator(DISPLAY_TEMP)).toHaveText('10:00');
+    await page.getByRole('button', { name: '1 hora', exact: true }).click();
+    await expect(page.locator(DISPLAY_TEMP)).toHaveText('1:00:00');
   });
 
-  test('HALLAZGO (07/11/2026, ABIERTO) · 2 min y −30 s no es una cuenta atrás válida y arranca 01:30', async ({
+  test('HALLAZGO 4156 (07/11/2026, REPARADO) · 2 min y −30 s no es una cuenta atrás válida: no arranca y lo dice', async ({
     page,
   }) => {
-    // Los campos son min="0", pero iniciarTemporizador (page.tsx:99-103) suma lo que haya:
-    // 2·60 − 30 = 90 s. Y 0:0:0 no arranca sin decir por qué (CASO 3).
-    test.fail();
+    // Los campos son min="0", pero iniciarTemporizador sumaba lo que hubiera: 2·60 − 30 = 90 s.
     await abrirTemporizador(page, '0', '2', '-30');
     await pararReloj(page);
     await boton(page, /Iniciar/).click();
     await page.clock.runFor(500);
     await expect(boton(page, /Pausar/)).toHaveCount(0);
+    await expect(page.getByRole('alert').filter({ hasText: 'Revisa el tiempo' })).toBeVisible();
+    // Al corregir el campo, el aviso se va y arranca
+    const seg = page.getByRole('spinbutton', { name: /seg/i });
+    await seg.fill('30');
+    await esperarValorEnReact(page, seg, '30');
+    await expect(page.getByRole('alert').filter({ hasText: 'Revisa el tiempo' })).toHaveCount(0);
+    await boton(page, /Iniciar/).click();
+    await expect(page.locator(DISPLAY_TEMP)).toHaveText('02:30');
+    await expect(boton(page, /Pausar/)).toBeVisible();
   });
 
-  test('HALLAZGO (07/11/2026, ABIERTO) · la «alarma sonora» es un chasquido de 23 ms, una sola vez', async ({
+  test('HALLAZGO 4148 (07/11/2026, REPARADO) · la «alarma sonora» era un chasquido de 23 ms, una sola vez', async ({
     page,
   }) => {
-    // El WAV en base64 (page.tsx:53) declara 1.546 bytes de datos a 8.000 Hz (0,193 s) y solo
-    // trae 186 (0,023 s), sin bucle. Para una cuenta atrás de cocina o Pomodoro, con la pestaña
-    // detrás, es lo único que avisa. Esperado: un aviso audible (≥ 1 s o en bucle hasta parar).
-    test.fail();
+    // El WAV en base64 declaraba 1.546 bytes de datos a 8.000 Hz (0,193 s) y solo traía 186
+    // (0,023 s), sin bucle. Para una cuenta atrás de cocina o Pomodoro, con la pestaña detrás, es
+    // lo único que avisa. Ahora: 1 s de tres pitidos, en bucle hasta cerrar el aviso de fin.
     await page.addInitScript(() => {
-      const w = window as unknown as { __plays: { dur: number; loop: boolean }[] };
+      const w = window as unknown as {
+        __plays: { dur: number; loop: boolean }[];
+        __alarma?: HTMLMediaElement;
+      };
       w.__plays = [];
       const original = HTMLMediaElement.prototype.play;
       HTMLMediaElement.prototype.play = function (this: HTMLMediaElement) {
         w.__plays.push({ dur: this.duration, loop: this.loop });
+        w.__alarma = this;
         return original.call(this);
       };
     });
@@ -338,13 +358,20 @@ test.describe('Cronómetro y Temporizador — escritorio', () => {
       () => (window as unknown as { __plays: { dur: number; loop: boolean }[] }).__plays,
     );
     expect(plays).toHaveLength(1);
-    expect(plays[0].loop || plays[0].dur >= 1).toBe(true);
+    expect(plays[0].loop).toBe(true);
+    // El fichero entero, no un trozo: 8.000 muestras a 8.000 Hz
+    if (!Number.isNaN(plays[0].dur)) expect(plays[0].dur).toBeCloseTo(1, 1);
+    // Cerrado el aviso (el manejador de arriba lo acepta), se calla
+    await expect
+      .poll(() =>
+        page.evaluate(() => (window as unknown as { __alarma?: HTMLMediaElement }).__alarma?.paused),
+      )
+      .toBe(true);
   });
 
-  test('HALLAZGO (07/11/2026, ABIERTO) · Pausar: blanco sobre ámbar a 2,15:1 (texto de 17,6 px exige 4,5:1)', async ({
+  test('HALLAZGO 4150 (07/11/2026, REPARADO) · Pausar: blanco sobre ámbar a 2,15:1 (texto de 17,6 px exige 4,5:1)', async ({
     page,
   }) => {
-    test.fail();
     await pararReloj(page);
     await boton(page, /Iniciar/).click();
     await page.clock.runFor(1000);
@@ -363,58 +390,73 @@ test.describe('Cronómetro y Temporizador — escritorio', () => {
     expect(contraste).toBeGreaterThanOrEqual(4.5);
   });
 
-  test('HALLAZGO (07/11/2026, ABIERTO) · los campos horas, min y seg no tienen nombre accesible', async ({
+  test('HALLAZGO 4151 (07/11/2026, REPARADO) · los campos horas, min y seg tienen nombre accesible', async ({
     page,
   }) => {
-    // Los rótulos son <span> sueltos (page.tsx:329, 341, 353): un lector de pantalla oye tres
-    // «botón de número» iguales.
-    test.fail();
+    // Los rótulos eran <span> sueltos: un lector de pantalla oía tres «botón de número» iguales.
     await boton(page, /Temporizador/).click();
     await expect(page.getByRole('spinbutton', { name: /hora/i })).toHaveCount(1);
     await expect(page.getByRole('spinbutton', { name: /min/i })).toHaveCount(1);
     await expect(page.getByRole('spinbutton', { name: /seg/i })).toHaveCount(1);
   });
 
-  test('HALLAZGO (07/11/2026, ABIERTO) · la flecha «↺» entra en el nombre de Reiniciar', async ({ page }) => {
-    // ▶, ⏸ y 🏁 van en <span aria-hidden>; ↺ no (page.tsx:265 y 390).
-    test.fail();
+  test('HALLAZGO 4158 (07/11/2026, REPARADO) · la flecha «↺» no entra en el nombre de Reiniciar', async ({ page }) => {
+    // ▶, ⏸ y 🏁 iban en <span aria-hidden>; ↺ no.
+    await expect(page.getByRole('button', { name: 'Reiniciar', exact: true })).toHaveCount(1);
+    await boton(page, /Temporizador/).click();
     await expect(page.getByRole('button', { name: 'Reiniciar', exact: true })).toHaveCount(1);
   });
 
-  test('HALLAZGO (07/11/2026, ABIERTO) · la FAQ de Pomodoro dice «reinicia y repite» y que las vueltas llevan la cuenta, pero Reiniciar las borra', async ({
+  test('HALLAZGO 4159 (07/11/2026, REPARADO) · la FAQ de Pomodoro decía «reinicia y repite», y Reiniciar borra las vueltas que llevan la cuenta', async ({
     page,
   }) => {
-    test.fail();
+    // Reiniciar sigue borrando las vueltas, como avisan el paso 4 y los errores habituales: lo
+    // que estaba mal era la instrucción. Ahora la FAQ manda reanudar con Iniciar, y así las
+    // vueltas cuentan los ciclos.
+    const pomodoro = page.locator('details', { hasText: '¿Cómo uso el cronómetro o el temporizador para la técnica Pomodoro?' });
+    await expect(pomodoro).not.toContainText('reinicia y repite');
+    await expect(pomodoro).toContainText('pulsa Iniciar, no Reiniciar');
     await pararReloj(page);
-    await boton(page, /Iniciar/).click();
-    await page.clock.runFor(1000);
-    await boton(page, /Vuelta/).click();
-    await boton(page, /Pausar/).click();
-    await boton(page, /Reiniciar/).click(); // «Tras el descanso, reinicia y repite»
-    await expect(page.locator('[class*="vueltaItem"]')).toHaveCount(1);
+    for (let ciclo = 1; ciclo <= 2; ciclo++) {
+      await boton(page, /Iniciar/).click();
+      await page.clock.runFor(1000); // el bloque de trabajo
+      await boton(page, /Vuelta/).click();
+      await boton(page, /Pausar/).click(); // el descanso
+      await page.clock.runFor(500);
+    }
+    await expect(page.locator('[class*="vueltaItem"]')).toHaveCount(2);
+    await expect(page.locator(DISPLAY)).toHaveText('00:02,00'); // el descanso no cuenta
   });
 });
 
 test.describe('Cronómetro y Temporizador — lo publicado', () => {
-  test('HALLAZGO (07/11/2026, ABIERTO) · `features` del JSON-LD vacía (§1.ter pide 4-8)', () => {
-    test.fail();
-    expect((jsonLd as { featureList?: string[] }).featureList?.length ?? 0).toBeGreaterThanOrEqual(4);
+  test('HALLAZGO 4160 (07/11/2026, REPARADO) · `features` del JSON-LD tenía 0 (§1.ter pide 4-8)', () => {
+    const n = (jsonLd as { featureList?: string[] }).featureList?.length ?? 0;
+    expect(n).toBeGreaterThanOrEqual(4);
+    expect(n).toBeLessThanOrEqual(8);
   });
 
-  test('HALLAZGO (07/11/2026, ABIERTO) · la FAQ del JSON-LD contradice a la visible y al código', async ({
+  test('HALLAZGO 4152 (07/11/2026, REPARADO) · la FAQ del JSON-LD contradecía a la visible y al código', async ({
     page,
   }) => {
-    // Precisión: la visible (y page.tsx:62-64) usa Date.now(); la del JSON-LD dice
-    // performance.now(). Pausa larga Pomodoro: la página dice 20-30 min (FAQ y escenario), el
-    // JSON-LD 15-30. La reparación es UNA constante PREGUNTAS_FRECUENTES (check:faq-unica).
-    test.fail();
+    // Precisión: la visible (y el código) usa Date.now(); la del JSON-LD decía performance.now().
+    // Pausa larga del Pomodoro: la página decía 20-30 min y el JSON-LD 15-30. Se queda 15-30, la
+    // de Cirillo y la de temporizador-pomodoro del mismo catálogo (su FAQ y sus consejos).
+    // Ahora las dos FAQ salen de PREGUNTAS_FRECUENTES (check:faq-unica).
     await page.goto(RUTA);
     const textoLd = faqJsonLd.mainEntity.map((q) => q.acceptedAnswer.text).join(' ');
     const html = await page.content();
     expect(html).toContain('Date.now()');
     expect(textoLd).not.toContain('performance.now()');
-    expect(html).toContain('20-30 minutos');
-    expect(textoLd).toContain('20-30 minutos');
+    expect(html).toContain('15-30 minutos');
+    expect(textoLd).toContain('15-30 minutos');
+    expect(html).not.toContain('20-30 minutos');
+    // Una sola fuente: cada pregunta del FAQPage está en la página con la MISMA respuesta
+    for (const q of faqJsonLd.mainEntity) {
+      const item = page.locator('details', { hasText: q.name });
+      await expect(item.locator('summary')).toHaveText(q.name);
+      await expect(item.locator('p')).toHaveText(q.acceptedAnswer.text);
+    }
   });
 });
 
@@ -445,13 +487,12 @@ test.describe('Cronómetro y Temporizador — móvil (Pixel 7)', () => {
     expect(ancho.sw).toBeLessThanOrEqual(ancho.cw);
   });
 
-  test('HALLAZGO (07/11/2026, ABIERTO) · primera visita: Vuelta y Reiniciar quedan bajo el pliegue', async ({
+  test('HALLAZGO 4149 (07/11/2026, REPARADO) · primera visita: Iniciar, Vuelta y Reiniciar dentro de la pantalla', async ({
     page,
   }) => {
-    // El DisclaimerCard (desplegado en cada sesión, nivel medium) va ANTES de la herramienta
-    // (page.tsx:204), no en la posición 6 de la estructura estándar. Medido el 07/11/2026:
-    // aviso 320-565, Iniciar 790-842, Vuelta 854-907, Reiniciar 919-971 con 839 de alto.
-    test.fail();
+    // El DisclaimerCard (desplegado en cada sesión, nivel medium) iba ANTES de la herramienta, no
+    // en la posición 6 de la estructura estándar. Medido el 07/11/2026: aviso 320-565, Iniciar
+    // 790-842, Vuelta 854-907, Reiniciar 919-971 con 839 de alto. Ahora va tras la herramienta.
     await page.goto(RUTA);
     await esperarBotonesHidratados(page);
     const alto = page.viewportSize()?.height ?? 0;
