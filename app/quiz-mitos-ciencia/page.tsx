@@ -677,7 +677,7 @@ export default function QuizMitosCiencia() {
         {/* WARNING BOX */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             Errores conceptuales frecuentes al hablar de ciencia
           </div>
           <ul className={styles.warningList}>

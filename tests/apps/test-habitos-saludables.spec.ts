@@ -574,18 +574,26 @@ test('HALLAZGO (02/11/2026, ABIERTO) · tras «Siguiente» con teclado, el Tabul
   ).toBe(true);
 });
 
-test('HALLAZGO (02/11/2026, ABIERTO) · los iconos de área junto a su nombre no llevan aria-hidden', async ({ page }) => {
+test('HALLAZGO 3929 (02/11/2026, REPARADO 07/11/2026) · los iconos de área junto a su nombre llevan aria-hidden', async ({ page }) => {
   // `areaIcon` (intro), `categoryIcon` (junto al <h2> del área) y `resultIcon` (tarjetas de
-  // resultado): el lector lee «gota de agua Hidratación». También `eduEscenarioIcon` y
-  // `eduTipIcono` en el bloque educativo.
-  test.fail();
+  // resultado): el lector leía «gota de agua Hidratación». También `eduEscenarioIcon` y
+  // `eduTipIcono` en el bloque educativo (cabo C0661). Se cuentan primero, para que un
+  // selector que no encuentra nada no pase en verde.
   await abrir(page);
+  const iconos = page.locator('[class*="areaIcon"], [class*="eduEscenarioIcon"], [class*="eduTipIcono"]');
+  expect(await iconos.count(), '7 de área, 4 de escenario y 6 de consejo').toBe(17);
   const sinOcultar = await page
     .locator('[class*="areaIcon"]:not([aria-hidden="true"]), [class*="eduEscenarioIcon"]:not([aria-hidden="true"]), [class*="eduTipIcono"]:not([aria-hidden="true"])')
     .count();
   expect(sinOcultar).toBe(0);
   await botonComenzar(page).click();
   await expect(page.locator('[class*="categoryIcon"]')).toHaveAttribute('aria-hidden', 'true');
+  await page.reload();
+  await esperarBotonHidratado(page, /Comenzar Test/);
+  await hacerTest(page, Array(7).fill([2, 2, 2]));
+  const resultIcon = page.locator('[class*="resultIcon"]');
+  await expect(resultIcon).toHaveCount(7);
+  expect(await page.locator('[class*="resultIcon"]:not([aria-hidden="true"])').count()).toBe(0);
 });
 
 test('HALLAZGO (02/11/2026, ABIERTO) · el porcentaje se pega a la cifra («63%»)', async ({ page }) => {

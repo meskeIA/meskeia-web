@@ -454,7 +454,7 @@ export default function TestHabitosPage() {
                   className={styles.areaItem}
                   style={{ borderColor: cat.color }}
                 >
-                  <span className={styles.areaIcon}>{cat.icon}</span>
+                  <span className={styles.areaIcon} aria-hidden="true">{cat.icon}</span>
                   <span className={styles.areaName}>{cat.name}</span>
                 </div>
               ))}
@@ -505,7 +505,7 @@ export default function TestHabitosPage() {
             className={styles.categoryHeader}
             style={{ backgroundColor: currentCategory.color }}
           >
-            <span className={styles.categoryIcon}>{currentCategory.icon}</span>
+            <span className={styles.categoryIcon} aria-hidden="true">{currentCategory.icon}</span>
             <h2 className={styles.categoryName}>{currentCategory.name}</h2>
           </div>
 
@@ -586,7 +586,7 @@ export default function TestHabitosPage() {
             {results.map(result => (
               <div key={result.category} className={styles.resultCard}>
                 <div className={styles.resultHeader}>
-                  <span className={styles.resultIcon}>{result.icon}</span>
+                  <span className={styles.resultIcon} aria-hidden="true">{result.icon}</span>
                   <span className={styles.resultCategory}>{result.category}</span>
                   <span
                     className={styles.resultLevel}
@@ -685,22 +685,22 @@ export default function TestHabitosPage() {
         <h3>¿Quién se beneficia de este test?</h3>
         <div className={styles.eduEscenariosGrid}>
           <div className={styles.eduEscenarioCard}>
-            <span className={styles.eduEscenarioIcon}>🏃</span>
+            <span className={styles.eduEscenarioIcon} aria-hidden="true">🏃</span>
             <h4>Personas activas</h4>
             <p>Identifica qué áreas fuera del ejercicio están limitando tu rendimiento y recuperación.</p>
           </div>
           <div className={styles.eduEscenarioCard}>
-            <span className={styles.eduEscenarioIcon}>💼</span>
+            <span className={styles.eduEscenarioIcon} aria-hidden="true">💼</span>
             <h4>Profesionales con estrés</h4>
             <p>Detecta si los hábitos de sueño y descanso están comprometidos por la carga laboral.</p>
           </div>
           <div className={styles.eduEscenarioCard}>
-            <span className={styles.eduEscenarioIcon}>👨‍👩‍👧</span>
+            <span className={styles.eduEscenarioIcon} aria-hidden="true">👨‍👩‍👧</span>
             <h4>Familias</h4>
             <p>Evalúa el estilo de vida familiar y detecta áreas de mejora colectivas (alimentación, pantallas).</p>
           </div>
           <div className={styles.eduEscenarioCard}>
-            <span className={styles.eduEscenarioIcon}>🎓</span>
+            <span className={styles.eduEscenarioIcon} aria-hidden="true">🎓</span>
             <h4>Estudiantes</h4>
             <p>El sueño y la nutrición impactan directamente en el aprendizaje. Este test ayuda a priorizar.</p>
           </div>
@@ -775,12 +775,12 @@ export default function TestHabitosPage() {
         {/* Tips */}
         <h3>6 claves para que los hábitos duren</h3>
         <div className={styles.eduTipsGrid}>
-          <div className={styles.eduTipCard}><span className={styles.eduTipIcono}>🎯</span><p>Un hábito a la vez. El «todo o nada» es la principal causa de abandono.</p></div>
-          <div className={styles.eduTipCard}><span className={styles.eduTipIcono}>📅</span><p>Misma hora, mismo lugar. La consistencia contextual acelera la automatización.</p></div>
-          <div className={styles.eduTipCard}><span className={styles.eduTipIcono}>👥</span><p>Comparte tu objetivo con alguien. La responsabilidad social duplica la adherencia.</p></div>
-          <div className={styles.eduTipCard}><span className={styles.eduTipIcono}>⚡</span><p>Prepara el entorno: zapatillas a la vista, fruta en la encimera, móvil fuera del dormitorio.</p></div>
-          <div className={styles.eduTipCard}><span className={styles.eduTipIcono}>🔄</span><p>Los fallos son normales. Fallar un día no rompe el hábito; abandonar tras el fallo, sí.</p></div>
-          <div className={styles.eduTipCard}><span className={styles.eduTipIcono}>🧠</span><p>Reencuadra la identidad: «soy una persona activa» funciona mejor que «intento hacer ejercicio».</p></div>
+          <div className={styles.eduTipCard}><span className={styles.eduTipIcono} aria-hidden="true">🎯</span><p>Un hábito a la vez. El «todo o nada» es la principal causa de abandono.</p></div>
+          <div className={styles.eduTipCard}><span className={styles.eduTipIcono} aria-hidden="true">📅</span><p>Misma hora, mismo lugar. La consistencia contextual acelera la automatización.</p></div>
+          <div className={styles.eduTipCard}><span className={styles.eduTipIcono} aria-hidden="true">👥</span><p>Comparte tu objetivo con alguien. La responsabilidad social duplica la adherencia.</p></div>
+          <div className={styles.eduTipCard}><span className={styles.eduTipIcono} aria-hidden="true">⚡</span><p>Prepara el entorno: zapatillas a la vista, fruta en la encimera, móvil fuera del dormitorio.</p></div>
+          <div className={styles.eduTipCard}><span className={styles.eduTipIcono} aria-hidden="true">🔄</span><p>Los fallos son normales. Fallar un día no rompe el hábito; abandonar tras el fallo, sí.</p></div>
+          <div className={styles.eduTipCard}><span className={styles.eduTipIcono} aria-hidden="true">🧠</span><p>Reencuadra la identidad: «soy una persona activa» funciona mejor que «intento hacer ejercicio».</p></div>
         </div>
 
         {/* Warning */}

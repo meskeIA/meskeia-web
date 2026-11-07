@@ -432,22 +432,22 @@ export default function LimpiadorTextoPage() {
             <h3><span aria-hidden="true">💡</span> Tips para Limpiezas Profesionales</h3>
             <div className={styles.eduTipsGrid}>
               <div className={styles.eduTipCard}>
-                <span className={styles.eduTipIcon}>💾</span>
+                <span className={styles.eduTipIcon} aria-hidden="true">💾</span>
                 <h4>Guarda el original siempre</h4>
                 <p>Antes de limpiar texto importante, guarda siempre una copia del original. Las operaciones de limpieza no tienen deshacer y pueden eliminar contenido que necesitarás recuperar.</p>
               </div>
               <div className={styles.eduTipCard}>
-                <span className={styles.eduTipIcon}>🔍</span>
+                <span className={styles.eduTipIcon} aria-hidden="true">🔍</span>
                 <h4>Revisa las estadísticas</h4>
                 <p>El porcentaje de caracteres eliminados te da una señal de si la limpieza fue razonable. Una reducción de más del 30% suele indicar que se eliminó contenido que quizás no debías.</p>
               </div>
               <div className={styles.eduTipCard}>
-                <span className={styles.eduTipIcon}>⚡</span>
+                <span className={styles.eduTipIcon} aria-hidden="true">⚡</span>
                 <h4>Empieza conservador</h4>
                 <p>Activa primero solo &quot;Espacios extra + Espacios inicio/fin&quot;. Son las operaciones más seguras. Añade opciones más agresivas (caracteres especiales, puntuación) solo si el resultado previo es insuficiente.</p>
               </div>
               <div className={styles.eduTipCard}>
-                <span className={styles.eduTipIcon}>🌐</span>
+                <span className={styles.eduTipIcon} aria-hidden="true">🌐</span>
                 <h4>Para NLP y análisis de texto</h4>
                 <p>Si preparas texto para modelos de lenguaje o análisis estadístico, la secuencia estándar es: minúsculas (en Conversor de Texto) → sin puntuación → sin números → sin URLs → sin emojis.</p>
               </div>
@@ -457,7 +457,7 @@ export default function LimpiadorTextoPage() {
           {/* SECCIÓN 6: Warning Box */}
           <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
-              <span className={styles.warningIcon}>⚠️</span>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               <h3>Limitaciones y Riesgos de la Limpieza de Texto</h3>
             </div>
             <ul className={styles.warningList}>

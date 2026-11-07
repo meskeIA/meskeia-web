@@ -1230,7 +1230,7 @@ export default function CalculadoraNotasPage() {
         {/* 6. WARNING BOX */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcono}>⚠️</span>
+            <span className={styles.warningIcono} aria-hidden="true">⚠️</span>
             <strong>Errores frecuentes al calcular medias académicas</strong>
           </div>
           <ul className={styles.warningList}>
