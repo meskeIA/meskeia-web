@@ -11,6 +11,8 @@
 import React from 'react';
 import { URL_PRIVACIDAD, URL_TERMINOS } from '@/lib/urls-legales';
 import Link from 'next/link';
+import { parseISODateLocal } from '@/lib/formatters';
+import AnioActual from './AnioActual';
 import DescubreVertical from './DescubreVertical';
 import styles from './LegalNotice.module.css';
 
@@ -19,9 +21,11 @@ interface LegalNoticeProps {
 }
 
 export default function LegalNotice({ lastUpdated }: LegalNoticeProps) {
-  // Formatear fecha para mostrar
+  // Formatear fecha para mostrar. Con parseISODateLocal y no con new Date(cadena), que lee
+  // «2026-02-02» como medianoche UTC: en un huso de América salía el 1 de febrero y el texto
+  // no cuadraba con el HTML prerenderizado (error de hidratación #418, el gotcha del hallazgo 482).
   const formatDate = (dateString: string): string => {
-    const date = new Date(dateString);
+    const date = parseISODateLocal(dateString);
     return date.toLocaleDateString('es-ES', {
       day: 'numeric',
       month: 'long',
@@ -31,7 +35,7 @@ export default function LegalNotice({ lastUpdated }: LegalNoticeProps) {
 
   // Formatear fecha compacta para móvil
   const formatDateShort = (dateString: string): string => {
-    const date = new Date(dateString);
+    const date = parseISODateLocal(dateString);
     return date.toLocaleDateString('es-ES', {
       day: '2-digit',
       month: '2-digit',
@@ -81,8 +85,8 @@ export default function LegalNotice({ lastUpdated }: LegalNoticeProps) {
       <span className={styles.separator} aria-hidden="true">|</span>
 
       <span className={styles.copyright}>
-        <span className={styles.copyrightFull}>© {new Date().getFullYear()} meskeIA</span>
-        <span className={styles.copyrightShort}>© {new Date().getFullYear()}</span>
+        <span className={styles.copyrightFull}>© <AnioActual /> meskeIA</span>
+        <span className={styles.copyrightShort}>© <AnioActual /></span>
       </span>
     </div>
 

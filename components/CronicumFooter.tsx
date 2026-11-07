@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import styles from './CronicumFooter.module.css';
 import { urlParaCompartir } from '@/lib/trackingFrom';
+import AnioActual from './AnioActual';
 
 /**
  * Footer propio de la marca Cronicum.
@@ -38,7 +39,6 @@ export default function CronicumFooter() {
     }
   };
 
-  const anio = new Date().getFullYear();
 
   return (
     <footer className={styles.footer}>
@@ -86,7 +86,7 @@ export default function CronicumFooter() {
           <a href="https://meskeia.com/" className={styles.parentLink}>meskeIA</a>
           {' '}— más de mil herramientas gratuitas para el día a día.
         </p>
-        <p className={styles.copyright}>© {anio} meskeIA · Cronicum</p>
+        <p className={styles.copyright}>© <AnioActual /> meskeIA · Cronicum</p>
       </div>
     </footer>
   );

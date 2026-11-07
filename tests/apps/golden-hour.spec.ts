@@ -472,9 +472,11 @@ test('el contenido educativo y el JSON-LD dicen la astronomía correcta', async 
 // navegador fijado al 21/06/2026 y al 21/12/2026, 12:00 en Madrid, el campo enseña ESE día en la
 // propiedad, el atributo y el estado de React, y las horas son las de ese día. React 19 reescribe
 // el `defaultValue` del input al hidratar y, con el campo sin tocar, eso mueve lo que se ve.
-// ⚠️ El día fijado va en el AÑO DEL BUILD: con otro año cambia el «© AAAA» de LegalNotice, React
-//   da el error 418 (texto distinto), REGENERA el árbol en el cliente y el campo sale bien por
+// ⚠️ El día fijado va en el AÑO DEL BUILD: con otro año cambiaba el «© AAAA» de LegalNotice, React
+//   daba el error 418 (texto distinto), REGENERABA el árbol en el cliente y el campo salía bien por
 //   eso, sin haber hidratado. Por eso el caso exige además que no haya error de hidratación.
+//   (Ese 418 lo reparó el cabo C0666 con components/AnioActual.tsx; el año del build se mantiene
+//   para que el caso no dependa de esa reparación.)
 // NOAA (implementación propia, como la cabecera; Madrid 40,4168 N 3,7038 O):
 //   21/06/2026 (UTC+2) orto 06:44:45 · ocaso 21:48:31 · día 903,8 min = 15h 4min
 //   21/12/2026 (UTC+1) orto 08:34:20 · ocaso 17:51:26 · día 557,1 min = 9h 17min
@@ -494,7 +496,7 @@ test('el campo de fecha y las horas son del día del navegador, no del build (ca
   const html = await (await request.get('/golden-hour/')).text();
   const etiqueta = html.match(/<input[^>]*id="gh-fecha"[^>]*>/)?.[0] ?? '';
   const fechaServida = etiqueta.match(/value="([^"]*)"/)?.[1] ?? '';
-  const anioCopyright = html.match(/©\s*(?:<!-- -->)?\s*(\d{4})/)?.[1];
+  const anioCopyright = html.match(/©\s*(?:<!-- -->)?\s*(?:<span[^>]*>)?(\d{4})/)?.[1];
   const anio = Number(anioCopyright ?? fechaServida.slice(0, 4)) || new Date().getFullYear();
   // El solsticio más lejano del build, para que sus horas no se parezcan a las del día servido.
   const mesBuild = Number(fechaServida.slice(5, 7)) || new Date().getMonth() + 1;

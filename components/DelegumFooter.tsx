@@ -5,6 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import styles from './DelegumFooter.module.css';
 import { urlParaCompartir } from '@/lib/trackingFrom';
+import AnioActual from './AnioActual';
 
 /**
  * Footer propio de la marca Delegum.
@@ -40,7 +41,6 @@ export default function DelegumFooter() {
     }
   };
 
-  const anio = new Date().getFullYear();
 
   return (
     <footer className={styles.footer}>
@@ -88,7 +88,7 @@ export default function DelegumFooter() {
           <a href="https://meskeia.com/" className={styles.parentLink}>meskeIA</a>
           {' '}— más de mil herramientas gratuitas para el día a día.
         </p>
-        <p className={styles.copyright}>© {anio} meskeIA · Delegum</p>
+        <p className={styles.copyright}>© <AnioActual /> meskeIA · Delegum</p>
       </div>
     </footer>
   );
