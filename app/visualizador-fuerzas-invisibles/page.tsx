@@ -22,6 +22,12 @@ interface FuerzaFisica {
   nombre: string;
   color: string;
   colorClaro: string;
+  /**
+   * El color del TEXTO de la fuerza (nombre, fórmula y «sorpresa»), que cambia con el tema: con
+   * `color` como texto daban 2,54-4,11:1 en claro y 3,07-4,40 en oscuro (cabo C0645). `color`
+   * sigue en bordes y viñetas. Medidos contra el blanco, la tarjeta oscura y el tinte del 10 %.
+   */
+  tono: string;
   ejemploCotidiano: string;
   pregunta: string;
   explicacionSimple: string;
@@ -38,6 +44,7 @@ const FUERZAS: FuerzaFisica[] = [
     nombre: 'Gravedad',
     color: '#2E86AB',
     colorClaro: 'rgba(46,134,171,0.10)',
+    tono: 'var(--primary-texto)',
     pregunta: '¿Por qué no flotas?',
     ejemploCotidiano: 'Una manzana cae del árbol. Una pelota que lanzas al aire siempre vuelve. Tu peso en la báscula.',
     explicacionSimple:
@@ -59,6 +66,7 @@ const FUERZAS: FuerzaFisica[] = [
     nombre: 'Fricción',
     color: '#e67e22',
     colorClaro: 'rgba(230,126,34,0.10)',
+    tono: 'var(--naranja-texto, #F0A35E)',
     pregunta: '¿Por qué no resbalas?',
     ejemploCotidiano: 'Frenar un coche. Escribir con un bolígrafo. Caminar sin caerte. Una caja que no se mueve sola en el suelo.',
     explicacionSimple:
@@ -80,6 +88,7 @@ const FUERZAS: FuerzaFisica[] = [
     nombre: 'Inercia',
     color: '#9b59b6',
     colorClaro: 'rgba(155,89,182,0.10)',
+    tono: 'var(--violeta-texto)',
     pregunta: '¿Por qué te lanzas hacia adelante al frenar?',
     ejemploCotidiano: 'Un frenazo brusco en el coche. Un café que se derrama en el metro. Un trineo que sigue deslizándose aunque dejes de empujar.',
     explicacionSimple:
@@ -101,6 +110,7 @@ const FUERZAS: FuerzaFisica[] = [
     nombre: 'Presión Atmosférica',
     color: '#27ae60',
     colorClaro: 'rgba(39,174,96,0.10)',
+    tono: 'var(--verde-texto, #5FD08A)',
     pregunta: '¿Por qué te duelen los oídos en el avión?',
     ejemploCotidiano: 'Oídos que tapan en el avión o en la montaña. Una ventosa que se pega a la pared. El agua que no cae de un vaso invertido con papel.',
     explicacionSimple:
@@ -122,6 +132,7 @@ const FUERZAS: FuerzaFisica[] = [
     nombre: 'Tensión Superficial',
     color: '#48A9A6',
     colorClaro: 'rgba(72,169,166,0.10)',
+    tono: 'var(--secondary-texto)',
     pregunta: '¿Por qué flotan los insectos en el agua?',
     ejemploCotidiano: 'Un zapatero que camina sobre el agua. Una moneda que flota si la pones con cuidado. El agua que forma gotas en vez de extenderse. El menisco del agua en un vaso.',
     explicacionSimple:
@@ -231,12 +242,12 @@ export default function VisualizadorFuerzasInvisiblesPage() {
                   {/* Fórmula */}
                   <div className={styles.formulaBox} style={{ background: f.colorClaro, borderColor: f.color }}>
                     <span className={styles.formulaLabel}>{f.formulaLabel}</span>
-                    <code className={styles.formulaValor} style={{ color: f.color }}>{f.formulaValor}</code>
+                    <code className={styles.formulaValor} style={{ color: f.tono }}>{f.formulaValor}</code>
                   </div>
 
                   {/* Dato sorprendente */}
                   <div className={styles.sorpresaBox}>
-                    <span className={styles.sorpresaLabel} style={{ color: f.color }}>
+                    <span className={styles.sorpresaLabel} style={{ color: f.tono }}>
                       <span aria-hidden="true">✨</span> Dato sorprendente
                     </span>
                     <p className={styles.sorpresaTexto}>{f.datoSorprendente}</p>
@@ -267,7 +278,7 @@ export default function VisualizadorFuerzasInvisiblesPage() {
             {FUERZAS.map(f => (
               <div key={f.id} className={styles.resumenCard} style={{ borderTop: `4px solid ${f.color}` }}>
                 <span className={styles.resumenIcono} aria-hidden="true">{f.icono}</span>
-                <span className={styles.resumenNombre} style={{ color: f.color }}>{f.nombre}</span>
+                <span className={styles.resumenNombre} style={{ color: f.tono }}>{f.nombre}</span>
                 <span className={styles.resumenFormula}>{f.formulaValor}</span>
                 <span className={styles.resumenPregunta}>{f.pregunta}</span>
               </div>

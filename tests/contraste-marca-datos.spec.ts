@@ -35,6 +35,10 @@ const APPS: App[] = [
   // El nombre de la vía ganadora del veredicto en el color de su barra: «Préstamo bancario» en la
   // marca (4,11:1 en claro, 3,50 en oscuro) y «Ampliación de capital» en #C0392B (2,64 en oscuro)
   { slug: 'simulador-financiacion-empresarial', todo: true },
+  // El nombre, la fórmula y la «sorpresa» de cada fuerza en su color de datos: 2,54-4,11:1 en
+  // claro (tensión superficial, gravedad, fricción, presión) y 3,07-4,40 en oscuro (inercia,
+  // gravedad, tensión). Las cinco fuerzas del acordeón, abiertas una a una
+  { slug: 'visualizador-fuerzas-invisibles', todo: true, secciones: "button[class*='fuerzaCabecera']" },
 ];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {
@@ -104,9 +108,14 @@ async function recorrer(page: Page, secciones?: string, todoElTexto = false): Pr
     await desplegarTodo(page);
     return suspensos(page, todoElTexto);
   }
+  await desplegarTodo(page);
   for (let i = 0; i < n; i++) {
-    await botones!.nth(i).click();
-    await desplegarTodo(page);
+    const boton = botones!.nth(i);
+    // Un acordeón (aria-expanded) se abre sección a sección sin volver a desplegarlo todo, que
+    // cerraría la que se mide; un botón de sección sin aria-expanded, como antes
+    if ((await boton.getAttribute('aria-expanded')) !== 'true') await boton.click();
+    if ((await boton.getAttribute('aria-expanded')) === null) await desplegarTodo(page);
+    else await expect(boton).toHaveAttribute('aria-expanded', 'true');
     todo.push(...(await suspensos(page, todoElTexto)).map((s) => `sección ${i + 1}: ${s}`));
   }
   return todo;
