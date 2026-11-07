@@ -11,6 +11,7 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
+import { normalizarBusqueda } from '@/lib/buscadorTablas';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -524,10 +525,10 @@ function TabComparativa() {
   const corrientesFiltradas = useMemo(() => {
     return CORRIENTES.filter((cor) => {
       const coincideCategoria = categoriaFiltro === 'todos' || cor.categoria === categoriaFiltro;
-      const termino = busqueda.toLowerCase();
+      const termino = normalizarBusqueda(busqueda);
       const coincideBusqueda = !termino ||
-        cor.nombre.toLowerCase().includes(termino) ||
-        cor.filosofos.some((f) => f.toLowerCase().includes(termino));
+        normalizarBusqueda(cor.nombre).includes(termino) ||
+        cor.filosofos.some((f) => normalizarBusqueda(f).includes(termino));
       return coincideCategoria && coincideBusqueda;
     });
   }, [categoriaFiltro, busqueda]);

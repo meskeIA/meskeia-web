@@ -2,6 +2,7 @@
 // Información orientativa - Verificar siempre con fuentes oficiales
 
 import { PLAZO_ISD } from '@/data/fiscal';
+import { normalizarBusqueda } from '@/lib/buscadorTablas';
 
 export type PlazoCategory =
   | 'consumo'
@@ -485,7 +486,7 @@ export const PLAZOS_LEGALES: PlazoLegal[] = [
 
 // Función para buscar plazos
 export function searchPlazos(query: string, category?: PlazoCategory): PlazoLegal[] {
-  const normalizedQuery = query.toLowerCase().trim();
+  const normalizedQuery = normalizarBusqueda(query).trim();
 
   let results = PLAZOS_LEGALES;
 
@@ -495,9 +496,9 @@ export function searchPlazos(query: string, category?: PlazoCategory): PlazoLega
 
   if (normalizedQuery) {
     results = results.filter(p =>
-      p.title.toLowerCase().includes(normalizedQuery) ||
-      p.description.toLowerCase().includes(normalizedQuery) ||
-      p.keywords.some(k => k.toLowerCase().includes(normalizedQuery))
+      normalizarBusqueda(p.title).includes(normalizedQuery) ||
+      normalizarBusqueda(p.description).includes(normalizedQuery) ||
+      p.keywords.some(k => normalizarBusqueda(k).includes(normalizedQuery))
     );
   }
 

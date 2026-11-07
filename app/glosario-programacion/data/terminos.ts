@@ -1,6 +1,8 @@
 // Base de datos de términos de programación
 // Glosario meskeIA - Términos esenciales para aprender desarrollo web
 
+import { normalizarBusqueda } from '@/lib/buscadorTablas';
+
 export type Categoria =
   | 'interfaz'      // Elementos de UI
   | 'datos'         // Peticiones, APIs, estructuras
@@ -1146,11 +1148,12 @@ export function getTerminosPorLetra(letra: string): Termino[] {
 
 // Función para buscar términos
 export function buscarTerminos(query: string): Termino[] {
-  const q = query.toLowerCase();
+  // Sin tildes ni mayúsculas en las dos partes: «funcion» encuentra «función» (cabo C0668)
+  const q = normalizarBusqueda(query);
   return TERMINOS.filter(t =>
-    t.termino.toLowerCase().includes(q) ||
-    t.traduccion?.toLowerCase().includes(q) ||
-    t.definicion.toLowerCase().includes(q)
+    normalizarBusqueda(t.termino).includes(q) ||
+    normalizarBusqueda(t.traduccion ?? '').includes(q) ||
+    normalizarBusqueda(t.definicion).includes(q)
   );
 }
 

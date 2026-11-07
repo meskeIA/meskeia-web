@@ -13,6 +13,7 @@ import {
   type InstrumentFamily,
   type InstrumentOrigin
 } from '@/data/instruments';
+import { normalizarBusqueda } from '@/lib/buscadorTablas';
 
 export default function InstrumentosMusicalesPage() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -24,10 +25,10 @@ export default function InstrumentosMusicalesPage() {
   const filteredInstruments = useMemo(() => {
     return INSTRUMENTS.filter(instrument => {
       const matchesSearch =
-        instrument.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        instrument.nombreIngles.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        instrument.subfamilia.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        instrument.materiales.some(m => m.toLowerCase().includes(searchTerm.toLowerCase()));
+        normalizarBusqueda(instrument.nombre).includes(normalizarBusqueda(searchTerm)) ||
+        normalizarBusqueda(instrument.nombreIngles).includes(normalizarBusqueda(searchTerm)) ||
+        normalizarBusqueda(instrument.subfamilia).includes(normalizarBusqueda(searchTerm)) ||
+        instrument.materiales.some(m => normalizarBusqueda(m).includes(normalizarBusqueda(searchTerm)));
 
       const matchesFamily = selectedFamily === 'Todas' || instrument.familia === selectedFamily;
       const matchesOrigin = selectedOrigin === 'Todos' || instrument.origen === selectedOrigin;

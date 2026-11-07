@@ -23,6 +23,10 @@ interface Fila {
   slug: string;
   /** Nombre de una ficha, tal como lo escribe la guía (con su tilde) */
   palabra: string;
+  /** Pestaña o botón que hay que pulsar antes, si el buscador no está a la vista al cargar */
+  pestana?: string;
+  /** Selector del campo, si no casa con el genérico (sin «Buscar» en placeholder ni etiqueta) */
+  selector?: string;
 }
 
 const FILAS: Fila[] = [
@@ -55,13 +59,39 @@ const FILAS: Fila[] = [
   { slug: 'guia-razas-perros', palabra: 'Dálmata' },
   { slug: 'guia-infusiones', palabra: 'Lúpulo' },
   { slug: 'guia-tipos-pasta', palabra: 'Nápoles' },
+  // Fuera de las guías: buscadores con el mismo filtro (cabo C0668, /reparar 07/11/2026). Palabras
+  // elegidas con .reparar-trabajo/c0668-elegir.mjs de la copia: la forma sin tilde no está escrita
+  // en las fuentes de la app, así que con el filtro viejo la fila cae.
+  { slug: 'aditivos-e-alimentarios', palabra: 'información' },
+  { slug: 'calculadora-congelacion', palabra: 'aromáticas' },
+  { slug: 'calculadora-cocina', palabra: 'Brócoli', pestana: 'Tiempos', selector: '#filtroTiempo' },
+  // «geminis» no cabe en el latín «Gemini»: con el filtro viejo no salía (las estrellas no se pintan en la tarjeta)
+  { slug: 'constelaciones-del-cielo', palabra: 'Géminis' },
+  { slug: 'errores-escritura-creativa', palabra: 'transición' },
+  { slug: 'falsos-amigos-ingles', palabra: 'términos' },
+  { slug: 'estimador-smi', palabra: 'Almería', pestana: 'Por provincia' },
+  { slug: 'glosario-fisica-quimica', palabra: 'interacción' },
+  { slug: 'glosario-programacion', palabra: 'múltiples' },
+  { slug: 'instrumentos-musicales', palabra: 'electrónico' },
+  { slug: 'vitaminas-minerales', palabra: 'producción' },
+  { slug: 'plazos-legales', palabra: 'términos' },
+  { slug: 'visualizador-arte-movimientos', palabra: 'anónimos', pestana: 'Comparativa' },
+  { slug: 'visualizador-arquitectura-estilos', palabra: 'clásica', pestana: 'Comparativa' },
+  { slug: 'visualizador-derechos-humanos', palabra: 'protección', pestana: 'Comparativa' },
+  { slug: 'visualizador-filosofia', palabra: 'presocráticos', pestana: 'Comparativa' },
+  { slug: 'visualizador-generos-novela', palabra: 'acción' },
+  { slug: 'visualizador-literatura-movimientos', palabra: 'García', pestana: 'Comparativa' },
+  { slug: 'visualizador-musica-movimientos', palabra: 'Léonin', pestana: 'Comparativa' },
+  { slug: 'visualizador-recursos-literarios', palabra: 'Hipérbole' },
+  { slug: 'visualizador-revoluciones-industriales', palabra: 'producción', pestana: 'Comparativa' },
+  { slug: 'visualizador-historia/roma', palabra: 'Rómulo', pestana: 'Comparativa' },
 ];
 
 const SELECTOR = 'input[type="search"], input[placeholder*="usca" i], input[aria-label*="usca" i]';
 const sinTilde = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '');
 
-async function apariciones(page: Page, consulta: string, objetivo: string): Promise<number> {
-  const input = page.locator(SELECTOR).first();
+async function apariciones(page: Page, selector: string, consulta: string, objetivo: string): Promise<number> {
+  const input = page.locator(selector).first();
   await input.fill(consulta);
   await expect(input).toHaveValue(consulta);
   // El filtro corre en el render: basta con que React haya repintado
@@ -74,16 +104,27 @@ test.describe('guías-directorio · el buscador encuentra sin tilde (C0658)', ()
   for (const f of FILAS) {
     test(`${f.slug}: «${sinTilde(f.palabra).toLowerCase()}» encuentra «${f.palabra}»`, async ({ page }) => {
       await page.goto(`/${f.slug}/`);
-      const input = page.locator(SELECTOR).first();
+      const selector = f.selector ?? SELECTOR;
+      if (f.pestana) {
+        const boton = page.getByRole('tab', { name: f.pestana, exact: true })
+          .or(page.getByRole('button', { name: f.pestana, exact: true }))
+          .first();
+        // El clic, cuando React ya escucha: antes de hidratar no cambiaría de pestaña
+        await expect
+          .poll(() => boton.evaluate((b) => Object.keys(b).some((k) => k.startsWith('__reactProps$'))))
+          .toBe(true);
+        await boton.click();
+      }
+      const input = page.locator(selector).first();
       await expect(input).toBeVisible();
       await expect
         .poll(() => input.evaluate((i) => Object.keys(i).some((k) => k.startsWith('__reactProps$'))))
         .toBe(true);
 
       const objetivo = sinTilde(f.palabra.toLowerCase());
-      const nada = await apariciones(page, 'zzqxw', objetivo);
-      const conTilde = await apariciones(page, f.palabra.toLowerCase(), objetivo);
-      const sinLaTilde = await apariciones(page, objetivo, objetivo);
+      const nada = await apariciones(page, selector, 'zzqxw', objetivo);
+      const conTilde = await apariciones(page, selector, f.palabra.toLowerCase(), objetivo);
+      const sinLaTilde = await apariciones(page, selector, objetivo, objetivo);
       expect(conTilde, 'con tilde la ficha sale (si no, la fila no mide nada)').toBeGreaterThan(nada);
       expect(sinLaTilde, 'sin tilde sale lo mismo que con tilde').toBe(conTilde);
     });

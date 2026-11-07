@@ -6,6 +6,7 @@ import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard, EducationalSection, DisclaimerCard } from '@/components';
 import { hoyISOLocal } from '@/lib';
+import { normalizarBusqueda } from '@/lib/buscadorTablas';
 
 // Categorías disponibles
 const CATEGORIAS = [
@@ -153,8 +154,8 @@ export default function NotasPage() {
   const notasFiltradas = notas.filter(nota => {
     const coincideCategoria = filtroCategoria === 'todas' || nota.categoria === filtroCategoria;
     const coincideBusqueda = busqueda === '' ||
-      nota.titulo.toLowerCase().includes(busqueda.toLowerCase()) ||
-      nota.contenido.toLowerCase().includes(busqueda.toLowerCase());
+      normalizarBusqueda(nota.titulo).includes(normalizarBusqueda(busqueda)) ||
+      normalizarBusqueda(nota.contenido).includes(normalizarBusqueda(busqueda));
     return coincideCategoria && coincideBusqueda;
   });
 

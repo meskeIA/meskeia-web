@@ -11,6 +11,7 @@ import {
   type ConstellationType,
   type Hemisphere
 } from '@/data/constellations';
+import { normalizarBusqueda } from '@/lib/buscadorTablas';
 
 export default function ConstelacionesDelCieloPage() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -22,11 +23,11 @@ export default function ConstelacionesDelCieloPage() {
   const filteredConstellations = useMemo(() => {
     return CONSTELLATIONS.filter(constellation => {
       const matchesSearch =
-        constellation.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        constellation.nombreLatin.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        constellation.abreviatura.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        normalizarBusqueda(constellation.nombre).includes(normalizarBusqueda(searchTerm)) ||
+        normalizarBusqueda(constellation.nombreLatin).includes(normalizarBusqueda(searchTerm)) ||
+        normalizarBusqueda(constellation.abreviatura).includes(normalizarBusqueda(searchTerm)) ||
         constellation.estrellasPrincipales.some(star =>
-          star.nombre.toLowerCase().includes(searchTerm.toLowerCase())
+          normalizarBusqueda(star.nombre).includes(normalizarBusqueda(searchTerm))
         );
 
       const matchesType = selectedType === 'Todas' || constellation.tipo === selectedType;

@@ -11,6 +11,7 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
+import { normalizarBusqueda } from '@/lib/buscadorTablas';
 
 type Categoria = 'cotidiano' | 'emociones' | 'profesional' | 'acciones' | 'identicos';
 type Nivel = 'basico' | 'medio' | 'avanzado';
@@ -169,13 +170,13 @@ export default function FalsosAmigosIngles() {
 
   // Catálogo filtrado
   const filtrados = useMemo(() => {
-    const q = busqueda.toLowerCase().trim();
+    const q = normalizarBusqueda(busqueda).trim();
     return FALSOS_AMIGOS.filter(fa => {
       const matchTexto = !q ||
-        fa.ingles.toLowerCase().includes(q) ||
-        fa.espanol.toLowerCase().includes(q) ||
-        fa.significadoIngles.toLowerCase().includes(q) ||
-        fa.significadoEspanol.toLowerCase().includes(q);
+        normalizarBusqueda(fa.ingles).includes(q) ||
+        normalizarBusqueda(fa.espanol).includes(q) ||
+        normalizarBusqueda(fa.significadoIngles).includes(q) ||
+        normalizarBusqueda(fa.significadoEspanol).includes(q);
       const matchCat = catFiltro === 'todas' || fa.categoria === catFiltro;
       const matchNivel = nivelFiltro === 'todos' || fa.nivel === nivelFiltro;
       return matchTexto && matchCat && matchNivel;

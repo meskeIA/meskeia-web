@@ -8,6 +8,7 @@ import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard } from '@/components';
 import EducationalSection from '@/components/EducationalSection';
 import { figurasRetorica, FiguraRetorica, GrupoFigura, NivelFigura } from '@/data/figuras-retoricas';
+import { normalizarBusqueda } from '@/lib/buscadorTablas';
 
 type FiltroNivel = NivelFigura | 'todos';
 type FiltroGrupo = GrupoFigura | 'todos';
@@ -105,7 +106,7 @@ export default function VisualizadorRecursosLiterariosPage() {
     return figurasRetorica.filter(f => {
       const coincideNivel = filtroNivel === 'todos' || f.nivel === filtroNivel;
       const coincideGrupo = filtroGrupo === 'todos' || f.grupo === filtroGrupo;
-      const coincideBusqueda = f.nombre.toLowerCase().includes(busqueda.toLowerCase());
+      const coincideBusqueda = normalizarBusqueda(f.nombre).includes(normalizarBusqueda(busqueda));
       return coincideNivel && coincideGrupo && coincideBusqueda;
     });
   }, [filtroNivel, filtroGrupo, busqueda]);

@@ -29,6 +29,7 @@ import {
   REDUCCION_RENDIMIENTOS_TRABAJO_2025,
   calcularRendimientoNetoTrabajo,
 } from '@/data/fiscal';
+import { normalizarBusqueda } from '@/lib/buscadorTablas';
 
 // ──────────────────────────────────────────
 // TIPOS
@@ -150,8 +151,8 @@ export default function EstimadorSMIPage() {
     // Filtrar
     const filtradas = busqueda
       ? datos.filter(p =>
-          p.provincia.toLowerCase().includes(busqueda.toLowerCase()) ||
-          p.ccaa.toLowerCase().includes(busqueda.toLowerCase())
+          normalizarBusqueda(p.provincia).includes(normalizarBusqueda(busqueda)) ||
+          normalizarBusqueda(p.ccaa).includes(normalizarBusqueda(busqueda))
         )
       : datos;
 

@@ -6,6 +6,7 @@ import styles from './GlosarioFisicaQuimica.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { normalizarBusqueda } from '@/lib/buscadorTablas';
 
 type Categoria = 'fisica' | 'quimica' | 'todos';
 type Nivel = 'basico' | 'intermedio' | 'avanzado' | 'todos';
@@ -95,8 +96,8 @@ export default function GlosarioFisicaQuimicaPage() {
   const terminosFiltrados = useMemo(() => {
     return GLOSARIO.filter(t => {
       const matchBusqueda = busqueda === '' ||
-        t.termino.toLowerCase().includes(busqueda.toLowerCase()) ||
-        t.definicion.toLowerCase().includes(busqueda.toLowerCase());
+        normalizarBusqueda(t.termino).includes(normalizarBusqueda(busqueda)) ||
+        normalizarBusqueda(t.definicion).includes(normalizarBusqueda(busqueda));
 
       const matchCategoria = categoriaFiltro === 'todos' || t.categoria === categoriaFiltro;
       const matchNivel = nivelFiltro === 'todos' || t.nivel === nivelFiltro;

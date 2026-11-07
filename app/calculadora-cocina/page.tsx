@@ -6,6 +6,7 @@ import styles from './CalculadoraCocina.module.css';
 import { MeskeiaLogo, Footer, ResultCard, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 import { PREGUNTAS_FRECUENTES } from './metadata';
+import { normalizarBusqueda } from '@/lib/buscadorTablas';
 
 type TabActiva = 'conversor' | 'escalador' | 'tiempos' | 'sustitutos';
 
@@ -411,7 +412,7 @@ export default function CalculadoraCocinaPage() {
 
   const tiemposFiltrados = tiemposCoccion.filter(t => {
     const coincideTexto = filtroTiempo === '' ||
-      t.alimento.toLowerCase().includes(filtroTiempo.toLowerCase());
+      normalizarBusqueda(t.alimento).includes(normalizarBusqueda(filtroTiempo));
     const coincideMetodo = metodoFiltro === 'todos' ||
       t.metodo.toLowerCase() === metodoFiltro.toLowerCase();
     return coincideTexto && coincideMetodo;
@@ -419,7 +420,7 @@ export default function CalculadoraCocinaPage() {
 
   const sustitutosFiltrados = sustitutosIngredientes.filter(s =>
     busquedaSustituto === '' ||
-    s.ingrediente.toLowerCase().includes(busquedaSustituto.toLowerCase())
+    normalizarBusqueda(s.ingrediente).includes(normalizarBusqueda(busquedaSustituto))
   );
 
   const metodosUnicos = [...new Set(tiemposCoccion.map(t => t.metodo))];

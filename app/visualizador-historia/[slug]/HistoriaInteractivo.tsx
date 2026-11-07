@@ -12,6 +12,7 @@ import {
   ShareCard,
   type RelatedApp,
 } from '@/components';
+import { normalizarBusqueda } from '@/lib/buscadorTablas';
 
 // ─────────────────────────────────────────
 // Helpers
@@ -175,8 +176,8 @@ export default function HistoriaInteractivo({
         h =>
           (catFiltro === 'todas' || h.categoria === catFiltro) &&
           (busqueda === '' ||
-            h.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
-            h.descripcion.toLowerCase().includes(busqueda.toLowerCase()))
+            normalizarBusqueda(h.nombre).includes(normalizarBusqueda(busqueda)) ||
+            normalizarBusqueda(h.descripcion).includes(normalizarBusqueda(busqueda)))
       ),
     [data.hitos, catFiltro, busqueda]
   );

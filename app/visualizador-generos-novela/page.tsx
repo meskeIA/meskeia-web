@@ -7,6 +7,7 @@ import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard } from '@/components';
 import EducationalSection from '@/components/EducationalSection';
+import { normalizarBusqueda } from '@/lib/buscadorTablas';
 
 type FiltroBusco = 'todos' | 'suspense' | 'mundos' | 'personajes' | 'ideas' | 'emocion' | 'historia';
 
@@ -415,7 +416,7 @@ export default function VisualizadorGenerosNovelaPage() {
   const generosFiltrados = useMemo(() => {
     return GENEROS.filter(g => {
       const coincideFiltro = filtroBusco === 'todos' || g.queBusca.includes(filtroBusco);
-      const coincideBusqueda = g.nombre.toLowerCase().includes(busqueda.toLowerCase());
+      const coincideBusqueda = normalizarBusqueda(g.nombre).includes(normalizarBusqueda(busqueda));
       return coincideFiltro && coincideBusqueda;
     });
   }, [filtroBusco, busqueda]);

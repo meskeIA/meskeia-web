@@ -8,6 +8,7 @@ import {
   ALIMENTOS_CONGELACION, CATEGORIAS_CONGELACION, ETIQUETA_APTO,
   type CategoriaCongelacion, type AptoCongelar,
 } from '@/lib/calculadoras/congelacion';
+import { normalizarBusqueda } from '@/lib/buscadorTablas';
 
 const CATEGORIAS = Object.keys(CATEGORIAS_CONGELACION) as CategoriaCongelacion[];
 const BADGE: Record<AptoCongelar, string> = { bien: styles.badgeBien, regular: styles.badgeRegular, no: styles.badgeNo };
@@ -17,9 +18,9 @@ export default function CalculadoraCongelacionPage() {
   const [busqueda, setBusqueda] = useState('');
 
   const lista = useMemo(() => {
-    const q = busqueda.trim().toLowerCase();
+    const q = normalizarBusqueda(busqueda).trim();
     return ALIMENTOS_CONGELACION.filter(
-      (a) => (!filtro || a.categoria === filtro) && (!q || a.nombre.toLowerCase().includes(q)),
+      (a) => (!filtro || a.categoria === filtro) && (!q || normalizarBusqueda(a.nombre).includes(q)),
     );
   }, [filtro, busqueda]);
 

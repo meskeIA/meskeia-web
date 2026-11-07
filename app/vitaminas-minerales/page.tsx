@@ -12,6 +12,7 @@ import {
   type NutrientType,
   type NutrientSubtype
 } from '@/data/nutrients';
+import { normalizarBusqueda } from '@/lib/buscadorTablas';
 
 export default function VitaminasMineralesPage() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -23,10 +24,10 @@ export default function VitaminasMineralesPage() {
   const filteredNutrients = useMemo(() => {
     return NUTRIENTS.filter(nutrient => {
       const matchesSearch =
-        nutrient.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        nutrient.nombreCientifico.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        nutrient.funcion.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        nutrient.fuentes.some(f => f.toLowerCase().includes(searchTerm.toLowerCase()));
+        normalizarBusqueda(nutrient.nombre).includes(normalizarBusqueda(searchTerm)) ||
+        normalizarBusqueda(nutrient.nombreCientifico).includes(normalizarBusqueda(searchTerm)) ||
+        normalizarBusqueda(nutrient.funcion).includes(normalizarBusqueda(searchTerm)) ||
+        nutrient.fuentes.some(f => normalizarBusqueda(f).includes(normalizarBusqueda(searchTerm)));
 
       const matchesType = selectedType === 'Todos' || nutrient.tipo === selectedType;
       const matchesSubtype = selectedSubtype === 'Todos' || nutrient.subtipo === selectedSubtype;

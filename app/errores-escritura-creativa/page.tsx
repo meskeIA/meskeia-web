@@ -4,6 +4,7 @@
 import { useState, useMemo, useEffect } from 'react';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard } from '@/components';
 import styles from './ErroresEscrituraCreativa.module.css';
+import { normalizarBusqueda } from '@/lib/buscadorTablas';
 
 type Categoria = 'voz' | 'dialogos' | 'descripcion' | 'estructura' | 'personajes' | 'estilo';
 type Nivel = 'basico' | 'intermedio' | 'avanzado';
@@ -230,11 +231,11 @@ export default function ErroresEscrituraCreativaPage() {
   const erroresFiltrados = useMemo(() => {
     return ERRORES.filter((err) => {
       const matchCategoria = filtro === 'todos' || err.categoria === filtro;
-      const query = busqueda.toLowerCase();
+      const query = normalizarBusqueda(busqueda);
       const matchBusqueda =
         !query ||
-        err.nombre.toLowerCase().includes(query) ||
-        err.descripcion.toLowerCase().includes(query);
+        normalizarBusqueda(err.nombre).includes(query) ||
+        normalizarBusqueda(err.descripcion).includes(query);
       return matchCategoria && matchBusqueda;
     });
   }, [filtro, busqueda]);

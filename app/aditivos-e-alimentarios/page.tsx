@@ -11,6 +11,7 @@ import {
   DisclaimerCard,
   ShareCard,
 } from '@/components';
+import { normalizarBusqueda } from '@/lib/buscadorTablas';
 
 // ============================================================
 // DATOS
@@ -159,15 +160,15 @@ export default function AdditivosEAlimentariosPage() {
   const [categoriaActiva, setCategoriaActiva] = useState('Todos');
 
   const aditivosFiltrados = useMemo(() => {
-    const q = busqueda.toLowerCase().trim();
+    const q = normalizarBusqueda(busqueda).trim();
     return ADITIVOS.filter((a) => {
       const coincideCategoria = categoriaActiva === 'Todos' || a.categoria === categoriaActiva;
       const coincideBusqueda =
         !q ||
-        a.codigo.toLowerCase().includes(q) ||
-        a.nombre.toLowerCase().includes(q) ||
-        a.funcion.toLowerCase().includes(q) ||
-        a.alimentos.some((al) => al.toLowerCase().includes(q));
+        normalizarBusqueda(a.codigo).includes(q) ||
+        normalizarBusqueda(a.nombre).includes(q) ||
+        normalizarBusqueda(a.funcion).includes(q) ||
+        a.alimentos.some((al) => normalizarBusqueda(al).includes(q));
       return coincideCategoria && coincideBusqueda;
     });
   }, [busqueda, categoriaActiva]);
