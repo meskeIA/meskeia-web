@@ -500,6 +500,104 @@ test.describe('Estimador de pensión de viudedad — móvil', () => {
   });
 });
 
+/**
+ * ── CABO C0135 (08/10/2026; puntos a, b y d anclados el 08/11/2026) ─────────────────────
+ * El punto (c) ya pasó a C0368/C0369 (CASOS 5b y 5c). Normas leídas en www.boe.es el 08/11/2026:
+ *   · Decreto 1646/1972, art. 7 (BOE-A-1972-944, consolidado, última actualización 27/12/2003):
+ *     7.2 «La base reguladora de las pensiones por muerte y supervivencia, derivadas de contingencias
+ *     comunes, será el cociente que resulte de dividir por 28 la suma de las bases de cotización del
+ *     interesado durante un período ininterrumpido de 24 meses, elegidos por los beneficiarios dentro
+ *     de los 15 años inmediatamente anteriores a la fecha del hecho causante de la pensión.»
+ *     7.3 «La base reguladora de las pensiones por muerte y supervivencia, cuando el causante, al tiempo
+ *     de su fallecimiento, fuese pensionista de jubilación o incapacidad permanente, será la misma que
+ *     sirvió para determinar su pensión. En estos casos, la cuantía de la pensión se incrementará
+ *     mediante la aplicación de las mejoras o revalorizaciones que, para las prestaciones de igual
+ *     naturaleza por muerte y supervivencia, hayan tenido lugar desde la fecha del hecho causante de
+ *     la pensión de la que deriven.»
+ *   · Orden de 13/02/1967, art. 11.1 (BOE-A-1967-2876, consolidada, última actualización 21/03/2009):
+ *     «podrán mantener el percibo de la pensión de viudedad, aunque contraigan nuevo matrimonio, los
+ *     pensionistas de viudedad en quienes concurran los siguientes requisitos: a) Ser mayor de sesenta
+ *     y un años o menor de dicha edad, siempre que […] tengan reconocida también una pensión de
+ *     incapacidad permanente, en el grado de incapacidad absoluta o de gran invalidez, o acrediten una
+ *     minusvalía en un grado igual o superior al 65 por 100. b) Constituir la pensión o pensiones de
+ *     viudedad […] la principal o única fuente de rendimientos» (≥ 75 % del total de ingresos) «c) Tener
+ *     el matrimonio unos ingresos anuales, de cualquier naturaleza, incluida la pensión o pensiones de
+ *     viudedad, que no superen dos veces el importe, en cómputo anual, del salario mínimo
+ *     interprofesional». Ya figura en la versión publicada el 31/12/2001: no es «desde 2010».
+ */
+test.describe('Estimador de pensión de viudedad — cabo C0135', () => {
+  // ABIERTO — cabo C0135 (a). Jubilación causada en 2026 (sin revalorizaciones posteriores) con una
+  // base reguladora de 2.000 €/mes al 80 % → cobraba 1.600 €/mes. Viudo/a < 60, sin cargas, ingresos 0.
+  // Art. 7.3: BR = 2.000,00 → 52 % = 1.040,00 €/mes. La app toma la pensión como BR: 1.600,00 → 832,00.
+  test.fail('CABO C0135 (a) — causante pensionista: la BR es la de su pensión (2.000), no lo que cobraba (1.600)', async ({ page }) => {
+    await abrir(page);
+    const texto = normalizar(await page.locator('body').innerText());
+    expect(texto).not.toContain('La base reguladora de viudedad es igual a esta cifra');
+    const ld = (await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ');
+    expect(ld).not.toContain('coincide con la cuantía de la pensión que percibía');
+
+    // Lo que tendría que poder hacerse: dar la base reguladora de la pensión y que se use tal cual.
+    const br = page.getByRole('textbox', { name: /base reguladora/i });
+    await expect(br).toHaveCount(1);
+    await sembrarValor(page, br, '2000');
+    await rellenar(page, { edad: '45', ingresos: '0' });
+    await calcular(page);
+    expect(await lineaDesglose(page, 'Base reguladora')).toBeCloseTo(2000, 2);
+    expect(await pensionFinal(page)).toBeCloseTo(1040, 2);
+  });
+
+  // ABIERTO — cabo C0135 (b). Causante en activo con bases de 2.800 €/mes en 24 meses seguidos dentro
+  // de los 15 años anteriores y de 1.400 €/mes en los últimos 24. Viudo/a < 60, sin cargas, ingresos 0.
+  // Art. 7.2: el beneficiario elige los de 2.800 → BR = 24 × 2.800 / 28 = 2.400,00 → 52 % = 1.248,00.
+  // La app pide la media «de los últimos 2 años» (1.400) → BR 1.200,00 → 624,00 → 709,40 con complemento.
+  test.fail('CABO C0135 (b) — causante en activo: 24 meses elegidos dentro de los 15 años, no los últimos 24', async ({ page }) => {
+    await abrir(page);
+    await page.getByRole('button', { name: /Trabajando/ }).click();
+    const texto = normalizar(await page.locator('body').innerText());
+    expect(texto).not.toContain('Base de cotización media de los últimos 2 años');
+    expect(texto).not.toContain('Media mensual de las bases de cotización de los últimos 24 meses');
+    const ld = (await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ');
+    expect(ld).not.toContain('de los 24 meses anteriores al fallecimiento');
+    expect(ld).toMatch(/15 años/);
+
+    // La fórmula ya es la del art. 7.2: con la media del período elegido sale la BR de la norma.
+    await sembrarValor(page, page.getByRole('textbox', { name: /Base de cotización media/ }), '2800');
+    await rellenar(page, { edad: '45', ingresos: '0' });
+    await calcular(page);
+    expect(await lineaDesglose(page, 'Base reguladora')).toBeCloseTo(2400, 2);
+    expect(await pensionFinal(page)).toBeCloseTo(1248, 2);
+  });
+
+  // ABIERTO — cabo C0135 (d). Viudo/a de 63 años con 900 €/mes de viudedad (12.600 €/año) y 20.000 €/año
+  // de otros ingresos, que se casa con alguien que ingresa 25.000 €/año. Art. 11.1: tiene la edad (a),
+  // pero la pensión es el 38,7 % de sus ingresos (< 75 %, falla b) y el matrimonio ingresa 57.600 €
+  // (> 2 × SMI_2026.anual = 34.188 €, falla c) → se extingue. El FAQPage dice que con 61 años «puede
+  // conservarla»: presenta a) y b) como alternativas y omite c).
+  test.fail('CABO C0135 (d) — nuevo matrimonio: los requisitos a), b) y c) del art. 11.1 se exigen a la vez', async ({ page }) => {
+    await page.goto(RUTA);
+    let respuesta = '';
+    for (const bloque of await page.locator('script[type="application/ld+json"]').allTextContents()) {
+      const datos = JSON.parse(bloque) as {
+        '@type'?: string;
+        mainEntity?: { name: string; acceptedAnswer: { text: string } }[];
+      };
+      if (datos['@type'] !== 'FAQPage') continue;
+      respuesta = datos.mainEntity?.find((q) => q.name.includes('vuelve a casar'))?.acceptedAnswer.text ?? '';
+    }
+    expect(respuesta).not.toBe('');
+    expect(respuesta).not.toContain('desde 2010');
+    // b) la pensión, al menos el 75 % de los ingresos · c) ingresos del matrimonio ≤ 2 veces el SMI
+    expect(respuesta).toMatch(/75\s?%/);
+    expect(respuesta).toMatch(/(dos|2) veces/);
+
+    const visible = normalizar(
+      (await page.locator('details').filter({ hasText: '¿Qué ocurre si me vuelvo a casar?' }).textContent()) ?? '',
+    );
+    expect(visible).not.toContain('Desde 2010');
+    expect(visible).toMatch(/(dos|2) veces/);
+  });
+});
+
 /** Abre la sección educativa, que es donde vive la guía del trámite. */
 async function abrirGuia(page: Page): Promise<void> {
   await page.goto(RUTA);

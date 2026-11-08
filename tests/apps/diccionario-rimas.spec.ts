@@ -1356,3 +1356,72 @@ test.describe('diccionario-rimas — reinspección 29/09/2026: el logo fijo no t
     });
   }
 });
+
+/*
+ * CABO C0366 (comprobado el 08/11/2026, modo cabo) — una cifra o un signo DENTRO de la palabra
+ * se borra en silencio. limpiarEntrada() (rimas.ts:76-81) quita todo lo que no es letra del
+ * español, y palabraFinal() solo parte por espacios: lo que queda pegado se busca como si fuera
+ * la palabra escrita, sin ningún aviso (el de #aviso-entrada solo sale si no queda palabra).
+ *
+ * Resuelto a mano ANTES de ejecutar. Con una cifra dentro, lo escrito no es una palabra: se
+ * espera un aviso (o el rechazo), no las rimas de otra palabra. Un compuesto con guion
+ * («teórico-práctico», OLE 2010) rima, como un final de verso, por su último elemento: la app
+ * ya lo hace así con los espacios (hallazgo 2443). Lo que se espera si se borra sin avisar:
+ *   cor4zón → «corzón»: cor-zón, 2 sílabas, aguda, -ón (corazón son 3), y «corazón» en la lista.
+ *   c4sa    → «csa»: 1 sílaba, aguda, -a (casa es ca-sa, llana, -asa).
+ *   4mor    → «mor», 1 sílaba · amor4 → «amor», sin rastro de la cifra.
+ *   teórico-práctico → «teóricopráctico», tónica en la primera tilde, «-óricopráctico»: 0
+ *            consonantes y asonantes o-o; práctico es prác-ti-co, -áctico, a-o (táctico, didáctico).
+ *
+ * Obtenido en el navegador, idéntico a lo previsto y sin ningún aviso:
+ *   cor4zón → ficha «cor-zón», «2 sílabas · aguda · rima desde -ón», 4.609 consonantes «con
+ *            corzón», ordenadas por parecido a «corzón» (torzón, arzón, barzón…) y con «corazón»
+ *            dentro (corazón da 4.608, encabezadas por razón y sinrazón).
+ *   c4sa    → «csa», «1 sílaba · aguda · rima desde -a», 149 consonantes (ca, cha, dna, fa…);
+ *            casa da 44 (asa, basa, brasa…).
+ *   cas4    → «cas», 1 sílaba, -as, 62 (as, gas, más…) · 4mor → «mor», 1 sílaba, -or ·
+ *   amor4   → «a-mor», igual que amor.
+ *   teórico-práctico → «te-ó-ri-co-prác-ti-co», «7 sílabas · esdrújula · rima desde
+ *            -óricopráctico», 0 consonantes y 4.395 asonantes o-o (biótico, gótico, óptico…).
+ *   físico-químico → «-ísicoquímico», 0 consonantes (químico: 26, mímico, anímico…).
+ * Sin defecto: «co-razón» y «cora_zón» dan corazón (co-ra-zón, -ón), que es lo escrito sin el
+ * signo; «franco-alemán» acierta por casualidad (la única tilde es la del último elemento), y
+ * «amor 4» rima con amor porque la cifra suelta no es palabra (el diseño de la reparación 2443).
+ */
+test.describe('diccionario-rimas — cabo C0366: una cifra o un guion dentro de la palabra', () => {
+  // ABIERTO — cabo C0366
+  test.fail('«cor4zón», «c4sa», «4mor» y «amor4» avisan de la cifra en vez de rimar otra palabra', async ({ page }) => {
+    await abrir(page);
+    for (const entrada of ['cor4zón', 'c4sa', '4mor', 'amor4']) {
+      await buscar(page, entrada);
+      // Vale el aviso en su región o en la ficha (no en la lista, que trae palabras sueltas)
+      const aviso = page
+        .locator('#aviso-entrada p, [class*="fichaConsulta"]')
+        .filter({ hasText: /cifra|n[uú]mero|d[ií]gito|signo|car[aá]cter|letra/i });
+      await expect(aviso.first(), `«${entrada}» se busca sin la cifra y sin avisar`).toBeVisible({ timeout: 3000 });
+    }
+  });
+
+  // ABIERTO — cabo C0366
+  test.fail('«teórico-práctico» rima con «práctico» (-áctico, a-o), no con «teóricopráctico»', async ({ page }) => {
+    await abrir(page);
+    await buscar(page, 'teórico-práctico');
+    await pestana(page, 'consonante');
+    // Rimar con el último elemento o avisar del guion: las dos salidas valen
+    const respuesta = page
+      .locator('#aviso-entrada p, [class*="fichaDatos"]')
+      .filter({ hasText: /rima desde -áctico|guion|signo|car[aá]cter|letra/i });
+    await expect(respuesta.first(), 'se rima desde -óricopráctico').toBeVisible({ timeout: 3000 });
+    await pestana(page, 'asonante');
+    expect(await palabrasVisibles(page), 'gótico asuena o-o; práctico es a-o').not.toContain('gótico');
+  });
+
+  test('control: «amor» y «amor 4» (la cifra suelta no es palabra) riman desde -or, a-mor', async ({ page }) => {
+    await abrir(page);
+    for (const entrada of ['amor', 'amor 4']) {
+      await buscar(page, entrada);
+      await expect(acentuacionFicha(page), `«${entrada}»`).toContainText('2 sílabas · aguda · rima desde -or');
+      expect(await silabeo(page), `«${entrada}»`).toBe('a-mor');
+    }
+  });
+});

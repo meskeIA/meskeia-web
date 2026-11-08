@@ -1,5 +1,11 @@
 import { test, expect, devices, Page } from '@playwright/test';
-import { esperarHidratacion, sembrarValor } from './_hidratacion';
+import { esperarHidratacion, sembrarValor, asentarAntesDeTraducir } from './_hidratacion';
+import { PUERTO, ORIGEN } from './_puerto';
+import { prepararParaMedir } from '../_contraste';
+
+// Nivel de FICHERO a propósito (fuerza un worker nuevo): stemum.com resuelve al servidor de pruebas
+// para medir la app también con la marca de Stemum (re-inspección del 08/11/2026, al final).
+test.use({ launchOptions: { args: [`--host-resolver-rules=MAP stemum.com 127.0.0.1:${PUERTO}`] } });
 
 /**
  * Inspector — simulador-vsepr (segmento interactiva, riesgo 3, 170 usos reales · Stemum/Química)
@@ -1017,4 +1023,377 @@ test.describe('simulador-vsepr · testigo 2415: el dibujo cuadra con los desliza
       }
     }
   });
+});
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════════
+ * RE-INSPECCIÓN (08/11/2026, modo cambio) — 852 usos. Lo que cambió desde la validación del
+ * 08/10/2026 (`git log ac046fdc..HEAD -- app/simulador-vsepr/`, seis commits); NINGUNO toca el
+ * motor, los vértices ni los casos de aula, así que no hay cálculo nuevo que rehacer:
+ *   · dfaf84a29 / 4488bd1da (campaña C0070): la marca como TEXTO pasa a --primary-texto /
+ *     --secondary-texto (eco de los deslizadores, acento del resultado, <h4> de los casos de uso,
+ *     «Tip» de la FAQ, ✓ de los consejos) y el BLANCO sobre la marca a --primary-boton (círculo de
+ *     los pasos, :hover de los botones de molécula; .calcBtn también, pero ningún elemento lo usa).
+ *   · 76dbda4e8 (cabo C0112): en oscuro el acento del resultado va en #93c5fd sobre el degradado
+ *     #1e3a5f → #14532d de .resultBlock (antes var(--primary): 3,26:1 en meskeia.com).
+ *   · 68e83c8a5 (cabo C0296): el ✗ de «Errores frecuentes» pasa a var(--ambar-texto, #f59e0b).
+ *   · 4fc83bcd8 (3297) y cdb074d0d (C0312): los rótulos «Ver/Ocultar pista» y «Ver por qué pasa /
+ *     Ocultar la explicación», y el « y N pares libres» del aviso fuera de tabla, en su <span>.
+ *
+ * ESPERADO, A MANO ANTES DE ABRIR EL NAVEGADOR (contraste WCAG 2.x con la luminancia relativa;
+ * colores de los tokens de app/globals.css y de SimuladorVsepr.module.css):
+ *   meskeia.com claro · #26718F sobre blanco 5,47:1 y sobre #eff6ff (inicio del degradado del
+ *     resultado) 5,02:1 · blanco sobre #26718F 5,47:1 · ✓ #327874 sobre blanco 5,15:1 (texto
+ *     grande: 19,2 px en negrita, umbral 3) · ✗ #8A5A00 sobre #fef3c7 5,32:1 (antes, #f59e0b:
+ *     1,93:1, por debajo hasta del 3:1).
+ *   meskeia.com oscuro · #3FA5D1 sobre --bg-card #2d2d2d 4,93:1 (el margen más corto de todos) ·
+ *     #93c5fd sobre #14532d 5,05:1 y sobre #1e3a5f 6,38:1 · blanco sobre #26718F 5,47:1 (el
+ *     -boton es igual en los dos temas) · ✓ #5ABDB9 6,17:1 · ✗ en la RESERVA #f59e0b, porque
+ *     --ambar-texto vale `initial` en oscuro, sobre #2d1b00 7,71:1.
+ *   stemum.com claro · #6B21A8 sobre blanco 8,72:1 y sobre #eff6ff 8,01:1 · blanco sobre #6B21A8
+ *     8,72:1 · ✓ #8B3BD1 5,76:1 · ✗ igual que en meskeia.com.
+ *   stemum.com oscuro · #C99BF5 sobre #2d2d2d 6,22:1 · el acento, el mismo #93c5fd (el override
+ *     oscuro del módulo vale para las dos marcas) · blanco sobre #6B21A8 8,72:1 · ✓ #BE8AF3 5,32:1.
+ * Obtenido el 08/11/2026 (.inspector-trabajo/vsepr-contraste.mjs): idéntico en los 32 puntos, y
+ * sin desbordamiento a 390 px con la guía abierta en los dos temas (scrollWidth = 390).
+ *
+ * CON LA PÁGINA TRADUCIDA (traductor simulado de los testigos C0243 / C0312): los dos botones de
+ * ayuda de los casos pasan a «Ocultar…» y vuelven, y subir los pares libres de 0 a 1 con X = 1
+ * (fuera de tabla) ya no tumba la app: el <span> pasa a « y 1 par libre» y se vacía al volver.
+ * Observado, FUERA del diff: en esa misma frase los nodos que no se tocaron siguen viejos con la
+ * página traducida («La combinación X=1 y E=0 …, repartidos en una sola dirección» con E = 1), la
+ * forma del cabo C0243 que su censo lleva aparte; no se fija aquí.
+ * ═══════════════════════════════════════════════════════════════════════════════════════════ */
+
+interface LecturaContraste {
+  /** Elementos visibles medidos. */
+  n: number;
+  /** Color del texto del PEOR de ellos, en #rrggbb. */
+  color: string;
+  /** Su peor contraste contra cualquiera de las paradas del fondo que tiene detrás. */
+  ratio: number;
+  fondo: string;
+}
+
+/**
+ * El peor contraste de los elementos visibles de `selector` (o de su `::before`) contra su fondo
+ * compuesto: sube por los antepasados hasta el primero opaco, mezclando los semitransparentes, y
+ * cuenta cada parada de un degradado (el de .resultBlock tiene dos). El color se normaliza
+ * pintándolo en un lienzo de 1 × 1, como el instrumento de tests/_contraste.ts.
+ */
+async function peorContraste(page: Page, selector: string, pseudo: '::before' | null = null): Promise<LecturaContraste> {
+  return page.evaluate(
+    ({ sel, ps }) => {
+      const lienzo = document.createElement('canvas');
+      lienzo.width = lienzo.height = 1;
+      const ctx = lienzo.getContext('2d', { willReadFrequently: true })!;
+      const normalizar = (css: string): number[] => {
+        ctx.clearRect(0, 0, 1, 1);
+        ctx.fillStyle = '#000';
+        ctx.fillStyle = css;
+        ctx.fillRect(0, 0, 1, 1);
+        const d = ctx.getImageData(0, 0, 1, 1).data;
+        return [d[0], d[1], d[2], d[3] / 255];
+      };
+      const canal = (c: number) => {
+        const s = c / 255;
+        return s <= 0.04045 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+      };
+      const lum = (p: number[]) => 0.2126 * canal(p[0]) + 0.7152 * canal(p[1]) + 0.0722 * canal(p[2]);
+      const ratio = (a: number[], b: number[]) => {
+        const [x, y] = [lum(a), lum(b)].sort((p, q) => q - p);
+        return (x + 0.05) / (y + 0.05);
+      };
+      const hex = (p: number[]) => '#' + p.slice(0, 3).map((v) => Math.round(v).toString(16).padStart(2, '0')).join('');
+      const fondosDe = (el: Element): number[][] => {
+        const pila: number[][][] = [];
+        for (let m: Element | null = el; m; m = m.parentElement) {
+          const cs = getComputedStyle(m);
+          const img = cs.backgroundImage;
+          const paradas = img && /gradient/i.test(img) ? (img.match(/(rgba?|color)\([^)]*\)/g) ?? []).map(normalizar) : [];
+          if (paradas.length) pila.push(paradas);
+          const c = normalizar(cs.backgroundColor);
+          if (c[3] > 0) pila.push([c]);
+          if (c[3] >= 1 || (paradas.length && paradas.every((p) => p[3] >= 1))) break;
+        }
+        let bases = [[255, 255, 255]];
+        for (let i = pila.length - 1; i >= 0; i--) {
+          bases = bases.flatMap((b) => pila[i].map((c) => [0, 1, 2].map((k) => c[k] * c[3] + b[k] * (1 - c[3]))));
+        }
+        return bases;
+      };
+      let peor: { color: string; ratio: number; fondo: string } | null = null;
+      let n = 0;
+      for (const el of Array.from(document.querySelectorAll(sel))) {
+        const r = el.getBoundingClientRect();
+        if (r.width === 0 || r.height === 0) continue;
+        const fg = normalizar(getComputedStyle(el, ps).color);
+        n++;
+        for (const f of fondosDe(el)) {
+          const v = ratio(fg, f);
+          if (!peor || v < peor.ratio) peor = { color: hex(fg), ratio: v, fondo: hex(f) };
+        }
+      }
+      return peor ? { n, ...peor } : { n: 0, color: '', ratio: -1, fondo: '' };
+    },
+    { sel: selector, ps: pseudo },
+  );
+}
+
+interface FilaContraste {
+  que: string;
+  selector: string;
+  pseudo?: '::before';
+  /** Cuántos hay en la página con la guía abierta. */
+  n: number;
+  color: string;
+  /** El contraste calculado a mano (cabecera de esta sección). */
+  ratio: number;
+  /** 4,5:1, o 3:1 si es texto grande. */
+  umbral: number;
+}
+
+interface Escenario {
+  nombre: string;
+  url: string;
+  marca: 'stemum' | null;
+  oscuro: boolean;
+  filas: FilaContraste[];
+  /** El :hover de un botón de molécula: blanco sobre este fondo, con este contraste. */
+  hover: { fondo: string; ratio: number };
+}
+
+const ECO = '[class*="inputGroup"] label strong';
+const ACENTO = '[class*="resultValueAccent"]';
+const CASO_USO = '[class*="escenarioCard"] h4';
+const TIP = '[class*="faqTip"]';
+const PASO = '[class*="stepNumber"]';
+const CONSEJO = '[class*="tipIcon"]';
+const ASPA = '[class*="warningList"] li';
+
+/** Las cuatro marcas-tema, con lo que calcula a mano la cabecera. */
+function escenarios(): Escenario[] {
+  const fila = (que: string, selector: string, n: number, color: string, ratio: number, umbral = 4.5, pseudo?: '::before'): FilaContraste => ({
+    que,
+    selector,
+    pseudo,
+    n,
+    color,
+    ratio,
+    umbral,
+  });
+  return [
+    {
+      nombre: 'meskeia.com · claro',
+      url: `${ORIGEN}${RUTA}`,
+      marca: null,
+      oscuro: false,
+      filas: [
+        fila('eco de los deslizadores', ECO, 2, '#26718f', 5.47),
+        fila('acento del resultado (sobre #eff6ff)', ACENTO, 2, '#26718f', 5.02),
+        fila('<h4> de los casos de uso', CASO_USO, 4, '#26718f', 5.47),
+        fila('«Tip» de la FAQ', TIP, 4, '#26718f', 5.47),
+        fila('número de los pasos (blanco)', PASO, 5, '#ffffff', 5.47),
+        fila('✓ de los consejos (texto grande)', CONSEJO, 6, '#327874', 5.15, 3),
+        fila('✗ de los errores frecuentes', ASPA, 6, '#8a5a00', 5.32, 4.5, '::before'),
+      ],
+      hover: { fondo: 'rgb(38, 113, 143)', ratio: 5.47 },
+    },
+    {
+      nombre: 'meskeia.com · oscuro',
+      url: `${ORIGEN}${RUTA}`,
+      marca: null,
+      oscuro: true,
+      filas: [
+        fila('eco de los deslizadores', ECO, 2, '#3fa5d1', 4.93),
+        fila('acento del resultado (sobre #14532d)', ACENTO, 2, '#93c5fd', 5.05),
+        fila('<h4> de los casos de uso', CASO_USO, 4, '#3fa5d1', 4.93),
+        fila('«Tip» de la FAQ', TIP, 4, '#3fa5d1', 4.93),
+        fila('número de los pasos (blanco)', PASO, 5, '#ffffff', 5.47),
+        fila('✓ de los consejos (texto grande)', CONSEJO, 6, '#5abdb9', 6.17, 3),
+        fila('✗ de los errores frecuentes (la reserva)', ASPA, 6, '#f59e0b', 7.71, 4.5, '::before'),
+      ],
+      hover: { fondo: 'rgb(38, 113, 143)', ratio: 5.47 },
+    },
+    {
+      nombre: 'stemum.com · claro',
+      url: `http://stemum.com${RUTA}`,
+      marca: 'stemum',
+      oscuro: false,
+      filas: [
+        fila('eco de los deslizadores', ECO, 2, '#6b21a8', 8.72),
+        fila('acento del resultado (sobre #eff6ff)', ACENTO, 2, '#6b21a8', 8.01),
+        fila('<h4> de los casos de uso', CASO_USO, 4, '#6b21a8', 8.72),
+        fila('«Tip» de la FAQ', TIP, 4, '#6b21a8', 8.72),
+        fila('número de los pasos (blanco)', PASO, 5, '#ffffff', 8.72),
+        fila('✓ de los consejos (texto grande)', CONSEJO, 6, '#8b3bd1', 5.76, 3),
+        fila('✗ de los errores frecuentes', ASPA, 6, '#8a5a00', 5.32, 4.5, '::before'),
+      ],
+      hover: { fondo: 'rgb(107, 33, 168)', ratio: 8.72 },
+    },
+    {
+      nombre: 'stemum.com · oscuro',
+      url: `http://stemum.com${RUTA}`,
+      marca: 'stemum',
+      oscuro: true,
+      filas: [
+        fila('eco de los deslizadores', ECO, 2, '#c99bf5', 6.22),
+        fila('acento del resultado (sobre #14532d)', ACENTO, 2, '#93c5fd', 5.05),
+        fila('<h4> de los casos de uso', CASO_USO, 4, '#c99bf5', 6.22),
+        fila('«Tip» de la FAQ', TIP, 4, '#c99bf5', 6.22),
+        fila('número de los pasos (blanco)', PASO, 5, '#ffffff', 8.72),
+        fila('✓ de los consejos (texto grande)', CONSEJO, 6, '#be8af3', 5.32, 3),
+        fila('✗ de los errores frecuentes (la reserva)', ASPA, 6, '#f59e0b', 7.71, 4.5, '::before'),
+      ],
+      hover: { fondo: 'rgb(107, 33, 168)', ratio: 8.72 },
+    },
+  ];
+}
+
+/** Abre la app en su marca y tema (con el botón del logo, como la persona) y despliega la guía. */
+async function abrirParaMedir(page: Page, url: string, marca: 'stemum' | null, oscuro: boolean): Promise<void> {
+  await page.goto(url);
+  await esperarHidratacion(page, DESLIZADORES);
+  await prepararParaMedir(page);
+  if (marca) await expect(page.locator('html')).toHaveAttribute('data-brand', marca);
+  if (oscuro) {
+    if ((await page.locator('html').getAttribute('data-theme')) !== 'dark') {
+      await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).first().click();
+    }
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+  } else {
+    await expect(page.locator('html')).not.toHaveAttribute('data-theme', 'dark');
+  }
+  await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+  await expect(page.locator(ASPA).first()).toBeVisible();
+}
+
+test.describe('simulador-vsepr · re-inspección 08/11/2026 · el contraste de lo que tocó la campaña de marca', () => {
+  for (const esc of escenarios()) {
+    test.describe(esc.nombre, () => {
+      test.use({ colorScheme: esc.oscuro ? 'dark' : 'light' });
+
+      test(`${esc.nombre}: el texto de marca, el blanco sobre la marca, el ✓ y el ✗ llegan a su umbral`, async ({ page }) => {
+        await abrirParaMedir(page, esc.url, esc.marca, esc.oscuro);
+        for (const f of esc.filas) {
+          const m = await peorContraste(page, f.selector, f.pseudo ?? null);
+          const clave = `${esc.nombre} · ${f.que}: ${m.ratio.toFixed(2)}:1 ${m.color} sobre ${m.fondo}`;
+          expect(m.n, clave).toBe(f.n);
+          expect(m.color, clave).toBe(f.color);
+          expect(Math.abs(m.ratio - f.ratio), `${clave} (a mano: ${f.ratio})`).toBeLessThanOrEqual(0.02);
+          expect(m.ratio, clave).toBeGreaterThanOrEqual(f.umbral);
+        }
+
+        // El :hover de un botón de molécula: blanco sobre --primary-boton, igual en los dos temas.
+        const boton = page.getByRole('button', { name: 'Cargar configuración de H2O' });
+        await boton.scrollIntoViewIfNeeded();
+        await boton.hover();
+        await expect(boton).toHaveCSS('background-color', esc.hover.fondo);
+        await expect(boton).toHaveCSS('color', 'rgb(255, 255, 255)');
+        const sobreBoton = await peorContraste(page, '[class*="moleculaBtn"]:hover');
+        expect(sobreBoton.n).toBe(1);
+        expect(Math.abs(sobreBoton.ratio - esc.hover.ratio), `hover: ${sobreBoton.ratio.toFixed(2)}:1`).toBeLessThanOrEqual(0.02);
+      });
+    });
+  }
+});
+
+/** Traductor simulado de los testigos C0243 / C0312: cada nodo de texto visible, a <font><font>. */
+async function traducirPagina(page: Page): Promise<void> {
+  await asentarAntesDeTraducir(page);
+  await page.evaluate(() => {
+    const caminante = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+      acceptNode: (n) => {
+        const padre = n.parentElement;
+        if (!padre || !(n.nodeValue ?? '').trim()) return NodeFilter.FILTER_REJECT;
+        if (/^(SCRIPT|STYLE|OPTION|NOSCRIPT|FONT)$/.test(padre.tagName)) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      },
+    });
+    const nodos: Text[] = [];
+    while (caminante.nextNode()) nodos.push(caminante.currentNode as Text);
+    for (const nodo of nodos) {
+      const exterior = document.createElement('font');
+      const interior = document.createElement('font');
+      interior.textContent = nodo.nodeValue;
+      exterior.appendChild(interior);
+      nodo.parentNode?.replaceChild(exterior, nodo);
+    }
+  });
+}
+
+test.describe('simulador-vsepr · re-inspección 08/11/2026 · con la página traducida', () => {
+  const seccion = (page: Page) => page.locator('section[aria-labelledby="aula-titulo"]');
+  let errores: string[] = [];
+
+  test.beforeEach(async ({ page }) => {
+    errores = [];
+    page.on('pageerror', (e) => errores.push(e.message));
+    await page.goto(RUTA);
+    await esperarHidratacion(page, DESLIZADORES);
+  });
+
+  test('caso 1 traducido: «Ver pista» y «Ver por qué pasa» pasan a «Ocultar…» y vuelven (4fc83bcd8)', async ({ page }) => {
+    await seccion(page).getByRole('button', { name: /^Caso 1:/ }).click();
+    await traducirPagina(page);
+    await expect(seccion(page).locator('font').first(), 'la sección quedó traducida').toBeAttached();
+    const pista = seccion(page).locator('button[aria-controls]').filter({ hasText: /pista/ });
+    await expect(pista).toHaveText('💡 Ver pista');
+    await pista.click();
+    await expect(pista).toHaveAttribute('aria-expanded', 'true');
+    await expect(pista).toHaveText('💡 Ocultar pista');
+    await pista.click();
+    await expect(pista).toHaveAttribute('aria-expanded', 'false');
+    await expect(pista).toHaveText('💡 Ver pista');
+
+    // CH₄ → NH₃: la respuesta a mano es «Pirámide trigonal» (tabla A_MANO_AULA).
+    await seccion(page).getByRole('radio', { name: 'Pirámide trigonal', exact: true }).check();
+    await seccion(page).getByRole('button', { name: 'Comprobar', exact: true }).click();
+    await expect(seccion(page).locator('p[role="alert"]')).toContainText('¡Correcto!');
+    await traducirPagina(page); // lo recién montado también pasa por el traductor
+    const porque = seccion(page).locator('button[aria-controls]').filter({ hasText: /por qué|explicación/ });
+    await expect(porque).toHaveText('🔎 Ver por qué pasa');
+    await porque.click();
+    await expect(porque).toHaveAttribute('aria-expanded', 'true');
+    await expect(porque).toHaveText('🔎 Ocultar la explicación');
+    await porque.click();
+    await expect(porque).toHaveAttribute('aria-expanded', 'false');
+    await expect(porque).toHaveText('🔎 Ver por qué pasa');
+    expect(errores).toEqual([]);
+  });
+
+  test('fuera de tabla y traducida: con X = 1, E de 0 a 1 y vuelta a 0 no tumba la app (cdb074d0d)', async ({ page }) => {
+    await ponerSlider(page, 'slider-enlaces', 1); // desde X = 4, E = 0: X = 1 está fuera de la tabla
+    const aviso = page.locator('[class*="mensajePedagogico"]');
+    await expect(aviso).toContainText('El lienzo dibuja igualmente 1 átomo X, repartidos en una sola dirección.');
+    await traducirPagina(page);
+    await expect(aviso.locator('font').first(), 'el aviso quedó traducido').toBeAttached();
+
+    await ponerSlider(page, 'slider-libres', 1); // AÑADE el texto condicional
+    await expect(page.getByText('Algo salió mal')).toHaveCount(0);
+    await expect(aviso).toBeVisible();
+    await expect(aviso).toContainText('1 átomo X y 1 par libre,');
+
+    await ponerSlider(page, 'slider-libres', 0); // y lo RETIRA
+    await expect(page.getByText('Algo salió mal')).toHaveCount(0);
+    await expect(aviso).toBeVisible();
+    await expect(aviso).not.toContainText('par libre');
+    expect(errores).toEqual([]);
+  });
+});
+
+test.describe('simulador-vsepr · re-inspección 08/11/2026 · a 390 px con la guía abierta', () => {
+  test.use({
+    viewport: { width: 390, height: 844 },
+    userAgent: devices['Pixel 7'].userAgent,
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  for (const oscuro of [false, true]) {
+    test(`${oscuro ? 'oscuro' : 'claro'}: nada desborda en horizontal (scrollWidth = 390)`, async ({ page }) => {
+      await abrirParaMedir(page, `${ORIGEN}${RUTA}`, null, oscuro);
+      expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
+    });
+  }
 });

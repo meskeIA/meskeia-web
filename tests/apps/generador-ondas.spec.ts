@@ -1002,3 +1002,133 @@ test('HALLAZGO — la tabla no llama «infrasónico» a 20 Hz ni pone ecografía
   await expect(page.getByText('20 Hz (infrasónico)')).toHaveCount(0, { timeout: 2000 });
   await expect(page.getByText(/Ecografías/)).toHaveCount(0, { timeout: 2000 });
 });
+
+// ============================================================
+// CABO C0657 (08/11/2026) — 15 clases de CSS module que el JSX pide y el módulo no declara
+// ============================================================
+
+/**
+ * ABIERTO — cabo C0657. page.tsx importa un solo módulo (./GeneradorOndas.module.css) y le pide 15
+ * clases que no declara: styleSection y styleButtons (l. 705-707), colorSection y colorPicker
+ * (735-745), exportSection (758), features, featureCard y featureIcon (769-786), guideSection
+ * (1027, 1066, 1106), introParagraph (1029), contentGrid y contentCard (1034-1056),
+ * waveExplanation, waveCard y waveUse (1069-1101). `styles.x` vale undefined y React no escribe
+ * el atributo class: el elemento sale sin maquetar.
+ *
+ * Lo que se VE, medido el 08/11/2026 a 1280 y 390 px, en claro y en oscuro (igual en los cuatro):
+ *   · «Características» (4 tarjetas, bajo «Reproducir» en el generador y bajo «Exportar como PNG»
+ *     en el visualizador): una columna de texto suelto, sin fondo, borde ni rejilla; el emoji de
+ *     cada una, a 16 px en su propia línea, y el de la primera a 2 px del botón de encima.
+ *   · Opciones del visualizador: «Barras», «Línea» y «Espejo» pegados (0 px entre ellos; a 390 px
+ *     «Espejo» cae a otra fila), «Color onda» y «Color fondo» pegados a su muestra (0 px) y
+ *     «Exportar como PNG» arrimado a la izquierda (0 px a la izquierda, 546 a la derecha a 1280),
+ *     cuando «Reproducir» va centrado.
+ *   · Guía: «¿Qué es una onda sonora?» y «Tipos de ondas» como texto corrido: las 8 tarjetas sin
+ *     fondo, borde ni relleno y en una columna (las .escenarioCard de la misma guía: 3 columnas,
+ *     borde de 1 px y 20 px de relleno), y cada «Uso: …» a 18 px de su párrafo y a 3 px del
+ *     título de la onda SIGUIENTE, así que se lee como de ella.
+ * No desborda a 390 px ni pierde contraste (el texto hereda el del contenedor: 15,96-17,4:1 en
+ * claro, 10,48-11,39:1 en oscuro), y todos los controles se ven y se pulsan.
+ */
+test.describe('Cabo C0657 (08/11/2026) · 15 clases de CSS module sin declarar', () => {
+  const NO_ENCONTRADO = '¡no encontrado!';
+
+  /** Clase de cada elemento que el JSX marca con styles.x, localizado por su texto. */
+  const clasesDeLosMarcados = (page: Page): Promise<Record<string, string | null>> =>
+    page.evaluate((noEncontrado) => {
+      const porTexto = (tag: string, texto: string): Element | null =>
+        [...document.querySelectorAll(tag)].find((e) => (e.textContent ?? '').includes(texto)) ?? null;
+      const boton = (texto: string): Element | null =>
+        [...document.querySelectorAll('button')].find((b) => (b.textContent ?? '').includes(texto)) ?? null;
+      const h4Estilo = [...document.querySelectorAll('h4')].find((e) => e.textContent?.trim() === 'Estilo') ?? null;
+      const etiqueta = porTexto('label', 'Color onda');
+      const h4Gen = porTexto('h4', 'Generador de tonos');
+      const h2Onda = porTexto('h2', '¿Qué es una onda sonora?');
+      const h4Frec = porTexto('h4', 'Frecuencia (Hz)');
+      const h4Seno = porTexto('h4', 'Onda Senoidal');
+      const marcados: Record<string, Element | null | undefined> = {
+        styleSection: h4Estilo?.parentElement,
+        styleButtons: boton('Barras')?.parentElement,
+        colorSection: etiqueta?.parentElement?.parentElement,
+        colorPicker: etiqueta?.parentElement,
+        exportSection: boton('Exportar como PNG')?.parentElement,
+        features: h4Gen?.parentElement?.parentElement,
+        featureCard: h4Gen?.parentElement,
+        featureIcon: h4Gen?.parentElement?.firstElementChild,
+        guideSection: h2Onda?.parentElement,
+        introParagraph: h2Onda?.nextElementSibling,
+        contentGrid: h4Frec?.parentElement?.parentElement,
+        contentCard: h4Frec?.parentElement,
+        waveExplanation: h4Seno?.parentElement?.parentElement,
+        waveCard: h4Seno?.parentElement,
+        waveUse: porTexto('span', 'Uso: Referencia en física'),
+      };
+      return Object.fromEntries(
+        Object.entries(marcados).map(([clase, el]) => [clase, el ? el.getAttribute('class') : noEncontrado]),
+      );
+    }, NO_ENCONTRADO);
+
+  /** Visualizador con un audio cargado: monta las opciones de estilo, color y exportación. */
+  async function conAudio(page: Page): Promise<void> {
+    await cargarAudio(page, 'la440_1s.wav', wav(1, () => 0.8));
+    await expect(page.getByRole('button', { name: /Exportar como PNG/ })).toBeVisible();
+  }
+
+  test('C0657 · los 15 elementos que mide el caso existen y se ven', async ({ page }) => {
+    // Caso hermano, en verde antes y después de reparar: si el de abajo falla porque un ancla ya
+    // no está (otro texto, otra estructura), lo dice este y no se confunde con la maqueta.
+    await expect(page.getByRole('heading', { name: 'Generador de tonos', level: 4, exact: true })).toBeVisible();
+    await conAudio(page);
+    const clases = await clasesDeLosMarcados(page);
+    expect(Object.keys(clases)).toHaveLength(15);
+    for (const [nombre, clase] of Object.entries(clases)) expect(clase, nombre).not.toBe(NO_ENCONTRADO);
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    await expect(page.getByRole('heading', { name: '¿Qué es una onda sonora?' })).toBeVisible();
+    await expect(page.getByText('Uso: Referencia en física, pruebas de audio, tonos puros')).toBeVisible();
+    await expect(page.getByRole('heading', { name: /Onda Cuadrada/ })).toBeVisible();
+  });
+
+  test('HALLAZGO — ABIERTO — cabo C0657 · cada elemento que el JSX marca con styles.x lleva su clase y se ve maquetado', async ({
+    page,
+  }) => {
+    // ABIERTO — cabo C0657. Esperado: las 15 con clase no vacía, y lo que esa maqueta separa,
+    // separado. Obtenido el 08/11/2026: las 15 sin atributo class; 2 px entre «Reproducir» y el
+    // emoji de la primera característica, 0 px entre «Barras» y «Línea», 0 px entre «Color onda»
+    // y su muestra, 3 px entre «Uso: …» de la senoidal y el título «Onda Cuadrada».
+    test.fail();
+
+    // Generador: «Reproducir» y el bloque de características que va debajo.
+    const play = await botonReproducir(page).boundingBox();
+    const icono = await page
+      .getByRole('heading', { name: 'Generador de tonos', level: 4, exact: true })
+      .locator('xpath=../*[1]')
+      .boundingBox();
+    expect
+      .soft((icono?.y ?? 0) - ((play?.y ?? 0) + (play?.height ?? 0)), 'hueco entre «Reproducir» y las características')
+      .toBeGreaterThanOrEqual(8);
+
+    // Visualizador: botones de estilo y selector de color.
+    await conAudio(page);
+    const barras = await page.getByRole('button', { name: /Barras/ }).boundingBox();
+    const linea = await page.getByRole('button', { name: /Línea/ }).boundingBox();
+    expect.soft((linea?.x ?? 0) - ((barras?.x ?? 0) + (barras?.width ?? 0)), 'hueco entre «Barras» y «Línea»').toBeGreaterThanOrEqual(4);
+    const etiqueta = await page.locator('label', { hasText: 'Color onda' }).boundingBox();
+    const muestra = await page.getByLabel('Color onda').boundingBox();
+    expect.soft((muestra?.x ?? 0) - ((etiqueta?.x ?? 0) + (etiqueta?.width ?? 0)), 'hueco entre «Color onda» y su muestra').toBeGreaterThanOrEqual(4);
+
+    // Las 15 clases (la guía está en el DOM aunque nazca plegada).
+    const clases = await clasesDeLosMarcados(page);
+    const sinClase = Object.entries(clases)
+      .filter(([, clase]) => !clase || !clase.trim())
+      .map(([nombre]) => nombre);
+    expect.soft(sinClase, 'elementos marcados con styles.x que salen sin clase').toEqual([]);
+
+    // Guía: el «Uso: …» de la senoidal, separado del título de la onda siguiente.
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const uso = await page.getByText('Uso: Referencia en física, pruebas de audio, tonos puros').boundingBox();
+    const siguiente = await page.getByRole('heading', { name: /Onda Cuadrada/ }).boundingBox();
+    expect
+      .soft((siguiente?.y ?? 0) - ((uso?.y ?? 0) + (uso?.height ?? 0)), 'hueco entre «Uso: …» y «Onda Cuadrada»')
+      .toBeGreaterThanOrEqual(8);
+  });
+});
