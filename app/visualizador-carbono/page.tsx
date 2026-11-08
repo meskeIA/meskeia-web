@@ -36,7 +36,9 @@ const ALOTROPOS: AlotropoInfo[] = [
       'Capas hexagonales superpuestas unidas débilmente entre sí. Dentro de cada capa los átomos están fuertemente unidos, pero las capas se deslizan entre ellas con facilidad.',
     propiedades: ['Blando y lubricante (capas que se deslizan)', 'Conductor eléctrico (electrones libres entre capas)', 'Resistente al calor (hasta 3.600 °C)'],
     usos: ['Lápices (las capas se depositan en el papel)', 'Lubricante industrial en alta temperatura', 'Electrodos en baterías y electrólisis'],
-    color: '#555',
+    // Seis cifras: el panel le pega el alfa ('66'), y '#555' + '66' era '#55566', un color
+    // inválido que dejaba al grafito sin el borde de su panel (cabo C0297)
+    color: '#555555',
   },
   {
     id: 'diamante',
