@@ -10,6 +10,14 @@
   --border: #E5E5E5;
   --hover: #F5F5F5;
   --hero-bg: #1a5278;
+  /*
+   * Tono de TEXTO del color de cada asistente (cabo C0645): pintados como texto daban 2,81-4,49:1.
+   * Peor caso sobre la fila desplegada (tinte de marca) en claro y en oscuro.
+   */
+  --claude-texto: #A0522D;  /* CC785C · 5,07 */
+  --copilot-texto: #005A9E; /* 0078D4 · 6,41 */
+  --gemini-texto: #1967D2;  /* 4285F4 · 4,84 */
+  --codex-texto: #0B7A5F;   /* 10A37F · 4,78 */
   --radius: 12px;
   --radius-large: 16px;
   --spacing-sm: 0.5rem;
@@ -34,6 +42,7 @@
   --text-muted: #9B9B9B;
   --border: #404040;
   --hover: #333333;
+  --claude-texto: #E0A08A; --copilot-texto: #4DA3FF; --gemini-texto: #8AB4F8; --codex-texto: #3FD1A8;
 }
 
 /* ─── Hero ─── */
@@ -139,7 +148,9 @@
 .tr:hover td { background: rgba(46, 134, 171, 0.05); }
 [data-theme='dark'] .tr:hover td { background: rgba(46, 134, 171, 0.1); }
 
-.trExpandido td { background: rgba(46, 134, 171, 0.07); }
+/* Tinte de la fila desplegada al 4 %: al 7 % la empresa en --text-muted daba 4,49:1 (C0645, receta
+   de C0278: se cambia el fondo, no el texto) */
+.trExpandido td { background: rgba(46, 134, 171, 0.04); }
 [data-theme='dark'] .trExpandido td { background: rgba(46, 134, 171, 0.12); }
 
 .td {
@@ -203,7 +214,8 @@
 
 .mejorTag {
   padding: 2px 8px;
-  background: rgba(46, 134, 171, 0.1);
+  /* Al 6 %: al 10 %, sobre la fila desplegada, la marca daba 4,47:1 (C0645 y C0278) */
+  background: rgba(46, 134, 171, 0.06);
   color: var(--primary-texto);
   border-radius: 40px;
   font-size: 0.75rem;

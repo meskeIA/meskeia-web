@@ -28,7 +28,13 @@ interface Asistente {
   nombreCorto: string;
   empresa: string;
   icono: string;
+  /** Color de marca del asistente: bordes e iconos */
   color: string;
+  /**
+   * Color del TEXTO (precio y nombre en la recomendación), que cambia con el tema: con `color`
+   * como texto daban 2,81-4,49:1 (cabo C0645). Token del módulo
+   */
+  tono: string;
   modeloBase: string;
   modos: ModoAcceso[];
   idesCompatibles: string[];
@@ -77,6 +83,7 @@ const ASISTENTES: Asistente[] = [
     empresa: 'Anthropic',
     icono: '🧠',
     color: '#CC785C',
+    tono: 'var(--claude-texto)',
     modeloBase: 'Claude Sonnet 4.6 / Haiku 4.5',
     modos: [
       { tipo: 'cli',       disponible: true,  detalle: 'Claude Code CLI — terminal, instalación vía npm' },
@@ -105,6 +112,7 @@ const ASISTENTES: Asistente[] = [
     empresa: 'GitHub / Microsoft',
     icono: '🪟',
     color: '#0078D4',
+    tono: 'var(--copilot-texto)',
     modeloBase: 'GPT-4o / Claude Sonnet (seleccionable)',
     modos: [
       { tipo: 'cli',       disponible: true,  detalle: 'gh-extension para terminal + Copilot Coding Agent' },
@@ -133,6 +141,7 @@ const ASISTENTES: Asistente[] = [
     empresa: 'Google',
     icono: '✨',
     color: '#4285F4',
+    tono: 'var(--gemini-texto)',
     modeloBase: 'Gemini 2.0 Flash / Gemini 2.5 Pro',
     modos: [
       { tipo: 'cli',       disponible: false, detalle: 'No tiene CLI propia de desarrollo local' },
@@ -161,6 +170,7 @@ const ASISTENTES: Asistente[] = [
     empresa: 'OpenAI',
     icono: '⚡',
     color: '#10A37F',
+    tono: 'var(--codex-texto)',
     modeloBase: 'GPT-4o / o3 / o4-mini',
     modos: [
       { tipo: 'cli',       disponible: true,  detalle: 'Codex CLI — herramienta de terminal (2025), similar a Claude Code CLI' },
@@ -394,7 +404,7 @@ export default function ComparadorAsistentesCodigo() {
                         </td>
                         <td className={styles.td}><span className={styles.modeloLabel}>{a.modeloBase}</span></td>
                         <td className={styles.td}>{a.planGratuito ? <span className={styles.siTag}><span aria-hidden="true">✅</span> Sí</span> : <span className={styles.noTag}><span aria-hidden="true">❌</span> No</span>}</td>
-                        <td className={styles.td}><span className={styles.precioTag} style={{ borderColor: a.color, color: a.color }}>{a.precioDesde}</span></td>
+                        <td className={styles.td}><span className={styles.precioTag} style={{ borderColor: a.color, color: a.tono }}>{a.precioDesde}</span></td>
                         <td className={styles.td}>{a.completionInline ? '✅' : '❌'}</td>
                         <td className={styles.td}>{a.agenteAutonomo ? '✅' : '❌'}</td>
                         <td className={styles.td}><span className={styles.privacidadLabel}>{badgePrivacidad(a.privacidad)}</span></td>
@@ -558,13 +568,13 @@ export default function ComparadorAsistentesCodigo() {
                       {primera && (
                         <div className={styles.combinacionAsistente}>
                           <span className={styles.combinacionLabel}>1ª opción</span>
-                          <span style={{ color: primera.color }}><span aria-hidden="true">{primera.icono}</span> {primera.nombreCorto}</span>
+                          <span style={{ color: primera.tono }}><span aria-hidden="true">{primera.icono}</span> {primera.nombreCorto}</span>
                         </div>
                       )}
                       {alt && (
                         <div className={styles.combinacionAsistente}>
                           <span className={styles.combinacionLabel}>Alternativa</span>
-                          <span style={{ color: alt.color }}><span aria-hidden="true">{alt.icono}</span> {alt.nombreCorto}</span>
+                          <span style={{ color: alt.tono }}><span aria-hidden="true">{alt.icono}</span> {alt.nombreCorto}</span>
                         </div>
                       )}
                     </div>

@@ -74,6 +74,10 @@ const APPS: App[] = [
   // corrientes, el nivel del deslizador y la escala de grados en su color de datos (2,06-3,90 en
   // claro, 2,09-3,90 en oscuro)
   { slug: 'visualizador-clima', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
+  // El precio y el nombre de cada asistente en su color de marca (2,81-4,49:1 en claro, 3,17-4,49
+  // en oscuro), y la empresa y las etiquetas «mejor para» sobre el tinte de la fila desplegada
+  // (4,47-4,49, forma de C0278). Las pestañas de la recomendación
+  { slug: 'comparador-asistentes-codigo', todo: true, secciones: "[role='tab']" },
 ];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {
