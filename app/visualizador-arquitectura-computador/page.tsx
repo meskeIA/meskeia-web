@@ -11,6 +11,38 @@ import {
   EducationalSection,
 } from '@/components';
 import styles from './VisualizadorArquitecturaComputador.module.css';
+import { tintaSobre } from '@/lib/tintaLegible';
+
+/**
+ * Tono de TEXTO de cada color de datos, que cambia con el tema (cabo C0645): con el color de datos
+ * como texto, el título del bloque, la sigla y el título de cada componente de la CPU y la latencia
+ * de cada memoria daban 1,59-4,11:1 en claro y 1,99-3,60 en oscuro. Tokens de globals (los
+ * semánticos con su reserva oscura) y del módulo. El color de datos sigue en bordes y barras.
+ */
+const TONOS: Record<string, string> = {
+  '#2E86AB': 'var(--primary-texto)',
+  '#48A9A6': 'var(--secondary-texto)',
+  '#1a6080': 'var(--azul-oscuro-texto)',
+  '#E07B39': 'var(--naranja-texto, #F0A35E)',
+  '#8E8E93': 'var(--gris-texto)',
+  '#666': 'var(--gris-oscuro-texto)',
+  '#555': 'var(--gris-oscuro-texto)',
+  '#5C8F4A': 'var(--oliva-texto)',
+  '#9B59B6': 'var(--violeta-texto)',
+  '#27AE60': 'var(--verde-texto, #5FD08A)',
+  '#E74C3C': 'var(--rojo-texto, #F87171)',
+  '#F39C12': 'var(--ambar-texto, #F5B041)',
+  '#F1C40F': 'var(--amarillo-texto)',
+  '#8E44AD': 'var(--morado-texto)',
+};
+const tonoDe = (color: string): string => TONOS[color] ?? 'var(--text-primary)';
+
+/**
+ * Relleno de las barras de memoria y de la insignia de fase, con texto encima: el blanco daba
+ * 1,66-4,11:1. El texto toma la tinta que más contrasta (tintaSobre), y la marca, con la que
+ * ninguna llega a 4,5, se oscurece a su tono de botón.
+ */
+const rellenoLegible = (color: string): string => (color === '#2E86AB' ? '#26718F' : color);
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Tipos
@@ -513,7 +545,7 @@ export default function VisualizadorArquitecturaComputadorPage() {
             <div className={styles.detallePanel}>
               {bloqueSeleccionado ? (
                 <>
-                  <h2 className={styles.detalleTitulo} style={{ color: bloqueSeleccionado.color }}>
+                  <h2 className={styles.detalleTitulo} style={{ color: tonoDe(bloqueSeleccionado.color) }}>
                     {bloqueSeleccionado.nombre}
                   </h2>
                   <p className={styles.detalleDesc}>{bloqueSeleccionado.descripcion}</p>
@@ -560,7 +592,7 @@ export default function VisualizadorArquitecturaComputadorPage() {
                 aria-pressed={componenteSeleccionado?.id === c.id}
               >
                 <span className={styles.cpuIcono} aria-hidden="true">{c.icono}</span>
-                <span className={styles.cpuSigla} style={{ color: c.color }}>{c.sigla}</span>
+                <span className={styles.cpuSigla} style={{ color: tonoDe(c.color) }}>{c.sigla}</span>
                 <span className={styles.cpuNombre}>{c.nombre}</span>
                 <span className={styles.cpuFuncion}>{c.funcion}</span>
               </button>
@@ -569,7 +601,7 @@ export default function VisualizadorArquitecturaComputadorPage() {
 
           {componenteSeleccionado && (
             <div className={styles.cpuDetalle} style={{ borderLeftColor: componenteSeleccionado.color }}>
-              <h3 style={{ color: componenteSeleccionado.color }}>
+              <h3 style={{ color: tonoDe(componenteSeleccionado.color) }}>
                 <span aria-hidden="true">{componenteSeleccionado.icono}</span> {componenteSeleccionado.sigla} — {componenteSeleccionado.nombre}
               </h3>
               <p>{componenteSeleccionado.detalle}</p>
@@ -604,7 +636,7 @@ export default function VisualizadorArquitecturaComputadorPage() {
 
           {/* Paso actual */}
           <div className={styles.fdePaso} style={{ borderTopColor: pasoActual.colorFase }}>
-            <div className={styles.fdeFaseBadge} style={{ backgroundColor: pasoActual.colorFase }}>
+            <div className={styles.fdeFaseBadge} style={{ backgroundColor: rellenoLegible(pasoActual.colorFase), color: tintaSobre(rellenoLegible(pasoActual.colorFase)) }}>
               {pasoActual.fase}
             </div>
             <h3 className={styles.fdePasoTitulo}>{pasoActual.titulo}</h3>
@@ -687,14 +719,14 @@ export default function VisualizadorArquitecturaComputadorPage() {
                 >
                   <div
                     className={styles.memoriaBarra}
-                    style={{ backgroundColor: n.color }}
+                    style={{ backgroundColor: rellenoLegible(n.color), color: tintaSobre(rellenoLegible(n.color)) }}
                   >
                     <span className={styles.memoriaBarraIcono} aria-hidden="true">{n.icono}</span>
                     <span className={styles.memoriaBarraNombre}>{n.nombre}</span>
                   </div>
                 </div>
                 <div className={styles.memoriaInfo}>
-                  <span className={styles.memoriaLatencia} style={{ color: n.color }}>
+                  <span className={styles.memoriaLatencia} style={{ color: tonoDe(n.color) }}>
                     {n.latencia}
                   </span>
                   <span className={styles.memoriaTamano}>{n.tamano}</span>

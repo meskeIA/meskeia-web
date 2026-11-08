@@ -62,6 +62,10 @@ const APPS: App[] = [
   // su color de datos (2,06-4,11:1 en claro, 1,84-3,81 en oscuro) y el blanco del Modo Realidad
   // sobre el verde (2,87). Las cuatro pestañas
   { slug: 'visualizador-mecanica-fluidos', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
+  // La pestaña activa con el ratón encima (el :hover pintaba el texto en su propio fondo, 1,00:1),
+  // siglas de la CPU y latencias en su color de datos (1,59-4,11:1 en claro, 1,99-3,60 en oscuro)
+  // y blanco sobre las barras de memoria y la insignia de fase (1,66-4,11)
+  { slug: 'visualizador-arquitectura-computador', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
 ];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {

@@ -2,6 +2,21 @@
   min-height: 100vh;
   background: var(--bg-primary);
   color: var(--text-primary);
+  /*
+   * Tono de TEXTO de los colores de datos que globals no tiene (cabo C0645): pintados como texto
+   * daban 1,59-4,11:1. Peor caso sobre #F5F5F5 en claro y #333333 en oscuro.
+   */
+  --azul-oscuro-texto: #1A6080; /* 1a6080 · 6,36 */
+  --gris-texto: #636366;        /* 8E8E93 · 5,49 */
+  --gris-oscuro-texto: #555555; /* 666 y 555 · 6,84 */
+  --oliva-texto: #4A7A3A;       /* 5C8F4A · 4,66 */
+  --violeta-texto: #7D3C98;     /* 9B59B6 · 6,48 */
+  --morado-texto: #6C3483;      /* 8E44AD · 7,84 */
+  --amarillo-texto: #7A6200;    /* F1C40F · 5,39 */
+}
+[data-theme='dark'] .container {
+  --azul-oscuro-texto: #6CB4EE; --gris-texto: #AEAEB2; --gris-oscuro-texto: #B0B0B0;
+  --oliva-texto: #9CC98A; --violeta-texto: #C39BD3; --morado-texto: #BB8FCE; --amarillo-texto: #F4D03F;
 }
 
 /* Hero */
@@ -50,7 +65,10 @@
   border-color: var(--primary);
   color: var(--primary-texto);
 }
-.tabBtnActive {
+.tabBtnActive,
+.tabBtnActive:hover {
+  /* El :hover de .tabBtn pintaba el texto de la pestaña activa en su propio fondo: 1,00:1 al
+     dejar el ratón encima tras pulsarla (C0645) */
   background: var(--primary-boton);
   border-color: var(--primary-boton);
   color: #fff;
@@ -766,7 +784,7 @@
   border-color: rgba(224, 123, 57, 0.25);
 }
 [data-theme='dark'] .warningHeader h3 {
-  color: #e09060;
+  color: #EBA57A; /* 5,42:1 sobre el aviso; #e09060 daba 4,41 (C0645) */
 }
 
 /* ── Responsive ── */
