@@ -349,7 +349,9 @@ function PrismaSVG() {
 
   return (
     <svg viewBox="0 0 600 400" aria-label="Prisma descomponiendo luz blanca en arcoíris">
-      {/* Rayo blanco de entrada */}
+      {/* Rayo blanco de entrada, con un contorno debajo: en tema claro el trazo blanco sobre la
+          tarjeta blanca no se veía (1:1); el contorno atenuado pasa de 3:1 en los dos temas */}
+      <line x1="30" y1={py + pHeight / 2} x2={px + 20} y2={py + pHeight / 2} stroke="var(--text-muted)" strokeWidth="7" />
       <line x1="30" y1={py + pHeight / 2} x2={px + 20} y2={py + pHeight / 2} stroke="white" strokeWidth="4" filter="url(#glow)" />
       <text x="40" y={py + pHeight / 2 - 12} fontSize="11" className={styles.svgTexto} fontWeight="600">Luz blanca</text>
 
