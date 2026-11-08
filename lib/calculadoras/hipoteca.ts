@@ -1,6 +1,6 @@
 /**
  * Calculadora de Hipoteca — lógica pura sin React ni DOM
- * Usada por: MCP server (calcular_hipoteca y consulta_compra_vivienda) y /api/chatgpt/hipoteca.
+ * Usada por: MCP server (calcular_hipoteca, consulta_compra_vivienda) y /api/chatgpt/hipoteca.
  * Su app gemela es estimador-hipoteca, que lleva la misma fórmula en su useMemo: unificados por
  * barrido el 08/11/2026 (_private/inspector/MOTORES.md, «HITO unificar-app-motor-hipoteca»).
  *
