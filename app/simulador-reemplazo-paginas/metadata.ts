@@ -71,7 +71,7 @@ export const faqJsonLd = {
       name: '¿Qué es la anomalía de Belady y con qué algoritmo ocurre?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La anomalía de Belady es el fenómeno contraintuitivo por el que aumentar el número de marcos de memoria puede incrementar el número de fallos de página. Solo ocurre con el algoritmo FIFO; LRU y Optimal están libres de esta anomalía porque son algoritmos de pila (stack algorithms). El simulador detecta y señala automáticamente cuándo se produce.',
+        text: 'La anomalía de Belady es el fenómeno contraintuitivo por el que aumentar el número de marcos de memoria puede incrementar el número de fallos de página. Puede darse en cualquier algoritmo que no sea de pila: FIFO (el caso clásico), Clock o segunda oportunidad, y LFU tal como se simula aquí, con el contador desde la carga. LRU y Optimal están libres de esta anomalía porque son algoritmos de pila (stack algorithms). El simulador detecta y señala automáticamente cuándo se produce en FIFO, Clock o LFU.',
       },
     },
     {

@@ -214,14 +214,19 @@ test.describe('simulador-reemplazo-paginas', () => {
     await expect(metrica(bloque(page, 'FIFO'), 'Fallos de página')).toHaveText('9');
   });
 
-  test('HALLAZGO (08/11/2026, ABIERTO) · la FAQ y la tabla dicen que Clock y LFU no tienen anomalía de Belady', async ({
+  test('HALLAZGO 4211 (REPARADO) · la FAQ y la tabla dicen que Clock y LFU no tienen anomalía de Belady', async ({
     page,
   }) => {
     // La propia app da Clock 9 → 10 en su ejemplo «Cadena de Belady» (3 → 4 marcos) y LFU
-    // 10 → 11 en LFU_ANOMALIA (4 → 5 marcos): los casos 1 y 1 ter de arriba. Pero el FAQPage
-    // dice «Solo ocurre con el algoritmo FIFO» y la tabla educativa pone «No en la práctica» en
-    // Clock y «No» en LFU. Ninguno de los dos es algoritmo de pila tal como los simula la app.
-    test.fail();
+    // 10 → 11 en LFU_ANOMALIA (4 → 5 marcos): los casos 1 y 1 ter de arriba. Antes el FAQPage
+    // decía «Solo ocurre con el algoritmo FIFO» y la tabla educativa ponía «No en la práctica» en
+    // Clock y «No» en LFU, y el aviso solo vigilaba FIFO. Ninguno de los dos es algoritmo de pila
+    // tal como los simula la app.
+    await page.getByRole('button', { name: 'Cadena de Belady' }).click();
+    await expect(avisoApp(page)).toContainText('Anomalía de Belady detectada en FIFO y Clock');
+    await fijarCadena(page, LFU_ANOMALIA);
+    await fijarMarcos(page, 4);
+    await expect(avisoApp(page)).toContainText('LFU');
     const jsonLd = (await page.locator('script[type="application/ld+json"]').allTextContents()).join('\n');
     expect(jsonLd).toContain('FAQPage');
     expect(jsonLd).not.toContain('Solo ocurre con el algoritmo FIFO');
@@ -231,48 +236,67 @@ test.describe('simulador-reemplazo-paginas', () => {
     expect(((await celda('LFU').textContent()) ?? '').trim()).not.toMatch(/^No\b/);
   });
 
-  test('HALLAZGO (08/11/2026, ABIERTO) · el porcentaje va pegado a la cifra: «75,0%»', async ({ page }) => {
+  test('HALLAZGO 4212 (REPARADO) · el porcentaje va pegado a la cifra: «75,0%»', async ({ page }) => {
     // Formato español (RAE 2010, CLAUDE.md §2): «75,0 %» con espacio duro U+00A0.
-    test.fail();
     await page.getByRole('button', { name: 'Cadena de Belady' }).click();
+    await expect(metrica(bloque(page, 'FIFO'), 'Eficiencia vs Optimal')).toHaveText('77,8 %');
+    await page.getByLabel('Comparar todos los algoritmos a la vez').check();
+    const resumen = page.locator('main table').filter({ has: page.locator('th', { hasText: 'Tasa fallos' }) });
+    await expect(resumen.locator('tbody tr').filter({ hasText: 'FIFO' }).locator('td').nth(2)).toHaveText('75,0 %');
     await expect(metrica(bloque(page, 'FIFO'), 'Tasa de fallos')).toHaveText('75,0 %');
   });
 
-  test('HALLAZGO (08/11/2026, ABIERTO) · «3.0» se lee como la página 3 y «1e1» como la 10, sin avisar', async ({
+  test('HALLAZGO 4213 (REPARADO) · «3.0» se lee como la página 3 y «1e1» como la 10, sin avisar', async ({
     page,
   }) => {
-    // La etiqueta pide «enteros 0-99 separados por coma o espacio». Number() acepta «3.0», «1e1»
-    // y «0x0A»: «1,2,3.0,4» (un punto tecleado por una coma) sale como 4 referencias 1 2 3 4 y
-    // se pierde la página 0 sin ningún aviso.
-    test.fail();
-    await fijarCadena(page, '1,2,3.0,4');
-    await expect(avisoApp(page)).toBeVisible({ timeout: 2000 });
-    await fijarCadena(page, '1e1');
-    await expect(avisoApp(page)).toBeVisible({ timeout: 2000 });
+    // La etiqueta pide «enteros 0-99 separados por coma o espacio». Number() aceptaba «3.0», «1e1»
+    // y «0x0A»: «1,2,3.0,4» (un punto tecleado por una coma) salía como 4 referencias 1 2 3 4 y
+    // se perdía la página 0 sin ningún aviso.
+    for (const [entrada, token] of [['1,2,3.0,4', '3.0'], ['1e1', '1e1'], ['0x0A', '0x0A'], ['+5', '+5']]) {
+      await fijarCadena(page, entrada);
+      await expect(avisoApp(page)).toHaveText(`Valor no válido: "${token}". Usa enteros entre 0 y 99.`);
+    }
+    // Lo bueno sigue valiendo, también con un cero a la izquierda en dos cifras
+    await fijarCadena(page, '07 7 1'); // 07 y 7 son la misma página
+    await expect(page.getByText('3 referencias · 2 páginas distintas')).toBeVisible();
   });
 
-  test('HALLAZGO (08/11/2026, ABIERTO) · el eje de la gráfica repite etiquetas: 0, 1, 1, 2, 2, 3', async ({ page }) => {
-    // Con 3 fallos como máximo, las seis rayas van en 0; 0,6; 1,2; 1,8; 2,4 y 3, y Math.round
-    // las rotula 0, 1, 1, 2, 2, 3: la raya «1» de 0,6 no está a la altura de un fallo.
-    test.fail();
+  test('HALLAZGO 4214 (REPARADO) · el eje de la gráfica repite etiquetas: 0, 1, 1, 2, 2, 3', async ({ page }) => {
+    // Con 3 fallos como máximo, las seis rayas iban en 0; 0,6; 1,2; 1,8; 2,4 y 3, y Math.round
+    // las rotulaba 0, 1, 1, 2, 2, 3: la raya «1» de 0,6 no estaba a la altura de un fallo. Ahora
+    // van en enteros: paso ⌈3/5⌉ = 1 → 0, 1, 2, 3.
     await fijarCadena(page, '0,0,99,99,0');
     await fijarMarcos(page, 1);
     await page.getByLabel('Comparar todos los algoritmos a la vez').check();
-    const rayas = await page.locator('svg[aria-label="Gráfica de fallos acumulados"] text[x="42"]').allTextContents();
-    expect(rayas.length).toBeGreaterThan(1);
-    expect(new Set(rayas).size).toBe(rayas.length);
+    const eje = page.locator('svg[aria-label="Gráfica de fallos acumulados"] text[x="42"]');
+    await expect(eje).toHaveText(['0', '1', '2', '3']);
+    // Cadena por defecto, 3 marcos: rayas enteras y distintas
+    await fijarCadena(page, POR_DEFECTO);
+    await fijarMarcos(page, 3);
+    const otras = await eje.allTextContents();
+    expect(otras.length).toBeGreaterThan(1);
+    expect(new Set(otras).size).toBe(otras.length);
+    for (const r of otras) expect(r).toMatch(/^\d+$/);
   });
 
-  test('HALLAZGO (08/11/2026, ABIERTO) · «1 referencias · 1 páginas distintas»', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO 4215 (REPARADO) · «1 referencias · 1 páginas distintas»', async ({ page }) => {
     await fijarCadena(page, '7');
     await expect(page.getByText(/^1 referencia · 1 página distinta$/)).toBeVisible({ timeout: 2000 });
+    await fijarCadena(page, '7,7');
+    await expect(page.getByText(/^2 referencias · 1 página distinta$/)).toBeVisible({ timeout: 2000 });
   });
 
-  test('HALLAZGO (08/11/2026, ABIERTO) · once emojis decorativos junto a texto sin aria-hidden', async ({ page }) => {
+  test('HALLAZGO 4216 (REPARADO) · once emojis decorativos junto a texto sin aria-hidden', async ({ page }) => {
     // 🐧 📊 🌐 📚 de los casos de uso, 📋 🎯 🔄 ⏱️ 🧭 📈 de las buenas prácticas y el ⚠ de
-    // «Errores frecuentes»: el lector de pantalla los lee antes de cada título (CLAUDE.md §5).
-    test.fail();
+    // «Errores frecuentes»: el lector de pantalla los leía antes de cada título (CLAUDE.md §5).
+    // Y los «●» de color delante de cada algoritmo, que se leían «círculo negro».
+    const bolitas = await page.evaluate(
+      () =>
+        Array.from(document.querySelectorAll('span')).filter(
+          (el) => el.textContent === '●' && !el.closest('[aria-hidden="true"]'),
+        ).length,
+    );
+    expect(bolitas).toBe(0);
     const sueltos = await page.evaluate(() => {
       const re = /\p{Extended_Pictographic}/u;
       return Array.from(document.querySelectorAll('span'))

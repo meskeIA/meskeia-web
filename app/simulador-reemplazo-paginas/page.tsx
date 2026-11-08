@@ -10,7 +10,7 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
-import { formatNumber } from '@/lib';
+import { formatNumber, formatPercentage } from '@/lib';
 import styles from './SimuladorReemplazoPaginas.module.css';
 
 // ============================================
@@ -99,7 +99,9 @@ function parsearCadena(input: string): { ok: boolean; refs: number[]; error?: st
 
   const refs: number[] = [];
   for (const token of tokens) {
-    const n = Number(token);
+    // Solo una o dos cifras: Number() aceptaba «3.0», «1e1», «0x0A» o «+5» como enteros, y un
+    // punto tecleado en lugar de una coma juntaba dos páginas en una sin avisar (hallazgo 4213)
+    const n = /^\d{1,2}$/.test(token) ? Number(token) : NaN;
     if (!Number.isInteger(n) || n < 0 || n > 99) {
       return { ok: false, refs: [], error: `Valor no válido: "${token}". Usa enteros entre 0 y 99.` };
     }
@@ -113,6 +115,22 @@ function parsearCadena(input: string): { ok: boolean; refs: number[]; error?: st
   }
   return { ok: true, refs };
 }
+
+/** «1 referencia · 1 página distinta», «5 referencias · 2 páginas distintas» (hallazgo 4215). */
+function resumenCadena(numRefs: number, distintas: number): string {
+  const r = numRefs === 1 ? 'referencia' : 'referencias';
+  const p = distintas === 1 ? 'página distinta' : 'páginas distintas';
+  return `${numRefs} ${r} · ${distintas} ${p}`;
+}
+
+/** «FIFO», «FIFO y Clock», «FIFO, Clock y LFU». */
+function listaNombres(algs: Algoritmo[]): string {
+  const nombres = algs.map((a) => ALGORITMOS[a].nombre);
+  return nombres.length <= 1 ? nombres.join('') : `${nombres.slice(0, -1).join(', ')} y ${nombres[nombres.length - 1]}`;
+}
+
+/** «75,0 %» con espacio duro (CLAUDE.md §2; hallazgo 4212). Recibe el porcentaje 0-100. */
+const pct1 = (porcentaje: number): string => formatPercentage(porcentaje / 100, 1);
 
 // ============================================
 // SIMULACIÓN DE ALGORITMOS
@@ -369,12 +387,14 @@ export default function SimuladorReemplazoPaginas() {
     };
   }, [parseado.ok, refs, numMarcos]);
 
-  // Detectar anomalía de Belady en FIFO: comparar con N+1 marcos
-  const anomaliaBelady = useMemo<boolean>(() => {
-    if (!parseado.ok || refs.length === 0 || numMarcos >= 10) return false;
-    const fifoActual = simular('fifo', refs, numMarcos);
-    const fifoMasMarcos = simular('fifo', refs, numMarcos + 1);
-    return fifoMasMarcos.faults > fifoActual.faults;
+  // Anomalía de Belady: comparar con N+1 marcos en los algoritmos que NO son de pila tal como
+  // se simulan aquí (FIFO, Clock y LFU con el contador desde la carga). LRU y Optimal no la
+  // sufren. Antes solo se vigilaba FIFO (hallazgo 4211).
+  const anomaliaBelady = useMemo<Algoritmo[]>(() => {
+    if (!parseado.ok || refs.length === 0 || numMarcos >= 10) return [];
+    return (['fifo', 'clock', 'lfu'] as Algoritmo[]).filter(
+      (alg) => simular(alg, refs, numMarcos + 1).faults > simular(alg, refs, numMarcos).faults,
+    );
   }, [parseado.ok, refs, numMarcos]);
 
   const cargarEjemplo = useCallback((ejemplo: EjemploPreconfigurado) => {
@@ -440,7 +460,7 @@ export default function SimuladorReemplazoPaginas() {
           )}
           {parseado.ok && (
             <p className={styles.refsInfo}>
-              {refs.length} referencias · {new Set(refs).size} páginas distintas
+              {resumenCadena(refs.length, new Set(refs).size)}
             </p>
           )}
         </div>
@@ -494,12 +514,14 @@ export default function SimuladorReemplazoPaginas() {
         )}
 
         {/* Anomalía de Belady */}
-        {parseado.ok && anomaliaBelady && (
+        {parseado.ok && anomaliaBelady.length > 0 && (
           <div className={styles.beladyAlert} role="alert">
-            <strong><span aria-hidden="true">⚠</span> Anomalía de Belady detectada en FIFO</strong>
+            <strong>
+              <span aria-hidden="true">⚠</span>
+              <span>{` Anomalía de Belady detectada en ${listaNombres(anomaliaBelady)}`}</span>
+            </strong>
             <p>
-              Con {numMarcos} marcos hay menos fallos que con {numMarcos + 1} marcos. Es un caso clásico
-              en el que añadir memoria empeora el rendimiento de FIFO. Ningún algoritmo de pila (LRU, Optimal) sufre esta anomalía.
+              {`Con ${numMarcos} marcos hay menos fallos que con ${numMarcos + 1} marcos en ${listaNombres(anomaliaBelady)}: añadir memoria empeora su rendimiento. Puede pasar en cualquier algoritmo que no sea de pila (FIFO, Clock, LFU tal como se simula aquí); LRU y Optimal, que sí lo son, no sufren esta anomalía.`}
             </p>
           </div>
         )}
@@ -513,7 +535,7 @@ export default function SimuladorReemplazoPaginas() {
               return (
                 <section key={alg} className={styles.resultBlock}>
                   <h3 className={styles.algoritmoTitle}>
-                    <span style={{ color: ALGORITMOS[alg].color }}>●</span> {ALGORITMOS[alg].nombre}
+                    <span style={{ color: ALGORITMOS[alg].color }} aria-hidden="true">●</span> {ALGORITMOS[alg].nombre}
                     <span className={styles.algoritmoSubtitle}> — {ALGORITMOS[alg].descripcion}</span>
                   </h3>
 
@@ -529,16 +551,16 @@ export default function SimuladorReemplazoPaginas() {
                     </div>
                     <div className={styles.metricCard}>
                       <div className={styles.metricLabel}>Tasa de fallos</div>
-                      <div className={styles.metricValue}>{formatNumber(r.faultRate, 1)}%</div>
+                      <div className={styles.metricValue}>{pct1(r.faultRate)}</div>
                     </div>
                     <div className={styles.metricCard}>
                       <div className={styles.metricLabel}>Hit ratio</div>
-                      <div className={styles.metricValue}>{formatNumber(r.hitRatio, 1)}%</div>
+                      <div className={styles.metricValue}>{pct1(r.hitRatio)}</div>
                     </div>
                     {alg !== 'optimal' && (
                       <div className={styles.metricCard}>
                         <div className={styles.metricLabel}>Eficiencia vs Optimal</div>
-                        <div className={styles.metricValue}>{formatNumber(eficiencia, 1)}%</div>
+                        <div className={styles.metricValue}>{pct1(eficiencia)}</div>
                       </div>
                     )}
                   </div>
@@ -639,12 +661,12 @@ export default function SimuladorReemplazoPaginas() {
                         return (
                           <tr key={alg}>
                             <td>
-                              <span style={{ color: ALGORITMOS[alg].color }}>●</span> {ALGORITMOS[alg].nombre}
+                              <span style={{ color: ALGORITMOS[alg].color }} aria-hidden="true">●</span> {ALGORITMOS[alg].nombre}
                             </td>
                             <td>{formatNumber(r.faults, 0)}</td>
-                            <td>{formatNumber(r.faultRate, 1)}%</td>
-                            <td>{formatNumber(r.hitRatio, 1)}%</td>
-                            <td>{formatNumber(ef, 1)}%</td>
+                            <td>{pct1(r.faultRate)}</td>
+                            <td>{pct1(r.hitRatio)}</td>
+                            <td>{pct1(ef)}</td>
                           </tr>
                         );
                       })}
@@ -714,7 +736,7 @@ export default function SimuladorReemplazoPaginas() {
                 <td>Bit de uso = 0 en recorrido circular</td>
                 <td>Bajo (1 bit por marco)</td>
                 <td>Cercano a LRU</td>
-                <td>No en la práctica</td>
+                <td>Sí, posible (no es de pila)</td>
                 <td>Implementación real (Linux, BSD)</td>
               </tr>
               <tr>
@@ -722,7 +744,7 @@ export default function SimuladorReemplazoPaginas() {
                 <td>La menos referenciada en total</td>
                 <td>Medio (contador por página)</td>
                 <td>Bueno si patrón estable</td>
-                <td>No</td>
+                <td>Sí, posible (con el contador desde la carga no es de pila)</td>
                 <td>Trabajos con conjuntos de páginas estables</td>
               </tr>
             </tbody>
@@ -733,7 +755,7 @@ export default function SimuladorReemplazoPaginas() {
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>🐧</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🐧</span>
               <strong>Linux: variante de Clock</strong>
             </div>
             <p className={styles.escenarioExample}>
@@ -746,7 +768,7 @@ export default function SimuladorReemplazoPaginas() {
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>📊</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">📊</span>
               <strong>Bases de datos: LRU + LFU</strong>
             </div>
             <p className={styles.escenarioExample}>
@@ -759,7 +781,7 @@ export default function SimuladorReemplazoPaginas() {
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>🌐</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🌐</span>
               <strong>Caches CDN: LRU adaptativo</strong>
             </div>
             <p className={styles.escenarioExample}>
@@ -772,7 +794,7 @@ export default function SimuladorReemplazoPaginas() {
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>📚</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">📚</span>
               <strong>Aulas y exámenes</strong>
             </div>
             <p className={styles.escenarioExample}>
@@ -796,7 +818,7 @@ export default function SimuladorReemplazoPaginas() {
               marcos puede ser distinta de la que se retiraría con N+1.
             </p>
             <p className={styles.faqTip}>
-              <span aria-hidden="true">💡</span> Algoritmos como LRU u Optimal cumplen la propiedad de pila y nunca empeoran al añadir marcos.
+              <span aria-hidden="true">💡</span> LRU y Optimal cumplen la propiedad de pila y nunca empeoran al añadir marcos. Clock y LFU no la cumplen y también pueden sufrirla: prueba la cadena de Belady con Clock.
             </p>
           </div>
           <div className={styles.faqItem}>
@@ -819,7 +841,7 @@ export default function SimuladorReemplazoPaginas() {
               FreeBSD) usan variantes de Clock, no LRU puro.
             </p>
             <p className={styles.faqTip}>
-              <span aria-hidden="true">💡</span> La diferencia es de 5-10% de fallos pero 100x menos sobrecarga.
+              <span aria-hidden="true">💡</span> La diferencia es de un 5-10&nbsp;% de fallos pero 100x menos sobrecarga.
             </p>
           </div>
           <div className={styles.faqItem}>
@@ -900,40 +922,40 @@ export default function SimuladorReemplazoPaginas() {
         <h3>Mejores Prácticas</h3>
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>📋</span>
+            <span className={styles.tipIcon} aria-hidden="true">📋</span>
             <strong>Dibuja siempre la tabla completa</strong>
             <p>Aunque pienses que sabes el resultado, escribir cada paso reduce errores y te hace ver qué páginas conviven en memoria.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🎯</span>
+            <span className={styles.tipIcon} aria-hidden="true">🎯</span>
             <strong>Para Optimal, mira hacia delante</strong>
             <p>No es un algoritmo causal: para decidir hoy hay que ver mañana. Anota junto a cada página su próxima aparición.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🔄</span>
+            <span className={styles.tipIcon} aria-hidden="true">🔄</span>
             <strong>En LRU usa una pila auxiliar</strong>
             <p>Lista ordenada por uso. Al hit, mueve la página al final (más reciente). Al evict, sale la del principio (menos reciente).</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>⏱️</span>
+            <span className={styles.tipIcon} aria-hidden="true">⏱️</span>
             <strong>En FIFO basta una cola</strong>
             <p>No importa si una página se usa mucho: lo único relevante es cuándo se cargó por primera vez. Mantén la cola estricta.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🧭</span>
+            <span className={styles.tipIcon} aria-hidden="true">🧭</span>
             <strong>En Clock, mueve el puntero</strong>
             <p>Después de cada reemplazo, el puntero avanza una posición. Si todos los bits son 1, dará una vuelta entera poniéndolos a 0.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>📈</span>
+            <span className={styles.tipIcon} aria-hidden="true">📈</span>
             <strong>Compara siempre con Optimal</strong>
-            <p>El cociente fallos_optimal / fallos_algoritmo te dice qué tan lejos estás del techo. Por debajo de 70% indica algoritmo mediocre o cadena hostil.</p>
+            <p>El cociente fallos_optimal / fallos_algoritmo te dice qué tan lejos estás del techo. Por debajo del 70&nbsp;% indica algoritmo mediocre o cadena hostil.</p>
           </div>
         </div>
 
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠</span>
             <strong>Errores frecuentes en exámenes</strong>
           </div>
           <ul className={styles.warningList}>
@@ -942,7 +964,7 @@ export default function SimuladorReemplazoPaginas() {
             <li>En Optimal, contar la referencia actual como "futura" — solo cuentan las posteriores al instante actual.</li>
             <li>Olvidar resetear el bit de uso en Clock al pasar el puntero por una página con bit=1.</li>
             <li>Cargar 2 páginas en el primer instante — solo se carga una por referencia, aunque haya marcos vacíos.</li>
-            <li>Suponer que más marcos siempre da menos fallos — la anomalía de Belady demuestra que en FIFO no es así.</li>
+            <li>Suponer que más marcos siempre da menos fallos — la anomalía de Belady muestra que en FIFO, y en cualquier algoritmo que no sea de pila, no es así.</li>
           </ul>
         </div>
       </EducationalSection>
@@ -980,8 +1002,14 @@ function FaultsChart({ resultados, numRefs }: FaultsChartProps): React.ReactElem
     1
   );
 
+  // Rayas del eje en valores ENTEROS (paso = ⌈máx/5⌉) y el eje hasta el múltiplo del paso que
+  // cubre el máximo: antes iban en máx·i/5 y Math.round las rotulaba «0, 1, 1, 2, 2, 3» con 3
+  // fallos, fuera de la altura de su número (hallazgo 4214)
+  const pasoEje = Math.ceil(maxFaults / 5);
+  const topeEje = pasoEje * Math.ceil(maxFaults / pasoEje);
+
   const xScale = (i: number): number => padX + (i / Math.max(numRefs - 1, 1)) * innerW;
-  const yScale = (f: number): number => height - padY - (f / maxFaults) * innerH;
+  const yScale = (f: number): number => height - padY - (f / topeEje) * innerH;
 
   const buildPath = (alg: Algoritmo): string => {
     const pasos = resultados[alg].pasos;
@@ -996,10 +1024,9 @@ function FaultsChart({ resultados, numRefs }: FaultsChartProps): React.ReactElem
   };
 
   // Líneas de cuadrícula horizontales
-  const ySteps = 5;
   const yLines: number[] = [];
-  for (let i = 0; i <= ySteps; i++) {
-    yLines.push((maxFaults * i) / ySteps);
+  for (let v = 0; v <= topeEje; v += pasoEje) {
+    yLines.push(v);
   }
 
   return (
@@ -1017,7 +1044,7 @@ function FaultsChart({ resultados, numRefs }: FaultsChartProps): React.ReactElem
               strokeWidth={1}
             />
             <text x={padX - 8} y={yScale(v) + 4} textAnchor="end" fontSize={11} fill="currentColor">
-              {Math.round(v)}
+              {v}
             </text>
           </g>
         ))}
