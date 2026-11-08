@@ -36,7 +36,7 @@ import { jsonLd, faqJsonLd } from '../../app/cara-o-cruz/metadata';
  * Lo que la app da bien se comprueba con el separador libre antes del «%» (\s?), para que el
  * hallazgo del formato no tape la mecánica; el formato va en su propio test.
  *
- * HALLAZGOS ABIERTOS (08/11/2026), con test.fail() al final del fichero: un doble clic (o dos
+ * HALLAZGOS 4230-4238 (08/11/2026), REPARADOS el mismo día, con su test al final: un doble clic (o dos
  * toques) en «Lanzar Moneda» con un resultado en pantalla pulsa «Reiniciar», que sube bajo el
  * puntero al desmontarse el resultado, y borra las estadísticas · «%» pegado a la cifra ·
  * «Total: 1 lanzamientos» · el resultado no se anuncia (sin región viva) · la racha actual dice el
@@ -141,6 +141,15 @@ interface Lectura {
 async function leer(page: Page): Promise<Lectura> {
   return page.evaluate(() => {
     const q = (s: string) => [...document.querySelectorAll(s)].map((e) => (e.textContent ?? '').trim());
+    // Lo que se VE: sin el texto .sr-only que nombra el lado para el lector de pantalla
+    const qVisible = (s: string) =>
+      [...document.querySelectorAll(s)].map((e) =>
+        [...e.childNodes]
+          .filter((n) => !(n instanceof Element && n.classList.contains('sr-only')))
+          .map((n) => n.textContent ?? '')
+          .join('')
+          .trim(),
+      );
     const moneda = [...document.querySelectorAll('[class]')].find((el) =>
       [...el.classList].some((c) => /(^|_)coin$/.test(c)),
     );
@@ -153,7 +162,7 @@ async function leer(page: Page): Promise<Lectura> {
       valores: q('[class*="statValue"]'),
       porcentajes: q('[class*="statPercent"]'),
       etiquetas: q('[class*="distributionLabels"] span'),
-      rachas: q('[class*="rachaValue"]'),
+      rachas: qVisible('[class*="rachaValue"]'),
       historial: [...document.querySelectorAll('[class*="historialItem"]')].map((e) => e.getAttribute('title')),
       resultado: q('[class*="resultadoTexto"]'),
       vacio: q('[class*="emptyStats"]').some((t) => t === 'Lanza la moneda para ver las estadísticas'),
@@ -390,13 +399,13 @@ test.describe('Cara o Cruz — móvil (390 px)', () => {
     expect(tras).toBeLessThanOrEqual(0);
   });
 
-  test('HALLAZGO (ABIERTO) · dos toques seguidos en la parte baja de «Lanzar Moneda» no borran las estadísticas', async ({
+  test('HALLAZGO 4230 (REPARADO) · dos toques seguidos en la parte baja de «Lanzar Moneda» no borran las estadísticas', async ({
     page,
   }) => {
-    // Con un resultado en pantalla, al lanzar se desmonta el «¡CRUZ!» y el bloque centrado sube
-    // ~27 px: «Reiniciar» queda bajo el dedo. Medido el 08/11/2026 (Pixel 7 emulado, 390 px):
-    // tras 4 lanzamientos, dos toques 8 px sobre el borde inferior del botón → «Total: 1».
-    test.fail();
+    // Antes, con un resultado en pantalla, al lanzar se desmontaba el «¡CRUZ!» y el bloque
+    // centrado subía ~27 px: «Reiniciar» quedaba bajo el dedo. Medido el 08/11/2026 (Pixel 7
+    // emulado, 390 px): tras 4 lanzamientos, dos toques 8 px sobre el borde inferior del botón →
+    // «Total: 1». Ahora el hueco del resultado está reservado y «Reiniciar» se deshabilita en vuelo.
     await abrir(page);
     await encolar(page, [0.1, 0.9, 0.1, 0.9, 0.1]);
     for (let i = 0; i < 4; i++) await lanzar(page);
@@ -435,22 +444,34 @@ test.describe('Cara o Cruz — referencias de probabilidad (sin navegador)', () 
     expect(pAlMenosUna).toBeCloseTo(0.3926, 3);
     // Rachas maximales esperadas de ≥10 caras: 1/2¹⁰ + (n − 10)/2¹¹ = 0,496
     expect(1 / 2 ** 10 + (n - 10) / 2 ** 11).toBeCloseTo(0.496, 3);
+    // ≥10 iguales seguidos (caras o cruces) en 1.024 tiradas: equivale a ≥9 «igual que el
+    // anterior» seguidos en las 1.023 transiciones, que son lanzamientos justos independientes
+    let dist2 = new Array<number>(9).fill(0);
+    dist2[0] = 1;
+    for (let i = 0; i < n - 1; i++) {
+      const nueva = new Array<number>(9).fill(0);
+      for (let r = 0; r < 9; r++) {
+        nueva[0] += dist2[r] * 0.5;
+        if (r + 1 < 9) nueva[r + 1] += dist2[r] * 0.5;
+      }
+      dist2 = nueva;
+    }
+    expect(1 - dist2.reduce((a, b) => a + b, 0)).toBeCloseTo(0.6327, 3);
     // Mejor de 3 con p = 1/2: p² + 2p²(1 − p) = 1/2
     const p = 0.5;
     expect(p * p + 2 * p * p * (1 - p)).toBe(0.5);
   });
 });
 
-test.describe('Cara o Cruz — hallazgos abiertos (08/11/2026)', () => {
-  test('HALLAZGO (ABIERTO) · un doble clic en «Lanzar Moneda» con resultados previos no borra las estadísticas', async ({
+test.describe('Cara o Cruz — hallazgos del 08/11/2026 (reparados)', () => {
+  test('HALLAZGO 4230 (REPARADO) · un doble clic en «Lanzar Moneda» con resultados previos no borra las estadísticas', async ({
     page,
   }) => {
-    // Al lanzar se desmonta el «¡CRUZ!» anterior y el bloque centrado sube (33-73 px según el
-    // alto de la ventana): «Reiniciar» queda bajo el puntero y el 2.º clic del doble clic lo
-    // pulsa; el lanzamiento en vuelo cae después y pasa a ser el 1.º de la serie. Medido el
-    // 08/11/2026 tras 4 lanzamientos: a 1280×720 el doble clic en el CENTRO del botón deja
-    // «Total: 1»; a 1280×900, el que cae 8 px sobre su borde inferior. Esperado: N + 1.
-    test.fail();
+    // Antes, al lanzar se desmontaba el «¡CRUZ!» anterior y el bloque centrado subía (33-73 px
+    // según el alto de la ventana): «Reiniciar» quedaba bajo el puntero y el 2.º clic del doble
+    // clic lo pulsaba; el lanzamiento en vuelo caía después y pasaba a ser el 1.º de la serie.
+    // Medido el 08/11/2026 tras 4 lanzamientos: a 1280×720 el doble clic en el CENTRO del botón
+    // dejaba «Total: 1»; a 1280×900, el que caía 8 px sobre su borde inferior. Esperado: N + 1.
     await abrir(page);
     await encolar(page, Array.from({ length: 12 }, (_, i) => (i % 2 ? 0.9 : 0.1)));
     const total = page.locator('[class*="distributionLabels"] span').nth(1);
@@ -471,32 +492,60 @@ test.describe('Cara o Cruz — hallazgos abiertos (08/11/2026)', () => {
     expect(obtenido).toEqual(esperado);
   });
 
-  test('HALLAZGO (ABIERTO) · el «%» va separado de la cifra con espacio duro: «100,0 %»', async ({ page }) => {
-    // CLAUDE.md global §2 (decidido el 25/09/2026): «15 %» con U+00A0. Hoy «100,0%» en las dos
-    // tarjetas y en la leyenda de la barra.
-    test.fail();
+  test('HALLAZGO 4230 (REPARADO) · el «Lanzar Moneda» no se mueve durante el vuelo y «Reiniciar» no se puede pulsar en él', async ({
+    page,
+  }) => {
+    await abrir(page);
+    await encolar(page, [0.1, 0.9, 0.2]);
+    for (let i = 0; i < 2; i++) await lanzar(page);
+    // Puntero fuera: el :hover sube el botón 3 px y no es lo que se mide
+    await page.mouse.move(0, 0);
+    const antes = await botonLanzar(page).boundingBox();
+    await botonLanzar(page).click();
+    await page.clock.runFor(300);
+    const enVuelo = await page.getByRole('button', { name: 'Lanzando...' }).boundingBox();
+    if (!antes || !enVuelo) throw new Error('Sin caja del botón');
+    expect(Math.abs(enVuelo.y - antes.y)).toBeLessThanOrEqual(1);
+    await expect(page.getByRole('button', { name: 'Reiniciar' })).toBeDisabled();
+    await page.clock.runFor(1201);
+    await expect(page.getByRole('button', { name: 'Reiniciar' })).toBeEnabled();
+    await expect(page.locator('[class*="distributionLabels"] span').nth(1)).toHaveText('Total: 3 lanzamientos');
+  });
+
+  test('HALLAZGO 4233 (REPARADO) · el «%» va separado de la cifra con espacio duro: «100,0 %»', async ({ page }) => {
+    // CLAUDE.md global §2 (decidido el 25/09/2026): «15 %» con U+00A0. Antes «100,0%» en las dos
+    // tarjetas y en la leyenda de la barra; también el bloque educativo y el JSON-LD.
     await abrir(page);
     await encolar(page, [0.2]);
     await lanzar(page);
     await expect(page.locator('[class*="statPercent"]').first()).toHaveText(`100,0${NBSP}%`);
     await expect(page.locator('[class*="distributionLabels"] span').first()).toHaveText(`Cara 100,0${NBSP}%`);
+    // Ningún «%» pegado a una cifra en el texto de la página ni en el JSON-LD
+    // (solo la app: las tarjetas de relacionadas y el pie no son suyos)
+    const texto = (
+      await page.locator('[class*="mainContent"], [class*="guideSection"]').allTextContents()
+    ).join(' ');
+    expect(texto).not.toMatch(/\d%/);
+    expect(texto).not.toMatch(/\d %/); // espacio normal: el «%» saltaría solo de línea
+    expect(JSON.stringify(faqJsonLd)).not.toMatch(/\d%/);
   });
 
-  test('HALLAZGO (ABIERTO) · con un lanzamiento la leyenda dice «Total: 1 lanzamiento», en singular', async ({ page }) => {
-    // Hoy «Total: 1 lanzamientos». Al repararlo: la palabra que alterna, en un <span> siempre
-    // montado (check:ternario-traducido).
-    test.fail();
+  test('HALLAZGO 4234 (REPARADO) · con un lanzamiento la leyenda dice «Total: 1 lanzamiento», en singular', async ({ page }) => {
+    // Antes «Total: 1 lanzamientos». El rótulo es una sola cadena (sin texto que aparezca junto a
+    // hermanos: check:ternario-traducido).
     await abrir(page);
-    await encolar(page, [0.9]);
+    await encolar(page, [0.9, 0.1]);
     await lanzar(page);
     await expect(page.locator('[class*="distributionLabels"] span').nth(1)).toHaveText('Total: 1 lanzamiento');
+    await lanzar(page);
+    await expect(page.locator('[class*="distributionLabels"] span').nth(1)).toHaveText('Total: 2 lanzamientos');
   });
 
-  test('HALLAZGO (ABIERTO) · el resultado se anuncia en una región viva que existe desde la carga', async ({ page }) => {
-    // Hoy no hay ningún aria-live ni role="status" en la app: el «¡CARA!» se monta en un <div>
-    // condicional y el lector de pantalla no dice nada tras pulsar «Lanzar Moneda». (El
-    // anunciador de rutas de Next vive en un shadow root: querySelectorAll no lo ve.)
-    test.fail();
+  test('HALLAZGO 4231 (REPARADO) · el resultado se anuncia en una región viva que existe desde la carga', async ({ page }) => {
+    // Antes no había ningún aria-live ni role="status" en la app: el «¡CARA!» se montaba en un
+    // <div> condicional y el lector de pantalla no decía nada tras pulsar «Lanzar Moneda». (El
+    // anunciador de rutas de Next vive en un shadow root: querySelectorAll no lo ve.) Y las dos
+    // caras de la moneda se leían a la vez: ahora la moneda es aria-hidden.
     await abrir(page);
     const vivasAlCargar = await page.evaluate(
       () => document.querySelectorAll('[aria-live="polite"], [aria-live="assertive"], [role="status"]').length,
@@ -510,49 +559,53 @@ test.describe('Cara o Cruz — hallazgos abiertos (08/11/2026)', () => {
       ),
     );
     expect(anunciado).toBe(true);
+    const zonaMoneda = await page.locator('[class*="coinArea"]').ariaSnapshot();
+    expect(zonaMoneda).not.toMatch(/CARA[\s\S]*CRUZ/);
   });
 
-  test('HALLAZGO (ABIERTO) · la racha actual dice en texto de qué lado es, no solo con un emoji', async ({ page }) => {
-    // Hoy el árbol accesible es «Racha actual 3 🦅»: el lado solo lo dice el emoji (y las
-    // fichas del historial son «🦅 🦅 🦅»).
-    test.fail();
+  test('HALLAZGO 4232 (REPARADO) · la racha actual dice en texto de qué lado es, no solo con un emoji', async ({ page }) => {
+    // Antes el árbol accesible era «Racha actual 3 🦅»: el lado solo lo decía el emoji (y las
+    // fichas del historial eran «🦅 🦅 🦅»).
     await abrir(page);
     await encolar(page, [0.9, 0.9, 0.9]);
     for (let i = 0; i < 3; i++) await lanzar(page);
     const arbol = await page.locator('[class*="rachaItem"]').first().ariaSnapshot();
-    expect(arbol).toMatch(/cruz/i);
+    expect(arbol).toMatch(/3 cruces/i);
+    const historial = await page.locator('[class*="historialGrid"]').ariaSnapshot();
+    expect(historial).toMatch(/cruz[\s\S]*cruz[\s\S]*cruz/);
+    expect(historial).not.toContain('🦅');
   });
 
-  test('HALLAZGO (ABIERTO) · el JSON-LD declara al menos 4 características (features)', () => {
-    // §1.ter del CLAUDE.md de meskeia-web: 4-8 características reales. Hoy `features: []`.
-    test.fail();
-    expect((jsonLd.featureList as string[]).length).toBeGreaterThanOrEqual(4);
+  test('HALLAZGO 4235 (REPARADO) · el JSON-LD declara al menos 4 características (features)', () => {
+    // §1.ter del CLAUDE.md de meskeia-web: 4-8 características reales. Antes `features: []`.
+    const lista = jsonLd.featureList as string[];
+    expect(lista.length).toBeGreaterThanOrEqual(4);
+    expect(lista.length).toBeLessThanOrEqual(8);
   });
 
-  test('HALLAZGO (ABIERTO) · la FAQ del JSON-LD no responde «Sí» a usarla para decisiones importantes', () => {
+  test('HALLAZGO 4236 (REPARADO) · la FAQ del JSON-LD no responde «Sí» a usarla para decisiones importantes', () => {
     // La página dice «No para decisiones importantes» y lo pone entre los «Errores comunes».
-    test.fail();
     const p = faqJsonLd.mainEntity.find((q) => q.name.includes('decisiones importantes'));
     expect(p).toBeDefined();
     // Sin \b: en una RegExp sin /u la «í» no es carácter de palabra y «Sí,» no tendría frontera
     expect(p?.acceptedAnswer.text).not.toMatch(/^Sí[\s,.]/);
   });
 
-  test('HALLAZGO (ABIERTO) · el «dato curioso» no dice que en 1.024 tiradas es esperable una racha de 10 caras', async ({
+  test('HALLAZGO 4237 (REPARADO) · el «dato curioso» no dice que en 1.024 tiradas es esperable una racha de 10 caras', async ({
     page,
   }) => {
     // P(al menos una racha de ≥10 caras en 1.024 tiradas) = 39,3 % y se esperan 0,50 rachas
     // (test de referencias, arriba). Lo que vale ≈ 1 es el número de VENTANAS solapadas.
-    test.fail();
     await abrir(page);
-    const texto = (await page.locator('[class*="faqTip"]').first().textContent()) ?? '';
+    const texto = ((await page.locator('[class*="faqTip"]').first().textContent()) ?? '').replace(/\s+/g, ' ');
     expect(texto).not.toContain('es estadísticamente esperable que una vez salga cara 10 seguidas');
+    expect(texto).toContain('39 %');
+    expect(texto).toContain('63 %');
   });
 
-  test('HALLAZGO (ABIERTO) · la guía no dice que un «mejor de 3» anula la aleatoriedad', async ({ page }) => {
+  test('HALLAZGO 4238 (REPARADO) · la guía no dice que un «mejor de 3» anula la aleatoriedad', async ({ page }) => {
     // Acordado ANTES de lanzar, un mejor de 3 con moneda justa da 1/2 a cada lado (referencias,
     // arriba). Lo que rompe el método es proponerlo DESPUÉS de ver el resultado.
-    test.fail();
     await abrir(page);
     const texto = (await page.locator('[class*="stepGuide"]').textContent()) ?? '';
     expect(texto).not.toContain('anula la aleatoriedad');

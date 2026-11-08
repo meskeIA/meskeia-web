@@ -186,8 +186,17 @@
 }
 
 /* Resultado */
+/* El hueco del resultado se reserva siempre (alto de una línea de .resultadoTexto): si se
+   desmontara al lanzar, el bloque centrado subiría y «Reiniciar» quedaría bajo el puntero */
 .resultado {
   margin-bottom: var(--spacing-lg);
+  min-height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.resultado .resultadoTexto {
   animation: resultadoAppear 0.3s ease-out;
 }
 
@@ -204,6 +213,7 @@
 
 .resultadoTexto {
   font-size: 2rem;
+  line-height: 1.25;
   font-weight: 700;
   color: var(--primary-texto);
 }
@@ -246,9 +256,14 @@
   transition: all 0.2s ease;
 }
 
-.btnReiniciar:hover {
+.btnReiniciar:hover:not(:disabled) {
   border-color: var(--primary);
   color: var(--primary-texto);
+}
+
+.btnReiniciar:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 /* Stats Area */

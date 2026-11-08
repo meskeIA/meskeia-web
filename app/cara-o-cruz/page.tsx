@@ -4,9 +4,16 @@
 import { useState, useCallback } from 'react';
 import styles from './CaraOCruz.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
-import { formatNumber } from '@/lib';
+import { formatPercentage } from '@/lib';
 
 type Resultado = 'cara' | 'cruz';
+
+/** «cara», «caras», «cruz», «cruces»: el lado de una racha dicho con palabras. */
+function nombreLado(tipo: Resultado | null, cantidad: number): string {
+  if (tipo === 'cara') return cantidad === 1 ? 'cara' : 'caras';
+  if (tipo === 'cruz') return cantidad === 1 ? 'cruz' : 'cruces';
+  return '';
+}
 
 interface Lanzamiento {
   id: number;
@@ -121,7 +128,7 @@ export default function CaraOCruzPage() {
 
       {/* Hero Section */}
       <header className={styles.hero}>
-        <span className={styles.heroIcon}>🪙</span>
+        <span className={styles.heroIcon} aria-hidden="true">🪙</span>
         <h1 className={styles.title}>Cara o Cruz</h1>
         <p className={styles.subtitle}>
           Lanza una moneda virtual con animación realista.
@@ -135,7 +142,9 @@ export default function CaraOCruzPage() {
       <div className={styles.mainContent}>
         {/* Moneda */}
         <div className={styles.coinArea}>
-          <div className={`${styles.coinContainer} ${animando ? styles.flipping : ''}`}>
+          {/* La moneda es decorativa: el resultado lo dice la región viva de debajo, y las dos
+              caras están siempre en el DOM (backface-visibility solo las oculta a la vista) */}
+          <div className={`${styles.coinContainer} ${animando ? styles.flipping : ''}`} aria-hidden="true">
             <div className={`${styles.coin} ${mostrandoResultado ? (resultadoActual === 'cara' ? styles.showCara : styles.showCruz) : ''}`}>
               <div className={styles.coinFace + ' ' + styles.cara}>
                 <span className={styles.coinEmoji}>👑</span>
@@ -148,14 +157,16 @@ export default function CaraOCruzPage() {
             </div>
           </div>
 
-          {/* Resultado */}
-          {mostrandoResultado && resultadoActual && (
-            <div className={styles.resultado}>
-              <span className={styles.resultadoTexto}>
-                ¡{resultadoActual === 'cara' ? 'CARA' : 'CRUZ'}!
+          {/* Resultado: región viva SIEMPRE montada y con su alto reservado. Montarla solo con
+              resultado no anunciaba nada, y al desmontarse en cada lanzamiento el bloque subía y
+              dejaba «Reiniciar» bajo el puntero del segundo clic de un doble clic */}
+          <div className={styles.resultado} role="status" aria-live="polite">
+            {mostrandoResultado && resultadoActual && (
+              <span key={historial.length} className={styles.resultadoTexto}>
+                {resultadoActual === 'cara' ? '¡CARA!' : '¡CRUZ!'}
               </span>
-            </div>
-          )}
+            )}
+          </div>
 
           {/* Botón lanzar */}
           <button type="button"
@@ -167,7 +178,7 @@ export default function CaraOCruzPage() {
           </button>
 
           {historial.length > 0 && (
-            <button type="button" onClick={reiniciar} className={styles.btnReiniciar}>
+            <button type="button" onClick={reiniciar} disabled={animando} className={styles.btnReiniciar}>
               Reiniciar
             </button>
           )}
@@ -186,16 +197,16 @@ export default function CaraOCruzPage() {
               {/* Contador principal */}
               <div className={styles.mainStats}>
                 <div className={styles.statCard + ' ' + styles.caraCard}>
-                  <div className={styles.statIcon}>👑</div>
+                  <div className={styles.statIcon} aria-hidden="true">👑</div>
                   <div className={styles.statValue}>{stats.caras}</div>
                   <div className={styles.statLabel}>Caras</div>
-                  <div className={styles.statPercent}>{formatNumber(stats.porcentajeCara, 1)}%</div>
+                  <div className={styles.statPercent}>{formatPercentage(stats.porcentajeCara / 100, 1)}</div>
                 </div>
                 <div className={styles.statCard + ' ' + styles.cruzCard}>
-                  <div className={styles.statIcon}>🦅</div>
+                  <div className={styles.statIcon} aria-hidden="true">🦅</div>
                   <div className={styles.statValue}>{stats.cruces}</div>
                   <div className={styles.statLabel}>Cruces</div>
-                  <div className={styles.statPercent}>{formatNumber(stats.porcentajeCruz, 1)}%</div>
+                  <div className={styles.statPercent}>{formatPercentage(stats.porcentajeCruz / 100, 1)}</div>
                 </div>
               </div>
 
@@ -211,9 +222,11 @@ export default function CaraOCruzPage() {
                 />
               </div>
               <div className={styles.distributionLabels}>
-                <span>Cara {formatNumber(stats.porcentajeCara, 1)}%</span>
-                <span>Total: {stats.total} lanzamientos</span>
-                <span>Cruz {formatNumber(stats.porcentajeCruz, 1)}%</span>
+                {/* Cada rótulo es UNA cadena: un número que cambia junto a texto hermano se queda
+                    viejo con la página traducida (cabo C0243) */}
+                <span>{`Cara ${formatPercentage(stats.porcentajeCara / 100, 1)}`}</span>
+                <span>{`Total: ${stats.total} ${stats.total === 1 ? 'lanzamiento' : 'lanzamientos'}`}</span>
+                <span>{`Cruz ${formatPercentage(stats.porcentajeCruz / 100, 1)}`}</span>
               </div>
 
               {/* Rachas */}
@@ -222,17 +235,26 @@ export default function CaraOCruzPage() {
                 <div className={styles.rachasGrid}>
                   <div className={styles.rachaItem}>
                     <span className={styles.rachaLabel}>Racha actual</span>
+                    {/* El lado lo dice el texto para el lector; el emoji es solo visual */}
                     <span className={styles.rachaValue}>
-                      {stats.rachaActual.cantidad} {stats.rachaActual.tipo === 'cara' ? '👑' : '🦅'}
+                      <span>{`${stats.rachaActual.cantidad} `}</span>
+                      <span aria-hidden="true">{stats.rachaActual.tipo === 'cara' ? '👑' : '🦅'}</span>
+                      <span className="sr-only">{nombreLado(stats.rachaActual.tipo, stats.rachaActual.cantidad)}</span>
                     </span>
                   </div>
                   <div className={styles.rachaItem}>
                     <span className={styles.rachaLabel}>Mejor racha cara</span>
-                    <span className={styles.rachaValue}>{stats.rachaMaxCara} 👑</span>
+                    <span className={styles.rachaValue}>
+                      <span>{`${stats.rachaMaxCara} `}</span>
+                      <span aria-hidden="true">👑</span>
+                    </span>
                   </div>
                   <div className={styles.rachaItem}>
                     <span className={styles.rachaLabel}>Mejor racha cruz</span>
-                    <span className={styles.rachaValue}>{stats.rachaMaxCruz} 🦅</span>
+                    <span className={styles.rachaValue}>
+                      <span>{`${stats.rachaMaxCruz} `}</span>
+                      <span aria-hidden="true">🦅</span>
+                    </span>
                   </div>
                 </div>
               </div>
@@ -247,7 +269,8 @@ export default function CaraOCruzPage() {
                       className={`${styles.historialItem} ${l.resultado === 'cara' ? styles.historialCara : styles.historialCruz}`}
                       title={l.resultado}
                     >
-                      {l.resultado === 'cara' ? '👑' : '🦅'}
+                      <span aria-hidden="true">{l.resultado === 'cara' ? '👑' : '🦅'}</span>
+                      <span className="sr-only">{l.resultado}</span>
                     </span>
                   ))}
                 </div>
@@ -266,14 +289,14 @@ export default function CaraOCruzPage() {
         <section className={styles.guideSection}>
           <h2>La Ley de los Grandes Números</h2>
           <p className={styles.introParagraph}>
-            Cuando lanzas una moneda justa, cada lanzamiento tiene exactamente un 50% de
-            probabilidad de ser cara y un 50% de ser cruz. Sin embargo, en pocas tiradas
+            Cuando lanzas una moneda justa, cada lanzamiento tiene exactamente un 50&nbsp;% de
+            probabilidad de ser cara y un 50&nbsp;% de ser cruz. Sin embargo, en pocas tiradas
             puedes ver resultados muy desiguales (por ejemplo, 7 caras y 3 cruces en 10 lanzamientos).
           </p>
           <p className={styles.introParagraph}>
             La <strong>Ley de los Grandes Números</strong> dice que a medida que aumentas
             el número de lanzamientos, el porcentaje observado se acercará cada vez más al
-            50% teórico. Prueba a hacer 100 o más lanzamientos y observa cómo los porcentajes
+            50&nbsp;% teórico. Prueba a hacer 100 o más lanzamientos y observa cómo los porcentajes
             se estabilizan.
           </p>
         </section>
@@ -291,7 +314,7 @@ export default function CaraOCruzPage() {
             <div className={styles.contentCard}>
               <h4><span aria-hidden="true">📊</span> Probabilidad teórica</h4>
               <p>
-                Para una moneda justa: P(cara) = P(cruz) = 0,5 o 50%.
+                Para una moneda justa: P(cara) = P(cruz) = 0,5 o 50&nbsp;%.
                 Cada lanzamiento es independiente del anterior.
               </p>
             </div>
@@ -306,7 +329,7 @@ export default function CaraOCruzPage() {
               <h4><span aria-hidden="true">📈</span> Frecuencia relativa</h4>
               <p>
                 El número de caras dividido entre el total de lanzamientos.
-                Con muchos lanzamientos, tiende al 50%.
+                Con muchos lanzamientos, tiende al 50&nbsp;%.
               </p>
             </div>
           </div>
@@ -376,7 +399,7 @@ export default function CaraOCruzPage() {
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>⚖️</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">⚖️</span>
                 <h4>Resolver un empate</h4>
               </div>
               <p className={styles.escenarioExample}>
@@ -389,7 +412,7 @@ export default function CaraOCruzPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>💬</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">💬</span>
                 <h4>Decisión trivial sin discusión</h4>
               </div>
               <p className={styles.escenarioExample}>
@@ -402,12 +425,12 @@ export default function CaraOCruzPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🧒</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🧒</span>
                 <h4>Ejercicio de probabilidad con niños</h4>
               </div>
               <p className={styles.escenarioExample}>
                 Lanzar 20 veces y registrar resultados enseña de forma práctica
-                que la probabilidad teórica (50%) puede diferir de la observada.
+                que la probabilidad teórica (50&nbsp;%) puede diferir de la observada.
               </p>
               <p className={styles.escenarioTip}>
                 Tip: usa el historial de esta app para visualizar la ley de grandes números.
@@ -425,18 +448,21 @@ export default function CaraOCruzPage() {
               <p>
                 Para una moneda perfectamente simétrica y lanzada sin sesgo, sí: P(cara) = P(cruz) = 0,5.
                 En la práctica, las monedas físicas tienen ligeras imperfecciones que pueden introducir
-                un sesgo mínimo (inferior al 1 %), pero estadísticamente irrelevante para el uso cotidiano.
+                un sesgo mínimo (inferior al 1&nbsp;%), pero estadísticamente irrelevante para el uso cotidiano.
               </p>
             </div>
             <div className={styles.faqItem}>
               <h4>¿Puede salir cara 10 veces seguidas?</h4>
               <p>
-                Sí. La probabilidad es (0,5)¹⁰ = 1/1024, es decir, aproximadamente un 0,1 %.
+                Sí. La probabilidad es (0,5)¹⁰ = 1/1024, es decir, aproximadamente un 0,1&nbsp;%.
                 Es poco probable pero perfectamente posible. Cada lanzamiento es independiente,
                 así que la racha anterior no influye en el siguiente resultado.
               </p>
               <p className={styles.faqTip}>
-                Dato curioso: si lanzas 1.024 veces, es estadísticamente esperable que una vez salga cara 10 seguidas.
+                Dato curioso: en 1.024 lanzamientos, la probabilidad de ver al menos una racha de 10 caras
+                seguidas es de un 39&nbsp;%, y la de ver 10 resultados iguales seguidos (caras o cruces), de
+                un 63&nbsp;%. Que 1/1.024 sea la probabilidad de una racha concreta no significa que en
+                1.024 lanzamientos «toque» verla una vez: las rachas se solapan.
               </p>
             </div>
             <div className={styles.faqItem}>
@@ -475,10 +501,11 @@ export default function CaraOCruzPage() {
             <div className={styles.step}>
               <span className={styles.stepNumber}>2</span>
               <div className={styles.stepContent}>
-                <h4>Lanza sin «mejores de 3»</h4>
+                <h4>Decide antes cuántos lanzamientos valen</h4>
                 <p>
-                  Un único lanzamiento es suficiente. Proponer repetir hasta 3 anula
-                  la aleatoriedad y convierte el método en una negociación encubierta.
+                  Un único lanzamiento es suficiente. Un «mejor de 3» acordado antes de lanzar
+                  sigue siendo justo (1/2 para cada lado); lo que convierte el método en una
+                  negociación encubierta es proponerlo después de ver el primer resultado.
                 </p>
               </div>
             </div>
@@ -510,22 +537,22 @@ export default function CaraOCruzPage() {
           <h2>Buenas prácticas</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <h4>Define antes de lanzar</h4>
               <p>Establece qué significa cara y qué significa cruz antes de ver el resultado.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <h4>Acepta el primer resultado</h4>
               <p>No repitas el lanzamiento. Un resultado válido no se anula por no gustar.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <h4>Úsalo para decisiones irrelevantes</h4>
               <p>Perfecta para trivialidades donde ambas opciones son igualmente aceptables.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>⛔</span>
+              <span className={styles.tipIcon} aria-hidden="true">⛔</span>
               <h4>No para decisiones importantes</h4>
               <p>Evita usarlo en decisiones irreversibles o con consecuencias significativas.</p>
             </div>
