@@ -51,6 +51,9 @@ const APPS: App[] = [
   // cronología en su color de datos (2,45-3,93:1), y blanco sobre el verde, el rojo, el naranja y
   // el gris de los botones activos y la cabecera (2,85-3,82). Las secciones
   { slug: 'visualizador-inflamacion', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
+  // Título de la zona, rótulo de cada barra de la tonotopía y nota de cada frecuencia en su color
+  // de datos: 1,52-4,11:1 en claro (el amarillo f1c40f, 1,52) y 3,08-4,44 en oscuro
+  { slug: 'visualizador-oido-equilibrio', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
 ];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {

@@ -171,6 +171,22 @@ const FREQ_PERDIDA: FrecuenciaPerdida[] = [
   { rango: '250-1.000 Hz', vulnerabilidad: 15, color: '#48A9A6', nota: 'Graves (las últimas)' },
 ];
 
+/**
+ * Tono de TEXTO de cada color de datos, que cambia con el tema (cabo C0645): con el color de datos
+ * como texto, el título de la zona, el rótulo de cada barra de la tonotopía y la nota de cada
+ * frecuencia daban 1,52-4,11:1 en claro y 3,08-4,44 en oscuro. Tokens de globals (los semánticos
+ * con su reserva oscura). El color de datos sigue en bordes y barras.
+ */
+const TONOS: Record<string, string> = {
+  '#2E86AB': 'var(--primary-texto)',
+  '#48A9A6': 'var(--secondary-texto)',
+  '#E67E22': 'var(--naranja-texto, #F0A35E)',
+  '#e67e22': 'var(--naranja-texto, #F0A35E)',
+  '#e74c3c': 'var(--rojo-texto, #F87171)',
+  '#f1c40f': 'var(--ambar-texto, #F5B041)',
+};
+const tonoDe = (color: string): string => TONOS[color] ?? 'var(--text-primary)';
+
 // ─────────────────────────────────────────────
 // Componente principal
 // ─────────────────────────────────────────────
@@ -304,7 +320,7 @@ export default function OidoEquilibrioPage() {
 
         {/* Panel info zona seleccionada */}
         <div className={styles.zonaInfoPanel} style={{ borderColor: zona.color }}>
-          <h3 className={styles.zonaInfoTitulo} style={{ color: zona.color }}>
+          <h3 className={styles.zonaInfoTitulo} style={{ color: tonoDe(zona.color) }}>
             <span aria-hidden="true">{zona.id === 'externo' ? '👂' : zona.id === 'medio' ? '🔨' : '🐚'}</span>
             {zona.titulo}
           </h3>
@@ -396,7 +412,7 @@ export default function OidoEquilibrioPage() {
                 <div className={styles.barraContainer}>
                   <div className={styles.barraFill} style={{ width: `${z.pct}%`, background: z.color }} />
                 </div>
-                <span className={styles.barraValor} style={{ color: z.color }}>{z.frecuencia}</span>
+                <span className={styles.barraValor} style={{ color: tonoDe(z.color) }}>{z.frecuencia}</span>
               </div>
             ))}
           </div>
@@ -579,7 +595,7 @@ export default function OidoEquilibrioPage() {
                 <div className={styles.freqBarContainer}>
                   <div className={styles.freqBar} style={{ width: `${f.vulnerabilidad}%`, background: f.color }} />
                 </div>
-                <span className={styles.freqPct} style={{ color: f.color }}>{f.nota}</span>
+                <span className={styles.freqPct} style={{ color: tonoDe(f.color) }}>{f.nota}</span>
               </div>
             ))}
           </div>
