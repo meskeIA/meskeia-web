@@ -12,6 +12,7 @@ import {
   ShareCard,
 } from '@/components';
 import { normalizarBusqueda } from '@/lib/buscadorTablas';
+import { rellenoConTinta } from '@/lib/tintaLegible';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -169,7 +170,9 @@ function TabTimeline() {
         break;
       }
     }
-    if (!filaAsignada) filas[0].push(mov);
+    // Sin hueco en ninguna fila, una fila nueva: antes iba a la 0 y tapaba a la que ya estaba allí
+    // («Globalización Industrial» quedaba bajo Industria 4.0 y 5.0, C0297).
+    if (!filaAsignada) filas.push([mov]);
   }
 
   const FILA_ALTO = 36;
@@ -208,6 +211,13 @@ function TabTimeline() {
               const w = Math.max(anoAX(anioFin) - x, 10);
               const y = FILA_OFFSET_Y + fi * (FILA_ALTO + 8);
               const esSeleccionado = seleccionado?.id === mov.id;
+              // Barra opaca y tinta legible sobre ella (C0297): el blanco sobre el color al 80 %
+              // no llegaba a 4,5:1. La selección se marca con el borde en el tono del texto.
+              const { relleno, tinta } = rellenoConTinta(mov.color);
+              // El rótulo se recorta a lo que cabe en la barra (≈ 0,6 × 9 px por carácter en
+              // negrita): «Globalización Industrial» se salía de la suya y caía sobre la vecina.
+              const caben = Math.floor((w - 8) / (9 * 0.6));
+              const rotulo = mov.nombre.length > caben ? `${mov.nombre.slice(0, Math.max(1, caben - 1)).trimEnd()}…` : mov.nombre;
 
               return (
                 <g key={mov.id} onClick={() => setSeleccionado(esSeleccionado ? null : mov)} style={{ cursor: 'pointer' }}>
@@ -217,9 +227,8 @@ function TabTimeline() {
                     width={w}
                     height={FILA_ALTO}
                     rx={4}
-                    fill={mov.color}
-                    opacity={esSeleccionado ? 1 : 0.8}
-                    stroke={esSeleccionado ? '#fff' : 'none'}
+                    fill={relleno}
+                    stroke={esSeleccionado ? 'var(--text-primary)' : 'none'}
                     strokeWidth={2}
                   />
                   {w > 60 && (
@@ -227,12 +236,12 @@ function TabTimeline() {
                       x={x + w / 2}
                       y={y + FILA_ALTO / 2 + 4}
                       fontSize={9}
-                      fill="#fff"
+                      fill={tinta}
                       textAnchor="middle"
                       fontWeight={600}
                       style={{ pointerEvents: 'none' }}
                     >
-                      {mov.nombre}
+                      {rotulo}
                     </text>
                   )}
                 </g>

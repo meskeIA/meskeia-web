@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { contraste, luminancia, rgbDeHex, tintaSobre, TINTA_CLARA, TINTA_OSCURA } from '../lib/tintaLegible';
+import { contraste, luminancia, rellenoConTinta, rgbDeHex, tintaSobre, TINTA_CLARA, TINTA_OSCURA } from '../lib/tintaLegible';
 
 /**
  * lib/tintaLegible.ts (cabo C0297, 06/11/2026). Casos a mano con la fórmula WCAG 2.x:
@@ -37,5 +37,30 @@ test.describe('tintaLegible', () => {
     expect(contraste(tintaSobre('#26718F'), '#26718F')).toBeGreaterThanOrEqual(4.5);
     // El azul de marca es un tono medio: hay que oscurecer el relleno, no basta la tinta
     expect(contraste(tintaSobre('#2E86AB'), '#2E86AB')).toBeLessThan(4.5);
+  });
+
+  /**
+   * rellenoConTinta (cabo C0297, cronologías de movimientos, 08/11/2026). A mano:
+   *   · #DAA520 (goldenrod): L = 0,2126·0,7011 + 0,7152·0,3763 + 0,0722·0,0144 = 0,4192;
+   *     blanco 1,05 / 0,4692 = 2,24, oscura 0,4692 / 0,0603 = 7,78 → relleno intacto, tinta oscura.
+   *   · #2E86AB: ninguna tinta llega (4,11 y 4,24). Oscurecido un 5 %: 46·0,95 = 43,7 → 44 (2C),
+   *     134·0,95 = 127,3 → 127 (7F), 171·0,95 = 162,45 → 162 (A2) = #2C7FA2; L = 0,1832 y con
+   *     blanco 1,05 / 0,2332 = 4,503 → #2C7FA2 con tinta blanca.
+   */
+  test('rellenoConTinta deja el relleno si alguna tinta llega, y si no lo oscurece lo justo', () => {
+    expect(rellenoConTinta('#DAA520')).toEqual({ relleno: '#DAA520', tinta: TINTA_OSCURA });
+    expect(rellenoConTinta('#2E86AB')).toEqual({ relleno: '#2C7FA2', tinta: TINTA_CLARA });
+    expect(contraste(TINTA_CLARA, '#2C7FA2')).toBeGreaterThanOrEqual(4.5);
+    expect(rellenoConTinta('rgb(1,2,3)')).toEqual({ relleno: 'rgb(1,2,3)', tinta: TINTA_CLARA });
+    // La garantía, en toda una rejilla de colores: el par devuelto siempre llega a 4,5
+    for (let r = 0; r <= 255; r += 17) {
+      for (let g = 0; g <= 255; g += 17) {
+        for (let b = 0; b <= 255; b += 51) {
+          const hex = '#' + [r, g, b].map((c) => c.toString(16).padStart(2, '0')).join('');
+          const { relleno, tinta } = rellenoConTinta(hex);
+          expect(contraste(tinta, relleno), hex).toBeGreaterThanOrEqual(4.5);
+        }
+      }
+    }
   });
 });

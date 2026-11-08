@@ -44,3 +44,29 @@ export function contraste(a: string, b: string): number {
 export function tintaSobre(relleno: string): typeof TINTA_CLARA | typeof TINTA_OSCURA {
   return contraste(TINTA_CLARA, relleno) >= contraste(TINTA_OSCURA, relleno) ? TINTA_CLARA : TINTA_OSCURA;
 }
+
+const hexDeRgb = (rgb: number[]): string =>
+  '#' + rgb.map((c) => Math.round(c).toString(16).padStart(2, '0')).join('').toUpperCase();
+
+/**
+ * Relleno y tinta para un texto sobre un color de datos, con la garantía de que el texto llega a
+ * `minimo` (4,5:1 por defecto, texto pequeño). Si con el relleno tal cual alguna tinta llega, se
+ * devuelve el relleno sin tocar y esa tinta; si no (los tonos medios como #2E86AB, #DAA520), se
+ * oscurece el relleno hacia el negro hasta que el blanco llega, o se aclara hacia el blanco hasta
+ * que llega la tinta oscura, lo que pida MENOS cambio, en pasos del 5 %. Nace de las cronologías
+ * de movimientos (cabo C0297, 08/11/2026): rótulos blancos sobre barras de cada color, 1,9-4,5:1.
+ * Un relleno que no es hexadecimal se devuelve tal cual con tinta blanca.
+ */
+export function rellenoConTinta(relleno: string, minimo = 4.5): { relleno: string; tinta: string } {
+  const rgb = rgbDeHex(relleno);
+  if (!rgb) return { relleno, tinta: TINTA_CLARA };
+  const tinta = tintaSobre(relleno);
+  if (contraste(tinta, relleno) >= minimo) return { relleno, tinta };
+  for (let k = 0.05; k <= 1.0001; k += 0.05) {
+    const oscuro = hexDeRgb(rgb.map((c) => c * (1 - k)));
+    if (contraste(TINTA_CLARA, oscuro) >= minimo) return { relleno: oscuro, tinta: TINTA_CLARA };
+    const claro = hexDeRgb(rgb.map((c) => c + (255 - c) * k));
+    if (contraste(TINTA_OSCURA, claro) >= minimo) return { relleno: claro, tinta: TINTA_OSCURA };
+  }
+  return { relleno: '#000000', tinta: TINTA_CLARA };
+}

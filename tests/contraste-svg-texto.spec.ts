@@ -22,6 +22,12 @@ interface App {
   secciones?: string;
   /** Además, en cada sección, cada deslizador a su mínimo y a su máximo (otros regímenes) */
   extremos?: boolean;
+  /**
+   * Ancho de la ventana para una app cuyo SVG es más ancho que la página y va en un contenedor
+   * con scroll (las cronologías de 1.100-1.400 px): la foto del SVG solo trae lo visible, y lo
+   * recortado sale blanco, así que un rótulo blanco fuera de la vista se mediría contra blanco.
+   */
+  ancho?: number;
 }
 
 const SECCIONES = "nav[aria-label*='ecciones'] button";
@@ -52,6 +58,19 @@ const APPS: App[] = [
   // pie en #aaa (2,30) y el bloque del bus en NEGRO por un fill inválido ('#666CC'), con su rótulo
   // desbordado tapando «Buses»
   { slug: 'visualizador-arquitectura-computador', secciones: SECCIONES, extremos: true },
+  // Las cronologías de movimientos, una familia (C0297, 08/11/2026): rótulo blanco a 9-10 px sobre
+  // la barra de su color al 80 % (1,90-4,49:1 en claro: Griega Clásica sobre goldenrod 1,90,
+  // Epicureísmo 2,18, la marca 4,11-4,18), el «año 0» en gris o rojo con opacidad (2,96-3,83) y,
+  // en revoluciones-industriales, barras sin hueco montadas en la fila 0 encima de otra.
+  { slug: 'visualizador-filosofia', ancho: 1800 },
+  { slug: 'visualizador-literatura-movimientos', ancho: 1800 },
+  { slug: 'visualizador-arte-movimientos', ancho: 1800 },
+  { slug: 'visualizador-musica-movimientos', ancho: 1800 },
+  { slug: 'visualizador-derechos-humanos', ancho: 1800 },
+  { slug: 'visualizador-revoluciones-industriales', ancho: 1800 },
+  { slug: 'visualizador-arquitectura-estilos', ancho: 1800 },
+  { slug: 'visualizador-historia/revolucion-francesa', ancho: 1800 },
+  { slug: 'visualizador-historia/china-dinastias', ancho: 1800 },
 ];
 
 interface TextoSvg {
@@ -217,28 +236,46 @@ async function medirAqui(page: Page, etiqueta: string, extremos: boolean): Promi
   return todo;
 }
 
-async function recorrer(page: Page, secciones?: string, extremos = false): Promise<string[]> {
+/**
+ * Suelta el recorte de los contenedores con scroll que envuelven un SVG con texto, para que la foto
+ * traiga el SVG entero y no blanco donde el contenedor lo corta (ver `ancho` en App).
+ */
+async function soltarScroll(page: Page): Promise<void> {
+  await page.evaluate(() => {
+    for (const svg of Array.from(document.querySelectorAll('svg'))) {
+      if (!svg.querySelector('text')) continue;
+      for (let p = svg.parentElement; p && p !== document.body; p = p.parentElement) {
+        if (getComputedStyle(p).overflowX !== 'visible') p.style.overflow = 'visible';
+      }
+    }
+  });
+}
+
+async function recorrer(page: Page, secciones?: string, extremos = false, soltar = false): Promise<string[]> {
   const todo: string[] = [];
   const botones = secciones ? page.locator(secciones) : null;
   const n = botones ? await botones.count() : 0;
   await desplegarTodo(page);
+  if (soltar) await soltarScroll(page);
   if (!n) return medirAqui(page, 'carga', extremos);
   for (let i = 0; i < n; i++) {
     await botones!.nth(i).click();
     await desplegarTodo(page);
+    if (soltar) await soltarScroll(page);
     todo.push(...(await medirAqui(page, `sección ${i + 1}`, extremos)));
   }
   return Array.from(new Set(todo));
 }
 
-for (const { slug, secciones, extremos } of APPS) {
+for (const { slug, secciones, extremos, ancho } of APPS) {
   test(`${slug}: el texto de sus SVG se lee contra lo que tiene detrás, en claro y en oscuro (C0297)`, async ({ page }) => {
     test.setTimeout(120_000);
+    if (ancho) await page.setViewportSize({ width: ancho, height: 900 });
     await page.goto(`/${slug}/`);
     await prepararParaMedir(page);
     if (secciones) await expect(page.locator(secciones).first()).toBeVisible();
-    expect.soft(await recorrer(page, secciones, extremos), 'claro').toEqual([]);
+    expect.soft(await recorrer(page, secciones, extremos, Boolean(ancho)), 'claro').toEqual([]);
     await activarTemaOscuro(page);
-    expect.soft(await recorrer(page, secciones, extremos), 'oscuro').toEqual([]);
+    expect.soft(await recorrer(page, secciones, extremos, Boolean(ancho)), 'oscuro').toEqual([]);
   });
 }

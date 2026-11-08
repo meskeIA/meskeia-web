@@ -12,6 +12,7 @@ import {
   ShareCard,
 } from '@/components';
 import { normalizarBusqueda } from '@/lib/buscadorTablas';
+import { rellenoConTinta } from '@/lib/tintaLegible';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -146,7 +147,8 @@ function TabTimeline() {
         break;
       }
     }
-    if (!filaAsignada) filas[0].push(mov);
+    // Sin hueco en ninguna fila, una fila nueva: en la 0 taparía a la que ya está allí (C0297)
+    if (!filaAsignada) filas.push([mov]);
   }
 
   const FILA_ALTO = 36;
@@ -189,6 +191,9 @@ function TabTimeline() {
               const w = Math.max(anioAX(anioFin) - x, 10);
               const y = FILA_OFFSET_Y + fi * (FILA_ALTO + 8);
               const esSeleccionado = seleccionado?.nombre === mov.nombre;
+              // Barra opaca y tinta legible sobre ella (C0297): el blanco sobre el color al 80 %
+              // no llegaba a 4,5:1. La selección se marca con el borde en el tono del texto.
+              const { relleno, tinta } = rellenoConTinta(mov.color);
 
               return (
                 <g key={`${fi}-${mi}`} onClick={() => setSeleccionado(esSeleccionado ? null : mov)} style={{ cursor: 'pointer' }}>
@@ -198,9 +203,8 @@ function TabTimeline() {
                     width={w}
                     height={FILA_ALTO}
                     rx={4}
-                    fill={mov.color}
-                    opacity={esSeleccionado ? 1 : 0.8}
-                    stroke={esSeleccionado ? '#fff' : 'none'}
+                    fill={relleno}
+                    stroke={esSeleccionado ? 'var(--text-primary)' : 'none'}
                     strokeWidth={2}
                   />
                   {w > 60 && (
@@ -208,7 +212,7 @@ function TabTimeline() {
                       x={x + w / 2}
                       y={y + FILA_ALTO / 2 + 4}
                       fontSize={9}
-                      fill="#fff"
+                      fill={tinta}
                       textAnchor="middle"
                       fontWeight={600}
                       style={{ pointerEvents: 'none' }}

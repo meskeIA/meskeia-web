@@ -13,6 +13,7 @@ import {
   type RelatedApp,
 } from '@/components';
 import { normalizarBusqueda } from '@/lib/buscadorTablas';
+import { rellenoConTinta } from '@/lib/tintaLegible';
 
 // ─────────────────────────────────────────
 // Helpers
@@ -273,6 +274,9 @@ export default function HistoriaInteractivo({
                     const w = Math.max(h.xF - h.xI, 10);
                     const esSeleccionado = seleccionado?.id === h.id;
                     const color = data.colores[h.categoria] ?? h.color;
+                    // Barra opaca y tinta legible sobre ella (C0297): el blanco sobre el color al
+                    // 80 % daba 1,90-4,18:1. La selección se marca con el borde en el tono del texto.
+                    const { relleno, tinta } = rellenoConTinta(color);
                     return (
                       <g
                         key={h.id}
@@ -287,15 +291,14 @@ export default function HistoriaInteractivo({
                           x={h.xI} y={y}
                           width={w} height={FILA_ALTO}
                           rx={4}
-                          fill={color}
-                          opacity={esSeleccionado ? 1 : 0.8}
-                          stroke={esSeleccionado ? '#fff' : 'none'}
+                          fill={relleno}
+                          stroke={esSeleccionado ? 'var(--text-primary)' : 'none'}
                           strokeWidth={2}
                         />
                         {w > 50 && (
                           <text
                             x={h.xI + w / 2} y={y + FILA_ALTO / 2 + 4}
-                            fontSize={9} fill="#fff" textAnchor="middle" fontWeight={600}
+                            fontSize={9} fill={tinta} textAnchor="middle" fontWeight={600}
                             style={{ pointerEvents: 'none' }}
                           >
                             {h.nombre.length > 20 ? h.nombre.substring(0, 18) + '…' : h.nombre}

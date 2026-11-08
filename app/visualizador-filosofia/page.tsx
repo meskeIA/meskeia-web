@@ -12,6 +12,7 @@ import {
   ShareCard,
 } from '@/components';
 import { normalizarBusqueda } from '@/lib/buscadorTablas';
+import { rellenoConTinta } from '@/lib/tintaLegible';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -323,7 +324,8 @@ function TabTimeline() {
         break;
       }
     }
-    if (!filaAsignada) filas[0].push(cor);
+    // Sin hueco en ninguna fila, una fila nueva: en la 0 taparía a la que ya está allí (C0297)
+    if (!filaAsignada) filas.push([cor]);
   }
 
   const FILA_ALTO = 36;
@@ -351,7 +353,7 @@ function TabTimeline() {
 
           {/* Marcador del año 0 */}
           <line x1={anioAX(0)} y1={FILA_OFFSET_Y} x2={anioAX(0)} y2={svgAlto - 16} stroke="#888" strokeWidth={1} strokeDasharray="4,3" />
-          <text x={anioAX(0)} y={svgAlto - 4} fontSize={9} fill="#888" textAnchor="middle">año 0</text>
+          <text x={anioAX(0)} y={svgAlto - 4} fontSize={9} fill="var(--text-muted)" textAnchor="middle">año 0</text>
 
           {/* Marcadores de siglos */}
           {siglos.map((s) => (
@@ -369,6 +371,9 @@ function TabTimeline() {
               const w = Math.max(anioAX(anioFin) - x, 10);
               const y = FILA_OFFSET_Y + fi * (FILA_ALTO + 8);
               const esSeleccionado = seleccionado?.id === cor.id;
+              // Barra opaca y tinta legible sobre ella (C0297): el blanco sobre el color al 80 %
+              // daba 1,90-4,49:1. La selección se marca con el borde en el tono del texto.
+              const { relleno, tinta } = rellenoConTinta(cor.color);
 
               return (
                 <g key={cor.id} onClick={() => setSeleccionado(esSeleccionado ? null : cor)} style={{ cursor: 'pointer' }}>
@@ -378,9 +383,8 @@ function TabTimeline() {
                     width={w}
                     height={FILA_ALTO}
                     rx={4}
-                    fill={cor.color}
-                    opacity={esSeleccionado ? 1 : 0.8}
-                    stroke={esSeleccionado ? '#fff' : 'none'}
+                    fill={relleno}
+                    stroke={esSeleccionado ? 'var(--text-primary)' : 'none'}
                     strokeWidth={2}
                   />
                   {w > 60 && (
@@ -388,7 +392,7 @@ function TabTimeline() {
                       x={x + w / 2}
                       y={y + FILA_ALTO / 2 + 4}
                       fontSize={9}
-                      fill="#fff"
+                      fill={tinta}
                       textAnchor="middle"
                       fontWeight={600}
                       style={{ pointerEvents: 'none' }}
