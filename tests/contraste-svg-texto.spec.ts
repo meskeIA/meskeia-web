@@ -27,8 +27,7 @@ const SECCIONES = "nav[aria-label*='ecciones'] button";
 /**
  * Una fila por app REPARADA. Control: sin la reparación, cada una cae con los textos de su
  * comentario. Medidas el 08/11/2026 y aún SIN reparar (cabo C0297), para añadirlas al repararlas:
- * visualizador-mecanica-fluidos, visualizador-arquitectura-computador y
- * visualizador-efecto-invernadero.
+ * visualizador-mecanica-fluidos y visualizador-arquitectura-computador.
  */
 const APPS: App[] = [
   // Sólido, Líquido y Gas en el color de su zona sobre el tinte de la propia zona (2,01-2,52:1 en
@@ -38,6 +37,10 @@ const APPS: App[] = [
   // en claro y 2,59-3,03 en oscuro, el teal 2,76 y el naranja 2,74 en claro, y «Ventana oval» en
   // #666 a 2,39 en oscuro
   { slug: 'visualizador-oido-equilibrio', secciones: SECCIONES },
+  // Blanco sobre el Sol (1,96:1 en claro, 2,51 en oscuro), las moléculas sobre su círculo al 40 %
+  // (1,06-2,30 en oscuro), la superficie sobre su franja (1,34-1,53 en oscuro), los rojos y el
+  // ámbar como texto con opacidad (1,86-3,81) y la leyenda en #666 a 1,90 en oscuro
+  { slug: 'visualizador-efecto-invernadero', secciones: SECCIONES },
 ];
 
 interface TextoSvg {

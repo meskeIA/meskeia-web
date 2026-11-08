@@ -10,6 +10,16 @@
   --azul-texto: #1D4ED8;    /* 3B82F6 · 6,15 */
   --gris-texto: #4B5563;    /* 6B7280 · 6,93 */
   --granate-texto: #991B1B; /* 991B1B · 7,62 */
+  /*
+   * Rótulos del diagrama SVG (cabo C0297), medidos por píxel contra lo que tienen detrás: las
+   * moléculas sobre su círculo al 40 %, que en oscuro se compone con el fondo oscuro, y la
+   * superficie sobre su franja verde. Antes, 1,06-3,73:1.
+   */
+  --co2-texto: #7F1D1D;
+  --ch4-texto: #92400E;
+  --h2o-texto: #1E40AF;
+  --n2o-texto: #5B21B6;
+  --tierra-texto: #166534;
   --radius: 12px; --radius-large: 16px;
   --spacing-sm: 0.5rem; --spacing-md: 1rem; --spacing-lg: 1.5rem; --spacing-xl: 2rem;
   max-width: 900px; margin: 0 auto; padding: var(--spacing-xl) var(--spacing-lg);
@@ -17,7 +27,8 @@
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 [data-theme='dark'] .container { --bg-primary: #1A1A1A; --bg-card: #2A2A2A; --text-primary: #E5E5E5; --text-secondary: #B0B0B0; --text-muted: #9B9B9B; --border: #404040; --hover: #333333;
-  --violeta-texto: #A78BFA; --azul-texto: #60A5FA; --gris-texto: #9CA3AF; --granate-texto: #FCA5A5; }
+  --violeta-texto: #A78BFA; --azul-texto: #60A5FA; --gris-texto: #9CA3AF; --granate-texto: #FCA5A5;
+  --co2-texto: #FECACA; --ch4-texto: #FDE68A; --h2o-texto: #BFDBFE; --n2o-texto: #DDD6FE; --tierra-texto: #86EFAC; }
 
 .hero { text-align: center; margin-bottom: var(--spacing-xl); margin-top: 80px; padding: var(--spacing-xl) var(--spacing-lg); background: var(--hero-bg); border-radius: var(--radius-large); color: white; }
 .title { font-size: 2.4rem; font-weight: 700; margin-bottom: var(--spacing-sm); }

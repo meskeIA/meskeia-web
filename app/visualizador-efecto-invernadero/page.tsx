@@ -285,7 +285,10 @@ function SeccionMecanismo() {
         >
           {/* Sol */}
           <circle cx="80" cy="50" r="35" fill="#F59E0B" opacity="0.9" />
-          <text x="80" y="55" textAnchor="middle" fill="white" fontSize="14" fontWeight="bold">Sol</text>
+          {/* Rótulos en el tono de TEXTO de su color, por tema (cabo C0297): el blanco sobre el
+              Sol daba 1,96:1 y los colores de datos como texto 1,06-3,73. Sin opacidad: el texto
+              translúcido perdía contraste contra lo que tenía detrás */}
+          <text x="80" y="55" textAnchor="middle" fill="#422006" fontSize="14" fontWeight="bold">Sol</text>
 
           {/* Flechas solares (amarillas) — hacia la superficie */}
           <line x1="115" y1="70" x2="250" y2="210" stroke="#F59E0B" strokeWidth="3" strokeDasharray="8,4" />
@@ -296,27 +299,27 @@ function SeccionMecanismo() {
           <polygon points="348,205 358,215 343,213" fill="#F59E0B" />
 
           {/* Etiqueta radiación solar */}
-          <text x="140" y="120" fill="#F59E0B" fontSize="11" fontWeight="600" transform="rotate(-30, 140, 120)">Radiación visible</text>
+          <text x="140" y="120" style={{ fill: 'var(--ambar-texto, #F59E0B)' }} fontSize="11" fontWeight="600" transform="rotate(-30, 140, 120)">Radiación visible</text>
 
           {/* Atmósfera (franja semitransparente) */}
           <rect x="0" y="150" width="600" height="70" fill="#3B82F6" opacity="0.08" rx="4" />
-          <text x="540" y="190" textAnchor="end" fill="#3B82F6" fontSize="10" fontWeight="600" opacity="0.7">ATMÓSFERA</text>
+          <text x="540" y="190" textAnchor="end" style={{ fill: 'var(--azul-texto)' }} fontSize="10" fontWeight="600">ATMÓSFERA</text>
 
           {/* Moléculas de gas en la atmósfera */}
           <circle cx="150" cy="175" r="8" fill="#EF4444" opacity="0.4" />
-          <text x="150" y="178" textAnchor="middle" fill="#EF4444" fontSize="6" fontWeight="bold">CO₂</text>
+          <text x="150" y="178" textAnchor="middle" style={{ fill: 'var(--co2-texto)' }} fontSize="6" fontWeight="bold">CO₂</text>
           <circle cx="300" cy="165" r="8" fill="#F59E0B" opacity="0.4" />
-          <text x="300" y="168" textAnchor="middle" fill="#92400E" fontSize="6" fontWeight="bold">CH₄</text>
+          <text x="300" y="168" textAnchor="middle" style={{ fill: 'var(--ch4-texto)' }} fontSize="6" fontWeight="bold">CH₄</text>
           <circle cx="420" cy="180" r="8" fill="#3B82F6" opacity="0.4" />
-          <text x="420" y="183" textAnchor="middle" fill="#1E40AF" fontSize="6" fontWeight="bold">H₂O</text>
+          <text x="420" y="183" textAnchor="middle" style={{ fill: 'var(--h2o-texto)' }} fontSize="6" fontWeight="bold">H₂O</text>
           <circle cx="500" cy="170" r="8" fill="#8B5CF6" opacity="0.4" />
-          <text x="500" y="173" textAnchor="middle" fill="#5B21B6" fontSize="6" fontWeight="bold">N₂O</text>
+          <text x="500" y="173" textAnchor="middle" style={{ fill: 'var(--n2o-texto)' }} fontSize="6" fontWeight="bold">N₂O</text>
 
           {/* Superficie terrestre */}
           <rect x="0" y="280" width="600" height="120" fill="#22C55E" opacity="0.15" rx="4" />
           <rect x="0" y="280" width="600" height="6" fill="#22C55E" opacity="0.4" rx="2" />
-          <text x="300" y="320" textAnchor="middle" fill="#166534" fontSize="13" fontWeight="600">Superficie terrestre</text>
-          <text x="300" y="340" textAnchor="middle" fill="#166534" fontSize="10" opacity="0.7">Absorbe radiación solar y se calienta</text>
+          <text x="300" y="320" textAnchor="middle" style={{ fill: 'var(--tierra-texto)' }} fontSize="13" fontWeight="600">Superficie terrestre</text>
+          <text x="300" y="340" textAnchor="middle" style={{ fill: 'var(--tierra-texto)' }} fontSize="10">Absorbe radiación solar y se calienta</text>
 
           {/* Flechas infrarrojas (rojas) — desde superficie hacia arriba */}
           <line x1="200" y1="278" x2="200" y2="175" stroke="#EF4444" strokeWidth="3" />
@@ -327,7 +330,7 @@ function SeccionMecanismo() {
           <polygon points="475,178 485,178 480,165" fill="#EF4444" />
 
           {/* Etiqueta infrarrojo */}
-          <text x="210" y="250" fill="#EF4444" fontSize="11" fontWeight="600">Infrarrojo ↑</text>
+          <text x="210" y="250" style={{ fill: 'var(--rojo-texto, #F87171)' }} fontSize="11" fontWeight="600">Infrarrojo ↑</text>
 
           {/* Flechas atrapadas — reemitidas hacia abajo */}
           <line x1="170" y1="185" x2="170" y2="270" stroke="#EF4444" strokeWidth="2" strokeDasharray="5,3" opacity="0.7" />
@@ -336,22 +339,22 @@ function SeccionMecanismo() {
           <polygon points="365,267 375,267 370,278" fill="#EF4444" opacity="0.7" />
 
           {/* Etiqueta reemisión */}
-          <text x="400" y="245" fill="#EF4444" fontSize="10" fontWeight="600" opacity="0.7">↓ Reemitido</text>
+          <text x="400" y="245" style={{ fill: 'var(--rojo-texto, #F87171)' }} fontSize="10" fontWeight="600">↓ Reemitido</text>
 
           {/* Algo escapa al espacio */}
           <line x1="200" y1="155" x2="200" y2="30" stroke="#EF4444" strokeWidth="2" opacity="0.4" />
           <polygon points="195,35 205,35 200,22" fill="#EF4444" opacity="0.4" />
           <line x1="480" y1="155" x2="480" y2="30" stroke="#EF4444" strokeWidth="2" opacity="0.4" />
           <polygon points="475,35 485,35 480,22" fill="#EF4444" opacity="0.4" />
-          <text x="340" y="25" textAnchor="middle" fill="#EF4444" fontSize="10" opacity="0.5">Parte escapa al espacio</text>
+          <text x="340" y="25" textAnchor="middle" style={{ fill: 'var(--rojo-texto, #F87171)' }} fontSize="10">Parte escapa al espacio</text>
 
           {/* Leyenda */}
           <rect x="10" y="365" width="12" height="12" fill="#F59E0B" rx="2" />
-          <text x="28" y="376" fill="#666" fontSize="10">Radiación solar (onda corta)</text>
+          <text x="28" y="376" style={{ fill: 'var(--text-secondary)' }} fontSize="10">Radiación solar (onda corta)</text>
           <rect x="220" y="365" width="12" height="12" fill="#EF4444" rx="2" />
-          <text x="238" y="376" fill="#666" fontSize="10">Radiación infrarroja (onda larga)</text>
+          <text x="238" y="376" style={{ fill: 'var(--text-secondary)' }} fontSize="10">Radiación infrarroja (onda larga)</text>
           <rect x="440" y="365" width="12" height="12" fill="#EF4444" rx="2" opacity="0.4" />
-          <text x="458" y="376" fill="#666" fontSize="10">Escapa al espacio</text>
+          <text x="458" y="376" style={{ fill: 'var(--text-secondary)' }} fontSize="10">Escapa al espacio</text>
         </svg>
       </div>
 
