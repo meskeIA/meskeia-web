@@ -27,7 +27,7 @@ const SECCIONES = "nav[aria-label*='ecciones'] button";
 /**
  * Una fila por app REPARADA. Control: sin la reparación, cada una cae con los textos de su
  * comentario. Medidas el 08/11/2026 y aún SIN reparar (cabo C0297), para añadirlas al repararlas:
- * visualizador-mecanica-fluidos y visualizador-arquitectura-computador.
+ * visualizador-mecanica-fluidos.
  */
 const APPS: App[] = [
   // Sólido, Líquido y Gas en el color de su zona sobre el tinte de la propia zona (2,01-2,52:1 en
@@ -41,6 +41,10 @@ const APPS: App[] = [
   // (1,06-2,30 en oscuro), la superficie sobre su franja (1,34-1,53 en oscuro), los rojos y el
   // ámbar como texto con opacidad (1,86-3,81) y la leyenda en #666 a 1,90 en oscuro
   { slug: 'visualizador-efecto-invernadero', secciones: SECCIONES },
+  // Blanco sobre el color de cada bloque al 80 % (2,36-2,97:1 en claro, 3,16-4,27 en oscuro), el
+  // pie en #aaa (2,30) y el bloque del bus en NEGRO por un fill inválido ('#666CC'), con su rótulo
+  // desbordado tapando «Buses»
+  { slug: 'visualizador-arquitectura-computador', secciones: SECCIONES },
 ];
 
 interface TextoSvg {
@@ -173,16 +177,33 @@ async function suspensos(page: Page): Promise<string[]> {
   return Array.from(new Set(fuera));
 }
 
+/**
+ * Formas con un `fill` que el navegador no entiende y pinta en NEGRO: visualizador-arquitectura-
+ * computador le pegaba el alfa a '#666' y salía '#666CC' (cabo C0297, 08/11/2026).
+ */
+async function rellenosInvalidos(page: Page): Promise<string[]> {
+  return page.evaluate(() => {
+    const malos: string[] = [];
+    for (const f of Array.from(document.querySelectorAll('svg [fill]'))) {
+      const v = (f.getAttribute('fill') ?? '').trim();
+      if (!v || /^(none|currentColor|url\(|var\(|transparent|inherit)/i.test(v)) continue;
+      if (!CSS.supports('color', v)) malos.push(`<${f.tagName.toLowerCase()} fill="${v}">`);
+    }
+    return Array.from(new Set(malos));
+  });
+}
+
 async function recorrer(page: Page, secciones?: string): Promise<string[]> {
   const todo: string[] = [];
   const botones = secciones ? page.locator(secciones) : null;
   const n = botones ? await botones.count() : 0;
   await desplegarTodo(page);
-  if (!n) return suspensos(page);
+  if (!n) return [...(await suspensos(page)), ...(await rellenosInvalidos(page))];
   for (let i = 0; i < n; i++) {
     await botones!.nth(i).click();
     await desplegarTodo(page);
     todo.push(...(await suspensos(page)).map((s) => `sección ${i + 1}: ${s}`));
+    todo.push(...(await rellenosInvalidos(page)).map((s) => `sección ${i + 1}: relleno inválido ${s}`));
   }
   return todo;
 }

@@ -26,6 +26,7 @@ const TONOS: Record<string, string> = {
   '#E07B39': 'var(--naranja-texto, #F0A35E)',
   '#8E8E93': 'var(--gris-texto)',
   '#666': 'var(--gris-oscuro-texto)',
+  '#666666': 'var(--gris-oscuro-texto)',
   '#555': 'var(--gris-oscuro-texto)',
   '#5C8F4A': 'var(--oliva-texto)',
   '#9B59B6': 'var(--violeta-texto)',
@@ -93,6 +94,28 @@ interface NivelMemoria {
 // ─────────────────────────────────────────────────────────────────────────────
 // Datos: diagrama Von Neumann
 // ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * Relleno de cada bloque del diagrama Von Neumann bajo su rótulo BLANCO, igual en los dos temas
+ * (cabo C0297): el color del bloque al 80 % daba 2,36-2,97:1 en claro y 3,16-4,27 en oscuro. Es su
+ * mismo tono oscurecido hasta 5,7-6,4:1 con el blanco; el color de datos sigue en el borde y en el
+ * panel de detalle. ALU, UC y Bus ya llegaban.
+ */
+const RELLENO_BLOQUE: Readonly<Record<string, string>> = {
+  cpu: '#1F6E8E',
+  registros: '#2B6B67',
+  ram: '#A84A12',
+  rom: '#5F5F64',
+  es: '#3F6B30',
+  bus: '#4A4A4A',
+};
+
+/**
+ * Rótulo dentro del bloque cuando el nombre no cabe: «Bus del sistema» a 11 px desbordaba el
+ * bloque de 60 de ancho y tapaba la etiqueta «Buses». El nombre completo sigue en el aria-label
+ * y en el panel de detalle.
+ */
+const ROTULO_CORTO: Readonly<Record<string, string>> = { bus: 'Bus' };
 
 const BLOQUES_VN: BloqueVN[] = [
   {
@@ -178,7 +201,9 @@ const BLOQUES_VN: BloqueVN[] = [
     id: 'bus',
     nombre: 'Bus del sistema',
     x: 215, y: 130, w: 60, h: 20,
-    color: '#666',
+    // Seis cifras: el diagrama le pega el alfa ('CC'), y '#666' + 'CC' era '#666CC', un color
+    // inválido que el SVG pintaba en negro (cabo C0297)
+    color: '#666666',
     descripcion: 'Canal de comunicación entre todos los componentes.',
     detalles: [
       'Bus de datos: transfiere datos entre componentes',
@@ -505,7 +530,7 @@ export default function VisualizadorArquitecturaComputadorPage() {
               <line x1="210" y1="150" x2="280" y2="150" stroke="#999" strokeWidth="3" strokeDasharray="5,3" />
               <line x1="210" y1="155" x2="280" y2="200" stroke="#999" strokeWidth="2" strokeDasharray="4,3" />
               <line x1="210" y1="160" x2="280" y2="255" stroke="#999" strokeWidth="2" strokeDasharray="4,3" />
-              <text x="230" y="140" fontSize="9" fill="#888">Buses</text>
+              <text x="245" y="124" textAnchor="middle" fontSize="9" style={{ fill: 'var(--text-muted)' }}>Buses</text>
 
               {/* Bloques */}
               {BLOQUES_VN.map((b) => (
@@ -519,7 +544,7 @@ export default function VisualizadorArquitecturaComputadorPage() {
                   <rect
                     x={b.x} y={b.y} width={b.w} height={b.h}
                     rx="6" ry="6"
-                    fill={bloqueSeleccionado?.id === b.id ? b.color : b.color + 'CC'}
+                    fill={RELLENO_BLOQUE[b.id] ?? (bloqueSeleccionado?.id === b.id ? b.color : b.color + 'CC')}
                     stroke={bloqueSeleccionado?.id === b.id ? '#fff' : b.color}
                     strokeWidth={bloqueSeleccionado?.id === b.id ? 2.5 : 1}
                   />
@@ -530,13 +555,13 @@ export default function VisualizadorArquitecturaComputadorPage() {
                     fontSize={b.id === 'cpu' ? 16 : 11}
                     fontWeight="700"
                   >
-                    {b.nombre}
+                    {ROTULO_CORTO[b.id] ?? b.nombre}
                   </text>
                 </g>
               ))}
 
               {/* Etiqueta arquitectura */}
-              <text x="225" y="295" textAnchor="middle" fontSize="9" fill="#aaa">
+              <text x="225" y="295" textAnchor="middle" fontSize="9" style={{ fill: 'var(--text-muted)' }}>
                 Arquitectura Von Neumann (1945)
               </text>
             </svg>
