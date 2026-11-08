@@ -33,6 +33,29 @@ const TABS: TabInfo[] = [
 ];
 
 // ─────────────────────────────────────────────
+// Tono de texto y fondo de botón de cada color de datos (cabo C0645)
+// ─────────────────────────────────────────────
+
+/**
+ * El color de datos pintado como texto daba 2,45-3,93:1, y como fondo de un botón con texto
+ * blanco 2,85-3,82. `tono` es el color del TEXTO, que cambia con el tema (tokens de globals con
+ * reserva oscura, o del módulo); `fondo`, el del botón activo y la cabecera, igual en los dos
+ * temas (blanco encima a 5,28-8,55:1). El color de datos sigue en bordes, puntos y tintes.
+ */
+const TONOS: Record<string, { tono: string; fondo: string }> = {
+  '#e74c3c': { tono: 'var(--rojo-texto, #F87171)', fondo: '#C0392B' },
+  '#e67e22': { tono: 'var(--naranja-texto, #F0A35E)', fondo: '#A04000' },
+  '#3498db': { tono: 'var(--azul-texto)', fondo: '#1F6FB2' },
+  '#9b59b6': { tono: 'var(--violeta-texto)', fondo: '#7D3C98' },
+  '#7f8c8d': { tono: 'var(--gris-texto)', fondo: '#5D6D6E' },
+  '#8e44ad': { tono: 'var(--morado-texto)', fondo: '#6C3483' },
+  '#27ae60': { tono: 'var(--verde-texto, #5FD08A)', fondo: '#196F3D' },
+  '#2E86AB': { tono: 'var(--resolucion-texto)', fondo: '#26718F' },
+};
+const tonoDe = (color: string): string => TONOS[color]?.tono ?? 'var(--text-primary)';
+const fondoDe = (color: string): string => TONOS[color]?.fondo ?? color;
+
+// ─────────────────────────────────────────────
 // Datos: 5 signos clásicos
 // ─────────────────────────────────────────────
 
@@ -229,7 +252,7 @@ function SeccionSignos() {
               >
                 <span className={styles.signoIcono} aria-hidden="true">{s.icono}</span>
                 <div className={styles.signoTextos}>
-                  <strong className={styles.signoNombre} style={{ color: s.color }}>
+                  <strong className={styles.signoNombre} style={{ color: tonoDe(s.color) }}>
                     {s.nombre}
                   </strong>
                   <span className={styles.signoLatino}>{s.latinNombre}</span>
@@ -316,7 +339,7 @@ function SeccionComparativa() {
         <button
           type="button"
           className={`${styles.tipoBtn} ${activa === 'aguda' ? styles.tipoBtnActivo : ''}`}
-          style={activa === 'aguda' ? { background: datos.aguda.color, borderColor: datos.aguda.color } : { borderColor: datos.aguda.color, color: datos.aguda.color }}
+          style={activa === 'aguda' ? { background: fondoDe(datos.aguda.color), borderColor: fondoDe(datos.aguda.color) } : { borderColor: datos.aguda.color, color: tonoDe(datos.aguda.color) }}
           onClick={() => setActiva('aguda')}
           aria-pressed={activa === 'aguda'}
         >
@@ -327,7 +350,7 @@ function SeccionComparativa() {
         <button
           type="button"
           className={`${styles.tipoBtn} ${activa === 'cronica' ? styles.tipoBtnActivo : ''}`}
-          style={activa === 'cronica' ? { background: datos.cronica.color, borderColor: datos.cronica.color } : { borderColor: datos.cronica.color, color: datos.cronica.color }}
+          style={activa === 'cronica' ? { background: fondoDe(datos.cronica.color), borderColor: fondoDe(datos.cronica.color) } : { borderColor: datos.cronica.color, color: tonoDe(datos.cronica.color) }}
           onClick={() => setActiva('cronica')}
           aria-pressed={activa === 'cronica'}
         >
@@ -342,7 +365,7 @@ function SeccionComparativa() {
         className={styles.comparativaPanel}
         style={{ borderColor: d.color, background: d.colorBg }}
       >
-        <div className={styles.comparativaHeader} style={{ background: d.color }}>
+        <div className={styles.comparativaHeader} style={{ background: fondoDe(d.color) }}>
           <h3 className={styles.comparativaTitulo}>
             Inflamación {activa === 'aguda' ? 'Aguda' : 'Crónica'} — {d.etiqueta}
           </h3>
@@ -351,7 +374,7 @@ function SeccionComparativa() {
           <tbody>
             {d.filas.map((f, i) => (
               <tr key={i} className={styles.comparativaFila}>
-                <th className={styles.comparativaCampo} style={{ color: d.color }}>{f.campo}</th>
+                <th className={styles.comparativaCampo} style={{ color: tonoDe(d.color) }}>{f.campo}</th>
                 <td className={styles.comparativaValor}>{f.valor}</td>
               </tr>
             ))}
@@ -363,7 +386,7 @@ function SeccionComparativa() {
       <h3 className={styles.subSeccionTitulo}>Comparativa rápida</h3>
       <div className={styles.comparativaDoble}>
         <div className={styles.comparativaCol} style={{ borderTopColor: datos.aguda.color }}>
-          <h4 className={styles.comparativaColTitulo} style={{ color: datos.aguda.color }}>Aguda <span aria-hidden="true">✅</span></h4>
+          <h4 className={styles.comparativaColTitulo} style={{ color: tonoDe(datos.aguda.color) }}>Aguda <span aria-hidden="true">✅</span></h4>
           <ul className={styles.comparativaLista}>
             <li>Trigger claro y controlable</li>
             <li>Neutrófilos como vanguardia</li>
@@ -373,7 +396,7 @@ function SeccionComparativa() {
           </ul>
         </div>
         <div className={styles.comparativaCol} style={{ borderTopColor: datos.cronica.color }}>
-          <h4 className={styles.comparativaColTitulo} style={{ color: datos.cronica.color }}>Crónica <span aria-hidden="true">⚠️</span></h4>
+          <h4 className={styles.comparativaColTitulo} style={{ color: tonoDe(datos.cronica.color) }}>Crónica <span aria-hidden="true">⚠️</span></h4>
           <ul className={styles.comparativaLista}>
             <li>Trigger persistente o inmunológico</li>
             <li>Macrófagos M1 bloqueados</li>
@@ -419,7 +442,7 @@ function SeccionCelulas() {
             key={i}
             type="button"
             className={`${styles.celulaBtn} ${celulaActiva === i ? styles.celulaBtnActiva : ''}`}
-            style={celulaActiva === i ? { background: cel.color, borderColor: cel.color } : { borderColor: cel.color, color: cel.color }}
+            style={celulaActiva === i ? { background: fondoDe(cel.color), borderColor: fondoDe(cel.color) } : { borderColor: cel.color, color: tonoDe(cel.color) }}
             onClick={() => setCelulaActiva(i)}
             aria-pressed={celulaActiva === i}
           >
@@ -434,7 +457,7 @@ function SeccionCelulas() {
         <div className={styles.celulaHeader}>
           <span className={styles.celulaIconoGrande} aria-hidden="true">{c.icono}</span>
           <div>
-            <h3 className={styles.celulaNombre} style={{ color: c.color }}>{c.nombre}</h3>
+            <h3 className={styles.celulaNombre} style={{ color: tonoDe(c.color) }}>{c.nombre}</h3>
           </div>
         </div>
         <dl className={styles.celulaData}>
@@ -465,7 +488,7 @@ function SeccionCelulas() {
               {i < 4 && <div className={styles.timelineLinea} />}
             </div>
             <div className={styles.timelineContenido}>
-              <span className={styles.timelineTiempo} style={{ color: paso.color }}>{paso.tiempo}</span>
+              <span className={styles.timelineTiempo} style={{ color: tonoDe(paso.color) }}>{paso.tiempo}</span>
               <strong className={styles.timelineCelula}>
                 <span aria-hidden="true">{paso.icono}</span> {paso.label}
               </strong>

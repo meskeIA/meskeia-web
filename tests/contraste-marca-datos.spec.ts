@@ -47,6 +47,10 @@ const APPS: App[] = [
   // transiciones, estado del agua y cifras de la escala en su color de datos (1,08-4,35:1 en los
   // dos temas). Las cuatro secciones
   { slug: 'visualizador-estados-materia', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
+  // Nombre de cada signo y de cada célula, campos y títulos de la comparativa y tiempos de la
+  // cronología en su color de datos (2,45-3,93:1), y blanco sobre el verde, el rojo, el naranja y
+  // el gris de los botones activos y la cabecera (2,85-3,82). Las secciones
+  { slug: 'visualizador-inflamacion', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
 ];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {
