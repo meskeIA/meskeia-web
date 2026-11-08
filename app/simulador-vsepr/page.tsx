@@ -510,7 +510,9 @@ export default function SimuladorVseprPage() {
         )}
 
         {!geometriaInfo && (
-          <section className={styles.mensajePedagogico}>
+          // key con la combinación: la frase mezcla nodos de texto con hermanos, y con la página
+          // traducida React escribiría en los que el traductor retiró (cabo C0243). Así se crea nueva.
+          <section key={`${enlaces}-${libres}`} className={styles.mensajePedagogico}>
             <strong>Combinación poco común</strong>
             La combinación X={enlaces} y E={libres} no corresponde a una geometría VSEPR estándar de
             la tabla de referencia. El lienzo dibuja igualmente{' '}

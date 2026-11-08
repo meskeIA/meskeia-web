@@ -1,5 +1,5 @@
 import { test, expect, type Page, type Locator } from '@playwright/test';
-import { asentarAntesDeTraducir } from './_hidratacion';
+import { asentarAntesDeTraducir, sembrarValor } from './_hidratacion';
 
 /**
  * Testigo de familia — el rótulo que se queda VIEJO con la página traducida (cabo C0243).
@@ -125,6 +125,22 @@ test.describe('texto que cambia con la página traducida, fuera de un botón (C0
     await traducir(page);
     await page.getByRole('button', { name: /Combustión/ }).click();
     await expect(titulo).toHaveText('Combustión: CₓHᵧ + O₂ → CO₂ + H₂O');
+    expect(errores).toEqual([]);
+  });
+
+  // Receta de bloque: key con lo que cambia en la sección entera (C0243, 08/11/2026). Control: sin
+  // la key, con X = 1 y E de 0 a 1 la frase seguía en «X=1 y E=0 … repartidos en una sola dirección».
+  test('simulador-vsepr: la frase de la combinación fuera de tabla sigue a los deslizadores', async ({ page }) => {
+    const errores: string[] = [];
+    page.on('pageerror', (e) => errores.push(e.message));
+    await page.goto('/simulador-vsepr/');
+    await sembrarValor(page, '#slider-enlaces', 1);
+    const aviso = page.locator('[class*="mensajePedagogico"]');
+    await expect(aviso).toContainText('La combinación X=1 y E=0');
+    await traducir(page);
+    await sembrarValor(page, '#slider-libres', 1);
+    await expect(aviso).toContainText('La combinación X=1 y E=1 no corresponde');
+    await expect(aviso).toContainText('repartidos en línea recta.');
     expect(errores).toEqual([]);
   });
 });

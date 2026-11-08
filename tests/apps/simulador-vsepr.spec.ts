@@ -1059,9 +1059,10 @@ test.describe('simulador-vsepr · testigo 2415: el dibujo cuadra con los desliza
  * CON LA PÁGINA TRADUCIDA (traductor simulado de los testigos C0243 / C0312): los dos botones de
  * ayuda de los casos pasan a «Ocultar…» y vuelven, y subir los pares libres de 0 a 1 con X = 1
  * (fuera de tabla) ya no tumba la app: el <span> pasa a « y 1 par libre» y se vacía al volver.
- * Observado, FUERA del diff: en esa misma frase los nodos que no se tocaron siguen viejos con la
+ * Observado, FUERA del diff: en esa misma frase los nodos que no se tocaron siguían viejos con la
  * página traducida («La combinación X=1 y E=0 …, repartidos en una sola dirección» con E = 1), la
- * forma del cabo C0243 que su censo lleva aparte; no se fija aquí.
+ * forma del cabo C0243. REPARADO en la tarea de /reparar del 08/11/2026: la sección lleva key con
+ * la combinación, y su test es «la frase entera sigue a los deslizadores».
  * ═══════════════════════════════════════════════════════════════════════════════════════════ */
 
 interface LecturaContraste {
@@ -1377,6 +1378,25 @@ test.describe('simulador-vsepr · re-inspección 08/11/2026 · con la página tr
     await expect(page.getByText('Algo salió mal')).toHaveCount(0);
     await expect(aviso).toBeVisible();
     await expect(aviso).not.toContainText('par libre');
+    expect(errores).toEqual([]);
+  });
+
+  test('fuera de tabla y traducida: la frase entera sigue a los deslizadores, no se queda con E y la disposición viejas (C0243)', async ({ page }) => {
+    // REPARADO (cabo C0243, nota del inspector del 08/11/2026). Con la página traducida, X = 1 y E de
+    // 0 a 2, esperado «La combinación X=1 y E=N …, repartidos <disposición de 1+N pares>»; antes quedaba
+    // «X=1 y E=0 … repartidos en una sola dirección»: los números y la disposición eran nodos de texto
+    // con hermanos dentro de la sección, y React escribía en los que el traductor había retirado.
+    await ponerSlider(page, 'slider-enlaces', 1);
+    const aviso = page.locator('[class*="mensajePedagogico"]');
+    await expect(aviso).toContainText('La combinación X=1 y E=0');
+    await traducirPagina(page);
+    await expect(aviso.locator('font').first(), 'el aviso quedó traducido').toBeAttached();
+
+    for (const [libres, disposicion] of [[1, 'en línea recta'], [2, 'en un triángulo plano'], [0, 'en una sola dirección']] as const) {
+      await ponerSlider(page, 'slider-libres', libres);
+      await expect(aviso).toContainText(`La combinación X=1 y E=${libres} no corresponde`);
+      await expect(aviso).toContainText(`repartidos ${disposicion}.`);
+    }
     expect(errores).toEqual([]);
   });
 });
