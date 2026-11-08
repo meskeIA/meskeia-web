@@ -54,6 +54,26 @@ const CO2_HISTORICO: CO2Dato[] = [
 ];
 
 // ─────────────────────────────────────────────
+// Tono de texto y relleno de cada color de datos (cabo C0645)
+// ─────────────────────────────────────────────
+
+/**
+ * Pintados como texto, los colores de datos daban 2,06-3,90:1 en claro y 2,09-3,90 en oscuro, y
+ * el blanco sobre las flechas del balance 2,15-3,76. `tono` cambia con el tema (tokens de globals
+ * con reserva oscura, o del módulo); `fondo` es igual en los dos (blanco encima a 5,02-7,62:1).
+ * El color de datos sigue en barras, bordes y el degradado del deslizador.
+ */
+const TONOS: Record<string, { tono: string; fondo: string }> = {
+  '#EF4444': { tono: 'var(--rojo-texto, #F87171)', fondo: '#B91C1C' },
+  '#F59E0B': { tono: 'var(--ambar-texto, #F5B041)', fondo: '#B45309' },
+  '#3B82F6': { tono: 'var(--azul-texto)', fondo: '#1D4ED8' },
+  '#22C55E': { tono: 'var(--verde-texto, #5FD08A)', fondo: '#15803D' },
+  '#991B1B': { tono: 'var(--granate-texto)', fondo: '#991B1B' },
+};
+const tonoDe = (color: string): string => TONOS[color]?.tono ?? 'var(--text-primary)';
+const fondoDe = (color: string): string => TONOS[color]?.fondo ?? color;
+
+// ─────────────────────────────────────────────
 // Datos de calentamiento por nivel
 // ─────────────────────────────────────────────
 
@@ -169,7 +189,7 @@ function SeccionTiempo() {
         <p className={styles.balanceSubtitulo}>La Tierra recibe energía del Sol y devuelve la misma cantidad al espacio. Si este balance se rompe, la temperatura cambia.</p>
         <div className={styles.balanceDiagrama}>
           <div className={styles.balanceFlujo}>
-            <div className={styles.balanceFlecha} style={{ background: '#F59E0B' }}>
+            <div className={styles.balanceFlecha} style={{ background: fondoDe('#F59E0B') }}>
               <span className={styles.balanceFlechaTexto}>Radiación solar entrante</span>
               <span className={styles.balanceFlechaValor}>340 W/m²</span>
             </div>
@@ -177,7 +197,7 @@ function SeccionTiempo() {
               <span aria-hidden="true">🌍</span>
               <span className={styles.balanceTierraTexto}>Tierra</span>
             </div>
-            <div className={styles.balanceFlecha} style={{ background: '#EF4444' }}>
+            <div className={styles.balanceFlecha} style={{ background: fondoDe('#EF4444') }}>
               <span className={styles.balanceFlechaTexto}>Radiación infrarroja saliente</span>
               <span className={styles.balanceFlechaValor}>~340 W/m²</span>
             </div>
@@ -245,7 +265,7 @@ function SeccionInvernadero() {
       <div className={styles.tempComparacion}>
         <div className={styles.tempCard}>
           <span className={styles.tempIcono} aria-hidden="true">❄️</span>
-          <span className={styles.tempValor} style={{ color: '#3B82F6' }}>-18°C</span>
+          <span className={styles.tempValor} style={{ color: tonoDe('#3B82F6') }}>-18°C</span>
           <span className={styles.tempLabel}>Sin efecto invernadero</span>
           <span className={styles.tempDetalle}>Tierra congelada, sin vida</span>
         </div>
@@ -256,7 +276,7 @@ function SeccionInvernadero() {
         </div>
         <div className={styles.tempCard}>
           <span className={styles.tempIcono} aria-hidden="true">🌍</span>
-          <span className={styles.tempValor} style={{ color: '#22C55E' }}>+15°C</span>
+          <span className={styles.tempValor} style={{ color: tonoDe('#22C55E') }}>+15°C</span>
           <span className={styles.tempLabel}>Con efecto invernadero natural</span>
           <span className={styles.tempDetalle}>Temperatura media actual</span>
         </div>
@@ -378,7 +398,7 @@ function SeccionCorrientes() {
               <span aria-hidden="true">{c.icono}</span>
               <div>
                 <h3 className={styles.corrienteNombre}>{c.nombre}</h3>
-                <span className={styles.corrienteTipo} style={{ color: c.color }}>{c.tipo}</span>
+                <span className={styles.corrienteTipo} style={{ color: tonoDe(c.color) }}>{c.tipo}</span>
               </div>
             </div>
             <p className={styles.corrienteEfecto}>{c.efecto}</p>
@@ -395,7 +415,7 @@ function SeccionCorrientes() {
           <div className={styles.ciudadCard}>
             <span className={styles.ciudadIcono} aria-hidden="true">🇬🇧</span>
             <span className={styles.ciudadNombre}>Londres</span>
-            <span className={styles.ciudadTemp} style={{ color: '#22C55E' }}>+5°C en invierno</span>
+            <span className={styles.ciudadTemp} style={{ color: tonoDe('#22C55E') }}>+5°C en invierno</span>
             <span className={styles.ciudadDetalle}>Calentada por la Gulf Stream</span>
           </div>
           <div className={styles.ciudadVs}>
@@ -405,7 +425,7 @@ function SeccionCorrientes() {
           <div className={styles.ciudadCard}>
             <span className={styles.ciudadIcono} aria-hidden="true">🇨🇦</span>
             <span className={styles.ciudadNombre}>Calgary</span>
-            <span className={styles.ciudadTemp} style={{ color: '#3B82F6' }}>-10°C en invierno</span>
+            <span className={styles.ciudadTemp} style={{ color: tonoDe('#3B82F6') }}>-10°C en invierno</span>
             <span className={styles.ciudadDetalle}>Sin corriente cálida</span>
           </div>
         </div>
@@ -455,7 +475,7 @@ function SeccionCalentamiento({ nivelIdx, setNivelIdx }: { nivelIdx: number; set
       <div className={styles.sliderZona}>
         <div className={styles.sliderHeader}>
           <label htmlFor="nivel-calentamiento" className={styles.sliderLabel}>Nivel de calentamiento global</label>
-          <span className={styles.sliderValor} style={{ color: nivel.color }}>+{nivel.grados}°C</span>
+          <span className={styles.sliderValor} style={{ color: tonoDe(nivel.color) }}>+{nivel.grados}°C</span>
         </div>
         <input
           id="nivel-calentamiento"
@@ -479,7 +499,7 @@ function SeccionCalentamiento({ nivelIdx, setNivelIdx }: { nivelIdx: number; set
 
       {/* Cabecera del nivel */}
       <div className={styles.nivelHeader} style={{ borderColor: nivel.color }}>
-        <h3 className={styles.nivelTitulo} style={{ color: nivel.color }}>{nivel.titulo}</h3>
+        <h3 className={styles.nivelTitulo} style={{ color: tonoDe(nivel.color) }}>{nivel.titulo}</h3>
         <span className={styles.nivelEstado}>{nivel.estado}</span>
       </div>
 
@@ -492,10 +512,10 @@ function SeccionCalentamiento({ nivelIdx, setNivelIdx }: { nivelIdx: number; set
           }} />
         </div>
         <div className={styles.termometroEscala}>
-          <span style={{ color: '#991B1B' }}>+4°C</span>
-          <span style={{ color: '#EF4444' }}>+2°C</span>
-          <span style={{ color: '#F59E0B' }}>+1°C</span>
-          <span style={{ color: '#22C55E' }}>0°C (preindustrial)</span>
+          <span style={{ color: tonoDe('#991B1B') }}>+4°C</span>
+          <span style={{ color: tonoDe('#EF4444') }}>+2°C</span>
+          <span style={{ color: tonoDe('#F59E0B') }}>+1°C</span>
+          <span style={{ color: tonoDe('#22C55E') }}>0°C (preindustrial)</span>
         </div>
       </div>
 

@@ -70,6 +70,10 @@ const APPS: App[] = [
   // de cada gas, el porcentaje de cada fuente y los grados de cada escenario en su color de datos
   // (2,15-4,23 en claro, 1,73-3,90 en oscuro)
   { slug: 'visualizador-efecto-invernadero', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
+  // Blanco sobre el ámbar y el rojo de las flechas del balance (2,15-3,76:1), y temperaturas,
+  // corrientes, el nivel del deslizador y la escala de grados en su color de datos (2,06-3,90 en
+  // claro, 2,09-3,90 en oscuro)
+  { slug: 'visualizador-clima', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
 ];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {
