@@ -57,6 +57,18 @@ const textoFrecuencia = (n: number) => String(n).replace('.', ',');
 const RAMPA_GANANCIA_S = 0.05;
 
 /**
+ * Margen, en el reloj de AUDIO, entre el instante en que se programa el tono y el que se fija
+ * para que empiecen a la vez el oscilador y su rampa de entrada (cabo C0651). Con
+ * `oscillator.start()` sin argumento el tono suena cuando el hilo de audio procesa el mensaje,
+ * pero la rampa se anclaba en el `currentTime` que leyó el hilo principal: si el reloj de audio ya
+ * había avanzado unos cuantos de render, la rampa empezaba sin sonido y el tono entraba con ella
+ * a medias (dos suites del 06/11/2026 dieron la misma amplitud, 0,090 a 5 ms frente a 0,039:
+ * unos 8,5 ms de desfase). Programados los dos en el mismo instante futuro, el retraso del
+ * mensaje deja de importar mientras sea menor que este margen; 20 ms no se perciben al pulsar.
+ */
+const ARRANQUE_S = 0.02;
+
+/**
  * Lleva la ganancia a 0 con una rampa ANCLADA en el valor en curso y programa el stop() del
  * oscilador al final de la rampa, en el reloj de audio (el patrón de `apagarConRampa` de
  * app/diapason y de `apagarTono` de app/generador-ondas). Sin el setValueAtTime, una rampa de Web
@@ -683,14 +695,19 @@ export default function GeneradorTonosPage() {
       oscillator.type = tipoOnda;
       oscillator.frequency.setValueAtTime(frecuenciaInicial ?? frecuencia, ctx.currentTime);
 
-      // Rampa de entrada 0 → volumen. Ya no la pisa el efecto de volumen (hallazgo 1637).
-      gainNode.gain.setValueAtTime(0, ctx.currentTime);
-      gainNode.gain.linearRampToValueAtTime(volumen, ctx.currentTime + RAMPA_GANANCIA_S);
+      // Rampa de entrada 0 → volumen. Ya no la pisa el efecto de volumen (hallazgo 1637). El
+      // oscilador y la rampa empiezan en el MISMO instante del reloj de audio, un poco por
+      // delante (ARRANQUE_S, cabo C0651). La ganancia nace a 0 y no en su 1 por defecto: si se
+      // detiene antes de t0, la rampa de salida se ancla en ese 0 y no deja pasar un golpe.
+      const t0 = ctx.currentTime + ARRANQUE_S;
+      gainNode.gain.value = 0;
+      gainNode.gain.setValueAtTime(0, t0);
+      gainNode.gain.linearRampToValueAtTime(volumen, t0 + RAMPA_GANANCIA_S);
 
       oscillator.connect(gainNode);
       gainNode.connect(ctx.destination);
 
-      oscillator.start();
+      oscillator.start(t0);
 
       oscillatorRef.current = oscillator;
       gainNodeRef.current = gainNode;

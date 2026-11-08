@@ -1313,6 +1313,47 @@ test('HALLAZGO E — en caliente (Reproducir → Detener → Reproducir), la ent
   comprobarEntrada(await capturarSalida(page), 'en caliente');
 });
 
+/**
+ * Cabo C0651 — el inestable del HALLAZGO E en frío. Dos suites del 06/11/2026 dieron la MISMA
+ * amplitud, 0,0903 a 5 ms (esperado 0,039): la rampa había empezado unos 8,5 ms antes de que el
+ * tono sonara. La rampa se anclaba en el `currentTime` que leía el hilo principal y el oscilador
+ * arrancaba con `start()` sin argumento, cuando el hilo de audio procesaba el mensaje: si el reloj
+ * de audio ya iba por delante de esa lectura, la entrada salía a medias. Bajo carga real no se
+ * reproducía a voluntad, así que aquí se SIMULA: un `currentTime` que llega 12 ms atrasado al
+ * hilo principal (con 8,5 ms la amplitud a 5 ms sale 0,081 y cabe en la tolerancia de 0,05; la
+ * de la suite, 0,0903, pide unos 10 ms). Control medido el 08/11/2026: con el código anterior cae
+ * 3 de 3 (0,247 a 30 ms frente a 0,189); REPARADO arrancando el oscilador y la rampa en el mismo
+ * instante, ARRANQUE_S (20 ms) por delante.
+ */
+function RELOJ_ATRASADO(): void {
+  const d = Object.getOwnPropertyDescriptor(BaseAudioContext.prototype, 'currentTime');
+  if (!d?.get) return;
+  const leer = d.get;
+  Object.defineProperty(BaseAudioContext.prototype, 'currentTime', {
+    configurable: true,
+    get(this: BaseAudioContext) {
+      return Math.max(0, (leer.call(this) as number) - 0.012);
+    },
+  });
+}
+
+test('C0651 — con el reloj de audio 12 ms por delante de lo que lee la página, la entrada sigue siendo la rampa entera', async ({
+  page,
+}) => {
+  await page.addInitScript(RELOJ_ATRASADO);
+  await abrirConSalida(page);
+  // En caliente: con el contexto recién creado el reloj está en 0 y el atraso no muerde.
+  await botonReproducir(page).click();
+  await expect.poll(() => gananciasCreadas(page)).toBe(1);
+  await esperarAudio(page, 0.3);
+  await botonDetener(page).click();
+  await expect(botonReproducir(page)).toHaveAttribute('aria-pressed', 'false');
+  await botonReproducir(page).click();
+  await expect.poll(() => gananciasCreadas(page)).toBe(2);
+  await esperarAudio(page, 0.2);
+  comprobarEntrada(await capturarSalida(page), 'con el reloj atrasado');
+});
+
 test('HALLAZGO E — bajar el volumen con el tono sonando es una rampa, no un escalón', async ({
   page,
 }) => {
