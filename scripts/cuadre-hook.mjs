@@ -96,6 +96,41 @@ if (evento === 'no-verify') {
   process.exit(0);
 }
 
+// ── PreToolUse · la puerta del push ──────────────────────────────────────────
+//
+// Un push a main publica en meskeia.com en un minuto, y Claude lee contenido de fuera (webs,
+// correo, datos de Bing) donde un texto puede intentar darle órdenes. Esa inyección llega
+// siempre como RESULTADO de una herramienta, nunca como mensaje del usuario: por eso la llave
+// es un mensaje suyo que empieza por /push, guardado por el evento `peticion`. Decidido con el
+// usuario el 08/11/2026, tras revisar los accesos de GitHub (Vigilancia/AuditorSeguridad/
+// REVISION-ACCESOS.md). Las tareas desatendidas ya tenían el push vetado en su configuración.
+//
+// La llave vale para ese mensaje y las DOS respuestas siguientes (la skill puede preguntar a
+// mitad, «¿entra este commit de otra conversación?»), y 90 minutos como mucho.
+//
+// Se juzga la orden ENTERA, sin quitar comillas ni heredocs como hace la del --no-verify: allí
+// un falso positivo era el coste a evitar; aquí lo es dejar pasar un `bash -c "git push"`. El
+// precio es que una orden que solo MENCIONA el push en la misma línea queda bloqueada.
+// Va antes de la guarda `dentro` a propósito: si la sesión no está en meskeia-web no hay llave
+// que leer y se bloquea, que es el lado seguro (el único repositorio con remoto es este).
+if (evento === 'push') {
+  const orden = String(datos.tool_input?.command || '');
+  if (!/\bgit\b[^\n|;&]*?\bpush\b/i.test(orden)) process.exit(0);
+  const estado = leer(path.join(DIR_ESTADO, `sesion-${datos.session_id || 'sin-id'}.json`));
+  const llave = estado?.pushAutorizado;
+  const turnosDesde = (estado?.turnos || 0) - (llave?.turno || 0);
+  const minutos = llave ? (Date.now() - Date.parse(llave.fecha)) / 60000 : Infinity;
+  if (llave && turnosDesde <= 2 && minutos <= 90) process.exit(0);
+  process.stderr.write(
+    'Push bloqueado: solo se sube cuando el usuario escribe un mensaje que EMPIEZA por /push ' +
+      '(vale para ese mensaje y sus dos respuestas siguientes, 90 minutos como mucho).\n' +
+      'Protege de instrucciones coladas en contenido externo: no pueden escribir un mensaje del usuario.\n' +
+      'Si el usuario quiere subir, pídele que escriba /push. Si la orden no sube nada y solo nombra ' +
+      'el push en la misma línea, reformúlala.\n',
+  );
+  process.exit(2);
+}
+
 if (!dentro) process.exit(0);
 
 const ficheroSesion = (id) => path.join(DIR_ESTADO, `sesion-${id || 'sin-id'}.json`);
@@ -172,7 +207,15 @@ if (evento === 'peticion') {
   // Import dinámico a propósito: este fichero lo cargan hooks GLOBALES, y un fallo al importar
   // el motor tumbaría también la puerta del --no-verify en todos los proyectos.
   const { esPeticionDelUsuario } = await import('./cuadre-motor.mjs');
-  if (esPeticionDelUsuario(texto)) estado.peticiones = [...(estado.peticiones || []), texto].slice(-40);
+  if (esPeticionDelUsuario(texto)) {
+    estado.peticiones = [...(estado.peticiones || []), texto].slice(-40);
+    // Contador propio: `peticiones` se recorta a 40 y no sirve para medir distancias.
+    estado.turnos = (estado.turnos || 0) + 1;
+    // La llave de la puerta del push (evento `push`, más abajo). Solo la abre un mensaje que
+    // EMPIEZA por /push, que es como se invoca la skill: «procede a instalar el hook que exige
+    // /push» habla del push sin pedirlo, y fue el mensaje que encargó este candado.
+    if (/^\/push(\s|$)/.test(texto)) estado.pushAutorizado = { fecha: new Date().toISOString(), turno: estado.turnos };
+  }
   if (datos.transcript_path) estado.transcript = datos.transcript_path;
   escribir(ruta, estado);
   process.exit(0);

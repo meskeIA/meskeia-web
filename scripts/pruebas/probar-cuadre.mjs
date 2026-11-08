@@ -23,6 +23,7 @@
  * tantas veces como haga falta.
  */
 
+import fs from 'node:fs';
 import path from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
@@ -420,6 +421,70 @@ const DEBE_PASAR = [
 ];
 for (const [nombre, orden] of DEBE_PASAR) {
   anotar(`P · deja pasar ${nombre}`, puerta(orden) === 0, `salida ${puerta(orden)}`);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// LA PUERTA DEL PUSH · solo abre un mensaje del usuario que EMPIEZA por /push
+// ═══════════════════════════════════════════════════════════════════════════
+//
+// Caso de origen (08/11/2026): el mensaje que encargó el candado, «OK; procede a instalar el hook
+// que exige /push», HABLA del push sin pedirlo. Si ese mensaje abriera la puerta, cualquier
+// conversación que lo mencione la dejaría abierta. Se recorre el camino real: el evento
+// `peticion` escribe la llave y el evento `push` la lee, sobre una sesión de prueba desechable.
+
+{
+  const SESION = `prueba-push-${process.pid}`;
+  const FICHERO = path.join(RAIZ, 'scratch', 'cuadre', `sesion-${SESION}.json`);
+  const hook = (evento, extra) =>
+    spawnSync(process.execPath, [path.join(RAIZ, 'scripts', 'cuadre-hook.mjs'), evento], {
+      input: JSON.stringify({ session_id: SESION, cwd: RAIZ, ...extra }),
+      encoding: 'utf8',
+    }).status;
+  const escribe = (prompt) => hook('peticion', { prompt });
+  const sube = (orden = 'git push origin main', herramienta = 'Bash') =>
+    hook('push', { tool_name: herramienta, tool_input: { command: orden } });
+  const limpiar = () => fs.rmSync(FICHERO, { force: true });
+
+  try {
+    limpiar();
+    anotar('U1 · sin ningún /push, el push se bloquea', sube() === 2);
+
+    escribe('OK; procede a instalar el hook que exige /push');
+    anotar('U2 · CASO DE ORIGEN: /push en mitad de la frase NO abre', sube() === 2);
+
+    escribe('Hagamos un /push de esta sesión');
+    anotar('U3 · /push en mitad de la frase tampoco, aunque lo pida', sube() === 2);
+
+    escribe('/pushear no es la skill');
+    anotar('U4 · /pushear no es /push', sube() === 2);
+
+    escribe('/push');
+    anotar('U5 · /push al principio abre', sube() === 0);
+    anotar('U6 · ...también con git -C y comillas', sube('git -C "C:/Users/jaceb/meskeia-web" push origin main') === 0);
+    anotar('U7 · ...y desde PowerShell', sube('git push origin main', 'PowerShell') === 0);
+    anotar('U8 · lo que no sube pasa siempre', sube('git status --short') === 0 && sube('npm run build') === 0);
+
+    escribe('sí, entra ese commit');
+    escribe('adelante');
+    anotar('U9 · vale para las dos respuestas siguientes', sube() === 0);
+    escribe('y ahora otra cosa');
+    anotar('U10 · a la tercera respuesta se cierra', sube() === 2);
+
+    escribe('/push');
+    const estado = JSON.parse(fs.readFileSync(FICHERO, 'utf8'));
+    estado.pushAutorizado.fecha = new Date(Date.now() - 91 * 60000).toISOString();
+    fs.writeFileSync(FICHERO, JSON.stringify(estado));
+    anotar('U11 · pasados 90 minutos se cierra', sube() === 2);
+
+    escribe('/push');
+    anotar(
+      'U12 · el push escondido también se ve',
+      sube('cd /c/Users/jaceb/meskeia-web && git push') === 0 && (limpiar(), sube('bash -c "git push origin main"') === 2),
+    );
+    anotar('U13 · sin fichero de sesión, bloquea (lado seguro)', sube() === 2);
+  } finally {
+    limpiar();
+  }
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
