@@ -328,6 +328,13 @@ const OBLIGACIONES = [
     'eso lo audita SIEMBRA_ESTRICTA=1 npx playwright test tests/apps',
     'npm run hidratacion:probar-candado', 'tests/hidratacion-carrera.spec.ts',
   ]],
+  ['Candado de los specs que solo pasan en next dev', [
+    'npm run check:specs-produccion', 'rompe el build', 'el commit añade a tests/',
+    'el nombre de clase de un módulo CSS', 'selectorDelModulo', 'tests/apps/_modulo-css.ts',
+    "una espera a 'networkidle'", 'esperarPaginaAsentada', 'Mira los literales, no los comentarios',
+    'las líneas que el commit añade', 'produccion-ok: <razón>', 'razón obligatoria',
+    'npm run check:specs-produccion -- --todo', 'npm run specs-produccion:probar-candado',
+  ]],
   ['Candado de las familias de apps', [
     'npm run check:familias', 'rompe el build', 'el testigo de una familia no está en verde',
     'si su tabla no cubre cada <NumberInput> de cada hermana', 'scripts/inspector/familias.mjs',

@@ -730,6 +730,19 @@ que el input YA tiene (el caso pasa aunque la app esté sorda): eso lo audita
 > Salió de dos specs en rojo el 12/09/2026. Crónica: cabecera de
 > `scripts/check-hidratacion-tests.mjs` · pruebas: `npm run hidratacion:probar-candado`.
 
+### Candado de los specs que solo pasan en next dev
+
+`npm run check:specs-produccion` — en el build, y **rompe el build** si el commit añade a `tests/`
+un localizador por el nombre de clase de un módulo CSS («-module», «__x» o `[class*="Foo"]` con
+`Foo.module.css`), que el build compila como «hash_x»: usar **`selectorDelModulo`** de
+`tests/apps/_modulo-css.ts`, o rol o texto; o una espera a `'networkidle'`, que en producción no
+llega nunca: **`esperarPaginaAsentada`**. Mira los literales, no los comentarios.
+Juzga **las líneas que el commit añade** · Escape: `produccion-ok: <razón>`, razón obligatoria ·
+`npm run check:specs-produccion -- --todo` mide el pasivo.
+> Salió de C0457/C0487, cerrados el 27/10/2026 sin candado y vueltos el 03/11 (a57337a0c) y el
+> 07/11 (c0f8ad3b9, 10b6d8a2d): tres recogidas paradas (P004). Crónica: cabecera de
+> `scripts/check-specs-produccion.mjs` · pruebas: `npm run specs-produccion:probar-candado`.
+
 ### Candado de las familias de apps
 
 `npm run check:familias` — en el build, **tras `next build`** contra un `next start` propio en el
