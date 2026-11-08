@@ -194,9 +194,14 @@ if (marcador) {
   // Y que esta trampa NO es vacua: con `insensible: false` se reproduce el comportamiento viejo
   // y el caso vuelve a fallar. Un caso que pasa con el código roto y con el arreglado no prueba
   // nada; esta línea es la que le da valor a las dos de arriba.
+  //
+  // La raíz va con la unidad en MAYÚSCULA, como en el caso de origen. Si el script arranca con la
+  // unidad en minúscula, `RAIZ` sale como `c:\…`, coincide literalmente con las rutas de prueba y
+  // esta trampa fallaba sin que hubiera nada roto (1 de 5 ejecuciones, 08/11/2026).
+  const raizMayuscula = raiz.replace(/^([a-z]):/, (_, letra) => `${letra.toUpperCase()}:`);
   anotar(
     '4.quinquies · la trampa caza el fallo (no pasa con el código viejo)',
-    DENTRO_MINUSCULA.every((r) => dentroDe(path.resolve(r), raiz, { insensible: false }) === false),
+    DENTRO_MINUSCULA.every((r) => dentroDe(path.resolve(r), raizMayuscula, { insensible: false }) === false),
     'si esto falla, el caso ya no distingue el bug y hay que rehacerlo',
   );
 }
