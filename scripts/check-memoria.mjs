@@ -213,9 +213,15 @@ for (const [f, rutas] of scriptsMuertos) {
 }
 
 // --- 6: punteros externos vivos ---
+// Las instantáneas fechadas de _private/memoria-refactor/AAAA-MM-DD*/ son ARCHIVO, no punteros:
+// copian el índice y el inventario de su día, así que nombran cada ficha que existía entonces.
+// Contarlas convertía en «puntero muerto» cualquier fusión posterior, y la fusión es justo la
+// corrección que pide el PASO 6.5 de /audit-meskeia (poda del 08/11/2026).
+const ARCHIVO_FECHADO = /memoria-refactor[\\/]\d{4}-\d{2}-\d{2}/;
 const rotosExternos = new Map();
 for (const fuente of FUENTES_EXTERNAS) {
   for (const fichero of ficherosDe(fuente)) {
+    if (ARCHIVO_FECHADO.test(fichero)) continue;
     let texto;
     try { texto = fs.readFileSync(fichero, 'utf8'); } catch { continue; }
     for (const m of texto.matchAll(/\b(?:project|feedback|reference|user)_[a-z0-9_-]+/g)) {

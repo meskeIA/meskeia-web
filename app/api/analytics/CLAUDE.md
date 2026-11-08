@@ -82,7 +82,7 @@ Umbral canónico, alineado con el digest: **app activa = ≥5 usos/30d** (⚠️
 - **Leer los ABSOLUTOS: el share engaña.** Un porcentaje cae cuando crece su denominador, que suele
   ser justo el objetivo estratégico. → `project_dashboard_navegacion`
 - El dashboard está **protegido**: `ANALYTICS_SECRET` vive en Vercel.
-  → `project_dashboard_analytics_protegido`
+  → `project_analytics_dashboard_revision`
 - Tras tocar el rollup, verificar con **`rollup-verify` + `dashboard-smoke`**, no con el build.
   → `project_analytics_optimizacion`
 
