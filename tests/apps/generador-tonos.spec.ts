@@ -2547,6 +2547,51 @@ test('C0173 — un micrófono que tarda 400 ms en entregar el primer audio no hu
   expect(Math.abs(a50 ?? Infinity), `tercio de 50 Hz de una cadena plana, en dB rel. (A: ${tablaA})`).toBeLessThanOrEqual(1.5);
 });
 
+/**
+ * Cabo C0683 — la forma de C0651 en la MEDIDA de respuesta: su tono arrancaba con start() sin
+ * argumento y la rampa se anclaba en el `currentTime` leído, así que con el reloj de audio por
+ * delante de esa lectura el primer tono entraba con la rampa empezada. Mismo simulador que el caso
+ * C0651 (reloj atrasado 12 ms) y la salida medida detrás de la ganancia de la medida.
+ * Esperado, a mano: rampa de 0 a VOLUMEN_MEDIDA (0,35) en 0,05 s, v(t) = 7·t, sobre el primer
+ * tercio, 50 Hz, que arranca en fase 0. En los picos del seno (5, 15 y 25 ms del arranque) la
+ * muestra ES la ganancia. Se toma el máximo de |x| en ±0,5 ms (ahí el seno vale ≥ 0,995), que en
+ * una subida es la ganancia del final de la ventana, 7·(t + 0,0005): 0,0385 · 0,1085 · 0,1785.
+ * Medido el 08/11/2026: con el código anterior cae 3 de 3 (0,050 a los 5 ms); REPARADO, 0,0382 ·
+ * 0,1072 · 0,1764, 3 de 3, arrancando oscilador y rampa en el mismo instante, ARRANQUE_S por delante.
+ */
+test('C0683 — con el reloj de audio 12 ms por delante, el primer tono de la medida entra con la rampa entera', async ({
+  page,
+}) => {
+  test.setTimeout(60000);
+  await page.addInitScript(RELOJ_ATRASADO);
+  await page.addInitScript(INSTRUMENTAR_SALIDA);
+  await abrirConMicro(page);
+  const antes = await gananciasCreadas(page);
+  await page.getByRole('button', { name: 'Medir A', exact: true }).click();
+  await expect.poll(() => gananciasCreadas(page), { timeout: 15000 }).toBeGreaterThan(antes);
+  await esperarAudio(page, 0.2);
+  const c = await capturarSalida(page);
+  const inicio = primeraMuestra(c);
+  expect(inicio, 'la captura tiene que empezar en silencio').toBeGreaterThan(0);
+  const picoEn = (t: number): number => {
+    const centro = inicio + Math.round(t * c.sr);
+    const media = Math.round(0.0005 * c.sr);
+    let maximo = 0;
+    for (let i = centro - media; i <= centro + media; i++) maximo = Math.max(maximo, Math.abs(c.x[i]));
+    return maximo;
+  };
+  for (const [t, esperado] of [
+    [0.005, 0.0385],
+    [0.015, 0.1085],
+    [0.025, 0.1785],
+  ] as const) {
+    const a = picoEn(t);
+    expect(Math.abs(a - esperado), `ganancia a ${t * 1000} ms del arranque: ${a.toFixed(4)} (esperado ${esperado})`).toBeLessThan(
+      0.006,
+    );
+  }
+});
+
 // ------------------------------------------------------------
 // CASO 12 — RECHAZO: sin permiso, con procesados activos, en silencio
 // ------------------------------------------------------------

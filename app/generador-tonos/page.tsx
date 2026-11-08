@@ -901,13 +901,17 @@ export default function GeneradorTonosPage() {
       oscilador = ctx.createOscillator();
       ganancia = ctx.createGain();
       oscilador.type = 'sine';
-      const arranque = ctx.currentTime;
+      // Oscilador y rampa de entrada en el MISMO instante, ARRANQUE_S por delante, como el tono
+      // manual (cabo C0683): con start() sin argumento y la rampa anclada en el currentTime leído,
+      // el tono entraba con la rampa empezada si el reloj de audio iba por delante.
+      const arranque = ctx.currentTime + ARRANQUE_S;
       oscilador.frequency.setValueAtTime(frecuencias[0], arranque);
+      ganancia.gain.value = 0;
       ganancia.gain.setValueAtTime(0, arranque);
       ganancia.gain.linearRampToValueAtTime(VOLUMEN_MEDIDA, arranque + RAMPA_MEDIDA_S);
       oscilador.connect(ganancia);
       ganancia.connect(ctx.destination);
-      oscilador.start();
+      oscilador.start(arranque);
       medidaNodosRef.current = { oscilador, ganancia };
 
       const puntos: PuntoMedida[] = [];
