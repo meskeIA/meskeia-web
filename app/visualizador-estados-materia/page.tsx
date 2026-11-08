@@ -521,7 +521,9 @@ export default function VisualizadorEstadosMateria() {
             aria-label="Zona sólida"
             onKeyDown={e => e.key === 'Enter' && handleDiagramaClick('solido')}
           />
-          <text x="80" y="180" fill="#2196F3" fontSize="13" fontWeight="600" pointerEvents="none">Sólido</text>
+          {/* Los rótulos del diagrama, en el tono de TEXTO de su color (cabo C0297): el color de la
+              zona como texto daba 2,01-2,52:1 sobre su propio tinte en claro */}
+          <text x="80" y="180" style={{ fill: 'var(--azul-texto)' }} fontSize="13" fontWeight="600" pointerEvents="none">Sólido</text>
 
           {/* Líquido */}
           <path
@@ -534,7 +536,7 @@ export default function VisualizadorEstadosMateria() {
             aria-label="Zona líquida"
             onKeyDown={e => e.key === 'Enter' && handleDiagramaClick('liquido')}
           />
-          <text x="190" y="170" fill="#48A9A6" fontSize="13" fontWeight="600" pointerEvents="none">Líquido</text>
+          <text x="190" y="170" style={{ fill: 'var(--teal-texto)' }} fontSize="13" fontWeight="600" pointerEvents="none">Líquido</text>
 
           {/* Gas */}
           <path
@@ -547,7 +549,7 @@ export default function VisualizadorEstadosMateria() {
             aria-label="Zona gaseosa"
             onKeyDown={e => e.key === 'Enter' && handleDiagramaClick('gas')}
           />
-          <text x="300" y="240" fill="#FF9800" fontSize="13" fontWeight="600" pointerEvents="none">Gas</text>
+          <text x="300" y="240" style={{ fill: 'var(--anaranjado-texto)' }} fontSize="13" fontWeight="600" pointerEvents="none">Gas</text>
 
           {/* Líneas de frontera */}
           <line x1="90" y1="80" x2="130" y2="180" stroke="#666" strokeWidth="1.5" strokeDasharray="4,2" />
@@ -564,7 +566,7 @@ export default function VisualizadorEstadosMateria() {
             aria-label="Punto triple: 0,01°C, 611 Pa"
             onKeyDown={e => e.key === 'Enter' && handleDiagramaClick('triple')}
           />
-          <text x="138" y="195" fill="#E91E63" fontSize="10" fontWeight="600" pointerEvents="none">Punto triple</text>
+          <text x="138" y="195" style={{ fill: 'var(--punto-triple-texto)' }} fontSize="10" fontWeight="600" pointerEvents="none">Punto triple</text>
 
           {/* Punto crítico */}
           <circle
@@ -576,7 +578,7 @@ export default function VisualizadorEstadosMateria() {
             aria-label="Punto crítico: 374°C, 22,1 MPa"
             onKeyDown={e => e.key === 'Enter' && handleDiagramaClick('critico')}
           />
-          <text x="288" y="45" fill="#9C27B0" fontSize="10" fontWeight="600" pointerEvents="none">Punto crítico</text>
+          <text x="288" y="45" style={{ fill: 'var(--punto-critico-texto)' }} fontSize="10" fontWeight="600" pointerEvents="none">Punto crítico</text>
 
           {/* Marcas de eje */}
           <text x="130" y="275" textAnchor="middle" fill="currentColor" fontSize="9">0°C</text>
