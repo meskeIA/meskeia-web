@@ -61,13 +61,20 @@ export interface ParametrosPensionViudedad {
    */
   situacionCausante: SituacionCausante;
   /**
-   * Base de cotización media mensual del causante en los últimos 2 años (€).
-   * Solo para 'activo' y 'no-alta'.
+   * Base de cotización media mensual del causante (€) en un período ININTERRUMPIDO de 24 meses
+   * que eligen los beneficiarios dentro de los 15 años anteriores al fallecimiento (art. 7.2 del
+   * Decreto 1646/1972), no necesariamente los últimos 24. Solo para 'activo' y 'no-alta'.
    */
   baseCotizacionMedia?: number;
   /**
-   * Pensión de jubilación del causante (€/mes).
-   * Solo para 'jubilado'.
+   * Base reguladora de la pensión que cobraba el causante, con las revalorizaciones posteriores
+   * (€/mes; art. 7.3 del Decreto 1646/1972). Solo para 'jubilado'; manda sobre `pensionCausante`.
+   */
+  baseReguladoraCausante?: number;
+  /**
+   * Pensión de jubilación que cobraba el causante (€/mes). Solo para 'jubilado' y solo como
+   * APROXIMACIÓN cuando falta `baseReguladoraCausante`: coincide con la base reguladora solo si
+   * cobraba el 100 % de ella, sin complemento a mínimos ni tope.
    */
   pensionCausante?: number;
   /** Edad del beneficiario (viudo/a) en años */
@@ -149,10 +156,21 @@ export function calcularPensionViudedad(p: ParametrosPensionViudedad): Resultado
   const pv = PENSION_VIUDEDAD_2026;
 
   // Base reguladora
+  // ⚠️ 2026-11-08 (hallazgos 4249 y 4250, cabo C0135): con el causante pensionista la BR era la
+  //    pensión que cobraba, y el art. 7.3 del Decreto 1646/1972 (BOE-A-1972-944, leído ese día)
+  //    dice que es «la misma que sirvió para determinar su pensión», revalorizada: solo coinciden
+  //    si cobraba el 100 % de su base. Y la base media de activo no es la de los últimos 24 meses,
+  //    sino la de 24 meses seguidos elegidos dentro de los 15 años anteriores (art. 7.2).
   let baseReguladora: number;
+  let brAproximada = false;
   if (p.situacionCausante === 'jubilado') {
-    if (!p.pensionCausante || p.pensionCausante <= 0) throw new Error('La pensión del causante es obligatoria para situación "jubilado".');
-    baseReguladora = p.pensionCausante;
+    if (p.baseReguladoraCausante && p.baseReguladoraCausante > 0) {
+      baseReguladora = p.baseReguladoraCausante;
+    } else {
+      if (!p.pensionCausante || p.pensionCausante <= 0) throw new Error('La base reguladora de la pensión del causante (o, en su defecto, la pensión que cobraba) es obligatoria para situación "jubilado".');
+      baseReguladora = p.pensionCausante;
+      brAproximada = true;
+    }
   } else {
     if (!p.baseCotizacionMedia || p.baseCotizacionMedia <= 0) throw new Error('La base de cotización media es obligatoria para situación "activo" o "no-alta".');
     // BR = (24 × base media) / 28
@@ -248,6 +266,8 @@ export function calcularPensionViudedad(p: ParametrosPensionViudedad): Resultado
 
   const notas: string[] = [
     'Cálculo orientativo. La SS calculará la pensión real a partir del historial completo de cotización del causante.',
+    brAproximada ? `Base reguladora aproximada con la pensión que cobraba el causante. La de la norma es la que sirvió para calcular su pensión, con las revalorizaciones posteriores (art. 7.3 del Decreto 1646/1972): solo coinciden si cobraba el ${pct(100)} de su base reguladora, sin complemento a mínimos ni tope. Figura en la resolución del INSS de su pensión.` : '',
+    p.situacionCausante !== 'jubilado' ? 'La base media es la de 24 meses seguidos que eligen los beneficiarios dentro de los 15 años anteriores al fallecimiento (art. 7.2 del Decreto 1646/1972): conviene elegir el período de bases más altas.' : '',
     p.situacionCausante === 'no-alta' ? 'Causante no en alta: se requieren 15 años cotizados en toda su vida laboral (art. 219.1 LGSS).' : '',
     porcentajeAplicable === pv.porcentaje70 ? `El ${pct(70)} se mide con los ingresos del ejercicio anterior y exige cumplir los requisitos mientras se cobra: si se deja de cumplir alguno, se pasa al ${pct(52)} (art. 31 del Decreto 3158/1966).` : '',
     p.situacionCausante === 'activo' ? 'Causante en alta: se requieren 500 días cotizados dentro de los 5 años anteriores al fallecimiento; ninguno si la muerte se debió a un accidente o a una enfermedad profesional (art. 219.1 LGSS).' : '',

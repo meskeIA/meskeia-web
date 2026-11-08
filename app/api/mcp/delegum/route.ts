@@ -2751,21 +2751,23 @@ function crearServidorDelegum(): McpServer {
     {
       situacion_causante: z.enum(['activo', 'jubilado', 'no-alta']).describe('"activo" = de alta en SS al fallecer · "jubilado" = percibía pensión de jubilación · "no-alta" = no estaba de alta'),
       edad_beneficiario: z.number().int().min(0).max(100).describe('Edad del beneficiario (viudo/a) en años'),
-      base_cotizacion_media: z.number().positive().optional().describe('Base de cotización media mensual del causante en los últimos 2 años (€). Obligatoria si el causante estaba "activo" o "no-alta".'),
-      pension_causante: z.number().positive().optional().describe('Pensión de jubilación mensual del causante (€). Obligatoria si el causante estaba "jubilado".'),
+      base_cotizacion_media: z.number().positive().optional().describe('Base de cotización media mensual del causante (€) en 24 meses seguidos elegidos por los beneficiarios dentro de los 15 años anteriores al fallecimiento (art. 7.2 del Decreto 1646/1972), no necesariamente los últimos 24. Obligatoria si el causante estaba "activo" o "no-alta".'),
+      base_reguladora_causante: z.number().positive().optional().describe('Base reguladora de la pensión que cobraba el causante, con las revalorizaciones posteriores (€/mes; art. 7.3 del Decreto 1646/1972). Es la base reguladora de la viudedad si el causante estaba "jubilado". Figura en la resolución del INSS de su pensión.'),
+      pension_causante: z.number().positive().optional().describe('Pensión mensual que cobraba el causante (€). Solo si estaba "jubilado" y falta base_reguladora_causante: se usa como aproximación, que solo coincide si cobraba el 100% de su base reguladora.'),
       tiene_cargas: z.boolean().optional().describe('¿El beneficiario convive con hijos menores de 26 años, mayores incapacitados o menores acogidos? Necesario para el 70% junto con renta_anual_unidad_familiar y miembros_unidad_familiar. Por defecto false.'),
       ingresos_mensuales_propios: z.number().min(0).optional().describe('Ingresos mensuales propios del beneficiario sin la pensión de viudedad: trabajo, capital y otras prestaciones (€, pagas extra prorrateadas). Determinan el acceso a los porcentajes del 60% y 70% y al complemento a mínimos.'),
       renta_anual_unidad_familiar: z.number().min(0).optional().describe('Ingresos anuales de toda la unidad familiar, incluidos los del beneficiario y SIN la pensión de viudedad (€/año). Para el 70%, divididos entre los miembros no pueden pasar del 75% del SMI sin pagas extra (art. 31.2 del Decreto 3158/1966). Sin este dato no se aplica el 70%.'),
       miembros_unidad_familiar: z.number().int().min(1).max(20).optional().describe('Personas de la unidad familiar, incluido el beneficiario (al menos 2 para el 70%).'),
     },
     { title: 'Estima la pensión de viudedad (porcentaje, mínimos y pensión final)', readOnlyHint: true },
-    async ({ situacion_causante, edad_beneficiario, base_cotizacion_media, pension_causante, tiene_cargas, ingresos_mensuales_propios, renta_anual_unidad_familiar, miembros_unidad_familiar }, extra) => {
+    async ({ situacion_causante, edad_beneficiario, base_cotizacion_media, base_reguladora_causante, pension_causante, tiene_cargas, ingresos_mensuales_propios, renta_anual_unidad_familiar, miembros_unidad_familiar }, extra) => {
       await registrarUsoDelegum('calcular_pension_viudedad', getCaller(extra));
       try {
         const r = calcularPensionViudedad({
           situacionCausante: situacion_causante as SituacionCausante,
           edadBeneficiario: edad_beneficiario,
           baseCotizacionMedia: base_cotizacion_media,
+          baseReguladoraCausante: base_reguladora_causante,
           pensionCausante: pension_causante,
           tieneCargas: tiene_cargas,
           ingresosMensualesPropios: ingresos_mensuales_propios,

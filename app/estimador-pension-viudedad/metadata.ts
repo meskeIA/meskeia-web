@@ -80,7 +80,7 @@ export const faqJsonLd = {
       name: '¿Cómo se calcula la base reguladora de la pensión de viudedad?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Si el fallecido era trabajador en activo, la base reguladora se calcula dividiendo las bases de cotización de los 24 meses anteriores al fallecimiento entre 28. Si ya era pensionista por jubilación o incapacidad permanente, la base reguladora de la pensión de viudedad coincide con la cuantía de la pensión que percibía. Sobre esa base se aplica el porcentaje correspondiente (52%, 60% o 70%).',
+        text: 'Si el fallecimiento se debe a una enfermedad común y el fallecido no era pensionista, la base reguladora es la suma de sus bases de cotización de 24 meses seguidos, elegidos por los beneficiarios dentro de los 15 años anteriores al fallecimiento, dividida entre 28 (art. 7.2 del Decreto 1646/1972). Si ya era pensionista de jubilación o incapacidad permanente, es la misma base reguladora que sirvió para calcular su pensión, con las revalorizaciones posteriores (art. 7.3); no coincide con lo que cobraba salvo que cobrase el 100 % de esa base. Sobre ella se aplica el porcentaje correspondiente (52 %, 60 % o 70 %).',
       },
     },
     {
@@ -88,7 +88,7 @@ export const faqJsonLd = {
       name: '¿Se pierde la pensión de viudedad si se vuelve a casar o se convive con otra persona?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'En general, contraer nuevo matrimonio implica la extinción de la pensión de viudedad. Sin embargo, desde 2010 existe una excepción: si el beneficiario tiene 61 o más años, o es declarado incapacitado permanente absoluto, o si la pensión es su única fuente de ingresos significativa, puede conservarla. La mera convivencia de hecho sin matrimonio no extingue la pensión, aunque puede generar nuevas obligaciones de comunicación a la Seguridad Social.',
+        text: 'En general, contraer nuevo matrimonio implica la extinción de la pensión de viudedad. Desde 2002 (Real Decreto 1465/2001) existe una excepción que exige cumplir a la vez tres requisitos (art. 11 de la Orden de 13/02/1967): tener más de 61 años, o menos con incapacidad permanente absoluta, gran invalidez o una discapacidad de al menos el 65 %; que la pensión de viudedad sea la principal o única fuente de ingresos, es decir, al menos el 75 % de los ingresos anuales; y que los ingresos anuales del nuevo matrimonio, pensión incluida, no superen dos veces el salario mínimo interprofesional en cómputo anual. Con la edad sola no basta. La mera convivencia de hecho sin matrimonio no extingue la pensión, aunque puede generar nuevas obligaciones de comunicación a la Seguridad Social.',
       },
     },
     {

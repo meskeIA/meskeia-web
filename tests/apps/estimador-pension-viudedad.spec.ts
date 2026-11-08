@@ -1,5 +1,6 @@
 import { test, expect, Page, Locator } from '@playwright/test';
 import { RECLAMACION_PREVIA_SS } from '../../data/fiscal/pensiones';
+import { calcularPensionViudedad } from '../../lib/calculadoras/pensionViudedad';
 import { esperarHidratacion, esperarValorEnReact, sembrarValor } from './_hidratacion';
 
 /**
@@ -76,8 +77,10 @@ import { esperarHidratacion, esperarValorEnReact, sembrarValor } from './_hidrat
 const RUTA = '/estimador-pension-viudedad/';
 
 const ROTULO = {
-  pension: 'Pensión mensual que cobraba el causante (€/mes)',
-  base: 'Base de cotización media de los últimos 2 años (€/mes)',
+  // Desde el 08/11/2026 (hallazgos 4249 y 4250): con el causante pensionista se pide la base
+  // reguladora de su pensión (art. 7.3), y en activo, la media de 24 meses seguidos (art. 7.2).
+  pension: 'Base reguladora de la pensión del causante (€/mes)',
+  base: 'Base de cotización media de 24 meses seguidos (€/mes)',
   anios: 'Años cotizados totales del causante',
   ingresos: 'Ingresos propios: trabajo, capital y otras prestaciones (€/mes)',
   rentaFamiliar: 'Ingresos anuales de toda la unidad familiar (€/año)',
@@ -526,10 +529,11 @@ test.describe('Estimador de pensión de viudedad — móvil', () => {
  *     interprofesional». Ya figura en la versión publicada el 31/12/2001: no es «desde 2010».
  */
 test.describe('Estimador de pensión de viudedad — cabo C0135', () => {
-  // ABIERTO — cabo C0135 (a). Jubilación causada en 2026 (sin revalorizaciones posteriores) con una
-  // base reguladora de 2.000 €/mes al 80 % → cobraba 1.600 €/mes. Viudo/a < 60, sin cargas, ingresos 0.
-  // Art. 7.3: BR = 2.000,00 → 52 % = 1.040,00 €/mes. La app toma la pensión como BR: 1.600,00 → 832,00.
-  test.fail('CABO C0135 (a) — causante pensionista: la BR es la de su pensión (2.000), no lo que cobraba (1.600)', async ({ page }) => {
+  // REPARADO el 08/11/2026 (hallazgo 4249) — cabo C0135 (a). Jubilación causada en 2026 (sin
+  // revalorizaciones posteriores) con una base reguladora de 2.000 €/mes al 80 % → cobraba 1.600 €/mes.
+  // Viudo/a < 60, sin cargas, ingresos 0. Art. 7.3: BR = 2.000,00 → 52 % = 1.040,00 €/mes. Antes la
+  // app tomaba la pensión como BR: 1.600,00 → 832,00. Ahora pide la base reguladora de la pensión.
+  test('CABO C0135 (a) — causante pensionista: la BR es la de su pensión (2.000), no lo que cobraba (1.600)', async ({ page }) => {
     await abrir(page);
     const texto = normalizar(await page.locator('body').innerText());
     expect(texto).not.toContain('La base reguladora de viudedad es igual a esta cifra');
@@ -546,11 +550,23 @@ test.describe('Estimador de pensión de viudedad — cabo C0135', () => {
     expect(await pensionFinal(page)).toBeCloseTo(1040, 2);
   });
 
-  // ABIERTO — cabo C0135 (b). Causante en activo con bases de 2.800 €/mes en 24 meses seguidos dentro
+  test('CABO C0135 (a) — el motor (también el del MCP) usa la base reguladora y, sin ella, avisa de que la pensión es una aproximación', () => {
+    const comun = { situacionCausante: 'jubilado' as const, edadBeneficiario: 45, ingresosMensualesPropios: 0 };
+    const conBR = calcularPensionViudedad({ ...comun, baseReguladoraCausante: 2000, pensionCausante: 1600 });
+    expect(conBR.baseReguladora).toBe(2000);
+    expect(conBR.pensionBruta).toBeCloseTo(1040, 2);
+    expect(conBR.notas.join(' ')).not.toContain('aproximada');
+    const soloPension = calcularPensionViudedad({ ...comun, pensionCausante: 1600 });
+    expect(soloPension.baseReguladora).toBe(1600);
+    expect(soloPension.notas.join(' ')).toContain('Base reguladora aproximada con la pensión que cobraba');
+  });
+
+  // REPARADO el 08/11/2026 (hallazgo 4250) — cabo C0135 (b). Causante en activo con bases de 2.800 €/mes en 24 meses seguidos dentro
   // de los 15 años anteriores y de 1.400 €/mes en los últimos 24. Viudo/a < 60, sin cargas, ingresos 0.
   // Art. 7.2: el beneficiario elige los de 2.800 → BR = 24 × 2.800 / 28 = 2.400,00 → 52 % = 1.248,00.
-  // La app pide la media «de los últimos 2 años» (1.400) → BR 1.200,00 → 624,00 → 709,40 con complemento.
-  test.fail('CABO C0135 (b) — causante en activo: 24 meses elegidos dentro de los 15 años, no los últimos 24', async ({ page }) => {
+  // Antes la app pedía la media «de los últimos 2 años» (1.400) → BR 1.200,00 → 624,00 → 709,40 con
+  // complemento. Ahora pide la de 24 meses seguidos elegidos dentro de los 15 años.
+  test('CABO C0135 (b) — causante en activo: 24 meses elegidos dentro de los 15 años, no los últimos 24', async ({ page }) => {
     await abrir(page);
     await page.getByRole('button', { name: /Trabajando/ }).click();
     const texto = normalizar(await page.locator('body').innerText());
@@ -568,12 +584,12 @@ test.describe('Estimador de pensión de viudedad — cabo C0135', () => {
     expect(await pensionFinal(page)).toBeCloseTo(1248, 2);
   });
 
-  // ABIERTO — cabo C0135 (d). Viudo/a de 63 años con 900 €/mes de viudedad (12.600 €/año) y 20.000 €/año
+  // REPARADO el 08/11/2026 (hallazgo 4251) — cabo C0135 (d). Viudo/a de 63 años con 900 €/mes de viudedad (12.600 €/año) y 20.000 €/año
   // de otros ingresos, que se casa con alguien que ingresa 25.000 €/año. Art. 11.1: tiene la edad (a),
   // pero la pensión es el 38,7 % de sus ingresos (< 75 %, falla b) y el matrimonio ingresa 57.600 €
   // (> 2 × SMI_2026.anual = 34.188 €, falla c) → se extingue. El FAQPage dice que con 61 años «puede
-  // conservarla»: presenta a) y b) como alternativas y omite c).
-  test.fail('CABO C0135 (d) — nuevo matrimonio: los requisitos a), b) y c) del art. 11.1 se exigen a la vez', async ({ page }) => {
+  // conservarla»: presentaba a) y b) como alternativas y omitía c).
+  test('CABO C0135 (d) — nuevo matrimonio: los requisitos a), b) y c) del art. 11.1 se exigen a la vez', async ({ page }) => {
     await page.goto(RUTA);
     let respuesta = '';
     for (const bloque of await page.locator('script[type="application/ld+json"]').allTextContents()) {

@@ -77,10 +77,12 @@ function calcularPension(form: FormData): Resultado | null {
   // complemento a mínimos con prueba de rentas y tope de la PNC, y neto con el IRPF real.
   const importe = leer(situacion === 'jubilado' ? form.pensionCausante : form.baseCotizacionMedia);
   if (importe <= 0) return null;
+  // Con el causante pensionista se pide la BASE REGULADORA de su pensión, no lo que cobraba
+  // (art. 7.3 del Decreto 1646/1972; hallazgo 4249).
   const calculo = calcularPensionViudedad({
     situacionCausante: situacion,
     baseCotizacionMedia: situacion === 'jubilado' ? undefined : importe,
-    pensionCausante: situacion === 'jubilado' ? importe : undefined,
+    baseReguladoraCausante: situacion === 'jubilado' ? importe : undefined,
     edadBeneficiario: edad,
     tieneCargas: form.tieneCargas,
     ingresosMensualesPropios: leer(form.ingresosTrabajoMes),
@@ -247,17 +249,17 @@ export default function EstimadorPensionViudedad() {
             <NumberInput
               value={form.pensionCausante}
               onChange={v => update('pensionCausante', v)}
-              label="Pensión mensual que cobraba el causante (€/mes)"
+              label="Base reguladora de la pensión del causante (€/mes)"
               placeholder="1400"
-              helperText="Importe bruto mensual de la pensión de jubilación. La base reguladora de viudedad es igual a esta cifra."
+              helperText={`La que sirvió para calcular su pensión de jubilación o incapacidad, con las revalorizaciones posteriores (art. 7.3 del Decreto 1646/1972). Figura en la resolución del INSS. No es lo que cobraba: solo coincide si cobraba el ${pct(100)} de su base reguladora, sin complemento a mínimos.`}
             />
           ) : (
             <NumberInput
               value={form.baseCotizacionMedia}
               onChange={v => update('baseCotizacionMedia', v)}
-              label="Base de cotización media de los últimos 2 años (€/mes)"
+              label="Base de cotización media de 24 meses seguidos (€/mes)"
               placeholder="2000"
-              helperText="Media mensual de las bases de cotización de los últimos 24 meses. Puedes consultarla en tu informe de vida laboral (Seguridad Social)."
+              helperText="Media de las bases de cotización de un período ininterrumpido de 24 meses que eliges tú dentro de los 15 años anteriores al fallecimiento (art. 7.2 del Decreto 1646/1972): conviene el de bases más altas, que no tiene por qué ser el último. Las bases figuran en el informe de bases de cotización de la Seguridad Social."
             />
           )}
 
@@ -494,11 +496,11 @@ export default function EstimadorPensionViudedad() {
           <li><strong>70&nbsp;%</strong>: exige tres cosas a la vez (art. 31.2 del Decreto 3158/1966). Cargas familiares: convivir con hijos menores de 26 años, mayores incapacitados o menores acogidos, y que los ingresos de toda la familia, divididos entre sus miembros, no pasen del 75&nbsp;% del SMI sin pagas extra ({formatCurrency(PV.limiteIngresos70 * 12)} al año por persona en 2026). Que la pensión sea la principal o única fuente de ingresos: al menos la mitad de lo que ingresa el viudo o la viuda. Y que sus ingresos anuales no pasen del límite del complemento a mínimos ({formatCurrency(COMPLEMENTO_MINIMOS_LIMITES_2026.sinConyuge)}) más la cuantía mínima de viudedad de su edad. Si la pensión al 70&nbsp;% más esos ingresos superan ese límite, la pensión se reduce hasta no superarlo (art. 31.3).</li>
         </ul>
         <h3>¿Cómo se calcula la base reguladora?</h3>
-        <p>Si el causante era pensionista: la base reguladora es igual al importe de su pensión. Si fallecía en activo: se toman las bases de cotización de los últimos 24 meses y se divide entre 28 (para obtener el equivalente mensual, incluyendo pagas extras).</p>
+        <p>Si el causante era pensionista de jubilación o incapacidad permanente: la base reguladora es la misma que sirvió para calcular su pensión, con las revalorizaciones posteriores (art. 7.3 del Decreto 1646/1972). No es lo que cobraba: solo coinciden si cobraba el 100&nbsp;% de su base reguladora, sin complemento a mínimos ni tope. Si fallecía en activo o sin estar en alta, por enfermedad común: se suman las bases de cotización de 24 meses seguidos, elegidos por los beneficiarios dentro de los 15 años anteriores al fallecimiento, y se divide entre 28 para obtener el equivalente mensual, incluyendo pagas extras (art. 7.2).</p>
         <h3>Parejas de hecho</h3>
         <p>Desde 2007 las parejas de hecho tienen acceso a la pensión de viudedad, con requisitos adicionales: inscripción en el registro autonómico o municipal (o constitución en documento público) con al menos 2 años de antelación al fallecimiento, y convivencia estable y notoria de al menos 5 años, acreditada con el empadronamiento, salvo que haya hijos en común. Desde la Ley 21/2021 ya no se exige ningún requisito de ingresos al superviviente (art. 221 LGSS).</p>
         <h3>Compatibilidades e incompatibilidades</h3>
-        <p>La pensión de viudedad es compatible con el trabajo y con la pensión de jubilación propia. Sin embargo, puede reducirse o extinguirse si el beneficiario contrae nuevo matrimonio (salvo excepciones para mayores de 61 años con pensión insuficiente).</p>
+        <p>La pensión de viudedad es compatible con el trabajo y con la pensión de jubilación propia. Sin embargo, se extingue si el beneficiario contrae nuevo matrimonio, salvo que cumpla a la vez los tres requisitos de la excepción del art. 11 de la Orden de 13/02/1967 (ver la pregunta sobre volver a casarse).</p>
         <h3>¿Cómo solicitarla?</h3>
         <p>En cualquier oficina de la Seguridad Social, por teléfono (901 10 65 70) o a través de Import@SS (sede electrónica). Presentar: DNI, certificado de matrimonio/convivencia, libro de familia, certificado de defunción y documentación laboral del causante.</p>
 
@@ -574,8 +576,8 @@ export default function EstimadorPensionViudedad() {
           </details>
           <details className={styles.faqItem}>
             <summary>¿Qué ocurre si me vuelvo a casar?</summary>
-            <p>Si el beneficiario contrae nuevo matrimonio, pierde el derecho a la pensión de viudedad. No obstante, puede recuperarla si el nuevo matrimonio se disuelve (fallecimiento, divorcio, separación), siempre que se cumplan los requisitos. En viudas mayores de 61 años, la norma es más flexible.</p>
-            <p className={styles.faqTip}><span aria-hidden="true">💡</span> Desde 2010, existen excepciones: viudas/viudos mayores de 61 años o con pensión de viudedad superior al 75&nbsp;% de sus ingresos pueden mantenerla tras nuevo matrimonio.</p>
+            <p>Si el beneficiario contrae nuevo matrimonio, pierde el derecho a la pensión de viudedad. No obstante, puede recuperarla si el nuevo matrimonio se disuelve (fallecimiento, divorcio, separación), siempre que se cumplan los requisitos.</p>
+            <p className={styles.faqTip}><span aria-hidden="true">💡</span> Hay una excepción, vigente desde 2002 (Real Decreto 1465/2001), que exige cumplir a la vez tres requisitos (art. 11 de la Orden de 13/02/1967): tener más de 61 años, o menos con incapacidad permanente absoluta, gran invalidez o una discapacidad de al menos el 65&nbsp;%; que la pensión de viudedad sea la principal o única fuente de ingresos (al menos el 75&nbsp;% de los ingresos anuales); y que los ingresos anuales del nuevo matrimonio, pensión incluida, no superen dos veces el salario mínimo interprofesional en cómputo anual. Con la edad sola no basta.</p>
           </details>
           <details className={styles.faqItem}>
             <summary>¿Cuáles son los requisitos de cotización del fallecido?</summary>
@@ -695,7 +697,7 @@ export default function EstimadorPensionViudedad() {
             <li><strong>Solicitar fuera del plazo de 3 meses:</strong> Pasado ese plazo, se pierde retroactividad y la prestación empieza desde la fecha de solicitud, no desde el fallecimiento.</li>
             <li><strong>No acreditar la convivencia en parejas de hecho:</strong> Sin la inscripción en el registro con al menos 2 años de antelación al fallecimiento, no hay derecho a pensión de viudedad para parejas no casadas.</li>
             <li><strong>Confundir pensión de viudedad con pensión de orfandad:</strong> Son prestaciones distintas. Los hijos no cobran viudedad; el cónyuge no cobra orfandad. Cada uno solicita la suya por separado.</li>
-            <li><strong>Asumir que el nuevo matrimonio siempre extingue el derecho:</strong> Hay excepciones para mayores de 61 años o cuando la pensión representa la mayor parte de los ingresos.</li>
+            <li><strong>Creer que basta con la edad para conservarla al volver a casarse:</strong> La excepción exige a la vez más de 61 años (o incapacidad o discapacidad), que la pensión sea al menos el 75&nbsp;% de los ingresos y que el nuevo matrimonio no ingrese más de dos veces el SMI anual. Si no se cumplen las tres y no se comunica la boda, habrá que devolver lo cobrado.</li>
             <li><strong>No declarar cambios de ingresos:</strong> Si tus ingresos aumentan significativamente (herencia, nueva nómina, etc.) y no lo comunicas, puede generarse una deuda con la Seguridad Social.</li>
             <li><strong>Olvidar solicitar la pensión de orfandad para los hijos:</strong> La pensión de viudedad no incluye automáticamente la de orfandad. Es una solicitud separada que debe tramitarse también, evitando así perder retroactividad también en esa prestación.</li>
           </ul>
