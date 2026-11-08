@@ -1447,7 +1447,7 @@ export default function Page() {
 
           <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
-              <span className={styles.warningIcon}>⚠️</span>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               Errores Frecuentes
             </div>
             <ul className={styles.warningList}>

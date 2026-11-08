@@ -526,7 +526,7 @@ export default function CalculadoraIvaPage() {
         {/* Warning Box */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <strong>Errores frecuentes con el IVA que puedes evitar</strong>
           </div>
           <ul className={styles.warningList}>
