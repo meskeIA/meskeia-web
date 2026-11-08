@@ -43,6 +43,10 @@ const APPS: App[] = [
   // en claro, 2,39-3,96 en oscuro), el «Punto crítico» en #C0392B (2,88 en oscuro) y las
   // «Limitaciones» en --text-muted sobre su velo oscuro (4,40). Las cuatro pestañas
   { slug: 'visualizador-ciclo-carbono-completo', todo: true, secciones: "[role='tab']" },
+  // Blanco sobre el color del estado activo (2,0-4,0:1), cabeceras de la tabla, nombres de las
+  // transiciones, estado del agua y cifras de la escala en su color de datos (1,08-4,35:1 en los
+  // dos temas). Las cuatro secciones
+  { slug: 'visualizador-estados-materia', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
 ];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {

@@ -38,7 +38,12 @@ interface EstadoInfo {
   id: EstadoMateria;
   nombre: string;
   icono: string;
+  /** Color de datos: partículas */
   color: string;
+  /** Color del TEXTO por tema (token del módulo): `color` como texto daba 2,06-4,16:1 (C0645) */
+  tono: string;
+  /** Fondo del botón activo, igual en los dos temas: texto blanco encima a 5,02-5,87:1 */
+  fondo: string;
   forma: string;
   volumen: string;
   compresibilidad: string;
@@ -48,22 +53,22 @@ interface EstadoInfo {
 
 const ESTADOS: EstadoInfo[] = [
   {
-    id: 'solido', nombre: 'Sólido', icono: '🧊', color: '#2196F3',
+    id: 'solido', nombre: 'Sólido', icono: '🧊', color: '#2196F3', tono: 'var(--azul-texto)', fondo: '#1565C0',
     forma: 'Definida', volumen: 'Definido', compresibilidad: 'Muy baja', energiaCinetica: 'Baja',
     descripcion: 'Las partículas vibran en posiciones fijas, manteniendo forma y volumen constantes.',
   },
   {
-    id: 'liquido', nombre: 'Líquido', icono: '💧', color: '#48A9A6',
+    id: 'liquido', nombre: 'Líquido', icono: '💧', color: '#48A9A6', tono: 'var(--teal-texto)', fondo: '#327874',
     forma: 'Variable (toma la del recipiente)', volumen: 'Definido', compresibilidad: 'Baja', energiaCinetica: 'Media',
     descripcion: 'Las partículas se deslizan unas sobre otras, manteniendo volumen pero adaptándose al recipiente.',
   },
   {
-    id: 'gas', nombre: 'Gas', icono: '💨', color: '#FF9800',
+    id: 'gas', nombre: 'Gas', icono: '💨', color: '#FF9800', tono: 'var(--anaranjado-texto)', fondo: '#B45309',
     forma: 'Variable', volumen: 'Variable', compresibilidad: 'Alta', energiaCinetica: 'Alta',
     descripcion: 'Las partículas se mueven libremente a gran velocidad, ocupando todo el espacio disponible.',
   },
   {
-    id: 'plasma', nombre: 'Plasma', icono: '⚡', color: '#E91E63',
+    id: 'plasma', nombre: 'Plasma', icono: '⚡', color: '#E91E63', tono: 'var(--rosa-texto)', fondo: '#C2185B',
     forma: 'Variable', volumen: 'Variable', compresibilidad: 'Alta', energiaCinetica: 'Muy alta',
     descripcion: 'Gas ionizado: los electrones se separan de los átomos, creando un estado cargado eléctricamente.',
   },
@@ -80,16 +85,19 @@ interface Transicion {
   ejemplo: string;
   detalle: string;
   icono: string;
+  /** Color de datos: borde de la tarjeta abierta */
   color: string;
+  /** Color del nombre por tema (token del módulo): `color` como texto daba 2,16-4,32:1 (C0645) */
+  tono: string;
 }
 
 const TRANSICIONES: Transicion[] = [
-  { nombre: 'Fusión', desde: 'Sólido', hasta: 'Líquido', ejemplo: 'Hielo derritiéndose', detalle: 'El calor rompe la estructura cristalina. El agua pasa de hielo a líquida a 0°C (a presión atmosférica).', icono: '🧊→💧', color: '#2196F3' },
-  { nombre: 'Solidificación', desde: 'Líquido', hasta: 'Sólido', ejemplo: 'Agua congelándose en el freezer', detalle: 'Al perder energía, las moléculas se ordenan en una estructura cristalina. Es el proceso inverso a la fusión.', icono: '💧→🧊', color: '#1565C0' },
-  { nombre: 'Evaporación', desde: 'Líquido', hasta: 'Gas', ejemplo: 'Charco que desaparece al sol', detalle: 'Las moléculas más rápidas de la superficie escapan al aire. A 100°C (presión normal), todo el líquido hierve.', icono: '💧→💨', color: '#48A9A6' },
-  { nombre: 'Condensación', desde: 'Gas', hasta: 'Líquido', ejemplo: 'Vaho en el espejo del baño', detalle: 'El vapor de agua pierde energía al tocar la superficie fría y se convierte en gotitas líquidas.', icono: '💨→💧', color: '#00897B' },
-  { nombre: 'Sublimación', desde: 'Sólido', hasta: 'Gas', ejemplo: 'Hielo seco (CO₂), naftalina', detalle: 'El sólido pasa directamente a gas sin pasar por líquido. Ocurre cuando la presión es muy baja o el sólido es volátil.', icono: '🧊→💨', color: '#FF9800' },
-  { nombre: 'Deposición', desde: 'Gas', hasta: 'Sólido', ejemplo: 'Escarcha formándose en la hierba', detalle: 'El vapor de agua se congela directamente sobre superficies frías, formando cristales de hielo sin pasar por líquido.', icono: '💨→🧊', color: '#E65100' },
+  { nombre: 'Fusión', desde: 'Sólido', hasta: 'Líquido', ejemplo: 'Hielo derritiéndose', detalle: 'El calor rompe la estructura cristalina. El agua pasa de hielo a líquida a 0°C (a presión atmosférica).', icono: '🧊→💧', color: '#2196F3', tono: 'var(--azul-texto)' },
+  { nombre: 'Solidificación', desde: 'Líquido', hasta: 'Sólido', ejemplo: 'Agua congelándose en el freezer', detalle: 'Al perder energía, las moléculas se ordenan en una estructura cristalina. Es el proceso inverso a la fusión.', icono: '💧→🧊', color: '#1565C0', tono: 'var(--azul-intenso-texto)' },
+  { nombre: 'Evaporación', desde: 'Líquido', hasta: 'Gas', ejemplo: 'Charco que desaparece al sol', detalle: 'Las moléculas más rápidas de la superficie escapan al aire. A 100°C (presión normal), todo el líquido hierve.', icono: '💧→💨', color: '#48A9A6', tono: 'var(--teal-texto)' },
+  { nombre: 'Condensación', desde: 'Gas', hasta: 'Líquido', ejemplo: 'Vaho en el espejo del baño', detalle: 'El vapor de agua pierde energía al tocar la superficie fría y se convierte en gotitas líquidas.', icono: '💨→💧', color: '#00897B', tono: 'var(--teal-intenso-texto)' },
+  { nombre: 'Sublimación', desde: 'Sólido', hasta: 'Gas', ejemplo: 'Hielo seco (CO₂), naftalina', detalle: 'El sólido pasa directamente a gas sin pasar por líquido. Ocurre cuando la presión es muy baja o el sólido es volátil.', icono: '🧊→💨', color: '#FF9800', tono: 'var(--anaranjado-texto)' },
+  { nombre: 'Deposición', desde: 'Gas', hasta: 'Sólido', ejemplo: 'Escarcha formándose en la hierba', detalle: 'El vapor de agua se congela directamente sobre superficies frías, formando cristales de hielo sin pasar por líquido.', icono: '💨→🧊', color: '#E65100', tono: 'var(--naranja-intenso-texto)' },
 ];
 
 // ─────────────────────────────────────────────
@@ -120,18 +128,21 @@ const CURIOSIDADES: Curiosidad[] = [
 interface PuntoEscala {
   temp: string;
   label: string;
+  /** Color de datos: el punto de la escala */
   color: string;
+  /** Color de la cifra por tema (token del módulo): `color` como texto daba 1,08-4,35:1 (C0645) */
+  tono: string;
 }
 
 const ESCALA_TEMPERATURAS: PuntoEscala[] = [
-  { temp: '−273,15 °C', label: 'Cero absoluto', color: '#1A237E' },
-  { temp: '−196 °C', label: 'Nitrógeno líquido', color: '#1565C0' },
-  { temp: '−78 °C', label: 'Hielo seco (CO₂)', color: '#2196F3' },
-  { temp: '0 °C', label: 'Agua se congela', color: '#4FC3F7' },
-  { temp: '100 °C', label: 'Agua hierve', color: '#FF9800' },
-  { temp: '1.538 °C', label: 'Hierro funde', color: '#E65100' },
-  { temp: '5.500 °C', label: 'Superficie del Sol', color: '#F44336' },
-  { temp: '15.000.000 °C', label: 'Núcleo del Sol', color: '#E91E63' },
+  { temp: '−273,15 °C', label: 'Cero absoluto', color: '#1A237E', tono: 'var(--indigo-texto)' },
+  { temp: '−196 °C', label: 'Nitrógeno líquido', color: '#1565C0', tono: 'var(--azul-intenso-texto)' },
+  { temp: '−78 °C', label: 'Hielo seco (CO₂)', color: '#2196F3', tono: 'var(--azul-texto)' },
+  { temp: '0 °C', label: 'Agua se congela', color: '#4FC3F7', tono: 'var(--celeste-texto)' },
+  { temp: '100 °C', label: 'Agua hierve', color: '#FF9800', tono: 'var(--anaranjado-texto)' },
+  { temp: '1.538 °C', label: 'Hierro funde', color: '#E65100', tono: 'var(--naranja-intenso-texto)' },
+  { temp: '5.500 °C', label: 'Superficie del Sol', color: '#F44336', tono: 'var(--rojo-dato-texto)' },
+  { temp: '15.000.000 °C', label: 'Núcleo del Sol', color: '#E91E63', tono: 'var(--rosa-texto)' },
 ];
 
 // ─────────────────────────────────────────────
@@ -277,6 +288,8 @@ export default function VisualizadorEstadosMateria() {
   // Estado del agua según temperatura (slider de transiciones)
   const estadoAgua = temperatura <= 0 ? 'Sólido (hielo)' : temperatura < 100 ? 'Líquido (agua)' : 'Gas (vapor)';
   const estadoAguaColor = temperatura <= 0 ? '#2196F3' : temperatura < 100 ? '#48A9A6' : '#FF9800';
+  // El mismo estado como TEXTO (cifra y nombre): el color de datos daba 1,98-4,04:1 (C0645)
+  const estadoAguaTono = temperatura <= 0 ? 'var(--azul-texto)' : temperatura < 100 ? 'var(--teal-texto)' : 'var(--anaranjado-texto)';
 
   // ─────────────────────────────────────────────
   // Diagrama de fases: zonas SVG
@@ -331,7 +344,7 @@ export default function VisualizadorEstadosMateria() {
               className={`${styles.estadoBtn} ${estadoActivo === e.id ? styles.estadoBtnActivo : ''}`}
               onClick={() => setEstadoActivo(e.id)}
               aria-pressed={estadoActivo === e.id}
-              style={estadoActivo === e.id ? { borderColor: e.color, background: e.color } : undefined}
+              style={estadoActivo === e.id ? { borderColor: e.fondo, background: e.fondo } : undefined}
             >
               <span aria-hidden="true">{e.icono}</span>
               <span className={styles.estadoBtnNombre}>{e.nombre}</span>
@@ -367,7 +380,7 @@ export default function VisualizadorEstadosMateria() {
               <tr>
                 <th>Propiedad</th>
                 {ESTADOS.map(e => (
-                  <th key={e.id} style={{ color: e.color }}>
+                  <th key={e.id} style={{ color: e.tono }}>
                     <span aria-hidden="true">{e.icono}</span>{' '}{e.nombre}
                   </th>
                 ))}
@@ -425,7 +438,7 @@ export default function VisualizadorEstadosMateria() {
             style={transicionActiva === i ? { borderColor: t.color } : undefined}
           >
             <span className={styles.transicionIcono} aria-hidden="true">{t.icono}</span>
-            <span className={styles.transicionNombre} style={{ color: t.color }}>{t.nombre}</span>
+            <span className={styles.transicionNombre} style={{ color: t.tono }}>{t.nombre}</span>
             <span className={styles.transicionDir}>{t.desde} → {t.hasta}</span>
             {transicionActiva === i && (
               <div className={styles.transicionDetalle}>
@@ -443,7 +456,7 @@ export default function VisualizadorEstadosMateria() {
       <h3 className={styles.subtituloSeccion}>Estado del agua según la temperatura</h3>
       <div className={styles.sliderContainer}>
         <label htmlFor="temp-slider" className={styles.sliderLabel}>
-          Temperatura: <strong style={{ color: estadoAguaColor }}>{formatNumber(temperatura, 0)} °C</strong>
+          Temperatura: <strong style={{ color: estadoAguaTono }}>{formatNumber(temperatura, 0)} °C</strong>
         </label>
         <input
           id="temp-slider"
@@ -461,7 +474,7 @@ export default function VisualizadorEstadosMateria() {
           <span>200 °C</span>
         </div>
         <div className={styles.sliderResultado} role="alert" aria-live="polite" style={{ borderLeftColor: estadoAguaColor }}>
-          <span className={styles.sliderEstado} style={{ color: estadoAguaColor }}>{estadoAgua}</span>
+          <span className={styles.sliderEstado} style={{ color: estadoAguaTono }}>{estadoAgua}</span>
           <span className={styles.sliderDetalle}>
             <span>{temperatura <= 0 && 'Las moléculas están fijas en una estructura cristalina hexagonal.'}</span>
             <span>{temperatura > 0 && temperatura < 100 && 'Las moléculas fluyen libremente pero mantienen contacto entre sí.'}</span>
@@ -618,7 +631,7 @@ export default function VisualizadorEstadosMateria() {
       <div className={styles.escalaContainer}>
         {ESCALA_TEMPERATURAS.map(p => (
           <div key={p.label} className={styles.escalaPunto}>
-            <span className={styles.escalaTemp} style={{ color: p.color }}>{p.temp}</span>
+            <span className={styles.escalaTemp} style={{ color: p.tono }}>{p.temp}</span>
             <span className={styles.escalaBarra} style={{ backgroundColor: p.color }} aria-hidden="true" />
             <span className={styles.escalaLabel}>{p.label}</span>
           </div>
