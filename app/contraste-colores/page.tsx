@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import styles from './ContrasteColores.module.css';
+import BotonCuentagotas, { useCuentagotasDisponible } from './Cuentagotas';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, EducationalSection, ShareCard,
@@ -79,6 +80,9 @@ export default function ContrasteColoresPage() {
   const [copied, setCopied] = useState(false);
   const [htmlCode, setHtmlCode] = useState<string>('');
   const [htmlExpanded, setHtmlExpanded] = useState(false);
+  // Cuentagotas de pantalla (S0261): solo en Chromium de escritorio
+  const cuentagotasDisponible = useCuentagotasDisponible();
+  const [avisoCuentagotas, setAvisoCuentagotas] = useState('');
 
   const result = useMemo(() => {
     const ratio = getContrastRatio(foreground, background);
@@ -297,6 +301,19 @@ export default function ContrasteColoresPage() {
         <div className={styles.panel}>
           <h2 className={styles.panelTitle}>Configuración</h2>
 
+          {cuentagotasDisponible && (
+            <div className={styles.cuentagotasAyuda}>
+              <p className={styles.cuentagotasTitulo}>
+                <span aria-hidden="true">💧</span> ¿Quieres comprobar una web que ya existe?
+              </p>
+              <p>
+                Ábrela en otra ventana, visible a la vez que esta. Pulsa «Coger el color de texto de
+                la pantalla» y haz clic sobre una letra de esa web; después haz lo mismo con su fondo.
+                Solo se lee el color del punto que eliges, nunca una imagen de tu pantalla.
+              </p>
+            </div>
+          )}
+
           {/* Color de texto */}
           <div className={styles.colorGroup}>
             <label htmlFor="fgHexInput" className={styles.label}>Color de Texto (Foreground)</label>
@@ -328,6 +345,9 @@ export default function ContrasteColoresPage() {
                 aria-hidden="true"
               />
             </div>
+            {cuentagotasDisponible && (
+              <BotonCuentagotas destino="texto" onColor={setForeground} onAviso={setAvisoCuentagotas} />
+            )}
           </div>
 
           {/* Botón Swap */}
@@ -366,7 +386,12 @@ export default function ContrasteColoresPage() {
                 aria-hidden="true"
               />
             </div>
+            {cuentagotasDisponible && (
+              <BotonCuentagotas destino="fondo" onColor={setBackground} onAviso={setAvisoCuentagotas} />
+            )}
           </div>
+
+          <p className={styles.cuentagotasEstado} role="status" aria-live="polite">{avisoCuentagotas}</p>
 
           {/* Presets */}
           <div className={styles.presetsSection}>

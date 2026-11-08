@@ -317,6 +317,67 @@
   color: var(--primary-texto);
 }
 
+/* Cuentagotas de pantalla (S0261) */
+.cuentagotasAyuda {
+  background: var(--hover);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.cuentagotasAyuda p {
+  margin: 0;
+}
+
+.cuentagotasAyuda .cuentagotasTitulo {
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: var(--spacing-xs);
+}
+
+.cuentagotasBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  margin-top: var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: 0.9rem;
+  font-weight: 600;
+  border: 1px solid var(--primary-boton);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  color: var(--primary-texto);
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.cuentagotasBtn:hover {
+  background: var(--hover);
+}
+
+.cuentagotasBtn:focus-visible {
+  outline: 2px solid var(--primary-texto);
+  outline-offset: 2px;
+}
+
+.cuentagotasBtn:disabled {
+  opacity: 0.75;
+  cursor: progress;
+}
+
+.cuentagotasEstado {
+  margin: 0 0 var(--spacing-md);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.cuentagotasEstado:empty {
+  margin: 0;
+}
+
 /* Presets */
 .presetsSection {
   border-top: 1px solid var(--border);

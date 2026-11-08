@@ -36,6 +36,7 @@ export const jsonLd = generateWebAppSchema({
       "8 combinaciones predefinidas (presets) con estilos habituales en diseño web",
       "Vista previa en vivo del contraste con ejemplos de texto normal y grande",
       "Generación de código CSS con variables validadas listas para copiar y usar",
+      "Cuentagotas de pantalla para tomar los colores de una web abierta en otra ventana (Chrome, Edge y navegadores basados en Chromium de escritorio)",
       "Gratuito, sin registro ni instalación",
   ],
 });
@@ -82,6 +83,14 @@ export const faqJsonLd = {
       acceptedAnswer: {
         '@type': 'Answer',
         text: 'En España, el Real Decreto 1112/2018 transpone la Directiva Europea 2016/2102 y obliga a los sitios web y aplicaciones del sector público a cumplir al menos el nivel WCAG 2.1 AA. Para el sector privado no existe una obligación legal general, aunque la normativa europea de accesibilidad (European Accessibility Act) extiende requisitos a empresas privadas en determinados servicios digitales a partir de junio de 2025.',
+      },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Puedo comprobar el contraste de una web que ya está publicada?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'Sí, sin buscar sus códigos de color. En Chrome, Edge y otros navegadores basados en Chromium de escritorio aparece un botón de cuentagotas: abre la web en otra ventana, pulsa el botón y haz clic sobre una letra de esa web, y después sobre su fondo. La herramienta solo recibe el color del punto elegido, nunca una imagen de la pantalla. En Firefox, Safari y el móvil el navegador no ofrece esa función, así que hay que escribir el código hexadecimal de cada color.',
       },
     },
   ],
