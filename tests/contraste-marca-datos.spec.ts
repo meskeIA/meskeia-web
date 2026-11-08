@@ -54,6 +54,10 @@ const APPS: App[] = [
   // Título de la zona, rótulo de cada barra de la tonotopía y nota de cada frecuencia en su color
   // de datos: 1,52-4,11:1 en claro (el amarillo f1c40f, 1,52) y 3,08-4,44 en oscuro
   { slug: 'visualizador-oido-equilibrio', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
+  // Títulos de función, órgano, paso y patología y el dato del órgano en su color de datos
+  // (2,19-4,11:1), blanco sobre la marca y el rojo de insignias y pasos (3,82-4,11) y el botón del
+  // órgano activo con texto blanco sobre la tarjeta blanca (1,00)
+  { slug: 'visualizador-sistema-linfatico', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
 ];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {

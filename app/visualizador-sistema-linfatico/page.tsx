@@ -33,6 +33,32 @@ const SECCIONES: SeccionInfo[] = [
 ];
 
 // ─────────────────────────────────────────────
+// Tono de texto y fondo de botón de cada color de datos (cabo C0645)
+// ─────────────────────────────────────────────
+
+/**
+ * El color de datos pintado como texto daba 2,19-4,11:1, y como fondo con texto blanco 3,82-4,11
+ * (el botón del órgano activo ponía además blanco sobre la tarjeta blanca: 1,00). `tono` es el
+ * color del TEXTO, que cambia con el tema (tokens de globals con reserva oscura, o del módulo);
+ * `fondo`, el de un botón activo o una insignia, igual en los dos temas (blanco encima a
+ * 5,15-8,55:1). El color de datos sigue en bordes, círculos y tintes.
+ */
+const TONOS: Record<string, { tono: string; fondo: string }> = {
+  '#2E86AB': { tono: 'var(--primary-texto)', fondo: '#26718F' },
+  '#48A9A6': { tono: 'var(--secondary-texto)', fondo: '#327874' },
+  '#7FB3D3': { tono: 'var(--acento-texto)', fondo: '#2C6E99' },
+  '#8e44ad': { tono: 'var(--morado-texto)', fondo: '#6C3483' },
+  '#e74c3c': { tono: 'var(--rojo-texto, #F87171)', fondo: '#C0392B' },
+  '#c0392b': { tono: 'var(--rojo-texto, #F87171)', fondo: '#A93226' },
+  '#f39c12': { tono: 'var(--ambar-texto, #F5B041)', fondo: '#8E5B00' },
+  '#27ae60': { tono: 'var(--verde-texto, #5FD08A)', fondo: '#196F3D' },
+  '#3498db': { tono: 'var(--azul-texto)', fondo: '#1F6FB2' },
+  '#9b59b6': { tono: 'var(--violeta-texto)', fondo: '#7D3C98' },
+};
+const tonoDe = (color: string): string => TONOS[color]?.tono ?? 'var(--text-primary)';
+const fondoDe = (color: string): string => TONOS[color]?.fondo ?? color;
+
+// ─────────────────────────────────────────────
 // Datos: 3 funciones principales
 // ─────────────────────────────────────────────
 
@@ -283,7 +309,7 @@ function SeccionFunciones() {
           >
             <div className={styles.funcionHeader}>
               <span className={styles.funcionIcono} aria-hidden="true">{f.icono}</span>
-              <h3 className={styles.funcionTitulo} style={{ color: f.color }}>{f.titulo}</h3>
+              <h3 className={styles.funcionTitulo} style={{ color: tonoDe(f.color) }}>{f.titulo}</h3>
             </div>
             <p className={styles.funcionDesc}>{f.descripcion}</p>
             {funcionActiva === f.titulo && (
@@ -335,7 +361,7 @@ function SeccionOrganos() {
 
       <div className={styles.organosCategoria}>
         <h3 className={styles.categoriaLabel}>
-          <span className={styles.categoriaBadge} style={{ background: '#8e44ad' }}>Primarios</span>
+          <span className={styles.categoriaBadge} style={{ background: fondoDe('#8e44ad') }}>Primarios</span>
           <span className={styles.categoriaDesc}>Donde maduran los linfocitos</span>
         </h3>
         <div className={styles.organosBtns}>
@@ -344,7 +370,7 @@ function SeccionOrganos() {
               key={o.id}
               type="button"
               className={`${styles.organoBtn} ${organoActivo === o.id ? styles.organoBtnActivo : ''}`}
-              style={{ borderColor: organoActivo === o.id ? o.color : undefined }}
+              style={organoActivo === o.id ? { borderColor: fondoDe(o.color), background: fondoDe(o.color) } : undefined}
               onClick={() => setOrganoActivo(o.id)}
               aria-pressed={organoActivo === o.id}
             >
@@ -357,7 +383,7 @@ function SeccionOrganos() {
 
       <div className={styles.organosCategoria}>
         <h3 className={styles.categoriaLabel}>
-          <span className={styles.categoriaBadge} style={{ background: '#2E86AB' }}>Secundarios</span>
+          <span className={styles.categoriaBadge} style={{ background: fondoDe('#2E86AB') }}>Secundarios</span>
           <span className={styles.categoriaDesc}>Donde se activan los linfocitos</span>
         </h3>
         <div className={styles.organosBtns}>
@@ -366,7 +392,7 @@ function SeccionOrganos() {
               key={o.id}
               type="button"
               className={`${styles.organoBtn} ${organoActivo === o.id ? styles.organoBtnActivo : ''}`}
-              style={{ borderColor: organoActivo === o.id ? o.color : undefined }}
+              style={organoActivo === o.id ? { borderColor: fondoDe(o.color), background: fondoDe(o.color) } : undefined}
               onClick={() => setOrganoActivo(o.id)}
               aria-pressed={organoActivo === o.id}
             >
@@ -382,10 +408,10 @@ function SeccionOrganos() {
           <div className={styles.organoDetalleHeader}>
             <span aria-hidden="true" className={styles.organoDetalleIcono}>{organo.icono}</span>
             <div>
-              <h3 className={styles.organoNombre} style={{ color: organo.color }}>{organo.nombre}</h3>
+              <h3 className={styles.organoNombre} style={{ color: tonoDe(organo.color) }}>{organo.nombre}</h3>
               <span
                 className={styles.organoTipoBadge}
-                style={{ background: organo.tipo === 'primario' ? '#8e44ad' : '#2E86AB' }}
+                style={{ background: fondoDe(organo.tipo === 'primario' ? '#8e44ad' : '#2E86AB') }}
               >
                 Órgano {organo.tipo}
               </span>
@@ -407,7 +433,7 @@ function SeccionOrganos() {
             </div>
             <div className={styles.organoInfoItem}>
               <span className={styles.organoInfoLabel}><span aria-hidden="true">📊</span> Dato</span>
-              <span className={styles.organoInfoTexto} style={{ color: organo.color, fontWeight: 700 }}>{organo.dato}</span>
+              <span className={styles.organoInfoTexto} style={{ color: tonoDe(organo.color), fontWeight: 700 }}>{organo.dato}</span>
             </div>
           </div>
         </div>
@@ -446,7 +472,7 @@ function SeccionFlujo() {
             key={i}
             type="button"
             className={`${styles.pasoBtn} ${pasoActivo === i ? styles.pasoBtnActivo : ''}`}
-            style={{ background: pasoActivo === i ? p.color : undefined, borderColor: pasoActivo === i ? p.color : undefined }}
+            style={{ background: pasoActivo === i ? fondoDe(p.color) : undefined, borderColor: pasoActivo === i ? fondoDe(p.color) : undefined }}
             onClick={() => setPasoActivo(i)}
             aria-pressed={pasoActivo === i}
             aria-label={`Paso ${i + 1}: ${p.titulo}`}
@@ -460,9 +486,9 @@ function SeccionFlujo() {
       {/* Detalle del paso */}
       <div className={styles.pasoDetalle} style={{ borderLeftColor: paso.color }}>
         <div className={styles.pasoDetalleHeader}>
-          <span className={styles.pasoDetalleNum} style={{ background: paso.color }} aria-hidden="true">{paso.num}</span>
+          <span className={styles.pasoDetalleNum} style={{ background: fondoDe(paso.color) }} aria-hidden="true">{paso.num}</span>
           <span className={styles.pasoDetalleIcono} aria-hidden="true">{paso.icono}</span>
-          <h3 className={styles.pasoDetalleTitulo} style={{ color: paso.color }}>{paso.titulo}</h3>
+          <h3 className={styles.pasoDetalleTitulo} style={{ color: tonoDe(paso.color) }}>{paso.titulo}</h3>
         </div>
         <p className={styles.pasoDetalleDesc}>{paso.descripcion}</p>
       </div>
@@ -538,7 +564,7 @@ function SeccionFallos() {
           >
             <div className={styles.patologiaHeader}>
               <span className={styles.patologiaIcono} aria-hidden="true">{p.icono}</span>
-              <h3 className={styles.patologiaNombre} style={{ color: p.color }}>{p.nombre}</h3>
+              <h3 className={styles.patologiaNombre} style={{ color: tonoDe(p.color) }}>{p.nombre}</h3>
               <span className={styles.patologiaToggle} aria-hidden="true">
                 {patologiaActiva === p.nombre ? '▲' : '▼'}
               </span>
