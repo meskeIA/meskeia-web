@@ -66,6 +66,10 @@ const APPS: App[] = [
   // siglas de la CPU y latencias en su color de datos (1,59-4,11:1 en claro, 1,99-3,60 en oscuro)
   // y blanco sobre las barras de memoria y la insignia de fase (1,66-4,11)
   { slug: 'visualizador-arquitectura-computador', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
+  // Blanco sobre el número de cada paso (2,15-4,23:1), y las temperaturas, las fórmulas y el GWP
+  // de cada gas, el porcentaje de cada fuente y los grados de cada escenario en su color de datos
+  // (2,15-4,23 en claro, 1,73-3,90 en oscuro)
+  { slug: 'visualizador-efecto-invernadero', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
 ];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {

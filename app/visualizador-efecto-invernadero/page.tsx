@@ -37,6 +37,25 @@ const SECCIONES: SeccionInfo[] = [
 // Datos de los gases
 // ─────────────────────────────────────────────
 
+/**
+ * Tono de TEXTO y relleno con texto blanco de cada color de datos (cabo C0645): pintados como
+ * texto daban 2,15-4,23:1 en claro y 1,73-3,90 en oscuro, y el blanco sobre el número de cada paso
+ * 2,15-4,23. `tono` cambia con el tema (tokens de globals con reserva oscura, o del módulo);
+ * `fondo` es igual en los dos (blanco encima a 5,02-7,10:1). El color de datos sigue en bordes y
+ * barras.
+ */
+const TONOS: Record<string, { tono: string; fondo: string }> = {
+  '#EF4444': { tono: 'var(--rojo-texto, #F87171)', fondo: '#B91C1C' },
+  '#F59E0B': { tono: 'var(--ambar-texto, #F5B041)', fondo: '#B45309' },
+  '#8B5CF6': { tono: 'var(--violeta-texto)', fondo: '#6D28D9' },
+  '#3B82F6': { tono: 'var(--azul-texto)', fondo: '#1D4ED8' },
+  '#22C55E': { tono: 'var(--verde-texto, #5FD08A)', fondo: '#15803D' },
+  '#6B7280': { tono: 'var(--gris-texto)', fondo: '#4B5563' },
+  '#991B1B': { tono: 'var(--granate-texto)', fondo: '#991B1B' },
+};
+const tonoDe = (color: string): string => TONOS[color]?.tono ?? 'var(--text-primary)';
+const fondoDe = (color: string): string => TONOS[color]?.fondo ?? color;
+
 interface GasInvernadero {
   nombre: string;
   formula: string;
@@ -347,7 +366,7 @@ function SeccionMecanismo() {
             onClick={() => setPasoActivo(pasoActivo === p.num ? null : p.num)}
             aria-expanded={pasoActivo === p.num}
           >
-            <div className={styles.pasoNumero} style={{ background: p.colorFlecha }}>{p.num}</div>
+            <div className={styles.pasoNumero} style={{ background: fondoDe(p.colorFlecha) }}>{p.num}</div>
             <span className={styles.pasoIcono} aria-hidden="true">{p.icono}</span>
             <h4 className={styles.pasoTitulo}>{p.titulo}</h4>
             {pasoActivo === p.num && (
@@ -364,7 +383,7 @@ function SeccionMecanismo() {
       <div className={styles.tempComparacion}>
         <div className={styles.tempCard}>
           <span className={styles.tempIcono} aria-hidden="true">❄️</span>
-          <span className={styles.tempValor} style={{ color: '#3B82F6' }}>-18°C</span>
+          <span className={styles.tempValor} style={{ color: tonoDe('#3B82F6') }}>-18°C</span>
           <span className={styles.tempLabel}>Sin efecto invernadero</span>
           <span className={styles.tempDetalle}>Tierra congelada, sin vida</span>
         </div>
@@ -374,7 +393,7 @@ function SeccionMecanismo() {
         </div>
         <div className={styles.tempCard}>
           <span className={styles.tempIcono} aria-hidden="true">🌍</span>
-          <span className={styles.tempValor} style={{ color: '#22C55E' }}>+15°C</span>
+          <span className={styles.tempValor} style={{ color: tonoDe('#22C55E') }}>+15°C</span>
           <span className={styles.tempLabel}>Con efecto natural</span>
           <span className={styles.tempDetalle}>Habitable y equilibrado</span>
         </div>
@@ -384,7 +403,7 @@ function SeccionMecanismo() {
         </div>
         <div className={styles.tempCard}>
           <span className={styles.tempIcono} aria-hidden="true">🔥</span>
-          <span className={styles.tempValor} style={{ color: '#EF4444' }}>+1,2°C</span>
+          <span className={styles.tempValor} style={{ color: tonoDe('#EF4444') }}>+1,2°C</span>
           <span className={styles.tempLabel}>Calentamiento actual</span>
           <span className={styles.tempDetalle}>Y subiendo</span>
         </div>
@@ -428,7 +447,7 @@ function SeccionGases() {
               <span className={styles.gasIcono} aria-hidden="true">{g.icono}</span>
               <div>
                 <h3 className={styles.gasNombre}>{g.nombre}</h3>
-                <span className={styles.gasFormula} style={{ color: g.color }}>{g.formula}</span>
+                <span className={styles.gasFormula} style={{ color: tonoDe(g.color) }}>{g.formula}</span>
               </div>
             </div>
             {gasActivo === i ? (
@@ -474,7 +493,7 @@ function SeccionGases() {
                   }}
                 />
               </div>
-              <span className={styles.gwpBarraValor} style={{ color: g.color }}>{g.gwp}×</span>
+              <span className={styles.gwpBarraValor} style={{ color: tonoDe(g.color) }}>{g.gwp}×</span>
             </div>
           ))}
         </div>
@@ -565,7 +584,7 @@ function SeccionNaturalVsExceso() {
               <div className={styles.fuenteHeader}>
                 <span aria-hidden="true">{f.icono}</span>
                 <span className={styles.fuenteNombre}>{f.nombre}</span>
-                <span className={styles.fuentePct} style={{ color: f.color }}>{f.porcentaje}%</span>
+                <span className={styles.fuentePct} style={{ color: tonoDe(f.color) }}>{f.porcentaje}%</span>
               </div>
               <div className={styles.fuenteBarraContainer}>
                 <div
@@ -587,7 +606,7 @@ function SeccionNaturalVsExceso() {
             className={styles.escenarioCard}
             style={{ borderTopColor: esc.color }}
           >
-            <span className={styles.escenarioGrados} style={{ color: esc.color }}>{esc.grados}</span>
+            <span className={styles.escenarioGrados} style={{ color: tonoDe(esc.color) }}>{esc.grados}</span>
             <h4 className={styles.escenarioTitulo}>{esc.titulo}</h4>
             <ul className={styles.escenarioLista}>
               {esc.consecuencias.map((c, j) => (
@@ -685,11 +704,11 @@ function SeccionDatos() {
           </div>
           <div className={styles.keelingFlecha} aria-hidden="true">→</div>
           <div className={styles.keelingDato}>
-            <span className={styles.keelingDatoValor} style={{ color: '#EF4444' }}>425 ppm</span>
+            <span className={styles.keelingDatoValor} style={{ color: tonoDe('#EF4444') }}>425 ppm</span>
             <span className={styles.keelingDatoLabel}>2024 (actual)</span>
           </div>
           <div className={styles.keelingDato}>
-            <span className={styles.keelingDatoValor} style={{ color: '#EF4444' }}>+35%</span>
+            <span className={styles.keelingDatoValor} style={{ color: tonoDe('#EF4444') }}>+35%</span>
             <span className={styles.keelingDatoLabel}>en 66 años</span>
           </div>
         </div>
