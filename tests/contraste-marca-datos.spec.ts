@@ -58,6 +58,10 @@ const APPS: App[] = [
   // (2,19-4,11:1), blanco sobre la marca y el rojo de insignias y pasos (3,82-4,11) y el botón del
   // órgano activo con texto blanco sobre la tarjeta blanca (1,00)
   { slug: 'visualizador-sistema-linfatico', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
+  // El régimen de cada resultado, las tarjetas de la sustentación y los cuatro regímenes de Mach en
+  // su color de datos (2,06-4,11:1 en claro, 1,84-3,81 en oscuro) y el blanco del Modo Realidad
+  // sobre el verde (2,87). Las cuatro pestañas
+  { slug: 'visualizador-mecanica-fluidos', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
 ];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {

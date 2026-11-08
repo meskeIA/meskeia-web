@@ -88,6 +88,23 @@ const PRESETS_FLUIDO: PresetFluido[] = [
 // Funciones de cálculo
 // ─────────────────────────────────────────────
 
+/**
+ * Tono de TEXTO de cada color de datos, que cambia con el tema (cabo C0645): con el color de datos
+ * como texto, el régimen de cada resultado, las tarjetas de la sustentación y los cuatro regímenes
+ * de Mach daban 2,06-4,11:1 en claro y 1,84-3,81 en oscuro (Hipersónico en 9B2335). Tokens de
+ * globals (los semánticos con su reserva oscura) y --granate-texto del módulo. El color de datos
+ * sigue en bordes y en el dibujo.
+ */
+const TONOS: Record<string, string> = {
+  '#2E86AB': 'var(--primary-texto)',
+  '#48A9A6': 'var(--secondary-texto)',
+  '#E84A5F': 'var(--rojo-texto, #F87171)',
+  '#F4A261': 'var(--naranja-texto, #F0A35E)',
+  '#9B2335': 'var(--granate-texto)',
+  '#27ae60': 'var(--verde-texto, #5FD08A)',
+};
+const tonoDe = (color: string): string => TONOS[color] ?? 'var(--text-primary)';
+
 function calcularReynolds(v: number, L: number, mu: number): number {
   return (DENSIDAD_AGUA * v * L) / mu;
 }
@@ -696,10 +713,10 @@ export default function VisualizadorMecanikaFluidos() {
 
           {/* Resultado */}
           <div className={styles.resultadoCard} style={{ borderColor: flujo.color }}>
-            <div className={styles.resultadoValor} style={{ color: flujo.color }}>
+            <div className={styles.resultadoValor} style={{ color: tonoDe(flujo.color) }}>
               Re = {Math.round(re).toLocaleString('es-ES')}
             </div>
-            <div className={styles.resultadoLabel} style={{ color: flujo.color }}>
+            <div className={styles.resultadoLabel} style={{ color: tonoDe(flujo.color) }}>
               Flujo {flujo.label}
             </div>
             <div className={styles.resultadoRango}>
@@ -731,7 +748,7 @@ export default function VisualizadorMecanikaFluidos() {
           </div>
 
           <div className={styles.resultadoCard}>
-            <div className={styles.resultadoValor} style={{ color: magnus.omega >= 0 ? 'var(--primary-texto)' : '#E84A5F' }}>
+            <div className={styles.resultadoValor} style={{ color: magnus.omega >= 0 ? 'var(--primary-texto)' : 'var(--rojo-texto, #F87171)' }}>
               F Magnus = {Math.abs(calcularFuerzaMagnus(magnus.omega, magnus.velocidadTraslacion)).toFixed(3)} N
             </div>
             <div className={styles.resultadoLabel}>
@@ -799,7 +816,7 @@ export default function VisualizadorMecanikaFluidos() {
               { titulo: 'Ángulo de ataque (20%)', desc: 'El ala desvía el aire hacia abajo; por 3ª ley de Newton el ala sube. Dominante en maniobras', color: '#27ae60' },
             ].map(info => (
               <div key={info.titulo} className={styles.infoCard} style={{ borderTopColor: info.color }}>
-                <strong style={{ color: info.color }}>{info.titulo}</strong>
+                <strong style={{ color: tonoDe(info.color) }}>{info.titulo}</strong>
                 <p>{info.desc}</p>
               </div>
             ))}
@@ -825,10 +842,10 @@ export default function VisualizadorMecanikaFluidos() {
           </div>
 
           <div className={styles.resultadoCard} style={{ borderColor: regimenMach.color }}>
-            <div className={styles.resultadoValor} style={{ color: regimenMach.color }}>
+            <div className={styles.resultadoValor} style={{ color: tonoDe(regimenMach.color) }}>
               M = {mach.toFixed(2)}
             </div>
-            <div className={styles.resultadoLabel} style={{ color: regimenMach.color }}>
+            <div className={styles.resultadoLabel} style={{ color: tonoDe(regimenMach.color) }}>
               {regimenMach.label}
             </div>
             <div className={styles.resultadoRango}>{regimenMach.descripcion}</div>
@@ -844,7 +861,7 @@ export default function VisualizadorMecanikaFluidos() {
               { label: 'Hipersónico', rango: 'M > 5', color: '#9B2335', ejemplo: 'Cápsula Apolo reentrada (M ≈ 36), X-15 (M ≈ 6,7)' },
             ].map(r => (
               <div key={r.label} className={styles.regimenCard} style={{ borderLeftColor: r.color }}>
-                <strong style={{ color: r.color }}>{r.label}</strong>
+                <strong style={{ color: tonoDe(r.color) }}>{r.label}</strong>
                 <span className={styles.regimenRango}>{r.rango}</span>
                 <span className={styles.regimenEjemplo}>{r.ejemplo}</span>
               </div>

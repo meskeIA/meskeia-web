@@ -3,6 +3,8 @@
   --text-primary: #1A1A1A; --text-secondary: #666666; --text-muted: #6E6E6E;
   --border: #E5E5E5; --hover: #F5F5F5;
   --rojo: #E84A5F; --verde: #27ae60; --naranja: #F4A261;
+  /* Texto del régimen hipersónico (su dato es #9B2335): 7,17:1 sobre #F5F5F5 (C0645) */
+  --granate-texto: #9B2335;
   --radius: 12px; --radius-large: 16px;
   --spacing-sm: 0.5rem; --spacing-md: 1rem; --spacing-lg: 1.5rem; --spacing-xl: 2rem;
   max-width: 960px; margin: 0 auto; padding: var(--spacing-xl) var(--spacing-lg);
@@ -13,6 +15,7 @@
 [data-theme='dark'] .container {
   --bg-primary: #1A1A1A; --bg-card: #2A2A2A; --text-primary: #E5E5E5;
   --text-secondary: #B0B0B0; --text-muted: #9B9B9B; --border: #404040; --hover: #333333;
+  --granate-texto: #F1948A; /* 5,62:1 sobre #333333 */
 }
 
 /* ── Hero ── */
@@ -148,8 +151,9 @@
   cursor: pointer; transition: all 0.2s;
 }
 .toggleBtn:hover { background: var(--naranja); color: white; }
-.toggleBtnOn { background: var(--verde); border-color: var(--verde); color: white; }
-.toggleBtnOn:hover { background: var(--verde); color: white; opacity: 0.9; }
+/* Verde de botón, igual en los dos temas: con --verde (#27ae60) el blanco daba 2,87:1, ahora 6,21 (C0645) */
+.toggleBtnOn { background: #196F3D; border-color: #196F3D; color: white; }
+.toggleBtnOn:hover { background: #196F3D; color: white; opacity: 0.9; }
 .toggleBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 
 /* ── Warning box ── */
