@@ -1045,6 +1045,59 @@ test.describe('Golden — calcularHipoteca (Capa 1 · fórmula francesa)', () =>
     expect(r2.ratioCuotaIngresos).toBeNull();
     expect(r2.alertaRatio).toBe(false);
   });
+
+  // ── Mixta (hito unificar-app-motor-hipoteca, 08/11/2026) ──────────────────
+  // Casos resueltos a mano con fórmulas CERRADAS (no iterativas): cuota francesa sobre el plazo
+  // total, saldo tras k cuotas S_k = C·(1+r)^k − a·((1+r)^k − 1)/r y cuota de la fase 2 sobre ese
+  // saldo y los meses que quedan. Es lo que hace estimador-hipoteca. Hasta este hito el motor
+  // devolvía en la mixta un resumenAnual con todos los años a cero.
+  // 150.000 € a 25 años: 5 años fijo al 2,5 %, después Euríbor 2,2 + 0,8 = 3,0 %.
+  const MIXTA = {
+    precioVivienda: 180000, entrada: 30000, plazoAnios: 25, tipoHipoteca: 'mixta' as const,
+    interesAnual: 2.5, euribor: 2.2, diferencial: 0.8, plazoFijoMixta: 5,
+  };
+
+  test('GOLDEN-MX1: mixta 150k € (5 años al 2,5 %, luego 3,0 %) → cuotas 672,93 € y 704,28 €, intereses 59.403,90 €', () => {
+    const res = calcularHipoteca(MIXTA);
+    expect(res.capital).toBeCloseTo(150000, 2);
+    expect(res.cuotaMensual).toBeCloseTo(672.93, 2);
+    expect(res.cuotaMensualFase2).toBeCloseTo(704.28, 2);
+    expect(res.tipoEfectivo).toBe(2.5);
+    expect(res.tipoEfectivFase2).toBeCloseTo(3.0, 10);
+    expect(res.totalIntereses).toBeCloseTo(59403.9, 2);
+    expect(res.totalPagado).toBeCloseTo(209403.9, 2);
+    expect(res.porcentajeInteresesSobreCapital).toBeCloseTo(39.6, 2);
+  });
+
+  test('GOLDEN-MX2: mixta — el resumen anual cambia de cuota en el año 6 y salda en el 25', () => {
+    const res = calcularHipoteca(MIXTA);
+    expect(res.resumenAnual).toHaveLength(25);
+    const [a1, a5, a6, a25] = [1, 5, 6, 25].map(a => res.resumenAnual[a - 1]);
+    expect(a1).toEqual({ anio: 1, cuotasAnuales: 8075.1, interesesAnio: 3700.1, capitalAnio: 4375.01, capitalPendiente: 145624.99 });
+    expect(a5.cuotasAnuales).toBeCloseTo(8075.1, 2);
+    expect(a5.interesesAnio).toBeCloseTo(3240.48, 2);
+    expect(a5.capitalAnio).toBeCloseTo(4834.63, 2);
+    expect(a5.capitalPendiente).toBeCloseTo(126990.27, 2); // saldo al acabar el tramo fijo
+    expect(a6.cuotasAnuales).toBeCloseTo(8451.42, 2);
+    expect(a6.interesesAnio).toBeCloseTo(3745.35, 2);
+    expect(a6.capitalAnio).toBeCloseTo(4706.07, 2);
+    expect(a6.capitalPendiente).toBeCloseTo(122284.2, 2);
+    expect(a25.interesesAnio).toBeCloseTo(135.75, 2);
+    expect(a25.capitalPendiente).toBeCloseTo(0, 2);
+    // Cuadre: lo pagado año a año suma el total, y el capital amortizado, el préstamo
+    const suma = (k: 'cuotasAnuales' | 'interesesAnio' | 'capitalAnio') => res.resumenAnual.reduce((s, a) => s + a[k], 0);
+    expect(suma('cuotasAnuales')).toBeCloseTo(209403.9, 0);
+    expect(suma('interesesAnio')).toBeCloseTo(59403.9, 0);
+    expect(suma('capitalAnio')).toBeCloseTo(150000, 0);
+  });
+
+  test('GOLDEN-MX4: mixta con 10 años de tramo fijo → la cuota de la fase 2 baja a 696,94 €', () => {
+    const res = calcularHipoteca({ ...MIXTA, plazoFijoMixta: 10 });
+    expect(res.cuotaMensual).toBeCloseTo(672.93, 2);
+    expect(res.cuotaMensualFase2).toBeCloseTo(696.94, 2);
+    expect(res.totalIntereses).toBeCloseTo(56199.58, 2);
+    expect(res.resumenAnual[10].cuotasAnuales).toBeCloseTo(696.94 * 12, 1);
+  });
 });
 
 // ────────────────────────────────────────────────────────────────────────────
