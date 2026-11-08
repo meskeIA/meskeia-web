@@ -1284,22 +1284,29 @@ function crearServidorDelegum(): McpServer {
       interes_anual: z.number().min(0).max(15).optional().describe('Tipo fijo anual en % (para "fijo" o fase fija de "mixta")'),
       euribor: z.number().min(-2).max(10).optional().describe('Euríbor actual en % (para "variable"/"mixta")'),
       diferencial: z.number().min(0).max(5).optional().describe('Diferencial del banco en % (para "variable"/"mixta")'),
+      plazo_fijo_mixta: z.number().int().min(1).max(39).optional().describe('Solo para "mixta": años del tramo fijo inicial. Por defecto 5.'),
       ingresos_mensuales: z.number().positive().optional().describe('Ingresos netos mensuales para el ratio de endeudamiento'),
     },
     { title: 'Calcula una hipoteca: cuota, intereses y ratio de endeudamiento', readOnlyHint: true },
-    async ({ precio_vivienda, entrada, plazo_anios, tipo_hipoteca, interes_anual, euribor, diferencial, ingresos_mensuales }, extra) => {
+    async ({ precio_vivienda, entrada, plazo_anios, tipo_hipoteca, interes_anual, euribor, diferencial, plazo_fijo_mixta, ingresos_mensuales }, extra) => {
       await registrarUsoDelegum('calcular_hipoteca', getCaller(extra));
       try {
         const r = calcularHipoteca({
           precioVivienda: precio_vivienda, entrada, plazoAnios: plazo_anios,
           tipoHipoteca: tipo_hipoteca as TipoHipoteca,
-          interesAnual: interes_anual, euribor, diferencial, ingresosMensuales: ingresos_mensuales,
+          interesAnual: interes_anual, euribor, diferencial, plazoFijoMixta: plazo_fijo_mixta,
+          ingresosMensuales: ingresos_mensuales,
         });
+        // Mixta: el tramo fijo real, con el mismo tope que el motor (deja al menos una cuota variable)
+        const mesesFijos = Math.min((plazo_fijo_mixta ?? 5) * 12, plazo_anios * 12 - 1);
+        const tramoFijo = mesesFijos % 12 === 0 ? `${mesesFijos / 12} años` : `${mesesFijos} meses`;
         const lineas = [
           `🏠 **Hipoteca**`,
           `📦 Capital financiado: ${fmt(r.capital)} € (${r.porcentajeFinanciacion}%)`,
-          `💳 **Cuota mensual: ${fmt(r.cuotaMensual)} €**`,
-          r.cuotaMensualFase2 ? `💳 Cuota fase variable: ${fmt(r.cuotaMensualFase2)} €` : '',
+          tipo_hipoteca === 'mixta'
+            ? `💳 **Cuota mensual del tramo fijo (${tramoFijo} al ${pct(r.tipoEfectivo)}%): ${fmt(r.cuotaMensual)} €**`
+            : `💳 **Cuota mensual: ${fmt(r.cuotaMensual)} €**`,
+          r.cuotaMensualFase2 ? `💳 Cuota del tramo variable (${pct(r.tipoEfectivFase2 ?? 0)}%): ${fmt(r.cuotaMensualFase2)} €` : '',
           `➕ Total intereses: ${fmt(r.totalIntereses)} € · Total pagado: ${fmt(r.totalPagado)} €`,
         ];
         if (r.ratioCuotaIngresos !== null) {
