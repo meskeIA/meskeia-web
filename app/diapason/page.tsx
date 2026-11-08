@@ -103,6 +103,20 @@ function apagarConRampa(
   osc.stop(fin);
 }
 
+/** Rampa de entrada al reproducir: de 0 al volumen elegido. */
+const RAMPA_ENTRADA_S = 0.1;
+
+/**
+ * Margen, en el reloj de AUDIO, entre el instante en que se programa el tono y el que se fija
+ * para que empiecen a la vez el oscilador y su rampa de entrada (cabo C0683, la forma de C0651
+ * en generador-tonos). Con `oscillator.start()` sin argumento el tono suena cuando el hilo de
+ * audio procesa el mensaje, pero la rampa se anclaba en el `currentTime` que leyó el hilo
+ * principal: si el reloj de audio ya iba por delante, el tono entraba con la rampa empezada.
+ * Programados los dos en el mismo instante futuro, el retraso del mensaje deja de importar
+ * mientras sea menor que este margen; 20 ms no se perciben al pulsar.
+ */
+const ARRANQUE_S = 0.02;
+
 /** Rampa de salida de Detener. */
 const RAMPA_SALIDA_S = 0.1;
 /** Rampa de salida al desmontar la página (navegar a otra app con el tono sonando). */
@@ -209,13 +223,18 @@ export default function DiapasonPage() {
     oscillator.type = tipoOnda;
     oscillator.frequency.setValueAtTime(frecuencia, ctx.currentTime);
 
-    gainNode.gain.setValueAtTime(0, ctx.currentTime);
-    gainNode.gain.linearRampToValueAtTime(volumen, ctx.currentTime + 0.1);
+    // Oscilador y rampa de entrada empiezan en el MISMO instante del reloj de audio, un poco por
+    // delante (ARRANQUE_S, cabo C0683). La ganancia nace a 0 y no en su 1 por defecto: si se
+    // detiene antes de t0, la rampa de salida se ancla en ese 0 y no deja pasar un golpe.
+    const t0 = ctx.currentTime + ARRANQUE_S;
+    gainNode.gain.value = 0;
+    gainNode.gain.setValueAtTime(0, t0);
+    gainNode.gain.linearRampToValueAtTime(volumen, t0 + RAMPA_ENTRADA_S);
 
     oscillator.connect(gainNode);
     gainNode.connect(ctx.destination);
 
-    oscillator.start();
+    oscillator.start(t0);
 
     oscillatorRef.current = oscillator;
     gainNodeRef.current = gainNode;

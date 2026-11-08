@@ -322,6 +322,9 @@ declare global {
   interface Window {
     __terminados: WeakSet<OscillatorNode>;
     __ganancias: { nodo: GainNode; ctx: BaseAudioContext; t0: number }[];
+    /** Instante del reloj de audio en que arranca cada oscilador (el argumento de start()). */
+    __inicios: number[];
+    __salidas: { an: AnalyserNode; ctx: AudioContext }[];
   }
 }
 
@@ -331,6 +334,12 @@ test.describe('Inspección 24/09/2026 — re-inspección: osciladores vivos, not
     await page.addInitScript(() => {
       window.__terminados = new WeakSet();
       window.__ganancias = [];
+      window.__inicios = [];
+      const arrancarOsc = OscillatorNode.prototype.start;
+      OscillatorNode.prototype.start = function (this: OscillatorNode, ...args: [number?]) {
+        window.__inicios.push(args[0] ?? this.context.currentTime);
+        return arrancarOsc.apply(this, args);
+      };
       const proto = BaseAudioContext.prototype;
       const crearOsc = proto.createOscillator;
       const crearGan = proto.createGain;
@@ -519,18 +528,23 @@ test.describe('Inspección 24/09/2026 — re-inspección: osciladores vivos, not
    * clic y espera al nodo nuevo; el clic es el de Playwright (un gesto de usuario real): con un
    * `element.click()` sintético, el AudioContext del primer arranque se quedaba suspendido y el
    * reloj no avanzaba.
+   *
+   * `dt` se cuenta desde que ARRANCA el oscilador (el argumento de su start()), no desde que se
+   * crea la ganancia: desde el cabo C0683 el tono y su rampa empiezan 20 ms por delante, a la vez.
    */
   async function arrancarYMuestrear(page: Page, limite: number): Promise<{ dt: number; valor: number }[]> {
     const muestreo = page.evaluate(async (hasta) => {
       const antes = window.__ganancias.length;
-      for (let i = 0; i < 2000 && window.__ganancias.length === antes; i++) {
+      const iniciosAntes = window.__inicios.length;
+      for (let i = 0; i < 2000 && (window.__ganancias.length === antes || window.__inicios.length === iniciosAntes); i++) {
         await new Promise((r) => setTimeout(r, 1));
       }
       const g = window.__ganancias[antes];
-      if (!g) return [];
+      const inicio = window.__inicios[iniciosAntes];
+      if (!g || inicio === undefined) return [];
       const muestras: { dt: number; valor: number }[] = [];
       for (let i = 0; i < 3000; i++) {
-        const dt = g.ctx.currentTime - g.t0;
+        const dt = g.ctx.currentTime - inicio;
         muestras.push({ dt, valor: g.nodo.gain.value });
         if (dt > hasta) break;
         await new Promise((r) => setTimeout(r, 2));
@@ -585,6 +599,88 @@ test.describe('Inspección 24/09/2026 — re-inspección: osciladores vivos, not
     comprobarRampaDeEntrada(await arrancarYMuestrear(page, 0.15), 'en caliente');
     await botonReproducir(page).click();
     await expect.poll(() => vivos(page)).toHaveLength(0);
+  });
+
+  /**
+   * Cabo C0683 (la forma de C0651 de generador-tonos). La rampa de entrada se anclaba en el
+   * `currentTime` que leía el hilo principal y el oscilador arrancaba con `start()` sin argumento,
+   * cuando el hilo de audio procesaba el mensaje: con el reloj de audio por delante de esa
+   * lectura, el tono entraba con la rampa empezada. Se SIMULA con un `currentTime` que llega
+   * 12 ms atrasado a la página, y se mide el SONIDO que sale (un AnalyserNode detrás de la
+   * ganancia), desde su primera muestra no nula. Rampa de 0 a 0,5 en 0,1 s: v(t) = 5·t; la
+   * ventana de ±1,5 ms toma el máximo, así que mide 5·(t + 0,0015):
+   *   5 ms → 0,033 · 10 ms → 0,058 · 20 ms → 0,108 · 30 ms → 0,158 · 150 ms → 0,500
+   * Medido el 08/11/2026 a 48 kHz: con el código anterior 0,066 · 0,092 · 0,150 · 0,208 (la rampa
+   * llevaba unos 7-10 ms recorridos al sonar); REPARADO, 0,031 · 0,054 · 0,105 · 0,156, 3 de 3.
+   * La reparación: oscilador y rampa arrancan en el mismo instante, 20 ms por delante.
+   */
+  test('C0683 · con el reloj de audio 12 ms por delante de lo que lee la página, la entrada es la rampa entera', async ({
+    page,
+  }) => {
+    await page.addInitScript(() => {
+      const d = Object.getOwnPropertyDescriptor(BaseAudioContext.prototype, 'currentTime');
+      if (d?.get) {
+        const leer = d.get;
+        Object.defineProperty(BaseAudioContext.prototype, 'currentTime', {
+          configurable: true,
+          get(this: BaseAudioContext) {
+            return Math.max(0, (leer.call(this) as number) - 0.012);
+          },
+        });
+      }
+      window.__salidas = [];
+      const crear = AudioContext.prototype.createGain;
+      AudioContext.prototype.createGain = function (this: AudioContext): GainNode {
+        const nodo = crear.call(this);
+        const an = this.createAnalyser();
+        an.fftSize = 32768;
+        nodo.connect(an);
+        window.__salidas.push({ an, ctx: this });
+        return nodo;
+      };
+    });
+    await page.reload();
+    await esperarHidratacion(page, [CAMPO]);
+    // En caliente: con el contexto recién creado el reloj está en 0 y el atraso no muerde.
+    await botonReproducir(page).click();
+    await expect.poll(() => vivos(page)).toHaveLength(1);
+    await page.waitForTimeout(300);
+    await botonReproducir(page).click();
+    await expect.poll(() => vivos(page)).toHaveLength(0);
+    await botonReproducir(page).click();
+    await expect.poll(() => page.evaluate(() => window.__salidas.length)).toBeGreaterThanOrEqual(2);
+    const n = await page.evaluate(() => window.__salidas.length);
+    // 0,2 s de reloj de audio desde el segundo arranque: el búfer (0,68 s) aún guarda el silencio previo.
+    await page.waitForTimeout(250);
+    const c = await page.evaluate((i) => {
+      const s = window.__salidas[i - 1];
+      const x = new Float32Array(s.an.fftSize);
+      s.an.getFloatTimeDomainData(x);
+      return { sr: s.ctx.sampleRate, x: Array.from(x) };
+    }, n);
+    const inicio = c.x.findIndex((v) => Math.abs(v) > 1e-6);
+    expect(inicio, 'la captura tiene que empezar en silencio').toBeGreaterThan(0);    const amplitud = (t: number): number => {
+      const centro = inicio + Math.round(t * c.sr);
+      const media = Math.round(0.0015 * c.sr);
+      let maximo = 0;
+      for (let i = Math.max(0, centro - media); i <= Math.min(c.x.length - 1, centro + media); i++) {
+        maximo = Math.max(maximo, Math.abs(c.x[i]));
+      }
+      return maximo;
+    };
+    for (const [t, esperado] of [
+      [0.005, 0.033],
+      [0.01, 0.058],
+      [0.02, 0.108],
+      [0.03, 0.158],
+    ] as const) {
+      // ±0,015, no el toBeCloseTo(…, 1) de generador-tonos: esta rampa es la mitad de empinada y
+      // el defecto solo se aleja 0,033-0,050 (medido abajo); ±0,05 lo dejaba pasar.
+      expect(Math.abs(amplitud(t) - esperado), `amplitud a ${t * 1000} ms del arranque (esperado ${esperado})`).toBeLessThan(
+        0.015,
+      );
+    }
+    expect(amplitud(0.15), 'volumen asentado (0,5)').toBeCloseTo(0.5, 2);
   });
 
   test('1509 · mover el volumen con el tono sonando es una rampa, no un escalón', async ({ page }) => {
