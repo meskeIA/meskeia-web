@@ -38,6 +38,13 @@ interface EjemploReflexion {
   descripcion: string;
 }
 
+/** Tono de TEXTO del rótulo de cada medio (C0297): su color de dato como texto daba 2,5-2,9:1 */
+const TONO_TEXTO_MEDIO: Record<string, string> = {
+  agua: styles.svgMarca,
+  vidrio: styles.svgTexto,
+  diamante: styles.svgRojo,
+};
+
 const EJEMPLOS_REFLEXION: EjemploReflexion[] = [
   { id: 'plano', icono: '🪞', nombre: 'Espejo plano', descripcion: 'Imagen del mismo tamaño' },
   { id: 'concavo', icono: '🔦', nombre: 'Espejo cóncavo', descripcion: 'Faros, telescopios' },
@@ -105,7 +112,7 @@ function ReflexionSVG({ angulo }: { angulo: number }) {
 
       {/* Normal (línea punteada vertical) */}
       <line x1={cx} y1={cy - 170} x2={cx} y2={cy} stroke="#999" strokeWidth="1.5" strokeDasharray="6,4" />
-      <text x={cx + 8} y={cy - 155} fontSize="11" fill="#999">Normal</text>
+      <text x={cx + 8} y={cy - 155} fontSize="11" className={styles.svgTexto}>Normal</text>
 
       {/* Rayo incidente */}
       <line x1={incX} y1={incY} x2={cx} y2={cy} stroke="#F39C12" strokeWidth="2.5" />
@@ -113,7 +120,7 @@ function ReflexionSVG({ angulo }: { angulo: number }) {
         points={`${cx},${cy} ${cx - 8 * Math.sin(anguloRad) - 5 * Math.cos(anguloRad)},${cy - 8 * Math.cos(anguloRad) + 5 * Math.sin(anguloRad)} ${cx - 8 * Math.sin(anguloRad) + 5 * Math.cos(anguloRad)},${cy - 8 * Math.cos(anguloRad) - 5 * Math.sin(anguloRad)}`}
         fill="#F39C12"
       />
-      <text x={incX - 10} y={incY - 8} fontSize="11" fill="#F39C12" fontWeight="600">Incidente</text>
+      <text x={incX - 10} y={incY - 8} fontSize="11" className={styles.svgNaranja} fontWeight="600">Incidente</text>
 
       {/* Rayo reflejado */}
       <line x1={cx} y1={cy} x2={refX} y2={refY} stroke="#E74C3C" strokeWidth="2.5" />
@@ -121,7 +128,7 @@ function ReflexionSVG({ angulo }: { angulo: number }) {
         points={`${refX},${refY} ${refX - 8 * Math.sin(anguloRad) - 5 * Math.cos(anguloRad)},${refY + 8 * Math.cos(anguloRad) + 5 * Math.sin(anguloRad)} ${refX - 8 * Math.sin(anguloRad) + 5 * Math.cos(anguloRad)},${refY + 8 * Math.cos(anguloRad) - 5 * Math.sin(anguloRad)}`}
         fill="#E74C3C"
       />
-      <text x={refX + 5} y={refY - 8} fontSize="11" fill="#E74C3C" fontWeight="600">Reflejado</text>
+      <text x={refX + 5} y={refY - 8} fontSize="11" className={styles.svgRojo} fontWeight="600">Reflejado</text>
 
       {/* Arco ángulo incidencia */}
       {angulo > 2 && (
@@ -130,7 +137,7 @@ function ReflexionSVG({ angulo }: { angulo: number }) {
             d={`M ${cx},${cy - arcRadius} A ${arcRadius},${arcRadius} 0 0,0 ${incArcEndX},${incArcEndY}`}
             fill="none" stroke="#F39C12" strokeWidth="1.5"
           />
-          <text x={cx - 35} y={cy - arcRadius + 15} fontSize="10" fill="#F39C12" fontWeight="600">
+          <text x={cx - 35} y={cy - arcRadius + 15} fontSize="10" className={styles.svgNaranja} fontWeight="600">
             {angulo}°
           </text>
         </>
@@ -143,14 +150,14 @@ function ReflexionSVG({ angulo }: { angulo: number }) {
             d={`M ${cx},${cy - arcRadius} A ${arcRadius},${arcRadius} 0 0,1 ${refArcEndX},${refArcEndY}`}
             fill="none" stroke="#E74C3C" strokeWidth="1.5"
           />
-          <text x={cx + 12} y={cy - arcRadius + 15} fontSize="10" fill="#E74C3C" fontWeight="600">
+          <text x={cx + 12} y={cy - arcRadius + 15} fontSize="10" className={styles.svgRojo} fontWeight="600">
             {angulo}°
           </text>
         </>
       )}
 
       {/* Etiqueta espejo */}
-      <text x={cx - espejoPad} y={cy + 22} fontSize="11" fill="#2E86AB" fontWeight="600">Espejo</text>
+      <text x={cx - espejoPad} y={cy + 22} fontSize="11" className={styles.svgMarca} fontWeight="600">Espejo</text>
     </svg>
   );
 }
@@ -183,11 +190,11 @@ function RefraccionSVG({ angulo, medio }: { angulo: number; medio: Medio }) {
     <svg viewBox="0 0 600 400" aria-label={`Refracción en ${medio.nombre} con ángulo ${angulo} grados`}>
       {/* Medio 1 (aire) */}
       <rect x="0" y="0" width="600" height={interfaceY} fill="rgba(135,206,235,0.08)" />
-      <text x="20" y="30" fontSize="12" fill="#999" fontWeight="600">Aire (n = 1,00)</text>
+      <text x="20" y="30" fontSize="12" className={styles.svgTexto} fontWeight="600">Aire (n = 1,00)</text>
 
       {/* Medio 2 */}
       <rect x="0" y={interfaceY} width="600" height={200} fill={`${medio.color}15`} />
-      <text x="20" y={interfaceY + 25} fontSize="12" fill={medio.color} fontWeight="600">
+      <text x="20" y={interfaceY + 25} fontSize="12" className={TONO_TEXTO_MEDIO[medio.id] ?? styles.svgTexto} fontWeight="600">
         {medio.nombre} (n = {medio.n.toFixed(2).replace('.', ',')})
       </text>
 
@@ -196,11 +203,11 @@ function RefraccionSVG({ angulo, medio }: { angulo: number; medio: Medio }) {
 
       {/* Normal */}
       <line x1={cx} y1={interfaceY - 170} x2={cx} y2={interfaceY + 170} stroke="#999" strokeWidth="1.5" strokeDasharray="6,4" />
-      <text x={cx + 8} y={interfaceY - 155} fontSize="11" fill="#999">Normal</text>
+      <text x={cx + 8} y={interfaceY - 155} fontSize="11" className={styles.svgTexto}>Normal</text>
 
       {/* Rayo incidente */}
       <line x1={incX} y1={incY} x2={cx} y2={interfaceY} stroke="#F39C12" strokeWidth="2.5" />
-      <text x={incX - 10} y={incY - 8} fontSize="11" fill="#F39C12" fontWeight="600">
+      <text x={incX - 10} y={incY - 8} fontSize="11" className={styles.svgNaranja} fontWeight="600">
         {angulo}°
       </text>
 
@@ -208,7 +215,7 @@ function RefraccionSVG({ angulo, medio }: { angulo: number; medio: Medio }) {
         <>
           {/* Reflexión total interna */}
           <line x1={cx} y1={interfaceY} x2={reflX} y2={reflY} stroke="#E74C3C" strokeWidth="2.5" />
-          <text x={reflX + 5} y={reflY - 8} fontSize="11" fill="#E74C3C" fontWeight="600">
+          <text x={reflX + 5} y={reflY - 8} fontSize="11" className={styles.svgRojo} fontWeight="600">
             Reflexión total
           </text>
         </>
@@ -216,14 +223,14 @@ function RefraccionSVG({ angulo, medio }: { angulo: number; medio: Medio }) {
         <>
           {/* Rayo refractado */}
           <line x1={cx} y1={interfaceY} x2={refractX} y2={refractY} stroke="#2ECC71" strokeWidth="2.5" />
-          <text x={refractX + 5} y={refractY + 5} fontSize="11" fill="#2ECC71" fontWeight="600">
+          <text x={refractX + 5} y={refractY + 5} fontSize="11" className={styles.svgVerde} fontWeight="600">
             {Math.round(radToDeg(theta2Rad))}°
           </text>
         </>
       )}
 
       {/* Fórmula Snell */}
-      <text x="300" y="385" fontSize="12" fill="#666" textAnchor="middle" fontWeight="600">
+      <text x="300" y="385" fontSize="12" className={styles.svgTexto} textAnchor="middle" fontWeight="600">
         n₁ sin(θ₁) = n₂ sin(θ₂) | Ángulo crítico: {criticalAngle.toFixed(1).replace('.', ',')}°
       </text>
     </svg>
@@ -269,16 +276,16 @@ function LentesSVG({ convergente, distObj }: { convergente: boolean; distObj: nu
           <line x1={cx + 12} y1={cy + 90} x2={cx} y2={cy + 90} stroke="#E74C3C" strokeWidth="2" />
         </>
       )}
-      <text x={cx} y={cy + 110} fontSize="11" fill={convergente ? '#2E86AB' : '#E74C3C'} textAnchor="middle" fontWeight="600">
+      <text x={cx} y={cy + 110} fontSize="11" className={convergente ? styles.svgMarca : styles.svgRojo} textAnchor="middle" fontWeight="600">
         {convergente ? 'Convergente' : 'Divergente'}
       </text>
 
       {/* Foco */}
       <circle cx={focoX} cy={cy} r="4" fill={convergente ? '#2E86AB' : '#E74C3C'} />
-      <text x={focoX} y={cy + 18} fontSize="10" fill="#999" textAnchor="middle">F</text>
+      <text x={focoX} y={cy + 18} fontSize="10" className={styles.svgTexto} textAnchor="middle">F</text>
       {/* Foco opuesto */}
       <circle cx={cx - (focoX - cx)} cy={cy} r="4" fill={convergente ? '#2E86AB' : '#E74C3C'} opacity="0.5" />
-      <text x={cx - (focoX - cx)} y={cy + 18} fontSize="10" fill="#999" textAnchor="middle">F&apos;</text>
+      <text x={cx - (focoX - cx)} y={cy + 18} fontSize="10" className={styles.svgTexto} textAnchor="middle">F&apos;</text>
 
       {/* Rayos paralelos (demostración) */}
       {convergente ? (
@@ -304,21 +311,21 @@ function LentesSVG({ convergente, distObj }: { convergente: boolean; distObj: nu
       {/* Objeto */}
       <line x1={objX} y1={cy} x2={objX} y2={cy - objH} stroke="#2ECC71" strokeWidth="2.5" />
       <polygon points={`${objX},${cy - objH} ${objX - 5},${cy - objH + 10} ${objX + 5},${cy - objH + 10}`} fill="#2ECC71" />
-      <text x={objX} y={cy + 18} fontSize="10" fill="#2ECC71" textAnchor="middle" fontWeight="600">Objeto</text>
+      <text x={objX} y={cy + 18} fontSize="10" className={styles.svgVerde} textAnchor="middle" fontWeight="600">Objeto</text>
 
       {/* Imagen (si está en rango visible) */}
       {Math.abs(diVal) > 0 && Math.abs(diVal) < 350 && (
         <>
           <line x1={imgX} y1={cy} x2={imgX} y2={cy - imgH} stroke="#9B59B6" strokeWidth="2" strokeDasharray={diVal < 0 ? '4,3' : 'none'} />
           <polygon points={`${imgX},${cy - imgH} ${imgX - 4},${cy - imgH + (imgH > 0 ? 8 : -8)} ${imgX + 4},${cy - imgH + (imgH > 0 ? 8 : -8)}`} fill="#9B59B6" opacity={diVal < 0 ? 0.6 : 1} />
-          <text x={imgX} y={cy + 18} fontSize="10" fill="#9B59B6" textAnchor="middle" fontWeight="600">
+          <text x={imgX} y={cy + 18} fontSize="10" className={styles.svgVioleta} textAnchor="middle" fontWeight="600">
             Imagen {diVal < 0 ? '(virtual)' : '(real)'}
           </text>
         </>
       )}
 
       {/* Info */}
-      <text x="300" y="385" fontSize="11" fill="#666" textAnchor="middle">
+      <text x="300" y="385" fontSize="11" className={styles.svgTexto} textAnchor="middle">
         1/f = 1/d₀ + 1/dᵢ | f = {convergente ? '+' : '-'}{focalLen}px | Aumento: {Math.abs(magnification).toFixed(1).replace('.', ',')}x {imgH < 0 ? '(invertida)' : '(derecha)'}
       </text>
     </svg>
@@ -344,7 +351,7 @@ function PrismaSVG() {
     <svg viewBox="0 0 600 400" aria-label="Prisma descomponiendo luz blanca en arcoíris">
       {/* Rayo blanco de entrada */}
       <line x1="30" y1={py + pHeight / 2} x2={px + 20} y2={py + pHeight / 2} stroke="white" strokeWidth="4" filter="url(#glow)" />
-      <text x="40" y={py + pHeight / 2 - 12} fontSize="11" fill="#999" fontWeight="600">Luz blanca</text>
+      <text x="40" y={py + pHeight / 2 - 12} fontSize="11" className={styles.svgTexto} fontWeight="600">Luz blanca</text>
 
       {/* Filtro glow para rayo blanco */}
       <defs>
@@ -364,7 +371,7 @@ function PrismaSVG() {
         stroke="#2E86AB"
         strokeWidth="2.5"
       />
-      <text x={px + pBase / 2} y={py + pHeight + 20} fontSize="11" fill="#2E86AB" textAnchor="middle" fontWeight="600">
+      <text x={px + pBase / 2} y={py + pHeight + 20} fontSize="11" className={styles.svgMarca} textAnchor="middle" fontWeight="600">
         Prisma
       </text>
 
@@ -378,7 +385,9 @@ function PrismaSVG() {
         return (
           <g key={c.nombre}>
             <line x1={startX} y1={startY} x2={endX} y2={endY} stroke={c.color} strokeWidth="2.5" opacity="0.9" />
-            <text x={endX + 5} y={endY + 4} fontSize="9" fill={c.color} fontWeight="600">
+            {/* El nombre en el tono de texto: el rayo ya lleva su color, y el amarillo o el
+                verde puro como texto no llegaban a 1,5:1 en claro, ni el índigo en oscuro (C0297) */}
+            <text x={endX + 5} y={endY + 4} fontSize="9" className={styles.svgTexto} fontWeight="600">
               {c.nombre} ({c.lambda})
             </text>
           </g>

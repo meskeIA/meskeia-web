@@ -61,6 +61,10 @@ const APPS: App[] = [
   // Los rótulos del eje en #666 (2,37:1 en oscuro), «Alto» y «Bajo» en #999 (2,82 en claro) y
   // «Ovulación» en naranja F39C12 (2,17 en claro)
   { slug: 'visualizador-ciclo-menstrual' },
+  // Los rótulos de los cuatro diagramas en el color de su rayo o de su medio: el verde 2ECC71 1,93:1,
+  // el naranja F39C12 2,09, el gris 999 2,72 y el agua 2,89 en claro; la fórmula en #666 a 2,26 en
+  // oscuro, y los nombres del espectro en su color puro (amarillo y verde casi invisibles en claro)
+  { slug: 'visualizador-optica', secciones: "[role='tablist'][aria-label*='ecciones'] [role='tab']", extremos: true },
   // Las cronologías de movimientos, una familia (C0297, 08/11/2026): rótulo blanco a 9-10 px sobre
   // la barra de su color al 80 % (1,90-4,49:1 en claro: Griega Clásica sobre goldenrod 1,90,
   // Epicureísmo 2,18, la marca 4,11-4,18), el «año 0» en gris o rojo con opacidad (2,96-3,83) y,
