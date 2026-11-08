@@ -1091,6 +1091,14 @@ test.describe('Golden — calcularHipoteca (Capa 1 · fórmula francesa)', () =>
     expect(suma('capitalAnio')).toBeCloseTo(150000, 0);
   });
 
+  test('GOLDEN-MX3: mixta sin tipo fijo inicial → 3,5 %, el mismo que la fija y que estimador-hipoteca', () => {
+    const { interesAnual: _sinTipo, ...sinTipo } = MIXTA;
+    const res = calcularHipoteca(sinTipo);
+    expect(res.tipoEfectivo).toBe(3.5);
+    expect(res.cuotaMensual).toBeCloseTo(750.94, 2);
+    expect(res.cuotaMensualFase2).toBeCloseTo(718.1, 2);
+  });
+
   test('GOLDEN-MX4: mixta con 10 años de tramo fijo → la cuota de la fase 2 baja a 696,94 €', () => {
     const res = calcularHipoteca({ ...MIXTA, plazoFijoMixta: 10 });
     expect(res.cuotaMensual).toBeCloseTo(672.93, 2);

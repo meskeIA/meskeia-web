@@ -98,7 +98,9 @@ export function calcularHipoteca(p: ParametrosHipoteca): ResultadoHipoteca {
   // Fases: la fija y la variable tienen una sola; la mixta, dos. Con la cuota de la fase 1
   // calculada sobre el plazo TOTAL (práctica bancaria) y la de la fase 2 sobre el saldo que queda.
   const esMixta = p.tipoHipoteca === 'mixta';
-  const interesFijo = p.interesAnual ?? (esMixta ? 3.0 : 3.5);
+  // Tipo fijo por defecto, 3,5 % también en la fase 1 de la mixta: en estimador-hipoteca los dos
+  // controles son el mismo estado. Hasta el 08/11/2026 la mixta caía a 3,0 %.
+  const interesFijo = p.interesAnual ?? 3.5;
   const interesVariable = (p.euribor ?? 3.0) + (p.diferencial ?? 0.8);
   const mesesFase1 = esMixta ? Math.min((p.plazoFijoMixta ?? 5) * 12, numCuotas - 1) : numCuotas;
   const tipoEfectivo = p.tipoHipoteca === 'variable' ? interesVariable : interesFijo;
