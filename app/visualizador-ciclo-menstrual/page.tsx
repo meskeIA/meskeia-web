@@ -233,7 +233,7 @@ export default function VisualizadorCicloMenstrual() {
                   y={PAD_TOP + GRAPH_H + 18}
                   textAnchor="middle"
                   fontSize={11}
-                  fill="#666"
+                  fill="var(--text-muted)"
                 >
                   {dia === 1 ? 'Día 1' : dia === 14 ? 'Día 14' : `Día ${dia}`}
                 </text>
@@ -246,7 +246,7 @@ export default function VisualizadorCicloMenstrual() {
               y={valorAY(100)}
               textAnchor="end"
               fontSize={9}
-              fill="#999"
+              fill="var(--text-muted)"
               dominantBaseline="middle"
             >
               Alto
@@ -256,7 +256,7 @@ export default function VisualizadorCicloMenstrual() {
               y={valorAY(0)}
               textAnchor="end"
               fontSize={9}
-              fill="#999"
+              fill="var(--text-muted)"
               dominantBaseline="middle"
             >
               Bajo
@@ -290,7 +290,7 @@ export default function VisualizadorCicloMenstrual() {
               x={diaAX(14) + 3}
               y={PAD_TOP + 12}
               fontSize={9}
-              fill="#F39C12"
+              fill="var(--naranja-texto, #F39C12)"
             >
               Ovulación
             </text>

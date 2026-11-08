@@ -58,6 +58,9 @@ const APPS: App[] = [
   // pie en #aaa (2,30) y el bloque del bus en NEGRO por un fill inválido ('#666CC'), con su rótulo
   // desbordado tapando «Buses»
   { slug: 'visualizador-arquitectura-computador', secciones: SECCIONES, extremos: true },
+  // Los rótulos del eje en #666 (2,37:1 en oscuro), «Alto» y «Bajo» en #999 (2,82 en claro) y
+  // «Ovulación» en naranja F39C12 (2,17 en claro)
+  { slug: 'visualizador-ciclo-menstrual' },
   // Las cronologías de movimientos, una familia (C0297, 08/11/2026): rótulo blanco a 9-10 px sobre
   // la barra de su color al 80 % (1,90-4,49:1 en claro: Griega Clásica sobre goldenrod 1,90,
   // Epicureísmo 2,18, la marca 4,11-4,18), el «año 0» en gris o rojo con opacidad (2,96-3,83) y,
