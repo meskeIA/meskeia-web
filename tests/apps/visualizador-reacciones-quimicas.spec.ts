@@ -81,7 +81,11 @@ async function pulsar(page: Page, accion: 'Aumentar' | 'Reducir', formula: strin
 }
 
 async function coeficientes(page: Page): Promise<string> {
-  return page.locator('[class*="coefValor"]').evaluateAll((els) => els.map((e) => e.textContent).join(','));
+  // El número visible; desde el 08/11/2026 (hallazgo 4245) el valor lleva al lado, solo para el
+  // lector de pantalla, «Coeficiente de H₂: 2» en un .sr-only
+  return page
+    .locator('[class*="coefValor"] > [aria-hidden="true"]')
+    .evaluateAll((els) => els.map((e) => e.textContent).join(','));
 }
 
 /** Filas del conteo como «H 4/4» (elemento, reactivos/productos). */
@@ -316,12 +320,12 @@ test.describe('móvil 390 px', () => {
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// HALLAZGOS ABIERTOS (08/11/2026)
+// HALLAZGOS 4239-4248 (08/11/2026), REPARADOS el mismo día
 // ─────────────────────────────────────────────────────────────────────────────
 
-test.describe('hallazgos abiertos', () => {
-  // ABIERTO — el diagrama de combustión crea un O y destruye un H: C,H,H,O,O → C,O,O,H,O
-  test.fail('combustión: el diagrama de átomos conserva cada elemento y usa los de CH₄ + 2O₂', async ({ page }) => {
+test.describe('hallazgos del 08/11/2026 (reparados)', () => {
+  // REPARADO el 08/11/2026 — antes:el diagrama de combustión crea un O y destruye un H: C,H,H,O,O → C,O,O,H,O
+  test('combustión: el diagrama de átomos conserva cada elemento y usa los de CH₄ + 2O₂', async ({ page }) => {
     await abrir(page);
     await seccion(page, 'Tipos').click();
     await botonesTipo(page).nth(4).click();
@@ -331,8 +335,8 @@ test.describe('hallazgos abiertos', () => {
     expect(despues).toEqual(antes);
   });
 
-  // ABIERTO — el diagrama de sustitución simple dibuja Fe + NaCl → FeCl + Na, no Zn + 2HCl
-  test.fail('sustitución simple: el diagrama usa los elementos de Zn + 2HCl → ZnCl₂ + H₂', async ({ page }) => {
+  // REPARADO el 08/11/2026 — antes:el diagrama de sustitución simple dibuja Fe + NaCl → FeCl + Na, no Zn + 2HCl
+  test('sustitución simple: el diagrama usa los elementos de Zn + 2HCl → ZnCl₂ + H₂', async ({ page }) => {
     await abrir(page);
     await seccion(page, 'Tipos').click();
     await botonesTipo(page).nth(2).click();
@@ -341,9 +345,9 @@ test.describe('hallazgos abiertos', () => {
     for (const s of simbolos) expect(['Zn', 'H', 'Cl'], `«${s}» no está en Zn + 2HCl`).toContain(s);
   });
 
-  // ABIERTO — title, description, featureList y «Pulsa cada tipo para ver la animación» prometen
+  // REPARADO el 08/11/2026 — antes:title, description, featureList y «Pulsa cada tipo para ver la animación» prometen
   // átomos animados; los átomos no tienen ninguna animación (solo la flecha late)
-  test.fail('la promesa de «átomos animados» se cumple o no se hace', async ({ page }) => {
+  test('la promesa de «átomos animados» se cumple o no se hace', async ({ page }) => {
     await abrir(page);
     const promesa = await page.evaluate(() => {
       const ld = Array.from(document.querySelectorAll('script[type="application/ld+json"]')).map(
@@ -367,8 +371,8 @@ test.describe('hallazgos abiertos', () => {
     expect(!promete || animacionesEnAtomos > 0, `promete: «${promesa} || ${subtitulo}» · animaciones en átomos: ${animacionesEnAtomos}`).toBe(true);
   });
 
-  // ABIERTO — texto blanco sobre el color de datos del tipo activo: 4,11 · 4,23 · 2,16 · 2,78 · 3,68
-  test.fail('contraste: el nombre del tipo pulsado llega a 4,5:1 (13,12 px)', async ({ page }) => {
+  // REPARADO el 08/11/2026 — antes:texto blanco sobre el color de datos del tipo activo: 4,11 · 4,23 · 2,16 · 2,78 · 3,68
+  test('contraste: el nombre del tipo pulsado llega a 4,5:1 (13,12 px)', async ({ page }) => {
     await abrir(page);
     await prepararParaMedir(page);
     await seccion(page, 'Tipos').click();
@@ -382,9 +386,9 @@ test.describe('hallazgos abiertos', () => {
     expect(bajos).toEqual([]);
   });
 
-  // ABIERTO — el título de la ficha en el color de datos, en claro: 2,16 (sustitución simple) y
+  // REPARADO el 08/11/2026 — antes:el título de la ficha en el color de datos, en claro: 2,16 (sustitución simple) y
   // 2,78 (doble sustitución) a 19,2 px en negrita, por debajo de 3:1
-  test.fail('contraste: el título de la ficha de cada tipo llega a 3:1 en claro (texto grande)', async ({ page }) => {
+  test('contraste: el título de la ficha de cada tipo llega a 3:1 en claro (texto grande)', async ({ page }) => {
     await abrir(page);
     await prepararParaMedir(page);
     await seccion(page, 'Tipos').click();
@@ -398,8 +402,8 @@ test.describe('hallazgos abiertos', () => {
     expect(bajos).toEqual([]);
   });
 
-  // ABIERTO — símbolo blanco en el átomo de O (4,23), Na (2,16) y Cl (2,78), 13,12 px
-  test.fail('contraste: el símbolo de cada átomo llega a 4,5:1', async ({ page }) => {
+  // REPARADO el 08/11/2026 — antes:símbolo blanco en el átomo de O (4,23), Na (2,16) y Cl (2,78), 13,12 px
+  test('contraste: el símbolo de cada átomo llega a 4,5:1', async ({ page }) => {
     await abrir(page);
     await prepararParaMedir(page);
     const bajos = new Set<string>();
@@ -418,9 +422,9 @@ test.describe('hallazgos abiertos', () => {
     expect([...bajos]).toEqual([]);
   });
 
-  // ABIERTO — en oscuro «Aún no cuadra» cae a #e74c3c (--rojo del módulo, porque --rojo-texto vale
+  // REPARADO el 08/11/2026 — antes:en oscuro «Aún no cuadra» cae a #e74c3c (--rojo del módulo, porque --rojo-texto vale
   // initial) sobre su tinte: 4,12:1 a 15,2 px
-  test.fail('contraste: «Aún no cuadra» llega a 4,5:1 en oscuro', async ({ page }) => {
+  test('contraste: «Aún no cuadra» llega a 4,5:1 en oscuro', async ({ page }) => {
     await abrir(page);
     await prepararParaMedir(page);
     await activarTemaOscuro(page);
@@ -429,9 +433,9 @@ test.describe('hallazgos abiertos', () => {
     expect(await contrasteSobreFondoReal(estado(page))).toBeGreaterThanOrEqual(4.5);
   });
 
-  // ABIERTO — con la página traducida, el veredicto se queda en «Aún no cuadra» (con ✅ y fondo
+  // REPARADO el 08/11/2026 — antes:con la página traducida, el veredicto se queda en «Aún no cuadra» (con ✅ y fondo
   // verde) y el título de la ficha en «Síntesis» tras pulsar «Combustión»: texto con hermanos
-  test.fail('página traducida: el veredicto y el título de la ficha siguen al estado', async ({ page }) => {
+  test('página traducida: el veredicto y el título de la ficha siguen al estado', async ({ page }) => {
     const errores: string[] = [];
     page.on('pageerror', (e) => errores.push(e.message));
     await abrir(page);
@@ -473,16 +477,16 @@ test.describe('hallazgos abiertos', () => {
     expect(errores).toEqual([]);
   });
 
-  // ABIERTO — aria-label en un <span> sin rol: el árbol de accesibilidad lee «H H H H O O»
-  test.fail('lector de pantalla: cada átomo expone el nombre de su elemento', async ({ page }) => {
+  // REPARADO el 08/11/2026 — antes:aria-label en un <span> sin rol: el árbol de accesibilidad lee «H H H H O O»
+  test('lector de pantalla: cada átomo expone el nombre de su elemento', async ({ page }) => {
     await abrir(page);
     const arbol = await page.locator('[class*="ecuacionVisual"]').first().ariaSnapshot();
     expect(arbol).toContain('Hidrógeno');
     expect(arbol).toContain('Oxígeno');
   });
 
-  // ABIERTO — role="alert" (asertivo) con aria-live="polite": dos órdenes contradictorias
-  test.fail('lector de pantalla: el veredicto no mezcla role="alert" con aria-live="polite"', async ({ page }) => {
+  // REPARADO el 08/11/2026 — antes:role="alert" (asertivo) con aria-live="polite": dos órdenes contradictorias
+  test('lector de pantalla: el veredicto no mezcla role="alert" con aria-live="polite"', async ({ page }) => {
     await abrir(page);
     await seccion(page, 'Balanceo').click();
     const role = await estado(page).getAttribute('role');
@@ -490,8 +494,8 @@ test.describe('hallazgos abiertos', () => {
     expect(role === 'alert' && vivo === 'polite', `role=${role} aria-live=${vivo}`).toBe(false);
   });
 
-  // ABIERTO — «unas 37.000.000.000.000 de reacciones por segundo» sin fuente (§1.quinquies.1)
-  test.fail('Día a día: la cifra de reacciones por segundo lleva fuente y año, o no está', async ({ page }) => {
+  // REPARADO el 08/11/2026 — antes:«unas 37.000.000.000.000 de reacciones por segundo» sin fuente (§1.quinquies.1)
+  test('Día a día: la cifra de reacciones por segundo lleva fuente y año, o no está', async ({ page }) => {
     await abrir(page);
     await seccion(page, 'Día a día').click();
     const texto = (await page.locator('[class*="insightBox"] p').textContent()) ?? '';
@@ -499,8 +503,8 @@ test.describe('hallazgos abiertos', () => {
     expect(!tieneCifra || /\b(19|20)\d{2}\b/.test(texto), texto).toBe(true);
   });
 
-  // ABIERTO — el FAQPage pregunta cinco cosas que la página no muestra (no hay FAQ visible)
-  test.fail('FAQPage: un solo bloque y sus preguntas están en la página', async ({ page }) => {
+  // REPARADO el 08/11/2026 — antes:el FAQPage pregunta cinco cosas que la página no muestra (no hay FAQ visible)
+  test('FAQPage: un solo bloque y sus preguntas están en la página', async ({ page }) => {
     await abrir(page);
     await comprobarFaqPageUnico(page);
   });

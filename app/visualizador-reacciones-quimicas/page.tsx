@@ -1,7 +1,7 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState } from 'react';
+import { useState, type CSSProperties } from 'react';
 import styles from './ReaccionesQuimicas.module.css';
 import {
   MeskeiaLogo,
@@ -12,6 +12,7 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
+import { PREGUNTAS_FRECUENTES } from './metadata';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -37,15 +38,19 @@ const SECCIONES: SeccionInfo[] = [
 // Colores de átomos (convención CPK)
 // ─────────────────────────────────────────────
 
+// Cada símbolo, a 4,5:1 o más sobre su fondo (hallazgo 4242): el blanco sobre el O (#E53935),
+// el Na y el Cl daba 4,23, 2,16 y 2,78. El O baja a un rojo más oscuro; Na, Cl y Zn llevan
+// letra oscura. El Zn no estaba y caía en el gris por defecto con letra blanca (2,68:1).
 const COLORES_ATOMO: Record<string, { bg: string; texto: string; nombre: string }> = {
   H: { bg: '#FFFFFF', texto: '#333333', nombre: 'Hidrógeno' },
-  O: { bg: '#E53935', texto: '#FFFFFF', nombre: 'Oxígeno' },
+  O: { bg: '#C62828', texto: '#FFFFFF', nombre: 'Oxígeno' },
   C: { bg: '#616161', texto: '#FFFFFF', nombre: 'Carbono' },
   N: { bg: '#1565C0', texto: '#FFFFFF', nombre: 'Nitrógeno' },
   Fe: { bg: '#795548', texto: '#FFFFFF', nombre: 'Hierro' },
-  Na: { bg: '#FF9800', texto: '#FFFFFF', nombre: 'Sodio' },
-  Cl: { bg: '#4CAF50', texto: '#FFFFFF', nombre: 'Cloro' },
+  Na: { bg: '#FF9800', texto: '#111111', nombre: 'Sodio' },
+  Cl: { bg: '#4CAF50', texto: '#111111', nombre: 'Cloro' },
   S: { bg: '#FDD835', texto: '#333333', nombre: 'Azufre' },
+  Zn: { bg: '#7D80B0', texto: '#111111', nombre: 'Zinc' },
 };
 
 // ─────────────────────────────────────────────
@@ -95,8 +100,12 @@ interface TipoReaccion {
   ejemplo: string;
   ecuacion: string;
   detalle: string;
+  /** Color de datos del tipo: borde de la ficha y flecha (no lleva texto encima) */
   color: string;
+  /** Texto del título en oscuro (≥ 3:1 sobre la tarjeta oscura: es grande y en negrita) */
   colorDark: string;
+  /** Relleno del botón pulsado y texto del título en claro: blanco encima a 4,5:1 o más */
+  relleno: string;
   atomosAntes: string[];
   atomosDespues: string[];
 }
@@ -108,7 +117,7 @@ const TIPOS_REACCION: TipoReaccion[] = [
     ejemplo: 'Formación de óxido de hierro (herrumbre)',
     ecuacion: '4Fe + 3O₂ → 2Fe₂O₃',
     detalle: 'La herrumbre que ves en un clavo viejo es hierro que se ha combinado con el oxígeno del aire. Es un proceso lento pero imparable.',
-    color: '#2E86AB', colorDark: '#5BA3C4',
+    color: '#2E86AB', colorDark: '#5BA3C4', relleno: '#1F6E8C',
     atomosAntes: ['Fe', 'Fe', 'O', 'O'],
     atomosDespues: ['Fe', 'O', 'Fe', 'O'],
   },
@@ -118,7 +127,7 @@ const TIPOS_REACCION: TipoReaccion[] = [
     ejemplo: 'Descomposición del agua por electricidad',
     ecuacion: '2H₂O → 2H₂ + O₂',
     detalle: 'Con electricidad puedes separar el agua en hidrógeno y oxígeno. Es el proceso inverso a la formación de agua.',
-    color: '#E53935', colorDark: '#EF5350',
+    color: '#E53935', colorDark: '#EF5350', relleno: '#C62828',
     atomosAntes: ['H', 'O', 'H', 'O'],
     atomosDespues: ['H', 'H', 'O', 'O'],
   },
@@ -128,9 +137,10 @@ const TIPOS_REACCION: TipoReaccion[] = [
     ejemplo: 'Zinc desplaza al hidrógeno del ácido',
     ecuacion: 'Zn + 2HCl → ZnCl₂ + H₂',
     detalle: 'El zinc es más reactivo que el hidrógeno, así que lo "expulsa" del ácido clorhídrico y ocupa su lugar.',
-    color: '#FF9800', colorDark: '#FFB74D',
-    atomosAntes: ['Fe', 'Na', 'Cl'],
-    atomosDespues: ['Fe', 'Cl', 'Na'],
+    color: '#FF9800', colorDark: '#FFB74D', relleno: '#A65400',
+    // Los átomos de Zn + 2HCl → ZnCl₂ + H₂ (hallazgo 4240: dibujaba Fe + NaCl → FeCl + Na)
+    atomosAntes: ['Zn', 'H', 'Cl', 'H', 'Cl'],
+    atomosDespues: ['Zn', 'Cl', 'Cl', 'H', 'H'],
   },
   {
     id: 'sustDoble', nombre: 'Doble sustitución', esquema: 'AB + CD → AD + CB',
@@ -138,7 +148,7 @@ const TIPOS_REACCION: TipoReaccion[] = [
     ejemplo: 'Vinagre + bicarbonato de sodio',
     ecuacion: 'NaHCO₃ + CH₃COOH → CH₃COONa + H₂O + CO₂',
     detalle: 'La efervescencia que ves al mezclar vinagre con bicarbonato es CO₂ liberándose. Un intercambio que produce gas, agua y una sal.',
-    color: '#4CAF50', colorDark: '#81C784',
+    color: '#4CAF50', colorDark: '#81C784', relleno: '#2E7D32',
     atomosAntes: ['Na', 'H', 'C', 'O'],
     atomosDespues: ['Na', 'O', 'C', 'H'],
   },
@@ -148,9 +158,11 @@ const TIPOS_REACCION: TipoReaccion[] = [
     ejemplo: 'Quemar gas natural (metano) en la cocina',
     ecuacion: 'CH₄ + 2O₂ → CO₂ + 2H₂O',
     detalle: 'Cada vez que enciendes el fuego de la cocina, el metano se combina con el O₂ del aire. Se libera energía como calor y luz.',
-    color: '#F44336', colorDark: '#EF5350',
-    atomosAntes: ['C', 'H', 'H', 'O', 'O'],
-    atomosDespues: ['C', 'O', 'O', 'H', 'O'],
+    color: '#F44336', colorDark: '#EF5350', relleno: '#B71C1C',
+    // Los átomos de CH₄ + 2O₂ → CO₂ + 2H₂O, que se conservan (hallazgo 4239: perdía un H y
+    // ganaba un O)
+    atomosAntes: ['C', 'H', 'H', 'H', 'H', 'O', 'O', 'O', 'O'],
+    atomosDespues: ['C', 'O', 'O', 'H', 'H', 'O', 'H', 'H', 'O'],
   },
 ];
 
@@ -279,15 +291,32 @@ const REACCIONES_COTIDIANAS: ReaccionCotidiana[] = [
 // ─────────────────────────────────────────────
 
 function Atomo({ simbolo, tamaño = 'normal' }: { simbolo: string; tamaño?: 'normal' | 'grande' }) {
-  const color = COLORES_ATOMO[simbolo] || { bg: '#9E9E9E', texto: '#FFFFFF', nombre: simbolo };
+  const color = COLORES_ATOMO[simbolo] || { bg: '#9E9E9E', texto: '#111111', nombre: simbolo };
+  // role="img": un <span> genérico no admite nombre accesible y el lector leía «H H O» en vez de
+  // «Hidrógeno, Hidrógeno, Oxígeno» (hallazgo 4245)
   return (
     <span
       className={`${styles.atomo} ${tamaño === 'grande' ? styles.atomoGrande : ''}`}
       style={{ background: color.bg, color: color.texto, border: `2px solid ${color.bg === '#FFFFFF' ? '#BDBDBD' : color.bg}` }}
       title={color.nombre}
+      role="img"
       aria-label={color.nombre}
     >
       {simbolo}
+    </span>
+  );
+}
+
+/**
+ * El coeficiente de un término: visible el número y, para el lector, «Coeficiente de H₂: 2» en
+ * una región viva siempre montada, que habla al pulsar + o − (hallazgo 4245). Cada texto es el
+ * único hijo de su <span>, para que no se quede viejo con la página traducida.
+ */
+function ValorCoeficiente({ formula, valor }: { formula: string; valor: number }) {
+  return (
+    <span className={styles.coefValor} aria-live="polite" aria-atomic="true">
+      <span aria-hidden="true">{String(valor)}</span>
+      <span className="sr-only">{`Coeficiente de ${formula}: ${valor}`}</span>
     </span>
   );
 }
@@ -419,7 +448,7 @@ export default function VisualizadorReaccionesQuimicasPage() {
       <div className={styles.seccionContent}>
         <div className={styles.seccionHeader}>
           <h2 className={styles.seccionTitulo}>5 tipos de reacciones</h2>
-          <p className={styles.seccionSubtitulo}>Pulsa cada tipo para ver la animación</p>
+          <p className={styles.seccionSubtitulo}>Pulsa cada tipo para ver sus átomos antes y después</p>
         </div>
 
         <div className={styles.tiposSelector}>
@@ -428,7 +457,7 @@ export default function VisualizadorReaccionesQuimicasPage() {
               key={t.id}
               type="button"
               className={`${styles.tipoBtn} ${tipoSeleccionado === i ? styles.tipoBtnActivo : ''}`}
-              style={tipoSeleccionado === i ? { borderColor: t.color, background: t.color, color: '#fff' } : {}}
+              style={tipoSeleccionado === i ? { borderColor: t.relleno, background: t.relleno, color: '#fff' } : {}}
               onClick={() => setTipoSeleccionado(i)}
               aria-pressed={tipoSeleccionado === i}
             >
@@ -439,8 +468,13 @@ export default function VisualizadorReaccionesQuimicasPage() {
         </div>
 
         <div className={styles.tipoDetalle} style={{ borderColor: tipo.color }}>
-          <h3 className={styles.tipoDetalleNombre} style={{ color: tipo.color }}>
-            {tipo.nombre}: {tipo.esquema}
+          {/* Una sola cadena: tres nodos de texto se quedaban viejos con la página traducida
+              (hallazgo 4244). El color, por tema: ver .tipoDetalleNombre en el módulo */}
+          <h3
+            className={styles.tipoDetalleNombre}
+            style={{ '--tipo-texto': tipo.relleno, '--tipo-texto-oscuro': tipo.colorDark } as CSSProperties}
+          >
+            {`${tipo.nombre}: ${tipo.esquema}`}
           </h3>
           <p className={styles.tipoDetalleDesc}>{tipo.descripcion}</p>
 
@@ -508,7 +542,7 @@ export default function VisualizadorReaccionesQuimicasPage() {
                 onClick={() => ajustarCoef(i, -1)}
                 aria-label={`Reducir coeficiente de ${comp.formula}`}
               >−</button>
-              <span className={styles.coefValor}>{coefs[i] || 1}</span>
+              <ValorCoeficiente formula={comp.formula} valor={coefs[i] || 1} />
               <button
                 type="button"
                 className={styles.coefBtn}
@@ -534,7 +568,7 @@ export default function VisualizadorReaccionesQuimicasPage() {
                   onClick={() => ajustarCoef(idx, -1)}
                   aria-label={`Reducir coeficiente de ${comp.formula}`}
                 >−</button>
-                <span className={styles.coefValor}>{coefs[idx] || 1}</span>
+                <ValorCoeficiente formula={comp.formula} valor={coefs[idx] || 1} />
                 <button
                   type="button"
                   className={styles.coefBtn}
@@ -583,8 +617,15 @@ export default function VisualizadorReaccionesQuimicasPage() {
       </div>
 
       {/* Estado del balance */}
-      <div className={`${styles.estadoBalance} ${balanceada ? styles.balanceOk : styles.balanceNo}`} role="alert" aria-live="polite">
-        {balanceada ? <><span aria-hidden="true">✅</span> ¡Ecuación balanceada! Los átomos cuadran a ambos lados.</> : <><span aria-hidden="true">❌</span> Aún no cuadra. Sigue ajustando los coeficientes.</>}
+      {/* role="status" (cortés) y no alert + aria-live a la vez (hallazgo 4246). Cada rama en su
+          <span key>: con la página traducida, el texto hermano del emoji se quedaba en «Aún no
+          cuadra» con la ecuación ya balanceada (hallazgo 4244) */}
+      <div className={`${styles.estadoBalance} ${balanceada ? styles.balanceOk : styles.balanceNo}`} role="status">
+        {balanceada ? (
+          <span key="ok"><span aria-hidden="true">✅</span>{' ¡Ecuación balanceada! Los átomos cuadran a ambos lados.'}</span>
+        ) : (
+          <span key="no"><span aria-hidden="true">❌</span>{' Aún no cuadra. Sigue ajustando los coeficientes.'}</span>
+        )}
       </div>
 
       {/* Botones de ayuda */}
@@ -637,7 +678,9 @@ export default function VisualizadorReaccionesQuimicasPage() {
 
       <div className={styles.insightBox}>
         <span aria-hidden="true">🧬</span>
-        <p>Tu cuerpo realiza unas {formatNumber(37000000000000, 0)} de reacciones por segundo. Cada célula es una fábrica química en miniatura.</p>
+        {/* Sin cifra: «37 billones de reacciones por segundo» iba sin fuente y coincide con la
+            estimación del número de CÉLULAS del cuerpo (hallazgo 4247, §1.quinquies.1) */}
+        <p>Tu cuerpo realiza sin parar un número enorme de reacciones químicas: cada célula es una fábrica química en miniatura.</p>
       </div>
     </div>
   );
@@ -721,6 +764,17 @@ export default function VisualizadorReaccionesQuimicasPage() {
               significa calcular mal las cantidades de reactivos, desperdiciando materiales o generando
               productos peligrosos inesperados.
             </p>
+          </section>
+
+          {/* FAQ visible: del MISMO array que el FAQPage de metadata.ts (hallazgo 4248) */}
+          <section className={styles.guideSection}>
+            <h2>Preguntas frecuentes</h2>
+            {PREGUNTAS_FRECUENTES.map((f) => (
+              <div key={f.question}>
+                <h3>{f.question}</h3>
+                <p>{f.answer}</p>
+              </div>
+            ))}
           </section>
         </EducationalSection>
 

@@ -8,7 +8,10 @@
   background: var(--bg-primary); min-height: 100vh;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
-[data-theme='dark'] .container { --bg-primary: #1A1A1A; --bg-card: #2A2A2A; --text-primary: #E5E5E5; --text-secondary: #B0B0B0; --text-muted: #9B9B9B; --border: #404040; --hover: #333333; }
+[data-theme='dark'] .container { --bg-primary: #1A1A1A; --bg-card: #2A2A2A; --text-primary: #E5E5E5; --text-secondary: #B0B0B0; --text-muted: #9B9B9B; --border: #404040; --hover: #333333;
+  /* En oscuro --rojo-texto vale initial y manda esta reserva: #e74c3c daba 4,12:1 en «Aún no
+     cuadra» sobre su tinte (hallazgo 4243); #ff6b5b da 5,6:1 */
+  --rojo: #ff6b5b; }
 
 /* ─── Hero ─── */
 .hero { text-align: center; margin-bottom: var(--spacing-xl); margin-top: 80px; padding: var(--spacing-xl) var(--spacing-lg); background: var(--hero-bg); border-radius: var(--radius-large); color: white; }
@@ -88,7 +91,10 @@
 .tipoBtnEsquema { font-size: 0.7rem; opacity: 0.8; }
 
 .tipoDetalle { background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); animation: fadeIn 0.2s ease; }
-.tipoDetalleNombre { font-size: 1.2rem; font-weight: 700; margin-bottom: var(--spacing-sm); }
+/* El color del título llega del TSX por tipo y tema (hallazgo 4242): en claro el relleno
+   oscurecido (≥ 4,5:1 sobre blanco), en oscuro el tono claro del tipo (≥ 3:1, texto grande) */
+.tipoDetalleNombre { font-size: 1.2rem; font-weight: 700; margin-bottom: var(--spacing-sm); color: var(--tipo-texto, var(--text-primary)); }
+[data-theme='dark'] .tipoDetalleNombre { color: var(--tipo-texto-oscuro, var(--text-primary)); }
 .tipoDetalleDesc { font-size: 0.95rem; color: var(--text-secondary); margin-bottom: var(--spacing-lg); }
 
 .tipoEjemplo { background: var(--hover); border-radius: var(--radius); padding: var(--spacing-lg); margin-top: var(--spacing-lg); }

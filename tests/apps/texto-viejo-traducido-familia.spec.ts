@@ -97,3 +97,34 @@ test.describe('rótulo que cambia con la página traducida (C0243)', () => {
     });
   }
 });
+
+// La misma clase fuera de un botón: un veredicto y un título de ficha (hallazgo 4244,
+// visualizador-reacciones-quimicas, 08/11/2026). Control: sin la reparación, el veredicto seguía
+// en «Aún no cuadra» con la clase balanceOk, y el título en «Síntesis: A + B → AB».
+test.describe('texto que cambia con la página traducida, fuera de un botón (C0243)', () => {
+  test('visualizador-reacciones-quimicas: el veredicto del balanceo y el título de la ficha de Tipos', async ({ page }) => {
+    const errores: string[] = [];
+    page.on('pageerror', (e) => errores.push(e.message));
+    await page.goto('/visualizador-reacciones-quimicas/');
+
+    const balanceo = page.getByRole('button', { name: 'Balanceo', exact: true });
+    await hidratado(balanceo);
+    await balanceo.click();
+    const veredicto = page.locator('[class*="estadoBalance"]');
+    await expect(veredicto).toContainText('Aún no cuadra');
+    await traducir(page);
+    // H₂ y H₂O a 2 → [2, 1, 2]
+    await page.getByRole('button', { name: 'Aumentar coeficiente de H₂', exact: true }).click();
+    await page.getByRole('button', { name: 'Aumentar coeficiente de H₂O', exact: true }).click();
+    await expect(veredicto).toContainText('¡Ecuación balanceada!');
+    await expect(veredicto).not.toContainText('Aún no cuadra');
+
+    await page.getByRole('button', { name: 'Tipos', exact: true }).click();
+    const titulo = page.locator('h3[class*="tipoDetalleNombre"]');
+    await expect(titulo).toHaveText('Síntesis: A + B → AB');
+    await traducir(page);
+    await page.getByRole('button', { name: /Combustión/ }).click();
+    await expect(titulo).toHaveText('Combustión: CₓHᵧ + O₂ → CO₂ + H₂O');
+    expect(errores).toEqual([]);
+  });
+});
