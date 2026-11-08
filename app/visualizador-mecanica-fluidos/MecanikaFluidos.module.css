@@ -5,6 +5,18 @@
   --rojo: #E84A5F; --verde: #27ae60; --naranja: #F4A261;
   /* Texto del régimen hipersónico (su dato es #9B2335): 7,17:1 sobre #F5F5F5 (C0645) */
   --granate-texto: #9B2335;
+  /*
+   * Rótulos de los SVG (cabo C0297): van sobre el tinte de su propio color (la franja de la
+   * presión, el recuadro del régimen y de la cavitación), donde ni el color de datos (1,87-3,60:1
+   * en claro, 2,40-3,04 en oscuro) ni los -texto de globals llegan. Medidos por píxel contra el
+   * tinte en los dos temas (tests/contraste-svg-texto.spec.ts).
+   */
+  --svg-azul-texto: #1A5278;
+  --svg-rojo-texto: #9B1C1C;
+  --svg-naranja-texto: #9A3412;
+  --svg-verde-texto: #166534;
+  --svg-granate-texto: #7F1D2D;
+  --cavita-bg: #FFF5F5;
   --radius: 12px; --radius-large: 16px;
   --spacing-sm: 0.5rem; --spacing-md: 1rem; --spacing-lg: 1.5rem; --spacing-xl: 2rem;
   max-width: 960px; margin: 0 auto; padding: var(--spacing-xl) var(--spacing-lg);
@@ -16,6 +28,10 @@
   --bg-primary: #1A1A1A; --bg-card: #2A2A2A; --text-primary: #E5E5E5;
   --text-secondary: #B0B0B0; --text-muted: #9B9B9B; --border: #404040; --hover: #333333;
   --granate-texto: #F1948A; /* 5,62:1 sobre #333333 */
+  --svg-azul-texto: #9CD0EA; --svg-rojo-texto: #FCA5A5; --svg-naranja-texto: #FDBA74;
+  --svg-verde-texto: #86EFAC; --svg-granate-texto: #F5B7B1;
+  /* El fondo de la cavitación activa era #FFF5F5 también en oscuro, con el texto claro encima */
+  --cavita-bg: #3A2226;
 }
 
 /* ── Hero ── */

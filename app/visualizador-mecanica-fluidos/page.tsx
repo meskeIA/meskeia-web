@@ -105,6 +105,21 @@ const TONOS: Record<string, string> = {
 };
 const tonoDe = (color: string): string => TONOS[color] ?? 'var(--text-primary)';
 
+/**
+ * Tono de los rótulos de los SVG, que van sobre el tinte de su propio color (cabo C0297): ni el
+ * color de datos ni los -texto de arriba llegan ahí. Tokens del módulo, por tema.
+ */
+const TONOS_SVG: Record<string, string> = {
+  '#2E86AB': 'var(--svg-azul-texto)',
+  '#1A6B8A': 'var(--svg-azul-texto)',
+  '#7FB3D3': 'var(--svg-azul-texto)',
+  '#E84A5F': 'var(--svg-rojo-texto)',
+  '#F4A261': 'var(--svg-naranja-texto)',
+  '#27ae60': 'var(--svg-verde-texto)',
+  '#9B2335': 'var(--svg-granate-texto)',
+};
+const tintaSvg = (color: string): { fill: string } => ({ fill: TONOS_SVG[color] ?? 'var(--text-primary)' });
+
 function calcularReynolds(v: number, L: number, mu: number): number {
   return (DENSIDAD_AGUA * v * L) / mu;
 }
@@ -167,7 +182,7 @@ function SvgReynolds({ re, clase }: { re: number; clase: string }) {
               fill="#2E86AB" opacity={0.8} />
           );
         })}
-        <text x={W / 2} y={H - 2} textAnchor="middle" fontSize={11} fill="#2E86AB" fontWeight="600">
+        <text x={W / 2} y={H - 2} textAnchor="middle" fontSize={11} style={tintaSvg('#2E86AB')} fontWeight="600">
           Re = {Math.round(re)} — Flujo Laminar
         </text>
       </svg>
@@ -196,7 +211,7 @@ function SvgReynolds({ re, clase }: { re: number; clase: string }) {
               stroke="#E84A5F" strokeWidth={1.4} fill="none" opacity={0.65} />
           );
         })}
-        <text x={W / 2} y={H - 2} textAnchor="middle" fontSize={11} fill="#E84A5F" fontWeight="600">
+        <text x={W / 2} y={H - 2} textAnchor="middle" fontSize={11} style={tintaSvg('#E84A5F')} fontWeight="600">
           Re = {Math.round(re)} — Flujo Turbulento
         </text>
       </svg>
@@ -223,7 +238,7 @@ function SvgReynolds({ re, clase }: { re: number; clase: string }) {
             stroke="#F4A261" strokeWidth={1.4} fill="none" opacity={0.7} />
         );
       })}
-      <text x={W / 2} y={H - 2} textAnchor="middle" fontSize={11} fill="#F4A261" fontWeight="600">
+      <text x={W / 2} y={H - 2} textAnchor="middle" fontSize={11} style={tintaSvg('#F4A261')} fontWeight="600">
         Re = {Math.round(re)} — Zona de Transición
       </text>
     </svg>
@@ -291,13 +306,13 @@ function SvgMagnus({ omega, velocidadTraslacion }: { omega: number; velocidadTra
           <rect x={cx - 38} y={ladoAlta === 'top' ? cy - r - 28 : cy + r + 4}
             width={76} height={20} rx={6} fill={ladoAlta === 'top' ? '#E84A5F' : '#2E86AB'} opacity={0.2} />
           <text x={cx} y={ladoAlta === 'top' ? cy - r - 13 : cy + r + 19}
-            textAnchor="middle" fontSize={10} fill={ladoAlta === 'top' ? '#E84A5F' : '#2E86AB'} fontWeight="600">
+            textAnchor="middle" fontSize={10} style={tintaSvg(ladoAlta === 'top' ? '#E84A5F' : '#2E86AB')} fontWeight="600">
             Alta presión
           </text>
           <rect x={cx - 36} y={ladoAlta === 'bottom' ? cy - r - 28 : cy + r + 4}
             width={72} height={20} rx={6} fill={ladoAlta === 'bottom' ? '#E84A5F' : '#2E86AB'} opacity={0.2} />
           <text x={cx} y={ladoAlta === 'bottom' ? cy - r - 13 : cy + r + 19}
-            textAnchor="middle" fontSize={10} fill={ladoAlta === 'bottom' ? '#E84A5F' : '#2E86AB'} fontWeight="600">
+            textAnchor="middle" fontSize={10} style={tintaSvg(ladoAlta === 'bottom' ? '#E84A5F' : '#2E86AB')} fontWeight="600">
             Baja presión
           </text>
         </>
@@ -392,7 +407,7 @@ function SvgBernoulli({ anguloAtaque, modoRealidad }: { anguloAtaque: number; mo
       {(() => {
         const [lx, ly] = rotarPunto(0, -52);
         return (
-          <text x={lx} y={ly} textAnchor="middle" fontSize={11} fill="#1A6B8A" fontWeight="700">
+          <text x={lx} y={ly} textAnchor="middle" fontSize={11} style={tintaSvg('#1A6B8A')} fontWeight="700">
             v ↑ (rápido) · P ↓ (baja presión)
           </text>
         );
@@ -400,7 +415,7 @@ function SvgBernoulli({ anguloAtaque, modoRealidad }: { anguloAtaque: number; mo
       {(() => {
         const [lx, ly] = rotarPunto(0, 38);
         return (
-          <text x={lx} y={ly} textAnchor="middle" fontSize={11} fill="#7FB3D3" fontWeight="700">
+          <text x={lx} y={ly} textAnchor="middle" fontSize={11} style={tintaSvg('#7FB3D3')} fontWeight="700">
             v ↓ (lento) · P ↑ (alta presión)
           </text>
         );
@@ -425,7 +440,7 @@ function SvgBernoulli({ anguloAtaque, modoRealidad }: { anguloAtaque: number; mo
       {/* Panel modo */}
       <rect x={8} y={8} width={modoRealidad ? 210 : 180} height={42} rx={8}
         fill={modoRealidad ? '#27ae60' : '#F4A261'} opacity={0.15} />
-      <text x={16} y={24} fontSize={11} fill={modoRealidad ? '#27ae60' : '#F4A261'} fontWeight="700">
+      <text x={16} y={24} fontSize={11} style={tintaSvg(modoRealidad ? '#27ae60' : '#F4A261')} fontWeight="700">
         {modoRealidad ? <><tspan aria-hidden="true">✅</tspan> Realidad: Bernoulli + Kutta-Joukowski</> : <><tspan aria-hidden="true">⚠️</tspan> Mito: Solo Bernoulli (incompleto)</>}
       </text>
       <text x={16} y={42} fontSize={10} fill="var(--text-secondary)">
@@ -472,7 +487,7 @@ function SvgMach({ mach }: { mach: number }) {
             y2={cy + (W - cx - 20) * Math.tan(anguloMach)}
             stroke={regimen.color} strokeWidth={2} opacity={0.8} />
           <text x={cx + 80} y={cy - (80 * Math.tan(anguloMach)) - 8}
-            fontSize={10} fill={regimen.color} fontWeight="600">
+            fontSize={10} style={tintaSvg(regimen.color)} fontWeight="600">
             Onda de choque (cono de Mach)
           </text>
         </>
@@ -495,10 +510,10 @@ function SvgMach({ mach }: { mach: number }) {
       {/* Etiqueta M */}
       <rect x={W - 130} y={8} width={122} height={50} rx={8}
         fill={regimen.color} opacity={0.12} />
-      <text x={W - 69} y={28} textAnchor="middle" fontSize={16} fill={regimen.color} fontWeight="800">
+      <text x={W - 69} y={28} textAnchor="middle" fontSize={16} style={tintaSvg(regimen.color)} fontWeight="800">
         M = {mach.toFixed(2)}
       </text>
-      <text x={W - 69} y={48} textAnchor="middle" fontSize={11} fill={regimen.color} fontWeight="600">
+      <text x={W - 69} y={48} textAnchor="middle" fontSize={11} style={tintaSvg(regimen.color)} fontWeight="600">
         {regimen.label}
       </text>
 
@@ -527,7 +542,7 @@ function SvgCavitacion({ presionLocal }: { presionLocal: number }) {
 
   return (
     <svg viewBox={`0 0 ${W} ${H}`} className={styles.svgFluido} aria-label={cavita ? 'Cavitación activa — burbujas de vapor' : 'Sin cavitación — presión suficiente'}>
-      <rect x={0} y={0} width={W} height={H} fill={cavita ? '#FFF5F5' : 'var(--bg-card)'}
+      <rect x={0} y={0} width={W} height={H} fill={cavita ? 'var(--cavita-bg)' : 'var(--bg-card)'}
         className={styles.svgBg} />
 
       {/* Hélice simplificada */}
@@ -554,7 +569,7 @@ function SvgCavitacion({ presionLocal }: { presionLocal: number }) {
       {/* Etiqueta */}
       <rect x={W - 195} y={8} width={187} height={44} rx={8}
         fill={cavita ? '#E84A5F' : '#2E86AB'} opacity={0.12} />
-      <text x={W - 101} y={26} textAnchor="middle" fontSize={12} fill={cavita ? '#E84A5F' : '#2E86AB'} fontWeight="700">
+      <text x={W - 101} y={26} textAnchor="middle" fontSize={12} style={tintaSvg(cavita ? '#E84A5F' : '#2E86AB')} fontWeight="700">
         {cavita ? <><tspan aria-hidden="true">⚠️</tspan> Cavitación activa</> : <><tspan aria-hidden="true">✅</tspan> Sin cavitación</>}
       </text>
       <text x={W - 101} y={44} textAnchor="middle" fontSize={10} fill="var(--text-secondary)">

@@ -20,31 +20,38 @@ interface App {
   slug: string;
   /** Botones que cambian de sección; sin él, solo la carga */
   secciones?: string;
+  /** Además, en cada sección, cada deslizador a su mínimo y a su máximo (otros regímenes) */
+  extremos?: boolean;
 }
 
 const SECCIONES = "nav[aria-label*='ecciones'] button";
 
 /**
- * Una fila por app REPARADA. Control: sin la reparación, cada una cae con los textos de su
- * comentario. Medidas el 08/11/2026 y aún SIN reparar (cabo C0297), para añadirlas al repararlas:
- * visualizador-mecanica-fluidos.
+ * Una fila por app REPARADA (las cinco candidatas de la nota del 08/11/2026 del cabo C0297, más
+ * las que se añadan). Control: sin la reparación, cada una cae con los textos de su comentario.
+ * Mide el estado de carga de cada sección: los rótulos que cambian con un deslizador (otro
+ * régimen, otra fase) se cubren porque toman el tono de la misma tabla que los medidos.
  */
 const APPS: App[] = [
   // Sólido, Líquido y Gas en el color de su zona sobre el tinte de la propia zona (2,01-2,52:1 en
   // claro), Punto triple (3,40 en claro, 2,12 en oscuro) y Punto crítico (2,28 en oscuro)
-  { slug: 'visualizador-estados-materia', secciones: SECCIONES },
+  { slug: 'visualizador-estados-materia', secciones: SECCIONES, extremos: true },
   // Los rótulos del esquema en el color de su zona sobre el tinte de la zona: la marca 3,19-3,62:1
   // en claro y 2,59-3,03 en oscuro, el teal 2,76 y el naranja 2,74 en claro, y «Ventana oval» en
   // #666 a 2,39 en oscuro
-  { slug: 'visualizador-oido-equilibrio', secciones: SECCIONES },
+  { slug: 'visualizador-oido-equilibrio', secciones: SECCIONES, extremos: true },
   // Blanco sobre el Sol (1,96:1 en claro, 2,51 en oscuro), las moléculas sobre su círculo al 40 %
   // (1,06-2,30 en oscuro), la superficie sobre su franja (1,34-1,53 en oscuro), los rojos y el
   // ámbar como texto con opacidad (1,86-3,81) y la leyenda en #666 a 1,90 en oscuro
-  { slug: 'visualizador-efecto-invernadero', secciones: SECCIONES },
+  { slug: 'visualizador-efecto-invernadero', secciones: SECCIONES, extremos: true },
+  // El rótulo de Reynolds, las presiones de Magnus, las velocidades del perfil, el aviso del mito y
+  // el régimen de Mach en su color de datos sobre el tinte de ese color: 1,87-3,60:1 en claro y
+  // 2,40-3,04 en oscuro
+  { slug: 'visualizador-mecanica-fluidos', secciones: SECCIONES, extremos: true },
   // Blanco sobre el color de cada bloque al 80 % (2,36-2,97:1 en claro, 3,16-4,27 en oscuro), el
   // pie en #aaa (2,30) y el bloque del bus en NEGRO por un fill inválido ('#666CC'), con su rótulo
   // desbordado tapando «Buses»
-  { slug: 'visualizador-arquitectura-computador', secciones: SECCIONES },
+  { slug: 'visualizador-arquitectura-computador', secciones: SECCIONES, extremos: true },
 ];
 
 interface TextoSvg {
@@ -172,7 +179,7 @@ async function suspensos(page: Page): Promise<string[]> {
     );
     fuera.push(...malos.map((m) => `svg ${i + 1}: ${m}`));
   }
-  await oculto.evaluate((n) => n.remove());
+  await oculto.evaluate((n) => (n as Element).remove());
   await page.evaluate(() => document.querySelectorAll('[data-svg-medido]').forEach((s) => s.removeAttribute('data-svg-medido')));
   return Array.from(new Set(fuera));
 }
@@ -193,29 +200,45 @@ async function rellenosInvalidos(page: Page): Promise<string[]> {
   });
 }
 
-async function recorrer(page: Page, secciones?: string): Promise<string[]> {
-  const todo: string[] = [];
-  const botones = secciones ? page.locator(secciones) : null;
-  const n = botones ? await botones.count() : 0;
-  await desplegarTodo(page);
-  if (!n) return [...(await suspensos(page)), ...(await rellenosInvalidos(page))];
+async function medirAqui(page: Page, etiqueta: string, extremos: boolean): Promise<string[]> {
+  const todo = [
+    ...(await suspensos(page)).map((s) => `${etiqueta}: ${s}`),
+    ...(await rellenosInvalidos(page)).map((s) => `${etiqueta}: relleno inválido ${s}`),
+  ];
+  if (!extremos) return todo;
+  const deslizadores = page.locator('input[type="range"]:visible');
+  const n = await deslizadores.count();
   for (let i = 0; i < n; i++) {
-    await botones!.nth(i).click();
-    await desplegarTodo(page);
-    todo.push(...(await suspensos(page)).map((s) => `sección ${i + 1}: ${s}`));
-    todo.push(...(await rellenosInvalidos(page)).map((s) => `sección ${i + 1}: relleno inválido ${s}`));
+    for (const tecla of ['End', 'Home'] as const) {
+      await deslizadores.nth(i).press(tecla);
+      todo.push(...(await suspensos(page)).map((s) => `${etiqueta}, deslizador ${i + 1} en ${tecla}: ${s}`));
+    }
   }
   return todo;
 }
 
-for (const { slug, secciones } of APPS) {
+async function recorrer(page: Page, secciones?: string, extremos = false): Promise<string[]> {
+  const todo: string[] = [];
+  const botones = secciones ? page.locator(secciones) : null;
+  const n = botones ? await botones.count() : 0;
+  await desplegarTodo(page);
+  if (!n) return medirAqui(page, 'carga', extremos);
+  for (let i = 0; i < n; i++) {
+    await botones!.nth(i).click();
+    await desplegarTodo(page);
+    todo.push(...(await medirAqui(page, `sección ${i + 1}`, extremos)));
+  }
+  return Array.from(new Set(todo));
+}
+
+for (const { slug, secciones, extremos } of APPS) {
   test(`${slug}: el texto de sus SVG se lee contra lo que tiene detrás, en claro y en oscuro (C0297)`, async ({ page }) => {
     test.setTimeout(120_000);
     await page.goto(`/${slug}/`);
     await prepararParaMedir(page);
     if (secciones) await expect(page.locator(secciones).first()).toBeVisible();
-    expect.soft(await recorrer(page, secciones), 'claro').toEqual([]);
+    expect.soft(await recorrer(page, secciones, extremos), 'claro').toEqual([]);
     await activarTemaOscuro(page);
-    expect.soft(await recorrer(page, secciones), 'oscuro').toEqual([]);
+    expect.soft(await recorrer(page, secciones, extremos), 'oscuro').toEqual([]);
   });
 }
