@@ -27,13 +27,17 @@ const SECCIONES = "nav[aria-label*='ecciones'] button";
 /**
  * Una fila por app REPARADA. Control: sin la reparación, cada una cae con los textos de su
  * comentario. Medidas el 08/11/2026 y aún SIN reparar (cabo C0297), para añadirlas al repararlas:
- * visualizador-oido-equilibrio, visualizador-mecanica-fluidos, visualizador-arquitectura-computador
- * y visualizador-efecto-invernadero.
+ * visualizador-mecanica-fluidos, visualizador-arquitectura-computador y
+ * visualizador-efecto-invernadero.
  */
 const APPS: App[] = [
   // Sólido, Líquido y Gas en el color de su zona sobre el tinte de la propia zona (2,01-2,52:1 en
   // claro), Punto triple (3,40 en claro, 2,12 en oscuro) y Punto crítico (2,28 en oscuro)
   { slug: 'visualizador-estados-materia', secciones: SECCIONES },
+  // Los rótulos del esquema en el color de su zona sobre el tinte de la zona: la marca 3,19-3,62:1
+  // en claro y 2,59-3,03 en oscuro, el teal 2,76 y el naranja 2,74 en claro, y «Ventana oval» en
+  // #666 a 2,39 en oscuro
+  { slug: 'visualizador-oido-equilibrio', secciones: SECCIONES },
 ];
 
 interface TextoSvg {
@@ -76,7 +80,8 @@ async function textosDeSvgs(page: Page): Promise<TextoSvg[][]> {
         if (cs.visibility === 'hidden' || cs.display === 'none' || +cs.opacity === 0) continue;
         if (cs.fill.startsWith('url(') || cs.fill === 'none') continue;
         const contenido = (t.textContent ?? '').trim();
-        if (!contenido) continue;
+        // Un emoji suelto se pinta con sus propios colores, no con el fill
+        if (!contenido || /^[\p{Extended_Pictographic}️‍\s]+$/u.test(contenido)) continue;
         const r = t.getBoundingClientRect();
         if (r.width < 2 || r.height < 2) continue;
         const fill = norm(cs.fill);

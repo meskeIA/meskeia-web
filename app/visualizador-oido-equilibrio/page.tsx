@@ -235,14 +235,14 @@ export default function OidoEquilibrioPage() {
               <ellipse cx="80" cy="180" rx="28" ry="55" fill="none" stroke="#2E86AB" strokeWidth="2" opacity="0.6" />
               {/* Canal auditivo */}
               <rect x="125" y="168" width="120" height="24" rx="12" fill="rgba(46,134,171,0.15)" stroke="#2E86AB" strokeWidth="2" />
-              <text x="165" y="185" fill="#2E86AB" fontSize="10" fontWeight="600" textAnchor="middle">Canal (2,5 cm)</text>
+              <text x="165" y="185" style={{ fill: 'var(--oido-externo-texto)' }} fontSize="10" fontWeight="600" textAnchor="middle">Canal (2,5 cm)</text>
               {/* Tímpano */}
               <ellipse cx="255" cy="180" rx="8" ry="35" fill="rgba(46,134,171,0.25)" stroke="#2E86AB" strokeWidth="2.5" />
-              <text x="255" y="230" fill="#2E86AB" fontSize="10" fontWeight="700" textAnchor="middle">Tímpano</text>
+              <text x="255" y="230" style={{ fill: 'var(--oido-externo-texto)' }} fontSize="10" fontWeight="700" textAnchor="middle">Tímpano</text>
               {/* Flechas de sonido */}
               <path d="M 20,170 L 55,175" fill="none" stroke="#2E86AB" strokeWidth="1.5" markerEnd="url(#arrowBlue)" opacity="0.5" />
               <path d="M 20,190 L 55,185" fill="none" stroke="#2E86AB" strokeWidth="1.5" markerEnd="url(#arrowBlue)" opacity="0.5" />
-              <text x="140" y="60" fill="#2E86AB" fontSize="14" fontWeight="700" textAnchor="middle" className={styles.zonaLabel}>OÍDO EXTERNO</text>
+              <text x="140" y="60" style={{ fill: 'var(--oido-externo-texto)' }} fontSize="14" fontWeight="700" textAnchor="middle" className={styles.zonaLabel}>OÍDO EXTERNO</text>
             </g>
 
             {/* Zona: Oído medio */}
@@ -260,21 +260,21 @@ export default function OidoEquilibrioPage() {
               {/* Martillo */}
               <circle cx="320" cy="160" r="10" fill="rgba(72,169,166,0.3)" stroke="#48A9A6" strokeWidth="2.5" />
               <line x1="320" y1="170" x2="320" y2="210" stroke="#48A9A6" strokeWidth="3" />
-              <text x="320" y="230" fill="#48A9A6" fontSize="9" fontWeight="600" textAnchor="middle">Martillo</text>
+              <text x="320" y="230" style={{ fill: 'var(--oido-medio-texto)' }} fontSize="9" fontWeight="600" textAnchor="middle">Martillo</text>
               {/* Yunque */}
               <circle cx="380" cy="145" r="12" fill="rgba(72,169,166,0.3)" stroke="#48A9A6" strokeWidth="2.5" />
               <line x1="330" y1="160" x2="370" y2="148" stroke="#48A9A6" strokeWidth="2.5" />
-              <text x="380" y="175" fill="#48A9A6" fontSize="9" fontWeight="600" textAnchor="middle">Yunque</text>
+              <text x="380" y="175" style={{ fill: 'var(--oido-medio-texto)' }} fontSize="9" fontWeight="600" textAnchor="middle">Yunque</text>
               {/* Estribo */}
               <ellipse cx="440" cy="160" rx="12" ry="8" fill="rgba(72,169,166,0.3)" stroke="#48A9A6" strokeWidth="2.5" />
               <line x1="392" y1="148" x2="428" y2="158" stroke="#48A9A6" strokeWidth="2.5" />
-              <text x="440" y="185" fill="#48A9A6" fontSize="9" fontWeight="600" textAnchor="middle">Estribo (3 mm)</text>
+              <text x="440" y="185" style={{ fill: 'var(--oido-medio-texto)' }} fontSize="9" fontWeight="600" textAnchor="middle">Estribo (3 mm)</text>
               {/* Amplificación */}
-              <text x="380" y="120" fill="#48A9A6" fontSize="11" fontWeight="800" textAnchor="middle">×22 amplificación</text>
+              <text x="380" y="120" style={{ fill: 'var(--oido-medio-texto)' }} fontSize="11" fontWeight="800" textAnchor="middle">×22 amplificación</text>
               {/* Trompa de Eustaquio */}
               <path d="M 350,280 Q 380,320 430,340" fill="none" stroke="#48A9A6" strokeWidth="2" strokeDasharray="4 3" />
-              <text x="400" y="355" fill="#48A9A6" fontSize="9" fontWeight="600" textAnchor="middle">Trompa de Eustaquio</text>
-              <text x="400" y="60" fill="#48A9A6" fontSize="14" fontWeight="700" textAnchor="middle" className={styles.zonaLabel}>OÍDO MEDIO</text>
+              <text x="400" y="355" style={{ fill: 'var(--oido-medio-texto)' }} fontSize="9" fontWeight="600" textAnchor="middle">Trompa de Eustaquio</text>
+              <text x="400" y="60" style={{ fill: 'var(--oido-medio-texto)' }} fontSize="14" fontWeight="700" textAnchor="middle" className={styles.zonaLabel}>OÍDO MEDIO</text>
             </g>
 
             {/* Zona: Oído interno */}
@@ -290,24 +290,24 @@ export default function OidoEquilibrioPage() {
               <rect x="530" y="30" width="260" height="340" rx="12" fill={zonaActiva === 'interno' ? 'rgba(230,126,34,0.12)' : 'rgba(230,126,34,0.04)'} stroke={zonaActiva === 'interno' ? '#E67E22' : 'transparent'} strokeWidth="2" />
               {/* Cóclea (espiral) */}
               <path d="M 620,220 Q 620,180 650,180 Q 680,180 680,210 Q 680,240 650,240 Q 635,240 635,225 Q 635,210 650,210" fill="none" stroke="#E67E22" strokeWidth="3" />
-              <text x="655" y="260" fill="#E67E22" fontSize="10" fontWeight="700" textAnchor="middle">Cóclea</text>
-              <text x="655" y="274" fill="#E67E22" fontSize="8" textAnchor="middle">(2,5 vueltas)</text>
+              <text x="655" y="260" style={{ fill: 'var(--oido-interno-texto)' }} fontSize="10" fontWeight="700" textAnchor="middle">Cóclea</text>
+              <text x="655" y="274" style={{ fill: 'var(--oido-interno-texto)' }} fontSize="8" textAnchor="middle">(2,5 vueltas)</text>
               {/* Canales semicirculares */}
               <ellipse cx="640" cy="110" rx="40" ry="25" fill="none" stroke="#E67E22" strokeWidth="2.5" transform="rotate(-15 640 110)" />
               <ellipse cx="680" cy="130" rx="25" ry="35" fill="none" stroke="#E67E22" strokeWidth="2" opacity="0.7" transform="rotate(10 680 130)" />
               <ellipse cx="610" cy="130" rx="20" ry="30" fill="none" stroke="#E67E22" strokeWidth="2" opacity="0.7" transform="rotate(-20 610 130)" />
-              <text x="640" y="80" fill="#E67E22" fontSize="9" fontWeight="600" textAnchor="middle">Canales semicirculares</text>
+              <text x="640" y="80" style={{ fill: 'var(--oido-interno-texto)' }} fontSize="9" fontWeight="600" textAnchor="middle">Canales semicirculares</text>
               {/* Nervio */}
               <line x1="680" y1="230" x2="760" y2="200" stroke="#E67E22" strokeWidth="4" strokeLinecap="round" />
-              <text x="755" y="190" fill="#E67E22" fontSize="9" fontWeight="600" textAnchor="middle">Nervio</text>
+              <text x="755" y="190" style={{ fill: 'var(--oido-interno-texto)' }} fontSize="9" fontWeight="600" textAnchor="middle">Nervio</text>
               <circle cx="770" cy="185" r="14" fill="rgba(230,126,34,0.15)" stroke="#E67E22" strokeWidth="2" />
-              <text x="770" y="189" fill="#E67E22" fontSize="12" textAnchor="middle">🧠</text>
-              <text x="660" y="60" fill="#E67E22" fontSize="14" fontWeight="700" textAnchor="middle" className={styles.zonaLabel}>OÍDO INTERNO</text>
+              <text x="770" y="189" style={{ fill: 'var(--oido-interno-texto)' }} fontSize="12" textAnchor="middle">🧠</text>
+              <text x="660" y="60" style={{ fill: 'var(--oido-interno-texto)' }} fontSize="14" fontWeight="700" textAnchor="middle" className={styles.zonaLabel}>OÍDO INTERNO</text>
             </g>
 
             {/* Ventana oval (conexión medio→interno) */}
             <ellipse cx="515" cy="160" rx="6" ry="18" fill="rgba(230,126,34,0.3)" stroke="#E67E22" strokeWidth="2" />
-            <text x="515" y="200" fill="#666" fontSize="8" fontWeight="600" textAnchor="middle">Ventana oval</text>
+            <text x="515" y="200" style={{ fill: 'var(--text-secondary)' }} fontSize="8" fontWeight="600" textAnchor="middle">Ventana oval</text>
 
             {/* Defs */}
             <defs>
