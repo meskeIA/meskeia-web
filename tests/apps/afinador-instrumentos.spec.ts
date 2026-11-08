@@ -500,7 +500,12 @@ test.describe('Detección de tono — INSPECTOR 07/11/2026', () => {
     await expect.poll(() => notaLeida(page)).toBe('La4');
     await expect.poll(() => desvioCents(page, 0)).toBeLessThanOrEqual(2);
     await expect(pantalla(page).estado).toHaveText('✓ Afinado');
-    expect(await hzLeidos(page)).toBeCloseTo(440, 0); // medido 440,3 Hz
+    // Los Hz con la MISMA tolerancia que los cents de arriba (±2 cents = ±0,51 Hz a 440, la
+    // precisión que promete la FAQ). Antes era toBeCloseTo(440, 0), que exige < 0,5 Hz: más
+    // estricto que los cents, y una lectura de 440,5 Hz (1,97 cents, dentro de lo prometido)
+    // lo hacía caer en la suite (cabo C0682, 08/11/2026). Medido 440,3 Hz.
+    const toleranciaHz = 440 * (2 ** (2 / 1200) - 1);
+    expect(Math.abs((await hzLeidos(page)) - 440)).toBeLessThanOrEqual(toleranciaHz);
   });
 
   test('NORMAL · 445 Hz es La4 +19,56 cents y «↑ Bajar tensión»', async ({ page }) => {
