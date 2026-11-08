@@ -54,6 +54,17 @@ const WAVE_INFO: Record<WaveType, { name: string; description: string; icon: str
  */
 const RAMPA_GANANCIA_S = 0.05;
 
+/**
+ * Margen, en el reloj de AUDIO, entre el instante en que se programa el tono y el que se fija
+ * para que empiecen a la vez el oscilador y su rampa de entrada (cabo C0683, la forma de C0651
+ * en generador-tonos). Con `oscillator.start()` sin argumento el tono suena cuando el hilo de
+ * audio procesa el mensaje, pero la rampa se anclaba en el `currentTime` que leyó el hilo
+ * principal: si el reloj de audio ya iba por delante, el tono entraba con la rampa empezada.
+ * Programados los dos en el mismo instante futuro, el retraso del mensaje deja de importar
+ * mientras sea menor que este margen; 20 ms no se perciben al pulsar.
+ */
+const ARRANQUE_S = 0.02;
+
 /** Nodos de un tono: se sueltan juntos cuando el oscilador termina de sonar. */
 interface NodosTono {
   oscilador: OscillatorNode;
@@ -148,11 +159,15 @@ export default function GeneradorOndasPage() {
     const gainNode = audioContext.createGain();
     const analyser = audioContext.createAnalyser();
 
-    const t0 = audioContext.currentTime;
+    // Oscilador y rampa de entrada empiezan en el MISMO instante del reloj de audio, un poco por
+    // delante (ARRANQUE_S, cabo C0683). La ganancia nace a 0 y no en su 1 por defecto: si se
+    // detiene antes de t0, la rampa de salida se ancla en ese 0 y no deja pasar un golpe.
+    const t0 = audioContext.currentTime + ARRANQUE_S;
     oscillator.type = waveType;
     oscillator.frequency.setValueAtTime(frequency, t0);
     // Rampa de entrada 0 → volumen (hallazgo 1758). El efecto de volumen ya no la pisa: solo
     // reacciona a cambios del VOLUMEN, no al paso de isPlaying a true.
+    gainNode.gain.value = 0;
     gainNode.gain.setValueAtTime(0, t0);
     gainNode.gain.linearRampToValueAtTime(volume / 100, t0 + RAMPA_GANANCIA_S);
 
@@ -163,7 +178,7 @@ export default function GeneradorOndasPage() {
     gainNode.connect(analyser);
     analyser.connect(audioContext.destination);
 
-    oscillator.start();
+    oscillator.start(t0);
 
     oscillatorRef.current = oscillator;
     gainNodeRef.current = gainNode;

@@ -674,6 +674,63 @@ test('HALLAZGO — Reproducir entra con rampa desde 0, no en escalón', async ({
 });
 
 /**
+ * Cabo C0683 (la forma de C0651 de generador-tonos). La rampa de entrada se anclaba en el
+ * `currentTime` que leía el hilo principal y el oscilador arrancaba con `start()` sin argumento,
+ * cuando el hilo de audio procesaba el mensaje: con el reloj de audio por delante de esa lectura,
+ * el tono entraba con la rampa empezada. Se SIMULA con un `currentTime` que llega 12 ms atrasado
+ * a la página. Rampa de 0 a 0,5 en 0,05 s: v(t) = 10·t, y la ventana de ±1,5 ms mide
+ * 10·(t + 0,0015): 5 ms → 0,065 · 10 ms → 0,115 · 20 ms → 0,215 · 30 ms → 0,315.
+ * Se mide en caliente (con el contexto recién creado el reloj está en 0 y el atraso no muerde), y
+ * el segundo Reproducir espera 0,6 s de reloj tras Detener para que la cola del primero haya
+ * salido del búfer del bus (0,68 s).
+ * Medido el 08/11/2026 a 48 kHz: con el código anterior cae 3 de 3 (0,142 a los 10 ms); REPARADO,
+ * 0,063 · 0,108 · 0,210 · 0,312, 3 de 3. Tolerancia ±0,015.
+ * La reparación: oscilador y rampa arrancan en el mismo instante, 20 ms por delante.
+ */
+test('C0683 — con el reloj de audio 12 ms por delante de lo que lee la página, la entrada es la rampa entera', async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    const d = Object.getOwnPropertyDescriptor(BaseAudioContext.prototype, 'currentTime');
+    if (!d?.get) return;
+    const leer = d.get;
+    Object.defineProperty(BaseAudioContext.prototype, 'currentTime', {
+      configurable: true,
+      get(this: BaseAudioContext) {
+        return Math.max(0, (leer.call(this) as number) - 0.012);
+      },
+    });
+  });
+  await page.reload();
+  await esperarHidratacion(page, [FRECUENCIA, VOLUMEN]);
+  await reproducir(page, 0.3);
+  const antes = await reloj(page);
+  await botonDetener(page).click();
+  await expect(botonReproducir(page)).toBeVisible();
+  await esperarReloj(page, antes + 0.6);
+  const nArranques = (await llamadas(page)).filter((l) => l.metodo === 'start').length;
+  await botonReproducir(page).click();
+  await expect
+    .poll(async () => (await llamadas(page)).filter((l) => l.metodo === 'start').length)
+    .toBe(nArranques + 1);
+  await esperarReloj(page, (await reloj(page)) + 0.2);
+  const c = await capturar(page);
+  const primera = c.x.findIndex((v) => Math.abs(v) > 1e-6);
+  expect(primera, 'la captura tiene que empezar en silencio').toBeGreaterThan(0);
+  for (const [t, esperado] of [
+    [0.005, 0.065],
+    [0.01, 0.115],
+    [0.02, 0.215],
+    [0.03, 0.315],
+  ] as const) {
+    const a = amplitudEn(c, primera + Math.round(t * c.sr));
+    expect(Math.abs(a - esperado), `amplitud a ${t * 1000} ms del arranque: ${a.toFixed(3)} (esperado ${esperado})`).toBeLessThan(
+      0.015,
+    );
+  }
+});
+
+/**
  * HALLAZGO [bajo · SOSPECHA confirmada]. El volumen cambia en escalón: el efecto sobre
  * [volume, isPlaying] (page.tsx 173-177) hace gain.setValueAtTime(v, currentTime), sin
  * cancelScheduledValues, sin ancla en el valor en curso y sin rampa.
