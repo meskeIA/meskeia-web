@@ -301,7 +301,7 @@ export default function OidoEquilibrioPage() {
               <line x1="680" y1="230" x2="760" y2="200" stroke="#E67E22" strokeWidth="4" strokeLinecap="round" />
               <text x="755" y="190" style={{ fill: 'var(--oido-interno-texto)' }} fontSize="9" fontWeight="600" textAnchor="middle">Nervio</text>
               <circle cx="770" cy="185" r="14" fill="rgba(230,126,34,0.15)" stroke="#E67E22" strokeWidth="2" />
-              <text x="770" y="189" style={{ fill: 'var(--oido-interno-texto)' }} fontSize="12" textAnchor="middle">🧠</text>
+              <text x="770" y="189" fontSize="12" textAnchor="middle" aria-hidden="true">🧠</text>
               <text x="660" y="60" style={{ fill: 'var(--oido-interno-texto)' }} fontSize="14" fontWeight="700" textAnchor="middle" className={styles.zonaLabel}>OÍDO INTERNO</text>
             </g>
 
