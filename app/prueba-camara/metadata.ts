@@ -2,17 +2,17 @@ import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
-  title: 'Prueba de Cámara Web Online - Test Webcam Gratis | meskeIA',
-  description: 'Prueba tu cámara web antes de videollamadas, en el ordenador (computadora), móvil o celular. Verifica resolución, brillo, contraste y toma fotos. Sin registro ni instalación. Totalmente privado.',
-  keywords: 'prueba camara, test webcam, probar camara web, verificar camara, videollamada, zoom, meet, teams, camara ordenador, camara computadora, camara movil, camara celular, webcam test',
+  title: 'Prueba de Cámara Web y Micrófono Online - Test Webcam Gratis | meskeIA',
+  description: 'Prueba tu cámara web y tu micrófono antes de videollamadas, en el ordenador (computadora), móvil o celular. Verifica resolución y brillo, mide el nivel de tu voz y escucha cómo suenas. Sin registro ni instalación. Totalmente privado.',
+  keywords: 'prueba camara y microfono, probar camara y microfono, prueba camara, test webcam, probar camara web, verificar camara, videollamada, zoom, meet, teams, camara ordenador, camara computadora, camara movil, camara celular, webcam test',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
   robots: 'index, follow',
   openGraph: {
     type: 'website',
-    title: 'Prueba de Cámara Web Online - Test Webcam Gratis',
-    description: 'Verifica tu cámara web antes de videollamadas. Test completo con captura de fotos.',
+    title: 'Prueba de Cámara Web y Micrófono Online - Test Webcam Gratis',
+    description: 'Verifica tu cámara web y tu micrófono antes de videollamadas: imagen, fotos de prueba y nivel de voz.',
     url: 'https://meskeia.com/prueba-camara/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -25,18 +25,25 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Prueba de Cámara Web Online',
-    description: 'Test de webcam gratis antes de tus videollamadas',
+    title: 'Prueba de Cámara Web y Micrófono Online',
+    description: 'Test de webcam y micrófono gratis antes de tus videollamadas',
     images: ['https://meskeia.com/og-image.png']
   },
 };
 
 export const jsonLd = generateWebAppSchema({
-  name: "Prueba de Cámara Web",
-  description: "Prueba tu cámara web antes de videollamadas, tanto en el ordenador (computadora) como en el móvil o celular. Verifica resolución, brillo, contraste y toma fotos. Sin registro ni instalación. Totalmente privado.",
+  name: "Prueba de Cámara Web y Micrófono",
+  description: "Prueba tu cámara web y tu micrófono antes de videollamadas, tanto en el ordenador (computadora) como en el móvil o celular. Verifica resolución y brillo, mide el nivel de tu voz y graba unos segundos para escuchar cómo suenas. Sin registro ni instalación. Totalmente privado.",
   url: "https://meskeia.com/prueba-camara/",
   category: 'UtilityApplication',
-  features: [],
+  features: [
+    'Imagen de la webcam en directo con la resolución real detectada',
+    'Ajuste de brillo, contraste y modo espejo',
+    'Fotos de prueba con cuenta atrás, descargables',
+    'Nivel del micrófono en directo con el procesado de voz de una videollamada',
+    'Grabación de 5 segundos para escuchar cómo te oirán',
+    'Selector de cámara y de entrada de audio',
+  ],
 });
 
 export const faqJsonLd = {
@@ -67,6 +74,11 @@ export const faqJsonLd = {
       '@type': 'Question',
       name: '¿Puedo probar la cámara en móvil (celular) o tablet?',
       acceptedAnswer: { '@type': 'Answer', text: 'Sí. Los navegadores modernos en Android (Chrome) e iOS (Safari 14.3 o superior) soportan acceso a cámara vía WebRTC. En el móvil o celular, la herramienta suele ofrecer la opción de elegir entre la cámara frontal y la trasera. El comportamiento es idéntico al del ordenador o computadora: sin instalación, sin registro y sin almacenamiento de datos.' },
+    },
+    {
+      '@type': 'Question',
+      name: '¿Puedo probar la cámara y el micrófono a la vez?',
+      acceptedAnswer: { '@type': 'Answer', text: 'Sí. Debajo de la imagen de la cámara hay una prueba de micrófono con una barra de nivel: habla con tu voz normal y comprueba que queda en la zona marcada como correcta, ni muy baja ni a punto de saturar. Si grabas 5 segundos, la herramienta los reproduce para que oigas cómo te llegará la voz a los demás. La captura usa la cancelación de eco y la supresión de ruido del navegador, como hacen Zoom, Meet o Teams.' },
     },
   ],
 };

@@ -38,6 +38,8 @@ const APPS: AppMicrofono[] = [
   { slug: 'afinador-instrumentos', boton: /Iniciar afinador/ },
   { slug: 'prueba-microfono', boton: /Iniciar Micrófono/ },
   { slug: 'ejercicios-vocalizacion', boton: /Activar micrófono/ },
+  // S0260 (08/11/2026): la prueba de micrófono dentro de la de cámara
+  { slug: 'prueba-camara', boton: /Probar micrófono/ },
 ];
 
 test.use({

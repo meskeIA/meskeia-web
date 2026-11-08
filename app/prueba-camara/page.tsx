@@ -4,6 +4,7 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
 import styles from './PruebaCamara.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
+import PanelMicrofono from './PanelMicrofono';
 
 interface CameraInfo {
   deviceId: string;
@@ -215,9 +216,9 @@ export default function PruebaCamaraPage() {
 
       <header className={styles.hero}>
         <span className={styles.heroIcon}>📷</span>
-        <h1 className={styles.title}>Prueba de Cámara Web</h1>
+        <h1 className={styles.title}>Prueba de Cámara Web y Micrófono</h1>
         <p className={styles.subtitle}>
-          Verifica tu webcam antes de videollamadas, en el ordenador (computadora) o en el móvil (celular). Toma fotos, ajusta configuración. Sin registro, 100% privado.
+          Verifica tu webcam y tu micrófono antes de videollamadas, en el ordenador (computadora) o en el móvil (celular). Toma fotos, mide el nivel de tu voz y escucha cómo suenas. Sin registro, 100&nbsp;% privado.
         </p>
       </header>
 
@@ -381,6 +382,9 @@ export default function PruebaCamaraPage() {
               )}
             </div>
 
+            {/* Micrófono: la otra mitad de la comprobación antes de una videollamada (S0260) */}
+            <PanelMicrofono />
+
             {/* Galería de fotos */}
             {photos.length > 0 && (
               <div className={styles.gallerySection}>
@@ -447,7 +451,7 @@ export default function PruebaCamaraPage() {
           <div className={styles.tipCard}>
             <span className={styles.tipIcon}>🔇</span>
             <h4>Antes de llamar</h4>
-            <p>Verifica también tu micrófono con nuestra herramienta de audio.</p>
+            <p>Prueba el micrófono aquí mismo y graba unos segundos para escuchar cómo te oirán.</p>
           </div>
         </div>
       </div>

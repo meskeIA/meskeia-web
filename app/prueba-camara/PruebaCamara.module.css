@@ -406,6 +406,107 @@
   color: var(--text-secondary);
 }
 
+/* Panel del micrófono (S0260) */
+.micPanel {
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-lg);
+  box-shadow: var(--shadow-md);
+  margin-bottom: var(--spacing-xl);
+}
+
+.micTitulo {
+  font-size: 1.2rem;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-sm);
+}
+
+.micIntro {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  margin: 0 0 var(--spacing-md);
+}
+
+.micMedidor {
+  position: relative;
+  height: 28px;
+  background: var(--hover);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.micMedidorApagado {
+  opacity: 0.6;
+}
+
+.micBarra {
+  height: 100%;
+  width: 0%;
+  transition: width 0.06s linear;
+}
+
+.micBarraNada { background: #9CA3AF; }
+.micBarraBajo { background: #F59E0B; }
+.micBarraBien { background: #22A35A; }
+.micBarraAlto { background: #DC2626; }
+
+/* Las dos marcas: -35 dBFS (empieza lo correcto) y -8 dBFS (empieza a saturar) */
+.micMarcaBajo,
+.micMarcaAlto {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--text-secondary);
+  opacity: 0.6;
+}
+
+.micMarcaBajo { left: 41.67%; }
+.micMarcaAlto { left: 86.67%; }
+
+.micEstado {
+  margin: var(--spacing-sm) 0 0;
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.micError {
+  margin: var(--spacing-sm) 0 var(--spacing-md);
+  color: var(--rojo-texto, #B91C1C);
+  font-size: 0.9rem;
+}
+
+.micError:empty {
+  margin: 0 0 var(--spacing-md);
+}
+
+.micSelector {
+  margin-top: var(--spacing-md);
+}
+
+.micGrabacion {
+  margin-top: var(--spacing-md);
+}
+
+.micAudio {
+  width: 100%;
+  margin-top: var(--spacing-sm);
+}
+
+[data-theme='dark'] .micError {
+  color: #FCA5A5;
+}
+
+[data-theme='dark'] .micBarraNada { background: #6B7280; }
+
+.btnAccent:disabled {
+  opacity: 0.7;
+  cursor: default;
+  transform: none;
+}
+
 /* Gallery Section */
 .gallerySection {
   background: var(--bg-card);
