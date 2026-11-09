@@ -5,6 +5,7 @@ import styles from './Luxometro.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, EducationalSection, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 import DataReference from '@/components/DataReference';
+import { FAQ_PRECISION } from './faq';
 import {
   ILUMINACION_RD486_META,
   ILUMINACION_EN12464_META,
@@ -89,6 +90,22 @@ const getPhotoRecommendations = (lux: number): { iso: string; aperture: string; 
   }
 };
 
+/** Lo que la página usa del AmbientLightSensor, que no está en los tipos estándar. */
+interface SensorLuz {
+  illuminance: number | null;
+  start(): void;
+  stop(): void;
+  addEventListener(tipo: 'reading' | 'error', oyente: () => void): void;
+}
+
+/**
+ * El historial guarda UNA muestra por segundo. Hasta el 09/11/2026 guardaba una por fotograma
+ * (~60 por segundo), así que el panel «últimos 60 segundos» resumía el último segundo
+ * (hallazgo 4262).
+ */
+const MS_ENTRE_MUESTRAS = 1000;
+const MUESTRAS_HISTORIAL = 60;
+
 // Obtener nivel de referencia actual
 const getCurrentReference = (lux: number) => {
   return LUX_REFERENCES.find(ref => lux >= ref.min && lux < ref.max) || LUX_REFERENCES[LUX_REFERENCES.length - 1];
@@ -129,28 +146,72 @@ export default function LuxometroPage() {
   const [calibracion, setCalibracion] = useState<number | null>(null);
   const [showCalibration, setShowCalibration] = useState(false);
   const [knownLux, setKnownLux] = useState('');
+  const [errorCalibracion, setErrorCalibracion] = useState<string | null>(null);
+  const campoCalibracionRef = useRef<HTMLInputElement>(null);
+
+  /**
+   * El sensor vive en una ref para que «Detener» pueda pararlo. Era una variable local: tras
+   * «Detener» las lecturas seguían llegando, borraban el aviso de «Medición detenida» y al volver
+   * a iniciar había dos sensores vivos (hallazgo 4261).
+   */
+  const sensorRef = useRef<SensorLuz | null>(null);
+  /**
+   * ¿El factor 1 lo puso el sensor (que da lux de verdad) y no el usuario? Si el sensor falla y
+   * se cae a la cámara, ese factor tiene que irse con él: si no, la señal cruda de la cámara
+   * salía como lux, con la insignia «Calibrado» (hallazgo 4260, el 908 por la ruta del sensor).
+   */
+  const calibracionDelSensorRef = useRef(false);
+  const ultimaMuestraRef = useRef(0);
+
+  /** Añade una muestra al historial, como mucho una por segundo (hallazgo 4262). */
+  const anotarHistorial = useCallback((valor: number) => {
+    const ahora = performance.now();
+    if (ahora - ultimaMuestraRef.current < MS_ENTRE_MUESTRAS) return;
+    ultimaMuestraRef.current = ahora;
+    setHistory(prev => [...prev.slice(-(MUESTRAS_HISTORIAL - 1)), valor]);
+  }, []);
+
+  const pararSensor = useCallback(() => {
+    if (sensorRef.current) {
+      sensorRef.current.stop();
+      sensorRef.current = null;
+    }
+  }, []);
 
   // Intentar usar Ambient Light Sensor API
   const tryAmbientLightSensor = useCallback(() => {
     if ('AmbientLightSensor' in window) {
       try {
+        pararSensor();
         // @ts-expect-error - AmbientLightSensor no está en tipos estándar
-        const sensor = new AmbientLightSensor();
+        const sensor: SensorLuz = new AmbientLightSensor();
         sensor.addEventListener('reading', () => {
           // Este sensor SÍ entrega lux de verdad, así que su señal es directamente el lux
           // y su factor de calibración es 1 mientras nadie lo cambie.
-          const luxValue = Math.round(sensor.illuminance);
+          const luxValue = Math.round(sensor.illuminance ?? 0);
           setSenal(luxValue);
           setLecturaCaducada(false);
-          setHistory(prev => [...prev.slice(-59), luxValue]);
+          anotarHistorial(luxValue);
         });
         sensor.addEventListener('error', () => {
-          // Sensor no disponible, usar cámara
+          // Sensor no disponible: se para, se retira el factor que puso él y se usa la cámara,
+          // que sin calibrar publica un nivel relativo y no lux (hallazgo 4260).
+          if (sensorRef.current === sensor) sensorRef.current = null;
+          sensor.stop();
+          if (calibracionDelSensorRef.current) {
+            calibracionDelSensorRef.current = false;
+            setCalibracion(null);
+          }
           startCameraMethod();
         });
         sensor.start();
+        sensorRef.current = sensor;
         setMethod('sensor');
-        setCalibracion(prev => prev ?? 1);
+        setCalibracion(prev => {
+          if (prev !== null) return prev;
+          calibracionDelSensorRef.current = true;
+          return 1;
+        });
         setIsActive(true);
         setError(null);
         return true;
@@ -159,7 +220,7 @@ export default function LuxometroPage() {
       }
     }
     return false;
-  }, []);
+  }, [anotarHistorial, pararSensor]);
 
   // Calcular luminosidad desde imagen de cámara
   const calculateLuxFromCamera = useCallback(() => {
@@ -197,10 +258,10 @@ export default function LuxometroPage() {
 
     setSenal(Math.max(0, senalCruda));
     setLecturaCaducada(false);
-    setHistory(prev => [...prev.slice(-59), senalCruda]);
+    anotarHistorial(Math.max(0, senalCruda));
 
     animationRef.current = requestAnimationFrame(calculateLuxFromCamera);
-  }, []);
+  }, [anotarHistorial]);
 
   // Iniciar método de cámara
   const startCameraMethod = useCallback(async () => {
@@ -257,6 +318,7 @@ export default function LuxometroPage() {
 
   // Detener medición
   const stopMeasurement = useCallback(() => {
+    pararSensor();
     if (animationRef.current) {
       cancelAnimationFrame(animationRef.current);
       animationRef.current = null;
@@ -276,7 +338,7 @@ export default function LuxometroPage() {
     // La cámara ya está apagada: lo que queda en pantalla es de otro momento y de otro sitio,
     // y sin esto se quedaba ahí con aspecto de lectura viva (hallazgo 910).
     setLecturaCaducada(true);
-  }, []);
+  }, [pararSensor]);
 
   /**
    * Calibra: el usuario dice cuántos lux hay de verdad y eso fija la escala.
@@ -288,21 +350,39 @@ export default function LuxometroPage() {
    */
   const calibrate = useCallback(() => {
     const known = parseSpanishNumber(knownLux);
-    if (Number.isFinite(known) && known > 0 && senal !== null && senal > 0) {
-      setCalibracion(known / senal);
-      setShowCalibration(false);
-      setKnownLux('');
+    // El rechazo se dice, con el motivo, y el foco vuelve al campo: antes retornaba en silencio
+    // y el panel se quedaba abierto con lo escrito (hallazgo 4264).
+    let motivo: string | null = null;
+    if (!Number.isFinite(known)) {
+      motivo = 'Escribe solo la cifra en lux, sin la unidad: por ejemplo, 500.';
+    } else if (known <= 0) {
+      motivo = 'El valor de referencia tiene que ser mayor que 0 lux.';
+    } else if (senal === null || senal <= 0) {
+      motivo = 'La cámara no ve luz ahora mismo (¿está tapado el objetivo?). Apúntala a la escena iluminada y vuelve a calibrar.';
     }
+    if (motivo !== null) {
+      setErrorCalibracion(motivo);
+      campoCalibracionRef.current?.focus();
+      return;
+    }
+    calibracionDelSensorRef.current = false;
+    setCalibracion(known / (senal as number));
+    setErrorCalibracion(null);
+    setShowCalibration(false);
+    setKnownLux('');
   }, [knownLux, senal]);
 
   // Volver a «sin calibrar»: se retira la cifra en lux, no se pone el factor a 1
   const resetCalibration = () => {
+    calibracionDelSensorRef.current = false;
     setCalibracion(null);
   };
 
   // Limpiar al desmontar
   useEffect(() => {
     return () => {
+      sensorRef.current?.stop();
+      sensorRef.current = null;
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
       }
@@ -326,6 +406,23 @@ export default function LuxometroPage() {
       ? Math.round(valorSenal * calibracion)
       : Math.min(100, Math.round(Math.pow(Math.max(0, valorSenal) / 100000, 1 / 2.2) * 100));
   const unidadHistorial = calibracion !== null ? 'lux' : 'nivel relativo';
+  /**
+   * Alto de cada barra del historial, en la MISMA escala que el medidor: logarítmica de lux si
+   * hay calibración y el propio nivel 0-100 si no. Antes el nivel pasaba por la escala de lux y
+   * un nivel 100 llenaba el 38,7 % de la barra con el medidor al 100 % (hallazgo 4263).
+   */
+  const alturaBarra = (valorSenal: number): number =>
+    calibracion !== null ? getMeterPercentage(enUnidad(valorSenal)) : enUnidad(valorSenal);
+  /**
+   * Media de lo que se pinta: en lux es lineal y vale promediar la señal; en nivel relativo se
+   * promedian los NIVELES, no se convierte la media de las señales (hallazgo 4263).
+   */
+  const mediaHistorial = (): number =>
+    history.length === 0
+      ? 0
+      : calibracion !== null
+        ? enUnidad(history.reduce((a, b) => a + b, 0) / history.length)
+        : Math.round(history.reduce((a, b) => a + enUnidad(b), 0) / history.length);
   const currentRef = lux !== null ? getCurrentReference(lux) : null;
   const photoRec = lux !== null ? getPhotoRecommendations(lux) : null;
 
@@ -513,18 +610,29 @@ export default function LuxometroPage() {
                 {/* type="text" + inputMode, no type="number": en un campo numérico el navegador
                     normaliza «1,5» a «1.5» y parseSpanishNumber lee el punto como millar. */}
                 <input
+                  ref={campoCalibracionRef}
                   id="lux-referencia"
                   type="text"
                   inputMode="decimal"
                   value={knownLux}
-                  onChange={(e) => setKnownLux(e.target.value)}
+                  onChange={(e) => {
+                    setKnownLux(e.target.value);
+                    setErrorCalibracion(null);
+                  }}
                   placeholder="Por ejemplo, 500"
                   className={styles.calibrationInput}
+                  aria-invalid={errorCalibracion !== null}
+                  aria-describedby={errorCalibracion !== null ? 'lux-referencia-error' : undefined}
                 />
                 <button type="button" onClick={calibrate} className={styles.btnSmall}>
                   Calibrar
                 </button>
               </div>
+              {errorCalibracion !== null && (
+                <p id="lux-referencia-error" className={styles.errorMessage} role="alert">
+                  {errorCalibracion}
+                </p>
+              )}
               {calibracion !== null && (
                 <button type="button" onClick={resetCalibration} className={styles.btnSmallDanger}>
                   Quitar la calibración (vuelve al nivel relativo)
@@ -542,7 +650,7 @@ export default function LuxometroPage() {
                   <div
                     key={idx}
                     className={styles.historyBar}
-                    style={{ height: `${getMeterPercentage(enUnidad(val))}%` }}
+                    style={{ height: `${alturaBarra(val)}%` }}
                     title={`${formatNumber(enUnidad(val), 0)} ${unidadHistorial}`}
                   />
                 ))}
@@ -550,7 +658,7 @@ export default function LuxometroPage() {
               <div className={styles.historyStats}>
                 <span>Mín: {formatNumber(enUnidad(Math.min(...history)), 0)}</span>
                 <span>Máx: {formatNumber(enUnidad(Math.max(...history)), 0)}</span>
-                <span>Media: {formatNumber(enUnidad(history.reduce((a, b) => a + b, 0) / history.length), 0)}</span>
+                <span>Media: {formatNumber(mediaHistorial(), 0)}</span>
               </div>
             </div>
           )}
@@ -802,8 +910,8 @@ export default function LuxometroPage() {
         {/* FAQ */}
         <ul className={styles.faqList}>
           <li className={styles.faqItem}>
-            <h3>¿Es preciso el luxómetro del navegador comparado con uno profesional?</h3>
-            <p>Depende del dispositivo. Los sensores de luz ambiente integrados en móviles (celulares) y portátiles tienen una respuesta espectral y rango limitados. Son útiles para estimaciones orientativas pero no para mediciones certificadas. Un luxómetro profesional calibrado (como los de Konica Minolta o Testo) tiene precisión de ±3-5%.</p>
+            <h3>{FAQ_PRECISION.pregunta}</h3>
+            <p>{FAQ_PRECISION.respuesta}</p>
           </li>
           <li className={styles.faqItem}>
             <h3>¿Qué diferencia hay entre lux, lumen y candela?</h3>
@@ -815,7 +923,8 @@ export default function LuxometroPage() {
           </li>
           <li className={styles.faqItem}>
             <h3>¿Por qué mi sensor no funciona en mi dispositivo?</h3>
-            <p>La API de sensor de luz ambiente (AmbientLightSensor) no está disponible en todos los navegadores ni dispositivos. Firefox la soporta con configuración especial; Chrome la soporta en Android con sensor hardware presente. En muchos portátiles y tablets el sensor está pero el navegador no lo expone por defecto.</p>
+            {/* Coherente con el aviso «Qué mide de verdad esta página» (hallazgo 4266): antes decía que Firefox y Chrome en Android la soportaban. */}
+            <p>La app intenta primero la API de sensor de luz ambiente (AmbientLightSensor), pero hoy ningún navegador de uso común la expone: en Chrome está tras un flag y en Safari y Firefox no existe. En muchos portátiles y tablets el sensor está, pero el navegador no lo ofrece a las páginas web. Por eso la app mide con la cámara trasera, y la insignia bajo el medidor dice qué método está usando.</p>
           </li>
           <li className={styles.faqItem}>
             <h3>¿Cuántos lux necesito en mi oficina según la normativa española?</h3>

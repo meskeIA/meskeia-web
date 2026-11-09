@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
+import { FAQ_PRECISION } from './faq';
 
 export const metadata: Metadata = {
   title: 'Luxómetro Online - Mide la Intensidad de Luz con tu Móvil o Celular | meskeIA',
@@ -12,7 +13,8 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     title: 'Luxómetro Online - Mide la Intensidad de Luz con tu Móvil o Celular',
-    description: 'Mide la luz ambiente con tu móvil o celular. Recomendaciones fotográficas incluidas.',
+    // Bajada a lo que hace la app, como la description (hallazgo 4267, tipo promesa)
+    description: 'Estima la luz de una escena con la cámara de tu móvil o celular: nivel relativo, y lux si lo calibras. Recomendaciones fotográficas incluidas.',
     url: 'https://meskeia.com/luxometro/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -26,7 +28,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Luxómetro Online - meskeIA',
-    description: 'Mide la intensidad de luz con tu móvil o celular y obtén recomendaciones para fotografía.',
+    description: 'Estima la luz con la cámara de tu móvil o celular (nivel relativo, o lux si lo calibras) y obtén recomendaciones para fotografía.',
     images: ['https://meskeia.com/og-image.png']
   },
   other: {
@@ -68,8 +70,8 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Es fiable un luxómetro de móvil o celular frente a uno profesional?',
-      acceptedAnswer: { '@type': 'Answer', text: 'No es el mismo instrumento. Un luxómetro tiene un fotodiodo con respuesta espectral corregida y ganancia fija; un móvil mide con una cámara que reajusta la exposición sola, y ese reajuste es justo lo que impide deducir la iluminancia del brillo de la imagen. Calibrado contra una referencia y sin mover el encuadre sirve para comparar puntos de una misma estancia; para acreditar el cumplimiento de una norma de iluminación en un puesto de trabajo hace falta un aparato con certificado de trazabilidad.' },
+      name: FAQ_PRECISION.pregunta,
+      acceptedAnswer: { '@type': 'Answer', text: FAQ_PRECISION.respuesta },
     },
   ],
 };

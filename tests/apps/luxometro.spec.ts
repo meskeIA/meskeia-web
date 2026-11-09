@@ -694,7 +694,7 @@ async function sensorDeLuz(page: Page, falla: boolean): Promise<void> {
 }
 
 test.describe('Hallazgos de la inspección de cambio del 09/11/2026', () => {
-  test('HALLAZGO (09/11/2026, ABIERTO) · si el sensor de luz falla y cae a la cámara, vuelve la cifra en lux sin calibrar y con la insignia «Calibrado»', async ({
+  test('HALLAZGO (09/11/2026, REPARADO) · si el sensor de luz falla y cae a la cámara, vuelve la cifra en lux sin calibrar y con la insignia «Calibrado»', async ({
     page,
   }) => {
     // `tryAmbientLightSensor` pone `setCalibracion(prev => prev ?? 1)` en cuanto el constructor
@@ -703,7 +703,7 @@ test.describe('Hallazgos de la inspección de cambio del 09/11/2026', () => {
     // salía «21.952 lux · Sombra exterior», «Calibrado», «Calibrado para esta escena» y las
     // recomendaciones de sunny 16 — el hallazgo 908 entero, por la puerta del sensor.
     // Esperado (contrato de la reparación del 18/09): nivel 50 «/ 100 (nivel relativo)».
-    test.fail();
+    // REPARADO (hallazgo 4260, /reparar 09/11/2026): el factor que pone el sensor se retira con él.
     await camaraDeLuminancia(page, 'rgb(128,128,128)');
     await sensorDeLuz(page, true);
     await abrirYMedir(page);
@@ -713,18 +713,22 @@ test.describe('Hallazgos de la inspección de cambio del 09/11/2026', () => {
     await expect(page.locator(INSIGNIA)).not.toContainText('Calibrado');
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · «Detener» no para el sensor de luz: la lectura sigue cambiando y «Medición detenida» se borra', async ({
+  test('HALLAZGO (09/11/2026, REPARADO) · «Detener» no para el sensor de luz: la lectura sigue cambiando y «Medición detenida» se borra', async ({
     page,
   }) => {
     // El sensor se crea en una variable local y `stopMeasurement` nunca llama a `stop()`: tras
     // «Detener» las lecturas siguen llegando, cada una pone `lecturaCaducada` a false y la cifra
     // alterna 320/640 con el botón «Iniciar Medición» en pantalla. Medido: 0 llamadas a stop();
     // al volver a iniciar hay dos sensores vivos.
-    test.fail();
+    // REPARADO (hallazgo 4261, /reparar 09/11/2026): el sensor vive en una ref y «Detener» lo para.
     await sensorDeLuz(page, false);
     await abrirYMedir(page);
     await expect(page.locator(INSIGNIA)).toContainText('Sensor de luz');
     await expect(page.locator(UNIDAD)).toHaveText('lux');
+    // Una lectura viva antes de detener: «lux» sale también con «---», y el sensor falso emite
+    // la primera a los 400 ms. Antes de la reparación las lecturas seguían tras «Detener» y
+    // tapaban esta carrera.
+    await expect(page.locator(VALOR)).toHaveText(/^\d/);
 
     await detener(page).click();
     await expect(iniciar(page)).toBeVisible();
@@ -735,14 +739,14 @@ test.describe('Hallazgos de la inspección de cambio del 09/11/2026', () => {
     expect(await texto(page.locator(VALOR))).toBe(congelada);
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · el «Historial (últimos 60 segundos)» guarda 60 fotogramas, alrededor de 1 s', async ({
+  test('HALLAZGO (09/11/2026, REPARADO) · el «Historial (últimos 60 segundos)» guarda 60 fotogramas, alrededor de 1 s', async ({
     page,
   }) => {
     // `setHistory(prev => [...prev.slice(-59), señal])` se ejecuta en cada requestAnimationFrame
     // (61 por segundo, medido): las 60 barras se llenan en ~1 s. Con gris 192 (nivel 75) durante
     // 3 s y luego gris 128 (nivel 50), cinco segundos después una ventana de 60 s tiene que
     // seguir viendo el 75. Medido el 09/11/2026: «Mín: 50 · Máx: 50 · Media: 50».
-    test.fail();
+    // REPARADO (hallazgo 4262, /reparar 09/11/2026): una muestra por segundo, 60 muestras.
     await camaraDeLuminancia(page, 'rgb(192,192,192)');
     await abrirYMedir(page);
     await expect(page.locator(VALOR)).toHaveText('75');
@@ -758,7 +762,7 @@ test.describe('Hallazgos de la inspección de cambio del 09/11/2026', () => {
     await expect(estadisticas).toContainText('Máx: 75');
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · en nivel relativo el historial usa la escala de los lux: la media sale de la señal y las barras se quedan en el 38,7 %', async ({
+  test('HALLAZGO (09/11/2026, REPARADO) · en nivel relativo el historial usa la escala de los lux: la media sale de la señal y las barras se quedan en el 38,7 %', async ({
     page,
   }) => {
     // `enUnidad()` convierte la MEDIA de las señales, no media los niveles: con 2/3 de muestras
@@ -766,7 +770,9 @@ test.describe('Hallazgos de la inspección de cambio del 09/11/2026', () => {
     // Y la altura de cada barra pasa el nivel 0-100 por `getMeterPercentage`, la escala
     // logarítmica de 0 a 150.000 lux: un nivel 100 llena log10(101)/log10(150001) = 38,72 % de
     // la barra mientras el medidor de la misma lectura va al 100 %.
-    test.fail();
+    // REPARADO (hallazgo 4263, /reparar 09/11/2026): barras en la escala del medidor y media de
+    // los niveles. Con una muestra por segundo (4262) ya no caben 20 de cada en 5 s: basta con
+    // que haya de los dos valores para comprobar la media, y se espera hasta 10 s.
     await camaraDeLuminancia(page, 'rgb(255,255,255)');
     await abrirYMedir(page);
     await expect(page.locator(VALOR)).toHaveText('100');
@@ -785,7 +791,7 @@ test.describe('Hallazgos de la inspección de cambio del 09/11/2026', () => {
     const mezcla = await page.evaluate(
       () =>
         new Promise<{ n: number; k100: number; media: number }>((resolver, rechazar) => {
-          const limite = window.setTimeout(() => rechazar(new Error('sin mezcla de 100 y 0 en 5 s')), 5000);
+          const limite = window.setTimeout(() => rechazar(new Error('sin mezcla de 100 y 0 en 10 s')), 10000);
           const mirar = (): void => {
             const niveles = Array.from(document.querySelectorAll('[class*="historyBar"]')).map((b) =>
               parseInt(b.getAttribute('title') ?? '', 10),
@@ -794,7 +800,7 @@ test.describe('Hallazgos de la inspección de cambio del 09/11/2026', () => {
             const k0 = niveles.filter((x) => x === 0).length;
             const stats = document.querySelector('[class*="historyStats"]')?.textContent ?? '';
             const media = /Media:\s*(\d+)/.exec(stats);
-            if (k100 >= 20 && k0 >= 20 && media) {
+            if (k100 >= 1 && k0 >= 2 && media) {
               window.clearTimeout(limite);
               resolver({ n: niveles.length, k100, media: Number(media[1]) });
             } else {
@@ -807,7 +813,7 @@ test.describe('Hallazgos de la inspección de cambio del 09/11/2026', () => {
     expect(mezcla.media).toBe(Math.round((100 * mezcla.k100) / mezcla.n));
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · una referencia que no se puede leer («500 lx», 0, negativa) se rechaza sin decir nada', async ({
+  test('HALLAZGO (09/11/2026, REPARADO) · una referencia que no se puede leer («500 lx», 0, negativa) se rechaza sin decir nada', async ({
     page,
   }) => {
     // `calibrate()` exige un número finito > 0 y una señal > 0, y si no los tiene RETORNA: no
@@ -815,7 +821,7 @@ test.describe('Hallazgos de la inspección de cambio del 09/11/2026', () => {
     // lo que escribe quien lee la etiqueta «Valor real en lux». Medido el 09/11/2026 con «500 lx»,
     // «500 lux», «abc», «0», «-5» y con el objetivo tapado (señal 0): ningún aviso.
     // Esperado: un aviso de la app (role="alert" dentro del medidor, no el anunciador de Next).
-    test.fail();
+    // REPARADO (hallazgo 4264, /reparar 09/11/2026): aviso con el motivo, aria-invalid y foco.
     await camaraDeLuminancia(page, 'rgb(128,128,128)');
     await abrirYMedir(page);
     await expect(page.locator(VALOR)).toHaveText('50');
@@ -829,14 +835,14 @@ test.describe('Hallazgos de la inspección de cambio del 09/11/2026', () => {
     await expect(page.locator('[class*="meterPanel"] [role="alert"]')).toBeVisible({ timeout: 3000 });
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · la FAQ visible responde a «¿es preciso frente a uno profesional?» con el sensor de luz ambiente, y el FAQPage con la cámara', async ({
+  test('HALLAZGO (09/11/2026, REPARADO) · la FAQ visible responde a «¿es preciso frente a uno profesional?» con el sensor de luz ambiente, y el FAQPage con la cámara', async ({
     page,
   }) => {
     // Es la misma pregunta con dos redacciones. El FAQPage (reescrito el 18/09) explica que la
     // cámara compensa la exposición y que sin calibrar no hay lux; la FAQ visible, que no se
     // tocó, sigue hablando de «sensores de luz ambiente […] útiles para estimaciones
     // orientativas». Esperado: una sola respuesta, la misma en los dos sitios.
-    test.fail();
+    // REPARADO (hallazgo 4265, /reparar 09/11/2026): las dos salen de FAQ_PRECISION (faq.ts).
     await page.goto('/luxometro/');
     const respuestaLd = await page.evaluate(() => {
       for (const s of Array.from(document.querySelectorAll('script[type="application/ld+json"]'))) {
@@ -858,14 +864,14 @@ test.describe('Hallazgos de la inspección de cambio del 09/11/2026', () => {
     await expect(visible).toContainText(respuestaLd);
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · la FAQ «¿Por qué mi sensor no funciona?» contradice el aviso nuevo sobre Firefox y Chrome', async ({
+  test('HALLAZGO (09/11/2026, REPARADO) · la FAQ «¿Por qué mi sensor no funciona?» contradice el aviso nuevo sobre Firefox y Chrome', async ({
     page,
   }) => {
     // El aviso del bloque educativo (reescrito el 18/09) dice que AmbientLightSensor «está tras
     // un flag en Chrome y no existe en Safari ni en Firefox»; la FAQ de la misma página sigue
     // diciendo «Firefox la soporta con configuración especial; Chrome la soporta en Android con
     // sensor hardware presente».
-    test.fail();
+    // REPARADO (hallazgo 4266, /reparar 09/11/2026): la FAQ dice lo mismo que el aviso.
     await page.goto('/luxometro/');
     await page.getByRole('button', { name: /Ver guía|guía educativa/i }).first().click();
     await expect(page.locator('[class*="warningBox"]')).toContainText('no existe en Safari ni en Firefox');
@@ -874,13 +880,13 @@ test.describe('Hallazgos de la inspección de cambio del 09/11/2026', () => {
     await expect(faq).not.toContainText('Firefox la soporta');
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · las tarjetas sociales siguen prometiendo que «mide» la luz', async ({
+  test('HALLAZGO (09/11/2026, REPARADO) · las tarjetas sociales siguen prometiendo que «mide» la luz', async ({
     page,
   }) => {
     // La reparación bajó `description` y el `jsonLd` a «Estima la luz […] nivel relativo, y lux
     // si lo calibras», pero dejó og:description «Mide la luz ambiente con tu móvil o celular» y
     // twitter:description «Mide la intensidad de luz con tu móvil o celular».
-    test.fail();
+    // REPARADO (hallazgo 4267, /reparar 09/11/2026, tipo promesa): las dos dicen «Estima».
     await page.goto('/luxometro/');
     await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /^Estima la luz/);
     await expect(page.locator('meta[property="og:description"]')).not.toHaveAttribute('content', /^Mide/);
