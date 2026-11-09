@@ -1562,7 +1562,8 @@ test.describe('re-inspección 02/10/2026 · contenido y lectores de pantalla', (
 // Los casos nuevos se resolvieron a mano con la tabla PESOS de motor.ts ANTES de abrir el
 // navegador; cada cuenta es la del flujo de su propio test.
 //
-// Hallazgos ABIERTOS que fija este bloque (inspector 10/10/2026):
+// Hallazgos que fija este bloque (inspector 10/10/2026), REPARADOS: el 1 el 19/10/2026 (3211) y
+// el 2 el 24/10/2026 (3212):
 //   1. El 2.º toque de un doble toque en «Ver resultado» o en «Repetir el test» cae en un ENLACE de
 //      un componente compartido («Contacto» del aviso legal; el pie, o «Más información →» del
 //      aviso de transparencia) y saca de la app. El guard de ráfaga del 2671 solo está en los
@@ -2046,5 +2047,112 @@ test.describe('Re-inspección 10/10/2026 — contenido (cabo C0011)', () => {
     expect(minimos).toEqual([50, 70, 100]);
     const mediaDeMinimos = minimos.reduce((a, b) => a + b, 0) / minimos.length;
     expect(mediaDeMinimos).toBeLessThanOrEqual(ocuPerroMes);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// CABO C0206 (inspector 09/11/2026) — Ley 7/2023, art. 30: seguro de RC y curso de tenencia
+//
+// Fuente: texto CONSOLIDADO de la Ley 7/2023, de 28 de marzo, de protección de los derechos y el
+// bienestar de los animales (BOE-A-2023-7936), «Última actualización, publicada el 29/03/2023»
+// (sin modificaciones posteriores; solo la corrección de errores BOE-A-2023-9633). Literal:
+//   · Art. 30.1: «Las personas que opten a ser titulares de perros deberán acreditar la
+//     realización de un curso de formación para la tenencia de perros que tendrá una validez
+//     indefinida.»
+//   · Art. 30.2: «Dicho curso de formación será gratuito y su contenido se determinará
+//     reglamentariamente.»
+//   · Art. 30.3: «En el caso de la tenencia de perros y durante toda la vida del animal, la
+//     persona titular deberá contratar y mantener en vigor un seguro de responsabilidad civil por
+//     daños a terceros, que incluya en su cobertura a las personas responsables del animal, por
+//     un importe de cuantía suficiente para sufragar los posibles gastos derivados, que se
+//     establecerá reglamentariamente.»
+//   · DF 9.ª: «La presente ley entrará en vigor a los seis meses de su publicación en el
+//     "Boletín Oficial del Estado"» (BOE núm. 75, 29/03/2023 → en vigor el 29/09/2023).
+//   · Ninguna disposición transitoria (1.ª a 6.ª) aplaza el art. 30. Cuando la ley quiere aplazar
+//     una obligación hasta el reglamento lo dice (DF 5.ª, párr. 2.º: «no será obligatoria hasta
+//     transcurridos doce meses desde que se produzca el desarrollo reglamentario»); en el 30.3 lo
+//     que remite al reglamento es la CUANTÍA, no la obligación de contratar el seguro.
+//   · «Análisis» de la ficha, referencias posteriores: solo la corrección de errores y la Orden
+//     PJC/549/2025 (BOE-A-2025-10775), dictada «de conformidad con los arts. 5 y 6». Ningún
+//     reglamento desarrolla el art. 30.
+//   · Art. 1.3.e excluye, entre otros, los perros pastores y de guarda del ganado y «los perros
+//     de caza, rehalas y animales auxiliares de caza»; un perro de compañía está dentro.
+//
+// Conclusión: el seguro de RC del 30.3 es exigible hoy a todo titular de un perro de compañía,
+// sea o no potencialmente peligroso. El curso del 30.1 no: su contenido «se determinará
+// reglamentariamente» y no hay reglamento publicado, así que no hay curso que acreditar y que la
+// app lo calle no es un hallazgo (el caso de control vigila que, si se menciona, no se dé por
+// exigible ya).
+// ─────────────────────────────────────────────────────────────────────────────
+
+test.describe('Cabo C0206 (09/11/2026) — Ley 7/2023, art. 30: seguro de RC y curso de tenencia', () => {
+  // El perfil del caso límite «Perro grande con 80 – 180 €/mes» de la re-inspección del 10/10/2026
+  // (perro-grande 10 · perro-mediano 9 · gato 3, cuentas en ese test). El consejo legal es el
+  // mismo para los tres tamaños de perro (motor.ts: `if (esPerro(mascota))`).
+  const PERRO_GRANDE: Perfil = [
+    'Mucho — más de 2 h', 'Casi nunca está vacía', 'Casa con jardín', 'Muy activo', 'No, solo adultos',
+    'Sin restricciones', 'Presencia tranquila', 'Varios años con posibilidad', 'Sin límite especial', '80 – 180 €/mes',
+  ];
+
+  /** El párrafo que sigue al <h3> «Obligaciones legales: el ejemplo de España» de la guía. */
+  async function parrafoObligaciones(page: Page): Promise<string> {
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const cabecera = page.getByRole('heading', { name: 'Obligaciones legales: el ejemplo de España' });
+    await cabecera.waitFor();
+    return (await cabecera.locator('xpath=following-sibling::p[1]').innerText()).replace(/\s+/g, ' ');
+  }
+
+  test.fail('HALLAZGO (C0206): el consejo del perro no ata el seguro a los potencialmente peligrosos y nombra el seguro de responsabilidad civil (art. 30.3)', async ({ page }) => {
+    // ABIERTO. Obtenido en todo resultado de perro, «Antes de decidirte»: «📋 Chip, vacunas y, si
+    // el perro está catalogado como potencialmente peligroso, licencia y seguro son gastos de los
+    // primeros meses.» El condicional deja el seguro solo para los PPP. Esperado (art. 30.3): el
+    // «seguro de responsabilidad civil por daños a terceros» es de todo perro, durante toda su
+    // vida; a los PPP se les suma la licencia municipal (Ley 50/1999, que la propia guía cita).
+    await abrirTest(page);
+    await responder(page, PERRO_GRANDE);
+    const ficha = await leerFicha(page);
+    expect(ficha.mascota).toBe('Perro grande');
+    // Sin fijar cuántos consejos hay: la reparación puede dar el seguro de RC en uno propio.
+    const todos = (await itemsDeSeccion(page, 'Antes de decidirte')).join(' ');
+    expect(todos.length, 'la sección «Antes de decidirte» se pinta').toBeGreaterThan(0);
+    expect(todos, 'el seguro no puede quedar condicionado a que el perro sea PPP')
+      .not.toContain('si el perro está catalogado como potencialmente peligroso, licencia y seguro');
+    expect(todos, 'Ley 7/2023, art. 30.3: «seguro de responsabilidad civil por daños a terceros»')
+      .toContain('responsabilidad civil');
+  });
+
+  test.fail('HALLAZGO (C0206): la guía «Obligaciones legales» incluye el seguro de responsabilidad civil de todo perro (art. 30.3)', async ({ page }) => {
+    // ABIERTO. Obtenido: el párrafo enumera, de la Ley 7/2023, el microchip y la esterilización de
+    // los gatos (art. 26.i) y evitar la reproducción incontrolada de los perros (art. 26.d), y añade
+    // «Los perros potencialmente peligrosos necesitan licencia municipal (Ley 50/1999)». No dice
+    // que todo titular de perro deba «contratar y mantener en vigor un seguro de responsabilidad
+    // civil por daños a terceros» (art. 30.3), en vigor desde el 29/09/2023 (DF 9.ª).
+    await abrirTest(page);
+    await responder(page, PERRO_GRANDE);
+    await leerFicha(page);
+    const parrafo = await parrafoObligaciones(page);
+    expect(parrafo).toContain('Ley 7/2023, de 28 de marzo');
+    expect(parrafo).toContain('(Ley 50/1999)');
+    expect(parrafo, 'Ley 7/2023, art. 30.3').toContain('responsabilidad civil');
+    expect(parrafo, 'la cita del artículo').toMatch(/art(\.|ículo)\s*30/);
+  });
+
+  test('control (C0206): si la app menciona el curso del art. 30.1 no lo da por exigible ya, y no inventa la cuantía del seguro', async ({ page }) => {
+    // Art. 30.2: el contenido del curso «se determinará reglamentariamente», y el reglamento no se
+    // ha publicado. Art. 30.3: la cuantía del seguro «se establecerá reglamentariamente». Pasa hoy
+    // (la app no menciona ni el curso ni el seguro de RC) y debe seguir pasando tras la reparación.
+    await abrirTest(page);
+    await responder(page, PERRO_GRANDE);
+    await leerFicha(page);
+    await parrafoObligaciones(page);
+    const cuerpo = (await page.locator('body').innerText()).replace(/\s+/g, ' ');
+    const frases = cuerpo.split(/(?<=[.!?])\s+/);
+    for (const f of frases.filter((x) => /curso de formación|curso .{0,40}tenencia/i.test(x))) {
+      expect(f, 'el curso está pendiente de desarrollo reglamentario (art. 30.2)')
+        .toMatch(/reglament|pendiente|desarroll|cuando se apruebe/i);
+    }
+    for (const f of frases.filter((x) => /responsabilidad civil/i.test(x))) {
+      expect(f, 'la cuantía del seguro la fijará un reglamento (art. 30.3)').not.toMatch(/\d[\d.]*\s*€/);
+    }
   });
 });

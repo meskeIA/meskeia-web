@@ -754,3 +754,142 @@ test.describe('Cabo C0667 — la solubilidad orientativa que acota Practicar (si
     await expect(aviso).toContainText('unos 350 g/L de sal común');
   });
 });
+
+/* ══════════════════════════════════════════════════════════════════════════════════════════
+ * Cabo C0667 — EL ANCLA (Inspector, 09/11/2026, segunda comprobación en modo cabo, con
+ * srdata.nist.gov ya en la red de fuentes). El bloque de arriba MIDE la tabla; este JUZGA la
+ * cifra del NaCl contra la fuente. Cuando /reparar la baje, los dos tests de arriba que fijan
+ * «nacl: 350» y la semilla 5312 se actualizan con la cifra nueva, como dice su cabecera.
+ *
+ * FUENTE: IUPAC-NIST Solubility Data Series, vol. 30 «Alkali Metal Halates, Ammonium Iodate and
+ * Iodic Acid» (1987), sección 2.3 «Sodium Chlorate — ternary systems», PDF de las páginas 37-81
+ * en https://srdata.nist.gov/solubility/IUPAC/SDS-30/SDS-30-pages_37.pdf. Las hojas del sistema
+ * NaCl + NaClO₃ + H₂O dan el punto binario (sin clorato, fase sólida NaCl), recopiladas por
+ * Hiroshi Miyamoto:
+ *   · p. 56, Oey, T.S.; Koopman, D.E. J. Phys. Chem. 1958, 62, 755-6. A 25 °C, fila x = 0,0000:
+ *     «NaClO₃ 0.000 mol kg⁻¹ · NaCl 6.161 mol kg⁻¹ · Sp. gr. 1.200 · B» (nota d: B = NaCl).
+ *     A 35 °C: «6.195 · 1.201»; p. 57, a 45 °C: «6.294 · 1.201».
+ *   · p. 58, Arkhipov, S.M.; Kashina, N.I.; Kuzina, V.A. Zh. Neorg. Khim. 1968, 13, 2872-6.
+ *     «Composition at 298.2 K», primera fila: «Sodium Chloride mass % 26.56 · Sodium Chlorate
+ *     --- · A» (nota a: A = NaCl).
+ * El vol. 47 (haluros alcalinos en agua, el que evalúa el NaCl) no se pudo leer: su PDF pasa de
+ * los 10 MB que admite WebFetch, en srdata.nist.gov y en iupac.github.io.
+ *
+ * DE LA FUENTE A g POR LITRO DE DISOLUCIÓN, a mano y ANTES de mirar la app (M = 58,44 g/mol):
+ *   Oey-Koopman 25 °C   w = 6,161·58,44 / (1000 + 6,161·58,44) = 360,05/1360,05 = 0,26473
+ *                       g/L = w · ρ · 1000 = 0,26473 · 1,200 · 1000 = 317,68 g/L
+ *                       (316,74 si «Sp. gr.» va contra el agua a 25 °C, 0,99705 g/cm³: se toma
+ *                       1,200, la lectura que más concede a la app)
+ *   Arkhipov 25 °C      w = 0,2656 con la densidad de Oey-Koopman: 0,2656 · 1,200 · 1000
+ *                       = 318,72 g/L  ← el TOPE que se exige: el mayor de los dos a 25 °C
+ *   Cota caliente       45 °C, 6,294 mol/kg → w = 0,26891 · 1,201 · 1000 = 322,96 g/L
+ *   Para 350 g/L con w = 0,26473 haría falta ρ = 1,322 g/cm³; la medida es 1,200.
+ * → La app da al NaCl 350 g/L, un 10 % por encima de la saturación a 25 °C y por encima incluso
+ *   de la de 45 °C. Practicar pide 52,5 g en 150 mL (semilla 5312, 350 g/L) o 97 g en 300 mL
+ *   (semilla 2, 323,33 g/L): disoluciones que no se pueden preparar. Y el panel Preparar, que
+ *   avisa con la misma cifra, calla entre 318,7 y 350 g/L (50 g en 150 mL = 333,33 g/L).
+ *
+ * LOS OTROS CINCO SOLUTOS no están en la SDS: ninguno de sus volúmenes trata CuSO₄, NiCl₂,
+ * KMnO₄, K₂Cr₂O₇ ni la glucosa en agua (índice de volúmenes en
+ * srdata.nist.gov/solubility/IUPAC/iupac.aspx, índices de sistemas de los vol. 30 y 44 y lista
+ * de sistemas de la base de datos en línea, sys_category.aspx). Sus cifras siguen MEDIDAS, sin
+ * verificar, en el bloque de arriba.
+ * ══════════════════════════════════════════════════════════════════════════════════════════ */
+
+/** Cifras literales de la SDS, vol. 30, sección 2.3 (ver la cabecera del bloque). */
+const SDS30_NACL = {
+  molalidad25: 6.161, // mol/kg, p. 56 (Oey y Koopman, 1958)
+  densidad25: 1.2, // «Sp. gr.», p. 56
+  porcentajeMasa25: 26.56, // % en masa a 298,2 K, p. 58 (Arkhipov, Kashina y Kuzina, 1968)
+  molalidad45: 6.294, // mol/kg, p. 57
+  densidad45: 1.201, // «Sp. gr.», p. 57
+} as const;
+
+const M_NACL_C0667 = 58.44;
+
+/** g por litro de disolución a partir de la molalidad y la densidad de la saturada. */
+const gLDesdeMolalidad = (m: number, densidad: number): number => ((m * M_NACL_C0667) / (1000 + m * M_NACL_C0667)) * densidad * 1000;
+
+/** El mayor de los dos valores de 25 °C: 0,2656 · 1,200 · 1000 = 318,72 g/L. */
+const NACL_SATURADA_25C_G_L = (SDS30_NACL.porcentajeMasa25 / 100) * SDS30_NACL.densidad25 * 1000;
+
+test.describe('Cabo C0667 — el tope del NaCl contra la IUPAC-NIST SDS (vol. 30, 1987)', () => {
+  test('la cuenta del ancla: la saturada de NaCl tiene 317,68-318,72 g/L a 25 °C y 322,96 a 45 °C', () => {
+    expect(gLDesdeMolalidad(SDS30_NACL.molalidad25, SDS30_NACL.densidad25)).toBeCloseTo(317.68, 1);
+    expect(NACL_SATURADA_25C_G_L).toBeCloseTo(318.72, 2);
+    expect(gLDesdeMolalidad(SDS30_NACL.molalidad45, SDS30_NACL.densidad45)).toBeCloseTo(322.96, 1);
+    // Ni la cota caliente llega a la cifra de hoy: el defecto no depende de la temperatura del aula.
+    expect(gLDesdeMolalidad(SDS30_NACL.molalidad45, SDS30_NACL.densidad45)).toBeLessThan(350);
+  });
+
+  // ABIERTO (Inspector 09/11/2026, cabo C0667): SOLUBILIDAD_ORIENTATIVA_G_L.nacl vale 350 g/L y
+  // la SDS da 317,7-318,7 g/L de disolución saturada a 25 °C.
+  test.fail('ABIERTO · la cifra del NaCl no pasa de la saturación de la SDS (318,72 g/L a 25 °C)', () => {
+    expect(SOLUBILIDAD_ORIENTATIVA_G_L.nacl, 'SOLUBILIDAD_ORIENTATIVA_G_L.nacl, en g/L de disolución').toBeLessThanOrEqual(NACL_SATURADA_25C_G_L);
+  });
+
+  // ABIERTO (Inspector 09/11/2026, cabo C0667): Practicar propone NaCl por encima de la
+  // saturación; hoy, entre otras, la semilla 5312 (52,5 g en 150 mL = 350 g/L) y la 2 (97 g en
+  // 300 mL = 323,33 g/L).
+  test.fail('ABIERTO · Practicar no pide una disolución de NaCl por encima de 318,72 g/L', () => {
+    const excesos: string[] = [];
+    let ejerciciosDeSal = 0;
+    for (let semilla = 1; semilla <= 6000; semilla++) {
+      const e = generarEjercicioAleatorio(semilla);
+      if (e.datos.solutoId !== 'nacl') continue;
+      const g = gPorLitroC0667(e.datos);
+      if (g === undefined) continue;
+      ejerciciosDeSal += 1;
+      if (g > NACL_SATURADA_25C_G_L + 1e-9) excesos.push(`semilla ${semilla}: ${g.toFixed(2)} g/L`);
+    }
+    test.info().annotations.push({
+      type: 'medida C0667',
+      description: `${excesos.length} de ${ejerciciosDeSal} ejercicios de sal (semillas 1-6000) pasan de 318,72 g/L`,
+    });
+    expect(ejerciciosDeSal, 'el generador sigue proponiendo ejercicios de sal').toBeGreaterThan(0);
+    expect(excesos, excesos.slice(0, 10).join(' · ')).toEqual([]);
+  });
+});
+
+test.describe('Cabo C0667 — el tope del NaCl en el navegador', () => {
+  // ABIERTO (Inspector 09/11/2026, cabo C0667): con la semilla 5312 el alumno lee «Se disuelven
+  // 52,5 g de sal común (NaCl) … hasta 150 mL de disolución»: 350 g/L, imposible a 25 °C.
+  test.fail('ABIERTO · Practicar (semilla 5312) no pide NaCl por encima de la saturación de la SDS', async ({ page }) => {
+    await page.addInitScript(() => {
+      const ahoraReal = Date.now.bind(Date);
+      const w = window as unknown as { __semillaC0667b?: number };
+      Date.now = () => (typeof w.__semillaC0667b === 'number' ? w.__semillaC0667b : ahoraReal());
+    });
+    await page.goto('/simulador-disoluciones/');
+    await esperarHidratacion(page, ['#masa-input', '#casos-respuesta']);
+    await page.evaluate(() => {
+      (window as unknown as { __semillaC0667b?: number }).__semillaC0667b = 5312;
+    });
+    await page.locator('#casos-practicar').click();
+    await page.evaluate(() => {
+      delete (window as unknown as { __semillaC0667b?: number }).__semillaC0667b;
+    });
+    await expect(page.locator('#casos-titulo-caso')).toHaveText('Ejercicio de práctica');
+    const texto = (await page.locator('#casos-enunciado').textContent()) ?? '';
+    const m = texto.match(/Se disuelven? ([\d.]+(?:,\d+)?) g de sal común .*? hasta ([\d.]+) mL de disolución/);
+    // Si tras la reparación la semilla ya no trae sal, no hay disolución de sal que juzgar.
+    if (!m) return;
+    const gL = Number(m[1].replace(/\./g, '').replace(',', '.')) / (Number(m[2].replace(/\./g, '')) / 1000);
+    expect(gL, `«${texto}»`).toBeLessThanOrEqual(NACL_SATURADA_25C_G_L);
+  });
+
+  // ABIERTO (Inspector 09/11/2026, cabo C0667): el aviso de saturación del panel (hallazgo 4204)
+  // usa la misma cifra, así que 50 g de NaCl en 150 mL (333,33 g/L, por encima de los 318,72 de
+  // la SDS) se pintan como disolución sin aviso.
+  test.fail('ABIERTO · el panel avisa de 50 g de NaCl en 150 mL (333,33 g/L): no se disuelven enteros', async ({ page }) => {
+    await page.goto('/simulador-disoluciones/');
+    await esperarHidratacion(page, ['#masa-input', '#casos-respuesta']);
+    await page.getByRole('button', { name: /NaCl/ }).first().click();
+    await sembrarValor(page, '#masa-input', 50);
+    await sembrarValor(page, '#vol-input', 150);
+    // Precondición, que pasa hoy: el panel calcula 50/0,150 = 333,33 g/L.
+    await expect(tarjeta(page, 'Concentración másica')).toContainText('333,33 g/L');
+    // Lo que falla: el aviso sigue vacío porque 333,33 < 350.
+    await expect(page.locator('[class*="avisoSaturacion"]')).toContainText('no se disuelve entera', { timeout: 3000 });
+  });
+});

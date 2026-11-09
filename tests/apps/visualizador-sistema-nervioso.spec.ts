@@ -443,3 +443,113 @@ test.describe('Accesibilidad: contraste del texto en color de datos (C0645)', ()
     expect([...claro, ...oscuro]).toEqual([]);
   });
 });
+
+/**
+ * Cabo C0677 (09/11/2026): las nueve sospechas de contenido que la primera inspección dejó sin caso
+ * por no tener fuente en red-fuentes-oficiales.txt. Seis tienen caso aquí, en cinco hallazgos: una
+ * contradicción interna (la fase del sueño que consolida la memoria) y cinco afirmaciones que caen
+ * en CLAUDE.md §1.quinquies (regla 1, cifra popular sin fuente ni año; regla 3, hallazgo discutido
+ * dado como hecho). Estos casos NO dicen que la cifra sea falsa: piden atribuirla a una fuente con
+ * año o matizarla, y la redacción la decide el usuario (neutralidad, nivel 3). Por eso aceptan como
+ * reparado tanto quitar la afirmación como dejarla con un año o un matiz (MATIZ).
+ * Sin caso, y por eso sin test: la acetilcolina «primer neurotransmisor descubierto (1914)», el
+ * período refractario en el que «no puede disparar otro impulso» y el curare que «lo usaban
+ * indígenas en flechas» (CIMA no tiene la tubocurarina: 0 resultados el 09/11/2026).
+ */
+const MATIZ = /\b(?:19|20)\d{2}\b|debate|discut|controvers|hipótesis|en roedores|en animales|se ha propuesto|se estima|según/i;
+
+/** Una afirmación categórica que sigue en el texto tiene que llevar fuente con año o matiz. */
+function sinAtribuir(texto: string, afirmacion: string): boolean {
+  return texto.includes(afirmacion) && !MATIZ.test(texto);
+}
+
+test.describe('Contenido: cabo C0677, sospechas sin fuente de la primera inspección', () => {
+  test('ABIERTO · una sola fase del sueño consolida la memoria: «sueño profundo» en una tarjeta y «sueño REM» en otra', async ({ page }) => {
+    // Contradicción interna de la guía. «Neurociencia en el día a día», tarjeta «Sueño y
+    // Rendimiento»: «Durante el sueño profundo, el cerebro consolida memorias…». «Mejores
+    // prácticas», tarjeta «Aprende antes de dormir»: «La consolidación de memoria ocurre
+    // principalmente durante el sueño REM». Cuál de las dos queda lo decide una fuente: aquí solo se
+    // exige que la guía no diga las dos.
+    await abrir(page);
+    const guia = page.locator('[data-guia-educativa]');
+    const sueno = guia.locator('[class*="escenarioCard"]').filter({ hasText: 'Sueño y Rendimiento' });
+    const tip = guia.locator('[class*="tipCard"]').filter({ hasText: 'Aprende antes de dormir' });
+    await expect(sueno).toHaveCount(1);
+    await expect(tip).toHaveCount(1);
+    const texto = `${await textoDe(sueno)} ${await textoDe(tip)}`;
+    const fases = new Set([...texto.matchAll(/sueño (profundo|REM)/g)].map((m) => m[1]));
+    test.fail();
+    expect([...fases], 'fases del sueño a las que la guía atribuye la consolidación').toHaveLength(1);
+  });
+
+  test('ABIERTO · «El cerebro en números»: la comparación con las estrellas de la Vía Láctea y los ~150 billones de sinapsis llevan fuente y año', async ({ page }) => {
+    // §1.quinquies regla 1. La FAQ visible cita a Azevedo et al. (2009) para las 86.000 millones de
+    // neuronas, pero «tantas como estrellas en la Vía Láctea» y «~150 billones» de «Sinapsis
+    // totales» (repetido en el texto destacado: «conectadas por ~150 billones de sinapsis») no
+    // tienen fuente ni año, y los 150 billones se dan para el cerebro entero.
+    await abrir(page);
+    await seccion(page, 'Neurotransmisores').click();
+    const curiosos = page.locator('[class*="datoCard"]');
+    const neuronas = curiosos.filter({ hasText: 'Neuronas en el cerebro' });
+    const sinapsis = curiosos.filter({ hasText: 'Sinapsis totales' });
+    await expect(neuronas).toHaveCount(1);
+    await expect(sinapsis).toHaveCount(1);
+    const destacado = await textoDe(page.locator('[class*="seccionContent"] [class*="insight"]'));
+    const sinFuente: string[] = [];
+    if (sinAtribuir(await textoDe(neuronas.locator('[class*="datoDesc"]')), 'Vía Láctea')) sinFuente.push('Vía Láctea');
+    if (sinAtribuir(await textoDe(sinapsis), '150 billones')) sinFuente.push('tarjeta 150 billones');
+    if (sinAtribuir(destacado, '150 billones')) sinFuente.push('destacado 150 billones');
+    test.fail();
+    expect(sinFuente).toEqual([]);
+  });
+
+  test('ABIERTO · «hasta 10.000 dendritas» lleva fuente y año (es la misma cifra que la app da para las conexiones)', async ({ page }) => {
+    // §1.quinquies regla 1. Ficha «Dendritas»: «Una sola neurona puede tener hasta 10.000
+    // dendritas», cifra redonda sin fuente, idéntica a la de la tarjeta «Sinapsis totales»: «Cada
+    // neurona puede conectarse con hasta 10.000 más». La propia ficha dice que las dendritas reciben
+    // «a través de las sinapsis»: dendritas y conexiones no son la misma magnitud.
+    await abrir(page);
+    await page.getByRole('button', { name: 'Dendritas', exact: true }).click();
+    await expect(fichaParte(page).locator('h3')).toHaveText('Dendritas');
+    const ficha = await textoDe(fichaParte(page));
+    test.fail();
+    expect(sinAtribuir(ficha, '10.000 dendritas'), `ficha: ${ficha}`).toBe(false);
+  });
+
+  test('ABIERTO · la neurogénesis adulta humana se atribuye o se matiza, no se da como hecho (FAQ, errores comunes y ejercicio)', async ({ page }) => {
+    // §1.quinquies regla 3. Tres sitios de la guía la dan por establecida en humanos: la FAQ («Sí.
+    // Hay neurogénesis adulta especialmente en el hipocampo (memoria) y el bulbo olfatorio»), los
+    // errores comunes («Hay neurogénesis adulta en el hipocampo y el bulbo olfatorio… pero existe y
+    // puede estimularse») y la tarjeta del ejercicio («favorece la neurogénesis en el hipocampo»);
+    // los pasos 2 y 4 de la guía la dan por supuesta («neurogénesis hipocampal», «reduce la
+    // neurogénesis»).
+    await abrir(page);
+    const guia = page.locator('[data-guia-educativa]');
+    const faq = guia.locator('[class*="faqItem"]').filter({ hasText: '¿Se pueden crear nuevas neuronas siendo adulto?' });
+    const mito = guia.locator('[class*="warningList"] li').filter({ hasText: 'Las neuronas no se regeneran nunca' });
+    const ejercicio = guia.locator('[class*="escenarioCard"]').filter({ hasText: 'Ejercicio y Neuroplasticidad' });
+    await expect(faq).toHaveCount(1);
+    await expect(mito).toHaveCount(1);
+    await expect(ejercicio).toHaveCount(1);
+    const comoHecho: string[] = [];
+    if (sinAtribuir(await textoDe(faq), 'Hay neurogénesis adulta')) comoHecho.push('FAQ');
+    if (sinAtribuir(await textoDe(mito), 'Hay neurogénesis adulta')) comoHecho.push('errores comunes');
+    if (sinAtribuir(await textoDe(ejercicio), 'neurogénesis en el hipocampo')) comoHecho.push('ejercicio');
+    test.fail();
+    expect(comoHecho).toEqual([]);
+  });
+
+  test('ABIERTO · la dopamina no se presenta como «el neurotransmisor del placer» sin matiz', async ({ page }) => {
+    // §1.quinquies regla 3: encuadre popular dado como hecho. La misma tarjeta la resume como
+    // «Recompensa y motivación» y su dato dice que «es la anticipación lo que motiva»; el FAQPage,
+    // «circuitos de recompensa y motivación». Toca el mismo texto que el hallazgo 4222.
+    await abrir(page);
+    await seccion(page, 'Neurotransmisores').click();
+    const tarjeta = page.locator('[aria-label="Ver detalles de Dopamina"]');
+    await tarjeta.click();
+    await expect(tarjeta.locator('[class*="ntDesc"]')).toBeVisible();
+    const descripcion = await textoDe(tarjeta.locator('[class*="ntDesc"]'));
+    test.fail();
+    expect(sinAtribuir(descripcion, 'neurotransmisor del placer'), `descripción: ${descripcion}`).toBe(false);
+  });
+});
