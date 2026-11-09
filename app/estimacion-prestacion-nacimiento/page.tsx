@@ -13,7 +13,7 @@ import {
   NumberInput, RegionBadge
 } from '@/components';
 import DataReference from '@/components/DataReference';
-import { formatCurrency } from '@/lib';
+import { formatCurrency, parseSpanishNumber } from '@/lib';
 import {
   FISCAL_MATERNIDAD_META,
   PRESTACION_NACIMIENTO,
@@ -38,6 +38,20 @@ interface ResultadoEstimacion {
   semanasVoluntarias: number;
   detalleAmpliaciones: string[];
   esContributiva: boolean;
+  /** Subsidio especial por parto multiple (RD 295/2009, art. 6.2): aparte del total, para uno de los progenitores. */
+  subsidioEspecial: number;
+}
+
+// Cifras del permiso desde data/fiscal, no escritas a mano en el JSX (hallazgo 4293)
+const PERMISO_BI = PERMISO_NACIMIENTO.find((p) => p.tipoFamilia === 'biparental') ?? PERMISO_NACIMIENTO[0];
+const PERMISO_MONO = PERMISO_NACIMIENTO.find((p) => p.tipoFamilia === 'monoparental') ?? PERMISO_NACIMIENTO[1];
+
+/** «20 semanas», «20 semanas y 3 dias»: la hospitalizacion amplia en DIAS (ET 48.4). */
+function textoDuracion(dias: number): string {
+  const semanas = Math.floor(dias / 7);
+  const resto = dias % 7;
+  const textoSemanas = `${semanas} semana${semanas === 1 ? '' : 's'}`;
+  return resto === 0 ? textoSemanas : `${textoSemanas} y ${resto} dia${resto === 1 ? '' : 's'}`;
 }
 
 // ===== COMPONENTE PRINCIPAL =====
@@ -51,14 +65,21 @@ export default function EstimacionPrestacionNacimiento() {
   const [partoMultiple, setPartoMultiple] = useState(false);
   const [numHijos, setNumHijos] = useState<number>(2);
   const [hospitalizacion, setHospitalizacion] = useState(false);
+  const [diasHospital, setDiasHospital] = useState<string>('');
   const [mostrarResultados, setMostrarResultados] = useState(false);
 
-  // Parsear la base de cotizacion
+  // Parsear la base de cotizacion con el parser canonico: el casero (quitar todos los
+  // puntos y luego parseFloat) leia «1850.40» como 185.040 (hallazgo 4281).
   const baseMensual = useMemo(() => {
-    const limpio = baseCotizacion.replace(/\./g, '').replace(',', '.');
-    const num = parseFloat(limpio);
+    const num = parseSpanishNumber(baseCotizacion);
     return isNaN(num) ? 0 : num;
   }, [baseCotizacion]);
+
+  // Dias de hospitalizacion del recien nacido (ET 48.4)
+  const diasIngreso = useMemo(() => {
+    const num = parseSpanishNumber(diasHospital);
+    return isNaN(num) || num < 0 ? 0 : Math.floor(num);
+  }, [diasHospital]);
 
   // Dias cotizados declarados (art. 178 LGSS)
   const dias7Anios = useMemo(() => {
@@ -77,10 +98,12 @@ export default function EstimacionPrestacionNacimiento() {
 
     const { basesReferencia, cotizacionMinima, noContributiva } = PRESTACION_NACIMIENTO;
 
-    const baseAplicable = Math.min(
-      Math.max(baseMensual, basesReferencia.baseMinimaMensual),
-      basesReferencia.baseMaximaMensual
-    );
+    // La base reguladora es la base REAL del mes anterior, sin suelo: una base inferior a la
+    // minima del regimen general es la de un contrato a tiempo parcial, y subirla a la minima
+    // inflaba la prestacion (hallazgo 4282; RD 295/2009, art. 7, solo pone suelo a la
+    // formacion y a artistas). El techo si existe: no se cotiza por encima de la maxima.
+    const baseAplicable = Math.min(baseMensual, basesReferencia.baseMaximaMensual);
+    const brDiaria = baseAplicable / 30;
 
     // Carencia del art. 178.1 LGSS: la decide la EDAD en la fecha del parto y
     // los DIAS COTIZADOS, no el importe de la base. Los dos umbrales de cada
@@ -120,24 +143,29 @@ export default function EstimacionPrestacionNacimiento() {
         ? [`+${diasExtra} dias naturales por ${supuestosNoContributiva.join(' y ')} (el incremento se aplica una sola vez)`]
         : [];
 
+      // Art. 182.2 LGSS y RD 295/2009, art. 16.2: el 100 % del IPREM, salvo que la base
+      // reguladora diaria sea inferior, en cuyo caso se cobra esta (hallazgo 4283).
+      const cuantiaDiaria = Math.min(noContributiva.cuantiaDiaria, brDiaria);
+
       return {
-        baseReguladoraDiaria: noContributiva.cuantiaDiaria,
-        prestacionDiaria: noContributiva.cuantiaDiaria,
-        semanasBase: 6,
-        semanasExtra: 0,
-        semanasTotal: 6,
+        baseReguladoraDiaria: brDiaria,
+        prestacionDiaria: cuantiaDiaria,
+        semanasBase: noContributiva.duracion / 7,
+        semanasExtra: diasExtra / 7,
+        // Las semanas salen de los dias: 42 + 14 son 8 semanas, no 6 (hallazgo 4284)
+        semanasTotal: diasTotal / 7,
         diasTotal,
-        prestacionTotal: noContributiva.cuantiaDiaria * diasTotal,
-        semanasObligatorias: 6,
+        prestacionTotal: cuantiaDiaria * diasTotal,
+        semanasObligatorias: noContributiva.duracion / 7,
         semanasVoluntarias: 0,
         detalleAmpliaciones: detalle,
         esContributiva: false,
+        subsidioEspecial: 0,
       };
     }
 
     // Prestacion contributiva
-    const brDiaria = baseAplicable / 30;
-    const prestacionDiaria = brDiaria; // 100% de la BR
+    const prestacionDiaria = brDiaria; // 100 % de la BR
 
     const permiso = PERMISO_NACIMIENTO.find((p) => p.tipoFamilia === tipoFamilia) ?? PERMISO_NACIMIENTO[0];
     let semanasExtra = 0;
@@ -151,21 +179,45 @@ export default function EstimacionPrestacionNacimiento() {
 
     // Ampliaciones (por identificador: ni el orden ni la redaccion del motivo
     // pueden desviar el calculo en silencio)
+    let subsidioEspecial = 0;
     if (partoMultiple && numHijos >= 2) {
       const hijosExtra = numHijos - 1;
-      const semanas = AMPLIACION_POR_ID['parto-multiple'].semanasExtra * hijosExtra;
+      // ET 48.6: dos semanas por cada hijo distinto del primero, «una para cada una de las
+      // personas progenitoras»; la unica persona progenitora disfruta «las ampliaciones
+      // completas», es decir, las dos (hallazgo 4285).
+      const factorFamilia = tipoFamilia === 'monoparental' ? 2 : 1;
+      const semanas = AMPLIACION_POR_ID['parto-multiple'].semanasExtra * hijosExtra * factorFamilia;
       semanasExtra += semanas;
       detalleAmpliaciones.push(
-        `+${semanas} semanas por parto multiple (${hijosExtra} hijo${hijosExtra > 1 ? 's' : ''} adicional${hijosExtra > 1 ? 'es' : ''})`
+        `+${semanas} semana${semanas === 1 ? '' : 's'} por parto multiple (${hijosExtra} hijo${hijosExtra > 1 ? 's' : ''} adicional${hijosExtra > 1 ? 'es' : ''})`
+      );
+      // RD 295/2009, art. 6.2: subsidio especial por cada hijo a partir del segundo, igual al
+      // del primero, durante las 6 semanas posteriores al parto; lo cobra UNO de los
+      // progenitores (art. 3.9), en un solo pago (art. 12.3). Va aparte del total (hallazgo 4286).
+      subsidioEspecial = prestacionDiaria * 42 * hijosExtra;
+      detalleAmpliaciones.push(
+        `Subsidio especial por parto multiple: ${formatCurrency(subsidioEspecial)} (6 semanas por cada hijo a partir del segundo, para uno solo de los progenitores, en un pago al terminar esas 6 semanas)`
       );
     }
 
+    // ET 48.4: la hospitalizacion de mas de siete dias amplia el permiso «en tantos dias como
+    // el nacido se encuentre hospitalizado», con un maximo de trece semanas. Hasta el
+    // 09/11/2026 se sumaban siempre las 13 semanas maximas (hallazgo 4287).
+    let diasExtraHospital = 0;
     if (hospitalizacion) {
-      const semanasHosp = AMPLIACION_POR_ID['hospitalizacion-neonatal'].semanasExtra;
-      semanasExtra += semanasHosp;
-      detalleAmpliaciones.push(
-        `Hasta +${semanasHosp} semanas por hospitalizacion neonatal (segun dias reales)`
-      );
+      const maxDias = AMPLIACION_POR_ID['hospitalizacion-neonatal'].semanasExtra * 7;
+      if (diasIngreso > 7) {
+        diasExtraHospital = Math.min(diasIngreso, maxDias);
+        detalleAmpliaciones.push(
+          `+${diasExtraHospital} dias por hospitalizacion neonatal (${diasIngreso} dias de ingreso; maximo ${maxDias})`
+        );
+      } else {
+        detalleAmpliaciones.push(
+          diasHospital.trim() === ''
+            ? `Hospitalizacion neonatal: escribe los dias de ingreso para sumarlos (amplia un dia por dia de ingreso si pasa de 7, hasta ${maxDias})`
+            : 'Hospitalizacion neonatal de 7 dias o menos: no amplia el permiso'
+        );
+      }
     }
 
     if (situacion === 'adopcion') {
@@ -174,8 +226,8 @@ export default function EstimacionPrestacionNacimiento() {
       );
     }
 
-    const semanasTotal = permiso.semanasTotal + semanasExtra;
-    const diasTotal = semanasTotal * 7;
+    const diasTotal = (permiso.semanasTotal + semanasExtra) * 7 + diasExtraHospital;
+    const semanasTotal = diasTotal / 7;
 
     return {
       baseReguladoraDiaria: brDiaria,
@@ -189,8 +241,9 @@ export default function EstimacionPrestacionNacimiento() {
       semanasVoluntarias: permiso.semanasVoluntarias,
       detalleAmpliaciones,
       esContributiva: true,
+      subsidioEspecial,
     };
-  }, [mostrarResultados, baseMensual, partoMultiple, numHijos, hospitalizacion, situacion, tipoFamilia, edad, dias7Anios, diasTotales, diasUltimos7Anios, diasVidaLaboral]);
+  }, [mostrarResultados, baseMensual, partoMultiple, numHijos, hospitalizacion, diasIngreso, diasHospital, situacion, tipoFamilia, edad, dias7Anios, diasTotales, diasUltimos7Anios, diasVidaLaboral]);
 
   // Requisitos de cotizacion por edad
   const requisitoEdad = useMemo(() => {
@@ -462,6 +515,22 @@ export default function EstimacionPrestacionNacimiento() {
             />
             Hospitalizacion neonatal o parto prematuro
           </label>
+          {hospitalizacion && (
+            <div className={styles.subField}>
+              <NumberInput
+                value={diasHospital}
+                onChange={(val) => {
+                  setDiasHospital(val);
+                  setMostrarResultados(false);
+                }}
+                label="Dias de hospitalizacion tras el parto"
+                placeholder="Ej: 10"
+                min={0}
+                max={365}
+                helperText={`Si pasan de 7, el permiso se amplia un dia por cada dia de ingreso, hasta ${AMPLIACION_POR_ID['hospitalizacion-neonatal'].semanasExtra} semanas (ET art. 48.4).`}
+              />
+            </div>
+          )}
         </div>
 
         <button type="submit" className={styles.submitButton}>
@@ -489,7 +558,9 @@ export default function EstimacionPrestacionNacimiento() {
               </span>
             </div>
             <div className={styles.resultItem}>
-              <span className={styles.resultLabel}>Prestacion diaria (100% BR)</span>
+              <span className={styles.resultLabel}>
+                {resultado.esContributiva ? 'Prestacion diaria (100 % BR)' : 'Subsidio diario (IPREM, o la BR si es menor)'}
+              </span>
               <span className={styles.resultValue}>
                 {formatCurrency(resultado.prestacionDiaria)}
               </span>
@@ -497,7 +568,7 @@ export default function EstimacionPrestacionNacimiento() {
             <div className={styles.resultItem}>
               <span className={styles.resultLabel}>Duracion total</span>
               <span className={styles.resultValue}>
-                {resultado.semanasTotal} semanas ({resultado.diasTotal} dias)
+                {`${textoDuracion(resultado.diasTotal)} (${resultado.diasTotal} dias)`}
               </span>
             </div>
             <div className={`${styles.resultItem} ${styles.resultTotal}`}>
@@ -509,6 +580,12 @@ export default function EstimacionPrestacionNacimiento() {
                 {formatCurrency(resultado.prestacionTotal)}
               </span>
             </div>
+            {resultado.subsidioEspecial > 0 && (
+              <div key="subsidio-especial" className={styles.resultItem}>
+                <span className={styles.resultLabel}>Subsidio especial por parto multiple (aparte, para uno de los progenitores)</span>
+                <span className={styles.resultValue}>{formatCurrency(resultado.subsidioEspecial)}</span>
+              </div>
+            )}
           </div>
 
           {/* Desglose */}
@@ -520,10 +597,12 @@ export default function EstimacionPrestacionNacimiento() {
               <span className={styles.breakdownLabel}>Semanas obligatorias (ininterrumpidas tras el parto)</span>
               <span className={styles.breakdownValue}>{resultado.semanasObligatorias} semanas</span>
             </div>
-            <div className={styles.breakdownItem}>
-              <span className={styles.breakdownLabel}>Semanas flexibles + cuidado prolongado (hasta los 12 meses / 8 anos del menor)</span>
-              <span className={styles.breakdownValue}>{resultado.semanasVoluntarias} semanas</span>
-            </div>
+            {resultado.esContributiva && (
+              <div key="voluntarias" className={styles.breakdownItem}>
+                <span className={styles.breakdownLabel}>Semanas flexibles + cuidado prolongado (hasta los 12 meses / 8 anos del menor)</span>
+                <span className={styles.breakdownValue}>{resultado.semanasVoluntarias} semanas</span>
+              </div>
+            )}
             {resultado.detalleAmpliaciones.map((detalle, i) => (
               <div key={i} className={styles.breakdownItem}>
                 <span className={styles.breakdownLabel}>{detalle}</span>
@@ -532,7 +611,7 @@ export default function EstimacionPrestacionNacimiento() {
             ))}
             <div className={styles.breakdownItem} style={{ fontWeight: 600 }}>
               <span className={styles.breakdownLabel}>Total</span>
-              <span className={styles.breakdownValue}>{resultado.semanasTotal} semanas = {resultado.diasTotal} dias</span>
+              <span className={styles.breakdownValue}>{`${textoDuracion(resultado.diasTotal)} = ${resultado.diasTotal} dias`}</span>
             </div>
           </div>
 
@@ -540,17 +619,29 @@ export default function EstimacionPrestacionNacimiento() {
           <div className={styles.resultNote}>
             <strong><span aria-hidden="true">ℹ️</span> Notas importantes:</strong>
             <ul style={{ margin: '0.5rem 0 0', paddingLeft: '1.2rem', listStyle: 'disc' }}>
-              <li>
-                La prestacion es el <strong>100% de la base reguladora</strong>, sin topes adicionales
-                (el tope es la base maxima de cotizacion: {formatCurrency(PRESTACION_NACIMIENTO.basesReferencia.baseMaximaMensual)}/mes).
-              </li>
-              <li>
-                {tipoFamilia === 'monoparental' ? (
-                  <>En familias monoparentales, el progenitor tiene derecho a <strong>{resultado.semanasBase} semanas</strong> (RDL 9/2025, en vigor desde el 31/07/2025).</>
-                ) : (
-                  <>Cada progenitor tiene derecho, de forma individual e intransferible, a <strong>{resultado.semanasBase} semanas</strong> (RDL 9/2025, en vigor desde el 31/07/2025).</>
-                )}
-              </li>
+              {resultado.esContributiva && (
+                <li key="tope">
+                  La prestacion es el <strong>100&nbsp;% de la base reguladora</strong>, sin topes adicionales
+                  (el tope es la base maxima de cotizacion: {formatCurrency(PRESTACION_NACIMIENTO.basesReferencia.baseMaximaMensual)}/mes).
+                  A tiempo parcial, la Seguridad Social suma las bases de los 12 meses anteriores y las
+                  divide entre 365, asi que la cifra puede variar un poco.
+                </li>
+              )}
+              {resultado.esContributiva && (
+                <li key="semanas">
+                  {tipoFamilia === 'monoparental' ? (
+                    <>En familias monoparentales, el progenitor tiene derecho a <strong>{resultado.semanasBase} semanas</strong> (RDL 9/2025, en vigor desde el 31/07/2025).</>
+                  ) : (
+                    <>Cada progenitor tiene derecho, de forma individual e intransferible, a <strong>{resultado.semanasBase} semanas</strong> (RDL 9/2025, en vigor desde el 31/07/2025).</>
+                  )}
+                </li>
+              )}
+              {!resultado.esContributiva && (
+                <li key="permiso-nc">
+                  El permiso sigue siendo de {tipoFamilia === 'monoparental' ? PERMISO_MONO.semanasTotal : PERMISO_BI.semanasTotal} semanas
+                  (RDL 9/2025): lo que dura {resultado.diasTotal} dias es el subsidio no contributivo, no el permiso.
+                </li>
+              )}
               <li>
                 Esta prestacion esta <strong>exenta de IRPF</strong> y no se incluye en la declaracion de la renta.
               </li>

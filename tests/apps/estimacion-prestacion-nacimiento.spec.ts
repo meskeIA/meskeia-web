@@ -126,7 +126,8 @@ test.describe('estimacion-prestacion-nacimiento', () => {
   }) => {
     const texto = await estimar(page, { base: '2.000' });
     expect(texto).toContain('Base reguladora diaria | 66,67 €');
-    expect(texto).toContain('Prestacion diaria (100% BR) | 66,67 €');
+    // «100 %» separado con espacio duro (CLAUDE.md §2); normalizar lo pasa a espacio normal
+    expect(texto).toContain('Prestacion diaria (100 % BR) | 66,67 €');
     expect(texto).toContain('Duracion total | 19 semanas (133 dias)');
     expect(texto).toContain('EXENTA IRPF | 8866,67 €');
     // ET 48.4: 6 obligatorias + 11 flexibles + 2 de cuidado hasta los 8 años = 19
@@ -197,73 +198,84 @@ test.describe('estimacion-prestacion-nacimiento', () => {
 
   // ══════════════════════ HALLAZGOS ABIERTOS (inspector 09/11/2026) ══════════════════════
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · «1850.40» con punto decimal se lee 185.040 y sale el tope', async ({
+  test('HALLAZGO 4281 (09/11/2026, REPARADO) · «1850.40» con punto decimal se lee 1850,4, no 185.040', async ({
     page,
   }) => {
-    // El parser casero quita TODOS los puntos: «1850.40» → 185040 → tope 5.101,20 → 170,04 €/día.
+    // El parser casero quitaba TODOS los puntos: «1850.40» → 185040 → tope 5.101,20 → 170,04 €/día.
     // parseSpanishNumber (y el blur del propio NumberInput) lo leen 1850,4 → 61,68 €/día.
-    test.fail();
     const texto = await estimar(page, { base: '1850.40' });
     expect(texto).toContain('Base reguladora diaria | 61,68 €');
     expect(texto).toContain('EXENTA IRPF | 8203,44 €');
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · una base por debajo de la mínima se sube a 1.424,40 en silencio', async ({
+  test('HALLAZGO 4282 (09/11/2026, REPARADO) · una base por debajo de la mínima es la base real', async ({
     page,
   }) => {
-    // Tiempo parcial: base real 1.000 €/mes. La BR es la base real (seg-social.es: «se dividirá
-    // entre treinta»; a tiempo parcial, 12 meses entre 365 = 32,88). Hoy: 1424,40 / 30 = 47,48.
-    test.fail();
+    // Tiempo parcial: base real 1.000 €/mes. La BR es la base real (RD 295/2009, art. 7: sin
+    // suelo salvo formación y artistas). Antes: 1424,40 / 30 = 47,48.
     const texto = await estimar(page, { base: '1.000' });
     expect(texto).toContain('Base reguladora diaria | 33,33 €');
     expect(texto).toContain('EXENTA IRPF | 4433,33 €');
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · no contributiva: no aplica la BR inferior al IPREM (art. 182.2)', async ({
+  test('HALLAZGO 4283 (09/11/2026, REPARADO) · no contributiva: la BR inferior al IPREM manda (art. 182.2)', async ({
     page,
   }) => {
-    // Base 450 €/mes → BR 15,00 €/día < 20 € → se estará a esta: 15 × 42 = 630,00 €. Hoy: 840,00 €.
-    test.fail();
+    // Base 450 €/mes → BR 15,00 €/día < 20 € → se estará a esta: 15 × 42 = 630,00 €. Antes: 840,00 €.
     const texto = await estimar(page, { base: '450', dias7: '100', diasVida: '200' });
     expect(texto).toContain('EXENTA IRPF | 630,00 €');
+    expect(texto).toContain('| 15,00 €');
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · no contributiva con +14 días: «6 semanas (56 dias)»', async ({ page }) => {
-    // 56 días son 8 semanas. Hoy la tarjeta y el total dicen «6 semanas (56 dias)».
-    test.fail();
+  test('HALLAZGO 4284 (09/11/2026, REPARADO) · no contributiva con +14 días: 8 semanas (56 dias)', async ({ page }) => {
+    // 56 días son 8 semanas. Antes la tarjeta y el total decían «6 semanas (56 dias)», y las notas
+    // daban el «100 % … sin topes» de la contributiva y un permiso de 6 semanas.
     const texto = await estimar(page, { base: '1.500', monoparental: true, dias7: '100', diasVida: '200' });
     expect(texto).toContain('8 semanas (56 dias)');
+    expect(texto).not.toContain('sin topes adicionales');
+    expect(texto).not.toMatch(/derecho a 6 semanas/);
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · monoparental con gemelos: +1 semana en vez de las 2 (ET 48.6)', async ({
+  test('HALLAZGO 4285 (09/11/2026, REPARADO) · monoparental con gemelos: +2 semanas (ET 48.6)', async ({
     page,
   }) => {
     // «una única persona progenitora […] podrá disfrutar de las ampliaciones completas»:
-    // 32 + 2 = 34 semanas = 238 días → 66,6667 × 238 = 15.866,67 €. Hoy 33 semanas, 15.400,00 €.
-    test.fail();
-    const texto = await estimar(page, { base: '2.000', monoparental: true, hijos: 2 });
+    // 32 + 2 = 34 semanas = 238 días → 66,6667 × 238 = 15.866,67 €. Antes 33 semanas, 15.400,00 €.
+    let texto = await estimar(page, { base: '2.000', monoparental: true, hijos: 2 });
     expect(texto).toContain('Duracion total | 34 semanas (238 dias)');
     expect(texto).toContain('EXENTA IRPF | 15.866,67 €');
+    // Trillizos: 32 + 4 = 36 semanas
+    await page.reload();
+    await esperarHidratacion(page, [`input[aria-label="${BASE}"]`]);
+    texto = await estimar(page, { base: '2.000', monoparental: true, hijos: 3 });
+    expect(texto).toContain('Duracion total | 36 semanas (252 dias)');
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · parto múltiple: no menciona el subsidio especial de 6 semanas', async ({
+  test('HALLAZGO 4286 (09/11/2026, REPARADO) · parto múltiple: el subsidio especial de 6 semanas, aparte', async ({
     page,
   }) => {
-    // seg-social.es: subsidio especial por cada hijo a partir del segundo, igual al del primero,
-    // 6 semanas, para uno de los progenitores: 42 × 66,67 = 2800,00 € que la app no nombra.
-    test.fail();
+    // RD 295/2009, art. 6.2: subsidio especial por cada hijo a partir del segundo, igual al del
+    // primero, 6 semanas, para uno de los progenitores: 42 × 66,67 = 2800,00 €, fuera del total.
     const texto = await estimar(page, { base: '2.000', hijos: 2 });
     expect(texto).toMatch(/subsidio especial/i);
+    expect(texto).toContain('2800,00 €');
+    expect(texto).toContain('EXENTA IRPF | 9333,33 €');
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · hospitalización: suma siempre las 13 semanas máximas', async ({
+  test('HALLAZGO 4287 (09/11/2026, REPARADO) · hospitalización: amplía en los días de ingreso, no 13 semanas', async ({
     page,
   }) => {
     // ET 48.4: se amplía «en tantos días como el nacido se encuentre hospitalizado» (más de 7),
-    // con un máximo de 13 semanas. La app no pregunta los días y estima 224 días, 14.933,33 €.
-    test.fail();
-    const texto = await estimar(page, { base: '2.000', hospitalizacion: true });
+    // con un máximo de 13 semanas. 10 días → 133 + 10 = 143 días → 66,6667 × 143 = 9533,33 €.
+    await rellenar(page, { base: '2.000', hospitalizacion: true });
+    const dias = page.getByLabel('Dias de hospitalizacion tras el parto');
+    await dias.fill('10');
+    await esperarValorEnReact(page, dias, '10');
+    await page.getByRole('button', { name: 'Estimar prestacion' }).click();
+    const texto = normalizar(await seccionResultado(page).innerText());
     expect(texto).not.toContain('(224 dias)');
+    expect(texto).toContain('(143 dias)');
+    expect(texto).toContain('EXENTA IRPF | 9533,33 €');
   });
 
   test('HALLAZGO (09/11/2026, ABIERTO) · adopción: anuncia «+2 semanas» por adopción internacional', async ({
