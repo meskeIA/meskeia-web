@@ -61,7 +61,35 @@ export default function TemporizadorPomodoroPage() {
   const [currentTask, setCurrentTask] = useState('');
 
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  /**
+   * La cuenta se mide contra un INSTANTE FINAL (Date.now), no restando 1 por tic. Hasta el
+   * 09/11/2026 restaba un segundo por disparo de setInterval: con la pestaña en segundo plano
+   * (Chrome espacia los temporizadores a uno por minuto pasados 5 min), la pantalla del móvil
+   * bloqueada o el portátil suspendido, un pomodoro de 25 min tardaba mucho más y la campana no
+   * sonaba a su hora. Mismo defecto que temporizador-visual (hallazgo 4325), medido aquí como su
+   * hermana.
+   */
+  const finRef = useRef<number | null>(null);
+  // Lo marchado en una pausa a mitad de segundo, para no tirarlo al continuar; vale solo si
+  // timeLeft no ha cambiado desde la pausa (reiniciar o cambiar de sesión lo invalida).
+  const pausaRef = useRef<{ ms: number; segundos: number } | null>(null);
+  const timeLeftRef = useRef(timeLeft);
+  timeLeftRef.current = timeLeft;
+  // Lo último que pintó el reloj: si al continuar timeLeft ya no vale eso, alguien lo cambió.
+  const pintadoRef = useRef(timeLeft);
+
+  /**
+   * Para el reloj EN EL ACTO, no en la limpieza del efecto: entre el render que cambia de sesión
+   * (o reinicia) y la limpieza puede colarse un tic, y ese tic volvía a escribir el tiempo viejo
+   * encima del nuevo. `guardarPausa` conserva lo marchado a mitad de segundo.
+   */
+  const detenerReloj = (guardarPausa: boolean) => {
+    pausaRef.current =
+      guardarPausa && finRef.current !== null
+        ? { ms: Math.max(0, finRef.current - Date.now()), segundos: pintadoRef.current }
+        : null;
+    finRef.current = null;
+  };
 
   // Cargar configuración y estadísticas del localStorage
   useEffect(() => {
@@ -171,6 +199,8 @@ export default function TemporizadorPomodoroPage() {
   // Completar sesión
   const completeSession = useCallback(() => {
     playSound();
+    finRef.current = null;
+    pausaRef.current = null;
     setIsRunning(false);
 
     if (sessionType === 'work') {
@@ -211,21 +241,38 @@ export default function TemporizadorPomodoroPage() {
     }
   }, [sessionType, pomodorosCompleted, config, playSound]);
 
-  // Timer principal
+  // Timer principal: el intervalo solo repinta lo que queda hasta el instante final
   useEffect(() => {
-    if (isRunning && timeLeft > 0) {
-      intervalRef.current = setInterval(() => {
-        setTimeLeft(prev => prev - 1);
-      }, 1000);
-    } else if (timeLeft === 0 && isRunning) {
-      completeSession();
-    }
-
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current);
-      }
+    if (!isRunning) return;
+    const pausa = pausaRef.current;
+    const ms0 = pausa && pausa.segundos === timeLeftRef.current ? pausa.ms : timeLeftRef.current * 1000;
+    pausaRef.current = null;
+    finRef.current = Date.now() + ms0;
+    pintadoRef.current = timeLeftRef.current;
+    const tic = () => {
+      if (finRef.current === null) return;
+      const ms = finRef.current - Date.now();
+      // Al llegar a 0 el reloj se para aquí mismo: los tics que queden no reescriben nada.
+      if (ms <= 0) finRef.current = null;
+      pintadoRef.current = Math.max(0, Math.ceil(ms / 1000));
+      setTimeLeft(pintadoRef.current);
     };
+    const id = setInterval(tic, 250);
+    const alVolver = () => {
+      if (document.visibilityState === 'visible') tic();
+    };
+    document.addEventListener('visibilitychange', alVolver);
+    return () => {
+      clearInterval(id);
+      document.removeEventListener('visibilitychange', alVolver);
+      // Si nadie lo paró antes (un arranque automático que se cancela), se guarda lo marchado.
+      if (finRef.current !== null) detenerReloj(true);
+    };
+  }, [isRunning]);
+
+  // Fin de la sesión
+  useEffect(() => {
+    if (isRunning && timeLeft === 0) completeSession();
   }, [isRunning, timeLeft, completeSession]);
 
   // Actualizar título de la página
@@ -249,9 +296,13 @@ export default function TemporizadorPomodoroPage() {
   };
 
   // Controles
-  const toggleTimer = () => setIsRunning(!isRunning);
+  const toggleTimer = () => {
+    if (isRunning) detenerReloj(true);
+    setIsRunning(!isRunning);
+  };
 
   const resetTimer = () => {
+    detenerReloj(false);
     setIsRunning(false);
     if (sessionType === 'work') {
       setTimeLeft(config.workMinutes * 60);
@@ -263,6 +314,7 @@ export default function TemporizadorPomodoroPage() {
   };
 
   const skipSession = () => {
+    detenerReloj(false);
     setIsRunning(false);
     if (sessionType === 'work') {
       setSessionType('shortBreak');
@@ -274,6 +326,7 @@ export default function TemporizadorPomodoroPage() {
   };
 
   const changeSessionType = (type: SessionType) => {
+    detenerReloj(false);
     setIsRunning(false);
     setSessionType(type);
     if (type === 'work') {
@@ -286,6 +339,14 @@ export default function TemporizadorPomodoroPage() {
   };
 
   const applyPreset = (preset: typeof PRESETS[0]) => {
+    // Cambia el tiempo de la sesión en curso: con el reloj en marcha, que siga desde el nuevo
+    // valor (como antes, que restaba sobre lo que hubiera en timeLeft).
+    if (finRef.current !== null) {
+      const sesion = sessionType === 'work' ? preset.work : sessionType === 'shortBreak' ? preset.short : preset.long;
+      finRef.current = Date.now() + sesion * 60 * 1000;
+    } else {
+      pausaRef.current = null;
+    }
     setConfig(prev => ({
       ...prev,
       workMinutes: preset.work,
