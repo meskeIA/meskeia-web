@@ -94,6 +94,35 @@ test.describe('bingo-personalizado', () => {
     await expect(page.getByRole('button', { name: 'Mostrar respuestas' })).toHaveAttribute('aria-pressed', 'true');
     const casilla = carton1(page).locator('td').first();
     await expect(casilla.locator('span[aria-hidden="true"]')).not.toBeEmpty();
+
+    // En una partida de palabras, las de 3 letras («oso», «pez») van con la misma letra que
+    // las de 4-8; la grande es solo para partidas en que todo es corto (números, símbolos)
+    const tamanos = await page.locator('td').evaluateAll((celdas) => {
+      const porLargo = new Map<number, Set<string>>();
+      for (const td of celdas) {
+        const texto = td.querySelectorAll('span')[1];
+        if (!texto) continue;
+        const n = (texto.textContent ?? '').length;
+        if (n > 8) continue;
+        const clave = n <= 3 ? 3 : 8;
+        if (!porLargo.has(clave)) porLargo.set(clave, new Set());
+        porLargo.get(clave)!.add(getComputedStyle(texto).fontSize);
+      }
+      return { cortas: [...(porLargo.get(3) ?? [])], medias: [...(porLargo.get(8) ?? [])] };
+    });
+    expect(tamanos.cortas.length).toBeGreaterThan(0);
+    expect(tamanos.cortas).toEqual(tamanos.medias);
+  });
+
+  test('partida de números: la letra grande se mantiene', async ({ page }) => {
+    await abrir(page);
+    await generarConPartida(page, '5');
+    // Tablas del 2 al 9: todos los productos tienen 1-2 cifras → textoCorto (1,25rem > la base)
+    const [numero, base] = await carton1(page)
+      .locator('td span')
+      .nth(1)
+      .evaluate((s) => [getComputedStyle(s).fontSize, getComputedStyle(document.body).fontSize]);
+    expect(parseFloat(numero)).toBeGreaterThan(parseFloat(base));
   });
 
   test('lista propia demasiado corta: avisa y no deja generar', async ({ page }) => {

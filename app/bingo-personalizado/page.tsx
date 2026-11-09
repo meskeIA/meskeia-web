@@ -56,10 +56,14 @@ const ID_PROPIA = 'propia';
 
 const EJEMPLO_PROPIA = 'capital de Perú = Lima\n7 × 8 = 56\ngato = cat\nsol\nluna';
 
-/** Clase de letra de una casilla según lo largo que es su texto */
-function claseLargo(texto: string): string {
+/**
+ * Clase de letra de una casilla según lo largo que es su texto. La letra grande es para las
+ * partidas en que TODO es corto (números, símbolos químicos): en una de palabras, «oso» y «pez»
+ * salían más grandes que el resto del cartón (vista de impresión del usuario, 09/11/2026).
+ */
+function claseLargo(texto: string, todoCorto: boolean): string {
   const n = texto.length;
-  if (n <= 3) return styles.textoCorto;
+  if (n <= 3 && todoCorto) return styles.textoCorto;
   if (n <= 8) return styles.textoMedio;
   if (n <= 14) return styles.textoLargo;
   return styles.textoMuyLargo;
@@ -192,6 +196,7 @@ export default function BingoPersonalizadoPage() {
       : 'Se gana con línea: una fila horizontal completa.';
 
   const columnasHoja = partida && partida.tamano.columnas >= 5 ? styles.rejillaAncha : styles.rejillaEstrecha;
+  const todoCorto = partida ? partida.enJuego.every((r) => r.carton.length <= 3) : false;
 
   return (
     <div className={`${styles.container} ${impresion.lienzo}`}>
@@ -548,7 +553,7 @@ export default function BingoPersonalizadoPage() {
                             <td
                               key={indice}
                               lang="es"
-                              className={`${styles.casilla} ${claseLargo(r.carton)} ${
+                              className={`${styles.casilla} ${claseLargo(r.carton, todoCorto)} ${
                                 partida.tamano.columnas >= 5 ? styles.casillaEstrecha : ''
                               }`}
                             >
