@@ -65,7 +65,7 @@ export const faqJsonLd = {
       name: '¿Cuáles son los 7 sistemas cristalinos?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Los 7 sistemas cristalinos se clasifican según los parámetros de celda (longitudes a, b, c y ángulos α, β, γ): cúbico, tetragonal, ortorrómbico, hexagonal, trigonal (romboédrico), monoclínico y triclínico. El sistema cúbico es el más simétrico y el triclínico el menos. La sal y el diamante pertenecen al sistema cúbico; el cuarzo, al hexagonal.',
+        text: 'Los 7 sistemas cristalinos se clasifican según los parámetros de celda (longitudes a, b, c y ángulos α, β, γ): cúbico, tetragonal, ortorrómbico, hexagonal, trigonal (romboédrico), monoclínico y triclínico. El sistema cúbico es el más simétrico y el triclínico el menos. La sal y el diamante pertenecen al sistema cúbico; el cuarzo, al trigonal (la forma α, estable por debajo de 573 °C; por encima pasa a cuarzo β, hexagonal).',
       },
     },
     {

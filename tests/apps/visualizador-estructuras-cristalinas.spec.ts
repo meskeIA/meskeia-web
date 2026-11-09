@@ -24,7 +24,7 @@ import { contrasteSobreFondoReal } from './_contraste';
  * Los `test.fail()` son hallazgos ABIERTOS de esta inspección (09/11/2026): pasarán a verde
  * cuando se reparen, y entonces se quita la marca. Reparados el 09/11/2026: 4357 (aristas),
  * 4358 (trigonal), 4359 (caras hexagonales), 4360 (grafito), 4361 (cuarzo SiO₄), 4363, 4364,
- * 4365, 4366, 4367 (contraste) y 4368 (%). Sigue abierto 4362 (el cuarzo en dos sistemas).
+ * 4365, 4366, 4367 (contraste), 4368 (%) y 4362 (el cuarzo, solo en trigonal).
  */
 
 const RUTA = '/visualizador-estructuras-cristalinas/';
@@ -374,12 +374,13 @@ test.describe('CASO 3 · cristales famosos', () => {
     }
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · el cuarzo figura en dos de los 7 sistemas', async ({ page }) => {
-    // La app dice «Todos los cristales pertenecen a uno de 7 sistemas» y pone «Cuarzo» de ejemplo
-    // en Hexagonal y en Trigonal; la FAQ (JSON-LD) dice «el cuarzo, al hexagonal».
-    // Sigue ABIERTO (hallazgo 4362): elegir el sistema exige una fuente cristalográfica que no
-    // estaba en la red de dominios permitidos de /reparar del 09/11/2026.
-    test.fail();
+  test('HALLAZGO (09/11/2026, REPARADO) · el cuarzo figura en dos de los 7 sistemas', async ({ page }) => {
+    // La app dice «Todos los cristales pertenecen a uno de 7 sistemas» y ponía «Cuarzo» de ejemplo
+    // en Hexagonal y en Trigonal; la FAQ (JSON-LD) decía «el cuarzo, al hexagonal».
+    // REPARADO (hallazgo 4362): Handbook of Mineralogy, ficha «Quartz» (Mineral Data Publishing,
+    // 2001): «Crystal Data: Hexagonal. Point Group: 32» · «Space Group: P3₁21 or P3₂21».
+    // «Hexagonal» es allí la FAMILIA; el grupo puntual 32 es del SISTEMA trigonal en los 7
+    // sistemas de la IUCr, que son los de la app. El cuarzo β (> 573 °C) sí es hexagonal.
     await abrir(page);
     const conCuarzo: string[] = [];
     for (const nombre of ['Cúbico', 'Tetragonal', 'Ortorrómbico', 'Hexagonal', 'Trigonal', 'Monoclínico', 'Triclínico']) {
@@ -387,10 +388,10 @@ test.describe('CASO 3 · cristales famosos', () => {
       const ejemplo = (await detalle(page).innerText()).split('\n').find((l) => l.startsWith('Ejemplo:')) ?? '';
       if (/cuarzo/i.test(ejemplo)) conCuarzo.push(nombre);
     }
-    expect(conCuarzo, 'sistemas que dan el cuarzo de ejemplo').toHaveLength(1);
+    expect(conCuarzo, 'sistemas que dan el cuarzo de ejemplo').toEqual(['Trigonal']);
     const faq = await page.locator('script[type="application/ld+json"]').allTextContents();
     const asignado = /el cuarzo, al (\p{L}+)/iu.exec(faq.join(' '))?.[1];
-    if (asignado) expect(asignado.toLowerCase(), 'la FAQ dice el mismo sistema que la página').toBe(conCuarzo[0]?.toLowerCase());
+    expect(asignado?.toLowerCase(), 'la FAQ dice el mismo sistema que la página').toBe('trigonal');
   });
 
   test('HALLAZGO (09/11/2026, REPARADO) · el grafito conduce «entre capas», y la propia app dice que en el plano', async ({ page }) => {

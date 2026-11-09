@@ -249,7 +249,7 @@ const SISTEMAS: SistemaCristalino[] = [
   },
   {
     nombre: 'Hexagonal', params: 'a = b ≠ c', angulos: 'α = β = 90°, γ = 120°',
-    ejemplo: 'Cuarzo, Grafito, Hielo', icono: '⬡', color: '#9B59B6',
+    ejemplo: 'Grafito, Hielo, Berilo', icono: '⬡', color: '#9B59B6',
     caras: hexCaras(S * 0.5, S * 0.8, '#9B59B6', -30),
     atomos: (() => {
       const atoms: Atomo3D[] = [];
