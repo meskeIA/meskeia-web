@@ -4,7 +4,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 export const metadata: Metadata = {
   title: 'Simulador de Colisiones — Elásticas e Inelásticas en 1D | meskeIA',
   description:
-    'Simula colisiones elásticas e inelásticas en 1D: ajusta masas, velocidades y coeficiente de restitución. Visualiza la conservación del momento lineal y la variación de energía cinética. Para Bachillerato y selectividad (España), o preparatoria y secundaria (Latinoamérica).',
+    'Simula colisiones elásticas e inelásticas en 1D: ajusta masas, velocidades y coeficiente de restitución. Visualiza la conservación del momento lineal y la variación de energía cinética. Para Física y Química de 1.º de Bachillerato (España), o preparatoria y secundaria (Latinoamérica).',
   keywords:
     'simulador colisiones, colisión elástica inelástica, momento lineal, coeficiente de restitución, conservación momento, energía cinética colisión, física bachillerato, física preparatoria, física secundaria',
   authors: [{ name: 'meskeIA' }],
@@ -56,7 +56,7 @@ export const faqJsonLd = {
       name: '¿Qué es el coeficiente de restitución y qué valores puede tomar?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El coeficiente de restitución (e) mide la proporción entre la velocidad relativa de separación y la de aproximación tras el choque. Varía entre 0 (colisión perfectamente inelástica, objetos que se pegan) y 1 (colisión perfectamente elástica, sin pérdida de energía). Materiales como el acero tienen e ≈ 0,9, mientras que la plastilina se aproxima a e ≈ 0.',
+        text: 'El coeficiente de restitución (e) es el cociente entre la velocidad relativa de separación después del choque y la de aproximación antes del choque. En los choques ordinarios va de 0 (colisión perfectamente inelástica, objetos que se pegan) a 1 (colisión perfectamente elástica, sin pérdida de energía cinética). Puede ser mayor que 1 en las colisiones superelásticas, en las que se libera energía interna, como en una explosión o con un muelle comprimido entre los objetos; el simulador cubre el tramo de 0 a 1. Materiales como el acero tienen e ≈ 0,9, mientras que la plastilina se aproxima a e ≈ 0.',
       },
     },
     {
@@ -72,7 +72,7 @@ export const faqJsonLd = {
       name: '¿Para qué asignaturas es útil este simulador de colisiones?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Es especialmente útil para Física de 2.º de Bachillerato (dinámica y cantidad de movimiento) y para preparar problemas de selectividad sobre colisiones. También resulta práctico en primero de ingeniería o física universitaria para visualizar los resultados antes de resolverlos analíticamente con las ecuaciones de choque.',
+        text: 'En España encaja en Física y Química de 1.º de Bachillerato, cuyo bloque de estática y dinámica trata el momento lineal y el impulso mecánico (Real Decreto 243/2022), y en otros países en los cursos de física de preparatoria o educación media que estudian la cantidad de movimiento. También resulta práctico en primero de ingeniería o física universitaria para visualizar los resultados antes de resolverlos analíticamente con las ecuaciones de choque.',
       },
     },
     {
@@ -97,6 +97,6 @@ export const jsonLd = generateWebAppSchema({
     'Coeficiente de restitución ajustable con clasificación automática del tipo de colisión',
     'Animación SVG del choque con fases pre-colisión, impacto y post-colisión',
     'Cálculo de momento lineal total y energía cinética antes y después',
-    'Ideal para Física de Bachillerato y selectividad (España) o preparatoria y secundaria (Latinoamérica)',
+    'Pensado para Física y Química de 1.º de Bachillerato (España) o física de preparatoria y secundaria (Latinoamérica)',
   ],
 });

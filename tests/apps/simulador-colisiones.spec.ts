@@ -19,7 +19,8 @@ import { activarTema, prepararParaMedir } from '../contraste-text-muted-auxiliar
  * +10 m/s contra 1 kg a −10 m/s, e = 0) y en un elástico con rebote; el aviso cuando A no
  * alcanza a B (vA ≤ vB); en móvil se maneja con el dedo y no desborda.
  *
- * HALLAZGOS ABIERTOS (test.fail, el test describe lo correcto):
+ * HALLAZGOS — todos REPARADOS el 09/11/2026 (H1 = 4389, H2 = 4390, H3 = 4391, H4 = 4392, H5 = 4393,
+ * H6 = 4394, H7 = 4395, H8 = 4396, H9 = 4397, H10 = 4398, H11 = 4399). Lo que decían:
  *   H1 (alto)   · La animación mueve A en sentido CONTRARIO a v'A (pos = impacto − signo·rapidez):
  *                 con e = 0 los dos cuerpos que «se pegan» salen despedidos en sentidos opuestos, y
  *                 un A que rebota (v'A = −4,33) avanza y se mete en B.
@@ -282,13 +283,12 @@ test.describe('simulador-colisiones · escritorio', () => {
     await expect(aviso(page)).toBeVisible();
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) H2 · si A no alcanza a B (vA = −2, vB = +5) no se pinta un choque inventado', async ({
+  test('HALLAZGO (09/11/2026, REPARADO) H2 · si A no alcanza a B (vA = −2, vB = +5) no se pinta un choque inventado', async ({
     page,
   }) => {
     // Esperado: no hay choque, así que o no hay resultado o las velocidades no cambian
     // (v'A = −2, v'B = +5, ΔEk = 0). Hoy aplica la fórmula a un choque que no ocurre:
     // v'A = [(4 − 1)·(−2) + 2·1,5·5]/6 = 1,5 · v'B = [4·1,5·(−2) + 0·5]/6 = −2 · ΔEk = 8,5 − 33 = −24,5 J
-    test.fail();
     await fijar(page, { m1: 4, m2: 2, v1: -2, v2: 5, e: 0.5 });
     await expect(aviso(page)).toBeVisible();
     const boton = page.getByRole('button', { name: /Simular colisión/ });
@@ -313,10 +313,9 @@ test.describe('simulador-colisiones · escritorio', () => {
     expect(caso2.dB).toBeGreaterThan(0.5);
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) H1 · A sale en el sentido de v\'A y, con e = 0, A y B se mueven juntos', async ({
+  test('HALLAZGO (09/11/2026, REPARADO) H1 · A sale en el sentido de v\'A y, con e = 0, A y B se mueven juntos', async ({
     page,
   }) => {
-    test.fail();
     // Caso 1: v'A = +1,5 → A debe avanzar (hoy retrocede de 43 % a 38,5 %).
     await fijar(page, { m1: 4, m2: 2, v1: 5, v2: -2, e: 0.5 });
     const caso1 = analizar(await grabarSimulacion(page));
@@ -332,21 +331,19 @@ test.describe('simulador-colisiones · escritorio', () => {
     expect.soft(rebote.dA, "v'A = −4,33: A retrocede").toBeLessThan(-0.5);
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) H3 · la aproximación se anima: A pasa por posiciones intermedias antes del choque', async ({
+  test('HALLAZGO (09/11/2026, REPARADO) H3 · la aproximación se anima: A pasa por posiciones intermedias antes del choque', async ({
     page,
   }) => {
     // El JSON-LD promete «fases pre-colisión, impacto y post-colisión». Hoy A está quieto en el
     // 18 % durante 600 ms y aparece de golpe en el 43 %: 0 posiciones intermedias.
-    test.fail();
     await fijar(page, { m1: 4, m2: 2, v1: 5, v2: -2, e: 0.5 });
     const { intermedias } = analizar(await grabarSimulacion(page));
     expect(intermedias).toBeGreaterThanOrEqual(3);
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) H4 · en claro, los textos con el color de cada objeto llegan a su umbral', async ({
+  test('HALLAZGO (09/11/2026, REPARADO) H4 · en claro, los textos con el color de cada objeto llegan a su umbral', async ({
     page,
   }) => {
-    test.fail();
     await prepararParaMedir(page); // sin transiciones: se mide el color final, no el del fundido
     await activarTema(page, 'light');
     // 16 px en negrita no es texto grande: 4,5:1 (hoy 4,11 y 2,97)
@@ -366,10 +363,9 @@ test.describe('simulador-colisiones · escritorio', () => {
     expect.soft(await contrasteSobreFondoReal(r2.getByText(/^ΔEk =/)), 'ΔEk sin pérdida').toBeGreaterThanOrEqual(4.5);
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) H4 · en oscuro, «Objeto A (azul)» y el aviso «no colisionarán» llegan a 4,5:1', async ({
+  test('HALLAZGO (09/11/2026, REPARADO) H4 · en oscuro, «Objeto A (azul)» y el aviso «no colisionarán» llegan a 4,5:1', async ({
     page,
   }) => {
-    test.fail();
     await prepararParaMedir(page); // sin el fundido del cambio de tema (sin él se mide 1,79:1 a medio camino)
     await activarTema(page, 'dark');
     // Hoy 3,35:1 (#2E86AB sobre #2d2d2d) y 3,62:1 (reserva #c0621a de --naranja-texto sobre su tinte)
@@ -380,10 +376,9 @@ test.describe('simulador-colisiones · escritorio', () => {
     expect.soft(await contrasteSobreFondoReal(aviso(page)), 'aviso «no colisionarán»').toBeGreaterThanOrEqual(4.5);
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) H6 · coma decimal y % separado: «4,5 kg», «+2,5 m/s», «(-45,4 %)»', async ({
+  test('HALLAZGO (09/11/2026, REPARADO) H6 · coma decimal y % separado: «4,5 kg», «+2,5 m/s», «(-45,4 %)»', async ({
     page,
   }) => {
-    test.fail();
     await fijar(page, { m1: 4.5, m2: 2, v1: 2.5, v2: -2, e: 1 });
     await expect.soft(page.locator('label[for="masa-a"]')).toHaveText('Masa: 4,5 kg');
     await expect.soft(page.locator('label[for="velocidad-a"]')).toHaveText('Velocidad: +2,5 m/s');
@@ -395,11 +390,10 @@ test.describe('simulador-colisiones · escritorio', () => {
     expect.soft(await r.innerText()).toContain(`(-45,4${espacioDuro}%)`);
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) H7 · la fórmula sustituida cierra sus paréntesis y pone los negativos entre paréntesis', async ({
+  test('HALLAZGO (09/11/2026, REPARADO) H7 · la fórmula sustituida cierra sus paréntesis y pone los negativos entre paréntesis', async ({
     page,
   }) => {
     // Esperado (caso 1): «= [(4−0,50·2)·5 + 2·1,50·(−2)] / 6». Hoy: «= [4−0,50·2)·5 + 2·1,50·-2] / 6».
-    test.fail();
     await fijar(page, { m1: 4, m2: 2, v1: 5, v2: -2, e: 0.5 });
     const r = await simular(page);
     const lineas = (
@@ -421,24 +415,22 @@ test.describe('simulador-colisiones · escritorio', () => {
     expect(features.length).toBeLessThanOrEqual(8);
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) H8 · la guía no llama «elásticas» a las colisiones del LHC', async ({ page }) => {
+  test('HALLAZGO (09/11/2026, REPARADO) H8 · la guía no llama «elásticas» a las colisiones del LHC', async ({ page }) => {
     // La tabla de la propia guía: elástica = energía cinética conservada. La tarjeta del LHC dice
     // «prácticamente elásticas en términos de bariones» y a renglón seguido que «la energía
     // cinética crea nuevas partículas»: por esa definición, es una colisión inelástica.
-    test.fail();
     const guia = normalizar((await page.locator('main').textContent()) ?? '');
     expect(guia).toContain('LHC');
     expect(guia).not.toContain('prácticamente elásticas');
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) H9 · «muelle» (o «resorte»), no «mola»', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO (09/11/2026, REPARADO) H9 · «muelle» (o «resorte»), no «mola»', async ({ page }) => {
     const guia = normalizar((await page.locator('main').textContent()) ?? '');
     expect(guia).toContain('muelle comprimido'); // la tabla ya lo dice así
     expect(guia).not.toMatch(/\bmola\b/);
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) H10 · el FAQPage no sitúa el momento lineal en Física de 2.º de Bachillerato', async ({
+  test('HALLAZGO (09/11/2026, REPARADO) H10 · el FAQPage no sitúa el momento lineal en Física de 2.º de Bachillerato', async ({
     page,
   }) => {
     // RD 243/2022, anexo II (boe.es, BOE-A-2022-5521): Física de 2.º = «A. Campo gravitatorio.
@@ -446,15 +438,13 @@ test.describe('simulador-colisiones · escritorio', () => {
     // y de partículas.»; Física y Química de 1.º, bloque «E. Estática y dinámica»: «Interpretación
     // de las leyes de la dinámica en términos de magnitudes como el momento lineal y el impulso
     // mecánico».
-    test.fail();
     const { faq } = await leerJsonLd(page);
     for (const q of faq) expect(q.respuesta, q.pregunta).not.toMatch(/2\.º de Bachillerato/);
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) H11 · el FAQPage no limita e a [0, 1] cuando la página enseña e > 1', async ({
+  test('HALLAZGO (09/11/2026, REPARADO) H11 · el FAQPage no limita e a [0, 1] cuando la página enseña e > 1', async ({
     page,
   }) => {
-    test.fail();
     const { faq } = await leerJsonLd(page);
     const coef = faq.find((q) => /coeficiente de restitución/i.test(q.pregunta));
     if (!coef) throw new Error('El FAQPage no tiene la pregunta del coeficiente de restitución');
@@ -497,9 +487,8 @@ test.describe('simulador-colisiones · móvil 390 px', () => {
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(390);
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) H5 · los rótulos del SVG se leen (≥ 9 px de alto)', async ({ page }) => {
+  test('HALLAZGO (09/11/2026, REPARADO) H5 · los rótulos del SVG se leen (≥ 9 px de alto)', async ({ page }) => {
     // viewBox de 500 unidades en 324 px: fontSize 8-9 → 5,2-5,8 px; cajas de 7-8 px hoy.
-    test.fail();
     const alturas = await pista(page)
       .locator('text')
       .evaluateAll((ts) =>

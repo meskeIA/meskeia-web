@@ -97,8 +97,20 @@
   border-radius: 8px;
   padding: 0.65rem 1rem;
   font-size: 0.875rem;
-  color: var(--naranja-texto, #c0621a);
+  color: var(--naranja-texto, #e09060);
 }
+
+/* ── Texto con el color de cada objeto (hallazgo 4392) ──
+   Hasta el 09/11/2026 iba en línea desde una constante (#2E86AB, #E07B39, #27AE60) y no llegaba
+   a 4,5:1 en ningún tema. En claro, los tokens de texto de globals; en oscuro --primary-texto
+   ya cambia solo, y el naranja y el verde toman la reserva, que es la clara para fondo oscuro. */
+.textoA { color: var(--primary-texto); }
+.textoB { color: var(--naranja-texto, #e09060); }
+.textoVerde { color: var(--verde-texto, #4ade80); }
+.svgTextoA { fill: var(--primary-texto); }
+.svgTextoB { fill: var(--naranja-texto, #e09060); }
+.svgMasa { fill: var(--text-secondary); }
+.bloqueA { fill: var(--primary-boton); }
 
 /* ── Botón simular ── */
 .btnWrapper { text-align: center; }
@@ -259,6 +271,9 @@
 
 /* ── Responsive ── */
 @media (max-width: 680px) {
+  /* El viewBox de 500 unidades se pinta en ~324 px: a 8-9 unidades los rótulos quedaban en
+     5-6 px (hallazgo 4393). font-size en CSS gana al atributo fontSize del SVG. */
+  .rotulo { font-size: 14px; }
   .panelGrid { grid-template-columns: 1fr; }
   .resGrid { grid-template-columns: 1fr; }
   .escenariosGrid { grid-template-columns: 1fr; }

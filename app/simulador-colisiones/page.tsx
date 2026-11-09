@@ -63,11 +63,59 @@ function clasificarTipo(e: number): string {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// Constantes de animación (posiciones SVG en %)
+// Geometría de la animación (posiciones SVG en % del ancho)
 // ─────────────────────────────────────────────────────────────────────────────
-const POS_B1_INIT = 18;   // bloque 1 inicio (izq)
-const POS_B2_INIT = 72;   // bloque 2 inicio (der)
-const POS_IMPACT  = 43;   // posición de impacto (centro-izq)
+// Hasta el 09/11/2026 el choque era siempre en un punto fijo (A en el 43 %, B en el 57 %) y A
+// salía con el signo cambiado (impacto − sentido·rapidez): con e = 0 los dos cuerpos «pegados»
+// se separaban y un A que rebota se metía en B (hallazgo 4389). Ahora cada bloque se mueve con
+// su velocidad real, a la misma escala antes y después del choque: x(t) = x_choque + v·s·t, con
+// t de −1 a 0 en la aproximación y de 0 a 1 tras el choque. El punto de contacto se elige para
+// que todo el recorrido quepa centrado en la pista, así que A nunca se solapa con B.
+const POS_A_REPOSO = 18;  // sin choque posible: A a la izquierda…
+const POS_B_REPOSO = 72;  // …y B a la derecha
+const RECORRIDO_MAX = 18; // % que recorre el bloque más rápido en cada fase
+const DUR_APROXIMACION = 900; // ms
+const DUR_IMPACTO = 250;      // ms
+const DUR_SALIDA = 900;       // ms
+
+const tamBloque = (masa: number): number => Math.max(10, Math.min(22, masa * 1.5));
+
+interface Geometria {
+  /** Posición izquierda de A y B al empezar, en el choque y al terminar. */
+  a: { inicio: number; choque: number; fin: number };
+  b: { inicio: number; choque: number; fin: number };
+  /** Punto de contacto: borde derecho de A = borde izquierdo de B. */
+  contacto: number;
+}
+
+function calcularGeometria(m1: number, m2: number, v1: number, v2: number, res: Resultado): Geometria {
+  const wA = tamBloque(m1);
+  const wB = tamBloque(m2);
+  const vMax = Math.max(Math.abs(v1), Math.abs(v2), Math.abs(res.v1f), Math.abs(res.v2f));
+  const s = vMax > 0 ? RECORRIDO_MAX / vMax : 0;
+  // Relativo al contacto (c = 0)
+  const aInicio = -wA - v1 * s;
+  const aFin = -wA + res.v1f * s;
+  const bInicio = -v2 * s;
+  const bFin = res.v2f * s;
+  const izquierda = Math.min(aInicio, aFin, -wA);
+  const derecha = Math.max(bInicio + wB, bFin + wB, wB);
+  const contacto = (100 - (derecha - izquierda)) / 2 - izquierda;
+  return {
+    a: { inicio: contacto + aInicio, choque: contacto - wA, fin: contacto + aFin },
+    b: { inicio: contacto + bInicio, choque: contacto, fin: contacto + bFin },
+    contacto,
+  };
+}
+
+/** Número de los deslizadores (paso 0,5): «4» o «4,5». */
+const numCorto = (x: number): string => formatNumber(x, Number.isInteger(x) ? 0 : 1);
+
+/** Velocidad con signo explícito: «+2,5». */
+const conSigno = (x: number): string => (x > 0 ? '+' : '') + numCorto(x);
+
+/** Un factor de la fórmula sustituida: los negativos, entre paréntesis y con signo menos. */
+const factor = (texto: string): string => (texto.startsWith('-') ? `(−${texto.slice(1)})` : texto);
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Componente principal
@@ -82,58 +130,82 @@ export default function SimuladorColisionesPage() {
 
   const [resultado, setResultado] = useState<Resultado | null>(null);
   const [fase, setFase] = useState<FaseAnim>('idle');
-  const [pos1, setPos1] = useState(POS_B1_INIT);
-  const [pos2, setPos2] = useState(POS_B2_INIT);
+  // Progreso de la animación: −1 → 0 en la aproximación, 0 en el impacto y 0 → 1 en la salida.
+  const [progreso, setProgreso] = useState(-1);
 
-  const animRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const animRef = useRef<number | null>(null);
+
+  // Solo hay choque si A (detrás, a la izquierda) va más deprisa que B (hallazgo 4390).
+  const hayChoque = v1 > v2;
 
   // Limpiar animación al desmontar
   useEffect(() => {
-    return () => { if (animRef.current) clearTimeout(animRef.current); };
+    return () => { if (animRef.current !== null) cancelAnimationFrame(animRef.current); };
   }, []);
 
   const lanzarSimulacion = useCallback(() => {
-    if (animRef.current) clearTimeout(animRef.current);
+    if (!hayChoque) return;
+    if (animRef.current !== null) cancelAnimationFrame(animRef.current);
     const res = calcularColision(m1, m2, v1, v2, e);
     setResultado(res);
+
+    const sinMovimiento = typeof window !== 'undefined'
+      && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    if (sinMovimiento) {
+      setProgreso(1);
+      setFase('done');
+      return;
+    }
+
     setFase('pre');
-    setPos1(POS_B1_INIT);
-    setPos2(POS_B2_INIT);
-
-    animRef.current = setTimeout(() => {
-      setFase('impact');
-      setPos1(POS_IMPACT);
-      setPos2(POS_IMPACT + 14);
-
-      animRef.current = setTimeout(() => {
+    setProgreso(-1);
+    const t0 = performance.now();
+    const paso = (ahora: number): void => {
+      const t = ahora - t0;
+      if (t < DUR_APROXIMACION) {
+        setFase('pre');
+        setProgreso(t / DUR_APROXIMACION - 1);
+      } else if (t < DUR_APROXIMACION + DUR_IMPACTO) {
+        setFase('impact');
+        setProgreso(0);
+      } else if (t < DUR_APROXIMACION + DUR_IMPACTO + DUR_SALIDA) {
         setFase('post');
-        const dir1 = res.v1f >= 0 ? 1 : -1;
-        const dir2 = res.v2f >= 0 ? 1 : -1;
-        const speed1 = Math.min(Math.abs(res.v1f) * 3, 30);
-        const speed2 = Math.min(Math.abs(res.v2f) * 3, 30);
-        setPos1(POS_IMPACT - dir1 * speed1);
-        setPos2(POS_IMPACT + 14 + dir2 * speed2);
-
-        animRef.current = setTimeout(() => setFase('done'), 900);
-      }, 700);
-    }, 600);
-  }, [m1, m2, v1, v2, e]);
+        setProgreso((t - DUR_APROXIMACION - DUR_IMPACTO) / DUR_SALIDA);
+      } else {
+        setProgreso(1);
+        setFase('done');
+        animRef.current = null;
+        return;
+      }
+      animRef.current = requestAnimationFrame(paso);
+    };
+    animRef.current = requestAnimationFrame(paso);
+  }, [m1, m2, v1, v2, e, hayChoque]);
 
   const resetear = () => {
-    if (animRef.current) clearTimeout(animRef.current);
+    if (animRef.current !== null) cancelAnimationFrame(animRef.current);
+    animRef.current = null;
     setFase('idle');
-    setPos1(POS_B1_INIT);
-    setPos2(POS_B2_INIT);
+    setProgreso(-1);
     setResultado(null);
   };
 
+  // Geometría del recorrido: con el resultado simulado o, en reposo, con el que daría la
+  // configuración actual (para dibujar los bloques donde empezarán).
+  const resGeometria = resultado ?? calcularColision(m1, m2, v1, v2, e);
+  const geo = hayChoque || resultado ? calcularGeometria(m1, m2, v1, v2, resGeometria) : null;
+  const interpolar = (p: { inicio: number; choque: number; fin: number }): number =>
+    progreso <= 0 ? p.choque + (p.choque - p.inicio) * progreso : p.choque + (p.fin - p.choque) * progreso;
+  const pos1 = geo ? interpolar(geo.a) : POS_A_REPOSO;
+  const pos2 = geo ? interpolar(geo.b) : POS_B_REPOSO;
+
+  // Bordes y relleno de los bloques (no son texto). El texto de cada objeto va con las clases
+  // textoA / textoB del módulo, que cumplen el contraste en los dos temas (hallazgo 4392).
   const colores = {
     b1: '#2E86AB',
     b2: '#E07B39',
     impacto: '#E74C3C',
   };
-
-  const tamBloque = (masa: number) => Math.max(10, Math.min(22, masa * 1.5));
 
   return (
     <div className={styles.container}>
@@ -155,18 +227,18 @@ export default function SimuladorColisionesPage() {
 
           {/* Objeto 1 */}
           <div className={styles.panelObj} style={{ borderTopColor: colores.b1 }}>
-            <h2 className={styles.panelTitulo} style={{ color: colores.b1 }}>
+            <h2 className={`${styles.panelTitulo} ${styles.textoA}`}>
               Objeto A (azul)
             </h2>
             <div className={styles.sliderRow}>
-              <label htmlFor="masa-a">Masa: <strong>{m1} kg</strong></label>
+              <label htmlFor="masa-a">Masa: <strong>{numCorto(m1)} kg</strong></label>
               <input id="masa-a" type="range" min={1} max={20} step={0.5} value={m1}
                 onChange={e => { setM1(Number(e.target.value)); resetear(); }}
                 className={styles.slider} aria-label="Masa objeto A" />
               <span className={styles.sliderLimits}><span>1 kg</span><span>20 kg</span></span>
             </div>
             <div className={styles.sliderRow}>
-              <label htmlFor="velocidad-a">Velocidad: <strong><span>{v1 > 0 ? '+' : ''}</span>{v1} m/s</strong></label>
+              <label htmlFor="velocidad-a">Velocidad: <strong>{conSigno(v1)} m/s</strong></label>
               <input id="velocidad-a" type="range" min={-10} max={10} step={0.5} value={v1}
                 onChange={e => { setV1(Number(e.target.value)); resetear(); }}
                 className={styles.slider} aria-label="Velocidad inicial objeto A" />
@@ -176,18 +248,18 @@ export default function SimuladorColisionesPage() {
 
           {/* Objeto 2 */}
           <div className={styles.panelObj} style={{ borderTopColor: colores.b2 }}>
-            <h2 className={styles.panelTitulo} style={{ color: colores.b2 }}>
+            <h2 className={`${styles.panelTitulo} ${styles.textoB}`}>
               Objeto B (naranja)
             </h2>
             <div className={styles.sliderRow}>
-              <label htmlFor="masa-b">Masa: <strong>{m2} kg</strong></label>
+              <label htmlFor="masa-b">Masa: <strong>{numCorto(m2)} kg</strong></label>
               <input id="masa-b" type="range" min={1} max={20} step={0.5} value={m2}
                 onChange={e => { setM2(Number(e.target.value)); resetear(); }}
                 className={styles.slider} aria-label="Masa objeto B" />
               <span className={styles.sliderLimits}><span>1 kg</span><span>20 kg</span></span>
             </div>
             <div className={styles.sliderRow}>
-              <label htmlFor="velocidad-b">Velocidad: <strong><span>{v2 > 0 ? '+' : ''}</span>{v2} m/s</strong></label>
+              <label htmlFor="velocidad-b">Velocidad: <strong>{conSigno(v2)} m/s</strong></label>
               <input id="velocidad-b" type="range" min={-10} max={10} step={0.5} value={v2}
                 onChange={e => { setV2(Number(e.target.value)); resetear(); }}
                 className={styles.slider} aria-label="Velocidad inicial objeto B" />
@@ -225,7 +297,7 @@ export default function SimuladorColisionesPage() {
           <button
             type="button"
             onClick={lanzarSimulacion}
-            disabled={fase === 'pre' || fase === 'impact'}
+            disabled={!hayChoque || fase === 'pre' || fase === 'impact' || fase === 'post'}
             className={styles.btnSimular}
           >
             {fase === 'idle' ? <><span aria-hidden="true">▶</span> Simular colisión</> : fase === 'done' ? <><span aria-hidden="true">↺</span> Volver a simular</> : <><span aria-hidden="true">⏳</span> Simulando...</>}
@@ -234,7 +306,7 @@ export default function SimuladorColisionesPage() {
 
         {/* ── Animación SVG ── */}
         <div className={styles.pista} aria-label="Animación de la colisión">
-          <svg viewBox="0 0 500 90" className={styles.pistaSvg}>
+          <svg viewBox="0 0 500 96" className={styles.pistaSvg}>
             {/* Suelo */}
             <line x1="0" y1="72" x2="500" y2="72" stroke="#888" strokeWidth="2" />
             {/* Marcas de escala */}
@@ -248,11 +320,11 @@ export default function SimuladorColisionesPage() {
               <g>
                 <line
                   x1={`${pos1 + tamBloque(m1) / 2}%`} y1="38"
-                  x2={`${pos1 + tamBloque(m1) / 2 + (v1 > 0 ? 12 : -12)}%`} y2="38"
+                  x2={`${pos1 + tamBloque(m1) / 2 + (v1 > 0 ? 8 : -8)}%`} y2="38"
                   stroke={colores.b1} strokeWidth="2" markerEnd={v1 > 0 ? 'url(#arrow-b1-r)' : 'url(#arrow-b1-l)'} />
-                <text x={`${pos1 + tamBloque(m1) / 2 + (v1 > 0 ? 14 : -14)}%`} y="35"
-                  textAnchor="middle" fontSize="9" fill={colores.b1}>
-                  <tspan>{v1 > 0 ? '+' : ''}</tspan>{v1} m/s
+                <text x={`${pos1 + tamBloque(m1) / 2 + (v1 > 0 ? 9 : -9)}%`} y="31"
+                  textAnchor="middle" fontSize="9" className={`${styles.rotulo} ${styles.svgTextoA}`}>
+                  {conSigno(v1)} m/s
                 </text>
               </g>
             )}
@@ -261,18 +333,18 @@ export default function SimuladorColisionesPage() {
               <g>
                 <line
                   x1={`${pos2 + tamBloque(m2) / 2}%`} y1="38"
-                  x2={`${pos2 + tamBloque(m2) / 2 + (v2 > 0 ? 12 : -12)}%`} y2="38"
+                  x2={`${pos2 + tamBloque(m2) / 2 + (v2 > 0 ? 8 : -8)}%`} y2="38"
                   stroke={colores.b2} strokeWidth="2" markerEnd={v2 > 0 ? 'url(#arrow-b2-r)' : 'url(#arrow-b2-l)'} />
-                <text x={`${pos2 + tamBloque(m2) / 2 + (v2 > 0 ? 14 : -14)}%`} y="35"
-                  textAnchor="middle" fontSize="9" fill={colores.b2}>
-                  <tspan>{v2 > 0 ? '+' : ''}</tspan>{v2} m/s
+                <text x={`${pos2 + tamBloque(m2) / 2 + (v2 > 0 ? 9 : -9)}%`} y="31"
+                  textAnchor="middle" fontSize="9" className={`${styles.rotulo} ${styles.svgTextoB}`}>
+                  {conSigno(v2)} m/s
                 </text>
               </g>
             )}
 
             {/* Flash de impacto */}
-            {fase === 'impact' && (
-              <circle cx={`${POS_IMPACT + 7}%`} cy="55" r="18"
+            {fase === 'impact' && geo && (
+              <circle cx={`${geo.contacto}%`} cy="55" r="18"
                 fill={colores.impacto} opacity="0.25" />
             )}
 
@@ -281,11 +353,11 @@ export default function SimuladorColisionesPage() {
               <g>
                 <line
                   x1={`${pos1 + tamBloque(m1) / 2}%`} y1="38"
-                  x2={`${pos1 + tamBloque(m1) / 2 + (resultado.v1f > 0 ? 12 : -12)}%`} y2="38"
+                  x2={`${pos1 + tamBloque(m1) / 2 + (resultado.v1f > 0 ? 8 : -8)}%`} y2="38"
                   stroke={colores.b1} strokeWidth="2" strokeDasharray="4 2"
                   markerEnd={resultado.v1f > 0 ? 'url(#arrow-b1-r)' : 'url(#arrow-b1-l)'} />
-                <text x={`${pos1 + tamBloque(m1) / 2 + (resultado.v1f > 0 ? 15 : -15)}%`} y="32"
-                  textAnchor="middle" fontSize="8" fill={colores.b1}>
+                <text x={`${pos1 + tamBloque(m1) / 2 + (resultado.v1f > 0 ? 9 : -9)}%`} y="31"
+                  textAnchor="middle" fontSize="9" className={`${styles.rotulo} ${styles.svgTextoA}`}>
                   {formatNumber(resultado.v1f, 1)} m/s
                 </text>
               </g>
@@ -294,40 +366,38 @@ export default function SimuladorColisionesPage() {
               <g>
                 <line
                   x1={`${pos2 + tamBloque(m2) / 2}%`} y1="38"
-                  x2={`${pos2 + tamBloque(m2) / 2 + (resultado.v2f > 0 ? 12 : -12)}%`} y2="38"
+                  x2={`${pos2 + tamBloque(m2) / 2 + (resultado.v2f > 0 ? 8 : -8)}%`} y2="38"
                   stroke={colores.b2} strokeWidth="2" strokeDasharray="4 2"
                   markerEnd={resultado.v2f > 0 ? 'url(#arrow-b2-r)' : 'url(#arrow-b2-l)'} />
-                <text x={`${pos2 + tamBloque(m2) / 2 + (resultado.v2f > 0 ? 15 : -15)}%`} y="32"
-                  textAnchor="middle" fontSize="8" fill={colores.b2}>
+                <text x={`${pos2 + tamBloque(m2) / 2 + (resultado.v2f > 0 ? 9 : -9)}%`} y="31"
+                  textAnchor="middle" fontSize="9" className={`${styles.rotulo} ${styles.svgTextoB}`}>
                   {formatNumber(resultado.v2f, 1)} m/s
                 </text>
               </g>
             )}
 
-            {/* Bloques */}
+            {/* Bloques (los mueve la animación por requestAnimationFrame, sin transición CSS) */}
             <rect
               x={`${pos1}%`} y={72 - tamBloque(m1)}
               width={`${tamBloque(m1)}%`} height={tamBloque(m1)}
-              fill={colores.b1} rx="3"
-              style={{ transition: fase === 'pre' ? 'x 0.6s ease-in' : fase === 'post' ? 'x 0.8s ease-out' : 'none' }}
+              className={styles.bloqueA} rx="3"
             />
             <text x={`${pos1 + tamBloque(m1) / 2}%`} y={72 - tamBloque(m1) / 2 + 4}
-              textAnchor="middle" fontSize="9" fill="white" fontWeight="700">A</text>
+              textAnchor="middle" fontSize="9" fill="#fff" fontWeight="700">A</text>
 
             <rect
               x={`${pos2}%`} y={72 - tamBloque(m2)}
               width={`${tamBloque(m2)}%`} height={tamBloque(m2)}
               fill={colores.b2} rx="3"
-              style={{ transition: fase === 'pre' ? 'x 0.6s ease-in' : fase === 'post' ? 'x 0.8s ease-out' : 'none' }}
             />
             <text x={`${pos2 + tamBloque(m2) / 2}%`} y={72 - tamBloque(m2) / 2 + 4}
-              textAnchor="middle" fontSize="9" fill="white" fontWeight="700">B</text>
+              textAnchor="middle" fontSize="9" fill="#1a1a1a" fontWeight="700">B</text>
 
             {/* Etiquetas de masa */}
-            <text x={`${pos1 + tamBloque(m1) / 2}%`} y="84"
-              textAnchor="middle" fontSize="8" fill="#888">{m1} kg</text>
-            <text x={`${pos2 + tamBloque(m2) / 2}%`} y="84"
-              textAnchor="middle" fontSize="8" fill="#888">{m2} kg</text>
+            <text x={`${pos1 + tamBloque(m1) / 2}%`} y="86"
+              textAnchor="middle" fontSize="8" className={`${styles.rotulo} ${styles.svgMasa}`}>{numCorto(m1)} kg</text>
+            <text x={`${pos2 + tamBloque(m2) / 2}%`} y="86"
+              textAnchor="middle" fontSize="8" className={`${styles.rotulo} ${styles.svgMasa}`}>{numCorto(m2)} kg</text>
 
             {/* Definiciones de flechas */}
             <defs>
@@ -352,7 +422,7 @@ export default function SimuladorColisionesPage() {
               {/* Velocidades finales */}
               <div className={styles.resCard} style={{ borderTopColor: colores.b1 }}>
                 <p className={styles.resLabel}>Velocidad final A</p>
-                <p className={styles.resValor} style={{ color: colores.b1 }}>
+                <p className={`${styles.resValor} ${styles.textoA}`}>
                   {formatNumber(resultado.v1f, 2)} <span className={styles.resUnidad}>m/s</span>
                 </p>
                 <p className={styles.resSub}>
@@ -361,7 +431,7 @@ export default function SimuladorColisionesPage() {
               </div>
               <div className={styles.resCard} style={{ borderTopColor: colores.b2 }}>
                 <p className={styles.resLabel}>Velocidad final B</p>
-                <p className={styles.resValor} style={{ color: colores.b2 }}>
+                <p className={`${styles.resValor} ${styles.textoB}`}>
                   {formatNumber(resultado.v2f, 2)} <span className={styles.resUnidad}>m/s</span>
                 </p>
                 <p className={styles.resSub}>
@@ -398,11 +468,8 @@ export default function SimuladorColisionesPage() {
                   <span>Después:</span>
                   <strong>{formatNumber(resultado.ek_despues, 2)} J</strong>
                 </div>
-                <p className={styles.resDelta} style={{
-                  color: resultado.delta_ek < -0.01 ? '#E07B39' : '#27AE60',
-                }}>
-                  ΔEk = {formatNumber(resultado.delta_ek, 2)} J
-                  (<span>{resultado.delta_ek_pct >= 0 ? '+' : ''}</span>{formatNumber(resultado.delta_ek_pct, 1)}%)
+                <p className={`${styles.resDelta} ${resultado.delta_ek < -0.01 ? styles.textoB : styles.textoVerde}`}>
+                  {`ΔEk = ${formatNumber(resultado.delta_ek, 2)} J (${resultado.delta_ek_pct >= 0 ? '+' : ''}${formatNumber(resultado.delta_ek_pct, 1)} %)`}
                 </p>
               </div>
             </div>
@@ -414,15 +481,15 @@ export default function SimuladorColisionesPage() {
                 <div className={styles.formula}>
                   <p className={styles.formulaEq}>v'<sub>A</sub> = [(m<sub>A</sub>−e·m<sub>B</sub>)v<sub>A</sub> + m<sub>B</sub>(1+e)v<sub>B</sub>] / (m<sub>A</sub>+m<sub>B</sub>)</p>
                   <p className={styles.formulaResult}>
-                    = [{m1}−{formatNumber(e,2)}·{m2})·{v1} + {m2}·{formatNumber(1+e,2)}·{v2}] / {m1+m2}
-                    = <strong>{formatNumber(resultado.v1f, 3)} m/s</strong>
+                    {`= [(${numCorto(m1)}−${formatNumber(e, 2)}·${numCorto(m2)})·${factor(numCorto(v1))} + ${numCorto(m2)}·${formatNumber(1 + e, 2)}·${factor(numCorto(v2))}] / ${numCorto(m1 + m2)} = `}
+                    <strong>{formatNumber(resultado.v1f, 3)} m/s</strong>
                   </p>
                 </div>
                 <div className={styles.formula}>
                   <p className={styles.formulaEq}>v'<sub>B</sub> = [m<sub>A</sub>(1+e)v<sub>A</sub> + (m<sub>B</sub>−e·m<sub>A</sub>)v<sub>B</sub>] / (m<sub>A</sub>+m<sub>B</sub>)</p>
                   <p className={styles.formulaResult}>
-                    = [{m1}·{formatNumber(1+e,2)}·{v1} + ({m2}−{formatNumber(e,2)}·{m1})·{v2}] / {m1+m2}
-                    = <strong>{formatNumber(resultado.v2f, 3)} m/s</strong>
+                    {`= [${numCorto(m1)}·${formatNumber(1 + e, 2)}·${factor(numCorto(v1))} + (${numCorto(m2)}−${formatNumber(e, 2)}·${numCorto(m1)})·${factor(numCorto(v2))}] / ${numCorto(m1 + m2)} = `}
+                    <strong>{formatNumber(resultado.v2f, 3)} m/s</strong>
                   </p>
                 </div>
               </div>
@@ -506,7 +573,7 @@ export default function SimuladorColisionesPage() {
                   <h3>Física de partículas</h3>
                 </div>
                 <p className={styles.escenarioTip}>
-                  En el LHC del CERN, las colisiones de protones a velocidades relativistas son prácticamente elásticas en términos de bariones. Sin embargo, la energía cinética crea nuevas partículas (E=mc²): en física de altas energías, el concepto de "energía cinética conservada" se amplía a energía total relativista.
+                  En el LHC del CERN, las colisiones de protones a velocidades relativistas son el caso extremo de choque inelástico: parte de la energía cinética se convierte en la masa de partículas nuevas (E = mc²). Se conservan el momento y la energía total relativista, pero no la energía cinética.
                 </p>
               </div>
               <div className={styles.escenarioCard}>
@@ -530,12 +597,12 @@ export default function SimuladorColisionesPage() {
                 <p>
                   El momento lineal se conserva en sistemas aislados como consecuencia directa de la tercera ley de Newton: la fuerza que A ejerce sobre B es igual y opuesta a la que B ejerce sobre A. Al integrar en el tiempo, los impulsos se cancelan → el momento total no cambia. La energía cinética, en cambio, puede transformarse en calor, sonido o deformación durante el impacto (siempre se pierde o mantiene, nunca se gana en colisiones ordinarias).
                 </p>
-                <p className={styles.faqTip}><span aria-hidden="true">💡</span> En selectividad o examen de admisión universitaria (preparatoria, secundaria): "conservación del momento lineal" = siempre. "conservación de energía cinética" = solo en colisiones elásticas.</p>
+                <p className={styles.faqTip}><span aria-hidden="true">💡</span> En los exámenes de bachillerato, preparatoria o secundaria: "conservación del momento lineal" = siempre. "conservación de energía cinética" = solo en colisiones elásticas.</p>
               </div>
               <div className={styles.faqItem}>
                 <h4><span aria-hidden="true">❓</span> ¿Puede la energía cinética total aumentar en una colisión?</h4>
                 <p>
-                  Sí, en las llamadas colisiones superelásticas (e &gt; 1), donde hay una fuente de energía interna: una mola comprimida entre los objetos, una explosión, o una reacción química. En estas colisiones, la energía química/elástica almacenada se convierte en energía cinética adicional. El momento sigue conservándose.
+                  Sí, en las llamadas colisiones superelásticas (e &gt; 1), donde hay una fuente de energía interna: un muelle (o resorte) comprimido entre los objetos, una explosión, o una reacción química. En estas colisiones, la energía química/elástica almacenada se convierte en energía cinética adicional. El momento sigue conservándose.
                 </p>
               </div>
               <div className={styles.faqItem}>
