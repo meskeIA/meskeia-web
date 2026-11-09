@@ -19,12 +19,19 @@ import {
   PRESTACION_NACIMIENTO,
   PERMISO_NACIMIENTO,
   AMPLIACION_POR_ID,
+  DEDUCCION_MATERNIDAD_IRPF,
 } from '@/data/fiscal';
 
 // ===== TIPOS =====
 type RangoEdad = 'menor21' | '21a25' | 'mayor26';
 type Situacion = 'nacimiento' | 'adopcion' | 'acogimiento';
 type TipoFamilia = 'biparental' | 'monoparental';
+
+/** Una línea del desglose. La etiqueta dice qué es: hasta el 09/11/2026 todas salían como «Extra», también la nota de carencia (hallazgo 4294). */
+interface LineaDesglose {
+  texto: string;
+  etiqueta: 'Ampliación' | 'Nota' | 'Aparte';
+}
 
 interface ResultadoEstimacion {
   baseReguladoraDiaria: number;
@@ -36,22 +43,24 @@ interface ResultadoEstimacion {
   prestacionTotal: number;
   semanasObligatorias: number;
   semanasVoluntarias: number;
-  detalleAmpliaciones: string[];
+  detalleAmpliaciones: LineaDesglose[];
   esContributiva: boolean;
-  /** Subsidio especial por parto multiple (RD 295/2009, art. 6.2): aparte del total, para uno de los progenitores. */
+  /** Subsidio especial por parto múltiple (RD 295/2009, art. 6.2): aparte del total, para uno de los progenitores. */
   subsidioEspecial: number;
 }
 
 // Cifras del permiso desde data/fiscal, no escritas a mano en el JSX (hallazgo 4293)
 const PERMISO_BI = PERMISO_NACIMIENTO.find((p) => p.tipoFamilia === 'biparental') ?? PERMISO_NACIMIENTO[0];
 const PERMISO_MONO = PERMISO_NACIMIENTO.find((p) => p.tipoFamilia === 'monoparental') ?? PERMISO_NACIMIENTO[1];
+const SEMANAS_PARTO_MULTIPLE = AMPLIACION_POR_ID['parto-multiple'].semanasExtra;
+const SEMANAS_HOSPITAL_MAX = AMPLIACION_POR_ID['hospitalizacion-neonatal'].semanasExtra;
 
-/** «20 semanas», «20 semanas y 3 dias»: la hospitalizacion amplia en DIAS (ET 48.4). */
+/** «20 semanas», «1 semana», «20 semanas y 3 días»: la hospitalización amplía en DÍAS (ET 48.4). */
 function textoDuracion(dias: number): string {
   const semanas = Math.floor(dias / 7);
   const resto = dias % 7;
   const textoSemanas = `${semanas} semana${semanas === 1 ? '' : 's'}`;
-  return resto === 0 ? textoSemanas : `${textoSemanas} y ${resto} dia${resto === 1 ? '' : 's'}`;
+  return resto === 0 ? textoSemanas : `${textoSemanas} y ${resto} día${resto === 1 ? '' : 's'}`;
 }
 
 // ===== COMPONENTE PRINCIPAL =====
@@ -69,20 +78,20 @@ export default function EstimacionPrestacionNacimiento() {
   const [errorBase, setErrorBase] = useState<string>('');
   const [mostrarResultados, setMostrarResultados] = useState(false);
 
-  // Parsear la base de cotizacion con el parser canonico: el casero (quitar todos los
-  // puntos y luego parseFloat) leia «1850.40» como 185.040 (hallazgo 4281).
+  // Parsear la base de cotización con el parser canónico: el casero (quitar todos los
+  // puntos y luego parseFloat) leía «1850.40» como 185.040 (hallazgo 4281).
   const baseMensual = useMemo(() => {
     const num = parseSpanishNumber(baseCotizacion);
     return isNaN(num) ? 0 : num;
   }, [baseCotizacion]);
 
-  // Dias de hospitalizacion del recien nacido (ET 48.4)
+  // Días de hospitalización del recién nacido (ET 48.4)
   const diasIngreso = useMemo(() => {
     const num = parseSpanishNumber(diasHospital);
     return isNaN(num) || num < 0 ? 0 : Math.floor(num);
   }, [diasHospital]);
 
-  // Dias cotizados declarados (art. 178 LGSS)
+  // Días cotizados declarados (art. 178 LGSS)
   const dias7Anios = useMemo(() => {
     const num = parseInt(diasUltimos7Anios.replace(/\./g, ''), 10);
     return isNaN(num) ? 0 : num;
@@ -100,23 +109,23 @@ export default function EstimacionPrestacionNacimiento() {
     const { basesReferencia, cotizacionMinima, noContributiva } = PRESTACION_NACIMIENTO;
 
     // La base reguladora es la base REAL del mes anterior, sin suelo: una base inferior a la
-    // minima del regimen general es la de un contrato a tiempo parcial, y subirla a la minima
-    // inflaba la prestacion (hallazgo 4282; RD 295/2009, art. 7, solo pone suelo a la
-    // formacion y a artistas). El techo si existe: no se cotiza por encima de la maxima.
+    // mínima del régimen general es la de un contrato a tiempo parcial, y subirla a la mínima
+    // inflaba la prestación (hallazgo 4282; RD 295/2009, art. 7, solo pone suelo a la
+    // formación y a artistas). El techo sí existe: no se cotiza por encima de la máxima.
     const baseAplicable = Math.min(baseMensual, basesReferencia.baseMaximaMensual);
     const brDiaria = baseAplicable / 30;
 
     // Carencia del art. 178.1 LGSS: la decide la EDAD en la fecha del parto y
-    // los DIAS COTIZADOS, no el importe de la base. Los dos umbrales de cada
+    // los DÍAS COTIZADOS, no el importe de la base. Los dos umbrales de cada
     // tramo son alternativos: basta cumplir uno.
     const umbral =
       edad === 'menor21' ? cotizacionMinima.menores21
       : edad === '21a25' ? cotizacionMinima.entre21y25
       : cotizacionMinima.mayores26;
 
-    // Si no se han declarado dias, NO se concluye que falte carencia: se asume
+    // Si no se han declarado días, NO se concluye que falte carencia: se asume
     // cumplida y se advierte. Dar por incumplido lo que el usuario no ha dicho
-    // seria negarle la prestacion por omision.
+    // sería negarle la prestación por omisión.
     const carenciaDeclarada = diasUltimos7Anios.trim() !== '' || diasVidaLaboral.trim() !== '';
 
     const esContributiva =
@@ -126,22 +135,25 @@ export default function EstimacionPrestacionNacimiento() {
       diasTotales >= umbral.diasVidaLaboral;
 
     if (!esContributiva) {
-      // Prestacion no contributiva (art. 182 LGSS). Los 42 dias del descanso
-      // obligatorio se amplian en 14 naturales por monoparentalidad, parto
-      // multiple, familia numerosa o discapacidad >=65%, y el incremento NO se
+      // Prestación no contributiva (art. 182 LGSS). Los 42 días del descanso
+      // obligatorio se amplían en 14 naturales por monoparentalidad, parto
+      // múltiple, familia numerosa o discapacidad >=65 %, y el incremento NO se
       // acumula aunque concurran varios supuestos (art. 182.3 in fine).
       const supuestosNoContributiva: string[] = [];
       if (tipoFamilia === 'monoparental') {
         supuestosNoContributiva.push('monoparentalidad');
       }
       if (partoMultiple && numHijos >= 2) {
-        supuestosNoContributiva.push('parto multiple');
+        supuestosNoContributiva.push('parto múltiple');
       }
 
       const diasExtra = supuestosNoContributiva.length > 0 ? noContributiva.incrementoDias : 0;
       const diasTotal = noContributiva.duracion + diasExtra;
-      const detalle = diasExtra > 0
-        ? [`+${diasExtra} dias naturales por ${supuestosNoContributiva.join(' y ')} (el incremento se aplica una sola vez)`]
+      const detalle: LineaDesglose[] = diasExtra > 0
+        ? [{
+            texto: `+${diasExtra} días naturales por ${supuestosNoContributiva.join(' y ')} (el incremento se aplica una sola vez)`,
+            etiqueta: 'Ampliación',
+          }]
         : [];
 
       // Art. 182.2 LGSS y RD 295/2009, art. 16.2: el 100 % del IPREM, salvo que la base
@@ -153,7 +165,7 @@ export default function EstimacionPrestacionNacimiento() {
         prestacionDiaria: cuantiaDiaria,
         semanasBase: noContributiva.duracion / 7,
         semanasExtra: diasExtra / 7,
-        // Las semanas salen de los dias: 42 + 14 son 8 semanas, no 6 (hallazgo 4284)
+        // Las semanas salen de los días: 42 + 14 son 8 semanas, no 6 (hallazgo 4284)
         semanasTotal: diasTotal / 7,
         diasTotal,
         prestacionTotal: cuantiaDiaria * diasTotal,
@@ -165,66 +177,72 @@ export default function EstimacionPrestacionNacimiento() {
       };
     }
 
-    // Prestacion contributiva
+    // Prestación contributiva
     const prestacionDiaria = brDiaria; // 100 % de la BR
 
     const permiso = PERMISO_NACIMIENTO.find((p) => p.tipoFamilia === tipoFamilia) ?? PERMISO_NACIMIENTO[0];
     let semanasExtra = 0;
-    const detalleAmpliaciones: string[] = [];
+    const detalleAmpliaciones: LineaDesglose[] = [];
 
     if (umbral.diasUltimos7Anios > 0 && !carenciaDeclarada) {
-      detalleAmpliaciones.push(
-        `Calculado asumiendo que cumples la carencia (${umbral.nota}). Rellena los dias cotizados para comprobarlo.`
-      );
+      detalleAmpliaciones.push({
+        texto: `Calculado asumiendo que cumples la carencia (${umbral.nota}). Rellena los días cotizados para comprobarlo.`,
+        etiqueta: 'Nota',
+      });
     }
 
-    // Ampliaciones (por identificador: ni el orden ni la redaccion del motivo
-    // pueden desviar el calculo en silencio)
+    // Ampliaciones (por identificador: ni el orden ni la redacción del motivo
+    // pueden desviar el cálculo en silencio)
     let subsidioEspecial = 0;
     if (partoMultiple && numHijos >= 2) {
       const hijosExtra = numHijos - 1;
       // ET 48.6: dos semanas por cada hijo distinto del primero, «una para cada una de las
-      // personas progenitoras»; la unica persona progenitora disfruta «las ampliaciones
+      // personas progenitoras»; la única persona progenitora disfruta «las ampliaciones
       // completas», es decir, las dos (hallazgo 4285).
       const factorFamilia = tipoFamilia === 'monoparental' ? 2 : 1;
-      const semanas = AMPLIACION_POR_ID['parto-multiple'].semanasExtra * hijosExtra * factorFamilia;
+      const semanas = SEMANAS_PARTO_MULTIPLE * hijosExtra * factorFamilia;
       semanasExtra += semanas;
-      detalleAmpliaciones.push(
-        `+${semanas} semana${semanas === 1 ? '' : 's'} por parto multiple (${hijosExtra} hijo${hijosExtra > 1 ? 's' : ''} adicional${hijosExtra > 1 ? 'es' : ''})`
-      );
+      detalleAmpliaciones.push({
+        texto: `+${semanas} semana${semanas === 1 ? '' : 's'} por parto múltiple (${hijosExtra} hijo${hijosExtra > 1 ? 's' : ''} adicional${hijosExtra > 1 ? 'es' : ''})`,
+        etiqueta: 'Ampliación',
+      });
       // RD 295/2009, art. 6.2: subsidio especial por cada hijo a partir del segundo, igual al
       // del primero, durante las 6 semanas posteriores al parto; lo cobra UNO de los
       // progenitores (art. 3.9), en un solo pago (art. 12.3). Va aparte del total (hallazgo 4286).
       subsidioEspecial = prestacionDiaria * 42 * hijosExtra;
-      detalleAmpliaciones.push(
-        `Subsidio especial por parto multiple: ${formatCurrency(subsidioEspecial)} (6 semanas por cada hijo a partir del segundo, para uno solo de los progenitores, en un pago al terminar esas 6 semanas)`
-      );
+      detalleAmpliaciones.push({
+        texto: `Subsidio especial por parto múltiple: ${formatCurrency(subsidioEspecial)} (6 semanas por cada hijo a partir del segundo, para uno solo de los progenitores, en un pago al terminar esas 6 semanas)`,
+        etiqueta: 'Aparte',
+      });
     }
 
-    // ET 48.4: la hospitalizacion de mas de siete dias amplia el permiso «en tantos dias como
-    // el nacido se encuentre hospitalizado», con un maximo de trece semanas. Hasta el
-    // 09/11/2026 se sumaban siempre las 13 semanas maximas (hallazgo 4287).
+    // ET 48.4: la hospitalización de más de siete días amplía el permiso «en tantos días como
+    // el nacido se encuentre hospitalizado», con un máximo de trece semanas. Hasta el
+    // 09/11/2026 se sumaban siempre las 13 semanas máximas (hallazgo 4287).
     let diasExtraHospital = 0;
     if (hospitalizacion) {
-      const maxDias = AMPLIACION_POR_ID['hospitalizacion-neonatal'].semanasExtra * 7;
+      const maxDias = SEMANAS_HOSPITAL_MAX * 7;
       if (diasIngreso > 7) {
         diasExtraHospital = Math.min(diasIngreso, maxDias);
-        detalleAmpliaciones.push(
-          `+${diasExtraHospital} dias por hospitalizacion neonatal (${diasIngreso} dias de ingreso; maximo ${maxDias})`
-        );
+        detalleAmpliaciones.push({
+          texto: `+${diasExtraHospital} días por hospitalización neonatal (${diasIngreso} días de ingreso; máximo ${maxDias})`,
+          etiqueta: 'Ampliación',
+        });
       } else {
-        detalleAmpliaciones.push(
-          diasHospital.trim() === ''
-            ? `Hospitalizacion neonatal: escribe los dias de ingreso para sumarlos (amplia un dia por dia de ingreso si pasa de 7, hasta ${maxDias})`
-            : 'Hospitalizacion neonatal de 7 dias o menos: no amplia el permiso'
-        );
+        detalleAmpliaciones.push({
+          texto: diasHospital.trim() === ''
+            ? `Hospitalización neonatal: escribe los días de ingreso para sumarlos (amplía un día por día de ingreso si pasa de 7, hasta ${maxDias})`
+            : 'Hospitalización neonatal de 7 días o menos: no amplía el permiso',
+          etiqueta: 'Nota',
+        });
       }
     }
 
     if (situacion === 'adopcion') {
-      detalleAmpliaciones.push(
-        `Posible +${AMPLIACION_POR_ID['adopcion-internacional'].semanasExtra} semanas si adopcion internacional (desplazamiento)`
-      );
+      detalleAmpliaciones.push({
+        texto: `Posible +${AMPLIACION_POR_ID['adopcion-internacional'].semanasExtra} semanas si adopción internacional (desplazamiento)`,
+        etiqueta: 'Nota',
+      });
     }
 
     const diasTotal = (permiso.semanasTotal + semanasExtra) * 7 + diasExtraHospital;
@@ -246,7 +264,7 @@ export default function EstimacionPrestacionNacimiento() {
     };
   }, [mostrarResultados, baseMensual, partoMultiple, numHijos, hospitalizacion, diasIngreso, diasHospital, situacion, tipoFamilia, edad, dias7Anios, diasTotales, diasUltimos7Anios, diasVidaLaboral]);
 
-  // Requisitos de cotizacion por edad
+  // Requisitos de cotización por edad
   const requisitoEdad = useMemo(() => {
     const { cotizacionMinima } = PRESTACION_NACIMIENTO;
     switch (edad) {
@@ -261,11 +279,11 @@ export default function EstimacionPrestacionNacimiento() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // El rechazo se dice: con la base vacia, a cero o ilegible no habia ni resultado ni aviso
+    // El rechazo se dice: con la base vacía, a cero o ilegible no había ni resultado ni aviso
     // (hallazgo 4296).
     const num = parseSpanishNumber(baseCotizacion);
     if (baseCotizacion.trim() === '') {
-      setErrorBase('Escribe tu base de cotizacion mensual para estimar la prestacion.');
+      setErrorBase('Escribe tu base de cotización mensual para estimar la prestación.');
       setMostrarResultados(false);
       return;
     }
@@ -275,7 +293,7 @@ export default function EstimacionPrestacionNacimiento() {
       return;
     }
     if (num <= 0) {
-      setErrorBase('La base de cotizacion tiene que ser mayor que 0.');
+      setErrorBase('La base de cotización tiene que ser mayor que 0.');
       setMostrarResultados(false);
       return;
     }
@@ -290,10 +308,10 @@ export default function EstimacionPrestacionNacimiento() {
       {/* Hero */}
       <header className={styles.hero}>
         <span className={styles.heroIcon} aria-hidden="true">👶</span>
-        <h1 className={styles.title}>Estimacion de Prestacion por Nacimiento</h1>
+        <h1 className={styles.title}>Estimación de prestación por nacimiento</h1>
         <p className={styles.subtitle}>
-          Calcula una estimacion de la prestacion que cobraras de la Seguridad Social
-          durante el permiso por nacimiento y cuidado del menor en Espana.
+          Calcula una estimación de la prestación que cobrarás de la Seguridad Social
+          durante el permiso por nacimiento y cuidado del menor en España.
         </p>
       </header>
 
@@ -305,19 +323,19 @@ export default function EstimacionPrestacionNacimiento() {
       {/* Disclaimer */}
       <DisclaimerCard variant="financial" severity="critical" collapsible={false}>
         <p>
-          Esta herramienta ofrece una estimacion <strong>ORIENTATIVA</strong> de la
-          prestacion por nacimiento de la Seguridad Social. La cuantia real depende de
+          Esta herramienta ofrece una estimación <strong>ORIENTATIVA</strong> de la
+          prestación por nacimiento de la Seguridad Social. La cuantía real depende de
           tu base reguladora individual, que calcula la SS a partir de tu historial de
-          cotizacion. No constituye asesoramiento laboral ni de la Seguridad Social.
+          cotización. No constituye asesoramiento laboral ni de la Seguridad Social.
         </p>
         <p>
-          <strong>La prestacion por nacimiento esta exenta de IRPF</strong> (art. 7.h Ley IRPF).
+          <strong>La prestación por nacimiento está exenta de IRPF</strong> (art. 7.h Ley IRPF).
         </p>
       </DisclaimerCard>
 
       {/* Referencia de datos */}
       <DataReference
-        normativa="Permiso por nacimiento 2025"
+        normativa={`Permiso por nacimiento ${FISCAL_MATERNIDAD_META.vigencia}`}
         fuente={FISCAL_MATERNIDAD_META.fuente}
         verificado={FISCAL_MATERNIDAD_META.verificado}
         urlOficial={FISCAL_MATERNIDAD_META.urlOficial}
@@ -326,7 +344,7 @@ export default function EstimacionPrestacionNacimiento() {
       {/* Formulario */}
       <form className={styles.formSection} onSubmit={handleSubmit}>
         <h2 className={styles.formTitle}>
-          <span aria-hidden="true">📋</span> Datos para la estimacion
+          <span aria-hidden="true">📋</span> Datos para la estimación
         </h2>
 
         {/* Tipo de familia */}
@@ -356,7 +374,7 @@ export default function EstimacionPrestacionNacimiento() {
             ))}
           </div>
           <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: '0.4rem 0 0' }}>
-            Desde el RDL 9/2025 (en vigor desde el 31/07/2025): {tipoFamilia === 'monoparental' ? '32 semanas para el unico progenitor' : '19 semanas por progenitor'}.
+            Desde el RDL 9/2025 (en vigor desde el 31/07/2025): {tipoFamilia === 'monoparental' ? `${PERMISO_MONO.semanasTotal} semanas para el único progenitor` : `${PERMISO_BI.semanasTotal} semanas por progenitor`}.
           </p>
         </div>
 
@@ -365,9 +383,9 @@ export default function EstimacionPrestacionNacimiento() {
           <span className={styles.formLabel} id="label-edad">Edad del progenitor</span>
           <div className={styles.radioGroup} role="radiogroup" aria-labelledby="label-edad">
             {([
-              { value: 'menor21' as RangoEdad, label: 'Menor de 21 anos' },
-              { value: '21a25' as RangoEdad, label: '21 a 25 anos' },
-              { value: 'mayor26' as RangoEdad, label: '26 o mas anos' },
+              { value: 'menor21' as RangoEdad, label: 'Menor de 21 años' },
+              { value: '21a25' as RangoEdad, label: '21 a 25 años' },
+              { value: 'mayor26' as RangoEdad, label: '26 o más años' },
             ]).map((opcion) => (
               <label
                 key={opcion.value}
@@ -388,11 +406,11 @@ export default function EstimacionPrestacionNacimiento() {
             ))}
           </div>
           <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: '0.4rem 0 0' }}>
-            Cotizacion minima requerida: {requisitoEdad.nota}
+            Cotización mínima requerida: {requisitoEdad.nota}
           </p>
         </div>
 
-        {/* Dias cotizados \u2014 solo si la edad exige carencia (art. 178.1 LGSS) */}
+        {/* Días cotizados — solo si la edad exige carencia (art. 178.1 LGSS) */}
         {edad !== 'menor21' && (
           <>
             <div className={styles.formGroup}>
@@ -402,7 +420,7 @@ export default function EstimacionPrestacionNacimiento() {
                   setDiasUltimos7Anios(val);
                   setMostrarResultados(false);
                 }}
-                label="Dias cotizados en los ultimos 7 anos"
+                label="Días cotizados en los últimos 7 años"
                 placeholder="Ej: 365"
                 min={0}
                 max={2555}
@@ -417,7 +435,7 @@ export default function EstimacionPrestacionNacimiento() {
                   setDiasVidaLaboral(val);
                   setMostrarResultados(false);
                 }}
-                label="Dias cotizados en toda tu vida laboral"
+                label="Días cotizados en toda tu vida laboral"
                 placeholder="Ej: 1.500"
                 min={0}
                 max={20000}
@@ -427,7 +445,7 @@ export default function EstimacionPrestacionNacimiento() {
           </>
         )}
 
-        {/* Base de cotizacion */}
+        {/* Base de cotización */}
         <div className={styles.formGroup}>
           <NumberInput
             value={baseCotizacion}
@@ -437,23 +455,23 @@ export default function EstimacionPrestacionNacimiento() {
               setMostrarResultados(false);
             }}
             error={errorBase || undefined}
-            label="Base de cotizacion mensual"
+            label="Base de cotización mensual"
             placeholder="Ej: 2.000"
             min={0}
             max={10000}
-            suffix="\u20AC"
-            helperText={`Aparece en tu nomina o en el informe de vida laboral. En ${FISCAL_MATERNIDAD_META.vigencia}: minima ${formatCurrency(PRESTACION_NACIMIENTO.basesReferencia.baseMinimaMensual)}, maxima ${formatCurrency(PRESTACION_NACIMIENTO.basesReferencia.baseMaximaMensual)}.`}
+            suffix="€"
+            helperText={`Aparece en tu nómina o en el informe de vida laboral. En ${FISCAL_MATERNIDAD_META.vigencia}, a jornada completa: mínima ${formatCurrency(PRESTACION_NACIMIENTO.basesReferencia.baseMinimaMensual)}, máxima ${formatCurrency(PRESTACION_NACIMIENTO.basesReferencia.baseMaximaMensual)}. A tiempo parcial puede ser menor.`}
             required
           />
         </div>
 
-        {/* Situacion */}
+        {/* Situación */}
         <div className={styles.formGroup}>
-          <span className={styles.formLabel} id="label-situacion">Situacion</span>
+          <span className={styles.formLabel} id="label-situacion">Situación</span>
           <div className={styles.radioGroup} role="radiogroup" aria-labelledby="label-situacion">
             {([
               { value: 'nacimiento' as Situacion, label: 'Nacimiento' },
-              { value: 'adopcion' as Situacion, label: 'Adopcion' },
+              { value: 'adopcion' as Situacion, label: 'Adopción' },
               { value: 'acogimiento' as Situacion, label: 'Acogimiento' },
             ]).map((opcion) => (
               <label
@@ -476,7 +494,7 @@ export default function EstimacionPrestacionNacimiento() {
           </div>
         </div>
 
-        {/* Parto multiple */}
+        {/* Parto múltiple */}
         <div className={styles.formGroup}>
           <label className={styles.checkboxLabel}>
             <input
@@ -487,11 +505,11 @@ export default function EstimacionPrestacionNacimiento() {
                 setMostrarResultados(false);
               }}
             />
-            Parto multiple (gemelos, trillizos...)
+            Parto múltiple (gemelos, trillizos...)
           </label>
           {partoMultiple && (
             <div className={styles.subField}>
-              <span className={styles.formLabel} id="label-numhijos">Numero de hijos en este parto</span>
+              <span className={styles.formLabel} id="label-numhijos">Número de hijos en este parto</span>
               <div className={styles.radioGroup} role="radiogroup" aria-labelledby="label-numhijos">
                 <label className={`${styles.radioOption} ${numHijos === 2 ? styles.radioOptionSelected : ''}`}>
                   <input
@@ -517,14 +535,14 @@ export default function EstimacionPrestacionNacimiento() {
                       setMostrarResultados(false);
                     }}
                   />
-                  3 o mas (trillizos+)
+                  3 o más (trillizos+)
                 </label>
               </div>
             </div>
           )}
         </div>
 
-        {/* Hospitalizacion neonatal */}
+        {/* Hospitalización neonatal */}
         <div className={styles.formGroup}>
           <label className={styles.checkboxLabel}>
             <input
@@ -535,7 +553,7 @@ export default function EstimacionPrestacionNacimiento() {
                 setMostrarResultados(false);
               }}
             />
-            Hospitalizacion neonatal o parto prematuro
+            Hospitalización neonatal o parto prematuro
           </label>
           {hospitalizacion && (
             <div className={styles.subField}>
@@ -545,29 +563,28 @@ export default function EstimacionPrestacionNacimiento() {
                   setDiasHospital(val);
                   setMostrarResultados(false);
                 }}
-                label="Dias de hospitalizacion tras el parto"
+                label="Días de hospitalización tras el parto"
                 placeholder="Ej: 10"
                 min={0}
                 max={365}
-                helperText={`Si pasan de 7, el permiso se amplia un dia por cada dia de ingreso, hasta ${AMPLIACION_POR_ID['hospitalizacion-neonatal'].semanasExtra} semanas (ET art. 48.4).`}
+                helperText={`Si pasan de 7, el permiso se amplía un día por cada día de ingreso, hasta ${SEMANAS_HOSPITAL_MAX} semanas (ET art. 48.4).`}
               />
             </div>
           )}
         </div>
 
         <button type="submit" className={styles.submitButton}>
-          Estimar prestacion
+          Estimar prestación
         </button>
       </form>
 
-      {/* Resultados */}
-      {/* La region viva existe ANTES del resultado y se llena despues: una que nace llena no
+      {/* La región viva existe ANTES del resultado y se llena después: una que nace llena no
           la anuncian los lectores de pantalla de forma fiable (hallazgo 4297). */}
       <div aria-live="polite">
       {resultado && (
         <section className={styles.resultados}>
           <h2 className={styles.resultadosTitle}>
-            <span aria-hidden="true">📊</span> Resultado de la estimacion
+            <span aria-hidden="true">📊</span> Resultado de la estimación
             {!resultado.esContributiva && (
               <span style={{ fontSize: '0.8rem', fontWeight: 400, marginLeft: '0.5rem', color: 'var(--text-muted)' }}>
                 (No contributiva)
@@ -584,21 +601,21 @@ export default function EstimacionPrestacionNacimiento() {
             </div>
             <div className={styles.resultItem}>
               <span className={styles.resultLabel}>
-                {resultado.esContributiva ? 'Prestacion diaria (100 % BR)' : 'Subsidio diario (IPREM, o la BR si es menor)'}
+                {resultado.esContributiva ? 'Prestación diaria (100 % BR)' : 'Subsidio diario (IPREM, o la BR si es menor)'}
               </span>
               <span className={styles.resultValue}>
                 {formatCurrency(resultado.prestacionDiaria)}
               </span>
             </div>
             <div className={styles.resultItem}>
-              <span className={styles.resultLabel}>Duracion total</span>
+              <span className={styles.resultLabel}>Duración total</span>
               <span className={styles.resultValue}>
-                {`${textoDuracion(resultado.diasTotal)} (${resultado.diasTotal} dias)`}
+                {`${textoDuracion(resultado.diasTotal)} (${resultado.diasTotal} días)`}
               </span>
             </div>
             <div className={`${styles.resultItem} ${styles.resultTotal}`}>
               <span className={styles.resultLabel}>
-                Prestacion total estimada
+                Prestación total estimada
                 <span className={styles.exentaTag}>EXENTA IRPF</span>
               </span>
               <span className={styles.resultValue}>
@@ -607,7 +624,7 @@ export default function EstimacionPrestacionNacimiento() {
             </div>
             {resultado.subsidioEspecial > 0 && (
               <div key="subsidio-especial" className={styles.resultItem}>
-                <span className={styles.resultLabel}>Subsidio especial por parto multiple (aparte, para uno de los progenitores)</span>
+                <span className={styles.resultLabel}>Subsidio especial por parto múltiple (aparte, para uno de los progenitores)</span>
                 <span className={styles.resultValue}>{formatCurrency(resultado.subsidioEspecial)}</span>
               </div>
             )}
@@ -624,19 +641,24 @@ export default function EstimacionPrestacionNacimiento() {
             </div>
             {resultado.esContributiva && (
               <div key="voluntarias" className={styles.breakdownItem}>
-                <span className={styles.breakdownLabel}>Semanas flexibles + cuidado prolongado (hasta los 12 meses / 8 anos del menor)</span>
+                <span className={styles.breakdownLabel}>Semanas flexibles + cuidado prolongado (hasta los 12 meses / 8 años del menor)</span>
                 <span className={styles.breakdownValue}>{resultado.semanasVoluntarias} semanas</span>
               </div>
             )}
             {resultado.detalleAmpliaciones.map((detalle, i) => (
               <div key={i} className={styles.breakdownItem}>
-                <span className={styles.breakdownLabel}>{detalle}</span>
-                <span className={styles.breakdownValue} style={{ color: 'var(--secondary-texto)' }}>Extra</span>
+                <span className={styles.breakdownLabel}>{detalle.texto}</span>
+                <span
+                  className={styles.breakdownValue}
+                  style={{ color: detalle.etiqueta === 'Nota' ? 'var(--text-muted)' : 'var(--secondary-texto)' }}
+                >
+                  {detalle.etiqueta}
+                </span>
               </div>
             ))}
             <div className={styles.breakdownItem} style={{ fontWeight: 600 }}>
               <span className={styles.breakdownLabel}>Total</span>
-              <span className={styles.breakdownValue}>{`${textoDuracion(resultado.diasTotal)} = ${resultado.diasTotal} dias`}</span>
+              <span className={styles.breakdownValue}>{`${textoDuracion(resultado.diasTotal)} = ${resultado.diasTotal} días`}</span>
             </div>
           </div>
 
@@ -646,10 +668,10 @@ export default function EstimacionPrestacionNacimiento() {
             <ul style={{ margin: '0.5rem 0 0', paddingLeft: '1.2rem', listStyle: 'disc' }}>
               {resultado.esContributiva && (
                 <li key="tope">
-                  La prestacion es el <strong>100&nbsp;% de la base reguladora</strong>, sin topes adicionales
-                  (el tope es la base maxima de cotizacion: {formatCurrency(PRESTACION_NACIMIENTO.basesReferencia.baseMaximaMensual)}/mes).
+                  La prestación es el <strong>100&nbsp;% de la base reguladora</strong>, sin topes adicionales
+                  (el tope es la base máxima de cotización: {formatCurrency(PRESTACION_NACIMIENTO.basesReferencia.baseMaximaMensual)}/mes).
                   A tiempo parcial, la Seguridad Social suma las bases de los 12 meses anteriores y las
-                  divide entre 365, asi que la cifra puede variar un poco.
+                  divide entre 365, así que la cifra puede variar un poco.
                 </li>
               )}
               {resultado.esContributiva && (
@@ -664,20 +686,20 @@ export default function EstimacionPrestacionNacimiento() {
               {!resultado.esContributiva && (
                 <li key="permiso-nc">
                   El permiso sigue siendo de {tipoFamilia === 'monoparental' ? PERMISO_MONO.semanasTotal : PERMISO_BI.semanasTotal} semanas
-                  (RDL 9/2025): lo que dura {resultado.diasTotal} dias es el subsidio no contributivo, no el permiso.
+                  (RDL 9/2025): lo que dura {resultado.diasTotal} días es el subsidio no contributivo, no el permiso.
                 </li>
               )}
               <li>
-                Esta prestacion esta <strong>exenta de IRPF</strong> y no se incluye en la declaracion de la renta.
+                Esta prestación está <strong>exenta de IRPF</strong> y no se incluye en la declaración de la renta.
               </li>
               {!resultado.esContributiva && (
                 <li>
-                  <strong>Prestacion no contributiva:</strong> al no alcanzar la cotizacion minima, se
-                  cobra el 100% del IPREM ({formatCurrency(PRESTACION_NACIMIENTO.noContributiva.cuantiaMensual)}/mes)
-                  durante {PRESTACION_NACIMIENTO.noContributiva.duracion} dias naturales, salvo que
-                  tu base reguladora sea inferior, en cuyo caso se cobra esta. Se amplia en{' '}
-                  {PRESTACION_NACIMIENTO.noContributiva.incrementoDias} dias por familia numerosa,
-                  monoparentalidad, parto multiple o discapacidad del 65% o mas, una sola vez aunque
+                  <strong>Prestación no contributiva:</strong> al no alcanzar la cotización mínima, se
+                  cobra el 100&nbsp;% del IPREM ({formatCurrency(PRESTACION_NACIMIENTO.noContributiva.cuantiaMensual)}/mes)
+                  durante {PRESTACION_NACIMIENTO.noContributiva.duracion} días naturales, salvo que
+                  tu base reguladora sea inferior, en cuyo caso se cobra esta. Se amplía en{' '}
+                  {PRESTACION_NACIMIENTO.noContributiva.incrementoDias} días por familia numerosa,
+                  monoparentalidad, parto múltiple o discapacidad del 65&nbsp;% o más, una sola vez aunque
                   coincidan varios supuestos (art. 182 LGSS).
                 </li>
               )}
@@ -687,31 +709,32 @@ export default function EstimacionPrestacionNacimiento() {
       )}
       </div>
 
-      {/* Seccion educativa v2.0 */}
+      {/* Sección educativa v2.0 */}
       <EducationalSection
-        title="Todo sobre la prestacion por nacimiento en Espana"
-        subtitle="Guia completa sobre el permiso, la prestacion y como solicitarla"
+        title="Todo sobre la prestación por nacimiento en España"
+        subtitle="Guía completa sobre el permiso, la prestación y cómo solicitarla"
       >
-        {/* Como funciona */}
+        {/* Cómo funciona */}
         <section className={styles.eduSection}>
-          <h2>Como funciona la prestacion por nacimiento</h2>
+          <h2>Cómo funciona la prestación por nacimiento</h2>
           <p style={{ fontSize: '0.9rem', color: 'var(--text-secondary)', lineHeight: 1.6 }}>
             Desde la entrada en vigor del RDL 9/2025 (31 de julio de 2025), cada progenitor tiene
-            derecho a <strong>19 semanas de permiso retribuido</strong> por nacimiento, adopcion o
-            acogimiento en familias biparentales (<strong>32 semanas</strong> en familias
-            monoparentales). La prestacion economica equivale al <strong>100% de la base
-            reguladora</strong>, que se calcula dividiendo la base de cotizacion del mes anterior
-            al inicio del descanso entre 30. Las 6 primeras semanas son obligatorias e
-            ininterrumpidas tras el parto. De las semanas restantes, 11 (22 en familias
-            monoparentales) se disfrutan de forma flexible hasta que el menor cumpla 12 meses, y
-            2 (4 en monoparentales) son de cuidado prolongado, distribuibles hasta que el menor
-            cumpla 8 anos.
+            derecho a <strong>{PERMISO_BI.semanasTotal} semanas de permiso retribuido</strong> por nacimiento, adopción o
+            acogimiento en familias biparentales (<strong>{PERMISO_MONO.semanasTotal} semanas</strong> en familias
+            monoparentales). La prestación económica equivale al <strong>100&nbsp;% de la base
+            reguladora</strong>, que se calcula dividiendo la base de cotización del mes anterior
+            al inicio del descanso entre 30 (a tiempo parcial, las bases de los 12 meses anteriores
+            entre 365). Las {PERMISO_BI.semanasObligatorias} primeras semanas son obligatorias e
+            ininterrumpidas tras el parto. De las semanas restantes, {PERMISO_BI.semanasFlexiblesHasta12Meses} ({PERMISO_MONO.semanasFlexiblesHasta12Meses} en familias
+            monoparentales) se disfrutan de forma flexible hasta que el menor cumpla 12 meses, y{' '}
+            {PERMISO_BI.semanasCuidadoProlongadoHasta8Anios} ({PERMISO_MONO.semanasCuidadoProlongadoHasta8Anios} en monoparentales) son de cuidado prolongado, distribuibles hasta que el menor
+            cumpla 8 años.
           </p>
         </section>
 
         {/* Tabla comparativa: contributiva vs no contributiva */}
         <section className={styles.eduSection}>
-          <h2>Comparativa: prestacion contributiva vs no contributiva</h2>
+          <h2>Comparativa: prestación contributiva vs no contributiva</h2>
           <div className={styles.tableWrapper}>
             <table className={styles.comparativaTable}>
               <thead>
@@ -724,45 +747,48 @@ export default function EstimacionPrestacionNacimiento() {
               <tbody>
                 <tr>
                   <td><strong>Requisito</strong></td>
-                  <td>Cotizacion minima segun edad</td>
-                  <td>Sin cotizacion suficiente</td>
+                  <td>Cotización mínima según edad</td>
+                  <td>Sin cotización suficiente</td>
                 </tr>
                 <tr>
-                  <td><strong>Cuantia</strong></td>
-                  <td>100% de la base reguladora</td>
+                  <td><strong>Cuantía</strong></td>
+                  <td>100&nbsp;% de la base reguladora</td>
                   <td>
-                    100% del IPREM ({formatCurrency(PRESTACION_NACIMIENTO.noContributiva.cuantiaMensual)}/mes),
+                    100&nbsp;% del IPREM ({formatCurrency(PRESTACION_NACIMIENTO.noContributiva.cuantiaMensual)}/mes),
                     o la base reguladora si fuese inferior
                   </td>
                 </tr>
                 <tr>
-                  <td><strong>Duracion</strong></td>
-                  <td>19 semanas/progenitor (133 dias); 32 semanas (224 dias) si familia monoparental</td>
+                  <td><strong>Duración</strong></td>
                   <td>
-                    {PRESTACION_NACIMIENTO.noContributiva.duracion} dias (6 semanas), +
+                    {PERMISO_BI.semanasTotal} semanas/progenitor ({PERMISO_BI.semanasTotal * 7} días);{' '}
+                    {PERMISO_MONO.semanasTotal} semanas ({PERMISO_MONO.semanasTotal * 7} días) si familia monoparental
+                  </td>
+                  <td>
+                    {PRESTACION_NACIMIENTO.noContributiva.duracion} días ({PRESTACION_NACIMIENTO.noContributiva.duracion / 7} semanas), +
                     {PRESTACION_NACIMIENTO.noContributiva.incrementoDias} en familia numerosa,
-                    monoparentalidad, parto multiple o discapacidad &ge; 65%
+                    monoparentalidad, parto múltiple o discapacidad &ge; 65&nbsp;%
                   </td>
                 </tr>
                 <tr>
-                  <td><strong>Cotizacion minima &lt; 21 anos</strong></td>
+                  <td><strong>Cotización mínima &lt; 21 años</strong></td>
                   <td>{PRESTACION_NACIMIENTO.cotizacionMinima.menores21.nota}</td>
                   <td>No aplica</td>
                 </tr>
                 <tr>
-                  <td><strong>Cotizacion minima 21-25 anos</strong></td>
+                  <td><strong>Cotización mínima 21-25 años</strong></td>
                   <td>{PRESTACION_NACIMIENTO.cotizacionMinima.entre21y25.nota}</td>
                   <td>No aplica</td>
                 </tr>
                 <tr>
-                  <td><strong>Cotizacion minima 26+ anos</strong></td>
+                  <td><strong>Cotización mínima 26+ años</strong></td>
                   <td>{PRESTACION_NACIMIENTO.cotizacionMinima.mayores26.nota}</td>
                   <td>No aplica</td>
                 </tr>
                 <tr>
                   <td><strong>Exenta de IRPF</strong></td>
-                  <td>Si</td>
-                  <td>Si</td>
+                  <td>Sí</td>
+                  <td>Sí</td>
                 </tr>
               </tbody>
             </table>
@@ -779,13 +805,13 @@ export default function EstimacionPrestacionNacimiento() {
                 <span className={styles.escenarioTag}>Nacimiento simple</span>
               </div>
               <p>
-                Laura, 32 anos, base de cotizacion de {formatCurrency(2200)}/mes. Su base reguladora
-                diaria es {formatCurrency(2200 / 30)}. Cobra el 100%: {formatCurrency(2200 / 30)}/dia
-                durante 19 semanas (133 dias), su parte individual del permiso biparental.
-                Total estimado: {formatCurrency((2200 / 30) * 133)}.
+                Laura, 32 años, base de cotización de {formatCurrency(2200)}/mes. Su base reguladora
+                diaria es {formatCurrency(2200 / 30)}. Cobra el 100&nbsp;%: {formatCurrency(2200 / 30)}/día
+                durante {PERMISO_BI.semanasTotal} semanas ({PERMISO_BI.semanasTotal * 7} días), su parte individual del permiso biparental.
+                Total estimado: {formatCurrency((2200 / 30) * PERMISO_BI.semanasTotal * 7)}.
               </p>
               <div className={styles.escenarioResultado}>
-                19 semanas al 100% de la BR, exentas de IRPF (32 si familia monoparental)
+                {PERMISO_BI.semanasTotal} semanas al 100&nbsp;% de la BR, exentas de IRPF ({PERMISO_MONO.semanasTotal} si familia monoparental)
               </div>
             </div>
             <div className={styles.escenarioCard}>
@@ -794,23 +820,26 @@ export default function EstimacionPrestacionNacimiento() {
                 <span className={styles.escenarioTag}>Gemelos</span>
               </div>
               <p>
-                Carlos, 28 anos, base de {formatCurrency(1800)}/mes. Al ser parto de gemelos,
-                obtiene +1 semana adicional (1 hijo extra, RDL 9/2025). Total: 20 semanas (140 dias).
-                Prestacion diaria: {formatCurrency(1800 / 30)}. Total: {formatCurrency((1800 / 30) * 140)}.
+                Carlos, 28 años, base de {formatCurrency(1800)}/mes. Al ser parto de gemelos,
+                obtiene +{SEMANAS_PARTO_MULTIPLE} semana adicional (1 hijo extra, RDL 9/2025; el otro progenitor
+                tiene la suya). Total: {PERMISO_BI.semanasTotal + SEMANAS_PARTO_MULTIPLE} semanas ({(PERMISO_BI.semanasTotal + SEMANAS_PARTO_MULTIPLE) * 7} días).
+                Prestación diaria: {formatCurrency(1800 / 30)}. Total: {formatCurrency((1800 / 30) * (PERMISO_BI.semanasTotal + SEMANAS_PARTO_MULTIPLE) * 7)}.
+                Además, uno de los dos cobra el subsidio especial de 6 semanas por el segundo hijo:{' '}
+                {formatCurrency((1800 / 30) * 42)}.
               </p>
               <div className={styles.escenarioResultado}>
-                20 semanas = 19 base + 1 por parto multiple
+                {PERMISO_BI.semanasTotal + SEMANAS_PARTO_MULTIPLE} semanas = {PERMISO_BI.semanasTotal} base + {SEMANAS_PARTO_MULTIPLE} por parto múltiple
               </div>
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
                 <span className={styles.escenarioEmoji} aria-hidden="true">✈️</span>
-                <span className={styles.escenarioTag}>Adopcion internacional</span>
+                <span className={styles.escenarioTag}>Adopción internacional</span>
               </div>
               <p>
                 Ana y Pedro adoptan en Colombia. Cada uno tiene 19 semanas de permiso (32 si fuera
-                familia monoparental). Ademas, pueden solicitar hasta 2 semanas adicionales por
-                desplazamiento al pais de origen. La prestacion se calcula igual: 100% de la base
+                familia monoparental). Además, pueden solicitar hasta 2 semanas adicionales por
+                desplazamiento al país de origen. La prestación se calcula igual: 100&nbsp;% de la base
                 reguladora.
               </p>
               <div className={styles.escenarioResultado}>
@@ -820,16 +849,16 @@ export default function EstimacionPrestacionNacimiento() {
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
                 <span className={styles.escenarioEmoji} aria-hidden="true">🏥</span>
-                <span className={styles.escenarioTag}>Prematuro con hospitalizacion</span>
+                <span className={styles.escenarioTag}>Prematuro con hospitalización</span>
               </div>
               <p>
-                Maria, 35 anos. Su hijo nace prematuro y permanece 45 dias hospitalizado.
-                A las 19 semanas base (32 si familia monoparental) se anaden hasta 13 semanas mas
-                (segun los dias reales de hospitalizacion tras el parto). La prestacion no se
-                interrumpe.
+                María, 35 años. Su hijo nace prematuro y permanece 45 días hospitalizado.
+                A las {PERMISO_BI.semanasTotal} semanas base ({PERMISO_MONO.semanasTotal} si familia monoparental) se añaden esos 45 días,
+                un día por cada día de ingreso, con un máximo de {SEMANAS_HOSPITAL_MAX} semanas (ET art. 48.4). La
+                prestación no se interrumpe.
               </p>
               <div className={styles.escenarioResultado}>
-                Hasta 32 semanas si hay hospitalizacion neonatal prolongada (45 si monoparental)
+                Hasta {PERMISO_BI.semanasTotal + SEMANAS_HOSPITAL_MAX} semanas si hay hospitalización neonatal prolongada ({PERMISO_MONO.semanasTotal + SEMANAS_HOSPITAL_MAX} si monoparental)
               </div>
             </div>
           </div>
@@ -837,97 +866,99 @@ export default function EstimacionPrestacionNacimiento() {
 
         {/* FAQ */}
         <section className={styles.eduSection}>
-          <h2>Preguntas frecuentes sobre la prestacion por nacimiento</h2>
+          <h2>Preguntas frecuentes sobre la prestación por nacimiento</h2>
           <div className={styles.faqList}>
             <div className={styles.faqItem}>
-              <h4>Cuando debo solicitar la prestacion?</h4>
+              <h4>¿Cuándo debo solicitar la prestación?</h4>
               <p>
-                Lo ideal es solicitarla en los 15 dias siguientes al inicio del descanso (fecha
-                de parto, adopcion o acogimiento). Se puede tramitar online con certificado
-                digital en la Sede Electronica de la Seguridad Social, o presencialmente en
-                una oficina del INSS con cita previa. No pierdas el plazo: el derecho prescribe
-                a los 5 anos, pero cobras desde la fecha de solicitud, no desde el parto.
+                Lo ideal es solicitarla en los 15 días siguientes al inicio del descanso (fecha
+                de parto, adopción o acogimiento). Se puede tramitar online con certificado
+                digital en la Sede Electrónica de la Seguridad Social, o presencialmente en
+                una oficina del INSS con cita previa. El subsidio se cobra desde el día en que
+                empieza el descanso, aunque lo pidas después. El derecho prescribe a los 5 años,
+                pero si la solicitud llega tarde, los efectos económicos solo se retrotraen a los
+                3 meses anteriores a la fecha de solicitud (art. 53.1 LGSS).
               </p>
             </div>
             <div className={styles.faqItem}>
-              <h4>Pueden ambos progenitores cobrar la prestacion a la vez?</h4>
+              <h4>¿Pueden ambos progenitores cobrar la prestación a la vez?</h4>
               <p>
-                Si. Desde el RDL 9/2025 (en vigor 31-jul-2025), cada progenitor tiene derecho{' '}
-                <strong>individual e intransferible</strong> a 19 semanas (32 si la familia es
-                monoparental). Las 6 primeras semanas son obligatorias y simultaneas (ambos de
-                baja a la vez). De las restantes, 11 semanas (22 en monoparental) son flexibles
-                hasta que el menor cumple 12 meses, y 2 semanas (4 en monoparental) son de cuidado
-                prolongado, distribuibles hasta que el menor cumple 8 anos. Esto permite que la
-                familia tenga cobertura durante mas tiempo.
+                Sí. Desde el RDL 9/2025 (en vigor el 31/07/2025), cada progenitor tiene derecho{' '}
+                <strong>individual e intransferible</strong> a {PERMISO_BI.semanasTotal} semanas ({PERMISO_MONO.semanasTotal} si la familia es
+                monoparental). Las {PERMISO_BI.semanasObligatorias} primeras semanas son obligatorias y simultáneas (ambos de
+                baja a la vez). De las restantes, {PERMISO_BI.semanasFlexiblesHasta12Meses} semanas ({PERMISO_MONO.semanasFlexiblesHasta12Meses} en monoparental) son flexibles
+                hasta que el menor cumple 12 meses, y {PERMISO_BI.semanasCuidadoProlongadoHasta8Anios} semanas ({PERMISO_MONO.semanasCuidadoProlongadoHasta8Anios} en monoparental) son de cuidado
+                prolongado, distribuibles hasta que el menor cumple 8 años. Esto permite que la
+                familia tenga cobertura durante más tiempo.
               </p>
             </div>
             <div className={styles.faqItem}>
-              <h4>Que pasa si soy autonomo?</h4>
+              <h4>¿Qué pasa si soy autónomo?</h4>
               <p>
-                Los trabajadores autonomos tienen exactamente el mismo derecho: 19 semanas (32 en
-                familias monoparentales) al 100% de la base reguladora. La diferencia es que la
-                base de cotizacion depende
-                de la cuota que pagues al RETA. Si cotizas por la base minima, tu prestacion
-                sera menor que la de un asalariado con sueldo alto. Se solicita igualmente al INSS.
+                Los trabajadores autónomos tienen exactamente el mismo derecho: {PERMISO_BI.semanasTotal} semanas ({PERMISO_MONO.semanasTotal} en
+                familias monoparentales) al 100&nbsp;% de la base reguladora. La diferencia es que la
+                base de cotización depende
+                de la cuota que pagues al RETA. Si cotizas por la base mínima, tu prestación
+                será menor que la de un asalariado con sueldo alto. Se solicita igualmente al INSS.
               </p>
             </div>
             <div className={styles.faqItem}>
-              <h4>La prestacion tributa en la declaracion de la renta?</h4>
+              <h4>¿La prestación tributa en la declaración de la renta?</h4>
               <p>
-                <strong>No.</strong> La prestacion por nacimiento y cuidado del menor esta exenta
-                de IRPF segun el articulo 7.h de la Ley del IRPF. No se incluye como ingreso en
-                la declaracion de la renta. Esto aplica tanto a la prestacion contributiva como a
+                <strong>No.</strong> La prestación por nacimiento y cuidado del menor está exenta
+                de IRPF según el artículo 7.h de la Ley del IRPF. No se incluye como ingreso en
+                la declaración de la renta. Esto aplica tanto a la prestación contributiva como a
                 la no contributiva.
               </p>
             </div>
             <div className={styles.faqItem}>
-              <h4>Puedo fraccionar las semanas flexibles?</h4>
+              <h4>¿Puedo fraccionar las semanas flexibles?</h4>
               <p>
-                Si. De las semanas no obligatorias, 11 (22 en familias monoparentales) son
+                Sí. De las semanas no obligatorias, {PERMISO_BI.semanasFlexiblesHasta12Meses} ({PERMISO_MONO.semanasFlexiblesHasta12Meses} en familias monoparentales) son
                 flexibles y pueden disfrutarse de forma continua o en periodos semanales (semanas
                 completas), de forma acumulada o interrumpida, hasta que el menor cumpla 12
-                meses. Las 2 restantes (4 en monoparental) son de cuidado prolongado y se pueden
-                distribuir hasta que el menor cumpla 8 anos. Necesitas acuerdo con la empresa y
-                preaviso de 15 dias. Tambien es posible disfrutarlas a jornada completa o parcial
-                (minimo 50%).
+                meses. Las {PERMISO_BI.semanasCuidadoProlongadoHasta8Anios} restantes ({PERMISO_MONO.semanasCuidadoProlongadoHasta8Anios} en monoparental) son de cuidado prolongado y se pueden
+                distribuir hasta que el menor cumpla 8 años. Necesitas acuerdo con la empresa y
+                preaviso de 15 días. También es posible disfrutarlas a jornada completa o parcial
+                (mínimo 50&nbsp;%).
               </p>
             </div>
             <div className={styles.faqItem}>
-              <h4>Que documentacion necesito para solicitarla?</h4>
+              <h4>¿Qué documentación necesito para solicitarla?</h4>
               <p>
                 DNI/NIE del solicitante, libro de familia o certificado del Registro Civil,
-                certificado de empresa con las bases de cotizacion de los ultimos meses, y el
-                informe de maternidad del SPS (lo emite el medico del servicio publico de salud).
-                En adopcion: resolucion judicial o administrativa. Todo se puede presentar online
+                certificado de empresa con las bases de cotización de los últimos meses, y el
+                informe de maternidad del SPS (lo emite el médico del servicio público de salud).
+                En adopción: resolución judicial o administrativa. Todo se puede presentar online
                 con certificado digital.
               </p>
             </div>
           </div>
         </section>
 
-        {/* Guia paso a paso */}
+        {/* Guía paso a paso */}
         <section className={styles.guideSection}>
-          <h2>Como solicitar la prestacion: paso a paso</h2>
+          <h2>Cómo solicitar la prestación: paso a paso</h2>
           <ol className={styles.stepGuide}>
             <li className={styles.step}>
               <span className={styles.stepNumber}>1</span>
               <div className={styles.stepContent}>
                 <strong>Comunica el nacimiento a tu empresa</strong>
                 <p>
-                  Informa a tu empresa con la mayor antelacion posible. Para las semanas
-                  voluntarias, se requiere un preaviso de 15 dias. La empresa debe emitir
-                  el certificado de empresa con las bases de cotizacion.
+                  Informa a tu empresa con la mayor antelación posible. Para las semanas
+                  voluntarias, se requiere un preaviso de 15 días. La empresa debe emitir
+                  el certificado de empresa con las bases de cotización.
                 </p>
               </div>
             </li>
             <li className={styles.step}>
               <span className={styles.stepNumber}>2</span>
               <div className={styles.stepContent}>
-                <strong>Reune la documentacion</strong>
+                <strong>Reúne la documentación</strong>
                 <p>
-                  DNI/NIE, libro de familia o inscripcion en el Registro Civil, certificado
+                  DNI/NIE, libro de familia o inscripción en el Registro Civil, certificado
                   de empresa, e informe de maternidad (lo solicitas en tu centro de salud).
-                  Si es adopcion, la resolucion judicial.
+                  Si es adopción, la resolución judicial.
                 </p>
               </div>
             </li>
@@ -936,9 +967,9 @@ export default function EstimacionPrestacionNacimiento() {
               <div className={styles.stepContent}>
                 <strong>Presenta la solicitud al INSS</strong>
                 <p>
-                  Puedes hacerlo online en la Sede Electronica de la Seguridad Social
+                  Puedes hacerlo online en la Sede Electrónica de la Seguridad Social
                   (con certificado digital o Cl@ve) o presencialmente en una oficina del
-                  INSS con cita previa (cita.seg-social.es). Plazo recomendado: 15 dias
+                  INSS con cita previa (cita.seg-social.es). Plazo recomendado: 15 días
                   desde el parto.
                 </p>
               </div>
@@ -946,11 +977,11 @@ export default function EstimacionPrestacionNacimiento() {
             <li className={styles.step}>
               <span className={styles.stepNumber}>4</span>
               <div className={styles.stepContent}>
-                <strong>Recibe la resolucion del INSS</strong>
+                <strong>Recibe la resolución del INSS</strong>
                 <p>
-                  El INSS resuelve en un plazo de 30 dias. Si es favorable, empezaras a
-                  cobrar por transferencia bancaria. Si hay incidencias, te comunicaran que
-                  documentacion adicional necesitan.
+                  El INSS resuelve en un plazo de 30 días. Si es favorable, empezarás a
+                  cobrar por transferencia bancaria. Si hay incidencias, te comunicarán qué
+                  documentación adicional necesitan.
                 </p>
               </div>
             </li>
@@ -959,10 +990,10 @@ export default function EstimacionPrestacionNacimiento() {
               <div className={styles.stepContent}>
                 <strong>Gestiona las semanas flexibles y de cuidado prolongado</strong>
                 <p>
-                  Una vez completadas las 6 semanas obligatorias, puedes distribuir las 11
-                  semanas flexibles (22 en familias monoparentales) antes de que el menor cumpla
-                  12 meses, y las 2 semanas de cuidado prolongado (4 en monoparental) hasta que
-                  cumpla 8 anos. Cada periodo requiere solicitud adicional al INSS y preaviso a
+                  Una vez completadas las {PERMISO_BI.semanasObligatorias} semanas obligatorias, puedes distribuir las{' '}
+                  {PERMISO_BI.semanasFlexiblesHasta12Meses} semanas flexibles ({PERMISO_MONO.semanasFlexiblesHasta12Meses} en familias monoparentales) antes de que el menor cumpla
+                  12 meses, y las {PERMISO_BI.semanasCuidadoProlongadoHasta8Anios} semanas de cuidado prolongado ({PERMISO_MONO.semanasCuidadoProlongadoHasta8Anios} en monoparental) hasta que
+                  cumpla 8 años. Cada periodo requiere solicitud adicional al INSS y preaviso a
                   la empresa.
                 </p>
               </div>
@@ -972,29 +1003,30 @@ export default function EstimacionPrestacionNacimiento() {
 
         {/* Consejos */}
         <section className={styles.eduSection}>
-          <h2>Consejos practicos sobre el permiso por nacimiento</h2>
+          <h2>Consejos prácticos sobre el permiso por nacimiento</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">📅</span>
-              <strong>Solicita cuanto antes</strong>
+              <strong>No la dejes pasar de 3 meses</strong>
               <p>
-                Aunque el plazo es amplio (5 anos), cobras desde la fecha de solicitud.
-                Cada dia de retraso es un dia sin prestacion.
+                El subsidio se cobra desde el primer día del descanso aunque lo pidas
+                después. Pero si la solicitud se retrasa más de 3 meses, los días anteriores
+                a esos 3 meses se pierden (art. 53.1 LGSS).
               </p>
             </div>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">💻</span>
               <strong>Tramita online</strong>
               <p>
-                Con certificado digital o Cl@ve es mas rapido. Evitas desplazamientos y
-                la resolucion suele ser mas agil.
+                Con certificado digital o Cl@ve es más rápido. Evitas desplazamientos y
+                la resolución suele ser más ágil.
               </p>
             </div>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">📋</span>
               <strong>Revisa tu vida laboral</strong>
               <p>
-                Comprueba que tienes la cotizacion minima para tu edad. Puedes consultar
+                Comprueba que tienes la cotización mínima para tu edad. Puedes consultar
                 tu informe de vida laboral en la web de la SS.
               </p>
             </div>
@@ -1002,24 +1034,27 @@ export default function EstimacionPrestacionNacimiento() {
               <span className={styles.tipIcon} aria-hidden="true">🤝</span>
               <strong>Coordina con tu pareja</strong>
               <p>
-                Las 6 semanas obligatorias son simultaneas. Planificad el resto (semanas
-                flexibles hasta los 12 meses y de cuidado prolongado hasta los 8 anos) para
-                maximizar el tiempo con el bebe.
+                Las {PERMISO_BI.semanasObligatorias} semanas obligatorias son simultáneas. Planificad el resto (semanas
+                flexibles hasta los 12 meses y de cuidado prolongado hasta los 8 años) para
+                maximizar el tiempo con el bebé.
               </p>
             </div>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">💰</span>
-              <strong>Comprueba la deduccion por maternidad</strong>
+              <strong>Comprueba la deducción por maternidad</strong>
               <p>
-                Las madres trabajadoras pueden cobrar {formatCurrency(1200)}/ano por hijo
-                menor de 3 anos (Modelo 140, pago anticipado mensual).
+                Las madres de alta en la Seguridad Social, o que cobraban prestación o subsidio
+                de desempleo al nacer el menor, pueden deducir{' '}
+                {formatCurrency(DEDUCCION_MATERNIDAD_IRPF.importeAnualPorHijo)}/año por hijo
+                menor de 3 años, y cobrarla por anticipado
+                ({formatCurrency(DEDUCCION_MATERNIDAD_IRPF.importeMensualPorHijo)}/mes, {DEDUCCION_MATERNIDAD_IRPF.anticipado.formulario}).
               </p>
             </div>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">⚖️</span>
               <strong>Conoce tus derechos</strong>
               <p>
-                Tu puesto de trabajo esta protegido durante el permiso. El despido durante
+                Tu puesto de trabajo está protegido durante el permiso. El despido durante
                 el permiso se considera nulo.
               </p>
             </div>
@@ -1030,37 +1065,39 @@ export default function EstimacionPrestacionNacimiento() {
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
             <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
-            <strong>Errores comunes al gestionar la prestacion por nacimiento</strong>
+            <strong>Errores comunes al gestionar la prestación por nacimiento</strong>
           </div>
           <ul className={styles.warningList}>
             <li>
-              <strong>Confundir base de cotizacion con salario neto:</strong> la prestacion
-              se calcula sobre la base de cotizacion (bruto), no sobre lo que recibes en
-              cuenta. Revisa tu nomina: la base de cotizacion figura en la parte inferior.
+              <strong>Confundir base de cotización con salario neto:</strong> la prestación
+              se calcula sobre la base de cotización (bruto), no sobre lo que recibes en
+              cuenta. Revisa tu nómina: la base de cotización figura en la parte inferior.
             </li>
             <li>
-              <strong>No solicitar la prestacion a tiempo:</strong> aunque el derecho no
-              prescribe en 5 anos, la prestacion se cobra desde la fecha de solicitud,
-              no desde el parto. Retrasar la solicitud supone perder dias de cobro.
+              <strong>Dejar pasar la solicitud más de 3 meses:</strong> el derecho prescribe
+              a los 5 años y se cobra desde el inicio del descanso, pero los efectos
+              económicos solo se retrotraen a los 3 meses anteriores a la solicitud
+              (art. 53.1 LGSS): lo que quede antes se pierde.
             </li>
             <li>
               <strong>Creer que el permiso es transferible:</strong> desde el RDL 9/2025
-              (31-jul-2025), las 19 semanas (32 en familias monoparentales) son individuales
+              (31/07/2025), las {PERMISO_BI.semanasTotal} semanas ({PERMISO_MONO.semanasTotal} en familias monoparentales) son individuales
               e intransferibles. Un progenitor no puede ceder sus semanas al otro.
             </li>
             <li>
               <strong>No pedir el informe de maternidad:</strong> es un documento que
-              emite el medico del servicio publico de salud y es obligatorio para la
-              solicitud. Pidelo en tu centro de salud lo antes posible.
+              emite el médico del servicio público de salud y es obligatorio para la
+              solicitud. Pídelo en tu centro de salud lo antes posible.
             </li>
             <li>
-              <strong>Olvidar la deduccion por maternidad:</strong> las madres trabajadoras
-              tienen derecho a {formatCurrency(100)}/mes por hijo menor de 3 anos (Modelo
-              140). Es compatible con la prestacion por nacimiento.
+              <strong>Olvidar la deducción por maternidad:</strong> las madres de alta, o que
+              cobraban prestación o subsidio de desempleo al nacer el menor, tienen derecho a{' '}
+              {formatCurrency(DEDUCCION_MATERNIDAD_IRPF.importeMensualPorHijo)}/mes por hijo menor de 3 años
+              ({DEDUCCION_MATERNIDAD_IRPF.anticipado.formulario}). Es compatible con la prestación por nacimiento.
             </li>
             <li>
-              <strong>No comunicar a la empresa con antelacion:</strong> las semanas
-              voluntarias requieren preaviso de 15 dias. Sin preaviso, la empresa puede
+              <strong>No comunicar a la empresa con antelación:</strong> las semanas
+              voluntarias requieren preaviso de 15 días. Sin preaviso, la empresa puede
               denegarte el disfrute en las fechas solicitadas.
             </li>
           </ul>

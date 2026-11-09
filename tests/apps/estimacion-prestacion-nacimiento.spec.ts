@@ -3,11 +3,12 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
 
 /**
  * Inspector — estimacion-prestacion-nacimiento (segmento fiscal, riesgo 1 · primera inspección
- * 09/11/2026).
+ * 09/11/2026 · reparada en /reparar el mismo día, salvo el hallazgo 4288, que es un dato de
+ * data/fiscal y espera la decisión del usuario).
  *
- * La app promete en su <h1> «Estimacion de Prestacion por Nacimiento» y en el subtítulo
- * «Calcula una estimacion de la prestacion que cobraras de la Seguridad Social durante el
- * permiso por nacimiento y cuidado del menor en Espana». Hay verdad comprobable: base
+ * La app promete en su <h1> «Estimación de prestación por nacimiento» y en el subtítulo
+ * «Calcula una estimación de la prestación que cobrarás de la Seguridad Social durante el
+ * permiso por nacimiento y cuidado del menor en España». Hay verdad comprobable: base
  * reguladora diaria, duración y total.
  *
  * DÓNDE VIVE EL CÁLCULO
@@ -35,6 +36,10 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  *     durante el período de 6 semanas», que «únicamente podrá percibirse por uno de los
  *     progenitores». Nacimiento: «Se tendrá derecho al subsidio a partir del mismo día en que
  *     dé comienzo el período de descanso».
+ *   · RD 295/2009 (BOE-A-2009-4724), consultado en /reparar: art. 6.2 (subsidio especial), 3.9
+ *     (uno de los progenitores), 7 (BR; tiempo parcial entre 365; suelo solo en formación y
+ *     artistas), 8.1 (derecho desde el inicio del descanso), 16.2 (no contributiva: la BR si es
+ *     inferior al IPREM).
  *   · LGSS art. 182.2-3 (RDL 9/2025, BOE-A-2025-15741): no contributiva al 100 % del IPREM
  *     «salvo» que la base reguladora «fuese de cuantía inferior, en cuyo caso se estará a
  *     esta»; duración del descanso obligatorio, «se incrementará en catorce días naturales»,
@@ -55,8 +60,8 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  *     parseSpanishNumber = 1850,4 → BR 61,68 €, total 8203,44 €.
  *   CASO 3 (rechazo) · base vacía, 0 o negativa: ninguna cifra, y un aviso que lo diga.
  *
- * Los test con test.fail() son HALLAZGOS ABIERTOS de esta inspección: el día que se reparen,
- * fallarán por pasar y habrá que quitarles el test.fail() (y cambiar ABIERTO por REPARADO).
+ * Los test con test.fail() son HALLAZGOS ABIERTOS: el día que se reparen, fallarán por pasar y
+ * habrá que quitarles el test.fail() (y cambiar ABIERTO por REPARADO).
  */
 
 const normalizar = (t: string) =>
@@ -65,26 +70,27 @@ const normalizar = (t: string) =>
 interface Opciones {
   base: string;
   monoparental?: boolean;
-  edad?: 'Menor de 21 anos' | '21 a 25 anos' | '26 o mas anos';
+  edad?: 'Menor de 21 años' | '21 a 25 años' | '26 o más años';
   dias7?: string;
   diasVida?: string;
-  situacion?: 'Adopcion' | 'Acogimiento';
+  situacion?: 'Adopción' | 'Acogimiento';
   hijos?: 2 | 3;
   hospitalizacion?: boolean;
 }
 
-const BASE = 'Base de cotizacion mensual';
+const BASE = 'Base de cotización mensual';
+const BOTON = 'Estimar prestación';
 
 async function rellenar(page: Page, o: Opciones): Promise<void> {
   if (o.monoparental) await page.getByLabel('Monoparental (1 progenitor)').check();
   if (o.edad) await page.getByLabel(o.edad, { exact: true }).check();
   if (o.dias7 !== undefined) {
-    const d7 = page.getByLabel('Dias cotizados en los ultimos 7 anos');
+    const d7 = page.getByLabel('Días cotizados en los últimos 7 años');
     await d7.fill(o.dias7);
     await esperarValorEnReact(page, d7, o.dias7);
   }
   if (o.diasVida !== undefined) {
-    const dv = page.getByLabel('Dias cotizados en toda tu vida laboral');
+    const dv = page.getByLabel('Días cotizados en toda tu vida laboral');
     await dv.fill(o.diasVida);
     await esperarValorEnReact(page, dv, o.diasVida);
   }
@@ -94,25 +100,44 @@ async function rellenar(page: Page, o: Opciones): Promise<void> {
   await base.blur();
   if (o.situacion) await page.getByLabel(o.situacion, { exact: true }).check();
   if (o.hijos) {
-    await page.getByLabel('Parto multiple (gemelos, trillizos...)').check();
-    await page.getByLabel(o.hijos === 2 ? '2 (gemelos)' : '3 o mas (trillizos+)').check();
+    await page.getByLabel('Parto múltiple (gemelos, trillizos...)').check();
+    await page.getByLabel(o.hijos === 2 ? '2 (gemelos)' : '3 o más (trillizos+)').check();
   }
-  if (o.hospitalizacion) await page.getByLabel('Hospitalizacion neonatal o parto prematuro').check();
+  if (o.hospitalizacion) await page.getByLabel('Hospitalización neonatal o parto prematuro').check();
 }
 
 function seccionResultado(page: Page) {
   return page
     .locator('section')
-    .filter({ has: page.getByRole('heading', { name: /Resultado de la estimacion/ }) });
+    .filter({ has: page.getByRole('heading', { name: /Resultado de la estimación/ }) });
 }
 
-/** Rellena, pulsa «Estimar prestacion» y devuelve el texto del bloque de resultados. */
+/** Rellena, pulsa «Estimar prestación» y devuelve el texto del bloque de resultados. */
 async function estimar(page: Page, o: Opciones): Promise<string> {
   await rellenar(page, o);
-  await page.getByRole('button', { name: 'Estimar prestacion' }).click();
+  await page.getByRole('button', { name: BOTON }).click();
   const seccion = seccionResultado(page);
   await expect(seccion).toBeVisible();
   return normalizar(await seccion.innerText());
+}
+
+async function recargar(page: Page): Promise<void> {
+  await page.reload();
+  await esperarHidratacion(page, [`input[aria-label="${BASE}"]`]);
+}
+
+async function respuestasFaqJsonLd(page: Page): Promise<string[]> {
+  return page.evaluate(() => {
+    const salida: string[] = [];
+    for (const s of Array.from(document.querySelectorAll('script[type="application/ld+json"]'))) {
+      const j = JSON.parse(s.textContent ?? '{}') as {
+        '@type'?: string;
+        mainEntity?: { name: string; acceptedAnswer: { text: string } }[];
+      };
+      if (j['@type'] === 'FAQPage') for (const q of j.mainEntity ?? []) salida.push(q.acceptedAnswer.text);
+    }
+    return salida;
+  });
 }
 
 test.describe('estimacion-prestacion-nacimiento', () => {
@@ -127,12 +152,12 @@ test.describe('estimacion-prestacion-nacimiento', () => {
     const texto = await estimar(page, { base: '2.000' });
     expect(texto).toContain('Base reguladora diaria | 66,67 €');
     // «100 %» separado con espacio duro (CLAUDE.md §2); normalizar lo pasa a espacio normal
-    expect(texto).toContain('Prestacion diaria (100 % BR) | 66,67 €');
-    expect(texto).toContain('Duracion total | 19 semanas (133 dias)');
+    expect(texto).toContain('Prestación diaria (100 % BR) | 66,67 €');
+    expect(texto).toContain('Duración total | 19 semanas (133 días)');
     expect(texto).toContain('EXENTA IRPF | 8866,67 €');
     // ET 48.4: 6 obligatorias + 11 flexibles + 2 de cuidado hasta los 8 años = 19
     expect(texto).toContain('Semanas obligatorias (ininterrumpidas tras el parto) | 6 semanas');
-    expect(texto).toMatch(/hasta los 12 meses \/ 8 anos del menor\) \| 13 semanas/);
+    expect(texto).toMatch(/hasta los 12 meses \/ 8 años del menor\) \| 13 semanas/);
   });
 
   test('CASO 1b (carencia, art. 178.1 LGSS) · los dos umbrales son alternativos', async ({ page }) => {
@@ -142,23 +167,21 @@ test.describe('estimacion-prestacion-nacimiento', () => {
     expect(texto).toContain('EXENTA IRPF | 8866,67 €');
 
     // 26+: 179 y 359 no llegan → no contributiva, 42 días × 20 € (IPREM_2026.diario) = 840 €
-    await page.reload();
-    await esperarHidratacion(page, [`input[aria-label="${BASE}"]`]);
+    await recargar(page);
     texto = await estimar(page, { base: '2.000', dias7: '179', diasVida: '359' });
     expect(texto).toContain('(No contributiva)');
     expect(texto).toContain('EXENTA IRPF | 840,00 €');
 
     // 21-25: 89 en 7 años, pero 180 en la vida laboral → contributiva
-    await page.reload();
-    await esperarHidratacion(page, [`input[aria-label="${BASE}"]`]);
-    texto = await estimar(page, { base: '2.000', edad: '21 a 25 anos', dias7: '89', diasVida: '180' });
+    await recargar(page);
+    texto = await estimar(page, { base: '2.000', edad: '21 a 25 años', dias7: '89', diasVida: '180' });
     expect(texto).not.toContain('No contributiva');
     expect(texto).toContain('EXENTA IRPF | 8866,67 €');
   });
 
   test('CASO 1c · menor de 21: sin período mínimo, la app no pide días cotizados', async ({ page }) => {
-    await page.getByLabel('Menor de 21 anos', { exact: true }).check();
-    await expect(page.getByLabel('Dias cotizados en los ultimos 7 anos')).toHaveCount(0);
+    await page.getByLabel('Menor de 21 años', { exact: true }).check();
+    await expect(page.getByLabel('Días cotizados en los últimos 7 años')).toHaveCount(0);
     const texto = await estimar(page, { base: '2.000' });
     expect(texto).toContain('EXENTA IRPF | 8866,67 €');
   });
@@ -175,28 +198,29 @@ test.describe('estimacion-prestacion-nacimiento', () => {
     page,
   }) => {
     const texto = await estimar(page, { base: '2.000', hijos: 2 });
-    expect(texto).toContain('Duracion total | 20 semanas (140 dias)');
+    expect(texto).toContain('Duración total | 20 semanas (140 días)');
     expect(texto).toContain('EXENTA IRPF | 9333,33 €');
+    // «+1 semana», no «+1 semanas» (hallazgo 4294)
+    expect(texto).toContain('+1 semana por parto múltiple');
   });
 
   test('CASO 2c (límite) · no contributiva monoparental: 42 + 14 días × 20 € = 1120,00 €', async ({ page }) => {
     const texto = await estimar(page, { base: '1.500', monoparental: true, dias7: '100', diasVida: '200' });
     expect(texto).toContain('(No contributiva)');
     expect(texto).toContain('EXENTA IRPF | 1120,00 €');
-    expect(texto).toContain('(56 dias)');
+    expect(texto).toContain('(56 días)');
   });
 
   test('CASO 3 (rechazo) · base vacía, 0 o negativa: no publica ninguna cifra', async ({ page }) => {
     for (const base of ['', '0', '-500']) {
-      await page.reload();
-      await esperarHidratacion(page, [`input[aria-label="${BASE}"]`]);
+      await recargar(page);
       await rellenar(page, { base });
-      await page.getByRole('button', { name: 'Estimar prestacion' }).click();
+      await page.getByRole('button', { name: BOTON }).click();
       await expect(seccionResultado(page)).toHaveCount(0);
     }
   });
 
-  // ══════════════════════ HALLAZGOS ABIERTOS (inspector 09/11/2026) ══════════════════════
+  // ══════════════════════ HALLAZGOS (inspector 09/11/2026) ══════════════════════
 
   test('HALLAZGO 4281 (09/11/2026, REPARADO) · «1850.40» con punto decimal se lee 1850,4, no 185.040', async ({
     page,
@@ -227,11 +251,11 @@ test.describe('estimacion-prestacion-nacimiento', () => {
     expect(texto).toContain('| 15,00 €');
   });
 
-  test('HALLAZGO 4284 (09/11/2026, REPARADO) · no contributiva con +14 días: 8 semanas (56 dias)', async ({ page }) => {
+  test('HALLAZGO 4284 (09/11/2026, REPARADO) · no contributiva con +14 días: 8 semanas (56 días)', async ({ page }) => {
     // 56 días son 8 semanas. Antes la tarjeta y el total decían «6 semanas (56 dias)», y las notas
     // daban el «100 % … sin topes» de la contributiva y un permiso de 6 semanas.
     const texto = await estimar(page, { base: '1.500', monoparental: true, dias7: '100', diasVida: '200' });
-    expect(texto).toContain('8 semanas (56 dias)');
+    expect(texto).toContain('8 semanas (56 días)');
     expect(texto).not.toContain('sin topes adicionales');
     expect(texto).not.toMatch(/derecho a 6 semanas/);
   });
@@ -242,13 +266,12 @@ test.describe('estimacion-prestacion-nacimiento', () => {
     // «una única persona progenitora […] podrá disfrutar de las ampliaciones completas»:
     // 32 + 2 = 34 semanas = 238 días → 66,6667 × 238 = 15.866,67 €. Antes 33 semanas, 15.400,00 €.
     let texto = await estimar(page, { base: '2.000', monoparental: true, hijos: 2 });
-    expect(texto).toContain('Duracion total | 34 semanas (238 dias)');
+    expect(texto).toContain('Duración total | 34 semanas (238 días)');
     expect(texto).toContain('EXENTA IRPF | 15.866,67 €');
     // Trillizos: 32 + 4 = 36 semanas
-    await page.reload();
-    await esperarHidratacion(page, [`input[aria-label="${BASE}"]`]);
+    await recargar(page);
     texto = await estimar(page, { base: '2.000', monoparental: true, hijos: 3 });
-    expect(texto).toContain('Duracion total | 36 semanas (252 dias)');
+    expect(texto).toContain('Duración total | 36 semanas (252 días)');
   });
 
   test('HALLAZGO 4286 (09/11/2026, REPARADO) · parto múltiple: el subsidio especial de 6 semanas, aparte', async ({
@@ -268,67 +291,70 @@ test.describe('estimacion-prestacion-nacimiento', () => {
     // ET 48.4: se amplía «en tantos días como el nacido se encuentre hospitalizado» (más de 7),
     // con un máximo de 13 semanas. 10 días → 133 + 10 = 143 días → 66,6667 × 143 = 9533,33 €.
     await rellenar(page, { base: '2.000', hospitalizacion: true });
-    const dias = page.getByLabel('Dias de hospitalizacion tras el parto');
+    const dias = page.getByLabel('Días de hospitalización tras el parto');
     await dias.fill('10');
     await esperarValorEnReact(page, dias, '10');
-    await page.getByRole('button', { name: 'Estimar prestacion' }).click();
+    await page.getByRole('button', { name: BOTON }).click();
     const texto = normalizar(await seccionResultado(page).innerText());
-    expect(texto).not.toContain('(224 dias)');
-    expect(texto).toContain('(143 dias)');
+    expect(texto).not.toContain('(224 días)');
+    expect(texto).toContain('20 semanas y 3 días (143 días)');
     expect(texto).toContain('EXENTA IRPF | 9533,33 €');
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · adopción: anuncia «+2 semanas» por adopción internacional', async ({
+  test('HALLAZGO 4288 (09/11/2026, ABIERTO) · adopción: anuncia «+2 semanas» por adopción internacional', async ({
     page,
   }) => {
     // ET 48.5: la suspensión «podrá iniciarse hasta cuatro semanas antes de la resolución»; no
     // hay semanas adicionales (el dato viene de AMPLIACION_POR_ID['adopcion-internacional']).
+    // Es un dato de data/fiscal: espera la decisión del usuario (tipo fiscal, nivel 3).
     test.fail();
-    const texto = await estimar(page, { base: '2.000', situacion: 'Adopcion' });
+    const texto = await estimar(page, { base: '2.000', situacion: 'Adopción' });
     expect(texto).not.toContain('+2 semanas');
   });
 
   test('HALLAZGO 4296 (09/11/2026, REPARADO) · el rechazo de la base vacía, 0 o negativa se dice', async ({ page }) => {
     for (const base of ['', '0', '-500']) {
-      await page.reload();
-      await esperarHidratacion(page, [`input[aria-label="${BASE}"]`]);
+      await recargar(page);
       await rellenar(page, { base });
-      await page.getByRole('button', { name: 'Estimar prestacion' }).click();
+      await page.getByRole('button', { name: BOTON }).click();
       // Acotado al formulario: el anunciador de rutas de Next también es role="alert".
       await expect(page.locator('form').getByRole('alert')).toBeVisible({ timeout: 2000 });
       await expect(seccionResultado(page)).toHaveCount(0);
     }
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · «cobras desde la fecha de solicitud»: LGSS 53.1 da tres meses', async ({
+  test('HALLAZGO 4289 (09/11/2026, REPARADO) · el cobro no empieza en la solicitud: LGSS 53.1 da tres meses', async ({
     page,
   }) => {
-    test.fail();
     const texto = await page.evaluate(() => document.body.textContent ?? '');
     expect(texto).not.toContain('cobras desde la fecha de solicitud');
-    expect(texto).not.toContain('Cada dia de retraso es un dia sin prestacion');
+    expect(texto).not.toMatch(/Cada d[ií]a de retraso es un d[ií]a sin prestaci[oó]n/);
+    expect(texto).not.toContain('no prescribe en 5');
+    expect(texto).toContain('3 meses anteriores');
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · el FAQPage contradice a la fuente y a la página', async ({ page }) => {
-    test.fail();
-    const respuestas = await page.evaluate(() => {
-      const salida: string[] = [];
-      for (const s of Array.from(document.querySelectorAll('script[type="application/ld+json"]'))) {
-        const j = JSON.parse(s.textContent ?? '{}') as {
-          '@type'?: string;
-          mainEntity?: { name: string; acceptedAnswer: { text: string } }[];
-        };
-        if (j['@type'] === 'FAQPage') for (const q of j.mainEntity ?? []) salida.push(q.acceptedAnswer.text);
-      }
-      return salida;
-    });
+  test('HALLAZGO 4290 (09/11/2026, REPARADO) · el FAQPage ya no contradice a la fuente ni a la página', async ({ page }) => {
+    const respuestas = await respuestasFaqJsonLd(page);
     expect(respuestas.length).toBe(5);
     // BR general: base del mes entre 30 (la de 12 meses entre 365 es la de tiempo parcial)
-    expect(respuestas[0]).not.toContain('365');
+    expect(respuestas[0]).toContain('dividida entre 30');
+    expect(respuestas[0]).toMatch(/tiempo parcial[^.]*365/);
     // Hospitalización: se amplía en DÍAS, no en semanas por día
     expect(respuestas[3]).not.toContain('tantas semanas de ampliación como días');
+    expect(respuestas[3]).toContain('tantos días como dure el ingreso');
+    // Parto múltiple: dos semanas por hijo, una por progenitor
+    expect(respuestas[3]).toContain('una para cada progenitor');
+  });
+
+  test('HALLAZGO 4291 (09/11/2026, REPARADO) · FAQPage: no contributiva y carencia de 21-25 completas', async ({ page }) => {
+    const respuestas = await respuestasFaqJsonLd(page);
     // No contributiva: la BR inferior manda (182.2) y hay +14 días (182.3)
     expect(respuestas[4]).not.toContain('cuantía fija');
+    expect(respuestas[4]).toContain('base reguladora sea inferior');
+    expect(respuestas[4]).toContain('14');
+    // 21-25 años: 90 en 7 años O 180 en la vida laboral
+    expect(respuestas[2]).toContain('180 en toda la vida laboral');
+    expect(respuestas[2]).not.toContain('De 21 a 26');
   });
 
   test('HALLAZGO 4292 (09/11/2026, REPARADO) · riesgo 1: el aviso es severity="critical"', async ({ page }) => {
@@ -336,10 +362,31 @@ test.describe('estimacion-prestacion-nacimiento', () => {
     await expect(page.locator('[aria-label="Aviso importante"]')).toHaveCount(1);
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · sin tildes ni eñes: «Menor de 21 anos», «Espana»', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO 4293 (09/11/2026, REPARADO) · la deducción por maternidad, desde data/fiscal y con las desempleadas', async ({
+    page,
+  }) => {
+    const texto = await page.evaluate(() => document.body.textContent ?? '');
+    expect(texto).not.toContain('Las madres trabajadoras pueden cobrar');
+    expect(texto).toContain('subsidio de desempleo al nacer el menor');
+    // DataReference con la vigencia del módulo, no «2025»
+    expect(texto).not.toContain('Permiso por nacimiento 2025');
+  });
+
+  test('HALLAZGO 4294 (09/11/2026, REPARADO) · con tildes y eñes: «Menor de 21 años», «España»', async ({ page }) => {
     await expect(page.getByRole('heading', { level: 1 })).toContainText('Estimación');
     await expect(page.getByLabel('Menor de 21 años', { exact: true })).toHaveCount(1);
+    await expect(page).toHaveTitle(/Estimación de prestación por nacimiento - Seguridad Social España/);
+  });
+
+  test('HALLAZGO 4294 (09/11/2026, REPARADO) · la nota de carencia no se marca «Extra»', async ({ page }) => {
+    const texto = await estimar(page, { base: '2.000' });
+    expect(texto).toMatch(/Rellena los días cotizados para comprobarlo\. \| Nota/);
+    expect(texto).not.toContain('| Extra');
+  });
+
+  test('HALLAZGO 4295 (09/11/2026, REPARADO) · la description no promete una cifra mensual', async ({ page }) => {
+    const descripcion = await page.locator('meta[name="description"]').getAttribute('content');
+    expect(descripcion).not.toMatch(/mensual/i);
   });
 
   test('HALLAZGO 4297 (09/11/2026, REPARADO) · la región aria-live existe antes del resultado', async ({
@@ -349,9 +396,9 @@ test.describe('estimacion-prestacion-nacimiento', () => {
       document.querySelectorAll('[aria-live]').forEach((n) => n.setAttribute('data-previa', '1')),
     );
     await rellenar(page, { base: '2.000' });
-    await page.getByRole('button', { name: 'Estimar prestacion' }).click();
+    await page.getByRole('button', { name: BOTON }).click();
     const previa = await page
-      .getByRole('heading', { name: /Resultado de la estimacion/ })
+      .getByRole('heading', { name: /Resultado de la estimación/ })
       .evaluate((h) => h.closest('[aria-live]')?.getAttribute('data-previa') ?? 'no');
     expect(previa).toBe('1');
   });
