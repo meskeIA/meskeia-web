@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { generateWebAppSchema } from '@/lib/schema-templates';
+import { generateWebAppSchema, type FAQItem } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Simulador de Deriva Genética y Selección Natural | meskeIA',
@@ -48,49 +48,60 @@ export const jsonLd = generateWebAppSchema({
   keywords: ['deriva genética', 'selección natural', 'Hardy-Weinberg', 'biología universidad'],
 });
 
+// FUENTE ÚNICA de la FAQ visible (page.tsx) y del FAQPage de abajo. Hasta el 09/11/2026 eran dos
+// FAQ distintas: ninguna pregunta del FAQPage estaba en la página, dos se repetían con otras
+// palabras y la tasa de mutación salía «10⁻⁵–10⁻⁶» en una y «10⁻⁶ a 10⁻⁴» en la otra
+// (hallazgo 4351). Queda la de la página, la misma de la tabla y del consejo de la guía. La regla
+// 4Ns lleva ahora el 4 en su condición (hallazgo 4352).
+export const PREGUNTAS_FRECUENTES: FAQItem[] = [
+  {
+    question: '¿Qué es la deriva genética y por qué es más fuerte en poblaciones pequeñas?',
+    answer:
+      'La deriva genética es el cambio aleatorio de las frecuencias alélicas causado por el sorteo de los gametos en cada generación. La varianza de ese cambio es pq/(2N) por generación: con N pequeño es grande, porque se sortean pocos alelos, y un alelo puede fijarse o perderse en pocas generaciones sin ninguna ventaja selectiva. Regla 4Ns: si |4Ns| ≪ 1, la deriva domina sobre la selección.',
+  },
+  {
+    question: '¿Cuál es la diferencia entre selección natural y deriva genética?',
+    answer:
+      'La selección natural es un proceso determinista: favorece a los genotipos con mayor fitness reproductivo y produce cambios predecibles en la dirección del alelo favorecido. La deriva genética es un proceso estocástico (aleatorio): las frecuencias alélicas fluctúan independientemente del fitness. En poblaciones grandes predomina la selección; en pequeñas, la deriva puede superar el efecto selectivo.',
+  },
+  {
+    question: '¿Qué establece el principio de Hardy-Weinberg y cuáles son sus condiciones?',
+    answer:
+      'Que las frecuencias alélicas y genotípicas se mantienen constantes generación tras generación, con p² + 2pq + q² = 1, si se cumplen cinco condiciones: población muy grande (sin deriva), apareamiento aleatorio (panmixia), sin mutación, sin migración y sin selección natural. Es el modelo nulo: si una población se desvía, alguna fuerza evolutiva está actuando.',
+  },
+  {
+    question: '¿Cuándo se rompe Hardy-Weinberg?',
+    answer:
+      'Cuando hay selección (fitness desiguales), mutación significativa, flujo génico, tamaño poblacional pequeño (deriva) o apareamiento no aleatorio (endogamia, apareamiento asortativo). En la práctica casi ninguna población real cumple Hardy-Weinberg de forma estricta.',
+  },
+  {
+    question: '¿Cuál es la diferencia entre selección direccional y equilibradora?',
+    answer:
+      'En la direccional un homocigoto es el más apto y el alelo correspondiente tiende a fijarse (p→0 o p→1). En la equilibradora el heterocigoto tiene ventaja y los dos alelos se mantienen en una frecuencia intermedia estable p*.',
+  },
+  {
+    question: '¿Qué es la fijación de un alelo y cuándo ocurre?',
+    answer:
+      'La fijación ocurre cuando la frecuencia de un alelo llega al 100 % (todos los individuos son homocigotos para ese alelo) y el alelo alternativo se pierde. En ausencia de selección, la probabilidad de fijación de un alelo es igual a su frecuencia inicial. Con selección positiva, la probabilidad aumenta; con selección negativa, disminuye. Cuanto menor es la población, antes se alcanza la fijación.',
+  },
+  {
+    question: '¿Qué es la heterocigosis y por qué importa?',
+    answer:
+      'H = 2pq es la proporción de heterocigotos esperada y mide la diversidad genética: H = 0 en una población fijada, sin variación, y es máxima (0,5) cuando p = q = 0,5. La deriva reduce H con el tiempo: Hₜ ≈ H₀(1−1/(2N))ᵗ. En el simulador, «H final» es la media de 2pq de cada población.',
+  },
+  {
+    question: '¿En qué se diferencian la mutación y la migración?',
+    answer:
+      'La mutación es interna: cambia un alelo en otro al copiar el ADN, a una tasa muy baja (del orden de 10⁻⁶ a 10⁻⁴ por gen y generación). La migración es externa: llegan individuos de otra población con otra frecuencia, y homogeneiza las poblaciones. Las dos introducen variación y contrarrestan la deriva, pero la migración suele actuar mucho más deprisa.',
+  },
+];
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
-  mainEntity: [
-    {
-      '@type': 'Question',
-      name: '¿Qué es la deriva genética y por qué afecta más a poblaciones pequeñas?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'La deriva genética es el cambio aleatorio en las frecuencias alélicas de una población causado por el muestreo al azar de gametos en cada generación. En poblaciones pequeñas, la muestra es menos representativa del conjunto y las fluctuaciones aleatorias son proporcionalmente mayores, por lo que un alelo puede fijarse o perderse en pocas generaciones incluso sin ventaja selectiva.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: '¿Cuál es la diferencia entre selección natural y deriva genética?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'La selección natural es un proceso determinista: favorece a los genotipos con mayor fitness reproductivo y produce cambios predecibles en la dirección del alelo favorecido. La deriva genética es un proceso estocástico (aleatorio): las frecuencias alélicas fluctúan independientemente del fitness. En poblaciones grandes predomina la selección; en pequeñas, la deriva puede superar el efecto selectivo.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: '¿Qué establece el equilibrio de Hardy-Weinberg y cuáles son sus condiciones?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'El principio de Hardy-Weinberg establece que las frecuencias alélicas y genotípicas se mantienen constantes de generación en generación si se cumplen cinco condiciones: población grande (sin deriva), apareamiento aleatorio (panmixia), sin mutación, sin migración y sin selección natural. Sirve como modelo nulo para detectar fuerzas evolutivas: cualquier desviación indica que alguna fuerza está actuando.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: '¿Qué es la fijación de un alelo y cuándo ocurre?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'La fijación ocurre cuando la frecuencia de un alelo llega al 100% (todos los individuos son homocigotos para ese alelo) y el alelo alternativo se pierde irreversiblemente. En ausencia de selección, la probabilidad de fijación de un alelo es igual a su frecuencia inicial. Con selección positiva, la probabilidad aumenta; con selección negativa, disminuye. Cuanto menor es la población, antes se alcanza la fijación.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: '¿Cómo influye la mutación y la migración en las frecuencias alélicas?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'La mutación introduce nuevos alelos a una tasa muy baja (10⁻⁵–10⁻⁶ por locus y generación), actuando principalmente como fuente de variación a largo plazo. La migración (flujo génico) incorpora o exporta alelos entre poblaciones, homogeneizando frecuencias entre ellas. Ambas fuerzas contrarrestan la deriva y mantienen la diversidad genética, especialmente en poblaciones pequeñas aisladas.',
-      },
-    },
-  ],
+  mainEntity: PREGUNTAS_FRECUENTES.map((f) => ({
+    '@type': 'Question',
+    name: f.question,
+    acceptedAnswer: { '@type': 'Answer', text: f.answer },
+  })),
 };

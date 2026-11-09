@@ -32,7 +32,9 @@ import { activarTema, prepararParaMedir } from '../contraste-text-muted-auxiliar
  *   C  · w_AA = w_Aa = w_aa = 0: fitness medio nulo, nadie deja descendencia; p' = (…)/w̄ es 0/0.
  *        Debe rechazarse o avisar. La app lo simula como deriva neutra.
  *
- * HALLAZGOS ABIERTOS (cada uno con test.fail(); al repararse pasan a «REPARADO»)
+ * HALLAZGOS — todos REPARADOS el 09/11/2026 (/reparar; el modelo pasó a motor.ts):
+ *   C = 4346 · H1 = 4342 · H2 = 4345 · H3 = 4344 · H4 = 4343 · H5 = 4347 · H6 = 4348 · H7 = 4349 ·
+ *   H8 = 4350 · H9 = 4351 · H10 = 4352. Lo que decía cada uno:
  *   H1 (alto) · «H final» es 2·p̄·(1−p̄) de la MEDIA de las K poblaciones, no la media de 2pq de cada
  *        una. Deriva pura N = 50, p0 = 0,5, G = 100, K = 50: E[H] = 0,5·(1−1/100)^100 = 0,183016,
  *        sd(media) = 0,0283 → [0,083; 0,283]. La app da 0,47-0,50 (E[2p̄q̄] = 0,4937).
@@ -192,9 +194,8 @@ test.describe('Inspector 09/11/2026 · casos con verdad comprobable', () => {
     expect(num(m['H inicial (2pq)'])).toBe(0.5);
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · C (se rechaza) · fitness 0, 0, 0: debería avisar y no simular', async ({ page }) => {
-    // w̄ = 0 → la app deja p igual (if (wAvg > 0)) y simula deriva neutra como si w = 1, 1, 1.
-    test.fail();
+  test('REPARADO (hallazgo 4346) · C (se rechaza) · fitness 0, 0, 0: avisa y no simula', async ({ page }) => {
+    // w̄ = 0 → antes la app dejaba p igual (if (wAvg > 0)) y simulaba deriva neutra como si w = 1, 1, 1.
     await sembrarValor(page, '#wAA', 0);
     await sembrarValor(page, '#wAa', 0);
     await sembrarValor(page, '#waa', 0);
@@ -205,35 +206,33 @@ test.describe('Inspector 09/11/2026 · casos con verdad comprobable', () => {
   });
 });
 
-test.describe('Inspector 09/11/2026 · hallazgos abiertos', () => {
-  test('HALLAZGO H1 (09/11/2026, ABIERTO) · deriva pura N = 50, K = 50: H final ≈ 0,5·0,99^100 = 0,183, no ≈ 0,49', async ({ page }) => {
-    // page.tsx: heteroFinal = 2·pFinalMedio·(1 − pFinalMedio), con pFinalMedio la MEDIA de las K p.
+test.describe('Inspector 09/11/2026 · hallazgos reparados', () => {
+  test('REPARADO H1 (hallazgo 4342) · deriva pura N = 50, K = 50: H final ≈ 0,5·0,99^100 = 0,183, no ≈ 0,49', async ({ page }) => {
+    // Antes: heteroFinal = 2·pFinalMedio·(1 − pFinalMedio), con pFinalMedio la MEDIA de las K p.
     // Lo que enseña la guía (H_t ≈ H₀(1−1/(2N))^t) es la media de 2·p_i·q_i de cada población.
-    test.fail();
     await sembrarValor(page, '#K', 50);
     const m = await simular(page);
     expect(num(m['H inicial (2pq)'])).toBe(0.5);
     expect(Math.abs(num(m['H final']) - 0.183016), `H final = ${m['H final']}`).toBeLessThan(0.1);
   });
 
-  test('HALLAZGO H2 (09/11/2026, ABIERTO) · «Tiempo medio» pinta G cuando nada se fijó, y 1 con p0 = 1', async ({ page }) => {
-    test.fail();
+  test('REPARADO H2 (hallazgo 4345) · «Tiempo medio» ya no pinta G cuando nada se fijó, y da 0 con p0 = 1', async ({ page }) => {
     await elegirModo(page, 'Hardy-Weinberg (N=1000)', 1000);
     let m = await simular(page);
     expect(num(m['P(fijación A)']) + num(m['P(pérdida A)'])).toBe(0);
     // Ninguna se fijó ni se perdió en 100 generaciones: «100» no es una media medida (teórica 2772,6)
     expect(m['Tiempo medio (gen.)']).not.toBe('100');
+    await expect(zonaResultados(page)).toContainText('ninguna población se fijó ni se perdió en 100 generaciones');
     await elegirModo(page, 'Deriva pura (N=50)', 50);
     await sembrarValor(page, '#p0', 1);
     m = await simular(page);
     // Fijado desde la generación 0
-    expect(num(m['Tiempo medio (gen.)'])).not.toBe(1);
+    expect(num(m['Tiempo medio (gen.)'])).toBe(0);
   });
 
-  test('HALLAZGO H3 (09/11/2026, ABIERTO) · N = 1000: P(fijación)·K = trayectorias que acaban en p = 1', async ({ page }) => {
+  test('REPARADO H3 (hallazgo 4344) · N = 1000: P(fijación)·K = trayectorias que acaban en p = 1', async ({ page }) => {
     // Sin mutación ni migración, p = 1 es absorbente: una población fijada termina en p = 1.
-    // La app marca «fijada» la que toca p ≥ 0,999 (con N = 1000, aún quedan 1-2 copias de a).
-    test.fail();
+    // Antes la app marcaba «fijada» la que tocaba p ≥ 0,999 (con N = 1000, aún quedan 1-2 copias de a).
     await elegirModo(page, 'Selección direccional', 200);
     await sembrarValor(page, '#N', 1000);
     await sembrarValor(page, '#K', 50);
@@ -272,11 +271,10 @@ test.describe('Inspector 09/11/2026 · hallazgos abiertos', () => {
     for (const c of corridas) expect(c.marcadas, JSON.stringify(corridas)).toBe(c.enUno);
   });
 
-  test('HALLAZGO H4 (09/11/2026, ABIERTO) · 1 copia en 2N = 100: P(perdido en 10 generaciones) = 0,8386 (binomial)', async ({ page }) => {
+  test('REPARADO H4 (hallazgo 4343) · 1 copia en 2N = 100: P(perdido en 10 generaciones) = 0,8386 (binomial)', async ({ page }) => {
     // Cadena de Markov binomial exacta: P(0 copias en g = 10 | 1 copia, 2N = 100) = 0,8386.
     // 100 corridas de K = 50 = 5000 réplicas → sd 0,0052; tolerancia ± 0,02 (3,8 sd).
-    // La normal redondeada de sampleBinomial da 0,8019 (y 0,804 medido).
-    test.fail();
+    // La normal redondeada del sampleBinomial viejo daba 0,8019 (y 0,804 medido).
     await sembrarValor(page, '#p0', 0.01);
     await sembrarValor(page, '#G', 10);
     await sembrarValor(page, '#K', 50);
@@ -300,8 +298,7 @@ test.describe('Inspector 09/11/2026 · hallazgos abiertos', () => {
     expect(Math.abs(media - 0.8386), `P(pérdida) media = ${media}`).toBeLessThan(0.02);
   });
 
-  test('HALLAZGO H5 (09/11/2026, ABIERTO) · mover K tras simular no cambia cuántas trayectorias dice la leyenda', async ({ page }) => {
-    test.fail();
+  test('REPARADO H5 (hallazgo 4347) · mover K tras simular no cambia cuántas trayectorias dice la leyenda', async ({ page }) => {
     await sembrarValor(page, '#K', 50);
     await simular(page);
     await sembrarValor(page, '#K', 20);
@@ -309,18 +306,21 @@ test.describe('Inspector 09/11/2026 · hallazgos abiertos', () => {
     if ((await zonaResultados(page).count()) === 0) return;
     const leyenda = (await page.getByText(/Media de las \d+ simulaciones/).textContent()) ?? '';
     expect(Number(leyenda.match(/\d+/)?.[0])).toBe(50);
+    await expect(page.getByText(/en las 50 simulaciones \(20 intervalos\)/)).toBeVisible();
   });
 
-  test('HALLAZGO H6 (09/11/2026, ABIERTO) · formato español: μ sin punto decimal y % separado', async ({ page }) => {
-    test.fail();
+  test('REPARADO H6 (hallazgo 4348) · formato español: μ sin punto decimal y % separado con espacio duro', async ({ page }) => {
     await sembrarValor(page, '#mu', 0.01);
     await expect(page.locator('label[for="mu"]')).not.toContainText(/\d\.\d/, { timeout: 1000 });
+    await expect(page.locator('label[for="mu"]')).toContainText('0,0100');
     const m = await simular(page);
+    // Regla del 25/09/2026 (CLAUDE.md global §2): espacio duro U+00A0 entre la cifra y el %
+    expect(m['P(fijación A)'].endsWith(String.fromCharCode(0xa0) + '%'), m['P(fijación A)']).toBe(true);
+    expect(m['P(fijación A)']).toMatch(/\d %$/);
     expect(m['P(fijación A)']).toMatch(/\d %$/);
   });
 
-  test('HALLAZGO H7 (09/11/2026, ABIERTO) · en oscuro los rótulos del gráfico llegan a 4,5:1', async ({ page }) => {
-    test.fail();
+  test('REPARADO H7 (hallazgo 4349) · en oscuro los rótulos del gráfico llegan a 4,5:1', async ({ page }) => {
     await activarTema(page, 'dark');
     await prepararParaMedir(page);
     await simular(page);
@@ -340,23 +340,25 @@ test.describe('Inspector 09/11/2026 · hallazgos abiertos', () => {
     expect(ratio).toBeGreaterThanOrEqual(4.5);
   });
 
-  test('HALLAZGO H8 (09/11/2026, ABIERTO) · el histograma da sus cuentas al lector de pantalla', async ({ page }) => {
-    test.fail();
+  test('REPARADO H8 (hallazgo 4350) · el histograma da sus cuentas al lector de pantalla', async ({ page }) => {
+    await sembrarValor(page, '#K', 50);
     await simular(page);
     const seccion = page.locator('section', {
       has: page.getByRole('heading', { name: 'Distribución de frecuencias finales p(A)' }),
     });
-    const accesible = seccion.getByRole('img').or(seccion.getByRole('table')).or(seccion.getByRole('list'));
-    await expect(accesible.first()).toBeAttached({ timeout: 2000 });
+    const img = seccion.getByRole('img');
+    await expect(img).toHaveCount(1);
+    // Las cuentas de los intervalos del nombre accesible suman las 50 simulaciones
+    const nombre = (await img.getAttribute('aria-label')) ?? '';
+    const cuentas = Array.from(nombre.matchAll(/: (\d+)/g)).map((x) => Number(x[1]));
+    expect(cuentas.reduce((a, b) => a + b, 0), nombre).toBe(50);
   });
 
-  test('HALLAZGO H9 (09/11/2026, ABIERTO) · un solo FAQPage, con las preguntas de la FAQ visible', async ({ page }) => {
-    test.fail();
+  test('REPARADO H9 (hallazgo 4351) · un solo FAQPage, con las preguntas de la FAQ visible', async ({ page }) => {
     await comprobarFaqPageUnico(page);
   });
 
-  test('HALLAZGO H10 (09/11/2026, ABIERTO) · la «regla 4Ns» lleva el 4 en su condición', async ({ page }) => {
-    test.fail();
+  test('REPARADO H10 (hallazgo 4352) · la «regla 4Ns» lleva el 4 en su condición', async ({ page }) => {
     const tip = page.getByText(/Regla 4Ns/);
     await expect(tip).toHaveCount(1);
     expect((await tip.textContent()) ?? '').not.toContain('|s|·N ≪ 1');

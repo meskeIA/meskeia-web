@@ -12,41 +12,11 @@ import {
 } from '@/components';
 import { formatNumber } from '@/lib';
 import styles from './SimuladorDerivaGenetica.module.css';
+import { PREGUNTAS_FRECUENTES } from './metadata';
+import { ejecutarTodas, errorDeParametros, type Params, type Resultado } from './motor';
 
-interface Params {
-  p0: number;
-  N: number;
-  wAA: number;
-  wAa: number;
-  waa: number;
-  mu: number;
-  nu: number;
-  m: number;
-  pm: number;
-  G: number;
-  K: number;
-}
-
-interface Simulacion {
-  trayectoria: number[];
-  fijado: boolean;
-  perdido: boolean;
-  tiempo: number;
-}
-
-interface Resultado {
-  simulaciones: Simulacion[];
-  media: number[];
-  pFijacion: number;
-  pPerdida: number;
-  tiempoMedio: number;
-  heteroInicial: number;
-  heteroFinal: number;
-  hwAA: number;
-  hwAa: number;
-  hwaa: number;
-  pFinalMedio: number;
-}
+/** Espacio duro antes del «%» (CLAUDE.md global §2, regla del 25/09/2026; hallazgo 4348). */
+const PCT = ' %';
 
 type Modo = 'deriva' | 'direccional' | 'equilibradora' | 'hardy-weinberg';
 
@@ -64,121 +34,16 @@ const PARAMS_INICIAL: Params = {
   K: 20,
 };
 
-function sampleBinomial(n: number, p: number): number {
-  if (p <= 0) return 0;
-  if (p >= 1) return n;
-  if (n < 30) {
-    let count = 0;
-    for (let i = 0; i < n; i++) if (Math.random() < p) count++;
-    return count;
-  }
-  const mu = n * p;
-  const sigma = Math.sqrt(n * p * (1 - p));
-  const u1 = Math.random();
-  const u2 = Math.random();
-  const z = Math.sqrt(-2 * Math.log(u1 || 1e-10)) * Math.cos(2 * Math.PI * u2);
-  return Math.max(0, Math.min(n, Math.round(mu + sigma * z)));
-}
-
-function siguienteGen(p: number, params: Params): number {
-  const q = 1 - p;
-  const wAvg = p * p * params.wAA + 2 * p * q * params.wAa + q * q * params.waa;
-  let p1 = p;
-  if (wAvg > 0) {
-    p1 = (p * p * params.wAA + p * q * params.wAa) / wAvg;
-  }
-  // Mutación
-  p1 = p1 * (1 - params.mu) + (1 - p1) * params.nu;
-  // Migración
-  p1 = (1 - params.m) * p1 + params.m * params.pm;
-  // Acotar
-  p1 = Math.max(0, Math.min(1, p1));
-  // Deriva (Wright-Fisher)
-  const alelos = sampleBinomial(2 * params.N, p1);
-  return alelos / (2 * params.N);
-}
-
-function ejecutarSimulacion(params: Params): Simulacion {
-  const trayectoria: number[] = [params.p0];
-  let p = params.p0;
-  let fijado = false;
-  let perdido = false;
-  let tiempo = params.G;
-
-  for (let g = 1; g <= params.G; g++) {
-    p = siguienteGen(p, params);
-    trayectoria.push(p);
-    if (!fijado && !perdido) {
-      if (p >= 0.999 && params.mu === 0 && params.nu === 0 && params.m === 0) {
-        fijado = true;
-        tiempo = g;
-      } else if (p <= 0.001 && params.mu === 0 && params.nu === 0 && params.m === 0) {
-        perdido = true;
-        tiempo = g;
-      }
-    }
-  }
-  // Estado final si no fue fijado/perdido durante el recorrido
-  if (!fijado && !perdido) {
-    const pFinal = trayectoria[trayectoria.length - 1] ?? p;
-    if (pFinal >= 0.999) fijado = true;
-    else if (pFinal <= 0.001) perdido = true;
-  }
-  return { trayectoria, fijado, perdido, tiempo };
-}
-
-function ejecutarTodas(params: Params): Resultado {
-  const simulaciones: Simulacion[] = [];
-  for (let k = 0; k < params.K; k++) {
-    simulaciones.push(ejecutarSimulacion(params));
-  }
-  // Media por generación
-  const media: number[] = [];
-  for (let g = 0; g <= params.G; g++) {
-    let sum = 0;
-    for (const sim of simulaciones) {
-      sum += sim.trayectoria[g] ?? 0;
-    }
-    media.push(sum / simulaciones.length);
-  }
-  // Métricas
-  const fijaciones = simulaciones.filter((s) => s.fijado);
-  const perdidas = simulaciones.filter((s) => s.perdido);
-  const pFijacion = fijaciones.length / simulaciones.length;
-  const pPerdida = perdidas.length / simulaciones.length;
-  const eventos = [...fijaciones, ...perdidas];
-  const tiempoMedio =
-    eventos.length > 0 ? eventos.reduce((s, e) => s + e.tiempo, 0) / eventos.length : params.G;
-
-  const q0 = 1 - params.p0;
-  const heteroInicial = 2 * params.p0 * q0;
-  const pFinalMedio = media[media.length - 1] ?? params.p0;
-  const qFinal = 1 - pFinalMedio;
-  const heteroFinal = 2 * pFinalMedio * qFinal;
-
-  return {
-    simulaciones,
-    media,
-    pFijacion,
-    pPerdida,
-    tiempoMedio,
-    heteroInicial,
-    heteroFinal,
-    hwAA: params.p0 * params.p0,
-    hwAa: 2 * params.p0 * (1 - params.p0),
-    hwaa: (1 - params.p0) * (1 - params.p0),
-    pFinalMedio,
-  };
-}
-
 export default function SimuladorDerivaGenetica() {
   const [params, setParams] = useState<Params>(PARAMS_INICIAL);
   const [modo, setModo] = useState<Modo>('deriva');
   const [resultado, setResultado] = useState<Resultado | null>(null);
+  const [errorSimulacion, setErrorSimulacion] = useState<string | null>(null);
 
   const aplicarModo = useCallback((nuevoModo: Modo) => {
     setModo(nuevoModo);
     setResultado(null);
+    setErrorSimulacion(null);
     if (nuevoModo === 'deriva') {
       setParams({
         p0: 0.5,
@@ -239,14 +104,22 @@ export default function SimuladorDerivaGenetica() {
   }, []);
 
   const handleSimular = useCallback(() => {
-    const res = ejecutarTodas(params);
-    setResultado(res);
+    // Con fitness medio 0 no hay siguiente generación: se rechaza (hallazgo 4346).
+    const error = errorDeParametros(params);
+    if (error) {
+      setErrorSimulacion(error);
+      setResultado(null);
+      return;
+    }
+    setErrorSimulacion(null);
+    setResultado(ejecutarTodas(params));
   }, [params]);
 
   const handleReiniciar = useCallback(() => {
     setParams(PARAMS_INICIAL);
     setModo('deriva');
     setResultado(null);
+    setErrorSimulacion(null);
   }, []);
 
   const updateParam = useCallback(<K extends keyof Params>(key: K, value: Params[K]) => {
@@ -272,14 +145,27 @@ export default function SimuladorDerivaGenetica() {
     [histograma]
   );
 
+  // Descripción del histograma para el lector de pantalla: las cuentas no nulas (hallazgo 4350).
+  const descripcionHistograma = useMemo(() => {
+    if (!resultado) return '';
+    const tramos = histograma
+      .map((c, i) =>
+        c > 0 ? `p de ${formatNumber(i / 20, 2)} a ${formatNumber((i + 1) / 20, 2)}: ${c}` : null
+      )
+      .filter((t): t is string => t !== null);
+    return `Histograma de la frecuencia final p(A) en ${resultado.parametros.K} simulaciones. ${tramos.join('; ')}.`;
+  }, [histograma, resultado]);
+
   // SVG dimensions
   const W = 700;
   const H = 350;
   const PAD = 40;
 
+  // Los ejes salen de las generaciones SIMULADAS, no del deslizador actual (hallazgo 4347).
+  const gSimuladas = resultado ? resultado.parametros.G : params.G;
   const xScale = useCallback(
-    (g: number) => PAD + (g / Math.max(1, params.G)) * (W - 2 * PAD),
-    [params.G]
+    (g: number) => PAD + (g / Math.max(1, gSimuladas)) * (W - 2 * PAD),
+    [gSimuladas]
   );
   const yScale = useCallback((p: number) => PAD + (1 - p) * (H - 2 * PAD), []);
 
@@ -444,7 +330,7 @@ export default function SimuladorDerivaGenetica() {
           <div className={styles.inputGrid}>
             <div className={styles.inputGroup}>
               <label htmlFor="mu">
-                μ (mutación A→a): <strong>{params.mu.toExponential(1)}</strong>
+                μ (mutación A→a): <strong>{formatNumber(params.mu, 4)}</strong>
               </label>
               <input
                 id="mu"
@@ -458,7 +344,7 @@ export default function SimuladorDerivaGenetica() {
             </div>
             <div className={styles.inputGroup}>
               <label htmlFor="nu">
-                ν (mutación a→A): <strong>{params.nu.toExponential(1)}</strong>
+                ν (mutación a→A): <strong>{formatNumber(params.nu, 4)}</strong>
               </label>
               <input
                 id="nu"
@@ -540,6 +426,9 @@ export default function SimuladorDerivaGenetica() {
               Reiniciar
             </button>
           </div>
+          <p className={styles.errorSimulacion} role="alert">
+            {errorSimulacion ?? ''}
+          </p>
         </section>
 
         {/* Hardy-Weinberg actual */}
@@ -552,15 +441,15 @@ export default function SimuladorDerivaGenetica() {
           <div className={styles.hwGrid}>
             <div className={styles.hwCell}>
               <strong>AA (p²)</strong>
-              <span>{formatNumber(params.p0 * params.p0 * 100, 1)}%</span>
+              <span>{`${formatNumber(params.p0 * params.p0 * 100, 1)}${PCT}`}</span>
             </div>
             <div className={styles.hwCell}>
               <strong>Aa (2pq)</strong>
-              <span>{formatNumber(2 * params.p0 * (1 - params.p0) * 100, 1)}%</span>
+              <span>{`${formatNumber(2 * params.p0 * (1 - params.p0) * 100, 1)}${PCT}`}</span>
             </div>
             <div className={styles.hwCell}>
               <strong>aa (q²)</strong>
-              <span>{formatNumber((1 - params.p0) * (1 - params.p0) * 100, 1)}%</span>
+              <span>{`${formatNumber((1 - params.p0) * (1 - params.p0) * 100, 1)}${PCT}`}</span>
             </div>
           </div>
         </section>
@@ -574,20 +463,29 @@ export default function SimuladorDerivaGenetica() {
                 <div className={styles.metricCard}>
                   <p className={styles.metricLabel}>P(fijación A)</p>
                   <p className={styles.metricValue}>
-                    {formatNumber(resultado.pFijacion * 100, 1)}%
+                    {`${formatNumber(resultado.pFijacion * 100, 1)}${PCT}`}
                   </p>
                 </div>
                 <div className={styles.metricCard}>
                   <p className={styles.metricLabel}>P(pérdida A)</p>
                   <p className={styles.metricValue}>
-                    {formatNumber(resultado.pPerdida * 100, 1)}%
+                    {`${formatNumber(resultado.pPerdida * 100, 1)}${PCT}`}
                   </p>
                 </div>
                 <div className={styles.metricCard}>
                   <p className={styles.metricLabel}>Tiempo medio (gen.)</p>
                   <p className={styles.metricValue}>
-                    {formatNumber(resultado.tiempoMedio, 0)}
+                    {resultado.tiempoMedio === null ? '—' : formatNumber(resultado.tiempoMedio, 0)}
                   </p>
+                  {/* Qué media es: sin absorciones no hay cifra, y con unas pocas es la media
+                      de esas, censurada en G (hallazgo 4345). */}
+                  <span className={styles.metricNota}>
+                    {resultado.tiempoMedio === null
+                      ? `ninguna población se fijó ni se perdió en ${resultado.parametros.G} generaciones`
+                      : resultado.absorbidas === resultado.simulaciones.length
+                        ? `hasta fijar o perder, en las ${resultado.absorbidas} poblaciones`
+                        : `solo de las ${resultado.absorbidas} de ${resultado.simulaciones.length} que se fijaron o perdieron antes de ${resultado.parametros.G} generaciones`}
+                  </span>
                 </div>
                 <div className={styles.metricCard}>
                   <p className={styles.metricLabel}>p̄ final</p>
@@ -603,6 +501,7 @@ export default function SimuladorDerivaGenetica() {
                 </div>
                 <div className={styles.metricCard}>
                   <p className={styles.metricLabel}>H final</p>
+                  {/* Media de 2·pᵢ·qᵢ de cada población, no 2·p̄·q̄ de la media (hallazgo 4342). */}
                   <p className={styles.metricValue}>
                     {formatNumber(resultado.heteroFinal, 3)}
                   </p>
@@ -614,7 +513,8 @@ export default function SimuladorDerivaGenetica() {
               <h2 className={styles.panelTitle}>Trayectorias de frecuencia p(A)</h2>
               <div className={styles.legend}>
                 <span className={styles.legendItem}>
-                  <span className={styles.colorDotMedia} aria-hidden="true" /> Media de las {params.K} simulaciones
+                  <span className={styles.colorDotMedia} aria-hidden="true" />
+                  <span>{`Media de las ${resultado.parametros.K} simulaciones`}</span>
                 </span>
                 <span className={styles.legendItem}>
                   <span className={styles.colorDotTrayectoria} aria-hidden="true" /> Trayectoria individual
@@ -662,7 +562,7 @@ export default function SimuladorDerivaGenetica() {
                         y={yScale(v) + 4}
                         textAnchor="end"
                         fontSize={10}
-                        fill="#6b7280"
+                        className={styles.ejeTexto}
                       >
                         {formatNumber(v, 2)}
                       </text>
@@ -677,7 +577,7 @@ export default function SimuladorDerivaGenetica() {
                   ))}
                   {/* Etiquetas X */}
                   {[0, 0.25, 0.5, 0.75, 1].map((f) => {
-                    const g = Math.round(params.G * f);
+                    const g = Math.round(gSimuladas * f);
                     return (
                       <g key={`x-${f}`}>
                         <text
@@ -685,7 +585,7 @@ export default function SimuladorDerivaGenetica() {
                           y={H - PAD + 16}
                           textAnchor="middle"
                           fontSize={10}
-                          fill="#6b7280"
+                          className={styles.ejeTexto}
                         >
                           {g}
                         </text>
@@ -727,7 +627,7 @@ export default function SimuladorDerivaGenetica() {
                     y={H - 6}
                     textAnchor="middle"
                     fontSize={11}
-                    fill="#6b7280"
+                    className={styles.ejeTexto}
                     fontWeight={600}
                   >
                     Generación
@@ -737,7 +637,7 @@ export default function SimuladorDerivaGenetica() {
                     y={H / 2}
                     textAnchor="middle"
                     fontSize={11}
-                    fill="#6b7280"
+                    className={styles.ejeTexto}
                     fontWeight={600}
                     transform={`rotate(-90, 12, ${H / 2})`}
                   >
@@ -762,7 +662,7 @@ export default function SimuladorDerivaGenetica() {
                   <span className={styles.colorDotFijado} aria-hidden="true" /> Fijación (p≈1)
                 </span>
               </div>
-              <div className={styles.histograma}>
+              <div className={styles.histograma} role="img" aria-label={descripcionHistograma}>
                 {histograma.map((c, i) => {
                   const altura = (c / maxCount) * 100;
                   let claseExtra = '';
@@ -789,7 +689,7 @@ export default function SimuladorDerivaGenetica() {
                 <span>1</span>
               </div>
               <p className={styles.chartCaption}>
-                Histograma de la frecuencia final p(A) en las {params.K} simulaciones (20 bins).
+                {`Histograma de la frecuencia final p(A) en las ${resultado.parametros.K} simulaciones (20 intervalos).`}
               </p>
             </section>
           </>
@@ -884,64 +784,14 @@ export default function SimuladorDerivaGenetica() {
           </div>
 
           <h3>Preguntas Frecuentes</h3>
+          {/* Misma fuente que el FAQPage del JSON-LD (metadata.ts, hallazgo 4351). */}
           <div className={styles.faqList}>
-            <div className={styles.faqItem}>
-              <strong>¿Qué dice el principio de Hardy-Weinberg?</strong>
-              <p>
-                En una población infinita, con apareamiento aleatorio, sin selección, mutación ni
-                migración, las frecuencias alélicas y genotípicas se mantienen constantes
-                generación tras generación: p² + 2pq + q² = 1.
-              </p>
-              <p className={styles.faqTip}>
-                Es el modelo nulo: si una población se desvía, alguna fuerza evolutiva está
-                actuando.
-              </p>
-            </div>
-            <div className={styles.faqItem}>
-              <strong>¿Por qué la deriva es más fuerte en poblaciones pequeñas?</strong>
-              <p>
-                La varianza del cambio en p por generación es pq/(2N). Con N pequeño la varianza es
-                grande: en cada generación se sortean pocos alelos, así que el azar domina sobre la
-                selección débil.
-              </p>
-              <p className={styles.faqTip}>
-                Regla 4Ns: si |s|·N ≪ 1, la selección es dominada por la deriva.
-              </p>
-            </div>
-            <div className={styles.faqItem}>
-              <strong>¿Cuál es la diferencia entre selección direccional y equilibradora?</strong>
-              <p>
-                <strong>Direccional</strong>: un homocigoto es el más apto, el alelo correspondiente
-                tiende a fijarse (p→0 o p→1).{' '}
-                <strong>Equilibradora</strong>: el heterocigoto tiene ventaja, ambos alelos se
-                mantienen en una frecuencia intermedia estable p*.
-              </p>
-            </div>
-            <div className={styles.faqItem}>
-              <strong>¿Cuándo se rompe Hardy-Weinberg?</strong>
-              <p>
-                Cuando hay selección (fitness desiguales), mutación significativa, flujo génico,
-                tamaño poblacional pequeño (deriva) o apareamiento no aleatorio (endogamia,
-                asortativo). En la práctica casi ninguna población real cumple HW estricto.
-              </p>
-            </div>
-            <div className={styles.faqItem}>
-              <strong>¿Qué es la heterocigosis y por qué importa?</strong>
-              <p>
-                H = 2pq es la proporción de individuos heterocigotos esperada. Es una medida de
-                diversidad genética: H=0 significa población fijada (sin variación), H máximo (0,5)
-                cuando p=q=0,5. La deriva reduce H en el tiempo: H<sub>t</sub> ≈ H₀(1−1/(2N))<sup>t</sup>.
-              </p>
-            </div>
-            <div className={styles.faqItem}>
-              <strong>¿En qué se diferencian mutación y migración?</strong>
-              <p>
-                <strong>Mutación</strong> es interna: cambia un alelo a otro al copiar el ADN, tasa
-                muy baja (10⁻⁶ a 10⁻⁴ por gen y generación). <strong>Migración</strong> es externa:
-                llegan individuos de otra población con una frecuencia distinta. Ambas introducen
-                variación, pero la migración es típicamente mucho más rápida.
-              </p>
-            </div>
+            {PREGUNTAS_FRECUENTES.map((f) => (
+              <div key={f.question} className={styles.faqItem}>
+                <strong>{f.question}</strong>
+                <p>{f.answer}</p>
+              </div>
+            ))}
           </div>
 
           <h3>Cómo Interpretar las Trayectorias — Paso a Paso</h3>

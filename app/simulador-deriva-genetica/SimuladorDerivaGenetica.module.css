@@ -250,6 +250,38 @@
   margin: 0;
 }
 
+/* Qué media es el tiempo medio (hallazgo 4345) */
+.metricNota {
+  display: block;
+  margin-top: 0.3rem;
+  font-size: 0.75rem;
+  line-height: 1.3;
+  color: var(--text-secondary);
+}
+
+/* Aviso de parámetros que no se pueden simular (hallazgo 4346) */
+.errorSimulacion {
+  margin: 0.75rem 0 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--rojo-texto, #f87171);
+}
+
+/* Vacía no ocupa sitio, pero sigue montada: una región viva oculta con display:none no
+   anunciaría el aviso al aparecer. */
+.errorSimulacion:empty {
+  margin: 0;
+}
+
+/* Rótulos del gráfico: el fill lo pone el CSS para tener variante oscura (hallazgo 4349) */
+.ejeTexto {
+  fill: #6b7280;
+}
+
+[data-theme='dark'] .ejeTexto {
+  fill: #9ca3af;
+}
+
 /* HW Box */
 .hwBox {
   background: var(--bg-card);
