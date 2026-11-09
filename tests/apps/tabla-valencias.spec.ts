@@ -16,9 +16,12 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  *   · FAQPage: hierro +2/+3, regla de deducción dentro de un compuesto, sufijos -oso/-ico,
  *     y por qué los metales de transición tienen varios estados.
  *
- * DÓNDE VIVE EL DATO — no hay módulo de datos: las **51** fichas (`ELEMENTOS`), los **26**
- * iones (`IONES`) y el formulador (`formularBinario`) están EMBEBIDOS en
- * app/tabla-valencias/page.tsx, 1.836 líneas de las que ~460 son el dataset químico.
+ * DÓNDE VIVE EL DATO — desde la ficha de aula (fee6ab48f) las **51** fichas (`ELEMENTOS`) y
+ * los **26** iones (`IONES`) viven en app/tabla-valencias/datos.ts; el formulador
+ * (`formularBinario`) sigue en page.tsx y la ficha de aula en casos.ts. Cotejado el 09/11/2026
+ * bloque contra bloque con el page.tsx de la base 9e48b0cd: el traslado no cambió ni un valor;
+ * la única diferencia es el nombre «Teluro» → «Telurio» (21b793a07, C0504), con sus dos
+ * ejemplos «óxido de telurio(IV)/(VI)».
  * (La cabecera anterior de este fichero decía «20 iones»: son 26, contados en el dataset y
  * en las filas de la tabla de la página.)
  *
@@ -91,7 +94,8 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  *       sitios (contador, párrafo de alcance, og:description y JSON-LD). Los 51 son: H + 5
  *       alcalinos + 5 alcalinotérreos + 5 del grupo 13 + 5 del 14 + 5 del 15 + 4 del 16 +
  *       4 del 17 + 5 gases nobles + 12 metales de transición.
- *       ⚠️ De ahí sale el hallazgo abierto: los grupos principales NO están completos —
+ *       ⚠️ De ahí salió el hallazgo 1065 (REPARADO el 21/09/2026: el párrafo ya nombra los
+ *       cinco radiactivos): los grupos principales NO estaban completos —
  *       faltan Fr(87), Ra(88), Po(84), At(85) y Rn(86), ninguno de los cuales es lantánido,
  *       actínido ni transuránico, que es lo único que el párrafo declara excluido.
  *
@@ -571,7 +575,7 @@ test.describe('La tabla declara hasta dónde llega (21/09/2026)', () => {
 });
 
 // ═══════════════════════════════════════════════════════════════════════════
-// HALLAZGOS ABIERTOS (21/09/2026) — con test.fail(): afirman lo que DEBERÍA pasar
+// HALLAZGOS DEL 21/09/2026 (1064, 1065, 1066) — REPARADOS: ya no llevan test.fail()
 // ═══════════════════════════════════════════════════════════════════════════
 
 test.describe('Los 3 hallazgos del 21/09/2026, reparados el mismo día', () => {
@@ -860,5 +864,205 @@ test.describe('Tabla de Valencias · ficha de búsqueda para el aula', () => {
     const inventado = resolverFicha({ campo: 'grupo', simbolo: 'Zzz' });
     expect(inventado.ok).toBe(false);
     expect(inventado.error).toBeTruthy();
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// INSPECCIÓN DEL CAMBIO · 09/11/2026 (modo cambio, diff 9e48b0cd..HEAD)
+//
+// Lo que cambió desde la validación del 21/09/2026: el dataset se mudó a datos.ts (sin
+// cambiar un valor, salvo Teluro → Telurio), la ficha de aula (casos.ts + su sección), el
+// buscador pasó a lib/buscadorTablas.ts en modo fórmulas (C0607), el título y el párrafo de
+// alcance, y la nota «Esto formula, no predice». Lo de abajo son los casos de ESTA vuelta, en el
+// NAVEGADOR (el bloque anterior prueba casos.ts sin pintar nada), resueltos a mano sobre
+// datos.ts antes de abrir la página.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const AULA = '#casos-aula';
+/** El veredicto de la ficha. Acotado a la sección: `getByRole('alert')` a secas casaría con el
+ *  anunciador de rutas de Next. */
+const VEREDICTO = `${AULA} [role="alert"]`;
+
+/** Elige la pregunta `n` de la ficha, escribe la respuesta y pulsa «Comprobar». */
+async function responderEnAula(page: Page, n: number, texto: string): Promise<Locator> {
+  // «Pregunta 1:» con los dos puntos no casa con «Pregunta 10:», «11:» ni «12:».
+  const boton = page.locator(`${AULA} button[aria-label^="Pregunta ${n}:"]`);
+  await boton.click();
+  await expect(boton).toHaveAttribute('aria-pressed', 'true');
+  await page.fill('#aula-respuesta', texto);
+  await esperarValorEnReact(page, '#aula-respuesta', texto);
+  await page.locator(`${AULA} button`, { hasText: 'Comprobar' }).click();
+  return page.locator(VEREDICTO);
+}
+
+/** Las cabeceras de las fichas visibles, en el orden de la tabla. */
+function cabeceras(page: Page): Locator {
+  return page.locator(`${LISTA} article button[aria-expanded]`);
+}
+
+test.describe('Cambio del 21/09 al 06/11/2026, inspeccionado el 09/11/2026', () => {
+  test('buscador C0607 · las fórmulas escritas con el teclado llegan a su elemento', async ({ page }) => {
+    // El índice junta nombre, sinónimos y las FÓRMULAS de los ejemplos (no sus nombres), con
+    // los subíndices pasados a cifras. Resuelto contra datos.ts:
+    //   «NH3»   → solo el ejemplo del N (NH₃, amoniaco)                       → 1: Nitrógeno.
+    //   «H2O»   → el ejemplo del H (H₂O) y dos del O (H₂O y H₂O₂)             → 2: Hidrógeno, Oxígeno.
+    //   «kmno4» → solo el Mn (KMnO₄); el K no lo lleva entre sus ejemplos (K₂O) → 1: Manganeso.
+    await buscar(page, 'NH3');
+    await expect(cabeceras(page)).toContainText(['Nitrógeno']);
+    await buscar(page, 'H2O');
+    await expect(cabeceras(page)).toContainText(['Hidrógeno', 'Oxígeno']);
+    await buscar(page, 'kmno4');
+    await expect(cabeceras(page)).toContainText(['Manganeso']);
+  });
+
+  test('buscador C0607 · «Cl» busca como subcadena: el cloro y los 11 con un cloruro de ejemplo', async ({
+    page,
+  }) => {
+    // Contado a mano en datos.ts: el símbolo Cl, más los ejemplos NaCl, RbCl, MgCl₂, InCl, SnCl₂,
+    // MnCl₂, FeCl₂, CoCl₂, PtCl₂, AuCl₃/AuCl y Hg₂Cl₂. Ningún nombre ni sinónimo lleva «cl»
+    // salvo los del propio cloro («cálcico» tiene «lc», no «cl»). Orden: el de ELEMENTOS.
+    await buscar(page, 'Cl');
+    await expect(cabeceras(page)).toContainText([
+      'Sodio', 'Rubidio', 'Magnesio', 'Indio', 'Estaño', 'Cloro',
+      'Manganeso', 'Hierro', 'Cobalto', 'Platino', 'Oro', 'Mercurio',
+    ]);
+    await expect(
+      page.locator('section[aria-label="Buscador de elementos"] [role="status"]'),
+    ).toHaveText('12 de 51 elementos');
+  });
+
+  test('buscador · un número atómico no se busca, como avisa el «Dónde mirar» de la pregunta 1', async ({
+    page,
+  }) => {
+    // casos.ts escribe en los pasos de la pregunta 1 que «el buscador … no entiende números
+    // atómicos»: «26» no está en ningún nombre, sinónimo ni fórmula de ejemplo.
+    await buscar(page, '26');
+    await expect(fichas(page)).toHaveCount(0);
+    await expect(
+      page.locator('section[aria-label="Buscador de elementos"] [role="status"]'),
+    ).toHaveText('0 de 51 elementos');
+  });
+
+  test('C0504 · el Te se llama Telurio en su ficha y en los tres nombres del formulador', async ({
+    page,
+  }) => {
+    // «teluro» sigue siendo sinónimo, así que las dos grafías llegan a la misma ficha.
+    for (const termino of ['teluro', 'telurio']) {
+      await buscar(page, termino);
+      await expect(cabeceras(page), termino).toContainText(['Telurio']);
+    }
+    // Te(+4, el más frecuente) + O(−2): mcd(4,2)=2 → TeO₂. El Te tiene dos estados positivos
+    // (+4, +6), así que Stock lleva romano; es no metal con raíz tradicional → anhídrido.
+    await page.selectOption('#elemento-positivo', 'Te');
+    await expect(formula(page)).toHaveText('TeO2');
+    await expect(nomenclatura(page, 'Nomenclatura sistemática')).toHaveText('dióxido de telurio');
+    await expect(nomenclatura(page, 'Nomenclatura de Stock')).toHaveText('óxido de telurio(IV)');
+    await expect(nomenclatura(page, 'Nomenclatura tradicional')).toHaveText('anhídrido teluroso');
+  });
+
+  test('ficha de aula · las 12 respuestas, escritas como las resolví a mano, salen «Correcto»', async ({
+    page,
+  }) => {
+    // Resueltas contra la química y la tabla ANTES de abrir la página: Z = 26 es el Fe · el S
+    // está en el grupo 16 · el Al tiene valencia 3 · el Cu actúa más a menudo con +2 · Fe(+3) es
+    // férrico · NO₂⁻ es el nitrito · Fe llega a +3 y Cu a +2 · el F tiene un solo estado (−1) ·
+    // el Mn trae 5 (+2, +3, +4, +6, +7) · PO₄³⁻ tiene carga −3 · en SO₄²⁻ el S vale +6 (4·(−2)
+    // + x = −2) · en H₂O₂ el O vale −1. Se escriben con el guion del teclado, no con el «−».
+    const respuestas: [number, string][] = [
+      [1, 'Fe'], [2, '16'], [3, '3'], [4, '+2'], [5, 'férrico'], [6, 'nitrito'],
+      [7, 'Fe'], [8, 'F'], [9, '5'], [10, '-3'], [11, '+6'], [12, '-1'],
+    ];
+    for (const [n, texto] of respuestas) {
+      const veredicto = await responderEnAula(page, n, texto);
+      await expect(veredicto, `pregunta ${n} con «${texto}»`).toContainText('Correcto');
+    }
+  });
+
+  test('ficha de aula · el signo cuenta: «1» por −1, «+3» por una valencia y «-2» por +2 no valen', async ({
+    page,
+  }) => {
+    // El convenio que la sección enseña en pantalla: la valencia sin signo y el número de
+    // oxidación con signo. En estos tres las cifras coinciden y el signo no, así que el aviso
+    // del signo es el que toca.
+    for (const [n, texto] of [[12, '1'], [3, '+3'], [4, '-2']] as [number, string][]) {
+      const veredicto = await responderEnAula(page, n, texto);
+      await expect(veredicto, `pregunta ${n} con «${texto}»`).toContainText('el signo no coincide');
+      await expect(veredicto, `pregunta ${n} con «${texto}»`).not.toContainText('Correcto');
+    }
+    // Y un dato que no es el pedido (el número atómico en vez del símbolo) es un fallo a secas.
+    const veredicto = await responderEnAula(page, 1, '26');
+    await expect(veredicto).toContainText('No es lo que dice la tabla');
+  });
+
+  test('ficha de aula · «Dónde mirar» de la 1 sitúa Z = 26 entre el manganeso y el cobalto', async ({
+    page,
+  }) => {
+    // Los vecinos por Z dentro de la tabla: Mn (25) y Co (27), los dos presentes en datos.ts.
+    await page.locator(`${AULA} button[aria-label^="Pregunta 1:"]`).click();
+    await page.locator(`${AULA} button`, { hasText: 'Dónde mirar' }).click();
+    const pasos = page.locator('#aula-pasos');
+    await expect(pasos).toContainText('Z = 26 cae entre Manganeso (25) y Cobalto (27).');
+    await expect(pasos).toContainText('Fe');
+  });
+
+  test('práctica al azar · la semilla 1 de partida pregunta el estado más frecuente del hierro: +3', async ({
+    page,
+  }) => {
+    // La semilla inicial es fija (1) para que servidor y navegador pinten lo mismo. El hierro
+    // actúa más a menudo con +3 (Fe₂O₃), que es el estado marcado en su ficha.
+    await page.getByRole('tab', { name: 'Práctica al azar' }).click();
+    const panel = page.locator('#aula-panel-practica');
+    await expect(panel).toContainText('semilla 1');
+    await expect(panel).toContainText('¿Con qué número de oxidación actúa más a menudo el elemento hierro (Fe)?');
+    await page.fill('#aula-respuesta-practica', '+3');
+    await esperarValorEnReact(page, '#aula-respuesta-practica', '+3');
+    await panel.locator('button', { hasText: 'Comprobar' }).click();
+    await expect(panel.locator('[role="alert"]')).toHaveText('Correcto: +3.');
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// HALLAZGOS ABIERTOS (inspector 09/11/2026) — con test.fail(): afirman lo que DEBERÍA pasar
+// ═══════════════════════════════════════════════════════════════════════════════
+
+test.describe('Hallazgos ABIERTOS del 09/11/2026 en la ficha de aula', () => {
+  test.fail('ABIERTO · «+ 2» y «− 3», con espacio tras el signo, son la respuesta correcta y no un signo cambiado', async ({
+    page,
+  }) => {
+    // normalizarRespuesta colapsa los espacios pero no quita el que va entre el signo y la
+    // cifra, así que «+ 2» no casa con «+2»; y como las cifras coinciden, la app contesta
+    // «el signo no coincide» a quien ha escrito el signo bueno. Contradice su propio aviso de
+    // convenio («se aceptan las grafías equivalentes del mismo dato … pero no un signo distinto»).
+    let veredicto = await responderEnAula(page, 4, '+ 2'); // Cu, el más frecuente: +2
+    await expect(veredicto).toContainText('Correcto');
+    veredicto = await responderEnAula(page, 10, '− 3'); // carga del fosfato: −3
+    await expect(veredicto).toContainText('Correcto');
+  });
+
+  test.fail('ABIERTO · el aviso del signo no sale en una respuesta sin signo («5 estados», «el 16», «valencia 3»)', async ({
+    page,
+  }) => {
+    // comprobarRespuesta da «el signo no coincide» siempre que las CIFRAS coinciden, aunque la
+    // respuesta no lleve signo: en la 9 (una cuenta), la 2 (un grupo) y la 3 (una valencia
+    // escrita sin signo) el alumno añadió una palabra y la app le corrige un signo que no hay.
+    for (const [n, texto] of [[9, '5 estados'], [2, 'el 16'], [3, 'valencia 3']] as [number, string][]) {
+      const veredicto = await responderEnAula(page, n, texto);
+      await expect(veredicto, `pregunta ${n} con «${texto}»`).not.toContainText('signo');
+    }
+  });
+
+  test.fail('ABIERTO · la semilla que se dicta en voz alta se puede escribir para sacar la misma pregunta', async ({
+    page,
+  }) => {
+    // La pestaña promete «Cada semilla da siempre la misma pregunta: si la dictas en voz alta,
+    // toda la clase trabaja sobre la misma», pero solo enseña la semilla: no hay campo para
+    // escribirla y «?semilla=…» en la URL no se lee. Con «Otra pregunta» salió la semilla
+    // 90.680 (bromo con +7 → perbrómico), y un alumno no tiene cómo llegar a ella.
+    await page.getByRole('tab', { name: 'Práctica al azar' }).click();
+    const panel = page.locator('#aula-panel-practica');
+    const campoSemilla = panel.getByLabel(/semilla/i);
+    await expect(campoSemilla).toHaveCount(1, { timeout: 3000 });
+    await campoSemilla.fill('90680');
+    await expect(panel).toContainText('bromo (Br) cuando actúa con número de oxidación +7');
   });
 });

@@ -1,4 +1,4 @@
-import { test, expect, Page, Locator } from '@playwright/test';
+import { test, expect, devices, Page, Locator } from '@playwright/test';
 import { esperarHidratacion, esperarPaginaAsentada } from './_hidratacion';
 import {
   CASOS,
@@ -401,5 +401,191 @@ test.describe('simulador-modelo-bohr · la sección de casos en el navegador', (
   test('la sección no duplica los atajos del simulador', async ({ page }) => {
     await expect(page.getByRole('button', { name: /^Hα/ })).toHaveCount(1);
     await expect(page.getByRole('button', { name: /^Lyman α/ })).toHaveCount(1);
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════════
+ * INSPECTOR · primera inspección (09/11/2026), con firma de rotura en la cola (87 % de visitas
+ * cortas, 4,8 % de recargas)
+ *
+ * Esperados calculados APARTE del motor (sin importarlo), con las constantes CODATA de
+ * physics.nist.gov/cuu: R∞ = 10.973.731,568 m⁻¹, mₚ/mₑ = 1836,152673, a₀ = 5,291772·10⁻¹¹ m, y
+ * h, c y e exactas. Con CODATA 2018 (la que declara la app) y con CODATA 2022 sale lo mismo en
+ * todas las cifras que se pintan.
+ *   R_H = R∞/(1 + mₑ/mₚ) = 10.967.758,34 m⁻¹ · E_ion = h·c·R_H/e = 13,598287 eV
+ *
+ *   A · 5 → 2, Hγ (normal). Factor 1/4 − 1/25 = 0,21
+ *       λ = 1e9/(0,21·R_H) = 434,1730 nm → «434,17 nm» (NIST ASD, vacío: 434,1692) · violeta (< 450)
+ *       ΔE = 0,21·13,598287 = 2,855640 eV → «2,856 eV» · ×1,602176634·10⁻¹⁹ = 4,5752·10⁻¹⁹ J
+ *       f = c·0,21·R_H = 6,9049·10¹⁴ Hz · E₅ = −13,598287/25 = −0,54393 → «−0,544 eV»
+ *       r₅ = 25·0,0529177 = 1,32294 → «1,3229 nm» · con R = 1,097·10⁷: 1e9/(1,097·10⁷·0,21) = 434,09 → «434,1 nm»
+ *   B · 7 → ∞, el nivel más alto que se elige, hasta el electrón libre (límite). Factor 1/49
+ *       ΔE = 13,598287/49 = 0,277516 → «0,278 eV» (= energía de ionización desde el 7)
+ *       λ = 49/R_H = 4467,64 nm → «4467,6 nm», infrarrojo · serie sin nombre (nivel inferior 7)
+ *       E∞ = 0 → «0 eV» · r₇ = 49·0,0529177 = 2,59297 → «2,5930 nm» · sin radio para ∞
+ *   B' · 7 → 1, el salto más largo hacia el fundamental: λ = 49/(48·R_H) = 93,0758 → «93,076 nm»,
+ *       ΔE = 13,598287·48/49 = 13,32077 → «13,321 eV». HALLAZGO ABIERTO: la tabla de la serie de
+ *       Lyman pinta 2 ↔ 1 … 6 ↔ 1 y ∞ ↔ 1 (`lineasDeSerie(nInferior, 5)`), y la línea elegida ni
+ *       sale ni se marca «el elegido». Solo le pasa al par 1 y 7: es el único a más de 5 niveles.
+ *   C · ∞ → ∞ (se rechaza): no hay salto; ni λ ni energía, ni NaN ni Infinity, y sin tabla de
+ *       serie. Volver a empezar no exige recargar: el atajo Hβ da 16/(3·R_H) = 486,27 nm.
+ *   Móvil · Pixel 7 (412 px): sin desborde, los niveles responden al toque (6 → 4: 576/(20·R_H) =
+ *       2625,88 → «2625,9 nm», ΔE = 13,598287·20/576 = 0,47216 → «0,472 eV»). HALLAZGO ABIERTO: la
+ *       tira del espectro (viewBox de 920 en ~343 px, escala 0,373) pinta sus rótulos de 12 y 14
+ *       a 4,5 y 5,2 px en pantalla; el diagrama de niveles, el más pequeño, a 9 px.
+ * ═══════════════════════════════════════════════════════════════════════════════════════════ */
+
+function seccionSerie(page: Page): Locator {
+  return page.locator('section[aria-labelledby="titulo-serie"]');
+}
+
+test.describe('Inspector 09/11/2026 · primera inspección', () => {
+  test('A (normal) · 5 → 2, Hγ: 434,17 nm, violeta, 2,856 eV', async ({ page }) => {
+    // Se parte de Lyman α (2 → 1) para que los DOS niveles cambien de verdad
+    await page.getByRole('button', { name: /^Lyman α/ }).click();
+    await expect(resultados(page)).toContainText('serie de Lyman');
+    await nivel(page, PARTIDA, 'Nivel 5').click();
+    await nivel(page, LLEGADA, 'Nivel 2').click();
+
+    const zona = resultados(page);
+    await expect(zona).toContainText('λ = 434,17 nm');
+    await expect(zona).toContainText('Fotón emitido');
+    await expect(zona).toContainText('serie de Balmer');
+    await expect(zona).toContainText('Visible, violeta');
+    expect(await leerTarjeta(page, 'Energía del fotón ΔE')).toBe('2,856 eV');
+    expect(await leerTarjeta(page, 'En julios')).toBe('4,575 × 10⁻¹⁹ J');
+    expect(await leerTarjeta(page, 'Frecuencia f = c/λ')).toBe('6,905 × 10¹⁴ Hz');
+    expect(await leerTarjeta(page, 'Número de onda 1/λ')).toBe('2,303 × 10⁶ m⁻¹');
+    expect(await leerTarjeta(page, 'Energía del nivel 5')).toBe('−0,544 eV');
+    expect(await leerTarjeta(page, 'Energía del nivel 2')).toBe('−3,400 eV');
+    expect(await leerTarjeta(page, 'Radio de la órbita 5 (n²·a₀)')).toBe('1,3229 nm');
+    await expect(page.getByText('del libro sale 434,1 nm')).toBeVisible();
+    // La línea medida en el vacío (NIST ASD, grupo 2–5: 434,1692 nm) queda a menos de 0,01 nm
+    const [entera, decimales] = (((await zona.textContent()) ?? '').match(/λ = (\d+,\d+) nm/)?.[1] ?? 'NaN,').split(',');
+    const lambda = Number(entera) + Number(`0.${decimales}`);
+    expect(Math.abs(lambda - 434.1692)).toBeLessThan(0.01);
+
+    const fila = seccionSerie(page).locator('tr', { hasText: 'el elegido' });
+    await expect(fila).toHaveCount(1);
+    await expect(fila).toContainText('5 ↔ 2');
+    await expect(fila).toContainText('434,17');
+  });
+
+  test('B (límite) · 7 → ∞: absorbe 0,278 eV, 4467,6 nm, infrarrojo, serie sin nombre', async ({ page }) => {
+    await nivel(page, PARTIDA, 'Nivel 7').click();
+    await nivel(page, LLEGADA, 'Nivel infinito: electrón libre').click();
+
+    const zona = resultados(page);
+    await expect(zona).toContainText('λ = 4467,6 nm');
+    await expect(zona).toContainText('Fotón absorbido');
+    await expect(zona).toContainText('serie sin nombre propio');
+    await expect(zona).toContainText('(límite de la serie)');
+    await expect(zona).toContainText('Infrarrojo: no lo ve el ojo');
+    await expect(zona).toContainText('0,278 eV es la energía de ionización desde el nivel 7');
+    expect(await leerTarjeta(page, 'Energía del fotón ΔE')).toBe('0,278 eV');
+    expect(await leerTarjeta(page, 'Energía del nivel 7')).toBe('−0,278 eV');
+    expect(await leerTarjeta(page, 'Energía del nivel ∞')).toBe('0 eV');
+    expect(await leerTarjeta(page, 'Radio de la órbita 7 (n²·a₀)')).toBe('2,5930 nm');
+    expect(await leerTarjeta(page, 'Radio de la órbita ∞ (n²·a₀)')).toBe('');
+    await expect(page.getByRole('heading', { level: 2, name: /Espectro visible del hidrógeno \(absorción\)/ })).toBeVisible();
+
+    await expect(page.getByRole('heading', { level: 2, name: /Líneas que llegan al nivel 7/ })).toBeVisible();
+    const fila = seccionSerie(page).locator('tr', { hasText: 'el elegido' });
+    await expect(fila).toHaveCount(1);
+    await expect(fila).toContainText('∞ ↔ 7');
+    await expect(fila).toContainText('4467,6');
+  });
+
+  test('B\' (límite) · 7 → 1: Lyman, 93,076 nm, 13,321 eV, ultravioleta', async ({ page }) => {
+    await nivel(page, PARTIDA, 'Nivel 7').click();
+    await nivel(page, LLEGADA, 'Nivel 1').click();
+
+    const zona = resultados(page);
+    await expect(zona).toContainText('λ = 93,076 nm');
+    await expect(zona).toContainText('serie de Lyman');
+    await expect(zona).toContainText('Ultravioleta: no lo ve el ojo');
+    expect(await leerTarjeta(page, 'Energía del fotón ΔE')).toBe('13,321 eV');
+    await expect(page.getByRole('heading', { level: 2, name: /Líneas de la serie de Lyman/ })).toBeVisible();
+  });
+
+  test('HALLAZGO (09/11/2026, ABIERTO) · con 7 → 1 la tabla de la serie no lista ni marca el salto elegido', async ({
+    page,
+  }) => {
+    // `lineasDeSerie(t.nInferior, 5)` da los 5 niveles por encima del inferior y el límite: para el
+    // nivel inferior 1, del 2 al 6. El 7 se puede elegir y es el único a más de 5 niveles de otro.
+    // Hoy la tabla pinta 2 ↔ 1 … 6 ↔ 1 y ∞ ↔ 1, ninguna marcada.
+    test.fail();
+    await nivel(page, PARTIDA, 'Nivel 7').click();
+    await nivel(page, LLEGADA, 'Nivel 1').click();
+    await expect(resultados(page)).toContainText('λ = 93,076 nm');
+    const fila = seccionSerie(page).locator('tr', { hasText: 'el elegido' });
+    await expect(fila).toHaveCount(1, { timeout: 2000 });
+    await expect(fila).toContainText('7 ↔ 1');
+    await expect(fila).toContainText('93,076');
+  });
+
+  test('C (se rechaza) · ∞ → ∞: no hay salto, ni λ ni NaN, y el atajo devuelve un salto sin recargar', async ({ page }) => {
+    await nivel(page, PARTIDA, 'Nivel infinito: electrón libre').click();
+    await nivel(page, LLEGADA, 'Nivel infinito: electrón libre').click();
+
+    const zona = resultados(page);
+    await expect(zona).toContainText('No hay salto');
+    const texto = (await zona.textContent()) ?? '';
+    expect(texto).not.toMatch(/λ =|\d\s*eV|NaN|Infinity|∞ nm/);
+    await expect(page.getByText('Con dos niveles distintos aparecen aquí las fórmulas')).toBeVisible();
+    await expect(seccionSerie(page)).toHaveCount(0);
+    await expect(page.locator('svg[role="img"]').first()).toHaveAttribute('aria-label', /sin salto.*\(∞\)/);
+    const cuerpo = (await page.locator('body').textContent()) ?? '';
+    expect(cuerpo).not.toMatch(/NaN|Infinity/);
+
+    // Volver a empezar con un atajo, sin recargar: Hβ = 16/(3·R_H) = 486,27 nm
+    await page.getByRole('button', { name: /^Hβ/ }).click();
+    await expect(zona).toContainText('λ = 486,27 nm');
+    await expect(nivel(page, PARTIDA, 'Nivel 4')).toHaveAttribute('aria-pressed', 'true');
+    await expect(nivel(page, LLEGADA, 'Nivel 2')).toHaveAttribute('aria-pressed', 'true');
+  });
+});
+
+test.describe('Inspector 09/11/2026 · móvil (Pixel 7)', () => {
+  test.use({
+    viewport: { width: 412, height: 839 },
+    userAgent: devices['Pixel 7'].userAgent,
+    deviceScaleFactor: 2.625,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test('sin desborde horizontal y los niveles responden al toque: 6 → 4 da 2625,9 nm', async ({ page }) => {
+    const desborde = () =>
+      page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
+    expect(await desborde()).toBeLessThanOrEqual(0);
+
+    await nivel(page, PARTIDA, 'Nivel 6').tap();
+    await nivel(page, LLEGADA, 'Nivel 4').tap();
+    const zona = resultados(page);
+    await expect(zona).toContainText('λ = 2625,9 nm');
+    await expect(zona).toContainText('serie de Brackett');
+    expect(await leerTarjeta(page, 'Energía del fotón ΔE')).toBe('0,472 eV');
+    await expect(nivel(page, PARTIDA, 'Nivel 6')).toHaveAttribute('aria-pressed', 'true');
+    expect(await desborde()).toBeLessThanOrEqual(0);
+  });
+
+  test('HALLAZGO (09/11/2026, ABIERTO) · los rótulos de la tira del espectro salen a 4,5-5,2 px en pantalla', async ({
+    page,
+  }) => {
+    // viewBox de 920 unidades en una tira de ~343 px: escala 0,373. «400 nm»… (12) → 4,5 px y la
+    // marca «656,5 nm» (14) → 5,2 px. Se pide al menos lo que ya da el diagrama de niveles en el
+    // mismo móvil, 9 px (su rótulo de 12 a escala 0,752).
+    test.fail();
+    const tamanos = await page.evaluate(() => {
+      const svg = document.querySelector('section[aria-labelledby="titulo-espectro"] svg') as SVGSVGElement;
+      const escala = svg.getBoundingClientRect().width / svg.viewBox.baseVal.width;
+      return Array.from(svg.querySelectorAll('text')).map((t) => ({
+        texto: t.textContent,
+        px: parseFloat(getComputedStyle(t).fontSize) * escala,
+      }));
+    });
+    expect(tamanos.length).toBeGreaterThan(0);
+    for (const t of tamanos) expect(t.px, `«${t.texto}»`).toBeGreaterThanOrEqual(9);
   });
 });

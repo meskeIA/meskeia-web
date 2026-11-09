@@ -558,3 +558,332 @@ test.describe('Los 7 hallazgos del 18/09/2026, reparados el mismo día', () => {
     await expect(page.locator(AVISO)).toContainText('ocupada por otra aplicación');
   });
 });
+
+/**
+ * ── INSPECCIÓN DE CAMBIO DEL 09/11/2026 ──
+ *
+ * Diff `885242c3..HEAD -- app/luxometro/`: la reparación del 18/09/2026 (señal cruda, nivel
+ * relativo, calibración en «lux por unidad de señal», `data/iluminacion-normativa.ts`), los
+ * tokens de contraste de C0070 y C0014, el `<span>` de C0312 en la escala y `<RelatedApps />`
+ * sin prop. Esperados calculados ANTES de abrir la app:
+ *
+ *   gris 128 → señal round((128/255)^2,2 · 100000) = 21.952 → nivel 50
+ *   gris 192 → señal 53.564 → nivel 75 · gris 255 → señal 100.000 → nivel 100 · gris 0 → 0
+ *   calibrar «1.500» con gris 128 → factor 1500/21.952 → round(21.952 · factor) = 1500 lux
+ *   calibrar «320,4» con gris 128 → 320,4 → round = 320 lux («Interior normal», 200-500)
+ *   RD 486/1997, Anexo IV, cotejado en boe.es (BOE-A-1997-8669) el 09/11/2026: 100 · 200 ·
+ *   500 · 1.000 lx por exigencia de la tarea; 50 · 100 lx en áreas o locales de uso ocasional
+ *   o habitual; 25 · 50 lx en vías de circulación de uso ocasional o habitual.
+ *
+ * Lo SANO del cambio: la calibración lee el formato español y se aplica al bucle en marcha; el
+ * nivel relativo y la cifra calibrada siguen la fórmula; la tabla del RD coincide con el BOE; la
+ * escala de entornos se pinta igual que antes del `<span>` de C0312.
+ */
+test.describe('Cambio del 18/09 al 09/11/2026: lo que está sano', () => {
+  test('CASO 4 · la calibración lee el formato español: «1.500» son 1500 lux y «320,4» son 320', async ({
+    page,
+  }) => {
+    // Con gris 128 la señal es 21.952, así que lux = round(21.952 × referencia / 21.952), que es
+    // la referencia redondeada. Si el punto se leyera como decimal, «1.500» daría 2 lux; si la
+    // coma se descartara, «320,4» daría 3204.
+    await camaraDeLuminancia(page, 'rgb(128,128,128)');
+    await abrirYMedir(page);
+    await expect(page.locator(VALOR)).toHaveText('50');
+
+    await page.getByTitle('Calibrar').click();
+    await esperarHidratacion(page, [CALIBRACION]);
+    await page.locator(CALIBRACION).fill('1.500');
+    await esperarValorEnReact(page, CALIBRACION, '1.500');
+    await page.getByRole('button', { name: 'Calibrar', exact: true }).click();
+    // es-ES no agrupa los millares con cuatro cifras: «1500», no «1.500»
+    await expect(page.locator(VALOR)).toHaveText('1500');
+    await expect(page.locator(UNIDAD)).toHaveText('lux');
+    // [1000, 5000) en LUX_REFERENCES
+    await expect(page.locator(REFERENCIA)).toHaveText('Día muy nublado');
+
+    // Recalibrar no acumula error: el factor se calcula sobre la señal, no sobre la cifra anterior
+    await page.getByTitle('Calibrar').click();
+    await page.locator(CALIBRACION).fill('320,4');
+    await esperarValorEnReact(page, CALIBRACION, '320,4');
+    await page.getByRole('button', { name: 'Calibrar', exact: true }).click();
+    await expect(page.locator(VALOR)).toHaveText('320');
+    await expect(page.locator(REFERENCIA)).toHaveText('Interior normal');
+  });
+
+  test('CASO 5 · la tabla del RD 486/1997 coincide con el Anexo IV del BOE, fila a fila', async ({
+    page,
+  }) => {
+    // Esperado: BOE-A-1997-8669, Anexo IV, apartado 3 (cotejado en boe.es el 09/11/2026).
+    const esperado: Array<[string, string]> = [
+      ['Tareas con bajas exigencias visuales', '100 lx'],
+      ['Tareas con exigencias visuales moderadas', '200 lx'],
+      ['Tareas con exigencias visuales altas', '500 lx'],
+      // es-ES no agrupa cuatro cifras: «1000 lx»
+      ['Tareas con exigencias visuales muy altas', '1000 lx'],
+      ['Áreas o locales de uso ocasional', '50 lx'],
+      ['Áreas o locales de uso habitual', '100 lx'],
+      ['Vías de circulación de uso ocasional', '25 lx'],
+      ['Vías de circulación de uso habitual', '50 lx'],
+    ];
+    await page.goto('/luxometro/');
+    await page.getByRole('button', { name: /Ver guía|guía educativa/i }).first().click();
+    const tabla = page
+      .locator('[class*="comparativaTable"]')
+      .filter({ hasText: 'Vías de circulación de uso habitual' });
+    await expect(tabla).toBeVisible();
+    const filas = await tabla.locator('tbody tr').evaluateAll((trs) =>
+      trs.map((tr) => [
+        (tr.querySelector('td strong')?.textContent ?? '').trim(),
+        (tr.querySelectorAll('td')[1]?.textContent ?? '').replace(/ /g, ' ').trim(),
+      ]),
+    );
+    expect(filas).toEqual(esperado);
+    // Y la regla de duplicar, que es del mismo anexo, va en el pie de la tabla
+    await expect(tabla.locator('caption')).toContainText('se duplican');
+  });
+
+  test('CASO 6 · la escala de entornos se pinta igual tras envolver el texto en <span> (C0312)', async ({
+    page,
+  }) => {
+    // LUX_REFERENCES: la primera va de 0 a 1 («<1 lux») y la octava de 5000 a 10000, que con
+    // es-ES sale «5000 - 10.000 lux» (cuatro cifras sin agrupar, cinco con punto).
+    await page.goto('/luxometro/');
+    const rangos = page.locator('[class*="refCardRange"]');
+    await expect(rangos).toHaveCount(12);
+    expect(await texto(rangos.nth(0))).toBe('<1 lux');
+    expect(await texto(rangos.nth(1))).toBe('1 - 10 lux');
+    expect(await texto(rangos.nth(7))).toBe('5000 - 10.000 lux');
+    expect(await texto(rangos.nth(11))).toBe('100.000 - 150.000 lux');
+  });
+});
+
+/**
+ * Un `AmbientLightSensor` de mentira. Ningún navegador de uso común lo expone sin flag, pero el
+ * código lo intenta PRIMERO, y lo que hace al fallar o al detenerse es parte del diff (el
+ * `setCalibracion(prev => prev ?? 1)` y el `setLecturaCaducada`). `falla: true` imita el
+ * escritorio con el flag de Chrome activado y sin sensor: `start()` va bien y luego llega un
+ * evento «error» (NotReadableError). Sin `falla`, emite lecturas de 320 y 640 lx cada 400 ms y
+ * cuenta las llamadas a `stop()` en `window.__paradasSensor`.
+ */
+async function sensorDeLuz(page: Page, falla: boolean): Promise<void> {
+  await page.addInitScript((romper: boolean) => {
+    const w = window as unknown as Record<string, unknown>;
+    w.__paradasSensor = 0;
+    class SensorFalso extends EventTarget {
+      illuminance: number | null = null;
+      private n = 0;
+      private reloj: number | undefined;
+      start(): void {
+        if (romper) {
+          window.setTimeout(() => this.dispatchEvent(new Event('error')), 30);
+          return;
+        }
+        this.reloj = window.setInterval(() => {
+          this.n += 1;
+          this.illuminance = this.n % 2 ? 320 : 640;
+          this.dispatchEvent(new Event('reading'));
+        }, 400);
+      }
+      stop(): void {
+        window.clearInterval(this.reloj);
+        w.__paradasSensor = (w.__paradasSensor as number) + 1;
+      }
+    }
+    w.AmbientLightSensor = SensorFalso;
+  }, falla);
+}
+
+test.describe('Hallazgos de la inspección de cambio del 09/11/2026', () => {
+  test('HALLAZGO (09/11/2026, ABIERTO) · si el sensor de luz falla y cae a la cámara, vuelve la cifra en lux sin calibrar y con la insignia «Calibrado»', async ({
+    page,
+  }) => {
+    // `tryAmbientLightSensor` pone `setCalibracion(prev => prev ?? 1)` en cuanto el constructor
+    // no lanza, y cuando el sensor emite «error» llama a `startCameraMethod()` sin devolver la
+    // calibración a null. La cámara publica entonces su señal cruda × 1 como lux: con gris 128
+    // salía «21.952 lux · Sombra exterior», «Calibrado», «Calibrado para esta escena» y las
+    // recomendaciones de sunny 16 — el hallazgo 908 entero, por la puerta del sensor.
+    // Esperado (contrato de la reparación del 18/09): nivel 50 «/ 100 (nivel relativo)».
+    test.fail();
+    await camaraDeLuminancia(page, 'rgb(128,128,128)');
+    await sensorDeLuz(page, true);
+    await abrirYMedir(page);
+    await expect(page.locator(INSIGNIA)).toContainText('Cámara', { timeout: 10000 });
+    await expect(page.locator(VALOR)).toHaveText('50', { timeout: 5000 });
+    await expect(page.locator(UNIDAD)).toContainText('nivel relativo');
+    await expect(page.locator(INSIGNIA)).not.toContainText('Calibrado');
+  });
+
+  test('HALLAZGO (09/11/2026, ABIERTO) · «Detener» no para el sensor de luz: la lectura sigue cambiando y «Medición detenida» se borra', async ({
+    page,
+  }) => {
+    // El sensor se crea en una variable local y `stopMeasurement` nunca llama a `stop()`: tras
+    // «Detener» las lecturas siguen llegando, cada una pone `lecturaCaducada` a false y la cifra
+    // alterna 320/640 con el botón «Iniciar Medición» en pantalla. Medido: 0 llamadas a stop();
+    // al volver a iniciar hay dos sensores vivos.
+    test.fail();
+    await sensorDeLuz(page, false);
+    await abrirYMedir(page);
+    await expect(page.locator(INSIGNIA)).toContainText('Sensor de luz');
+    await expect(page.locator(UNIDAD)).toHaveText('lux');
+
+    await detener(page).click();
+    await expect(iniciar(page)).toBeVisible();
+    const congelada = await texto(page.locator(VALOR));
+    await page.waitForTimeout(1500);
+    expect(await page.evaluate(() => (window as unknown as { __paradasSensor: number }).__paradasSensor)).toBe(1);
+    await expect(page.locator('[class*="avisoMedidor"]')).toContainText('Medición detenida');
+    expect(await texto(page.locator(VALOR))).toBe(congelada);
+  });
+
+  test('HALLAZGO (09/11/2026, ABIERTO) · el «Historial (últimos 60 segundos)» guarda 60 fotogramas, alrededor de 1 s', async ({
+    page,
+  }) => {
+    // `setHistory(prev => [...prev.slice(-59), señal])` se ejecuta en cada requestAnimationFrame
+    // (61 por segundo, medido): las 60 barras se llenan en ~1 s. Con gris 192 (nivel 75) durante
+    // 3 s y luego gris 128 (nivel 50), cinco segundos después una ventana de 60 s tiene que
+    // seguir viendo el 75. Medido el 09/11/2026: «Mín: 50 · Máx: 50 · Media: 50».
+    test.fail();
+    await camaraDeLuminancia(page, 'rgb(192,192,192)');
+    await abrirYMedir(page);
+    await expect(page.locator(VALOR)).toHaveText('75');
+    await page.getByRole('button', { name: 'Ver el historial de lecturas' }).click();
+    await expect(page.locator('[class*="historyPanel"] h3')).toContainText('últimos 60 segundos');
+    await page.waitForTimeout(3000);
+
+    await page.evaluate(() => window.__pintarCamara?.('rgb(128,128,128)'));
+    await expect(page.locator(VALOR)).toHaveText('50');
+    await page.waitForTimeout(5000);
+    const estadisticas = page.locator('[class*="historyStats"]');
+    await expect(estadisticas).toContainText('Mín: 50');
+    await expect(estadisticas).toContainText('Máx: 75');
+  });
+
+  test('HALLAZGO (09/11/2026, ABIERTO) · en nivel relativo el historial usa la escala de los lux: la media sale de la señal y las barras se quedan en el 38,7 %', async ({
+    page,
+  }) => {
+    // `enUnidad()` convierte la MEDIA de las señales, no media los niveles: con 2/3 de muestras
+    // a 100 y 1/3 a 0, la media de lo pintado es 67 y la app da round((2/3)^(1/2,2)·100) = 83.
+    // Y la altura de cada barra pasa el nivel 0-100 por `getMeterPercentage`, la escala
+    // logarítmica de 0 a 150.000 lux: un nivel 100 llena log10(101)/log10(150001) = 38,72 % de
+    // la barra mientras el medidor de la misma lectura va al 100 %.
+    test.fail();
+    await camaraDeLuminancia(page, 'rgb(255,255,255)');
+    await abrirYMedir(page);
+    await expect(page.locator(VALOR)).toHaveText('100');
+    await page.getByRole('button', { name: 'Ver el historial de lecturas' }).click();
+    await page.waitForTimeout(1500);
+
+    const medidas = await page.evaluate(() => ({
+      barra: (document.querySelector('[class*="historyBar"]') as HTMLElement | null)?.style.height ?? '',
+      medidor: (document.querySelector('[class*="meterFill"]') as HTMLElement | null)?.style.width ?? '',
+    }));
+    expect(medidas.medidor).toBe('100%');
+    expect(parseFloat(medidas.barra)).toBeCloseTo(100, 0);
+
+    // La media, fotografiada en el mismo fotograma que las barras: k muestras a 100 de n.
+    await page.evaluate(() => window.__pintarCamara?.('rgb(0,0,0)'));
+    const mezcla = await page.evaluate(
+      () =>
+        new Promise<{ n: number; k100: number; media: number }>((resolver, rechazar) => {
+          const limite = window.setTimeout(() => rechazar(new Error('sin mezcla de 100 y 0 en 5 s')), 5000);
+          const mirar = (): void => {
+            const niveles = Array.from(document.querySelectorAll('[class*="historyBar"]')).map((b) =>
+              parseInt(b.getAttribute('title') ?? '', 10),
+            );
+            const k100 = niveles.filter((x) => x === 100).length;
+            const k0 = niveles.filter((x) => x === 0).length;
+            const stats = document.querySelector('[class*="historyStats"]')?.textContent ?? '';
+            const media = /Media:\s*(\d+)/.exec(stats);
+            if (k100 >= 20 && k0 >= 20 && media) {
+              window.clearTimeout(limite);
+              resolver({ n: niveles.length, k100, media: Number(media[1]) });
+            } else {
+              requestAnimationFrame(mirar);
+            }
+          };
+          mirar();
+        }),
+    );
+    expect(mezcla.media).toBe(Math.round((100 * mezcla.k100) / mezcla.n));
+  });
+
+  test('HALLAZGO (09/11/2026, ABIERTO) · una referencia que no se puede leer («500 lx», 0, negativa) se rechaza sin decir nada', async ({
+    page,
+  }) => {
+    // `calibrate()` exige un número finito > 0 y una señal > 0, y si no los tiene RETORNA: no
+    // hay mensaje, ni aria-invalid, ni foco; el panel sigue abierto con lo escrito. «500 lx» es
+    // lo que escribe quien lee la etiqueta «Valor real en lux». Medido el 09/11/2026 con «500 lx»,
+    // «500 lux», «abc», «0», «-5» y con el objetivo tapado (señal 0): ningún aviso.
+    // Esperado: un aviso de la app (role="alert" dentro del medidor, no el anunciador de Next).
+    test.fail();
+    await camaraDeLuminancia(page, 'rgb(128,128,128)');
+    await abrirYMedir(page);
+    await expect(page.locator(VALOR)).toHaveText('50');
+    await page.getByTitle('Calibrar').click();
+    await esperarHidratacion(page, [CALIBRACION]);
+    await page.locator(CALIBRACION).fill('500 lx');
+    await esperarValorEnReact(page, CALIBRACION, '500 lx');
+    await page.getByRole('button', { name: 'Calibrar', exact: true }).click();
+
+    await expect(page.locator(VALOR)).toHaveText('50');
+    await expect(page.locator('[class*="meterPanel"] [role="alert"]')).toBeVisible({ timeout: 3000 });
+  });
+
+  test('HALLAZGO (09/11/2026, ABIERTO) · la FAQ visible responde a «¿es preciso frente a uno profesional?» con el sensor de luz ambiente, y el FAQPage con la cámara', async ({
+    page,
+  }) => {
+    // Es la misma pregunta con dos redacciones. El FAQPage (reescrito el 18/09) explica que la
+    // cámara compensa la exposición y que sin calibrar no hay lux; la FAQ visible, que no se
+    // tocó, sigue hablando de «sensores de luz ambiente […] útiles para estimaciones
+    // orientativas». Esperado: una sola respuesta, la misma en los dos sitios.
+    test.fail();
+    await page.goto('/luxometro/');
+    const respuestaLd = await page.evaluate(() => {
+      for (const s of Array.from(document.querySelectorAll('script[type="application/ld+json"]'))) {
+        const datos = JSON.parse(s.textContent ?? '{}') as {
+          '@type'?: string;
+          mainEntity?: Array<{ name: string; acceptedAnswer: { text: string } }>;
+        };
+        if (datos['@type'] === 'FAQPage') {
+          return datos.mainEntity?.find((q) => q.name.includes('profesional'))?.acceptedAnswer.text ?? '';
+        }
+      }
+      return '';
+    });
+    expect(respuestaLd).toContain('reajusta la exposición');
+
+    await page.getByRole('button', { name: /Ver guía|guía educativa/i }).first().click();
+    const visible = page.locator('[class*="faqItem"]').filter({ hasText: 'comparado con uno profesional' });
+    await expect(visible).toHaveCount(1);
+    await expect(visible).toContainText(respuestaLd);
+  });
+
+  test('HALLAZGO (09/11/2026, ABIERTO) · la FAQ «¿Por qué mi sensor no funciona?» contradice el aviso nuevo sobre Firefox y Chrome', async ({
+    page,
+  }) => {
+    // El aviso del bloque educativo (reescrito el 18/09) dice que AmbientLightSensor «está tras
+    // un flag en Chrome y no existe en Safari ni en Firefox»; la FAQ de la misma página sigue
+    // diciendo «Firefox la soporta con configuración especial; Chrome la soporta en Android con
+    // sensor hardware presente».
+    test.fail();
+    await page.goto('/luxometro/');
+    await page.getByRole('button', { name: /Ver guía|guía educativa/i }).first().click();
+    await expect(page.locator('[class*="warningBox"]')).toContainText('no existe en Safari ni en Firefox');
+    const faq = page.locator('[class*="faqItem"]').filter({ hasText: '¿Por qué mi sensor no funciona' });
+    await expect(faq).toHaveCount(1);
+    await expect(faq).not.toContainText('Firefox la soporta');
+  });
+
+  test('HALLAZGO (09/11/2026, ABIERTO) · las tarjetas sociales siguen prometiendo que «mide» la luz', async ({
+    page,
+  }) => {
+    // La reparación bajó `description` y el `jsonLd` a «Estima la luz […] nivel relativo, y lux
+    // si lo calibras», pero dejó og:description «Mide la luz ambiente con tu móvil o celular» y
+    // twitter:description «Mide la intensidad de luz con tu móvil o celular».
+    test.fail();
+    await page.goto('/luxometro/');
+    await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /^Estima la luz/);
+    await expect(page.locator('meta[property="og:description"]')).not.toHaveAttribute('content', /^Mide/);
+    await expect(page.locator('meta[name="twitter:description"]')).not.toHaveAttribute('content', /^Mide/);
+  });
+});

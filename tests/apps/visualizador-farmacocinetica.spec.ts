@@ -34,6 +34,8 @@ import { esperarHidratacion, sembrarValor, sembrarValorAcotado } from './_hidrat
  * Fuentes: ninguna de las semividas, Vd ni biodisponibilidades de la app trae fuente, y las fichas
  * técnicas (CIMA-AEMPS) y la EMA no están en la lista de dominios del Inspector: no se han podido
  * cotejar; ver el hallazgo «sin fuente».
+ * Desde el 05/11/2026 cima.aemps.es SÍ está en la red de fuentes (la EMA sigue fuera). Con ella se
+ * cotejaron el 09/11/2026 las sospechas del cabo C0644: ver el bloque «cabo C0644», al final.
  */
 
 const URL_APP = '/visualizador-farmacocinetica/';
@@ -417,5 +419,75 @@ test.describe('visualizador-farmacocinetica', () => {
     await page.keyboard.press('ArrowRight');
     await expect(page.getByRole('tab', { name: /Vida media/ })).toHaveAttribute('aria-selected', 'true', { timeout: 2000 });
     await expect(page.getByRole('tabpanel')).toHaveCount(1);
+  });
+
+  // ------------------------------------------------------------------ cabo C0644 (09/11/2026)
+
+  /*
+   * Las cuatro sospechas sin caso de la primera inspección, cotejadas con fuentes de la red:
+   *   (a) fluoxetina y tamoxifeno — ficha técnica de FLUOXETINA CINFA 20 mg CÁPSULAS DURAS EFG
+   *       (CIMA, n.º de registro 63499), sección 4.5; texto revisado en mayo de 2021.
+   *   (b) control de la warfarina — ficha técnica de ALDOCUMAR 5 mg COMPRIMIDOS (CIMA, n.º 63064),
+   *       secciones 4.2 y 4.4; texto revisado en noviembre de 2021.
+   *   (c) «Alcohol: 5–10% se elimina por el aliento» (tarjeta «Vía pulmonar», sección E del ADME) —
+   *       SIN ANCLAR: en CIMA el etanol solo figura como principio activo de uso cutáneo o como
+   *       excipiente (ninguna ficha da su eliminación pulmonar) y no hay otra fuente en la red. No es
+   *       hallazgo y no lleva caso: si la red gana la EMA, el cabo vuelve.
+   *   (d) bioequivalencia — OMS, Technical Report Series n.º 1003 (2017), anexo 6, §7.7 «Acceptance
+   *       ranges» (en www.who.int). La guía de la EMA, que es la que aplica la AEMPS, no está en la red.
+   */
+  test('HALLAZGO (09/11/2026, ABIERTO) [contenido/alto]: la tarjeta de fluoxetina dice que aumenta los niveles de tamoxifeno', async ({ page }) => {
+    test.fail(); // HALLAZGO (09/11/2026, ABIERTO) [contenido/alto] — cabo C0644 (a)
+    // ENTRADA  pestaña «CYP450», tarjeta «Fluoxetina · ISRS · Inhibidor»
+    // ESPERADO lo que dice la ficha técnica de la fluoxetina (4.5): con inhibidores de CYP2D6, «una
+    //          reducción del 65-75% en los niveles plasmáticos de uno de los metabolitos activos más
+    //          importantes del tamoxifeno, el endoxifeno», y la combinación con fluoxetina «debe evitarse
+    //          siempre que sea posible ya que no se puede descartar la posibilidad de la reducción del
+    //          efecto de tamoxifeno»
+    // OBTENIDO «Inhibe CYP2D6 → aumenta niveles de tamoxifeno, tramadol, antipsicóticos», bajo la
+    //          leyenda «Inhibidor — frena el metabolismo → aumenta niveles del fármaco»: el efecto clínico
+    //          sale al revés, porque el tamoxifeno se activa por CYP2D6 (endoxifeno), el mismo mecanismo
+    //          que la app explica con la codeína
+    await page.getByRole('tab', { name: /CYP450/ }).click();
+    const contenido = page.locator('[class*="tabContenido"]');
+    await expect(contenido).toContainText('Fluoxetina');
+    await expect(contenido).not.toContainText(/aumenta (los )?niveles de tamoxifeno/, { timeout: 2000 });
+  });
+
+  test('HALLAZGO (09/11/2026, ABIERTO) [contenido/medio]: la warfarina se controla con «niveles plasmáticos» y no con el INR', async ({ page }) => {
+    test.fail(); // HALLAZGO (09/11/2026, ABIERTO) [contenido/medio] — cabo C0644 (b)
+    // ENTRADA  cuadro «Índice terapéutico y margen de seguridad» (siempre visible), FAQ visible «¿Qué
+    //          significa que un medicamento tenga índice terapéutico estrecho?» y tarjeta «Monitorización
+    //          de IT estrecho» de la guía
+    // ESPERADO ficha técnica de la warfarina, 4.2: «La dosificación debe ajustarse basándose en el valor de
+    //          INR (Indice Internacional Normalizado)»; 4.4: «La determinación periódica del tiempo de
+    //          protrombina (INR) es esencial». La ficha no pide medir la concentración de warfarina
+    // OBTENIDO «warfarina, digoxina, litio, teofilina, ciclosporina— requieren monitorización plasmática
+    //          obligatoria»; «Por eso requieren monitorización periódica de niveles plasmáticos»;
+    //          «Warfarina, litio, digoxina y ciclosporina requieren análisis periódicos de niveles en sangre
+    //          para ajustar dosis». El INR no aparece en ningún punto de la página
+    const textos = await page.locator('p, li').allTextContents();
+    const sobreControl = textos.filter(
+      (t) => /warfarina/i.test(t) && /monitoriz|niveles (plasmáticos|en sangre)|análisis/i.test(t),
+    );
+    const sinInr = sobreControl.filter((t) => !/\bINR\b/.test(t));
+    expect(sinInr, sinInr.join(' ‖ ')).toEqual([]);
+  });
+
+  test('HALLAZGO (09/11/2026, ABIERTO) [contenido/bajo]: la bioequivalencia se da como «F dentro del 80-125%» sin el IC 90 % del cociente', async ({ page }) => {
+    test.fail(); // HALLAZGO (09/11/2026, ABIERTO) [contenido/bajo] — cabo C0644 (d)
+    // ENTRADA  guía educativa: tarjeta «Genéricos y bioequivalencia» y «Errores comunes»
+    // ESPERADO OMS, TRS 1003 (2017), anexo 6, §7.7: «The 90% confidence interval for this measure of
+    //          relative bioavailability should lie within a bioequivalence range of 80.00–125.00%» (AUC),
+    //          el mismo límite «applied to the 90% confidence interval for the mean Cmax ratio», y
+    //          90,00–111,11 % si el principio activo tiene índice terapéutico estrecho
+    // OBTENIDO «Los genéricos deben demostrar bioequivalencia regulada: F dentro del 80-125% del original.
+    //          No son inferiores.» y «el genérico debe demostrar el mismo AUC y Cmax dentro de márgenes
+    //          estrictos (80-125%)»: leído así, un genérico con el 80 % de la exposición del original
+    //          cumpliría, que es justo el malentendido que la propia app quiere desmentir
+    const textos = await page.locator('p, li').allTextContents();
+    const conRango = textos.filter((t) => /80(,00)?\s*[-–]\s*125/.test(t));
+    const sinIntervalo = conRango.filter((t) => !/intervalo de confianza|IC\s*(del\s*)?90/i.test(t));
+    expect(sinIntervalo, sinIntervalo.join(' ‖ ')).toEqual([]);
   });
 });

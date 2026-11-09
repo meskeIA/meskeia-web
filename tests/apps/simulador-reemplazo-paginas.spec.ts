@@ -23,6 +23,12 @@ import { esperarHidratacion, sembrarValor, esperarValorEnReact } from './_hidrat
  *   Clock 3 → 9 · Clock 4 → 10 (con todos los bits a 1 degenera en FIFO: TAMBIÉN tiene la anomalía)
  *   LFU 3 → 10 · LFU 4 → 8
  *
+ * Cabo C0680 (09/11/2026): la cadena por defecto es la del ejemplo «Cadena de Tanenbaum». Frente a
+ * la de 20 referencias 7 0 1 2 0 3 0 4 2 3 0 3 2 1 2 0 1 7 0 1 coincide en 1-12, lleva «0 3» de
+ * más en 13-14 y sigue igual (15-22 = 13-20). Esas dos son aciertos en los tres algoritmos y no
+ * cambian ninguna decisión posterior: la de 20, a mano, da también FIFO 15 · LRU 12 · Optimal 9.
+ * De qué manual sale cada una no se ha podido anclar (sin acceso a las obras): no es hallazgo.
+ *
  * Cadena por defecto 7 0 1 2 0 3 0 4 2 3 0 3 0 3 2 1 2 0 1 7 0 1 (22 referencias), 3 marcos:
  *   FIFO 15 (marcos al final [7, 0, 1]) · LRU 12 · Optimal 9 → eficiencia FIFO 9/15 = 60,0 %.
  *
@@ -304,5 +310,52 @@ test.describe('simulador-reemplazo-paginas', () => {
         .map((el) => el.textContent);
     });
     expect(sueltos).toEqual([]);
+  });
+
+  test('CABO C0680 (a) · el ejemplo de manual carga 22 referencias; con 3 marcos FIFO 15, LRU 12, Optimal 9', async ({
+    page,
+  }) => {
+    // A mano (cabecera): 15/22 = 68,2 % · 12/22 = 54,5 % · 9/22 = 40,9 % · eficiencia LRU 9/12 = 75,0 %
+    await page.getByRole('button', { name: /Tanenbaum|Silberschatz|clásica/i }).click();
+    await expect(page.locator('#cadena')).toHaveValue(POR_DEFECTO);
+    await expect(page.getByText('22 referencias · 6 páginas distintas')).toBeVisible();
+    await expect(page.locator('label[for="marcos"] strong')).toHaveText('3');
+    await page.getByLabel('Comparar todos los algoritmos a la vez').check();
+    const resumen = page.locator('main table').filter({ has: page.locator('th', { hasText: 'Tasa fallos' }) });
+    // El espacio duro del «%» lo vigila el HALLAZGO 4212: aquí se normaliza para mirar solo la cifra
+    const celdas = async (alg: string): Promise<string[]> =>
+      (await resumen.locator('tbody tr').filter({ hasText: alg }).locator('td').allTextContents()).map((t) =>
+        t.replace(/ /g, ' ').trim(),
+      );
+    expect((await celdas('FIFO')).slice(1, 3)).toEqual(['15', '68,2 %']);
+    expect((await celdas('LRU')).slice(1, 5)).toEqual(['12', '54,5 %', '45,5 %', '75,0 %']);
+    expect((await celdas('Optimal')).slice(1, 3)).toEqual(['9', '40,9 %']);
+
+    // La de 20 referencias (sin el «0 3» de 13-14) da los mismos fallos en los tres
+    await fijarCadena(page, '7,0,1,2,0,3,0,4,2,3,0,3,2,1,2,0,1,7,0,1');
+    await expect(page.getByText('20 referencias · 6 páginas distintas')).toBeVisible();
+    const fallos = await fallosComparativa(page);
+    expect([fallos.FIFO, fallos.LRU, fallos.Optimal]).toEqual(['15', '12', '9']);
+    expect((await celdas('FIFO')).slice(1, 3)).toEqual(['15', '75,0 %']); // 15/20
+  });
+
+  test('HALLAZGO C0680 (b1) (ABIERTO) · la FAQ «LRU vs Clock» da «5-10 % de fallos pero 100x menos sobrecarga» sin fuente', async ({
+    page,
+  }) => {
+    test.fail();
+    // Regla 1 de neutralidad (CLAUDE.md §1.quinquies): una cifra presentada como dato lleva fuente y
+    // año, o no se da. Vale cualquiera de las dos reparaciones: sin la cifra, o con el año de su fuente.
+    const parrafos = await page.locator('p').filter({ hasText: /5-10|100x/ }).allTextContents();
+    for (const t of parrafos) expect(t).toMatch(/\b(19|20)\d{2}\b/);
+    const jsonLd = (await page.locator('script[type="application/ld+json"]').allTextContents()).join('\n');
+    expect(jsonLd).not.toMatch(/5-10|100x/); // hoy el FAQPage no la repite
+  });
+
+  test('HALLAZGO C0680 (b2) (ABIERTO) · «Por debajo del 70 % indica algoritmo mediocre» sin fuente', async ({ page }) => {
+    test.fail();
+    // Tarjeta «Compara siempre con Optimal» de Mejores prácticas: un umbral de eficiencia presentado
+    // como criterio, sin fuente ni año. Con él, FIFO (60,0 %) en el ejemplo de manual sería «mediocre».
+    const parrafos = await page.locator('p').filter({ hasText: /\b70[\s ]*%/ }).allTextContents();
+    for (const t of parrafos) expect(t).toMatch(/\b(19|20)\d{2}\b/);
   });
 });

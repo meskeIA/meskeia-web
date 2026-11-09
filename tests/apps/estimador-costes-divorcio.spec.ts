@@ -97,6 +97,33 @@ import { faqJsonLd } from '../../app/estimador-costes-divorcio/metadata';
  *   decir que son libres · 2797 requisito del notarial · 2798 justicia gratuita sin el múltiplo
  *   del IPREM · 2799 duraciones de las FAQ/JSON-LD · 2800 emojis sin aria-hidden · 2801 grupos
  *   sin nombre accesible · 2802 contraste en los dos temas.
+ *
+ * ── Cabo C0130 (comprobado el 09/11/2026: NO se confirma) ─────────────────────────────
+ *   Sospecha: «el mutuo acuerdo sin hijos ante el letrado de la Administración de Justicia
+ *   (CC art. 82.1) quizá no exija procurador; la app lo trata como juzgado con procurador».
+ *   Textos consolidados leídos en boe.es ANTES de mirar la app:
+ *   · CC art. 82.1 (BOE-A-1889-4763), aplicable al divorcio por el art. 87: el convenio se
+ *     formula «ante el letrado de la Administración de Justicia o en escritura pública ante
+ *     Notario» y los cónyuges intervienen «sin perjuicio de que deban estar asistidos por
+ *     letrado en ejercicio». Exige abogado en las dos vías; del procurador no dice nada.
+ *   · LEC art. 777.10 (BOE-A-2000-323): «Si la competencia fuera del letrado de la
+ *     Administración de Justicia por no existir hijos con discapacidad con medidas de apoyo
+ *     atribuidas a sus progenitores ni menores no emancipados, inmediatamente después de la
+ *     ratificación de los cónyuges ante el letrado de la Administración de Justicia, este
+ *     dictará decreto…». La vía del LAJ es el MISMO procedimiento del art. 777 (777.1: «se
+ *     tramitarán por el procedimiento establecido en el presente artículo»).
+ *   · LEC art. 748.3.º: el título se aplica a «Los de nulidad del matrimonio, separación y
+ *     divorcio»; art. 750.1: «las partes actuarán en los procesos a que se refiere este título
+ *     con asistencia de abogado y representadas por procurador»; art. 750.2: «En los
+ *     procedimientos de separación o divorcio solicitado de común acuerdo por los cónyuges,
+ *     éstos podrán valerse de una sola defensa y representación».
+ *   · Ley 15/2015 de la Jurisdicción Voluntaria (BOE-A-2015-7391): su Título III (familia) NO
+ *     regula la separación ni el divorcio; el preámbulo (XI) dice que atribuirlos al LAJ y al
+ *     notario «conllevan una reforma… de la Ley de Enjuiciamiento Civil». Su régimen de
+ *     postulación no es el de este trámite.
+ *   Esperado: sin hijos, vía judicial (LAJ) → abogado Y procurador, uno para los dos; ante
+ *   notario → abogado y sin procurador. La app da eso: procurador 101,94 € compartido
+ *   (70,21 × 1,20 + IVA) en el judicial y «No necesario» en el notarial.
  */
 
 const RUTA = '/estimador-costes-divorcio/';
@@ -346,6 +373,19 @@ test.describe('MOTOR · casos resueltos a mano', () => {
     ).toBe(843.84);
   });
 
+  test('CABO C0130 · sin hijos, la vía del LAJ lleva procurador (LEC 748.3.º y 750.1) y uno para los dos (750.2); el notarial no', () => {
+    const laj = calcular({ ...BASE, tipo: 'mutuo_acuerdo_judicial' });
+    expect(laj.procurador).not.toBeNull();
+    expect(laj.procurador?.total).toBe(101.94);
+    // Un solo procurador para los dos cónyuges: art. 6.1 RD 434/2024, 1 + 2 × 10 %.
+    expect(laj.procurador?.recargo?.factor).toBeCloseTo(1.2, 10);
+    expect(laj.notas).toContain('Un solo abogado y procurador para ambos (coste compartido)');
+    // CC art. 82.1: ante notario basta «letrado en ejercicio».
+    const notarial = calcular({ ...BASE, tipo: 'mutuo_acuerdo_notarial' });
+    expect(notarial.procurador).toBeNull();
+    expect(notarial.abogado.min).toBeGreaterThan(0);
+  });
+
   test('el notarial ignora «hijos» (no cabe) y el presupuesto sustituye a la horquilla', () => {
     const notarialConHijos = calcular({ ...BASE, tipo: 'mutuo_acuerdo_notarial', hijos: true });
     expect(notarialConHijos).toEqual(calcular({ ...BASE, tipo: 'mutuo_acuerdo_notarial' }));
@@ -479,6 +519,29 @@ test('CASO 4 · las pensiones suman la escala del art. 2 sobre una anualidad: pr
   await escribir(page, campoPension(page), '400');
   await estimar(page);
   expect(await partida(page, /Procurador/)).toBe('843,84 €');
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+test('CABO C0130 · mutuo acuerdo sin hijos: ante el LAJ, abogado y UN procurador para los dos (LEC 750 y 777.10); ante notario, sin procurador (CC 82.1)', async ({ page }) => {
+  // Sin hijos, el «Mutuo acuerdo (judicial)» es competencia del letrado de la Administración de
+  // Justicia (LEC 777.10), dentro del proceso de divorcio del título I del libro IV (748.3.º):
+  // abogado y procurador (750.1), que pueden ser uno solo para los dos (750.2).
+  await elegirTipo(page, 'Mutuo acuerdo (judicial)');
+  await elegirHijos(page, false);
+  await elegirComplejidad(page, 'Sin bienes comunes');
+  await estimar(page);
+  const [abogadoMin] = horquilla(await partida(page, /Abogado/));
+  expect(abogadoMin).toBeGreaterThan(0);
+  // 70,21 € (art. 22.1.a RD 434/2024) × 1,20 (art. 6.1) + IVA 21 % = 101,94 €.
+  expect(await partida(page, /Procurador/)).toBe('101,94 €');
+  expect(await notas(page)).toContain('Un solo abogado y procurador para ambos (coste compartido)');
+
+  // Ante notario: «asistidos por letrado en ejercicio» (CC 82.1) y ningún procurador.
+  await elegirTipo(page, 'Mutuo acuerdo (notarial)');
+  await estimar(page);
+  const [abogadoNotarial] = horquilla(await partida(page, /Abogado/));
+  expect(abogadoNotarial).toBeGreaterThan(0);
+  expect(await partida(page, /Procurador/)).toBe('No necesario');
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
