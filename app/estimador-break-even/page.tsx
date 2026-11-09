@@ -642,7 +642,6 @@ export default function CalculadoraBreakEvenPage() {
                   <th>Costes fijos típicos</th>
                   <th>Costes variables principales</th>
                   <th>Margen bruto habitual</th>
-                  <th>Plazo para break-even</th>
                   <th>Indicador clave</th>
                 </tr>
               </thead>
@@ -652,7 +651,6 @@ export default function CalculadoraBreakEvenPage() {
                   <td>Alquiler, personal, suministros</td>
                   <td>Coste de mercancía (COGS)</td>
                   <td>30–50 %</td>
-                  <td>12–24 meses</td>
                   <td>Ventas por m²</td>
                 </tr>
                 <tr>
@@ -660,7 +658,6 @@ export default function CalculadoraBreakEvenPage() {
                   <td>Plataforma, marketing, logística fija</td>
                   <td>Producto, envío, devoluciones</td>
                   <td>20–40 %</td>
-                  <td>6–18 meses</td>
                   <td>Coste de adquisición de cliente (CAC)</td>
                 </tr>
                 <tr>
@@ -668,7 +665,6 @@ export default function CalculadoraBreakEvenPage() {
                   <td>Alquiler, personal, licencias</td>
                   <td>Alimentos y bebidas (food cost)</td>
                   <td>60–70 %</td>
-                  <td>18–36 meses</td>
                   <td>Ticket medio y rotación de mesas</td>
                 </tr>
                 <tr>
@@ -676,7 +672,6 @@ export default function CalculadoraBreakEvenPage() {
                   <td>Desarrollo, infraestructura, ventas</td>
                   <td>Soporte, servidores por usuario</td>
                   <td>70–90 %</td>
-                  <td>6–24 meses</td>
                   <td>MRR y churn rate</td>
                 </tr>
                 <tr>
@@ -684,7 +679,6 @@ export default function CalculadoraBreakEvenPage() {
                   <td>Salarios consultores, oficina, formación</td>
                   <td>Viajes, materiales por proyecto</td>
                   <td>50–70 %</td>
-                  <td>3–12 meses</td>
                   <td>Tasa de utilización (horas facturadas)</td>
                 </tr>
                 <tr>
@@ -692,7 +686,6 @@ export default function CalculadoraBreakEvenPage() {
                   <td>Maquinaria, nave, personal fijo</td>
                   <td>Materias primas, energía, embalaje</td>
                   <td>25–45 %</td>
-                  <td>24–48 meses</td>
                   <td>Coste por unidad producida</td>
                 </tr>
               </tbody>
@@ -807,9 +800,9 @@ export default function CalculadoraBreakEvenPage() {
             <div className={styles.faqItem}>
               <h3>¿Cuánto tiempo es normal tardar en alcanzar el break-even?</h3>
               <p>
-                Depende del sector: una consultoría puede lograrlo en 3–6 meses, mientras que un restaurante
-                o una tienda física puede tardar 18–36 meses. Lo importante no es solo cuándo, sino si el
-                volumen de ventas necesario es alcanzable en tu mercado.
+                No hay un plazo que valga para todos: depende del sector, de la inversión inicial y del volumen
+                de ventas que puedas alcanzar, y varía mucho de un negocio a otro aun dentro del mismo sector.
+                Lo importante no es solo cuándo, sino si el volumen de ventas necesario es alcanzable en tu mercado.
               </p>
             </div>
             <div className={styles.faqItem}>
@@ -820,7 +813,8 @@ export default function CalculadoraBreakEvenPage() {
                 más resistente es tu negocio ante caídas de ventas o imprevistos.
               </p>
               <p className={styles.faqTip}>
-                Se recomienda mantener un margen de seguridad mínimo del 15–20 % para absorber variaciones estacionales.
+                No hay un porcentaje que valga para todos: es un colchón que cada negocio fija según lo que
+                varíen sus ventas (por ejemplo, con la temporada) y el riesgo que pueda asumir.
               </p>
             </div>
             <div className={styles.faqItem}>
@@ -914,7 +908,8 @@ export default function CalculadoraBreakEvenPage() {
                 <p>
                   Facturación mínima = Unidades break-even × Precio de venta (sin IVA).
                   Esta es la cifra de negocio mensual que necesitas alcanzar para cubrir todos tus costes.
-                  Añade un 15 % adicional como margen de seguridad recomendado.
+                  Si quieres un margen de seguridad, fija tu objetivo por encima de esa cifra, tanto como pida
+                  el riesgo de tu negocio.
                 </p>
               </div>
             </div>
@@ -971,10 +966,11 @@ export default function CalculadoraBreakEvenPage() {
             </div>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">🛡️</span>
-              <h3>Añade un 15 % de margen de seguridad</h3>
+              <h3>Añade un margen de seguridad</h3>
               <p>
-                Una vez calculado el break-even, establece tu objetivo de ventas mínimo un 15 % por encima.
-                Este colchón absorbe imprevistos, estacionalidad y errores en las estimaciones.
+                Una vez calculado el break-even, establece tu objetivo de ventas mínimo por encima. Cuánto,
+                lo decide el riesgo de tu negocio: cuanto más varíen tus ventas, mayor colchón. Este colchón
+                absorbe imprevistos, estacionalidad y errores en las estimaciones.
               </p>
             </div>
           </div>

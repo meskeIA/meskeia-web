@@ -406,25 +406,28 @@ test.describe('estimador-break-even', () => {
     expect(normalizar(enLd?.respuesta ?? '')).toBe(normalizar(visible ?? ''));
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · la FAQ da a la tienda física 18–36 meses y la tabla 12–24', async ({
+  test('REPARADO (hallazgo 4322, 09/11/2026) · la guía no da plazos de break-even ni un margen de seguridad en porcentaje sin fuente', async ({
     page,
   }) => {
-    test.fail();
-    const plazos = await page.evaluate(() => {
-      const fila = Array.from(document.querySelectorAll('tr')).find((tr) =>
-        tr.textContent?.includes('Retail físico'),
-      );
-      const celdas = fila ? Array.from(fila.querySelectorAll('td')) : [];
-      const h = Array.from(document.querySelectorAll('h3')).find((n) =>
-        n.textContent?.includes('¿Cuánto tiempo es normal tardar'),
-      );
+    // Antes la tabla daba a la tienda física 12–24 meses y la FAQ 18–36 (consultoría 3–12 frente
+    // a 3–6), y el margen de seguridad era «mínimo del 15–20 %» en la FAQ y «15 %» en el paso 7
+    // y el consejo, sin fuente. Decidido por el usuario el 09/11/2026 (cabo C0695): fuera las
+    // cifras; el plazo depende del sector y el colchón lo fija cada negocio según su riesgo.
+    const guia = await page.evaluate(() => {
+      const cabeceras = Array.from(document.querySelectorAll('th')).map((th) => th.textContent?.trim() ?? '');
+      const fila = Array.from(document.querySelectorAll('tr')).find((tr) => tr.textContent?.includes('Retail físico'));
       return {
-        tabla: celdas[4]?.textContent?.trim() ?? null,
-        faq: (h?.nextElementSibling?.textContent ?? '').replace(/\s+/g, ' '),
+        cabeceras,
+        celdasRetail: fila ? fila.querySelectorAll('td').length : 0,
+        texto: (document.body.textContent ?? '').replace(/\s+/g, ' '),
       };
     });
-    expect(plazos.tabla).not.toBeNull();
-    const m = plazos.faq.match(/tienda física puede tardar ([\d–-]+) meses/);
-    if (m) expect(`${m[1]} meses`).toBe(plazos.tabla);
+    expect(guia.cabeceras).not.toContain('Plazo para break-even');
+    expect(guia.celdasRetail).toBe(5); // la fila sigue cuadrando con sus cinco columnas
+    expect(guia.texto).toContain('¿Cuánto tiempo es normal tardar en alcanzar el break-even?');
+    expect(guia.texto.match(/\d+\s*[–-]\s*\d+\s+meses/g) ?? []).toEqual([]);
+    // El ejemplo calculado de la FAQ («50 unidades (25 %)») se queda: es una cuenta, no una recomendación.
+    expect(guia.texto.match(/mínimo del \d+/g) ?? []).toEqual([]);
+    expect(guia.texto.match(/un \d+\s*%\s*(?:adicional|de margen|por encima)/g) ?? []).toEqual([]);
   });
 });
