@@ -808,8 +808,19 @@
     grid-template-columns: 1fr;
   }
 
+  /* Márgenes de papel en mm: con los de pantalla, 3 cartones 5×5 cabían y el pie saltaba solo
+     a una segunda hoja en blanco */
   .tituloHoja {
     font-size: 5.5mm;
+    margin: 0 0 1.5mm;
+  }
+
+  .reglaHoja {
+    margin-bottom: 4mm;
+  }
+
+  .pieHoja {
+    margin-top: 3mm;
   }
 
   .reglaHoja,
@@ -828,6 +839,31 @@
 
   .emojiCasilla {
     font-size: 5.5mm;
+  }
+
+  /* El 5×5 a 14 mm dejaba 2 cartones por hoja y un tercio en blanco (13 hojas para 25 cartones).
+     A 12 mm, con el dibujo y el relleno algo más justos, caben 3 (decidido el 09/11/2026). */
+  .cartonesAltos {
+    --alto-casilla: 12mm;
+    gap: 4mm;
+  }
+
+  .cartonesAltos .carton {
+    padding: 2.5mm 3mm;
+  }
+
+  .cartonesAltos .cartonCabecera {
+    margin-bottom: 1.5mm;
+  }
+
+  .cartonesAltos .casilla {
+    padding: 0.5mm;
+    line-height: 1.05;
+  }
+
+  .cartonesAltos .emojiCasilla {
+    font-size: 4.6mm;
+    line-height: 1.1;
   }
 
   /* En papel los cartones de 5 y 6 columnas van uno por fila, a todo el ancho: su casilla ya no

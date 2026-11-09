@@ -114,6 +114,29 @@ test.describe('bingo-personalizado', () => {
     expect(tamanos.cortas).toEqual(tamanos.medias);
   });
 
+  test('impresión: los cartones 5×5 de animales caben a 3 por hoja A4', async ({ page }) => {
+    await abrir(page);
+    await page.getByRole('button', { name: 'Animales', exact: true }).click();
+    await page.getByRole('button', { name: '5×5', exact: true }).click();
+    await page.getByRole('slider').fill('3');
+    await expect(page.getByText('Número de cartones: 3')).toBeVisible();
+    await generarConPartida(page, '7');
+    await expect(page.getByRole('table')).toHaveCount(3);
+
+    // Con la casilla a 14 mm, el título y 3 cartones no cabían en la primera hoja: salían 2
+    const pdf = await page.pdf({ format: 'A4' });
+    const hojas = (pdf.toString('latin1').match(/\/Type\s*\/Page(?!s)/g) ?? []).length;
+    expect(hojas).toBe(1);
+
+    // Y la casilla no se estira por su contenido (dibujo + palabra caben en los 12 mm)
+    await page.emulateMedia({ media: 'print' });
+    const altos = await carton1(page).locator('td').evaluateAll((celdas) =>
+      celdas.map((td) => td.getBoundingClientRect().height),
+    );
+    const mm12 = (12 * 96) / 25.4;
+    for (const alto of altos) expect(alto).toBeLessThan(mm12 + 1.5);
+  });
+
   test('partida de números: la letra grande se mantiene', async ({ page }) => {
     await abrir(page);
     await generarConPartida(page, '5');

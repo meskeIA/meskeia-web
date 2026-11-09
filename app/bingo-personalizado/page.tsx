@@ -533,7 +533,11 @@ export default function BingoPersonalizadoPage() {
           </h2>
           <p className={styles.reglaHoja}>{reglaGanar}</p>
 
-          <div className={`${styles.rejillaCartones} ${columnasHoja}`}>
+          <div
+            className={`${styles.rejillaCartones} ${columnasHoja} ${
+              partida.tamano.filas >= 5 ? styles.cartonesAltos : ''
+            }`}
+          >
             {partida.cartones.map((carton) => (
               <div key={carton.numero} className={`${styles.carton} ${impresion.bloque}`}>
                 <div className={styles.cartonCabecera}>
