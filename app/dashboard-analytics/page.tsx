@@ -6,6 +6,7 @@ import type { inferRouterOutputs } from '@trpc/server';
 import styles from './DashboardAnalytics.module.css';
 import { MeskeiaLogo, LegalNotice } from '@/components';
 import { trpc } from '@/lib/trpc';
+import { formatNumber, formatPercentage } from '@/lib/formatters';
 import type { AppRouter } from '@/server/routers/_app';
 
 // Importar Chart.js
@@ -1984,135 +1985,137 @@ function DashboardContent({ onAuthError }: { onAuthError: () => void }) {
       {tabActiva === 'navegacion' && (
         <div className={styles.tabContent}>
           <section className={styles.section}>
-            <h2 className={styles.sectionTitle}><span aria-hidden="true">🧭</span> Motor de descubrimiento interno</h2>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '1rem' }}>
-              Lo que esta página mide y ninguna otra: los clics <code>?from=</code> de navegación entre apps
-              (descubrimiento interno) y los saltos cross-dominio meskeIA ↔ verticales. Es la <strong>única palanca de
-              crecimiento endógena</strong> — la que sí controlas, frente a Google/Bing/IA que son exógenos.
-              Ventana: últimos {navegacionQuery.data?.ventanaDias ?? 30} días — <strong>la misma que el digest</strong>,
-              para comparar sin conversión. Excluye bots, MCP y Mi IP.
-            </p>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '1rem' }}>
-              La <strong>lectura diaria</strong> de estas métricas (absoluto + tendencia + avisos de corte de
-              instrumentación) la hace <code>/digest-diario</code>; esta pestaña es el <strong>desglose por canal</strong>{' '}
-              para investigar cuando el digest marca algo.
-            </p>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem', marginBottom: '1.5rem', background: 'var(--bg-primary)', borderLeft: '3px solid var(--primary)', padding: '0.75rem 1rem', borderRadius: '0 6px 6px 0' }}>
-              <strong>Por qué el clic <code>?from=</code> y no «apps por sesión».</strong> El <code>sesion_id</code> no
-              sobrevive a los saltos en webviews in-app (app de Google, ChatGPT, redes) ni a las aperturas en pestaña nueva,
-              así que las métricas de sesión <strong>infravaloran</strong> el descubrimiento. El clic <code>?from=</code> lo
-              cuenta directo, sobreviva o no la sesión. Se lee en <strong>absoluto y tendencia, sin suelos</strong>.
+            <h2 className={styles.sectionTitle}><span aria-hidden="true">🧭</span> Navegación entre apps</h2>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem', marginBottom: '1.5rem' }}>
+              Clics <code>?from=</code> que llevan de una app de meskeIA a otra: la única palanca de crecimiento que
+              controlas tú, frente a buscadores e IA. Se cuentan por el clic y no por la sesión, porque el{' '}
+              <code>sesion_id</code> se pierde en las webviews y en las pestañas nuevas. Últimos{' '}
+              {navegacionQuery.data?.ventanaDias ?? 30} días, con <strong>la misma definición que la sección 9 del digest
+              semanal</strong>: los saltos a los portales van aparte. Excluye bots, MCP y Mi IP.
             </p>
 
             {navegacionQuery.isLoading && <p><span aria-hidden="true">⏳</span> Cargando análisis de navegación…</p>}
             {navegacionQuery.error && <p style={{ color: '#dc2626' }}>Error: {navegacionQuery.error.message}</p>}
-            {navegacionQuery.data && (
-              <>
-                {/* KPIs — Descubrimiento interno protagonista + Contexto refundido */}
-                <div className={styles.statsGrid} style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))' }}>
-                  {/* Card protagonista — pulso en 3 ventanas */}
-                  <div className={`${styles.statCard} ${styles.highlight}`}>
-                    <div className={styles.statContent} style={{ width: '100%' }}>
-                      <h3 style={{ marginBottom: '2px' }}><span aria-hidden="true">🎯</span> Descubrimiento interno</h3>
-                      <small style={{ opacity: 0.9 }}>clics <code>?from=</code> que llevan a una 2ª app · % = de las visitas de esa ventana</small>
-                      <div style={{ display: 'flex', gap: '8px', margin: '14px 0 10px' }}>
-                        {([
-                          { label: 'Hoy (24 h)', w: navegacionQuery.data.descubrimientoInterno.ventanas.hoy },
-                          { label: '7 días', w: navegacionQuery.data.descubrimientoInterno.ventanas.semana },
-                          { label: '30 días', w: navegacionQuery.data.descubrimientoInterno.ventanas.ventana, ref: true },
-                        ]).map((v) => (
-                          <div key={v.label} style={{
-                            flex: 1, textAlign: 'center', padding: '10px 4px', borderRadius: '10px',
-                            background: v.ref ? 'rgba(255,255,255,0.22)' : 'rgba(255,255,255,0.12)',
-                          }}>
-                            <div style={{ fontSize: '0.72rem', textTransform: 'uppercase', letterSpacing: '0.03em', opacity: 0.9 }}>{v.label}</div>
-                            <div style={{ fontSize: '2.1rem', fontWeight: 700, lineHeight: 1.1, margin: '2px 0' }}>{v.w.pct}%</div>
-                            <div style={{ fontSize: '0.8rem', opacity: 0.85 }}>{v.w.clics} clics</div>
+            {navegacionQuery.data && (() => {
+              const nav = navegacionQuery.data;
+              const interno = nav.descubrimientoInterno;
+              const semana = interno.ventanas.semana;
+              // Qué es cada canal (lib/trackingFrom.ts). Lo que no está aquí sale con su nombre crudo.
+              const CANALES: Record<string, string> = {
+                related: 'Tarjetas «apps relacionadas» al pie de cada app',
+                'home-search': 'Buscador de la portada',
+                'sidebar-recent': '«Apps visitadas» de la barra lateral: alguien que vuelve',
+                'home-daily': '«Apps del día» de la portada',
+                'home-related-suite': 'Suite destacada de la portada',
+                catalog: 'Catálogo /apps/',
+                'catalog-guides': 'Pestaña «Guías» del catálogo: lleva a una guía, no a una app',
+                otro: 'Residual: valores de from sin canal conocido',
+              };
+              const canales = Object.entries(interno.porCategoria).sort((a, b) => b[1] - a[1]);
+              const oculto = { position: 'absolute', width: 1, height: 1, overflow: 'hidden', clip: 'rect(0 0 0 0)', whiteSpace: 'nowrap' } as const;
+              return (
+                <>
+                  <div className={styles.statsGrid} style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))' }}>
+                    <div className={`${styles.statCard} ${styles.highlight}`}>
+                      <div className={styles.statContent} style={{ width: '100%' }}>
+                        <h3 style={{ marginBottom: '2px' }}><span aria-hidden="true">🎯</span> Descubrimiento interno</h3>
+                        <div style={{ fontSize: '2.4rem', fontWeight: 700, lineHeight: 1.1, margin: '10px 0 2px' }}>
+                          {formatNumber(interno.total, 0)} clics
+                        </div>
+                        <div style={{ opacity: 0.9 }}>
+                          {formatPercentage(interno.pctDeVisitas / 100, 1)} de {formatNumber(nav.kpis.totalVisitas, 0)} visitas en {nav.ventanaDias} días
+                        </div>
+                        <div style={{ marginTop: '10px', padding: '8px 10px', borderRadius: '8px', background: 'rgba(255,255,255,0.15)' }}>
+                          Últimos 7 días: <strong>{formatNumber(semana.clics, 0)} clics</strong> · {formatPercentage(semana.pct / 100, 1)} de las visitas
+                        </div>
+                        <small style={{ display: 'block', marginTop: '10px', opacity: 0.9 }}>
+                          Léelo por el <strong>absoluto</strong>: el % baja también cuando crece la entrada desde buscadores, que es buena noticia.
+                        </small>
+                      </div>
+                    </div>
+
+                    <div className={styles.statCard}>
+                      <div style={{ width: '100%' }}>
+                        <h3 style={{ marginBottom: '10px', fontSize: '1rem' }}><span aria-hidden="true">🔀</span> Saltos a los portales</h3>
+                        {[
+                          { label: 'meskeIA → portales', valor: nav.crossDominio.aVertical, sub: `${formatNumber(nav.crossDominio.aVerticalPorMil, 1)} por cada 1.000 visitas · banda «Descubre» de las apps` },
+                          { label: 'portales → meskeIA', valor: nav.crossDominio.portalAMeskeia, sub: 'enlaces de vuelta desde Stemum, Cronicum, Coquinum y Delegum' },
+                        ].map((fila) => (
+                          <div key={fila.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: '12px', padding: '6px 0', borderBottom: '1px solid var(--border)' }}>
+                            <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>{fila.label}<span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-muted)' }}>{fila.sub}</span></span>
+                            <strong style={{ fontSize: '1.15rem', color: 'var(--text-primary)' }}>{formatNumber(fila.valor, 0)}</strong>
                           </div>
                         ))}
+                        <small style={{ display: 'block', marginTop: '10px', color: 'var(--text-muted)', lineHeight: 1.4 }}>
+                          No cuentan como descubrimiento interno: miden si la marca madre lleva visitas a los portales.
+                        </small>
                       </div>
-                      <small style={{ opacity: 0.9 }}>
-                        Tasa = clics de descubrimiento ÷ visitas de la ventana. Se lee la <strong>dirección</strong> (30 días = referencia, la ventana del digest), sin suelos ni alarmas.
-                      </small>
                     </div>
                   </div>
 
-                  {/* Card contexto — refunde las 5 métricas heredadas */}
-                  <div className={styles.statCard}>
-                    <div style={{ width: '100%' }}>
-                      <div style={{ fontSize: '0.8rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.03em', color: 'var(--text-muted)', marginBottom: '10px' }}>
-                        Composición del descubrimiento (30 días)
-                      </div>
-                      {[
-                        { label: 'Visitas de la ventana', value: navegacionQuery.data.kpis.totalVisitas.toLocaleString('es-ES'), sub: 'denominador' },
-                        { label: 'Clics de descubrimiento', value: navegacionQuery.data.descubrimientoInterno.total.toLocaleString('es-ES'), sub: `${navegacionQuery.data.descubrimientoInterno.pctDeVisitas}% de las visitas` },
-                        { label: '— vía RelatedApps', value: (navegacionQuery.data.descubrimientoInterno.porCategoria['related'] || 0).toLocaleString('es-ES'), sub: 'palanca que curas a mano' },
-                        { label: '— meskeIA → verticales', value: (navegacionQuery.data.descubrimientoInterno.porCategoria['a-vertical'] || 0).toLocaleString('es-ES'), sub: 'marca madre empujando' },
-                        { label: '— verticales → meskeIA', value: (navegacionQuery.data.descubrimientoInterno.porCategoria['portal-a-meskeia'] || 0).toLocaleString('es-ES'), sub: 'retorno de los portales' },
-                      ].map((row) => (
-                        <div key={row.label} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', padding: '6px 0', borderBottom: '1px solid var(--border)' }}>
-                          <span style={{ fontSize: '0.9rem', color: 'var(--text-secondary)' }}>{row.label}<span style={{ display: 'block', fontSize: '0.72rem', color: 'var(--text-muted)' }}>{row.sub}</span></span>
-                          <strong style={{ fontSize: '1.15rem', color: 'var(--text-primary)' }}>{row.value}</strong>
-                        </div>
-                      ))}
-                      <small style={{ display: 'block', marginTop: '10px', color: 'var(--text-muted)', lineHeight: 1.4 }}>
-                        Todo en <strong>absoluto</strong>. El cross-dominio (meskeIA ↔ verticales) no aparece en ninguna otra pestaña:
-                        es el termómetro de si la marca madre alimenta a los portales por dentro.
-                      </small>
-                    </div>
+                  <h3 style={{ marginTop: '2rem', fontSize: '1.05rem' }}>Por canal, y su evolución semana a semana</h3>
+                  <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '0.75rem' }}>
+                    De dónde salió cada clic. Las cuatro columnas de la derecha son semanas de 7 días hasta hoy, de la más antigua a
+                    la más reciente: un canal que se dispara en una sola semana se ve aquí y no en el total de 30 días.
+                  </p>
+                  <div className={styles.tableContainer}>
+                    <table className={styles.table}>
+                      <thead>
+                        <tr>
+                          <th>Canal</th>
+                          <th style={{ textAlign: 'right' }}>{nav.ventanaDias} días</th>
+                          <th style={{ textAlign: 'right' }}>% del interno</th>
+                          {nav.semanas.map((s) => (
+                            <th key={s.desde} style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>{s.desde}–{s.hasta}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {canales.map(([canal, clics]) => (
+                          <tr key={canal}>
+                            <td>
+                              <code>{canal}</code>
+                              <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-muted)' }}>{CANALES[canal] ?? 'Canal sin descripción'}</span>
+                            </td>
+                            <td style={{ textAlign: 'right' }}><strong>{formatNumber(clics, 0)}</strong></td>
+                            <td style={{ textAlign: 'right' }}>{formatPercentage(interno.total > 0 ? clics / interno.total : 0, 1)}</td>
+                            {nav.semanas.map((s) => {
+                              const conc = s.concentradas[canal];
+                              return (
+                                <td key={s.desde} style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
+                                  {formatNumber(s.porCategoria[canal] ?? 0, 0)}
+                                  {conc && (
+                                    // position: relative: sin él, el texto oculto (absolute) se sale del
+                                    // contenedor con scroll y ensancha la página entera en móvil
+                                    <span style={{ position: 'relative' }} title={`Una sola IP${conc.pais ? ` (${conc.pais})` : ''} aporta el ${conc.pctIp} % de estos clics`}>
+                                      {' '}<span aria-hidden="true">⚑</span>
+                                      <span style={oculto}>{`, una sola IP${conc.pais ? ` de ${conc.pais}` : ''} aporta el ${conc.pctIp} %`}</span>
+                                    </span>
+                                  )}
+                                </td>
+                              );
+                            })}
+                          </tr>
+                        ))}
+                        <tr>
+                          <td><strong>Total interno</strong></td>
+                          <td style={{ textAlign: 'right' }}><strong>{formatNumber(interno.total, 0)}</strong></td>
+                          <td style={{ textAlign: 'right' }}>{formatPercentage(1, 0)}</td>
+                          {nav.semanas.map((s) => (
+                            <td key={s.desde} style={{ textAlign: 'right' }}><strong>{formatNumber(s.total, 0)}</strong></td>
+                          ))}
+                        </tr>
+                      </tbody>
+                    </table>
                   </div>
-                </div>
-
-                {/* Desglose del descubrimiento interno por origen */}
-                <h3 style={{ marginTop: '2rem', fontSize: '1.05rem' }}>
-                  Descubrimiento interno por origen del clic
-                </h3>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '0.75rem' }}>
-                  De dónde salió cada clic que llevó a una segunda app: <code>related</code> (RelatedApps),
-                  <code>sidebar-recent</code>, <code>home-daily</code>, <code>catalog</code>, <code>search</code>.
-                  Y los saltos cross-dominio: <code>meskeIA → vertical</code> (marca madre empujando a los portales)
-                  y <code>portal → meskeIA</code>. El cajón <code>otro</code> queda ya como residual (bots / <code>from=</code> espurios).
-                </p>
-                <div className={styles.tableContainer}>
-                  <table className={styles.table}>
-                    <thead>
-                      <tr>
-                        <th>Origen del clic</th>
-                        <th style={{ textAlign: 'right' }}>Clics</th>
-                        <th style={{ textAlign: 'right' }}>%</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {Object.entries(navegacionQuery.data.descubrimientoInterno.porCategoria)
-                        .sort((a, b) => b[1] - a[1])
-                        .map(([origen, clics]) => {
-                          const tot = navegacionQuery.data!.descubrimientoInterno.total;
-                          const pct = tot > 0 ? (clics / tot) * 100 : 0;
-                          const ETIQUETAS_ORIGEN: Record<string, string> = {
-                            'a-vertical': 'meskeIA → vertical',
-                            'portal-a-meskeia': 'portal → meskeIA',
-                          };
-                          const etiqueta = ETIQUETAS_ORIGEN[origen] || origen;
-                          return (
-                            <tr key={origen}>
-                              <td><code>{etiqueta}</code></td>
-                              <td style={{ textAlign: 'right' }}><strong>{clics}</strong></td>
-                              <td style={{ textAlign: 'right' }}>{pct.toFixed(1)}%</td>
-                            </tr>
-                          );
-                        })}
-                    </tbody>
-                  </table>
-                </div>
-
-                {/* El «detalle forense» (transiciones + puente/puerta) se retiró el 21/08/2026:
-                    las transiciones estaban dominadas por falsos `prev:X → X` (recargas — el
-                    fallback prev: no filtraba la misma app) y puente/puerta respondía, con el
-                    orden de sesión que los webviews fragmentan, a una pregunta ya cerrada
-                    (app de un golpe = puerta ES el producto funcionando). Una transición
-                    concreta se consulta en el dump. */}
-              </>
-            )}
+                  <p style={{ color: 'var(--text-muted)', fontSize: '0.8rem', marginTop: '0.5rem' }}>
+                    <span aria-hidden="true">⚑</span> Esa semana, una sola IP aporta el 40 % o más de los clics del canal (con 10 o más).
+                    Suele ser una clase entera tras la red de su centro: léelo como un evento, no como una tendencia. Pasa el ratón
+                    por encima para ver el país.
+                  </p>
+                </>
+              );
+            })()}
           </section>
         </div>
       )}

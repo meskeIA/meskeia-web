@@ -839,8 +839,10 @@ export const analyticsRouter = router({
 
   /**
    * Procedure: getNavegacion
-   * Desglose EN VIVO del descubrimiento interno (clics ?from= entre apps y
-   * saltos cross-dominio meskeIA ↔ verticales). Es la herramienta de
+   * Desglose EN VIVO del descubrimiento interno (clics ?from= entre apps) y,
+   * APARTE, de los saltos cross-dominio meskeIA ↔ verticales (09/11/2026: hasta
+   * entonces se sumaban al interno y la vista no cuadraba con el digest), con
+   * el reparto por canal de las 4 últimas semanas. Es la herramienta de
    * investigación cuando el digest marca algo raro en un canal; la lectura
    * diaria protegida (absoluto + Δ7d + racha + avisos de corte) la hace
    * /digest-diario, no esta vista.
@@ -882,11 +884,11 @@ export const analyticsRouter = router({
       const ahora = ahoraMadrid();
       const limite = new Date(ahora);
       limite.setDate(limite.getDate() - input.dias);
-      // Sub-ventanas anidadas para el pulso del descubrimiento interno: 24 h y 7 días
+      // Sub-ventana de 7 días para el pulso del descubrimiento interno. La de 24 h se retiró
+      // el 09/11/2026: un día suelto es lo que lee /digest-diario, y aquí solo metía ruido.
       const limite7 = new Date(ahora); limite7.setDate(limite7.getDate() - 7);
-      const limite1 = new Date(ahora); limite1.setDate(limite1.getDate() - 1);
-      // Contadores de clics ?from= y visitas por sub-ventana (24 h / 7 d); la ventana completa reutiliza los totales
-      let visitas24h = 0, visitas7d = 0, clics24h = 0, clics7d = 0;
+      // Visitas y clics INTERNOS de la sub-ventana de 7 días
+      let visitas7d = 0, clics7d = 0;
 
       // Cargar visitas relevantes ordenadas por sesión y momento.
       // Excluimos bot, mcp y mi-ip ya en SQL, y ACOTAMOS por fecha en SQL
@@ -895,7 +897,7 @@ export const analyticsRouter = router({
       // El corte fino por hora exacta se mantiene en JS (limite incluye la hora).
       const limiteOrd = `${limite.getFullYear()}${String(limite.getMonth() + 1).padStart(2, '0')}${String(limite.getDate()).padStart(2, '0')}`;
       const result = await client.execute({
-        sql: `SELECT id, aplicacion, sesion_id, modo, datos_adicionales, ip_address, timestamp
+        sql: `SELECT id, aplicacion, sesion_id, modo, datos_adicionales, ip_address, pais, timestamp
               FROM uso_aplicaciones
               WHERE sesion_id IS NOT NULL AND sesion_id != ''
                 AND modo NOT IN ('bot', 'mcp')
@@ -915,9 +917,49 @@ export const analyticsRouter = router({
         );
       };
 
-      // Estructura: agrupar por sesion_id manteniendo orden
+      // Categoría de un `from`. Los saltos cross-dominio NO son descubrimiento interno desde
+      // el 05/08/2026 (lo decidió el digest, que los sacó ese día de su sección 9). Hasta el
+      // 09/11/2026 esta vista los seguía sumando al total, así que decía 4.172 clics y 8 %
+      // donde el digest decía 3.423 y 6,7 %, y su cabecera prometía «comparar sin conversión».
+      // Portales verticales que emiten `?from=<portal>` al enlazar de vuelta a meskeIA.
+      const PORTALES_VERTICALES = ['delegum', 'cronicum', 'stemum', 'coquinum'];
+      // Canales internos con nombre propio (lib/trackingFrom.ts). `search` era el modal
+      // Ctrl+K, retirado el 19/09/2026: si reapareciera caería en `otro`, que es lo correcto.
+      const CANALES_INTERNOS = ['home-search', 'home-daily', 'home-related-suite', 'sidebar-recent', 'catalog', 'catalog-guides'];
+      const categoriaDe = (from: string): string => {
+        if (from.startsWith('related-')) return 'related';
+        if (CANALES_INTERNOS.includes(from)) return from;
+        // `meskeia` (cards de portal) y `meskeia-<modulo>` (app del catálogo ya migrada a un
+        // vertical, ver lib/trackingFrom.ts): salidas de meskeIA hacia un portal.
+        if (from === 'meskeia' || from.startsWith('meskeia-')) return 'a-vertical';
+        if (PORTALES_VERTICALES.includes(from)) return 'portal-a-meskeia';
+        return 'otro';
+      };
+      const esCrossDominio = (cat: string) => cat === 'a-vertical' || cat === 'portal-a-meskeia';
+
+      // Cuatro semanas de 7 días hacia atrás desde ahora (0 = la última). Es lo que dejó ver
+      // el 09/11/2026 que el buscador de la portada se había doblado en una semana por UNA
+      // clase de Perú: el total de 30 días no lo enseñaba y hubo que ir al dump.
+      const N_SEMANAS = 4;
+      const MS_DIA = 86400000;
+      const semanaDe = (fecha: Date): number => {
+        const k = Math.floor((ahora.getTime() - fecha.getTime()) / (7 * MS_DIA));
+        return k >= 0 && k < N_SEMANAS ? k : -1;
+      };
+      type Semana = { total: number; porCategoria: Record<string, number>; ips: Map<string, Map<string, number>> };
+      const semanas: Semana[] = Array.from({ length: N_SEMANAS }, () => ({ total: 0, porCategoria: {}, ips: new Map() }));
+      const paisDeIp = new Map<string, string>();
+
+      // Agrupar por sesion_id manteniendo orden
       type Visita = { app: string; from: string | null; modo: string };
       const sesiones = new Map<string, Visita[]>();
+      let totalVisitas = 0;
+      // Descubrimiento interno: cada clic de navegación entre apps por el atributo ?from=,
+      // INDEPENDIENTEMENTE de si la sesión se fragmenta (el sesion_id no sobrevive a los
+      // saltos en webviews in-app ni a las aperturas en pestaña nueva).
+      let clicsInternos = 0;
+      const clicsPorCategoria: Record<string, number> = {};
+      const cross = { aVertical: 0, portalAMeskeia: 0 };
 
       for (const row of result.rows) {
         const ts = String(row.timestamp || '');
@@ -936,70 +978,80 @@ export const analyticsRouter = router({
           }
         } catch { /* ignorar */ }
 
-        // Pulso por sub-ventana (ventanas anidadas: 24 h ⊂ 7 d ⊂ 14 d)
-        if (fecha >= limite1) { visitas24h++; if (from) clics24h++; }
-        if (fecha >= limite7) { visitas7d++; if (from) clics7d++; }
-
+        totalVisitas++;
         if (!sesiones.has(sesionId)) sesiones.set(sesionId, []);
         sesiones.get(sesionId)!.push({ app, from, modo });
-      }
 
-      // KPIs globales
-      const totalSesiones = sesiones.size;
-      let totalVisitas = 0;
+        const cat = from ? categoriaDe(from) : null;
+        const interno = cat !== null && !esCrossDominio(cat);
+        if (fecha >= limite7) { visitas7d++; if (interno) clics7d++; }
+        if (cat === null) continue;
+        if (cat === 'a-vertical') { cross.aVertical++; continue; }
+        if (cat === 'portal-a-meskeia') { cross.portalAMeskeia++; continue; }
 
-      // Descubrimiento interno (KPI honesto): cuenta cada clic de navegación entre apps
-      // a través del atributo ?from=, INDEPENDIENTEMENTE de si la sesión se fragmenta.
-      // apps/sesión infravalora este dato porque el sesion_id no sobrevive a los saltos
-      // en webviews in-app (app de Google, ChatGPT, redes) ni a las aperturas en pestaña nueva.
-      let clicsInternos = 0;
-      const clicsPorCategoria: Record<string, number> = {};
-      // Portales verticales que emiten `?from=<portal>` al enlazar de vuelta a meskeIA.
-      const PORTALES_VERTICALES = ['delegum', 'cronicum', 'stemum', 'coquinum'];
-      const categoriaDe = (from: string): string => {
-        if (from.startsWith('related-')) return 'related';
-        // `home-search` = buscador de la portada (AsistenteChat); `search` = modal
-        // Ctrl+K del header de las páginas estáticas. Son superficies distintas.
-        if (['home-daily', 'sidebar-recent', 'catalog', 'catalog-guides', 'search', 'home-search'].includes(from)) return from;
-        // Saltos cross-dominio (antes caían todos en "otro"):
-        // `meskeia` (cards de portal) y `meskeia-<modulo>` (app del catálogo ya
-        // migrada a un vertical, p.ej. una cronología abierta desde "Apps del día":
-        // ver lib/trackingFrom.ts). Ambos son salidas de meskeIA hacia un portal.
-        if (from === 'meskeia' || from.startsWith('meskeia-')) return 'a-vertical';
-        if (PORTALES_VERTICALES.includes(from)) return 'portal-a-meskeia';  // portal vertical → meskeIA
-        return 'otro';
-      };
-
-      for (const [, visitas] of sesiones) {
-        totalVisitas += visitas.length;
-
-        // Clic de descubrimiento interno: cualquier visita con ?from= explícito
-        for (const v of visitas) {
-          if (v.from) {
-            clicsInternos++;
-            const cat = categoriaDe(v.from);
-            clicsPorCategoria[cat] = (clicsPorCategoria[cat] || 0) + 1;
+        clicsInternos++;
+        clicsPorCategoria[cat] = (clicsPorCategoria[cat] || 0) + 1;
+        const k = semanaDe(fecha);
+        if (k >= 0) {
+          const s = semanas[k];
+          s.total++;
+          s.porCategoria[cat] = (s.porCategoria[cat] || 0) + 1;
+          const ip = row.ip_address ? String(row.ip_address) : null;
+          if (ip) {
+            if (!s.ips.has(cat)) s.ips.set(cat, new Map());
+            const m = s.ips.get(cat)!;
+            m.set(ip, (m.get(ip) || 0) + 1);
+            if (row.pais && !paisDeIp.has(ip)) paisDeIp.set(ip, String(row.pais));
           }
         }
       }
 
+      // Celda concentrada: una IP aporta >=40 % de los clics de ese canal esa semana, con
+      // >=10 clics. Mismos listones que el digest (TRAC_CONC y FROM_IP_MIN de
+      // scripts/digest-diario.mjs): no son umbrales nuevos. Una IP NO es una persona: suele
+      // ser una clase tras el NAT del centro, y por eso no se nombra la IP aquí.
+      const CONC_SHARE = 0.4;
+      const CONC_MIN = 10;
+      const fechaCorta = (d: Date) => `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`;
+      const semanasSalida = semanas.map((s, k) => {
+        const hasta = new Date(ahora.getTime() - k * 7 * MS_DIA);
+        const desde = new Date(hasta.getTime() - 7 * MS_DIA);
+        const concentradas: Record<string, { pctIp: number; pais: string | null }> = {};
+        for (const [cat, ips] of s.ips) {
+          const n = s.porCategoria[cat] || 0;
+          let ipTop = '', nTop = 0;
+          for (const [ip, c] of ips) if (c > nTop) { ipTop = ip; nTop = c; }
+          if (n >= CONC_MIN && nTop / n >= CONC_SHARE) {
+            concentradas[cat] = { pctIp: Math.round((nTop / n) * 100), pais: paisDeIp.get(ipTop) ?? null };
+          }
+        }
+        return { desde: fechaCorta(desde), hasta: fechaCorta(hasta), total: s.total, porCategoria: s.porCategoria, concentradas };
+      }).reverse(); // de la más antigua a la más reciente, como se lee una serie
+
+      const pct = (a: number, b: number) => (b > 0 ? Math.round((a / b) * 1000) / 10 : 0);
       return {
         ventanaDias: input.dias,
         kpis: {
-          totalSesiones,
+          totalSesiones: sesiones.size,
           totalVisitas,
         },
+        // Solo navegación DENTRO del catálogo: la misma definición que la sección 9 del digest.
         descubrimientoInterno: {
           total: clicsInternos,
-          pctDeVisitas: totalVisitas > 0 ? Math.round((clicsInternos / totalVisitas) * 1000) / 10 : 0,
+          pctDeVisitas: pct(clicsInternos, totalVisitas),
           porCategoria: clicsPorCategoria,
-          // Pulso en 3 ventanas anidadas: mide si la TASA de descubrimiento interno acelera o frena
           ventanas: {
-            hoy: { clics: clics24h, visitas: visitas24h, pct: visitas24h > 0 ? Math.round((clics24h / visitas24h) * 1000) / 10 : 0 },
-            semana: { clics: clics7d, visitas: visitas7d, pct: visitas7d > 0 ? Math.round((clics7d / visitas7d) * 1000) / 10 : 0 },
-            ventana: { clics: clicsInternos, visitas: totalVisitas, pct: totalVisitas > 0 ? Math.round((clicsInternos / totalVisitas) * 1000) / 10 : 0 },
+            semana: { clics: clics7d, visitas: visitas7d, pct: pct(clics7d, visitas7d) },
+            ventana: { clics: clicsInternos, visitas: totalVisitas, pct: pct(clicsInternos, totalVisitas) },
           },
         },
+        // Saltos entre dominios propios, aparte: no son descubrimiento interno.
+        crossDominio: {
+          aVertical: cross.aVertical,
+          portalAMeskeia: cross.portalAMeskeia,
+          aVerticalPorMil: totalVisitas > 0 ? Math.round((cross.aVertical / totalVisitas) * 10000) / 10 : 0,
+        },
+        semanas: semanasSalida,
       };
     }),
 

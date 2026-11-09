@@ -133,6 +133,13 @@ console.log('\n═══ getNavegacion ═══');
   check(rd.ventanaDias === 30, `ventanaDias = ${rd?.ventanaDias}`);
   check(typeof rd.descubrimientoInterno?.total === 'number', `descubrimiento interno = ${rd?.descubrimientoInterno?.total} clics`);
   check(typeof rd.descubrimientoInterno?.ventanas?.ventana?.pct === 'number', `tasa 30d = ${rd?.descubrimientoInterno?.ventanas?.ventana?.pct}%`);
+  // 09/11/2026: los saltos a los portales salen del interno y van aparte, como en el digest
+  const cats = Object.keys(rd.descubrimientoInterno?.porCategoria ?? {});
+  check(!cats.includes('a-vertical') && !cats.includes('portal-a-meskeia'), `el interno no lleva saltos cross-dominio (${cats.join(', ')})`);
+  check(typeof rd.crossDominio?.aVertical === 'number', `meskeIA → portales = ${rd?.crossDominio?.aVertical}, portales → meskeIA = ${rd?.crossDominio?.portalAMeskeia}`);
+  const sumaSemanas = (rd.semanas ?? []).reduce((a, s) => a + s.total, 0);
+  check(rd.semanas?.length === 4 && sumaSemanas <= rd.descubrimientoInterno.total, `4 semanas, ${sumaSemanas} clics <= ${rd?.descubrimientoInterno?.total} del total`);
+  check(rd.descubrimientoInterno?.ventanas?.hoy === undefined, 'ventana de 24 h retirada del shape');
   // Forense retirado el 21/08/2026 (transiciones dominadas por falsos prev:X→X; puente/puerta con pregunta cerrada)
   check(rd.topPares === undefined && rd.tablaPuente === undefined, 'topPares/tablaPuente retirados del shape');
 }
