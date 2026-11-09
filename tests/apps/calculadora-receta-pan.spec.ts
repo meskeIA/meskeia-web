@@ -1,5 +1,6 @@
 import { test, expect, Page } from '@playwright/test';
 import { esperarHidratacion, sembrarValor } from './_hidratacion';
+import { parseSpanishNumber } from '@/lib/formatters';
 
 /**
  * calculadora-receta-pan — verificación de INTERACCIÓN (PASO 4.bis de /nueva-app-meskeia)
@@ -316,5 +317,308 @@ test.describe('Calculadora de pan casero — mis recetas', () => {
     await expect(lista.getByRole('listitem')).toHaveCount(1);
     await expect(lista).toContainText('Buena');
     expect(errores).toEqual([]);
+  });
+});
+
+/**
+ * INSPECTOR 09/11/2026 (primera inspección, segmento motor)
+ *
+ * A diferencia del bloque de interacción de arriba, aquí SÍ se verifica aritmética, y en la
+ * pantalla: cada esperado está resuelto a mano con las reglas de `lib/calculadoras/recetaPan.ts`
+ * ANTES de mirar la app, y se comprueba lo que ve el usuario, no lo que devuelve el motor.
+ * Los casos «HALLAZGO (…, ABIERTO)» llevan `test.fail()`: describen lo que DEBERÍA pasar y
+ * hoy no pasa. Cuando se repare, Playwright los marcará en rojo por pasar: se quita el
+ * `test.fail()` y «ABIERTO» pasa a «REPARADO».
+ */
+
+/** La sección del resultado, por su título: resumen, tabla, tiempo, avisos y nota. */
+const seccionResultado = (page: Page) => page.locator('section[aria-labelledby="titulo-resultado"]');
+
+/** Gramos de harina que la lista manda PESAR: la suma de sus filas de harina. */
+async function harinaAPesar(page: Page): Promise<number> {
+  const filas = await tablaReceta(page)
+    .locator('tbody tr')
+    .evaluateAll((trs) =>
+      trs.map((tr) => [
+        tr.querySelector('td strong')?.textContent ?? '',
+        tr.querySelectorAll('td')[1]?.textContent ?? '',
+      ]),
+    );
+  return filas
+    .filter(([nombre]) => /^(Espelta blanca|Trigo panificable)$/.test(nombre))
+    .reduce((suma, [, gramos]) => suma + parseSpanishNumber(gramos.replace(/\s*g$/, '')), 0);
+}
+
+interface EntradaFaq {
+  pregunta: string;
+  respuesta: string;
+}
+
+/** La FAQPage del JSON-LD, que es la que leen buscadores y asistentes. */
+async function faqDelJsonLd(page: Page): Promise<EntradaFaq[]> {
+  return page.locator('script[type="application/ld+json"]').evaluateAll((scripts) => {
+    type Nodo = { '@type'?: string; mainEntity?: { name: string; acceptedAnswer: { text: string } }[] };
+    const nodos: Nodo[] = scripts.flatMap((s) => {
+      const j = JSON.parse(s.textContent ?? '{}') as Nodo & { '@graph'?: Nodo[] };
+      return j['@graph'] ?? [j];
+    });
+    const faq = nodos.find((n) => n['@type'] === 'FAQPage');
+    return (faq?.mainEntity ?? []).map((q) => ({ pregunta: q.name, respuesta: q.acceptedAnswer.text }));
+  });
+}
+
+/** Las `features` del WebApplication (en el JSON-LD salen como `featureList`). */
+async function featuresDelJsonLd(page: Page): Promise<string[]> {
+  return page.locator('script[type="application/ld+json"]').evaluateAll((scripts) => {
+    type Nodo = { '@type'?: string; featureList?: string[] };
+    const nodos: Nodo[] = scripts.flatMap((s) => {
+      const j = JSON.parse(s.textContent ?? '{}') as Nodo & { '@graph'?: Nodo[] };
+      return j['@graph'] ?? [j];
+    });
+    return nodos.find((n) => n['@type'] === 'WebApplication')?.featureList ?? [];
+  });
+}
+
+/**
+ * Una pregunta de la FAQ visible con su respuesta. Vive en la guía educativa, que nace
+ * plegada por CSS: se busca por selector, no por rol, porque el rol no ve lo oculto.
+ */
+const itemFaqVisible = (page: Page, pregunta: string) =>
+  page.locator('[data-guia-educativa] h3').filter({ hasText: pregunta }).locator('xpath=..');
+
+const normalizar = (s: string) => s.replace(/\s+/g, ' ').trim();
+
+test.describe('Inspector 09/11/2026 — el motor, la FAQ y los avisos', () => {
+  test('CASO 1 (normal) · 800 g, hogaza, 30 % de integral, masa madre al 50 % y «esta tarde»', async ({ page }) => {
+    // A mano, con las reglas del motor:
+    //   «esta tarde» = 7 % de harina prefermentada → harina total = 800 / 0,93 = 860,22 g;
+    //   dentro de la masa madre van 60,22 g de harina y, al 50 %, 30,11 g de agua → 90,32 g
+    //   integral = 860,22 × 30 % = 258,06 g · panificable = 860,22 × 70 % − 60,22 = 541,94 g
+    //   (258 + 542 = 800: se pesa lo que se pidió)
+    //   hidratación = 72 + 6 × 0,30 = 73,8 % → agua = 860,22 × 73,8 % − 30,11 = 604,73 g (70,3 %)
+    //   sal = 2 % → 17,20 g · masa = 860,22 + 604,73 + 30,11 + 17,20 = 1.512,26 g → 2 × 756 g
+    await irALaApp(page);
+    await sembrarValor(page, '#harina-g', '800');
+    await page.locator('#tipo-harina').selectOption('integral');
+    await sembrarValor(page, '#proporcion', '30');
+    await page.getByRole('button', { name: /Masa madre/ }).click();
+    await page.getByRole('button', { name: '50 %', exact: true }).click();
+    await expect(page.getByRole('button', { name: /Esta tarde/ })).toHaveAttribute('aria-pressed', 'true');
+
+    await expect(filaDe(page, /^Integral de trigo$/)).toContainText(/258 g\s*30,0\s%/);
+    await expect(filaDe(page, /^Trigo panificable$/)).toContainText(/542 g\s*63,0\s%/);
+    await expect(filaDe(page, /^Agua$/)).toContainText(/605 g\s*70,3\s%/);
+    await expect(filaDe(page, /^Masa madre activa/)).toContainText(/90 g\s*10,5\s%/);
+    await expect(filaDe(page, /^Masa madre activa/)).toContainText('60 g de harina y 30 g de agua');
+    await expect(filaDe(page, /^Sal$/)).toContainText(/17 g\s*2,0\s%/);
+
+    const resultado = seccionResultado(page);
+    await expect(resultado).toContainText(/1512 g\s*de masa en total/);
+    await expect(resultado).toContainText('2 × 756 g');
+    await expect(resultado).toContainText(/74\s%\s*de hidratación/); // 73,8 sin decimales
+    await expect(resultado).toContainText(/860 g de harina total[\s\S]*los 60 g[\s\S]*800 g que pediste/);
+    await expect(resultado).toContainText('5-7 h de primera fermentación + 1-2 h de formado');
+    // 30 % ≤ 80 % de integral y 73,8 % < 75 %: no hay avisos.
+    await expect(resultado.getByText('Antes de amasar')).toHaveCount(0);
+  });
+
+  test('HALLAZGO (09/11/2026, ABIERTO) · con masa madre, «esta tarde» y el 95 % de espelta se pesan 511 g de harina, no los 500 pedidos', async ({ page }) => {
+    // harina total = 500 / 0,93 = 537,63 g, de los que 37,63 g van dentro de la masa madre. El
+    // motor los descuenta del trigo panificable, pero al 95 % el panificable es el 5 % (26,88 g)
+    // y no llega: su fila desaparece y la espelta sale entera, 537,63 × 95 % = 510,75 g.
+    // Esperado: 500 g a pesar, como promete la nota («Tú solo pesas los 500 g que pediste») y
+    // como hace la rama del 100 %, que da 500 g de espelta (caso siguiente).
+    // Hoy: 511 g de espelta y ninguna otra harina; la hidratación real cae al 66,9 % (366,67 g de
+    // agua sobre 548,39 g de harina) mientras la pantalla dice 68 %.
+    test.fail();
+    await irALaApp(page);
+    await page.locator('#tipo-harina').selectOption('espelta');
+    await page.getByRole('button', { name: /Masa madre/ }).click();
+    await sembrarValor(page, '#proporcion', '95');
+    await expect(seccionResultado(page)).toContainText('Tú solo pesas los 500 g que pediste');
+    await expect.poll(async () => Math.abs((await harinaAPesar(page)) - 500)).toBeLessThanOrEqual(1);
+  });
+
+  test('CASO 2 (límite, pareja del anterior) · con masa madre, al 100 % y al 90 % de espelta sí se pesan 500 g', async ({ page }) => {
+    // 100 %: espelta = 537,63 − 37,63 = 500 g, sin panificable.
+    // 90 %: espelta = 537,63 × 90 % = 483,87 → 484 g · panificable = 53,76 − 37,63 = 16,13 → 16 g.
+    await irALaApp(page);
+    await page.locator('#tipo-harina').selectOption('espelta');
+    await page.getByRole('button', { name: /Masa madre/ }).click();
+    await expect(filaDe(page, /^Espelta blanca$/)).toContainText('500 g');
+    await expect(filaDe(page, /^Trigo panificable$/)).toHaveCount(0);
+
+    await sembrarValor(page, '#proporcion', '90');
+    await expect(filaDe(page, /^Espelta blanca$/)).toContainText('484 g');
+    await expect(filaDe(page, /^Trigo panificable$/)).toContainText(/\D16 g/);
+    expect(await harinaAPesar(page)).toBe(500);
+  });
+
+  test('CASO 3 (rechazo) · harina negativa, con letras o a cero: no hay receta y se pide la cantidad', async ({ page }) => {
+    await irALaApp(page);
+    await expect(tablaReceta(page)).toBeVisible();
+    for (const valor of ['-500', '12abc', '0']) {
+      await page.locator('#harina-g').fill(valor);
+      await expect(page.getByText(/Escribe cuántos gramos de harina/)).toBeVisible();
+      await expect(tablaReceta(page)).toHaveCount(0);
+    }
+    // Y vuelve con una cantidad válida: 750 g × 72 % = 540 g de agua; sal 2 % = 15 g.
+    await sembrarValor(page, '#harina-g', '750');
+    await expect(filaDe(page, /^Agua$/)).toContainText('540 g');
+    await expect(filaDe(page, /^Sal$/)).toContainText('15 g');
+  });
+
+  test('LA LEVADURA SECA sobre 500 g según el ritmo: 6,0 g, 3,5 g y 1,0 g', async ({ page }) => {
+    // Harina prefermentada del 12 %, 7 % y 2 % de 500 g = 60, 35 y 10 g; la seca es su décima parte.
+    await irALaApp(page);
+    const levadura = () => filaDe(page, /^Levadura seca/);
+    await expect(levadura()).toContainText('3,5 g');
+    await page.getByRole('button', { name: /Lo antes posible/ }).click();
+    await expect(levadura()).toContainText('6,0 g');
+    await page.getByRole('button', { name: /De un día para otro/ }).click();
+    await expect(levadura()).toContainText('1,0 g');
+  });
+
+  test('HALLAZGO (09/11/2026, ABIERTO) · la FAQ visible dice «el doble» (7 g) para el pan rápido; la app y la FAQPage, 6 g', async ({ page }) => {
+    // «Para un pan de tarde son unos 3,5 g de levadura seca […]; si lo quieres en dos horas, el
+    // doble» = 7 g. El motor da 500 × 12 % / 10 = 6,0 g (caso anterior) y la FAQPage, «sube a 6 g».
+    test.fail();
+    await irALaApp(page);
+    const item = itemFaqVisible(page, '¿Cuánta levadura hace falta para 500 gramos de harina?');
+    await expect(item).toHaveCount(1);
+    await expect(item).toContainText(/(^|[^\d,])6 g/);
+  });
+
+  test('HALLAZGO (09/11/2026, ABIERTO) · las preguntas que repiten la FAQ visible y la FAQPage tienen respuestas distintas', async ({ page }) => {
+    // check:faq-unica: una pregunta que está en las dos va en UNA constante. Hoy lo están
+    // «¿Cuánta levadura hace falta para 500 gramos de harina?» y «¿Cuántos gramos de masa madre
+    // por kilo de harina?», escritas dos veces, y la primera con otra cifra (caso anterior).
+    test.fail();
+    await irALaApp(page);
+    const faq = await faqDelJsonLd(page);
+    expect(faq.length).toBeGreaterThan(0);
+    for (const { pregunta, respuesta } of faq) {
+      const item = itemFaqVisible(page, pregunta);
+      if ((await item.count()) === 0) continue;
+      const visible = normalizar((await item.first().textContent()) ?? '');
+      expect(visible, pregunta).toContain(normalizar(respuesta));
+    }
+  });
+
+  test('LA MASA MADRE POR KILO va de 31 g (nevera, al 50 %) a 169 g (esta tarde, al 125 %)', async ({ page }) => {
+    // nevera: 1.000 / 0,98 × 2 % = 20,41 g de harina × 1,5 = 30,6 g → 31 g
+    // esta tarde al 125 %: 1.000 / 0,93 × 7 % = 75,27 g × 2,25 = 169,4 g → 169 g
+    // («esta tarde» es el ritmo más rápido que la app admite con masa madre).
+    await irALaApp(page);
+    await sembrarValor(page, '#harina-g', '1000');
+    await page.getByRole('button', { name: /Masa madre/ }).click();
+    const masaMadre = () => filaDe(page, /^Masa madre activa/);
+    await page.getByRole('button', { name: '125 %', exact: true }).click();
+    await expect(masaMadre()).toContainText(/\D169 g/);
+    await page.getByRole('button', { name: /De un día para otro/ }).click();
+    await page.getByRole('button', { name: '50 %', exact: true }).click();
+    await expect(masaMadre()).toContainText(/\D31 g/);
+  });
+
+  test('HALLAZGO (09/11/2026, ABIERTO) · las dos FAQ dicen «entre 20 y 250 g» de masa madre por kilo; la app da de 31 a 169 g', async ({ page }) => {
+    test.fail();
+    await irALaApp(page);
+    const pregunta = '¿Cuántos gramos de masa madre por kilo de harina?';
+    const visible = itemFaqVisible(page, pregunta);
+    await expect(visible).toHaveCount(1);
+    const enJsonLd = (await faqDelJsonLd(page)).find((f) => f.pregunta === pregunta)?.respuesta ?? '';
+    expect(enJsonLd).not.toContain('20 y 250');
+    await expect(visible).not.toContainText('20 y 250');
+  });
+
+  test('HALLAZGO (09/11/2026, ABIERTO) · con masa madre, el 10 % de centeno ya avisa «con tanto centeno»', async ({ page }) => {
+    // La condición `esMasaMadre && (harinaPrincipal === 'centeno' || proporcion >= 60) &&
+    // harina.id === 'centeno'` se reduce a «masa madre y centeno»: el 60 % no filtra nada. Al
+    // 10 % —la cuarta parte del 40 % que la app da como máximo— no hay «tanto centeno».
+    // Mezcla: 537,63 × 10 % = 53,76 → 54 g de centeno.
+    test.fail();
+    await irALaApp(page);
+    await page.locator('#tipo-harina').selectOption('centeno');
+    await sembrarValor(page, '#proporcion', '10');
+    await page.getByRole('button', { name: /Masa madre/ }).click();
+    await expect(filaDe(page, /^Centeno$/)).toContainText('54 g');
+    await expect(seccionResultado(page).getByText(/Con tanto centeno/)).toHaveCount(0);
+  });
+
+  test('EL CENTENO POR ENCIMA DEL 40 % avisa (pareja del anterior)', async ({ page }) => {
+    // Con levadura seca y 100 % de centeno: el aviso de la harina (máximo 40 %) y el de la
+    // hidratación, 72 + 8 = 80 % ≥ 75 %.
+    await irALaApp(page);
+    await page.locator('#tipo-harina').selectOption('centeno');
+    await expect(seccionResultado(page)).toContainText(/Por encima del 40\s%\sde centeno/);
+    await expect(seccionResultado(page)).toContainText(/Al 80\s%\sde hidratación/);
+  });
+
+  test('HALLAZGO (09/11/2026, ABIERTO) · bollos: «Tu bollos y panecillos» y «Unos 1 huevos M»', async ({ page }) => {
+    // 500 g × 10 % de huevo = 50 g → Math.round(50 / 50) = 1 huevo, pero la nota va en plural; y
+    // el título concuerda «Tu» con un plural.
+    test.fail();
+    await irALaApp(page);
+    await page.getByRole('button', { name: /Bollos y panecillos/ }).click();
+    await expect(filaDe(page, /^Huevo$/)).toContainText('50 g');
+    await expect(filaDe(page, /^Huevo$/)).not.toContainText('Unos 1 huevos');
+    await expect(page.locator('#titulo-resultado')).not.toContainText(/Tu bollos/);
+  });
+
+  test('HALLAZGO (09/11/2026, ABIERTO) · los deslizadores de los extras no dicen de qué ingrediente son', async ({ page }) => {
+    // Su <label> es solo «15 % de la harina»: con nueces y semillas activas, un lector de
+    // pantalla oye dos deslizadores «N % de la harina» sin saber cuál es cuál.
+    test.fail();
+    await irALaApp(page);
+    await page.locator('#toggle-extras').click();
+    await page.getByRole('button', { name: /Nueces, almendras/ }).click();
+    await page.getByRole('button', { name: /Semillas/ }).click();
+    await expect(page.locator('#pct-nueces')).toBeVisible();
+    await expect(page.getByRole('slider', { name: /Nueces/ })).toHaveCount(1);
+    await expect(page.getByRole('slider', { name: /Semillas/ })).toHaveCount(1);
+  });
+
+  test('HALLAZGO (09/11/2026, ABIERTO) · focaccia con aceite de extra: dos filas «Aceite de oliva» en la lista de pesar', async ({ page }) => {
+    // La focaccia lleva 6 % de aceite (30 g) y el extra suma un 4 % (20 g): la lista dice
+    // «Aceite de oliva 30 g» y, más abajo, «Aceite de oliva 20 g». El mismo camino del motor
+    // repite «Leche», «Azúcar» o «Mantequilla o manteca» en los panes que ya los llevan.
+    test.fail();
+    await irALaApp(page);
+    await page.getByRole('button', { name: /Focaccia/ }).click();
+    await page.locator('#toggle-extras').click();
+    await page.getByRole('button', { name: /Aceite de oliva$/ }).click();
+    await expect(page.locator('#pct-aceite')).toBeVisible();
+    await expect(
+      tablaReceta(page).locator('tbody tr td strong').filter({ hasText: /^Aceite de oliva$/ }),
+    ).toHaveCount(1);
+  });
+
+  test('HALLAZGO (09/11/2026, ABIERTO) · la FAQPage manda plegar «por encima del 75 %»; la página, ya a la hogaza del 72 %', async ({ page }) => {
+    // La hogaza (72 %) sale con el consejo «A esta hidratación la masa se pega: se trabaja con
+    // plegados…», y el paso 3 de la guía dice «Hasta el 68 % se amasa sobre la mesa. Por encima,
+    // se trabaja con plegados».
+    test.fail();
+    await irALaApp(page);
+    await expect(seccionResultado(page)).toContainText('se trabaja con plegados');
+    const agua = (await faqDelJsonLd(page)).find((f) => /Cuánta agua lleva el pan/.test(f.pregunta))?.respuesta ?? '';
+    expect(agua).not.toMatch(/Por encima del 75\s%/);
+  });
+
+  test('HALLAZGO (09/11/2026, ABIERTO) · features dice que semillas y frutos secos «sí corrigen la fórmula»', async ({ page }) => {
+    // La propia página: los frutos secos «No tocan nada → solo se suman al peso», y el agua del
+    // remojo de las semillas «no forma parte de la masa».
+    test.fail();
+    await irALaApp(page);
+    const corrigen = (await featuresDelJsonLd(page)).find((f) => /corrigen la fórmula/.test(f)) ?? '';
+    expect(corrigen).not.toMatch(/semillas|frutos secos/);
+  });
+
+  test('HALLAZGO (09/11/2026, ABIERTO) · el «%» va con espacio normal, no con espacio duro (U+00A0)', async ({ page }) => {
+    // CLAUDE.md global §2: «15 %» con U+00A0 para que el signo no salte solo de línea.
+    test.fail();
+    await irALaApp(page);
+    await expect(filaDe(page, /^Agua$/)).toContainText('360 g');
+    const celda = (await filaDe(page, /^Agua$/).locator('td').nth(2).textContent()) ?? '';
+    expect(celda).toMatch(/ %/);
   });
 });

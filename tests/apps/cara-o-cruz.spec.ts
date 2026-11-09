@@ -611,3 +611,117 @@ test.describe('Cara o Cruz — hallazgos del 08/11/2026 (reparados)', () => {
     expect(texto).not.toContain('anula la aleatoriedad');
   });
 });
+
+/**
+ * Cabo C0679 (comprobado el 09/11/2026): las dos afirmaciones que la 1.ª inspección dejó sin anclar.
+ *
+ * (a) FAQ visible, «¿Las monedas físicas son perfectamente equitativas?»: «Estudios de la Universidad
+ *     de Stanford demuestran que las monedas físicas pueden caer con un ligero sesgo hacia el lado que
+ *     estaba boca arriba […] (sesgo de Diaconis, ~51/49)». Lo comprobable sin la fuente es el texto:
+ *     el verbo «demuestran» (regla 3 de neutralidad editorial, §1.quinquies del CLAUDE.md de
+ *     meskeia-web: «propuso», «identificó») y la atribución a una institución en vez de a un trabajo
+ *     con autores y año. La cifra ~51/49 NO se ancla: la red de fuentes no tiene ninguna académica, y
+ *     el criterio del usuario (cabo C0203) es matizarla o retirarla, no corregirla de memoria. El test
+ *     no exige nada sobre la cifra: la redacción nueva es decisión del usuario (nivel 3).
+ *
+ * (b) JSON-LD (faqJsonLd, 5.ª pregunta): «Una moneda virtual es matemáticamente perfecta en su
+ *     aleatoriedad». El motor es `Math.random() < 0.5` (page.tsx, una llamada por lanzamiento, ningún
+ *     crypto.getRandomValues): un generador pseudoaleatorio del navegador. Con Math.random sustituido
+ *     por mulberry32 de semilla fija (679), dos cargas independientes dan la MISMA serie, la que dicta
+ *     la semilla calculada aquí sin mirar la app: el resultado es determinista dada la semilla. La
+ *     frase no está en el title, la description, la FAQ visible ni en ninguna guía (no hay guía con
+ *     esta app); solo en el JSON-LD, que no se ve en la página.
+ */
+type VentanaSembrada = Window & { __llamadasRandom: number; __llamadasCrypto: number };
+
+/** Script de inicio del cabo C0679: Math.random ENTERO sustituido por mulberry32 con semilla fija. */
+function sembrarMathRandom(semilla: number): void {
+  let a = semilla >>> 0;
+  const w = window as unknown as VentanaSembrada;
+  w.__llamadasRandom = 0;
+  w.__llamadasCrypto = 0;
+  Math.random = function (): number {
+    w.__llamadasRandom++;
+    a = (a + 0x6d2b79f5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+  const original = crypto.getRandomValues.bind(crypto) as unknown as (x: ArrayBufferView) => ArrayBufferView;
+  (crypto as unknown as { getRandomValues: (x: ArrayBufferView) => ArrayBufferView }).getRandomValues = (x) => {
+    w.__llamadasCrypto++;
+    return original(x);
+  };
+  try {
+    localStorage.setItem('meskeia_transparency_banner_dismissed', 'true');
+  } catch {
+    /* sin almacenamiento: saldrá el aviso */
+  }
+}
+
+test.describe('Cabo C0679 — «demuestran» de Stanford y la moneda «matemáticamente perfecta»', () => {
+  test('(b) el motor es Math.random: con semilla fija dos cargas dan la misma serie, la que dicta la semilla, sin crypto.getRandomValues', async ({
+    browser,
+  }) => {
+    test.setTimeout(60_000);
+    const N = 10;
+    // Esperado, antes de mirar la app: la serie de la semilla 679 (cara si < 0,5). Las llamadas que
+    // el resto de la página haga a Math.random antes del 1.er clic la desplazan: se miden.
+    const dictada = serieFija(679, 200).map((v) => (v < 0.5 ? 'cara' : 'cruz'));
+    const series: string[][] = [];
+    for (let carga = 0; carga < 2; carga++) {
+      const ctx = await browser.newContext({ baseURL: test.info().project.use.baseURL });
+      const page = await ctx.newPage();
+      await page.addInitScript(sembrarMathRandom, 679);
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+      await page.clock.install();
+      await page.goto(RUTA);
+      await expect(page.locator('h1')).toHaveText('Cara o Cruz');
+      await esperarBotonHidratado(page);
+      const ahora = await page.evaluate(() => Date.now());
+      await page.clock.pauseAt(ahora + 1000);
+      const previas = await page.evaluate(() => (window as unknown as VentanaSembrada).__llamadasRandom);
+      const resultados: string[] = [];
+      for (let i = 0; i < N; i++) {
+        const antes = await page.evaluate(() => (window as unknown as VentanaSembrada).__llamadasRandom);
+        await lanzar(page);
+        const despues = await page.evaluate(() => (window as unknown as VentanaSembrada).__llamadasRandom);
+        expect(despues - antes).toBe(1); // una sola llamada a Math.random por lanzamiento
+        const t = (await page.locator('[class*="resultadoTexto"]').textContent()) ?? '';
+        resultados.push(t === '¡CARA!' ? 'cara' : t === '¡CRUZ!' ? 'cruz' : `?${t}`);
+      }
+      expect(await page.evaluate(() => (window as unknown as VentanaSembrada).__llamadasCrypto)).toBe(0);
+      expect(resultados).toEqual(dictada.slice(previas, previas + N));
+      series.push(resultados);
+      await ctx.close();
+    }
+    expect(series[1]).toEqual(series[0]);
+  });
+
+  test('HALLAZGO (ABIERTO) · (b) el JSON-LD no llama «matemáticamente perfecta en su aleatoriedad» a una moneda que tira de Math.random', () => {
+    // ABIERTO (cabo C0679, 09/11/2026). Tipo promesa: el texto promete más de lo que hace la app,
+    // que es un generador pseudoaleatorio (test anterior). La 2.ª pregunta del mismo JSON-LD los llama
+    // ya «pseudoaleatorios» y aun así responde «Sí» a «¿Es realmente aleatorio…?». Redactarlo, del usuario.
+    test.fail();
+    const quinta = faqJsonLd.mainEntity.find((q) => q.name.includes('física y una virtual'));
+    expect(quinta).toBeDefined();
+    expect(quinta?.acceptedAnswer.text).not.toContain('matemáticamente perfecta');
+  });
+
+  test('HALLAZGO (ABIERTO) · (a) la FAQ visible no da el sesgo de Diaconis por «demostrado» por «Estudios de la Universidad de Stanford»', async ({
+    page,
+  }) => {
+    // ABIERTO (cabo C0679, 09/11/2026). Regla 3 de §1.quinquies: «demostró» para un resultado sin
+    // trabajo citado → «propuso», «estimó». Se juzga solo lo que está en el texto: el verbo y la
+    // atribución a una institución sin autores ni año. La cifra ~51/49 queda a decisión del usuario
+    // (matizarla o retirarla, cabo C0203): este test no la mira.
+    test.fail();
+    await abrir(page);
+    const item = page.locator('[class*="faqItem"]').filter({ hasText: '¿Las monedas físicas son perfectamente equitativas?' });
+    await expect(item).toHaveCount(1);
+    const texto = ((await item.textContent()) ?? '').replace(/\s+/g, ' ');
+    expect(texto).not.toMatch(/\bdemuestra|\bdemostr/i);
+    expect(texto).not.toContain('Estudios de la Universidad de Stanford');
+  });
+});

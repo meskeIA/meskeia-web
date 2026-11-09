@@ -893,3 +893,133 @@ test.describe('Hallazgos de la inspección de cambio del 09/11/2026', () => {
     await expect(page.locator('meta[name="twitter:description"]')).not.toHaveAttribute('content', /^Mide/);
   });
 });
+
+/**
+ * ── CABO C0688 (comprobación del 09/11/2026) ──
+ *
+ * Pregunta: el paso 5 de la guía («La app calcula el EV y sugiere una combinación
+ * ISO/apertura/velocidad»), la tarjeta «Fotografía en exteriores» («El luxómetro te da el EV
+ * (Exposure Value) que necesitas») y el consejo «Usa el EV como punto de partida» («El EV
+ * calculado da la exposición…») prometen un valor de exposición. Desde la reparación del
+ * 18/09/2026 el panel enseña un nivel relativo, o lux si se calibra, y rangos de
+ * ISO/apertura/velocidad: ¿sale un EV en alguna ruta?
+ *
+ * Esperado, calculado ANTES de abrir la app con la fórmula de su propia FAQ visible
+ * («EV = log₂(lux / 2,5)», «2.500 lx ≈ EV 10»):
+ *   · sin calibrar → no hay lux y, por tanto, tampoco EV (la regla del 908: sin unidad, nada);
+ *   · calibrada a 2.500 lx → EV = log₂(1.000) = 9,97 ≈ 10;
+ *   · sensor de luz ambiente a 320 / 640 lx → EV = log₂(128) = 7 / log₂(256) = 8.
+ * Obtenido el 09/11/2026 (cámara falsa de Chromium con readyState 4 y 640×480, calibración con el
+ * ⚙️, AmbientLightSensor simulado): ni «EV» ni ningún valor de exposición en el texto visible ni
+ * en el árbol de accesibilidad, en ninguna de las tres rutas. «Exposición» solo aparece en los
+ * avisos junto al medidor («La cámara ajusta sola la exposición…»), nunca como cifra.
+ *
+ * Los casos del EV piden que la promesa y la pantalla digan lo mismo, sin elegir la reparación:
+ * o aparece el EV, o desaparece la frase que lo promete.
+ */
+test.describe('Cabo C0688 — la guía promete un EV que la app no muestra en ninguna ruta', () => {
+  const RE_EV = /\bEV\b/;
+  const PROMESA_EV = /La app calcula el EV|te da el EV|El EV calculado/;
+
+  /** ¿Promete la guía un EV calculado? Se lee el texto aunque el bloque educativo siga plegado. */
+  async function promesaDelEv(page: Page): Promise<boolean> {
+    const bloques = await page
+      .locator('[class*="stepGuide"], [class*="escenariosGrid"], [class*="tipsGrid"]')
+      .allTextContents();
+    return bloques.some((t) => PROMESA_EV.test(t));
+  }
+
+  /** ¿Hay un EV en la herramienta (medidor, recomendaciones, escala), visible o en el árbol de accesibilidad? */
+  async function evEnPantalla(page: Page): Promise<boolean> {
+    const herramienta = page.locator('main');
+    const visible = await herramienta.innerText();
+    const arbol = await herramienta.ariaSnapshot();
+    return RE_EV.test(visible) || RE_EV.test(arbol);
+  }
+
+  async function videoVivo(page: Page): Promise<void> {
+    await page.waitForFunction(
+      () => {
+        const v = document.querySelector('video');
+        return Boolean(v && v.readyState >= 2 && v.videoWidth > 0);
+      },
+      undefined,
+      { timeout: 15000 },
+    );
+  }
+
+  test('sin calibrar no sale ningún EV: sin lux no hay de dónde sacarlo (vigila el 908)', async ({
+    page,
+  }) => {
+    // Comprueba la ausencia actual, que es la correcta. Si la reparación del C0688 elige
+    // mostrar el EV, este caso vigila que no salga del nivel relativo: sería el 908 otra vez,
+    // una cifra derivada de un número sin unidad.
+    await abrirYMedir(page);
+    await videoVivo(page);
+    await expect(page.locator(UNIDAD)).toContainText('nivel relativo');
+    expect(await evEnPantalla(page)).toBe(false);
+  });
+
+  test('HALLAZGO (09/11/2026, ABIERTO) · calibrada a 2.500 lx, la guía dice que «la app calcula el EV» y en pantalla no hay EV (esperado ≈ 10)', async ({
+    page,
+  }) => {
+    // ABIERTO (cabo C0688, tipo promesa): con la cámara calibrada salen lux, el rótulo de escena
+    // y «ISO 100-200 · f/8 - f/11 · 1/500 - 1/2000», pero ningún EV, mientras el paso 5, la
+    // tarjeta «Fotografía en exteriores» y el consejo «Usa el EV como punto de partida» lo dan
+    // por calculado.
+    test.fail();
+    await abrirYMedir(page);
+    await videoVivo(page);
+    await expect(page.locator(UNIDAD)).toContainText('nivel relativo');
+
+    await page.getByTitle('Calibrar').click();
+    await esperarHidratacion(page, [CALIBRACION]);
+    await page.locator(CALIBRACION).fill('2500');
+    await esperarValorEnReact(page, CALIBRACION, '2500');
+    await page.getByRole('button', { name: 'Calibrar', exact: true }).click();
+    await expect(page.locator(INSIGNIA)).toContainText('Calibrado');
+    await expect(page.locator(UNIDAD)).toHaveText('lux');
+    await expect(page.locator('[class*="photoPanel"]')).toBeVisible();
+
+    const promete = await promesaDelEv(page);
+    const muestra = await evEnPantalla(page);
+    expect(promete && !muestra, `la guía promete el EV: ${promete} · la pantalla lo muestra: ${muestra}`).toBe(false);
+  });
+
+  test('HALLAZGO (09/11/2026, ABIERTO) · con el sensor de luz ambiente (320 / 640 lx) tampoco sale el EV prometido (esperado 7 / 8)', async ({
+    page,
+  }) => {
+    // ABIERTO (cabo C0688, tipo promesa): el sensor entrega lux de verdad y la app los publica
+    // con sus recomendaciones de ISO/apertura/velocidad, pero tampoco aquí aparece el EV.
+    test.fail();
+    await sensorDeLuz(page, false);
+    await abrirYMedir(page);
+    await expect(page.locator(INSIGNIA)).toContainText('Sensor de luz');
+    await expect(page.locator(VALOR)).toHaveText(/^(320|640)$/);
+    await expect(page.locator(UNIDAD)).toHaveText('lux');
+    await expect(page.locator('[class*="photoPanel"]')).toBeVisible();
+
+    const promete = await promesaDelEv(page);
+    const muestra = await evEnPantalla(page);
+    expect(promete && !muestra, `la guía promete el EV: ${promete} · la pantalla lo muestra: ${muestra}`).toBe(false);
+  });
+
+  test('HALLAZGO (09/11/2026, ABIERTO) · el featureList del JSON-LD WebApplication está vacío (§1.ter pide de 4 a 8)', async ({
+    page,
+  }) => {
+    // ABIERTO (cabo C0688): `features: []` en metadata.ts, así que el JSON-LD sale con
+    // «featureList: []». Medido en el HTML servido el 09/11/2026.
+    test.fail();
+    await page.goto('/luxometro/');
+    const caracteristicas = await page.evaluate(() => {
+      for (const s of Array.from(document.querySelectorAll('script[type="application/ld+json"]'))) {
+        const datos = JSON.parse(s.textContent ?? '{}') as { '@type'?: string; featureList?: unknown };
+        if (datos['@type'] === 'WebApplication') {
+          return Array.isArray(datos.featureList) ? datos.featureList.length : -1;
+        }
+      }
+      return -1;
+    });
+    expect(caracteristicas).toBeGreaterThanOrEqual(4);
+  });
+});
