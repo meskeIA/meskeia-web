@@ -432,6 +432,12 @@ const bingoApp: RelatedApp = {
   name: 'Cartones de Bingo',
   description: 'Cartones únicos y bombo digital',
 };
+const bingoPersonalizadoApp: RelatedApp = {
+  url: '/bingo-personalizado/',
+  icon: '🎯',
+  name: 'Bingo Personalizado',
+  description: 'Tablas, inglés, palabras o tu propia lista',
+};
 const ligaApp: RelatedApp = {
   url: '/generador-calendario-liga/',
   icon: '🏆',
@@ -2901,10 +2907,16 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/juego-memoria/', icon: '🧠', name: 'Memoria', description: 'Encuentra parejas' },
   ],
   'generador-cartones-bingo': [
+    bingoPersonalizadoApp,
     ligaApp,
     { url: '/ruleta-aleatoria/', icon: '🎰', name: 'Ruleta', description: 'Sorteos y decisiones al azar' },
-    { url: '/generador-loteria/', icon: '🎲', name: 'Lotería', description: 'Combinaciones aleatorias' },
     amigoInvisibleApp,
+  ],
+  'bingo-personalizado': [
+    bingoApp,
+    fichasCalculoApp,
+    { url: '/tablas-multiplicar/', icon: '✖️', name: 'Tablas de Multiplicar', description: 'Practica las tablas' },
+    sopaLetrasApp,
   ],
   'generador-calendario-liga': [
     bingoApp,
@@ -2916,7 +2928,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/tablas-multiplicar/', icon: '✖️', name: 'Tablas de Multiplicar', description: 'Practica las tablas' },
     { url: '/calculadora-fracciones/', icon: '➗', name: 'Calculadora de Fracciones', description: 'Comprueba las fichas paso a paso' },
     sudokusApp,
-    { url: '/juego-puzzle-matematico/', icon: '➕', name: 'Puzzle Matemático', description: 'Retos numéricos' },
+    bingoPersonalizadoApp,
   ],
   'generador-sudokus': [
     { url: '/juego-sudoku/', icon: '🔢', name: 'Sudoku', description: 'Juega en pantalla, sin imprimir' },

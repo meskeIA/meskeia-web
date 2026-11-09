@@ -550,6 +550,7 @@ export const implementedAppsUrls = [
   "/generador-sopa-letras/",             // Sopas de letras con palabras propias, imprimibles y con solución
   "/generador-laberintos/",              // Laberintos de solución única en SVG, listos para imprimir
   "/generador-cartones-bingo/",          // Cartones de bingo 90/75 únicos + bombo digital
+  "/bingo-personalizado/",               // Bingo de palabras, tablas, inglés o lista propia: el bombo canta la pregunta (S0263)
   "/generador-calendario-liga/",          // Calendario de liga todos contra todos + clasificación imprimible
   "/generador-fichas-calculo/",          // Fichas de operaciones por nivel con hoja de soluciones
   "/generador-sudokus/",                 // Sudokus con unicidad verificada y nivel medido por técnicas
