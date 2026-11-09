@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react';
 import styles from './LimpiadorTexto.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { formatNumber } from '@/lib';
+import { repararTextoPdf } from './motor';
 
 // ==================== TIPOS ====================
 
@@ -22,6 +23,8 @@ export default function LimpiadorTextoPage() {
   const [opciones, setOpciones] = useState<OpcionLimpieza[]>([
     { id: 'espaciosExtra', nombre: 'Espacios extra', descripcion: 'Reduce múltiples espacios a uno solo', activo: true },
     { id: 'espaciosInicio', nombre: 'Espacios inicio/fin', descripcion: 'Elimina espacios al inicio y fin de líneas', activo: true },
+    // Antes de «Líneas vacías»: las líneas en blanco son las que separan los párrafos (S0262).
+    { id: 'parrafosPdf', nombre: 'Párrafos de PDF', descripcion: 'Une las líneas partidas y las palabras cortadas con guion, sin perder los párrafos', activo: false },
     { id: 'lineasVacias', nombre: 'Líneas vacías', descripcion: 'Elimina líneas en blanco', activo: false },
     { id: 'lineasDuplicadas', nombre: 'Líneas duplicadas', descripcion: 'Elimina líneas repetidas', activo: false },
     { id: 'saltosLinea', nombre: 'Saltos de línea', descripcion: 'Convierte a una sola línea', activo: false },
@@ -68,6 +71,9 @@ export default function LimpiadorTextoPage() {
           break;
         case 'espaciosInicio':
           resultado = resultado.split('\n').map(linea => linea.trim()).join('\n');
+          break;
+        case 'parrafosPdf':
+          resultado = repararTextoPdf(resultado);
           break;
         case 'lineasVacias':
           resultado = resultado.split('\n').filter(linea => linea.trim() !== '').join('\n');
@@ -322,7 +328,8 @@ export default function LimpiadorTextoPage() {
               </div>
               <div className={styles.eduInfoCard}>
                 <h4><span aria-hidden="true">📄</span> Estructura de líneas</h4>
-                <p><strong>Líneas vacías</strong> → compactar texto para conteo de palabras real<br />
+                <p><strong>Párrafos de PDF</strong> → texto copiado de un PDF, con cada renglón cortado y palabras partidas con guion<br />
+                <strong>Líneas vacías</strong> → compactar texto para conteo de palabras real<br />
                 <strong>Líneas duplicadas</strong> → listas de emails, CSV con registros repetidos<br />
                 <strong>Saltos de línea</strong> → convertir párrafos a una sola línea para SQL/JSON</p>
               </div>
@@ -374,7 +381,7 @@ export default function LimpiadorTextoPage() {
             <div className={styles.eduFaqList}>
               <details className={styles.eduFaqItem}>
                 <summary className={styles.eduFaqQuestion}>¿En qué orden se aplican las operaciones?</summary>
-                <p className={styles.eduFaqAnswer}>Las operaciones se aplican en el orden en que aparecen en la lista de opciones: primero espacios extra, luego espacios inicio/fin, líneas vacías, líneas duplicadas, saltos de línea, tabulaciones, caracteres especiales, números, puntuación, emojis, HTML, URLs y finalmente emails. El orden importa: por ejemplo, eliminar saltos de línea antes que espacios extra puede dejar espacios que luego se limpian correctamente.</p>
+                <p className={styles.eduFaqAnswer}>Las operaciones se aplican en el orden en que aparecen en la lista de opciones: primero espacios extra, luego espacios inicio/fin, párrafos de PDF, líneas vacías, líneas duplicadas, saltos de línea, tabulaciones, caracteres especiales, números, puntuación, emojis, HTML, URLs y finalmente emails. El orden importa: por ejemplo, eliminar saltos de línea antes que espacios extra puede dejar espacios que luego se limpian correctamente.</p>
               </details>
               <details className={styles.eduFaqItem}>
                 <summary className={styles.eduFaqQuestion}>¿Por qué &quot;Caracteres especiales&quot; mantiene tildes y ñ?</summary>
@@ -390,7 +397,7 @@ export default function LimpiadorTextoPage() {
               </details>
               <details className={styles.eduFaqItem}>
                 <summary className={styles.eduFaqQuestion}>¿Cómo limpiar texto de un PDF copiado?</summary>
-                <p className={styles.eduFaqAnswer}>El texto copiado de PDFs suele tener: (1) guiones de partición de palabras al final de línea (-), (2) saltos de línea dentro de párrafos, (3) espacios dobles. La combinación más efectiva es activar: <strong>Espacios extra + Espacios inicio/fin</strong>. Si los párrafos están partidos en múltiples líneas, añade también <strong>Saltos de línea</strong>, aunque esto fusionará todos los párrafos en uno.</p>
+                <p className={styles.eduFaqAnswer}>El texto copiado de PDFs suele tener: (1) guiones de partición de palabras al final de línea (-), (2) saltos de línea dentro de párrafos, (3) espacios dobles. Activa <strong>Párrafos de PDF</strong> junto a las dos opciones que vienen marcadas: une los renglones de cada párrafo, quita el guion de las palabras partidas («comunica-» + «ción» → «comunicación») y deja cada párrafo en su línea. Reconoce el final de párrafo por una línea en blanco o por una línea corta que acaba en punto, y deja en su sitio las viñetas, las listas numeradas y los títulos en mayúsculas. No actives a la vez <strong>Saltos de línea</strong>, que vuelve a juntarlo todo en una sola línea.</p>
               </details>
             </div>
           </div>
@@ -464,6 +471,7 @@ export default function LimpiadorTextoPage() {
               <li><strong><span aria-hidden="true">❌</span> &quot;Caracteres especiales&quot; puede eliminar datos importantes:</strong> Símbolos como @, #, $, &amp; tienen significado funcional en muchos contextos (menciones de Twitter, hashtags, divisas, operadores lógicos). Esta opción elimina todo símbolo no estándar, lo que puede corromper datos estructurados como JSON, XML o código de programación.</li>
               <li><strong><span aria-hidden="true">❌</span> &quot;Líneas duplicadas&quot; no distingue contexto:</strong> Si tu texto tiene dos párrafos que comienzan igual (por ejemplo, en legalese repetitivo), el segundo se elimina aunque sea diferente. La deduplicación es estricta: cualquier línea normalizada idéntica a una anterior se descarta.</li>
               <li><strong><span aria-hidden="true">❌</span> &quot;Saltos de línea&quot; fusiona párrafos:</strong> Convertir a una sola línea elimina la estructura de párrafos. Si después necesitas distinguir dónde empezaba cada párrafo, habrás perdido esa información. Úsalo solo cuando el texto destino es un campo de texto plano sin estructura (como un campo de búsqueda o una variable de código).</li>
+              <li><strong><span aria-hidden="true">❌</span> &quot;Párrafos de PDF&quot; no distingue un compuesto partido en su guion:</strong> Si el PDF parte «teórico-práctico» justo en el guion y no lo repite al principio de la línea siguiente, como pide la Ortografía de la RAE, el resultado es «teóricopráctico»: sin esa repetición es indistinguible de una palabra partida. Tampoco adivina un párrafo que acaba en una línea larga sin línea en blanco detrás. Revisa el resultado antes de usarlo.</li>
               <li><strong><span aria-hidden="true">❌</span> La detección de emails y URLs es aproximada:</strong> Las expresiones regulares usadas capturan la mayoría de formatos, pero pueden dar falsos positivos (eliminar texto que parece email pero no lo es) o falsos negativos (no detectar URLs con formatos inusuales). Para procesamiento de producción, usa librerías especializadas.</li>
             </ul>
           </div>

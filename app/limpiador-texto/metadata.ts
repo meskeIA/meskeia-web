@@ -40,7 +40,8 @@ export const jsonLd = generateWebAppSchema({
   url: "https://meskeia.com/limpiador-texto/",
   category: 'UtilityApplication',
   features: [
-    '13 opciones de limpieza: espacios, líneas vacías, duplicados, tabulaciones, caracteres especiales, números, puntuación, emojis, HTML, URLs y emails',
+    '14 opciones de limpieza: espacios, párrafos de PDF, líneas vacías, duplicados, tabulaciones, caracteres especiales, números, puntuación, emojis, HTML, URLs y emails',
+    'Reconstruye los párrafos del texto copiado de un PDF y une las palabras partidas con guion',
     'Procesamiento 100% local en el navegador — el texto nunca sale de tu dispositivo',
     'Estadísticas en tiempo real: caracteres antes/después y porcentaje eliminado',
     'Botón "Aplicar resultado" para encadenar múltiples limpiezas',

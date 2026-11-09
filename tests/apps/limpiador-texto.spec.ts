@@ -1,4 +1,5 @@
 import { test, expect, Page } from '@playwright/test';
+import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
 
 /**
  * Inspector — limpiador-texto (segmento interactiva, riesgo 3)
@@ -141,5 +142,31 @@ test.describe('limpiador-texto', () => {
     await expect(entrada(page)).toHaveValue('');
     await expect(salida(page)).toHaveValue('');
     await expect(page.locator('[role="status"]')).toHaveCount(0);
+  });
+
+  // -------------------------------------------------------------------------------------
+  // CASO 4 · «Párrafos de PDF» (S0262, 09/11/2026) — el motor tiene sus casos en
+  // tests/parrafos-pdf-motor.spec.ts; aquí se comprueba que la vista lo engancha y en qué
+  // ORDEN: va antes de «Líneas vacías», que si actuara primero borraría la línea en blanco
+  // que separa los dos párrafos y los fundiría en uno.
+  //   Entrada: «  La comunica-␤ción es clave.␤␤Segundo párrafo␤aquí.»
+  //   Espacios inicio/fin recorta la sangría → Párrafos de PDF une «comunica-»+«ción» y
+  //   «Segundo párrafo»+«aquí.», conservando la línea en blanco → Líneas vacías la quita
+  //   después: dos párrafos, uno por línea.
+  // -------------------------------------------------------------------------------------
+  test('CASO 4 · «Párrafos de PDF» une renglones y palabras partidas, y no funde los párrafos con «Líneas vacías»', async ({
+    page,
+  }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['textarea[aria-label="Texto original a limpiar"]']);
+
+    await activarOpcion(page, 'Párrafos de PDF', true);
+    await activarOpcion(page, 'Líneas vacías', true);
+
+    const original = '  La comunica-\nción es clave.\n\nSegundo párrafo\naquí.';
+    await entrada(page).fill(original);
+    await esperarValorEnReact(page, entrada(page), original);
+
+    await expect(salida(page)).toHaveValue('La comunicación es clave.\nSegundo párrafo aquí.');
   });
 });
