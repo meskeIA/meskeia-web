@@ -87,10 +87,13 @@ export default function EstimacionBajaMaternalPage() {
     let semanasExtras = 0;
     const detalleExtras: string[] = [];
 
-    // Parto multiple: 1 semana por cada hijo adicional a partir del segundo (RDL 9/2025)
+    // Parto multiple: 1 semana por progenitor por cada hijo adicional (RDL 9/2025). ET 48.6:
+    // la unica persona progenitora disfruta «las ampliaciones completas», las 2 semanas.
+    // Hasta el 09/11/2026 la familia monoparental recibia 1 (hermana del hallazgo 4285).
     if (partoMultiple && numBebes > 1) {
       const hijosAdicionales = numBebes - 1;
-      const extraMultiple = hijosAdicionales * AMPLIACION_POR_ID['parto-multiple'].semanasExtra;
+      const factorFamilia = tipoFamilia === 'monoparental' ? 2 : 1;
+      const extraMultiple = hijosAdicionales * AMPLIACION_POR_ID['parto-multiple'].semanasExtra * factorFamilia;
       semanasExtras += extraMultiple;
       detalleExtras.push(
         `Parto multiple (${numBebes} bebes): +${extraMultiple} semanas`
@@ -106,8 +109,10 @@ export default function EstimacionBajaMaternalPage() {
       );
     }
 
-    // Hospitalizacion neonatal: 1 semana por cada 7 dias, con el tope del modulo
-    if (hospitalizacion && diasHospitalizacion > 0) {
+    // Hospitalizacion neonatal: solo si pasa de 7 dias (ET 48.4, «por un periodo superior a
+    // siete dias»); hasta el 09/11/2026 un ingreso de 1 a 7 dias sumaba una semana (hermana
+    // del hallazgo 4287). Sigue redondeando a semanas: el ET amplia en DIAS (cabo anotado).
+    if (hospitalizacion && diasHospitalizacion > 7) {
       const semanasHosp = Math.min(
         Math.ceil(diasHospitalizacion / 7),
         AMPLIACION_POR_ID['hospitalizacion-neonatal'].semanasExtra
@@ -340,7 +345,7 @@ export default function EstimacionBajaMaternalPage() {
                   className={styles.numberInput}
                 />
                 <p className={styles.helpText}>
-                  Maximo 13 semanas adicionales (91 dias). Se calcula 1 semana extra por cada 7 dias.
+                  Solo amplia si pasa de 7 dias. Maximo 13 semanas adicionales (91 dias). Se calcula 1 semana extra por cada 7 dias o fraccion.
                 </p>
               </div>
             )}
