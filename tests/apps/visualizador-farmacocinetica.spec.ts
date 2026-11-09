@@ -431,8 +431,9 @@ test.describe('visualizador-farmacocinetica', () => {
    *       secciones 4.2 y 4.4; texto revisado en noviembre de 2021.
    *   (c) «Alcohol: 5–10% se elimina por el aliento» (tarjeta «Vía pulmonar», sección E del ADME) —
    *       SIN ANCLAR: en CIMA el etanol solo figura como principio activo de uso cutáneo o como
-   *       excipiente (ninguna ficha da su eliminación pulmonar) y no hay otra fuente en la red. No es
-   *       hallazgo y no lleva caso: si la red gana la EMA, el cabo vuelve.
+   *       excipiente (ninguna ficha da su eliminación pulmonar) y no hay otra fuente en la red.
+   *       RETIRADA la cifra el 09/11/2026 por decisión del usuario (cabo C0686, neutralidad
+   *       editorial, regla 1: cifra sin fuente): la tarjeta dice «una pequeña parte», sin porcentaje.
    *   (d) bioequivalencia — OMS, Technical Report Series n.º 1003 (2017), anexo 6, §7.7 «Acceptance
    *       ranges» (en www.who.int). La guía de la EMA, que es la que aplica la AEMPS, no está en la red.
    */
@@ -495,5 +496,17 @@ test.describe('visualizador-farmacocinetica', () => {
     const sinIntervalo = conRango.filter((t) => !/intervalo de confianza|IC\s*(del\s*)?90/i.test(t));
     expect(conRango.length).toBeGreaterThanOrEqual(2);
     expect(sinIntervalo, sinIntervalo.join(' ‖ ')).toEqual([]);
+  });
+
+  test('C0686 (09/11/2026, REPARADO) · la vía pulmonar no da un porcentaje de alcohol sin fuente', async ({ page }) => {
+    // Decisión del usuario en la recogida de /reparar: retirar el «5–10 %», que ninguna fuente de
+    // la red respalda, y dejar la idea («una pequeña parte», la base del alcoholímetro).
+    // La tarjeta vive en la sección «E — Excreción» del ciclo ADME, que no está montada hasta pulsarla.
+    await page.getByRole('button', { name: /Excreción/ }).click();
+    const tarjeta = page.locator('h4', { hasText: 'Vía pulmonar' }).locator('..');
+    await expect(tarjeta).toBeVisible();
+    const texto = (await tarjeta.textContent()) ?? '';
+    expect(texto).toContain('una pequeña parte se elimina por el aliento');
+    expect(texto).not.toMatch(/\d+\s*[–-]\s*\d+\s*%/);
   });
 });

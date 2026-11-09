@@ -374,7 +374,7 @@ export default function VisualizadorFarmacocinetica() {
                 <div className={styles.excrecionCard}>
                   <span className={styles.excrecionIcono} aria-hidden="true">🫁</span>
                   <h4>Vía pulmonar</h4>
-                  <p>Anestésicos volátiles (halotano, sevoflurano). Alcohol: 5–10% se elimina por el aliento (base del etilómetro).</p>
+                  <p>Anestésicos volátiles (halotano, sevoflurano). Alcohol: una pequeña parte se elimina por el aliento, que es lo que mide el alcoholímetro.</p>
                 </div>
                 <div className={styles.excrecionCard}>
                   <span className={styles.excrecionIcono} aria-hidden="true">🍼</span>
