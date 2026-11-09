@@ -2102,8 +2102,8 @@ test.describe('Cabo C0206 (09/11/2026) — Ley 7/2023, art. 30: seguro de RC y c
     return (await cabecera.locator('xpath=following-sibling::p[1]').innerText()).replace(/\s+/g, ' ');
   }
 
-  test.fail('HALLAZGO (C0206): el consejo del perro no ata el seguro a los potencialmente peligrosos y nombra el seguro de responsabilidad civil (art. 30.3)', async ({ page }) => {
-    // ABIERTO. Obtenido en todo resultado de perro, «Antes de decidirte»: «📋 Chip, vacunas y, si
+  test('HALLAZGO 4416 (C0206): el consejo del perro no ata el seguro a los potencialmente peligrosos y nombra el seguro de responsabilidad civil (art. 30.3)', async ({ page }) => {
+    // REPARADO (09/11/2026). Antes, en todo resultado de perro, «Antes de decidirte»: «📋 Chip, vacunas y, si
     // el perro está catalogado como potencialmente peligroso, licencia y seguro son gastos de los
     // primeros meses.» El condicional deja el seguro solo para los PPP. Esperado (art. 30.3): el
     // «seguro de responsabilidad civil por daños a terceros» es de todo perro, durante toda su
@@ -2121,8 +2121,8 @@ test.describe('Cabo C0206 (09/11/2026) — Ley 7/2023, art. 30: seguro de RC y c
       .toContain('responsabilidad civil');
   });
 
-  test.fail('HALLAZGO (C0206): la guía «Obligaciones legales» incluye el seguro de responsabilidad civil de todo perro (art. 30.3)', async ({ page }) => {
-    // ABIERTO. Obtenido: el párrafo enumera, de la Ley 7/2023, el microchip y la esterilización de
+  test('HALLAZGO 4417 (C0206): la guía «Obligaciones legales» incluye el seguro de responsabilidad civil de todo perro (art. 30.3)', async ({ page }) => {
+    // REPARADO (09/11/2026). Antes, el párrafo enumera, de la Ley 7/2023, el microchip y la esterilización de
     // los gatos (art. 26.i) y evitar la reproducción incontrolada de los perros (art. 26.d), y añade
     // «Los perros potencialmente peligrosos necesitan licencia municipal (Ley 50/1999)». No dice
     // que todo titular de perro deba «contratar y mantener en vigor un seguro de responsabilidad
@@ -2139,8 +2139,8 @@ test.describe('Cabo C0206 (09/11/2026) — Ley 7/2023, art. 30: seguro de RC y c
 
   test('control (C0206): si la app menciona el curso del art. 30.1 no lo da por exigible ya, y no inventa la cuantía del seguro', async ({ page }) => {
     // Art. 30.2: el contenido del curso «se determinará reglamentariamente», y el reglamento no se
-    // ha publicado. Art. 30.3: la cuantía del seguro «se establecerá reglamentariamente». Pasa hoy
-    // (la app no menciona ni el curso ni el seguro de RC) y debe seguir pasando tras la reparación.
+    // ha publicado. Art. 30.3: la cuantía del seguro «se establecerá reglamentariamente». Desde la
+    // reparación de 4416/4417 la app nombra el seguro de RC, sin cuantía.
     await abrirTest(page);
     await responder(page, PERRO_GRANDE);
     await leerFicha(page);

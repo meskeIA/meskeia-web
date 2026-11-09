@@ -689,7 +689,7 @@ export function calcularResultado(r: Record<number, string>): Resultado {
   if (esPerro(mascota)) {
     // «45\u00A0%»: el porcentaje va con espacio duro (CLAUDE.md global §2; hallazgo 2673).
     consejos.push({ icono: '💉', texto: 'Prevé cómo afrontarías un gasto veterinario imprevisto, con un seguro de salud para mascotas o de otra forma: en la encuesta de la OCU (España, 2022), el 45\u00A0% de los dueños de perro tuvo que llevarlo a urgencias en el último año. El precio del seguro depende de la especie, la edad, la raza y lo que cubra: compara varias ofertas.' });
-    consejos.push({ icono: '📋', texto: 'Chip, vacunas y, si el perro está catalogado como potencialmente peligroso, licencia y seguro son gastos de los primeros meses. En España la esterilización del perro no es obligatoria por ley estatal, pero sí evitar que críe sin control.' });
+    consejos.push({ icono: '📋', texto: 'Chip, vacunas y seguro de responsabilidad civil son gastos de los primeros meses. En España ese seguro es obligatorio para todo perro, durante toda su vida (Ley 7/2023, art. 30.3), y si el perro está catalogado como potencialmente peligroso necesita además licencia municipal (Ley 50/1999). La esterilización del perro no es obligatoria por ley estatal, pero sí evitar que críe sin control.' });
   }
   if (mascota === 'gato') {
     consejos.push({ icono: '✂️', texto: 'La esterilización reduce problemas de salud y comportamiento. Su precio depende del sexo (en la hembra es una cirugía abdominal, más compleja que la castración del macho) y de la clínica: pide presupuesto. En España es obligatoria antes de los 6 meses (Ley 7/2023, art. 26.i), salvo gatos inscritos como reproductores.' });
