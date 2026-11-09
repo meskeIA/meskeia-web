@@ -288,12 +288,16 @@ test.describe('estimacion-prestacion-nacimiento', () => {
     expect(texto).not.toContain('+2 semanas');
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · el rechazo de la base vacía es mudo: ningún aviso', async ({ page }) => {
-    test.fail();
-    await rellenar(page, { base: '' });
-    await page.getByRole('button', { name: 'Estimar prestacion' }).click();
-    // Acotado al formulario: el anunciador de rutas de Next también es role="alert".
-    await expect(page.locator('form').getByRole('alert')).toBeVisible({ timeout: 2000 });
+  test('HALLAZGO 4296 (09/11/2026, REPARADO) · el rechazo de la base vacía, 0 o negativa se dice', async ({ page }) => {
+    for (const base of ['', '0', '-500']) {
+      await page.reload();
+      await esperarHidratacion(page, [`input[aria-label="${BASE}"]`]);
+      await rellenar(page, { base });
+      await page.getByRole('button', { name: 'Estimar prestacion' }).click();
+      // Acotado al formulario: el anunciador de rutas de Next también es role="alert".
+      await expect(page.locator('form').getByRole('alert')).toBeVisible({ timeout: 2000 });
+      await expect(seccionResultado(page)).toHaveCount(0);
+    }
   });
 
   test('HALLAZGO (09/11/2026, ABIERTO) · «cobras desde la fecha de solicitud»: LGSS 53.1 da tres meses', async ({
@@ -327,9 +331,8 @@ test.describe('estimacion-prestacion-nacimiento', () => {
     expect(respuestas[4]).not.toContain('cuantía fija');
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · riesgo 1: el aviso no es severity="critical"', async ({ page }) => {
+  test('HALLAZGO 4292 (09/11/2026, REPARADO) · riesgo 1: el aviso es severity="critical"', async ({ page }) => {
     // DisclaimerCard solo pone aria-label="Aviso importante" con severity="critical".
-    test.fail();
     await expect(page.locator('[aria-label="Aviso importante"]')).toHaveCount(1);
   });
 
@@ -339,10 +342,9 @@ test.describe('estimacion-prestacion-nacimiento', () => {
     await expect(page.getByLabel('Menor de 21 años', { exact: true })).toHaveCount(1);
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · la región aria-live nace con el resultado y no se anuncia', async ({
+  test('HALLAZGO 4297 (09/11/2026, REPARADO) · la región aria-live existe antes del resultado', async ({
     page,
   }) => {
-    test.fail();
     await page.evaluate(() =>
       document.querySelectorAll('[aria-live]').forEach((n) => n.setAttribute('data-previa', '1')),
     );

@@ -66,6 +66,7 @@ export default function EstimacionPrestacionNacimiento() {
   const [numHijos, setNumHijos] = useState<number>(2);
   const [hospitalizacion, setHospitalizacion] = useState(false);
   const [diasHospital, setDiasHospital] = useState<string>('');
+  const [errorBase, setErrorBase] = useState<string>('');
   const [mostrarResultados, setMostrarResultados] = useState(false);
 
   // Parsear la base de cotizacion con el parser canonico: el casero (quitar todos los
@@ -260,6 +261,25 @@ export default function EstimacionPrestacionNacimiento() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    // El rechazo se dice: con la base vacia, a cero o ilegible no habia ni resultado ni aviso
+    // (hallazgo 4296).
+    const num = parseSpanishNumber(baseCotizacion);
+    if (baseCotizacion.trim() === '') {
+      setErrorBase('Escribe tu base de cotizacion mensual para estimar la prestacion.');
+      setMostrarResultados(false);
+      return;
+    }
+    if (isNaN(num)) {
+      setErrorBase('No se ha podido leer la base: escribe solo la cifra, por ejemplo 2.000.');
+      setMostrarResultados(false);
+      return;
+    }
+    if (num <= 0) {
+      setErrorBase('La base de cotizacion tiene que ser mayor que 0.');
+      setMostrarResultados(false);
+      return;
+    }
+    setErrorBase('');
     setMostrarResultados(true);
   };
 
@@ -283,7 +303,7 @@ export default function EstimacionPrestacionNacimiento() {
       <LegalNotice />
 
       {/* Disclaimer */}
-      <DisclaimerCard variant="financial" severity="high" collapsible={false}>
+      <DisclaimerCard variant="financial" severity="critical" collapsible={false}>
         <p>
           Esta herramienta ofrece una estimacion <strong>ORIENTATIVA</strong> de la
           prestacion por nacimiento de la Seguridad Social. La cuantia real depende de
@@ -413,8 +433,10 @@ export default function EstimacionPrestacionNacimiento() {
             value={baseCotizacion}
             onChange={(val) => {
               setBaseCotizacion(val);
+              setErrorBase('');
               setMostrarResultados(false);
             }}
+            error={errorBase || undefined}
             label="Base de cotizacion mensual"
             placeholder="Ej: 2.000"
             min={0}
@@ -539,8 +561,11 @@ export default function EstimacionPrestacionNacimiento() {
       </form>
 
       {/* Resultados */}
+      {/* La region viva existe ANTES del resultado y se llena despues: una que nace llena no
+          la anuncian los lectores de pantalla de forma fiable (hallazgo 4297). */}
+      <div aria-live="polite">
       {resultado && (
-        <section className={styles.resultados} aria-live="polite">
+        <section className={styles.resultados}>
           <h2 className={styles.resultadosTitle}>
             <span aria-hidden="true">📊</span> Resultado de la estimacion
             {!resultado.esContributiva && (
@@ -660,6 +685,7 @@ export default function EstimacionPrestacionNacimiento() {
           </div>
         </section>
       )}
+      </div>
 
       {/* Seccion educativa v2.0 */}
       <EducationalSection
