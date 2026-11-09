@@ -156,6 +156,12 @@ const NIVEL_MANUAL = {
   // Nació el 11/10/2026 (5bd2082c) con aviso químico propio: sosa y potasa cáusticas queman piel
   // y ojos. Mismo caso que calculadora-piscinas: el riesgo no es el de su suite.
   'calculadora-jabon':          2,
+
+  // ── Revisión del 09/11/2026 (audit-meskeia). Suite "productividad" (nivel 3), pero es un
+  // buscador de significados de emojis: no decide nada ni toca dinero, salud o datos. Nació el
+  // 05/11/2026 (c67abae6) con aviso informativo `low`; sus hermanas de las mismas suites
+  // (detector-idioma, conversor-texto, generador-anagramas) van exentas. Nivel 4 por lo que hace.
+  'buscador-emojis':            4,
 };
 
 // Apps que importan de data/fiscal/ algo que NO es un dato normativo, y por eso no llevan
