@@ -727,7 +727,7 @@ export default function HuesosCuerpoHumanoPage() {
         <section className={styles.guideSection}>
           <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
-              <span className={styles.warningIcon}>⚠️</span>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               <h3>Errores Comunes que Cuestan Puntos en los Exámenes</h3>
             </div>
             <ul className={styles.warningList}>

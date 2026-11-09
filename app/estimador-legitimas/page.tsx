@@ -571,7 +571,7 @@ export default function EstimadorLegitimas() {
       {/* 6. Warning Box */}
       <div className={styles.warningBox}>
         <div className={styles.warningHeader}>
-          <span className={styles.warningIcon}>⚠️</span>
+          <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
           <strong>Errores frecuentes en la planificación de legítimas</strong>
         </div>
         <ul className={styles.warningList}>

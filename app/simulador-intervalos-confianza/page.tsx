@@ -960,7 +960,7 @@ export default function SimuladorIntervalosConfianzaPage() {
         {/* WARNING BOX */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <strong>5 errores frecuentes con intervalos de confianza</strong>
           </div>
           <ul className={styles.warningList}>

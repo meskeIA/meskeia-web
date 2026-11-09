@@ -571,7 +571,7 @@ export default function ConversorHorariosPage() {
           <div className={styles.eduEscenariosGrid}>
             <div className={styles.eduEscenarioCard}>
               <div className={styles.eduEscenarioHeader}>
-                <span className={styles.eduEscenarioIcon}>🏢</span>
+                <span className={styles.eduEscenarioIcon} aria-hidden="true">🏢</span>
                 <h4>Trabajador Remoto con Equipo Internacional</h4>
               </div>
               <p className={styles.eduEscenarioExample}>Madrid CET+1 coordina con: Nueva York (EST, -6h en invierno, -5h en verano), Londres (GMT, -1h en invierno = misma hora). Ventana de solapamiento: 14:00-17:00 Madrid = 9:00-12:00 NY.</p>
@@ -579,7 +579,7 @@ export default function ConversorHorariosPage() {
             </div>
             <div className={styles.eduEscenarioCard}>
               <div className={styles.eduEscenarioHeader}>
-                <span className={styles.eduEscenarioIcon}>💻</span>
+                <span className={styles.eduEscenarioIcon} aria-hidden="true">💻</span>
                 <h4>Freelance con Clientes Internacionales</h4>
               </div>
               <p className={styles.eduEscenarioExample}>Freelance español con clientes en EE.UU. (PST): diferencia de 9h en invierno, 8h en verano. Mejor horario de reunión: 17:00-19:00 Madrid = 08:00-10:00 Los Ángeles. Usar esta herramienta para confirmar antes de proponer horario.</p>
@@ -587,7 +587,7 @@ export default function ConversorHorariosPage() {
             </div>
             <div className={styles.eduEscenarioCard}>
               <div className={styles.eduEscenarioHeader}>
-                <span className={styles.eduEscenarioIcon}>🌏</span>
+                <span className={styles.eduEscenarioIcon} aria-hidden="true">🌏</span>
                 <h4>Empresa con Sedes en Múltiples Países</h4>
               </div>
               <p className={styles.eduEscenarioExample}>Reunión global mensual: Madrid (CET+1), Nueva York (EST), Singapur (SGT+8), Sídney (AEST+10). El único horario viable para los 4: 08:00 Madrid = 02:00 NY = 15:00 Singapur = 17:00 Sídney. Rotar la penalización entre equipos.</p>
@@ -595,7 +595,7 @@ export default function ConversorHorariosPage() {
             </div>
             <div className={styles.eduEscenarioCard}>
               <div className={styles.eduEscenarioHeader}>
-                <span className={styles.eduEscenarioIcon}>✈️</span>
+                <span className={styles.eduEscenarioIcon} aria-hidden="true">✈️</span>
                 <h4>Viajero Internacional Frecuente</h4>
               </div>
               <p className={styles.eduEscenarioExample}>Vuelo Madrid → Tokio: +8h de diferencia. Si tu reunión habitual es los martes a las 10:00 Madrid, en Tokio son las 18:00 del mismo día en invierno. Con esta herramienta: introduce la hora en Madrid y selecciona Tokio para ver la hora local antes de aterrizar.</p>
@@ -699,32 +699,32 @@ export default function ConversorHorariosPage() {
           <h3><span aria-hidden="true">✅</span> 6 Prácticas para la Coordinación Global</h3>
           <div className={styles.eduTipsGrid}>
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcon}>📅</span>
+              <span className={styles.eduTipIcon} aria-hidden="true">📅</span>
               <h4>Usa siempre UTC en comunicaciones escritas</h4>
               <p>Escribir la hora en UTC elimina ambigüedad total. &ldquo;15:00 UTC&rdquo; es inequívoco para cualquier persona en el mundo.</p>
             </div>
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcon}>🔄</span>
+              <span className={styles.eduTipIcon} aria-hidden="true">🔄</span>
               <h4>Vigila las semanas de cambio horario</h4>
               <p>Las semanas de cambio de horario en marzo y octubre son las más problemáticas. Confirma siempre la hora con tus contactos esa semana.</p>
             </div>
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcon}>📱</span>
+              <span className={styles.eduTipIcon} aria-hidden="true">📱</span>
               <h4>Configura tu móvil con zonas secundarias</h4>
               <p>Los móviles permiten mostrar 2-3 zonas horarias en el reloj. Añade las zonas de tus principales colaboradores para tenerlas siempre visibles.</p>
             </div>
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcon}>🗓️</span>
+              <span className={styles.eduTipIcon} aria-hidden="true">🗓️</span>
               <h4>Crea eventos en el calendario con zona correcta</h4>
               <p>Google Calendar y Outlook convierten automáticamente si creas el evento con la zona horaria del organizador. Así todos ven la hora correcta en su zona.</p>
             </div>
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcon}>🤝</span>
+              <span className={styles.eduTipIcon} aria-hidden="true">🤝</span>
               <h4>Respeta los horarios laborales ajenos</h4>
               <p>Una reunión a las 08:00 en tu zona puede ser medianoche para alguien. Verifica siempre que el horario propuesto cae dentro del horario laboral del participante.</p>
             </div>
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcon}>⚡</span>
+              <span className={styles.eduTipIcon} aria-hidden="true">⚡</span>
               <h4>Documenta los acuerdos en UTC</h4>
               <p>Actas, contratos y registros con horas deberían indicar UTC o la zona explícita. &ldquo;Firmado a las 15:00&rdquo; es ambiguo; &ldquo;15:00 CET&rdquo; o &ldquo;14:00 UTC&rdquo; no lo es.</p>
             </div>
