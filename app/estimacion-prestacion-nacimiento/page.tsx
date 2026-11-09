@@ -240,7 +240,9 @@ export default function EstimacionPrestacionNacimiento() {
 
     if (situacion === 'adopcion') {
       detalleAmpliaciones.push({
-        texto: `Posible +${AMPLIACION_POR_ID['adopcion-internacional'].semanasExtra} semanas si adopción internacional (desplazamiento)`,
+        // ET 48.5: el desplazamiento adelanta el inicio, no suma semanas. Hasta el 09/11/2026
+        // anunciaba «+2 semanas» (hallazgo 4288).
+        texto: `Adopción internacional. ${AMPLIACION_POR_ID['adopcion-internacional'].nota}`,
         etiqueta: 'Nota',
       });
     }
@@ -838,12 +840,12 @@ export default function EstimacionPrestacionNacimiento() {
               </div>
               <p>
                 Ana y Pedro adoptan en Colombia. Cada uno tiene 19 semanas de permiso (32 si fuera
-                familia monoparental). Además, pueden solicitar hasta 2 semanas adicionales por
-                desplazamiento al país de origen. La prestación se calcula igual: 100&nbsp;% de la base
-                reguladora.
+                familia monoparental). El viaje al país de origen no añade semanas: el permiso puede
+                empezar hasta 4 semanas antes de la resolución de adopción (art. 48.5 del Estatuto de
+                los Trabajadores). La prestación se calcula igual: 100&nbsp;% de la base reguladora.
               </p>
               <div className={styles.escenarioResultado}>
-                Hasta 21 semanas si hay desplazamiento internacional (34 si monoparental)
+                19 semanas cada uno, que pueden empezar hasta 4 antes de la resolución (32 si monoparental)
               </div>
             </div>
             <div className={styles.escenarioCard}>

@@ -110,11 +110,15 @@ export const AMPLIACIONES_PERMISO: AmpliacionPermiso[] = [
     nota: 'Por cada hijo/a adicional a partir del segundo (RDL 9/2025)',
   },
   {
+    // ET 48.6: «una duración adicional de dos semanas, una para cada una de las personas
+    // progenitoras»; la única persona progenitora disfruta «las ampliaciones completas» (las 2).
+    // Hasta el 09/11/2026 valía 2 por progenitor (hallazgo 4288, decidido por el usuario con
+    // el texto consolidado del BOE consultado ese día).
     id: 'discapacidad-menor',
     motivo: 'Discapacidad del hijo/a',
-    semanasExtra: 2,
+    semanasExtra: 1,
     porProgenitor: true,
-    nota: 'Si el recién nacido tiene discapacidad reconocida',
+    nota: 'Si el menor tiene discapacidad, en nacimiento, adopción, guarda o acogimiento. En familia monoparental, 2 (ET 48.6)',
   },
   {
     id: 'hospitalizacion-neonatal',
@@ -124,11 +128,14 @@ export const AMPLIACIONES_PERMISO: AmpliacionPermiso[] = [
     nota: 'Hasta 13 semanas adicionales (días de hospitalización tras el parto). Solo un progenitor.',
   },
   {
+    // ET 48.5: con desplazamiento previo al país de origen, el permiso «podrá iniciarse hasta
+    // cuatro semanas antes de la resolución por la que se constituye la adopción». Adelanta el
+    // inicio, no suma semanas. Hasta el 09/11/2026 valía 2 semanas extra (hallazgo 4288).
     id: 'adopcion-internacional',
-    motivo: 'Adopción/acogimiento internacional',
-    semanasExtra: 2,
-    porProgenitor: false,
-    nota: 'Hasta 2 semanas adicionales por desplazamiento al país de origen',
+    motivo: 'Adopción internacional',
+    semanasExtra: 0,
+    porProgenitor: true,
+    nota: 'No añade semanas: si hay que viajar al país de origen, el permiso puede empezar hasta 4 semanas antes de la resolución de adopción (ET 48.5)',
   },
 ];
 

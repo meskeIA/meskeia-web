@@ -159,10 +159,11 @@ export default function PermisoPrestacionNacimientoPage() {
                     <tr key={a.motivo}>
                       <th scope="row" className={styles.rowHead}>{a.motivo}</th>
                       <td className={styles.numCol}>
-                        <span className={styles.tipoTag}>+{a.semanasExtra}</span>
+                        {/* La adopción internacional no suma semanas (ET 48.5): sale «0», sin «+» ni reparto. */}
+                        <span className={styles.tipoTag}>{a.semanasExtra === 0 ? '0' : `+${a.semanasExtra}`}</span>
                       </td>
                       <td className={styles.notaCell}>
-                        {a.porProgenitor ? 'Por progenitor. ' : 'Solo un progenitor. '}{a.nota}
+                        {(a.semanasExtra === 0 ? '' : a.porProgenitor ? 'Por progenitor. ' : 'Solo un progenitor. ') + a.nota}
                       </td>
                     </tr>
                   ))}

@@ -3292,10 +3292,12 @@ test.describe('Golden — calcularPrestacionMaternidadPaternidad (Capa 1 · LGSS
     expect(mp.cuotaTotalPrestacion).toBeCloseTo(10640.00, 2);
   });
 
-  test('GOLDEN-CF: BC 3.000 €/mes, parto múltiple (2 hijos) + discapacidad → +3 semanas adicionales [sin contraste oficial]', () => {
-    // BR diaria = 3.000/30 = 100 €. +1 semana (1 hijo adicional, RDL 9/2025) + 2 semanas (discapacidad) = 22 semanas = 154 días.
-    // Obligatorios = 42 días, flexibles = 112 días.
-    // Cuantía mensual = 100 × 30 = 3.000 €. Total prestación = 100 × 154 = 15.400 €.
+  test('GOLDEN-CF: BC 3.000 €/mes, parto múltiple (2 hijos) + discapacidad → +2 semanas adicionales por progenitor [ET 48.6]', () => {
+    // BR diaria = 3.000/30 = 100 €. +1 semana (1 hijo adicional) + 1 semana (discapacidad) = 21 semanas = 147 días.
+    // ET 48.6: la de discapacidad es «de dos semanas, una para cada una de las personas
+    // progenitoras». Hasta el 09/11/2026 el motor daba 2 a cada uno, 22 semanas (hallazgo 4288).
+    // Obligatorios = 42 días, flexibles = 105 días.
+    // Cuantía mensual = 100 × 30 = 3.000 €. Total prestación = 100 × 147 = 14.700 €.
     const mp = calcularPrestacionMaternidadPaternidad({
       baseCotizacionMensual: 3000,
       edadProgenitor: 'entre_21_y_26',
@@ -3305,12 +3307,27 @@ test.describe('Golden — calcularPrestacionMaternidadPaternidad (Capa 1 · LGSS
     expect(mp.baseReguladoraDiaria).toBeCloseTo(100.00, 2);
     expect(mp.baseReguladoraMensual).toBeCloseTo(3000.00, 2);
     expect(mp.semanasAdicionalMultiple).toBe(1);
-    expect(mp.semanasAdicionalDiscapacidad).toBe(2);
-    expect(mp.duracionTotalDias).toBe(154);
+    expect(mp.semanasAdicionalDiscapacidad).toBe(1);
+    expect(mp.duracionTotalDias).toBe(147);
     expect(mp.diasObligatorios).toBe(42);
-    expect(mp.diasFlexibles).toBe(112);
+    expect(mp.diasFlexibles).toBe(105);
     expect(mp.cuantiaMensual).toBeCloseTo(3000.00, 2);
-    expect(mp.cuotaTotalPrestacion).toBeCloseTo(15400.00, 2);
+    expect(mp.cuotaTotalPrestacion).toBeCloseTo(14700.00, 2);
+  });
+
+  test('GOLDEN-CF2: monoparental con un hijo con discapacidad → 32 + 2 = 34 semanas (ET 48.6, ampliaciones completas)', () => {
+    // La única persona progenitora disfruta «las ampliaciones completas previstas en este
+    // apartado para el caso de familias con dos personas progenitoras»: las 2 de discapacidad.
+    // 34 semanas = 238 días. BR diaria 100 € → total 23.800 €.
+    const mp = calcularPrestacionMaternidadPaternidad({
+      baseCotizacionMensual: 3000,
+      edadProgenitor: 'entre_21_y_26',
+      tipoFamilia: 'monoparental',
+      hijoConDiscapacidad: true,
+    });
+    expect(mp.semanasAdicionalDiscapacidad).toBe(2);
+    expect(mp.duracionTotalDias).toBe(238);
+    expect(mp.cuotaTotalPrestacion).toBeCloseTo(23800.00, 2);
   });
 
   test('GOLDEN-CG: BC 6.000 €/mes (supera base máxima) sin carencia → subsidio no contributivo de 600 €/mes [sin contraste oficial]', () => {

@@ -16,6 +16,13 @@ import { esperarHidratacion } from './_hidratacion';
  *   · Biparental, gemelos: 19 + 1 = 20 semanas.
  *   · Biparental, hospitalización de 7 días (el valor por defecto): 19 semanas, sin ampliación
  *     (antes 20).
+ *
+ * HALLAZGO 4288 (decidido por el usuario el 09/11/2026, ET 48.5 y 48.6 en el BOE ese día):
+ *   · Discapacidad, biparental: 19 + 1 = 20 semanas por progenitor (antes 21).
+ *   · Discapacidad, monoparental: 32 + 2 = 34 semanas (las ampliaciones completas; daba 34
+ *     por accidente: 2 por progenitor).
+ *   · Adopción o acogimiento: 19 semanas (antes 21: sumaba 2 por un desplazamiento que el ET
+ *     no da en semanas, solo adelanta el inicio hasta cuatro antes de la resolución).
  */
 
 async function estimar(page: Page): Promise<string> {
@@ -49,5 +56,23 @@ test.describe('estimacion-baja-maternal', () => {
   }) => {
     await page.getByLabel('Hospitalizacion neonatal (parto prematuro u otra causa)').check();
     expect(await estimar(page)).toBe('19');
+  });
+
+  test('REPARADO (09/11/2026, 4288) · discapacidad en familia biparental: 19 + 1 = 20 semanas', async ({ page }) => {
+    await page.getByLabel('El bebe tiene discapacidad reconocida').check();
+    expect(await estimar(page)).toBe('20');
+  });
+
+  test('REPARADO (09/11/2026, 4288) · discapacidad en familia monoparental: 32 + 2 = 34 semanas', async ({ page }) => {
+    await page.getByLabel('Monoparental (1 progenitor): 32 semanas').check();
+    await page.getByLabel('El bebe tiene discapacidad reconocida').check();
+    expect(await estimar(page)).toBe('34');
+  });
+
+  test('REPARADO (09/11/2026, 4288) · adopción y acogimiento no suman semanas: 19', async ({ page }) => {
+    for (const situacion of ['Adopcion', 'Acogimiento']) {
+      await page.getByLabel(situacion, { exact: true }).check();
+      expect(await estimar(page), situacion).toBe('19');
+    }
   });
 });

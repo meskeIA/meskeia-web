@@ -23,8 +23,9 @@
  *     cumpla 8 años
  *   - Reparto monoparental: 6 semanas obligatorias + 22 semanas flexibles
  *     hasta los 12 meses + 4 semanas de cuidado prolongado hasta los 8 años
- *   - Discapacidad del menor ≥33%: +2 semanas adicionales (fijo, igual para
- *     ambos progenitores)
+ *   - Discapacidad del menor ≥33%: +1 semana para cada progenitor (ET 48.6:
+ *     «dos semanas, una para cada una de las personas progenitoras»); la
+ *     familia monoparental, las 2. Hasta el 09/11/2026 daba 2 a cada uno (4288)
  *   - Parto múltiple: +1 semana adicional por cada hijo a partir del segundo
  *   - Nacimiento prematuro u hospitalización del recién nacido tras el parto:
  *     el permiso se amplía un día por cada día de hospitalización, con un
@@ -77,7 +78,7 @@ const SEMANAS_FLEXIBLES_HASTA_12_MESES_MONOPARENTAL = PERMISO_MONOPARENTAL.seman
 const SEMANAS_CUIDADO_PROLONGADO_BIPARENTAL = PERMISO_BIPARENTAL.semanasCuidadoProlongadoHasta8Anios; // distribuibles hasta los 8 años
 const SEMANAS_CUIDADO_PROLONGADO_MONOPARENTAL = PERMISO_MONOPARENTAL.semanasCuidadoProlongadoHasta8Anios;
 const SEMANAS_ADICIONAL_MULTIPLE_POR_HIJO = AMPLIACION_POR_ID['parto-multiple'].semanasExtra; // por cada hijo a partir del segundo
-const SEMANAS_ADICIONAL_DISCAPACIDAD = AMPLIACION_POR_ID['discapacidad-menor'].semanasExtra; // fijo, para cada progenitor
+const SEMANAS_ADICIONAL_DISCAPACIDAD = AMPLIACION_POR_ID['discapacidad-menor'].semanasExtra; // por progenitor (×2 en monoparental)
 const BASE_MAXIMA_MENSUAL = PRESTACION_NACIMIENTO.basesReferencia.baseMaximaMensual; // €/mes, ejercicio en curso
 const BASE_MAXIMA_DIARIA = BASE_MAXIMA_MENSUAL / 30;
 const NO_CONTRIBUTIVA = PRESTACION_NACIMIENTO.noContributiva;
@@ -176,7 +177,8 @@ export function calcularPrestacionMaternidadPaternidad(
   // completas»: las dos. Hasta el 09/11/2026 la monoparental recibía una (hermana del 4285).
   const factorFamilia = tipoFamilia === 'monoparental' ? 2 : 1;
   const semanasAdicionalMultiple = hijosAdicionales * SEMANAS_ADICIONAL_MULTIPLE_POR_HIJO * factorFamilia;
-  const semanasAdicionalDiscapacidad = p.hijoConDiscapacidad ? SEMANAS_ADICIONAL_DISCAPACIDAD : 0;
+  // La de discapacidad sigue la misma regla del ET 48.6 (hallazgo 4288, 09/11/2026).
+  const semanasAdicionalDiscapacidad = p.hijoConDiscapacidad ? SEMANAS_ADICIONAL_DISCAPACIDAD * factorFamilia : 0;
 
   // ── Carencia ──────────────────────────────────────────────────────────────
   const cumpleCarencia = p.cumpleCarencia ?? true;
@@ -241,7 +243,11 @@ export function calcularPrestacionMaternidadPaternidad(
     advertencias.push(`Parto múltiple (${numHijos} hijos): se añade ${SEMANAS_ADICIONAL_MULTIPLE_POR_HIJO} semana adicional por cada hijo a partir del segundo (total +${semanasAdicionalMultiple} semanas / ${semanasAdicionalMultiple * DIAS_SEMANA} días) para cada progenitor.`);
   }
   if (p.hijoConDiscapacidad) {
-    advertencias.push(`Discapacidad del menor ≥33%: se añaden ${SEMANAS_ADICIONAL_DISCAPACIDAD} semanas adicionales (${SEMANAS_ADICIONAL_DISCAPACIDAD * DIAS_SEMANA} días) para cada progenitor.`);
+    advertencias.push(
+      tipoFamilia === 'monoparental'
+        ? `Discapacidad del menor ≥33%: se añaden ${semanasAdicionalDiscapacidad} semanas (${semanasAdicionalDiscapacidad * DIAS_SEMANA} días), las dos de una familia con dos progenitores (ET 48.6).`
+        : `Discapacidad del menor ≥33%: se añade ${semanasAdicionalDiscapacidad} semana (${semanasAdicionalDiscapacidad * DIAS_SEMANA} días) para cada progenitor (ET 48.6).`,
+    );
   }
   if (limitadaPorBaseMaxima) {
     advertencias.push(`La base de cotización supera la base máxima del ejercicio (${BASE_MAXIMA_MENSUAL.toLocaleString('es-ES')} €/mes). La cuantía diaria se limita a ${BASE_MAXIMA_DIARIA.toFixed(2)} €/día.`);

@@ -301,15 +301,15 @@ test.describe('estimacion-prestacion-nacimiento', () => {
     expect(texto).toContain('EXENTA IRPF | 9533,33 €');
   });
 
-  test('HALLAZGO 4288 (09/11/2026, ABIERTO) · adopción: anuncia «+2 semanas» por adopción internacional', async ({
+  test('HALLAZGO 4288 (09/11/2026, REPARADO) · adopción: ya no anuncia «+2 semanas» por adopción internacional', async ({
     page,
   }) => {
     // ET 48.5: la suspensión «podrá iniciarse hasta cuatro semanas antes de la resolución»; no
     // hay semanas adicionales (el dato viene de AMPLIACION_POR_ID['adopcion-internacional']).
-    // Es un dato de data/fiscal: espera la decisión del usuario (tipo fiscal, nivel 3).
-    test.fail();
+    // Corregido en data/fiscal con la decisión del usuario del 09/11/2026 (tipo fiscal).
     const texto = await estimar(page, { base: '2.000', situacion: 'Adopción' });
     expect(texto).not.toContain('+2 semanas');
+    expect(texto).toContain('puede empezar hasta 4 semanas antes de la resolución');
   });
 
   test('HALLAZGO 4296 (09/11/2026, REPARADO) · el rechazo de la base vacía, 0 o negativa se dice', async ({ page }) => {

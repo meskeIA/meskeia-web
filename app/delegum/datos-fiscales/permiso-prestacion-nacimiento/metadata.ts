@@ -123,7 +123,7 @@ export const faqJsonLd = {
       name: '¿Se puede ampliar el permiso por nacimiento?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Sí. Se amplía una semana por progenitor por cada hijo adicional en parto múltiple, dos semanas por discapacidad del recién nacido, hasta 13 semanas adicionales por parto prematuro u hospitalización neonatal, y hasta 2 semanas por adopción internacional. Estas ampliaciones se suman a las semanas ordinarias.',
+        text: 'Sí. Se amplía una semana por progenitor por cada hijo adicional en parto múltiple, una semana por progenitor si el menor tiene discapacidad (las dos, en familia monoparental) y hasta 13 semanas adicionales por parto prematuro u hospitalización neonatal. Estas ampliaciones se suman a las semanas ordinarias. La adopción internacional no añade semanas: con desplazamiento al país de origen, el permiso puede empezar hasta cuatro semanas antes de la resolución.',
       },
     },
   ],

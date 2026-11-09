@@ -70,7 +70,7 @@ export const faqJsonLd = {
       name: '¿Se pueden ampliar las semanas del permiso de maternidad o paternidad?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Sí. El permiso se amplía en 1 semana por cada hijo adicional a partir del segundo en caso de parto múltiple, en 2 semanas si el recién nacido tiene discapacidad reconocida, y hasta 13 semanas más por hospitalización neonatal o parto prematuro, un día por cada día de ingreso. Estas ampliaciones se suman a las 19 semanas base. Las familias monoparentales no reciben una semana extra: su progenitor único tiene 32 semanas de partida (RDL 9/2025).',
+        text: 'Sí. El permiso se amplía en 1 semana por cada hijo adicional a partir del segundo en caso de parto múltiple, en 1 semana para cada progenitor si el menor tiene discapacidad (2 en familia monoparental), y hasta 13 semanas más por hospitalización neonatal o parto prematuro, un día por cada día de ingreso. Estas ampliaciones se suman a las 19 semanas base. Las familias monoparentales no reciben una semana extra: su progenitor único tiene 32 semanas de partida (RDL 9/2025).',
       },
     },
     {

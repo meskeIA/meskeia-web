@@ -90,9 +90,9 @@ export default function EstimacionBajaMaternalPage() {
     // Parto multiple: 1 semana por progenitor por cada hijo adicional (RDL 9/2025). ET 48.6:
     // la unica persona progenitora disfruta «las ampliaciones completas», las 2 semanas.
     // Hasta el 09/11/2026 la familia monoparental recibia 1 (hermana del hallazgo 4285).
+    const factorFamilia = tipoFamilia === 'monoparental' ? 2 : 1;
     if (partoMultiple && numBebes > 1) {
       const hijosAdicionales = numBebes - 1;
-      const factorFamilia = tipoFamilia === 'monoparental' ? 2 : 1;
       const extraMultiple = hijosAdicionales * AMPLIACION_POR_ID['parto-multiple'].semanasExtra * factorFamilia;
       semanasExtras += extraMultiple;
       detalleExtras.push(
@@ -100,12 +100,14 @@ export default function EstimacionBajaMaternalPage() {
       );
     }
 
-    // Discapacidad del menor
+    // Discapacidad del menor. ET 48.6: «dos semanas, una para cada una de las personas
+    // progenitoras», y las dos completas para la única persona progenitora. Hasta el
+    // 09/11/2026 daba 2 a cada progenitor (hallazgo 4288).
     if (discapacidad) {
-      const extraDiscapacidad = AMPLIACION_POR_ID['discapacidad-menor'].semanasExtra;
+      const extraDiscapacidad = AMPLIACION_POR_ID['discapacidad-menor'].semanasExtra * factorFamilia;
       semanasExtras += extraDiscapacidad;
       detalleExtras.push(
-        `Discapacidad del bebe: +${extraDiscapacidad} semanas`
+        `Discapacidad del bebé: +${extraDiscapacidad} ${extraDiscapacidad === 1 ? 'semana' : 'semanas'}`
       );
     }
 
@@ -123,14 +125,9 @@ export default function EstimacionBajaMaternalPage() {
       );
     }
 
-    // Adopcion/acogimiento internacional: desplazamiento al pais de origen
-    if (situacion === 'adopcion' || situacion === 'acogimiento') {
-      const extraAdopcion = AMPLIACION_POR_ID['adopcion-internacional'].semanasExtra;
-      semanasExtras += extraAdopcion;
-      detalleExtras.push(
-        `${situacion === 'adopcion' ? 'Adopcion' : 'Acogimiento'} (desplazamiento): +${extraAdopcion} semanas`
-      );
-    }
+    // Adopción y acogimiento no suman semanas. ET 48.5: con desplazamiento al país de origen,
+    // el permiso solo puede EMPEZAR hasta cuatro semanas antes de la resolución. Hasta el
+    // 09/11/2026 sumaba 2 semanas a toda adopción y acogimiento, internacional o no (4288).
 
     const semanasTotal = semanasObligatorias + semanasVoluntarias + semanasExtras;
 
@@ -667,12 +664,12 @@ export default function EstimacionBajaMaternalPage() {
               <h4>Adopcion internacional</h4>
             </div>
             <div className={styles.escenarioExample}>
-              <p>19 semanas base (32 si familia monoparental) + hasta 2 semanas por desplazamiento.</p>
-              <p>Las semanas de desplazamiento pueden disfrutarse antes de la resolucion judicial/administrativa.</p>
-              <p><strong>Total: hasta 21 semanas</strong> (34 en monoparental).</p>
+              <p>19 semanas (32 si familia monoparental), las mismas que en una adopción nacional.</p>
+              <p>El viaje al país de origen no añade semanas: si hace falta, el permiso puede empezar hasta 4 semanas antes de la resolución de adopción (art. 48.5 del Estatuto de los Trabajadores).</p>
+              <p><strong>Total: 19 semanas</strong> (32 en monoparental).</p>
             </div>
             <div className={styles.escenarioTip}>
-              En adopcion nacional: mismas 19/32 semanas, sin semanas de desplazamiento.
+              Las semanas que se adelantan forman parte de las 19 (o 32): no se suman a ellas.
             </div>
           </div>
         </div>

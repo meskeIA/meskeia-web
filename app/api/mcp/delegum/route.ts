@@ -2559,7 +2559,7 @@ function crearServidorDelegum(): McpServer {
       base_cotizacion_mensual: z.number().positive().describe('Base de cotización mensual del mes anterior al inicio de la prestación (€)'),
       edad_progenitor: z.enum(['menor_21', 'entre_21_y_26', 'mayor_26']).describe('Tramo de edad del progenitor (determina la carencia exigida)'),
       numero_hijos: z.number().int().min(1).optional().describe('Número de hijos en el parto (1=simple, 2+=múltiple, suma semanas). Por defecto 1.'),
-      hijo_con_discapacidad: z.boolean().optional().describe('¿Algún hijo con discapacidad ≥33%? (añade 2 semanas). Por defecto false.'),
+      hijo_con_discapacidad: z.boolean().optional().describe('¿Algún hijo con discapacidad ≥33%? (añade 1 semana por progenitor, 2 en familia monoparental). Por defecto false.'),
       cumple_carencia: z.boolean().optional().describe('¿Cumple el período de carencia exigido? Por defecto true.'),
       situacion_laboral: z.enum(['trabajador_cuenta_ajena', 'autonomo', 'desempleado_sin_derecho']).optional().describe('Situación laboral del progenitor. Por defecto trabajador por cuenta ajena.'),
       tipo_familia: z.enum(['biparental', 'monoparental']).optional().describe('Tipo de familia: "biparental" (19 semanas, por defecto) o "monoparental" (32 semanas, RDL 9/2025).'),
