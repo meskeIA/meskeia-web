@@ -171,7 +171,11 @@ export function calcularPrestacionMaternidadPaternidad(
 
   const numHijos = p.numerosHijos ?? 1;
   const hijosAdicionales = Math.max(0, numHijos - 1);
-  const semanasAdicionalMultiple = hijosAdicionales * SEMANAS_ADICIONAL_MULTIPLE_POR_HIJO;
+  // ET 48.6: la ampliación por parto múltiple es de una semana por progenitor por cada hijo
+  // distinto del primero, y la única persona progenitora disfruta «las ampliaciones
+  // completas»: las dos. Hasta el 09/11/2026 la monoparental recibía una (hermana del 4285).
+  const factorFamilia = tipoFamilia === 'monoparental' ? 2 : 1;
+  const semanasAdicionalMultiple = hijosAdicionales * SEMANAS_ADICIONAL_MULTIPLE_POR_HIJO * factorFamilia;
   const semanasAdicionalDiscapacidad = p.hijoConDiscapacidad ? SEMANAS_ADICIONAL_DISCAPACIDAD : 0;
 
   // ── Carencia ──────────────────────────────────────────────────────────────

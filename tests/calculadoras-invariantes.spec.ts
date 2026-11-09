@@ -3356,6 +3356,22 @@ test.describe('Golden — calcularPrestacionMaternidadPaternidad (Capa 1 · LGSS
     expect(mp.cuotaTotalPrestacion).toBeCloseTo(22400.00, 2);
   });
 
+  test('GOLDEN: BC 2.000 €/mes, familia monoparental, gemelos → 34 semanas (ET 48.6, ampliaciones completas)', () => {
+    // ET art. 48.6 (BOE-A-2015-11430, consultado el 09/11/2026): parto múltiple, una semana por
+    // progenitor por cada hijo distinto del primero; «En caso de haber una única persona
+    // progenitora, esta podrá disfrutar de las ampliaciones completas». 32 + 2 = 34 semanas =
+    // 238 días. El motor redondea la BR diaria a céntimos antes de multiplicar (66,67 €), así
+    // que el total es 66,67 × 238 = 15.867,46 €. Antes daba 33 semanas (hermana del hallazgo 4285).
+    const mp = calcularPrestacionMaternidadPaternidad({
+      baseCotizacionMensual: 2000,
+      edadProgenitor: 'mayor_26',
+      numerosHijos: 2,
+      tipoFamilia: 'monoparental',
+    });
+    expect(mp.duracionTotalDias).toBe(238);
+    expect(mp.cuotaTotalPrestacion).toBeCloseTo(15867.46, 2);
+  });
+
 });
 
 // ────────────────────────────────────────────────────────────────────────────
