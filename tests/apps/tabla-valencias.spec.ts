@@ -1022,11 +1022,11 @@ test.describe('Cambio del 21/09 al 06/11/2026, inspeccionado el 09/11/2026', () 
 });
 
 // ═══════════════════════════════════════════════════════════════════════════════
-// HALLAZGOS ABIERTOS (inspector 09/11/2026) — con test.fail(): afirman lo que DEBERÍA pasar
+// HALLAZGOS DEL 09/11/2026 (4268, 4269, 4270) — REPARADOS en /reparar el mismo día
 // ═══════════════════════════════════════════════════════════════════════════════
 
-test.describe('Hallazgos ABIERTOS del 09/11/2026 en la ficha de aula', () => {
-  test.fail('ABIERTO · «+ 2» y «− 3», con espacio tras el signo, son la respuesta correcta y no un signo cambiado', async ({
+test.describe('Hallazgos del 09/11/2026 en la ficha de aula (REPARADOS)', () => {
+  test('4268 REPARADO · «+ 2» y «− 3», con espacio tras el signo, son la respuesta correcta y no un signo cambiado', async ({
     page,
   }) => {
     // normalizarRespuesta colapsa los espacios pero no quita el que va entre el signo y la
@@ -1039,7 +1039,7 @@ test.describe('Hallazgos ABIERTOS del 09/11/2026 en la ficha de aula', () => {
     await expect(veredicto).toContainText('Correcto');
   });
 
-  test.fail('ABIERTO · el aviso del signo no sale en una respuesta sin signo («5 estados», «el 16», «valencia 3»)', async ({
+  test('4269 REPARADO · el aviso del signo no sale en una respuesta sin signo («5 estados», «el 16», «valencia 3»)', async ({
     page,
   }) => {
     // comprobarRespuesta da «el signo no coincide» siempre que las CIFRAS coinciden, aunque la
@@ -1051,18 +1051,24 @@ test.describe('Hallazgos ABIERTOS del 09/11/2026 en la ficha de aula', () => {
     }
   });
 
-  test.fail('ABIERTO · la semilla que se dicta en voz alta se puede escribir para sacar la misma pregunta', async ({
+  test('4269 control · el aviso del signo SÍ sale cuando lo único distinto es el signo', async ({ page }) => {
+    // Lo que el aviso tiene que seguir cazando: el dato bueno con el signo cambiado. («2» por
+    // «+2» no: la ficha lo acepta como grafía equivalente, el + es opcional.)
+    const veredicto = await responderEnAula(page, 4, '-2'); // Cu, el más frecuente: +2
+    await expect(veredicto).toContainText('el signo no coincide');
+  });
+
+  test('4270 REPARADO (otro esperado) · la nota de la práctica ya no promete una semilla que se pueda dictar', async ({
     page,
   }) => {
-    // La pestaña promete «Cada semilla da siempre la misma pregunta: si la dictas en voz alta,
+    // La pestaña prometía «Cada semilla da siempre la misma pregunta: si la dictas en voz alta,
     // toda la clase trabaja sobre la misma», pero solo enseña la semilla: no hay campo para
-    // escribirla y «?semilla=…» en la URL no se lee. Con «Otra pregunta» salió la semilla
-    // 90.680 (bromo con +7 → perbrómico), y un alumno no tiene cómo llegar a ella.
+    // escribirla. El acta proponía añadir el campo (amplía la app: decisión del usuario) o
+    // bajar el texto (tipo promesa, nivel 2). Se bajó el texto: para que toda la clase trabaje
+    // sobre lo mismo, la nota manda a las preguntas fijas, que ya se asignan por número.
     await page.getByRole('tab', { name: 'Práctica al azar' }).click();
     const panel = page.locator('#aula-panel-practica');
-    const campoSemilla = panel.getByLabel(/semilla/i);
-    await expect(campoSemilla).toHaveCount(1, { timeout: 3000 });
-    await campoSemilla.fill('90680');
-    await expect(panel).toContainText('bromo (Br) cuando actúa con número de oxidación +7');
+    await expect(panel).not.toContainText('si la dictas en voz alta');
+    await expect(panel).toContainText('asígnalas por su número');
   });
 });

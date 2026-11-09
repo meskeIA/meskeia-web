@@ -144,7 +144,10 @@ export function normalizarRespuesta(texto: string): string {
     .replace(/[,;]/g, ' ')
     .replace(/[.]+$/g, '')
     .replace(/\s+/g, ' ')
-    .trim();
+    .trim()
+    // «+ 2» y «− 3» son «+2» y «−3»: el espacio tras el signo inicial no cambia el dato. Sin
+    // esto, el signo bueno caía en el aviso de «signo cambiado» (hallazgo 4268).
+    .replace(/^([+-]) /, '$1');
 }
 
 /** Grafía romana de un número de oxidación, la que usa la nomenclatura de Stock */
@@ -587,9 +590,16 @@ export const TOTAL_CASOS: number = CASOS.length;
 // COMPROBACIÓN
 // ───────────────────────────────────────────────────────────────────────
 
-/** Solo los dígitos de una respuesta, para distinguir «el signo está mal» de «el dato está mal» */
-function soloDigitos(texto: string): string {
-  return (texto.match(/\d+/g) ?? []).join(' ');
+/**
+ * La respuesta sin sus signos, para distinguir «el signo está mal» de «el dato está mal».
+ *
+ * Hasta el 09/11/2026 comparaba solo los DÍGITOS, así que «5 estados», «el 16» o «valencia 3»
+ * —respuestas sin signo a preguntas sin signo— recibían el aviso de signo cambiado, justo el
+ * concepto que la ficha enseña (hallazgo 4269). Ahora el aviso exige que lo escrito y lo
+ * esperado sean lo mismo salvo los signos: «+3» frente a «3» sí, «5 estados» frente a «5» no.
+ */
+function sinSignos(texto: string): string {
+  return texto.replace(/[+-]/g, '').replace(/\s+/g, ' ').trim();
 }
 
 export function comprobarRespuesta(
@@ -620,7 +630,7 @@ export function comprobarRespuesta(
   }
 
   // El número está bien y el signo no: merece un aviso distinto de «está mal».
-  if (soloDigitos(escrito) === soloDigitos(esperada) && soloDigitos(esperada) !== '') {
+  if (sinSignos(escrito) === sinSignos(esperada) && /\d/.test(esperada)) {
     return {
       correcto: false,
       motivo: 'El número es el que da la tabla, pero el signo no coincide. Recuerda: la valencia va sin signo y el número de oxidación con signo.',

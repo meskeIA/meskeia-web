@@ -338,7 +338,8 @@ export default function TablaValenciasPage() {
   // ── Ficha de búsqueda de aula ──────────────────────────────────────
   // Las 12 preguntas son FIJAS y numeradas para que un profesor pueda asignarlas por su
   // número («resuelve la 3, la 7 y la 11»). La pestaña de práctica genera otra distinta a
-  // partir de una semilla, y la semilla se escribe en pantalla para poder dictarla igual.
+  // partir de una semilla. La semilla se ve pero no se puede escribir, así que la nota del
+  // panel ya no promete dictarla (hallazgo 4270, tipo promesa: 09/11/2026).
   const [pestanaAula, setPestanaAula] = useState<'preguntas' | 'practica'>('preguntas');
   const [casoActivo, setCasoActivo] = useState(1);
   const [respuestaAula, setRespuestaAula] = useState('');
@@ -1177,8 +1178,9 @@ export default function TablaValenciasPage() {
             </div>
 
             <p className={styles.aulaNota}>
-              Cada semilla da siempre la misma pregunta: si la dictas en voz alta, toda la clase
-              trabaja sobre la misma. Los datos salen de esta tabla, no de una lista aparte.
+              Las preguntas de práctica salen al azar de esta tabla, no de una lista aparte. Para
+              que toda la clase trabaje sobre la misma pregunta, usa las {TOTAL_CASOS} fijas de la
+              otra pestaña y asígnalas por su número.
             </p>
           </div>
         )}
