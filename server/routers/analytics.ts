@@ -886,7 +886,8 @@ export const analyticsRouter = router({
       limite.setDate(limite.getDate() - input.dias);
       // Sub-ventana de 7 días para el pulso del descubrimiento interno. La de 24 h se retiró
       // el 09/11/2026: un día suelto es lo que lee /digest-diario, y aquí solo metía ruido.
-      const limite7 = new Date(ahora); limite7.setDate(limite7.getDate() - 7);
+      // Días naturales [hoy-6, hoy], igual que la última columna semanal de abajo (09/11/2026).
+      const limite7 = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate() - 6);
       // Visitas y clics INTERNOS de la sub-ventana de 7 días
       let visitas7d = 0, clics7d = 0;
 
@@ -942,8 +943,11 @@ export const analyticsRouter = router({
       // clase de Perú: el total de 30 días no lo enseñaba y hubo que ir al dump.
       const N_SEMANAS = 4;
       const MS_DIA = 86400000;
+      const diaNatural = (d: Date) => Math.round(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / MS_DIA);
       const semanaDe = (fecha: Date): number => {
-        const k = Math.floor((ahora.getTime() - fecha.getTime()) / (7 * MS_DIA));
+        // Por DÍAS NATURALES, no por horas desde ahora: con 168 h las etiquetas se pisaban
+        // («12/10–19/10», «19/10–26/10») y la última parecía de ocho días (09/11/2026).
+        const k = Math.floor((diaNatural(ahora) - diaNatural(fecha)) / 7);
         return k >= 0 && k < N_SEMANAS ? k : -1;
       };
       type Semana = { total: number; porCategoria: Record<string, number>; ips: Map<string, Map<string, number>> };
@@ -1014,8 +1018,8 @@ export const analyticsRouter = router({
       const CONC_MIN = 10;
       const fechaCorta = (d: Date) => `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`;
       const semanasSalida = semanas.map((s, k) => {
-        const hasta = new Date(ahora.getTime() - k * 7 * MS_DIA);
-        const desde = new Date(hasta.getTime() - 7 * MS_DIA);
+        const hasta = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate() - k * 7);
+        const desde = new Date(ahora.getFullYear(), ahora.getMonth(), ahora.getDate() - k * 7 - 6);
         const concentradas: Record<string, { pctIp: number; pais: string | null }> = {};
         for (const [cat, ips] of s.ips) {
           const n = s.porCategoria[cat] || 0;
