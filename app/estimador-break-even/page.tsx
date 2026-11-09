@@ -4,6 +4,45 @@ import { useState, useMemo } from 'react';
 import styles from './EstimadorBreakEven.module.css';
 import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
+import { PREGUNTA_COSTES_FIJOS_VARIABLES } from './metadata';
+import {
+  calcularEquilibrio,
+  clasificarImporte,
+  errorDeImporte,
+  resultadoEnEquilibrio,
+  unidadesParaObjetivo,
+  type LecturaImporte,
+} from './motor';
+
+/** Espacio duro antes del «%» (CLAUDE.md global §2, regla del 25/09/2026; hallazgo 4323). */
+const PCT = ' %';
+
+type Tendencia = 'mejora' | 'empeora' | 'neutro';
+
+/**
+ * Compara el equilibrio de un escenario con el actual. `null` es «no hay equilibrio»: antes era
+ * un 0 centinela, y con margen negativo un precio más bajo salía como mejora en verde (4313).
+ */
+function compararEquilibrio(nuevo: number | null, actual: number | null): { texto: string; tendencia: Tendencia } {
+  if (nuevo === null && actual === null) return { texto: 'sigue sin punto de equilibrio', tendencia: 'neutro' };
+  if (nuevo === null) return { texto: 'sin punto de equilibrio', tendencia: 'empeora' };
+  if (actual === null) return { texto: 'ahora sí hay punto de equilibrio', tendencia: 'mejora' };
+  const dif = nuevo - actual;
+  if (dif < 0) return { texto: `↓ ${formatNumber(-dif, 0)} uds menos`, tendencia: 'mejora' };
+  if (dif > 0) return { texto: `↑ ${formatNumber(dif, 0)} uds más`, tendencia: 'empeora' };
+  return { texto: 'igual que el actual', tendencia: 'neutro' };
+}
+
+function unidadesOSin(n: number | null): string {
+  return n === null ? 'Sin equilibrio' : `${formatNumber(n, 0)} uds`;
+}
+
+/** Lee un campo del escenario personalizado: vacío = el valor actual; un 0 es un 0 (4314). */
+function leerEscenario(l: LecturaImporte, base: number): number | null {
+  if (l.estado === 'vacio') return base;
+  if (l.estado === 'ok') return l.valor;
+  return null;
+}
 
 export default function CalculadoraBreakEvenPage() {
   // Inputs principales
@@ -23,92 +62,160 @@ export default function CalculadoraBreakEvenPage() {
   const [escenarioCostoVar, setEscenarioCostoVar] = useState('');
   const [escenarioCostosFijos, setEscenarioCostosFijos] = useState('');
 
-  // Cálculos principales
+  // Lectura de los campos: un importe ilegible o negativo se NOMBRA y no se calcula con él.
+  // Hasta el 09/11/2026 «|| 0» lo convertía en 0 y la app publicaba un resultado verosímil (4316).
+  const lecturas = useMemo(() => ({
+    precio: clasificarImporte(precioVenta, parseSpanishNumber),
+    costoVar: clasificarImporte(costoVariable, parseSpanishNumber),
+    fijos: clasificarImporte(costosFijos, parseSpanishNumber),
+    ventas: clasificarImporte(ventasActuales, parseSpanishNumber),
+    objetivo: clasificarImporte(objetivoGanancia, parseSpanishNumber),
+  }), [precioVenta, costoVariable, costosFijos, ventasActuales, objetivoGanancia]);
+
+  const errores = {
+    precio: errorDeImporte(lecturas.precio, 'el precio de venta', 'El precio de venta no puede ser negativo.'),
+    costoVar: errorDeImporte(lecturas.costoVar, 'el coste variable', 'El coste variable no puede ser negativo.'),
+    fijos: errorDeImporte(lecturas.fijos, 'los costes fijos', 'Los costes fijos no pueden ser negativos.'),
+    ventas: errorDeImporte(lecturas.ventas, 'las ventas actuales', 'Las ventas no pueden ser negativas.'),
+    objetivo: errorDeImporte(lecturas.objetivo, 'el objetivo de ganancia', 'El objetivo de ganancia no puede ser negativo.'),
+  };
+
+  // Cálculos principales: null mientras falte un dato obligatorio o alguno no se pueda leer.
   const calculos = useMemo(() => {
-    const precio = parseSpanishNumber(precioVenta) || 0;
-    const costoVar = parseSpanishNumber(costoVariable) || 0;
-    const fijos = parseSpanishNumber(costosFijos) || 0;
-    const ventas = parseSpanishNumber(ventasActuales) || 0;
-    const objetivo = parseSpanishNumber(objetivoGanancia) || 0;
+    const { precio: lP, costoVar: lCV, fijos: lCF, ventas: lV, objetivo: lO } = lecturas;
+    if (lP.estado !== 'ok' || lCV.estado !== 'ok' || lCF.estado !== 'ok') return null;
+    if (lV.estado !== 'ok' && lV.estado !== 'vacio') return null;
+    if (lO.estado !== 'ok' && lO.estado !== 'vacio') return null;
 
-    // Margen de contribución (por unidad)
-    const margenContribucion = precio - costoVar;
-    const margenContribucionPorcentaje = precio > 0 ? (margenContribucion / precio) * 100 : 0;
+    const precio = lP.valor;
+    const costoVar = lCV.valor;
+    const fijos = lCF.valor;
+    const ventas = lV.estado === 'ok' ? lV.valor : 0;
+    const objetivo = lO.estado === 'ok' ? lO.valor : null;
 
-    // Punto de equilibrio en unidades
-    const breakEvenUnidades = margenContribucion > 0 ? Math.ceil(fijos / margenContribucion) : 0;
-
-    // Punto de equilibrio en euros
-    const breakEvenEuros = breakEvenUnidades * precio;
-
-    // Unidades para alcanzar objetivo de ganancia
-    const unidadesObjetivo = margenContribucion > 0 ? Math.ceil((fijos + objetivo) / margenContribucion) : 0;
+    const eq = calcularEquilibrio(precio, costoVar, fijos);
+    const margenContribucionPorcentaje = precio > 0 ? (eq.margen / precio) * 100 : null;
+    const unidadesObjetivo = objetivo === null ? null : unidadesParaObjetivo(precio, costoVar, fijos, objetivo);
 
     // Situación actual
     const ingresosTotales = ventas * precio;
-    const costosTotales = fijos + (ventas * costoVar);
+    const costosTotales = fijos + ventas * costoVar;
     const gananciaActual = ingresosTotales - costosTotales;
-    const porcentajeBreakEven = breakEvenUnidades > 0 ? (ventas / breakEvenUnidades) * 100 : 0;
-
-    // Margen de seguridad
-    const margenSeguridad = ventas - breakEvenUnidades;
-    const margenSeguridadPorcentaje = ventas > 0 ? (margenSeguridad / ventas) * 100 : 0;
 
     return {
       precio,
       costoVar,
       fijos,
-      margenContribucion,
+      objetivo,
+      margenContribucion: eq.margen,
       margenContribucionPorcentaje,
-      breakEvenUnidades,
-      breakEvenEuros,
+      breakEvenUnidades: eq.unidades,
+      breakEvenEuros: eq.euros,
       unidadesObjetivo,
       ingresosTotales,
       costosTotales,
       gananciaActual,
-      porcentajeBreakEven,
-      margenSeguridad,
-      margenSeguridadPorcentaje,
+      // Sin equilibrio, ni porcentaje ni margen de seguridad: no hay contra qué medirlos.
+      margenSeguridad: eq.unidades === null ? null : ventas - eq.unidades,
+      resultadoEquilibrio: eq.unidades === null ? null : resultadoEnEquilibrio(precio, costoVar, fijos, eq.unidades),
       esRentable: gananciaActual > 0,
-      ventasActuales: ventas
+      ventasActuales: ventas,
     };
-  }, [precioVenta, costoVariable, costosFijos, ventasActuales, objetivoGanancia]);
+  }, [lecturas]);
 
-  // Cálculos de escenarios
+  // Escenario personalizado: vacío = el valor actual; un 0 tecleado es un 0 (4314).
+  const lecturasEscenario = useMemo(() => ({
+    precio: clasificarImporte(escenarioPrecio, parseSpanishNumber),
+    costoVar: clasificarImporte(escenarioCostoVar, parseSpanishNumber),
+    fijos: clasificarImporte(escenarioCostosFijos, parseSpanishNumber),
+  }), [escenarioPrecio, escenarioCostoVar, escenarioCostosFijos]);
+
+  const erroresEscenario = {
+    precio: errorDeImporte(lecturasEscenario.precio, 'el nuevo precio', 'El nuevo precio no puede ser negativo.'),
+    costoVar: errorDeImporte(lecturasEscenario.costoVar, 'el nuevo coste variable', 'El nuevo coste variable no puede ser negativo.'),
+    fijos: errorDeImporte(lecturasEscenario.fijos, 'los nuevos costes fijos', 'Los nuevos costes fijos no pueden ser negativos.'),
+  };
+
   const escenarios = useMemo(() => {
-    const precioBase = calculos.precio;
-    const costoVarBase = calculos.costoVar;
-    const fijosBase = calculos.fijos;
+    if (calculos === null) return null;
+    const { precio, costoVar, fijos } = calculos;
 
-    const calcularEscenario = (precio: number, costoVar: number, fijos: number) => {
-      const margen = precio - costoVar;
-      const breakEven = margen > 0 ? Math.ceil(fijos / margen) : 0;
-      return { margen, breakEven, breakEvenEuros: breakEven * precio };
-    };
-
-    // Escenario: +10% precio
-    const esc1 = calcularEscenario(precioBase * 1.1, costoVarBase, fijosBase);
-
-    // Escenario: -10% costos variables
-    const esc2 = calcularEscenario(precioBase, costoVarBase * 0.9, fijosBase);
-
-    // Escenario: -20% costos fijos
-    const esc3 = calcularEscenario(precioBase, costoVarBase, fijosBase * 0.8);
-
-    // Escenario personalizado
-    const precioCustom = parseSpanishNumber(escenarioPrecio) || precioBase;
-    const costoVarCustom = parseSpanishNumber(escenarioCostoVar) || costoVarBase;
-    const fijosCustom = parseSpanishNumber(escenarioCostosFijos) || fijosBase;
-    const escCustom = calcularEscenario(precioCustom, costoVarCustom, fijosCustom);
+    const pC = leerEscenario(lecturasEscenario.precio, precio);
+    const cvC = leerEscenario(lecturasEscenario.costoVar, costoVar);
+    const fC = leerEscenario(lecturasEscenario.fijos, fijos);
 
     return {
       actual: { breakEven: calculos.breakEvenUnidades, breakEvenEuros: calculos.breakEvenEuros },
-      precioPlusTen: esc1,
-      costoVarMinusTen: esc2,
-      fijoMinusTwenty: esc3,
-      custom: escCustom
+      precioPlusTen: calcularEquilibrio(precio * 1.1, costoVar, fijos).unidades,
+      costoVarMinusTen: calcularEquilibrio(precio, costoVar * 0.9, fijos).unidades,
+      fijoMinusTwenty: calcularEquilibrio(precio, costoVar, fijos * 0.8).unidades,
+      custom: pC === null || cvC === null || fC === null ? undefined : calcularEquilibrio(pC, cvC, fC).unidades,
     };
-  }, [calculos, escenarioPrecio, escenarioCostoVar, escenarioCostosFijos]);
+  }, [calculos, lecturasEscenario]);
+
+  // Textos del resultado principal (estables en sus <span>, sin nodos que aparezcan y desaparezcan).
+  const sinEquilibrio = calculos !== null && calculos.breakEvenUnidades === null;
+  const cifraPrincipal = calculos === null || calculos.breakEvenUnidades === null ? '—' : formatNumber(calculos.breakEvenUnidades, 0);
+  const rotuloPrincipal = calculos === null
+    ? 'faltan datos o alguno no se puede leer'
+    : sinEquilibrio ? 'no hay punto de equilibrio' : 'unidades/mes';
+  let explicacionSinEquilibrio = '';
+  if (calculos !== null && sinEquilibrio) {
+    if (calculos.margenContribucion === 0) {
+      explicacionSinEquilibrio = calculos.fijos > 0
+        ? `El precio iguala al coste variable: cada unidad aporta 0 € a los costes fijos, así que ninguna cantidad de ventas cubre los ${formatCurrency(calculos.fijos)}. Con este precio el negocio no es viable.`
+        : 'El precio iguala al coste variable: sin costes fijos no pierdes, pero ninguna venta deja beneficio.';
+    } else {
+      explicacionSinEquilibrio = `El precio no cubre el coste variable: cada unidad vendida pierde ${formatCurrency(-calculos.margenContribucion)}, y cuantas más vendes, más pierdes. Con este precio el negocio no es viable.`;
+    }
+  }
+
+  // Barra de la situación actual
+  let progresoIzquierda = '';
+  let progresoDerecha = '';
+  let progresoAncho = 0;
+  if (calculos !== null) {
+    const u = calculos.breakEvenUnidades;
+    if (u === null) {
+      progresoIzquierda = 'Sin punto de equilibrio';
+      progresoDerecha = calculos.margenContribucion === 0
+        ? 'Cada venta aporta 0 € a los costes fijos'
+        : `Cada venta pierde ${formatCurrency(-calculos.margenContribucion)}`;
+    } else if (u === 0) {
+      // Sin costes fijos el equilibrio es 0 y cualquier venta ya da beneficio (4318).
+      progresoIzquierda = 'Equilibrio superado: sin costes fijos, cada venta da beneficio';
+      progresoDerecha = `Margen de seguridad: ${formatNumber(calculos.ventasActuales, 0)} uds`;
+      progresoAncho = 100;
+    } else {
+      const pct = (calculos.ventasActuales / u) * 100;
+      progresoIzquierda = `${formatNumber(pct, 0)}${PCT} del punto de equilibrio`;
+      const ms = calculos.margenSeguridad ?? 0;
+      progresoDerecha = ms >= 0
+        ? `Margen de seguridad: ${formatNumber(ms, 0)} uds`
+        : `Faltan: ${formatNumber(Math.abs(ms), 0)} uds`;
+      progresoAncho = Math.min(pct, 100);
+    }
+  }
+
+  // Tarjeta del objetivo
+  let objetivoValor = '—';
+  let objetivoDescripcion = 'Sin objetivo de ganancia: escríbelo arriba';
+  if (calculos !== null && calculos.objetivo !== null) {
+    if (calculos.unidadesObjetivo === null) {
+      objetivoDescripcion = `Inalcanzable con este margen: ninguna venta permite ganar ${formatCurrency(calculos.objetivo)}`;
+    } else {
+      objetivoValor = formatNumber(calculos.unidadesObjetivo, 0);
+      objetivoDescripcion = `Necesitas vender para ganar ${formatCurrency(calculos.objetivo)}`;
+    }
+  }
+
+  const comparacionPrecio = escenarios ? compararEquilibrio(escenarios.precioPlusTen, escenarios.actual.breakEven) : null;
+  const comparacionCosteVar = escenarios ? compararEquilibrio(escenarios.costoVarMinusTen, escenarios.actual.breakEven) : null;
+  const comparacionFijos = escenarios ? compararEquilibrio(escenarios.fijoMinusTwenty, escenarios.actual.breakEven) : null;
+  const comparacionCustom = escenarios && escenarios.custom !== undefined
+    ? compararEquilibrio(escenarios.custom, escenarios.actual.breakEven)
+    : null;
+  const claseTendencia = (t: Tendencia): string => (t === 'mejora' ? styles.mejora : t === 'empeora' ? styles.empeora : '');
 
   return (
     <div className={styles.container}>
@@ -137,6 +244,8 @@ export default function CalculadoraBreakEvenPage() {
                 placeholder="50"
                 suffix="€"
                 min={0}
+                acotarAlSalir={false}
+                error={errores.precio}
                 helperText="Lo que cobras por cada unidad"
               />
               <NumberInput
@@ -146,6 +255,8 @@ export default function CalculadoraBreakEvenPage() {
                 placeholder="20"
                 suffix="€"
                 min={0}
+                acotarAlSalir={false}
+                error={errores.costoVar}
                 helperText="Materia prima, producción, envío..."
               />
               <NumberInput
@@ -155,6 +266,8 @@ export default function CalculadoraBreakEvenPage() {
                 placeholder="5000"
                 suffix="€"
                 min={0}
+                acotarAlSalir={false}
+                error={errores.fijos}
                 helperText="Alquiler, salarios, seguros..."
               />
             </div>
@@ -169,6 +282,8 @@ export default function CalculadoraBreakEvenPage() {
                 label="Ventas actuales (unidades/mes)"
                 placeholder="200"
                 min={0}
+                acotarAlSalir={false}
+                error={errores.ventas}
                 helperText="Para comparar con el punto de equilibrio"
               />
               <NumberInput
@@ -178,6 +293,8 @@ export default function CalculadoraBreakEvenPage() {
                 placeholder="2000"
                 suffix="€"
                 min={0}
+                acotarAlSalir={false}
+                error={errores.objetivo}
                 helperText="Cuánto quieres ganar"
               />
             </div>
@@ -190,15 +307,24 @@ export default function CalculadoraBreakEvenPage() {
           <div className={styles.resultadoPrincipal}>
             <h2 className={styles.resultadoTitulo}>Punto de Equilibrio</h2>
             <div className={styles.breakEvenBig}>
-              <span className={styles.breakEvenNumero}>{formatNumber(calculos.breakEvenUnidades, 0)}</span>
-              <span className={styles.breakEvenLabel}>unidades/mes</span>
+              <span className={styles.breakEvenNumero}>{cifraPrincipal}</span>
+              <span className={styles.breakEvenLabel}>{rotuloPrincipal}</span>
             </div>
-            <p className={styles.breakEvenEuros}>
-              Equivalente a <strong>{formatCurrency(calculos.breakEvenEuros)}</strong> en ventas
-            </p>
+            {calculos !== null && calculos.breakEvenEuros !== null ? (
+              <p key="equivalente" className={styles.breakEvenEuros}>
+                Equivalente a <strong>{formatCurrency(calculos.breakEvenEuros)}</strong> en ventas
+              </p>
+            ) : (
+              <p key="sin-equivalente" className={styles.breakEvenEuros}>
+                {calculos === null
+                  ? 'Completa el precio, el coste variable y los costes fijos con cifras válidas.'
+                  : explicacionSinEquilibrio}
+              </p>
+            )}
           </div>
 
           {/* Cards de métricas */}
+          {calculos !== null && (
           <div className={styles.metricsGrid}>
             <ResultCard
               title="Margen de Contribución"
@@ -206,20 +332,23 @@ export default function CalculadoraBreakEvenPage() {
               unit="€/ud"
               variant="info"
               icon="📈"
-              description={`${formatNumber(calculos.margenContribucionPorcentaje, 1)}% del precio`}
+              description={calculos.margenContribucionPorcentaje === null
+                ? 'Sin precio no hay porcentaje'
+                : `${formatNumber(calculos.margenContribucionPorcentaje, 1)}${PCT} del precio`}
             />
             <ResultCard
               title="Para tu objetivo"
-              value={formatNumber(calculos.unidadesObjetivo, 0)}
+              value={objetivoValor}
               unit="uds"
               variant="default"
               icon="🎯"
-              description={`Necesitas vender para ganar ${formatCurrency(parseSpanishNumber(objetivoGanancia))}`}
+              description={objetivoDescripcion}
             />
           </div>
+          )}
 
           {/* Estado actual */}
-          {calculos.ventasActuales > 0 && (
+          {calculos !== null && calculos.ventasActuales > 0 && (
             <div className={`${styles.estadoActual} ${calculos.esRentable ? styles.estadoPositivo : styles.estadoNegativo}`}>
               <h3>Tu situación actual</h3>
               <div className={styles.estadoGrid}>
@@ -246,18 +375,13 @@ export default function CalculadoraBreakEvenPage() {
               {/* Barra de progreso */}
               <div className={styles.progresoWrapper}>
                 <div className={styles.progresoInfo}>
-                  <span>{formatNumber(calculos.porcentajeBreakEven, 0)}% del punto de equilibrio</span>
-                  <span>
-                    {calculos.margenSeguridad >= 0
-                      ? `Margen de seguridad: ${formatNumber(calculos.margenSeguridad, 0)} uds`
-                      : `Faltan: ${formatNumber(Math.abs(calculos.margenSeguridad), 0)} uds`
-                    }
-                  </span>
+                  <span>{progresoIzquierda}</span>
+                  <span>{progresoDerecha}</span>
                 </div>
                 <div className={styles.progresoBarra}>
                   <div
-                    className={`${styles.progresoRelleno} ${calculos.porcentajeBreakEven >= 100 ? styles.progresoCompleto : ''}`}
-                    style={{ width: `${Math.min(calculos.porcentajeBreakEven, 100)}%` }}
+                    className={`${styles.progresoRelleno} ${progresoAncho >= 100 ? styles.progresoCompleto : ''}`}
+                    style={{ width: `${progresoAncho}%` }}
                   />
                   <div className={styles.progresoMeta} style={{ left: '100%' }} />
                 </div>
@@ -288,7 +412,15 @@ export default function CalculadoraBreakEvenPage() {
           </button>
         </div>
 
-        {tabActivo === 'basico' && (
+        {calculos === null && (
+          <div className={styles.tabContent}>
+            <p className={styles.escenarioDesc}>
+              Completa el precio, el coste variable y los costes fijos con cifras válidas para ver el desglose y los escenarios.
+            </p>
+          </div>
+        )}
+
+        {calculos !== null && tabActivo === 'basico' && (
           <div className={styles.tabContent}>
             <h3>Desglose de Costos</h3>
             <div className={styles.desgloseGrid}>
@@ -312,30 +444,42 @@ export default function CalculadoraBreakEvenPage() {
 
               <div className={styles.desgloseCard}>
                 <h4>En el punto de equilibrio</h4>
-                <div className={styles.desgloseItems}>
+                {calculos.breakEvenUnidades === null || calculos.resultadoEquilibrio === null ? (
+                  <p key="sin-desglose" className={styles.escenarioDesc}>
+                    No hay punto de equilibrio: el precio no supera el coste variable.
+                  </p>
+                ) : (
+                <div key="desglose" className={styles.desgloseItems}>
                   <div className={styles.desgloseItem}>
                     <span>Ingresos totales</span>
-                    <span>{formatCurrency(calculos.breakEvenEuros)}</span>
+                    <span>{formatCurrency(calculos.breakEvenEuros ?? 0)}</span>
                   </div>
                   <div className={styles.desgloseItem}>
                     <span>Costos fijos</span>
                     <span>-{formatCurrency(calculos.fijos)}</span>
                   </div>
                   <div className={styles.desgloseItem}>
-                    <span>Costos variables ({calculos.breakEvenUnidades} uds)</span>
+                    <span>{`Costos variables (${calculos.breakEvenUnidades} uds)`}</span>
                     <span>-{formatCurrency(calculos.breakEvenUnidades * calculos.costoVar)}</span>
                   </div>
                   <div className={`${styles.desgloseItem} ${styles.desgloseTotal}`}>
                     <span>Resultado</span>
-                    <span>0 € (equilibrio)</span>
+                    {/* La suma real de las tres líneas: al redondear a unidades enteras casi
+                        nunca es 0 (hallazgo 4317). */}
+                    <span>
+                      {calculos.resultadoEquilibrio === 0
+                        ? `${formatCurrency(0)} (equilibrio)`
+                        : `+${formatCurrency(calculos.resultadoEquilibrio)} (por redondear a unidades enteras)`}
+                    </span>
                   </div>
                 </div>
+                )}
               </div>
             </div>
           </div>
         )}
 
-        {tabActivo === 'escenarios' && (
+        {calculos !== null && escenarios !== null && tabActivo === 'escenarios' && (
           <div className={styles.tabContent}>
             <h3>¿Qué pasa si...?</h3>
             <p className={styles.escenarioDesc}>
@@ -345,31 +489,30 @@ export default function CalculadoraBreakEvenPage() {
             <div className={styles.escenariosGrid}>
               <div className={styles.escenarioCard}>
                 <h4><span aria-hidden="true">📊</span> Actual</h4>
-                <p className={styles.escenarioBreakEven}>{formatNumber(escenarios.actual.breakEven, 0)} uds</p>
-                <p className={styles.escenarioSubtexto}>{formatCurrency(escenarios.actual.breakEvenEuros)}</p>
-              </div>
-              <div className={styles.escenarioCard}>
-                <h4><span aria-hidden="true">📈</span> +10% Precio</h4>
-                <p className={styles.escenarioBreakEven}>{formatNumber(escenarios.precioPlusTen.breakEven, 0)} uds</p>
-                <p className={`${styles.escenarioSubtexto} ${escenarios.precioPlusTen.breakEven < escenarios.actual.breakEven ? styles.mejora : ''}`}>
-                  {escenarios.precioPlusTen.breakEven < escenarios.actual.breakEven
-                    ? `↓ ${formatNumber(escenarios.actual.breakEven - escenarios.precioPlusTen.breakEven, 0)} uds menos`
-                    : `↑ ${formatNumber(escenarios.precioPlusTen.breakEven - escenarios.actual.breakEven, 0)} uds más`
-                  }
+                <p className={styles.escenarioBreakEven}>{unidadesOSin(escenarios.actual.breakEven)}</p>
+                <p className={styles.escenarioSubtexto}>
+                  {escenarios.actual.breakEvenEuros === null ? 'el precio no supera el coste variable' : formatCurrency(escenarios.actual.breakEvenEuros)}
                 </p>
               </div>
               <div className={styles.escenarioCard}>
-                <h4><span aria-hidden="true">📉</span> -10% Costo Var.</h4>
-                <p className={styles.escenarioBreakEven}>{formatNumber(escenarios.costoVarMinusTen.breakEven, 0)} uds</p>
-                <p className={`${styles.escenarioSubtexto} ${styles.mejora}`}>
-                  ↓ {formatNumber(escenarios.actual.breakEven - escenarios.costoVarMinusTen.breakEven, 0)} uds menos
+                <h4><span aria-hidden="true">📈</span> {'+10 % Precio'}</h4>
+                <p className={styles.escenarioBreakEven}>{unidadesOSin(escenarios.precioPlusTen)}</p>
+                <p className={`${styles.escenarioSubtexto} ${comparacionPrecio ? claseTendencia(comparacionPrecio.tendencia) : ''}`}>
+                  {comparacionPrecio?.texto}
                 </p>
               </div>
               <div className={styles.escenarioCard}>
-                <h4><span aria-hidden="true">🏢</span> -20% Costos Fijos</h4>
-                <p className={styles.escenarioBreakEven}>{formatNumber(escenarios.fijoMinusTwenty.breakEven, 0)} uds</p>
-                <p className={`${styles.escenarioSubtexto} ${styles.mejora}`}>
-                  ↓ {formatNumber(escenarios.actual.breakEven - escenarios.fijoMinusTwenty.breakEven, 0)} uds menos
+                <h4><span aria-hidden="true">📉</span> {'−10 % Costo Var.'}</h4>
+                <p className={styles.escenarioBreakEven}>{unidadesOSin(escenarios.costoVarMinusTen)}</p>
+                <p className={`${styles.escenarioSubtexto} ${comparacionCosteVar ? claseTendencia(comparacionCosteVar.tendencia) : ''}`}>
+                  {comparacionCosteVar?.texto}
+                </p>
+              </div>
+              <div className={styles.escenarioCard}>
+                <h4><span aria-hidden="true">🏢</span> {'−20 % Costos Fijos'}</h4>
+                <p className={styles.escenarioBreakEven}>{unidadesOSin(escenarios.fijoMinusTwenty)}</p>
+                <p className={`${styles.escenarioSubtexto} ${comparacionFijos ? claseTendencia(comparacionFijos.tendencia) : ''}`}>
+                  {comparacionFijos?.texto}
                 </p>
               </div>
             </div>
@@ -382,30 +525,48 @@ export default function CalculadoraBreakEvenPage() {
                   value={escenarioPrecio}
                   onChange={setEscenarioPrecio}
                   label="Nuevo precio"
-                  placeholder={String(calculos.precio)}
+                  placeholder={formatNumber(calculos.precio, 2)}
                   suffix="€"
+                  min={0}
+                  acotarAlSalir={false}
+                  error={erroresEscenario.precio}
                 />
                 <NumberInput
                   value={escenarioCostoVar}
                   onChange={setEscenarioCostoVar}
                   label="Nuevo costo variable"
-                  placeholder={String(calculos.costoVar)}
+                  placeholder={formatNumber(calculos.costoVar, 2)}
                   suffix="€"
+                  min={0}
+                  acotarAlSalir={false}
+                  error={erroresEscenario.costoVar}
                 />
                 <NumberInput
                   value={escenarioCostosFijos}
                   onChange={setEscenarioCostosFijos}
                   label="Nuevos costos fijos"
-                  placeholder={String(calculos.fijos)}
+                  placeholder={formatNumber(calculos.fijos, 2)}
                   suffix="€"
+                  min={0}
+                  acotarAlSalir={false}
+                  error={erroresEscenario.fijos}
                 />
               </div>
               <div className={styles.customResultado}>
                 <span>Nuevo punto de equilibrio:</span>
-                <strong>{formatNumber(escenarios.custom.breakEven, 0)} unidades</strong>
-                <span className={escenarios.custom.breakEven < escenarios.actual.breakEven ? styles.mejora : styles.empeora}>
-                  ({escenarios.custom.breakEven < escenarios.actual.breakEven ? '↓' : '↑'}
-                  {formatNumber(Math.abs(escenarios.custom.breakEven - escenarios.actual.breakEven), 0)} vs actual)
+                <strong>
+                  {escenarios.custom === undefined
+                    ? 'revisa los datos del escenario'
+                    : escenarios.custom === null
+                      ? 'sin equilibrio'
+                      : `${formatNumber(escenarios.custom, 0)} unidades`}
+                </strong>
+                <span className={comparacionCustom ? claseTendencia(comparacionCustom.tendencia) : ''}>
+                  {comparacionCustom
+                    ? /^[↓↑]/.test(comparacionCustom.texto)
+                      ? `(${comparacionCustom.texto} que el actual)`
+                      : `(${comparacionCustom.texto})`
+                    : ''}
                 </span>
               </div>
             </div>
@@ -623,12 +784,9 @@ export default function CalculadoraBreakEvenPage() {
               </p>
             </div>
             <div className={styles.faqItem}>
-              <h3>¿Qué se considera coste fijo vs. variable?</h3>
-              <p>
-                <strong>Costes fijos:</strong> No cambian con el volumen de ventas (alquiler, seguros, salarios fijos,
-                amortizaciones, cuota de autónomos). <strong>Costes variables:</strong> Aumentan proporcionalmente
-                con cada unidad vendida (materia prima, envíos, comisiones de venta, embalaje).
-              </p>
+              {/* Misma fuente que el FAQPage del JSON-LD (metadata.ts, hallazgo 4321). */}
+              <h3>{PREGUNTA_COSTES_FIJOS_VARIABLES.question}</h3>
+              <p>{PREGUNTA_COSTES_FIJOS_VARIABLES.answer}</p>
             </div>
             <div className={styles.faqItem}>
               <h3>¿El salario del autónomo es coste fijo?</h3>
@@ -823,10 +981,13 @@ export default function CalculadoraBreakEvenPage() {
         </section>
 
         {/* 6. Warning Box */}
-        <div className={styles.warningBox} role="alert">
+        {/* Contenido estático: un <aside> con su encabezado. Hasta el 09/11/2026 llevaba
+            role="alert", y al desplegar la guía el lector anunciaba de golpe sus 1.124
+            caracteres (hallazgo 4324, mismo caso que el cabo C0053). */}
+        <aside className={styles.warningBox} aria-labelledby="errores-frecuentes-break-even">
           <div className={styles.warningHeader}>
             <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
-            <h3>Errores frecuentes al calcular el break-even</h3>
+            <h3 id="errores-frecuentes-break-even">Errores frecuentes al calcular el break-even</h3>
           </div>
           <ul className={styles.warningList}>
             <li>
@@ -856,7 +1017,7 @@ export default function CalculadoraBreakEvenPage() {
               de meses pico puede ser inalcanzable en temporada baja, comprometiendo la tesorería anual.
             </li>
           </ul>
-        </div>
+        </aside>
       </EducationalSection>
 
       <RelatedApps />

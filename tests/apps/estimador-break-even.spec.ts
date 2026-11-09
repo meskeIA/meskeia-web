@@ -223,16 +223,33 @@ test.describe('estimador-break-even', () => {
     await expect(s).toContainText('-6000,00 €');
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · con precio ≤ coste variable el equilibrio sale «0 unidades», «0,00 €» y «Margen de seguridad: 200 uds»', async ({
+  test('REPARADO (hallazgo 4313) · con precio ≤ coste variable dice que no hay punto de equilibrio, sin «0 unidades» ni margen de seguridad', async ({
     page,
   }) => {
-    test.fail();
     await poner(page, ROTULO.precio, '20');
     await expect(tarjeta(page, 'Margen de Contribución')).toContainText('0,00');
     // Con MC = 0 no hay punto de equilibrio: ninguna cantidad cubre los 5.000 € fijos.
-    await expect(cifraEquilibrio(page)).not.toHaveText('0');
-    await expect(equivalente(page)).not.toContainText('0,00 €');
-    await expect(situacion(page)).not.toContainText('Margen de seguridad: 200 uds');
+    await expect(cifraEquilibrio(page)).toHaveText('—');
+    await expect(page.getByText('no hay punto de equilibrio', { exact: true })).toBeVisible();
+    await expect(page.getByText(/ninguna cantidad de ventas cubre los 5000,00\s€/)).toBeVisible();
+    await expect(equivalente(page)).toHaveCount(0);
+    await expect(situacion(page)).toContainText('-5000,00 €');
+    await expect(situacion(page)).toContainText('Sin punto de equilibrio');
+    await expect(situacion(page)).not.toContainText('Margen de seguridad');
+    await expect(tarjeta(page, 'Para tu objetivo')).toContainText('Inalcanzable');
+
+    // Escenarios: +10 % de precio (22 €) sí da equilibrio, ⌈5.000 ÷ 2⌉ = 2.500; −10 % de CV
+    // (18 €), también 2.500; −20 % de fijos sigue sin equilibrio. Nada de «2500 uds más».
+    await page.getByRole('button', { name: 'Escenarios What-If' }).click();
+    await expect(escenario(page, 'Actual')).toContainText('Sin equilibrio');
+    await expect(escenario(page, /\+\s?10\s?%\s?Precio/)).toContainText('2500 uds');
+    await expect(escenario(page, /\+\s?10\s?%\s?Precio/)).toContainText('ahora sí hay punto de equilibrio');
+    await expect(escenario(page, /20\s?%\s?Cost[oe]s Fijos/i)).toContainText('Sin equilibrio');
+
+    // P 15 €: margen −5 €. El personalizado con precio 15 tampoco tiene equilibrio, y no sale en verde.
+    await poner(page, 'Nuevo precio', '15');
+    await expect(personalizado(page)).toContainText('sin equilibrio');
+    await expect(personalizado(page)).not.toContainText('↓');
   });
 
   test('CASO 2b (límite) · costes fijos 0: equilibrio en 0 unidades y objetivo en 67', async ({ page }) => {
@@ -245,19 +262,18 @@ test.describe('estimador-break-even', () => {
     await expect(situacion(page)).toContainText('+6000,00 €');
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · con costes fijos 0 la barra dice «0 % del punto de equilibrio» mientras hay +6.000 € de ganancia', async ({
+  test('REPARADO (hallazgo 4318) · con costes fijos 0 la barra dice que el equilibrio está superado, no «0 %»', async ({
     page,
   }) => {
-    test.fail();
     await poner(page, ROTULO.fijos, '0');
     await expect(situacion(page)).toContainText('+6000,00 €');
     await expect(situacion(page)).not.toContainText(/(^|\D)0\s?%\s+del punto de equilibrio/);
+    await expect(situacion(page)).toContainText('Equilibrio superado');
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · coma flotante: 2,30 € / 1,10 € / 1.200 € da 1001 uds y no 1000', async ({
+  test('REPARADO (hallazgo 4315) · coma flotante: 2,30 € / 1,10 € / 1.200 € da 1000 uds exactas', async ({
     page,
   }) => {
-    test.fail();
     await poner(page, ROTULO.precio, '2,30');
     await poner(page, ROTULO.costeVariable, '1,10');
     await poner(page, ROTULO.fijos, '1.200');
@@ -265,6 +281,12 @@ test.describe('estimador-break-even', () => {
     // 1.200 ÷ 1,20 = 1.000 EXACTAS (en 1.000 uds: 2.300 = 1.200 + 1.100); 1.000 × 2,30 = 2.300 €
     await expect(cifraEquilibrio(page)).toHaveText('1000');
     await expect(equivalente(page)).toContainText('2300,00 €');
+    // Y el otro par del acta: 2.300 ÷ (4,60 − 2,30) = 1.000 exactas → 4600,00 €
+    await poner(page, ROTULO.precio, '4,60');
+    await poner(page, ROTULO.costeVariable, '2,30');
+    await poner(page, ROTULO.fijos, '2.300');
+    await expect(cifraEquilibrio(page)).toHaveText('1000');
+    await expect(equivalente(page)).toContainText('4600,00 €');
   });
 
   test('CASO 3 (rechazo) · una letra tecleada en un importe se rechaza: «7200abc» queda en 7200 → 240 uds', async ({
@@ -280,30 +302,32 @@ test.describe('estimador-break-even', () => {
     await expect(equivalente(page)).toContainText('12.000,00 €');
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · costes fijos ilegibles «5.000.50» se leen como 0 sin aviso: «0 unidades/mes»', async ({
+  test('REPARADO (hallazgo 4316) · costes fijos ilegibles «5.000.50» se nombran y no dan resultado', async ({
     page,
   }) => {
-    test.fail();
     await poner(page, ROTULO.fijos, '5.000.50');
     await expect(campo(page, ROTULO.fijos)).toHaveValue('5.000.50');
-    // Esperado: aviso de importe ilegible y ningún punto de equilibrio inventado
-    await expect(cifraEquilibrio(page)).not.toHaveText('0');
-    await expect(situacion(page)).not.toContainText('+6000,00 €');
+    // Aviso de importe ilegible y ningún punto de equilibrio inventado
+    await expect(page.getByRole('alert').filter({ hasText: 'No se ha podido leer los costes fijos' })).toBeVisible();
+    await expect(cifraEquilibrio(page)).toHaveText('—');
+    await expect(page.getByText('Tu situación actual')).toHaveCount(0);
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · costes fijos negativos con el foco dentro: «-100 unidades/mes» y «-5000,00 €»', async ({
+  test('REPARADO (hallazgo 4316) · costes fijos negativos se rechazan con el foco dentro y también al salir', async ({
     page,
   }) => {
-    test.fail();
     await poner(page, ROTULO.fijos, '-3000', false);
-    await expect(cifraEquilibrio(page)).not.toHaveText('-100');
-    await expect(equivalente(page)).not.toContainText('-5000,00 €');
+    await expect(cifraEquilibrio(page)).toHaveText('—');
+    await expect(page.getByRole('alert').filter({ hasText: 'no pueden ser negativos' })).toBeVisible();
+    // Al salir del campo ya no se reescribe a 0 en silencio: sigue el «-3000» y el aviso.
+    await campo(page, ROTULO.fijos).press('Tab');
+    await expect(campo(page, ROTULO.fijos)).toHaveValue('-3000');
+    await expect(cifraEquilibrio(page)).toHaveText('—');
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · el escenario personalizado ignora un 0: costes fijos 0 → 167 uds en vez de 0', async ({
+  test('REPARADO (hallazgo 4314) · el escenario personalizado respeta un 0: costes fijos 0 → 0 uds', async ({
     page,
   }) => {
-    test.fail();
     await page.getByRole('button', { name: 'Escenarios What-If' }).click();
     await expect(escenario(page, 'Actual')).toContainText('167 uds');
     // Con 50 / 20 por defecto y CF 0: ⌈0 ÷ 30⌉ = 0 uds
@@ -313,12 +337,15 @@ test.describe('estimador-break-even', () => {
     await poner(page, 'Nuevos costos fijos', '');
     await poner(page, 'Nuevo costo variable', '0');
     await expect(personalizado(page)).toContainText(/equilibrio:\s*100 unidades/);
+    await expect(personalizado(page)).toContainText('↓ 67 uds menos que el actual');
+    // Vacío = el valor actual: igual que el actual, sin clase de «empeora»
+    await poner(page, 'Nuevo costo variable', '');
+    await expect(personalizado(page)).toContainText('(igual que el actual)');
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · el desglose escribe «Resultado 0 € (equilibrio)» aunque sus líneas sumen 3.000 €', async ({
+  test('REPARADO (hallazgo 4317) · el desglose suma sus líneas: +3.000 € al redondear a 3 uds', async ({
     page,
   }) => {
-    test.fail();
     await poner(page, ROTULO.precio, '10.000');
     await poner(page, ROTULO.costeVariable, '4.000');
     await poner(page, ROTULO.fijos, '15.000');
@@ -329,52 +356,54 @@ test.describe('estimador-break-even', () => {
     await expect(d).toContainText('-15.000,00 €');
     await expect(d).toContainText('-12.000,00 €');
     await expect(d).not.toContainText('0 € (equilibrio)');
+    await expect(d).toContainText('+3000,00 €');
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · con el objetivo vacío la tarjeta dice «para ganar No definido»', async ({
+  test('REPARADO (hallazgo 4319) · con el objetivo vacío la tarjeta no dice «No definido»', async ({
     page,
   }) => {
-    test.fail();
     await poner(page, ROTULO.objetivo, '');
     await expect(cifraEquilibrio(page)).toHaveText('167');
     await expect(tarjeta(page, 'Para tu objetivo')).not.toContainText('No definido');
+    await expect(tarjeta(page, 'Para tu objetivo')).toContainText('Sin objetivo de ganancia');
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · el % va pegado a la cifra: «60,0% del precio»', async ({ page }) => {
-    test.fail();
+  test('REPARADO (hallazgo 4323) · el % lleva espacio duro: «60,0 % del precio», barra y escenarios', async ({ page }) => {
     await expect(tarjeta(page, 'Margen de Contribución')).toContainText('30,00');
     const texto = await tarjeta(page, 'Margen de Contribución').evaluate((n) => n.textContent ?? '');
     // Regla del 25/09/2026 (CLAUDE.md global §2): «60,0 %», con espacio duro U+00A0
     expect(texto).toContain(`60,0${ESPACIO_DURO}% del precio`);
+    const barra = await situacion(page).evaluate((n) => n.textContent ?? '');
+    expect(barra).toContain(`120${ESPACIO_DURO}% del punto de equilibrio`);
+    await page.getByRole('button', { name: 'Escenarios What-If' }).click();
+    const titulo = await escenario(page, /\+\s?10\s?%\s?Precio/).locator('h4').textContent();
+    expect(titulo ?? '').toContain(`+10${ESPACIO_DURO}% Precio`);
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · el recuadro ESTÁTICO «Errores frecuentes» lleva role="alert"', async ({
+  test('REPARADO (hallazgo 4324) · el recuadro ESTÁTICO «Errores frecuentes» ya no lleva role="alert"', async ({
     page,
   }) => {
-    test.fail();
     const titulo = page.locator('h3', { hasText: 'Errores frecuentes al calcular el break-even' });
     await expect(titulo).toHaveCount(1);
     await expect(titulo.locator('xpath=ancestor::*[@role="alert"]')).toHaveCount(0);
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · `features` del JSON-LD vacía (§1.ter pide 4-8)', async ({ page }) => {
-    test.fail();
+  test('REPARADO (hallazgo 4320) · `features` del JSON-LD con 4-8 características', async ({ page }) => {
     const { features } = await jsonLdServido(page);
     expect(features).not.toBeNull();
     expect((features ?? []).length).toBeGreaterThanOrEqual(4);
+    expect((features ?? []).length).toBeLessThanOrEqual(8);
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · «costes fijos y variables» tiene una respuesta en el FAQPage y otra en la FAQ visible', async ({
+  test('REPARADO (hallazgo 4321) · «costes fijos y variables» tiene una sola respuesta en el FAQPage y en la FAQ visible', async ({
     page,
   }) => {
-    test.fail();
     const { faq } = await jsonLdServido(page);
     const enLd = faq.find((q) => /costes fijos y costes variables/i.test(q.pregunta));
-    const visible = await respuestaVisible(page, '¿Qué se considera coste fijo vs. variable?');
-    if (enLd && visible) {
-      // La reparación es UNA constante que importen las dos (check:faq-unica)
-      expect(normalizar(enLd.respuesta)).toBe(normalizar(visible));
-    }
+    expect(enLd).toBeDefined();
+    const visible = await respuestaVisible(page, enLd?.pregunta ?? '');
+    expect(visible).not.toBeNull();
+    expect(normalizar(enLd?.respuesta ?? '')).toBe(normalizar(visible ?? ''));
   });
 
   test('HALLAZGO (09/11/2026, ABIERTO) · la FAQ da a la tienda física 18–36 meses y la tabla 12–24', async ({

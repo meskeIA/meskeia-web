@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { generateWebAppSchema } from '@/lib/schema-templates';
+import { generateWebAppSchema, type FAQItem } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Estimador Break-Even - Punto de Equilibrio de Productos | meskeIA',
@@ -36,8 +36,25 @@ export const jsonLd = generateWebAppSchema({
   description: "Calcula el punto de equilibrio de tus productos. Analiza cuántas unidades necesitas vender para cubrir costes. Margen de contribución, rentabilidad y escenarios.",
   url: "https://meskeia.com/estimador-break-even/",
   category: 'BusinessApplication',
-  features: [],
+  // Las siete, vistas hacer a la app por el Inspector (hallazgo 4320, 09/11/2026).
+  features: [
+    'Punto de equilibrio en unidades al mes y su facturación equivalente',
+    'Margen de contribución por unidad en euros y en porcentaje del precio',
+    'Unidades necesarias para alcanzar un objetivo de ganancia mensual',
+    'Comparación con las ventas actuales: ingresos, costes, ganancia o pérdida y margen de seguridad',
+    'Desglose de ingresos y costes en el punto de equilibrio',
+    'Escenarios what-if: +10 % de precio, −10 % de coste variable y −20 % de costes fijos',
+    'Escenario personalizado con precio, coste variable y costes fijos propios',
+  ],
 });
+
+// FUENTE ÚNICA de la pregunta de costes fijos y variables, que estaba en la FAQ visible
+// (page.tsx) y en el FAQPage de abajo con dos redacciones (hallazgo 4321, 09/11/2026).
+export const PREGUNTA_COSTES_FIJOS_VARIABLES: FAQItem = {
+  question: '¿Qué diferencia hay entre costes fijos y costes variables en el cálculo?',
+  answer:
+    'Los costes fijos no cambian con el volumen de ventas: alquiler, seguros, salarios fijos, amortizaciones, cuota de autónomos o suscripciones. Los costes variables aumentan proporcionalmente con cada unidad producida o vendida: materias primas, envíos, embalaje, comisiones de venta. Separar bien ambas categorías es esencial para que el cálculo del break-even sea fiable.',
+};
 
 export const faqJsonLd = {
   '@context': 'https://schema.org',
@@ -69,10 +86,10 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Qué diferencia hay entre costes fijos y costes variables en el cálculo?',
+      name: PREGUNTA_COSTES_FIJOS_VARIABLES.question,
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Los costes fijos no cambian con el volumen de producción: alquiler, seguros, suscripciones. Los costes variables aumentan proporcionalmente con cada unidad producida o vendida: materias primas, embalaje, comisiones de venta. Separar ambas categorías correctamente es esencial para que el cálculo del break-even sea fiable.',
+        text: PREGUNTA_COSTES_FIJOS_VARIABLES.answer,
       },
     },
     {
