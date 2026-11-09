@@ -436,8 +436,9 @@ test.describe('visualizador-farmacocinetica', () => {
    *   (d) bioequivalencia — OMS, Technical Report Series n.º 1003 (2017), anexo 6, §7.7 «Acceptance
    *       ranges» (en www.who.int). La guía de la EMA, que es la que aplica la AEMPS, no está en la red.
    */
-  test('HALLAZGO (09/11/2026, ABIERTO) [contenido/alto]: la tarjeta de fluoxetina dice que aumenta los niveles de tamoxifeno', async ({ page }) => {
-    test.fail(); // HALLAZGO (09/11/2026, ABIERTO) [contenido/alto] — cabo C0644 (a)
+  test('HALLAZGO 4298 (09/11/2026, REPARADO) [contenido/alto]: la tarjeta de fluoxetina ya no dice que aumenta los niveles de tamoxifeno', async ({ page }) => {
+    // REPARADO en /reparar el 09/11/2026: la tarjeta dice que reduce el endoxifeno y que la
+    // combinación debe evitarse, y la leyenda del inhibidor nombra el caso del profármaco.
     // ENTRADA  pestaña «CYP450», tarjeta «Fluoxetina · ISRS · Inhibidor»
     // ESPERADO lo que dice la ficha técnica de la fluoxetina (4.5): con inhibidores de CYP2D6, «una
     //          reducción del 65-75% en los niveles plasmáticos de uno de los metabolitos activos más
@@ -452,10 +453,12 @@ test.describe('visualizador-farmacocinetica', () => {
     const contenido = page.locator('[class*="tabContenido"]');
     await expect(contenido).toContainText('Fluoxetina');
     await expect(contenido).not.toContainText(/aumenta (los )?niveles de tamoxifeno/, { timeout: 2000 });
+    await expect(contenido).toContainText('endoxifeno');
+    await expect(contenido).toContainText('profármaco');
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) [contenido/medio]: la warfarina se controla con «niveles plasmáticos» y no con el INR', async ({ page }) => {
-    test.fail(); // HALLAZGO (09/11/2026, ABIERTO) [contenido/medio] — cabo C0644 (b)
+  test('HALLAZGO 4299 (09/11/2026, REPARADO) [contenido/medio]: la warfarina se controla con el INR, no con niveles plasmáticos', async ({ page }) => {
+    // REPARADO en /reparar el 09/11/2026: los tres sitios nombran el INR para la warfarina.
     // ENTRADA  cuadro «Índice terapéutico y margen de seguridad» (siempre visible), FAQ visible «¿Qué
     //          significa que un medicamento tenga índice terapéutico estrecho?» y tarjeta «Monitorización
     //          de IT estrecho» de la guía
@@ -471,11 +474,13 @@ test.describe('visualizador-farmacocinetica', () => {
       (t) => /warfarina/i.test(t) && /monitoriz|niveles (plasmáticos|en sangre)|análisis/i.test(t),
     );
     const sinInr = sobreControl.filter((t) => !/\bINR\b/.test(t));
+    expect(sobreControl.length).toBeGreaterThanOrEqual(3);
     expect(sinInr, sinInr.join(' ‖ ')).toEqual([]);
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) [contenido/bajo]: la bioequivalencia se da como «F dentro del 80-125%» sin el IC 90 % del cociente', async ({ page }) => {
-    test.fail(); // HALLAZGO (09/11/2026, ABIERTO) [contenido/bajo] — cabo C0644 (d)
+  test('HALLAZGO 4300 (09/11/2026, REPARADO) [contenido/bajo]: la bioequivalencia se da con el IC 90 % del cociente', async ({ page }) => {
+    // REPARADO en /reparar el 09/11/2026: las dos menciones del 80-125 % dicen que se aplica al
+    // intervalo de confianza del 90 % del cociente de AUC y Cmax.
     // ENTRADA  guía educativa: tarjeta «Genéricos y bioequivalencia» y «Errores comunes»
     // ESPERADO OMS, TRS 1003 (2017), anexo 6, §7.7: «The 90% confidence interval for this measure of
     //          relative bioavailability should lie within a bioequivalence range of 80.00–125.00%» (AUC),
@@ -488,6 +493,7 @@ test.describe('visualizador-farmacocinetica', () => {
     const textos = await page.locator('p, li').allTextContents();
     const conRango = textos.filter((t) => /80(,00)?\s*[-–]\s*125/.test(t));
     const sinIntervalo = conRango.filter((t) => !/intervalo de confianza|IC\s*(del\s*)?90/i.test(t));
+    expect(conRango.length).toBeGreaterThanOrEqual(2);
     expect(sinIntervalo, sinIntervalo.join(' ‖ ')).toEqual([]);
   });
 });

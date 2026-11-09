@@ -113,7 +113,7 @@ const FARMACOS_VIDA_MEDIA: FarmacoVidaMedia[] = [
 const CYP_EJEMPLOS: CypEjemplo[] = [
   { tipo: 'inhibidor', nombre: 'Zumo de pomelo', fuente: 'Alimento', efecto: 'Inhibe CYP3A4 intestinal → aumenta niveles de estatinas, ciclosporina, antihistamínicos', icono: '🍊' },
   { tipo: 'inhibidor', nombre: 'Ketoconazol', fuente: 'Antifúngico', efecto: 'Potente inhibidor CYP3A4 → interacciona con docenas de fármacos', icono: '🔬' },
-  { tipo: 'inhibidor', nombre: 'Fluoxetina', fuente: 'ISRS', efecto: 'Inhibe CYP2D6 → aumenta niveles de tamoxifeno, tramadol, antipsicóticos', icono: '💊' },
+  { tipo: 'inhibidor', nombre: 'Fluoxetina', fuente: 'ISRS', efecto: 'Inhibe CYP2D6 → aumenta niveles de tramadol y antipsicóticos. Con el tamoxifeno, un profármaco, reduce su metabolito activo (endoxifeno) y puede restarle eficacia: la combinación debe evitarse', icono: '💊' },
   { tipo: 'inhibidor', nombre: 'Ciprofloxacino', fuente: 'Antibiótico', efecto: 'Inhibe CYP1A2 → aumenta niveles de teofilina, warfarina, clozapina', icono: '💉' },
   { tipo: 'inductor', nombre: 'Rifampicina', fuente: 'Antibiótico antituberculoso', efecto: 'Potente inductor CYP3A4/CYP2C → reduce niveles de anticonceptivos, antivirales, anticoagulantes', icono: '⚡' },
   { tipo: 'inductor', nombre: 'Carbamazepina', fuente: 'Antiepiléptico', efecto: 'Inductor CYP3A4 → autoinducción propia + reduce eficacia de muchos fármacos', icono: '🧠' },
@@ -642,7 +642,7 @@ export default function VisualizadorFarmacocinetica() {
 
               <div className={styles.cypLegenda}>
                 <span className={styles.cypBadgeInductor}><span aria-hidden="true">⚡</span> Inductor — acelera el metabolismo → reduce niveles del fármaco</span>
-                <span className={styles.cypBadgeInhibidor}><span aria-hidden="true">🚫</span> Inhibidor — frena el metabolismo → aumenta niveles del fármaco</span>
+                <span className={styles.cypBadgeInhibidor}><span aria-hidden="true">🚫</span> Inhibidor — frena el metabolismo → aumenta niveles del fármaco (si es un profármaco, como la codeína o el tamoxifeno, baja el del metabolito activo)</span>
               </div>
 
               <div className={styles.cypGrid}>
@@ -681,8 +681,9 @@ export default function VisualizadorFarmacocinetica() {
           <h3><span aria-hidden="true">🔑</span> Índice terapéutico y margen de seguridad</h3>
           <p>
             El <strong>índice terapéutico (IT)</strong> mide el margen entre la dosis eficaz y la dosis tóxica.
-            Los fármacos con IT estrecho —warfarina, digoxina, litio, teofilina, ciclosporina— requieren monitorización
-            plasmática obligatoria porque pequeñas variaciones en la concentración pueden causar toxicidad grave o pérdida de eficacia.
+            Los fármacos con IT estrecho requieren un control estrecho porque pequeñas variaciones en la concentración
+            pueden causar toxicidad grave o pérdida de eficacia: digoxina, litio, teofilina o ciclosporina se controlan
+            midiendo sus niveles en sangre, y la warfarina, midiendo su efecto sobre la coagulación (INR).
             La farmacocinética es la base racional para diseñar regímenes de dosificación seguros.
           </p>
           <p>
@@ -804,7 +805,8 @@ export default function VisualizadorFarmacocinetica() {
                 El índice terapéutico (IT) es la relación entre la dosis tóxica y la dosis eficaz. Fármacos con IT estrecho
                 como la warfarina, la digoxina, el litio o la teofilina tienen muy poco margen: pequeñas variaciones de dosis
                 o de parámetros farmacocinéticos pueden llevar de la ineficacia a la toxicidad grave. Por eso requieren
-                monitorización periódica de niveles plasmáticos y ajuste individual.
+                controles periódicos y ajuste individual: niveles en sangre para la digoxina, el litio o la teofilina, y el
+                INR (el tiempo de protrombina, que mide el efecto sobre la coagulación) para la warfarina.
               </p>
               <span className={styles.faqTip}>Concepto clave: Índice Terapéutico</span>
             </div>
@@ -908,14 +910,14 @@ export default function VisualizadorFarmacocinetica() {
               <span className={styles.tipIcon} aria-hidden="true">💊</span>
               <div>
                 <strong>Genéricos y bioequivalencia</strong>
-                <p>Los genéricos deben demostrar bioequivalencia regulada: F dentro del 80-125% del original. No son inferiores.</p>
+                <p>Los genéricos deben demostrar bioequivalencia: el intervalo de confianza del 90&nbsp;% del cociente de AUC y de Cmax frente al original tiene que caer entero dentro del 80-125&nbsp;%, así que la exposición media queda cerca del 100&nbsp;%. No son inferiores.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">🩺</span>
               <div>
                 <strong>Monitorización de IT estrecho</strong>
-                <p>Warfarina, litio, digoxina y ciclosporina requieren análisis periódicos de niveles en sangre para ajustar dosis.</p>
+                <p>Litio, digoxina y ciclosporina requieren análisis periódicos de niveles en sangre para ajustar dosis; la warfarina se ajusta con el INR.</p>
               </div>
             </div>
           </div>
@@ -944,7 +946,8 @@ export default function VisualizadorFarmacocinetica() {
               </li>
               <li>
                 <strong>«El genérico es peor porque tiene menos principio activo»</strong> — La bioequivalencia está
-                regulada por la AEMPS: el genérico debe demostrar el mismo AUC y Cmax dentro de márgenes estrictos (80-125%).
+                regulada por la AEMPS: el intervalo de confianza del 90&nbsp;% del cociente de AUC y de Cmax del genérico frente al
+                original tiene que caer entero dentro del 80-125&nbsp;% (más estrecho en fármacos de índice terapéutico estrecho).
               </li>
               <li>
                 <strong>«La vida media indica cuándo hay que tomar la siguiente dosis»</strong> — La dosificación depende
