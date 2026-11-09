@@ -11,6 +11,7 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
+import { parseSpanishNumber } from '@/lib';
 
 // Presets de tiempo en minutos
 const PRESETS = [1, 2, 5, 10, 15, 20, 30];
@@ -22,12 +23,29 @@ const CIRCUNFERENCIA = 2 * Math.PI * RADIO;
 // Estado del temporizador
 type EstadoTimer = 'parado' | 'corriendo' | 'pausado' | 'terminado';
 
-// Colores según porcentaje restante
-function getColorTiempo(porcentaje: number): string {
-  if (porcentaje > 60) return '#22C55E';   // Verde
-  if (porcentaje > 40) return '#EAB308';   // Amarillo
-  if (porcentaje > 20) return '#F97316';   // Naranja
-  return '#EF4444';                        // Rojo
+type Tramo = 'verde' | 'amarillo' | 'naranja' | 'rojo';
+
+// Tramo de color según el porcentaje restante. El color lo pone el CSS (.tramoVerde…), con una
+// variante oscura del tono en tema claro: los vivos de antes daban 1,92-2,80:1 sobre la tarjeta
+// blanca, y las cifras se leen de lejos (hallazgo 4329).
+function getTramoTiempo(porcentaje: number): Tramo {
+  if (porcentaje > 60) return 'verde';
+  if (porcentaje > 40) return 'amarillo';
+  if (porcentaje > 20) return 'naranja';
+  return 'rojo';
+}
+
+/**
+ * Lee el campo «Otro tiempo...». Antes era parseInt sobre un type="number": «2,5» llegaba como
+ * «2.5» y se cortaba a 2 sin avisar, y fuera de 1-180 no pasaba nada (hallazgos 4326 y 4327).
+ * Ahora admite fracciones (2,5 min = 02:30) y nombra lo que no aplica.
+ */
+function leerMinutos(texto: string): { minutos: number } | { error: string } {
+  if (texto.trim() === '') return { error: 'Escribe cuántos minutos quieres, entre 1 y 180.' };
+  const n = parseSpanishNumber(texto);
+  if (!Number.isFinite(n)) return { error: `No se ha podido leer «${texto}»: escribe los minutos con cifras, por ejemplo 2,5.` };
+  if (n < 1 || n > 180) return { error: 'La duración tiene que estar entre 1 y 180 minutos.' };
+  return { minutos: n };
 }
 
 // Tono de aviso con Web Audio API
@@ -63,81 +81,156 @@ function formatearTiempo(segundos: number): string {
 export default function TemporizadorVisualPage() {
   const [duracionMin, setDuracionMin] = useState(5);
   const [inputPersonalizado, setInputPersonalizado] = useState('');
+  const [errorPersonalizado, setErrorPersonalizado] = useState('');
   const [segundosRestantes, setSegundosRestantes] = useState(5 * 60);
   const [estado, setEstado] = useState<EstadoTimer>('parado');
   const [sonidoActivo, setSonidoActivo] = useState(true);
 
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const segundosTotales = duracionMin * 60;
+  /**
+   * La cuenta se mide contra un INSTANTE FINAL (Date.now), no contando tics de setInterval.
+   * Hasta el 09/11/2026 restaba 1 por tic: con la pestaña en segundo plano, la pantalla del móvil
+   * bloqueada o el portátil suspendido el navegador no dispara el intervalo y la cuenta se paraba;
+   * cada Pausar/Continuar y cada toque al sonido tiraba lo marchado desde el último tic
+   * (hallazgo 4325). Ahora el intervalo solo repinta, como en cronometro.
+   */
+  const finRef = useRef<number | null>(null);        // instante final, mientras corre
+  const restanteMsRef = useRef(5 * 60 * 1000);       // lo que queda, mientras no corre
+  const sonidoRef = useRef(sonidoActivo);
+  const btnPrincipalRef = useRef<HTMLButtonElement>(null);
+  const btnResetRef = useRef<HTMLButtonElement>(null);
+
+  const segundosTotales = Math.round(duracionMin * 60);
   const porcentajeRestante = segundosTotales > 0 ? (segundosRestantes / segundosTotales) * 100 : 0;
   const strokeOffset = CIRCUNFERENCIA * (1 - porcentajeRestante / 100);
-  const colorActual = getColorTiempo(porcentajeRestante);
+  const tramoActual = getTramoTiempo(porcentajeRestante);
+  const claseTramo = {
+    verde: styles.tramoVerde,
+    amarillo: styles.tramoAmarillo,
+    naranja: styles.tramoNaranja,
+    rojo: styles.tramoRojo,
+  }[tramoActual];
 
-  // Limpiar intervalo al desmontar
   useEffect(() => {
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    };
+    sonidoRef.current = sonidoActivo;
+  }, [sonidoActivo]);
+
+  // Recalcula lo que queda contra el instante final; al llegar a 0, termina y suena una vez.
+  const actualizar = useCallback(() => {
+    if (finRef.current === null) return;
+    const ms = finRef.current - Date.now();
+    if (ms <= 0) {
+      finRef.current = null;
+      restanteMsRef.current = 0;
+      setSegundosRestantes(0);
+      setEstado('terminado');
+      if (sonidoRef.current) reproducirAlerta();
+      return;
+    }
+    setSegundosRestantes(Math.ceil(ms / 1000));
   }, []);
 
-  // Tick del temporizador
+  // Repintado mientras corre, y al volver a la pestaña (el navegador puede haber parado el intervalo)
   useEffect(() => {
-    if (estado === 'corriendo') {
-      intervalRef.current = setInterval(() => {
-        setSegundosRestantes(prev => {
-          if (prev <= 1) {
-            clearInterval(intervalRef.current!);
-            setEstado('terminado');
-            if (sonidoActivo) reproducirAlerta();
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-    } else {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-    }
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
+    if (estado !== 'corriendo') return;
+    const id = setInterval(actualizar, 250);
+    const alVolver = () => {
+      if (document.visibilityState === 'visible') actualizar();
     };
-  }, [estado, sonidoActivo]);
+    document.addEventListener('visibilitychange', alVolver);
+    return () => {
+      clearInterval(id);
+      document.removeEventListener('visibilitychange', alVolver);
+    };
+  }, [estado, actualizar]);
+
+  // Pantalla encendida mientras corre (Wake Lock): en el móvil se apagaba por inactividad.
+  useEffect(() => {
+    if (estado !== 'corriendo' || !('wakeLock' in navigator)) return;
+    let cancelado = false;
+    let bloqueo: WakeLockSentinel | null = null;
+    const pedir = async () => {
+      try {
+        const s = await navigator.wakeLock.request('screen');
+        if (cancelado) void s.release();
+        else bloqueo = s;
+      } catch {
+        /* sin permiso o sin batería: la cuenta sigue igual, solo no se impide el apagado */
+      }
+    };
+    void pedir();
+    // El bloqueo se suelta solo al ocultar la pestaña: se vuelve a pedir al volver.
+    const alVolver = () => {
+      if (document.visibilityState === 'visible') void pedir();
+    };
+    document.addEventListener('visibilitychange', alVolver);
+    return () => {
+      cancelado = true;
+      document.removeEventListener('visibilitychange', alVolver);
+      if (bloqueo) void bloqueo.release().catch(() => {});
+    };
+  }, [estado]);
+
+  // Al terminar, el botón principal pasa a disabled: el foco va a Reiniciar en vez de caer a
+  // <body> (hallazgo 4328).
+  useEffect(() => {
+    if (estado !== 'terminado') return;
+    const activo = document.activeElement;
+    if (activo === btnPrincipalRef.current || activo === document.body || activo === null) {
+      btnResetRef.current?.focus();
+    }
+  }, [estado]);
+
+  const fijarDuracion = useCallback((min: number) => {
+    finRef.current = null;
+    restanteMsRef.current = Math.round(min * 60) * 1000;
+    setDuracionMin(min);
+    setSegundosRestantes(Math.round(min * 60));
+    setEstado('parado');
+  }, []);
 
   const seleccionarPreset = useCallback((min: number) => {
-    if (intervalRef.current) clearInterval(intervalRef.current);
-    setDuracionMin(min);
-    setSegundosRestantes(min * 60);
-    setEstado('parado');
+    fijarDuracion(min);
     setInputPersonalizado('');
-  }, []);
+    setErrorPersonalizado('');
+  }, [fijarDuracion]);
 
   const aplicarPersonalizado = () => {
-    const min = parseInt(inputPersonalizado, 10);
-    if (!isNaN(min) && min >= 1 && min <= 180) {
-      seleccionarPreset(min);
+    const lectura = leerMinutos(inputPersonalizado);
+    if ('error' in lectura) {
+      setErrorPersonalizado(lectura.error);
+      return;
     }
+    seleccionarPreset(lectura.minutos);
   };
 
   const iniciarPausar = () => {
     if (estado === 'terminado') return;
     if (estado === 'corriendo') {
+      const ms = (finRef.current ?? Date.now()) - Date.now();
+      if (ms <= 0) {
+        actualizar();
+        return;
+      }
+      finRef.current = null;
+      restanteMsRef.current = ms;
+      setSegundosRestantes(Math.ceil(ms / 1000));
       setEstado('pausado');
     } else {
+      finRef.current = Date.now() + restanteMsRef.current;
       setEstado('corriendo');
     }
   };
 
   const resetear = () => {
-    if (intervalRef.current) clearInterval(intervalRef.current);
-    setSegundosRestantes(duracionMin * 60);
-    setEstado('parado');
+    fijarDuracion(duracionMin);
   };
 
-  // Etiqueta del botón principal
-  const etiquetaBotonPrincipal = (): string => {
-    if (estado === 'corriendo') return '⏸ Pausar';
-    if (estado === 'pausado') return '▶ Continuar';
-    if (estado === 'terminado') return '✅ Terminado';
-    return '▶ Iniciar';
+  // Botón principal: el símbolo va aparte y oculto al lector, que oye solo la palabra (4332)
+  const botonPrincipal = (): { icono: string; texto: string } => {
+    if (estado === 'corriendo') return { icono: '⏸', texto: 'Pausar' };
+    if (estado === 'pausado') return { icono: '▶', texto: 'Continuar' };
+    if (estado === 'terminado') return { icono: '✅', texto: 'Terminado' };
+    return { icono: '▶', texto: 'Iniciar' };
   };
 
   // Mensaje de estado
@@ -170,9 +263,9 @@ export default function TemporizadorVisualPage() {
             <button
               type="button"
               key={min}
-              className={`${styles.presetBtn} ${duracionMin === min && inputPersonalizado === '' ? styles.presetActivo : ''}`}
+              className={`${styles.presetBtn} ${duracionMin === min ? styles.presetActivo : ''}`}
               onClick={() => seleccionarPreset(min)}
-              aria-pressed={duracionMin === min && inputPersonalizado === ''}
+              aria-pressed={duracionMin === min}
               aria-label={`${min} ${min === 1 ? 'minuto' : 'minutos'}`}
             >
               <span className={styles.presetNum}>{min}</span>
@@ -184,16 +277,19 @@ export default function TemporizadorVisualPage() {
         {/* Tiempo personalizado */}
         <div className={styles.personalizado}>
           <input
-            type="number"
-            inputMode="numeric"
+            type="text"
+            inputMode="decimal"
             className={styles.inputPersonalizado}
             value={inputPersonalizado}
-            onChange={e => setInputPersonalizado(e.target.value)}
+            onChange={e => {
+              setInputPersonalizado(e.target.value);
+              setErrorPersonalizado('');
+            }}
             onKeyDown={e => e.key === 'Enter' && aplicarPersonalizado()}
             placeholder="Otro tiempo..."
-            min={1}
-            max={180}
             aria-label="Tiempo personalizado en minutos"
+            aria-invalid={errorPersonalizado !== ''}
+            aria-describedby="error-tiempo-personalizado"
           />
           <button
             type="button"
@@ -204,6 +300,9 @@ export default function TemporizadorVisualPage() {
             Aplicar
           </button>
         </div>
+        <p id="error-tiempo-personalizado" className={styles.errorPersonalizado} role="alert">
+          {errorPersonalizado}
+        </p>
       </section>
 
       {/* Círculo temporizador */}
@@ -211,7 +310,6 @@ export default function TemporizadorVisualPage() {
         <div
           className={`${styles.timerContainer} ${estado === 'terminado' ? styles.terminado : ''}`}
           role="timer"
-          aria-live="polite"
           aria-label={`Tiempo restante: ${formatearTiempo(segundosRestantes)}`}
         >
           <svg
@@ -235,7 +333,7 @@ export default function TemporizadorVisualPage() {
               r={RADIO}
               fill="none"
               strokeWidth="18"
-              stroke={colorActual}
+              className={`${styles.svgArco} ${claseTramo}`}
               strokeDasharray={CIRCUNFERENCIA}
               strokeDashoffset={strokeOffset}
               strokeLinecap="round"
@@ -248,8 +346,8 @@ export default function TemporizadorVisualPage() {
               y="145"
               textAnchor="middle"
               dominantBaseline="middle"
-              className={styles.svgTiempo}
-              fill={colorActual}
+              className={`${styles.svgTiempo} ${claseTramo}`}
+              data-tramo={tramoActual}
             >
               {formatearTiempo(segundosRestantes)}
             </text>
@@ -266,20 +364,28 @@ export default function TemporizadorVisualPage() {
           </svg>
         </div>
 
+        {/* El fin de la cuenta, para el lector de pantalla: la región viva de antes solo contenía
+            un <svg aria-hidden> y no anunciaba nada (hallazgo 4328). */}
+        <p className="sr-only" role="status">
+          {estado === 'terminado' ? '¡Tiempo terminado!' : ''}
+        </p>
+
         {/* Botones de control */}
         <div className={styles.controles}>
           <button
             type="button"
+            ref={btnPrincipalRef}
             className={`${styles.btnControl} ${styles.btnPrincipal} ${estado === 'terminado' ? styles.btnTerminado : ''}`}
             onClick={iniciarPausar}
             disabled={estado === 'terminado'}
-            aria-label={etiquetaBotonPrincipal()}
           >
-            {etiquetaBotonPrincipal()}
+            <span aria-hidden="true">{botonPrincipal().icono}</span>{' '}
+            <span>{botonPrincipal().texto}</span>
           </button>
 
           <button
             type="button"
+            ref={btnResetRef}
             className={`${styles.btnControl} ${styles.btnReset}`}
             onClick={resetear}
             aria-label="Reiniciar temporizador"
@@ -288,22 +394,23 @@ export default function TemporizadorVisualPage() {
           </button>
         </div>
 
-        {/* Toggle sonido */}
+        {/* Toggle sonido: nombre fijo y el estado en aria-pressed, para no oírlo dos veces (4332) */}
         <div className={styles.sonidoToggle}>
           <button
             type="button"
             className={`${styles.btnSonido} ${sonidoActivo ? styles.sonidoOn : styles.sonidoOff}`}
             onClick={() => setSonidoActivo(prev => !prev)}
             aria-pressed={sonidoActivo}
-            aria-label={sonidoActivo ? 'Sonido activado, pulsar para desactivar' : 'Sonido desactivado, pulsar para activar'}
+            aria-label="Sonido"
           >
-            {sonidoActivo ? <><span aria-hidden="true">🔔</span> Sonido activado</> : <><span aria-hidden="true">🔕</span> Sonido desactivado</>}
+            <span aria-hidden="true">{sonidoActivo ? '🔔' : '🔕'}</span>{' '}
+            <span>{sonidoActivo ? 'Sonido activado' : 'Sonido desactivado'}</span>
           </button>
         </div>
       </section>
 
       <EducationalSection
-        title="⏱️ Todo sobre el Temporizador Visual"
+        title="Todo sobre el Temporizador Visual"
         subtitle="Cómo usar el tiempo visual para apoyar la autonomía, la concentración y las rutinas"
       >
         {/* Tabla comparativa */}
@@ -384,10 +491,12 @@ export default function TemporizadorVisualPage() {
             <p>Verde (más del 60% restante) → Amarillo (40-60%) → Naranja (20-40%) → Rojo (menos del 20%). Es una señal visual progresiva de urgencia.</p>
             <span className={styles.faqTip}>El cambio de color es gradual para evitar sobresaltos.</span>
           </div>
+          {/* Hasta el 09/11/2026 prometía que con F11 «el círculo ocupe toda la pantalla», y el
+              círculo mide como mucho 320 px (hallazgo 4331): la promesa baja a lo que hace. */}
           <div className={styles.faqItem}>
-            <strong>¿Funciona en modo pantalla completa?</strong>
-            <p>Sí. Puedes usar el modo pantalla completa del navegador (F11) para que el círculo ocupe toda la pantalla y sea visible desde lejos.</p>
-            <span className={styles.faqTip}>Ideal para proyectarlo en clase o colocarlo en la pared.</span>
+            <strong>¿Se puede ver desde lejos?</strong>
+            <p>El círculo tiene un tamaño fijo, de unos 320 píxeles de ancho como máximo. Para verlo desde más lejos, agranda la página con el zoom del navegador (Ctrl y + en el ordenador, o pellizcando en el móvil): el círculo crece con ella.</p>
+            <span className={styles.faqTip}>En una pantalla grande o un proyector, prueba el zoom antes de empezar la actividad.</span>
           </div>
           <div className={styles.faqItem}>
             <strong>¿Qué pasa cuando suena la alarma?</strong>
@@ -396,7 +505,7 @@ export default function TemporizadorVisualPage() {
           </div>
           <div className={styles.faqItem}>
             <strong>¿Puedo usar tiempos distintos a los predefinidos?</strong>
-            <p>Sí. Usa el campo &quot;Otro tiempo...&quot; para introducir cualquier duración entre 1 y 180 minutos y pulsa Aplicar.</p>
+            <p>Sí. Usa el campo &quot;Otro tiempo...&quot; para introducir cualquier duración entre 1 y 180 minutos y pulsa Aplicar. Admite decimales: 2,5 son 2 minutos y 30 segundos.</p>
             <span className={styles.faqTip}>Los presets de 1, 2, 5, 10, 15, 20 y 30 minutos cubren la mayoría de situaciones habituales.</span>
           </div>
         </div>
@@ -448,7 +557,7 @@ export default function TemporizadorVisualPage() {
           <div className={styles.tipCard}>
             <span className={styles.tipIcon} aria-hidden="true">📱</span>
             <strong>Orienta la pantalla</strong>
-            <p>En móvil, usa orientación vertical. En tablet o proyector, horizontal para mayor tamaño.</p>
+            <p>En móvil, usa orientación vertical. En una pantalla grande, agranda el círculo con el zoom del navegador.</p>
           </div>
           <div className={styles.tipCard}>
             <span className={styles.tipIcon} aria-hidden="true">🔄</span>

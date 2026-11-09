@@ -185,6 +185,20 @@
   outline-offset: 2px;
 }
 
+/* Aviso del campo personalizado (hallazgos 4326 y 4327). Vacío no ocupa sitio, pero sigue
+   montado para que la región viva anuncie el aviso al aparecer. */
+.errorPersonalizado {
+  margin: 0.75rem 0 0;
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--rojo-texto, #F87171);
+}
+
+.errorPersonalizado:empty {
+  margin: 0;
+}
+
 /* ============================================
    CÍRCULO TEMPORIZADOR
    ============================================ */
@@ -237,6 +251,19 @@
   letter-spacing: -0.02em;
 }
 
+/* Color del tramo para las cifras y el arco. En claro, el tono oscuro de cada semántico (6,35 /
+   5,93 / 5,59 / 6,47:1 sobre blanco); en oscuro, --*-texto vale initial y manda la reserva viva,
+   que sobre #2A2A2A pasa de 3:1. Hasta el 09/11/2026 eran los vivos en los dos temas: 1,92-2,80:1
+   en claro (hallazgo 4329). */
+.tramoVerde { fill: var(--verde-texto, #22C55E); stroke: var(--verde-texto, #22C55E); }
+.tramoAmarillo { fill: var(--ambar-texto, #EAB308); stroke: var(--ambar-texto, #EAB308); }
+.tramoNaranja { fill: var(--naranja-texto, #F97316); stroke: var(--naranja-texto, #F97316); }
+.tramoRojo { fill: var(--rojo-texto, #F87171); stroke: var(--rojo-texto, #F87171); }
+
+.svgArco {
+  fill: none;
+}
+
 .svgEstado {
   font-size: 1rem;
   font-weight: 600;
@@ -244,8 +271,9 @@
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
+/* #B0B0B0 sobre #2A2A2A: 7,0:1. Era #808080, 3,63:1 (hallazgo 4330). */
 [data-theme='dark'] .svgEstado {
-  fill: #808080;
+  fill: #B0B0B0;
 }
 
 /* ============================================
@@ -332,9 +360,11 @@
   border: 2px solid transparent;
 }
 
+/* En oscuro manda la reserva: #4ADE80 sobre el tinte verde de la tarjeta oscura pasa de 7:1.
+   Era #16A34A, 3,55:1 (hallazgo 4330). */
 .sonidoOn {
   background: rgba(34, 197, 94, 0.12);
-  color: var(--verde-texto, #16A34A);
+  color: var(--verde-texto, #4ADE80);
   border-color: rgba(34, 197, 94, 0.3);
 }
 

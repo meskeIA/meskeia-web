@@ -42,7 +42,10 @@ export const jsonLd = generateWebAppSchema({
     'Botones grandes accesibles para personas con dificultades motoras',
     'Presets de 1 a 30 minutos',
     'Sonido al finalizar',
-    'Compatible con pantallas grandes y proyectores para uso en aula',
+    // Hasta el 09/11/2026: «Compatible con pantallas grandes y proyectores para uso en aula»,
+    // con un círculo de 320 px como máximo (hallazgo 4331, tipo promesa).
+    'Duración personalizada de 1 a 180 minutos, con decimales',
+    'La cuenta sigue bien aunque la pestaña quede en segundo plano, y pide al navegador que no apague la pantalla mientras corre',
   ],
 });
 

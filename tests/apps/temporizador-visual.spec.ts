@@ -102,7 +102,8 @@ const arco = (page: Page): Locator => page.locator('[role="timer"] svg circle').
 const principal = (page: Page): Locator =>
   page.getByRole('button', { name: /Iniciar|Pausar|Continuar|Terminado/ });
 const preset = (page: Page, nombre: string): Locator => page.getByRole('button', { name: nombre, exact: true });
-const campo = (page: Page): Locator => page.getByRole('spinbutton', { name: 'Tiempo personalizado en minutos' });
+// Campo de texto desde el 09/11/2026 (era type="number", que entregaba «2,5» como «2.5»: 4326)
+const campo = (page: Page): Locator => page.getByRole('textbox', { name: 'Tiempo personalizado en minutos' });
 const aplicar = (page: Page): Locator => page.getByRole('button', { name: 'Aplicar tiempo personalizado' });
 
 async function tonos(page: Page): Promise<Tono[]> {
@@ -155,11 +156,6 @@ function contraste(a: number[], b: number[]): number {
   return (Math.max(la, lb) + 0.05) / (Math.min(la, lb) + 0.05);
 }
 
-function hexARgb(hex: string): number[] {
-  const h = hex.replace('#', '');
-  return [0, 2, 4].map((i) => parseInt(h.slice(i, i + 2), 16));
-}
-
 test.describe('Temporizador Visual — la cuenta atrás', () => {
   test('CASO 1 (normal) · 2 min: 01:30 verde a los 30 s, 01:05 amarillo a los 55 s, la pausa congela, 00:40 naranja y 00:20 rojo', async ({
     page,
@@ -174,13 +170,14 @@ test.describe('Temporizador Visual — la cuenta atrás', () => {
     await page.clock.runFor(30000);
     await expect(tiempo(page)).toHaveText('01:30');
     await expect(rotulo(page)).toHaveText('Tiempo en marcha...');
-    await expect(tiempo(page)).toHaveAttribute('fill', '#22C55E'); // 75 %: verde
+    // El color lo pone el CSS por tramo desde el 09/11/2026 (hallazgo 4329): se mira el tramo
+    await expect(tiempo(page)).toHaveAttribute('data-tramo', 'verde'); // 75 %: verde
     expect(await offset(page)).toBeCloseTo(188.5, 0);
     await expect(page.locator('[role="timer"]')).toHaveAttribute('aria-label', 'Tiempo restante: 01:30');
 
     await page.clock.runFor(25000);
     await expect(tiempo(page)).toHaveText('01:05');
-    await expect(tiempo(page)).toHaveAttribute('fill', '#EAB308'); // 54 %: amarillo
+    await expect(tiempo(page)).toHaveAttribute('data-tramo', 'amarillo'); // 54 %: amarillo
     expect(await offset(page)).toBeCloseTo(345.58, 0);
 
     // Pausa en un segundo entero (el intervalo acaba de disparar): no se pierde nada
@@ -193,12 +190,12 @@ test.describe('Temporizador Visual — la cuenta atrás', () => {
     await principal(page).click();
     await page.clock.runFor(25000);
     await expect(tiempo(page)).toHaveText('00:40');
-    await expect(tiempo(page)).toHaveAttribute('fill', '#F97316'); // 33 %: naranja
+    await expect(tiempo(page)).toHaveAttribute('data-tramo', 'naranja'); // 33 %: naranja
     expect(await offset(page)).toBeCloseTo(502.65, 0);
 
     await page.clock.runFor(20000);
     await expect(tiempo(page)).toHaveText('00:20');
-    await expect(tiempo(page)).toHaveAttribute('fill', '#EF4444'); // 17 %: rojo
+    await expect(tiempo(page)).toHaveAttribute('data-tramo', 'rojo'); // 17 %: rojo
     expect(await offset(page)).toBeCloseTo(628.32, 0);
   });
 
@@ -292,14 +289,13 @@ test.describe('Temporizador Visual — la cuenta atrás', () => {
   });
 });
 
-test.describe('Temporizador Visual — hallazgos de la 1.ª pasada (09/11/2026)', () => {
-  test('HALLAZGO (09/11/2026, ABIERTO) · cuenta tics de setInterval: con la pestaña dormida 60 s, 5 min − 71 s de reloj marcan 04:48 y no 03:49', async ({
+test.describe('Temporizador Visual — hallazgos de la 1.ª pasada (09/11/2026), REPARADOS el mismo día', () => {
+  test('REPARADO (hallazgo 4325) · ya no cuenta tics de setInterval: con la pestaña dormida 60 s, 5 min − 71 s de reloj marcan 03:49', async ({
     page,
   }) => {
-    // segundosRestantes baja 1 por cada disparo del intervalo de 1 s. Si el navegador no lo
-    // dispara (pestaña en segundo plano más de 5 min, pantalla del móvil bloqueada, portátil
-    // suspendido), la cuenta se para. Esperado: 300 − 10 − 60 − 1 = 229 s → «03:49». Hoy: «04:48».
-    test.fail();
+    // Antes segundosRestantes bajaba 1 por cada disparo del intervalo de 1 s. Si el navegador no
+    // lo disparaba (pestaña en segundo plano, pantalla bloqueada, portátil suspendido), la cuenta
+    // se paraba. Esperado: 300 − 10 − 60 − 1 = 229 s → «03:49». Antes: «04:48».
     await abrir(page);
     await principal(page).click();
     await page.clock.runFor(10000);
@@ -309,12 +305,33 @@ test.describe('Temporizador Visual — hallazgos de la 1.ª pasada (09/11/2026)'
     await expect(tiempo(page)).toHaveText('03:49');
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO, el mismo) · 1 min con la pestaña dormida 120 s: al volver no ha terminado ni suena', async ({
+  test('REPARADO (hallazgo 4325, Wake Lock) · al iniciar pide que la pantalla no se apague, y lo suelta al pausar', async ({ page }) => {
+    await page.addInitScript(() => {
+      const w = window as unknown as { __bloqueos: { pedidos: number; soltados: number } };
+      w.__bloqueos = { pedidos: 0, soltados: 0 };
+      Object.defineProperty(navigator, 'wakeLock', {
+        configurable: true,
+        value: {
+          request: async () => {
+            w.__bloqueos.pedidos++;
+            return { release: async () => { w.__bloqueos.soltados++; } };
+          },
+        },
+      });
+    });
+    await abrir(page);
+    const bloqueos = () => page.evaluate(() => (window as unknown as { __bloqueos: { pedidos: number; soltados: number } }).__bloqueos);
+    await principal(page).click();
+    await expect.poll(async () => (await bloqueos()).pedidos).toBe(1);
+    await principal(page).click(); // Pausar
+    await expect.poll(async () => (await bloqueos()).soltados).toBe(1);
+  });
+
+  test('REPARADO (hallazgo 4325, el mismo) · 1 min con la pestaña dormida 120 s: al volver ha terminado y suena', async ({
     page,
   }) => {
     // Esperado: pasado el minuto, «¡Tiempo terminado!» y la alarma en cuanto la pestaña vuelve.
-    // Hoy: «00:58» y «Tiempo en marcha...», sin ningún tono.
-    test.fail();
+    // Antes: «00:58» y «Tiempo en marcha...», sin ningún tono.
     await abrir(page);
     await preset(page, '1 minuto').click();
     await principal(page).click();
@@ -325,12 +342,11 @@ test.describe('Temporizador Visual — hallazgos de la 1.ª pasada (09/11/2026)'
     await expect.poll(() => tonos(page)).toHaveLength(3);
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO, el mismo) · cada pausa tira lo marchado desde el último tic: 4 × 1,5 s = 6 s y marca 04:56, no 04:54', async ({
+  test('REPARADO (hallazgo 4325, el mismo) · las pausas no tiran lo marchado: 4 × 1,5 s = 6 s y marca 04:54', async ({
     page,
   }) => {
-    // Pausar borra el intervalo y Continuar crea otro que espera 1 s entero: el medio segundo
-    // de cada tramo se pierde. Esperado: 300 − 6 = 294 s → «04:54». Hoy: «04:56».
-    test.fail();
+    // Antes Pausar borraba el intervalo y Continuar creaba otro que esperaba 1 s entero: el medio
+    // segundo de cada tramo se perdía. Esperado: 300 − 6 = 294 s → «04:54». Antes: «04:56».
     await abrir(page);
     for (let i = 0; i < 4; i++) {
       await principal(page).click(); // Iniciar / Continuar
@@ -341,12 +357,11 @@ test.describe('Temporizador Visual — hallazgos de la 1.ª pasada (09/11/2026)'
     await expect(tiempo(page)).toHaveText('04:54');
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO, el mismo) · cambiar el sonido en marcha reinicia el intervalo: 2 s con cuatro toques siguen en 05:00', async ({
+  test('REPARADO (hallazgo 4325, el mismo) · cambiar el sonido en marcha no reinicia la cuenta: 2 s con cuatro toques marcan 04:58', async ({
     page,
   }) => {
-    // El efecto del intervalo depende de [estado, sonidoActivo]: cada toque al sonido lo borra y
-    // crea otro. Esperado: 300 − 2 = 298 s → «04:58». Hoy: «05:00».
-    test.fail();
+    // Antes el efecto del intervalo dependía de [estado, sonidoActivo]: cada toque al sonido lo
+    // borraba y creaba otro. Esperado: 300 − 2 = 298 s → «04:58». Antes: «05:00».
     await abrir(page);
     await principal(page).click();
     const sonido = page.locator('button[aria-pressed]').filter({ hasText: /Sonido/ });
@@ -357,45 +372,40 @@ test.describe('Temporizador Visual — hallazgos de la 1.ª pasada (09/11/2026)'
     await expect(tiempo(page)).toHaveText('04:58');
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · «2,5» minutos se aplican como 02:00, sin aviso', async ({ page }) => {
-    // El campo es type="number": en es-ES la coma tecleada llega como «2.5», y parseInt la corta
-    // a 2. La FAQ visible promete «cualquier duración entre 1 y 180 minutos». Esperado: 02:30, o
-    // que no se aplique y lo diga. Hoy: «02:00» y el campo se vacía.
-    test.fail();
+  test('REPARADO (hallazgo 4326) · «2,5» minutos se aplican como 02:30, y «1e2» se rechaza con aviso', async ({ page }) => {
+    // Antes el campo era type="number": en es-ES la coma tecleada llegaba como «2.5», y parseInt
+    // la cortaba a 2. Ahora es texto con parseSpanishNumber, que admite la coma decimal.
     await abrir(page);
     await campo(page).click();
     await page.keyboard.type('2,5');
-    await esperarValorEnReact(page, campo(page), '2.5');
+    await esperarValorEnReact(page, campo(page), '2,5');
     await aplicar(page).click();
-    const leido = await tiempo(page).textContent();
-    if (leido === '05:00') {
-      await expect(page.locator('[role="alert"], [role="status"]').filter({ hasText: /minuto/ })).toBeVisible();
-    } else {
-      expect(leido).toBe('02:30');
-    }
+    await expect(tiempo(page)).toHaveText('02:30');
+    // «1e2» (100 para un type="number") no es una cifra en español: aviso y el círculo no cambia
+    await escribirMinutos(page, '1e2');
+    await aplicar(page).click();
+    await expect(tiempo(page)).toHaveText('02:30');
+    await expect(page.getByRole('alert').filter({ hasText: /No se ha podido leer/ })).toBeVisible();
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · 181 minutos se rechaza en silencio: ni un aviso del rango 1-180', async ({
+  test('REPARADO (hallazgo 4327) · 181 minutos se rechaza con un aviso del rango 1-180, y el preset de 5 min sigue marcado', async ({
     page,
   }) => {
-    // aplicarPersonalizado no hace nada fuera de 1-180: el círculo sigue en 05:00, el campo
-    // conserva «181» y el preset de 5 min pierde su marca. Esperado: un aviso que diga el rango.
-    test.fail();
+    // Antes aplicarPersonalizado no hacía nada fuera de 1-180 y el preset de 5 min perdía su marca.
     await abrir(page);
     await escribirMinutos(page, '181');
     await aplicar(page).click();
     await expect(tiempo(page)).toHaveText('05:00');
     await expect(page.locator('[role="alert"], [role="status"]').filter({ hasText: /180/ })).toBeVisible();
+    await expect(preset(page, '5 minutos')).toHaveAttribute('aria-pressed', 'true');
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · el fin no se anuncia: la región viva solo tiene un <svg aria-hidden>, y el foco cae a <body>', async ({
+  test('REPARADO (hallazgo 4328) · el fin se anuncia en una región viva y el foco pasa a Reiniciar', async ({
     page,
   }) => {
-    // role="timer" aria-live="polite" envuelve un SVG con aria-hidden: lo único que cambia es su
-    // aria-label, que una región viva no anuncia. Sin sonido (lo que la guía aconseja para
-    // personas sensibles), un lector de pantalla no recibe nada. Además el botón con el foco pasa
-    // a disabled y el foco se pierde.
-    test.fail();
+    // Antes role="timer" aria-live="polite" envolvía un SVG con aria-hidden: lo único que cambiaba
+    // era su aria-label, que una región viva no anuncia; y el botón con el foco pasaba a disabled
+    // y el foco caía a <body>.
     await abrir(page);
     await preset(page, '1 minuto').click();
     await page.locator('button[aria-pressed]').filter({ hasText: /Sonido/ }).click();
@@ -405,39 +415,56 @@ test.describe('Temporizador Visual — hallazgos de la 1.ª pasada (09/11/2026)'
     await expect(rotulo(page)).toHaveText('¡Tiempo terminado!');
     await expect.poll(() => textoDeRegionesVivas(page)).toContainEqual(expect.stringContaining('Tiempo terminado'));
     await page.waitForTimeout(300);
-    expect(await page.evaluate(() => document.activeElement?.tagName)).not.toBe('BODY');
+    expect(await page.evaluate(() => document.activeElement?.getAttribute('aria-label'))).toBe('Reiniciar temporizador');
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · claro: las cifras del círculo en verde, amarillo y naranja no llegan a 3:1 sobre la tarjeta blanca', async ({
+  test('REPARADO (hallazgo 4329) · claro: las cifras y el arco del círculo llegan a 3:1 sobre la tarjeta blanca en los cuatro tramos', async ({
     page,
   }) => {
-    // Hoy: verde #22C55E 2,28:1 · amarillo #EAB308 1,92:1 · naranja #F97316 2,80:1 (rojo 3,76:1).
-    test.fail();
+    // Antes: verde #22C55E 2,28:1 · amarillo #EAB308 1,92:1 · naranja #F97316 2,80:1 (rojo 3,76:1).
     await abrir(page);
     await preset(page, '1 minuto').click();
     const fondo = canales(
       await page.getByRole('region', { name: 'Temporizador', exact: true }).evaluate((s) => getComputedStyle(s).backgroundColor),
     );
-    const medidos: Record<string, number> = {};
-    medidos.verde = contraste(hexARgb((await tiempo(page).getAttribute('fill')) ?? ''), fondo);
+    const medir = async (): Promise<number[]> => [
+      contraste(canales(await tiempo(page).evaluate((t) => getComputedStyle(t).fill)), fondo),
+      contraste(canales(await arco(page).evaluate((c) => getComputedStyle(c).stroke)), fondo),
+    ];
+    const medidos: Record<string, number[]> = {};
+    medidos.verde = await medir();
     await principal(page).click();
     await page.clock.runFor(30000); // 50 %: amarillo
     await expect(tiempo(page)).toHaveText('00:30');
-    medidos.amarillo = contraste(hexARgb((await tiempo(page).getAttribute('fill')) ?? ''), fondo);
+    medidos.amarillo = await medir();
     await page.clock.runFor(10000); // 33 %: naranja
     await expect(tiempo(page)).toHaveText('00:20');
-    medidos.naranja = contraste(hexARgb((await tiempo(page).getAttribute('fill')) ?? ''), fondo);
-    for (const [color, r] of Object.entries(medidos)) {
-      expect(r, `${color}: ${r.toFixed(2)}:1`).toBeGreaterThanOrEqual(3);
+    medidos.naranja = await medir();
+    await page.clock.runFor(10000); // 17 %: rojo
+    await expect(tiempo(page)).toHaveText('00:10');
+    medidos.rojo = await medir();
+    for (const [color, [rTexto, rArco]] of Object.entries(medidos)) {
+      expect(rTexto, `${color} (cifras): ${rTexto.toFixed(2)}:1`).toBeGreaterThanOrEqual(3);
+      expect(rArco, `${color} (arco): ${rArco.toFixed(2)}:1`).toBeGreaterThanOrEqual(3);
     }
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · oscuro: «Tiempo en marcha...» a 3,63:1 y «Sonido activado» a 3,55:1 (piden 4,5:1)', async ({
+  test('REPARADO (hallazgo 4329, en oscuro) · las cifras del círculo llegan a 3:1 sobre la tarjeta oscura', async ({ page }) => {
+    await abrir(page, { oscuro: true });
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    await preset(page, '1 minuto').click();
+    const seccion = page.getByRole('region', { name: 'Temporizador', exact: true });
+    await expect.poll(() => seccion.evaluate((s) => getComputedStyle(s).backgroundColor)).toBe('rgb(42, 42, 42)');
+    const fondo = canales(await seccion.evaluate((s) => getComputedStyle(s).backgroundColor));
+    const r = contraste(canales(await tiempo(page).evaluate((t) => getComputedStyle(t).fill)), fondo);
+    expect(r, `verde en oscuro: ${r.toFixed(2)}:1`).toBeGreaterThanOrEqual(3);
+  });
+
+  test('REPARADO (hallazgo 4330) · oscuro: «Listo para empezar» y «Sonido activado» llegan a 4,5:1', async ({
     page,
   }) => {
-    // .svgEstado pasa a #808080 sobre #2A2A2A; «Sonido activado» usa var(--verde-texto, #16A34A)
-    // y --verde-texto es `initial` en oscuro, así que manda #16A34A sobre su tinte verde al 12 %.
-    test.fail();
+    // Antes .svgEstado pasaba a #808080 sobre #2A2A2A (3,63:1) y «Sonido activado» tomaba la
+    // reserva #16A34A de var(--verde-texto, …) sobre su tinte verde (3,55:1).
     await abrir(page, { oscuro: true });
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
     const seccion = page.getByRole('region', { name: 'Temporizador', exact: true });
@@ -455,30 +482,30 @@ test.describe('Temporizador Visual — hallazgos de la 1.ª pasada (09/11/2026)'
     expect(rSonido, `sonido ${rSonido.toFixed(2)}:1`).toBeGreaterThanOrEqual(4.5);
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · F11 «para que el círculo ocupe toda la pantalla»: en 1920×1080 el círculo mide 320 px', async ({
+  test('REPARADO (hallazgo 4331, tipo promesa) · la página ya no promete que con F11 el círculo ocupe toda la pantalla ni proyectores', async ({
     page,
   }) => {
-    // max-width: 320px en .timerContainer. Si la página sigue prometiendo pantalla completa o
-    // proyector, el círculo debe crecer con ella; si deja de prometerlo, este test pasa.
-    test.fail();
+    // max-width: 320px en .timerContainer. Si la página vuelve a prometer pantalla completa o
+    // proyector, el círculo debe crecer con ella; mientras no lo prometa, este test pasa.
     await page.setViewportSize({ width: 1920, height: 1080 });
     await abrir(page);
     const prometeTodaLaPantalla = (await page.getByText('ocupe toda la pantalla').count()) > 0;
     const prometeProyector = ((jsonLd as { featureList?: string[] }).featureList ?? []).some((f) => /proyector/i.test(f));
     const caja = await page.locator('[role="timer"] svg').boundingBox();
     const ancho = caja?.width ?? 0;
+    expect(prometeTodaLaPantalla).toBe(false);
+    expect(prometeProyector).toBe(false);
     if (prometeTodaLaPantalla || prometeProyector) {
       expect(ancho, `círculo de ${ancho} px en 1920×1080`).toBeGreaterThanOrEqual(0.6 * 1080);
     }
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · nombres accesibles: «▶ Iniciar», un sonido que cambia de nombre y de aria-pressed a la vez, y «⏱️» en el título de la guía', async ({
+  test('REPARADO (hallazgo 4332) · nombres accesibles: «Iniciar» sin símbolo, el sonido con nombre fijo y aria-pressed, y la guía sin «⏱️»', async ({
     page,
   }) => {
-    // El aria-label del botón principal repite el texto con el símbolo (▶ ⏸ ✅); el del sonido
-    // dice el estado y además lleva aria-pressed; el title de EducationalSection trae «⏱️» junto
-    // al 📚 del componente, sin aria-hidden.
-    test.fail();
+    // Antes el aria-label del botón principal repetía el texto con el símbolo (▶ ⏸ ✅); el del
+    // sonido decía el estado y además llevaba aria-pressed; el title de EducationalSection traía
+    // «⏱️» junto al 📚 del componente, sin aria-hidden.
     await abrir(page);
     await expect(page.getByRole('button', { name: 'Iniciar', exact: true })).toHaveCount(1);
     const sonido = page.locator('button[aria-pressed]').filter({ hasText: /Sonido/ });
