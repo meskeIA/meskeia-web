@@ -1,6 +1,6 @@
 'use client';
 // @disclaimer: exempt
-import { useState, useRef, useCallback } from 'react';
+import { useState, useRef, useCallback, type CSSProperties } from 'react';
 import styles from './EstructurasCristalinas.module.css';
 import {
   MeskeiaLogo,
@@ -100,6 +100,25 @@ const SECCIONES: SeccionInfo[] = [
   { id: 'datos', titulo: 'Datos y Propiedades', icono: '📊', subtitulo: 'Por qué importa la estructura' },
 ];
 
+/**
+ * El color de cada estructura como TEXTO del título de su tarjeta. En oscuro vale el color de la
+ * estructura (cumple sobre la tarjeta oscura); en claro, sobre la tarjeta blanca, siete no
+ * llegaban al mínimo (de 2,03:1 a 4,11:1, hallazgo 4367): aquí, su tono oscurecido, todos por
+ * encima de 4,5:1 salvo el violeta, que ya daba 4,67:1. Se pasan como --tono y --tono-claro.
+ */
+const TONO_TEXTO_CLARO: Record<string, string> = {
+  '#2E86AB': '#26718F', // 5,47:1
+  '#48A9A6': '#327874', // 5,15:1
+  '#E8A87C': '#9A5B2E', // 5,38:1
+  '#9B59B6': '#9B59B6', // 4,67:1
+  '#27AE60': '#1E7A43', // 5,36:1
+  '#F39C12': '#9A6100', // 5,14:1
+  '#E74C3C': '#C0392B', // 5,40:1
+};
+function estiloTono(color: string): CSSProperties {
+  return { '--tono': color, '--tono-claro': TONO_TEXTO_CLARO[color] ?? color } as CSSProperties;
+}
+
 // ─── Helpers para generar geometría ───
 
 const S = 90; // escala: 1 unidad = 90px
@@ -143,20 +162,65 @@ function cuboCaras(sx: number, sy: number, sz: number, color: string): Cara3D[] 
   ];
 }
 
-function hexCaras(radio: number, altura: number, color: string): Cara3D[] {
+/**
+ * Caras laterales de un prisma hexagonal cuyos vértices están en los ángulos angInicial + 60·i,
+ * a `radio` del eje, y que mide `altura` (de −altura/2 a +altura/2). Cada cara es el rectángulo
+ * entre dos vértices consecutivos: ancho = radio (el lado del hexágono regular), centro en el
+ * punto medio y giro rotateY(90° − m), con m el ángulo medio, que lleva el eje X de la cara a
+ * la dirección de la arista. Hasta el 09/11/2026 medían el doble de alto en el sistema
+ * hexagonal, iban giradas 60° y en HCP y cuarzo con el hexágono desfasado 30° (hallazgo 4359).
+ */
+function hexCaras(radio: number, altura: number, color: string, angInicial: number): Cara3D[] {
   const caras: Cara3D[] = [];
-  const h = altura / 2;
-  // 6 caras laterales del prisma hexagonal
   for (let i = 0; i < 6; i++) {
-    const ang = (i * 60 + 30) * Math.PI / 180;
-    const nextAng = ((i + 1) * 60 + 30) * Math.PI / 180;
-    const midX = (Math.cos(ang) + Math.cos(nextAng)) * radio / 2;
-    const midZ = (Math.sin(ang) + Math.sin(nextAng)) * radio / 2;
-    const faceWidth = radio; // aproximación del ancho de la cara
-    const rotY = -(i * 60 + 30);
-    caras.push({ cx: midX, cy: 0, cz: midZ, rotX: 0, rotY, rotZ: 0, w: faceWidth, h: altura, color });
+    const a1 = (angInicial + i * 60) * Math.PI / 180;
+    const a2 = (angInicial + (i + 1) * 60) * Math.PI / 180;
+    const midX = (Math.cos(a1) + Math.cos(a2)) * radio / 2;
+    const midZ = (Math.sin(a1) + Math.sin(a2)) * radio / 2;
+    const medio = angInicial + i * 60 + 30;
+    caras.push({ cx: midX, cy: 0, cz: midZ, rotX: 0, rotY: 90 - medio, rotZ: 0, w: radio, h: altura, color });
   }
   return caras;
+}
+
+/**
+ * Romboedro (celda trigonal): tres aristas de la misma longitud L, a 120° en planta alrededor
+ * del eje vertical y con la misma inclinación θ respecto a él, así que forman entre sí el mismo
+ * ángulo α: cos α = cos²θ − sen²θ/2. Con α = 75°, cos²θ = (cos α + 1/2)/(3/2).
+ * Hasta el 09/11/2026 era un cubo cizallado con un desplazamiento distinto en cada cara, que daba
+ * aristas de 90 · 96,9 · 91,8 px y ángulos de 94° · 79° · 112°: una celda triclínica (hallazgo 4358).
+ */
+const ROMBOEDRO_ALFA = 75; // grados
+function romboedroEsquinas(): [number, number, number][] {
+  const L = S * 0.8;
+  const cosAlfa = Math.cos(ROMBOEDRO_ALFA * Math.PI / 180);
+  const cosTheta = Math.sqrt((cosAlfa + 0.5) / 1.5);
+  const senTheta = Math.sqrt(1 - cosTheta * cosTheta);
+  const v = [0, 1, 2].map((k) => {
+    const phi = (90 + 120 * k) * Math.PI / 180;
+    return [L * senTheta * Math.cos(phi), L * cosTheta, L * senTheta * Math.sin(phi)];
+  });
+  const centro = [0, 1, 2].map((e) => (v[0][e] + v[1][e] + v[2][e]) / 2);
+  const esquinas: [number, number, number][] = [];
+  // Esquina i: suma de las aristas cuyo bit está a 1 (bit 0 → v0, bit 1 → v1, bit 2 → v2)
+  for (let i = 0; i < 8; i++) {
+    const p = [0, 1, 2].map((e) =>
+      (i & 1 ? v[0][e] : 0) + (i & 2 ? v[1][e] : 0) + (i & 4 ? v[2][e] : 0) - centro[e]);
+    esquinas.push([p[0], p[1], p[2]]);
+  }
+  return esquinas;
+}
+function romboedroAristas(): Arista3D[] {
+  const c = romboedroEsquinas();
+  const aristas: Arista3D[] = [];
+  for (let i = 0; i < 8; i++) {
+    for (const bit of [1, 2, 4]) {
+      if (i & bit) continue;
+      const j = i | bit;
+      aristas.push({ x1: c[i][0], y1: c[i][1], z1: c[i][2], x2: c[j][0], y2: c[j][1], z2: c[j][2] });
+    }
+  }
+  return aristas;
 }
 
 // ─── 7 Sistemas cristalinos ───
@@ -186,7 +250,7 @@ const SISTEMAS: SistemaCristalino[] = [
   {
     nombre: 'Hexagonal', params: 'a = b ≠ c', angulos: 'α = β = 90°, γ = 120°',
     ejemplo: 'Cuarzo, Grafito, Hielo', icono: '⬡', color: '#9B59B6',
-    caras: hexCaras(S * 0.5, S * 0.8 * 2, '#9B59B6'),
+    caras: hexCaras(S * 0.5, S * 0.8, '#9B59B6', -30),
     atomos: (() => {
       const atoms: Atomo3D[] = [];
       const h = S * 0.8;
@@ -225,34 +289,8 @@ const SISTEMAS: SistemaCristalino[] = [
   {
     nombre: 'Trigonal', params: 'a = b = c', angulos: 'α = β = γ ≠ 90°',
     ejemplo: 'Calcita, Cuarzo', icono: '🔺', color: '#27AE60',
-    atomos: (() => {
-      // Romboedro: cubo deformado
-      const a = S * 0.5;
-      const skew = S * 0.2;
-      return [
-        { x: -a + skew, y: -a, z: -a, color: '#27AE60', size: 18 },
-        { x: a + skew, y: -a, z: -a, color: '#27AE60', size: 18 },
-        { x: a - skew, y: a, z: -a, color: '#27AE60', size: 18 },
-        { x: -a - skew, y: a, z: -a, color: '#27AE60', size: 18 },
-        { x: -a + skew + skew, y: -a, z: a, color: '#27AE60', size: 18 },
-        { x: a + skew + skew, y: -a, z: a, color: '#27AE60', size: 18 },
-        { x: a - skew + skew, y: a, z: a, color: '#27AE60', size: 18 },
-        { x: -a - skew + skew, y: a, z: a, color: '#27AE60', size: 18 },
-      ];
-    })(),
-    aristas: (() => {
-      const a = S * 0.5;
-      const skew = S * 0.2;
-      const c = [
-        [-a + skew, -a, -a], [a + skew, -a, -a], [a - skew, a, -a], [-a - skew, a, -a],
-        [-a + skew + skew, -a, a], [a + skew + skew, -a, a], [a - skew + skew, a, a], [-a - skew + skew, a, a],
-      ];
-      const edges = [[0,1],[1,2],[2,3],[3,0],[4,5],[5,6],[6,7],[7,4],[0,4],[1,5],[2,6],[3,7]];
-      return edges.map(([i, j]) => ({
-        x1: c[i][0], y1: c[i][1], z1: c[i][2],
-        x2: c[j][0], y2: c[j][1], z2: c[j][2],
-      }));
-    })(),
+    atomos: romboedroEsquinas().map(([x, y, z]) => ({ x, y, z, color: '#27AE60', size: 18 })),
+    aristas: romboedroAristas(),
   },
   {
     nombre: 'Monoclínico', params: 'a ≠ b ≠ c', angulos: 'α = γ = 90°, β ≠ 90°',
@@ -434,7 +472,7 @@ const ESTRUCTURAS_METALICAS: EstructuraMetalica[] = [
     color: '#48A9A6',
     atomos: hcpAtomos(),
     aristas: hcpAristas(),
-    caras: hexCaras(S * 0.45, S, '#48A9A6'),
+    caras: hexCaras(S * 0.45, S, '#48A9A6', 0),
   },
 ];
 
@@ -516,63 +554,85 @@ function diamanteAristas(): Arista3D[] {
   return cuboAristas(S, S, S);
 }
 
-function grafitoAtomos(): Atomo3D[] {
-  const atoms: Atomo3D[] = [];
-  const r = S * 0.35;
-  const layerGap = S * 0.55;
-  // Dos capas hexagonales
-  for (let layer = -1; layer <= 1; layer += 2) {
-    const y = layer * layerGap / 2;
-    const offset = layer === 1 ? 30 : 0;
-    for (let i = 0; i < 6; i++) {
-      const ang = (i * 60 + offset) * Math.PI / 180;
-      atoms.push({ x: Math.cos(ang) * r, y, z: Math.sin(ang) * r, color: layer === -1 ? '#333333' : '#666666', size: 16 });
+/**
+ * Grafito: dos capas de grafeno con dos anillos hexagonales cada una (10 carbonos), sin átomo en
+ * el centro del anillo —cada carbono, a lo sumo 3 vecinos (sp²)—, y la segunda capa DESPLAZADA
+ * un enlace (apilamiento ABAB, o de Bernal): uno de sus átomos cae sobre el centro de un anillo de
+ * la de abajo. Hasta el 09/11/2026 cada capa tenía un carbono en el centro del anillo, con 6
+ * vecinos, y la segunda iba girada 30° (hallazgo 4360).
+ */
+const GRAFITO_ENLACE = S * 0.33;
+const GRAFITO_SEPARACION = S * 0.75;
+function grafitoCapa(): [number, number][] {
+  const d = GRAFITO_ENLACE;
+  const puntos: [number, number][] = [];
+  // Dos anillos que comparten la arista vertical x = 0: centros en x = ∓d·√3/2
+  for (const cx of [-d * Math.sqrt(3) / 2, d * Math.sqrt(3) / 2]) {
+    for (let k = 0; k < 6; k++) {
+      const ang = (30 + 60 * k) * Math.PI / 180;
+      const p: [number, number] = [cx + d * Math.cos(ang), d * Math.sin(ang)];
+      if (!puntos.some((q) => Math.hypot(q[0] - p[0], q[1] - p[1]) < 0.01)) puntos.push(p);
     }
-    atoms.push({ x: 0, y, z: 0, color: layer === -1 ? '#333333' : '#666666', size: 16 });
   }
-  return atoms;
+  return puntos;
+}
+function grafitoPuntos(): { capa: number; x: number; y: number; z: number }[] {
+  const base = grafitoCapa();
+  const d = GRAFITO_ENLACE;
+  return [-1, 1].flatMap((capa) => base.map(([x, z]) => ({
+    capa,
+    x,
+    y: capa * GRAFITO_SEPARACION / 2,
+    // Capa B: la A trasladada un vector de enlace, (0, d) en planta
+    z: capa === 1 ? z + d : z,
+  })));
+}
+
+function grafitoAtomos(): Atomo3D[] {
+  return grafitoPuntos().map(({ capa, x, y, z }) => ({ x, y, z, color: capa === -1 ? '#333333' : '#666666', size: 12 }));
 }
 
 function grafitoAristas(): Arista3D[] {
+  const pts = grafitoPuntos();
   const edges: Arista3D[] = [];
-  const r = S * 0.35;
-  const layerGap = S * 0.55;
-  // Enlaces dentro de cada capa
-  for (let layer = -1; layer <= 1; layer += 2) {
-    const y = layer * layerGap / 2;
-    const offset = layer === 1 ? 30 : 0;
-    const pts: [number, number][] = [];
-    for (let i = 0; i < 6; i++) {
-      const ang = (i * 60 + offset) * Math.PI / 180;
-      pts.push([Math.cos(ang) * r, Math.sin(ang) * r]);
-    }
-    for (let i = 0; i < 6; i++) {
-      const n = (i + 1) % 6;
-      edges.push({ x1: pts[i][0], y1: y, z1: pts[i][1], x2: pts[n][0], y2: y, z2: pts[n][1] });
+  for (let i = 0; i < pts.length; i++) {
+    for (let j = i + 1; j < pts.length; j++) {
+      const p = pts[i];
+      const q = pts[j];
+      if (p.capa !== q.capa) continue;
+      if (Math.abs(Math.hypot(p.x - q.x, p.z - q.z) - GRAFITO_ENLACE) < 0.01) {
+        edges.push({ x1: p.x, y1: p.y, z1: p.z, x2: q.x, y2: q.y, z2: q.z });
+      }
     }
   }
   return edges;
 }
 
+/**
+ * Tres tetraedros SiO₄ a lo largo de una hélice: cada oxígeno, en una de las cuatro direcciones
+ * (±1, ±1, ±1)/√3 con un número par de signos menos —los vértices de un tetraedro regular, con
+ * O–Si–O = arccos(−1/3) = 109,47°—, giradas 40° por capa alrededor del eje vertical (un giro no
+ * cambia los ángulos). Hasta el 09/11/2026 los cuatro O iban en un plano con 109,5° usado como
+ * acimut, y los O–Si–O salían de 33° a 139° (hallazgo 4361).
+ */
+const TETRAEDRO: [number, number, number][] = [
+  [1, 1, 1], [1, -1, -1], [-1, 1, -1], [-1, -1, 1],
+].map(([x, y, z]) => [x / Math.sqrt(3), y / Math.sqrt(3), z / Math.sqrt(3)]);
 function cuarzoAtomos(): Atomo3D[] {
   const atoms: Atomo3D[] = [];
   const r = S * 0.4;
-  // Tetraedros de SiO₄ apilados helicoidalmente
+  const enlace = S * 0.2; // Si–O
   for (let layer = -1; layer <= 1; layer++) {
     const y = layer * S * 0.4;
     const ang = layer * 40 * Math.PI / 180;
-    // Si central
-    atoms.push({ x: Math.cos(ang) * r * 0.3, y, z: Math.sin(ang) * r * 0.3, color: '#F39C12', size: 20, label: 'Si' });
-    // 4 O tetraédricos
-    const tetraAngles = [0, 109.5, 219, 328.5];
-    for (const ta of tetraAngles) {
-      const a2 = (ta + layer * 40) * Math.PI / 180;
-      atoms.push({
-        x: Math.cos(ang) * r * 0.3 + Math.cos(a2) * S * 0.2,
-        y: y + Math.sin(a2 * 0.5) * S * 0.15,
-        z: Math.sin(ang) * r * 0.3 + Math.sin(a2) * S * 0.2,
-        color: '#E74C3C', size: 14, label: 'O',
-      });
+    const sx = Math.cos(ang) * r * 0.3;
+    const sz = Math.sin(ang) * r * 0.3;
+    atoms.push({ x: sx, y, z: sz, color: '#F39C12', size: 20, label: 'Si' });
+    for (const [tx, ty, tz] of TETRAEDRO) {
+      // rotateY(ang): x' = x·cos + z·sin, z' = −x·sin + z·cos
+      const rx = tx * Math.cos(ang) + tz * Math.sin(ang);
+      const rz = -tx * Math.sin(ang) + tz * Math.cos(ang);
+      atoms.push({ x: sx + rx * enlace, y: y + ty * enlace, z: sz + rz * enlace, color: '#E74C3C', size: 14, label: 'O' });
     }
   }
   return atoms;
@@ -619,7 +679,7 @@ const CRISTALES_FAMOSOS: CristalFamoso[] = [
     formula: 'C (sp²)',
     icono: '✏️',
     descripcion: 'Capas hexagonales de carbono (grafeno) unidas por fuerzas de Van der Waals débiles. Las capas se deslizan fácilmente unas sobre otras.',
-    dato: 'Dureza 1-2 Mohs. Conductor eléctrico (electrones libres entre capas). Mismo átomo que el diamante, propiedades opuestas.',
+    dato: 'Dureza 1-2 Mohs. Conduce la electricidad en el plano de las capas (electrones π deslocalizados), no en perpendicular a ellas. Mismo átomo que el diamante, propiedades opuestas.',
     atomos: grafitoAtomos(),
     aristas: grafitoAristas(),
   },
@@ -627,11 +687,11 @@ const CRISTALES_FAMOSOS: CristalFamoso[] = [
     nombre: 'Cuarzo (SiO₂)',
     formula: 'SiO₂',
     icono: '🔮',
-    descripcion: 'Tetraedros de SiO₄ conectados en espiral helicoidal. El silicio (amarillo) está en el centro y 4 oxígenos (rojo) en los vértices.',
+    descripcion: 'Tetraedros de SiO₄ que en el cristal comparten sus vértices y se enlazan en hélices. Aquí se dibujan tres, girados a lo largo de la hélice: el silicio (amarillo) en el centro y 4 oxígenos (rojo) en los vértices.',
     dato: 'Efecto piezoeléctrico: vibra a frecuencia exacta con electricidad. Base de todos los relojes de cuarzo y osciladores electrónicos.',
     atomos: cuarzoAtomos(),
     aristas: cuarzoAristas(),
-    caras: hexCaras(S * 0.45, S, '#F39C12'),
+    caras: hexCaras(S * 0.45, S, '#F39C12', 0),
   },
 ];
 
@@ -649,7 +709,7 @@ const DATOS_PROPIEDADES: DatoPropiedad[] = [
   {
     titulo: 'Empaquetamiento y densidad',
     icono: '📦',
-    contenido: 'FCC y HCP empaquetan al 74% (máximo posible para esferas iguales), BCC al 68%. Mayor empaquetamiento = mayor densidad. Por eso el oro (FCC, 19,3 g/cm³) es más denso que el hierro (BCC, 7,87 g/cm³).',
+    contenido: 'FCC y HCP empaquetan al 74 % (máximo posible para esferas iguales), BCC al 68 %. Con el mismo átomo, empaquetar más da algo más de densidad (74/68 ≈ 1,09), pero la densidad depende sobre todo de la masa y el tamaño del átomo: el wolframio (BCC, 19,30 g/cm³) es casi tan denso como el oro (FCC, 19,32 g/cm³), y el aluminio (FCC, 2,70 g/cm³) mucho menos que el hierro (BCC, 7,87 g/cm³). Densidades: NIST, X-Ray Mass Attenuation Coefficients, tabla 1.',
   },
   {
     titulo: 'Dureza y enlace',
@@ -700,17 +760,26 @@ interface Escena3DProps {
   rotacionInicial?: Rotation;
 }
 
+/**
+ * La arista es un elemento que nace sobre el eje X, de longitud L. Para que vaya de (x1, y1, z1)
+ * a (x2, y2, z2) se inclina primero hacia Y con un giro alrededor de Z, de asin(dy/L) (lleva
+ * (1, 0, 0) a (c, dy/L, 0)), y luego se orienta en planta con un giro alrededor de Y, de
+ * atan2(−dz, dx) (en CSS rotateY lleva (c, s, 0) a (c·cos ψ, s, −c·sin ψ)).
+ * Hasta el 09/11/2026 se giraba en X un vector del eje X —que no lo mueve— y en Y con un ángulo
+ * calculado para el eje Z: casi ninguna arista llegaba a su átomo y ninguna salía vertical
+ * (hallazgo 4357). El giro en Z va como rotate3d(0, 0, 1, …) para no confundirse con las caras,
+ * que se distinguen por su rotateZ.
+ */
 function calcularAristaCSS(ar: Arista3D) {
   const dx = ar.x2 - ar.x1;
   const dy = ar.y2 - ar.y1;
   const dz = ar.z2 - ar.z1;
   const length = Math.sqrt(dx * dx + dy * dy + dz * dz);
-  // Ángulos de rotación para alinear la arista
-  const rotY = Math.atan2(dx, dz) * 180 / Math.PI;
-  const rotX = -Math.asin(dy / length) * 180 / Math.PI;
+  const inclinacion = length > 0 ? Math.asin(dy / length) * 180 / Math.PI : 0;
+  const rumbo = Math.atan2(-dz, dx) * 180 / Math.PI;
   return {
     width: `${length}px`,
-    transform: `translate3d(${ar.x1}px, ${ar.y1}px, ${ar.z1}px) rotateY(${rotY}deg) rotateX(${rotX}deg)`,
+    transform: `translate3d(${ar.x1}px, ${ar.y1}px, ${ar.z1}px) rotateY(${rumbo}deg) rotate3d(0, 0, 1, ${inclinacion}deg)`,
   };
 }
 
@@ -862,7 +931,7 @@ export default function VisualizadorEstructurasCristalinas() {
       {seccion === 'sistemas' && (
         <section className={styles.seccionContent}>
           <p className={styles.contexto}>
-            Todos los cristales pertenecen a uno de 7 sistemas según la geometría de su celda unitaria: las longitudes de sus ejes (a, b, c) y los ángulos entre ellos (α, β, γ).
+            Todos los cristales pertenecen a uno de 7 sistemas según la simetría de su red, que se refleja en la geometría de su celda unitaria: las longitudes de sus ejes (a, b, c) y los ángulos entre ellos (α, β, γ).
           </p>
 
           <div className={styles.sistemasGrid}>
@@ -883,7 +952,7 @@ export default function VisualizadorEstructurasCristalinas() {
 
           {/* Detalle del sistema seleccionado */}
           <div className={styles.sistemaDetalle} role="status" aria-live="polite" aria-atomic="true" style={{ borderColor: SISTEMAS[sistemaActivo].color }}>
-            <h3 className={styles.sistemaDetalleNombre} style={{ color: SISTEMAS[sistemaActivo].color }}>
+            <h3 className={`${styles.sistemaDetalleNombre} ${styles.tonoTitulo}`} style={estiloTono(SISTEMAS[sistemaActivo].color)}>
               <span aria-hidden="true">{SISTEMAS[sistemaActivo].icono}</span> {SISTEMAS[sistemaActivo].nombre}
             </h3>
             <div className={styles.sistemaDetalleInfo}>
@@ -938,7 +1007,7 @@ export default function VisualizadorEstructurasCristalinas() {
             const em = ESTRUCTURAS_METALICAS[metalicaActiva];
             return (
               <div className={styles.metalicaDetalle} role="status" aria-live="polite" aria-atomic="true">
-                <h3 className={styles.metalicaDetalleNombre} style={{ color: em.color }}>
+                <h3 className={`${styles.metalicaDetalleNombre} ${styles.tonoTitulo}`} style={estiloTono(em.color)}>
                   {em.siglas} — {em.nombre}
                 </h3>
                 <p className={styles.metalicaDesc}>{em.descripcion}</p>
@@ -964,7 +1033,7 @@ export default function VisualizadorEstructurasCristalinas() {
                     <span className={styles.metalicaStatLabel}>Nº coordinación</span>
                   </div>
                   <div className={styles.metalicaStat}>
-                    <span className={styles.metalicaStatValor}>{formatNumber(em.empaquetamiento, 0)}%</span>
+                    <span className={styles.metalicaStatValor}>{formatNumber(em.empaquetamiento, 0)}{' '}%</span>
                     <span className={styles.metalicaStatLabel}>Empaquetamiento</span>
                   </div>
                 </div>
@@ -989,12 +1058,12 @@ export default function VisualizadorEstructurasCristalinas() {
                       style={{ width: `${em.empaquetamiento}%`, background: em.color }}
                     />
                   </div>
-                  <span className={styles.comparativaValor}>{formatNumber(em.empaquetamiento, 0)}%</span>
+                  <span className={styles.comparativaValor}>{formatNumber(em.empaquetamiento, 0)}{' '}%</span>
                 </div>
               ))}
             </div>
             <p className={styles.comparativaNota}>
-              74% es el máximo empaquetamiento posible para esferas iguales (conjetura de Kepler, demostrada en 1998).
+              74&nbsp;% es el máximo empaquetamiento posible para esferas iguales (conjetura de Kepler, demostrada en 1998).
             </p>
           </div>
         </section>
@@ -1115,7 +1184,7 @@ export default function VisualizadorEstructurasCristalinas() {
 
         <h4>¿Por qué solo 7 sistemas?</h4>
         <p>
-          La matemática demuestra que solo existen 7 formas fundamentales de paralelepípedo que, al repetirse, llenan todo el espacio sin huecos. Estos 7 sistemas se subdividen en 14 redes de Bravais y 230 grupos espaciales que describen todas las simetrías posibles.
+          Cualquier paralelepípedo llena el espacio sin huecos al repetirse, así que la forma de la celda por sí sola no limita nada: hay infinitas. Lo que deja solo 7 sistemas es la simetría. Según qué ejes de giro y planos de simetría admite la red, sus parámetros quedan obligados a ciertas igualdades (a = b, ángulos de 90° o de 120°…), y solo hay 7 combinaciones posibles. Estos 7 sistemas se subdividen en 14 redes de Bravais y 230 grupos espaciales que describen todas las simetrías posibles.
         </p>
 
         <h4>Cristales amorfos vs cristalinos</h4>

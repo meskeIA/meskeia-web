@@ -22,7 +22,9 @@ import { contrasteSobreFondoReal } from './_contraste';
  * aristas (0 50 %, 1 px de alto): las dos puntas comparten ese desplazamiento.
  *
  * Los `test.fail()` son hallazgos ABIERTOS de esta inspección (09/11/2026): pasarán a verde
- * cuando se reparen, y entonces se quita la marca.
+ * cuando se reparen, y entonces se quita la marca. Reparados el 09/11/2026: 4357 (aristas),
+ * 4358 (trigonal), 4359 (caras hexagonales), 4360 (grafito), 4361 (cuarzo SiO₄), 4363, 4364,
+ * 4365, 4366, 4367 (contraste) y 4368 (%). Sigue abierto 4362 (el cuarzo en dos sistemas).
  */
 
 const RUTA = '/visualizador-estructuras-cristalinas/';
@@ -189,9 +191,8 @@ test.describe('CASO 1 · estructuras metálicas', () => {
     expect(despues.y, 'arrastrar a la derecha gira sobre el eje vertical').toBeGreaterThan(antes.y);
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · el porcentaje va pegado: «68%» en vez de «68 %»', async ({ page }) => {
+  test('HALLAZGO (09/11/2026, REPARADO) · el porcentaje va pegado: «68%» en vez de «68 %»', async ({ page }) => {
     // Norma de la casa (CLAUDE.md global §2, RAE 2010): número, espacio duro (U+00A0) y «%».
-    test.fail();
     await abrir(page);
     await irASeccion(page, /Metálicas/);
     await elegir(page, /^BCC/);
@@ -225,11 +226,10 @@ test.describe('CASO 2 · los 7 sistemas', () => {
     }
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · la celda «trigonal» dibujada es triclínica', async ({ page }) => {
+  test('HALLAZGO (09/11/2026, REPARADO) · la celda «trigonal» dibujada es triclínica', async ({ page }) => {
     // La app dice «a = b = c» y «α = β = γ ≠ 90°» (romboedro). Resuelto a mano con las esquinas
     // del código: aristas (90, 0, 0), (−36, 90, 0) y (18, 0, 90) → 90 · 96,93 · 91,78 px y
     // ángulos 94,18° · 78,69° · 111,8°: ni iguales las aristas ni iguales los ángulos.
-    test.fail();
     await abrir(page);
     await elegir(page, 'Trigonal');
     await expect(detalle(page)).toContainText('Parámetros: a = b = c');
@@ -239,13 +239,12 @@ test.describe('CASO 2 · los 7 sistemas', () => {
     expect(angulos[0], 'α ≠ 90°').toBeLessThan(88);
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · las aristas no unen átomos: ninguna sale vertical', async ({ page }) => {
+  test('HALLAZGO (09/11/2026, REPARADO) · las aristas no unen átomos: ninguna sale vertical', async ({ page }) => {
     // Un cubo tiene 12 aristas que unen sus 8 esquinas, 4 de ellas verticales. calcularAristaCSS
     // orienta un elemento que nace sobre el eje X con rotateY(atan2(dx, dz)) rotateX(...): el giro
     // en X no mueve un vector del eje X y el de Y está calculado para el eje Z. Hoy en el cubo
     // 6 de 12 acaban en un átomo y 0 son verticales; en monoclínico, triclínico, trigonal,
     // hexagonal, HCP y grafito no acaba en un átomo NINGUNA.
-    test.fail();
     await abrir(page);
     for (const nombre of ['Cúbico', 'Monoclínico']) {
       await elegir(page, nombre);
@@ -258,11 +257,34 @@ test.describe('CASO 2 · los 7 sistemas', () => {
     }
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · las caras del prisma hexagonal no coinciden con él', async ({ page }) => {
+  test('REPARADO 4357/4359 · en todas las escenas cada arista une dos átomos y cada esquina de cara cae en un vértice', async ({ page }) => {
+    // El hallazgo 4357 decía que en monoclínico, triclínico, trigonal, hexagonal, HCP y grafito
+    // NINGUNA arista acababa en un átomo. Fuera, a propósito: el prisma del cuarzo, que es el
+    // contorno del cristal y no une átomos (los tetraedros van dentro).
+    await abrir(page);
+    const escenas: [RegExp | null, string | RegExp][] = [
+      [null, 'Cúbico'], [null, 'Tetragonal'], [null, 'Ortorrómbico'], [null, 'Hexagonal'],
+      [null, 'Trigonal'], [null, 'Monoclínico'], [null, 'Triclínico'],
+      [/Metálicas/, /^BCC/], [/Metálicas/, /^FCC/], [/Metálicas/, /^HCP/],
+      [/Cristales Famosos/, /Sal \(NaCl\)/], [/Cristales Famosos/, /Diamante/], [/Cristales Famosos/, /Grafito/],
+    ];
+    for (const [seccion, nombre] of escenas) {
+      if (seccion) await irASeccion(page, seccion);
+      await elegir(page, nombre);
+      const { atomos, aristas, caras } = await leerEscena(page);
+      expect(aristas.length, `${nombre}: tiene aristas`).toBeGreaterThan(0);
+      const sueltas = aristas.filter((ar) => masCercano(ar.a, atomos) > 1 || masCercano(ar.b, atomos) > 1);
+      expect(sueltas.length, `${nombre}: aristas con una punta fuera de los átomos`).toBe(0);
+      if (/Hexagonal|HCP/.test(String(nombre))) {
+        for (const esquina of caras.flat()) expect(masCercano(esquina, atomos), `${nombre}: esquina de cara sobre un vértice`).toBeLessThan(1);
+      }
+    }
+  });
+
+  test('HALLAZGO (09/11/2026, REPARADO) · las caras del prisma hexagonal no coinciden con él', async ({ page }) => {
     // Prisma de la app: hexágono de 45 px de radio y 72 px de alto (átomos en y = ±36). Las caras
     // de hexCaras miden 144 px de alto (y = ±72) y cada una está girada 60° respecto a su arista:
     // sus esquinas quedan a 22,5 px de los vértices en planta. Lo mismo en HCP y en el cuarzo.
-    test.fail();
     await abrir(page);
     await elegir(page, 'Hexagonal');
     const { atomos, caras } = await leerEscena(page);
@@ -308,12 +330,11 @@ test.describe('CASO 3 · cristales famosos', () => {
     }
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · grafito: un carbono en el centro de cada anillo, con 6 vecinos', async ({ page }) => {
+  test('HALLAZGO (09/11/2026, REPARADO) · grafito: un carbono en el centro de cada anillo, con 6 vecinos', async ({ page }) => {
     // sp²: cada carbono se une a 3 dentro de su capa (lo dice la FAQ de la app). Hoy cada capa
     // pinta el anillo de 6 y un átomo en su centro, a 31,5 px de los seis: la misma distancia que
     // el lado del anillo, es decir, un carbono con 6 enlaces. En el panal del grafeno el centro
     // del hexágono está vacío. Además la segunda capa está girada 30°, no desplazada (ABAB).
-    test.fail();
     await abrir(page);
     await irASeccion(page, /Cristales Famosos/);
     await elegir(page, /Grafito/);
@@ -330,11 +351,10 @@ test.describe('CASO 3 · cristales famosos', () => {
     }
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · cuarzo: los «tetraedros SiO₄» no son tetraedros', async ({ page }) => {
+  test('HALLAZGO (09/11/2026, REPARADO) · cuarzo: los «tetraedros SiO₄» no son tetraedros', async ({ page }) => {
     // Tetraedro regular: los seis O–Si–O valen 109,47°. Hoy van de 33,33° a 138,7° (tetraAngles
     // [0, 109,5, 219, 328,5] usa el ángulo de enlace como acimut en un plano). Tolerancia de 10°:
     // un modelo simplificado puede deformar un poco; el defecto es de 76°.
-    test.fail();
     await abrir(page);
     await irASeccion(page, /Cristales Famosos/);
     await elegir(page, /Cuarzo/);
@@ -357,6 +377,8 @@ test.describe('CASO 3 · cristales famosos', () => {
   test('HALLAZGO (09/11/2026, ABIERTO) · el cuarzo figura en dos de los 7 sistemas', async ({ page }) => {
     // La app dice «Todos los cristales pertenecen a uno de 7 sistemas» y pone «Cuarzo» de ejemplo
     // en Hexagonal y en Trigonal; la FAQ (JSON-LD) dice «el cuarzo, al hexagonal».
+    // Sigue ABIERTO (hallazgo 4362): elegir el sistema exige una fuente cristalográfica que no
+    // estaba en la red de dominios permitidos de /reparar del 09/11/2026.
     test.fail();
     await abrir(page);
     const conCuarzo: string[] = [];
@@ -371,41 +393,37 @@ test.describe('CASO 3 · cristales famosos', () => {
     if (asignado) expect(asignado.toLowerCase(), 'la FAQ dice el mismo sistema que la página').toBe(conCuarzo[0]?.toLowerCase());
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · el grafito conduce «entre capas», y la propia app dice que en el plano', async ({ page }) => {
+  test('HALLAZGO (09/11/2026, REPARADO) · el grafito conduce «entre capas», y la propia app dice que en el plano', async ({ page }) => {
     // «Datos y Propiedades → Conductividad»: «El grafito conduce en el plano (electrones π
     // deslocalizados) pero no perpendicular a las capas». El «Dato clave» del grafito dice lo
     // contrario: «Conductor eléctrico (electrones libres entre capas)».
-    test.fail();
     await abrir(page);
     await irASeccion(page, /Cristales Famosos/);
     await elegir(page, /Grafito/);
     await expect(detalle(page)).not.toContainText('entre capas');
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · «mayor empaquetamiento = mayor densidad, por eso el oro…»', async ({ page }) => {
+  test('HALLAZGO (09/11/2026, REPARADO) · «mayor empaquetamiento = mayor densidad, por eso el oro…»', async ({ page }) => {
     // 0,7405 / 0,6802 = 1,09: el empaquetamiento explica como mucho un 9 %, y oro/hierro es 2,45.
     // Con las listas de la propia app y las densidades del NIST (X-Ray Mass Attenuation
     // Coefficients, tabla 1): wolframio BCC 19,30 g/cm³ ≈ oro FCC 19,32; aluminio FCC 2,699 <
     // hierro BCC 7,874. La densidad la marcan sobre todo la masa atómica y el radio.
-    test.fail();
     await abrir(page);
     await irASeccion(page, /Datos y Propiedades/);
     const tarjeta = page.getByRole('heading', { name: 'Empaquetamiento y densidad' }).locator('xpath=../..');
     await expect(tarjeta).not.toContainText(/Por eso el oro/);
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · «solo existen 7 formas de paralelepípedo que llenan el espacio»', async ({ page }) => {
+  test('HALLAZGO (09/11/2026, REPARADO) · «solo existen 7 formas de paralelepípedo que llenan el espacio»', async ({ page }) => {
     // Todo paralelepípedo de aristas a, b, c no coplanarias llena el espacio por traslación: cada
     // punto r = x·a + y·b + z·c cae en una sola copia (la de ⌊x⌋, ⌊y⌋, ⌊z⌋). Hay infinitas
     // formas (el propio triclínico de la app es una familia continua). Los 7 sistemas salen de
     // la SIMETRÍA de la red, no de que solo 7 formas teselen.
-    test.fail();
     await abrir(page);
     await expect(page.locator('[data-guia-educativa]')).not.toContainText('solo existen 7 formas fundamentales de paralelepípedo');
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · el JSON-LD promete «empaquetamiento … con radio atómico» y no lo hay', async ({ page }) => {
-    test.fail();
+  test('HALLAZGO (09/11/2026, REPARADO) · el JSON-LD promete «empaquetamiento … con radio atómico» y no lo hay', async ({ page }) => {
     await abrir(page);
     const ld = (await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ');
     const prometeRadio = /radio atómico/i.test(ld);
@@ -421,11 +439,10 @@ test.describe('CASO 3 · cristales famosos', () => {
 test.describe('Accesibilidad', () => {
   test.use({ colorScheme: 'light' });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · contraste en claro de los títulos coloreados', async ({ page }) => {
+  test('HALLAZGO (09/11/2026, REPARADO) · contraste en claro de los títulos coloreados', async ({ page }) => {
     // Sobre la tarjeta blanca: Tetragonal 2,80 · Ortorrómbico 2,03 · Trigonal 2,87 · Monoclínico
     // 2,19 (19,2 px negrita: texto grande, mínimo 3:1); BCC 4,11 · FCC 2,19 · HCP 2,80 (17,6 px
     // negrita: no llega a grande, mínimo 4,5:1). En oscuro cumplen todos.
-    test.fail();
     await abrir(page);
     const fallos: string[] = [];
     const medir = async (rotulo: string) => {

@@ -103,6 +103,10 @@
 .sistemaNombre { font-size: 0.78rem; font-weight: 700; text-align: center; color: var(--text-primary); }
 
 .sistemaDetalle { background: var(--bg-card); border: 2px solid var(--primary); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
+/* Título con el color de la estructura: --tono-claro en claro y --tono en oscuro (los pone el
+   TSX con estiloTono; hallazgo 4367). */
+.tonoTitulo { color: var(--tono-claro, var(--text-primary)); }
+[data-theme='dark'] .tonoTitulo { color: var(--tono, var(--text-primary)); }
 .sistemaDetalleNombre { font-size: 1.2rem; font-weight: 700; margin-bottom: var(--spacing-md); text-align: center; }
 .sistemaDetalleInfo { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: var(--spacing-md); }
 .sistemaParam { font-size: 0.9rem; color: var(--text-secondary); text-align: center; }
