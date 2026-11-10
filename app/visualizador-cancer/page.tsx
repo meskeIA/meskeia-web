@@ -106,10 +106,12 @@ function SeccionCiclo() {
           <path d="M 30 160 A 130 130 0 0 1 160 30" fill="rgba(39,174,96,0.15)" stroke="#27ae60" strokeWidth={faseActiva === 3 ? 4 : 2} />
 
           {/* Etiquetas de fase */}
-          <text x="235" y="110" textAnchor="middle" fill="#2E86AB" fontSize="14" fontWeight="700">G1</text>
-          <text x="235" y="220" textAnchor="middle" fill="#e67e22" fontSize="14" fontWeight="700">S</text>
-          <text x="82" y="220" textAnchor="middle" fill="#8e44ad" fontSize="14" fontWeight="700">G2</text>
-          <text x="82" y="110" textAnchor="middle" fill="#27ae60" fontSize="14" fontWeight="700">M</text>
+          {/* Tono de TEXTO por fase y tema (.svgX del módulo); el color de la fase, en el arco.
+              En su color daban 2,46-3,47:1 en claro y 2,18-3,99 en oscuro (C0297, 10/11/2026) */}
+          <text x="235" y="110" textAnchor="middle" className={styles.svgAzul} fontSize="14" fontWeight="700">G1</text>
+          <text x="235" y="220" textAnchor="middle" className={styles.svgNaranja} fontSize="14" fontWeight="700">S</text>
+          <text x="82" y="220" textAnchor="middle" className={styles.svgVioleta} fontSize="14" fontWeight="700">G2</text>
+          <text x="82" y="110" textAnchor="middle" className={styles.svgVerde} fontSize="14" fontWeight="700">M</text>
 
           {/* Flecha dirección horario */}
           <path d="M 175 32 L 165 20 L 155 32" fill="currentColor" opacity="0.5" />
@@ -283,18 +285,20 @@ function SeccionOncogenes() {
           <circle cx="350" cy="165" r="14" fill="var(--bg-card)" />
 
           {/* Acelerador (izquierda del interior) — verde */}
-          <rect x="90" y="108" width="30" height="42" rx="4" fill="#27ae60" />
+          {/* Pedales opacos y oscurecidos bajo el texto blanco: el verde 27ae60 daba 2,87:1 y el
+              rojo e74c3c 3,80, y el texto al 85 % menos (hallazgo de C0297, 10/11/2026) */}
+          <rect x="90" y="108" width="30" height="42" rx="4" fill="#1E8449" />
           <text x="105" y="124" textAnchor="middle" fill="white" fontSize="7" fontWeight="700">Acele-</text>
           <text x="105" y="133" textAnchor="middle" fill="white" fontSize="7" fontWeight="700">rador</text>
-          <text x="105" y="142" textAnchor="middle" fill="white" fontSize="6" opacity="0.85">Oncogén</text>
-          {/* Flecha acelerador bloqueado */}
-          <text x="105" y="155" textAnchor="middle" fill="#27ae60" fontSize="12" fontWeight="700">↓</text>
+          <text x="105" y="142" textAnchor="middle" fill="white" fontSize="6">Oncogén</text>
+          {/* Flecha acelerador bloqueado: debajo del pedal, no montada sobre su borde (1,00:1) */}
+          <text x="105" y="161" textAnchor="middle" className={styles.svgVerde} fontSize="12" fontWeight="700">↓</text>
 
           {/* Freno (derecha del interior) — rojo */}
-          <rect x="360" y="108" width="30" height="42" rx="4" fill="#e74c3c" />
+          <rect x="360" y="108" width="30" height="42" rx="4" fill="#C0392B" />
           <text x="375" y="124" textAnchor="middle" fill="white" fontSize="7" fontWeight="700">Freno</text>
-          <text x="375" y="135" textAnchor="middle" fill="white" fontSize="6" opacity="0.85">Supresor</text>
-          <text x="375" y="144" textAnchor="middle" fill="white" fontSize="6" opacity="0.85">tumoral</text>
+          <text x="375" y="135" textAnchor="middle" fill="white" fontSize="6">Supresor</text>
+          <text x="375" y="144" textAnchor="middle" fill="white" fontSize="6">tumoral</text>
           {/* Freno cortado (línea tachada) */}
           <line x1="358" y1="106" x2="392" y2="152" stroke="#fff" strokeWidth="2.5" strokeDasharray="4 2" />
 
@@ -304,7 +308,7 @@ function SeccionOncogenes() {
 
           {/* Estado cáncer (flechas de velocidad) */}
           <path d="M 420 145 L 460 145 L 454 140 M 460 145 L 454 150" stroke="#e74c3c" strokeWidth="2" fill="none" />
-          <text x="465" y="148" fill="#e74c3c" fontSize="8" fontWeight="700">→</text>
+          <text x="465" y="148" className={styles.svgRojo} fontSize="8" fontWeight="700">→</text>
         </svg>
       </div>
 
@@ -576,19 +580,21 @@ function SeccionInmunoterapia() {
           {/* Linfocito T (izquierda) */}
           <circle cx="100" cy="110" r="65" fill="rgba(46,134,171,0.12)" stroke="#2E86AB" strokeWidth="2" />
           <circle cx="100" cy="110" r="28" fill="rgba(46,134,171,0.25)" stroke="#2E86AB" strokeWidth="1.5" />
-          <text x="100" y="114" textAnchor="middle" fill="#2E86AB" fontSize="8" fontWeight="700">núcleo T</text>
-          <text x="100" y="195" textAnchor="middle" fill="#2E86AB" fontSize="9" fontWeight="600">Linfocito T CD8+</text>
+          {/* Rótulos en tono de TEXTO por tema (.svgX); el color de la célula, en el trazo. En su color
+              daban 2,31-4,07:1, y el blanco sobre las etiquetas al 85 %, 3,16-3,21 (C0297, 10/11/2026) */}
+          <text x="100" y="114" textAnchor="middle" className={styles.svgAzul} fontSize="8" fontWeight="700">núcleo T</text>
+          <text x="100" y="195" textAnchor="middle" className={styles.svgAzul} fontSize="9" fontWeight="600">Linfocito T CD8+</text>
           {/* PD-1 en la superficie del linfocito T */}
-          <rect x="158" y="90" width="32" height="20" rx="6" fill="#2E86AB" opacity="0.85" />
+          <rect x="158" y="90" width="32" height="20" rx="6" fill="#26718F" />
           <text x="174" y="103" textAnchor="middle" fill="white" fontSize="7.5" fontWeight="700">PD-1</text>
 
           {/* Célula tumoral (derecha) */}
           <circle cx="400" cy="110" r="65" fill="rgba(231,76,60,0.1)" stroke="#e74c3c" strokeWidth="2" />
           <circle cx="400" cy="110" r="28" fill="rgba(231,76,60,0.2)" stroke="#e74c3c" strokeWidth="1.5" />
-          <text x="400" y="114" textAnchor="middle" fill="#e74c3c" fontSize="8" fontWeight="700">núcleo</text>
-          <text x="400" y="195" textAnchor="middle" fill="#e74c3c" fontSize="9" fontWeight="600">Célula tumoral</text>
+          <text x="400" y="114" textAnchor="middle" className={styles.svgRojo} fontSize="8" fontWeight="700">núcleo</text>
+          <text x="400" y="195" textAnchor="middle" className={styles.svgRojo} fontSize="9" fontWeight="600">Célula tumoral</text>
           {/* PD-L1 en la superficie tumoral */}
-          <rect x="330" y="90" width="32" height="20" rx="6" fill="#e74c3c" opacity="0.85" />
+          <rect x="330" y="90" width="32" height="20" rx="6" fill="#C0392B" />
           <text x="346" y="103" textAnchor="middle" fill="white" fontSize="7.5" fontWeight="700">PD-L1</text>
 
           {/* Estado NORMAL: sin interacción PD-1/PD-L1 */}
@@ -596,7 +602,7 @@ function SeccionInmunoterapia() {
             <>
               {/* T activo → destruye célula tumoral */}
               <path d="M 165 110 L 330 110" stroke="#27ae60" strokeWidth="2.5" strokeDasharray="5 3" markerEnd="url(#arrowGreen)" />
-              <text x="247" y="103" textAnchor="middle" fill="#27ae60" fontSize="8" fontWeight="700">T activo → destruye</text>
+              <text x="247" y="103" textAnchor="middle" className={styles.svgVerde} fontSize="8" fontWeight="700">T activo → destruye</text>
               <defs>
                 <marker id="arrowGreen" markerWidth="8" markerHeight="8" refX="5" refY="3" orient="auto">
                   <path d="M 0 0 L 6 3 L 0 6 Z" fill="#27ae60" />
@@ -613,11 +619,12 @@ function SeccionInmunoterapia() {
               {/* Línea PD-1 -- PD-L1 activa (inhibición) */}
               <line x1="190" y1="100" x2="330" y2="100" stroke="#e74c3c" strokeWidth="3" />
               <circle cx="260" cy="100" r="6" fill="#e74c3c" />
-              <text x="260" y="84" textAnchor="middle" fill="#e74c3c" fontSize="8" fontWeight="700">PD-1 ⟷ PD-L1</text>
-              <text x="260" y="75" textAnchor="middle" fill="#e74c3c" fontSize="7.5">Señal inhibidora → T apagado</text>
-              {/* Símbolo de "stop" en el linfocito */}
-              <circle cx="100" cy="110" r="12" fill="rgba(231,76,60,0.7)" />
-              <text x="100" y="114" textAnchor="middle" fill="white" fontSize="10" fontWeight="700">✕</text>
+              <text x="260" y="84" textAnchor="middle" className={styles.svgRojo} fontSize="8" fontWeight="700">PD-1 ⟷ PD-L1</text>
+              <text x="260" y="75" textAnchor="middle" className={styles.svgRojo} fontSize="7.5">Señal inhibidora → T apagado</text>
+              {/* Símbolo de "stop" en el linfocito: encima del núcleo y opaco. En su centro tapaba el
+                  rótulo «núcleo T», y el blanco sobre el rojo al 70 % no llegaba a 4,5:1 */}
+              <circle cx="100" cy="68" r="12" fill="#C0392B" />
+              <text x="100" y="72" textAnchor="middle" fill="white" fontSize="10" fontWeight="700">✕</text>
               <text x="247" y="145" textAnchor="middle" fill="var(--text-secondary)" fontSize="7.5">El linfocito T entra en estado</text>
               <text x="247" y="156" textAnchor="middle" fill="var(--text-secondary)" fontSize="7.5">de agotamiento (exhaustion)</text>
             </>
@@ -635,7 +642,7 @@ function SeccionInmunoterapia() {
               {/* Extremos brazos */}
               <circle cx="198" cy="96" r="5" fill="#48A9A6" />
               <circle cx="232" cy="96" r="5" fill="#48A9A6" />
-              <text x="215" y="148" textAnchor="middle" fill="#48A9A6" fontSize="7.5" fontWeight="700">anti-PD-1</text>
+              <text x="215" y="148" textAnchor="middle" className={styles.svgTeal} fontSize="7.5" fontWeight="700">anti-PD-1</text>
               {/* Bloqueo de la interacción */}
               <line x1="235" y1="95" x2="330" y2="100" stroke="var(--border)" strokeWidth="2" strokeDasharray="4 3" />
               <circle cx="282" cy="97" r="8" fill="none" stroke="#e74c3c" strokeWidth="2" />
@@ -647,7 +654,7 @@ function SeccionInmunoterapia() {
                   <path d="M 0 0 L 6 3 L 0 6 Z" fill="#27ae60" />
                 </marker>
               </defs>
-              <text x="247" y="158" textAnchor="middle" fill="#27ae60" fontSize="7.5" fontWeight="700">T recupera actividad citotóxica</text>
+              <text x="247" y="158" textAnchor="middle" className={styles.svgVerde} fontSize="7.5" fontWeight="700">T recupera actividad citotóxica</text>
             </>
           )}
         </svg>

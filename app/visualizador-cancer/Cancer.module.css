@@ -273,6 +273,22 @@
   color: #e0c060;
 }
 
+/* Tono de TEXTO de los rótulos de los SVG por color de dato y tema (cabo C0297, 10/11/2026): el
+   color del dato se queda en arcos, trazos y círculos. Medidos contra la tarjeta y los tintes de
+   su zona: 4,68-8,55:1 en claro y 5,45-8,53:1 en oscuro (.reparar-trabajo/tonos-cancer.mjs) */
+.svgAzul { fill: #1B5E7E; }
+.svgNaranja { fill: #A04F0A; }
+.svgVioleta { fill: #6C3483; }
+.svgVerde { fill: #1B6E3D; }
+.svgRojo { fill: #922B21; }
+.svgTeal { fill: #2F7472; }
+[data-theme='dark'] .svgAzul { fill: #9CCFE6; }
+[data-theme='dark'] .svgNaranja { fill: #F5B97A; }
+[data-theme='dark'] .svgVioleta { fill: #D7BDE2; }
+[data-theme='dark'] .svgVerde { fill: #82D9A5; }
+[data-theme='dark'] .svgRojo { fill: #F5A59B; }
+[data-theme='dark'] .svgTeal { fill: #6CC5C2; }
+
 /* Reducción de movimiento */
 @media (prefers-reduced-motion: reduce) {
   .container * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }

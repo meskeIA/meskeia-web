@@ -94,6 +94,12 @@ const APPS: App[] = [
     extremos: true,
     subestados: "button[class*='fallaCard']",
   },
+  // Del censo del 08/11/2026 (C0297), reparada el 10/11/2026: las fases del ciclo en su color sobre
+  // el tinte del arco (2,46-3,47:1 en claro, 2,18-3,99 en oscuro), blanco sobre los pedales verde
+  // y rojo y sobre PD-1 y PD-L1 al 85 % (2,47-3,80), la flecha del acelerador montada sobre su
+  // pedal (1,00) y los rótulos de las células en su color (2,31-4,07). Los tres estados de la
+  // inmunoterapia, como subestados.
+  { slug: 'visualizador-cancer', secciones: SECCIONES, extremos: true, subestados: "button[class*='estadoBtn']" },
 ];
 
 interface TextoSvg {
