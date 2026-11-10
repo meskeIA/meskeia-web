@@ -2863,19 +2863,42 @@ test.describe('re-inspección 15/10/2026 · móvil 360×740', () => {
     const problemas: string[] = [];
 
     // 1) Test a medias recuperado (B en la 1, C en la 2); B en la 3 y «Siguiente» tocado a esa altura.
-    await sembrarSesion1510(page, { currentQuestion: 2, answers: { 1: 2, 2: 3 } });
-    await expect(aviso(page)).toContainText('con 2 de 10 respuestas');
-    await page.waitForTimeout(500);
-    await opcion(page, 1).tap();
-    const yEmpezar = await alturaDeEmpezarTrasRecolocar(page);
-    const s = await centroA(page, botonSiguiente(page), yEmpezar);
-    await page.touchscreen.tap(s.x, s.y);
-    await page.waitForTimeout(90);
-    await page.touchscreen.tap(s.x, s.y);
-    await page.waitForTimeout(500);
-    if (await page.getByRole('button', { name: /Comenzar Test/ }).count()) {
-      problemas.push(`doble toque en «Siguiente» a ${Math.round(s.y)} px → portada, sesión ${await page.evaluate((k) => sessionStorage.getItem(k), CLAVE_SESION_1510)}`);
-    }
+    //    Cabo C0696 (inestable el 09/11/2026 en la suite, 3 de 3 aislado): la guarda de la app absorbe
+    //    el 2.º toque si llega a menos de 450 ms del 1.º (VENTANA_DOBLE_ACTIVACION_MS, por timeStamp
+    //    del evento), y `touchscreen.tap` no suelta el 2.º hasta que la página procesa el 1.º: con la
+    //    máquina cargada el hueco crece (medido con la CPU frenada: 90 ms de espera → 174-403 ms entre
+    //    clics a 12-30×). Por encima de la ventana ya no es un doble toque, para la app tampoco: se
+    //    mide el hueco real y, si pasa, se repite la escena (hasta tres veces) en vez de dar por roto
+    //    lo que no se llegó a probar.
+    const yEmpezar = await (async () => {
+      for (let intento = 1; intento <= 3; intento++) {
+        await sembrarSesion1510(page, { currentQuestion: 2, answers: { 1: 2, 2: 3 } });
+        await expect(aviso(page)).toContainText('con 2 de 10 respuestas');
+        await page.waitForTimeout(500);
+        await opcion(page, 1).tap();
+        const y = await alturaDeEmpezarTrasRecolocar(page);
+        const s = await centroA(page, botonSiguiente(page), y);
+        await page.evaluate(() => {
+          const w = window as unknown as { __clics3310: number[] };
+          w.__clics3310 = [];
+          window.addEventListener('click', (e) => w.__clics3310.push(e.timeStamp), true);
+        });
+        await page.touchscreen.tap(s.x, s.y);
+        await page.waitForTimeout(90);
+        await page.touchscreen.tap(s.x, s.y);
+        await page.waitForTimeout(500);
+        const clics = await page.evaluate(() => (window as unknown as { __clics3310: number[] }).__clics3310);
+        const hueco = clics.length >= 2 ? clics[1] - clics[0] : 0;
+        if (hueco >= 450 && intento < 3) continue;
+        if (hueco >= 450) {
+          problemas.push(`tres intentos sin un doble toque de menos de 450 ms (último: ${Math.round(hueco)} ms): la máquina va demasiado cargada para probarlo`);
+        } else if (await page.getByRole('button', { name: /Comenzar Test/ }).count()) {
+          problemas.push(`doble toque en «Siguiente» a ${Math.round(s.y)} px (${Math.round(hueco)} ms entre clics) → portada, sesión ${await page.evaluate((k) => sessionStorage.getItem(k), CLAVE_SESION_1510)}`);
+        }
+        return y;
+      }
+      throw new Error('inalcanzable');
+    })();
 
     // 2) Test recuperado y TERMINADO (C en las diez = 30): «Revisar» tocado a la altura del botón.
     await sembrarSesion1510(page, { currentQuestion: 9, answers: { 1: 3, 2: 3, 3: 3, 4: 3, 5: 3, 6: 3, 7: 3, 8: 3, 9: 3 } });
