@@ -2776,11 +2776,13 @@ function crearServidorDelegum(): McpServer {
       pension_causante: z.number().positive().optional().describe('Pensión mensual que cobraba el causante (€). Solo si estaba "jubilado" y falta base_reguladora_causante: se usa como aproximación, que solo coincide si cobraba el 100% de su base reguladora.'),
       tiene_cargas: z.boolean().optional().describe('¿El beneficiario convive con hijos menores de 26 años, mayores incapacitados o menores acogidos? Necesario para el 70% junto con renta_anual_unidad_familiar y miembros_unidad_familiar. Por defecto false.'),
       ingresos_mensuales_propios: z.number().min(0).optional().describe('Ingresos mensuales propios del beneficiario sin la pensión de viudedad: trabajo, capital y otras prestaciones (€, pagas extra prorrateadas). Determinan el acceso a los porcentajes del 60% y 70% y al complemento a mínimos.'),
+      ingresos_trabajo_mensuales: z.number().min(0).optional().describe('De ingresos_mensuales_propios, lo que procede de trabajo por cuenta ajena o propia (€/mes). El 60% (65 años o más) exige no percibir NINGUNO (DA 30.ª de la Ley 27/2011). Si se omite, todos los ingresos propios se toman como del trabajo y no se aplica el 60% si hay ingresos.'),
+      otra_pension_publica_mensual: z.number().min(0).optional().describe('De ingresos_mensuales_propios, otra pensión pública que cobre el beneficiario (€/mes, extras prorrateadas). Para el 60% solo es compatible si no excede del incremento sobre el 52%, que entonces se abona por la diferencia (DA 30.ª de la Ley 27/2011). Por defecto 0.'),
       renta_anual_unidad_familiar: z.number().min(0).optional().describe('Ingresos anuales de toda la unidad familiar, incluidos los del beneficiario y SIN la pensión de viudedad (€/año). Para el 70%, divididos entre los miembros no pueden pasar del 75% del SMI sin pagas extra (art. 31.2 del Decreto 3158/1966). Sin este dato no se aplica el 70%.'),
       miembros_unidad_familiar: z.number().int().min(1).max(20).optional().describe('Personas de la unidad familiar, incluido el beneficiario (al menos 2 para el 70%).'),
     },
     { title: 'Estima la pensión de viudedad (porcentaje, mínimos y pensión final)', readOnlyHint: true },
-    async ({ situacion_causante, edad_beneficiario, base_cotizacion_media, base_reguladora_causante, pension_causante, tiene_cargas, ingresos_mensuales_propios, renta_anual_unidad_familiar, miembros_unidad_familiar }, extra) => {
+    async ({ situacion_causante, edad_beneficiario, base_cotizacion_media, base_reguladora_causante, pension_causante, tiene_cargas, ingresos_mensuales_propios, ingresos_trabajo_mensuales, otra_pension_publica_mensual, renta_anual_unidad_familiar, miembros_unidad_familiar }, extra) => {
       await registrarUsoDelegum('calcular_pension_viudedad', getCaller(extra));
       try {
         const r = calcularPensionViudedad({
@@ -2791,6 +2793,8 @@ function crearServidorDelegum(): McpServer {
           pensionCausante: pension_causante,
           tieneCargas: tiene_cargas,
           ingresosMensualesPropios: ingresos_mensuales_propios,
+          ingresosTrabajoMensuales: ingresos_trabajo_mensuales,
+          otraPensionPublicaMensual: otra_pension_publica_mensual,
           rentaAnualUnidadFamiliar: renta_anual_unidad_familiar,
           miembrosUnidadFamiliar: miembros_unidad_familiar,
         });

@@ -3106,8 +3106,10 @@ test.describe('Golden — calcularPensionViudedad (Capa 1 · LGSS arts. 219-231)
     expect(pv.pensionNetaAprox).toBeCloseTo(891.43, 2);
   });
 
-  test('GOLDEN-CC: causante jubilado, pensión 1.800 €, beneficiario 67 años, ingresos < SMI → 60% [sin contraste oficial]', () => {
-    // BR = pensión del causante = 1.800 €. Edad ≥ 65 e ingresos (500) < SMI (1.221) → 60%.
+  test('GOLDEN-CC: causante jubilado, pensión 1.800 €, beneficiario 67 años, 500 €/mes de capital y ningún ingreso del trabajo → 60% [DA 30.ª Ley 27/2011]', () => {
+    // BR = pensión del causante = 1.800 €. Edad ≥ 65, sin ingresos del trabajo ni otra pensión
+    // pública, y demás rentas 500 × 12 = 6.000 ≤ 9.442 (límite de la mínima de viudedad) → 60%.
+    // Hasta el 10/11/2026 bastaba «ingresos < SMI» (cabo C0701).
     // Pensión bruta = 1.800 × 60% = 1.080 €. Mínimo (≥ 65, 2026) = 936,20 € → no se aplica.
     // Neto con el IRPF de la pensión sola (hallazgo 2815; antes, una retención fija del 8 % → 993,60):
     // 15.120 €/año − 2.000 − reducción art. 20 [7.302 − 1,75 × (15.120 − 14.852) = 6.833] = 6.287 €,
@@ -3118,6 +3120,7 @@ test.describe('Golden — calcularPensionViudedad (Capa 1 · LGSS arts. 219-231)
       edadBeneficiario: 67,
       tieneCargas: false,
       ingresosMensualesPropios: 500,
+      ingresosTrabajoMensuales: 0,
     });
     expect(pv.baseReguladora).toBeCloseTo(1800.00, 2);
     expect(pv.porcentajeAplicable).toBe(60);
@@ -3125,6 +3128,53 @@ test.describe('Golden — calcularPensionViudedad (Capa 1 · LGSS arts. 219-231)
     expect(pv.pensionMinima).toBeCloseTo(936.20, 2);
     expect(pv.pensionFinal).toBeCloseTo(1080.00, 2);
     expect(pv.pensionNetaAprox).toBeCloseTo(1080.00, 2);
+  });
+
+  // ── El 60 % de la DA 30.ª de la Ley 27/2011 (redacción del RDL 28/2018; cabo C0701, 10/11/2026) ──
+  // a) 65 años o más · b) sin otra pensión pública, salvo una que no exceda del incremento, que se
+  // abona por la diferencia · c) NINGÚN ingreso del trabajo · d) demás rentas ≤ 9.442 €/año.
+  const viudedad67 = (extra: { ingresos: number; trabajo?: number; otraPension?: number }) =>
+    calcularPensionViudedad({
+      situacionCausante: 'jubilado', pensionCausante: 1800, edadBeneficiario: 67, tieneCargas: false,
+      ingresosMensualesPropios: extra.ingresos, ingresosTrabajoMensuales: extra.trabajo,
+      otraPensionPublicaMensual: extra.otraPension,
+    });
+
+  test('GOLDEN-CC2: 67 años con 800 €/mes de nómina → 52 %, aunque sean menos que el SMI (caso del cabo C0701)', () => {
+    // El motor viejo daba aquí el 60 % (800 < 1.221). 1.800 × 52 % = 936,00.
+    const pv = viudedad67({ ingresos: 800, trabajo: 800 });
+    expect(pv.porcentajeAplicable).toBe(52);
+    expect(pv.pensionBruta).toBeCloseTo(936.00, 2);
+    expect(pv.razonPorcentaje).toContain('ningún ingreso del trabajo');
+  });
+
+  test('GOLDEN-CC3: sin desglosar los ingresos propios, se toman como del trabajo → 52 %; sin ingresos → 60 %', () => {
+    expect(viudedad67({ ingresos: 300 }).porcentajeAplicable).toBe(52);
+    expect(viudedad67({ ingresos: 300 }).razonPorcentaje).toContain('no consta qué parte');
+    expect(viudedad67({ ingresos: 0 }).porcentajeAplicable).toBe(60);
+  });
+
+  test('GOLDEN-CC4: demás rentas 10.200 €/año > 9.442 → 52 %', () => {
+    // 850 × 12 = 10.200 de capital, sin trabajo.
+    const pv = viudedad67({ ingresos: 850, trabajo: 0 });
+    expect(pv.porcentajeAplicable).toBe(52);
+    // Con cuatro cifras enteras no se agrupa (Ortografía de la RAE, 2010; como Intl en es-ES).
+    expect(pv.razonPorcentaje).toContain('9442,00');
+  });
+
+  test('GOLDEN-CC5: otra pensión pública que no excede del incremento → 60 %, con el incremento por la diferencia', () => {
+    // Incremento = 1.800 × 8 % = 144 × 14 = 2.016 €/año. Otra pensión 100 × 12 = 1.200 ≤ 2.016.
+    // Se abona la diferencia: (2.016 − 1.200) / 14 = 58,29 €/mes → 936,00 + 58,29 = 994,29.
+    const pv = viudedad67({ ingresos: 100, trabajo: 0, otraPension: 100 });
+    expect(pv.porcentajeAplicable).toBe(60);
+    expect(pv.pensionBruta).toBeCloseTo(994.29, 2);
+  });
+
+  test('GOLDEN-CC6: otra pensión pública que excede del incremento (2.400 > 2.016 €/año) → 52 %', () => {
+    const pv = viudedad67({ ingresos: 200, trabajo: 0, otraPension: 200 });
+    expect(pv.porcentajeAplicable).toBe(52);
+    expect(pv.pensionBruta).toBeCloseTo(936.00, 2);
+    expect(pv.razonPorcentaje).toContain('excede del incremento');
   });
 
   test('GOLDEN-CD: causante activo, BC media 1.200 €, 45 años con cargas → 70% pero se aplica el mínimo [sin contraste oficial]', () => {

@@ -198,6 +198,30 @@ test.describe('Estimador de pensión de viudedad — cálculo', () => {
     expect(await pensionFinal(page)).toBeCloseTo(936.2, 2);
   });
 
+  test('C0701 — ≥ 65 con 800 €/mes de nómina: 52 %, no 60 %, aunque sean menos que el SMI', async ({ page }) => {
+    // DA 30.ª de la Ley 27/2011 (redacción del RDL 28/2018), leída en el BOE el 10/11/2026: el 60 %
+    // exige «no percibir ingresos por la realización de trabajo por cuenta ajena o por cuenta
+    // propia» (ninguno) y que las demás rentas no pasen de 9.442 €/año. Hasta ese día la app daba el
+    // 60 % con ingresos < SMI (1.221 €/mes).
+    await abrir(page);
+    await rellenar(page, { pension: '1800', edad: '67', cargas: false, ingresos: '800' });
+    await sembrarValor(page, campo(page, 'De ellos, del trabajo por cuenta ajena o propia (€/mes)'), '800');
+    await calcular(page);
+    expect(normalizar(await panelResultado(page).innerText())).toContain('Porcentaje aplicado 52');
+    expect(await lineaDesglose(page, 'Pensión calculada')).toBeCloseTo(936, 2);
+
+    // Control: los mismos 800 €/mes, pero de capital (9.600 €/año > 9.442) → tampoco el 60 %;
+    // con 700 €/mes de capital (8.400 ≤ 9.442) sí: 1.800 × 60 % = 1.080,00.
+    await sembrarValor(page, campo(page, 'De ellos, del trabajo por cuenta ajena o propia (€/mes)'), '0');
+    await calcular(page);
+    expect(normalizar(await panelResultado(page).innerText())).toContain('Porcentaje aplicado 52');
+    await sembrarValor(page, campo(page, ROTULO.ingresos), '700');
+    await sembrarValor(page, campo(page, 'De ellos, del trabajo por cuenta ajena o propia (€/mes)'), '0');
+    await calcular(page);
+    expect(normalizar(await panelResultado(page).innerText())).toContain('Porcentaje aplicado 60');
+    expect(await lineaDesglose(page, 'Pensión calculada')).toBeCloseTo(1080, 2);
+  });
+
   test('CASO 3 — la máxima: 52 % de 7.000 = 3.640 se queda en 3.359,60 €/mes', async ({ page }) => {
     await abrir(page);
     await rellenar(page, { pension: '7000', edad: '45', ingresos: '0' });

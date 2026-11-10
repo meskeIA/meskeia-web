@@ -87,9 +87,23 @@ export interface ParametrosPensionViudedad {
   /**
    * Ingresos propios del beneficiario sin la pensión de viudedad: trabajo, capital y otras
    * prestaciones (€/mes, con las pagas extra prorrateadas: se anualizan × 12).
-   * Determinan el acceso a los porcentajes del 60 % y 70 % y al complemento a mínimos.
+   * Determinan el acceso a los porcentajes del 60 % y 70 % y al complemento a mínimos. Incluyen
+   * los del trabajo y otra pensión pública, que para el 60 % se detallan aparte (abajo).
    */
   ingresosMensualesPropios?: number;
+  /**
+   * De `ingresosMensualesPropios`, lo que procede de trabajo por cuenta ajena o propia (€/mes,
+   * extras prorrateadas). Solo cuenta para el 60 %, que exige no percibir NINGUNO (DA 30.ª de la
+   * Ley 27/2011, letra c). Sin el dato, todos los ingresos propios se toman como del trabajo: con
+   * ingresos el 60 % no se da, y la razón dice qué falta para darlo.
+   */
+  ingresosTrabajoMensuales?: number;
+  /**
+   * De `ingresosMensualesPropios`, otra pensión pública que cobre el beneficiario (€/mes, extras
+   * prorrateadas). Para el 60 %, solo es compatible si no excede del incremento sobre el 52 %, y
+   * entonces el incremento se abona por la diferencia (DA 30.ª, letra b). 0 o sin dato: ninguna.
+   */
+  otraPensionPublicaMensual?: number;
   /**
    * Renta anual de toda la unidad familiar, incluidos los ingresos del beneficiario y SIN la
    * pensión de viudedad (€/año). Solo cuenta con `tieneCargas`: sin ella no se puede comprobar
@@ -183,16 +197,49 @@ export function calcularPensionViudedad(p: ParametrosPensionViudedad): Resultado
   const tieneCargas = p.tieneCargas ?? false;
 
   // Sin el 70 %: el 60 % si se cumple, si no el 52 % general.
-  let porcentajeAplicable: number;
-  let razonPorcentaje: string;
-  if (edad >= 65 && ingresos < pv.smiMensual) {
-    porcentajeAplicable = pv.porcentaje60;
-    razonPorcentaje = `${pct(pv.porcentaje60)}: tiene 65 años o más e ingresos del trabajo inferiores al SMI (${eur(pv.smiMensual)}/mes)`;
-  } else {
-    porcentajeAplicable = pv.porcentajeGeneral;
-    razonPorcentaje = `Porcentaje general (${pct(pv.porcentajeGeneral)})`;
+  // ⚠️ 2026-11-10 (cabo C0701): el 60 % se daba con «65 años e ingresos < SMI». La DA 30.ª de la
+  //    Ley 27/2011 (BOE-A-2011-13242, redacción del RDL 28/2018), releída en el BOE ese día, pide
+  //    a) 65 años o más; b) no tener derecho a otra pensión pública, salvo una que no exceda del
+  //    incremento, que entonces «se abonará exclusivamente por la diferencia»; c) no percibir
+  //    ingresos por trabajo por cuenta ajena o propia (NINGUNO, no «menos del SMI»); d) que los
+  //    rendimientos o rentas «diferentes de los arriba señalados» no superen, en cómputo anual, el
+  //    límite de ingresos de la pensión mínima de viudedad: el del complemento a mínimos sin
+  //    cónyuge (art. 9.2 RD 241/2026). Con 800 €/mes de nómina daba el 60 % y la ley, el 52 %.
+  const trabajoMes = Math.min(ingresos, Math.max(0, p.ingresosTrabajoMensuales ?? ingresos));
+  const otraPensionMes = Math.min(ingresos - trabajoMes, Math.max(0, p.otraPensionPublicaMensual ?? 0));
+  const otrasRentasAnuales = r((ingresos - trabajoMes - otraPensionMes) * MESES);
+  const incremento60Anual = r(baseReguladora * (pv.porcentaje60 - pv.porcentajeGeneral) / 100) * PAGAS;
+  const otraPensionAnual = r(otraPensionMes * MESES);
+  const limite60 = COMPLEMENTO_MINIMOS_LIMITES_2026.sinConyuge;
+
+  let porcentajeAplicable: number = pv.porcentajeGeneral;
+  let razonPorcentaje = `Porcentaje general (${pct(pv.porcentajeGeneral)})`;
+  let pensionBruta = r(baseReguladora * pv.porcentajeGeneral / 100);
+  if (edad >= 65) {
+    let motivoSin60 = '';
+    if (trabajoMes > 0) {
+      motivoSin60 = p.ingresosTrabajoMensuales === undefined
+        ? `exige no percibir ningún ingreso del trabajo por cuenta ajena o propia, y no consta qué parte de tus ingresos propios (${eur(ingresos)}/mes) lo es`
+        : `exige no percibir ningún ingreso del trabajo por cuenta ajena o propia, y percibes ${eur(trabajoMes)}/mes`;
+    } else if (otraPensionAnual > incremento60Anual) {
+      motivoSin60 = `tu otra pensión pública (${eur(otraPensionAnual)}/año) excede del incremento del ${pct(pv.porcentaje60)} sobre el ${pct(pv.porcentajeGeneral)} (${eur(incremento60Anual)}/año), y solo es compatible con una que no lo exceda`;
+    } else if (otrasRentasAnuales > limite60) {
+      motivoSin60 = `tus demás rentas (${eur(otrasRentasAnuales)}/año) superan el límite de ingresos de la pensión mínima de viudedad (${eur(limite60)}/año)`;
+    }
+
+    if (motivoSin60) {
+      razonPorcentaje += `. Sin el ${pct(pv.porcentaje60)}: ${motivoSin60} (DA 30.ª de la Ley 27/2011)`;
+    } else {
+      porcentajeAplicable = pv.porcentaje60;
+      // El incremento se abona por la diferencia con la otra pensión, si la hay (letra b).
+      const incrementoMes = r((incremento60Anual - otraPensionAnual) / PAGAS);
+      pensionBruta = otraPensionAnual > 0
+        ? r(pensionBruta + incrementoMes)
+        : r(baseReguladora * pv.porcentaje60 / 100);
+      razonPorcentaje = `${pct(pv.porcentaje60)}: tienes 65 años o más, no percibes ingresos del trabajo y tus demás rentas no superan ${eur(limite60)}/año (DA 30.ª de la Ley 27/2011)`
+        + (otraPensionAnual > 0 ? `. Tu otra pensión pública no excede del incremento, que se abona por la diferencia: ${eur(incrementoMes)}/mes en vez de ${eur(r(incremento60Anual / PAGAS))}` : '');
+    }
   }
-  let pensionBruta = r(baseReguladora * porcentajeAplicable / 100);
   let recorte70 = 0;
 
   // ── 70 % (art. 31.2 y 31.3 del Decreto 3158/1966; cabecera) ──

@@ -34,6 +34,8 @@ interface FormData {
   edadBeneficiario: string;
   tieneCargas: boolean;          // Convive con hijos < 26, mayores incapacitados o menores acogidos
   ingresosTrabajoMes: string;    // Ingresos propios del beneficiario: trabajo, capital y prestaciones
+  ingresosDelTrabajoMes: string; // De ellos, del trabajo (solo para el 60 %); en blanco = no consta
+  otraPensionMes: string;        // De ellos, otra pensión pública (solo para el 60 %)
   rentaFamiliarAnual: string;    // Renta anual de la unidad familiar, sin la pensión de viudedad
   miembrosFamilia: string;       // Personas de la unidad familiar, incluido el beneficiario
   tipoVinculo: TipoVinculo;
@@ -86,6 +88,10 @@ function calcularPension(form: FormData): Resultado | null {
     edadBeneficiario: edad,
     tieneCargas: form.tieneCargas,
     ingresosMensualesPropios: leer(form.ingresosTrabajoMes),
+    // Para el 60 % (DA 30.ª Ley 27/2011, cabo C0701). En blanco, el motor toma todos los ingresos
+    // propios como del trabajo y lo dice en la razón del porcentaje.
+    ingresosTrabajoMensuales: form.ingresosDelTrabajoMes.trim() === '' ? undefined : leer(form.ingresosDelTrabajoMes),
+    otraPensionPublicaMensual: leer(form.otraPensionMes),
     // El 70 % mira la renta de la unidad familiar por miembro (art. 31.2 Decreto 3158/1966, cabo C0368).
     rentaAnualUnidadFamiliar: leer(form.rentaFamiliarAnual),
     miembrosUnidadFamiliar: leer(form.miembrosFamilia),
@@ -161,6 +167,8 @@ export default function EstimadorPensionViudedad() {
     edadBeneficiario: '67',
     tieneCargas: false,
     ingresosTrabajoMes: '0',
+    ingresosDelTrabajoMes: '',
+    otraPensionMes: '0',
     rentaFamiliarAnual: '0',
     miembrosFamilia: '2',
     tipoVinculo: 'matrimonio',
@@ -342,6 +350,26 @@ export default function EstimadorPensionViudedad() {
             helperText="Al mes, con las pagas extra prorrateadas y sin la pensión de viudedad. Deciden si se aplica el 60 % o el 70 % y si hay complemento a mínimos. Pon 0 si no tienes."
           />
 
+          {/* El 60 % exige no percibir NINGÚN ingreso del trabajo y limita la otra pensión (DA 30.ª Ley 27/2011, cabo C0701) */}
+          {form.edadBeneficiario === '67' && leer(form.ingresosTrabajoMes) > 0 && (
+            <>
+              <NumberInput
+                value={form.ingresosDelTrabajoMes}
+                onChange={v => update('ingresosDelTrabajoMes', v)}
+                label="De ellos, del trabajo por cuenta ajena o propia (€/mes)"
+                placeholder="0"
+                helperText={`Nómina o actividad como autónomo. El ${pct(60)} exige no percibir ninguno: con cualquier importe se aplica el ${pct(52)}.`}
+              />
+              <NumberInput
+                value={form.otraPensionMes}
+                onChange={v => update('otraPensionMes', v)}
+                label="De ellos, otra pensión pública (€/mes)"
+                placeholder="0"
+                helperText={`Jubilación, incapacidad u otra pensión pública que cobres. Para el ${pct(60)} no puede pasar del incremento del ${pct(52)} al ${pct(60)}, y ese incremento se cobra solo por la diferencia.`}
+              />
+            </>
+          )}
+
           {/* Unidad familiar: solo cuenta para el 70 % (art. 31.2 del Decreto 3158/1966) */}
           {form.tieneCargas && (
             <>
@@ -469,7 +497,7 @@ export default function EstimadorPensionViudedad() {
                 </div>
                 <div className={`${styles.refItem} ${resultado.porcentajeAplicable === 60 ? styles.refActivo : ''}`}>
                   <strong>60&nbsp;%</strong>
-                  <span>≥65 años + renta baja</span>
+                  <span>≥65 años, sin trabajo ni otra pensión</span>
                 </div>
                 <div className={`${styles.refItem} ${resultado.porcentajeAplicable === 70 ? styles.refActivo : ''}`}>
                   <strong>70&nbsp;%</strong>
@@ -492,7 +520,7 @@ export default function EstimadorPensionViudedad() {
         <h3>Los tres porcentajes</h3>
         <ul>
           <li><strong>52&nbsp;%</strong>: cuantía general, para la mayoría de los casos.</li>
-          <li><strong>60&nbsp;%</strong>: si el beneficiario tiene 65 o más años, no recibe otra pensión pública y sus ingresos por trabajo no superan el SMI anual.</li>
+          <li><strong>60&nbsp;%</strong>: si el beneficiario tiene 65 o más años, no percibe ningún ingreso del trabajo por cuenta ajena o propia, no tiene derecho a otra pensión pública (o la que cobra no pasa del incremento del 52&nbsp;% al 60&nbsp;%, que entonces se abona por la diferencia) y sus demás rentas no superan el límite de ingresos de la pensión mínima de viudedad ({formatCurrency(COMPLEMENTO_MINIMOS_LIMITES_2026.sinConyuge)} al año en 2026). Lo fija la disposición adicional 30.ª de la Ley 27/2011.</li>
           <li><strong>70&nbsp;%</strong>: exige tres cosas a la vez (art. 31.2 del Decreto 3158/1966). Cargas familiares: convivir con hijos menores de 26 años, mayores incapacitados o menores acogidos, y que los ingresos de toda la familia, divididos entre sus miembros, no pasen del 75&nbsp;% del SMI sin pagas extra ({formatCurrency(PV.limiteIngresos70 * 12)} al año por persona en 2026). Que la pensión sea la principal o única fuente de ingresos: al menos la mitad de lo que ingresa el viudo o la viuda. Y que sus ingresos anuales no pasen del límite del complemento a mínimos ({formatCurrency(COMPLEMENTO_MINIMOS_LIMITES_2026.sinConyuge)}) más la cuantía mínima de viudedad de su edad. Si la pensión al 70&nbsp;% más esos ingresos superan ese límite, la pensión se reduce hasta no superarlo (art. 31.3).</li>
         </ul>
         <h3>¿Cómo se calcula la base reguladora?</h3>
@@ -519,7 +547,7 @@ export default function EstimadorPensionViudedad() {
             <tbody>
               <tr><td>General (sin cargas familiares)</td><td>52&nbsp;%</td><td>Cualquier circunstancia</td><td>Vitalicia</td></tr>
               <tr><td>Con hijos menores de 26, incapacitados o acogidos</td><td>70&nbsp;%</td><td>Cargas familiares, la pensión como ingreso principal y rentas bajo el límite</td><td>Mientras dure la situación</td></tr>
-              <tr><td>Mayor de 65 años sin otras rentas</td><td>60&nbsp;%</td><td>Ingresos &lt; límite legal (anual)</td><td>Vitalicia</td></tr>
+              <tr><td>Mayor de 65 años sin otras rentas</td><td>60&nbsp;%</td><td>Ningún ingreso del trabajo, sin otra pensión pública y demás rentas bajo el límite anual</td><td>Vitalicia</td></tr>
               <tr><td>Pareja de hecho reconocida</td><td>52&nbsp;%</td><td>5 años de convivencia (salvo hijos en común) + inscripción 2 años antes</td><td>Vitalicia</td></tr>
               <tr><td>Ex cónyuge divorciado/separado</td><td>Proporcional</td><td>Pensión compensatoria activa</td><td>Según pensión compensatoria</td></tr>
             </tbody>

@@ -449,7 +449,8 @@ export const PENSION_VIUDEDAD_2026 = {
   // (compatible con una que no exceda del incremento, que se abona por la diferencia); c) «No
   // percibir ingresos por la realización de trabajo por cuenta ajena o por cuenta propia»; d) que
   // las demás rentas no superen el límite de ingresos de la pensión mínima de viudedad. NO es
-  // «rentas < SMI», que es lo que aplica hoy el motor: cabo C0701, para /reparar.
+  // «rentas < SMI», que es lo que aplicaba el motor hasta el 10/11/2026 (cabo C0701): ahora
+  // lib/calculadoras/pensionViudedad.ts aplica los cuatro con COMPLEMENTO_MINIMOS_LIMITES_2026.
   porcentajeGeneral:       52,   // % — Caso general
   porcentaje60:            60,   // % — ≥65, sin otra pensión pública, sin ingresos del trabajo y demás rentas ≤ límite de la mínima de viudedad (DA 30.ª Ley 27/2011)
   porcentaje70:            70,   // % — art. 31.2-31.3: cargas (renta familiar por miembro ≤ 75 % SMI), pensión ingreso principal y rentas bajo límite (motor: lib/calculadoras/pensionViudedad.ts)
