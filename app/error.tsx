@@ -127,10 +127,10 @@ export default function GlobalError({
           color: 'var(--text-muted)',
         }}>
           Si el problema persiste, por favor{' '}
+          {/* Hasta el 10/11/2026 iba a github.com/meskeia/feedback/issues, un repositorio que no
+              existe (404; cabo C0702): el canal de verdad es el formulario de contacto. */}
           <a
-            href="https://github.com/meskeia/feedback/issues"
-            target="_blank"
-            rel="noopener noreferrer"
+            href="/contacto/"
             style={{
               color: 'var(--primary-texto)',
               textDecoration: 'underline',

@@ -236,7 +236,7 @@ export default function OrientadorFacturacionRetencionPage() {
             normativa="IRPF 2025 — Retenciones profesionales"
             fuente="Real Decreto 439/2007 (RIRPF), arts. 95-101 + LPGE 2025"
             verificado="2025-01-01"
-            urlOficial="https://www.agenciatributaria.es/AEAT.internet/Inicio/Ayuda/Modelos__Procedimientos_y_Servicios/Ayuda_Modelo_111/Informacion_general/Retenciones_e_ingresos_a_cuenta/Rendimientos_del_trabajo_y_de_actividades_economicas/Retenciones_e_ingresos_a_cuenta/Rendimientos_del_trabajo_y_de_actividades_economicas.shtml"
+            urlOficial="https://sede.agenciatributaria.gob.es/Sede/procedimientoini/GH01.shtml"
           />
 
           {/* Selector de perfil */}

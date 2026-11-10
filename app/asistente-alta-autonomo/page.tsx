@@ -138,7 +138,9 @@ const CHECKLIST_ITEMS: Omit<ChecklistItem, 'completado'>[] = [
     texto: 'Decidir actividad y buscar epígrafe IAE',
     descripcion: 'Busca en la lista de epígrafes IAE el que mejor describe tu actividad. Es importante elegir bien porque determina obligaciones fiscales.',
     obligatorio: true,
-    enlaceUtil: { texto: 'Buscador epígrafes IAE', url: 'https://www.agenciatributaria.es/AEAT.internet/Inicio/Ayuda/Modelos__Procedimientos_y_Servicios/Ayuda_Modelo_036_702/Informacion/Consulta_de_los_Epigrafes_IAE/Consulta_de_los_Epigrafes_IAE.shtml' },
+    // La consulta de epígrafes de la web antigua de la AEAT da 404 (cabo C0702, 10/11/2026): la
+    // lista oficial de epígrafes es el anexo I del RD Legislativo 1175/1990, consolidado en el BOE.
+    enlaceUtil: { texto: 'Tarifas del IAE con todos sus epígrafes (BOE)', url: 'https://www.boe.es/buscar/act.php?id=BOE-A-1990-23930' },
   },
   {
     id: 'certificado-digital',
