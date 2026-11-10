@@ -444,6 +444,27 @@
   line-height: 1.6;
 }
 
+/* Rótulos de los SVG (cabo C0297, 10/11/2026). Los de cada régimen van sobre una placa opaca del
+   color de la tarjeta: debajo hay un degradado radial que en oscuro los dejaba a 1,01-2,61:1 y
+   sobre cuyo centro ningún tono llega a 4,5. Tono de texto por régimen y tema: 5,2-7,9:1 en claro
+   y 6,3-9,6:1 en oscuro. Ejes en --text-muted y la tipología aristotélica en --text-secondary
+   (#999, #888 y #666 daban 2,26-3,83:1) */
+.svgPlaca { fill: var(--bg-card); }
+.svgEje { fill: var(--text-muted); }
+.svgTextoSec { fill: var(--text-secondary); }
+.svgAzul { fill: #1B5E7E; }
+.svgTeal { fill: #2C7873; }
+.svgAzulGris { fill: #2F5F82; }
+.svgAmbar { fill: #92400E; }
+.svgRojo { fill: #991B1B; }
+.svgGranate { fill: #7F1D1D; }
+[data-theme='dark'] .svgAzul { fill: #9CCFE6; }
+[data-theme='dark'] .svgTeal { fill: #7FD1CB; }
+[data-theme='dark'] .svgAzulGris { fill: #A9C9E3; }
+[data-theme='dark'] .svgAmbar { fill: #F5B97A; }
+[data-theme='dark'] .svgRojo { fill: #FCA5A5; }
+[data-theme='dark'] .svgGranate { fill: #F5A59B; }
+
 /* ─── Dark mode ─────────────────────────────────── */
 [data-theme='dark'] .container {
   background: var(--bg-primary);
@@ -492,8 +513,10 @@
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
 }
 
+/* Tinte al 5 % y no al 10: con él, «Mecanismo político» en --primary-texto daba 4,40:1 (receta de
+   C0278: se cambia el fondo, no el texto) */
 [data-theme='dark'] .transicionMecanismo {
-  background: rgba(46, 134, 171, 0.1);
+  background: rgba(46, 134, 171, 0.05);
 }
 
 [data-theme='dark'] .eduCard {

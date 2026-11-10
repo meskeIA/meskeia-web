@@ -325,6 +325,39 @@ const calcularAreasApiladas = (
   return areas;
 };
 
+interface RotuloRegimenProps {
+  x: number;
+  y: number;
+  lineas: string[];
+  anchor: 'start' | 'middle';
+  clase: string;
+  size: number;
+  negrita?: boolean;
+}
+
+/**
+ * Rótulo de un régimen del espectro sobre una placa opaca del color de la tarjeta (cabo C0297,
+ * 10/11/2026): debajo hay un degradado radial cuyo centro no deja leer ningún tono, en oscuro
+ * sobre todo (1,01-2,61:1). La placa se estima por el número de letras, con holgura.
+ */
+function RotuloRegimen({ x, y, lineas, anchor, clase, size, negrita }: RotuloRegimenProps) {
+  const salto = size + 2;
+  const ancho = Math.max(...lineas.map((l) => l.length)) * size * 0.62 + 8;
+  const x0 = anchor === 'middle' ? x - ancho / 2 : x - 4;
+  const y0 = y - size - 2;
+  const alto = (lineas.length - 1) * salto + size + 6;
+  return (
+    <g>
+      <rect x={x0} y={y0} width={ancho} height={alto} rx="3" className={styles.svgPlaca} />
+      {lineas.map((l, i) => (
+        <text key={i} x={x} y={y + i * salto} textAnchor={anchor} fontSize={size} fontWeight={negrita ? 700 : undefined} className={clase}>
+          {l}
+        </text>
+      ))}
+    </g>
+  );
+}
+
 // ─────────────────────────────────────────────
 // Componente principal
 // ─────────────────────────────────────────────
@@ -501,50 +534,42 @@ export default function VisualizadorRegimenesPoliticos() {
             {/* Ejes */}
             {/* Eje X: concentración (horizontal) */}
             <line x1="60" y1="180" x2="560" y2="180" stroke="#ccc" strokeWidth="1.5" />
-            <text x="60" y="175" fontSize="11" fill="#999" textAnchor="start">← Poder distribuido</text>
-            <text x="560" y="175" fontSize="11" fill="#999" textAnchor="end">Poder concentrado →</text>
+            <text x="60" y="175" fontSize="11" className={styles.svgEje} textAnchor="start">← Poder distribuido</text>
+            <text x="560" y="175" fontSize="11" className={styles.svgEje} textAnchor="end">Poder concentrado →</text>
 
             {/* Eje Y: legitimidad (vertical) */}
             <line x1="310" y1="30" x2="310" y2="330" stroke="#ccc" strokeWidth="1.5" />
-            <text x="312" y="42" fontSize="11" fill="#999" textAnchor="start">Legitimidad electoral ↑</text>
-            <text x="312" y="325" fontSize="11" fill="#999" textAnchor="start">↓ Imposición/tradición/ideología</text>
+            <text x="312" y="42" fontSize="11" className={styles.svgEje} textAnchor="start">Legitimidad electoral ↑</text>
+            <text x="312" y="325" fontSize="11" className={styles.svgEje} textAnchor="start">↓ Imposición/tradición/ideología</text>
 
-            {/* Zonas difusas para cada tipo */}
+            {/* Zonas difusas para cada tipo; los rótulos, después y sobre su placa */}
             {/* Democracia liberal: distribuido + electoral */}
             <ellipse cx="155" cy="80" rx="90" ry="55" fill="url(#gradDemLib)" />
-            <text x="155" y="68" textAnchor="middle" fontSize="10" fontWeight="700" fill="#2E86AB">Democracia</text>
-            <text x="155" y="80" textAnchor="middle" fontSize="10" fontWeight="700" fill="#2E86AB">liberal</text>
-
             {/* República constitucional: distribuido-centro + electoral */}
             <ellipse cx="210" cy="100" rx="80" ry="50" fill="url(#gradRepConst)" />
-            <text x="270" y="92" textAnchor="start" fontSize="9" fill="#2c7873">República</text>
-            <text x="270" y="103" textAnchor="start" fontSize="9" fill="#2c7873">constitucional</text>
-
             {/* Monarquía constitucional: distribuido-centro + mixto */}
             <ellipse cx="200" cy="145" rx="80" ry="48" fill="url(#gradMonConst)" />
-            <text x="82" y="152" textAnchor="start" fontSize="9" fill="#4a7fa5">Monarquía</text>
-            <text x="82" y="163" textAnchor="start" fontSize="9" fill="#4a7fa5">constitucional</text>
-
             {/* Autocracia electoral: centro-concentrado + parcialmente electoral */}
             <ellipse cx="390" cy="130" rx="85" ry="52" fill="url(#gradAutocr)" />
-            <text x="390" y="120" textAnchor="middle" fontSize="9" fill="#92400e">Autocracia</text>
-            <text x="390" y="131" textAnchor="middle" fontSize="9" fill="#92400e">electoral</text>
-
             {/* Autoritarismo: concentrado + imposición */}
             <ellipse cx="450" cy="230" rx="80" ry="55" fill="url(#gradAutorit)" />
-            <text x="450" y="223" textAnchor="middle" fontSize="9" fill="#991b1b">Autoritarismo</text>
-
             {/* Totalitarismo: muy concentrado + ideología */}
             <ellipse cx="495" cy="295" rx="68" ry="42" fill="url(#gradTotal)" />
-            <text x="495" y="291" textAnchor="middle" fontSize="9" fill="#7f1d1d">Totalitarismo</text>
+
+            <RotuloRegimen x={155} y={68} lineas={['Democracia', 'liberal']} anchor="middle" clase={styles.svgAzul} size={10} negrita />
+            <RotuloRegimen x={270} y={92} lineas={['República', 'constitucional']} anchor="start" clase={styles.svgTeal} size={9} />
+            <RotuloRegimen x={82} y={152} lineas={['Monarquía', 'constitucional']} anchor="start" clase={styles.svgAzulGris} size={9} />
+            <RotuloRegimen x={390} y={120} lineas={['Autocracia', 'electoral']} anchor="middle" clase={styles.svgAmbar} size={9} />
+            <RotuloRegimen x={450} y={223} lineas={['Autoritarismo']} anchor="middle" clase={styles.svgRojo} size={9} />
+            <RotuloRegimen x={495} y={291} lineas={['Totalitarismo']} anchor="middle" clase={styles.svgGranate} size={9} />
 
             {/* Conexión aristotélica */}
             <rect x="62" y="240" width="205" height="78" rx="8" fill="rgba(46,134,171,0.05)" stroke="rgba(46,134,171,0.2)" strokeWidth="1" />
-            <text x="70" y="254" fontSize="9" fill="#2E86AB" fontWeight="700">Tipología aristotélica:</text>
-            <text x="70" y="266" fontSize="8.5" fill="#666">Monarquía → Aristocracia → Politeia</text>
-            <text x="70" y="278" fontSize="8.5" fill="#666">(formas rectas: bien común)</text>
-            <text x="70" y="290" fontSize="8.5" fill="#666">Tiranía → Oligarquía → Demagogia</text>
-            <text x="70" y="302" fontSize="8.5" fill="#666">(formas desviadas: interés propio)</text>
+            <text x="70" y="254" fontSize="9" className={styles.svgAzul} fontWeight="700">Tipología aristotélica:</text>
+            <text x="70" y="266" fontSize="8.5" className={styles.svgTextoSec}>Monarquía → Aristocracia → Politeia</text>
+            <text x="70" y="278" fontSize="8.5" className={styles.svgTextoSec}>(formas rectas: bien común)</text>
+            <text x="70" y="290" fontSize="8.5" className={styles.svgTextoSec}>Tiranía → Oligarquía → Demagogia</text>
+            <text x="70" y="302" fontSize="8.5" className={styles.svgTextoSec}>(formas desviadas: interés propio)</text>
           </svg>
         </div>
 
@@ -590,7 +615,7 @@ export default function VisualizadorRegimenesPoliticos() {
                   strokeWidth="0.8"
                   strokeDasharray="3 3"
                 />
-                <text x={PAD_L - 4} y={yPos(pct) + 4} fontSize="8.5" fill="#999" textAnchor="end">
+                <text x={PAD_L - 4} y={yPos(pct) + 4} fontSize="8.5" className={styles.svgEje} textAnchor="end">
                   {pct}%
                 </text>
               </g>
@@ -603,7 +628,7 @@ export default function VisualizadorRegimenesPoliticos() {
                 x={xPos(i)}
                 y={SVG_H - PAD_B + 14}
                 fontSize="8.5"
-                fill="#888"
+                className={styles.svgEje}
                 textAnchor="middle"
               >
                 {p}

@@ -184,6 +184,11 @@ const APPS: App[] = [
   // CÁTODO 3,96) y sobre la tarjeta («H₂ (comb.)» 3,31, «⚡ e⁻» 3,61), el rojo sobre el círculo
   // blanco del motor (3,73) y el gris de --text-muted sobre los tintes (3,99-4,20)
   { slug: 'visualizador-hidrogeno', subestados: 'button[aria-pressed]' },
+  // Del censo del 10/11/2026 (C0297): los rótulos de cada régimen sobre el centro de su degradado
+  // radial (en oscuro: Autocracia 1,07:1, Autoritarismo 1,01, Totalitarismo 1,16, Democracia liberal
+  // 1,84-2,29; en claro la marca 2,23-2,81 y Monarquía 4,28), los ejes en #999 y #888 (2,82-3,83) y
+  // la tipología aristotélica en #666 sobre su tinte en oscuro (2,26)
+  { slug: 'visualizador-regimenes-politicos' },
 ];
 
 interface TextoSvg {

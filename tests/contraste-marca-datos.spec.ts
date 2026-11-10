@@ -123,6 +123,9 @@ const APPS: App[] = [
   // rojo puros (2,28 y 3,76), el blanco sobre la insignia verde (2,28) y, en oscuro, el texto claro
   // del tema sobre el botón activo de la densidad (4,46)
   { slug: 'visualizador-hidrogeno', todo: true, secciones: 'button[aria-pressed]' },
+  // Del censo de C0297 (10/11/2026): «Mecanismo político» en --primary-texto sobre el tinte de marca
+  // al 10 % en oscuro (4,40:1)
+  { slug: 'visualizador-regimenes-politicos', todo: true },
 ];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {
