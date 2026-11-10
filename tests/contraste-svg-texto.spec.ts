@@ -230,6 +230,12 @@ const APPS: App[] = [
     extremos: true,
     subestados: 'button[aria-pressed]',
   },
+  // Del censo del 10/11/2026 (C0297): las letras de los aminoácidos y las subunidades en el color de
+  // su círculo sobre su propio tinte (el amarillo 1,54:1, el teal 2,45, el verde 2,46, el naranja
+  // 2,49, la marca 3,47 en claro), los rótulos de la terciaria sobre sus tintes (2,25-3,49), los
+  // grises #999 y #888 (2,82-3,24) y, en el embudo, «cadena desplegada», «intermedios» y «nativa»
+  // sobre el degradado (2,19-2,58). Las cuatro pestañas de estructura
+  { slug: 'visualizador-proteinas-plegamiento', secciones: "[role='tab']", extremos: true },
 ];
 
 interface TextoSvg {

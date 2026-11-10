@@ -88,6 +88,22 @@
 [data-theme='dark'] .svgFull text,
 [data-theme='dark'] .svgMed text { fill: var(--text-primary); }
 
+/* Tono de TEXTO de cada color de dato en claro (cabo C0297, 10/11/2026): con el color puro sobre su
+   tinte, el amarillo F1C40F daba 1,54:1, el teal 2,25-2,78, el verde 2,46, el naranja 2,19-2,49, la
+   marca 2,58-4,07 y el rojo 2,27-3,79, y los grises #999 y #888 2,82-3,24. En oscuro manda la regla
+   de arriba (--text-primary), que pesa más que estas clases */
+.tAzul { fill: #1F5F7A; }
+.tTeal { fill: #1F6F6C; }
+.tVerde { fill: #1B5E20; }
+.tNaranja { fill: #9A4A12; }
+.tVioleta { fill: #6C3483; }
+.tRojo { fill: #991B1B; }
+.tAmarillo { fill: #7A5A00; }
+.tGris { fill: var(--text-secondary); }
+
+/* Placa bajo los rótulos que caen dentro del degradado del embudo */
+.placa { fill: var(--bg-card); }
+
 /* ─── Funnel ─── */
 .funnelContainer {
   display: grid; grid-template-columns: 1fr 1fr; gap: var(--spacing-xl);

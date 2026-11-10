@@ -12,6 +12,21 @@ import {
   ShareCard,
 } from '@/components';
 
+/**
+ * Tono de TEXTO de cada color de dato de los diagramas, por tema (cabo C0297, 10/11/2026): el color
+ * puro se queda en trazos y rellenos, y el rótulo toma la clase del módulo con su variante oscura.
+ */
+const TONO: Record<string, string> = {
+  '#2E86AB': 'tAzul',
+  '#48A9A6': 'tTeal',
+  '#27AE60': 'tVerde',
+  '#E67E22': 'tNaranja',
+  '#9B59B6': 'tVioleta',
+  '#E74C3C': 'tRojo',
+  '#F1C40F': 'tAmarillo',
+};
+const tono = (color: string): string => styles[TONO[color] ?? 'tGris'];
+
 // ─────────────────────────────────────────────
 // Tipos
 // ─────────────────────────────────────────────
@@ -165,11 +180,11 @@ function SvgEstructuraPrimaria() {
           <g key={aa + i}>
             {i > 0 && <line x1={cx - 16} y1={40} x2={cx - 6} y2={40} stroke="#ccc" strokeWidth="2" />}
             <circle cx={cx} cy={40} r={18} fill={colores[i]} fillOpacity="0.15" stroke={colores[i]} strokeWidth="2" />
-            <text x={cx} y={45} textAnchor="middle" fontSize="13" fontWeight="700" fill={colores[i]}>{aa}</text>
+            <text x={cx} y={45} textAnchor="middle" fontSize="13" fontWeight="700" className={tono(colores[i])}>{aa}</text>
           </g>
         );
       })}
-      <text x={220} y={72} textAnchor="middle" fontSize="10" fill="#999">N-terminal → ... → C-terminal</text>
+      <text x={220} y={72} textAnchor="middle" fontSize="10" className={styles.tGris}>N-terminal → ... → C-terminal</text>
     </svg>
   );
 }
@@ -189,7 +204,7 @@ function SvgEstructuraSecundaria() {
   return (
     <svg viewBox="0 0 440 140" className={styles.svgFull} aria-label="Estructura secundaria: hélice alfa y lámina beta">
       {/* Etiqueta hélice alfa */}
-      <text x={95} y={14} textAnchor="middle" fontSize="11" fontWeight="700" fill="#2E86AB">Hélice Alfa (α)</text>
+      <text x={95} y={14} textAnchor="middle" fontSize="11" fontWeight="700" className={styles.tAzul}>Hélice Alfa (α)</text>
       {/* Hélice alfa */}
       <polyline points={helicePuntos} fill="none" stroke="#2E86AB" strokeWidth="3" strokeLinecap="round" />
       {/* Puentes H en hélice */}
@@ -201,7 +216,7 @@ function SvgEstructuraSecundaria() {
       <line x1={220} y1={10} x2={220} y2={130} stroke="#E5E5E5" strokeWidth="1" />
 
       {/* Etiqueta lámina beta */}
-      <text x={330} y={14} textAnchor="middle" fontSize="11" fontWeight="700" fill="#48A9A6">Lámina Beta (β)</text>
+      <text x={330} y={14} textAnchor="middle" fontSize="11" fontWeight="700" className={styles.tTeal}>Lámina Beta (β)</text>
 
       {/* Láminas beta: 3 cadenas paralelas con flechas */}
       {[0, 1, 2].map(row => {
@@ -219,7 +234,7 @@ function SvgEstructuraSecundaria() {
           </g>
         );
       })}
-      <text x={330} y={128} textAnchor="middle" fontSize="9" fill="#999">--- puentes de hidrógeno</text>
+      <text x={330} y={128} textAnchor="middle" fontSize="9" className={styles.tGris}>--- puentes de hidrógeno</text>
     </svg>
   );
 }
@@ -235,21 +250,21 @@ function SvgEstructuraTerciaria() {
       <ellipse cx={150} cy={100} rx={110} ry={80} fill="#2E86AB" fillOpacity="0.08" stroke="#2E86AB" strokeWidth="2" />
       {/* Hélices (rojo) */}
       <ellipse cx={110} cy={75} rx={35} ry={18} fill="#E74C3C" fillOpacity="0.25" stroke="#E74C3C" strokeWidth="1.5" />
-      <text x={110} y={79} textAnchor="middle" fontSize="9" fill="#E74C3C" fontWeight="600">hélices α</text>
+      <text x={110} y={79} textAnchor="middle" fontSize="9" className={styles.tRojo} fontWeight="600">hélices α</text>
       {/* Láminas (amarillo) */}
       <rect x={155} y={58} width={60} height={22} rx={4} fill="#F1C40F" fillOpacity="0.3" stroke="#F1C40F" strokeWidth="1.5" />
-      <text x={185} y={73} textAnchor="middle" fontSize="9" fill="#B7950B" fontWeight="600">láminas β</text>
+      <text x={185} y={73} textAnchor="middle" fontSize="9" className={styles.tAmarillo} fontWeight="600">láminas β</text>
       {/* Loops (gris) */}
       <path d="M 90 115 Q 150 145 210 115" fill="none" stroke="#999" strokeWidth="2.5" strokeLinecap="round" />
-      <text x={150} y={148} textAnchor="middle" fontSize="9" fill="#888">loops</text>
+      <text x={150} y={148} textAnchor="middle" fontSize="9" className={styles.tGris}>loops</text>
       {/* Interior hidrofóbico */}
       <ellipse cx={150} cy={95} rx={28} ry={20} fill="#48A9A6" fillOpacity="0.15" stroke="#48A9A6" strokeWidth="1" strokeDasharray="4,2" />
-      <text x={150} y={99} textAnchor="middle" fontSize="8" fill="#48A9A6">interior</text>
-      <text x={150} y={110} textAnchor="middle" fontSize="7" fill="#48A9A6">hidrofóbico</text>
+      <text x={150} y={99} textAnchor="middle" fontSize="8" className={styles.tTeal}>interior</text>
+      <text x={150} y={110} textAnchor="middle" fontSize="7" className={styles.tTeal}>hidrofóbico</text>
       {/* Sitio activo */}
       <circle cx={195} cy={130} r={12} fill="#E74C3C" fillOpacity="0.2" stroke="#E74C3C" strokeWidth="2" />
-      <text x={195} y={134} textAnchor="middle" fontSize="8" fill="#E74C3C" fontWeight="700">SA</text>
-      <text x={195} y={158} textAnchor="middle" fontSize="9" fill="#E74C3C">sitio activo</text>
+      <text x={195} y={134} textAnchor="middle" fontSize="8" className={styles.tRojo} fontWeight="700">SA</text>
+      <text x={195} y={158} textAnchor="middle" fontSize="9" className={styles.tRojo}>sitio activo</text>
     </svg>
   );
 }
@@ -278,11 +293,11 @@ function SvgEstructuraCuaternaria() {
       {subunidades.map(s => (
         <g key={s.label}>
           <ellipse cx={s.cx} cy={s.cy} rx={38} ry={28} fill={s.color} fillOpacity="0.15" stroke={s.color} strokeWidth="2" />
-          <text x={s.cx} y={s.cy + 5} textAnchor="middle" fontSize="13" fontWeight="700" fill={s.color}>{s.label}</text>
+          <text x={s.cx} y={s.cy + 5} textAnchor="middle" fontSize="13" fontWeight="700" className={tono(s.color)}>{s.label}</text>
         </g>
       ))}
 
-      <text x={150} y={185} textAnchor="middle" fontSize="10" fill="#666">Hemoglobina (2α + 2β) — efecto alostérico</text>
+      <text x={150} y={185} textAnchor="middle" fontSize="10" className={styles.tGris}>Hemoglobina (2α + 2β) — efecto alostérico</text>
     </svg>
   );
 }
@@ -319,26 +334,30 @@ function SvgFunnelEnergetico() {
 
       {/* Eje Y */}
       <line x1={8} y1={15} x2={8} y2={250} stroke="#999" strokeWidth="1.5" />
-      <text x={6} y={13} textAnchor="middle" fontSize="9" fill="#999">↑</text>
-      <text x={6} y={25} fontSize="8" fill="#999" transform="rotate(-90,6,50)" textAnchor="middle">Energía libre</text>
+      <text x={6} y={13} textAnchor="middle" fontSize="9" className={styles.tGris}>↑</text>
+      <text x={6} y={25} fontSize="8" className={styles.tGris} transform="rotate(-90,6,50)" textAnchor="middle">Energía libre</text>
 
       {/* Etiquetas */}
-      <text x={170} y={15} textAnchor="middle" fontSize="9" fill="#E74C3C" fontWeight="600">muchas conformaciones — alta energía</text>
-      <text x={170} y={258} textAnchor="middle" fontSize="9" fill="#2E86AB" fontWeight="600">estructura nativa — mínimo energético</text>
+      <text x={170} y={15} textAnchor="middle" fontSize="9" className={styles.tRojo} fontWeight="600">muchas conformaciones — alta energía</text>
+      <text x={170} y={258} textAnchor="middle" fontSize="9" className={styles.tAzul} fontWeight="600">estructura nativa — mínimo energético</text>
 
-      {/* Puntos en el funnel */}
+      {/* Puntos en el funnel. Los rótulos de dentro van sobre una placa del color de la
+          tarjeta: el degradado cambia de rojo a naranja y azul bajo cada uno (cabo C0297) */}
       <circle cx={80} cy={50} r={5} fill="#E74C3C" />
-      <text x={88} y={54} fontSize="9" fill="#E74C3C">cadena desplegada</text>
+      <rect x={86} y={45} width={80} height={12} rx={3} className={styles.placa} />
+      <text x={88} y={54} fontSize="9" className={styles.tRojo}>cadena desplegada</text>
 
       <circle cx={200} cy={50} r={5} fill="#E74C3C" />
 
       <circle cx={130} cy={135} r={5} fill="#F39C12" />
-      <text x={138} y={139} fontSize="9" fill="#E67E22">intermedios</text>
+      <rect x={136} y={130} width={52} height={12} rx={3} className={styles.placa} />
+      <text x={138} y={139} fontSize="9" className={styles.tNaranja}>intermedios</text>
 
       <circle cx={200} cy={135} r={5} fill="#F39C12" />
 
       <circle cx={170} cy={230} r={6} fill="#2E86AB" />
-      <text x={178} y={234} fontSize="9" fill="#2E86AB" fontWeight="600">nativa</text>
+      <rect x={176} y={225} width={34} height={12} rx={3} className={styles.placa} />
+      <text x={178} y={234} fontSize="9" className={styles.tAzul} fontWeight="600">nativa</text>
 
       {/* Partículas en la superficie */}
       {[50, 100, 150, 240, 290].map((x, i) => (
