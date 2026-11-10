@@ -36,6 +36,31 @@
 .svgZona { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); overflow-x: auto; }
 .diagramaSvg { width: 100%; height: auto; display: block; }
 
+/* Tono de TEXTO de cada color de dato por tema (cabos C0297 y C0645, 10/11/2026): los rótulos de
+   los cinco diagramas y los títulos de las tarjetas iban en el color puro del dato, igual en los
+   dos temas (verde 2,46-2,87:1 y rojo 3,18-3,82 en claro; violetas 1,15-2,45 en oscuro). El color
+   puro se queda en trazos, recuadros y flechas. Medidos contra la tarjeta y el tinte más denso de
+   cada color: 4,9-6,5:1 en claro y 5,0-8,1 en oscuro */
+.container {
+  --ap-verde: #17663A;
+  --ap-rojo: #922B21;
+  --ap-violeta: #5B2C6F;
+  --ap-azul: #1F5F80;
+  --ap-teal: #2A6E6B;
+  --ap-naranja: #8A5A00;
+  --ap-azulgris: #3D6380;
+}
+
+[data-theme='dark'] .container {
+  --ap-verde: #58D68D;
+  --ap-rojo: #F5A59B;
+  --ap-violeta: #D2B4DE;
+  --ap-azul: #85C1E9;
+  --ap-teal: #76D7C4;
+  --ap-naranja: #F5B041;
+  --ap-azulgris: #A9C6DE;
+}
+
 /* Leyenda de vías SVG */
 .svgLeyenda { display: flex; gap: var(--spacing-sm); flex-wrap: wrap; margin-bottom: var(--spacing-md); }
 .svgLeyendaBtn { padding: 0.4rem 1rem; border-radius: 20px; border: 2px solid; background: var(--bg-card); cursor: pointer; font-size: 0.82rem; font-weight: 600; transition: all 0.2s; color: var(--text-primary); }

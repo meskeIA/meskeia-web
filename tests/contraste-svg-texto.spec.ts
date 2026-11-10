@@ -146,6 +146,16 @@ const APPS: App[] = [
     extremos: true,
     subestados: "section[aria-label] button[aria-pressed]",
   },
+  // Del censo del 08/11/2026 (C0297), reparada el 10/11/2026: los rótulos de sus cinco diagramas en
+  // el color puro de su dato (verde 2,46-2,87:1 y rojo 3,18-3,82 en claro sobre su tinte; violetas
+  // 1,15-2,45 en oscuro), el blanco sobre la kinesina, el ovillo y el núcleo del cuerpo de Lewy
+  // translúcidos (2,17-4,34) y la marca sobre el soma (2,49). Las dos enfermedades, y la vía
+  // elegida y el estado del circuito como subestados
+  {
+    slug: 'visualizador-alzheimer-parkinson',
+    secciones: "nav[aria-label*='nfermedad'] button",
+    subestados: "button[aria-pressed]:not(nav button)",
+  },
 ];
 
 interface TextoSvg {

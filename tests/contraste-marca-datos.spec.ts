@@ -107,6 +107,10 @@ const APPS: App[] = [
   // color del dato con style (1,21-2,25), las marcas ✓ ± ✗ (2,25-3,39) y los valores de los
   // deslizadores (4,29)
   { slug: 'visualizador-microbiologia', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
+  // Del resto del censo de C0645 (10/11/2026): títulos de tarjeta, de la comparativa y del detalle
+  // en el color puro del dato con style (verde 2,87:1 y rojo 3,82 en claro, violetas 2,03-2,45 en
+  // oscuro) y el blanco sobre los botones activos en verde y rojo (2,87-3,82)
+  { slug: 'visualizador-alzheimer-parkinson', todo: true, secciones: "nav[aria-label*='nfermedad'] button, button[aria-pressed]:not(nav button)" },
 ];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {
