@@ -51,14 +51,34 @@ export const SOLUTO_PERSONALIZADO: Soluto = {
  * para no pedir una disolución que no se puede hacer, y el panel «Preparar», para avisar de que
  * la masa elegida no se disuelve entera (hallazgo 4204: 100 g de KMnO₄ en 50 mL salían como
  * «12,656 mol/L» sin ningún aviso). El soluto personalizado no tiene cifra: no se avisa.
+ *
+ * DE DÓNDE SALE CADA CIFRA (consultado el 10/11/2026, cabo C0697 y hallazgo 4410). El aviso dice
+ * «se disuelven unos X g/L como mucho», así que una cifra muy baja también mentiría: se toma la
+ * lectura literal de la fuente a 20-25 °C y se redondea un poco a la baja, sin inventar densidades.
+ *   · NaCl 310: IUPAC-NIST Solubility Data Series, vol. 30 (1987), sec. 2.3, pp. 56 y 58 — la
+ *     saturada a 25 °C tiene 26,56 % en masa con gravedad específica 1,200 = 318,7 g/L de
+ *     disolución (cuenta entera en tests/apps/simulador-disoluciones.spec.ts). Hasta el 10/11/2026
+ *     ponía 350: Practicar pedía disoluciones de sal imposibles (hallazgo 4410).
+ *   · Glucosa 470: PubChem (CID 5793), HSDB: «In water, 4.79X10+5 mg/L at 20 °C» (Yalkowsky,
+ *     Handbook of Aqueous Solubility Data, 2.ª ed., 2010, p. 308) = 479 g/L. Hasta el 10/11/2026
+ *     ponía 900, casi el doble.
+ *   · CuSO₄ 200: PubChem (CID 24462), ICSC 0751, sal anhidra: 203 g/L a 20 °C.
+ *   · K₂Cr₂O₇ 120: PubChem (CID 24502), ICSC: 12 g/100 mL a 20 °C; el Merck Index (2013,
+ *     p. 1419) da 11,7 % de la disolución saturada a 20 °C, que con cualquier densidad mayor que la
+ *     del agua pasa de 117 g/L.
+ *   · KMnO₄ 60: PubChem (CID 516875), HSDB: «6.40X10+4 mg/l @ 20 °C» (Shiu et al., Rev Environ
+ *     Contam Toxicol 116, 1990) e ICSC 0672: 6,4 g/100 mL a 20 °C = 64 g/L.
+ *   · NiCl₂ 600: SIN ANCLA. PubChem (CID 24385) solo da 64,2 g por 100 cc de AGUA a 20 °C (Prager,
+ *     1995, p. 867), sin decir si es la sal anhidra o el hexahidrato ni la densidad de la saturada,
+ *     así que no se puede pasar a g por litro de disolución. Sigue en el cabo C0697.
  */
 export const SOLUBILIDAD_ORIENTATIVA_G_L: Readonly<Record<string, number>> = {
   kmno4: 60,
   cuso4: 200,
   k2cr2o7: 120,
   nicl2: 600,
-  nacl: 350,
-  glucosa: 900,
+  nacl: 310,
+  glucosa: 470,
 };
 
 /** El soluto de la lista con ese id, o undefined. */

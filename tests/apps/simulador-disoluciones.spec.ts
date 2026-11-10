@@ -659,26 +659,53 @@ function gPorLitroC0667(d: DatosCaso): number | undefined {
 }
 
 /** [semilla, soluto] que llevan Practicar justo al tope de la tabla (medido el 09/11/2026). */
+// NaCl y glucosa, puestas al día el 10/11/2026 con sus topes nuevos (310 y 470, cabo C0697 y
+// hallazgo 4410): 3913 pide 46,5 g de NaCl en 150 mL y 1814, 47 g de glucosa en 100 mL.
 const SEMILLAS_AL_TOPE_C0667: ReadonlyArray<[number, string]> = [
-  [5312, 'nacl'],
-  [3252, 'glucosa'],
+  [3913, 'nacl'],
+  [1814, 'glucosa'],
   [20220, 'nicl2'],
   [526, 'cuso4'],
   [12968, 'k2cr2o7'],
   [5443, 'kmno4'],
 ];
 
-test.describe('Cabo C0667 — la solubilidad orientativa que acota Practicar (sin ancla de fuente)', () => {
-  test('mide la tabla actual, en g por litro de disolución: KMnO₄ 60 · CuSO₄ 200 · K₂Cr₂O₇ 120 · NiCl₂ 600 · NaCl 350 · glucosa 900', () => {
-    // Cifra MEDIDA, no verificada: falta la fuente (ver la cabecera de este bloque).
+test.describe('Cabo C0667 — la solubilidad orientativa que acota Practicar', () => {
+  /**
+   * Cabo C0697 (10/11/2026): cinco de las seis cifras tienen ya fuente, consultada en PubChem el
+   * 10/11/2026 (la cita de cada una, en el comentario de SOLUBILIDAD_ORIENTATIVA_G_L de motor.ts),
+   * y el NaCl la tiene en la SDS (bloque de abajo). Cada cifra queda por debajo de la de su fuente a
+   * 20-25 °C y a menos de un 10 % de ella:
+   *   NaCl 310 ≤ 318,7 (SDS) · glucosa 470 ≤ 479 (HSDB) · CuSO₄ 200 ≤ 203 (ICSC 0751)
+   *   K₂Cr₂O₇ 120 ≤ 120 (ICSC) · KMnO₄ 60 ≤ 64 (HSDB e ICSC 0672)
+   * NiCl₂ 600 sigue SIN ANCLA: la única cifra es por 100 cc de AGUA (64,2, Prager) sin densidad de la
+   * saturada ni forma de la sal. Hasta el 10/11/2026 la tabla daba NaCl 350 y glucosa 900.
+   */
+  const FUENTE_G_L: Readonly<Record<string, number>> = {
+    nacl: 318.72,
+    glucosa: 479,
+    cuso4: 203,
+    k2cr2o7: 120,
+    kmno4: 64,
+  };
+
+  test('la tabla, en g por litro de disolución: KMnO₄ 60 · CuSO₄ 200 · K₂Cr₂O₇ 120 · NiCl₂ 600 · NaCl 310 · glucosa 470', () => {
     expect({ ...SOLUBILIDAD_ORIENTATIVA_G_L }).toEqual({
       kmno4: 60,
       cuso4: 200,
       k2cr2o7: 120,
       nicl2: 600,
-      nacl: 350,
-      glucosa: 900,
+      nacl: 310,
+      glucosa: 470,
     });
+  });
+
+  test('REPARADO (C0697) · cada cifra con fuente queda por debajo de su fuente y a menos de un 10 % de ella', () => {
+    for (const [id, fuente] of Object.entries(FUENTE_G_L)) {
+      const tope = SOLUBILIDAD_ORIENTATIVA_G_L[id];
+      expect(tope, `${id}: no pasa de la fuente (${fuente} g/L)`).toBeLessThanOrEqual(fuente);
+      expect(tope, `${id}: no se queda muy por debajo (el aviso dice «como mucho»)`).toBeGreaterThanOrEqual(fuente * 0.9);
+    }
   });
 
   test('Practicar llega justo al tope de cada soluto y nunca lo pasa', () => {
@@ -687,10 +714,10 @@ test.describe('Cabo C0667 — la solubilidad orientativa que acota Practicar (si
       expect(e.datos.solutoId, `semilla ${semilla}: ${e.enunciado}`).toBe(id);
       expect(gPorLitroC0667(e.datos)!, `semilla ${semilla}: ${e.enunciado}`).toBeCloseTo(SOLUBILIDAD_ORIENTATIVA_G_L[id], 6);
     }
-    // La semilla 2: 97 g de NaCl en 300 mL = 323,33 g/L.
+    // La semilla 2 pedía 97 g de NaCl en 300 mL = 323,33 g/L hasta el 10/11/2026; con el tope en
+    // 310 el generador la rechaza y la semilla 2 trae ahora otro soluto.
     const dos = generarEjercicioAleatorio(2);
-    expect(dos.datos.solutoId).toBe('nacl');
-    expect(gPorLitroC0667(dos.datos)!).toBeCloseTo(97 / 0.3, 6);
+    expect(dos.datos.solutoId === 'nacl' && gPorLitroC0667(dos.datos)! > 310).toBe(false);
     // Y ninguna de las 300 primeras semillas pasa del tope de su soluto.
     for (let s = 1; s <= 300; s++) {
       const e = generarEjercicioAleatorio(s);
@@ -700,7 +727,7 @@ test.describe('Cabo C0667 — la solubilidad orientativa que acota Practicar (si
     }
   });
 
-  test('en el navegador: Practicar pide 52,5 g de NaCl en 150 mL (350 g/L) y 90 g de glucosa en 100 mL (900 g/L), y el panel no avisa en el tope', async ({
+  test('en el navegador: Practicar pide 46,5 g de NaCl en 150 mL (310 g/L) y 47 g de glucosa en 100 mL (470 g/L), y el panel no avisa en el tope', async ({
     page,
   }) => {
     // La vista siembra con Date.now() en el clic: se fija mientras dura el clic y nada más.
@@ -732,26 +759,26 @@ test.describe('Cabo C0667 — la solubilidad orientativa que acota Practicar (si
       return masa / (volumen / 1000);
     };
 
-    const sal = await practicarCon(5312);
-    expect(sal).toContain('52,5 g de sal común (NaCl)');
+    const sal = await practicarCon(3913);
+    expect(sal).toContain('46,5 g de sal común (NaCl');
     expect(sal).toContain('150 mL de disolución');
-    expect(gPorLitroDelTexto(sal)).toBeCloseTo(350, 6);
+    expect(gPorLitroDelTexto(sal)).toBeCloseTo(310, 6);
 
-    const glucosa = await practicarCon(3252);
-    expect(glucosa).toContain('90 g de glucosa');
+    const glucosa = await practicarCon(1814);
+    expect(glucosa).toContain('47 g de glucosa');
     expect(glucosa).toContain('100 mL de disolución');
-    expect(gPorLitroDelTexto(glucosa)).toBeCloseTo(900, 6);
+    expect(gPorLitroDelTexto(glucosa)).toBeCloseTo(470, 6);
 
-    // El panel usa la misma cifra: 52,5 g en 150 mL (350,00 g/L) no avisa; 53 g (353,33) sí.
+    // El panel usa la misma cifra: 46,5 g en 150 mL (310,00 g/L) no avisa; 47 g (313,33) sí.
     const aviso = page.locator('[class*="avisoSaturacion"]');
     await page.getByRole('button', { name: /NaCl/ }).first().click();
-    await sembrarValor(page, '#masa-input', 52.5);
+    await sembrarValor(page, '#masa-input', 46.5);
     await sembrarValor(page, '#vol-input', 150);
-    await expect(tarjeta(page, 'Concentración másica')).toContainText('350,00 g/L');
+    await expect(tarjeta(page, 'Concentración másica')).toContainText('310,00 g/L');
     await expect(aviso).toHaveText('');
-    await sembrarValor(page, '#masa-input', 53);
-    await expect(aviso).toContainText('353,33 g/L');
-    await expect(aviso).toContainText('unos 350 g/L de sal común');
+    await sembrarValor(page, '#masa-input', 47);
+    await expect(aviso).toContainText('313,33 g/L');
+    await expect(aviso).toContainText('unos 310 g/L de sal común');
   });
 });
 
@@ -792,8 +819,9 @@ test.describe('Cabo C0667 — la solubilidad orientativa que acota Practicar (si
  * LOS OTROS CINCO SOLUTOS no están en la SDS: ninguno de sus volúmenes trata CuSO₄, NiCl₂,
  * KMnO₄, K₂Cr₂O₇ ni la glucosa en agua (índice de volúmenes en
  * srdata.nist.gov/solubility/IUPAC/iupac.aspx, índices de sistemas de los vol. 30 y 44 y lista
- * de sistemas de la base de datos en línea, sys_category.aspx). Sus cifras siguen MEDIDAS, sin
- * verificar, en el bloque de arriba.
+ * de sistemas de la base de datos en línea, sys_category.aspx). El 10/11/2026 (cabo C0697) cuatro
+ * se anclaron en PubChem (HSDB e ICSC) y NiCl₂ sigue sin ancla: ver el bloque de arriba.
+ * REPARADO el 10/11/2026 (hallazgo 4410): el NaCl pasa a 310 g/L.
  * ══════════════════════════════════════════════════════════════════════════════════════════ */
 
 /** Cifras literales de la SDS, vol. 30, sección 2.3 (ver la cabecera del bloque). */
@@ -822,16 +850,15 @@ test.describe('Cabo C0667 — el tope del NaCl contra la IUPAC-NIST SDS (vol. 30
     expect(gLDesdeMolalidad(SDS30_NACL.molalidad45, SDS30_NACL.densidad45)).toBeLessThan(350);
   });
 
-  // ABIERTO (Inspector 09/11/2026, cabo C0667): SOLUBILIDAD_ORIENTATIVA_G_L.nacl vale 350 g/L y
-  // la SDS da 317,7-318,7 g/L de disolución saturada a 25 °C.
-  test.fail('ABIERTO · la cifra del NaCl no pasa de la saturación de la SDS (318,72 g/L a 25 °C)', () => {
+  // REPARADO el 10/11/2026 en /reparar (hallazgo 4410): SOLUBILIDAD_ORIENTATIVA_G_L.nacl valía
+  // 350 g/L y la SDS da 317,7-318,7 g/L de disolución saturada a 25 °C; ahora vale 310.
+  test('REPARADO (4410) · la cifra del NaCl no pasa de la saturación de la SDS (318,72 g/L a 25 °C)', () => {
     expect(SOLUBILIDAD_ORIENTATIVA_G_L.nacl, 'SOLUBILIDAD_ORIENTATIVA_G_L.nacl, en g/L de disolución').toBeLessThanOrEqual(NACL_SATURADA_25C_G_L);
   });
 
-  // ABIERTO (Inspector 09/11/2026, cabo C0667): Practicar propone NaCl por encima de la
-  // saturación; hoy, entre otras, la semilla 5312 (52,5 g en 150 mL = 350 g/L) y la 2 (97 g en
-  // 300 mL = 323,33 g/L).
-  test.fail('ABIERTO · Practicar no pide una disolución de NaCl por encima de 318,72 g/L', () => {
+  // REPARADO el 10/11/2026 (hallazgo 4410): Practicar proponía NaCl por encima de la saturación;
+  // entre otras, la semilla 5312 (52,5 g en 150 mL = 350 g/L) y la 2 (97 g en 300 mL = 323,33 g/L).
+  test('REPARADO (4410) · Practicar no pide una disolución de NaCl por encima de 318,72 g/L', () => {
     const excesos: string[] = [];
     let ejerciciosDeSal = 0;
     for (let semilla = 1; semilla <= 6000; semilla++) {
@@ -852,9 +879,10 @@ test.describe('Cabo C0667 — el tope del NaCl contra la IUPAC-NIST SDS (vol. 30
 });
 
 test.describe('Cabo C0667 — el tope del NaCl en el navegador', () => {
-  // ABIERTO (Inspector 09/11/2026, cabo C0667): con la semilla 5312 el alumno lee «Se disuelven
-  // 52,5 g de sal común (NaCl) … hasta 150 mL de disolución»: 350 g/L, imposible a 25 °C.
-  test.fail('ABIERTO · Practicar (semilla 5312) no pide NaCl por encima de la saturación de la SDS', async ({ page }) => {
+  // REPARADO el 10/11/2026 (hallazgo 4410): con la semilla 5312 el alumno leía «Se disuelven
+  // 52,5 g de sal común (NaCl) … hasta 150 mL de disolución»: 350 g/L, imposible a 25 °C. Se
+  // mide con la 3913, que con el tope nuevo es la que lleva la sal al máximo (46,5 g en 150 mL).
+  test('REPARADO (4410) · Practicar (semilla 3913, la sal al tope) no pide NaCl por encima de la saturación de la SDS', async ({ page }) => {
     await page.addInitScript(() => {
       const ahoraReal = Date.now.bind(Date);
       const w = window as unknown as { __semillaC0667b?: number };
@@ -863,7 +891,7 @@ test.describe('Cabo C0667 — el tope del NaCl en el navegador', () => {
     await page.goto('/simulador-disoluciones/');
     await esperarHidratacion(page, ['#masa-input', '#casos-respuesta']);
     await page.evaluate(() => {
-      (window as unknown as { __semillaC0667b?: number }).__semillaC0667b = 5312;
+      (window as unknown as { __semillaC0667b?: number }).__semillaC0667b = 3913;
     });
     await page.locator('#casos-practicar').click();
     await page.evaluate(() => {
@@ -872,16 +900,16 @@ test.describe('Cabo C0667 — el tope del NaCl en el navegador', () => {
     await expect(page.locator('#casos-titulo-caso')).toHaveText('Ejercicio de práctica');
     const texto = (await page.locator('#casos-enunciado').textContent()) ?? '';
     const m = texto.match(/Se disuelven? ([\d.]+(?:,\d+)?) g de sal común .*? hasta ([\d.]+) mL de disolución/);
-    // Si tras la reparación la semilla ya no trae sal, no hay disolución de sal que juzgar.
-    if (!m) return;
-    const gL = Number(m[1].replace(/\./g, '').replace(',', '.')) / (Number(m[2].replace(/\./g, '')) / 1000);
+    expect(m, `«${texto}»: la semilla 3913 trae sal`).not.toBeNull();
+    const gL = Number(m![1].replace(/\./g, '').replace(',', '.')) / (Number(m![2].replace(/\./g, '')) / 1000);
+    expect(gL).toBeCloseTo(310, 6);
     expect(gL, `«${texto}»`).toBeLessThanOrEqual(NACL_SATURADA_25C_G_L);
   });
 
-  // ABIERTO (Inspector 09/11/2026, cabo C0667): el aviso de saturación del panel (hallazgo 4204)
+  // REPARADO el 10/11/2026 (hallazgo 4410): el aviso de saturación del panel (hallazgo 4204)
   // usa la misma cifra, así que 50 g de NaCl en 150 mL (333,33 g/L, por encima de los 318,72 de
-  // la SDS) se pintan como disolución sin aviso.
-  test.fail('ABIERTO · el panel avisa de 50 g de NaCl en 150 mL (333,33 g/L): no se disuelven enteros', async ({ page }) => {
+  // la SDS) se pintaban como disolución sin aviso.
+  test('REPARADO (4410) · el panel avisa de 50 g de NaCl en 150 mL (333,33 g/L): no se disuelven enteros', async ({ page }) => {
     await page.goto('/simulador-disoluciones/');
     await esperarHidratacion(page, ['#masa-input', '#casos-respuesta']);
     await page.getByRole('button', { name: /NaCl/ }).first().click();
@@ -889,7 +917,7 @@ test.describe('Cabo C0667 — el tope del NaCl en el navegador', () => {
     await sembrarValor(page, '#vol-input', 150);
     // Precondición, que pasa hoy: el panel calcula 50/0,150 = 333,33 g/L.
     await expect(tarjeta(page, 'Concentración másica')).toContainText('333,33 g/L');
-    // Lo que falla: el aviso sigue vacío porque 333,33 < 350.
+    // Lo que fallaba: el aviso seguía vacío porque 333,33 < 350; con 310, avisa.
     await expect(page.locator('[class*="avisoSaturacion"]')).toContainText('no se disuelve entera', { timeout: 3000 });
   });
 });
