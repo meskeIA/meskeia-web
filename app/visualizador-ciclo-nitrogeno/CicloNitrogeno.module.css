@@ -125,9 +125,54 @@
   transition: opacity 0.15s;
 }
 
+/* Subrayado y no opacidad al pasar el ratón: al 75 % el rótulo bajaba de su contraste */
 .svgLabel:hover {
-  opacity: 0.75;
+  text-decoration: underline;
 }
+
+/* ─── Tonos del diagrama (cabo C0297, 10/11/2026) ──────────────────────────
+   Antes: rótulos en el color puro de su dato (el amarillo F9A825 1,59-1,95:1, el agua 1,90-2,93,
+   el teal 2,07-2,78 en claro), las franjas en pastel al 35-40 % que en oscuro quedaban en un gris
+   medio (todo lo de encima a 1,03-2,11:1) y las placas blancas al 85 % también en oscuro. Ahora
+   cada color de dato tiene un tono de TEXTO por tema, en `fill` (SVG) y `color` (HTML); las
+   franjas y las placas cambian con el tema. */
+.tonoAzul { fill: #1F5F7A; color: #1F5F7A; }
+.tonoNaranja { fill: #9A4A12; color: #9A4A12; }
+.tonoGris { fill: #555555; color: #555555; }
+.tonoTeal { fill: #1F6F6C; color: #1F6F6C; }
+.tonoVerde { fill: #1B5E20; color: #1B5E20; }
+.tonoAmarillo { fill: #7A4F00; color: #7A4F00; }
+.tonoRojo { fill: #B91C1C; color: #B91C1C; }
+.tonoMarron { fill: #5D4037; color: #5D4037; }
+.tonoAgua { fill: #1F5A8A; color: #1F5A8A; }
+[data-theme='dark'] .tonoAzul { fill: #8FCBE6; color: #8FCBE6; }
+[data-theme='dark'] .tonoNaranja { fill: #FDBA74; color: #FDBA74; }
+[data-theme='dark'] .tonoGris { fill: #C8C8C8; color: #C8C8C8; }
+[data-theme='dark'] .tonoTeal { fill: #8FDCD9; color: #8FDCD9; }
+[data-theme='dark'] .tonoVerde { fill: #86EFAC; color: #86EFAC; }
+[data-theme='dark'] .tonoAmarillo { fill: #FCD34D; color: #FCD34D; }
+[data-theme='dark'] .tonoRojo { fill: #FCA5A5; color: #FCA5A5; }
+[data-theme='dark'] .tonoMarron { fill: #D7B8AA; color: #D7B8AA; }
+[data-theme='dark'] .tonoAgua { fill: #A9D1F2; color: #A9D1F2; }
+
+.zonaAtmosfera { fill: #E3F2FD; opacity: 0.4; }
+.zonaSuelo { fill: #EFEBE9; opacity: 0.35; }
+.zonaAgua { fill: #E1F5FE; opacity: 0.4; }
+[data-theme='dark'] .zonaAtmosfera { fill: #1E3A5F; opacity: 0.35; }
+[data-theme='dark'] .zonaSuelo { fill: #4E342E; opacity: 0.3; }
+[data-theme='dark'] .zonaAgua { fill: #01579B; opacity: 0.25; }
+
+.rotuloAtmosfera { fill: #1565C0; }
+.rotuloSuelo { fill: #4E342E; }
+.rotuloAgua { fill: #01579B; }
+[data-theme='dark'] .rotuloAtmosfera { fill: #90CAF9; }
+[data-theme='dark'] .rotuloSuelo { fill: #D7CCC8; }
+[data-theme='dark'] .rotuloAgua { fill: #81D4FA; }
+
+.placa { fill: #FFFFFF; opacity: 0.85; }
+[data-theme='dark'] .placa { fill: var(--bg-card); opacity: 0.9; }
+
+.rotuloAyuda { fill: var(--text-muted); }
 
 /* ─── Leyenda de procesos ─────────────────────────────────────────────────── */
 .leyendaProcesos {
@@ -149,8 +194,9 @@
   white-space: nowrap;
 }
 
+/* Sombra y no opacidad: al 80 % el nombre bajaba de su contraste */
 .procesoBadge:hover {
-  opacity: 0.8;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
 }
 
 .procesoBadgeActivo {
@@ -825,8 +871,9 @@
   border-color: rgba(46, 134, 171, 0.2);
 }
 
+/* Al 12 %, «Condición» en --primary-texto daba 4,32:1 (cabo C0278) */
 [data-theme='dark'] .microCondicion {
-  background: rgba(46, 134, 171, 0.12);
+  background: rgba(46, 134, 171, 0.04);
 }
 
 [data-theme='dark'] .microCuriosidad {
@@ -845,6 +892,10 @@
   background: var(--bg-card);
   border-color: rgba(255,255,255,0.08);
 }
+
+/* El rojo #C62828 y el verde #2E7D32 daban 2,45 y 2,69:1 sobre la tarjeta oscura (cabo C0645) */
+[data-theme='dark'] .consecuenciaNegativa h4 { color: #FCA5A5; }
+[data-theme='dark'] .consecuenciaPositiva h4 { color: #86EFAC; }
 
 [data-theme='dark'] .tableWrapper {
   border-color: rgba(46, 134, 171, 0.25);
@@ -895,13 +946,15 @@
   border-color: rgba(46, 134, 171, 0.25);
 }
 
+/* Tinte al 3-5 % en oscuro (cabo C0278): al 9-15 %, el título en --primary-texto se quedaba en
+   4,30:1 */
 [data-theme='dark'] .tipCard {
-  background: rgba(46, 134, 171, 0.09);
+  background: rgba(46, 134, 171, 0.03);
   border-color: rgba(46, 134, 171, 0.25);
 }
 
 [data-theme='dark'] .tipCard:hover {
-  background: rgba(46, 134, 171, 0.15);
+  background: rgba(46, 134, 171, 0.05);
 }
 
 /* ─── Responsive ──────────────────────────────────────────────────────────── */

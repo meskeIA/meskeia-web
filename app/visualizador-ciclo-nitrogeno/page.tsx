@@ -9,7 +9,26 @@ import {
   ShareCard,
   EducationalSection,
 } from '@/components';
+import { rellenoConTinta } from '@/lib/tintaLegible';
 import styles from './CicloNitrogeno.module.css';
+
+/**
+ * Tono de TEXTO de cada color de dato, por tema (cabo C0297, 10/11/2026): el color puro se queda en
+ * flechas, bordes y rellenos, y los rótulos toman la clase `tono<Nombre>` del módulo, que pone
+ * `fill` y `color` con su variante oscura.
+ */
+const TONO: Record<string, string> = {
+  '#2E86AB': 'tonoAzul',
+  '#E07B39': 'tonoNaranja',
+  '#888888': 'tonoGris',
+  '#48A9A6': 'tonoTeal',
+  '#2E7D32': 'tonoVerde',
+  '#F9A825': 'tonoAmarillo',
+  '#C62828': 'tonoRojo',
+  '#795548': 'tonoMarron',
+  '#5C9BD6': 'tonoAgua',
+};
+const tono = (color: string): string => styles[TONO[color] ?? 'tonoGris'];
 
 // ─── Tipos ───────────────────────────────────────────────────────────────────
 
@@ -265,113 +284,115 @@ function CicloSVG({ procesoSeleccionado, onSelectProceso }: {
       </defs>
 
       {/* Fondo de atmósfera */}
-      <rect x="0" y="0" width="480" height="90" rx="8" fill="#E3F2FD" opacity="0.4" />
-      <text x="8" y="14" fontSize="10" fill="#1565C0" opacity="0.6">ATMÓSFERA</text>
+      {/* Las tres franjas cambian de tono con el tema: los pasteles claros al 35-40 % se
+          quedaban en un gris medio sobre la tarjeta oscura y apagaban todo lo de encima */}
+      <rect x="0" y="0" width="480" height="90" rx="8" className={styles.zonaAtmosfera} />
+      <text x="8" y="14" fontSize="10" className={styles.rotuloAtmosfera}>ATMÓSFERA</text>
 
       {/* Fondo de suelo */}
-      <rect x="0" y="180" width="480" height="100" rx="8" fill="#EFEBE9" opacity="0.35" />
-      <text x="8" y="194" fontSize="10" fill="#4E342E" opacity="0.6">SUELO / BIOSFERA</text>
+      <rect x="0" y="180" width="480" height="100" rx="8" className={styles.zonaSuelo} />
+      <text x="8" y="194" fontSize="10" className={styles.rotuloSuelo}>SUELO / BIOSFERA</text>
 
       {/* Fondo de agua */}
-      <rect x="0" y="290" width="480" height="65" rx="8" fill="#E1F5FE" opacity="0.4" />
-      <text x="8" y="304" fontSize="10" fill="#01579B" opacity="0.6">HIDRÓSFERA</text>
+      <rect x="0" y="290" width="480" height="65" rx="8" className={styles.zonaAgua} />
+      <text x="8" y="304" fontSize="10" className={styles.rotuloAgua}>HIDRÓSFERA</text>
 
       {/* Reservorios */}
       {reservorios.map(r => (
         <g key={r.id}>
           <rect x={r.x} y={r.y} width={r.w} height={r.h} rx="6"
-            fill={r.color} opacity="0.18" stroke={r.color} strokeWidth="1.5" />
+            fill={r.color} fillOpacity="0.18" stroke={r.color} strokeWidth="1.5" />
           <text x={r.x + r.w / 2} y={r.y + 16} textAnchor="middle"
-            fontSize="11" fontWeight="bold" fill={r.color}>{r.label}</text>
+            fontSize="11" fontWeight="bold" className={tono(r.color)}>{r.label}</text>
           <text x={r.x + r.w / 2} y={r.y + 30} textAnchor="middle"
-            fontSize="9" fill={r.color} opacity="0.9">{r.sublabel}</text>
+            fontSize="9" className={tono(r.color)}>{r.sublabel}</text>
         </g>
       ))}
 
       {/* Fijación biológica: suelo → atmósfera (invertida: atm → suelo) */}
       <line x1="130" y1="74" x2="95" y2="200"
         stroke="#2E86AB" strokeWidth="2" markerEnd="url(#arrow-azul)" />
-      <rect x="45" y="130" width="70" height="16" rx="3" fill="white" opacity="0.85" />
-      <text x="80" y="142" textAnchor="middle" fontSize="8.5" fill="#2E86AB"
-        className={styles.svgLabel} style={{ cursor: 'pointer' }}
+      <rect x="45" y="130" width="70" height="16" rx="3" className={styles.placa} />
+      <text x="80" y="142" textAnchor="middle" fontSize="8.5"
+        className={`${styles.svgLabel} ${styles.tonoAzul}`} style={{ cursor: 'pointer' }}
         onClick={() => onSelectProceso('fijacion-biologica')}>Fijación biol.</text>
 
       {/* Fijación industrial: hacia plantas (atmósfera ↓ plantas) */}
       <line x1="280" y1="74" x2="250" y2="200"
         stroke="#E07B39" strokeWidth="2.5" strokeDasharray="5,3" markerEnd="url(#arrow-naranja)" />
-      <rect x="290" y="130" width="70" height="16" rx="3" fill="white" opacity="0.85" />
-      <text x="325" y="142" textAnchor="middle" fontSize="8.5" fill="#E07B39"
-        className={styles.svgLabel} style={{ cursor: 'pointer' }}
+      <rect x="290" y="130" width="70" height="16" rx="3" className={styles.placa} />
+      <text x="325" y="142" textAnchor="middle" fontSize="8.5"
+        className={`${styles.svgLabel} ${styles.tonoNaranja}`} style={{ cursor: 'pointer' }}
         onClick={() => onSelectProceso('fijacion-industrial')}>Haber-Bosch</text>
 
       {/* Rayos */}
       <line x1="200" y1="74" x2="155" y2="170"
         stroke="#888888" strokeWidth="1.5" strokeDasharray="3,3" markerEnd="url(#arrow-gris)" />
-      <rect x="137" y="120" width="42" height="14" rx="3" fill="white" opacity="0.85" />
-      <text x="158" y="130" textAnchor="middle" fontSize="8" fill="#888888"
-        className={styles.svgLabel} style={{ cursor: 'pointer' }}
+      <rect x="137" y="120" width="42" height="14" rx="3" className={styles.placa} />
+      <text x="158" y="130" textAnchor="middle" fontSize="8"
+        className={`${styles.svgLabel} ${styles.tonoGris}`} style={{ cursor: 'pointer' }}
         onClick={() => onSelectProceso('fijacion-rayos')}>Rayos</text>
 
       {/* Asimilación: suelo → plantas */}
       <line x1="130" y1="222" x2="170" y2="222"
         stroke="#48A9A6" strokeWidth="2" markerEnd="url(#arrow-teal)" />
-      <rect x="128" y="208" width="52" height="13" rx="3" fill="white" opacity="0.85" />
-      <text x="154" y="218" textAnchor="middle" fontSize="8" fill="#48A9A6"
-        className={styles.svgLabel} style={{ cursor: 'pointer' }}
+      <rect x="128" y="208" width="52" height="13" rx="3" className={styles.placa} />
+      <text x="154" y="218" textAnchor="middle" fontSize="8"
+        className={`${styles.svgLabel} ${styles.tonoTeal}`} style={{ cursor: 'pointer' }}
         onClick={() => onSelectProceso('asimilacion')}>Asimilación</text>
 
       {/* Consumo: plantas → animales */}
       <line x1="280" y1="222" x2="330" y2="222"
         stroke="#2E7D32" strokeWidth="2" markerEnd="url(#arrow-verde)" />
-      <rect x="278" y="208" width="48" height="13" rx="3" fill="white" opacity="0.85" />
-      <text x="302" y="218" textAnchor="middle" fontSize="8" fill="#2E7D32"
-        className={styles.svgLabel} style={{ cursor: 'pointer' }}
+      <rect x="278" y="208" width="48" height="13" rx="3" className={styles.placa} />
+      <text x="302" y="218" textAnchor="middle" fontSize="8"
+        className={`${styles.svgLabel} ${styles.tonoVerde}`} style={{ cursor: 'pointer' }}
         onClick={() => onSelectProceso('consumo-animal')}>Consumo</text>
 
       {/* Nitrificación: amonio → nitrato (izquierda del suelo) */}
       <path d="M 75 230 Q 55 260 75 244" stroke="#F9A825" strokeWidth="0" fill="none" />
-      <text x="75" y="268" textAnchor="middle" fontSize="8" fill="#F9A825"
-        className={styles.svgLabel} style={{ cursor: 'pointer' }}
+      <text x="75" y="268" textAnchor="middle" fontSize="8"
+        className={`${styles.svgLabel} ${styles.tonoAmarillo}`} style={{ cursor: 'pointer' }}
         onClick={() => onSelectProceso('nitrificacion')}>NH₃→NO₃⁻</text>
-      <rect x="32" y="256" width="72" height="14" rx="3" fill="white" opacity="0.85" />
-      <text x="68" y="267" textAnchor="middle" fontSize="8" fill="#F9A825"
-        className={styles.svgLabel} style={{ cursor: 'pointer' }}
+      <rect x="32" y="256" width="72" height="14" rx="3" className={styles.placa} />
+      <text x="68" y="267" textAnchor="middle" fontSize="8"
+        className={`${styles.svgLabel} ${styles.tonoAmarillo}`} style={{ cursor: 'pointer' }}
         onClick={() => onSelectProceso('nitrificacion')}>Nitrificación</text>
 
       {/* Desnitrificación: suelo → atmósfera (arco) */}
       <path d="M 75 200 Q 30 120 200 52"
         stroke="#C62828" strokeWidth="2" fill="none" markerEnd="url(#arrow-rojo)" />
-      <rect x="16" y="155" width="58" height="14" rx="3" fill="white" opacity="0.85" />
-      <text x="45" y="165" textAnchor="middle" fontSize="8" fill="#C62828"
-        className={styles.svgLabel} style={{ cursor: 'pointer' }}
+      <rect x="16" y="155" width="58" height="14" rx="3" className={styles.placa} />
+      <text x="45" y="165" textAnchor="middle" fontSize="8"
+        className={`${styles.svgLabel} ${styles.tonoRojo}`} style={{ cursor: 'pointer' }}
         onClick={() => onSelectProceso('desnitrificacion')}>Denitrific.</text>
 
       {/* Descomposición: animales → suelo */}
       <line x1="380" y1="244" x2="130" y2="244"
         stroke="#795548" strokeWidth="1.5" strokeDasharray="4,2" markerEnd="url(#arrow-marron)" />
-      <rect x="212" y="248" width="64" height="14" rx="3" fill="white" opacity="0.85" />
-      <text x="244" y="258" textAnchor="middle" fontSize="8" fill="#795548"
-        className={styles.svgLabel} style={{ cursor: 'pointer' }}
+      <rect x="212" y="248" width="64" height="14" rx="3" className={styles.placa} />
+      <text x="244" y="258" textAnchor="middle" fontSize="8"
+        className={`${styles.svgLabel} ${styles.tonoMarron}`} style={{ cursor: 'pointer' }}
         onClick={() => onSelectProceso('descomposicion')}>Descompos.</text>
 
       {/* Lixiviación: suelo → agua */}
       <line x1="130" y1="244" x2="360" y2="320"
         stroke="#5C9BD6" strokeWidth="1.5" strokeDasharray="3,3" />
-      <rect x="195" y="286" width="60" height="14" rx="3" fill="white" opacity="0.85" />
-      <text x="225" y="296" textAnchor="middle" fontSize="8" fill="#5C9BD6">Lixiviación</text>
+      <rect x="195" y="286" width="60" height="14" rx="3" className={styles.placa} />
+      <text x="225" y="296" textAnchor="middle" fontSize="8" className={styles.tonoAgua}>Lixiviación</text>
 
       {/* Agua reservorio */}
       <rect x="360" y="310" width="100" height="44" rx="6"
-        fill="#5C9BD6" opacity="0.18" stroke="#5C9BD6" strokeWidth="1.5" />
-      <text x="410" y="326" textAnchor="middle" fontSize="11" fontWeight="bold" fill="#5C9BD6">Agua</text>
-      <text x="410" y="340" textAnchor="middle" fontSize="9" fill="#5C9BD6" opacity="0.9">NO₃⁻ lixiv.</text>
+        fill="#5C9BD6" fillOpacity="0.18" stroke="#5C9BD6" strokeWidth="1.5" />
+      <text x="410" y="326" textAnchor="middle" fontSize="11" fontWeight="bold" className={styles.tonoAgua}>Agua</text>
+      <text x="410" y="340" textAnchor="middle" fontSize="9" className={styles.tonoAgua}>NO₃⁻ lixiv.</text>
 
       {/* Leyenda de selección */}
       {procesoSeleccionado && (
         <rect x="150" y="90" width="180" height="18" rx="4" fill="#2E86AB" opacity="0.12" />
       )}
       {!procesoSeleccionado && (
-        <text x="240" y="105" textAnchor="middle" fontSize="9" fill="#666" opacity="0.8">
+        <text x="240" y="105" textAnchor="middle" fontSize="9" className={styles.rotuloAyuda}>
           Haz clic en un proceso para ver detalles
         </text>
       )}
@@ -406,26 +427,31 @@ function TabCicloCompleto() {
 
       {/* Leyenda de procesos clicables */}
       <div className={styles.leyendaProcesos}>
-        {PROCESOS.map(p => (
+        {PROCESOS.map(p => {
+          // Sin elegir, el nombre en el tono de texto de su color; elegido, sobre su color
+          // oscurecido lo justo para que la tinta llegue a 4,5:1 (cabo C0645)
+          const activo = rellenoConTinta(p.color);
+          return (
           <button
             key={p.id}
             type="button"
-            className={`${styles.procesoBadge} ${procesoSeleccionado === p.id ? styles.procesoBadgeActivo : ''}`}
-            style={{ borderColor: p.color, color: procesoSeleccionado === p.id ? '#fff' : p.color,
-              backgroundColor: procesoSeleccionado === p.id ? p.color : 'transparent' }}
+            className={`${styles.procesoBadge} ${procesoSeleccionado === p.id ? styles.procesoBadgeActivo : tono(p.color)}`}
+            style={{ borderColor: p.color,
+              ...(procesoSeleccionado === p.id ? { color: activo.tinta, backgroundColor: activo.relleno } : { backgroundColor: 'transparent' }) }}
             onClick={() => setProcesoSeleccionado(procesoSeleccionado === p.id ? null : p.id)}
             aria-pressed={procesoSeleccionado === p.id}
           >
             {p.nombre}
           </button>
-        ))}
+          );
+        })}
       </div>
 
       {/* Panel de detalle */}
       {detalle && (
         <div className={styles.procesoDetalle} style={{ borderLeftColor: detalle.color }}>
           <div className={styles.procesoDetalleHeader}>
-            <span className={styles.procesoDetalleTitulo} style={{ color: detalle.color }}>
+            <span className={`${styles.procesoDetalleTitulo} ${tono(detalle.color)}`}>
               {detalle.nombre}
             </span>
             <button
@@ -682,7 +708,11 @@ function TabComparativa() {
                 <td>
                   <span
                     className={styles.alteracionBadge}
-                    style={{ backgroundColor: badgeColor(c.nivelAlteracion) }}
+                    style={(() => {
+                      // El naranja y el amarillo con blanco daban 2,97 y 1,97:1 (cabo C0645)
+                      const { relleno, tinta } = rellenoConTinta(badgeColor(c.nivelAlteracion));
+                      return { backgroundColor: relleno, color: tinta };
+                    })()}
                   >
                     {c.alteracionHumana}
                   </span>

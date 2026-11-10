@@ -146,6 +146,13 @@ const APPS: App[] = [
   // --primary-boton (2,42), el precio y los pagos en #f06090 sobre su tinte rosa (4,07) y la cifra
   // de Nash en --primary-texto sobre el tinte al 10 % (4,40)
   { slug: 'visualizador-estructuras-mercado', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
+  // Del censo de C0297 (10/11/2026): el nombre de cada proceso en su color con style (el amarillo
+  // 1,89:1, el teal 2,68, el naranja 2,85, el gris 3,40 en claro; el marrón 2,66, el rojo 3,10 y el
+  // verde 3,39 en oscuro), los títulos de los impactos en rojo y verde sobre la tarjeta oscura
+  // (2,45-2,69), el blanco sobre las insignias naranja y amarilla de alteración humana (1,97-2,97)
+  // y en oscuro los títulos sobre el tinte de marca al 9-12 % (4,30-4,32, forma de C0278). El
+  // proceso elegido toma su fondo de rellenoConTinta, que garantiza 4,5:1 por construcción
+  { slug: 'visualizador-ciclo-nitrogeno', todo: true, secciones: "[role='tablist'][aria-label*='ecciones'] [role='tab']" },
 ];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {

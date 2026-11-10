@@ -219,6 +219,17 @@ const APPS: App[] = [
   // en oscuro) y los ejes y los valores de equilibrio en #666 y #555 fijos (1,82-2,37 en oscuro).
   // Los deslizadores en sus extremos y las estructuras y estrategias como subestados
   { slug: 'visualizador-estructuras-mercado', secciones: SECCIONES, extremos: true, subestados: "button[aria-pressed]:not(nav button)" },
+  // Del censo del 10/11/2026 (C0297): los rótulos del ciclo en el color puro de su dato, sobre su
+  // reservorio teñido o sobre una placa blanca al 85 % (el amarillo 1,59-1,95:1, el agua 1,90-2,93,
+  // el teal 2,07-2,78, el naranja 2,95 en claro), y en oscuro las franjas en pastel al 35-40 %, que
+  // quedaban en un gris medio y dejaban encima todo a 1,03-2,11, y las placas blancas, con los
+  // rótulos de proceso a 1,64-4,26. Los procesos, como subestados
+  {
+    slug: 'visualizador-ciclo-nitrogeno',
+    secciones: "[role='tablist'][aria-label*='ecciones'] [role='tab']",
+    extremos: true,
+    subestados: 'button[aria-pressed]',
+  },
 ];
 
 interface TextoSvg {
