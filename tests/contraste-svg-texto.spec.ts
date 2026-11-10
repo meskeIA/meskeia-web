@@ -166,6 +166,13 @@ const APPS: App[] = [
     secciones: SECCIONES,
     subestados: "button[class*='componenteCard'], button[class*='animacionBtn']",
   },
+  // Del censo del 10/11/2026 (C0297): blanco sobre las histonas y el octámero al 85 % (3,17:1),
+  // sobre el violeta del metilo (4,3), sobre el naranja del grupo •CH₃ (2,17) y sobre el amarillo de
+  // la marca Ac de las colas (1,4); #7d5a00 sobre el amarillo (3,55-3,86), #999 sobre el gris de la
+  // citosina sin metilar (2,12), la marca y el teal sobre su tinte en el imprinting (2,5-3,6) y el
+  // blanco sobre el gen apagado en #ddd. Los dos toggles, las cuatro marcas (botones nuevos) y los
+  // dos alelos, como subestados
+  { slug: 'visualizador-epigenetica', subestados: 'button[aria-pressed]' },
 ];
 
 interface TextoSvg {

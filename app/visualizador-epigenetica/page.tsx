@@ -214,35 +214,38 @@ const SeccionNucleosoma = () => {
             )}
 
             {/* Histonas (núcleo octamérico) */}
-            <ellipse cx="200" cy="175" rx="55" ry="35" fill={esActivo ? '#2E86AB' : '#c0392b'} opacity="0.85" />
+            {/* Opaca y oscurecida bajo el blanco (5,47 y 5,44:1; al 85 % la marca daba 3,17) */}
+            <ellipse cx="200" cy="175" rx="55" ry="35" fill={esActivo ? '#26718F' : '#c0392b'} />
             <text x="200" y="170" textAnchor="middle" fontSize="12" fontWeight="700" fill="white">Histonas</text>
-            <text x="200" y="186" textAnchor="middle" fontSize="10" fill="white" opacity="0.9">(H2A, H2B, H3, H4)</text>
+            <text x="200" y="186" textAnchor="middle" fontSize="10" fill="white">(H2A, H2B, H3, H4)</text>
 
             {/* Colas de histona */}
             {esActivo ? (
               /* Colas con grupos acetilo */
               <>
                 <line x1="155" y1="155" x2="110" y2="130" stroke="#2E86AB" strokeWidth="2" />
+                {/* Tinta casi negra sobre el amarillo del acetilo (#7d5a00 daba 3,55-3,86:1) */}
                 <circle cx="100" cy="125" r="10" fill="#f1c40f" stroke="#e67e22" strokeWidth="1.5" />
-                <text x="100" y="129" textAnchor="middle" fontSize="8" fontWeight="700" fill="#7d5a00">Ac</text>
+                <text x="100" y="129" textAnchor="middle" fontSize="8" fontWeight="700" fill="#3D2C00">Ac</text>
                 <line x1="245" y1="155" x2="290" y2="130" stroke="#2E86AB" strokeWidth="2" />
                 <circle cx="300" cy="125" r="10" fill="#f1c40f" stroke="#e67e22" strokeWidth="1.5" />
-                <text x="300" y="129" textAnchor="middle" fontSize="8" fontWeight="700" fill="#7d5a00">Ac</text>
+                <text x="300" y="129" textAnchor="middle" fontSize="8" fontWeight="700" fill="#3D2C00">Ac</text>
                 <line x1="200" y1="210" x2="200" y2="240" stroke="#2E86AB" strokeWidth="2" />
                 <circle cx="200" cy="250" r="10" fill="#f1c40f" stroke="#e67e22" strokeWidth="1.5" />
-                <text x="200" y="254" textAnchor="middle" fontSize="8" fontWeight="700" fill="#7d5a00">Ac</text>
+                <text x="200" y="254" textAnchor="middle" fontSize="8" fontWeight="700" fill="#3D2C00">Ac</text>
               </>
             ) : (
               /* Colas con grupos metilo en ADN */
               <>
                 <line x1="155" y1="155" x2="110" y2="130" stroke="#c0392b" strokeWidth="2" />
-                <circle cx="100" cy="125" r="10" fill="#9b59b6" stroke="#8e44ad" strokeWidth="1.5" />
+                {/* Violeta oscurecido bajo el blanco (#7D3C98, 7,0:1; #9b59b6 daba 4,3) */}
+                <circle cx="100" cy="125" r="10" fill="#7D3C98" stroke="#8e44ad" strokeWidth="1.5" />
                 <text x="100" y="129" textAnchor="middle" fontSize="7" fontWeight="700" fill="white">CH₃</text>
                 <line x1="245" y1="155" x2="290" y2="130" stroke="#c0392b" strokeWidth="2" />
-                <circle cx="300" cy="125" r="10" fill="#9b59b6" stroke="#8e44ad" strokeWidth="1.5" />
+                <circle cx="300" cy="125" r="10" fill="#7D3C98" stroke="#8e44ad" strokeWidth="1.5" />
                 <text x="300" y="129" textAnchor="middle" fontSize="7" fontWeight="700" fill="white">CH₃</text>
                 <line x1="200" y1="210" x2="200" y2="240" stroke="#c0392b" strokeWidth="2" />
-                <circle cx="200" cy="250" r="10" fill="#9b59b6" stroke="#8e44ad" strokeWidth="1.5" />
+                <circle cx="200" cy="250" r="10" fill="#7D3C98" stroke="#8e44ad" strokeWidth="1.5" />
                 <text x="200" y="254" textAnchor="middle" fontSize="7" fontWeight="700" fill="white">CH₃</text>
               </>
             )}
@@ -256,7 +259,7 @@ const SeccionNucleosoma = () => {
             {/* Etiqueta estado */}
             <rect x="10" y="240" width="380" height="28" rx="6" fill={esActivo ? 'rgba(72,169,166,0.12)' : 'rgba(231,76,60,0.1)'} />
             <text x="200" y="259" textAnchor="middle" fontSize="11" fontWeight="700"
-              fill={esActivo ? '#2a7c79' : '#c0392b'}>
+              fill={esActivo ? '#1F5F5C' : '#A93226'}>
               {esActivo ? <><tspan aria-hidden="true">🔓</tspan> Cromatina abierta — Gen accesible para transcripción</> : <><tspan aria-hidden="true">🔒</tspan> Cromatina compacta — Gen inaccesible (silenciado)</>}
             </text>
           </svg>
@@ -361,23 +364,25 @@ const SeccionMetilacion = () => {
                 {/* Puente entre cadenas */}
                 <line x1={x} y1={48} x2={x} y2={82} stroke={metilado ? '#9b59b6' : '#aaaaaa'} strokeWidth="2" />
                 {/* Círculo CpG */}
-                <circle cx={x} cy={65} r={metilado ? 10 : 7} fill={metilado ? '#9b59b6' : '#ddd'} />
+                {/* La citosina metilada, violeta oscurecido bajo el blanco (7,0:1); sin metilar,
+                    tinta gris oscura sobre el gris claro (#999 daba 2,12) */}
+                <circle cx={x} cy={65} r={metilado ? 10 : 7} fill={metilado ? '#7D3C98' : '#ddd'} />
                 {metilado && (
                   <>
-                    {/* Grupo metilo arriba */}
+                    {/* Grupo metilo arriba: tinta casi negra sobre el naranja (el blanco daba 2,17) */}
                     <circle cx={x} cy={32} r={7} fill="#f39c12" stroke="#e67e22" strokeWidth="1" />
-                    <text x={x} y={36} textAnchor="middle" fontSize="7" fontWeight="700" fill="white">CH₃</text>
+                    <text x={x} y={36} textAnchor="middle" fontSize="7" fontWeight="700" fill="#3D2C00">CH₃</text>
                     <line x1={x} y1={39} x2={x} y2={55} stroke="#e67e22" strokeWidth="1.5" strokeDasharray="2 1" />
                   </>
                 )}
                 {/* Etiqueta C */}
-                <text x={x} y={69} textAnchor="middle" fontSize="8" fontWeight="700" fill={metilado ? 'white' : '#999'}>C</text>
+                <text x={x} y={69} textAnchor="middle" fontSize="8" fontWeight="700" fill={metilado ? 'white' : '#555'}>C</text>
               </g>
             );
           })}
 
           {/* Leyenda */}
-          <circle cx="30" cy="115" r="6" fill="#9b59b6" />
+          <circle cx="30" cy="115" r="6" fill="#7D3C98" />
           <text x="42" y="119" fontSize="10" fill="#555">CpG metilado (5mC)</text>
           <circle cx="170" cy="115" r="6" fill="#ddd" stroke="#aaa" strokeWidth="1" />
           <text x="182" y="119" fontSize="10" fill="#555">CpG sin metilar</text>
@@ -419,11 +424,13 @@ const SeccionHistonas = () => {
   const detalle = MODIFICACIONES[activa];
 
   // Posiciones de las colas en el SVG del nucleosoma
-  const colas: { id: ModificacionHistona; label: string; cx: number; cy: number; color: string }[] = [
-    { id: 'acetilacion', label: 'Ac', cx: 95, cy: 95, color: '#f1c40f' },
-    { id: 'metilH3K4', label: 'K4', cx: 305, cy: 95, color: '#2E86AB' },
-    { id: 'metilH3K27', label: 'K27', cx: 95, cy: 215, color: '#c0392b' },
-    { id: 'fosforilacion', label: 'P', cx: 305, cy: 215, color: '#9b59b6' },
+  // Cada marca, opaca, con la tinta que se lee sobre su color (cabo C0297, 10/11/2026): el blanco
+  // sobre el amarillo daba 1,4:1 y, con la opacidad de las no elegidas, 2,1-3,6 sobre las demás
+  const colas: { id: ModificacionHistona; label: string; cx: number; cy: number; color: string; tinta: string }[] = [
+    { id: 'acetilacion', label: 'Ac', cx: 95, cy: 95, color: '#f1c40f', tinta: '#3D2C00' },
+    { id: 'metilH3K4', label: 'K4', cx: 305, cy: 95, color: '#26718F', tinta: 'white' },
+    { id: 'metilH3K27', label: 'K27', cx: 95, cy: 215, color: '#c0392b', tinta: 'white' },
+    { id: 'fosforilacion', label: 'P', cx: 305, cy: 215, color: '#7D3C98', tinta: 'white' },
   ];
 
   return (
@@ -445,9 +452,9 @@ const SeccionHistonas = () => {
             <rect width="400" height="320" fill="#f8fcfe" rx="12" />
 
             {/* Octámero de histonas */}
-            <ellipse cx="200" cy="160" rx="80" ry="55" fill="#2E86AB" opacity="0.85" />
+            <ellipse cx="200" cy="160" rx="80" ry="55" fill="#26718F" />
             <text x="200" y="154" textAnchor="middle" fontSize="13" fontWeight="700" fill="white">Octámero</text>
-            <text x="200" y="171" textAnchor="middle" fontSize="10" fill="white" opacity="0.9">H2A·H2B·H3·H4 ×2</text>
+            <text x="200" y="171" textAnchor="middle" fontSize="10" fill="white">H2A·H2B·H3·H4 ×2</text>
 
             {/* ADN enrollado */}
             <ellipse cx="200" cy="160" rx="105" ry="78" fill="none" stroke="#48A9A6" strokeWidth="2.5" strokeDasharray="10 5" opacity="0.7" />
@@ -468,7 +475,6 @@ const SeccionHistonas = () => {
                   fill={cola.color}
                   stroke={activa === cola.id ? '#333' : 'transparent'}
                   strokeWidth="2.5"
-                  opacity={activa === cola.id ? 1 : 0.75}
                 />
                 <text
                   x={cola.cx}
@@ -476,7 +482,7 @@ const SeccionHistonas = () => {
                   textAnchor="middle"
                   fontSize="10"
                   fontWeight="800"
-                  fill="white"
+                  fill={cola.tinta}
                 >
                   {cola.label}
                 </text>
@@ -484,10 +490,25 @@ const SeccionHistonas = () => {
             ))}
 
             {/* Instrucción */}
-            <text x="200" y="305" textAnchor="middle" fontSize="10" fill="#888">
+            <text x="200" y="305" textAnchor="middle" fontSize="10" fill="#555">
               ← Haz clic en una marca para ver detalles →
             </text>
           </svg>
+          {/* El SVG es role="img" y sus marcas no llegan al teclado ni al lector: la misma
+              elección, con botones (10/11/2026) */}
+          <div className={styles.toggleRow}>
+            {colas.map((cola) => (
+              <button
+                key={cola.id}
+                type="button"
+                className={`${styles.toggleBtn} ${activa === cola.id ? styles.toggleBtnActive : ''}`}
+                onClick={() => setActiva(cola.id)}
+                aria-pressed={activa === cola.id}
+              >
+                {MODIFICACIONES[cola.id].nombre}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* Panel de detalle */}
@@ -579,27 +600,29 @@ const SeccionImprinting = () => {
 
           {/* Alelo paterno */}
           <rect x="20" y="20" width="250" height="60" rx="10" fill={origen === 'paterno' ? 'rgba(46,134,171,0.15)' : 'rgba(200,200,200,0.15)'} stroke={origen === 'paterno' ? '#2E86AB' : '#ccc'} strokeWidth="2" />
-          <text x="145" y="38" textAnchor="middle" fontSize="11" fontWeight="700" fill={origen === 'paterno' ? '#2E86AB' : '#aaa'}>👨 Alelo paterno</text>{/* a11y-ok: el SVG es role="img" con aria-label; su texto no llega al lector */}
+          {/* El fondo es claro en los dos temas: rótulos en tonos oscuros fijos (cabo C0297,
+              10/11/2026; la marca daba 3,6:1 sobre su tinte, el teal 2,5 y el gris #aaa o #999 2,0-2,3) */}
+          <text x="145" y="38" textAnchor="middle" fontSize="11" fontWeight="700" fill={origen === 'paterno' ? '#1B5E7E' : '#666'}>👨 Alelo paterno</text>{/* a11y-ok: el SVG es role="img" con aria-label; su texto no llega al lector */}
 
-          {/* Gen IGF2 paterno */}
-          <rect x="35" y="50" width="80" height="22" rx="6" fill={origen === 'paterno' ? '#2E86AB' : '#ddd'} opacity="0.9" />
-          <text x="75" y="65" textAnchor="middle" fontSize="10" fontWeight="700" fill="white">IGF2 ✓</text>
+          {/* Gen IGF2 paterno: activo, relleno opaco oscurecido bajo el blanco; si no, gris claro con tinta oscura */}
+          <rect x="35" y="50" width="80" height="22" rx="6" fill={origen === 'paterno' ? '#26718F' : '#ddd'} />
+          <text x="75" y="65" textAnchor="middle" fontSize="10" fontWeight="700" fill={origen === 'paterno' ? 'white' : '#555'}>IGF2 ✓</text>
 
           {/* Gen H19 paterno (silenciado) */}
           <rect x="145" y="50" width="80" height="22" rx="6" fill="#ddd" opacity="0.6" />
-          <text x="185" y="65" textAnchor="middle" fontSize="10" fill="#999">H19 ✗</text>
+          <text x="185" y="65" textAnchor="middle" fontSize="10" fill="#555">H19 ✗</text>
 
           {/* Alelo materno */}
           <rect x="310" y="20" width="250" height="60" rx="10" fill={origen === 'materno' ? 'rgba(72,169,166,0.15)' : 'rgba(200,200,200,0.15)'} stroke={origen === 'materno' ? '#48A9A6' : '#ccc'} strokeWidth="2" />
-          <text x="435" y="38" textAnchor="middle" fontSize="11" fontWeight="700" fill={origen === 'materno' ? '#48A9A6' : '#aaa'}>👩 Alelo materno</text>{/* a11y-ok: el SVG es role="img" con aria-label; su texto no llega al lector */}
+          <text x="435" y="38" textAnchor="middle" fontSize="11" fontWeight="700" fill={origen === 'materno' ? '#2A6F6C' : '#666'}>👩 Alelo materno</text>{/* a11y-ok: el SVG es role="img" con aria-label; su texto no llega al lector */}
 
           {/* Gen IGF2 materno (silenciado) */}
           <rect x="325" y="50" width="80" height="22" rx="6" fill="#ddd" opacity="0.6" />
-          <text x="365" y="65" textAnchor="middle" fontSize="10" fill="#999">IGF2 ✗</text>
+          <text x="365" y="65" textAnchor="middle" fontSize="10" fill="#555">IGF2 ✗</text>
 
           {/* Gen H19 materno */}
-          <rect x="435" y="50" width="80" height="22" rx="6" fill={origen === 'materno' ? '#48A9A6' : '#ddd'} opacity="0.9" />
-          <text x="475" y="65" textAnchor="middle" fontSize="10" fontWeight="700" fill="white">H19 ✓</text>
+          <rect x="435" y="50" width="80" height="22" rx="6" fill={origen === 'materno' ? '#327874' : '#ddd'} />
+          <text x="475" y="65" textAnchor="middle" fontSize="10" fontWeight="700" fill={origen === 'materno' ? 'white' : '#555'}>H19 ✓</text>
         </svg>
 
         {/* Detalle genes */}

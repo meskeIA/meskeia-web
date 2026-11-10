@@ -304,14 +304,26 @@
   margin-bottom: 0.5rem;
 }
 
+/* El teal de texto sobre el tinte teal (cabo C0645, 10/11/2026): con --secondary-texto o #2a7c79
+   las insignias daban 3,80-4,32:1 en claro y 3,66-4,25 en oscuro. #1F5F5C en claro (5,6-6,3:1) y
+   #A3E0DD en oscuro (5,5-6,9:1), aquí y en .efectoActiva, .badgeActivo e .impactoBajo; el rojo en
+   oscuro, #F5A59B (6,4:1; #e74c3c daba 3,25) */
 .estadoActivo {
   background: rgba(72, 169, 166, 0.15);
-  color: var(--secondary-texto);
+  color: #1F5F5C;
+}
+
+[data-theme='dark'] .estadoActivo {
+  color: #A3E0DD;
 }
 
 .estadoSilenciado {
   background: rgba(231, 76, 60, 0.1);
   color: var(--rojo-texto, #e74c3c);
+}
+
+[data-theme='dark'] .estadoSilenciado {
+  color: #F5A59B;
 }
 
 .genDesc {
@@ -386,7 +398,7 @@
 
 .efectoActiva {
   background: rgba(72, 169, 166, 0.15);
-  color: #2a7c79;
+  color: #1F5F5C;
 }
 
 .efectoSilencia {
@@ -400,11 +412,11 @@
 }
 
 [data-theme='dark'] .efectoActiva {
-  color: var(--secondary-texto);
+  color: #A3E0DD;
 }
 
 [data-theme='dark'] .efectoSilencia {
-  color: #e74c3c;
+  color: #F5A59B;
 }
 
 [data-theme='dark'] .efectoSenal {
@@ -528,16 +540,21 @@
 
 .badgeActivo {
   background: rgba(72, 169, 166, 0.2);
-  color: #2a7c79;
+  color: #1F5F5C;
 }
 
+/* El gris sobre su tinte gris: --text-muted daba 4,19:1 en claro y 3,16-3,36 en oscuro */
 .badgeSilenciado {
   background: rgba(153, 153, 153, 0.15);
-  color: var(--text-muted, #999999);
+  color: #555555;
 }
 
 [data-theme='dark'] .badgeActivo {
-  color: var(--secondary-texto);
+  color: #A3E0DD;
+}
+
+[data-theme='dark'] .badgeSilenciado {
+  color: #C8C8C8;
 }
 
 .imprintingGenDesc {
@@ -615,11 +632,11 @@
 
 .impactoBajo {
   background: rgba(72, 169, 166, 0.12);
-  color: #2a7c79;
+  color: #1F5F5C;
 }
 
 [data-theme='dark'] .impactoAlto {
-  color: #e74c3c;
+  color: #F5A59B;
 }
 
 [data-theme='dark'] .impactoMedio {
@@ -627,7 +644,7 @@
 }
 
 [data-theme='dark'] .impactoBajo {
-  color: var(--secondary-texto);
+  color: #A3E0DD;
 }
 
 .factorMecanismo {
@@ -653,7 +670,8 @@
 
 [data-theme='dark'] .factorAviso {
   border-top-color: rgba(255, 255, 255, 0.08);
-  color: #777777;
+  /* #777777 daba 3,08:1 sobre la tarjeta oscura */
+  color: var(--text-muted);
 }
 
 /* ─── Educational Section ────────────────────── */

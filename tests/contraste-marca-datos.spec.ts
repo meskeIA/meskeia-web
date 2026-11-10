@@ -111,6 +111,10 @@ const APPS: App[] = [
   // en el color puro del dato con style (verde 2,87:1 y rojo 3,82 en claro, violetas 2,03-2,45 en
   // oscuro) y el blanco sobre los botones activos en verde y rojo (2,87-3,82)
   { slug: 'visualizador-alzheimer-parkinson', todo: true, secciones: "nav[aria-label*='nfermedad'] button, button[aria-pressed]:not(nav button)" },
+  // Del censo de C0297 (10/11/2026): las insignias de estado en teal sobre su tinte teal (3,80-4,32:1
+  // en claro, 3,66-4,25 en oscuro), «Silenciado ahora» en gris sobre su tinte (4,19 y 3,16-3,36), las
+  // de evidencia en #e74c3c sobre su tinte en oscuro (3,25) y los avisos en #777 en oscuro (3,08)
+  { slug: 'visualizador-epigenetica', todo: true, secciones: 'button[aria-pressed]' },
 ];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {
