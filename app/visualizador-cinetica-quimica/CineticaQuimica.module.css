@@ -399,7 +399,8 @@
 
 .vidaMediaItem span:first-child {
   font-size: 0.75rem;
-  color: var(--text-muted);
+  /* --text-muted daba 4,48:1 sobre el tinte del recuadro en claro (cabo C0645, 10/11/2026) */
+  color: var(--text-secondary);
 }
 
 .vidaMediaItem span:last-child {
@@ -561,6 +562,21 @@
   border-color: var(--primary);
   box-shadow: 0 4px 16px rgba(46, 134, 171, 0.2);
 }
+
+/* Tono de TEXTO de los rótulos de los SVG, que van sobre la tarjeta (cabo C0297, 10/11/2026): el
+   color del dato se queda en las curvas y los puntos. Sobre #FFFFFF: 5,1-7,0:1; sobre #2D2D2D:
+   5,0-8,6:1. .tNaranja vale también para la cifra naranja de la comparativa de vidas medias */
+.svgEje { fill: var(--text-muted); }
+.svgAzul { fill: #1B5E7E; }
+.svgTeal { fill: #2F7472; }
+.svgNaranja { fill: #A04F0A; }
+.svgRojo { fill: #B91C1C; }
+.tNaranja { color: #A04F0A; }
+[data-theme='dark'] .svgAzul { fill: #9CCFE6; }
+[data-theme='dark'] .svgTeal { fill: #6CC5C2; }
+[data-theme='dark'] .svgNaranja { fill: #F5B97A; }
+[data-theme='dark'] .svgRojo { fill: #F5A59B; }
+[data-theme='dark'] .tNaranja { color: #F5B97A; }
 
 /* ─── Motion reducida ────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {

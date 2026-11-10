@@ -139,21 +139,21 @@ function SvgPerfil({ ea, deltaH, mostrarCat, eaCat }: SvgPerfilProps) {
 
       {/* Eje Y */}
       <line x1={padX} y1={padY} x2={padX} y2={padY + plotH + 12} stroke="#ccc" strokeWidth="1" />
-      <text x={padX - 4} y={padY + 6} textAnchor="end" fontSize="8" fill="#999">E</text>
+      <text x={padX - 4} y={padY + 6} textAnchor="end" fontSize="8" className={styles.svgEje}>E</text>
 
       {/* Eje X */}
       <line x1={padX - 4} y1={padY + plotH} x2={padX + plotW + 4} y2={padY + plotH} stroke="#ccc" strokeWidth="1" />
-      <text x={padX + plotW / 2} y={H - 4} textAnchor="middle" fontSize="9" fill="#999">Coordenada de reacción →</text>
+      <text x={padX + plotW / 2} y={H - 4} textAnchor="middle" fontSize="9" className={styles.svgEje}>Coordenada de reacción →</text>
 
       {/* Línea de reactivos */}
       <line x1={x0} y1={yReact} x2={x0 + 20} y2={yReact} stroke="#48A9A6" strokeWidth="1.5" strokeDasharray="3 2" opacity="0.5" />
-      <text x={x0 + 2} y={yReact - 5} fontSize="8" fill="#48A9A6">Reactivos</text>
-      <text x={x0 + 2} y={yReact + 12} fontSize="7" fill="#999">(0 kJ/mol)</text>
+      <text x={x0 + 2} y={yReact - 5} fontSize="8" className={styles.svgTeal}>Reactivos</text>
+      <text x={x0 + 2} y={yReact + 12} fontSize="7" className={styles.svgEje}>(0 kJ/mol)</text>
 
       {/* Línea de productos */}
       <line x1={x4 - 20} y1={yProd} x2={x4} y2={yProd} stroke="#48A9A6" strokeWidth="1.5" strokeDasharray="3 2" opacity="0.5" />
-      <text x={x4 - 2} y={yProd - 5} fontSize="8" fill="#48A9A6" textAnchor="end">Productos</text>
-      <text x={x4 - 2} y={yProd + 12} fontSize="7" fill="#999" textAnchor="end"><tspan>{deltaH > 0 ? '+' : ''}</tspan>{deltaH} kJ/mol</text>
+      <text x={x4 - 2} y={yProd - 5} fontSize="8" className={styles.svgTeal} textAnchor="end">Productos</text>
+      <text x={x4 - 2} y={yProd + 12} fontSize="7" className={styles.svgEje} textAnchor="end"><tspan>{deltaH > 0 ? '+' : ''}</tspan>{deltaH} kJ/mol</text>
 
       {/* Curva principal */}
       <path d={pathNormal} fill="none" stroke="#2E86AB" strokeWidth="2.5" strokeLinejoin="round" />
@@ -165,18 +165,18 @@ function SvgPerfil({ ea, deltaH, mostrarCat, eaCat }: SvgPerfilProps) {
 
       {/* Etiqueta TS */}
       <circle cx={x2} cy={yTS} r="4" fill="#2E86AB" />
-      <text x={x2 + 6} y={yTS - 4} fontSize="8" fill="#2E86AB" fontWeight="700">TS</text>
+      <text x={x2 + 6} y={yTS - 4} fontSize="8" className={styles.svgAzul} fontWeight="700">TS</text>
 
       {/* Flecha Ea */}
       <line x1={x2 - 18} y1={yReact} x2={x2 - 18} y2={yTS + 2} stroke="#2E86AB" strokeWidth="1" strokeDasharray="3 2" opacity="0.7" markerEnd="url(#arrowE)" />
-      <text x={x2 - 28} y={(yReact + yTS) / 2 + 4} fontSize="8" fill="#2E86AB" fontWeight="700" textAnchor="middle">Ea</text>
-      <text x={x2 - 28} y={(yReact + yTS) / 2 + 14} fontSize="7" fill="#2E86AB" textAnchor="middle">{ea} kJ</text>
+      <text x={x2 - 28} y={(yReact + yTS) / 2 + 4} fontSize="8" className={styles.svgAzul} fontWeight="700" textAnchor="middle">Ea</text>
+      <text x={x2 - 28} y={(yReact + yTS) / 2 + 14} fontSize="7" className={styles.svgAzul} textAnchor="middle">{ea} kJ</text>
 
       {/* Flecha ΔH */}
       {deltaH !== 0 && (
         <>
           <line x1={x4 - 8} y1={yReact} x2={x4 - 8} y2={yProd + 2} stroke="#48A9A6" strokeWidth="1" strokeDasharray="2 2" opacity="0.7" markerEnd="url(#arrowE)" />
-          <text x={x4 + 4} y={(yReact + yProd) / 2 + 4} fontSize="8" fill="#48A9A6" fontWeight="600">ΔH</text>
+          <text x={x4 + 4} y={(yReact + yProd) / 2 + 4} fontSize="8" className={styles.svgTeal} fontWeight="600">ΔH</text>
         </>
       )}
 
@@ -184,8 +184,8 @@ function SvgPerfil({ ea, deltaH, mostrarCat, eaCat }: SvgPerfilProps) {
       {mostrarCat && (
         <>
           <circle cx={x2} cy={yTScat} r="4" fill="#E67E22" />
-          <text x={x2 + 6} y={yTScat - 4} fontSize="8" fill="#E67E22" fontWeight="700">TS (cat)</text>
-          <text x={x2 + 6} y={yTScat + 8} fontSize="7" fill="#E67E22">Ea={eaCat} kJ</text>
+          <text x={x2 + 6} y={yTScat - 4} fontSize="8" className={styles.svgNaranja} fontWeight="700">TS (cat)</text>
+          <text x={x2 + 6} y={yTScat + 8} fontSize="7" className={styles.svgNaranja}>Ea={eaCat} kJ</text>
         </>
       )}
     </svg>
@@ -253,8 +253,8 @@ function SvgArrhenius({ eaKJ, tActual }: SvgArrheniusProps) {
       <line x1={padX - 4} y1={padY + plotH} x2={padX + plotW + 4} y2={padY + plotH} stroke="#ccc" strokeWidth="1" />
 
       {/* Etiquetas ejes */}
-      <text x={padX + plotW / 2} y={H - 4} textAnchor="middle" fontSize="9" fill="#999">Temperatura (K) →</text>
-      <text x={8} y={padY + plotH / 2} textAnchor="middle" fontSize="9" fill="#999" transform={`rotate(-90, 8, ${padY + plotH / 2})`}>k →</text>
+      <text x={padX + plotW / 2} y={H - 4} textAnchor="middle" fontSize="9" className={styles.svgEje}>Temperatura (K) →</text>
+      <text x={8} y={padY + plotH / 2} textAnchor="middle" fontSize="9" className={styles.svgEje} transform={`rotate(-90, 8, ${padY + plotH / 2})`}>k →</text>
 
       {/* Curva k vs T */}
       <polyline points={puntos} fill="none" stroke="#2E86AB" strokeWidth="2" strokeLinejoin="round" />
@@ -262,7 +262,7 @@ function SvgArrhenius({ eaKJ, tActual }: SvgArrheniusProps) {
       {/* Punto actual */}
       <circle cx={xAct} cy={yAct} r="5" fill="#E74C3C" />
       <line x1={xAct} y1={yAct} x2={xAct} y2={padY + plotH} stroke="#E74C3C" strokeWidth="1" strokeDasharray="3 2" opacity="0.6" />
-      <text x={xAct} y={padY + plotH + 12} textAnchor="middle" fontSize="8" fill="#E74C3C">{tActual} K</text>
+      <text x={xAct} y={padY + plotH + 12} textAnchor="middle" fontSize="8" className={styles.svgRojo}>{tActual} K</text>
     </svg>
   );
 }
@@ -327,15 +327,15 @@ function SvgLineal({ eaKJ, tActual }: SvgLinealProps) {
       <line x1={padX} y1={padY} x2={padX} y2={padY + plotH + 6} stroke="#ccc" strokeWidth="1" />
       <line x1={padX - 4} y1={padY + plotH} x2={padX + plotW + 4} y2={padY + plotH} stroke="#ccc" strokeWidth="1" />
 
-      <text x={padX + plotW / 2} y={H - 4} textAnchor="middle" fontSize="9" fill="#999">1/T (K⁻¹) →</text>
-      <text x={8} y={padY + plotH / 2} textAnchor="middle" fontSize="9" fill="#999" transform={`rotate(-90, 8, ${padY + plotH / 2})`}>ln(k)</text>
+      <text x={padX + plotW / 2} y={H - 4} textAnchor="middle" fontSize="9" className={styles.svgEje}>1/T (K⁻¹) →</text>
+      <text x={8} y={padY + plotH / 2} textAnchor="middle" fontSize="9" className={styles.svgEje} transform={`rotate(-90, 8, ${padY + plotH / 2})`}>ln(k)</text>
 
-      <text x={padX + plotW - 4} y={padY + 14} textAnchor="end" fontSize="8" fill="#999" fontStyle="italic">pendiente = -Ea/R</text>
+      <text x={padX + plotW - 4} y={padY + 14} textAnchor="end" fontSize="8" className={styles.svgEje} fontStyle="italic">pendiente = -Ea/R</text>
 
       <polyline points={puntosStr} fill="none" stroke="#48A9A6" strokeWidth="2" strokeLinejoin="round" />
 
       <circle cx={xE(x1Act)} cy={yE(y1Act)} r="5" fill="#E74C3C" />
-      <text x={xE(x1Act)} y={padY + plotH + 12} textAnchor="middle" fontSize="8" fill="#E74C3C">{(x1Act * 1000).toFixed(2)}×10⁻³</text>
+      <text x={xE(x1Act)} y={padY + plotH + 12} textAnchor="middle" fontSize="8" className={styles.svgRojo}>{(x1Act * 1000).toFixed(2)}×10⁻³</text>
     </svg>
   );
 }
@@ -347,10 +347,13 @@ function SvgLineal({ eaKJ, tActual }: SvgLinealProps) {
 interface SvgOrdenProps {
   orden: 0 | 1 | 2;
   k: number;
+  /** Color de la curva y de la línea de vida media */
   color: string;
+  /** Clase del módulo con el tono de TEXTO de ese color por tema (el color puro daba 2,8-4,1:1) */
+  claseTexto: string;
 }
 
-function SvgOrden({ orden, k, color }: SvgOrdenProps) {
+function SvgOrden({ orden, k, color, claseTexto }: SvgOrdenProps) {
   const W = 260;
   const H = 160;
   const padX = 32;
@@ -392,8 +395,8 @@ function SvgOrden({ orden, k, color }: SvgOrdenProps) {
       <line x1={padX} y1={padY} x2={padX} y2={padY + plotH + 4} stroke="#ccc" strokeWidth="1" />
       <line x1={padX - 4} y1={padY + plotH} x2={padX + plotW + 4} y2={padY + plotH} stroke="#ccc" strokeWidth="1" />
 
-      <text x={padX + plotW / 2} y={H - 4} textAnchor="middle" fontSize="8" fill="#999">Tiempo →</text>
-      <text x={padX + 2} y={padY + 8} fontSize="8" fill="#999">[A]₀</text>
+      <text x={padX + plotW / 2} y={H - 4} textAnchor="middle" fontSize="8" className={styles.svgEje}>Tiempo →</text>
+      <text x={padX + 2} y={padY + 8} fontSize="8" className={styles.svgEje}>[A]₀</text>
 
       <polyline points={puntos} fill="none" stroke={color} strokeWidth="2.5" strokeLinejoin="round" />
 
@@ -401,13 +404,13 @@ function SvgOrden({ orden, k, color }: SvgOrdenProps) {
       {t12 <= tMax && (
         <>
           <line x1={xt12} y1={padY + plotH / 2} x2={xt12} y2={padY + plotH} stroke={color} strokeWidth="1" strokeDasharray="3 2" opacity="0.7" />
-          <text x={xt12 + 2} y={padY + plotH - 4} fontSize="7" fill={color}>t₁/₂</text>
+          <text x={xt12 + 2} y={padY + plotH - 4} fontSize="7" className={claseTexto}>t₁/₂</text>
         </>
       )}
 
       {/* Línea horizontal en A0/2 */}
       <line x1={padX} y1={padY + plotH / 2} x2={padX + plotW} y2={padY + plotH / 2} stroke="#ccc" strokeWidth="0.8" strokeDasharray="3 3" />
-      <text x={padX - 2} y={padY + plotH / 2 + 4} fontSize="7" fill="#aaa" textAnchor="end">½[A]₀</text>
+      <text x={padX - 2} y={padY + plotH / 2 + 4} fontSize="7" className={styles.svgEje} textAnchor="end">½[A]₀</text>
     </svg>
   );
 }
@@ -674,7 +677,7 @@ export default function VisualizadorCineticaQuimica() {
             <div className={styles.ordenCard}>
               <h3 className={styles.ordenTitulo}>Orden 0</h3>
               <p className={styles.ordenFormula}>[A] = [A]₀ − k·t</p>
-              <SvgOrden orden={0} k={kOrden0} color="#2E86AB" />
+              <SvgOrden orden={0} k={kOrden0} color="#2E86AB" claseTexto={styles.svgAzul} />
               <div className={styles.kSliderRow}>
                 <label htmlFor="k-orden-0">k:</label>
                 <input
@@ -699,7 +702,7 @@ export default function VisualizadorCineticaQuimica() {
             <div className={styles.ordenCard}>
               <h3 className={styles.ordenTitulo}>Orden 1</h3>
               <p className={styles.ordenFormula}>[A] = [A]₀ · e<sup>−kt</sup></p>
-              <SvgOrden orden={1} k={kOrden1} color="#48A9A6" />
+              <SvgOrden orden={1} k={kOrden1} color="#48A9A6" claseTexto={styles.svgTeal} />
               <div className={styles.kSliderRow}>
                 <label htmlFor="k-orden-1">k:</label>
                 <input
@@ -724,7 +727,7 @@ export default function VisualizadorCineticaQuimica() {
             <div className={styles.ordenCard}>
               <h3 className={styles.ordenTitulo}>Orden 2</h3>
               <p className={styles.ordenFormula}>1/[A] = 1/[A]₀ + k·t</p>
-              <SvgOrden orden={2} k={kOrden2} color="#E67E22" />
+              <SvgOrden orden={2} k={kOrden2} color="#E67E22" claseTexto={styles.svgNaranja} />
               <div className={styles.kSliderRow}>
                 <label htmlFor="k-orden-2">k:</label>
                 <input
@@ -760,7 +763,7 @@ export default function VisualizadorCineticaQuimica() {
               </div>
               <div className={styles.vidaMediaItem}>
                 <span>Orden 2</span>
-                <span style={{ color: '#E67E22' }}>{t12_2.toFixed(1)} s</span>
+                <span className={styles.tNaranja}>{t12_2.toFixed(1)} s</span>
               </div>
             </div>
           </div>

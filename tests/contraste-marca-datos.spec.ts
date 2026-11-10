@@ -115,6 +115,9 @@ const APPS: App[] = [
   // en claro, 3,66-4,25 en oscuro), «Silenciado ahora» en gris sobre su tinte (4,19 y 3,16-3,36), las
   // de evidencia en #e74c3c sobre su tinte en oscuro (3,25) y los avisos en #777 en oscuro (3,08)
   { slug: 'visualizador-epigenetica', todo: true, secciones: 'button[aria-pressed]' },
+  // Del censo de C0297 (10/11/2026): «Orden 0, 1, 2» de la comparativa de vidas medias en
+  // --text-muted sobre su tinte (4,48:1 en claro) y la vida media del orden 2 en #E67E22 con style
+  { slug: 'visualizador-cinetica-quimica', todo: true, secciones: 'button[aria-pressed]' },
 ];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {

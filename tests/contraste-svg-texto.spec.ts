@@ -173,6 +173,12 @@ const APPS: App[] = [
   // blanco sobre el gen apagado en #ddd. Los dos toggles, las cuatro marcas (botones nuevos) y los
   // dos alelos, como subestados
   { slug: 'visualizador-epigenetica', subestados: 'button[aria-pressed]' },
+  // Del censo del 10/11/2026 (C0297): los rótulos de sus cinco gráficos, sobre la tarjeta, en el color
+  // puro de su curva (la marca 4,11:1 en claro y 3,3 en oscuro, el teal 2,80, el naranja del
+  // catalizador y del orden 2 2,9, el rojo del punto actual 3,8 y 3,6) y los ejes en #999 y #aaa
+  // (2,85 y 2,32 en claro). Los ejemplos y el catalizador como subestados, y los deslizadores en
+  // sus extremos
+  { slug: 'visualizador-cinetica-quimica', extremos: true, subestados: 'button[aria-pressed]' },
 ];
 
 interface TextoSvg {
