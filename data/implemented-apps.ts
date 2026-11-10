@@ -433,6 +433,7 @@ export const implementedAppsUrls = [
   "/simulador-modelo-bohr/",        // Niveles del hidrógeno, saltos de emisión/absorción con Rydberg (R_H con masa reducida), series y color (S0184, 07/10/2026)
   "/simulador-osmosis/",            // Membrana semipermeable: sentido del agua y π = i·M·R·T; célula animal o vegetal en medio hipo/iso/hipertónico (S0186, 12/10/2026)
   "/simulador-campo-electrico/",    // Cargas puntuales interactivas: líneas de campo, equipotenciales, mapa color |E|, carga prueba con F y U
+  "/simulador-ley-coulomb/",       // Ley de Coulomb: fuerza entre dos cargas, despeje de r o q, medio con εr, gráfica F-r y 12 casos de aula (S0264, 10/11/2026)
   "/simulador-ondas-interferencia/", // Onda viajera 1D, interferencia 2D 2 fuentes, ondas estacionarias en cuerda y tubo (5 modos armónicos)
 
   // Tanda 3 simuladores Bachillerato/Universidad (2026-05-07)

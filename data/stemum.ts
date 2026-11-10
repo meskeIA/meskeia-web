@@ -369,6 +369,13 @@ export const STEMUM_APPS: StemumApp[] = [
     disciplina: 'fisica',
   },
   {
+    slug: 'simulador-ley-coulomb',
+    icon: '🧲',
+    titulo: 'Ley de Coulomb',
+    desc: 'La fuerza entre dos cargas, con su sentido y el efecto del medio. Despeja la distancia o una carga y mira cómo cae con el cuadrado de la distancia.',
+    disciplina: 'fisica',
+  },
+  {
     slug: 'simulador-campo-magnetico',
     icon: '🧲',
     titulo: 'Campo magnético',

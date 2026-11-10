@@ -3460,7 +3460,13 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/simulador-campo-magnetico/', icon: '🧲', name: 'Campo Magnético', description: 'El campo hermano: fuerza de Lorentz, solenoides e inducción' },
     { url: '/simulador-circuitos-electricos/', icon: '⚡', name: 'Circuitos Eléctricos', description: 'Serie, paralelo, Ley de Ohm' },
     { url: '/visualizador-electromagnetismo/', icon: '🧲', name: 'Electromagnetismo', description: 'Campos E y B, inducción' },
-    { url: '/simulador-ondas-interferencia/', icon: '🌊', name: 'Ondas e Interferencia', description: 'Superposición y estacionarias' },
+    { url: '/simulador-ley-coulomb/', icon: '🧲', name: 'Ley de Coulomb', description: 'La fuerza entre dos cargas, con despejes y casos de clase' },
+  ],
+  'simulador-ley-coulomb': [
+    { url: '/simulador-campo-electrico/', icon: '⚡', name: 'Campo Eléctrico', description: 'Más de dos cargas: líneas de campo, equipotenciales y la misma k' },
+    { url: '/simulador-condensadores/', icon: '🔋', name: 'Condensadores', description: 'La permitividad del dieléctrico, ahora entre dos placas' },
+    { url: '/simulador-campo-magnetico/', icon: '🧲', name: 'Campo Magnético', description: 'La otra fuerza entre cargas: la que aparece cuando se mueven' },
+    { url: '/tabla-constantes-fisicas/', icon: '🔬', name: 'Constantes Físicas', description: 'k, ε₀ y la carga elemental con sus valores de referencia' },
   ],
   'simulador-ondas-interferencia': [
     { url: '/simulador-pendulo/', icon: '⏳', name: 'Péndulo y MAS', description: 'Oscilaciones y resonancia' },
