@@ -69,6 +69,37 @@ test.describe('estimacion-baja-maternal', () => {
     expect(await estimar(page)).toBe('34');
   });
 
+  /**
+   * Cabo C0691 — REPARADO el 10/11/2026. ET 48.4 (BOE consolidado, consultado el 10/11/2026): la
+   * hospitalización de más de siete días amplía el permiso «en tantos días como el nacido se
+   * encuentre hospitalizado», con un máximo de trece semanas adicionales. La app redondeaba a semanas
+   * (Math.ceil): 10 días de ingreso sumaban 14 y daba 21 semanas.
+   *   · Biparental, 10 días: 19 × 7 + 10 = 143 días = 20 semanas y 3 días. (El cabo esperaba
+   *     «19 semanas y 3 días (136 días)»: suma mal, 19 × 7 + 10 son 143.)
+   *   · Con fecha 01/03/2026: fin si se toman todas consecutivas = 01/03 + 143 días = 22/07/2026.
+   *   · Biparental, 100 días: el tope, 13 semanas → 19 + 13 = 32 semanas justas.
+   */
+  test('REPARADO (C0691) · 10 días de hospitalización amplían 10 días: 20 semanas y 3 días', async ({ page }) => {
+    await page.getByLabel('Hospitalizacion neonatal (parto prematuro u otra causa)').check();
+    const dias = page.locator('#diasHosp');
+    await dias.fill('10');
+    await page.locator('#fechaParto').fill('2026-03-01');
+    expect(await estimar(page)).toBe('20');
+    await expect(page.getByText('semanas y 3 días (143 días)')).toBeVisible();
+    const tabla = page.locator('table');
+    await expect(tabla.locator('tr', { hasText: 'Total' })).toContainText('20 semanas y 3 días');
+    await expect(tabla.locator('tr', { hasText: 'Extras' })).toContainText('+10 días');
+    await expect(page.locator('div', { hasText: /^Fin si se toman todas consecutivas/ }).last()).toContainText('22/07/2026');
+  });
+
+  test('REPARADO (C0691) · 100 días de hospitalización se quedan en el tope de 13 semanas: 32', async ({ page }) => {
+    await page.getByLabel('Hospitalizacion neonatal (parto prematuro u otra causa)').check();
+    await page.locator('#diasHosp').fill('100');
+    expect(await estimar(page)).toBe('32');
+    await expect(page.locator('table tr', { hasText: 'Total' })).toContainText('32 semanas');
+    await expect(page.locator('table tr', { hasText: 'Total' })).not.toContainText('días');
+  });
+
   test('REPARADO (09/11/2026, 4288) · adopción y acogimiento no suman semanas: 19', async ({ page }) => {
     for (const situacion of ['Adopcion', 'Acogimiento']) {
       await page.getByLabel(situacion, { exact: true }).check();

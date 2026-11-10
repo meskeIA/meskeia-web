@@ -28,7 +28,12 @@ interface ResultadoBaja {
   semanasObligatorias: number;
   semanasVoluntarias: number;
   semanasExtras: number;
-  semanasTotal: number;
+  /** Ampliación por hospitalización neonatal, en DÍAS (ET 48.4). */
+  diasHospitalizacion: number;
+  /** Ampliaciones en días: semanas de parto múltiple y discapacidad × 7 + hospitalización. */
+  diasExtras: number;
+  /** Permiso entero en días. */
+  diasTotal: number;
   detalleExtras: string[];
   fechaInicio: Date | null;
   fechaFinObligatorias: Date | null;
@@ -54,6 +59,16 @@ function addDays(date: Date, days: number): Date {
   const result = new Date(date);
   result.setDate(result.getDate() + days);
   return result;
+}
+
+/** «20 semanas», «1 semana», «20 semanas y 3 días»: la hospitalización amplía en DÍAS (ET 48.4).
+ *  La misma que estimacion-prestacion-nacimiento. */
+function textoDuracion(dias: number): string {
+  const semanas = Math.floor(dias / 7);
+  const resto = dias % 7;
+  const textoSemanas = `${semanas} semana${semanas === 1 ? '' : 's'}`;
+  if (semanas === 0 && resto > 0) return `${resto} día${resto === 1 ? '' : 's'}`;
+  return resto === 0 ? textoSemanas : `${textoSemanas} y ${resto} día${resto === 1 ? '' : 's'}`;
 }
 
 function formatFecha(date: Date): string {
@@ -113,15 +128,17 @@ export default function EstimacionBajaMaternalPage() {
 
     // Hospitalizacion neonatal: solo si pasa de 7 dias (ET 48.4, «por un periodo superior a
     // siete dias»); hasta el 09/11/2026 un ingreso de 1 a 7 dias sumaba una semana (hermana
-    // del hallazgo 4287). Sigue redondeando a semanas: el ET amplia en DIAS (cabo anotado).
+    // del hallazgo 4287). Y amplia «en tantos días como el nacido se encuentre hospitalizado»,
+    // con un máximo de trece semanas (BOE consolidado, consultado el 10/11/2026): hasta esa
+    // fecha se redondeaba a semanas (Math.ceil), y 10 días de ingreso sumaban 14 (cabo C0691).
+    let diasHosp = 0;
     if (hospitalizacion && diasHospitalizacion > 7) {
-      const semanasHosp = Math.min(
-        Math.ceil(diasHospitalizacion / 7),
-        AMPLIACION_POR_ID['hospitalizacion-neonatal'].semanasExtra
+      diasHosp = Math.min(
+        diasHospitalizacion,
+        AMPLIACION_POR_ID['hospitalizacion-neonatal'].semanasExtra * 7
       );
-      semanasExtras += semanasHosp;
       detalleExtras.push(
-        `Hospitalizacion neonatal (${diasHospitalizacion} dias): +${semanasHosp} semanas`
+        `Hospitalización neonatal (${diasHospitalizacion} días de ingreso): +${diasHosp} días`
       );
     }
 
@@ -129,7 +146,8 @@ export default function EstimacionBajaMaternalPage() {
     // el permiso solo puede EMPEZAR hasta cuatro semanas antes de la resolución. Hasta el
     // 09/11/2026 sumaba 2 semanas a toda adopción y acogimiento, internacional o no (4288).
 
-    const semanasTotal = semanasObligatorias + semanasVoluntarias + semanasExtras;
+    const diasExtras = semanasExtras * 7 + diasHosp;
+    const diasTotal = (semanasObligatorias + semanasVoluntarias) * 7 + diasExtras;
 
     // Calcular fechas si se proporciono fecha de parto
     let fechaInicio: Date | null = null;
@@ -140,7 +158,7 @@ export default function EstimacionBajaMaternalPage() {
     if (fechaParto) {
       fechaInicio = new Date(fechaParto);
       fechaFinObligatorias = addWeeks(fechaInicio, semanasObligatorias);
-      fechaFinTotal = addWeeks(fechaInicio, semanasTotal);
+      fechaFinTotal = addDays(fechaInicio, diasTotal);
       fechaLimiteVoluntarias = addMonths(fechaInicio, datosBase.voluntariasHasta);
     }
 
@@ -148,7 +166,9 @@ export default function EstimacionBajaMaternalPage() {
       semanasObligatorias,
       semanasVoluntarias,
       semanasExtras,
-      semanasTotal,
+      diasHospitalizacion: diasHosp,
+      diasExtras,
+      diasTotal,
       detalleExtras,
       fechaInicio,
       fechaFinObligatorias,
@@ -342,7 +362,7 @@ export default function EstimacionBajaMaternalPage() {
                   className={styles.numberInput}
                 />
                 <p className={styles.helpText}>
-                  Solo amplia si pasa de 7 dias. Maximo 13 semanas adicionales (91 dias). Se calcula 1 semana extra por cada 7 dias o fraccion.
+                  Solo amplía si pasa de 7 días, y entonces suma un día por cada día de ingreso. Máximo 13 semanas adicionales (91 días).
                 </p>
               </div>
             )}
@@ -402,8 +422,12 @@ export default function EstimacionBajaMaternalPage() {
               {/* Resumen numerico */}
               <div className={styles.resultadoFinal}>
                 <p className={styles.resultadoLabel}>Duracion total del permiso</p>
-                <p className={styles.resultadoValor}>{resultado.semanasTotal}</p>
-                <span className={styles.resultadoBadge}>semanas</span>
+                <p className={styles.resultadoValor}>{Math.floor(resultado.diasTotal / 7)}</p>
+                <span className={styles.resultadoBadge}>
+                  {resultado.diasTotal % 7 === 0
+                    ? 'semanas'
+                    : `semanas y ${resultado.diasTotal % 7} día${resultado.diasTotal % 7 === 1 ? '' : 's'} (${resultado.diasTotal} días)`}
+                </span>
               </div>
 
               {/* Tabla desglose */}
@@ -412,19 +436,19 @@ export default function EstimacionBajaMaternalPage() {
                   <thead>
                     <tr>
                       <th>Concepto</th>
-                      <th>Semanas</th>
+                      <th>Duración</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr>
                       <td>Obligatorias (ininterrumpidas tras el parto)</td>
-                      <td>{resultado.semanasObligatorias}</td>
+                      <td>{textoDuracion(resultado.semanasObligatorias * 7)}</td>
                     </tr>
                     <tr>
                       <td>Flexibles + cuidado prolongado (hasta los 12 meses / 8 anos)</td>
-                      <td>{resultado.semanasVoluntarias}</td>
+                      <td>{textoDuracion(resultado.semanasVoluntarias * 7)}</td>
                     </tr>
-                    {resultado.semanasExtras > 0 && (
+                    {resultado.diasExtras > 0 && (
                       <tr>
                         <td>
                           Extras
@@ -434,12 +458,12 @@ export default function EstimacionBajaMaternalPage() {
                             ))}
                           </ul>
                         </td>
-                        <td>{resultado.semanasExtras}</td>
+                        <td>{textoDuracion(resultado.diasExtras)}</td>
                       </tr>
                     )}
                     <tr>
                       <td><strong>Total</strong></td>
-                      <td><strong>{resultado.semanasTotal}</strong></td>
+                      <td><strong>{textoDuracion(resultado.diasTotal)}</strong></td>
                     </tr>
                   </tbody>
                 </table>
@@ -449,11 +473,11 @@ export default function EstimacionBajaMaternalPage() {
               <h3 className={styles.timelineTitle}>
                 <span aria-hidden="true">📊</span> Timeline visual
               </h3>
-              <div className={styles.timeline} role="img" aria-label={`Timeline del permiso: ${resultado.semanasObligatorias} semanas obligatorias, ${resultado.semanasVoluntarias} flexibles/cuidado prolongado${resultado.semanasExtras > 0 ? `, ${resultado.semanasExtras} extras` : ''}`}>
+              <div className={styles.timeline} role="img" aria-label={`Timeline del permiso: ${resultado.semanasObligatorias} semanas obligatorias, ${resultado.semanasVoluntarias} flexibles/cuidado prolongado${resultado.diasExtras > 0 ? `, ${textoDuracion(resultado.diasExtras)} extras` : ''}`}>
                 <div className={styles.timelineBar}>
                   <div
                     className={styles.timelineObligatorias}
-                    style={{ width: getTimelineWidth(resultado.semanasObligatorias, resultado.semanasTotal) }}
+                    style={{ width: getTimelineWidth(resultado.semanasObligatorias * 7, resultado.diasTotal) }}
                   >
                     <span className={styles.timelineBarLabel}>
                       {resultado.semanasObligatorias} sem.
@@ -461,19 +485,19 @@ export default function EstimacionBajaMaternalPage() {
                   </div>
                   <div
                     className={styles.timelineVoluntarias}
-                    style={{ width: getTimelineWidth(resultado.semanasVoluntarias, resultado.semanasTotal) }}
+                    style={{ width: getTimelineWidth(resultado.semanasVoluntarias * 7, resultado.diasTotal) }}
                   >
                     <span className={styles.timelineBarLabel}>
                       {resultado.semanasVoluntarias} sem.
                     </span>
                   </div>
-                  {resultado.semanasExtras > 0 && (
+                  {resultado.diasExtras > 0 && (
                     <div
                       className={styles.timelineExtras}
-                      style={{ width: getTimelineWidth(resultado.semanasExtras, resultado.semanasTotal) }}
+                      style={{ width: getTimelineWidth(resultado.diasExtras, resultado.diasTotal) }}
                     >
                       <span className={styles.timelineBarLabel}>
-                        +{resultado.semanasExtras}
+                        {resultado.diasExtras % 7 === 0 ? `+${resultado.diasExtras / 7}` : `+${resultado.diasExtras} d`}
                       </span>
                     </div>
                   )}
@@ -487,7 +511,7 @@ export default function EstimacionBajaMaternalPage() {
                     <span className={styles.legendDotVol} aria-hidden="true" />
                     Flexibles + cuidado prolongado
                   </span>
-                  {resultado.semanasExtras > 0 && (
+                  {resultado.diasExtras > 0 && (
                     <span className={styles.legendItem}>
                       <span className={styles.legendDotExtra} aria-hidden="true" />
                       Extras
@@ -650,7 +674,7 @@ export default function EstimacionBajaMaternalPage() {
             </div>
             <div className={styles.escenarioExample}>
               <p>19 semanas base (32 si familia monoparental) + hasta 13 semanas adicionales.</p>
-              <p>Se anade 1 semana por cada 7 dias de hospitalizacion neonatal.</p>
+              <p>Si el ingreso pasa de 7 días, se añade un día por cada día de hospitalización neonatal: 10 días de ingreso suman 10 días.</p>
               <p><strong>Maximo posible: 32 semanas</strong> (45 en monoparental), para un solo progenitor.</p>
             </div>
             <div className={styles.escenarioTip}>
