@@ -118,6 +118,11 @@ const APPS: App[] = [
   // Del censo de C0297 (10/11/2026): «Orden 0, 1, 2» de la comparativa de vidas medias en
   // --text-muted sobre su tinte (4,48:1 en claro) y la vida media del orden 2 en #E67E22 con style
   { slug: 'visualizador-cinetica-quimica', todo: true, secciones: 'button[aria-pressed]' },
+  // Del censo de C0297 (10/11/2026): el nombre de cada color del hidrógeno en su color puro con style
+  // sobre su tinte (amarillo 1,94:1, verde 2,03, gris 2,29, azul 3,15 en claro), el CO₂ en verde y
+  // rojo puros (2,28 y 3,76), el blanco sobre la insignia verde (2,28) y, en oscuro, el texto claro
+  // del tema sobre el botón activo de la densidad (4,46)
+  { slug: 'visualizador-hidrogeno', todo: true, secciones: 'button[aria-pressed]' },
 ];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {

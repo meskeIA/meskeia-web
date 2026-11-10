@@ -313,13 +313,41 @@
   margin: 0 auto;
 }
 
+/* --text-secondary y no --text-muted: sobre el tinte del ánodo y del cátodo el muted daba 3,99-4,20:1
+   en oscuro (cabo C0297, 10/11/2026) */
 .svgMuted {
-  fill: var(--text-muted, #999);
+  fill: var(--text-secondary);
 }
 
-[data-theme='dark'] .svgMuted {
-  fill: var(--text-muted, #888);
-}
+/* Tono de TEXTO de los rótulos de la pila por color de dato y tema (cabo C0297, 10/11/2026): el
+   color se queda en los rectángulos y trazos. Sobre la tarjeta y el tinte de cada zona: 5,6-7,9:1
+   en claro y 5,3-9,5:1 en oscuro (el ámbar, que en oscuro daba 1,19-1,69, pasa a 5,8) */
+.svgAzul { fill: #1B5E7E; }
+.svgTeal { fill: #2F7472; }
+.svgAmbar { fill: #78350F; }
+.svgVerde { fill: #166534; }
+.svgRojo { fill: #B91C1C; }
+[data-theme='dark'] .svgAzul { fill: #9CCFE6; }
+[data-theme='dark'] .svgTeal { fill: #6CC5C2; }
+[data-theme='dark'] .svgAmbar { fill: #FCD34D; }
+[data-theme='dark'] .svgVerde { fill: #86EFAC; }
+[data-theme='dark'] .svgRojo { fill: #FCA5A5; }
+
+/* Tono de TEXTO de cada color del hidrógeno y de su CO₂ (cabo C0645, 10/11/2026): con el color puro
+   como texto daba 1,94-3,76:1 en claro (el amarillo 1,94, el verde 2,03, el gris 2,29). El color
+   del dato se queda en el borde y el tinte de la cabecera */
+.tGris { color: #4B5563; }
+.tAzul { color: #1D4ED8; }
+.tVerde { color: #166534; }
+.tAmbar { color: #92400E; }
+.tNegro { color: #1F2937; }
+.tRojo { color: #B91C1C; }
+[data-theme='dark'] .tGris { color: #D1D5DB; }
+[data-theme='dark'] .tAzul { color: #93C5FD; }
+[data-theme='dark'] .tVerde { color: #86EFAC; }
+[data-theme='dark'] .tAmbar { color: #FCD34D; }
+[data-theme='dark'] .tNegro { color: #E5E7EB; }
+[data-theme='dark'] .tRojo { color: #FCA5A5; }
 
 .fuelCellApps h3 {
   font-size: 1.05rem;
@@ -421,7 +449,8 @@
 
 .colorBadge {
   display: inline-block;
-  background: #22C55E;
+  /* Verde oscurecido bajo el blanco: #22C55E daba 2,28:1; #15803D, 5,02 */
+  background: #15803D;
   color: #fff;
   font-size: 0.72rem;
   font-weight: 600;
@@ -493,6 +522,8 @@
 [data-theme='dark'] .toggleActivo {
   background: var(--primary-boton);
   border-color: var(--primary-boton);
+  /* Blanco: heredaba el #E8E8E8 de .toggleBtn en oscuro, 4,46:1 sobre el botón */
+  color: #fff;
 }
 
 .densityChart {

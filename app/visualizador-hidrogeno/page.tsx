@@ -126,6 +126,15 @@ const COLORES_H2: ColorH2[] = [
   },
 ];
 
+/** Tono de TEXTO del nombre de cada color, por tema (el color puro daba 1,94-3,15:1 en claro) */
+const TONO_H2: Record<string, string> = {
+  Gris: styles.tGris,
+  Azul: styles.tAzul,
+  Verde: styles.tVerde,
+  Amarillo: styles.tAmbar,
+  Negro: styles.tNegro,
+};
+
 // ---- Datos densidad energética ----
 const DENSIDAD_MASICA = {
   labels: ['H₂ hidrógeno', 'Metano natural', 'Gasolina', 'Madera seca', 'Batería Li-ion'],
@@ -217,8 +226,8 @@ function PilaCombustibleSVG() {
     >
       {/* Ánodo */}
       <rect x="10" y="20" width="100" height="180" rx="8" fill="#2E86AB" opacity="0.15" stroke="#2E86AB" strokeWidth="2" />
-      <text x="60" y="46" textAnchor="middle" fontSize="13" fontWeight="bold" fill="#2E86AB">ÁNODO</text>
-      <text x="60" y="64" textAnchor="middle" fontSize="10" fill="#2E86AB">(−)</text>
+      <text x="60" y="46" textAnchor="middle" fontSize="13" fontWeight="bold" className={styles.svgAzul}>ÁNODO</text>
+      <text x="60" y="64" textAnchor="middle" fontSize="10" className={styles.svgAzul}>(−)</text>
       <text x="60" y="100" textAnchor="middle" fontSize="11" fill="currentColor">H₂ → 2H⁺</text>
       <text x="60" y="118" textAnchor="middle" fontSize="11" fill="currentColor">+ 2e⁻</text>
       <text x="60" y="145" textAnchor="middle" fontSize="10" fill="#666" className={styles.svgMuted}>Hidrógeno</text>
@@ -226,20 +235,20 @@ function PilaCombustibleSVG() {
 
       {/* Membrana PEM */}
       <rect x="120" y="20" width="60" height="180" rx="0" fill="#F59E0B" opacity="0.25" stroke="#F59E0B" strokeWidth="2" />
-      <text x="150" y="46" textAnchor="middle" fontSize="11" fontWeight="bold" fill="#B45309">MEMBRANA</text>
-      <text x="150" y="62" textAnchor="middle" fontSize="9" fill="#B45309">PEM</text>
-      <text x="150" y="100" textAnchor="middle" fontSize="10" fill="#92400E">H⁺ →</text>
-      <text x="150" y="118" textAnchor="middle" fontSize="9" fill="#92400E">pasan</text>
-      <text x="150" y="134" textAnchor="middle" fontSize="9" fill="#92400E">protones</text>
-      <text x="150" y="155" textAnchor="middle" fontSize="9" fill="#B45309">bloquea e⁻</text>
+      <text x="150" y="46" textAnchor="middle" fontSize="11" fontWeight="bold" className={styles.svgAmbar}>MEMBRANA</text>
+      <text x="150" y="62" textAnchor="middle" fontSize="9" className={styles.svgAmbar}>PEM</text>
+      <text x="150" y="100" textAnchor="middle" fontSize="10" className={styles.svgAmbar}>H⁺ →</text>
+      <text x="150" y="118" textAnchor="middle" fontSize="9" className={styles.svgAmbar}>pasan</text>
+      <text x="150" y="134" textAnchor="middle" fontSize="9" className={styles.svgAmbar}>protones</text>
+      <text x="150" y="155" textAnchor="middle" fontSize="9" className={styles.svgAmbar}>bloquea e⁻</text>
 
       {/* Cátodo */}
       <rect x="190" y="20" width="100" height="180" rx="8" fill="#48A9A6" opacity="0.15" stroke="#48A9A6" strokeWidth="2" />
-      <text x="240" y="46" textAnchor="middle" fontSize="13" fontWeight="bold" fill="#48A9A6">CÁTODO</text>
-      <text x="240" y="64" textAnchor="middle" fontSize="10" fill="#48A9A6">(+)</text>
+      <text x="240" y="46" textAnchor="middle" fontSize="13" fontWeight="bold" className={styles.svgTeal}>CÁTODO</text>
+      <text x="240" y="64" textAnchor="middle" fontSize="10" className={styles.svgTeal}>(+)</text>
       <text x="240" y="95" textAnchor="middle" fontSize="10" fill="currentColor">½O₂ + 2H⁺</text>
       <text x="240" y="113" textAnchor="middle" fontSize="10" fill="currentColor">+ 2e⁻ →</text>
-      <text x="240" y="131" textAnchor="middle" fontSize="12" fontWeight="bold" fill="#22C55E">H₂O</text>
+      <text x="240" y="131" textAnchor="middle" fontSize="12" fontWeight="bold" className={styles.svgVerde}>H₂O</text>
       <text x="240" y="155" textAnchor="middle" fontSize="10" fill="#666" className={styles.svgMuted}>Oxígeno</text>
       <text x="240" y="170" textAnchor="middle" fontSize="10" fill="#666" className={styles.svgMuted}>entra aquí</text>
 
@@ -247,9 +256,10 @@ function PilaCombustibleSVG() {
       <path d="M 60 20 Q 60 10 150 10 Q 240 10 240 20" stroke="#EF4444" fill="none" strokeWidth="2.5" strokeDasharray="6,3" />
       {/* Motor */}
       <circle cx="150" cy="10" r="8" fill="white" stroke="#EF4444" strokeWidth="2" />
-      <text x="150" y="14" textAnchor="middle" fontSize="8" fill="#EF4444" fontWeight="bold">M</text>
+      {/* El círculo del motor es blanco en los dos temas: rojo oscuro fijo (6,47:1; #EF4444 daba 3,73) */}
+      <text x="150" y="14" textAnchor="middle" fontSize="8" fill="#B91C1C" fontWeight="bold">M</text>
       {/* a11y-ok: <text> de un <svg role="img"> con su aria-label: el lector no entra en el dibujo */}
-      <text x="150" y="0" textAnchor="middle" fontSize="9" fill="#EF4444">⚡ e⁻</text>
+      <text x="150" y="0" textAnchor="middle" fontSize="9" className={styles.svgRojo}>⚡ e⁻</text>
 
       {/* Flechas H⁺ en membrana */}
       <line x1="125" y1="110" x2="170" y2="110" stroke="#B45309" strokeWidth="1.5" markerEnd="url(#arrowH)" />
@@ -262,10 +272,10 @@ function PilaCombustibleSVG() {
       {/* Leyenda lateral */}
       <rect x="310" y="20" width="100" height="180" rx="8" fill="none" stroke="#E5E7EB" strokeWidth="1" />
       <text x="360" y="42" textAnchor="middle" fontSize="11" fontWeight="bold" fill="currentColor">Resumen</text>
-      <text x="360" y="60" textAnchor="middle" fontSize="9" fill="#2E86AB">H₂ (comb.)</text>
-      <text x="360" y="75" textAnchor="middle" fontSize="9" fill="#48A9A6">O₂ (aire)</text>
+      <text x="360" y="60" textAnchor="middle" fontSize="9" className={styles.svgAzul}>H₂ (comb.)</text>
+      <text x="360" y="75" textAnchor="middle" fontSize="9" className={styles.svgTeal}>O₂ (aire)</text>
       <text x="360" y="95" textAnchor="middle" fontSize="10" fill="currentColor">Salida:</text>
-      <text x="360" y="112" textAnchor="middle" fontSize="11" fontWeight="bold" fill="#22C55E">H₂O</text>
+      <text x="360" y="112" textAnchor="middle" fontSize="11" fontWeight="bold" className={styles.svgVerde}>H₂O</text>
       <text x="360" y="132" textAnchor="middle" fontSize="9" fill="currentColor">Eficiencia:</text>
       <text x="360" y="148" textAnchor="middle" fontSize="10" fontWeight="bold" fill="currentColor">60-65%</text>
       <text x="360" y="162" textAnchor="middle" fontSize="9" fill="#666" className={styles.svgMuted}>vs 30-40%</text>
@@ -469,7 +479,7 @@ export default function VisualizadorHidrogeno() {
             >
               <div className={styles.colorHeader} style={{ backgroundColor: c.color + '22' }}>
                 <span className={styles.colorEmoji} aria-hidden="true">{c.emoji}</span>
-                <strong className={styles.colorNombre} style={{ color: c.color }}>
+                <strong className={`${styles.colorNombre} ${TONO_H2[c.nombre] ?? ''}`}>
                   Hidrógeno {c.nombre}
                 </strong>
                 {c.destacado && (
@@ -480,7 +490,7 @@ export default function VisualizadorHidrogeno() {
                 <p className={styles.colorProceso}>{c.proceso}</p>
                 <div className={styles.colorMetrica}>
                   <span>CO₂:</span>
-                  <strong style={{ color: c.sostenible ? '#22C55E' : '#EF4444' }}>
+                  <strong className={c.sostenible ? styles.tVerde : styles.tRojo}>
                     {c.co2}
                   </strong>
                 </div>

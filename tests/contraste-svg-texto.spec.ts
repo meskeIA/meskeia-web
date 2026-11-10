@@ -179,6 +179,11 @@ const APPS: App[] = [
   // (2,85 y 2,32 en claro). Los ejemplos y el catalizador como subestados, y los deslizadores en
   // sus extremos
   { slug: 'visualizador-cinetica-quimica', extremos: true, subestados: 'button[aria-pressed]' },
+  // Del censo del 10/11/2026 (C0297): los rótulos de la pila de combustible en la marca, el teal, el
+  // ámbar y el verde puros sobre el tinte de su zona (en oscuro: ÁNODO 2,84:1, la membrana 1,19-1,69,
+  // CÁTODO 3,96) y sobre la tarjeta («H₂ (comb.)» 3,31, «⚡ e⁻» 3,61), el rojo sobre el círculo
+  // blanco del motor (3,73) y el gris de --text-muted sobre los tintes (3,99-4,20)
+  { slug: 'visualizador-hidrogeno', subestados: 'button[aria-pressed]' },
 ];
 
 interface TextoSvg {
