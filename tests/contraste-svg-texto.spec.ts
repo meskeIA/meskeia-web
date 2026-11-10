@@ -198,6 +198,11 @@ const APPS: App[] = [
     secciones: SECCIONES,
     subestados: "button[aria-pressed]:not(nav button)",
   },
+  // Del censo del 10/11/2026 (C0297): blanco sobre las cajas de los diagramas del feedback y del eje
+  // HPA en su color al 85 % (verde 2,45:1, naranja 2,42, la marca 3,16, rojo 3,21, violeta 3,56 en
+  // claro; verde 3,59 y naranja 3,53 en oscuro) y «FEEDBACK NEGATIVO» y «Feedback (frena)» en
+  // currentColor al 50 % (3,33 en claro, 4,10 en oscuro). Las glándulas, como subestados
+  { slug: 'visualizador-sistema-endocrino', secciones: SECCIONES, extremos: true, subestados: "button[aria-pressed]:not(nav button)" },
 ];
 
 interface TextoSvg {

@@ -130,6 +130,9 @@ const APPS: App[] = [
   // blanco sobre las barras de Richter (1,98-3,76) y las magnitudes históricas en su color (naranja
   // 2,67 en claro, granate 1,73 en oscuro)
   { slug: 'visualizador-tectonica-placas', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
+  // Del censo de C0297 (10/11/2026): el nivel del glucagón en el naranja #e67e22 de su barra con
+  // style (2,85:1 en claro)
+  { slug: 'visualizador-sistema-endocrino', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
 ];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {

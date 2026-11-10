@@ -146,6 +146,15 @@
   .subtitle { font-size: 0.95rem; }
 }
 
+/* Rótulo tenue de los diagramas del feedback (cabo C0297, 10/11/2026): currentColor al 50 % daba
+   3,33:1 en claro y 4,10 en oscuro; --text-muted del tema, 5,1 y 6,3 */
+.svgTenue { fill: var(--text-muted); }
+
+/* Tono de TEXTO del nivel del glucagón (cabo C0645, 10/11/2026): el naranja #e67e22 de la barra
+   daba 2,85:1 sobre blanco; el color de dato se queda en la barra */
+.tNaranja { color: #B93E0B; }
+[data-theme='dark'] .tNaranja { color: #FDBA74; }
+
 @media (prefers-reduced-motion: reduce) {
   .navBtn, .glandulaDot, .hormonaCard, .sliderBarraFill { transition-duration: 0.01ms !important; }
 }

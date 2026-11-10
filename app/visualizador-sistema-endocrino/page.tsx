@@ -424,23 +424,23 @@ function SeccionFeedback() {
       <div className={styles.feedbackDiagrama}>
         <svg viewBox="0 0 340 280" className={styles.feedbackSvg} role="img" aria-label="Diagrama circular del feedback negativo: hipotálamo detecta, hipófisis envía señal, glándula produce hormona, niveles suben, hipotálamo reduce señal">
           {/* Nodos */}
-          <rect x="110" y="10" width="120" height="44" rx="10" fill="#8e44ad" opacity="0.85" />
+          <rect x="110" y="10" width="120" height="44" rx="10" fill="#8e44ad" />
           <text x="170" y="30" textAnchor="middle" fill="#fff" fontSize="10" fontWeight="700">Hipotálamo</text>
           <text x="170" y="44" textAnchor="middle" fill="#fff" fontSize="8">detecta niveles</text>
 
-          <rect x="230" y="100" width="100" height="44" rx="10" fill="#9b59b6" opacity="0.85" />
+          <rect x="230" y="100" width="100" height="44" rx="10" fill="#9b59b6" />
           <text x="280" y="120" textAnchor="middle" fill="#fff" fontSize="10" fontWeight="700">Hipófisis</text>
           <text x="280" y="134" textAnchor="middle" fill="#fff" fontSize="8">envía señal</text>
 
-          <rect x="220" y="210" width="110" height="44" rx="10" fill="#2E86AB" opacity="0.85" />
+          <rect x="220" y="210" width="110" height="44" rx="10" fill="#26718F" />
           <text x="275" y="230" textAnchor="middle" fill="#fff" fontSize="10" fontWeight="700">Glándula diana</text>
           <text x="275" y="244" textAnchor="middle" fill="#fff" fontSize="8">produce hormona</text>
 
-          <rect x="10" y="210" width="110" height="44" rx="10" fill="#27ae60" opacity="0.85" />
+          <rect x="10" y="210" width="110" height="44" rx="10" fill="#1E7B45" />
           <text x="65" y="230" textAnchor="middle" fill="#fff" fontSize="10" fontWeight="700">Niveles suben</text>
           <text x="65" y="244" textAnchor="middle" fill="#fff" fontSize="8">en sangre</text>
 
-          <rect x="10" y="100" width="110" height="44" rx="10" fill="#e74c3c" opacity="0.85" />
+          <rect x="10" y="100" width="110" height="44" rx="10" fill="#C0392B" />
           <text x="65" y="120" textAnchor="middle" fill="#fff" fontSize="10" fontWeight="700">Freno</text>
           <text x="65" y="134" textAnchor="middle" fill="#fff" fontSize="8">hipotálamo reduce</text>
 
@@ -459,8 +459,8 @@ function SeccionFeedback() {
           </defs>
 
           {/* Etiqueta central */}
-          <text x="170" y="160" textAnchor="middle" fill="currentColor" fontSize="9" fontWeight="600" opacity="0.5">FEEDBACK</text>
-          <text x="170" y="173" textAnchor="middle" fill="currentColor" fontSize="9" fontWeight="600" opacity="0.5">NEGATIVO</text>
+          <text x="170" y="160" textAnchor="middle" className={styles.svgTenue} fontSize="9" fontWeight="600">FEEDBACK</text>
+          <text x="170" y="173" textAnchor="middle" className={styles.svgTenue} fontSize="9" fontWeight="600">NEGATIVO</text>
         </svg>
       </div>
 
@@ -526,7 +526,7 @@ function SeccionFeedback() {
           <div className={styles.sliderBarraGrupo}>
             <div className={styles.sliderBarraLabel}>
               <span><span aria-hidden="true">🟠</span> Glucagón (sube glucosa)</span>
-              <span className={styles.sliderBarraNivel} style={{ color: '#e67e22' }}>
+              <span className={`${styles.sliderBarraNivel} ${styles.tNaranja}`}>
                 {glucagonNivel > 50 ? 'Alto' : glucagonNivel > 15 ? 'Medio' : 'Bajo'}
               </span>
             </div>
@@ -568,7 +568,7 @@ function SeccionEstres() {
       <div className={styles.ejeHpaZona}>
         <svg viewBox="0 0 300 320" className={styles.ejeHpaSvg} role="img" aria-label="Diagrama del eje HPA: estrés activa hipotálamo, que libera CRH, la hipófisis libera ACTH, las suprarrenales liberan cortisol">
           {/* Estresor */}
-          <rect x="90" y="5" width="120" height="36" rx="8" fill="#e74c3c" opacity="0.85" />
+          <rect x="90" y="5" width="120" height="36" rx="8" fill="#C0392B" />
           <text x="150" y="20" textAnchor="middle" fill="#fff" fontSize="10" fontWeight="700">ESTRÉS</text>
           <text x="150" y="34" textAnchor="middle" fill="#fff" fontSize="7.5">trabajo, peligro, ansiedad</text>
 
@@ -576,34 +576,34 @@ function SeccionEstres() {
           <line x1="150" y1="41" x2="150" y2="58" stroke="currentColor" strokeWidth="2" markerEnd="url(#arrowHpa)" opacity="0.5" />
 
           {/* Hipotálamo */}
-          <rect x="85" y="58" width="130" height="40" rx="8" fill="#8e44ad" opacity="0.85" />
+          <rect x="85" y="58" width="130" height="40" rx="8" fill="#8e44ad" />
           <text x="150" y="75" textAnchor="middle" fill="#fff" fontSize="10" fontWeight="700">Hipotálamo</text>
           <text x="150" y="90" textAnchor="middle" fill="#fff" fontSize="8">libera CRH</text>
 
           <line x1="150" y1="98" x2="150" y2="115" stroke="currentColor" strokeWidth="2" markerEnd="url(#arrowHpa)" opacity="0.5" />
 
           {/* Hipófisis */}
-          <rect x="85" y="115" width="130" height="40" rx="8" fill="#9b59b6" opacity="0.85" />
+          <rect x="85" y="115" width="130" height="40" rx="8" fill="#9b59b6" />
           <text x="150" y="132" textAnchor="middle" fill="#fff" fontSize="10" fontWeight="700">Hipófisis</text>
           <text x="150" y="147" textAnchor="middle" fill="#fff" fontSize="8">libera ACTH</text>
 
           <line x1="150" y1="155" x2="150" y2="172" stroke="currentColor" strokeWidth="2" markerEnd="url(#arrowHpa)" opacity="0.5" />
 
           {/* Suprarrenales */}
-          <rect x="75" y="172" width="150" height="40" rx="8" fill="#e67e22" opacity="0.85" />
+          <rect x="75" y="172" width="150" height="40" rx="8" fill="#B35309" />
           <text x="150" y="189" textAnchor="middle" fill="#fff" fontSize="10" fontWeight="700">Suprarrenales</text>
           <text x="150" y="203" textAnchor="middle" fill="#fff" fontSize="8">liberan CORTISOL</text>
 
           <line x1="150" y1="212" x2="150" y2="229" stroke="currentColor" strokeWidth="2" markerEnd="url(#arrowHpa)" opacity="0.5" />
 
           {/* Efectos */}
-          <rect x="55" y="229" width="190" height="40" rx="8" fill="#2E86AB" opacity="0.85" />
+          <rect x="55" y="229" width="190" height="40" rx="8" fill="#26718F" />
           <text x="150" y="247" textAnchor="middle" fill="#fff" fontSize="9" fontWeight="700">Efectos en todo el cuerpo</text>
           <text x="150" y="261" textAnchor="middle" fill="#fff" fontSize="7.5">glucosa↑ inmunidad↓ inflamación↓ energía↑</text>
 
           {/* Feedback negativo (flecha de vuelta) */}
           <path d="M55 249 Q20 249 20 160 Q20 70 85 70" fill="none" stroke="#e74c3c" strokeWidth="1.5" strokeDasharray="4 3" markerEnd="url(#arrowHpaRed)" opacity="0.6" />
-          <text x="8" y="165" fill="currentColor" fontSize="7" fontWeight="600" opacity="0.5" transform="rotate(-90, 8, 165)">Feedback (frena)</text>
+          <text x="8" y="165" className={styles.svgTenue} fontSize="7" fontWeight="600" transform="rotate(-90, 8, 165)">Feedback (frena)</text>
 
           <defs>
             <marker id="arrowHpa" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
