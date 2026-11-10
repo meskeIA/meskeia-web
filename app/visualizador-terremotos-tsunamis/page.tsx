@@ -9,6 +9,7 @@ import LegalNotice from '@/components/LegalNotice';
 import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
+import { rellenoConTinta } from '@/lib/tintaLegible';
 
 // --- Rótulo de SVG sobre placa ---
 
@@ -41,6 +42,13 @@ function RotuloSvg({ x, y, texto, tamano, anchor = 'start', negrita = false }: R
     </g>
   );
 }
+
+/**
+ * Tono de TEXTO de cada falla, por tema (cabo C0645, 10/11/2026). El color de dato de TIPOS_FALLA
+ * se queda en el borde de la tarjeta; como texto se leía a 2,80-4,11:1 en claro (el teal y la
+ * marca) y 2,77-3,35 en oscuro (el rojo y la marca).
+ */
+const TONO_FALLA = [styles.fallaTono0, styles.fallaTono1, styles.fallaTono2];
 
 // --- Datos estáticos ---
 
@@ -258,7 +266,7 @@ export default function VisualizadorTerremotosTsunamis() {
                 <button
                   key={i}
                   type="button"
-                  className={`${styles.fallaCard} ${fallaSeleccionada === i ? styles.fallaCardActiva : ''}`}
+                  className={`${styles.fallaCard} ${TONO_FALLA[i]} ${fallaSeleccionada === i ? styles.fallaCardActiva : ''}`}
                   onClick={() => setFallaSeleccionada(i)}
                   style={{ '--falla-color': falla.color } as React.CSSProperties}
                   aria-pressed={fallaSeleccionada === i}
@@ -361,7 +369,7 @@ export default function VisualizadorTerremotosTsunamis() {
               </div>
 
               <div className={styles.fallaDetalle}>
-                <h3 style={{ color: TIPOS_FALLA[fallaSeleccionada].color }}>{TIPOS_FALLA[fallaSeleccionada].nombre}</h3>
+                <h3 className={`${styles.fallaDetalleTitulo} ${TONO_FALLA[fallaSeleccionada]}`}>{TIPOS_FALLA[fallaSeleccionada].nombre}</h3>
                 <div className={styles.fallaDetalleGrid}>
                   <div className={styles.fallaDetalleItem}>
                     <span className={styles.fallaDetalleLabel}>Mecanismo</span>
@@ -461,7 +469,14 @@ export default function VisualizadorTerremotosTsunamis() {
               {ONDAS_SISMICAS.map((onda, i) => (
                 <div key={i} className={styles.ondaCard} style={{ '--onda-color': onda.color } as React.CSSProperties}>
                   <div className={styles.ondaHeader}>
-                    <span className={styles.ondaSigla} style={{ background: onda.color }}>{onda.sigla}</span>
+                    {/* Blanco sobre la marca daba 4,11:1 y sobre el ámbar 2,15 (cabo C0645): la tinta
+                        y, si ninguna llega, el relleno se ajustan con rellenoConTinta */}
+                    <span
+                      className={styles.ondaSigla}
+                      style={{ background: rellenoConTinta(onda.color).relleno, color: rellenoConTinta(onda.color).tinta }}
+                    >
+                      {onda.sigla}
+                    </span>
                     <h3 className={styles.ondaNombre}>{onda.nombre}</h3>
                   </div>
                   <div className={styles.ondaInfo}>
@@ -805,12 +820,14 @@ export default function VisualizadorTerremotosTsunamis() {
               <h3 className={styles.subTitle}>Tiempo Disponible para Evacuar</h3>
               <div className={styles.tiempoCards}>
                 <div className={styles.tiempoCard} style={{ borderColor: '#D62839' }}>
-                  <div className={styles.tiempoValor} style={{ color: '#D62839' }}>5–30 min</div>
+                  {/* El color de dato como texto: el rojo a 2,77:1 en oscuro y el ámbar a 2,15 en
+                      claro (cabo C0645). Se queda en el borde; el texto, con su tono por tema. */}
+                  <div className={`${styles.tiempoValor} ${styles.tiempoRojo}`}>5–30 min</div>
                   <h4>Terremoto local</h4>
                   <p>Epicentro a menos de 100 km de la costa. La única estrategia viable: correr inmediatamente a terreno elevado. No esperes la alerta oficial.</p>
                 </div>
                 <div className={styles.tiempoCard} style={{ borderColor: '#F59E0B' }}>
-                  <div className={styles.tiempoValor} style={{ color: '#F59E0B' }}>30 min – 12 h</div>
+                  <div className={`${styles.tiempoValor} ${styles.tiempoAmbar}`}>30 min – 12 h</div>
                   <h4>Terremoto lejano</h4>
                   <p>Epicentro a más de 500 km. El sistema de alerta tiene tiempo de funcionar. La evacuación ordenada siguiendo las vías señalizadas es posible.</p>
                 </div>

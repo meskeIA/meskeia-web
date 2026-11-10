@@ -159,7 +159,29 @@
 .fallaTitle {
   font-size: 1rem;
   font-weight: 700;
-  color: var(--falla-color, var(--primary-texto));
+  color: var(--falla-texto, var(--primary-texto));
+}
+
+/* Tono de TEXTO de cada falla por tema (cabo C0645): el color de dato (--falla-color) se queda en
+   el borde. Normal = marca, Inversa = rojo, Desgarre = teal. */
+.fallaTono0 {
+  --falla-texto: var(--primary-texto);
+}
+
+.fallaTono1 {
+  --falla-texto: #b4232f;
+}
+
+[data-theme='dark'] .fallaTono1 {
+  --falla-texto: #f4848e;
+}
+
+.fallaTono2 {
+  --falla-texto: var(--secondary-texto);
+}
+
+.fallaDetalleTitulo {
+  color: var(--falla-texto, var(--primary-texto));
 }
 
 .fallaTipo {
@@ -710,8 +732,10 @@
   padding: 1rem 1.25rem;
 }
 
+/* En oscuro el tinte al 10 % dejaba la etiqueta (--text-muted) a 4,42:1 y la cifra (--primary-texto)
+   a 4,40 (cabo C0645, forma de C0278): se cambia el fondo, no el texto */
 [data-theme='dark'] .energiaCifra {
-  background: rgba(46, 134, 171, 0.1);
+  background: rgba(46, 134, 171, 0.03);
 }
 
 .energiaLabel {
@@ -1113,6 +1137,15 @@
   font-weight: 800;
   line-height: 1.1;
   margin-bottom: 0.4rem;
+}
+
+/* Tonos de texto por tema (cabo C0645): en claro los -texto de globals; en oscuro manda la reserva */
+.tiempoRojo {
+  color: var(--rojo-texto, #f4848e);
+}
+
+.tiempoAmbar {
+  color: var(--ambar-texto, #f59e0b);
 }
 
 .tiempoCard h4 {

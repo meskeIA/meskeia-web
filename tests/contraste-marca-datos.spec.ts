@@ -78,6 +78,7 @@ const APPS: App[] = [
   // en oscuro), y la empresa y las etiquetas «mejor para» sobre el tinte de la fila desplegada
   // (4,47-4,49, forma de C0278). Las pestañas de la recomendación
   { slug: 'comparador-asistentes-codigo', todo: true, secciones: "[role='tab']" },
+  { slug: 'visualizador-terremotos-tsunamis', todo: true, secciones: "[role='tablist'][aria-label*='ecciones'] [role='tab']" },
 ];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {
