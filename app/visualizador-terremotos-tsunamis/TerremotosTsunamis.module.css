@@ -201,6 +201,32 @@
   height: auto;
 }
 
+/* Rótulos de los SVG (cabo C0297, 10/11/2026). Los que van sobre tierra, agua o placas se pintan
+   sobre una placa opaca con el texto del tema (RotuloSvg de page.tsx); los que van sobre la tarjeta,
+   en un tono de TEXTO por tema: el color de dato (#2E86AB, #7FB3D3, #D62839) se queda en flechas de
+   trazo y líneas. Medidos con tests/contraste-svg-texto.spec.ts en los dos temas. */
+.placaSvg {
+  fill: var(--bg-card);
+  stroke: rgba(93, 78, 55, 0.4);
+  stroke-width: 0.75;
+}
+
+.textoPlacaSvg {
+  fill: var(--text-primary);
+}
+
+.tonoAzulSvg {
+  fill: var(--primary-texto);
+}
+
+.tonoRojoSvg {
+  fill: #b4232f;
+}
+
+[data-theme='dark'] .tonoRojoSvg {
+  fill: #f4848e;
+}
+
 .fallaDetalle h3 {
   font-size: 1.15rem;
   font-weight: 700;

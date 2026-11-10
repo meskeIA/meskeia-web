@@ -28,6 +28,11 @@ interface App {
    * recortado sale blanco, así que un rótulo blanco fuera de la vista se mediría contra blanco.
    */
   ancho?: number;
+  /**
+   * Botones que cambian el SVG DENTRO de una sección (la falla normal, inversa y de desgarre de
+   * visualizador-terremotos-tsunamis): en cada sección donde se vean, se pulsan uno a uno y se mide.
+   */
+  subestados?: string;
 }
 
 const SECCIONES = "nav[aria-label*='ecciones'] button";
@@ -78,6 +83,17 @@ const APPS: App[] = [
   { slug: 'visualizador-arquitectura-estilos', ancho: 1800 },
   { slug: 'visualizador-historia/revolucion-francesa', ancho: 1800 },
   { slug: 'visualizador-historia/china-dinastias', ancho: 1800 },
+  // De la tanda del censo del 08/11/2026 (C0297), reparada el 10/11/2026: blanco sobre la arena de
+  // las fallas (1,50:1), «Corteza» en marrón sobre su franja (2,81 en claro, 1,22 en oscuro), los
+  // rótulos de la subducción en azul claro, trigo, rojo o ámbar sobre el agua y las placas
+  // (1,06-2,71 en claro), el azul claro de la ola del tsunami como texto (2,24) y el trigo sobre
+  // el fondo marino (1,82). Las tres fallas se miden como subestados de la primera sección.
+  {
+    slug: 'visualizador-terremotos-tsunamis',
+    secciones: "[role='tablist'][aria-label*='ecciones'] [role='tab']",
+    extremos: true,
+    subestados: "button[class*='fallaCard']",
+  },
 ];
 
 interface TextoSvg {
@@ -258,31 +274,44 @@ async function soltarScroll(page: Page): Promise<void> {
   });
 }
 
-async function recorrer(page: Page, secciones?: string, extremos = false, soltar = false): Promise<string[]> {
+/** Mide la sección tal cual y, si tiene `subestados` visibles, cada uno de ellos. */
+async function medirConSubestados(page: Page, donde: string, extremos: boolean, subestados?: string): Promise<string[]> {
+  const todo = await medirAqui(page, donde, extremos);
+  if (!subestados) return todo;
+  const subs = page.locator(`${subestados}:visible`);
+  const m = await subs.count();
+  for (let j = 0; j < m; j++) {
+    await subs.nth(j).click();
+    todo.push(...(await medirAqui(page, `${donde}, subestado ${j + 1}`, extremos)));
+  }
+  return todo;
+}
+
+async function recorrer(page: Page, secciones?: string, extremos = false, soltar = false, subestados?: string): Promise<string[]> {
   const todo: string[] = [];
   const botones = secciones ? page.locator(secciones) : null;
   const n = botones ? await botones.count() : 0;
   await desplegarTodo(page);
   if (soltar) await soltarScroll(page);
-  if (!n) return medirAqui(page, 'carga', extremos);
+  if (!n) return medirConSubestados(page, 'carga', extremos, subestados);
   for (let i = 0; i < n; i++) {
     await botones!.nth(i).click();
     await desplegarTodo(page);
     if (soltar) await soltarScroll(page);
-    todo.push(...(await medirAqui(page, `sección ${i + 1}`, extremos)));
+    todo.push(...(await medirConSubestados(page, `sección ${i + 1}`, extremos, subestados)));
   }
   return Array.from(new Set(todo));
 }
 
-for (const { slug, secciones, extremos, ancho } of APPS) {
+for (const { slug, secciones, extremos, ancho, subestados } of APPS) {
   test(`${slug}: el texto de sus SVG se lee contra lo que tiene detrás, en claro y en oscuro (C0297)`, async ({ page }) => {
     test.setTimeout(120_000);
     if (ancho) await page.setViewportSize({ width: ancho, height: 900 });
     await page.goto(`/${slug}/`);
     await prepararParaMedir(page);
     if (secciones) await expect(page.locator(secciones).first()).toBeVisible();
-    expect.soft(await recorrer(page, secciones, extremos, Boolean(ancho)), 'claro').toEqual([]);
+    expect.soft(await recorrer(page, secciones, extremos, Boolean(ancho), subestados), 'claro').toEqual([]);
     await activarTemaOscuro(page);
-    expect.soft(await recorrer(page, secciones, extremos, Boolean(ancho)), 'oscuro').toEqual([]);
+    expect.soft(await recorrer(page, secciones, extremos, Boolean(ancho), subestados), 'oscuro').toEqual([]);
   });
 }

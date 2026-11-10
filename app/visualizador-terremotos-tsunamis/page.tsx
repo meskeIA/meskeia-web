@@ -10,6 +10,38 @@ import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
 
+// --- Rótulo de SVG sobre placa ---
+
+interface RotuloSvgProps {
+  x: number;
+  y: number;
+  texto: string;
+  tamano: number;
+  anchor?: 'start' | 'middle';
+  negrita?: boolean;
+}
+
+/**
+ * Rótulo de un diagrama sobre una placa opaca del color de la tarjeta, con el texto del tema.
+ * Cabo C0297 (10/11/2026): los rótulos iban en blanco, trigo, marrón o rojo directamente sobre la
+ * tierra, el agua y las placas, y se leían a 1,06-3,43:1 en claro y 1,22-3,96 en oscuro (blanco
+ * sobre arena 1,50). Sobre una placa se leen igual en los dos temas, pase lo que pase por debajo.
+ * El ancho se estima por el número de letras (sobra un poco, mejor que falte).
+ */
+function RotuloSvg({ x, y, texto, tamano, anchor = 'start', negrita = false }: RotuloSvgProps) {
+  const ancho = Array.from(texto).length * tamano * (negrita ? 0.6 : 0.55) + tamano * 0.8;
+  const alto = tamano * 1.4;
+  const x0 = anchor === 'middle' ? x - ancho / 2 : x - tamano * 0.4;
+  return (
+    <g>
+      <rect x={x0} y={y - tamano * 1.05} width={ancho} height={alto} rx={3} className={styles.placaSvg} />
+      <text x={x} y={y} textAnchor={anchor} fontSize={tamano} fontWeight={negrita ? 700 : 600} className={styles.textoPlacaSvg}>
+        {texto}
+      </text>
+    </g>
+  );
+}
+
 // --- Datos estáticos ---
 
 interface TipoFalla {
@@ -262,13 +294,13 @@ export default function VisualizadorTerremotosTsunamis() {
                     {/* Plano de falla */}
                     <line x1="190" y1="30" x2="190" y2="220" stroke="#D62839" strokeWidth="3" strokeDasharray="8,4" />
                     {/* Flechas de movimiento */}
-                    <text x="100" y="30" textAnchor="middle" fill="#2E86AB" fontSize="22" fontWeight="bold">→</text>
-                    <text x="290" y="75" textAnchor="middle" fill="#D62839" fontSize="22" fontWeight="bold">↓</text>
+                    <text x="100" y="30" textAnchor="middle" className={styles.tonoAzulSvg} fontSize="22" fontWeight="bold">→</text>
+                    <text x="290" y="75" textAnchor="middle" className={styles.tonoRojoSvg} fontSize="22" fontWeight="bold">↓</text>
                     {/* Etiquetas */}
-                    <text x="95" y="165" textAnchor="middle" fill="white" fontSize="13" fontWeight="600">Bloque fijo</text>
-                    <text x="290" y="165" textAnchor="middle" fill="white" fontSize="13" fontWeight="600">Bloque hundido</text>
-                    <text x="230" y="25" fill="#D62839" fontSize="11" fontWeight="bold">Plano de falla</text>
-                    <text x="30" y="60" fill="#654321" fontSize="11">Corteza</text>
+                    <RotuloSvg x={95} y={165} texto="Bloque fijo" tamano={13} anchor="middle" />
+                    <RotuloSvg x={290} y={165} texto="Bloque hundido" tamano={13} anchor="middle" />
+                    <text x="230" y="25" className={styles.tonoRojoSvg} fontSize="11" fontWeight="bold">Plano de falla</text>
+                    <RotuloSvg x={30} y={64} texto="Corteza" tamano={11} />
                   </svg>
                 )}
                 {/* SVG Falla Inversa */}
@@ -288,14 +320,14 @@ export default function VisualizadorTerremotosTsunamis() {
                     {/* Plano de falla */}
                     <line x1="200" y1="40" x2="170" y2="220" stroke="#D62839" strokeWidth="3" strokeDasharray="8,4" />
                     {/* Flechas */}
-                    <text x="100" y="50" textAnchor="middle" fill="#D62839" fontSize="22" fontWeight="bold">↑</text>
-                    <text x="310" y="95" textAnchor="middle" fill="#2E86AB" fontSize="22" fontWeight="bold">→</text>
+                    <text x="100" y="50" textAnchor="middle" className={styles.tonoRojoSvg} fontSize="22" fontWeight="bold">↑</text>
+                    <text x="310" y="95" textAnchor="middle" className={styles.tonoAzulSvg} fontSize="22" fontWeight="bold">→</text>
                     {/* Etiquetas */}
-                    <text x="95" y="170" textAnchor="middle" fill="white" fontSize="13" fontWeight="600">Bloque superior</text>
-                    <text x="295" y="170" textAnchor="middle" fill="white" fontSize="13" fontWeight="600">Bloque inferior</text>
-                    <text x="215" y="35" fill="#D62839" fontSize="11" fontWeight="bold">Plano de falla</text>
+                    <RotuloSvg x={95} y={170} texto="Bloque superior" tamano={13} anchor="middle" />
+                    <RotuloSvg x={295} y={170} texto="Bloque inferior" tamano={13} anchor="middle" />
+                    <text x="215" y="35" className={styles.tonoRojoSvg} fontSize="11" fontWeight="bold">Plano de falla</text>
                     {/* a11y-ok: <text> de un <svg> que ya es aria-hidden entero; ahí no cabe <span> */}
-                    <text x="30" y="85" fill="#650000" fontSize="11">⚠ Máx. energía</text>
+                    <RotuloSvg x={30} y={85} texto="⚠ Máx. energía" tamano={11} />
                   </svg>
                 )}
                 {/* SVG Falla en Desgarre */}
@@ -316,12 +348,14 @@ export default function VisualizadorTerremotosTsunamis() {
                     {/* Línea de falla */}
                     <line x1="20" y1="110" x2="380" y2="110" stroke="#D62839" strokeWidth="3" strokeDasharray="10,5" />
                     {/* Flechas horizontales opuestas */}
-                    <text x="320" y="75" textAnchor="middle" fill="#2E86AB" fontSize="24" fontWeight="bold">→</text>
-                    <text x="80" y="160" textAnchor="middle" fill="#2E86AB" fontSize="24" fontWeight="bold">←</text>
+                    <text x="320" y="75" textAnchor="middle" className={styles.tonoAzulSvg} fontSize="24" fontWeight="bold">→</text>
+                    {/* Fuera de la franja teal (120-150), sobre la tierra como la → del bloque norte:
+                        sobre la franja se leía a 2,88:1 en claro y 2,27 en oscuro */}
+                    <text x="80" y="185" textAnchor="middle" className={styles.tonoAzulSvg} fontSize="24" fontWeight="bold">←</text>
                     {/* Etiquetas */}
-                    <text x="120" y="70" fill="white" fontSize="13" fontWeight="600">Placa Norte</text>
-                    <text x="195" y="175" fill="white" fontSize="13" fontWeight="600">Placa Sur</text>
-                    <text x="140" y="105" fill="#D62839" fontSize="11" fontWeight="bold">Plano de falla transformante</text>
+                    <RotuloSvg x={120} y={75} texto="Placa Norte" tamano={13} />
+                    <RotuloSvg x={195} y={180} texto="Placa Sur" tamano={13} />
+                    <RotuloSvg x={140} y={104} texto="Plano de falla transformante" tamano={11} negrita />
                   </svg>
                 )}
               </div>
@@ -380,29 +414,33 @@ export default function VisualizadorTerremotosTsunamis() {
                 </defs>
                 {/* Océano */}
                 <rect x="0" y="0" width="500" height="60" fill="#1E6E9E" opacity="0.35" />
-                <text x="130" y="35" textAnchor="middle" fill="#7FB3D3" fontSize="13" fontWeight="600">Océano</text>
                 {/* Placa oceánica (subducta) */}
                 <polygon points="0,60 260,60 340,260 0,260" fill="url(#oceano)" />
-                <text x="100" y="170" fill="#7FB3D3" fontSize="12">Placa oceánica</text>
                 {/* Placa continental */}
                 <polygon points="240,60 500,60 500,260 200,260" fill="url(#continente)" />
-                <text x="380" y="130" fill="#F5DEB3" fontSize="12">Placa continental</text>
                 {/* Zona de contacto (plano de Benioff) */}
                 <line x1="250" y1="60" x2="340" y2="260" stroke="#D62839" strokeWidth="3" strokeDasharray="10,5" />
-                <text x="295" y="175" fill="#D62839" fontSize="10" fontWeight="bold" transform="rotate(25, 295, 175)">Plano Benioff</text>
                 {/* Foco del terremoto */}
                 <circle cx="290" cy="155" r="10" fill="#D62839" opacity="0.9" />
-                <text x="320" y="155" fill="#D62839" fontSize="11" fontWeight="bold">Foco</text>
                 {/* Epicentro */}
                 <circle cx="280" cy="60" r="6" fill="#F59E0B" />
                 <line x1="280" y1="60" x2="280" y2="145" stroke="#F59E0B" strokeWidth="1.5" strokeDasharray="5,3" />
-                <text x="280" y="50" textAnchor="middle" fill="#F59E0B" fontSize="11" fontWeight="bold">Epicentro</text>
-                {/* Olas sísmicas */}
-                <text x="200" y="90" fill="#48A9A6" fontSize="20">〜〜〜</text>
-                <text x="150" y="38" fill="white" fontSize="13">↑ Ondas sísmicas</text>
+                {/* Olas sísmicas: trazo, no texto (eran tres «〜» en teal sobre el agua) */}
+                <path d="M 200 84 q 7.5 -6 15 0 t 15 0 t 15 0 t 15 0" fill="none" stroke="#48A9A6" strokeWidth="2.5" />
                 {/* Montaña */}
                 <polygon points="420,60 450,15 480,60" fill="#5D4E37" />
-                <text x="450" y="12" textAnchor="middle" fill="#F5DEB3" fontSize="10">Cordillera</text>
+                {/* Rótulos, encima de todo y sobre placa (cabo C0297). «Océano» y «Ondas sísmicas» se
+                    montaban uno encima del otro: ahora van separados y por encima de «Epicentro». */}
+                <RotuloSvg x={60} y={35} texto="Océano" tamano={13} anchor="middle" />
+                <RotuloSvg x={150} y={32} texto="↑ Ondas sísmicas" tamano={13} />
+                <RotuloSvg x={100} y={170} texto="Placa oceánica" tamano={12} />
+                <RotuloSvg x={380} y={130} texto="Placa continental" tamano={12} />
+                <g transform="rotate(25, 295, 175)">
+                  <RotuloSvg x={295} y={175} texto="Plano Benioff" tamano={10} negrita />
+                </g>
+                <RotuloSvg x={320} y={155} texto="Foco" tamano={11} negrita />
+                <RotuloSvg x={280} y={50} texto="Epicentro" tamano={11} anchor="middle" negrita />
+                <RotuloSvg x={450} y={12} texto="Cordillera" tamano={10} anchor="middle" />
               </svg>
               <p className={styles.svgNota}>La placa oceánica es más densa y se hunde bajo la continental. La fricción en el plano de contacto acumula energía elástica que se libera bruscamente en un terremoto.</p>
             </div>
@@ -656,16 +694,17 @@ export default function VisualizadorTerremotosTsunamis() {
                 {/* Ola en costa (alta y corta) */}
                 <path d="M 360 80 Q 380 30 400 80 Q 420 130 440 100" fill="none" stroke="#2E86AB" strokeWidth="3" />
                 {/* Flechas de dirección */}
-                <text x="155" y="58" textAnchor="middle" fill="#7FB3D3" fontSize="18" fontWeight="bold">→</text>
-                {/* Anotaciones */}
-                <text x="155" y="38" textAnchor="middle" fill="#7FB3D3" fontSize="11" fontWeight="600">Mar profundo: 700-800 km/h · ola 0,5 m</text>
-                <text x="410" y="20" textAnchor="middle" fill="#2E86AB" fontSize="11" fontWeight="600">Costa: 30 km/h · ola 10-40 m</text>
+                <text x="155" y="58" textAnchor="middle" className={styles.tonoAzulSvg} fontSize="18" fontWeight="bold">→</text>
+                {/* Anotaciones (cabo C0297: el azul claro de la ola, como texto sobre la tarjeta, se
+                    leía a 2,24:1, y la marca a 4,07 en claro y 3,31 en oscuro) */}
+                <text x="155" y="38" textAnchor="middle" className={styles.tonoAzulSvg} fontSize="11" fontWeight="600">Mar profundo: 700-800 km/h · ola 0,5 m</text>
+                <text x="410" y="20" textAnchor="middle" className={styles.tonoAzulSvg} fontSize="11" fontWeight="600">Costa: 30 km/h · ola 10-40 m</text>
                 <line x1="410" y1="23" x2="400" y2="35" stroke="#2E86AB" strokeWidth="1.5" />
                 {/* Flecha costa */}
-                <text x="340" y="90" fill="#2E86AB" fontSize="18" fontWeight="bold">→</text>
+                <text x="340" y="90" className={styles.tonoAzulSvg} fontSize="18" fontWeight="bold">→</text>
                 {/* Etiqueta fondo */}
-                <text x="150" y="185" textAnchor="middle" fill="#F5DEB3" fontSize="10">Plataforma continental</text>
-                <text x="450" y="185" textAnchor="middle" fill="#F5DEB3" fontSize="10">Costa</text>
+                <RotuloSvg x={150} y={185} texto="Plataforma continental" tamano={10} anchor="middle" />
+                <RotuloSvg x={450} y={185} texto="Costa" tamano={10} anchor="middle" />
               </svg>
               <p className={styles.svgNota}>La energía se conserva. Al disminuir la profundidad, la velocidad cae drásticamente y la energía se "comprime" verticalmente: la amplitud puede multiplicarse por 30-40.</p>
             </div>
