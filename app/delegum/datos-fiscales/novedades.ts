@@ -23,6 +23,12 @@ export interface Novedad {
 // Sembrado con los cambios normativos reales recientes. Ampliar al mantener fichas.
 export const NOVEDADES: Novedad[] = [
   {
+    fecha: '2026-11-10',
+    fichaSlug: 'itp-ccaa',
+    texto:
+      'Castilla-La Mancha: desde el 31/03/2026, el tipo reducido de la primera vivienda habitual financiada con hipoteca de más del 50 % alcanza a viviendas de hasta 240.000 € (antes 180.000 €). Es del 6 % (5 %, 4 % o 3 % en municipios de zonas de despoblación), del 5 % con familia numerosa, monoparental o discapacidad igual o superior al 65 %, y del 3 % para menores de 36 años (art. 19 de la Ley 8/2013, en la redacción del art. 18 de la Ley 1/2026, BOE-A-2026-23387).',
+  },
+  {
     fecha: '2026-10-28',
     fichaSlug: 'sucesiones-isd',
     texto:

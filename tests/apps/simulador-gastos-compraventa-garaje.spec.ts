@@ -4520,13 +4520,15 @@ test.describe('Regresión — hallazgo 1154 de la re-inspección del 21/09/2026'
     await sembrarImporte(page, 'Precio del garaje / plaza de parking', '22000');
 
     const aviso = page.locator('[role="note"]').filter({ hasText: 'Podrías pagar menos' });
-    const texto = (await aviso.innerText()).replace(/\s+/g, ' ').trim();
 
-    // Las oportunidades que SÍ puede cumplir un garaje se siguen enseñando.
-    expect(texto).toContain('5,00 % — Zona despoblación nivel 1');
-
-    // La que exige vivienda habitual, no. Hoy sale «6,00% — Vivienda habitual (primera compra)».
-    expect(texto).not.toContain('Vivienda habitual');
+    // 10/11/2026 (triaje fiscal): las tres líneas de despoblación que este caso daba por
+    // alcanzables tampoco lo son. Son el «No obstante» del art. 19.2 de la Ley 8/2013 (redacción
+    // de la Ley 1/2026, BOE-A-2026-23387), que trata de «la adquisición de la primera vivienda
+    // habitual», y desde hoy la ficha lo declara en sus condiciones (parte de CLM del cabo
+    // C0163). A un garaje suelto no le queda ningún reducido en Castilla-La Mancha, así que el
+    // aviso no sale; con él se va también la línea «6,00 % — Vivienda habitual» del hallazgo.
+    expect(await valorTarjeta(page, 'ITP (9,00 %)')).toBe('1980,00 €');
+    await expect(aviso).toHaveCount(0);
   });
 });
 

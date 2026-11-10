@@ -4302,12 +4302,15 @@ test.describe('Inspector 21/09/2026 — re-inspección: el tope del reducido y e
     // además del array `condiciones`, y reconoce «primera vivienda» como la otra forma de
     // escribir el requisito. La ficha sigue declarándolo en el nombre —no se tocó el dato,
     // que es correcto— y lo que cambió es el filtro que lo lee.
-    // El requisito está en el nombre y no en las condiciones: de ahí venía el hueco
+    // 10/11/2026 (triaje fiscal): al aplicar la Ley 1/2026 de Castilla-La Mancha (art. 19.2 de
+    // la Ley 8/2013, «primera vivienda habitual», BOE-A-2026-23387) las condiciones dicen ya
+    // «Primera vivienda habitual», así que la ficha no reproduce el hueco del nombre; el filtro
+    // que lee el nombre se queda, y este caso sigue midiendo lo que importa: el aviso del garaje.
     const clm = ITP_CCAA['castilla-mancha'].tiposReducidos.find((t) =>
       /vivienda habitual/i.test(t.nombre),
     );
     expect(clm?.tipo).toBe(6);
-    expect(clm?.condiciones.some((c) => /vivienda habitual/i.test(c))).toBe(false);
+    expect(clm?.condiciones).toContain('Primera vivienda habitual');
 
     await abrir21(page);
     await page.getByRole('button', { name: /Garaje\/Parking/ }).click();
@@ -4322,6 +4325,9 @@ test.describe('Inspector 21/09/2026 — re-inspección: el tope del reducido y e
     const aviso = page.locator('div[class*="avisoReducidos"]');
     if (await aviso.count()) {
       expect(await aviso.first().innerText()).not.toContain('Vivienda habitual');
+      // 10/11/2026: tampoco los de despoblación, que son de la primera vivienda habitual
+      // (art. 19.2 Ley 8/2013, redacción de la Ley 1/2026; parte de CLM del cabo C0163).
+      expect(await aviso.first().innerText()).not.toContain('Zona despoblación');
     }
   });
 
@@ -11871,7 +11877,8 @@ test.describe('inspector 26/10/2026 (3) — Castilla-La Mancha, la frontera de u
    *   Gestoría GESTORIA_POR_DEFECTO.vivienda = 300 · total 15.300 + 690,86 + 214,61 + 300 = 16.505,47 €
    *   (9,709 % → «9,71 %») · coste 186.505,47 €
    *   «Podrías pagar menos» con perfil General: los cuatro reducidos que no son de colectivo y bajan del
-   *   9 % — «Vivienda habitual (primera compra)» al 6 % (tope 180.000, no lo supera) y despoblación 5/4/3.
+   *   9 % — «Vivienda habitual (primera compra)» al 6 % (tope 240.000 desde el 31/03/2026 por la
+   *   Ley 1/2026 de CLM, antes 180.000; no lo supera) y despoblación 5/4/3, de la misma primera vivienda.
    *   El motor del MCP y de la API (lib/calculadoras/compraventa.ts) tiene que dar lo mismo (f8aa2eeb).
    *  Vendedor: compra 100.000 · 0 años y 6 meses completos · suelo 32.000 · total 80.000 · comisión 3 %
    *  de serie · «Es mi vivienda habitual» de serie, sin exención pedida:
@@ -11918,7 +11925,7 @@ test.describe('inspector 26/10/2026 (3) — Castilla-La Mancha, la frontera de u
     const aviso = limpio3(await page.locator('[role="note"]', { hasText: 'Podrías pagar menos' }).first().textContent());
     expect(aviso).toContain('El cálculo usa el tipo general porque no podemos comprobar tu situación. En Castilla-La Mancha existen:');
     expect(aviso).toContain('6,00 % — Vivienda habitual (primera compra)');
-    expect(aviso).toContain('Requisitos: Primera vivienda · Valor ≤ 180.000 € · Hipoteca > 50 % del valor');
+    expect(aviso).toContain('Requisitos: Primera vivienda habitual · Valor ≤ 240.000 € · Hipoteca > 50 % del valor');
     expect(aviso).toContain('3,00 % — Zona despoblación nivel 3');
 
     await page.getByRole('button', { name: 'Vendedor', exact: true }).click();

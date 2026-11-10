@@ -56,7 +56,11 @@ export const TIPOS_ITP_CCAA_2025: TipoITPCCAA[] = [
   { ccaa: 'Baleares',           tipo: 8,    reducido: 4,    notaReducido: 'Escala progresiva 8/9/10/12/13 % según valor. Reducido 4 % vivienda habitual ≤270.151 €; menores de 30 años o discapacidad ≥33 %: 0 %; familia numerosa o VPO: 5 %' },
   { ccaa: 'Canarias',           tipo: 6.5,  reducido: 5,    notaReducido: 'Vivienda habitual, valor ≤150.000 € (sin ser titular de otra vivienda)' },
   { ccaa: 'Cantabria',          tipo: 9,    reducido: 7,    notaReducido: 'Vivienda habitual valor < 200.000 €; jóvenes <36 años hasta 4 %' },
-  { ccaa: 'Castilla-La Mancha', tipo: 9,    reducido: 6,    notaReducido: 'Jóvenes <36 años, familia numerosa o discapacidad, vivienda habitual ≤180.000 €' },
+  // 10/11/2026 (Vigía, BOE-A-2026-23387): la Ley 1/2026 de Castilla-La Mancha, art. 18.Nueve,
+  // reescribe el art. 19.2 y 19.6 y añade el 19.9 de la Ley 8/2013, desde el 31/03/2026. Leído en
+  // el BOE el 10/11/2026. Antes la fila decía «Jóvenes <36, familia numerosa o discapacidad,
+  // vivienda habitual ≤180.000 €» con un único 6 %. El sello del módulo no se mueve: es UNA comunidad.
+  { ccaa: 'Castilla-La Mancha', tipo: 9,    reducido: 6,    notaReducido: 'Primera vivienda habitual ≤240.000 € financiada con hipoteca de más del 50 %: 6 % (5 %, 4 % o 3 % en municipios de zonas de despoblación); familia numerosa, monoparental o discapacidad ≥65 %: 5 %; menores de 36 años: 3 %. Desde el 31/03/2026 (Ley 1/2026; antes, hasta 180.000 €)' },
   { ccaa: 'Castilla y León',    tipo: 8,    reducido: 4,    notaReducido: 'Reducido 4 % (≤150.000 €) o 6 % (resto) para jóvenes <36, familia numerosa/monoparental, discapacidad ≥65 %, VPO o zonas rurales. Jóvenes <36 en municipios <10.000 hab. (≤150.000 €): 0,01 %' },
   { ccaa: 'Cataluña',           tipo: 10,   reducido: 5,    notaReducido: 'Jóvenes ≤35 años desde el 27/06/2025 (Decreto-ley 5/2025; antes ≤32) con renta ≤36.000 €, familia numerosa/monoparental o discapacidad ≥65 % (vivienda habitual). VPO: 7 %. Escala progresiva 10/11/12/13 % según valor' },
   { ccaa: 'Extremadura',        tipo: 8,    reducido: 7,    notaReducido: 'Vivienda habitual (≤180.000 €, con límites de renta). ⚠️ Dato orientativo: escala progresiva (8/10/11 %) y varios tipos para jóvenes/familia numerosa según valor y renta — verifica la tarifa vigente en gobiernodeextremadura.es' },

@@ -4470,7 +4470,9 @@ test.describe('RE-INSPECCIÓN 23/09/2026 — Andalucía, Castilla-La Mancha y el
    *   coste = 393.862,11
    *   (sin la rebaja: 928,38 · 795,76–1.061,01 · 294,30 · 33.922,68)
    *   El reducido «Vivienda habitual (primera compra)» (6 %) NO puede ofrecerse: exige
-   *   primera vivienda (hallazgos 1154/1155) y su tope es 180.000 €.
+   *   primera vivienda (hallazgos 1154/1155) y su tope es 240.000 € (180.000 € hasta la Ley
+   *   1/2026 de CLM). Desde el 10/11/2026 los de despoblación tampoco (art. 19.2 de la Ley
+   *   8/2013, primera vivienda habitual), así que no sale ningún aviso de reducidos.
    *
    * VENDEDOR — compra 40.000 · sin gastos de aquella compra · 20 años · suelo 10.000 · total
    * vacío · comisión 0 · sin gestoría:
@@ -4500,7 +4502,7 @@ test.describe('RE-INSPECCIÓN 23/09/2026 — Andalucía, Castilla-La Mancha y el
     expect(await valorTarjeta(page, 'Total gastos adicionales')).toBe('33.862,11 €');
     expect(await descripcionTarjeta(page, 'Total gastos adicionales')).toBe('9,41 % sobre el precio');
     expect(await valorTarjeta(page, 'COSTE TOTAL')).toBe('393.862,11 €');
-    expect(await avisoReducidos(page).innerText()).not.toContain('Vivienda habitual (primera compra)');
+    await expect(avisoReducidos(page)).toHaveCount(0);
 
     await page.getByRole('button', { name: /Vendedor/ }).click();
     await sembrar(page, 'Precio de compra original', '40000');
@@ -6669,15 +6671,40 @@ test.describe('Inspector 08/10/2026 — Galicia con discapacidad, el umbral vale
   // Cataluña, Castilla y León, Valencia y La Rioja. La referencia y garaje tienen la misma frase.
   //   Castilla-La Mancha · segunda mano · 27.500 € · general → obtenido «En Castilla-La Mancha
   //   existe:» y debajo 5,00 %, 4,00 % y 3,00 %.
+  //   10/11/2026 (triaje fiscal): el caso de Castilla-La Mancha dejó de servir, porque sus tres
+  //   tipos de despoblación son de la primera vivienda habitual (art. 19.2 de la Ley 8/2013,
+  //   redacción de la Ley 1/2026, BOE-A-2026-23387) y a un trastero suelto ya no se le ofrecen
+  //   (parte de CLM del cabo C0163). El plural se mide ahora con Cantabria y familia numerosa:
+  //   «Familia numerosa» y «Familia monoparental», los dos al 4 %, salen como oportunidad (de
+  //   colectivo, con su requisito impreso: la asimetría del 14/09 en `elegirTipoITP`). Sale
+  //   además «Municipios despoblados», con la misma forma que tenía CLM y sin verificar en su
+  //   norma (anotado en C0163): por eso se exigen las dos de familia y «al menos dos», no tres.
   test('[08/10-e] el aviso de reducidos concuerda en plural cuando ofrece varios tipos', async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
+    await page.locator('#select-ccaa').selectOption('cantabria');
+    await page.locator('#select-perfil').selectOption('familia-numerosa');
+    await sembrar(page, 'Precio del trastero', '27500');
+    const aviso = avisoReducidos0810(page);
+    await expect(aviso.locator('li', { hasText: '4,00 % — Familia numerosa' })).toHaveCount(1);
+    await expect(aviso.locator('li', { hasText: '4,00 % — Familia monoparental' })).toHaveCount(1);
+    expect(await aviso.locator('li').count()).toBeGreaterThanOrEqual(2);
+    // El defecto.
+    expect(await texto(aviso)).toContain('En Cantabria existen:');
+  });
+
+  // 10/11/2026 (triaje fiscal, Ley 1/2026 de Castilla-La Mancha, BOE-A-2026-23387): los tipos
+  // del 5/4/3 % por despoblación son el «No obstante» del art. 19.2 de la Ley 8/2013, que trata
+  // de «la adquisición de la primera vivienda habitual». Hasta hoy se le ofrecían a un trastero
+  // suelto con perfil general (cabo C0163).
+  //   Castilla-La Mancha · segunda mano · 27.500 € · general → esperado: ningún aviso de reducidos.
+  test('[10/11] Castilla-La Mancha no ofrece a un trastero suelto los tipos por despoblación', async ({ page }) => {
     await page.goto(RUTA);
     await esperarHidratacion(page, ['input[aria-label="Precio del trastero"]']);
     await page.locator('#select-ccaa').selectOption('castilla-mancha');
     await sembrar(page, 'Precio del trastero', '27500');
-    const aviso = avisoReducidos0810(page);
-    await expect(aviso.locator('li')).toHaveCount(3);
-    // El defecto.
-    expect(await texto(aviso)).toContain('En Castilla-La Mancha existen:');
+    expect(await valorTarjeta(page, /^ITP \(/)).toBe('2475,00 €');
+    await expect(avisoReducidos0810(page)).toHaveCount(0);
   });
 
   // HALLAZGO [08/10-f] (bajo, accesibilidad) — ✅ REPARADO el 08/10/2026 (3083, también en la referencia y garaje). El aviso de que el precio supera el tope

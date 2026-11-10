@@ -499,31 +499,55 @@ export const ITP_CCAA: Record<ComunidadAutonoma, DatosCCAA> = {
   'castilla-mancha': {
     nombre: 'Castilla-La Mancha',
     tipoGeneral: tipoGeneralDe('Castilla-La Mancha'),
+    // 10/11/2026 (triaje fiscal; Vigía, BOE-A-2026-23387): art. 19 de la Ley 8/2013 en la
+    // redacción de la Ley 1/2026 de Castilla-La Mancha (art. 18.Nueve), vigente desde el
+    // 31/03/2026 y leída en el BOE ese día. Todos estos tipos son de la «primera vivienda
+    // habitual», con valor ≤ 240.000 € (antes 180.000 €) y hipoteca de más del 50 % (19.2.a,
+    // 19.6.a y 19.9.a). Los tres de despoblación son el «No obstante» del propio 19.2: sustituyen
+    // al 6 % en esos municipios con las mismas condiciones, así que NO son de cualquier inmueble
+    // (hasta hoy se ofrecían a garajes y trasteros sueltos; cabo C0163). El 5 % (19.6) y el 3 %
+    // (19.9) no existían en esta tabla. El AJD reducido (art. 21.2: 0,75 % · 0,50 % · 0,25 %) no
+    // se modela, como en ninguna comunidad: va en la nota.
     tiposReducidos: [
       {
         nombre: 'Vivienda habitual (primera compra)',
         tipo: 6,
-        condiciones: ['Primera vivienda', 'Valor ≤ 180.000 €', 'Hipoteca > 50 % del valor'],
-        valorMaximo: 180000,
+        condiciones: ['Primera vivienda habitual', 'Valor ≤ 240.000 €', 'Hipoteca > 50 % del valor'],
+        valorMaximo: 240000,
+      },
+      {
+        nombre: 'Familia numerosa, monoparental o discapacidad ≥ 65 %',
+        tipo: 5,
+        condiciones: ['Familia numerosa, monoparental o discapacidad ≥ 65 %', 'Primera vivienda habitual', 'Valor ≤ 240.000 €', 'Hipoteca > 50 % del valor'],
+        valorMaximo: 240000,
+      },
+      {
+        nombre: 'Jóvenes menores de 36 años',
+        tipo: 3,
+        condiciones: ['Menor de 36 años', 'Primera vivienda habitual', 'Valor ≤ 240.000 €', 'Hipoteca > 50 % del valor'],
+        valorMaximo: 240000,
       },
       {
         nombre: 'Zona despoblación nivel 1',
         tipo: 5,
-        condiciones: ['Municipio en zona de despoblación nivel 1'],
+        condiciones: ['Municipio en zona de despoblación nivel 1', 'Primera vivienda habitual', 'Valor ≤ 240.000 €', 'Hipoteca > 50 % del valor'],
+        valorMaximo: 240000,
       },
       {
         nombre: 'Zona despoblación nivel 2',
         tipo: 4,
-        condiciones: ['Municipio en zona de despoblación nivel 2'],
+        condiciones: ['Municipio en zona de despoblación nivel 2', 'Primera vivienda habitual', 'Valor ≤ 240.000 €', 'Hipoteca > 50 % del valor'],
+        valorMaximo: 240000,
       },
       {
         nombre: 'Zona despoblación nivel 3',
         tipo: 3,
-        condiciones: ['Municipio en zona de despoblación nivel 3'],
+        condiciones: ['Municipio en zona de despoblación nivel 3', 'Primera vivienda habitual', 'Valor ≤ 240.000 €', 'Hipoteca > 50 % del valor'],
+        valorMaximo: 240000,
       },
     ],
     ajd: 1.5,
-    notas: 'Sistema de zonas de despoblación con tipos decrecientes.',
+    notas: 'Tipos reducidos solo para la primera vivienda habitual de hasta 240.000 € financiada con hipoteca de más del 50 % (desde el 31/03/2026, Ley 1/2026): 6 % general, 5 % con familia numerosa, monoparental o discapacidad ≥ 65 %, 3 % para menores de 36 años, y 5 %, 4 % o 3 % en municipios de zonas de despoblación. AJD de esa escritura: 0,75 %, 0,50 % o 0,25 %.',
   },
 
   'cataluna': {
@@ -1088,6 +1112,8 @@ export const normaliza = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '
  * garaje o un trastero SUELTOS, tres puntos por debajo del 9 % que se les cobra y bajo un
  * rótulo que promete pagar menos. Las otras dos entradas que llevan el requisito solo en el
  * nombre («VPO primera vivienda» de Valencia y La Rioja) ya quedaban fuera por DE_COLECTIVO.
+ * Desde el 10/11/2026 las condiciones de Castilla-La Mancha dicen ya «Primera vivienda habitual»
+ * (Ley 1/2026): la lectura del nombre se queda como defensa para la próxima ficha que lo calle.
  */
 const PIDE_VIVIENDA_HABITUAL = /vivienda habitual|primera vivienda/;
 const exigeViviendaHabitual = (r: TipoReducido): boolean =>
