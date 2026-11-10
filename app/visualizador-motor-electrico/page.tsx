@@ -59,13 +59,15 @@ const COMPARATIVA: FilaComparativa[] = [
 
 function SvgCampoMagnetico(): React.ReactNode {
   // 6 posiciones de bobinas (pares U, V, W) en el estátor
+  // Rellenos opacos con la tinta que llega a 4,5:1 (cabo C0297): la marca y el teal oscurecidos
+  // con blanco, el acento con tinta oscura
   const bobinas = [
-    { angulo: 0,   fase: 'U', color: '#2E86AB' },
-    { angulo: 60,  fase: 'V', color: '#48A9A6' },
-    { angulo: 120, fase: 'W', color: '#7FB3D3' },
-    { angulo: 180, fase: 'U', color: '#2E86AB' },
-    { angulo: 240, fase: 'V', color: '#48A9A6' },
-    { angulo: 300, fase: 'W', color: '#7FB3D3' },
+    { angulo: 0,   fase: 'U', color: '#26718F', tinta: '#FFFFFF' },
+    { angulo: 60,  fase: 'V', color: '#327874', tinta: '#FFFFFF' },
+    { angulo: 120, fase: 'W', color: '#7FB3D3', tinta: '#1A1A1A' },
+    { angulo: 180, fase: 'U', color: '#26718F', tinta: '#FFFFFF' },
+    { angulo: 240, fase: 'V', color: '#327874', tinta: '#FFFFFF' },
+    { angulo: 300, fase: 'W', color: '#7FB3D3', tinta: '#1A1A1A' },
   ];
 
   return (
@@ -93,7 +95,6 @@ function SvgCampoMagnetico(): React.ReactNode {
               height="10"
               rx="2"
               fill={b.color}
-              opacity="0.85"
               transform={`rotate(${b.angulo}, ${x}, ${y})`}
             />
             <text
@@ -102,7 +103,7 @@ function SvgCampoMagnetico(): React.ReactNode {
               textAnchor="middle"
               dominantBaseline="middle"
               fontSize="6"
-              fill="#fff"
+              fill={b.tinta}
               fontWeight="bold"
               transform={`rotate(${b.angulo}, ${x}, ${y})`}
             >
@@ -132,21 +133,21 @@ function SvgInversor(): React.ReactNode {
   return (
     <svg viewBox="0 0 320 100" className={styles.svgDiagramWide} aria-label="Esquema de inversor trifásico">
       {/* Batería */}
-      <rect x="4" y="30" width="60" height="40" rx="6" fill="var(--primary)" opacity="0.9" />
+      <rect x="4" y="30" width="60" height="40" rx="6" fill="var(--primary-boton)" />
       <text x="34" y="47" textAnchor="middle" fontSize="8" fill="#fff" fontWeight="bold">Batería</text>
       <text x="34" y="58" textAnchor="middle" fontSize="7" fill="#fff">DC 400V</text>
-      <text x="34" y="68" textAnchor="middle" fontSize="6" fill="#ddd">▓▓▓░</text>
+      <text x="34" y="68" textAnchor="middle" fontSize="6" fill="#fff">▓▓▓░</text>
 
       {/* Flecha 1 */}
       <line x1="64" y1="50" x2="88" y2="50" stroke="var(--text-secondary)" strokeWidth="2" />
       <polygon points="88,46 96,50 88,54" fill="var(--text-secondary)" />
 
       {/* Inversor IGBT */}
-      <rect x="96" y="20" width="80" height="60" rx="6" fill="var(--secondary)" opacity="0.9" />
+      <rect x="96" y="20" width="80" height="60" rx="6" fill="var(--secondary-boton)" />
       <text x="136" y="39" textAnchor="middle" fontSize="8" fill="#fff" fontWeight="bold">Inversor</text>
       <text x="136" y="50" textAnchor="middle" fontSize="7" fill="#fff">6 IGBT</text>
       <text x="136" y="61" textAnchor="middle" fontSize="6.5" fill="#fff">PWM</text>
-      <text x="136" y="72" textAnchor="middle" fontSize="6" fill="#ddd">frecuencia variable</text>
+      <text x="136" y="72" textAnchor="middle" fontSize="6" fill="#fff">frecuencia variable</text>
 
       {/* Flechas 3 fases */}
       <line x1="176" y1="38" x2="200" y2="38" stroke="var(--primary)" strokeWidth="1.5" />
@@ -157,9 +158,9 @@ function SvgInversor(): React.ReactNode {
       <polygon points="200,58 208,62 200,66" fill="var(--accent)" />
 
       {/* Etiqueta fases */}
-      <text x="202" y="34" fontSize="6" fill="var(--primary)" fontWeight="bold">U</text>
-      <text x="202" y="46" fontSize="6" fill="var(--secondary)" fontWeight="bold">V</text>
-      <text x="202" y="59" fontSize="6" fill="var(--accent)" fontWeight="bold">W</text>
+      <text x="202" y="34" fontSize="6" className={styles.svgFaseU} fontWeight="bold">U</text>
+      <text x="202" y="46" fontSize="6" className={styles.svgFaseV} fontWeight="bold">V</text>
+      <text x="202" y="59" fontSize="6" className={styles.svgFaseW} fontWeight="bold">W</text>
 
       {/* Motor */}
       <ellipse cx="260" cy="50" rx="44" ry="38" fill="var(--bg-card)" stroke="var(--primary)" strokeWidth="3" />
@@ -177,28 +178,28 @@ function SvgRegeneracion(): React.ReactNode {
   return (
     <svg viewBox="0 0 300 120" className={styles.svgDiagramWide} aria-label="Diagrama de frenado regenerativo">
       {/* Caja motor */}
-      <rect x="10" y="35" width="90" height="50" rx="8" fill="var(--primary)" opacity="0.9" />
+      <rect x="10" y="35" width="90" height="50" rx="8" fill="var(--primary-boton)" />
       <text x="55" y="57" textAnchor="middle" fontSize="10" fill="#fff" fontWeight="bold">MOTOR</text>
-      <text x="55" y="70" textAnchor="middle" fontSize="7.5" fill="#ddd">/ GENERADOR</text>
-      <text x="55" y="80" textAnchor="middle" fontSize="6.5" fill="#ddd">Principio reversible</text>
+      <text x="55" y="70" textAnchor="middle" fontSize="7.5" fill="#fff">/ GENERADOR</text>
+      <text x="55" y="80" textAnchor="middle" fontSize="6.5" fill="#fff">Principio reversible</text>
 
       {/* Flecha tracción → */}
       <path d="M 100 48 Q 150 30 200 48" fill="none" stroke="#2ECC71" strokeWidth="2.5" strokeDasharray="0" />
       <polygon points="200,44 208,48 200,52" fill="#2ECC71" />
-      <text x="150" y="28" textAnchor="middle" fontSize="7.5" fill="#2ECC71" fontWeight="bold"><tspan aria-hidden="true">⚡</tspan> Tracción</text>
-      <text x="150" y="37" textAnchor="middle" fontSize="6.5" fill="#2ECC71">Batería → Motor → Ruedas</text>
+      <text x="150" y="28" textAnchor="middle" fontSize="7.5" className={styles.svgVerde} fontWeight="bold"><tspan aria-hidden="true">⚡</tspan> Tracción</text>
+      <text x="150" y="37" textAnchor="middle" fontSize="6.5" className={styles.svgVerde}>Batería → Motor → Ruedas</text>
 
       {/* Flecha regeneración ← */}
       <path d="M 200 72 Q 150 90 100 72" fill="none" stroke="#E84855" strokeWidth="2.5" strokeDasharray="5 3" />
       <polygon points="100,68 92,72 100,76" fill="#E84855" />
-      <text x="150" y="100" textAnchor="middle" fontSize="7.5" fill="#E84855" fontWeight="bold"><tspan aria-hidden="true">🔄</tspan> Regeneración</text>
-      <text x="150" y="110" textAnchor="middle" fontSize="6.5" fill="#E84855">Ruedas → Generador → Batería</text>
+      <text x="150" y="100" textAnchor="middle" fontSize="7.5" className={styles.svgRojo} fontWeight="bold"><tspan aria-hidden="true">🔄</tspan> Regeneración</text>
+      <text x="150" y="110" textAnchor="middle" fontSize="6.5" className={styles.svgRojo}>Ruedas → Generador → Batería</text>
 
       {/* Caja batería */}
-      <rect x="200" y="35" width="90" height="50" rx="8" fill="var(--secondary)" opacity="0.9" />
+      <rect x="200" y="35" width="90" height="50" rx="8" fill="var(--secondary-boton)" />
       <text x="245" y="57" textAnchor="middle" fontSize="10" fill="#fff" fontWeight="bold">BATERÍA</text>
-      <text x="245" y="69" textAnchor="middle" fontSize="7" fill="#ddd">400–800V DC</text>
-      <text x="245" y="80" textAnchor="middle" fontSize="6.5" fill="#ddd">recarga parcial</text>
+      <text x="245" y="69" textAnchor="middle" fontSize="7" fill="#fff">400–800V DC</text>
+      <text x="245" y="80" textAnchor="middle" fontSize="6.5" fill="#fff">recarga parcial</text>
     </svg>
   );
 }
@@ -338,10 +339,10 @@ function TabRegeneracion(): React.ReactNode {
           potencia constante en un amplio rango de velocidades gracias al control electrónico del inversor.
         </p>
         <div className={styles.curvaPar}>
-          <div className={styles.curvaBar} style={{ height: '100%', background: 'var(--primary)' }}>
+          <div className={styles.curvaBar} style={{ height: '100%', background: 'var(--primary-boton)' }}>
             <span>Par EV</span>
           </div>
-          <div className={styles.curvaBar} style={{ height: '45%', background: 'var(--text-muted)', alignSelf: 'flex-end' }}>
+          <div className={styles.curvaBar} style={{ height: '45%', background: '#6E6E6E', alignSelf: 'flex-end' }}>
             <span>Par ICE</span>
           </div>
           <div className={styles.curvaAxis}>

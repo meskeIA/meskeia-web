@@ -208,6 +208,12 @@ const APPS: App[] = [
   // blanco sobre las cajas de la espiral salarios-precios en su color al 90 % (el acento 2,07, el
   // teal 2,50, el verde del BCE 2,58 en claro). Las causas, como subestados
   { slug: 'visualizador-inflacion', secciones: SECCIONES, extremos: true, subestados: "button[aria-pressed]:not(nav button)" },
+  // Del censo del 10/11/2026 (C0297): el blanco y el #ddd sobre la batería, el inversor y las cajas
+  // del frenado regenerativo en la marca y el teal al 90 % (1,84-3,51:1 en claro, 1,93-3,18 en
+  // oscuro), el blanco de las fases sobre sus bobinas al 85 % (1,98-3,16), las etiquetas U, V y W en
+  // la marca, el teal y el acento puros (2,24-4,07) y la tracción en verde (2,08) y la regeneración
+  // en rojo (3,79 en claro, 3,55 en oscuro)
+  { slug: 'visualizador-motor-electrico', secciones: SECCIONES, extremos: true },
 ];
 
 interface TextoSvg {

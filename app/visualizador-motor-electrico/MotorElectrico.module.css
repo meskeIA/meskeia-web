@@ -428,9 +428,24 @@
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
 }
 
+/* Tinte al 4 % en oscuro (cabo C0278): al 10 %, el título en --primary-texto y los rótulos en
+   --text-muted se quedaban en 4,24-4,26:1 */
 [data-theme='dark'] .infoBox {
-  background: color-mix(in srgb, var(--primary) 10%, var(--bg-card));
+  background: color-mix(in srgb, var(--primary) 4%, var(--bg-card));
 }
+
+/* Tono de TEXTO de los rótulos de los SVG, por tema (cabo C0297, 10/11/2026): con la marca, el teal
+   y el acento puros las fases daban 2,24-4,07:1 en claro, el verde de la tracción 2,08 y el rojo de
+   la regeneración 3,79 en claro y 3,55 en oscuro. El color de dato se queda en flechas y trazos */
+.svgFaseU { fill: var(--primary-texto); }
+.svgFaseV { fill: #2C7A78; }
+.svgFaseW { fill: #45698A; }
+.svgVerde { fill: #136E35; }
+.svgRojo { fill: #B91C1C; }
+[data-theme='dark'] .svgFaseV { fill: #6CC5C2; }
+[data-theme='dark'] .svgFaseW { fill: #A9CCE3; }
+[data-theme='dark'] .svgVerde { fill: #86EFAC; }
+[data-theme='dark'] .svgRojo { fill: #FCA5A5; }
 
 [data-theme='dark'] .comparativaWrapper {
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
