@@ -102,6 +102,11 @@ const APPS: App[] = [
   // («Alcoholes» 3,06 en oscuro). Las ocho tarjetas de grupo, como secciones (la pestaña de grupos
   // es la de carga)
   { slug: 'visualizador-quimica-organica', todo: true, secciones: "button[class*='grupoCard']" },
+  // Del resto del censo de C0645 (10/11/2026): en oscuro, el texto claro del tema sobre el pastel
+  // de cada parte bacteriana (1,04-1,18:1), los nombres de dominio y tipos de la comparativa en el
+  // color del dato con style (1,21-2,25), las marcas ✓ ± ✗ (2,25-3,39) y los valores de los
+  // deslizadores (4,29)
+  { slug: 'visualizador-microbiologia', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
 ];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {

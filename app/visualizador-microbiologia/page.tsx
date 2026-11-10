@@ -133,7 +133,7 @@ function SvgCocos() {
       {/* segunda agrupación: pares */}
       <circle cx={140} cy={34} r={12} fill="#48A9A6" fillOpacity={0.75} stroke="#2E7D7A" strokeWidth={1.5} />
       <circle cx={165} cy={34} r={12} fill="#48A9A6" fillOpacity={0.75} stroke="#2E7D7A" strokeWidth={1.5} />
-      <text x={100} y={95} textAnchor="middle" fontSize={9} fill="#666" fontFamily="sans-serif">Staphylococcus (racimos) · Diplococcus (pares)</text>
+      <text x={100} y={95} textAnchor="middle" fontSize={9} fill="var(--m-gris)" fontFamily="sans-serif">Staphylococcus (racimos) · Diplococcus (pares)</text>
     </svg>
   );
 }
@@ -148,7 +148,7 @@ function SvgBacilos() {
           <path d={`M80,${25 + i * 28} Q100,${10 + i * 28} 110,${25 + i * 28}`} fill="none" stroke="#48A9A6" strokeWidth={1.5} />
         </g>
       ))}
-      <text x={100} y={95} textAnchor="middle" fontSize={9} fill="#666" fontFamily="sans-serif">E. coli · Salmonella · Mycobacterium</text>
+      <text x={100} y={95} textAnchor="middle" fontSize={9} fill="var(--m-gris)" fontFamily="sans-serif">E. coli · Salmonella · Mycobacterium</text>
     </svg>
   );
 }
@@ -166,7 +166,7 @@ function SvgEspirilos() {
           strokeLinecap="round"
         />
       ))}
-      <text x={100} y={95} textAnchor="middle" fontSize={9} fill="#666" fontFamily="sans-serif">Treponema · Helicobacter · Borrelia</text>
+      <text x={100} y={95} textAnchor="middle" fontSize={9} fill="var(--m-gris)" fontFamily="sans-serif">Treponema · Helicobacter · Borrelia</text>
     </svg>
   );
 }
@@ -185,7 +185,7 @@ function SvgBacteria({ parteActiva }: { parteActiva: string | null }) {
       <ellipse cx={160} cy={140} rx={105} ry={77} fill="#FAFAFA" stroke="none" opacity={0.95} />
       {/* Nucleoide */}
       <ellipse cx={160} cy={135} rx={55} ry={38} fill="#C8E6C9" stroke="#388E3C" strokeWidth={parteActiva === 'nucleoide' ? 4 : 2} opacity={getOpacity('nucleoide')} />
-      <text x={160} y={139} textAnchor="middle" fontSize={9} fill="#2E7D32" fontWeight="600">ADN circular</text>
+      <text x={160} y={139} textAnchor="middle" fontSize={9} fill="#1B5E20" fontWeight="600">ADN circular</text>
       {/* Plásmidos */}
       <ellipse cx={230} cy={105} rx={14} ry={10} fill="none" stroke="#8E24AA" strokeWidth={parteActiva === 'plasmidos' ? 4 : 2} opacity={getOpacity('plasmidos')} />
       <ellipse cx={215} cy={125} rx={11} ry={8} fill="none" stroke="#8E24AA" strokeWidth={1.5} opacity={getOpacity('plasmidos')} />
@@ -200,11 +200,13 @@ function SvgBacteria({ parteActiva }: { parteActiva: string | null }) {
       {[0, 1, 2, 3].map((i) => (
         <line key={i} x1={40 + i * 18} y1={65} x2={50 + i * 16} y2={38} stroke="#9FA8DA" strokeWidth={parteActiva === 'pili' ? 4 : 2} opacity={getOpacity('pili')} />
       ))}
-      {/* Etiquetas */}
-      <text x={160} y={22} textAnchor="middle" fontSize={8} fill="#1565C0" opacity={getOpacity('capsula')}>Cápsula</text>
-      <text x={285} y={60} textAnchor="middle" fontSize={8} fill="#1E88E5" opacity={getOpacity('flagelo')}>Flagelo</text>
-      <text x={56} y={30} textAnchor="middle" fontSize={8} fill="#7986CB" opacity={getOpacity('pili')}>Pili</text>
-      <text x={248} y={100} textAnchor="start" fontSize={8} fill="#8E24AA" opacity={getOpacity('plasmidos')}>Plásmidos</text>
+      {/* Etiquetas, siempre legibles: se apaga la forma, no su rótulo (al 25 % daban 1,30-1,53:1),
+          y el de la parte elegida va en negrita. Las de la tarjeta, con el tono del tema; la de los
+          plásmidos, dentro del citoplasma claro (montaba mitad sobre la pared y mitad fuera) */}
+      <text x={160} y={22} textAnchor="middle" fontSize={8} fill="var(--m-celeste)" fontWeight={parteActiva === 'capsula' ? 700 : 400}>Cápsula</text>
+      <text x={285} y={60} textAnchor="middle" fontSize={8} fill="var(--m-celeste)" fontWeight={parteActiva === 'flagelo' ? 700 : 400}>Flagelo</text>
+      <text x={56} y={30} textAnchor="middle" fontSize={8} fill="var(--m-indigo)" fontWeight={parteActiva === 'pili' ? 700 : 400}>Pili</text>
+      <text x={212} y={96} textAnchor="end" fontSize={8} fill="#6A1B9A" fontWeight={parteActiva === 'plasmidos' ? 700 : 400}>Plásmidos</text>
     </svg>
   );
 }
@@ -214,12 +216,14 @@ function SvgGramComparativa() {
     <svg viewBox="0 0 380 180" className={styles.gramSvg} aria-label="Comparativa pared celular Gram+ y Gram-">
       {/* Gram+ */}
       <rect x={10} y={20} width={160} height={140} rx={8} fill="#EDE7F6" stroke="#7B1FA2" strokeWidth={1.5} />
-      <text x={90} y={14} textAnchor="middle" fontSize={11} fontWeight="700" fill="#4A148C">Gram +</text>
+      {/* Títulos sobre la tarjeta, con el tono del tema (#4A148C y #B71C1C daban 1,47 y 2,65:1 en
+          oscuro); lo de dentro de las cajas, que son claras en los dos temas, con tinta fija */}
+      <text x={90} y={14} textAnchor="middle" fontSize={11} fontWeight="700" fill="var(--m-violeta)">Gram +</text>
       {/* Membrana citoplasmática */}
       <rect x={20} y={90} width={140} height={14} rx={2} fill="#CE93D8" opacity={0.9} />
       <text x={90} y={101} textAnchor="middle" fontSize={7.5} fill="#4A148C">Membrana citoplasmática</text>
       {/* Peptidoglicano grueso */}
-      <rect x={20} y={50} width={140} height={38} rx={2} fill="#7B1FA2" opacity={0.75} />
+      <rect x={20} y={50} width={140} height={38} rx={2} fill="#7B1FA2" />
       <text x={90} y={66} textAnchor="middle" fontSize={7.5} fill="white">Peptidoglicano</text>
       <text x={90} y={77} textAnchor="middle" fontSize={7} fill="white">(20-80 nm — GRUESO)</text>
       {/* cristal violeta label */}
@@ -228,12 +232,12 @@ function SvgGramComparativa() {
 
       {/* Gram- */}
       <rect x={210} y={20} width={160} height={140} rx={8} fill="#FFEBEE" stroke="#C62828" strokeWidth={1.5} />
-      <text x={290} y={14} textAnchor="middle" fontSize={11} fontWeight="700" fill="#B71C1C">Gram −</text>
-      {/* Membrana externa */}
-      <rect x={220} y={38} width={140} height={12} rx={2} fill="#EF9A9A" opacity={0.9} />
+      <text x={290} y={14} textAnchor="middle" fontSize={11} fontWeight="700" fill="var(--m-rojo)">Gram −</text>
+      {/* Membrana externa: rosa más claro bajo el rojo (sobre #EF9A9A daba 3,27:1) */}
+      <rect x={220} y={38} width={140} height={12} rx={2} fill="#FCDCDC" stroke="#E57373" strokeWidth={1} />
       <text x={290} y={48} textAnchor="middle" fontSize={7} fill="#B71C1C">Mb. externa + LPS</text>
-      {/* Peptidoglicano fino */}
-      <rect x={220} y={52} width={140} height={12} rx={2} fill="#E53935" opacity={0.65} />
+      {/* Peptidoglicano fino: rojo opaco y oscurecido bajo el blanco (al 65 % daba 2,80:1) */}
+      <rect x={220} y={52} width={140} height={12} rx={2} fill="#B71C1C" />
       <text x={290} y={62} textAnchor="middle" fontSize={7} fill="white">Peptidoglicano (2-7 nm)</text>
       {/* Membrana citoplasmática */}
       <rect x={220} y={66} width={140} height={12} rx={2} fill="#FFCDD2" opacity={0.95} stroke="#E53935" strokeWidth={1} />
@@ -250,7 +254,7 @@ function SvgDominios() {
     <svg viewBox="0 0 400 280" className={styles.dominioTree} aria-label="Árbol de los 3 dominios de la vida">
       {/* Tronco común */}
       <line x1={200} y1={250} x2={200} y2={175} stroke="#795548" strokeWidth={4} />
-      <text x={200} y={270} textAnchor="middle" fontSize={9} fill="#666">Ancestro Común Universal (LUCA)</text>
+      <text x={200} y={270} textAnchor="middle" fontSize={9} fill="var(--m-gris)">Ancestro Común Universal (LUCA)</text>
       {/* Rama izquierda: Bacteria */}
       <path d="M200,175 Q150,155 80,120" fill="none" stroke="#2E86AB" strokeWidth={3} />
       {/* Rama central: Archaea */}
@@ -260,31 +264,33 @@ function SvgDominios() {
 
       {/* Nodo Bacteria */}
       <circle cx={80} cy={115} r={8} fill="#2E86AB" />
-      <text x={80} y={102} textAnchor="middle" fontSize={12} fontWeight="700" fill="#1A5F7A">Bacteria</text>
-      <text x={80} y={140} textAnchor="middle" fontSize={7.5} fill="#2E86AB">Procariontes</text>
-      <text x={80} y={150} textAnchor="middle" fontSize={7.5} fill="#555">Peptidoglicano</text>
-      <text x={80} y={160} textAnchor="middle" fontSize={7.5} fill="#555">Ribosomas 70S</text>
-      <text x={80} y={170} textAnchor="middle" fontSize={7.5} fill="#555">E. coli · Cianobacterias</text>
+      {/* Nombres y rasgos con el tono de texto de su dominio por tema (en el color puro daban
+          1,47-4,24:1 en oscuro y 3,93 en claro) */}
+      <text x={80} y={102} textAnchor="middle" fontSize={12} fontWeight="700" fill="var(--m-azul)">Bacteria</text>
+      <text x={80} y={140} textAnchor="middle" fontSize={7.5} fill="var(--m-azul)">Procariontes</text>
+      <text x={80} y={150} textAnchor="middle" fontSize={7.5} fill="var(--m-gris)">Peptidoglicano</text>
+      <text x={80} y={160} textAnchor="middle" fontSize={7.5} fill="var(--m-gris)">Ribosomas 70S</text>
+      <text x={80} y={170} textAnchor="middle" fontSize={7.5} fill="var(--m-gris)">E. coli · Cianobacterias</text>
 
       {/* Nodo Archaea */}
       <circle cx={200} cy={108} r={8} fill="#8E24AA" />
-      <text x={200} y={95} textAnchor="middle" fontSize={12} fontWeight="700" fill="#4A148C">Archaea</text>
-      <text x={200} y={128} textAnchor="middle" fontSize={7.5} fill="#8E24AA">Procariontes</text>
-      <text x={200} y={138} textAnchor="middle" fontSize={7.5} fill="#555">Sin peptidoglicano</text>
-      <text x={200} y={148} textAnchor="middle" fontSize={7.5} fill="#555">Lípidos éter</text>
-      <text x={200} y={158} textAnchor="middle" fontSize={7.5} fill="#555">Metanógenos · Termófilos</text>
+      <text x={200} y={95} textAnchor="middle" fontSize={12} fontWeight="700" fill="var(--m-violeta)">Archaea</text>
+      <text x={200} y={128} textAnchor="middle" fontSize={7.5} fill="var(--m-violeta)">Procariontes</text>
+      <text x={200} y={138} textAnchor="middle" fontSize={7.5} fill="var(--m-gris)">Sin peptidoglicano</text>
+      <text x={200} y={148} textAnchor="middle" fontSize={7.5} fill="var(--m-gris)">Lípidos éter</text>
+      <text x={200} y={158} textAnchor="middle" fontSize={7.5} fill="var(--m-gris)">Metanógenos · Termófilos</text>
 
       {/* Nodo Eukarya */}
       <circle cx={320} cy={115} r={8} fill="#388E3C" />
-      <text x={320} y={102} textAnchor="middle" fontSize={12} fontWeight="700" fill="#1B5E20">Eukarya</text>
-      <text x={320} y={140} textAnchor="middle" fontSize={7.5} fill="#388E3C">Eucariontes</text>
-      <text x={320} y={150} textAnchor="middle" fontSize={7.5} fill="#555">Núcleo membranoso</text>
-      <text x={320} y={160} textAnchor="middle" fontSize={7.5} fill="#555">Ribosomas 80S</text>
-      <text x={320} y={170} textAnchor="middle" fontSize={7.5} fill="#555">Hongos · Plantas · Animales</text>
+      <text x={320} y={102} textAnchor="middle" fontSize={12} fontWeight="700" fill="var(--m-verde)">Eukarya</text>
+      <text x={320} y={140} textAnchor="middle" fontSize={7.5} fill="var(--m-verde)">Eucariontes</text>
+      <text x={320} y={150} textAnchor="middle" fontSize={7.5} fill="var(--m-gris)">Núcleo membranoso</text>
+      <text x={320} y={160} textAnchor="middle" fontSize={7.5} fill="var(--m-gris)">Ribosomas 80S</text>
+      <text x={320} y={170} textAnchor="middle" fontSize={7.5} fill="var(--m-gris)">Hongos · Plantas · Animales</text>
 
       {/* Teoría endosimbiótica: flechas */}
       <path d="M80,110 Q150,60 310,148" fill="none" stroke="#2E86AB" strokeWidth={1.5} strokeDasharray="4,3" markerEnd="url(#arr)" />
-      <text x={190} y={50} textAnchor="middle" fontSize={7} fill="#2E86AB">Endosimbiosis (mitocondria)</text>
+      <text x={190} y={50} textAnchor="middle" fontSize={7} fill="var(--m-azul)">Endosimbiosis (mitocondria)</text>
 
       <defs>
         <marker id="arr" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
@@ -332,22 +338,23 @@ function SvgCrecimiento({ td, k }: { td: number; k: number }) {
       <line x1={pad.left} y1={pad.top + iH} x2={pad.left + iW} y2={pad.top + iH} stroke="#999" strokeWidth={1.5} />
       {/* Línea capacidad de carga */}
       <line x1={pad.left} y1={toY(k)} x2={pad.left + iW} y2={toY(k)} stroke="#E53935" strokeWidth={1} strokeDasharray="5,3" />
-      <text x={pad.left + iW + 2} y={toY(k) + 4} fontSize={8} fill="#E53935">K</text>
+      {/* Rótulos con el tono de texto de su dato por tema (en el color puro, 3,93-4,24:1) */}
+      <text x={pad.left + iW + 2} y={toY(k) + 4} fontSize={8} fill="var(--m-rojo)">K</text>
       {/* Curva */}
       <path d={pathD} fill="none" stroke="#2E86AB" strokeWidth={2.5} strokeLinecap="round" />
       {/* Etiquetas fases */}
-      <text x={pad.left + 10} y={pad.top + iH - 20} fontSize={7.5} fill="#666">Latencia</text>
-      <text x={pad.left + 50} y={pad.top + 30} fontSize={7.5} fill="#2E86AB">Exponencial</text>
-      <text x={pad.left + 160} y={toY(k) - 8} fontSize={7.5} fill="#388E3C">Estacionaria</text>
+      <text x={pad.left + 10} y={pad.top + iH - 20} fontSize={7.5} fill="var(--m-gris)">Latencia</text>
+      <text x={pad.left + 50} y={pad.top + 30} fontSize={7.5} fill="var(--m-azul)">Exponencial</text>
+      <text x={pad.left + 160} y={toY(k) - 8} fontSize={7.5} fill="var(--m-verde)">Estacionaria</text>
       {/* Eje X ticks */}
       {[0, 6, 12, 18, 24].map((t) => (
         <g key={t}>
           <line x1={toX(t)} y1={pad.top + iH} x2={toX(t)} y2={pad.top + iH + 4} stroke="#999" strokeWidth={1} />
-          <text x={toX(t)} y={pad.top + iH + 12} textAnchor="middle" fontSize={7.5} fill="#666">{t}h</text>
+          <text x={toX(t)} y={pad.top + iH + 12} textAnchor="middle" fontSize={7.5} fill="var(--m-gris)">{t}h</text>
         </g>
       ))}
       {/* Eje Y label */}
-      <text x={12} y={pad.top + iH / 2} textAnchor="middle" fontSize={7.5} fill="#666" transform={`rotate(-90, 12, ${pad.top + iH / 2})`}>Nº bacterias</text>
+      <text x={12} y={pad.top + iH / 2} textAnchor="middle" fontSize={7.5} fill="var(--m-gris)" transform={`rotate(-90, 12, ${pad.top + iH / 2})`}>Nº bacterias</text>
     </svg>
   );
 }
@@ -561,15 +568,17 @@ export default function VisualizadorMicrobiologia() {
               <h4>Conjugación bacteriana</h4>
               <p>Una bacteria donante (F+) forma un <strong>pilus sexual</strong> que conecta físicamente con una receptora (F−). A través del tubo de conjugación se transfiere una copia del <strong>plásmido F</strong> o fragmentos de ADN cromosómico. Es el principal mecanismo de diseminación de genes de resistencia a antibióticos entre bacterias (incluso de especies distintas).</p>
               <svg viewBox="0 0 300 120" className={styles.procesoSvg} aria-label="Conjugación bacteriana">
-                <rect x={20} y={40} width={80} height={30} rx={15} fill="#2E86AB" fillOpacity={0.8} />
+                {/* Bacterias opacas y oscurecidas bajo el blanco (al 80 % daban 2,24-3,82:1) y
+                    rótulos con el tono de su dato por tema (C0297) */}
+                <rect x={20} y={40} width={80} height={30} rx={15} fill="#26718F" />
                 <text x={60} y={59} textAnchor="middle" fontSize={9} fill="white">Bacteria F+</text>
-                <rect x={200} y={40} width={80} height={30} rx={15} fill="#48A9A6" fillOpacity={0.8} />
+                <rect x={200} y={40} width={80} height={30} rx={15} fill="#327874" />
                 <text x={240} y={59} textAnchor="middle" fontSize={9} fill="white">Bacteria F−</text>
                 <line x1={100} y1={55} x2={200} y2={55} stroke="#8E24AA" strokeWidth={3} />
-                <text x={150} y={50} textAnchor="middle" fontSize={8} fill="#8E24AA">Pilus sexual</text>
+                <text x={150} y={50} textAnchor="middle" fontSize={8} fill="var(--m-violeta)">Pilus sexual</text>
                 <circle cx={130} cy={55} r={6} fill="#F9A825" />
-                <text x={130} y={82} textAnchor="middle" fontSize={7.5} fill="#E65100">Plásmido</text>
-                <text x={150} y={105} textAnchor="middle" fontSize={8} fill="#555">→ Transferencia de resistencia antibiótica</text>
+                <text x={130} y={82} textAnchor="middle" fontSize={7.5} fill="var(--m-naranja)">Plásmido</text>
+                <text x={150} y={105} textAnchor="middle" fontSize={8} fill="var(--m-gris)">→ Transferencia de resistencia antibiótica</text>
               </svg>
             </div>
           )}
@@ -579,16 +588,16 @@ export default function VisualizadorMicrobiologia() {
               <h4>Esporulación</h4>
               <p>Cuando las condiciones son desfavorables (falta de nutrientes, desecación, calor), bacterias de los géneros <strong>Bacillus</strong> y <strong>Clostridium</strong> forman <strong>endosporas</strong>. Son estructuras metabólicamente inactivas con varias capas protectoras que resisten temperaturas de 100°C, radiación UV y desinfectantes. Una espora puede germinar y dar lugar a una bacteria activa siglos después.</p>
               <svg viewBox="0 0 300 100" className={styles.procesoSvg} aria-label="Esporulación bacteriana">
-                <rect x={20} y={30} width={80} height={30} rx={15} fill="#2E86AB" fillOpacity={0.7} />
+                <rect x={20} y={30} width={80} height={30} rx={15} fill="#26718F" />
                 <text x={60} y={50} textAnchor="middle" fontSize={8} fill="white">Bacillus activo</text>
-                <text x={115} y={48} textAnchor="middle" fontSize={16} fill="#E65100">→</text>
+                <text x={115} y={48} textAnchor="middle" fontSize={16} fill="var(--m-naranja)">→</text>
                 <rect x={135} y={30} width={80} height={30} rx={15} fill="#78909C" fillOpacity={0.6} />
-                <ellipse cx={175} cy={45} rx={20} ry={14} fill="#455A64" opacity={0.9} />
+                <ellipse cx={175} cy={45} rx={20} ry={14} fill="#455A64" />
                 <text x={175} y={50} textAnchor="middle" fontSize={7} fill="white">Endospora</text>
-                <text x={240} y={48} textAnchor="middle" fontSize={16} fill="#E65100">→</text>
-                <rect x={255} y={30} width={40} height={28} rx={14} fill="#2E86AB" fillOpacity={0.85} />
+                <text x={240} y={48} textAnchor="middle" fontSize={16} fill="var(--m-naranja)">→</text>
+                <rect x={255} y={30} width={40} height={28} rx={14} fill="#26718F" />
                 <text x={275} y={48} textAnchor="middle" fontSize={7} fill="white">Germina</text>
-                <text x={150} y={85} textAnchor="middle" fontSize={7.5} fill="#555">Resiste 100°C · Viable durante siglos</text>
+                <text x={150} y={85} textAnchor="middle" fontSize={7.5} fill="var(--m-gris)">Resiste 100°C · Viable durante siglos</text>
               </svg>
             </div>
           )}
@@ -682,7 +691,8 @@ export default function VisualizadorMicrobiologia() {
 
           <div className={styles.dominiosGrid}>
             <div className={styles.dominioCard} style={{ borderColor: '#2E86AB' }}>
-              <h3 className={styles.dominioNombre} style={{ color: '#1A5F7A' }}><span aria-hidden="true">🔵</span> Bacteria</h3>
+              {/* Tono de texto por tema (cabo C0645): con style, igual en los dos temas, daba 1,21-2,02:1 en oscuro */}
+              <h3 className={`${styles.dominioNombre} ${styles.tonoAzul}`}><span aria-hidden="true">🔵</span> Bacteria</h3>
               <ul className={styles.dominioLista}>
                 <li>Procariontes: sin núcleo membranoso</li>
                 <li>Pared con <strong>peptidoglicano</strong></li>
@@ -692,7 +702,7 @@ export default function VisualizadorMicrobiologia() {
               </ul>
             </div>
             <div className={styles.dominioCard} style={{ borderColor: '#8E24AA' }}>
-              <h3 className={styles.dominioNombre} style={{ color: '#4A148C' }}><span aria-hidden="true">🟣</span> Archaea</h3>
+              <h3 className={`${styles.dominioNombre} ${styles.tonoVioleta}`}><span aria-hidden="true">🟣</span> Archaea</h3>
               <ul className={styles.dominioLista}>
                 <li>Procariontes: sin núcleo membranoso</li>
                 <li><strong>Sin peptidoglicano</strong> en la pared</li>
@@ -702,7 +712,7 @@ export default function VisualizadorMicrobiologia() {
               </ul>
             </div>
             <div className={styles.dominioCard} style={{ borderColor: '#388E3C' }}>
-              <h3 className={styles.dominioNombre} style={{ color: '#1B5E20' }}><span aria-hidden="true">🟢</span> Eukarya</h3>
+              <h3 className={`${styles.dominioNombre} ${styles.tonoVerde}`}><span aria-hidden="true">🟢</span> Eukarya</h3>
               <ul className={styles.dominioLista}>
                 <li>Eucariontes: <strong>núcleo con membrana</strong></li>
                 <li>Ribosomas 80S (40S + 60S)</li>
@@ -750,7 +760,7 @@ export default function VisualizadorMicrobiologia() {
             </thead>
             <tbody>
               <tr>
-                <td className={styles.comparativaTipo} style={{ color: '#7B1FA2' }}><strong>Gram+</strong></td>
+                <td className={`${styles.comparativaTipo} ${styles.tonoVioleta}`}><strong>Gram+</strong></td>
                 <td>Peptidoglicano grueso (20-80 nm)</td>
                 <td>Azul/violeta (retiene cristal violeta)</td>
                 <td>Penicilinas, Vancomicina, Cefalosporinas</td>
@@ -758,7 +768,7 @@ export default function VisualizadorMicrobiologia() {
                 <td>Piel, mucosas, suelo, agua</td>
               </tr>
               <tr>
-                <td className={styles.comparativaTipo} style={{ color: '#C62828' }}><strong>Gram−</strong></td>
+                <td className={`${styles.comparativaTipo} ${styles.tonoRojo}`}><strong>Gram−</strong></td>
                 <td>Peptidoglicano fino + membrana externa con LPS</td>
                 <td>Rosa/rojo (safranina tras decoloración)</td>
                 <td>Aminoglucósidos, Polimixinas, Fluoroquinolonas</td>
@@ -766,7 +776,7 @@ export default function VisualizadorMicrobiologia() {
                 <td>Intestino, agua, suelo, hospedadores</td>
               </tr>
               <tr>
-                <td className={styles.comparativaTipo} style={{ color: '#6A1B9A' }}><strong>Archaea</strong></td>
+                <td className={`${styles.comparativaTipo} ${styles.tonoVioleta}`}><strong>Archaea</strong></td>
                 <td>Sin peptidoglicano (pseudomureína u otras)</td>
                 <td>Variable (técnica Gram poco útil)</td>
                 <td>Resistentes a la mayoría de antibióticos convencionales</td>

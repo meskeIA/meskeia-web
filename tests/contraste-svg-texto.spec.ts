@@ -135,6 +135,17 @@ const APPS: App[] = [
     secciones: "[role='tablist'][aria-label*='ecciones'] [role='tab']",
     subestados: "section[class*='content'] button[aria-pressed]",
   },
+  // Del censo del 08/11/2026 (C0297), reparada el 10/11/2026: rótulos sobre la tarjeta en #555 y
+  // #666 fijos (1,93-3,03:1 en oscuro) o en el color puro de su dato (dominios, fases de la curva,
+  // Gram, pilus: 1,47-4,24 en oscuro, 3,42-4,05 en claro), los de la bacteria apagados al 25 %
+  // (1,30-1,53) y el blanco sobre bacterias y peptidoglicano translúcidos (2,24-3,82). Las cuatro
+  // pestañas, y sus botones (partes, procesos, Gram) como subestados
+  {
+    slug: 'visualizador-microbiologia',
+    secciones: SECCIONES,
+    extremos: true,
+    subestados: "section[aria-label] button[aria-pressed]",
+  },
 ];
 
 interface TextoSvg {

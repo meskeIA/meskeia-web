@@ -71,6 +71,53 @@
 }
 .morfSvgContainer { display: flex; justify-content: center; align-items: center; }
 .morfSvg { width: 100%; max-width: 220px; height: auto; }
+
+/* Tonos de los diagramas por tema (cabo C0297, 10/11/2026): los rótulos sobre la tarjeta iban en
+   grises fijos (#555 a 1,93:1 y #666 a 2,50-3,03 en oscuro) o en el color puro de su dato (1,47-4,24
+   en oscuro, 3,42-4,05 en claro), y los de la bacteria se apagaban al 25 % (1,30-1,53). Lo que va
+   sobre un relleno claro fijo (citoplasma, nucleoide, paredes de Gram) lleva tinta fija oscura */
+.morfSvg,
+.bacteriaSvg,
+.gramSvg,
+.dominioTree,
+.graficaCrecimiento,
+.procesoSvg {
+  --m-gris: var(--text-secondary);
+  --m-azul: var(--primary-texto);
+  --m-verde: #2E7D32;
+  --m-violeta: #6A1B9A;
+  --m-rojo: #B71C1C;
+  --m-naranja: #B93E0B;
+  --m-celeste: #1565C0;
+  --m-indigo: #3949AB;
+}
+
+[data-theme='dark'] .morfSvg,
+[data-theme='dark'] .bacteriaSvg,
+[data-theme='dark'] .gramSvg,
+[data-theme='dark'] .dominioTree,
+[data-theme='dark'] .graficaCrecimiento,
+[data-theme='dark'] .procesoSvg {
+  --m-azul: #85C1E9;
+  --m-verde: #81C784;
+  --m-violeta: #CE93D8;
+  --m-rojo: #EF9A9A;
+  --m-naranja: #FFB74D;
+  --m-celeste: #90CAF9;
+  --m-indigo: #9FA8DA;
+}
+
+/* Tono de texto de los dominios y de los tipos de la tabla comparativa (C0645): iban en el color
+   del dato con style, igual en los dos temas (1,21-2,25:1 en oscuro). .container sube la
+   especificidad por encima de .comparativaTable td */
+.container .tonoAzul { color: #1A5F7A; }
+.container .tonoVioleta { color: #6A1B9A; }
+.container .tonoVerde { color: #1B5E20; }
+.container .tonoRojo { color: #C62828; }
+[data-theme='dark'] .container .tonoAzul { color: #85C1E9; }
+[data-theme='dark'] .container .tonoVioleta { color: #CE93D8; }
+[data-theme='dark'] .container .tonoVerde { color: #81C784; }
+[data-theme='dark'] .container .tonoRojo { color: #EF9A9A; }
 .morfNombre { font-size: 1.2rem; font-weight: 700; color: var(--text-primary); margin: 0 0 0.4rem 0; }
 .morfDescLarga { font-size: 0.9rem; color: var(--text-secondary); margin: 0 0 0.75rem 0; line-height: 1.5; }
 .morfInfo { display: flex; flex-direction: column; }
@@ -100,6 +147,9 @@
   font-size: 0.82rem; font-weight: 600; color: var(--text-primary);
   transition: all 0.2s; text-align: left;
 }
+/* El fondo de cada parte es su pastel claro también en oscuro: el texto, oscuro (el claro del tema
+   daba 1,04-1,18:1; C0645) */
+[data-theme='dark'] .parteBtn { color: #1A1A1A; }
 .parteBtn:hover { border-color: var(--primary); }
 .parteBtn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 .parteBtnActive { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(46, 134, 171, 0.2); }
@@ -127,7 +177,8 @@
   font-size: 1rem; font-weight: 700; color: var(--primary-texto);
   background: #EBF5FB; padding: 0.2rem 0.6rem; border-radius: 6px;
 }
-[data-theme='dark'] .sliderValue { background: #1C3A4A; }
+/* En oscuro, --primary-texto sobre #1C3A4A daba 4,29:1 (C0645) */
+[data-theme='dark'] .sliderValue { background: #1C3A4A; color: #85C1E9; }
 .slider {
   width: 100%; accent-color: var(--primary); height: 6px;
   cursor: pointer; border-radius: 3px;
@@ -215,7 +266,10 @@
 .antibMec { padding: 0.65rem 1rem; font-size: 0.82rem; color: var(--text-secondary); }
 .sensibleSi { color: #2E7D32; font-weight: 800; font-size: 1.1rem; }
 .sensibleNo { color: #C62828; font-weight: 800; font-size: 1.1rem; }
-.sensibleParcial { color: var(--naranja-texto, #E65100); font-weight: 800; font-size: 1.1rem; }
+.sensibleParcial { color: var(--naranja-texto, #FFB74D); font-weight: 800; font-size: 1.1rem; }
+/* En oscuro, el verde y el rojo de claro daban 2,25-3,39:1 (C0645) */
+[data-theme='dark'] .sensibleSi { color: #81C784; }
+[data-theme='dark'] .sensibleNo { color: #EF9A9A; }
 
 /* ─── Dominios ─── */
 .dominioTree { width: 100%; max-width: 500px; height: auto; display: block; margin: 0 auto var(--spacing-xl); }
