@@ -12264,3 +12264,43 @@ test.describe('inspector 26/10/2026 (3) — Castilla-La Mancha, la frontera de u
     expect(await valorTarjeta(page, /^Total gastos adicionales/)).toBe('16.416,69 €');
   });
 });
+
+/**
+ * Cabo C0685 (hito unificar-app-motor-hipoteca, 08/11/2026) — REPARADO. La tool
+ * `consulta_compra_vivienda` del MCP de Delegum, con un ahorro que cubre precio y gastos, calculaba
+ * entrada = ahorro − gastos ≥ precio y calcularHipoteca lanzaba «La entrada debe ser entre 0 y el
+ * precio de la vivienda»: la consulta entera devolvía error y se perdían también los impuestos, que sí
+ * estaban calculados. Ahora se salta la hipoteca y lo dice.
+ * Caso: 300.000 € en Madrid, segunda mano, ahorro 400.000 €, plazo 25. El motor da los gastos; el
+ * sobrante es 400.000 − (300.000 + gastos). Con 300.000 € de ahorro (no llega) sigue saliendo la hipoteca.
+ */
+test('C0685 — consulta_compra_vivienda con ahorro que cubre la compra: impuestos y «no necesitas hipoteca», sin error', async ({ request }) => {
+  const llamar = async (argumentos: Record<string, unknown>): Promise<{ texto: string; error: boolean }> => {
+    const r = await request.post('/api/mcp/delegum/', {
+      headers: { Accept: 'application/json, text/event-stream' },
+      data: { jsonrpc: '2.0', id: 1, method: 'tools/call', params: { name: 'consulta_compra_vivienda', arguments: argumentos } },
+    });
+    expect(r.ok()).toBeTruthy();
+    const res = (await r.json()).result as { content: { text: string }[]; isError?: boolean };
+    return { texto: res.content[0].text.replace(/\s+/g, ' '), error: res.isError === true };
+  };
+  const c = calcularCompraventa({ precioInmueble: 300000, ccaa: 'madrid', tipoTransmision: 'segunda_mano' }).comprador;
+  const fmtEs = (n: number) => new Intl.NumberFormat('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
+
+  const cubre = await llamar({ precio: 300000, ccaa: 'madrid', ahorro_disponible: 400000, plazo_anios: 25 });
+  expect(cubre.error, cubre.texto).toBe(false);
+  expect(cubre.texto).not.toContain('La entrada debe ser');
+  expect(cubre.texto).toContain('Impuestos y gastos de compra');
+  expect(cubre.texto).toContain('No necesitas hipoteca');
+  expect(cubre.texto).toContain(`te quedarían ${fmtEs(400000 - c.totalOperacion)} €`);
+  expect(cubre.texto).not.toContain('Hipoteca estimada');
+
+  const justo = await llamar({ precio: 300000, ccaa: 'madrid', ahorro_disponible: c.totalOperacion, plazo_anios: 25 });
+  expect(justo.error, justo.texto).toBe(false);
+  expect(justo.texto).toContain('No necesitas hipoteca');
+
+  const noLlega = await llamar({ precio: 300000, ccaa: 'madrid', ahorro_disponible: 300000, plazo_anios: 25 });
+  expect(noLlega.error, noLlega.texto).toBe(false);
+  expect(noLlega.texto).toContain('Hipoteca estimada');
+  expect(noLlega.texto).not.toContain('No necesitas hipoteca');
+});

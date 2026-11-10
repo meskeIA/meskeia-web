@@ -568,8 +568,21 @@ function crearServidorDelegum(): McpServer {
           `🏦 **Ahorro total necesario (precio + gastos${c.impuestoNoCalculado ? ', sin el impuesto indirecto' : ''}): ${fmt(c.totalOperacion)} €**`,
         ];
 
-        // Si hay ahorro y plazo, estimamos la hipoteca
-        if (plazo_anios) {
+        // Si el ahorro cubre precio y gastos no hay nada que financiar: calcularHipoteca
+        // lanzaría «La entrada debe ser entre 0 y el precio» y la consulta entera saldría
+        // en error, perdiendo también los impuestos ya calculados (cabo C0685).
+        if (ahorro_disponible !== undefined && ahorro_disponible >= c.totalOperacion) {
+          const sobrante = ahorro_disponible - c.totalOperacion;
+          lineas.push(
+            '',
+            `✅ **No necesitas hipoteca**: tu ahorro (${fmt(ahorro_disponible)} €) cubre el precio y los gastos de compra (${fmt(c.totalOperacion)} €)` +
+              (sobrante > 0 ? `, y te quedarían ${fmt(sobrante)} €.` : '.'),
+          );
+          if (c.impuestoNoCalculado) {
+            lineas.push(`⚠️ *Ese total no incluye el impuesto indirecto: comprueba que el sobrante lo cubre.*`);
+          }
+        } else if (plazo_anios) {
+          // Si hay plazo, estimamos la hipoteca
           const entrada = ahorro_disponible !== undefined
             ? Math.max(0, ahorro_disponible - c.totalGastos)
             : Math.round(precio * 0.20);
