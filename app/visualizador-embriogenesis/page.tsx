@@ -259,15 +259,16 @@ function SvgFecundacion({ paso }: { paso: number }) {
           ))}
         </>
       )}
-      {/* Etiquetas */}
-      <text x="180" y="182" textAnchor="middle" fontSize="9" fill="#666">Óvulo / Cigoto</text>
+      {/* Etiquetas, sobre la tarjeta: con los tokens de texto del tema. En #666, #999 y la marca
+          daban 2,37-3,31:1 en oscuro y 2,82-4,07 en claro (cabo C0297, 10/11/2026) */}
+      <text x="180" y="182" textAnchor="middle" fontSize="9" fill="var(--text-secondary)">Óvulo / Cigoto</text>
       {!mostrarCigoto && (
-        <text x={espermaX - 10} y="82" textAnchor="middle" fontSize="8" fill="#2E86AB">Espermato-</text>
+        <text x={espermaX - 10} y="82" textAnchor="middle" fontSize="8" fill="var(--primary-texto)">Espermato-</text>
       )}
       {!mostrarCigoto && (
-        <text x={espermaX - 10} y="91" textAnchor="middle" fontSize="8" fill="#2E86AB">zoide</text>
+        <text x={espermaX - 10} y="91" textAnchor="middle" fontSize="8" fill="var(--primary-texto)">zoide</text>
       )}
-      <text x="180" y="15" textAnchor="middle" fontSize="8" fill="#999">Zona pelúcida</text>
+      <text x="180" y="15" textAnchor="middle" fontSize="8" fill="var(--text-secondary)">Zona pelúcida</text>
     </svg>
   );
 }
@@ -338,7 +339,8 @@ function SvgSegmentacion({ estadioIdx }: { estadioIdx: number }) {
           <circle cx={cx + 8} cy={cy} r="40" fill="#D6EAF8" stroke="#7FB3D3" strokeWidth="1" strokeDasharray="4 2" />
           <text x={cx + 8} y={cy + 3} textAnchor="middle" fontSize="8" fill="#2E86AB">Blastocele</text>
           {/* MCI */}
-          <circle cx={cx - 32} cy={cy - 22} r="16" fill="#2E86AB" opacity="0.7" />
+          {/* Opaca y en --primary-boton bajo el blanco (la marca al 70 % no llega a 4,5:1) */}
+          <circle cx={cx - 32} cy={cy - 22} r="16" fill="#26718F" />
           <text x={cx - 32} y={cy - 18} textAnchor="middle" fontSize="7" fill="#fff">MCI</text>
           {/* Trofoblasto */}
           {[0, 40, 80, 120, 160, 200, 240, 280, 320].map((a) => {
@@ -354,7 +356,7 @@ function SvgSegmentacion({ estadioIdx }: { estadioIdx: number }) {
               />
             );
           })}
-          <text x={cx} y={cy + 75} textAnchor="middle" fontSize="8" fill="#48A9A6">Trofoblasto</text>
+          <text x={cx} y={cy + 75} textAnchor="middle" fontSize="8" fill="var(--secondary-texto)">Trofoblasto</text>
         </>
       )}
 
@@ -384,7 +386,7 @@ function SvgSegmentacion({ estadioIdx }: { estadioIdx: number }) {
       {esImplantacion && (
         <>
           <circle cx={cx} cy={cy - 15} r="55" fill="#EBF5FB" stroke="#2E86AB" strokeWidth="2" />
-          <circle cx={cx - 22} cy={cy - 28} r="14" fill="#2E86AB" opacity="0.6" />
+          <circle cx={cx - 22} cy={cy - 28} r="14" fill="#26718F" />
           <text x={cx - 22} y={cy - 24} textAnchor="middle" fontSize="7" fill="#fff">MCI</text>
           {[30, 90, 150, 210, 270, 330].map((a) => {
             const rad = (a * Math.PI) / 180;
@@ -424,7 +426,7 @@ function SvgSegmentacion({ estadioIdx }: { estadioIdx: number }) {
       )}
 
       {/* Etiqueta del estadio */}
-      <text x={cx} y="188" textAnchor="middle" fontSize="10" fill="#1A1A1A" fontWeight="bold">
+      <text x={cx} y="188" textAnchor="middle" fontSize="10" fill="var(--text-primary)" fontWeight="bold">
         {estadio.nombre}
       </text>
     </svg>
@@ -446,7 +448,8 @@ function SvgGastrulacion({ capaActiva }: { capaActiva: CapaId | null }) {
 
       {/* Mesodermo */}
       <ellipse cx="150" cy="90" rx="100" ry="28" fill="#FADBD8" stroke="#E74C3C" strokeWidth="2.5" opacity={opacity('mesodermo')} />
-      <text x="150" y="94" textAnchor="middle" fontSize="10" fill="#1A1A1A" fontWeight="bold" opacity={opacity('mesodermo')}>Mesodermo</text>
+      {/* Por encima del notocordio: los dos rótulos iban en y≈93, uno encima del otro */}
+      <text x="150" y="81" textAnchor="middle" fontSize="10" fill="#1A1A1A" fontWeight="bold" opacity={opacity('mesodermo')}>Mesodermo</text>
 
       {/* Endodermo */}
       <ellipse cx="150" cy="138" rx="100" ry="28" fill="#FDEBD0" stroke="#F39C12" strokeWidth="2.5" opacity={opacity('endodermo')} />
@@ -454,11 +457,11 @@ function SvgGastrulacion({ capaActiva }: { capaActiva: CapaId | null }) {
 
       {/* Línea primitiva (flecha hacia abajo) */}
       <path d="M 258 42 L 258 138" stroke="#999" strokeWidth="1" strokeDasharray="4 2" />
-      <text x="270" y="90" fontSize="8" fill="#999" textAnchor="middle" transform="rotate(90, 270, 90)">Gastrulación →</text>
+      <text x="270" y="90" fontSize="8" fill="var(--text-secondary)" textAnchor="middle" transform="rotate(90, 270, 90)">Gastrulación →</text>
 
-      {/* Notocordio */}
-      <ellipse cx="150" cy="90" rx="18" ry="8" fill="#48A9A6" opacity="0.8" />
-      <text x="150" y="93" textAnchor="middle" fontSize="7" fill="#fff">Notocordio</text>
+      {/* Notocordio: opaco y oscurecido bajo el blanco (el teal al 80 % daba 2,42:1) */}
+      <ellipse cx="150" cy="102" rx="20" ry="8" fill="#2F7472" />
+      <text x="150" y="104.5" textAnchor="middle" fontSize="7" fill="#fff">Notocordio</text>
     </svg>
   );
 }
@@ -480,9 +483,9 @@ function SvgMorfogeno() {
       <rect x="20" y="40" width="260" height="60" fill="url(#shhGrad)" rx="8" />
 
       {/* Notocordio (fuente de SHH) */}
-      <circle cx="30" cy="70" r="14" fill="#48A9A6" />
+      <circle cx="30" cy="70" r="14" fill="#2F7472" />
       <text x="30" y="73" textAnchor="middle" fontSize="6" fill="#fff" fontWeight="bold">SHH</text>
-      <text x="30" y="102" textAnchor="middle" fontSize="7" fill="#48A9A6">Notocordio</text>
+      <text x="30" y="102" textAnchor="middle" fontSize="7" fill="var(--secondary-texto)">Notocordio</text>
 
       {/* Tubo neural con células respondiendo */}
       {[80, 120, 160, 200, 240, 280].map((x, i) => {
@@ -497,9 +500,10 @@ function SvgMorfogeno() {
           />
         );
       })}
-      <text x="180" y="125" textAnchor="middle" fontSize="9" fill="#1A1A1A">Tubo neural — respuesta al gradiente de SHH</text>
-      <text x="30" y="145" textAnchor="start" fontSize="8" fill="#666">Alta [SHH] → ventral</text>
-      <text x="280" y="145" textAnchor="end" fontSize="8" fill="#666">Baja [SHH] → dorsal</text>
+      {/* Sobre la tarjeta: tokens de texto del tema (#1A1A1A y #666 daban 1,28 y 2,37:1 en oscuro) */}
+      <text x="180" y="125" textAnchor="middle" fontSize="9" fill="var(--text-primary)">Tubo neural — respuesta al gradiente de SHH</text>
+      <text x="30" y="145" textAnchor="start" fontSize="8" fill="var(--text-secondary)">Alta [SHH] → ventral</text>
+      <text x="280" y="145" textAnchor="end" fontSize="8" fill="var(--text-secondary)">Baja [SHH] → dorsal</text>
     </svg>
   );
 }
