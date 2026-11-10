@@ -126,6 +126,10 @@ const APPS: App[] = [
   // Del censo de C0297 (10/11/2026): «Mecanismo político» en --primary-texto sobre el tinte de marca
   // al 10 % en oscuro (4,40:1)
   { slug: 'visualizador-regimenes-politicos', todo: true },
+  // Del censo de C0297 (10/11/2026): el borde activo en su color puro con style (verde 2,28:1), el
+  // blanco sobre las barras de Richter (1,98-3,76) y las magnitudes históricas en su color (naranja
+  // 2,67 en claro, granate 1,73 en oscuro)
+  { slug: 'visualizador-tectonica-placas', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
 ];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {

@@ -175,6 +175,33 @@
   .famosoDetalle { padding-left: 0; }
 }
 
+/* Tono de TEXTO de los rótulos de los diagramas de bordes, por dato y tema (cabo C0297, 10/11/2026):
+   el color se queda en flechas y formas. Sobre la tarjeta, 5,6-7,8:1 en claro y 6,0-9,5:1 en
+   oscuro; «Manto», que es texto grande sobre el tinte rojo, 3,4:1 en claro y 5,9 en oscuro (el rojo
+   puro daba 2,13 en oscuro) */
+.svgManto { fill: #C53030; }
+.svgRojo { fill: #B91C1C; }
+.svgVerde { fill: #166534; }
+.svgAmbar { fill: #92400E; }
+[data-theme='dark'] .svgManto { fill: #F5A59B; }
+[data-theme='dark'] .svgRojo { fill: #FCA5A5; }
+[data-theme='dark'] .svgVerde { fill: #86EFAC; }
+[data-theme='dark'] .svgAmbar { fill: #FCD34D; }
+
+/* Tono de TEXTO de los bordes y de las magnitudes históricas, por dato y tema (cabo C0645,
+   10/11/2026): con el color puro, el verde daba 2,28:1 y el naranja 2,67 en claro, y el granate
+   #991B1B 1,73 en oscuro. 5,6-9,4:1 en claro y 6,0-9,5 en oscuro */
+.tVerde { color: #166534; }
+.tRojo { color: #B91C1C; }
+.tAmbar { color: #92400E; }
+.tNaranja { color: #B93E0B; }
+.tGranate { color: #991B1B; }
+[data-theme='dark'] .tVerde { color: #86EFAC; }
+[data-theme='dark'] .tRojo { color: #FCA5A5; }
+[data-theme='dark'] .tAmbar { color: #FCD34D; }
+[data-theme='dark'] .tNaranja { color: #FDBA74; }
+[data-theme='dark'] .tGranate { color: #F5A59B; }
+
 @media (prefers-reduced-motion: reduce) {
   .placaAnimIzq,
   .placaAnimDer,

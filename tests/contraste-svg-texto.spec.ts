@@ -189,6 +189,15 @@ const APPS: App[] = [
   // 1,84-2,29; en claro la marca 2,23-2,81 y Monarquía 4,28), los ejes en #999 y #888 (2,82-3,83) y
   // la tipología aristotélica en #666 sobre su tinte en oscuro (2,26)
   { slug: 'visualizador-regimenes-politicos' },
+  // Del censo del 10/11/2026 (C0297): el blanco de «Africana» sobre su placa naranja al 70 % (4,01:1),
+  // «Manto» en rojo sobre su tinte en oscuro (2,13), «Magma», «Fosa» y «SUBDUCCIÓN» en rojo puro
+  // (3,73-3,81), «DORSAL OCEÁNICA» en verde (2,26) y «FALLA TRANSFORMANTE» en ámbar (2,13). Las
+  // placas y los tres bordes, como subestados
+  {
+    slug: 'visualizador-tectonica-placas',
+    secciones: SECCIONES,
+    subestados: "button[aria-pressed]:not(nav button)",
+  },
 ];
 
 interface TextoSvg {

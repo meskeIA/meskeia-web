@@ -12,6 +12,7 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
+import { tintaSobre } from '@/lib/tintaLegible';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -108,6 +109,13 @@ const BORDES: BordeInfo[] = [
   },
 ];
 
+/** Tono de TEXTO de cada borde por tema: el color puro daba 2,28:1 (verde) en claro (cabo C0645) */
+const TONO_BORDE: Record<string, string> = {
+  divergente: styles.tVerde,
+  convergente: styles.tRojo,
+  transformante: styles.tAmbar,
+};
+
 // ─────────────────────────────────────────────
 // Datos: Escala Richter
 // ─────────────────────────────────────────────
@@ -125,8 +133,8 @@ const MAGNITUDES: MagnitudInfo[] = [
   { magnitud: '1-2', descripcion: 'Micro', efectos: 'Solo detectado por sismógrafos', energiaTNT: '~30 g de TNT', frecuencia: '~1.300.000/año', color: '#22C55E' },
   { magnitud: '3-4', descripcion: 'Menor', efectos: 'Se siente, objetos vibran', energiaTNT: '~480 kg de TNT', frecuencia: '~13.000/año', color: '#84CC16' },
   { magnitud: '5-6', descripcion: 'Moderado a fuerte', efectos: 'Daños moderados a graves en edificios', energiaTNT: '~15.000 t de TNT', frecuencia: '~1.300/año', color: '#F59E0B' },
-  { magnitud: '7-7.9', descripcion: 'Mayor', efectos: 'Destructivo en amplias zonas', energiaTNT: '~480.000 t de TNT', frecuencia: '~15/año', color: '#F97316' },
-  { magnitud: '8-8.9', descripcion: 'Gran terremoto', efectos: 'Destrucción total en zonas extensas', energiaTNT: '~15 millones t de TNT', frecuencia: '~1/año', color: '#EF4444' },
+  { magnitud: '7-7,9', descripcion: 'Mayor', efectos: 'Destructivo en amplias zonas', energiaTNT: '~480.000 t de TNT', frecuencia: '~15/año', color: '#F97316' },
+  { magnitud: '8-8,9', descripcion: 'Gran terremoto', efectos: 'Destrucción total en zonas extensas', energiaTNT: '~15 millones t de TNT', frecuencia: '~1/año', color: '#EF4444' },
   { magnitud: '9+', descripcion: 'Catastrófico', efectos: 'Devastación a escala continental', energiaTNT: '~480 millones t de TNT', frecuencia: '~1 cada 20 años', color: '#991B1B' },
 ];
 
@@ -198,14 +206,15 @@ function SeccionPlacas() {
       {/* Mapa simplificado SVG */}
       <div className={styles.mapaContainer}>
         <svg viewBox="0 0 800 400" className={styles.mapaSvg} aria-label="Mapa simplificado de placas tectónicas">
-          {/* Fondo océano */}
+          {/* Fondo océano. Las placas, al 60 % sobre él: al 70 % el naranja de la Africana dejaba su
+              rótulo blanco a 4,01:1 (cabo C0297, 10/11/2026); al 60 %, 5,5 */}
           <rect x="0" y="0" width="800" height="400" fill="#1E3A5F" rx="8" />
 
           {/* Norteamericana */}
           <path
             d="M120,40 L280,30 L320,80 L300,160 L240,190 L180,180 L130,140 L100,100 Z"
             fill={principales[1].color}
-            fillOpacity="0.7"
+            fillOpacity="0.6"
             stroke="white"
             strokeWidth="1.5"
             className={styles.placaSvg}
@@ -222,7 +231,7 @@ function SeccionPlacas() {
           <path
             d="M210,210 L270,195 L290,230 L280,310 L250,350 L220,340 L200,290 L195,250 Z"
             fill={principales[6].color}
-            fillOpacity="0.7"
+            fillOpacity="0.6"
             stroke="white"
             strokeWidth="1.5"
             className={styles.placaSvg}
@@ -238,7 +247,7 @@ function SeccionPlacas() {
           <path
             d="M340,40 L560,30 L620,50 L650,100 L620,140 L500,150 L400,140 L340,110 Z"
             fill={principales[2].color}
-            fillOpacity="0.7"
+            fillOpacity="0.6"
             stroke="white"
             strokeWidth="1.5"
             className={styles.placaSvg}
@@ -254,7 +263,7 @@ function SeccionPlacas() {
           <path
             d="M350,160 L430,150 L470,180 L460,290 L420,330 L370,310 L350,250 L340,200 Z"
             fill={principales[3].color}
-            fillOpacity="0.7"
+            fillOpacity="0.6"
             stroke="white"
             strokeWidth="1.5"
             className={styles.placaSvg}
@@ -270,7 +279,7 @@ function SeccionPlacas() {
           <path
             d="M520,170 L620,155 L690,180 L710,230 L680,270 L600,260 L540,240 L510,210 Z"
             fill={principales[5].color}
-            fillOpacity="0.7"
+            fillOpacity="0.6"
             stroke="white"
             strokeWidth="1.5"
             className={styles.placaSvg}
@@ -286,7 +295,7 @@ function SeccionPlacas() {
           <path
             d="M660,60 L780,50 L790,190 L770,300 L700,310 L660,270 L640,180 L650,100 Z"
             fill={principales[0].color}
-            fillOpacity="0.7"
+            fillOpacity="0.6"
             stroke="white"
             strokeWidth="1.5"
             className={styles.placaSvg}
@@ -302,7 +311,7 @@ function SeccionPlacas() {
           <path
             d="M100,360 L350,355 L550,360 L700,365 L750,380 L400,390 L100,385 Z"
             fill={principales[4].color}
-            fillOpacity="0.7"
+            fillOpacity="0.6"
             stroke="white"
             strokeWidth="1.5"
             className={styles.placaSvg}
@@ -410,7 +419,7 @@ function DiagramaDivergente() {
     <svg viewBox="0 0 400 200" className={styles.diagramaSvg} aria-label="Diagrama de borde divergente: dos placas se separan">
       {/* Manto */}
       <rect x="0" y="100" width="400" height="100" fill="#C53030" opacity="0.3" />
-      <text x="200" y="170" fill="#C53030" fontSize="12" textAnchor="middle" fontWeight="600">Manto (astenosfera)</text>
+      <text x="200" y="170" className={styles.svgManto} fontSize="12" textAnchor="middle" fontWeight="600">Manto (astenosfera)</text>
 
       {/* Placa izquierda */}
       <rect x="10" y="60" width="170" height="40" fill="#6B7280" rx="4" className={styles.placaAnimIzq} />
@@ -422,14 +431,14 @@ function DiagramaDivergente() {
 
       {/* Magma ascendiendo */}
       <path d="M200,160 L185,100 L200,60 L215,100 Z" fill="#EF4444" opacity="0.7" />
-      <text x="200" y="50" fill="#EF4444" fontSize="10" textAnchor="middle" fontWeight="600">Magma ↑</text>
+      <text x="200" y="50" className={styles.svgRojo} fontSize="10" textAnchor="middle" fontWeight="600">Magma ↑</text>
 
       {/* Flechas dirección */}
       <line x1="140" y1="45" x2="60" y2="45" stroke="#22C55E" strokeWidth="2.5" markerEnd="url(#arrowGreen)" />
       <line x1="260" y1="45" x2="340" y2="45" stroke="#22C55E" strokeWidth="2.5" markerEnd="url(#arrowGreen)" />
 
       {/* Dorsal */}
-      <text x="200" y="18" fill="#22C55E" fontSize="11" textAnchor="middle" fontWeight="700">DORSAL OCEÁNICA</text>
+      <text x="200" y="18" className={styles.svgVerde} fontSize="11" textAnchor="middle" fontWeight="700">DORSAL OCEÁNICA</text>
 
       <defs>
         <marker id="arrowGreen" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
@@ -445,7 +454,7 @@ function DiagramaConvergente() {
     <svg viewBox="0 0 400 200" className={styles.diagramaSvg} aria-label="Diagrama de borde convergente: subducción">
       {/* Manto */}
       <rect x="0" y="110" width="400" height="90" fill="#C53030" opacity="0.3" />
-      <text x="320" y="170" fill="#C53030" fontSize="12" textAnchor="middle" fontWeight="600">Manto</text>
+      <text x="320" y="170" className={styles.svgManto} fontSize="12" textAnchor="middle" fontWeight="600">Manto</text>
 
       {/* Placa continental (arriba) */}
       <rect x="200" y="55" width="190" height="45" fill="#92400E" rx="4" />
@@ -461,13 +470,13 @@ function DiagramaConvergente() {
 
       {/* Fosa */}
       <path d="M195,55 L200,75 L205,55" fill="#1E3A5F" />
-      <text x="200" y="48" fill="#EF4444" fontSize="9" textAnchor="middle" fontWeight="600">Fosa</text>
+      <text x="200" y="48" className={styles.svgRojo} fontSize="9" textAnchor="middle" fontWeight="600">Fosa</text>
 
       {/* Flechas */}
       <line x1="60" y1="50" x2="140" y2="50" stroke="#EF4444" strokeWidth="2.5" markerEnd="url(#arrowRed)" />
       <line x1="340" y1="42" x2="260" y2="42" stroke="#EF4444" strokeWidth="2.5" markerEnd="url(#arrowRed)" />
 
-      <text x="200" y="18" fill="#EF4444" fontSize="11" textAnchor="middle" fontWeight="700">SUBDUCCIÓN</text>
+      <text x="200" y="18" className={styles.svgRojo} fontSize="11" textAnchor="middle" fontWeight="700">SUBDUCCIÓN</text>
 
       <defs>
         <marker id="arrowRed" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
@@ -483,7 +492,7 @@ function DiagramaTransformante() {
     <svg viewBox="0 0 400 200" className={styles.diagramaSvg} aria-label="Diagrama de borde transformante: placas deslizan lateralmente">
       {/* Manto */}
       <rect x="0" y="120" width="400" height="80" fill="#C53030" opacity="0.3" />
-      <text x="200" y="170" fill="#C53030" fontSize="12" textAnchor="middle" fontWeight="600">Manto</text>
+      <text x="200" y="170" className={styles.svgManto} fontSize="12" textAnchor="middle" fontWeight="600">Manto</text>
 
       {/* Placa superior izquierda */}
       <rect x="10" y="40" width="185" height="70" fill="#6B7280" rx="4" className={styles.placaAnimArriba} />
@@ -495,7 +504,7 @@ function DiagramaTransformante() {
 
       {/* Línea de falla */}
       <line x1="198" y1="30" x2="198" y2="120" stroke="#F59E0B" strokeWidth="3" strokeDasharray="6,3" />
-      <text x="200" y="18" fill="#F59E0B" fontSize="11" textAnchor="middle" fontWeight="700">FALLA TRANSFORMANTE</text>
+      <text x="200" y="18" className={styles.svgAmbar} fontSize="11" textAnchor="middle" fontWeight="700">FALLA TRANSFORMANTE</text>
 
       {/* Flechas opuestas */}
       <line x1="140" y1="32" x2="60" y2="32" stroke="#F59E0B" strokeWidth="2.5" markerEnd="url(#arrowYellow)" />
@@ -538,8 +547,8 @@ function SeccionBordes() {
           <button
             key={b.id}
             type="button"
-            className={`${styles.bordeSelectorBtn} ${bordeActivo === i ? styles.bordeSelectorActivo : ''}`}
-            style={bordeActivo === i ? { borderColor: b.color, color: b.color } : undefined}
+            className={`${styles.bordeSelectorBtn} ${bordeActivo === i ? `${styles.bordeSelectorActivo} ${TONO_BORDE[b.id] ?? ''}` : ''}`}
+            style={bordeActivo === i ? { borderColor: b.color } : undefined}
             onClick={() => setBordeActivo(i)}
             aria-pressed={bordeActivo === i}
           >
@@ -556,7 +565,7 @@ function SeccionBordes() {
 
       {/* Información del borde */}
       <div className={styles.bordeInfo} style={{ borderLeftColor: borde.color }}>
-        <h3 className={styles.bordeInfoTitulo} style={{ color: borde.color }}>
+        <h3 className={`${styles.bordeInfoTitulo} ${TONO_BORDE[borde.id] ?? ''}`}>
           <span aria-hidden="true">{borde.icono}</span> Borde {borde.nombre}
         </h3>
         <p className={styles.bordeInfoDesc}>{borde.descripcion}</p>
@@ -609,7 +618,9 @@ function SeccionTerremotos() {
                     background: m.color,
                   }}
                 >
-                  <span className={styles.richterMagnitud}>{m.magnitud}</span>
+                  {/* La tinta que se lee sobre la barra: el blanco daba 1,98-3,76:1 sobre el verde, el
+                      lima, el ámbar, el naranja y el rojo (cabo C0645, 10/11/2026) */}
+                  <span className={styles.richterMagnitud} style={{ color: tintaSobre(m.color) }}>{m.magnitud}</span>
                 </div>
                 <span className={styles.richterDesc}>{m.descripcion}</span>
                 <span className={styles.richterEnergia}>{m.energiaTNT}</span>
@@ -658,7 +669,7 @@ function SeccionTerremotos() {
               aria-expanded={terremotoActivo === i}
             >
               <div className={styles.famosoHeader}>
-                <span className={styles.famosoMag} style={{ color: t.magnitud >= 9 ? '#991B1B' : t.magnitud >= 8 ? '#EF4444' : '#F97316' }}>
+                <span className={`${styles.famosoMag} ${t.magnitud >= 9 ? styles.tGranate : t.magnitud >= 8 ? styles.tRojo : styles.tNaranja}`}>
                   {formatNumber(t.magnitud, 1)}
                 </span>
                 <div className={styles.famosoInfo}>
