@@ -97,14 +97,15 @@ const PilaDaniellSvg = ({ cargaConectada }: { cargaConectada: boolean }) => (
     <rect x="25" y="130" width="150" height="105" rx="4" fill="#BFDBFE" opacity="0.6" />
     {/* Electrodo Zn */}
     <rect x="80" y="85" width="18" height="140" rx="4" fill="#9CA3AF" stroke="#6B7280" strokeWidth="1" />
-    <text x="89" y="78" fontSize="11" fontWeight="700" fill="#374151" textAnchor="middle">Zn</text>
-    {/* Iones Zn²⁺ aparecen */}
-    <text x="50" y="170" fontSize="10" fill="#1D4ED8" opacity="0.8">Zn²⁺</text>
-    <text x="120" y="200" fontSize="10" fill="#1D4ED8" opacity="0.6">Zn²⁺</text>
+    {/* Sobre la tarjeta: texto del tema (#374151 daba 1,39:1 en oscuro) */}
+    <text x="89" y="78" fontSize="11" fontWeight="700" fill="var(--text-primary)" textAnchor="middle">Zn</text>
+    {/* Iones Zn²⁺ aparecen: sin opacidad (al 60-80 % daban 2,58-3,70:1 sobre la disolución) */}
+    <text x="50" y="170" fontSize="10" fill="#1D4ED8">Zn²⁺</text>
+    <text x="120" y="200" fontSize="10" fill="#1D4ED8">Zn²⁺</text>
     {/* Label ánodo */}
-    <text x="100" y="258" fontSize="12" fontWeight="700" fill="#EF4444" textAnchor="middle">ÁNODO (−)</text>
-    <text x="100" y="272" fontSize="9" fill="#6B7280" textAnchor="middle">Zn → Zn²⁺ + 2e⁻</text>
-    <text x="100" y="284" fontSize="9" fill="#6B7280" textAnchor="middle">E° = −0,76 V</text>
+    <text x="100" y="258" fontSize="12" fontWeight="700" fill="var(--t-rojo)" textAnchor="middle">ÁNODO (−)</text>
+    <text x="100" y="272" fontSize="9" fill="var(--t-gris)" textAnchor="middle">Zn → Zn²⁺ + 2e⁻</text>
+    <text x="100" y="284" fontSize="9" fill="var(--t-gris)" textAnchor="middle">E° = −0,76 V</text>
 
     {/* ── Semicelda CÁTODO (Cu / CuSO₄) ── */}
     <rect x="340" y="80" width="160" height="160" rx="8" fill="#FFF7ED" stroke="#CBD5E1" strokeWidth="1.5" />
@@ -112,23 +113,23 @@ const PilaDaniellSvg = ({ cargaConectada }: { cargaConectada: boolean }) => (
     <rect x="345" y="130" width="150" height="105" rx="4" fill="#A5F3FC" opacity="0.5" />
     {/* Electrodo Cu */}
     <rect x="420" y="85" width="18" height="140" rx="4" fill="#B45309" stroke="#92400E" strokeWidth="1" />
-    <text x="429" y="78" fontSize="11" fontWeight="700" fill="#374151" textAnchor="middle">Cu</text>
+    <text x="429" y="78" fontSize="11" fontWeight="700" fill="var(--text-primary)" textAnchor="middle">Cu</text>
     {/* Iones Cu²⁺ se depositan */}
-    <text x="360" y="170" fontSize="10" fill="#0369A1" opacity="0.8">Cu²⁺</text>
-    <text x="380" y="205" fontSize="10" fill="#0369A1" opacity="0.6">Cu²⁺</text>
+    <text x="360" y="170" fontSize="10" fill="#0369A1">Cu²⁺</text>
+    <text x="380" y="205" fontSize="10" fill="#0369A1">Cu²⁺</text>
     {/* Label cátodo */}
-    <text x="420" y="258" fontSize="12" fontWeight="700" fill="#3B82F6" textAnchor="middle">CÁTODO (+)</text>
-    <text x="420" y="272" fontSize="9" fill="#6B7280" textAnchor="middle">Cu²⁺ + 2e⁻ → Cu</text>
-    <text x="420" y="284" fontSize="9" fill="#6B7280" textAnchor="middle">E° = +0,34 V</text>
+    <text x="420" y="258" fontSize="12" fontWeight="700" fill="var(--t-azul)" textAnchor="middle">CÁTODO (+)</text>
+    <text x="420" y="272" fontSize="9" fill="var(--t-gris)" textAnchor="middle">Cu²⁺ + 2e⁻ → Cu</text>
+    <text x="420" y="284" fontSize="9" fill="var(--t-gris)" textAnchor="middle">E° = +0,34 V</text>
 
     {/* ── Puente salino (KCl) ── */}
     <rect x="180" y="80" width="160" height="40" rx="8" fill="#F0FDF4" stroke="#86EFAC" strokeWidth="1.5" />
     <text x="260" y="97" fontSize="11" fontWeight="700" fill="#15803D" textAnchor="middle">Puente salino</text>
-    <text x="260" y="112" fontSize="9" fill="#16A34A" textAnchor="middle">KCl(aq)</text>
-    {/* Iones en puente */}
+    <text x="260" y="112" fontSize="9" fill="#15803D" textAnchor="middle">KCl(aq)</text>
+    {/* Iones en puente (el Cl⁻, sobre un violeta más claro y opaco: daba 4,46:1) */}
     <circle className={styles.ionKPlus} cx="220" cy="100" r="8" fill="#FBBF24" opacity="0.9" />
     <text className={styles.ionKPlus} x="220" y="104" fontSize="8" fill="#78350F" textAnchor="middle" fontWeight="700">K⁺</text>
-    <circle className={styles.ionClMenos} cx="300" cy="100" r="8" fill="#A78BFA" opacity="0.9" />
+    <circle className={styles.ionClMenos} cx="300" cy="100" r="8" fill="#C4B5FD" />
     <text className={styles.ionClMenos} x="300" y="104" fontSize="8" fill="#4C1D95" textAnchor="middle" fontWeight="700">Cl⁻</text>
 
     {/* ── Cable externo ── */}
@@ -149,7 +150,7 @@ const PilaDaniellSvg = ({ cargaConectada }: { cargaConectada: boolean }) => (
       <>
         {/* Circuito abierto */}
         <circle cx="260" cy="40" r="14" fill="#F1F5F9" stroke="#CBD5E1" strokeWidth="2" />
-        <text x="260" y="44" fontSize="11" fill="#94A3B8" textAnchor="middle">○</text>
+        <text x="260" y="44" fontSize="11" fill="#475569" textAnchor="middle">○</text>
         <line x1="274" y1="40" x2="390" y2="40" stroke="#CBD5E1" strokeWidth="2.5" strokeDasharray="6 4" />
         <line x1="400" y1="40" x2="429" y2="40" stroke="#CBD5E1" strokeWidth="2.5" strokeDasharray="6 4" />
       </>
@@ -166,8 +167,8 @@ const PilaDaniellSvg = ({ cargaConectada }: { cargaConectada: boolean }) => (
           className={styles.electronesPath}
           strokeLinecap="round"
         />
-        <text x="170" y="28" fontSize="9" fill="#F59E0B" fontWeight="700" textAnchor="middle">e⁻ →</text>
-        <text x="350" y="28" fontSize="9" fill="#F59E0B" fontWeight="700" textAnchor="middle">e⁻ →</text>
+        <text x="170" y="28" fontSize="9" fill="var(--t-ambar)" fontWeight="700" textAnchor="middle">e⁻ →</text>
+        <text x="350" y="28" fontSize="9" fill="var(--t-ambar)" fontWeight="700" textAnchor="middle">e⁻ →</text>
       </>
     )}
 
@@ -385,25 +386,26 @@ const ElectrolisisSvg = ({ voltaje }: { voltaje: number }) => {
       {/* Fuente de corriente */}
       <rect x="150" y="10" width="100" height="40" rx="8" fill="#F1F5F9" stroke="#94A3B8" strokeWidth="1.5" />
       <text x="200" y="28" fontSize="10" fontWeight="700" fill="#374151" textAnchor="middle">Fuente CC</text>
-      <text x="200" y="42" fontSize="9" fill="#6B7280" textAnchor="middle">{voltaje.toFixed(1)} V</text>
+      <text x="200" y="42" fontSize="9" fill="#4B5563" textAnchor="middle">{voltaje.toFixed(1)} V</text>
       {/* Cables */}
       <line x1="150" y1="30" x2="100" y2="30" stroke="#374151" strokeWidth="2" />
       <line x1="100" y1="30" x2="100" y2="80" stroke="#374151" strokeWidth="2" />
       <line x1="250" y1="30" x2="300" y2="30" stroke="#374151" strokeWidth="2" />
       <line x1="300" y1="30" x2="300" y2="80" stroke="#374151" strokeWidth="2" />
       {/* Labels +/- */}
-      <text x="285" y="27" fontSize="12" fontWeight="900" fill="#3B82F6">+</text>
-      <text x="108" y="27" fontSize="12" fontWeight="900" fill="#EF4444">−</text>
+      <text x="285" y="27" fontSize="12" fontWeight="900" fill="var(--t-azul)">+</text>
+      <text x="108" y="27" fontSize="12" fontWeight="900" fill="var(--t-rojo)">−</text>
 
-      {/* Cubeta con agua */}
-      <rect x="50" y="80" width="300" height="150" rx="6" fill="#BFDBFE" opacity="0.5" stroke="#93C5FD" strokeWidth="1.5" />
+      {/* Cubeta con agua: opaca, con un tono por tema (translúcida, en oscuro dejaba los
+          rótulos de dentro a 1,03-2,65:1). Cabo C0297 */}
+      <rect x="50" y="80" width="300" height="150" rx="6" fill="var(--e-agua)" stroke="#93C5FD" strokeWidth="1.5" />
       {/* Texto agua */}
-      <text x="200" y="230" fontSize="10" fill="#1D4ED8" textAnchor="middle">H₂O(l) + H₂SO₄(aq)</text>
+      <text x="200" y="226" fontSize="10" fill="var(--t-azul)" textAnchor="middle">H₂O(l) + H₂SO₄(aq)</text>
 
       {/* Cátodo (−) — izquierda → H₂ */}
       <rect x="90" y="80" width="16" height="130" rx="4" fill="#6B7280" stroke="#374151" strokeWidth="1" />
-      <text x="98" y="76" fontSize="10" fontWeight="700" fill="#EF4444" textAnchor="middle">Cátodo (−)</text>
-      <text x="98" y="224" fontSize="9" fill="#374151" textAnchor="middle">H₂</text>
+      <text x="98" y="76" fontSize="10" fontWeight="700" fill="var(--t-rojo)" textAnchor="middle">Cátodo (−)</text>
+      <text x="98" y="224" fontSize="9" fill="var(--text-primary)" textAnchor="middle">H₂</text>
       {/* Burbujas H₂ */}
       {burbujasActivas && (
         <>
@@ -416,8 +418,8 @@ const ElectrolisisSvg = ({ voltaje }: { voltaje: number }) => {
 
       {/* Ánodo (+) — derecha → O₂ */}
       <rect x="294" y="80" width="16" height="130" rx="4" fill="#B45309" stroke="#92400E" strokeWidth="1" />
-      <text x="302" y="76" fontSize="10" fontWeight="700" fill="#3B82F6" textAnchor="middle">Ánodo (+)</text>
-      <text x="302" y="224" fontSize="9" fill="#374151" textAnchor="middle">O₂</text>
+      <text x="302" y="76" fontSize="10" fontWeight="700" fill="var(--t-azul)" textAnchor="middle">Ánodo (+)</text>
+      <text x="302" y="224" fontSize="9" fill="var(--text-primary)" textAnchor="middle">O₂</text>
       {/* Burbujas O₂ (menos, relación 1:2) */}
       {burbujasActivas && (
         <>
@@ -429,12 +431,13 @@ const ElectrolisisSvg = ({ voltaje }: { voltaje: number }) => {
       {/* Relación volúmenes */}
       {burbujasActivas && (
         <>
-          <text x="98" y="100" fontSize="9" fill="#1D4ED8" textAnchor="middle" fontWeight="700">2 vol H₂</text>
-          <text x="302" y="100" fontSize="9" fill="#DC2626" textAnchor="middle" fontWeight="700">1 vol O₂</text>
+          {/* Junto a su electrodo y no encima (centrados en él, la mitad caía sobre el metal) */}
+          <text x="114" y="100" fontSize="9" fill="var(--t-azul)" textAnchor="start" fontWeight="700">2 vol H₂</text>
+          <text x="286" y="100" fontSize="9" fill="var(--t-rojo)" textAnchor="end" fontWeight="700">1 vol O₂</text>
         </>
       )}
       {!burbujasActivas && (
-        <text x="200" y="155" fontSize="11" fill="#EF4444" textAnchor="middle" fontWeight="600">
+        <text x="200" y="155" fontSize="11" fill="var(--t-rojo)" textAnchor="middle" fontWeight="600">
           Voltaje insuficiente (&lt; 1,23 V teórico)
         </text>
       )}
@@ -558,10 +561,12 @@ const BateriaLiionSvg = ({ modoDescarga }: { modoDescarga: boolean }) => (
     <rect x="0" y="0" width="480" height="240" fill="transparent" />
 
     {/* ── Ánodo grafito ── */}
-    <rect x="30" y="30" width="120" height="180" rx="8" fill="#374151" opacity="0.85" />
-    <text x="90" y="20" fontSize="11" fontWeight="700" fill="#9CA3AF" textAnchor="middle">Ánodo</text>
+    {/* Electrodos opacos (al 85 % su texto claro bajaba a 2,58-4,45:1) y rótulos de encima con
+        el texto del tema (#9CA3AF y #93C5FD sobre la tarjeta clara daban 1,79-2,52). Cabo C0297 */}
+    <rect x="30" y="30" width="120" height="180" rx="8" fill="#374151" />
+    <text x="90" y="20" fontSize="11" fontWeight="700" fill="var(--t-gris)" textAnchor="middle">Ánodo</text>
     <text x="90" y="195" fontSize="9" fill="#D1D5DB" textAnchor="middle">Grafito</text>
-    <text x="90" y="207" fontSize="8" fill="#9CA3AF" textAnchor="middle">(C₆LiₓC₆)</text>
+    <text x="90" y="207" fontSize="8" fill="#D1D5DB" textAnchor="middle">(C₆LiₓC₆)</text>
     {/* Capas de grafito */}
     {[50, 72, 94, 116, 138, 160].map((y, i) => (
       <line key={i} x1="40" y1={y} x2="140" y2={y} stroke="#6B7280" strokeWidth="1.5" />
@@ -575,28 +580,30 @@ const BateriaLiionSvg = ({ modoDescarga }: { modoDescarga: boolean }) => (
     ))}
 
     {/* ── Electrolito ── */}
-    <rect x="160" y="30" width="160" height="180" rx="4" fill="#ECFDF5" opacity="0.7" stroke="#86EFAC" strokeWidth="1" />
-    <text x="240" y="20" fontSize="11" fontWeight="700" fill="#15803D" textAnchor="middle">Electrolito</text>
-    <text x="240" y="207" fontSize="8" fill="#16A34A" textAnchor="middle">LiPF₆ en carbonato</text>
-    <text x="240" y="198" fontSize="8" fill="#16A34A" textAnchor="middle">Separador poroso</text>
+    {/* Electrolito opaco con un tono por tema (translúcido, en oscuro dejaba el verde a 1,72:1) */}
+    <rect x="160" y="30" width="160" height="180" rx="4" fill="var(--e-electrolito)" stroke="#86EFAC" strokeWidth="1" />
+    <text x="240" y="20" fontSize="11" fontWeight="700" fill="var(--t-verde)" textAnchor="middle">Electrolito</text>
+    <text x="240" y="207" fontSize="8" fill="var(--t-verde)" textAnchor="middle">LiPF₆ en carbonato</text>
+    <text x="240" y="198" fontSize="8" fill="var(--t-verde)" textAnchor="middle">Separador poroso</text>
 
     {/* Iones Li⁺ moviéndose */}
     {[70, 110, 155].map((y, i) => (
       <g key={i} className={modoDescarga ? styles.ionLi : styles.ionLiCarga}
         style={{ animationDelay: `${i * 0.65}s` }}>
-        <circle cx="240" cy={y} r="9" fill="#EAB308" opacity="0.85" />
+        {/* Opaco: al 85 % sobre el electrolito oscuro, el Li⁺ marrón bajaba a 3,63:1 */}
+        <circle cx="240" cy={y} r="9" fill="#EAB308" />
         <text x="240" y={y + 4} fontSize="8" fill="#78350F" fontWeight="700" textAnchor="middle">Li⁺</text>
       </g>
     ))}
 
     {/* Flecha dirección iones */}
-    <text x="240" y="215" fontSize="9" fill="#16A34A" textAnchor="middle" fontWeight="600">
+    <text x="240" y="221" fontSize="9" fill="var(--t-verde)" textAnchor="middle" fontWeight="600">
       {modoDescarga ? 'Li⁺ →' : '← Li⁺'}
     </text>
 
     {/* ── Cátodo LiCoO₂ ── */}
-    <rect x="330" y="30" width="120" height="180" rx="8" fill="#1E3A5F" opacity="0.85" />
-    <text x="390" y="20" fontSize="11" fontWeight="700" fill="#93C5FD" textAnchor="middle">Cátodo</text>
+    <rect x="330" y="30" width="120" height="180" rx="8" fill="#1E3A5F" />
+    <text x="390" y="20" fontSize="11" fontWeight="700" fill="var(--t-azul)" textAnchor="middle">Cátodo</text>
     <text x="390" y="195" fontSize="9" fill="#BFDBFE" textAnchor="middle">LiCoO₂</text>
     <text x="390" y="207" fontSize="8" fill="#93C5FD" textAnchor="middle">(Óxido cobalto)</text>
     {/* Capas cátodo */}
@@ -612,7 +619,7 @@ const BateriaLiionSvg = ({ modoDescarga }: { modoDescarga: boolean }) => (
     ))}
 
     {/* Circuito externo */}
-    <text x="240" y="238" fontSize="9" fill="#6B7280" textAnchor="middle">
+    <text x="240" y="236" fontSize="9" fill="var(--t-gris)" textAnchor="middle">
       {modoDescarga ? <><tspan aria-hidden="true">⚡</tspan> Descarga: e⁻ fluyen ánodo → cátodo (circuito externo)</> : <><tspan aria-hidden="true">🔌</tspan> Carga: e⁻ forzados cátodo → ánodo</>}
     </text>
   </svg>

@@ -115,6 +115,17 @@ const APPS: App[] = [
   // 1,54-3,80 en oscuro) y las leyendas en #555 y #888 fijos (1,82 en oscuro). Los tres tipos, como
   // secciones, y los dos estados del páncreas, como subestados
   { slug: 'visualizador-diabetes-mecanismo', secciones: "[role='tab']", subestados: "button[class*='toggleBtn']" },
+  // Del censo del 08/11/2026 (C0297), reparada el 10/11/2026: rótulos sobre la tarjeta en rojo,
+  // azul, ámbar y verde puros o en grises fijos (#374151 a 1,39:1 en oscuro, «Cátodo» #93C5FD a
+  // 1,79 en claro), los iones con opacidad (2,50-3,70), y la cubeta y el electrolito translúcidos,
+  // que en oscuro dejaban sus rótulos a 1,03-2,65. Descarga y carga, y las dos pestañas de la
+  // electrólisis, como subestados
+  {
+    slug: 'visualizador-electroquimica',
+    secciones: SECCIONES,
+    extremos: true,
+    subestados: "button[class*='bateriaBtn'], button[class*='electroTab']",
+  },
 ];
 
 interface TextoSvg {

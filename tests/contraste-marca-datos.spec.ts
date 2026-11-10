@@ -93,6 +93,10 @@ const APPS: App[] = [
   // claro, 3,99 en oscuro), y en oscuro la insignia «Glucosa elevada» (4,32) y los títulos de la
   // guía (4,19). Los dos estados del páncreas y los tres tipos, como secciones
   { slug: 'visualizador-diabetes-mecanismo', todo: true, secciones: "button[class*='toggleBtn'], [role='tab']" },
+  // Del resto del censo de C0645 (10/11/2026): «Cátodo — Reducción» en #3B82F6 sobre su tinte (3,36:1
+  // en claro, 3,57 en oscuro), y en oscuro los potenciales positivos en #2563EB (2,44-2,56) y la
+  // reserva de la receta -texto en #EF4444 y #16A34A (3,36-3,82)
+  { slug: 'visualizador-electroquimica', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
 ];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {
