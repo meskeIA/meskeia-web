@@ -302,10 +302,11 @@ test.describe('visualizador-cuerpo-numeros', () => {
     expect(Math.abs(parp!.fraccion / lat!.fraccion - 0.1)).toBeLessThan(0.05);
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) [accesibilidad/medio] · cifras en claro por debajo del umbral: «206» a 1,40:1, «78» a 2,80:1, saliva 2,10:1', async ({
+  test('HALLAZGO 4339 (09/11/2026, REPARADO 10/11) [accesibilidad/medio] · cifras en claro por debajo del umbral: «206» a 1,40:1, «78» a 2,80:1, saliva 2,10:1', async ({
     page,
   }) => {
-    test.fail();
+    // REPARADO: cada cifra lleva un tono de texto por tema (.tonoX del módulo) y el color del dato
+    // se queda en el borde y la barra; la composición, la tinta de rellenoConTinta por segmento.
     // Estructura: 20,8 px / 800 = texto grande → 3:1
     const fallos: string[] = [];
     const numeros = page.locator('button[aria-label] > span:nth-child(2)');
@@ -315,6 +316,8 @@ test.describe('visualizador-cuerpo-numeros', () => {
     }
     // Composición por peso: negro al 70 % sobre el color del segmento, 10,4 px → 4,5:1
     const etiquetas = page.locator('[title*="%"] span');
+    await expect(numeros).toHaveCount(4);
+    await expect(etiquetas).toHaveCount(5);
     for (let i = 0; i < (await etiquetas.count()); i++) {
       const r = await contrasteSobreFondoReal(etiquetas.nth(i));
       if (r < 4.5) fallos.push(`${await etiquetas.nth(i).textContent()} ${r.toFixed(2)}`);
@@ -326,15 +329,16 @@ test.describe('visualizador-cuerpo-numeros', () => {
       const r = await contrasteSobreFondoReal(valores.nth(i));
       if (r < 4.5) fallos.push(`${await valores.nth(i).textContent()} ${r.toFixed(2)}`);
     }
-    // Hoy: 206 1,40 · 78 2,80 · «Músculos 40%» 3,97 · «Órg. 11%» 4,49 · latidos 3,82 ·
+    // Antes: 206 1,40 · 78 2,80 · «Músculos 40%» 3,97 · «Órg. 11%» 4,49 · latidos 3,82 ·
     // respiraciones 3,15 · saliva 2,10 · pensamientos 2,19
+    // Que el localizador siga encontrando las seis cifras: sin ellas el test pasaría sin medir nada
+    await expect(valores).toHaveCount(6);
     expect(fallos).toEqual([]);
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) [accesibilidad/medio] · en oscuro, latidos 3,76:1, sangre 2,64:1 y parpadeos 3,07:1', async ({
+  test('HALLAZGO 4339 (09/11/2026, REPARADO 10/11) [accesibilidad/medio] · en oscuro, latidos 3,76:1, sangre 2,64:1 y parpadeos 3,07:1', async ({
     page,
   }) => {
-    test.fail();
     await page.addInitScript(() => window.localStorage.setItem('meskeia-theme', 'dark'));
     await page.goto(RUTA);
     await esperarPaginaAsentada(page);

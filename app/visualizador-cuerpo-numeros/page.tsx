@@ -12,6 +12,7 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
+import { rellenoConTinta } from '@/lib/tintaLegible';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -37,6 +38,25 @@ const SECCIONES: SeccionInfo[] = [
 // Datos: Estructura
 // ─────────────────────────────────────────────
 
+/**
+ * Tono del TEXTO de cada dato, con su variante por tema en el módulo (.tonoX). El `color` de
+ * cada dato se queda en el borde y la barra: como texto daba 1,40-3,82:1 en claro y 2,64-3,76 en
+ * oscuro (hallazgo 4339, cabo C0645).
+ */
+type Tono = 'rojo' | 'azul' | 'rojoOscuro' | 'verde' | 'violeta' | 'naranja' | 'hueso' | 'teal' | 'marca';
+
+const CLASE_TONO: Record<Tono, string> = {
+  rojo: styles.tonoRojo,
+  azul: styles.tonoAzul,
+  rojoOscuro: styles.tonoRojoOscuro,
+  verde: styles.tonoVerde,
+  violeta: styles.tonoVioleta,
+  naranja: styles.tonoNaranja,
+  hueso: styles.tonoHueso,
+  teal: styles.tonoTeal,
+  marca: styles.tonoMarca,
+};
+
 interface BloqueEstructura {
   icono: string;
   nombre: string;
@@ -44,31 +64,45 @@ interface BloqueEstructura {
   unidad: string;
   porcentaje: number;
   color: string;
+  tono: Tono;
   curiosidad: string;
 }
 
 const ESTRUCTURA_DATOS: BloqueEstructura[] = [
   {
     icono: '🦴', nombre: 'Huesos', cantidad: 206, unidad: 'huesos',
-    porcentaje: 15, color: '#E8D8C4',
+    porcentaje: 15, color: '#E8D8C4', tono: 'hueso',
     curiosidad: 'El más pequeño: el estribo del oído (3 mm). El más grande: el fémur (48 cm). Un bebé nace con unos 270 huesos que se fusionan con el tiempo.',
   },
   {
     icono: '💪', nombre: 'Músculos', cantidad: 640, unidad: 'músculos',
-    porcentaje: 40, color: '#E74C3C',
+    porcentaje: 40, color: '#E74C3C', tono: 'rojo',
     curiosidad: 'El más fuerte: el masetero (mandíbula), capaz de ejercer 70 kg de fuerza. El más pequeño: el estapedio (1 mm), protege el oído de sonidos fuertes.',
   },
   {
     icono: '🫁', nombre: 'Órganos', cantidad: 78, unidad: 'órganos',
-    porcentaje: 7, color: '#48A9A6',
+    porcentaje: 7, color: '#48A9A6', tono: 'teal',
     curiosidad: 'El más grande: la piel (2 m², 3-4 kg). El más pesado interno: el hígado (1,5 kg). El intestino delgado mide 6-7 metros.',
   },
   {
     icono: '🧬', nombre: 'Células', cantidad: 37_200_000_000_000, unidad: 'células',
-    porcentaje: 100, color: '#2E86AB',
+    porcentaje: 100, color: '#2E86AB', tono: 'marca',
     curiosidad: '37,2 billones de células trabajando en equipo. Se renuevan constantemente: produces 3,8 millones de células nuevas cada segundo.',
   },
 ];
+
+/**
+ * Composición por peso. El rótulo iba en negro al 70 % sobre cada segmento y daba 3,97:1 en
+ * «Músculos» y 4,49 en «Órganos» (hallazgo 4339): ahora cada segmento lleva la tinta que llega a
+ * 4,5:1 sobre su color, y si ninguna llega, el relleno se oscurece lo justo (rellenoConTinta).
+ */
+const COMPOSICION = [
+  { peso: 40, color: '#E74C3C', titulo: 'Músculos: 40%', rotulo: 'Músculos 40%' },
+  { peso: 15, color: '#E8D8C4', titulo: 'Huesos: 15%', rotulo: 'Huesos 15%' },
+  { peso: 25, color: '#F39C12', titulo: 'Grasa: 25%', rotulo: 'Grasa 25%' },
+  { peso: 11, color: '#3498DB', titulo: 'Órganos: 11%', rotulo: 'Órg. 11%' },
+  { peso: 9, color: '#48A9A6', titulo: 'Otros: 9%', rotulo: 'Otros 9%' },
+].map((seg) => ({ ...seg, ...rellenoConTinta(seg.color) }));
 
 // ─────────────────────────────────────────────
 // Datos: Sistemas en acción (diario)
@@ -82,38 +116,39 @@ interface StatDiario {
   equivalencia: string;
   porcentajeBarra: number;
   color: string;
+  tono: Tono;
 }
 
 const STATS_DIARIOS: StatDiario[] = [
   {
     icono: '❤️', nombre: 'Latidos del corazón', valor: 100000, unidad: 'latidos/día',
     equivalencia: 'En una vida: 2.500 millones de latidos sin descanso',
-    porcentajeBarra: 100, color: '#E74C3C',
+    porcentajeBarra: 100, color: '#E74C3C', tono: 'rojo',
   },
   {
     icono: '🫁', nombre: 'Respiraciones', valor: 25000, unidad: 'respiraciones/día',
     equivalencia: 'Mueves unos 11.000 litros de aire cada día',
-    porcentajeBarra: 75, color: '#3498DB',
+    porcentajeBarra: 75, color: '#3498DB', tono: 'azul',
   },
   {
     icono: '🩸', nombre: 'Distancia de la sangre', valor: 19000, unidad: 'km/día',
     equivalencia: 'Casi la mitad de la circunferencia de la Tierra (40.075 km)',
-    porcentajeBarra: 95, color: '#C0392B',
+    porcentajeBarra: 95, color: '#C0392B', tono: 'rojoOscuro',
   },
   {
     icono: '💧', nombre: 'Saliva producida', valor: 1.5, unidad: 'litros/día',
     equivalencia: 'En toda tu vida: suficiente para llenar 2 piscinas',
-    porcentajeBarra: 30, color: '#2ECC71',
+    porcentajeBarra: 30, color: '#2ECC71', tono: 'verde',
   },
   {
     icono: '👁️', nombre: 'Parpadeos', valor: 10000, unidad: 'parpadeos/día',
     equivalencia: 'Pasas un 10% del día con los ojos cerrados sin darte cuenta',
-    porcentajeBarra: 60, color: '#9B59B6',
+    porcentajeBarra: 60, color: '#9B59B6', tono: 'violeta',
   },
   {
     icono: '🧠', nombre: 'Pensamientos', valor: 60000, unidad: 'pensamientos/día',
     equivalencia: 'Unos 2.500 por hora. El 95% son repetitivos',
-    porcentajeBarra: 85, color: '#F39C12',
+    porcentajeBarra: 85, color: '#F39C12', tono: 'naranja',
   },
 ];
 
@@ -251,7 +286,7 @@ function SeccionEstructura() {
             aria-label={`${dato.nombre}: ${dato.cantidad > 1000000 ? '37,2 billones' : formatNumber(dato.cantidad, 0)} ${dato.unidad}`}
           >
             <span className={styles.bloqueIcono} aria-hidden="true">{dato.icono}</span>
-            <span className={styles.bloqueNumero} style={{ color: dato.color }}>
+            <span className={`${styles.bloqueNumero} ${CLASE_TONO[dato.tono]}`}>
               {dato.cantidad > 1000000000 ? '37,2 B' : formatNumber(dato.cantidad, 0)}
             </span>
             <span className={styles.bloqueNombre}>{dato.nombre}</span>
@@ -268,21 +303,16 @@ function SeccionEstructura() {
       <div className={styles.composicionCard}>
         <h3 className={styles.composicionTitulo}>Composición por peso</h3>
         <div className={styles.composicionBarra}>
-          <div className={styles.composicionSegmento} style={{ flex: 40, background: '#E74C3C' }} title="Músculos: 40%">
-            <span className={styles.composicionLabel}>Músculos 40%</span>
-          </div>
-          <div className={styles.composicionSegmento} style={{ flex: 15, background: '#E8D8C4' }} title="Huesos: 15%">
-            <span className={styles.composicionLabel}>Huesos 15%</span>
-          </div>
-          <div className={styles.composicionSegmento} style={{ flex: 25, background: '#F39C12' }} title="Grasa: 25%">
-            <span className={styles.composicionLabel}>Grasa 25%</span>
-          </div>
-          <div className={styles.composicionSegmento} style={{ flex: 11, background: '#3498DB' }} title="Órganos: 11%">
-            <span className={styles.composicionLabel}>Órg. 11%</span>
-          </div>
-          <div className={styles.composicionSegmento} style={{ flex: 9, background: '#48A9A6' }} title="Otros: 9%">
-            <span className={styles.composicionLabel}>Otros 9%</span>
-          </div>
+          {COMPOSICION.map((seg) => (
+            <div
+              key={seg.titulo}
+              className={styles.composicionSegmento}
+              style={{ flex: seg.peso, background: seg.relleno, color: seg.tinta }}
+              title={seg.titulo}
+            >
+              <span className={styles.composicionLabel}>{seg.rotulo}</span>
+            </div>
+          ))}
         </div>
       </div>
 
@@ -321,7 +351,7 @@ function SeccionSistemas() {
             <div className={styles.barraHeader}>
               <span className={styles.barraIcono} aria-hidden="true">{stat.icono}</span>
               <span className={styles.barraNombre}>{stat.nombre}</span>
-              <span className={styles.barraValor} style={{ color: stat.color }}>
+              <span className={`${styles.barraValor} ${CLASE_TONO[stat.tono]}`}>
                 {formatNumber(stat.valor, stat.valor < 10 ? 1 : 0)} {stat.unidad}
               </span>
             </div>

@@ -79,6 +79,11 @@ const APPS: App[] = [
   // (4,47-4,49, forma de C0278). Las pestañas de la recomendación
   { slug: 'comparador-asistentes-codigo', todo: true, secciones: "[role='tab']" },
   { slug: 'visualizador-terremotos-tsunamis', todo: true, secciones: "[role='tablist'][aria-label*='ecciones'] [role='tab']" },
+  // Hallazgo 4339: las cifras de los bloques de Estructura y de las barras de Sistemas en el color
+  // de cada dato, igual en los dos temas («206» en #E8D8C4 a 1,40:1, «78» en el teal 2,80, saliva
+  // 2,10, pensamientos 2,19 en claro; latidos 3,76, sangre 2,64, parpadeos 3,07 en oscuro), y los
+  // porcentajes de la composición por peso en negro al 70 % sobre cada segmento (3,97-4,49)
+  { slug: 'visualizador-cuerpo-numeros', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
 ];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {
