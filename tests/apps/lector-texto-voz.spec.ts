@@ -397,10 +397,14 @@ test.describe('lector-texto-voz · contador, resaltado y controles', () => {
     await abrir(page);
     await botonLeer(page).click();
     await boundary(page, 0);
-    const arbol = await page.getByRole('status').filter({ hasText: 'La lectura en voz alta' }).ariaSnapshot();
-    const marks = arbol.split('\n').filter((l) => /^\s*- mark\b/.test(l)).length;
-    expect(marks).toBe(1);
+    // Primero que React haya pintado la palabra actual: la foto del árbol tomada justo tras el
+    // evento podía llegar antes del render y contar 0 marcas (inestable en la suite del 09/11/2026,
+    // cabo C0700). Y la cuenta, con reintento, por si el árbol tarda un fotograma más.
     await expect(resaltada(page)).toHaveText('La');
+    const estado = page.getByRole('status').filter({ hasText: 'La lectura en voz alta' });
+    await expect
+      .poll(async () => (await estado.ariaSnapshot()).split('\n').filter((l) => /^\s*- mark\b/.test(l)).length)
+      .toBe(1);
   });
 
   test('HALLAZGO 3964 (03/11/2026, REPARADO) · en pausa, velocidad, tono y voz quedan fijos', async ({
