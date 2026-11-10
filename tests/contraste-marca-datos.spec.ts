@@ -84,6 +84,10 @@ const APPS: App[] = [
   // 2,10, pensamientos 2,19 en claro; latidos 3,76, sangre 2,64, parpadeos 3,07 en oscuro), y los
   // porcentajes de la composición por peso en negro al 70 % sobre cada segmento (3,97-4,49)
   { slug: 'visualizador-cuerpo-numeros', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
+  // Del resto del censo de C0645 (10/11/2026): la cifra de cada tarjeta de fidelidad en su color de
+  // datos, igual en los dos temas, y el blanco sobre las barras naranja, teal y verde de las tres
+  // capas de protección. Los cinco pasos de la horquilla, como secciones
+  { slug: 'visualizador-adn-polimerasa', todo: true, secciones: "button[class*='indicadorPunto']" },
 ];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {

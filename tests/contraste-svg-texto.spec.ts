@@ -104,6 +104,11 @@ const APPS: App[] = [
   // #666 y #999 fijos (1,28-2,37:1 en oscuro, 2,82 en claro), el espermatozoide y el notocordio
   // en la marca y el teal (2,78-4,07), y blanco sobre el teal y la marca translúcidos (2,42-2,77)
   { slug: 'visualizador-embriogenesis', secciones: SECCIONES, extremos: true },
+  // Del censo del 08/11/2026 (C0297), reparada el 10/11/2026: los extremos 5' y 3' de cada hebra en
+  // la marca y el teal, la hebra líder en el acento y los fragmentos de Okazaki en naranja sobre la
+  // tarjeta, y el blanco sobre las bases, la helicasa gris, la polimerasa y la ligasa translúcidas.
+  // Los cinco pasos de la horquilla, como secciones
+  { slug: 'visualizador-adn-polimerasa', secciones: "button[class*='indicadorPunto']" },
 ];
 
 interface TextoSvg {

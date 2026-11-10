@@ -45,6 +45,7 @@ const DATOS_FIDELIDAD = [
     valor: '~1.000 nt/s',
     descripcion: 'Nucleótidos por segundo (bacterias). El genoma humano (~3.000 millones de pares de bases) tarda ~8 horas en replicarse con múltiples horquillas activas simultáneamente.',
     color: '#2E86AB',
+    tono: 'tonoMarca',
   },
   {
     icono: '🎯',
@@ -52,6 +53,7 @@ const DATOS_FIDELIDAD = [
     valor: '1 error / 10⁵',
     descripcion: 'Sin sistemas de corrección, la ADN polimerasa comete ~1 error por cada 100.000 bases incorporadas.',
     color: '#e67e22',
+    tono: 'tonoNaranja',
   },
   {
     icono: '🔍',
@@ -59,6 +61,7 @@ const DATOS_FIDELIDAD = [
     valor: '1 error / 10⁷',
     descripcion: 'La actividad exonucleasa 3\'→5\' detecta y elimina nucleótidos mal insertados. Reduce el error 100 veces.',
     color: '#48A9A6',
+    tono: 'tonoTeal',
   },
   {
     icono: '🛡️',
@@ -66,6 +69,7 @@ const DATOS_FIDELIDAD = [
     valor: '1 error / 10⁹',
     descripcion: 'Sistemas adicionales de reparación del ADN llevan la tasa de error final a ~1 por cada 1.000 millones de bases. En una célula humana: ~1-2 errores por replicación completa.',
     color: '#27ae60',
+    tono: 'tonoVerde',
   },
 ];
 
@@ -76,6 +80,14 @@ const POLIMERASAS_EUCARIOTAS = [
   { nombre: 'Pol γ', localizacion: 'Mitocondria', funcion: 'Replica el ADN mitocondrial', detalle: 'Herencia de endosimbiosis bacteriana' },
   { nombre: 'Pol β', localizacion: 'Núcleo', funcion: 'Reparación del ADN (BER)', detalle: 'Reparación por escisión de bases' },
 ];
+
+// Rellenos opacos de las enzimas, iguales en los dos temas, bajo su rótulo blanco (cabo C0297,
+// 10/11/2026): al 80-90 % de su color daban 2,61-3,76:1; así, 5,47-5,57
+const AZUL_POLIMERASA = '#26718F';
+const GRIS_HELICASA = '#5F6B6D';
+const NARANJA_LIGASA = '#A0540F';
+// Texto naranja por tema: el de globals en claro y, en oscuro (donde vale initial), la reserva
+const NARANJA_TEXTO = 'var(--naranja-texto, #F5B041)';
 
 function SvgDobleHebra() {
   const peldanos = Array.from({ length: 12 }, (_, i) => i);
@@ -89,23 +101,27 @@ function SvgDobleHebra() {
         const par = pares[i];
         const color1 = par === 'AT' ? '#e74c3c' : '#27ae60';
         const color2 = par === 'AT' ? '#3498db' : '#f39c12';
+        // Las letras van en el hueco entre las dos bases, con el texto del tema: en blanco, la
+        // primera caía en el hueco (blanco sobre el fondo claro) y la segunda sobre una base de
+        // 5 px (2,17-3,09:1 en oscuro). Cabo C0297, 10/11/2026
         return (
           <g key={i}>
-            <rect x={x - 5} y="34" width="5" height="22" fill={color1} rx="2" />
-            <rect x={x - 5} y="64" width="5" height="22" fill={color2} rx="2" />
-            <text x={x - 2} y="62" fontSize="7" textAnchor="middle" fill="#fff" fontWeight="bold">
+            <rect x={x - 5} y="34" width="5" height="16" fill={color1} rx="2" />
+            <rect x={x - 5} y="70" width="5" height="16" fill={color2} rx="2" />
+            <text x={x - 2.5} y="58.5" fontSize="7" textAnchor="middle" fill="var(--text-primary)" fontWeight="bold">
               {par[0]}
             </text>
-            <text x={x - 2} y="72" fontSize="7" textAnchor="middle" fill="#fff" fontWeight="bold">
+            <text x={x - 2.5} y="67.5" fontSize="7" textAnchor="middle" fill="var(--text-primary)" fontWeight="bold">
               {par[1]}
             </text>
           </g>
         );
       })}
-      <text x="20" y="22" fontSize="9" fill="#2E86AB" fontWeight="bold">5&#39;</text>
-      <text x="295" y="22" fontSize="9" fill="#2E86AB" fontWeight="bold">3&#39;</text>
-      <text x="20" y="107" fontSize="9" fill="#48A9A6" fontWeight="bold">3&#39;</text>
-      <text x="295" y="107" fontSize="9" fill="#48A9A6" fontWeight="bold">5&#39;</text>
+      {/* Extremos de cada hebra: la marca y el teal como texto daban 3,01 y 4,42:1 en oscuro */}
+      <text x="20" y="22" fontSize="9" fill="var(--primary-texto)" fontWeight="bold">5&#39;</text>
+      <text x="295" y="22" fontSize="9" fill="var(--primary-texto)" fontWeight="bold">3&#39;</text>
+      <text x="20" y="107" fontSize="9" fill="var(--secondary-texto)" fontWeight="bold">3&#39;</text>
+      <text x="295" y="107" fontSize="9" fill="var(--secondary-texto)" fontWeight="bold">5&#39;</text>
     </svg>
   );
 }
@@ -121,11 +137,12 @@ function SvgHelicasa() {
         const x = 25 + i * 22;
         return <line key={i} x1={x} y1="34" x2={x} y2="86" stroke="#95a5a6" strokeWidth="2" strokeDasharray="3,2" />;
       })}
-      <circle cx="165" cy="60" r="18" fill="#95a5a6" opacity="0.9" />
+      {/* Enzimas opacas y oscurecidas bajo el blanco: el gris al 90 % daba 2,93:1 */}
+      <circle cx="165" cy="60" r="18" fill={GRIS_HELICASA} />
       <text x="165" y="55" fontSize="7" textAnchor="middle" fill="white" fontWeight="bold">Heli</text>
       <text x="165" y="65" fontSize="7" textAnchor="middle" fill="white" fontWeight="bold">casa</text>
-      <text x="280" y="14" fontSize="9" fill="#2E86AB" fontWeight="bold">5&#39;→</text>
-      <text x="280" y="124" fontSize="9" fill="#48A9A6" fontWeight="bold">←3&#39;</text>
+      <text x="280" y="14" fontSize="9" fill="var(--primary-texto)" fontWeight="bold">5&#39;→</text>
+      <text x="280" y="124" fontSize="9" fill="var(--secondary-texto)" fontWeight="bold">←3&#39;</text>
     </svg>
   );
 }
@@ -142,13 +159,14 @@ function SvgHebraLider() {
       {[0, 1, 2, 3, 4].map((i) => (
         <circle key={i} cx={25 + i * 22} cy="50" r="5" fill={nucleotidoColors[i]} />
       ))}
-      <circle cx="155" cy="42" r="18" fill="#2E86AB" opacity="0.9" />
+      <circle cx="155" cy="42" r="18" fill={AZUL_POLIMERASA} />
       <text x="155" y="38" fontSize="6" textAnchor="middle" fill="white" fontWeight="bold">ADN</text>
       <text x="155" y="47" fontSize="6" textAnchor="middle" fill="white" fontWeight="bold">pol III</text>
-      <circle cx="175" cy="60" r="18" fill="#95a5a6" opacity="0.9" />
+      <circle cx="175" cy="60" r="18" fill={GRIS_HELICASA} />
       <text x="175" y="55" fontSize="6" textAnchor="middle" fill="white" fontWeight="bold">Heli</text>
       <text x="175" y="65" fontSize="6" textAnchor="middle" fill="white" fontWeight="bold">casa</text>
-      <text x="25" y="145" fontSize="8" fill="#7FB3D3" fontWeight="bold">← Hebra líder (continua 5&#39;→3&#39;)</text>
+      {/* El acento #7FB3D3 se queda en la hebra; como texto daba 2,15:1 en claro */}
+      <text x="25" y="145" fontSize="8" fill="var(--primary-texto)" fontWeight="bold">← Hebra líder (continua 5&#39;→3&#39;)</text>
     </svg>
   );
 }
@@ -164,16 +182,17 @@ function SvgOkazaki() {
       <line x1="20" y1="110" x2="60" y2="110" stroke="#e67e22" strokeWidth="3" strokeLinecap="round" />
       <line x1="70" y1="110" x2="110" y2="110" stroke="#e67e22" strokeWidth="3" strokeLinecap="round" />
       <line x1="120" y1="110" x2="155" y2="110" stroke="#e67e22" strokeWidth="3" strokeLinecap="round" />
-      <circle cx="75" cy="100" r="14" fill="#2E86AB" opacity="0.8" />
+      <circle cx="75" cy="100" r="14" fill={AZUL_POLIMERASA} />
       <text x="75" y="96" fontSize="5.5" textAnchor="middle" fill="white" fontWeight="bold">ADN</text>
       <text x="75" y="104" fontSize="5.5" textAnchor="middle" fill="white" fontWeight="bold">pol</text>
-      <circle cx="115" cy="100" r="14" fill="#2E86AB" opacity="0.8" />
+      <circle cx="115" cy="100" r="14" fill={AZUL_POLIMERASA} />
       <text x="115" y="96" fontSize="5.5" textAnchor="middle" fill="white" fontWeight="bold">ADN</text>
       <text x="115" y="104" fontSize="5.5" textAnchor="middle" fill="white" fontWeight="bold">pol</text>
-      <text x="10" y="130" fontSize="7" fill="#e67e22" fontWeight="bold">F1</text>
-      <text x="50" y="130" fontSize="7" fill="#e67e22" fontWeight="bold">F2</text>
-      <text x="90" y="130" fontSize="7" fill="#e67e22" fontWeight="bold">F3</text>
-      <text x="10" y="155" fontSize="7.5" fill="#e67e22">← Fragmentos de Okazaki (síntesis discontinua)</text>
+      {/* El naranja se queda en los fragmentos; su texto, con el tono por tema (2,71:1 en claro) */}
+      <text x="10" y="130" fontSize="7" fill={NARANJA_TEXTO} fontWeight="bold">F1</text>
+      <text x="50" y="130" fontSize="7" fill={NARANJA_TEXTO} fontWeight="bold">F2</text>
+      <text x="90" y="130" fontSize="7" fill={NARANJA_TEXTO} fontWeight="bold">F3</text>
+      <text x="10" y="155" fontSize="7.5" fill={NARANJA_TEXTO}>← Fragmentos de Okazaki (síntesis discontinua)</text>
     </svg>
   );
 }
@@ -188,13 +207,13 @@ function SvgLigasa() {
       ))}
       <line x1="20" y1="50" x2="300" y2="50" stroke="#7FB3D3" strokeWidth="3" strokeLinecap="round" />
       <line x1="20" y1="110" x2="300" y2="110" stroke="#e67e22" strokeWidth="3" strokeLinecap="round" />
-      <circle cx="80" cy="78" r="14" fill="#e67e22" opacity="0.9" />
+      <circle cx="80" cy="78" r="14" fill={NARANJA_LIGASA} />
       <text x="80" y="74" fontSize="5.5" textAnchor="middle" fill="white" fontWeight="bold">Lig</text>
       <text x="80" y="83" fontSize="5.5" textAnchor="middle" fill="white" fontWeight="bold">asa</text>
-      <circle cx="160" cy="78" r="14" fill="#e67e22" opacity="0.9" />
+      <circle cx="160" cy="78" r="14" fill={NARANJA_LIGASA} />
       <text x="160" y="74" fontSize="5.5" textAnchor="middle" fill="white" fontWeight="bold">Lig</text>
       <text x="160" y="83" fontSize="5.5" textAnchor="middle" fill="white" fontWeight="bold">asa</text>
-      <text x="10" y="155" fontSize="8" fill="#27ae60" fontWeight="bold">✓ Dos moléculas de ADN idénticas</text>
+      <text x="10" y="155" fontSize="8" fill="var(--verde-texto, #58D68D)" fontWeight="bold">✓ Dos moléculas de ADN idénticas</text>
     </svg>
   );
 }
@@ -309,7 +328,8 @@ export default function VisualizadorAdnPolimerasa() {
             >
               <span className={styles.tarjetaIcono} aria-hidden="true">{dato.icono}</span>
               <h3 className={styles.tarjetaTitulo}>{dato.titulo}</h3>
-              <p className={styles.tarjetaValor} style={{ color: dato.color }}>{dato.valor}</p>
+              {/* El color del dato, en el borde; la cifra, con su tono de texto por tema (C0645) */}
+              <p className={`${styles.tarjetaValor} ${styles[dato.tono]}`}>{dato.valor}</p>
               <p className={styles.tarjetaDescripcion}>{dato.descripcion}</p>
             </div>
           ))}
@@ -317,21 +337,23 @@ export default function VisualizadorAdnPolimerasa() {
 
         <div className={styles.barraFidelidadContainer} aria-label="Comparativa de tasas de error">
           <h3 className={styles.barraFidelidadTitulo}>Reducción de errores: tres capas de protección</h3>
+          {/* Rellenos oscurecidos, iguales en los dos temas, bajo el texto blanco: en su color puro
+              daban 2,80-2,87:1; ahora 5,15-6,35 (cabo C0645, 10/11/2026) */}
           <div className={styles.barraFidelidad}>
             <div className={styles.barraEtapa}>
-              <div className={styles.barraBloque} style={{ width: '100%', backgroundColor: '#e67e22' }}>
+              <div className={styles.barraBloque} style={{ width: '100%', backgroundColor: '#B93E0B' }}>
                 <span>Sin corrección</span>
               </div>
               <span className={styles.barraEtiqueta}>1 / 10⁵</span>
             </div>
             <div className={styles.barraEtapa}>
-              <div className={styles.barraBloque} style={{ width: '60%', backgroundColor: '#48A9A6' }}>
+              <div className={styles.barraBloque} style={{ width: '60%', backgroundColor: '#327874' }}>
                 <span>+ Proofreading</span>
               </div>
               <span className={styles.barraEtiqueta}>1 / 10⁷</span>
             </div>
             <div className={styles.barraEtapa}>
-              <div className={styles.barraBloque} style={{ width: '25%', backgroundColor: '#27ae60' }}>
+              <div className={styles.barraBloque} style={{ width: '25%', backgroundColor: '#136E35' }}>
                 <span>+ Reparación</span>
               </div>
               <span className={styles.barraEtiqueta}>1 / 10⁹</span>
@@ -357,9 +379,11 @@ export default function VisualizadorAdnPolimerasa() {
           </div>
         </div>
 
+        {/* Etiquetas de temperatura: rojo, azul y naranja oscurecidos bajo el blanco (en su color
+            puro daban 2,85-3,82:1; ahora 5,59-6,47), iguales en los dos temas (C0645) */}
         <div className={styles.cicloPCR} aria-label="Ciclo de PCR en 3 pasos">
           <div className={styles.cicloPaso}>
-            <div className={styles.temperaturaTag} style={{ backgroundColor: '#e74c3c' }}>
+            <div className={styles.temperaturaTag} style={{ backgroundColor: '#B91C1C' }}>
               <span aria-hidden="true">🌡️</span> 95°C
             </div>
             <h3 className={styles.cicloPasoTitulo}>Desnaturalización</h3>
@@ -371,7 +395,7 @@ export default function VisualizadorAdnPolimerasa() {
           <div className={styles.cicloFlecha} aria-hidden="true">→</div>
 
           <div className={styles.cicloPaso}>
-            <div className={styles.temperaturaTag} style={{ backgroundColor: '#3498db' }}>
+            <div className={styles.temperaturaTag} style={{ backgroundColor: '#1F6A9A' }}>
               <span aria-hidden="true">❄️</span> 55–65°C
             </div>
             <h3 className={styles.cicloPasoTitulo}>Anillamiento</h3>
@@ -383,7 +407,7 @@ export default function VisualizadorAdnPolimerasa() {
           <div className={styles.cicloFlecha} aria-hidden="true">→</div>
 
           <div className={styles.cicloPaso}>
-            <div className={styles.temperaturaTag} style={{ backgroundColor: '#e67e22' }}>
+            <div className={styles.temperaturaTag} style={{ backgroundColor: '#B93E0B' }}>
               <span aria-hidden="true">🔥</span> 72°C
             </div>
             <h3 className={styles.cicloPasoTitulo}>Extensión</h3>
