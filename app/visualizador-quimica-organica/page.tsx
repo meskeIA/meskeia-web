@@ -131,8 +131,25 @@ const GRUPOS: GrupoFuncional[] = [
 // SVG de moléculas simplificadas
 // ─────────────────────────────────────────────
 
+// Tono de TEXTO de cada grupo (clase del módulo con --q-dato por tema) y relleno, igual en los dos
+// temas, bajo el texto blanco de su etiqueta: el color puro del grupo daba 1,96-2,57:1 con blanco
+// encima y 1,88-4,34 como texto (cabos C0297 y C0645, 10/11/2026)
+const TONO_GRUPO: Record<string, { clase: string; relleno: string }> = {
+  alcanos: { clase: styles.datoAlcanos, relleno: '#5C636A' },
+  alquenos: { clase: styles.datoAlquenos, relleno: '#146C43' },
+  alcoholes: { clase: styles.datoAlcoholes, relleno: '#0A58CA' },
+  aldehidos: { clase: styles.datoAldehidos, relleno: '#A8530C' },
+  cetonas: { clase: styles.datoCetonas, relleno: '#6610F2' },
+  acidos: { clase: styles.datoAcidos, relleno: '#B02A37' },
+  esteres: { clase: styles.datoEsteres, relleno: '#13795B' },
+  aminas: { clase: styles.datoAminas, relleno: '#087990' },
+};
+
 function MoleculaSVG({ grupoId, color }: { grupoId: string; color: string }) {
-  const base = '#444';
+  // Átomos y enlaces con el tono del tema (#444 fijo daba 1,79:1 en oscuro); el grupo, con el
+  // tono de texto de su dato. El color puro del grupo se queda en dobles enlaces y recuadros
+  const base = 'var(--q-base)';
+  const tinta = 'var(--q-dato)';
 
   if (grupoId === 'alcanos') {
     return (
@@ -163,7 +180,7 @@ function MoleculaSVG({ grupoId, color }: { grupoId: string; color: string }) {
         <text x="54" y="45" fill={base} fontFamily="monospace" fontSize="16" fontWeight="bold">C</text>
         <line x1="72" y1="42" x2="96" y2="42" stroke={base} strokeWidth="2"/>
         <text x="98" y="45" fill={base} fontFamily="monospace" fontSize="16" fontWeight="bold">C</text>
-        <text x="36" y="28" fill={color} fontFamily="monospace" fontSize="11" fontWeight="bold">= (doble)</text>
+        <text x="36" y="28" fill={tinta} fontFamily="monospace" fontSize="11" fontWeight="bold">= (doble)</text>
       </svg>
     );
   }
@@ -175,9 +192,9 @@ function MoleculaSVG({ grupoId, color }: { grupoId: string; color: string }) {
         <line x1="28" y1="42" x2="52" y2="42" stroke={base} strokeWidth="2"/>
         <text x="54" y="45" fill={base} fontFamily="monospace" fontSize="16" fontWeight="bold">C</text>
         <line x1="72" y1="42" x2="96" y2="42" stroke={base} strokeWidth="2"/>
-        <text x="98" y="45" fill={color} fontFamily="monospace" fontSize="16" fontWeight="bold">OH</text>
+        <text x="98" y="45" fill={tinta} fontFamily="monospace" fontSize="16" fontWeight="bold">OH</text>
         <rect x="95" y="28" width="36" height="22" rx="4" fill="none" stroke={color} strokeWidth="1.5" strokeDasharray="4,2"/>
-        <text x="97" y="18" fill={color} fontFamily="monospace" fontSize="10">grupo funcional</text>
+        <text x="97" y="18" fill={tinta} fontFamily="monospace" fontSize="10">grupo funcional</text>
       </svg>
     );
   }
@@ -189,10 +206,10 @@ function MoleculaSVG({ grupoId, color }: { grupoId: string; color: string }) {
         <line x1="28" y1="42" x2="52" y2="42" stroke={base} strokeWidth="2"/>
         <text x="54" y="45" fill={base} fontFamily="monospace" fontSize="16" fontWeight="bold">C</text>
         <line x1="72" y1="42" x2="96" y2="42" stroke={base} strokeWidth="2"/>
-        <text x="98" y="45" fill={color} fontFamily="monospace" fontSize="16" fontWeight="bold">CHO</text>
+        <text x="98" y="45" fill={tinta} fontFamily="monospace" fontSize="16" fontWeight="bold">CHO</text>
         <rect x="95" y="28" width="46" height="22" rx="4" fill="none" stroke={color} strokeWidth="1.5" strokeDasharray="4,2"/>
         {/* doble enlace C=O esquemático */}
-        <text x="97" y="18" fill={color} fontFamily="monospace" fontSize="10">−CHO (C=O)</text>
+        <text x="97" y="18" fill={tinta} fontFamily="monospace" fontSize="10">−CHO (C=O)</text>
       </svg>
     );
   }
@@ -205,10 +222,10 @@ function MoleculaSVG({ grupoId, color }: { grupoId: string; color: string }) {
         <text x="54" y="45" fill={base} fontFamily="monospace" fontSize="16" fontWeight="bold">C</text>
         {/* doble enlace hacia arriba = O */}
         <line x1="63" y1="28" x2="63" y2="42" stroke={color} strokeWidth="2.5"/>
-        <text x="58" y="24" fill={color} fontFamily="monospace" fontSize="14" fontWeight="bold">O</text>
+        <text x="58" y="24" fill={tinta} fontFamily="monospace" fontSize="14" fontWeight="bold">O</text>
         <line x1="72" y1="42" x2="96" y2="42" stroke={base} strokeWidth="2"/>
         <text x="98" y="45" fill={base} fontFamily="monospace" fontSize="16" fontWeight="bold">C</text>
-        <text x="50" y="72" fill={color} fontFamily="monospace" fontSize="10">C=O central (cetona)</text>
+        <text x="50" y="72" fill={tinta} fontFamily="monospace" fontSize="10">C=O central (cetona)</text>
       </svg>
     );
   }
@@ -220,9 +237,9 @@ function MoleculaSVG({ grupoId, color }: { grupoId: string; color: string }) {
         <line x1="28" y1="42" x2="52" y2="42" stroke={base} strokeWidth="2"/>
         <text x="54" y="45" fill={base} fontFamily="monospace" fontSize="16" fontWeight="bold">C</text>
         <line x1="72" y1="42" x2="96" y2="42" stroke={base} strokeWidth="2"/>
-        <text x="98" y="45" fill={color} fontFamily="monospace" fontSize="16" fontWeight="bold">COOH</text>
+        <text x="98" y="45" fill={tinta} fontFamily="monospace" fontSize="16" fontWeight="bold">COOH</text>
         <rect x="95" y="28" width="60" height="22" rx="4" fill="none" stroke={color} strokeWidth="1.5" strokeDasharray="4,2"/>
-        <text x="97" y="18" fill={color} fontFamily="monospace" fontSize="10">grupo ácido</text>
+        <text x="97" y="18" fill={tinta} fontFamily="monospace" fontSize="10">grupo ácido</text>
       </svg>
     );
   }
@@ -234,11 +251,11 @@ function MoleculaSVG({ grupoId, color }: { grupoId: string; color: string }) {
         <line x1="28" y1="42" x2="52" y2="42" stroke={base} strokeWidth="2"/>
         <text x="54" y="45" fill={base} fontFamily="monospace" fontSize="16" fontWeight="bold">C</text>
         <line x1="72" y1="42" x2="96" y2="42" stroke={base} strokeWidth="2"/>
-        <text x="98" y="45" fill={color} fontFamily="monospace" fontSize="15" fontWeight="bold">COO</text>
+        <text x="98" y="45" fill={tinta} fontFamily="monospace" fontSize="15" fontWeight="bold">COO</text>
         <line x1="138" y1="42" x2="158" y2="42" stroke={base} strokeWidth="2"/>
         <text x="160" y="45" fill={base} fontFamily="monospace" fontSize="16" fontWeight="bold">C</text>
         <rect x="95" y="28" width="50" height="22" rx="4" fill="none" stroke={color} strokeWidth="1.5" strokeDasharray="4,2"/>
-        <text x="97" y="18" fill={color} fontFamily="monospace" fontSize="10">enlace éster</text>
+        <text x="97" y="18" fill={tinta} fontFamily="monospace" fontSize="10">enlace éster</text>
       </svg>
     );
   }
@@ -250,9 +267,9 @@ function MoleculaSVG({ grupoId, color }: { grupoId: string; color: string }) {
         <line x1="28" y1="42" x2="52" y2="42" stroke={base} strokeWidth="2"/>
         <text x="54" y="45" fill={base} fontFamily="monospace" fontSize="16" fontWeight="bold">C</text>
         <line x1="72" y1="42" x2="96" y2="42" stroke={base} strokeWidth="2"/>
-        <text x="98" y="45" fill={color} fontFamily="monospace" fontSize="16" fontWeight="bold">NH₂</text>
+        <text x="98" y="45" fill={tinta} fontFamily="monospace" fontSize="16" fontWeight="bold">NH₂</text>
         <rect x="95" y="28" width="42" height="22" rx="4" fill="none" stroke={color} strokeWidth="1.5" strokeDasharray="4,2"/>
-        <text x="97" y="18" fill={color} fontFamily="monospace" fontSize="10">grupo amino</text>
+        <text x="97" y="18" fill={tinta} fontFamily="monospace" fontSize="10">grupo amino</text>
       </svg>
     );
   }
@@ -374,7 +391,7 @@ function BencenoSVG({ tipo }: { tipo: 'kekule' | 'resonancia' }) {
       {/* Hexágono */}
       {vertices.map((v, i) => {
         const next = vertices[(i + 1) % 6];
-        return <line key={i} x1={v.x} y1={v.y} x2={next.x} y2={next.y} stroke="#333" strokeWidth="2.5"/>;
+        return <line key={i} x1={v.x} y1={v.y} x2={next.x} y2={next.y} stroke="var(--q-base)" strokeWidth="2.5"/>;
       })}
 
       {tipo === 'kekule' ? (
@@ -394,13 +411,13 @@ function BencenoSVG({ tipo }: { tipo: 'kekule' | 'resonancia' }) {
         <circle cx={cx} cy={cy} r={r * 0.55} fill="none" stroke="#2E86AB" strokeWidth="2.5"/>
       )}
 
-      {/* Átomos C en vértices */}
+      {/* Átomos C en vértices, con el tono del tema (#333 fijo daba 1,07:1 en oscuro; C0297) */}
       {vertices.map((v, i) => (
-        <text key={i} x={v.x - 6} y={v.y + 5} fill="#333" fontFamily="monospace" fontSize="12" fontWeight="bold">C</text>
+        <text key={i} x={v.x - 6} y={v.y + 5} fill="var(--q-base)" fontFamily="monospace" fontSize="12" fontWeight="bold">C</text>
       ))}
 
       {/* Label */}
-      <text x={cx - 32} y={cy + r + 22} fill="#666" fontFamily="sans-serif" fontSize="11">
+      <text x={cx - 32} y={cy + r + 22} fill="var(--q-gris)" fontFamily="sans-serif" fontSize="11">
         {tipo === 'kekule' ? 'Kekulé' : 'Resonancia'}
       </text>
     </svg>
@@ -439,37 +456,39 @@ const TIPOS_ISOMERIA: TipoIsomeria[] = [
   },
 ];
 
-// SVG isomería estructural
+// SVG de isomería: átomos, enlaces y rótulos con los tonos --q-* del módulo, por tema (#444, #666,
+// #888 y #aaa fijos daban 1,79-3,03:1 en oscuro y 2,23-3,40 en claro; cabo C0297). Los dobles
+// enlaces conservan su color puro
 function IsoEstructuralSVG() {
   return (
     <svg viewBox="0 0 260 110" className={styles.isomeriaSvg} aria-label="Isomería estructural: butano vs isobutano">
       {/* Butano lineal */}
-      <text x="5" y="18" fill="#666" fontFamily="sans-serif" fontSize="10" fontWeight="bold">n-Butano</text>
-      <text x="5" y="40" fill="#444" fontFamily="monospace" fontSize="13" fontWeight="bold">C</text>
-      <line x1="20" y1="37" x2="38" y2="37" stroke="#444" strokeWidth="2"/>
-      <text x="40" y="40" fill="#444" fontFamily="monospace" fontSize="13" fontWeight="bold">C</text>
-      <line x1="55" y1="37" x2="73" y2="37" stroke="#444" strokeWidth="2"/>
-      <text x="75" y="40" fill="#444" fontFamily="monospace" fontSize="13" fontWeight="bold">C</text>
-      <line x1="90" y1="37" x2="108" y2="37" stroke="#444" strokeWidth="2"/>
-      <text x="110" y="40" fill="#444" fontFamily="monospace" fontSize="13" fontWeight="bold">C</text>
-      <text x="5" y="58" fill="#888" fontFamily="sans-serif" fontSize="9">cadena lineal (C₄H₁₀)</text>
+      <text x="5" y="18" fill="var(--q-gris)" fontFamily="sans-serif" fontSize="10" fontWeight="bold">n-Butano</text>
+      <text x="5" y="40" fill="var(--q-base)" fontFamily="monospace" fontSize="13" fontWeight="bold">C</text>
+      <line x1="20" y1="37" x2="38" y2="37" stroke="var(--q-base)" strokeWidth="2"/>
+      <text x="40" y="40" fill="var(--q-base)" fontFamily="monospace" fontSize="13" fontWeight="bold">C</text>
+      <line x1="55" y1="37" x2="73" y2="37" stroke="var(--q-base)" strokeWidth="2"/>
+      <text x="75" y="40" fill="var(--q-base)" fontFamily="monospace" fontSize="13" fontWeight="bold">C</text>
+      <line x1="90" y1="37" x2="108" y2="37" stroke="var(--q-base)" strokeWidth="2"/>
+      <text x="110" y="40" fill="var(--q-base)" fontFamily="monospace" fontSize="13" fontWeight="bold">C</text>
+      <text x="5" y="58" fill="var(--q-gris)" fontFamily="sans-serif" fontSize="9">cadena lineal (C₄H₁₀)</text>
 
       {/* Separador */}
       <line x1="140" y1="10" x2="140" y2="100" stroke="#ddd" strokeWidth="1" strokeDasharray="4,2"/>
-      <text x="144" y="55" fill="#aaa" fontFamily="sans-serif" fontSize="10">vs</text>
+      <text x="144" y="55" fill="var(--q-gris)" fontFamily="sans-serif" fontSize="10">vs</text>
 
       {/* Isobutano */}
-      <text x="160" y="18" fill="#666" fontFamily="sans-serif" fontSize="10" fontWeight="bold">Isobutano</text>
+      <text x="160" y="18" fill="var(--q-gris)" fontFamily="sans-serif" fontSize="10" fontWeight="bold">Isobutano</text>
       {/* cadena principal C-C-C */}
-      <text x="162" y="52" fill="#444" fontFamily="monospace" fontSize="13" fontWeight="bold">C</text>
-      <line x1="177" y1="49" x2="195" y2="49" stroke="#444" strokeWidth="2"/>
-      <text x="197" y="52" fill="#2E86AB" fontFamily="monospace" fontSize="13" fontWeight="bold">C</text>
-      <line x1="212" y1="49" x2="230" y2="49" stroke="#444" strokeWidth="2"/>
-      <text x="232" y="52" fill="#444" fontFamily="monospace" fontSize="13" fontWeight="bold">C</text>
+      <text x="162" y="52" fill="var(--q-base)" fontFamily="monospace" fontSize="13" fontWeight="bold">C</text>
+      <line x1="177" y1="49" x2="195" y2="49" stroke="var(--q-base)" strokeWidth="2"/>
+      <text x="197" y="52" fill="var(--q-azul)" fontFamily="monospace" fontSize="13" fontWeight="bold">C</text>
+      <line x1="212" y1="49" x2="230" y2="49" stroke="var(--q-base)" strokeWidth="2"/>
+      <text x="232" y="52" fill="var(--q-base)" fontFamily="monospace" fontSize="13" fontWeight="bold">C</text>
       {/* rama */}
-      <line x1="205" y1="37" x2="205" y2="21" stroke="#444" strokeWidth="2"/>
-      <text x="199" y="18" fill="#444" fontFamily="monospace" fontSize="13" fontWeight="bold">C</text>
-      <text x="160" y="72" fill="#2E86AB" fontFamily="sans-serif" fontSize="9">carbono central ramificado</text>
+      <line x1="205" y1="37" x2="205" y2="21" stroke="var(--q-base)" strokeWidth="2"/>
+      <text x="199" y="18" fill="var(--q-base)" fontFamily="monospace" fontSize="13" fontWeight="bold">C</text>
+      <text x="160" y="72" fill="var(--q-azul)" fontFamily="sans-serif" fontSize="9">carbono central ramificado</text>
     </svg>
   );
 }
@@ -479,40 +498,40 @@ function IsoCisTransSVG() {
   return (
     <svg viewBox="0 0 280 120" className={styles.isomeriaSvg} aria-label="Isomería cis/trans del 2-buteno">
       {/* CIS */}
-      <text x="5" y="16" fill="#666" fontFamily="sans-serif" fontSize="10" fontWeight="bold">cis-2-buteno</text>
+      <text x="5" y="16" fill="var(--q-gris)" fontFamily="sans-serif" fontSize="10" fontWeight="bold">cis-2-buteno</text>
       {/* doble enlace central */}
       <line x1="80" y1="55" x2="115" y2="55" stroke="#dc3545" strokeWidth="2.5"/>
       <line x1="80" y1="61" x2="115" y2="61" stroke="#dc3545" strokeWidth="2.5"/>
       {/* CH₃ ambos arriba */}
-      <text x="30" y="48" fill="#444" fontFamily="monospace" fontSize="12">CH₃</text>
-      <line x1="63" y1="46" x2="80" y2="55" stroke="#444" strokeWidth="2"/>
-      <text x="118" y="48" fill="#444" fontFamily="monospace" fontSize="12">CH₃</text>
-      <line x1="115" y1="55" x2="118" y2="46" stroke="#444" strokeWidth="2"/>
+      <text x="30" y="48" fill="var(--q-base)" fontFamily="monospace" fontSize="12">CH₃</text>
+      <line x1="63" y1="46" x2="80" y2="55" stroke="var(--q-base)" strokeWidth="2"/>
+      <text x="118" y="48" fill="var(--q-base)" fontFamily="monospace" fontSize="12">CH₃</text>
+      <line x1="115" y1="55" x2="118" y2="46" stroke="var(--q-base)" strokeWidth="2"/>
       {/* H ambos abajo */}
-      <text x="50" y="80" fill="#888" fontFamily="monospace" fontSize="11">H</text>
-      <line x1="57" y1="76" x2="80" y2="61" stroke="#888" strokeWidth="1.5"/>
-      <text x="105" y="80" fill="#888" fontFamily="monospace" fontSize="11">H</text>
-      <line x1="115" y1="61" x2="110" y2="76" stroke="#888" strokeWidth="1.5"/>
-      <text x="25" y="100" fill="#dc3545" fontFamily="sans-serif" fontSize="9">mismos grupos = mismo lado</text>
+      <text x="50" y="80" fill="var(--q-gris)" fontFamily="monospace" fontSize="11">H</text>
+      <line x1="57" y1="76" x2="80" y2="61" stroke="var(--q-gris)" strokeWidth="1.5"/>
+      <text x="105" y="80" fill="var(--q-gris)" fontFamily="monospace" fontSize="11">H</text>
+      <line x1="115" y1="61" x2="110" y2="76" stroke="var(--q-gris)" strokeWidth="1.5"/>
+      <text x="25" y="100" fill="var(--q-rojo)" fontFamily="sans-serif" fontSize="9">mismos grupos = mismo lado</text>
 
       {/* Separador */}
       <line x1="155" y1="10" x2="155" y2="110" stroke="#ddd" strokeWidth="1" strokeDasharray="4,2"/>
 
       {/* TRANS */}
-      <text x="162" y="16" fill="#666" fontFamily="sans-serif" fontSize="10" fontWeight="bold">trans-2-buteno</text>
+      <text x="162" y="16" fill="var(--q-gris)" fontFamily="sans-serif" fontSize="10" fontWeight="bold">trans-2-buteno</text>
       <line x1="198" y1="55" x2="233" y2="55" stroke="#198754" strokeWidth="2.5"/>
       <line x1="198" y1="61" x2="233" y2="61" stroke="#198754" strokeWidth="2.5"/>
       {/* CH₃ en lados opuestos */}
-      <text x="155" y="48" fill="#444" fontFamily="monospace" fontSize="12">CH₃</text>
-      <line x1="186" y1="46" x2="198" y2="55" stroke="#444" strokeWidth="2"/>
-      <text x="236" y="80" fill="#444" fontFamily="monospace" fontSize="12">CH₃</text>
-      <line x1="233" y1="61" x2="238" y2="76" stroke="#444" strokeWidth="2"/>
+      <text x="155" y="48" fill="var(--q-base)" fontFamily="monospace" fontSize="12">CH₃</text>
+      <line x1="186" y1="46" x2="198" y2="55" stroke="var(--q-base)" strokeWidth="2"/>
+      <text x="236" y="80" fill="var(--q-base)" fontFamily="monospace" fontSize="12">CH₃</text>
+      <line x1="233" y1="61" x2="238" y2="76" stroke="var(--q-base)" strokeWidth="2"/>
       {/* H en lados opuestos */}
-      <text x="165" y="80" fill="#888" fontFamily="monospace" fontSize="11">H</text>
-      <line x1="172" y1="76" x2="198" y2="61" stroke="#888" strokeWidth="1.5"/>
-      <text x="222" y="48" fill="#888" fontFamily="monospace" fontSize="11">H</text>
-      <line x1="233" y1="55" x2="228" y2="46" stroke="#888" strokeWidth="1.5"/>
-      <text x="160" y="100" fill="#198754" fontFamily="sans-serif" fontSize="9">grupos opuestos = lados distintos</text>
+      <text x="165" y="80" fill="var(--q-gris)" fontFamily="monospace" fontSize="11">H</text>
+      <line x1="172" y1="76" x2="198" y2="61" stroke="var(--q-gris)" strokeWidth="1.5"/>
+      <text x="222" y="48" fill="var(--q-gris)" fontFamily="monospace" fontSize="11">H</text>
+      <line x1="233" y1="55" x2="228" y2="46" stroke="var(--q-gris)" strokeWidth="1.5"/>
+      <text x="160" y="100" fill="var(--q-verde)" fontFamily="sans-serif" fontSize="9">grupos opuestos = lados distintos</text>
     </svg>
   );
 }
@@ -522,36 +541,36 @@ function IsoOpticaSVG() {
   return (
     <svg viewBox="0 0 280 130" className={styles.isomeriaSvg} aria-label="Isomería óptica: dos enantiómeros imagen especular">
       {/* Enantiómero L */}
-      <text x="10" y="16" fill="#666" fontFamily="sans-serif" fontSize="10" fontWeight="bold">L-Alanina</text>
-      <text x="55" y="52" fill="#2E86AB" fontFamily="monospace" fontSize="13" fontWeight="bold">C*</text>
+      <text x="10" y="16" fill="var(--q-gris)" fontFamily="sans-serif" fontSize="10" fontWeight="bold">L-Alanina</text>
+      <text x="55" y="52" fill="var(--q-azul)" fontFamily="monospace" fontSize="13" fontWeight="bold">C*</text>
       {/* 4 grupos */}
-      <text x="10" y="44" fill="#444" fontFamily="monospace" fontSize="11">NH₂</text>
-      <line x1="48" y1="43" x2="55" y2="50" stroke="#444" strokeWidth="1.8"/>
-      <text x="10" y="70" fill="#444" fontFamily="monospace" fontSize="11">COOH</text>
-      <line x1="50" y1="66" x2="57" y2="60" stroke="#444" strokeWidth="1.8"/>
-      <text x="78" y="52" fill="#444" fontFamily="monospace" fontSize="11">H</text>
-      <line x1="72" y1="50" x2="80" y2="50" stroke="#444" strokeWidth="1.8"/>
-      <text x="45" y="82" fill="#444" fontFamily="monospace" fontSize="11">CH₃</text>
-      <line x1="60" y1="63" x2="60" y2="72" stroke="#444" strokeWidth="1.8"/>
-      <text x="15" y="105" fill="#2E86AB" fontFamily="sans-serif" fontSize="9">forma L (proteínas)</text>
+      <text x="10" y="44" fill="var(--q-base)" fontFamily="monospace" fontSize="11">NH₂</text>
+      <line x1="48" y1="43" x2="55" y2="50" stroke="var(--q-base)" strokeWidth="1.8"/>
+      <text x="10" y="70" fill="var(--q-base)" fontFamily="monospace" fontSize="11">COOH</text>
+      <line x1="50" y1="66" x2="57" y2="60" stroke="var(--q-base)" strokeWidth="1.8"/>
+      <text x="78" y="52" fill="var(--q-base)" fontFamily="monospace" fontSize="11">H</text>
+      <line x1="72" y1="50" x2="80" y2="50" stroke="var(--q-base)" strokeWidth="1.8"/>
+      <text x="45" y="82" fill="var(--q-base)" fontFamily="monospace" fontSize="11">CH₃</text>
+      <line x1="60" y1="63" x2="60" y2="72" stroke="var(--q-base)" strokeWidth="1.8"/>
+      <text x="15" y="105" fill="var(--q-azul)" fontFamily="sans-serif" fontSize="9">forma L (proteínas)</text>
 
       {/* Espejo */}
       <line x1="140" y1="10" x2="140" y2="120" stroke="#ccc" strokeWidth="1.5" strokeDasharray="5,3"/>
-      <text x="124" y="8" fill="#aaa" fontFamily="sans-serif" fontSize="9">espejo</text>
+      <text x="124" y="8" fill="var(--q-gris)" fontFamily="sans-serif" fontSize="9">espejo</text>
 
       {/* Enantiómero D */}
-      <text x="155" y="16" fill="#666" fontFamily="sans-serif" fontSize="10" fontWeight="bold">D-Alanina</text>
-      <text x="193" y="52" fill="#dc3545" fontFamily="monospace" fontSize="13" fontWeight="bold">C*</text>
+      <text x="155" y="16" fill="var(--q-gris)" fontFamily="sans-serif" fontSize="10" fontWeight="bold">D-Alanina</text>
+      <text x="193" y="52" fill="var(--q-rojo)" fontFamily="monospace" fontSize="13" fontWeight="bold">C*</text>
       {/* 4 grupos espejados */}
-      <text x="160" y="52" fill="#444" fontFamily="monospace" fontSize="11">H</text>
-      <line x1="172" y1="50" x2="193" y2="50" stroke="#444" strokeWidth="1.8"/>
-      <text x="218" y="44" fill="#444" fontFamily="monospace" fontSize="11">NH₂</text>
-      <line x1="208" y1="43" x2="200" y2="50" stroke="#444" strokeWidth="1.8"/>
-      <text x="218" y="70" fill="#444" fontFamily="monospace" fontSize="11">COOH</text>
-      <line x1="218" y1="66" x2="207" y2="60" stroke="#444" strokeWidth="1.8"/>
-      <text x="190" y="82" fill="#444" fontFamily="monospace" fontSize="11">CH₃</text>
-      <line x1="200" y1="63" x2="200" y2="72" stroke="#444" strokeWidth="1.8"/>
-      <text x="155" y="105" fill="#dc3545" fontFamily="sans-serif" fontSize="9">forma D (bacterias)</text>
+      <text x="160" y="52" fill="var(--q-base)" fontFamily="monospace" fontSize="11">H</text>
+      <line x1="172" y1="50" x2="193" y2="50" stroke="var(--q-base)" strokeWidth="1.8"/>
+      <text x="218" y="44" fill="var(--q-base)" fontFamily="monospace" fontSize="11">NH₂</text>
+      <line x1="208" y1="43" x2="200" y2="50" stroke="var(--q-base)" strokeWidth="1.8"/>
+      <text x="218" y="70" fill="var(--q-base)" fontFamily="monospace" fontSize="11">COOH</text>
+      <line x1="218" y1="66" x2="207" y2="60" stroke="var(--q-base)" strokeWidth="1.8"/>
+      <text x="190" y="82" fill="var(--q-base)" fontFamily="monospace" fontSize="11">CH₃</text>
+      <line x1="200" y1="63" x2="200" y2="72" stroke="var(--q-base)" strokeWidth="1.8"/>
+      <text x="155" y="105" fill="var(--q-rojo)" fontFamily="sans-serif" fontSize="9">forma D (bacterias)</text>
     </svg>
   );
 }
@@ -619,11 +638,11 @@ export default function VisualizadorQuimicaOrganica() {
                   key={g.id}
                   type="button"
                   onClick={() => setGrupoSeleccionado(g.id)}
-                  className={`${styles.grupoCard} ${grupoSeleccionado === g.id ? styles.grupoCardActive : ''}`}
-                  style={grupoSeleccionado === g.id ? { borderColor: g.color, color: g.color } as React.CSSProperties : undefined}
+                  className={`${styles.grupoCard} ${TONO_GRUPO[g.id]?.clase ?? ''} ${grupoSeleccionado === g.id ? styles.grupoCardActive : ''}`}
+                  style={grupoSeleccionado === g.id ? { borderColor: g.color, color: 'var(--q-dato)' } as React.CSSProperties : undefined}
                   aria-pressed={grupoSeleccionado === g.id}
                 >
-                  <span className={styles.etiquetaGrupo} style={{ background: g.color } as React.CSSProperties}>
+                  <span className={styles.etiquetaGrupo} style={{ background: TONO_GRUPO[g.id]?.relleno ?? g.color } as React.CSSProperties}>
                     {g.grupo}
                   </span>
                   <span className={styles.grupoNombre}>{g.nombre}</span>
@@ -631,8 +650,8 @@ export default function VisualizadorQuimicaOrganica() {
               ))}
             </div>
 
-            <div className={styles.grupoDetalle}>
-              <h2 style={{ color: grupo.color }}>{grupo.nombre}</h2>
+            <div className={`${styles.grupoDetalle} ${TONO_GRUPO[grupo.id]?.clase ?? ''}`}>
+              <h2 style={{ color: 'var(--q-dato)' }}>{grupo.nombre}</h2>
               <p className={styles.formulaGeneral}>{grupo.formula}</p>
 
               <MoleculaSVG grupoId={grupo.id} color={grupo.color} />

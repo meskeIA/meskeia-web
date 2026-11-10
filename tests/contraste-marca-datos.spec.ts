@@ -97,6 +97,11 @@ const APPS: App[] = [
   // en claro, 3,57 en oscuro), y en oscuro los potenciales positivos en #2563EB (2,44-2,56) y la
   // reserva de la receta -texto en #EF4444 y #16A34A (3,36-3,82)
   { slug: 'visualizador-electroquimica', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
+  // Del resto del censo de C0645 (10/11/2026): el blanco sobre la etiqueta de cada grupo en su color
+  // puro (−NH₂ 1,96:1, −COO− 2,13, −CHO 2,57) y el título del detalle en el color del grupo
+  // («Alcoholes» 3,06 en oscuro). Las ocho tarjetas de grupo, como secciones (la pestaña de grupos
+  // es la de carga)
+  { slug: 'visualizador-quimica-organica', todo: true, secciones: "button[class*='grupoCard']" },
 ];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {

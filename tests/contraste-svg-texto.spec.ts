@@ -126,6 +126,15 @@ const APPS: App[] = [
     extremos: true,
     subestados: "button[class*='bateriaBtn'], button[class*='electroTab']",
   },
+  // Del censo del 08/11/2026 (C0297), reparada el 10/11/2026: átomos y enlaces en #333/#444 fijos
+  // (1,07-1,79:1 en oscuro), rótulos en #666, #888 y #aaa (2,23-3,40 en claro, 2,37-3,03 en
+  // oscuro) y el grupo funcional en su color puro (NH₂ 1,88, COO 2,04, CHO 2,46 en claro; C=O de
+  // la cetona 2,42 en oscuro). Las cuatro pestañas, y los botones de cada una como subestados
+  {
+    slug: 'visualizador-quimica-organica',
+    secciones: "[role='tablist'][aria-label*='ecciones'] [role='tab']",
+    subestados: "section[class*='content'] button[aria-pressed]",
+  },
 ];
 
 interface TextoSvg {

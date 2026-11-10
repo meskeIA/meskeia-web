@@ -182,6 +182,48 @@
   background: var(--bg-primary, #FAFAFA);
 }
 
+/* Tonos de las fórmulas por tema (cabo C0297, 10/11/2026): átomos y enlaces iban en #333/#444
+   fijos (1,07-1,79:1 en oscuro), los rótulos en #666, #888 y #aaa (2,23-3,40 en claro) y los
+   grupos en el color puro de su dato (1,88-4,34 en claro, 2,42-3,87 en oscuro) */
+.moleculaSvg,
+.bencenoSvg,
+.isomeriaSvg {
+  --q-base: #333333;
+  --q-gris: var(--text-secondary);
+  --q-azul: var(--primary-texto);
+  --q-rojo: #B02A37;
+  --q-verde: #146C43;
+}
+
+[data-theme='dark'] .moleculaSvg,
+[data-theme='dark'] .bencenoSvg,
+[data-theme='dark'] .isomeriaSvg {
+  --q-base: #D4D4D4;
+  --q-azul: #85C1E9;
+  --q-rojo: #EA868F;
+  --q-verde: #75B798;
+}
+
+/* El tono de TEXTO de cada grupo funcional por tema (--q-dato): lo leen la fórmula, el título del
+   detalle y la tarjeta activa. El color puro del grupo se queda en bordes y recuadros (C0297 y
+   C0645). Claro 4,85-6,89:1 sobre #FAFAFA · oscuro 5,15-11,2 sobre la página y la tarjeta */
+.datoAlcanos { --q-dato: #5C636A; }
+.datoAlquenos { --q-dato: #146C43; }
+.datoAlcoholes { --q-dato: #0A58CA; }
+.datoAldehidos { --q-dato: #A8530C; }
+.datoCetonas { --q-dato: #6610F2; }
+.datoAcidos { --q-dato: #B02A37; }
+.datoEsteres { --q-dato: #13795B; }
+.datoAminas { --q-dato: #087990; }
+[data-theme='dark'] .datoAlcanos { --q-dato: #ADB5BD; }
+[data-theme='dark'] .datoAlquenos { --q-dato: #75B798; }
+[data-theme='dark'] .datoAlcoholes { --q-dato: #6EA8FE; }
+[data-theme='dark'] .datoAldehidos { --q-dato: #FEB272; }
+[data-theme='dark'] .datoCetonas { --q-dato: #C29FFA; }
+[data-theme='dark'] .datoAcidos { --q-dato: #EA868F; }
+[data-theme='dark'] .datoEsteres { --q-dato: #79DFC1; }
+[data-theme='dark'] .datoAminas { --q-dato: #6EDFF6; }
+
 .detalleGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
