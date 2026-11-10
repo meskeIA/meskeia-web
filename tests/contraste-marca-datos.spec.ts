@@ -88,6 +88,11 @@ const APPS: App[] = [
   // datos, igual en los dos temas, y el blanco sobre las barras naranja, teal y verde de las tres
   // capas de protección. Los cinco pasos de la horquilla, como secciones
   { slug: 'visualizador-adn-polimerasa', todo: true, secciones: "button[class*='indicadorPunto']" },
+  // Del resto del censo de C0645 (10/11/2026): el blanco sobre los números de paso en su color de
+  // datos (2,80-4,11:1), el nombre de la complicación abierta en su color sobre su tinte (3,65 en
+  // claro, 3,99 en oscuro), y en oscuro la insignia «Glucosa elevada» (4,32) y los títulos de la
+  // guía (4,19). Los dos estados del páncreas y los tres tipos, como secciones
+  { slug: 'visualizador-diabetes-mecanismo', todo: true, secciones: "button[class*='toggleBtn'], [role='tab']" },
 ];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {

@@ -109,6 +109,12 @@ const APPS: App[] = [
   // tarjeta, y el blanco sobre las bases, la helicasa gris, la polimerasa y la ligasa translúcidas.
   // Los cinco pasos de la horquilla, como secciones
   { slug: 'visualizador-adn-polimerasa', secciones: "button[class*='indicadorPunto']" },
+  // Del censo del 08/11/2026 (C0297), reparada el 10/11/2026: blanco sobre las células β y α, la
+  // insulina, GLUT4, Hb y HbA1c en su color translúcido (1,83-4,11:1), #888 sobre las células
+  // inactivas (2,25), los rótulos en rojo, naranja, teal y marca puros (2,41-3,93 en claro,
+  // 1,54-3,80 en oscuro) y las leyendas en #555 y #888 fijos (1,82 en oscuro). Los tres tipos, como
+  // secciones, y los dos estados del páncreas, como subestados
+  { slug: 'visualizador-diabetes-mecanismo', secciones: "[role='tab']", subestados: "button[class*='toggleBtn']" },
 ];
 
 interface TextoSvg {

@@ -21,6 +21,8 @@ type MecanismoComplicacion = {
   subtitulo: string;
   descripcion: string;
   color: string;
+  /** Clase del módulo con el tono de TEXTO de ese color en cada tema */
+  tono: 'tonoNaranja' | 'tonoRojo' | 'tonoVioleta' | 'tonoAzul';
 };
 
 // ─────────────────────────────────────────────
@@ -33,26 +35,42 @@ const MECANISMOS_COMPLICACIONES: MecanismoComplicacion[] = [
     subtitulo: 'Productos finales de glicosilación avanzada',
     descripcion: 'La glucosa reacciona espontáneamente con grupos amino de proteínas formando bases de Schiff y luego productos de Amadori. La reorganización ulterior genera AGEs (Advanced Glycation End-products). Estos modifican covalentemente el colágeno y otras proteínas estructurales, alterando sus propiedades biomecánicas y generando entrecruzamientos anómalos que rigidizan las matrices extracelulares.',
     color: '#E67E22',
+    tono: 'tonoNaranja',
   },
   {
     nombre: 'Estrés oxidativo mitocondrial',
     subtitulo: 'Sobreproducción de especies reactivas de oxígeno (ROS)',
     descripcion: 'El exceso de glucosa amplifica el flujo a través de la cadena respiratoria mitocondrial. La hiperpolarización de la membrana mitocondrial interna provoca la donación prematura de electrones al O₂, generando anión superóxido (O₂·⁻). Este activa la poliadenilato ribosa polimerasa (PARP), inhibe la gliceraldehído-3-fosfato deshidrogenasa (GAPDH) y daña el ADN mitocondrial.',
     color: '#E74C3C',
+    tono: 'tonoRojo',
   },
   {
     nombre: 'Vía del poliol',
     subtitulo: 'Acumulación intracelular de sorbitol',
     descripcion: 'La aldosa reductasa convierte glucosa en sorbitol consumiendo NADPH. El sorbitol se oxida lentamente a fructosa por la sorbitol deshidrogenasa, consumiendo NAD⁺. El resultado es acumulación de sorbitol (efecto osmótico), depleción de NADPH (que limita la síntesis de glutatión reducido) y aumento del cociente NADH/NAD⁺ (pseudohipoxia).',
     color: '#9B59B6',
+    tono: 'tonoVioleta',
   },
   {
     nombre: 'Activación de proteína quinasa C (PKC)',
     subtitulo: 'Disfunción de la señalización endotelial',
     descripcion: 'La glucosa elevada aumenta la síntesis de diacilglicerol (DAG) de novo. El DAG activa isoformas de PKC (especialmente β y δ), que fosforilan sustratos endoteliales clave: reducen la producción de óxido nítrico (eNOS), aumentan la permeabilidad vascular (VEGF), activan NF-κB (inflamación) y aumentan la producción de endotelina-1 (vasoconstricción).',
     color: '#2E86AB',
+    tono: 'tonoAzul',
   },
 ];
+
+// Rellenos de los diagramas bajo texto blanco: el color del dato, opaco y oscurecido, igual en los
+// dos temas (cabo C0297, 10/11/2026). Blanco encima: 5,36-6,47:1
+const AZUL_CELULA = '#26718F';
+const NARANJA_CELULA = '#A0540F';
+const TEAL_INSULINA = '#327874';
+const VERDE_GLUT4 = '#1D7A43';
+const ROJO_HB = '#B91C1C';
+const DORADO_HBA1C = '#8A5A00';
+// Célula inactiva: gris claro con texto oscuro (5,52:1), igual en los dos temas
+const GRIS_INACTIVA = '#ccc';
+const TEXTO_INACTIVA = '#4A4A4A';
 
 // ─────────────────────────────────────────────
 // Componente: Páncreas SVG (ciclo normal)
@@ -101,39 +119,41 @@ function BloquePancreas() {
             <ellipse cx="175" cy="80" rx="55" ry="48" fill="#FFE0B2" stroke="#E0C8A0" strokeWidth="1" opacity="0.6" />
             <ellipse cx="265" cy="95" rx="40" ry="38" fill="#FFE0B2" stroke="#E0C8A0" strokeWidth="1" opacity="0.6" />
 
-            {/* Islotes de Langerhans */}
+            {/* Islotes de Langerhans. Células activas en su color oscurecido bajo el blanco (la marca
+                daba 4,11:1 y el naranja 2,61) y las inactivas en gris con texto oscuro (#888 sobre
+                #ccc daba 2,25). Cabo C0297, 10/11/2026 */}
             {/* Islote 1 */}
             <circle cx="95" cy="85" r="22" fill={esAlta ? 'rgba(46,134,171,0.15)' : 'rgba(230,126,34,0.15)'} stroke={esAlta ? '#2E86AB' : '#E67E22'} strokeWidth="1.5" />
             {/* Células β (azul) */}
-            <circle cx="88" cy="80" r="7" fill={esAlta ? '#2E86AB' : '#ccc'} />
-            <text x="88" y="83" textAnchor="middle" fontSize="8" fill={esAlta ? 'white' : '#888'} fontWeight="bold">β</text>
-            <circle cx="102" cy="82" r="6" fill={esAlta ? '#2E86AB' : '#ccc'} />
-            <text x="102" y="85" textAnchor="middle" fontSize="7" fill={esAlta ? 'white' : '#888'} fontWeight="bold">β</text>
-            <circle cx="93" cy="93" r="6" fill={esAlta ? '#2E86AB' : '#ccc'} />
-            <text x="93" y="96" textAnchor="middle" fontSize="7" fill={esAlta ? 'white' : '#888'} fontWeight="bold">β</text>
+            <circle cx="88" cy="80" r="7" fill={esAlta ? AZUL_CELULA : GRIS_INACTIVA} />
+            <text x="88" y="83" textAnchor="middle" fontSize="8" fill={esAlta ? 'white' : TEXTO_INACTIVA} fontWeight="bold">β</text>
+            <circle cx="102" cy="82" r="6" fill={esAlta ? AZUL_CELULA : GRIS_INACTIVA} />
+            <text x="102" y="85" textAnchor="middle" fontSize="7" fill={esAlta ? 'white' : TEXTO_INACTIVA} fontWeight="bold">β</text>
+            <circle cx="93" cy="93" r="6" fill={esAlta ? AZUL_CELULA : GRIS_INACTIVA} />
+            <text x="93" y="96" textAnchor="middle" fontSize="7" fill={esAlta ? 'white' : TEXTO_INACTIVA} fontWeight="bold">β</text>
             {/* Célula α (naranja) */}
-            <circle cx="103" cy="72" r="5" fill={!esAlta ? '#E67E22' : '#ccc'} />
-            <text x="103" y="75" textAnchor="middle" fontSize="6" fill={!esAlta ? 'white' : '#888'} fontWeight="bold">α</text>
+            <circle cx="103" cy="72" r="5" fill={!esAlta ? NARANJA_CELULA : GRIS_INACTIVA} />
+            <text x="103" y="75" textAnchor="middle" fontSize="6" fill={!esAlta ? 'white' : TEXTO_INACTIVA} fontWeight="bold">α</text>
 
             {/* Islote 2 */}
             <circle cx="185" cy="75" r="20" fill={esAlta ? 'rgba(46,134,171,0.15)' : 'rgba(230,126,34,0.15)'} stroke={esAlta ? '#2E86AB' : '#E67E22'} strokeWidth="1.5" />
-            <circle cx="178" cy="70" r="6" fill={esAlta ? '#2E86AB' : '#ccc'} />
-            <text x="178" y="73" textAnchor="middle" fontSize="7" fill={esAlta ? 'white' : '#888'} fontWeight="bold">β</text>
-            <circle cx="192" cy="73" r="7" fill={esAlta ? '#2E86AB' : '#ccc'} />
-            <text x="192" y="76" textAnchor="middle" fontSize="8" fill={esAlta ? 'white' : '#888'} fontWeight="bold">β</text>
-            <circle cx="183" cy="84" r="5" fill={esAlta ? '#2E86AB' : '#ccc'} />
-            <text x="183" y="87" textAnchor="middle" fontSize="6" fill={esAlta ? 'white' : '#888'} fontWeight="bold">β</text>
-            <circle cx="194" cy="63" r="5" fill={!esAlta ? '#E67E22' : '#ccc'} />
-            <text x="194" y="66" textAnchor="middle" fontSize="6" fill={!esAlta ? 'white' : '#888'} fontWeight="bold">α</text>
+            <circle cx="178" cy="70" r="6" fill={esAlta ? AZUL_CELULA : GRIS_INACTIVA} />
+            <text x="178" y="73" textAnchor="middle" fontSize="7" fill={esAlta ? 'white' : TEXTO_INACTIVA} fontWeight="bold">β</text>
+            <circle cx="192" cy="73" r="7" fill={esAlta ? AZUL_CELULA : GRIS_INACTIVA} />
+            <text x="192" y="76" textAnchor="middle" fontSize="8" fill={esAlta ? 'white' : TEXTO_INACTIVA} fontWeight="bold">β</text>
+            <circle cx="183" cy="84" r="5" fill={esAlta ? AZUL_CELULA : GRIS_INACTIVA} />
+            <text x="183" y="87" textAnchor="middle" fontSize="6" fill={esAlta ? 'white' : TEXTO_INACTIVA} fontWeight="bold">β</text>
+            <circle cx="194" cy="63" r="5" fill={!esAlta ? NARANJA_CELULA : GRIS_INACTIVA} />
+            <text x="194" y="66" textAnchor="middle" fontSize="6" fill={!esAlta ? 'white' : TEXTO_INACTIVA} fontWeight="bold">α</text>
 
-            {/* Etiquetas */}
-            <text x="160" y="178" textAnchor="middle" fontSize="11" fill="#888" fontStyle="italic">Islotes de Langerhans (páncreas endocrino)</text>
+            {/* Etiquetas, sobre la tarjeta: #888 y #555 fijos daban 3,51 en claro y 1,82 en oscuro */}
+            <text x="160" y="178" textAnchor="middle" fontSize="11" fill="var(--t-gris)" fontStyle="italic">Islotes de Langerhans (páncreas endocrino)</text>
 
             {/* Leyenda células */}
-            <circle cx="30" cy="188" r="5" fill="#2E86AB" />
-            <text x="38" y="192" fontSize="10" fill="#555">Células β (insulina)</text>
-            <circle cx="150" cy="188" r="5" fill="#E67E22" />
-            <text x="158" y="192" fontSize="10" fill="#555">Células α (glucagón)</text>
+            <circle cx="30" cy="188" r="5" fill={AZUL_CELULA} />
+            <text x="38" y="192" fontSize="10" fill="var(--t-gris)">Células β (insulina)</text>
+            <circle cx="150" cy="188" r="5" fill={NARANJA_CELULA} />
+            <text x="158" y="192" fontSize="10" fill="var(--t-gris)">Células α (glucagón)</text>
           </svg>
         </div>
 
@@ -243,43 +263,46 @@ function BloqueTipos() {
               <svg viewBox="0 0 340 140" className={styles.tipoSvg} role="img" aria-label="Diagrama del ataque autoinmune sobre células beta">
                 {/* Islote de Langerhans */}
                 <ellipse cx="170" cy="70" rx="90" ry="55" fill="rgba(46,134,171,0.08)" stroke="#2E86AB" strokeWidth="1.5" strokeDasharray="4 3" />
-                <text x="170" y="138" textAnchor="middle" fontSize="10" fill="#888">Islote de Langerhans</text>
+                <text x="170" y="138" textAnchor="middle" fontSize="10" fill="var(--t-gris)">Islote de Langerhans</text>
 
-                {/* Células β (algunas destruidas) */}
-                <circle cx="130" cy="65" r="14" fill="#2E86AB" opacity="0.9" />
+                {/* Células β (algunas destruidas): la sana, opaca bajo el blanco; las que se apagan
+                    conservan su transparencia, con el rótulo en el texto del tema (en blanco o #888
+                    daban 1,83-2,65:1) */}
+                <circle cx="130" cy="65" r="14" fill={AZUL_CELULA} />
                 <text x="130" y="69" textAnchor="middle" fontSize="10" fill="white" fontWeight="bold">β</text>
 
                 <circle cx="160" cy="50" r="14" fill="#2E86AB" opacity="0.4" />
-                <text x="160" y="54" textAnchor="middle" fontSize="10" fill="white" fontWeight="bold">β</text>
+                <text x="160" y="54" textAnchor="middle" fontSize="10" fill="var(--text-primary)" fontWeight="bold">β</text>
                 {/* Cruz de destrucción */}
                 <line x1="152" y1="42" x2="168" y2="58" stroke="#E74C3C" strokeWidth="2.5" strokeLinecap="round" />
                 <line x1="168" y1="42" x2="152" y2="58" stroke="#E74C3C" strokeWidth="2.5" strokeLinecap="round" />
 
                 <circle cx="195" cy="65" r="14" fill="#2E86AB" opacity="0.2" />
-                <text x="195" y="69" textAnchor="middle" fontSize="10" fill="#888" fontWeight="bold">β</text>
+                <text x="195" y="69" textAnchor="middle" fontSize="10" fill="var(--text-primary)" fontWeight="bold">β</text>
                 <line x1="187" y1="57" x2="203" y2="73" stroke="#E74C3C" strokeWidth="2.5" strokeLinecap="round" />
                 <line x1="203" y1="57" x2="187" y2="73" stroke="#E74C3C" strokeWidth="2.5" strokeLinecap="round" />
 
                 {/* Célula α (intacta) */}
-                <circle cx="165" cy="88" r="11" fill="#E67E22" opacity="0.9" />
+                <circle cx="165" cy="88" r="11" fill={NARANJA_CELULA} />
                 <text x="165" y="92" textAnchor="middle" fontSize="10" fill="white" fontWeight="bold">α</text>
 
-                {/* Células T autorreactivas */}
-                <circle cx="60" cy="40" r="15" fill="rgba(231,76,60,0.15)" stroke="#E74C3C" strokeWidth="2" />
-                <text x="60" y="38" textAnchor="middle" fontSize="9" fill="#C0392B" fontWeight="bold">Célula T</text>
-                <text x="60" y="50" textAnchor="middle" fontSize="8" fill="#C0392B">CD8+</text>
-                <path d="M 75 42 L 112 58" stroke="#E74C3C" strokeWidth="1.5" strokeDasharray="3 2" markerEnd="url(#arrowRed1)" />
+                {/* Células T autorreactivas: el rojo #C0392B como texto daba 4,25 en claro y 2,03 en oscuro */}
+                {/* Círculos de r 21 y 16: con r 15 y 13 el anillo cruzaba «Célula T» e «islote» */}
+                <circle cx="60" cy="40" r="21" fill="rgba(231,76,60,0.15)" stroke="#E74C3C" strokeWidth="2" />
+                <text x="60" y="38" textAnchor="middle" fontSize="9" fill="var(--t-rojo)" fontWeight="bold">Célula T</text>
+                <text x="60" y="50" textAnchor="middle" fontSize="8" fill="var(--t-rojo)">CD8+</text>
+                <path d="M 81 47 L 112 58" stroke="#E74C3C" strokeWidth="1.5" strokeDasharray="3 2" markerEnd="url(#arrowRed1)" />
 
-                <circle cx="55" cy="100" r="15" fill="rgba(231,76,60,0.15)" stroke="#E74C3C" strokeWidth="2" />
-                <text x="55" y="98" textAnchor="middle" fontSize="9" fill="#C0392B" fontWeight="bold">Célula T</text>
-                <text x="55" y="110" textAnchor="middle" fontSize="8" fill="#C0392B">CD4+</text>
-                <path d="M 70 96 L 108 78" stroke="#E74C3C" strokeWidth="1.5" strokeDasharray="3 2" />
+                <circle cx="55" cy="100" r="21" fill="rgba(231,76,60,0.15)" stroke="#E74C3C" strokeWidth="2" />
+                <text x="55" y="98" textAnchor="middle" fontSize="9" fill="var(--t-rojo)" fontWeight="bold">Célula T</text>
+                <text x="55" y="110" textAnchor="middle" fontSize="8" fill="var(--t-rojo)">CD4+</text>
+                <path d="M 75 93 L 108 78" stroke="#E74C3C" strokeWidth="1.5" strokeDasharray="3 2" />
 
                 {/* Anticuerpos */}
-                <circle cx="295" cy="55" r="13" fill="rgba(155,89,182,0.15)" stroke="#9B59B6" strokeWidth="2" />
-                <text x="295" y="53" textAnchor="middle" fontSize="8" fill="#7D3C98" fontWeight="bold">Anti-</text>
-                <text x="295" y="64" textAnchor="middle" fontSize="8" fill="#7D3C98">islote</text>
-                <path d="M 282 57 L 250 62" stroke="#9B59B6" strokeWidth="1.5" strokeDasharray="3 2" />
+                <circle cx="295" cy="57" r="16" fill="rgba(155,89,182,0.15)" stroke="#9B59B6" strokeWidth="2" />
+                <text x="295" y="55" textAnchor="middle" fontSize="8" fill="var(--t-violeta)" fontWeight="bold">Anti-</text>
+                <text x="295" y="65" textAnchor="middle" fontSize="8" fill="var(--t-violeta)">islote</text>
+                <path d="M 279 59 L 250 62" stroke="#9B59B6" strokeWidth="1.5" strokeDasharray="3 2" />
 
                 <defs>
                   <marker id="arrowRed1" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
@@ -289,39 +312,41 @@ function BloqueTipos() {
               </svg>
             </div>
 
+            {/* Los números de paso de los tres tipos llevan el color de su dato oscurecido, igual en
+                los dos temas, bajo el blanco: en su color puro daban 2,80-4,11:1 (cabo C0645) */}
             <div className={styles.mecanimoSteps}>
               <div className={styles.mecanismoStep}>
-                <span className={styles.mecanismoStepNum} style={{ background: '#2E86AB' }}>1</span>
+                <span className={styles.mecanismoStepNum} style={{ background: '#26718F' }}>1</span>
                 <div>
                   <strong>Predisposición genética:</strong> Alelos HLA-DR3 y HLA-DR4 (complejo mayor de histocompatibilidad clase II) presentan péptidos propios de las células β como antígenos. El haplotipo HLA-DQ8 es el de mayor riesgo conocido.
                 </div>
               </div>
               <div className={styles.mecanismoStep}>
-                <span className={styles.mecanismoStepNum} style={{ background: '#E74C3C' }}>2</span>
+                <span className={styles.mecanismoStepNum} style={{ background: '#B91C1C' }}>2</span>
                 <div>
                   <strong>Desencadenante ambiental (hipótesis):</strong> Infecciones virales, microbiota alterada u otros factores rompen la tolerancia inmunológica central. Los linfocitos T autorreactivos escapan al timo sin ser eliminados.
                 </div>
               </div>
               <div className={styles.mecanismoStep}>
-                <span className={styles.mecanismoStepNum} style={{ background: '#E74C3C' }}>3</span>
+                <span className={styles.mecanismoStepNum} style={{ background: '#B91C1C' }}>3</span>
                 <div>
                   <strong>Insulitis:</strong> Infiltración del islote por linfocitos T CD8+ citotóxicos y CD4+ helper, macrófagos y células NK. Los CD8+ destruyen directamente las células β mediante perforinas y granzimas.
                 </div>
               </div>
               <div className={styles.mecanismoStep}>
-                <span className={styles.mecanismoStepNum} style={{ background: '#9B59B6' }}>4</span>
+                <span className={styles.mecanismoStepNum} style={{ background: '#7D3C98' }}>4</span>
                 <div>
                   <strong>Anticuerpos anti-islote:</strong> Linfocitos B producen anticuerpos contra la insulina (IAA), glutamato descarboxilasa (GADA), tirosina fosfatasa IA-2 (IA-2A) y transportador de zinc ZnT8 (ZnT8A).
                 </div>
               </div>
               <div className={styles.mecanismoStep}>
-                <span className={styles.mecanismoStepNum} style={{ background: '#888' }}>5</span>
+                <span className={styles.mecanismoStepNum} style={{ background: '#5F6B6D' }}>5</span>
                 <div>
                   <strong>Resultado:</strong> Destrucción progresiva (durante meses o años) de las células β. Cuando queda menos del 10-20% de la masa celular β, la secreción de insulina es insuficiente para mantener la homeostasis. Las células α permanecen intactas (el ataque es específico de célula β).
                 </div>
               </div>
               <div className={styles.mecanismoStep}>
-                <span className={styles.mecanismoStepNum} style={{ background: '#E67E22' }}>6</span>
+                <span className={styles.mecanismoStepNum} style={{ background: '#A0540F' }}>6</span>
                 <div>
                   <strong>Cetoacidosis:</strong> Sin insulina, las células no captan glucosa → el organismo activa la lipólisis → ácidos grasos libres → beta-oxidación mitocondrial hepática → acumulación de acetoacetato, beta-hidroxibutirato y acetona (cuerpos cetónicos) → acidosis metabólica.
                 </div>
@@ -348,41 +373,43 @@ function BloqueTipos() {
               <svg viewBox="0 0 340 148" className={styles.tipoSvg} role="img" aria-label="Diagrama de la resistencia a la insulina en el receptor celular">
                 {/* Membrana celular */}
                 <rect x="0" y="60" width="340" height="8" fill="#E8F4F8" stroke="#B0D4E0" strokeWidth="1" />
-                <text x="10" y="75" fontSize="9" fill="#888">Membrana celular</text>
+                <text x="10" y="75" fontSize="9" fill="var(--t-gris)">Membrana celular</text>
 
-                {/* Receptor de insulina — lado izquierdo (normal) */}
-                <text x="65" y="20" textAnchor="middle" fontSize="10" fill="#2E86AB" fontWeight="bold">Normal</text>
+                {/* Receptor de insulina — lado izquierdo (normal). Rótulos con el tono de texto de su
+                    dato y rellenos opacos bajo el blanco: en el color puro daban 2,45-3,93:1 (C0297) */}
+                <text x="65" y="20" textAnchor="middle" fontSize="10" fill="var(--t-azul)" fontWeight="bold">Normal</text>
                 {/* Subunidades α extracelulares */}
                 <rect x="45" y="30" width="18" height="28" rx="4" fill="url(#gradNorm)" />
                 <rect x="68" y="30" width="18" height="28" rx="4" fill="url(#gradNorm)" />
                 {/* Insulina unida */}
-                <ellipse cx="65" cy="24" rx="16" ry="8" fill="#48A9A6" opacity="0.9" />
+                <ellipse cx="65" cy="24" rx="16" ry="8" fill={TEAL_INSULINA} />
                 <text x="65" y="27" textAnchor="middle" fontSize="8" fill="white" fontWeight="bold">Insulina</text>
                 {/* Subunidades β transmembrana */}
                 <rect x="50" y="58" width="12" height="22" rx="2" fill="url(#gradNormDark)" />
                 <rect x="68" y="58" width="12" height="22" rx="2" fill="url(#gradNormDark)" />
                 {/* GLUT4 que se activa */}
-                <rect x="42" y="85" width="42" height="18" rx="6" fill="#27AE60" opacity="0.85" />
+                <rect x="42" y="85" width="42" height="18" rx="6" fill={VERDE_GLUT4} />
                 <text x="63" y="98" textAnchor="middle" fontSize="9" fill="white" fontWeight="bold">GLUT4 ✓</text>
                 {/* Flecha de glucosa entrando */}
                 <path d="M 63 110 L 63 120" stroke="#27AE60" strokeWidth="2" markerEnd="url(#arrowGreen)" />
-                <text x="63" y="144" textAnchor="middle" fontSize="9" fill="#27AE60">Glucosa entra</text>
+                <text x="63" y="144" textAnchor="middle" fontSize="9" fill="var(--t-verde)">Glucosa entra</text>
 
                 {/* Separador */}
                 <line x1="168" y1="10" x2="168" y2="135" stroke="#ddd" strokeWidth="1" strokeDasharray="4 3" />
 
                 {/* Receptor de insulina — lado derecho (resistente) */}
-                <text x="253" y="20" textAnchor="middle" fontSize="10" fill="#E74C3C" fontWeight="bold">Resistente</text>
+                <text x="253" y="20" textAnchor="middle" fontSize="10" fill="var(--t-rojo)" fontWeight="bold">Resistente</text>
                 <rect x="233" y="30" width="18" height="28" rx="4" fill="url(#gradRes)" />
                 <rect x="256" y="30" width="18" height="28" rx="4" fill="url(#gradRes)" />
-                <ellipse cx="253" cy="24" rx="16" ry="8" fill="#48A9A6" opacity="0.9" />
+                <ellipse cx="253" cy="24" rx="16" ry="8" fill={TEAL_INSULINA} />
                 <text x="253" y="27" textAnchor="middle" fontSize="8" fill="white" fontWeight="bold">Insulina</text>
                 <rect x="238" y="58" width="12" height="22" rx="2" fill="url(#gradResDark)" />
                 <rect x="256" y="58" width="12" height="22" rx="2" fill="url(#gradResDark)" />
                 {/* IRS-1 bloqueado */}
-                <rect x="228" y="85" width="50" height="18" rx="6" fill="#E74C3C" opacity="0.25" stroke="#E74C3C" strokeWidth="1.5" />
-                <text x="253" y="98" textAnchor="middle" fontSize="9" fill="#C0392B" fontWeight="bold">GLUT4 ✗</text>
-                <text x="253" y="144" textAnchor="middle" fontSize="9" fill="#C0392B">Glucosa no entra</text>
+                {/* Tinte al 15 % (al 25 % el rojo de texto no llegaba en claro) */}
+                <rect x="228" y="85" width="50" height="18" rx="6" fill="rgba(231,76,60,0.15)" stroke="#E74C3C" strokeWidth="1.5" />
+                <text x="253" y="98" textAnchor="middle" fontSize="9" fill="var(--t-rojo)" fontWeight="bold">GLUT4 ✗</text>
+                <text x="253" y="144" textAnchor="middle" fontSize="9" fill="var(--t-rojo)">Glucosa no entra</text>
 
                 <defs>
                   <linearGradient id="gradNorm" x1="0" y1="0" x2="0" y2="1">
@@ -410,31 +437,31 @@ function BloqueTipos() {
 
             <div className={styles.mecanimoSteps}>
               <div className={styles.mecanismoStep}>
-                <span className={styles.mecanismoStepNum} style={{ background: '#E67E22' }}>1</span>
+                <span className={styles.mecanismoStepNum} style={{ background: '#A0540F' }}>1</span>
                 <div>
                   <strong>Inflamación crónica de bajo grado:</strong> El tejido adiposo visceral hipertrofiado secreta citocinas proinflamatorias (TNF-α, IL-6, resistina). El TNF-α fosforila el sustrato del receptor de insulina IRS-1 en serina (en lugar de tirosina), bloqueando la señalización downstream de PI3K/Akt.
                 </div>
               </div>
               <div className={styles.mecanismoStep}>
-                <span className={styles.mecanismoStepNum} style={{ background: '#E67E22' }}>2</span>
+                <span className={styles.mecanismoStepNum} style={{ background: '#A0540F' }}>2</span>
                 <div>
                   <strong>Lipotoxicidad ectópica:</strong> Los ácidos grasos libres y ceramidas se acumulan en hepatocitos y fibras musculares esqueléticas (hígado graso no alcohólico, músculo lipotóxico). Activan proteína quinasa Cθ (PKCθ), que fosforila IRS-1 en serina → resistencia periférica.
                 </div>
               </div>
               <div className={styles.mecanismoStep}>
-                <span className={styles.mecanismoStepNum} style={{ background: '#2E86AB' }}>3</span>
+                <span className={styles.mecanismoStepNum} style={{ background: '#26718F' }}>3</span>
                 <div>
                   <strong>Hiperinsulinemia compensatoria:</strong> Las células β detectan la resistencia periférica y aumentan la producción de insulina. El páncreas puede mantener la normoglucemia durante años sobreproduciendo insulina.
                 </div>
               </div>
               <div className={styles.mecanismoStep}>
-                <span className={styles.mecanismoStepNum} style={{ background: '#E74C3C' }}>4</span>
+                <span className={styles.mecanismoStepNum} style={{ background: '#B91C1C' }}>4</span>
                 <div>
                   <strong>Agotamiento de células β:</strong> La hipersecreción crónica genera estrés del retículo endoplasmático en las células β (UPR activado), glucolipotoxicidad y depósito de polipéptido amiloide de los islotes (IAPP, amilina). La masa de células β disminuye progresivamente por apoptosis.
                 </div>
               </div>
               <div className={styles.mecanismoStep}>
-                <span className={styles.mecanismoStepNum} style={{ background: '#27AE60' }}>5</span>
+                <span className={styles.mecanismoStepNum} style={{ background: '#1D7A43' }}>5</span>
                 <div>
                   <strong>Reversibilidad fisiológica en fases iniciales:</strong> En las primeras fases (resistencia + hiperinsulinemia sin agotamiento β), intervenciones sobre la composición corporal pueden restaurar la sensibilidad a la insulina al reducir la lipotoxicidad ectópica. La pérdida de masa de células β es en gran parte irreversible.
                 </div>
@@ -458,30 +485,32 @@ function BloqueTipos() {
               <svg viewBox="0 0 340 120" className={styles.tipoSvg} role="img" aria-label="Eje placentario y resistencia a la insulina gestacional">
                 {/* Placenta */}
                 <ellipse cx="90" cy="60" rx="70" ry="42" fill="rgba(230,126,34,0.12)" stroke="#E67E22" strokeWidth="2" />
-                <text x="90" y="48" textAnchor="middle" fontSize="11" fill="#C0392B" fontWeight="bold">Placenta</text>
-                <text x="90" y="62" textAnchor="middle" fontSize="9" fill="#E67E22">Lactógeno placentario</text>
-                <text x="90" y="74" textAnchor="middle" fontSize="9" fill="#E67E22">Progesterona</text>
-                <text x="90" y="86" textAnchor="middle" fontSize="9" fill="#E67E22">Cortisol placentario</text>
+                {/* Rótulos con el tono de texto de su dato; el color puro, en trazos y flechas. En
+                    rojo, naranja, teal y marca puros daban 2,41-3,50 en claro y 1,99-3,80 en oscuro (C0297) */}
+                <text x="90" y="48" textAnchor="middle" fontSize="11" fill="var(--t-rojo)" fontWeight="bold">Placenta</text>
+                <text x="90" y="62" textAnchor="middle" fontSize="9" fill="var(--t-naranja)">Lactógeno placentario</text>
+                <text x="90" y="74" textAnchor="middle" fontSize="9" fill="var(--t-naranja)">Progesterona</text>
+                <text x="90" y="86" textAnchor="middle" fontSize="9" fill="var(--t-naranja)">Cortisol placentario</text>
 
                 {/* Flecha hacia tejidos maternos */}
                 <path d="M 162 55 L 195 55" stroke="#E67E22" strokeWidth="2" markerEnd="url(#arrowOrange)" />
-                <text x="178" y="50" textAnchor="middle" fontSize="8" fill="#E67E22">Hormonas</text>
+                <text x="178" y="50" textAnchor="middle" fontSize="8" fill="var(--t-naranja)">Hormonas</text>
 
                 {/* Tejidos maternos (resistencia) */}
                 <rect x="196" y="30" width="80" height="55" rx="8" fill="rgba(231,76,60,0.08)" stroke="#E74C3C" strokeWidth="1.5" />
-                <text x="236" y="50" textAnchor="middle" fontSize="10" fill="#C0392B" fontWeight="bold">Tejidos</text>
-                <text x="236" y="63" textAnchor="middle" fontSize="9" fill="#C0392B">maternos</text>
-                <text x="236" y="76" textAnchor="middle" fontSize="8" fill="#C0392B">(resistencia ↑)</text>
+                <text x="236" y="50" textAnchor="middle" fontSize="10" fill="var(--t-rojo)" fontWeight="bold">Tejidos</text>
+                <text x="236" y="63" textAnchor="middle" fontSize="9" fill="var(--t-rojo)">maternos</text>
+                <text x="236" y="76" textAnchor="middle" fontSize="8" fill="var(--t-rojo)">(resistencia ↑)</text>
 
                 {/* Flecha hacia glucosa fetal */}
                 <path d="M 236 85 L 236 108" stroke="#48A9A6" strokeWidth="2" markerEnd="url(#arrowTeal)" />
-                <text x="236" y="118" textAnchor="middle" fontSize="9" fill="#48A9A6">Glucosa → Feto</text>
+                <text x="236" y="118" textAnchor="middle" fontSize="9" fill="var(--t-teal)">Glucosa → Feto</text>
 
                 {/* Páncreas materno */}
                 <rect x="282" y="30" width="52" height="50" rx="8" fill="rgba(46,134,171,0.1)" stroke="#2E86AB" strokeWidth="1.5" />
-                <text x="308" y="50" textAnchor="middle" fontSize="9" fill="#2E86AB" fontWeight="bold">Páncreas</text>
-                <text x="308" y="63" textAnchor="middle" fontSize="9" fill="#2E86AB">materno</text>
-                <text x="308" y="75" textAnchor="middle" fontSize="8" fill="#2E86AB">compensar ↑</text>
+                <text x="308" y="50" textAnchor="middle" fontSize="9" fill="var(--t-azul)" fontWeight="bold">Páncreas</text>
+                <text x="308" y="63" textAnchor="middle" fontSize="9" fill="var(--t-azul)">materno</text>
+                <text x="308" y="75" textAnchor="middle" fontSize="8" fill="var(--t-azul)">compensar ↑</text>
 
                 <defs>
                   <marker id="arrowOrange" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
@@ -496,31 +525,31 @@ function BloqueTipos() {
 
             <div className={styles.mecanimoSteps}>
               <div className={styles.mecanismoStep}>
-                <span className={styles.mecanismoStepNum} style={{ background: '#E67E22' }}>1</span>
+                <span className={styles.mecanismoStepNum} style={{ background: '#A0540F' }}>1</span>
                 <div>
                   <strong>Resistencia fisiológica placentaria:</strong> La placenta secreta lactógeno placentario humano (hPL), progesterona, cortisol y TNF-α placentario. Estos antagonizan la señalización de la insulina en los tejidos maternos (fosforilación en serina de IRS-1, igual que en el Tipo 2), generando resistencia periférica intencionada.
                 </div>
               </div>
               <div className={styles.mecanismoStep}>
-                <span className={styles.mecanismoStepNum} style={{ background: '#48A9A6' }}>2</span>
+                <span className={styles.mecanismoStepNum} style={{ background: '#327874' }}>2</span>
                 <div>
                   <strong>Función evolutiva:</strong> Al disminuir la captación materna de glucosa, el organismo mantiene una glucemia ligeramente elevada que asegura el suministro continuo al feto (el feto capta glucosa por GLUT1/3 sin necesitar insulina materna).
                 </div>
               </div>
               <div className={styles.mecanismoStep}>
-                <span className={styles.mecanismoStepNum} style={{ background: '#2E86AB' }}>3</span>
+                <span className={styles.mecanismoStepNum} style={{ background: '#26718F' }}>3</span>
                 <div>
                   <strong>Compensación pancreática:</strong> El páncreas materno normalmente compensa hipertrofiando las células β (aumento de masa β hasta un 50% durante el embarazo) e hipersecretando insulina. Las incretinas (GLP-1) potencian este proceso.
                 </div>
               </div>
               <div className={styles.mecanismoStep}>
-                <span className={styles.mecanismoStepNum} style={{ background: '#E74C3C' }}>4</span>
+                <span className={styles.mecanismoStepNum} style={{ background: '#B91C1C' }}>4</span>
                 <div>
                   <strong>Cuando la compensación falla:</strong> Si las células β maternas no pueden producir suficiente insulina para vencer la resistencia placentaria (por agotamiento o masa insuficiente), la glucemia materna se eleva más allá del umbral fisiológico → diabetes gestacional.
                 </div>
               </div>
               <div className={styles.mecanismoStep}>
-                <span className={styles.mecanismoStepNum} style={{ background: '#27AE60' }}>5</span>
+                <span className={styles.mecanismoStepNum} style={{ background: '#1D7A43' }}>5</span>
                 <div>
                   <strong>Resolución posparto:</strong> Tras la expulsión de la placenta, las hormonas placentarias desaparecen rápidamente (semivida corta). La resistencia a la insulina se revierte en horas-días. La función pancreática se normaliza cuando la causa era solo la resistencia placentaria.
                 </div>
@@ -552,35 +581,36 @@ function BloqueHba1c() {
             {/* Glóbulo rojo (disco bicóncavo) */}
             <ellipse cx="110" cy="100" rx="90" ry="55" fill="#FDECEA" stroke="#E74C3C" strokeWidth="2" />
             <ellipse cx="110" cy="100" rx="60" ry="35" fill="#FAD7D3" stroke="#E74C3C" strokeWidth="1" opacity="0.5" />
-            <text x="110" y="185" textAnchor="middle" fontSize="11" fill="#888" fontStyle="italic">Eritrocito (vida media: ~120 días)</text>
+            <text x="110" y="185" textAnchor="middle" fontSize="11" fill="var(--t-gris)" fontStyle="italic">Eritrocito (vida media: ~120 días)</text>
 
-            {/* Moléculas de hemoglobina normales */}
-            <circle cx="75" cy="88" r="10" fill="#E74C3C" opacity="0.8" />
+            {/* Moléculas de hemoglobina normales: rojo y dorado opacos y oscurecidos bajo el blanco
+                (al 80-90 % de su color daban 3,12 y 2,08:1). Cabo C0297 */}
+            <circle cx="75" cy="88" r="10" fill={ROJO_HB} />
             <text x="75" y="91" textAnchor="middle" fontSize="8" fill="white">Hb</text>
 
-            <circle cx="105" cy="78" r="10" fill="#E74C3C" opacity="0.8" />
+            <circle cx="105" cy="78" r="10" fill={ROJO_HB} />
             <text x="105" y="81" textAnchor="middle" fontSize="8" fill="white">Hb</text>
 
-            <circle cx="140" cy="90" r="10" fill="#E74C3C" opacity="0.8" />
+            <circle cx="140" cy="90" r="10" fill={ROJO_HB} />
             <text x="140" y="93" textAnchor="middle" fontSize="8" fill="white">Hb</text>
 
             {/* Moléculas HbA1c (glicosiladas) — color dorado */}
-            <circle cx="90" cy="112" r="11" fill="#F39C12" opacity="0.9" />
+            <circle cx="90" cy="112" r="11" fill={DORADO_HBA1C} />
             <text x="90" y="112" textAnchor="middle" fontSize="7" fill="white" fontWeight="bold">HbA1c</text>
             {/* Glucosa unida */}
             <circle cx="82" cy="102" r="5" fill="#F1C40F" opacity="0.9" />
             <line x1="85" y1="105" x2="88" y2="108" stroke="#F39C12" strokeWidth="1.5" />
 
-            <circle cx="125" cy="108" r="11" fill="#F39C12" opacity="0.9" />
+            <circle cx="125" cy="108" r="11" fill={DORADO_HBA1C} />
             <text x="125" y="108" textAnchor="middle" fontSize="7" fill="white" fontWeight="bold">HbA1c</text>
             <circle cx="136" cy="100" r="5" fill="#F1C40F" opacity="0.9" />
             <line x1="133" y1="102" x2="130" y2="105" stroke="#F39C12" strokeWidth="1.5" />
 
             {/* Leyenda */}
-            <circle cx="20" cy="160" r="6" fill="#E74C3C" />
-            <text x="30" y="164" fontSize="9" fill="#555">Hb sin glicosilar</text>
-            <circle cx="20" cy="175" r="6" fill="#F39C12" />
-            <text x="30" y="179" fontSize="9" fill="#555">HbA1c (glicosilada)</text>
+            <circle cx="20" cy="160" r="6" fill={ROJO_HB} />
+            <text x="30" y="164" fontSize="9" fill="var(--t-gris)">Hb sin glicosilar</text>
+            <circle cx="20" cy="175" r="6" fill={DORADO_HBA1C} />
+            <text x="30" y="179" fontSize="9" fill="var(--t-gris)">HbA1c (glicosilada)</text>
           </svg>
         </div>
 
@@ -629,7 +659,8 @@ function BloqueComplicaciones() {
             aria-expanded={mecanismoActivo === i}
           >
             <div className={styles.complicacionIndicador} style={{ background: mec.color }} />
-            <h3 className={styles.complicacionNombre} style={mecanismoActivo === i ? { color: mec.color } : {}}>
+            {/* Abierta, el nombre toma el tono de texto de su dato (cabo C0645); el color puro, el borde */}
+            <h3 className={`${styles.complicacionNombre} ${mecanismoActivo === i ? styles[mec.tono] : ''}`}>
               {mec.nombre}
             </h3>
             <p className={styles.complicacionSubtitulo}>{mec.subtitulo}</p>
