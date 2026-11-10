@@ -203,6 +203,11 @@ const APPS: App[] = [
   // claro; verde 3,59 y naranja 3,53 en oscuro) y «FEEDBACK NEGATIVO» y «Feedback (frena)» en
   // currentColor al 50 % (3,33 en claro, 4,10 en oscuro). Las glándulas, como subestados
   { slug: 'visualizador-sistema-endocrino', secciones: SECCIONES, extremos: true, subestados: "button[aria-pressed]:not(nav button)" },
+  // Del censo del 10/11/2026 (C0297): los rótulos del gráfico de demanda en el color de su curva
+  // (el teal de la oferta 2,78:1, la marca 4,07 y el rojo 3,79 en claro; 3,50-3,76 en oscuro) y el
+  // blanco sobre las cajas de la espiral salarios-precios en su color al 90 % (el acento 2,07, el
+  // teal 2,50, el verde del BCE 2,58 en claro). Las causas, como subestados
+  { slug: 'visualizador-inflacion', secciones: SECCIONES, extremos: true, subestados: "button[aria-pressed]:not(nav button)" },
 ];
 
 interface TextoSvg {

@@ -133,6 +133,10 @@ const APPS: App[] = [
   // Del censo de C0297 (10/11/2026): el nivel del glucagón en el naranja #e67e22 de su barra con
   // style (2,85:1 en claro)
   { slug: 'visualizador-sistema-endocrino', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
+  // Del censo de C0297 (10/11/2026): el nombre y la tasa de cada tipo de inflación en su color con
+  // style (verde 2,28:1, ámbar 2,15, rojo 3,76, índigo 4,47 en claro; la hiperinflación #7f1d1d
+  // 1,43 y el índigo 3,21 en oscuro) y «↑ Por encima» en la reserva roja de la receta en oscuro (3,76)
+  { slug: 'visualizador-inflacion', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
 ];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {

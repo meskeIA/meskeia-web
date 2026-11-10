@@ -251,25 +251,25 @@ export default function VisualizadorInflacion() {
               <text x="260" y="220" fill="currentColor" fontSize="11" textAnchor="middle">Cantidad (Q)</text>
               {/* Curva Oferta (S) — rígida (vertical) */}
               <line x1="200" y1="30" x2="200" y2="190" stroke="#48A9A6" strokeWidth="2.5" strokeDasharray="6,3"/>
-              <text x="195" y="24" fill="#48A9A6" fontSize="11" textAnchor="middle">Oferta (fija)</text>
+              <text x="195" y="24" className={styles.svgTeal} fontSize="11" textAnchor="middle">Oferta (fija)</text>
               {/* Curva Demanda D1 */}
               <path d="M 80,50 Q 180,130 350,185" stroke="#2E86AB" strokeWidth="2.5" fill="none"/>
-              <text x="355" y="185" fill="#2E86AB" fontSize="11">D₁</text>
+              <text x="355" y="185" className={styles.svgAzul} fontSize="11">D₁</text>
               {/* Curva Demanda D2 — desplazada a la derecha/arriba */}
               <path d="M 80,25 Q 180,100 420,175" stroke="#e74c3c" strokeWidth="2.5" fill="none"/>
-              <text x="425" y="175" fill="#e74c3c" fontSize="11">D₂</text>
+              <text x="425" y="175" className={styles.svgRojo} fontSize="11">D₂</text>
               {/* Punto de equilibrio original */}
               <circle cx="200" cy="128" r="5" fill="#2E86AB"/>
               <line x1="60" y1="128" x2="200" y2="128" stroke="#2E86AB" strokeWidth="1" strokeDasharray="4,3"/>
-              <text x="56" y="131" fill="#2E86AB" fontSize="10" textAnchor="end">P₁</text>
+              <text x="56" y="131" className={styles.svgAzul} fontSize="10" textAnchor="end">P₁</text>
               {/* Nuevo equilibrio con D2 */}
               <circle cx="200" cy="96" r="5" fill="#e74c3c"/>
               <line x1="60" y1="96" x2="200" y2="96" stroke="#e74c3c" strokeWidth="1" strokeDasharray="4,3"/>
-              <text x="56" y="99" fill="#e74c3c" fontSize="10" textAnchor="end">P₂</text>
+              <text x="56" y="99" className={styles.svgRojo} fontSize="10" textAnchor="end">P₂</text>
               {/* Flecha ascendente de precio */}
               <line x1="240" y1="128" x2="240" y2="100" stroke="#e74c3c" strokeWidth="2"/>
               <polygon points="240,92 235,102 245,102" fill="#e74c3c"/>
-              <text x="245" y="116" fill="#e74c3c" fontSize="10">↑ Precio</text>
+              <text x="245" y="116" className={styles.svgRojo} fontSize="10">↑ Precio</text>
               {/* Leyenda */}
               <text x="80" y="18" fill="currentColor" fontSize="10" opacity="0.7">La oferta es rígida a corto plazo</text>
             </svg>
@@ -354,24 +354,25 @@ export default function VisualizadorInflacion() {
 
               {/* Cajas de la espiral */}
               {/* 1. Precios suben (arriba) */}
-              <rect x="170" y="10" width="160" height="50" rx="10" fill="#2E86AB" opacity="0.9"/>
+              {/* Rellenos opacos con tinta que llega a 4,5:1 en los dos temas (cabo C0297) */}
+              <rect x="170" y="10" width="160" height="50" rx="10" fill="#26718F"/>
               <text x="250" y="32" fill="white" fontSize="12" textAnchor="middle" fontWeight="600">Precios suben</text>
               <text x="250" y="48" fill="white" fontSize="10" textAnchor="middle">Poder adquisitivo cae</text>
 
               {/* 2. Trabajadores piden más (derecha) */}
-              <rect x="350" y="120" width="140" height="50" rx="10" fill="#48A9A6" opacity="0.9"/>
+              <rect x="350" y="120" width="140" height="50" rx="10" fill="#2C7A78"/>
               <text x="420" y="142" fill="white" fontSize="12" textAnchor="middle" fontWeight="600">Trabajadores</text>
               <text x="420" y="158" fill="white" fontSize="10" textAnchor="middle">exigen ↑ salarios</text>
 
               {/* 3. Costes empresariales suben (abajo) */}
-              <rect x="170" y="240" width="160" height="50" rx="10" fill="#e74c3c" opacity="0.9"/>
+              <rect x="170" y="240" width="160" height="50" rx="10" fill="#C0392B"/>
               <text x="250" y="262" fill="white" fontSize="12" textAnchor="middle" fontWeight="600">Costes laborales</text>
               <text x="250" y="278" fill="white" fontSize="10" textAnchor="middle">de empresas suben</text>
 
               {/* 4. Empresas suben precios (izquierda) */}
-              <rect x="10" y="120" width="140" height="50" rx="10" fill="#7FB3D3" opacity="0.9"/>
-              <text x="80" y="142" fill="white" fontSize="12" textAnchor="middle" fontWeight="600">Empresas suben</text>
-              <text x="80" y="158" fill="white" fontSize="10" textAnchor="middle">precios para mantener margen</text>
+              <rect x="10" y="120" width="140" height="50" rx="10" fill="#7FB3D3"/>
+              <text x="80" y="142" fill="#1A1A1A" fontSize="12" textAnchor="middle" fontWeight="600">Empresas suben</text>
+              <text x="80" y="158" fill="#1A1A1A" fontSize="10" textAnchor="middle">precios para mantener margen</text>
 
               {/* Flechas conectoras */}
               <line x1="330" y1="35" x2="365" y2="120" stroke="#2E86AB" strokeWidth="2" markerEnd="url(#arrowBlue)"/>
@@ -381,12 +382,12 @@ export default function VisualizadorInflacion() {
 
               {/* Centro: ojo de la espiral */}
               <circle cx="250" cy="155" r="45" fill="none" stroke="#e74c3c" strokeWidth="2" strokeDasharray="6,4"/>
-              <text x="250" y="149" fill="#e74c3c" fontSize="11" textAnchor="middle" fontWeight="600">ESPIRAL</text>
-              <text x="250" y="163" fill="#e74c3c" fontSize="10" textAnchor="middle">auto-alimentada</text>
+              <text x="250" y="149" className={styles.svgRojo} fontSize="11" textAnchor="middle" fontWeight="600">ESPIRAL</text>
+              <text x="250" y="163" className={styles.svgRojo} fontSize="10" textAnchor="middle">auto-alimentada</text>
 
               {/* Flecha BCE interrumpiendo */}
               <line x1="250" y1="310" x2="250" y2="204" stroke="#27ae60" strokeWidth="2.5" markerEnd="url(#arrowBlue)" strokeDasharray="5,3"/>
-              <rect x="195" y="290" width="110" height="22" rx="5" fill="#27ae60" opacity="0.9"/>
+              <rect x="195" y="290" width="110" height="22" rx="5" fill="#1E7B45"/>
               <text x="250" y="305" fill="white" fontSize="10" textAnchor="middle" fontWeight="600">BCE: sube tipos ↑</text>
             </svg>
           </div>
@@ -581,8 +582,8 @@ export default function VisualizadorInflacion() {
             </div>
             {TIPOS_INFLACION.map((t) => (
               <div key={t.tipo} className={styles.inflacionRow} style={{ borderLeftColor: t.color }}>
-                <span className={styles.inflacionTipo} style={{ color: t.color }}>{t.tipo}</span>
-                <span className={styles.inflacionRango} style={{ color: t.color }}>{t.rango}</span>
+                <span className={`${styles.inflacionTipo} ${styles[`tNivel${t.nivel}`]}`}>{t.tipo}</span>
+                <span className={`${styles.inflacionRango} ${styles[`tNivel${t.nivel}`]}`}>{t.rango}</span>
                 <div className={styles.inflacionInfo}>
                   <p className={styles.inflacionDesc}>{t.descripcion}</p>
                   <p className={styles.inflacionEj}><em>{t.ejemplo}</em></p>

@@ -191,6 +191,33 @@
 }
 .icpMas span:nth-child(2) { color: var(--rojo-texto, var(--rojo)); font-weight: 700; }
 .icpMenos span:nth-child(2) { color: var(--verde-texto, var(--verde)); font-weight: 700; }
+/* En oscuro la receta cae a la reserva --rojo (#e74c3c), 3,76:1 sobre la tarjeta (cabo C0681) */
+[data-theme='dark'] .icpMas span:nth-child(2) { color: #FCA5A5; }
+
+/* Tono de TEXTO de los rótulos de los SVG, por tema (cabo C0297, 10/11/2026): el color de dato se
+   queda en curvas y flechas. Con la marca, el teal y el rojo puros, 2,78-4,07:1 en claro y
+   3,50-3,76 en oscuro */
+.svgAzul { fill: var(--primary-texto); }
+.svgTeal { fill: #2C7A78; }
+.svgRojo { fill: #B91C1C; }
+[data-theme='dark'] .svgTeal { fill: #6CC5C2; }
+[data-theme='dark'] .svgRojo { fill: #FCA5A5; }
+
+/* Tono de TEXTO de cada tipo de inflación, por tema (cabo C0645, 10/11/2026): el color del dato se
+   queda en el borde izquierdo. Con el color puro, 2,15-4,47:1 en claro y 1,43-3,81 en oscuro
+   (la hiperinflación en #7f1d1d) */
+.tNivel1 { color: #4338CA; }
+.tNivel2 { color: #136E35; }
+.tNivel3 { color: #8A5A00; }
+.tNivel4 { color: #B91C1C; }
+.tNivel5 { color: #991B1B; }
+.tNivel6 { color: #7F1D1D; }
+[data-theme='dark'] .tNivel1 { color: #A5B4FC; }
+[data-theme='dark'] .tNivel2 { color: #86EFAC; }
+[data-theme='dark'] .tNivel3 { color: #FCD34D; }
+[data-theme='dark'] .tNivel4 { color: #FCA5A5; }
+[data-theme='dark'] .tNivel5 { color: #F87171; }
+[data-theme='dark'] .tNivel6 { color: #FECACA; }
 
 /* ─── Tipos de inflación ─── */
 .inflacionTable {
