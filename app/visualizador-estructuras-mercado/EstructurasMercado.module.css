@@ -246,7 +246,8 @@
 
 .badgeCantidad {
   background: rgba(72, 169, 166, 0.15);
-  color: #2e8a87;
+  /* #2e8a87 daba 3,58:1 sobre este tinte (cabo C0645) */
+  color: #1F6F6C;
   border: 1px solid rgba(72, 169, 166, 0.4);
 }
 
@@ -456,6 +457,19 @@
   font-weight: 600;
 }
 
+/* Tono de TEXTO de los rótulos de las gráficas, por tema (cabo C0297, 10/11/2026): con el color de
+   cada curva, el acento daba 2,17:1, el teal 2,68, la marca 3,93 y el rosa 3,75 en claro; en
+   oscuro la marca 3,31, el rosa 3,47, y los ejes en #666 y #555 fijos 1,82-2,37. El color de dato
+   se queda en curvas, puntos y áreas */
+.svgEje { fill: var(--text-muted); }
+.svgAzul { fill: var(--primary-texto); }
+.svgTeal { fill: #1F6F6C; }
+.svgAcento { fill: #45698A; }
+.svgRosa { fill: #B5174A; }
+[data-theme='dark'] .svgTeal { fill: #6CC5C2; }
+[data-theme='dark'] .svgAcento { fill: #A9CCE3; }
+[data-theme='dark'] .svgRosa { fill: #F9A8C4; }
+
 /* ========================================
    DARK MODE
    ======================================== */
@@ -481,7 +495,8 @@
   color: #7FB3D3;
 }
 
-[data-theme='dark'] .tabBtnActivo {
+[data-theme='dark'] .tabBtnActivo,
+[data-theme='dark'] .tabBtnActivo:hover {
   border-color: var(--primary-boton);
   background: var(--primary-boton);
   color: #ffffff;
@@ -533,7 +548,7 @@
 
 [data-theme='dark'] .badgePrecio {
   background: rgba(232, 63, 111, 0.1);
-  color: #f06090;
+  color: #F9A8C4;
   border-color: rgba(232, 63, 111, 0.3);
 }
 
@@ -560,7 +575,8 @@
   color: #7FB3D3;
 }
 
-[data-theme='dark'] .btnEstrategiaActivo {
+[data-theme='dark'] .btnEstrategiaActivo,
+[data-theme='dark'] .btnEstrategiaActivo:hover {
   border-color: var(--primary-boton);
   background: var(--primary-boton);
   color: #ffffff;
@@ -579,14 +595,15 @@
   color: var(--secondary-texto);
 }
 
+/* #f06090 daba 4,07:1 sobre su tinte en oscuro (cabo C0645) */
 [data-theme='dark'] .celda01 {
   background: rgba(232, 63, 111, 0.1);
-  color: #f06090;
+  color: #F9A8C4;
 }
 
 [data-theme='dark'] .celda10 {
   background: rgba(232, 63, 111, 0.1);
-  color: #f06090;
+  color: #F9A8C4;
 }
 
 [data-theme='dark'] .celda11 {
@@ -594,8 +611,9 @@
   color: #c8a050;
 }
 
+/* Tinte al 4 % en oscuro (cabo C0278): al 10 %, la cifra en --primary-texto daba 4,40:1 */
 [data-theme='dark'] .resultadoNash {
-  background: rgba(46, 134, 171, 0.1);
+  background: rgba(46, 134, 171, 0.04);
   border-color: rgba(46, 134, 171, 0.3);
 }
 
@@ -771,7 +789,8 @@
   border-left: 3px solid #48A9A6;
   border-radius: 0 6px 6px 0;
   font-size: 0.82rem;
-  color: #2e8a87;
+  /* #2e8a87 daba 3,74:1 sobre este tinte (cabo C0278) */
+  color: #1F6F6C;
   font-style: italic;
 }
 

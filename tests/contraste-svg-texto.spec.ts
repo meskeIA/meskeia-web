@@ -214,6 +214,11 @@ const APPS: App[] = [
   // la marca, el teal y el acento puros (2,24-4,07) y la tracción en verde (2,08) y la regeneración
   // en rojo (3,79 en claro, 3,55 en oscuro)
   { slug: 'visualizador-motor-electrico', secciones: SECCIONES, extremos: true },
+  // Del censo del 10/11/2026 (C0297): los rótulos de las gráficas en el color de su curva (el acento
+  // de IM 2,17:1, el teal 2,68, la marca 3,93 y el rosa 3,75 en claro; la marca 3,31 y el rosa 3,47
+  // en oscuro) y los ejes y los valores de equilibrio en #666 y #555 fijos (1,82-2,37 en oscuro).
+  // Los deslizadores en sus extremos y las estructuras y estrategias como subestados
+  { slug: 'visualizador-estructuras-mercado', secciones: SECCIONES, extremos: true, subestados: "button[aria-pressed]:not(nav button)" },
 ];
 
 interface TextoSvg {

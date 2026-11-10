@@ -727,8 +727,8 @@ function CompetenciaPerfeztaSVG({ desplazamiento, precio, cantidad }: Competenci
       <line x1={padL} y1={H - padB} x2={W - padR} y2={H - padB} stroke="#999" strokeWidth="1.5" />
 
       {/* Etiquetas ejes */}
-      <text x={padL - 35} y={padT + plotH / 2} fontSize="11" fill="#666" textAnchor="middle" transform={`rotate(-90, ${padL - 35}, ${padT + plotH / 2})`}>Precio (P)</text>
-      <text x={padL + plotW / 2} y={H - 5} fontSize="11" fill="#666" textAnchor="middle">Cantidad (Q)</text>
+      <text x={padL - 35} y={padT + plotH / 2} fontSize="11" className={styles.svgEje} textAnchor="middle" transform={`rotate(-90, ${padL - 35}, ${padT + plotH / 2})`}>Precio (P)</text>
+      <text x={padL + plotW / 2} y={H - 5} fontSize="11" className={styles.svgEje} textAnchor="middle">Cantidad (Q)</text>
 
       {/* Área excedente consumidor */}
       <polygon points={excCons} fill="rgba(46,134,171,0.25)" />
@@ -742,7 +742,7 @@ function CompetenciaPerfeztaSVG({ desplazamiento, precio, cantidad }: Competenci
         x2={toX(ofertaQ2)} y2={toY(ofertaP2)}
         stroke="#48A9A6" strokeWidth="2.5"
       />
-      <text x={toX(ofertaQ2) - 10} y={toY(ofertaP2) - 6} fontSize="13" fill="#48A9A6" fontWeight="bold">S</text>
+      <text x={toX(ofertaQ2) - 10} y={toY(ofertaP2) - 6} fontSize="13" className={styles.svgTeal} fontWeight="bold">S</text>
 
       {/* Curva Demanda (D) */}
       <line
@@ -750,7 +750,7 @@ function CompetenciaPerfeztaSVG({ desplazamiento, precio, cantidad }: Competenci
         x2={toX(demQ2)} y2={toY(Math.max(demP2, 0))}
         stroke="#2E86AB" strokeWidth="2.5"
       />
-      <text x={toX(demQ2) - 10} y={toY(Math.max(demP2, 0)) - 6} fontSize="13" fill="#2E86AB" fontWeight="bold">D</text>
+      <text x={toX(demQ2) - 10} y={toY(Math.max(demP2, 0)) - 6} fontSize="13" className={styles.svgAzul} fontWeight="bold">D</text>
 
       {/* Líneas punteadas al equilibrio */}
       <line x1={toX(eqQ)} y1={toY(eqP)} x2={toX(eqQ)} y2={H - padB} stroke="#555" strokeWidth="1" strokeDasharray="4,3" />
@@ -758,11 +758,11 @@ function CompetenciaPerfeztaSVG({ desplazamiento, precio, cantidad }: Competenci
 
       {/* Punto equilibrio */}
       <circle cx={toX(eqQ)} cy={toY(eqP)} r="5" fill="#E83F6F" />
-      <text x={toX(eqQ) + 8} y={toY(eqP) - 6} fontSize="11" fill="#E83F6F" fontWeight="bold">E</text>
+      <text x={toX(eqQ) + 8} y={toY(eqP) - 6} fontSize="11" className={styles.svgRosa} fontWeight="bold">E</text>
 
       {/* Labels en ejes */}
-      <text x={toX(eqQ)} y={H - padB + 14} fontSize="10" fill="#555" textAnchor="middle">Q*={eqQ.toFixed(0)}</text>
-      <text x={padL - 6} y={toY(eqP) + 4} fontSize="10" fill="#555" textAnchor="end">P*={eqP.toFixed(0)}</text>
+      <text x={toX(eqQ)} y={H - padB + 14} fontSize="10" className={styles.svgEje} textAnchor="middle">Q*={eqQ.toFixed(0)}</text>
+      <text x={padL - 6} y={toY(eqP) + 4} fontSize="10" className={styles.svgEje} textAnchor="end">P*={eqP.toFixed(0)}</text>
     </svg>
   );
 }
@@ -814,15 +814,15 @@ function MonopolioSVG() {
 
       {/* Curva Demanda (D): P = 100 - q */}
       <line x1={toX(0)} y1={toY(100)} x2={toX(100)} y2={toY(0)} stroke="#2E86AB" strokeWidth="2.5" />
-      <text x={toX(95)} y={toY(5) - 5} fontSize="13" fill="#2E86AB" fontWeight="bold">D</text>
+      <text x={toX(95)} y={toY(5) - 5} fontSize="13" className={styles.svgAzul} fontWeight="bold">D</text>
 
       {/* Ingreso marginal (IM): P = 100 - 2q */}
       <line x1={toX(0)} y1={toY(100)} x2={toX(50)} y2={toY(0)} stroke="#7FB3D3" strokeWidth="2" strokeDasharray="5,3" />
-      <text x={toX(46)} y={toY(6) - 5} fontSize="12" fill="#7FB3D3" fontWeight="bold">IM</text>
+      <text x={toX(46)} y={toY(6) - 5} fontSize="12" className={styles.svgAcento} fontWeight="bold">IM</text>
 
       {/* Coste marginal (CM) horizontal */}
       <line x1={toX(0)} y1={toY(CM)} x2={toX(100)} y2={toY(CM)} stroke="#48A9A6" strokeWidth="2.5" />
-      <text x={toX(92)} y={toY(CM) - 5} fontSize="12" fill="#48A9A6" fontWeight="bold">CM</text>
+      <text x={toX(92)} y={toY(CM) - 5} fontSize="12" className={styles.svgTeal} fontWeight="bold">CM</text>
 
       {/* Líneas monopolio */}
       <line x1={toX(Qm)} y1={toY(Pm)} x2={toX(Qm)} y2={H - padB} stroke="#E83F6F" strokeWidth="1.5" strokeDasharray="4,3" />
@@ -837,16 +837,16 @@ function MonopolioSVG() {
       <circle cx={toX(Qc)} cy={toY(Pc)} r="5" fill="#48A9A6" />
 
       {/* Labels en ejes */}
-      <text x={toX(Qm)} y={H - padB + 14} fontSize="10" fill="#E83F6F" textAnchor="middle">Qm={Qm}</text>
-      <text x={toX(Qc)} y={H - padB + 14} fontSize="10" fill="#48A9A6" textAnchor="middle">Qc={Qc}</text>
-      <text x={padL - 6} y={toY(Pm) + 4} fontSize="10" fill="#E83F6F" textAnchor="end">Pm={Pm}</text>
-      <text x={padL - 6} y={toY(Pc) + 4} fontSize="10" fill="#48A9A6" textAnchor="end">Pc={Pc}</text>
+      <text x={toX(Qm)} y={H - padB + 14} fontSize="10" className={styles.svgRosa} textAnchor="middle">Qm={Qm}</text>
+      <text x={toX(Qc)} y={H - padB + 14} fontSize="10" className={styles.svgTeal} textAnchor="middle">Qc={Qc}</text>
+      <text x={padL - 6} y={toY(Pm) + 4} fontSize="10" className={styles.svgRosa} textAnchor="end">Pm={Pm}</text>
+      <text x={padL - 6} y={toY(Pc) + 4} fontSize="10" className={styles.svgTeal} textAnchor="end">Pc={Pc}</text>
 
       {/* Etiqueta DWL */}
-      <text x={toX((Qm + Qc) / 2)} y={toY((Pm + Pc) / 2)} fontSize="10" fill="#E83F6F" textAnchor="middle" fontWeight="bold">DWL</text>
+      <text x={toX((Qm + Qc) / 2)} y={toY((Pm + Pc) / 2)} fontSize="10" className={styles.svgRosa} textAnchor="middle" fontWeight="bold">DWL</text>
 
-      <text x={padL - 35} y={padT + plotH / 2} fontSize="11" fill="#666" textAnchor="middle" transform={`rotate(-90, ${padL - 35}, ${padT + plotH / 2})`}>Precio (P)</text>
-      <text x={padL + plotW / 2} y={H - 5} fontSize="11" fill="#666" textAnchor="middle">Cantidad (Q)</text>
+      <text x={padL - 35} y={padT + plotH / 2} fontSize="11" className={styles.svgEje} textAnchor="middle" transform={`rotate(-90, ${padL - 35}, ${padT + plotH / 2})`}>Precio (P)</text>
+      <text x={padL + plotW / 2} y={H - 5} fontSize="11" className={styles.svgEje} textAnchor="middle">Cantidad (Q)</text>
     </svg>
   );
 }

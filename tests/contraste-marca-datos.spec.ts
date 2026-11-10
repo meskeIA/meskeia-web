@@ -141,6 +141,11 @@ const APPS: App[] = [
   // oscuro) y el de «Par ICE» sobre --text-muted en oscuro (2,78), y en oscuro los títulos de los
   // recuadros y los rótulos del eje sobre el tinte de marca al 10 % (4,24-4,26, forma de C0278)
   { slug: 'visualizador-motor-electrico', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
+  // Del censo de C0297 (10/11/2026): la cantidad y las pistas de la FAQ en #2e8a87 sobre su tinte
+  // teal (3,58-3,74:1 en claro), y en oscuro la pestaña activa con el ratón encima en el acento sobre
+  // --primary-boton (2,42), el precio y los pagos en #f06090 sobre su tinte rosa (4,07) y la cifra
+  // de Nash en --primary-texto sobre el tinte al 10 % (4,40)
+  { slug: 'visualizador-estructuras-mercado', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
 ];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {
