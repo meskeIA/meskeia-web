@@ -156,6 +156,16 @@ const APPS: App[] = [
     secciones: "nav[aria-label*='nfermedad'] button",
     subestados: "button[aria-pressed]:not(nav button)",
   },
+  // Del censo del 10/11/2026 (C0297): blanco sobre el componente activo en su color puro (la marca
+  // 4,11:1, el diferencial 3,80, los magnetotérmicos en teal 2,77, la tierra en verde, el PIA en
+  // naranja 2,17), «Luz, Ench., Cocina…» en #999 (2,64), el título con opacidad (3,33), «Fase» y
+  // «Neutro» en marrón y azul sobre la tarjeta oscura (2,02 y 2,58) y el verde y el rojo como texto
+  // (OK 2,58, Fuga 3,31, SALTA! 3,76). Las tarjetas del cuadro y los tres flujos, como subestados
+  {
+    slug: 'visualizador-electricidad-domestica',
+    secciones: SECCIONES,
+    subestados: "button[class*='componenteCard'], button[class*='animacionBtn']",
+  },
 ];
 
 interface TextoSvg {

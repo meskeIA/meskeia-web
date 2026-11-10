@@ -137,6 +137,22 @@
 .warningBox { background: #FEF3C7; border: 1px solid #F59E0B; border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-top: var(--spacing-lg); font-size: 0.9rem; line-height: 1.5; color: #92400E; }
 [data-theme='dark'] .warningBox { background: #422006; border-color: #B45309; color: #FDE68A; }
 
+/* Tono de TEXTO de los rótulos de los SVG que van sobre la tarjeta, por color de dato y tema
+   (cabo C0297, 10/11/2026): el color del dato se queda en cables y bordes. Contra la tarjeta
+   blanca y la oscura #2A2A2A: 5,6-7,1:1 en claro y 6,4-9,9:1 en oscuro. Lo que va dentro de una
+   caja clara en los dos temas (las del cuadro, la carga) lleva tinta oscura fija en el TSX. */
+.svgTexto { fill: var(--text-secondary); }
+.svgMarron { fill: #8B4513; }
+.svgAzul { fill: #0066CC; }
+.svgVerde { fill: #136E35; }
+.svgRojo { fill: #B91C1C; }
+.svgNaranja { fill: #A04F0A; }
+[data-theme='dark'] .svgMarron { fill: #D9A066; }
+[data-theme='dark'] .svgAzul { fill: #7FB8F0; }
+[data-theme='dark'] .svgVerde { fill: #82D9A5; }
+[data-theme='dark'] .svgRojo { fill: #F5A59B; }
+[data-theme='dark'] .svgNaranja { fill: #F5B97A; }
+
 /* Responsive */
 @media (max-width: 768px) {
   .hero { margin-top: 60px; padding: var(--spacing-lg); }

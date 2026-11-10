@@ -103,14 +103,14 @@ function SeccionCuadro() {
         <svg viewBox="0 0 560 320" className={styles.cuadroSvg} aria-label="Diagrama del cuadro eléctrico doméstico">
           {/* Marco del cuadro */}
           <rect x="10" y="10" width="540" height="300" rx="8" fill="none" stroke="currentColor" strokeWidth="2" opacity="0.3" />
-          <text x="280" y="35" textAnchor="middle" fontSize="13" fontWeight="700" fill="currentColor" opacity="0.5">CUADRO GENERAL DE MANDO Y PROTECCION</text>
+          <text x="280" y="35" textAnchor="middle" fontSize="13" fontWeight="700" className={styles.svgTexto}>CUADRO GENERAL DE MANDO Y PROTECCION</text>
 
           {/* Linea de entrada */}
           <line x1="50" y1="55" x2="50" y2="80" stroke="#8B4513" strokeWidth="3" />
-          <text x="50" y="52" textAnchor="middle" fontSize="9" fill="currentColor" opacity="0.6">Acometida</text>
+          <text x="50" y="52" textAnchor="middle" fontSize="9" className={styles.svgTexto}>Acometida</text>
 
-          {/* ICP */}
-          <rect x="25" y="80" width="50" height="60" rx="4" fill={componenteActivo === 'icp' ? '#2E86AB' : '#f0f0f0'} stroke={componenteActivo === 'icp' ? '#2E86AB' : '#999'} strokeWidth="2" onClick={() => setComponenteActivo(componenteActivo === 'icp' ? null : 'icp')} style={{ cursor: 'pointer' }} />
+          {/* ICP. Activo, relleno oscurecido bajo el blanco (#26718F, 5,47:1; con la marca era 4,11) */}
+          <rect x="25" y="80" width="50" height="60" rx="4" fill={componenteActivo === 'icp' ? '#26718F' : '#f0f0f0'} stroke={componenteActivo === 'icp' ? '#2E86AB' : '#999'} strokeWidth="2" onClick={() => setComponenteActivo(componenteActivo === 'icp' ? null : 'icp')} style={{ cursor: 'pointer' }} />
           <text x="50" y="108" textAnchor="middle" fontSize="9" fontWeight="700" fill={componenteActivo === 'icp' ? 'white' : '#333'}>ICP</text>
           <text x="50" y="120" textAnchor="middle" fontSize="7" fill={componenteActivo === 'icp' ? 'white' : '#666'}>3,45kW</text>
 
@@ -118,7 +118,7 @@ function SeccionCuadro() {
           <line x1="75" y1="110" x2="115" y2="110" stroke="#8B4513" strokeWidth="2" />
 
           {/* IGA */}
-          <rect x="115" y="80" width="50" height="60" rx="4" fill={componenteActivo === 'iga' ? '#2E86AB' : '#f0f0f0'} stroke={componenteActivo === 'iga' ? '#2E86AB' : '#999'} strokeWidth="2" onClick={() => setComponenteActivo(componenteActivo === 'iga' ? null : 'iga')} style={{ cursor: 'pointer' }} />
+          <rect x="115" y="80" width="50" height="60" rx="4" fill={componenteActivo === 'iga' ? '#26718F' : '#f0f0f0'} stroke={componenteActivo === 'iga' ? '#2E86AB' : '#999'} strokeWidth="2" onClick={() => setComponenteActivo(componenteActivo === 'iga' ? null : 'iga')} style={{ cursor: 'pointer' }} />
           <text x="140" y="108" textAnchor="middle" fontSize="9" fontWeight="700" fill={componenteActivo === 'iga' ? 'white' : '#333'}>IGA</text>
           <text x="140" y="120" textAnchor="middle" fontSize="7" fill={componenteActivo === 'iga' ? 'white' : '#666'}>25A</text>
 
@@ -126,7 +126,7 @@ function SeccionCuadro() {
           <line x1="165" y1="110" x2="205" y2="110" stroke="#8B4513" strokeWidth="2" />
 
           {/* Protector sobretensiones */}
-          <rect x="205" y="80" width="50" height="60" rx="4" fill={componenteActivo === 'sobretensiones' ? '#2E86AB' : '#f0f0f0'} stroke={componenteActivo === 'sobretensiones' ? '#2E86AB' : '#999'} strokeWidth="2" onClick={() => setComponenteActivo(componenteActivo === 'sobretensiones' ? null : 'sobretensiones')} style={{ cursor: 'pointer' }} />
+          <rect x="205" y="80" width="50" height="60" rx="4" fill={componenteActivo === 'sobretensiones' ? '#26718F' : '#f0f0f0'} stroke={componenteActivo === 'sobretensiones' ? '#2E86AB' : '#999'} strokeWidth="2" onClick={() => setComponenteActivo(componenteActivo === 'sobretensiones' ? null : 'sobretensiones')} style={{ cursor: 'pointer' }} />
           <text x="230" y="105" textAnchor="middle" fontSize="8" fontWeight="700" fill={componenteActivo === 'sobretensiones' ? 'white' : '#333'}>Sobre-</text>
           <text x="230" y="118" textAnchor="middle" fontSize="8" fontWeight="700" fill={componenteActivo === 'sobretensiones' ? 'white' : '#333'}>tensiones</text>
 
@@ -134,14 +134,14 @@ function SeccionCuadro() {
           <line x1="255" y1="110" x2="295" y2="110" stroke="#8B4513" strokeWidth="2" />
 
           {/* Diferencial */}
-          <rect x="295" y="80" width="60" height="60" rx="4" fill={componenteActivo === 'diferencial' ? '#e74c3c' : '#fff0f0'} stroke={componenteActivo === 'diferencial' ? '#e74c3c' : '#cc0000'} strokeWidth="2" onClick={() => setComponenteActivo(componenteActivo === 'diferencial' ? null : 'diferencial')} style={{ cursor: 'pointer' }} />
+          <rect x="295" y="80" width="60" height="60" rx="4" fill={componenteActivo === 'diferencial' ? '#B91C1C' : '#fff0f0'} stroke={componenteActivo === 'diferencial' ? '#e74c3c' : '#cc0000'} strokeWidth="2" onClick={() => setComponenteActivo(componenteActivo === 'diferencial' ? null : 'diferencial')} style={{ cursor: 'pointer' }} />
           <text x="325" y="105" textAnchor="middle" fontSize="9" fontWeight="700" fill={componenteActivo === 'diferencial' ? 'white' : '#cc0000'}>ID</text>
           <text x="325" y="118" textAnchor="middle" fontSize="7" fill={componenteActivo === 'diferencial' ? 'white' : '#cc0000'}>30mA</text>
           <text x="325" y="130" textAnchor="middle" fontSize="7" fill={componenteActivo === 'diferencial' ? 'white' : '#cc0000'}>40A</text>
 
           {/* Toma de tierra - cable verde-amarillo */}
           <line x1="325" y1="140" x2="325" y2="175" stroke="#22c55e" strokeWidth="2" strokeDasharray="4,2" />
-          <rect x="305" y="175" width="40" height="25" rx="3" fill={componenteActivo === 'tierra' ? '#22c55e' : '#f0fff0'} stroke="#22c55e" strokeWidth="1.5" onClick={() => setComponenteActivo(componenteActivo === 'tierra' ? null : 'tierra')} style={{ cursor: 'pointer' }} />
+          <rect x="305" y="175" width="40" height="25" rx="3" fill={componenteActivo === 'tierra' ? '#15803D' : '#f0fff0'} stroke="#22c55e" strokeWidth="1.5" onClick={() => setComponenteActivo(componenteActivo === 'tierra' ? null : 'tierra')} style={{ cursor: 'pointer' }} />
           <text x="325" y="191" textAnchor="middle" fontSize="8" fontWeight="600" fill={componenteActivo === 'tierra' ? 'white' : '#166534'}>Tierra</text>
 
           {/* Barra de distribucion */}
@@ -156,10 +156,10 @@ function SeccionCuadro() {
             return (
               <g key={c} onClick={() => setComponenteActivo(componenteActivo === 'magneto' ? null : 'magneto')} style={{ cursor: 'pointer' }}>
                 <line x1={x} y1="115" x2={x} y2="135" stroke="#8B4513" strokeWidth="2" />
-                <rect x={x - 14} y="135" width="28" height="55" rx="3" fill={componenteActivo === 'magneto' ? '#48A9A6' : '#f5f5f5'} stroke={componenteActivo === 'magneto' ? '#48A9A6' : '#888'} strokeWidth="1.5" />
+                <rect x={x - 14} y="135" width="28" height="55" rx="3" fill={componenteActivo === 'magneto' ? '#327874' : '#f5f5f5'} stroke={componenteActivo === 'magneto' ? '#48A9A6' : '#888'} strokeWidth="1.5" />
                 <text x={x} y="155" textAnchor="middle" fontSize="8" fontWeight="700" fill={componenteActivo === 'magneto' ? 'white' : '#333'}>{c}</text>
                 <text x={x} y="167" textAnchor="middle" fontSize="7" fill={componenteActivo === 'magneto' ? 'white' : '#666'}>{amperios}</text>
-                <text x={x} y="179" textAnchor="middle" fontSize="6" fill={componenteActivo === 'magneto' ? 'white' : '#999'}>{usos}</text>
+                <text x={x} y="179" textAnchor="middle" fontSize="6" fill={componenteActivo === 'magneto' ? 'white' : '#555'}>{usos}</text>
                 {/* Cable bajante */}
                 <line x1={x} y1="190" x2={x} y2="210" stroke="#8B4513" strokeWidth="1.5" />
                 <circle cx={x} cy="215" r="5" fill="none" stroke="#8B4513" strokeWidth="1" />
@@ -169,13 +169,13 @@ function SeccionCuadro() {
 
           {/* Leyenda colores cables */}
           <g transform="translate(25, 240)">
-            <text x="0" y="0" fontSize="10" fontWeight="700" fill="currentColor" opacity="0.7">Colores de cables:</text>
+            <text x="0" y="0" fontSize="10" fontWeight="700" className={styles.svgTexto}>Colores de cables:</text>
             <line x1="0" y1="12" x2="20" y2="12" stroke="#8B4513" strokeWidth="3" />
-            <text x="25" y="16" fontSize="9" fill="currentColor" opacity="0.6">Fase (marron)</text>
+            <text x="25" y="16" fontSize="9" className={styles.svgTexto}>Fase (marron)</text>
             <line x1="120" y1="12" x2="140" y2="12" stroke="#0066cc" strokeWidth="3" />
-            <text x="145" y="16" fontSize="9" fill="currentColor" opacity="0.6">Neutro (azul)</text>
+            <text x="145" y="16" fontSize="9" className={styles.svgTexto}>Neutro (azul)</text>
             <line x1="240" y1="12" x2="260" y2="12" stroke="#22c55e" strokeWidth="3" strokeDasharray="4,2" />
-            <text x="265" y="16" fontSize="9" fill="currentColor" opacity="0.6">Tierra (verde-amarillo)</text>
+            <text x="265" y="16" fontSize="9" className={styles.svgTexto}>Tierra (verde-amarillo)</text>
           </g>
         </svg>
       </div>
@@ -400,25 +400,26 @@ function SeccionProtecciones() {
 
           {/* Cable fase (ida) */}
           <line x1="70" y1="90" x2="180" y2="90" stroke="#8B4513" strokeWidth="3" />
-          <text x="125" y="82" textAnchor="middle" fontSize="8" fill="#8B4513" fontWeight="600">Fase (L)</text>
+          <text x="125" y="82" textAnchor="middle" fontSize="8" className={styles.svgMarron} fontWeight="600">Fase (L)</text>
 
-          {/* Diferencial */}
-          <rect x="180" y="60" width="50" height="100" rx="5" fill={modo === 'fuga' ? '#e74c3c' : '#f5f5f5'} stroke={modo === 'fuga' ? '#e74c3c' : '#999'} strokeWidth="2" />
+          {/* Diferencial. Al saltar, relleno oscurecido bajo el blanco (#B91C1C, 6,47:1) */}
+          <rect x="180" y="60" width="50" height="100" rx="5" fill={modo === 'fuga' ? '#B91C1C' : '#f5f5f5'} stroke={modo === 'fuga' ? '#e74c3c' : '#999'} strokeWidth="2" />
           <text x="205" y="105" textAnchor="middle" fontSize="9" fontWeight="700" fill={modo === 'fuga' ? 'white' : '#333'}>ID</text>
           <text x="205" y="118" textAnchor="middle" fontSize="7" fill={modo === 'fuga' ? 'white' : '#666'}>30mA</text>
           {modo === 'fuga' && (
-            <text x="205" y="50" textAnchor="middle" fontSize="11" fontWeight="800" fill="#e74c3c">SALTA!</text>
+            <text x="205" y="50" textAnchor="middle" fontSize="11" fontWeight="800" className={styles.svgRojo}>SALTA!</text>
           )}
 
           {/* Cable fase (continua) */}
           <line x1="230" y1="90" x2="320" y2="90" stroke={modo === 'fuga' ? '#ccc' : '#8B4513'} strokeWidth="3" strokeDasharray={modo === 'fuga' ? '5,5' : 'none'} />
 
           {/* Magnetotermico */}
-          <rect x="320" y="70" width="40" height="80" rx="4" fill={modo === 'cortocircuito' ? '#f39c12' : '#f5f5f5'} stroke={modo === 'cortocircuito' ? '#f39c12' : '#999'} strokeWidth="2" />
+          {/* Al saltar, relleno oscurecido bajo el blanco (#B45309, 5,02:1; con #f39c12 era 2,17) */}
+          <rect x="320" y="70" width="40" height="80" rx="4" fill={modo === 'cortocircuito' ? '#B45309' : '#f5f5f5'} stroke={modo === 'cortocircuito' ? '#f39c12' : '#999'} strokeWidth="2" />
           <text x="340" y="105" textAnchor="middle" fontSize="8" fontWeight="700" fill={modo === 'cortocircuito' ? 'white' : '#333'}>PIA</text>
           <text x="340" y="118" textAnchor="middle" fontSize="7" fill={modo === 'cortocircuito' ? 'white' : '#666'}>16A</text>
           {modo === 'cortocircuito' && (
-            <text x="340" y="60" textAnchor="middle" fontSize="11" fontWeight="800" fill="#f39c12">SALTA!</text>
+            <text x="340" y="60" textAnchor="middle" fontSize="11" fontWeight="800" className={styles.svgNaranja}>SALTA!</text>
           )}
 
           {/* Cable a carga */}
@@ -427,35 +428,36 @@ function SeccionProtecciones() {
           {/* Carga (electrodomestico) */}
           <rect x="430" y="80" width="60" height="60" rx="5" fill={modo === 'normal' ? '#e8f5e9' : '#ffebee'} stroke={modo === 'normal' ? '#27ae60' : '#e74c3c'} strokeWidth="1.5" />
           <text x="460" y="108" textAnchor="middle" fontSize="16">{modo === 'cortocircuito' ? '💥' : modo === 'fuga' ? '⚠️' : '🔌'}</text>
-          <text x="460" y="130" textAnchor="middle" fontSize="7" fill={modo === 'normal' ? '#27ae60' : '#e74c3c'}>{modo === 'normal' ? 'OK' : modo === 'fuga' ? 'Fuga' : 'Corto'}</text>
+          {/* La caja de la carga es clara en los dos temas: tinta oscura fija (6,0 y 5,9:1) */}
+          <text x="460" y="130" textAnchor="middle" fontSize="7" fill={modo === 'normal' ? '#1B6E3D' : '#B91C1C'}>{modo === 'normal' ? 'OK' : modo === 'fuga' ? 'Fuga' : 'Corto'}</text>
 
           {/* Cable neutro (vuelta) */}
           <line x1="430" y1="140" x2="230" y2="140" stroke={modo !== 'normal' ? '#ccc' : '#0066cc'} strokeWidth="2" />
           <line x1="180" y1="140" x2="70" y2="140" stroke="#0066cc" strokeWidth="2" />
-          <text x="125" y="155" textAnchor="middle" fontSize="8" fill="#0066cc" fontWeight="600">Neutro (N)</text>
+          <text x="125" y="155" textAnchor="middle" fontSize="8" className={styles.svgAzul} fontWeight="600">Neutro (N)</text>
 
           {/* Fuga a tierra */}
           {modo === 'fuga' && (
             <>
               <line x1="460" y1="140" x2="460" y2="195" stroke="#22c55e" strokeWidth="2" strokeDasharray="4,2" />
-              <text x="460" y="210" textAnchor="middle" fontSize="9" fontWeight="700" fill="#22c55e">Tierra</text>
+              <text x="460" y="210" textAnchor="middle" fontSize="9" fontWeight="700" className={styles.svgVerde}>Tierra</text>
               {/* Flecha indicando corriente de fuga */}
-              <text x="480" y="170" fontSize="8" fill="#e74c3c" fontWeight="600">30mA+</text>
+              <text x="480" y="170" fontSize="8" className={styles.svgRojo} fontWeight="600">30mA+</text>
             </>
           )}
 
           {/* Flujo de corriente normal */}
           {modo === 'normal' && (
             <>
-              <text x="125" y="100" textAnchor="middle" fontSize="8" fill="#27ae60" fontWeight="600">10A →</text>
-              <text x="125" y="135" textAnchor="middle" fontSize="8" fill="#27ae60" fontWeight="600">← 10A</text>
-              <text x="250" y="180" textAnchor="middle" fontSize="9" fill="#27ae60" fontWeight="600">Ida = Vuelta → Sin fuga</text>
+              <text x="125" y="100" textAnchor="middle" fontSize="8" className={styles.svgVerde} fontWeight="600">10A →</text>
+              <text x="125" y="135" textAnchor="middle" fontSize="8" className={styles.svgVerde} fontWeight="600">← 10A</text>
+              <text x="250" y="180" textAnchor="middle" fontSize="9" className={styles.svgVerde} fontWeight="600">Ida = Vuelta → Sin fuga</text>
             </>
           )}
 
           {/* Cortocircuito */}
           {modo === 'cortocircuito' && (
-            <text x="400" y="100" textAnchor="middle" fontSize="8" fill="#f39c12" fontWeight="700">500A!</text>
+            <text x="400" y="100" textAnchor="middle" fontSize="8" className={styles.svgNaranja} fontWeight="700">500A!</text>
           )}
         </svg>
 
