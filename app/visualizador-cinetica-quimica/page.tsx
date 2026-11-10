@@ -8,6 +8,7 @@ import LegalNotice from '@/components/LegalNotice';
 import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
+import { formatNumber } from '@/lib';
 import styles from './CineticaQuimica.module.css';
 
 // ─────────────────────────────────────────────
@@ -335,7 +336,7 @@ function SvgLineal({ eaKJ, tActual }: SvgLinealProps) {
       <polyline points={puntosStr} fill="none" stroke="#48A9A6" strokeWidth="2" strokeLinejoin="round" />
 
       <circle cx={xE(x1Act)} cy={yE(y1Act)} r="5" fill="#E74C3C" />
-      <text x={xE(x1Act)} y={padY + plotH + 12} textAnchor="middle" fontSize="8" className={styles.svgRojo}>{(x1Act * 1000).toFixed(2)}×10⁻³</text>
+      <text x={xE(x1Act)} y={padY + plotH + 12} textAnchor="middle" fontSize="8" className={styles.svgRojo}>{formatNumber(x1Act * 1000, 2)}×10⁻³</text>
     </svg>
   );
 }
@@ -641,7 +642,7 @@ export default function VisualizadorCineticaQuimica() {
 
             <div className={styles.arrheniusValorBox} role="status" aria-live="polite" aria-atomic="true">
               <strong>ln(k) relativo</strong>
-              <span>{lnK.toFixed(1)}</span>
+              <span>{formatNumber(lnK, 1)}</span>
             </div>
 
             <div className={styles.reglaPractica}>
@@ -690,10 +691,10 @@ export default function VisualizadorCineticaQuimica() {
                   onChange={(e) => setKOrden0(Number(e.target.value))}
                   aria-label="Constante de velocidad orden 0"
                 />
-                <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{kOrden0.toFixed(2)}</span>
+                <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{formatNumber(kOrden0, 2)}</span>
               </div>
               <div className={styles.ordenEjemplo}>
-                t₁/₂ = [A]₀/(2k) = <strong>{t12_0.toFixed(1)} s</strong>
+                t₁/₂ = [A]₀/(2k) = <strong>{formatNumber(t12_0, 1)} s</strong>
                 <br />Ej: descomposición catalítica superficial
               </div>
             </div>
@@ -715,10 +716,10 @@ export default function VisualizadorCineticaQuimica() {
                   onChange={(e) => setKOrden1(Number(e.target.value))}
                   aria-label="Constante de velocidad orden 1"
                 />
-                <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{kOrden1.toFixed(2)}</span>
+                <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{formatNumber(kOrden1, 2)}</span>
               </div>
               <div className={styles.ordenEjemplo}>
-                t₁/₂ = ln2/k = <strong>{t12_1.toFixed(1)} s</strong> (constante)
+                t₁/₂ = ln2/k = <strong>{formatNumber(t12_1, 1)} s</strong> (constante)
                 <br />Ej: desintegración radiactiva, hidrólisis ácida
               </div>
             </div>
@@ -740,10 +741,10 @@ export default function VisualizadorCineticaQuimica() {
                   onChange={(e) => setKOrden2(Number(e.target.value))}
                   aria-label="Constante de velocidad orden 2"
                 />
-                <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{kOrden2.toFixed(2)}</span>
+                <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', whiteSpace: 'nowrap' }}>{formatNumber(kOrden2, 2)}</span>
               </div>
               <div className={styles.ordenEjemplo}>
-                t₁/₂ = 1/(k·[A]₀) = <strong>{t12_2.toFixed(1)} s</strong> (crece con t)
+                t₁/₂ = 1/(k·[A]₀) = <strong>{formatNumber(t12_2, 1)} s</strong> (crece con t)
                 <br />Ej: reacciones bimoleculares, dimerización
               </div>
             </div>
@@ -755,15 +756,15 @@ export default function VisualizadorCineticaQuimica() {
             <div className={styles.vidaMediaValores}>
               <div className={styles.vidaMediaItem}>
                 <span>Orden 0</span>
-                <span style={{ color: 'var(--primary-texto)' }}>{t12_0.toFixed(1)} s</span>
+                <span style={{ color: 'var(--primary-texto)' }}>{formatNumber(t12_0, 1)} s</span>
               </div>
               <div className={styles.vidaMediaItem}>
                 <span>Orden 1</span>
-                <span style={{ color: 'var(--secondary-texto)' }}>{t12_1.toFixed(1)} s</span>
+                <span style={{ color: 'var(--secondary-texto)' }}>{formatNumber(t12_1, 1)} s</span>
               </div>
               <div className={styles.vidaMediaItem}>
                 <span>Orden 2</span>
-                <span className={styles.tNaranja}>{t12_2.toFixed(1)} s</span>
+                <span className={styles.tNaranja}>{formatNumber(t12_2, 1)} s</span>
               </div>
             </div>
           </div>
