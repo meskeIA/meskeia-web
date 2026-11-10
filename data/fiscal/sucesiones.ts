@@ -17,7 +17,7 @@ export const FISCAL_SUCESIONES_META = {
   fuente: 'Ley 29/1987 ISD + normativas autonómicas 2025',
   verificado: '2025-01-01',
   vigencia: '2025',
-  urlOficial: 'https://sede.agenciatributaria.gob.es/Sede/impuestos-tasas/isd.html',
+  urlOficial: 'https://www.boe.es/buscar/act.php?id=BOE-A-1987-28141',
   nota: 'Impuesto cedido a las CCAA. Verificar bonificaciones en la Agencia Tributaria de cada comunidad.',
 };
 

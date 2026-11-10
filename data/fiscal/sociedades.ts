@@ -10,14 +10,14 @@
  * para microempresas (cifra de negocio < 1M €) en sustitución del
  * antiguo tipo plano del 23%.
  * Verificado: 2026-06-10
- * URL oficial: https://sede.agenciatributaria.gob.es/Sede/impuesto-sociedades.html
+ * URL oficial: https://sede.agenciatributaria.gob.es/Sede/impuesto-sobre-sociedades.html
  */
 
 export const FISCAL_SOCIEDADES_META = {
   fuente: 'Ley 27/2014, de 27 de noviembre, del Impuesto sobre Sociedades (modificada por Ley 7/2024, de 20 de diciembre)',
   verificado: '2026-06-10',
   vigencia: '2026',
-  urlOficial: 'https://sede.agenciatributaria.gob.es/Sede/impuesto-sociedades.html',
+  urlOficial: 'https://sede.agenciatributaria.gob.es/Sede/impuesto-sobre-sociedades.html',
   nota: 'Tipo general 25% sin cambios. Las microempresas (cifra de negocio < 1M €) tributan desde 2025 por la escala progresiva de la Ley 7/2024 — ver TRAMOS_IS_MICROPYMES_2026 y calcularCuotaISMicropyme(). Las sociedades de nueva creación mantienen el 15% en los dos primeros periodos con base imponible positiva. Verificar en la Agencia Tributaria para el cálculo exacto.',
 };
 

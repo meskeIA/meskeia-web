@@ -8,7 +8,7 @@
  * Fuente: Ley 28/2022 de Fomento del Ecosistema de Empresas Emergentes (Ley de Startups)
  *         + Real Decreto 1008/2023 (Reglamento de desarrollo)
  * Verificado: 2026-06-11
- * URL oficial: https://www.inclusion.gob.es/web/migraciones/nomadas-digitales
+ * URL oficial: https://www.inclusion.gob.es/web/unidadgrandesempresas/teletrabajadores
  */
 
 import { SMI_2026 } from './smi';
@@ -18,7 +18,7 @@ export const NOMADA_DIGITAL_META = {
   descripcion: 'Visa Nómada Digital y Autorización de Residencia para Teletrabajo Internacional',
   verificado: '2026-06-11',
   vigencia: '2026',
-  urlOficial: 'https://www.inclusion.gob.es/web/migraciones/nomadas-digitales',
+  urlOficial: 'https://www.inclusion.gob.es/web/unidadgrandesempresas/teletrabajadores',
   nota: 'SMI de referencia: RD 126/2026 (1.221 €/mes, 14 pagas) — ver data/fiscal/smi.ts',
 };
 

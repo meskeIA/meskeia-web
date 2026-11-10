@@ -12,7 +12,7 @@
  *   - Plusvalía municipal: RDL 26/2021
  *
  * Verificado: 2025-01-15
- * URL oficial ITP: https://sede.agenciatributaria.gob.es/Sede/itp-ajd.html
+ * URL oficial ITP: https://www.boe.es/buscar/act.php?id=BOE-A-1993-25359
  * URL oficial IRPF plusvalías: https://sede.agenciatributaria.gob.es/Sede/procedimientoini/GI01.shtml
  */
 
@@ -23,7 +23,7 @@ export const FISCAL_INMUEBLES_META = {
   fuente: 'Real Decreto Legislativo 1/1993 (ITP y AJD) + Ley 35/2006 IRPF + Ley 37/1992 IVA + RDL 26/2021',
   verificado: '2026-06-17',
   vigencia: '2026',
-  urlOficialITP: 'https://sede.agenciatributaria.gob.es/Sede/itp-ajd.html',
+  urlOficialITP: 'https://www.boe.es/buscar/act.php?id=BOE-A-1993-25359',
   urlOficialIRPF: 'https://sede.agenciatributaria.gob.es/Sede/procedimientoini/GI01.shtml',
   nota: 'El ITP de la vivienda varía por comunidad autónoma: del 4 % (País Vasco, donde el resto de inmuebles tributa al 7 %) al 10 % de tipo general, y hasta el 13 % en el tramo más alto de las comunidades con escala progresiva (Baleares y Cataluña). Los tipos indicados son orientativos. Consulta el tipo exacto de tu CCAA antes de calcular.',
 };
@@ -87,7 +87,13 @@ export const TIPOS_AJD_2025 = {
   general:       1.5,  // % — Tipo medio orientativo (varía 0,5%-2% por CCAA)
   minimo:        0.5,  // % — Tipo mínimo
   maximo:        2.0,  // % — Tipo máximo
-  nota: 'El AJD en hipotecas lo paga la entidad financiera desde la Ley 5/2019. En escrituras de compraventa sin hipoteca, lo paga el comprador.',
+  // 10/11/2026 (cabo C0444): decía «desde la Ley 5/2019», que solo remite a la normativa
+  // tributaria (art. 14.1.e, BOE-A-2019-3814). Quien hace sujeto pasivo al prestamista es el
+  // art. 29, párrafo segundo, del TRLITPAJD (BOE-A-1993-25359) en la redacción del RDL 17/2018
+  // (BOE-A-2018-15344), vigente desde el 10/11/2018, releído en el BOE el 10/11/2026: «Cuando se
+  // trate de escrituras de préstamo con garantía hipotecaria, se considerará sujeto pasivo al
+  // prestamista».
+  nota: 'El AJD de la escritura de hipoteca lo paga la entidad financiera desde el 10/11/2018 (art. 29 del texto refundido del ITP y AJD, en la redacción del Real Decreto-ley 17/2018). En escrituras de compraventa sin hipoteca, lo paga el comprador.',
 };
 
 // ─── IVA en obra nueva ────────────────────────────────────────────────────────

@@ -11,7 +11,7 @@
  *         IRPF: Ley 35/2006 art. 60-65 (mínimos discapacidad)
  *         RDL 17/2026 (Grado III+ y nivel mínimo de protección, BOE-A-2026-13643)
  * Verificado: 2026-07-14
- * URL oficial IMSERSO: https://imserso.es/el-saad/prestaciones
+ * URL oficial IMSERSO: https://imserso.es/autonomia-personal-dependencia/sistema-autonomia-atencion-dependencia-saad
  * URL oficial SS cuidadores: https://www.seg-social.es
  */
 
@@ -23,7 +23,7 @@ export const FISCAL_DEPENDENCIA_META = {
   fuente: 'Ley 39/2006 LAPAD + LPGE 2025 + RD 1051/2013 (anexo IV en la redacción del RD 675/2023) + Orden ISM/835/2023 + RDL 17/2026',
   verificado: '2026-07-14',
   vigencia: '2025-2026',
-  urlOficial: 'https://imserso.es/el-saad/prestaciones',
+  urlOficial: 'https://imserso.es/autonomia-personal-dependencia/sistema-autonomia-atencion-dependencia-saad',
   nota: 'Las cuantías son máximas estatales. Cada CCAA puede complementar con importes adicionales. El copago reduce la prestación según capacidad económica. Datos orientativos.',
 };
 

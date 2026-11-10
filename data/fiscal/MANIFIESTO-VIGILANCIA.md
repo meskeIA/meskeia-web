@@ -84,7 +84,7 @@ la §1.0 no pide `BOE-A-`; en cuanto uno de ellos declare un importe, sí.
 | Seguridad Social — Revalorización | https://www.seg-social.es | RD de revalorización de pensiones, cuantías mín/máx | Anual (ene) |
 | INE — Tabla 72975 (IRAV) | https://www.ine.es/jaxiT3/Tabla.htm?t=72975 | Índice de referencia de arrendamientos de vivienda (mensual). IPC interanual: calculadora varipc (https://www.ine.es/varipc/), sistema base 2025. ⚠️ La antigua tabla 25171 sirve hoy el IPV (corregido 2026-07-14) | **Mensual** |
 | Ministerio de Educación — Becas | https://www.becaseducacion.gob.es | RD de umbrales y cuantías por curso académico | Anual (~jun-ago) |
-| IMSERSO / SAAD | https://imserso.es/el-saad/prestaciones | Cuantías de prestaciones de dependencia | Anual |
+| IMSERSO / SAAD | https://imserso.es/autonomia-personal-dependencia/sistema-autonomia-atencion-dependencia-saad | Cuantías de prestaciones de dependencia | Anual |
 | Consejo de Ministros (referencias) | https://www.lamoncloa.gob.es | Anticipa RDL antes de su publicación en BOE | Semanal (martes) |
 
 ### 1.1 Hasta dónde llega este contrato (y dónde deja de llegar)

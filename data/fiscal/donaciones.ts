@@ -33,7 +33,7 @@ export const FISCAL_DONACIONES_META = {
   fuente: 'Ley 29/1987 ISD (donaciones) + normativas autonómicas 2025',
   verificado: '2025-01-01',
   vigencia: '2025',
-  urlOficial: 'https://sede.agenciatributaria.gob.es/Sede/impuestos-tasas/isd.html',
+  urlOficial: 'https://www.boe.es/buscar/act.php?id=BOE-A-1987-28141',
   nota: 'El impuesto está cedido a las CCAA. Plazo general de autoliquidación: 30 días hábiles desde el día siguiente a la donación (art. 67.1.b RISD), salvo que la comunidad fije uno propio (Modelo 651).',
 };
 

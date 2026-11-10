@@ -17,7 +17,7 @@ export const FISCAL_CALENDARIO_META = {
   verificado: '2026-06-20',
   vigencia: '2026',
   urlOficial:
-    'https://sede.agenciatributaria.gob.es/Sede/ayuda/calendarios/calendario-contribuyente.html',
+    'https://sede.agenciatributaria.gob.es/Sede/calendario-contribuyente.html',
   nota: 'Plazos recurrentes. Si el último día es inhábil (fin de semana o festivo) se traslada al siguiente día hábil, y la domiciliación bancaria se cierra unos días antes. Confirma las fechas exactas del ejercicio en el calendario del contribuyente de la AEAT.',
 };
 

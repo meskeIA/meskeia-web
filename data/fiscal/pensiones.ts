@@ -181,8 +181,10 @@ export function getEscalaPorcentajePension(anioJubilacion: number): EscalaPorcen
 }
 
 // ─── Límites de pensión 2026 (euros/mes, 14 pagas) ───────────────────────────
-// Máxima: art. 1 del RD 241/2026 (BOE-A-2026-6977), 3.359,60 €/mes o 47.034,40 €/año; mínimas,
-// su Anexo I. Revalorización general de 2026: 2,7 % (art. 6). Cotejado en el BOE el 22/10/2026.
+// Máxima: art. 3.1 del RD 241/2026 (BOE-A-2026-6977), que aplica el art. 1 del RDL 3/2026:
+// 3.359,60 €/mes o 47.034,40 €/año (cita del artículo corregida el 10/11/2026, cabo C0560;
+// hasta entonces decía «art. 1 del RD», que es el del RDL); mínimas, su Anexo I. Revalorización
+// general de 2026: 2,7 % (art. 6). Cotejado en el BOE el 22/10/2026 y el art. 3.1 el 10/11/2026.
 // Se llamó LIMITES_PENSION_2025 hasta ese día con las cifras de 2026 dentro (cabo C0093).
 
 export const LIMITES_PENSION_2026 = {
@@ -438,10 +440,18 @@ export function minimoViudedad2026(edad: number, tieneCargasFamiliares: boolean,
 export const PENSION_VIUDEDAD_2026 = {
   // Porcentajes sobre la base reguladora: el 52 % y el 70 % son los apartados 1 y 2 del art. 31
   // del Decreto 3158/1966 (BOE-A-1966-21116, redacción de los RD 1465/2001 y 1795/2003), leído
-  // en el BOE el 22/10/2026. El 60 % no está en ese artículo: su fuente queda por cotejar. Hasta
-  // ese día se citaba el art. 231 LGSS, que trata del impedimento por homicidio (cabo C0134).
+  // en el BOE el 22/10/2026. Hasta ese día se citaba el art. 231 LGSS, que trata del impedimento
+  // por homicidio (cabo C0134).
+  // El 60 % es la DA 30.ª de la Ley 27/2011 (BOE-A-2011-13242), en la redacción del RDL 28/2018
+  // (BOE-A-2018-17992), vigente desde el 01/01/2019 (el 56 % de agosto de 2018 y el 60 % de 2019
+  // los fijó la DA 44.ª de la Ley 6/2018, BOE-A-2018-9268). Leída en el BOE el 10/11/2026 (cabo
+  // C0369). Requisitos, literales: a) 65 años o más; b) no tener derecho a otra pensión pública
+  // (compatible con una que no exceda del incremento, que se abona por la diferencia); c) «No
+  // percibir ingresos por la realización de trabajo por cuenta ajena o por cuenta propia»; d) que
+  // las demás rentas no superen el límite de ingresos de la pensión mínima de viudedad. NO es
+  // «rentas < SMI», que es lo que aplica hoy el motor: cabo C0701, para /reparar.
   porcentajeGeneral:       52,   // % — Caso general
-  porcentaje60:            60,   // % — ≥65 años sin otra pensión pública y rentas < SMI
+  porcentaje60:            60,   // % — ≥65, sin otra pensión pública, sin ingresos del trabajo y demás rentas ≤ límite de la mínima de viudedad (DA 30.ª Ley 27/2011)
   porcentaje70:            70,   // % — art. 31.2-31.3: cargas (renta familiar por miembro ≤ 75 % SMI), pensión ingreso principal y rentas bajo límite (motor: lib/calculadoras/pensionViudedad.ts)
 
   // SMI 2026 mensual (14 pagas, RD 126/2026 — ver data/fiscal/smi.ts)

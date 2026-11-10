@@ -9,14 +9,14 @@
  * artículo 12.1 (tabla de coeficientes de amortización lineal y métodos
  * de amortización degresiva admitidos: porcentaje constante y números dígitos).
  * Verificado: 2026-06-18
- * URL oficial: https://sede.agenciatributaria.gob.es/Sede/impuesto-sociedades.html
+ * URL oficial: https://sede.agenciatributaria.gob.es/Sede/impuesto-sobre-sociedades.html
  */
 
 export const FISCAL_AMORTIZACION_META = {
   fuente: 'Ley 27/2014, de 27 de noviembre, del Impuesto sobre Sociedades (art. 12.1)',
   verificado: '2026-06-18',
   vigencia: '2026',
-  urlOficial: 'https://sede.agenciatributaria.gob.es/Sede/impuesto-sociedades.html',
+  urlOficial: 'https://sede.agenciatributaria.gob.es/Sede/impuesto-sobre-sociedades.html',
   nota: 'Coeficientes de la tabla oficial de amortización del art. 12.1.a LIS (selección de los elementos más habituales). El coeficiente lineal máximo marca la amortización más rápida admitida; el período máximo, la más lenta. La amortización degresiva por porcentaje constante (art. 12.1.b) no es aplicable a edificios, mobiliario y enseres.',
 };
 

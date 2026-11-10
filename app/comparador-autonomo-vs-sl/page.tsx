@@ -434,7 +434,7 @@ export default function ComparadorAutonomoVsSLPage() {
           <a href={FISCAL_IRPF_META.urlOficial} target="_blank" rel="noopener noreferrer">
             {FISCAL_IRPF_META.fuente}
           </a>{' '}y{' '}
-          <a href="https://sede.agenciatributaria.gob.es/Sede/impuesto-sociedades.html" target="_blank" rel="noopener noreferrer">
+          <a href="https://sede.agenciatributaria.gob.es/Sede/impuesto-sobre-sociedades.html" target="_blank" rel="noopener noreferrer">
             {FISCAL_SOCIEDADES_META.fuente}
           </a>. La decisión real autónomo vs SL depende de factores no incluidos:
         </p>

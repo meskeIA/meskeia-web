@@ -81,6 +81,15 @@ export const ORDEN_MODULOS_VIGENTE = {
  * rendimiento neto de módulos obtenido en 2026 en un 5 por ciento» (DA 1.ª.1), y se tiene
  * en cuenta también en los pagos fraccionados (DA 1.ª.3). Es transitoria: la fija cada
  * Orden para su ejercicio, así que al re-sellar hay que leer la del año siguiente.
+ *
+ * 10/11/2026 — la del año siguiente ya está: Orden HAC/1161/2026, de 4 de noviembre
+ * (BOE-A-2026-23174, ejercicio 2027), leída en el BOE ese día. DA 1.ª.1: «podrán reducir el
+ * rendimiento neto de módulos obtenido en 2027 en un 5 por ciento», también en los pagos
+ * fraccionados (DA 1.ª.3): el porcentaje NO cambia. Su art. 3.1 a) remite los límites a «el
+ * previsto, para el período impositivo 2027» en el art. 31.1.3.ª LIRPF, sin cifras, y la DT 32.ª
+ * consolidada sigue sin prórroga (última actualización del bloque: 28/02/2026). Esta constante
+ * y ORDEN_MODULOS_VIGENTE siguen en 2026 hasta el 01/01/2027, porque rigen el ejercicio en curso;
+ * el cambio de ejercicio y los límites de 2027 (criterio de la AEAT) van a la revisión de enero.
  */
 export const REDUCCION_GENERAL_MODULOS = {
   porcentaje: 5,

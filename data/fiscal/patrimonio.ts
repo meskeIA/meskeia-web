@@ -16,7 +16,7 @@ export const FISCAL_PATRIMONIO_META = {
   fuente: 'Ley 19/1991 del Impuesto sobre el Patrimonio (Art. 31) + normativa autonómica + Ley 38/2022 ITSGF',
   verificado: '2025-01-15',
   vigencia: '2025',
-  urlOficial: 'https://sede.agenciatributaria.gob.es/Sede/iae-iva-otros-impuestos/impuesto-sobre-patrimonio.html',
+  urlOficial: 'https://sede.agenciatributaria.gob.es/Sede/declaraciones-informativas-otros-impuestos-tasas/impuesto-sobre-patrimonio.html',
   nota: 'Las bonificaciones autonómicas pueden modificarse cada ejercicio. Verifica con tu CCAA antes de tomar decisiones.',
 };
 
@@ -51,7 +51,7 @@ export const ITSGF_META = {
   fuente: 'Ley 38/2022 — Impuesto Temporal de Solidaridad de las Grandes Fortunas',
   verificado: '2025-01-15',
   vigencia: '2025 (prorrogado)',
-  urlOficial: 'https://sede.agenciatributaria.gob.es/Sede/iae-iva-otros-impuestos/impuesto-solidaridad-grandes-fortunas.html',
+  urlOficial: 'https://sede.agenciatributaria.gob.es/Sede/declaraciones-informativas-otros-impuestos-tasas/impuesto-temporal-solidaridad-grandes-fortunas.html',
   nota: 'Aplica a patrimonios netos > 3M€. Coordinado con IP autonómico: si pagas IP, descuentas la cuota del ITSGF. Pensado para CCAA con bonificación 100%.',
 };
 
