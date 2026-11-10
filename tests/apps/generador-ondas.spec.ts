@@ -661,9 +661,15 @@ test('HALLAZGO — al salir a otra app, rampa de la ganancia a 0 antes de stop()
  * Medido (44,1 kHz): eventos de la ganancia = setValueAtTime(0,5; 0) · start() ·
  * setValueAtTime(0,5; 0,0203); amplitud emitida a los 5/10/20/50 ms del arranque: 0,500 en
  * todos. Con la rampa del patrón reparado (0 → 0,5 en 0,1 s) serían ≈ 0,03 · 0,06 · 0,11 · 0,26.
+ *
+ * Espera 0,3 s de reloj de audio, no 0,15 (10/11/2026): desde ac4c00baf el oscilador arranca
+ * ARRANQUE_S = 20 ms por delante del currentTime del start(), así que la primera muestra cae en
+ * inicio + 0,02 y el «volumen asentado» se mide en inicio + 0,16, fuera de una captura de 0,15 s:
+ * leía 0 o 0,5 según cuánto se alargara el sondeo (suite de la tanda de /reparar, 2 de 3 aislado).
+ * 0,3 s sigue dentro de la ventana del analizador (32.768 muestras, ≥ 0,68 s), con el arranque.
  */
 test('HALLAZGO — Reproducir entra con rampa desde 0, no en escalón', async ({ page }) => {
-  const inicio = await reproducir(page, 0.15);
+  const inicio = await reproducir(page, 0.3);
   const c = await capturar(page);
   const primera = c.x.findIndex((v) => Math.abs(v) > 1e-6);
   expect(primera, 'la captura tiene que empezar en silencio').toBeGreaterThan(0);
