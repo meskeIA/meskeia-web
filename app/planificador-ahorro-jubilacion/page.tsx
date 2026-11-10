@@ -694,7 +694,7 @@ export default function PlanificadorAhorroJubilacionPage() {
 
           <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
-              <span className={styles.warningIcon}>⚠️</span>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               <strong>Errores frecuentes al planificar el ahorro</strong>
             </div>
             <ul className={styles.warningList}>

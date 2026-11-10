@@ -1025,7 +1025,7 @@ export default function ContrasteColoresPage() {
         {/* WARNING BOX: Errores comunes */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <h3>Errores Comunes que Rompen Accesibilidad</h3>
           </div>
           <ul className={styles.warningList}>
