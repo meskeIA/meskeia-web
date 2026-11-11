@@ -15,8 +15,9 @@ import { esperarPaginaAsentada, esperarValorEnReact } from './_hidratacion';
  *   app/etiqueta-dgt/motor.ts — `clasificar` y `FECHAS_DGT`, sin React. Pide combustible; el año
  *   para gasolina, diésel y gas; el mes solo para el diésel de 2015; y para el PHEV, si la autonomía
  *   es «de 40 km o más». El HEV pide el año como el gas (CASO 34); el BEV no pide nada más.
- *   Los datos de acceso por ciudad (CIUDADES_ZBE) y la mención de la ayuda Auto+ están en page.tsx;
- *   la ayuda sale de data/fiscal/ayudas-vehiculo.ts (AYUDA_AUTO_PLUS_2026, FISCAL_AYUDAS_VEHICULO_META).
+ *   Los datos de acceso por ciudad (CIUDADES_ZBE) están en app/etiqueta-dgt/zbe.ts, que lee también
+ *   /api/chatgpt/etiqueta-dgt; la mención de la ayuda Auto+, en page.tsx, y la ayuda sale de
+ *   data/fiscal/ayudas-vehiculo.ts (AYUDA_AUTO_PLUS_2026, FISCAL_AYUDAS_VEHICULO_META).
  *
  * LAS FUENTES (leídas en sesión, no de memoria)
  *   · DGT, «Distintivo ambiental» (consultada el 25/09 y el 04/10/2026)
@@ -77,6 +78,26 @@ import { esperarPaginaAsentada, esperarValorEnReact } from './_hidratacion';
  *   CASO 34 bajo   · el HEV sale ECO sin pedir el año; la ECO exige cumplir la C, como al gas.
  *   CASO 35 bajo   · el botón se ve «Consultar mi etiqueta DGT» y se llama «Calcular etiqueta…».
  *   CASO 36 bajo   · el JSON-LD dice FinanceApplication y features vacías; el meta, Utility.
+ *
+ * CABO C0037 (11/11/2026, modo cabo): lo que la re-inspección dejó sin anclar. ABIERTOS (test.fail)
+ *   Fuentes leídas en sesión, solo las del BOE (dgt.es, madrid.es y los ayuntamientos no están en la
+ *   red de fuentes de la tarea):
+ *   · RD 1052/2022, de zonas de bajas emisiones (BOE-A-2022-22689): art. 5.2, las restricciones
+ *     usan «la clasificación establecida en el anexo II.E del Real Decreto 2822/1998»; art. 15, no
+ *     respetarlas es infracción grave del art. 76 z3) LTSV. No habla del distintivo ni de cámaras.
+ *   · Orden PCI/810/2018 (RGV anexo II, V-25.2): «La Administración competente podrá establecer la
+ *     obligatoriedad de la colocación del distintivo en el vehículo», en su instrumento normativo.
+ *   · RDL 6/2015 (LTSV), art. 76 z3): «No respetar las restricciones de circulación derivadas de la
+ *     aplicación de los protocolos ante episodios de contaminación y de las zonas de bajas
+ *     emisiones». Ninguna infracción de los arts. 75-77 es no llevar el distintivo ambiental.
+ *   · RD 1428/2003 (RGC), art. 35.2: los VAO van «ocupados por el número de personas que para cada
+ *     tramo de la red viaria se fije»; la autoridad, «en circunstancias no habituales», «podrá
+ *     permitir, recomendar u ordenar a otros vehículos la utilización del carril reservado». No
+ *     nombra la ECO, la CERO ni la clasificación ambiental.
+ *   CASO 37 medio  · Valencia, Sevilla, Zaragoza y Valladolid: reglas municipales sin fuente («a 2025»).
+ *   CASO 38 bajo   · las plazas SER de Madrid para la CERO y la ECO, sin fuente ni fecha.
+ *   CASO 39 medio  · el BUS-VAO «con al menos un ocupante» para la ECO (y la CERO), sin fuente.
+ *   CASO 40 bajo   · la FAQ 5: sin el distintivo visible «las cámaras … pueden multar».
  */
 
 const RUTA = '/etiqueta-dgt/';
@@ -132,6 +153,21 @@ async function consultar(
   }
   // Por su tipo y no por su nombre: el nombre accesible es justo lo que discute el CASO 35.
   await page.locator('form button[type="submit"]').click();
+}
+
+/** Una fecha en formato español (dd/mm/aaaa): la de verificación de una regla municipal. */
+const FECHA_ES = /\b\d{2}\/\d{2}\/\d{4}\b/;
+
+/** Las ciudades que el cabo C0037 dejó sin anclar a una fuente. */
+const CIUDADES_SIN_ANCLAR = ['Valencia', 'Sevilla', 'Zaragoza', 'Valladolid'] as const;
+
+/** Cada recomendación del resultado que nombra `texto` lleva la fecha de su fuente; si no hay ninguna, vale. */
+async function recomendacionesConFecha(page: Page, texto: string | RegExp): Promise<void> {
+  const tarjetas = resultado(page).locator('[class*="recomendacionCard"]', { hasText: texto });
+  const n = await tarjetas.count();
+  for (let i = 0; i < n; i++) {
+    await expect(tarjetas.nth(i), String(texto)).toContainText(FECHA_ES, { timeout: 3000 });
+  }
 }
 
 /** El FAQPage del JSON-LD, como texto. */
@@ -681,6 +717,98 @@ test.describe('etiqueta-dgt — la etiqueta que da la DGT', () => {
     // DEBERÍA: la misma categoría que el meta (UtilityApplication). Obtenido: FinanceApplication.
     expect(jsonLd?.applicationCategory).toBe(meta?.applicationCategory);
     expect(Array.isArray(jsonLd?.featureList) ? (jsonLd?.featureList as unknown[]).length : 0).toBeGreaterThanOrEqual(4);
+  });
+
+  // ───────────────────────── Cabo C0037 (11/11/2026): lo que quedaba sin anclar ─────────────────────────
+
+  /**
+   * CASO 37 (medio, dato) — ABIERTO: CIUDADES_ZBE (zbe.ts, que sirve también a
+   * /api/chatgpt/etiqueta-dgt) da reglas municipales de Valencia, Sevilla, Zaragoza y Valladolid
+   * sin fuente: la cabecera de zbe.ts solo cita madrid.es y el AMB (04/10/2026), y la nota bajo
+   * las tarjetas dice «Información orientativa a 2025». El RD 1052/2022 (art. 5.2) deja las
+   * restricciones a cada ayuntamiento, y ninguna de esas ordenanzas está en el BOE.
+   * DEBERÍA: cada regla con su fuente y su fecha, como Madrid y Barcelona, o la ciudad retirada.
+   * Obtenido (B, diésel 2010): Valencia «⚠ Con restricciones · Restricciones de circulación en el
+   * área central…», Zaragoza «⚠ Con restricciones · Restricciones en determinados horarios y días
+   * laborables en la ZBE del centro.»; (sin etiqueta, diésel 2000): Sevilla «… Se prevé prohibición
+   * total en 2025-2026.» a 11/11/2026, y Zaragoza «Control automático mediante cámaras en los
+   * accesos.» (la guía educativa repite: «Zaragoza y Valladolid también han implantado sistemas de
+   * control automático en los accesos a sus ZBE.»).
+   * Si la reparación pone la fuente fuera de la tarjeta (una nota común), este caso se adapta a ella.
+   */
+  test('CASO 37 · las reglas de Valencia, Sevilla, Zaragoza y Valladolid llevan fuente y fecha, o no salen', async ({ page }) => {
+    test.fail();
+    const comprobar = async (): Promise<void> => {
+      for (const ciudad of CIUDADES_SIN_ANCLAR) {
+        const tarjeta = tarjetaCiudad(page, ciudad);
+        if ((await tarjeta.count()) === 0) continue; // retirada: también vale
+        await expect(tarjeta, ciudad).toContainText(FECHA_ES, { timeout: 3000 });
+      }
+    };
+    await consultar(page, 'diesel', { anio: 2000 });
+    await expect(tituloResultado(page)).toHaveText('Sin etiqueta');
+    await expect(resultado(page)).not.toContainText('Se prevé prohibición total en 2025-2026', { timeout: 3000 });
+    await comprobar();
+    await consultar(page, 'diesel', { anio: 2010 });
+    await expect(tituloResultado(page)).toHaveText('Etiqueta B');
+    await comprobar();
+  });
+
+  /**
+   * CASO 38 (bajo, dato) — ABIERTO: las recomendaciones de la CERO («En Madrid puedes aparcar
+   * gratuitamente en zona SER los primeros 120 minutos (residentes de otras zonas) con autorización
+   * previa.») y de la ECO («En Madrid, la etiqueta ECO permite aparcar en zona SER con beneficios…»)
+   * son reglas de la ordenanza municipal de Madrid, sin fuente ni fecha en la app ni en zbe.ts.
+   * DEBERÍA: fuente y fecha de la regla del SER, o retirarla/matizarla.
+   */
+  test('CASO 38 · las plazas SER de Madrid para la CERO y la ECO llevan fuente y fecha, o no se afirman', async ({ page }) => {
+    test.fail();
+    await consultar(page, 'bev');
+    await expect(tituloResultado(page)).toHaveText('Etiqueta CERO');
+    await recomendacionesConFecha(page, 'zona SER');
+    await consultar(page, 'hev', { anio: 2018 });
+    await expect(tituloResultado(page)).toHaveText('Etiqueta ECO');
+    await recomendacionesConFecha(page, 'zona SER');
+  });
+
+  /**
+   * CASO 39 (medio, dato) — ABIERTO: la ECO dice «En Madrid, la etiqueta ECO permite … acceder a
+   * carriles BUS+VAO con al menos un ocupante.» (todo coche lleva al menos al conductor), y la CERO
+   * «Accedes a todos los beneficios ZBE, carriles BUS+VAO…». El RGC (RD 1428/2003, art. 35.2) fija
+   * la ocupación «para cada tramo de la red viaria» y solo deja a la autoridad permitir «a otros
+   * vehículos» el carril «en circunstancias no habituales»: no nombra la ECO ni la CERO.
+   * DEBERÍA: la fuente y la fecha de la autorización (qué carril, qué etiqueta, con cuántos
+   * ocupantes), o no afirmarla.
+   */
+  test('CASO 39 · el BUS-VAO para la ECO y la CERO lleva la fuente de su autorización, o no se afirma', async ({ page }) => {
+    test.fail();
+    await consultar(page, 'hev', { anio: 2018 });
+    await expect(tituloResultado(page)).toHaveText('Etiqueta ECO');
+    await expect(resultado(page)).not.toContainText('con al menos un ocupante', { timeout: 3000 });
+    await recomendacionesConFecha(page, /BUS[+-]VAO/);
+    await consultar(page, 'bev');
+    await expect(tituloResultado(page)).toHaveText('Etiqueta CERO');
+    await recomendacionesConFecha(page, /BUS[+-]VAO/);
+  });
+
+  /**
+   * CASO 40 (bajo, contenido) — ABIERTO: la FAQ «¿La etiqueta DGT es obligatoria para circular?»
+   * (solo en el FAQPage: la página no pinta FAQ visible) dice que el distintivo es «imprescindible
+   * para acceder a las Zonas de Bajas Emisiones» y que «Sin ella visible en el parabrisas, los
+   * agentes o cámaras de control pueden multar al vehículo incluso si técnicamente le corresponde
+   * una categoría que permite el acceso». BOE: la Orden PCI/810/2018 (RGV anexo II, V-25.2) dice
+   * que «La Administración competente podrá establecer la obligatoriedad de la colocación del
+   * distintivo», y la LTSV (art. 76 z3) sanciona «No respetar las restricciones de circulación …
+   * de las zonas de bajas emisiones»; ninguna infracción estatal es no llevarlo.
+   * DEBERÍA: que llevarlo es obligatorio donde la ordenanza lo exija, y que lo que sanciona la ley
+   * es entrar sin la clasificación que pide la ZBE.
+   */
+  test('CASO 40 · la FAQ no da por sancionable en general no llevar el distintivo a la vista', async ({ page }) => {
+    test.fail();
+    const faq = await faqJsonLd(page);
+    expect(faq).toContain('FAQPage');
+    expect(faq).not.toMatch(/imprescindible para acceder a las Zonas de Bajas Emisiones/);
+    expect(faq).not.toMatch(/cámaras de control pueden multar al vehículo incluso si técnicamente/);
   });
 });
 

@@ -55,6 +55,35 @@ import { sembrarValor } from './_hidratacion';
  * CABO C0508 (el botón del espejo se llamaba solo «✓ Activado»): NO se confirma. Desde
  * 443763725 (30/10/2026) el <label htmlFor="espejo"> apunta al botón, y Chromium lo nombra
  * «Espejo:» con aria-pressed. Queda como candado de regresión.
+ *
+ * INSPECCIÓN DE CAMBIO (11/11/2026, tras 532a9704f y 15c76e745). Esperados escritos antes de
+ * ejecutar; los bloques «CAMBIO …» de abajo son esos casos.
+ *
+ *   VISTA PREVIA. Cámara falsa de Chromium (1920 × 1080). La caja mide 100 % de ancho y toma
+ *     `aspect-ratio: 1920 / 1080` del flujo, con `max-height: 70vh` y `object-fit: contain`:
+ *       escritorio 1280 × 720  → ancho 1200 − 2·24 − 2·24 = 1104; alto min(1104·1080/1920 = 621,
+ *                                0,7·720 = 504) = 504: manda el alto máximo y el fotograma se
+ *                                pinta entero (896 × 504) con bandas. Medido: 1104 × 504.  PASA
+ *       escritorio 1920 × 1080 → 1104 × 621, proporción de la caja = la del flujo, 1,778.   PASA
+ *       Pixel 7 (412 × 839)    → 412 − 2·16 − 2·24 = 332; 332·1080/1920 = 186,75 < 587.    PASA
+ *   FOTO CON LOS AJUSTES DE AHORA (cámara de mitades 50 | 200; filtros como en el CASO 2):
+ *       espejo off + brillo 150          → izquierda 75, derecha 255                     PASA
+ *       espejo on + contraste 50         → (v − 127,5)·0,5 + 127,5: 50→88,75, 200→163,75;
+ *                                          volteada: izquierda ≈ 164, derecha ≈ 89 (sale 163/88) PASA
+ *       «Foto 3s» y brillo a 50 DURANTE la cuenta (espejo on) → 50→25, 200→100; volteada:
+ *                                          izquierda 100, derecha 25                      PASA
+ *       «Foto 3s» dos veces seguidas     → una sola foto                                  PASA
+ *       «Foto 3s», «Detener» e «Iniciar» → ninguna foto ni cuenta en pantalla             PASA
+ *   CAMBIO DE CÁMARA (medido en un script con `device-count=2`, no cabe en este fichero sin
+ *     otro worker): 1 apertura sin deviceId; elegir la otra → 2.ª con `exact`, 1 sola viva y con
+ *     ese deviceId; volver → 3.ª; «Detener» → 0 vivas. PASA.
+ *   PERMISO DENEGADO DE VERDAD (script con `--use-fake-ui-for-media-stream=deny`, sin sustituir
+ *     getUserMedia): «NotAllowedError | Permission denied», el aviso en español en el role="alert"
+ *     de la caja y «Iniciar Cámara» visible. PASA. Aquí se reproduce con ese name y message.
+ *   DOBLE CLIC en «Iniciar Cámara» a ritmo humano (150 ms) con una cámara que tarda 400 ms en
+ *     abrir (una webcam real tarda cientos de ms): esperado 1 pista viva y 0 tras «Detener».
+ *     Sale 2 getUserMedia, 2 vivas y 1 VIVA tras «Detener», en escritorio y con doble toque en el
+ *     Pixel 7 (4 de 4 rondas): la luz de la cámara sigue encendida. HALLAZGO ABIERTO.
  */
 
 test.use({
@@ -73,6 +102,7 @@ test.beforeEach(() => {
 /** Lo que las sustituciones de getUserMedia dejan colgado de window para poder contarlo. */
 interface Ventana {
   __aperturas: MediaStream[];
+  __llamadas?: number;
 }
 
 const CONTENEDOR = '[class*="_videoContainer"]';
@@ -115,6 +145,92 @@ async function registrarAperturas(page: Page): Promise<void> {
       return flujo;
     };
   });
+}
+
+/**
+ * Como registrarAperturas, pero la cámara falsa tarda `ms` en abrir, como una webcam real
+ * (cientos de ms): es la ventana en la que cabe el segundo clic de un doble clic.
+ */
+async function registrarAperturasLentas(page: Page, ms: number): Promise<void> {
+  await page.addInitScript((retraso: number) => {
+    const w = window as unknown as Ventana;
+    w.__aperturas = [];
+    w.__llamadas = 0;
+    const original = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
+    navigator.mediaDevices.getUserMedia = async (c?: MediaStreamConstraints): Promise<MediaStream> => {
+      w.__llamadas = (w.__llamadas ?? 0) + 1;
+      await new Promise((r) => window.setTimeout(r, retraso));
+      const flujo = await original(c);
+      w.__aperturas.push(flujo);
+      return flujo;
+    };
+  }, ms);
+}
+
+/** Pistas que siguen vivas entre todas las que se abrieron. */
+async function pistasVivas(page: Page): Promise<number> {
+  return page.evaluate(
+    () => (window as unknown as Ventana).__aperturas.flatMap((f) => f.getTracks()).filter((p) => p.readyState === 'live').length,
+  );
+}
+
+/** Dos clics (o dos toques) en «Iniciar Cámara» separados 150 ms: un doble clic humano. */
+async function dobleClicHumano(page: Page, tocar: boolean): Promise<void> {
+  const boton = iniciar(page);
+  await boton.scrollIntoViewIfNeeded();
+  await page.waitForTimeout(300);
+  const caja = await boton.boundingBox();
+  if (!caja) throw new Error('«Iniciar Cámara» no tiene caja en pantalla.');
+  const x = caja.x + caja.width / 2;
+  const y = caja.y + caja.height / 2;
+  if (tocar) await page.touchscreen.tap(x, y);
+  else await page.mouse.click(x, y);
+  await page.waitForTimeout(150);
+  if (tocar) await page.touchscreen.tap(x, y);
+  else await page.mouse.click(x, y);
+}
+
+interface VistaPrevia {
+  readyState: number;
+  videoW: number;
+  videoH: number;
+  objectFit: string;
+  aspectRatio: string;
+  cajaW: number;
+  cajaH: number;
+  alto70vh: number;
+}
+
+/** La caja de la vista previa frente al flujo que pinta. */
+async function medirVistaPrevia(page: Page): Promise<VistaPrevia> {
+  return page.evaluate((sel) => {
+    const v = document.querySelector('video') as HTMLVideoElement;
+    const contenedor = document.querySelector(sel) as HTMLElement;
+    const caja = contenedor.getBoundingClientRect();
+    return {
+      readyState: v.readyState,
+      videoW: v.videoWidth,
+      videoH: v.videoHeight,
+      objectFit: getComputedStyle(v).objectFit,
+      aspectRatio: contenedor.style.aspectRatio,
+      cajaW: caja.width,
+      cajaH: caja.height,
+      alto70vh: window.innerHeight * 0.7,
+    };
+  }, CONTENEDOR);
+}
+
+/**
+ * Lo que tiene que cumplir la vista previa tras 532a9704f: contain (el fotograma entero), la caja
+ * con la proporción del flujo y, si esa proporción pide más alto que 70vh, el alto máximo.
+ */
+function comprobarVistaPrevia(m: VistaPrevia): void {
+  expect(m.readyState).toBeGreaterThanOrEqual(2);
+  expect(m.videoW).toBeGreaterThan(0);
+  expect(m.objectFit).toBe('contain');
+  expect(m.aspectRatio).toBe(`${m.videoW} / ${m.videoH}`);
+  const altoEsperado = Math.min((m.cajaW * m.videoH) / m.videoW, m.alto70vh);
+  expect(Math.abs(m.cajaH - altoEsperado), `caja ${m.cajaW} × ${m.cajaH}, alto esperado ${altoEsperado}`).toBeLessThanOrEqual(1);
 }
 
 /**
@@ -180,8 +296,8 @@ async function arrancar(page: Page, tocar = false): Promise<void> {
       { timeout: 15000 },
     )
     .toBe(true);
-  // La app reabre la cámara una vez al poco de arrancar (ver el hallazgo de las dos aperturas):
-  // se deja asentar antes de medir
+  // Hasta 532a9704f la app reabría la cámara al poco de arrancar (hallazgo 4430, reparado); la
+  // espera se queda para medir con la vista ya asentada
   await page.waitForTimeout(1200);
 }
 
@@ -320,6 +436,52 @@ test.describe('Escritorio · el medio arranca de verdad y se libera', () => {
     await page.waitForTimeout(1500);
     expect(await page.evaluate(() => (window as unknown as Ventana).__aperturas.length)).toBe(1);
   });
+
+  test('CAMBIO 532a9704f · a 1280 × 720 la vista previa no recorta: contain, proporción del flujo y el alto máximo de 70vh (1104 × 504)', async ({
+    page,
+  }) => {
+    // Esperado en la cabecera (VISTA PREVIA): 1104·1080/1920 = 621 > 0,7·720 = 504, así que manda
+    // el alto máximo y el fotograma 1920 × 1080 se pinta entero (896 × 504) con bandas.
+    await registrarAperturas(page);
+    await arrancar(page);
+    const m = await medirVistaPrevia(page);
+    comprobarVistaPrevia(m);
+    expect([m.videoW, m.videoH]).toEqual([1920, 1080]);
+    expect(Math.round(m.cajaH)).toBe(504);
+  });
+
+  test('HALLAZGO (11/11/2026, ABIERTO) · un doble clic en «Iniciar Cámara» con una cámara que tarda 400 ms deja una pista VIVA tras «Detener» (esperado 0)', async ({
+    page,
+  }) => {
+    // ABIERTO: startCamera es async y el botón sigue siendo «Iniciar Cámara» hasta que
+    // getUserMedia resuelve; las dos llamadas ven streamRef.current === null, la segunda pisa a la
+    // primera en streamRef y nadie para la primera. Medido: 2 getUserMedia, 2 pistas vivas y 1 viva
+    // tras «Detener» (4 de 4 rondas): la luz de la cámara sigue encendida y, donde el sistema da la
+    // cámara a una sola app, Zoom o Teams la encuentran ocupada hasta cerrar la pestaña.
+    test.fail();
+    await registrarAperturasLentas(page, 400);
+    await abrir(page);
+    await dobleClicHumano(page, false);
+    await expect(detener(page)).toBeVisible();
+    await page.waitForTimeout(1500);
+    await detener(page).click();
+    await expect(iniciar(page)).toBeVisible();
+    await page.waitForTimeout(800);
+    expect(await pistasVivas(page)).toBe(0);
+  });
+});
+
+test.describe('Escritorio 1920 × 1080 · la caja toma la proporción del flujo', () => {
+  test.use({ viewport: { width: 1920, height: 1080 } });
+
+  test('CAMBIO 532a9704f · sin alto máximo que mande, la caja es 1104 × 621, la proporción 1920 / 1080 del flujo', async ({ page }) => {
+    await registrarAperturas(page);
+    await arrancar(page);
+    const m = await medirVistaPrevia(page);
+    comprobarVistaPrevia(m);
+    expect(m.cajaH).toBeLessThan(m.alto70vh);
+    expect(m.cajaW / m.cajaH).toBeCloseTo(m.videoW / m.videoH, 2);
+  });
 });
 
 test.describe('Escritorio · la foto de prueba', () => {
@@ -390,6 +552,80 @@ test.describe('Escritorio · la foto de prueba', () => {
     );
     expect(vacias).toBe(0);
     await expect(page.locator(FOTOS)).toHaveCount(0);
+  });
+
+  test('CAMBIO 532a9704f · la foto lee los ajustes de AHORA: espejo desactivado + brillo 150 → 75/255', async ({ page }) => {
+    // Sin voltear: 50·1,5 = 75 a la izquierda; 200·1,5 = 300, recortado a 255, a la derecha
+    await camaraDeMitades(page, 640, 480);
+    await arrancar(page);
+    await abrirAjustes(page);
+    await page.getByRole('button', { name: /^Espejo/ }).click();
+    await expect(page.getByRole('button', { name: /^Espejo/ })).toHaveAttribute('aria-pressed', 'false');
+    await sembrarValor(page, '#brillo', 150);
+    await expect(page.locator('label[for="brillo"]')).toHaveText('Brillo: 150 %');
+    await hacerFoto(page);
+    const f = await analizarUltimaFoto(page);
+    expect(Math.abs(f.izquierda - 75), `izquierda ${f.izquierda}`).toBeLessThanOrEqual(3);
+    expect(Math.abs(f.derecha - 255), `derecha ${f.derecha}`).toBeLessThanOrEqual(3);
+  });
+
+  test('CAMBIO 532a9704f · la foto lee los ajustes de AHORA: espejo activado + contraste 50 → 164/89 volteada', async ({ page }) => {
+    // (v − 127,5)·0,5 + 127,5: 50 → 88,75 y 200 → 163,75; volteada, la clara a la izquierda.
+    // Medido 163/88 (Chromium trunca): tolerancia 3
+    await camaraDeMitades(page, 640, 480);
+    await arrancar(page);
+    await abrirAjustes(page);
+    await sembrarValor(page, '#contraste', 50);
+    await expect(page.locator('label[for="contraste"]')).toHaveText('Contraste: 50 %');
+    await hacerFoto(page);
+    const f = await analizarUltimaFoto(page);
+    expect(Math.abs(f.izquierda - 164), `izquierda ${f.izquierda}`).toBeLessThanOrEqual(3);
+    expect(Math.abs(f.derecha - 89), `derecha ${f.derecha}`).toBeLessThanOrEqual(3);
+  });
+
+  test('CAMBIO 532a9704f · «Foto 3s» captura con el brillo que hay al llegar a cero (puesto a 50 durante la cuenta → 100/25)', async ({
+    page,
+  }) => {
+    // La cuenta atrás lee capturaRef al terminar: brillo 50 → 50·0,5 = 25 y 200·0,5 = 100;
+    // con el espejo de inicio, volteada: 100 a la izquierda y 25 a la derecha
+    await camaraDeMitades(page, 640, 480);
+    await arrancar(page);
+    await abrirAjustes(page);
+    await page.getByRole('button', { name: /Foto 3s/ }).click();
+    await expect(page.locator(CUENTA_ATRAS)).toBeVisible();
+    await sembrarValor(page, '#brillo', 50);
+    await expect(page.locator(FOTOS)).toHaveCount(1, { timeout: 8000 });
+    const f = await analizarUltimaFoto(page);
+    expect(Math.abs(f.izquierda - 100), `izquierda ${f.izquierda}`).toBeLessThanOrEqual(3);
+    expect(Math.abs(f.derecha - 25), `derecha ${f.derecha}`).toBeLessThanOrEqual(3);
+  });
+
+  test('CAMBIO 532a9704f · «Foto 3s» pulsado dos veces seguidas deja UNA foto (la segunda reinicia la cuenta)', async ({ page }) => {
+    await camaraDeMitades(page, 640, 480);
+    await arrancar(page);
+    const conCuenta = page.getByRole('button', { name: /Foto 3s/ });
+    await conCuenta.click();
+    await page.waitForTimeout(300);
+    await conCuenta.click();
+    await expect(page.locator(FOTOS)).toHaveCount(1, { timeout: 8000 });
+    await page.waitForTimeout(1500);
+    await expect(page.locator(FOTOS)).toHaveCount(1);
+  });
+
+  test('CAMBIO 532a9704f · «Foto 3s», «Detener» e «Iniciar» antes de que acabe la cuenta: ninguna foto ni cuenta en pantalla', async ({
+    page,
+  }) => {
+    await camaraDeMitades(page, 640, 480);
+    await arrancar(page);
+    await page.getByRole('button', { name: /Foto 3s/ }).click();
+    await page.waitForTimeout(500);
+    await detener(page).click();
+    await page.waitForTimeout(500);
+    await iniciar(page).click();
+    await expect(detener(page)).toBeVisible();
+    await page.waitForTimeout(4000);
+    await expect(page.locator(FOTOS)).toHaveCount(0);
+    await expect(page.locator(CUENTA_ATRAS)).toHaveCount(0);
   });
 });
 
@@ -462,6 +698,50 @@ test.describe('Escritorio · rechazos', () => {
     });
     expect(anunciado).toBe(true);
   });
+
+  test('CAMBIO 532a9704f · el permiso denegado sale en el role="alert" de la app, no en el anunciador de rutas de Next', async ({ page }) => {
+    // name y message medidos hoy con el permiso denegado DE VERDAD (--use-fake-ui-for-media-stream=deny):
+    // «NotAllowedError | Permission denied». getByRole('alert') casa también con el anunciador de
+    // rutas de Next: se acota por el texto y por la caja del vídeo.
+    await camaraQueFalla(page, 'NotAllowedError', 'Permission denied');
+    await abrir(page);
+    await iniciar(page).click();
+    const aviso = page.getByRole('alert').filter({ hasText: 'Permiso denegado' });
+    await expect(aviso).toHaveCount(1);
+    await expect(aviso).toContainText('Permiso denegado. Permite el acceso a la cámara en tu navegador.');
+    await expect(page.locator(`${CONTENEDOR} [role="alert"]`)).toHaveCount(1);
+    await expect(iniciar(page)).toBeVisible();
+  });
+
+  test('HALLAZGO (11/11/2026, ABIERTO) · el role="alert" del aviso anuncia también el ❌ decorativo (esperado solo el texto)', async ({ page }) => {
+    // ABIERTO: 532a9704f puso role="alert" en el <div> que contiene <span className={errorIcon}>❌</span>
+    // sin aria-hidden (CLAUDE.md global §5: emoji junto a texto → aria-hidden). Medido con
+    // ariaSnapshot: «- alert: - text: ❌ - paragraph: Permiso denegado. …»: el lector lo lee antes del aviso.
+    test.fail();
+    await camaraQueFalla(page, 'NotAllowedError', 'Permission denied');
+    await abrir(page);
+    await iniciar(page).click();
+    const aviso = page.locator(`${CONTENEDOR} [role="alert"]`);
+    await expect(aviso).toBeVisible();
+    expect(await aviso.ariaSnapshot()).not.toContain('❌');
+  });
+
+  test('HALLAZGO (11/11/2026, ABIERTO) · la guía dice que con Zoom o Teams abiertos «recibirás un error de acceso denegado», y la app dice «ocupada»', async ({
+    page,
+  }) => {
+    // ABIERTO: desde 532a9704f la cámara ocupada (NotReadableError) avisa «La cámara está ocupada o
+    // bloqueada por el sistema. Cierra Zoom, Teams…», y «Permiso denegado» queda para el permiso. La
+    // advertencia «4 errores habituales» sigue atando Zoom/Teams a «acceso denegado»: quien vea
+    // «Permiso denegado» cerrará Zoom en vez de dar el permiso.
+    test.fail();
+    await camaraQueFalla(page, 'NotReadableError', 'Could not start video source');
+    await abrir(page);
+    await iniciar(page).click();
+    await expect(page.locator(AVISO)).toContainText('La cámara está ocupada o bloqueada por el sistema');
+    const advertencia = (await page.locator('li', { hasText: 'Tener otra app usando la cámara' }).textContent()) ?? '';
+    expect(advertencia.length).toBeGreaterThan(0);
+    expect(advertencia).not.toContain('error de acceso denegado');
+  });
 });
 
 test.describe('Escritorio · ajustes y textos', () => {
@@ -514,6 +794,40 @@ test.describe('Escritorio · ajustes y textos', () => {
     const resolucion = faq['¿Qué resolución debería tener una webcam para videollamadas profesionales?'] ?? '';
     expect(resolucion.length).toBeGreaterThan(0);
     expect(resolucion).not.toMatch(/\d+\s?%/);
+  });
+
+  test('CAMBIO 532a9704f · el botón de ajustes se llama exactamente «Ajustes de la cámara» y su aria-expanded sigue al panel', async ({ page }) => {
+    // Esperado: sin aria-pressed (es un desplegable); aria-expanded false → true (panel visible) → false
+    await registrarAperturas(page);
+    await arrancar(page);
+    const boton = page.getByRole('button', { name: 'Ajustes de la cámara', exact: true });
+    await expect(boton).toHaveCount(1);
+    await expect(boton).not.toHaveAttribute('aria-pressed', /.*/);
+    await expect(boton).toHaveAttribute('aria-expanded', 'false');
+    await expect(page.locator(PANEL)).toHaveCount(0);
+    await boton.click();
+    await expect(boton).toHaveAttribute('aria-expanded', 'true');
+    await expect(page.locator(PANEL)).toBeVisible();
+    await boton.click();
+    await expect(boton).toHaveAttribute('aria-expanded', 'false');
+    await expect(page.locator(PANEL)).toHaveCount(0);
+  });
+
+  test('CAMBIO 15c76e745 · entre la cifra y el % va U+00A0, también al mover el deslizador (toHaveText no lo distingue: se miran los códigos)', async ({
+    page,
+  }) => {
+    // toHaveText normaliza el espacio (\s incluye U+00A0): aquí se lee textContent tal cual
+    await registrarAperturas(page);
+    await arrancar(page);
+    await abrirAjustes(page);
+    const texto = async (sel: string): Promise<string> => (await page.locator(sel).first().textContent()) ?? '';
+    expect(await texto('label[for="brillo"]')).toBe('Brillo: 100 %');
+    expect(await texto('label[for="contraste"]')).toBe('Contraste: 100 %');
+    await sembrarValor(page, '#brillo', 150);
+    await expect(page.locator('label[for="brillo"]')).toHaveText('Brillo: 150 %');
+    expect(await texto('label[for="brillo"]')).toBe('Brillo: 150 %');
+    const offline = (await page.locator('li', { hasText: 'offline' }).first().textContent()) ?? '';
+    expect(offline).toContain('Funciona 100 % offline');
   });
 });
 
@@ -582,5 +896,34 @@ test.describe('Móvil (Pixel 7)', () => {
     // el fotograma contenido cabe entero en la caja, que es más alta que ancha como el flujo.
     const caja = await page.locator(CONTENEDOR).evaluate((el) => el.getBoundingClientRect());
     expect(caja.height).toBeGreaterThan(caja.width);
+  });
+
+  test('CAMBIO 532a9704f · con la cámara falsa de Chromium el medio arranca y la caja tiene la proporción del flujo (332 × 186,75)', async ({
+    page,
+  }) => {
+    // Esperado en la cabecera: 412 − 2·16 − 2·24 = 332 de ancho; 332·1080/1920 = 186,75 < 0,7·839
+    await registrarAperturas(page);
+    await arrancar(page, true);
+    const m = await medirVistaPrevia(page);
+    comprobarVistaPrevia(m);
+    expect(m.cajaH).toBeLessThan(m.alto70vh);
+    expect(m.cajaW / m.cajaH).toBeCloseTo(m.videoW / m.videoH, 2);
+  });
+
+  test('HALLAZGO (11/11/2026, ABIERTO) · un doble toque en «Iniciar Cámara» con una cámara que tarda 400 ms deja una pista VIVA tras «Detener» (esperado 0)', async ({
+    page,
+  }) => {
+    // ABIERTO: el mismo de escritorio, con dos toques separados 150 ms. Medido: 2 getUserMedia y
+    // 1 pista viva tras «Detener».
+    test.fail();
+    await registrarAperturasLentas(page, 400);
+    await abrir(page);
+    await dobleClicHumano(page, true);
+    await expect(detener(page)).toBeVisible();
+    await page.waitForTimeout(1500);
+    await detener(page).tap();
+    await expect(iniciar(page)).toBeVisible();
+    await page.waitForTimeout(800);
+    expect(await pistasVivas(page)).toBe(0);
   });
 });

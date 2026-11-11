@@ -368,3 +368,77 @@ test.describe('Orientador IMC · móvil 360 px', () => {
     expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(360);
   });
 });
+
+/*
+ * ─── Cabo C0676 (censo C0157 del 13/10/2026): clases del aviso médico sin declarar ─────────
+ * page.tsx:668, 675 y 680 ponen styles.disclaimerList, styles.highlight y styles.emergency, y
+ * OrientadorIMC.module.css no declara ninguna de las tres: `styles.x` vale undefined y React
+ * pinta el <ul> y los dos <p> SIN atributo class. Medido el 11/11/2026 en claro y oscuro, a 1280
+ * y 390 px (las clases de la pieza que se copió, .highlight y .emergency, viven en
+ * DisclaimerCard.module.css y no alcanzan a los hijos que pone la app):
+ *   · la lista sale con padding-left 0 y margen 0: las viñetas cuelgan fuera de la columna del
+ *     texto, en el relleno de la tarjeta, y la última toca el párrafo siguiente (0 px);
+ *   · el párrafo «⚕️ Esta herramienta NO diagnostica…» no se separa de la lista y se lee como
+ *     continuación de la cuarta viñeta;
+ *   · el aviso «🚨 … acude a tu médico de inmediato» sale en el color y sin el fondo del resto
+ *     del aviso (rgb(26, 26, 26) sobre #e3f2fd en claro; rgb(229, 229, 229) sobre #0d2644 en
+ *     oscuro), cuando la pieza de DisclaimerCard que copia lo pinta en rojo sobre rosa
+ *     (#b71c1c sobre #ffebee; #ff8a80 sobre #4a1a1a en oscuro).
+ * Los localizadores van por rol y texto, no por clase: lo que se mide es justo que falta.
+ */
+test.describe('Orientador IMC · cabo C0676, clases del aviso médico', () => {
+  test.beforeEach(async ({ page }) => {
+    await abrir(page);
+  });
+
+  const aviso = (page: Page): Locator =>
+    page.getByRole('note').filter({ hasText: 'NO distingue entre masa muscular' });
+
+  test('C0676 · el aviso «acude a tu médico de inmediato» lleva clase y se distingue del texto del aviso, en claro y oscuro', async ({ page }) => {
+    // ABIERTO: styles.emergency no está declarada en OrientadorIMC.module.css; el <p> sale sin
+    // class, con el mismo color, fondo y borde que el párrafo normal del aviso.
+    test.fail();
+    const urgencia = aviso(page).locator('p', { hasText: 'acude a tu médico de inmediato' });
+    const normal = aviso(page).locator('p', { hasText: 'es un indicador orientativo' });
+    await expect(urgencia).toBeVisible();
+    await expect(normal).toBeVisible();
+    const estilo = (loc: Locator) =>
+      loc.evaluate((el) => {
+        const s = getComputedStyle(el);
+        return {
+          clase: (el.getAttribute('class') ?? '').trim(),
+          color: s.color,
+          fondo: s.backgroundColor,
+          borde: `${s.borderLeftWidth} ${s.borderLeftStyle} ${s.borderLeftColor} · ${s.borderTopWidth}`,
+        };
+      });
+    const fallos: string[] = [];
+    for (const tema of ['light', 'dark'] as const) {
+      await page.evaluate((t) => document.documentElement.setAttribute('data-theme', t), tema);
+      await asentar(page);
+      const u = await estilo(urgencia);
+      const n = await estilo(normal);
+      if (!u.clase) fallos.push(`${tema} · sin atributo class`);
+      if (u.color === n.color && u.fondo === n.fondo && u.borde === n.borde) {
+        fallos.push(`${tema} · igual que el párrafo normal (${u.color} sobre ${u.fondo})`);
+      }
+    }
+    expect(fallos).toEqual([]);
+  });
+
+  test('C0676 · la lista de limitaciones y el párrafo «NO diagnostica» llevan clase', async ({ page }) => {
+    // ABIERTO: styles.disclaimerList y styles.highlight no están declaradas en
+    // OrientadorIMC.module.css; el <ul> y el <p> salen sin atributo class.
+    test.fail();
+    const lista = aviso(page).locator('ul', { hasText: 'NO distingue entre masa muscular y grasa' });
+    const destacado = aviso(page).locator('p', { hasText: 'Esta herramienta NO diagnostica ni trata enfermedades.' });
+    await expect(lista).toBeVisible();
+    await expect(destacado).toBeVisible();
+    const clases: Record<string, string> = {
+      disclaimerList: ((await lista.getAttribute('class')) ?? '').trim(),
+      highlight: ((await destacado.getAttribute('class')) ?? '').trim(),
+    };
+    const sinClase = Object.entries(clases).filter(([, c]) => c === '').map(([n]) => n);
+    expect(sinClase).toEqual([]);
+  });
+});

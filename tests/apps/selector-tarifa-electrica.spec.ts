@@ -224,7 +224,7 @@ test('las opciones son radios: aria-checked, sin aria-pressed, y una sola marcad
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 4. Hallazgos ABIERTOS (inspector 10/10/2026)
+// 4. Hallazgos de la inspección del 10/10/2026 (todos REPARADOS, 12/10 y 20/10/2026)
 // ─────────────────────────────────────────────────────────────────────────────
 
 test('hallazgo 3166: la pantalla no recomienda «Mercado libre» mientras marca PVPC como «Más barata»', async ({ page }) => {
@@ -577,4 +577,160 @@ test('sin banda de Delegum: es-only fuera de las suites de Delegum no la lleva',
 
   await page.goto('/selector-seguro-hogar/');
   await expect(page.getByText('fiscalidad, derecho laboral y finanzas').first()).toBeVisible();
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 5. Cabo C0204 (comprobación del 11/11/2026)
+// ─────────────────────────────────────────────────────────────────────────────
+//
+// Fuentes leídas en el BOE el 11/11/2026:
+//   · Circular 3/2020 de la CNMC (BOE-A-2020-1066, consolidada a 05/02/2025): art. 6.2.a, el
+//     peaje 2.0TD es el de los suministros «en redes de tensión no superior a 1 kV» y «con
+//     potencia contratada inferior o igual a 15 kW»; su única variante para ese grupo, la 2.0TDA
+//     (art. 6.3.a, autoconsumo próximo a través de red), también tiene tres periodos. Art. 7.3:
+//     son valle todo el día «los sábados, domingos, el 6 de enero y los días festivos de ámbito
+//     nacional, definidos como tales en el año que se trate, con exclusión tanto de los festivos
+//     sustituibles como de los que no tienen fecha fija».
+//   · RD 2001/1983, art. 45 (vigente): las fiestas nacionales; sin sustituir y con fecha fija
+//     quedan 1 de enero, 1 de mayo, 15 de agosto, 12 de octubre, 1 de noviembre, 6 y 8 de
+//     diciembre y 25 de diciembre. Viernes Santo es nacional y no sustituible, pero sin fecha
+//     fija; Jueves Santo, 6 de enero y San José / Santiago son sustituibles. Con el 6 de enero
+//     que la Circular nombra aparte, nueve fechas al año (más los fines de semana).
+//   · RD 897/2017, art. 6.3 (consolidado a 28/01/2026, tras la Resolución de 27/01/2026 que dejó
+//     sin efecto el RDL 16/2025): «descuento del 35 por ciento en todos los términos que componen
+//     el PVPC» y «En el caso del consumidor vulnerable severo, el descuento será del 50 por ciento».
+//   · RD 216/2014, art. 20.3: la CNMC «deberá publicar en su página web una lista con los
+//     comercializadores de referencia».
+//   · CUPS: RD 1435/2002 (art. 7.1.a, «el “CUPS” completo»; su DA 1.ª remite al RD 385/2002,
+//     derogado por el RD 1110/2007, y ninguno de los dos lo define; el RD 1110/2007, art. 12.6,
+//     remite a un procedimiento de operación). Ninguna norma leída fija su longitud ni sus caracteres.
+
+/** Texto de la página entera, guía plegada incluida, sin scripts. */
+async function textoPagina(page: Page): Promise<string> {
+  return page.evaluate(() => {
+    const copia = document.body.cloneNode(true) as HTMLElement;
+    copia.querySelectorAll('script, style').forEach((n) => n.remove());
+    return (copia.textContent ?? '').replace(/\s+/g, ' ');
+  });
+}
+
+/** Preguntas y respuestas del FAQPage servido. */
+async function faqPage(page: Page): Promise<{ p: string; r: string }[]> {
+  const html = await (await page.request.get('/selector-tarifa-electrica/')).text();
+  const bloques = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].map(
+    (m) => JSON.parse(m[1]) as { '@type'?: string; mainEntity?: { name: string; acceptedAnswer: { text: string } }[] },
+  );
+  const faq = bloques.find((b) => b['@type'] === 'FAQPage');
+  return (faq?.mainEntity ?? []).map((q) => ({ p: q.name, r: q.acceptedAnswer.text }));
+}
+
+test('cabo C0204 · 1: no hay ningún «~X €/año» ni coste estimado que pueda callar IVA, impuesto eléctrico o contador', async ({ page }) => {
+  // Desde d70caa64 (12/10/2026) la app no tiene precios: sin estimación no hay impuestos que
+  // incluir o callar. Esperado a mano para UMBRAL_4: 4 puntos → PVPC y ningún importe.
+  await abrir(page);
+  await responder(page, UMBRAL_4);
+  await verResultado(page);
+  const r = await leerResultado(page);
+  expect(r.recomendacion).toBe('PVPC (tarifa regulada)');
+  expect(r.texto).not.toMatch(IMPORTE);
+  await repetir(page);
+  const texto = await textoPagina(page);
+  expect(texto).not.toMatch(/€\s*\/\s*a[ñn]o|~\s*\d|coste (anual|estimado)/i);
+});
+
+test('cabo C0204 · 1: la cifra anual del stand-by tiene fuente y base de cálculo', async ({ page }) => {
+  test.fail();
+  // ABIERTO (cabo C0204, 11/11/2026): la única cifra anual en euros que queda en la página es
+  // «Los aparatos en stand-by consumen entre 50 y 100 euros al año» (Consejos para ahorrar), sin
+  // fuente, sin el consumo ni el precio de los que sale y sin decir si lleva IVA, impuesto
+  // especial sobre la electricidad o alquiler del contador. La app no tiene precios con los que
+  // resolverla a mano. Se espera la cifra con su fuente y su base, o sin cifra.
+  await abrir(page);
+  const texto = await textoPagina(page);
+  expect(texto).not.toContain('consumen entre 50 y 100 euros al año');
+});
+
+test('cabo C0204 · 2: el Bono Social no da porcentajes y remite a la fuente oficial', async ({ page }) => {
+  // Hoy rigen el 35 % (vulnerable) y el 50 % (vulnerable severo), art. 6.3 del RD 897/2017; el
+  // «25 % (o 40 %)» que daba la FAQ hasta el 20/10/2026 estaría desfasado. La app no da ninguno:
+  // toma la descripción de data/fiscal/ayudas-personas.ts y enlaza bonosocial.gob.es.
+  await abrir(page);
+  const texto = (await page.locator('[class*="faqItem"]', { hasText: 'Bono Social' }).locator('p').textContent()) ?? '';
+  expect(texto).not.toMatch(/\d\s*%|por ciento/);
+  expect(texto).toContain('bonosocial.gob.es');
+});
+
+test('cabo C0204 · 2: el descuento del Bono Social es sobre todos los términos del PVPC, no solo la energía', async ({ page }) => {
+  test.fail();
+  // ABIERTO (cabo C0204, 11/11/2026): la FAQ dice «Descuento sobre el precio de la energía»
+  // (descripción de bono-social-electrico en data/fiscal/ayudas-personas.ts). El art. 6.3 del
+  // RD 897/2017 lo aplica «en todos los términos que componen el PVPC» (potencia y energía; el
+  // límite anual de kWh opera sobre la energía). Reparación en data/fiscal, que leen otras apps.
+  await abrir(page);
+  const texto = (await page.locator('[class*="faqItem"]', { hasText: 'Bono Social' }).locator('p').textContent()) ?? '';
+  expect(texto).not.toMatch(/Descuento sobre el precio de la energ[ií]a/);
+});
+
+test('cabo C0204 · 3: ya no dice «14 festivos nacionales al año»', async ({ page }) => {
+  // Retirado en 3f8e7242 (20/10/2026). Los días de valle completo de la 2.0TD son nueve fechas
+  // al año más los fines de semana (Circular 3/2020, art. 7.3, y RD 2001/1983, art. 45).
+  await abrir(page);
+  const texto = await textoPagina(page);
+  const faq = (await faqPage(page)).map((q) => q.r).join(' ');
+  expect(`${texto} ${faq}`).not.toMatch(/14 festivos|\(14 al año\)|catorce festivos/i);
+});
+
+test('cabo C0204 · 3: los festivos de valle todo el día son los nacionales de fecha fija no sustituibles, no todos', async ({ page }) => {
+  test.fail();
+  // ABIERTO (cabo C0204, 11/11/2026): la tarjeta «Tres franjas horarias (2.0TD)», la FAQ «¿Las
+  // franjas horarias cambian en verano?», la FAQ «¿Los festivos locales cuentan como valle?»
+  // («Solo los festivos nacionales tienen tarifa valle las 24 horas») y el FAQPage de la 2.0TD dan
+  // valle todo el día en cualquier festivo nacional. La Circular 3/2020 (art. 7.3) excluye los
+  // sustituibles y los que no tienen fecha fija: el Viernes Santo (03/04/2026), fiesta nacional,
+  // a las 12:00 es punta (P1), no valle. Cada frase que hable de festivos nacionales debe acotarlos.
+  await abrir(page);
+  const texto = await textoPagina(page);
+  const faq = (await faqPage(page)).map((q) => q.r).join(' ');
+  const frases = `${texto} ${faq}`
+    .split(/(?<=[.?!])\s+/)
+    .filter((f) => /festiv/i.test(f) && /nacional/i.test(f));
+  expect(frases.length).toBeGreaterThan(0);
+  const sinAcotar = frases.filter((f) => !/fecha fija/i.test(f));
+  expect(sinAcotar, 'frases que dan valle todo el día en cualquier festivo nacional').toEqual([]);
+});
+
+test('cabo C0204 · 4: la pregunta 2 no ofrece «No» a la 2.0TD, que tiene todo suministro doméstico de hasta 15 kW', async ({ page }) => {
+  test.fail();
+  // ABIERTO (cabo C0204, 11/11/2026): «¿Tienes tarifa con discriminación horaria (2.0TD)?» con
+  // «Sí / No / No sé», y «No» resta 1 punto al PVPC. Por la Circular 3/2020 (art. 6.2.a) todo
+  // suministro de baja tensión con 15 kW o menos tiene el peaje 2.0TD desde el 01/06/2021 (y su
+  // variante 2.0TDA también tiene tres periodos), así que «No» no es una respuesta posible tal
+  // como está escrita. El mismo hogar, UMBRAL_4 con «Sí», da PVPC (6 puntos) y con «No», «Ambas»
+  // (3 puntos). El JSON-LD dice también «PVPC regulada (2.0TD con discriminación horaria) o
+  // mercado libre con precio fijo», como si la 2.0TD fuera solo del PVPC.
+  await abrir(page);
+  const grupo = page.getByRole('radiogroup', { name: /discriminaci[oó]n horaria/ });
+  const enunciado = (await page.locator('#pregunta-2-texto').textContent()) ?? '';
+  const opciones = (await grupo.locator('[role="radio"]').allTextContents()).map((t) => t.trim());
+  expect(enunciado.includes('2.0TD') && opciones.includes('No'), 'ofrece «No» a la 2.0TD').toBe(false);
+});
+
+test('cabo C0204 · 5: el FAQPage no lista comercializadoras de referencia y remite a la lista de la CNMC', async ({ page }) => {
+  // RD 216/2014, art. 20.3: la CNMC publica en su web la lista de comercializadores de referencia.
+  const html = await (await page.request.get('/selector-tarifa-electrica/')).text();
+  const cambio = (await faqPage(page)).find((q) => /cambiar de tarifa/i.test(q.p));
+  expect(cambio?.r).toContain('la lista oficial está en la web de la CNMC');
+  expect(html).not.toMatch(/Curenerg|Energía XXI|Comercializadora Regulada|Baser|Régsiti|Teramelcor/i);
+});
+
+test('cabo C0204 · 5: el formato del CUPS que da el FAQPage tiene fuente', async ({ page }) => {
+  test.fail();
+  // ABIERTO (cabo C0204, 11/11/2026): «un código de 20-22 caracteres […] Comienza siempre por
+  // "ES" seguido de números». Ninguna norma leída en el BOE fija la longitud ni que tras «ES»
+  // solo vengan números (RD 1435/2002, art. 7.1.a y DA 1.ª; RD 385/2002, derogado; RD
+  // 1110/2007, art. 12.6). Se espera matizarlo a lo que respalda la norma (un código que figura
+  // en el contrato y en la factura) o citar la fuente del formato.
+  const cups = (await faqPage(page)).find((q) => /CUPS/.test(q.p));
+  expect(cups, 'el FAQPage tiene la pregunta del CUPS').toBeTruthy();
+  expect(cups?.r).not.toMatch(/seguido de n[uú]meros|20-22 caracteres/);
 });

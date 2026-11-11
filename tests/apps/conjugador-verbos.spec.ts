@@ -405,6 +405,290 @@ test.describe('Inspección 11/11/2026 — conjugación en escritorio', () => {
   });
 });
 
+/* =====================================================================================
+ * Inspección del 11/11/2026 (modo cambio, commit b6c2923b2: motor de reglas nuevo en
+ * reglasConjugacion.ts, derivados por prefijo, grupos de irregularidad, rechazo de lo que no es
+ * verbo y pronominales).
+ *
+ * Los esperados están resueltos A MANO antes de ejecutar la app, con los paradigmas de la Nueva
+ * gramática (RAE-ASALE) y el DPD (la RAE devuelve 403, así que salen del paradigma, no de una
+ * consulta) y la Ortografía de 2010 para las tildes. Cada caso dice de qué modelo sale cada forma.
+ *
+ * Lo que está en verde son candados; lo que lleva test.fail() es un hallazgo ABIERTO.
+ * =================================================================================== */
+
+/** Pulsa la pestaña del modo (si hace falta) y lee las seis formas de un tiempo. */
+async function formas(page: Page, modo: 'Indicativo' | 'Subjuntivo' | 'Imperativo', tiempo: string): Promise<string[]> {
+  const pestaña = page.getByRole('button', { name: modo, exact: true });
+  await pestaña.click();
+  await expect(pestaña).toHaveAttribute('aria-pressed', 'true');
+  return leerTiempo(page, tiempo);
+}
+
+/** Envía un verbo y espera a SU cabecera, para no leer la tabla del verbo anterior. */
+async function conjugarYEsperar(page: Page, texto: string, infinitivo: string = texto) {
+  await enviar(page, texto);
+  await expect(cabecera(page, infinitivo)).toBeVisible();
+}
+
+/** La nota del modelo, el párrafo que sigue a la cabecera del resultado. */
+function notaModelo(page: Page) {
+  return page.locator('h2[tabindex="-1"] + p');
+}
+
+test.describe('Inspección 11/11/2026 (cambio) — motor de reglas', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto(URL);
+    await esperarHidratacion(page, [ENTRADA]);
+  });
+
+  test('derivados por prefijo: contener, prever, bendecir, maldecir, predecir, sonreír, desoír, decaer', async ({ page }) => {
+    // contener ← tener (contengo, contuve, contendré; imperativo «contén», aguda en -n con tilde).
+    await conjugarYEsperar(page, 'contener');
+    await expect(notaModelo(page)).toHaveText('Se conjuga como «tener».');
+    await expect(formaNoPersonal(page, 'Participio:')).toHaveText('contenido');
+    expect(await formas(page, 'Indicativo', 'Presente')).toEqual(['contengo', 'contienes', 'contiene', 'contenemos', 'contenéis', 'contienen']);
+    expect(await formas(page, 'Indicativo', 'Pretérito Indefinido')).toEqual(['contuve', 'contuviste', 'contuvo', 'contuvimos', 'contuvisteis', 'contuvieron']);
+    expect(await formas(page, 'Indicativo', 'Futuro Simple')).toEqual(['contendré', 'contendrás', 'contendrá', 'contendremos', 'contendréis', 'contendrán']);
+    expect(await formas(page, 'Subjuntivo', 'Imperfecto de Subjuntivo')).toEqual(['contuviera', 'contuvieras', 'contuviera', 'contuviéramos', 'contuvierais', 'contuvieran']);
+    expect(await formas(page, 'Imperativo', 'Imperativo Afirmativo')).toEqual(['-', 'contén', 'contenga', 'contengamos', 'contened', 'contengan']);
+
+    // prever ← ver, NO ← proveer: preveo, prevés, prevé, prevéis, prevén (agudas con tilde);
+    // preví, previó; preveré; previsto.
+    await conjugarYEsperar(page, 'prever');
+    await expect(formaNoPersonal(page, 'Participio:')).toHaveText('previsto');
+    await expect(formaNoPersonal(page, 'Gerundio:')).toHaveText('previendo');
+    expect(await formas(page, 'Indicativo', 'Presente')).toEqual(['preveo', 'prevés', 'prevé', 'prevemos', 'prevéis', 'prevén']);
+    expect(await formas(page, 'Indicativo', 'Pretérito Indefinido')).toEqual(['preví', 'previste', 'previó', 'previmos', 'previsteis', 'previeron']);
+    expect(await formas(page, 'Indicativo', 'Futuro Simple')).toEqual(['preveré', 'preverás', 'preverá', 'preveremos', 'preveréis', 'preverán']);
+    expect(await formas(page, 'Subjuntivo', 'Presente de Subjuntivo')).toEqual(['prevea', 'preveas', 'prevea', 'preveamos', 'preveáis', 'prevean']);
+    expect(await formas(page, 'Imperativo', 'Imperativo Afirmativo')).toEqual(['-', 'prevé', 'prevea', 'preveamos', 'preved', 'prevean']);
+
+    // bendecir y maldecir: como decir en presente e indefinido, pero futuro y condicional
+    // regulares (bendeciré), participio regular (bendecido; «bendito» es adjetivo) e imperativo
+    // «bendice» (DPD, s. v. bendecir).
+    await conjugarYEsperar(page, 'bendecir');
+    await expect(formaNoPersonal(page, 'Participio:')).toHaveText('bendecido');
+    await expect(formaNoPersonal(page, 'Gerundio:')).toHaveText('bendiciendo');
+    expect(await formas(page, 'Indicativo', 'Presente')).toEqual(['bendigo', 'bendices', 'bendice', 'bendecimos', 'bendecís', 'bendicen']);
+    expect(await formas(page, 'Indicativo', 'Pretérito Indefinido')).toEqual(['bendije', 'bendijiste', 'bendijo', 'bendijimos', 'bendijisteis', 'bendijeron']);
+    expect(await formas(page, 'Indicativo', 'Futuro Simple')).toEqual(['bendeciré', 'bendecirás', 'bendecirá', 'bendeciremos', 'bendeciréis', 'bendecirán']);
+    expect(await formas(page, 'Indicativo', 'Condicional Simple')).toEqual(['bendeciría', 'bendecirías', 'bendeciría', 'bendeciríamos', 'bendeciríais', 'bendecirían']);
+    expect(await formas(page, 'Subjuntivo', 'Imperfecto de Subjuntivo')).toEqual(['bendijera', 'bendijeras', 'bendijera', 'bendijéramos', 'bendijerais', 'bendijeran']);
+    expect(await formas(page, 'Imperativo', 'Imperativo Afirmativo')).toEqual(['-', 'bendice', 'bendiga', 'bendigamos', 'bendecid', 'bendigan']);
+    await conjugarYEsperar(page, 'maldecir');
+    await expect(formaNoPersonal(page, 'Participio:')).toHaveText('maldecido');
+    expect((await formas(page, 'Indicativo', 'Futuro Simple'))[0]).toBe('maldeciré');
+    expect((await formas(page, 'Imperativo', 'Imperativo Afirmativo'))[1]).toBe('maldice');
+
+    // predecir: participio «predicho» e imperativo «predice» (DPD); el futuro preferido es «prediré».
+    await conjugarYEsperar(page, 'predecir');
+    await expect(formaNoPersonal(page, 'Participio:')).toHaveText('predicho');
+    expect((await formas(page, 'Indicativo', 'Futuro Simple'))[0]).toBe('prediré');
+    expect((await formas(page, 'Imperativo', 'Imperativo Afirmativo'))[1]).toBe('predice');
+
+    // sonreír ← reír: sonrío, sonrió (aguda bisílaba, con tilde, aunque «rio» no la lleve),
+    // sonriáis (aguda en -s), sonreíd.
+    await conjugarYEsperar(page, 'sonreír');
+    await expect(formaNoPersonal(page, 'Gerundio:')).toHaveText('sonriendo');
+    await expect(formaNoPersonal(page, 'Participio:')).toHaveText('sonreído');
+    expect(await formas(page, 'Indicativo', 'Presente')).toEqual(['sonrío', 'sonríes', 'sonríe', 'sonreímos', 'sonreís', 'sonríen']);
+    expect(await formas(page, 'Indicativo', 'Pretérito Indefinido')).toEqual(['sonreí', 'sonreíste', 'sonrió', 'sonreímos', 'sonreísteis', 'sonrieron']);
+    expect(await formas(page, 'Subjuntivo', 'Presente de Subjuntivo')).toEqual(['sonría', 'sonrías', 'sonría', 'sonriamos', 'sonriáis', 'sonrían']);
+    expect(await formas(page, 'Imperativo', 'Imperativo Afirmativo')).toEqual(['-', 'sonríe', 'sonría', 'sonriamos', 'sonreíd', 'sonrían']);
+
+    // desoír ← oír; decaer ← caer.
+    await conjugarYEsperar(page, 'desoír');
+    expect(await formas(page, 'Indicativo', 'Presente')).toEqual(['desoigo', 'desoyes', 'desoye', 'desoímos', 'desoís', 'desoyen']);
+    await conjugarYEsperar(page, 'decaer');
+    expect(await formas(page, 'Indicativo', 'Pretérito Indefinido')).toEqual(['decaí', 'decaíste', 'decayó', 'decaímos', 'decaísteis', 'decayeron']);
+  });
+
+  test('grupos de irregularidad: diptongación, cierre e→i, -zc-, -duje, i→ie', async ({ page }) => {
+    // o→ue como contar, solo en las formas con acento en la raíz.
+    await conjugarYEsperar(page, 'acostar');
+    await expect(notaModelo(page)).toContainText('diptonga o→ue');
+    expect(await formas(page, 'Indicativo', 'Presente')).toEqual(['acuesto', 'acuestas', 'acuesta', 'acostamos', 'acostáis', 'acuestan']);
+    expect(await formas(page, 'Indicativo', 'Pretérito Indefinido')).toEqual(['acosté', 'acostaste', 'acostó', 'acostamos', 'acostasteis', 'acostaron']);
+    expect(await formas(page, 'Subjuntivo', 'Presente de Subjuntivo')).toEqual(['acueste', 'acuestes', 'acueste', 'acostemos', 'acostéis', 'acuesten']);
+    expect(await formas(page, 'Imperativo', 'Imperativo Afirmativo')).toEqual(['-', 'acuesta', 'acueste', 'acostemos', 'acostad', 'acuesten']);
+    // o→ue + g→gu ante e; o→ue con h- inicial (huelo); o→ue tras g con diéresis (avergüenzo); cocer sin -zc-.
+    await conjugarYEsperar(page, 'colgar');
+    expect(await formas(page, 'Subjuntivo', 'Presente de Subjuntivo')).toEqual(['cuelgue', 'cuelgues', 'cuelgue', 'colguemos', 'colguéis', 'cuelguen']);
+    await conjugarYEsperar(page, 'oler');
+    expect(await formas(page, 'Indicativo', 'Presente')).toEqual(['huelo', 'hueles', 'huele', 'olemos', 'oléis', 'huelen']);
+    expect(await formas(page, 'Imperativo', 'Imperativo Afirmativo')).toEqual(['-', 'huele', 'huela', 'olamos', 'oled', 'huelan']);
+    await conjugarYEsperar(page, 'avergonzar');
+    expect(await formas(page, 'Subjuntivo', 'Presente de Subjuntivo')).toEqual(['avergüence', 'avergüences', 'avergüence', 'avergoncemos', 'avergoncéis', 'avergüencen']);
+    await conjugarYEsperar(page, 'cocer');
+    expect(await formas(page, 'Indicativo', 'Presente')).toEqual(['cuezo', 'cueces', 'cuece', 'cocemos', 'cocéis', 'cuecen']);
+    // e→ie como entender; en inicial, ye- (yerro: DPD, uso de España).
+    await conjugarYEsperar(page, 'defender');
+    expect(await formas(page, 'Indicativo', 'Presente')).toEqual(['defiendo', 'defiendes', 'defiende', 'defendemos', 'defendéis', 'defienden']);
+    expect(await formas(page, 'Subjuntivo', 'Presente de Subjuntivo')).toEqual(['defienda', 'defiendas', 'defienda', 'defendamos', 'defendáis', 'defiendan']);
+    await conjugarYEsperar(page, 'errar');
+    expect((await formas(page, 'Indicativo', 'Presente'))[0]).toBe('yerro');
+    // e→i como pedir: también en las átonas con -ió, -ie-, -a (midió, midiendo, midamos).
+    await conjugarYEsperar(page, 'medir');
+    await expect(formaNoPersonal(page, 'Gerundio:')).toHaveText('midiendo');
+    expect(await formas(page, 'Indicativo', 'Presente')).toEqual(['mido', 'mides', 'mide', 'medimos', 'medís', 'miden']);
+    expect(await formas(page, 'Indicativo', 'Pretérito Indefinido')).toEqual(['medí', 'mediste', 'midió', 'medimos', 'medisteis', 'midieron']);
+    expect(await formas(page, 'Subjuntivo', 'Imperfecto de Subjuntivo')).toEqual(['midiera', 'midieras', 'midiera', 'midiéramos', 'midierais', 'midieran']);
+    expect(await formas(page, 'Imperativo', 'Imperativo Afirmativo')).toEqual(['-', 'mide', 'mida', 'midamos', 'medid', 'midan']);
+    // e→ie / e→i como sentir.
+    await conjugarYEsperar(page, 'divertir');
+    await expect(formaNoPersonal(page, 'Gerundio:')).toHaveText('divirtiendo');
+    expect(await formas(page, 'Indicativo', 'Presente')).toEqual(['divierto', 'diviertes', 'divierte', 'divertimos', 'divertís', 'divierten']);
+    expect(await formas(page, 'Indicativo', 'Pretérito Indefinido')).toEqual(['divertí', 'divertiste', 'divirtió', 'divertimos', 'divertisteis', 'divirtieron']);
+    expect(await formas(page, 'Subjuntivo', 'Presente de Subjuntivo')).toEqual(['divierta', 'diviertas', 'divierta', 'divirtamos', 'divirtáis', 'diviertan']);
+    // i→ie como adquirir.
+    await conjugarYEsperar(page, 'adquirir');
+    expect(await formas(page, 'Indicativo', 'Presente')).toEqual(['adquiero', 'adquieres', 'adquiere', 'adquirimos', 'adquirís', 'adquieren']);
+    // -zc- como conocer (agradezco, agradezca), indefinido regular.
+    await conjugarYEsperar(page, 'agradecer');
+    expect(await formas(page, 'Indicativo', 'Presente')).toEqual(['agradezco', 'agradeces', 'agradece', 'agradecemos', 'agradecéis', 'agradecen']);
+    expect((await formas(page, 'Indicativo', 'Pretérito Indefinido'))[0]).toBe('agradecí');
+    expect(await formas(page, 'Subjuntivo', 'Presente de Subjuntivo')).toEqual(['agradezca', 'agradezcas', 'agradezca', 'agradezcamos', 'agradezcáis', 'agradezcan']);
+    // -zc- y -duje como conducir; el imperfecto de subjuntivo sale de «introdujeron».
+    await conjugarYEsperar(page, 'introducir');
+    expect(await formas(page, 'Indicativo', 'Presente')).toEqual(['introduzco', 'introduces', 'introduce', 'introducimos', 'introducís', 'introducen']);
+    expect(await formas(page, 'Indicativo', 'Pretérito Indefinido')).toEqual(['introduje', 'introdujiste', 'introdujo', 'introdujimos', 'introdujisteis', 'introdujeron']);
+    expect(await formas(page, 'Subjuntivo', 'Imperfecto de Subjuntivo')).toEqual(['introdujera', 'introdujeras', 'introdujera', 'introdujéramos', 'introdujerais', 'introdujeran']);
+  });
+
+  test('-uy- como construir en todo lo que no es la 1.ª plural del imperfecto de subjuntivo', async ({ page }) => {
+    // contribuyo, contribuís (aguda en -s con tilde: cons-tri-buís), contribuyó, contribuyendo.
+    await conjugarYEsperar(page, 'contribuir');
+    await expect(formaNoPersonal(page, 'Gerundio:')).toHaveText('contribuyendo');
+    expect(await formas(page, 'Indicativo', 'Presente')).toEqual(['contribuyo', 'contribuyes', 'contribuye', 'contribuimos', 'contribuís', 'contribuyen']);
+    expect(await formas(page, 'Indicativo', 'Pretérito Indefinido')).toEqual(['contribuí', 'contribuiste', 'contribuyó', 'contribuimos', 'contribuisteis', 'contribuyeron']);
+    expect(await formas(page, 'Subjuntivo', 'Presente de Subjuntivo')).toEqual(['contribuya', 'contribuyas', 'contribuya', 'contribuyamos', 'contribuyáis', 'contribuyan']);
+    expect(await formas(page, 'Imperativo', 'Imperativo Afirmativo')).toEqual(['-', 'contribuye', 'contribuya', 'contribuyamos', 'contribuid', 'contribuyan']);
+  });
+
+  test('hiato y ortografía de los regulares: actuar, reunir, criar, enraizar, averiguar, coger, distinguir', async ({ page }) => {
+    // -uar en hiato (actúo); u en hiato con tilde (reúno); -iar en hiato con los monosílabos de
+    // 2010 sin tilde (criais, crie, crio); enraizar con z→c y la tilde del hiato (enraíce).
+    await conjugarYEsperar(page, 'actuar');
+    expect(await formas(page, 'Indicativo', 'Presente')).toEqual(['actúo', 'actúas', 'actúa', 'actuamos', 'actuáis', 'actúan']);
+    expect(await formas(page, 'Subjuntivo', 'Presente de Subjuntivo')).toEqual(['actúe', 'actúes', 'actúe', 'actuemos', 'actuéis', 'actúen']);
+    expect(await formas(page, 'Imperativo', 'Imperativo Afirmativo')).toEqual(['-', 'actúa', 'actúe', 'actuemos', 'actuad', 'actúen']);
+    await conjugarYEsperar(page, 'reunir');
+    expect(await formas(page, 'Indicativo', 'Presente')).toEqual(['reúno', 'reúnes', 'reúne', 'reunimos', 'reunís', 'reúnen']);
+    await conjugarYEsperar(page, 'criar');
+    expect(await formas(page, 'Indicativo', 'Presente')).toEqual(['crío', 'crías', 'cría', 'criamos', 'criais', 'crían']);
+    expect(await formas(page, 'Indicativo', 'Pretérito Indefinido')).toEqual(['crie', 'criaste', 'crio', 'criamos', 'criasteis', 'criaron']);
+    await conjugarYEsperar(page, 'enraizar');
+    expect(await formas(page, 'Subjuntivo', 'Presente de Subjuntivo')).toEqual(['enraíce', 'enraíces', 'enraíce', 'enraicemos', 'enraicéis', 'enraícen']);
+    // -guar: gu→gü ante e (averigüé, averigüe); -ger: g→j ante a/o; -guir: gu→g ante a/o.
+    await conjugarYEsperar(page, 'averiguar');
+    expect(await formas(page, 'Indicativo', 'Pretérito Indefinido')).toEqual(['averigüé', 'averiguaste', 'averiguó', 'averiguamos', 'averiguasteis', 'averiguaron']);
+    expect(await formas(page, 'Subjuntivo', 'Presente de Subjuntivo')).toEqual(['averigüe', 'averigües', 'averigüe', 'averigüemos', 'averigüéis', 'averigüen']);
+    await conjugarYEsperar(page, 'coger');
+    expect(await formas(page, 'Subjuntivo', 'Presente de Subjuntivo')).toEqual(['coja', 'cojas', 'coja', 'cojamos', 'cojáis', 'cojan']);
+    await conjugarYEsperar(page, 'distinguir');
+    expect(await formas(page, 'Indicativo', 'Presente')).toEqual(['distingo', 'distingues', 'distingue', 'distinguimos', 'distinguís', 'distinguen']);
+  });
+
+  test('rechazo y pronominal: xyzar y mujer se rechazan con su motivo; arrepentirse conjuga su base', async ({ page }) => {
+    await enviar(page, 'xyzar');
+    await expect(page.getByRole('alert').filter({ hasText: '«xyzar» no es un verbo del español: su raíz no tiene ninguna vocal.' })).toBeVisible();
+    await expect(page.locator('h3', { hasText: /^Presente$/ })).toHaveCount(0);
+    await enviar(page, 'mujer');
+    await expect(page.getByRole('alert').filter({ hasText: '«mujer» no es un verbo, aunque acabe en -er.' })).toBeVisible();
+    // arrepentirse ← arrepentir, como sentir: arrepiento, arrepintió, arrepintamos, arrepintiendo.
+    await conjugarYEsperar(page, 'arrepentirse', 'arrepentir');
+    await expect(notaModelo(page)).toContainText('«arrepentirse» es pronominal');
+    await expect(formaNoPersonal(page, 'Gerundio:')).toHaveText('arrepintiendo');
+    expect(await formas(page, 'Indicativo', 'Presente')).toEqual(['arrepiento', 'arrepientes', 'arrepiente', 'arrepentimos', 'arrepentís', 'arrepienten']);
+    expect(await formas(page, 'Indicativo', 'Pretérito Indefinido')).toEqual(['arrepentí', 'arrepentiste', 'arrepintió', 'arrepentimos', 'arrepentisteis', 'arrepintieron']);
+    expect(await formas(page, 'Subjuntivo', 'Presente de Subjuntivo')).toEqual(['arrepienta', 'arrepientas', 'arrepienta', 'arrepintamos', 'arrepintáis', 'arrepientan']);
+  });
+
+  test('HALLAZGO ABIERTO (11/11/2026) · la 1.ª plural del imperfecto de subjuntivo pierde la y (contribuyéramos) y la i tras ñ (tiñéramos)', async ({ page }) => {
+    test.fail(true, 'ABIERTO: unir() mira /^i[aeoó]/ y /^i[eó]/, sin la é de «-iéramos»');
+    // Desinencia -iéramos: tras vocal la i átona pasa a y (contribuyéramos, poseyéramos, como
+    // contribuyera y poseyera de la misma tarjeta); tras ñ o ll se funde (tiñéramos, como tiñera).
+    // El futuro de subjuntivo, que sale del imperfecto en -ra, hereda el fallo (contribuiéremos).
+    await conjugarYEsperar(page, 'contribuir');
+    expect((await formas(page, 'Subjuntivo', 'Imperfecto de Subjuntivo'))[3]).toBe('contribuyéramos');
+    expect((await formas(page, 'Subjuntivo', 'Futuro de Subjuntivo'))[3]).toBe('contribuyéremos');
+    await conjugarYEsperar(page, 'poseer');
+    expect((await formas(page, 'Subjuntivo', 'Imperfecto de Subjuntivo'))[3]).toBe('poseyéramos');
+    await conjugarYEsperar(page, 'teñir');
+    expect((await formas(page, 'Subjuntivo', 'Imperfecto de Subjuntivo'))[3]).toBe('tiñéramos');
+  });
+
+  test('HALLAZGO ABIERTO (11/11/2026) · «oir» y «reir» sin tilde salen como regulares («yo oo», «yo reo»)', async ({ page }) => {
+    test.fail(true, 'ABIERTO: la entrada sin tilde no se lleva a «oír»/«reír» ni se rechaza');
+    // Paradigma de oír: oigo, oyes, oye, oímos, oís, oyen; de reír: río, ríes, ríe, reímos, reís, ríen.
+    // Vale conjugarlos como oír/reír o avisar de que se escriben con tilde; no vale «oo, oes, oe».
+    await enviar(page, 'oir');
+    await expect(page.locator('h2[tabindex="-1"], p[role="alert"]').first()).toBeVisible();
+    await expect(page.locator('td', { hasText: /^oo$/ })).toHaveCount(0);
+    await enviar(page, 'reir');
+    await expect(page.locator('h2[tabindex="-1"], p[role="alert"]').first()).toBeVisible();
+    await expect(page.locator('td', { hasText: /^reo$/ })).toHaveCount(0);
+  });
+
+  test('HALLAZGO ABIERTO (11/11/2026) · «sofreír», derivado de freír, sale como regular («sofreo», «sofreyó»)', async ({ page }) => {
+    test.fail(true, 'ABIERTO: freír no tiene derivados en DERIVADOS (sí reír → sonreír y oír → desoír)');
+    // sofreír ← freír: sofrío, sofríes, sofríe, sofreímos, sofreís, sofríen; sofrió (aguda bisílaba).
+    await conjugarYEsperar(page, 'sofreír');
+    expect(await formas(page, 'Indicativo', 'Presente')).toEqual(['sofrío', 'sofríes', 'sofríe', 'sofreímos', 'sofreís', 'sofríen']);
+    expect((await formas(page, 'Indicativo', 'Pretérito Indefinido'))[2]).toBe('sofrió');
+  });
+
+  test('HALLAZGO ABIERTO (11/11/2026) · la h intercalada no impide el hiato: rehíce, rehízo, rehúyo', async ({ page }) => {
+    test.fail(true, 'ABIERTO: contarSilabas() corta la secuencia de vocales en la h');
+    // Ortografía de 2010: la h entre vocales no cuenta para diptongos ni hiatos (prohíbo, rehúso).
+    // rehacer ← hacer: re-hí-ce, re-hí-zo; rehuir, como huir: re-hú-yo.
+    await conjugarYEsperar(page, 'rehacer');
+    expect(await formas(page, 'Indicativo', 'Pretérito Indefinido')).toEqual(['rehíce', 'rehiciste', 'rehízo', 'rehicimos', 'rehicisteis', 'rehicieron']);
+    await conjugarYEsperar(page, 'rehuir');
+    expect((await formas(page, 'Indicativo', 'Presente'))[0]).toBe('rehúyo');
+  });
+
+  test('HALLAZGO ABIERTO (11/11/2026) · «ui» es diptongo en la Ortografía de 2010: flui y fluis, sin tilde', async ({ page }) => {
+    test.fail(true, 'ABIERTO: contarSilabas() cuenta «uí» como hiato y no quita la tilde del monosílabo');
+    // fluir: flui (monosílabo), fluiste, fluyó…; presente fluyo, fluyes, fluye, fluimos, fluis, fluyen.
+    await conjugarYEsperar(page, 'fluir');
+    expect((await formas(page, 'Indicativo', 'Pretérito Indefinido'))[0]).toBe('flui');
+    expect((await formas(page, 'Indicativo', 'Presente'))[4]).toBe('fluis');
+  });
+
+  test('HALLAZGO ABIERTO (11/11/2026) · «argüir» no entra en el grupo -uy- por la diéresis («argüo», «argüió»)', async ({ page }) => {
+    test.fail(true, 'ABIERTO: el patrón /[^gq]uir$/ no casa con «-üir»');
+    // argüir, como construir: arguyo, arguyes, arguye, argüimos, argüís, arguyen; arguyó; arguyendo.
+    await conjugarYEsperar(page, 'argüir');
+    expect(await formas(page, 'Indicativo', 'Presente')).toEqual(['arguyo', 'arguyes', 'arguye', 'argüimos', 'argüís', 'arguyen']);
+    await expect(formaNoPersonal(page, 'Gerundio:')).toHaveText('arguyendo');
+  });
+
+  test('HALLAZGO ABIERTO (11/11/2026) · la nota del pronominal manda poner el pronombre delante también en el imperativo', async ({ page }) => {
+    test.fail(true, 'ABIERTO: «con me, te, se… delante» da «te arrepiente»; el imperativo afirmativo es «arrepiéntete»');
+    // Con imperativo afirmativo, infinitivo y gerundio el pronombre va detrás y unido:
+    // arrepiéntete, arrepiéntase, arrepintámonos, arrepentíos, arrepiéntanse; arrepintiéndose.
+    // Lo dice la FAQ visible de la propia página («se une al infinitivo, gerundio e imperativo»).
+    await conjugarYEsperar(page, 'arrepentirse', 'arrepentir');
+    const nota = (await notaModelo(page).textContent()) ?? '';
+    const tu = (await formas(page, 'Imperativo', 'Imperativo Afirmativo'))[1];
+    expect(tu === 'arrepiéntete' || /imperativo|detrás|se une/i.test(nota)).toBe(true);
+  });
+
+  test('HALLAZGO ABIERTO (11/11/2026) · openGraph y twitter siguen diciendo «Conjuga cualquier verbo» y una feature pega el %', async ({ page }) => {
+    test.fail(true, 'ABIERTO: la reparación quitó «cualquier verbo» del hero pero no de metadata.ts');
+    const og = await page.locator('meta[property="og:description"]').getAttribute('content');
+    const tw = await page.locator('meta[name="twitter:description"]').getAttribute('content');
+    expect(og ?? '').not.toContain('cualquier verbo');
+    expect(tw ?? '').not.toContain('cualquier verbo');
+    // Solo el WebApplication de la app (sus features), no el JSON-LD del layout raíz.
+    const ld = (await page.locator('script[type="application/ld+json"]').allTextContents()).filter((t) => t.includes('"WebApplication"')).join('\n');
+    expect(ld).toContain('WebApplication');
+    expect(ld).not.toMatch(/\d%/);
+  });
+});
+
 /* -------------------------------------------------------------------------------------
  * Firma de rotura en móvil (Pixel 7). Las opciones van enumeradas: un viewport móvil dentro
  * de un describe necesita las cinco para no heredar el userAgent de escritorio.
@@ -467,5 +751,17 @@ test.describe('Inspección 11/11/2026 — móvil (Pixel 7)', () => {
     const entrada = page.getByPlaceholder('Escribe un verbo en infinitivo...');
     await expect(entrada).toBeInViewport({ ratio: 1 });
     await expect(entrada).toBeFocused();
+  });
+
+  test('Inspección 11/11/2026 (cambio) · móvil: un verbo ESCRITO y conjugado por regla deja su cabecera y su nota a la vista', async ({ page }) => {
+    // La firma de rotura (85 % de visitas cortas) se midió antes de la reparación; aquí el flujo
+    // de quien escribe en vez de tocar un botón: «contribuir» → Conjugar. Medido el 11/11/2026:
+    // cabecera en y = 66 px, con el foco.
+    await enviar(page, 'contribuir');
+    await expect(cabecera(page, 'contribuir')).toBeInViewport({ ratio: 1 });
+    await expect(cabecera(page, 'contribuir')).toBeFocused();
+    await expect(notaModelo(page)).toContainText('añade -y- ante a, e y o, como construir');
+    await expect(notaModelo(page)).toBeInViewport();
+    await expect(tarjetaDeTiempo(page, 'Presente').locator('td', { hasText: /^contribuyo$/ })).toBeAttached();
   });
 });
