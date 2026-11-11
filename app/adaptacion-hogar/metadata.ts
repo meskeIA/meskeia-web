@@ -1,5 +1,6 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
+import { rangoDe, RANGO_TOTAL } from './catalogo';
 
 export const metadata: Metadata = {
   title: 'Adaptación del Hogar para Mayores - Checklist y costes | meskeIA',
@@ -51,7 +52,7 @@ export const faqJsonLd = {
       name: '¿Cuánto cuesta adaptar una casa para una persona mayor?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El coste varía mucho según las intervenciones. Las adaptaciones básicas del baño (barras de apoyo, asiento de ducha, antideslizante) rondan 200–600 €. Una ducha a ras de suelo cuesta entre 1.000 y 3.000 €. Una silla salvaescaleras puede oscilar entre 2.000 y 6.000 €, y una plataforma elevadora entre 5.000 y 15.000 €. La suma total de una adaptación integral del hogar puede superar los 20.000 €.',
+        text: `El coste varía mucho según las intervenciones. Las adaptaciones básicas del baño (barras de apoyo, asiento de ducha y suelo antideslizante) suman ${rangoDe(['barras_apoyo', 'silla_ducha', 'suelo_bano'])}. Una ducha accesible sin barreras cuesta ${rangoDe(['ducha_accesible'])}. Una silla salvaescaleras, ${rangoDe(['silla_salvaescaleras'])}, y una plataforma elevadora, ${rangoDe(['plataforma_elevadora'])}. Las 23 adaptaciones de la lista juntas suman ${RANGO_TOTAL}. Son rangos orientativos: el precio real depende de la zona, las calidades y la mano de obra.`,
       },
     },
     {
@@ -75,7 +76,7 @@ export const faqJsonLd = {
       name: '¿Qué diferencia hay entre una silla salvaescaleras y una plataforma elevadora?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La silla salvaescaleras se instala sobre la escalera existente y la persona se sienta en ella para desplazarse entre plantas; es más económica (2.000–6.000 €) y no requiere obra. La plataforma elevadora (o elevador vertical) funciona como un pequeño ascensor interior y permite trasladar también sillas de ruedas; tiene mayor coste (5.000–15.000 €) y puede precisar obra civil. La elección depende del nivel de movilidad de la persona y del tipo de escalera.',
+        text: `La silla salvaescaleras se instala sobre la escalera existente y la persona se sienta en ella para desplazarse entre plantas; es más económica (${rangoDe(['silla_salvaescaleras'])}) y no requiere obra. La plataforma elevadora (o elevador vertical) funciona como un pequeño ascensor interior y permite trasladar también sillas de ruedas; tiene mayor coste (${rangoDe(['plataforma_elevadora'])}) y puede precisar obra civil. La elección depende del nivel de movilidad de la persona y del tipo de escalera.`,
       },
     },
     {

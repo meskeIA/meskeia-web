@@ -248,17 +248,25 @@ test('HALLAZGO H3 (11/11/2026, REPARADO) · obras en alquiler: notificación esc
   expect(texto).toMatch(/reponer la vivienda/);
 });
 
-test('HALLAZGO H4 (11/11/2026, ABIERTO) · las FAQ no contradicen los costes que suma la lista', async ({ page }) => {
+test('HALLAZGO H4 (11/11/2026, REPARADO) · las FAQ no contradicen los costes que suma la lista', async ({ page }) => {
   // La lista suma barras 80–300 €, silla salvaescaleras 2500–6000 € y plataforma 4000–12.000 €.
-  // FAQ visible: «Barras de seguridad en baño (500-1.500 €)», «sillas salvaescaleras
-  // (3.000-10.000 €)». FAQPage: silla «2.000–6.000 €», plataforma «5.000–15.000 €».
-  test.fail();
+  // Antes, FAQ visible: «Barras de seguridad en baño (500-1.500 €)», «sillas salvaescaleras
+  // (3.000-10.000 €)»; FAQPage: silla «2.000–6.000 €», plataforma «5.000–15.000 €». Ahora las
+  // dos FAQ salen de CATEGORIAS (catalogo.ts). Baño básico: barras 80–300 + asiento 50–200 +
+  // antideslizante 30–150 = 160–650 €; las 23 = 10.050–34.800 € (CASO 2).
   const texto = await abrirGuia(page);
   expect(texto).not.toContain('Barras de seguridad en baño (500-1.500 €)');
   expect(texto).not.toContain('(3.000-10.000 €)');
-  const faq = JSON.stringify((await jsonLd(page)).find((b) => b['@type'] === 'FAQPage'));
+  expect(texto).toContain('Barras de apoyo en ducha y WC (80–300 €)');
+  expect(texto).toContain('silla salvaescaleras (2500–6000 €)');
+  expect(texto).toContain('plataforma elevadora (4000–12.000 €)');
+  const faq = limpiar(JSON.stringify((await jsonLd(page)).find((b) => b['@type'] === 'FAQPage')));
   expect(faq).not.toContain('2.000–6.000 €');
   expect(faq).not.toContain('5.000–15.000 €');
+  expect(faq).toContain('suman 160–650 €');
+  expect(faq).toContain('(2500–6000 €)');
+  expect(faq).toContain('(4000–12.000 €)');
+  expect(faq).toContain('juntas suman 10.050–34.800 €');
 });
 
 test('HALLAZGO H7 (11/11/2026, ABIERTO) · features del JSON-LD con al menos 4 características', async ({ page }) => {

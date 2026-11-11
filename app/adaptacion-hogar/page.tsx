@@ -5,90 +5,13 @@ import styles from './AdaptacionHogar.module.css';
 import { MeskeiaLogo, LegalNotice, Footer, EducationalSection, RelatedApps, ShareCard, DisclaimerCard, DataReference } from '@/components';
 import { formatCurrency } from '@/lib';
 import { cuantiaMaximaPEVS, FISCAL_DEPENDENCIA_META } from '@/data/fiscal';
+import { CATEGORIAS, TODOS_LOS_ITEMS, rangoDe } from './catalogo';
 
 /** Tope estatal de la prestación vinculada al servicio en grado III (anexo IV del RD 1051/2013). */
 const PEVS_GRADO_III = cuantiaMaximaPEVS(3);
 
 // ─── Datos ────────────────────────────────────────────────────────────────────
-
-interface ItemAdaptacion {
-  id: string;
-  nombre: string;
-  costeMin: number;
-  costeMax: number;
-  prioridad: 'alta' | 'media' | 'baja';
-  ayuda: boolean;
-}
-
-interface Categoria {
-  id: string;
-  nombre: string;
-  items: ItemAdaptacion[];
-}
-
-const CATEGORIAS: Categoria[] = [
-  {
-    id: 'bano',
-    nombre: '🚿 Baño',
-    items: [
-      { id: 'barras_apoyo', nombre: 'Barras de apoyo en ducha y WC', costeMin: 80, costeMax: 300, prioridad: 'alta', ayuda: true },
-      { id: 'silla_ducha', nombre: 'Silla o asiento de ducha', costeMin: 50, costeMax: 200, prioridad: 'alta', ayuda: false },
-      { id: 'suelo_bano', nombre: 'Suelo antideslizante en baño', costeMin: 30, costeMax: 150, prioridad: 'alta', ayuda: false },
-      { id: 'elevador_wc', nombre: 'Elevador de WC con brazos', costeMin: 40, costeMax: 200, prioridad: 'media', ayuda: false },
-      { id: 'ducha_accesible', nombre: 'Ducha accesible sin barreras', costeMin: 800, costeMax: 3000, prioridad: 'alta', ayuda: true },
-      { id: 'grifo_monomando', nombre: 'Grifo monomando ergonómico', costeMin: 60, costeMax: 200, prioridad: 'baja', ayuda: false },
-    ],
-  },
-  {
-    id: 'dormitorio',
-    nombre: '🛏️ Dormitorio',
-    items: [
-      { id: 'cama_articulada', nombre: 'Cama articulada o ajustable', costeMin: 400, costeMax: 2500, prioridad: 'media', ayuda: true },
-      { id: 'barra_cama', nombre: 'Barra lateral de apoyo (cama)', costeMin: 80, costeMax: 300, prioridad: 'media', ayuda: false },
-      { id: 'iluminacion_nocturna', nombre: 'Iluminación nocturna automática', costeMin: 30, costeMax: 100, prioridad: 'alta', ayuda: false },
-      { id: 'eliminar_alfombras', nombre: 'Eliminar o fijar alfombras', costeMin: 0, costeMax: 50, prioridad: 'alta', ayuda: false },
-    ],
-  },
-  {
-    id: 'cocina',
-    nombre: '🍳 Cocina',
-    items: [
-      { id: 'induccion', nombre: 'Cocina de inducción (mayor seguridad)', costeMin: 250, costeMax: 800, prioridad: 'media', ayuda: false },
-      { id: 'tiradores_cocina', nombre: 'Tiradores y cajones ergonómicos', costeMin: 100, costeMax: 400, prioridad: 'baja', ayuda: false },
-      { id: 'encimera_adaptada', nombre: 'Encimera a altura accesible', costeMin: 500, costeMax: 2000, prioridad: 'media', ayuda: true },
-    ],
-  },
-  {
-    id: 'accesos',
-    nombre: '🚪 Accesos y pasillos',
-    items: [
-      { id: 'rampa_entrada', nombre: 'Rampa de acceso exterior', costeMin: 100, costeMax: 1500, prioridad: 'alta', ayuda: true },
-      { id: 'pasamanos_pasillos', nombre: 'Pasamanos en pasillos', costeMin: 150, costeMax: 600, prioridad: 'alta', ayuda: true },
-      { id: 'ampliar_puertas', nombre: 'Ampliar puertas (≥ 80 cm)', costeMin: 300, costeMax: 1500, prioridad: 'media', ayuda: true },
-      { id: 'tiradores_palanca', nombre: 'Tiradores de palanca en puertas', costeMin: 100, costeMax: 400, prioridad: 'baja', ayuda: false },
-    ],
-  },
-  {
-    id: 'escaleras',
-    nombre: '⬆️ Escaleras',
-    items: [
-      { id: 'doble_pasamanos', nombre: 'Doble pasamanos en escalera', costeMin: 200, costeMax: 800, prioridad: 'alta', ayuda: true },
-      { id: 'silla_salvaescaleras', nombre: 'Silla salvaescaleras', costeMin: 2500, costeMax: 6000, prioridad: 'alta', ayuda: true },
-      { id: 'plataforma_elevadora', nombre: 'Plataforma elevadora vertical', costeMin: 4000, costeMax: 12000, prioridad: 'alta', ayuda: true },
-    ],
-  },
-  {
-    id: 'seguridad',
-    nombre: '🔔 Seguridad general',
-    items: [
-      { id: 'telealarma', nombre: 'Telealarma / detector de caídas', costeMin: 30, costeMax: 300, prioridad: 'alta', ayuda: true },
-      { id: 'suelos_generales', nombre: 'Suelos antideslizantes (toda la casa)', costeMin: 100, costeMax: 1000, prioridad: 'alta', ayuda: false },
-      { id: 'interruptores', nombre: 'Interruptores a altura accesible', costeMin: 150, costeMax: 500, prioridad: 'baja', ayuda: false },
-    ],
-  },
-];
-
-const TODOS_LOS_ITEMS = CATEGORIAS.flatMap(c => c.items);
+// El catálogo vive en catalogo.ts: de él salen también las cifras de las dos FAQ.
 
 const LABELS_PRIORIDAD: Record<string, string> = {
   alta: 'Prioritario',
@@ -366,7 +289,7 @@ export default function AdaptacionHogar() {
         <h3>Preguntas frecuentes sobre adaptación del hogar</h3>
         <div className={styles.faqItem}>
           <strong>¿Qué adaptaciones son las más habituales?</strong>
-          <p>Barras de seguridad en baño (500-1.500 €), sustitución bañera por ducha accesible (1.500-4.000 €), ampliación de puertas (500-1.500 €/puerta), rampas (500-3.000 €) y elevadores/sillas salvaescaleras (3.000-10.000 €).</p>
+          <p>Barras de apoyo en ducha y WC ({rangoDe(['barras_apoyo'])}), ducha accesible sin barreras en lugar de la bañera ({rangoDe(['ducha_accesible'])}), ampliación de puertas ({rangoDe(['ampliar_puertas'])}), rampa de acceso ({rangoDe(['rampa_entrada'])}), silla salvaescaleras ({rangoDe(['silla_salvaescaleras'])}) y plataforma elevadora ({rangoDe(['plataforma_elevadora'])}). Son los mismos rangos orientativos que suma la lista de arriba.</p>
         </div>
         <div className={styles.faqItem}>
           <strong>¿Necesito certificado de discapacidad para acceder a las ayudas?</strong>
