@@ -111,7 +111,7 @@ export const faqJsonLd = {
       name: '¿Cómo sé qué patrón alimentario se adapta mejor a mí?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Los factores clave son tu objetivo principal (perder peso, mejorar la salud cardiovascular, ganar masa muscular…), tu nivel de actividad física, restricciones alimentarias o alergias, tiempo disponible para cocinar y tu relación con los grupos de alimentos. Un test orientativo basado en estas variables puede orientarte hacia la dieta más adecuada, aunque siempre es recomendable validar la elección con un profesional de la nutrición.',
+        text: 'Los factores clave son tu objetivo principal (perder peso, mejorar la salud cardiovascular, ganar masa muscular…), tu nivel de actividad física, si eres vegetariano, vegano o necesitas comer sin gluten, alguna condición de salud diagnosticada, el tiempo disponible para cocinar, el presupuesto y tu relación con la comida. Un test orientativo basado en estas variables puede orientarte hacia un patrón, aunque siempre es recomendable validar la elección con un profesional de la nutrición. Las alergias alimentarias no entran en un test así: si tienes alguna, revisa cada alimento del patrón con tu médico o dietista.',
       },
     },
   ],

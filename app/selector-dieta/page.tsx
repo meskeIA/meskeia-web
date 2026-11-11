@@ -343,8 +343,9 @@ export default function SelectorDieta() {
 
           <h3>Por qué la mediterránea es la más respaldada</h3>
           <p>
-            La dieta mediterránea cuenta con décadas de investigación y es el patrón más recomendado por
-            organismos como la OMS y la EFSA. El estudio PREDIMED (realizado en España) demostró una reducción
+            La dieta mediterránea cuenta con décadas de investigación detrás. Las recomendaciones de
+            patrón las fijan las guías alimentarias de cada país (la EFSA, la autoridad europea, da valores
+            de referencia de nutrientes, pero no recomienda patrones). El estudio PREDIMED (realizado en España) demostró una reducción
             del 30&nbsp;% en eventos cardiovasculares mayores. Su ventaja clave: es sostenible culturalmente en
             España, variada y sin prohibiciones absolutas.
           </p>
@@ -374,8 +375,10 @@ export default function SelectorDieta() {
             Esta herramienta es orientativa. Consulta con un profesional colegiado si: tienes una condición
             de salud diagnosticada (diabetes, enfermedad renal, cardiovascular), estás embarazada o en período
             de lactancia, tienes menos de 18 o más de 70 años, o si quieres adoptar una dieta vegana o
-            cetogénica estricta. El Colegio Oficial de Dietistas-Nutricionistas de España (CODINUA) ofrece
-            un buscador de profesionales en su web oficial.
+            cetogénica estricta. En España, los dietistas-nutricionistas se colegian en el colegio oficial
+            de su comunidad autónoma, que agrupa el Consejo General de Colegios Oficiales de
+            Dietistas-Nutricionistas (Ley 19/2014); en otros países, consulta el registro profesional o la
+            asociación de dietistas de tu país.
           </p>
         </EducationalSection>
       </div>

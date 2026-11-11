@@ -953,38 +953,42 @@ test('candado (C0205): el cuestionario que se ve es exactamente el de PREGUNTAS'
   }
 });
 
-test('ABIERTO (C0205 a): la guía no remite a un «Colegio Oficial de Dietistas-Nutricionistas de España (CODINUA)», que no existe', async ({ page }) => {
-  // ABIERTO desde el 11/11/2026 (cabo C0205). «Cuándo consultar con un dietista-nutricionista»
-  // dice: «El Colegio Oficial de Dietistas-Nutricionistas de España (CODINUA) ofrece un buscador de
+test('REPARADO (C0205 a, hallazgo 4476): la guía no remite a un «Colegio Oficial de Dietistas-Nutricionistas de España (CODINUA)», que no existe', async ({ page }) => {
+  // REPARADO el 11/11/2026 (/reparar). «Cuándo consultar con un dietista-nutricionista» decía:
+  // «El Colegio Oficial de Dietistas-Nutricionistas de España (CODINUA) ofrece un buscador de
   // profesionales en su web oficial.» Los colegios son de ámbito inferior al nacional y los agrupa
-  // el Consejo General (Ley 19/2014, BOE-A-2014-10518), corporación de derecho público: ese sí se
-  // puede citar, igual que el colegio oficial de cada comunidad.
-  test.fail();
+  // el Consejo General (Ley 19/2014, BOE-A-2014-10518, cotejada: «por la que se crea el Consejo
+  // General de Colegios Oficiales de Dietistas-Nutricionistas»). Ahora cita los dos.
   const html = await (await page.request.get('/selector-dieta/')).text();
   expect(html.includes('CODINUA') || html.includes('Colegio Oficial de Dietistas-Nutricionistas de España'), 'entidad inexistente en la guía')
     .toBe(false);
+  expect(html).toContain('Consejo General de Colegios Oficiales de');
 });
 
-test('ABIERTO (C0205 b): la guía no atribuye a la EFSA la recomendación de la dieta mediterránea', async ({ page }) => {
-  // ABIERTO desde el 11/11/2026 (cabo C0205). «Por qué la mediterránea es la más respaldada»:
-  // «es el patrón más recomendado por organismos como la OMS y la EFSA». La EFSA: «The setting of
-  // nutrition goals and recommendations is outside EFSA's remit». (La mitad de la OMS no es del cabo.)
-  test.fail();
+test('REPARADO (C0205 b, hallazgo 4477): la guía no atribuye a la EFSA la recomendación de la dieta mediterránea', async ({ page }) => {
+  // REPARADO el 11/11/2026 (/reparar). Decía: «es el patrón más recomendado por organismos como la
+  // OMS y la EFSA». La EFSA: «The setting of nutrition goals and recommendations is outside EFSA's
+  // remit». La OMS tampoco se pudo anclar: la frase ya no atribuye la recomendación a ningún
+  // organismo y dice que las guías son de cada país.
   const html = await (await page.request.get('/selector-dieta/')).text();
-  expect(/recomendad[oa]s?[^.<]*EFSA|EFSA[^.<]*recomienda/.test(html), 'la EFSA como recomendadora de un patrón').toBe(false);
+  // «EFSA … no recomienda patrones» es la frase reparada: la negación no cuenta.
+  expect(/recomendad[oa]s?[^.<]*EFSA|EFSA[^.<]*(?<!no )recomienda /.test(html), 'la EFSA como recomendadora de un patrón').toBe(false);
+  expect(html).toContain('no recomienda patrones');
 });
 
-test('ABIERTO (C0205 c): el FAQPage no da las alergias como factor de un test que no pregunta por ellas', async ({ page }) => {
-  // ABIERTO desde el 11/11/2026 (cabo C0205). 5.ª pregunta del FAQPage («¿Cómo sé qué patrón
-  // alimentario se adapta mejor a mí?»): «Los factores clave son […] restricciones alimentarias o
-  // alergias […]. Un test orientativo basado en estas variables puede orientarte hacia la dieta más
-  // adecuada». El cuestionario solo pregunta por vegetariano, vegano y sin gluten (celiaquía o
-  // sensibilidad, que no son alergias), y cinco de las seis fichas llevan frutos secos entre sus
-  // alimentos clave.
-  test.fail();
+test('REPARADO (C0205 c, hallazgo 4478): el FAQPage no da las alergias como factor de un test que no pregunta por ellas', async ({ page }) => {
+  // REPARADO el 11/11/2026 (/reparar). 5.ª pregunta del FAQPage («¿Cómo sé qué patrón alimentario
+  // se adapta mejor a mí?») decía: «Los factores clave son […] restricciones alimentarias o
+  // alergias […]». El cuestionario solo pregunta por vegetariano, vegano y sin gluten, y cinco de
+  // las seis fichas llevan frutos secos. El esperado del acta pedía no nombrar las alergias; la
+  // respuesta las nombra para decir que el test NO las tiene en cuenta, que es lo que necesita
+  // saber quien tiene una alergia. Se mide: los factores (la primera frase) no las incluyen, y si
+  // aparecen es para excluirlas.
   const faq = (await jsonLd(page)).find((b) => b['@type'] === 'FAQPage') as
     { mainEntity: { name: string; acceptedAnswer: { text: string } }[] } | undefined;
   const respuesta = faq?.mainEntity.find((q) => q.name.includes('se adapta mejor a mí'))?.acceptedAnswer.text ?? '';
-  const cuestionario = PREGUNTAS.map((p) => [p.texto, ...p.opciones.map((o) => `${o.etiqueta} ${o.descripcion}`)].join(' ')).join(' ');
-  expect(/alergi/i.test(respuesta) && !/alergi/i.test(cuestionario), 'promete alergias y no las pregunta').toBe(false);
+  const factores = respuesta.split('. ')[0];
+  expect(factores).toContain('Los factores clave son');
+  expect(/alergi/i.test(factores), 'da las alergias como factor').toBe(false);
+  if (/alergi/i.test(respuesta)) expect(respuesta).toContain('Las alergias alimentarias no entran en un test así');
 });
