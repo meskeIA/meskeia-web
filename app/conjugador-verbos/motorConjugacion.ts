@@ -6,7 +6,7 @@
  */
 
 import { verbosIrregulares, ConjugacionCompleta } from './verbosIrregulares';
-import { conjugarInfinitivo, motivoNoInfinitivo } from './reglasConjugacion';
+import { conjugarInfinitivo, conTildeDeHiato, motivoNoInfinitivo } from './reglasConjugacion';
 
 // Pronombres personales
 export const PRONOMBRES = ['yo', 'tú', 'él/ella/Ud.', 'nosotros', 'vosotros', 'ellos/ellas/Uds.'];
@@ -169,7 +169,7 @@ export function expandirConCompuestos(conj: ConjugacionCompleta): ConjugacionCon
  * patrón o regla (reglasConjugacion.ts). `null` si la entrada no se acepta como infinitivo.
  */
 export function conjugarVerbo(infinitivo: string): ConjugacionConCompuestos | null {
-  const verbo = infinitivo.toLowerCase().trim();
+  const verbo = conTildeDeHiato(infinitivo.toLowerCase().trim());
   if (motivoNoInfinitivo(verbo)) return null;
   const resultado = conjugarInfinitivo(verbo);
   return resultado ? expandirConCompuestos(resultado.conjugacion) : null;
@@ -180,7 +180,7 @@ export function conjugarVerbo(infinitivo: string): ConjugacionConCompuestos | nu
  * 11/11/2026 se rechazaban por mirar solo «-ir» sin tilde (hallazgo 4420).
  */
 export function esVerboValido(infinitivo: string): boolean {
-  return motivoNoInfinitivo(infinitivo.toLowerCase().trim()) === null;
+  return motivoNoInfinitivo(conTildeDeHiato(infinitivo.toLowerCase().trim())) === null;
 }
 
 /**
@@ -189,7 +189,7 @@ export function esVerboValido(infinitivo: string): boolean {
  * (buscar → busqué) no lo hace irregular.
  */
 export function esIrregular(infinitivo: string): boolean {
-  const verbo = infinitivo.toLowerCase().trim();
+  const verbo = conTildeDeHiato(infinitivo.toLowerCase().trim());
   if (motivoNoInfinitivo(verbo)) return false;
   return conjugarInfinitivo(verbo)?.irregular ?? false;
 }
@@ -211,22 +211,34 @@ export type ResultadoEntrada =
  * de «no válido» sin explicar qué hacer).
  */
 export function analizarEntrada(texto: string): ResultadoEntrada {
-  const limpio = texto.toLowerCase().trim();
+  let limpio = texto.toLowerCase().trim();
   let verbo = limpio;
   let pronominal = false;
   if (/(ar|er|ir|ír)se$/.test(limpio)) {
     verbo = limpio.slice(0, -2);
     pronominal = true;
   }
+  const notas: string[] = [];
+  const conTilde = conTildeDeHiato(verbo);
+  if (conTilde !== verbo) {
+    notas.push(`Se escribe «${conTilde}», con tilde.`);
+    verbo = conTilde;
+    limpio = pronominal ? `${verbo}se` : verbo;
+  }
   const motivo = motivoNoInfinitivo(verbo);
   if (motivo) return { ok: false, error: pronominal ? motivo.replace(`«${verbo}»`, `«${limpio}»`) : motivo };
   const resultado = conjugarInfinitivo(verbo);
   if (!resultado) return { ok: false, error: 'No se pudo conjugar el verbo' };
-  const notas: string[] = [];
   if (pronominal) {
-    const p = resultado.conjugacion.indicativo.presente;
+    const c = resultado.conjugacion;
+    const p = c.indicativo.presente;
+    // Detrás y unido en el infinitivo, el gerundio y el imperativo afirmativo, y el imperativo de
+    // vosotros pierde la -d (hallazgo 4485: la nota decía «delante» para todo, y «te arrepiente»).
+    const gerundio = `${c.gerundio.replace(/([ae])ndo$/, (_, v: string) => (v === 'a' ? 'á' : 'é') + 'ndo')}se`;
+    const vos = c.imperativo.afirmativo[4];
+    const vosotros = verbo === 'ir' ? 'idos' : `${vos.slice(0, -1).replace(/i$/, 'í')}os`;
     notas.push(
-      `«${limpio}» es pronominal: se conjuga como «${verbo}» con me, te, se, nos, os, se delante (me ${p[0]}, te ${p[1]}…).`,
+      `«${limpio}» es pronominal: se conjuga como «${verbo}» con me, te, se, nos, os, se delante de las formas conjugadas (me ${p[0]}, te ${p[1]}…). En el infinitivo, el gerundio y el imperativo afirmativo el pronombre va detrás y unido (${limpio}, ${gerundio}, ${vosotros}), y el imperativo de vosotros pierde la -d.`,
     );
   }
   if (resultado.modelo) {
@@ -253,11 +265,17 @@ export function obtenerVerbosIrregulares(): string[] {
  * «ir», el propio «ir»), luego los que lo contienen (hallazgo 4426).
  */
 export function buscarVerbos(patron: string): string[] {
-  const busqueda = patron.toLowerCase().trim();
+  // Sin distinguir tildes: con «oi» o «rei», tecleados sin ella, salen oír y reír (hallazgo 4480).
+  const busqueda = sinTildes(patron.toLowerCase().trim());
   const irregulares = obtenerVerbosIrregulares();
-  const empiezan = irregulares.filter((verbo) => verbo.startsWith(busqueda));
-  const contienen = irregulares.filter((verbo) => !verbo.startsWith(busqueda) && verbo.includes(busqueda));
+  const empiezan = irregulares.filter((verbo) => sinTildes(verbo).startsWith(busqueda));
+  const contienen = irregulares.filter((verbo) => !sinTildes(verbo).startsWith(busqueda) && sinTildes(verbo).includes(busqueda));
   return [...empiezan, ...contienen].slice(0, 10);
+}
+
+const LETRA_SIN_TILDE: Record<string, string> = { á: 'a', é: 'e', í: 'i', ó: 'o', ú: 'u', ü: 'u' };
+function sinTildes(texto: string): string {
+  return texto.replace(/[áéíóúü]/g, (c) => LETRA_SIN_TILDE[c] ?? c);
 }
 
 // Re-exportar tipo

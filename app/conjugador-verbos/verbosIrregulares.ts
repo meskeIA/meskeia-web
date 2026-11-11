@@ -1167,9 +1167,10 @@ export const verbosIrregulares: Record<string, ConjugacionCompleta> = {
     gerundio: 'huyendo',
     participio: 'huido',
     indicativo: {
-      presente: ['huyo', 'huyes', 'huye', 'huimos', 'huís', 'huyen'],
+      // «hui» y «huis», monosílabos sin tilde: «ui» es siempre diptongo (Ortografía de 2010; hallazgo 4483).
+      presente: ['huyo', 'huyes', 'huye', 'huimos', 'huis', 'huyen'],
       preterito_imperfecto: ['huía', 'huías', 'huía', 'huíamos', 'huíais', 'huían'],
-      preterito_indefinido: ['huí', 'huiste', 'huyó', 'huimos', 'huisteis', 'huyeron'],
+      preterito_indefinido: ['hui', 'huiste', 'huyó', 'huimos', 'huisteis', 'huyeron'],
       futuro: ['huiré', 'huirás', 'huirá', 'huiremos', 'huiréis', 'huirán'],
       condicional: ['huiría', 'huirías', 'huiría', 'huiríamos', 'huiríais', 'huirían'],
     },

@@ -151,6 +151,8 @@ interface Derivado {
   /** Futuro y condicional regulares sobre el infinitivo (bendeciré). */
   futuroRegular?: boolean;
   participio?: string;
+  /** Letras que se quitan del principio de cada forma de la base antes del prefijo (des-l + íe). */
+  recorte?: number;
 }
 
 const DERIVADOS: Record<string, Derivado> = {};
@@ -201,27 +203,62 @@ const NO_VERBOS = new Set([
 
 const VOCALES = 'aeiouáéíóúü';
 const FUERTES = 'aeoáéó';
+const CERRADAS_ATONAS = 'iuü';
 const CON_TILDE: Record<string, string> = { a: 'á', e: 'é', i: 'í', o: 'ó', u: 'ú' };
 const SIN_TILDE: Record<string, string> = { á: 'a', é: 'e', í: 'i', ó: 'o', ú: 'u' };
+const LETRA_BASE: Record<string, string> = { ...SIN_TILDE, ü: 'u' };
 
 /**
- * Sílabas de una forma según la Ortografía de 2010: abierta + cerrada átona, o dos cerradas, es
- * diptongo; dos abiertas, o una cerrada con tilde, es hiato. Basta para decidir la tilde de una
- * forma verbal; no silabea palabras en general.
+ * ¿Forman estas vocales seguidas una sola sílaba? Ortografía de 2010: abierta + cerrada átona (o
+ * al revés) es diptongo; dos cerradas distintas, ui o iu, también, lleven o no tilde (flui,
+ * construí); cerrada átona + abierta + cerrada átona es triptongo (fiais). Dos abiertas, o una
+ * cerrada tónica junto a una abierta, es hiato (le-í, rí-o).
+ */
+function esUnaSilaba(vocales: string): boolean {
+  const v = [...vocales];
+  if (v.length === 1) return true;
+  if (v.length === 2) {
+    const [a, b] = v;
+    if (FUERTES.includes(a)) return CERRADAS_ATONAS.includes(b);
+    if (FUERTES.includes(b)) return CERRADAS_ATONAS.includes(a);
+    return (LETRA_BASE[a] ?? a) !== (LETRA_BASE[b] ?? b);
+  }
+  if (v.length === 3) return CERRADAS_ATONAS.includes(v[0]) && FUERTES.includes(v[1]) && CERRADAS_ATONAS.includes(v[2]);
+  return false;
+}
+
+/**
+ * Sílabas de una forma según la Ortografía de 2010 (reglas en `esUnaSilaba`). La h intercalada no
+ * impide el diptongo ni el hiato (pro-hí-bo, re-hú-so: hallazgo 4482), y la u de gue, gui, que,
+ * qui no suena. Basta para decidir la tilde de una forma verbal; no silabea palabras en general.
  */
 export function contarSilabas(palabra: string): number {
+  const letras = [...palabra];
   let n = 0;
-  let anterior = '';
-  for (const c of palabra) {
-    if (!VOCALES.includes(c)) {
-      anterior = '';
+  let nucleo = '';
+  for (let i = 0; i < letras.length; i++) {
+    const c = letras[i];
+    if (c === 'h') continue;
+    const uMuda = c === 'u' && 'gq'.includes(letras[i - 1] ?? '-') && 'eiéí'.includes(letras[i + 1] ?? '-');
+    if (!VOCALES.includes(c) || uMuda) {
+      nucleo = '';
       continue;
     }
-    if (!anterior) n++;
-    else if ((FUERTES.includes(anterior) && FUERTES.includes(c)) || 'íú'.includes(anterior) || 'íú'.includes(c)) n++;
-    anterior = c;
+    if (nucleo && esUnaSilaba(nucleo + c)) {
+      nucleo += c;
+    } else {
+      n++;
+      nucleo = c;
+    }
   }
   return n;
+}
+
+/** ¿Lleva el acento la primera sílaba de una forma sin tilde? (llana bisílaba: hi-ce, hi-zo). */
+function tonicaEnLaPrimera(forma: string): boolean {
+  const n = contarSilabas(forma);
+  const tonica = /[aeiouns]$/.test(forma) ? n - 2 : n - 1;
+  return tonica <= 0;
 }
 
 function tieneTilde(forma: string): boolean {
@@ -253,7 +290,13 @@ function prefijar(prefijo: string, forma: string): string {
   if (forma === '-') return forma;
   if (forma.startsWith('no ')) return `no ${prefijar(prefijo, forma.slice(3))}`;
   const agudaNueva = !tieneTilde(forma) && contarSilabas(forma) === 1 && /[aeiouns]$/.test(forma);
-  return prefijo + (agudaNueva ? acentuarNucleo(forma) : forma);
+  if (agudaNueva) return prefijo + acentuarNucleo(forma);
+  // La i o la u tónica que queda junto a la vocal abierta del prefijo (la h no cuenta) forma
+  // hiato y lleva tilde: re-hí-ce, re-hí-zo (DPD, s. v. rehacer; hallazgo 4482).
+  if (/[aeo]$/.test(prefijo) && /^h?[iu][^aeiouáéíóúü]/.test(forma) && !tieneTilde(forma) && tonicaEnLaPrimera(forma)) {
+    return prefijo + forma.replace(/^(h?)([iu])/, (_, h: string, v: string) => h + CON_TILDE[v]);
+  }
+  return prefijo + forma;
 }
 
 /** Un monosílabo no lleva tilde (crié → crie, guió → guio, fiáis → fiais). */
@@ -323,7 +366,8 @@ function modeloDe(infinitivo: string): Modelo | null {
     cambio,
     zc: (/[aeo]cer$/.test(infinitivo) || /ucir$/.test(infinitivo)) && !SIN_ZC.has(infinitivo),
     ducir: infinitivo.endsWith('ducir'),
-    uy: /[^gq]uir$/.test(infinitivo),
+    // argüir entra también, con la diéresis solo ante i (arguyo, argüimos: NGLE; hallazgo 4484).
+    uy: /[^gq]uir$/.test(infinitivo) || infinitivo.endsWith('güir'),
     raizHiato,
     participio: participio ? infinitivo.slice(0, -participio[0].length) + participio[1] : null,
   };
@@ -351,12 +395,15 @@ function unir(m: Modelo, raiz: string, desinencia: string): string {
   let d = desinencia;
   if (m.conj !== 'ar') {
     const ultima = r.slice(-1);
-    const vocalQueSuena = 'aeo'.includes(ultima) || (ultima === 'u' && !/[gq]u$/.test(r));
+    const vocalQueSuena = 'aeo'.includes(ultima) || ultima === 'ü' || (ultima === 'u' && !/[gq]u$/.test(r));
+    // La é de «-iéramos» cuenta como las demás (contribuyéramos, tiñéramos: hallazgo 4479).
     if (vocalQueSuena) {
-      if (/^i[aeoó]/.test(d)) d = 'y' + d.slice(1); // leyó, construyendo
-      else if (/^i/.test(d) && ultima !== 'u') d = 'í' + d.slice(1); // leíste, leído
+      if (/^i[aeoóé]/.test(d)) {
+        d = 'y' + d.slice(1); // leyó, construyendo
+        if (ultima === 'ü') r = r.slice(0, -1) + 'u'; // arguyó: la diéresis solo ante i
+      } else if (/^i/.test(d) && ultima !== 'u' && ultima !== 'ü') d = 'í' + d.slice(1); // leíste, leído
     }
-    if ((r.endsWith('ñ') || r.endsWith('ll')) && /^i[eó]/.test(d)) d = d.slice(1); // tiñó, bulló
+    if ((r.endsWith('ñ') || r.endsWith('ll')) && /^i[eéó]/.test(d)) d = d.slice(1); // tiñó, bulló
   }
   return sinTildeSiMonosilabo(r + d);
 }
@@ -377,8 +424,11 @@ function conjugarModelo(m: Modelo): ConjugacionCompleta {
   }
   if (m.raizHiato) tonica = m.raizHiato;
   if (m.uy) {
-    tonica = r + 'y';
-    subjAtona = r + 'y';
+    // argüir → arguy-; la u en hiato con la vocal anterior lleva tilde en las tónicas (re-hú-yo,
+    // la h no cuenta: hallazgo 4482).
+    const raizU = r.endsWith('ü') ? r.slice(0, -1) + 'u' : r;
+    tonica = (/[aeo]h?u$/.test(raizU) ? raizU.slice(0, -1) + 'ú' : raizU) + 'y';
+    subjAtona = raizU + 'y';
   }
 
   const presente = D.presente.map((d, i) => unir(m, [3, 4].includes(i) ? r : tonica, d));
@@ -423,7 +473,12 @@ function conjugarModelo(m: Modelo): ConjugacionCompleta {
 
 function conjugarDerivado(infinitivo: string, d: Derivado): ConjugacionCompleta {
   const base = verbosIrregulares[d.base];
-  const p = (f: string) => prefijar(d.prefijo, f);
+  const corte = d.recorte ?? 0;
+  const p = (f: string): string => {
+    if (f === '-' || corte === 0) return prefijar(d.prefijo, f);
+    if (f.startsWith('no ')) return `no ${prefijar(d.prefijo, f.slice(3 + corte))}`;
+    return prefijar(d.prefijo, f.slice(corte));
+  };
   const futuro = d.futuroRegular ? FUTURO.map((t) => infinitivo + t) : base.indicativo.futuro.map(p);
   const condicional = d.futuroRegular ? CONDICIONAL.map((t) => infinitivo + t) : base.indicativo.condicional.map(p);
   const afirmativo = base.imperativo.afirmativo.map(p);
@@ -508,11 +563,31 @@ export function motivoNoInfinitivo(verbo: string): string | null {
   return null;
 }
 
+/**
+ * Un verbo en -ír nunca es regular: es oír, reír o freír, o se conjuga como uno de ellos
+ * (hallazgo 4481). sofreír y refreír ← freír (sofrito); entreoír ← oír; engreír, desleír y los
+ * demás en -eír, como reír, cambiando la r de la base por su raíz (des-l-íe como r-íe).
+ */
+function derivadoEnIr(verbo: string): Derivado | null {
+  if (verbo.endsWith('freír')) return { base: 'freír', prefijo: verbo.slice(0, -5) };
+  if (verbo.endsWith('eír')) return { base: 'reír', prefijo: verbo.slice(0, -3), recorte: 1 };
+  if (verbo.endsWith('oír')) return { base: 'oír', prefijo: verbo.slice(0, -3) };
+  return null;
+}
+
+/**
+ * «oir», «reir», «freir» → oír, reír, freír: un infinitivo en vocal abierta + ir lleva siempre la
+ * tilde del hiato, y sin ella salía conjugado como regular («yo oo», «yo reo»: hallazgo 4480).
+ */
+export function conTildeDeHiato(verbo: string): string {
+  return /[aeo]ir$/.test(verbo) ? `${verbo.slice(0, -2)}ír` : verbo;
+}
+
 /** Conjuga un infinitivo ya validado: tabla → derivado → patrón o regla. */
 export function conjugarInfinitivo(verbo: string): VerboConjugado | null {
   const tabla = verbosIrregulares[verbo];
   if (tabla) return { conjugacion: tabla, tipo: 'tabla', irregular: true, modelo: null };
-  const derivado = DERIVADOS[verbo];
+  const derivado = DERIVADOS[verbo] ?? derivadoEnIr(verbo);
   if (derivado) {
     return {
       conjugacion: conjugarDerivado(verbo, derivado),

@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     title: 'Conjugador de Verbos Español | meskeIA',
-    description: 'Conjuga cualquier verbo en español. Todos los tiempos, incluidos irregulares.',
+    description: 'Conjuga verbos en español con todos los tiempos verbales, incluidos los irregulares.',
     url: 'https://meskeia.com/conjugador-verbos/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'Conjugador de Verbos Español | meskeIA',
-    description: 'Conjuga cualquier verbo en español con todos los tiempos verbales.',
+    description: 'Conjuga verbos en español con todos los tiempos verbales.',
     images: ['https://meskeia.com/og-image.png']
   },
 };
@@ -44,7 +44,7 @@ export const jsonLd = generateWebAppSchema({
     'Más de 60 verbos irregulares de tabla y sus derivados por prefijo (mantener, suponer, prever)',
     'Grupos de irregularidad por regla: diptongación (vuelo), cierre vocálico (pidió), -zc- (agradezco) y -uy- (construyo)',
     'Regulares con sus cambios ortográficos (busqué, cojo, envío), y la nota del modelo con que se conjuga cada verbo',
-    'Funciona 100% en el navegador, sin registro ni instalación',
+    'Funciona 100 % en el navegador, sin registro ni instalación',
   ],
 });
 
@@ -75,7 +75,7 @@ export const faqJsonLd = {
     {
       '@type': 'Question',
       name: '¿Para qué sirve un conjugador de verbos en línea?',
-      acceptedAnswer: { '@type': 'Answer', text: 'Un conjugador de verbos en línea permite obtener de forma inmediata las formas conjugadas de un verbo en español: los irregulares de uso común, sus derivados y los regulares, con sus cambios ortográficos. Los pronominales (levantarse) se conjugan como su verbo base, con el pronombre delante (me levanto). Es útil para estudiantes de español como segunda lengua, para hablantes nativos que dudan de formas poco frecuentes (futuro de subjuntivo, pretérito anterior), y para escritores o traductores que necesitan confirmar la conjugación correcta sin consultar gramáticas extensas.' },
+      acceptedAnswer: { '@type': 'Answer', text: 'Un conjugador de verbos en línea permite obtener de forma inmediata las formas conjugadas de un verbo en español: los irregulares de uso común, sus derivados y los regulares, con sus cambios ortográficos. Los pronominales (levantarse) se conjugan como su verbo base, con el pronombre delante de las formas conjugadas (me levanto) y detrás y unido en el infinitivo, el gerundio y el imperativo afirmativo (levantarse, levantándose, levántate). Es útil para estudiantes de español como segunda lengua, para hablantes nativos que dudan de formas poco frecuentes (futuro de subjuntivo, pretérito anterior), y para escritores o traductores que necesitan confirmar la conjugación correcta sin consultar gramáticas extensas.' },
     },
   ],
 };

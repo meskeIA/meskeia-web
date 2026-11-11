@@ -605,8 +605,8 @@ test.describe('Inspección 11/11/2026 (cambio) — motor de reglas', () => {
     expect(await formas(page, 'Subjuntivo', 'Presente de Subjuntivo')).toEqual(['arrepienta', 'arrepientas', 'arrepienta', 'arrepintamos', 'arrepintáis', 'arrepientan']);
   });
 
-  test('HALLAZGO ABIERTO (11/11/2026) · la 1.ª plural del imperfecto de subjuntivo pierde la y (contribuyéramos) y la i tras ñ (tiñéramos)', async ({ page }) => {
-    test.fail(true, 'ABIERTO: unir() mira /^i[aeoó]/ y /^i[eó]/, sin la é de «-iéramos»');
+  test('HALLAZGO 4479 (11/11/2026, REPARADO) · la 1.ª plural del imperfecto de subjuntivo lleva la y (contribuyéramos) y funde la i tras ñ (tiñéramos)', async ({ page }) => {
+    // Era unir(), que miraba /^i[aeoó]/ y /^i[eó]/ sin la é de «-iéramos».
     // Desinencia -iéramos: tras vocal la i átona pasa a y (contribuyéramos, poseyéramos, como
     // contribuyera y poseyera de la misma tarjeta); tras ñ o ll se funde (tiñéramos, como tiñera).
     // El futuro de subjuntivo, que sale del imperfecto en -ra, hereda el fallo (contribuiéremos).
@@ -617,67 +617,106 @@ test.describe('Inspección 11/11/2026 (cambio) — motor de reglas', () => {
     expect((await formas(page, 'Subjuntivo', 'Imperfecto de Subjuntivo'))[3]).toBe('poseyéramos');
     await conjugarYEsperar(page, 'teñir');
     expect((await formas(page, 'Subjuntivo', 'Imperfecto de Subjuntivo'))[3]).toBe('tiñéramos');
+    expect((await formas(page, 'Subjuntivo', 'Futuro de Subjuntivo'))[3]).toBe('tiñéremos');
+    // Hermanos del mismo fallo: proveer (proveyéramos, como proveyera) y gruñir (gruñéramos).
+    await conjugarYEsperar(page, 'proveer');
+    expect((await formas(page, 'Subjuntivo', 'Imperfecto de Subjuntivo'))[3]).toBe('proveyéramos');
+    await conjugarYEsperar(page, 'gruñir');
+    expect((await formas(page, 'Subjuntivo', 'Imperfecto de Subjuntivo'))[3]).toBe('gruñéramos');
   });
 
-  test('HALLAZGO ABIERTO (11/11/2026) · «oir» y «reir» sin tilde salen como regulares («yo oo», «yo reo»)', async ({ page }) => {
-    test.fail(true, 'ABIERTO: la entrada sin tilde no se lleva a «oír»/«reír» ni se rechaza');
+  test('HALLAZGO 4480 (11/11/2026, REPARADO) · «oir» y «reir» sin tilde se conjugan como oír y reír, con la nota de la tilde', async ({ page }) => {
+    // Antes salían como regulares («yo oo», «yo reo»). Un infinitivo en vocal abierta + ir lleva
+    // siempre la tilde del hiato: se lleva a oír/reír y se avisa de cómo se escribe.
+    // Las sugerencias no distinguen tildes: con «rei» sale reír, y con «oi», oír.
+    const entrada = page.getByPlaceholder('Escribe un verbo en infinitivo...');
+    await entrada.pressSequentially('rei');
+    await expect(page.getByRole('option', { name: /^reír/ })).toBeVisible();
+    await entrada.fill('');
+    await entrada.pressSequentially('oi');
+    await expect(page.getByRole('option', { name: /^oír/ })).toBeVisible();
+    await entrada.fill('');
     // Paradigma de oír: oigo, oyes, oye, oímos, oís, oyen; de reír: río, ríes, ríe, reímos, reís, ríen.
-    // Vale conjugarlos como oír/reír o avisar de que se escriben con tilde; no vale «oo, oes, oe».
-    await enviar(page, 'oir');
-    await expect(page.locator('h2[tabindex="-1"], p[role="alert"]').first()).toBeVisible();
-    await expect(page.locator('td', { hasText: /^oo$/ })).toHaveCount(0);
-    await enviar(page, 'reir');
-    await expect(page.locator('h2[tabindex="-1"], p[role="alert"]').first()).toBeVisible();
-    await expect(page.locator('td', { hasText: /^reo$/ })).toHaveCount(0);
+    await conjugarYEsperar(page, 'oir', 'oír');
+    await expect(notaModelo(page)).toContainText('Se escribe «oír», con tilde.');
+    expect(await formas(page, 'Indicativo', 'Presente')).toEqual(['oigo', 'oyes', 'oye', 'oímos', 'oís', 'oyen']);
+    await conjugarYEsperar(page, 'reir', 'reír');
+    expect(await formas(page, 'Indicativo', 'Presente')).toEqual(['río', 'ríes', 'ríe', 'reímos', 'reís', 'ríen']);
+    await conjugarYEsperar(page, 'sonreir', 'sonreír');
+    expect((await formas(page, 'Indicativo', 'Presente'))[0]).toBe('sonrío');
   });
 
-  test('HALLAZGO ABIERTO (11/11/2026) · «sofreír», derivado de freír, sale como regular («sofreo», «sofreyó»)', async ({ page }) => {
-    test.fail(true, 'ABIERTO: freír no tiene derivados en DERIVADOS (sí reír → sonreír y oír → desoír)');
+  test('HALLAZGO 4481 (11/11/2026, REPARADO) · los verbos en -ír se conjugan como oír, reír o freír (sofreír, desleír, entreoír)', async ({ page }) => {
     // sofreír ← freír: sofrío, sofríes, sofríe, sofreímos, sofreís, sofríen; sofrió (aguda bisílaba).
     await conjugarYEsperar(page, 'sofreír');
+    await expect(notaModelo(page)).toHaveText('Se conjuga como «freír».');
     expect(await formas(page, 'Indicativo', 'Presente')).toEqual(['sofrío', 'sofríes', 'sofríe', 'sofreímos', 'sofreís', 'sofríen']);
-    expect((await formas(page, 'Indicativo', 'Pretérito Indefinido'))[2]).toBe('sofrió');
+    expect(await formas(page, 'Indicativo', 'Pretérito Indefinido')).toEqual(['sofreí', 'sofreíste', 'sofrió', 'sofreímos', 'sofreísteis', 'sofrieron']);
+    // desleír, como reír (DPD): deslío, deslíes, deslíe, desleímos, desleís, deslíen; deslió;
+    // desliáis (aguda en -s); desleído; desliendo.
+    await conjugarYEsperar(page, 'desleír');
+    expect(await formas(page, 'Indicativo', 'Presente')).toEqual(['deslío', 'deslíes', 'deslíe', 'desleímos', 'desleís', 'deslíen']);
+    expect((await formas(page, 'Indicativo', 'Pretérito Indefinido'))[2]).toBe('deslió');
+    expect(await formas(page, 'Subjuntivo', 'Presente de Subjuntivo')).toEqual(['deslía', 'deslías', 'deslía', 'desliamos', 'desliáis', 'deslían']);
+    await expect(formaNoPersonal(page, 'Participio:')).toHaveText('desleído');
+    await expect(formaNoPersonal(page, 'Gerundio:')).toHaveText('desliendo');
+    // entreoír ← oír: entreoigo, entreoyes…
+    await conjugarYEsperar(page, 'entreoír');
+    expect(await formas(page, 'Indicativo', 'Presente')).toEqual(['entreoigo', 'entreoyes', 'entreoye', 'entreoímos', 'entreoís', 'entreoyen']);
   });
 
-  test('HALLAZGO ABIERTO (11/11/2026) · la h intercalada no impide el hiato: rehíce, rehízo, rehúyo', async ({ page }) => {
-    test.fail(true, 'ABIERTO: contarSilabas() corta la secuencia de vocales en la h');
+  test('HALLAZGO 4482 (11/11/2026, REPARADO) · la h intercalada no impide el hiato: rehíce, rehízo, rehúyo', async ({ page }) => {
+    // Era contarSilabas(), que cortaba la secuencia de vocales en la h.
     // Ortografía de 2010: la h entre vocales no cuenta para diptongos ni hiatos (prohíbo, rehúso).
     // rehacer ← hacer: re-hí-ce, re-hí-zo; rehuir, como huir: re-hú-yo.
     await conjugarYEsperar(page, 'rehacer');
     expect(await formas(page, 'Indicativo', 'Pretérito Indefinido')).toEqual(['rehíce', 'rehiciste', 'rehízo', 'rehicimos', 'rehicisteis', 'rehicieron']);
     await conjugarYEsperar(page, 'rehuir');
-    expect((await formas(page, 'Indicativo', 'Presente'))[0]).toBe('rehúyo');
+    // rehuís y rehuí: agudas bisílabas (re-huís), con tilde; rehuyamos, átona, sin ella.
+    expect(await formas(page, 'Indicativo', 'Presente')).toEqual(['rehúyo', 'rehúyes', 'rehúye', 'rehuimos', 'rehuís', 'rehúyen']);
+    expect(await formas(page, 'Indicativo', 'Pretérito Indefinido')).toEqual(['rehuí', 'rehuiste', 'rehuyó', 'rehuimos', 'rehuisteis', 'rehuyeron']);
+    expect(await formas(page, 'Subjuntivo', 'Presente de Subjuntivo')).toEqual(['rehúya', 'rehúyas', 'rehúya', 'rehuyamos', 'rehuyáis', 'rehúyan']);
   });
 
-  test('HALLAZGO ABIERTO (11/11/2026) · «ui» es diptongo en la Ortografía de 2010: flui y fluis, sin tilde', async ({ page }) => {
-    test.fail(true, 'ABIERTO: contarSilabas() cuenta «uí» como hiato y no quita la tilde del monosílabo');
+  test('HALLAZGO 4483 (11/11/2026, REPARADO) · «ui» es diptongo en la Ortografía de 2010: flui y fluis, sin tilde', async ({ page }) => {
+    // Era contarSilabas(), que contaba «uí» como hiato y no quitaba la tilde del monosílabo.
     // fluir: flui (monosílabo), fluiste, fluyó…; presente fluyo, fluyes, fluye, fluimos, fluis, fluyen.
     await conjugarYEsperar(page, 'fluir');
     expect((await formas(page, 'Indicativo', 'Pretérito Indefinido'))[0]).toBe('flui');
     expect((await formas(page, 'Indicativo', 'Presente'))[4]).toBe('fluis');
+    // La tabla de huir, igual (hui, huis); construí y contribuís, bisílabas o más, la conservan.
+    await conjugarYEsperar(page, 'huir');
+    expect((await formas(page, 'Indicativo', 'Pretérito Indefinido'))[0]).toBe('hui');
+    expect((await formas(page, 'Indicativo', 'Presente'))[4]).toBe('huis');
+    await conjugarYEsperar(page, 'contribuir');
+    expect((await formas(page, 'Indicativo', 'Pretérito Indefinido'))[0]).toBe('contribuí');
   });
 
-  test('HALLAZGO ABIERTO (11/11/2026) · «argüir» no entra en el grupo -uy- por la diéresis («argüo», «argüió»)', async ({ page }) => {
-    test.fail(true, 'ABIERTO: el patrón /[^gq]uir$/ no casa con «-üir»');
+  test('HALLAZGO 4484 (11/11/2026, REPARADO) · «argüir» entra en el grupo -uy-, con la diéresis solo ante i', async ({ page }) => {
+    // Antes el patrón /[^gq]uir$/ no casaba con «-üir» y salía «argüo», «argüió».
     // argüir, como construir: arguyo, arguyes, arguye, argüimos, argüís, arguyen; arguyó; arguyendo.
     await conjugarYEsperar(page, 'argüir');
     expect(await formas(page, 'Indicativo', 'Presente')).toEqual(['arguyo', 'arguyes', 'arguye', 'argüimos', 'argüís', 'arguyen']);
+    expect(await formas(page, 'Indicativo', 'Pretérito Indefinido')).toEqual(['argüí', 'argüiste', 'arguyó', 'argüimos', 'argüisteis', 'arguyeron']);
     await expect(formaNoPersonal(page, 'Gerundio:')).toHaveText('arguyendo');
+    await expect(formaNoPersonal(page, 'Participio:')).toHaveText('argüido');
   });
 
-  test('HALLAZGO ABIERTO (11/11/2026) · la nota del pronominal manda poner el pronombre delante también en el imperativo', async ({ page }) => {
-    test.fail(true, 'ABIERTO: «con me, te, se… delante» da «te arrepiente»; el imperativo afirmativo es «arrepiéntete»');
+  test('HALLAZGO 4485 (11/11/2026, REPARADO) · la nota del pronominal dice que en el imperativo el pronombre va detrás', async ({ page }) => {
+    // Antes decía «con me, te, se… delante» para todo, y daba «te arrepiente».
     // Con imperativo afirmativo, infinitivo y gerundio el pronombre va detrás y unido:
     // arrepiéntete, arrepiéntase, arrepintámonos, arrepentíos, arrepiéntanse; arrepintiéndose.
     // Lo dice la FAQ visible de la propia página («se une al infinitivo, gerundio e imperativo»).
     await conjugarYEsperar(page, 'arrepentirse', 'arrepentir');
-    const nota = (await notaModelo(page).textContent()) ?? '';
-    const tu = (await formas(page, 'Imperativo', 'Imperativo Afirmativo'))[1];
-    expect(tu === 'arrepiéntete' || /imperativo|detrás|se une/i.test(nota)).toBe(true);
+    await expect(notaModelo(page)).toContainText('delante de las formas conjugadas (me arrepiento, te arrepientes…)');
+    await expect(notaModelo(page)).toContainText('el imperativo afirmativo el pronombre va detrás y unido (arrepentirse, arrepintiéndose, arrepentíos)');
+    await conjugarYEsperar(page, 'levantarse', 'levantar');
+    await expect(notaModelo(page)).toContainText('(levantarse, levantándose, levantaos)');
+    const ld = (await page.locator('script[type="application/ld+json"]').allTextContents()).filter((t) => t.includes('"FAQPage"')).join('\n');
+    expect(ld).toContain('detrás y unido en el infinitivo, el gerundio y el imperativo afirmativo');
   });
 
-  test('HALLAZGO ABIERTO (11/11/2026) · openGraph y twitter siguen diciendo «Conjuga cualquier verbo» y una feature pega el %', async ({ page }) => {
-    test.fail(true, 'ABIERTO: la reparación quitó «cualquier verbo» del hero pero no de metadata.ts');
+  test('HALLAZGO 4486 (11/11/2026, REPARADO) · openGraph y twitter ya no dicen «Conjuga cualquier verbo» y la feature lleva «100 %»', async ({ page }) => {
     const og = await page.locator('meta[property="og:description"]').getAttribute('content');
     const tw = await page.locator('meta[name="twitter:description"]').getAttribute('content');
     expect(og ?? '').not.toContain('cualquier verbo');
