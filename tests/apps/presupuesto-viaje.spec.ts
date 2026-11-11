@@ -20,6 +20,8 @@ import { esperarHidratacion } from './_hidratacion';
  *
  * Los casos abiertos van en `test.fail()` con «HALLAZGO (11/11/2026, ABIERTO)»: cuando se
  * reparen, el test pasará y `test.fail()` lo pondrá en rojo para que se quite la marca.
+ * Los de contenido 4466-4470 y 4472 se repararon en la segunda tanda del 11/11/2026 y tienen su
+ * test al final (no tenían caso escrito).
  */
 
 test.use({ locale: 'es-ES' });
@@ -224,5 +226,87 @@ test.describe('presupuesto-viaje', () => {
         timeout: 2000,
       });
     }
+  });
+
+  /** Texto de la guía educativa, ya abierta, con los espacios (también los duros) a uno. */
+  async function guia(page: Page): Promise<string> {
+    await page.getByRole('button', { name: /Ver guía educativa/ }).click();
+    return (await page.locator('main').innerText()).replace(/\s+/g, ' ');
+  }
+
+  test('HALLAZGO 4466 (11/11/2026, REPARADO) · la FAQ del autónomo exige estimación directa y restauración', async ({
+    page,
+  }) => {
+    // Art. 30.2.5.ª c LIRPF (BOE-A-2006-20764, cotejado el 11/11/2026): el art. 30 es el de la
+    // estimación directa; la manutención, «en establecimientos de restauración y hostelería» y
+    // pagada «utilizando cualquier medio electrónico de pago». Decía «Sí» a todo autónomo.
+    const texto = await guia(page);
+    expect(texto).toContain('Solo en estimación directa');
+    expect(texto).toContain('establecimientos de restauración y hostelería');
+    expect(texto).toContain('supermercado no entra');
+    expect(texto).toContain('tarjeta u otro medio electrónico');
+  });
+
+  test('HALLAZGO 4467 (11/11/2026, REPARADO) · la ficha de negocios habla de dietas exentas, no deducibles', async ({
+    page,
+  }) => {
+    // Art. 9.A.3 RIRPF (BOE-A-2007-6820, cotejado el 11/11/2026): «quedarán exceptuadas de
+    // gravamen»; estancia, «los importes que se justifiquen»; manutención en el extranjero
+    // pernoctando, 91,35 € al día. Decía «son deducibles con límites legales».
+    const texto = await guia(page);
+    expect(texto).not.toContain('los gastos de alojamiento y manutención son deducibles con límites legales');
+    expect(texto).toContain('están exentas del IRPF');
+    expect(texto).toContain('el hotel por el importe que justifiques y la manutención hasta 91,35 € al día en el extranjero');
+  });
+
+  test('HALLAZGO 4468 (11/11/2026, REPARADO) · las cifras de imprevistos y coste diario cuadran entre sí', async ({
+    page,
+  }) => {
+    // Imprevistos: el FAQPage decía «entre un 10% y un 20%» y la página 10–15 %. Coste diario:
+    // la tabla 100–150 € y el paso 2 «80–120 €». Ahora una sola cifra de cada, dicha como regla
+    // práctica u orientativa.
+    const faq = JSON.stringify(
+      (await page.locator('script[type="application/ld+json"]').allTextContents())
+        .map((t) => JSON.parse(t) as Record<string, unknown>)
+        .find((b) => b['@type'] === 'FAQPage'),
+    );
+    expect(faq).not.toMatch(/10\s?% y un 20\s?%|acercarse al 20/);
+    const texto = await guia(page);
+    // (la columna «Familiar» de la tabla sí da 80–120 €: es otro perfil)
+    expect(texto).not.toContain('cuenta al menos 80–120 €');
+    expect(texto).toContain('la tabla de arriba estima 100–150 € por persona y día');
+  });
+
+  test('HALLAZGO 4469 (11/11/2026, REPARADO) · el JSON-LD WebApplication lleva de 4 a 8 características', async ({
+    page,
+  }) => {
+    const app = (await page.locator('script[type="application/ld+json"]').allTextContents())
+      .map((t) => JSON.parse(t) as { '@type'?: string; featureList?: string[] })
+      .find((b) => b['@type'] === 'WebApplication');
+    expect((app?.featureList ?? []).length).toBeGreaterThanOrEqual(4);
+    expect((app?.featureList ?? []).length).toBeLessThanOrEqual(8);
+  });
+
+  test('HALLAZGO 4470 (11/11/2026, REPARADO) · el % va separado de la cifra en el resumen y en la guía', async ({
+    page,
+  }) => {
+    await teclear(page, 'Presupuesto máximo (opcional)', '3000');
+    await teclear(page, 'Importe de Vuelos en EUR', '480');
+    const panel = (await resumen(page).innerText()).replace(/\s+/g, ' ');
+    // 480 / 3000 = 16 %; Transporte es el 100 % del total
+    expect(panel).toContain('16 % del presupuesto');
+    expect(panel).toContain('(100 %)');
+    expect(panel).not.toMatch(/\d%/);
+    expect(await guia(page)).not.toMatch(/\d%/);
+  });
+
+  test('HALLAZGO 4472 (11/11/2026, REPARADO) · la guía no recomienda entidades financieras con sus condiciones', async ({
+    page,
+  }) => {
+    // Misma regla que selector-smartphone (81fd4bea): marcas y condiciones comerciales caducan y
+    // parecen publicidad. Ahora dice qué buscar en una tarjeta.
+    const texto = await guia(page);
+    expect(texto).not.toMatch(/Revolut|Wise|N26/);
+    expect(texto).toContain('sin comisión por cambio de divisa');
   });
 });

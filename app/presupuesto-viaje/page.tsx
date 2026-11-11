@@ -381,7 +381,7 @@ export default function PresupuestoViaje() {
                       />
                     </div>
                     <div className={styles.presupuestoMaxInfo}>
-                      <span>{porcentajeUsado}% del presupuesto</span>
+                      <span>{porcentajeUsado}&nbsp;% del presupuesto</span>
                       {sobrePresupuesto
                         ? <span className={styles.textoRojo}>Te excedes en {formatNumber(Math.abs(sobrante), 2)} {simboloDivisa}</span>
                         : <span className={styles.textoVerde}>Te sobran {formatNumber(sobrante, 2)} {simboloDivisa}</span>
@@ -411,7 +411,7 @@ export default function PresupuestoViaje() {
                         <span className={styles.desgloseImporte}>
                           {formatNumber(subtotal, 2)} {simboloDivisa}
                           <span className={styles.desglosePorc}>
-                            ({formatNumber(porcentaje, 0)}%)
+                            ({formatNumber(porcentaje, 0)}&nbsp;%)
                           </span>
                         </span>
                       </div>
@@ -575,10 +575,10 @@ export default function PresupuestoViaje() {
                 </tr>
                 <tr>
                   <td><strong>Ahorro posible vs. improv.</strong></td>
-                  <td>40–60% respecto a estándar</td>
+                  <td>40–60&nbsp;% respecto a estándar</td>
                   <td>Referencia base</td>
                   <td>Sin prioridad de ahorro</td>
-                  <td>20–35% con apartamento vs. hotel</td>
+                  <td>20–35&nbsp;% con apartamento vs. hotel</td>
                 </tr>
               </tbody>
             </table>
@@ -598,7 +598,8 @@ export default function PresupuestoViaje() {
               </p>
               <p className={styles.escenarioTip}>
                 <strong>Presupuesto estimado:</strong> 1.800–2.200 € por persona (85–105 €/día incluyendo transporte).
-                Usa la tarjeta Revolut para pagos en Forint y Corona checa sin comisiones.
+                Para pagar en forintos y coronas checas, una tarjeta sin comisión por cambio de divisa evita
+                el recargo de cada compra.
               </p>
             </div>
             <div className={styles.escenarioCard}>
@@ -612,7 +613,7 @@ export default function PresupuestoViaje() {
               </p>
               <p className={styles.escenarioTip}>
                 <strong>Presupuesto estimado:</strong> 3.500–4.500 € en total (87–112 €/persona/día).
-                Reserva apartamento en octubre para julio y ahorra hasta un 30% frente a reserva tardía.
+                Reserva apartamento en octubre para julio y ahorra hasta un 30&nbsp;% frente a reserva tardía.
               </p>
             </div>
             <div className={styles.escenarioCard}>
@@ -639,8 +640,11 @@ export default function PresupuestoViaje() {
                 taxis o Uber, comidas en restaurantes con ticket de empresa.
               </p>
               <p className={styles.escenarioTip}>
-                <strong>Presupuesto estimado:</strong> 900–1.400 € totales. Guarda todos los justificantes
-                digitalizados; los gastos de alojamiento y manutención son deducibles con límites legales.
+                <strong>Presupuesto estimado:</strong> 900–1.400 € totales. Si trabajas por cuenta ajena y la
+                empresa te paga las dietas, en España están exentas del IRPF (art. 9.A del Reglamento del IRPF):
+                el hotel por el importe que justifiques y la manutención hasta{' '}
+                {formatCurrency(DIETAS_MANUTENCION_EXENTAS.extranjero.conPernocta)} al día en el extranjero si
+                pernoctas. Guarda todos los justificantes digitalizados.
               </p>
             </div>
           </div>
@@ -663,16 +667,18 @@ export default function PresupuestoViaje() {
             </li>
             <li className={styles.faqItem}>
               <strong>¿Qué tarjetas no cobran comisiones en el extranjero?</strong>
-              <p>Las mejores opciones para viajeros españoles son <strong>Revolut</strong> (hasta 1.000 €/mes sin
-              comisiones en plan gratuito), <strong>Wise</strong> (tipo de cambio interbancario real) y
-              <strong> N26</strong> (tarjeta débito gratuita sin comisiones en zona euro). Evita sacar más de lo
-              necesario en cajeros con Revolut en plan gratuito (cobran por exceso).</p>
+              <p>Más que una marca, mira tres condiciones en las del banco o entidad que te interese:
+              <strong> sin comisión por cambio de divisa</strong>, que aplique un <strong>tipo de cambio cercano
+              al interbancario</strong> (sin margen escondido) y <strong>retiradas en cajero gratuitas</strong> o
+              con un límite mensual que cubra tu viaje. Las condiciones cambian a menudo y cada plan tiene sus
+              topes: compruébalas en la web de la entidad antes de salir. En el cajero, si te ofrece cobrarte
+              en tu moneda, elige pagar en la moneda local.</p>
             </li>
             <li className={styles.faqItem}>
               <strong>¿Cambio de moneda en el destino o antes de viajar?</strong>
               <p>Nunca cambies en el aeropuerto: las casas de cambio aeroportuarias aplican comisiones del
-              <strong> 5–8%</strong>. Las mejores opciones: usa tu tarjeta Revolut/Wise directamente en cajeros o
-              comercios del destino (tipo de cambio real), o cambia en oficinas de cambio del centro de la ciudad
+              <strong> 5–8&nbsp;%</strong>. Las mejores opciones: paga o saca en cajeros del destino con una tarjeta
+              sin comisión por cambio de divisa, o cambia en oficinas de cambio del centro de la ciudad
               del destino (mejores tarifas que en origen).</p>
             </li>
             <li className={styles.faqItem}>
@@ -684,7 +690,7 @@ export default function PresupuestoViaje() {
             </li>
             <li className={styles.faqItem}>
               <strong>¿Cómo gestionar imprevistos económicos durante el viaje?</strong>
-              <p>Reserva un fondo de emergencia del <strong>10–15% del presupuesto total</strong> en una cuenta
+              <p>Reserva un fondo de emergencia del <strong>10–15&nbsp;% del presupuesto total</strong> (una regla práctica, no una cifra oficial) en una cuenta
               separada (no lo gastes). Si surge un imprevisto grave (accidente, robo), contacta primero con tu
               seguro de viaje y con el banco para bloquear tarjetas si es necesario. Lleva siempre una segunda
               tarjeta de banco diferente como respaldo.</p>
@@ -698,15 +704,17 @@ export default function PresupuestoViaje() {
             </li>
             <li className={styles.faqItem}>
               <strong>¿El presupuesto de viaje es deducible de impuestos para autónomos?</strong>
-              <p>Sí, si el viaje tiene finalidad profesional demostrable: asistencia a ferias, visitas a clientes,
-              formación. Son deducibles: transporte, alojamiento y manutención. La manutención tiene los
-              límites diarios de las dietas de los trabajadores: en España,{' '}
+              <p>Solo en estimación directa (en estimación objetiva o módulos no se deducen gastos sueltos) y si
+              el viaje tiene finalidad profesional demostrable: asistencia a ferias, visitas a clientes,
+              formación. Son deducibles el transporte y el alojamiento justificados. Tu manutención se deduce
+              con tres condiciones (art. 30.2.5.ª c de la Ley del IRPF): que sea en establecimientos de
+              restauración y hostelería (la compra en el supermercado no entra), que la pagues con tarjeta u
+              otro medio electrónico y con los límites diarios de las dietas de los trabajadores: en España,{' '}
               {formatCurrency(DIETAS_MANUTENCION_EXENTAS.espana.sinPernocta)} sin pernoctar y{' '}
               {formatCurrency(DIETAS_MANUTENCION_EXENTAS.espana.conPernocta)} si pernoctas fuera; en el extranjero,{' '}
               {formatCurrency(DIETAS_MANUTENCION_EXENTAS.extranjero.sinPernocta)} y{' '}
-              {formatCurrency(DIETAS_MANUTENCION_EXENTAS.extranjero.conPernocta)}. Además, tienes que pagarla con
-              tarjeta u otro medio electrónico. Guarda siempre factura o ticket, y justifica la relación con tu
-              actividad económica.</p>
+              {formatCurrency(DIETAS_MANUTENCION_EXENTAS.extranjero.conPernocta)}. Guarda siempre factura o
+              ticket, y justifica la relación con tu actividad económica.</p>
             </li>
           </ul>
 
@@ -728,7 +736,8 @@ export default function PresupuestoViaje() {
                 <strong>Investiga los costes del destino</strong>
                 <p>Busca el coste de vida medio del destino (Numbeo.com es una buena referencia). Calcula si
                 el presupuesto es realista para los días planificados y el número de personas. Para Europa
-                Occidental, cuenta al menos 80–120 € por persona y día en modo estándar.</p>
+                Occidental, la tabla de arriba estima 100–150 € por persona y día en turismo estándar
+                (orientativo: varía mucho por ciudad y temporada).</p>
               </div>
             </li>
             <li className={styles.step}>
@@ -752,8 +761,8 @@ export default function PresupuestoViaje() {
             <li className={styles.step}>
               <span className={styles.stepNumber}>5</span>
               <div className={styles.stepContent}>
-                <strong>Añade el fondo de imprevistos (10–15%)</strong>
-                <p>Suma un 10–15% del total estimado como colchón de seguridad en la categoría "Imprevistos".
+                <strong>Añade el fondo de imprevistos (10–15&nbsp;%)</strong>
+                <p>Suma un 10–15&nbsp;% del total estimado como colchón de seguridad en la categoría "Imprevistos".
                 Este dinero cubre: tasas inesperadas, retrasos con gastos extra, compras no planificadas o
                 cualquier emergencia. Si no lo usas, ¡vuelve a casa con ese dinero!</p>
               </div>
@@ -762,9 +771,9 @@ export default function PresupuestoViaje() {
               <span className={styles.stepNumber}>6</span>
               <div className={styles.stepContent}>
                 <strong>Prepara los medios de pago para el viaje</strong>
-                <p>Activa o consigue una tarjeta sin comisiones en el extranjero (Revolut, Wise, N26). Lleva
-                una segunda tarjeta de otro banco como respaldo. Determina cuánto efectivo local necesitarás
-                para los primeros días. Cambia en la ciudad de destino o usa cajero con tu tarjeta Revolut.</p>
+                <p>Activa o consigue una tarjeta sin comisión por cambio de divisa. Lleva una segunda tarjeta
+                de otro banco como respaldo. Determina cuánto efectivo local necesitarás para los primeros
+                días. Cambia en la ciudad de destino o saca en un cajero con esa tarjeta.</p>
               </div>
             </li>
             <li className={styles.step}>
@@ -791,7 +800,7 @@ export default function PresupuestoViaje() {
             </div>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">🛡️</span>
-              <strong>Fondo de emergencia del 10–15%</strong>
+              <strong>Fondo de emergencia del 10–15&nbsp;%</strong>
               <p>Siempre añade un margen de imprevistos sobre el presupuesto estimado. Este colchón cubre
               tasas aeroportuarias no previstas, retrasos, urgencias médicas o cualquier gasto inesperado
               que arruinaría el viaje sin él.</p>
@@ -799,15 +808,15 @@ export default function PresupuestoViaje() {
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">💳</span>
               <strong>Tarjeta sin comisiones para pagos en el extranjero</strong>
-              <p>Revolut, Wise y N26 no cobran comisión por cambio de divisa (tipo de cambio real). Ahorro
-              potencial de 50–150 € en un viaje de 2 semanas frente a usar la tarjeta bancaria española
-              convencional (comisión media: 2–3% + 1–2 € por operación).</p>
+              <p>Busca una sin comisión por cambio de divisa y con un tipo de cambio cercano al
+              interbancario: una tarjeta convencional puede cargar un porcentaje en cada pago en otra moneda,
+              más una cantidad fija por operación. Compara las condiciones vigentes de tu entidad antes de salir.</p>
             </div>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">🏠</span>
               <strong>Airbnb vs. hotel para estancias largas</strong>
               <p>Para estancias de más de 5 días, un apartamento en Airbnb suele ser más económico que un
-              hotel equivalente (25–40% de ahorro) y permite cocinar, reduciendo el gasto en comidas.
+              hotel equivalente (25–40&nbsp;% de ahorro) y permite cocinar, reduciendo el gasto en comidas.
               Para 1–2 noches, el hotel puede ser más cómodo y a veces más barato.</p>
             </div>
             <div className={styles.tipCard}>
@@ -821,7 +830,7 @@ export default function PresupuestoViaje() {
               <span className={styles.tipIcon} aria-hidden="true">📅</span>
               <strong>Viaja en temporada baja</strong>
               <p>Septiembre-octubre y abril-mayo son temporada media-baja en la mayoría de destinos europeos:
-              vuelos y hoteles hasta un 40% más baratos que en agosto, menos aglomeraciones y mismo clima
+              vuelos y hoteles hasta un 40&nbsp;% más baratos que en agosto, menos aglomeraciones y mismo clima
               agradable. Para el Caribe y Asia, investiga la temporada según el destino concreto.</p>
             </div>
           </div>
@@ -836,12 +845,13 @@ export default function PresupuestoViaje() {
               <li>
                 <strong>No incluir las tasas aeroportuarias en el precio del vuelo.</strong> Los vuelos
                 low-cost (Ryanair, Vueling) muestran precios base sin tasas. El precio real puede ser un
-                30–50% superior al anunciado. Revisa siempre el precio final antes de comparar.
+                30–50&nbsp;% superior al anunciado. Revisa siempre el precio final antes de comparar.
               </li>
               <li>
                 <strong>Cambiar moneda en el aeropuerto.</strong> Las casas de cambio aeroportuarias aplican
-                comisiones del 5–8% sobre el tipo de cambio oficial. En un cambio de 500 €, pierdes entre
-                25 y 40 €. Usa cajero con tarjeta Revolut o cambia en el centro de la ciudad de destino.
+                comisiones del 5–8&nbsp;% sobre el tipo de cambio oficial. En un cambio de 500 €, pierdes entre
+                25 y 40 €. Saca en un cajero con una tarjeta sin comisión por cambio de divisa o cambia en el centro
+                de la ciudad de destino.
               </li>
               <li>
                 <strong>Viajar sin seguro de viaje fuera de la UE.</strong> Una hospitalización en Estados
@@ -856,14 +866,14 @@ export default function PresupuestoViaje() {
               </li>
               <li>
                 <strong>Olvidar las propinas en países donde son obligatorias.</strong> En EEUU y Canadá,
-                la propina del 15–20% es prácticamente obligatoria y no está incluida en el precio del menú.
-                En México, Brasil y muchos países latinoamericanos se espera un 10–15%. Calcula este extra
+                la propina del 15–20&nbsp;% es prácticamente obligatoria y no está incluida en el precio del menú.
+                En México, Brasil y muchos países latinoamericanos se espera un 10–15&nbsp;%. Calcula este extra
                 en tu presupuesto de comidas.
               </li>
               <li>
                 <strong>No tener fondo de emergencia para imprevistos.</strong> El error más común: presupuestar
                 justo sin margen. Una pérdida de equipaje, un vuelo cancelado con gastos extra o una visita al
-                médico pueden arruinar el viaje económicamente. El fondo del 10–15% no es opcional, es seguridad.
+                médico pueden arruinar el viaje económicamente. El fondo del 10–15&nbsp;% no es opcional, es seguridad.
               </li>
             </ul>
           </div>

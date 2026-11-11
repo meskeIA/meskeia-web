@@ -27,6 +27,15 @@ export const jsonLd = {
   operatingSystem: 'Web',
   inLanguage: 'es',
   isAccessibleForFree: true,
+  featureList: [
+    'Gastos por categorías editables: transporte, alojamiento, comida, actividades y otros',
+    'Añadir y quitar gastos y categorías propias',
+    'Total del viaje, coste por persona y por persona y día',
+    'Desglose por categoría con su porcentaje del total',
+    'Presupuesto máximo con barra de consumo y lo que sobra o se excede',
+    'Reparto automático del presupuesto máximo entre categorías (30/35/20/10/5 %)',
+    'Símbolo de nueve divisas (EUR, USD, GBP, MXN, ARS, COP, PEN, CLP, BRL), sin conversión',
+  ],
   offers: {
     '@type': 'Offer',
     price: '0',
@@ -59,7 +68,7 @@ export const faqJsonLd = {
       name: '¿Qué categorías de gastos debo incluir al planificar un viaje?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Las categorías principales son: transporte (vuelos, trenes, autobús), alojamiento, comida y bebida, actividades y entradas, compras y souvenirs, seguro de viaje y una partida para imprevistos de al menos el 10-15% del total. Para viajes internacionales también conviene incluir los costes de visado o tasas de entrada si aplica.',
+        text: 'Las categorías principales son: transporte (vuelos, trenes, autobús), alojamiento, comida y bebida, actividades y entradas, compras y souvenirs, seguro de viaje y una partida para imprevistos (como regla práctica, un 10-15 % del total). Para viajes internacionales también conviene incluir los costes de visado o tasas de entrada si aplica.',
       },
     },
     {
@@ -75,7 +84,7 @@ export const faqJsonLd = {
       name: '¿Cuánto debería reservar para imprevistos en un viaje?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Se recomienda añadir entre un 10% y un 20% sobre el presupuesto planificado para cubrir imprevistos: retrasos, cambios de planes, gastos médicos menores o actividades no previstas. En viajes de larga duración o a destinos con menor infraestructura es prudente acercarse al 20%. Contar con un seguro de viaje reduce la necesidad de esta reserva para emergencias mayores.',
+        text: 'No hay una cifra oficial: como regla práctica, un 10-15 % sobre el presupuesto planificado para cubrir imprevistos como retrasos, cambios de planes, gastos médicos menores o actividades no previstas. En viajes largos o a destinos con menos infraestructura conviene ir hacia la parte alta. Contar con un seguro de viaje reduce la necesidad de esta reserva para emergencias mayores.',
       },
     },
   ],
