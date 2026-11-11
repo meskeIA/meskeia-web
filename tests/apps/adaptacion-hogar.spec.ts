@@ -270,8 +270,7 @@ test('HALLAZGO H4 (11/11/2026, REPARADO) · las FAQ no contradicen los costes qu
   expect(faq).toContain('juntas suman 10.050–34.800 €');
 });
 
-test('HALLAZGO H7 (11/11/2026, ABIERTO) · features del JSON-LD con al menos 4 características', async ({ page }) => {
-  test.fail();
+test('HALLAZGO H7 (11/11/2026, REPARADO) · features del JSON-LD con al menos 4 características', async ({ page }) => {
   const app = (await jsonLd(page)).find((b) => b['@type'] === 'WebApplication');
   expect(app).toBeTruthy();
   expect(((app?.featureList as unknown[]) ?? []).length).toBeGreaterThanOrEqual(4);

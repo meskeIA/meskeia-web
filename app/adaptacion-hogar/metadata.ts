@@ -40,7 +40,14 @@ export const jsonLd = generateWebAppSchema({
   description: "Checklist interactivo de adaptaciones del hogar para mayores y personas con movilidad reducida. Costes orientativos, ítems con ayudas públicas y prioridades por estancia.",
   url: "https://meskeia.com/adaptacion-hogar/",
   category: 'FinanceApplication',
-  features: [],
+  features: [
+    'Lista de 23 adaptaciones del hogar en 6 estancias: baño, dormitorio, cocina, accesos, escaleras y seguridad',
+    'Coste orientativo mínimo y máximo de cada adaptación',
+    'Suma en tiempo real del coste total del plan',
+    'Prioridad de cada adaptación: prioritaria, recomendada u opcional',
+    'Recuento de adaptaciones prioritarias y de las que pueden tener ayudas públicas',
+    'Detalle de las adaptaciones elegidas con su coste',
+  ],
 });
 
 export const faqJsonLd = {
