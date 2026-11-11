@@ -489,26 +489,31 @@ test.describe('Escritorio · ajustes y textos', () => {
     await expect(boton).toHaveAttribute('aria-expanded', 'false');
   });
 
-  test('HALLAZGO (11/11/2026, ABIERTO) · los porcentajes del panel van pegados («Brillo: 100%», esperado «100 %» con espacio duro)', async ({
+  test('HALLAZGO 4434 (11/11/2026, REPARADO) · los porcentajes del panel ya no van pegados («Brillo: 100%», esperado «100 %» con espacio duro)', async ({
     page,
   }) => {
-    test.fail();
+    // REPARADO: «Brillo: {brightness}&nbsp;%», lo mismo Contraste y «100 % offline».
     await registrarAperturas(page);
     await arrancar(page);
     await abrirAjustes(page);
+    await expect(page.locator('label[for="contraste"]')).toHaveText('Contraste: 100 %');
+    await expect(page.getByText('Funciona 100 % offline')).toHaveCount(1);
     await expect(page.locator('label[for="brillo"]')).toHaveText('Brillo: 100 %');
   });
 
-  test('HALLAZGO (11/11/2026, ABIERTO) · el FAQPage dice que el permiso se pide «al acceder a la herramienta»', async ({ page }) => {
-    // ABIERTO: el CASO 1 mide 0 aperturas al cargar; la guía visible (paso 1) dice bien que se
-    // pide al pulsar «Iniciar Cámara». La respuesta del JSON-LD también trae «el 99% de los casos
-    // profesionales», una cifra redonda sin fuente.
-    test.fail();
+  test('HALLAZGO 4435 y 4436 (11/11/2026, REPARADO) · el FAQPage ya no dice que el permiso se pide «al acceder a la herramienta» ni da un 99 % sin fuente', async ({ page }) => {
+    // REPARADO: el CASO 1 mide 0 aperturas al cargar y la guía visible (paso 1) dice que se pide
+    // al pulsar «Iniciar Cámara»; la respuesta del JSON-LD dice ahora lo mismo. La de resoluciones
+    // traía «el 99% de los casos profesionales», una cifra redonda sin fuente: ya no.
     await page.goto('/prueba-camara/');
     const faq = await faqJsonLd(page);
     const respuesta = faq['¿Cómo sé si mi cámara web funciona correctamente?'] ?? '';
     expect(respuesta.length).toBeGreaterThan(0);
     expect(respuesta).not.toContain('Al acceder a la herramienta, el navegador solicita permiso');
+    expect(respuesta).toContain('Al pulsar «Iniciar Cámara», el navegador solicita permiso');
+    const resolucion = faq['¿Qué resolución debería tener una webcam para videollamadas profesionales?'] ?? '';
+    expect(resolucion.length).toBeGreaterThan(0);
+    expect(resolucion).not.toMatch(/\d+\s?%/);
   });
 });
 

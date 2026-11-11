@@ -53,7 +53,7 @@ export const faqJsonLd = {
     {
       '@type': 'Question',
       name: '¿Cómo sé si mi cámara web funciona correctamente?',
-      acceptedAnswer: { '@type': 'Answer', text: 'Puedes comprobarlo directamente en el navegador sin instalar nada. Al acceder a la herramienta, el navegador solicita permiso para usar la cámara y muestra la imagen en tiempo real. Si ves tu propia imagen con buena nitidez y sin parpadeos, la cámara funciona bien. Si no aparece imagen, el problema puede ser que el permiso fue denegado, un driver desactualizado o que la cámara esté siendo usada por otra aplicación.' },
+      acceptedAnswer: { '@type': 'Answer', text: 'Puedes comprobarlo directamente en el navegador sin instalar nada. Al pulsar «Iniciar Cámara», el navegador solicita permiso para usar la cámara y la herramienta muestra la imagen en tiempo real. Si ves tu propia imagen con buena nitidez y sin parpadeos, la cámara funciona bien. Si no aparece imagen, el problema puede ser que el permiso fue denegado, un driver desactualizado o que la cámara esté siendo usada por otra aplicación.' },
     },
     {
       '@type': 'Question',
@@ -63,7 +63,7 @@ export const faqJsonLd = {
     {
       '@type': 'Question',
       name: '¿Qué resolución debería tener una webcam para videollamadas profesionales?',
-      acceptedAnswer: { '@type': 'Answer', text: 'Para videollamadas de trabajo se recomienda un mínimo de 720p (HD, 1280×720 píxeles). La mayoría de plataformas como Zoom y Teams limitan la transmisión a 1080p incluso si la cámara captura más. Una webcam 1080p a 30 fps es suficiente para el 99% de los casos profesionales. La iluminación del entorno influye más en la calidad percibida que la resolución de la cámara.' },
+      acceptedAnswer: { '@type': 'Answer', text: 'Para videollamadas de trabajo se recomienda un mínimo de 720p (HD, 1280×720 píxeles). La mayoría de plataformas como Zoom y Teams limitan la transmisión a 1080p incluso si la cámara captura más. Una webcam 1080p a 30 fps suele bastar para videollamadas de trabajo. La iluminación del entorno influye más en la calidad percibida que la resolución de la cámara.' },
     },
     {
       '@type': 'Question',

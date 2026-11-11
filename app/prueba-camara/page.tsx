@@ -380,7 +380,7 @@ export default function PruebaCamaraPage() {
 
                   {/* Brillo */}
                   <div className={styles.settingRow}>
-                    <label htmlFor="brillo">Brillo: {brightness}%</label>
+                    <label htmlFor="brillo">Brillo: {brightness}&nbsp;%</label>
                     <input
                       id="brillo"
                       type="range"
@@ -394,7 +394,7 @@ export default function PruebaCamaraPage() {
 
                   {/* Contraste */}
                   <div className={styles.settingRow}>
-                    <label htmlFor="contraste">Contraste: {contrast}%</label>
+                    <label htmlFor="contraste">Contraste: {contrast}&nbsp;%</label>
                     <input
                       id="contraste"
                       type="range"
@@ -461,7 +461,7 @@ export default function PruebaCamaraPage() {
           <li>✓ El video NO se envía a ningún servidor</li>
           <li>✓ Las fotos se guardan SOLO en tu navegador</li>
           <li>✓ No almacenamos ningún dato</li>
-          <li>✓ Funciona 100% offline una vez cargado</li>
+          <li>✓ Funciona 100&nbsp;% offline una vez cargado</li>
         </ul>
       </div>
 
