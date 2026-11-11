@@ -30,7 +30,7 @@ import { DatabaseSync } from 'node:sqlite';
 import { readFileSync, readdirSync } from 'node:fs';
 import path from 'node:path';
 
-const TURSO_DIR = 'C:/Users/jaceb/Documents/meskeIA_Critico/turso';
+const TURSO_DIR = 'C:/Users/jaceb/meskeia-web/_backups/turso'; // donde nace el dump (14 días); la copia de meskeIA_Critico va comprimida desde el 11/11/2026
 const ARGS = process.argv.slice(2);
 const DESDE = ARGS.includes('--desde') ? ARGS[ARGS.indexOf('--desde') + 1] : '2026-06-29';
 

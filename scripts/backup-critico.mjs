@@ -39,7 +39,9 @@
  * ------------------------------------------------------------------
  */
 
-import { cpSync, mkdirSync, rmSync, existsSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { cpSync, mkdirSync, rmSync, existsSync, readdirSync, readFileSync, writeFileSync, statSync, utimesSync, createReadStream, createWriteStream } from 'node:fs';
+import { createGzip } from 'node:zlib';
+import { pipeline } from 'node:stream/promises';
 import { execFileSync, spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { tmpdir } from 'node:os';
@@ -117,6 +119,13 @@ if (registro.length === 0) {
 }
 
 // --- 2. Último dump de Turso (vive en _backups/, excluido del barrido) ---
+// Va COMPRIMIDO (.sql.gz) desde el 11/11/2026. Cada día el dump nuevo sustituye al
+// anterior, y el anterior va a la papelera de Proton, que no caduca: con 105 MB
+// diarios eran ~3 GB al mes de cuota (1,39 GB recuperados al vaciarla ese día).
+// Comprimido, un SQL de INSERT baja a una décima parte o menos.
+// Nadie lee el dump de aquí: los scripts del digest leen de _backups/turso, donde
+// nace (hasta el 11/11/2026 lo leían de esta carpeta, y por eso iba sin comprimir).
+// El Verificador de Backups comprueba que el .gz descomprime al tamaño del original.
 const dirTurso = join(RAIZ, '_backups', 'turso');
 if (existsSync(dirTurso)) {
   const dumps = readdirSync(dirTurso)
@@ -124,9 +133,15 @@ if (existsSync(dirTurso)) {
     .sort();
   if (dumps.length) {
     const ultimo = dumps[dumps.length - 1];
+    const origenDump = join(dirTurso, ultimo);
+    const destinoDump = join(PREPARACION, 'turso', `${ultimo}.gz`);
     mkdirSync(join(PREPARACION, 'turso'), { recursive: true });
-    cpSync(join(dirTurso, ultimo), join(PREPARACION, 'turso', ultimo), { preserveTimestamps: true });
-    registro.push(`  · turso/${ultimo} (último dump)`);
+    await pipeline(createReadStream(origenDump), createGzip({ level: 9 }), createWriteStream(destinoDump));
+    // La fecha del original, por lo mismo que preserveTimestamps arriba
+    const { atime, mtime } = statSync(origenDump);
+    utimesSync(destinoDump, atime, mtime);
+    const mb = (bytes) => (bytes / 1048576).toFixed(1).replace('.', ',');
+    registro.push(`  · turso/${ultimo}.gz (último dump, ${mb(statSync(origenDump).size)} MB → ${mb(statSync(destinoDump).size)} MB)`);
   }
 }
 
@@ -143,6 +158,10 @@ const manifiesto = [
   '',
   'Contenido copiado:',
   ...registro,
+  '',
+  'El dump de Turso va comprimido (turso/*.sql.gz). Para restaurarlo,',
+  'descomprimirlo (7-Zip, o `gzip -d`) y seguir el runbook de restauración',
+  '(_private/RUNBOOK-RESTAURACION-TURSO.md).',
   '',
   'Los originales NO se modifican. La Rutina Matinal (05:50 diaria)',
   'actualiza esta carpeta y Proton la sube sola a la nube.',

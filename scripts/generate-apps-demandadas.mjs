@@ -50,7 +50,7 @@ import { fileURLToPath } from 'node:url';
 import { parsearApplications } from './parsers-catalogo.mjs';
 
 const RAIZ = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
-const TURSO_DIR = 'C:/Users/jaceb/Documents/meskeIA_Critico/turso';
+const TURSO_DIR = 'C:/Users/jaceb/meskeia-web/_backups/turso'; // donde nace el dump (14 días); la copia de meskeIA_Critico va comprimida desde el 11/11/2026
 const SALIDA = path.join(RAIZ, 'data', 'apps-demandadas.ts');
 
 const args = process.argv.slice(2);
