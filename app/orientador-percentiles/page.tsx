@@ -702,7 +702,7 @@ export default function CalculadoraPercentilesPage() {
         <section className={styles.eduWarning}>
           <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
-              <span className={styles.warningIcon}>⚠️</span>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               <h3>Errores de interpretación frecuentes que generan ansiedad innecesaria</h3>
             </div>
             <ul className={styles.warningList}>

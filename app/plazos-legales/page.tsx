@@ -633,7 +633,7 @@ export default function PlazosLegalesPage() {
         <section className={styles.guideSection}>
           <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
-              <span className={styles.warningIcon}>⚠️</span>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               <h3>Errores frecuentes que cuestan derechos</h3>
             </div>
             <ul className={styles.warningList}>
