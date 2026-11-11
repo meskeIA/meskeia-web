@@ -148,7 +148,30 @@ function obtenerPerfil(autoexigencia: number, reconocimiento: number): Perfil {
     };
   }
 
-  if (autoexigencia >= reconocimiento) {
+  // Con las dos iguales en la zona media (contestar lo mismo a todo lleva aquí) no hay tendencia
+  // que atribuir: el desempate «>=» daba «Tendencia al Impostor» («tu autoexigencia supera a tu
+  // capacidad de reconocer logros») siendo iguales (cabo C0712, receta de test-estilo-parental).
+  if (autoexigencia === reconocimiento) {
+    return {
+      nombre: 'Sin tendencia predominante',
+      emoji: '⚖️',
+      descripcion: 'Tus puntuaciones de autoexigencia y de reconocimiento son iguales y quedan las dos en la zona media del mapa, así que el test no te sitúa en ningún cuadrante ni apunta hacia un lado. Contestar casi lo mismo a todas las afirmaciones lleva aquí: puede reflejar un equilibrio real o que las afirmaciones encajaban a medias con tu experiencia.',
+      fortalezas: [
+        'Ninguna de las dos dimensiones queda por debajo de la otra',
+        'Un punto de partida sin inercias marcadas hacia un lado',
+      ],
+      riesgos: [
+        'Un resultado en la zona media puede esconder experiencias muy distintas según el momento o el tipo de logro',
+        'Al no destacar ninguna dimensión, es fácil no saber en qué fijarse',
+      ],
+      acciones: [
+        'Repetir el test pensando en un logro o un reto concreto y reciente, no en cómo te sueles sentir en general',
+        'Leer las dos tendencias vecinas, «Tendencia al Impostor» y «Autoestima en Construcción», y quedarte con lo que reconozcas de tu caso',
+      ],
+    };
+  }
+
+  if (autoexigencia > reconocimiento) {
     return {
       nombre: 'Tendencia al Impostor',
       emoji: '🌀',
@@ -229,8 +252,11 @@ export default function TestSindromeImpostorPage() {
 
   const perfil = obtenerPerfil(puntuacionAutoexigencia, puntuacionReconocimiento);
 
-  const posX = ((puntuacionAutoexigencia - 5) / 20) * 100;
-  const posY = 100 - ((puntuacionReconocimiento - 5) / 20) * 100;
+  // De 5 % a 95 % (5 → 5 %, 15 → 50 %, 25 → 95 %): en 0 % y 100 % el punto quedaba centrado en
+  // la esquina y el mapa lo recortaba (cabo C0712). Las líneas de umbral, con la misma escala.
+  const aPorcentaje = (puntos: number) => 5 + ((puntos - 5) / 20) * 90;
+  const posX = aPorcentaje(puntuacionAutoexigencia);
+  const posY = 100 - aPorcentaje(puntuacionReconocimiento);
 
   return (
     <div className={styles.container}>
@@ -340,10 +366,10 @@ export default function TestSindromeImpostorPage() {
                 <div className={`${styles.quadrant} ${styles.quadrantBR}`}>
                   <span><span aria-hidden="true">🎭</span> Impostor Activo</span>
                 </div>
-                <div className={styles.thresholdLineV} style={{ left: '45%' }} aria-hidden="true" />
-                <div className={styles.thresholdLineV} style={{ left: '65%' }} aria-hidden="true" />
-                <div className={styles.thresholdLineH} style={{ top: '35%' }} aria-hidden="true" />
-                <div className={styles.thresholdLineH} style={{ top: '55%' }} aria-hidden="true" />
+                <div className={styles.thresholdLineV} style={{ left: `${aPorcentaje(14)}%` }} aria-hidden="true" />
+                <div className={styles.thresholdLineV} style={{ left: `${aPorcentaje(18)}%` }} aria-hidden="true" />
+                <div className={styles.thresholdLineH} style={{ top: `${100 - aPorcentaje(18)}%` }} aria-hidden="true" />
+                <div className={styles.thresholdLineH} style={{ top: `${100 - aPorcentaje(14)}%` }} aria-hidden="true" />
                 <div
                   className={styles.mapDot}
                   style={{ left: `${posX}%`, top: `${posY}%` }}

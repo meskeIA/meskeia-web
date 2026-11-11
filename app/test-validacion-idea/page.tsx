@@ -80,7 +80,21 @@ function obtenerPerfil(asuncion: number, validacion: number): Perfil {
     };
   }
 
-  if (asuncion >= validacion) {
+  // Con las dos iguales en la zona media (contestar lo mismo a todo lleva aquí) no hay tendencia
+  // que atribuir: el desempate «>=» daba «Tendencia a Asumir» («tus asunciones superan a tu
+  // validación») siendo iguales (cabo C0712, receta de test-estilo-parental).
+  if (asuncion === validacion) {
+    return {
+      nombre: 'Sin tendencia predominante',
+      emoji: '⚖️',
+      descripcion: 'Tus puntuaciones de asunción y de validación son iguales y quedan las dos en la zona media del mapa, así que el test no te sitúa en ningún cuadrante ni apunta hacia un lado. Contestar casi lo mismo a todas las afirmaciones lleva aquí: puede reflejar un equilibrio real o que las afirmaciones encajaban a medias con la fase en que está tu idea.',
+      fortalezas: ['Ninguna de las dos dimensiones queda por debajo de la otra', 'Un punto de partida sin inercias marcadas hacia un lado'],
+      riesgos: ['Un resultado en la zona media puede esconder partes de la idea muy validadas y otras nada', 'Al no destacar ninguna dimensión, es fácil no saber por dónde empezar'],
+      acciones: ['Repetir el test pensando en una parte concreta de tu idea (el cliente, el precio, el canal), no en la idea en general', 'Leer las dos tendencias vecinas, «Tendencia a Asumir» y «Tendencia a Validar», y quedarte con lo que reconozcas de tu caso'],
+    };
+  }
+
+  if (asuncion > validacion) {
     return {
       nombre: 'Tendencia a Asumir',
       emoji: '💭',
@@ -118,8 +132,11 @@ export default function TestValidacionIdeaPage() {
   const puntuacionAsuncion = PREGUNTAS.filter((p) => p.dimension === 'asuncion').reduce((sum, p) => sum + (respuestas[p.id] || 0), 0);
   const puntuacionValidacion = PREGUNTAS.filter((p) => p.dimension === 'validacion').reduce((sum, p) => sum + (respuestas[p.id] || 0), 0);
   const perfil = obtenerPerfil(puntuacionAsuncion, puntuacionValidacion);
-  const posX = ((puntuacionAsuncion - 5) / 20) * 100;
-  const posY = 100 - ((puntuacionValidacion - 5) / 20) * 100;
+  // De 5 % a 95 % (5 → 5 %, 15 → 50 %, 25 → 95 %): en 0 % y 100 % el punto quedaba centrado en
+  // la esquina y el mapa lo recortaba (cabo C0712). Las líneas de umbral, con la misma escala.
+  const aPorcentaje = (puntos: number) => 5 + ((puntos - 5) / 20) * 90;
+  const posX = aPorcentaje(puntuacionAsuncion);
+  const posY = 100 - aPorcentaje(puntuacionValidacion);
 
   return (
     <div className={styles.container}>
@@ -178,10 +195,10 @@ export default function TestValidacionIdeaPage() {
                 <div className={`${styles.quadrant} ${styles.quadrantTR}`}><span><span aria-hidden="true">🔀</span> En Conflicto</span></div>
                 <div className={`${styles.quadrant} ${styles.quadrantBL}`}><span><span aria-hidden="true">🌱</span> Fase Exploración</span></div>
                 <div className={`${styles.quadrant} ${styles.quadrantBR}`}><span><span aria-hidden="true">💘</span> Enamorado de la Idea</span></div>
-                <div className={styles.thresholdLineV} style={{ left: '45%' }} aria-hidden="true" />
-                <div className={styles.thresholdLineV} style={{ left: '65%' }} aria-hidden="true" />
-                <div className={styles.thresholdLineH} style={{ top: '35%' }} aria-hidden="true" />
-                <div className={styles.thresholdLineH} style={{ top: '55%' }} aria-hidden="true" />
+                <div className={styles.thresholdLineV} style={{ left: `${aPorcentaje(14)}%` }} aria-hidden="true" />
+                <div className={styles.thresholdLineV} style={{ left: `${aPorcentaje(18)}%` }} aria-hidden="true" />
+                <div className={styles.thresholdLineH} style={{ top: `${100 - aPorcentaje(18)}%` }} aria-hidden="true" />
+                <div className={styles.thresholdLineH} style={{ top: `${100 - aPorcentaje(14)}%` }} aria-hidden="true" />
                 <div className={styles.mapDot} style={{ left: `${posX}%`, top: `${posY}%` }} aria-label={`Tu posición: Asunción ${puntuacionAsuncion}/25, Validación ${puntuacionValidacion}/25`}>
                   <span className={styles.mapDotLabel}>Tú</span>
                 </div>

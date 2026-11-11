@@ -148,7 +148,30 @@ function obtenerPerfil(conformidad: number, disidencia: number): Perfil {
     };
   }
 
-  if (conformidad >= disidencia) {
+  // Con las dos iguales en la zona media (contestar lo mismo a todo lleva aquí) no hay tendencia
+  // que atribuir: el desempate «>=» daba «Tendencia al Groupthink» («la conformidad supera a la
+  // disidencia») siendo iguales (cabo C0712, receta de test-estilo-parental).
+  if (conformidad === disidencia) {
+    return {
+      nombre: 'Sin tendencia predominante',
+      emoji: '⚖️',
+      descripcion: 'Las puntuaciones de conformidad y de disidencia de tu equipo son iguales y quedan las dos en la zona media del mapa, así que el test no lo sitúa en ningún cuadrante ni apunta hacia un lado. Contestar casi lo mismo a todas las afirmaciones lleva aquí: puede reflejar un equilibrio real o que las afirmaciones encajaban a medias con la forma de trabajar del grupo.',
+      fortalezas: [
+        'Ninguna de las dos dimensiones queda por debajo de la otra',
+        'Un punto de partida sin inercias marcadas hacia un lado',
+      ],
+      riesgos: [
+        'Un resultado en la zona media puede esconder dinámicas muy distintas según el tema o la reunión',
+        'Al no destacar ninguna dimensión, es fácil no saber en qué fijarse',
+      ],
+      acciones: [
+        'Repetir el test pensando en una decisión concreta y reciente del equipo, no en cómo funciona en general',
+        'Leer las dos tendencias vecinas, «Tendencia al Groupthink» y «Tendencia al Debate», y quedarse con lo que se reconozca del caso',
+      ],
+    };
+  }
+
+  if (conformidad > disidencia) {
     return {
       nombre: 'Tendencia al Groupthink',
       emoji: '⚠️',
@@ -229,8 +252,11 @@ export default function TestPensamientoGrupoPage() {
 
   const perfil = obtenerPerfil(puntuacionConformidad, puntuacionDisidencia);
 
-  const posX = ((puntuacionConformidad - 5) / 20) * 100;
-  const posY = 100 - ((puntuacionDisidencia - 5) / 20) * 100;
+  // De 5 % a 95 % (5 → 5 %, 15 → 50 %, 25 → 95 %): en 0 % y 100 % el punto quedaba centrado en
+  // la esquina y el mapa lo recortaba (cabo C0712). Las líneas de umbral, con la misma escala.
+  const aPorcentaje = (puntos: number) => 5 + ((puntos - 5) / 20) * 90;
+  const posX = aPorcentaje(puntuacionConformidad);
+  const posY = 100 - aPorcentaje(puntuacionDisidencia);
 
   return (
     <div className={styles.container}>
@@ -338,10 +364,10 @@ export default function TestPensamientoGrupoPage() {
                 <div className={`${styles.quadrant} ${styles.quadrantBR}`}>
                   <span><span aria-hidden="true">🫧</span> Groupthink Activo</span>
                 </div>
-                <div className={styles.thresholdLineV} style={{ left: '45%' }} aria-hidden="true" />
-                <div className={styles.thresholdLineV} style={{ left: '65%' }} aria-hidden="true" />
-                <div className={styles.thresholdLineH} style={{ top: '35%' }} aria-hidden="true" />
-                <div className={styles.thresholdLineH} style={{ top: '55%' }} aria-hidden="true" />
+                <div className={styles.thresholdLineV} style={{ left: `${aPorcentaje(14)}%` }} aria-hidden="true" />
+                <div className={styles.thresholdLineV} style={{ left: `${aPorcentaje(18)}%` }} aria-hidden="true" />
+                <div className={styles.thresholdLineH} style={{ top: `${100 - aPorcentaje(18)}%` }} aria-hidden="true" />
+                <div className={styles.thresholdLineH} style={{ top: `${100 - aPorcentaje(14)}%` }} aria-hidden="true" />
                 <div
                   className={styles.mapDot}
                   style={{ left: `${posX}%`, top: `${posY}%` }}

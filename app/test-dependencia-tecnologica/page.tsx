@@ -147,8 +147,30 @@ function obtenerPerfil(autonomia: number, adaptabilidad: number): Perfil {
     };
   }
 
-  // Perfiles intermedios
-  if (autonomia >= adaptabilidad) {
+  // Perfiles intermedios. Con las dos iguales en la zona media (contestar lo mismo a todo lleva
+  // aquí) no hay tendencia que atribuir: el desempate «>=» decía «adoptas herramientas con cierta
+  // lentitud» siendo iguales (cabo C0712, receta de test-estilo-parental).
+  if (autonomia === adaptabilidad) {
+    return {
+      nombre: 'Sin tendencia predominante',
+      emoji: '⚖️',
+      descripcion: 'Tus puntuaciones de autonomía y de adaptabilidad son iguales y quedan las dos en la zona media del mapa, así que el test no te sitúa en ningún cuadrante ni apunta hacia un lado. Contestar casi lo mismo a todas las afirmaciones lleva aquí: puede reflejar un equilibrio real o que las afirmaciones encajaban a medias con tu trabajo.',
+      fortalezas: [
+        'Ninguna de las dos dimensiones queda por debajo de la otra',
+        'Un punto de partida sin inercias marcadas hacia un lado',
+      ],
+      riesgos: [
+        'Un resultado en la zona media puede esconder situaciones muy distintas según la tarea o la herramienta',
+        'Al no destacar ninguna dimensión, es fácil no saber por dónde empezar',
+      ],
+      acciones: [
+        'Repetir el test pensando en una tarea concreta y reciente, no en cómo trabajas en general',
+        'Leer las dos tendencias vecinas, «Base Sólida, Ritmo Lento» y «Ágil pero Expuesto», y quedarte con lo que reconozcas de tu caso',
+      ],
+    };
+  }
+
+  if (autonomia > adaptabilidad) {
     return {
       nombre: 'Base Sólida, Ritmo Lento',
       emoji: '🏔️',
@@ -229,9 +251,12 @@ export default function TestDependenciaTecnologicaPage() {
 
   const perfil = obtenerPerfil(puntuacionAutonomia, puntuacionAdaptabilidad);
 
-  // Posición en el mapa (0-100%) — X: adaptabilidad, Y: autonomía
-  const posX = ((puntuacionAdaptabilidad - 5) / 20) * 100;
-  const posY = 100 - ((puntuacionAutonomia - 5) / 20) * 100;
+  // Posición en el mapa — X: adaptabilidad, Y: autonomía. De 5 % a 95 % (5 → 5 %, 15 → 50 %,
+  // 25 → 95 %): en 0 % y 100 % el punto quedaba centrado en la esquina y el mapa lo recortaba
+  // (cabo C0712). Las líneas de umbral (14 y 18) se colocan con la misma escala.
+  const aPorcentaje = (puntos: number) => 5 + ((puntos - 5) / 20) * 90;
+  const posX = aPorcentaje(puntuacionAdaptabilidad);
+  const posY = 100 - aPorcentaje(puntuacionAutonomia);
 
   return (
     <div className={styles.container}>
@@ -340,10 +365,10 @@ export default function TestDependenciaTecnologicaPage() {
                 <div className={`${styles.quadrant} ${styles.quadrantBR}`}>
                   <span><span aria-hidden="true">🏄</span> Surfista Digital</span>
                 </div>
-                <div className={styles.thresholdLineV} style={{ left: '45%' }} aria-hidden="true" />
-                <div className={styles.thresholdLineV} style={{ left: '65%' }} aria-hidden="true" />
-                <div className={styles.thresholdLineH} style={{ top: '35%' }} aria-hidden="true" />
-                <div className={styles.thresholdLineH} style={{ top: '55%' }} aria-hidden="true" />
+                <div className={styles.thresholdLineV} style={{ left: `${aPorcentaje(14)}%` }} aria-hidden="true" />
+                <div className={styles.thresholdLineV} style={{ left: `${aPorcentaje(18)}%` }} aria-hidden="true" />
+                <div className={styles.thresholdLineH} style={{ top: `${100 - aPorcentaje(18)}%` }} aria-hidden="true" />
+                <div className={styles.thresholdLineH} style={{ top: `${100 - aPorcentaje(14)}%` }} aria-hidden="true" />
                 <div
                   className={styles.mapDot}
                   style={{ left: `${posX}%`, top: `${posY}%` }}

@@ -147,7 +147,30 @@ function obtenerPerfil(urgencia: number, presencia: number): Perfil {
     };
   }
 
-  if (urgencia >= presencia) {
+  // Con las dos iguales en la zona media (contestar lo mismo a todo lleva aquí) no hay tendencia
+  // que atribuir: el desempate «>=» daba «Tendencia a la Aceleración» siendo iguales (cabo C0712,
+  // receta de test-estilo-parental).
+  if (urgencia === presencia) {
+    return {
+      nombre: 'Sin tendencia predominante',
+      emoji: '⚖️',
+      descripcion: 'Tus puntuaciones de urgencia y de presencia son iguales y quedan las dos en la zona media del mapa, así que el test no te sitúa en ningún cuadrante ni apunta hacia un lado. Contestar casi lo mismo a todas las afirmaciones lleva aquí: puede reflejar un equilibrio real o que las afirmaciones encajaban a medias con tu día a día.',
+      fortalezas: [
+        'Ninguna de las dos dimensiones queda por debajo de la otra',
+        'Un punto de partida sin inercias marcadas hacia un lado',
+      ],
+      riesgos: [
+        'Un resultado en la zona media puede esconder semanas muy distintas entre sí',
+        'Al no destacar ninguna dimensión, es fácil no saber en qué fijarse',
+      ],
+      acciones: [
+        'Repetir el test pensando en una semana concreta y reciente, no en cómo vives en general',
+        'Leer las dos tendencias vecinas, «Tendencia a la Aceleración» y «Tendencia a la Calma», y quedarte con lo que reconozcas de tu caso',
+      ],
+    };
+  }
+
+  if (urgencia > presencia) {
     return {
       nombre: 'Tendencia a la Aceleración',
       emoji: '⏩',
@@ -228,8 +251,11 @@ export default function TestRitmoVitalPage() {
 
   const perfil = obtenerPerfil(puntuacionUrgencia, puntuacionPresencia);
 
-  const posX = ((puntuacionUrgencia - 5) / 20) * 100;
-  const posY = 100 - ((puntuacionPresencia - 5) / 20) * 100;
+  // De 5 % a 95 % (5 → 5 %, 15 → 50 %, 25 → 95 %): en 0 % y 100 % el punto quedaba centrado en
+  // la esquina y el mapa lo recortaba (cabo C0712). Las líneas de umbral, con la misma escala.
+  const aPorcentaje = (puntos: number) => 5 + ((puntos - 5) / 20) * 90;
+  const posX = aPorcentaje(puntuacionUrgencia);
+  const posY = 100 - aPorcentaje(puntuacionPresencia);
 
   return (
     <div className={styles.container}>
@@ -332,10 +358,10 @@ export default function TestRitmoVitalPage() {
                 <div className={`${styles.quadrant} ${styles.quadrantBR}`}>
                   <span><span aria-hidden="true">🏃</span> Urgencia Permanente</span>
                 </div>
-                <div className={styles.thresholdLineV} style={{ left: '45%' }} aria-hidden="true" />
-                <div className={styles.thresholdLineV} style={{ left: '65%' }} aria-hidden="true" />
-                <div className={styles.thresholdLineH} style={{ top: '35%' }} aria-hidden="true" />
-                <div className={styles.thresholdLineH} style={{ top: '55%' }} aria-hidden="true" />
+                <div className={styles.thresholdLineV} style={{ left: `${aPorcentaje(14)}%` }} aria-hidden="true" />
+                <div className={styles.thresholdLineV} style={{ left: `${aPorcentaje(18)}%` }} aria-hidden="true" />
+                <div className={styles.thresholdLineH} style={{ top: `${100 - aPorcentaje(18)}%` }} aria-hidden="true" />
+                <div className={styles.thresholdLineH} style={{ top: `${100 - aPorcentaje(14)}%` }} aria-hidden="true" />
                 <div
                   className={styles.mapDot}
                   style={{ left: `${posX}%`, top: `${posY}%` }}

@@ -149,8 +149,30 @@ function obtenerPerfil(acompanamiento: number, autonomia: number): Perfil {
     };
   }
 
-  // Perfiles intermedios
-  if (acompanamiento >= autonomia) {
+  // Perfiles intermedios. Con las dos iguales en la zona media (contestar lo mismo a todo lleva
+  // aquí) no hay tendencia que atribuir: el desempate «>=» decía «acompañas más de lo que sueltas»
+  // siendo iguales (cabo C0712, receta de test-estilo-parental).
+  if (acompanamiento === autonomia) {
+    return {
+      nombre: 'Sin tendencia predominante',
+      emoji: '⚖️',
+      descripcion: 'Tus puntuaciones de acompañamiento y de autonomía son iguales y quedan las dos en la zona media del mapa, así que el test no te sitúa en ningún cuadrante ni apunta hacia un lado. Contestar casi lo mismo a todas las afirmaciones lleva aquí: puede reflejar un equilibrio real o que las afirmaciones encajaban a medias con tu forma de delegar.',
+      fortalezas: [
+        'Ninguna de las dos dimensiones queda por debajo de la otra',
+        'Un punto de partida sin inercias marcadas hacia un lado',
+      ],
+      riesgos: [
+        'Un resultado en la zona media puede esconder formas de delegar muy distintas según la tarea o la persona',
+        'Al no destacar ninguna dimensión, es fácil no saber por dónde empezar',
+      ],
+      acciones: [
+        'Repetir el test pensando en una delegación concreta y reciente, no en cómo sueles hacerlo en general',
+        'Leer las dos tendencias vecinas, «Tendencia al Control» y «Tendencia a Soltar», y quedarte con lo que reconozcas de tu caso',
+      ],
+    };
+  }
+
+  if (acompanamiento > autonomia) {
     return {
       nombre: 'Tendencia al Control',
       emoji: '📋',
@@ -232,9 +254,12 @@ export default function TestDelegacionEfectivaPage() {
 
   const perfil = obtenerPerfil(puntuacionAcompanamiento, puntuacionAutonomia);
 
-  // Posición en el mapa (0-100%) — X: autonomía, Y: acompañamiento
-  const posX = ((puntuacionAutonomia - 5) / 20) * 100;
-  const posY = 100 - ((puntuacionAcompanamiento - 5) / 20) * 100;
+  // Posición en el mapa — X: autonomía, Y: acompañamiento. De 5 % a 95 % (5 → 5 %, 15 → 50 %,
+  // 25 → 95 %): en 0 % y 100 % el punto quedaba centrado en la esquina y el mapa lo recortaba
+  // (cabo C0712). Las líneas de umbral (14 y 18) se colocan con la misma escala.
+  const aPorcentaje = (puntos: number) => 5 + ((puntos - 5) / 20) * 90;
+  const posX = aPorcentaje(puntuacionAutonomia);
+  const posY = 100 - aPorcentaje(puntuacionAcompanamiento);
 
   return (
     <div className={styles.container}>
@@ -354,10 +379,10 @@ export default function TestDelegacionEfectivaPage() {
                   <span><span aria-hidden="true">🪂</span> Soltar y Rezar</span>
                 </div>
                 {/* Líneas de umbral */}
-                <div className={styles.thresholdLineV} style={{ left: '45%' }} aria-hidden="true" />
-                <div className={styles.thresholdLineV} style={{ left: '65%' }} aria-hidden="true" />
-                <div className={styles.thresholdLineH} style={{ top: '35%' }} aria-hidden="true" />
-                <div className={styles.thresholdLineH} style={{ top: '55%' }} aria-hidden="true" />
+                <div className={styles.thresholdLineV} style={{ left: `${aPorcentaje(14)}%` }} aria-hidden="true" />
+                <div className={styles.thresholdLineV} style={{ left: `${aPorcentaje(18)}%` }} aria-hidden="true" />
+                <div className={styles.thresholdLineH} style={{ top: `${100 - aPorcentaje(18)}%` }} aria-hidden="true" />
+                <div className={styles.thresholdLineH} style={{ top: `${100 - aPorcentaje(14)}%` }} aria-hidden="true" />
                 {/* Punto de posición */}
                 <div
                   className={styles.mapDot}

@@ -687,6 +687,35 @@
   }
 }
 
+/* ─── Mapa: rótulos de los ejes y punto en los extremos (cabo C0712) ───
+   Los rótulos se colocaban en absoluto respecto a .mapLabels, una fila sin alto encima del mapa:
+   «Bajo …» salía arriba, pegado a «Alto …», y los laterales en los bordes de la sección, cortados.
+   Ahora se colocan respecto a .mapContainer, que envuelve el mapa con su hueco. Y .map ya no
+   recorta: el punto de los extremos y su etiqueta «Tú» se veían a medias; las esquinas
+   redondeadas las ponen los cuadrantes. */
+.mapContainer {
+  position: relative;
+  max-width: calc(400px + 4.5rem);
+  margin-inline: auto;
+  padding: 2.25rem 2.25rem 1.75rem;
+}
+
+.mapLabels { position: static; margin: 0; }
+.mapLabelTop { top: 0.25rem; }
+.mapLabelBottom { bottom: 0.25rem; }
+.mapLabelLeft { left: 0.25rem; }
+.mapLabelRight { right: 0.25rem; }
+
+.map { margin: 0 auto; overflow: visible; }
+.quadrantTL { border-top-left-radius: var(--radius); }
+.quadrantTR { border-top-right-radius: var(--radius); }
+.quadrantBL { border-bottom-left-radius: var(--radius); }
+.quadrantBR { border-bottom-right-radius: var(--radius); }
+
+@media (max-width: 768px) {
+  .mapContainer { max-width: calc(300px + 4.5rem); }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .mapDot,
   .barFill,
