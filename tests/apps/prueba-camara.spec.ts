@@ -306,15 +306,15 @@ test.describe('Escritorio · el medio arranca de verdad y se libera', () => {
     await expect(page.locator(RESOLUCION)).toHaveCount(0);
   });
 
-  test('HALLAZGO (11/11/2026, ABIERTO) · un solo clic en «Iniciar Cámara» abre la cámara dos veces (esperado 1 getUserMedia)', async ({
+  test('HALLAZGO 4430 (11/11/2026, REPARADO) · un solo clic en «Iniciar Cámara» abre la cámara una vez (1 getUserMedia)', async ({
     page,
   }) => {
-    // ABIERTO: tras el primer getUserMedia, getCameras() fija selectedCamera con el deviceId de la
+    // REPARADO: la cámara elegida sale de la pista abierta (getSettings().deviceId) y el efecto no
+    // reabre la que ya está abierta. Antes: tras el primer getUserMedia, getCameras() fija selectedCamera con el deviceId de la
     // PRIMERA cámara enumerada y el useEffect([selectedCamera]) llama otra vez a startCamera(), que
     // para la pista recién abierta y pide `deviceId: { exact }`. Medido: 2 aperturas, la primera
     // en ended. La luz de la cámara parpadea y, donde la predeterminada no sea la primera de la
     // lista, cambia de cámara sin que nadie lo pida (esto último no se ha podido reproducir).
-    test.fail();
     await registrarAperturas(page);
     await arrancar(page);
     await page.waitForTimeout(1500);
@@ -335,12 +335,11 @@ test.describe('Escritorio · la foto de prueba', () => {
     expect(Math.abs(f.derecha - 50)).toBeLessThanOrEqual(12);
   });
 
-  test('HALLAZGO (11/11/2026, ABIERTO) · con el espejo desactivado la foto sigue saliendo volteada (esperado izquierda 50, derecha 200)', async ({
+  test('HALLAZGO 4428 (11/11/2026, REPARADO) · con el espejo desactivado la foto sale sin voltear (izquierda 50, derecha 200)', async ({
     page,
   }) => {
-    // ABIERTO: takePhoto es useCallback(…, []) y llama al capturePhoto del PRIMER render, que se
-    // quedó con isMirrored = true, brillo 100 y contraste 100. La vista previa sí se desvoltea.
-    test.fail();
+    // REPARADO: takePhoto era useCallback(…, []) y llamaba al capturePhoto del PRIMER render, que se
+    // quedó con isMirrored = true, brillo 100 y contraste 100. Ahora lee la captura más reciente.
     await camaraDeMitades(page, 640, 480);
     await arrancar(page);
     await abrirAjustes(page);
@@ -352,12 +351,11 @@ test.describe('Escritorio · la foto de prueba', () => {
     expect(Math.abs(f.derecha - 200), `derecha ${f.derecha}`).toBeLessThanOrEqual(12);
   });
 
-  test('HALLAZGO (11/11/2026, ABIERTO) · el brillo y el contraste al 150 % no llegan a la foto (esperado 255/75 y 236/11)', async ({
+  test('HALLAZGO 4428 (11/11/2026, REPARADO) · el brillo y el contraste al 150 % llegan a la foto (255/75 y 236/11)', async ({
     page,
   }) => {
-    // ABIERTO: el mismo cierre viejo de takePhoto. Medido: con brillo 150 la foto da 200/50, y con
-    // contraste 150 también 200/50, mientras la vista previa sí cambia (style.filter).
-    test.fail();
+    // REPARADO: era el mismo cierre viejo de takePhoto. Daba 200/50 con brillo 150 y con contraste
+    // 150, mientras la vista previa sí cambiaba (style.filter).
     await camaraDeMitades(page, 640, 480);
     await arrancar(page);
     await abrirAjustes(page);
@@ -375,12 +373,11 @@ test.describe('Escritorio · la foto de prueba', () => {
     expect.soft(Math.abs(conContraste.derecha - 11), `contraste 150, derecha ${conContraste.derecha}`).toBeLessThanOrEqual(12);
   });
 
-  test('HALLAZGO (11/11/2026, ABIERTO) · «Foto 3s» y «Detener» antes de que acabe la cuenta dejan una foto vacía en la galería', async ({
+  test('HALLAZGO 4431 (11/11/2026, REPARADO) · «Foto 3s» y «Detener» antes de que acabe la cuenta no dejan foto vacía', async ({
     page,
   }) => {
-    // ABIERTO: al llegar a cero capturePhoto() dibuja un <video> sin flujo (videoWidth 0): el
-    // canvas de 0 × 0 da «data:,» y la galería añade una tarjeta rota con su botón «Descargar».
-    test.fail();
+    // REPARADO: al llegar a cero capturePhoto() dibujaba un <video> sin flujo (videoWidth 0): el
+    // canvas de 0 × 0 daba «data:,». Ahora Detener cancela la cuenta y sin flujo no se captura.
     await camaraDeMitades(page, 640, 480);
     await arrancar(page);
     await page.getByRole('button', { name: /Foto 3s/ }).click();
@@ -392,6 +389,7 @@ test.describe('Escritorio · la foto de prueba', () => {
       imgs.filter((i) => (i as HTMLImageElement).naturalWidth === 0).length,
     );
     expect(vacias).toBe(0);
+    await expect(page.locator(FOTOS)).toHaveCount(0);
   });
 });
 
@@ -407,38 +405,36 @@ test.describe('Escritorio · rechazos', () => {
     await expect(detener(page)).toHaveCount(0);
   });
 
-  test('HALLAZGO (11/11/2026, ABIERTO) · sin cámara (NotFoundError «Requested device not found») sale el mensaje del navegador en inglés', async ({
+  test('HALLAZGO 4429 (11/11/2026, REPARADO) · sin cámara (NotFoundError «Requested device not found») avisa en español', async ({
     page,
   }) => {
-    // ABIERTO: page.tsx busca 'NotFoundError' en err.message, y ningún navegador pone el nombre
-    // en el mensaje. Medido: «Error al acceder a la cámara: Requested device not found».
-    test.fail();
+    // REPARADO: page.tsx buscaba 'NotFoundError' en err.message, y ningún navegador pone el nombre
+    // en el mensaje. Daba «Error al acceder a la cámara: Requested device not found». Ahora, err.name.
     await camaraQueFalla(page, 'NotFoundError', 'Requested device not found');
     await abrir(page);
     await iniciar(page).click();
     await expect(page.locator(AVISO)).toContainText('No se encontró ninguna cámara');
   });
 
-  test('HALLAZGO (11/11/2026, ABIERTO) · cámara ocupada por otra app (NotReadableError «Could not start video source») sale en inglés', async ({
+  test('HALLAZGO 4429 (11/11/2026, REPARADO) · cámara ocupada por otra app (NotReadableError) avisa en español y dice qué cerrar', async ({
     page,
   }) => {
-    // ABIERTO: la causa que la propia página da por la más habitual (Zoom o Teams abiertos) cae en
-    // la rama genérica. Medido: «Error al acceder a la cámara: Could not start video source».
-    test.fail();
+    // REPARADO: la causa que la propia página da por la más habitual (Zoom o Teams abiertos) caía en
+    // la rama genérica: «Error al acceder a la cámara: Could not start video source».
     await camaraQueFalla(page, 'NotReadableError', 'Could not start video source');
     await abrir(page);
     await iniciar(page).click();
     await expect(page.locator(AVISO)).toBeVisible();
     await expect(page.locator(AVISO)).not.toContainText('Could not start video source');
+    await expect(page.locator(AVISO)).toContainText('Zoom');
   });
 
-  test('HALLAZGO (11/11/2026, ABIERTO) · permiso denegado en Safari (NotAllowedError con su mensaje) no dice «Permiso denegado»', async ({
+  test('HALLAZGO 4429 (11/11/2026, REPARADO) · permiso denegado en Safari (NotAllowedError con su mensaje) dice «Permiso denegado»', async ({
     page,
   }) => {
-    // ABIERTO: solo el mensaje de Chrome lleva «Permission denied». Medido: «Error al acceder a la
+    // REPARADO: solo el mensaje de Chrome lleva «Permission denied». Daba «Error al acceder a la
     // cámara: The request is not allowed by the user agent or the platform in the current
     // context, possibly because the user denied permission.»
-    test.fail();
     await camaraQueFalla(
       page,
       'NotAllowedError',
@@ -449,12 +445,11 @@ test.describe('Escritorio · rechazos', () => {
     await expect(page.locator(AVISO)).toContainText('Permiso denegado');
   });
 
-  test('HALLAZGO (11/11/2026, ABIERTO) · el aviso de error de la cámara no se anuncia (sin role="alert" ni aria-live)', async ({
+  test('HALLAZGO 4432 (11/11/2026, REPARADO) · el aviso de error de la cámara se anuncia (role="alert")', async ({
     page,
   }) => {
-    // ABIERTO: el panel del micrófono sí lo hace (<p role="alert">); el de la cámara pinta el
-    // aviso en un <div> dentro de la caja del vídeo y el foco se queda en «Iniciar Cámara».
-    test.fail();
+    // REPARADO: el panel del micrófono sí lo hacía (<p role="alert">); el de la cámara pintaba el
+    // aviso en un <div> sin role ni aria-live dentro de la caja del vídeo.
     await camaraQueFalla(page, 'NotAllowedError', 'Permission denied');
     await abrir(page);
     await iniciar(page).click();
@@ -483,14 +478,15 @@ test.describe('Escritorio · ajustes y textos', () => {
     expect(await page.locator('video').evaluate((v) => getComputedStyle(v).transform)).toBe('none');
   });
 
-  test('HALLAZGO (11/11/2026, ABIERTO) · el botón que abre los ajustes se llama solo «⚙️»', async ({ page }) => {
-    // ABIERTO: <button aria-pressed aria-expanded>⚙️</button> sin aria-label. Detrás están el
-    // selector de cámara, el espejo, el brillo y el contraste. Además lleva aria-pressed Y
-    // aria-expanded: un desplegable va solo con aria-expanded.
-    test.fail();
+  test('HALLAZGO 4433 (11/11/2026, REPARADO) · el botón que abre los ajustes se llama «Ajustes de la cámara»', async ({ page }) => {
+    // REPARADO: era <button aria-pressed aria-expanded>⚙️</button> sin aria-label. Detrás están el
+    // selector de cámara, el espejo, el brillo y el contraste. Un desplegable va solo con aria-expanded.
     await registrarAperturas(page);
     await arrancar(page);
-    await expect(page.getByRole('button', { name: /ajustes/i })).toHaveCount(1);
+    const boton = page.getByRole('button', { name: /ajustes/i });
+    await expect(boton).toHaveCount(1);
+    await expect(boton).not.toHaveAttribute('aria-pressed', /.*/);
+    await expect(boton).toHaveAttribute('aria-expanded', 'false');
   });
 
   test('HALLAZGO (11/11/2026, ABIERTO) · los porcentajes del panel van pegados («Brillo: 100%», esperado «100 %» con espacio duro)', async ({
@@ -565,18 +561,21 @@ test.describe('Móvil (Pixel 7)', () => {
     expect(vivas).toBe(0);
   });
 
-  test('HALLAZGO (11/11/2026, ABIERTO) · con el móvil en vertical (flujo 480 × 640) la vista previa enseña solo el 42 % de la altura', async ({
+  test('HALLAZGO 4427 (11/11/2026, REPARADO) · con el móvil en vertical (flujo 480 × 640) la vista previa enseña el fotograma entero', async ({
     page,
   }) => {
-    // ABIERTO: la caja del vídeo es aspect-ratio 16/9 con object-fit: cover. Un móvil sujeto en
+    // REPARADO: object-fit contain y la caja con la proporción del flujo. Antes: la caja del vídeo es aspect-ratio 16/9 con object-fit: cover. Un móvil sujeto en
     // vertical entrega fotogramas verticales: con 480 × 640 se ve (9/16)/(4/3) = 42,2 % de la
     // altura; con 1080 × 1920, el 31,6 %. Una webcam 4:3 de escritorio pierde el 25 %. La foto,
     // en cambio, guarda el fotograma entero: lo que se encuadra no es lo que se ve.
-    test.fail();
     await camaraDeMitades(page, 480, 640);
     await arrancar(page, true);
     expect(await page.locator('video').evaluate((v) => (v as HTMLVideoElement).videoHeight)).toBe(640);
     const fraccion = await fraccionVisibleDeLaAltura(page);
     expect(fraccion, `fracción visible de la altura: ${fraccion.toFixed(4)}`).toBeGreaterThanOrEqual(0.99);
+    // Y no por la puerta de atrás del medidor (que da 1 con cualquier ajuste que no sea cover):
+    // el fotograma contenido cabe entero en la caja, que es más alta que ancha como el flujo.
+    const caja = await page.locator(CONTENEDOR).evaluate((el) => el.getBoundingClientRect());
+    expect(caja.height).toBeGreaterThan(caja.width);
   });
 });

@@ -112,10 +112,17 @@
   transform: scaleX(-1);
 }
 
+/* contain y no cover (hallazgo 4427): con cover, un móvil en vertical solo enseñaba una franja
+   central (el 42 % de la altura) y una webcam 4:3 perdía un 25 %, justo lo que hay que encuadrar.
+   La caja toma además la proporción del flujo real (style en page.tsx), con un alto máximo. */
 .video {
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+}
+
+.videoContainer {
+  max-height: 70vh;
 }
 
 .placeholder,

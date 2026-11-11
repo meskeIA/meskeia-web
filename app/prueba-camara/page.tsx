@@ -33,8 +33,14 @@ export default function PruebaCamaraPage() {
   const [contrast, setContrast] = useState(100);
   const [showSettings, setShowSettings] = useState(false);
   const [countdown, setCountdown] = useState<number | null>(null);
+  /** Proporción del flujo real (ancho / alto), para que la caja no recorte el fotograma. */
+  const [proporcion, setProporcion] = useState<string | null>(null);
+  /** deviceId de la pista abierta: elegir la cámara que ya está abierta no la reabre. */
+  const camaraAbiertaRef = useRef<string>('');
+  const cuentaAtrasRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Obtener lista de cámaras
+  // Obtener lista de cámaras. Ya no elige la primera de la lista: lo hacía tras abrir la
+  // predeterminada y el efecto de abajo la reabría con deviceId exact (hallazgo 4430).
   const getCameras = useCallback(async () => {
     try {
       const devices = await navigator.mediaDevices.enumerateDevices();
@@ -45,13 +51,10 @@ export default function PruebaCamaraPage() {
           label: device.label || `Cámara ${devices.indexOf(device) + 1}`
         }));
       setCameras(videoDevices);
-      if (videoDevices.length > 0 && !selectedCamera) {
-        setSelectedCamera(videoDevices[0].deviceId);
-      }
     } catch (err) {
       console.error('Error al enumerar dispositivos:', err);
     }
-  }, [selectedCamera]);
+  }, []);
 
   // Iniciar cámara
   const startCamera = useCallback(async () => {
@@ -84,18 +87,26 @@ export default function PruebaCamaraPage() {
           width: settings.width || 0,
           height: settings.height || 0
         });
+        const abierta = settings.deviceId ?? '';
+        camaraAbiertaRef.current = abierta;
+        if (abierta) setSelectedCamera(abierta);
       }
 
       setIsActive(true);
       await getCameras(); // Actualizar lista con nombres
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Error desconocido';
-      if (errorMessage.includes('Permission denied') || errorMessage.includes('NotAllowedError')) {
+      // Se decide por err.name, como PanelMicrofono (hallazgo 4429): ningún navegador pone el
+      // nombre en el mensaje, así que «sin cámara» no salía nunca y el permiso denegado de Safari
+      // o la cámara ocupada por otra app acababan en un texto técnico en inglés.
+      const nombre = err instanceof Error || err instanceof DOMException ? err.name : '';
+      if (nombre === 'NotAllowedError' || nombre === 'SecurityError') {
         setError('Permiso denegado. Permite el acceso a la cámara en tu navegador.');
-      } else if (errorMessage.includes('NotFoundError')) {
+      } else if (nombre === 'NotFoundError' || nombre === 'OverconstrainedError') {
         setError('No se encontró ninguna cámara. Conecta una webcam e intenta de nuevo.');
+      } else if (nombre === 'NotReadableError' || nombre === 'AbortError') {
+        setError('La cámara está ocupada o bloqueada por el sistema. Cierra Zoom, Teams u otra app que la esté usando e inténtalo de nuevo.');
       } else {
-        setError(`Error al acceder a la cámara: ${errorMessage}`);
+        setError('No se pudo acceder a la cámara. Comprueba que está conectada y que el navegador tiene permiso.');
       }
       setIsActive(false);
     }
@@ -103,6 +114,15 @@ export default function PruebaCamaraPage() {
 
   // Detener cámara
   const stopCamera = useCallback(() => {
+    // Detener cancela la cuenta atrás: si no, al llegar a cero dibujaba un vídeo sin flujo y dejaba
+    // una foto vacía en la galería (hallazgo 4431).
+    if (cuentaAtrasRef.current) {
+      clearInterval(cuentaAtrasRef.current);
+      cuentaAtrasRef.current = null;
+    }
+    setCountdown(null);
+    camaraAbiertaRef.current = '';
+    setProporcion(null);
     if (streamRef.current) {
       streamRef.current.getTracks().forEach(track => track.stop());
       streamRef.current = null;
@@ -114,29 +134,6 @@ export default function PruebaCamaraPage() {
     setResolution(null);
   }, []);
 
-  // Tomar foto con cuenta atrás opcional
-  const takePhoto = useCallback((withCountdown = false) => {
-    if (withCountdown) {
-      setCountdown(3);
-      const interval = setInterval(() => {
-        setCountdown(prev => {
-          if (prev === null || prev <= 1) {
-            clearInterval(interval);
-            // Tomar foto cuando llega a 0
-            setTimeout(() => {
-              capturePhoto();
-              setCountdown(null);
-            }, 100);
-            return null;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-    } else {
-      capturePhoto();
-    }
-  }, []);
-
   const capturePhoto = useCallback(() => {
     if (!videoRef.current || !canvasRef.current) return;
 
@@ -144,7 +141,8 @@ export default function PruebaCamaraPage() {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
 
-    if (!ctx) return;
+    // Sin flujo (cámara detenida) el canvas sería de 0×0 y daría «data:,»: ninguna foto.
+    if (!ctx || video.videoWidth === 0 || video.videoHeight === 0) return;
 
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
@@ -170,6 +168,36 @@ export default function PruebaCamaraPage() {
     setPhotos(prev => [newPhoto, ...prev].slice(0, 10)); // Máximo 10 fotos
   }, [isMirrored, brightness, contrast]);
 
+  // La captura más reciente, con el espejo, el brillo y el contraste de AHORA. Antes takePhoto
+  // era useCallback(…, []) y usaba la del primer render: la foto salía siempre volteada y al
+  // 100/100 (hallazgo 4428). La cuenta atrás la lee al llegar a cero.
+  const capturaRef = useRef(capturePhoto);
+  useEffect(() => {
+    capturaRef.current = capturePhoto;
+  }, [capturePhoto]);
+
+  // Tomar foto con cuenta atrás opcional
+  const takePhoto = useCallback((withCountdown = false) => {
+    if (!withCountdown) {
+      capturaRef.current();
+      return;
+    }
+    if (cuentaAtrasRef.current) clearInterval(cuentaAtrasRef.current);
+    let restante = 3;
+    setCountdown(restante);
+    cuentaAtrasRef.current = setInterval(() => {
+      restante -= 1;
+      if (restante > 0) {
+        setCountdown(restante);
+        return;
+      }
+      if (cuentaAtrasRef.current) clearInterval(cuentaAtrasRef.current);
+      cuentaAtrasRef.current = null;
+      setCountdown(null);
+      capturaRef.current();
+    }, 1000);
+  }, []);
+
   // Descargar foto
   const downloadPhoto = useCallback((photo: PhotoData) => {
     const link = document.createElement('a');
@@ -183,9 +211,9 @@ export default function PruebaCamaraPage() {
     setPhotos(prev => prev.filter(p => p.id !== id));
   }, []);
 
-  // Cambiar cámara
+  // Cambiar cámara: solo si la elegida no es la que ya está abierta (hallazgo 4430).
   useEffect(() => {
-    if (isActive && selectedCamera) {
+    if (isActive && selectedCamera && selectedCamera !== camaraAbiertaRef.current) {
       startCamera();
     }
   }, [selectedCamera]);
@@ -193,6 +221,7 @@ export default function PruebaCamaraPage() {
   // Limpiar al desmontar
   useEffect(() => {
     return () => {
+      if (cuentaAtrasRef.current) clearInterval(cuentaAtrasRef.current);
       if (streamRef.current) {
         streamRef.current.getTracks().forEach(track => track.stop());
       }
@@ -237,7 +266,10 @@ export default function PruebaCamaraPage() {
             <div className={styles.videoPanel}>
               <div
                 className={`${styles.videoContainer} ${isMirrored ? styles.mirrored : ''}`}
-                style={{ filter: `brightness(${brightness}%) contrast(${contrast}%)` }}
+                style={{
+                  filter: `brightness(${brightness}%) contrast(${contrast}%)`,
+                  ...(proporcion ? { aspectRatio: proporcion } : {}),
+                }}
               >
                 {!isActive && !error && (
                   <div className={styles.placeholder}>
@@ -246,7 +278,7 @@ export default function PruebaCamaraPage() {
                   </div>
                 )}
                 {error && (
-                  <div className={styles.errorOverlay}>
+                  <div className={styles.errorOverlay} role="alert">
                     <span className={styles.errorIcon}>❌</span>
                     <p>{error}</p>
                   </div>
@@ -262,6 +294,10 @@ export default function PruebaCamaraPage() {
                   playsInline
                   muted
                   className={styles.video}
+                  onLoadedMetadata={(e) => {
+                    const { videoWidth, videoHeight } = e.currentTarget;
+                    if (videoWidth > 0 && videoHeight > 0) setProporcion(`${videoWidth} / ${videoHeight}`);
+                  }}
                 />
               </div>
 
@@ -294,7 +330,7 @@ export default function PruebaCamaraPage() {
                     <button
                       type="button"
                       onClick={() => setShowSettings(!showSettings)}
-                      aria-pressed={showSettings}
+                      aria-label="Ajustes de la cámara"
                       aria-expanded={showSettings}
                       className={`${styles.btnIcon} ${showSettings ? styles.active : ''}`}
                     >
