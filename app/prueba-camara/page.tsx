@@ -56,8 +56,19 @@ export default function PruebaCamaraPage() {
     }
   }, []);
 
+  // Una apertura cada vez (hallazgo 4487): el botón sigue siendo «Iniciar Cámara» hasta que
+  // getUserMedia resuelve, y un doble clic abría la cámara dos veces; la segunda pista pisaba a la
+  // primera en streamRef y esta seguía viva tras «Detener», con la luz de la cámara encendida.
+  // `generacionRef` sube con cada apertura y con «Detener»: el flujo que llega de una apertura que
+  // ya no es la última (se detuvo mientras se abría) se cierra en vez de quedarse huérfano.
+  const abriendoRef = useRef(false);
+  const generacionRef = useRef(0);
+
   // Iniciar cámara
   const startCamera = useCallback(async () => {
+    if (abriendoRef.current) return;
+    abriendoRef.current = true;
+    const generacion = ++generacionRef.current;
     try {
       setError(null);
 
@@ -75,6 +86,10 @@ export default function PruebaCamaraPage() {
       };
 
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      if (generacion !== generacionRef.current) {
+        stream.getTracks().forEach(track => track.stop());
+        return;
+      }
       streamRef.current = stream;
 
       if (videoRef.current) {
@@ -95,6 +110,7 @@ export default function PruebaCamaraPage() {
       setIsActive(true);
       await getCameras(); // Actualizar lista con nombres
     } catch (err) {
+      if (generacion !== generacionRef.current) return;
       // Se decide por err.name, como PanelMicrofono (hallazgo 4429): ningún navegador pone el
       // nombre en el mensaje, así que «sin cámara» no salía nunca y el permiso denegado de Safari
       // o la cámara ocupada por otra app acababan en un texto técnico en inglés.
@@ -109,11 +125,16 @@ export default function PruebaCamaraPage() {
         setError('No se pudo acceder a la cámara. Comprueba que está conectada y que el navegador tiene permiso.');
       }
       setIsActive(false);
+    } finally {
+      if (generacion === generacionRef.current) abriendoRef.current = false;
     }
   }, [selectedCamera, getCameras]);
 
   // Detener cámara
   const stopCamera = useCallback(() => {
+    // Invalida una apertura en curso: su flujo, si llega, se cierra al llegar.
+    generacionRef.current += 1;
+    abriendoRef.current = false;
     // Detener cancela la cuenta atrás: si no, al llegar a cero dibujaba un vídeo sin flujo y dejaba
     // una foto vacía en la galería (hallazgo 4431).
     if (cuentaAtrasRef.current) {
@@ -222,6 +243,7 @@ export default function PruebaCamaraPage() {
   useEffect(() => {
     return () => {
       if (cuentaAtrasRef.current) clearInterval(cuentaAtrasRef.current);
+      generacionRef.current += 1; // un flujo que llegue tras desmontar se cierra al llegar
       if (streamRef.current) {
         streamRef.current.getTracks().forEach(track => track.stop());
       }
@@ -256,7 +278,7 @@ export default function PruebaCamaraPage() {
       <main className={styles.mainContent}>
         {!isSupported ? (
           <div className={styles.errorCard}>
-            <span className={styles.errorIcon}>⚠️</span>
+            <span className={styles.errorIcon} aria-hidden="true">⚠️</span>
             <h2>Navegador no compatible</h2>
             <p>Tu navegador no soporta acceso a la cámara. Prueba con Chrome, Firefox, Edge o Safari actualizados.</p>
           </div>
@@ -279,7 +301,7 @@ export default function PruebaCamaraPage() {
                 )}
                 {error && (
                   <div className={styles.errorOverlay} role="alert">
-                    <span className={styles.errorIcon}>❌</span>
+                    <span className={styles.errorIcon} aria-hidden="true">❌</span>
                     <p>{error}</p>
                   </div>
                 )}
@@ -780,7 +802,9 @@ export default function PruebaCamaraPage() {
                 <strong>Tener otra app usando la cámara simultáneamente.</strong> Solo una
                 aplicación puede acceder a la cámara a la vez en la mayoría de sistemas.
                 Si Zoom o Teams están activos en segundo plano, este test no podrá iniciar
-                la cámara y recibirás un error de acceso denegado.
+                la cámara y verás el aviso «La cámara está ocupada o bloqueada por el sistema»:
+                cierra esa app y vuelve a intentarlo. El aviso «Permiso denegado» es otra cosa:
+                el navegador no tiene permiso para usar la cámara.
               </li>
               <li>
                 <strong>No comprobar la cámara antes de reuniones importantes.</strong> Esperar

@@ -450,20 +450,20 @@ test.describe('Escritorio · el medio arranca de verdad y se libera', () => {
     expect(Math.round(m.cajaH)).toBe(504);
   });
 
-  test('HALLAZGO (11/11/2026, ABIERTO) · un doble clic en «Iniciar Cámara» con una cámara que tarda 400 ms deja una pista VIVA tras «Detener» (esperado 0)', async ({
+  test('HALLAZGO 4487 (11/11/2026, REPARADO) · un doble clic en «Iniciar Cámara» con una cámara que tarda 400 ms no deja ninguna pista viva tras «Detener»', async ({
     page,
   }) => {
-    // ABIERTO: startCamera es async y el botón sigue siendo «Iniciar Cámara» hasta que
-    // getUserMedia resuelve; las dos llamadas ven streamRef.current === null, la segunda pisa a la
-    // primera en streamRef y nadie para la primera. Medido: 2 getUserMedia, 2 pistas vivas y 1 viva
-    // tras «Detener» (4 de 4 rondas): la luz de la cámara sigue encendida y, donde el sistema da la
-    // cámara a una sola app, Zoom o Teams la encuentran ocupada hasta cerrar la pestaña.
-    test.fail();
+    // Era: startCamera es async y el botón sigue siendo «Iniciar Cámara» hasta que getUserMedia
+    // resuelve; las dos llamadas veían streamRef.current === null, la segunda pisaba a la primera
+    // en streamRef y nadie paraba la primera. Medido: 2 getUserMedia, 2 pistas vivas y 1 viva tras
+    // «Detener» (4 de 4 rondas). Hoy la segunda pulsación se ignora mientras se abre la primera.
     await registrarAperturasLentas(page, 400);
     await abrir(page);
     await dobleClicHumano(page, false);
     await expect(detener(page)).toBeVisible();
     await page.waitForTimeout(1500);
+    expect(await page.evaluate(() => (window as unknown as Ventana).__llamadas)).toBe(1);
+    expect(await pistasVivas(page)).toBe(1);
     await detener(page).click();
     await expect(iniciar(page)).toBeVisible();
     await page.waitForTimeout(800);
@@ -713,27 +713,26 @@ test.describe('Escritorio · rechazos', () => {
     await expect(iniciar(page)).toBeVisible();
   });
 
-  test('HALLAZGO (11/11/2026, ABIERTO) · el role="alert" del aviso anuncia también el ❌ decorativo (esperado solo el texto)', async ({ page }) => {
-    // ABIERTO: 532a9704f puso role="alert" en el <div> que contiene <span className={errorIcon}>❌</span>
+  test('HALLAZGO 4488 (11/11/2026, REPARADO) · el role="alert" del aviso anuncia solo el texto, sin el ❌ decorativo', async ({ page }) => {
+    // Era: 532a9704f puso role="alert" en el <div> que contiene <span className={errorIcon}>❌</span>
     // sin aria-hidden (CLAUDE.md global §5: emoji junto a texto → aria-hidden). Medido con
-    // ariaSnapshot: «- alert: - text: ❌ - paragraph: Permiso denegado. …»: el lector lo lee antes del aviso.
-    test.fail();
+    // ariaSnapshot: «- alert: - text: ❌ - paragraph: Permiso denegado. …»: el lector lo leía antes.
     await camaraQueFalla(page, 'NotAllowedError', 'Permission denied');
     await abrir(page);
     await iniciar(page).click();
     const aviso = page.locator(`${CONTENEDOR} [role="alert"]`);
     await expect(aviso).toBeVisible();
     expect(await aviso.ariaSnapshot()).not.toContain('❌');
+    await expect(aviso).toContainText('Permiso denegado. Permite el acceso a la cámara en tu navegador.');
   });
 
-  test('HALLAZGO (11/11/2026, ABIERTO) · la guía dice que con Zoom o Teams abiertos «recibirás un error de acceso denegado», y la app dice «ocupada»', async ({
+  test('HALLAZGO 4489 (11/11/2026, REPARADO) · la guía nombra el aviso de cámara ocupada para Zoom o Teams, como la app', async ({
     page,
   }) => {
-    // ABIERTO: desde 532a9704f la cámara ocupada (NotReadableError) avisa «La cámara está ocupada o
+    // Era: desde 532a9704f la cámara ocupada (NotReadableError) avisa «La cámara está ocupada o
     // bloqueada por el sistema. Cierra Zoom, Teams…», y «Permiso denegado» queda para el permiso. La
-    // advertencia «4 errores habituales» sigue atando Zoom/Teams a «acceso denegado»: quien vea
-    // «Permiso denegado» cerrará Zoom en vez de dar el permiso.
-    test.fail();
+    // advertencia «4 errores habituales» seguía atando Zoom/Teams a «acceso denegado»: quien viera
+    // «Permiso denegado» cerraría Zoom en vez de dar el permiso.
     await camaraQueFalla(page, 'NotReadableError', 'Could not start video source');
     await abrir(page);
     await iniciar(page).click();
@@ -741,6 +740,7 @@ test.describe('Escritorio · rechazos', () => {
     const advertencia = (await page.locator('li', { hasText: 'Tener otra app usando la cámara' }).textContent()) ?? '';
     expect(advertencia.length).toBeGreaterThan(0);
     expect(advertencia).not.toContain('error de acceso denegado');
+    expect(advertencia.replace(/\s+/g, ' ')).toContain('«La cámara está ocupada o bloqueada por el sistema»');
   });
 });
 
@@ -910,17 +910,17 @@ test.describe('Móvil (Pixel 7)', () => {
     expect(m.cajaW / m.cajaH).toBeCloseTo(m.videoW / m.videoH, 2);
   });
 
-  test('HALLAZGO (11/11/2026, ABIERTO) · un doble toque en «Iniciar Cámara» con una cámara que tarda 400 ms deja una pista VIVA tras «Detener» (esperado 0)', async ({
+  test('HALLAZGO 4487 (11/11/2026, REPARADO) · un doble toque en «Iniciar Cámara» con una cámara que tarda 400 ms no deja ninguna pista viva tras «Detener»', async ({
     page,
   }) => {
-    // ABIERTO: el mismo de escritorio, con dos toques separados 150 ms. Medido: 2 getUserMedia y
+    // El mismo de escritorio, con dos toques separados 150 ms. Medido antes: 2 getUserMedia y
     // 1 pista viva tras «Detener».
-    test.fail();
     await registrarAperturasLentas(page, 400);
     await abrir(page);
     await dobleClicHumano(page, true);
     await expect(detener(page)).toBeVisible();
     await page.waitForTimeout(1500);
+    expect(await page.evaluate(() => (window as unknown as Ventana).__llamadas)).toBe(1);
     await detener(page).tap();
     await expect(iniciar(page)).toBeVisible();
     await page.waitForTimeout(800);
