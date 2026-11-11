@@ -915,3 +915,76 @@ test('motor: las notas solo salen cuando lo declarado choca con el patrón', () 
   // La ficha vegetariana y el FAQPage dicen lo mismo de la B12 (hallazgo 3159).
   expect(DIETAS.vegetariana.consejos.join(' ')).not.toContain('suplementación recomendable');
 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 9. Cabo C0205 (comprobación puntual, 11/11/2026): el colegio, la EFSA y las alergias
+// ─────────────────────────────────────────────────────────────────────────────
+//
+// Las tres partes se dejaron sin fuente el 10/10/2026 (aquella sesión no tenía red). Fuentes:
+//   (a) Ley 19/2014, de 15 de octubre, «por la que se crea el Consejo General de Colegios Oficiales
+//       de Dietistas-Nutricionistas» (BOE-A-2014-10518), art. 1: «Se crea el Consejo General de
+//       Colegios Oficiales de Dietistas-Nutricionistas como corporación de derecho público»; su
+//       disposición adicional primera habla de «cada uno de los Colegios Oficiales de
+//       Dietistas-Nutricionistas existentes en el territorio nacional». Orden SCB/85/2019
+//       (BOE-A-2019-1391), art. 1 de los Estatutos provisionales: «El Consejo General de Colegios
+//       de Dietistas-Nutricionistas de España es el órgano superior de representación y
+//       coordinación de aquéllos». No hay un «Colegio Oficial … de España», ni las siglas CODINUA.
+//   (b) EFSA, página «Dietary reference values» (efsa.europa.eu/en/topics/topic/dietary-reference-values):
+//       «The setting of nutrition goals and recommendations is outside EFSA's remit», y las
+//       recomendaciones «may therefore differ from country to country»; en 2010 «EFSA assists
+//       public authorities in Member States with its opinion on food-based dietary guidelines».
+//   (c) Las 10 preguntas de PREGUNTAS (motor.ts), que son las que se ven: ninguna menciona alergias;
+//       la P2 ofrece «Ninguna», «Vegetariano/a», «Vegano/a» y «Sin gluten (celiaquía o sensibilidad)».
+
+test('candado (C0205): el cuestionario que se ve es exactamente el de PREGUNTAS', async ({ page }) => {
+  // Base del caso (c): el FAQPage se coteja con PREGUNTAS, así que la página tiene que pintar esas.
+  test.setTimeout(60_000);
+  await abrirTest(page);
+  for (let i = 0; i < PREGUNTAS.length; i++) {
+    await expect(page.getByText(`Pregunta ${i + 1} de 10`)).toBeVisible();
+    await expect(page.getByRole('heading', { name: PREGUNTAS[i].texto })).toBeVisible();
+    const radios = page.getByRole('radio');
+    const vistas = (await radios.allInnerTexts()).map((t) => t.replace(/\s+/g, ' ').trim());
+    expect(vistas.map((t, j) => t.startsWith(PREGUNTAS[i].opciones[j]?.etiqueta ?? '\u0000')), `P${i + 1}: ${vistas.join(' | ')}`)
+      .toEqual(PREGUNTAS[i].opciones.map(() => true));
+    await radios.first().click();
+    await botonAvance(page, i).click();
+    if (i < 9) await page.waitForTimeout(500);
+  }
+});
+
+test('ABIERTO (C0205 a): la guía no remite a un «Colegio Oficial de Dietistas-Nutricionistas de España (CODINUA)», que no existe', async ({ page }) => {
+  // ABIERTO desde el 11/11/2026 (cabo C0205). «Cuándo consultar con un dietista-nutricionista»
+  // dice: «El Colegio Oficial de Dietistas-Nutricionistas de España (CODINUA) ofrece un buscador de
+  // profesionales en su web oficial.» Los colegios son de ámbito inferior al nacional y los agrupa
+  // el Consejo General (Ley 19/2014, BOE-A-2014-10518), corporación de derecho público: ese sí se
+  // puede citar, igual que el colegio oficial de cada comunidad.
+  test.fail();
+  const html = await (await page.request.get('/selector-dieta/')).text();
+  expect(html.includes('CODINUA') || html.includes('Colegio Oficial de Dietistas-Nutricionistas de España'), 'entidad inexistente en la guía')
+    .toBe(false);
+});
+
+test('ABIERTO (C0205 b): la guía no atribuye a la EFSA la recomendación de la dieta mediterránea', async ({ page }) => {
+  // ABIERTO desde el 11/11/2026 (cabo C0205). «Por qué la mediterránea es la más respaldada»:
+  // «es el patrón más recomendado por organismos como la OMS y la EFSA». La EFSA: «The setting of
+  // nutrition goals and recommendations is outside EFSA's remit». (La mitad de la OMS no es del cabo.)
+  test.fail();
+  const html = await (await page.request.get('/selector-dieta/')).text();
+  expect(/recomendad[oa]s?[^.<]*EFSA|EFSA[^.<]*recomienda/.test(html), 'la EFSA como recomendadora de un patrón').toBe(false);
+});
+
+test('ABIERTO (C0205 c): el FAQPage no da las alergias como factor de un test que no pregunta por ellas', async ({ page }) => {
+  // ABIERTO desde el 11/11/2026 (cabo C0205). 5.ª pregunta del FAQPage («¿Cómo sé qué patrón
+  // alimentario se adapta mejor a mí?»): «Los factores clave son […] restricciones alimentarias o
+  // alergias […]. Un test orientativo basado en estas variables puede orientarte hacia la dieta más
+  // adecuada». El cuestionario solo pregunta por vegetariano, vegano y sin gluten (celiaquía o
+  // sensibilidad, que no son alergias), y cinco de las seis fichas llevan frutos secos entre sus
+  // alimentos clave.
+  test.fail();
+  const faq = (await jsonLd(page)).find((b) => b['@type'] === 'FAQPage') as
+    { mainEntity: { name: string; acceptedAnswer: { text: string } }[] } | undefined;
+  const respuesta = faq?.mainEntity.find((q) => q.name.includes('se adapta mejor a mí'))?.acceptedAnswer.text ?? '';
+  const cuestionario = PREGUNTAS.map((p) => [p.texto, ...p.opciones.map((o) => `${o.etiqueta} ${o.descripcion}`)].join(' ')).join(' ');
+  expect(/alergi/i.test(respuesta) && !/alergi/i.test(cuestionario), 'promete alergias y no las pregunta').toBe(false);
+});

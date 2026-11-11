@@ -484,3 +484,51 @@ test.describe('Accesibilidad y presentación', () => {
     expect(medida.fin).toBeLessThanOrEqual(medida.ancho);
   });
 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Cabo C0365 (inspector 11/11/2026): el tiempo «de lesión a coágulo estable»
+// ─────────────────────────────────────────────────────────────────────────────
+
+test.describe('Cabo C0365 · el tiempo hasta el coágulo estable', () => {
+  /** Una cifra se da por atribuida si su frase dice de dónde sale (un «según», una fuente o un año). */
+  const ATRIBUIDA = /según|fuente|\b(?:19|20)\d{2}\b/i;
+
+  /** Las frases del texto visible que dan minutos para el coágulo «estable» o el «proceso completo». */
+  function frasesDelCoaguloEstable(texto: string): string[] {
+    return texto
+      .split(/\n|(?<=\.)\s+/)
+      .map((f) => f.trim())
+      .filter((f) => /minuto/i.test(f) && /estable|proceso completo/i.test(f));
+  }
+
+  test('o) los minutos «de lesión a coágulo estable» llevan fuente o no se atribuyen al proceso completo', async ({
+    page,
+  }) => {
+    test.fail(); // HALLAZGO ABIERTO (cabo C0365, 11/11/2026) [contenido/bajo]
+    // ENTRADA sección «Coagulación» (párrafo de contexto, page.tsx:621) y sección «Datos y
+    //         análisis» (dato curioso «Coagulación en 3-5 minutos», page.tsx:313)
+    // ESPERADO una cifra con fuente para el punto final que nombra la app, que su propio paso 7
+    //          define como «El factor XIII estabiliza la red de fibrina (reticulación). El coágulo
+    //          se contrae y sella la herida completamente», o la frase matizada sin atribuir esos
+    //          minutos al coágulo «estable» ni al «proceso completo». Ninguna fuente de la lista
+    //          de dominios permitidos da ese tiempo, y el tapón plaquetario de los primeros
+    //          minutos (hemostasia primaria, paso 4) no es el coágulo de fibrina entrecruzado y
+    //          retraído del paso 7.
+    // OBTENIDO «De lesión a coágulo estable en 3-5 minutos.» y «Desde la lesión hasta el
+    //          coágulo estable, el proceso completo tarda entre 3 y 5 minutos.», sin fuente
+    //          (el título de la tarjeta, «Coagulación en 3-5 minutos», repite la cifra).
+    // Si la frase se retira o se matiza, el caso se da por cumplido; si se queda, con su fuente.
+    test.setTimeout(60_000);
+    await irAlVisualizador(page);
+    const textoVisible = () => page.evaluate(() => document.body.innerText);
+
+    await irASeccion(page, 'Coagulación');
+    await expect(page.locator('circle[role="button"][aria-label^="Paso 7"]')).toBeVisible();
+    const enCoagulacion = frasesDelCoaguloEstable(await textoVisible());
+
+    await irASeccion(page, 'Datos y análisis');
+    const enDatos = frasesDelCoaguloEstable(await textoVisible());
+
+    for (const frase of [...enCoagulacion, ...enDatos]) expect(frase, frase).toMatch(ATRIBUIDA);
+  });
+});

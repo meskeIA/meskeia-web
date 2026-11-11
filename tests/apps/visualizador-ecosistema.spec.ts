@@ -730,3 +730,96 @@ test.describe('móvil 393 × 851 con toque', () => {
     await expect(page.locator('div[class$="_nivelDetalle"] h3')).toHaveText('Consumidores terciarios');
   });
 });
+
+// ─── Cabo C0057, comprobado el 11/11/2026 (modo cabo: solo su pregunta) ────────────────────────
+// Localizadores por rol y por texto: el detalle de cada ficha cuelga de su <h3>.
+
+// ABIERTO (cabo C0057, parte b) — el reparto 60/20/10/10 contradice a la propia página.
+// Entrada: «Ciclos biogeoquímicos» → Carbono → «Descomposición», y «Regla del 10 %» → la tarjeta
+// «¿Adónde va la energía que no pasa?», abriendo sus cuatro casillas.
+// Qué reparte: la tarjeta va DESPUÉS del flujo entero (10.000 → 1.000 → 100 → 10 kcal), cuyo primer
+// paso es plantas → herbívoros («9.000 kcal que no pasan: calor de la respiración, desechos y
+// partes no consumidas»), y su 100 % es la energía DE UN NIVEL: «Pasa al siguiente nivel» 10 % =
+// 1.000 / 10.000 (caso 1). No es el presupuesto de lo que come un herbívoro (respiración, heces,
+// crecimiento): mezcla la respiración y las heces del que come con lo que queda sin comer del
+// nivel de abajo, y esa casilla nombra partes de planta: «Partes no consumidas 10 % — Huesos,
+// pelo, plumas, raíces y partes que el depredador no come». La nota solo habla de animales
+// («en los animales de sangre caliente la respiración se lleva bastante más»).
+// Resuelto a mano con las cifras de la propia app, paso plantas → herbívoros: el reparto deja sin
+// comer 10 % × 10.000 = 1.000 kcal; «Descomposición» dice «En tierra, en torno al 90 % de la
+// producción vegetal no se la come ningún herbívoro» (Gessner et al., 2010): ~9.000 kcal.
+// Esperado: o el reparto se acota a los pasos entre animales sin nombrar partes de planta, o dice
+// que en el paso plantas → herbívoros lo no consumido es la mayor parte (o retira esa casilla).
+// Obtenido: 10 % frente a ~90 %, nueve veces menos, en la misma página.
+test('cabo C0057 — el reparto de la energía no contradice el ~90 % de producción vegetal que no come ningún herbívoro', async ({
+  page,
+}) => {
+  test.fail(); // ABIERTO — cabo C0057 (b), hallazgo de contenido del 11/11/2026
+  await irA(page, 'Ciclos biogeoquímicos');
+  await page.getByRole('button', { name: 'Ciclo del Carbono' }).click();
+  await page.getByRole('button', { name: /^Descomposición:/ }).click();
+  const detalle = ((await page.getByRole('heading', { level: 3, name: 'Descomposición' }).locator('xpath=../..').textContent()) ?? '')
+    .replace(/\s+/g, ' ');
+  const noComido = Number(detalle.match(/(\d+)\s?% de la producción vegetal no se la come/)?.[1] ?? NaN);
+
+  await irA(page, 'Regla del 10');
+  const titulo = page.getByRole('heading', { level: 3, name: /Adónde va la energía/ });
+  const tarjeta = titulo.locator('xpath=..');
+  const casillas = tarjeta.getByRole('button');
+  const reparto: Array<{ pct: number; texto: string }> = [];
+  for (let i = 0; i < (await casillas.count()); i++) {
+    await casillas.nth(i).click();
+    await expect(casillas.nth(i)).toHaveAttribute('aria-expanded', 'true');
+    const t = ((await casillas.nth(i).textContent()) ?? '').replace(/\s+/g, ' ').trim();
+    reparto.push({ pct: porcentaje(t), texto: t });
+  }
+  const textoTarjeta = [
+    (await titulo.textContent()) ?? '',
+    ...reparto.map((r) => r.texto),
+    ...(await tarjeta.locator('p').allTextContents()),
+  ]
+    .join(' ')
+    .replace(/\s+/g, ' ');
+
+  const noConsumidas = reparto.find((r) => /no consumid|no se com/i.test(r.texto));
+  // Lo arregla cualquiera de las tres salidas del «Esperado»
+  const pasoPlantas =
+    /(herbívor|vegetal|plantas)[^.]{0,120}?\b[5-9]\d\s?%|\b[5-9]\d\s?%[^.]{0,120}?(herbívor|vegetal|plantas)/i.test(textoTarjeta);
+  const nombraPlantas = !!noConsumidas && /raíces|hojas|tallos|plantas|vegetal/i.test(noConsumidas.texto);
+  const acotadoAAnimales = /entre animales|de un animal a otro|de herbívoro a carnívoro|entre consumidores/i.test(textoTarjeta);
+  const contradiccion =
+    Number.isFinite(noComido) &&
+    !!noConsumidas &&
+    noConsumidas.pct < noComido / 2 &&
+    !pasoPlantas &&
+    (nombraPlantas || !acotadoAAnimales);
+  expect(
+    contradiccion ? [`reparto: «${noConsumidas?.texto}» · Descomposición: «${detalle}»`] : [],
+    'el reparto deja sin comer el 10 % de la energía del nivel, raíces incluidas, y la misma página dice ~90 % para las plantas',
+  ).toEqual([]);
+});
+
+// ABIERTO (cabo C0057, parte a) — la biomasa del mar abierto, sin fuente.
+// Entrada: «Pirámide trófica» → «Productores» → Biomasa.
+// Obtenido: «En tierra, la mayor de la pirámide: de unas 7 t por hectárea en matorral desértico a
+// unas 450 t en selva tropical (Whittaker y Likens, 1975). En mar abierto, apenas unos kilos de
+// fitoplancton por hectárea.» La segunda frase no lleva fuente y se lee como sacada de la misma
+// tabla, que según el cabo (inspección del 27/09/2026) da ~0,003 kg/m² ≈ 30 kg/ha en mar abierto:
+// decenas de kilos, no «unos kilos». Ni esa tabla ni otra se pudo anclar en las fuentes permitidas
+// (atlasnacional.ign.es y miteco.gob.es, 11/11/2026), así que la cifra no es verificable.
+// Esperado: la cantidad del mar abierto con su fuente en la misma frase, o sin cantidad (el dato
+// cualitativo —muy poca biomasa porque el fitoplancton se renueva en días— ya está en el nivel de
+// los consumidores primarios).
+test('cabo C0057 — la biomasa de fitoplancton del mar abierto lleva fuente o no lleva cantidad', async ({ page }) => {
+  test.fail(); // ABIERTO — cabo C0057 (a), hallazgo de contenido del 11/11/2026
+  await irA(page, 'Pirámide trófica');
+  await page.getByRole('button', { name: /^Productores,/ }).click();
+  await expect(page.getByRole('heading', { level: 3, name: 'Productores' })).toBeVisible();
+  const biomasa = ((await page.getByText('Biomasa', { exact: true }).locator('xpath=following-sibling::span[1]').textContent()) ?? '')
+    .replace(/\s+/g, ' ');
+  expect(biomasa).toContain('Whittaker y Likens');
+  const frase = biomasa.split(/(?<=\.)\s+/).find((f) => /mar abierto|océano abierto/i.test(f)) ?? '';
+  const conCantidad = /\d|kilos?\b|\bkg\b|gramos?|toneladas?|\bt\b/i.test(frase);
+  const conFuente = /\([^()]*\b(1[89]|20)\d{2}\)|Whittaker|misma (tabla|fuente)/i.test(frase);
+  expect(conCantidad && !conFuente ? [frase] : [], 'cantidad del mar abierto sin fuente').toEqual([]);
+});
