@@ -88,7 +88,6 @@ export const ESTILOS_PARENTALES: EstiloParental[] = [
       'Poca supervisión del hijo',
       'Escasa o nula demostración de afecto',
       'Desinterés por el rendimiento escolar o las amistades',
-      'Delegación excesiva del cuidado en terceros',
       'Falta de rutinas o estructura',
     ],
     impactoHijos: 'Riesgo de problemas de conducta, baja autoestima, dificultades académicas, apego inseguro.',

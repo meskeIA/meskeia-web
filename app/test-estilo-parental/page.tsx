@@ -31,7 +31,7 @@ const PREGUNTAS: Pregunta[] = [
   { id: 2, texto: 'Establezco horarios fijos para comer, dormir y hacer deberes', dimension: 'control', polaridad: 'positivo' },
   { id: 3, texto: 'Si mi hijo/a quiere algo que no es adecuado, le explico por qué no puede ser', dimension: 'control', polaridad: 'positivo' },
   { id: 4, texto: 'Creo que los niños necesitan normas firmes para sentirse seguros', dimension: 'control', polaridad: 'positivo' },
-  { id: 5, texto: 'Dejo que mi hijo/a decida la mayoría de las cosas por sí mismo/a', dimension: 'control', polaridad: 'negativo' },
+  { id: 5, texto: 'Dejo que mi hijo/a decida cosas que aún no le corresponden por su edad', dimension: 'control', polaridad: 'negativo' },
   { id: 6, texto: 'Prefiero evitar los conflictos y cedo con frecuencia', dimension: 'control', polaridad: 'negativo' },
   { id: 7, texto: 'No suelo insistir mucho si mi hijo/a se niega a hacer algo', dimension: 'control', polaridad: 'negativo' },
   { id: 8, texto: 'Las rutinas en casa son bastante flexibles y cambian según el día', dimension: 'control', polaridad: 'negativo' },
@@ -41,9 +41,9 @@ const PREGUNTAS: Pregunta[] = [
   { id: 10, texto: 'Cuando mi hijo/a llora o se enfada, intento entender qué siente antes de actuar', dimension: 'afecto', polaridad: 'positivo' },
   { id: 11, texto: 'Le digo a mi hijo/a con frecuencia que le quiero', dimension: 'afecto', polaridad: 'positivo' },
   { id: 12, texto: 'Celebro sus logros, por pequeños que sean', dimension: 'afecto', polaridad: 'positivo' },
-  { id: 13, texto: 'A veces me cuesta encontrar momentos para estar a solas con mi hijo/a', dimension: 'afecto', polaridad: 'negativo' },
+  { id: 13, texto: 'Me cuesta mostrar cariño con gestos (abrazos, caricias)', dimension: 'afecto', polaridad: 'negativo' },
   { id: 14, texto: 'Me resulta difícil expresar mis emociones abiertamente', dimension: 'afecto', polaridad: 'negativo' },
-  { id: 15, texto: 'Suelo estar ocupado/a y delego gran parte del cuidado en otros', dimension: 'afecto', polaridad: 'negativo' },
+  { id: 15, texto: 'Cuando mi hijo/a me cuenta un problema, tiendo a quitarle importancia', dimension: 'afecto', polaridad: 'negativo' },
   { id: 16, texto: 'Creo que los niños se espabilan solos si les dejas', dimension: 'afecto', polaridad: 'negativo' },
 ];
 
@@ -475,10 +475,11 @@ export default function TestEstiloParentalPage(): React.JSX.Element {
                 </div>
                 <div className={styles.escenarioExample}>
                   <p>Situación:</p>
-                  <code>Ambos progenitores trabajan. Poco tiempo entre semana. Cansancio acumulado. Tendencia a ceder para evitar conflictos.</code>
+                  <code>Ambos progenitores trabajan. Poco tiempo entre semana. Cansancio acumulado. A veces cuesta sostener las normas al final del día.</code>
                 </div>
                 <p className={styles.escenarioTip}>
-                  <strong>Riesgo:</strong> Deslizarse hacia el estilo permisivo o negligente por falta de energía.
+                  <strong>Qué ayuda:</strong> Tener poco tiempo no define un estilo: el afecto y las normas se
+                  pueden sostener también con horarios largos o con el cuidado compartido con otras personas.
                   Establecer 3-4 normas clave (no negociables) y ser consistente ayuda más que intentar controlar todo.
                 </p>
               </div>

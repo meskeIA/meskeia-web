@@ -48,13 +48,17 @@ const NEGLIGENTE_MAXIMO = [1, 1, 1, 1, 5, 5, 5, 5, 1, 1, 1, 1, 5, 5, 5, 5];
 /** control 13 − 12 + 16 = 17 (> 16, alto por un punto) · afecto 32 → democrático */
 const UMBRAL_CONTROL_17 = [4, 3, 3, 3, 3, 3, 3, 3, 5, 5, 5, 5, 1, 1, 1, 1];
 /**
- * «De acuerdo» con los cuatro ítems de afecto positivo (hablo cada día con mi hijo/a, intento
- * entender qué siente, le digo que le quiero, celebro sus logros), neutral en la 14 y la 16, y
- * «Muy de acuerdo» con la 13 (cuesta encontrar momentos a solas) y la 15 (ocupado/a, delego el
- * cuidado). control (4·4) − (2·4) + 16 = 24 · afecto 16 − (5+3+5+3) + 16 = 16, el punto medio:
- * desde el 11/11/2026, «Entre Democrático y Autoritario» (antes, «Autoritario»).
+ * Control alto y afecto en el punto medio: control (4·4) − (2·4) + 16 = 24 · afecto
+ * 16 − (5+3+5+3) + 16 = 16 → «Entre Democrático y Autoritario» (antes del 11/11/2026, «Autoritario»).
  */
-const TRABAJA_Y_DELEGA = [4, 4, 4, 4, 2, 2, 2, 2, 4, 4, 4, 4, 5, 3, 5, 3];
+const CONTROL_ALTO_AFECTO_MEDIO = [4, 4, 4, 4, 2, 2, 2, 2, 4, 4, 4, 4, 5, 3, 5, 3];
+/**
+ * Quien trabaja muchas horas y comparte el cuidado, y declara el cariño: «De acuerdo» con los
+ * cuatro ítems de afecto positivo, neutral en la 14 y la 16, y «En desacuerdo» con la 13 (me cuesta
+ * mostrar cariño con gestos) y la 15 (quito importancia a sus problemas). Ninguno de los 16 ítems
+ * pregunta ya por el tiempo disponible. control 24 · afecto 16 − (2+3+2+3) + 16 = 22 → alto.
+ */
+const TRABAJA_Y_DELEGA = [4, 4, 4, 4, 2, 2, 2, 2, 4, 4, 4, 4, 2, 3, 2, 3];
 
 const perfil = (page: Page) => page.locator('[class*="resultProfile"]');
 const puntuaciones = (page: Page) => page.locator('[class*="scoreValue"]');
@@ -224,7 +228,7 @@ test.describe('Cálculo: cuadrante, punto medio y escala (reparados el 11/11/202
 
   test('con el punto medio solo en el afecto, el resultado queda entre los dos estilos que separa', async ({ page }) => {
     await abrir(page);
-    await verResultado(page, TRABAJA_Y_DELEGA); // control 24 (alto), afecto 16 (medio)
+    await verResultado(page, CONTROL_ALTO_AFECTO_MEDIO); // control 24 (alto), afecto 16 (medio)
     await expect(perfil(page)).toHaveText('Entre Democrático y Autoritario');
     await expect(page.locator('[class*="styleCard"]')).toContainText('Tu puntuación de afecto está justo en el punto medio');
   });
@@ -248,18 +252,29 @@ test.describe('Cálculo: cuadrante, punto medio y escala (reparados el 11/11/202
   });
 });
 
-test.describe('Hallazgo abierto de contenido: los ítems 13 y 15 miden disponibilidad, no afecto', () => {
-  // ABIERTO (4493, espera la decisión del usuario: cambiar ítems del test es cambiar lo que mide):
-  // quien está «De acuerdo» con los cuatro ítems de afecto positivo pero trabaja muchas horas y
-  // delega parte del cuidado (13 y 15 «Muy de acuerdo») no llega a afecto alto: hasta el 11/11/2026
-  // le daba «Autoritario»; desde la reparación del punto medio (4491), «Entre Democrático y
-  // Autoritario». CLAUDE.md §1.quinquies 2 y 4: asunción de privilegio y moralizar una elección
-  // legítima (delegar el cuidado en abuelos o en una escuela infantil).
-  test.fail('afecto positivo «De acuerdo» en 9-12 queda en afecto alto aunque trabaje y delegue', async ({ page }) => {
+test.describe('Hallazgo 4493 (REPARADO): los ítems de afecto miden calidez, no tiempo disponible', () => {
+  // REPARADO (decisión del usuario, 11/11/2026, cabo C0714): la 13 («A veces me cuesta encontrar
+  // momentos para estar a solas con mi hijo/a») y la 15 («Suelo estar ocupado/a y delego gran parte
+  // del cuidado en otros») restaban afecto a quien trabaja muchas horas o comparte el cuidado con
+  // abuelos o una escuela infantil, aunque declarase las cuatro conductas de cariño. CLAUDE.md
+  // §1.quinquies 2 y 4. Hoy la 13 pregunta por mostrar cariño con gestos y la 15 por quitar
+  // importancia a sus problemas; la ficha Negligente ya no lista «Delegación excesiva del cuidado en
+  // terceros», el escenario de jornada completa no atribuye un estilo y la 5 se matiza por la edad.
+  test('quien declara el cariño queda en afecto alto aunque trabaje y comparta el cuidado', async ({ page }) => {
     await abrir(page);
     await verResultado(page, TRABAJA_Y_DELEGA);
     await expect(puntuaciones(page).nth(0)).toHaveText(/^24\//);
-    await expect(perfil(page)).toHaveText('Democrático (Autoritativo)', { timeout: 2000 });
+    await expect(puntuaciones(page).nth(1)).toHaveText(/^22\//);
+    await expect(perfil(page)).toHaveText('Democrático (Autoritativo)');
+  });
+
+  test('ningún ítem ni la ficha Negligente preguntan por el tiempo o por delegar el cuidado', async ({ page }) => {
+    await abrir(page);
+    await expect(page.getByText('Me cuesta mostrar cariño con gestos (abrazos, caricias)')).toHaveCount(1);
+    await expect(page.getByText('Cuando mi hijo/a me cuenta un problema, tiendo a quitarle importancia')).toHaveCount(1);
+    await expect(page.getByText('Dejo que mi hijo/a decida cosas que aún no le corresponden por su edad')).toHaveCount(1);
+    await expect(page.getByText(/estar a solas con mi hijo|delego gran parte del cuidado|Delegación excesiva/)).toHaveCount(0);
+    await expect(page.getByText(/Deslizarse hacia el estilo permisivo o negligente/)).toHaveCount(0);
   });
 });
 
