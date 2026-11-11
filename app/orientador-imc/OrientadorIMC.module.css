@@ -356,6 +356,40 @@
   color: #e0a800;
 }
 
+/* Contenido del DisclaimerCard médico. Las tres clases se usaban en page.tsx sin declararse aquí:
+   la lista salía sin sangría, el «NO diagnostica» pegado a ella y el aviso de urgencia como un
+   párrafo más (hallazgos 4531 y 4532, cabo C0676). Copian .highlight y .emergency de
+   DisclaimerCard.module.css y .disclaimerList de calculadora-estadistica-medica. */
+/* La separación con el párrafo siguiente va en la lista: el margin-top de .highlight lo pisa
+   `.content p` de DisclaimerCard, que tiene más especificidad. */
+.disclaimerList {
+  margin: var(--spacing-sm) 0 var(--spacing-lg);
+  padding-left: var(--spacing-lg);
+}
+
+.disclaimerList li {
+  margin-bottom: var(--spacing-xs);
+}
+
+.highlight {
+  font-weight: 600;
+  margin-top: var(--spacing-lg);
+}
+
+.emergency {
+  font-weight: 700;
+  color: #b71c1c;
+  padding: var(--spacing-md);
+  background: #ffebee;
+  border-radius: var(--radius);
+  margin-top: var(--spacing-lg);
+}
+
+[data-theme='dark'] .emergency {
+  color: #ff8a80;
+  background: #4a1a1a;
+}
+
 /* Responsive */
 @media (max-width: 1024px) {
   .mainContent {

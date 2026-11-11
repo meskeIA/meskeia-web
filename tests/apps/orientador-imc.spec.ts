@@ -395,9 +395,9 @@ test.describe('Orientador IMC · cabo C0676, clases del aviso médico', () => {
     page.getByRole('note').filter({ hasText: 'NO distingue entre masa muscular' });
 
   test('C0676 · el aviso «acude a tu médico de inmediato» lleva clase y se distingue del texto del aviso, en claro y oscuro', async ({ page }) => {
-    // ABIERTO: styles.emergency no está declarada en OrientadorIMC.module.css; el <p> sale sin
-    // class, con el mismo color, fondo y borde que el párrafo normal del aviso.
-    test.fail();
+    // HALLAZGO 4531 (REPARADO 11/11/2026): styles.emergency no estaba declarada en
+    // OrientadorIMC.module.css; el <p> salía sin class, con el mismo color, fondo y borde que el
+    // párrafo normal del aviso.
     const urgencia = aviso(page).locator('p', { hasText: 'acude a tu médico de inmediato' });
     const normal = aviso(page).locator('p', { hasText: 'es un indicador orientativo' });
     await expect(urgencia).toBeVisible();
@@ -427,9 +427,9 @@ test.describe('Orientador IMC · cabo C0676, clases del aviso médico', () => {
   });
 
   test('C0676 · la lista de limitaciones y el párrafo «NO diagnostica» llevan clase', async ({ page }) => {
-    // ABIERTO: styles.disclaimerList y styles.highlight no están declaradas en
-    // OrientadorIMC.module.css; el <ul> y el <p> salen sin atributo class.
-    test.fail();
+    // HALLAZGO 4532 (REPARADO 11/11/2026): styles.disclaimerList y styles.highlight no estaban
+    // declaradas en OrientadorIMC.module.css; el <ul> y el <p> salían sin atributo class, la lista
+    // con padding-left 0 y el párrafo pegado a la última viñeta (0 px).
     const lista = aviso(page).locator('ul', { hasText: 'NO distingue entre masa muscular y grasa' });
     const destacado = aviso(page).locator('p', { hasText: 'Esta herramienta NO diagnostica ni trata enfermedades.' });
     await expect(lista).toBeVisible();
@@ -440,5 +440,11 @@ test.describe('Orientador IMC · cabo C0676, clases del aviso médico', () => {
     };
     const sinClase = Object.entries(clases).filter(([, c]) => c === '').map(([n]) => n);
     expect(sinClase).toEqual([]);
+    // Maquetadas: la lista con sangría y el párrafo separado de ella.
+    const sangria = await lista.evaluate((el) => parseFloat(getComputedStyle(el).paddingLeft));
+    expect(sangria).toBeGreaterThan(0);
+    const cajaLista = await lista.boundingBox();
+    const cajaParrafo = await destacado.boundingBox();
+    expect(cajaParrafo!.y - (cajaLista!.y + cajaLista!.height)).toBeGreaterThan(8);
   });
 });
