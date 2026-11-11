@@ -13,6 +13,17 @@ const PEVS_GRADO_III = cuantiaMaximaPEVS(3);
 // ─── Datos ────────────────────────────────────────────────────────────────────
 // El catálogo vive en catalogo.ts: de él salen también las cifras de las dos FAQ.
 
+/**
+ * El coste de una fila tal como lo suma el total: «Sin coste» solo si el máximo es 0. Hasta el
+ * 11/11/2026 miraba solo el mínimo, y «Eliminar o fijar alfombras» (0–50 €) decía «Sin coste»
+ * mientras el total subía 50 € (hallazgo 4456).
+ */
+function textoCoste(min: number, max: number, separador: string): string {
+  if (max === 0) return 'Sin coste';
+  if (min === 0) return `hasta ${formatCurrency(max)}`;
+  return `${formatCurrency(min)}${separador}${formatCurrency(max)}`;
+}
+
 const LABELS_PRIORIDAD: Record<string, string> = {
   alta: 'Prioritario',
   media: 'Recomendado',
@@ -93,13 +104,15 @@ export default function AdaptacionHogar() {
                     onChange={() => toggleItem(item.id)}
                     onClick={e => e.stopPropagation()}
                     aria-label={item.nombre}
+                    aria-describedby={`detalle-${item.id}`}
                   />
-                  <label className={styles.checklistLabel}>
+                  {/* Un <div>, no un <label>: la casilla ya se nombra con aria-label y la fila
+                      la conmuta con su onClick; un <label> sin control que envolvía dos <div>
+                      no nombraba nada (cabo C0465, hallazgo 4457). */}
+                  <div className={styles.checklistLabel}>
                     <div className={styles.itemNombre}>{item.nombre}</div>
-                    <div className={styles.itemBadges}>
-                      <span className={styles.itemCoste}>
-                        {item.costeMin === 0 ? 'Sin coste' : `${formatCurrency(item.costeMin)} – ${formatCurrency(item.costeMax)}`}
-                      </span>
+                    <div className={styles.itemBadges} id={`detalle-${item.id}`}>
+                      <span className={styles.itemCoste}>{textoCoste(item.costeMin, item.costeMax, ' – ')}</span>
                       <span className={`${styles.badge} ${styles[`prioridad${item.prioridad.charAt(0).toUpperCase() + item.prioridad.slice(1)}`]}`}>
                         {LABELS_PRIORIDAD[item.prioridad]}
                       </span>
@@ -107,7 +120,7 @@ export default function AdaptacionHogar() {
                         <span className={`${styles.badge} ${styles.badgeAyuda}`}>✓ Con ayudas</span>
                       )}
                     </div>
-                  </label>
+                  </div>
                 </div>
               ))}
             </div>
@@ -165,9 +178,7 @@ export default function AdaptacionHogar() {
                   {resumen.items.map(item => (
                     <div key={item.id} className={styles.itemSelRow}>
                       <span className={styles.itemSelNombre}>{item.nombre}</span>
-                      <span className={styles.itemSelCoste}>
-                        {item.costeMin === 0 ? 'Sin coste' : `${formatCurrency(item.costeMin)}–${formatCurrency(item.costeMax)}`}
-                      </span>
+                      <span className={styles.itemSelCoste}>{textoCoste(item.costeMin, item.costeMax, '–')}</span>
                     </div>
                   ))}
                 </div>

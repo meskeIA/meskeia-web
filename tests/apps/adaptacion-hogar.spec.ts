@@ -173,36 +173,37 @@ test.describe('Cabo C0465 · casillas de la lista', () => {
     await expect(casilla(page, 'Silla o asiento de ducha')).not.toBeChecked();
   });
 
-  test('HALLAZGO H6 (11/11/2026, ABIERTO) · ninguna fila lleva un <label> sin control', async ({ page }) => {
-    // Hoy las 23 filas llevan <label> sin htmlFor ni control dentro, con dos <div> (un label
-    // solo admite contenido de frase). Arreglo del cabo: cambiarlo por <div> (la casilla ya se
-    // nombra con aria-label) o htmlFor + quitar el onClick de la fila; los casos de arriba
-    // vigilan que cada gesto siga conmutando una vez.
-    test.fail();
+  test('HALLAZGO H6 (11/11/2026, REPARADO) · ninguna fila lleva un <label> sin control', async ({ page }) => {
+    // Las 23 filas llevaban <label> sin htmlFor ni control dentro, con dos <div>. Ahora es un
+    // <div> (la casilla se nombra con aria-label) y la casilla se describe con sus insignias
+    // (aria-describedby): coste, prioridad y «Con ayudas». Los casos de arriba vigilan que cada
+    // gesto siga conmutando una vez.
     const huerfanos = await page.evaluate(
       () =>
-        Array.from(document.querySelectorAll('input[type="checkbox"] + label')).filter(
+        Array.from(document.querySelectorAll('label')).filter(
           (l) => !(l as HTMLLabelElement).control,
         ).length,
     );
     expect(huerfanos).toBe(0);
+    await expect(casilla(page, 'Barras de apoyo en ducha y WC')).toHaveAccessibleDescription(
+      /80,00\s€ – 300,00\s€\s*Prioritario\s*✓ Con ayudas/,
+    );
   });
 });
 
-test('HALLAZGO H5 (11/11/2026, ABIERTO) · «Eliminar o fijar alfombras» no dice «Sin coste» si suma 50 €', async ({ page }) => {
-  // CATEGORIAS: costeMin 0, costeMax 50. La fila y el detalle dicen «Sin coste» (miran solo el
-  // mínimo) y el total dice «0,00 € – 50,00 €». Lo que se pinta por fila tiene que cuadrar con
-  // lo que suma.
-  test.fail();
+test('HALLAZGO H5 (11/11/2026, REPARADO) · «Eliminar o fijar alfombras» no dice «Sin coste» si suma 50 €', async ({ page }) => {
+  // CATEGORIAS: costeMin 0, costeMax 50. La fila y el detalle decían «Sin coste» (miraban solo
+  // el mínimo) y el total «0,00 € – 50,00 €». Ahora «Sin coste» solo si el máximo es 0; con
+  // mínimo 0, «hasta 50,00 €», que es lo que suma el total.
   const alfombras = casilla(page, 'Eliminar o fijar alfombras');
   await alfombras.check();
   const fila = limpiar(await alfombras.locator('..').innerText());
   const resumen = await textoResumen(page);
-  if (fila.includes('Sin coste')) {
-    expect(resumen).toContain('0,00 € – 0,00 €');
-  } else {
-    expect(fila).toMatch(/50(,00)? €/);
-  }
+  expect(fila).not.toContain('Sin coste');
+  expect(fila).toContain('hasta 50,00 €');
+  expect(resumen).toContain('0,00 € – 50,00 €');
+  expect(resumen).toContain('Eliminar o fijar alfombras\nhasta 50,00 €');
+  expect(resumen).not.toContain('Sin coste');
 });
 
 test('HALLAZGO H1 (11/11/2026, REPARADO) · la prestación vinculada no se ofrece como ayuda de obras ni con 833 €/mes', async ({ page }) => {
