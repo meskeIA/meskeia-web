@@ -51,7 +51,7 @@ export default function CalculadoraElectricidadPage() {
   const [variablePotencia, setVariablePotencia] = useState<VariablePotencia>('P');
   const [potencia, setPotencia] = useState('100');
   const [voltajePot, setVoltajePot] = useState('220');
-  const [corrientePot, setCorrientePot] = useState('0.45');
+  const [corrientePot, setCorrientePot] = useState('0,45');
 
   // Estados para Circuitos
   const [tipoCircuito, setTipoCircuito] = useState<TipoCircuito>('serie');
@@ -525,6 +525,7 @@ export default function CalculadoraElectricidadPage() {
                       <input
                         id="voltaje"
                         type="text"
+                        inputMode="decimal"
                         value={voltaje}
                         onChange={(e) => setVoltaje(e.target.value)}
                         className={styles.input}
@@ -541,6 +542,7 @@ export default function CalculadoraElectricidadPage() {
                       <input
                         id="corriente"
                         type="text"
+                        inputMode="decimal"
                         value={corriente}
                         onChange={(e) => setCorriente(e.target.value)}
                         className={styles.input}
@@ -557,6 +559,7 @@ export default function CalculadoraElectricidadPage() {
                       <input
                         id="resistencia"
                         type="text"
+                        inputMode="decimal"
                         value={resistencia}
                         onChange={(e) => setResistencia(e.target.value)}
                         className={styles.input}
@@ -591,6 +594,7 @@ export default function CalculadoraElectricidadPage() {
                       <input
                         id="potencia"
                         type="text"
+                        inputMode="decimal"
                         value={potencia}
                         onChange={(e) => setPotencia(e.target.value)}
                         className={styles.input}
@@ -607,6 +611,7 @@ export default function CalculadoraElectricidadPage() {
                       <input
                         id="voltaje-pot"
                         type="text"
+                        inputMode="decimal"
                         value={voltajePot}
                         onChange={(e) => setVoltajePot(e.target.value)}
                         className={styles.input}
@@ -623,6 +628,7 @@ export default function CalculadoraElectricidadPage() {
                       <input
                         id="corriente-pot"
                         type="text"
+                        inputMode="decimal"
                         value={corrientePot}
                         onChange={(e) => setCorrientePot(e.target.value)}
                         className={styles.input}
@@ -696,6 +702,7 @@ export default function CalculadoraElectricidadPage() {
                       <input
                         id="voltaje-fuente"
                         type="text"
+                        inputMode="decimal"
                         value={voltajeFuente}
                         onChange={(e) => setVoltajeFuente(e.target.value)}
                         className={styles.input}
@@ -712,6 +719,7 @@ export default function CalculadoraElectricidadPage() {
                       <input
                         id="corriente-fuente"
                         type="text"
+                        inputMode="decimal"
                         value={corrienteFuente}
                         onChange={(e) => setCorrienteFuente(e.target.value)}
                         className={styles.input}
@@ -727,6 +735,7 @@ export default function CalculadoraElectricidadPage() {
                     <input
                       id="r1-divisor"
                       type="text"
+                      inputMode="decimal"
                       value={r1Divisor}
                       onChange={(e) => setR1Divisor(e.target.value)}
                       className={styles.input}
@@ -741,6 +750,7 @@ export default function CalculadoraElectricidadPage() {
                     <input
                       id="r2-divisor"
                       type="text"
+                      inputMode="decimal"
                       value={r2Divisor}
                       onChange={(e) => setR2Divisor(e.target.value)}
                       className={styles.input}
@@ -828,6 +838,7 @@ export default function CalculadoraElectricidadPage() {
                     <input
                       id="resistencia-rcrl"
                       type="text"
+                      inputMode="decimal"
                       value={resistenciaRCRL}
                       onChange={(e) => setResistenciaRCRL(e.target.value)}
                       className={styles.input}
@@ -843,6 +854,7 @@ export default function CalculadoraElectricidadPage() {
                       <input
                         id="capacitancia"
                         type="text"
+                        inputMode="decimal"
                         value={capacitancia}
                         onChange={(e) => setCapacitancia(e.target.value)}
                         className={styles.input}
@@ -859,6 +871,7 @@ export default function CalculadoraElectricidadPage() {
                       <input
                         id="inductancia"
                         type="text"
+                        inputMode="decimal"
                         value={inductancia}
                         onChange={(e) => setInductancia(e.target.value)}
                         className={styles.input}
@@ -874,6 +887,7 @@ export default function CalculadoraElectricidadPage() {
                     <input
                       id="voltaje-rcrl"
                       type="text"
+                      inputMode="decimal"
                       value={voltajeRCRL}
                       onChange={(e) => setVoltajeRCRL(e.target.value)}
                       className={styles.input}
@@ -888,6 +902,7 @@ export default function CalculadoraElectricidadPage() {
                     <input
                       id="tiempo-rcrl"
                       type="text"
+                      inputMode="decimal"
                       value={tiempoRCRL}
                       onChange={(e) => setTiempoRCRL(e.target.value)}
                       className={styles.input}
@@ -906,6 +921,7 @@ export default function CalculadoraElectricidadPage() {
                     <input
                       id="potencia-consumo"
                       type="text"
+                      inputMode="decimal"
                       value={potenciaConsumo}
                       onChange={(e) => setPotenciaConsumo(e.target.value)}
                       className={styles.input}
@@ -920,6 +936,7 @@ export default function CalculadoraElectricidadPage() {
                     <input
                       id="horas-uso"
                       type="text"
+                      inputMode="decimal"
                       value={horasUso}
                       onChange={(e) => setHorasUso(e.target.value)}
                       className={styles.input}
@@ -934,6 +951,7 @@ export default function CalculadoraElectricidadPage() {
                     <input
                       id="dias-mes"
                       type="text"
+                      inputMode="decimal"
                       value={diasMes}
                       onChange={(e) => setDiasMes(e.target.value)}
                       className={styles.input}
@@ -948,6 +966,7 @@ export default function CalculadoraElectricidadPage() {
                     <input
                       id="precio-kwh"
                       type="text"
+                      inputMode="decimal"
                       value={precioKwh}
                       onChange={(e) => setPrecioKwh(e.target.value)}
                       className={styles.input}
@@ -1167,15 +1186,15 @@ export default function CalculadoraElectricidadPage() {
                 <h4>Tiempos Característicos</h4>
                 <div className={styles.tiemposGrid}>
                   <div className={styles.tiempoItem}>
-                    <span>1τ (63,2%)</span>
+                    <span>1τ (63,2&nbsp;%)</span>
                     <span>{formatNumber(resultadoRCRL.tiempo63 * 1000, 4)} ms</span>
                   </div>
                   <div className={styles.tiempoItem}>
-                    <span>3τ (95%)</span>
+                    <span>3τ (95&nbsp;%)</span>
                     <span>{formatNumber(resultadoRCRL.tiempo95 * 1000, 4)} ms</span>
                   </div>
                   <div className={styles.tiempoItem}>
-                    <span>5τ (99%)</span>
+                    <span>5τ (99&nbsp;%)</span>
                     <span>{formatNumber(resultadoRCRL.tiempo99 * 1000, 4)} ms</span>
                   </div>
                   <div className={styles.tiempoItem}>
@@ -1256,15 +1275,15 @@ export default function CalculadoraElectricidadPage() {
 
       {/* Sección educativa */}
       <EducationalSection
-        title="⚡ Aprende Electricidad: Leyes, Cálculos y Aplicaciones Prácticas"
+        title={<><span aria-hidden="true">⚡</span> Aprende Electricidad: Leyes, Cálculos y Aplicaciones Prácticas</>}
         subtitle="Desde la Ley de Ohm hasta instalaciones reales — todo lo que necesitas saber"
       >
         {/* Sección 1: Tabla Comparativa */}
         <section className={styles.guideSection}>
           <h2>Leyes y Fórmulas Eléctricas Fundamentales</h2>
           <p className={styles.introParagraph}>
-            Las siete leyes y conceptos que resuelven el 95% de los problemas eléctricos reales,
-            con fórmulas, unidades y un ejemplo concreto de cada una.
+            Siete leyes y conceptos básicos de los cálculos eléctricos, con fórmulas, unidades y
+            un ejemplo concreto de cada una.
           </p>
           <div className={styles.tableWrapper}>
             <table className={styles.tablaComparativaV2}>
@@ -1349,7 +1368,7 @@ export default function CalculadoraElectricidadPage() {
           <div className={styles.escenarioGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🏠</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏠</span>
                 <span className={styles.escenarioTitulo}>Propietario de vivienda</span>
               </div>
               <p className={styles.escenarioProblema}>
@@ -1364,7 +1383,7 @@ export default function CalculadoraElectricidadPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>⚡</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">⚡</span>
                 <span className={styles.escenarioTitulo}>Técnico electricista</span>
               </div>
               <p className={styles.escenarioProblema}>
@@ -1381,7 +1400,7 @@ export default function CalculadoraElectricidadPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🌞</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🌞</span>
                 <span className={styles.escenarioTitulo}>Instalador solar</span>
               </div>
               <p className={styles.escenarioProblema}>
@@ -1396,11 +1415,11 @@ export default function CalculadoraElectricidadPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🏭</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏭</span>
                 <span className={styles.escenarioTitulo}>Ingeniero industrial</span>
               </div>
               <p className={styles.escenarioProblema}>
-                Motor trifásico 15 kW, cos φ = 0,85, η = 92%. Potencia aparente: S = 15/(0,85 × 0,92) = 19,2 kVA.
+                Motor trifásico 15 kW, cos φ = 0,85, η = 92&nbsp;%. Potencia aparente: S = 15/(0,85 × 0,92) = 19,2 kVA.
                 Corriente de línea a 400 V: I = 19.200/(√3 × 400) = 27,7 A →
                 <strong> magnetotérmico de 32 A.</strong>
               </p>
@@ -1482,7 +1501,8 @@ export default function CalculadoraElectricidadPage() {
               <p className={styles.faqRespuesta}>
                 En España (PVPC y tarifas reguladas): valle (0-8 h, fines de semana) a ~0,08 €/kWh,
                 punta (10-14 h y 18-22 h) a ~0,28 €/kWh. Usar lavadora, lavavajillas y cargador EV
-                en horas valle puede ahorrar 30-40% en la factura eléctrica.
+                en horas valle abarata lo que cuestan esas cargas; cuánto depende de la diferencia
+                de precio entre los periodos de tu tarifa.
               </p>
             </div>
           </div>
@@ -1511,7 +1531,7 @@ export default function CalculadoraElectricidadPage() {
               <div className={styles.pasoContent}>
                 <p className={styles.pasoTitle}>Estimar horas de uso</p>
                 <p className={styles.pasoDesc}>
-                  Frigorífico: 24 h (ciclo 30%). TV: 4 h/día. Calefacción eléctrica: 6 h/día en invierno.
+                  Frigorífico: 24 h (ciclo 30&nbsp;%). TV: 4 h/día. Calefacción eléctrica: 6 h/día en invierno.
                   Iluminación: 3 h/día promedio.
                 </p>
               </div>
@@ -1550,8 +1570,9 @@ export default function CalculadoraElectricidadPage() {
               <div className={styles.pasoContent}>
                 <p className={styles.pasoTitle}>Añadir términos fijos</p>
                 <p className={styles.pasoDesc}>
-                  Término de potencia (~3,5 €/kW contratado × kW/mes) + IVA 21% + impuesto eléctrico
-                  5,1% + alquiler equipo medida (~3 €/mes).
+                  Término de potencia (~3,5 €/kW contratado × kW/mes) + IVA 21&nbsp;% + impuesto eléctrico
+                  5,1&nbsp;% + alquiler del contador (0,81 €/mes el contador digital doméstico, Orden
+                  ITC/3860/2007, anexo II).
                 </p>
               </div>
             </div>
@@ -1560,8 +1581,8 @@ export default function CalculadoraElectricidadPage() {
               <div className={styles.pasoContent}>
                 <p className={styles.pasoTitle}>Identificar mayores consumidores</p>
                 <p className={styles.pasoDesc}>
-                  Normalmente: climatización (40%), calentador ACS (20%), frigorífico (15%), iluminación
-                  (10%). Actúa sobre los mayores consumidores primero.
+                  Normalmente: climatización (40&nbsp;%), calentador ACS (20&nbsp;%), frigorífico (15&nbsp;%), iluminación
+                  (10&nbsp;%). Actúa sobre los mayores consumidores primero.
                 </p>
               </div>
             </div>
@@ -1576,7 +1597,7 @@ export default function CalculadoraElectricidadPage() {
           </p>
           <div className={styles.mejoresPracticasGrid}>
             <div className={styles.mejorPracticaCard}>
-              <div className={styles.mejorPracticaIcono}>🔌</div>
+              <div className={styles.mejorPracticaIcono} aria-hidden="true">🔌</div>
               <div className={styles.mejorPracticaTitulo}>Mide antes de estimar</div>
               <p className={styles.mejorPracticaDesc}>
                 Un medidor de consumo enchufable (&lt;15 €) te da el consumo real de cada aparato.
@@ -1584,23 +1605,23 @@ export default function CalculadoraElectricidadPage() {
               </p>
             </div>
             <div className={styles.mejorPracticaCard}>
-              <div className={styles.mejorPracticaIcono}>⏰</div>
+              <div className={styles.mejorPracticaIcono} aria-hidden="true">⏰</div>
               <div className={styles.mejorPracticaTitulo}>Programar consumos en valle</div>
               <p className={styles.mejorPracticaDesc}>
-                Lavar, secar y cargar el coche en horas valle (0-8 h) puede ahorrar 30-40% en esas
-                cargas con tarifa discriminación horaria.
+                Lavar, secar y cargar el coche en horas valle (0-8 h) abarata esas cargas con una
+                tarifa de discriminación horaria; cuánto, según la diferencia de precio entre periodos.
               </p>
             </div>
             <div className={styles.mejorPracticaCard}>
-              <div className={styles.mejorPracticaIcono}>🌡️</div>
-              <div className={styles.mejorPracticaTitulo}>1°C menos = 7% ahorro calefacción</div>
+              <div className={styles.mejorPracticaIcono} aria-hidden="true">🌡️</div>
+              <div className={styles.mejorPracticaTitulo}>1°C menos = 7&nbsp;% ahorro calefacción</div>
               <p className={styles.mejorPracticaDesc}>
-                Bajar el termostato de 22°C a 21°C ahorra ~7% en calefacción. De 22°C a 19°C: 21%
+                Bajar el termostato de 22°C a 21°C ahorra ~7&nbsp;% en calefacción. De 22°C a 19°C: 21&nbsp;%
                 de ahorro, sin sacrificar confort.
               </p>
             </div>
             <div className={styles.mejorPracticaCard}>
-              <div className={styles.mejorPracticaIcono}>💡</div>
+              <div className={styles.mejorPracticaIcono} aria-hidden="true">💡</div>
               <div className={styles.mejorPracticaTitulo}>LED para iluminación siempre</div>
               <p className={styles.mejorPracticaDesc}>
                 El LED tiene 15.000-25.000 h de vida vs 1.000 h del incandescente. Con precio actual,
@@ -1608,7 +1629,7 @@ export default function CalculadoraElectricidadPage() {
               </p>
             </div>
             <div className={styles.mejorPracticaCard}>
-              <div className={styles.mejorPracticaIcono}>🔋</div>
+              <div className={styles.mejorPracticaIcono} aria-hidden="true">🔋</div>
               <div className={styles.mejorPracticaTitulo}>Dimensiona bien la instalación solar</div>
               <p className={styles.mejorPracticaDesc}>
                 Sobredimensionar paneles es barato (paneles son baratos). Sobredimensionar baterías es caro.
@@ -1616,7 +1637,7 @@ export default function CalculadoraElectricidadPage() {
               </p>
             </div>
             <div className={styles.mejorPracticaCard}>
-              <div className={styles.mejorPracticaIcono}>📊</div>
+              <div className={styles.mejorPracticaIcono} aria-hidden="true">📊</div>
               <div className={styles.mejorPracticaTitulo}>Contrata la potencia justa</div>
               <p className={styles.mejorPracticaDesc}>
                 En España, bajar de 5,75 kW a 4,6 kW ahorra unos 4 €/mes en término de potencia
@@ -1639,8 +1660,8 @@ export default function CalculadoraElectricidadPage() {
               </li>
               <li>
                 <strong>Usar cable de sección insuficiente en instalaciones solares 12 V:</strong> A 12 V,
-                la corriente es el doble que a 24 V para la misma potencia. El 80% de incendios en
-                instalaciones solares son por cables mal dimensionados.
+                la corriente es el doble que a 24 V para la misma potencia, y un cable que se queda corto
+                se calienta.
               </li>
               <li>
                 <strong>Confundir kW con kWh en baterías:</strong> Una batería de 200 Ah a 12 V = 2.400 Wh
@@ -1648,7 +1669,7 @@ export default function CalculadoraElectricidadPage() {
               </li>
               <li>
                 <strong>No considerar la caída de tensión en DC:</strong> En corriente continua (solar,
-                12/24 V), tramos largos de cable pueden perder 10-20% de tensión si la sección es insuficiente.
+                12/24 V), tramos largos de cable pueden perder 10-20&nbsp;% de tensión si la sección es insuficiente.
               </li>
               <li>
                 <strong>Instalar sin diferencial o con uno averiado:</strong> El diferencial salva vidas

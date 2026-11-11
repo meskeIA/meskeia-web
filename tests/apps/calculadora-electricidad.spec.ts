@@ -19,8 +19,8 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  *                  siete resistencias en serie.
  *   3 · rechazo  · Mixtos rechaza paralelo(10, 0) con aviso.
  *
- * REPARADOS el 11/11/2026 (/reparar): H1, H2, H3, H5, H7, H8, H10 y H12 (sin test.fail()).
- * HALLAZGOS — los demás siguen ABIERTOS (cada uno con su test.fail(), que afirma lo que la app DEBE hacer):
+ * REPARADOS el 11/11/2026 (/reparar): H1, H2, H3, H5, H7, H8, H10 y H12; en la segunda tanda del
+ * mismo día, H4, H6, H9, H11, H13, H14 y H15. Ninguno lleva ya test.fail(). Lo que decían:
  *   H1 (alto)   · Mixtos parte por TODAS las comas: serie(10,5, 20) da 35 Ω (30,5) y paralelo(4,7, 10)
  *                 da 2,0290 Ω (3,1973). Serie/Paralelo lo arregló el 04/09/2026; Mixtos no.
  *   H2 (alto)   · FAQ visible «¿Qué sección de cable necesito?»: «1,5 mm² hasta 16 A … 4 mm² hasta
@@ -246,7 +246,7 @@ test('CASO 3 · Mixtos rechaza paralelo(10, 0) con aviso', async ({ page }) => {
 });
 
 // ============================================================
-// HALLAZGOS — ABIERTOS
+// HALLAZGOS — todos REPARADOS (11/11/2026)
 // ============================================================
 
 test('HALLAZGO H1 (4437) — REPARADO · Mixtos lee la coma decimal: serie(10,5, 20) = 30,5 Ω', async ({ page }) => {
@@ -393,13 +393,14 @@ test('HALLAZGO H8 (4444) — REPARADO · el ahorro por bajar potencia cuadra con
   expect(t).toContain('ahorra unos 4 €/mes');
 });
 
-test('HALLAZGO H9 — ABIERTO · el alquiler del contador es el de la Orden ITC/3860/2007', async ({ page }) => {
-  // ABIERTO. Orden ITC/3860/2007, anexo II d) (BOE-A-2007-22458): «Contadores electrónicos con
+test('HALLAZGO H9 (4445) — REPARADO · el alquiler del contador es el de la Orden ITC/3860/2007', async ({ page }) => {
+  // REPARADO el 11/11/2026 (/reparar). Orden ITC/3860/2007, anexo II d) (BOE-A-2007-22458, cotejado
+  // en la sesión, sin modificación posterior en el consolidado): «Contadores electrónicos con
   // discriminación horaria y con posibilidad de telegestión para consumidores domésticos»,
-  // 0,81 €/mes. La guía dice «alquiler equipo medida (~3 €/mes)».
-  test.fail();
+  // 0,81 €/mes. La guía decía «alquiler equipo medida (~3 €/mes)».
   const t = await textoGuia(page);
   expect(t).not.toContain('alquiler equipo medida (~3 €/mes)');
+  expect(t).toMatch(/0,81 €\/mes el contador digital doméstico/);
 });
 
 test('HALLAZGO H10 (4446) — REPARADO · las features del JSON-LD prometen solo lo que hace la app', async ({ page }) => {
@@ -413,11 +414,15 @@ test('HALLAZGO H10 (4446) — REPARADO · las features del JSON-LD prometen solo
   expect(features.some((f) => /hasta 6 componentes/i.test(f))).toBe(false);
 });
 
-test('HALLAZGO H11 — ABIERTO · formato español: «0,45» y el % separado', async ({ page }) => {
-  // ABIERTO. Obtenido el 11/11/2026: «0.45» en el campo de corriente de Potencia y «1τ (63,2%)»,
-  // «3τ (95%)», «5τ (99%)» en RC/RL (CLAUDE.md global §2: «63,2 %», con espacio duro).
-  test.fail();
+test('HALLAZGO H11 (4447) — REPARADO · formato español: «0,45» y el % separado', async ({ page }) => {
+  // REPARADO el 11/11/2026 (/reparar). Obtenido antes: «0.45» en el campo de corriente de Potencia
+  // y «1τ (63,2%)», «3τ (95%)», «5τ (99%)» en RC/RL (CLAUDE.md global §2: «63,2 %», con espacio
+  // duro), «t=0,1s» en las etiquetas y el % pegado en la guía.
+  const t = await textoGuia(page);
+  expect(t).not.toMatch(/\d%/);
   await modo(page, 'Potencia');
+  // P = 220 V × 0,45 A = 99 W: el valor por defecto se lee como 0,45
+  await verEnPanel(page, 'Potencia (P) 99,0000 W');
   await expect(page.locator('#corriente-pot')).toHaveValue('0,45');
   await modo(page, 'RC/RL');
   const texto = await panel(page).innerText();
@@ -441,10 +446,10 @@ test('HALLAZGO H12 (4448) — REPARADO · los selectores de cada modo llevan ari
   await expect(page.getByRole('button', { name: 'RC (Capacitor)', exact: true })).toHaveAttribute('aria-pressed', 'false');
 });
 
-test('HALLAZGO H13 — ABIERTO · emojis de la guía ocultos al lector e inputs con teclado decimal', async ({ page }) => {
-  // ABIERTO. Obtenido el 11/11/2026: «⚡ Aprende Electricidad…» (título, emoji junto a texto) y los
-  // iconos 🏠 ⚡ 🌞 🏭 🔌 ⏰ 🌡️ 💡 🔋 📊 sin aria-hidden; inputmode = null en los campos numéricos.
-  test.fail();
+test('HALLAZGO H13 (4449) — REPARADO · emojis de la guía ocultos al lector e inputs con teclado decimal', async ({ page }) => {
+  // REPARADO el 11/11/2026 (/reparar). Obtenido antes: «⚡ Aprende Electricidad…» (título, emoji
+  // junto a texto) y los iconos 🏠 ⚡ 🌞 🏭 🔌 ⏰ 🌡️ 💡 🔋 📊 sin aria-hidden; inputmode = null en
+  // los campos numéricos (la lista de resistencias sigue en texto: lleva comas y espacios).
   const sueltos = await page.evaluate(() => {
     const raices = Array.from(document.querySelectorAll('[data-guia-educativa]'));
     const titulo = Array.from(document.querySelectorAll('h3')).find((h) => h.textContent?.includes('Aprende Electricidad'));
@@ -465,22 +470,24 @@ test('HALLAZGO H13 — ABIERTO · emojis de la guía ocultos al lector e inputs 
   await expect(page.locator('#resistencia')).toHaveAttribute('inputmode', 'decimal');
 });
 
-test('HALLAZGO H14 — ABIERTO · la guía no da cifras sin fuente ni se contradice', async ({ page }) => {
-  // ABIERTO. «El 80% de incendios en instalaciones solares son por cables mal dimensionados» y «las
+test('HALLAZGO H14 (4450) — REPARADO · la guía no da cifras sin fuente ni se contradice', async ({ page }) => {
+  // REPARADO el 11/11/2026 (/reparar): se retiran las dos cifras sin fuente y las dos frases del
+  // valle dicen que abarata esas cargas según la tarifa. Antes: «El 80% de incendios en instalaciones solares son por cables mal dimensionados» y «las
   // siete leyes … resuelven el 95% de los problemas eléctricos reales», sin fuente; la FAQ promete
   // «ahorrar 30-40% en la factura eléctrica» y la tarjeta de buenas prácticas, «30-40% en esas cargas».
-  test.fail();
   const t = await textoGuia(page);
+  expect(t).toContain('abarata lo que cuestan esas cargas');
+  expect(t).not.toContain('30-40');
   expect(t).not.toMatch(/80[\s ]?%\s+de\s+incendios/);
   expect(t).not.toMatch(/95[\s ]?%\s+de\s+los\s+problemas/);
   expect(t).not.toMatch(/30-40[\s ]?%\s+en\s+la\s+factura/);
 });
 
-test('HALLAZGO H15 — ABIERTO · el FAQPage no usa vocabulario solo de España', async ({ page }) => {
-  // ABIERTO. «estudiantes de Física y Tecnología (ESO y Bachillerato)» (CLAUDE.md §1.bis:
-  // secundaria, preparatoria, educación media).
-  test.fail();
+test('HALLAZGO H15 (4451) — REPARADO · el FAQPage no usa vocabulario solo de España', async ({ page }) => {
+  // REPARADO el 11/11/2026 (/reparar). Antes: «estudiantes de Física y Tecnología (ESO y
+  // Bachillerato)» (CLAUDE.md §1.bis: secundaria, preparatoria, educación media).
   const faq = await jsonLd(page, 'FAQPage');
   const textos = (faq.mainEntity ?? []).map((q) => `${q.name} ${q.acceptedAnswer.text}`).join(' ');
   expect(textos).not.toMatch(/\bESO\b|Bachillerato/);
+  expect(textos).toContain('secundaria y educación media');
 });

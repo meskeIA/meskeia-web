@@ -80,7 +80,7 @@ export const faqJsonLd = {
       name: '¿Para quién está pensada esta calculadora eléctrica?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Es útil tanto para estudiantes de Física y Tecnología (ESO y Bachillerato) como para técnicos electricistas, estudiantes de ciclos formativos de Electricidad y Electrónica, y cualquier persona que quiera entender o verificar cálculos eléctricos básicos. También la usan instaladores que necesitan comprobar rápidamente valores de circuitos sin recurrir a fórmulas manualmente.',
+        text: 'Es útil tanto para estudiantes de Física y Tecnología de secundaria y educación media como para técnicos electricistas, estudiantes de formación técnica o profesional en Electricidad y Electrónica, y cualquier persona que quiera entender o verificar cálculos eléctricos básicos. También la usan instaladores que necesitan comprobar rápidamente valores de circuitos sin recurrir a fórmulas manualmente.',
       },
     },
     {
