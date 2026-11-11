@@ -14,6 +14,30 @@ type TipoCircuito = 'serie' | 'paralelo';
 type TipoDivisor = 'tension' | 'corriente';
 type TipoRCRL = 'rc' | 'rl';
 
+const PREFIJOS_SUBMULTIPLO: { factor: number; simbolo: string }[] = [
+  { factor: 1e-3, simbolo: 'm' },
+  { factor: 1e-6, simbolo: 'µ' },
+  { factor: 1e-9, simbolo: 'n' },
+];
+
+/**
+ * Una magnitud con su unidad, bajando a mili, micro o nano cuando en la unidad base perdería
+ * cifras: por debajo de 10^-(decimales − 2), donde ya no quedan tres significativas (0,01 con 4
+ * decimales; 1 con 2). Hasta el 11/11/2026 todo salía en la unidad base con 4 decimales (2 la
+ * frecuencia): 12 V / 1 MΩ daba «≈0 A» (12 µA), 12 V / 4,7 kΩ «0,0026 A» y la fc de τ = 100 s
+ * «0,00 Hz» (hallazgo 4440). Solo hacia abajo, a propósito: lo que se lee bien en la unidad base
+ * sigue así («0,1200 A», el ejemplo del FAQPage; «30.000,0000 V»), como lo tenía la app.
+ */
+function conPrefijo(valor: number, unidad: string, decimales = 4): string {
+  if (!Number.isFinite(valor) || valor === 0 || Math.abs(valor) >= 10 ** -(decimales - 2)) {
+    return `${formatNumber(valor, decimales)} ${unidad}`;
+  }
+  const prefijo =
+    PREFIJOS_SUBMULTIPLO.find(p => Math.abs(Number((valor / p.factor).toFixed(decimales))) >= 1) ??
+    PREFIJOS_SUBMULTIPLO[PREFIJOS_SUBMULTIPLO.length - 1];
+  return `${formatNumber(valor / prefijo.factor, decimales)} ${prefijo.simbolo}${unidad}`;
+}
+
 export default function CalculadoraElectricidadPage() {
   const [tipoCalculo, setTipoCalculo] = useState<TipoCalculo>('ohm');
 
@@ -62,6 +86,8 @@ export default function CalculadoraElectricidadPage() {
     const V = parseSpanishNumber(voltaje);
     const I = parseSpanishNumber(corriente);
     const R = parseSpanishNumber(resistencia);
+    // Una resistencia negativa no existe (hallazgo 4442): avisoRango lo dice.
+    if (variableOhm !== 'R' && R < 0) return null;
 
     switch (variableOhm) {
       case 'V':
@@ -153,6 +179,8 @@ export default function CalculadoraElectricidadPage() {
     const precio = parseSpanishNumber(precioKwh);
 
     if (isNaN(P) || isNaN(h) || isNaN(d) || isNaN(precio)) return null;
+    // Lo imposible no se calcula (hallazgo 4442): avisoRango dice qué sobra.
+    if (P < 0 || h < 0 || h > 24 || d < 0 || d > 31 || precio < 0) return null;
 
     const kWhDiario = (P / 1000) * h;
     const kWhMensual = kWhDiario * d;
@@ -166,6 +194,30 @@ export default function CalculadoraElectricidadPage() {
       costeAnual
     };
   }, [potenciaConsumo, horasUso, diasMes, precioKwh]);
+
+  /**
+   * Por qué no se calcula, cuando el motivo es un valor físicamente imposible y no un campo vacío
+   * o una división entre 0. Hasta el 11/11/2026 la app calculaba con 25 h de uso al día
+   * («25,000 kWh/día»), con potencia negativa («-12,00 €/mes»), con R negativa en Ohm
+   * («-2,0000 A») y con tiempo negativo en RC/RL (hallazgo 4442).
+   */
+  const avisoRango = useMemo((): string | null => {
+    const negativo = (texto: string): boolean => parseSpanishNumber(texto) < 0;
+    if (tipoCalculo === 'ohm' && variableOhm !== 'R' && negativo(resistencia)) {
+      return 'Una resistencia no puede ser negativa.';
+    }
+    if (tipoCalculo === 'consumo') {
+      if (negativo(potenciaConsumo)) return 'La potencia de un aparato no puede ser negativa.';
+      if (negativo(horasUso) || parseSpanishNumber(horasUso) > 24) return 'Las horas de uso al día van de 0 a 24.';
+      if (negativo(diasMes) || parseSpanishNumber(diasMes) > 31) return 'Los días de uso al mes van de 0 a 31.';
+      if (negativo(precioKwh)) return 'El precio del kWh no puede ser negativo.';
+    }
+    if (tipoCalculo === 'rcrl') {
+      if (negativo(resistenciaRCRL)) return 'Una resistencia no puede ser negativa.';
+      if (negativo(tiempoRCRL)) return 'El tiempo de análisis no puede ser negativo: se cuenta desde que se conecta la fuente (t = 0).';
+    }
+    return null;
+  }, [tipoCalculo, variableOhm, resistencia, potenciaConsumo, horasUso, diasMes, precioKwh, resistenciaRCRL, tiempoRCRL]);
 
   // Cálculos de Divisor de tensión/corriente
   const resultadoDivisor = useMemo(() => {
@@ -312,7 +364,7 @@ export default function CalculadoraElectricidadPage() {
     const V0 = parseSpanishNumber(voltajeRCRL);
     const t = parseSpanishNumber(tiempoRCRL);
 
-    if (isNaN(R) || isNaN(V0) || isNaN(t) || R <= 0) return null;
+    if (isNaN(R) || isNaN(V0) || isNaN(t) || R <= 0 || t < 0) return null;
 
     if (tipoRCRL === 'rc') {
       const C = parseSpanishNumber(capacitancia) * 1e-6; // µF a F
@@ -916,7 +968,7 @@ export default function CalculadoraElectricidadPage() {
             <div className={styles.resultadoDestacado}>
               <span className={styles.resultadoLabel}>{resultadoOhm.variable}</span>
               <span className={styles.resultadoValor}>
-                {formatNumber(resultadoOhm.valor, 4)} {resultadoOhm.unidad}
+                {conPrefijo(resultadoOhm.valor, resultadoOhm.unidad)}
               </span>
               <div className={styles.formulaBox}>
                 <p>Fórmula: V = I × R</p>
@@ -931,7 +983,7 @@ export default function CalculadoraElectricidadPage() {
             <div className={styles.resultadoDestacado}>
               <span className={styles.resultadoLabel}>{resultadoPotencia.variable}</span>
               <span className={styles.resultadoValor}>
-                {formatNumber(resultadoPotencia.valor, 4)} {resultadoPotencia.unidad}
+                {conPrefijo(resultadoPotencia.valor, resultadoPotencia.unidad)}
               </span>
               <div className={styles.formulaBox}>
                 <p>Fórmula: P = V × I</p>
@@ -948,7 +1000,7 @@ export default function CalculadoraElectricidadPage() {
               <div className={styles.resultadoDestacado}>
                 <span className={styles.resultadoLabel}>Resistencia Equivalente ({resultadoCircuito.tipo})</span>
                 <span className={styles.resultadoValor}>
-                  {formatNumber(resultadoCircuito.resistenciaEquivalente, 4)} Ω
+                  {conPrefijo(resultadoCircuito.resistenciaEquivalente, 'Ω')}
                 </span>
               </div>
 
@@ -1039,7 +1091,7 @@ export default function CalculadoraElectricidadPage() {
               <div className={styles.resultadoDestacado}>
                 <span className={styles.resultadoLabel}>Resistencia Equivalente</span>
                 <span className={styles.resultadoValor}>
-                  {formatNumber(resultadoMixto.resistenciaEquivalente, 4)} Ω
+                  {conPrefijo(resultadoMixto.resistenciaEquivalente, 'Ω')}
                 </span>
               </div>
               <div className={styles.formulaBox}>
@@ -1072,16 +1124,16 @@ export default function CalculadoraElectricidadPage() {
                 {resultadoRCRL.tipo === 'RC' && (
                   <>
                     <div className={styles.rcrlCard}>
-                      <span className={styles.rcrlLabel}>Voltaje Carga (t={tiempoRCRL}s)</span>
+                      <span className={styles.rcrlLabel}>Voltaje Carga (t = {tiempoRCRL}&nbsp;s)</span>
                       <span className={styles.rcrlValor}>{formatNumber(resultadoRCRL.voltajeCarga, 4)} V</span>
                     </div>
                     <div className={styles.rcrlCard}>
-                      <span className={styles.rcrlLabel}>Voltaje Descarga (t={tiempoRCRL}s)</span>
+                      <span className={styles.rcrlLabel}>Voltaje Descarga (t = {tiempoRCRL}&nbsp;s)</span>
                       <span className={styles.rcrlValor}>{formatNumber(resultadoRCRL.voltajeDescarga, 4)} V</span>
                     </div>
                     <div className={styles.rcrlCard}>
                       <span className={styles.rcrlLabel}>Corriente Carga</span>
-                      <span className={styles.rcrlValor}>{formatNumber(resultadoRCRL.corrienteCarga * 1000, 4)} mA</span>
+                      <span className={styles.rcrlValor}>{conPrefijo(resultadoRCRL.corrienteCarga, 'A')}</span>
                     </div>
                     <div className={styles.rcrlCard}>
                       <span className={styles.rcrlLabel}>Energía Almacenada</span>
@@ -1092,12 +1144,12 @@ export default function CalculadoraElectricidadPage() {
                 {resultadoRCRL.tipo === 'RL' && (
                   <>
                     <div className={styles.rcrlCard}>
-                      <span className={styles.rcrlLabel}>Corriente Carga (t={tiempoRCRL}s)</span>
-                      <span className={styles.rcrlValor}>{formatNumber(resultadoRCRL.corrienteCarga * 1000, 4)} mA</span>
+                      <span className={styles.rcrlLabel}>Corriente Carga (t = {tiempoRCRL}&nbsp;s)</span>
+                      <span className={styles.rcrlValor}>{conPrefijo(resultadoRCRL.corrienteCarga, 'A')}</span>
                     </div>
                     <div className={styles.rcrlCard}>
-                      <span className={styles.rcrlLabel}>Corriente Descarga (t={tiempoRCRL}s)</span>
-                      <span className={styles.rcrlValor}>{formatNumber(resultadoRCRL.corrienteDescarga * 1000, 4)} mA</span>
+                      <span className={styles.rcrlLabel}>Corriente Descarga (t = {tiempoRCRL}&nbsp;s)</span>
+                      <span className={styles.rcrlValor}>{conPrefijo(resultadoRCRL.corrienteDescarga, 'A')}</span>
                     </div>
                     <div className={styles.rcrlCard}>
                       <span className={styles.rcrlLabel}>Voltaje Inductor</span>
@@ -1128,7 +1180,7 @@ export default function CalculadoraElectricidadPage() {
                   </div>
                   <div className={styles.tiempoItem}>
                     <span>Frec. Corte</span>
-                    <span>{formatNumber(resultadoRCRL.frecuenciaCorte, 2)} Hz</span>
+                    <span>{conPrefijo(resultadoRCRL.frecuenciaCorte, 'Hz', 2)}</span>
                   </div>
                 </div>
               </div>
@@ -1186,8 +1238,8 @@ export default function CalculadoraElectricidadPage() {
             (tipoCalculo === 'rcrl' && !resultadoRCRL)) && (
             <div className={styles.errorBox} role="alert">
               <p>
-                No se puede calcular con estos valores. Revisa que todos los campos sean números
-                y que no haya que dividir entre 0 (una resistencia, una corriente o una tensión de 0).
+                {avisoRango ??
+                  'No se puede calcular con estos valores. Revisa que todos los campos sean números y que no haya que dividir entre 0 (una resistencia, una corriente o una tensión de 0).'}
               </p>
             </div>
           )}

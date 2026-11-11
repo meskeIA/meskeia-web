@@ -300,18 +300,21 @@ test('HALLAZGO H3 (4439) — REPARADO · un 0 Ω en paralelo no se descarta en s
   expect(/0,0000[\s ]*Ω/.test(texto) || avisos > 0).toBe(true);
 });
 
-test('HALLAZGO H4 — ABIERTO · corrientes de µA y mA y frecuencias de mHz no se pierden al redondear', async ({ page }) => {
-  // ABIERTO. Obtenido el 11/11/2026: «≈0 A», «0,0026 A» y «0,00 Hz».
-  test.fail();
+test('HALLAZGO H4 (4440) — REPARADO · corrientes de µA y mA y frecuencias de mHz no se pierden al redondear', async ({ page }) => {
+  // REPARADO el 11/11/2026 (/reparar). Obtenido antes: «≈0 A», «0,0026 A» y «0,00 Hz». Ahora lo
+  // que perdería cifras en la unidad base baja a mili, micro o nano (conPrefijo): 12,0000 µA,
+  // 2,5532 mA y 1,59 mHz; 0,12 A sigue en amperios (CASO 1a).
   await pulsar(page, 'Corriente');
   await escribir(page, '#voltaje', '12');
   // 12 / 1.000.000 = 0,000012 A = 12 µA
   await escribir(page, '#resistencia', '1.000.000');
+  await verEnPanel(page, 'Corriente (I) 12,0000 µA');
   let texto = await panel(page).innerText();
   expect(texto).not.toContain('≈0');
   expect(texto).toMatch(/0,000012\d*[\s ]*A|12(,0+)?[\s ]*µA/);
   // 12 / 4.700 = 0,00255319 A = 2,5532 mA
   await escribir(page, '#resistencia', '4.700');
+  await verEnPanel(page, 'Corriente (I) 2,5532 mA');
   texto = await panel(page).innerText();
   expect(texto).toMatch(/2,553\d*[\s ]*mA|0,002553\d*[\s ]*A/);
   // RC con 100 kΩ y 1000 µF: τ = 100 s → fc = 1/(2π·100) = 0,0016 Hz (1,59 mHz)
@@ -341,17 +344,29 @@ test('HALLAZGO H5 (4441) — REPARADO · R = 0 o un texto no dejan el panel en b
   await expect(panel(page)).not.toContainText('No definido');
 });
 
-test('HALLAZGO H6 — ABIERTO · Consumo no acepta 25 h al día ni potencia negativa', async ({ page }) => {
-  // ABIERTO. Un día tiene 24 h; una potencia de -1000 W no consume. Obtenido el 11/11/2026:
-  // «25,000 kWh/día» (1 kW × 25 h) y «-12,00 €/mes» (-1 kW × 2 h × 30 d × 0,20).
-  test.fail();
+test('HALLAZGO H6 (4442) — REPARADO · Consumo no acepta 25 h al día ni potencia negativa', async ({ page }) => {
+  // REPARADO el 11/11/2026 (/reparar). Un día tiene 24 h; una potencia de -1000 W no consume.
+  // Obtenido antes: «25,000 kWh/día» (1 kW × 25 h) y «-12,00 €/mes» (-1 kW × 2 h × 30 d × 0,20).
+  // Ahora no calcula y el aviso dice qué sobra. Lo mismo R negativa en Ohm y t negativo en RC.
   await modo(page, 'Consumo');
   await escribir(page, '#horas-uso', '25');
   await expect(panel(page)).not.toContainText('25,000');
+  await expect(panel(page).getByRole('alert')).toContainText('de 0 a 24');
+  await escribir(page, '#horas-uso', '24');
+  await verEnPanel(page, 'Consumo Diario 24,000 kWh/día');
   await escribir(page, '#horas-uso', '2');
   await escribir(page, '#precio-kwh', '0,20');
   await escribir(page, '#potencia-consumo', '-1000');
   await expect(panel(page)).not.toContainText(/-\d/);
+  await expect(panel(page).getByRole('alert')).toContainText('no puede ser negativa');
+  await modo(page, 'Ley de Ohm');
+  await pulsar(page, 'Corriente');
+  await escribir(page, '#resistencia', '-6');
+  await expect(panel(page)).not.toContainText('-2,0000');
+  await expect(panel(page).getByRole('alert')).toContainText('Una resistencia no puede ser negativa');
+  await modo(page, 'RC/RL');
+  await escribir(page, '#tiempo-rcrl', '-1');
+  await expect(panel(page).getByRole('alert')).toContainText('no puede ser negativo');
 });
 
 test('HALLAZGO H7 (4443) — REPARADO · el escenario de la bomba: 1,5 mm² cumple la caída del 3 % a 15 m', async ({ page }) => {
