@@ -928,7 +928,7 @@ ascensos y descensos: ficha `feedback_frontera_decisiones` de la memoria.
 | 2 | `retirar-muerto`: código sin lectores | `check:motores-consumidos`, `check:tipos` |
 | 2 | `promesa`: bajar a lo que la app hace un title, description o FAQ que promete más | el Inspector; el usuario lo decidió el 05/10/2026: «no tiene sentido prometer algo que no hacemos» |
 | 2 | `config-claude`: ajustes de Claude Code que no amplían lo que sale del PC | la sesión siguiente lo valida; copia del perfil |
-| 2 | `integrar-reparar`, clases A y B: rojo que falla igual en main sin la tanda · spec de la tanda que falla sin ella y pasa con ella, sin menos `expect` (C0621, 08/11/2026). Lo demás que para la recogida sigue en 3 | `contra-main` de `reparar-tarea.mjs`; su `probar-contra-main` reinyecta los 8 casos de origen y una regla aflojada |
+| 2 | `integrar-reparar`, clases A y B: rojo que falla igual en main sin la tanda, también si solo falla repetido con carga · spec de la tanda que falla sin ella y pasa con ella, sin menos `expect`, salvo bloques de control (C0621, 08/11/2026; ampliado el 11/11). Y la tanda que deja decisiones sin tocarlas, con su cabo `usuario`: se preguntan en `/push`. Lo demás que para la recogida sigue en 3 | `contra-main` y `decidirDecisiones` de `reparar-tarea.mjs`; `probar-contra-main` y `probar-auto` reinyectan los casos de origen con cada regla apagada |
 | 3 | Push y todo lo que sale del PC · borrar fuera de git · Turso | — |
 | 3 | `fiscal`: dato normativo de `data/fiscal` | nada automático: se pregunta con **cita literal de la fuente, valor anterior y valor nuevo**. Fuera del ascenso |
 | 3 | Qué se construye, prioriza, publica o retira · ampliar una app para cumplir su promesa · neutralidad editorial · formato de los rituales | es el qué |
