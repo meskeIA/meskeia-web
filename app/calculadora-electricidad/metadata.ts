@@ -38,8 +38,8 @@ export const jsonLd = generateWebAppSchema({
   category: 'EducationalApplication',
   features: [
     'Ley de Ohm: calcula voltaje, corriente o resistencia dado cualquier par de valores',
-    'Potencia eléctrica: P=VI y fórmulas derivadas con conversión automática de unidades',
-    'Circuitos en serie y paralelo: resistencia equivalente para hasta 6 componentes',
+    'Potencia eléctrica: P = V·I despejando cualquiera de las tres magnitudes',
+    'Circuitos en serie y paralelo: resistencia equivalente con todas las resistencias que se quiera',
     'Divisor de tensión y divisor de corriente con fórmulas explicadas',
     'Circuitos mixtos con sintaxis serie(...)/paralelo(...) anidable',
     'Circuitos RC y RL: constante de tiempo τ, respuesta transitoria y frecuencia de corte',

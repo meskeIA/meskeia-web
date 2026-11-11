@@ -103,9 +103,13 @@ export default function CalculadoraElectricidadPage() {
     // coma decimal no tenía cabida. El lector compartido deduce su papel del propio texto
     // (04/09/2026, mismo arreglo que en las dos apps de estadística). Aquí no hace falta el
     // eco de LecturaSerie porque la app ya lista abajo cada resistencia interpretada.
-    const valores = parsearSerieNumerica(resistencias).valores.filter(n => n > 0);
+    // Hasta el 11/11/2026 se filtraban en silencio el 0, los negativos y el texto (hallazgo
+    // 4439): «10, 0, 20» en paralelo daba 6,6667 Ω cuando un 0 Ω es un cortocircuito. Ahora
+    // cualquiera de ellos deja el cálculo sin resultado y avisoCircuito dice cuál sobra.
+    const lectura = parsearSerieNumerica(resistencias);
+    const valores = lectura.valores;
 
-    if (valores.length === 0) return null;
+    if (valores.length === 0 || lectura.descartados.length > 0 || valores.some(n => n <= 0)) return null;
 
     if (tipoCircuito === 'serie') {
       const total = valores.reduce((a, b) => a + b, 0);
@@ -124,6 +128,22 @@ export default function CalculadoraElectricidadPage() {
       };
     }
   }, [tipoCircuito, resistencias]);
+
+  const avisoCircuito = useMemo(() => {
+    const lectura = parsearSerieNumerica(resistencias);
+    if (lectura.descartados.length > 0) {
+      return `«${lectura.descartados.join('», «')}» no es un número: escribe solo valores en ohmios, separados por comas.`;
+    }
+    const noPositivos = lectura.valores.filter(n => n <= 0);
+    if (noPositivos.length > 0) {
+      const lista = noPositivos.map(n => formatNumber(n, 2)).join(', ');
+      return noPositivos.some(n => n === 0)
+        ? `Hay una resistencia de 0 Ω (${lista}): es un cortocircuito. En paralelo dejaría la equivalente en 0 Ω; en serie no suma nada. Quítala o escribe su valor real.`
+        : `Una resistencia no puede ser negativa (${lista}).`;
+    }
+    if (lectura.valores.length === 0) return 'Escribe al menos una resistencia, en ohmios.';
+    return null;
+  }, [resistencias]);
 
   // Cálculos de Consumo
   const resultadoConsumo = useMemo(() => {
@@ -202,7 +222,9 @@ export default function CalculadoraElectricidadPage() {
     // Caso base: número simple
     const numMatch = expr.match(/^[\d,\.]+$/);
     if (numMatch) {
-      return parseSpanishNumber(expr);
+      // «10.5.3» da NaN: sin esto llegaba al resultado como «No definido Ω» (hallazgo 4441).
+      const n = parseSpanishNumber(expr);
+      return Number.isFinite(n) ? n : null;
     }
 
     // Caso serie(...)
@@ -225,16 +247,35 @@ export default function CalculadoraElectricidadPage() {
     return null;
   };
 
+  /**
+   * Parte el contenido de un serie(…)/paralelo(…) en sus elementos de primer nivel.
+   *
+   * La coma decimal (11/11/2026, hallazgo 4437): antes toda coma de nivel 0 separaba, así que
+   * «serie(10,5, 20)» se leía 10 + 5 + 20. Mismo criterio que parsearSerieNumerica en
+   * Serie/Paralelo: si en ese nivel hay otro separador (un espacio o un punto y coma), la coma
+   * entre dos cifras es decimal; si la coma es lo único que separa, separa («serie(10,20)»).
+   */
   const parseElementos = (contenido: string): number[] | null => {
     const elementos: number[] = [];
     let nivel = 0;
     let actual = '';
 
-    for (let i = 0; i < contenido.length; i++) {
-      const char = contenido[i];
+    let hayOtroSeparador = false;
+    for (const char of contenido.trim()) {
       if (char === '(') nivel++;
       else if (char === ')') nivel--;
-      else if (char === ',' && nivel === 0) {
+      else if (nivel === 0 && (char === ';' || /\s/.test(char))) hayOtroSeparador = true;
+    }
+    nivel = 0;
+
+    for (let i = 0; i < contenido.length; i++) {
+      const char = contenido[i];
+      const esComaDecimal =
+        char === ',' && nivel === 0 && hayOtroSeparador &&
+        /\d/.test(contenido[i - 1] ?? '') && /\d/.test(contenido[i + 1] ?? '');
+      if (char === '(') nivel++;
+      else if (char === ')') nivel--;
+      else if ((char === ',' || char === ';') && nivel === 0 && !esComaDecimal) {
         const valor = parseCircuitoMixto(actual.trim());
         if (valor === null || valor <= 0) return null;
         elementos.push(valor);
@@ -256,7 +297,7 @@ export default function CalculadoraElectricidadPage() {
   // Cálculos de Circuitos Mixtos
   const resultadoMixto = useMemo(() => {
     const req = parseCircuitoMixto(configuracionMixta);
-    if (req === null || req <= 0) return null;
+    if (req === null || !Number.isFinite(req) || req <= 0) return null;
 
     return {
       resistenciaEquivalente: req,
@@ -418,6 +459,7 @@ export default function CalculadoraElectricidadPage() {
                       key={v}
                       className={`${styles.selectorBtn} ${variableOhm === v ? styles.selectorActivo : ''}`}
                       onClick={() => setVariableOhm(v)}
+                      aria-pressed={variableOhm === v}
                     >
                       {v === 'V' ? 'Voltaje' : v === 'I' ? 'Corriente' : 'Resistencia'}
                     </button>
@@ -483,6 +525,7 @@ export default function CalculadoraElectricidadPage() {
                       key={v}
                       className={`${styles.selectorBtn} ${variablePotencia === v ? styles.selectorActivo : ''}`}
                       onClick={() => setVariablePotencia(v)}
+                      aria-pressed={variablePotencia === v}
                     >
                       {v === 'P' ? 'Potencia' : v === 'V' ? 'Voltaje' : 'Corriente'}
                     </button>
@@ -546,14 +589,16 @@ export default function CalculadoraElectricidadPage() {
                   <button type="button"
                     className={`${styles.selectorBtn} ${tipoCircuito === 'serie' ? styles.selectorActivo : ''}`}
                     onClick={() => setTipoCircuito('serie')}
+                    aria-pressed={tipoCircuito === 'serie'}
                   >
-                    Serie ─⫘─⫘─
+                    Serie <span aria-hidden="true">─⫘─⫘─</span>
                   </button>
                   <button type="button"
                     className={`${styles.selectorBtn} ${tipoCircuito === 'paralelo' ? styles.selectorActivo : ''}`}
                     onClick={() => setTipoCircuito('paralelo')}
+                    aria-pressed={tipoCircuito === 'paralelo'}
                   >
-                    Paralelo ═⫘═
+                    Paralelo <span aria-hidden="true">═⫘═</span>
                   </button>
                 </div>
 
@@ -579,12 +624,14 @@ export default function CalculadoraElectricidadPage() {
                   <button type="button"
                     className={`${styles.selectorBtn} ${tipoDivisor === 'tension' ? styles.selectorActivo : ''}`}
                     onClick={() => setTipoDivisor('tension')}
+                    aria-pressed={tipoDivisor === 'tension'}
                   >
                     Tensión
                   </button>
                   <button type="button"
                     className={`${styles.selectorBtn} ${tipoDivisor === 'corriente' ? styles.selectorActivo : ''}`}
                     onClick={() => setTipoDivisor('corriente')}
+                    aria-pressed={tipoDivisor === 'corriente'}
                   >
                     Corriente
                   </button>
@@ -676,6 +723,7 @@ export default function CalculadoraElectricidadPage() {
                   <p>• <code>serie(R1, R2, R3)</code> - Resistencias en serie</p>
                   <p>• <code>paralelo(R1, R2)</code> - Resistencias en paralelo</p>
                   <p>• Puedes anidar: <code>serie(10, paralelo(20, 30), 40)</code></p>
+                  <p>• Decimales con coma, separando con coma y espacio: <code>paralelo(4,7, 10)</code></p>
                   <p>• Los valores son en ohmios (Ω)</p>
                 </div>
                 <div className={styles.ejemplosBox}>
@@ -709,12 +757,14 @@ export default function CalculadoraElectricidadPage() {
                   <button type="button"
                     className={`${styles.selectorBtn} ${tipoRCRL === 'rc' ? styles.selectorActivo : ''}`}
                     onClick={() => setTipoRCRL('rc')}
+                    aria-pressed={tipoRCRL === 'rc'}
                   >
                     RC (Capacitor)
                   </button>
                   <button type="button"
                     className={`${styles.selectorBtn} ${tipoRCRL === 'rl' ? styles.selectorActivo : ''}`}
                     onClick={() => setTipoRCRL('rl')}
+                    aria-pressed={tipoRCRL === 'rl'}
                   >
                     RL (Inductor)
                   </button>
@@ -887,6 +937,10 @@ export default function CalculadoraElectricidadPage() {
                 <p>Fórmula: P = V × I</p>
               </div>
             </div>
+          )}
+
+          {tipoCalculo === 'circuito' && avisoCircuito && (
+            <div className={styles.errorBox} role="alert"><p>{avisoCircuito}</p></div>
           )}
 
           {tipoCalculo === 'circuito' && resultadoCircuito && (
@@ -1122,10 +1176,19 @@ export default function CalculadoraElectricidadPage() {
             </div>
           )}
 
-          {!resultadoOhm && !resultadoPotencia && !resultadoCircuito && !resultadoConsumo && !resultadoDivisor && !resultadoMixto && !resultadoRCRL && (
-            <div className={styles.placeholder}>
-              <span className={styles.placeholderIcon}>⚡</span>
-              <p>Ingresa los valores para calcular</p>
+          {/* Hasta el 11/11/2026 este aviso exigía que fallaran los siete modos a la vez y no salía
+              nunca: R = 0 o «abc» dejaban el panel en blanco (hallazgo 4441). Ahora mira solo el
+              modo activo; Mixtos y Serie/Paralelo tienen su propio aviso arriba. */}
+          {((tipoCalculo === 'ohm' && !resultadoOhm) ||
+            (tipoCalculo === 'potencia' && !resultadoPotencia) ||
+            (tipoCalculo === 'consumo' && !resultadoConsumo) ||
+            (tipoCalculo === 'divisor' && !resultadoDivisor) ||
+            (tipoCalculo === 'rcrl' && !resultadoRCRL)) && (
+            <div className={styles.errorBox} role="alert">
+              <p>
+                No se puede calcular con estos valores. Revisa que todos los campos sean números
+                y que no haya que dividir entre 0 (una resistencia, una corriente o una tensión de 0).
+              </p>
             </div>
           )}
         </div>
@@ -1254,8 +1317,10 @@ export default function CalculadoraElectricidadPage() {
               </div>
               <p className={styles.escenarioProblema}>
                 Dimensionar el cable de una instalación: bomba de 1.500 W a 230 V, 15 m de distancia,
-                caída de tensión máx. 3%. I = 6,52 A → cable de 1,5 mm² es suficiente para potencia,
-                pero la caída de tensión exige <strong>2,5 mm²</strong>.
+                caída de tensión máx. 3&nbsp;%. I = 6,52 A. Con 1,5 mm² de cobre en el caso más
+                desfavorable (γ = 44 m/(Ω·mm²), a 90 °C): ΔV = 2 × 15 × 6,52 / (44 × 1,5) ≈ 2,96 V,
+                un 1,29&nbsp;% de 230 V. <strong>Basta 1,5 mm²</strong>: la caída solo obligaría a
+                subir de sección a partir de unos 35 m.
               </p>
               <div className={styles.escenarioTip}>
                 <span className={styles.escenarioTipLabel}>Tip profesional</span>
@@ -1345,9 +1410,12 @@ export default function CalculadoraElectricidadPage() {
             <div className={styles.faqItem}>
               <p className={styles.faqPregunta}>¿Qué sección de cable necesito para mi instalación?</p>
               <p className={styles.faqRespuesta}>
-                Regla práctica: 1,5 mm² hasta 16 A (bombillas, enchufes pequeños), 2,5 mm² hasta 20 A
-                (enchufes uso general), 4 mm² hasta 25 A (cocina, lavadora), 6 mm² hasta 32 A (horno,
-                cargador VE). Siempre calcular caída de tensión en tramos largos.
+                En una vivienda española, la ITC-BT-25 del Reglamento Electrotécnico para Baja Tensión
+                (Tabla 1) fija para cada circuito su interruptor automático y su sección mínima:
+                iluminación, 10 A y 1,5 mm²; tomas de uso general, y las de baño y cocina, 16 A y 2,5 mm²;
+                lavadora, lavavajillas y termo, 20 A y 4 mm²; cocina y horno, 25 A y 6 mm². El automático
+                está para proteger el cable: no se sube de calibre sin subir la sección. En tramos largos,
+                calcula además la caída de tensión.
               </p>
             </div>
             <div className={styles.faqItem}>
@@ -1499,7 +1567,8 @@ export default function CalculadoraElectricidadPage() {
               <div className={styles.mejorPracticaIcono}>📊</div>
               <div className={styles.mejorPracticaTitulo}>Contrata la potencia justa</div>
               <p className={styles.mejorPracticaDesc}>
-                En España, bajar de 5,75 kW a 4,6 kW ahorra ~15 €/mes en término de potencia.
+                En España, bajar de 5,75 kW a 4,6 kW ahorra unos 4 €/mes en término de potencia
+                (1,15 kW × ~3,5 €/kW al mes, la referencia del paso 6).
                 Si no tienes climatización eléctrica, 3,45 kW puede ser suficiente.
               </p>
             </div>

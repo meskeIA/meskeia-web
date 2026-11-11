@@ -19,7 +19,8 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  *                  siete resistencias en serie.
  *   3 · rechazo  · Mixtos rechaza paralelo(10, 0) con aviso.
  *
- * HALLAZGOS — ABIERTOS (cada uno con su test.fail(), que afirma lo que la app DEBE hacer):
+ * REPARADOS el 11/11/2026 (/reparar): H1, H2, H3, H5, H7, H8, H10 y H12 (sin test.fail()).
+ * HALLAZGOS — los demás siguen ABIERTOS (cada uno con su test.fail(), que afirma lo que la app DEBE hacer):
  *   H1 (alto)   · Mixtos parte por TODAS las comas: serie(10,5, 20) da 35 Ω (30,5) y paralelo(4,7, 10)
  *                 da 2,0290 Ω (3,1973). Serie/Paralelo lo arregló el 04/09/2026; Mixtos no.
  *   H2 (alto)   · FAQ visible «¿Qué sección de cable necesito?»: «1,5 mm² hasta 16 A … 4 mm² hasta
@@ -248,41 +249,52 @@ test('CASO 3 · Mixtos rechaza paralelo(10, 0) con aviso', async ({ page }) => {
 // HALLAZGOS — ABIERTOS
 // ============================================================
 
-test('HALLAZGO H1 — ABIERTO · Mixtos lee la coma decimal: serie(10,5, 20) = 30,5 Ω', async ({ page }) => {
-  // ABIERTO. Esperado 30,5 Ω y 3,1973 Ω; obtenido el 11/11/2026: 35,0000 Ω (lee 10 + 5 + 20) y
-  // 2,0290 Ω (lee paralelo(4, 7, 10)). Con punto, «paralelo(4.7, 10)», ya da 3,1973 Ω.
-  test.fail();
+test('HALLAZGO H1 (4437) — REPARADO · Mixtos lee la coma decimal: serie(10,5, 20) = 30,5 Ω', async ({ page }) => {
+  // REPARADO el 11/11/2026. Daba 35,0000 Ω (leía 10 + 5 + 20) y 2,0290 Ω (paralelo(4, 7, 10)).
+  // Mismo criterio que Serie/Paralelo: con un espacio en el nivel, la coma entre cifras es decimal.
   await modo(page, 'Mixtos');
   await escribir(page, '#configuracion-mixta', 'serie(10,5, 20)');
   await verEnPanel(page,'Resistencia Equivalente 30,5000 Ω');
   // 1/(1/4,7 + 1/10) = 3,1973 Ω
   await escribir(page, '#configuracion-mixta', 'paralelo(4,7, 10)');
   await verEnPanel(page,'Resistencia Equivalente 3,1973 Ω');
+  // Sin espacios la coma sigue separando, como antes: 10 + 20 = 30 Ω.
+  await escribir(page, '#configuracion-mixta', 'serie(10,20)');
+  await verEnPanel(page,'Resistencia Equivalente 30,0000 Ω');
+  // Anidado: 10,5 + 1/(1/4,7 + 1/10) = 13,6973 Ω
+  await escribir(page, '#configuracion-mixta', 'serie(10,5, paralelo(4,7, 10))');
+  await verEnPanel(page,'Resistencia Equivalente 13,6973 Ω');
 });
 
-test('HALLAZGO H2 — ABIERTO · la regla de secciones de la FAQ cuadra con la ITC-BT-25', async ({ page }) => {
-  // ABIERTO. ITC-BT-25, Tabla 1 (REBT, BOE-A-2002-18099): C1 iluminación 10 A y 1,5 mm² · C2 tomas
+test('HALLAZGO H2 (4438) — REPARADO · la regla de secciones de la FAQ cuadra con la ITC-BT-25', async ({ page }) => {
+  // REPARADO el 11/11/2026, cotejado en la sesión con la ITC-BT-25 del BOE. ITC-BT-25, Tabla 1 (REBT, BOE-A-2002-18099): C1 iluminación 10 A y 1,5 mm² · C2 tomas
   // de uso general 16 A y 2,5 mm² · C3 cocina y horno 25 A y 6 mm² · C4 lavadora, lavavajillas y
   // termo 20 A y 4 mm². La FAQ visible empareja cada sección con el interruptor del escalón de
   // arriba: «1,5 mm² hasta 16 A … 2,5 mm² hasta 20 A … 4 mm² hasta 25 A (cocina, lavadora), 6 mm²
   // hasta 32 A (horno…)». En la ITC-BT-19, Tabla 1, 1,5 mm² PVC en tubo empotrado (método A, dos
   // cargados) admite 13 A: un automático de 16 A no lo protege.
-  test.fail();
   const t = await textoGuia(page);
   expect(t).not.toContain('1,5 mm² hasta 16 A');
   expect(t).not.toContain('2,5 mm² hasta 20 A');
   expect(t).not.toContain('4 mm² hasta 25 A (cocina');
+  expect(t).toContain('iluminación, 10 A y 1,5 mm²');
+  expect(t).toContain('cocina y horno, 25 A y 6 mm²');
 });
 
-test('HALLAZGO H3 — ABIERTO · un 0 Ω en paralelo no se descarta en silencio', async ({ page }) => {
-  // ABIERTO. Una resistencia de 0 Ω en paralelo cortocircuita el conjunto: Req = 0 Ω, o un aviso.
-  // Obtenido el 11/11/2026: 6,6667 Ω (1/(1/10 + 1/20)) con «Resistencias: 2»; igual con «-5» o «abc».
-  test.fail();
+test('HALLAZGO H3 (4439) — REPARADO · un 0 Ω en paralelo no se descarta en silencio', async ({ page }) => {
+  // REPARADO el 11/11/2026. Una resistencia de 0 Ω en paralelo cortocircuita el conjunto: Req = 0 Ω,
+  // o un aviso. Daba 6,6667 Ω (1/(1/10 + 1/20)) con «Resistencias: 2»; igual con «-5» o «abc».
   await modo(page, 'Serie/Paralelo');
   await pulsar(page, /^Paralelo/);
+  await escribir(page, '#resistencias', '10, -5, 20');
+  await expect(panel(page).getByRole('alert')).toContainText('no puede ser negativa');
+  await escribir(page, '#resistencias', '10, abc, 20');
+  await expect(panel(page).getByRole('alert')).toContainText('«abc» no es un número');
   await escribir(page, '#resistencias', '10, 0, 20');
   const p = panel(page);
   await expect(p).not.toContainText('6,6667');
+  await expect(p.getByRole('alert')).toContainText('cortocircuito');
+  await expect(p).not.toContainText('Resistencia Equivalente');
   const avisos = await page.locator('[role="alert"]:not(#__next-route-announcer__)').count();
   const texto = await p.innerText();
   expect(/0,0000[\s ]*Ω/.test(texto) || avisos > 0).toBe(true);
@@ -311,16 +323,22 @@ test('HALLAZGO H4 — ABIERTO · corrientes de µA y mA y frecuencias de mHz no 
   expect(fc).toMatch(/0,0016\d*[\s ]*Hz|1,59\d*[\s ]*mHz/);
 });
 
-test('HALLAZGO H5 — ABIERTO · R = 0 o un texto no dejan el panel en blanco', async ({ page }) => {
-  // ABIERTO. I = V/R con R = 0 no existe: la app debe decirlo. Obtenido el 11/11/2026: el panel solo
-  // dice «Resultados»; el «Ingresa los valores para calcular» no sale porque su condición (línea
-  // 1125) exige que fallen los SIETE modos a la vez, y los otros seis llevan valores por defecto.
-  test.fail();
+test('HALLAZGO H5 (4441) — REPARADO · R = 0 o un texto no dejan el panel en blanco', async ({ page }) => {
+  // REPARADO el 11/11/2026. I = V/R con R = 0 no existe: la app debe decirlo. El panel solo decía
+  // «Resultados»; el «Ingresa los valores para calcular» no salía porque su condición exigía que
+  // fallaran los SIETE modos a la vez. Ahora mira el modo activo.
   await pulsar(page, 'Corriente');
   await escribir(page, '#resistencia', '0');
   await expect(panel(page)).not.toHaveText(/^\s*Resultados\s*$/);
+  await expect(panel(page).getByRole('alert')).toContainText('dividir entre 0');
   await escribir(page, '#resistencia', 'abc');
   await expect(panel(page)).not.toHaveText(/^\s*Resultados\s*$/);
+  await expect(panel(page).getByRole('alert')).toContainText('sean números');
+  // Mixtos con un número mal escrito: aviso de sintaxis, no «No definido Ω».
+  await modo(page, 'Mixtos');
+  await escribir(page, '#configuracion-mixta', 'serie(10.5.3, 2)');
+  await expect(panel(page).getByRole('alert')).toContainText('Verifica la expresión del circuito');
+  await expect(panel(page)).not.toContainText('No definido');
 });
 
 test('HALLAZGO H6 — ABIERTO · Consumo no acepta 25 h al día ni potencia negativa', async ({ page }) => {
@@ -336,25 +354,28 @@ test('HALLAZGO H6 — ABIERTO · Consumo no acepta 25 h al día ni potencia nega
   await expect(panel(page)).not.toContainText(/-\d/);
 });
 
-test('HALLAZGO H7 — ABIERTO · el escenario de la bomba: 1,5 mm² cumple la caída del 3 % a 15 m', async ({ page }) => {
-  // ABIERTO. I = 1500/230 = 6,52 A. Caída monofásica ΔV = 2·L·I/(γ·S) con cos φ = 1 (el de la
+test('HALLAZGO H7 (4443) — REPARADO · el escenario de la bomba: 1,5 mm² cumple la caída del 3 % a 15 m', async ({ page }) => {
+  // REPARADO el 11/11/2026. I = 1500/230 = 6,52 A. Caída monofásica ΔV = 2·L·I/(γ·S) con cos φ = 1 (el de la
   // propia guía). Con γ = 44 m/(Ω·mm²) (cobre a 90 °C, el peor caso de calculadora-seccion-cable):
   // 1,5 mm² → 2·15·6,5217/(44·1,5) = 2,96 V = 1,29 % < 3 %; la sección mínima por caída es 0,64 mm².
-  test.fail();
+  // Y el 3 % (6,9 V) no se alcanza hasta L = 6,9·44·1,5/(2·6,5217) ≈ 34,9 m («unos 35 m»).
   const corriente = 1500 / 230;
   const caida = (2 * 15 * corriente) / (44 * 1.5);
   expect((caida / 230) * 100).toBeCloseTo(1.29, 2);
+  expect((0.03 * 230 * 44 * 1.5) / (2 * corriente)).toBeCloseTo(34.9, 1);
   const t = await textoGuia(page);
   expect(t).not.toContain('la caída de tensión exige 2,5 mm²');
+  expect(t).toContain('Basta 1,5 mm²');
+  expect(t).toMatch(/1,29\s%/);
 });
 
-test('HALLAZGO H8 — ABIERTO · el ahorro por bajar potencia cuadra con la tarifa del paso 6', async ({ page }) => {
-  // ABIERTO. Paso 6: «Término de potencia (~3,5 €/kW contratado × kW/mes)». Bajar de 5,75 a 4,6 kW
-  // son 1,15 kW × 3,5 = 4,03 €/mes; la tarjeta «Contrata la potencia justa» dice «~15 €/mes».
-  test.fail();
+test('HALLAZGO H8 (4444) — REPARADO · el ahorro por bajar potencia cuadra con la tarifa del paso 6', async ({ page }) => {
+  // REPARADO el 11/11/2026. Paso 6: «Término de potencia (~3,5 €/kW contratado × kW/mes)». Bajar de
+  // 5,75 a 4,6 kW son 1,15 kW × 3,5 = 4,03 €/mes; la tarjeta decía «~15 €/mes».
   expect((5.75 - 4.6) * 3.5).toBeCloseTo(4.025, 3);
   const t = await textoGuia(page);
   expect(t).not.toContain('ahorra ~15 €/mes');
+  expect(t).toContain('ahorra unos 4 €/mes');
 });
 
 test('HALLAZGO H9 — ABIERTO · el alquiler del contador es el de la Orden ITC/3860/2007', async ({ page }) => {
@@ -366,10 +387,9 @@ test('HALLAZGO H9 — ABIERTO · el alquiler del contador es el de la Orden ITC/
   expect(t).not.toContain('alquiler equipo medida (~3 €/mes)');
 });
 
-test('HALLAZGO H10 — ABIERTO · las features del JSON-LD prometen solo lo que hace la app', async ({ page }) => {
-  // ABIERTO. Potencia no convierte unidades (W, V y A fijos) y Serie/Paralelo admite más de 6
-  // resistencias (CASO 2d: siete dan 7 Ω).
-  test.fail();
+test('HALLAZGO H10 (4446) — REPARADO · las features del JSON-LD prometen solo lo que hace la app', async ({ page }) => {
+  // REPARADO el 11/11/2026. Potencia no convierte unidades (W, V y A fijos) y Serie/Paralelo admite
+  // más de 6 resistencias (CASO 2d: siete dan 7 Ω).
   const app = await jsonLd(page, 'WebApplication');
   const features = app.featureList ?? [];
   expect(features.length).toBeGreaterThanOrEqual(4);
@@ -390,16 +410,20 @@ test('HALLAZGO H11 — ABIERTO · formato español: «0,45» y el % separado', a
   expect(texto).toMatch(/95[\s ]%/);
 });
 
-test('HALLAZGO H12 — ABIERTO · los selectores de cada modo llevan aria-pressed', async ({ page }) => {
-  // ABIERTO. Los botones de tipo de cálculo sí lo llevan; los de «Calcular» (Voltaje, Corriente,
-  // Resistencia), Serie/Paralelo, Tensión/Corriente y RC/RL no: obtenido aria-pressed = null.
-  test.fail();
+test('HALLAZGO H12 (4448) — REPARADO · los selectores de cada modo llevan aria-pressed', async ({ page }) => {
+  // REPARADO el 11/11/2026. Los botones de tipo de cálculo sí lo llevaban; los de «Calcular» (Voltaje,
+  // Corriente, Resistencia), Serie/Paralelo, Tensión/Corriente y RC/RL no: aria-pressed = null.
   await pulsar(page, 'Corriente');
   await expect(page.getByRole('button', { name: 'Corriente', exact: true })).toHaveAttribute('aria-pressed', 'true');
   await expect(page.getByRole('button', { name: 'Voltaje', exact: true })).toHaveAttribute('aria-pressed', 'false');
   await modo(page, 'Serie/Paralelo');
   await pulsar(page, /^Paralelo/);
   await expect(page.getByRole('button', { name: /^Paralelo/ })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('button', { name: /^Serie$/ })).toHaveAttribute('aria-pressed', 'false');
+  await modo(page, 'RC/RL');
+  await pulsar(page, 'RL (Inductor)');
+  await expect(page.getByRole('button', { name: 'RL (Inductor)', exact: true })).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('button', { name: 'RC (Capacitor)', exact: true })).toHaveAttribute('aria-pressed', 'false');
 });
 
 test('HALLAZGO H13 — ABIERTO · emojis de la guía ocultos al lector e inputs con teclado decimal', async ({ page }) => {
