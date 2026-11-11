@@ -956,9 +956,11 @@
 
 /* ── Responsive ────────────────────────────────────────── */
 
-/* Por debajo de 1024 px el logo fijo cae encima del <h1> centrado: se le deja su alto de hueco
-   (62 px hasta 768, 92 por encima) más un respiro. Por encima, el logo queda a un lado. */
-@media (max-width: 1023px) {
+/* Hasta 1439 px el logo fijo cae encima del <h1> centrado: se le deja su alto de hueco
+   (62 px hasta 768, 92 por encima) más un respiro. El título mide 726 px y el logo llega a
+   x = 203, así que no queda a un lado hasta ~1.132 px; el corte de 1023 lo tapaba a 1024
+   (C0706). Se sube al de 3de36a1f, que deja margen si el título crece. */
+@media (max-width: 1439px) {
   .hero {
     padding-top: calc(var(--alto-barra-logo, 62px) + 1rem);
   }

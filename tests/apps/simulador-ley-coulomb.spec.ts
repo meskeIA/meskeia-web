@@ -261,6 +261,33 @@ test.describe('simulador-ley-coulomb · la página', () => {
     await esperarHidratacion(page, ['#q1-valor', '#r-valor', '#casos-respuesta']);
   });
 
+  /*
+   * Cabo C0706 (Ronda del 11/11/2026): el hueco del logo acababa en 1023 px y a 1024 el logo
+   * (x 20-203, y 15-77) tapaba «Ley» (h1 en x 149-875, y 39-87). El título centrado no queda a
+   * un lado del logo hasta ~1.132 px. Se mide la caja del texto del h1 contra la del logo.
+   */
+  test('el logo no tapa el título de 360 a 1440 px (C0706)', async ({ page }) => {
+    for (const ancho of [360, 800, 1023, 1024, 1100, 1132, 1200, 1280, 1440]) {
+      await page.setViewportSize({ width: ancho, height: 900 });
+      await page.evaluate(
+        () => new Promise<void>((r) => requestAnimationFrame(() => requestAnimationFrame(() => r()))),
+      );
+      const cajas = await page.evaluate(() => {
+        const logo = document.querySelector('[class*="headerBar"]')?.firstElementChild?.getBoundingClientRect();
+        const rango = document.createRange();
+        rango.selectNodeContents(document.querySelector('h1') as Element);
+        const t = rango.getBoundingClientRect();
+        return {
+          seCruzan: !!logo && logo.right > t.left && logo.left < t.right && logo.bottom > t.top + 1,
+          logo: logo ? [Math.round(logo.right), Math.round(logo.bottom)] : null,
+          titulo: [Math.round(t.left), Math.round(t.top)],
+        };
+      });
+      expect(cajas.logo, 'la barra del logo existe').not.toBeNull();
+      expect(cajas.seCruzan, `a ${ancho} px: logo ${cajas.logo} · título ${cajas.titulo}`).toBe(false);
+    }
+  });
+
   test('arranque: +2 µC y −3 µC a 30 cm se atraen con 0,599 N', async ({ page }) => {
     await expect(resultado(page)).toContainText('0,599 N');
     await expect(resultado(page)).toContainText('Atracción');
