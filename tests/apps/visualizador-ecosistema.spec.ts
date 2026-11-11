@@ -734,7 +734,7 @@ test.describe('móvil 393 × 851 con toque', () => {
 // ─── Cabo C0057, comprobado el 11/11/2026 (modo cabo: solo su pregunta) ────────────────────────
 // Localizadores por rol y por texto: el detalle de cada ficha cuelga de su <h3>.
 
-// ABIERTO (cabo C0057, parte b) — el reparto 60/20/10/10 contradice a la propia página.
+// REPARADO el 11/11/2026 (cabo C0057, parte b; hallazgo 4473) — el reparto 60/20/10/10 contradice a la propia página.
 // Entrada: «Ciclos biogeoquímicos» → Carbono → «Descomposición», y «Regla del 10 %» → la tarjeta
 // «¿Adónde va la energía que no pasa?», abriendo sus cuatro casillas.
 // Qué reparte: la tarjeta va DESPUÉS del flujo entero (10.000 → 1.000 → 100 → 10 kcal), cuyo primer
@@ -754,7 +754,9 @@ test.describe('móvil 393 × 851 con toque', () => {
 test('cabo C0057 — el reparto de la energía no contradice el ~90 % de producción vegetal que no come ningún herbívoro', async ({
   page,
 }) => {
-  test.fail(); // ABIERTO — cabo C0057 (b), hallazgo de contenido del 11/11/2026
+  // REPARADO el 11/11/2026 (/reparar, hallazgo 4473): la nota acota el reparto a un paso entre
+  // animales («de herbívoro a carnívoro»), la casilla ya no nombra raíces y la nota da el ~90 % del
+  // paso plantas → herbívoros con la misma cita que «Descomposición».
   await irA(page, 'Ciclos biogeoquímicos');
   await page.getByRole('button', { name: 'Ciclo del Carbono' }).click();
   await page.getByRole('button', { name: /^Descomposición:/ }).click();
@@ -799,7 +801,7 @@ test('cabo C0057 — el reparto de la energía no contradice el ~90 % de producc
   ).toEqual([]);
 });
 
-// ABIERTO (cabo C0057, parte a) — la biomasa del mar abierto, sin fuente.
+// REPARADO el 11/11/2026 (cabo C0057, parte a; hallazgo 4474) — la biomasa del mar abierto, sin fuente.
 // Entrada: «Pirámide trófica» → «Productores» → Biomasa.
 // Obtenido: «En tierra, la mayor de la pirámide: de unas 7 t por hectárea en matorral desértico a
 // unas 450 t en selva tropical (Whittaker y Likens, 1975). En mar abierto, apenas unos kilos de
@@ -811,7 +813,8 @@ test('cabo C0057 — el reparto de la energía no contradice el ~90 % de producc
 // cualitativo —muy poca biomasa porque el fitoplancton se renueva en días— ya está en el nivel de
 // los consumidores primarios).
 test('cabo C0057 — la biomasa de fitoplancton del mar abierto lleva fuente o no lleva cantidad', async ({ page }) => {
-  test.fail(); // ABIERTO — cabo C0057 (a), hallazgo de contenido del 11/11/2026
+  // REPARADO el 11/11/2026 (/reparar, hallazgo 4474): la frase del mar abierto queda sin cantidad
+  // (la biomasa presente es pequeña porque el fitoplancton se renueva en días).
   await irA(page, 'Pirámide trófica');
   await page.getByRole('button', { name: /^Productores,/ }).click();
   await expect(page.getByRole('heading', { level: 3, name: 'Productores' })).toBeVisible();

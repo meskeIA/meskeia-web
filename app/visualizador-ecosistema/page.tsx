@@ -127,7 +127,7 @@ const NIVELES_TROFICOS: NivelTrofico[] = [
     anchoMovil: '100%',
     transferencias: 0,
     ejemplos: ['Plantas', 'Algas', 'Fitoplancton', 'Cianobacterias', 'Musgos'],
-    biomasa: 'En tierra, la mayor de la pirámide: de unas 7 t por hectárea en matorral desértico a unas 450 t en selva tropical (Whittaker y Likens, 1975). En mar abierto, apenas unos kilos de fitoplancton por hectárea.',
+    biomasa: 'En tierra, la mayor de la pirámide: de unas 7 t por hectárea en matorral desértico a unas 450 t en selva tropical (Whittaker y Likens, 1975). En mar abierto, en cambio, la biomasa de fitoplancton presente en cada momento es pequeña, porque se renueva en días.',
     numEspecies: 'Unas 391.000 plantas vasculares conocidas (Kew, 2016), más algas y cianobacterias.',
     descripcion: 'Fotosíntesis: convierten la energía solar en materia orgánica. Son la base de toda la vida.',
   },
@@ -189,7 +189,9 @@ interface DestinoPerdida {
 const DESTINO_ENERGIA: DestinoPerdida[] = [
   { destino: 'Respiración celular (calor)', porcentaje: 60, icono: '🌡️', explicacion: 'Los organismos queman energía para moverse, crecer y mantener la temperatura corporal' },
   { destino: 'Desechos y excreciones', porcentaje: 20, icono: '💩', explicacion: 'Heces, orina y otros productos metabólicos que no se asimilan' },
-  { destino: 'Partes no consumidas', porcentaje: 10, icono: '🦴', explicacion: 'Huesos, pelo, plumas, raíces y partes que el depredador no come' },
+  // Sin «raíces» (hallazgo 4473): el reparto es de un paso entre animales; en el de las plantas a
+  // los herbívoros lo no consumido es la mayor parte, y lo dice la nota de la tarjeta.
+  { destino: 'Partes no consumidas', porcentaje: 10, icono: '🦴', explicacion: 'Huesos, pelo, plumas y partes de la presa que el depredador no come' },
   { destino: 'Pasa al siguiente nivel', porcentaje: 10, icono: '⬆️', explicacion: 'Solo esta fracción queda disponible para el siguiente consumidor' },
 ];
 
@@ -470,8 +472,10 @@ function SeccionRegla10() {
           ))}
         </div>
         <p className={styles.destinoNota}>
-          Reparto orientativo. Varía mucho entre organismos: en los animales de sangre caliente la respiración se lleva
-          bastante más, y en muchos invertebrados, menos.
+          Reparto orientativo de un paso entre animales, de herbívoro a carnívoro. Varía mucho entre organismos: en
+          los animales de sangre caliente la respiración se lleva bastante más, y en muchos invertebrados, menos. En
+          el paso de las plantas a los herbívoros es distinto: en tierra, en torno al 90&nbsp;% de la producción
+          vegetal no se la come ningún herbívoro y acaba como materia muerta (Gessner et al., 2010).
         </p>
       </div>
 
