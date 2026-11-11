@@ -3,27 +3,26 @@ import { esperarPaginaAsentada } from './_hidratacion';
 import { contrasteSobreFondoReal } from './_contraste';
 
 /**
- * Inspector — test-estilo-parental (la cola la clasifica «fiscal, riesgo 1» solo porque
- * `ESTILOS_PARENTALES` vive en `data/fiscal/maternidad.ts`; es un test de autoconocimiento).
+ * Inspector — test-estilo-parental (test de autoconocimiento; hasta el 11/11/2026 la cola lo
+ * clasificaba «fiscal, riesgo 1» porque `ESTILOS_PARENTALES` vivía en `data/fiscal/maternidad.ts`;
+ * hoy vive en `data/estilos-parentales.ts`, hallazgo 4502).
  *
- * Primera inspección: 11/11/2026.
+ * Primera inspección: 11/11/2026. Reparado en /reparar del mismo día (4490-4502 salvo 4493).
  *
- * Resuelto a mano ANTES de abrir el navegador, leyendo `app/test-estilo-parental/page.tsx`
- * (preguntas y puntuación inline) y `data/fiscal/maternidad.ts` (los 4 estilos).
- *
- * LA ARITMÉTICA
+ * LA ARITMÉTICA (desde la reparación del 11/11/2026)
  *   16 preguntas Likert 1-5 (Muy en desacuerdo … Muy de acuerdo).
- *     control = (P1+P2+P3+P4) − (P5+P6+P7+P8) + 20
- *     afecto  = (P9+P10+P11+P12) − (P13+P14+P15+P16) + 20
- *   Cada suma de cuatro va de 4 a 20, así que cada dimensión va de 4 a 36 (punto medio 20).
- *   Estilo: control > 20 y afecto > 20 → democrático · control > 20 y afecto ≤ 20 → autoritario ·
- *   control ≤ 20 y afecto > 20 → permisivo · el resto → negligente.
- *   Punto del cuadrante: left = control/40 · 100 %, top = 100 − afecto/40 · 100 %
+ *     control = (P1+P2+P3+P4) − (P5+P6+P7+P8) + 16
+ *     afecto  = (P9+P10+P11+P12) − (P13+P14+P15+P16) + 16
+ *   Cada suma de cuatro va de 4 a 20, así que cada dimensión va de 0 a 32 (punto medio 16). Antes
+ *   se sumaba 20 y se mostraba «sobre 40» con una escala de 4 a 36 (hallazgo 4492).
+ *   Estilo: > 16 alto, < 16 bajo; con un 16 en una dimensión no se asigna estilo: «Entre X e Y», o
+ *   «Sin tendencia predominante» con 16 en las dos (antes 16 → «bajo»: hallazgo 4491).
+ *   Punto del cuadrante: left = control/32 · 100 %, top = 100 − afecto/32 · 100 %
  *   (derecha = más control, arriba = más afecto; el eje X dice «Bajo control … Alto control»).
  *
- *   Empates: en cada dimensión, 38.165 de las 5^8 = 390.625 combinaciones (9,8 %) suman justo 20
- *   (Σ N(s)² con N(s) = 1,4,10,20,35,52,68,80,85,80,… las formas de sumar s con cuatro dados de 5
- *   caras) y la app las da todas por «bajo».
+ *   Empates: en cada dimensión, 38.165 de las 5^8 = 390.625 combinaciones (9,8 %) caen justo en el
+ *   punto medio (Σ N(s)² con N(s) = 1,4,10,20,35,52,68,80,85,80,… las formas de sumar s con cuatro
+ *   dados de 5 caras); antes la app las daba todas por «bajo».
  */
 
 const RUTA = '/test-estilo-parental/';
@@ -36,23 +35,24 @@ const TEXTO: Record<number, string> = {
 };
 
 // Respuestas por pregunta (índice 0 = pregunta 1).
-/** control (4+4+5+4) − (2+2+1+3) + 20 = 29 · afecto (5+4+5+5) − (3+2+1+1) + 20 = 32 → democrático */
+/** control (4+4+5+4) − (2+2+1+3) + 16 = 25 · afecto (5+4+5+5) − (3+2+1+1) + 16 = 28 → democrático */
 const DEMOCRATICO_MODERADO = [4, 4, 5, 4, 2, 2, 1, 3, 5, 4, 5, 5, 3, 2, 1, 1];
-/** control 20 − 4 + 20 = 36 · afecto 20 − 4 + 20 = 36 */
+/** control 20 − 4 + 16 = 32 · afecto 20 − 4 + 16 = 32 */
 const DEMOCRATICO_MAXIMO = [5, 5, 5, 5, 1, 1, 1, 1, 5, 5, 5, 5, 1, 1, 1, 1];
-/** control 36 · afecto 4 − 20 + 20 = 4 */
+/** control 32 · afecto 4 − 20 + 16 = 0 */
 const AUTORITARIO_MAXIMO = [5, 5, 5, 5, 1, 1, 1, 1, 1, 1, 1, 1, 5, 5, 5, 5];
-/** control 4 · afecto 36 */
+/** control 0 · afecto 32 */
 const PERMISIVO_MAXIMO = [1, 1, 1, 1, 5, 5, 5, 5, 5, 5, 5, 5, 1, 1, 1, 1];
-/** control 4 · afecto 4 */
+/** control 0 · afecto 0 */
 const NEGLIGENTE_MAXIMO = [1, 1, 1, 1, 5, 5, 5, 5, 1, 1, 1, 1, 5, 5, 5, 5];
-/** control 13 − 12 + 20 = 21 (> 20, alto por un punto) · afecto 36 → democrático */
-const UMBRAL_CONTROL_21 = [4, 3, 3, 3, 3, 3, 3, 3, 5, 5, 5, 5, 1, 1, 1, 1];
+/** control 13 − 12 + 16 = 17 (> 16, alto por un punto) · afecto 32 → democrático */
+const UMBRAL_CONTROL_17 = [4, 3, 3, 3, 3, 3, 3, 3, 5, 5, 5, 5, 1, 1, 1, 1];
 /**
  * «De acuerdo» con los cuatro ítems de afecto positivo (hablo cada día con mi hijo/a, intento
  * entender qué siente, le digo que le quiero, celebro sus logros), neutral en la 14 y la 16, y
  * «Muy de acuerdo» con la 13 (cuesta encontrar momentos a solas) y la 15 (ocupado/a, delego el
- * cuidado). control (4·4) − (2·4) + 20 = 28 · afecto 16 − (5+3+5+3) + 20 = 20 → autoritario.
+ * cuidado). control (4·4) − (2·4) + 16 = 24 · afecto 16 − (5+3+5+3) + 16 = 16, el punto medio:
+ * desde el 11/11/2026, «Entre Democrático y Autoritario» (antes, «Autoritario»).
  */
 const TRABAJA_Y_DELEGA = [4, 4, 4, 4, 2, 2, 2, 2, 4, 4, 4, 4, 5, 3, 5, 3];
 
@@ -98,15 +98,15 @@ async function cuadranteDelPunto(page: Page): Promise<string[]> {
 }
 
 test.describe('Caso 1 (normal): un perfil democrático moderado', () => {
-  test('29 de control y 32 de afecto → «Democrático (Autoritativo)», punto en 72,5 % / 20 %', async ({ page }) => {
+  test('25 de control y 28 de afecto → «Democrático (Autoritativo)», punto en 75,3125 % / 16,25 %', async ({ page }) => {
     await abrir(page);
     await verResultado(page, DEMOCRATICO_MODERADO);
     await expect(perfil(page)).toHaveText('Democrático (Autoritativo)');
-    // La cifra, no la escala (la escala «/40» es otro hallazgo, abajo).
-    await expect(puntuaciones(page).nth(0)).toHaveText(/^29\//);
-    await expect(puntuaciones(page).nth(1)).toHaveText(/^32\//);
-    // left = 29/40 · 100 = 72,5 % · top = 100 − 32/40 · 100 = 20 %
-    await expect(punto(page)).toHaveAttribute('style', /left: 72\.5%; top: 20%/);
+    await expect(puntuaciones(page).nth(0)).toHaveText('25/32');
+    await expect(puntuaciones(page).nth(1)).toHaveText('28/32');
+    // Posición = 5 + valor/32 · 90 (0 → 5 %, 16 → 50 %, 32 → 95 %):
+    // left = 5 + 25/32 · 90 = 75,3125 % · top = 100 − (5 + 28/32 · 90) = 16,25 %
+    await expect(punto(page)).toHaveAttribute('style', /left: 75\.3125%; top: 16\.25%/);
     expect(await cuadranteDelPunto(page)).toEqual(['Democrático']);
     await expect(page.locator('[class*="styleCard"]')).toContainText('Normas claras con explicaciones razonadas');
   });
@@ -114,10 +114,10 @@ test.describe('Caso 1 (normal): un perfil democrático moderado', () => {
 
 test.describe('Caso 2 (límite): los cuatro estilos se alcanzan y el umbral es estricto', () => {
   const extremos: [string, number[], string, number, number][] = [
-    ['democrático', DEMOCRATICO_MAXIMO, 'Democrático (Autoritativo)', 36, 36],
-    ['autoritario', AUTORITARIO_MAXIMO, 'Autoritario', 36, 4],
-    ['permisivo', PERMISIVO_MAXIMO, 'Permisivo (Indulgente)', 4, 36],
-    ['negligente', NEGLIGENTE_MAXIMO, 'Negligente (No implicado)', 4, 4],
+    ['democrático', DEMOCRATICO_MAXIMO, 'Democrático (Autoritativo)', 32, 32],
+    ['autoritario', AUTORITARIO_MAXIMO, 'Autoritario', 32, 0],
+    ['permisivo', PERMISIVO_MAXIMO, 'Permisivo (Indulgente)', 0, 32],
+    ['negligente', NEGLIGENTE_MAXIMO, 'Negligente (No implicado)', 0, 0],
   ];
   for (const [nombre, valores, titulo, control, afecto] of extremos) {
     test(`respuestas extremas ${nombre} → «${titulo}» con ${control} y ${afecto}`, async ({ page }) => {
@@ -129,19 +129,19 @@ test.describe('Caso 2 (límite): los cuatro estilos se alcanzan y el umbral es e
     });
   }
 
-  test('control 21 (un punto sobre el medio) con afecto 36 → democrático, no permisivo', async ({ page }) => {
+  test('control 17 (un punto sobre el medio) con afecto 32 → democrático, no permisivo', async ({ page }) => {
     await abrir(page);
-    await verResultado(page, UMBRAL_CONTROL_21);
+    await verResultado(page, UMBRAL_CONTROL_17);
     await expect(perfil(page)).toHaveText('Democrático (Autoritativo)');
-    await expect(puntuaciones(page).nth(0)).toHaveText(/^21\//);
+    await expect(puntuaciones(page).nth(0)).toHaveText(/^17\//);
   });
 
   test('extremos democrático y negligente: su punto cae en su cuadrante', async ({ page }) => {
     await abrir(page);
-    await verResultado(page, DEMOCRATICO_MAXIMO); // left 90 %, top 10 %
+    await verResultado(page, DEMOCRATICO_MAXIMO); // left 95 %, top 5 %
     expect(await cuadranteDelPunto(page)).toEqual(['Democrático']);
     await page.getByRole('button', { name: 'Repetir test' }).click();
-    await verResultado(page, NEGLIGENTE_MAXIMO); // left 10 %, top 90 %
+    await verResultado(page, NEGLIGENTE_MAXIMO); // left 5 %, top 95 %
     expect(await cuadranteDelPunto(page)).toEqual(['Negligente']);
   });
 });
@@ -175,51 +175,63 @@ test.describe('Caso 3 (rechazo): sin las 16 respuestas no hay resultado', () => 
     await expect(page.getByRole('radio', { checked: true })).toHaveCount(0);
   });
 
-  // ABIERTO: con una pregunta pendiente el botón dice «Responde las 1 preguntas restantes».
-  test.fail('con 15 respuestas el botón concuerda en singular', async ({ page }) => {
+  // HALLAZGO 4496 (REPARADO): con una pregunta pendiente el botón decía «Responde las 1 preguntas restantes».
+  test('con 15 respuestas el botón concuerda en singular', async ({ page }) => {
     await abrir(page);
     await responder(page, DEMOCRATICO_MODERADO, 15);
-    await expect(botonVer(page)).not.toHaveText(/las 1 preguntas/);
+    await expect(botonVer(page)).toHaveText('Responde la pregunta que falta');
+    await responder(page, DEMOCRATICO_MODERADO, 14);
+    await expect(botonVer(page)).toHaveText('Responde la pregunta que falta');
   });
 });
 
-test.describe('Hallazgos abiertos del cálculo', () => {
-  // ABIERTO: los rótulos Autoritario y Permisivo están intercambiados. El punto se coloca con
-  // left = control (derecha = alto control, como dice el eje «Bajo control … Alto control») y
-  // top invertido sobre el afecto (arriba = alto afecto), pero el cuadrante de arriba a la
-  // izquierda (bajo control, alto afecto) dice «Autoritario» y el de abajo a la derecha (alto
-  // control, bajo afecto) dice «Permisivo». Medido el 11/11/2026: el autoritario extremo cae en
-  // «Permisivo» y el permisivo extremo en «Autoritario».
-  test.fail('el punto de un resultado autoritario cae en el cuadrante «Autoritario»', async ({ page }) => {
+test.describe('Cálculo: cuadrante, punto medio y escala (reparados el 11/11/2026)', () => {
+  // HALLAZGO 4490 (REPARADO): los rótulos Autoritario y Permisivo estaban intercambiados. El punto
+  // se coloca con left = control (derecha = alto control, como dice el eje «Bajo control … Alto
+  // control») y top invertido sobre el afecto (arriba = alto afecto); el cuadrante de arriba a la
+  // izquierda (bajo control, alto afecto) decía «Autoritario» y el de abajo a la derecha (alto
+  // control, bajo afecto), «Permisivo». El eje vertical, además, no tenía rótulo.
+  test('el punto de un resultado autoritario cae en el cuadrante «Autoritario»', async ({ page }) => {
     await abrir(page);
     await verResultado(page, AUTORITARIO_MAXIMO);
     await expect(perfil(page)).toHaveText('Autoritario');
     expect(await cuadranteDelPunto(page)).toEqual(['Autoritario']);
+    await expect(page.getByText('Alto afecto', { exact: true })).toBeVisible();
+    await expect(page.getByText('Bajo afecto', { exact: true })).toBeVisible();
   });
 
-  test.fail('el punto de un resultado permisivo cae en el cuadrante «Permisivo»', async ({ page }) => {
+  test('el punto de un resultado permisivo cae en el cuadrante «Permisivo»', async ({ page }) => {
     await abrir(page);
     await verResultado(page, PERMISIVO_MAXIMO);
     await expect(perfil(page)).toHaveText('Permisivo (Indulgente)');
     expect(await cuadranteDelPunto(page)).toEqual(['Permisivo']);
   });
 
-  // ABIERTO: el punto medio (20) cuenta como «bajo» en las dos dimensiones. Contestar lo mismo a
-  // las 16 preguntas (todo Neutral, todo «Muy de acuerdo» o todo «Muy en desacuerdo») da 20 y 20,
-  // el punto en el centro exacto del cuadrante, y la app dice «Negligente (No implicado)»: «El
-  // progenitor está ausente física o emocionalmente» y la recomendación de servicios sociales.
-  test.fail('contestar lo mismo a todo (20 y 20, el centro) no da «Negligente»', async ({ page }) => {
+  // HALLAZGO 4491 (REPARADO): el punto medio contaba como «bajo» en las dos dimensiones. Contestar
+  // lo mismo a las 16 preguntas (todo Neutral, todo «Muy de acuerdo» o todo «Muy en desacuerdo»)
+  // deja el punto en el centro exacto del cuadrante, y la app decía «Negligente (No implicado)»:
+  // «El progenitor está ausente física o emocionalmente» y la recomendación de servicios sociales.
+  test('contestar lo mismo a todo (16 y 16, el centro) da «Sin tendencia predominante», no «Negligente»', async ({ page }) => {
     for (const v of [3, 5, 1]) {
       await abrir(page);
       await verResultado(page, Array(16).fill(v));
       await expect(punto(page)).toHaveAttribute('style', /left: 50%; top: 50%/);
-      await expect(perfil(page)).not.toHaveText(/Negligente/);
+      await expect(perfil(page)).toHaveText('Sin tendencia predominante');
+      await expect(page.locator('[class*="styleCard"]')).toContainText('Tu puntuación de control y de afecto está justo en el punto medio de la escala (16 de 32)');
+      await expect(page.getByText('servicios sociales')).toHaveCount(0);
     }
   });
 
-  // ABIERTO: cada dimensión va de 4 a 36, pero se muestra «sobre 40»: el máximo posible sale
-  // «36/40» y el mínimo «4/40» (también en el aria-label del punto, «Control 36 de 40»).
-  test.fail('las respuestas de máximo control y afecto muestran el máximo de la escala', async ({ page }) => {
+  test('con el punto medio solo en el afecto, el resultado queda entre los dos estilos que separa', async ({ page }) => {
+    await abrir(page);
+    await verResultado(page, TRABAJA_Y_DELEGA); // control 24 (alto), afecto 16 (medio)
+    await expect(perfil(page)).toHaveText('Entre Democrático y Autoritario');
+    await expect(page.locator('[class*="styleCard"]')).toContainText('Tu puntuación de afecto está justo en el punto medio');
+  });
+
+  // HALLAZGO 4492 (REPARADO): cada dimensión iba de 4 a 36, pero se mostraba «sobre 40»: el máximo
+  // posible salía «36/40» y el mínimo «4/40» (también en el aria-label del punto). Hoy va de 0 a 32.
+  test('las respuestas de máximo control y afecto muestran el máximo de la escala, y las de mínimo, 0', async ({ page }) => {
     await abrir(page);
     await verResultado(page, DEMOCRATICO_MAXIMO);
     for (const i of [0, 1]) {
@@ -227,20 +239,27 @@ test.describe('Hallazgos abiertos del cálculo', () => {
       const [num, den] = texto.split('/').map((p) => Number(p.trim()));
       expect(num, texto).toBe(den);
     }
+    await expect(punto(page)).toHaveAttribute('aria-label', 'Tu posición: Control 32 de 32, Afecto 32 de 32');
+    await expect(punto(page)).toHaveAttribute('style', /left: 95%; top: 5%/);
+    await page.getByRole('button', { name: 'Repetir test' }).click();
+    await verResultado(page, NEGLIGENTE_MAXIMO);
+    await expect(puntuaciones(page).nth(0)).toHaveText('0/32');
+    await expect(puntuaciones(page).nth(1)).toHaveText('0/32');
   });
 });
 
 test.describe('Hallazgo abierto de contenido: los ítems 13 y 15 miden disponibilidad, no afecto', () => {
-  // ABIERTO: quien está «De acuerdo» con los cuatro ítems de afecto positivo pero trabaja muchas
-  // horas y delega parte del cuidado (13 y 15 «Muy de acuerdo») queda en afecto 20 = bajo, y con
-  // control 28 la app le da «Autoritario» («Escasa demostración de afecto», «Poca expresión
-  // emocional»). CLAUDE.md §1.quinquies 2 y 4: asunción de privilegio y moralizar una elección
+  // ABIERTO (4493, espera la decisión del usuario: cambiar ítems del test es cambiar lo que mide):
+  // quien está «De acuerdo» con los cuatro ítems de afecto positivo pero trabaja muchas horas y
+  // delega parte del cuidado (13 y 15 «Muy de acuerdo») no llega a afecto alto: hasta el 11/11/2026
+  // le daba «Autoritario»; desde la reparación del punto medio (4491), «Entre Democrático y
+  // Autoritario». CLAUDE.md §1.quinquies 2 y 4: asunción de privilegio y moralizar una elección
   // legítima (delegar el cuidado en abuelos o en una escuela infantil).
-  test.fail('afecto positivo «De acuerdo» en 9-12 no queda en bajo afecto por trabajar y delegar', async ({ page }) => {
+  test.fail('afecto positivo «De acuerdo» en 9-12 queda en afecto alto aunque trabaje y delegue', async ({ page }) => {
     await abrir(page);
     await verResultado(page, TRABAJA_Y_DELEGA);
-    await expect(puntuaciones(page).nth(0)).toHaveText(/^28\//);
-    await expect(perfil(page)).not.toHaveText('Autoritario');
+    await expect(puntuaciones(page).nth(0)).toHaveText(/^24\//);
+    await expect(perfil(page)).toHaveText('Democrático (Autoritativo)', { timeout: 2000 });
   });
 });
 
@@ -260,29 +279,32 @@ test.describe('Accesibilidad', () => {
     await expect(page.locator('h1 span[aria-hidden="true"]')).toHaveCount(1);
   });
 
-  // ABIERTO: cada radiogroup se llama «Pregunta N»; el enunciado no forma parte de su nombre, y
-  // quien llega con Tab oye «Pregunta 2, Muy en desacuerdo» sin la afirmación que valora.
-  test.fail('el grupo de opciones se anuncia con el enunciado de la pregunta', async ({ page }) => {
+  // HALLAZGO 4497 (REPARADO): cada radiogroup se llamaba «Pregunta N»; el enunciado no formaba
+  // parte de su nombre, y quien llegaba con Tab oía «Pregunta 2, Muy en desacuerdo» sin la afirmación.
+  test('el grupo de opciones se anuncia con el enunciado de la pregunta', async ({ page }) => {
     await abrir(page);
     await expect(
-      page.getByRole('radiogroup', { name: /Establezco horarios fijos para comer, dormir y hacer deberes/ }),
+      page.getByRole('radiogroup', { name: 'Pregunta 2 de 16 Establezco horarios fijos para comer, dormir y hacer deberes' }),
     ).toHaveCount(1);
   });
 
-  // ABIERTO: el botón pulsado desaparece al pintar el resultado y el foco cae a <body>.
-  test.fail('tras «Ver mi resultado» con teclado el foco no queda en <body>', async ({ page }) => {
+  // HALLAZGO 4498 (REPARADO): el botón pulsado desaparecía al pintar el resultado y el foco caía a
+  // <body>; con «Repetir test», igual. Hoy va al encabezado del resultado y a la entradilla del test.
+  test('tras «Ver mi resultado» con teclado el foco va al encabezado del resultado', async ({ page }) => {
     await abrir(page);
     await responder(page, DEMOCRATICO_MODERADO);
     await botonVer(page).focus();
     await page.keyboard.press('Enter');
     await expect(perfil(page)).toBeVisible();
-    const enBody = await page.evaluate(() => document.activeElement === document.body);
-    expect(enBody).toBe(false);
+    await expect(page.getByRole('heading', { name: 'Tu tendencia predominante' })).toBeFocused();
+    await page.getByRole('button', { name: 'Repetir test' }).focus();
+    await page.keyboard.press('Enter');
+    await expect(page.getByText('No hay respuestas correctas ni incorrectas.')).toBeFocused();
   });
 
-  // ABIERTO: el emoji grande del resultado (🤝, 👊…) va en su propio <div> sin aria-hidden, junto
-  // al encabezado «Tu tendencia predominante»: un lector de pantalla lo lee antes.
-  test.fail('el emoji del encabezado del resultado va oculto al lector de pantalla', async ({ page }) => {
+  // HALLAZGO 4499 (REPARADO): el emoji grande del resultado (🤝, 👊…) iba en su propio <div> sin
+  // aria-hidden, junto al encabezado «Tu tendencia predominante»: un lector de pantalla lo leía antes.
+  test('el emoji del encabezado del resultado va oculto al lector de pantalla', async ({ page }) => {
     await abrir(page);
     await verResultado(page, DEMOCRATICO_MODERADO);
     const oculto = await page
@@ -292,10 +314,10 @@ test.describe('Accesibilidad', () => {
   });
 
   for (const tema of ['light', 'dark'] as const) {
-    // ABIERTO: los rótulos del cuadrante (12 px, peso 600: texto normal, exige 4,5:1). Medido el
-    // 11/11/2026: claro, Negligente 4,28:1 · oscuro, Autoritario 4,21, Negligente 3,95 y
-    // Permisivo 4,40.
-    test.fail(`tema ${tema}: los cuatro rótulos del cuadrante cumplen 4,5:1`, async ({ page }) => {
+    // HALLAZGO 4500 (REPARADO): los rótulos del cuadrante (12 px, peso 600: texto normal, exige
+    // 4,5:1). Medido el 11/11/2026: claro, Negligente 4,28:1 · oscuro, Autoritario 4,21,
+    // Negligente 3,95 y Permisivo 4,40.
+    test(`tema ${tema}: los cuatro rótulos del cuadrante cumplen 4,5:1`, async ({ page }) => {
       await page.addInitScript((t) => window.localStorage.setItem('meskeia-theme', t), tema);
       await abrir(page);
       await expect(page.locator('html')).toHaveAttribute('data-theme', tema);
@@ -330,11 +352,10 @@ test.describe('Móvil 360 px con toque', () => {
     await expect(perfil(page)).toHaveText('Democrático (Autoritativo)');
   });
 
-  // ABIERTO: «Ver mi resultado» hace scrollTo(0) y deja arriba el hero, el distintivo y el aviso
-  // legal: medido el 11/11/2026, el nombre del estilo queda entre 694 y 761 px de una pantalla de
-  // 740 (cortado) y el cuadrante y las puntuaciones, fuera. El desplazamiento es suave y en su
-  // camino hacia arriba pasa por el resultado: se mide cuando PARA, no mientras pasa.
-  test.fail('tras «Ver mi resultado» el nombre del estilo queda entero a la vista', async ({ page }) => {
+  // HALLAZGO 4501 (REPARADO): «Ver mi resultado» hacía scrollTo(0) y dejaba arriba el hero, el
+  // distintivo y el aviso legal: medido el 11/11/2026, el nombre del estilo quedaba entre 694 y
+  // 761 px de una pantalla de 740 (cortado). Se mide cuando el desplazamiento PARA.
+  test('tras «Ver mi resultado» el nombre del estilo queda entero a la vista', async ({ page }) => {
     await abrir(page);
     const tarjetas = page.locator('[class*="questionCard"]');
     for (let i = 0; i < 16; i++) {
@@ -360,12 +381,12 @@ test.describe('Móvil 360 px con toque', () => {
   });
 });
 
-test.describe('Hallazgos abiertos de contenido editorial', () => {
-  // ABIERTO: afirmaciones concluyentes sin fuente sobre un marco discutido (§1.quinquies 3 y 5),
-  // en la misma página que reconoce que el modelo «se desarrolló en un contexto occidental». El
-  // FAQPage dice lo mismo con cautela («sugiere», «ningún estilo funciona igual en todos los
-  // contextos»).
-  test.fail('la guía no da por «confirmado» ni «determinante» lo que la investigación discute', async ({ page }) => {
+test.describe('Contenido editorial (reparado el 11/11/2026)', () => {
+  // HALLAZGO 4494 (REPARADO): afirmaciones concluyentes sin fuente sobre un marco discutido
+  // (§1.quinquies 3 y 5), en la misma página que reconoce que el modelo «se desarrolló en un
+  // contexto occidental». Hoy dicen lo mismo que el FAQPage, con cautela («sugieren», «ningún estilo
+  // funciona igual»), y la recomendación del democrático ya no dice «por la evidencia».
+  test('la guía no da por «confirmado» ni «determinante» lo que la investigación discute', async ({ page }) => {
     await abrir(page);
     await page.getByRole('button', { name: 'Ver guía educativa' }).click();
     const cultura = page.locator('details', { hasText: '¿La cultura influye en el estilo parental?' });
@@ -374,14 +395,20 @@ test.describe('Hallazgos abiertos de contenido editorial', () => {
     await expect(genetica).toHaveCount(1);
     await expect(cultura).not.toContainText('la investigación intercultural confirma');
     await expect(genetica).not.toContainText('el ambiente familiar es determinante');
+    await expect(cultura).toContainText('ningún estilo funciona igual en todas las culturas');
+    await expect(page.locator('li', { hasText: 'Ser estricto es mejor que ser blando' })).not.toContainText('La evidencia muestra');
+    await abrir(page);
+    await verResultado(page, DEMOCRATICO_MODERADO);
+    await expect(page.locator('[class*="recommendationBox"]')).not.toContainText('por la evidencia');
   });
 
-  // ABIERTO: el distintivo «es-data» dice que los datos de referencia son de España, pero la app
-  // no tiene ningún dato español: el marco (Baumrind, Maccoby y Martin) y la evidencia que cita
-  // salen de muestras de EE. UU.
-  test.fail('el distintivo de región no atribuye a España datos que la app no tiene', async ({ page }) => {
+  // HALLAZGO 4495 (REPARADO): el distintivo «es-data» decía que los datos de referencia eran de
+  // España, pero la app no tiene ningún dato español: el marco (Baumrind, Maccoby y Martin) y la
+  // evidencia que cita salen de muestras de EE. UU. Hoy lleva la variante «global».
+  test('el distintivo de región no atribuye a España datos que la app no tiene', async ({ page }) => {
     await abrir(page);
     await expect(page.getByText('Datos de referencia: España')).toHaveCount(0);
+    await expect(page.getByText('Herramienta universal')).toBeVisible();
   });
 });
 

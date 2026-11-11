@@ -1,7 +1,7 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import styles from './TestEstiloParental.module.css';
 import {
   MeskeiaLogo,
@@ -11,7 +11,8 @@ import {
   LegalNotice,
   ShareCard, RegionBadge
 } from '@/components';
-import { ESTILOS_PARENTALES } from '@/data/fiscal';
+import { enfocarALaVista } from '@/lib';
+import { ESTILOS_PARENTALES } from '@/data/estilos-parentales';
 
 // ─── Tipos ─────────────────────────────────────────────────────────────────────
 
@@ -56,34 +57,85 @@ const OPCIONES_LIKERT = [
 
 // ─── Funciones de cálculo ──────────────────────────────────────────────────────
 
+/**
+ * Cada dimensión es la suma de sus cuatro ítems positivos menos la de los cuatro negativos (las dos
+ * van de 4 a 20) más 16: de 0 a 32, con el punto medio en 16. Hasta el 11/11/2026 se sumaba 20 y
+ * se mostraba «sobre 40», aunque la escala iba de 4 a 36 (hallazgo 4492).
+ */
+const ESCALA = 32;
+const MEDIO = 16;
+
 function calcularPuntuaciones(respuestas: Record<number, number>): { control: number; afecto: number } {
-  // Suma de preguntas positivas (Q1-4) - Suma de negativas (Q5-8) + 20
   const controlPositivo = (respuestas[1] ?? 0) + (respuestas[2] ?? 0) + (respuestas[3] ?? 0) + (respuestas[4] ?? 0);
   const controlNegativo = (respuestas[5] ?? 0) + (respuestas[6] ?? 0) + (respuestas[7] ?? 0) + (respuestas[8] ?? 0);
-  const control = controlPositivo - controlNegativo + 20;
+  const control = controlPositivo - controlNegativo + MEDIO;
 
   const afectoPositivo = (respuestas[9] ?? 0) + (respuestas[10] ?? 0) + (respuestas[11] ?? 0) + (respuestas[12] ?? 0);
   const afectoNegativo = (respuestas[13] ?? 0) + (respuestas[14] ?? 0) + (respuestas[15] ?? 0) + (respuestas[16] ?? 0);
-  const afecto = afectoPositivo - afectoNegativo + 20;
+  const afecto = afectoPositivo - afectoNegativo + MEDIO;
 
   return { control, afecto };
 }
 
-function obtenerEstilo(control: number, afecto: number): string {
-  if (control > 20 && afecto > 20) return 'democratico';
-  if (control > 20 && afecto <= 20) return 'autoritario';
-  if (control <= 20 && afecto > 20) return 'permisivo';
-  return 'negligente';
+type Nivel = 'alto' | 'bajo';
+
+/**
+ * El punto medio exacto no es ni alto ni bajo: no se asigna. Hasta el 11/11/2026 contaba como
+ * «bajo», y contestar lo mismo a las 16 preguntas daba «Negligente», con su recomendación de acudir
+ * a servicios sociales (hallazgo 4491).
+ */
+function nivelDe(valor: number): Nivel | null {
+  if (valor > MEDIO) return 'alto';
+  if (valor < MEDIO) return 'bajo';
+  return null;
 }
+
+function estiloDe(control: Nivel, afecto: Nivel): string {
+  if (control === 'alto') return afecto === 'alto' ? 'democratico' : 'autoritario';
+  return afecto === 'alto' ? 'permisivo' : 'negligente';
+}
+
+/** Los estilos posibles: uno solo, o los dos (o cuatro) entre los que queda un punto medio. */
+function estilosPosibles(control: number, afecto: number): string[] {
+  const nc = nivelDe(control);
+  const na = nivelDe(afecto);
+  const niveles: Nivel[] = ['alto', 'bajo'];
+  const controles = nc ? [nc] : niveles;
+  const afectos = na ? [na] : niveles;
+  return controles.flatMap((c) => afectos.map((a) => estiloDe(c, a)));
+}
+
+const NOMBRE_CORTO: Record<string, string> = {
+  democratico: 'Democrático',
+  autoritario: 'Autoritario',
+  permisivo: 'Permisivo',
+  negligente: 'Negligente',
+};
 
 // ─── Componente principal ──────────────────────────────────────────────────────
 
 export default function TestEstiloParentalPage(): React.JSX.Element {
   const [respuestas, setRespuestas] = useState<Record<number, number>>({});
   const [mostrarResultado, setMostrarResultado] = useState(false);
+  // Adónde va el foco tras «Ver mi resultado» o «Repetir test»: el botón pulsado se desmonta, y sin
+  // esto el foco caía a <body> y la vista volvía al principio de la página (hallazgos 4498 y 4501).
+  const [destinoFoco, setDestinoFoco] = useState<{ a: 'resultado' | 'test'; n: number } | null>(null);
+  const resultadoRef = useRef<HTMLHeadingElement>(null);
+  const introRef = useRef<HTMLParagraphElement>(null);
+
+  useEffect(() => {
+    if (!destinoFoco) return;
+    enfocarALaVista(destinoFoco.a === 'resultado' ? resultadoRef.current : introRef.current);
+  }, [destinoFoco]);
 
   const totalRespondidas = Object.keys(respuestas).length;
   const todasRespondidas = totalRespondidas === 16;
+  const faltan = 16 - totalRespondidas;
+  const textoBoton = todasRespondidas
+    ? 'Ver mi resultado'
+    : faltan === 1
+      ? 'Responde la pregunta que falta'
+      : `Responde las ${faltan} preguntas restantes`;
 
   const handleRespuesta = (preguntaId: number, valor: number) => {
     setRespuestas((prev) => ({ ...prev, [preguntaId]: valor }));
@@ -92,24 +144,36 @@ export default function TestEstiloParentalPage(): React.JSX.Element {
   const handleVerResultado = () => {
     if (todasRespondidas) {
       setMostrarResultado(true);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+      setDestinoFoco((previo) => ({ a: 'resultado', n: (previo?.n ?? 0) + 1 }));
     }
   };
 
   const handleRepetir = () => {
     setRespuestas({});
     setMostrarResultado(false);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setDestinoFoco((previo) => ({ a: 'test', n: (previo?.n ?? 0) + 1 }));
   };
 
   // Calcular puntuaciones
   const { control, afecto } = calcularPuntuaciones(respuestas);
-  const estiloId = obtenerEstilo(control, afecto);
-  const estiloData = ESTILOS_PARENTALES.find((e) => e.id === estiloId);
+  const posibles = estilosPosibles(control, afecto);
+  const estiloData = posibles.length === 1 ? ESTILOS_PARENTALES.find((e) => e.id === posibles[0]) : undefined;
+  const nombrePerfil = estiloData
+    ? estiloData.nombre
+    : posibles.length === 4
+      ? 'Sin tendencia predominante'
+      : `Entre ${NOMBRE_CORTO[posibles[0]]} y ${NOMBRE_CORTO[posibles[1]]}`;
+  const dimensionesEnMedio = [
+    control === MEDIO ? 'control' : null,
+    afecto === MEDIO ? 'afecto' : null,
+  ].filter((d): d is string => d !== null);
 
-  // Posición del punto en el cuadrante (0-100%)
-  const dotX = Math.min(100, Math.max(0, (control / 40) * 100));
-  const dotY = Math.min(100, Math.max(0, 100 - (afecto / 40) * 100)); // invertido: Y alto = arriba
+  // Posición del punto en el cuadrante, en la misma escala de 0 a 32 que las cifras: 0 → 5 %,
+  // 16 → 50 % (el centro), 32 → 95 %. El margen del 5 % deja un extremo dentro de su cuadrante,
+  // en vez de partido por la esquina (el contenedor recorta lo que sale).
+  const posicion = (valor: number) => 5 + (Math.min(ESCALA, Math.max(0, valor)) / ESCALA) * 90;
+  const dotX = posicion(control);
+  const dotY = 100 - posicion(afecto); // invertido: Y alto = arriba
 
   return (
     <div className={styles.container}>
@@ -124,46 +188,49 @@ export default function TestEstiloParentalPage(): React.JSX.Element {
           </p>
         </header>
 
-      <RegionBadge variant="es-data" />
+      {/* «global», no «es-data»: la app no usa ningún dato de España (hallazgo 4495). */}
+      <RegionBadge variant="global" />
 
 
         <LegalNotice />
 
 
         {/* ─── RESULTADO ─── */}
-        {mostrarResultado && estiloData && (
+        {mostrarResultado && (
           <div className={styles.resultScreen}>
             <div className={styles.resultHeader}>
-              <div className={styles.resultIcon}>{estiloData.icono}</div>
-              <h2 className={styles.resultTitle}>Tu tendencia predominante</h2>
-              <p className={styles.resultProfile}>{estiloData.nombre}</p>
+              <div className={styles.resultIcon} aria-hidden="true">{estiloData ? estiloData.icono : '⚖️'}</div>
+              <h2 className={styles.resultTitle} ref={resultadoRef} tabIndex={-1}>Tu tendencia predominante</h2>
+              <p className={styles.resultProfile}>{nombrePerfil}</p>
             </div>
 
-            {/* Cuadrante 2D */}
+            {/* Cuadrante 2D: derecha = más control, arriba = más afecto. Hasta el 11/11/2026 los
+                rótulos Autoritario y Permisivo estaban intercambiados (hallazgo 4490). */}
             <div className={styles.quadrantWrapper}>
+              <div className={styles.axisLabelY}>Alto afecto</div>
               <div className={styles.quadrantContainer}>
-                <div className={`${styles.quadrant} ${styles.quadrantTopLeft}`}>
+                <div className={`${styles.quadrant} ${styles.quadrantPermisivo}`}>
                   <div>
-                    <span className={styles.quadrantLabel} aria-hidden="true">👊</span>
-                    <span className={styles.quadrantName}>Autoritario</span>
+                    <span className={styles.quadrantLabel} aria-hidden="true">🫶</span>
+                    <span className={styles.quadrantName}>Permisivo</span>
                   </div>
                 </div>
-                <div className={`${styles.quadrant} ${styles.quadrantTopRight}`}>
+                <div className={`${styles.quadrant} ${styles.quadrantDemocratico}`}>
                   <div>
                     <span className={styles.quadrantLabel} aria-hidden="true">🤝</span>
                     <span className={styles.quadrantName}>Democrático</span>
                   </div>
                 </div>
-                <div className={`${styles.quadrant} ${styles.quadrantBottomLeft}`}>
+                <div className={`${styles.quadrant} ${styles.quadrantNegligente}`}>
                   <div>
                     <span className={styles.quadrantLabel} aria-hidden="true">😶</span>
                     <span className={styles.quadrantName}>Negligente</span>
                   </div>
                 </div>
-                <div className={`${styles.quadrant} ${styles.quadrantBottomRight}`}>
+                <div className={`${styles.quadrant} ${styles.quadrantAutoritario}`}>
                   <div>
-                    <span className={styles.quadrantLabel} aria-hidden="true">🫶</span>
-                    <span className={styles.quadrantName}>Permisivo</span>
+                    <span className={styles.quadrantLabel} aria-hidden="true">👊</span>
+                    <span className={styles.quadrantName}>Autoritario</span>
                   </div>
                 </div>
 
@@ -174,9 +241,10 @@ export default function TestEstiloParentalPage(): React.JSX.Element {
                   className={styles.userDot}
                   style={{ left: `${dotX}%`, top: `${dotY}%` }}
                   role="img"
-                  aria-label={`Tu posición: Control ${control} de 40, Afecto ${afecto} de 40`}
+                  aria-label={`Tu posición: Control ${control} de ${ESCALA}, Afecto ${afecto} de ${ESCALA}`}
                 />
               </div>
+              <div className={styles.axisLabelY}>Bajo afecto</div>
               <div className={styles.axisLabelX}>
                 <span>Bajo control</span>
                 <span>Alto control</span>
@@ -187,15 +255,27 @@ export default function TestEstiloParentalPage(): React.JSX.Element {
             <div className={styles.scoresRow}>
               <div className={styles.scoreItem}>
                 <span className={styles.scoreLabel}>Control / Exigencia</span>
-                <span className={styles.scoreValue}>{control}/40</span>
+                <span className={styles.scoreValue}>{control}/{ESCALA}</span>
               </div>
               <div className={styles.scoreItem}>
                 <span className={styles.scoreLabel}>Afecto / Responsividad</span>
-                <span className={styles.scoreValue}>{afecto}/40</span>
+                <span className={styles.scoreValue}>{afecto}/{ESCALA}</span>
               </div>
             </div>
 
+            {!estiloData && (
+              <div className={styles.styleCard}>
+                <p>
+                  Tu puntuación de {dimensionesEnMedio.join(' y de ')} está justo en el punto medio de la
+                  escala ({MEDIO} de {ESCALA}): el test no puede decir si tiende a alta o a baja, así que no
+                  te asigna un estilo. Puede que combines rasgos de varios estilos, o que tus respuestas
+                  dependan mucho de la situación.
+                </p>
+              </div>
+            )}
+
             {/* Tarjeta del estilo */}
+            {estiloData && (
             <div className={styles.styleCard}>
               <h3><span aria-hidden="true">{estiloData.icono}</span> {estiloData.nombre}</h3>
               <p>{estiloData.descripcion}</p>
@@ -217,6 +297,7 @@ export default function TestEstiloParentalPage(): React.JSX.Element {
                 <p>{estiloData.recomendacion}</p>
               </div>
             </div>
+            )}
 
             <div className={styles.noteBox}>
               La mayoría de padres y madres combinan elementos de varios estilos.
@@ -236,7 +317,7 @@ export default function TestEstiloParentalPage(): React.JSX.Element {
         {/* ─── TEST ─── */}
         {!mostrarResultado && (
           <>
-            <p className={styles.introText}>
+            <p className={styles.introText} ref={introRef} tabIndex={-1}>
               No hay respuestas correctas ni incorrectas. Responde según lo que realmente haces,
               no lo que crees que deberías hacer.
             </p>
@@ -253,11 +334,17 @@ export default function TestEstiloParentalPage(): React.JSX.Element {
             {/* Preguntas */}
             {PREGUNTAS.map((pregunta) => (
               <div key={pregunta.id} className={styles.questionCard}>
-                <span className={styles.questionNumber}>
+                <span className={styles.questionNumber} id={`pregunta-${pregunta.id}-numero`}>
                   Pregunta {pregunta.id} de 16
                 </span>
-                <p className={styles.questionText}>{pregunta.texto}</p>
-                <div className={styles.likertScale} role="radiogroup" aria-label={`Pregunta ${pregunta.id}`}>
+                <p className={styles.questionText} id={`pregunta-${pregunta.id}-texto`}>{pregunta.texto}</p>
+                {/* El grupo se nombra con el número y el enunciado: con solo «Pregunta N», quien llegaba
+                    con Tab no oía la afirmación que valora (hallazgo 4497). */}
+                <div
+                  className={styles.likertScale}
+                  role="radiogroup"
+                  aria-labelledby={`pregunta-${pregunta.id}-numero pregunta-${pregunta.id}-texto`}
+                >
                   {OPCIONES_LIKERT.map((opcion) => (
                     <button
                       type="button"
@@ -281,9 +368,8 @@ export default function TestEstiloParentalPage(): React.JSX.Element {
               className={styles.btnPrimary}
               onClick={handleVerResultado}
               disabled={!todasRespondidas}
-              aria-label={todasRespondidas ? 'Ver mi resultado' : `Responde las ${16 - totalRespondidas} preguntas restantes`}
             >
-              {todasRespondidas ? 'Ver mi resultado' : `Responde las ${16 - totalRespondidas} preguntas restantes`}
+              {textoBoton}
             </button>
           </>
         )}
@@ -470,10 +556,11 @@ export default function TestEstiloParentalPage(): React.JSX.Element {
               <details className={styles.faqItem}>
                 <summary>¿La cultura influye en el estilo parental?</summary>
                 <p>
-                  Sí, significativamente. Lo que se considera "autoritario" en Escandinavia puede ser la norma
-                  en otras culturas. El modelo de Baumrind se desarrolló en un contexto occidental. Sin embargo,
-                  la investigación intercultural confirma que la combinación de afecto + estructura (estilo
-                  democrático) tiende a producir buenos resultados en la mayoría de contextos culturales.
+                  Sí. Lo que se considera "autoritario" en Escandinavia puede ser la norma en otras culturas.
+                  El modelo de Baumrind se formuló y se estudió sobre todo con familias de EE. UU. Varios
+                  estudios en otros países sugieren que la combinación de afecto y estructura (estilo
+                  democrático) se asocia a buenos resultados en muchos contextos, pero ningún estilo funciona
+                  igual en todas las culturas ni en todas las familias.
                 </p>
               </details>
               <details className={styles.faqItem}>
@@ -569,9 +656,9 @@ export default function TestEstiloParentalPage(): React.JSX.Element {
             </div>
             <ul className={styles.warningList}>
               <li>
-                <strong>"Ser estricto es mejor que ser blando".</strong> La evidencia muestra que la
-                combinación de firmeza + afecto (estilo democrático) supera tanto a la rigidez pura
-                como a la permisividad. No se trata de elegir entre ser duro o blando, sino de
+                <strong>"Ser estricto es mejor que ser blando".</strong> Buena parte de la investigación
+                sobre este modelo asocia la combinación de firmeza y afecto (estilo democrático) a
+                mejores resultados que la rigidez pura o la permisividad. No se trata de elegir entre ser duro o blando, sino de
                 encontrar el equilibrio.
               </li>
               <li>
@@ -591,8 +678,8 @@ export default function TestEstiloParentalPage(): React.JSX.Element {
               </li>
               <li>
                 <strong>"El estilo parental no importa, es genética".</strong> La genética influye
-                en el temperamento, pero el ambiente familiar es determinante en habilidades
-                sociales, regulación emocional y rendimiento académico. Ambos factores interactúan.
+                en el temperamento, y el ambiente familiar también influye en las habilidades
+                sociales, la regulación emocional y el rendimiento académico. Ambos factores interactúan.
               </li>
             </ul>
           </div>
