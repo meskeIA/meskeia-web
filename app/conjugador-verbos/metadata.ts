@@ -41,9 +41,9 @@ export const jsonLd = generateWebAppSchema({
     'Tiempos compuestos completos, con el participio irregular de cada verbo (he dicho, hubiera vuelto)',
     'Futuro de subjuntivo, simple y compuesto (fuere, hubiere cantado), marcado como arcaico',
     'Pretérito anterior con su nota de uso: cuándo aparece y por qué casi no se ve',
-    'Más de 70 verbos irregulares con conjugación verificada, y conjugación automática de los regulares',
-    'Buscador con sugerencias a partir de dos letras',
-    'Gerundio y participio de cada verbo',
+    'Más de 60 verbos irregulares de tabla y sus derivados por prefijo (mantener, suponer, prever)',
+    'Grupos de irregularidad por regla: diptongación (vuelo), cierre vocálico (pidió), -zc- (agradezco) y -uy- (construyo)',
+    'Regulares con sus cambios ortográficos (busqué, cojo, envío), y la nota del modelo con que se conjuga cada verbo',
     'Funciona 100% en el navegador, sin registro ni instalación',
   ],
 });
@@ -70,12 +70,12 @@ export const faqJsonLd = {
     {
       '@type': 'Question',
       name: '¿Cómo se conjuga el subjuntivo y cuándo se usa?',
-      acceptedAnswer: { '@type': 'Answer', text: 'El subjuntivo se forma generalmente con la raíz del presente de indicativo y desinencias específicas (-e/-a para la primera conjugación y -a/-e para la segunda y tercera). Se usa para expresar deseos, dudas, posibilidades, emociones y mandatos negativos: "Espero que vengas", "No creo que llueva", "Quiero que estudies". El presente de subjuntivo (hable, coma, viva) y el pretérito imperfecto de subjuntivo (hablara/hablase) son los tiempos más empleados.' },
+      acceptedAnswer: { '@type': 'Answer', text: 'El presente de subjuntivo se forma con la raíz de la primera persona del presente de indicativo (hablo → hable, tengo → tenga) y cambia la vocal de la desinencia: -e en la primera conjugación (hable, hables) y -a en la segunda y la tercera (coma, viva). Se usa para expresar deseos, dudas, posibilidades, emociones y mandatos negativos: "Espero que vengas", "No creo que llueva", "Quiero que estudies". El presente de subjuntivo y el pretérito imperfecto de subjuntivo, que tiene dos formas equivalentes en -ra y en -se (hablara o hablase; este conjugador muestra la forma en -ra), son los tiempos más empleados.' },
     },
     {
       '@type': 'Question',
       name: '¿Para qué sirve un conjugador de verbos en línea?',
-      acceptedAnswer: { '@type': 'Answer', text: 'Un conjugador de verbos en línea permite obtener de forma inmediata todas las formas conjugadas de cualquier verbo en español: regulares, irregulares, reflexivos y defectivos. Es útil para estudiantes de español como segunda lengua, para hablantes nativos que dudan de formas poco frecuentes (futuro de subjuntivo, pretérito anterior), y para escritores o traductores que necesitan confirmar la conjugación correcta sin consultar gramáticas extensas.' },
+      acceptedAnswer: { '@type': 'Answer', text: 'Un conjugador de verbos en línea permite obtener de forma inmediata las formas conjugadas de un verbo en español: los irregulares de uso común, sus derivados y los regulares, con sus cambios ortográficos. Los pronominales (levantarse) se conjugan como su verbo base, con el pronombre delante (me levanto). Es útil para estudiantes de español como segunda lengua, para hablantes nativos que dudan de formas poco frecuentes (futuro de subjuntivo, pretérito anterior), y para escritores o traductores que necesitan confirmar la conjugación correcta sin consultar gramáticas extensas.' },
     },
   ],
 };

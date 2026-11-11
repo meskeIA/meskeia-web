@@ -163,8 +163,14 @@
   transition: background 0.2s;
 }
 
-.sugerenciaItem:hover {
+.sugerenciaItem:hover,
+.sugerenciaActiva {
   background: var(--hover);
+}
+
+.sugerenciaActiva {
+  outline: 2px solid var(--primary);
+  outline-offset: -2px;
 }
 
 .badgeIrregular {
@@ -185,6 +191,11 @@
   color: #dc2626;
   text-align: center;
   margin-bottom: var(--spacing-md);
+}
+
+/* #dc2626 sobre la tarjeta oscura #2A2A2A daba 2,97:1 (hallazgo 4425); #f87171 da 4,8:1. */
+[data-theme='dark'] .error {
+  color: #f87171;
 }
 
 /* Popular Section */
@@ -261,6 +272,31 @@
 [data-theme='dark'] .badgeIrregularLarge {
   background: #78350f;
   color: #fef3c7;
+}
+
+.oculto {
+  display: none;
+}
+
+.verbTitle:focus {
+  outline: none;
+}
+
+.verbTitle:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 4px;
+}
+
+/* Con qué modelo se ha conjugado el verbo (regla, derivado, pronominal). */
+.notaModelo {
+  margin: 0 auto var(--spacing-md);
+  max-width: 40rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.notaModelo:empty {
+  display: none;
 }
 
 .formasNoPersonales {

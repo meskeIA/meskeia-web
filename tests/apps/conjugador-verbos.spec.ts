@@ -256,39 +256,44 @@ test.describe('Inspección 11/11/2026 — conjugación en escritorio', () => {
     await expect(page.locator('h3', { hasText: /^Presente$/ })).toHaveCount(0);
   });
 
-  test('HALLAZGO (11/11/2026, ABIERTO) · CASO 3 · una palabra que no es un verbo y acaba en -ar/-er se conjuga inventando', async ({ page }) => {
-    // esVerboValido() solo mira la terminación: «mujer» sale «yo mujo, tú mujes…» (gerundio
-    // «mujiendo»), «xyzar» sale «xyzo» y «ar» a secas sale «o, as, a…» con gerundio «ando».
-    // Esperado: avisar de que no es un verbo conocido en vez de presentar una conjugación.
-    test.fail();
+  test('HALLAZGO 4422 (11/11/2026, REPARADO) · CASO 3 · una palabra que no es un verbo y acaba en -ar/-er ya no se conjuga', async ({ page }) => {
+    // Antes esVerboValido() solo miraba la terminación: «mujer» salía «yo mujo, tú mujes…», «xyzar»
+    // salía «xyzo» y «ar» a secas «o, as, a…». Ahora se rechaza la raíz sin vocal y las palabras
+    // corrientes que no son verbos (la app no tiene diccionario, y lo dice en sus limitaciones).
     await enviar(page, 'mujer');
     await expect(page.locator('h3', { hasText: /^Presente$/ })).toHaveCount(0);
+    await expect(page.getByRole('alert').filter({ hasText: '«mujer» no es un verbo' })).toBeVisible();
     await enviar(page, 'xyzar');
     await expect(page.locator('h3', { hasText: /^Presente$/ })).toHaveCount(0);
+    // Un pronominal real se conjuga como su base y lo explica, en vez de rechazarse.
+    await enviar(page, 'levantarse');
+    await expect(cabecera(page, 'levantar')).toBeVisible();
+    await expect(page.getByText(/es pronominal: se conjuga como «levantar»/)).toBeVisible();
+    expect((await leerTiempo(page, 'Presente'))[0]).toBe('levanto');
   });
 
-  test('HALLAZGO (11/11/2026, ABIERTO) · «oír», de la propia lista, y los verbos en -ír se rechazan como no válidos', async ({ page }) => {
-    // esVerboValido() comprueba endsWith('ir') y «oír» acaba en «ír» (con tilde): el botón «oír»
-    // de la lista, su sugerencia y el texto tecleado dan «Por favor, introduce un verbo válido…».
-    // Lo mismo «reír», «sonreír» y «freír». Esperado (paradigma de oír): oigo, oyes, oye, oímos, oís, oyen.
+  test('HALLAZGO 4420 (11/11/2026, REPARADO) · «oír», de la propia lista, y los verbos en -ír se conjugan', async ({ page }) => {
+    // esVerboValido() comprobaba endsWith('ir') y «oír» acaba en «ír» (con tilde): el botón «oír»
+    // de la lista daba «Por favor, introduce un verbo válido…». Lo mismo «reír», «sonreír» y «freír».
+    // Paradigma de oír: oigo, oyes, oye, oímos, oís, oyen; de reír: río, ríes, ríe, reímos, reís, ríen.
     const boton = page.getByRole('button', { name: 'oír', exact: true });
     await expect(boton).toBeVisible();
-    test.fail();
     await boton.click();
     await expect(cabecera(page, 'oír')).toBeVisible();
     expect(await leerTiempo(page, 'Presente')).toEqual(['oigo', 'oyes', 'oye', 'oímos', 'oís', 'oyen']);
     await enviar(page, 'reír');
     await expect(avisoNoValido(page)).toHaveCount(0);
+    await expect(cabecera(page, 'reír')).toBeVisible();
+    expect(await leerTiempo(page, 'Presente')).toEqual(['río', 'ríes', 'ríe', 'reímos', 'reís', 'ríen']);
   });
 
-  test('HALLAZGO (11/11/2026, ABIERTO) · los regulares con cambio ortográfico pierden el sonido de la raíz', async ({ page }) => {
-    // conjugarRegular() pega raíz + desinencia sin ajustar la grafía: hoy «buscé», «busce»,
+  test('HALLAZGO 4418 (11/11/2026, REPARADO) · los regulares con cambio ortográfico conservan el sonido de la raíz', async ({ page }) => {
+    // conjugarRegular() pegaba raíz + desinencia sin ajustar la grafía: «buscé», «busce»,
     // «llegé», «cruzé», «cogo», «envio» (sin tilde). Son verbos REGULARES para la gramática:
     // la ortografía solo conserva el sonido (c→qu y g→gu ante e, z→c ante e, g→j ante a/o)
-    // y marca el hiato de -iar (envío).
+    // y marca el hiato de -iar (envío). El motor, caso a caso: tests/conjugacion-reglas-motor.spec.ts.
     await enviar(page, 'buscar');
     await expect(cabecera(page, 'buscar')).toBeVisible();
-    test.fail();
     expect((await leerTiempo(page, 'Pretérito Indefinido'))[0]).toBe('busqué');
     await page.getByRole('button', { name: 'Subjuntivo', exact: true }).click();
     expect(await leerTiempo(page, 'Presente de Subjuntivo')).toEqual(['busque', 'busques', 'busque', 'busquemos', 'busquéis', 'busquen']);
@@ -303,14 +308,15 @@ test.describe('Inspección 11/11/2026 — conjugación en escritorio', () => {
     expect((await leerTiempo(page, 'Presente'))[0]).toBe('envío');
   });
 
-  test('HALLAZGO (11/11/2026, ABIERTO) · un irregular fuera de la lista, o derivado de uno de ella, sale como regular', async ({ page }) => {
-    // Lo que no está entre los 66 irregulares se conjuga como regular, sin aviso ni distintivo:
-    // hoy «volo», «manteno / mantení / manteneré», «componido», «devolvido», «describido».
+  test('HALLAZGO 4419 (11/11/2026, REPARADO) · un irregular fuera de la lista, o derivado de uno de ella, ya no sale como regular', async ({ page }) => {
+    // Lo que no estaba entre los 66 irregulares se conjugaba como regular, sin aviso ni distintivo:
+    // «volo», «manteno / mantení / manteneré», «componido», «devolvido», «describido».
     // La FAQ de la propia página dice que los compuestos heredan el participio irregular
     // («describir→descrito, componer→compuesto, devolver→devuelto»).
     await enviar(page, 'volar');
     await expect(cabecera(page, 'volar')).toBeVisible();
-    test.fail();
+    await expect(page.getByRole('heading', { level: 2, name: /^volar ?Irregular$/ })).toBeVisible();
+    await expect(page.getByText(/Conjugado por regla: diptonga o→ue/)).toBeVisible();
     expect((await leerTiempo(page, 'Presente'))[0]).toBe('vuelo');
     await enviar(page, 'mantener');
     expect((await leerTiempo(page, 'Presente'))[0]).toBe('mantengo');
@@ -329,39 +335,42 @@ test.describe('Inspección 11/11/2026 — conjugación en escritorio', () => {
     expect(await contrasteSobreFondoReal(avisoNoValido(page))).toBeGreaterThanOrEqual(4.5);
   });
 
-  test('HALLAZGO (11/11/2026, ABIERTO) · el aviso de error no se anuncia y en oscuro no llega a 4,5:1', async ({ page }) => {
-    // El <p> del error no lleva role="alert" ni aria-live, y su color #dc2626 no tiene variante
-    // oscura: sobre la tarjeta #2A2A2A da 2,97:1 (WCAG 1.4.3 pide 4,5:1 para texto normal).
+  test('HALLAZGO 4425 (11/11/2026, REPARADO) · el aviso de error se anuncia y en oscuro llega a 4,5:1', async ({ page }) => {
+    // El <p> del error no llevaba role="alert" ni aria-live, y su color #dc2626 no tenía variante
+    // oscura: sobre la tarjeta #2A2A2A daba 2,97:1 (WCAG 1.4.3 pide 4,5:1 para texto normal).
     await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).click();
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
     await enviar(page, 'xyz');
     const aviso = avisoNoValido(page);
     await expect(aviso).toBeVisible();
-    test.fail();
-    expect(await contrasteSobreFondoReal(aviso)).toBeGreaterThanOrEqual(4.5);
+    // Se mide con poll: el fondo de la tarjeta tiene transición al cambiar de tema, y la primera
+    // lectura caía a mitad de camino entre el blanco y el #2A2A2A (1,76:1 con el rojo nuevo).
+    await expect.poll(() => contrasteSobreFondoReal(aviso), { timeout: 3000 }).toBeGreaterThanOrEqual(4.5);
     const anunciado = await aviso.evaluate((el) => el.getAttribute('role') === 'alert' || !!el.getAttribute('aria-live') || !!el.closest('[aria-live],[role="alert"]'));
     expect(anunciado).toBe(true);
   });
 
-  test('HALLAZGO (11/11/2026, ABIERTO) · las sugerencias no se eligen con el teclado ni ponen primero lo tecleado', async ({ page }) => {
-    // Las sugerencias son <li onClick> sin role ni tabindex: con «ten» + Flecha abajo + Intro se
-    // envía «ten» y sale el aviso de no válido. Y van por orden alfabético con «contiene»:
-    // «ten» propone primero «entender», e «ir» propone diez verbos sin «ir» entre ellos.
+  test('HALLAZGO 4426 (11/11/2026, REPARADO) · las sugerencias se eligen con el teclado y ponen primero lo tecleado', async ({ page }) => {
+    // Las sugerencias eran <li onClick> sin role ni tabindex: con «ten» + Flecha abajo + Intro se
+    // enviaba «ten» y salía el aviso de no válido. E iban por orden alfabético con «contiene»:
+    // «ten» proponía primero «entender», e «ir» diez verbos sin «ir» entre ellos.
     const entrada = page.getByPlaceholder('Escribe un verbo en infinitivo...');
     await entrada.pressSequentially('ir');
     const sugerencias = page.locator('form li');
     await expect(sugerencias.first()).toBeVisible();
-    test.fail();
     await expect(sugerencias.first()).toHaveText(/^ir(irregular)?$/);
+    await expect(page.getByRole('listbox')).toBeVisible();
     await entrada.fill('');
     await entrada.pressSequentially('ten');
     await expect(sugerencias).toHaveCount(2);
     await entrada.press('ArrowDown');
+    await expect(page.getByRole('option', { name: /^tener/ })).toHaveAttribute('aria-selected', 'true');
     await entrada.press('Enter');
     await expect(avisoNoValido(page)).toHaveCount(0);
+    await expect(cabecera(page, 'tener')).toBeVisible();
   });
 
-  test('HALLAZGO (11/11/2026, ABIERTO) · la guía enseña reglas que la propia conjugación desmiente', async ({ page }) => {
+  test('HALLAZGO 4423 (11/11/2026, REPARADO) · la guía ya no enseña reglas que la propia conjugación desmiente', async ({ page }) => {
     // Lo que la app conjuga (verde, candado):
     await enviar(page, 'tener');
     expect((await leerTiempo(page, 'Pretérito Indefinido'))[0]).toBe('tuve');
@@ -372,17 +381,18 @@ test.describe('Inspección 11/11/2026 — conjugación en escritorio', () => {
     // Lo que la guía afirma: que el indefinido y el presente de subjuntivo comparten raíz (tuve /
     // tenga: no; la comparte el IMPERFECTO de subjuntivo, tuvieron → tuviera) y que el gerundio
     // «siempre» acaba en -ando o -iendo (leyendo, yendo, trayendo).
-    test.fail();
     const html = await page.content();
     expect(html).not.toContain('El pretérito indefinido y el presente de subjuntivo suelen compartir la misma raíz irregular');
     expect(html).not.toContain('El gerundio siempre termina en -ando');
+    expect(html).toContain('El pretérito indefinido y el imperfecto de subjuntivo comparten siempre la raíz');
+    expect(html).not.toContain('Afectan solo a formas tónicas (yo, tú, él, ellos) en presente');
+    expect(html).not.toContain('Solo tiene formas de tú, vosotros, usted, ustedes');
   });
 
-  test('HALLAZGO (11/11/2026, ABIERTO) · el FAQPage y las features prometen lo que la app no hace', async ({ page }) => {
+  test('HALLAZGO 4424 (11/11/2026, REPARADO) · el FAQPage y las features ya no prometen lo que la app no hace', async ({ page }) => {
     const subtitulo = await page.getByText(/verbos irregulares con conjugación verificada/).textContent();
     const enLista = parseInt(subtitulo ?? '', 10);
     expect(enLista).toBeGreaterThan(0);
-    test.fail();
     const ld = (await page.locator('script[type="application/ld+json"]').allTextContents()).join('\n');
     // features: «Más de 70 verbos irregulares» con 66 en la lista (65 alcanzables: «oír» falla).
     const promesa = ld.match(/Más de (\d+) verbos irregulares/);
@@ -426,35 +436,34 @@ test.describe('Inspección 11/11/2026 — móvil (Pixel 7)', () => {
     expect(desborde).toBeLessThanOrEqual(0);
   });
 
-  test('HALLAZGO (11/11/2026, ABIERTO) · móvil: tras pulsar un verbo el resultado queda fuera de la pantalla', async ({ page }) => {
-    // Nada lleva el resultado a la vista: con «ser» la cabecera empieza en y = 838 px de una
-    // pantalla de 839 px (se ve el buscador y el borde vacío de la tarjeta), y con «volver», el
-    // último de la lista, la pantalla se queda en «Condicional Perfecto» y la cabecera a −3.696 px.
+  test('HALLAZGO 4421 (11/11/2026, REPARADO) · móvil: tras pulsar un verbo el resultado se trae a la pantalla', async ({ page }) => {
+    // Nada llevaba el resultado a la vista: con «ser» la cabecera empezaba en y = 838 px de una
+    // pantalla de 839 px (se veía el buscador y el borde vacío de la tarjeta), y con «volver», el
+    // último de la lista, la pantalla se quedaba en «Condicional Perfecto» y la cabecera a −3.696 px.
+    // Ahora la cabecera recibe el foco y, si no se ve entera, sube bajo la barra (enfocarALaVista).
     await page.getByRole('button', { name: 'ser', exact: true }).first().tap();
     await expect(cabecera(page, 'ser')).toBeAttached();
-    test.fail();
     await expect(cabecera(page, 'ser')).toBeInViewport({ ratio: 1 });
+    await expect(cabecera(page, 'ser')).toBeFocused();
     await expect(tarjetaDeTiempo(page, 'Presente').locator('td', { hasText: /^soy$/ })).toBeInViewport();
   });
 
-  test('HALLAZGO (11/11/2026, ABIERTO) · móvil: un verbo del final de la lista deja a la vista el último tiempo', async ({ page }) => {
+  test('HALLAZGO 4421 (11/11/2026, REPARADO) · móvil: un verbo del final de la lista lleva a su cabecera', async ({ page }) => {
     const volver = page.getByRole('button', { name: 'volver', exact: true });
     await volver.scrollIntoViewIfNeeded();
     await volver.tap();
     await expect(cabecera(page, 'volver')).toBeAttached();
-    test.fail();
     await expect(cabecera(page, 'volver')).toBeInViewport();
   });
 
-  test('HALLAZGO (11/11/2026, ABIERTO) · móvil: «Buscar otro verbo» no lleva al buscador', async ({ page }) => {
-    // Al volver al estado inicial la pantalla se queda en la rejilla de irregulares y el
+  test('HALLAZGO 4421 (11/11/2026, REPARADO) · móvil: «Buscar otro verbo» lleva al buscador', async ({ page }) => {
+    // Al volver al estado inicial la pantalla se quedaba en la rejilla de irregulares y el
     // buscador, sin foco, a −591 px.
     await page.getByRole('button', { name: 'ser', exact: true }).first().tap();
     const otro = page.getByRole('button', { name: 'Buscar otro verbo' });
     await otro.scrollIntoViewIfNeeded();
     await otro.tap();
     await expect(page.getByRole('button', { name: 'volver', exact: true })).toBeAttached();
-    test.fail();
     const entrada = page.getByPlaceholder('Escribe un verbo en infinitivo...');
     await expect(entrada).toBeInViewport({ ratio: 1 });
     await expect(entrada).toBeFocused();

@@ -1,12 +1,12 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import styles from './ConjugadorVerbos.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { enfocarALaVista } from '@/lib';
 import {
-  conjugarVerbo,
-  esVerboValido,
+  analizarEntrada,
   esIrregular,
   buscarVerbos,
   obtenerVerbosIrregulares,
@@ -18,17 +18,33 @@ import {
 
 type ModoVista = 'indicativo' | 'subjuntivo' | 'imperativo';
 
+const ID_LISTA_SUGERENCIAS = 'conjugador-sugerencias';
+
 export default function ConjugadorVerbosPage() {
   const [busqueda, setBusqueda] = useState('');
   const [conjugacion, setConjugacion] = useState<ConjugacionConCompuestos | null>(null);
+  const [irregular, setIrregular] = useState(false);
+  const [nota, setNota] = useState<string | null>(null);
   const [sugerencias, setSugerencias] = useState<string[]>([]);
+  const [activa, setActiva] = useState(-1);
   const [modoVista, setModoVista] = useState<ModoVista>('indicativo');
   const [error, setError] = useState('');
   const [mostrarSugerencias, setMostrarSugerencias] = useState(false);
+  // Cada conjugación (aunque sea del mismo verbo) y cada «Buscar otro verbo» piden mover el foco:
+  // en móvil el resultado se pintaba bajo el borde de la pantalla y nada lo traía (hallazgo 4421).
+  const [destinoFoco, setDestinoFoco] = useState<{ a: 'resultado' | 'buscador'; n: number } | null>(null);
+  const cabeceraRef = useRef<HTMLHeadingElement>(null);
+  const entradaRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!destinoFoco) return;
+    enfocarALaVista(destinoFoco.a === 'resultado' ? cabeceraRef.current : entradaRef.current);
+  }, [destinoFoco]);
 
   const handleBusquedaChange = useCallback((valor: string) => {
     setBusqueda(valor);
     setError('');
+    setActiva(-1);
 
     if (valor.length >= 2) {
       const resultados = buscarVerbos(valor);
@@ -45,21 +61,20 @@ export default function ConjugadorVerbosPage() {
     setBusqueda(verboLimpio);
     setMostrarSugerencias(false);
     setSugerencias([]);
+    setActiva(-1);
 
-    if (!esVerboValido(verboLimpio)) {
-      setError('Por favor, introduce un verbo válido en infinitivo (terminado en -ar, -er o -ir)');
+    const resultado = analizarEntrada(verboLimpio);
+    if (!resultado.ok) {
+      setError(resultado.error);
       setConjugacion(null);
+      setNota(null);
       return;
     }
-
-    const resultado = conjugarVerbo(verboLimpio);
-    if (resultado) {
-      setConjugacion(resultado);
-      setError('');
-    } else {
-      setError('No se pudo conjugar el verbo');
-      setConjugacion(null);
-    }
+    setConjugacion(resultado.conjugacion);
+    setIrregular(resultado.irregular);
+    setNota(resultado.nota);
+    setError('');
+    setDestinoFoco((previo) => ({ a: 'resultado', n: (previo?.n ?? 0) + 1 }));
   }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -69,6 +84,26 @@ export default function ConjugadorVerbosPage() {
 
   const handleSugerenciaClick = (verbo: string) => {
     conjugar(verbo);
+  };
+
+  /** Patrón combobox: flechas para recorrer las sugerencias, Intro para elegir, Escape para cerrar. */
+  const handleTeclaBuscador = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const abiertas = mostrarSugerencias && sugerencias.length > 0;
+    if (e.key === 'ArrowDown' && sugerencias.length > 0) {
+      e.preventDefault();
+      setMostrarSugerencias(true);
+      setActiva((i) => (i + 1) % sugerencias.length);
+    } else if (e.key === 'ArrowUp' && abiertas) {
+      e.preventDefault();
+      setActiva((i) => (i <= 0 ? sugerencias.length - 1 : i - 1));
+    } else if (e.key === 'Enter' && abiertas && activa >= 0) {
+      e.preventDefault();
+      conjugar(sugerencias[activa]);
+    } else if (e.key === 'Escape' && abiertas) {
+      e.preventDefault();
+      setMostrarSugerencias(false);
+      setActiva(-1);
+    }
   };
 
   const verbosPopulares = ['ser', 'estar', 'tener', 'hacer', 'ir', 'poder', 'decir', 'ver', 'querer', 'saber'];
@@ -81,8 +116,8 @@ export default function ConjugadorVerbosPage() {
         <span className={styles.heroIcon} aria-hidden="true">📖</span>
         <h1 className={styles.title}>Conjugador de Verbos Español</h1>
         <p className={styles.subtitle}>
-          Conjuga cualquier verbo en español. Incluye todos los tiempos verbales
-          y más de 60 verbos irregulares completamente conjugados.
+          Conjuga verbos en español con todos los tiempos verbales: más de 60 irregulares
+          en tabla, sus derivados, los grupos de irregularidad más comunes y los regulares por regla.
         </p>
       </header>
 
@@ -93,14 +128,24 @@ export default function ConjugadorVerbosPage() {
         <form onSubmit={handleSubmit} className={styles.searchForm}>
           <div className={styles.searchWrapper}>
             <input
+              ref={entradaRef}
               type="text"
               value={busqueda}
               onChange={(e) => handleBusquedaChange(e.target.value)}
+              onKeyDown={handleTeclaBuscador}
               onFocus={() => sugerencias.length > 0 && setMostrarSugerencias(true)}
               onBlur={() => setTimeout(() => setMostrarSugerencias(false), 200)}
               placeholder="Escribe un verbo en infinitivo..."
+              aria-label="Verbo en infinitivo"
               className={styles.searchInput}
               autoComplete="off"
+              role="combobox"
+              aria-autocomplete="list"
+              aria-expanded={mostrarSugerencias && sugerencias.length > 0}
+              aria-controls={ID_LISTA_SUGERENCIAS}
+              aria-activedescendant={
+                mostrarSugerencias && activa >= 0 ? `${ID_LISTA_SUGERENCIAS}-${activa}` : undefined
+              }
             />
             <button type="submit" className={styles.searchButton}>
               Conjugar
@@ -108,12 +153,16 @@ export default function ConjugadorVerbosPage() {
 
             {/* Sugerencias */}
             {mostrarSugerencias && sugerencias.length > 0 && (
-              <ul className={styles.sugerencias}>
-                {sugerencias.map((verbo) => (
+              <ul className={styles.sugerencias} role="listbox" id={ID_LISTA_SUGERENCIAS} aria-label="Sugerencias">
+                {sugerencias.map((verbo, i) => (
                   <li
                     key={verbo}
+                    id={`${ID_LISTA_SUGERENCIAS}-${i}`}
+                    role="option"
+                    aria-selected={i === activa}
+                    onMouseDown={(e) => e.preventDefault()}
                     onClick={() => handleSugerenciaClick(verbo)}
-                    className={styles.sugerenciaItem}
+                    className={`${styles.sugerenciaItem} ${i === activa ? styles.sugerenciaActiva : ''}`}
                   >
                     {verbo}
                     {esIrregular(verbo) && (
@@ -126,7 +175,7 @@ export default function ConjugadorVerbosPage() {
           </div>
         </form>
 
-        {error && <p className={styles.error}>{error}</p>}
+        {error && <p className={styles.error} role="alert">{error}</p>}
 
         {/* Verbos populares */}
         {!conjugacion && (
@@ -153,12 +202,13 @@ export default function ConjugadorVerbosPage() {
         <div className={styles.resultSection}>
           {/* Cabecera del verbo */}
           <div className={styles.verbHeader}>
-            <h2 className={styles.verbTitle}>
-              {conjugacion.infinitivo}
-              {esIrregular(conjugacion.infinitivo) && (
-                <span className={styles.badgeIrregularLarge}>Irregular</span>
-              )}
+            <h2 className={styles.verbTitle} ref={cabeceraRef} tabIndex={-1}>
+              <span>{conjugacion.infinitivo}</span>
+              <span className={irregular ? styles.badgeIrregularLarge : styles.oculto}>
+                {irregular ? 'Irregular' : ''}
+              </span>
             </h2>
+            <p className={styles.notaModelo}>{nota ?? ''}</p>
             <div className={styles.formasNoPersonales}>
               <div className={styles.formaNP}>
                 <span className={styles.formaNPLabel}>Gerundio:</span>
@@ -279,7 +329,9 @@ export default function ConjugadorVerbosPage() {
             type="button"
             onClick={() => {
               setConjugacion(null);
+              setNota(null);
               setBusqueda('');
+              setDestinoFoco((previo) => ({ a: 'buscador', n: (previo?.n ?? 0) + 1 }));
             }}
             className={styles.newSearchButton}
           >
@@ -378,7 +430,7 @@ export default function ConjugadorVerbosPage() {
                   <td>Órdenes, instrucciones, consejos, ruegos</td>
                   <td><em>¡Come! / ¡No comas!</em></td>
                   <td>Imperativo afirmativo, imperativo negativo</td>
-                  <td>Solo tiene formas de tú, vosotros, usted, ustedes</td>
+                  <td>Formas propias solo de tú y vosotros (come, comed); usted, ustedes y nosotros (coma, coman, comamos) y todo el negativo las toman del presente de subjuntivo</td>
                 </tr>
               </tbody>
             </table>
@@ -394,7 +446,7 @@ export default function ConjugadorVerbosPage() {
           </p>
           <div className={styles.casosUsoGrid}>
             <div className={styles.casoCard}>
-              <span className={styles.casoIcon}>📖</span>
+              <span className={styles.casoIcon} aria-hidden="true">📖</span>
               <div className={styles.casoTitle}>Estudiante de español</div>
               <div className={styles.casoSubtitle}>Secundaria / preparatoria</div>
               <p className={styles.casoDesc}>
@@ -403,7 +455,7 @@ export default function ConjugadorVerbosPage() {
               </p>
             </div>
             <div className={styles.casoCard}>
-              <span className={styles.casoIcon}>🌍</span>
+              <span className={styles.casoIcon} aria-hidden="true">🌍</span>
               <div className={styles.casoTitle}>Estudiante extranjero</div>
               <div className={styles.casoSubtitle}>Aprendizaje de español (ELE)</div>
               <p className={styles.casoDesc}>
@@ -412,7 +464,7 @@ export default function ConjugadorVerbosPage() {
               </p>
             </div>
             <div className={styles.casoCard}>
-              <span className={styles.casoIcon}>🎓</span>
+              <span className={styles.casoIcon} aria-hidden="true">🎓</span>
               <div className={styles.casoTitle}>Profesor de español</div>
               <div className={styles.casoSubtitle}>Educación / ELE</div>
               <p className={styles.casoDesc}>
@@ -421,7 +473,7 @@ export default function ConjugadorVerbosPage() {
               </p>
             </div>
             <div className={styles.casoCard}>
-              <span className={styles.casoIcon}>✍️</span>
+              <span className={styles.casoIcon} aria-hidden="true">✍️</span>
               <div className={styles.casoTitle}>Escritor / Corrector</div>
               <div className={styles.casoSubtitle}>Creación de contenido</div>
               <p className={styles.casoDesc}>
@@ -439,8 +491,10 @@ export default function ConjugadorVerbosPage() {
             <div className={styles.contentCard}>
               <h4>Cambios vocálicos (diptongación)</h4>
               <p>
-                E→IE (pensar→pienso), O→UE (contar→cuento), E→I (pedir→pido).
-                Afectan solo a formas tónicas (yo, tú, él, ellos) en presente.
+                E→IE (pensar→pienso) y O→UE (contar→cuento) solo en las formas con el acento
+                en la raíz: yo, tú, él y ellos del presente de indicativo y de subjuntivo, y el
+                imperativo de tú. Los de -ir cierran además la vocal en otras formas: E→I
+                (pedir→pido, pidió, pidamos, pidiendo) y O→U (dormir→durmió, durmamos, durmiendo).
               </p>
             </div>
             <div className={styles.contentCard}>
@@ -619,8 +673,8 @@ export default function ConjugadorVerbosPage() {
             <div className={styles.tipsColumn}>
               <div className={styles.tipsHeader}>✓ Buenas prácticas</div>
               <div className={styles.tipItem}>Aprende primero los 10 verbos irregulares más comunes: ser, estar, ir, tener, hacer, poder, decir, ver, querer, saber.</div>
-              <div className={styles.tipItem}>El pretérito indefinido y el presente de subjuntivo suelen compartir la misma raíz irregular.</div>
-              <div className={styles.tipItem}>El gerundio siempre termina en -ando (1ª conj.) o -iendo (2ª y 3ª).</div>
+              <div className={styles.tipItem}>El pretérito indefinido y el imperfecto de subjuntivo comparten siempre la raíz (tuvieron → tuviera); el presente de subjuntivo sale de la 1.ª persona del presente (tengo → tenga).</div>
+              <div className={styles.tipItem}>El gerundio termina en -ando (1.ª conjugación) o -iendo (2.ª y 3.ª); tras vocal, la i pasa a y: leyendo, cayendo, yendo.</div>
               <div className={styles.tipItem}>El futuro y el condicional de verbos regulares comparten la misma raíz (el infinitivo completo).</div>
               <div className={styles.tipItem}>Los verbos reflexivos llevan pronombres: me, te, se, nos, os, se — antes del verbo conjugado.</div>
               <div className={styles.tipItem}>Los tiempos compuestos son siempre haber + participio, y el participio no cambia nunca: «las cartas que he escrito», no «escritas».</div>
@@ -661,7 +715,7 @@ export default function ConjugadorVerbosPage() {
             <h3>Limitaciones del Conjugador y Errores Comunes</h3>
           </div>
           <ul className={styles.warningList}>
-            <li><strong><span aria-hidden="true">❌</span> Diccionario limitado (~600 verbos):</strong> Este conjugador incluye los verbos más frecuentes del español, pero el diccionario de la RAE recoge más de 10.000 verbos. Si no encuentras un verbo muy específico o técnico, prueba a buscar su forma base en el diccionario oficial.</li>
+            <li><strong><span aria-hidden="true">❌</span> No lleva diccionario:</strong> conjuga de tabla los {obtenerVerbosIrregulares().length} irregulares de la lista y sus derivados (mantener, suponer, prever…), y el resto por regla, según su terminación y los grupos de irregularidad más comunes (pensar, contar, pedir, conocer, construir…). Bajo la cabecera dice con qué modelo ha conjugado cada verbo. Un irregular poco frecuente que no esté en sus grupos saldría como regular, y una palabra inventada acabada en -ar, -er o -ir se conjugaría igual: si dudas de que un verbo exista o de una forma rara, consulta el diccionario de la RAE.</li>
             <li><strong><span aria-hidden="true">❌</span> No incluye variantes dialectales:</strong> El español tiene variantes regionales significativas: el voseo (vos tenés, vos sos) de Argentina, Uruguay y zonas de Centroamérica no está representado. Las conjugaciones corresponden al español estándar peninsular.</li>
             <li><strong><span aria-hidden="true">❌</span> Los tiempos verbales tienen usos contextuales complejos:</strong> Saber conjugar un verbo no equivale a saber cuándo usarlo. El pretérito indefinido vs. el pretérito imperfecto, o el presente de subjuntivo, requieren comprensión del contexto. La conjugación es la forma; la sintaxis dicta cuándo.</li>
             <li><strong><span aria-hidden="true">❌</span> El imperativo negativo usa subjuntivo:</strong> Un error frecuente es usar el imperativo positivo para negar. &quot;No habla&quot; (incorrecto) vs &quot;No hables&quot; (correcto). El imperativo negativo en español siempre usa la forma de subjuntivo presente.</li>

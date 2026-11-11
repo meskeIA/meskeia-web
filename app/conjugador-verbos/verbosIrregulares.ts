@@ -1413,6 +1413,52 @@ export const verbosIrregulares: Record<string, ConjugacionCompleta> = {
       negativo: ['-', 'no establezcas', 'no establezca', 'no establezcamos', 'no establezcáis', 'no establezcan'],
     },
   },
+
+  // ========== VERBOS EN -ÍR (11/11/2026, hallazgo 4420) ==========
+  // e→i en las formas tónicas, con la i en hiato (río, ríe) y sin tilde en las monosílabas
+  // de la Ortografía de 2010 (rio, riais). De reír sale sonreír, que conjuga el motor por prefijo.
+  reír: {
+    infinitivo: 'reír',
+    gerundio: 'riendo',
+    participio: 'reído',
+    indicativo: {
+      presente: ['río', 'ríes', 'ríe', 'reímos', 'reís', 'ríen'],
+      preterito_imperfecto: ['reía', 'reías', 'reía', 'reíamos', 'reíais', 'reían'],
+      preterito_indefinido: ['reí', 'reíste', 'rio', 'reímos', 'reísteis', 'rieron'],
+      futuro: ['reiré', 'reirás', 'reirá', 'reiremos', 'reiréis', 'reirán'],
+      condicional: ['reiría', 'reirías', 'reiría', 'reiríamos', 'reiríais', 'reirían'],
+    },
+    subjuntivo: {
+      presente: ['ría', 'rías', 'ría', 'riamos', 'riais', 'rían'],
+      preterito_imperfecto: ['riera', 'rieras', 'riera', 'riéramos', 'rierais', 'rieran'],
+    },
+    imperativo: {
+      afirmativo: ['-', 'ríe', 'ría', 'riamos', 'reíd', 'rían'],
+      negativo: ['-', 'no rías', 'no ría', 'no riamos', 'no riais', 'no rían'],
+    },
+  },
+
+  freír: {
+    infinitivo: 'freír',
+    gerundio: 'friendo',
+    // La RAE admite «frito» y «freído»; «frito» es el corriente.
+    participio: 'frito',
+    indicativo: {
+      presente: ['frío', 'fríes', 'fríe', 'freímos', 'freís', 'fríen'],
+      preterito_imperfecto: ['freía', 'freías', 'freía', 'freíamos', 'freíais', 'freían'],
+      preterito_indefinido: ['freí', 'freíste', 'frio', 'freímos', 'freísteis', 'frieron'],
+      futuro: ['freiré', 'freirás', 'freirá', 'freiremos', 'freiréis', 'freirán'],
+      condicional: ['freiría', 'freirías', 'freiría', 'freiríamos', 'freiríais', 'freirían'],
+    },
+    subjuntivo: {
+      presente: ['fría', 'frías', 'fría', 'friamos', 'friais', 'frían'],
+      preterito_imperfecto: ['friera', 'frieras', 'friera', 'friéramos', 'frierais', 'frieran'],
+    },
+    imperativo: {
+      afirmativo: ['-', 'fríe', 'fría', 'friamos', 'freíd', 'frían'],
+      negativo: ['-', 'no frías', 'no fría', 'no friamos', 'no friais', 'no frían'],
+    },
+  },
 };
 
 // Lista de infinitivos disponibles para búsqueda

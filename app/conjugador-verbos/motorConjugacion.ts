@@ -1,70 +1,12 @@
 /**
  * Motor de Conjugación de Verbos Españoles
- * Maneja tanto verbos regulares como irregulares
+ * Maneja tanto verbos regulares como irregulares: la tabla de irregulares de
+ * verbosIrregulares.ts y, para todo lo demás, las reglas de reglasConjugacion.ts
+ * (derivados por prefijo, patrones de irregularidad y ortografía de los regulares).
  */
 
 import { verbosIrregulares, ConjugacionCompleta } from './verbosIrregulares';
-
-// Terminaciones para verbos regulares
-const TERMINACIONES = {
-  ar: {
-    indicativo: {
-      presente: ['o', 'as', 'a', 'amos', 'áis', 'an'],
-      preterito_indefinido: ['é', 'aste', 'ó', 'amos', 'asteis', 'aron'],
-      preterito_imperfecto: ['aba', 'abas', 'aba', 'ábamos', 'abais', 'aban'],
-      futuro: ['é', 'ás', 'á', 'emos', 'éis', 'án'],
-      condicional: ['ía', 'ías', 'ía', 'íamos', 'íais', 'ían'],
-    },
-    subjuntivo: {
-      presente: ['e', 'es', 'e', 'emos', 'éis', 'en'],
-      preterito_imperfecto: ['ara', 'aras', 'ara', 'áramos', 'arais', 'aran'],
-    },
-    imperativo: {
-      afirmativo: ['', 'a', 'e', 'emos', 'ad', 'en'],
-      negativo: ['', 'es', 'e', 'emos', 'éis', 'en'],
-    },
-    gerundio: 'ando',
-    participio: 'ado',
-  },
-  er: {
-    indicativo: {
-      presente: ['o', 'es', 'e', 'emos', 'éis', 'en'],
-      preterito_indefinido: ['í', 'iste', 'ió', 'imos', 'isteis', 'ieron'],
-      preterito_imperfecto: ['ía', 'ías', 'ía', 'íamos', 'íais', 'ían'],
-      futuro: ['é', 'ás', 'á', 'emos', 'éis', 'án'],
-      condicional: ['ía', 'ías', 'ía', 'íamos', 'íais', 'ían'],
-    },
-    subjuntivo: {
-      presente: ['a', 'as', 'a', 'amos', 'áis', 'an'],
-      preterito_imperfecto: ['iera', 'ieras', 'iera', 'iéramos', 'ierais', 'ieran'],
-    },
-    imperativo: {
-      afirmativo: ['', 'e', 'a', 'amos', 'ed', 'an'],
-      negativo: ['', 'as', 'a', 'amos', 'áis', 'an'],
-    },
-    gerundio: 'iendo',
-    participio: 'ido',
-  },
-  ir: {
-    indicativo: {
-      presente: ['o', 'es', 'e', 'imos', 'ís', 'en'],
-      preterito_indefinido: ['í', 'iste', 'ió', 'imos', 'isteis', 'ieron'],
-      preterito_imperfecto: ['ía', 'ías', 'ía', 'íamos', 'íais', 'ían'],
-      futuro: ['é', 'ás', 'á', 'emos', 'éis', 'án'],
-      condicional: ['ía', 'ías', 'ía', 'íamos', 'íais', 'ían'],
-    },
-    subjuntivo: {
-      presente: ['a', 'as', 'a', 'amos', 'áis', 'an'],
-      preterito_imperfecto: ['iera', 'ieras', 'iera', 'iéramos', 'ierais', 'ieran'],
-    },
-    imperativo: {
-      afirmativo: ['', 'e', 'a', 'amos', 'id', 'an'],
-      negativo: ['', 'as', 'a', 'amos', 'áis', 'an'],
-    },
-    gerundio: 'iendo',
-    participio: 'ido',
-  },
-};
+import { conjugarInfinitivo, motivoNoInfinitivo } from './reglasConjugacion';
 
 // Pronombres personales
 export const PRONOMBRES = ['yo', 'tú', 'él/ella/Ud.', 'nosotros', 'vosotros', 'ellos/ellas/Uds.'];
@@ -178,62 +120,6 @@ function derivarFuturoSubjuntivo(imperfectoRa: string[]): string[] {
 }
 
 /**
- * Obtiene la raíz y la terminación de un verbo
- */
-function analizarVerbo(infinitivo: string): { raiz: string; terminacion: 'ar' | 'er' | 'ir' } | null {
-  const verbo = infinitivo.toLowerCase().trim();
-
-  if (verbo.endsWith('ar')) {
-    return { raiz: verbo.slice(0, -2), terminacion: 'ar' };
-  } else if (verbo.endsWith('er')) {
-    return { raiz: verbo.slice(0, -2), terminacion: 'er' };
-  } else if (verbo.endsWith('ir')) {
-    return { raiz: verbo.slice(0, -2), terminacion: 'ir' };
-  }
-
-  return null;
-}
-
-/**
- * Conjuga un verbo regular
- */
-function conjugarRegular(infinitivo: string): ConjugacionCompleta | null {
-  const analisis = analizarVerbo(infinitivo);
-  if (!analisis) return null;
-
-  const { raiz, terminacion } = analisis;
-  const term = TERMINACIONES[terminacion];
-
-  return {
-    infinitivo,
-    gerundio: raiz + term.gerundio,
-    participio: raiz + term.participio,
-    indicativo: {
-      presente: term.indicativo.presente.map(t => raiz + t),
-      preterito_indefinido: term.indicativo.preterito_indefinido.map(t => raiz + t),
-      preterito_imperfecto: term.indicativo.preterito_imperfecto.map(t => raiz + t),
-      // Futuro y condicional: infinitivo completo + terminación
-      futuro: term.indicativo.futuro.map(t => infinitivo + t),
-      condicional: term.indicativo.condicional.map(t => infinitivo + t),
-    },
-    subjuntivo: {
-      presente: term.subjuntivo.presente.map(t => raiz + t),
-      preterito_imperfecto: term.subjuntivo.preterito_imperfecto.map(t => raiz + t),
-    },
-    imperativo: {
-      afirmativo: term.imperativo.afirmativo.map((t, i) => {
-        if (i === 0) return '-';
-        return raiz + t;
-      }),
-      negativo: term.imperativo.negativo.map((t, i) => {
-        if (i === 0) return '-';
-        return 'no ' + raiz + t;
-      }),
-    },
-  };
-}
-
-/**
  * Conjugación tal y como se muestra: los tiempos simples que están almacenados más los
  * compuestos y el futuro de subjuntivo, que se derivan. Las claves son exactamente las
  * de TIEMPOS, así que un tiempo nuevo en TIEMPOS sin su forma aquí no compila.
@@ -279,51 +165,99 @@ export function expandirConCompuestos(conj: ConjugacionCompleta): ConjugacionCon
 }
 
 /**
- * Busca si un verbo es irregular o conjuga regularmente
+ * Conjuga un infinitivo: de la tabla si es uno de sus irregulares; si no, por derivación,
+ * patrón o regla (reglasConjugacion.ts). `null` si la entrada no se acepta como infinitivo.
  */
 export function conjugarVerbo(infinitivo: string): ConjugacionConCompuestos | null {
   const verbo = infinitivo.toLowerCase().trim();
-
-  // Primero buscar en irregulares
-  const simples = verbosIrregulares[verbo] ?? conjugarRegular(verbo);
-  if (!simples) return null;
-
-  return expandirConCompuestos(simples);
+  if (motivoNoInfinitivo(verbo)) return null;
+  const resultado = conjugarInfinitivo(verbo);
+  return resultado ? expandirConCompuestos(resultado.conjugacion) : null;
 }
 
 /**
- * Verifica si un verbo es válido
+ * Verifica si un verbo es válido. Admite los infinitivos en -ír (oír, reír), que hasta el
+ * 11/11/2026 se rechazaban por mirar solo «-ir» sin tilde (hallazgo 4420).
  */
 export function esVerboValido(infinitivo: string): boolean {
-  const verbo = infinitivo.toLowerCase().trim();
-  return verbo.endsWith('ar') || verbo.endsWith('er') || verbo.endsWith('ir');
+  return motivoNoInfinitivo(infinitivo.toLowerCase().trim()) === null;
 }
 
 /**
- * Verifica si un verbo es irregular
+ * Verifica si un verbo es irregular para la gramática: de la tabla, derivado de uno de ella
+ * (mantener) o de un patrón irregular (volar, agradecer, construir). Un cambio solo ortográfico
+ * (buscar → busqué) no lo hace irregular.
  */
 export function esIrregular(infinitivo: string): boolean {
   const verbo = infinitivo.toLowerCase().trim();
-  return verbo in verbosIrregulares;
+  if (motivoNoInfinitivo(verbo)) return false;
+  return conjugarInfinitivo(verbo)?.irregular ?? false;
+}
+
+/** Resultado de lo que el usuario escribe en el buscador. */
+export type ResultadoEntrada =
+  | { ok: false; error: string }
+  | {
+      ok: true;
+      conjugacion: ConjugacionConCompuestos;
+      irregular: boolean;
+      /** Una o dos frases sobre cómo se ha conjugado (modelo, verbo pronominal). */
+      nota: string | null;
+    };
+
+/**
+ * Interpreta lo que se escribe en el buscador. Un pronominal («levantarse») se conjuga como su
+ * verbo base, con la nota de que los pronombres van delante (hallazgo 4422: antes daba el aviso
+ * de «no válido» sin explicar qué hacer).
+ */
+export function analizarEntrada(texto: string): ResultadoEntrada {
+  const limpio = texto.toLowerCase().trim();
+  let verbo = limpio;
+  let pronominal = false;
+  if (/(ar|er|ir|ír)se$/.test(limpio)) {
+    verbo = limpio.slice(0, -2);
+    pronominal = true;
+  }
+  const motivo = motivoNoInfinitivo(verbo);
+  if (motivo) return { ok: false, error: pronominal ? motivo.replace(`«${verbo}»`, `«${limpio}»`) : motivo };
+  const resultado = conjugarInfinitivo(verbo);
+  if (!resultado) return { ok: false, error: 'No se pudo conjugar el verbo' };
+  const notas: string[] = [];
+  if (pronominal) {
+    const p = resultado.conjugacion.indicativo.presente;
+    notas.push(
+      `«${limpio}» es pronominal: se conjuga como «${verbo}» con me, te, se, nos, os, se delante (me ${p[0]}, te ${p[1]}…).`,
+    );
+  }
+  if (resultado.modelo) {
+    const modelo = resultado.modelo.charAt(0).toUpperCase() + resultado.modelo.slice(1);
+    notas.push(resultado.tipo === 'derivado' ? `${modelo}.` : `Conjugado por regla: ${resultado.modelo}.`);
+  }
+  return {
+    ok: true,
+    conjugacion: expandirConCompuestos(resultado.conjugacion),
+    irregular: resultado.irregular,
+    nota: notas.length ? notas.join(' ') : null,
+  };
 }
 
 /**
  * Obtiene la lista de verbos irregulares disponibles
  */
 export function obtenerVerbosIrregulares(): string[] {
-  return Object.keys(verbosIrregulares).sort();
+  return Object.keys(verbosIrregulares).sort((a, b) => a.localeCompare(b, 'es'));
 }
 
 /**
- * Busca verbos que coincidan con un patrón
+ * Busca verbos que coincidan con un patrón: primero los que EMPIEZAN por lo tecleado (con
+ * «ir», el propio «ir»), luego los que lo contienen (hallazgo 4426).
  */
 export function buscarVerbos(patron: string): string[] {
   const busqueda = patron.toLowerCase().trim();
   const irregulares = obtenerVerbosIrregulares();
-
-  return irregulares.filter(verbo =>
-    verbo.startsWith(busqueda) || verbo.includes(busqueda)
-  ).slice(0, 10);
+  const empiezan = irregulares.filter((verbo) => verbo.startsWith(busqueda));
+  const contienen = irregulares.filter((verbo) => !verbo.startsWith(busqueda) && verbo.includes(busqueda));
+  return [...empiezan, ...contienen].slice(0, 10);
 }
 
 // Re-exportar tipo
