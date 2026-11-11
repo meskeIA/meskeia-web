@@ -4,11 +4,17 @@ import { useMemo, useState } from 'react';
 import styles from './AdaptacionHogar.module.css';
 import { MeskeiaLogo, LegalNotice, Footer, EducationalSection, RelatedApps, ShareCard, DisclaimerCard, DataReference } from '@/components';
 import { formatCurrency } from '@/lib';
-import { cuantiaMaximaPEVS, FISCAL_DEPENDENCIA_META } from '@/data/fiscal';
+import { cuantiaMaximaPEVS, FISCAL_DEPENDENCIA_META, PORCENTAJES_IVA } from '@/data/fiscal';
 import { CATEGORIAS, TODOS_LOS_ITEMS, rangoDe } from './catalogo';
 
 /** Tope estatal de la prestación vinculada al servicio en grado III (anexo IV del RD 1051/2013). */
 const PEVS_GRADO_III = cuantiaMaximaPEVS(3);
+
+/** Tipos del IVA (data/fiscal/iva.ts) y el ejemplo del escenario 4: 10.000 € de obra. */
+const IVA_REDUCIDO = PORCENTAJES_IVA.reducido;
+const IVA_GENERAL = PORCENTAJES_IVA.general;
+const OBRAS_EJEMPLO = 10000;
+const AHORRO_IVA_EJEMPLO = (OBRAS_EJEMPLO * (IVA_GENERAL - IVA_REDUCIDO)) / 100;
 
 // ─── Datos ────────────────────────────────────────────────────────────────────
 // El catálogo vive en catalogo.ts: de él salen también las cifras de las dos FAQ.
@@ -133,7 +139,7 @@ export default function AdaptacionHogar() {
 
           {resumen.total === 0 ? (
             <p className={styles.sinSeleccion}>
-              Marca las adaptaciones que necesitas en la lista de la izquierda.<br />El resumen se actualiza en tiempo real.
+              Marca las adaptaciones que necesitas en la lista.<br />El resumen se actualiza en cuanto marcas una.
             </p>
           ) : (
             <div className={styles.resumenGrid}>
@@ -166,7 +172,7 @@ export default function AdaptacionHogar() {
               {resumen.conAyuda > 0 && (
                 <div className={styles.ayudasCard}>
                   <div className={styles.ayudasCardTitulo}><span aria-hidden="true">ℹ</span> Posibles ayudas públicas</div>
-                  {resumen.conAyuda} de tus adaptaciones pueden ser elegibles para ayudas del IMSERSO, Plan Estatal de Vivienda o programas autonómicos. Consulta en tu ayuntamiento o servicios sociales municipales.
+                  {`${resumen.conAyuda} de tus adaptaciones ${resumen.conAyuda === 1 ? 'puede ser elegible' : 'pueden ser elegibles'} para ayudas del IMSERSO, Plan Estatal de Vivienda o programas autonómicos. Consulta en tu ayuntamiento o servicios sociales municipales.`}
                 </div>
               )}
 
@@ -223,7 +229,7 @@ export default function AdaptacionHogar() {
             </tr>
             <tr>
               <td>Prestación Servicios Sociales Municipales</td>
-              <td>Variable (hasta 100%)</td>
+              <td>Variable (hasta 100&nbsp;%)</td>
               <td>Valoración social + renta</td>
               <td>Servicios Sociales municipales</td>
             </tr>
@@ -241,13 +247,13 @@ export default function AdaptacionHogar() {
             </tr>
             <tr>
               <td>Deducción IRPF autonómica</td>
-              <td>10-30% gastos adaptación</td>
-              <td>Discapacidad ≥33% o dependencia</td>
+              <td>10-30&nbsp;% gastos adaptación</td>
+              <td>Discapacidad ≥&nbsp;33&nbsp;% o dependencia</td>
               <td>CCAA (en declaración)</td>
             </tr>
             <tr>
               <td>IVA reducido en obras de adaptación</td>
-              <td>10% en lugar de 21%</td>
+              <td>{IVA_REDUCIDO}&nbsp;% en lugar de {IVA_GENERAL}&nbsp;%</td>
               <td>Vivienda habitual, contratista registrado</td>
               <td>Automático en factura</td>
             </tr>
@@ -271,7 +277,7 @@ export default function AdaptacionHogar() {
             <span className={styles.escenarioIcon} aria-hidden="true">♿</span>
             <strong>Persona con discapacidad reconocida</strong>
           </div>
-          <p>Discapacidad motriz 40%, trabaja en casa y necesita adaptar el acceso, baño y cocina. El Plan Estatal de Vivienda puede cubrir una parte del coste.</p>
+          <p>Discapacidad motriz del 40&nbsp;%, trabaja en casa y necesita adaptar el acceso, baño y cocina. El Plan Estatal de Vivienda puede cubrir una parte del coste.</p>
           <div className={styles.escenarioExample}>Ejemplo: presupuesto de 15.000 € → la subvención es un porcentaje de ese coste con un tope por vivienda que fija la convocatoria; con la discapacidad reconocida puede ser mayor</div>
           <div className={styles.escenarioTip}><span aria-hidden="true">💡</span> Con certificado de discapacidad en vigor, los trámites para las ayudas son más ágiles.</div>
         </div>
@@ -290,7 +296,7 @@ export default function AdaptacionHogar() {
             <strong>Propietario mayor que quiere hacer accesible el piso</strong>
           </div>
           <p>70 años, sin dependencia reconocida pero prevé dificultades. Inversión preventiva en accesibilidad. Puede aprovechar IVA reducido y deducciones IRPF autonómicas.</p>
-          <div className={styles.escenarioExample}>Obras 10.000 € con IVA 10% en vez de 21% → ahorro 1.100 € en IVA</div>
+          <div className={styles.escenarioExample}>Obras {formatCurrency(OBRAS_EJEMPLO)} con IVA {IVA_REDUCIDO}&nbsp;% en vez de {IVA_GENERAL}&nbsp;% → ahorro {formatCurrency(AHORRO_IVA_EJEMPLO)} en IVA</div>
           <div className={styles.escenarioTip}><span aria-hidden="true">💡</span> Invertir en accesibilidad preventiva aumenta el valor de la vivienda y facilita el envejecimiento activo.</div>
         </div>
       </div>
@@ -368,7 +374,7 @@ export default function AdaptacionHogar() {
           <div className={styles.stepNumber}>5</div>
           <div className={styles.stepContent}>
             <strong>Ejecuta las obras con empresa registrada</strong>
-            <p>Usa empresas de instalación registradas para aplicar el IVA reducido del 10%. Guarda todas las facturas para justificar la subvención y para la declaración de IRPF.</p>
+            <p>Usa empresas de instalación registradas para aplicar el IVA reducido del {IVA_REDUCIDO}&nbsp;%. Guarda todas las facturas para justificar la subvención y para la declaración de IRPF.</p>
           </div>
         </div>
         <div className={styles.step}>
@@ -428,7 +434,7 @@ export default function AdaptacionHogar() {
         <ul className={styles.warningList}>
           <li><strong>Hacer las obras antes de solicitar la ayuda</strong>: La mayoría de subvenciones no se pueden solicitar retroactivamente. Una vez iniciadas las obras, se pierde el derecho a muchas ayudas.</li>
           <li><strong>No solicitar valoración de dependencia</strong>: Sin el grado reconocido, se pierden los servicios y prestaciones del SAAD (teleasistencia, ayuda a domicilio…) y las ayudas autonómicas para adaptar el hogar que lo exigen.</li>
-          <li><strong>Contratar empresa no registrada</strong>: Para aplicar el IVA reducido del 10%, la empresa debe cumplir requisitos. Una empresa no registrada puede implicar pagar el 21%.</li>
+          <li><strong>Contratar empresa no registrada</strong>: Para aplicar el IVA reducido del {IVA_REDUCIDO}&nbsp;%, la empresa debe cumplir requisitos. Una empresa no registrada puede implicar pagar el {IVA_GENERAL}&nbsp;%.</li>
           <li><strong>Ignorar las ayudas autonómicas</strong>: Muchas CCAA tienen ayudas adicionales a las estatales. No consultarlas puede suponer perder miles de euros en subvenciones disponibles.</li>
           <li><strong>No guardar todas las facturas</strong>: Las facturas son necesarias para justificar subvenciones, aplicar deducciones en IRPF y garantizar la garantía de las instalaciones.</li>
           <li><strong>Hacer adaptaciones insuficientes por ahorro</strong>: Hacer solo adaptaciones parciales puede resultar en tener que volver a hacer obras pocos años después, gastando más en total.</li>

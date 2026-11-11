@@ -91,7 +91,7 @@ export const faqJsonLd = {
       name: '¿Se necesita licencia de obras para adaptar el hogar de un mayor?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Las obras menores de accesibilidad (barras, antideslizantes, cambia de bañera a ducha) generalmente requieren solo comunicación previa al ayuntamiento. Las intervenciones estructurales o la instalación de ascensores interiores pueden requerir licencia de obras. En comunidades de propietarios, cualquier modificación de elementos comunes (portal, escalera) necesita aprobación de la comunidad, aunque la Ley de Propiedad Horizontal facilita estas obras de accesibilidad.',
+        text: 'Las obras menores de accesibilidad (barras, antideslizantes, cambio de bañera a ducha) generalmente requieren solo comunicación previa al ayuntamiento. Las intervenciones estructurales o la instalación de ascensores interiores pueden requerir licencia de obras. En comunidades de propietarios, cualquier modificación de elementos comunes (portal, escalera) necesita aprobación de la comunidad, aunque la Ley de Propiedad Horizontal facilita estas obras de accesibilidad.',
       },
     },
   ],

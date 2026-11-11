@@ -22,7 +22,7 @@ import { esperarHidratacion } from './_hidratacion';
  *   Cabo C0465  · la casilla es un checkbox nativo con nombre (aria-label) y cada gesto la conmuta
  *                 UNA vez: clic en el texto de la fila, clic en la casilla y Tab + Espacio.
  *
- * HALLAZGOS — ABIERTOS (cada uno con su test.fail(), que afirma lo que la app DEBE hacer):
+ * HALLAZGOS — REPARADOS en /reparar del 11/11/2026 (4452-4460; ya sin test.fail()):
  *   H1 (alto)  · Tabla de ayudas: «Prestación vinculada a servicio (SAAD) · Hasta 833 €/mes
  *                (Grado III)». data/fiscal/dependencia.ts (anexo IV del RD 1051/2013, redacción
  *                del RD 675/2023): 747,25 €/mes; y esa prestación va vinculada a un servicio del
@@ -276,15 +276,15 @@ test('HALLAZGO H7 (11/11/2026, REPARADO) · features del JSON-LD con al menos 4 
   expect(((app?.featureList as unknown[]) ?? []).length).toBeGreaterThanOrEqual(4);
 });
 
-test.describe('HALLAZGO H8 (11/11/2026, ABIERTO) · textos', () => {
+test.describe('HALLAZGO H8 (11/11/2026, REPARADO) · textos', () => {
   test('con una sola adaptación con ayuda, la frase concuerda en singular', async ({ page }) => {
-    test.fail();
     await casilla(page, 'Barras de apoyo en ducha y WC').check();
-    expect(await textoResumen(page)).not.toContain('1 de tus adaptaciones pueden ser elegibles');
+    const texto = await textoResumen(page);
+    expect(texto).not.toContain('1 de tus adaptaciones pueden ser elegibles');
+    expect(texto).toContain('1 de tus adaptaciones puede ser elegible para ayudas');
   });
 
   test('en móvil la lista va ENCIMA del resumen, no «a la izquierda»', async ({ page }) => {
-    test.fail();
     await page.setViewportSize({ width: 390, height: 844 });
     await abrir(page);
     const lista = await page.getByRole('heading', { name: 'Selecciona las adaptaciones que necesitas' }).boundingBox();
@@ -294,17 +294,20 @@ test.describe('HALLAZGO H8 (11/11/2026, ABIERTO) · textos', () => {
   });
 
   test('el «%» va separado de la cifra (Ortografía de la RAE, 2010)', async ({ page }) => {
-    // Hoy: «40-80%», «40%-80%», «100%», «10-30%», «≥33%», «10% en lugar de 21%», «60%»…
+    // Antes: «40-80%», «40%-80%», «100%», «10-30%», «≥33%», «10% en lugar de 21%», «60%»…
     // Se mira solo la guía de la app (el abuelo del botón), no los componentes compartidos.
-    test.fail();
+    // Hallazgo 4458: los tipos del IVA salen de PORCENTAJES_IVA (reducido 10, general 21) y el
+    // ahorro del escenario 4 se calcula: 10.000 × (21 − 10) / 100 = 1100 €.
     await abrirGuia(page);
     const guia = page.getByRole('button', { name: /Ocultar guía educativa/ }).locator('../..');
     await expect(guia).toContainText('Comparativa: Ayudas disponibles');
-    expect(limpiar(await guia.innerText())).not.toMatch(/\d%/);
+    const texto = limpiar(await guia.innerText());
+    expect(texto).not.toMatch(/\d%/);
+    expect(texto).toContain('10 % en lugar de 21 %');
+    expect(texto).toContain('Obras 10.000,00 € con IVA 10 % en vez de 21 % → ahorro 1100,00 € en IVA');
   });
 
   test('FAQPage: «cambio de bañera a ducha», no «cambia»', async ({ page }) => {
-    test.fail();
     const faq = JSON.stringify((await jsonLd(page)).find((b) => b['@type'] === 'FAQPage'));
     expect(faq).not.toContain('cambia de bañera a ducha');
   });
