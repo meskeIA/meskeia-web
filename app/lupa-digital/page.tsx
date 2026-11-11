@@ -79,6 +79,8 @@ export default function LupaDigitalPage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const visorRef = useRef<HTMLDivElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
+  /** Sube con cada apertura y al detener: ver iniciarCamara (cabo C0715). */
+  const generacionRef = useRef(0);
   const arrastreRef = useRef<{ x: number; y: number } | null>(null);
   const wakeLockRef = useRef<WakeLockSentinel | null>(null);
 
@@ -107,6 +109,13 @@ export default function LupaDigitalPage() {
    * devolvía la cámara ANTERIOR y el primer toque no cambiaba nada.
    */
   const iniciarCamara = async (facingMode: 'user' | 'environment' = camaraActual) => {
+    // Gana la última apertura (cabo C0715, alcance del hallazgo 4487 de prueba-camara): el botón
+    // sigue diciendo «Activar lupa» hasta que getUserMedia resuelve, y un doble clic abría la
+    // cámara dos veces; el segundo flujo pisaba al primero en streamRef y este quedaba vivo tras
+    // «Detener», con la luz encendida. Aquí no se ignora la segunda pulsación porque «Cambiar
+    // cámara» también reabre: `generacionRef` sube con cada apertura y al detener, y el flujo que
+    // llega de una apertura que ya no es la última se cierra al llegar.
+    const generacion = ++generacionRef.current;
     try {
       // Detener stream anterior si existe
       if (streamRef.current) {
@@ -126,6 +135,12 @@ export default function LupaDigitalPage() {
       };
 
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      if (generacion !== generacionRef.current) {
+        stream.getTracks().forEach(track => track.stop());
+        return;
+      }
+      // La de una apertura anterior que llegó antes que esta no se queda encendida
+      streamRef.current?.getTracks().forEach(track => track.stop());
       streamRef.current = stream;
       setPermisoCamara('granted');
 
@@ -149,6 +164,7 @@ export default function LupaDigitalPage() {
         toggleLinterna(true);
       }
     } catch (error) {
+      if (generacion !== generacionRef.current) return;
       console.error('Error al acceder a la cámara:', error);
       const nombre = error instanceof Error ? error.name : '';
       if (nombre === 'NotFoundError' || nombre === 'DevicesNotFoundError') {
@@ -162,6 +178,8 @@ export default function LupaDigitalPage() {
   };
 
   const detenerCamara = () => {
+    // Invalida una apertura en curso: su flujo, si llega, se cierra al llegar
+    generacionRef.current += 1;
     if (streamRef.current) {
       streamRef.current.getTracks().forEach(track => track.stop());
       streamRef.current = null;

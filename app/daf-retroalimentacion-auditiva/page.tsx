@@ -98,7 +98,19 @@ export default function DafRetroalimentacionPage() {
     noiseGainRef.current = null;
   }, []);
 
+  // Una apertura cada vez (cabo C0715, alcance del hallazgo 4487 de prueba-camara): el botón
+  // sigue siendo el de activar hasta que getUserMedia resuelve, y un doble clic abría el
+  // micrófono dos veces, con dos retardos sonando a la vez en los auriculares; el segundo flujo
+  // pisaba al primero en streamRef y este seguía vivo tras detener. `generacionRef` sube con cada
+  // apertura, al detener y al desmontar: el flujo que llega de una apertura que ya no es la
+  // última se cierra al llegar.
+  const abriendoRef = useRef(false);
+  const generacionRef = useRef(0);
+
   const iniciar = useCallback(async () => {
+    if (abriendoRef.current) return;
+    abriendoRef.current = true;
+    const generacion = ++generacionRef.current;
     setErrorMic(null);
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -109,10 +121,16 @@ export default function DafRetroalimentacionPage() {
         },
         video: false,
       });
+      if (generacion !== generacionRef.current) {
+        stream.getTracks().forEach(t => t.stop());
+        return;
+      }
       streamRef.current = stream;
       const ctx = new AudioContext();
       ctxRef.current = ctx;
       if (ctx.state === 'suspended') await ctx.resume();
+      // Detenida durante el resume: el flujo y el contexto ya se cerraron
+      if (generacion !== generacionRef.current) return;
 
       const source = ctx.createMediaStreamSource(stream);
 
@@ -133,6 +151,7 @@ export default function DafRetroalimentacionPage() {
       if (enmascaramiento) arrancarRuido();
       rafRef.current = requestAnimationFrame(leerNivel);
     } catch (err) {
+      if (generacion !== generacionRef.current) return;
       // El tipo de fallo va en `name` («NotFoundError»), no en `message`, que es el texto
       // del navegador en inglés («Requested device not found»). Ramificar sobre el mensaje
       // dejaba la rama muerta y soltaba ese inglés en una app en castellano — es el
@@ -148,10 +167,15 @@ export default function DafRetroalimentacionPage() {
       } else {
         setErrorMic(`No se pudo acceder al micrófono: ${msg}`);
       }
+    } finally {
+      if (generacion === generacionRef.current) abriendoRef.current = false;
     }
   }, [retardoMs, enmascaramiento, arrancarRuido, leerNivel]);
 
   const detener = useCallback(() => {
+    // Invalida una apertura en curso: su flujo, si llega, se cierra al llegar
+    generacionRef.current += 1;
+    abriendoRef.current = false;
     if (rafRef.current) { cancelAnimationFrame(rafRef.current); rafRef.current = null; }
     detenerRuido();
     delayRef.current?.disconnect();
@@ -183,6 +207,7 @@ export default function DafRetroalimentacionPage() {
   // Limpieza al desmontar
   useEffect(() => {
     return () => {
+      generacionRef.current += 1; // un flujo que llegue tras desmontar se cierra al llegar
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       try { noiseSourceRef.current?.stop(); } catch { /* ya detenido */ }
       streamRef.current?.getTracks().forEach(t => t.stop());

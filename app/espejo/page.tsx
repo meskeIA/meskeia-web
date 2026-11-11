@@ -17,7 +17,18 @@ export default function EspejoPage() {
   const containerRef = useRef<HTMLDivElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
 
+  // Una apertura cada vez (cabo C0715, alcance del hallazgo 4487 de prueba-camara): el botón
+  // sigue diciendo «Activar espejo» hasta que getUserMedia resuelve, y un doble clic abría la
+  // cámara dos veces; el segundo flujo pisaba al primero en streamRef y este quedaba vivo tras
+  // «Apagar», con la luz encendida. `generacionRef` sube con cada apertura y al apagar (también
+  // al desmontar): el flujo que llega de una apertura que ya no es la última se cierra al llegar.
+  const abriendoRef = useRef(false);
+  const generacionRef = useRef(0);
+
   const iniciarCamara = async () => {
+    if (abriendoRef.current) return;
+    abriendoRef.current = true;
+    const generacion = ++generacionRef.current;
     try {
       if (streamRef.current) {
         streamRef.current.getTracks().forEach(track => track.stop());
@@ -30,6 +41,10 @@ export default function EspejoPage() {
           height: { ideal: 1080 },
         }
       });
+      if (generacion !== generacionRef.current) {
+        stream.getTracks().forEach(track => track.stop());
+        return;
+      }
 
       streamRef.current = stream;
       setPermisoCamara('granted');
@@ -40,12 +55,18 @@ export default function EspejoPage() {
 
       setActivo(true);
     } catch (error) {
+      if (generacion !== generacionRef.current) return;
       console.error('Error al acceder a la cámara:', error);
       setPermisoCamara('denied');
+    } finally {
+      if (generacion === generacionRef.current) abriendoRef.current = false;
     }
   };
 
   const detenerCamara = () => {
+    // Invalida una apertura en curso: su flujo, si llega, se cierra al llegar
+    generacionRef.current += 1;
+    abriendoRef.current = false;
     if (streamRef.current) {
       streamRef.current.getTracks().forEach(track => track.stop());
       streamRef.current = null;

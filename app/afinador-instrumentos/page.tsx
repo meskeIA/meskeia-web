@@ -51,6 +51,8 @@ export default function AfinadorInstrumentosPage() {
   const audioContextRef = useRef<AudioContext | null>(null);
   const analyserRef = useRef<AnalyserNode | null>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
+  /** Sube con cada apertura del micrófono y al detener: ver iniciarEscucha (cabo C0715). */
+  const generacionRef = useRef(0);
   const animationRef = useRef<number | null>(null);
   const bufferRef = useRef<Float32Array | null>(null);
   // El bucle de requestAnimationFrame se reprograma a sí mismo con la función del arranque: si
@@ -81,9 +83,20 @@ export default function AfinadorInstrumentosPage() {
   }, []);
 
   const iniciarEscucha = async (entrada: string = entradaId) => {
+    // Gana la última apertura (cabo C0715, alcance del hallazgo 4487 de prueba-camara): el botón
+    // sigue diciendo «Iniciar afinador» hasta que el micrófono abre, y un doble clic lo abría dos
+    // veces; el segundo flujo pisaba al primero en mediaStreamRef y este seguía vivo tras
+    // «Detener». No se ignora la segunda pulsación porque cambiar de entrada también reabre:
+    // `generacionRef` sube con cada apertura y con detenerEscucha (también al desmontar), y el
+    // flujo que llega de una apertura que ya no es la última se cierra al llegar.
+    const generacion = ++generacionRef.current;
     try {
       // Sin el procesado de voz del navegador, que apagaba la nota sostenida (cabo C0581)
       const abierta = await abrirEntradaAudio(entrada);
+      if (generacion !== generacionRef.current) {
+        abierta.stream.getTracks().forEach(track => track.stop());
+        return;
+      }
       const stream = abierta.stream;
       setEntradaId(abierta.entradaId);
       mediaStreamRef.current = stream;
@@ -115,12 +128,15 @@ export default function AfinadorInstrumentosPage() {
       detectarPitch();
       void actualizarEntradas();
     } catch (error) {
+      if (generacion !== generacionRef.current) return;
       console.error('Error al acceder al micrófono:', error);
       setPermisoMicrofono('denied');
     }
   };
 
   const detenerEscucha = () => {
+    // Invalida una apertura en curso: su flujo, si llega, se cierra al llegar
+    generacionRef.current += 1;
     if (animationRef.current) {
       cancelAnimationFrame(animationRef.current);
     }

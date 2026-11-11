@@ -63,7 +63,15 @@ export default function PanelMicrofono() {
   const [restante, setRestante] = useState<number | null>(null);
   const [urlGrabacion, setUrlGrabacion] = useState<string | null>(null);
 
+  // Cabo C0715 (alcance del hallazgo 4487): el botón sigue diciendo «Probar micrófono» hasta que
+  // getUserMedia resuelve, y un doble clic abría el micrófono dos veces; el segundo flujo pisaba
+  // al primero en streamRef y este seguía vivo tras «Detener micrófono». `cerrar` sube la
+  // generación, así que el flujo que llega de una apertura que ya no es la última se cierra al
+  // llegar. Vale también para cambiar de entrada mientras se abre y para salir de la página.
+  const generacionRef = useRef(0);
+
   const cerrar = useCallback(() => {
+    generacionRef.current += 1;
     cancelAnimationFrame(animacionRef.current);
     if (grabadorRef.current && grabadorRef.current.state !== 'inactive') grabadorRef.current.stop();
     grabadorRef.current = null;
@@ -77,6 +85,7 @@ export default function PanelMicrofono() {
     async (idEntrada: string) => {
       setError(null);
       cerrar();
+      const generacion = generacionRef.current;
       try {
         const audio: MediaTrackConstraints = {
           ...(idEntrada ? { deviceId: { exact: idEntrada } } : {}),
@@ -96,6 +105,10 @@ export default function PanelMicrofono() {
             audio: { echoCancellation: true, noiseSuppression: true, autoGainControl: true },
           });
           setEntradaId('');
+        }
+        if (generacion !== generacionRef.current) {
+          stream.getTracks().forEach((pista) => pista.stop());
+          return;
         }
         streamRef.current = stream;
 
@@ -149,6 +162,8 @@ export default function PanelMicrofono() {
         setActivo(true);
         await actualizarEntradas();
       } catch (fallo) {
+        // El fallo de una apertura que ya no es la última no pisa a la que sigue en curso
+        if (generacion !== generacionRef.current) return;
         const nombre = fallo instanceof Error ? fallo.name : '';
         if (nombre === 'NotAllowedError' || nombre === 'SecurityError') {
           setError('Permiso denegado. Permite el acceso al micrófono en tu navegador (icono del candado en la barra de direcciones).');

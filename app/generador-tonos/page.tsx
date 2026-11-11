@@ -493,6 +493,8 @@ export default function GeneradorTonosPage() {
   const [frecuenciaEnCurso, setFrecuenciaEnCurso] = useState<number | null>(null);
   const [avisoMedida, setAvisoMedida] = useState<string | null>(null);
   const streamMicroRef = useRef<MediaStream | null>(null);
+  /** Una medida de respuesta en curso, desde el clic (cabo C0715): ver medirRespuesta. */
+  const medidaEnCursoRef = useRef(false);
   /** Oscilador y ganancia de la medida en curso: el desmontaje también los apaga con rampa. */
   const medidaNodosRef = useRef<{ oscilador: OscillatorNode; ganancia: GainNode } | null>(null);
 
@@ -780,10 +782,16 @@ export default function GeneradorTonosPage() {
    * daría un suelo altísimo y descartaría la medida entera.
    */
   const medirRespuesta = useCallback(async (ranura: Ranura) => {
-    if (midiendo) return;
+    // `midiendo` es estado y no llega hasta que el micrófono abre: un doble clic en «Medir A»
+    // lo abría dos veces, el segundo flujo pisaba al primero en streamMicroRef y el primero
+    // quedaba vivo tras la medida (cabo C0715, alcance del hallazgo 4487 de prueba-camara). El
+    // ref se pone en el acto y se suelta en cada salida.
+    if (midiendo || medidaEnCursoRef.current) return;
+    medidaEnCursoRef.current = true;
     setAvisoMedida(null);
 
     if (!navigator.mediaDevices?.getUserMedia) {
+      medidaEnCursoRef.current = false;
       setAvisoMedida('Este navegador no da acceso al micrófono, así que aquí no se puede medir.');
       return;
     }
@@ -809,6 +817,7 @@ export default function GeneradorTonosPage() {
         audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false },
       });
     } catch {
+      medidaEnCursoRef.current = false;
       setAvisoMedida('No se ha podido abrir el micrófono. Hay que dar permiso al navegador para medir.');
       return;
     }
@@ -818,6 +827,7 @@ export default function GeneradorTonosPage() {
     // procesados apagados, pero hay navegadores que ignoran la petición sin avisar.
     const veredicto = evaluarMicrofono(stream.getAudioTracks()[0]?.getSettings() ?? {});
     if (!veredicto.sirve) {
+      medidaEnCursoRef.current = false;
       cerrarMicrofono();
       setAvisoMedida(avisoProcesados(veredicto.procesadosActivos));
       return;
@@ -963,6 +973,7 @@ export default function GeneradorTonosPage() {
       }
       cerrarMicrofono();
       liberarWakeLock();
+      medidaEnCursoRef.current = false;
       setMidiendo(null);
       setFrecuenciaEnCurso(null);
     }

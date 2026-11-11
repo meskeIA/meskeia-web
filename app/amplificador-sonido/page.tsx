@@ -31,8 +31,19 @@ export default function AmplificadorSonidoPage() {
   // Ganancia real (multiplicador) derivada del deslizador
   const gainValue = (gainPct / 100) * GAIN_MAX;
 
+  // Una apertura cada vez (cabo C0715, alcance del hallazgo 4487 de prueba-camara): el botón
+  // sigue diciendo «Iniciar amplificación» hasta que getUserMedia resuelve, y un doble clic abría
+  // el micrófono dos veces, con dos cadenas sonando a la vez en los auriculares; el segundo flujo
+  // pisaba al primero en streamRef y este seguía vivo tras «Detener». `generacionRef` sube con
+  // cada apertura y con `detener` (también al desmontar): el flujo que llega de una apertura que
+  // ya no es la última se cierra al llegar.
+  const abriendoRef = useRef(false);
+  const generacionRef = useRef(0);
+
   // Detener y liberar todos los recursos de audio
   const detener = useCallback(() => {
+    generacionRef.current += 1;
+    abriendoRef.current = false;
     if (animationRef.current) {
       cancelAnimationFrame(animationRef.current);
       animationRef.current = null;
@@ -75,6 +86,9 @@ export default function AmplificadorSonidoPage() {
 
   // Iniciar la escucha amplificada
   const iniciar = async () => {
+    if (abriendoRef.current) return;
+    abriendoRef.current = true;
+    const generacion = ++generacionRef.current;
     try {
       setError(null);
 
@@ -85,11 +99,17 @@ export default function AmplificadorSonidoPage() {
           autoGainControl: false, // la ganancia la controla el usuario, no el navegador
         },
       });
+      if (generacion !== generacionRef.current) {
+        stream.getTracks().forEach((track) => track.stop());
+        return;
+      }
       streamRef.current = stream;
 
       const ctx = new AudioContext();
       audioContextRef.current = ctx;
       await ctx.resume();
+      // «Detener» durante el resume ya cerró este contexto y el flujo
+      if (generacion !== generacionRef.current) return;
 
       const source = ctx.createMediaStreamSource(stream);
 
@@ -129,6 +149,7 @@ export default function AmplificadorSonidoPage() {
       setIsActive(true);
       medirNivel();
     } catch (err) {
+      if (generacion !== generacionRef.current) return;
       console.error('Error al acceder al micrófono:', err);
       if (err instanceof Error) {
         if (err.name === 'NotAllowedError') {
@@ -139,6 +160,8 @@ export default function AmplificadorSonidoPage() {
           setError(`No se pudo iniciar el audio: ${err.message}`);
         }
       }
+    } finally {
+      if (generacion === generacionRef.current) abriendoRef.current = false;
     }
   };
 

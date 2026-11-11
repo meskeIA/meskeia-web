@@ -263,8 +263,19 @@ export default function LuxometroPage() {
     animationRef.current = requestAnimationFrame(calculateLuxFromCamera);
   }, [anotarHistorial]);
 
+  // Una apertura cada vez (cabo C0715, alcance del hallazgo 4487 de prueba-camara): el botón
+  // sigue diciendo «Iniciar Medición» hasta que llega el primer fotograma, y un doble clic abría
+  // la cámara dos veces; el segundo flujo pisaba al primero en streamRef y este quedaba vivo tras
+  // «Detener», con la luz de la cámara encendida. `generacionRef` sube con cada apertura, con
+  // «Detener» y al desmontar: el flujo que llega de una apertura que ya no es la última se cierra.
+  const abriendoRef = useRef(false);
+  const generacionRef = useRef(0);
+
   // Iniciar método de cámara
   const startCameraMethod = useCallback(async () => {
+    if (abriendoRef.current) return;
+    abriendoRef.current = true;
+    const generacion = ++generacionRef.current;
     try {
       setError(null);
 
@@ -275,7 +286,13 @@ export default function LuxometroPage() {
           height: { ideal: 480 }
         }
       });
+      if (generacion !== generacionRef.current) {
+        stream.getTracks().forEach(track => track.stop());
+        return;
+      }
 
+      // Una cámara anterior (iniciar de nuevo sin detener) no se queda encendida
+      streamRef.current?.getTracks().forEach(track => track.stop());
       streamRef.current = stream;
 
       if (videoRef.current) {
@@ -288,6 +305,7 @@ export default function LuxometroPage() {
         };
       }
     } catch (err) {
+      if (generacion !== generacionRef.current) return;
       // El navegador pone el tipo de fallo en `name` («NotAllowedError», «NotFoundError») y en
       // `message` un texto suyo en inglés («Requested device not found»). Buscar «NotFound» en
       // el MENSAJE dejaba esa rama muerta y el usuario recibía el inglés crudo del navegador
@@ -303,6 +321,8 @@ export default function LuxometroPage() {
       } else {
         setError(`Error al acceder a la cámara: ${detalle}`);
       }
+    } finally {
+      if (generacion === generacionRef.current) abriendoRef.current = false;
     }
   }, [calculateLuxFromCamera]);
 
@@ -318,6 +338,9 @@ export default function LuxometroPage() {
 
   // Detener medición
   const stopMeasurement = useCallback(() => {
+    // Invalida una apertura en curso: su flujo, si llega, se cierra al llegar
+    generacionRef.current += 1;
+    abriendoRef.current = false;
     pararSensor();
     if (animationRef.current) {
       cancelAnimationFrame(animationRef.current);
@@ -381,6 +404,7 @@ export default function LuxometroPage() {
   // Limpiar al desmontar
   useEffect(() => {
     return () => {
+      generacionRef.current += 1; // un flujo que llegue tras desmontar se cierra al llegar
       sensorRef.current?.stop();
       sensorRef.current = null;
       if (animationRef.current) {

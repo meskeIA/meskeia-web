@@ -139,8 +139,17 @@ export default function PruebaMicrofonoPage() {
     draw();
   }, [showWaveform, sensitivity, peakVolume]);
 
+  // Gana la última apertura (cabo C0715, alcance del hallazgo 4487 de prueba-camara): el botón
+  // sigue diciendo «Iniciar Micrófono» hasta que getUserMedia resuelve, y un doble clic abría el
+  // micrófono dos veces (tres, con la reapertura al conocer la lista de micrófonos); el flujo
+  // pisado seguía vivo tras «Detener». No se ignora la segunda llamada porque cambiar de
+  // micrófono también reabre: `generacionRef` sube con cada apertura, con «Detener» y al
+  // desmontar, y el flujo que llega de una apertura que ya no es la última se cierra al llegar.
+  const generacionRef = useRef(0);
+
   // Iniciar micrófono
   const startMicrophone = useCallback(async () => {
+    const generacion = ++generacionRef.current;
     try {
       setError(null);
 
@@ -158,6 +167,10 @@ export default function PruebaMicrofonoPage() {
       };
 
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
+      if (generacion !== generacionRef.current) {
+        stream.getTracks().forEach(track => track.stop());
+        return;
+      }
       streamRef.current = stream;
 
       // Crear contexto de audio. Creado tras el await de getUserMedia puede nacer suspendido
@@ -193,13 +206,20 @@ export default function PruebaMicrofonoPage() {
       await getMicrophones();
       drawVisualization();
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Error desconocido';
-      if (errorMessage.includes('Permission denied') || errorMessage.includes('NotAllowedError')) {
+      if (generacion !== generacionRef.current) return;
+      // Se decide por err.name, como PanelMicrofono y prueba-camara (cabo C0707): ningún navegador
+      // pone el nombre en el mensaje, así que «sin micrófono» no salía nunca, y fuera de Chrome el
+      // permiso denegado (Safari: «The request is not allowed by the user agent…») o el micrófono
+      // ocupado acababan en un texto técnico en inglés.
+      const nombre = err instanceof Error || err instanceof DOMException ? err.name : '';
+      if (nombre === 'NotAllowedError' || nombre === 'SecurityError') {
         setError('Permiso denegado. Permite el acceso al micrófono en tu navegador.');
-      } else if (errorMessage.includes('NotFoundError')) {
+      } else if (nombre === 'NotFoundError' || nombre === 'OverconstrainedError') {
         setError('No se encontró ningún micrófono. Conecta uno e intenta de nuevo.');
+      } else if (nombre === 'NotReadableError' || nombre === 'AbortError') {
+        setError('El micrófono está ocupado o bloqueado por el sistema. Cierra otras apps de videollamada o grabación e inténtalo de nuevo.');
       } else {
-        setError(`Error al acceder al micrófono: ${errorMessage}`);
+        setError('No se pudo acceder al micrófono. Comprueba que está conectado y que el navegador tiene permiso.');
       }
       setIsActive(false);
     }
@@ -207,6 +227,8 @@ export default function PruebaMicrofonoPage() {
 
   // Detener micrófono
   const stopMicrophone = useCallback(() => {
+    // Invalida una apertura en curso: su flujo, si llega, se cierra al llegar
+    generacionRef.current += 1;
     if (animationRef.current) {
       cancelAnimationFrame(animationRef.current);
     }
@@ -322,6 +344,7 @@ export default function PruebaMicrofonoPage() {
   // Limpiar al desmontar
   useEffect(() => {
     return () => {
+      generacionRef.current += 1; // un flujo que llegue tras desmontar se cierra al llegar
       if (animationRef.current) {
         cancelAnimationFrame(animationRef.current);
       }

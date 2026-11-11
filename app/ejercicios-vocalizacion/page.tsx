@@ -142,10 +142,25 @@ export default function EjerciciosVocalizacionPage() {
     animFrameRef.current = requestAnimationFrame(leerVolumen);
   }, []);
 
+  // Una apertura cada vez (cabo C0715, alcance del hallazgo 4487 de prueba-camara): el botón
+  // sigue diciendo «Activar micrófono» hasta que getUserMedia resuelve, y un doble clic abría el
+  // micrófono dos veces; el segundo flujo pisaba al primero en streamRef y este seguía vivo tras
+  // «Desactivar micrófono». `generacionRef` sube con cada apertura, al desactivar y al desmontar:
+  // el flujo que llega de una apertura que ya no es la última se cierra al llegar.
+  const abriendoRef = useRef(false);
+  const generacionRef = useRef(0);
+
   const activarMicrofono = useCallback(async () => {
+    if (abriendoRef.current) return;
+    abriendoRef.current = true;
+    const generacion = ++generacionRef.current;
     setErrorMic(null);
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+      if (generacion !== generacionRef.current) {
+        stream.getTracks().forEach(t => t.stop());
+        return;
+      }
       streamRef.current = stream;
       const ctx = new AudioContext();
       audioCtxRef.current = ctx;
@@ -170,6 +185,7 @@ export default function EjerciciosVocalizacionPage() {
       setMicActivo(true);
       leerVolumen();
     } catch (err) {
+      if (generacion !== generacionRef.current) return;
       // El tipo de fallo va en `name` («NotFoundError»), no en `message`, que es el texto
       // del navegador en inglés («Requested device not found»). Ramificar sobre el mensaje
       // dejaba la rama muerta y soltaba ese inglés en una app en castellano — es el
@@ -185,10 +201,15 @@ export default function EjerciciosVocalizacionPage() {
       } else {
         setErrorMic(`No se pudo acceder al micrófono: ${msg}`);
       }
+    } finally {
+      if (generacion === generacionRef.current) abriendoRef.current = false;
     }
   }, [leerVolumen]);
 
   const desactivarMicrofono = useCallback(() => {
+    // Invalida una apertura en curso: su flujo, si llega, se cierra al llegar
+    generacionRef.current += 1;
+    abriendoRef.current = false;
     if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
     if (timerRef.current) clearInterval(timerRef.current);
     streamRef.current?.getTracks().forEach(t => t.stop());
@@ -205,6 +226,7 @@ export default function EjerciciosVocalizacionPage() {
   // Limpiar al desmontar
   useEffect(() => {
     return () => {
+      generacionRef.current += 1; // un flujo que llegue tras desmontar se cierra al llegar
       if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current);
       if (timerRef.current) clearInterval(timerRef.current);
       streamRef.current?.getTracks().forEach(t => t.stop());

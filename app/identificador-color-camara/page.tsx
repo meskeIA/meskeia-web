@@ -164,13 +164,28 @@ export default function IdentificadorColorPage() {
     setColor({ r: Math.round(sr / n), g: Math.round(sg / n), b: Math.round(sb / n) });
   }, []);
 
+  // Una apertura cada vez (cabo C0715, alcance del hallazgo 4487 de prueba-camara): el botón
+  // sigue diciendo «Activar cámara» hasta que getUserMedia resuelve, y un doble clic abría la
+  // cámara dos veces; el segundo flujo pisaba al primero en streamRef y este quedaba vivo tras
+  // «Apagar cámara», con la luz encendida. `generacionRef` sube con cada apertura, al apagar y al
+  // desmontar: el flujo que llega de una apertura que ya no es la última se cierra al llegar.
+  const abriendoRef = useRef(false);
+  const generacionRef = useRef(0);
+
   const iniciarCamara = useCallback(async () => {
+    if (abriendoRef.current) return;
+    abriendoRef.current = true;
+    const generacion = ++generacionRef.current;
     setErrorCamara(null);
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } },
         audio: false,
       });
+      if (generacion !== generacionRef.current) {
+        stream.getTracks().forEach(t => t.stop());
+        return;
+      }
       streamRef.current = stream;
       // El <video> aún no está montado (aparece al pasar camaraActiva a true).
       // El stream se adjunta en un efecto cuando el elemento ya existe en el DOM.
@@ -179,6 +194,7 @@ export default function IdentificadorColorPage() {
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       rafRef.current = requestAnimationFrame(muestrearCentro);
     } catch (err) {
+      if (generacion !== generacionRef.current) return;
       // Se clasifica por `name`, que es el valor ESTANDARIZADO de DOMException, y no por
       // `message`, que es texto en inglés que fija cada navegador. Con el mensaje:
       //   · la rama de «NotFound» era código muerto, porque Chrome dice «Requested device
@@ -198,6 +214,8 @@ export default function IdentificadorColorPage() {
       } else {
         setErrorCamara(`No se pudo acceder a la cámara (${nombre || msg}). Prueba con el modo imagen.`);
       }
+    } finally {
+      if (generacion === generacionRef.current) abriendoRef.current = false;
     }
   }, [muestrearCentro]);
 
@@ -213,6 +231,9 @@ export default function IdentificadorColorPage() {
   }, [camaraActiva]);
 
   const detenerCamara = useCallback(() => {
+    // Invalida una apertura en curso: su flujo, si llega, se cierra al llegar
+    generacionRef.current += 1;
+    abriendoRef.current = false;
     if (rafRef.current) { cancelAnimationFrame(rafRef.current); rafRef.current = null; }
     streamRef.current?.getTracks().forEach(t => t.stop());
     streamRef.current = null;
@@ -231,6 +252,7 @@ export default function IdentificadorColorPage() {
   // Limpieza al desmontar
   useEffect(() => {
     return () => {
+      generacionRef.current += 1; // un flujo que llegue tras desmontar se cierra al llegar
       if (rafRef.current) cancelAnimationFrame(rafRef.current);
       streamRef.current?.getTracks().forEach(t => t.stop());
     };

@@ -272,6 +272,8 @@ export default function SonometroPage() {
   // frecuencia de muestreo y del fftSize, así que se tabula una vez al arrancar en vez de
   // evaluar el logaritmo 1.024 veces en cada fotograma.
   const gananciaARef = useRef<Float64Array | null>(null);
+  /** Sube con cada apertura del micrófono y al detener: ver startMeasuring (cabo C0715). */
+  const generacionRef = useRef(0);
 
   // Limpiar recursos al desmontar
   useEffect(() => {
@@ -552,6 +554,13 @@ export default function SonometroPage() {
   // `conservarAviso`: al cambiar de entrada midiendo, el aviso de que la medición anterior se
   // guardó tiene que seguir en pantalla cuando arranca la nueva.
   const startMeasuring = async (entrada: string = entradaId, conservarAviso = false) => {
+    // Gana la última apertura (cabo C0715, alcance del hallazgo 4487 de prueba-camara): el botón
+    // sigue diciendo «Iniciar medición» hasta que el micrófono abre, y un doble clic lo abría dos
+    // veces; el segundo flujo pisaba al primero en streamRef y este seguía vivo tras «Detener y
+    // guardar». No se ignora la segunda pulsación porque cambiar de entrada también reabre:
+    // `generacionRef` sube con cada apertura y con stopMeasuring (también al desmontar), y el
+    // flujo que llega de una apertura que ya no es la última se cierra al llegar.
+    const generacion = ++generacionRef.current;
     try {
       setError(null);
       if (!conservarAviso) setAvisoRegistro(null);
@@ -559,6 +568,10 @@ export default function SonometroPage() {
       // Sin echoCancellation, noiseSuppression ni autoGainControl: con ellos el nivel no es el
       // de la sala sino el que el navegador decide dejar pasar.
       const abierta = await abrirEntradaAudio(entrada);
+      if (generacion !== generacionRef.current) {
+        abierta.stream.getTracks().forEach(track => track.stop());
+        return;
+      }
       const stream = abierta.stream;
       setEntradaId(abierta.entradaId);
 
@@ -625,6 +638,8 @@ export default function SonometroPage() {
       void actualizarEntradas();
 
     } catch (err) {
+      // El fallo de una apertura que ya no es la última no pisa a la que sigue en curso
+      if (generacion !== generacionRef.current) return;
       console.error('Error al acceder al micrófono:', err);
       // Si el fallo llega DESPUÉS de conceder el permiso —un navegador sin AudioContext sin
       // prefijo, por ejemplo—, el stream se quedaba abierto: la app decía que no estaba
@@ -650,6 +665,8 @@ export default function SonometroPage() {
 
   // Detener medición
   const stopMeasuring = () => {
+    // Invalida una apertura en curso: su flujo, si llega, se cierra al llegar
+    generacionRef.current += 1;
     if (animationRef.current) {
       cancelAnimationFrame(animationRef.current);
       animationRef.current = null;
