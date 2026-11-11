@@ -58,6 +58,8 @@ const RUTAS = [
   '/simulador-automata-pila/', // C0415
   '/escalador-recetas/', // C0433
   '/escandallo-food-cost/', // C0434
+  // C0705 (Ronda del 11/11/2026): la fila de botones de marca de histona sin flex-wrap
+  '/visualizador-epigenetica/',
 ];
 
 for (const ruta of RUTAS) {
