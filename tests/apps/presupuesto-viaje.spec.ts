@@ -14,9 +14,9 @@ import { esperarHidratacion } from './_hidratacion';
  * coinciden con el art. 9.A.3.a del RIRPF (RD 439/2007), cotejado en el BOE el 11/11/2026:
  * 53,34 € en España y 91,35 € en el extranjero pernoctando; 26,67 € y 48,08 € sin pernoctar.
  *
- * Los importes son `<input type="number">` leídos con `parseFloat(v.replace(',', '.'))`: Chromium,
- * en esta página `lang="es"`, entrega «1.500» tal cual y se lee 1,5; «1.234,56» llega como
- * «1.23456». Los campos Días y Personas ya son `CampoNumerico` y leen bien.
+ * Los importes eran `<input type="number">` leídos con `parseFloat(v.replace(',', '.'))`: Chromium,
+ * en esta página `lang="es"`, entregaba «1.500» tal cual y se leía 1,5. Desde el 11/11/2026
+ * (/reparar, hallazgos 4461-4465 y 4471) son `CampoNumerico`, como Días y Personas.
  *
  * Los casos abiertos van en `test.fail()` con «HALLAZGO (11/11/2026, ABIERTO)»: cuando se
  * reparen, el test pasará y `test.fail()` lo pondrá en rojo para que se quite la marca.
@@ -127,24 +127,22 @@ test.describe('presupuesto-viaje', () => {
     await expect(resumen(page)).toContainText(/Por persona \(1 viajero\)\s*300,00 €/);
   });
 
-  test('HALLAZGO (11/11/2026, ABIERTO) · CASO 3 · un importe negativo resta del total', async ({
+  test('HALLAZGO 4462 (11/11/2026, REPARADO) · CASO 3 · un importe negativo ya no resta del total', async ({
     page,
   }) => {
     // Un gasto no puede ser negativo: «-500» debe rechazarse (o quedarse en 0) y el total seguir
-    // en 300. Hoy entra tal cual: total −200,00 € y −100,00 € por persona. El `min="0"` del
-    // input no impide teclearlo.
-    test.fail();
+    // en 300. Entraba tal cual: total −200,00 € y −100,00 € por persona. Ahora CampoNumerico con
+    // min 0 lo acota a 0.
     await teclear(page, 'Importe de Hotel / Airbnb en EUR', '300');
     await teclear(page, 'Importe de Vuelos en EUR', '-500');
     await expect(resumen(page)).toContainText(/Total del viaje\s*300,00\s*€/, { timeout: 2000 });
   });
 
-  test('HALLAZGO (11/11/2026, ABIERTO) · un importe con punto de millar se lee mil veces menor', async ({
+  test('HALLAZGO 4461 (11/11/2026, REPARADO) · un importe con punto de millar se lee en formato español', async ({
     page,
   }) => {
     // «1.500» es mil quinientos y «1.234,56» mil doscientos treinta y cuatro con cincuenta y seis
-    // (formato español, parseSpanishNumber). Hoy: total 1,50 € y, con «1.234,56», 1,23 €.
-    test.fail();
+    // (formato español, parseSpanishNumber). Daba total 1,50 € y, con «1.234,56», 1,23 €.
     await teclear(page, 'Personas', '1');
     await teclear(page, 'Importe de Vuelos en EUR', '1.500');
     await expect(resumen(page)).toContainText(/Total del viaje\s*1500,00\s*€/, { timeout: 2000 });
@@ -152,12 +150,11 @@ test.describe('presupuesto-viaje', () => {
     await expect(resumen(page)).toContainText(/Total del viaje\s*1234,56\s*€/, { timeout: 2000 });
   });
 
-  test('HALLAZGO (11/11/2026, ABIERTO) · un presupuesto máximo con punto de millar se lee mil veces menor', async ({
+  test('HALLAZGO 4461 (11/11/2026, REPARADO) · un presupuesto máximo con punto de millar se lee en formato español', async ({
     page,
   }) => {
     // «3.000» es tres mil: con 500 de hotel, 500 / 3000 = 16,67 → 17 % y sobran 2500.
-    // Hoy: «500,00 / 3,00 €», «16667% del presupuesto», «Te excedes en 497,00 €».
-    test.fail();
+    // Daba «500,00 / 3,00 €», «16667% del presupuesto», «Te excedes en 497,00 €».
     await teclear(page, 'Presupuesto máximo (opcional)', '3.000');
     await teclear(page, 'Importe de Hotel / Airbnb en EUR', '500');
     const panel = resumen(page);
@@ -166,12 +163,11 @@ test.describe('presupuesto-viaje', () => {
     await expect(panel).toContainText('Te sobran 2500,00 €', { timeout: 2000 });
   });
 
-  test('HALLAZGO (11/11/2026, ABIERTO) · el reparto automático de un presupuesto exacto da «Sobre presupuesto»', async ({
+  test('HALLAZGO 4463 (11/11/2026, REPARADO) · el reparto automático de un presupuesto exacto suma el presupuesto', async ({
     page,
   }) => {
-    // 1000 € con tres gastos en Comida: 20 % = 200 ÷ 3 = 66,666… El reparto redondea cada uno a
-    // 66,67 (3 × 66,67 = 200,01) y el total pasa a 1000,01. Lo repartido debe sumar el presupuesto.
-    test.fail();
+    // 1000 € con tres gastos en Comida: 20 % = 200 ÷ 3 = 66,666… El reparto redondeaba cada uno a
+    // 66,67 (3 × 66,67 = 200,01) y el total pasaba a 1000,01. Ahora: 66,66 + 66,66 + 66,68 = 200.
     await teclear(page, 'Presupuesto máximo (opcional)', '1000');
     const tarjetaComida = page
       .locator('div')
@@ -183,14 +179,14 @@ test.describe('presupuesto-viaje', () => {
     const panel = resumen(page);
     await expect(panel).toContainText(/Total del viaje\s*1000,00\s*€/, { timeout: 2000 });
     await expect(panel).toContainText('Dentro del presupuesto', { timeout: 2000 });
+    await expect(panel).toContainText(/Comida y bebida\s*200,00 €/);
   });
 
-  test('HALLAZGO (11/11/2026, ABIERTO) · el botón de reparto pone «€» aunque la divisa sea otra', async ({
+  test('HALLAZGO 4464 (11/11/2026, REPARADO) · el botón de reparto pone la divisa elegida', async ({
     page,
   }) => {
-    // Con USD todo el resumen dice «USD»; el botón usa formatCurrency, que fija el euro.
-    // Hoy: «Distribuir automáticamente (1000,00 €)».
-    test.fail();
+    // Con USD todo el resumen dice «USD»; el botón usaba formatCurrency, que fija el euro:
+    // «Distribuir automáticamente (1000,00 €)».
     await page.getByLabel('Divisa').selectOption('USD');
     await teclear(page, 'Presupuesto máximo (opcional)', '1000');
     const boton = page.getByRole('button', { name: /Distribuir presupuesto máximo/ });
@@ -198,28 +194,29 @@ test.describe('presupuesto-viaje', () => {
     await expect(boton).not.toContainText('€', { timeout: 2000 });
   });
 
-  test('HALLAZGO (11/11/2026, ABIERTO) · la barra del presupuesto no tiene nombre accesible', async ({
+  test('HALLAZGO 4471 (11/11/2026, REPARADO) · la barra del presupuesto tiene nombre y hay una sola región viva', async ({
     page,
   }) => {
-    // role="progressbar" exige nombre (WAI-ARIA 1.2); el aria-label va en el div de fuera, que
-    // es genérico y no lo transmite. Hoy el árbol accesible dice solo «progressbar».
-    test.fail();
+    // role="progressbar" exige nombre (WAI-ARIA 1.2); el aria-label iba en el div de fuera, que
+    // es genérico y no lo transmite. Y había dos regiones vivas anidadas (la sección y la barra).
     await teclear(page, 'Presupuesto máximo (opcional)', '1000');
     await teclear(page, 'Importe de Hotel / Airbnb en EUR', '400');
     await expect(page.getByRole('progressbar', { name: /presupuesto/i })).toHaveCount(1, {
       timeout: 2000,
     });
+    const vivas = resumen(page).locator('[aria-live]');
+    await expect(vivas).toHaveCount(1);
+    await expect(vivas).toContainText('Total del viaje');
+    await expect(resumen(page)).not.toHaveAttribute('aria-live', /.+/);
   });
 
-  test('HALLAZGO (11/11/2026, ABIERTO) · enseña dietas fiscales sin aviso crítico ni DataReference', async ({
+  test('HALLAZGO 4465 (11/11/2026, REPARADO) · las dietas fiscales llevan aviso crítico y DataReference', async ({
     page,
   }) => {
     // Suites viajes + finanzas con un componente fiscal (las dietas deducibles del autónomo):
     // nivel 1 de _private/DISCLAIMER-POLICY.md → DisclaimerCard critical, no plegable, y
-    // DataReference con FISCAL_RETRIBUCIONES_EXENTAS_META. Hoy: «general», «medium» y plegable,
-    // sin DataReference. Si la reparación retira las dietas de la página, este test pasa y hay
-    // que quitarle el test.fail().
-    test.fail();
+    // DataReference con FISCAL_RETRIBUCIONES_EXENTAS_META. Era «general», «medium» y plegable,
+    // sin DataReference.
     const faq = page.locator('li').filter({ hasText: '53,34' });
     if ((await faq.count()) > 0) {
       await expect(page.getByRole('note', { name: 'Aviso importante' })).toHaveCount(1, { timeout: 2000 });

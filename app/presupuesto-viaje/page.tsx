@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useCallback } from 'react';
-import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard, DisclaimerCard, CampoNumerico } from '@/components';
+import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard, DisclaimerCard, DataReference, CampoNumerico } from '@/components';
 import { formatCurrency, formatNumber } from '@/lib/formatters';
-import { DIETAS_MANUTENCION_EXENTAS } from '@/data/fiscal';
+import { DIETAS_MANUTENCION_EXENTAS, FISCAL_RETRIBUCIONES_EXENTAS_META } from '@/data/fiscal';
 import styles from './PresupuestoViaje.module.css';
 
 interface GastoItem {
@@ -70,6 +70,10 @@ const DIVISAS_COMUNES = ['EUR', 'USD', 'GBP', 'MXN', 'ARS', 'COP', 'PEN', 'CLP',
 
 const generarId = () => Math.random().toString(36).slice(2, 9);
 
+/** Un importe en el campo, sin foco: vacío si es 0 (deja ver el placeholder), sin ceros de relleno. */
+const mostrarImporte = (v: number): string =>
+  v ? formatNumber(v, Number.isInteger(v) ? 0 : 2) : '';
+
 export default function PresupuestoViaje() {
   const [destino, setDestino] = useState<string>('');
   const [numeroDias, setNumeroDias] = useState<number>(7);
@@ -93,8 +97,9 @@ export default function PresupuestoViaje() {
   const porDiaPersona = numeroDias > 0 && personas > 0 ? totalGeneral / numeroDias / personas : 0;
 
   // Actualizar importe de un gasto
-  const actualizarImporte = (catId: string, gastoId: string, valor: string) => {
-    const num = parseFloat(valor.replace(',', '.')) || 0;
+  // El importe llega ya leído por CampoNumerico (parseSpanishNumber, min 0). Hasta el 11/11/2026
+  // era un type="number" con parseFloat: «1.500» se leía 1,5 y «-500» restaba (hallazgos 4461 y 4462).
+  const actualizarImporte = (catId: string, gastoId: string, num: number) => {
     setCategorias(prev => prev.map(cat =>
       cat.id === catId
         ? { ...cat, gastos: cat.gastos.map(g => g.id === gastoId ? { ...g, importe: num } : g) }
@@ -162,19 +167,35 @@ export default function PresupuestoViaje() {
       actividades: 0.10,
       otros: 0.05,
     };
-    setCategorias(prev => prev.map(cat => {
-      const porcentaje = distribucion[cat.id] ?? 0;
-      const importeCategoria = presupuestoMaximo * porcentaje;
-      if (porcentaje === 0 || cat.gastos.length === 0) return cat;
-      const importePorGasto = importeCategoria / cat.gastos.length;
-      return {
-        ...cat,
-        gastos: cat.gastos.map(g => ({
-          ...g,
-          importe: Math.round(importePorGasto * 100) / 100,
-        })),
-      };
-    }));
+    // Se reparte en céntimos enteros y el céntimo que sobra o falta va al último gasto: antes cada
+    // gasto se redondeaba por separado y 1000 € con tres gastos en Comida sumaban 1000,01 €, con
+    // «Sobre presupuesto» justo después de repartir (hallazgo 4463).
+    setCategorias(prev => {
+      const totalCentimos = Math.round(presupuestoMaximo * 100);
+      const receptoras = prev.filter(cat => (distribucion[cat.id] ?? 0) > 0 && cat.gastos.length > 0);
+      const centimosCategoria = new Map<string, number>();
+      let asignados = 0;
+      receptoras.forEach((cat, i) => {
+        const centimos = i === receptoras.length - 1 && receptoras.length === Object.keys(distribucion).length
+          ? totalCentimos - asignados
+          : Math.round(totalCentimos * distribucion[cat.id]);
+        centimosCategoria.set(cat.id, centimos);
+        asignados += centimos;
+      });
+      return prev.map(cat => {
+        const centimos = centimosCategoria.get(cat.id);
+        if (centimos === undefined) return cat;
+        const n = cat.gastos.length;
+        const base = Math.floor(centimos / n);
+        return {
+          ...cat,
+          gastos: cat.gastos.map((g, i) => ({
+            ...g,
+            importe: (i === n - 1 ? centimos - base * (n - 1) : base) / 100,
+          })),
+        };
+      });
+    });
   }, [presupuestoMaximo]);
 
   // Reset
@@ -203,11 +224,20 @@ export default function PresupuestoViaje() {
 
       <LegalNotice />
 
+      {/* Nivel 1 de _private/DISCLAIMER-POLICY.md (hallazgo 4465): la página da las dietas de
+          manutención deducibles del autónomo, un componente fiscal. Antes: general, medium, plegable. */}
       <DisclaimerCard
-        variant="general"
-        severity="medium"
-        collapsible={true}
+        variant="financial"
+        severity="critical"
+        collapsible={false}
         context="presupuesto-viaje-disclaimer"
+      />
+      <DataReference
+        normativa="Dietas de manutención exentas y deducibles (IRPF)"
+        fuente={FISCAL_RETRIBUCIONES_EXENTAS_META.fuente}
+        verificado={FISCAL_RETRIBUCIONES_EXENTAS_META.verificado}
+        urlOficial={FISCAL_RETRIBUCIONES_EXENTAS_META.urlOficial}
+        nota={FISCAL_RETRIBUCIONES_EXENTAS_META.nota}
       />
 
       <main className={styles.main}>
@@ -266,17 +296,18 @@ export default function PresupuestoViaje() {
 
             <div className={styles.grupoCampo}>
               <label htmlFor="presupuestoMax">Presupuesto máximo (opcional)</label>
-              <input
+              {/* Era un type="number" con parseFloat: «3.000» se leía 3 (hallazgo 4461) */}
+              <CampoNumerico
                 id="presupuestoMax"
-                type="number"
                 className={styles.inputNumero}
-                value={presupuestoMaximo || ''}
-                onChange={e => setPresupuestoMaximo(parseFloat(e.target.value.replace(',', '.')) || 0)}
+                valor={presupuestoMaximo}
+                onCambio={setPresupuestoMaximo}
+                min={0}
+                decimales={2}
+                paso={100}
+                formatear={mostrarImporte}
                 placeholder="Ej: 2000"
-                min="0"
-                step="any"
-                inputMode="decimal"
-                aria-describedby="presupuestoMax-hint"
+                ariaDescribedBy="presupuestoMax-hint"
               />
               <span id="presupuestoMax-hint" className={styles.campoHint}>
                 Presupuesto total del viaje para el grupo
@@ -291,18 +322,20 @@ export default function PresupuestoViaje() {
               onClick={distribuirPresupuesto}
               aria-label="Distribuir presupuesto máximo automáticamente entre categorías"
             >
-              <span aria-hidden="true">✨</span> Distribuir automáticamente ({formatCurrency(presupuestoMaximo)})
+              <span aria-hidden="true">✨</span> Distribuir automáticamente ({formatNumber(presupuestoMaximo, 2)} {simboloDivisa})
             </button>
           )}
         </section>
 
         {/* Panel de resultados */}
-        <section className={styles.panelResultados} aria-live="polite">
+        {/* Una sola región viva, acotada al total (hallazgo 4471): antes era la sección entera, con
+            otra anidada en la barra, y cada tecla volvía a anunciar el panel completo. */}
+        <section className={styles.panelResultados}>
           <h2>
             Resumen<span>{destino ? ` — ${destino}` : ''}</span>
           </h2>
 
-          <div className={styles.totalGeneral}>
+          <div className={styles.totalGeneral} aria-live="polite" aria-atomic="true">
             <span className={styles.totalGeneralLabel}>Total del viaje</span>
             <span className={styles.totalGeneralValor}>
               {formatNumber(totalGeneral, 2)}
@@ -326,7 +359,7 @@ export default function PresupuestoViaje() {
 
           {/* Barra presupuesto máximo */}
           {presupuestoMaximo > 0 && (
-            <div className={styles.presupuestoMaxSection} aria-live="polite" aria-label="Estado del presupuesto máximo">
+            <div className={styles.presupuestoMaxSection}>
               {(() => {
                 const porcentajeUsado = Math.round((totalGeneral / presupuestoMaximo) * 100);
                 const sobrante = presupuestoMaximo - totalGeneral;
@@ -341,7 +374,7 @@ export default function PresupuestoViaje() {
                         {formatNumber(totalGeneral, 2)} / {formatNumber(presupuestoMaximo, 2)} {simboloDivisa}
                       </span>
                     </div>
-                    <div className={styles.barraPresupuesto} role="progressbar" aria-valuenow={Math.min(porcentajeUsado, 100)} aria-valuemin={0} aria-valuemax={100}>
+                    <div className={styles.barraPresupuesto} role="progressbar" aria-label="Presupuesto máximo usado" aria-valuenow={Math.min(porcentajeUsado, 100)} aria-valuemin={0} aria-valuemax={100}>
                       <div
                         className={`${styles.barraPresupuestoRelleno} ${sobrePresupuesto ? styles.barraRoja : porcentajeUsado > 80 ? styles.barraAmbar : styles.barraVerde}`}
                         style={{ width: `${Math.min(porcentajeUsado, 100)}%` }}
@@ -444,16 +477,15 @@ export default function PresupuestoViaje() {
                       placeholder="Descripción"
                       aria-label="Descripción del gasto"
                     />
-                    <input
-                      type="number"
+                    <CampoNumerico
                       className={styles.inputGastoImporte}
-                      value={gasto.importe || ''}
-                      onChange={e => actualizarImporte(cat.id, gasto.id, e.target.value)}
+                      valor={gasto.importe}
+                      onCambio={(num) => actualizarImporte(cat.id, gasto.id, num)}
+                      min={0}
+                      decimales={2}
+                      formatear={mostrarImporte}
                       placeholder="0"
-                      min="0"
-                      step="any"
-                      inputMode="decimal"
-                      aria-label={`Importe de ${gasto.descripcion} en ${divisa}`}
+                      ariaLabel={`Importe de ${gasto.descripcion} en ${divisa}`}
                     />
                     <button
                       type="button"
