@@ -374,7 +374,7 @@ export default function AdaptacionHogar() {
         </div>
         <div className={styles.faqItem}>
           <strong>¿Se pueden hacer obras en un piso de alquiler?</strong>
-          <p>Sí, si el inquilino tiene discapacidad o dependencia, tiene derecho a realizar obras de adaptación necesarias con el consentimiento del propietario, quien no puede negarse si son razonables.</p>
+          <p>En España, sí. La Ley de Arrendamientos Urbanos (art. 24) permite al inquilino hacer en el interior de la vivienda las obras necesarias por la discapacidad o la edad superior a setenta años suya, de su cónyuge o pareja o de los familiares que convivan con él. No necesita el consentimiento del propietario: basta con <strong>notificárselo antes por escrito</strong>. Las obras no pueden afectar a elementos o servicios comunes del edificio ni a su estabilidad o seguridad, y al terminar el contrato el inquilino tendrá que reponer la vivienda a su estado anterior si el propietario lo exige.</p>
         </div>
         <div className={styles.faqItem}>
           <strong>¿El ascensor de la comunidad puede adaptarse con ayudas?</strong>

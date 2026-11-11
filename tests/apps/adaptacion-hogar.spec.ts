@@ -236,16 +236,16 @@ test('HALLAZGO H2 (11/11/2026, REPARADO) · el Plan Estatal de Vivienda no exige
   expect(texto).toContain('no exige discapacidad');
 });
 
-test('HALLAZGO H3 (11/11/2026, ABIERTO) · obras en alquiler: notificación escrita, no consentimiento (LAU art. 24)', async ({ page }) => {
-  // Ley 29/1994, art. 24.1 (BOE-A-1994-26003): el arrendatario, «previa notificación escrita al
-  // arrendador», puede hacer las obras necesarias por discapacidad o edad superior a setenta
-  // años (suya, de su cónyuge o pareja o de familiares que convivan); art. 24.2: al terminar,
-  // reponer la vivienda si así lo exige el arrendador.
-  test.fail();
+test('HALLAZGO H3 (11/11/2026, REPARADO) · obras en alquiler: notificación escrita, no consentimiento (LAU art. 24)', async ({ page }) => {
+  // Ley 29/1994, art. 24.1 (BOE-A-1994-26003, cotejado el 11/11/2026): el arrendatario, «previa
+  // notificación escrita al arrendador», puede hacer las obras necesarias por discapacidad o
+  // edad superior a setenta años (suya, de su cónyuge o pareja o de familiares que convivan);
+  // art. 24.2: al terminar, «reponer la vivienda al estado anterior, si así lo exige el arrendador».
   const texto = await abrirGuia(page);
   expect(texto).not.toContain('con el consentimiento del propietario');
-  expect(texto).toMatch(/notificaci[oó]n/i);
-  expect(texto).toMatch(/setenta años|70 años/);
+  expect(texto).toMatch(/notificárselo antes por escrito/);
+  expect(texto).toMatch(/setenta años/);
+  expect(texto).toMatch(/reponer la vivienda/);
 });
 
 test('HALLAZGO H4 (11/11/2026, ABIERTO) · las FAQ no contradicen los costes que suma la lista', async ({ page }) => {
