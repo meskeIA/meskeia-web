@@ -310,7 +310,9 @@ const DATOS_FASCINANTES: DatoFascinante[] = [
   { icono: '🌍', titulo: '96.000 km de vasos', descripcion: 'Si pusieras todos tus vasos sanguíneos en línea, darían 2,5 vueltas a la Tierra.' },
   { icono: '💀', titulo: 'Hemofilia real', descripcion: 'La hemofilia (falta de factor VIII o IX) afectó a la realeza europea. Se conocía como "la enfermedad de los reyes".' },
   { icono: '🔬', titulo: 'La capa fantasma', descripcion: 'La capa leucoplaquetaria (buffy coat) es <1 % del volumen, pero contiene TODOS los leucocitos y plaquetas.' },
-  { icono: '⚡', titulo: 'Coagulación en 3-5 minutos', descripcion: 'Desde la lesión hasta el coágulo estable, el proceso completo tarda entre 3 y 5 minutos.' },
+  // Decía «Coagulación en 3-5 minutos … hasta el coágulo estable, el proceso completo», sin fuente
+  // y mezclando el tapón de plaquetas con la red de fibrina estabilizada y retraída (hallazgo 4475).
+  { icono: '⚡', titulo: 'Primero un tapón, luego la red', descripcion: 'En pocos minutos las plaquetas forman un tapón que frena la hemorragia; la red de fibrina que lo refuerza se estabiliza y se retrae después.' },
   { icono: '🅾️', titulo: 'O- es oro líquido', descripcion: 'Solo el 9 % de los españoles son O-. Sus glóbulos rojos se pueden transfundir a cualquier receptor, y por eso son imprescindibles en emergencias (con el plasma es al revés: el universal es el AB).' },
 ];
 
@@ -618,7 +620,7 @@ function SeccionCoagulacion() {
   return (
     <div className={styles.seccionContent}>
       <div className={styles.contexto}>
-        <p>Cuando un vaso se rompe, tu cuerpo activa una cascada de <strong>7 pasos</strong> para sellar la herida. De lesión a coágulo estable en 3-5 minutos.</p>
+        <p>Cuando un vaso se rompe, tu cuerpo activa una cascada de <strong>7 pasos</strong> para sellar la herida. Primero las plaquetas forman un tapón que frena la hemorragia; después, la red de fibrina lo refuerza, se estabiliza y se retrae.</p>
       </div>
 
       {/* Cascada visual SVG */}

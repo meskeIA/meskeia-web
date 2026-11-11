@@ -504,7 +504,8 @@ test.describe('Cabo C0365 · el tiempo hasta el coágulo estable', () => {
   test('o) los minutos «de lesión a coágulo estable» llevan fuente o no se atribuyen al proceso completo', async ({
     page,
   }) => {
-    test.fail(); // HALLAZGO ABIERTO (cabo C0365, 11/11/2026) [contenido/bajo]
+    // REPARADO el 11/11/2026 (/reparar, hallazgo 4475, cabo C0365): las dos frases se matizan sin
+    // minutos para el coágulo estable: primero el tapón de plaquetas, después la red de fibrina.
     // ENTRADA sección «Coagulación» (párrafo de contexto, page.tsx:621) y sección «Datos y
     //         análisis» (dato curioso «Coagulación en 3-5 minutos», page.tsx:313)
     // ESPERADO una cifra con fuente para el punto final que nombra la app, que su propio paso 7
@@ -530,5 +531,10 @@ test.describe('Cabo C0365 · el tiempo hasta el coágulo estable', () => {
     const enDatos = frasesDelCoaguloEstable(await textoVisible());
 
     for (const frase of [...enCoagulacion, ...enDatos]) expect(frase, frase).toMatch(ATRIBUIDA);
+    // Y que no sea por haber quitado las secciones: el texto matizado está en las dos.
+    await irASeccion(page, 'Coagulación');
+    expect(await textoVisible()).toContain('Primero las plaquetas forman un tapón');
+    await irASeccion(page, 'Datos y análisis');
+    expect(await textoVisible()).toContain('Primero un tapón, luego la red');
   });
 });
