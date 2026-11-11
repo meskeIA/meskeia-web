@@ -2,8 +2,12 @@
 
 import { useMemo, useState } from 'react';
 import styles from './AdaptacionHogar.module.css';
-import { MeskeiaLogo, LegalNotice, Footer, EducationalSection, RelatedApps, ShareCard, DisclaimerCard } from '@/components';
+import { MeskeiaLogo, LegalNotice, Footer, EducationalSection, RelatedApps, ShareCard, DisclaimerCard, DataReference } from '@/components';
 import { formatCurrency } from '@/lib';
+import { cuantiaMaximaPEVS, FISCAL_DEPENDENCIA_META } from '@/data/fiscal';
+
+/** Tope estatal de la prestación vinculada al servicio en grado III (anexo IV del RD 1051/2013). */
+const PEVS_GRADO_III = cuantiaMaximaPEVS(3);
 
 // ─── Datos ────────────────────────────────────────────────────────────────────
 
@@ -137,6 +141,12 @@ export default function AdaptacionHogar() {
           <br /><em>meskeIA no se responsabiliza de decisiones basadas en estas estimaciones.</em>
         </span>
       </DisclaimerCard>
+      <DataReference
+        normativa="Prestaciones de dependencia (Ley 39/2006 y RD 1051/2013)"
+        fuente={FISCAL_DEPENDENCIA_META.fuente}
+        verificado={FISCAL_DEPENDENCIA_META.verificado}
+        urlOficial={FISCAL_DEPENDENCIA_META.urlOficial}
+      />
 
       <div className={styles.mainContent}>
         {/* Checklist */}
@@ -247,11 +257,11 @@ export default function AdaptacionHogar() {
       <EducationalSection title="¿Qué ayudas existen para adaptar el hogar?" subtitle="IMSERSO, Plan de Vivienda y programas autonómicos">
         <p>Existen varias vías de financiación pública para adaptar el hogar a las necesidades de personas mayores o con discapacidad:</p>
         <h3>Plan Estatal de Vivienda</h3>
-        <p>Contempla ayudas para la accesibilidad universal de viviendas y edificios. Las subvenciones pueden llegar al 40-80% del coste según el tipo de adaptación y la renta del solicitante.</p>
+        <p>El Plan Estatal de Vivienda 2026-2030 (Real Decreto 326/2026) subvenciona obras de accesibilidad en los edificios y dentro de las viviendas. Pueden pedirlo los propietarios, los usufructuarios, las comunidades de propietarios y, si su contrato se lo permite, los inquilinos: <strong>no hace falta tener reconocida una discapacidad ni una dependencia</strong>. La ayuda es un porcentaje del coste con un tope por vivienda; sube si en la vivienda o el edificio reside una persona con discapacidad o mayor, y tiene un refuerzo para situaciones de vulnerabilidad económica. Los porcentajes, los topes y los plazos los aplica cada comunidad autónoma en su convocatoria.</p>
         <h3>Servicios Sociales municipales</h3>
         <p>Muchos ayuntamientos tienen programas propios de adaptación del hogar para mayores. Es el primer lugar donde consultar, ya que gestionan los recursos locales y autonómicos.</p>
         <h3>Prestaciones por dependencia</h3>
-        <p>Si la persona tiene reconocido un Grado de Dependencia (I, II o III), puede acceder a la prestación vinculada al servicio de adaptación del entorno. Gestionar el reconocimiento de dependencia desbloquea múltiples ayudas.</p>
+        <p>Con un grado de dependencia reconocido (I, II o III), la prestación económica vinculada al servicio ayuda a pagar un servicio del catálogo de la Ley de Dependencia (teleasistencia, ayuda a domicilio, centro de día…), <strong>no obras</strong>. Las adaptaciones del hogar se financian con otra vía de la misma ley (disposición adicional 3.ª): ayudas para la autonomía personal, con carácter de subvención, que convoca cada comunidad autónoma. Tener el grado reconocido abre las dos.</p>
         <h3>IMSERSO</h3>
         <p>El IMSERSO y sus equivalentes autonómicos financian adaptaciones específicas (telealarma, ayudas técnicas, eliminación de barreras) para personas en situación de dependencia o vulnerabilidad.</p>
         <h3>Deducción IRPF</h3>
@@ -272,9 +282,9 @@ export default function AdaptacionHogar() {
           </thead>
           <tbody>
             <tr>
-              <td>Plan de Vivienda (Estatal)</td>
-              <td>40%-80% del coste</td>
-              <td>Discapacidad/dependencia acreditada</td>
+              <td>Plan Estatal de Vivienda 2026-2030 (RD 326/2026)</td>
+              <td>Porcentaje del coste con tope por vivienda, según convocatoria (más si reside una persona con discapacidad o mayor)</td>
+              <td>Ser propietario, usufructuario, comunidad o inquilino autorizado; no exige discapacidad</td>
               <td>CCAA / Ayuntamiento</td>
             </tr>
             <tr>
@@ -284,10 +294,16 @@ export default function AdaptacionHogar() {
               <td>Servicios Sociales municipales</td>
             </tr>
             <tr>
-              <td>Prestación vinculada a servicio (SAAD)</td>
-              <td>Hasta 833 €/mes (Grado III)</td>
-              <td>Grado dependencia reconocido</td>
-              <td>IMSERSO / CCAA</td>
+              <td>Ayudas para adaptaciones del hogar (Ley 39/2006, disposición adicional 3.ª)</td>
+              <td>Subvención según convocatoria</td>
+              <td>Grado de dependencia reconocido</td>
+              <td>CCAA</td>
+            </tr>
+            <tr>
+              <td>Prestación vinculada al servicio (SAAD)</td>
+              <td>Hasta {formatCurrency(PEVS_GRADO_III)}/mes en grado III, para pagar un servicio del catálogo (teleasistencia, ayuda a domicilio…), no obras</td>
+              <td>Grado de dependencia reconocido</td>
+              <td>CCAA</td>
             </tr>
             <tr>
               <td>Deducción IRPF autonómica</td>
@@ -313,7 +329,7 @@ export default function AdaptacionHogar() {
             <strong>Persona mayor con movilidad reducida</strong>
           </div>
           <p>75 años, dificultad para subir escaleras y bañarse. Necesita instalación de barras, sustitución de bañera por plato ducha y posiblemente elevador o rampa.</p>
-          <div className={styles.escenarioExample}>Coste estimado: 3.000-8.000 € → con ayudas: puede cubrirse 40-80%</div>
+          <div className={styles.escenarioExample}>Coste estimado: 3.000-8.000 € → las ayudas a la accesibilidad pueden cubrir una parte, según la convocatoria de su comunidad; las del Plan Estatal de Vivienda no le piden un grado reconocido</div>
           <div className={styles.escenarioTip}><span aria-hidden="true">💡</span> Solicitar valoración de dependencia antes de iniciar obras para poder acceder a todas las ayudas.</div>
         </div>
         <div className={styles.escenarioCard}>
@@ -321,8 +337,8 @@ export default function AdaptacionHogar() {
             <span className={styles.escenarioIcon} aria-hidden="true">♿</span>
             <strong>Persona con discapacidad reconocida</strong>
           </div>
-          <p>Discapacidad motriz 40%, trabaja en casa y necesita adaptar el acceso, baño y cocina. El Plan de Vivienda estatal puede cubrir gran parte del coste.</p>
-          <div className={styles.escenarioExample}>Ejemplo: Presupuesto 15.000 € → subvención 60% = 9.000 € cubiertos</div>
+          <p>Discapacidad motriz 40%, trabaja en casa y necesita adaptar el acceso, baño y cocina. El Plan Estatal de Vivienda puede cubrir una parte del coste.</p>
+          <div className={styles.escenarioExample}>Ejemplo: presupuesto de 15.000 € → la subvención es un porcentaje de ese coste con un tope por vivienda que fija la convocatoria; con la discapacidad reconocida puede ser mayor</div>
           <div className={styles.escenarioTip}><span aria-hidden="true">💡</span> Con certificado de discapacidad en vigor, los trámites para las ayudas son más ágiles.</div>
         </div>
         <div className={styles.escenarioCard}>
@@ -330,8 +346,8 @@ export default function AdaptacionHogar() {
             <span className={styles.escenarioIcon} aria-hidden="true">🏠</span>
             <strong>Familiar cuidador que acondiciona la casa</strong>
           </div>
-          <p>Hijo que acoge a su madre con dependencia Grado II. Necesita adaptar una habitación y el baño. Puede acceder a ayudas del SAAD y deducción autonómica.</p>
-          <div className={styles.escenarioExample}>Prestación SAAD para adaptación + deducción IRPF autonómica por obras</div>
+          <p>Hijo que acoge a su madre con dependencia Grado II. Necesita adaptar una habitación y el baño. Puede pedir las ayudas autonómicas para adaptar el hogar de la Ley de Dependencia y la deducción autonómica.</p>
+          <div className={styles.escenarioExample}>Subvención autonómica para adaptaciones del hogar (dependencia) + deducción IRPF autonómica por obras</div>
           <div className={styles.escenarioTip}><span aria-hidden="true">💡</span> El cuidador familiar puede solicitar la prestación económica para cuidados en el entorno familiar también.</div>
         </div>
         <div className={styles.escenarioCard}>
@@ -354,7 +370,7 @@ export default function AdaptacionHogar() {
         </div>
         <div className={styles.faqItem}>
           <strong>¿Necesito certificado de discapacidad para acceder a las ayudas?</strong>
-          <p>Para la mayoría de ayudas sí. Con certificado de discapacidad (≥33%) o valoración de dependencia, el acceso a subvenciones y prestaciones es mucho más amplio.</p>
+          <p>No siempre. Las ayudas a la accesibilidad del Plan Estatal de Vivienda no lo exigen: el certificado de discapacidad, o ser una persona mayor, solo puede subir la cuantía. Las ayudas de dependencia sí piden el grado reconocido, y muchas municipales valoran la situación social y la renta.</p>
         </div>
         <div className={styles.faqItem}>
           <strong>¿Se pueden hacer obras en un piso de alquiler?</strong>
@@ -362,7 +378,7 @@ export default function AdaptacionHogar() {
         </div>
         <div className={styles.faqItem}>
           <strong>¿El ascensor de la comunidad puede adaptarse con ayudas?</strong>
-          <p>Sí, la instalación o adaptación de ascensores en comunidades de propietarios puede beneficiarse del Plan de Vivienda si hay residentes con movilidad reducida o dependencia.</p>
+          <p>Sí, la instalación o adaptación de ascensores en comunidades de propietarios puede beneficiarse de las ayudas a la accesibilidad de edificios del Plan Estatal de Vivienda, que pide la comunidad. Si en el edificio reside una persona con discapacidad o mayor, la ayuda puede ser mayor.</p>
         </div>
         <div className={styles.faqItem}>
           <strong>¿Cuánto tarda en resolverse la ayuda del Plan de Vivienda?</strong>
@@ -477,7 +493,7 @@ export default function AdaptacionHogar() {
         </div>
         <ul className={styles.warningList}>
           <li><strong>Hacer las obras antes de solicitar la ayuda</strong>: La mayoría de subvenciones no se pueden solicitar retroactivamente. Una vez iniciadas las obras, se pierde el derecho a muchas ayudas.</li>
-          <li><strong>No solicitar valoración de dependencia</strong>: Sin el grado reconocido, se pierde acceso a las prestaciones del SAAD, que pueden cubrir una parte importante del coste.</li>
+          <li><strong>No solicitar valoración de dependencia</strong>: Sin el grado reconocido, se pierden los servicios y prestaciones del SAAD (teleasistencia, ayuda a domicilio…) y las ayudas autonómicas para adaptar el hogar que lo exigen.</li>
           <li><strong>Contratar empresa no registrada</strong>: Para aplicar el IVA reducido del 10%, la empresa debe cumplir requisitos. Una empresa no registrada puede implicar pagar el 21%.</li>
           <li><strong>Ignorar las ayudas autonómicas</strong>: Muchas CCAA tienen ayudas adicionales a las estatales. No consultarlas puede suponer perder miles de euros en subvenciones disponibles.</li>
           <li><strong>No guardar todas las facturas</strong>: Las facturas son necesarias para justificar subvenciones, aplicar deducciones en IRPF y garantizar la garantía de las instalaciones.</li>

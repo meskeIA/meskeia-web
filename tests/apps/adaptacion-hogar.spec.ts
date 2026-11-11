@@ -205,29 +205,35 @@ test('HALLAZGO H5 (11/11/2026, ABIERTO) · «Eliminar o fijar alfombras» no dic
   }
 });
 
-test('HALLAZGO H1 (11/11/2026, ABIERTO) · la prestación vinculada no se ofrece como ayuda de obras ni con 833 €/mes', async ({ page }) => {
+test('HALLAZGO H1 (11/11/2026, REPARADO) · la prestación vinculada no se ofrece como ayuda de obras ni con 833 €/mes', async ({ page }) => {
   // data/fiscal/dependencia.ts, PRESTACIONES_DEPENDENCIA_2025 (anexo IV del RD 1051/2013,
   // cotejado con BOE-A-2013-13811): vinculada al servicio, grado III = 747,25 €/mes. Ley
-  // 39/2006, art. 17.2: «vinculada a la adquisición de un servicio» del catálogo del art. 15.1,
-  // que no tiene ninguno de obras; las adaptaciones del hogar son las ayudas de su disposición
-  // adicional 3.ª («A facilitar la accesibilidad y adaptaciones en el hogar»), con carácter de
-  // subvención.
-  test.fail();
+  // 39/2006, art. 17.2: «en todo caso, vinculada a la adquisición de un servicio» (cotejado en
+  // el BOE el 11/11/2026); las adaptaciones del hogar son las ayudas de su disposición
+  // adicional 3.ª, letra b, con carácter de subvención. Ahora la cifra sale de cuantiaMaximaPEVS(3)
+  // y la fila dice que va a un servicio, no a obras; la DA 3.ª tiene su propia fila.
   const texto = await abrirGuia(page);
   expect(texto).not.toContain('833 €/mes');
   expect(texto).not.toContain('servicio de adaptación del entorno');
+  expect(texto).toContain('Hasta 747,25 €/mes en grado III');
+  expect(texto).toContain('disposición adicional 3.ª');
+  // Datos con caducidad → DataReference tras el aviso
+  await expect(page.getByText(/Ley 39\/2006 LAPAD/).first()).toBeVisible();
 });
 
-test('HALLAZGO H2 (11/11/2026, ABIERTO) · el Plan Estatal de Vivienda no exige discapacidad ni cubre «40-80 %»', async ({ page }) => {
-  // RD 326/2026, Plan Estatal de Vivienda 2026-2030 (BOE-A-2026-8872): art. 99.2.b, «El 70 %
-  // del coste de la actuación», 80 % si reside una persona con discapacidad ≥ 33 % o mayor de
-  // 65; art. 108.1, hasta el 80 % dentro de la vivienda; arts. 96.1 y 105.1, beneficiarios sin
-  // requisito de discapacidad ni dependencia (solo suben la cuantía).
-  test.fail();
+test('HALLAZGO H2 (11/11/2026, REPARADO) · el Plan Estatal de Vivienda no exige discapacidad ni cubre «40-80 %»', async ({ page }) => {
+  // RD 326/2026, Plan Estatal de Vivienda 2026-2030 (BOE-A-2026-8872, cotejado el 11/11/2026):
+  // art. 99.2.b, «El 70 % del coste de la actuación», hasta el 80 % si reside una persona con
+  // discapacidad o mayor de 65; art. 108.1, hasta el 80 % dentro de la vivienda; arts. 96.1 y
+  // 105.1, beneficiarios sin requisito de discapacidad ni dependencia (solo suben la cuantía).
+  // No hay módulo de data/fiscal para este programa: la app ya no da porcentajes y remite a la
+  // convocatoria, y dice quién puede pedirla.
   const texto = await abrirGuia(page);
   expect(texto).not.toContain('40%-80% del coste');
   expect(texto).not.toContain('40-80% del coste');
   expect(texto).not.toContain('Discapacidad/dependencia acreditada');
+  expect(texto).not.toContain('subvención 60%');
+  expect(texto).toContain('no exige discapacidad');
 });
 
 test('HALLAZGO H3 (11/11/2026, ABIERTO) · obras en alquiler: notificación escrita, no consentimiento (LAU art. 24)', async ({ page }) => {

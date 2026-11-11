@@ -59,7 +59,7 @@ export const faqJsonLd = {
       name: '¿Hay ayudas públicas para adaptar el hogar de una persona mayor?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Sí. El IMSERSO y las comunidades autónomas ofrecen subvenciones para adaptaciones de accesibilidad. También existen ayudas de los ayuntamientos a través del Plan Estatal de Vivienda y deducciones en el IRPF por obras de mejora de accesibilidad. Las personas con grado de dependencia reconocido pueden acceder a prestaciones del SAAD para financiar parcialmente estas adaptaciones.',
+        text: 'Sí. El Plan Estatal de Vivienda 2026-2030 subvenciona obras de accesibilidad en edificios y viviendas sin exigir discapacidad ni dependencia (con ellas, o si reside una persona mayor, la ayuda puede ser mayor); lo convocan las comunidades autónomas. Las personas con grado de dependencia reconocido pueden pedir además las ayudas autonómicas para adaptaciones del hogar de la Ley de Dependencia, que son subvenciones. Muchos ayuntamientos tienen programas propios, y algunas comunidades dan deducciones en el IRPF por obras de accesibilidad.',
       },
     },
     {
