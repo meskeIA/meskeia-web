@@ -1,5 +1,5 @@
 import { test, expect, Page, Locator } from '@playwright/test';
-import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
+import { asentarAntesDeTraducir, esperarHidratacion, esperarValorEnReact } from './_hidratacion';
 import { prepararParaMedir } from '../_contraste';
 
 /**
@@ -369,7 +369,8 @@ test('REGRESIÓN 5 · el número suelto conserva el cero final de los decimales'
 // ─── TESTIGO DEL HALLAZGO ABIERTO (afirma el fallo tal y como está hoy) ───────
 
 /**
- * TESTIGO · hallazgo de la segunda inspección (24/08/2026), bajo, ABIERTO. Es hijo de la
+ * TESTIGO · hallazgo de la segunda inspección (24/08/2026), bajo, REPARADO el 24/08/2026
+ * (hallazgo 263): el testigo invertido es la REGRESIÓN 6, justo debajo. Es hijo de la
  * reparación del hallazgo 4: la página comprueba el tope con Math.floor(|v|), de modo que
  * 999.999.999.999,995 pasa el filtro; después cantidadALetras() redondea a céntimos
  * (Math.round(|v| × 100)) y el entero resultante ya es 1.000.000.000.000, así que el motor
@@ -933,8 +934,8 @@ async function contrasteEfectivo(control: Locator): Promise<number> {
  *   E · «Lps.» (lempira) y «¢» (colón) se rechazan aunque la ayuda diga «con o sin símbolo»
  *
  * REPARADOS el 25/09/2026 (Ronda 15): A = 1706, B = 1707, C = 1708 y D = 1709; sus marcas se
- * retiran y cada uno lleva debajo casos de más. E = 1710 sigue ABIERTO: los símbolos viven en
- * SIMBOLOS de lib/numeroALetras.ts, que es compartido y queda fuera de la reparación de la app.
+ * retiran y cada uno lleva debajo casos de más. E = 1710, REPARADO también el 25/09/2026 en
+ * SIMBOLOS de lib/numeroALetras.ts (compartido): su test lo dice en el título.
  */
 test.describe('Inspección 25/09/2026 — firma de rotura, México, redondeo y norma del DPD', () => {
   const panel = (page: Page) => page.locator('[role="region"][aria-label="Resultado"]');
@@ -1224,5 +1225,220 @@ test.describe('Inspección 25/09/2026 — firma de rotura, México, redondeo y n
       await expect(texto(page), entrada).toHaveText(esperado, { timeout: 2000 });
       await expect(page.locator('#moneda'), entrada).toHaveValue(codigo);
     }
+  });
+});
+
+/**
+ * ══════════════════════════════════════════════════════════════════════════════════════════
+ * QUINTA INSPECCIÓN · 12/11/2026 — modo CAMBIO (git diff ac046fdc HEAD -- app/conversor-numeros-letras/)
+ * ══════════════════════════════════════════════════════════════════════════════════════════
+ *
+ * Dos commits tocan la app, ninguno el cálculo:
+ *   · cd462414 (cabos C0090 y C0116): sale el `scroll-margin-top: 72px` de .campoPrincipal. El
+ *     hueco bajo la barra fija del logo lo pone ahora el documento, en globals.css:
+ *     `html:has([data-barra-logo]) { scroll-padding-top: calc(var(--alto-barra-logo) + 0.25rem) }`,
+ *     con la barra de 62 px hasta 768 px de ancho (92 px por encima) y el alto medido que publica
+ *     MeskeiaLogo.
+ *   · 53e07954 (C0312, lote 2 de 6): « Elige la tuya en «Moneda».» del aviso de moneda y el « o »
+ *     entre las lecturas en voz alta, cada uno en un <span> siempre montado, para que con la página
+ *     traducida React cambie su textContent en vez de retirar un nodo de texto que ya es un <font>.
+ *
+ * ESPERADOS, RESUELTOS ANTES DE ABRIR EL NAVEGADOR
+ *   · Al tocar el campo en móvil la app hace scrollIntoView({ block: 'start' }) del bloque
+ *     «Cantidad» (hallazgo 1538). Con el padding global, el bloque queda a 62 + 4 = 66 px del
+ *     borde, justo bajo la caja de la barra (62 px). Si volviera el scroll-margin de la app, se
+ *     SUMARÍA al padding (66 + 72 = 138 px: el defecto que el commit retiró en 33 módulos); sin
+ *     ninguno de los dos, a 0 px y tapado por la barra. A 768 px de ancho, el mismo 66: la regla de
+ *     la app (max-width: 768px) y la barra de 62 px llegan las dos hasta ese ancho.
+ *   · Sin traducir, el texto visible es el de antes del span, letra a letra.
+ *   · Con la página traducida, el aviso pasa de «£» (con su botón) a «$» (con «Elige la tuya») sin
+ *     caerse: el span cambia de textContent.
+ *
+ * HALLAZGO (test.fail: afirma lo CORRECTO y hoy falla; al repararse, se quita la marca)
+ *   · Con la página traducida, cambiar el número suelto cuando tiene lecturas en voz alta tumba la
+ *     app (NotFoundError en insertBefore, «Algo salió mal»).
+ */
+test.describe('Inspección 12/11/2026 — scroll-padding global y textos condicionales en su span', () => {
+  const panel = (page: Page) => page.locator('[role="region"][aria-label="Resultado"]');
+  const oral = (page: Page) => panel(page).locator('p', { hasText: 'En voz alta' });
+
+  /** Escribe como el usuario (fill) y espera a que el ESTADO de React lo haya recogido. */
+  async function escribir(page: Page, entrada: string): Promise<void> {
+    await page.locator('#cantidad').fill(entrada);
+    await esperarValorEnReact(page, '#cantidad', entrada);
+  }
+
+  // Traductor simulado, el de tests/apps/texto-condicional-traducido-familia.spec.ts: cada nodo
+  // de texto visible, a <font><font>texto</font></font>, con la página entera asentada antes
+  const traducir = async (page: Page) => {
+    await asentarAntesDeTraducir(page);
+    await page.evaluate(() => {
+      const caminante = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+        acceptNode: (n) => {
+          const padre = n.parentElement;
+          if (!padre || !(n.nodeValue ?? '').trim()) return NodeFilter.FILTER_REJECT;
+          if (/^(SCRIPT|STYLE|OPTION|NOSCRIPT|FONT)$/.test(padre.tagName)) return NodeFilter.FILTER_REJECT;
+          return NodeFilter.FILTER_ACCEPT;
+        },
+      });
+      const nodos: Text[] = [];
+      while (caminante.nextNode()) nodos.push(caminante.currentNode as Text);
+      for (const nodo of nodos) {
+        const exterior = document.createElement('font');
+        const interior = document.createElement('font');
+        interior.textContent = nodo.nodeValue;
+        exterior.appendChild(interior);
+        nodo.parentNode?.replaceChild(exterior, nodo);
+      }
+    });
+  };
+
+  /** Errores de página y de consola que delatan la caída del traductor. */
+  const vigilarCaidas = (page: Page): string[] => {
+    const errores: string[] = [];
+    page.on('pageerror', (e) => errores.push(e.message));
+    page.on('console', (m) => {
+      if (m.type() === 'error' && /NotFoundError|insertBefore|removeChild/.test(m.text())) errores.push(m.text());
+    });
+    return errores;
+  };
+
+  test.beforeEach(async ({ page }) => {
+    await esperarHidratacion(page, ['#cantidad']);
+  });
+
+  test('53e07954 · sin traducir, los textos que van ahora en su span se leen igual que antes', async ({ page }) => {
+    // «£» elige la libra; con el euro elegido a mano, el aviso nombra la libra y no pide elegir
+    await escribir(page, '£1.500');
+    await page.locator('#moneda').selectOption('EUR');
+    const avisoTexto = panel(page).locator('[role="status"] p').first();
+    await expect(avisoTexto).toHaveText('«£» indica la libra, pero el texto sale en euros, la moneda elegida.');
+    // «$» no dice qué moneda es: el mismo párrafo con la frase del span, sin espacio de más ni de menos
+    await escribir(page, '$1.500');
+    await expect(avisoTexto).toHaveText(
+      '«$» puede ser el peso o el dólar, pero el texto sale en euros, la moneda elegida. Elige la tuya en «Moneda».',
+    );
+
+    // Las dos lecturas en voz alta, unidas por « o » y con el punto pegado a la última. Se lee el
+    // párrafo sin el emoji decorativo (aria-hidden), que no es parte de la frase.
+    const lecturaOral = () =>
+      oral(page).evaluate((p) =>
+        [...p.childNodes]
+          .filter((n) => !(n instanceof Element && n.getAttribute('aria-hidden') === 'true'))
+          .map((n) => n.textContent ?? '')
+          .join('')
+          .replace(/\s+/g, ' ')
+          .trim(),
+      );
+    const coletilla =
+      '. Es lectura del registro oral: el Diccionario panhispánico de dudas no la considera apropiada en ' +
+      'documentos técnicos, administrativos o contables.';
+    await page.getByRole('button', { name: /Número suelto/ }).click();
+    await escribir(page, '3,45');
+    await expect
+      .poll(lecturaOral)
+      .toBe(`En voz alta también se dice «tres coma cuarenta y cinco» o «tres coma cuatro cinco»${coletilla}`);
+    // Con una sola lectura (cuatro decimales: solo cifra a cifra, motor.ts), ningún « o » suelto
+    await escribir(page, '3,4567');
+    await expect.poll(lecturaOral).toBe(`En voz alta también se dice «tres coma cuatro cinco seis siete»${coletilla}`);
+  });
+
+  test('53e07954 · traducida, el aviso de moneda pasa de «£» a «$» sin tumbar la app', async ({ page }) => {
+    const errores = vigilarCaidas(page);
+    await escribir(page, '£1.500');
+    await page.locator('#moneda').selectOption('EUR');
+    await expect(page.getByRole('button', { name: 'Escribir en libras' })).toBeVisible();
+    await traducir(page);
+    // «$» con el euro elegido: el aviso sigue montado, retira su botón y su span pasa a decir
+    // « Elige la tuya en «Moneda».». Es el caso que el span de C0312 tiene que aguantar.
+    await page.locator('#cantidad').fill('$1.500');
+    await page.waitForTimeout(300);
+    expect(errores).toEqual([]);
+    await expect(page.getByText('Algo salió mal')).toHaveCount(0);
+    await expect(panel(page).locator('[role="status"]')).toContainText('Elige la tuya en «Moneda».');
+    await expect(page.getByRole('button', { name: 'Escribir en libras' })).toHaveCount(0);
+    // El texto en letras es hijo único de su <p>: sigue a la cifra aunque la página esté traducida
+    await expect(page.locator('p[aria-live="polite"]')).toHaveText('mil quinientos euros');
+  });
+
+  /**
+   * ABIERTO (operativa, medio) — Inspector 12/11/2026, en el mismo párrafo que 53e07954 reparó.
+   * Las lecturas en voz alta salen de `resultado.orales.map(o => <span key={o}>…</span>)`, y
+   * detrás va un texto suelto hermano: «. Es lectura del registro oral: …». Cada número nuevo trae
+   * lecturas nuevas, es decir CLAVES nuevas: React retira los span viejos e inserta los nuevos con
+   * insertBefore delante de ese texto, que el traductor ya cambió por <font>. NotFoundError y la
+   * página entera a «Algo salió mal». Pasa con 3,45 → 3,46, con 3,45 → 3,4 y con 3,4 → 3,45: basta
+   * teclear un decimal más en «Número suelto» con la página traducida.
+   * Es la forma de C0548 (elemento que se inserta delante de un texto hermano) en un .map, que el
+   * censo de C0548 dejó fuera a propósito y check:ternario-traducido no mira. Receta probable: el
+   * .map dentro de un <span> siempre montado, o el texto final en su propio <span>.
+   * Control: sin traducir, el mismo cambio no da ningún error (primer caso de este bloque).
+   */
+  test('ABIERTO (operativa, medio) · traducida, cambiar el número suelto con lectura en voz alta no tumba la app', async ({ page }) => {
+    test.fail();
+    const errores = vigilarCaidas(page);
+    await page.getByRole('button', { name: /Número suelto/ }).click();
+    await escribir(page, '3,45');
+    await expect(oral(page)).toContainText('«tres coma cuarenta y cinco» o «tres coma cuatro cinco»');
+    await traducir(page);
+    await page.locator('#cantidad').fill('3,46');
+    await page.waitForTimeout(300);
+    expect(errores).toEqual([]);
+    await expect(page.getByText('Algo salió mal')).toHaveCount(0);
+    // 3,46: la forma escrita del DPD §3.4 y las dos lecturas nuevas, con sus claves nuevas
+    await expect(page.locator('p[aria-live="polite"]')).toHaveText('tres con cuarenta y seis centésimas');
+    await expect(panel(page)).toContainText('«tres coma cuarenta y seis»');
+    await expect(panel(page)).toContainText('«tres coma cuatro seis»');
+  });
+
+  test.describe('en móvil (390×844, táctil)', () => {
+    test.use({
+      viewport: { width: 390, height: 844 },
+      userAgent:
+        'Mozilla/5.0 (Linux; Android 13; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36',
+      deviceScaleFactor: 3,
+      isMobile: true,
+      hasTouch: true,
+    });
+
+    test('cd462414 · al tocar el campo, «Cantidad» queda justo bajo la barra del logo, sin hueco doble', async ({ page }) => {
+      const bloque = page.locator('#cantidad').locator('xpath=..');
+      const rotulo = page.locator('label[for="cantidad"]');
+      // La app ya no pone su scroll-margin: el hueco es el scroll-padding del documento (62 + 4)
+      expect(await bloque.evaluate((el) => getComputedStyle(el).scrollMarginTop)).toBe('0px');
+      expect(await page.evaluate(() => getComputedStyle(document.documentElement).scrollPaddingTop)).toBe('66px');
+
+      await page.locator('#cantidad').tap();
+      const barra = await page.locator('[data-barra-logo]').boundingBox();
+      expect(barra!.y + barra!.height).toBeCloseTo(62, 0);
+      // Sube hasta 66 px: con el margen viejo sumado se quedaría en 138 y esta espera no llegaría
+      await expect.poll(async () => (await rotulo.boundingBox())!.y).toBeLessThanOrEqual(72);
+      // …y no por encima de la barra, que lo taparía
+      expect((await rotulo.boundingBox())!.y).toBeGreaterThanOrEqual(barra!.y + barra!.height);
+      // Y el resultado sigue en la mitad que deja libre el teclado (presupuesto de REGRESIÓN 1538)
+      await page.keyboard.type('1500');
+      await expect(page.locator('p[aria-live="polite"]')).toHaveText('mil quinientos euros');
+      const caja = await page.locator('p[aria-live="polite"]').boundingBox();
+      expect(caja!.y + caja!.height).toBeLessThanOrEqual(422);
+    });
+  });
+
+  test.describe('en tableta (768×1024, táctil: el último ancho con el salto al campo)', () => {
+    test.use({
+      viewport: { width: 768, height: 1024 },
+      userAgent:
+        'Mozilla/5.0 (Linux; Android 13; SM-X200) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      deviceScaleFactor: 2,
+      isMobile: true,
+      hasTouch: true,
+    });
+
+    test('cd462414 · a 768 px el campo sube igual, bajo la barra de 62 px', async ({ page }) => {
+      const rotulo = page.locator('label[for="cantidad"]');
+      expect(await page.evaluate(() => getComputedStyle(document.documentElement).scrollPaddingTop)).toBe('66px');
+      await page.locator('#cantidad').tap();
+      await expect.poll(async () => (await rotulo.boundingBox())!.y).toBeLessThanOrEqual(72);
+      expect((await rotulo.boundingBox())!.y).toBeGreaterThanOrEqual(62);
+    });
   });
 });

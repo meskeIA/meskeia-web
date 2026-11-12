@@ -1,6 +1,7 @@
 import { test, expect, Page } from '@playwright/test';
 import { esperarHidratacion } from './_hidratacion';
 import { comprobarFaqPageUnico } from './_faqpage-unico';
+import { contrasteSobreFondoReal } from './_contraste';
 
 /**
  * Inspector — calculadora-notas (segmento interactiva, riesgo 3, 459 usos reales)
@@ -13,11 +14,13 @@ import { comprobarFaqPageUnico } from './_faqpage-unico';
  *
  * DÓNDE VIVE EL CÁLCULO — app/calculadora-notas/page.tsx
  *   · resultadoMedia      ← Σ(nota × créditos) / Σ(créditos), descartando filas con nota NaN,
- *                           créditos NaN o créditos ≤ 0. NO hay validación de rango de la nota.
+ *                           créditos NaN o créditos ≤ 0, y (desde el 23/08/2026, hallazgo 178)
+ *                           las notas fuera de 0-10, con aviso. Las suspensas SÍ entran.
  *   · resultadoSimulador  ← X = (objetivo × (credCursados + credRestantes) − actual × credCursados)
  *                               / credRestantes  ; estado «imposible» si X > 10, «difícil» si X > 8
  *   · resultadoEvau       ← acceso = 0,6 × bachillerato + 0,4 × media(fase general)
- *                           bonificación = (M1 − 5) × 0,2 + (M2 − 5) × 0,2   ← ver HALLAZGO 1
+ *                           bonificación = M1 × 0,2 + M2 × 0,2 (las dos mejores ≥ 5); hasta el
+ *                           23/08/2026, (M − 5) × 0,2   ← ver HALLAZGO 1
  *   · convertirNota()     ← normaliza a 0-10 y de ahí a cada escala:
  *                           Chile (n−1)/6×10 · Colombia n×2 · Perú/Venezuela n/2 ·
  *                           GPA n/4×10 · porcentaje n/10 ; luego recorta a [0, 10]
@@ -65,6 +68,28 @@ import { comprobarFaqPageUnico } from './_faqpage-unico';
  *   5. Accesibilidad · ninguno de los 7 <button> propios lleva type="button", las 3 pestañas no
  *      exponen aria-pressed ni role="tab"+aria-selected (el estado activo viaja solo por la
  *      clase CSS) y los emojis decorativos no llevan aria-hidden="true".
+ *
+ * INSPECCIÓN DE CAMBIO del 12/11/2026 — diff a7f3c27f..HEAD, cuatro commits: aced16e6 (a11y,
+ * C0437), b74dc2b6 (texto semántico en claro, C0296), ff344392 (una sola FAQ, C0593) y 9b86f89d
+ * (iconos de tarjeta, C0661). Esperados calculados ANTES de abrir el navegador:
+ *   · C0296 · en claro, «Aprobadas» y «alcanzable» con --verde-texto #136E35, «Suspensas» y
+ *     «difícil» con --ambar-texto #8A5A00 e «Imposible» con --rojo-texto #B91C1C, sobre el --hover
+ *     #F5F5F5 del módulo: 5,82 · 5,44 · 5,94 : 1 (antes, #10B981 sobre #F5F5F5 daba 2,33). En
+ *     oscuro los tokens valen `initial` y manda la reserva del módulo: #10B981 · #F59E0B · #FCA5A5
+ *     sobre #333333 = 4,98 · 5,88 · 6,66. Medido igual a 1280 y a 390 px.
+ *   · C0593 · el FAQPage y la FAQ visible salen de PREGUNTAS_FRECUENTES: mismas 8 preguntas con
+ *     las mismas respuestas. El ejemplo de su 2.ª pregunta —final al 60 %, continua 4 al 40 %,
+ *     objetivo 5— resuelto en «¿Qué nota necesito?» (4 · 40 · 5 · 60):
+ *     X = (5 × 100 − 4 × 40) / 60 = 340 / 60 = 5,67, que es lo que la FAQ promete.
+ *   · ABIERTOS (inspector 12/11/2026), con test.fail() — los casos, en su test:
+ *     A. La FAQ del GPA («9-10 → 4,0», «3-4,9 → D») contradice al conversor (9 → 3,60; 3,5 → F)
+ *        y a la tabla de equivalencias (0-4,9 → F, que el conversor llama D en 4,5).
+ *     B. La fórmula que enseña el panel EvAU sigue siendo «(M1-5)×0.2 + (M2-5)×0.2», la que el
+ *        hallazgo 177 retiró del motor, y escribe «0.2» con punto.
+ *     C. Con una suspensa, la media incluye la suspensa sin decirlo, cuando la FAQ (RD 1125/2003,
+ *        art. 5.3) y el bloque «Errores frecuentes» dicen que el expediente solo cuenta las superadas.
+ *     D. Diez iconos de tarjeta (escenarioIcon, tipIcono), la ⭐ de «Fase Específica» y el «+» de
+ *        «Añadir materia específica» siguen sin aria-hidden: C0661 solo buscaba eduEscenarioIcon.
  */
 
 const RUTA = '/calculadora-notas/';
@@ -475,5 +500,213 @@ test.describe('JSON-LD', () => {
   test('C0593 · un solo FAQPage, con las preguntas de la FAQ visible', async ({ page }) => {
     await page.goto(RUTA);
     await comprobarFaqPageUnico(page);
+  });
+
+  test('C0593 · el FAQPage dice lo mismo que la FAQ visible, pregunta a pregunta y respuesta a respuesta', async ({
+    page,
+  }) => {
+    // Las dos salen de PREGUNTAS_FRECUENTES (metadata.ts) desde ff344392: 8 pares idénticos.
+    const { ld, visible } = await page.evaluate(() => {
+      let ld: string[][] = [];
+      for (const s of Array.from(document.querySelectorAll('script[type="application/ld+json"]'))) {
+        const j = JSON.parse(s.textContent ?? '{}') as {
+          '@type'?: string;
+          mainEntity?: { name: string; acceptedAnswer: { text: string } }[];
+        };
+        if (j['@type'] === 'FAQPage' && j.mainEntity) {
+          ld = j.mainEntity.map((q) => [q.name, q.acceptedAnswer.text]);
+        }
+      }
+      const visible = Array.from(document.querySelectorAll('[class*="faqItem"]'))
+        .filter((d) => d.querySelector('[class*="faqPregunta"]'))
+        .map((d) => [
+          d.querySelector('[class*="faqPregunta"]')?.textContent ?? '',
+          d.querySelector('[class*="faqRespuesta"]')?.textContent ?? '',
+        ]);
+      return { ld, visible };
+    });
+    expect(visible).toHaveLength(8);
+    expect(ld).toEqual(visible);
+  });
+});
+
+/** Respuesta de la FAQ visible cuya pregunta casa con el patrón (la FAQ nace plegada: textContent). */
+async function respuestaFaq(page: Page, pregunta: RegExp): Promise<string> {
+  const pares = await page.evaluate(() =>
+    Array.from(document.querySelectorAll('[class*="faqItem"]'))
+      .filter((d) => d.querySelector('[class*="faqPregunta"]'))
+      .map((d) => [
+        d.querySelector('[class*="faqPregunta"]')?.textContent ?? '',
+        d.querySelector('[class*="faqRespuesta"]')?.textContent ?? '',
+      ]),
+  );
+  const par = pares.find(([q]) => pregunta.test(q));
+  if (!par) throw new Error(`No hay ninguna pregunta de la FAQ que case con ${pregunta}`);
+  return par[1];
+}
+
+test.describe('Inspección de cambio 12/11/2026 — texto semántico en claro (C0296)', () => {
+  for (const tema of ['light', 'dark'] as const) {
+    test(`${tema} · Aprobadas, Suspensas y las tres notas del simulador llegan a 4,5:1`, async ({
+      page,
+    }) => {
+      if (tema === 'dark') {
+        await page.addInitScript((t) => window.localStorage.setItem('meskeia-theme', t), tema);
+        await page.goto(RUTA);
+        await esperarHidratacion(page, ['input[placeholder="0-10"]', 'input[placeholder="ECTS"]']);
+      }
+      await expect(page.locator('html')).toHaveAttribute('data-theme', tema);
+
+      // 8 con 6 ECTS y 3 con 6 ECTS: una aprobada y una suspensa, para que las dos tarjetas pinten.
+      await nota(page, 0).fill('8');
+      await creditos(page, 0).fill('6');
+      await nota(page, 1).fill('3');
+      await creditos(page, 1).fill('6');
+      await expect(page.locator('[class*="resultadoValor"]').first()).toHaveText('5,50');
+
+      // Esperado (cabecera): claro 5,82 y 5,44 · oscuro 4,98 y 5,88. Antes del lote, en claro, 2,33.
+      const aprobadas = page.locator('[class*="statCard"][class*="success"] [class*="statValue"]');
+      const suspensas = page.locator('[class*="statCard"][class*="warning"] [class*="statValue"]');
+      await expect(aprobadas).toHaveText('1');
+      await expect(suspensas).toHaveText('1');
+      expect(await contrasteSobreFondoReal(aprobadas)).toBeGreaterThanOrEqual(4.5);
+      expect(await contrasteSobreFondoReal(suspensas)).toBeGreaterThanOrEqual(4.5);
+
+      // Los tres estados del simulador (sus cifras, en los CASOS de arriba).
+      const valor = page.locator('[class*="simuladorResultadoValor"]');
+      for (const [a, b, c, d, esperado] of [
+        ['5', '100', '8', '20', 'Imposible'], // X = 23 → rojo · claro 5,94 · oscuro 6,66
+        ['6,5', '120', '7,5', '60', '9,50'], // X = 9,50 → ámbar · 5,44 · 5,88
+        ['6,5', '120', '7', '60', '8,00'], // X = 8,00 → verde · 5,82 · 4,98
+      ] as const) {
+        await pedirNotaNecesaria(page, a, b, c, d);
+        await expect(valor).toHaveText(esperado);
+        expect(await contrasteSobreFondoReal(valor), `«${esperado}» en ${tema}`).toBeGreaterThanOrEqual(4.5);
+      }
+    });
+  }
+});
+
+test.describe('Inspección de cambio 12/11/2026 — lo que dice la FAQ única (C0593)', () => {
+  test('el ejemplo de la FAQ «examen final» sale en «¿Qué nota necesito?»: 5,67', async ({ page }) => {
+    // FAQ: «Si el examen final vale un 60% y tienes un 4 en la evaluación continua (40%) …
+    // nota_final ≥ (5 - 1,6) / 0,6 = 5,67. La calculadora puede resolver este cálculo».
+    // Con los porcentajes en el lugar de los créditos: X = (5 × (40 + 60) − 4 × 40) / 60
+    // = (500 − 160) / 60 = 340 / 60 = 5,6667 → «5,67», que no pasa de 8 → «alcanzable».
+    const faq = await respuestaFaq(page, /examen final para aprobar/);
+    expect(faq).toContain('5,67');
+    const texto = await pedirNotaNecesaria(page, '4', '40', '5', '60');
+    expect(texto).toContain('5,67');
+    expect(texto).toContain('Objetivo alcanzable');
+  });
+
+  test('ABIERTO A (inspector 12/11/2026) — la FAQ del GPA no contradice al conversor ni a la tabla', async ({
+    page,
+  }) => {
+    // FAQ: «9-10 → 4,0 (A), 7-8,9 → 3,0-3,9 (B), 5-6,9 → 2,0-2,9 (C), 3-4,9 → 1,0-1,9 (D),
+    // 0-2,9 → 0,0 (F)». El conversor es lineal (nota / 10 × 4) con letra D desde 4:
+    //   9 → 3,60 · A   7 → 2,80 · B   4,5 → 1,80 · D   3,5 → 1,40 · F
+    // y la tabla de equivalencias de la misma pestaña pone «0 - 4,9 … 0 - 1,9 F», sin D.
+    // Tres versiones de la misma conversión en una página: la reparación las deja en una.
+    test.fail();
+    const faq = await respuestaFaq(page, /GPA/);
+    await page.getByRole('button', { name: /Conversor Escalas/ }).click();
+    const entrada = page.locator('input[placeholder="7,5"]');
+    const resultados = page.locator('[class*="conversorResultados"]');
+    const convertir = async (n: string): Promise<{ gpa: string; letra: string }> => {
+      await entrada.fill(n);
+      await expect(resultados).toBeVisible();
+      const t = (await resultados.innerText()).replace(/\s+/g, ' ');
+      return {
+        gpa: t.match(/GPA USA \(0-4\) ([\d,]+)/)?.[1] ?? '',
+        letra: t.match(/Letra \(USA\) (\S+)/)?.[1] ?? '',
+      };
+    };
+    const n9 = await convertir('9');
+    const n7 = await convertir('7');
+    const n45 = await convertir('4,5');
+    const n35 = await convertir('3,5');
+    const filaSuspenso = (
+      await page.locator('table[class*="tablaConversion"] tbody tr').last().innerText()
+    ).replace(/\s+/g, ' ');
+
+    const contradicciones: string[] = [];
+    if (faq.includes('9-10 → 4,0') && n9.gpa !== '4,00')
+      contradicciones.push(`9: la FAQ dice GPA 4,0 y el conversor ${n9.gpa}`);
+    if (faq.includes('7-8,9 → 3,0') && n7.gpa !== '3,00')
+      contradicciones.push(`7: la FAQ dice GPA 3,0 y el conversor ${n7.gpa}`);
+    if (faq.includes('3-4,9 → 1,0-1,9 (D)') && n35.letra !== 'D')
+      contradicciones.push(`3,5: la FAQ dice D y el conversor ${n35.letra}`);
+    if (/^0 - 4,9 .* F/.test(filaSuspenso) && n45.letra === 'D')
+      contradicciones.push(`4,5: la tabla dice F y el conversor ${n45.letra}`);
+    expect(contradicciones).toEqual([]);
+  });
+});
+
+test.describe('Inspección de cambio 12/11/2026 — abiertos en el resto de lo tocado', () => {
+  test('ABIERTO B (inspector 12/11/2026) — la fórmula del panel EvAU es la que calcula: M × 0,2', async ({
+    page,
+  }) => {
+    // Bachillerato 8, troncales 7-6-8-7, específicas 9 y 6:
+    //   acceso 0,6·8 + 0,4·7 = 7,600 · motor y FAQ («máximo +2 por materia»): 9×0,2 + 6×0,2 = 3,00
+    //   → 10,600. La fórmula escrita en el panel, «Nota Acceso + (M1-5)×0.2 + (M2-5)×0.2», da
+    //   7,600 + 0,80 + 0,20 = 8,600: es la del hallazgo 177, que se reparó en el motor y no aquí.
+    //   Y «0.2» va con punto (CLAUDE.md §2), también en «Las 2 mejores notas (≥5) ponderan ×0.2».
+    test.fail();
+    await page.getByRole('button', { name: /Simulador EvAU/ }).click();
+    await page.locator('input[placeholder="Ej: 7,5"]').fill('8');
+    const notas = ['7', '6', '8', '7', '9', '6'];
+    for (let i = 0; i < notas.length; i++) await nota(page, i).fill(notas[i]);
+    expect(await valorPrincipal(page)).toBe('10,600');
+    expect(await panel(page)).toContain('Bonificación Específica +3,00');
+
+    const formula = (await panel(page)).split('Fórmula:')[1] ?? '';
+    expect(formula).toContain('Nota Admisión');
+    expect(formula).not.toContain('-5)');
+    expect(formula).not.toMatch(/\d\.\d/);
+    expect(await page.getByText(/Las 2 mejores notas/).innerText()).not.toMatch(/\d\.\d/);
+  });
+
+  test('ABIERTO C (inspector 12/11/2026) — con una suspensa, el panel da la media del expediente oficial: 8,00', async ({
+    page,
+  }) => {
+    // 8 con 6 ECTS y 3 con 6 ECTS. La app da (48 + 18) / 12 = 5,50 «Aprobado» con «Suspensas 1».
+    // El expediente oficial, según la FAQ de la propia app y el RD 1125/2003, art. 5.3 (BOE, «el
+    // total de créditos obtenidos», los que se obtienen al superar la materia), solo cuenta las
+    // superadas: 8 × 6 / 6 = 8,00. El bloque «Errores frecuentes» llama a incluir las suspensas
+    // «error», y la tarjeta «Universitario» invita a «calcular tu expediente académico».
+    test.fail();
+    await nota(page, 0).fill('8');
+    await creditos(page, 0).fill('6');
+    await nota(page, 1).fill('3');
+    await creditos(page, 1).fill('6');
+    await expect(page.locator('[class*="resultadoValor"]').first()).not.toHaveText('—');
+    expect(await panel(page)).toContain('8,00');
+  });
+
+  test('ABIERTO D (inspector 12/11/2026) — los iconos de tarjeta, la ⭐ y el «+» no se leen', async ({
+    page,
+  }) => {
+    // 9b86f89d (C0661) puso aria-hidden al ⚠️ de warningIcono, pero el detector buscaba
+    // eduEscenarioIcon/eduTipIcono y aquí las clases son escenarioIcon (4) y tipIcono (6): esos
+    // diez siguen leyéndose («📚Estudiante de Bachillerato»). Igual la ⭐ del <h3> «Fase
+    // Específica (Voluntaria)» y el «+» de «Añadir materia específica», en la línea a la que
+    // aced16e6 añadió type="button" (el «+» de «Añadir asignatura» sí lo lleva).
+    test.fail();
+    const iconos = await page.evaluate(() =>
+      Array.from(
+        document.querySelectorAll('span[class*="escenarioIcon"], span[class*="tipIcono"], span[class*="warningIcono"]'),
+      ).map((s) => ({ texto: s.textContent ?? '', oculto: s.getAttribute('aria-hidden') === 'true' })),
+    );
+    expect(iconos).toHaveLength(11); // 4 + 6 + 1: si cambia, el test ya no mira lo que creía
+    expect(iconos.filter((i) => !i.oculto).map((i) => i.texto)).toEqual([]);
+
+    await page.getByRole('button', { name: /Simulador EvAU/ }).click();
+    await expect(
+      page.getByRole('heading', { name: 'Fase Específica (Voluntaria)', exact: true }),
+    ).toHaveCount(1);
+    await expect(
+      page.getByRole('button', { name: 'Añadir materia específica', exact: true }),
+    ).toHaveCount(1);
   });
 });

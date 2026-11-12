@@ -2,9 +2,11 @@ import { test, expect, Page } from '@playwright/test';
 import {
   esperarHidratacion,
   esperarPaginaAsentada,
+  esperarValorEnReact,
   sembrarValor,
   sembrarValorAcotado,
 } from './_hidratacion';
+import { leerRespuestaAula } from '../../lib/calculadoras/correctorCasosAula';
 import {
   CASOS,
   TOTAL_CASOS,
@@ -104,6 +106,13 @@ test.use({ launchOptions: { args: [`--host-resolver-rules=MAP stemum.com 127.0.0
  *   error conceptual típico de cada uno tecleado en el navegador, y la tolerancia del corrector.
  *   El hero se midió en meskeia.com y bajo stemum.com: 0 puntos del h1 tapados a 360, 390, 800
  *   y de 1024 a 1060 px (la píldora «Stemum › Física» llega a x = 232; el título, desde x = 269).
+ *
+ * REINSPECCIÓN DEL 12/11/2026 (modo cambio, diff 2bf5cecb..HEAD)
+ *   Al final del fichero, «Re-inspección 12/11/2026». Lo cambiado: la ley de Hooke en estático
+ *   (767e7d4f), la tarjeta «Fuerza del resorte F = −k·x», el corrector compartido de los casos
+ *   para clase (2221d315, 03ec4600, 3b92acef) y la lectura de «X.YYY» con leerRespuestaAula
+ *   (447183de, C0558), la caja de fórmulas en spans para la página traducida (cdb074d0), los
+ *   colores del lienzo (2bd66ad7), las relacionadas por el layout (99e1ee7e) y la metadata.
  */
 
 /** El valor de una tarjeta o de una barra, localizado por su etiqueta (las clases van con hash). */
@@ -1874,5 +1883,290 @@ test.describe('Cabo C0108 — escenarios de la guía y placeholder de los casos 
       expect(m.placeholder).toBe('Tu respuesta');
     }
     expect(medidas).toHaveLength(2);
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════════
+ * RE-INSPECCIÓN DEL 12/11/2026 — modo cambio (diff 2bf5cecb..HEAD)
+ *
+ * Resuelto a mano ANTES de abrir la app, con g = 9,81 m/s² (la que declara el propio panel):
+ *
+ * LEY DE HOOKE CON LOS DESLIZADORES · F = m·g · Δx = m·g/k, en cm a una décima por debajo del
+ * metro y en m a dos decimales desde el metro (textoLongitud de page.tsx)
+ *   · arranque m = 1 kg, k = 20 N/m → Δx = 9,81/20 = 0,4905 m → «49,1 cm»
+ *   · m = 0,5 kg, k = 50 N/m  → F = 4,905 N → «4,91 N» · Δx = 0,0981 m → «9,8 cm»
+ *   · m = 5,0 kg, k = 1 N/m   → F = 49,05 N → «49,05 N» · Δx = 49,05 m → «49,05 m»
+ *   · m = 0,1 kg, k = 100 N/m → F = 0,981 N → «0,98 N» · Δx = 0,00981 m = 0,981 cm → «1,0 cm»
+ *
+ * k CON UNA MEDIDA TECLEADA · k = m·g/Δx, con la masa en g y el alargamiento en cm
+ *   · «2.000» g (punto de millar) y «49,05» cm → 2·9,81/0,4905 = 40 N/m → «40,00 N/m»
+ *   · «1.000» g y «49,05» cm → 9,81/0,4905 = 20 N/m → «20,00 N/m»: la k del deslizador cuyo Δx
+ *     con 1 kg publica el bloque de al lado (49,1 cm). Ida y vuelta.
+ *   · «0.500» g y «0.1» cm (punto decimal; un millar no empieza por 0) → 0,0005·9,81/0,001 =
+ *     4,905 N/m → «4,91 N/m»
+ *   · «-200» g → sin cifra; al salir del campo el control lo acota a «0» y sigue sin cifra.
+ *
+ * FUERZA DEL RESORTE EN t = 0 (en pausa y reiniciado) · m = 2 kg, k = 20 N/m, A = 0,30 m, γ = 0
+ *   x = A = 0,300 m · F = −k·x = −6,00 N · a = F/m = −3,000 m/s² (la tarjeta F no repite la a).
+ *
+ * CASOS PARA CLASE CON PUNTO (leerRespuestaAula, C0558) · tolerancia = media unidad del redondeo
+ * pedido si la cifra exacta hay que redondearla, 0 si es exacta (hallazgo 2626):
+ *   · caso 2, T = 2π/6 = 1,047198 → 1,05, entra [1,045; 1,055]: «1.047» y «1.05» entran (antes de
+ *     C0558, «1.047» se leía 1047) · «1.056» se desvía 0,006 → «Te has desviado 0,01»
+ *   · caso 4, k = 32π² = 315,827 → 316, entra [315,5; 316,5]: «315.827» entra · «315» → «1»
+ *   · caso 5, m = 20/π² = 2,026424 → 2,03: «2.026» entra
+ *   · caso 6, E = 1 J exacto: «1,004» y «1.004» → «Te has desviado 0,004» (hallazgo 3369: no «0»)
+ *   · caso 7, v_máx = 0,5 exacto: «0.500» entra
+ *   · caso 11, γ_c = 100 exacto: «100,4» → «Te has desviado 0,4»
+ *   · caso 12, T = 2π/4 = 1,570796 → 1,57: «1.565» entra (el borde) · «1.564» → «0,01»
+ *   · caso 4 con «3.158» se rechaza, como debe. La desviación que enseña sale de leerlo 3,158
+ *     (312,84) y no 3158 (2842): es el defecto del módulo compartido registrado en
+ *     visualizador-volumenes en la tanda del 12/11/2026, así que aquí se fija solo el veredicto.
+ *
+ * Medido además en el navegador: el panel de Hooke en claro y oscuro a 1280 y 390 px (texto de
+ * 4,93:1 a 17,4:1, sin desbordar y con los dos campos apilados en móvil) y los rótulos del lienzo
+ * (tests/contraste-lienzo.spec.ts, fila de esta app, en verde).
+ * ═══════════════════════════════════════════════════════════════════════════════════════════ */
+
+const panelHooke = (page: Page) => page.locator('section[aria-labelledby="titulo-hooke"]');
+
+/** Teclea una respuesta en el caso `id` y devuelve el texto del veredicto. */
+async function veredictoDe(page: Page, id: number, respuesta: string): Promise<string> {
+  await page.locator('#casos-aula').getByRole('button', { name: new RegExp(`^Caso ${id}:`) }).click();
+  await expect(page.locator('#casos-titulo-caso')).toHaveText(new RegExp(`^Caso ${id} ·`));
+  await page.locator('#casos-respuesta').fill(respuesta);
+  await esperarValorEnReact(page, '#casos-respuesta', respuesta);
+  await page.locator('#casos-comprobar').click();
+  // Por su id y no por getByRole('alert'), que casa también con el anunciador de rutas de Next.
+  const veredicto = page.locator('#casos-veredicto');
+  await expect(veredicto).toBeVisible();
+  return (await veredicto.innerText()).trim();
+}
+
+test.describe('Re-inspección 12/11/2026 · ley de Hooke en estático', () => {
+  test('con los deslizadores: F = m·g y Δx = m·g/k en tres esquinas del recorrido', async ({ page }) => {
+    // Arranque: m = 1 kg, k = 20 N/m → Δx = 0,4905 m → «49,1 cm»
+    await expect.poll(() => leerFila(page, 'Alargamiento Δx = m·g/k')).toBe('49,1 cm');
+    const filas: ReadonlyArray<readonly [number, number, string, string, string]> = [
+      [0.5, 50, 'm = 0,5 kg · k = 50 N/m', '4,91 N', '9,8 cm'],
+      [5, 1, 'm = 5,0 kg · k = 1 N/m', '49,05 N', '49,05 m'],
+      [0.1, 100, 'm = 0,1 kg · k = 100 N/m', '0,98 N', '1,0 cm'],
+    ];
+    for (const [m, k, dato, fuerza, alargamiento] of filas) {
+      await sembrarValor(page, '#slider-masa', m);
+      await sembrarValor(page, '#slider-k', k);
+      await expect(panelHooke(page)).toContainText(dato);
+      await expect.poll(() => leerFila(page, 'Fuerza que soporta F = m·g')).toBe(fuerza);
+      await expect.poll(() => leerFila(page, 'Alargamiento Δx = m·g/k')).toBe(alargamiento);
+    }
+  });
+
+  test('con una medida: punto de millar, ida y vuelta con el deslizador, punto decimal y negativo', async ({
+    page,
+  }) => {
+    const masa = panelHooke(page).getByLabel('Masa colgada (g)');
+    const alargamiento = panelHooke(page).getByLabel('Alargamiento medido (cm)');
+    const k = () => leerFila(page, 'Constante k = m·g/Δx');
+
+    await masa.fill('2.000');
+    await esperarValorEnReact(page, masa, '2.000');
+    await alargamiento.fill('49,05');
+    await esperarValorEnReact(page, alargamiento, '49,05');
+    await expect.poll(k).toBe('40,00 N/m'); // 2·9,81/0,4905
+
+    await masa.fill('1.000');
+    await esperarValorEnReact(page, masa, '1.000');
+    await expect.poll(k).toBe('20,00 N/m'); // 9,81/0,4905
+    // …que es la k del deslizador, cuyo alargamiento con 1 kg publica el bloque de al lado
+    await expect.poll(() => leerFila(page, 'Alargamiento Δx = m·g/k')).toBe('49,1 cm');
+
+    await masa.fill('0.500');
+    await esperarValorEnReact(page, masa, '0.500');
+    await alargamiento.fill('0.1');
+    await esperarValorEnReact(page, alargamiento, '0.1');
+    await expect.poll(k).toBe('4,91 N/m'); // 0,0005·9,81/0,001 = 4,905
+
+    await masa.fill('-200');
+    await esperarValorEnReact(page, masa, '-200');
+    await expect.poll(k).toBe('escribe masa y alargamiento mayores que 0');
+    await alargamiento.click(); // al salir del campo, el control acota a su min = 0
+    await expect(masa).toHaveValue('0');
+    await expect.poll(k).toBe('escribe masa y alargamiento mayores que 0');
+  });
+
+  test('la tarjeta «Fuerza del resorte» en t = 0 es −k·x, y no la aceleración: m = 2 kg', async ({ page }) => {
+    await sembrarValor(page, '#slider-masa', 2); // arranca en 1,0
+    await page.getByRole('button', { name: 'Pausar simulación' }).click();
+    await expect(page.getByRole('button', { name: 'Reanudar simulación' })).toBeVisible();
+    await page.getByRole('button', { name: 'Reiniciar simulación' }).click();
+    // x(0) = A = 0,30 m · F = −20·0,30 = −6,00 N · a = −6/2 = −3,000 m/s²
+    await expect.poll(() => leerFila(page, 'Posición x')).toBe('0,300 m');
+    await expect.poll(() => leerFila(page, 'Fuerza del resorte F = −k·x')).toBe('-6,00 N');
+    await expect.poll(() => leerFila(page, 'Aceleración a')).toBe('-3,000 m/s²');
+  });
+
+  test('el panel se lee en claro y en oscuro, y a 390 px no se sale y apila los campos', async ({ page }) => {
+    test.setTimeout(60000);
+    const sel = 'section[aria-labelledby="titulo-hooke"]';
+    // Medido el 12/11/2026: de 5,47:1 (cifra de tarjeta) a 17,4:1 en claro y de 4,93:1 a 11,24:1
+    // en oscuro; el código «m·g = k·Δx» va en --primary-texto sobre --bg-card, sin tinte de marca.
+    const elementos: ReadonlyArray<readonly [string, string]> = [
+      ['título', `${sel} h2`],
+      ['explicación', `${sel} p`],
+      ['fórmula', `${sel} code`],
+      ['subtítulo', `${sel} h3`],
+      ['etiqueta de tarjeta', `${sel} div > span:first-child`],
+      ['cifra de tarjeta', `${sel} div > span:last-child`],
+      ['rótulo del campo', `${sel} label`],
+    ];
+    for (const tema of ['light', 'dark'] as const) {
+      await page.evaluate((t) => localStorage.setItem('meskeia-theme', t), tema);
+      await page.reload();
+      await esperarHidratacion(page, SLIDERS);
+      await expect(page.locator('html')).toHaveAttribute('data-theme', tema);
+      await page.evaluate(() => {
+        for (const a of document.getAnimations()) a.finish();
+      });
+      for (const [nombre, s] of elementos) {
+        const r = await contrasteElemento(page, s);
+        expect(r, `${tema} · ${nombre}: ${r.toFixed(2)}:1`).toBeGreaterThanOrEqual(4.5);
+      }
+    }
+
+    const disposicion = async () =>
+      page.evaluate((s) => {
+        const sec = document.querySelector(s) as HTMLElement;
+        const campos = [...sec.querySelectorAll('input')].map((i) => i.getBoundingClientRect());
+        return {
+          desborda:
+            sec.scrollWidth > sec.clientWidth + 1 ||
+            document.documentElement.scrollWidth > window.innerWidth,
+          campos: campos.length,
+          apilados: campos.length === 2 && campos[1].top >= campos[0].bottom,
+        };
+      }, sel);
+    await page.setViewportSize({ width: 1280, height: 900 });
+    const ancho = await disposicion();
+    expect(ancho).toEqual({ desborda: false, campos: 2, apilados: false }); // lado a lado
+    await page.setViewportSize({ width: 390, height: 900 });
+    await expect.poll(disposicion).toEqual({ desborda: false, campos: 2, apilados: true });
+  });
+});
+
+test.describe('Re-inspección 12/11/2026 · casos para clase con punto (leerRespuestaAula, C0558)', () => {
+  test.beforeEach(async ({ page }) => {
+    await esperarHidratacion(page, ['#casos-respuesta']);
+  });
+
+  test('«X.YYY» se lee como decimal si es la lectura cercana, y la desviación nunca sale «0»', async ({
+    page,
+  }) => {
+    test.setTimeout(90000);
+    // [caso, tecleado, final literal del veredicto]: cada cifra, a mano en la cabecera del bloque.
+    const tabla: ReadonlyArray<readonly [number, string, string]> = [
+      [2, '1.047', '¡Correcto!'],
+      [2, '1.05', '¡Correcto!'],
+      [2, '1.056', 'No es correcto. Te has desviado 0,01 de la respuesta.'],
+      [4, '315.827', '¡Correcto!'],
+      [4, '315', 'No es correcto. Te has desviado 1 de la respuesta.'],
+      [5, '2.026', '¡Correcto!'],
+      [6, '1,004', 'No es correcto. Te has desviado 0,004 de la respuesta.'],
+      [6, '1.004', 'No es correcto. Te has desviado 0,004 de la respuesta.'],
+      [7, '0.500', '¡Correcto!'],
+      [11, '100,4', 'No es correcto. Te has desviado 0,4 de la respuesta.'],
+      [12, '1.565', '¡Correcto!'],
+      [12, '1.564', 'No es correcto. Te has desviado 0,01 de la respuesta.'],
+    ];
+    const distintos: string[] = [];
+    for (const [id, tecleado, esperado] of tabla) {
+      const obtenido = await veredictoDe(page, id, tecleado);
+      if (!obtenido.endsWith(esperado)) {
+        distintos.push(`caso ${id} «${tecleado}»: esperado «${esperado}» · obtenido «${obtenido}»`);
+      }
+    }
+    expect(distintos).toEqual([]);
+  });
+
+  test('un error de un orden de magnitud tecleado con punto («3.158» en el caso 4) se rechaza', async ({
+    page,
+  }) => {
+    // k = 316 N/m: «3.158» no es correcto ni leído 3,158 ni leído 3158. Qué desviación enseña lo
+    // decide el defecto del módulo compartido registrado en visualizador-volumenes (12/11/2026):
+    // hoy 312,84, la de leerlo 3,158. Aquí se fija solo el veredicto, que es el correcto.
+    expect(await veredictoDe(page, 4, '3.158')).toContain('No es correcto');
+  });
+
+  test('la lectura y la desviación son las del módulo compartido', async () => {
+    // La más cercana a la clave cuando «X.YYY» admite dos lecturas; si no, la de parseSpanishNumber
+    expect(leerRespuestaAula('1.047', A_MANO_CASOS[2])).toBe(1.047);
+    expect(leerRespuestaAula('315.827', A_MANO_CASOS[4])).toBe(315.827);
+    expect(leerRespuestaAula('1,047', A_MANO_CASOS[2])).toBe(1.047);
+    expect(leerRespuestaAula('0.500', A_MANO_CASOS[7])).toBe(0.5); // un millar no empieza por 0
+    expect(Number.isNaN(leerRespuestaAula('1,0,5', A_MANO_CASOS[2]))).toBe(true);
+    // Una cifra exacta no tiene margen: 1,004 frente a E = 1 J se desvía 0,004, no «0» (3369)
+    expect(comprobarRespuesta(1.004, 1, datosDe(6)).motivo).toBe(
+      'No es correcto. Te has desviado 0,004 de la respuesta.',
+    );
+  });
+
+  test('ni los doce casos ni 40 ejercicios de Practicar escriben un punto decimal', async () => {
+    // Un punto seguido de 1-2 o de 4 o más cifras solo puede ser decimal («1.05», «3.1416»); el
+    // de millar va con tres («40.000»). Con el redondeo del motor compartido (C0126) y numero()
+    // en es-ES no debe salir ninguno, ni en el enunciado ni en los pasos de la solución.
+    const PUNTO_DECIMAL = /\d\.(?:\d{1,2}|\d{4,})(?!\d)/;
+    const textos = [
+      ...CASOS.flatMap((c) => [c.enunciado, ...c.pasos, c.respuestaTexto]),
+      ...Array.from({ length: 40 }, (_, i) => generarEjercicioAleatorio(i + 1)).flatMap((e) => [
+        e.enunciado,
+        ...e.pasos,
+      ]),
+    ];
+    expect(textos.filter((t) => PUNTO_DECIMAL.test(t))).toEqual([]);
+  });
+});
+
+test.describe('Re-inspección 12/11/2026 · metadata, FAQ y relacionadas', () => {
+  /** Los bloques JSON-LD de la página, ya parseados. */
+  async function jsonLd(page: Page): Promise<Record<string, unknown>[]> {
+    const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+    return bloques.map((b) => JSON.parse(b) as Record<string, unknown>);
+  }
+
+  test('el JSON-LD promete la ley de Hooke y la fuerza del resorte, y la página las tiene', async ({ page }) => {
+    await expect(page).toHaveTitle(/Ley de Hooke/);
+    const app = (await jsonLd(page)).find((j) => j['@type'] === 'WebApplication');
+    expect(app).toBeDefined();
+    const lista = (app?.featureList ?? []) as string[];
+    expect(lista.length).toBeGreaterThanOrEqual(4); // §1.ter
+    expect(lista.some((f) => /Ley de Hooke en estático/.test(f))).toBe(true);
+    expect(lista.some((f) => /fuerza del resorte/.test(f))).toBe(true);
+    // Lo prometido existe y calcula
+    await expect(panelHooke(page).getByRole('heading', { name: 'Ley de Hooke: F = k·Δx' })).toBeVisible();
+    await expect(panelHooke(page).getByLabel('Masa colgada (g)')).toBeVisible();
+    await expect.poll(() => leerFila(page, 'Fuerza del resorte F = −k·x')).toMatch(/ N$/);
+  });
+
+  test('la FAQ del JSON-LD y la visible no repiten una pregunta con otra respuesta', async ({ page }) => {
+    const faq = (await jsonLd(page)).find((j) => j['@type'] === 'FAQPage');
+    expect(faq).toBeDefined();
+    const entradas = (faq?.mainEntity ?? []) as { name: string; acceptedAnswer: { text: string } }[];
+    const ld = new Map(entradas.map((q) => [q.name, q.acceptedAnswer.text]));
+    expect(ld.size).toBeGreaterThan(0);
+    await page.getByRole('button', { name: 'Ver guía educativa' }).click();
+    const visibles = await page.evaluate(() => {
+      const h3 = [...document.querySelectorAll('h3')].find((h) => h.textContent?.trim() === 'Preguntas frecuentes');
+      return [...(h3?.nextElementSibling?.children ?? [])].map((item) => ({
+        pregunta: item.querySelector('strong')?.textContent?.trim() ?? '',
+        respuesta: item.querySelector('p')?.textContent?.replace(/\s+/g, ' ').trim() ?? '',
+      }));
+    });
+    expect(visibles.length).toBeGreaterThan(0);
+    // Dos FAQ con preguntas distintas es lo normal; la misma pregunta con dos respuestas, no.
+    const repetidas = visibles.filter((v) => ld.has(v.pregunta) && ld.get(v.pregunta) !== v.respuesta);
+    expect(repetidas).toEqual([]);
+  });
+
+  test('las relacionadas llegan por el layout (ConRelacionadas): cuatro tarjetas', async ({ page }) => {
+    await expect(page.locator('section[aria-label="Aplicaciones relacionadas"] a')).toHaveCount(4);
   });
 });

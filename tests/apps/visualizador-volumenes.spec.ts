@@ -34,6 +34,10 @@
  * RE-INSPECCIONES del 22/09/2026 (hallazgos 1222-1225, REPARADOS el mismo día en 67de72aa) y
  * del 02/10/2026 (bloques del final: casos nuevos y los hallazgos 2649-2656, escritos contra lo
  * que DEBERÍA ocurrir con `test.fail()` y REPARADOS el mismo día: hoy son de regresión).
+ *
+ * RE-INSPECCIÓN del 12/11/2026 (modo cambio: «Casos para clase» y el corrector compartido con
+ * `leerRespuestaAula`): bloques «re-inspección 12/11/2026» del final, con dos hallazgos ABIERTOS
+ * escritos con `test.fail()` contra lo que DEBERÍA ocurrir.
  */
 
 import { test, expect, type Locator, type Page } from '@playwright/test';
@@ -1841,5 +1845,273 @@ test.describe('casos para clase · en la página', () => {
     await seccion.getByRole('button', { name: 'Comprobar' }).click();
     await expect(seccion.getByRole('alert')).toContainText('Escribe un número');
     await expect(seccion.getByRole('alert')).not.toContainText('NaN');
+  });
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN 12/11/2026 (modo cambio) — casos para clase y el corrector compartido
+// ═══════════════════════════════════════════════════════════════════════════
+/**
+ * Motivo: desde ac046fdc la app ganó «Casos para clase» (casos.ts + CasosAula.tsx) y pasó a
+ * corregir con lib/calculadoras/correctorCasosAula.ts, que el 01/11/2026 añadió
+ * `leerRespuestaAula` (C0558: «2.493» es 2,493 o 2493 y se queda con la lectura más cercana a
+ * la respuesta). Los casos de abajo se resolvieron A MANO antes de abrir la app y se escriben en
+ * la casilla como los teclea un alumno: coma decimal, punto de millares y punto decimal.
+ *
+ *   CASO 7 · piscina 8 × 4 × 1,5 m = 48 m³; 1 m³ = 1000 L → 48.000 L. EXACTA (no hay π):
+ *     tolerancia de redondeo 0.
+ *     «48.000» → lectura española 48000 (la otra, 48, queda a 47.952) → acierta.
+ *     «47.990» → 47990 (47,99 queda más lejos) → suspende, «desviado 10,00 L».
+ *     «48» → son los m³ sin pasar a litros: error con nombre.
+ *   CASO 8 · esfera de 2 m de diámetro → r = 1 m → V = 4π/3 = 4,18879020 m³ → 4188,7902 L
+ *     → 4188,79 L. Depende de π → tolerancia relativa max(0,01; 1 %) = 41,89 L.
+ *     π = 3,14 → 4/3 · 3,14 · 1000 = 4186,67 (0,05 %) → acierta.
+ *     π = 3 → 4000 (4,5 %) → suspende, «desviado 188,79 L».
+ *     «4.188,79» → con los dos separadores manda el último: 4188,79 → acierta.
+ *     «4.100» → 4100 (4,1 queda más lejos) → «desviado 88,79 L».
+ *   CASO 10 · vaso de r = 4 cm con 1000 cm³ → h = 1000 ÷ (16π) = 1000 ÷ 50,265482 = 19,894368
+ *     → 19,89 cm; tolerancia 1 % = 0,1989 cm.
+ *     π = 3,14 → 1000 ÷ 50,24 = 19,9045 → «19,90» acierta.
+ *     «19.89» → punto con DOS cifras detrás: no puede ser millar, es el decimal de
+ *     Latinoamérica → acierta.
+ *     «19,69» → desviado 0,20 cm, fuera del 1 % → suspende. («19,70», a 0,19, está dentro: es el
+ *     margen que la sección anuncia, «se acepta una desviación del 1 %».)
+ *   CASO 2 · ortoedro 7 × 4 × 2,5 = 70 cm³, exacta: «70,00» acierta; «69,99» y «70,01»,
+ *     a 0,01, suspenden.
+ */
+
+/** Elige el caso, escribe la respuesta, pulsa «Comprobar» y devuelve el veredicto. */
+async function corregirCaso(page: Page, caso: number, texto: string): Promise<string> {
+  const seccion = page.locator('section[aria-labelledby="casos-aula-titulo"]');
+  const boton = seccion.getByRole('button', { name: new RegExp(`^Caso ${caso}:`) });
+  if ((await boton.getAttribute('aria-pressed')) !== 'true') {
+    await boton.click();
+    await expect(boton).toHaveAttribute('aria-pressed', 'true');
+  }
+  await escribir(seccion.locator('#casos-respuesta'), texto);
+  await seccion.getByRole('button', { name: 'Comprobar' }).click();
+  // El veredicto es el único role="alert" de la sección (los avisos de los campos de medida
+  // y el anunciador de rutas de Next quedan fuera de ella).
+  const veredicto = seccion.getByRole('alert');
+  await expect(veredicto).toBeVisible();
+  return (await veredicto.innerText()).replace(/\s+/g, ' ').trim();
+}
+
+test.describe('re-inspección 12/11/2026 · casos para clase en la página', () => {
+  test('CASO 7 · piscina: «48.000» y «48000» aciertan; «47.990» se lee como 47990 y suspende', async ({
+    page,
+  }) => {
+    expect(await corregirCaso(page, 7, '48.000')).toContain('¡Correcto!');
+    expect(await corregirCaso(page, 7, '48000')).toContain('¡Correcto!');
+    expect(await corregirCaso(page, 7, '47.990')).toContain('Te has desviado 10,00 L de la respuesta.');
+    expect(await corregirCaso(page, 7, '48.000,5')).toContain('Te has desviado 0,50 L de la respuesta.');
+    expect(await corregirCaso(page, 7, '48')).toContain('Eso es el volumen en m³');
+  });
+
+  test('CASO 8 · depósito: con π = 3,14 y con punto de millares acierta; con π = 3 o 4.100, no', async ({
+    page,
+  }) => {
+    expect(await corregirCaso(page, 8, '4.188,79')).toContain('¡Correcto!');
+    expect(await corregirCaso(page, 8, '4188,79')).toContain('¡Correcto!');
+    expect(await corregirCaso(page, 8, '4186,67')).toContain('¡Correcto!');
+    expect(await corregirCaso(page, 8, '4.189')).toContain('¡Correcto!');
+    expect(await corregirCaso(page, 8, '4000')).toContain('Te has desviado 188,79 L de la respuesta.');
+    expect(await corregirCaso(page, 8, '4.100')).toContain('Te has desviado 88,79 L de la respuesta.');
+    // La solución llega a la misma cifra que la clave, con coma decimal
+    const seccion = page.locator('section[aria-labelledby="casos-aula-titulo"]');
+    await seccion.getByRole('button', { name: 'Ver solución' }).click();
+    await expect(seccion).toContainText('r = 2 ÷ 2 = 1 m');
+    await expect(seccion).toContainText('V = (4/3) × π × 1³ = 4,1888 m³');
+    await expect(seccion.locator('strong')).toHaveText(/^4188,79\sL$/);
+  });
+
+  test('CASO 10 · vaso: «19,89», «19,90» (π = 3,14) y «19.89» aciertan; «19,69» suspende', async ({
+    page,
+  }) => {
+    expect(await corregirCaso(page, 10, '19,89')).toContain('¡Correcto!');
+    expect(await corregirCaso(page, 10, '19,90')).toContain('¡Correcto!');
+    expect(await corregirCaso(page, 10, '19.89')).toContain('¡Correcto!');
+    expect(await corregirCaso(page, 10, '19,70')).toContain('¡Correcto!');
+    expect(await corregirCaso(page, 10, '19,69')).toContain('Te has desviado 0,20 cm de la respuesta.');
+    const seccion = page.locator('section[aria-labelledby="casos-aula-titulo"]');
+    await seccion.getByRole('button', { name: 'Ver solución' }).click();
+    await expect(seccion).toContainText('π × r² = π × 4² = 50,2655 cm²');
+    await expect(seccion).toContainText('h = 1000 ÷ 50,2655 = 19,8944 cm');
+  });
+
+  test('CASO 2 · exacta: «70,00» acierta y una centésima de más o de menos suspende', async ({ page }) => {
+    expect(await corregirCaso(page, 2, '70,00')).toContain('¡Correcto!');
+    expect(await corregirCaso(page, 2, '69,99')).toContain('Te has desviado 0,01 cm³ de la respuesta.');
+    expect(await corregirCaso(page, 2, '70,01')).toContain('Te has desviado 0,01 cm³ de la respuesta.');
+  });
+});
+
+test.describe('re-inspección 12/11/2026 · casos para clase, lógica', () => {
+  // 1000 semillas del modo práctica, con el volumen PROPIO del test (`respuestaPropia`), no con
+  // el de la app: la cuenta de libro con π = 3,14 o 22/7, redondeada a dos decimales, acierta, y
+  // con π = 3 suspende allí donde π no se cancela. Las 40 semillas del bloque anterior no llegan
+  // al borde de la tolerancia mínima (respuestas entre 1 y 2, donde el 1 % ronda 0,01).
+  test('modo práctica: π = 3,14 y 22/7 aciertan y π = 3 suspende en 1000 semillas', () => {
+    const fallos: string[] = [];
+    for (let semilla = 1; semilla <= 1000; semilla++) {
+      const e = generarEjercicioAleatorio(semilla);
+      for (const pi of [3.14, 22 / 7]) {
+        const delLibro = red2(respuestaPropia(e.datos, pi));
+        if (!comprobarRespuesta(delLibro, e.respuesta, e.datos).correcto) {
+          fallos.push(`semilla ${semilla}: suspende ${delLibro} con π = ${pi} (clave ${e.respuesta})`);
+        }
+      }
+      if (dependeDePi(e.datos)) {
+        const conTres = red2(respuestaPropia(e.datos, 3));
+        if (comprobarRespuesta(conTres, e.respuesta, e.datos).correcto) {
+          fallos.push(`semilla ${semilla}: acepta π = 3 (${conTres}, clave ${e.respuesta})`);
+        }
+      }
+    }
+    expect(fallos).toEqual([]);
+  });
+
+  // HALLAZGO (contenido, bajo) — ABIERTO, re-inspección del 12/11/2026. En los pasos de una
+  // capacidad en m³ → L, la solución multiplica el volumen YA RECORTADO a cuatro decimales y
+  // escribe como resultado el del volumen sin recortar: «4,1888 m³ × 1000 = 4188,7902 L», cuando
+  // 4,1888 × 1000 = 4188,8. Quien rehace la cuenta que la solución le enseña no llega a la cifra
+  // escrita. Con las otras conversiones (× 1 y × 0,001) no se nota.
+  // Caso: caso 8 · Ver solución → esperado una igualdad que se cumpla a la precisión escrita
+  //       (4,1888 × 1000 = 4188,8, o el volumen con más cifras) · obtenido «4,1888 m³ × 1000 =
+  //       4188,7902 L».
+  test.fail('ABIERTO · lo que los pasos escriben como «A u³ × F = B» se cumple a la precisión de B', () => {
+    const leer = (t: string): number => Number(t.replace(/\./g, '').replace(',', '.'));
+    const pasos = CASOS_AULA[7].pasos.map(sinEspacioDuro);
+    const igualdades = pasos
+      .map((p) => p.match(/(\d[\d.,]*) (?:cm|dm|m)³ × (\d[\d.,]*) = (\d[\d.,]*) (?:mL|L)/))
+      .filter((m): m is RegExpMatchArray => m !== null);
+    for (const [, a, f, b] of igualdades) {
+      const decimales = (b.split(',')[1] ?? '').length;
+      const producto = leer(a) * leer(f);
+      expect(Math.abs(producto - leer(b)), `${a} × ${f} = ${b}`).toBeLessThanOrEqual(10 ** -decimales / 2 + 1e-9);
+    }
+  });
+});
+
+// HALLAZGO (cálculo, medio) — ABIERTO, re-inspección del 12/11/2026. `leerRespuestaAula`
+// (C0558, cd6270a91) elige entre «X.YYY» como millar y como decimal la lectura MÁS CERCANA a la
+// respuesta, también cuando ninguna de las dos es correcta. Así, una respuesta equivocada escrita
+// con punto de millares se lee mil veces más pequeña: el alumno que comete justo el error que el
+// caso está pensado para cazar —el diámetro como radio, casos 6 y 8— no recibe el aviso con nombre
+// sino una desviación falsa. El veredicto («no es correcto») sigue siendo el bueno; lo que miente
+// es el diagnóstico y la cifra. Es del corrector compartido: alcanza a las 27 apps con CasosAula.
+// Casos (a mano, lectura española):
+//   caso 8 · «33.510» = 33510 L; con r = 2: (4/3)·π·8·1000 = 33.510,32 L, dentro del 1 % →
+//            esperado «Has usado el diámetro como si fuera el radio» · obtenido «No es correcto.
+//            Te has desviado 4155,28 L» (= 4188,79 − 33,51: lo ha leído como 33,51).
+//   caso 6 · «1.847» = 1847 mL; con r = 7: π·49·12 = 1.847,26 mL → esperado el mismo aviso ·
+//            obtenido «Te has desviado 459,96 mL» (= 461,81 − 1,847).
+// Sin punto («33510», «1847») o con decimales («1.847,26») el aviso sale bien.
+test.describe('re-inspección 12/11/2026 · hallazgo abierto del corrector', () => {
+  test.fail('ABIERTO · «33.510» y «1.847» (diámetro como radio, con punto de millares) reciben su aviso', async ({
+    page,
+  }) => {
+    expect(await corregirCaso(page, 8, '33510')).toContain('diámetro como si fuera el radio');
+    expect(await corregirCaso(page, 6, '1847')).toContain('diámetro como si fuera el radio');
+    expect(await corregirCaso(page, 8, '33.510')).toContain('diámetro como si fuera el radio');
+    expect(await corregirCaso(page, 6, '1.847')).toContain('diámetro como si fuera el radio');
+  });
+});
+
+/**
+ * La sección nueva a 390 px y en los dos temas (12/11/2026). Medido antes de escribir esto: sin
+ * desborde horizontal, botones de 44 × 44 y todos los textos por encima de 4,5:1 (el más justo, el
+ * título en oscuro, 4,93:1). El fondo de cada texto es el primer fondo opaco de sus ancestros,
+ * mezclando las capas translúcidas que encuentre por el camino.
+ */
+test.describe('re-inspección 12/11/2026 · casos para clase en móvil (390×844), dos temas', () => {
+  test.use({
+    viewport: { width: 390, height: 844 },
+    userAgent:
+      'Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.0 Mobile/15E148 Safari/604.1',
+    deviceScaleFactor: 3,
+    isMobile: true,
+    hasTouch: true,
+  });
+
+  test('sin desborde, dianas de 44 px y todo texto a 4,5:1 con veredicto y solución abiertos', async ({
+    page,
+  }) => {
+    await page.addStyleTag({
+      content: '*, *::before, *::after { transition: none !important; animation: none !important; }',
+    });
+    const seccion = page.locator('section[aria-labelledby="casos-aula-titulo"]');
+    const fallos: string[] = [];
+    for (const tema of ['claro', 'oscuro']) {
+      if (tema === 'oscuro') {
+        await page.getByRole('button', { name: 'Cambiar a modo oscuro' }).first().click();
+        await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+      }
+      for (const texto of ['4000', '4188,79']) {
+        await corregirCaso(page, 8, texto);
+        const pista = seccion.getByRole('button', { name: /Ver pista/ });
+        if (await pista.count()) await pista.click();
+        const solucion = seccion.getByRole('button', { name: /Ver solución/ });
+        if (await solucion.count()) await solucion.click();
+        await expect(seccion.locator('ol li')).toHaveCount(5);
+        // El ratón queda encima del último botón pulsado: se aparta para medir el estado normal
+        await page.mouse.move(0, 0);
+        const medida = await seccion.evaluate((sec) => {
+          const rgba = (c: string) => {
+            const p = (c.match(/rgba?\(([^)]+)\)/)?.[1] ?? '0,0,0,0').split(',').map((x) => parseFloat(x));
+            return { r: p[0], g: p[1], b: p[2], a: p.length > 3 ? p[3] : 1 };
+          };
+          const canal = (c: number) => {
+            const s = c / 255;
+            return s <= 0.03928 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+          };
+          const lum = (c: { r: number; g: number; b: number }) =>
+            0.2126 * canal(c.r) + 0.7152 * canal(c.g) + 0.0722 * canal(c.b);
+          const fondoDe = (el: Element) => {
+            const capas: { r: number; g: number; b: number; a: number }[] = [];
+            for (let n: Element | null = el; n; n = n.parentElement) {
+              const c = rgba(getComputedStyle(n).backgroundColor);
+              if (c.a > 0) {
+                capas.push(c);
+                if (c.a >= 1) break;
+              }
+            }
+            let f = { r: 255, g: 255, b: 255 };
+            for (let i = capas.length - 1; i >= 0; i--) {
+              const c = capas[i];
+              f = { r: c.r * c.a + f.r * (1 - c.a), g: c.g * c.a + f.g * (1 - c.a), b: c.b * c.a + f.b * (1 - c.a) };
+            }
+            return f;
+          };
+          const bajos: string[] = [];
+          for (const el of Array.from(sec.querySelectorAll('h2, h3, p, label, button, input, li, strong, [role="alert"]'))) {
+            const t = (el instanceof HTMLInputElement ? el.value : (el as HTMLElement).innerText).trim();
+            if (!t) continue;
+            const a = lum(rgba(getComputedStyle(el).color));
+            const b = lum(fondoDe(el));
+            const ratio = (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+            if (ratio < 4.5) bajos.push(`«${t.slice(0, 30)}» ${ratio.toFixed(2)}:1`);
+          }
+          const pequenos = Array.from(sec.querySelectorAll('button, input'))
+            .map((el) => el.getBoundingClientRect())
+            .filter((r) => r.height < 44 || r.width < 44).length;
+          return {
+            bajos,
+            pequenos,
+            desborde: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+            derecha: sec.getBoundingClientRect().right,
+          };
+        });
+        const donde = `${tema} · caso 8 «${texto}»`;
+        for (const b of medida.bajos) fallos.push(`${donde}: ${b}`);
+        if (medida.pequenos > 0) fallos.push(`${donde}: ${medida.pequenos} dianas de menos de 44 px`);
+        if (medida.desborde > 0) fallos.push(`${donde}: la página desborda ${medida.desborde} px`);
+        if (medida.derecha > 390) fallos.push(`${donde}: la sección acaba en ${medida.derecha} px`);
+        await seccion.getByRole('button', { name: /Ocultar solución/ }).click();
+        const ocultarPista = seccion.getByRole('button', { name: /Ocultar pista/ });
+        if (await ocultarPista.count()) await ocultarPista.click();
+      }
+    }
+    expect(fallos).toEqual([]);
   });
 });

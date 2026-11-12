@@ -1,5 +1,5 @@
 import { test, expect, Page, Locator } from '@playwright/test';
-import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
+import { asentarAntesDeTraducir, esperarHidratacion, esperarValorEnReact } from './_hidratacion';
 import { contrasteSobreFondoReal } from './_contraste';
 
 /**
@@ -17,7 +17,10 @@ import { contrasteSobreFondoReal } from './_contraste';
  * bloque va detrás del de la cuarta. Sus 9 hallazgos (2738-2746) se REPARARON el mismo 03/10/2026:
  * quedan como regresión al final de ese bloque, y `contraste()` compone ya los tintes (2742).
  * Sexta: 03/11/2026, comprobación puntual de los cabos C0115 (Ferrari, «fisiólogo») y C0132
- * (cifras sin fuente de la guía y del aviso de la VAM): su bloque va al final del fichero.
+ * (cifras sin fuente de la guía y del aviso de la VAM): su bloque va detrás del de la quinta.
+ * Séptima: 12/11/2026, inspección de CAMBIO desde ac046fdc (avisos del motor de dcb9cd6c, span
+ * de la VAM del estimador de c3843ed6, scroll-padding de cd462414 y --primary-texto de 4488bd1d):
+ * su bloque va al final del fichero.
  *
  * QUÉ PROMETE
  *   <h1>: «🚴 Calculadora de Vatios en Ciclismo»
@@ -1662,8 +1665,9 @@ test.describe('Inspector 03/10/2026', () => {
       page,
     }) => {
       // REPARADO: el aviso y los resultados de «Calcular potencia» van justo detrás de su panel
-      // (antes, detrás del estimador) y se llevan a la vista con scroll-margin para la barra
-      // del logo y la píldora del Footer.
+      // (antes, detrás del estimador) y se llevan a la vista salvando la barra del logo y la
+      // píldora del Footer: con scroll-margin en .salida hasta el 13/10/2026 y desde entonces con
+      // el scroll-padding de globals.css (cd462414, cabos C0090 y C0116).
       // ENTRADA abrir el estimador, vaciar el peso y tocar «Calcular potencia»
       // ESPERADO el aviso «El peso debe ser un número mayor que 0 kg.» a la vista
       // OBTENIDO el aviso a 1045 px de la parte superior de una pantalla de 839 (1830 px si la
@@ -1959,5 +1963,250 @@ test.describe('Cabos C0115 y C0132 (03/11/2026)', () => {
     const alerta = page.locator('p[role="alert"]');
     await expect(alerta).toContainText('7,52 W/kg, por encima del techo de 7,5 W/kg que admite la herramienta');
     await expect(alerta).not.toContainText('escaladores');
+  });
+});
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════
+ * Inspector 12/11/2026 — inspección de CAMBIO desde ac046fdc
+ *
+ * QUÉ CAMBIÓ (git diff ac046fdc HEAD -- app/calculadora-potencia-ciclismo/ lib/calculadoras/deporte.ts)
+ *   dcb9cd6c · motor: los avisos por encima de 7,5 W/kg y de 2000 m/h dejan de compararse con «los
+ *              mejores escaladores» sin fuente y se apoyan en el techo de la herramienta
+ *              (hallazgo 4025, cabo C0611); el comentario de VAM_MAX_M_H lo dice.
+ *   c3843ed6 · página: «Esa subida son … m/h de VAM» del estimador, en un <span> siempre montado
+ *              (C0312, la página traducida). Nota: cualquier cambio en un campo del estimador pone
+ *              `vatios` a null y desmonta la tarjeta entera, así que la frase no aparece ni
+ *              desaparece DENTRO de una tarjeta montada: el span es preventivo, y el test de abajo
+ *              recorre con la página traducida el único camino que existe.
+ *   cd462414 · CSS: fuera el scroll-margin de .salida; la barra del logo y la píldora del pie las
+ *              salva el scroll-padding de globals.css (cabos C0090 y C0116).
+ *   4488bd1d · CSS: .resultValor pasa de var(--primary) a var(--primary-texto).
+ *   El resto del diff de deporte.ts (dbd79b37, 5cfc6fe2, 0368823b) es de calcularSWOLF y sus
+ *   constantes, que esta app no importa: no se inspecciona aquí.
+ *
+ * LOS CASOS, RESUELTOS A MANO ANTES DE ABRIR EL NAVEGADOR
+ *   (.inspector-trabajo/potencia-ciclismo-esperado-cambio.mjs, sin importar el motor)
+ *   Avisos del motor
+ *     · 60 kg · 451 W → 451 / 60 = 7,5167 → 7,52 > 7,5 → «451 W con 60 kg son 7,52 W/kg, por
+ *       encima del techo de 7,5 W/kg que admite la herramienta, y por encima de él no da
+ *       veredicto: revisa el peso y el FTP.»
+ *     · 1000 m en 25 min → 1000 · 60 / 25 = 2400 m/h > 2000 → «1000 m en 25 min serían 2400 m/h
+ *       de VAM, por encima del techo de 2000 m/h hasta el que la herramienta clasifica una subida: …»
+ *     · 3000 m en 10 min → 18000 m/h → «18.000 m/h» (cinco cifras sí se agrupan en es-ES)
+ *     · 60,5 kg · 460 W → 7,6033 → 7,60 → «460 W con 60,5 kg son 7,60 W/kg»   (sale «60.5 kg»)
+ *     · 1000 m en 25,5 min → 2352,94 → 2353 → «1000 m en 25,5 min serían 2353 m/h»   (sale «25.5»)
+ *   Estimador: P = (m·g·sen θ + Crr·m·g·cos θ + ½·ρ·CdA·v²)·v / η, θ = arctan(pendiente/100),
+ *   v = km/h / 3,6, g 9,80665 · Crr 0,005 · CdA 0,32 m² · ρ 1,225 kg/m³ · η 0,975
+ *     · 78 kg · 22 km/h · 4 %: v 6,11111 m/s · sen θ 0,0399680 · F_g 30,5723 · F_r 3,8215 ·
+ *       F_a 7,3198 N → P = 41,7136 · 6,11111 / 0,975 = 261,45 → «261 W» (reparto 191,62 · 23,95 ·
+ *       45,88 → 192 · 24 · 46); VAM = 6,11111 · 0,0399680 · 3600 = 879,30 → «879 m/h»
+ *     · 78 kg · 15 km/h · 0 %: (3,8246 + 3,4028) · 4,16667 / 0,975 = 30,89 → «31 W», sin VAM
+ *     · 78 kg · 15 km/h · 7 %: 259,11 W y 1047,44 m/h (los del bloque del 30/09/2026)
+ *   Contraste de .resultValor (WCAG 2.x, luminancia relativa)
+ *     · claro  #26718F sobre la tarjeta #FFFFFF = 5,47:1 (antes #2E86AB, 4,11:1)
+ *     · oscuro #3FA5D1 sobre la tarjeta #2D2D2D = 4,93:1
+ *   scroll-padding de globals.css, medido: 96 px arriba y 63 abajo a 1280; 66 y 8 a 390.
+ * ═══════════════════════════════════════════════════════════════════════════════════════ */
+
+/** Simula la traducción del navegador: cada texto visible pasa a <font><font>, como Google Translate. */
+async function traducirPagina(page: Page): Promise<void> {
+  // Antes del primer <font>, la página entera asentada (cabo C0493)
+  await asentarAntesDeTraducir(page);
+  await page.evaluate(() => {
+    const caminante = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+      acceptNode: (n) => {
+        const padre = n.parentElement;
+        if (!padre || !(n.nodeValue ?? '').trim()) return NodeFilter.FILTER_REJECT;
+        if (/^(SCRIPT|STYLE|OPTION|NOSCRIPT|FONT)$/.test(padre.tagName)) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      },
+    });
+    const nodos: Text[] = [];
+    while (caminante.nextNode()) nodos.push(caminante.currentNode as Text);
+    for (const nodo of nodos) {
+      const exterior = document.createElement('font');
+      const interior = document.createElement('font');
+      interior.textContent = nodo.nodeValue;
+      exterior.appendChild(interior);
+      nodo.parentNode?.replaceChild(exterior, nodo);
+    }
+  });
+}
+
+/** Contraste esperado de .resultValor en cada tema (resuelto a mano, arriba). */
+const CONTRASTE_CIFRA: Record<'light' | 'dark', { color: string; ratio: number }> = {
+  light: { color: 'rgb(38, 113, 143)', ratio: 5.47 }, // #26718F sobre #FFFFFF
+  dark: { color: 'rgb(63, 165, 209)', ratio: 4.93 }, // #3FA5D1 sobre #2D2D2D
+};
+
+/** Pone el tema sin transición; el color de la cifra lo espera después `toHaveCSS`, que reintenta. */
+async function ponerTema(page: Page, tema: 'light' | 'dark'): Promise<void> {
+  // globals.css anima el color 0,3 s al cambiar de tema; con movimiento reducido, 0,01 ms
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.evaluate((t) => document.documentElement.setAttribute('data-theme', t), tema);
+}
+
+test.describe('Inspector 12/11/2026 — cambio', () => {
+  test.use({ locale: 'es-ES' });
+
+  test('dcb9cd6c · el aviso de 60 kg con 451 W, literal: se apoya solo en el techo de la herramienta', async ({
+    page,
+  }) => {
+    // 451 / 60 = 7,5167 → 7,52 > 7,5 (WKG_MAX)
+    await calcular(page, { peso: '60', ftp: '451' });
+    await expect(page.locator('p[role="alert"]')).toHaveText(
+      '451 W con 60 kg son 7,52 W/kg, por encima del techo de 7,5 W/kg que admite la herramienta, ' +
+        'y por encima de él no da veredicto: revisa el peso y el FTP.',
+    );
+    await expect(resultados(page)).toHaveCount(0);
+  });
+
+  test('dcb9cd6c · el aviso de una VAM por encima de 2000 m/h, literal, y 18.000 m/h agrupado', async ({
+    page,
+  }) => {
+    await abrirVam(page);
+    // 1000 · 60 / 25 = 2400 m/h > 2000 (VAM_MAX_M_H)
+    await calcular(page, { peso: '70', ftp: '280', desnivel: '1000', tiempo: '25' });
+    const aviso = resultados(page).locator('p', { hasText: 'm/h de VAM' });
+    await expect(aviso).toHaveText(
+      '1000 m en 25 min serían 2400 m/h de VAM, por encima del techo de 2000 m/h hasta el que la ' +
+        'herramienta clasifica una subida: revisa el desnivel y el tiempo. En un repecho de pocos ' +
+        'minutos la VAM se dispara, y esta escala, pensada para subidas largas, no se le aplica.',
+    );
+    // El W/kg, que no depende de la subida, sigue: 280 / 70 = 4,00; y ningún veredicto de VAM
+    await expect(resultados(page)).toContainText('4,00');
+    await expect(resultados(page)).not.toContainText('Élite / Profesional');
+    // 3000 · 60 / 10 = 18000: con cinco cifras es-ES sí agrupa
+    await calcular(page, { desnivel: '3000', tiempo: '10' });
+    await expect(aviso).toContainText('3000 m en 10 min serían 18.000 m/h de VAM, por encima del techo de 2000 m/h');
+  });
+
+  test('control del hallazgo de abajo: con decimales, los dos avisos salen y la cifra calculada es la buena', async ({
+    page,
+  }) => {
+    // 460 / 60,5 = 7,6033 → 7,60 > 7,5
+    await calcular(page, { peso: '60,5', ftp: '460' });
+    await expect(page.locator('p[role="alert"]')).toContainText(
+      'son 7,60 W/kg, por encima del techo de 7,5 W/kg que admite la herramienta',
+    );
+    // 1000 · 60 / 25,5 = 2352,94 → 2353 > 2000
+    await abrirVam(page);
+    await calcular(page, { peso: '70', ftp: '280', desnivel: '1000', tiempo: '25,5' });
+    await expect(resultados(page)).toContainText(
+      'serían 2353 m/h de VAM, por encima del techo de 2000 m/h hasta el que la herramienta clasifica una subida',
+    );
+  });
+
+  test('HALLAZGO · los avisos repiten el peso y el tiempo tecleados con punto decimal: «60.5 kg», «25.5 min»', async ({
+    page,
+  }) => {
+    test.fail(); // HALLAZGO ABIERTO (Inspector 12/11/2026) [contenido/bajo]
+    // Los dos mensajes que reescribió dcb9cd6c interpolan el número crudo (`${peso_kg}`,
+    // `${desnivel_m}`, `${tiempo_min}` en calcularPotenciaCiclismo), que JavaScript escribe con
+    // punto; las cifras calculadas de la misma frase sí pasan por toLocaleString('es-ES'). Sale
+    // igual en la API de ChatGPT y en la tool del MCP, que comparten el motor.
+    // ENTRADA peso «60,5» · FTP 460 → ESPERADO «460 W con 60,5 kg son 7,60 W/kg»
+    //         OBTENIDO «460 W con 60.5 kg son 7,60 W/kg» (punto y coma en la misma frase)
+    // ENTRADA 70 kg · 280 W · desnivel 1000 · tiempo «25,5» → ESPERADO «1000 m en 25,5 min serían
+    //         2353 m/h» · OBTENIDO «1000 m en 25.5 min serían 2353 m/h» (y «1500.5 m» con 1500,5)
+    await calcular(page, { peso: '60,5', ftp: '460' });
+    await expect.soft(page.locator('p[role="alert"]')).toContainText('460 W con 60,5 kg son 7,60 W/kg');
+    await abrirVam(page);
+    await calcular(page, { peso: '70', ftp: '280', desnivel: '1000', tiempo: '25,5' });
+    await expect.soft(resultados(page)).toContainText('1000 m en 25,5 min serían 2353 m/h');
+  });
+
+  test('c3843ed6 · la frase de la VAM del estimador: con su espacio en subida, ausente en llano', async ({
+    page,
+  }) => {
+    const tarjeta = await abrirEstimador(page);
+    const reparto = tarjeta.locator('p').first();
+    // 78 kg · 22 km/h · 4 %: 261,45 W (191,62 · 23,95 · 45,88) y 879,30 m/h
+    await estimar(page, { masa: '78', velocidad: '22', pendiente: '4' });
+    await expect(tarjeta).toContainText('261 W');
+    await expect(reparto).toHaveText(
+      'Reparto del esfuerzo: 192 W contra la gravedad · 24 W de rodadura · 46 W contra el aire. ' +
+        'Esa subida son 879 m/h de VAM.',
+    );
+    // 78 kg · 15 km/h · 0 %: 30,89 W y sin componente vertical: la frase no sale
+    await estimar(page, { masa: '78', velocidad: '15', pendiente: '0' });
+    await expect(tarjeta).toContainText('31 W');
+    await expect(reparto).toHaveText(
+      'Reparto del esfuerzo: 0 W contra la gravedad · 16 W de rodadura · 15 W contra el aire.',
+    );
+  });
+
+  test('c3843ed6 · con la página traducida, de subida a llano y vuelta: la app no cae y las cifras siguen', async ({
+    page,
+  }) => {
+    const errores: string[] = [];
+    page.on('pageerror', (e) => errores.push(e.message));
+    page.on('console', (m) => {
+      if (m.type() === 'error' && /NotFoundError|insertBefore|removeChild/.test(m.text())) errores.push(m.text());
+    });
+    const tarjeta = await abrirEstimador(page);
+    // 78 kg · 15 km/h · 7 %: 259,11 W y 1047,44 m/h
+    await estimar(page, { masa: '78', velocidad: '15', pendiente: '7' });
+    await expect(tarjeta).toContainText('1047 m/h de VAM');
+    await traducirPagina(page);
+    // A llano: 30,89 W, sin VAM
+    await estimar(page, { pendiente: '0' });
+    await expect(tarjeta).toContainText('31 W');
+    await expect(tarjeta).not.toContainText('de VAM');
+    // Y de vuelta a una subida: 78 kg · 22 km/h · 4 % = 261,45 W y 879,30 m/h
+    await estimar(page, { velocidad: '22', pendiente: '4' });
+    await expect(tarjeta).toContainText('261 W');
+    await expect(tarjeta).toContainText('Esa subida son 879 m/h de VAM.');
+    await expect(page.getByText('Algo salió mal')).toHaveCount(0);
+    expect(errores).toEqual([]);
+  });
+
+  test.describe('Escritorio 1280×900', () => {
+    test.use({ viewport: { width: 1280, height: 900 } });
+
+    for (const tema of ['light', 'dark'] as const) {
+      test(`cd462414 y 4488bd1d · en ${tema === 'light' ? 'claro' : 'oscuro'}: el W/kg queda entre las barras y su cifra llega a 4,5:1`, async ({
+        page,
+      }) => {
+        await ponerTema(page, tema);
+        // Estimar 259 W (78 kg · 15 km/h · 7 %), escribirlos como FTP con 70 kg: 259 / 70 = 3,70
+        await flujoEstimadorAFtp(page, false);
+        const cifra = resultados(page).locator('[class*="_resultValor"]').first();
+        await expect(cifra).toHaveCSS('color', CONTRASTE_CIFRA[tema].color);
+        await expect.poll(() => contrasteSobreFondoReal(cifra)).toBeGreaterThanOrEqual(4.5);
+        expect(await contrasteSobreFondoReal(cifra)).toBeCloseTo(CONTRASTE_CIFRA[tema].ratio, 1);
+      });
+    }
+  });
+
+  test.describe('Móvil 390×844', () => {
+    test.use({
+      viewport: { width: 390, height: 844 },
+      userAgent:
+        'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Mobile Safari/537.36',
+      deviceScaleFactor: 3,
+      isMobile: true,
+      hasTouch: true,
+    });
+
+    for (const tema of ['light', 'dark'] as const) {
+      test(`cd462414 y 4488bd1d · a 390 px en ${tema === 'light' ? 'claro' : 'oscuro'}: el W/kg y el aviso del estimador quedan a la vista`, async ({
+        page,
+      }) => {
+        await ponerTema(page, tema);
+        await flujoEstimadorAFtp(page, true);
+        const cifra = resultados(page).locator('[class*="_resultValor"]').first();
+        await expect(cifra).toHaveCSS('color', CONTRASTE_CIFRA[tema].color);
+        expect(await contrasteSobreFondoReal(cifra)).toBeCloseTo(CONTRASTE_CIFRA[tema].ratio, 1);
+        // El aviso del estimador, tras su botón, también salva la barra del logo
+        await page.fill('#velocidad', '');
+        await esperarValorEnReact(page, '#velocidad', '');
+        await page.getByRole('button', { name: /Estimar vatios/i }).tap();
+        const aviso = page.locator('p[role="alert"]');
+        await expect(aviso).toHaveText('La velocidad debe ser un número mayor que 0 km/h.');
+        await expect(aviso).toBeInViewport({ ratio: 1 });
+        await expect.poll(() => entreBarras(page, aviso)).toBe(true);
+      });
+    }
   });
 });
