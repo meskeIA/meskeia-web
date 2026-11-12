@@ -3061,6 +3061,12 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/conversor-unidades/', icon: '📏', name: 'Conversor de Unidades', description: 'Longitud, superficie, peso y temperatura' },
     { url: '/calculadora-geometria/', icon: '📐', name: 'Calculadora de Geometría', description: 'Distancias, áreas y ángulos en el plano' },
   ],
+  'conversor-fecha-juliana': [
+    { url: '/calculadora-caducidad/', icon: '🧊', name: 'Cuánto Dura Cada Alimento', description: 'Nevera, congelador y despensa, alimento a alimento' },
+    { url: '/calculadora-fechas/', icon: '📅', name: 'Calculadora de Fechas', description: 'Días entre fechas, sumar y restar días' },
+    { url: '/conversor-horarios/', icon: '⚡', name: 'Conversor de Horarios', description: 'Pasa tu hora local a otras zonas horarias' },
+    { url: '/calculadora-horas/', icon: '🕒', name: 'Calculadora de Horas', description: 'Suma y resta horas y minutos' },
+  ],
   'conversor-unidades-rf': [
     { url: '/conversor-unidades/', icon: '📏', name: 'Conversor Unidades', description: 'Longitud, peso, temperatura' },
     { url: '/conversor-coordenadas/', icon: '🧭', name: 'Conversor de Coordenadas', description: 'UTM, MGRS y grados minutos segundos' },
@@ -3165,7 +3171,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
 
   // SALUD FEMENINA
   'seguimiento-ciclo-menstrual': saludFemeninaApps.filter(a => a.url !== '/seguimiento-ciclo-menstrual/'),
-  'calculadora-fechas': [{ url: '/calculadora-horas/', icon: '🕒', name: 'Calculadora de Horas', description: 'Suma y resta horas y minutos' }, ...familiaApps.filter(a => a.url !== '/calculadora-fechas/').slice(0, 2), ...productividadApps.slice(0, 1)],
+  'calculadora-fechas': [{ url: '/calculadora-horas/', icon: '🕒', name: 'Calculadora de Horas', description: 'Suma y resta horas y minutos' }, { url: '/conversor-fecha-juliana/', icon: '📅', name: 'Conversor de Fecha Juliana', description: 'Día del año, código de lote y día juliano' }, ...familiaApps.filter(a => a.url !== '/calculadora-fechas/').slice(0, 2)],
 
   // ARITMÉTICA DE TIEMPO
   'calculadora-horas': [
@@ -6760,7 +6766,7 @@ export const appRelationsMap: Record<string, RelatedApp[]> = {
     { url: '/tiempos-coccion/', icon: '⏱️', name: 'Tiempos de Cocción', description: 'Cuánto cocer cada alimento en agua' },
     { url: '/temperatura-coccion-carne/', icon: '🌡️', name: 'Temperatura Interna de Cocción', description: 'Cocina carne y pescado de forma segura' },
     { url: '/planificador-menu/', icon: '🗓️', name: 'Planificador de Menú', description: 'Organiza la semana y aprovecha mejor la compra' },
-    { url: '/calculadora-merma/', icon: '📉', name: 'Calculadora de Merma', description: 'Cuánto se aprovecha de verdad de cada alimento' },
+    { url: '/conversor-fecha-juliana/', icon: '📅', name: 'Fecha Juliana de un Lote', description: 'Qué día se fabricó un lote por su código (26316, 6316)' },
   ],
   'ratio-cafe': [
     { url: '/guia-cafe/', icon: '☕', name: 'Guía del Café', description: 'Métodos, tuestes y orígenes para entender cada taza' },
