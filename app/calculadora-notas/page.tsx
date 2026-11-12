@@ -247,29 +247,43 @@ export default function CalculadoraNotasPage() {
     });
 
     if (asignaturasValidas.length === 0) {
-      return { media: 0, totalCreditos: 0, asignaturasContadas: 0, aprobadas: 0, suspensas: 0 };
+      return { media: 0, totalCreditos: 0, asignaturasContadas: 0, aprobadas: 0, suspensas: 0, mediaSuperadas: 0 };
     }
 
     let sumaPonderada = 0;
     let totalCreditos = 0;
     let aprobadas = 0;
     let suspensas = 0;
+    let sumaSuperadas = 0;
+    let creditosSuperados = 0;
 
     asignaturasValidas.forEach(a => {
       const nota = parseFloat(a.nota.replace(',', '.'));
       const creditos = parseFloat(a.creditos.replace(',', '.'));
       sumaPonderada += nota * creditos;
       totalCreditos += creditos;
-      if (nota >= 5) aprobadas++;
-      else suspensas++;
+      if (nota >= 5) {
+        aprobadas++;
+        sumaSuperadas += nota * creditos;
+        creditosSuperados += creditos;
+      } else suspensas++;
     });
 
+    /*
+     * Hallazgo 4555 (12/11/2026, REPARADO): la media metía las suspensas sin decirlo, y el
+     * expediente oficial universitario solo cuenta las superadas: el RD 1125/2003, art. 5.3,
+     * divide entre «el número de créditos totales obtenidos por el alumno» (BOE-A-2003-17643,
+     * cotejado el 12/11/2026), y un crédito se obtiene al superar la materia. La media de todas
+     * se mantiene —es la que sirve en secundaria o con pesos que no son créditos— y, si hay
+     * suspensas, se da también la de las superadas con una línea que dice cuál es cada una.
+     */
     return {
       media: sumaPonderada / totalCreditos,
       totalCreditos,
       asignaturasContadas: asignaturasValidas.length,
       aprobadas,
-      suspensas
+      suspensas,
+      mediaSuperadas: creditosSuperados > 0 ? sumaSuperadas / creditosSuperados : 0,
     };
   }, [asignaturas]);
 
@@ -643,6 +657,12 @@ export default function CalculadoraNotasPage() {
               )}
             </div>
 
+            {resultadoMedia.suspensas > 0 && resultadoMedia.aprobadas > 0 && (
+              <p className={styles.notaSuperadas}>
+                {`Esta media incluye ${resultadoMedia.suspensas === 1 ? 'una asignatura suspensa' : `${formatNumber(resultadoMedia.suspensas, 0)} asignaturas suspensas`}. Solo con las superadas, que es como se calcula la media del expediente universitario oficial (RD 1125/2003, art. 5.3), sale ${formatNumber(resultadoMedia.mediaSuperadas, 2)}.`}
+              </p>
+            )}
+
             {notasFueraDeRango > 0 && (
               <p className={styles.avisoRango} role="alert">
                 <span aria-hidden="true">⚠️</span>{' '}
@@ -766,7 +786,7 @@ export default function CalculadoraNotasPage() {
                 <span aria-hidden="true">⭐</span> Fase Específica (Voluntaria)
               </h3>
               <p className={styles.evauInfo}>
-                Hasta 4 exámenes para subir nota. Las 2 mejores notas (≥5) ponderan ×0.2
+                Hasta 4 exámenes para subir nota. Las 2 mejores notas (≥5) ponderan ×0,2
               </p>
 
               <div className={styles.asignaturasList}>
@@ -852,8 +872,11 @@ export default function CalculadoraNotasPage() {
 
             <div style={{ marginTop: 'var(--spacing-lg)', padding: 'var(--spacing-md)', background: 'var(--hover)', borderRadius: 'var(--radius)', fontSize: '0.85rem', color: 'var(--text-secondary)' }}>
               <strong>Fórmula:</strong><br/>
-              Nota Acceso = 60% Bachillerato + 40% Fase General<br/>
-              Nota Admisión = Nota Acceso + (M1-5)×0.2 + (M2-5)×0.2
+              {/* Hallazgo 4554 (12/11/2026, REPARADO): aquí seguía la fórmula «(M1-5)×0.2» que el
+                  hallazgo 177 retiró del motor; daba 2 puntos menos que la cifra de arriba. */}
+              Nota Acceso = 60{' '}% Bachillerato + 40{' '}% Fase General<br/>
+              Nota Admisión = Nota Acceso + M1×0,2 + M2×0,2<br/>
+              M1 y M2: las dos mejores materias de la fase específica con 5 o más. El 0,2 es el ponderador máximo; cada universidad lo fija entre 0,1 y 0,2 para cada materia y titulación.
             </div>
           </div>
         </div>
@@ -1054,14 +1077,24 @@ export default function CalculadoraNotasPage() {
                   <td>C</td>
                   <td>50 - 59</td>
                 </tr>
+                {/* La D desde 4, como el conversor y la FAQ (hallazgo 4553): antes 0-4,9 era todo F */}
                 <tr>
-                  <td>0 - 4,9</td>
-                  <td>1,0 - 3,9</td>
-                  <td>0 - 2,4</td>
-                  <td>0 - 9</td>
+                  <td>4,0 - 4,9</td>
+                  <td>3,4 - 3,9</td>
+                  <td>2,0 - 2,4</td>
+                  <td>8 - 9</td>
+                  <td>1,6 - 1,9</td>
+                  <td>D</td>
+                  <td>40 - 49</td>
+                </tr>
+                <tr>
+                  <td>0 - 3,9</td>
+                  <td>1,0 - 3,3</td>
                   <td>0 - 1,9</td>
+                  <td>0 - 7</td>
+                  <td>0 - 1,5</td>
                   <td>F</td>
-                  <td>0 - 49</td>
+                  <td>0 - 39</td>
                 </tr>
               </tbody>
             </table>

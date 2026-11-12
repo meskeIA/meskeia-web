@@ -73,7 +73,9 @@ export const PREGUNTAS_FRECUENTES: { question: string; answer: string }[] = [
     },
     {
       question: '¿Cómo se convierte una nota española al sistema GPA americano?',
-      answer: 'La conversión más usada: 9-10 → 4,0 (A), 7-8,9 → 3,0-3,9 (B), 5-6,9 → 2,0-2,9 (C), 3-4,9 → 1,0-1,9 (D), 0-2,9 → 0,0 (F). Sin embargo, no existe una fórmula oficial; cada institución americana puede aplicar su propia escala de conversión.',
+      // Hallazgo 4553 (12/11/2026, REPARADO): describía una tabla por tramos que no era la del
+      // conversor ni la de la Tabla de Equivalencias. Ahora las tres dicen lo mismo.
+      answer: 'No existe una fórmula oficial: cada institución americana aplica su propia escala. Esta calculadora usa la conversión lineal GPA = nota × 4 ÷ 10 (un 9 da 3,6; un 7, 2,8; un 5, 2,0) y asigna la letra por tramos de la nota sobre 10: A desde 9, B+ desde 8, B desde 7, C+ desde 6, C desde 5, D desde 4 y F por debajo de 4. Hay otras tablas por tramos muy extendidas que, por ejemplo, dan 4,0 a cualquier nota desde 9.',
     },
     {
       question: '¿Las asignaturas suspensas cuentan en la media del expediente universitario?',

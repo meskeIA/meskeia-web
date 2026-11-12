@@ -81,7 +81,7 @@ import { contrasteSobreFondoReal } from './_contraste';
  *     las mismas respuestas. El ejemplo de su 2.ª pregunta —final al 60 %, continua 4 al 40 %,
  *     objetivo 5— resuelto en «¿Qué nota necesito?» (4 · 40 · 5 · 60):
  *     X = (5 × 100 − 4 × 40) / 60 = 340 / 60 = 5,67, que es lo que la FAQ promete.
- *   · ABIERTOS (inspector 12/11/2026), con test.fail() — los casos, en su test:
+ *   · REPARADOS el 12/11/2026 (hallazgos 4553, 4554 y 4555; abiertos por el inspector ese día):
  *     A. La FAQ del GPA («9-10 → 4,0», «3-4,9 → D») contradice al conversor (9 → 3,60; 3,5 → F)
  *        y a la tabla de equivalencias (0-4,9 → F, que el conversor llama D en 4,5).
  *     B. La fórmula que enseña el panel EvAU sigue siendo «(M1-5)×0.2 + (M2-5)×0.2», la que el
@@ -601,7 +601,7 @@ test.describe('Inspección de cambio 12/11/2026 — lo que dice la FAQ única (C
     expect(texto).toContain('Objetivo alcanzable');
   });
 
-  test('ABIERTO A (inspector 12/11/2026) — la FAQ del GPA no contradice al conversor ni a la tabla', async ({
+  test('4553 A (inspector 12/11/2026, REPARADO) — la FAQ del GPA no contradice al conversor ni a la tabla', async ({
     page,
   }) => {
     // FAQ: «9-10 → 4,0 (A), 7-8,9 → 3,0-3,9 (B), 5-6,9 → 2,0-2,9 (C), 3-4,9 → 1,0-1,9 (D),
@@ -609,7 +609,6 @@ test.describe('Inspección de cambio 12/11/2026 — lo que dice la FAQ única (C
     //   9 → 3,60 · A   7 → 2,80 · B   4,5 → 1,80 · D   3,5 → 1,40 · F
     // y la tabla de equivalencias de la misma pestaña pone «0 - 4,9 … 0 - 1,9 F», sin D.
     // Tres versiones de la misma conversión en una página: la reparación las deja en una.
-    test.fail();
     const faq = await respuestaFaq(page, /GPA/);
     await page.getByRole('button', { name: /Conversor Escalas/ }).click();
     const entrada = page.locator('input[placeholder="7,5"]');
@@ -631,21 +630,25 @@ test.describe('Inspección de cambio 12/11/2026 — lo que dice la FAQ única (C
       await page.locator('table[class*="tablaConversion"] tbody tr').last().innerText()
     ).replace(/\s+/g, ' ');
 
-    const contradicciones: string[] = [];
-    if (faq.includes('9-10 → 4,0') && n9.gpa !== '4,00')
-      contradicciones.push(`9: la FAQ dice GPA 4,0 y el conversor ${n9.gpa}`);
-    if (faq.includes('7-8,9 → 3,0') && n7.gpa !== '3,00')
-      contradicciones.push(`7: la FAQ dice GPA 3,0 y el conversor ${n7.gpa}`);
-    if (faq.includes('3-4,9 → 1,0-1,9 (D)') && n35.letra !== 'D')
-      contradicciones.push(`3,5: la FAQ dice D y el conversor ${n35.letra}`);
-    if (/^0 - 4,9 .* F/.test(filaSuspenso) && n45.letra === 'D')
-      contradicciones.push(`4,5: la tabla dice F y el conversor ${n45.letra}`);
-    expect(contradicciones).toEqual([]);
+    // REPARADO (hallazgo 4553): se queda la conversión del conversor —lineal y D desde 4— y la
+    // FAQ y la tabla la describen. Se comprueba en positivo: lo que dice cada una, y que casen.
+    expect(faq).toContain('GPA = nota × 4 ÷ 10');
+    expect(faq).toContain('un 9 da 3,6; un 7, 2,8');
+    expect(faq).toContain('D desde 4 y F por debajo de 4');
+    expect(n9).toEqual({ gpa: '3,60', letra: 'A' });
+    expect(n7).toEqual({ gpa: '2,80', letra: 'B' });
+    expect(n45).toEqual({ gpa: '1,80', letra: 'D' });
+    expect(n35).toEqual({ gpa: '1,40', letra: 'F' });
+    const filaD = (
+      await page.locator('table[class*="tablaConversion"] tbody tr').nth(-2).innerText()
+    ).replace(/\s+/g, ' ');
+    expect(filaD).toMatch(/^4,0 - 4,9 .*1,6 - 1,9 D/);
+    expect(filaSuspenso).toMatch(/^0 - 3,9 .*0 - 1,5 F/);
   });
 });
 
 test.describe('Inspección de cambio 12/11/2026 — abiertos en el resto de lo tocado', () => {
-  test('ABIERTO B (inspector 12/11/2026) — la fórmula del panel EvAU es la que calcula: M × 0,2', async ({
+  test('4554 B (inspector 12/11/2026, REPARADO) — la fórmula del panel EvAU es la que calcula: M × 0,2', async ({
     page,
   }) => {
     // Bachillerato 8, troncales 7-6-8-7, específicas 9 y 6:
@@ -653,7 +656,7 @@ test.describe('Inspección de cambio 12/11/2026 — abiertos en el resto de lo t
     //   → 10,600. La fórmula escrita en el panel, «Nota Acceso + (M1-5)×0.2 + (M2-5)×0.2», da
     //   7,600 + 0,80 + 0,20 = 8,600: es la del hallazgo 177, que se reparó en el motor y no aquí.
     //   Y «0.2» va con punto (CLAUDE.md §2), también en «Las 2 mejores notas (≥5) ponderan ×0.2».
-    test.fail();
+    //   REPARADO: la fórmula es ahora «Nota Acceso + M1×0,2 + M2×0,2».
     await page.getByRole('button', { name: /Simulador EvAU/ }).click();
     await page.locator('input[placeholder="Ej: 7,5"]').fill('8');
     const notas = ['7', '6', '8', '7', '9', '6'];
@@ -668,7 +671,7 @@ test.describe('Inspección de cambio 12/11/2026 — abiertos en el resto de lo t
     expect(await page.getByText(/Las 2 mejores notas/).innerText()).not.toMatch(/\d\.\d/);
   });
 
-  test('ABIERTO C (inspector 12/11/2026) — con una suspensa, el panel da la media del expediente oficial: 8,00', async ({
+  test('4555 C (inspector 12/11/2026, REPARADO) — con una suspensa, el panel da la media del expediente oficial: 8,00', async ({
     page,
   }) => {
     // 8 con 6 ECTS y 3 con 6 ECTS. La app da (48 + 18) / 12 = 5,50 «Aprobado» con «Suspensas 1».
@@ -676,13 +679,26 @@ test.describe('Inspección de cambio 12/11/2026 — abiertos en el resto de lo t
     // total de créditos obtenidos», los que se obtienen al superar la materia), solo cuenta las
     // superadas: 8 × 6 / 6 = 8,00. El bloque «Errores frecuentes» llama a incluir las suspensas
     // «error», y la tarjeta «Universitario» invita a «calcular tu expediente académico».
-    test.fail();
     await nota(page, 0).fill('8');
     await creditos(page, 0).fill('6');
     await nota(page, 1).fill('3');
     await creditos(page, 1).fill('6');
     await expect(page.locator('[class*="resultadoValor"]').first()).not.toHaveText('—');
-    expect(await panel(page)).toContain('8,00');
+    // REPARADO (hallazgo 4555): la media de todas (5,50) se mantiene y se dice que incluye la
+    // suspensa; al lado, la de las superadas, con la norma que la define.
+    expect(await valorPrincipal(page)).toBe('5,50');
+    const texto = await panel(page);
+    expect(texto).toContain('Esta media incluye una asignatura suspensa');
+    expect(texto).toContain('RD 1125/2003, art. 5.3), sale 8,00.');
+  });
+
+  test('4555 — sin suspensas no aparece la línea de las superadas', async ({ page }) => {
+    await nota(page, 0).fill('8');
+    await creditos(page, 0).fill('6');
+    await nota(page, 1).fill('6');
+    await creditos(page, 1).fill('6');
+    await expect(page.locator('[class*="resultadoValor"]').first()).toHaveText('7,00');
+    expect(await panel(page)).not.toContain('Solo con las superadas');
   });
 
   // REPARADO el 12/11/2026 (hallazgo 4556, cabo C0723): aria-hidden en los diez iconos de tarjeta,

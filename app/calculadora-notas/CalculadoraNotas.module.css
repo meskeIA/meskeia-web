@@ -936,3 +936,20 @@
   color: #fcd9b6;
   border-color: #b45309;
 }
+
+/* Media de las superadas cuando hay suspensas (hallazgo 4555): informativa, no un error */
+.notaSuperadas {
+  margin: 0 0 1rem;
+  padding: 0.7rem 0.9rem;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  border-left: 4px solid var(--primary-boton);
+  border-radius: 0 8px 8px 0;
+  background: var(--hover);
+  color: var(--text-primary);
+}
+
+[data-theme='dark'] .notaSuperadas {
+  background: var(--hover);
+  color: var(--text-primary);
+}
