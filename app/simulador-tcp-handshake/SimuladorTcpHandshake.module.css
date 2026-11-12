@@ -92,6 +92,23 @@
   color: #e5e5e5;
 }
 
+/* Aviso de ISN rechazado (hallazgos 4567 y 4568) */
+.avisoIsn {
+  margin: 0.75rem 0 0;
+  padding: 0.6rem 0.8rem;
+  border-left: 4px solid #d97706;
+  border-radius: 0 6px 6px 0;
+  background: #fffbeb;
+  color: #1a1a1a;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+[data-theme='dark'] .avisoIsn {
+  background: rgba(217, 119, 6, 0.14);
+  color: #e5e5e5;
+}
+
 .velSelector {
   display: flex;
   gap: 0.4rem;

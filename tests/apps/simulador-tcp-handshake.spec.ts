@@ -34,7 +34,8 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  * CASO 3 (rechazo) — ISN cliente −5 → no se aplica (el SYN sigue con seq 1000) y se avisa.
  *   Hoy no se aplica, pero en silencio, y el campo se queda enseñando «-5».
  *
- * HALLAZGOS ABIERTOS de esta inspección (cada uno con su test.fail()):
+ * HALLAZGOS de esta inspección, REPARADOS el mismo día (4567-4575; A-B = 4567/4568, C = 4569,
+ * D = 4570, E = 4571, F = 4572, G = 4573, H = 4574, I = 4575):
  *   A. «Aplicar ISN» aplica lo que el propio campo marca inválido: 4294967295 → ack 4294967296;
  *      12.7 → seq 12 con el campo enseñando 12.7.
  *   B. −5 y 0 se descartan sin aviso; el campo sigue con el valor rechazado y el diagrama con el
@@ -206,24 +207,22 @@ test.describe('CASO 1 (normal) — los números de secuencia y de acuse', () => 
       );
   });
 
-  test('HALLAZGO (12/11/2026, ABIERTO) · C: la banda «CONEXIÓN CERRADA (TIME_WAIT)» no se pinta nunca', async ({
+  test('HALLAZGO (12/11/2026, REPARADO) · C: la banda «CONEXIÓN CERRADA (TIME_WAIT)» no se pinta nunca', async ({
     page,
   }) => {
     // dibujarCanvas la pinta si `pasoActivo >= pasos.length`, pero avanzarPaso no pasa de
     // pasos.length − 1 (= 6): tras el séptimo paso el lienzo no la trae, y es el único sitio del
     // diagrama que nombra TIME_WAIT. La de «CONEXIÓN ESTABLECIDA» sí sale tras el tercero.
-    test.fail();
     await page.getByRole('button', { name: 'Apertura + Cierre' }).click();
     for (let i = 0; i < 7; i++) await avanzar(page);
     await expect(panel(page)).toContainText('Conexión cerrada');
     await expect.poll(() => textosLienzo(page), { timeout: 3000 }).toContain('CONEXIÓN CERRADA (TIME_WAIT)');
   });
 
-  test('HALLAZGO (12/11/2026, ABIERTO) · D: el ACK final anuncia Window 0', async ({ page }) => {
+  test('HALLAZGO (12/11/2026, REPARADO) · D: el ACK final anuncia Window 0', async ({ page }) => {
     // Los seis segmentos anteriores anuncian 65.535 y nada en la simulación llena el búfer de
     // recepción del cliente; una ventana 0 es la señal de «no me mandes más» del control de
     // flujo, y la app no la explica. Esperado 65.535 (la misma) · obtenido 0.
-    test.fail();
     await page.getByRole('button', { name: 'Apertura + Cierre' }).click();
     for (let i = 0; i < 6; i++) await avanzar(page);
     await expect(dato(page, 'Window')).toHaveText('65.535');
@@ -262,13 +261,12 @@ test.describe('CASO 2 (límite) — los extremos del campo y lo que hay más all
     });
   });
 
-  test('HALLAZGO (12/11/2026, ABIERTO) · A: aplica 4294967295, que el campo marca inválido, y enseña ack 4294967296', async ({
+  test('HALLAZGO (12/11/2026, REPARADO) · A: aplica 4294967295, que el campo marca inválido, y enseña ack 4294967296', async ({
     page,
   }) => {
     // El campo declara max = 999999 y lo marca con rangeOverflow, pero aplicarISN solo mira
     // `>= 1`. Esperado: rechazo (el SYN sigue con 1000 y el SYN-ACK con ack 1001) o, si se
     // admite, la suma módulo 2^32 del campo de 32 bits (ack 0) · obtenido: ack 4294967296.
-    test.fail();
     await aplicarIsn(page, '4294967295', '5000');
     expect(
       await page.locator('#isnCliente').evaluate((el) => (el as HTMLInputElement).validity.rangeOverflow),
@@ -284,10 +282,9 @@ test.describe('CASO 2 (límite) — los extremos del campo y lo que hay más all
     }
   });
 
-  test('HALLAZGO (12/11/2026, ABIERTO) · A: aplica 12.7 como 12 con el campo enseñando 12.7', async ({ page }) => {
+  test('HALLAZGO (12/11/2026, REPARADO) · A: aplica 12.7 como 12 con el campo enseñando 12.7', async ({ page }) => {
     // Un ISN es entero; el campo (step 1 por defecto) marca 12.7 con stepMismatch y parseInt lo
     // trunca. Esperado: rechazo (el SYN sigue con 1000) · obtenido: seq 12.
-    test.fail();
     await aplicarIsn(page, '12.7', '5000');
     await avanzar(page);
     await expect(dato(page, 'Seq')).toHaveText('1000', { timeout: 2000 });
@@ -302,26 +299,32 @@ test.describe('CASO 3 (rechazo) — un ISN negativo', () => {
     await expect(dato(page, 'Ack')).toHaveText('–');
   });
 
-  test('HALLAZGO (12/11/2026, ABIERTO) · B: el rechazo es mudo y el campo sigue diciendo −5', async ({ page }) => {
+  test('HALLAZGO (12/11/2026, REPARADO) · B: el rechazo es mudo y el campo sigue diciendo −5', async ({ page }) => {
     // Esperado: un aviso de la app junto al formulario (o el campo vuelve al ISN en vigor) ·
     // obtenido: ningún mensaje, el campo enseña «-5» y el diagrama usa 1000. Igual con 0.
-    test.fail();
+    // REPARADO: el campo conserva lo tecleado (para corregirlo) y la app avisa con el rango y los
+    // ISN que siguen en vigor. Igual con 0, y el aviso se va al aplicar un ISN válido.
+    const aviso = page.getByRole('alert').filter({ hasText: /ISN/ });
     await aplicarIsn(page, '-5', '5000');
-    const aviso = page.getByRole('alert').filter({ hasText: /ISN|secuencia/i });
-    const campoCoherente = (await page.locator('#isnCliente').inputValue()) === '1000';
-    if (!campoCoherente) await expect(aviso).toBeVisible({ timeout: 2000 });
+    await expect(aviso).toContainText('El ISN de cliente tiene que ser un número entero entre 1 y 999.999');
+    await expect(aviso).toContainText('cliente 1000, servidor 5000');
+    await aplicarIsn(page, '0', '5000');
+    await expect(aviso).toBeVisible();
+    await aplicarIsn(page, '2500', '7300');
+    await expect(aviso).toHaveCount(0);
+    await avanzar(page);
+    await expect(dato(page, 'Seq')).toHaveText('2500');
   });
 });
 
 test.describe('Textos: FAQ, guía y fuente', () => {
-  test('HALLAZGO (12/11/2026, ABIERTO) · F: «3 pasos y no 2» tiene dos respuestas, y la visible invierte quién confirma', async ({
+  test('HALLAZGO (12/11/2026, REPARADO) · F: «3 pasos y no 2» tiene dos respuestas, y la visible invierte quién confirma', async ({
     page,
   }) => {
     // FAQ visible: «el tercer ACK permite al cliente confirmar que el servidor recibió el
     // SYN-ACK» (el SYN-ACK lo ENVÍA el servidor; quien lo recibe y lo confirma es el cliente,
     // como dice su frase siguiente). FAQPage: «el cliente nunca confirmaría que recibió el
     // SYN-ACK del servidor». La reparación es UNA constante que lean las dos (check:faq-unica).
-    test.fail();
     const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
     let respuestaJsonLd = '';
     for (const b of bloques) {
@@ -342,10 +345,9 @@ test.describe('Textos: FAQ, guía y fuente', () => {
     expect(respuestaVisible.trim()).toBe(respuestaJsonLd.trim());
   });
 
-  test('HALLAZGO (12/11/2026, ABIERTO) · G: la guía promete ISN aleatorios por defecto y salen 1000 y 5000', async ({
+  test('HALLAZGO (12/11/2026, REPARADO) · G: la guía promete ISN aleatorios por defecto y salen 1000 y 5000', async ({
     page,
   }) => {
-    test.fail();
     await expect(page.locator('#isnCliente')).toHaveValue('1000');
     await expect(page.locator('#isnServidor')).toHaveValue('5000');
     // El paso 1 de «Cómo usar el simulador»: el <strong> y el resto de la frase, en su <div>
@@ -354,22 +356,20 @@ test.describe('Textos: FAQ, guía y fuente', () => {
     await expect(paso1).not.toContainText('valores aleatorios por defecto', { timeout: 2000 });
   });
 
-  test('HALLAZGO (12/11/2026, ABIERTO) · E: MSL ≈ 60 s y TIME_WAIT ≈ 120 s, sin fuente', async ({ page }) => {
+  test('HALLAZGO (12/11/2026, REPARADO) · E: MSL ≈ 60 s y TIME_WAIT ≈ 120 s, sin fuente', async ({ page }) => {
     // La RFC 9293 §3.4.2 es la que fija el MSL; no se pudo cotejar desde la tarea (rfc-editor.org
     // fuera de la red de fuentes). La cifra tiene que salir citada de ahí o matizarse.
-    test.fail();
     const faq = (await page.locator('h4', { hasText: 'TIME_WAIT' }).locator('xpath=following-sibling::p[1]').textContent()) ?? '';
     expect(faq).not.toMatch(/≈\s*60 segundos/);
   });
 });
 
 test.describe('Móvil y accesibilidad', () => {
-  test('HALLAZGO (12/11/2026, ABIERTO) · H: a 360 px el lienzo se estrecha sin bajar de alto y deforma el diagrama', async ({
+  test('HALLAZGO (12/11/2026, REPARADO) · H: a 360 px el lienzo se estrecha sin bajar de alto y deforma el diagrama', async ({
     page,
   }) => {
     // `.canvas { max-width: 100% }` encoge el ancho, pero el alto va fijo en línea (380 px):
     // relación pintada 0,73 frente a la del dibujo 1,26 (el texto sale al 58 % de ancho).
-    test.fail();
     await page.setViewportSize({ width: 360, height: 740 });
     await page.waitForTimeout(300);
     const r = await page.locator('canvas').evaluate((el) => {
@@ -380,10 +380,9 @@ test.describe('Móvil y accesibilidad', () => {
     expect(Math.abs(r.pintada - r.dibujo) / r.dibujo).toBeLessThan(0.02);
   });
 
-  test('HALLAZGO (12/11/2026, ABIERTO) · I: el paquete nuevo no se anuncia (sin región viva)', async ({ page }) => {
+  test('HALLAZGO (12/11/2026, REPARADO) · I: el paquete nuevo no se anuncia (sin región viva)', async ({ page }) => {
     // Al pulsar Siguiente el foco se queda en el botón y el panel cambia sin aria-live ni
     // role="status"; el lienzo tiene un aria-label fijo que no dice qué paquetes hay.
-    test.fail();
     await avanzar(page);
     await expect(
       page.locator('[aria-live="polite"], [role="status"]').filter({ hasText: /SYN/ }),

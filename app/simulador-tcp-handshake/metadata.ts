@@ -51,6 +51,15 @@ export const jsonLd = generateWebAppSchema({
   ],
 });
 
+/**
+ * Una sola respuesta para la FAQ visible y el FAQPage (hallazgo 4572, check:faq-unica): estaba
+ * escrita dos veces, y la visible invertía quién confirma el SYN-ACK.
+ */
+export const PREGUNTA_TRES_PASOS = {
+  question: '¿Por qué TCP necesita tres pasos y no dos?',
+  answer: 'Con dos pasos solo el servidor confirmaría que recibió el SYN del cliente, pero el cliente nunca confirmaría que recibió el SYN-ACK del servidor. El tercer paso (ACK del cliente) verifica que la comunicación bidireccional funciona y permite sincronizar los números de secuencia de ambos lados. Sin él, el servidor podría abrir una conexión que el cliente nunca completó, desperdiciando recursos.',
+};
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -73,10 +82,10 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Por qué TCP necesita tres pasos y no dos?',
+      name: PREGUNTA_TRES_PASOS.question,
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Con dos pasos solo el servidor confirmaría que recibió el SYN del cliente, pero el cliente nunca confirmaría que recibió el SYN-ACK del servidor. El tercer paso (ACK del cliente) verifica que la comunicación bidireccional funciona y permite sincronizar los números de secuencia de ambos lados. Sin él, el servidor podría abrir una conexión que el cliente nunca completó, desperdiciando recursos.',
+        text: PREGUNTA_TRES_PASOS.answer,
       },
     },
     {

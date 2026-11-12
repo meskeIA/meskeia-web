@@ -3,8 +3,13 @@
 
 import { useRef, useEffect, useState, useCallback } from 'react';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, ShareCard, EducationalSection } from '@/components';
-import { trazarRectRedondeado } from '@/lib';
+import { trazarRectRedondeado, formatNumber } from '@/lib';
 import styles from './SimuladorTcpHandshake.module.css';
+import { PREGUNTA_TRES_PASOS } from './metadata';
+
+/** Rango del ISN que admite el campo (y con el que ack = ISN + 2 cabe en los 32 bits de TCP) */
+const ISN_MIN = 1;
+const ISN_MAX = 999999;
 
 // ============================================
 // TIPOS
@@ -148,8 +153,12 @@ function generarPasos(isnC: number, isnS: number, modo: ModoSimulador): Paso[] {
         flags: 'SYN=0, ACK=1',
         seq: isnC + 2,
         ack: isnS + 2,
-        window: 0,
-        descripcion: `El cliente confirma el FIN del servidor. Entra en estado TIME_WAIT durante 2×MSL (~120s) para asegurar que no hay paquetes rezagados antes de liberar el puerto.`,
+        // Hallazgo 4570: anunciaba Window 0 (la señal de «no envíes más» del control de flujo)
+        // sin que nada en la simulación llenara el búfer. Es la misma ventana que los seis anteriores.
+        window: 65535,
+        // Hallazgo 4571: daba «~120s» como dato del estándar sin fuente. El MSL lo fija cada
+        // sistema, así que la duración se matiza en vez de citarse.
+        descripcion: `El cliente confirma el FIN del servidor. Entra en estado TIME_WAIT durante 2×MSL (el doble del tiempo máximo de vida de un segmento, que fija cada sistema operativo) para asegurar que no hay paquetes rezagados antes de liberar el puerto.`,
       }
     );
   }
@@ -201,7 +210,10 @@ function dibujarCanvas(canvas: HTMLCanvasElement, opts: OpcionesRender) {
   canvas.width = dim.w * dpr;
   canvas.height = dim.h * dpr;
   canvas.style.width = `${dim.w}px`;
-  canvas.style.height = `${dim.h}px`;
+  // Alto automático: en móvil `max-width: 100%` estrecha el lienzo, y con el alto fijo en
+  // píxeles el diagrama salía deformado (relación 0,73 frente a 1,26, hallazgo 4574). Con
+  // `auto` el navegador conserva la proporción del propio lienzo.
+  canvas.style.height = 'auto';
 
   const ctx = canvas.getContext('2d');
   if (!ctx) return;
@@ -329,8 +341,11 @@ function dibujarCanvas(canvas: HTMLCanvasElement, opts: OpcionesRender) {
     dibujarBandaEstado(y, 'CONEXIÓN ESTABLECIDA', COLOR_ESTABLECIDA);
   }
 
-  // Estado "CONEXIÓN CERRADA" tras todos los pasos de cierre
-  if (pasoActivo >= pasos.length && pasos.length > 3) {
+  // Estado "CONEXIÓN CERRADA" tras todos los pasos de cierre. Pedía pasoActivo >= pasos.length,
+  // y el paso activo llega como mucho a pasos.length − 1: no se pintaba nunca (hallazgo 4569).
+  // Ahora, como la de «establecida»: cuando el último paquete ha aterrizado.
+  const ultimo = pasos.length - 1;
+  if (pasos.length > 3 && (pasoActivo > ultimo || (pasoActivo === ultimo && progreso >= 1))) {
     const y = ALTO_CABECERA + pasos.length * ALTO_PASO - 10;
     dibujarBandaEstado(y, 'CONEXIÓN CERRADA (TIME_WAIT)', COLOR_CERRADA);
   }
@@ -499,6 +514,7 @@ export default function SimuladorTcpHandshakePage() {
   const generarISNAleatorio = () => {
     const c = randomISN();
     const s = randomISN();
+    setAvisoIsn('');
     setIsnCliente(c);
     setIsnServidor(s);
     setIsnClienteInput(String(c));
@@ -506,18 +522,46 @@ export default function SimuladorTcpHandshakePage() {
     reiniciar();
   };
 
+  /*
+   * Hallazgos 4567 y 4568 (12/11/2026, REPARADOS): solo se comprobaba parseInt(x) >= 1, así que
+   * se aplicaba lo que el propio campo marca inválido (4294967295 enseñaba un ack que no cabe en
+   * los 32 bits de TCP; 12.7 se truncaba a 12) y lo rechazado (−5, 0) se descartaba sin decir
+   * nada. Ahora se exige un entero dentro del rango que declara el campo (1-999.999, con el que
+   * ack = ISN + 2 cabe siempre en 32 bits) y, si no, se avisa y se mantiene el ISN en vigor.
+   */
+  const [avisoIsn, setAvisoIsn] = useState<string>('');
+
+  const leerIsn = (texto: string): number | null => {
+    const n = Number(texto);
+    return texto.trim() !== '' && Number.isInteger(n) && n >= ISN_MIN && n <= ISN_MAX ? n : null;
+  };
+
   const aplicarISN = () => {
-    const c = parseInt(isnClienteInput, 10);
-    const s = parseInt(isnServidorInput, 10);
-    if (!isNaN(c) && c >= 1 && !isNaN(s) && s >= 1) {
-      setIsnCliente(c);
-      setIsnServidor(s);
-      reiniciar();
+    const c = leerIsn(isnClienteInput);
+    const s = leerIsn(isnServidorInput);
+    if (c === null || s === null) {
+      const cuales = [c === null ? 'cliente' : '', s === null ? 'servidor' : ''].filter(Boolean).join(' y ');
+      setAvisoIsn(
+        `El ISN de ${cuales} tiene que ser un número entero entre ${formatNumber(ISN_MIN, 0)} y ${formatNumber(ISN_MAX, 0)}. Se mantienen los ISN en vigor: cliente ${isnCliente}, servidor ${isnServidor}.`,
+      );
+      return;
     }
+    setAvisoIsn('');
+    setIsnCliente(c);
+    setIsnServidor(s);
+    reiniciar();
   };
 
   // Paquete activo para el panel lateral
   const pasoPanel: Paso | null = pasoActivo >= 0 && pasoActivo < pasos.length ? pasos[pasoActivo] : null;
+
+  /** Lo que se anuncia al aterrizar cada paquete, y lo que el lienzo dice que contiene. */
+  const etiquetaPaquete = (p: Paso): string =>
+    `${p.tipo} de ${p.origen === 'cliente' ? 'cliente a servidor' : 'servidor a cliente'}, seq ${p.seq}${p.ack > 0 ? `, ack ${p.ack}` : ''}`;
+  const anuncioPaquete = pasoPanel ? `Paso ${pasoPanel.id} de ${pasos.length}: ${etiquetaPaquete(pasoPanel)}.` : '';
+  const descripcionLienzo = pasoActivo < 0
+    ? 'Diagrama de secuencia del TCP handshake, sin paquetes enviados todavía'
+    : `Diagrama de secuencia del TCP handshake: ${pasos.slice(0, pasoActivo + 1).map(etiquetaPaquete).join('; ')}`;
 
   const etiquetaEstado: Record<EstadoConexion, string> = {
     idle: 'Inactivo',
@@ -581,7 +625,8 @@ export default function SimuladorTcpHandshakePage() {
             />
           </div>
           <div className={styles.configGrupo}>
-            <label id="velocidad-label" className={styles.configLabel}>Velocidad</label>
+            {/* Nombre de grupo, no <label>: no hay un control que asociarle (hallazgo 4575) */}
+            <span id="velocidad-label" className={styles.configLabel}>Velocidad</span>
             <div role="group" aria-labelledby="velocidad-label" className={styles.velSelector}>
               {(['lenta', 'normal', 'rapida'] as VelocidadAnim[]).map((v) => (
                 <button
@@ -597,7 +642,7 @@ export default function SimuladorTcpHandshakePage() {
             </div>
           </div>
           <div className={styles.configGrupo}>
-            <label id="modo-label" className={styles.configLabel}>Modo</label>
+            <span id="modo-label" className={styles.configLabel}>Modo</span>
             <div role="group" aria-labelledby="modo-label" className={styles.velSelector}>
               <button
                 type="button"
@@ -626,6 +671,11 @@ export default function SimuladorTcpHandshakePage() {
             ISN Aleatorio
           </button>
         </div>
+        {avisoIsn && (
+          <p className={styles.avisoIsn} role="alert">
+            {avisoIsn}
+          </p>
+        )}
       </section>
 
       {/* ============================================ */}
@@ -638,10 +688,16 @@ export default function SimuladorTcpHandshakePage() {
           <canvas
             ref={canvasRef}
             className={styles.canvas}
-            aria-label="Diagrama de secuencia del TCP handshake"
+            aria-label={descripcionLienzo}
             role="img"
           />
         </div>
+
+        {/* Hallazgo 4575: el panel cambiaba sin región viva y el foco se queda en «Siguiente»,
+            así que un lector de pantalla no oía el paquete nuevo. Una cadena, hija única. */}
+        <p className="sr-only" role="status" aria-live="polite">
+          {anuncioPaquete}
+        </p>
 
         {/* Panel lateral de detalles */}
         <aside className={styles.panelDetalles}>
@@ -894,8 +950,8 @@ export default function SimuladorTcpHandshakePage() {
           <h3>Preguntas Frecuentes</h3>
           <div className={styles.faqLista}>
             <div className={styles.faqItem}>
-              <h4>¿Por qué el handshake tiene 3 pasos y no 2?</h4>
-              <p>Con 2 pasos solo el servidor confirmaría al cliente; el tercer ACK permite al cliente confirmar que el servidor recibió el SYN-ACK. Sin ese tercer paso, el servidor no sabría si el cliente recibió su respuesta: ambos extremos necesitan confirmación bidireccional.</p>
+              <h4>{PREGUNTA_TRES_PASOS.question}</h4>
+              <p>{PREGUNTA_TRES_PASOS.answer}</p>
             </div>
             <div className={styles.faqItem}>
               <h4>¿Qué son los ISN y por qué son aleatorios?</h4>
@@ -911,7 +967,9 @@ export default function SimuladorTcpHandshakePage() {
             </div>
             <div className={styles.faqItem}>
               <h4>¿Qué es TIME_WAIT y por qué dura 2×MSL?</h4>
-              <p>Estado tras el último ACK del cierre que espera posibles paquetes duplicados rezagados. MSL (Maximum Segment Lifetime) ≈ 60 segundos. TIME_WAIT dura 2×MSL ≈ 120s para garantizar que ningún paquete de la conexión anterior pueda confundirse con una conexión nueva al mismo puerto.</p>
+              {/* Hallazgo 4571: daba «MSL ≈ 60 segundos» y «≈ 120s» como dato del estándar, sin
+                  fuente. La especificación (RFC 9293) define el MSL y cada sistema fija su valor. */}
+              <p>Estado tras el último ACK del cierre que espera posibles paquetes duplicados rezagados. El MSL (Maximum Segment Lifetime) es el tiempo máximo que un segmento puede seguir vivo en la red: la especificación de TCP (RFC 9293) lo define y cada sistema operativo fija su valor, así que lo que dura TIME_WAIT (2×MSL) cambia de una implementación a otra. Esa espera garantiza que ningún paquete de la conexión anterior pueda confundirse con una conexión nueva al mismo puerto.</p>
             </div>
           </div>
         </section>
@@ -922,7 +980,7 @@ export default function SimuladorTcpHandshakePage() {
           <div className={styles.guiaPasos}>
             <div className={styles.guiaPaso}>
               <div className={styles.guiaPasoNum}>1</div>
-              <div><strong>Configura los ISN</strong> de cliente y servidor (o usa los valores aleatorios por defecto).</div>
+              <div><strong>Configura los ISN</strong> de cliente y servidor: vienen con los valores de ejemplo 1000 y 5000, o pulsa «ISN Aleatorio».</div>
             </div>
             <div className={styles.guiaPaso}>
               <div className={styles.guiaPasoNum}>2</div>
