@@ -759,10 +759,12 @@ test.describe('simulador-conservacion-energia · casos para clase', () => {
    * C0126), el texto de la desviación (e27fbb163, 3b92acef6) y `leerRespuestaAula` (cd6270a91,
    * C0558). Resuelto a mano ANTES de ejecutar:
    *
-   *   LECTURA — «d.ddd» con punto es 2,493 o 2493: se queda la lectura más cercana a la clave.
+   *   LECTURA — «d.ddd» con punto es 2,493 o 2493: la decimal gana si es la más cercana a la clave
+   *     Y queda a menos del 10 % (o media unidad) de ella; si no, manda la española (C0724, 12/11/2026).
    *     «9.899»   caso 3 (clave 9,9)  → 9899 o 9,899  → |9,899 − 9,9| = 0,001  → 9,899
    *     «294.000» caso 4 (clave 294)  → 294000 o 294  → 294
-   *     «2.940»   caso 4 (clave 294)  → 2940 o 2,94   → |2,94 − 294| = 291,06 < |2940 − 294| = 2646 → 2,94
+   *     «2.940»   caso 4 (clave 294)  → 2940 o 2,94   → |2,94 − 294| = 291,06 > 29,4 (10 %) → 2940,
+   *                                     desviado |2940 − 294| = 2646 (antes de C0724 se leía 2,94)
    *     «97,6»    coma decimal         → 97,6, sin ambigüedad
    *
    *   TOLERANCIA — la página NO anuncia ningún margen (ni «1 %» ni otro): la intro de la sección
@@ -785,7 +787,7 @@ test.describe('simulador-conservacion-energia · casos para clase', () => {
     // porque Number('9.899') y el literal 9.899 son el mismo doble.
     expect(leerRespuestaAula('9.899', 9.9)).toBe(9.899);
     expect(leerRespuestaAula('294.000', 294)).toBe(294);
-    expect(leerRespuestaAula('2.940', 294)).toBe(2.94);
+    expect(leerRespuestaAula('2.940', 294)).toBe(2940); // ninguna lectura cerca: la española (C0724)
     expect(leerRespuestaAula('97,6', 97.6)).toBe(97.6);
 
     const caso = (id: number) => CASOS.find((c) => c.id === id)!;
@@ -809,7 +811,7 @@ test.describe('simulador-conservacion-energia · casos para clase', () => {
     expect(corrige('98,004', 1).motivo).toBe('No es correcto. Te has desviado 0,004 de la respuesta.');
     expect(corrige('6.980', 9).motivo).toBe('No es correcto. Te has desviado 0,01 de la respuesta.');
     expect(corrige('9,81', 3).motivo).toBe('No es correcto. Te has desviado 0,09 de la respuesta.');
-    expect(corrige('2.940', 4).motivo).toBe('No es correcto. Te has desviado 291,06 de la respuesta.');
+    expect(corrige('2.940', 4).motivo).toBe('No es correcto. Te has desviado 2646 de la respuesta.');
   });
 });
 

@@ -1613,9 +1613,10 @@ test.describe('JSON-LD', () => {
  *   caso 2 · 0,80·10 = 8 mmol / 0,50 = 16 mL ⇒ «16» aprueba; «15,85» desviado 0,15; «16,1» 0,1
  *   caso 3 · 0,10·20,00 = 2 mmol / 25 = 0,08 mol/L ⇒ «0,08», «0.08» y «0,080» aprueban;
  *            «0,0805» desviado 0,0005 (antes dentro de 0,0008); «0,079» desviado 0,001;
- *            «8.000» se lee 8 (la lectura más cercana a 0,08) ⇒ desviado 7,92
+ *            «8.000» se lee 8000: la lectura decimal (8) no queda a media unidad de 0,08, así que
+ *            manda la española (C0724, 12/11/2026; antes se leía 8) ⇒ desviado 7999,92
  *   caso 4 · 0,20·42,50 = 8,5 mmol / 10 = 0,85 mol/L ⇒ «0,85» y «0.850» aprueban; «0,851» y
- *            «0,849» desviados 0,001; «8.500» se lee 8,5 ⇒ desviado 7,65
+ *            «0,849» desviados 0,001; «8.500» se lee 8500 (por lo mismo) ⇒ desviado 8499,15
  *   caso 5 · pH (sin cambio) −log(1/40) = 1,6021 → 1,60 ⇒ 1,58 y 1,62 aprueban (borde exacto
  *            de ±0,02), 1,63 desviado 0,03
  *   práctica · el V_eq o la C se recalculan desde el enunciado que pinta la app; exacto aprueba
@@ -1650,13 +1651,13 @@ test.describe('Inspector 04/11/2026 · modo cambio: margen 0 en lo exacto (C0267
     for (const ok of ['0,08', '0.08', '0,080']) expect(await responder(page, ok), ok).toContain('Correcto');
     expect(await responder(page, '0,0805')).toContain('Te has desviado 0,0005 de');
     expect(await responder(page, '0,079')).toContain('Te has desviado 0,001 de');
-    expect(await responder(page, '8.000')).toContain('Te has desviado 7,92 de');
+    expect(await responder(page, '8.000')).toContain('Te has desviado 7999,92 de');
 
     await irACaso(page, 4);
     for (const ok of ['0,85', '0.850']) expect(await responder(page, ok), ok).toContain('Correcto');
     expect(await responder(page, '0,851')).toContain('Te has desviado 0,001 de');
     expect(await responder(page, '0,849')).toContain('Te has desviado 0,001 de');
-    expect(await responder(page, '8.500')).toContain('Te has desviado 7,65 de');
+    expect(await responder(page, '8.500')).toContain('Te has desviado 8499,15 de');
 
     await irACaso(page, 5);
     for (const ok of ['1,60', '1,58', '1,62']) expect(await responder(page, ok), ok).toContain('Correcto');
