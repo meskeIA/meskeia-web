@@ -94,7 +94,9 @@ export default function CasosAula({ onCargarEnCalculadora }: Props) {
         <p className={styles.casosIntro}>
           El simulador usa masas molares con tres decimales (H₂ = 2,016; CH₄ = 16,043…). Si haces
           las cuentas con las redondeadas de tu libro (H = 1, C = 12, N = 14, O = 16, Na = 23,
-          Cl = 35,5…), el resultado también se da por bueno: se acepta una desviación del 1&nbsp;%.
+          Cl = 35,5…), el resultado también se da por bueno: se acepta cualquier cifra entre la que
+          sale con unas masas y la que sale con las otras, más un 0,5&nbsp;% para los redondeos
+          intermedios y media unidad del último decimal pedido.
           «Cargar en la calculadora» pone la reacción y las cantidades del caso; pulsa allí el botón
           de calcular para comprobar tu respuesta.
         </p>

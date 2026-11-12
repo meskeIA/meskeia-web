@@ -714,6 +714,25 @@ test.describe('casos para clase · lógica (sin navegador)', () => {
     }
   });
 
+  test('C0719 · lo que la sección promete del margen es lo que hace el corrector', () => {
+    // Cabo C0719 (inspector 12/11/2026): la intro decía «se acepta una desviación del 1 %» y desde
+    // C0267 la ventana es la de ventanaDe (entre las dos tablas + 0,5 % + media unidad). Con el 1 %
+    // prometido, «141» en el caso 4 (a un 0,66 % de 140,07) debía aprobar y suspendía. A mano,
+    // caso 4: tablas 140,07 y 140,00; margen 0,005 · 140,07 + 0,005 = 0,705; centro 140,035,
+    // tolerancia 0,035 + 0,705 = 0,74 → aprueba de 139,295 a 140,775.
+    const c4 = CASOS_AULA[3];
+    expect(comprobarRespuesta(140.77, c4.respuesta, c4.datos).correcto).toBe(true);
+    expect(comprobarRespuesta(139.3, c4.respuesta, c4.datos).correcto).toBe(true);
+    expect(comprobarRespuesta(140.8, c4.respuesta, c4.datos).correcto).toBe(false);
+    expect(comprobarRespuesta(139.29, c4.respuesta, c4.datos).correcto).toBe(false);
+  });
+
+  test('C0719 · la sección ya no promete el 1 % y dice el margen de verdad', async ({ page }) => {
+    const intro = page.locator('section[aria-labelledby="casos-aula-titulo"]');
+    await expect(intro).toContainText('0,5 % para los redondeos');
+    await expect(intro).not.toContainText(/desviación del 1/);
+  });
+
   test('7.bis · el corrector: errores típicos con nombre y lo que no es número', () => {
     const caso = (id: number) => CASOS_AULA[id - 1];
     // caso 1 multiplicando: 50 × 100,087 = 5004,35
