@@ -6,6 +6,7 @@ import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, ShareCard, LegalN
   DataReference, RegionBadge
 } from '@/components';
 import { formatCurrency, formatDate, formatNumber, formatPercentage, parseISODateLocal, parseSpanishNumber } from '@/lib';
+import { organismoDeUrl } from '@/lib/organismoDeUrl';
 import {
   FISCAL_DONACIONES_META,
   BONIFICACIONES_CCAA_ID,
@@ -147,6 +148,7 @@ const EJ_HIJO_100K_CLM_SIN_ESCRITURA = calcularDonacion({
 });
 
 const FECHA_VERIFICADO = formatDate(parseISODateLocal(FISCAL_DONACIONES_META.verificado));
+const ORGANISMO_FUENTE = organismoDeUrl(FISCAL_DONACIONES_META.urlOficial);
 const R = ESCALA_RECARGO_EXTEMPORANEO;
 const PLAZO = `${PLAZO_AUTOLIQUIDACION_DONACIONES.diasHabiles} días hábiles`;
 
@@ -246,7 +248,8 @@ export default function EstimadorImpuestoDonacionesPage() {
         <p className={styles.metaVerificado}>
           Datos verificados: {FECHA_VERIFICADO} — Fuente:{' '}
           <a href={FISCAL_DONACIONES_META.urlOficial} target="_blank" rel="noopener noreferrer" className={styles.linkFuente}>
-            Agencia Tributaria
+            {/* Del destino del enlace, no a mano (hallazgo 4544, C0718): desde 1d40d66a2 es el BOE. */}
+            {ORGANISMO_FUENTE}
           </a>
         </p>
       </header>

@@ -7,6 +7,7 @@ import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, ShareCard, LegalN
 } from '@/components';
 import { formatCurrency, formatDate, formatNumber, formatPercentage, parseISODateLocal, parseSpanishNumber } from '@/lib';
 import { porcentajeRecargoExtemporaneo } from '@/lib/calculadoras/recargoPresentacionTardia';
+import { organismoDeUrl } from '@/lib/organismoDeUrl';
 import {
   FISCAL_SUCESIONES_META,
   FISCAL_SUCESIONES_CATALUNA_META,
@@ -415,7 +416,8 @@ const enLetra = (n: number) => EN_LETRA[n] ?? String(n);
 const SELLO_GENERAL = {
   meta: FISCAL_SUCESIONES_META,
   normativa: `ISD ${FISCAL_SUCESIONES_META.vigencia}`,
-  organismo: 'Agencia Tributaria',
+  // Del destino del enlace, no a mano (hallazgo 4544): desde 1d40d66a2 es el BOE.
+  organismo: organismoDeUrl(FISCAL_SUCESIONES_META.urlOficial),
 };
 const SELLO_CATALUNA = {
   meta: FISCAL_SUCESIONES_CATALUNA_META,

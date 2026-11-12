@@ -1143,3 +1143,25 @@ test.describe('Cabo C0383 — el panel de resultados en el papel (área imprimib
     expect(medida.dentro, JSON.stringify(medida)).toBeLessThanOrEqual(medida.visible + 1);
   });
 });
+
+/*
+ * Cabo C0718 (alcance del hallazgo 4544 de estimador-impuesto-sucesiones, 12/11/2026). El triaje
+ * fiscal del 10/11/2026 (1d40d66a2) llevó FISCAL_DONACIONES_META.urlOficial de la sede de la AEAT
+ * al BOE (Ley 29/1987 consolidada), y el hero seguía rotulando el enlace «Agencia Tributaria»,
+ * escrito a mano: nombraba un organismo y abría otro (WCAG 2.4.4). Control: con el rótulo a mano
+ * este test cae («Agencia Tributaria» lleva a www.boe.es).
+ */
+test('C0718 · el enlace de la fuente del hero se llama como el organismo al que lleva', async ({ page }) => {
+  await abrir(page);
+  const enlace = page.locator('[class*="metaVerificado"] a');
+  const href = (await enlace.getAttribute('href')) ?? '';
+  const host = new URL(href).hostname;
+  const nombre = (await enlace.innerText()).trim();
+  const organismos: Array<{ dominio: RegExp; nombre: RegExp }> = [
+    { dominio: /(^|\.)boe\.es$/, nombre: /\bBOE\b|Bolet[ií]n Oficial del Estado/ },
+    { dominio: /(^|\.)agenciatributaria\.(gob\.)?es$/, nombre: /Agencia Tributaria/ },
+  ];
+  const organismo = organismos.find((o) => o.dominio.test(host));
+  expect(organismo, `dominio sin organismo conocido: ${host}`).toBeTruthy();
+  expect(nombre, `el enlace «${nombre}» lleva a ${host}`).toMatch(organismo!.nombre);
+});

@@ -3645,7 +3645,9 @@ test.describe('Inspector 12/11/2026 — la fuente oficial del ISD es la Ley 29/1
   });
 
   /**
-   * ABIERTO (Inspector 12/11/2026, contenido, bajo) — el enlace del hero se sigue llamando
+   * REPARADO el 12/11/2026 (hallazgo 4544, cabo C0718): el rótulo sale de `organismoDeUrl` sobre el
+   * propio urlOficial (lib/organismoDeUrl.ts), así que con el BOE dice «Boletín Oficial del Estado».
+   * Era (Inspector 12/11/2026, contenido, bajo): el enlace del hero se seguía llamando
    * «Agencia Tributaria» (`SELLO_GENERAL.organismo`, tecleado en page.tsx) y desde 1d40d66a2 lleva
    * al BOE: «Datos verificados: 01/01/2025 — Fuente: Agencia Tributaria» abre la Ley 29/1987 en
    * boe.es. El nombre del enlace dice un organismo y el destino es otro (WCAG 2.4.4, propósito del
@@ -3654,8 +3656,7 @@ test.describe('Inspector 12/11/2026 — la fuente oficial del ISD es la Ley 29/1
    * prescribir la reparación (cambiar el rótulo o derivarlo del sello).
    */
   test('el nombre del enlace del hero es el del organismo al que lleva', async ({ page }) => {
-    test.fail();
-    for (const ccaa of ['cataluna', 'madrid']) {
+    for (const ccaa of ['cataluna', 'madrid', 'andalucia']) {
       await page.locator('#ccaa-causante').selectOption(ccaa);
       const enlace = enlaceHero(page);
       const href = (await enlace.getAttribute('href')) ?? '';
