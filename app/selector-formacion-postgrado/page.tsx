@@ -14,6 +14,7 @@ import {
 } from '@/components';
 import { calcularResultado, enumerar, FORMACIONES, LABELS, CON_ARTICULO, PREGUNTAS, RESTRICCION_CORTA } from './motor';
 import { useGuardaRafaga } from '@/lib/useGuardaRafaga';
+import { traerTramoALaVista } from '@/lib';
 
 // Las preguntas con sus pesos, las fichas de cada vía y la lógica viven en ./motor.ts.
 
@@ -26,6 +27,7 @@ export default function SelectorFormacionPostgradoPage() {
   const [paso, setPaso] = useState<'quiz' | 'resultado'>('quiz');
   const [preguntaActual, setPreguntaActual] = useState(0);
   const tituloResultado = useRef<HTMLHeadingElement>(null);
+  const tarjetaResultado = useRef<HTMLDivElement>(null);
   const enunciado = useRef<HTMLParagraphElement>(null);
   // Solo se mueve el foco cuando CAMBIA la pregunta o la pantalla: al cargar, la pregunta 1 ya está a
   // la vista (y el modo estricto de React repite el efecto del montaje sin que cambie nada).
@@ -40,8 +42,14 @@ export default function SelectorFormacionPostgradoPage() {
     const vista = `${paso}-${preguntaActual}`;
     if (vista === vistaAnterior.current) return;
     vistaAnterior.current = vista;
-    if (paso === 'resultado') tituloResultado.current?.focus();
-    else enunciado.current?.focus();
+    if (paso === 'resultado') {
+      // Hallazgo 4551 (C0720): con «Ver resultado» al pie, el título ya se veía y focus() no movía
+      // la página, pero la etiqueta «Tu formación recomendada», 199 px más arriba, quedaba bajo la
+      // píldora del logo. Se sube la tarjeta si no se ve entero el tramo que va de su borde
+      // (la etiqueta y el emoji) al título.
+      traerTramoALaVista(tarjetaResultado.current, tituloResultado.current);
+      tituloResultado.current?.focus({ preventScroll: true });
+    } else enunciado.current?.focus();
   }, [paso, preguntaActual]);
 
   const totalPreguntas = PREGUNTAS.length;
@@ -244,7 +252,7 @@ export default function SelectorFormacionPostgradoPage() {
       {/* Resultado */}
       {paso === 'resultado' && calculo && resultado && puntuaciones && (
         <section className={styles.resultado} aria-label="Tu recomendación de formación">
-          <div className={styles.resultadoCard}>
+          <div className={styles.resultadoCard} ref={tarjetaResultado}>
             <div className={styles.resultadoBadge} aria-label="Tu recomendación principal">
               <span aria-hidden="true">✨</span> Tu formación recomendada
             </div>

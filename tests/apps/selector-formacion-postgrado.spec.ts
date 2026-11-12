@@ -1177,14 +1177,15 @@ test.describe('Cabo C0189 — el aviso de las vías apartadas y la etiqueta del 
     const fondoBarra = (page: Page) =>
       page.evaluate(() => Math.max(...[...document.querySelectorAll('[data-barra-logo] > *')].map((e) => e.getBoundingClientRect().bottom)));
 
-    // ABIERTO (cabo C0189 b, 12/11/2026): con «Ver resultado» al pie (scrollIntoView 'end'), la
+    // REPARADO el 12/11/2026 (hallazgo 4551, cabo C0720): traerTramoALaVista(tarjeta, título) sube la
+    // tarjeta si no se ve entera de su borde al título. Era (cabo C0189 b): con «Ver resultado» al pie (scrollIntoView 'end'), la
     // página no se mueve (scrollY 1138 antes y después): el foco va al título (hallazgo 3100), que ya
     // está a la vista a 205 px, por debajo del scroll-padding-top de 66 px, así que focus() no
     // desplaza. La etiqueta, 199 px por encima del título, queda a 6 px, con la barra hasta 52 px (la
     // píldora, x 15-141) y su caja hasta 62: el «✨» y el borde izquierdo de la etiqueta, bajo la
     // píldora, y el texto entre la píldora y el conmutador. Con el botón en el centro o arriba la
     // página sí se mueve y la etiqueta queda a 185 px. Esperado: la etiqueta por debajo de la barra.
-    test.fail('(b) ABIERTO: tras «Ver resultado» al pie, la etiqueta «Tu formación recomendada» no queda bajo la barra del logo', async ({ page }) => {
+    test('(b) 4551: tras «Ver resultado» al pie, la etiqueta «Tu formación recomendada» no queda bajo la barra del logo', async ({ page }) => {
       await abrirTest(page);
       for (let k = 0; k < 10; k++) {
         await page.waitForTimeout(500); // lee antes de contestar: un toque a <300 ms del de «Siguiente» es el doble toque que se ignora (3101)

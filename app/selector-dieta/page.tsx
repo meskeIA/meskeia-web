@@ -5,6 +5,7 @@ import styles from './SelectorDieta.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard, DisclaimerCard, RegionBadge } from '@/components';
 import { calcularResultado, DIETAS, PREGUNTAS, type ResultadoCalculo } from './motor';
 import { useGuardaRafaga } from '@/lib/useGuardaRafaga';
+import { traerTramoALaVista } from '@/lib';
 
 // Las preguntas con sus pesos, las fichas y el cálculo viven en ./motor.ts.
 
@@ -21,6 +22,7 @@ export default function SelectorDieta() {
   const [resultado, setResultado] = useState<ResultadoCalculo | null>(null);
   const enunciado = useRef<HTMLHeadingElement>(null);
   const nombreResultado = useRef<HTMLHeadingElement>(null);
+  const tarjetaResultado = useRef<HTMLDivElement>(null);
 
   // Al cambiar de pantalla o de pregunta se desmonta o se desactiva el botón que tenía el foco
   // («Comenzar», «Siguiente» sin respuesta aún, «Ver resultado»), y el foco caía a <body>: el
@@ -29,8 +31,14 @@ export default function SelectorDieta() {
   // enunciado de la pregunta nueva o al nombre del patrón recomendado, que con el
   // scroll-padding del documento quedan a la vista (receta de selector-smartphone, 1680 y 2657).
   useEffect(() => {
-    if (pantalla === 'resultado') nombreResultado.current?.focus();
-    else if (pantalla === 'test') enunciado.current?.focus();
+    if (pantalla === 'resultado') {
+      // Cabo C0720 (la forma del hallazgo 4551 de selector-formacion-postgrado): con «Ver
+      // resultado» al pie el nombre ya se veía y focus() no movía la página, pero «Tu patrón
+      // recomendado» y su emoji, encima, quedaban bajo la píldora del logo (37 px a 360×740). Se
+      // sube la tarjeta si no se ve entero el tramo que va de su borde al nombre.
+      traerTramoALaVista(tarjetaResultado.current, nombreResultado.current);
+      nombreResultado.current?.focus({ preventScroll: true });
+    } else if (pantalla === 'test') enunciado.current?.focus();
   }, [pantalla, indicePregunta]);
 
   const preguntaActual = PREGUNTAS[indicePregunta];
@@ -240,7 +248,7 @@ export default function SelectorDieta() {
       {pantalla === 'resultado' && resultado && dietaInfo && (
         <main className={styles.resultadosContainer}>
           {/* Tarjeta principal */}
-          <div className={styles.recomendacionCard}>
+          <div className={styles.recomendacionCard} ref={tarjetaResultado}>
             <span className={styles.recomendacionIcon} aria-hidden="true">{dietaInfo.icono}</span>
             <p className={styles.recomendacionLabel}>Tu patrón recomendado</p>
             <h2 className={styles.recomendacionValor} ref={nombreResultado} tabIndex={-1}>{dietaInfo.nombre}</h2>

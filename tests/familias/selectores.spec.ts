@@ -499,6 +499,63 @@ for (const h of HERMANAS) {
       await expect(grupo().locator('[role="radio"]').first()).toHaveAttribute('aria-checked', 'true');
       enLaApp('Siguiente');
     });
+
+    /**
+     * Hallazgo 4551 (selector-formacion-postgrado) y cabo C0720, 12/11/2026. A 360×740, con «Ver
+     * resultado» al pie de la pantalla, el título del resultado ya se ve, así que focus() no mueve
+     * la página; lo que va ENCIMA del título en su tarjeta (la etiqueta «Tu formación recomendada»,
+     * su emoji) quedaba bajo la píldora fija del logo, a 6 px. Medido en las 16: caían
+     * formacion-postgrado (6 px) y dieta (37 px), y las dos pasan a traerTramoALaVista(tarjeta,
+     * título). Se mide la cara de arriba del primer hermano visible del título (o del título si no
+     * tiene) contra el borde de abajo del cromo fijo. Control: con el focus() a secas en
+     * formacion-postgrado, cae.
+     */
+    test('a 360×740 con «Ver resultado» al pie, lo que va encima del título del resultado no queda bajo el logo', async ({ page }) => {
+      test.setTimeout(90_000);
+      await page.setViewportSize({ width: 360, height: 740 });
+      await abrirTest(page, h);
+      for (let paso = 1; paso <= 30; paso++) {
+        await page.locator(GRUPO_PREGUNTA).first().locator('button').first().click();
+        const boton = botonSiguiente(page);
+        if (/resultado/i.test(await boton.innerText())) {
+          await boton.evaluate((el) => el.scrollIntoView({ block: 'end' }));
+          await page.waitForTimeout(150);
+          await boton.click();
+          break;
+        }
+        const antes = await page.locator(GRUPO_PREGUNTA).first().innerText();
+        await boton.click();
+        await expect.poll(() => page.locator(GRUPO_PREGUNTA).first().innerText(), { message: `paso ${paso}: avanza` }).not.toBe(antes);
+      }
+      await esperarFocoEnTitulo(page, 'tras «Ver resultado»');
+      await page.waitForTimeout(300);
+      const medida = await page.evaluate(() => {
+        const titulo = document.activeElement as HTMLElement;
+        let barra = 0;
+        for (const el of document.querySelectorAll('body *')) {
+          if (getComputedStyle(el).position !== 'fixed') continue;
+          const r = el.getBoundingClientRect();
+          if (r.top <= 4 && r.height > 0 && r.height < 160 && r.width > 0) barra = Math.max(barra, r.bottom);
+        }
+        const fuera = /headerBar|hero|legalNotice|logo/i;
+        const visible = (e: Element) => {
+          if (fuera.test(String((e as HTMLElement).className)) || e.tagName === 'HEADER') return false;
+          if (e.querySelector('[class*="headerBar"], [class*="hero"]')) return false;
+          const r = e.getBoundingClientRect();
+          return r.height > 0 && r.width > 0;
+        };
+        // Los hermanos de antes del título en su tarjeta (o en la de su padre, si el título va solo)
+        let previos: Element[] = [];
+        let el: Element | null = titulo;
+        for (let nivel = 0; nivel < 2 && previos.length === 0 && el; nivel++) {
+          for (let s = el.previousElementSibling; s; s = s.previousElementSibling) if (visible(s)) previos.push(s);
+          el = el.parentElement;
+        }
+        const tops = [titulo, ...previos].map((p) => p.getBoundingClientRect().top);
+        return { arriba: Math.round(Math.min(...tops)), barra: Math.round(barra), encima: previos.map((p) => (p.textContent ?? '').trim().slice(0, 30)) };
+      });
+      expect(medida.arriba, `lo de encima del título (${medida.encima.join(' · ') || 'nada'}) frente al cromo`).toBeGreaterThanOrEqual(medida.barra);
+    });
   });
 }
 
