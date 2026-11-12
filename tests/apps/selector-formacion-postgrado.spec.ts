@@ -1,6 +1,7 @@
 import { test, expect, type Page } from '@playwright/test';
 import { calcularResultado, CLAVES, COSTE_MINIMO, PREGUNTAS, type TipoFormacion } from '../../app/selector-formacion-postgrado/motor';
 import { FORMACIONES } from '../../app/selector-formacion-postgrado/motor';
+import { CON_ARTICULO } from '../../app/selector-formacion-postgrado/motor';
 import { parseSpanishNumber } from '../../lib/formatters';
 
 /**
@@ -614,7 +615,8 @@ test.describe('Reparación 24/09/2026 — restricciones declaradas, datos de la 
  *   · C0104 (3) guía montada solo en el resultado — DESCARTADA: los 7 bloques están desde la carga.
  *   · C0104 (1) el título del resultado no queda bajo la barra (213-407 px frente a 52/77); sí queda
  *     fuera de la vista el enunciado de cada pregunta nueva (ver C0016 b).
- *   · Lo demás son hallazgos nuevos: test.fail() con «ABIERTO».
+ *   · Lo demás eran hallazgos nuevos (3099-3106), escritos entonces como test.fail() con «ABIERTO»;
+ *     todos REPARADOS (09-10/10/2026), y cada test lo dice en su comentario.
  */
 test.describe('Re-inspección 09/10/2026 — casos a mano, sospechas de la familia y lo que el testigo no ve', () => {
   const textos = async (page: Page, sel: string): Promise<string[]> =>
@@ -1038,6 +1040,164 @@ test.describe('Re-inspección 09/10/2026 — casos a mano, sospechas de la famil
         }
       }
       expect(anomalias).toEqual([]);
+    });
+  });
+});
+
+/**
+ * CABO C0189 (Inspector, 12/11/2026) — las dos observaciones de la re-inspección del 09/10 que no
+ * llegaron a hallazgo:
+ *   (a) el aviso «Por afinidad encajaría más el X…» nombra una sola vía apartada por los límites,
+ *       aunque la comparativa las marca todas;
+ *   (b) a 360 px, con «Ver resultado» al pie, la etiqueta «Tu formación recomendada» queda bajo la
+ *       barra fija del logo.
+ * Casos resueltos a mano con los pesos de motor.ts ANTES de ejecutar la app.
+ */
+test.describe('Cabo C0189 — el aviso de las vías apartadas y la etiqueta del resultado en móvil', () => {
+  const aviso = (page: Page) => page.locator('[class*="avisoRestricciones"]');
+  const textos = async (page: Page, sel: string): Promise<string[]> =>
+    (await page.locator(sel).allInnerTexts()).map((s) => s.replace(/\s+/g, ' ').trim());
+  const sinEmoji = (s: string) => s.replace(/^\S+\s/, '');
+
+  // Especializarme académicamente · 2-4 años de preparación · Recién graduado · Más de 15.000 € o
+  // beca · Administración Pública · Sin experiencia · Presencial · Administración pública, educación
+  // o justicia · LO ANTES POSIBLE, EN MESES · Prefiero titulación pública.
+  const TRES_APARTADAS = [1, 2, 0, 3, 0, 0, 0, 1, 0, 1] as const;
+  // A mano (pesos de motor.ts):
+  //   oposiciones 4 (P2) + 2 (P3) + 5 (P5) + 2 (P6) + 2 (P7) + 5 (P8) + 2 (P10) = 22
+  //   máster      4 (P1) + 2 (P2) + 3 (P3) + 4 (P4) + 3 (P6) + 3 (P7) + 1 (P8) = 20
+  //   FP          1 (P1) + 3 (P3) + 3 (P6) + 3 (P7) + 5 (P10)                   = 15
+  //   certificación 1 (P5) + 4 (P9) = 5 · bootcamp 4 (P9) = 4
+  // Límites: «Lo antes posible, en meses» son 6 meses (MESES_URGENCIA) y aparta las vías que duran
+  // un año o más: máster (12), FP (12) y oposiciones (24). «2-4 años» (48 meses), «Más de 15.000 €»
+  // y «Titulación pública» no apartan nada. Cumplen todo la certificación (5) y el bootcamp (4): se
+  // recomienda la certificación, y las TRES vías apartadas tienen más afinidad que ella.
+
+  test('(a) caso: la urgencia aparta oposiciones, máster y FP; la comparativa marca las tres y el aviso nombra la más afín', async ({ page }) => {
+    await abrirTest(page);
+    await responder(page, TRES_APARTADAS);
+    await expect(page.locator('[class*="resultadoTitulo"]')).toHaveText('Certificación Profesional');
+    expect(await textos(page, '[class*="alternativaPct"]')).toEqual(['5 puntos', '22 puntos', '20 puntos', '15 puntos', '4 puntos']);
+    expect((await textos(page, '[class*="alternativaLabel"]')).map(sinEmoji)).toEqual(['Certificación', 'Oposiciones', 'Máster', 'FP Superior', 'Bootcamp']);
+    expect(await page.locator('[class*="alternativaItem"]').evaluateAll((els) => els.map((e) => (e.querySelector('[class*="alternativaIncumple"]')?.textContent ?? '').trim()))).toEqual([
+      '',
+      'más larga que tu urgencia',
+      'más larga que tu urgencia',
+      'más larga que tu urgencia',
+      '',
+    ]);
+    // La que nombra es la de MÁS afinidad de las apartadas (22): esa parte del cabo no se confirma.
+    await expect(aviso(page)).toHaveText(
+      '⚠️ Por afinidad encajaría más la preparación de oposiciones (22 puntos), pero dura 2-5 años de preparación, y necesitas incorporarte lo antes posible, en meses.',
+    );
+  });
+
+  // ABIERTO (cabo C0189 a, 12/11/2026): el aviso, en singular y sin «la más afín», calla el máster
+  // (20 puntos) y la FP (15), apartados por el mismo límite y con tres y cuatro veces los puntos de
+  // la recomendada (5). Esperado: que nombre las tres vías apartadas con más afinidad, o que diga que
+  // la nombrada es la más afín de varias. Obtenido: solo «la preparación de oposiciones (22 puntos)».
+  test.fail('(a) ABIERTO: el aviso no deja creer que la única vía apartada con más afinidad es la que nombra', async ({ page }) => {
+    await abrirTest(page);
+    await responder(page, TRES_APARTADAS);
+    const texto = (await aviso(page).innerText()).replace(/\s+/g, ' ');
+    const nombraLasTres = ['la preparación de oposiciones', 'el máster universitario', 'la FP de grado superior'].every((n) => texto.includes(n));
+    const diceQueHayMas = /más afín|de más afinidad|entre otras/.test(texto);
+    expect(nombraLasTres || diceQueHayMas, texto).toBe(true);
+  });
+
+  /** Las 1.048.576 combinaciones, una vez por worker: los avisos «una vía con más afinidad se ha apartado». */
+  interface Recuento { conApartada: number; varias: number; sinAviso: number; noLaMasAfin: number; callan: number; ejemplo: string }
+  let recuento: Recuento | null = null;
+  const contar = (): Recuento => {
+    if (recuento) return recuento;
+    const c: Recuento = { conApartada: 0, varias: 0, sinAviso: 0, noLaMasAfin: 0, callan: 0, ejemplo: '' };
+    const r: Record<number, number> = {};
+    const recorrer = (i: number): void => {
+      if (i === PREGUNTAS.length) {
+        const res = calcularResultado(r);
+        if (res.incumple[res.tipo].length > 0) return;
+        const apartadas = CLAVES.filter((k) => res.incumple[k].length > 0 && res.puntos[k] > res.puntos[res.tipo]);
+        if (apartadas.length === 0) return;
+        c.conApartada++;
+        const texto = res.avisoRestricciones;
+        if (!texto) { c.sinAviso++; return; }
+        // La primera vía que nombra el aviso tiene que ser la de más puntos de las apartadas.
+        const nombradas = apartadas.filter((k) => texto.includes(CON_ARTICULO[k])).sort((a, b) => texto.indexOf(CON_ARTICULO[a]) - texto.indexOf(CON_ARTICULO[b]));
+        const max = Math.max(...apartadas.map((k) => res.puntos[k]));
+        if (nombradas.length === 0 || res.puntos[nombradas[0]] !== max) c.noLaMasAfin++;
+        if (apartadas.length > 1) {
+          c.varias++;
+          if (nombradas.length < apartadas.length && !/más afín|de más afinidad|entre otras/.test(texto)) {
+            c.callan++;
+            if (!c.ejemplo) c.ejemplo = `${JSON.stringify(r)} → ${texto}`;
+          }
+        }
+        return;
+      }
+      for (let k = 0; k < PREGUNTAS[i].opciones.length; k++) {
+        r[PREGUNTAS[i].id] = k;
+        recorrer(i + 1);
+      }
+    };
+    recorrer(0);
+    recuento = c;
+    return c;
+  };
+
+  test('(a) motor: si una vía con más afinidad se aparta, se avisa, y la que se nombra es la más afín', () => {
+    test.setTimeout(180_000);
+    const c = contar();
+    // Recuento del motor el 12/11/2026: 165.114 perfiles con alguna vía más afín apartada, 58.089
+    // de ellos con dos o más (el cabo decía 61.430 el 09/10, antes del 3104, que dejó de apartar
+    // el bootcamp por presupuesto).
+    expect(c.conApartada).toBe(165_114);
+    expect(c.varias).toBe(58_089);
+    expect(c.sinAviso).toBe(0);
+    expect(c.noLaMasAfin).toBe(0);
+  });
+
+  // ABIERTO (cabo C0189 a): en los 58.089 perfiles con dos o más vías más afines apartadas, el aviso
+  // nombra una sola y no dice que es la más afín. Esperado 0; obtenido 58.089.
+  test.fail('(a) ABIERTO motor: con varias vías más afines apartadas, el aviso no calla las demás', () => {
+    test.setTimeout(180_000);
+    const c = contar();
+    expect(c.callan, c.ejemplo).toBe(0);
+  });
+
+  test.describe('móvil 360 × 740', () => {
+    test.use({
+      viewport: { width: 360, height: 740 },
+      userAgent: 'Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36',
+      deviceScaleFactor: 3,
+      isMobile: true,
+      hasTouch: true,
+    });
+
+    /** Borde inferior de lo que se pinta en la barra fija del logo (la píldora y el conmutador). */
+    const fondoBarra = (page: Page) =>
+      page.evaluate(() => Math.max(...[...document.querySelectorAll('[data-barra-logo] > *')].map((e) => e.getBoundingClientRect().bottom)));
+
+    // ABIERTO (cabo C0189 b, 12/11/2026): con «Ver resultado» al pie (scrollIntoView 'end'), la
+    // página no se mueve (scrollY 1138 antes y después): el foco va al título (hallazgo 3100), que ya
+    // está a la vista a 205 px, por debajo del scroll-padding-top de 66 px, así que focus() no
+    // desplaza. La etiqueta, 199 px por encima del título, queda a 6 px, con la barra hasta 52 px (la
+    // píldora, x 15-141) y su caja hasta 62: el «✨» y el borde izquierdo de la etiqueta, bajo la
+    // píldora, y el texto entre la píldora y el conmutador. Con el botón en el centro o arriba la
+    // página sí se mueve y la etiqueta queda a 185 px. Esperado: la etiqueta por debajo de la barra.
+    test.fail('(b) ABIERTO: tras «Ver resultado» al pie, la etiqueta «Tu formación recomendada» no queda bajo la barra del logo', async ({ page }) => {
+      await abrirTest(page);
+      for (let k = 0; k < 10; k++) {
+        await page.waitForTimeout(500); // lee antes de contestar: un toque a <300 ms del de «Siguiente» es el doble toque que se ignora (3101)
+        await page.locator('[role="radiogroup"] [role="radio"]').nth(3).tap();
+        const boton = page.getByRole('button', { name: /^Siguiente|^Ver resultado/ });
+        await boton.evaluate((b) => b.scrollIntoView({ block: 'end' }));
+        await boton.tap();
+      }
+      const etiqueta = page.locator('[class*="resultadoBadge"]');
+      await expect(etiqueta).toHaveText(/Tu formación recomendada/);
+      await page.waitForTimeout(600);
+      const caja = await etiqueta.boundingBox();
+      expect(caja?.y ?? -1).toBeGreaterThanOrEqual(await fondoBarra(page));
     });
   });
 });

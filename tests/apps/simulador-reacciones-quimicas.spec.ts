@@ -93,11 +93,15 @@ import {
  *   · REPARADO (hallazgo 118) — En el empate 1:1 del CASO 2 la app rotulaba «⚠️ LÍMITE» al
  *     primer reactivo de la lista. Lo comprueba el CASO 2.
  *
- * ABIERTO — cabo C0127 (03/11/2026): el empate se detecta con tolerancia ABSOLUTA 1e-9 sobre
- *   los cocientes (`calcularLimitante` en motor.ts), así que solo sale «ninguno limita» con
- *   múltiplos exactos de las M de la app. Con los gramos que la PROPIA app muestra en la
- *   pestaña Estequiometría (tres decimales) nombra un limitante y un sobrante «≈0». Ver los
- *   tests «C0127» al final del bloque de casos.
+ * REPARADO (hallazgo 3972, 99865716e) — cabo C0127 (03/11/2026): el empate se detectaba con
+ *   tolerancia ABSOLUTA 1e-9 sobre los cocientes (`calcularLimitante` en motor.ts), así que solo
+ *   salía «ninguno limita» con múltiplos exactos de las M de la app. Hoy, en gramos, tolera medio
+ *   milésimo de cada masa molar. Ver los tests «C0127» al final del bloque de casos.
+ *
+ * INSPECCIÓN DE CAMBIO (12/11/2026, diff 3908727b..HEAD = esa reparación) — bloque «CAMBIO
+ *   12/11/2026» tras los tests C0127. ABIERTOS: la tolerancia copiada fija 0,0005 para todas las
+ *   masas (Zn 65,38, BaCl₂ 208,23, Na₂SO₄ 142,04 y Fe₂O₃ 159,69 van al centésimo) y no cubre el
+ *   redondeo a tres decimales con que Estequiometría enseña los gramos.
  * ─────────────────────────────────────────────────────────────────────────────────────────
  */
 
@@ -299,8 +303,8 @@ test('CASO 4 (extra) — Zn + 2HCl: limita el HCl y sobra zinc', async ({ page }
 //       2,4801563. Diferencia relativa 1,0·10⁻⁶, 264 veces MENOR que la tolerancia de arriba (y
 //       los 0,00008 g de redondeo de 79,365079 caben en el medio milésimo que muestra la app)
 //       ⇒ «ninguno limita», sin sobrante; H₂O 4,960317 mol × 18,015 = 89,360 g.
-//       ABIERTO (C0127): la app compara con tolerancia absoluta 1e-9 y la diferencia es
-//       2,48·10⁻⁶, así que da «Reactivo limitante: O₂» y «H₂ sobrante (exceso) ≈0 mol — ≈0 g».
+//       REPARADO (hallazgo 3972): la app comparaba con tolerancia absoluta 1e-9 y la diferencia
+//       es 2,48·10⁻⁶, así que daba «Reactivo limitante: O₂» y «H₂ sobrante (exceso) ≈0 mol — ≈0 g».
 //   C · control, 4 g de H₂ y 32 g de O₂ (el problema de libro con M(H₂) = 2)
 //       cociente H₂ = 4 ÷ 2,016 ÷ 2 = 0,992063 · O₂ = 1,000. Diferencia 0,79 %, treinta veces
 //       la tolerancia ⇒ limita el H₂; sobra (1 − 0,992063) mol de O₂ = 0,0079 mol × 32 =
@@ -354,6 +358,128 @@ test('C0127 · B — los 79,365 g de O₂ que la propia app da para 10 g de H₂
   await expect(resultado(page)).not.toContainText('Reactivo limitante:');
   await expect(resultado(page)).not.toContainText('sobrante');
   await expect(fila(page, 2)).toContainText('89,360 g');
+});
+
+// ─────────────────────────────────────────────────────────────────────────────────────────────
+// CAMBIO 12/11/2026 — inspección del diff 3908727b..HEAD: la reparación del hallazgo 3972
+// (99865716e). `calcularLimitante` da empate, en gramos, cuando los cocientes n ÷ coef difieren
+// en relativo menos que 0,0005/M_i + 0,0005/M_limitante; en moles sigue la comparación con 1e-9.
+// Y en el empate todos los excesos valen 0 (sin fila «sobrante»).
+//
+// Resueltos a mano ANTES de abrir el navegador, con las masas del catálogo (motor.ts):
+//
+//   D · Haber, N₂ + 3H₂ → 2NH₃ — los gramos que la propia Estequiometría da para 10 g de N₂
+//       n(N₂) = 10 ÷ 28,014 = 0,356964 mol · n(H₂) = × 3 = 1,070893 mol × 2,016 = 2,158921 g
+//       → «2,159 g». En Limitante con 10 g y 2,159 g: cociente N₂ 0,3569644 · H₂ 2,159 ÷ 2,016 ÷ 3
+//       = 0,3569775 → diferencia relativa 3,7·10⁻⁵ < 0,0005/28,014 + 0,0005/2,016 = 2,66·10⁻⁴
+//       ⇒ «ninguno limita», sin sobrante; NH₃ 0,713929 mol × 17,031 = 12,159 g («12,16 g NH₃»).
+//
+//   E · La anchura de la tolerancia en 2H₂ + O₂ → 2H₂O (2,64·10⁻⁴), 10 g de H₂ (cociente 2,4801587)
+//       79,38 g de O₂ → 79,38 ÷ 32 = 2,480625 → 1,88·10⁻⁴, dentro ⇒ «ninguno limita»; H₂O 89,360 g.
+//       79,4 g de O₂  → 79,4 ÷ 32 = 2,48125  → 4,40·10⁻⁴, fuera  ⇒ limita el H₂; sobran
+//       0,0010913 mol de O₂ × 32 = 0,0349 g → «0,0011 mol — 0,035 g»; H₂O 89,360 g.
+//
+//   F · ABIERTO — la copia de la receta fija medio MILÉSIMO para todas las masas. La receta de
+//       simulador-estequiometria (`incertidumbreRelativa`, hallazgo 2711) toma medio dígito del
+//       ÚLTIMO decimal de cada M, y cuatro reactivos de este catálogo van al centésimo: Zn 65,38 ·
+//       BaCl₂ 208,23 · Na₂SO₄ 142,04 · Fe₂O₃ 159,69. Con los gramos de la propia Estequiometría:
+//       F1 · 10 g de Zn → n = 10 ÷ 65,38 = 0,1529520 mol · HCl × 2 = 0,3059039 mol × 36,461 =
+//            11,15356 g → «11,154 g». Limitante 10 g y 11,154 g: cociente Zn 0,1529520 · HCl
+//            11,154 ÷ 36,461 ÷ 2 = 0,1529580 → diferencia relativa 3,9·10⁻⁵. Con la receta,
+//            0,005/65,38 + 0,0005/36,461 = 9,0·10⁻⁵ ⇒ «ninguno limita». La app tolera
+//            0,0005/65,38 + 0,0005/36,461 = 2,1·10⁻⁵ y da «Reactivo limitante: Zn» con «HCl
+//            sobrante (exceso) ≈0 mol — 0,000 g». ZnCl₂ 0,152952 mol × 136,286 = 20,845 g.
+//       F2 · 10 g de BaCl₂ → n = 10 ÷ 208,23 = 0,0480238 mol × 142,04 = 6,82130 g de Na₂SO₄ →
+//            «6,821 g». Cociente Na₂SO₄ 6,821 ÷ 142,04 = 0,0480217 → 4,46·10⁻⁵. Receta:
+//            0,005/208,23 + 0,005/142,04 = 5,92·10⁻⁵ ⇒ empate. La app tolera 5,92·10⁻⁶ y da
+//            «Reactivo limitante: Na₂SO₄» con «BaCl₂ sobrante (exceso) ≈0 mol — 0,000 g».
+//
+//   G · ABIERTO — la tolerancia de las masas molares no cubre el redondeo a tres decimales con
+//       que Estequiometría enseña los gramos, que es de donde sale la discrepancia del caso que
+//       se reparaba (0,0005 g ÷ m). Con masas al milésimo y 1 g de N₂ en Haber:
+//       n(N₂) = 1 ÷ 28,014 = 0,0356964 mol · H₂ × 3 = 0,1070893 mol × 2,016 = 0,215892 g →
+//       «0,216 g». Limitante 1 g y 0,216 g: cociente H₂ 0,216 ÷ 2,016 ÷ 3 = 0,0357143 →
+//       5,0·10⁻⁴ > 2,66·10⁻⁴ ⇒ la app da «Reactivo limitante: N₂» con «H₂ sobrante (exceso)
+//       0,0001 mol — 0,000 g», la misma forma del 3972 con 1 g en vez de 10.
+// ─────────────────────────────────────────────────────────────────────────────────────────────
+
+async function gramosDeEstequiometria(page: Page, reaccionId: string, gramosBase: string, filaObjetivo: number, esperado: string): Promise<void> {
+  await abrirPestana(page, /Estequiometr/);
+  await page.locator('#stoicReaccion').selectOption(reaccionId);
+  await page.locator('#stoicSustancia').selectOption('0');
+  await page.getByRole('button', { name: 'Gramos' }).click();
+  await page.locator('input[type="number"]').first().fill(gramosBase);
+  await page.getByRole('button', { name: 'Calcular', exact: true }).click();
+  await expect(fila(page, filaObjetivo)).toContainText(esperado);
+}
+
+async function limitanteGramos(page: Page, reaccionId: string, a: string, b: string): Promise<void> {
+  await abrirPestana(page, /Reactivo Límite/);
+  await page.locator('#limReaccion').selectOption(reaccionId);
+  await page.getByRole('button', { name: 'Gramos' }).click();
+  const campos = page.locator('input[type="number"]');
+  await campos.nth(0).fill(a);
+  await campos.nth(1).fill(b);
+  await page.getByRole('button', { name: /Calcular reactivo limitante/ }).click();
+}
+
+test.describe('CAMBIO 12/11/2026 · empate con la tolerancia de las masas molares', () => {
+  test.beforeEach(async ({ page }) => {
+    await esperarHidratacion(page, ['#casos-respuesta']);
+  });
+
+  test('D — Haber: los 2,159 g de H₂ que Estequiometría da para 10 g de N₂ son proporción exacta', async ({ page }) => {
+    await gramosDeEstequiometria(page, 'haber', '10', 1, '2,159 g'); // 1,070893 mol × 2,016
+    await limitanteGramos(page, 'haber', '10', '2.159');
+    await expect(resultado(page)).toContainText('ninguno limita'); // 3,7·10⁻⁵ < 2,66·10⁻⁴
+    await expect(resultado(page)).not.toContainText('Reactivo limitante:');
+    await expect(resultado(page)).not.toContainText('sobrante');
+    await expect(fila(page, 2)).toContainText('12,159 g'); // NH₃ 0,713929 mol × 17,031
+    await expect(resultado(page)).toContainText('12,16 g NH₃');
+  });
+
+  test('E — anchura: 79,38 g de O₂ con 10 g de H₂ empatan (1,88·10⁻⁴) y 79,4 g ya no (4,40·10⁻⁴)', async ({ page }) => {
+    await limitanteGramos(page, 'sintesis-agua', '10', '79.38');
+    await expect(resultado(page)).toContainText('ninguno limita');
+    await expect(resultado(page)).not.toContainText('sobrante');
+    await expect(fila(page, 2)).toContainText('89,360 g'); // 4,9603175 mol × 18,015
+
+    await limitanteGramos(page, 'sintesis-agua', '10', '79.4');
+    await expect(resultado(page)).toContainText('Reactivo limitante: H₂');
+    await expect(resultado(page)).toContainText('O₂ sobrante (exceso)');
+    await expect(resultado(page)).toContainText('0,0011 mol — 0,035 g'); // 0,0010913 mol × 32
+    await expect(fila(page, 2)).toContainText('89,360 g');
+  });
+
+  // ABIERTO (inspección de cambio 12/11/2026): la tolerancia fija 0,0005 y Zn va al centésimo.
+  test.fail('F1 — los 11,154 g de HCl que Estequiometría da para 10 g de Zn: ninguno limita (ABIERTO)', async ({ page }) => {
+    await gramosDeEstequiometria(page, 'zinc-hcl', '10', 1, '11,154 g'); // 0,3059039 mol × 36,461
+    await limitanteGramos(page, 'zinc-hcl', '10', '11.154');
+    await expect(fila(page, 2)).toContainText('20,845 g'); // ZnCl₂, lo da igual con o sin empate
+    // Hoy: «Reactivo limitante: Zn» y «HCl sobrante (exceso) ≈0 mol — 0,000 g».
+    await expect(resultado(page)).toContainText('ninguno limita');
+    await expect(resultado(page)).not.toContainText('sobrante');
+  });
+
+  // ABIERTO (inspección de cambio 12/11/2026): BaCl₂ 208,23 y Na₂SO₄ 142,04 van al centésimo.
+  test.fail('F2 — los 6,821 g de Na₂SO₄ que Estequiometría da para 10 g de BaCl₂: ninguno limita (ABIERTO)', async ({ page }) => {
+    await gramosDeEstequiometria(page, 'baso4', '10', 1, '6,821 g'); // 0,0480238 mol × 142,04
+    await limitanteGramos(page, 'baso4', '10', '6.821');
+    await expect(fila(page, 2)).toContainText('11,208 g'); // BaSO₄ 0,0480217 mol × 233,39
+    // Hoy: «Reactivo limitante: Na₂SO₄» y «BaCl₂ sobrante (exceso) ≈0 mol — 0,000 g».
+    await expect(resultado(page)).toContainText('ninguno limita');
+    await expect(resultado(page)).not.toContainText('sobrante');
+  });
+
+  // ABIERTO (inspección de cambio 12/11/2026): el redondeo a tres decimales de los gramos.
+  test.fail('G — los 0,216 g de H₂ que Estequiometría da para 1 g de N₂: ninguno limita (ABIERTO)', async ({ page }) => {
+    await gramosDeEstequiometria(page, 'haber', '1', 1, '0,216 g'); // 0,1070893 mol × 2,016
+    await limitanteGramos(page, 'haber', '1', '0.216');
+    await expect(fila(page, 2)).toContainText('1,216 g'); // NH₃ 0,0713929 mol × 17,031
+    // Hoy: «Reactivo limitante: N₂» y «H₂ sobrante (exceso) 0,0001 mol — 0,000 g».
+    await expect(resultado(page)).toContainText('ninguno limita');
+    await expect(resultado(page)).not.toContainText('sobrante');
+  });
 });
 
 // ─────────────────────────────────────────────────────────────────────────────────────────────
@@ -652,5 +778,35 @@ test.describe('casos para clase · en la página', () => {
     await page.getByRole('button', { name: 'Calcular', exact: true }).click();
     // 64 g de O₂ = 2 mol → 4 mol de H₂O × 18,015 = 72,060 g
     await expect(fila(page, 0)).toContainText('72,060 g');
+  });
+
+  test('lectura de la respuesta (leerRespuestaAula, C0558): coma, punto ambiguo y un error que no aprueba', async ({ page }) => {
+    // Caso 2: 22 ÷ 44,096 × 5 = 2,49456 mol → clave 2,495. Ventana (ventanaDe): app 2,494557 y
+    // libro 22 ÷ 44 × 5 = 2,5; margen 0,005 × 2,494557 + 0,0005 = 0,012973 → de 2,4816 a 2,5130.
+    // «2.495» admite dos lecturas, 2,495 (punto decimal) y 2495 (millar): gana la más cercana.
+    // «2.594» se lee 2,594, fuera de la ventana: |2,594 − 2,495| = 0,099 mol.
+    // Caso 4: 250 ÷ 100,087 × 56,077 = 140,0744 → clave 140,07; «140.07» no agrupa millares.
+    // Caso 1: «0.500» no es un millar (empieza por cero) → 0,5 = la clave 0,500 mol.
+    await esperarHidratacion(page, ['#casos-respuesta']);
+    const seccion = page.locator('section[aria-labelledby="casos-aula-titulo"]');
+    const casilla = seccion.locator('#casos-respuesta');
+    const veredicto = seccion.getByRole('alert');
+    async function corrige(caso: number, texto: string): Promise<void> {
+      await seccion.getByRole('button', { name: new RegExp(`^Caso ${caso}:`) }).click();
+      await casilla.fill(texto);
+      await seccion.getByRole('button', { name: 'Comprobar' }).click();
+    }
+    await corrige(2, '2,495');
+    await expect(veredicto).toContainText('¡Correcto!');
+    await corrige(2, '2.495');
+    await expect(veredicto).toContainText('¡Correcto!');
+    await corrige(2, '2.594');
+    await expect(veredicto).toContainText('No es correcto. Te has desviado 0,099 mol de la respuesta.');
+    await corrige(4, '140,07');
+    await expect(veredicto).toContainText('¡Correcto!');
+    await corrige(4, '140.07');
+    await expect(veredicto).toContainText('¡Correcto!');
+    await corrige(1, '0.500');
+    await expect(veredicto).toContainText('¡Correcto!');
   });
 });

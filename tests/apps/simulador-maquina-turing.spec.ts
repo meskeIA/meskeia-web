@@ -402,3 +402,260 @@ test.describe('Regresión de los hallazgos del Inspector', () => {
     await expect(page.locator('[class*="velocidadNota"]')).toContainText('sin esperar');
   });
 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+// INSPECTOR 12/11/2026 — modo cambio (diff ac76770d..HEAD)
+// ─────────────────────────────────────────────────────────────────────────────
+//
+// Lo que cambió el diff y se comprueba aquí:
+//   · `origenCinta` (hallazgo 341): los índices que se dibujan bajo cada celda ya no se
+//     renumeran cuando la cinta crece por la izquierda; el cabezal pasa a −1.
+//   · VELOCIDAD_MIN = 10 ms («Sin pausa», hallazgo 342).
+//   · La etiqueta «Símbolos escritos» pasa a «Celdas modificadas» (hallazgo 340).
+//
+// Todas las trazas están hechas A MANO sobre la constante PROGRAMAS de page.tsx antes de
+// mirar la app. Comprobado también por script, y NO incluido aquí por su duración (81,5 s a
+// CPU normal): la máquina «q0 _→_,R,q0» a «Sin pausa» para en «RECHAZADO (límite de pasos
+// alcanzado)» con Pasos 5000, Movimientos 5000, Celdas 0 y el cabezal en el índice 5000.
+
+/** Las 21 celdas que dibuja el SVG de la cinta: símbolo, índice real y si lleva el destello. */
+async function leerCinta(page: Page) {
+  return page.evaluate(() => {
+    const svg = document.querySelector('svg[aria-label="Cinta de la máquina de Turing"]');
+    if (!svg) return [];
+    return Array.from(svg.querySelectorAll('g')).map((g) => {
+      const textos = g.querySelectorAll('text');
+      const clase = g.querySelector('rect')?.getAttribute('class') ?? '';
+      return {
+        simbolo: textos[0]?.textContent ?? '',
+        indice: textos[1]?.textContent ?? '',
+        // Nombre local del módulo: «hash_celdaEscrita» en el build, «…__celdaEscrita» en dev.
+        escrita: /_celdaEscrita$/.test(clase),
+      };
+    });
+  });
+}
+
+type Celda = { simbolo: string; indice: string; escrita: boolean };
+
+/** Símbolo dibujado en la celda de índice real `indice` (la ventana es de 21 celdas). */
+function simboloEn(cinta: Celda[], indice: number): string | undefined {
+  return cinta.find((c) => c.indice === String(indice))?.simbolo;
+}
+
+/**
+ * Prueba que React ya responde antes de tocar controles que no se reintentan (el deslizador,
+ * los selectores de la tabla): cambiar de programa solo actualiza aria-pressed tras hidratar.
+ */
+async function esperarHidratada(page: Page) {
+  const palindromos = page.getByRole('button', { name: /Palíndromos binarios/ });
+  await expect(async () => {
+    await palindromos.click();
+    await expect(palindromos).toHaveAttribute('aria-pressed', 'true', { timeout: 500 });
+  }).toPass({ timeout: 10_000 });
+}
+
+async function cargarProgramaHidratado(page: Page, nombre: RegExp) {
+  await esperarHidratada(page);
+  const boton = page.getByRole('button', { name: nombre });
+  await boton.click();
+  await expect(boton).toHaveAttribute('aria-pressed', 'true');
+}
+
+/** Lleva el deslizador al mínimo (10 ms), que la app rotula «Sin pausa». */
+async function ponerSinPausa(page: Page) {
+  const slider = page.locator('#velocidad-slider');
+  await slider.focus();
+  await page.keyboard.press('Home');
+  await expect(slider).toHaveValue('10');
+  await expect(page.locator('#velocidad-slider + span')).toHaveText('Sin pausa');
+}
+
+test.describe('Inspector 12/11/2026 · lo cambiado desde el 25/08', () => {
+  // TRAZA A MANO: es la del CASO 2 de este fichero (incrementador, cinta 111), mirando ahora
+  // los índices REALES que se dibujan bajo cada celda. Paso 7: q1 lee el 1 del índice 0,
+  // escribe 0 y mueve L → el cabezal sale por la izquierda al índice −1 (celda nueva, blanca).
+  // Lo escrito conserva su índice: 0, 1 y 2 valen 0, y el destello marca la celda 0, la
+  // escrita en ese paso. La ventana va de −1 − 10 = −11 a −1 + 10 = 9.
+  // Paso 8: q1 _→1,S,qf escribe 1 en el −1 sin moverse. Antes del arreglo del hallazgo 341
+  // el cabezal mostraba el índice 0 y el 000 aparecía en 1, 2 y 3.
+  test('341 · el cabezal que sale por la izquierda pasa al índice −1 y lo escrito conserva el suyo', async ({
+    page,
+  }) => {
+    await cargarCinta(page, '111');
+    await avanzar(page, 7);
+
+    let cinta = await leerCinta(page);
+    expect(cinta).toHaveLength(21);
+    expect(cinta[10]).toMatchObject({ simbolo: '_', indice: '-1' }); // la celda central es el cabezal
+    expect([0, 1, 2].map((i) => simboloEn(cinta, i))).toEqual(['0', '0', '0']);
+    expect(cinta.filter((c) => c.escrita).map((c) => c.indice)).toEqual(['0']);
+    expect(cinta[0].indice).toBe('-11');
+    expect(cinta[20].indice).toBe('9');
+
+    await avanzar(page, 1, 7);
+    cinta = await leerCinta(page);
+    expect(cinta[10]).toMatchObject({ simbolo: '1', indice: '-1' });
+    expect([0, 1, 2].map((i) => simboloEn(cinta, i))).toEqual(['0', '0', '0']);
+    await expect(metrica(page, 'Cinta final (limpia)')).toHaveText('1000');
+    await expect(resultado(page)).toContainText('ACEPTADO');
+
+    // Reiniciar devuelve el origen a cero: el 1 inicial vuelve a estar en el índice 0.
+    await page.getByRole('button', { name: 'Reiniciar', exact: true }).click();
+    await expect(metrica(page, 'Pasos ejecutados')).toHaveText('0');
+    cinta = await leerCinta(page);
+    expect(cinta[10]).toMatchObject({ simbolo: '1', indice: '0' });
+    expect(cinta[0].indice).toBe('-10');
+  });
+
+  // TRAZA A MANO (incrementador, cinta 1011 del programa; la tabla está en el CASO 1).
+  // Paso 9: q2 lee el 1 del índice 0 y mueve L → cabezal en −1, destello en 0.
+  // Paso 10: q2 _→_,R,qf → cabezal vuelve al 0 (símbolo 1), destello en −1 (escribió _ allí).
+  test('341 bis · el destello de la celda escrita sigue en su índice tras crecer la cinta', async ({
+    page,
+  }) => {
+    await avanzar(page, 9);
+    let cinta = await leerCinta(page);
+    expect(cinta[10]).toMatchObject({ simbolo: '_', indice: '-1' });
+    expect(cinta.filter((c) => c.escrita).map((c) => c.indice)).toEqual(['0']);
+
+    await avanzar(page, 1, 9);
+    cinta = await leerCinta(page);
+    expect(cinta[10]).toMatchObject({ simbolo: '1', indice: '0' });
+    expect(cinta.filter((c) => c.escrita).map((c) => c.indice)).toEqual(['-1']);
+    expect([0, 1, 2, 3].map((i) => simboloEn(cinta, i))).toEqual(['1', '1', '0', '0']);
+  });
+
+  // TRAZA A MANO («Duplicar cadena unaria», cinta 111, q0, finales {qf}).
+  //   Ronda 1, pasos 1-7:   X en 0, Z en 3, vuelta a la X        → X11Z
+  //   Ronda 2, pasos 8-14:  X en 1, Z en 4                        → XX1ZZ
+  //   Ronda 3, pasos 15-21: X en 2, Z en 5                        → XXXZZZ
+  //   22: q0 lee Z → L, q5 · 23-25: q5 X→L ×3; el 25 sale al índice −1 (celda nueva)
+  //   26: q5 _→_,R,q4 · 27-32: q4 X→1 ×3 y Z→1 ×3, cabezal de 0 a 6 · 33: q4 _→_,S,qf
+  // Celdas modificadas: 3 X + 3 Z + 6 unos = 12 (6 tras el paso 25). Movimientos: 32, todos
+  // menos el 33 (S). Cinta final 111111, cabezal en el índice 6, sobre un blanco.
+  test('duplicar 111 paso a paso: 33 transiciones, 111111 y el cabezal pasa por −1', async ({
+    page,
+  }) => {
+    await cargarProgramaHidratado(page, /Duplicar cadena unaria/);
+    await expect(metrica(page, 'Cinta final (limpia)')).toHaveText('111');
+
+    await avanzar(page, 25);
+    await expect(estadoActual(page)).toHaveText('Estado:q5');
+    await expect(metrica(page, 'Cinta final (limpia)')).toHaveText('XXXZZZ');
+    await expect(metrica(page, 'Celdas modificadas')).toHaveText('6');
+    await expect(metrica(page, 'Movimientos del cabezal')).toHaveText('25');
+    let cinta = await leerCinta(page);
+    expect(cinta[10]).toMatchObject({ simbolo: '_', indice: '-1' });
+
+    await avanzar(page, 8, 25);
+    await expect(resultado(page)).toContainText('ACEPTADO');
+    await expect(estadoActual(page)).toHaveText('Estado:qf');
+    await expect(metrica(page, 'Pasos ejecutados')).toHaveText('33');
+    await expect(metrica(page, 'Celdas modificadas')).toHaveText('12');
+    await expect(metrica(page, 'Movimientos del cabezal')).toHaveText('32');
+    await expect(metrica(page, 'Cinta final (limpia)')).toHaveText('111111');
+    cinta = await leerCinta(page);
+    expect(cinta[10]).toMatchObject({ simbolo: '_', indice: '6' });
+    expect([0, 1, 2, 3, 4, 5].map((i) => simboloEn(cinta, i))).toEqual(['1', '1', '1', '1', '1', '1']);
+    expect(simboloEn(cinta, -1)).toBe('_');
+  });
+
+  /**
+   * HALLAZGO (12/11/2026, ABIERTO) · «Acelerar» desde «Sin pausa» RALENTIZA.
+   *
+   * El diff bajó el mínimo del deslizador a VELOCIDAD_MIN = 10 ms, pero el botón sigue con
+   * `Math.max(100, v - 200)`: desde 10 ms lo lleva a 100 ms (diez veces más lento), y desde
+   * 600 ms se queda en 100 sin llegar nunca a «Sin pausa». Esperado: acelerar no aumenta
+   * nunca la pausa; desde el mínimo se queda en el mínimo.
+   */
+  test('HALLAZGO (12/11/2026, ABIERTO) · «Acelerar» desde «Sin pausa» no aumenta la pausa', async ({
+    page,
+  }) => {
+    test.fail();
+    await esperarHidratada(page);
+    await ponerSinPausa(page);
+    await page.getByRole('button', { name: 'Acelerar', exact: true }).click();
+    await expect(page.locator('#velocidad-slider')).toHaveValue('10', { timeout: 2000 });
+    await expect(page.locator('#velocidad-slider + span')).toHaveText('Sin pausa', { timeout: 1000 });
+  });
+
+  /**
+   * HALLAZGO (12/11/2026, ABIERTO) · a «Sin pausa» con la CPU frenada, los contadores cuentan
+   * transiciones de más y los índices de la cinta se corren.
+   *
+   * El intervalo se vuelve a crear en cada paso (el efecto depende de `paso`, que cambia con
+   * cada estado) y el viejo solo se limpia en el efecto pasivo, después del commit. Con 10 ms
+   * entre pasos, si el render tarda, el intervalo VIEJO dispara otra vez con el cierre viejo:
+   * repite la transición ya aplicada; cinta, cabezal y estado salen iguales, pero los contadores
+   * (`setPasos(p => p + 1)`, celdas, movimientos) y `setOrigenCinta(o => o + 1)` suman dos veces.
+   * Medido por script: duplicar 111 a ×10 dio 35 y 49 pasos (esperado 33), y en el de 49 el
+   * cabezal pintaba el índice 5 en vez del 6; a ×6, 34 en una de tres; el bucle de abajo a ×4,
+   * 1013 pasos con el cabezal en el 1012. A 100 ms (el mínimo anterior) no se alcanzaba.
+   */
+  test('HALLAZGO (12/11/2026, ABIERTO) · «Sin pausa» con la CPU frenada no cuenta pasos de más', async ({
+    page,
+  }) => {
+    test.fail();
+    test.setTimeout(150_000);
+    const cdp = await page.context().newCDPSession(page);
+
+    // 1) Duplicar 111: la traza a mano del test anterior (33 / 12 / 32, cabezal en el 6).
+    await cargarProgramaHidratado(page, /Duplicar cadena unaria/);
+    await ponerSinPausa(page);
+    await cdp.send('Emulation.setCPUThrottlingRate', { rate: 10 });
+    await page.getByRole('button', { name: 'Iniciar', exact: true }).click();
+    await expect(resultado(page)).toContainText('ACEPTADO', { timeout: 60_000 });
+    await cdp.send('Emulation.setCPUThrottlingRate', { rate: 1 });
+    await expect(metrica(page, 'Pasos ejecutados')).toHaveText('33', { timeout: 1000 });
+    await expect(metrica(page, 'Celdas modificadas')).toHaveText('12', { timeout: 1000 });
+    await expect(metrica(page, 'Movimientos del cabezal')).toHaveText('32', { timeout: 1000 });
+    expect((await leerCinta(page))[10].indice).toBe('6');
+
+    // 2) Máquina que no para: incrementador con la regla 3 cambiada a  q0 _→_,R,q0. Empieza en
+    // el índice 0 y SIEMPRE mueve a la derecha, así que tras N transiciones reales el cabezal
+    // está en el índice N: Pasos y Movimientos tienen que valer exactamente ese índice.
+    await page.goto(RUTA);
+    await cargarProgramaHidratado(page, /Incrementador binario/);
+    await page.getByRole('combobox', { name: 'Regla 3: hacia dónde mueve el cabezal' }).selectOption('R');
+    const destino = page.getByRole('textbox', { name: 'Regla 3: estado al que pasa' });
+    await destino.fill('q0');
+    await expect(destino).toHaveValue('q0');
+    await ponerSinPausa(page);
+    await cdp.send('Emulation.setCPUThrottlingRate', { rate: 10 });
+    await page.getByRole('button', { name: 'Iniciar', exact: true }).click();
+    await expect
+      .poll(async () => Number(await metrica(page, 'Pasos ejecutados').textContent()), { timeout: 90_000 })
+      .toBeGreaterThanOrEqual(250);
+    await page.getByRole('button', { name: 'Pausar', exact: true }).click();
+    await expect(resultado(page)).toContainText('EN PAUSA');
+    await cdp.send('Emulation.setCPUThrottlingRate', { rate: 1 });
+    const pasos = await metrica(page, 'Pasos ejecutados').textContent();
+    const movimientos = await metrica(page, 'Movimientos del cabezal').textContent();
+    const indiceCabezal = (await leerCinta(page))[10].indice;
+    expect(pasos).toBe(indiceCabezal);
+    expect(movimientos).toBe(indiceCabezal);
+    await expect(metrica(page, 'Celdas modificadas')).toHaveText('0', { timeout: 1000 });
+  });
+
+  /**
+   * HALLAZGO (12/11/2026, ABIERTO) · el JSON-LD sigue anunciando «símbolos escritos».
+   *
+   * El hallazgo 340 renombró en la página la métrica «Símbolos escritos» a «Celdas modificadas»
+   * porque solo cuenta las escrituras que CAMBIAN la celda; `features` del jsonLd
+   * (metadata.ts) conserva «Métricas: pasos, símbolos escritos, ACEPTADO/RECHAZADO».
+   */
+  test('HALLAZGO (12/11/2026, ABIERTO) · el JSON-LD nombra las métricas como la página', async ({
+    page,
+  }) => {
+    test.fail();
+    await expect(page.getByText('Celdas modificadas', { exact: true })).toBeVisible();
+    const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+    const app = bloques
+      .map((b) => JSON.parse(b) as { '@type'?: string; featureList?: string[] })
+      .find((j) => j['@type'] === 'WebApplication');
+    const caracteristicas = (app?.featureList ?? []).join(' · ');
+    expect(caracteristicas).toContain('Métricas');
+    expect(caracteristicas).not.toMatch(/símbolos escritos/i);
+  });
+});

@@ -745,3 +745,77 @@ test.describe('inspector 29/10/2026 · hallazgos nuevos', () => {
     expect(FUENTE).toMatch(/canica en el centro de un estadio de fútbol, su electrón no estaría en las gradas: estaría a unos 500 metros/);
   });
 });
+
+// ─────────────────────────────────────────────────────────────────────────────
+// INSPECTOR 12/11/2026 · cabo C0524 (la concordancia de la insignia de respuesta)
+//
+// Esperado, decidido antes de abrir la app: «verdad» es un sustantivo femenino y «mito» uno
+// masculino, así que la insignia dice «Era una VERDAD» y «Era un MITO». Lo mismo si se acierta
+// que si se falla: la insignia dice qué ERA la afirmación, no qué contestó el usuario.
+// Las afirmaciones se identifican por la CLAVE (contenido), no por su posición.
+// ─────────────────────────────────────────────────────────────────────────────
+
+test.describe('inspector 12/11/2026 · cabo C0524 · insignia de respuesta', () => {
+  const insignia = (page: Page): Locator => page.locator('[class*="respuestaCorrecta"]');
+
+  test('sano · la insignia de un mito dice «Era un MITO», tanto al acertar como al fallar', async ({ page }) => {
+    // Medido el 12/11/2026: «Era un MITO» en el cerebro (acierto con «Mito») y en la sangre venosa
+    // (fallo con «Verdad»).
+    test.setTimeout(60_000);
+    await abrir(page);
+    await page.getByRole('button', { name: 'Comenzar quiz' }).click();
+    let acierto = false;
+    let fallo = false;
+    for (let n = 1; n <= 25 && !(acierto && fallo); n++) {
+      await expect(prog(page)).toHaveText(`${n} / 25`);
+      const c = await clave(page);
+      if (!c.verdad && !acierto) {
+        await responder(page, true);
+        await expect(page.locator('[class*="resultadoBadge"]')).toContainText('¡Correcto!');
+        await expect(insignia(page)).toHaveText('Era un MITO');
+        acierto = true;
+      } else if (!c.verdad && !fallo) {
+        await responder(page, false);
+        await expect(page.locator('[class*="resultadoBadge"]')).toContainText('Incorrecto');
+        await expect(insignia(page)).toHaveText('Era un MITO');
+        fallo = true;
+      } else {
+        await responder(page, true);
+      }
+      await btnAvanzar(page).click();
+    }
+    expect(acierto && fallo, 'no se han visto un acierto y un fallo sobre un mito').toBe(true);
+  });
+
+  test('HALLAZGO (12/11/2026, ABIERTO, hallazgo 3742 · cabo C0524) · la insignia de una verdad dice «Era una VERDAD», al acertar y al fallar', async ({ page }) => {
+    // ABIERTO. page.tsx:432 `Era un {pregunta.esVerdad ? 'VERDAD' : 'MITO'}`: el artículo es fijo
+    // y no concuerda con «verdad». Medido el 12/11/2026: los huesos (1.ª verdad) contestados
+    // «Verdad» dan «✓ ¡Correcto!» con «Era un VERDAD», y los pulpos (2.ª verdad) contestados «Mito»
+    // dan «✗ Incorrecto» con «Era un VERDAD». Las 7 verdades del banco pasan por la misma línea.
+    test.fail();
+    test.setTimeout(90_000);
+    await abrir(page);
+    await page.getByRole('button', { name: 'Comenzar quiz' }).click();
+    let acierto = false;
+    let fallo = false;
+    for (let n = 1; n <= 25 && !(acierto && fallo); n++) {
+      await expect(prog(page)).toHaveText(`${n} / 25`);
+      const c = await clave(page);
+      if (c.verdad && !acierto) {
+        await responder(page, true);
+        await expect(page.locator('[class*="resultadoBadge"]')).toContainText('¡Correcto!');
+        await expect.soft(insignia(page), `acierto en «${c.texto}»`).toHaveText('Era una VERDAD', { timeout: 1000 });
+        acierto = true;
+      } else if (c.verdad && !fallo) {
+        await responder(page, false);
+        await expect(page.locator('[class*="resultadoBadge"]')).toContainText('Incorrecto');
+        await expect.soft(insignia(page), `fallo en «${c.texto}»`).toHaveText('Era una VERDAD', { timeout: 1000 });
+        fallo = true;
+      } else {
+        await responder(page, true);
+      }
+      await btnAvanzar(page).click();
+    }
+    expect(acierto && fallo, 'no se han visto un acierto y un fallo sobre una verdad').toBe(true);
+  });
+});

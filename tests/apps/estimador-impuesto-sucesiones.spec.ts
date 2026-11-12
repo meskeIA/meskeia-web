@@ -3587,3 +3587,83 @@ test.describe('Cabo C0383 — el panel de resultados en el papel (área imprimib
     expect(medida.cuotaDentroDelRecorte).toBe(true);
   });
 });
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// Inspector 12/11/2026 (modo cambio) — la fuente oficial del módulo pasa al BOE
+// ═══════════════════════════════════════════════════════════════════════════════
+//
+// El único cambio desde la última validación (15136685) es `FISCAL_SUCESIONES_META.urlOficial`
+// (1d40d66a2, triaje fiscal del 10/11/2026): de la página del ISD de la sede de la AEAT, que daba
+// 404, al texto consolidado de la Ley 29/1987 en el BOE. Ninguna cifra cambia, así que no hay caso
+// de cálculo: se inspecciona adónde lleva el enlace y cómo se llama.
+//
+// Cotejado en el BOE el 12/11/2026 (WebFetch): https://www.boe.es/buscar/act.php?id=BOE-A-1987-28141
+// es «Ley 29/1987, de 18 de diciembre, del Impuesto sobre Sucesiones y Donaciones», BOE núm. 303,
+// de 19/12/1987, texto consolidado. El identificador es correcto.
+
+/** Organismo que publica la página de cada dominio que puede salir en el enlace del hero. */
+const ORGANISMO_POR_DOMINIO: Array<{ dominio: RegExp; nombre: RegExp }> = [
+  { dominio: /(^|\.)boe\.es$/, nombre: /\bBOE\b|Bolet[ií]n Oficial del Estado/ },
+  { dominio: /(^|\.)agenciatributaria\.(gob\.)?es$/, nombre: /Agencia Tributaria/ },
+  { dominio: /(^|\.)gencat\.cat$/, nombre: /Agència Tributària de Catalunya/ },
+];
+
+test.describe('Inspector 12/11/2026 — la fuente oficial del ISD es la Ley 29/1987 en el BOE', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, ['#saldos-cuentas']);
+  });
+
+  const enlaceHero = (page: Page) => page.locator('[class*="metaVerificado"] a');
+  const enlaceReferencia = (page: Page) =>
+    page.getByRole('note', { name: 'Datos de referencia normativos' }).getByRole('link');
+
+  /**
+   * Sin comunidad elegida, con una de régimen común (Madrid) y con Andalucía, que tiene tarifa
+   * propia pero sigue en el sello general: el hero y el DataReference llevan a la ley consolidada.
+   * Con Cataluña, a la Agència Tributària de Catalunya, que el cambio no toca.
+   */
+  test('el hero y el DataReference enlazan BOE-A-1987-28141; Cataluña sigue con su sello', async ({ page }) => {
+    // Esperado literal: el identificador cotejado en el BOE el 12/11/2026 (cabecera del bloque).
+    expect(FISCAL_SUCESIONES_META.urlOficial).toBe('https://www.boe.es/buscar/act.php?id=BOE-A-1987-28141');
+
+    for (const ccaa of ['', 'madrid', 'andalucia']) {
+      if (ccaa) await page.locator('#ccaa-causante').selectOption(ccaa);
+      await expect(enlaceHero(page), `hero con «${ccaa || 'sin elegir'}»`).toHaveAttribute(
+        'href',
+        FISCAL_SUCESIONES_META.urlOficial,
+      );
+      await expect(enlaceReferencia(page), `DataReference con «${ccaa || 'sin elegir'}»`).toHaveAttribute(
+        'href',
+        FISCAL_SUCESIONES_META.urlOficial,
+      );
+    }
+
+    await page.locator('#ccaa-causante').selectOption('cataluna');
+    await expect(enlaceHero(page)).toHaveAttribute('href', FISCAL_SUCESIONES_CATALUNA_META.urlOficial);
+    await expect(enlaceReferencia(page)).toHaveAttribute('href', FISCAL_SUCESIONES_CATALUNA_META.urlOficial);
+  });
+
+  /**
+   * ABIERTO (Inspector 12/11/2026, contenido, bajo) — el enlace del hero se sigue llamando
+   * «Agencia Tributaria» (`SELLO_GENERAL.organismo`, tecleado en page.tsx) y desde 1d40d66a2 lleva
+   * al BOE: «Datos verificados: 01/01/2025 — Fuente: Agencia Tributaria» abre la Ley 29/1987 en
+   * boe.es. El nombre del enlace dice un organismo y el destino es otro (WCAG 2.4.4, propósito del
+   * enlace). Con Cataluña sí cuadran: «Agència Tributària de Catalunya» → atc.gencat.cat.
+   * Se afirma lo CORRECTO —que el nombre sea el del organismo del dominio al que lleva— sin
+   * prescribir la reparación (cambiar el rótulo o derivarlo del sello).
+   */
+  test('el nombre del enlace del hero es el del organismo al que lleva', async ({ page }) => {
+    test.fail();
+    for (const ccaa of ['cataluna', 'madrid']) {
+      await page.locator('#ccaa-causante').selectOption(ccaa);
+      const enlace = enlaceHero(page);
+      const href = (await enlace.getAttribute('href')) ?? '';
+      const nombre = (await enlace.innerText()).trim();
+      const host = new URL(href).hostname;
+      const organismo = ORGANISMO_POR_DOMINIO.find((o) => o.dominio.test(host));
+      expect(organismo, `dominio sin organismo conocido: ${host}`).toBeTruthy();
+      expect(nombre, `con «${ccaa}» el enlace «${nombre}» lleva a ${host}`).toMatch(organismo!.nombre);
+    }
+  });
+});

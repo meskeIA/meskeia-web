@@ -23,7 +23,12 @@ import {
 // Siembra con testigo de hidratación. La añade la re-inspección del 12/09/2026 (bloque final):
 // `page.goto()` espera al evento `load`, no a que React haya montado, así que escribir antes
 // mueve el DOM sin que el estado de React se entere y el caso mide otro escenario.
-import { esperarHidratacion, sembrarValor } from './_hidratacion';
+import {
+  asentarAntesDeTraducir,
+  esperarHidratacion,
+  esperarValorEnReact,
+  sembrarValor,
+} from './_hidratacion';
 
 /**
  * Inspector — simulador-equilibrio-quimico (segmento cálculo/química, riesgo 3, 497 usos reales)
@@ -393,7 +398,7 @@ test('CASO 3 (rechazo) — negativo, vacío y texto no producen NaN ni resultado
 });
 
 // ─────────────────────────────────────────────────────────────────────────────────────────
-// HALLAZGOS ABIERTOS
+// HALLAZGOS DEL 21/08/2026 — REPARADOS (23/08 y 13/09/2026); sus testigos quedan como candados
 // ─────────────────────────────────────────────────────────────────────────────────────────
 
 test('HALLAZGO [1] — el mensaje de Le Chatelier contradice la flecha de la propia app', async ({ page }) => {
@@ -1063,7 +1068,8 @@ test.describe('Simulador de Equilibrio Químico · casos para clase', () => {
 // resueltos a mano ANTES de abrir el navegador, y los testigos de lo que sigue abierto.
 //
 // ── ESTADO DE LOS SEIS HALLAZGOS DEL 21/08 ─────────────────────────────────
-//   [1] alto/calculo   mensaje de Le Chatelier ↔ flecha .... ABIERTO en su raíz (ver [7])
+//   [1] alto/calculo   mensaje de Le Chatelier ↔ flecha .... REPARADO en su raíz el 13/09/2026
+//                      (hallazgo 788: la consecuencia se compone desde `direccion`)
 //   [2] alto/calculo   esterificación «endotérmica» con ΔH<0  REPARADO (rótulo «exotérmica»;
 //                      el campo booleano `exotermica` ya no existe: `esExotermicaDe(ΔH)`)
 //   [3] dato/medio     Kc rotuladas «a 298 K, referencia» ... REPARADO en la interfaz
@@ -1368,5 +1374,271 @@ test.describe('Simulador de Equilibrio Químico · re-inspección 12/09/2026', (
     );
     const hayEjeDeTiempo = /tiempo/i.test(await page.locator('main').innerText());
     expect(prometeGraficoTemporal && !hayEjeDeTiempo).toBe(false);
+  });
+});
+
+
+// ═══════════════════════════════════════════════════════════════════════════
+// INSPECCIÓN DE CAMBIO (12/11/2026) — `git diff ac046fdc HEAD` sobre la app y el corrector.
+//
+// Qué cambió: el corrector de «Casos para clase» pasó al motor compartido
+// lib/calculadoras/correctorCasosAula.ts (2221d3155), con tolerancia 0 para las respuestas
+// EXACTAS a dos decimales (cabo C0267, 03ec46007), dominio 'entero' para Δn con su aviso
+// (hallazgo 1207) y `leerRespuestaAula`, que de las dos lecturas de un punto con tres cifras se
+// queda con la más cercana a la respuesta (cd6270a91, C0558). Los campos de concentración y de
+// temperatura pasaron a CampoNumerico (cabo C0311). En el mensaje de Le Chatelier las tres
+// frases de dirección se envolvieron en <span> para la página traducida (C0312). El resto,
+// tokens de contraste (medidos: todos ≥ 4,9:1 en claro y ≥ 5,2:1 en oscuro).
+//
+// La página NO anuncia ninguna tolerancia en %: solo «(redondea a 2 decimales)» en el caso 6.
+// El corrector aplica 0 en los casos 1-5 (exactos) y max(0,01; 1 % · K) en el 6. La app no
+// enseña la desviación al suspender («Todavía no. Despliega la solución…»), así que no hay
+// cifra de desviación que pueda mentir.
+//
+// ── LA ARITMÉTICA, HECHA A MANO ANTES DE ABRIR EL NAVEGADOR ──────────────────
+//   Caso 1 · Q = 0,4²/(1·2³) = 0,16/8 = 0,02 exacto → tolerancia 0
+//       «0,02» y «0.02» (un punto con DOS cifras solo puede ser decimal) aprueban;
+//       «0,03» y «0,01» suspenden.
+//   Caso 2 · Q = (1·1)/(0,5·0,5) = 4 exacto → «4.000» se lee 4000 o 4: la más cercana a 4 es 4 → aprueba.
+//       «3,96» (el 1 % de antes) suspende.
+//   Caso 3 · Δn = 2 − 3 = −1, ENTERO → «−1» (signo tipográfico U+2212) y «-1,0» aprueban;
+//       «-0,99» no está cerca de −1: no existe → «La respuesta es un número entero: no lleva
+//       decimales.»; «1» (el signo al revés) suspende; «1.000» se lee 1000 o 1, ninguna es −1 →
+//       suspende; «-1.000» se lee −1000 o −1 → −1 → aprueba.
+//   Caso 4 · Q = (1·1)/(1·0,5) = 2. «1» es lo que sale si se excluyen los líquidos → suspende.
+//   Caso 5 · Q = (0,2·0,1)/0,5 = 0,04 = Kc exacto → «0,05» suspende (diría que NO está en equilibrio).
+//   Caso 6 · van ’t Hoff: ln(K₂/K₁) = (88.000/8,314)·(1/298 − 1/350)
+//                       = 10.584,55617 · 0,000498561841 = 5,2770558
+//       K₂ = 0,04 · e^5,2770558 = 0,04 · 195,7926 = 7,831704 → tolerancia = 1 % = 0,078317
+//       «7.832» se lee 7832 o 7,832 → 7,832, a 0,0003 → aprueba.
+//       «7,87» (1/T a seis decimales: 0,002857 − 0,003356 = −0,000499 ⇒ ln = 5,28169 ⇒
+//       K₂ = 7,8681) está a 0,0383 → aprueba, que es para lo que existe el 1 %.
+//       Borde inferior: «7,76» (0,0717) aprueba y «7,75» (0,0817) suspende.
+//       Borde superior: «7,91» (0,0783 − 0,00002) aprueba y «7,92» (0,0883) suspende.
+//
+//   Simulador, TECLEANDO en los CampoNumerico (coma decimal):
+//     Haber-Bosch con [N₂]=1, [H₂]=2, [NH₃]=0,4 (los datos del caso 1) → Q = 0,02 → «0,0200»;
+//       Q < Kc = 0,5 ⇒ «→ Productos».
+//     PCl₅ con [PCl₅]=0,5, [PCl₃]=0,2, [Cl₂]=0,1 (los del caso 5) → Q = 0,04 = Kc → «0,0400»,
+//       «⇌ Equilibrio», y el equilibrio predicho es el mismo estado: 0,5000 / 0,2000 / 0,1000.
+//     Water-gas shift con 0,5 / 0,5 / 1 / 1 (los del caso 2) → Q = 4 → «4,0000» < Kc = 5 ⇒ «→ Productos».
+//       (1+x)/(0,5−x) = √5 = 2,2360680 ⇒ x = 0,1180340/3,2360680 = 0,0364745
+//       [CO]eq = 0,4635255 → «0,4635 mol/L» · [CO₂]eq = 1,0364745 → «1,0365 mol/L»
+//     PCl₅ tecleando «350» en la temperatura → Kc = 7,8317 (el «3» no se reescribe a 100).
+//
+// ── HALLAZGOS NUEVOS (abiertos con test.fail(): pasan a rojo el día que se reparen) ──
+//   [A] operativa/medio — con la página traducida la app CAE («Algo salió mal», NotFoundError en
+//       removeChild). `{notaKc && <> {notaKc}</>}` sigue en el mismo div del mensaje de Le
+//       Chatelier cuyas tres frases de dirección se envolvieron en <span> por C0312: subir la
+//       temperatura (o comprimir, o el catalizador) pone la nota, y cualquier perturbación de
+//       concentración la retira; con la página traducida el nodo ya es un <font>.
+//   [B] operativa/bajo — con la página traducida el veredicto se queda VIEJO: el <p role="alert">
+//       de cada caso pinta `{' '}{veredicto…}` como texto suelto junto al emoji, y al corregir de
+//       «0,05» a «0,04» el caso 5 dice «✅ Todavía no…» con el contador ya en «1 de 12» (forma C0243).
+//       La misma forma, fuera del diff, en `{accion}` del mensaje de Le Chatelier (sigue en
+//       «Reacción cargada… Pulsa una perturbación» tras añadir NH₃) y en el rótulo
+//       «Kc (a {temperaturaK} K)», que sigue en «298 K» con el campo en 348 y Kc = 0,0024.
+// ═══════════════════════════════════════════════════════════════════════════
+
+/** Traductor simulado de los testigos C0312/C0243: cada nodo de texto visible a <font><font>. */
+const traducir = async (page: Page) => {
+  await asentarAntesDeTraducir(page);
+  await page.evaluate(() => {
+    const caminante = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+      acceptNode: (n) => {
+        const padre = n.parentElement;
+        if (!padre || !(n.nodeValue ?? '').trim()) return NodeFilter.FILTER_REJECT;
+        if (/^(SCRIPT|STYLE|OPTION|NOSCRIPT|FONT)$/.test(padre.tagName)) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      },
+    });
+    const nodos: Text[] = [];
+    while (caminante.nextNode()) nodos.push(caminante.currentNode as Text);
+    for (const nodo of nodos) {
+      const exterior = document.createElement('font');
+      const interior = document.createElement('font');
+      interior.textContent = nodo.nodeValue;
+      exterior.appendChild(interior);
+      nodo.parentNode?.replaceChild(exterior, nodo);
+    }
+  });
+};
+
+/** Recoge las caídas de la página: excepciones y los NotFoundError que React deja en consola. */
+function vigilarCaidas(page: Page): string[] {
+  const errores: string[] = [];
+  page.on('pageerror', (e) => errores.push(e.message));
+  page.on('console', (m) => {
+    if (m.type() === 'error' && /NotFoundError|insertBefore|removeChild/.test(m.text())) errores.push(m.text());
+  });
+  return errores;
+}
+
+test.describe('Simulador de Equilibrio Químico · inspección de cambio 12/11/2026', () => {
+  const INPUTS_TESTIGO = ['#temperatura', '#conc-N₂', '#respuesta-caso-1'];
+
+  const caso = (page: Page, n: number) =>
+    page.locator('article').filter({ has: page.locator(`#respuesta-caso-${n}`) });
+
+  /** «Has resuelto N de 12»: el <p> entero, que con la página traducida sigue siendo el mismo nodo. */
+  const contador = (page: Page) => page.locator('p[aria-live="polite"]').filter({ hasText: 'resuelto' });
+
+  /** Escribe la respuesta, espera a que React la tenga y devuelve el aviso de ESE caso. */
+  async function corregir(page: Page, n: number, texto: string) {
+    await page.locator(`#respuesta-caso-${n}`).fill(texto);
+    await esperarValorEnReact(page, `#respuesta-caso-${n}`, texto);
+    await caso(page, n).getByRole('button', { name: 'Comprobar' }).click();
+    return caso(page, n).locator('[role="alert"]');
+  }
+
+  /** Teclea de verdad en un CampoNumerico y sale del campo, como un usuario. */
+  async function teclear(page: Page, selector: string, texto: string) {
+    await page.locator(selector).click();
+    await page.keyboard.press('Control+A');
+    await page.keyboard.type(texto);
+    await page.locator(selector).press('Tab');
+  }
+
+  test('corrector compartido · lee la coma, el punto ambiguo y el signo, y suspende lo que no es', async ({
+    page,
+  }) => {
+    await esperarHidratacion(page, INPUTS_TESTIGO);
+    const OK = '¡Correcto!';
+    const NO = 'Todavía no. Despliega la solución o vuelve a intentarlo.';
+    // [caso, lo que escribe el alumno, lo que tiene que decir el aviso] — ver la aritmética arriba
+    const filas: Array<[number, string, string]> = [
+      [1, '0,02', OK], // 0,16/8 exacto
+      [1, '0.02', OK], // un punto con dos cifras solo puede ser decimal
+      [1, '0,03', NO], // exacta: sin margen (C0267)
+      [1, '0,01', NO],
+      [2, '4.000', OK], // 4000 o 4: la más cercana a Q = 4 es 4 (C0558)
+      [2, '3,96', NO], // el 1 % de antes ya no vale en una exacta
+      [3, '−1', OK], // signo menos tipográfico U+2212
+      [3, '-1,0', OK],
+      [3, '-0,99', 'La respuesta es un número entero: no lleva decimales.'], // Δn entero (1207)
+      [3, '1', NO], // el signo al revés
+      [3, '1.000', NO], // 1000 o 1: ninguna es −1
+      [3, '-1.000', OK], // −1000 o −1 → −1
+      [4, '1', NO], // lo que da excluir los líquidos
+      [4, '2', OK],
+      [5, '0,05', NO], // diría que el sistema NO está en equilibrio
+      [5, '0,04', OK],
+      [6, '7.832', OK], // 7832 o 7,832 → 7,832, a 0,0003 de 7,831704
+      [6, '7,87', OK], // 1/T a seis decimales: a 0,0383, dentro del 1 % (0,078317)
+      [6, '7,76', OK], // a 0,0717
+      [6, '7,75', NO], // a 0,0817
+      [6, '7,91', OK], // a 0,0783 (dos cienmilésimas dentro)
+      [6, '7,92', NO], // a 0,0883
+    ];
+    for (const [n, texto, aviso] of filas) {
+      const alerta = await corregir(page, n, texto);
+      await expect(alerta, `caso ${n} «${texto}»`).toContainText(aviso);
+    }
+    // El último intento de cada caso decide el contador: 1 ✗ (0,01) · 2 ✗ (3,96) · 3 ✓ · 4 ✓ ·
+    // 5 ✓ · 6 ✗ (7,92) ⇒ 3 de 12.
+    await expect(contador(page)).toHaveText('Has resuelto 3 de 12');
+  });
+
+  test('corrector compartido · solo el caso 6 pide redondear, y es el único con margen', async ({ page }) => {
+    await esperarHidratacion(page, INPUTS_TESTIGO);
+    // La única tolerancia que la página anuncia es «(redondea a 2 decimales)», y va con el caso
+    // cuyo valor exacto (7,831704…) la necesita. Los casos 1-5 son exactos y no la llevan.
+    await expect(page.getByLabel('Valor de Kc a 350 K (redondea a 2 decimales)')).toBeVisible();
+    for (const n of [1, 2, 3, 4, 5]) {
+      await expect(caso(page, n).locator('label')).not.toContainText('redondea');
+    }
+  });
+
+  test('CampoNumerico · los datos de los casos 1, 5 y 2 tecleados con coma dan su mismo Q', async ({
+    page,
+  }) => {
+    await esperarHidratacion(page, INPUTS_TESTIGO);
+
+    // Caso 1 en el simulador: Q = 0,16/8 = 0,02 < Kc = 0,5 ⇒ hacia productos
+    await reaccion(page, /Haber-Bosch/).click();
+    await teclear(page, '#conc-N₂', '1');
+    await teclear(page, '#conc-H₂', '2');
+    await teclear(page, '#conc-NH₃', '0,4');
+    await expect(page.locator('#conc-NH₃')).toHaveValue('0,4');
+    await expect(valorDe(page, 'Q (cociente actual)')).toHaveText('0,0200');
+    await expect(valorDe(page, 'Dirección de desplazamiento')).toHaveText('→ Productos');
+
+    // Caso 5 en el simulador: Q = 0,02/0,5 = 0,04 = Kc ⇒ ya está en equilibrio y no se mueve
+    await reaccion(page, /Disociación de PCl₅/).click();
+    await teclear(page, '#conc-PCl₅', '0,5');
+    await teclear(page, '#conc-PCl₃', '0,2');
+    await teclear(page, '#conc-Cl₂', '0,1');
+    await expect(valorDe(page, 'Q (cociente actual)')).toHaveText('0,0400');
+    await expect(valorDe(page, 'Kc (a 298 K)')).toHaveText('0,0400');
+    await expect(valorDe(page, 'Dirección de desplazamiento')).toHaveText('⇌ Equilibrio');
+    await expect(valorDe(page, '[PCl₅]eq')).toHaveText('0,5000 mol/L');
+    await expect(valorDe(page, '[PCl₃]eq')).toHaveText('0,2000 mol/L');
+    await expect(valorDe(page, '[Cl₂]eq')).toHaveText('0,1000 mol/L');
+
+    // Caso 2 en el simulador: Q = 1/0,25 = 4 < Kc = 5; (1+x)/(0,5−x) = √5 ⇒ x = 0,0364745
+    await reaccion(page, /Water-gas shift/).click();
+    await teclear(page, '#conc-CO', '0,5');
+    await teclear(page, '#conc-H₂O', '0,5');
+    await teclear(page, '#conc-CO₂', '1');
+    await teclear(page, '#conc-H₂', '1');
+    await expect(valorDe(page, 'Q (cociente actual)')).toHaveText('4,0000');
+    await expect(valorDe(page, 'Dirección de desplazamiento')).toHaveText('→ Productos');
+    await expect(valorDe(page, '[CO]eq')).toHaveText('0,4635 mol/L');
+    await expect(valorDe(page, '[CO₂]eq')).toHaveText('1,0365 mol/L');
+
+    // Temperatura tecleada cifra a cifra (cabo C0311): el «3» no se reescribe a 100 bajo el cursor.
+    // ln(K₂/K₁) = 5,2770558 ⇒ K₂ = 0,04 · 195,7926 = 7,8317
+    await reaccion(page, /Disociación de PCl₅/).click();
+    await teclear(page, '#temperatura', '350');
+    await expect(page.locator('#temperatura')).toHaveValue('350');
+    await expect(valorDe(page, 'Kc (a 350 K)')).toHaveText('7,8317');
+  });
+
+  test('traducida · las frases de dirección reparadas con <span> cambian sin tumbar la app (control)', async ({
+    page,
+  }) => {
+    const errores = vigilarCaidas(page);
+    await esperarHidratacion(page, INPUTS_TESTIGO);
+    await reaccion(page, /Haber-Bosch/).click();
+    await traducir(page);
+    // equilibrio → +NH₃ (Q 0,9558 > Kc: ←) → −NH₃ (equilibrio) → −NH₃ (0,8071: Q = 0,1907 < Kc: →)
+    await page.getByRole('button', { name: '+ Añadir NH₃' }).click();
+    await page.getByRole('button', { name: '− Quitar NH₃' }).click();
+    await page.getByRole('button', { name: '− Quitar NH₃' }).click();
+    await expect(valorDe(page, 'Dirección de desplazamiento')).toHaveText('→ Productos');
+    await expect(page.getByText('Algo salió mal')).toHaveCount(0);
+    expect(errores).toEqual([]);
+  });
+
+  test('HALLAZGO [A] — traducida, retirar la nota de Kc tumba la app entera', async ({ page }) => {
+    test.fail();
+    const errores = vigilarCaidas(page);
+    await esperarHidratacion(page, INPUTS_TESTIGO);
+    await reaccion(page, /Haber-Bosch/).click();
+    // Subir T pone la nota de van ’t Hoff: `{notaKc && <> {notaKc}</>}`, texto suelto junto a hermanos
+    await page.getByRole('button', { name: /Subir T/ }).click();
+    await expect(mensaje(page)).toContainText('subir T hace DISMINUIR Kc');
+    await traducir(page);
+    // Añadir un reactivo hace setNotaKc(''): React retira un nodo de texto que ya es un <font>.
+    // Hoy: «Algo salió mal» y NotFoundError: Failed to execute 'removeChild' on 'Node'.
+    // (No se mira el texto de `accion`: con la página traducida se queda viejo, que es [B].)
+    await page.getByRole('button', { name: '+ Añadir N₂' }).click();
+    await expect(mensaje(page)).toBeVisible();
+    await expect(page.getByText('Algo salió mal')).toHaveCount(0);
+    expect(errores).toEqual([]);
+  });
+
+  test('HALLAZGO [B] — traducida, el veredicto corregido sigue diciendo «Todavía no»', async ({ page }) => {
+    test.fail();
+    await esperarHidratacion(page, INPUTS_TESTIGO);
+    // Caso 5: Q = 0,04 exacto. Primero un intento fallido, con la página aún en español.
+    await expect(await corregir(page, 5, '0,05')).toContainText('Todavía no');
+    await traducir(page);
+    // Ahora la respuesta correcta: el contador sube a 1, el emoji pasa a ✅…
+    const alerta = await corregir(page, 5, '0,04');
+    await expect(contador(page)).toHaveText('Has resuelto 1 de 12');
+    // …pero el texto del aviso es un nodo suelto junto al emoji y React escribe en el que el
+    // traductor ya retiró. Hoy se lee «✅ Todavía no. Despliega la solución o vuelve a intentarlo.»
+    await expect(alerta).toContainText('¡Correcto!');
   });
 });

@@ -1,5 +1,5 @@
 import { test, expect, Page } from '@playwright/test';
-import { esperarHidratacion, sembrarValorAcotado } from './_hidratacion';
+import { esperarHidratacion, esperarValorEnReact, sembrarValorAcotado } from './_hidratacion';
 
 /**
  * Inspector — simulador-conservacion-energia (segmento cálculo/física, riesgo 3, 285 usos)
@@ -93,8 +93,9 @@ import { esperarHidratacion, sembrarValorAcotado } from './_hidratacion';
  *       integrador, la misma del HALLAZGO C.
  *
  * ─────────────────────────────────────────────────────────────────────────────────────────
- * HALLAZGOS ABIERTOS (Inspector, 26/08/2026). Los tests del bloque final FALLAN hoy a
- * propósito: describen lo que debería ocurrir, no lo que ocurre.
+ * HALLAZGOS 357-362 (Inspector, 26/08/2026) — REPARADOS el 26/08/2026 y cerrados en la base
+ * (`npm run inspector:hallazgos -- --app simulador-conservacion-energia --todos`, 12/11/2026).
+ * Los tests del bloque «REGRESIÓN» de abajo los vigilan; ya no fallan.
  *   A · alto  (cálculo)       el tope de la pista se come la energía y la llama «disipada»
  *   B · alto  (operativa)     el deslizador de altura promete alturas que la pista no da
  *   C · bajo  (cálculo)       la deriva del integrador se presenta como energía disipada
@@ -564,6 +565,7 @@ import {
   comprobarRespuesta,
   generarEjercicioAleatorio,
 } from '../../app/simulador-conservacion-energia/casos';
+import { leerRespuestaAula } from '../../lib/calculadoras/correctorCasosAula';
 
 const A_MANO: Readonly<Record<number, number>> = {
   1: 98,
@@ -750,6 +752,65 @@ test.describe('simulador-conservacion-energia · casos para clase', () => {
     expect(sinMasa.ok).toBe(false);
     expect(sinMasa.error).toContain('masa');
   });
+
+  /*
+   * Inspector 12/11/2026 (modo cambio, diff ac046fdc..HEAD): el corrector pasó al motor
+   * compartido `lib/calculadoras/correctorCasosAula.ts` (2221d3155), con su redondeo (03ec46007,
+   * C0126), el texto de la desviación (e27fbb163, 3b92acef6) y `leerRespuestaAula` (cd6270a91,
+   * C0558). Resuelto a mano ANTES de ejecutar:
+   *
+   *   LECTURA — «d.ddd» con punto es 2,493 o 2493: se queda la lectura más cercana a la clave.
+   *     «9.899»   caso 3 (clave 9,9)  → 9899 o 9,899  → |9,899 − 9,9| = 0,001  → 9,899
+   *     «294.000» caso 4 (clave 294)  → 294000 o 294  → 294
+   *     «2.940»   caso 4 (clave 294)  → 2940 o 2,94   → |2,94 − 294| = 291,06 < |2940 − 294| = 2646 → 2,94
+   *     «97,6»    coma decimal         → 97,6, sin ambigüedad
+   *
+   *   TOLERANCIA — la página NO anuncia ningún margen (ni «1 %» ni otro): la intro de la sección
+   *     solo fija g = 9,8 y los casos de velocidad piden «Redondea a dos decimales». El corrector
+   *     da media centésima alrededor de la cifra SIN redondear cuando hay que redondear, y 0
+   *     cuando la respuesta es exacta (C0267). Coherente con lo que el enunciado pide.
+   *     caso 3 · v = √(2·9,8·5) = √98 = 9,8994949… m/s → acepta [9,8944949 ; 9,9044949]
+   *       9,895 → |9,895 − 9,8994949| = 0,0044949 ≤ 0,005 → correcto
+   *       9,894 → 0,0054949 > 0,005                       → no
+   *       9,905 → 0,0055051 > 0,005 (y redondea a 9,91)   → no
+   *
+   *   DESVIACIÓN QUE SE ENSEÑA — |respuesta − cifra sin redondear|, con los decimales pedidos y
+   *     más si a esos decimales saldría 0 (hallazgo 3369):
+   *     caso 1 (98 J exactos)   «97,1»   → 0,9     · «98,004» → 0,004
+   *     caso 9 (√48,8 = 6,98570) «6.980» → 6,98 → 0,0057 → «0,01»
+   *     caso 3 (9,8994949)       «9,81»  → 0,0894949 → «0,09»
+   */
+  test('C0558 · la lectura del punto ambiguo, la media centésima y la desviación que se enseña', async () => {
+    // El defecto que se vigila es leer mil veces de más o de menos: basta la igualdad exacta,
+    // porque Number('9.899') y el literal 9.899 son el mismo doble.
+    expect(leerRespuestaAula('9.899', 9.9)).toBe(9.899);
+    expect(leerRespuestaAula('294.000', 294)).toBe(294);
+    expect(leerRespuestaAula('2.940', 294)).toBe(2.94);
+    expect(leerRespuestaAula('97,6', 97.6)).toBe(97.6);
+
+    const caso = (id: number) => CASOS.find((c) => c.id === id)!;
+    const corrige = (texto: string, id: number) => {
+      const c = caso(id);
+      return comprobarRespuesta(leerRespuestaAula(texto, c.respuesta), c.respuesta, c.datos);
+    };
+
+    // Media centésima alrededor de √98, no alrededor de la clave ni el 1 % (±0,099).
+    expect(corrige('9.899', 3).correcto).toBe(true);
+    expect(corrige('9,895', 3).correcto).toBe(true);
+    expect(corrige('9,894', 3).correcto).toBe(false);
+    expect(corrige('9,905', 3).correcto).toBe(false);
+
+    // Respuestas exactas: margen 0.
+    expect(corrige('294.000', 4).correcto).toBe(true);
+    expect(corrige('2.940', 5).correcto).toBe(true); // caso 5: 2,94 J exactos
+
+    // La desviación que se lee es la real, con los decimales que hagan falta.
+    expect(corrige('97,1', 1).motivo).toBe('No es correcto. Te has desviado 0,9 de la respuesta.');
+    expect(corrige('98,004', 1).motivo).toBe('No es correcto. Te has desviado 0,004 de la respuesta.');
+    expect(corrige('6.980', 9).motivo).toBe('No es correcto. Te has desviado 0,01 de la respuesta.');
+    expect(corrige('9,81', 3).motivo).toBe('No es correcto. Te has desviado 0,09 de la respuesta.');
+    expect(corrige('2.940', 4).motivo).toBe('No es correcto. Te has desviado 291,06 de la respuesta.');
+  });
 });
 
 /* ───────────────────────────────────────────────────────────────────────────────────────
@@ -804,6 +865,36 @@ test.describe('simulador-conservacion-energia · la sección de casos en el nave
     await expect(verSolucion).toHaveAttribute('aria-expanded', 'false');
     await verSolucion.click();
     await expect(page.locator('[class*="casoSolucion"]')).toContainText('3 metros');
+  });
+
+  /*
+   * Inspector 12/11/2026 (modo cambio): lo mismo que el test C0558 de arriba, pero por la
+   * casilla real, que es donde `CasosAula.tsx` llama a `leerRespuestaAula(texto, clave)` y a
+   * `comprobarRespuesta(valor, clave, datos)`. Esperados resueltos a mano en ese comentario.
+   */
+  test('C0558 · la casilla lee coma, punto ambiguo y error, y dice la desviación real', async ({ page }) => {
+    await page.goto(RUTA);
+    await esperarHidratacion(page, [CAMPO]);
+
+    const TABLA: ReadonlyArray<readonly [number, string, string]> = [
+      [8, '97,6', '¡Correcto!'], // 4·9,8·3 − 20 = 97,6 J exactos, con coma
+      [3, '9,90', '¡Correcto!'], // √98 = 9,8995 → 9,90
+      [3, '9.899', '¡Correcto!'], // punto decimal latinoamericano: 9,899, no 9899
+      [5, '2.940', '¡Correcto!'], // 0,2·9,8·1,5 = 2,94 J; «2.940» se lee 2,94
+      [9, '6.980', 'No es correcto. Te has desviado 0,01 de la respuesta.'], // √48,8 = 6,9857
+      [1, '97,1', 'No es correcto. Te has desviado 0,9 de la respuesta.'], // 98 J exactos: sin margen
+      [1, '98,004', 'No es correcto. Te has desviado 0,004 de la respuesta.'], // nunca «desviado 0»
+      [3, '9,81', 'No es correcto. Te has desviado 0,09 de la respuesta.'], // dentro del 1 %, fuera del redondeo
+    ];
+    for (const [id, texto, motivo] of TABLA) {
+      await page.getByRole('button', { name: `Caso ${id}:` }).click();
+      await page.fill(CAMPO, texto);
+      await esperarValorEnReact(page, CAMPO, texto);
+      await page.getByRole('button', { name: 'Comprobar' }).click();
+      const v = veredicto(page);
+      await expect(v, `caso ${id} · «${texto}»`).toContainText(motivo);
+      if (motivo === '¡Correcto!') await expect(v, `caso ${id} · «${texto}»`).not.toContainText('No es correcto');
+    }
   });
 
   test('el simulador de arriba sigue funcionando con la sección añadida', async ({ page }) => {

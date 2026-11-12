@@ -1,5 +1,5 @@
 import { test, expect, type Page } from '@playwright/test';
-import { calcularResultado, PREGUNTAS, UMBRAL_BASICA, UMBRAL_ESTANDAR } from '../../app/selector-seguro-hogar/motor';
+import { calcularResultado, PREGUNTAS, UMBRAL_BASICA, UMBRAL_ESTANDAR, VEREDICTOS } from '../../app/selector-seguro-hogar/motor';
 
 /**
  * Asesor de Seguro de Hogar (selector-seguro-hogar) — reparado el 24/09/2026 desde una sospecha
@@ -862,5 +862,90 @@ test.describe('Re-inspección 10/10/2026 — umbrales, foco, teclado, doble toqu
       }
       expect(anomalias).toEqual([]);
     });
+  });
+});
+
+/**
+ * CABO C0202 (Inspector, 12/11/2026, Opus 5.5 en xhigh). Resto de C0011: la app orienta sobre el
+ * seguro ligado a la hipoteca y sobre cambiar de seguro, y no menciona ni el derecho a aportar otra
+ * póliza equivalente ni el preaviso para oponerse a la prórroga. Leído ANTES de abrir la app, en el
+ * texto consolidado del BOE (12/11/2026):
+ *   · Ley 5/2019, art. 17.3 (BOE-A-2019-3814): «los prestamistas o intermediarios de crédito
+ *     inmobiliario podrán exigir al prestatario la suscripción de una póliza de seguro» (en garantía
+ *     del préstamo, de daños sobre el inmueble hipotecado y los demás de la normativa del mercado
+ *     hipotecario), pero el prestamista «deberá aceptar pólizas alternativas de todos aquellos
+ *     proveedores que ofrezcan unas condiciones» y prestaciones equivalentes a la que él propone,
+ *     «tanto en la suscripción inicial como en cada una de las renovaciones»; aceptarla no puede
+ *     empeorar las condiciones del préstamo, y «no podrá cobrar comisión o gasto alguno por el
+ *     análisis de las pólizas alternativas».
+ *   · Ley 50/1980, art. 22.2 (BOE-A-1980-22501, redacción de la Ley 20/2015): «Las partes pueden
+ *     oponerse a la prórroga del contrato mediante una notificación escrita a la otra parte», el
+ *     tomador «con un plazo de, al menos, un mes de anticipación a la conclusión del período del
+ *     seguro en curso» «y de dos meses cuando sea el asegurador».
+ *
+ * Veredicto: NO es hallazgo. La app dice «El banco suele exigir un seguro mínimo» (opción de la
+ * pregunta 1) y que asegurar el continente es «obligatorio si tienes hipoteca» (guía, RD 716/2009):
+ * lo que el art. 17.3 permite exigir es una póliza, no la del banco, y la app nunca dice con quién se
+ * contrata. Sobre cambiar, aconseja revisar la póliza cada año y comparar presupuestos «antes de
+ * decidir», y nunca dice que se pueda dar de baja en cualquier momento. Su silencio no lleva a
+ * ningún error práctico. Este test fija esos textos para que una edición futura no los cambie sin
+ * mirar la norma: si un día habla de la prórroga, tiene que dar el mes de preaviso del tomador.
+ */
+test.describe('Cabo C0202 (12/11/2026) — el seguro que exige el banco y la prórroga de la póliza', () => {
+  // Propietario/a con hipoteca 3 · Estudio 0 · Menos de 10 años 0 · Menos de 10.000 € 0 · Centro urbano 2 ·
+  // Solo/a 0 · Nada valioso 0 · Agua 1 · Ninguno 0 · Precio 0 = 6 → básica.
+  const HIPOTECA_BASICA_6 = [0, 3, 0, 0, 0, 0, 0, 0, 0, 0] as const;
+  // Hipoteca 3 · Piso 1 · 10-30 años 1 · 10.000-30.000 € 2 · Centro urbano 2 · Dos personas 1 ·
+  // Nada valioso 0 · Agua 1 · Ninguno 0 · Equilibrio 1 = 12 → estándar.
+  const HIPOTECA_ESTANDAR_12 = [0, 0, 1, 1, 0, 1, 0, 0, 0, 1] as const;
+
+  /** Lo que contradiría el art. 17.3 de la Ley 5/2019 o el 22.2 de la Ley 50/1980. */
+  const CONTRADICE: [RegExp, string][] = [
+    [/(contrat|suscrib)\w*[^.]{0,40}\b(con|en|a través de) (el|tu|su|la) (banco|entidad)/i, 'que el seguro se contrata con el banco (art. 17.3: debe aceptar pólizas alternativas equivalentes)'],
+    [/(seguro|póliza) (del|de tu|de su) banco/i, 'que el seguro ha de ser el del banco (art. 17.3)'],
+    [/en cualquier momento/i, 'que la póliza se deja en cualquier momento (art. 22.2: un mes de preaviso antes del vencimiento)'],
+    [/sin (preaviso|previo aviso|avisar)/i, 'que se cambia de seguro sin preaviso (art. 22.2)'],
+    [/cuando (tú )?quieras/i, 'que se cambia de seguro cuando se quiera (art. 22.2)'],
+  ];
+
+  test('la app no dice que el seguro de la hipoteca se contrate con el banco ni que se pueda dejar sin preaviso', async ({ page }) => {
+    await page.goto('/selector-seguro-hogar/');
+    await esperarHidratacionBotones(page);
+    // La guía está en el DOM aunque plegada: textContent la lee entera.
+    const guia = ((await page.locator('[class*="guiaContainer"]').first().textContent()) ?? '').replace(/\s+/g, ' ');
+    const faq = (await page.locator('script[type="application/ld+json"]').allTextContents()).join(' ');
+
+    // Lo que dice hoy, que no contradice la norma.
+    expect(guia).toContain('obligatorio si tienes hipoteca: el Real Decreto 716/2009, art. 10, exige asegurar el inmueble contra daños por su valor de tasación, sin el suelo');
+    expect(guia).toContain('Pide varios presupuestos: directamente a aseguradoras o a través de un mediador o un comparador');
+
+    await abrirTest(page);
+    const hipoteca = page.locator('[role="radiogroup"] [role="radio"]').first();
+    await expect(hipoteca).toContainText('Propietario/a con hipoteca vigente');
+    await expect(hipoteca).toContainText('El banco suele exigir un seguro mínimo');
+    const opcionesP1 = (await page.locator('[role="radiogroup"] [role="radio"]').allInnerTexts()).join(' | ');
+
+    const basica = await responder(page, HIPOTECA_BASICA_6);
+    expect(basica).toContain('Cobertura Básica');
+    expect(basica).toContain('Tu puntuación es 6:');
+    expect(basica).toContain('Revisa la póliza anualmente — los precios y necesidades cambian');
+
+    await abrirTest(page);
+    const estandar = await responder(page, HIPOTECA_ESTANDAR_12);
+    expect(estandar).toContain('Multirriesgo Estándar');
+    expect(estandar).toContain('Tu puntuación es 12:');
+    expect(estandar).toContain('Compara al menos 3 presupuestos antes de decidir');
+
+    // Y nada de lo que la app puede decir (las tres fichas, todas las opciones, la guía, el
+    // resultado y el FAQPage) lo contradice.
+    const fichas = Object.values(VEREDICTOS)
+      .flatMap((v) => [v.descripcion, v.precioNota, ...[...v.coberturaIncluida, ...v.coberturaRecomendada, ...v.consejos].flatMap((i) => [i.texto, i.inquilino ?? ''])]);
+    const opciones = PREGUNTAS.flatMap((p) => [p.texto, ...p.opciones.flatMap((o) => [o.etiqueta, o.descripcion])]);
+    const todo = [guia, faq, opcionesP1, basica, estandar, ...fichas, ...opciones].join(' | ');
+    expect(CONTRADICE.filter(([re]) => re.test(todo)).map(([, que]) => que)).toEqual([]);
+
+    // Si un día habla de la prórroga o de la renovación, ha de dar el preaviso del tomador (art. 22.2).
+    const hablaDeProrroga = /pr[oó]rroga|oponerte|renovaci[oó]n|vencimiento/i.test(todo);
+    expect(!hablaDeProrroga || /al menos(,)? un mes|un mes de (antelaci[oó]n|anticipaci[oó]n)/i.test(todo), 'habla de la prórroga sin el mes de preaviso del art. 22.2').toBe(true);
   });
 });
