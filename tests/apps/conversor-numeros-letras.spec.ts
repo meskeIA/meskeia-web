@@ -1362,7 +1362,9 @@ test.describe('Inspección 12/11/2026 — scroll-padding global y textos condici
   });
 
   /**
-   * ABIERTO (operativa, medio) — Inspector 12/11/2026, en el mismo párrafo que 53e07954 reparó.
+   * REPARADO el 12/11/2026 (hallazgo 4552, cabo C0722): la lista de lecturas va en un <span>
+   * siempre montado, y el texto de detrás ya no es hermano de los span con clave.
+   * Era (operativa, medio) — Inspector 12/11/2026, en el mismo párrafo que 53e07954 reparó.
    * Las lecturas en voz alta salen de `resultado.orales.map(o => <span key={o}>…</span>)`, y
    * detrás va un texto suelto hermano: «. Es lectura del registro oral: …». Cada número nuevo trae
    * lecturas nuevas, es decir CLAVES nuevas: React retira los span viejos e inserta los nuevos con
@@ -1374,8 +1376,7 @@ test.describe('Inspección 12/11/2026 — scroll-padding global y textos condici
    * .map dentro de un <span> siempre montado, o el texto final en su propio <span>.
    * Control: sin traducir, el mismo cambio no da ningún error (primer caso de este bloque).
    */
-  test('ABIERTO (operativa, medio) · traducida, cambiar el número suelto con lectura en voz alta no tumba la app', async ({ page }) => {
-    test.fail();
+  test('4552 · traducida, cambiar el número suelto con lectura en voz alta no tumba la app', async ({ page }) => {
     const errores = vigilarCaidas(page);
     await page.getByRole('button', { name: /Número suelto/ }).click();
     await escribir(page, '3,45');
@@ -1389,6 +1390,39 @@ test.describe('Inspección 12/11/2026 — scroll-padding global y textos condici
     await expect(page.locator('p[aria-live="polite"]')).toHaveText('tres con cuarenta y seis centésimas');
     await expect(panel(page)).toContainText('«tres coma cuarenta y seis»');
     await expect(panel(page)).toContainText('«tres coma cuatro seis»');
+    // Y vuelta a una sola lectura (3,4567) y a dos (3,4): las tres transiciones del hallazgo
+    await page.locator('#cantidad').fill('3,4567');
+    await expect(panel(page)).toContainText('«tres coma cuatro cinco seis siete»');
+    await page.locator('#cantidad').fill('3,4');
+    await page.waitForTimeout(300);
+    expect(errores).toEqual([]);
+    await expect(page.getByText('Algo salió mal')).toHaveCount(0);
+  });
+
+  /**
+   * Cabo C0243 (nota del Inspector del 12/11/2026): con la página traducida, al cambiar «£1.500»
+   * por «$1.500» el aviso de moneda seguía diciendo «“£” indica la libra…»: el símbolo y el nombre
+   * son nodos de texto entre otros en el mismo <p>, y React escribía en los que el traductor ya
+   * había cambiado por <font>. Ahora el párrafo lleva key con sus variables y se crea nuevo. Igual
+   * la fórmula «Páguese por este … la cantidad de …», que se quedaba con la cantidad anterior.
+   * Control: sin la key del aviso, el primer expect lee «£» indica la libra.
+   */
+  test('C0243 · traducida, el aviso de moneda y la fórmula del documento siguen a lo escrito', async ({ page }) => {
+    const errores = vigilarCaidas(page);
+    await escribir(page, '£1.500');
+    await page.locator('#moneda').selectOption('EUR');
+    const avisoTexto = panel(page).locator('[role="status"] p').first();
+    await expect(avisoTexto).toContainText('indica la libra');
+    await traducir(page);
+    await page.locator('#cantidad').fill('$1.500');
+    await expect(avisoTexto).toContainText('«$» puede ser el peso o el dólar');
+    await expect(avisoTexto).not.toContainText('libra');
+    const documento = panel(page).locator('p', { hasText: 'En un documento' });
+    await expect(documento).toContainText('la cantidad de mil quinientos euros»');
+    await page.locator('#cantidad').fill('$2.000');
+    await expect(documento).toContainText('la cantidad de dos mil euros»');
+    await expect(documento).not.toContainText('quinientos');
+    expect(errores).toEqual([]);
   });
 
   test.describe('en móvil (390×844, táctil)', () => {

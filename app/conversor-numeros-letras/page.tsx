@@ -390,7 +390,10 @@ export default function ConversorNumerosLetrasPage() {
 
             {/* La moneda escrita junto a la cifra: elegida, contradicha o sobrante (1540) */}
             {textosFuera.length > 0 && modo === 'numero' && (
-              <p className={styles.nota} role="status">
+              /* Los párrafos con variables entre su texto llevan key con ellas (cabo C0243, receta de
+                 contador-silabas): con la página traducida, React escribía en nodos de texto que el
+                 traductor ya había cambiado por <font> y en pantalla seguía el texto anterior. */
+              <p className={styles.nota} role="status" key={`fuera|${citar(textosFuera)}`}>
                 En «Número suelto» no se escribe la moneda: {citar(textosFuera)}{' '}
                 {textosFuera.length > 1 ? 'se han dejado' : 'se ha dejado'} fuera. Para
                 escribirla, elige «Importe con moneda».
@@ -398,7 +401,7 @@ export default function ConversorNumerosLetrasPage() {
             )}
             {monedaNacional && !marca && modo === 'importe' && moneda.codigo !== 'MXN' && (
               <div className={styles.aviso} role="status">
-                <p className={styles.avisoTexto}>
+                <p className={styles.avisoTexto} key={`nacional|${monedaNacional}`}>
                   «{monedaNacional}» (moneda nacional) no dice cuál es la moneda, y el texto sale
                   en <strong>{moneda.plural}</strong>, la moneda elegida. Se usa sobre todo en los
                   importes de México; si es otra, elígela en «Moneda».
@@ -418,20 +421,24 @@ export default function ConversorNumerosLetrasPage() {
               </div>
             )}
             {marca && modo === 'importe' && marcaCuadra && monedaPorMarca === moneda.codigo && (
-              <p className={styles.nota} role="status">
+              <p className={styles.nota} role="status" key={`elegida|${citar(marca.textos)}|${moneda.codigo}`}>
                 Moneda elegida por {citar(marca.textos)}: {moneda.singular} ({moneda.zona}). Si no
                 es la tuya, cámbiala en «Moneda».
               </p>
             )}
             {marca && modo === 'importe' && !marcaCuadra && (
               <div className={styles.aviso} role="status">
-                <p className={styles.avisoTexto}>
+                <p
+                  className={styles.avisoTexto}
+                  key={`marca|${citar(marca.textos)}|${nombresMarca}|${moneda.codigo}|${monedaDeLaMarca?.codigo ?? ''}`}
+                >
                   {citar(marca.textos)} {monedaDeLaMarca || !nombresMarca.includes(' o ') ? 'indica' : 'puede ser'}{' '}
                   {nombresMarca}, pero el texto sale en <strong>{moneda.plural}</strong>, la moneda
                   elegida.<span>{monedaDeLaMarca ? '' : ' Elige la tuya en «Moneda».'}</span>
                 </p>
                 {monedaDeLaMarca && (
                   <button
+                    key={monedaDeLaMarca.codigo}
                     type="button"
                     className={styles.avisoBtn}
                     onClick={() => {
@@ -463,6 +470,7 @@ export default function ConversorNumerosLetrasPage() {
                   <strong>{alternativa.texto}</strong>.
                 </p>
                 <button
+                  key={alternativa.texto}
                   type="button"
                   className={styles.desambiguacionBtn}
                   onClick={() => setEntrada(`${lectura.antes}${alternativa.texto}${lectura.despues}`)}
@@ -476,7 +484,7 @@ export default function ConversorNumerosLetrasPage() {
             {modo === 'importe' && (
               <p className={styles.resultadoDocumento}>
                 <span aria-hidden="true">📄</span> En un documento:{' '}
-                <em>
+                <em key={`${moneda.codigo}|${resultado.texto}`}>
                   «Páguese por este {moneda.codigo === 'EUR' ? 'pagaré' : 'documento'} la cantidad de{' '}
                   {resultado.texto}»
                 </em>
@@ -485,12 +493,17 @@ export default function ConversorNumerosLetrasPage() {
             {modo === 'numero' && resultado.orales && resultado.orales.length > 0 && (
               <p className={styles.resultadoDocumento}>
                 <span aria-hidden="true">🗣️</span> En voz alta también se dice{' '}
-                {resultado.orales.map((o, i) => (
-                  <span key={o}>
-                    <span>{i > 0 ? ' o ' : ''}</span>
-                    <em>«{o}»</em>
-                  </span>
-                ))}
+                {/* Hallazgo 4552 (C0722): la lista va en un span siempre montado. Suelta, cada
+                    número nuevo trae claves nuevas y React insertaba los span delante de «. Es
+                    lectura…», que con la página traducida ya era un <font>: NotFoundError. */}
+                <span>
+                  {resultado.orales.map((o, i) => (
+                    <span key={o}>
+                      <span>{i > 0 ? ' o ' : ''}</span>
+                      <em>«{o}»</em>
+                    </span>
+                  ))}
+                </span>
                 . Es lectura del registro oral: el Diccionario panhispánico de dudas no la
                 considera apropiada en documentos técnicos, administrativos o contables.
               </p>
