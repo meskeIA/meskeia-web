@@ -192,6 +192,29 @@ const CASOS: Caso[] = [
     },
   },
   {
+    // Cabo C0722 (12/11/2026): la forma de 4552 en un .map con key (redondeos.map seguido del
+    // «.» suelto). A mano: 139,5 → 140 (un redondeo); 129,5/84,4 → 130/84 (dos redondeos).
+    // Control: sin el span que envuelve la lista, el segundo redondeo tumba la app.
+    slug: 'orientador-tension-arterial',
+    descripcion: 'de un redondeo a dos: entra un elemento del .map delante del punto final',
+    preparar: async (page) => {
+      const sis = page.locator('#sistolica');
+      await hidratado(sis);
+      await sis.fill('139.5');
+      await page.locator('#diastolica').fill('85');
+      await page.getByRole('button', { name: 'Calcular', exact: true }).click();
+      const nota = page.locator('[class*="resultadoRedondeo"]');
+      await expect(nota).toContainText('sistólica 139,5 → 140');
+      return async () => {
+        await sis.fill('129.5');
+        await page.locator('#diastolica').fill('84.4');
+        await page.getByRole('button', { name: 'Calcular', exact: true }).click();
+        await expect.poll(() => textoDe(nota)).toContain('sistólica 129,5 → 130 · diastólica 84,4 → 84');
+        expect(await textoDe(nota)).not.toContain('139,5');
+      };
+    },
+  },
+  {
     slug: 'visualizador-volumenes',
     descripcion: 'de un número largo con cortes a uno corto: retira los trozos y cambia la cifra',
     preparar: async (page) => {

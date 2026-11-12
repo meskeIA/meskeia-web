@@ -1381,12 +1381,17 @@ export default function SimuladorAutomatasFinitos() {
                 ) : (
                   <span key="rama-3">
                     Se fusionan{' '}
-                    {minimizacion.fusionados.map((g, i) => (
-                      <span key={i}>
-                        <span>{i > 0 && ', '}</span>
-                        <code>{`{${g.join(',')}}`}</code>
-                      </span>
-                    ))}
+                    {/* En un span siempre montado (cabo C0722, la forma del hallazgo 4552): suelta,
+                        un grupo más se insertaba delante de «. El autómata…», que con la página
+                        traducida ya es un <font>. */}
+                    <span>
+                      {minimizacion.fusionados.map((g, i) => (
+                        <span key={i}>
+                          <span>{i > 0 && ', '}</span>
+                          <code>{`{${g.join(',')}}`}</code>
+                        </span>
+                      ))}
+                    </span>
                     . El autómata mínimo tiene{' '}
                     <strong>{contar(minimizacion.automata.estados.length, 'estado', 'estados')}</strong>.
                   </span>

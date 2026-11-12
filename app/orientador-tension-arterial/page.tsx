@@ -154,12 +154,17 @@ function Resultado({ lectura, recomendacionRef }: ResultadoProps) {
       {redondeos.length > 0 && (
         <p className={styles.resultadoRedondeo}>
           La guía define sus cortes en valores enteros, así que se ha redondeado al más próximo:{' '}
-          {redondeos.map((r, i) => (
-            <span key={r.campo}>
-              <span>{i > 0 ? ' · ' : ''}</span>
-              {r.campo} {formatNumber(r.tecleado, r.decimales)} → <strong>{r.usado}</strong>
-            </span>
-          ))}
+          {/* La lista va en un span siempre montado (cabo C0722, la forma del hallazgo 4552): suelta,
+              un redondeo nuevo se insertaba delante del «.», que con la página traducida ya es un
+              <font>, y la app caía. Cada redondeo, con key por sus cifras, para que no quede viejo. */}
+          <span>
+            {redondeos.map((r, i) => (
+              <span key={`${r.campo}|${r.tecleado}|${r.usado}`}>
+                <span>{i > 0 ? ' · ' : ''}</span>
+                {r.campo} {formatNumber(r.tecleado, r.decimales)} → <strong>{r.usado}</strong>
+              </span>
+            ))}
+          </span>
           .
         </p>
       )}
