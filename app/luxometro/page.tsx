@@ -5,7 +5,8 @@ import styles from './Luxometro.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, EducationalSection, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 import DataReference from '@/components/DataReference';
-import { FAQ_PRECISION } from './faq';
+import { FAQ_PRECISION, FAQ_LUMENES } from './faq';
+import ConversorLumenes from './ConversorLumenes';
 import {
   ILUMINACION_RD486_META,
   ILUMINACION_EN12464_META,
@@ -736,6 +737,9 @@ export default function LuxometroPage() {
             ))}
           </div>
         </div>
+
+        {/* De lux a lúmenes y candelas (S0270): solo recibe lux si el medidor está calibrado */}
+        <ConversorLumenes luxMedidor={lux} />
       </main>
 
       {/* Aviso de privacidad */}
@@ -936,6 +940,10 @@ export default function LuxometroPage() {
           <li className={styles.faqItem}>
             <h3>{FAQ_PRECISION.pregunta}</h3>
             <p>{FAQ_PRECISION.respuesta}</p>
+          </li>
+          <li className={styles.faqItem}>
+            <h3>{FAQ_LUMENES.pregunta}</h3>
+            <p>{FAQ_LUMENES.respuesta}</p>
           </li>
           <li className={styles.faqItem}>
             <h3>¿Qué diferencia hay entre lux, lumen y candela?</h3>

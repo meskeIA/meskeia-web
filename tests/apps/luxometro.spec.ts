@@ -1004,12 +1004,11 @@ test.describe('Cabo C0688 — la guía promete un EV que la app no muestra en ni
     expect(promete && !muestra, `la guía promete el EV: ${promete} · la pantalla lo muestra: ${muestra}`).toBe(false);
   });
 
-  test('HALLAZGO (09/11/2026, ABIERTO) · el featureList del JSON-LD WebApplication está vacío (§1.ter pide de 4 a 8)', async ({
+  test('HALLAZGO 4354 (09/11/2026, REPARADO el 12/11/2026) · el featureList del JSON-LD WebApplication está vacío (§1.ter pide de 4 a 8)', async ({
     page,
   }) => {
-    // ABIERTO (cabo C0688): `features: []` en metadata.ts, así que el JSON-LD sale con
-    // «featureList: []». Medido en el HTML servido el 09/11/2026.
-    test.fail();
+    // Era `features: []` en metadata.ts (cabo C0688), así que el JSON-LD salía con
+    // «featureList: []». Se rellenó con 7 características al añadir el bloque de lúmenes (S0270).
     await page.goto('/luxometro/');
     const caracteristicas = await page.evaluate(() => {
       for (const s of Array.from(document.querySelectorAll('script[type="application/ld+json"]'))) {
@@ -1021,5 +1020,89 @@ test.describe('Cabo C0688 — la guía promete un EV que la app no muestra en ni
       return -1;
     });
     expect(caracteristicas).toBeGreaterThanOrEqual(4);
+  });
+});
+
+/**
+ * ── De lux a lúmenes y candelas (S0270, 12/11/2026) ──
+ *
+ * Este bloque sí tiene inputs en el DOM desde la carga, así que aquí vale el helper canónico
+ * `esperarHidratacion` (lo que dice `esperarBotonVivo` sobre «ni un input al cargar» era cierto
+ * hasta este día). El cálculo vive en lib/calculadoras/luxLumenes.ts, con sus casos de motor en
+ * tests/lux-lumenes-motor.spec.ts; aquí se comprueba que la vista los pinta y lee bien.
+ *
+ * Casos resueltos a mano (I = E·d² · Ω = 2π(1 − cos θ/2) · Φ = I·Ω · alcance = 2·√I), con los
+ * decimales de la vista (0 desde 100, 1 desde 10, 2 por debajo):
+ *
+ *   1.000 lx · 1 m · 10°   → 1000 cd · Ω = 0,023910 → 23,91 lm → «≈ 23,9 lm» · 2·31,62 → «63,2 m»
+ *   800 lm · 2 m · 120°    → Ω = π → 254,65 cd → «255 cd» · 254,65/4 = 63,66 → «≈ 63,7 lx»
+ *                            · 2·√254,65 = 31,92 → «31,9 m»
+ *   «1.500» lx · 1 m       → 1500 lux (formato español) → «1500 cd»
+ *   distancia 0            → aviso, ninguna cifra
+ *   calibrado a 500 lux    → aparece «Usar la lectura del medidor (500 lux)» y rellena 500
+ */
+test.describe('De lux a lúmenes y candelas (S0270)', () => {
+  const bloque = (page: Page): Locator => page.getByRole('region', { name: 'De lux a lúmenes y candelas' });
+  const resultado = (page: Page): Locator => bloque(page).getByRole('status');
+
+  async function abrirBloque(page: Page): Promise<void> {
+    await page.goto('/luxometro/');
+    await esperarHidratacion(page, ['#lumenes-lux', '#lumenes-distancia', '#lumenes-angulo']);
+  }
+
+  async function escribir(page: Page, selector: string, valor: string): Promise<void> {
+    await page.locator(selector).fill(valor);
+    await esperarValorEnReact(page, selector, valor);
+  }
+
+  test('CASO 7 · linterna: 1.000 lx a 1 m con haz de 10° → 1000 cd, ≈ 23,9 lm, alcance 63,2 m', async ({ page }) => {
+    await abrirBloque(page);
+    await expect(resultado(page)).toContainText('Escribe los lux');
+    await escribir(page, '#lumenes-lux', '1000');
+    await bloque(page).getByRole('button', { name: 'Linterna enfocada (10°)' }).click();
+    await expect(bloque(page).getByRole('button', { name: 'Linterna enfocada (10°)' })).toHaveAttribute('aria-pressed', 'true');
+    await expect(resultado(page)).toContainText('1000 cd');
+    await expect(resultado(page)).toContainText('≈ 23,9 lm');
+    await expect(resultado(page)).toContainText('63,2 m');
+  });
+
+  test('CASO 8 · al revés: 800 lm con haz de 120° a 2 m → 255 cd, ≈ 63,7 lx, alcance 31,9 m', async ({ page }) => {
+    await abrirBloque(page);
+    await bloque(page).getByRole('button', { name: 'Tengo los lúmenes, quiero los lux' }).click();
+    await esperarHidratacion(page, ['#lumenes-lm']);
+    await escribir(page, '#lumenes-lm', '800');
+    await escribir(page, '#lumenes-distancia', '2');
+    await bloque(page).getByRole('button', { name: 'Panel o tira LED (120°)' }).click();
+    await expect(resultado(page)).toContainText('255 cd');
+    await expect(resultado(page)).toContainText('≈ 63,7 lx');
+    await expect(resultado(page)).toContainText('31,9 m');
+    await expect(resultado(page)).not.toContainText(' lm');
+  });
+
+  test('CASO 9 · lee el formato español y avisa de una distancia imposible', async ({ page }) => {
+    await abrirBloque(page);
+    await escribir(page, '#lumenes-lux', '1.500');
+    await expect(resultado(page)).toContainText('1500 cd');
+    await escribir(page, '#lumenes-distancia', '0');
+    await expect(resultado(page)).toContainText('La distancia tiene que ser un número mayor que 0.');
+    await expect(resultado(page)).not.toContainText(' cd');
+  });
+
+  test('CASO 10 · sin calibrar no ofrece la lectura del medidor; calibrado a 500 lux, sí', async ({ page }) => {
+    await camaraDeLuminancia(page, 'rgb(128,128,128)');
+    await abrirYMedir(page);
+    const usar = bloque(page).getByRole('button', { name: /Usar la lectura del medidor/ });
+    await expect(usar).toHaveCount(0);
+
+    await page.getByTitle('Calibrar').click();
+    await esperarHidratacion(page, [CALIBRACION]);
+    await page.locator(CALIBRACION).fill('500');
+    await esperarValorEnReact(page, CALIBRACION, '500');
+    await page.getByRole('button', { name: 'Calibrar', exact: true }).click();
+    await expect(usar).toHaveText('Usar la lectura del medidor (500 lux)');
+    await usar.click();
+    await expect(page.locator('#lumenes-lux')).toHaveValue('500');
+    // 500 lx a 1 m: 500 cd, con cualquier ángulo
+    await expect(resultado(page)).toContainText('500 cd');
   });
 });

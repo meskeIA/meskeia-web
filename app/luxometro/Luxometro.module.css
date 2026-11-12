@@ -1051,3 +1051,174 @@
     padding: 0.5rem 0.6rem;
   }
 }
+
+/* ===== De lux a lúmenes y candelas (S0270) ===== */
+
+.lumenesPanel {
+  background: var(--bg-card);
+  border-radius: var(--radius-large);
+  padding: var(--spacing-xl);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+}
+
+.lumenesIntro {
+  margin: 0 0 var(--spacing-lg);
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.lumenesModos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-lg);
+}
+
+.lumenesModo {
+  flex: 1 1 220px;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.lumenesModo:hover {
+  border-color: var(--primary);
+}
+
+.lumenesModoActivo,
+.lumenesModoActivo:hover {
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
+  color: white;
+}
+
+.lumenesCampos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+}
+
+.lumenesCampo {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.lumenesUsarLectura {
+  align-self: flex-start;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--hover);
+  color: var(--primary-texto);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.lumenesUsarLectura:hover {
+  border-color: var(--primary);
+}
+
+.lumenesAngulos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-lg);
+}
+
+.lumenesAngulo {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: var(--hover);
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.lumenesAngulo:hover {
+  border-color: var(--primary);
+}
+
+.lumenesAnguloActivo,
+.lumenesAnguloActivo:hover {
+  background: var(--primary-boton);
+  border-color: var(--primary-boton);
+  color: white;
+}
+
+.lumenesModo:focus-visible,
+.lumenesUsarLectura:focus-visible,
+.lumenesAngulo:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
+}
+
+.lumenesResultado {
+  margin-bottom: var(--spacing-lg);
+}
+
+.lumenesEspera {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+}
+
+.lumenesError {
+  margin: 0;
+  padding: var(--spacing-md);
+  border-radius: var(--radius);
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+[data-theme='dark'] .lumenesError {
+  background: #450a0a;
+  color: #fecaca;
+}
+
+.lumenesTarjetas {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--spacing-md);
+}
+
+.lumenesTarjeta {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-md);
+  border-radius: var(--radius);
+  background: var(--hover);
+  text-align: center;
+}
+
+.lumenesEtiqueta {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.lumenesValor {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+@media (max-width: 768px) {
+  .lumenesPanel {
+    padding: var(--spacing-lg);
+  }
+
+  .lumenesTarjetas {
+    grid-template-columns: 1fr;
+  }
+}

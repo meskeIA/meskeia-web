@@ -1,11 +1,11 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
-import { FAQ_PRECISION } from './faq';
+import { FAQ_PRECISION, FAQ_LUMENES } from './faq';
 
 export const metadata: Metadata = {
   title: 'Luxómetro Online - Mide la Intensidad de Luz con tu Móvil o Celular | meskeIA',
-  description: 'Estima la luz de una escena con la cámara trasera de tu móvil o celular: nivel relativo, y lux si lo calibras con un luxómetro de referencia. Para fotógrafos, con recomendaciones de ISO, apertura y velocidad.',
-  keywords: 'luxometro, luxometro celular, fotometro, medir luz, intensidad luminosa, lux, luxometro movil, fotografia, exposicion, iso, apertura, velocidad obturacion, iluminacion',
+  description: 'Estima la luz de una escena con la cámara trasera de tu móvil o celular: nivel relativo, y lux si lo calibras con un luxómetro de referencia. Convierte lux en candelas y lúmenes aproximados, y recomienda ISO, apertura y velocidad.',
+  keywords: 'luxometro, luxometro celular, fotometro, medir luz, lux a lumenes, medir lumenes, candelas, intensidad luminosa, lux, luxometro movil, fotografia, exposicion, iso, apertura, velocidad obturacion, iluminacion',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
   publisher: 'meskeIA',
@@ -38,10 +38,18 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: "Luxómetro / Fotómetro",
-  description: "Estima la luz de una escena con la cámara de tu dispositivo. Publica un nivel relativo y, una vez calibrada con un luxómetro de referencia, la lectura en lux. Para fotógrafos, con recomendaciones de ISO, apertura y velocidad.",
+  description: "Estima la luz de una escena con la cámara de tu dispositivo. Publica un nivel relativo y, una vez calibrada con un luxómetro de referencia, la lectura en lux. Convierte lux en candelas y lúmenes aproximados con la distancia y el ángulo del haz. Para fotógrafos, con recomendaciones de ISO, apertura y velocidad.",
   url: "https://meskeia.com/luxometro/",
   category: 'UtilityApplication',
-  features: [],
+  features: [
+    'Nivel de luz relativo con la cámara trasera del móvil',
+    'Lectura en lux tras calibrar con un luxómetro de referencia',
+    'Conversión de lux a candelas y lúmenes aproximados según la distancia y el ángulo del haz',
+    'Cálculo inverso: lux que da una bombilla o linterna a una distancia a partir de sus lúmenes',
+    'Alcance de una linterna según el estándar ANSI/PLATO FL1',
+    'Recomendaciones de ISO, apertura y velocidad según los lux',
+    'Niveles mínimos de iluminación en el trabajo (RD 486/1997 y EN 12464-1)',
+  ],
 });
 
 export const faqJsonLd = {
@@ -67,6 +75,11 @@ export const faqJsonLd = {
       '@type': 'Question',
       name: '¿Cómo se usan los lux para ajustar los parámetros de una cámara fotográfica?',
       acceptedAnswer: { '@type': 'Answer', text: 'Conociendo los lux ambientales puedes estimar la exposición adecuada. Con poca luz (menos de 200 lux) conviene subir el ISO (800-3200), abrir el diafragma (f/1,8-f/2,8) y reducir la velocidad de obturación. Con luz abundante (más de 10.000 lux) se puede usar ISO 100, diafragma cerrado (f/8-f/11) y velocidades rápidas (1/500-1/2000 s). La relación entre lux y EV (valor de exposición) permite calcular la configuración óptima.' },
+    },
+    {
+      '@type': 'Question',
+      name: FAQ_LUMENES.pregunta,
+      acceptedAnswer: { '@type': 'Answer', text: FAQ_LUMENES.respuesta },
     },
     {
       '@type': 'Question',
