@@ -1993,7 +1993,8 @@ test.describe('re-inspección 12/11/2026 · casos para clase, lógica', () => {
   });
 });
 
-// HALLAZGO (cálculo, medio) — ABIERTO, re-inspección del 12/11/2026. `leerRespuestaAula`
+// HALLAZGO 4557 (cálculo, medio) — REPARADO el 12/11/2026 en el corrector compartido (cabo C0724):
+// la lectura decimal solo gana si además queda cerca de la respuesta. Re-inspección del 12/11/2026. `leerRespuestaAula`
 // (C0558, cd6270a91) elige entre «X.YYY» como millar y como decimal la lectura MÁS CERCANA a la
 // respuesta, también cuando ninguna de las dos es correcta. Así, una respuesta equivocada escrita
 // con punto de millares se lee mil veces más pequeña: el alumno que comete justo el error que el
@@ -2007,8 +2008,8 @@ test.describe('re-inspección 12/11/2026 · casos para clase, lógica', () => {
 //   caso 6 · «1.847» = 1847 mL; con r = 7: π·49·12 = 1.847,26 mL → esperado el mismo aviso ·
 //            obtenido «Te has desviado 459,96 mL» (= 461,81 − 1,847).
 // Sin punto («33510», «1847») o con decimales («1.847,26») el aviso sale bien.
-test.describe('re-inspección 12/11/2026 · hallazgo abierto del corrector', () => {
-  test.fail('ABIERTO · «33.510» y «1.847» (diámetro como radio, con punto de millares) reciben su aviso', async ({
+test.describe('re-inspección 12/11/2026 · hallazgo del corrector (4557)', () => {
+  test('REPARADO · «33.510» y «1.847» (diámetro como radio, con punto de millares) reciben su aviso', async ({
     page,
   }) => {
     expect(await corregirCaso(page, 8, '33510')).toContain('diámetro como si fuera el radio');

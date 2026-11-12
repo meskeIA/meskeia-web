@@ -435,6 +435,22 @@ test.describe('leerRespuestaAula', () => {
     }
   });
 
+  /*
+   * Hallazgo 4557 (visualizador-volumenes) y cabo C0724, 12/11/2026. Valores a mano: el caso 8
+   * espera 4188,79 L (r = 1 m); con el diámetro como radio sale 33.510,32 L, y quien lo escribe
+   * «33.510» tiene que leerse 33510 para que salte el aviso del diámetro, no 33,51 (que está a
+   * 4155 de la respuesta). Igual el caso 6: 459,96 mL, y con el diámetro 1.847,26 mL.
+   * simulador-mas-resorte, caso 4: «3.158» para 316 se desvía 2842, no 312,84.
+   */
+  test('4557 — una respuesta equivocada con punto de millares conserva su lectura española', () => {
+    expect(leerRespuestaAula('33.510', 4188.79)).toBe(33510);
+    expect(leerRespuestaAula('1.847', 459.96)).toBe(1847);
+    expect(leerRespuestaAula('3.158', 316)).toBe(3158);
+    // Si la lectura decimal está cerca, aunque no apruebe, sigue ganando: es la que quiso escribir.
+    expect(leerRespuestaAula('2.490', 2.493)).toBe(2.49);
+    expect(leerRespuestaAula('1.700', 1.2)).toBe(1.7); // a media unidad, el suelo de la banda
+  });
+
   test('sin una respuesta esperada que sea número, no adivina', () => {
     expect(leerRespuestaAula('2.493', NaN)).toBe(2493);
     expect(leerRespuestaAula('2.493', Infinity)).toBe(2493);

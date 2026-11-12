@@ -225,6 +225,13 @@ function mayuscula(texto: string): string {
  * Lo que se acepta a cambio: «1.500» para 1,5 se aprueba, porque la notación es ambigua de verdad.
  *
  * `check:respuesta-aula` rompe el build si un `CasosAula.tsx` vuelve a leer con `parseSpanishNumber`.
+ *
+ * ⚠️ 12/11/2026 (hallazgo 4557 de visualizador-volumenes, cabo C0724) — la lectura decimal solo
+ * gana si además queda CERCA de la respuesta (`BANDA_LECTURA_DECIMAL`). Antes ganaba la más cercana
+ * aunque las dos estuvieran lejos, así que una respuesta EQUIVOCADA con punto de millares se leía
+ * mil veces más pequeña: «33.510» L (el diámetro usado como radio, 8 veces la respuesta 4188,79)
+ * pasaba a 33,51, el aviso del error típico no salía y la desviación enseñada era de otro número.
+ * Cuando ninguna lectura es buena, manda la convención del sitio, que es la española.
  */
 export function leerRespuestaAula(texto: string, esperado: number): number {
   const leido = parseSpanishNumber(texto);
@@ -237,8 +244,20 @@ export function leerRespuestaAula(texto: string, esperado: number): number {
     .replace(/^[+-]/, '');
   if (!/^[1-9]\d{0,2}\.\d{3}$/.test(cuerpo)) return leido;
   const decimal = Math.sign(leido) * Number(cuerpo);
-  return Math.abs(decimal - esperado) < Math.abs(leido - esperado) ? decimal : leido;
+  const distanciaDecimal = Math.abs(decimal - esperado);
+  const cerca = distanciaDecimal <= Math.max(0.5, Math.abs(esperado) * BANDA_LECTURA_DECIMAL);
+  return cerca && distanciaDecimal < Math.abs(leido - esperado) ? decimal : leido;
 }
+
+/**
+ * Hasta dónde puede quedar la lectura decimal de «X.YYY» de la respuesta para preferirla a la
+ * española: el 10 % del valor, o media unidad si eso es menos. Es más ancha que cualquier
+ * tolerancia del catálogo (el 1 % relativo, o media unidad del último decimal pedido, que con
+ * una respuesta de 1 o más no pasa de 0,5), así que una lectura decimal que APRUEBA sigue
+ * aprobando; y más estrecha que los errores de concepto que los casos buscan (radio por
+ * diámetro, ×2 a ×8; unidades, ×1000), que se leen entonces en español y conservan su aviso.
+ */
+const BANDA_LECTURA_DECIMAL = 0.1;
 
 /* ─────────────────────────────── Corrector ─────────────────────────────── */
 
