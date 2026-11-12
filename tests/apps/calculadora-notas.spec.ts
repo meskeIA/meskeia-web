@@ -88,8 +88,9 @@ import { contrasteSobreFondoReal } from './_contraste';
  *        hallazgo 177 retiró del motor, y escribe «0.2» con punto.
  *     C. Con una suspensa, la media incluye la suspensa sin decirlo, cuando la FAQ (RD 1125/2003,
  *        art. 5.3) y el bloque «Errores frecuentes» dicen que el expediente solo cuenta las superadas.
- *     D. Diez iconos de tarjeta (escenarioIcon, tipIcono), la ⭐ de «Fase Específica» y el «+» de
- *        «Añadir materia específica» siguen sin aria-hidden: C0661 solo buscaba eduEscenarioIcon.
+ *     D. (REPARADO el 12/11/2026, hallazgo 4556) Diez iconos de tarjeta (escenarioIcon, tipIcono),
+ *        la ⭐ de «Fase Específica» y el «+» de «Añadir materia específica» iban sin aria-hidden:
+ *        C0661 solo buscaba eduEscenarioIcon.
  */
 
 const RUTA = '/calculadora-notas/';
@@ -684,7 +685,9 @@ test.describe('Inspección de cambio 12/11/2026 — abiertos en el resto de lo t
     expect(await panel(page)).toContain('8,00');
   });
 
-  test('ABIERTO D (inspector 12/11/2026) — los iconos de tarjeta, la ⭐ y el «+» no se leen', async ({
+  // REPARADO el 12/11/2026 (hallazgo 4556, cabo C0723): aria-hidden en los diez iconos de tarjeta,
+  // la ⭐ y el «+».
+  test('4556 D (inspector 12/11/2026) — los iconos de tarjeta, la ⭐ y el «+» no se leen', async ({
     page,
   }) => {
     // 9b86f89d (C0661) puso aria-hidden al ⚠️ de warningIcono, pero el detector buscaba
@@ -692,7 +695,6 @@ test.describe('Inspección de cambio 12/11/2026 — abiertos en el resto de lo t
     // diez siguen leyéndose («📚Estudiante de Bachillerato»). Igual la ⭐ del <h3> «Fase
     // Específica (Voluntaria)» y el «+» de «Añadir materia específica», en la línea a la que
     // aced16e6 añadió type="button" (el «+» de «Añadir asignatura» sí lo lleva).
-    test.fail();
     const iconos = await page.evaluate(() =>
       Array.from(
         document.querySelectorAll('span[class*="escenarioIcon"], span[class*="tipIcono"], span[class*="warningIcono"]'),

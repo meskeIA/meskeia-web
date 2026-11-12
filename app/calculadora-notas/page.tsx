@@ -763,7 +763,7 @@ export default function CalculadoraNotasPage() {
             {/* Fase Específica */}
             <div className={styles.evauSection}>
               <h3 className={styles.evauSectionTitle}>
-                <span>⭐</span> Fase Específica (Voluntaria)
+                <span aria-hidden="true">⭐</span> Fase Específica (Voluntaria)
               </h3>
               <p className={styles.evauInfo}>
                 Hasta 4 exámenes para subir nota. Las 2 mejores notas (≥5) ponderan ×0.2
@@ -803,7 +803,7 @@ export default function CalculadoraNotasPage() {
 
               {asignaturasEspecificas.length < 4 && (
                 <button type="button" className={styles.btnAnadir} onClick={agregarEspecifica}>
-                  <span>+</span> Añadir materia específica
+                  <span aria-hidden="true">+</span> Añadir materia específica
                 </button>
               )}
             </div>
@@ -1119,7 +1119,7 @@ export default function CalculadoraNotasPage() {
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>📚</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">📚</span>
               <strong>Estudiante de Bachillerato</strong>
             </div>
             <p>Calcula tu nota media ponderada de todos los trimestres para saber si alcanzas el aprobado o si necesitas mejorar en asignaturas específicas antes de los exámenes finales.</p>
@@ -1127,7 +1127,7 @@ export default function CalculadoraNotasPage() {
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>🎓</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🎓</span>
               <strong>Universitario</strong>
             </div>
             <p>Calcula tu expediente académico (media ponderada por créditos ECTS) para valorar si optas a una beca, un máster competitivo o unas prácticas con requisito de nota mínima.</p>
@@ -1135,7 +1135,7 @@ export default function CalculadoraNotasPage() {
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>🧮</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🧮</span>
               <strong>Preparando oposiciones</strong>
             </div>
             <p>Muchas oposiciones tienen baremos que incluyen el expediente académico. Conoce tu nota exacta para saber cuántos puntos aporta tu expediente al total de la oposición.</p>
@@ -1143,7 +1143,7 @@ export default function CalculadoraNotasPage() {
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>📋</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">📋</span>
               <strong>Padres / Tutores</strong>
             </div>
             <p>Supervisa el rendimiento académico de tus hijos calculando la media trimestral y anual por asignatura para identificar materias que necesitan refuerzo antes de las evaluaciones.</p>
@@ -1196,32 +1196,32 @@ export default function CalculadoraNotasPage() {
         {/* 5. TIPS GRID */}
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcono}>⚖️</span>
+            <span className={styles.tipIcono} aria-hidden="true">⚖️</span>
             <strong>Peso ≠ Dificultad</strong>
             <p>Una asignatura difícil pero con pocos créditos impacta menos en tu media que una fácil con muchos. Enfoca el esfuerzo donde el retorno es mayor.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcono}>📈</span>
+            <span className={styles.tipIcono} aria-hidden="true">📈</span>
             <strong>Mejora incremental</strong>
             <p>Subir de 6 a 7 en una asignatura de 6 ECTS mejora tu media en +0,25 puntos (en un año de 24 ECTS). Cada décima cuenta en expedientes competitivos.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcono}>🎯</span>
+            <span className={styles.tipIcono} aria-hidden="true">🎯</span>
             <strong>Nota objetivo</strong>
             <p>Define tu nota objetivo antes de empezar el curso (ej: 7,0 para beca, 8,5 para máster). Calcula qué nota necesitas en cada asignatura para alcanzarla.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcono}>📅</span>
+            <span className={styles.tipIcono} aria-hidden="true">📅</span>
             <strong>Seguimiento trimestral</strong>
             <p>No esperes al final del año para calcular tu media. Calcula la media parcial tras cada evaluación para detectar y corregir desviaciones a tiempo.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcono}>🔄</span>
+            <span className={styles.tipIcono} aria-hidden="true">🔄</span>
             <strong>Recuperaciones</strong>
             <p>En muchos centros, una recuperación aprobada con un 5 cuenta como 5 aunque el original fuera un 3. Considera si compensa el esfuerzo en función del peso de la asignatura.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcono}>📋</span>
+            <span className={styles.tipIcono} aria-hidden="true">📋</span>
             <strong>Guarda tu expediente</strong>
             <p>Anota todas las notas en una hoja de cálculo personal. Muchas universidades tardan meses en actualizar el expediente oficial y puedes necesitar la media antes.</p>
           </div>
