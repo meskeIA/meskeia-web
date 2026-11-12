@@ -1,11 +1,16 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
 
+// «guitarra» al frente del título (12/11/2026): en Bing, «afinador de guitarra online» y sus
+// variantes suman ~5.000 impresiones en 6 meses, y en Google la página tuvo UNA impresión con
+// «guitarra» en 90 días (posición 16) pese a que la guitarra es el instrumento que sale
+// seleccionado al abrir. «afinador cromático» se queda: trae 1.781 impresiones en posición 8,7.
+// Es la excepción de S0084 (vatios en ciclismo), no una campaña de títulos.
 const DESCRIPCION =
-  'Afinador cromático online gratuito para guitarra, bajo, violín, viola, ukelele, bandurria, laúd, vihuela, trompeta, clarinete, saxo, flauta y piano. Con los instrumentos transpositores te dice además qué nota estás leyendo tú.';
+  'Afinador de guitarra online y afinador cromático gratuito: guitarra, bajo, violín, viola, ukelele, bandurria, laúd, vihuela, trompeta, clarinete, saxo, flauta y piano. Con los transpositores te dice además qué nota estás leyendo tú.';
 
 export const metadata: Metadata = {
-  title: 'Afinador Cromático Online Gratis: Cuerda y Viento | meskeIA',
+  title: 'Afinador de Guitarra Online y Afinador Cromático Gratis | meskeIA',
   description: DESCRIPCION,
   keywords:
     'afinador online, afinador cromático, afinador gratis, afinador de instrumentos, afinador guitarra, afinador bajo, afinador violín, afinador viola, afinador ukelele, afinador bandurria, afinador laúd, afinador vihuela, afinador trompeta, afinador clarinete, afinador saxo, afinador flauta, afinador piano, instrumentos transpositores, tuner online, afinar instrumento',
@@ -15,8 +20,8 @@ export const metadata: Metadata = {
   robots: 'index, follow',
   openGraph: {
     type: 'website',
-    title: 'Afinador Cromático Online Gratis: Cuerda y Viento',
-    description: 'Afina guitarra, bandurria, trompeta, clarinete o saxo. Con los transpositores, también la nota que lees tú.',
+    title: 'Afinador de Guitarra Online y Afinador Cromático Gratis',
+    description: 'Afina la guitarra, el bajo, el ukelele, el violín o la trompeta con el micrófono. Con los transpositores, también la nota que lees tú.',
     url: 'https://meskeia.com/afinador-instrumentos/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -29,14 +34,14 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Afinador Cromático Online Gratis: Cuerda y Viento',
-    description: 'Afina guitarra, bandurria, trompeta, clarinete o saxo. Con los transpositores, también la nota que lees tú.',
+    title: 'Afinador de Guitarra Online y Afinador Cromático Gratis',
+    description: 'Afina la guitarra, el bajo, el ukelele, el violín o la trompeta con el micrófono. Con los transpositores, también la nota que lees tú.',
     images: ['https://meskeia.com/og-image.png']
   },
 };
 
 export const jsonLd = generateWebAppSchema({
-  name: "Afinador de Instrumentos",
+  name: "Afinador de Guitarra y Cromático",
   description: DESCRIPCION,
   url: "https://meskeia.com/afinador-instrumentos/",
   category: 'EducationalApplication',

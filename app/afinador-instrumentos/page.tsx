@@ -190,10 +190,10 @@ export default function AfinadorInstrumentosPage() {
       <MeskeiaLogo />
 
       <header className={styles.hero}>
-        <h1 className={styles.title}>Afinador de Instrumentos</h1>
+        <h1 className={styles.title}>Afinador de Guitarra y Cromático</h1>
         <p className={styles.subtitle}>
-          Afinador cromático de cuerda, viento y tecla. Con los instrumentos transpositores
-          te dice también qué nota estás leyendo tú
+          Afina la guitarra, que viene seleccionada, o cualquier instrumento de cuerda, viento y
+          tecla. Con los instrumentos transpositores te dice también qué nota estás leyendo tú
         </p>
       </header>
 

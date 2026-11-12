@@ -190,7 +190,8 @@ test.describe('Instrumentos transpositores', () => {
 test.describe('Lo que la página promete', () => {
   test('el subtítulo anuncia las tres familias y la traducción', async ({ page }) => {
     await page.goto(RUTA);
-    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Afinador de Instrumentos');
+    // H1 renombrado el 12/11/2026 para nombrar la búsqueda «afinador de guitarra»
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Afinador de Guitarra y Cromático');
     await expect(page.getByText(/cuerda, viento y tecla/i)).toBeVisible();
   });
 
