@@ -725,3 +725,26 @@ test.describe('Cabo C0679 — «demuestran» de Stanford y la moneda «matemáti
     expect(texto).not.toContain('Estudios de la Universidad de Stanford');
   });
 });
+
+/*
+ * Cabo C0716 (12/11/2026). El CASO 3 («…el foco sigue en el botón y otro Enter lanza otra vez»)
+ * salía rojo 1 de cada 6 veces. No era el test: con reloj REAL, tras lanzar con Enter el foco cae
+ * a <body> las 5 veces de 5 (el botón se deshabilita en el vuelo y Chrome le quita el foco); con
+ * page.clock el salto de 1.501 ms a veces llegaba antes de que Chrome lo retirara y el caso
+ * pasaba. La app devuelve ahora el foco al botón al aterrizar si lo tenía al lanzar. Aquí, con el
+ * reloj de verdad y sin forzar la moneda. Control: sin la devolución, el foco está en BODY.
+ */
+test.describe('Cabo C0716 — el foco vuelve a «Lanzar Moneda» al aterrizar (reloj real)', () => {
+  test('tres lanzamientos con Enter seguidos, sin volver a enfocar: el foco sigue en el botón', async ({ page }) => {
+    test.setTimeout(30_000);
+    await page.goto(RUTA);
+    await esperarBotonHidratado(page);
+    await botonLanzar(page).focus();
+    for (let i = 1; i <= 3; i++) {
+      await page.keyboard.press('Enter');
+      await expect(page.getByRole('button', { name: 'Lanzando...' })).toBeDisabled();
+      await expect(botonLanzar(page), `lanzamiento ${i}: al aterrizar, el foco vuelve al botón`).toBeFocused({ timeout: 4000 });
+    }
+    await expect(page.locator('[class*="distributionLabels"] span').nth(1)).toHaveText('Total: 3 lanzamientos');
+  });
+});

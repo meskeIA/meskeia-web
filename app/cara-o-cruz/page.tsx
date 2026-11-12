@@ -1,7 +1,7 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import styles from './CaraOCruz.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 import { formatPercentage } from '@/lib';
@@ -37,6 +37,16 @@ export default function CaraOCruzPage() {
   const [animando, setAnimando] = useState(false);
   const [resultadoActual, setResultadoActual] = useState<Resultado | null>(null);
   const [mostrandoResultado, setMostrandoResultado] = useState(false);
+  // Cabo C0716 (12/11/2026): el botón se deshabilita durante el vuelo y Chrome le quita el foco,
+  // que cae a <body>: quien lanzaba con Enter perdía su sitio y el siguiente Tab empezaba arriba
+  // (medido con reloj real: 5 de 5). Si el botón tenía el foco al lanzar, se le devuelve al aterrizar.
+  const botonLanzar = useRef<HTMLButtonElement>(null);
+  const devolverFoco = useRef(false);
+  useEffect(() => {
+    if (animando || !devolverFoco.current) return;
+    devolverFoco.current = false;
+    botonLanzar.current?.focus({ preventScroll: true });
+  }, [animando]);
 
   // Calcular estadísticas
   const calcularEstadisticas = useCallback((lanzamientos: Lanzamiento[]): Estadisticas => {
@@ -93,6 +103,7 @@ export default function CaraOCruzPage() {
   const lanzarMoneda = useCallback(() => {
     if (animando) return;
 
+    devolverFoco.current = document.activeElement === botonLanzar.current;
     setAnimando(true);
     setMostrandoResultado(false);
 
@@ -170,6 +181,7 @@ export default function CaraOCruzPage() {
 
           {/* Botón lanzar */}
           <button type="button"
+            ref={botonLanzar}
             onClick={lanzarMoneda}
             disabled={animando}
             className={styles.btnLanzar}
