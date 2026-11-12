@@ -768,7 +768,7 @@ export default function CalculadoraMedicamentosMascotasPage() {
         {/* Warning Box */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <strong>Errores peligrosos en la desparasitación de mascotas</strong>
           </div>
           <ul className={styles.warningList}>

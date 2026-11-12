@@ -1028,7 +1028,7 @@ Total real con opción compra: ~26.200 € (vs 35.000 contado)</code>
         {/* WARNING BOX */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <h3>Errores frecuentes al comprar un vehículo que cuestan miles de euros</h3>
           </div>
           <ul className={styles.warningList}>

@@ -872,7 +872,7 @@ export default function CalculadoraInversionesPage() {
           <div className={styles.eduEscenariosGrid}>
             <div className={styles.eduEscenarioCard}>
               <div className={styles.eduEscenarioHeader}>
-                <span className={styles.eduEscenarioIcon}>🌱</span>
+                <span className={styles.eduEscenarioIcon} aria-hidden="true">🌱</span>
                 <h3>Primer inversor</h3>
               </div>
               <div className={styles.eduEscenarioExample}>
@@ -888,7 +888,7 @@ export default function CalculadoraInversionesPage() {
 
             <div className={styles.eduEscenarioCard}>
               <div className={styles.eduEscenarioHeader}>
-                <span className={styles.eduEscenarioIcon}>🎯</span>
+                <span className={styles.eduEscenarioIcon} aria-hidden="true">🎯</span>
                 <h3>Inversor intermedio</h3>
               </div>
               <div className={styles.eduEscenarioExample}>
@@ -904,7 +904,7 @@ export default function CalculadoraInversionesPage() {
 
             <div className={styles.eduEscenarioCard}>
               <div className={styles.eduEscenarioHeader}>
-                <span className={styles.eduEscenarioIcon}>🚀</span>
+                <span className={styles.eduEscenarioIcon} aria-hidden="true">🚀</span>
                 <h3>Inversor avanzado</h3>
               </div>
               <div className={styles.eduEscenarioExample}>
@@ -920,7 +920,7 @@ export default function CalculadoraInversionesPage() {
 
             <div className={styles.eduEscenarioCard}>
               <div className={styles.eduEscenarioHeader}>
-                <span className={styles.eduEscenarioIcon}>🛡️</span>
+                <span className={styles.eduEscenarioIcon} aria-hidden="true">🛡️</span>
                 <h3>Jubilado / Preservación</h3>
               </div>
               <div className={styles.eduEscenarioExample}>
@@ -1127,7 +1127,7 @@ export default function CalculadoraInversionesPage() {
           <h2>6 Principios del Inversor Pasivo Exitoso</h2>
           <div className={styles.eduTipsGrid}>
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcon}>🌍</span>
+              <span className={styles.eduTipIcon} aria-hidden="true">🌍</span>
               <h3>Diversifica por activo y geografía</h3>
               <p>
                 Un ETF global cubre 1.500+ empresas de 23 países. No concentres en España,
@@ -1136,7 +1136,7 @@ export default function CalculadoraInversionesPage() {
             </div>
 
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcon}>🔄</span>
+              <span className={styles.eduTipIcon} aria-hidden="true">🔄</span>
               <h3>Rebalancea una vez al año</h3>
               <p>
                 El rebalanceo anual fuerza a comprar barato y vender caro sistemáticamente.
@@ -1145,7 +1145,7 @@ export default function CalculadoraInversionesPage() {
             </div>
 
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcon}>💸</span>
+              <span className={styles.eduTipIcon} aria-hidden="true">💸</span>
               <h3>Minimiza el TER total</h3>
               <p>
                 El coste total de tu cartera debería ser inferior al 0,3% anual. Cada 0,1%
@@ -1154,7 +1154,7 @@ export default function CalculadoraInversionesPage() {
             </div>
 
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcon}>📅</span>
+              <span className={styles.eduTipIcon} aria-hidden="true">📅</span>
               <h3>No persigas rentabilidades pasadas</h3>
               <p>
                 El fondo más rentable del año pasado raramente repite. Mantén tu estrategia
@@ -1163,7 +1163,7 @@ export default function CalculadoraInversionesPage() {
             </div>
 
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcon}>🏦</span>
+              <span className={styles.eduTipIcon} aria-hidden="true">🏦</span>
               <h3>Separa objetivos por horizonte</h3>
               <p>
                 Corto plazo (1–3 años) → liquidez/RF. Medio plazo (3–7 años) → mixto.
@@ -1172,7 +1172,7 @@ export default function CalculadoraInversionesPage() {
             </div>
 
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcon}>🧘</span>
+              <span className={styles.eduTipIcon} aria-hidden="true">🧘</span>
               <h3>Ignora el ruido del mercado</h3>
               <p>
                 Las noticias económicas diarias son ruido para el inversor a largo plazo.

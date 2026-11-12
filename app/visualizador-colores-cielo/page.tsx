@@ -587,7 +587,7 @@ export default function VisualizadorColoresCielo() {
 
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <strong>Errores frecuentes</strong>
           </div>
           <ul className={styles.warningList}>

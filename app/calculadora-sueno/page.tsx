@@ -380,7 +380,7 @@ export default function CalculadoraSuenoPage() {
 
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <strong>Errores que arruinan la calidad de tu sueño</strong>
           </div>
           <ul className={styles.warningList}>

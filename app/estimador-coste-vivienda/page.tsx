@@ -608,7 +608,7 @@ export default function CalculadoraCosteViviendaPage() {
           <div className={styles.eduEscenariosGrid}>
             <div className={styles.eduEscenarioCard}>
               <div className={styles.eduEscenarioHeader}>
-                <span className={styles.eduEscenarioIcon}>🎓</span>
+                <span className={styles.eduEscenarioIcon} aria-hidden="true">🎓</span>
                 <h4>Joven comprador — 30 años</h4>
               </div>
               <p className={styles.eduEscenarioExample}>
@@ -618,7 +618,7 @@ export default function CalculadoraCosteViviendaPage() {
             </div>
             <div className={styles.eduEscenarioCard}>
               <div className={styles.eduEscenarioHeader}>
-                <span className={styles.eduEscenarioIcon}>👨‍👩‍👧</span>
+                <span className={styles.eduEscenarioIcon} aria-hidden="true">👨‍👩‍👧</span>
                 <h4>Familia — Sin hipoteca</h4>
               </div>
               <p className={styles.eduEscenarioExample}>
@@ -628,7 +628,7 @@ export default function CalculadoraCosteViviendaPage() {
             </div>
             <div className={styles.eduEscenarioCard}>
               <div className={styles.eduEscenarioHeader}>
-                <span className={styles.eduEscenarioIcon}>🏖️</span>
+                <span className={styles.eduEscenarioIcon} aria-hidden="true">🏖️</span>
                 <h4>Segunda residencia — Costa</h4>
               </div>
               <p className={styles.eduEscenarioExample}>
@@ -638,7 +638,7 @@ export default function CalculadoraCosteViviendaPage() {
             </div>
             <div className={styles.eduEscenarioCard}>
               <div className={styles.eduEscenarioHeader}>
-                <span className={styles.eduEscenarioIcon}>🏙️</span>
+                <span className={styles.eduEscenarioIcon} aria-hidden="true">🏙️</span>
                 <h4>Propietario inversor — Alquiler</h4>
               </div>
               <p className={styles.eduEscenarioExample}>
@@ -751,32 +751,32 @@ export default function CalculadoraCosteViviendaPage() {
           <h3><span aria-hidden="true">⚡</span> 6 Hábitos del Propietario Inteligente</h3>
           <div className={styles.eduTipsGrid}>
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcon}>🔍</span>
+              <span className={styles.eduTipIcon} aria-hidden="true">🔍</span>
               <h4>Compara seguros cada año</h4>
               <p>Dedica 30 minutos al año a comparar seguros de hogar y vida. El ahorro potencial es de 50-150 €/año sin reducir cobertura.</p>
             </div>
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcon}>💰</span>
+              <span className={styles.eduTipIcon} aria-hidden="true">💰</span>
               <h4>Fondo de reserva del 1%</h4>
               <p>Aparta mensualmente el 1% anual del valor del inmueble. Una caldera nueva cuesta 2.000-4.000 €. Con el fondo, no te pilla por sorpresa.</p>
             </div>
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcon}>⚡</span>
+              <span className={styles.eduTipIcon} aria-hidden="true">⚡</span>
               <h4>Revisa la potencia eléctrica</h4>
               <p>Si nunca saltan los plomos, tienes potencia de sobra. Reducirla cuesta 0 € y puede ahorrarte 100-200 €/año en el término fijo.</p>
             </div>
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcon}>🔧</span>
+              <span className={styles.eduTipIcon} aria-hidden="true">🔧</span>
               <h4>Mantenimiento preventivo</h4>
               <p>Revisar la caldera cuesta 80 €. Una avería de caldera sin mantenimiento puede costar 1.500-3.000 €. El mantenimiento preventivo siempre sale más barato.</p>
             </div>
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcon}>📞</span>
+              <span className={styles.eduTipIcon} aria-hidden="true">📞</span>
               <h4>Negocia cada 18 meses</h4>
               <p>Alarma, fibra y gas tienen tarifas para nuevos clientes mejores que las de fidelización. Amenaza con irse o cámbiate realmente: el ahorro acumulado es significativo.</p>
             </div>
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcon}>🌡️</span>
+              <span className={styles.eduTipIcon} aria-hidden="true">🌡️</span>
               <h4>Mejora el aislamiento</h4>
               <p>Sellar ventanas con burletes y colocar film solar puede ahorrar 10-15% en climatización sin obras. Las subvenciones del PREE pueden financiar mejoras más profundas.</p>
             </div>

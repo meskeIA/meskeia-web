@@ -448,22 +448,22 @@ export default function PaisesDelMundoPage() {
           <h3><span aria-hidden="true">🎯</span> ¿Para Qué Necesitas Conocer los Países del Mundo?</h3>
           <div className={styles.eduEscenariosGrid}>
             <div className={styles.eduEscenarioCard}>
-              <span className={styles.eduEscenarioIcon}>🎓</span>
+              <span className={styles.eduEscenarioIcon} aria-hidden="true">🎓</span>
               <h4>Estudios de Geografía</h4>
               <p>Preparar exámenes, proyectos escolares y concursos de cultura general. Conocer capitales, banderas, idiomas y datos clave de cada país del mundo.</p>
             </div>
             <div className={styles.eduEscenarioCard}>
-              <span className={styles.eduEscenarioIcon}>✈️</span>
+              <span className={styles.eduEscenarioIcon} aria-hidden="true">✈️</span>
               <h4>Viajes Internacionales</h4>
               <p>Antes de viajar: prefijo telefónico, moneda local, zona horaria, idioma oficial, dominio de internet (.es, .fr...) y ubicación en el mapa para planificar tu ruta.</p>
             </div>
             <div className={styles.eduEscenarioCard}>
-              <span className={styles.eduEscenarioIcon}>🌐</span>
+              <span className={styles.eduEscenarioIcon} aria-hidden="true">🌐</span>
               <h4>Geopolítica y Negocios</h4>
               <p>Identificar mercados emergentes, entender relaciones entre países vecinos, analizar bloques económicos (UE, ASEAN, Mercosur) y evaluar riesgos geopolíticos.</p>
             </div>
             <div className={styles.eduEscenarioCard}>
-              <span className={styles.eduEscenarioIcon}>📚</span>
+              <span className={styles.eduEscenarioIcon} aria-hidden="true">📚</span>
               <h4>Educación Escolar</h4>
               <p>Herramienta ideal para docentes y estudiantes de primaria a bachillerato. Busca cualquier país y obtén sus datos básicos de forma rápida y fiable para trabajos y presentaciones.</p>
             </div>
@@ -560,32 +560,32 @@ export default function PaisesDelMundoPage() {
           <h3><span aria-hidden="true">💡</span> Claves para Estudiar Geografía Política</h3>
           <div className={styles.eduTipsGrid}>
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcon}>🗺️</span>
+              <span className={styles.eduTipIcon} aria-hidden="true">🗺️</span>
               <h4>Usa mapas físicos y políticos</h4>
               <p>Los mapas físicos (relieve, ríos, costas) explican por qué las fronteras están donde están. Las cordilleras y los ríos son las fronteras naturales más antiguas del mundo.</p>
             </div>
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcon}>📰</span>
+              <span className={styles.eduTipIcon} aria-hidden="true">📰</span>
               <h4>Sigue noticias internacionales</h4>
               <p>La geografía cobra vida con la actualidad. El conflicto en Ucrania, las tensiones en el Mar de China o las elecciones en África son geografía política en tiempo real.</p>
             </div>
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcon}>🔢</span>
+              <span className={styles.eduTipIcon} aria-hidden="true">🔢</span>
               <h4>Aprende las capitales por regiones</h4>
               <p>Es más fácil memorizar capitales agrupando por región: los países del Golfo Pérsico, los bálticos, los andinos. Los patrones regionales facilitan la memorización.</p>
             </div>
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcon}>🏳️</span>
+              <span className={styles.eduTipIcon} aria-hidden="true">🏳️</span>
               <h4>Las banderas cuentan historias</h4>
               <p>Los colores panafricanos (rojo-amarillo-verde), los símbolos islámicos (media luna), las cruces nórdicas o las estrellas del Pacífico revelan la historia e identidad de cada nación.</p>
             </div>
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcon}>📊</span>
+              <span className={styles.eduTipIcon} aria-hidden="true">📊</span>
               <h4>Compara datos entre países similares</h4>
               <p>Comparar Portugal con España, Argentina con Brasil, o Corea del Norte con Corea del Sur es más revelador que estudiar un país aislado. El contraste ilumina factores clave.</p>
             </div>
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcon}>🌍</span>
+              <span className={styles.eduTipIcon} aria-hidden="true">🌍</span>
               <h4>Distingue idiomas de lenguas francas</h4>
               <p>El inglés es lengua oficial en 67 países, el francés en 29, el árabe en 26, el español en 21. Un idioma «oficial» no siempre es el más hablado en casa por la población.</p>
             </div>
@@ -876,7 +876,7 @@ export default function PaisesDelMundoPage() {
         <section>
           <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
-              <span className={styles.warningIcon}>⚠️</span>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               <strong>6 Confusiones Geográficas Muy Frecuentes</strong>
             </div>
             <ul className={styles.warningList}>

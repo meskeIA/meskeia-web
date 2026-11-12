@@ -538,7 +538,7 @@ export default function ContadorPalabrasPage() {
 
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <strong>Errores comunes al contar palabras</strong>
           </div>
           <ul className={styles.warningList}>

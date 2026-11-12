@@ -910,7 +910,7 @@ export default function ConversorIEEE754Page() {
         {/* 6. Warning box */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <strong>Errores que Causan Bugs Difíciles de Detectar</strong>
           </div>
           <ul className={styles.warningList}>

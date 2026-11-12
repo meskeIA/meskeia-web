@@ -1101,7 +1101,7 @@ export default function CalculadoraDistribucionesPage() {
           {/* 6. Warning Box */}
           <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
-              <span className={styles.warningIcon}>⚠️</span>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               <h3>Errores que invalidan el análisis estadístico</h3>
             </div>
             <ul className={styles.warningList}>

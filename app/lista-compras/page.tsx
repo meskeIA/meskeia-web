@@ -723,7 +723,7 @@ export default function ListaComprasPage() {
         <section>
           <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
-              <span className={styles.warningIcon}>⚠️</span>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               <strong>6 errores que te hacen gastar más sin darte cuenta</strong>
             </div>
             <ul className={styles.warningList}>

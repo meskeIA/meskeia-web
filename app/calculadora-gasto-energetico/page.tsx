@@ -1043,7 +1043,7 @@ export default function CalculadoraGastoEnergeticoPage() {
         <section className={styles.guideSection}>
           <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
-              <span className={styles.warningIcon}>⚠️</span>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               <h3>6 Errores que Disparan tu Factura de Luz</h3>
             </div>
             <ul className={styles.warningList}>
