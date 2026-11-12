@@ -41,7 +41,7 @@ export const jsonLd = generateWebAppSchema({
     '4 programas predefinidos clásicos',
     'Estados iniciales y finales configurables',
     'Velocidad ajustable y modo paso a paso',
-    'Métricas: pasos, símbolos escritos, ACEPTADO/RECHAZADO',
+    'Métricas: pasos, celdas modificadas, movimientos del cabezal y ACEPTADO/RECHAZADO',
     'En español',
   ],
   keywords: ['máquina de Turing', 'computabilidad', 'autómatas', 'teoría computación'],

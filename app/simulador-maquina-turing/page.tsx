@@ -282,7 +282,8 @@ export default function SimuladorMaquinaTuring() {
   const [velocidad, setVelocidad] = useState<number>(600);
   const [estadoFinalInputDraft, setEstadoFinalInputDraft] = useState<string>('');
 
-  const intervaloRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  // Temporizador del paso siguiente en ejecución continua (un setTimeout por paso, hallazgo 4545)
+  const intervaloRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const detenidoRef = useRef<boolean>(false);
 
   // Cargar un programa predefinido
@@ -305,7 +306,7 @@ export default function SimuladorMaquinaTuring() {
     setCeldaEscrita(null);
     setEstadoEjecucion('detenida');
     if (intervaloRef.current) {
-      clearInterval(intervaloRef.current);
+      clearTimeout(intervaloRef.current);
       intervaloRef.current = null;
     }
   }, []);
@@ -313,7 +314,7 @@ export default function SimuladorMaquinaTuring() {
   // Reiniciar (sin cambiar reglas)
   const reiniciar = useCallback(() => {
     if (intervaloRef.current) {
-      clearInterval(intervaloRef.current);
+      clearTimeout(intervaloRef.current);
       intervaloRef.current = null;
     }
     detenidoRef.current = true;
@@ -379,7 +380,7 @@ export default function SimuladorMaquinaTuring() {
     if (estadoEjecucion === 'ejecutando') {
       // pausar
       if (intervaloRef.current) {
-        clearInterval(intervaloRef.current);
+        clearTimeout(intervaloRef.current);
         intervaloRef.current = null;
       }
       setEstadoEjecucion('pausada');
@@ -400,22 +401,28 @@ export default function SimuladorMaquinaTuring() {
   useEffect(() => {
     if (estadoEjecucion !== 'ejecutando') {
       if (intervaloRef.current) {
-        clearInterval(intervaloRef.current);
+        clearTimeout(intervaloRef.current);
         intervaloRef.current = null;
       }
       return;
     }
     detenidoRef.current = false;
-    intervaloRef.current = setInterval(() => {
-      const continuar = paso();
-      if (!continuar && intervaloRef.current) {
-        clearInterval(intervaloRef.current);
-        intervaloRef.current = null;
-      }
+    /*
+     * Hallazgo 4545 (12/11/2026, REPARADO): aquí había un setInterval que se recreaba en cada
+     * paso (el efecto depende de `paso`), y el viejo solo se limpiaba en el efecto pasivo, tras
+     * el commit. A «Sin pausa» (10 ms) con la CPU lenta, el viejo volvía a disparar con su
+     * cierre viejo: la cinta salía igual, pero los contadores con setter funcional (pasos,
+     * celdas, movimientos, origen de la cinta) sumaban dos veces. Ahora es un setTimeout de UN
+     * disparo: el siguiente paso solo se programa cuando el anterior ya está pintado, así que
+     * nunca hay dos temporizadores vivos con el mismo estado.
+     */
+    intervaloRef.current = setTimeout(() => {
+      intervaloRef.current = null;
+      paso();
     }, velocidad);
     return () => {
       if (intervaloRef.current) {
-        clearInterval(intervaloRef.current);
+        clearTimeout(intervaloRef.current);
         intervaloRef.current = null;
       }
     };
@@ -425,7 +432,7 @@ export default function SimuladorMaquinaTuring() {
   useEffect(() => {
     return () => {
       if (intervaloRef.current) {
-        clearInterval(intervaloRef.current);
+        clearTimeout(intervaloRef.current);
       }
     };
   }, []);
@@ -855,7 +862,9 @@ export default function SimuladorMaquinaTuring() {
           <button
             type="button"
             className={styles.btnGhost}
-            onClick={() => setVelocidad((v) => Math.max(100, v - 200))}
+            // El suelo es el del deslizador: con 100 fijo, desde «Sin pausa» la pausa se
+            // multiplicaba por diez y nunca se llegaba a ella (hallazgo 4546).
+            onClick={() => setVelocidad((v) => Math.max(VELOCIDAD_MIN, v - 200))}
           >
             Acelerar
           </button>

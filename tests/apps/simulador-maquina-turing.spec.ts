@@ -562,17 +562,16 @@ test.describe('Inspector 12/11/2026 · lo cambiado desde el 25/08', () => {
   });
 
   /**
-   * HALLAZGO (12/11/2026, ABIERTO) · «Acelerar» desde «Sin pausa» RALENTIZA.
+   * HALLAZGO (12/11/2026, REPARADO) · «Acelerar» desde «Sin pausa» RALENTIZA.
    *
    * El diff bajó el mínimo del deslizador a VELOCIDAD_MIN = 10 ms, pero el botón sigue con
    * `Math.max(100, v - 200)`: desde 10 ms lo lleva a 100 ms (diez veces más lento), y desde
    * 600 ms se queda en 100 sin llegar nunca a «Sin pausa». Esperado: acelerar no aumenta
    * nunca la pausa; desde el mínimo se queda en el mínimo.
    */
-  test('HALLAZGO (12/11/2026, ABIERTO) · «Acelerar» desde «Sin pausa» no aumenta la pausa', async ({
+  test('HALLAZGO (12/11/2026, REPARADO) · «Acelerar» desde «Sin pausa» no aumenta la pausa', async ({
     page,
-  }) => {
-    test.fail();
+  }) => {
     await esperarHidratada(page);
     await ponerSinPausa(page);
     await page.getByRole('button', { name: 'Acelerar', exact: true }).click();
@@ -581,7 +580,7 @@ test.describe('Inspector 12/11/2026 · lo cambiado desde el 25/08', () => {
   });
 
   /**
-   * HALLAZGO (12/11/2026, ABIERTO) · a «Sin pausa» con la CPU frenada, los contadores cuentan
+   * HALLAZGO (12/11/2026, REPARADO) · a «Sin pausa» con la CPU frenada, los contadores cuentan
    * transiciones de más y los índices de la cinta se corren.
    *
    * El intervalo se vuelve a crear en cada paso (el efecto depende de `paso`, que cambia con
@@ -593,10 +592,9 @@ test.describe('Inspector 12/11/2026 · lo cambiado desde el 25/08', () => {
    * cabezal pintaba el índice 5 en vez del 6; a ×6, 34 en una de tres; el bucle de abajo a ×4,
    * 1013 pasos con el cabezal en el 1012. A 100 ms (el mínimo anterior) no se alcanzaba.
    */
-  test('HALLAZGO (12/11/2026, ABIERTO) · «Sin pausa» con la CPU frenada no cuenta pasos de más', async ({
+  test('HALLAZGO (12/11/2026, REPARADO) · «Sin pausa» con la CPU frenada no cuenta pasos de más', async ({
     page,
-  }) => {
-    test.fail();
+  }) => {
     test.setTimeout(150_000);
     const cdp = await page.context().newCDPSession(page);
 
@@ -639,16 +637,15 @@ test.describe('Inspector 12/11/2026 · lo cambiado desde el 25/08', () => {
   });
 
   /**
-   * HALLAZGO (12/11/2026, ABIERTO) · el JSON-LD sigue anunciando «símbolos escritos».
+   * HALLAZGO (12/11/2026, REPARADO) · el JSON-LD sigue anunciando «símbolos escritos».
    *
    * El hallazgo 340 renombró en la página la métrica «Símbolos escritos» a «Celdas modificadas»
    * porque solo cuenta las escrituras que CAMBIAN la celda; `features` del jsonLd
    * (metadata.ts) conserva «Métricas: pasos, símbolos escritos, ACEPTADO/RECHAZADO».
    */
-  test('HALLAZGO (12/11/2026, ABIERTO) · el JSON-LD nombra las métricas como la página', async ({
+  test('HALLAZGO (12/11/2026, REPARADO) · el JSON-LD nombra las métricas como la página', async ({
     page,
-  }) => {
-    test.fail();
+  }) => {
     await expect(page.getByText('Celdas modificadas', { exact: true })).toBeVisible();
     const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
     const app = bloques
