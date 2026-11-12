@@ -1610,8 +1610,8 @@ test.describe('Simulador de Equilibrio Químico · inspección de cambio 12/11/2
     expect(errores).toEqual([]);
   });
 
-  test('HALLAZGO [A] — traducida, retirar la nota de Kc tumba la app entera', async ({ page }) => {
-    test.fail();
+  // REPARADO el 12/11/2026 (hallazgo 4548): la nota de Kc va en un <span> siempre montado.
+  test('HALLAZGO [A] (REPARADO) — traducida, retirar la nota de Kc tumba la app entera', async ({ page }) => {
     const errores = vigilarCaidas(page);
     await esperarHidratacion(page, INPUTS_TESTIGO);
     await reaccion(page, /Haber-Bosch/).click();
@@ -1628,8 +1628,9 @@ test.describe('Simulador de Equilibrio Químico · inspección de cambio 12/11/2
     expect(errores).toEqual([]);
   });
 
-  test('HALLAZGO [B] — traducida, el veredicto corregido sigue diciendo «Todavía no»', async ({ page }) => {
-    test.fail();
+  // REPARADO el 12/11/2026 (hallazgo 4549): el veredicto, `{accion}` y el rótulo de Kc van
+  // cada uno como hijo único de su <span>.
+  test('HALLAZGO [B] (REPARADO) — traducida, el veredicto corregido sigue diciendo «Todavía no»', async ({ page }) => {
     await esperarHidratacion(page, INPUTS_TESTIGO);
     // Caso 5: Q = 0,04 exacto. Primero un intento fallido, con la página aún en español.
     await expect(await corregir(page, 5, '0,05')).toContainText('Todavía no');
@@ -1640,5 +1641,20 @@ test.describe('Simulador de Equilibrio Químico · inspección de cambio 12/11/2
     // …pero el texto del aviso es un nodo suelto junto al emoji y React escribe en el que el
     // traductor ya retiró. Hoy se lee «✅ Todavía no. Despliega la solución o vuelve a intentarlo.»
     await expect(alerta).toContainText('¡Correcto!');
+  });
+
+  test('4549 (REPARADO) — traducida, la acción de Le Chatelier y el rótulo de Kc siguen al estado', async ({ page }) => {
+    const errores = vigilarCaidas(page);
+    await esperarHidratacion(page, INPUTS_TESTIGO);
+    await reaccion(page, /Haber-Bosch/).click();
+    await traducir(page);
+    // Antes seguía «Reacción cargada… Pulsa una perturbación» tras añadir NH₃
+    await page.getByRole('button', { name: '+ Añadir NH₃' }).click();
+    await expect(mensaje(page)).not.toContainText('Pulsa una perturbación');
+    // Antes el rótulo seguía en «298 K» con la temperatura subida
+    await page.getByRole('button', { name: /Subir T/ }).click();
+    await expect(page.getByText('Kc (a 298 K)', { exact: true })).toHaveCount(0);
+    await expect(page.getByText('Kc (a 348 K)', { exact: true })).toHaveCount(1);
+    expect(errores).toEqual([]);
   });
 });

@@ -603,7 +603,9 @@ export default function SimuladorEquilibrioQuimicoPage() {
               </span>
             </div>
             <div className={styles.resultRow}>
-              <span className={styles.resultLabel}>Kc (a {temperaturaK} K)</span>
+              {/* Una sola cadena, hija única de su span: con la página traducida se quedaba en
+                  «298 K» al cambiar la temperatura (hallazgo 4549). */}
+              <span className={styles.resultLabel}>{`Kc (a ${temperaturaK} K)`}</span>
               <span className={styles.resultValueAccent}>{formatNumber(KcEfectiva, 4)}</span>
             </div>
             <div className={styles.resultRow}>
@@ -648,14 +650,18 @@ export default function SimuladorEquilibrioQuimicoPage() {
               fila «Dirección de desplazamiento»: por construcción no pueden discrepar
               (hallazgo 788). Lo único que se recuerda del clic es qué se hizo. */}
           <div className={styles.mensajePedagogico} role="status">
-            <strong>Le Chatelier dice:</strong> {accion}{' '}
+            {/* Hallazgos 4548 y 4549 (12/11/2026, REPARADOS): `{accion}` y la nota de Kc iban
+                como texto suelto junto a sus hermanos; con la página traducida, retirar la nota
+                tumbaba la app (removeChild) y la acción se quedaba vieja. Cada texto variable va
+                ahora en su span siempre montado, hijo único. */}
+            <strong>Le Chatelier dice:</strong>{' '}<span>{accion}</span>{' '}
             <span>{direccion === 'derecha' &&
               `Ahora Q = ${formatNumber(Q, 4)} está por DEBAJO de Kc = ${formatNumber(KcEfectiva, 4)}, así que el sistema avanza hacia los productos (→) hasta recuperar el equilibrio.`}</span>
             <span>{direccion === 'izquierda' &&
               `Ahora Q = ${formatNumber(Q, 4)} está por ENCIMA de Kc = ${formatNumber(KcEfectiva, 4)}, así que el sistema retrocede hacia los reactivos (←) hasta recuperar el equilibrio.`}</span>
             <span>{direccion === 'equilibrio' &&
               `Q = ${formatNumber(Q, 4)} y Kc = ${formatNumber(KcEfectiva, 4)} coinciden: el sistema está en equilibrio y no se mueve.`}</span>
-            {notaKc && <> {notaKc}</>}
+            <span>{notaKc && ` ${notaKc}`}</span>
           </div>
 
           {historialPerturbaciones.length > 0 && (
@@ -831,15 +837,19 @@ export default function SimuladorEquilibrioQuimicoPage() {
                               ? '🔢'
                               : '❌'}
                       </span>{' '}
-                      {veredicto.correcto
-                        ? '¡Correcto!'
-                        : veredicto.motivo === 'vacia'
-                          ? caso.tipo === 'numerico'
-                            ? 'Escribe una respuesta antes de comprobar.'
-                            : 'Elige una de las tres opciones antes de comprobar.'
-                          : veredicto.motivo === 'no-numerico'
-                            ? 'Eso no es un número. Escribe solo la cifra, con coma decimal.'
-                            : (veredicto.aviso ?? 'Todavía no. Despliega la solución o vuelve a intentarlo.')}
+                      {/* Hija única de su span (hallazgo 4549): suelta junto al emoji, con la
+                          página traducida el veredicto nuevo no llegaba a pintarse. */}
+                      <span>
+                        {veredicto.correcto
+                          ? '¡Correcto!'
+                          : veredicto.motivo === 'vacia'
+                            ? caso.tipo === 'numerico'
+                              ? 'Escribe una respuesta antes de comprobar.'
+                              : 'Elige una de las tres opciones antes de comprobar.'
+                            : veredicto.motivo === 'no-numerico'
+                              ? 'Eso no es un número. Escribe solo la cifra, con coma decimal.'
+                              : (veredicto.aviso ?? 'Todavía no. Despliega la solución o vuelve a intentarlo.')}
+                      </span>
                     </p>
                   )}
 
