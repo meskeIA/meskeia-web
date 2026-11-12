@@ -1,6 +1,6 @@
 import { test, expect, Page, Locator } from '@playwright/test';
-import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
-import { COSTAS_JUDICIALES_META } from '../../data/fiscal/costas-judiciales';
+import { asentarAntesDeTraducir, esperarHidratacion, esperarValorEnReact } from './_hidratacion';
+import { COSTAS_JUDICIALES_META, COSTAS_LJCA, UMBRALES_LEC } from '../../data/fiscal/costas-judiciales';
 
 /**
  * Inspector — estimador-costas-judiciales (segmento fiscal, RIESGO 1 CRÍTICO)
@@ -760,4 +760,136 @@ test('REPARADO · el resultado se anuncia al lector de pantalla', async ({ page 
     .locator('[aria-live]:not(#__next-route-announcer__), [role="status"]')
     .filter({ hasText: 'Coste total estimado' });
   await expect(anunciado).toHaveCount(1, { timeout: 1000 });
+});
+
+// ═════════════════════════════════════════════════════════════════════════════
+// RE-INSPECCIÓN EN MODO CAMBIO DEL 12/11/2026 (diff ffc46288..216ed6776)
+// Lo que cambió en la app: 99e1ee7e (relacionadas por <ConRelacionadas> en el layout),
+// d34e9b8f (el inciso de la cuantía indeterminada del bloque de condena, en un <span> siempre
+// montado, C0312) y 791e5a41 (la viñeta de las listas de aviso a var(--ambar-texto, #f9a825),
+// C0296). Lo añadido a data/fiscal/costas-judiciales.ts (ARANCEL_PROCURA_FAMILIA,
+// ARANCEL_NOTARIAL_DIVORCIO, UMBRALES_JUSTICIA_GRATUITA) no lo lee esta app: es de
+// estimador-costes-divorcio. El cálculo no cambió.
+// ═════════════════════════════════════════════════════════════════════════════
+
+test.describe('CAMBIO 12/11/2026 · lo tocado desde la validación del 01/10/2026', () => {
+  /** Primer párrafo de «Si te condenan en costas», con el espacio duro normalizado. */
+  async function frasedelTope(page: Page): Promise<string> {
+    return limpiar(await bloqueCondena(page).locator('p').first().innerText());
+  }
+
+  test('el inciso de la cuantía indeterminada se pinta con su punto, y no aparece si la cuantía es determinada', async ({ page }) => {
+    // Resueltos a mano ANTES de ejecutar la app:
+    //  · verbal, 2.000 €: tercio 2.000 / 3 = 666,67 € (art. 394.3 LEC, UMBRALES_LEC.limiteCostasFraccion);
+    //    abogado máx. 900 (ancla de mercado de 2.000 €) > 666,67 → muerde. Sin inciso.
+    //  · ordinario indeterminada: 24.000 € (UMBRALES_LEC.valorPretensionInestimable) / 3 = 8.000 €;
+    //    abogado máx. 3.000 + 0,6 × 1.500 = 3.900 (anclas 15.000 y 30.000) < 8.000 → no muerde.
+    //  · contencioso indeterminada: 18.000 € (COSTAS_LJCA.valorCuantiaIndeterminada) / 3 = 6.000 €;
+    //    abogado máx. 3.300 + procurador 351,11 (art. 69.2.a) = 3.651,11 < 6.000 → no muerde.
+    expect(UMBRALES_LEC.valorPretensionInestimable).toBe(24000);
+    expect(COSTAS_LJCA.valorCuantiaIndeterminada).toBe(18000);
+
+    await elegirProcedimiento(page, /Juicio verbal/);
+    await elegirPersona(page, 'Persona física');
+    await estimar(page, '2000');
+    expect(await frasedelTope(page)).toBe(
+      '⚖️ El art. 394.3 LEC limita lo que pagarías de la parte contraria por abogado y demás profesionales no sujetos a arancel a un tercio de la cuantía del proceso: en tu caso, 666,67 €. Ese tope está por debajo del máximo estimado de abogado, así que aquí sí muerde.',
+    );
+
+    await elegirProcedimiento(page, /Juicio ordinario/);
+    await page.getByRole('button', { name: 'Cuantía indeterminada' }).click();
+    await page.getByRole('button', { name: 'Estimar costas' }).click();
+    expect(await frasedelTope(page)).toBe(
+      '⚖️ El art. 394.3 LEC limita lo que pagarías de la parte contraria por abogado y demás profesionales no sujetos a arancel a un tercio de la cuantía del proceso: en tu caso, 8000,00 € (la pretensión de cuantía indeterminada se valora en 24.000,00 €). Con esta cuantía el tope queda por encima del máximo estimado, así que no llega a aplicarse.',
+    );
+
+    await elegirProcedimiento(page, /Contencioso/);
+    await page.getByRole('button', { name: 'Estimar costas' }).click();
+    expect(await frasedelTope(page)).toBe(
+      '⚖️ El art. 139.4 LJCA limita lo que pagarías de la parte contraria —abogado, procurador y demás costas— a una cantidad total de un tercio de la cuantía del proceso: en tu caso, 6000,00 € (la pretensión de cuantía indeterminada se valora en 18.000,00 €). Con esta cuantía el tope queda por encima del máximo estimado, así que no llega a aplicarse.',
+    );
+  });
+
+  test('con la página traducida, pasar de indeterminada a determinada y volver no tumba la app', async ({ page }) => {
+    // C0312: un texto que aparece o desaparece junto a hermanos ya traducidos (<font>) tumbaba
+    // React en removeChild/insertBefore. Aquí el resultado se desmonta al cambiar un dato, así que
+    // el <span> es defensivo; se recorre el flujo real con dos traducciones y no debe caer.
+    const errores: string[] = [];
+    page.on('pageerror', (e) => errores.push(String(e)));
+    const traducir = async () => {
+      await asentarAntesDeTraducir(page);
+      await page.evaluate(() => {
+        const caminante = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+          acceptNode: (n) => {
+            const padre = n.parentElement;
+            if (!padre || !(n.nodeValue ?? '').trim()) return NodeFilter.FILTER_REJECT;
+            if (/^(SCRIPT|STYLE|OPTION|NOSCRIPT|FONT)$/.test(padre.tagName)) return NodeFilter.FILTER_REJECT;
+            return NodeFilter.FILTER_ACCEPT;
+          },
+        });
+        const nodos: Text[] = [];
+        while (caminante.nextNode()) nodos.push(caminante.currentNode as Text);
+        for (const nodo of nodos) {
+          const exterior = document.createElement('font');
+          const interior = document.createElement('font');
+          interior.textContent = nodo.nodeValue;
+          exterior.appendChild(interior);
+          nodo.parentNode?.replaceChild(exterior, nodo);
+        }
+      });
+    };
+    const indeterminada = page.getByRole('button', { name: 'Cuantía indeterminada' });
+    const estimarBtn = page.getByRole('button', { name: 'Estimar costas' });
+
+    await indeterminada.click();
+    await estimarBtn.click();
+    await expect(bloqueCondena(page)).toContainText('24.000,00');
+    await traducir();
+    await estimarBtn.click();
+    await indeterminada.click();
+    await estimar(page, '2000');
+    await expect(bloqueCondena(page)).toContainText('666,67');
+    await traducir();
+    await indeterminada.click();
+    await estimarBtn.click();
+    await expect(bloqueCondena(page)).toContainText('24.000,00');
+    expect(errores).toEqual([]);
+  });
+
+  test('la viñeta de las listas de aviso usa --ambar-texto en claro y la reserva #f9a825 en oscuro', async ({ page }) => {
+    // 791e5a41 (C0296): globals.css declara --ambar-texto: #8A5A00 en claro e `initial` en oscuro,
+    // donde manda la reserva. Contraste calculado con la fórmula WCAG sobre los fondos medidos en
+    // navegador: en claro, #8A5A00 da 5,43:1 sobre #F5F5F5 y 5,58:1 sobre #FFF8E1; en oscuro,
+    // #F9A825 da 6,69:1 sobre #303030 y 5,51:1 sobre el tinte ámbar al 10 % de la caja de aviso.
+    // Todos por encima del 3:1 que el candado pide a un `::before`.
+    const vinetas = () =>
+      page.evaluate(() =>
+        Array.from(document.querySelectorAll('ul[class*="warningList"] > li:first-child')).map(
+          (li) => getComputedStyle(li, '::before').color,
+        ),
+      );
+    expect(await vinetas()).toEqual(['rgb(138, 90, 0)', 'rgb(138, 90, 0)']);
+    await page.getByRole('button', { name: /Cambiar a modo oscuro/i }).first().click();
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+    await expect.poll(vinetas).toEqual(['rgb(249, 168, 37)', 'rgb(249, 168, 37)']);
+  });
+
+  test('las relacionadas llegan del layout: las 4 de app-relations, en el HTML servido y sin 404', async ({ page, request }) => {
+    // data/app-relations.ts, clave 'estimador-costas-judiciales' (4 entradas, en este orden).
+    const esperadas = [
+      '/estimador-costes-divorcio/',
+      '/orientador-justicia-gratuita/',
+      '/plazos-legales/',
+      '/asistente-reclamaciones/',
+    ];
+    const hrefs = await page
+      .locator('section[aria-label="Aplicaciones relacionadas"] a')
+      .evaluateAll((as) => as.map((a) => a.getAttribute('href')));
+    expect(hrefs).toEqual(esperadas.map((u) => `${u}#from=related-estimador-costas-judiciales`));
+    const html = await (await request.get(RUTA)).text();
+    for (const u of esperadas) {
+      expect(html).toContain(`href="${u}#from=related-estimador-costas-judiciales"`);
+      expect((await request.get(u)).status()).toBe(200);
+    }
+  });
 });

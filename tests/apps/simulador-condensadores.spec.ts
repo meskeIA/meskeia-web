@@ -520,3 +520,212 @@ test.describe('simulador-condensadores · la sección de casos en el navegador',
     await expect(page.locator('#casos-resultado')).toContainText('11,9 nJ');
   });
 });
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════════
+ * INSPECTOR · PRIMERA INSPECCIÓN (12/11/2026, Opus 5.5)
+ *
+ * Esperados resueltos a mano ANTES de abrir el navegador, con el ε₀ que usa la app
+ * (8,8541878128·10⁻¹² F/m) y el formato de `conPrefijo` (3 decimales por debajo de 10, 2 por
+ * debajo de 100 y 1 por encima). La diferencia con el ε₀ de CODATA 2022 (relativa 6,8·10⁻¹⁰) no
+ * mueve ninguna de estas cifras.
+ *
+ * CASO A (normal) — 250 cm² = 0,025 m², 0,8 mm = 0,0008 m, teflón (εr = 2,1), 50 V
+ *   A/d = 31,25 m · C₀ = ε₀·31,25 = 276,6934 pF → «276,7 pF» · C = 2,1·C₀ = 581,0561 pF → «581,1 pF»
+ *   Q = 50·C = 29,0528 nC → «29,05 nC» · E = 50/0,0008 = 62.500 V/m · U = ½·C·50² = 726,320 nJ
+ *   → «726,3 nJ»
+ *   Desconectada (Q fija): V 50 → 50/2,1 = 23,8095 V («23,81 V», «÷ 2,10») · Q₀ = 13,8347 nC,
+ *     «igual» · E 62.500 → 29.761,9 V/m («29.762 V/m») · U₀ = 345,867 nJ → 164,698 nJ («164,7 nJ»)
+ *   Conectada (V fija): Q 13,83 → 29,05 nC («× 2,10») · U 345,9 → 726,3 nJ · E «igual»
+ *   RC con la C de la parte 1 y R = 4.700 kΩ = 4,7·10⁶ Ω: τ = 4,7·10⁶ · 581,0561·10⁻¹² = 2,73096 ms
+ *     → «2,731 ms» · en t = τ: V_C = 50·(1 − e⁻¹) = 31,6060 V → «31,606 V» · I₀ = 50/4,7·10⁶ =
+ *     10,638 µA → «10,64 µA» · I = I₀·e⁻¹ = 3,9136 µA → «3,914 µA»
+ *
+ * CASO B (límite) — el tope de los rangos que anuncia la app, escritos con punto de millar:
+ *   1.000 cm² = 0,1 m², 0,1 mm = 10⁻⁴ m, agua (εr = 80), 1.000 V y R = 10.000 kΩ = 10⁷ Ω
+ *   C = ε₀·80·0,1/10⁻⁴ = ε₀·80.000 = 708,335 nF → «708,3 nF» · Q = 1.000·C = 708,335 µC → «708,3 µC»
+ *   E = 1.000/10⁻⁴ = 10⁷ V/m → «10.000.000 V/m» · U = ½·C·10⁶ = 0,354168 J → «354,2 mJ»
+ *   τ = 10⁷ · 708,335·10⁻⁹ = 7,08335 s → «7,083 s» · V_C(τ) = 1.000·0,632121 → «632,121 V»
+ *   I₀ = 1.000/10⁷ = 100 µA → «100,0 µA» · I(τ) = 100·e⁻¹ = 36,788 µA → «36,79 µA»
+ *   Y V = 0, el otro extremo: Q = E = U = 0 → «0 C», «0 V/m», «0 J»; en la tabla el cambio de 0 a 0
+ *   sale «—» y V_C = «0,000 V». Ni NaN ni ∞.
+ *
+ * CASO C (rechazo) — εr a medida = 0 (C = 0: no hay condensador), V = −12 V y R = 0. Entre medias,
+ *   εr = 0,5 sí calcula (C = 0,5·88,5419 pF = 44,27 pF) pero avisa de que ese material no existe.
+ *
+ * CASO D (aula) — caso 12: τ = 100.000 · 22·10⁻⁶ = 2,2 s; t = −2,2·ln(1 − 8/12) = 2,2·ln 3 =
+ *   2,41695 s → clave 2,42, margen ±0,005: «2,42» y «2.416» (punto decimal) aprueban; «2,2», que
+ *   es responder τ, suspende con «Te has desviado 0,22» (|2,2 − 2,42|).
+ * ═══════════════════════════════════════════════════════════════════════════════════════════ */
+
+const OTRO_ER = 'input[aria-label="Constante dieléctrica εr"]';
+
+interface PreguntaLd {
+  name: string;
+  acceptedAnswer: { text: string };
+}
+
+interface BloqueLd {
+  '@type': string;
+  mainEntity?: PreguntaLd[];
+}
+
+/** Los mensajes «falta…» de la parte 1 y de la parte 2, localizados por estructura y no por texto. */
+async function mensajesFalta(page: Page): Promise<string[]> {
+  return page.evaluate(() =>
+    ['titulo-parte1', 'titulo-parte2'].flatMap((id) =>
+      [...document.querySelectorAll(`section[aria-labelledby="${id}"] [role="status"] > p`)].map((p) =>
+        (p.textContent ?? '').replace(/\s+/g, ' ').trim(),
+      ),
+    ),
+  );
+}
+
+test.describe('Inspector 12/11/2026 · primera inspección', () => {
+  test('CASO A (normal) · 250 cm², 0,8 mm, teflón y 50 V: tarjetas, experimento y RC con 4.700 kΩ', async ({ page }) => {
+    const teflon = boton(page, /^Teflón/);
+    await teflon.click();
+    await expect(teflon).toHaveAttribute('aria-pressed', 'true');
+    await escribir(page, AREA, '250');
+    await escribir(page, SEPARACION, '0,8');
+    await escribir(page, TENSION, '50');
+
+    await expect.poll(() => leerTarjeta(page, 'Capacidad C')).toBe('581,1 pF');
+    expect(await leerTarjeta(page, 'Carga Q = C·V')).toBe('29,05 nC');
+    expect(await leerTarjeta(page, 'Campo E = V/d')).toBe('62.500 V/m');
+    expect(await leerTarjeta(page, 'Energía U = ½·C·V²')).toBe('726,3 nJ');
+
+    await boton(page, /^Batería desconectada/).click();
+    await expect(filaExperimento(page, 'Capacidad C')).toHaveText(['276,7 pF', '581,1 pF', '× 2,10']);
+    await expect(filaExperimento(page, 'Tensión V')).toHaveText(['50,00 V', '23,81 V', '÷ 2,10']);
+    await expect(filaExperimento(page, 'Carga Q')).toHaveText(['13,83 nC', '13,83 nC', 'igual']);
+    await expect(filaExperimento(page, 'Campo E')).toHaveText(['62.500 V/m', '29.762 V/m', '÷ 2,10']);
+    await expect(filaExperimento(page, 'Energía U')).toHaveText(['345,9 nJ', '164,7 nJ', '÷ 2,10']);
+
+    await boton(page, /^Batería conectada/).click();
+    await expect(filaExperimento(page, 'Carga Q')).toHaveText(['13,83 nC', '29,05 nC', '× 2,10']);
+    await expect(filaExperimento(page, 'Campo E')).toHaveText(['62.500 V/m', '62.500 V/m', 'igual']);
+    await expect(filaExperimento(page, 'Energía U')).toHaveText(['345,9 nJ', '726,3 nJ', '× 2,10']);
+
+    await expect(boton(page, /^C de la parte 1/)).toHaveText('C de la parte 1 (581,1 pF)');
+    await escribir(page, RESISTENCIA, '4.700');
+    await expect.poll(() => leerTarjeta(page, 'Constante de tiempo τ = R·C')).toBe('2,731 ms');
+    expect(await leerTarjeta(page, 'Tensión V_C(t)')).toBe('31,606 V');
+    expect(await leerTarjeta(page, 'Corriente I(t)')).toBe('3,914 µA');
+    expect(await leerTarjeta(page, 'Corriente inicial V/R')).toBe('10,64 µA');
+  });
+
+  test('CASO B (límite) · el tope de los rangos con punto de millar, y después V = 0', async ({ page }) => {
+    await boton(page, /^Agua/).click();
+    await escribir(page, AREA, '1.000');
+    await escribir(page, SEPARACION, '0,1');
+    await escribir(page, TENSION, '1.000');
+    await escribir(page, RESISTENCIA, '10.000');
+
+    await expect.poll(() => leerTarjeta(page, 'Capacidad C')).toBe('708,3 nF');
+    expect(await leerTarjeta(page, 'Carga Q = C·V')).toBe('708,3 µC');
+    expect(await leerTarjeta(page, 'Campo E = V/d')).toBe('10.000.000 V/m');
+    expect(await leerTarjeta(page, 'Energía U = ½·C·V²')).toBe('354,2 mJ');
+    await expect.poll(() => leerTarjeta(page, 'Constante de tiempo τ = R·C')).toBe('7,083 s');
+    expect(await leerTarjeta(page, 'Tensión V_C(t)')).toBe('632,121 V');
+    expect(await leerTarjeta(page, 'Corriente I(t)')).toBe('36,79 µA');
+    expect(await leerTarjeta(page, 'Corriente inicial V/R')).toBe('100,0 µA');
+
+    await escribir(page, TENSION, '0');
+    await expect.poll(() => leerTarjeta(page, 'Carga Q = C·V')).toBe('0 C');
+    expect(await leerTarjeta(page, 'Capacidad C')).toBe('708,3 nF');
+    expect(await leerTarjeta(page, 'Campo E = V/d')).toBe('0 V/m');
+    expect(await leerTarjeta(page, 'Energía U = ½·C·V²')).toBe('0 J');
+    await expect(filaExperimento(page, 'Tensión V')).toHaveText(['0 V', '0 V', '—']);
+    expect(await leerTarjeta(page, 'Tensión V_C(t)')).toBe('0,000 V');
+    expect(await leerTarjeta(page, 'Corriente I(t)')).toBe('0 A');
+    expect(await page.locator('main').innerText()).not.toMatch(/NaN|∞|Infinity|undefined/);
+  });
+
+  test('CASO C (rechazo) · εr a medida 0, tensión negativa y R = 0: sin cifras y nombrando el dato', async ({ page }) => {
+    const otro = boton(page, /^Otro εr/);
+    await otro.click();
+    await expect(otro).toHaveAttribute('aria-pressed', 'true');
+    await esperarHidratacion(page, [OTRO_ER]);
+
+    await escribir(page, OTRO_ER, '0');
+    await expect(page.getByText('Para calcular falta la constante dieléctrica εr (mayor que 0).')).toBeVisible();
+    await expect(page.getByText('Falta una constante dieléctrica εr mayor que 0.')).toBeVisible();
+    expect(await leerTarjeta(page, 'Capacidad C')).toBe('');
+    expect(await leerTarjeta(page, 'Constante de tiempo τ = R·C')).toBe('');
+
+    // εr = 0,5 calcula, pero avisa: C = 0,5 · 88,5419 pF = 44,27 pF
+    await escribir(page, OTRO_ER, '0,5');
+    await expect.poll(() => leerTarjeta(page, 'Capacidad C')).toBe('44,27 pF');
+    await expect(page.getByText(/Un εr menor que 1 no corresponde a ningún aislante ordinario/)).toBeVisible();
+
+    await escribir(page, TENSION, '-12');
+    await expect(page.getByText('Para calcular falta la tensión de la batería (0 o más).')).toBeVisible();
+    expect(await leerTarjeta(page, 'Carga Q = C·V')).toBe('');
+
+    await escribir(page, TENSION, '12');
+    await escribir(page, RESISTENCIA, '0');
+    await expect(page.getByText('Para la parte 2 falta la resistencia R (mayor que 0).')).toBeVisible();
+    expect(await leerTarjeta(page, 'Constante de tiempo τ = R·C')).toBe('');
+    expect(await leerTarjeta(page, 'Capacidad C')).toBe('44,27 pF');
+    expect(await page.locator('main').innerText()).not.toMatch(/NaN|∞|Infinity|undefined/);
+  });
+
+  test('CASO D (aula) · caso 12: «2,42» y «2.416» aprueban; «2,2» (responder τ) suspende', async ({ page }) => {
+    await esperarHidratacion(page, ['#casos-respuesta']);
+    expect(await corregirAula(page, 12, '2,42')).toBe(true);
+    expect(await corregirAula(page, 12, '2.416')).toBe(true);
+    expect(await corregirAula(page, 12, '2,2')).toBe(false);
+    await expect(page.locator('#casos-veredicto')).toContainText('Te has desviado 0,22');
+    await page.locator('#casos-aula').getByRole('button', { name: /Ver solución/ }).click();
+    await expect(page.locator('#casos-resultado')).toHaveText('Respuesta: 2,42 s');
+  });
+
+  test('HALLAZGO (12/11/2026, ABIERTO) · ε₀ es el de CODATA 2018; el recomendado vigente (CODATA 2022) es 8,8541878188·10⁻¹² F/m', async ({ page }) => {
+    // Fuente: NIST, physics.nist.gov/cgi-bin/cuu/Value?ep0 — «8.854 187 8188 x 10⁻¹² F m⁻¹»,
+    // incertidumbre típica 0.000 000 0014·10⁻¹², ajuste CODATA 2022. La app escribe y usa
+    // 8,8541878128·10⁻¹² (CODATA 2018) en la fórmula, en EPSILON_0 del motor, en la intro de los
+    // casos y en los pasos de su solución; tabla-constantes-fisicas ya publica 8,854187818·10⁻¹².
+    // Ninguna cifra impresa cambia (diferencia relativa 6,8·10⁻¹⁰): es el dato y su rótulo.
+    test.fail();
+    expect(EPSILON_0).toBe(8.8541878188e-12);
+    await expect(page.locator('main')).not.toContainText('8,8541878128');
+    await expect(page.locator('main')).toContainText('8,8541878188·10⁻¹² F/m');
+  });
+
+  test('HALLAZGO (12/11/2026, ABIERTO) · «¿Cuánto tarda en cargarse del todo?» se contesta dos veces, distinto en la FAQ visible y en el FAQPage', async ({ page }) => {
+    // La misma pregunta, con «un condensador» de más en el JSON-LD: por eso check:faq-unica, que
+    // compara el texto de la pregunta literal, no la ve. Las dos dan 63,2 % y 99,3 %; la visible
+    // añade el 95,0 % de 3τ y la del FAQPage el error típico de «en un τ ya está lleno».
+    test.fail();
+    const bloques = await page.evaluate(() =>
+      [...document.querySelectorAll('script[type="application/ld+json"]')].map((s) => s.textContent ?? ''),
+    );
+    const faq = bloques.map((t) => JSON.parse(t) as BloqueLd).find((b) => b['@type'] === 'FAQPage');
+    const enLd = faq?.mainEntity?.find((q) => /^¿Cuánto tarda en cargarse del todo/.test(q.name))?.acceptedAnswer.text ?? '';
+    const visible = await page.evaluate(() => {
+      const fuerte = [...document.querySelectorAll('main strong')].find((s) =>
+        /^¿Cuánto tarda en cargarse del todo/.test((s.textContent ?? '').trim()),
+      );
+      return fuerte?.nextElementSibling?.textContent ?? '';
+    });
+    expect(enLd).not.toBe('');
+    expect(visible).not.toBe('');
+    expect(visible.replace(/\s+/g, ' ').trim()).toBe(enLd.replace(/\s+/g, ' ').trim());
+  });
+
+  test('HALLAZGO (12/11/2026, ABIERTO) · «falta los datos de la parte 1» y «falta el área…, la separación…»: el verbo no concuerda', async ({ page }) => {
+    // Con área −5 y separación 0 la app dice «Para calcular falta el área de las placas (mayor que
+    // 0), la separación entre placas (mayor que 0).» y «Para la parte 2 falta los datos de la parte
+    // 1, de donde sale C.». Con dos sujetos, o uno plural, el verbo va en plural.
+    test.fail();
+    await escribir(page, AREA, '-5');
+    await escribir(page, SEPARACION, '0');
+    await expect.poll(() => leerTarjeta(page, 'Capacidad C')).toBe('');
+    const mensajes = await mensajesFalta(page);
+    expect(mensajes).toHaveLength(2);
+    for (const m of mensajes) {
+      expect(m, m).not.toMatch(/\bfalta (los|las) /);
+      expect(m, m).not.toMatch(/\bfalta\b[^.]*\), /);
+    }
+  });
+});
