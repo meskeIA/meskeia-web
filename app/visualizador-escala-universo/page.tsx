@@ -11,9 +11,10 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
+import { formatNumber } from '@/lib';
 
 // ─────────────────────────────────────────────
-// Datos de los 12 niveles de escala
+// Datos de los 14 niveles de escala
 // ─────────────────────────────────────────────
 
 interface NivelEscala {
@@ -54,7 +55,7 @@ const NIVELES: NivelEscala[] = [
     notacion: '10⁻¹⁵ m',
     objeto: 'Protón (núcleo del hidrógeno)',
     comparacion: '1.000 veces más grande que un quark',
-    datoCurioso: 'Un protón contiene 3 quarks unidos por la fuerza nuclear fuerte. Si el protón fuera una pelota de tenis, el átomo sería tan grande como un estadio de fútbol.',
+    datoCurioso: 'Un protón contiene 3 quarks unidos por la fuerza nuclear fuerte. El átomo es 100.000 veces mayor: si el protón fuera una pelota de tenis (unos 7 cm), el átomo mediría unos 7 km, como una ciudad pequeña.',
     color: '#e74c3c',
   },
   {
@@ -65,7 +66,7 @@ const NIVELES: NivelEscala[] = [
     notacion: '10⁻¹⁰ m',
     objeto: 'Átomo de hidrógeno (el más pequeño)',
     comparacion: '100.000 veces más grande que un protón',
-    datoCurioso: 'El átomo es casi todo espacio vacío: si el núcleo fuera una naranja en el centro de un campo de fútbol, los electrones estarían en las gradas. El 99,9999% es vacío.',
+    datoCurioso: 'El átomo es casi todo espacio vacío: si el átomo fuera un campo de fútbol de 100 m, su núcleo sería una cabeza de alfiler de 1 mm en el centro, y los electrones se moverían por todo el campo.',
     color: '#3498db',
   },
   {
@@ -120,7 +121,7 @@ const NIVELES: NivelEscala[] = [
     notacion: '1,7 m',
     objeto: 'Persona adulta de talla media',
     comparacion: '1.700 veces más alto que una hormiga',
-    datoCurioso: 'Somos la única escala que puede percibir directamente todas las demás (con instrumentos). En el universo observable somos exactamente medianos: tan lejos de lo más grande como de lo más pequeño.',
+    datoCurioso: 'Somos la única escala que puede percibir directamente todas las demás (con instrumentos). En esta escala, del quark a la galaxia, quedamos cerca de la mitad, algo más próximos a lo pequeño: hasta el quark hay unos 18 órdenes de magnitud y hasta la galaxia, casi 21.',
     color: '#2E86AB',
   },
   {
@@ -129,7 +130,7 @@ const NIVELES: NivelEscala[] = [
     icono: '🏙️',
     metros: 500,
     notacion: '500 m',
-    objeto: 'Torre Eiffel / Burj Khalifa (~830 m)',
+    objeto: 'Rascacielos muy alto (~500 m; el Burj Khalifa llega a 828 m)',
     comparacion: '300 veces más alto que una persona',
     datoCurioso: 'El edificio más alto del mundo (Burj Khalifa, 828 m) es tan alto que puedes ver el atardecer desde la planta baja, subir al piso 160 en ascensor y ver el Sol ponerse de nuevo.',
     color: '#607D8B',
@@ -141,7 +142,7 @@ const NIVELES: NivelEscala[] = [
     metros: 8849,
     notacion: '8,8 km',
     objeto: 'Monte Everest (8.849 m)',
-    comparacion: '17 veces más alto que el Burj Khalifa',
+    comparacion: 'Unas 10,7 veces más alto que el Burj Khalifa (828 m)',
     datoCurioso: 'Si pusieras el Everest en el fondo del Challenger Deep (la fosa más profunda del océano, 11 km), habría más de 2 km de agua sobre su cima.',
     color: '#78909C',
   },
@@ -185,7 +186,7 @@ const NIVELES: NivelEscala[] = [
     metros: 9.46e20,
     notacion: '100.000 años luz',
     objeto: 'Diámetro de la Vía Láctea',
-    comparacion: '100.000 millones de veces el diámetro del sistema solar',
+    comparacion: 'Unos 105 millones de veces el diámetro del sistema solar',
     datoCurioso: 'La Vía Láctea tiene entre 200.000 y 400.000 millones de estrellas. Si viajáramos a la velocidad de la luz, cruzarla de punta a punta llevaría 100.000 años.',
     color: '#48A9A6',
   },
@@ -195,20 +196,65 @@ const NIVELES: NivelEscala[] = [
 // Utilidad: formato de metros
 // ─────────────────────────────────────────────
 
+/**
+ * Cifra en formato español con los decimales justos, hasta `maxDecimales`: «1,7», «500», «8,8»,
+ * «12.700». Sin ceros de relleno («500,0», «1,0»), que sugieren una precisión que el dato no tiene.
+ */
+function cifra(valor: number, maxDecimales: number): string {
+  const redondeado = Number(valor.toFixed(maxDecimales));
+  let decimales = 0;
+  while (decimales < maxDecimales && Number(valor.toFixed(decimales)) !== redondeado) decimales++;
+  return formatNumber(valor, decimales);
+}
+
+/*
+ * Hallazgos 4579 y 4584 (12/11/2026, REPARADOS): la Tierra (1,27 × 10⁷ m) caía en un tramo que
+ * dividía entre 10⁶ y rotulaba «millones km» (salía «12.70 millones km», mil veces su diámetro), y
+ * todo se escribía con toFixed(): punto decimal, ceros de relleno y sin separador de millar.
+ * Ahora todo el tramo de 1 km a 10⁹ m va en km, y cada cifra pasa por formatNumber.
+ */
 function formatMetros(metros: number): string {
-  if (metros < 1e-15) return `${(metros * 1e18).toFixed(0)} × 10⁻¹⁸ m`;
-  if (metros < 1e-12) return `${(metros * 1e15).toFixed(0)} fm`;
-  if (metros < 1e-9) return `${(metros * 1e9).toFixed(1)} nm`;
-  if (metros < 1e-6) return `${(metros * 1e9).toFixed(0)} nm`;
-  if (metros < 1e-3) return `${(metros * 1e6).toFixed(0)} µm`;
-  if (metros < 1) return `${(metros * 1000).toFixed(1)} mm`;
-  if (metros < 1000) return `${metros.toFixed(1)} m`;
-  if (metros < 1e6) return `${(metros / 1000).toFixed(0)} km`;
-  if (metros < 1e9) return `${(metros / 1e6).toFixed(2)} millones km`;
-  if (metros < 1e12) return `${(metros / 1e9).toFixed(2)} × 10⁹ m`;
-  if (metros < 1e16) return `${(metros / 1e12).toFixed(0)} × 10¹² m`;
-  if (metros < 1e20) return `${(metros / 9.46e15).toFixed(0)} años luz`;
-  return `${(metros / 9.46e15).toFixed(0)} años luz`;
+  if (metros < 1e-15) return `${cifra(metros * 1e18, 1)} × 10⁻¹⁸ m`;
+  if (metros < 1e-12) return `${cifra(metros * 1e15, 1)} fm`;
+  if (metros < 1e-6) return `${cifra(metros * 1e9, 1)} nm`;
+  if (metros < 1e-3) return `${cifra(metros * 1e6, 1)} µm`;
+  if (metros < 1) return `${cifra(metros * 1000, 1)} mm`;
+  if (metros < 1000) return `${cifra(metros, 1)} m`;
+  if (metros < 1e9) return `${cifra(metros / 1000, 1)} km`;
+  if (metros < 1e12) return `${cifra(metros / 1e9, 2)} × 10⁹ m`;
+  if (metros < 1e16) return `${cifra(metros / 1e12, 1)} × 10¹² m`;
+  return `${cifra(metros / 9.46e15, 0)} años luz`;
+}
+
+// ─────────────────────────────────────────────
+// Contraste de la cabecera del nivel
+// ─────────────────────────────────────────────
+
+/** Luminancia relativa WCAG de un color sRGB [r, g, b] (0-255). */
+function luminancia([r, g, b]: readonly number[]): number {
+  const canal = (v: number): number => {
+    const c = v / 255;
+    return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+  };
+  return 0.2126 * canal(r) + 0.7152 * canal(g) + 0.0722 * canal(b);
+}
+
+/**
+ * Hallazgo 4585 (12/11/2026, REPARADO): la cabecera pintaba texto blanco directamente sobre el
+ * color del nivel, y en 11 de 14 no llegaba a 4,5:1 (El Sol, 2,03:1). Ahora el fondo es ese mismo
+ * color oscurecido lo justo para que el texto MÁS tenue de la cabecera —la etiqueta «Tamaño»,
+ * blanca con opacidad 0,85— llegue a 4,6:1. Igual en los dos temas: la cabecera no cambia con él.
+ */
+function fondoCabecera(hex: string): string {
+  const base = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
+  const OPACIDAD_MINIMA = 0.85;
+  for (let factor = 1; factor > 0; factor -= 0.02) {
+    const fondo = base.map((c) => Math.round(c * factor));
+    const texto = fondo.map((c) => 255 * OPACIDAD_MINIMA + c * (1 - OPACIDAD_MINIMA));
+    const ratio = (luminancia(texto) + 0.05) / (luminancia(fondo) + 0.05);
+    if (ratio >= 4.6) return `rgb(${fondo.join(', ')})`;
+  }
+  return 'rgb(0, 0, 0)';
 }
 
 // ─────────────────────────────────────────────
@@ -243,7 +289,7 @@ export default function VisualizadorEscalaUniversoPage() {
 
           {/* Tarjeta del nivel activo */}
           <div className={styles.nivelCard} style={{ borderColor: nivel.color }}>
-            <div className={styles.nivelHeader} style={{ background: nivel.color }}>
+            <div className={styles.nivelHeader} style={{ background: fondoCabecera(nivel.color) }}>
               <span className={styles.nivelIconoGrande} aria-hidden="true">{nivel.icono}</span>
               <div>
                 <h2 className={styles.nivelNombre}>{nivel.nombre}</h2>
@@ -287,6 +333,7 @@ export default function VisualizadorEscalaUniversoPage() {
               onChange={(e) => setNivelActivo(Number(e.target.value))}
               className={styles.slider}
               aria-label="Nivel de escala del universo"
+              aria-valuetext={`${nivel.nombre}, ${nivel.notacion}`}
               style={{ '--nivel-color': nivel.color } as React.CSSProperties}
             />
             <div className={styles.sliderEscala}>
@@ -360,7 +407,13 @@ export default function VisualizadorEscalaUniversoPage() {
                     onClick={() => setNivelActivo(i)}
                     style={{ cursor: 'pointer' }}
                     tabIndex={0}
-                    onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') setNivelActivo(i); }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter' || e.key === ' ') {
+                        // Sin preventDefault, Espacio además desplazaba la página (hallazgo 4589).
+                        e.preventDefault();
+                        setNivelActivo(i);
+                      }
+                    }}
                     aria-selected={i === nivelActivo}
                   >
                     <td><span aria-hidden="true">{n.icono}</span></td>
@@ -390,7 +443,7 @@ export default function VisualizadorEscalaUniversoPage() {
             </div>
             <div className={styles.compCard}>
               <p className={styles.compTexto}>
-                Un ser humano está exactamente a mitad de la escala logarítmica entre un quark y la galaxia. <strong>Somos el centro del universo en escala</strong>.
+                En la escala logarítmica que va del quark a la galaxia, un ser humano queda <strong>cerca de la mitad</strong>, algo más próximo a lo pequeño que a lo grande.
               </p>
             </div>
           </div>

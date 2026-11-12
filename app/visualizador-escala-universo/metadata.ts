@@ -3,7 +3,7 @@ import { generateWebAppSchema } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'La Escala del Universo - Del Quark a la Galaxia | meskeIA',
-  description: 'Explora los 12 niveles de escala del universo: desde un quark hasta una galaxia. Zoom interactivo con tamaños, comparaciones y datos fascinantes para Bachillerato.',
+  description: 'Explora los 14 niveles de escala del universo: desde un quark hasta una galaxia. Zoom interactivo con tamaños, comparaciones y datos fascinantes para Bachillerato.',
   keywords: 'escala universo, tamaño universo, física bachillerato, quark átomo molécula célula, escala espacial, astronomía educativa, ciencias bachillerato',
   authors: [{ name: 'meskeIA' }],
   creator: 'meskeIA',
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     title: 'La Escala del Universo',
-    description: 'Del quark a la galaxia: 12 niveles de zoom interactivo con tamaños y comparaciones.',
+    description: 'Del quark a la galaxia: 14 niveles de zoom interactivo con tamaños y comparaciones.',
     url: 'https://meskeia.com/visualizador-escala-universo/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -26,7 +26,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     title: 'La Escala del Universo',
-    description: 'Explora 12 niveles de escala del universo, del quark a la galaxia.',
+    description: 'Explora 14 niveles de escala del universo, del quark a la galaxia.',
     images: ['https://meskeia.com/og-image.png']
   },
   other: { 'application-name': 'Escala Universo meskeIA' },
@@ -34,14 +34,15 @@ export const metadata: Metadata = {
 
 export const jsonLd = generateWebAppSchema({
   name: 'La Escala del Universo',
-  description: 'Explicador visual interactivo de las escalas de tamaño del universo: desde un quark (10⁻¹⁸ m) hasta una galaxia (10²¹ m). 12 niveles con iconos, tamaños, objetos representativos y comparaciones sorprendentes.',
+  description: 'Explicador visual interactivo de las escalas de tamaño del universo: desde un quark (10⁻¹⁸ m) hasta una galaxia (10²¹ m). 14 niveles con iconos, tamaños, objetos representativos y comparaciones sorprendentes.',
   url: 'https://meskeia.com/visualizador-escala-universo/',
   features: [
-    '12 niveles de escala: quark, átomo, molécula ADN, célula, hormiga, humano, edificio, montaña, Tierra, Sol, sistema solar, galaxia',
-    'Slider de zoom interactivo entre niveles',
-    'Tamaño en metros con notación científica',
-    'Comparación entre niveles adyacentes',
-    'Objeto representativo y dato fascinante por nivel',
+    '14 niveles de escala, del quark a la Vía Láctea',
+    'Deslizador, botones, línea logarítmica y tabla para cambiar de nivel',
+    'Tamaño, notación y objeto representativo de cada nivel',
+    'Comparación con el nivel anterior',
+    'Línea con la posición logarítmica de cada nivel',
+    'Tabla con los 14 niveles de un vistazo',
   ],
 });
 
@@ -54,7 +55,7 @@ export const faqJsonLd = {
       name: '¿Qué es la escala del universo?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La escala del universo es una representación comparativa de los tamaños de los objetos que existen en la naturaleza, desde las partículas subatómicas hasta las estructuras cósmicas más grandes. Abarca unos 42 órdenes de magnitud: el quark mide aproximadamente 10⁻¹⁸ metros, mientras que una galaxia típica como la Vía Láctea alcanza los 10²¹ metros (unos 100.000 años luz).',
+        text: 'La escala del universo es una representación comparativa de los tamaños de los objetos que existen en la naturaleza, desde las partículas subatómicas hasta las estructuras cósmicas más grandes. Abarca unos 39 órdenes de magnitud: el quark mide aproximadamente 10⁻¹⁸ metros, mientras que una galaxia típica como la Vía Láctea alcanza los 10²¹ metros (unos 100.000 años luz).',
       },
     },
     {
@@ -70,7 +71,7 @@ export const faqJsonLd = {
       name: '¿Para qué nivel educativo está pensado este visualizador?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El visualizador es adecuado desde la educación secundaria hasta el bachillerato y primeros cursos universitarios de física y astronomía. Los 12 niveles con notación científica y comparaciones cotidianas ayudan a desarrollar la intuición sobre las escalas de tamaño, un concepto clave en física, química y biología.',
+        text: 'El visualizador es adecuado desde la educación secundaria hasta el bachillerato y primeros cursos universitarios de física y astronomía. Los 14 niveles con notación científica y comparaciones cotidianas ayudan a desarrollar la intuición sobre las escalas de tamaño, un concepto clave en física, química y biología.',
       },
     },
     {
