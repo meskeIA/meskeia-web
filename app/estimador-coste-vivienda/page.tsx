@@ -518,8 +518,11 @@ export default function CalculadoraCosteViviendaPage() {
           <div className={styles.faqItem}>
             <h4>¿Cuánto debería reservar para mantenimiento?</h4>
             <p>
-              La regla general es reservar el <strong>1% del valor del inmueble</strong> anualmente
-              para mantenimiento y reparaciones. Para viviendas antiguas (+30 años), sube al 1,5-2%.
+              No hay una cifra oficial. Una pauta orientativa muy difundida, sin un estudio de
+              referencia detrás, es reservar en torno al <strong>1&nbsp;% del valor del inmueble</strong> al
+              año para mantenimiento y reparaciones, y algo más en viviendas antiguas. El gasto real
+              depende del estado, la antigüedad y el tipo de vivienda: si tienes facturas de años
+              anteriores, son mejor referencia.
             </p>
           </div>
 
@@ -680,7 +683,7 @@ export default function CalculadoraCosteViviendaPage() {
             </div>
             <div className={styles.eduFaqItem}>
               <h4>¿Cuánto debo reservar para imprevistos y mantenimiento?</h4>
-              <p>La regla del 1%: reserva anualmente el 1% del valor del inmueble para mantenimiento y reparaciones. En viviendas antiguas (+30 años), sube al 1,5-2%. Para un piso de 200.000 €, son 2.000 €/año (167 €/mes). Este fondo cubre desde pequeñas reparaciones hasta averías de caldera o fontanería.</p>
+              <p>No hay una cifra oficial. Una pauta orientativa muy difundida, sin un estudio de referencia detrás, es reservar en torno al 1&nbsp;% del valor del inmueble al año para mantenimiento y reparaciones, y algo más en viviendas antiguas; el gasto real depende del estado y la antigüedad de cada vivienda. Con esa pauta, un piso de 200.000 € serían unos 2.000 €/año (167 €/mes). Este fondo cubre desde pequeñas reparaciones hasta averías de caldera o fontanería.</p>
             </div>
             <div className={styles.eduFaqItem}>
               <h4>¿Cuándo conviene refinanciar la hipoteca?</h4>
@@ -726,7 +729,7 @@ export default function CalculadoraCosteViviendaPage() {
               <span className={styles.eduStepNumber}>5</span>
               <div className={styles.eduStepContent}>
                 <h4>Crea un fondo de mantenimiento separado</h4>
-                <p>Abre una cuenta de ahorro específica para la vivienda y aporta mensualmente el 1% anual del valor del inmueble dividido entre 12. Este fondo evita el impacto económico de averías inesperadas (caldera, fontanería, electrodomésticos).</p>
+                <p>Abre una cuenta de ahorro específica para la vivienda y aporta cada mes una cantidad fija: con la pauta orientativa del 1&nbsp;% anual del valor del inmueble, esa cifra dividida entre 12. Este fondo evita el impacto económico de averías inesperadas (caldera, fontanería, electrodomésticos).</p>
               </div>
             </div>
             <div className={styles.eduStepItem}>
@@ -757,8 +760,8 @@ export default function CalculadoraCosteViviendaPage() {
             </div>
             <div className={styles.eduTipCard}>
               <span className={styles.eduTipIcon} aria-hidden="true">💰</span>
-              <h4>Fondo de reserva del 1%</h4>
-              <p>Aparta mensualmente el 1% anual del valor del inmueble. Una caldera nueva cuesta 2.000-4.000 €. Con el fondo, no te pilla por sorpresa.</p>
+              <h4>Fondo de reserva para mantenimiento</h4>
+              <p>Aparta cada mes una cantidad fija (una pauta orientativa es el 1&nbsp;% anual del valor del inmueble, repartido en 12 meses). Una caldera nueva cuesta 2.000-4.000 €. Con el fondo, no te pilla por sorpresa.</p>
             </div>
             <div className={styles.eduTipCard}>
               <span className={styles.eduTipIcon} aria-hidden="true">⚡</span>
