@@ -4,7 +4,12 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import styles from './TablaDerivadas.module.css';
-import { RESPUESTA_FAQ_NO_DERIVABLE, RESPUESTA_FAQ_PRODUCTO } from './metadata';
+import {
+  PREGUNTA_FAQ_MEMORIZAR,
+  RESPUESTA_FAQ_MEMORIZAR,
+  RESPUESTA_FAQ_NO_DERIVABLE,
+  RESPUESTA_FAQ_PRODUCTO,
+} from './metadata';
 import {
   MeskeiaLogo,
   Footer,
@@ -24,6 +29,9 @@ import { buscarEnTabla, indexar, textoFormula } from '@/lib/buscadorTablas';
  * Fracción legible construida con flexbox. El «entre» oculto es para el lector de pantalla
  * (cabo C0591, la forma del hallazgo 3939 de tabla-integrales): apilados sin nada en medio,
  * 1 sobre x² se anunciaba «1 x²», que es otra fórmula.
+ *
+ * Lo mismo con los exponentes (hallazgo 4566, 12/11/2026): cada <sup> lleva dentro un
+ * «elevado a» oculto, porque «n·x<sup>n−1</sup>» se oía «n·xn−1». textoFormula lo salta.
  */
 function Frac({ n, d }: { n: ReactNode; d: ReactNode }) {
   return (
@@ -133,27 +141,28 @@ const DERIVADAS: EntradaDerivada[] = [
     nombre: 'Potencia',
     funcion: (
       <>
-        x<sup>n</sup>
+        x<sup><span className="sr-only"> elevado a </span>n</sup>
       </>
     ),
     derivada: (
       <>
-        n·x<sup>n−1</sup>
+        n·x<sup><span className="sr-only"> elevado a </span>n−1</sup>
       </>
     ),
     cadenaFuncion: (
       <>
-        u<sup>n</sup>
+        u<sup><span className="sr-only"> elevado a </span>n</sup>
       </>
     ),
     cadenaDerivada: (
       <>
-        n·u<sup>n−1</sup>·u′
+        n·u<sup><span className="sr-only"> elevado a </span>n−1</sup>·u′
       </>
     ),
     condiciones: 'n cualquier número real (si n no es entero, x > 0)',
     busqueda:
-      'potencia exponente x elevado a n regla de la potencia cuadrado cubo x^n polinomio monomio',
+      // Con exponentes concretos, que es como se busca (hallazgo 4561): «x²», «x^3», «x al cuadrado».
+      'potencia exponente x elevado a n regla de la potencia cuadrado cubo x^n polinomio monomio x^2 x^3 x^4 x al cuadrado x al cubo',
     justificacion:
       'Para n natural sale del binomio de Newton: al desarrollar (x+h)ⁿ, el término en h de menor grado es n·xⁿ⁻¹·h, y al dividir por h y hacer h → 0 solo sobrevive n·xⁿ⁻¹. La fórmula se extiende a exponentes negativos y fraccionarios escribiendo xⁿ = e^(n·ln x) para x > 0.',
     ejemploTitulo: 'Derivar f(x) = x⁵ − 3x² + 4',
@@ -233,7 +242,21 @@ const DERIVADAS: EntradaDerivada[] = [
         d={
           <>
             n·<span>(ⁿ√x)</span>
-            <sup>n−1</sup>
+            <sup><span className="sr-only"> elevado a </span>n−1</sup>
+          </>
+        }
+      />
+    ),
+    // La versión con u faltaba en ocho fórmulas elementales que features y description
+    // prometen con ella (hallazgo 4562, 12/11/2026): esta y las siete que llevan la misma nota.
+    cadenaFuncion: <>ⁿ√u</>,
+    cadenaDerivada: (
+      <Frac
+        n={<>u′</>}
+        d={
+          <>
+            n·<span>(ⁿ√u)</span>
+            <sup><span className="sr-only"> elevado a </span>n−1</sup>
           </>
         }
       />
@@ -258,22 +281,22 @@ const DERIVADAS: EntradaDerivada[] = [
     nombre: 'Exponencial de base e',
     funcion: (
       <>
-        e<sup>x</sup>
+        e<sup><span className="sr-only"> elevado a </span>x</sup>
       </>
     ),
     derivada: (
       <>
-        e<sup>x</sup>
+        e<sup><span className="sr-only"> elevado a </span>x</sup>
       </>
     ),
     cadenaFuncion: (
       <>
-        e<sup>u</sup>
+        e<sup><span className="sr-only"> elevado a </span>u</sup>
       </>
     ),
     cadenaDerivada: (
       <>
-        e<sup>u</sup>·u′
+        e<sup><span className="sr-only"> elevado a </span>u</sup>·u′
       </>
     ),
     busqueda:
@@ -289,27 +312,27 @@ const DERIVADAS: EntradaDerivada[] = [
     nombre: 'Exponencial de base a',
     funcion: (
       <>
-        a<sup>x</sup>
+        a<sup><span className="sr-only"> elevado a </span>x</sup>
       </>
     ),
     derivada: (
       <>
-        a<sup>x</sup>·ln a
+        a<sup><span className="sr-only"> elevado a </span>x</sup>·ln a
       </>
     ),
     cadenaFuncion: (
       <>
-        a<sup>u</sup>
+        a<sup><span className="sr-only"> elevado a </span>u</sup>
       </>
     ),
     cadenaDerivada: (
       <>
-        a<sup>u</sup>·ln a·u′
+        a<sup><span className="sr-only"> elevado a </span>u</sup>·ln a·u′
       </>
     ),
     condiciones: 'a > 0, a ≠ 1',
     busqueda:
-      'exponencial base a elevado a x dos elevado a x potencia de base constante ln a',
+      'exponencial base a elevado a x dos elevado a x potencia de base constante ln a 2^x 3^x 10^x',
     justificacion:
       'Se escribe aˣ = e^(x·ln a) y se aplica la regla de la cadena: la derivada es e^(x·ln a)·ln a = aˣ·ln a. El factor ln a es 1 justo cuando a = e, que es lo que hace especial a esa base.',
     ejemploTitulo: 'Derivar f(x) = 2ˣ',
@@ -341,6 +364,8 @@ const DERIVADAS: EntradaDerivada[] = [
     nombre: 'Logaritmo del valor absoluto',
     funcion: <>ln|x|</>,
     derivada: <Frac n="1" d="x" />,
+    cadenaFuncion: <>ln|u|</>,
+    cadenaDerivada: <Frac n={<>u′</>} d={<>u</>} />, // hallazgo 4562
     condiciones: 'x ≠ 0',
     busqueda:
       'logaritmo valor absoluto ln de x en valor absoluto modulo primitiva de 1/x dominio negativo',
@@ -465,7 +490,7 @@ const DERIVADAS: EntradaDerivada[] = [
     busqueda:
       'cotangente cotg cot ctg cosecante al cuadrado derivada de la cotangente signo negativo',
     justificacion:
-      'Con la regla del cociente sobre cotg x = cos x / sen x: (−sen x·sen x − cos x·cos x)/sen²x = −(sen²x + cos²x)/sen²x = −1/sen²x. Es la simétrica de la tangente, pero con signo negativo porque la cotangente es decreciente en todo su dominio.',
+      'Con la regla del cociente sobre cotg x = cos x / sen x: (−sen x·sen x − cos x·cos x)/sen²x = −(sen²x + cos²x)/sen²x = −1/sen²x. Es la simétrica de la tangente, pero con signo negativo porque la cotangente es decreciente en cada intervalo (kπ, (k+1)π), aunque no en todo su dominio a la vez: cotg(3π/4) = −1 es menor que cotg(5π/4) = 1.',
     ejemploTitulo: 'Derivar f(x) = cotg(x/2)',
     ejemploPasos: [
       'u = x/2, u′ = 1/2',
@@ -617,6 +642,8 @@ const DERIVADAS: EntradaDerivada[] = [
     nombre: 'Arcosecante',
     funcion: <>arcsec x</>,
     derivada: <Frac n="1" d={<>|x|·√(x² − 1)</>} />,
+    cadenaFuncion: <>arcsec u</>,
+    cadenaDerivada: <Frac n={<>u′</>} d={<>|u|·√(u² − 1)</>} />, // hallazgo 4562
     condiciones: '|x| > 1',
     busqueda:
       'arcosecante arcsec inversa de la secante derivada valor absoluto raiz de x cuadrado menos uno',
@@ -639,6 +666,12 @@ const DERIVADAS: EntradaDerivada[] = [
         −<Frac n="1" d={<>|x|·√(x² − 1)</>} />
       </>
     ),
+    cadenaFuncion: <>arccosec u</>,
+    cadenaDerivada: (
+      <>
+        −<Frac n={<>u′</>} d={<>|u|·√(u² − 1)</>} />
+      </>
+    ), // hallazgo 4562
     condiciones: '|x| > 1',
     busqueda:
       'arcocosecante arccosec arccsc inversa de la cosecante derivada signo negativo',
@@ -721,6 +754,12 @@ const DERIVADAS: EntradaDerivada[] = [
         −<Frac n="1" d={<>senh²x</>} />
       </>
     ),
+    cadenaFuncion: <>cotgh u</>,
+    cadenaDerivada: (
+      <>
+        −<Frac n={<>u′</>} d={<>senh²u</>} />
+      </>
+    ), // hallazgo 4562
     condiciones: 'x ≠ 0',
     busqueda:
       'cotangente hiperbolica coth cotgh derivada signo negativo cosech al cuadrado',
@@ -739,6 +778,8 @@ const DERIVADAS: EntradaDerivada[] = [
     nombre: 'Argumento del seno hiperbólico',
     funcion: <>argsenh x</>,
     derivada: <Frac n="1" d={<>√(x² + 1)</>} />,
+    cadenaFuncion: <>argsenh u</>,
+    cadenaDerivada: <Frac n={<>u′</>} d={<>√(u² + 1)</>} />, // hallazgo 4562
     condiciones: 'válida para todo x real',
     busqueda:
       'argumento seno hiperbolico argsenh arcsenh asinh inversa del seno hiperbolico',
@@ -757,6 +798,8 @@ const DERIVADAS: EntradaDerivada[] = [
     nombre: 'Argumento del coseno hiperbólico',
     funcion: <>argcosh x</>,
     derivada: <Frac n="1" d={<>√(x² − 1)</>} />,
+    cadenaFuncion: <>argcosh u</>,
+    cadenaDerivada: <Frac n={<>u′</>} d={<>√(u² − 1)</>} />, // hallazgo 4562
     condiciones: 'x > 1',
     busqueda:
       'argumento coseno hiperbolico argcosh arccosh acosh inversa del coseno hiperbolico',
@@ -775,6 +818,8 @@ const DERIVADAS: EntradaDerivada[] = [
     nombre: 'Argumento de la tangente hiperbólica',
     funcion: <>argtgh x</>,
     derivada: <Frac n="1" d={<>1 − x²</>} />,
+    cadenaFuncion: <>argtgh u</>,
+    cadenaDerivada: <Frac n={<>u′</>} d={<>1 − u²</>} />, // hallazgo 4562
     condiciones: '|x| < 1',
     busqueda:
       'argumento tangente hiperbolica argtgh arctanh atanh inversa de la tangente hiperbolica',
@@ -865,7 +910,7 @@ const DERIVADAS: EntradaDerivada[] = [
     nombre: 'Derivada de la función inversa',
     funcion: (
       <>
-        f<sup>−1</sup>(y)
+        f<sup><span className="sr-only"> elevado a </span>−1</sup>(y)
       </>
     ),
     derivada: <Frac n="1" d={<>f′(x)</>} />,
@@ -904,12 +949,12 @@ const DERIVADAS: EntradaDerivada[] = [
     nombre: 'Derivación logarítmica',
     funcion: (
       <>
-        f(x)<sup>g(x)</sup>
+        f(x)<sup><span className="sr-only"> elevado a </span>g(x)</sup>
       </>
     ),
     derivada: (
       <>
-        f<sup>g</sup>·(g′·ln f + g·
+        f<sup><span className="sr-only"> elevado a </span>g</sup>·(g′·ln f + g·
         <Frac n={<>f′</>} d={<>f</>} />)
       </>
     ),
@@ -948,6 +993,16 @@ const INDICE_BUSQUEDA = new Map(
   }),
 );
 
+/**
+ * Lo que se escribe alrededor de la fórmula y no la identifica (hallazgo 4560, 12/11/2026):
+ * «derivada» solo estaba en los sinónimos de 26 de las 38 filas, así que «derivada de la
+ * exponencial», la forma más natural de buscar en una tabla de derivadas, daba 0 resultados.
+ */
+const PALABRAS_VACIAS: ReadonlySet<string> = new Set([
+  'derivada', 'derivadas', 'derivar', 'deriva', 'derivacion',
+  'de', 'del', 'la', 'el', 'las', 'los', 'lo', 'un', 'una',
+]);
+
 /* ────────────────────────────────────────────────────────────────
    Componente principal
 ──────────────────────────────────────────────────────────────── */
@@ -967,7 +1022,9 @@ export default function TablaDerivadasPage() {
     const enCategoria = DERIVADAS.filter(
       (entrada) => categoriaActiva === 'todas' || entrada.categoria === categoriaActiva,
     );
-    return buscarEnTabla(enCategoria, consulta, (entrada) => INDICE_BUSQUEDA.get(entrada.id)!);
+    return buscarEnTabla(enCategoria, consulta, (entrada) => INDICE_BUSQUEDA.get(entrada.id)!, {
+      palabrasVacias: PALABRAS_VACIAS,
+    });
   }, [consulta, categoriaActiva]);
 
   const alternarFila = (id: string) => {
@@ -1231,7 +1288,12 @@ export default function TablaDerivadasPage() {
                   <td>
                     <strong>Hiperbólicas</strong>
                   </td>
-                  <td>Como las trigonométricas, pero sin el signo menos</td>
+                  {/* Hallazgo 4563: «sin el signo menos» lo contradecían tgh, cotgh y argtgh, y
+                      aplicado a cotgh daba el signo contrario. */}
+                  <td>
+                    Parecidas a las trigonométricas, pero con algún signo cambiado: compruébalo
+                    fila a fila (cotgh′ = −1/senh²x conserva el menos de cotg′)
+                  </td>
                   <td>cosh′ = senh (positivo), a diferencia de cos′ = −sen</td>
                   <td>Catenarias, relatividad, redes neuronales</td>
                 </tr>
@@ -1333,14 +1395,9 @@ export default function TablaDerivadasPage() {
               </p>
             </div>
             <div className={styles.faqItem}>
-              <h4>¿Hay que memorizar toda la tabla?</h4>
-              <p>
-                No toda con el mismo nivel de exigencia. Conviene tener automatizadas las de
-                potencia, exponencial, logaritmo, seno y coseno, más las cuatro reglas (suma,
-                producto, cociente y cadena): con eso se deducen casi todas las demás. Las inversas
-                y las hiperbólicas suelen consultarse en un formulario, y ese es precisamente el uso
-                de esta página.
-              </p>
+              {/* Una sola fuente con el FAQPage (hallazgo 4565, check:faq-unica) */}
+              <h4>{PREGUNTA_FAQ_MEMORIZAR}</h4>
+              <p>{RESPUESTA_FAQ_MEMORIZAR}</p>
               <p className={styles.faqTip}>
                 <span aria-hidden="true">💡</span> Comprueba antes del examen si tu centro permite
                 formulario: cambia por completo la estrategia de estudio.

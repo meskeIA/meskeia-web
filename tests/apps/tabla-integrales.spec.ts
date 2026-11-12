@@ -146,6 +146,9 @@ async function formulasDeFila(page: Page, id: string): Promise<{ integral: strin
   return filaDe(page, id).evaluate((boton) => {
     const linealizar = (el: Element): string => {
       const clon = el.cloneNode(true) as Element;
+      // Fuera el texto solo para el lector («elevado a» dentro de cada <sup>, alcance del
+      // hallazgo 4566 de tabla-derivadas): no es fórmula.
+      for (const s of [...clon.querySelectorAll('.sr-only')]) s.remove();
       for (const s of [...clon.querySelectorAll('sup')]) s.replaceWith(`^(${s.textContent ?? ''})`);
       for (const s of [...clon.querySelectorAll('sub')]) s.replaceWith(`_(${s.textContent ?? ''})`);
       const esClase = (e: Element, nombre: string) =>
@@ -549,4 +552,14 @@ test.describe('Hallazgos de la inspección del 02/11/2026', () => {
     const texto = (await tarjeta.textContent()) ?? '';
     if (/eficaz/.test(texto)) expect(texto).toMatch(/cuadrado|cuadrática|raíz/i);
   });
+});
+
+// Alcance del hallazgo 4566 de tabla-derivadas (12/11/2026): sin texto oculto, el lector de
+// pantalla pegaba el exponente a su base («∫ xn dx», «xn+1»). Y el límite superior de la integral
+// definida no es un exponente: «desde a hasta b».
+test('4566 (alcance) · el superíndice se anuncia «elevado a» y los límites de ∫ «desde … hasta»', async ({ page }) => {
+  await page.goto('/tabla-integrales/');
+  await expect(page.locator('button[aria-controls="detalle-potencia"]')).toHaveAccessibleName(/∫ x elevado a n dx/);
+  await expect(page.locator('button[aria-controls="detalle-exp-e"]')).toHaveAccessibleName(/e elevado a x/);
+  await expect(page.getByText(/f\(x\) dx = F\(b\) − F\(a\)/)).toHaveText(/∫\s*desde\s*a\s*hasta\s*b f\(x\) dx/);
 });

@@ -69,6 +69,9 @@ async function fila(page: Page, id: string) {
     const linealizar = (el: Element | undefined): string => {
       if (!el) return '';
       const clon = el.cloneNode(true) as Element;
+      // Fuera el texto solo para el lector («elevado a» dentro de cada <sup>, alcance del
+      // hallazgo 4566 de tabla-derivadas): no es fórmula.
+      for (const s of [...clon.querySelectorAll('.sr-only')]) s.remove();
       for (const s of [...clon.querySelectorAll('sup')]) s.replaceWith(`^(${s.textContent ?? ''})`);
       for (const s of [...clon.querySelectorAll('sub')]) s.replaceWith(`_(${s.textContent ?? ''})`);
       const esClase = (e: Element, nombre: string) =>
@@ -669,4 +672,13 @@ test.describe('Hallazgos de la inspección del 03/11/2026', () => {
       expect.soft(texto, id).toMatch(/\d %/);
     }
   });
+});
+
+// Alcance del hallazgo 4566 de tabla-derivadas (12/11/2026): sin texto oculto, el lector de
+// pantalla pegaba el exponente a su base («(1 + 1/n)n»). El índice de una raíz no es un
+// exponente: «raíz de índice n de n».
+test('4566 (alcance) · el superíndice se anuncia «elevado a» y el índice de la raíz como tal', async ({ page }) => {
+  await page.goto('/tabla-limites-notables/');
+  await expect(page.locator('button[aria-controls="detalle-e-sucesion"]')).toHaveAccessibleName(/elevado a n/);
+  await expect(page.locator('button[aria-controls="detalle-raiz-n-de-n"]')).toHaveAccessibleName(/raíz de índice n de n/);
 });

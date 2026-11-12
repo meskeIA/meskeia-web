@@ -95,7 +95,7 @@ test.describe('tabla-derivadas — C0591', () => {
  * como ^(…) y la fracción como (n)/(d)), para que reparar la lectura de los superíndices no
  * mueva estos casos.
  *
- * HALLAZGOS ABIERTOS (test.fail, al final): «derivada de …» y los exponentes concretos en el
+ * HALLAZGOS 4560-4566, REPARADOS el 12/11/2026 (al final): «derivada de …» y los exponentes concretos en el
  * buscador; la versión con u que se promete «en cada fórmula elemental»; dos frases del texto
  * que la propia tabla contradice; la FAQ de memorizar escrita dos veces; los superíndices sin
  * «elevado a» para el lector de pantalla.
@@ -271,14 +271,13 @@ test.describe('tabla-derivadas — INSPECTOR 12/11/2026 (primera)', () => {
     expect(await filasVisibles(page)).toEqual(['Seno hiperbólico']);
   });
 
-  test('HALLAZGO (12/11/2026, ABIERTO) · «derivada de …» no encuentra 12 de las 38 filas', async ({ page }) => {
+  test('HALLAZGO (12/11/2026, REPARADO) · «derivada de …» no encuentra 12 de las 38 filas', async ({ page }) => {
     // operativa, medio. La palabra «derivada» está en el índice de 26 filas y falta en 12
     // (Potencia, Constante por función, Inverso de x, Raíz n-ésima, las dos exponenciales,
     // ln|x|, los tres argumentos hiperbólicos, Derivación implícita y Derivación logarítmica:
     // «derivación» no empieza por «derivada»). Como TODAS las palabras tienen que casar, la
     // consulta más natural en una tabla de derivadas da 0 y el aviso de que no existe, u otra fila.
     // Hoy: 0 · solo «Logaritmo neperiano» · solo «Función identidad» · 0 · 0.
-    test.fail();
     expect(await consultar(page, 'derivada de la exponencial')).toContain('Exponencial de base e');
     expect((await consultar(page, 'derivada de e^x'))[0]).toBe('Exponencial de base e');
     expect(await consultar(page, 'derivada de 1/x')).toContain('Inverso de x');
@@ -286,26 +285,24 @@ test.describe('tabla-derivadas — INSPECTOR 12/11/2026 (primera)', () => {
     expect(await consultar(page, 'derivada de la tangente hiperbolica')).toContain('Tangente hiperbólica');
   });
 
-  test('HALLAZGO (12/11/2026, ABIERTO) · un exponente concreto (x², 2^x) no encuentra su fila', async ({ page }) => {
+  test('HALLAZGO (12/11/2026, REPARADO) · un exponente concreto (x², 2^x) no encuentra su fila', async ({ page }) => {
     // operativa, bajo. El índice solo tiene la fórmula genérica (x^n, a^x): «x²» exige la
     // palabra «2», que no está en ninguna fila, y «x al cuadrado» casa con los sinónimos
     // «secante al cuadrado», «sech al cuadrado», «denominador al cuadrado»…
     // Hoy: 0 · Tangente, Cotangente, Tangente hiperbólica, Cotangente hiperbólica y Regla del
     // cociente, sin Potencia · 0 (y el ejemplo de la fila es justo 2ˣ).
-    test.fail();
     expect(await consultar(page, 'x²')).toContain('Potencia');
     expect(await consultar(page, 'x al cuadrado')).toContain('Potencia');
     expect(await consultar(page, '2^x')).toContain('Exponencial de base a');
   });
 
-  test('HALLAZGO (12/11/2026, ABIERTO) · la versión con u no está «en cada fórmula elemental», como prometen', async ({ page }) => {
+  test('HALLAZGO (12/11/2026, REPARADO) · la versión con u no está «en cada fórmula elemental», como prometen', async ({ page }) => {
     // contenido, medio. features del JSON-LD: «Versión con regla de la cadena (u′) en cada
     // fórmula elemental»; su description: «Cada fórmula incluye su versión con la regla de la
     // cadena»; la justificación de la Regla de la cadena: «En cada fila de esta tabla tienes la
     // versión con u ya preparada». Ocho fórmulas elementales no tienen el bloque, y dos de ellas
     // (argsenh, argtgh) lo usan en su propio ejemplo. Pasa con el bloque en las ocho o con la
     // promesa rebajada en los tres sitios.
-    test.fail();
     const sinCadena: string[] = [];
     for (const id of ['raiz-n', 'ln-abs', 'arcsec', 'arccosec', 'coth', 'argsenh', 'argcosh', 'argtanh']) {
       const detalle = await abrir(page, id);
@@ -322,29 +319,26 @@ test.describe('tabla-derivadas — INSPECTOR 12/11/2026 (primera)', () => {
     ).toBe(true);
   });
 
-  test('HALLAZGO (12/11/2026, ABIERTO) · «Hiperbólicas: como las trigonométricas, pero sin el signo menos» lo contradice la tabla', async ({ page }) => {
+  test('HALLAZGO (12/11/2026, REPARADO) · «Hiperbólicas: como las trigonométricas, pero sin el signo menos» lo contradice la tabla', async ({ page }) => {
     // contenido, bajo. La propia tabla da tgh′ = 1 − tgh²x (frente a tg′ = 1 + tg²x),
     // cotgh′ = −1/senh²x (el mismo menos que cotg′ = −1/sen²x) y argtgh′ = 1/(1 − x²) (frente a
     // arctg′ = 1/(1 + x²)): quien aplique el patrón a cotgh sacará +1/senh²x.
-    test.fail();
     await expect(page.locator('table tr').filter({ hasText: 'Hiperbólicas' })).not.toContainText('sin el signo menos', {
       timeout: 2000,
     });
   });
 
-  test('HALLAZGO (12/11/2026, ABIERTO) · la cotangente no es «decreciente en todo su dominio»', async ({ page }) => {
+  test('HALLAZGO (12/11/2026, REPARADO) · la cotangente no es «decreciente en todo su dominio»', async ({ page }) => {
     // contenido, bajo. Decrece en cada intervalo (kπ, (k+1)π), no en ℝ \ {kπ}:
     // cotg(3π/4) = −1 < cotg(5π/4) = 1 con 3π/4 < 5π/4. La tabla lo dice bien de 1/x («tanto para
     // x > 0 como para x < 0») y de cotgh («en cada rama»).
-    test.fail();
     await expect(await abrir(page, 'cotg')).not.toContainText('decreciente en todo su dominio', { timeout: 2000 });
   });
 
-  test('HALLAZGO (12/11/2026, ABIERTO) · la FAQ de qué memorizar está escrita dos veces', async ({ page }) => {
+  test('HALLAZGO (12/11/2026, REPARADO) · la FAQ de qué memorizar está escrita dos veces', async ({ page }) => {
     // contenido, bajo. FAQ visible «¿Hay que memorizar toda la tabla?» y FAQPage «¿Qué derivadas
     // hay que memorizar y cuáles se pueden consultar?»: la misma pregunta con dos redacciones de
     // la misma respuesta. check:faq-unica no la ve porque compara el texto de la pregunta.
-    test.fail();
     const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
     const faq = bloques.map((b) => JSON.parse(b)).find((o) => o['@type'] === 'FAQPage') as
       | { mainEntity: { name: string; acceptedAnswer: { text: string } }[] }
@@ -356,11 +350,10 @@ test.describe('tabla-derivadas — INSPECTOR 12/11/2026 (primera)', () => {
     expect(respuesta).toBe(enLd.acceptedAnswer.text.replace(/\s+/g, ' ').trim());
   });
 
-  test('HALLAZGO (12/11/2026, ABIERTO) · el lector de pantalla lee «x n» y «n·x n−1»: el superíndice no dice «elevado a»', async ({ page }) => {
+  test('HALLAZGO (12/11/2026, REPARADO) · el lector de pantalla lee «x n» y «n·x n−1»: el superíndice no dice «elevado a»', async ({ page }) => {
     // accesibilidad, bajo. La forma del hallazgo 3939 (la fracción leída «1 x²», reparada con
     // «entre» en C0591), ahora en <sup>: el nombre de la fila Potencia es «… f(x) xn f′(x) n·xn−1»,
     // que se oye como otra fórmula (n·x·n − 1). Igual en aˣ, eˣ, uⁿ…
-    test.fail();
     await expect(page.locator('button[aria-controls="detalle-potencia"]')).toHaveAccessibleName(
       /f\(x\) x\s*(elevado a|elevada a|a la)\s*n\b/,
       { timeout: 2000 },

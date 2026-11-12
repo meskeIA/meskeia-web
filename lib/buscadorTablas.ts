@@ -108,7 +108,10 @@ export function textoFormula(nodo: ReactNode, fraccion?: unknown): string {
   if (typeof nodo === 'string' || typeof nodo === 'number') return String(nodo);
   if (Array.isArray(nodo)) return nodo.map((n) => textoFormula(n, fraccion)).join('');
   if (isValidElement(nodo)) {
-    const props = nodo.props as { children?: ReactNode; n?: ReactNode; d?: ReactNode };
+    const props = nodo.props as { children?: ReactNode; n?: ReactNode; d?: ReactNode; className?: string };
+    // El texto solo para el lector de pantalla («elevado a» dentro de un <sup>, hallazgo 4566
+    // de tabla-derivadas) no es fórmula: con él, «x^n» se indexaba como «x^ elevado a n».
+    if (props.className === 'sr-only') return '';
     if (fraccion !== undefined && nodo.type === fraccion) {
       return `${textoFormula(props.n, fraccion)}/${textoFormula(props.d, fraccion)}`;
     }
@@ -199,6 +202,18 @@ export function buscarEnTabla<T>(
   const consultaPalabras = significativas.length > 0 ? significativas : todas;
   const variantes = (q: string): readonly string[] => [q, ...(opciones.sinonimos?.[q] ?? [])];
   const consultaCompacta = compactar(consulta);
+  // La fórmula seguida también sin las palabras vacías: «derivada de e^x» tiene que puntuar la
+  // fila de eˣ como «e^x» (hallazgo 4560 de tabla-derivadas, 12/11/2026). Solo suma puntos:
+  // no cambia qué entradas casan.
+  const compactaSinVacias =
+    vacias === undefined || significativas.length === todas.length || significativas.length === 0
+      ? consultaCompacta
+      : compactar(
+          prepararBusqueda(consulta)
+            .split(/\s+/)
+            .filter((t) => !vacias.has(t))
+            .join(' '),
+        ) || consultaCompacta;
   const puntuadas = entradas
     .map((entrada) => {
       const indice = indiceDe(entrada);
@@ -206,7 +221,9 @@ export function buscarEnTabla<T>(
         variantes(q).some((v) => indice.palabras.some((p) => casa(v, p))),
       );
       const exacta = consultaPalabras.every((q) => indice.palabras.includes(q));
-      const puntos = (indice.compacto.includes(consultaCompacta) ? 2 : 0) + (exacta ? 1 : 0);
+      const formulaSeguida =
+        indice.compacto.includes(consultaCompacta) || indice.compacto.includes(compactaSinVacias);
+      const puntos = (formulaSeguida ? 2 : 0) + (exacta ? 1 : 0);
       return { entrada, encaja, puntos };
     })
     .filter((r) => r.encaja);

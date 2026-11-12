@@ -131,7 +131,7 @@ const INTEGRALES: EntradaIntegral[] = [
     nombre: 'Potencia',
     integral: (
       <>
-        ∫ x<sup>n</sup> dx
+        ∫ x<sup><span className="sr-only"> elevado a </span>n</sup> dx
       </>
     ),
     primitiva: (
@@ -139,7 +139,7 @@ const INTEGRALES: EntradaIntegral[] = [
         <Frac
           n={
             <>
-              x<sup>n+1</sup>
+              x<sup><span className="sr-only"> elevado a </span>n+1</sup>
             </>
           }
           d={<>n + 1</>}
@@ -149,7 +149,7 @@ const INTEGRALES: EntradaIntegral[] = [
     ),
     cadenaIntegral: (
       <>
-        ∫ u<sup>n</sup>·u′ dx
+        ∫ u<sup><span className="sr-only"> elevado a </span>n</sup>·u′ dx
       </>
     ),
     cadenaPrimitiva: (
@@ -157,7 +157,7 @@ const INTEGRALES: EntradaIntegral[] = [
         <Frac
           n={
             <>
-              u<sup>n+1</sup>
+              u<sup><span className="sr-only"> elevado a </span>n+1</sup>
             </>
           }
           d={<>n + 1</>}
@@ -183,7 +183,7 @@ const INTEGRALES: EntradaIntegral[] = [
     nombre: 'Caso especial n = −1',
     integral: (
       <>
-        ∫ x<sup>−1</sup> dx = ∫ <Frac n={<>dx</>} d={<>x</>} />
+        ∫ x<sup><span className="sr-only"> elevado a </span>−1</sup> dx = ∫ <Frac n={<>dx</>} d={<>x</>} />
       </>
     ),
     primitiva: <>ln|x| + C</>,
@@ -278,7 +278,7 @@ const INTEGRALES: EntradaIntegral[] = [
     nombre: 'Potencia de un binomio lineal',
     integral: (
       <>
-        ∫ (ax + b)<sup>n</sup> dx
+        ∫ (ax + b)<sup><span className="sr-only"> elevado a </span>n</sup> dx
       </>
     ),
     primitiva: (
@@ -286,7 +286,7 @@ const INTEGRALES: EntradaIntegral[] = [
         <Frac
           n={
             <>
-              (ax + b)<sup>n+1</sup>
+              (ax + b)<sup><span className="sr-only"> elevado a </span>n+1</sup>
             </>
           }
           d={<>a(n + 1)</>}
@@ -314,22 +314,22 @@ const INTEGRALES: EntradaIntegral[] = [
     nombre: 'Exponencial de base e',
     integral: (
       <>
-        ∫ e<sup>x</sup> dx
+        ∫ e<sup><span className="sr-only"> elevado a </span>x</sup> dx
       </>
     ),
     primitiva: (
       <>
-        e<sup>x</sup> + C
+        e<sup><span className="sr-only"> elevado a </span>x</sup> + C
       </>
     ),
     cadenaIntegral: (
       <>
-        ∫ e<sup>u</sup>·u′ dx
+        ∫ e<sup><span className="sr-only"> elevado a </span>u</sup>·u′ dx
       </>
     ),
     cadenaPrimitiva: (
       <>
-        e<sup>u</sup> + C
+        e<sup><span className="sr-only"> elevado a </span>u</sup> + C
       </>
     ),
     busqueda:
@@ -349,7 +349,7 @@ const INTEGRALES: EntradaIntegral[] = [
     nombre: 'Exponencial de base a',
     integral: (
       <>
-        ∫ a<sup>x</sup> dx
+        ∫ a<sup><span className="sr-only"> elevado a </span>x</sup> dx
       </>
     ),
     primitiva: (
@@ -357,7 +357,7 @@ const INTEGRALES: EntradaIntegral[] = [
         <Frac
           n={
             <>
-              a<sup>x</sup>
+              a<sup><span className="sr-only"> elevado a </span>x</sup>
             </>
           }
           d={<>ln a</>}
@@ -427,12 +427,12 @@ const INTEGRALES: EntradaIntegral[] = [
     nombre: 'x por exponencial',
     integral: (
       <>
-        ∫ x·e<sup>x</sup> dx
+        ∫ x·e<sup><span className="sr-only"> elevado a </span>x</sup> dx
       </>
     ),
     primitiva: (
       <>
-        e<sup>x</sup>(x − 1) + C
+        e<sup><span className="sr-only"> elevado a </span>x</sup>(x − 1) + C
       </>
     ),
     busqueda:
@@ -1094,8 +1094,8 @@ function HojaFormulario({ enBlanco }: { enBlanco: boolean }) {
         <h3 className={styles.hojaCategoriaTitulo}>Integral definida (regla de Barrow)</h3>
         <div className={styles.hojaFila}>
           <span className={styles.hojaIntegral}>
-            ∫<sub>a</sub>
-            <sup>b</sup> f(x) dx
+            ∫<sub><span className="sr-only"> desde </span>a</sub>
+            <sup><span className="sr-only"> hasta </span>b</sup> f(x) dx
           </span>
           <span>=</span>
           <span>F(b) − F(a)</span>
@@ -1384,8 +1384,8 @@ export default function TablaIntegralesPage() {
           en un intervalo.
         </p>
         <div className={styles.formulaBox}>
-          ∫<sub>a</sub>
-          <sup>b</sup> f(x) dx = F(b) − F(a), &nbsp;siendo F cualquier primitiva de f
+          ∫<sub><span className="sr-only"> desde </span>a</sub>
+          <sup><span className="sr-only"> hasta </span>b</sup> f(x) dx = F(b) − F(a), &nbsp;siendo F cualquier primitiva de f
         </div>
         <p>
           Esa es la <strong>regla de Barrow</strong>, consecuencia del teorema fundamental del

@@ -329,7 +329,7 @@ const LIMITES: EntradaLimite[] = [
       <Frac
         n={
           <>
-            e<sup>x</sup> − 1
+            e<sup><span className="sr-only"> elevado a </span>x</sup> − 1
           </>
         }
         d={<>x</>}
@@ -356,7 +356,7 @@ const LIMITES: EntradaLimite[] = [
       <Frac
         n={
           <>
-            a<sup>x</sup> − 1
+            a<sup><span className="sr-only"> elevado a </span>x</sup> − 1
           </>
         }
         d={<>x</>}
@@ -430,7 +430,7 @@ const LIMITES: EntradaLimite[] = [
       <Frac
         n={
           <>
-            (1 + x)<sup>α</sup> − 1
+            (1 + x)<sup><span className="sr-only"> elevado a </span>α</sup> − 1
           </>
         }
         d={<>x</>}
@@ -458,7 +458,7 @@ const LIMITES: EntradaLimite[] = [
       <Frac
         n={
           <>
-            x<sup>a</sup> − 1
+            x<sup><span className="sr-only"> elevado a </span>a</sup> − 1
           </>
         }
         d={<>x − 1</>}
@@ -525,7 +525,7 @@ const LIMITES: EntradaLimite[] = [
     tendencia: 'x → 0⁺',
     expresion: (
       <>
-        x<sup>x</sup>
+        x<sup><span className="sr-only"> elevado a </span>x</sup>
       </>
     ),
     valor: <>1</>,
@@ -553,7 +553,7 @@ const LIMITES: EntradaLimite[] = [
     tendencia: 'x → ∞',
     expresion: (
       <>
-        (1 + <Frac n={<>1</>} d={<>x</>} />)<sup>x</sup>
+        (1 + <Frac n={<>1</>} d={<>x</>} />)<sup><span className="sr-only"> elevado a </span>x</sup>
       </>
     ),
     valor: <>e ≈ 2,71828</>,
@@ -576,7 +576,7 @@ const LIMITES: EntradaLimite[] = [
     tendencia: 'x → 0',
     expresion: (
       <>
-        (1 + x)<sup>1/x</sup>
+        (1 + x)<sup><span className="sr-only"> elevado a </span>1/x</sup>
       </>
     ),
     valor: <>e</>,
@@ -598,12 +598,12 @@ const LIMITES: EntradaLimite[] = [
     tendencia: 'x → ∞',
     expresion: (
       <>
-        (1 + <Frac n={<>k</>} d={<>x</>} />)<sup>x</sup>
+        (1 + <Frac n={<>k</>} d={<>x</>} />)<sup><span className="sr-only"> elevado a </span>x</sup>
       </>
     ),
     valor: (
       <>
-        e<sup>k</sup>
+        e<sup><span className="sr-only"> elevado a </span>k</sup>
       </>
     ),
     condiciones: 'k constante real',
@@ -625,7 +625,7 @@ const LIMITES: EntradaLimite[] = [
     tendencia: 'x → ∞',
     expresion: (
       <>
-        (1 − <Frac n={<>1</>} d={<>x</>} />)<sup>x</sup>
+        (1 − <Frac n={<>1</>} d={<>x</>} />)<sup><span className="sr-only"> elevado a </span>x</sup>
       </>
     ),
     valor: <Frac n={<>1</>} d={<>e</>} />,
@@ -646,12 +646,12 @@ const LIMITES: EntradaLimite[] = [
     tendencia: 'x → a (o ∞)',
     expresion: (
       <>
-        f(x)<sup>g(x)</sup>
+        f(x)<sup><span className="sr-only"> elevado a </span>g(x)</sup>
       </>
     ),
     valor: (
       <>
-        e<sup>lím g(x)·(f(x) − 1)</sup>
+        e<sup><span className="sr-only"> elevado a </span>lím g(x)·(f(x) − 1)</sup>
       </>
     ),
     condiciones: 'f(x) → 1 y g(x) → ∞',
@@ -790,7 +790,7 @@ const LIMITES: EntradaLimite[] = [
     tendencia: 'cualquier tendencia',
     expresion: (
       <>
-        1<sup>∞</sup>
+        1<sup><span className="sr-only"> elevado a </span>∞</sup>
       </>
     ),
     valor: <>Depende (sale un e)</>,
@@ -815,7 +815,7 @@ const LIMITES: EntradaLimite[] = [
     tendencia: 'cualquier tendencia',
     expresion: (
       <>
-        0<sup>0</sup>
+        0<sup><span className="sr-only"> elevado a </span>0</sup>
       </>
     ),
     valor: <>Depende</>,
@@ -841,7 +841,7 @@ const LIMITES: EntradaLimite[] = [
     tendencia: 'x → ∞',
     expresion: (
       <>
-        ∞<sup>0</sup>
+        ∞<sup><span className="sr-only"> elevado a </span>0</sup>
       </>
     ),
     valor: <>Depende</>,
@@ -993,7 +993,7 @@ const LIMITES: EntradaLimite[] = [
     tendencia: 'x → 0',
     expresion: (
       <>
-        e<sup>x</sup> − 1
+        e<sup><span className="sr-only"> elevado a </span>x</sup> − 1
       </>
     ),
     valor: <>~ x</>,
@@ -1015,7 +1015,7 @@ const LIMITES: EntradaLimite[] = [
     tendencia: 'x → 0',
     expresion: (
       <>
-        a<sup>x</sup> − 1
+        a<sup><span className="sr-only"> elevado a </span>x</sup> − 1
       </>
     ),
     valor: <>~ x·ln a</>,
@@ -1076,7 +1076,7 @@ const LIMITES: EntradaLimite[] = [
     tendencia: 'x → 0',
     expresion: (
       <>
-        (1 + x)<sup>α</sup> − 1
+        (1 + x)<sup><span className="sr-only"> elevado a </span>α</sup> − 1
       </>
     ),
     valor: <>~ αx</>,
@@ -1120,7 +1120,7 @@ const LIMITES: EntradaLimite[] = [
     tendencia: 'x → ∞',
     expresion: (
       <>
-        ln x ≪ x<sup>a</sup> ≪ b<sup>x</sup> ≪ x! ≪ x<sup>x</sup>
+        ln x ≪ x<sup><span className="sr-only"> elevado a </span>a</sup> ≪ b<sup><span className="sr-only"> elevado a </span>x</sup> ≪ x! ≪ x<sup><span className="sr-only"> elevado a </span>x</sup>
       </>
     ),
     valor: <>Gana el de la derecha</>,
@@ -1149,12 +1149,12 @@ const LIMITES: EntradaLimite[] = [
       <Frac
         n={
           <>
-            (ln x)<sup>p</sup>
+            (ln x)<sup><span className="sr-only"> elevado a </span>p</sup>
           </>
         }
         d={
           <>
-            x<sup>a</sup>
+            x<sup><span className="sr-only"> elevado a </span>a</sup>
           </>
         }
       />
@@ -1181,12 +1181,12 @@ const LIMITES: EntradaLimite[] = [
       <Frac
         n={
           <>
-            x<sup>a</sup>
+            x<sup><span className="sr-only"> elevado a </span>a</sup>
           </>
         }
         d={
           <>
-            b<sup>x</sup>
+            b<sup><span className="sr-only"> elevado a </span>x</sup>
           </>
         }
       />
@@ -1253,7 +1253,7 @@ const LIMITES: EntradaLimite[] = [
     tendencia: 'x → ∞',
     expresion: (
       <>
-        a<sup>x</sup>
+        a<sup><span className="sr-only"> elevado a </span>x</sup>
       </>
     ),
     valor: <>0 si 0 &lt; a &lt; 1</>,
@@ -1301,7 +1301,7 @@ const LIMITES: EntradaLimite[] = [
     tendencia: 'n → ∞',
     expresion: (
       <>
-        <sup>n</sup>√n
+        <sup><span className="sr-only">raíz de índice </span>n</sup><span aria-hidden="true">√</span><span className="sr-only"> de </span>n
       </>
     ),
     valor: <>1</>,
@@ -1323,7 +1323,7 @@ const LIMITES: EntradaLimite[] = [
     tendencia: 'n → ∞',
     expresion: (
       <>
-        <sup>n</sup>√a
+        <sup><span className="sr-only">raíz de índice </span>n</sup><span aria-hidden="true">√</span><span className="sr-only"> de </span>a
       </>
     ),
     valor: <>1</>,
@@ -1346,7 +1346,7 @@ const LIMITES: EntradaLimite[] = [
     tendencia: 'n → ∞',
     expresion: (
       <>
-        <sup>n</sup>√a<sub>n</sub>
+        <sup><span className="sr-only">raíz de índice </span>n</sup><span aria-hidden="true">√</span><span className="sr-only"> de </span>a<sub>n</sub>
       </>
     ),
     valor: (
@@ -1379,7 +1379,7 @@ const LIMITES: EntradaLimite[] = [
       <Frac
         n={
           <>
-            <sup>n</sup>√(n!)
+            <sup><span className="sr-only">raíz de índice </span>n</sup><span aria-hidden="true">√</span><span className="sr-only"> de </span>(n!)
           </>
         }
         d={<>n</>}
@@ -1453,7 +1453,7 @@ const LIMITES: EntradaLimite[] = [
     tendencia: 'n → ∞',
     expresion: (
       <>
-        (1 + <Frac n={<>1</>} d={<>n</>} />)<sup>n</sup>
+        (1 + <Frac n={<>1</>} d={<>n</>} />)<sup><span className="sr-only"> elevado a </span>n</sup>
       </>
     ),
     valor: <>e</>,

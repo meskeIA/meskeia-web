@@ -56,7 +56,7 @@ export const jsonLd = generateWebAppSchema({
     'Dominios y condiciones de validez indicados fórmula a fórmula',
     'Demostración breve y ejemplo resuelto en cada fila desplegable',
     'Reglas de derivación: suma, producto, cociente, cadena, inversa, implícita y logarítmica',
-    'Funciona 100% en el navegador, sin registro ni instalación',
+    'Funciona 100 % en el navegador, sin registro ni instalación',
     'Gratuito y sin publicidad',
   ],
   keywords: ['tabla de derivadas', 'derivadas', 'regla de la cadena', 'cálculo diferencial'],
@@ -68,6 +68,11 @@ export const RESPUESTA_FAQ_PRODUCTO =
   'Porque al variar x cambian los dos factores a la vez y el resultado recoge ambas contribuciones: (f·g)′ = f′·g + f·g′. La comprobación es inmediata con f = g = x: el atajo incorrecto daría 1·1 = 1, cuando la derivada de x² es 2x. La regla correcta devuelve 1·x + x·1 = 2x.';
 export const RESPUESTA_FAQ_NO_DERIVABLE =
   'En tres casos típicos: cuando hay un pico o esquina y las pendientes laterales no coinciden (por ejemplo |x| en x = 0), cuando la tangente es vertical (√x en x = 0) y cuando la función no es continua en ese punto. Toda función derivable es continua, pero lo contrario no se cumple: la continuidad es necesaria y no suficiente.';
+// Hallazgo 4565 (12/11/2026): la pregunta de qué memorizar estaba con dos redacciones; el
+// candado no la veía porque compara la pregunta literal. Se queda la del JSON-LD.
+export const PREGUNTA_FAQ_MEMORIZAR = '¿Qué derivadas hay que memorizar y cuáles se pueden consultar?';
+export const RESPUESTA_FAQ_MEMORIZAR =
+  'Conviene tener automatizadas las de potencia, exponencial, logaritmo, seno y coseno, junto con las cuatro reglas básicas (suma, producto, cociente y cadena): con ellas se deducen casi todas las demás. Las trigonométricas inversas y las hiperbólicas suelen consultarse en un formulario, que es exactamente el uso de una tabla de derivadas como esta.';
 
 export const faqJsonLd = {
   '@context': 'https://schema.org',
@@ -107,10 +112,10 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Qué derivadas hay que memorizar y cuáles se pueden consultar?',
+      name: PREGUNTA_FAQ_MEMORIZAR,
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Conviene tener automatizadas las de potencia, exponencial, logaritmo, seno y coseno, junto con las cuatro reglas básicas (suma, producto, cociente y cadena): con ellas se deducen casi todas las demás. Las trigonométricas inversas y las hiperbólicas suelen consultarse en un formulario, que es exactamente el uso de una tabla de derivadas como esta.',
+        text: RESPUESTA_FAQ_MEMORIZAR,
       },
     },
   ],
