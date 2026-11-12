@@ -99,13 +99,33 @@ const fechaEs = (iso) => (iso ? iso.slice(0, 10).split('-').reverse().join('/') 
 // La elección del día — pura, sin E/S, para poder probarla (--probar)
 // -------------------------------------------------------------------------------------------------
 
-/** Cuántas solicitudes se rastrearon y cuántas seguidas, al final, no se han rastreado. */
-function recuento(ficha) {
+/**
+ * Cuántas solicitudes se rastrearon y cuántas seguidas, al final, no se han rastreado.
+ * Para retirar solo cuentan las de los días en que consta que se pidió la lista (`diasHechos`):
+ * un día que el usuario no pudo pedirla no es un rechazo de Google.
+ */
+function recuento(ficha, diasHechos) {
   const p = ficha.propuestas ?? [];
   const rastreadas = p.filter((x) => x.rastreada).length;
   let sinRastreo = 0;
-  for (let i = p.length - 1; i >= 0 && !p[i].rastreada; i--) sinRastreo++;
+  for (let i = p.length - 1; i >= 0 && !p[i].rastreada; i--) if (diasHechos.has(p[i].fecha)) sinRastreo++;
   return { rastreadas, sinRastreo, ultima: p.at(-1) ?? null };
+}
+
+/**
+ * Días en que consta que se pidió la lista: alguna URL propuesta ese día se rastreó después, o
+ * entró en el índice con esa como última solicitud. Una solicitud hace rastrear casi siempre la
+ * URL ese mismo día; si no se rastreó NINGUNA de las del día, lo normal es que no se pidieran.
+ * Sale del caso de que el usuario no pudiera un día (12/11/2026): sin esto, cuatro días seguidos
+ * sin pedirla retiraban sus diez URLs como si Google se negara a rastrearlas.
+ */
+function diasConSolicitud(urls) {
+  const dias = new Set();
+  for (const f of Object.values(urls)) {
+    if (f.ultimoEpisodio?.ultimaSolicitud) dias.add(f.ultimoEpisodio.ultimaSolicitud);
+    for (const p of f.propuestas ?? []) if (p.rastreada || (f.rastreo && f.rastreo >= p.fecha)) dias.add(p.fecha);
+  }
+  return dias;
 }
 
 const conSenal = (f) => (f.senal?.google ?? 0) + (f.senal?.bing ?? 0) > 0;
@@ -117,12 +137,13 @@ const conSenal = (f) => (f.senal?.google ?? 0) + (f.senal?.bing ?? 0) > 0;
 export function elegirDelDia(urls, hoy) {
   const grupos = [[], [], [], [], [], []];
   const retiradasHoy = [];
+  const diasHechos = diasConSolicitud(urls);
 
   for (const [url, f] of Object.entries(urls)) {
     if (!f.clase || f.retirada || dentro(f.estado)) continue;
     const ult = f.propuestas?.at(-1);
     if (ult && !ult.rastreada && f.rastreo && f.rastreo >= ult.fecha) ult.rastreada = true;
-    const { rastreadas, sinRastreo, ultima } = recuento(f);
+    const { rastreadas, sinRastreo, ultima } = recuento(f, diasHechos);
 
     if (ultima?.fecha === hoy) { grupos[0].push({ url, motivo: 'propuesta hoy' }); continue; }
 
@@ -171,7 +192,7 @@ export function aplicarInspeccion(f, res, hoy) {
   f.rastreo = res.rastreo || f.rastreo || '';
   f.visto = hoy;
   if (dentro(res.estado) && f.clase) {
-    f.ultimoEpisodio = { clase: f.clase, solicitudes: f.propuestas?.length ?? 0, entro: hoy };
+    f.ultimoEpisodio = { clase: f.clase, solicitudes: f.propuestas?.length ?? 0, ultimaSolicitud: f.propuestas?.at(-1)?.fecha ?? null, entro: hoy };
     f.clase = null; f.propuestas = []; f.retirada = null; delete f.salio;
     return 'entra';
   }
@@ -226,10 +247,17 @@ function probar() {
   caso('dos solicitudes rastreadas sin entrar: retirada', res.retiradasHoy.length === 1 && r.retirada);
 
   // Cuatro solicitudes seguidas sin rastreo: retirada
-  const n = { clase: 'nueva', estado: 'Google no reconoce esta URL',
-    propuestas: ['2026-11-16', '2026-11-17', '2026-11-18', '2026-11-19'].map((fecha) => ({ fecha, rastreada: false })) };
-  res = elegirDelDia({ [u('n')]: n }, hoy);
-  caso('cuatro sin rastreo: retirada', res.retiradasHoy.length === 1 && /no la rastrea/.test(n.retirada?.motivo ?? ''));
+  const dias = ['2026-11-16', '2026-11-17', '2026-11-18', '2026-11-19'];
+  const n = { clase: 'nueva', estado: 'Google no reconoce esta URL', propuestas: dias.map((fecha) => ({ fecha, rastreada: false })) };
+  const testigos = Object.fromEntries(dias.map((d) => [u(`testigo-${d}`), { clase: null, estado: 'Enviada e indexada', ultimoEpisodio: { ultimaSolicitud: d } }]));
+  res = elegirDelDia({ [u('n')]: n, ...testigos }, hoy);
+  caso('cuatro sin rastreo en días en que se pidió la lista: retirada', res.retiradasHoy.length === 1 && /no la rastrea/.test(n.retirada?.motivo ?? ''));
+
+  // Días en que no se pidió la lista (ninguna URL de ese día se rastreó): no cuentan
+  const saltada = { clase: 'salida', estado: fuera, rastreo: '2026-06-01', propuestas: dias.map((fecha) => ({ fecha, rastreada: false })) };
+  const companera = { clase: 'salida', estado: fuera, rastreo: '2026-06-01', propuestas: dias.map((fecha) => ({ fecha, rastreada: false })) };
+  res = elegirDelDia({ [u('saltada')]: saltada, [u('companera')]: companera }, hoy);
+  caso('cuatro días sin pedir la lista: no se retira, vuelve a salir', res.retiradasHoy.length === 0 && res.lista.length === 2);
 
   // Movimientos de la inspección
   const e = { clase: 'salida', estado: fuera, propuestas: [{ fecha: '2026-11-10', rastreada: true }] };
@@ -443,7 +471,9 @@ function resumenParte() {
   p.lista.forEach(({ url, motivo }, i) => {
     const s = urls[url]?.senal;
     const senal = s && (s.google || s.bing) ? ` · ${s.google} impr. Google, ${s.bing} Bing` : '';
-    console.log(`  ${String(i + 1).padStart(2)}. ${url} — ${motivo}${senal}`);
+    // Un Soft 404 no es «sin indexar»: Google cree que la página está vacía o da error
+    const soft = /soft 404/i.test(urls[url]?.estado ?? '') ? ' · ⚠️ Google la ve como Soft 404' : '';
+    console.log(`  ${String(i + 1).padStart(2)}. ${url} — ${motivo}${senal}${soft}`);
   });
 }
 
