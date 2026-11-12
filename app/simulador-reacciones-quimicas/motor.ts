@@ -21,6 +21,12 @@ export interface SustanciaR {
   nombre: string;
   coef: number;
   masa: number;
+  /**
+   * Decimales que la masa molar tiene DE VERDAD, si no son tres (la mayoría del catálogo va al
+   * milésimo; 32.0 es 32,000). Los que van al centésimo lo declaran: Zn 65,38, BaCl₂ 208,23…
+   * (hallazgo 4542).
+   */
+  decimalesM?: number;
   esReactivo: boolean;
 }
 
@@ -134,7 +140,7 @@ export const REACCIONES: Reaccion[] = [
     descripcion: 'El zinc desplaza al hidrógeno del ácido clorhídrico, produciendo burbujas de H₂ gaseoso visibles. Ejemplo clásico de serie de actividad.',
     aplicaciones: 'Generación de hidrógeno en laboratorio, pilas de zinc-carbono (pila Leclanché).',
     sustancias: [
-      { formula: 'Zn', nombre: 'Zinc', coef: 1, masa: 65.38, esReactivo: true },
+      { formula: 'Zn', nombre: 'Zinc', coef: 1, masa: 65.38, decimalesM: 2, esReactivo: true },
       { formula: 'HCl', nombre: 'Ácido clorhídrico', coef: 2, masa: 36.461, esReactivo: true },
       { formula: 'ZnCl₂', nombre: 'Cloruro de zinc', coef: 1, masa: 136.286, esReactivo: false },
       { formula: 'H₂', nombre: 'Hidrógeno', coef: 1, masa: 2.016, esReactivo: false },
@@ -183,9 +189,9 @@ export const REACCIONES: Reaccion[] = [
     descripcion: 'Forma sulfato de bario, un precipitado blanco insoluble. Utilizado en medicina como contraste radiológico gastrointestinal.',
     aplicaciones: 'Contraste en radiografías de aparato digestivo, pintura blanca de alta densidad, industria del papel.',
     sustancias: [
-      { formula: 'BaCl₂', nombre: 'Cloruro de bario', coef: 1, masa: 208.23, esReactivo: true },
-      { formula: 'Na₂SO₄', nombre: 'Sulfato de sodio', coef: 1, masa: 142.04, esReactivo: true },
-      { formula: 'BaSO₄', nombre: 'Sulfato de bario', coef: 1, masa: 233.39, esReactivo: false },
+      { formula: 'BaCl₂', nombre: 'Cloruro de bario', coef: 1, masa: 208.23, decimalesM: 2, esReactivo: true },
+      { formula: 'Na₂SO₄', nombre: 'Sulfato de sodio', coef: 1, masa: 142.04, decimalesM: 2, esReactivo: true },
+      { formula: 'BaSO₄', nombre: 'Sulfato de bario', coef: 1, masa: 233.39, decimalesM: 2, esReactivo: false },
       { formula: 'NaCl', nombre: 'Cloruro de sodio', coef: 2, masa: 58.443, esReactivo: false },
     ],
   },
@@ -247,7 +253,7 @@ export const REACCIONES: Reaccion[] = [
     sustancias: [
       { formula: 'Fe', nombre: 'Hierro', coef: 4, masa: 55.845, esReactivo: true },
       { formula: 'O₂', nombre: 'Oxígeno', coef: 3, masa: 32.0, esReactivo: true },
-      { formula: 'Fe₂O₃', nombre: 'Óxido de hierro(III)', coef: 2, masa: 159.69, esReactivo: false },
+      { formula: 'Fe₂O₃', nombre: 'Óxido de hierro(III)', coef: 2, masa: 159.69, decimalesM: 2, esReactivo: false },
     ],
   },
   {
@@ -256,7 +262,7 @@ export const REACCIONES: Reaccion[] = [
     descripcion: 'El aluminio reduce el óxido de hierro a hierro metálico fundido a ~2500°C. Una de las reacciones más energéticas conocidas.',
     aplicaciones: 'Soldadura aluminotérmica de raíles ferroviarios, recubrimientos y materiales refractarios.',
     sustancias: [
-      { formula: 'Fe₂O₃', nombre: 'Óxido de hierro(III)', coef: 1, masa: 159.69, esReactivo: true },
+      { formula: 'Fe₂O₃', nombre: 'Óxido de hierro(III)', coef: 1, masa: 159.69, decimalesM: 2, esReactivo: true },
       { formula: 'Al', nombre: 'Aluminio', coef: 2, masa: 26.982, esReactivo: true },
       { formula: 'Al₂O₃', nombre: 'Óxido de aluminio', coef: 1, masa: 101.961, esReactivo: false },
       { formula: 'Fe', nombre: 'Hierro', coef: 2, masa: 55.845, esReactivo: false },
@@ -321,11 +327,22 @@ export interface ResultadoLimitante {
 }
 
 /**
- * Incertidumbre relativa de una masa molar del catálogo por su redondeo: medio dígito del
- * milésimo (las masas se tabulan al milésimo; 32,0 es 32,000). H₂ 2,016 → 0,0005 ÷ 2,016 =
- * 0,025 %; O₂ 32,000 → 0,0016 %.
+ * Incertidumbre relativa de una masa molar del catálogo por su redondeo: medio dígito de su
+ * ÚLTIMO decimal, la receta de simulador-estequiometria (`incertidumbreRelativa`, hallazgo
+ * 2711). H₂ 2,016 → 0,0005 ÷ 2,016 = 0,025 %; O₂ 32,000 → 0,0016 %; Zn 65,38 → 0,005 ÷ 65,38 =
+ * 0,0076 %. Hasta el 12/11/2026 fijaba 0,0005 para todas, y con las que van al centésimo la
+ * tolerancia salía diez veces menor (hallazgo 4542).
  */
-const incertidumbreMasaMolar = (s: SustanciaR): number => 0.0005 / s.masa;
+const incertidumbreMasaMolar = (s: SustanciaR): number => (0.5 * 10 ** -(s.decimalesM ?? 3)) / s.masa;
+
+/**
+ * Redondeo con que la pestaña Estequiometría ENSEÑA las cantidades, que es de donde las copia
+ * quien comprueba aquí la proporción: gramos a tres decimales, moles a cuatro. Medio dígito
+ * del último, relativo a la cantidad tecleada (hallazgo 4543: 1 g de N₂ y los 0,216 g de H₂
+ * que da Estequiometría difieren 5,0·10⁻⁴, dentro de los 0,0005 ÷ 0,216 = 2,3·10⁻³ del redondeo).
+ */
+const redondeoMostrado = (cantidad: number, unidad: Unidad): number =>
+  (unidad === 'gramos' ? 0.0005 : 0.00005) / cantidad;
 
 /**
  * Pestaña «Reactivo Límite»: con la cantidad de cada reactivo (en el orden de la ecuación),
@@ -345,11 +362,15 @@ export function calcularLimitante(r: Reaccion, cantidades: readonly number[], un
   // estos datos: con 1e-9 absoluto, los 79,365 g de O₂ que la pestaña Estequiometría da para
   // 10 g de H₂ salían «limita el O₂, sobran ≈0 g de H₂» (hallazgo 3972; la misma receta que
   // simulador-estequiometria aplicó en el 2711). En moles no hay masa molar de por medio.
+  // A eso se suma el redondeo con que Estequiometría enseña las cantidades (hallazgo 4543).
   const hayEmpate = coefUnits.every((cu, i) => {
     if (!(limiteCoefUnit > 0)) return Math.abs(cu - limiteCoefUnit) < 1e-9;
-    const tolerancia = unidad === 'gramos'
+    const deMasas = unidad === 'gramos'
       ? incertidumbreMasaMolar(reactivos[i]) + incertidumbreMasaMolar(reactivos[idxMin])
-      : 1e-9;
+      : 0;
+    const tolerancia = deMasas
+      + redondeoMostrado(cantidades[i], unidad)
+      + redondeoMostrado(cantidades[idxMin], unidad);
     return Math.abs(cu - limiteCoefUnit) / limiteCoefUnit <= tolerancia;
   });
   const limiteIdx = hayEmpate ? -1 : idxMin;

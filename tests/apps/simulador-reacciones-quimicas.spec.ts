@@ -99,9 +99,10 @@ import {
  *   milésimo de cada masa molar. Ver los tests «C0127» al final del bloque de casos.
  *
  * INSPECCIÓN DE CAMBIO (12/11/2026, diff 3908727b..HEAD = esa reparación) — bloque «CAMBIO
- *   12/11/2026» tras los tests C0127. ABIERTOS: la tolerancia copiada fija 0,0005 para todas las
- *   masas (Zn 65,38, BaCl₂ 208,23, Na₂SO₄ 142,04 y Fe₂O₃ 159,69 van al centésimo) y no cubre el
- *   redondeo a tres decimales con que Estequiometría enseña los gramos.
+ *   12/11/2026» tras los tests C0127. REPARADOS el mismo día (4542 y 4543): la tolerancia copiada
+ *   fijaba 0,0005 para todas las masas (Zn 65,38, BaCl₂ 208,23, Na₂SO₄ 142,04 y Fe₂O₃ 159,69 van
+ *   al centésimo; ahora lo declaran con `decimalesM`) y no cubría el redondeo con que
+ *   Estequiometría enseña las cantidades (ahora suma 0,0005 g o 0,00005 mol ÷ cantidad).
  * ─────────────────────────────────────────────────────────────────────────────────────────
  */
 
@@ -374,12 +375,13 @@ test('C0127 · B — los 79,365 g de O₂ que la propia app da para 10 g de H₂
 //       = 0,3569775 → diferencia relativa 3,7·10⁻⁵ < 0,0005/28,014 + 0,0005/2,016 = 2,66·10⁻⁴
 //       ⇒ «ninguno limita», sin sobrante; NH₃ 0,713929 mol × 17,031 = 12,159 g («12,16 g NH₃»).
 //
-//   E · La anchura de la tolerancia en 2H₂ + O₂ → 2H₂O (2,64·10⁻⁴), 10 g de H₂ (cociente 2,4801587)
+//   E · La anchura de la tolerancia en 2H₂ + O₂ → 2H₂O (2,64·10⁻⁴ de las masas; desde el 4543,
+//       + 0,0005/10 + 0,0005/79,4 del redondeo mostrado = 3,2·10⁻⁴), 10 g de H₂ (cociente 2,4801587)
 //       79,38 g de O₂ → 79,38 ÷ 32 = 2,480625 → 1,88·10⁻⁴, dentro ⇒ «ninguno limita»; H₂O 89,360 g.
 //       79,4 g de O₂  → 79,4 ÷ 32 = 2,48125  → 4,40·10⁻⁴, fuera  ⇒ limita el H₂; sobran
 //       0,0010913 mol de O₂ × 32 = 0,0349 g → «0,0011 mol — 0,035 g»; H₂O 89,360 g.
 //
-//   F · ABIERTO — la copia de la receta fija medio MILÉSIMO para todas las masas. La receta de
+//   F · REPARADO (4542) — la copia de la receta fija medio MILÉSIMO para todas las masas. La receta de
 //       simulador-estequiometria (`incertidumbreRelativa`, hallazgo 2711) toma medio dígito del
 //       ÚLTIMO decimal de cada M, y cuatro reactivos de este catálogo van al centésimo: Zn 65,38 ·
 //       BaCl₂ 208,23 · Na₂SO₄ 142,04 · Fe₂O₃ 159,69. Con los gramos de la propia Estequiometría:
@@ -394,7 +396,7 @@ test('C0127 · B — los 79,365 g de O₂ que la propia app da para 10 g de H₂
 //            0,005/208,23 + 0,005/142,04 = 5,92·10⁻⁵ ⇒ empate. La app tolera 5,92·10⁻⁶ y da
 //            «Reactivo limitante: Na₂SO₄» con «BaCl₂ sobrante (exceso) ≈0 mol — 0,000 g».
 //
-//   G · ABIERTO — la tolerancia de las masas molares no cubre el redondeo a tres decimales con
+//   G · REPARADO (4543) — la tolerancia de las masas molares no cubre el redondeo a tres decimales con
 //       que Estequiometría enseña los gramos, que es de donde sale la discrepancia del caso que
 //       se reparaba (0,0005 g ÷ m). Con masas al milésimo y 1 g de N₂ en Haber:
 //       n(N₂) = 1 ÷ 28,014 = 0,0356964 mol · H₂ × 3 = 0,1070893 mol × 2,016 = 0,215892 g →
@@ -451,8 +453,8 @@ test.describe('CAMBIO 12/11/2026 · empate con la tolerancia de las masas molare
     await expect(fila(page, 2)).toContainText('89,360 g');
   });
 
-  // ABIERTO (inspección de cambio 12/11/2026): la tolerancia fija 0,0005 y Zn va al centésimo.
-  test.fail('F1 — los 11,154 g de HCl que Estequiometría da para 10 g de Zn: ninguno limita (ABIERTO)', async ({ page }) => {
+  // REPARADO el 12/11/2026 (hallazgo 4542): cada masa declara sus decimales; Zn va al centésimo.
+  test('F1 — los 11,154 g de HCl que Estequiometría da para 10 g de Zn: ninguno limita (REPARADO)', async ({ page }) => {
     await gramosDeEstequiometria(page, 'zinc-hcl', '10', 1, '11,154 g'); // 0,3059039 mol × 36,461
     await limitanteGramos(page, 'zinc-hcl', '10', '11.154');
     await expect(fila(page, 2)).toContainText('20,845 g'); // ZnCl₂, lo da igual con o sin empate
@@ -461,8 +463,8 @@ test.describe('CAMBIO 12/11/2026 · empate con la tolerancia de las masas molare
     await expect(resultado(page)).not.toContainText('sobrante');
   });
 
-  // ABIERTO (inspección de cambio 12/11/2026): BaCl₂ 208,23 y Na₂SO₄ 142,04 van al centésimo.
-  test.fail('F2 — los 6,821 g de Na₂SO₄ que Estequiometría da para 10 g de BaCl₂: ninguno limita (ABIERTO)', async ({ page }) => {
+  // REPARADO el 12/11/2026 (hallazgo 4542): BaCl₂ 208,23 y Na₂SO₄ 142,04 declaran el centésimo.
+  test('F2 — los 6,821 g de Na₂SO₄ que Estequiometría da para 10 g de BaCl₂: ninguno limita (REPARADO)', async ({ page }) => {
     await gramosDeEstequiometria(page, 'baso4', '10', 1, '6,821 g'); // 0,0480238 mol × 142,04
     await limitanteGramos(page, 'baso4', '10', '6.821');
     await expect(fila(page, 2)).toContainText('11,208 g'); // BaSO₄ 0,0480217 mol × 233,39
@@ -471,12 +473,27 @@ test.describe('CAMBIO 12/11/2026 · empate con la tolerancia de las masas molare
     await expect(resultado(page)).not.toContainText('sobrante');
   });
 
-  // ABIERTO (inspección de cambio 12/11/2026): el redondeo a tres decimales de los gramos.
-  test.fail('G — los 0,216 g de H₂ que Estequiometría da para 1 g de N₂: ninguno limita (ABIERTO)', async ({ page }) => {
+  // REPARADO el 12/11/2026 (hallazgo 4543): la tolerancia suma el redondeo de los gramos mostrados.
+  test('G — los 0,216 g de H₂ que Estequiometría da para 1 g de N₂: ninguno limita (REPARADO)', async ({ page }) => {
     await gramosDeEstequiometria(page, 'haber', '1', 1, '0,216 g'); // 0,1070893 mol × 2,016
     await limitanteGramos(page, 'haber', '1', '0.216');
     await expect(fila(page, 2)).toContainText('1,216 g'); // NH₃ 0,0713929 mol × 17,031
     // Hoy: «Reactivo limitante: N₂» y «H₂ sobrante (exceso) 0,0001 mol — 0,000 g».
+    await expect(resultado(page)).toContainText('ninguno limita');
+    await expect(resultado(page)).not.toContainText('sobrante');
+  });
+
+  // Hallazgo 4543, en moles: Estequiometría los enseña con cuatro decimales. 0,3333 mol de N₂
+  // con 1 mol de H₂: cocientes 0,3333 y 0,33333 → 1,0·10⁻⁴, dentro de 0,00005/0,3333 +
+  // 0,00005/1 = 2,0·10⁻⁴ ⇒ ninguno limita. Antes: «H₂ sobrante (exceso) 0,0001 mol — 0,000 g».
+  test('G2 — 0,3333 mol de N₂ con 1 mol de H₂: ninguno limita (REPARADO)', async ({ page }) => {
+    await abrirPestana(page, /Reactivo Límite/);
+    await page.locator('#limReaccion').selectOption('haber');
+    await page.getByRole('button', { name: 'Moles' }).click();
+    const campos = page.locator('input[type="number"]');
+    await campos.nth(0).fill('0.3333');
+    await campos.nth(1).fill('1');
+    await page.getByRole('button', { name: /Calcular reactivo limitante/ }).click();
     await expect(resultado(page)).toContainText('ninguno limita');
     await expect(resultado(page)).not.toContainText('sobrante');
   });
