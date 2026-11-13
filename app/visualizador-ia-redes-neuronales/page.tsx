@@ -8,6 +8,8 @@ import LegalNotice from '@/components/LegalNotice';
 import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
+import { formatNumber } from '@/lib';
+import { rellenoConTinta } from '@/lib/tintaLegible';
 
 type SeccionId = 'neurona' | 'red' | 'entrenamiento' | 'tipos';
 type FuncionActivacion = 'sigmoid' | 'relu' | 'tanh' | 'softmax';
@@ -108,8 +110,31 @@ function obtenerColorActivacion(valor: number): string {
   const r = Math.round(46 + (169 - 46) * v);
   const g = Math.round(134 + (72 - 134) * v);
   const b = Math.round(171 + (102 - 171) * v);
-  return `rgb(${r}, ${g}, ${b})`;
+  // En hexadecimal para que rellenoConTinta pueda medirlo (cabo C0297, 13/11/2026)
+  return '#' + [r, g, b].map((c) => c.toString(16).padStart(2, '0')).join('');
 }
+
+/**
+ * Tono de texto de cada color de capa (cabo C0297, 13/11/2026): los nombres de las capas y los pesos
+ * iban en su color puro, la marca 4,07:1 en claro y 3,31 en oscuro, el teal 2,78 y el acento 2,24.
+ */
+const CLASE_TONO: Record<string, string> = {
+  '#2E86AB': styles.svgMarca,
+  '#48A9A6': styles.svgTeal,
+  '#7FB3D3': styles.svgAcento,
+};
+
+/**
+ * Lo mismo para el texto del HTML (cabo C0645, 13/11/2026): los pasos del ciclo de entrenamiento y el
+ * tipo de capa iban en su color con style (el acento 2,26:1, el teal 2,80, el naranja 2,97 y la marca
+ * 4,11 en claro; la marca 3,35 en oscuro).
+ */
+const CLASE_TEXTO: Record<string, string> = {
+  '#2E86AB': styles.txtMarca,
+  '#48A9A6': styles.txtTeal,
+  '#7FB3D3': styles.txtAcento,
+  '#E07B39': styles.txtNaranja,
+};
 
 // Nodos de la red neuronal para el diagrama
 const CAPAS_RED = [
@@ -135,6 +160,8 @@ export default function VisualizadorIaRedesNeuronales() {
 
   const sumasPonderada = peso1 * entrada1 + peso2 * entrada2 + bias;
   const salidaNeurona = calcularActivacion(sumasPonderada, fnActivacion);
+  // El blanco sobre el color de la activación daba 4,11-4,46:1 (cabo C0297, 13/11/2026)
+  const activacion = rellenoConTinta(obtenerColorActivacion(salidaNeurona));
 
   const simularEpoch = useCallback(() => {
     setEpoch(prev => prev + 1);
@@ -206,7 +233,7 @@ export default function VisualizadorIaRedesNeuronales() {
               <div className={styles.controlesNeurona}>
                 <div className={styles.controlGrupo}>
                   <label htmlFor="entrada-1" className={styles.controlLabel}>
-                    Entrada x₁ = <strong>{entrada1.toFixed(2)}</strong>
+                    Entrada x₁ = <strong>{formatNumber(entrada1, 2)}</strong>
                   </label>
                   <input
                     id="entrada-1"
@@ -219,7 +246,7 @@ export default function VisualizadorIaRedesNeuronales() {
                 </div>
                 <div className={styles.controlGrupo}>
                   <label htmlFor="entrada-2" className={styles.controlLabel}>
-                    Entrada x₂ = <strong>{entrada2.toFixed(2)}</strong>
+                    Entrada x₂ = <strong>{formatNumber(entrada2, 2)}</strong>
                   </label>
                   <input
                     id="entrada-2"
@@ -232,7 +259,7 @@ export default function VisualizadorIaRedesNeuronales() {
                 </div>
                 <div className={styles.controlGrupo}>
                   <label htmlFor="peso-1" className={styles.controlLabel}>
-                    Peso w₁ = <strong>{peso1.toFixed(2)}</strong>
+                    Peso w₁ = <strong>{formatNumber(peso1, 2)}</strong>
                   </label>
                   <input
                     id="peso-1"
@@ -245,7 +272,7 @@ export default function VisualizadorIaRedesNeuronales() {
                 </div>
                 <div className={styles.controlGrupo}>
                   <label htmlFor="peso-2" className={styles.controlLabel}>
-                    Peso w₂ = <strong>{peso2.toFixed(2)}</strong>
+                    Peso w₂ = <strong>{formatNumber(peso2, 2)}</strong>
                   </label>
                   <input
                     id="peso-2"
@@ -258,7 +285,7 @@ export default function VisualizadorIaRedesNeuronales() {
                 </div>
                 <div className={styles.controlGrupo}>
                   <label htmlFor="bias" className={styles.controlLabel}>
-                    Bias b = <strong>{bias.toFixed(2)}</strong>
+                    Bias b = <strong>{formatNumber(bias, 2)}</strong>
                   </label>
                   <input
                     id="bias"
@@ -299,44 +326,44 @@ export default function VisualizadorIaRedesNeuronales() {
                   <line x1="20" y1="60" x2="120" y2="100" stroke="#2E86AB" strokeWidth="2" />
                   <line x1="20" y1="140" x2="120" y2="100" stroke="#48A9A6" strokeWidth="2" />
                   {/* Labels entradas */}
-                  <text x="22" y="55" fontSize="11" fill="currentColor">x₁={entrada1.toFixed(1)}</text>
-                  <text x="22" y="155" fontSize="11" fill="currentColor">x₂={entrada2.toFixed(1)}</text>
+                  <text x="22" y="55" fontSize="11" fill="currentColor">x₁={formatNumber(entrada1, 1)}</text>
+                  <text x="22" y="155" fontSize="11" fill="currentColor">x₂={formatNumber(entrada2, 1)}</text>
                   {/* Labels pesos */}
-                  <text x="52" y="74" fontSize="10" fill="#2E86AB">w₁={peso1.toFixed(1)}</text>
-                  <text x="52" y="135" fontSize="10" fill="#48A9A6">w₂={peso2.toFixed(1)}</text>
-                  {/* Soma (cuerpo neurona) */}
+                  <text x="52" y="74" fontSize="10" className={styles.svgMarca}>w₁={formatNumber(peso1, 1)}</text>
+                  <text x="52" y="135" fontSize="10" className={styles.svgTeal}>w₂={formatNumber(peso2, 1)}</text>
+                  {/* Soma (cuerpo neurona): el relleno de la activación con la tinta que le llega */}
                   <circle
                     cx="140" cy="100" r="30"
-                    fill={obtenerColorActivacion(salidaNeurona)}
+                    fill={activacion.relleno}
                     stroke="#2E86AB" strokeWidth="2"
                   />
-                  <text x="140" y="95" textAnchor="middle" fontSize="9" fill="white">Σ+b</text>
-                  <text x="140" y="108" textAnchor="middle" fontSize="8" fill="white">{sumasPonderada.toFixed(2)}</text>
+                  <text x="140" y="95" textAnchor="middle" fontSize="9" fill={activacion.tinta}>Σ+b</text>
+                  <text x="140" y="108" textAnchor="middle" fontSize="8" fill={activacion.tinta}>{formatNumber(sumasPonderada, 2)}</text>
                   {/* Bias */}
-                  <text x="140" y="145" textAnchor="middle" fontSize="10" fill="currentColor">b={bias.toFixed(1)}</text>
+                  <text x="140" y="145" textAnchor="middle" fontSize="10" fill="currentColor">b={formatNumber(bias, 1)}</text>
                   {/* Función activación */}
                   <rect x="185" y="80" width="60" height="40" rx="6" fill="var(--bg-card)" stroke="#48A9A6" strokeWidth="1.5" />
-                  <text x="215" y="96" textAnchor="middle" fontSize="9" fill="#48A9A6">f(x)</text>
+                  <text x="215" y="96" textAnchor="middle" fontSize="9" className={styles.svgTeal}>f(x)</text>
                   <text x="215" y="110" textAnchor="middle" fontSize="8" fill="currentColor">{fnActivacion}</text>
                   <line x1="170" y1="100" x2="185" y2="100" stroke="#48A9A6" strokeWidth="2" />
                   {/* Salida */}
                   <line x1="245" y1="100" x2="310" y2="100" stroke="#7FB3D3" strokeWidth="2" />
-                  <circle cx="316" cy="100" r="16" fill={obtenerColorActivacion(salidaNeurona)} stroke="#7FB3D3" strokeWidth="2" />
-                  <text x="316" y="104" textAnchor="middle" fontSize="9" fill="white">{salidaNeurona.toFixed(2)}</text>
-                  <text x="270" y="90" fontSize="10" fill="#7FB3D3">salida</text>
+                  <circle cx="316" cy="100" r="16" fill={activacion.relleno} stroke="#7FB3D3" strokeWidth="2" />
+                  <text x="316" y="104" textAnchor="middle" fontSize="9" fill={activacion.tinta}>{formatNumber(salidaNeurona, 2)}</text>
+                  <text x="270" y="90" fontSize="10" className={styles.svgAcento}>salida</text>
                 </svg>
 
                 <div className={styles.formulaBox} role="math" aria-label="Fórmula de la neurona">
                   <div className={styles.formulaLinea}>
                     <span className={styles.formulaLabel}>Suma ponderada:</span>
                     <span className={styles.formulaValor}>
-                      {peso1.toFixed(1)}×{entrada1.toFixed(1)} + {peso2.toFixed(1)}×{entrada2.toFixed(1)} + {bias.toFixed(1)} = <strong>{sumasPonderada.toFixed(3)}</strong>
+                      {formatNumber(peso1, 1)}×{formatNumber(entrada1, 1)} + {formatNumber(peso2, 1)}×{formatNumber(entrada2, 1)} + {formatNumber(bias, 1)} = <strong>{formatNumber(sumasPonderada, 3)}</strong>
                     </span>
                   </div>
                   <div className={styles.formulaLinea}>
                     <span className={styles.formulaLabel}>Activación {fnActivacion}:</span>
                     <span className={styles.formulaValor}>
-                      f({sumasPonderada.toFixed(3)}) = <strong style={{ color: obtenerColorActivacion(salidaNeurona) }}>{salidaNeurona.toFixed(4)}</strong>
+                      f({formatNumber(sumasPonderada, 3)}) = <strong>{formatNumber(salidaNeurona, 4)}</strong>
                     </span>
                   </div>
                 </div>
@@ -401,7 +428,7 @@ export default function VisualizadorIaRedesNeuronales() {
                       <g key={id}>
                         <circle
                           cx={cx} cy={cy} r={seleccionado ? 14 : 11}
-                          fill={seleccionado ? capa.color : 'var(--bg-card)'}
+                          fill={seleccionado ? rellenoConTinta(capa.color).relleno : 'var(--bg-card)'}
                           stroke={capa.color}
                           strokeWidth={seleccionado ? 3 : 2}
                           style={{ cursor: 'pointer' }}
@@ -410,7 +437,8 @@ export default function VisualizadorIaRedesNeuronales() {
                           aria-label={`Neurona ${ni + 1} de capa ${capa.nombre}`}
                         />
                         {seleccionado && (
-                          <text cx={cx} cy={cy} textAnchor="middle" fontSize="9" fill="white" dy={3}>
+                          // x e y, no cx y cy: con cx/cy el rótulo salía en la esquina (0, 0) del SVG
+                          <text x={cx} y={cy} textAnchor="middle" fontSize="9" fill={rellenoConTinta(capa.color).tinta} dy={3} style={{ pointerEvents: 'none' }}>
                             n{ni + 1}
                           </text>
                         )}
@@ -421,7 +449,7 @@ export default function VisualizadorIaRedesNeuronales() {
 
                 {/* Labels de capas */}
                 {CAPAS_RED.map((capa, ci) => (
-                  <text key={ci} x={40 + ci * 130} y={245} textAnchor="middle" fontSize="11" fill={capa.color} fontWeight="600">
+                  <text key={ci} x={40 + ci * 130} y={245} textAnchor="middle" fontSize="11" className={CLASE_TONO[capa.color]} fontWeight="600">
                     {capa.nombre}
                   </text>
                 ))}
@@ -445,7 +473,7 @@ export default function VisualizadorIaRedesNeuronales() {
                   return (
                     <div className={styles.nodoInfo}>
                       <div className={styles.nodoInfoHeader} style={{ borderColor: capa.color }}>
-                        <span className={styles.nodoInfoTipo} style={{ color: capa.color }}>Capa {capa.nombre}</span>
+                        <span className={`${styles.nodoInfoTipo} ${CLASE_TEXTO[capa.color]}`}>Capa {capa.nombre}</span>
                         <span className={styles.nodoInfoId}>Neurona {ni + 1} de {capa.neuronas}</span>
                       </div>
                       <p>{descripcionesCapa[capa.nombre]}</p>
@@ -493,16 +521,20 @@ export default function VisualizadorIaRedesNeuronales() {
               <div className={styles.cicloEntrenamiento}>
                 {[
                   { paso: '1', titulo: 'Forward Pass', desc: 'Los datos fluyen de entrada a salida. La red genera una predicción.', icono: '→', color: '#2E86AB' },
-                  { paso: '2', titulo: 'Calcular Loss', desc: `Error actual: ${loss.toFixed(4)}. Mide la distancia entre predicción y valor real.`, icono: '📏', color: '#E07B39' },
+                  { paso: '2', titulo: 'Calcular Loss', desc: `Error actual: ${formatNumber(loss, 4)}. Mide la distancia entre predicción y valor real.`, icono: '📏', color: '#E07B39' },
                   { paso: '3', titulo: 'Backpropagation', desc: 'Se calcula el gradiente de la pérdida para cada peso usando la regla de la cadena.', icono: '←', color: '#48A9A6' },
-                  { paso: '4', titulo: 'Gradient Descent', desc: `w = w − ${learningRate} × ∂L/∂w. Los pesos se ajustan en la dirección que reduce el error.`, icono: '⬇️', color: '#7FB3D3' },
+                  { paso: '4', titulo: 'Gradient Descent', desc: `w = w − ${formatNumber(learningRate, 3)} × ∂L/∂w. Los pesos se ajustan en la dirección que reduce el error.`, icono: '⬇️', color: '#7FB3D3' },
                 ].map(item => (
                   <div key={item.paso} className={styles.cicloItem} style={{ borderLeftColor: item.color }}>
-                    <div className={styles.cicloNumero} style={{ background: item.color }} aria-hidden="true">
+                    <div
+                      className={styles.cicloNumero}
+                      style={{ background: rellenoConTinta(item.color).relleno, color: rellenoConTinta(item.color).tinta }}
+                      aria-hidden="true"
+                    >
                       {item.icono}
                     </div>
                     <div>
-                      <strong className={styles.cicloTitulo} style={{ color: item.color }}>{item.titulo}</strong>
+                      <strong className={`${styles.cicloTitulo} ${CLASE_TEXTO[item.color]}`}>{item.titulo}</strong>
                       <p className={styles.cicloDesc}>{item.desc}</p>
                     </div>
                   </div>
@@ -512,7 +544,7 @@ export default function VisualizadorIaRedesNeuronales() {
               <div className={styles.simuladorEntrenamiento}>
                 <div className={styles.controlGrupo}>
                   <label htmlFor="learning-rate" className={styles.controlLabel}>
-                    Learning rate (α) = <strong>{learningRate.toFixed(3)}</strong>
+                    Learning rate (α) = <strong>{formatNumber(learningRate, 3)}</strong>
                   </label>
                   <input
                     id="learning-rate"
@@ -538,8 +570,8 @@ export default function VisualizadorIaRedesNeuronales() {
                   </div>
                   <div className={styles.statBox}>
                     <span className={styles.statLabel}>Loss</span>
-                    <span className={styles.statValor} style={{ color: loss < 0.1 ? 'var(--secondary-texto)' : loss > 0.5 ? '#E07B39' : 'var(--primary-texto)' }}>
-                      {loss.toFixed(4)}
+                    <span className={`${styles.statValor} ${loss < 0.1 ? styles.txtTeal : loss > 0.5 ? styles.txtNaranja : styles.txtMarca}`}>
+                      {formatNumber(loss, 4)}
                     </span>
                   </div>
                   <div className={styles.statBox}>

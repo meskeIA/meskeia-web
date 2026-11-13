@@ -352,6 +352,15 @@ const APPS: App[] = [
   // Fulcro en rojo 3,79 y 3,76, Banda A en violeta 2,45 en oscuro, Carga sobre su tinte 4,40 y 2,13)
   // y «(bíceps)» encima de la punta de la flecha (4,23 y 3,26)
   { slug: 'visualizador-musculos-movimiento', secciones: SECCIONES },
+  // 13/11/2026: los pesos, f(x) y los nombres de las capas en el color puro de su dato (la marca 4,07:1
+  // en claro y 3,31 en oscuro, el teal 2,78, el acento 2,24) y el blanco sobre el color de la
+  // activación en la neurona (4,11-4,46). Los nodos de la red, como subestados (el elegido pinta su n)
+  {
+    slug: 'visualizador-ia-redes-neuronales',
+    secciones: SECCIONES,
+    extremos: true,
+    subestados: "svg circle[role='button']",
+  },
 ];
 
 interface TextoSvg {

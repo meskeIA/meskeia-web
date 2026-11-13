@@ -210,6 +210,11 @@ const APPS: App[] = [
   // 13/11/2026: el blanco de las etiquetas de cada tipo de músculo sobre su color puro (la marca
   // 4,11:1, el teal 2,80, el rojo 3,82) y la viñeta en rojo (3,82 en claro, 3,76 en oscuro)
   { slug: 'visualizador-musculos-movimiento', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
+  // 13/11/2026: la pestaña activa con el ratón encima ponía --primary-texto sobre su propio fondo (1,00:1
+  // en claro, 1,96 en oscuro), los pasos del ciclo de entrenamiento en su color con style (el acento
+  // 2,26, el teal 2,80, el naranja 2,97, la marca 4,11 y 3,35), el loss en naranja (2,85) y, en
+  // oscuro, el rango de la función elegida sobre el tinte de marca al 10 % (4,42)
+  { slug: 'visualizador-ia-redes-neuronales', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
 ];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {

@@ -69,7 +69,10 @@
   color: var(--primary-texto);
 }
 
-.navBtnActivo {
+/* También con el ratón encima: .navBtn:hover pesa más que una clase sola y ponía --primary-texto
+   sobre su propio fondo, 1,00:1 en claro (C0297, 13/11/2026) */
+.navBtnActivo,
+.navBtnActivo:hover {
   background-color: var(--primary-boton);
   color: white;
   border-color: var(--primary-boton);
@@ -732,6 +735,26 @@
   background-color: var(--bg-card);
   border-color: rgba(46, 134, 171, 0.2);
 }
+
+/* Rótulos de la neurona y de la red — cabo C0297 (13/11/2026). Iban en el color puro de su dato:
+   la marca 4,07:1 en claro y 3,31 en oscuro, el teal 2,78 y el acento 2,24 en claro. Un tono de
+   texto por dato y tema; el color de dato se queda en líneas y nodos. El fill por CSS manda sobre
+   el atributo. Medido en tests/contraste-svg-texto.spec.ts. */
+.svgMarca { fill: var(--primary-texto, #26718F); }
+.svgTeal { fill: var(--secondary-texto, #327874); }
+.svgAcento { fill: var(--primary-texto, #26718F); }
+[data-theme='dark'] .svgAcento { fill: #7FB3D3; }
+
+/* Lo mismo en el HTML (C0645): pasos del ciclo, tipo de capa y la cifra del loss */
+.txtMarca { color: var(--primary-texto, #26718F); }
+.txtTeal { color: var(--secondary-texto, #327874); }
+.txtAcento { color: var(--primary-texto, #26718F); }
+.txtNaranja { color: var(--naranja-texto, #B93E0B); }
+[data-theme='dark'] .txtAcento { color: #7FB3D3; }
+[data-theme='dark'] .txtNaranja { color: #F0B27A; }
+
+/* Tinte al 5 % y no al 10 en oscuro: el rango «(0, 1)» en --text-muted encima daba 4,42:1 (C0278) */
+[data-theme='dark'] .fnBtnActivo { background-color: rgba(46, 134, 171, 0.05); }
 
 [data-theme='dark'] .nodoInfoPlaceholder {
   border-color: rgba(46, 134, 171, 0.25);
