@@ -296,6 +296,10 @@ const APPS: App[] = [
   // #999 (2,62-2,82) y los nombres en #666 (2,50 en oscuro), el blanco sobre las hojas de Huffman en
   // la marca (4,11) y, con una barra alta, su cifra encima de la propia barra (1,24-1,37)
   { slug: 'visualizador-teoria-informacion', secciones: SECCIONES, extremos: true },
+  // 13/11/2026: los ejes de sus cuatro gráficos en #999 (2,64:1 sobre el fondo del gráfico en claro),
+  // la D de la demanda en rojo puro (3,54 en claro, 3,36 en oscuro), O y P₂ en la marca (3,80 y
+  // 3,12) y la E del equilibrio en teal (2,59). Los botones de elasticidad y estructura, como subestados
+  { slug: 'visualizador-microeconomia', extremos: true, subestados: 'button[aria-pressed]' },
 ];
 
 interface TextoSvg {

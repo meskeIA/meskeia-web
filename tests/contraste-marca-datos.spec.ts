@@ -180,6 +180,9 @@ const APPS: App[] = [
   // la eficiencia de Huffman en el color de su dato (el ámbar 1,99-2,08:1, el teal 2,80, el rojo
   // 3,61-3,77, la marca 4,11 y #999 2,73 en claro; la marca 3,50 y el rojo 3,81 en oscuro)
   { slug: 'visualizador-teoria-informacion', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
+  // 13/11/2026 (C0645): «demanda» en #e74c3c (3,50:1 en claro, 3,31 en oscuro) y la caída de la
+  // cantidad y el poder de mercado en #27ae60 con style (2,87 en claro)
+  { slug: 'visualizador-microeconomia', todo: true, secciones: 'button[aria-pressed]' },
 ];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {

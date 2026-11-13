@@ -71,6 +71,24 @@
 /* Visual genérico */
 .visualWrap { background: var(--hover); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-xl); }
 .visualSvg { width: 100%; height: auto; max-height: 220px; display: block; }
+/* Rótulos de los gráficos — cabo C0297 (13/11/2026). En #999 daban 2,64:1 sobre el fondo del
+   gráfico en claro, y en su color puro la D roja 3,54 (3,36 en oscuro), O y P₂ en la marca 3,80
+   (3,12) y E en teal 2,59. Un tono de texto por dato y tema; el color de dato se queda en las
+   curvas y el punto. El fill por CSS manda sobre el atributo. Medido en tests/contraste-svg-texto.spec.ts. */
+.svgTenue { fill: var(--text-secondary); }
+.svgMarca { fill: var(--primary-texto, #26718F); }
+.svgTeal { fill: var(--secondary-texto, #327874); }
+.svgRojo { fill: var(--rojo-texto, #B91C1C); }
+[data-theme='dark'] .svgRojo { fill: #F1948A; }
+/* Las mismas cifras en el HTML (C0645): «demanda» en #e74c3c (3,50:1 en claro, 3,31 en oscuro) y
+   la caída de la cantidad y el poder de mercado en #27ae60 (2,87 en claro). Medido en
+   tests/contraste-marca-datos.spec.ts. */
+.container .txtRojo { color: var(--rojo-texto, #B91C1C); }
+.container .txtNaranja { color: var(--naranja-texto, #B93E0B); }
+.container .txtVerde { color: var(--verde-texto, #136E35); }
+[data-theme='dark'] .container .txtRojo { color: #F1948A; }
+[data-theme='dark'] .container .txtNaranja { color: #F0B27A; }
+[data-theme='dark'] .container .txtVerde { color: #58D68D; }
 .visualLeyenda { font-size: 0.8rem; color: var(--text-secondary); text-align: center; margin-top: var(--spacing-sm); line-height: 1.5; }
 .visualLeyenda strong { color: var(--text-primary); }
 

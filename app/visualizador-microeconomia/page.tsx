@@ -165,8 +165,8 @@ function VisualEscasez() {
       <svg viewBox="0 0 100 100" className={styles.visualSvg} role="img" aria-label={`Frontera de posibilidades: ${bienA} de educación y ${bienB} de ocio`}>
         <line x1="12" y1="88" x2="95" y2="88" stroke="#ccc" strokeWidth="1.5" />
         <line x1="12" y1="88" x2="12" y2="6" stroke="#ccc" strokeWidth="1.5" />
-        <text x="94" y="96" fontSize="6" fill="#999" textAnchor="end">Ocio</text>
-        <text x="4" y="10" fontSize="6" fill="#999">Estudio</text>
+        <text x="94" y="96" fontSize="6" className={styles.svgTenue} textAnchor="end">Ocio</text>
+        <text x="4" y="10" fontSize="6" className={styles.svgTenue}>Estudio</text>
         {/* Frontera cóncava */}
         <path d="M 12,12 A 76,76 0 0 1 88,88" stroke="#2E86AB" strokeWidth="2.5" fill="none" />
         {/* Líneas guía */}
@@ -215,23 +215,23 @@ function VisualOfertaDemanda() {
       <svg viewBox="0 0 100 100" className={styles.visualSvg} role="img" aria-label="Curva de oferta ascendente y curva de demanda descendente que se cruzan en el punto de equilibrio">
         <line x1="12" y1="88" x2="95" y2="88" stroke="#ccc" strokeWidth="1.5" />
         <line x1="12" y1="88" x2="12" y2="6" stroke="#ccc" strokeWidth="1.5" />
-        <text x="94" y="96" fontSize="6" fill="#999" textAnchor="end">Cantidad</text>
-        <text x="4" y="10" fontSize="6" fill="#999">Precio</text>
+        <text x="94" y="96" fontSize="6" className={styles.svgTenue} textAnchor="end">Cantidad</text>
+        <text x="4" y="10" fontSize="6" className={styles.svgTenue}>Precio</text>
         {/* Demanda (descendente) */}
         <line x1="18" y1="16" x2="86" y2="80" stroke="#e74c3c" strokeWidth="2.5" strokeLinecap="round" />
-        <text x="88" y="82" fontSize="7" fill="#e74c3c" fontWeight="bold">D</text>
+        <text x="88" y="82" fontSize="7" className={styles.svgRojo} fontWeight="bold">D</text>
         {/* Oferta (ascendente) */}
         <line x1="18" y1="80" x2="86" y2="16" stroke="#2E86AB" strokeWidth="2.5" strokeLinecap="round" />
-        <text x="88" y="16" fontSize="7" fill="#2E86AB" fontWeight="bold">O</text>
+        <text x="88" y="16" fontSize="7" className={styles.svgMarca} fontWeight="bold">O</text>
         {/* Equilibrio */}
         <line x1="12" y1="48" x2="52" y2="48" stroke="#48A9A6" strokeWidth="1" strokeDasharray="3,2" />
         <line x1="52" y1="88" x2="52" y2="48" stroke="#48A9A6" strokeWidth="1" strokeDasharray="3,2" />
         <circle cx="52" cy="48" r="3.5" fill="#48A9A6" stroke="#fff" strokeWidth="1.2" />
-        <text x="55" y="44" fontSize="6" fill="#48A9A6" fontWeight="bold">E</text>
+        <text x="55" y="44" fontSize="6" className={styles.svgTeal} fontWeight="bold">E</text>
       </svg>
       <p className={styles.visualLeyenda}>
         La <strong style={{ color: 'var(--primary-texto)' }}>oferta</strong> sube con el precio; la{' '}
-        <strong style={{ color: '#e74c3c' }}>demanda</strong> baja con él. Se cruzan en el{' '}
+        <strong className={styles.txtRojo}>demanda</strong> baja con él. Se cruzan en el{' '}
         <strong>punto de equilibrio (E)</strong>: el precio donde lo que se quiere comprar iguala a lo que se quiere vender.
       </p>
     </div>
@@ -266,15 +266,15 @@ function VisualElasticidad() {
       <svg viewBox="0 0 100 100" className={styles.visualSvg} role="img" aria-label={`Demanda ${modo}: al subir el precio, la cantidad cae un ${caidaCantidad}%`}>
         <line x1="12" y1="88" x2="95" y2="88" stroke="#ccc" strokeWidth="1.5" />
         <line x1="12" y1="88" x2="12" y2="6" stroke="#ccc" strokeWidth="1.5" />
-        <text x="94" y="96" fontSize="6" fill="#999" textAnchor="end">Cantidad</text>
-        <text x="4" y="10" fontSize="6" fill="#999">Precio</text>
+        <text x="94" y="96" fontSize="6" className={styles.svgTenue} textAnchor="end">Cantidad</text>
+        <text x="4" y="10" fontSize="6" className={styles.svgTenue}>Precio</text>
         {/* Curva de demanda */}
         <path d={curva} stroke="#e74c3c" strokeWidth="2.5" fill="none" strokeLinecap="round" />
         {/* Precio antes (bajo) y después (alto) */}
         <line x1="12" y1="62" x2="88" y2="62" stroke="#999" strokeWidth="0.8" strokeDasharray="3,2" />
         <line x1="12" y1="30" x2="88" y2="30" stroke="#2E86AB" strokeWidth="1" strokeDasharray="3,2" />
-        <text x="13" y="60" fontSize="5" fill="#999">P₁</text>
-        <text x="13" y="28" fontSize="5" fill="#2E86AB" fontWeight="bold">P₂ ↑</text>
+        <text x="13" y="60" fontSize="5" className={styles.svgTenue}>P₁</text>
+        <text x="13" y="28" fontSize="5" className={styles.svgMarca} fontWeight="bold">P₂ ↑</text>
       </svg>
       <div className={styles.datosFila}>
         <div className={styles.datoBloque}>
@@ -284,7 +284,7 @@ function VisualElasticidad() {
         </div>
         <div className={styles.datoBloque}>
           <div className={styles.datoEtiqueta}>Cae la cantidad</div>
-          <div className={styles.datoValor} style={{ color: inelastico ? '#27ae60' : '#e74c3c' }}>−{caidaCantidad} %</div>
+          <div className={`${styles.datoValor} ${inelastico ? styles.txtVerde : styles.txtRojo}`}>−{caidaCantidad} %</div>
           <div className={styles.datoNota}>{inelastico ? 'apenas reaccionas' : 'te vas a otro'}</div>
         </div>
       </div>
@@ -315,8 +315,8 @@ function VisualCostes() {
       <svg viewBox="0 0 100 100" className={styles.visualSvg} role="img" aria-label={`Con ${unidades} unidades el coste medio es ${costeMedio.toFixed(1)} euros`}>
         <line x1="12" y1="88" x2="95" y2="88" stroke="#ccc" strokeWidth="1.5" />
         <line x1="12" y1="88" x2="12" y2="6" stroke="#ccc" strokeWidth="1.5" />
-        <text x="94" y="96" fontSize="6" fill="#999" textAnchor="end">Unidades</text>
-        <text x="4" y="10" fontSize="6" fill="#999">€/ud</text>
+        <text x="94" y="96" fontSize="6" className={styles.svgTenue} textAnchor="end">Unidades</text>
+        <text x="4" y="10" fontSize="6" className={styles.svgTenue}>€/ud</text>
         {/* Curva de coste medio decreciente: CM = 1000/q + 4 */}
         <path
           d={(() => {
@@ -411,7 +411,7 @@ function VisualEstructuras() {
           <div className={styles.meterTrack}>
             <div className={styles.meterFill} style={{ width: `${e.poder}%`, background: e.poder > 60 ? '#e74c3c' : e.poder > 25 ? '#e67e22' : '#27ae60' }} />
           </div>
-          <div className={styles.meterValor} style={{ color: e.poder > 60 ? '#e74c3c' : e.poder > 25 ? '#e67e22' : '#27ae60' }}>{e.poder}/100</div>
+          <div className={`${styles.meterValor} ${e.poder > 60 ? styles.txtRojo : e.poder > 25 ? styles.txtNaranja : styles.txtVerde}`}>{e.poder}/100</div>
         </div>
       </div>
       <p className={styles.visualLeyenda}>{e.ejemplo}</p>
