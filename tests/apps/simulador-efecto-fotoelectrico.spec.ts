@@ -12,7 +12,7 @@ import {
   generarEjercicioAleatorio,
   resolverCaso,
 } from '../../app/simulador-efecto-fotoelectrico/casos';
-import { METALES } from '../../app/simulador-efecto-fotoelectrico/motor';
+import { MASA_ELECTRON, METALES } from '../../app/simulador-efecto-fotoelectrico/motor';
 
 /**
  * Simulador del Efecto Fotoeléctrico — PASO 4.bis de /nueva-app-meskeia (06/10/2026)
@@ -29,8 +29,10 @@ import { METALES } from '../../app/simulador-efecto-fotoelectrico/motor';
  *   Estado inicial: λ = 400 nm, sodio, intensidad 60 %.
  *
  * LA VERDAD FÍSICA, CALCULADA A MANO ANTES DE ABRIR EL NAVEGADOR
- *   CODATA 2018: h = 6,62607015e−34 J·s · e = 1,602176634e−19 C · c = 299.792.458 m/s ·
- *   mₑ = 9,1093837015e−31 kg  →  h·c/e = 1.239,8419843 eV·nm.
+ *   CODATA 2022: h = 6,62607015e−34 J·s · e = 1,602176634e−19 C · c = 299.792.458 m/s ·
+ *   mₑ = 9,1093837139e−31 kg  →  h·c/e = 1.239,8419843 eV·nm. (Hasta el 13/11/2026 la app usaba
+ *   la mₑ de CODATA 2018, 9,1093837015e−31: 1,4·10⁻¹⁰ relativo, que no mueve ninguna cifra de
+ *   abajo. Por eso el caso 7 mira el rótulo, que es lo único que cambia en pantalla.)
  *
  *   λ = 400 nm: E = 1.239,8419843/400 = 3,0996050 eV  → la vista, con 3 decimales: «3,100 eV»
  *               E en J = 3,0996050 × 1,602176634e−19 = 4,966115e−19 → «4,966 × 10⁻¹⁹ J»
@@ -39,7 +41,7 @@ import { METALES } from '../../app/simulador-efecto-fotoelectrico/motor';
  *   Sodio (φ = 2,46 eV) a 400 nm:
  *     E_c = 3,0996050 − 2,46 = 0,6396050 eV                        → «0,640 eV»
  *     V₀ = E_c/e: el mismo número en voltios                        → «0,640 V»
- *     v = √(2 · 0,6396050 · 1,602176634e−19 / 9,1093837015e−31) = 4,743311e5 m/s
+ *     v = √(2 · 0,6396050 · 1,602176634e−19 / 9,1093837139e−31) = 4,743311e5 m/s
  *                                                                   → «4,743 × 10⁵ m/s»
  *     λ₀ = 1.239,8419843/2,46 = 504,0008 nm                         → «504,0 nm»
  *     f₀ = 2,46 · 1,602176634e−19 / 6,62607015e−34 = 5,948254e14 Hz → «5,948 × 10¹⁴ Hz»
@@ -70,6 +72,8 @@ import { METALES } from '../../app/simulador-efecto-fotoelectrico/motor';
  *   4) prefers-reduced-motion: ninguna animación en marcha y electrones repartidos quietos.
  *   5) presets de metal con aria-pressed, más «Otro φ».
  *   6) RelatedApps pinta 4 tarjetas.
+ *   7) el rótulo de las constantes dice CODATA 2022 y la mₑ de 2022, la misma que usa el motor
+ *      (cabo C0726: el de 2018 seguía en pantalla).
  */
 
 const SLIDERS = ['#slider-lambda', '#slider-intensidad'] as const;
@@ -231,10 +235,23 @@ test('Caso 6 — RelatedApps pinta 4 tarjetas, con el espectro entre ellas', asy
   ).toHaveCount(1);
 });
 
+// ─────────────────────────────────────────────────────────────────────────────
+test('Caso 7 — el rótulo de las constantes es el de CODATA 2022, igual que el motor (C0726)', async ({ page }) => {
+  // mₑ de CODATA 2022 leída en physics.nist.gov/cgi-bin/cuu/Value?me: 9,109 383 7139(28)·10⁻³¹ kg.
+  // El cambio desde la de 2018 no mueve ninguna tarjeta (ver la cabecera), así que lo único que
+  // delata una constante vieja en pantalla es este rótulo.
+  expect(MASA_ELECTRON).toBe(9.1093837139e-31);
+  const rotulo = page.locator('p').filter({ hasText: /^Constantes CODATA/ });
+  await expect(rotulo).toHaveCount(1);
+  await expect(rotulo).toContainText('Constantes CODATA 2022');
+  await expect(rotulo).toContainText('mₑ = 9,1093837139 × 10⁻³¹ kg');
+  await expect(rotulo).not.toContainText('2018');
+});
+
 /* ═══════════════════════════════════════════════════════════════════════════════════════════
  * CASOS PARA CLASE (skill /casos-aula-meskeia, 06/10/2026) — `casos.ts` sin navegador
  *
- * El convenio que hay que vigilar son las CONSTANTES: la app usa CODATA 2018 (h·c = 1.239,84
+ * El convenio que hay que vigilar son las CONSTANTES: la app usa CODATA 2022 (h·c = 1.239,84
  * eV·nm) y en clase se usa h·c = 1240 eV·nm, h = 6,63·10⁻³⁴ J·s, e = 1,60·10⁻¹⁹ C y
  * mₑ = 9,11·10⁻³¹ kg. Cada enunciado declara las suyas, y aquí cada caso se recalcula con las
  * DOS tandas, con fórmulas escritas en este test (no las de casos.ts ni las del motor): las dos
