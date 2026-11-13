@@ -171,12 +171,17 @@ if (marcador) {
 // ⚠️ La trampa 4.quater NO podía cazarlo: recibe `ficherosFuera` ya calculado, así que da por
 // buena justo la parte que estaba rota. Esta ejercita la comparación misma.
 {
-  const DENTRO_MINUSCULA = [
-    'c:\\Users\\jaceb\\meskeia-web\\app\\conjugador-verbos\\page.tsx',
-    'c:\\Users\\jaceb\\meskeia-web\\scripts\\gsc-promesa.mjs',
-    'c:\\Users\\jaceb\\meskeia-web\\tests\\apps\\tabla-valencias.spec.ts',
-  ];
+  // Las rutas salen de la raíz REAL con la unidad en minúscula, no de «meskeia-web» escrito a
+  // mano: en las copias de las tareas (meskeia-reparar, meskeia-inspector) la raíz es otra, y con
+  // la carpeta fija estas tres rutas quedaban fuera de verdad y la trampa fallaba sin que hubiera
+  // nada roto (13/11/2026, al probar C0731 en meskeia-reparar).
   const raiz = path.join(RAIZ);
+  const raizMinuscula = raiz.replace(/^([A-Za-z]):/, (_, letra) => `${letra.toLowerCase()}:`).replace(/\//g, '\\');
+  const DENTRO_MINUSCULA = [
+    `${raizMinuscula}\\app\\conjugador-verbos\\page.tsx`,
+    `${raizMinuscula}\\scripts\\gsc-promesa.mjs`,
+    `${raizMinuscula}\\tests\\apps\\tabla-valencias.spec.ts`,
+  ];
   const todasDentro = DENTRO_MINUSCULA.every((r) => dentroDe(path.resolve(r), raiz));
   anotar(
     '4.quinquies · una ruta de DENTRO en minúscula NO se marca fuera',
