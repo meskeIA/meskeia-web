@@ -215,6 +215,10 @@ const APPS: App[] = [
   // 2,26, el teal 2,80, el naranja 2,97, la marca 4,11 y 3,35), el loss en naranja (2,85) y, en
   // oscuro, el rango de la función elegida sobre el tinte de marca al 10 % (4,42)
   { slug: 'visualizador-ia-redes-neuronales', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
+  // 13/11/2026: el título de la fuerza elegida en su color con style (la sustentación en verde, 3,30:1
+  // en claro y 4,18 en oscuro) y, en oscuro, «El mito» y la respuesta de los casos cayendo a la
+  // reserva de su receta (#DC2626 a 2,85, #16A34A a 4,18)
+  { slug: 'visualizador-vuelo-avion', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
 ];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {

@@ -366,6 +366,11 @@ const APPS: App[] = [
   // naranja (2,14), «Pétalos» (4,31 en claro, 3,30 en oscuro) y «Receptáculo» en marrón (2,19 en
   // oscuro). Cada parte elegida, como subestado (su brillo aclaraba también el rótulo)
   { slug: 'visualizador-anatomia-flor', secciones: SECCIONES, subestados: "button[aria-pressed]:not(nav button)" },
+  // 13/11/2026: los rótulos de sus dos diagramas en el color puro de su dato: la sustentación en verde
+  // (3,16-3,27:1 en claro, 4,12 en oscuro), α en naranja (2,82), los flujos en el acento (2,24) y el
+  // teal (2,78), el empuje en la marca (3,93 y 4,24), el peso en marrón (1,92 en oscuro) y la
+  // resistencia en rojo (3,60 en oscuro)
+  { slug: 'visualizador-vuelo-avion', secciones: SECCIONES, extremos: true },
 ];
 
 interface TextoSvg {

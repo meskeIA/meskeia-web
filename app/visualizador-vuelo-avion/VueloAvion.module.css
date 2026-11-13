@@ -24,8 +24,14 @@
 .mitoHeader, .realidadHeader { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.4rem; }
 .mitoIcono { font-size: 1.2rem; }
 .realidadIcono { font-size: 1.2rem; }
-.mitoTitulo { font-size: 0.85rem; font-weight: 700; text-transform: uppercase; color: #DC2626; margin: 0; }
+.mitoTitulo { font-size: 0.85rem; font-weight: 700; text-transform: uppercase; color: var(--rojo-texto, #DC2626); margin: 0; }
 .realidadTitulo { font-size: 0.85rem; font-weight: 700; text-transform: uppercase; color: var(--verde-texto, #16A34A); margin: 0; }
+/* En oscuro la receta caía a su reserva: «El mito» en #DC2626 a 2,85:1 y el verde a 4,18 sobre la
+   tarjeta (C0681, 13/11/2026). Igual en la respuesta de los casos y el aviso de pérdida. */
+[data-theme='dark'] .mitoTitulo,
+[data-theme='dark'] .stallWarning { color: #F1948A; }
+[data-theme='dark'] .realidadTitulo,
+[data-theme='dark'] .casoRespuesta { color: #4ADE80; }
 .mitoTexto { font-size: 0.9rem; color: var(--text-secondary); font-style: italic; margin: 0 0 0.75rem; padding: 0.5rem 0.75rem; background: #FEE2E2; border-radius: 6px; }
 [data-theme='dark'] .mitoTexto { background: #3B0A0A; }
 .realidadTexto { font-size: 0.9rem; color: var(--text-secondary); margin: 0 0 0.75rem; font-weight: 500; }
@@ -37,12 +43,34 @@
 .diagramaWrapper { background: var(--bg-card); border-radius: 12px; padding: 1rem; margin-bottom: 1.5rem; }
 .diagrama { width: 100%; height: auto; display: block; }
 
+/* Rótulos de los dos diagramas — cabo C0297 (13/11/2026). Iban en el color puro de su dato: la
+   sustentación en verde 3,16-3,27:1 en claro y 4,12 en oscuro, α en naranja 2,82, los flujos en el
+   acento 2,24 y el teal 2,78, el empuje en la marca 3,93, el peso en marrón 1,92 y la resistencia en
+   rojo 3,60 en oscuro. Un tono de texto por dato y tema; el color de dato se queda en las flechas.
+   El fill por CSS manda sobre el atributo. Medido en tests/contraste-svg-texto.spec.ts. */
+.svgVerde { fill: var(--verde-texto, #136E35); }
+.svgNaranja { fill: var(--naranja-texto, #B93E0B); }
+.svgMarca { fill: var(--primary-texto, #26718F); }
+.svgAcento { fill: var(--primary-texto, #26718F); }
+.svgTeal { fill: var(--secondary-texto, #327874); }
+.svgMarron { fill: #78350F; }
+.svgRojo { fill: var(--rojo-texto, #B91C1C); }
+[data-theme='dark'] .svgVerde { fill: #4ADE80; }
+[data-theme='dark'] .svgNaranja { fill: #F0B27A; }
+[data-theme='dark'] .svgAcento { fill: #7FB3D3; }
+[data-theme='dark'] .svgMarron { fill: #D6A77A; }
+[data-theme='dark'] .svgRojo { fill: #F1948A; }
+
+/* Lo mismo para el título de la fuerza elegida (C0645): las variables las pone su page.tsx */
+.tonoFuerza { color: var(--tono-claro, var(--text-primary)); }
+[data-theme='dark'] .tonoFuerza { color: var(--tono-oscuro, var(--text-primary)); }
+
 /* Slider */
 .sliderSection { background: var(--bg-card); border-radius: 12px; padding: 1.25rem; margin-bottom: 1rem; }
 .sliderTitulo { font-size: 1rem; font-weight: 700; color: var(--primary-texto); margin: 0 0 1rem; }
 .sliderWrapper { margin-bottom: 1rem; }
 .sliderLabel { display: block; font-size: 0.9rem; margin-bottom: 0.5rem; color: var(--text-primary); }
-.stallWarning { color: #DC2626; font-weight: 700; }
+.stallWarning { color: var(--rojo-texto, #DC2626); font-weight: 700; }
 .slider { width: 100%; accent-color: var(--primary); cursor: pointer; }
 .sliderMarks { display: flex; justify-content: space-between; font-size: 0.72rem; color: var(--text-muted); margin-top: 0.3rem; }
 .sustentacionMetric { margin-top: 0.75rem; }

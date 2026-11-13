@@ -1,7 +1,7 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState } from 'react';
+import { useState, type CSSProperties } from 'react';
 import styles from './VueloAvion.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
 
@@ -17,6 +17,8 @@ interface FuerzaVuelo {
   nombre: string;
   icono: string;
   color: string;
+  /** Tono del título de la fuerza en claro y en oscuro (cabo C0645): su color como texto daba 3,30:1 */
+  tonoTexto: [string, string];
   direccion: string;
   descripcion: string;
   formula: string;
@@ -53,6 +55,7 @@ const FUERZAS: FuerzaVuelo[] = [
     nombre: 'Sustentación (Lift)',
     icono: '⬆️',
     color: '#16A34A',
+    tonoTexto: ['#136E35', '#4ADE80'],
     direccion: 'Vertical hacia arriba',
     descripcion: 'Fuerza perpendicular al flujo de aire. Se genera por la diferencia de presión entre extradós (baja presión) e intradós (alta presión), causada por el ángulo de ataque.',
     formula: 'L = ½ × ρ × v² × S × CL',
@@ -61,6 +64,7 @@ const FUERZAS: FuerzaVuelo[] = [
     nombre: 'Resistencia (Drag)',
     icono: '⬅️',
     color: '#DC2626',
+    tonoTexto: ['#B91C1C', '#F1948A'],
     direccion: 'Horizontal opuesta al movimiento',
     descripcion: 'Fuerza paralela al flujo de aire que se opone al avance. Tiene dos componentes: resistencia de forma (fricción del aire) y resistencia inducida (subproducto de la sustentación).',
     formula: 'D = ½ × ρ × v² × S × CD',
@@ -69,6 +73,7 @@ const FUERZAS: FuerzaVuelo[] = [
     nombre: 'Empuje (Thrust)',
     icono: '➡️',
     color: '#2E86AB',
+    tonoTexto: ['#26718F', '#3FA5D1'],
     direccion: 'Horizontal hacia adelante',
     descripcion: 'Fuerza generada por los motores (turbofán, hélice o cohete) que vence la resistencia y mantiene la velocidad necesaria para que el ala genere sustentación.',
     formula: 'T = ṁ × (v_salida − v_entrada)',
@@ -77,6 +82,7 @@ const FUERZAS: FuerzaVuelo[] = [
     nombre: 'Peso (Weight)',
     icono: '⬇️',
     color: '#78350F',
+    tonoTexto: ['#78350F', '#D6A77A'],
     direccion: 'Vertical hacia abajo',
     descripcion: 'Fuerza gravitatoria sobre la masa total del avión (estructura + combustible + carga + pasajeros). En vuelo nivelado, la sustentación debe igualar exactamente al peso.',
     formula: 'W = m × g',
@@ -237,15 +243,15 @@ export default function VueloAvionPage() {
 
               {/* Flecha sustentación */}
               <line x1="250" y1="130" x2="250" y2="40" stroke="#16A34A" strokeWidth="3" markerEnd="url(#arrow-green)" />
-              <text x="255" y="85" fontSize="12" fill="#16A34A" fontWeight="bold">Sustentación ↑</text>
+              <text x="255" y="85" fontSize="12" className={styles.svgVerde} fontWeight="bold">Sustentación ↑</text>
 
               {/* Ángulo de ataque */}
               <path d="M 155 95 A 20 20 0 0 1 168 80" fill="none" stroke="#E67E22" strokeWidth="2" />
-              <text x="175" y="95" fontSize="11" fill="#E67E22">α (ángulo ataque)</text>
+              <text x="175" y="95" fontSize="11" className={styles.svgNaranja}>α (ángulo ataque)</text>
 
               {/* Labels */}
-              <text x="20" y="20" fontSize="11" fill="#7FB3D3">Flujo entrada</text>
-              <text x="430" y="25" fontSize="11" fill="#48A9A6">Flujo deflectado ↓</text>
+              <text x="20" y="20" fontSize="11" className={styles.svgAcento}>Flujo entrada</text>
+              <text x="430" y="25" fontSize="11" className={styles.svgTeal}>Flujo deflectado ↓</text>
 
               <defs>
                 <marker id="arrow-blue" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto">
@@ -344,19 +350,19 @@ export default function VueloAvionPage() {
 
               {/* Sustentación ↑ */}
               <line x1="150" y1="107" x2="150" y2="40" stroke="#16A34A" strokeWidth="3" markerEnd="url(#f-green)" />
-              <text x="155" y="70" fontSize="11" fill="#16A34A">Sustentación</text>
+              <text x="155" y="70" fontSize="11" className={styles.svgVerde}>Sustentación</text>
 
               {/* Peso ↓ */}
               <line x1="150" y1="143" x2="150" y2="210" stroke="#78350F" strokeWidth="3" markerEnd="url(#f-brown)" />
-              <text x="155" y="185" fontSize="11" fill="#78350F">Peso</text>
+              <text x="155" y="185" fontSize="11" className={styles.svgMarron}>Peso</text>
 
               {/* Empuje → */}
               <line x1="205" y1="125" x2="270" y2="125" stroke="#2E86AB" strokeWidth="3" markerEnd="url(#f-blue)" />
-              <text x="218" y="118" fontSize="11" fill="#2E86AB">Empuje</text>
+              <text x="218" y="118" fontSize="11" className={styles.svgMarca}>Empuje</text>
 
               {/* Resistencia ← */}
               <line x1="95" y1="125" x2="30" y2="125" stroke="#DC2626" strokeWidth="3" markerEnd="url(#f-red)" />
-              <text x="32" y="118" fontSize="11" fill="#DC2626">Resistencia</text>
+              <text x="32" y="118" fontSize="11" className={styles.svgRojo}>Resistencia</text>
 
               <defs>
                 <marker id="f-green" markerWidth="6" markerHeight="6" refX="3" refY="3" orient="auto"><path d="M 0 0 L 6 3 L 0 6 Z" fill="#16A34A" /></marker>
@@ -371,7 +377,12 @@ export default function VueloAvionPage() {
             <div className={styles.fuerzaHeader}>
               <span className={styles.fuerzaIconoGrande} aria-hidden="true">{fuerzaActual.icono}</span>
               <div>
-                <h3 style={{ color: fuerzaActual.color, margin: 0 }}>{fuerzaActual.nombre}</h3>
+                <h3
+                  className={styles.tonoFuerza}
+                  style={{ '--tono-claro': fuerzaActual.tonoTexto[0], '--tono-oscuro': fuerzaActual.tonoTexto[1], margin: 0 } as CSSProperties}
+                >
+                  {fuerzaActual.nombre}
+                </h3>
                 <p className={styles.fuerzaDireccion}>{fuerzaActual.direccion}</p>
               </div>
             </div>
