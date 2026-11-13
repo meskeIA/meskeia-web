@@ -124,6 +124,26 @@ escribir('app/garaje-unica/metadata.ts', leer('app/garaje-unica/metadata.ts').re
 espera(false, 'en una app con PREGUNTAS_FRECUENTES, corregir la respuesta');
 deshacer();
 
+// C0570: la misma pregunta redactada de otra forma en cada FAQ (hallazgo 4577 de
+// simulador-condensadores, 12/11/2026: la visible sin «un condensador» al final)
+escribir('app/garaje/page.tsx', leer('app/garaje/page.tsx').replace('¿Qué ITP paga un garaje de segunda mano?', '¿Qué ITP paga un garaje de segunda mano en España?'));
+git('commit', '-qam', 'visible con otra redacción');
+escribir('app/garaje/metadata.ts', leer('app/garaje/metadata.ts').replace("'El tipo reducido de la vivienda.'", `'${CORREGIDA}'`));
+espera(true, 'C0570: la visible añade una coletilla a la misma pregunta (una contiene a la otra)');
+git('checkout', '--', '.');
+escribir('app/garaje/page.tsx', leer('app/garaje/page.tsx').replace('¿Qué ITP paga un garaje de segunda mano en España?','¿QUE ITP paga un garaje de segunda mano?'));
+git('commit', '-qam', 'visible sin tilde y con otras mayúsculas');
+escribir('app/garaje/metadata.ts', leer('app/garaje/metadata.ts').replace("'El tipo reducido de la vivienda.'", `'${CORREGIDA}'`));
+espera(true, 'C0570: la misma pregunta sin tilde y con otras mayúsculas');
+git('checkout', '--', '.');
+escribir('app/garaje/page.tsx', leer('app/garaje/page.tsx').replace('¿QUE ITP paga un garaje de segunda mano?', '¿Qué ITP paga un garaje de segunda mano si el comprador es una empresa con actividad?'));
+git('commit', '-qam', 'visible: otra pregunta que empieza igual');
+escribir('app/garaje/metadata.ts', leer('app/garaje/metadata.ts').replace("'El tipo reducido de la vivienda.'", `'${CORREGIDA}'`));
+espera(false, 'C0570: una pregunta que solo empieza igual y añade más del 40 % es otra pregunta');
+git('checkout', '--', '.');
+escribir('app/garaje/page.tsx', PAGE_DOBLE);
+git('commit', '-qam', 'vuelta a la base');
+
 escribir('app/garaje/metadata.ts', `// faq-ok: comparte cada respuesta con constantes propias\n${leer('app/garaje/metadata.ts').replace("'El tipo reducido de la vivienda.'", `'${CORREGIDA}'`)}`);
 espera(false, 'escape «faq-ok:» con razón');
 deshacer();

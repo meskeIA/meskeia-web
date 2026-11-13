@@ -18,6 +18,9 @@
  * distintas, que la pregunta repetida salga de una constante compartida (garaje) o de una sola.
  * Dos FAQ con preguntas DISTINTAS no se tocan: medido el 01/11/2026, es lo normal (solo 5 de 534
  * apps con las dos FAQ las tenían con las mismas preguntas) y no es un defecto.
+ * «La misma pregunta» incluye, desde el 13/11/2026 (cabo C0570), la redactada con otras tildes,
+ * mayúsculas o plurales, o con una coletilla (`mismaPregunta`): con eso el pasivo pasó de 2 a 24
+ * apps, las 22 nuevas revisadas a mano y todas la misma pregunta. `--todo --detalle` las empareja.
  *
  * DE DÓNDE SALE
  * ─────────────
@@ -109,11 +112,39 @@ const normal = (t) => t.replace(/<[^>]*>/g, ' ').replace(/[{}]/g, ' ').replace(/
   .replace(/ |&nbsp;/g, ' ').replace(/\s+/g, ' ').trim().toLowerCase();
 
 /**
- * Las preguntas ESCRITAS DOS VECES: las del `faqJsonLd` que también están, con el mismo texto, en
- * la FAQ visible, y cuya respuesta del JSON-LD es un literal (no una constante compartida, como
- * `RESPUESTA_ITP_GARAJE_SEGUNDA_MANO` en garaje). Medido el 01/11/2026, la mayoría de las apps
- * tienen dos FAQ DISTINTAS —otras preguntas en cada sitio—, y eso no es un defecto (lo dice la
- * skill del Inspector, 2.bis); el defecto es la misma pregunta con su respuesta escrita dos veces.
+ * La CLAVE de una pregunta, para reconocerla redactada de otra forma: sin tildes, mayúsculas,
+ * signos ni la -s final de cada palabra (singular y plural). Cabo C0570: el candado comparaba el
+ * texto exacto y el Inspector encontró, entre el 03 y el 12/11/2026, 12 pares de la misma pregunta
+ * escrita de otra forma en cada FAQ, con la respuesta escrita dos veces (calculadora-escalas,
+ * tabla-limites-notables, tabla-areas-volumenes, simulador-modelo-bohr, luxometro,
+ * simulador-tcp-handshake, tabla-derivadas, simulador-condensadores), que no veía.
+ */
+const clave = (t) => normal(t).normalize('NFD').replace(/[̀-ͯ]/g, '')
+  .replace(/[¿?¡!.,:;«»"'“”‘’()…\-–—]/g, ' ').split(/\s+/).filter(Boolean)
+  .map((p) => (p.length > 3 ? p.replace(/e?s$/, '') : p)).join(' ');
+
+/**
+ * ¿Son la misma pregunta? Iguales en su clave, o una CONTIENE a la otra palabra por palabra y es
+ * al menos el 60 % de ella: «¿Cuánto tarda en cargarse del todo?» frente a «¿Cuánto tarda en
+ * cargarse del todo un condensador?» (hallazgo 4577) sí; «¿Qué es un condensador?» frente a
+ * «¿Qué es un condensador electrolítico y cuándo conviene usarlo?» no: es otra pregunta.
+ * Una reformulación con otras palabras («¿Por qué el handshake tiene 3 pasos y no 2?» frente a
+ * «¿Por qué TCP necesita tres pasos y no dos?») NO la ve: eso sigue siendo del Inspector (2.bis).
+ */
+function mismaPregunta(a, b) {
+  if (!a || !b) return false;
+  if (a === b) return true;
+  const [corta, larga] = a.length <= b.length ? [a, b] : [b, a];
+  return corta.length >= 15 && corta.length >= 0.6 * larga.length && ` ${larga} `.includes(` ${corta} `);
+}
+
+/**
+ * Las preguntas ESCRITAS DOS VECES: las del `faqJsonLd` que también están en la FAQ visible —con
+ * el mismo texto o redactadas de otra forma (`mismaPregunta`)—, y cuya respuesta del JSON-LD es un
+ * literal (no una constante compartida, como `RESPUESTA_ITP_GARAJE_SEGUNDA_MANO` en garaje).
+ * Medido el 01/11/2026, la mayoría de las apps tienen dos FAQ DISTINTAS —otras preguntas en cada
+ * sitio—, y eso no es un defecto (lo dice la skill del Inspector, 2.bis); el defecto es la misma
+ * pregunta con su respuesta escrita dos veces.
  */
 function preguntasDobles(slug) {
   const jl = ficheroJsonLd(slug);
@@ -123,11 +154,16 @@ function preguntasDobles(slug) {
   const rFaq = rangoDeclaracion(jl.texto, /export const faqJsonLd\b/);
   const bloque = jl.texto.split('\n').slice(rFaq[0] - 1, rFaq[1]).join('\n');
   const visible = normal(page.split('\n').slice(rVis[0], rVis[1]).join(' '));
+  // Las preguntas visibles: en español van entre ¿ y ?
+  const visibles = [...visible.matchAll(/¿([^¿?]{6,250})\?/g)].map((m) => ({ texto: m[0], clave: clave(m[1]) }));
   const dobles = [];
   for (const m of bloque.matchAll(/name:\s*(['"`])((?:\\.|(?!\1)[\s\S])*?)\1[\s\S]{0,300}?text:\s*(\S)/g)) {
     const pregunta = normal(m[2]);
     const literal = /['"`]/.test(m[3]);
-    if (pregunta.length > 12 && literal && visible.includes(pregunta)) dobles.push(m[2].trim());
+    if (pregunta.length <= 12 || !literal) continue;
+    const c = clave(m[2]);
+    const pareja = visible.includes(pregunta) ? null : visibles.find((v) => mismaPregunta(c, v.clave));
+    if (visible.includes(pregunta) || pareja) dobles.push(pareja ? `${m[2].trim()} ↔ visible: ${pareja.texto}` : m[2].trim());
   }
   return dobles;
 }
@@ -223,6 +259,12 @@ if (TODO) {
   }
   console.log(`📋 FAQ única — pasivo: ${duplicadas.length} de ${conAmbas} apps con FAQ visible y FAQPage repiten alguna pregunta con la respuesta escrita dos veces`);
   if (argv.includes('--lista')) console.log(`   ${duplicadas.join(', ')}`);
+  if (argv.includes('--detalle')) {
+    for (const d of duplicadas) {
+      const s = d.replace(/ \(\d+\)$/, '');
+      for (const p of preguntasDobles(s)) console.log(`   · ${s}: ${p}`);
+    }
+  }
   console.log('   (modo --todo: informa, no rompe; se unifican cuando una sesión toca su FAQ; --lista las nombra)');
   process.exit(0);
 }
