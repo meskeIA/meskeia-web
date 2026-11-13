@@ -49,6 +49,22 @@
 /* SVG zona */
 .svgZona { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-sm); overflow-x: auto; }
 .musculoSvg { width: 100%; height: auto; color: var(--text-primary); }
+
+/* Rótulos del sarcómero y de la palanca — cabo C0297 (13/11/2026). Iban en el color puro de su dato:
+   la marca 4,07:1 en claro y 3,50 en oscuro, el teal 2,78, el rojo 3,79 y 3,76, el violeta 2,45 en
+   oscuro (4,40 sobre su tinte en claro y 2,13 en oscuro). Un tono de texto por dato y tema; el color
+   de dato se queda en líneas y formas. El fill por CSS manda sobre el atributo. Medido en
+   tests/contraste-svg-texto.spec.ts. */
+.svgMarca { fill: var(--primary-texto, #26718F); }
+.svgTeal { fill: var(--secondary-texto, #327874); }
+.svgRojo { fill: var(--rojo-texto, #B91C1C); }
+.svgVioleta { fill: #6C3483; }
+[data-theme='dark'] .svgRojo { fill: #F1948A; }
+[data-theme='dark'] .svgVioleta { fill: #D2B4DE; }
+
+/* Tono de texto de un color de datos por tema (C0645): las variables las pone tono() del page.tsx */
+.tonoDato { color: var(--tono-claro, var(--text-primary)); }
+[data-theme='dark'] .tonoDato { color: var(--tono-oscuro, var(--text-primary)); }
 .svgHint { text-align: center; font-size: 0.82rem; color: var(--text-muted); margin-bottom: var(--spacing-lg); }
 
 /* Sarcomero */

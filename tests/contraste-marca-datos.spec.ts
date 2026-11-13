@@ -207,6 +207,9 @@ const APPS: App[] = [
   // ciclo en naranja (2,19) en claro; «Lóbulo derecho» en rojo (3,20) y «FASE 1» en violeta (2,81-2,97)
   // en oscuro; el blanco sobre el naranja de la glucosa en el botón elegido y los pasos (2,19)
   { slug: 'visualizador-higado', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
+  // 13/11/2026: el blanco de las etiquetas de cada tipo de músculo sobre su color puro (la marca
+  // 4,11:1, el teal 2,80, el rojo 3,82) y la viñeta en rojo (3,82 en claro, 3,76 en oscuro)
+  { slug: 'visualizador-musculos-movimiento', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
 ];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {

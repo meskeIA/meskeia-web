@@ -347,6 +347,11 @@ const APPS: App[] = [
   // (la vesícula 1,59-1,85:1, la arteria 1,73-2,14, el lóbulo izquierdo 2,02-2,83, el caudado 2,28-2,57,
   // la vena porta 2,21-2,79) y sobre el rojo elegido al 85 % (4,25). Cada zona, como subestado
   { slug: 'visualizador-higado', secciones: SECCIONES, subestados: "button[aria-pressed]:not(nav button)" },
+  // 13/11/2026: los rótulos del sarcómero y de la palanca en el color puro de su dato (Línea Z y
+  // Fuerza en la marca 4,07:1 en claro y 3,50 en oscuro, Banda I en teal 2,78, Banda H, Línea M y
+  // Fulcro en rojo 3,79 y 3,76, Banda A en violeta 2,45 en oscuro, Carga sobre su tinte 4,40 y 2,13)
+  // y «(bíceps)» encima de la punta de la flecha (4,23 y 3,26)
+  { slug: 'visualizador-musculos-movimiento', secciones: SECCIONES },
 ];
 
 interface TextoSvg {

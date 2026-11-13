@@ -1,8 +1,9 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState } from 'react';
+import { useState, type CSSProperties } from 'react';
 import styles from './MusculosMovimiento.module.css';
+import { rellenoConTinta } from '@/lib/tintaLegible';
 import {
   MeskeiaLogo,
   Footer,
@@ -18,6 +19,21 @@ import { formatNumber } from '@/lib';
 // ─────────────────────────────────────────────
 
 type Seccion = 'tipos' | 'contraccion' | 'articulaciones' | 'datos';
+
+/**
+ * Tono de TEXTO de cada color de tipo de músculo, en claro y en oscuro (cabo C0645, 13/11/2026): la
+ * viñeta en el rojo del cardíaco daba 3,82:1 en claro y 3,76 en oscuro. Lo usa la clase `tonoDato`.
+ */
+const TONOS_TEXTO: Record<string, [string, string]> = {
+  '#2E86AB': ['#26718F', '#3FA5D1'],
+  '#48A9A6': ['#327874', '#5ABDB9'],
+  '#E74C3C': ['#B91C1C', '#F1948A'],
+};
+
+function tono(color: string): CSSProperties {
+  const [claro, oscuro] = TONOS_TEXTO[color.toUpperCase()] ?? ['var(--text-primary)', 'var(--text-primary)'];
+  return { '--tono-claro': claro, '--tono-oscuro': oscuro } as CSSProperties;
+}
 
 interface SeccionInfo {
   id: Seccion;
@@ -334,26 +350,26 @@ function SvgSarcomero() {
       {/* Lineas Z */}
       <line x1="50" y1="30" x2="50" y2="150" stroke="#2E86AB" strokeWidth="3" />
       <line x1="450" y1="30" x2="450" y2="150" stroke="#2E86AB" strokeWidth="3" />
-      <text x="50" y="25" textAnchor="middle" fill="#2E86AB" fontSize="11" fontWeight="700">Línea Z</text>
-      <text x="450" y="25" textAnchor="middle" fill="#2E86AB" fontSize="11" fontWeight="700">Línea Z</text>
+      <text x="50" y="25" textAnchor="middle" className={styles.svgMarca} fontSize="11" fontWeight="700">Línea Z</text>
+      <text x="450" y="25" textAnchor="middle" className={styles.svgMarca} fontSize="11" fontWeight="700">Línea Z</text>
 
       {/* Banda I (solo actina) */}
       <rect x="50" y="55" width="60" height="60" fill="#48A9A6" opacity="0.1" />
       <rect x="390" y="55" width="60" height="60" fill="#48A9A6" opacity="0.1" />
-      <text x="80" y="170" textAnchor="middle" fill="#48A9A6" fontSize="10" fontWeight="600">Banda I</text>
-      <text x="420" y="170" textAnchor="middle" fill="#48A9A6" fontSize="10" fontWeight="600">Banda I</text>
+      <text x="80" y="170" textAnchor="middle" className={styles.svgTeal} fontSize="10" fontWeight="600">Banda I</text>
+      <text x="420" y="170" textAnchor="middle" className={styles.svgTeal} fontSize="10" fontWeight="600">Banda I</text>
 
       {/* Banda A (miosina + overlap) */}
       <rect x="130" y="55" width="240" height="60" fill="#8e44ad" opacity="0.08" />
-      <text x="250" y="170" textAnchor="middle" fill="#8e44ad" fontSize="10" fontWeight="600">Banda A</text>
+      <text x="250" y="170" textAnchor="middle" className={styles.svgVioleta} fontSize="10" fontWeight="600">Banda A</text>
 
       {/* Banda H (solo miosina) */}
       <rect x="200" y="55" width="100" height="60" fill="#e74c3c" opacity="0.08" />
-      <text x="250" y="185" textAnchor="middle" fill="#e74c3c" fontSize="10" fontWeight="600">Banda H</text>
+      <text x="250" y="185" textAnchor="middle" className={styles.svgRojo} fontSize="10" fontWeight="600">Banda H</text>
 
       {/* Linea M */}
       <line x1="250" y1="45" x2="250" y2="125" stroke="#e74c3c" strokeWidth="1.5" strokeDasharray="4,3" />
-      <text x="250" y="195" textAnchor="middle" fill="#e74c3c" fontSize="9">Línea M</text>
+      <text x="250" y="195" textAnchor="middle" className={styles.svgRojo} fontSize="9">Línea M</text>
 
       {/* Filamentos de actina (finos) - desde Z */}
       {[65, 80, 95, 105].map((y) => (
@@ -417,18 +433,19 @@ function SvgPalancaBrazo() {
 
       {/* Fulcro (codo) */}
       <polygon points="80,100 70,120 90,120" fill="#e74c3c" />
-      <text x="80" y="140" textAnchor="middle" fill="#e74c3c" fontSize="11" fontWeight="700">Fulcro</text>
+      <text x="80" y="140" textAnchor="middle" className={styles.svgRojo} fontSize="11" fontWeight="700">Fulcro</text>
       <text x="80" y="152" textAnchor="middle" fill="currentColor" fontSize="9">(codo)</text>
 
       {/* Fuerza (biceps) */}
       <line x1="150" y1="100" x2="150" y2="50" stroke="#2E86AB" strokeWidth="3" markerEnd="url(#arrowUp)" />
-      <text x="150" y="42" textAnchor="middle" fill="#2E86AB" fontSize="11" fontWeight="700">Fuerza</text>
-      <text x="150" y="54" textAnchor="middle" fill="currentColor" fontSize="9">(bíceps)</text>
+      {/* Encima de la punta de la flecha: «(bíceps)» en y=54 caía sobre ella (C0297) */}
+      <text x="150" y="28" textAnchor="middle" className={styles.svgMarca} fontSize="11" fontWeight="700">Fuerza</text>
+      <text x="150" y="41" textAnchor="middle" fill="currentColor" fontSize="9">(bíceps)</text>
 
       {/* Carga (mano) */}
       <line x1="340" y1="100" x2="340" y2="150" stroke="#8e44ad" strokeWidth="3" markerEnd="url(#arrowDown)" />
       <rect x="320" y="155" width="40" height="25" rx="4" fill="#8e44ad" opacity="0.2" />
-      <text x="340" y="172" textAnchor="middle" fill="#8e44ad" fontSize="10" fontWeight="600">Carga</text>
+      <text x="340" y="172" textAnchor="middle" className={styles.svgVioleta} fontSize="10" fontWeight="600">Carga</text>
       <text x="340" y="195" textAnchor="middle" fill="currentColor" fontSize="9">(mano)</text>
 
       {/* Etiqueta palanca */}
@@ -481,7 +498,12 @@ export default function MusculosMovimientoPage() {
                 <div className={styles.tipoHeader}>
                   <span className={styles.tipoIcono} aria-hidden="true">{tipo.icono}</span>
                   <h3 className={styles.tipoNombre}>{tipo.nombre}</h3>
-                  <span className={styles.tipoTag} style={{ background: tipo.tagColor }}>{tipo.tag}</span>
+                  <span
+                    className={styles.tipoTag}
+                    style={{ background: rellenoConTinta(tipo.tagColor).relleno, color: rellenoConTinta(tipo.tagColor).tinta }}
+                  >
+                    {tipo.tag}
+                  </span>
                 </div>
                 <p className={styles.tipoDesc}>{tipo.descripcion}</p>
 
@@ -498,7 +520,7 @@ export default function MusculosMovimientoPage() {
                     <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 0.5rem 0' }}>
                       {tipo.caracteristicas.map((c, i) => (
                         <li key={i} style={{ fontSize: '0.85rem', color: 'var(--text-primary)', lineHeight: 1.8 }}>
-                          <span style={{ color: tipo.color, fontWeight: 700, marginRight: '0.4rem' }}>&bull;</span>{c}
+                          <span className={styles.tonoDato} style={{ ...tono(tipo.color), fontWeight: 700, marginRight: '0.4rem' }}>&bull;</span>{c}
                         </li>
                       ))}
                     </ul>
