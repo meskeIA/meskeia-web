@@ -390,6 +390,10 @@ const APPS: App[] = [
   // 13/11/2026: los ejes de sus tres gráficos en #999 fijo (2,82:1 en claro) y «Rₜ = 1» en rojo puro
   // (3,79 en claro, 3,76 en oscuro)
   { slug: 'visualizador-modelos-epidemiologicos', secciones: SECCIONES, extremos: true },
+  // 13/11/2026: «Sitio activo» en blanco sobre la enzima translúcida (3,02:1 en claro), los nombres
+  // encima del borde inferior de las elipses (3,82 en oscuro) y los rótulos de las curvas en su color
+  // puro (el rojo 3,49-3,79 en claro y 3,43-3,76 en oscuro, el verde 2,85, la marca 4,07 y 3,50)
+  { slug: 'visualizador-enzimas-cuerpo-humano', secciones: SECCIONES, extremos: true },
 ];
 
 interface TextoSvg {

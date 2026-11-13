@@ -11,6 +11,10 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
+import { rellenoConTinta } from '@/lib/tintaLegible';
+
+/** Relleno opaco de la enzima en el modelo llave-cerradura y la tinta de su rótulo (cabo C0297) */
+const ENZIMA = rellenoConTinta('#2E86AB');
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -215,10 +219,13 @@ export default function EnzimasCuerpoHumanoPage() {
         <div className={styles.svgZona}>
           <svg viewBox="0 0 600 180" className={styles.svgDiagrama} role="img" aria-label="Diagrama del modelo llave-cerradura: el sustrato encaja en el sitio activo de la enzima como una llave en su cerradura">
             {/* Enzima (cerradura) */}
-            <ellipse cx="100" cy="100" rx="65" ry="50" fill="#2E86AB" opacity="0.85" />
+            {/* Enzima opaca con la tinta que le llega, y los nombres debajo de las elipses: translúcida
+                sobre el fondo, «Sitio activo» daba 3,02:1 en claro y los nombres caían encima de su
+                borde inferior (3,82 en oscuro). Cabo C0297, 13/11/2026 */}
+            <ellipse cx="100" cy="100" rx="65" ry="50" fill={ENZIMA.relleno} />
             <path d="M85 75 L85 95 L115 95 L115 75" fill="#FAFAFA" stroke="#1A1A1A" strokeWidth="2" />
-            <text x="100" y="140" textAnchor="middle" fontSize="12" fill="currentColor" fontWeight="600">Enzima</text>
-            <text x="100" y="68" textAnchor="middle" fontSize="10" fill="#FAFAFA">Sitio activo</text>
+            <text x="100" y="168" textAnchor="middle" fontSize="12" fill="currentColor" fontWeight="600">Enzima</text>
+            <text x="100" y="68" textAnchor="middle" fontSize="10" fill={ENZIMA.tinta}>Sitio activo</text>
 
             {/* Flecha */}
             <text x="185" y="105" textAnchor="middle" fontSize="20" fill="currentColor">→</text>
@@ -231,19 +238,19 @@ export default function EnzimasCuerpoHumanoPage() {
             <text x="275" y="105" textAnchor="middle" fontSize="20" fill="currentColor">→</text>
 
             {/* Complejo enzima-sustrato */}
-            <ellipse cx="370" cy="100" rx="65" ry="50" fill="#2E86AB" opacity="0.85" />
+            <ellipse cx="370" cy="100" rx="65" ry="50" fill={ENZIMA.relleno} />
             <rect x="355" y="75" width="30" height="20" rx="3" fill="#48A9A6" />
-            <text x="370" y="140" textAnchor="middle" fontSize="11" fill="currentColor" fontWeight="600">Complejo E-S</text>
+            <text x="370" y="168" textAnchor="middle" fontSize="11" fill="currentColor" fontWeight="600">Complejo E-S</text>
 
             {/* Flecha */}
             <text x="455" y="105" textAnchor="middle" fontSize="20" fill="currentColor">→</text>
 
             {/* Productos */}
-            <ellipse cx="540" cy="100" rx="50" ry="40" fill="#2E86AB" opacity="0.85" />
+            <ellipse cx="540" cy="100" rx="50" ry="40" fill={ENZIMA.relleno} />
             <rect x="510" y="55" width="15" height="12" rx="2" fill="#e67e22" />
             <rect x="535" y="55" width="15" height="12" rx="2" fill="#27ae60" />
-            <text x="540" y="140" textAnchor="middle" fontSize="11" fill="currentColor" fontWeight="600">Productos</text>
-            <text x="540" y="155" textAnchor="middle" fontSize="10" fill="currentColor">(enzima se recicla)</text>
+            <text x="540" y="158" textAnchor="middle" fontSize="11" fill="currentColor" fontWeight="600">Productos</text>
+            <text x="540" y="172" textAnchor="middle" fontSize="10" fill="currentColor">(enzima se recicla)</text>
           </svg>
         </div>
 
@@ -420,7 +427,7 @@ export default function EnzimasCuerpoHumanoPage() {
                 y={120 - actividadTemperatura(temperatura, 37) * 1.1 - 10}
                 textAnchor="middle"
                 fontSize="9"
-                fill="#e74c3c"
+                className={styles.svgRojo}
                 fontWeight="700"
               >
                 {formatNumber(actividadTemperatura(temperatura, 37), 0)}%
@@ -428,7 +435,7 @@ export default function EnzimasCuerpoHumanoPage() {
 
               {/* Zona de desnaturalización */}
               <rect x={40 + 42 * 9} y="10" width={8 * 9} height="110" fill="#e74c3c" opacity="0.08" />
-              <text x={40 + 46 * 9} y="25" fontSize="7" fill="#e74c3c" textAnchor="middle">Desnaturalización</text>
+              <text x={40 + 46 * 9} y="25" fontSize="7" className={styles.svgRojo} textAnchor="middle">Desnaturalización</text>
             </svg>
           </div>
 
@@ -459,7 +466,7 @@ export default function EnzimasCuerpoHumanoPage() {
               strokeWidth="2"
               points={puntosPH_pepsina.map(p => `${40 + (p.x / 14) * 460},${130 - p.y * 1.2}`).join(' ')}
             />
-            <text x={40 + (2 / 14) * 460} y="15" fontSize="8" fill="#e74c3c" textAnchor="middle" fontWeight="600">Pepsina (pH 2)</text>
+            <text x={40 + (2 / 14) * 460} y="15" fontSize="8" className={styles.svgRojo} textAnchor="middle" fontWeight="600">Pepsina (pH 2)</text>
 
             {/* Curva amilasa */}
             <polyline
@@ -468,7 +475,7 @@ export default function EnzimasCuerpoHumanoPage() {
               strokeWidth="2"
               points={puntosPH_amilasa.map(p => `${40 + (p.x / 14) * 460},${130 - p.y * 1.2}`).join(' ')}
             />
-            <text x={40 + (7 / 14) * 460} y="15" fontSize="8" fill="#27ae60" textAnchor="middle" fontWeight="600">Amilasa (pH 7)</text>
+            <text x={40 + (7 / 14) * 460} y="15" fontSize="8" className={styles.svgVerde} textAnchor="middle" fontWeight="600">Amilasa (pH 7)</text>
 
             {/* Curva tripsina */}
             <polyline
@@ -477,7 +484,7 @@ export default function EnzimasCuerpoHumanoPage() {
               strokeWidth="2"
               points={puntosPH_tripsina.map(p => `${40 + (p.x / 14) * 460},${130 - p.y * 1.2}`).join(' ')}
             />
-            <text x={40 + (8 / 14) * 460} y="25" fontSize="8" fill="#2E86AB" textAnchor="middle" fontWeight="600">Tripsina (pH 8)</text>
+            <text x={40 + (8 / 14) * 460} y="25" fontSize="8" className={styles.svgMarca} textAnchor="middle" fontWeight="600">Tripsina (pH 8)</text>
           </svg>
         </div>
         <div className={styles.contexto}>
@@ -510,7 +517,7 @@ export default function EnzimasCuerpoHumanoPage() {
 
               {/* Línea Vmax */}
               <line x1="40" y1="20" x2="500" y2="20" stroke="#e74c3c" strokeWidth="1" strokeDasharray="4" opacity="0.5" />
-              <text x="505" y="23" fontSize="7" fill="#e74c3c">Vmax</text>
+              <text x="505" y="23" fontSize="7" className={styles.svgRojo}>Vmax</text>
 
               {/* Línea Km */}
               <line x1={40 + (25 / 200) * 460} y1="120" x2={40 + (25 / 200) * 460} y2="70" stroke="#999" strokeWidth="1" strokeDasharray="3" opacity="0.4" />
