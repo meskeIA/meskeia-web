@@ -17,6 +17,9 @@
  * fichas de juego-2048 y juego-wordle lo son) ni ve los fondos que llegan por var() o desde otra
  * regla. Solo dice dónde mirar; el valor se decide midiendo por píxel contra el fondo real, app
  * por app (receta de contraste: cambiar el fondo hasta 4,5:1 conservando el tono).
+ *
+ * Lo que entra NUEVO lo para desde el 13/11/2026 `npm run check:blanco-semantico`, con este mismo
+ * criterio sobre las líneas que añade cada commit; este censo sigue midiendo el pasivo.
  */
 import fs from 'node:fs';
 import path from 'node:path';

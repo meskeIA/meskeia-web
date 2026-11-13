@@ -578,6 +578,35 @@ Barre `app/`, `components/` y `styles/`, **sin pasivo**; fuera, cursos y portale
 > Crónica: cabecera de `scripts/check-semanticos-claro.mjs` · pruebas:
 > `npm run semanticos-claro:probar-candado`.
 
+### Candado del blanco sobre fondo semántico
+
+`npm run check:blanco-semantico` — en el build, y **rompe el build** si el commit añade o toca, en
+un `.module.css`, el `color` blanco o el `background` literal rojo, naranja, ámbar o verde de una
+regla que da menos de 4,5:1. Juzga **las líneas que el commit añade** (`--desde <ref>` y `--todo`) ·
+Escape: `blanco-ok: <razón>` dentro de la regla o en la línea anterior (texto grande a 3:1).
+⚠️ No ve los fondos por `var()` ni de otra regla: lo mide el píxel. El pasivo, el Inspector app por app.
+> Salió del cabo C0659 (cronometro, Pausar a 2,15:1). Crónica: cabecera de
+> `scripts/check-blanco-semantico.mjs` · pruebas: `npm run blanco-semantico:probar-candado`.
+
+### Candado de los colores prohibidos
+
+`npm run check:colores-prohibidos` — en el build, y **rompe el build** si el commit añade
+`#7C3AED` o `#2DD4BF` (también con alfa) en un `.ts`, `.tsx` o `.css` de `app/`, `components/` o
+`styles/`. Juzga **las líneas que el commit añade** (`--desde <ref>` y `--todo`) · Escape:
+`colores-ok: <razón>` (un color de datos de un gráfico), razón obligatoria.
+> Salió del cabo C0635 (tablero-comunicacion, «Personas» en violeta por datos). Crónica: cabecera
+> de `scripts/check-colores-prohibidos.mjs` · pruebas: `npm run colores-prohibidos:probar-candado`.
+
+### Candado del alfa pegado a un color de tres cifras
+
+`npm run check:alfa-tres-cifras` — en el build, y **rompe el build** si un fichero pega un alfa de
+dos cifras a `obj.prop` (`b.color + 'CC'`, `${b.color}55`) y la tabla de la que sale `obj` da a
+`prop` un literal de tres cifras: `'#666' + 'CC'` no es un color (en SVG, negro). Barre el árbol
+entero, **sin pasivo** · Escape: `alfa-ok: <razón>`, razón obligatoria.
+⚠️ No ve el alfa pegado a una variable suelta ni a una reserva (`?? '#999'`).
+> Salió del cabo C0684 (a2c0f1324 y 2c2af478a). Crónica: cabecera de
+> `scripts/check-alfa-tres-cifras.mjs` · pruebas: `npm run alfa-tres-cifras:probar-candado`.
+
 ### Candado de la variable CSS que no existe
 
 `npm run check:var-css` — en el build, y **rompe el build** si un `.module.css` usa `var(--x)`
