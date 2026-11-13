@@ -11,6 +11,7 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
+import { tintaSobre } from '@/lib/tintaLegible';
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -54,6 +55,8 @@ interface TipoRoca {
   nombre: string;
   icono: string;
   color: string;
+  /** Clase del módulo con el tono de TEXTO de su color, por tema (C0297, C0645) */
+  tono: 'tonoRojo' | 'tonoAmbar' | 'tonoVioleta';
   descripcion: string;
   proceso: string;
   subtipos: SubtipoRoca[];
@@ -67,6 +70,7 @@ const TIPOS_ROCAS: TipoRoca[] = [
     nombre: 'Ígneas',
     icono: '🔥',
     color: '#DC2626',
+    tono: 'tonoRojo',
     descripcion: 'Se forman al enfriar magma o lava. La velocidad de enfriamiento determina el tamaño de los cristales.',
     proceso: 'Magma/lava → enfriamiento → cristalización',
     textura: 'Cristalina (gruesa o fina)',
@@ -95,6 +99,7 @@ const TIPOS_ROCAS: TipoRoca[] = [
     nombre: 'Sedimentarias',
     icono: '📐',
     color: '#D97706',
+    tono: 'tonoAmbar',
     descripcion: 'Se forman por compactación y cementación de sedimentos acumulados durante millones de años.',
     proceso: 'Erosión → transporte → depósito → compactación → cementación',
     textura: 'Capas visibles (estratos)',
@@ -131,6 +136,7 @@ const TIPOS_ROCAS: TipoRoca[] = [
     nombre: 'Metamórficas',
     icono: '💎',
     color: '#7C3AED',
+    tono: 'tonoVioleta',
     descripcion: 'Se forman cuando rocas existentes se transforman por presión y/o calor intenso sin llegar a fundir.',
     proceso: 'Roca original + presión + calor → recristalización → nueva roca',
     textura: 'Foliada o masiva',
@@ -268,8 +274,8 @@ function SeccionTipos() {
           <button
             key={t.id}
             type="button"
-            className={`${styles.tipoBtn} ${tipoActivo === i ? styles.tipoBtnActivo : ''}`}
-            style={tipoActivo === i ? { borderColor: t.color, color: t.color } : undefined}
+            className={`${styles.tipoBtn} ${tipoActivo === i ? `${styles.tipoBtnActivo} ${styles[t.tono]}` : ''}`}
+            style={tipoActivo === i ? { borderColor: t.color } : undefined}
             onClick={() => { setTipoActivo(i); setRocaActiva(null); }}
             aria-pressed={tipoActivo === i}
           >
@@ -281,7 +287,7 @@ function SeccionTipos() {
 
       {/* Info del tipo */}
       <div className={styles.tipoCard} style={{ borderLeftColor: tipo.color }}>
-        <h3 className={styles.tipoCardTitulo} style={{ color: tipo.color }}>
+        <h3 className={`${styles.tipoCardTitulo} ${styles[tipo.tono]}`}>
           <span aria-hidden="true">{tipo.icono}</span> Rocas {tipo.nombre}
         </h3>
         <p className={styles.tipoCardDesc}>{tipo.descripcion}</p>
@@ -335,7 +341,7 @@ function SeccionTipos() {
         </div>
         {TIPOS_ROCAS.map((t) => (
           <div key={t.id} className={styles.tablaRow}>
-            <span className={styles.tablaCell} style={{ color: t.color, fontWeight: 700 }}><span aria-hidden="true">{t.icono}</span> {t.nombre}</span>
+            <span className={`${styles.tablaCell} ${styles[t.tono]}`} style={{ fontWeight: 700 }}><span aria-hidden="true">{t.icono}</span> {t.nombre}</span>
             <span className={styles.tablaCell}>{t.proceso.split('→')[0].trim()}</span>
             <span className={styles.tablaCell}>{t.textura}</span>
             <span className={styles.tablaCell}>{t.dureza}</span>
@@ -384,22 +390,22 @@ function SeccionCiclo() {
           {/* Nodo central: Magma */}
           <circle cx="200" cy="180" r="28" fill="#EF4444" opacity="0.15" />
           <text x="200" y="176" textAnchor="middle" fontSize="10" fill="#EF4444" fontWeight="700" aria-hidden="true">🌋</text>
-          <text x="200" y="192" textAnchor="middle" fontSize="10" fill="#EF4444" fontWeight="600">Magma</text>
+          <text x="200" y="192" textAnchor="middle" fontSize="10" className={styles.tonoRojo} fontWeight="600">Magma</text>
 
           {/* Nodo: Ígneas (arriba) */}
           <circle cx="200" cy="60" r="36" fill="#DC2626" opacity="0.12" stroke="#DC2626" strokeWidth="2" />
-          <text x="200" y="56" textAnchor="middle" fontSize="11" fill="#DC2626" fontWeight="700"><tspan aria-hidden="true">🔥</tspan> Ígneas</text>
-          <text x="200" y="72" textAnchor="middle" fontSize="8" fill="#DC2626">(enfriamiento)</text>
+          <text x="200" y="56" textAnchor="middle" fontSize="11" className={styles.tonoRojo} fontWeight="700"><tspan aria-hidden="true">🔥</tspan> Ígneas</text>
+          <text x="200" y="72" textAnchor="middle" fontSize="8" className={styles.tonoRojo}>(enfriamiento)</text>
 
           {/* Nodo: Sedimentarias (abajo-izq) */}
           <circle cx="90" cy="300" r="36" fill="#D97706" opacity="0.12" stroke="#D97706" strokeWidth="2" />
-          <text x="90" y="296" textAnchor="middle" fontSize="10" fill="#D97706" fontWeight="700"><tspan aria-hidden="true">📐</tspan> Sediment.</text>
-          <text x="90" y="310" textAnchor="middle" fontSize="8" fill="#D97706">(compactación)</text>
+          <text x="90" y="296" textAnchor="middle" fontSize="10" className={styles.tonoAmbar} fontWeight="700"><tspan aria-hidden="true">📐</tspan> Sediment.</text>
+          <text x="90" y="310" textAnchor="middle" fontSize="8" className={styles.tonoAmbar}>(compactación)</text>
 
           {/* Nodo: Metamórficas (abajo-der) */}
           <circle cx="310" cy="300" r="36" fill="#7C3AED" opacity="0.12" stroke="#7C3AED" strokeWidth="2" />
-          <text x="310" y="296" textAnchor="middle" fontSize="10" fill="#7C3AED" fontWeight="700"><tspan aria-hidden="true">💎</tspan> Metamórf.</text>
-          <text x="310" y="310" textAnchor="middle" fontSize="8" fill="#7C3AED">(presión+calor)</text>
+          <text x="310" y="296" textAnchor="middle" fontSize="10" className={styles.tonoVioleta} fontWeight="700"><tspan aria-hidden="true">💎</tspan> Metamórf.</text>
+          <text x="310" y="310" textAnchor="middle" fontSize="8" className={styles.tonoVioleta}>(presión+calor)</text>
 
           {/* Flecha principal: Ígneas → Sedimentarias (erosión) */}
           <path d="M170,88 Q60,160 78,264" fill="none" stroke="#2E86AB" strokeWidth="2.5" markerEnd="url(#arrowPrimary)"
@@ -407,7 +413,7 @@ function SeccionCiclo() {
           />
           <g className={styles.flechaLabel} onClick={() => setProcesoActivo(procesoActivo === 'ig-sed' ? null : 'ig-sed')} style={{ cursor: 'pointer' }}>
             <rect x="52" y="158" width="80" height="20" rx="10" fill="var(--bg-card, #fff)" stroke="#2E86AB" strokeWidth="1" />
-            <text x="92" y="172" textAnchor="middle" fontSize="8" fill="#2E86AB" fontWeight="600">Erosión</text>
+            <text x="92" y="172" textAnchor="middle" fontSize="8" className={styles.tonoMarca} fontWeight="600">Erosión</text>
           </g>
 
           {/* Flecha principal: Sedimentarias → Metamórficas (presión+calor) */}
@@ -416,7 +422,7 @@ function SeccionCiclo() {
           />
           <g className={styles.flechaLabel} onClick={() => setProcesoActivo(procesoActivo === 'sed-met' ? null : 'sed-met')} style={{ cursor: 'pointer' }}>
             <rect x="155" y="320" width="90" height="20" rx="10" fill="var(--bg-card, #fff)" stroke="#2E86AB" strokeWidth="1" />
-            <text x="200" y="334" textAnchor="middle" fontSize="8" fill="#2E86AB" fontWeight="600">Presión + Calor</text>
+            <text x="200" y="334" textAnchor="middle" fontSize="8" className={styles.tonoMarca} fontWeight="600">Presión + Calor</text>
           </g>
 
           {/* Flecha principal: Metamórficas → Magma → Ígneas (fusión) */}
@@ -425,7 +431,7 @@ function SeccionCiclo() {
           />
           <g className={styles.flechaLabel} onClick={() => setProcesoActivo(procesoActivo === 'met-ig' ? null : 'met-ig')} style={{ cursor: 'pointer' }}>
             <rect x="292" y="158" width="80" height="20" rx="10" fill="var(--bg-card, #fff)" stroke="#2E86AB" strokeWidth="1" />
-            <text x="332" y="172" textAnchor="middle" fontSize="8" fill="#2E86AB" fontWeight="600">Fusión</text>
+            <text x="332" y="172" textAnchor="middle" fontSize="8" className={styles.tonoMarca} fontWeight="600">Fusión</text>
           </g>
 
           {/* Atajo: Ígneas → Metamórficas (directo) */}
@@ -434,7 +440,7 @@ function SeccionCiclo() {
           />
           <g className={styles.flechaLabel} onClick={() => setProcesoActivo(procesoActivo === 'ig-met' ? null : 'ig-met')} style={{ cursor: 'pointer' }}>
             <rect x="252" y="130" width="52" height="16" rx="8" fill="var(--bg-card, #fff)" stroke="#999" strokeWidth="1" />
-            <text x="278" y="142" textAnchor="middle" fontSize="7" fill="#999" fontWeight="600">atajo</text>
+            <text x="278" y="142" textAnchor="middle" fontSize="7" className={styles.tonoTenue} fontWeight="600">atajo</text>
           </g>
 
           {/* Atajo: Sedimentarias → Sedimentarias (re-erosión) */}
@@ -443,7 +449,7 @@ function SeccionCiclo() {
           />
           <g className={styles.flechaLabel} onClick={() => setProcesoActivo(procesoActivo === 'sed-sed' ? null : 'sed-sed')} style={{ cursor: 'pointer' }}>
             <rect x="14" y="276" width="52" height="16" rx="8" fill="var(--bg-card, #fff)" stroke="#999" strokeWidth="1" />
-            <text x="40" y="288" textAnchor="middle" fontSize="7" fill="#999" fontWeight="600">recicla</text>
+            <text x="40" y="288" textAnchor="middle" fontSize="7" className={styles.tonoTenue} fontWeight="600">recicla</text>
           </g>
 
           {/* Atajo: Metamórficas → Sedimentarias (erosión) */}
@@ -452,7 +458,7 @@ function SeccionCiclo() {
           />
           <g className={styles.flechaLabel} onClick={() => setProcesoActivo(procesoActivo === 'met-sed' ? null : 'met-sed')} style={{ cursor: 'pointer' }}>
             <rect x="174" y="282" width="52" height="16" rx="8" fill="var(--bg-card, #fff)" stroke="#999" strokeWidth="1" />
-            <text x="200" y="294" textAnchor="middle" fontSize="7" fill="#999" fontWeight="600">erosión</text>
+            <text x="200" y="294" textAnchor="middle" fontSize="7" className={styles.tonoTenue} fontWeight="600">erosión</text>
           </g>
         </svg>
 
@@ -587,7 +593,9 @@ function SeccionDatos() {
                   background: m.color,
                 }}
               >
-                <span className={styles.mohsDureza}>{m.dureza}</span>
+                {/* Blanco sobre los verdes y ámbares claros de la escala daba 1,28-3,76:1 (C0645):
+                    la tinta que contrasta con cada barra */}
+                <span className={styles.mohsDureza} style={{ color: tintaSobre(m.color) }}>{m.dureza}</span>
               </div>
               <span className={styles.mohsMineral}>{m.mineral}</span>
               <span className={styles.mohsRef}>{m.referencia}</span>

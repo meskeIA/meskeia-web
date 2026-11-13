@@ -272,6 +272,11 @@ const APPS: App[] = [
   // (3,92:1), «Corriente del Golfo» en #c0390a (4,01), las latitudes en #666 (4,20) y el aviso «Sin
   // corriente» en #c0392b sobre su tinte (3,27). Los escenarios del AMOC y del Golfo, como subestados
   { slug: 'visualizador-oceanos-corrientes', secciones: SECCIONES, extremos: true, subestados: "button[aria-pressed]:not(nav button)" },
+  // 13/11/2026: en el ciclo de las rocas, cada tipo en su color sobre el tinte de su nodo (el ámbar
+  // de las sedimentarias 2,78:1 y el rojo de las ígneas 3,08-3,92 en claro; el violeta de las
+  // metamórficas 2,27 y el rojo 2,72 en oscuro), los procesos en la marca (4,07 y 3,50) y los atajos
+  // en #999 (2,82). Los procesos, como subestados
+  { slug: 'visualizador-tipos-rocas', secciones: SECCIONES, subestados: "button[aria-pressed]:not(nav button)" },
 ];
 
 interface TextoSvg {

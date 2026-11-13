@@ -165,6 +165,10 @@ const APPS: App[] = [
   // --primary-texto y las marcas del deslizador en --text-muted sobre el tinte de marca al 10-12 %
   // (4,32-4,42:1), y el enfriamiento «-1.5°C» en #c0392b fijo (2,26)
   { slug: 'visualizador-oceanos-corrientes', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
+  // 13/11/2026 (C0645): el nombre de cada tipo de roca en su color con style (Sedimentarias 3,19:1 en
+  // claro; Ígneas 2,97 y Metamórficas 2,52 en oscuro) y el blanco sobre las barras verdes y ámbar de
+  // la escala de Mohs (1,28-3,76)
+  { slug: 'visualizador-tipos-rocas', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
 ];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {

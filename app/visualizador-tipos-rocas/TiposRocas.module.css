@@ -79,6 +79,22 @@
 .flechaLabel { cursor: pointer; }
 .flechaLabel:hover rect { fill: rgba(46,134,171,0.08); }
 
+/* Rótulos del ciclo de las rocas — cabo C0297 (13/11/2026). En el color de su tipo sobre el tinte
+   del propio nodo daban 2,78-3,92:1 en claro (el ámbar de las sedimentarias, el rojo de las
+   ígneas) y 2,27-3,90 en oscuro (el violeta de las metamórficas), los procesos en la marca 4,07 y
+   3,50, y los atajos en #999 a 2,82. Un tono de TEXTO por color de dato y tema; el color de dato
+   se queda en el círculo y el trazo. El fill por CSS manda sobre el atributo. Los mismos tonos,
+   como `color`, para el nombre de cada tipo en el HTML (2,52-3,19:1 con su color puro, C0645).
+   Medido en tests/contraste-svg-texto.spec.ts y tests/contraste-marca-datos.spec.ts. */
+.tonoRojo { color: #B91C1C; fill: #B91C1C; }
+.tonoAmbar { color: #8A5A00; fill: #8A5A00; }
+.tonoVioleta { color: #6D28D9; fill: #6D28D9; }
+.tonoMarca { fill: var(--primary-texto, #26718F); }
+.tonoTenue { fill: var(--text-secondary, #666666); }
+[data-theme='dark'] .tonoRojo { color: #F1948A; fill: #F1948A; }
+[data-theme='dark'] .tonoAmbar { color: #F0B84A; fill: #F0B84A; }
+[data-theme='dark'] .tonoVioleta { color: #C4B5FD; fill: #C4B5FD; }
+
 .procesoDetalle { background: var(--bg-card); border: 2px solid var(--primary); border-radius: var(--radius); padding: var(--spacing-lg); margin-bottom: var(--spacing-lg); }
 .procesoDetalleTitulo { font-size: 1.1rem; font-weight: 700; color: var(--primary-texto); margin-bottom: var(--spacing-sm); }
 .procesoDetalleNombre { font-size: 0.95rem; color: var(--text-primary); margin-bottom: var(--spacing-sm); }
@@ -126,7 +142,7 @@
 .mohsGrid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 0.3rem; align-items: flex-end; min-height: 200px; }
 .mohsItem { display: flex; flex-direction: column; align-items: center; gap: 0.2rem; text-align: center; }
 .mohsBarra { width: 100%; border-radius: 6px 6px 0 0; display: flex; align-items: flex-end; justify-content: center; padding-bottom: 0.3rem; min-width: 20px; transition: height 0.5s ease; }
-.mohsDureza { color: white; font-weight: 800; font-size: 0.85rem; text-shadow: 0 1px 2px rgba(0,0,0,0.3); }
+.mohsDureza { color: white; font-weight: 800; font-size: 0.85rem; }
 .mohsMineral { font-size: 0.62rem; font-weight: 600; color: var(--text-primary); line-height: 1.1; }
 .mohsRef { font-size: 0.55rem; color: var(--text-muted); line-height: 1.1; }
 
