@@ -301,16 +301,16 @@ export default function VisualizadorEvolucionMolecular() {
       {/* Gibon */}
       <line x1="340" y1="180" x2="390" y2="60" stroke="#7FB3D3" strokeWidth="2" />
       {/* Etiquetas */}
-      <text x="90" y="50" textAnchor="middle" fill="#2E86AB" fontSize="11" fontWeight="600">Humano</text>
-      <text x="190" y="50" textAnchor="middle" fill="#2E86AB" fontSize="11" fontWeight="600">Chimp.</text>
-      <text x="140" y="50" textAnchor="middle" fill="#48A9A6" fontSize="11" fontWeight="600">Gorila</text>
-      <text x="310" y="50" textAnchor="middle" fill="#666" fontSize="11">Orangután</text>
-      <text x="390" y="50" textAnchor="middle" fill="#666" fontSize="11">Gibón</text>
+      <text x="90" y="50" textAnchor="middle" className={styles.svgMarca} fontSize="11" fontWeight="600">Humano</text>
+      <text x="190" y="50" textAnchor="middle" className={styles.svgMarca} fontSize="11" fontWeight="600">Chimp.</text>
+      <text x="140" y="50" textAnchor="middle" className={styles.svgTeal} fontSize="11" fontWeight="600">Gorila</text>
+      <text x="310" y="50" textAnchor="middle" className={styles.svgTenue} fontSize="11">Orangután</text>
+      <text x="390" y="50" textAnchor="middle" className={styles.svgTenue} fontSize="11">Gibón</text>
       {/* Nodo MRCA humano+chimp */}
       <circle cx="140" cy="120" r="5" fill="#48A9A6" />
       {/* Nodo raíz */}
       <circle cx="240" cy="180" r="6" fill="#2E86AB" />
-      <text x="240" y="272" textAnchor="middle" fill="#999" fontSize="10">Ancestro común ~25 Ma</text>
+      <text x="240" y="272" textAnchor="middle" className={styles.svgTenue} fontSize="10">Ancestro común ~25 Ma</text>
     </svg>
   );
 
@@ -330,14 +330,14 @@ export default function VisualizadorEvolucionMolecular() {
       {/* Cerdo */}
       <line x1="240" y1="180" x2="240" y2="60" stroke="#2E86AB" strokeWidth="2" strokeDasharray="4,4" />
       {/* Etiquetas */}
-      <text x="80" y="50" textAnchor="middle" fill="#2E86AB" fontSize="11" fontWeight="600">Ballena</text>
-      <text x="180" y="50" textAnchor="middle" fill="#2E86AB" fontSize="11" fontWeight="600">Delfín</text>
-      <text x="240" y="50" textAnchor="middle" fill="#48A9A6" fontSize="11">Cerdo</text>
-      <text x="310" y="50" textAnchor="middle" fill="#666" fontSize="11">Vaca</text>
-      <text x="400" y="50" textAnchor="middle" fill="#666" fontSize="11">Hipop.</text>
+      <text x="80" y="50" textAnchor="middle" className={styles.svgMarca} fontSize="11" fontWeight="600">Ballena</text>
+      <text x="180" y="50" textAnchor="middle" className={styles.svgMarca} fontSize="11" fontWeight="600">Delfín</text>
+      <text x="240" y="50" textAnchor="middle" className={styles.svgTeal} fontSize="11">Cerdo</text>
+      <text x="310" y="50" textAnchor="middle" className={styles.svgTenue} fontSize="11">Vaca</text>
+      <text x="400" y="50" textAnchor="middle" className={styles.svgTenue} fontSize="11">Hipop.</text>
       <circle cx="130" cy="120" r="5" fill="#48A9A6" />
       <circle cx="240" cy="180" r="6" fill="#2E86AB" />
-      <text x="240" y="272" textAnchor="middle" fill="#999" fontSize="10">Divergencia artiodáctilos ~55 Ma</text>
+      <text x="240" y="272" textAnchor="middle" className={styles.svgTenue} fontSize="10">Divergencia artiodáctilos ~55 Ma</text>
     </svg>
   );
 

@@ -183,6 +183,10 @@ const APPS: App[] = [
   // 13/11/2026 (C0645): «demanda» en #e74c3c (3,50:1 en claro, 3,31 en oscuro) y la caída de la
   // cantidad y el poder de mercado en #27ae60 con style (2,87 en claro)
   { slug: 'visualizador-microeconomia', todo: true, secciones: 'button[aria-pressed]' },
+  // 13/11/2026 (C0278, C0645): los aminoácidos y las bases del alineamiento en --primary-texto sobre
+  // el tinte de marca al 10 % (4,48:1 en claro) y los distintos en #C62828 sobre su tinte rojo
+  // (4,43); en oscuro, T y C sobre su fondo (3,79 y 4,23)
+  { slug: 'visualizador-evolucion-molecular', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
 ];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {

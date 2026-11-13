@@ -308,6 +308,10 @@ const APPS: App[] = [
     extremos: true,
     subestados: "[role='tablist'][aria-label='Aplicaciones'] [role='tab']",
   },
+  // 13/11/2026: los rótulos de los árboles filogenéticos en la marca pura (4,07:1 en claro, 3,50 en
+  // oscuro), en teal (2,78), el pie en #999 (2,82) y las especies lejanas en #666 (2,50 en oscuro).
+  // Los conjuntos de especies, como subestados (cada uno dibuja su árbol)
+  { slug: 'visualizador-evolucion-molecular', secciones: SECCIONES, extremos: true, subestados: "button[class*='conjuntoBtn']" },
 ];
 
 interface TextoSvg {

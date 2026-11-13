@@ -79,9 +79,17 @@
 .baseC { background: #FCE4EC; color: #AD1457; }
 .baseMutada { border-color: #F44336; box-shadow: 0 0 6px rgba(244,67,54,0.4); }
 [data-theme='dark'] .baseA { background: #1B5E20; color: #A5D6A7; }
-[data-theme='dark'] .baseT { background: #BF360C; color: #FFCC80; }
+/* Rótulos de los árboles filogenéticos — cabo C0297 (13/11/2026). En la marca pura daban 4,07:1
+   en claro y 3,50 en oscuro, en teal 2,78, el pie en #999 2,82 y las especies lejanas en #666 2,50
+   en oscuro. El fill por CSS manda sobre el atributo. Medido en tests/contraste-svg-texto.spec.ts. */
+.svgMarca { fill: var(--primary-texto, #26718F); }
+.svgTeal { fill: var(--secondary-texto, #327874); }
+.svgTenue { fill: var(--text-secondary); }
+
+/* En oscuro, T y C sobre su fondo daban 3,79:1 y 4,23 (cabo C0645, 13/11/2026): fondo oscurecido */
+[data-theme='dark'] .baseT { background: #A02C0A; color: #FFCC80; }
 [data-theme='dark'] .baseG { background: #0D47A1; color: #90CAF9; }
-[data-theme='dark'] .baseC { background: #880E4F; color: #F48FB1; }
+[data-theme='dark'] .baseC { background: #780C46; color: #F48FB1; }
 
 .secuenciaPosicion {
   display: flex; flex-wrap: wrap; gap: 4px; justify-content: center;
@@ -149,12 +157,14 @@
 .aa {
   width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
   border-radius: 5px; font-size: 0.75rem; font-weight: 700;
-  background: rgba(46,134,171,0.1); color: var(--primary-texto);
+  /* Tinte al 5 % y no al 10: la marca de texto encima daba 4,48:1 (C0278, 13/11/2026) */
+  background: rgba(46,134,171,0.05); color: var(--primary-texto);
   border: 1px solid rgba(46,134,171,0.2); font-family: monospace;
   transition: all 0.3s;
 }
 .aaDiferente {
-  background: rgba(244,67,54,0.12); color: #C62828; border-color: #EF9A9A;
+  /* #C62828 sobre su tinte daba 4,43:1 (C0645, 13/11/2026) */
+  background: rgba(244,67,54,0.12); color: var(--rojo-texto, #C62828); border-color: #EF9A9A;
 }
 [data-theme='dark'] .aa { background: rgba(46,134,171,0.2); color: #90CAF9; border-color: rgba(46,134,171,0.35); }
 [data-theme='dark'] .aaDiferente { background: rgba(244,67,54,0.22); color: #EF9A9A; border-color: #EF5350; }
@@ -232,11 +242,12 @@
 .alineamientoBase {
   width: 22px; height: 22px; display: flex; align-items: center; justify-content: center;
   border-radius: 4px; font-size: 0.68rem; font-weight: 700;
-  font-family: monospace; background: rgba(46,134,171,0.1);
+  /* Tinte al 5 % y no al 10, y la base distinta en el rojo de texto: 4,48:1 y 4,43 (C0278, C0645) */
+  font-family: monospace; background: rgba(46,134,171,0.05);
   color: var(--primary-texto); border: 1px solid rgba(46,134,171,0.2);
 }
 .alineamientoBaseDif {
-  background: rgba(244,67,54,0.12); color: #C62828; border-color: #EF9A9A;
+  background: rgba(244,67,54,0.12); color: var(--rojo-texto, #C62828); border-color: #EF9A9A;
 }
 [data-theme='dark'] .alineamientoBase { background: rgba(46,134,171,0.2); color: #90CAF9; border-color: rgba(46,134,171,0.35); }
 [data-theme='dark'] .alineamientoBaseDif { background: rgba(244,67,54,0.22); color: #EF9A9A; border-color: #EF5350; }
