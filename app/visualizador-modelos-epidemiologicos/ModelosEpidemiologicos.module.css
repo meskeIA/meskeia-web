@@ -191,6 +191,20 @@
   .seccionTitulo { font-size: 1.15rem; }
   .metricaValor { font-size: 1.3rem; }
 }
+
+/* Rótulos de los ejes y del umbral de los gráficos — cabo C0297 (13/11/2026): los ejes iban en #999
+   fijo (2,82:1 en claro) y «Rₜ = 1» en rojo puro (3,79 en claro, 3,76 en oscuro). El fill por CSS
+   manda sobre el atributo. Medido en tests/contraste-svg-texto.spec.ts. */
+.svgEje { fill: var(--text-secondary); }
+.svgRojo { fill: var(--rojo-texto, #B91C1C); }
+[data-theme='dark'] .svgRojo { fill: #F1948A; }
+
+/* En oscuro la receta var(--rojo-texto, var(--rojo)) caía a #e74c3c: el R₀ alto sobre su tinte rojo
+   daba 4,03:1 (C0681, 13/11/2026) */
+[data-theme='dark'] .metricaAlerta .metricaValor,
+[data-theme='dark'] .r0ValorAlerta,
+[data-theme='dark'] .r0BadgeAlto { color: #F1948A; }
+
 @media (prefers-reduced-motion: reduce) {
   .container .tabBtn,
   .container .modoBtnBase,

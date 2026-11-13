@@ -387,6 +387,9 @@ const APPS: App[] = [
     slug: 'visualizador-insulina-glucosa',
     avanzar: { boton: "button[aria-label='Siguiente paso']", veces: 2 },
   },
+  // 13/11/2026: los ejes de sus tres gráficos en #999 fijo (2,82:1 en claro) y «Rₜ = 1» en rojo puro
+  // (3,79 en claro, 3,76 en oscuro)
+  { slug: 'visualizador-modelos-epidemiologicos', secciones: SECCIONES, extremos: true },
 ];
 
 interface TextoSvg {

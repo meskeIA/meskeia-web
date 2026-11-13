@@ -283,8 +283,8 @@ const EjesSvg = ({ maxVal, totalDias }: { maxVal: number; totalDias: number }) =
         return (
           <g key={frac}>
             <line x1={PADDING.left - 4} y1={y} x2={PADDING.left} y2={y} stroke="#ccc" strokeWidth="1" />
-            <text x={PADDING.left - 6} y={y + 4} textAnchor="end" fontSize="9" fill="#999">
-              {v >= 1000 ? `${Math.round(v / 100) / 10}k` : v}
+            <text x={PADDING.left - 6} y={y + 4} textAnchor="end" fontSize="9" className={styles.svgEje}>
+              {v >= 1000 ? `${formatNum(Math.round(v / 100) / 10)}k` : v}
             </text>
           </g>
         );
@@ -295,7 +295,7 @@ const EjesSvg = ({ maxVal, totalDias }: { maxVal: number; totalDias: number }) =
         return (
           <g key={d}>
             <line x1={x} y1={VB_H - PADDING.bottom} x2={x} y2={VB_H - PADDING.bottom + 4} stroke="#ccc" strokeWidth="1" />
-            <text x={x} y={VB_H - PADDING.bottom + 14} textAnchor="middle" fontSize="9" fill="#999">
+            <text x={x} y={VB_H - PADDING.bottom + 14} textAnchor="middle" fontSize="9" className={styles.svgEje}>
               {d}d
             </text>
           </g>
@@ -515,8 +515,8 @@ const SeccionSIR = ({
           )}
 
           {/* Etiquetas de ejes */}
-          <text x={PADDING.left - 14} y={PADDING.top - 6} fontSize="9" fill="#999" textAnchor="middle">N</text>
-          <text x={VB_W - PADDING.right} y={VB_H - PADDING.bottom + 24} fontSize="9" fill="#999" textAnchor="end">días</text>
+          <text x={PADDING.left - 14} y={PADDING.top - 6} fontSize="9" className={styles.svgEje} textAnchor="middle">N</text>
+          <text x={VB_W - PADDING.right} y={VB_H - PADDING.bottom + 24} fontSize="9" className={styles.svgEje} textAnchor="end">días</text>
         </svg>
       </div>
     </div>
@@ -659,7 +659,7 @@ const SeccionSEIR = ({
             </>
           )}
 
-          <text x={VB_W - PADDING.right} y={VB_H - PADDING.bottom + 24} fontSize="9" fill="#999" textAnchor="end">días</text>
+          <text x={VB_W - PADDING.right} y={VB_H - PADDING.bottom + 24} fontSize="9" className={styles.svgEje} textAnchor="end">días</text>
         </svg>
       </div>
     </div>
@@ -793,7 +793,7 @@ const SeccionRt = () => {
             x2={VB_W - PADDING.right} y2={marcaRt1Y}
             stroke="#e74c3c" strokeWidth="1.5" strokeDasharray="6 3"
           />
-          <text x={VB_W - PADDING.right - 2} y={marcaRt1Y - 4} fontSize="9" fill="#e74c3c" textAnchor="end">Rₜ = 1</text>
+          <text x={VB_W - PADDING.right - 2} y={marcaRt1Y - 4} fontSize="9" className={styles.svgRojo} textAnchor="end">Rₜ = 1</text>
 
           {/* Curva Rₜ */}
           <polyline points={rtPolyline} fill="none" stroke="#2E86AB" strokeWidth="2.5" strokeLinejoin="round" />
@@ -807,7 +807,7 @@ const SeccionRt = () => {
             return `${x},${yScaled}`;
           }).join(' ')} fill="none" stroke="#e74c3c" strokeWidth="1.8" strokeLinejoin="round" opacity="0.6" />
 
-          <text x={VB_W - PADDING.right} y={VB_H - PADDING.bottom + 24} fontSize="9" fill="#999" textAnchor="end">días</text>
+          <text x={VB_W - PADDING.right} y={VB_H - PADDING.bottom + 24} fontSize="9" className={styles.svgEje} textAnchor="end">días</text>
         </svg>
       </div>
     </div>

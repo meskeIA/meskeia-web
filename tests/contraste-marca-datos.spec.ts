@@ -225,6 +225,8 @@ const APPS: App[] = [
   { slug: 'visualizador-termodinamica', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
   // 13/11/2026: en oscuro, «Nota importante» en --primary-texto sobre el fondo aclarado del aviso (3,70:1)
   { slug: 'visualizador-insulina-glucosa', todo: true },
+  // 13/11/2026: en oscuro, el R₀ alto sobre su tinte rojo caía a la reserva #e74c3c de su receta (4,03:1)
+  { slug: 'visualizador-modelos-epidemiologicos', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
 ];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {
