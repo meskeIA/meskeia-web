@@ -10,7 +10,19 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
+import { formatNumber } from '@/lib';
 import styles from './NumerosComplejos.module.css';
+
+/**
+ * Tono de TEXTO del rótulo de cada vector según su color (cabo C0297, 13/11/2026): en el color
+ * puro no se leía en claro. El color de dato se queda en el vector y su punto.
+ */
+const TONO_VECTOR: Record<string, 'svgMarca' | 'svgTeal' | 'svgNaranja'> = {
+  '#2E86AB': 'svgMarca',
+  '#48A9A6': 'svgTeal',
+  '#E67E22': 'svgNaranja',
+};
+const tonoDe = (color: string): string => styles[TONO_VECTOR[color.toUpperCase()] ?? 'svgTenue'];
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -31,8 +43,7 @@ function argGrados(re: number, im: number): number {
 }
 
 function fmtNum(n: number): string {
-  const s = n.toFixed(2);
-  return s;
+  return formatNumber(n, 2);
 }
 
 function fmtComplejo(re: number, im: number): string {
@@ -94,7 +105,7 @@ function FlechaSVG({ re, im, color, strokeWidth = 2.5, dashed = false, markerId,
       />
       <circle cx={x2} cy={y2} r={4} fill={color} />
       {label && (
-        <text x={labelX} y={labelY} fontSize="11" fill={color} fontWeight="600" textAnchor="middle">
+        <text x={labelX} y={labelY} fontSize="11" className={tonoDe(color)} fontWeight="600" textAnchor="middle">
           {label}
         </text>
       )}
@@ -214,22 +225,22 @@ function PlanoArgand() {
           {/* Eje X (Re) */}
           <line x1={20} y1={ARGAND_CENTRO_Y} x2={476} y2={ARGAND_CENTRO_Y} stroke="#888" strokeWidth="1.8" />
           <polygon points={`476,${ARGAND_CENTRO_Y - 5} 486,${ARGAND_CENTRO_Y} 476,${ARGAND_CENTRO_Y + 5}`} fill="#888" />
-          <text x={488} y={ARGAND_CENTRO_Y + 4} fontSize="13" fill="#888" fontWeight="600">Re</text>
+          <text x={488} y={ARGAND_CENTRO_Y + 4} fontSize="13" className={styles.svgTenue} fontWeight="600">Re</text>
 
           {/* Eje Y (Im) */}
           <line x1={ARGAND_CENTRO_X} y1={400} x2={ARGAND_CENTRO_X} y2={24} stroke="#888" strokeWidth="1.8" />
           <polygon points={`${ARGAND_CENTRO_X - 5},24 ${ARGAND_CENTRO_X},14 ${ARGAND_CENTRO_X + 5},24`} fill="#888" />
-          <text x={ARGAND_CENTRO_X + 6} y={14} fontSize="13" fill="#888" fontWeight="600">Im</text>
+          <text x={ARGAND_CENTRO_X + 6} y={14} fontSize="13" className={styles.svgTenue} fontWeight="600">Im</text>
 
           {/* Etiquetas de escala en eje Re */}
           {[-4, -2, 2, 4].map(r => (
-            <text key={`lr${r}`} x={svgX(r)} y={ARGAND_CENTRO_Y + 16} fontSize="10" fill="#aaa" textAnchor="middle">
+            <text key={`lr${r}`} x={svgX(r)} y={ARGAND_CENTRO_Y + 16} fontSize="10" className={styles.svgTenue} textAnchor="middle">
               {r}
             </text>
           ))}
           {/* Etiquetas de escala en eje Im */}
           {[-3, -1, 1, 3].map(i => (
-            <text key={`li${i}`} x={ARGAND_CENTRO_X - 14} y={svgY(i) + 4} fontSize="10" fill="#aaa" textAnchor="middle">
+            <text key={`li${i}`} x={ARGAND_CENTRO_X - 14} y={svgY(i) + 4} fontSize="10" className={styles.svgTenue} textAnchor="middle">
               {i}
             </text>
           ))}
@@ -446,25 +457,25 @@ function CirculoEuler() {
           <circle cx={px} cy={py} r={5} fill="#2E86AB" />
 
           {/* Etiquetas cos/sin */}
-          <text x={(cx + px) / 2} y={py - 6} fontSize="10" fill="#48A9A6" textAnchor="middle">
-            cos={cosVal.toFixed(2)}
+          <text x={(cx + px) / 2} y={py - 6} fontSize="10" className={styles.svgTeal} textAnchor="middle">
+            cos={formatNumber(cosVal, 2)}
           </text>
-          <text x={px + 8} y={(cy + py) / 2} fontSize="10" fill="#E67E22">
-            sin={sinVal.toFixed(2)}
+          <text x={px + 8} y={(cy + py) / 2} fontSize="10" className={styles.svgNaranja}>
+            sin={formatNumber(sinVal, 2)}
           </text>
 
           {/* Origen */}
           <circle cx={cx} cy={cy} r={3} fill="#888" />
 
           {/* Etiquetas ejes */}
-          <text x={318} y={cy + 4} fontSize="11" fill="#888">Re</text>
-          <text x={cx + 6} y={18} fontSize="11" fill="#888">Im</text>
+          <text x={318} y={cy + 4} fontSize="11" className={styles.svgTenue}>Re</text>
+          <text x={cx + 6} y={18} fontSize="11" className={styles.svgTenue}>Im</text>
 
           {/* Labels -1, 1 en ejes */}
-          <text x={cx + r + 2} y={cy + 14} fontSize="9" fill="#bbb">1</text>
-          <text x={cx - r - 8} y={cy + 14} fontSize="9" fill="#bbb">-1</text>
-          <text x={cx + 4} y={cy - r - 2} fontSize="9" fill="#bbb">i</text>
-          <text x={cx + 4} y={cy + r + 14} fontSize="9" fill="#bbb">-i</text>
+          <text x={cx + r + 2} y={cy + 14} fontSize="9" className={styles.svgTenue}>1</text>
+          <text x={cx - r - 8} y={cy + 14} fontSize="9" className={styles.svgTenue}>-1</text>
+          <text x={cx + 4} y={cy - r - 2} fontSize="9" className={styles.svgTenue}>i</text>
+          <text x={cx + 4} y={cy + r + 14} fontSize="9" className={styles.svgTenue}>-i</text>
         </svg>
       </div>
 

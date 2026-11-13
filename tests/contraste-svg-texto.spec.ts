@@ -312,6 +312,10 @@ const APPS: App[] = [
   // oscuro), en teal (2,78), el pie en #999 (2,82) y las especies lejanas en #666 (2,50 en oscuro).
   // Los conjuntos de especies, como subestados (cada uno dibuja su árbol)
   { slug: 'visualizador-evolucion-molecular', secciones: SECCIONES, extremos: true, subestados: "button[class*='conjuntoBtn']" },
+  // 13/11/2026: en claro, z₁ en la marca pura (4,07:1), z₂ y cos en teal (2,78), el resultado y sin
+  // en naranja E67E22 (2,82), Re e Im en #888 (3,51) y las marcas de los ejes en #aaa y #bbb
+  // (1,90-2,30). Las cuatro operaciones, como subestados, y los deslizadores en sus extremos
+  { slug: 'visualizador-numeros-complejos', extremos: true, subestados: 'button[aria-pressed]' },
 ];
 
 interface TextoSvg {

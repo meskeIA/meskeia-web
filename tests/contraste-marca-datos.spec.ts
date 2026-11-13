@@ -187,6 +187,8 @@ const APPS: App[] = [
   // el tinte de marca al 10 % (4,48:1 en claro) y los distintos en #C62828 sobre su tinte rojo
   // (4,43); en oscuro, T y C sobre su fondo (3,79 y 4,23)
   { slug: 'visualizador-evolucion-molecular', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
+  // 13/11/2026 (C0278): en oscuro, «Nota:» en --primary-texto sobre el tinte de marca al 8 % (4,33:1)
+  { slug: 'visualizador-numeros-complejos', todo: true, secciones: 'button[aria-pressed]' },
 ];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {

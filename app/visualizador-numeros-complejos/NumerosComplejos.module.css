@@ -505,8 +505,9 @@
   color: var(--text-primary);
 }
 
+/* Tinte al 4 % y no al 8: «Nota:» en --primary-texto encima daba 4,33:1 (C0278, 13/11/2026) */
 [data-theme='dark'] .warningBox {
-  background: rgba(46, 134, 171, 0.08);
+  background: rgba(46, 134, 171, 0.04);
   border-color: rgba(46, 134, 171, 0.3);
   color: var(--text-secondary);
 }
@@ -515,6 +516,17 @@
   background: rgba(72, 169, 166, 0.08);
   color: var(--text-secondary);
 }
+
+/* Rótulos del plano de Argand y del círculo unitario — cabo C0297 (13/11/2026). En claro, z₁ en la
+   marca pura daba 4,07:1, z₂ y cos en teal 2,78, el resultado y sin en naranja E67E22 2,82, Re e
+   Im en #888 3,51 y las marcas de los ejes en #aaa y #bbb 1,90-2,30. Un tono de texto por dato;
+   el color de dato se queda en vectores y puntos. El fill por CSS manda sobre el atributo. Medido
+   en tests/contraste-svg-texto.spec.ts. */
+.svgMarca { fill: var(--primary-texto, #26718F); }
+.svgTeal { fill: var(--secondary-texto, #327874); }
+.svgNaranja { fill: var(--naranja-texto, #B93E0B); }
+.svgTenue { fill: var(--text-secondary); }
+[data-theme='dark'] .svgNaranja { fill: #F0B27A; }
 
 /* ─────────────────────────────────────────────
    Accesibilidad: Movimiento reducido
