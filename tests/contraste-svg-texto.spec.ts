@@ -249,6 +249,10 @@ const APPS: App[] = [
     secciones: "[role='tablist'] [role='tab']",
     subestados: "button[class*='parteCard'], button[class*='defectoCard']",
   },
+  // 13/11/2026: «Selecciona un tipo de radiación» en #999 encima de los materiales (1,39:1), y los
+  // rótulos de materiales, espesores y ejes en grises fijos, 1,8-2,5 en oscuro. Cada pestaña y cada
+  // tipo de radiación (el rayo cambia lo que hay detrás)
+  { slug: 'visualizador-radioactividad', secciones: SECCIONES, subestados: "button[aria-pressed]:not(nav button)" },
 ];
 
 interface TextoSvg {

@@ -235,28 +235,28 @@ const PenetracionSvg = ({ tipoActivo }: { tipoActivo: TipoRadiacion | null }) =>
       {/* Fuente radiactiva */}
       <circle cx={40} cy={65} r={16} fill="#2E86AB" />
       <text x={40} y={69} textAnchor="middle" fontSize="9" fill="white" fontWeight="bold">☢</text>
-      <text x={40} y={90} textAnchor="middle" fontSize="7" fill="#666">Fuente</text>
+      <text x={40} y={90} textAnchor="middle" fontSize="7" className={styles.svgEtiqueta}>Fuente</text>
 
       {/* Materiales */}
       {/* Aire */}
       <rect x={80} y={30} width={60} height={70} fill="#EBF5FB" stroke="#ccc" strokeWidth="0.5" rx="2" />
-      <text x={110} y={108} textAnchor="middle" fontSize="7" fill="#666">Aire</text>
+      <text x={110} y={108} textAnchor="middle" fontSize="7" className={styles.svgEtiqueta}>Aire</text>
 
       {/* Papel */}
       <rect x={140} y={30} width={18} height={70} fill="#F9E4B7" stroke="#D4AC0D" strokeWidth="0.8" />
-      <text x={149} y={108} textAnchor="middle" fontSize="7" fill="#666">Papel</text>
+      <text x={149} y={108} textAnchor="middle" fontSize="7" className={styles.svgEtiqueta}>Papel</text>
 
       {/* Aluminio */}
       <rect x={158} y={30} width={22} height={70} fill="#BFC9CA" stroke="#808B96" strokeWidth="0.8" />
-      <text x={169} y={108} textAnchor="middle" fontSize="7" fill="#666">Al</text>
+      <text x={169} y={108} textAnchor="middle" fontSize="7" className={styles.svgEtiqueta}>Al</text>
 
       {/* Plomo */}
       <rect x={180} y={30} width={30} height={70} fill="#808B96" stroke="#566573" strokeWidth="0.8" />
-      <text x={195} y={108} textAnchor="middle" fontSize="7" fill="#444">Pb</text>
+      <text x={195} y={108} textAnchor="middle" fontSize="7" className={styles.svgEtiqueta}>Pb</text>
 
       {/* Hormigón */}
       <rect x={210} y={30} width={50} height={70} fill="#AEB6BF" stroke="#717D7E" strokeWidth="0.8" />
-      <text x={235} y={108} textAnchor="middle" fontSize="7" fill="#444">Hormigón</text>
+      <text x={235} y={108} textAnchor="middle" fontSize="7" className={styles.svgEtiqueta}>Hormigón</text>
 
       {/* Rayo */}
       {tipoActivo && (
@@ -287,16 +287,17 @@ const PenetracionSvg = ({ tipoActivo }: { tipoActivo: TipoRadiacion | null }) =>
 
       {/* Etiqueta vacía si no hay selección */}
       {!tipoActivo && (
-        <text x={185} y={65} textAnchor="middle" fontSize="8" fill="#999">
+        // Va encima de los materiales, que son claros en los dos temas: tinta oscura (#999 daba 1,39:1)
+        <text x={185} y={65} textAnchor="middle" fontSize="8" fill="#1A1A1A">
           Selecciona un tipo de radiación
         </text>
       )}
 
       {/* Leyenda de materiales arriba */}
-      <text x={149} y={24} textAnchor="middle" fontSize="6.5" fill="#555">1 cm</text>
-      <text x={169} y={24} textAnchor="middle" fontSize="6.5" fill="#555">2 cm</text>
-      <text x={195} y={24} textAnchor="middle" fontSize="6.5" fill="#555">5 cm</text>
-      <text x={235} y={24} textAnchor="middle" fontSize="6.5" fill="#555">30 cm</text>
+      <text x={149} y={24} textAnchor="middle" fontSize="6.5" className={styles.svgEtiqueta}>1 cm</text>
+      <text x={169} y={24} textAnchor="middle" fontSize="6.5" className={styles.svgEtiqueta}>2 cm</text>
+      <text x={195} y={24} textAnchor="middle" fontSize="6.5" className={styles.svgEtiqueta}>5 cm</text>
+      <text x={235} y={24} textAnchor="middle" fontSize="6.5" className={styles.svgEtiqueta}>30 cm</text>
     </svg>
   );
 };
@@ -336,7 +337,7 @@ const GraficaDesintegracion = ({ fracciones }: { fracciones: number[] }) => {
         return (
           <g key={frac}>
             <line x1={PAD.left - 4} y1={y} x2={PAD.left} y2={y} stroke="#ccc" strokeWidth="1" />
-            <text x={PAD.left - 6} y={y + 3} textAnchor="end" fontSize="8" fill="#999">{label}</text>
+            <text x={PAD.left - 6} y={y + 3} textAnchor="end" fontSize="8" className={styles.svgEtiqueta}>{label}</text>
             {/* Línea guía discontinua */}
             <line x1={PAD.left} y1={y} x2={VB_W - PAD.right} y2={y} stroke="#eee" strokeWidth="0.8" strokeDasharray="3 3" />
           </g>
@@ -349,7 +350,7 @@ const GraficaDesintegracion = ({ fracciones }: { fracciones: number[] }) => {
         return (
           <g key={vm}>
             <line x1={x} y1={VB_H - PAD.bottom} x2={x} y2={VB_H - PAD.bottom + 4} stroke="#ccc" strokeWidth="1" />
-            <text x={x} y={VB_H - PAD.bottom + 13} textAnchor="middle" fontSize="7.5" fill="#999">
+            <text x={x} y={VB_H - PAD.bottom + 13} textAnchor="middle" fontSize="7.5" className={styles.svgEtiqueta}>
               {vm}t½
             </text>
           </g>
@@ -377,8 +378,8 @@ const GraficaDesintegracion = ({ fracciones }: { fracciones: number[] }) => {
       <polyline points={puntos} fill="none" stroke="#2E86AB" strokeWidth="2.5" strokeLinejoin="round" />
 
       {/* Etiquetas ejes */}
-      <text x={PAD.left - 12} y={PAD.top - 6} fontSize="8" fill="#999" textAnchor="middle">N/N₀</text>
-      <text x={VB_W - PAD.right} y={VB_H - PAD.bottom + 24} fontSize="8" fill="#999" textAnchor="end">Tiempo</text>
+      <text x={PAD.left - 12} y={PAD.top - 6} fontSize="8" className={styles.svgEtiqueta} textAnchor="middle">N/N₀</text>
+      <text x={VB_W - PAD.right} y={VB_H - PAD.bottom + 24} fontSize="8" className={styles.svgEtiqueta} textAnchor="end">Tiempo</text>
     </svg>
   );
 };

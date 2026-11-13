@@ -122,6 +122,10 @@
 .graficaCaption { font-size: 0.78rem; color: var(--text-muted); text-align: center; margin-top: 0.5rem; }
 .penetracionSvg { width: 100%; height: auto; display: block; }
 .graficaSvg { width: 100%; height: auto; display: block; }
+/* Rótulos de los SVG sobre la tarjeta — cabo C0297 (13/11/2026): en grises fijos (#444-#999) caían
+   en oscuro a 1,8-2,5:1 y los #999 de la gráfica a 2,85 en claro. El fill por CSS manda sobre el
+   atributo. Medido en tests/contraste-svg-texto.spec.ts. */
+.svgEtiqueta { fill: var(--text-secondary); }
 
 /* ── Fórmula matemática destacada ── */
 .formulaBox {
