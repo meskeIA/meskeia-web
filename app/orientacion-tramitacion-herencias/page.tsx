@@ -274,7 +274,7 @@ export default function OrientacionTramitacionHerenciasPage() {
         <p className={styles.metaVerificado}>
           Información basada en la normativa vigente ·{' '}
           <a
-            href="https://www.mjusticia.gob.es/es/ciudadanos/tramites/sucesiones"
+            href="https://www.mjusticia.gob.es/es/ciudadania/tramites/certificado-actos-ultima"
             target="_blank"
             rel="noopener noreferrer"
             className={styles.linkFuente}

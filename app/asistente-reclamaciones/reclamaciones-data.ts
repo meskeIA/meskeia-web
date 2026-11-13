@@ -122,19 +122,19 @@ export const ORGANISMS: Record<string, Organism> = {
   omic: {
     name: 'OMIC (Oficina Municipal de Información al Consumidor)',
     description: 'Servicio gratuito de tu ayuntamiento para orientación y mediación',
-    url: 'https://www.consumo.gob.es/es/consumo/oficinas-municipales-informacion-consumidor',
+    url: 'https://cidoc.consumo.gob.es/directorio-mapas/oficinas-municipales-informacion-consumidor',
     type: 'autonomico',
   },
   consumo_ccaa: {
     name: 'Dirección General de Consumo de tu CCAA',
     description: 'Organismo autonómico para reclamaciones formales',
-    url: 'https://www.consumo.gob.es/es/consumo/direcciones-generales-consumo',
+    url: 'https://www.dsca.gob.es/es/consumo/organismos-autonomicos-consumo',
     type: 'autonomico',
   },
   junta_arbitral: {
     name: 'Junta Arbitral de Consumo',
     description: 'Resolución extrajudicial gratuita y vinculante (si la empresa está adherida)',
-    url: 'https://www.consumo.gob.es/es/consumo/juntas-arbitrales-consumo',
+    url: 'https://www.dsca.gob.es/es/consumo/como-reclamar-conflicto-consumo/sistema-arbitral-consumo/organos/juntasArbitrales',
     type: 'nacional',
   },
   odr_europeo: {
@@ -383,37 +383,3 @@ A la espera de su pronta respuesta, les saluda atentamente,
 [Nombre completo]
 DNI: [Tu DNI]`;
 }
-
-// Lista de OMIC por provincias (principales)
-export const OMIC_BY_PROVINCE: Record<string, { name: string; phone: string; url: string }> = {
-  madrid: {
-    name: 'OMIC Madrid',
-    phone: '010 / 915 294 900',
-    url: 'https://www.madrid.es/omic',
-  },
-  barcelona: {
-    name: 'OMIC Barcelona',
-    phone: '010 / 934 023 000',
-    url: 'https://ajuntament.barcelona.cat/omic',
-  },
-  valencia: {
-    name: 'OMIC Valencia',
-    phone: '010 / 963 525 478',
-    url: 'https://www.valencia.es/omic',
-  },
-  sevilla: {
-    name: 'OMIC Sevilla',
-    phone: '010 / 955 010 010',
-    url: 'https://www.sevilla.org/omic',
-  },
-  bilbao: {
-    name: 'OMIC Bilbao',
-    phone: '944 204 200',
-    url: 'https://www.bilbao.eus/omic',
-  },
-  zaragoza: {
-    name: 'OMIC Zaragoza',
-    phone: '976 721 100',
-    url: 'https://www.zaragoza.es/omic',
-  },
-};

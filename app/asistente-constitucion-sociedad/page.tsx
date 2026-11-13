@@ -272,8 +272,8 @@ export default function AsistenteConstitucionSociedadPage() {
         </p>
         <p className={styles.metaVerificado}>
           Información actualizada 2025 ·{' '}
-          <a href="https://www.ipyme.org/es-ES/Paginas/Tramitacion.aspx" target="_blank" rel="noopener noreferrer" className={styles.linkFuente}>
-            Fuente: IPYME
+          <a href="https://administracion.gob.es/tu-espacio-europeo/derechos-obligaciones/empresas/inicio-gestion-cierre/registro-cambio-cierre/crear" target="_blank" rel="noopener noreferrer" className={styles.linkFuente}>
+            Fuente: Punto de Acceso General
           </a>
         </p>
       </header>
