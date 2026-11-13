@@ -17,7 +17,7 @@
 import {
   FISCAL_IRPF_META,
   LIMITES_PLAN_PENSIONES_2025,
-  tipoMarginalDesdeRendimientosBrutos,
+  tipoMarginalDesdeRendimientoNetoTrabajo,
 } from '@/data/fiscal';
 
 // ─── Constantes ────────────────────────────────────────────────────────────────
@@ -100,8 +100,10 @@ export function calcularPlanPensiones(p: ParametrosPlanPensiones): ResultadoPlan
   const excesoNoDeducible = r(Math.max(0, aportacionTotal - baseReducible));
   const superaLimite = excesoNoDeducible > 0;
 
-  // Ahorro fiscal — tipo marginal estimado desde sueldo bruto (SS + art.19 + art.20)
-  const tipo = tipoMarginalDesdeRendimientosBrutos(p.rendimientosNetos);
+  // Ahorro fiscal — tipo marginal desde el rendimiento NETO, que es lo que se recibe (y lo que
+  // pide el 30 % de arriba): solo falta la reducción del art. 20. Hasta el 13/11/2026 se
+  // llamaba a la versión de brutos, que volvía a restar la SS y los 2.000 € (cabo C0019).
+  const tipo = tipoMarginalDesdeRendimientoNetoTrabajo(p.rendimientosNetos);
   const ahorroFiscalAnual = r(baseReducible * (tipo / 100));
   const costeNetoAnual = r(aportacionTotal - ahorroFiscalAnual);
 

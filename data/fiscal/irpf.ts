@@ -642,8 +642,36 @@ export function tipoMarginalDesdeRendimientosBrutos(brutos: number): number {
     integros: brutos,
     gastosAaE: brutos * (totalSS / 100),
   });
+  return tipoMarginalDeBase(baseImponible);
+}
+
+/**
+ * Estima el tipo marginal IRPF a partir del rendimiento NETO del trabajo del art. 19 (íntegro
+ * menos la cotización a la SS y los 2.000 € de la letra f), que es lo que pide el límite del
+ * 30 % del art. 51. Solo le falta la reducción del art. 20, que se calcula sobre el
+ * rendimiento ANTES de la letra f), es decir, sobre `neto + 2.000`.
+ * Orientativo, como la de brutos: sin mínimo personal ni otras circunstancias.
+ *
+ * ⚠️ Nace el 13/11/2026 por el cabo C0019: `lib/calculadoras/planPensiones.ts` (la tool
+ * `calcular_plan_pensiones` del MCP de Delegum, cuyo parámetro se llama
+ * `rendimientos_netos`) pasaba ese neto a `tipoMarginalDesdeRendimientosBrutos`, que le
+ * volvía a restar la SS y los 2.000 €: 36.000 € netos salían al 30 % en vez del 37 %, y
+ * 22.000 € al 24 % en vez del 30 %.
+ */
+export function tipoMarginalDesdeRendimientoNetoTrabajo(neto: number): number {
+  const otrosGastos = GASTOS_DEDUCIBLES_TRABAJO_2025.importeGeneral;
+  const { rendimientoNetoReducido: baseImponible } = calcularRendimientoNetoTrabajo({
+    integros: Math.max(0, neto) + otrosGastos,
+    gastosAaE: 0,
+    otrosGastos,
+  });
+  return tipoMarginalDeBase(baseImponible);
+}
+
+/** El tipo de la escala general (estatal + autonómica de referencia) en el que cae `base`. */
+function tipoMarginalDeBase(base: number): number {
   for (const tramo of TRAMOS_IRPF_2025) {
-    if (baseImponible <= tramo.hasta) return tramo.tipo;
+    if (base <= tramo.hasta) return tramo.tipo;
   }
   return 47;
 }

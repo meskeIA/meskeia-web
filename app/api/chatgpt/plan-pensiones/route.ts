@@ -46,8 +46,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           error:
-            'El campo rendimientosNetos es obligatorio (€ brutos anuales del trabajo o actividad económica). ' +
-            'Ejemplo: 35000 para un sueldo bruto de 35.000€/año.',
+            'El campo rendimientosNetos es obligatorio (€ netos anuales del trabajo o actividad económica: ' +
+            'el bruto menos la cotización a la Seguridad Social y los 2.000 € de otros gastos). ' +
+            'Ejemplo: 30000 para unos rendimientos netos de 30.000 €/año.',
         },
         { status: 400, headers: corsHeaders() }
       );

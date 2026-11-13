@@ -13,7 +13,7 @@ import {
   NumberInput,
   ShareCard, RegionBadge
 } from '@/components';
-import { formatCurrency, formatNumber } from '@/lib';
+import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
 import {
   FISCAL_ESPERANZA_VIDA_META,
   FISCAL_PENSIONES_META,
@@ -126,12 +126,15 @@ function calcularProyecciones(
 }
 
 function calcularPlanPensiones(
-  baseImponible: number,
+  salarioBruto: number,
   aportacionMensual: number
 ): ResultadoPlanPensiones {
   const aportacionAnual = aportacionMensual * 12;
   const deducibleAnual = Math.min(aportacionAnual, LIMITES_PLAN_PENSIONES_2025.limiteIndividualAnual);
-  const tipoMarginal = tipoMarginalDesdeRendimientosBrutos(baseImponible);
+  // El campo es el sueldo BRUTO: hasta el 13/11/2026 se rotulaba «Base imponible», y quien
+  // tecleaba la de su declaración recibía el tipo de una base más baja, porque esta función
+  // le vuelve a restar la SS, los 2.000 € y la reducción del art. 20 (cabo C0019).
+  const tipoMarginal = tipoMarginalDesdeRendimientosBrutos(salarioBruto);
   const ahorroFiscalAnual = deducibleAnual * tipoMarginal / 100;
   const costeNetoAnual = aportacionAnual - ahorroFiscalAnual;
 
@@ -166,19 +169,21 @@ export default function PlanificadorAhorroJubilacionPage() {
 
   // Plan de pensiones (toggle)
   const [showPlan, setShowPlan] = useState(false);
-  const [baseImponible, setBaseImponible] = useState('');
+  const [salarioBrutoPlan, setSalarioBrutoPlan] = useState('');
   const [aportacionPlan, setAportacionPlan] = useState('');
   const [resultadoPlan, setResultadoPlan] = useState<ResultadoPlanPensiones | null>(null);
 
   // ── Cálculo principal ──
   function calcular() {
     setError('');
-    const sueldo = parseFloat(sueldoNeto.replace(',', '.'));
-    const pension = parseFloat(pensionEstimada.replace(',', '.'));
+    // parseSpanishNumber: con el replace casero, «1.800» de sueldo y «1.200» de pensión valían
+    // 1,8 y 1,2, y la app calculaba una brecha de 60 céntimos sin decir nada (13/11/2026).
+    const sueldo = parseSpanishNumber(sueldoNeto);
+    const pension = parseSpanishNumber(pensionEstimada);
     const edad = parseInt(edadActual);
     const edadJub = parseInt(edadJubilacion);
     const anos = parseInt(anosJubilado);
-    const rent = parseFloat(rentabilidad.replace(',', '.'));
+    const rent = parseSpanishNumber(rentabilidad);
 
     if (isNaN(sueldo) || sueldo <= 0) { setError('Introduce tu sueldo neto mensual.'); return; }
     if (isNaN(pension) || pension <= 0) { setError('Introduce la pensión estimada mensual.'); return; }
@@ -202,10 +207,12 @@ export default function PlanificadorAhorroJubilacionPage() {
 
   // ── Cálculo plan de pensiones ──
   function calcularPlan() {
-    const base = parseFloat(baseImponible.replace(',', '.'));
-    const aportacion = parseFloat(aportacionPlan.replace(',', '.'));
-    if (isNaN(base) || isNaN(aportacion) || aportacion <= 0) return;
-    setResultadoPlan(calcularPlanPensiones(base, aportacion));
+    // parseSpanishNumber: con el replace casero, «35.000» (el ejemplo del propio campo) valía 35
+    // y el tipo marginal salía el 19 % para cualquier sueldo escrito con punto de millar.
+    const bruto = parseSpanishNumber(salarioBrutoPlan);
+    const aportacion = parseSpanishNumber(aportacionPlan);
+    if (isNaN(bruto) || isNaN(aportacion) || aportacion <= 0) return;
+    setResultadoPlan(calcularPlanPensiones(bruto, aportacion));
   }
 
   return (
@@ -440,11 +447,11 @@ export default function PlanificadorAhorroJubilacionPage() {
             {showPlan && (
               <div id="seccion-plan" className={styles.toggleContent}>
                 <NumberInput
-                  value={baseImponible}
-                  onChange={setBaseImponible}
-                  label="Base imponible IRPF anual (€)"
+                  value={salarioBrutoPlan}
+                  onChange={setSalarioBrutoPlan}
+                  label="Salario bruto anual (€)"
                   placeholder="Ej: 35.000"
-                  helperText="Aproximación de tu salario bruto anual sujeto a IRPF."
+                  helperText="Tu sueldo bruto anual. El tipo marginal se estima restando la cotización a la Seguridad Social, los 2.000 € de otros gastos y la reducción por rendimientos del trabajo."
                   min={0}
                   max={300000}
                 />

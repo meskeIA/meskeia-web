@@ -2759,6 +2759,9 @@ test.describe('Golden — calcularPlanPensiones (Capa 1 · LIRPF art. 51)', () =
     // dejaba la base en 33.036 € y por debajo del corte de 35.200 €. Sin esa resta indebida,
     // 35.400 > 35.200 y el marginal es el 37 %.
     // Ahorro fiscal = 1.500×37% = 555 €. Coste neto = 1.500 − 555 = 945 €.
+    // ⚠️ 13/11/2026 (cabo C0019): el cálculo de arriba trataba los 40.000 € como BRUTOS. Son
+    // netos: base 40.000 € (sin reducción del art. 20, se agota antes), también en el 37 %.
+    // El caso que distingue las dos lecturas es GOLDEN-BR2.
     // Capital a 27 años (4% anual, sin capital previo) = 1.500 × ((1,04^27 − 1)/0,04) = 70.626,32 €.
     const pp = calcularPlanPensiones({
       rendimientosNetos: 40000,
@@ -2776,6 +2779,28 @@ test.describe('Golden — calcularPlanPensiones (Capa 1 · LIRPF art. 51)', () =
     expect(pp.anosAhorro).toBe(27);
     expect(pp.capitalEstimadoJubilacion).toBeCloseTo(70626.32, 2);
     expect(pp.rentaMensualEstimada).toBeCloseTo(235.42, 2);
+  });
+
+  test('GOLDEN-BR2 (cabo C0019): los rendimientos son NETOS, no se les vuelve a restar la SS ni los 2.000 €', () => {
+    // El parámetro es el rendimiento neto del art. 19 (lo dice el MCP: «rendimientos_netos»), y
+    // sobre él se calcula ya el 30 % del art. 51. Para el tipo marginal solo falta la reducción
+    // del art. 20, que se mide sobre neto + 2.000 € (antes de la letra f).
+    // 36.000 € netos: previo 38.000 > 19.747,5 → reducción 0 → base 36.000 > 35.200 → 37 %.
+    //   Antes: 36.000 × (1 − 6,50 %) − 2.000 = 31.660 → 30 %, ahorro 450 € en vez de 555 €.
+    const a = calcularPlanPensiones({ rendimientosNetos: 36000, aportacionIndividual: 1500, edadActual: 40 });
+    expect(a.tipoMarginal).toBe(37);
+    expect(a.ahorroFiscalAnual).toBeCloseTo(555, 2);
+    // 22.000 € netos: previo 24.000 → reducción 0 → base 22.000 > 20.200 → 30 % (antes 24 %).
+    const b = calcularPlanPensiones({ rendimientosNetos: 22000, aportacionIndividual: 1500, edadActual: 40 });
+    expect(b.tipoMarginal).toBe(30);
+    // 15.000 € netos: previo 17.000 → reducción 7.302 − 1,75 × (17.000 − 14.852) = 3.543 →
+    // base 11.457 ≤ 12.450 → 19 %. La reducción del art. 20 se sigue aplicando.
+    const c = calcularPlanPensiones({ rendimientosNetos: 15000, aportacionIndividual: 1500, edadActual: 40 });
+    expect(c.tipoMarginal).toBe(19);
+    // 17.000 € netos: previo 19.000 → reducción 2.364,34 − 1,14 × (19.000 − 17.673,52) = 852,15
+    // → base 16.147,85 → 24 %.
+    const d = calcularPlanPensiones({ rendimientosNetos: 17000, aportacionIndividual: 1500, edadActual: 40 });
+    expect(d.tipoMarginal).toBe(24);
   });
 
 });
