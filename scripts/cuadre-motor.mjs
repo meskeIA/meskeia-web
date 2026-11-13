@@ -451,6 +451,29 @@ export function elegirSesion(id, candidatas, ahora = Date.now()) {
 }
 
 /**
+ * Las escrituras fuera del repositorio que cuentan para la regla 9 en un pre-commit: las de la
+ * sesión SOLO si se la eligió por su identificador.
+ *
+ * Sin `CLAUDE_CODE_SESSION_ID` el commit no lo ha lanzado Claude Code —lo hace un script de una
+ * tarea (la recogida del Inspector o de /reparar)—, y la «más reciente» de `elegirSesion` es
+ * otra conversación cualquiera. Su base, sus peticiones y sus autorizaciones se pueden seguir
+ * usando (las autorizaciones solo silencian, y la base abarca de más, no de menos), pero sus
+ * escrituras no son de quien commitea: las bloquearía en nombre de otro.
+ *
+ * ⚠️ Caso de origen, cabo C0731 (12/11/2026 12:58): la recogida automática del Inspector quedó
+ * sin cerrar porque el pre-commit le cargó a su commit (5 specs de tests/apps) dos specs que una
+ * conversación de VS Code había escrito en C:/Users/jaceb/meskeia-reparar/. El mismo commit,
+ * hecho desde una conversación, pasó sin CUADRE_OK (fc99ad45b).
+ *
+ * @param {string|null|undefined} id       el `CLAUDE_CODE_SESSION_ID` del proceso
+ * @param {object|null} sesion              la sesión que devolvió `elegirSesion` (sus `datos`)
+ * @param {string[]} escrituras             las escrituras fuera del ámbito de su transcript
+ */
+export function escriturasQueCuentan(id, sesion, escrituras) {
+  return id && sesion?.sesion === id ? escrituras : [];
+}
+
+/**
  * Las autorizaciones que cubren la ventana de una sesión: las suyas y las de cualquier sesión
  * que haya escrito algo desde que esta empezó.
  *

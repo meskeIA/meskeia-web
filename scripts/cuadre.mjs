@@ -64,6 +64,7 @@ import {
   autoverificar,
   dentroDe,
   elegirSesion,
+  escriturasQueCuentan,
   autorizadosVigentes,
   reconciliar,
 } from './cuadre-motor.mjs';
@@ -494,7 +495,12 @@ function modoPreCommit() {
     destino: '',
     ficheros,
     diff,
-    ficherosFuera: escriturasFuera(sesion?.transcript),
+    // Solo las de la sesión que commitea: sin id, la elegida es otra conversación (cabo C0731).
+    ficherosFuera: escriturasQueCuentan(
+      process.env.CLAUDE_CODE_SESSION_ID,
+      sesion,
+      escriturasFuera(sesion?.transcript),
+    ),
   });
 
   const nuevos = resultado.hallazgos.filter((h) => !autorizados.has(h.huella));

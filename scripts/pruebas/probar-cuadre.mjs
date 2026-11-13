@@ -32,6 +32,7 @@ import {
   REGLAS_QUE_BLOQUEAN,
   dentroDe,
   elegirSesion,
+  escriturasQueCuentan,
   autorizadosVigentes,
   reconciliar,
   esPeticionDelUsuario,
@@ -384,6 +385,50 @@ if (marcador) {
   anotar(
     'S6 · lo que escribe el usuario SÍ lo es',
     esPeticionDelUsuario('/ronda') && esPeticionDelUsuario('Reparar los últimos hallazgos <b>ya</b>'),
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// S7 · EL COMMIT DE UNA TAREA NO HEREDA LAS ESCRITURAS DE OTRA CONVERSACIÓN (cabo C0731)
+// ═══════════════════════════════════════════════════════════════════════════
+//
+// Reinyecta el 12/11/2026 12:58: la recogida automática del Inspector (un script, sin
+// CLAUDE_CODE_SESSION_ID) commiteó 5 specs de tests/apps, y el pre-commit tomó la sesión más
+// reciente —un /reparar relanzado a mano en VS Code, que había escrito dos specs en la copia
+// meskeia-reparar— y le bloqueó el commit por «fuera del ámbito declarado».
+
+{
+  const VSCODE = { datos: { sesion: 'vscode12', inicio: '2026-11-12T10:30:00Z', base: 'b', autorizados: [] }, mtime: Date.parse('2026-11-12T11:57:00Z') };
+  const ahora = Date.parse('2026-11-12T11:58:00Z');
+  const escrituras = [
+    'C:/Users/jaceb/meskeia-reparar/tests/apps/simulador-conservacion-energia.spec.ts',
+    'C:/Users/jaceb/meskeia-reparar/tests/apps/simulador-titulacion.spec.ts',
+  ];
+  const ficheros = [{ ruta: 'tests/apps/a.spec.ts', estado: 'M' }];
+
+  // Sin id (la tarea), la elegida sigue siendo la de VS Code, pero sus escrituras no cuentan.
+  const sinId = elegirSesion(undefined, [VSCODE], ahora);
+  const fueraTarea = escriturasQueCuentan(undefined, sinId?.datos, escrituras);
+  anotar(
+    'S7 · el commit de una tarea (sin id) no carga las escrituras de otra conversación',
+    !reglasDe(cuadrar({ ficheros, ficherosFuera: fueraTarea })).includes('fuera-del-repositorio'),
+    `${fueraTarea.length} escrituras contadas`,
+  );
+
+  // Con el id de la propia conversación, la regla 9 sigue viva: la trampa no es vacua.
+  const conId = elegirSesion('vscode12', [VSCODE], ahora);
+  const fueraPropia = escriturasQueCuentan('vscode12', conId?.datos, escrituras);
+  anotar(
+    'S7 · la conversación que escribió fuera SÍ las carga en su commit',
+    reglasDe(cuadrar({ ficheros, ficherosFuera: fueraPropia })).includes('fuera-del-repositorio'),
+    'si esto falla, la regla 9 se ha apagado entera',
+  );
+
+  // Y un id que no está en disco tampoco adopta la ajena por la vía de la más reciente.
+  const otraId = elegirSesion('nohay', [VSCODE], ahora);
+  anotar(
+    'S7 · un id sin fichero de sesión no carga las escrituras de la más reciente',
+    escriturasQueCuentan('nohay', otraId?.datos, escrituras).length === 0,
   );
 }
 
