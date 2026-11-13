@@ -692,11 +692,11 @@ test.describe('Inspector 12/11/2026 · primera inspección', () => {
     await expect(page.locator('main')).toContainText('8,8541878188·10⁻¹² F/m');
   });
 
-  test('HALLAZGO (12/11/2026, ABIERTO) · «¿Cuánto tarda en cargarse del todo?» se contesta dos veces, distinto en la FAQ visible y en el FAQPage', async ({ page }) => {
-    // La misma pregunta, con «un condensador» de más en el JSON-LD: por eso check:faq-unica, que
-    // compara el texto de la pregunta literal, no la ve. Las dos dan 63,2 % y 99,3 %; la visible
-    // añade el 95,0 % de 3τ y la del FAQPage el error típico de «en un τ ya está lleno».
-    test.fail();
+  test('HALLAZGO 4577 (12/11/2026, REPARADO 13/11) · «¿Cuánto tarda en cargarse del todo?» se contesta igual en la FAQ visible y en el FAQPage', async ({ page }) => {
+    // La misma pregunta, con «un condensador» de más en el JSON-LD: check:faq-unica, que comparaba
+    // el texto literal, no la veía (lo ve desde C0570, 13/11/2026). Las dos daban 63,2 % y 99,3 %;
+    // la visible añadía el 95,0 % de 3τ y la del FAQPage el error típico. Ahora una sola constante,
+    // RESPUESTA_FAQ_CARGA_COMPLETA, con las dos cosas.
     const bloques = await page.evaluate(() =>
       [...document.querySelectorAll('script[type="application/ld+json"]')].map((s) => s.textContent ?? ''),
     );
@@ -711,6 +711,10 @@ test.describe('Inspector 12/11/2026 · primera inspección', () => {
     expect(enLd).not.toBe('');
     expect(visible).not.toBe('');
     expect(visible.replace(/\s+/g, ' ').trim()).toBe(enLd.replace(/\s+/g, ' ').trim());
+    // Lo que aportaba cada una sigue: 1 − e^−3 = 0,9502 y el error de «en un τ ya está lleno»
+    expect(visible).toMatch(/3τ por el 95,0\s%/);
+    expect(visible).toMatch(/63,2\s%.*99,3\s%/);
+    expect(visible).toContain('error frecuente pensar que en un τ ya está lleno');
   });
 
   test('HALLAZGO (12/11/2026, ABIERTO) · «falta los datos de la parte 1» y «falta el área…, la separación…»: el verbo no concuerda', async ({ page }) => {

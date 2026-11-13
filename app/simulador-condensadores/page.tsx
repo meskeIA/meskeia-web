@@ -26,7 +26,7 @@ import {
   type ModoRC,
 } from './motor';
 import CasosAula from './CasosAula';
-import { RESPUESTA_FAQ_CAPACITOR } from './metadata';
+import { RESPUESTA_FAQ_CAPACITOR, RESPUESTA_FAQ_CARGA_COMPLETA } from './metadata';
 
 // ─── Presentación de cifras ──────────────────────────────────────────────────
 
@@ -884,10 +884,7 @@ export default function SimuladorCondensadoresPage() {
             </div>
             <div className={styles.faqItem}>
               <strong>¿Cuánto tarda en cargarse del todo?</strong>
-              <p>
-                En teoría, nunca: V_C = V·(1 − e^(−t/τ)) solo se acerca a V. En un τ va por el 63,2&nbsp;%, en 3τ por
-                el 95,0&nbsp;% y en 5τ por el 99,3&nbsp;%, que es cuando en la práctica se da por cargado.
-              </p>
+              <p>{RESPUESTA_FAQ_CARGA_COMPLETA}</p>
             </div>
             <div className={styles.faqItem}>
               <strong>¿Por qué la corriente es máxima al principio?</strong>

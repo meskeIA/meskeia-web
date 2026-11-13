@@ -51,6 +51,12 @@ export const jsonLd = generateWebAppSchema({
 export const RESPUESTA_FAQ_CAPACITOR =
   'Sí. «Condensador» es el término habitual en España y «capacitor» el más usado en buena parte de Latinoamérica y en inglés; nombran el mismo componente, dos conductores separados por un aislante que almacenan carga. De forma parecida, la magnitud se llama capacidad o capacitancia, y se mide en faradios (F).';
 
+// Hallazgo 4577: la visible decía «¿Cuánto tarda en cargarse del todo?» y el JSON-LD lo mismo con
+// «un condensador» al final, cada una con su respuesta. Se juntan las dos: los tres hitos de la
+// visible (1 − e^−1 = 63,2 %, 1 − e^−3 = 95,0 %, 1 − e^−5 = 99,3 %) y el error típico del JSON-LD.
+export const RESPUESTA_FAQ_CARGA_COMPLETA =
+  'En teoría, nunca: la tensión sigue V_C = V·(1 − e^(−t/τ)), que solo se acerca a V. En un τ va por el 63,2 %, en 3τ por el 95,0 % y en 5τ por el 99,3 %, que es cuando en la práctica se da por cargado. Por eso es un error frecuente pensar que en un τ ya está lleno.';
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -92,7 +98,7 @@ export const faqJsonLd = {
       name: '¿Cuánto tarda en cargarse del todo un condensador?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'En teoría nunca llega al 100 %, porque la carga sigue V·(1 − e^(−t/τ)), que solo se acerca a V. En la práctica se toma 5τ como «cargado»: ahí está al 99,3 %. Por eso es un error frecuente pensar que en un τ ya está lleno, cuando solo va por el 63,2 %.',
+        text: RESPUESTA_FAQ_CARGA_COMPLETA,
       },
     },
   ],
