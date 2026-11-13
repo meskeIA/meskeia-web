@@ -291,28 +291,28 @@ export default function CalculadoraPorcentajesPage() {
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>🛍️</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🛍️</span>
               <h4>Rebajas y descuentos</h4>
             </div>
             <p className={styles.escenarioDesc}>Un artículo cuesta 79 € con un 25% de descuento. Usa «Disminuir X en Y%»: 79 × (1 – 0,25) = <strong>59,25 €</strong>. Ojo con los descuentos acumulados: un 30% + 20% no es un 50%, sino un 44%.</p>
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>🧾</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🧾</span>
               <h4>IVA y precios sin impuestos</h4>
             </div>
             <p className={styles.escenarioDesc}>Si el precio con IVA (21%) es 121 €, el precio sin IVA es 121 / 1,21 = <strong>100 €</strong>. Usa «¿Qué % es X de Y?» para comprobarlo: 21 de 121 = 17,36% (no 21% — el IVA se aplica sobre el neto, no sobre el total).</p>
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>📈</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">📈</span>
               <h4>Inflación y variación de precios</h4>
             </div>
             <p className={styles.escenarioDesc}>Si la luz costaba 120 €/mes y ahora cuesta 156 €, usa «Variación de X a Y»: de 120 a 156 = <strong>+30%</strong>. Para saber cuánto subirá si se aplica un 8% de IPC al año que viene: «Aumentar 156 en 8%» = 168,48 €/mes.</p>
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>🎓</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🎓</span>
               <h4>Notas y rendimiento académico</h4>
             </div>
             <p className={styles.escenarioDesc}>Has sacado 63 puntos de 80 posibles en un examen. Usa «¿Qué % es X de Y?»: 63 de 80 = <strong>78,75%</strong>. Si el aprobado es el 50%, necesitas al menos 40 puntos. Si ponderan 3 asignaturas: (7 × 40% + 6 × 35% + 8 × 25%) = 6,9 sobre 10.</p>
@@ -392,32 +392,32 @@ export default function CalculadoraPorcentajesPage() {
         <h3 className={styles.eduTitle}><span aria-hidden="true">✅</span> 6 trucos mentales con porcentajes</h3>
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🔢</span>
+            <span className={styles.tipIcon} aria-hidden="true">🔢</span>
             <h4>El truco del 1%</h4>
             <p>Para calcular cualquier porcentaje mentalmente, primero calcula el 1% (divide entre 100) y luego multiplica. El 7% de 350 = 3,50 × 7 = 24,50 €.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🔄</span>
+            <span className={styles.tipIcon} aria-hidden="true">🔄</span>
             <h4>La conmutatividad</h4>
             <p>El 18% de 50 es igual al 50% de 18. Usa la versión más fácil de calcular. El 50% de 18 = 9. Por eso el 18% de 50 también es 9.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>📉</span>
+            <span className={styles.tipIcon} aria-hidden="true">📉</span>
             <h4>Descuentos en dos pasos</h4>
             <p>Un descuento del 25% = quitar la cuarta parte. Un 20% = quitar la quinta parte. Un 33% ≈ quitar un tercio. Más rápido que calcular el porcentaje exacto.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>⚡</span>
+            <span className={styles.tipIcon} aria-hidden="true">⚡</span>
             <h4>El método del complemento</h4>
             <p>Si hay un 30% de descuento, pagas el 70%. Multiplica directamente por 0,70 en lugar de calcular el 30% y restarlo. Un paso menos.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>📊</span>
+            <span className={styles.tipIcon} aria-hidden="true">📊</span>
             <h4>Porcentaje de aumento para volver al original</h4>
             <p>Si algo baja un 20% y quieres saber cuánto debe subir para recuperar el valor, no es un 20% — es un 25%. Porque ahora partes de una base menor.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>💡</span>
+            <span className={styles.tipIcon} aria-hidden="true">💡</span>
             <h4>Porcentajes mayores de 100%</h4>
             <p>Un 150% de 40 = 60. Un aumento del 200% significa que algo se triplica (precio original + 200% más). Común en inversiones, precios de activos y crecimiento empresarial.</p>
           </div>

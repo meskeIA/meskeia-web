@@ -1682,7 +1682,7 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🏘️</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏘️</span>
                 <h4>Asociación cultural de vecinos</h4>
               </div>
               <p className={styles.escenarioExample}>
@@ -1698,7 +1698,7 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🌍</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🌍</span>
                 <h4>ONG de ayuda humanitaria (Ley 49/2002)</h4>
               </div>
               <p className={styles.escenarioExample}>
@@ -1714,7 +1714,7 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>⚽</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">⚽</span>
                 <h4>Club deportivo amateur</h4>
               </div>
               <p className={styles.escenarioExample}>
@@ -1730,7 +1730,7 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🩺</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🩺</span>
                 <h4>Asociación profesional (médicos, ingenieros)</h4>
               </div>
               <p className={styles.escenarioExample}>
@@ -1931,7 +1931,7 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
           <h2>Mejores prácticas para gestionar tu asociación</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📝</span>
+              <span className={styles.tipIcon} aria-hidden="true">📝</span>
               <p>
                 <strong>Define el objeto social de forma amplia pero coherente.</strong> Los cambios
                 posteriores en el objeto o la denominación requieren asamblea extraordinaria, modificación
@@ -1941,7 +1941,7 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📊</span>
+              <span className={styles.tipIcon} aria-hidden="true">📊</span>
               <p>
                 <strong>Separa contablemente las actividades exentas de las no exentas.</strong> Las
                 actividades relacionadas con los fines propios pueden estar exentas en el IS; las
@@ -1951,7 +1951,7 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📋</span>
+              <span className={styles.tipIcon} aria-hidden="true">📋</span>
               <p>
                 <strong>Lleva actas de todas las asambleas y reuniones de junta directiva.</strong> Es
                 obligatorio y además protege a los directivos: los acuerdos adoptados deben poder
@@ -1961,7 +1961,7 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📁</span>
+              <span className={styles.tipIcon} aria-hidden="true">📁</span>
               <p>
                 <strong>Si recibes subvenciones, prepárate para la justificación documental.</strong>
                 Guarda facturas, contratos, hojas de asistencia, fotografías de eventos y cualquier
@@ -1971,7 +1971,7 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>⭐</span>
+              <span className={styles.tipIcon} aria-hidden="true">⭐</span>
               <p>
                 <strong>Para acceder a Ley 49/2002 necesitas acreditación del Ministerio de Hacienda.</strong>
                 Comunícalo en el modelo 036. Hacienda puede comprobar el cumplimiento de todos los
@@ -1981,7 +1981,7 @@ ${datosAsociacion.acogerLey49_2002 ? '3. Solicitar el acogimiento a la Ley 49/20
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔄</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔄</span>
               <p>
                 <strong>Renueva los cargos directivos dentro de los plazos estatutarios.</strong> Los
                 estatutos fijan la duración del mandato (habitualmente 2-4 años). Los actos realizados

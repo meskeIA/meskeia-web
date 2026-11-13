@@ -345,32 +345,32 @@ export default function CalculadoraHidratacionPage() {
           <h2>Casos reales de hidratación</h2>
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
-              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon}>🏃</span><h3>Corredor de maratón</h3></div>
+              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon} aria-hidden="true">🏃</span><h3>Corredor de maratón</h3></div>
               <p className={styles.escenarioExample}>En una maratón se pierden 1–2 L/hora por sudor. Beber solo agua puede provocar hiponatremia (sodio bajo). Lo correcto: bebidas isotónicas + agua, 150–200 ml cada 20 min.</p>
               <span className={styles.escenarioTip}>Demasiada agua sin sales = hiponatremia</span>
             </div>
             <div className={styles.escenarioCard}>
-              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon}>💼</span><h3>Oficinista con AC</h3></div>
+              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon} aria-hidden="true">💼</span><h3>Oficinista con AC</h3></div>
               <p className={styles.escenarioExample}>El aire acondicionado reseca el ambiente y aumenta la pérdida insensible de agua. Muchos no sienten sed porque están en ambiente frío. Resultado: deshidratación crónica leve que reduce concentración y energía.</p>
               <span className={styles.escenarioTip}>Pon un vaso de agua en tu escritorio, visible</span>
             </div>
             <div className={styles.escenarioCard}>
-              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon}>👵</span><h3>Anciano en verano</h3></div>
+              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon} aria-hidden="true">👵</span><h3>Anciano en verano</h3></div>
               <p className={styles.escenarioExample}>La percepción de sed disminuye con la edad. Los mayores pueden estar significativamente deshidratados sin sentir sed. Con calor extremo, el riesgo de golpe de calor es muy alto. Hidratación proactiva, no reactiva.</p>
               <span className={styles.escenarioTip}>Beber aunque no tengan sed: vital en verano</span>
             </div>
             <div className={styles.escenarioCard}>
-              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon}>🤒</span><h3>Persona con fiebre o diarrea</h3></div>
+              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon} aria-hidden="true">🤒</span><h3>Persona con fiebre o diarrea</h3></div>
               <p className={styles.escenarioExample}>Fiebre de 38°C aumenta las pérdidas en ~0,5 L/día. La diarrea puede causar deshidratación aguda en horas. Solución de rehidratación oral (agua + sal + azúcar) es más efectiva que agua sola en estos casos.</p>
               <span className={styles.escenarioTip}>Suero oral &gt; agua sola en enfermedad</span>
             </div>
             <div className={styles.escenarioCard}>
-              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon}>🤰</span><h3>Embarazada en tercer trimestre</h3></div>
+              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon} aria-hidden="true">🤰</span><h3>Embarazada en tercer trimestre</h3></div>
               <p className={styles.escenarioExample}>El volumen sanguíneo aumenta un 50% durante el embarazo. La deshidratación puede provocar contracciones prematuras. Necesidad mínima: 2,3 L/día de todas las fuentes, más en calor o actividad física.</p>
               <span className={styles.escenarioTip}>La deshidratación puede provocar contracciones</span>
             </div>
             <div className={styles.escenarioCard}>
-              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon}>🏗️</span><h3>Trabajador en obra en verano</h3></div>
+              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon} aria-hidden="true">🏗️</span><h3>Trabajador en obra en verano</h3></div>
               <p className={styles.escenarioExample}>Con 35°C y trabajo físico intenso, las pérdidas pueden superar 2 L/hora. El protocolo de prevención: 250 ml cada 15–20 min, no esperar a tener sed, reponer electrolitos, pausas en la sombra.</p>
               <span className={styles.escenarioTip}>250 ml cada 20 min en calor extremo</span>
             </div>
@@ -407,12 +407,12 @@ export default function CalculadoraHidratacionPage() {
         <div className={styles.eduTips}>
           <h2>Trucos para beber más agua sin esfuerzo</h2>
           <div className={styles.tipsGrid}>
-            <div className={styles.tipCard}><span className={styles.tipIcon}>🍋</span><strong>Aromatiza tu agua</strong><p>Añade rodajas de limón, pepino, menta o jengibre. El sabor suave hace que bebas más sin añadir azúcar ni calorías. Infusiones frías también cuentan.</p></div>
-            <div className={styles.tipCard}><span className={styles.tipIcon}>📱</span><strong>Apps de recordatorio</strong><p>Usa WaterMinder, Hydro Coach o simplemente alarmas en el móvil cada 1–2 horas. Los primeros días son los más difíciles; con el tiempo se convierte en un hábito automático (los estudios estiman entre 2 y 8 meses de media para consolidar un hábito nuevo).</p></div>
-            <div className={styles.tipCard}><span className={styles.tipIcon}>🫙</span><strong>Botella visible en tu mesa</strong><p>El principio de "lo que ves, lo haces". Una botella de 1L en tu escritorio que vacíes dos veces al día es más efectiva que cualquier app.</p></div>
-            <div className={styles.tipCard}><span className={styles.tipIcon}>🍽️</span><strong>Agua antes de cada comida</strong><p>Un vaso de agua 15–20 min antes de comer mejora la hidratación y reduce ligeramente el apetito. Crea un ritual automático ligado a algo que ya haces.</p></div>
-            <div className={styles.tipCard}><span className={styles.tipIcon}>🫧</span><strong>Agua con gas si no te gusta la natural</strong><p>El agua carbonatada hidrata igual que el agua plana. Si el agua natural te parece aburrida, el agua con gas (sin azúcar) es una alternativa perfectamente válida.</p></div>
-            <div className={styles.tipCard}><span className={styles.tipIcon}>🌿</span><strong>Sopa e infusiones en invierno</strong><p>En invierno la sed disminuye pero las necesidades no. Sopas, caldos e infusiones calientes son una forma excelente de mantener la hidratación cuando el agua fría no apetece.</p></div>
+            <div className={styles.tipCard}><span className={styles.tipIcon} aria-hidden="true">🍋</span><strong>Aromatiza tu agua</strong><p>Añade rodajas de limón, pepino, menta o jengibre. El sabor suave hace que bebas más sin añadir azúcar ni calorías. Infusiones frías también cuentan.</p></div>
+            <div className={styles.tipCard}><span className={styles.tipIcon} aria-hidden="true">📱</span><strong>Apps de recordatorio</strong><p>Usa WaterMinder, Hydro Coach o simplemente alarmas en el móvil cada 1–2 horas. Los primeros días son los más difíciles; con el tiempo se convierte en un hábito automático (los estudios estiman entre 2 y 8 meses de media para consolidar un hábito nuevo).</p></div>
+            <div className={styles.tipCard}><span className={styles.tipIcon} aria-hidden="true">🫙</span><strong>Botella visible en tu mesa</strong><p>El principio de "lo que ves, lo haces". Una botella de 1L en tu escritorio que vacíes dos veces al día es más efectiva que cualquier app.</p></div>
+            <div className={styles.tipCard}><span className={styles.tipIcon} aria-hidden="true">🍽️</span><strong>Agua antes de cada comida</strong><p>Un vaso de agua 15–20 min antes de comer mejora la hidratación y reduce ligeramente el apetito. Crea un ritual automático ligado a algo que ya haces.</p></div>
+            <div className={styles.tipCard}><span className={styles.tipIcon} aria-hidden="true">🫧</span><strong>Agua con gas si no te gusta la natural</strong><p>El agua carbonatada hidrata igual que el agua plana. Si el agua natural te parece aburrida, el agua con gas (sin azúcar) es una alternativa perfectamente válida.</p></div>
+            <div className={styles.tipCard}><span className={styles.tipIcon} aria-hidden="true">🌿</span><strong>Sopa e infusiones en invierno</strong><p>En invierno la sed disminuye pero las necesidades no. Sopas, caldos e infusiones calientes son una forma excelente de mantener la hidratación cuando el agua fría no apetece.</p></div>
           </div>
         </div>
 

@@ -1061,7 +1061,7 @@ export default function ConvertidorColoresPage() {
 
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
-              <div className={styles.escenarioIcon}>🌐</div>
+              <div className={styles.escenarioIcon} aria-hidden="true">🌐</div>
               <h3>Desarrollo web (CSS)</h3>
               <div className={styles.escenarioContent}>
                 <p><strong>Formato recomendado:</strong> HEX o RGB</p>
@@ -1078,7 +1078,7 @@ export default function ConvertidorColoresPage() {
             </div>
 
             <div className={styles.escenarioCard}>
-              <div className={styles.escenarioIcon}>🎨</div>
+              <div className={styles.escenarioIcon} aria-hidden="true">🎨</div>
               <h3>Diseño UI/UX (Figma, Sketch)</h3>
               <div className={styles.escenarioContent}>
                 <p><strong>Formato recomendado:</strong> HSL</p>
@@ -1095,7 +1095,7 @@ export default function ConvertidorColoresPage() {
             </div>
 
             <div className={styles.escenarioCard}>
-              <div className={styles.escenarioIcon}>🖨️</div>
+              <div className={styles.escenarioIcon} aria-hidden="true">🖨️</div>
               <h3>Material impreso (imprenta)</h3>
               <div className={styles.escenarioContent}>
                 <p><strong>Formato recomendado:</strong> CMYK</p>
@@ -1112,7 +1112,7 @@ export default function ConvertidorColoresPage() {
             </div>
 
             <div className={styles.escenarioCard}>
-              <div className={styles.escenarioIcon}>📱</div>
+              <div className={styles.escenarioIcon} aria-hidden="true">📱</div>
               <h3>Apps móviles (iOS, Android)</h3>
               <div className={styles.escenarioContent}>
                 <p><strong>Formato recomendado:</strong> HEX o RGB</p>
@@ -1290,32 +1290,32 @@ export default function ConvertidorColoresPage() {
           <h2>Mejores prácticas para trabajar con colores</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <h4>Usa variables CSS</h4>
               <p>Define colores en variables para cambiarlos fácilmente: --primary: #2E86AB;</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <h4>Documenta tu paleta</h4>
               <p>Crea una guía de estilo con todos los colores y sus usos específicos (botones, fondos, textos).</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <h4>Valida el contraste</h4>
               <p>Asegúrate de cumplir WCAG 2.1 AA (mínimo 4,5:1) para texto sobre fondo.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <h4>Usa HSL para variaciones</h4>
               <p>Es más fácil crear hovers, disabled states y escalas de color ajustando S y L.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <h4>Prueba en dispositivos reales</h4>
               <p>Los colores varían según la pantalla. Verifica en móviles, tablets y monitores diferentes.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <h4>Mantén consistencia</h4>
               <p>Elige UN formato principal para tu proyecto y úsalo en toda la documentación.</p>
             </div>

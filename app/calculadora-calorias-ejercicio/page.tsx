@@ -368,7 +368,7 @@ export default function CalculadoraCaloriasPage() {
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>⚖️</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">⚖️</span>
                 <h3>Perder 1 kg de grasa al mes</h3>
               </div>
               <p className={styles.escenarioExample}>
@@ -379,7 +379,7 @@ export default function CalculadoraCaloriasPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>💪</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">💪</span>
                 <h3>Ganar músculo (recomposición)</h3>
               </div>
               <p className={styles.escenarioExample}>
@@ -390,7 +390,7 @@ export default function CalculadoraCaloriasPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🏃</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏃</span>
                 <h3>Corredor de 10k (principiante)</h3>
               </div>
               <p className={styles.escenarioExample}>
@@ -401,7 +401,7 @@ export default function CalculadoraCaloriasPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🕐</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🕐</span>
                 <h3>Trabajador sedentario activo en pausas</h3>
               </div>
               <p className={styles.escenarioExample}>
@@ -412,7 +412,7 @@ export default function CalculadoraCaloriasPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🔥</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🔥</span>
                 <h3>Sesión HIIT de 20 minutos</h3>
               </div>
               <p className={styles.escenarioExample}>
@@ -423,7 +423,7 @@ export default function CalculadoraCaloriasPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>👵</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">👵</span>
                 <h3>Persona mayor (65+) con objetivo salud</h3>
               </div>
               <p className={styles.escenarioExample}>
@@ -552,32 +552,32 @@ export default function CalculadoraCaloriasPage() {
           <h2><span aria-hidden="true">✅</span> Claves para optimizar tu entrenamiento</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🧬</span>
+              <span className={styles.tipIcon} aria-hidden="true">🧬</span>
               <h4>La dieta hace el 70-80%</h4>
               <p>No puedes superar una mala dieta con ejercicio. Una hora de running quema ~600 kcal; una pizza las repone en 5 minutos. Enfoca la energía en hábitos alimentarios sostenibles.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>💤</span>
+              <span className={styles.tipIcon} aria-hidden="true">💤</span>
               <h4>El sueño es el suplemento gratuito</h4>
               <p>Dormir 7-9 horas optimiza hormona de crecimiento, cortisol y leptina. Dormir 6h reduce el rendimiento un 20-30% y aumenta el apetito por alimentos calóricos al día siguiente.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔄</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔄</span>
               <h4>Varía el estímulo cada 4-6 semanas</h4>
               <p>El cuerpo se adapta al ejercicio repetitivo y reduce su gasto. Cambia intensidad, duración, tipo de ejercicio o patrón de descanso para seguir progresando y evitar la meseta.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🏃</span>
+              <span className={styles.tipIcon} aria-hidden="true">🏃</span>
               <h4>Más pasos, no solo más gimnasio</h4>
               <p>8.000-10.000 pasos diarios (NEAT) pueden quemar más calorías que una sesión de gym semanal. Sube escaleras, aparca lejos, camina en las llamadas. El movimiento cotidiano suma.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🥗</span>
+              <span className={styles.tipIcon} aria-hidden="true">🥗</span>
               <h4>Proteína primero en cada comida</h4>
               <p>La proteína tiene efecto termogénico (quema el 20-30% de sus calorías en digestión), sacia más y preserva el músculo en déficit. 1,6-2g/kg de peso es el rango óptimo para deportistas.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📈</span>
+              <span className={styles.tipIcon} aria-hidden="true">📈</span>
               <h4>Consistencia supera intensidad</h4>
               <p>3 sesiones semanales durante 6 meses superan siempre a 6 sesiones semanales durante 3 semanas. El hábito sostenible es la única estrategia que funciona a largo plazo.</p>
             </div>

@@ -420,28 +420,28 @@ export default function CalculadoraPorcionesPage() {
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>📉</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">📉</span>
               <h4>Control de peso gradual</h4>
             </div>
             <p className={styles.escenarioDesc}>Reduce ligeramente la porción de carbohidratos (de 1 puño a 3/4) y aumenta las verduras. Sin contar calorías estrictamente.</p>
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>🎉</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🎉</span>
               <h4>Preparación evento especial</h4>
             </div>
             <p className={styles.escenarioDesc}>Ajuste temporal de 4–8 semanas. Sigue el método de la mano de forma más estricta; aumenta proteína y verdura, reduce grasas.</p>
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>👶</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">👶</span>
               <h4>Alimentación infantil</h4>
             </div>
             <p className={styles.escenarioDesc}>Los niños tienen manos más pequeñas, lo que ajusta automáticamente sus porciones. No presiones a terminar el plato.</p>
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>🏋️</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🏋️</span>
               <h4>Deportista activo</h4>
             </div>
             <p className={styles.escenarioDesc}>Aumenta la porción de proteína a 1,5 palmas y los carbohidratos a 1,5 puños en días de entrenamiento intenso. Consulta con un nutricionista.</p>

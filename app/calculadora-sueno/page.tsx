@@ -244,22 +244,22 @@ export default function CalculadoraSuenoPage() {
         <h3><span aria-hidden="true">🌟</span> Consejos para dormir mejor</h3>
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcono}>📱</span>
+            <span className={styles.tipIcono} aria-hidden="true">📱</span>
             <h4>Evita pantallas</h4>
             <p>Deja el móvil 1 hora antes de dormir. La luz azul afecta la melatonina.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcono}>🌡️</span>
+            <span className={styles.tipIcono} aria-hidden="true">🌡️</span>
             <h4>Temperatura ideal</h4>
             <p>Mantén la habitación entre 18-21°C para un sueño reparador.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcono}>☕</span>
+            <span className={styles.tipIcono} aria-hidden="true">☕</span>
             <h4>Limita cafeína</h4>
             <p>Evita café, té y refrescos con cafeína 6 horas antes de dormir.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcono}>🕐</span>
+            <span className={styles.tipIcono} aria-hidden="true">🕐</span>
             <h4>Horario regular</h4>
             <p>Acuéstate y levántate a la misma hora, incluso fines de semana.</p>
           </div>
@@ -307,32 +307,32 @@ export default function CalculadoraSuenoPage() {
           <h2>Patrones de sueño según perfil y situación</h2>
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
-              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon}>🎓</span><h3>Estudiante en época de exámenes</h3></div>
+              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon} aria-hidden="true">🎓</span><h3>Estudiante en época de exámenes</h3></div>
               <p className={styles.escenarioExample}>Estudia hasta las 2h, despertador a las 7h. Solo 5h de sueño: pierde la mayor parte del REM (última parte de la noche), clave para consolidar lo aprendido. Contraproducente.</p>
               <span className={styles.escenarioTip}>Dormir 7h consolida mejor que estudiar 2h más</span>
             </div>
             <div className={styles.escenarioCard}>
-              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon}>🏋️</span><h3>Deportista de alto rendimiento</h3></div>
+              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon} aria-hidden="true">🏋️</span><h3>Deportista de alto rendimiento</h3></div>
               <p className={styles.escenarioExample}>Necesita 8-10h. En NREM 3 se libera hormona del crecimiento, clave para reparación muscular. Muchos atletas de élite añaden siesta de 20 min para recuperación sin entrar en sueño profundo.</p>
               <span className={styles.escenarioTip}>La siesta de 20 min mejora rendimiento un 34%</span>
             </div>
             <div className={styles.escenarioCard}>
-              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon}>👶</span><h3>Padre/madre con bebé</h3></div>
+              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon} aria-hidden="true">👶</span><h3>Padre/madre con bebé</h3></div>
               <p className={styles.escenarioExample}>Interrupciones cada 2-3h destruyen los ciclos. La fragmentación es más dañina que pocas horas seguidas. Estrategia: dormir en fases de 90 min mínimo cuando sea posible y compartir turnos.</p>
               <span className={styles.escenarioTip}>90 min mínimos = un ciclo completo</span>
             </div>
             <div className={styles.escenarioCard}>
-              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon}>✈️</span><h3>Viajero con jet lag</h3></div>
+              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon} aria-hidden="true">✈️</span><h3>Viajero con jet lag</h3></div>
               <p className={styles.escenarioExample}>Cambio de zona horaria desincroniza el ritmo circadiano. Hacia el este es más difícil (adelantar el sueño). Regla: 1 día de adaptación por cada hora de diferencia. Exposición a luz natural por la mañana acelera el ajuste.</p>
               <span className={styles.escenarioTip}>Luz solar por la mañana = reset del ritmo</span>
             </div>
             <div className={styles.escenarioCard}>
-              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon}>👴</span><h3>Persona mayor de 65 años</h3></div>
+              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon} aria-hidden="true">👴</span><h3>Persona mayor de 65 años</h3></div>
               <p className={styles.escenarioExample}>Producción de melatonina disminuye. Los ciclos se acortan y hay más despertares nocturnos. Es normal adelantar el horario de sueño 1-2h. La calidad importa más que la cantidad (necesitan menos NREM 3).</p>
               <span className={styles.escenarioTip}>7h de calidad &gt; 9h fragmentadas</span>
             </div>
             <div className={styles.escenarioCard}>
-              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon}>🌙</span><h3>Trabajador nocturno o en turnos</h3></div>
+              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon} aria-hidden="true">🌙</span><h3>Trabajador nocturno o en turnos</h3></div>
               <p className={styles.escenarioExample}>Dormir de día reduce la calidad hasta un 30%: la luz y el ruido interrumpen el sueño profundo. Persianas blackout, tapones y temperatura fresca son esenciales. Los turnos rotativos son más perjudiciales que el nocturno fijo.</p>
               <span className={styles.escenarioTip}>Turno fijo nocturno &gt; turnos rotativos</span>
             </div>
@@ -369,12 +369,12 @@ export default function CalculadoraSuenoPage() {
         <div className={styles.eduTips}>
           <h2>Hábitos de los que duermen bien</h2>
           <div className={styles.tipsGrid}>
-            <div className={styles.tipCard}><span className={styles.tipIcon}>🌡️</span><strong>Temperatura ideal: 18-20°C</strong><p>El cuerpo necesita bajar su temperatura central para iniciar el sueño. Una habitación fresca facilita este proceso de forma natural.</p></div>
-            <div className={styles.tipCard}><span className={styles.tipIcon}>⏰</span><strong>Despertador en múltiplo de 90 min</strong><p>Algunas personas notan menos inercia del sueño si se despiertan al final de un ciclo aproximado de 90 minutos, aunque la evidencia es mixta. La regularidad del horario tiene mayor respaldo científico.</p></div>
-            <div className={styles.tipCard}><span className={styles.tipIcon}>📵</span><strong>Sin pantallas 1h antes</strong><p>Sustituye por lectura física, podcast relajante o meditación. El cerebro no distingue entre contenido relajante e intenso en pantalla — la luz azul siempre suprime melatonina.</p></div>
-            <div className={styles.tipCard}><span className={styles.tipIcon}>🧘</span><strong>Técnica 4-7-8 para conciliar</strong><p>Inhala 4 seg, retén 7 seg, exhala 8 seg. Activa el sistema parasimpático y reduce la frecuencia cardíaca, facilitando la transición al sueño.</p></div>
-            <div className={styles.tipCard}><span className={styles.tipIcon}>☀️</span><strong>Luz solar al despertar</strong><p>10-15 min de luz natural nada más levantarte sincroniza el ritmo circadiano, mejora el estado de ánimo y facilita dormir mejor esa noche.</p></div>
-            <div className={styles.tipCard}><span className={styles.tipIcon}>📓</span><strong>Escribe tus preocupaciones antes de dormir</strong><p>El "journaling" de 5 min — listar tareas pendientes y preocupaciones — descarga la mente y reduce la activación cognitiva que impide conciliar el sueño.</p></div>
+            <div className={styles.tipCard}><span className={styles.tipIcon} aria-hidden="true">🌡️</span><strong>Temperatura ideal: 18-20°C</strong><p>El cuerpo necesita bajar su temperatura central para iniciar el sueño. Una habitación fresca facilita este proceso de forma natural.</p></div>
+            <div className={styles.tipCard}><span className={styles.tipIcon} aria-hidden="true">⏰</span><strong>Despertador en múltiplo de 90 min</strong><p>Algunas personas notan menos inercia del sueño si se despiertan al final de un ciclo aproximado de 90 minutos, aunque la evidencia es mixta. La regularidad del horario tiene mayor respaldo científico.</p></div>
+            <div className={styles.tipCard}><span className={styles.tipIcon} aria-hidden="true">📵</span><strong>Sin pantallas 1h antes</strong><p>Sustituye por lectura física, podcast relajante o meditación. El cerebro no distingue entre contenido relajante e intenso en pantalla — la luz azul siempre suprime melatonina.</p></div>
+            <div className={styles.tipCard}><span className={styles.tipIcon} aria-hidden="true">🧘</span><strong>Técnica 4-7-8 para conciliar</strong><p>Inhala 4 seg, retén 7 seg, exhala 8 seg. Activa el sistema parasimpático y reduce la frecuencia cardíaca, facilitando la transición al sueño.</p></div>
+            <div className={styles.tipCard}><span className={styles.tipIcon} aria-hidden="true">☀️</span><strong>Luz solar al despertar</strong><p>10-15 min de luz natural nada más levantarte sincroniza el ritmo circadiano, mejora el estado de ánimo y facilita dormir mejor esa noche.</p></div>
+            <div className={styles.tipCard}><span className={styles.tipIcon} aria-hidden="true">📓</span><strong>Escribe tus preocupaciones antes de dormir</strong><p>El "journaling" de 5 min — listar tareas pendientes y preocupaciones — descarga la mente y reduce la activación cognitiva que impide conciliar el sueño.</p></div>
           </div>
         </div>
 

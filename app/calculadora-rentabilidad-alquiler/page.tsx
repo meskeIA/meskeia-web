@@ -580,32 +580,32 @@ export default function CalculadoraRentabilidadAlquilerPage() {
           <h2>Ejemplos reales por perfil de inversor</h2>
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
-              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon}>🏙️</span><h3>Piso en Madrid al contado</h3></div>
+              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon} aria-hidden="true">🏙️</span><h3>Piso en Madrid al contado</h3></div>
               <p className={styles.escenarioExample}>Compra 280.000 € · Alquiler 1.200 €/mes · Gastos 250 €/mes. Rentabilidad bruta: 5,14%. Neta: 4,07%. Cap rate: 4,07%.</p>
               <span className={styles.escenarioTip}>Zona prime = menor rentabilidad, menor riesgo</span>
             </div>
             <div className={styles.escenarioCard}>
-              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon}>🏡</span><h3>Piso en ciudad media con hipoteca</h3></div>
+              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon} aria-hidden="true">🏡</span><h3>Piso en ciudad media con hipoteca</h3></div>
               <p className={styles.escenarioExample}>Compra 120.000 € · 30% entrada · Hipoteca 500 €/mes · Alquiler 700 €/mes. Cash-on-cash sobre 36.000 € invertidos: 6,7%.</p>
               <span className={styles.escenarioTip}>Apalancamiento mejora el cash-on-cash</span>
             </div>
             <div className={styles.escenarioCard}>
-              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon}>🎓</span><h3>Piso de estudiantes por habitaciones</h3></div>
+              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon} aria-hidden="true">🎓</span><h3>Piso de estudiantes por habitaciones</h3></div>
               <p className={styles.escenarioExample}>Compra 95.000 € · 3 habitaciones a 350 €/mes. Ingresos 1.050 €/mes vs 650 € en alquiler convencional. Rentabilidad bruta: 13,3%.</p>
               <span className={styles.escenarioTip}>Mayor rentabilidad, mayor gestión</span>
             </div>
             <div className={styles.escenarioCard}>
-              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon}>🏖️</span><h3>Alquiler vacacional (Airbnb)</h3></div>
+              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon} aria-hidden="true">🏖️</span><h3>Alquiler vacacional (Airbnb)</h3></div>
               <p className={styles.escenarioExample}>Compra 200.000 € · 120 noches/año a 90 €. Ingresos 10.800 €/año. Rentabilidad bruta: 5,4% pero con alta estacionalidad y gestión intensiva.</p>
               <span className={styles.escenarioTip}>Compara siempre con alquiler tradicional</span>
             </div>
             <div className={styles.escenarioCard}>
-              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon}>🔨</span><h3>Compra para reformar y alquilar</h3></div>
+              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon} aria-hidden="true">🔨</span><h3>Compra para reformar y alquilar</h3></div>
               <p className={styles.escenarioExample}>Precio 80.000 € + reforma 25.000 € = coste total 105.000 €. Alquiler 750 €/mes. Rentabilidad bruta real: 8,6% (muy superior a compra sin reforma).</p>
               <span className={styles.escenarioTip}>La reforma bien ejecutada multiplica la rentabilidad</span>
             </div>
             <div className={styles.escenarioCard}>
-              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon}>🏢</span><h3>Local comercial en zona céntrica</h3></div>
+              <div className={styles.escenarioHeader}><span className={styles.escenarioIcon} aria-hidden="true">🏢</span><h3>Local comercial en zona céntrica</h3></div>
               <p className={styles.escenarioExample}>Compra 150.000 € · Alquiler 900 €/mes. Rentabilidad bruta: 7,2%. Mayor que residencial pero con vacíos más largos y menor protección legal.</p>
               <span className={styles.escenarioTip}>Mayor rendimiento, mayor riesgo de vacío</span>
             </div>
@@ -645,12 +645,12 @@ export default function CalculadoraRentabilidadAlquilerPage() {
         <div className={styles.eduTips}>
           <h2>Claves para maximizar la rentabilidad</h2>
           <div className={styles.tipsGrid}>
-            <div className={styles.tipCard}><span className={styles.tipIcon}>📍</span><strong>La zona lo es todo</strong><p>Una propiedad mediocre en zona prime siempre supera a una excelente en zona deprimida. Prioriza demanda de alquiler sobre precio bajo.</p></div>
-            <div className={styles.tipCard}><span className={styles.tipIcon}>🔒</span><strong>Contrata seguro de impago</strong><p>Cuesta un 3-5% del alquiler anual y cubre 12 meses de impago + defensa jurídica. El coste vs el riesgo hace que sea casi obligatorio.</p></div>
-            <div className={styles.tipCard}><span className={styles.tipIcon}>🧾</span><strong>Declara todo correctamente</strong><p>Las deducciones legales (gastos, amortización del inmueble) pueden reducir tu carga fiscal significativamente. Un gestor especializado en IRPF inmobiliario se amortiza en el primer año.</p></div>
-            <div className={styles.tipCard}><span className={styles.tipIcon}>🔧</span><strong>Provisiona para reparaciones</strong><p>Reserva el 1% del valor del piso al año para mantenimiento. Un propietario que no provisiona sufre sorpresas que destrozan la rentabilidad de varios años.</p></div>
-            <div className={styles.tipCard}><span className={styles.tipIcon}>📊</span><strong>Revisa la renta cada año</strong><p>Actualiza según IPC o el índice pactado en el contrato. No actualizar durante años crea una brecha que luego es difícil de recuperar con el mismo inquilino.</p></div>
-            <div className={styles.tipCard}><span className={styles.tipIcon}>🤝</span><strong>Selección de inquilino rigurosa</strong><p>Solicita 3 últimas nóminas, contrato laboral y referencias. Un buen inquilino durante 5 años vale más que una renta 10% más alta con moroso.</p></div>
+            <div className={styles.tipCard}><span className={styles.tipIcon} aria-hidden="true">📍</span><strong>La zona lo es todo</strong><p>Una propiedad mediocre en zona prime siempre supera a una excelente en zona deprimida. Prioriza demanda de alquiler sobre precio bajo.</p></div>
+            <div className={styles.tipCard}><span className={styles.tipIcon} aria-hidden="true">🔒</span><strong>Contrata seguro de impago</strong><p>Cuesta un 3-5% del alquiler anual y cubre 12 meses de impago + defensa jurídica. El coste vs el riesgo hace que sea casi obligatorio.</p></div>
+            <div className={styles.tipCard}><span className={styles.tipIcon} aria-hidden="true">🧾</span><strong>Declara todo correctamente</strong><p>Las deducciones legales (gastos, amortización del inmueble) pueden reducir tu carga fiscal significativamente. Un gestor especializado en IRPF inmobiliario se amortiza en el primer año.</p></div>
+            <div className={styles.tipCard}><span className={styles.tipIcon} aria-hidden="true">🔧</span><strong>Provisiona para reparaciones</strong><p>Reserva el 1% del valor del piso al año para mantenimiento. Un propietario que no provisiona sufre sorpresas que destrozan la rentabilidad de varios años.</p></div>
+            <div className={styles.tipCard}><span className={styles.tipIcon} aria-hidden="true">📊</span><strong>Revisa la renta cada año</strong><p>Actualiza según IPC o el índice pactado en el contrato. No actualizar durante años crea una brecha que luego es difícil de recuperar con el mismo inquilino.</p></div>
+            <div className={styles.tipCard}><span className={styles.tipIcon} aria-hidden="true">🤝</span><strong>Selección de inquilino rigurosa</strong><p>Solicita 3 últimas nóminas, contrato laboral y referencias. Un buen inquilino durante 5 años vale más que una renta 10% más alta con moroso.</p></div>
           </div>
         </div>
 

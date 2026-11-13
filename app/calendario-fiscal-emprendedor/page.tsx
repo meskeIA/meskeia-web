@@ -1190,7 +1190,7 @@ export default function CalendarioFiscalPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>💼</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">💼</span>
                 <h4>Autónomo en estimación directa, sin empleados, con alquiler de local</h4>
               </div>
               <div className={styles.escenarioExample}>
@@ -1214,7 +1214,7 @@ export default function CalendarioFiscalPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>👥</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">👥</span>
                 <h4>Autónomo con 2 empleados</h4>
               </div>
               <div className={styles.escenarioExample}>
@@ -1232,7 +1232,7 @@ export default function CalendarioFiscalPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🏢</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏢</span>
                 <h4>SL unipersonal con administrador autónomo</h4>
               </div>
               <div className={styles.escenarioExample}>
@@ -1252,7 +1252,7 @@ export default function CalendarioFiscalPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🩺</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🩺</span>
                 <h4>Freelance exento de IVA (psicólogo, médico, profesor)</h4>
               </div>
               <div className={styles.escenarioExample}>
@@ -1419,42 +1419,42 @@ export default function CalendarioFiscalPage() {
           <div className={styles.tipsGrid}>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📅</span>
+              <span className={styles.tipIcon} aria-hidden="true">📅</span>
               <p>
                 El pago del modelo 303 puede domiciliarse hasta el día anterior al fin del plazo: 19 de abril, 19 de julio, 19 de octubre y 29 de enero. No esperes al último día para iniciar la presentación.
               </p>
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>↩️</span>
+              <span className={styles.tipIcon} aria-hidden="true">↩️</span>
               <p>
                 Si el resultado del 303 es <strong>negativo</strong> (más IVA soportado que repercutido), tienes dos opciones: pedir devolución en el 4T o compensar el saldo en los trimestres siguientes. La compensación es más rápida, pero la devolución puede ser conveniente si el importe es elevado.
               </p>
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🧮</span>
+              <span className={styles.tipIcon} aria-hidden="true">🧮</span>
               <p>
                 El modelo 130 en estimación directa simplificada se calcula sobre el <strong>beneficio acumulado desde el 1 de enero</strong> al trimestre correspondiente, aplicando el 20 %, y restando lo ya pagado en trimestres anteriores. No se calcula sobre el beneficio del trimestre aislado.
               </p>
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>💻</span>
+              <span className={styles.tipIcon} aria-hidden="true">💻</span>
               <p>
                 Pide a tu gestor acceso al sistema <strong>Cl@ve PIN</strong> o activa tu certificado digital para consultar tus presentaciones en la Sede Electrónica de la AEAT. Así puedes verificar en cualquier momento si todas tus declaraciones están registradas correctamente.
               </p>
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📬</span>
+              <span className={styles.tipIcon} aria-hidden="true">📬</span>
               <p>
                 Las notificaciones de Hacienda llegan por <strong>Dirección Electrónica Habilitada (DEH)</strong>. Actívala y revísala cada semana. Si una notificación electrónica no se abre en 10 días, se da por recibida automáticamente — con las consecuencias legales que ello conlleva.
               </p>
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🏦</span>
+              <span className={styles.tipIcon} aria-hidden="true">🏦</span>
               <p>
                 Reserva el <strong>25-30 % de cada cobro</strong> en una cuenta separada destinada exclusivamente al pago de impuestos. Nunca uses ese dinero para gastos corrientes. Esta práctica elimina la angustia al llegar los trimestres y evita problemas de liquidez.
               </p>

@@ -548,7 +548,7 @@ export default function ContrasteColoresPage() {
             {/* Caso 1: Diseño web corporativo */}
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🌐</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🌐</span>
                 <h3>Diseño Web Corporativo</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -567,7 +567,7 @@ export default function ContrasteColoresPage() {
             {/* Caso 2: Dashboards y Apps */}
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>📊</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">📊</span>
                 <h3>Dashboards y Apps de Datos</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -586,7 +586,7 @@ export default function ContrasteColoresPage() {
             {/* Caso 3: E-commerce */}
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🛒</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🛒</span>
                 <h3>E-commerce: Precios y CTAs</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -605,7 +605,7 @@ export default function ContrasteColoresPage() {
             {/* Caso 4: Modo Oscuro */}
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🌙</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🌙</span>
                 <h3>Modo Oscuro: Apps Nocturnas</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -625,7 +625,7 @@ export default function ContrasteColoresPage() {
             {/* Caso 5: Contenido Editorial */}
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>📝</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">📝</span>
                 <h3>Contenido Editorial: Lectura Prolongada</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -644,7 +644,7 @@ export default function ContrasteColoresPage() {
             {/* Caso 6: Cumplimiento Legal */}
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>⚖️</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">⚖️</span>
                 <h3>Cumplimiento Legal: Sector Público</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -968,7 +968,7 @@ export default function ContrasteColoresPage() {
           <div className={styles.tipsGrid}>
             {/* Tip 1 */}
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <h4>Usa HSL para ajustar luminosidad</h4>
               <p>
                 Convierte colores a HSL y modifica solo el componente L (lightness) para mantener identidad de marca mientras cumples contraste.
@@ -977,7 +977,7 @@ export default function ContrasteColoresPage() {
 
             {/* Tip 2 */}
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <h4>Prioriza AA sobre AAA en primera auditoría</h4>
               <p>
                 Si nunca has auditado accesibilidad, apunta a cumplir AA primero. Una vez logrado, mejora gradualmente elementos críticos a AAA.
@@ -986,7 +986,7 @@ export default function ContrasteColoresPage() {
 
             {/* Tip 3 */}
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <h4>Verifica contraste en modo oscuro también</h4>
               <p>
                 No asumas simetría: un par que funciona en claro puede fallar en oscuro. Usa #E5E5E5 (no #FFFFFF) para evitar deslumbramiento.
@@ -995,7 +995,7 @@ export default function ContrasteColoresPage() {
 
             {/* Tip 4 */}
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <h4>Crea design tokens con pares validados</h4>
               <p>
                 Documenta en tu design system solo combinaciones aprobadas. Añade comentarios CSS con el ratio para referencia futura.
@@ -1004,7 +1004,7 @@ export default function ContrasteColoresPage() {
 
             {/* Tip 5 */}
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <h4>Usa herramientas de desarrollo (DevTools)</h4>
               <p>
                 Chrome DevTools (F12 → Inspeccionar → Accessibility) muestra contraste detectado en vivo. Úsalo para debugging rápido.
@@ -1013,7 +1013,7 @@ export default function ContrasteColoresPage() {
 
             {/* Tip 6 */}
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <h4>Considera daltonismo además de contraste</h4>
               <p>
                 8% de hombres tienen daltonismo. No uses SOLO color para transmitir información crítica (ej: rojo=error). Añade iconos o texto.

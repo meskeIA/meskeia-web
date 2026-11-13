@@ -921,7 +921,7 @@ export default function CalculadoraDistribucionesPage() {
             <h3 style={{ gridColumn: '1 / -1' }}><span aria-hidden="true">👥</span> Casos de Uso por Perfil Profesional</h3>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🧑‍🎓</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🧑‍🎓</span>
                 <h4>Estudiante de Estadística</h4>
               </div>
               <p className={styles.escenarioExample}>
@@ -931,7 +931,7 @@ export default function CalculadoraDistribucionesPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🏭</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏭</span>
                 <h4>Ingeniero de Calidad</h4>
               </div>
               <p className={styles.escenarioExample}>
@@ -941,7 +941,7 @@ export default function CalculadoraDistribucionesPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>📋</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">📋</span>
                 <h4>Actuario / Asegurador</h4>
               </div>
               <p className={styles.escenarioExample}>
@@ -951,7 +951,7 @@ export default function CalculadoraDistribucionesPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🔬</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🔬</span>
                 <h4>Científico de Datos</h4>
               </div>
               <p className={styles.escenarioExample}>
@@ -1067,32 +1067,32 @@ export default function CalculadoraDistribucionesPage() {
           <div className={styles.tipsGrid}>
             <h3 style={{ gridColumn: '1 / -1', marginBottom: '0.5rem' }}><span aria-hidden="true">✅</span> Mejores Prácticas al Trabajar con Distribuciones</h3>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📊</span>
+              <span className={styles.tipIcon} aria-hidden="true">📊</span>
               <h4>Visualiza antes de asumir</h4>
               <p>Haz siempre un histograma y un Q-Q plot antes de seleccionar una distribución. El 70% de los errores en análisis estadístico provienen de asumir normalidad sin verificarla. Matplotlib, ggplot2 o incluso Excel permiten validaciones rápidas.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔢</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔢</span>
               <h4>Atención a la parametrización</h4>
               <p>La Exponencial tiene dos formas: con tasa λ (scipy.stats usa escala=1/λ) y con escala=1/λ. La Gamma en R puede especificarse con shape/rate o shape/scale. Verifica siempre la documentación. Un error de parametrización invierte el resultado completamente.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔍</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔍</span>
               <h4>Verifica la independencia</h4>
               <p>Binomial y Poisson asumen eventos independientes. Series temporales, datos autocorrelacionados o eventos que se &quot;contagian&quot; violan este supuesto. El test de Ljung-Box detecta autocorrelación. Si falla, los intervalos de confianza calculados serán incorrectos (demasiado estrechos).</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>⚠️</span>
+              <span className={styles.tipIcon} aria-hidden="true">⚠️</span>
               <h4>Cuida las colas de la distribución</h4>
               <p>La Normal subestima la probabilidad de eventos extremos. En finanzas, seguros y gestión de riesgos, usa t-Student (colas pesadas) o distribuciones de Valores Extremos (GEV, GPD). El VaR al 99,9% basado en Normal puede subestimar el riesgo real en un factor de 3-5x.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📏</span>
+              <span className={styles.tipIcon} aria-hidden="true">📏</span>
               <h4>Tamaño muestral y potencia estadística</h4>
               <p>Con n &lt; 30, los tests son poco potentes (alta tasa de falsos negativos). Para detectar una diferencia de 0,5 desviaciones estándar con potencia 80% y α=0,05, necesitas n ≥ 64 por grupo. Usa <code>pwr.t.test()</code> en R o <code>statsmodels.stats.power</code> en Python para calcular n óptimo.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🧪</span>
+              <span className={styles.tipIcon} aria-hidden="true">🧪</span>
               <h4>Pruebas de bondad de ajuste siempre</h4>
               <p>Nunca publiques resultados sin validar el ajuste. KS test, Shapiro-Wilk, Chi-cuadrado y Anderson-Darling son complementarios: KS detecta diferencias en la mediana, AD es más sensible en las colas. Un p-valor &gt; 0,05 no confirma la distribución, solo no la rechaza: reporta el estadístico de ajuste, no solo el p-valor.</p>
             </div>

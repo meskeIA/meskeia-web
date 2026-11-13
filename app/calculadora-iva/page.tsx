@@ -342,7 +342,7 @@ export default function CalculadoraIvaPage() {
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>💻</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">💻</span>
                 <strong>Freelance con clientes en España</strong>
               </div>
               <p className={styles.escenarioExample}>Factura diseño web a empresa española: base 2.000 € + 21% IVA = 2.420 €. Presenta el IVA cobrado (repercutido) menos el IVA pagado en compras (soportado) en el modelo 303 trimestral.</p>
@@ -350,7 +350,7 @@ export default function CalculadoraIvaPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🌍</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🌍</span>
                 <strong>Freelance con clientes en la UE</strong>
               </div>
               <p className={styles.escenarioExample}>Si el cliente UE tiene NIF intracomunitario, la factura va sin IVA (inversión del sujeto pasivo). Si es particular sin NIF, aplica el IVA del país de destino (OSS). Requiere registro previo.</p>
@@ -358,7 +358,7 @@ export default function CalculadoraIvaPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🏪</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏪</span>
                 <strong>Restaurante o bar (hostelería)</strong>
               </div>
               <p className={styles.escenarioExample}>Comida en local: 10% IVA. Bebidas alcohólicas: 21% IVA. Comida para llevar: 10%. El ticket debe desglosar IVA por tipo. El IVA soportado en compras (alimentos, suministros) lo pueden deducir.</p>
@@ -366,7 +366,7 @@ export default function CalculadoraIvaPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🏠</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏠</span>
                 <strong>Alquiler de inmueble</strong>
               </div>
               <p className={styles.escenarioExample}>Alquiler vivienda habitual: exento de IVA. Alquiler de local comercial u oficina: sujeto a 21% IVA. El arrendador deberá darse de alta como autónomo y presentar modelo 303.</p>
@@ -374,7 +374,7 @@ export default function CalculadoraIvaPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🛒</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🛒</span>
                 <strong>E-commerce con ventas a particulares UE</strong>
               </div>
               <p className={styles.escenarioExample}>Desde julio 2021, si superas 10.000 € en ventas a particulares de la UE, debes aplicar el IVA del país del comprador. El sistema OSS (One-Stop-Shop) simplifica la declaración desde España.</p>
@@ -382,7 +382,7 @@ export default function CalculadoraIvaPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🔨</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🔨</span>
                 <strong>Reforma o construcción en vivienda</strong>
               </div>
               <p className={styles.escenarioExample}>Obras de reforma en vivienda habitual: 10% IVA si son obras de renovación/reparación. Obra nueva o primera entrega de edificios: 10% (vivienda) o 4% (VPO). Importante distinguir el tipo de obra para no aplicar mal el 21%.</p>
@@ -491,32 +491,32 @@ export default function CalculadoraIvaPage() {
           <h2>Tips para no tener problemas con el IVA</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🗂️</span>
+              <span className={styles.tipIcon} aria-hidden="true">🗂️</span>
               <strong>Digitaliza todas tus facturas</strong>
               <p>Usa apps como Holded, Quipu o Sage para registrar ingresos y gastos con IVA en tiempo real.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📅</span>
+              <span className={styles.tipIcon} aria-hidden="true">📅</span>
               <strong>Pon alertas en el calendario</strong>
               <p>Los plazos de presentación del 303 son fijos cada trimestre. Saltártelos conlleva recargos automáticos.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>💰</span>
+              <span className={styles.tipIcon} aria-hidden="true">💰</span>
               <strong>Separa el IVA desde el primer día</strong>
               <p>Cuando cobres una factura, transfiere el 21% (o el tipo aplicable) a una cuenta de reserva para Hacienda.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🧾</span>
+              <span className={styles.tipIcon} aria-hidden="true">🧾</span>
               <strong>Exige siempre factura completa</strong>
               <p>Un ticket no sirve para deducir IVA. Pide siempre factura con tus datos cuando el gasto sea profesional.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🤝</span>
+              <span className={styles.tipIcon} aria-hidden="true">🤝</span>
               <strong>Verifica NIF intracomunitario</strong>
               <p>Antes de emitir factura sin IVA a cliente UE, comprueba su NIF en el VIES (vies.ec.europa.eu).</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>👨‍💼</span>
+              <span className={styles.tipIcon} aria-hidden="true">👨‍💼</span>
               <strong>Contrata un asesor fiscal</strong>
               <p>Para operaciones complejas (UE, exenciones, inmuebles), un asesor puede ahorrarte más de lo que cuesta.</p>
             </div>

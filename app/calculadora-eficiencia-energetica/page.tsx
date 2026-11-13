@@ -481,7 +481,7 @@ export default function EficienciaEnergeticaPage() {
             <div className={styles.escenariosGrid}>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>🏠</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">🏠</span>
                   <strong>Vivienda unifamiliar años 70–80</strong>
                 </div>
                 <div className={styles.escenarioExample}>
@@ -494,7 +494,7 @@ export default function EficienciaEnergeticaPage() {
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>🏢</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">🏢</span>
                   <strong>Piso en bloque de los 90</strong>
                 </div>
                 <div className={styles.escenarioExample}>
@@ -507,7 +507,7 @@ export default function EficienciaEnergeticaPage() {
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>🌊</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">🌊</span>
                   <strong>Vivienda en zona costera (clima suave)</strong>
                 </div>
                 <div className={styles.escenarioExample}>
@@ -520,7 +520,7 @@ export default function EficienciaEnergeticaPage() {
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>❄️</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">❄️</span>
                   <strong>Vivienda en zona fría (meseta norte)</strong>
                 </div>
                 <div className={styles.escenarioExample}>
@@ -537,32 +537,32 @@ export default function EficienciaEnergeticaPage() {
             <h3><span aria-hidden="true">✅</span> Claves para maximizar el retorno de tu inversión</h3>
             <div className={styles.tipsGrid}>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>📋</span>
+                <span className={styles.tipIcon} aria-hidden="true">📋</span>
                 <strong>Solicita 3 presupuestos siempre</strong>
                 <p>Los precios de instalación de aislamiento y ventanas varían hasta un 40% entre empresas. Compara siempre al menos 3 presupuestos con las mismas especificaciones técnicas.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>🏛️</span>
+                <span className={styles.tipIcon} aria-hidden="true">🏛️</span>
                 <strong>Aprovecha las deducciones IRPF</strong>
                 <p>Las mejoras que reducen la demanda en ≥30% tienen deducción del 40% en IRPF (hasta 7.500 €). Necesitas certificado energético antes y después. No lo dejes para la declaración siguiente.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>📊</span>
+                <span className={styles.tipIcon} aria-hidden="true">📊</span>
                 <strong>Prioriza por payback, no por ahorro absoluto</strong>
                 <p>Un aislamiento que ahorra 300 €/año con inversión de 2.000 € (payback 6,7 años) es mejor inversión que unas ventanas que ahorran 400 €/año con inversión de 8.000 € (payback 20 años).</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>⚡</span>
+                <span className={styles.tipIcon} aria-hidden="true">⚡</span>
                 <strong>Instala fotovoltaica después del aislamiento</strong>
                 <p>Si instalas placas antes de aislar, las sobredimensionas para una demanda que luego va a bajar. Primero reduce el consumo, luego genera tu propia energía.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>🌡️</span>
+                <span className={styles.tipIcon} aria-hidden="true">🌡️</span>
                 <strong>Considera la refrigeración al calcular la BC</strong>
                 <p>En España, la bomba de calor también sirve como aire acondicionado. Si actualmente tienes splits de refrigeración, el ahorro total de la BC incluye también la sustitución del coste de refrigeración.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>🏘️</span>
+                <span className={styles.tipIcon} aria-hidden="true">🏘️</span>
                 <strong>En comunidades, acuerda por mayoría simple</strong>
                 <p>Desde 2022, la Ley de Propiedad Horizontal permite aprobar obras de mejora energética con mayoría simple (antes 3/5). Es más fácil que nunca coordinar mejoras de fachada o cubierta comunitaria.</p>
               </div>

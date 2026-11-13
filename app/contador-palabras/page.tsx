@@ -400,7 +400,7 @@ export default function ContadorPalabrasPage() {
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>✍️</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">✍️</span>
               <strong>Redacción SEO</strong>
             </div>
             <p className={styles.escenarioDesc}>
@@ -409,7 +409,7 @@ export default function ContadorPalabrasPage() {
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>📧</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">📧</span>
               <strong>Email marketing</strong>
             </div>
             <p className={styles.escenarioDesc}>
@@ -418,7 +418,7 @@ export default function ContadorPalabrasPage() {
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>🎤</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🎤</span>
               <strong>Discursos y ponencias</strong>
             </div>
             <p className={styles.escenarioDesc}>
@@ -427,7 +427,7 @@ export default function ContadorPalabrasPage() {
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>📱</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">📱</span>
               <strong>Redes sociales</strong>
             </div>
             <p className={styles.escenarioDesc}>
@@ -506,32 +506,32 @@ export default function ContadorPalabrasPage() {
         <h3 className={styles.eduTitle}>Consejos para escribir mejor</h3>
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>📏</span>
+            <span className={styles.tipIcon} aria-hidden="true">📏</span>
             <strong>Párrafos cortos</strong>
             <p>Limita cada párrafo a 3-4 frases. En móvil, los bloques de texto largos tienen una tasa de abandono muy alta.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>💡</span>
+            <span className={styles.tipIcon} aria-hidden="true">💡</span>
             <strong>Una idea por párrafo</strong>
             <p>Cada párrafo debe desarrollar una sola idea. Si introduces un segundo concepto, empieza párrafo nuevo.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🏷️</span>
+            <span className={styles.tipIcon} aria-hidden="true">🏷️</span>
             <strong>Subtítulos cada 300 palabras</strong>
             <p>Los subtítulos (H2, H3) mejoran la escaneabilidad del texto y ayudan al SEO al estructurar el contenido.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🎯</span>
+            <span className={styles.tipIcon} aria-hidden="true">🎯</span>
             <strong>Variedad en la longitud</strong>
             <p>Alterna frases cortas (impacto) con frases largas (explicación). La monotonía en el ritmo cansa al lector.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🔍</span>
+            <span className={styles.tipIcon} aria-hidden="true">🔍</span>
             <strong>Densidad natural de keywords</strong>
             <p>Usa tu keyword principal en el primer párrafo, en algún subtítulo y de forma natural en el resto. Nunca la fuerces.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>✂️</span>
+            <span className={styles.tipIcon} aria-hidden="true">✂️</span>
             <strong>Elimina el relleno</strong>
             <p>Cada frase debe aportar valor. Si puedes eliminar una oración sin perder información, elimínala.</p>
           </div>

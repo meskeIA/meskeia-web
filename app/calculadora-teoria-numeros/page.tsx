@@ -1095,7 +1095,7 @@ export default function CalculadoraTeoriaNumerosPage() {
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🎓</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🎓</span>
                 <h4>Estudiante de ESO/Bachillerato</h4>
               </div>
               <p><strong>Situación:</strong> Estudia conjuntos numéricos para el examen de 4.º ESO.</p>
@@ -1109,7 +1109,7 @@ export default function CalculadoraTeoriaNumerosPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>💻</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">💻</span>
                 <h4>Programador — Criptografía RSA</h4>
               </div>
               <p><strong>Situación:</strong> Implementa RSA-2048 para cifrar comunicaciones.</p>
@@ -1124,7 +1124,7 @@ export default function CalculadoraTeoriaNumerosPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🔬</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🔬</span>
                 <h4>Matemático — Congruencias Modulares</h4>
               </div>
               <p><strong>Situación:</strong> Estudia el Teorema Chino del Resto para sistemas de congruencias.</p>
@@ -1139,7 +1139,7 @@ export default function CalculadoraTeoriaNumerosPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>⚡</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">⚡</span>
                 <h4>Ingeniero — Circuitos AC</h4>
               </div>
               <p><strong>Situación:</strong> Analiza impedancias en circuitos de corriente alterna.</p>
@@ -1326,7 +1326,7 @@ export default function CalculadoraTeoriaNumerosPage() {
           <h2>Mejores Prácticas al Trabajar con Teoría de Números</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>⚡</span>
+              <span className={styles.tipIcon} aria-hidden="true">⚡</span>
               <h4>Solo divide hasta √n para verificar primalidad</h4>
               <p>
                 Si n tiene un divisor d {'>'} √n, entonces n/d {'<'} √n ya fue encontrado antes.
@@ -1334,7 +1334,7 @@ export default function CalculadoraTeoriaNumerosPage() {
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔍</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔍</span>
               <h4>Usa criterios de divisibilidad antes de dividir</h4>
               <p>
                 Descarta candidatos rápidamente: divisible por 2 si termina en par, por 3 si la
@@ -1343,7 +1343,7 @@ export default function CalculadoraTeoriaNumerosPage() {
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔄</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔄</span>
               <h4>Usa el Teorema Chino del Resto para congruencias</h4>
               <p>
                 Si tienes un sistema de congruencias con módulos coprimos, el TCR garantiza
@@ -1352,7 +1352,7 @@ export default function CalculadoraTeoriaNumerosPage() {
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🛡️</span>
+              <span className={styles.tipIcon} aria-hidden="true">🛡️</span>
               <h4>Usa exponenciación modular rápida para criptografía</h4>
               <p>
                 Calcular aⁿ mod m directamente desborda. La exponenciación binaria descompone
@@ -1361,7 +1361,7 @@ export default function CalculadoraTeoriaNumerosPage() {
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📐</span>
+              <span className={styles.tipIcon} aria-hidden="true">📐</span>
               <h4>El algoritmo de Euclides es la forma más rápida de calcular el MCD</h4>
               <p>
                 MCD(a, b) = MCD(b, a mod b), con caso base MCD(a, 0) = a.
@@ -1370,7 +1370,7 @@ export default function CalculadoraTeoriaNumerosPage() {
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🏗️</span>
+              <span className={styles.tipIcon} aria-hidden="true">🏗️</span>
               <h4>Usa la criba segmentada para rangos de primos grandes</h4>
               <p>
                 La criba de Eratóstenes clásica requiere O(n) memoria. La criba segmentada

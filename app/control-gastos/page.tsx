@@ -566,7 +566,7 @@ export default function ControlGastosPage() {
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>💼</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">💼</span>
                 <h4>Trabajador con nómina fija (2.000 €/mes)</h4>
               </div>
               <p>
@@ -587,7 +587,7 @@ export default function ControlGastosPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>💻</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">💻</span>
                 <h4>Freelance con ingresos variables</h4>
               </div>
               <p>
@@ -608,7 +608,7 @@ export default function ControlGastosPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>👨‍👩‍👧</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">👨‍👩‍👧</span>
                 <h4>Familia con dos sueldos</h4>
               </div>
               <p>
@@ -629,7 +629,7 @@ export default function ControlGastosPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🎓</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🎓</span>
                 <h4>Estudiante universitario</h4>
               </div>
               <p>
@@ -846,7 +846,7 @@ export default function ControlGastosPage() {
           </p>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>⏰</span>
+              <span className={styles.tipIcon} aria-hidden="true">⏰</span>
               <h4>La regla de las 24 horas</h4>
               <p>
                 Antes de cualquier compra no planificada superior a 50 €, espera 24 horas.
@@ -855,14 +855,14 @@ export default function ControlGastosPage() {
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🤖</span>
+              <span className={styles.tipIcon} aria-hidden="true">🤖</span>
               <h4>Automatiza el ahorro</h4>
               <p>
                 Si tu situación lo permite, transfiere automáticamente un porcentaje fijo de tu nómina el día de cobro (el rango 10-20% es una referencia; lo importante es que sea sostenible). Cualquier cantidad estable funciona si se mantiene en el tiempo.
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔍</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔍</span>
               <h4>Audita suscripciones cada 6 meses</h4>
               <p>
                 La media española acumula entre 8 y 12 suscripciones activas. El coste medio
@@ -871,7 +871,7 @@ export default function ControlGastosPage() {
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📋</span>
+              <span className={styles.tipIcon} aria-hidden="true">📋</span>
               <h4>Compara seguros anualmente</h4>
               <p>
                 Hogar, coche y salud suelen ser los seguros más caros. Comparar ofertas una
@@ -880,7 +880,7 @@ export default function ControlGastosPage() {
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🛒</span>
+              <span className={styles.tipIcon} aria-hidden="true">🛒</span>
               <h4>Planifica la compra semanal con lista</h4>
               <p>
                 Ir al supermercado sin lista puede incrementar el gasto en alimentación hasta
@@ -889,7 +889,7 @@ export default function ControlGastosPage() {
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🎉</span>
+              <span className={styles.tipIcon} aria-hidden="true">🎉</span>
               <h4>Ocio consciente sin culpa</h4>
               <p>
                 Fijar un presupuesto de ocio mensual no significa privarse: significa

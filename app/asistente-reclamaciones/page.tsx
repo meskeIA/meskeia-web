@@ -627,37 +627,37 @@ export default function AsistenteReclamacionesPage() {
           <h2>Consejos para reclamar con éxito</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✍️</span>
+              <span className={styles.tipIcon} aria-hidden="true">✍️</span>
               <strong>Siempre por escrito</strong>
               <p>Reclama siempre por correo electrónico o formulario web, nunca solo por teléfono.
               Necesitas prueba de que reclamaste y en qué fecha.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📅</span>
+              <span className={styles.tipIcon} aria-hidden="true">📅</span>
               <strong>Controla los plazos legales</strong>
               <p>Garantía: 3 años desde la entrega. Desistimiento online: 14 días. Vuelo cancelado: 5 años
               para reclamar. No esperes demasiado.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📁</span>
+              <span className={styles.tipIcon} aria-hidden="true">📁</span>
               <strong>Guarda toda la documentación</strong>
               <p>Ticket, factura, correos, fotos del defecto, capturas de conversaciones de chat.
               Cuanta más evidencia, más fuerte es tu posición.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🎯</span>
+              <span className={styles.tipIcon} aria-hidden="true">🎯</span>
               <strong>Sé concreto en tu reclamación</strong>
               <p>Indica claramente: qué pasó, cuándo, qué producto/servicio, qué solución pides
               (reparación, sustitución, devolución) y en qué plazo.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>⚖️</span>
+              <span className={styles.tipIcon} aria-hidden="true">⚖️</span>
               <strong>Conoce la legislación básica</strong>
               <p>TRLGDCU (garantías y devoluciones), Ley 50/1980 (seguros), Reglamento EU 261 (vuelos).
               Citar la normativa en tu reclamación aumenta la efectividad.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🌐</span>
+              <span className={styles.tipIcon} aria-hidden="true">🌐</span>
               <strong>Usa la plataforma ODR para compras UE</strong>
               <p>Para conflictos con empresas de otros países de la UE, la Plataforma Online de Resolución
               de Disputas (ec.europa.eu/odr) es la vía más efectiva y gratuita.</p>
@@ -668,7 +668,7 @@ export default function AsistenteReclamacionesPage() {
         {/* Warning Box */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <strong>Errores que debilitan o invalidan tu reclamación</strong>
           </div>
           <ul className={styles.warningList}>

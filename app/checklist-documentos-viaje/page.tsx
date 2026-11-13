@@ -381,7 +381,7 @@ export default function ChecklistDocumentosViajePage() {
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>💼</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">💼</span>
                 <strong>Viajero frecuente de negocios a Europa</strong>
               </div>
               <p className={styles.escenarioExample}>Ejemplo: vuelos mensuales a Alemania, Francia o Italia.</p>
@@ -396,7 +396,7 @@ export default function ChecklistDocumentosViajePage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>👨‍👩‍👧‍👦</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">👨‍👩‍👧‍👦</span>
                 <strong>Familia con niños al extranjero</strong>
               </div>
               <p className={styles.escenarioExample}>Ejemplo: vacaciones en verano a EEUU con 2 hijos menores.</p>
@@ -412,7 +412,7 @@ export default function ChecklistDocumentosViajePage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🎒</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🎒</span>
                 <strong>Joven que viaja a EEUU por primera vez</strong>
               </div>
               <p className={styles.escenarioExample}>Ejemplo: viaje de mochilero de 3 semanas por la Costa Este.</p>
@@ -427,7 +427,7 @@ export default function ChecklistDocumentosViajePage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🧓</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🧓</span>
                 <strong>Mayor de 65 años viajando fuera de la UE</strong>
               </div>
               <p className={styles.escenarioExample}>Ejemplo: crucero por el Mediterráneo con escala en Marruecos y Turquía.</p>
@@ -560,42 +560,42 @@ export default function ChecklistDocumentosViajePage() {
           <h4 className={styles.eduSectionTitle}>6 mejores prácticas para viajeros experimentados</h4>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📄</span>
+              <span className={styles.tipIcon} aria-hidden="true">📄</span>
               <div>
                 <strong>Fotocopias siempre separadas de los originales</strong>
                 <p>Guarda una fotocopia de todos tus documentos en casa (en poder de un familiar) y otra en el equipaje separada de los originales. Si pierdes el pasaporte, la fotocopia agiliza enormemente el trámite en el consulado.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>☁️</span>
+              <span className={styles.tipIcon} aria-hidden="true">☁️</span>
               <div>
                 <strong>Copias digitales en la nube accesibles sin contraseña</strong>
                 <p>Envíate por correo electrónico los escaneados de pasaporte, seguro, ESTA y reservas. También puedes usar Google Drive o iCloud. Lo importante es que puedas acceder desde cualquier dispositivo aunque pierdas el móvil.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🏛️</span>
+              <span className={styles.tipIcon} aria-hidden="true">🏛️</span>
               <div>
                 <strong>Regístrate en el consulado para viajes de más de 2 semanas</strong>
                 <p>El Registro de Viajeros del Ministerio de Asuntos Exteriores (maec.es) es gratuito y permite que la embajada española te localice en caso de emergencia, catástrofe natural o conflicto armado. Especialmente importante en destinos de riesgo medio o alto.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📞</span>
+              <span className={styles.tipIcon} aria-hidden="true">📞</span>
               <div>
                 <strong>Guarda los contactos de la embajada española</strong>
                 <p>El teléfono de asistencia a españoles en el extranjero del MAEC es el <strong>+34 913 94 21 00</strong> (disponible 24h). También puedes consultar el directorio de embajadas en exteriores.gob.es antes de salir y guardar el número específico del país de destino.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>💳</span>
+              <span className={styles.tipIcon} aria-hidden="true">💳</span>
               <div>
                 <strong>Diversifica los métodos de pago</strong>
                 <p>Lleva siempre al menos dos tarjetas de dos bancos diferentes, más algo de efectivo en moneda local. El número de bloqueo de tarjetas (en el reverso o en la app del banco) debe estar guardado por separado del wallet. Tarjetas como Revolut o Wise no cobran comisiones en el extranjero.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📅</span>
+              <span className={styles.tipIcon} aria-hidden="true">📅</span>
               <div>
                 <strong>Crea alertas de caducidad en el calendario</strong>
                 <p>Añade una alerta recurrente anual en tu calendario para revisar las fechas de caducidad del pasaporte, DNI y TSE. El pasaporte se renueva cada 10 años (adultos) o 5 años (menores de 30). El DNI, cada 10 años para adultos. La TSE tiene su propia caducidad indicada en la tarjeta.</p>

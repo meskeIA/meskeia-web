@@ -1038,7 +1038,7 @@ export default function CompresorImagenesPage() {
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>👨‍💻</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">👨‍💻</span>
                 <h4>Desarrollador web</h4>
               </div>
               <p className={styles.escenarioExample}>
@@ -1052,7 +1052,7 @@ export default function CompresorImagenesPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>✍️</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">✍️</span>
                 <h4>Blogger / creador de contenido</h4>
               </div>
               <p className={styles.escenarioExample}>
@@ -1065,7 +1065,7 @@ export default function CompresorImagenesPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🛒</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🛒</span>
                 <h4>E-commerce con 1000+ fotos</h4>
               </div>
               <p className={styles.escenarioExample}>
@@ -1078,7 +1078,7 @@ export default function CompresorImagenesPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🎨</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🎨</span>
                 <h4>Diseñador gráfico</h4>
               </div>
               <p className={styles.escenarioExample}>
@@ -1270,7 +1270,7 @@ export default function CompresorImagenesPage() {
           <h2>Mejores prácticas de optimización de imágenes</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🌐</span>
+              <span className={styles.tipIcon} aria-hidden="true">🌐</span>
               <h4>WebP con fallback JPEG/PNG</h4>
               <p>
                 Usa el elemento <code>&lt;picture&gt;</code> para servir WebP a navegadores modernos
@@ -1279,7 +1279,7 @@ export default function CompresorImagenesPage() {
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🎯</span>
+              <span className={styles.tipIcon} aria-hidden="true">🎯</span>
               <h4>Calidad 70-85% para fotos</h4>
               <p>
                 Para fotografías en web, la calidad 70-85% en JPEG/WebP es el punto óptimo.
@@ -1288,7 +1288,7 @@ export default function CompresorImagenesPage() {
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📐</span>
+              <span className={styles.tipIcon} aria-hidden="true">📐</span>
               <h4>Dimensiones máximas 1920px</h4>
               <p>
                 Para imágenes full-width en escritorio, 1920px es suficiente incluso en pantallas 4K
@@ -1297,7 +1297,7 @@ export default function CompresorImagenesPage() {
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📱</span>
+              <span className={styles.tipIcon} aria-hidden="true">📱</span>
               <h4>Srcset para imágenes responsive</h4>
               <p>
                 Proporciona múltiples versiones de la imagen (300w, 800w, 1200w) con el atributo
@@ -1306,7 +1306,7 @@ export default function CompresorImagenesPage() {
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>⚡</span>
+              <span className={styles.tipIcon} aria-hidden="true">⚡</span>
               <h4>Nunca subas imágenes sin comprimir</h4>
               <p>
                 Establece como norma comprimir siempre antes de subir. Una imagen sin comprimir
@@ -1315,7 +1315,7 @@ export default function CompresorImagenesPage() {
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔍</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔍</span>
               <h4>Verifica con PageSpeed Insights</h4>
               <p>
                 Después de optimizar, usa Google PageSpeed Insights o Lighthouse para verificar
@@ -1330,7 +1330,7 @@ export default function CompresorImagenesPage() {
         <section className={styles.guideSection}>
           <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
-              <span className={styles.warningIcon}>⚠️</span>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               <h3>Errores que ralentizan tu web</h3>
             </div>
             <ul className={styles.warningList}>

@@ -339,7 +339,7 @@ export default function CalculadoraCombustiblePage() {
 
                   {/* Tip */}
                   <div className={styles.tip}>
-                    <span className={styles.tipIcon}>💡</span>
+                    <span className={styles.tipIcon} aria-hidden="true">💡</span>
                     <p>
                       Si viajas con más personas, puedes dividir el coste.
                       Con 4 personas: <strong>{formatCurrency(resultado.costeViaje! / 4)}</strong> por persona.
@@ -428,28 +428,28 @@ export default function CalculadoraCombustiblePage() {
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>🏙️</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🏙️</span>
               <h4>Commuter diario</h4>
             </div>
             <p className={styles.escenarioDesc}>Calculas 30 km diarios × 5 días = 150 km/semana. Con un consumo de 7 L/100km y gasolina a 1,52 €/L, son <strong>15,96 €/semana</strong> o ~830 €/año solo en combustible para ir al trabajo.</p>
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>🛣️</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🛣️</span>
               <h4>Planificar viaje largo</h4>
             </div>
             <p className={styles.escenarioDesc}>Madrid–Barcelona son 620 km. Con 6,5 L/100km y gasolina a 1,50 €/L, el viaje cuesta <strong>60,45 €</strong> en combustible. Divide entre pasajeros para comparar con el tren (AVE ~45–90 €/persona).</p>
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>🚗</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🚗</span>
               <h4>Comparar dos coches (carros o autos)</h4>
             </div>
             <p className={styles.escenarioDesc}>El coche, carro o auto A consume 5 L/100km, el B consume 9 L/100km. Si recorres 15.000 km/año, la diferencia es <strong>600 L × 1,50 € = 900 €/año</strong>. En 5 años, 4.500 € de diferencia solo en combustible.</p>
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>🏢</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🏢</span>
               <h4>Gestión de flota</h4>
             </div>
             <p className={styles.escenarioDesc}>Registra el consumo real de cada vehículo de empresa. Un camión con consumo de 28 L/100km recorriendo 5.000 km/mes gasta <strong>2.030 €/mes</strong> en combustible. Detectar anomalías del ±2 L puede suponer 145 €/mes de ahorro.</p>
@@ -536,32 +536,32 @@ export default function CalculadoraCombustiblePage() {
         <h3 className={styles.eduSectionTitle}><span aria-hidden="true">✅</span> 6 hábitos del conductor eficiente</h3>
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>⛽</span>
+            <span className={styles.tipIcon} aria-hidden="true">⛽</span>
             <h4>Repostad con el depósito a un cuarto</h4>
             <p>No esperes al mínimo — la bomba se calienta con el depósito bajo. Tampoco lo llenes siempre a tope: el peso extra del combustible consume más en ciudad.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🌡️</span>
+            <span className={styles.tipIcon} aria-hidden="true">🌡️</span>
             <h4>Pre-climatiza enchufado (eléctrico/híbrido)</h4>
             <p>Si tienes coche eléctrico o híbrido enchufable, pre-climatiza con el coche conectado a la red antes de salir. Conservas la batería y partes a temperatura ideal sin consumirla.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🛣️</span>
+            <span className={styles.tipIcon} aria-hidden="true">🛣️</span>
             <h4>Usa el modo Eco o similar en trayectos largos</h4>
             <p>La mayoría de coches modernos tienen modo Eco que suaviza la respuesta del acelerador y ajusta el A/C. Actívalo en autopista — puede reducir el consumo un 5–8% sin notar diferencia de conducción.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>📱</span>
+            <span className={styles.tipIcon} aria-hidden="true">📱</span>
             <h4>Usa el navegador para evitar retenciones</h4>
             <p>Waze o Google Maps en tiempo real evitan atascos. Circular en ciudad parado consume más que en fluidez. Un desvío de 5 km en fluidez puede ser más eficiente que 2 km en retención.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🔧</span>
+            <span className={styles.tipIcon} aria-hidden="true">🔧</span>
             <h4>Cambia el aceite por viscosidad adecuada</h4>
             <p>Los aceites de baja viscosidad (5W-30, 0W-20) recomendados por el fabricante reducen la fricción interna. Usar un aceite más espeso del recomendado puede aumentar el consumo un 1–2%.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🚶</span>
+            <span className={styles.tipIcon} aria-hidden="true">🚶</span>
             <h4>Evalúa alternativas para trayectos cortos</h4>
             <p>El motor frío (menos de 5 km) consume el doble del normal y genera más emisiones. Considera la bicicleta, el transporte público o ir andando para trayectos de menos de 3 km — además de ahorrar, reduces el desgaste del motor.</p>
           </div>

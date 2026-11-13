@@ -794,7 +794,7 @@ export default function ComparadorVehiculosPage() {
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>👨‍💼</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">👨‍💼</span>
                 <h3>Particular con ahorros: prioridad libertad</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -806,7 +806,7 @@ Financiación (TAE 9%, 60 meses): Coste total ~18.500 €</code>
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🚀</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🚀</span>
                 <h3>Freelance o autónomo: optimización fiscal</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -819,7 +819,7 @@ Coste mensual real neto: 196 €/mes</code>
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🏢</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏢</span>
                 <h3>Empresa con flota: gestión simplificada</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -831,7 +831,7 @@ Compra: 125.000 € inicial + gastos + gestión interna estimada 40.000 €</cod
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🎓</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🎓</span>
                 <h3>Joven sin ahorros: primer coche</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -843,7 +843,7 @@ Renting: 0 € entrada + 350 €/mes × 48 (todo incluido)</code>
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🔧</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🔧</span>
                 <h3>Alto kilometraje: cuidado con el renting</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -855,7 +855,7 @@ Coste real: 400 € cuota + 150 € = 550 €/mes (vs 350 € ofertado)</code>
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>📑</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">📑</span>
                 <h3>Autónomo que quiere quedarse el coche</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -993,32 +993,32 @@ Total real con opción compra: ~26.200 € (vs 35.000 contado)</code>
           <h2><span aria-hidden="true">✅</span> Claves para tomar la mejor decisión de compra</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📊</span>
+              <span className={styles.tipIcon} aria-hidden="true">📊</span>
               <h4>Compara TAE, no cuota</h4>
               <p>La cuota mensual baja puede esconder un TAE del 12%. Siempre calcula el coste total: entrada + todas las cuotas + comisiones. El comparador meskeIA lo hace automáticamente.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔢</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔢</span>
               <h4>Estima los km reales, no los optimistas</h4>
               <p>En renting, multiplica tus km actuales por 1,2 para el contrato. Es mejor pagar algo más por cuota que enfrentarte a una factura de exceso al devolver el coche.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>💶</span>
+              <span className={styles.tipIcon} aria-hidden="true">💶</span>
               <h4>Negocia precio antes que modalidad</h4>
               <p>Consigue el mejor precio posible al contado primero. Ese precio negociado es la base de todas las opciones. El concesionario no puede subir el precio si decides después financiar.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📅</span>
+              <span className={styles.tipIcon} aria-hidden="true">📅</span>
               <h4>Considera el valor residual al elegir</h4>
               <p>Un coche que retiene bien su valor (Toyota, BMW) favorece la compra al contado. Uno que se deprecia rápido (marcas genéricas, diésel) favorece el renting para no asumir esa pérdida.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🏦</span>
+              <span className={styles.tipIcon} aria-hidden="true">🏦</span>
               <h4>Para autónomos: simula el ahorro fiscal real</h4>
               <p>Activa el perfil &quot;Autónomo&quot; en el comparador. El ahorro fiscal puede reducir el coste efectivo del renting en un 40-50%. Sin calcularlo, es imposible comparar con el contado de forma justa.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📋</span>
+              <span className={styles.tipIcon} aria-hidden="true">📋</span>
               <h4>Lee la letra pequeña del renting</h4>
               <p>Revisa: km por año incluidos, coste km extra, estado de devolución exigido, mantenimiento oficial obligatorio. Los &quot;extras&quot; al devolver pueden sumar 2.000-4.000 € sorpresa.</p>
             </div>

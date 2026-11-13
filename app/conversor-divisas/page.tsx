@@ -253,32 +253,32 @@ export default function ConversionDivisas() {
             <h2>Cuánto pierdes realmente al cambiar divisas</h2>
             <div className={styles.escenariosGrid}>
               <div className={styles.escenarioCard}>
-                <div className={styles.escenarioHeader}><span className={styles.escenarioIcon}>✈️</span><h3>Viaje a EE.UU. (1.500 €)</h3></div>
+                <div className={styles.escenarioHeader}><span className={styles.escenarioIcon} aria-hidden="true">✈️</span><h3>Viaje a EE.UU. (1.500 €)</h3></div>
                 <p className={styles.escenarioExample}>Banco tradicional (4% spread + comisión): pierdes ~70 €. Revolut: pierdes ~5 €. Diferencia: 65 € — casi una noche de hotel. Lección: cambia con Revolut o Wise antes del viaje.</p>
                 <span className={styles.escenarioTip}>65 € de ahorro = una noche de hotel</span>
               </div>
               <div className={styles.escenarioCard}>
-                <div className={styles.escenarioHeader}><span className={styles.escenarioIcon}>🏢</span><h3>Freelance con clientes en USD</h3></div>
+                <div className={styles.escenarioHeader}><span className={styles.escenarioIcon} aria-hidden="true">🏢</span><h3>Freelance con clientes en USD</h3></div>
                 <p className={styles.escenarioExample}>Cobrar 3.000 USD/mes por PayPal (spread 3,5% + comisión): pierdes ~120 €/mes = 1.440 €/año. Con Wise: pierdes ~20 €/mes. Diferencia: 1.200 €/año — un mes de salario.</p>
                 <span className={styles.escenarioTip}>1.200 €/año de diferencia entre métodos</span>
               </div>
               <div className={styles.escenarioCard}>
-                <div className={styles.escenarioHeader}><span className={styles.escenarioIcon}>🏠</span><h3>Comprar propiedad en el extranjero</h3></div>
+                <div className={styles.escenarioHeader}><span className={styles.escenarioIcon} aria-hidden="true">🏠</span><h3>Comprar propiedad en el extranjero</h3></div>
                 <p className={styles.escenarioExample}>Transferencia de 200.000 GBP al banco: spread 2% = 4.000 £ perdidas. Con un broker especializado (Moneycorp, OFX): spread 0,3–0,5% = 600–1.000 £. Ahorro: 3.000–3.400 £.</p>
                 <span className={styles.escenarioTip}>En cantidades grandes, usa broker especializado</span>
               </div>
               <div className={styles.escenarioCard}>
-                <div className={styles.escenarioHeader}><span className={styles.escenarioIcon}>🛒</span><h3>Compras online en tiendas extranjeras</h3></div>
+                <div className={styles.escenarioHeader}><span className={styles.escenarioIcon} aria-hidden="true">🛒</span><h3>Compras online en tiendas extranjeras</h3></div>
                 <p className={styles.escenarioExample}>Amazon UK, tiendas japonesas, etc. Con tarjeta bancaria española (3% cambio): en 200 € de compra, pagas 6 € extra. Con Revolut: 0 €. Si compras habitualmente en el extranjero, Revolut se amortiza rápido.</p>
                 <span className={styles.escenarioTip}>Revolut gratuito para compras internacionales</span>
               </div>
               <div className={styles.escenarioCard}>
-                <div className={styles.escenarioHeader}><span className={styles.escenarioIcon}>👨‍🎓</span><h3>Estudiante Erasmus</h3></div>
+                <div className={styles.escenarioHeader}><span className={styles.escenarioIcon} aria-hidden="true">👨‍🎓</span><h3>Estudiante Erasmus</h3></div>
                 <p className={styles.escenarioExample}>9 meses en Praga (CZK). Con banco español: 3–4% en cada transacción. Con Revolut o cuenta local: prácticamente gratis. En 9 meses con 800 €/mes de gastos: ahorro potencial 200–280 €.</p>
                 <span className={styles.escenarioTip}>Revolut o cuenta local = esencial en Erasmus</span>
               </div>
               <div className={styles.escenarioCard}>
-                <div className={styles.escenarioHeader}><span className={styles.escenarioIcon}>💰</span><h3>Inversión en acciones USA</h3></div>
+                <div className={styles.escenarioHeader}><span className={styles.escenarioIcon} aria-hidden="true">💰</span><h3>Inversión en acciones USA</h3></div>
                 <p className={styles.escenarioExample}>Broker con cambio de divisa propio (2–3%): en 10.000 € invertidos en S&P 500, pagas 200–300 € solo en cambio. Brokers como IBKR o brokers europeos con cambio barato: 10–15 €. El cambio puede destruir parte de la rentabilidad.</p>
                 <span className={styles.escenarioTip}>El cambio de divisa es un coste de inversión más</span>
               </div>
@@ -318,12 +318,12 @@ export default function ConversionDivisas() {
           <div className={styles.eduTips}>
             <h2>Trucos para cambiar divisas sin perder dinero</h2>
             <div className={styles.tipsGrid}>
-              <div className={styles.tipCard}><span className={styles.tipIcon}>📱</span><strong>Revolut gratuito para viajes</strong><p>El plan gratuito de Revolut permite cambio sin comisiones hasta 1.000 €/mes en días laborables. Para viajes habituales, es suficiente y completamente gratuito.</p></div>
-              <div className={styles.tipCard}><span className={styles.tipIcon}>⏰</span><strong>Evita cambiar en fin de semana con Revolut</strong><p>El mercado Forex cierra el fin de semana. Revolut aplica un +1% de margen el sábado y domingo para cubrirse. Cambia divisas el viernes por la tarde si puedes.</p></div>
-              <div className={styles.tipCard}><span className={styles.tipIcon}>🏧</span><strong>Retira en cajeros locales, no en aeropuertos</strong><p>El cajero del banco local en la ciudad aplica el tipo interbancario. El cajero del aeropuerto aplica su propio tipo (peor). Usa tu tarjeta Revolut en cualquier cajero de la ciudad.</p></div>
-              <div className={styles.tipCard}><span className={styles.tipIcon}>💸</span><strong>Para freelances: Wise Cuenta</strong><p>Wise ofrece cuentas bancarias locales en USD, GBP, EUR y otras divisas. Recibe como local, sin conversión hasta que quieras transferir. Ideal para trabajar con clientes internacionales.</p></div>
-              <div className={styles.tipCard}><span className={styles.tipIcon}>🔔</span><strong>Alertas de tipo de cambio</strong><p>Wise y XE.com permiten configurar alertas cuando una divisa alcanza un tipo determinado. Útil si tienes una transferencia grande y quieres esperar un momento favorable.</p></div>
-              <div className={styles.tipCard}><span className={styles.tipIcon}>📊</span><strong>Compara siempre antes de transferir</strong><p>Wise, Revolut y tu banco muestran el tipo aplicado antes de confirmar. Compara los tres en transferencias importantes. La diferencia puede ser significativa en importes altos.</p></div>
+              <div className={styles.tipCard}><span className={styles.tipIcon} aria-hidden="true">📱</span><strong>Revolut gratuito para viajes</strong><p>El plan gratuito de Revolut permite cambio sin comisiones hasta 1.000 €/mes en días laborables. Para viajes habituales, es suficiente y completamente gratuito.</p></div>
+              <div className={styles.tipCard}><span className={styles.tipIcon} aria-hidden="true">⏰</span><strong>Evita cambiar en fin de semana con Revolut</strong><p>El mercado Forex cierra el fin de semana. Revolut aplica un +1% de margen el sábado y domingo para cubrirse. Cambia divisas el viernes por la tarde si puedes.</p></div>
+              <div className={styles.tipCard}><span className={styles.tipIcon} aria-hidden="true">🏧</span><strong>Retira en cajeros locales, no en aeropuertos</strong><p>El cajero del banco local en la ciudad aplica el tipo interbancario. El cajero del aeropuerto aplica su propio tipo (peor). Usa tu tarjeta Revolut en cualquier cajero de la ciudad.</p></div>
+              <div className={styles.tipCard}><span className={styles.tipIcon} aria-hidden="true">💸</span><strong>Para freelances: Wise Cuenta</strong><p>Wise ofrece cuentas bancarias locales en USD, GBP, EUR y otras divisas. Recibe como local, sin conversión hasta que quieras transferir. Ideal para trabajar con clientes internacionales.</p></div>
+              <div className={styles.tipCard}><span className={styles.tipIcon} aria-hidden="true">🔔</span><strong>Alertas de tipo de cambio</strong><p>Wise y XE.com permiten configurar alertas cuando una divisa alcanza un tipo determinado. Útil si tienes una transferencia grande y quieres esperar un momento favorable.</p></div>
+              <div className={styles.tipCard}><span className={styles.tipIcon} aria-hidden="true">📊</span><strong>Compara siempre antes de transferir</strong><p>Wise, Revolut y tu banco muestran el tipo aplicado antes de confirmar. Compara los tres en transferencias importantes. La diferencia puede ser significativa en importes altos.</p></div>
             </div>
           </div>
 

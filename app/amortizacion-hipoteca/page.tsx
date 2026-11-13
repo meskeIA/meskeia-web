@@ -1094,32 +1094,32 @@ export default function AmortizacionHipotecaPage() {
           <h2>6 consejos para amortizar de forma inteligente</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📅</span>
+              <span className={styles.tipIcon} aria-hidden="true">📅</span>
               <strong>Amortiza a principios de año</strong>
               <p>Cada mes que adelantas la amortización reduce el tiempo durante el que pagas intereses. La diferencia entre enero y diciembre puede ser de cientos de euros.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🏦</span>
+              <span className={styles.tipIcon} aria-hidden="true">🏦</span>
               <strong>Negocia la eliminación de comisiones</strong>
               <p>Muchos bancos las eliminan si llevas productos vinculados (seguro de hogar, nómina domiciliada). Pide que conste en el contrato o en una adenda firmada.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>💡</span>
+              <span className={styles.tipIcon} aria-hidden="true">💡</span>
               <strong>Reducir plazo vs. cuota: dos lógicas distintas</strong>
               <p>Reducir plazo minimiza intereses totales pero mantiene la presión mensual. Reducir cuota libera liquidez recurrente, útil si tu situación es variable o prevés gastos crecientes (familia, formación, salud). Ninguna opción es objetivamente superior.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🛡️</span>
+              <span className={styles.tipIcon} aria-hidden="true">🛡️</span>
               <strong>Mantén fondo de emergencia primero</strong>
               <p>Antes de amortizar, asegúrate de tener 3-6 meses de gastos en liquidez. La hipoteca está garantizada por el inmueble; no lo priorices sobre tu seguridad financiera.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📊</span>
+              <span className={styles.tipIcon} aria-hidden="true">📊</span>
               <strong>Considera el impacto fiscal</strong>
               <p>Si tu hipoteca es anterior a 2013, verificar si la amortización anticipa reduce tu base de deducción por vivienda habitual puede cambiar la decisión óptima.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔄</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔄</span>
               <strong>Plan de amortizaciones anuales</strong>
               <p>Aportar 3.000-5.000 € extras cada año puede reducir el plazo en 4-6 años y ahorrarte más de 15.000 € en intereses en una hipoteca de 200.000 € al 3 %.</p>
             </div>

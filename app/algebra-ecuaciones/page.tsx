@@ -1330,7 +1330,7 @@ export default function AlgebraEcuacionesPage() {
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>🎓</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🎓</span>
               <strong>Estudiante de ESO / Bachillerato</strong>
             </div>
             <p>Verifica los resultados de tus ejercicios de álgebra, comprende el proceso de resolución paso a paso y detecta dónde te has equivocado antes de entregar el examen.</p>
@@ -1338,7 +1338,7 @@ export default function AlgebraEcuacionesPage() {
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>📐</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">📐</span>
               <strong>Ingeniero / Físico</strong>
             </div>
             <p>Resuelve ecuaciones que aparecen en problemas de circuitos eléctricos, mecánica, termodinámica y optimización donde las soluciones analíticas exactas son necesarias.</p>
@@ -1346,7 +1346,7 @@ export default function AlgebraEcuacionesPage() {
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>💼</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">💼</span>
               <strong>Profesional / Opositor</strong>
             </div>
             <p>Practica la resolución de ecuaciones para pruebas de aptitud numérica, test de razonamiento lógico-matemático y exámenes de oposición que incluyen álgebra básica e intermedia.</p>
@@ -1354,7 +1354,7 @@ export default function AlgebraEcuacionesPage() {
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>👩‍🏫</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">👩‍🏫</span>
               <strong>Docente / Tutor</strong>
             </div>
             <p>Genera soluciones detalladas paso a paso para explicar en clase o en tutorías. Útil para crear enunciados de examen y verificar que los problemas planteados tienen solución real.</p>
@@ -1432,32 +1432,32 @@ export default function AlgebraEcuacionesPage() {
         {/* 5. TIPS GRID */}
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcono}>⚡</span>
+            <span className={styles.tipIcono} aria-hidden="true">⚡</span>
             <strong>Discriminante primero</strong>
             <p>En cualquier cuadrática, calcula Δ = b²-4ac antes de nada. Si es negativo, no hay soluciones reales y ahorras tiempo de cálculo.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcono}>🔍</span>
+            <span className={styles.tipIcono} aria-hidden="true">🔍</span>
             <strong>Factorización rápida</strong>
             <p>Para x² + bx + c = 0 (a=1), busca dos números cuya suma sea b y cuyo producto sea c. Más rápido que la fórmula para coeficientes enteros pequeños.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcono}>📋</span>
+            <span className={styles.tipIcono} aria-hidden="true">📋</span>
             <strong>Vieta como verificación</strong>
             <p>Suma de raíces = -b/a y producto = c/a. Comprueba esto tras resolver cualquier cuadrática. Si no coincide, hay un error de cálculo.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcono}>🔢</span>
+            <span className={styles.tipIcono} aria-hidden="true">🔢</span>
             <strong>Ruffini: prueba con ±1, ±2...</strong>
             <p>Los candidatos a raíces racionales son los divisores del término independiente divididos entre los del coeficiente principal. Empieza siempre por ±1.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcono}>✏️</span>
+            <span className={styles.tipIcono} aria-hidden="true">✏️</span>
             <strong>Escribe cada paso</strong>
             <p>En exámenes, la resolución paso a paso vale puntos parciales aunque el resultado final sea incorrecto. Nunca saltes pasos mentalmente.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcono}>🎯</span>
+            <span className={styles.tipIcono} aria-hidden="true">🎯</span>
             <strong>Comprueba siempre</strong>
             <p>30 segundos de verificación sustituyendo la solución en la ecuación original evitan errores graves. Especialmente crítico en irracionales y racionales.</p>
           </div>

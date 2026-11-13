@@ -673,7 +673,7 @@ export default function ConversorIEEE754Page() {
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🎮</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🎮</span>
                 <h3>Motores de Videojuegos</h3>
               </div>
               <p className={styles.escenarioExample}>
@@ -684,7 +684,7 @@ export default function ConversorIEEE754Page() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🤖</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🤖</span>
                 <h3>Machine Learning / IA</h3>
               </div>
               <p className={styles.escenarioExample}>
@@ -695,7 +695,7 @@ export default function ConversorIEEE754Page() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>💰</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">💰</span>
                 <h3>Finanzas y Banca</h3>
               </div>
               <p className={styles.escenarioExample}>
@@ -706,7 +706,7 @@ export default function ConversorIEEE754Page() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🔬</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🔬</span>
                 <h3>Cálculo Científico</h3>
               </div>
               <p className={styles.escenarioExample}>
@@ -717,7 +717,7 @@ export default function ConversorIEEE754Page() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>💻</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">💻</span>
                 <h3>Sistemas Embebidos</h3>
               </div>
               <p className={styles.escenarioExample}>
@@ -728,7 +728,7 @@ export default function ConversorIEEE754Page() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🌐</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🌐</span>
                 <h3>JavaScript y Web</h3>
               </div>
               <p className={styles.escenarioExample}>
@@ -875,32 +875,32 @@ export default function ConversorIEEE754Page() {
           <h2><span aria-hidden="true">✅</span> Mejores Prácticas con Punto Flotante</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🎯</span>
+              <span className={styles.tipIcon} aria-hidden="true">🎯</span>
               <strong>Usa epsilon para comparar</strong>
               <p>Math.abs(a - b) &lt; Number.EPSILON en vez de a === b para floats</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔢</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔢</span>
               <strong>Double por defecto</strong>
               <p>En caso de duda, usa double (64-bit). La diferencia de rendimiento es mínima en CPUs modernas</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>💶</span>
+              <span className={styles.tipIcon} aria-hidden="true">💶</span>
               <strong>Nunca float para dinero</strong>
               <p>Usa enteros de centavos o librerías especializadas (decimal.js, big.js). 0,1 + 0,2 ≠ 0,3</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🖥️</span>
+              <span className={styles.tipIcon} aria-hidden="true">🖥️</span>
               <strong>Float en arrays para WebGL</strong>
               <p>Float32Array consume la mitad de memoria que Float64Array en GPU. Importante para rendimiento gráfico</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>⚖️</span>
+              <span className={styles.tipIcon} aria-hidden="true">⚖️</span>
               <strong>Ordena las operaciones</strong>
               <p>Suma primero los números de magnitud similar. Evita (grandísimo + pequeñísimo) que pierde los dígitos pequeños</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔍</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔍</span>
               <strong>Verifica NaN explícitamente</strong>
               <p>isNaN(x) en JS convierte a número antes. Usa Number.isNaN(x) para verificación exacta</p>
             </div>

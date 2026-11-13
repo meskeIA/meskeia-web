@@ -835,7 +835,7 @@ Ejemplo: 5, 7, 8, 6, 9   ·   con decimales: 1,5 2,3 4,7 o bien 1.5 2.3 4.7"
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🎓</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🎓</span>
                 <div>
                   <strong>Estudiante de Bachillerato</strong>
                   <div className={styles.escenarioSubtitle}>Análisis de encuesta de clase</div>
@@ -854,7 +854,7 @@ Ejemplo: 5, 7, 8, 6, 9   ·   con decimales: 1,5 2,3 4,7 o bien 1.5 2.3 4.7"
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>👥</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">👥</span>
                 <div>
                   <strong>Analista de RRHH</strong>
                   <div className={styles.escenarioSubtitle}>Comparación de salarios por departamento</div>
@@ -872,7 +872,7 @@ Ejemplo: 5, 7, 8, 6, 9   ·   con decimales: 1,5 2,3 4,7 o bien 1.5 2.3 4.7"
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🏥</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏥</span>
                 <div>
                   <strong>Médico Investigador</strong>
                   <div className={styles.escenarioSubtitle}>Interpretación de ensayo clínico</div>
@@ -890,7 +890,7 @@ Ejemplo: 5, 7, 8, 6, 9   ·   con decimales: 1,5 2,3 4,7 o bien 1.5 2.3 4.7"
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🛍️</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🛍️</span>
                 <div>
                   <strong>Comercio Local</strong>
                   <div className={styles.escenarioSubtitle}>Análisis de ventas mensuales</div>
@@ -1110,7 +1110,7 @@ Ejemplo: 5, 7, 8, 6, 9   ·   con decimales: 1,5 2,3 4,7 o bien 1.5 2.3 4.7"
           </p>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📊</span>
+              <span className={styles.tipIcon} aria-hidden="true">📊</span>
               <strong>Visualiza siempre primero</strong>
               <p>
                 Antes de interpretar cualquier estadístico, representa los datos en un histograma
@@ -1119,7 +1119,7 @@ Ejemplo: 5, 7, 8, 6, 9   ·   con decimales: 1,5 2,3 4,7 o bien 1.5 2.3 4.7"
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔍</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔍</span>
               <strong>Comprueba outliers antes de calcular la media</strong>
               <p>
                 Aplica la regla IQR como primer paso. Si hay outliers, decide conscientemente
@@ -1128,7 +1128,7 @@ Ejemplo: 5, 7, 8, 6, 9   ·   con decimales: 1,5 2,3 4,7 o bien 1.5 2.3 4.7"
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>💰</span>
+              <span className={styles.tipIcon} aria-hidden="true">💰</span>
               <strong>Usa mediana para ingresos y precios</strong>
               <p>
                 Los datos de salarios, precios inmobiliarios, rentas o tiempos de espera suelen
@@ -1137,7 +1137,7 @@ Ejemplo: 5, 7, 8, 6, 9   ·   con decimales: 1,5 2,3 4,7 o bien 1.5 2.3 4.7"
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📏</span>
+              <span className={styles.tipIcon} aria-hidden="true">📏</span>
               <strong>Reporta media + desviación típica juntas</strong>
               <p>
                 Una media sin su desviación típica no dice nada. Escribe siempre: &quot;Media = 7,3
@@ -1146,7 +1146,7 @@ Ejemplo: 5, 7, 8, 6, 9   ·   con decimales: 1,5 2,3 4,7 o bien 1.5 2.3 4.7"
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📐</span>
+              <span className={styles.tipIcon} aria-hidden="true">📐</span>
               <strong>Usa el CV para comparar series distintas</strong>
               <p>
                 Si comparas la variabilidad de salarios (en tu moneda) con la de temperaturas (en °C),
@@ -1155,7 +1155,7 @@ Ejemplo: 5, 7, 8, 6, 9   ·   con decimales: 1,5 2,3 4,7 o bien 1.5 2.3 4.7"
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🎯</span>
+              <span className={styles.tipIcon} aria-hidden="true">🎯</span>
               <strong>Distingue muestra de población</strong>
               <p>
                 Si tus datos son una muestra de un grupo mayor, usa s (divide por n−1) y menciona
