@@ -646,16 +646,19 @@ test('HALLAZGO (02/11/2026, ABIERTO) · la FAQPage dice que el test mide «gesti
   expect(texto).not.toMatch(/gestión del estrés/i);
 });
 
-test('HALLAZGO (02/11/2026, ABIERTO) · la pregunta de horas de sueño se responde dos veces, con autoridades distintas', async ({ page }) => {
-  // FAQ visible: «La OMS y la NSF recomiendan 7-9 horas para adultos. Menos de 6 horas crónicas se
-  // asocia con obesidad…». FAQPage: «… entre 7 y 9 horas … según las recomendaciones de la National
-  // Sleep Foundation …». Una sola constante (PREGUNTAS_FRECUENTES), que exige check:faq-unica.
-  test.fail();
+test('HALLAZGO 3921 (02/11/2026, REPARADO 13/11) · la pregunta de horas de sueño se responde una vez, atribuida a la National Sleep Foundation', async ({ page }) => {
+  // Antes, FAQ visible: «La OMS y la NSF recomiendan 7-9 horas para adultos. Menos de 6 horas
+  // crónicas se asocia con obesidad…». FAQPage: «… entre 7 y 9 horas … según las recomendaciones de
+  // la National Sleep Foundation …». Ahora una constante de metadata.ts (C0570) con las dos cosas y
+  // sin la OMS, que no publica esa cifra para adultos y no se pudo cotejar (who.int no está en la red).
   await page.goto(RUTA);
   const ld = (await faqLd(page)).find((q) => /horas de sueño/i.test(q.name));
   const dt = page.locator('dt', { hasText: /horas de sueño/i });
   const visible = (await dt.locator('xpath=following-sibling::dd[1]').textContent()) ?? '';
   expect(visible.trim()).toBe((ld as PreguntaLd).acceptedAnswer.text.trim());
+  expect(visible).toContain('National Sleep Foundation');
+  expect(visible).not.toContain('OMS');
+  expect(visible).toContain('menos de 6 horas');
 });
 
 test('HALLAZGO (02/11/2026, ABIERTO) · el JSON-LD sale con `features` vacía', async ({ page }) => {
