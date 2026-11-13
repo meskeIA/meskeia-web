@@ -11,6 +11,7 @@ import {
   EducationalSection,
 } from '@/components';
 import styles from './TestTipoLector.module.css';
+import { RESPUESTA_FAQ_PARA_QUE_PERFIL } from './metadata';
 
 // ── Tipos ──────────────────────────────────────────────────────────────────
 
@@ -627,7 +628,7 @@ export default function TestTipoLector() {
               </div>
               <div className={styles.faqItem}>
                 <h4>¿Para qué sirve conocer mi perfil?</h4>
-                <p>Para elegir mejor: cuando conoces tu motor de lectura, reconoces más rápidamente qué libros te van a funcionar. También sirve para salir de la zona de confort de manera informada: un Empático que quiere explorar el noir puede empezar por autores con personajes muy humanos (Donna Leon, Martin Beck de Sjöwall y Wahlöö).</p>
+                <p>{RESPUESTA_FAQ_PARA_QUE_PERFIL}</p>
               </div>
             </div>
 

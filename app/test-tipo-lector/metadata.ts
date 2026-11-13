@@ -50,6 +50,12 @@ export const jsonLd = generateWebAppSchema({
   ],
 });
 
+// La pregunta está también en la FAQ visible («¿Para qué sirve conocer mi perfil?»): una sola
+// respuesta para las dos (check:faq-unica, C0570, 13/11/2026). Se juntan las dos; lo que promete se
+// comprobó en page.tsx: 6 preguntas, y cada perfil trae autores y lecturas con título y autor.
+export const RESPUESTA_FAQ_PARA_QUE_PERFIL =
+  'Conocer tu perfil lector ayuda a elegir libros con más acierto: cuando sabes qué te engancha, reconoces antes qué libros te van a funcionar, abandonas menos lecturas que no conectan contigo y descubres géneros o autores que quizás no habrías explorado. También sirve para salir de la zona de confort de manera informada: un perfil Empático que quiere explorar el noir puede empezar por autores con personajes muy humanos (Donna Leon, o Martin Beck de Sjöwall y Wahlöö). Es útil, además, para educadores y bibliotecarios que quieran recomendar lecturas personalizadas. El test tarda menos de 3 minutos y el resultado incluye sugerencias concretas de títulos y autores.';
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -91,7 +97,7 @@ export const faqJsonLd = {
       name: '¿Para qué sirve conocer mi perfil lector?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Conocer tu perfil lector ayuda a elegir libros con más acierto, reducir el abandono de lecturas que no conectan contigo y descubrir géneros o autores que quizás no habrías explorado. También es útil para educadores y bibliotecarios que quieran recomendar lecturas personalizadas. El test tarda menos de 3 minutos y el resultado incluye sugerencias concretas de títulos y autores.',
+        text: RESPUESTA_FAQ_PARA_QUE_PERFIL,
       },
     },
   ],
