@@ -209,6 +209,11 @@
   .warningBox { padding: 0.9rem 1rem; }
 }
 
+/* Tono de texto de un color de datos por tema (cabo C0645, 13/11/2026): las variables las pone
+   tono() del page.tsx. Medido en tests/contraste-marca-datos.spec.ts. */
+.tonoDato { color: var(--tono-claro, var(--text-primary)); }
+[data-theme='dark'] .tonoDato { color: var(--tono-oscuro, var(--text-primary)); }
+
 @media (prefers-reduced-motion: reduce) {
   .navBtn, .zonaBtn, .detoxBtn, .metaSelectorBtn, .metaEstadoBtn, .zonaBtnActivo, .funcionBtn { transition: none; }
 }

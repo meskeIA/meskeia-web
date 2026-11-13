@@ -1,8 +1,9 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState } from 'react';
+import { useState, type CSSProperties } from 'react';
 import styles from './VisualizadorHigado.module.css';
+import { rellenoConTinta } from '@/lib/tintaLegible';
 import {
   MeskeiaLogo,
   Footer,
@@ -328,6 +329,38 @@ const META_CICLOS: MetaCiclo[] = [
   },
 ];
 
+/**
+ * Tono de TEXTO de cada color de datos, en claro y en oscuro (cabo C0645, 13/11/2026). El color puro
+ * como texto daba «Producción de bilis» en amarillo 1,52:1, «FASE 2» en verde 2,56-2,75 y el título
+ * del ciclo en naranja 2,19 en claro; «Lóbulo derecho» en rojo 3,20 y «FASE 1» en violeta 2,81-2,97
+ * en oscuro. El color de dato se queda en bordes y barras.
+ */
+const TONOS_TEXTO: Record<string, [string, string]> = {
+  '#C0392B': ['#B91C1C', '#F1948A'],
+  '#E74C3C': ['#B91C1C', '#F1948A'],
+  '#8E44AD': ['#7D3C98', '#C39BD3'],
+  '#27AE60': ['#136E35', '#58D68D'],
+  '#2980B9': ['#1F6391', '#7FB8E0'],
+  '#E67E22': ['#B93E0B', '#F0B27A'],
+  '#F39C12': ['#8A5A00', '#F5B041'],
+  '#F1C40F': ['#8A5A00', '#F4D03F'],
+};
+
+/** Variables del tono de texto de un color de datos, para la clase `tonoDato` del módulo. */
+function tono(color: string): CSSProperties {
+  const [claro, oscuro] = TONOS_TEXTO[color.toUpperCase()] ?? ['var(--text-primary)', 'var(--text-primary)'];
+  return { '--tono-claro': claro, '--tono-oscuro': oscuro } as CSSProperties;
+}
+
+/**
+ * Fondo de un color de datos con la tinta que le llega (C0645, 13/11/2026): el blanco daba 2,19:1
+ * sobre el naranja de la glucosa en el botón elegido y en los números de paso del ciclo.
+ */
+function pastilla(color: string): CSSProperties {
+  const { relleno, tinta } = rellenoConTinta(color);
+  return { borderColor: relleno, background: relleno, color: tinta };
+}
+
 // ─────────────────────────────────────────────
 // Componentes de sección
 // ─────────────────────────────────────────────
@@ -335,6 +368,16 @@ const META_CICLOS: MetaCiclo[] = [
 function SeccionAnatomia() {
   const [zonaActiva, setZonaActiva] = useState<string>('lobulo-derecho');
   const zona = ZONAS_HIGADO.find(z => z.id === zonaActiva) ?? ZONAS_HIGADO[0];
+  // Relleno opaco de cada zona y la tinta de su rótulo (cabo C0297, 13/11/2026): el blanco iba sobre
+  // los pastel de las zonas no elegidas al 85-90 % (1,59-2,48:1) y sobre el rojo elegido (4,25)
+  const pintura = (id: string, elegida: string, reposo: string) =>
+    rellenoConTinta(zonaActiva === id ? elegida : reposo);
+  const derecho = pintura('lobulo-derecho', '#C0392B', '#E8B4B0');
+  const izquierdo = pintura('lobulo-izquierdo', '#C0392B', '#F1948A');
+  const caudado = pintura('lobulo-caudado', '#7D3C98', '#C39BD3');
+  const vesicula = pintura('vesicula', '#1E8449', '#82E0AA');
+  const porta = pintura('vena-porta', '#1A5276', '#5DADE2');
+  const arteria = pintura('arteria-hepatica', '#A04000', '#F0B27A');
 
   return (
     <div className={styles.seccionContent}>
@@ -367,38 +410,38 @@ function SeccionAnatomia() {
           <div className={styles.higadoVisual}>
             <svg viewBox="0 0 320 200" className={styles.higadoSvg} role="img" aria-label="Diagrama anatómico del hígado">
               {/* Lóbulo derecho */}
-              <ellipse cx="115" cy="95" rx="95" ry="75" fill={zonaActiva === 'lobulo-derecho' ? '#C0392B' : '#E8B4B0'} opacity="0.85" stroke="white" strokeWidth="2" style={{ cursor: 'pointer' }} onClick={() => setZonaActiva('lobulo-derecho')} />
-              <text x="95" y="90" fontSize="10" fill="white" fontWeight="700" textAnchor="middle" style={{ pointerEvents: 'none' }}>Lóbulo</text>
-              <text x="95" y="103" fontSize="10" fill="white" fontWeight="700" textAnchor="middle" style={{ pointerEvents: 'none' }}>derecho</text>
+              <ellipse cx="115" cy="95" rx="95" ry="75" fill={derecho.relleno} stroke="white" strokeWidth="2" style={{ cursor: 'pointer' }} onClick={() => setZonaActiva('lobulo-derecho')} />
+              <text x="95" y="90" fontSize="10" fill={derecho.tinta} fontWeight="700" textAnchor="middle" style={{ pointerEvents: 'none' }}>Lóbulo</text>
+              <text x="95" y="103" fontSize="10" fill={derecho.tinta} fontWeight="700" textAnchor="middle" style={{ pointerEvents: 'none' }}>derecho</text>
 
               {/* Lóbulo izquierdo */}
-              <ellipse cx="235" cy="85" rx="65" ry="55" fill={zonaActiva === 'lobulo-izquierdo' ? '#C0392B' : '#F1948A'} opacity="0.85" stroke="white" strokeWidth="2" style={{ cursor: 'pointer' }} onClick={() => setZonaActiva('lobulo-izquierdo')} />
-              <text x="235" y="82" fontSize="10" fill="white" fontWeight="700" textAnchor="middle" style={{ pointerEvents: 'none' }}>Lóbulo</text>
-              <text x="235" y="95" fontSize="10" fill="white" fontWeight="700" textAnchor="middle" style={{ pointerEvents: 'none' }}>izquierdo</text>
+              <ellipse cx="235" cy="85" rx="65" ry="55" fill={izquierdo.relleno} stroke="white" strokeWidth="2" style={{ cursor: 'pointer' }} onClick={() => setZonaActiva('lobulo-izquierdo')} />
+              <text x="235" y="82" fontSize="10" fill={izquierdo.tinta} fontWeight="700" textAnchor="middle" style={{ pointerEvents: 'none' }}>Lóbulo</text>
+              <text x="235" y="95" fontSize="10" fill={izquierdo.tinta} fontWeight="700" textAnchor="middle" style={{ pointerEvents: 'none' }}>izquierdo</text>
 
               {/* Lóbulo caudado */}
-              <ellipse cx="160" cy="155" rx="30" ry="20" fill={zonaActiva === 'lobulo-caudado' ? '#7D3C98' : '#C39BD3'} opacity="0.9" stroke="white" strokeWidth="2" style={{ cursor: 'pointer' }} onClick={() => setZonaActiva('lobulo-caudado')} />
-              <text x="160" y="159" fontSize="9" fill="white" fontWeight="700" textAnchor="middle" style={{ pointerEvents: 'none' }}>Caudado</text>
+              <ellipse cx="160" cy="155" rx="30" ry="20" fill={caudado.relleno} stroke="white" strokeWidth="2" style={{ cursor: 'pointer' }} onClick={() => setZonaActiva('lobulo-caudado')} />
+              <text x="160" y="159" fontSize="9" fill={caudado.tinta} fontWeight="700" textAnchor="middle" style={{ pointerEvents: 'none' }}>Caudado</text>
 
               {/* Vesícula biliar */}
-              <ellipse cx="80" cy="158" rx="22" ry="14" fill={zonaActiva === 'vesicula' ? '#1E8449' : '#82E0AA'} opacity="0.9" stroke="white" strokeWidth="2" style={{ cursor: 'pointer' }} onClick={() => setZonaActiva('vesicula')} />
-              <text x="80" y="162" fontSize="8" fill="white" fontWeight="700" textAnchor="middle" style={{ pointerEvents: 'none' }}>Vesícula</text>
+              <ellipse cx="80" cy="158" rx="22" ry="14" fill={vesicula.relleno} stroke="white" strokeWidth="2" style={{ cursor: 'pointer' }} onClick={() => setZonaActiva('vesicula')} />
+              <text x="80" y="162" fontSize="8" fill={vesicula.tinta} fontWeight="700" textAnchor="middle" style={{ pointerEvents: 'none' }}>Vesícula</text>
 
               {/* Vena porta */}
-              <rect x="10" y="88" width="25" height="30" rx="4" fill={zonaActiva === 'vena-porta' ? '#1A5276' : '#5DADE2'} opacity="0.9" style={{ cursor: 'pointer' }} onClick={() => setZonaActiva('vena-porta')} />
-              <text x="22" y="100" fontSize="7" fill="white" fontWeight="700" textAnchor="middle" style={{ pointerEvents: 'none' }}>Vena</text>
-              <text x="22" y="110" fontSize="7" fill="white" fontWeight="700" textAnchor="middle" style={{ pointerEvents: 'none' }}>porta</text>
+              <rect x="10" y="88" width="25" height="30" rx="4" fill={porta.relleno} style={{ cursor: 'pointer' }} onClick={() => setZonaActiva('vena-porta')} />
+              <text x="22" y="100" fontSize="7" fill={porta.tinta} fontWeight="700" textAnchor="middle" style={{ pointerEvents: 'none' }}>Vena</text>
+              <text x="22" y="110" fontSize="7" fill={porta.tinta} fontWeight="700" textAnchor="middle" style={{ pointerEvents: 'none' }}>porta</text>
 
               {/* Arteria hepática */}
-              <rect x="10" y="128" width="25" height="25" rx="4" fill={zonaActiva === 'arteria-hepatica' ? '#A04000' : '#F0B27A'} opacity="0.9" style={{ cursor: 'pointer' }} onClick={() => setZonaActiva('arteria-hepatica')} />
-              <text x="22" y="138" fontSize="7" fill="white" fontWeight="700" textAnchor="middle" style={{ pointerEvents: 'none' }}>Art.</text>
-              <text x="22" y="148" fontSize="7" fill="white" fontWeight="700" textAnchor="middle" style={{ pointerEvents: 'none' }}>hep.</text>
+              <rect x="10" y="128" width="25" height="25" rx="4" fill={arteria.relleno} style={{ cursor: 'pointer' }} onClick={() => setZonaActiva('arteria-hepatica')} />
+              <text x="22" y="138" fontSize="7" fill={arteria.tinta} fontWeight="700" textAnchor="middle" style={{ pointerEvents: 'none' }}>Art.</text>
+              <text x="22" y="148" fontSize="7" fill={arteria.tinta} fontWeight="700" textAnchor="middle" style={{ pointerEvents: 'none' }}>hep.</text>
             </svg>
           </div>
 
           {/* Detalle zona */}
           <div className={styles.zonaDetalle} style={{ borderLeftColor: zona.color }}>
-            <h4 className={styles.zonaDetalleTitulo} style={{ color: zona.color }}>{zona.nombre}</h4>
+            <h4 className={`${styles.zonaDetalleTitulo} ${styles.tonoDato}`} style={tono(zona.color)}>{zona.nombre}</h4>
             <p className={styles.zonaDescripcion}>{zona.descripcion}</p>
             <p className={styles.zonaDato}><span aria-hidden="true">💡</span> {zona.dato}</p>
           </div>
@@ -411,7 +454,7 @@ function SeccionAnatomia() {
               key={z.id}
               type="button"
               className={`${styles.zonaBtn} ${zonaActiva === z.id ? styles.zonaBtnActivo : ''}`}
-              style={zonaActiva === z.id ? { borderColor: z.color, background: z.color } : {}}
+              style={zonaActiva === z.id ? pastilla(z.color) : {}}
               onClick={() => setZonaActiva(z.id)}
               aria-pressed={zonaActiva === z.id}
             >
@@ -473,7 +516,10 @@ function SeccionFunciones() {
                 aria-expanded={activo}
               >
                 <span className={styles.funcionIcono} aria-hidden="true">{grupo.icono}</span>
-                <span className={styles.funcionTitulo} style={{ color: activo ? grupo.color : undefined }}>
+                <span
+                  className={activo ? `${styles.funcionTitulo} ${styles.tonoDato}` : styles.funcionTitulo}
+                  style={activo ? tono(grupo.color) : undefined}
+                >
                   {grupo.titulo}
                 </span>
                 <span className={styles.funcionResumen}>{grupo.resumen}</span>
@@ -510,7 +556,7 @@ function SeccionDetox() {
       {/* Diagrama de fases */}
       <div className={styles.detoxDiagrama}>
         <div className={styles.detoxFase} style={{ background: 'rgba(142,68,173,0.08)', borderColor: '#8E44AD' }}>
-          <h3 className={styles.detoxFaseTitulo} style={{ color: '#8E44AD' }}>FASE 1 — Bioactivación</h3>
+          <h3 className={`${styles.detoxFaseTitulo} ${styles.tonoDato}`} style={tono('#8E44AD')}>FASE 1 — Bioactivación</h3>
           <p className={styles.detoxFaseSubtitulo}>Enzimas CYP450 (citocromo P450)</p>
           <ul className={styles.detoxFaseLista}>
             <li>Oxidación, reducción, hidrólisis</li>
@@ -521,7 +567,7 @@ function SeccionDetox() {
         </div>
         <div className={styles.detoxFlecha} aria-hidden="true">→</div>
         <div className={styles.detoxFase} style={{ background: 'rgba(39,174,96,0.08)', borderColor: '#27AE60' }}>
-          <h3 className={styles.detoxFaseTitulo} style={{ color: '#27AE60' }}>FASE 2 — Conjugación</h3>
+          <h3 className={`${styles.detoxFaseTitulo} ${styles.tonoDato}`} style={tono('#27AE60')}>FASE 2 — Conjugación</h3>
           <p className={styles.detoxFaseSubtitulo}>Transferasas (glutatión, UGT, SULT)</p>
           <ul className={styles.detoxFaseLista}>
             <li>Unión con moléculas polares</li>
@@ -554,12 +600,12 @@ function SeccionDetox() {
         </div>
         <div className={styles.detoxCardFases}>
           <div className={styles.detoxCardFase}>
-            <span className={styles.detoxCardFaseLabel} style={{ color: '#8E44AD' }}>FASE 1</span>
+            <span className={`${styles.detoxCardFaseLabel} ${styles.tonoDato}`} style={tono('#8E44AD')}>FASE 1</span>
             <p>{sustancia.fase1}</p>
           </div>
           <div className={styles.detoxCardFlechaInline} aria-hidden="true">↓</div>
           <div className={styles.detoxCardFase}>
-            <span className={styles.detoxCardFaseLabel} style={{ color: '#27AE60' }}>FASE 2</span>
+            <span className={`${styles.detoxCardFaseLabel} ${styles.tonoDato}`} style={tono('#27AE60')}>FASE 2</span>
             <p>{sustancia.fase2}</p>
           </div>
           <div className={styles.detoxCardFlechaInline} aria-hidden="true">↓</div>
@@ -592,7 +638,7 @@ function SeccionMetabolismo() {
             key={c.id}
             type="button"
             className={`${styles.metaSelectorBtn} ${selector === c.id ? styles.metaSelectorActivo : ''}`}
-            style={selector === c.id ? { borderColor: c.color, background: c.color } : {}}
+            style={selector === c.id ? pastilla(c.color) : {}}
             onClick={() => setSelector(c.id)}
             aria-pressed={selector === c.id}
           >
@@ -624,13 +670,15 @@ function SeccionMetabolismo() {
 
       {/* Ciclo metabólico */}
       <div className={styles.metaCicloCard} style={{ borderColor: ciclo.color }}>
-        <h3 className={styles.metaCicloTitulo} style={{ color: ciclo.color }}>
+        <h3 className={`${styles.metaCicloTitulo} ${styles.tonoDato}`} style={tono(ciclo.color)}>
           <span aria-hidden="true">{ciclo.icono}</span> {cicloEstado.titulo}
         </h3>
         <ol className={styles.metaCicloPasos}>
           {cicloEstado.pasos.map((paso, i) => (
             <li key={i} className={styles.metaCicloPaso}>
-              <span className={styles.metaCicloPasoNum} style={{ background: ciclo.color }}>{i + 1}</span>
+              <span className={styles.metaCicloPasoNum} style={pastilla(ciclo.color)}>
+                {i + 1}
+              </span>
               <span>{paso}</span>
             </li>
           ))}

@@ -343,6 +343,10 @@ const APPS: App[] = [
   // del núcleo (1,57), «Zona de sombra» en --text-muted (3,43), el viento solar en ámbar (2,06) y
   // las auroras en teal (2,46) en claro; en oscuro, la Onda P 4,24 y la S 4,10
   { slug: 'visualizador-capas-tierra', secciones: SECCIONES, subestados: "button[aria-pressed]:not(nav button)" },
+  // 13/11/2026: el blanco de los rótulos del hígado sobre las zonas no elegidas en pastel al 85-90 %
+  // (la vesícula 1,59-1,85:1, la arteria 1,73-2,14, el lóbulo izquierdo 2,02-2,83, el caudado 2,28-2,57,
+  // la vena porta 2,21-2,79) y sobre el rojo elegido al 85 % (4,25). Cada zona, como subestado
+  { slug: 'visualizador-higado', secciones: SECCIONES, subestados: "button[aria-pressed]:not(nav button)" },
 ];
 
 interface TextoSvg {
