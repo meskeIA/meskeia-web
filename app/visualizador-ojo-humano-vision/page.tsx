@@ -118,7 +118,7 @@ function OjoSVG({ parteActiva, onClickParte }: { parteActiva: string | null; onC
       {/* Humor vítreo (interior del ojo) */}
       <ellipse
         cx={cx} cy={cy} rx={rx} ry={ry}
-        fill={estaActiva('humor-vitreo') ? 'rgba(213,219,219,0.4)' : 'rgba(213,219,219,0.15)'}
+        className={estaActiva('humor-vitreo') ? styles.vitreoActivo : styles.vitreo}
         stroke={estaActiva('humor-vitreo') ? '#D5DBDB' : '#bbb'}
         strokeWidth={estaActiva('humor-vitreo') ? 2.5 : 1.5}
         style={{ cursor: 'pointer' }}
@@ -153,7 +153,7 @@ function OjoSVG({ parteActiva, onClickParte }: { parteActiva: string | null; onC
         tabIndex={0}
         aria-label="Fóvea"
       />
-      <text x={cx + rx + 5} y={cy - 10} fontSize="9" fill="#E67E22" fontWeight="600">Fóvea</text>
+      <text x={cx + rx + 5} y={cy - 10} fontSize="9" className={styles.svgNaranja} fontWeight="600">Fóvea</text>
 
       {/* Punto ciego (un poco abajo de la fóvea, donde sale el nervio) */}
       <circle
@@ -181,8 +181,8 @@ function OjoSVG({ parteActiva, onClickParte }: { parteActiva: string | null; onC
         tabIndex={0}
         aria-label="Nervio óptico"
       />
-      <text x={cx + rx + 50} y={cy + 60} fontSize="9" fill="#8E44AD" fontWeight="600">Nervio</text>
-      <text x={cx + rx + 50} y={cy + 72} fontSize="9" fill="#8E44AD" fontWeight="600">óptico</text>
+      <text x={cx + rx + 50} y={cy + 60} fontSize="9" className={styles.svgMorado} fontWeight="600">Nervio</text>
+      <text x={cx + rx + 50} y={cy + 72} fontSize="9" className={styles.svgMorado} fontWeight="600">óptico</text>
 
       {/* Córnea (parte frontal, curva más pronunciada) */}
       <path
@@ -196,7 +196,7 @@ function OjoSVG({ parteActiva, onClickParte }: { parteActiva: string | null; onC
         tabIndex={0}
         aria-label="Córnea"
       />
-      <text x={cx - rx - 58} y={cy - 60} fontSize="9" fill="#3498db" fontWeight="600">Córnea</text>
+      <text x={cx - rx - 58} y={cy - 60} fontSize="9" className={styles.svgAzul} fontWeight="600">Córnea</text>
 
       {/* Humor acuoso (entre córnea e iris) */}
       <ellipse
@@ -234,7 +234,7 @@ function OjoSVG({ parteActiva, onClickParte }: { parteActiva: string | null; onC
         tabIndex={0}
         aria-label="Iris inferior"
       />
-      <text x={cx - rx + 38} y={cy - 45} fontSize="9" fill="#27AE60" fontWeight="600">Iris</text>
+      <text x={cx - rx + 38} y={cy - 45} fontSize="9" className={styles.svgVerde} fontWeight="600">Iris</text>
 
       {/* Pupila (abertura) */}
       <ellipse cx={cx - rx + 30} cy={cy} rx={4} ry={14} fill="#1A1A1A" />
@@ -251,20 +251,20 @@ function OjoSVG({ parteActiva, onClickParte }: { parteActiva: string | null; onC
         tabIndex={0}
         aria-label="Cristalino"
       />
-      <text x={cx - rx + 40} y={cy + 48} fontSize="9" fill="#F1C40F" fontWeight="600">Cristalino</text>
+      <text x={cx - rx + 40} y={cy + 48} fontSize="9" className={styles.svgAmbar} fontWeight="600">Cristalino</text>
 
       {/* Rayos de luz entrante */}
       <line x1={20} y1={cy - 30} x2={cx - rx - 15} y2={cy - 5} stroke="#FFD700" strokeWidth="1.5" strokeDasharray="6,3" opacity="0.7" />
       <line x1={20} y1={cy} x2={cx - rx - 15} y2={cy} stroke="#FFD700" strokeWidth="1.5" strokeDasharray="6,3" opacity="0.7" />
       <line x1={20} y1={cy + 30} x2={cx - rx - 15} y2={cy + 5} stroke="#FFD700" strokeWidth="1.5" strokeDasharray="6,3" opacity="0.7" />
-      <text x={15} y={cy - 40} fontSize="9" fill="#FFD700" fontWeight="600">Luz</text>
+      <text x={15} y={cy - 40} fontSize="9" className={styles.svgAmbar} fontWeight="600">Luz</text>
 
       {/* Etiquetas adicionales */}
-      <text x={cx} y={cy + 5} fontSize="8" fill="var(--text-muted, #999)" textAnchor="middle">Humor vítreo</text>
-      <text x={cx - rx + 8} y={cy + 55} fontSize="8" fill="#85C1E9" textAnchor="middle">H. acuoso</text>
+      <text x={cx} y={cy + 5} fontSize="8" className={styles.svgTenue} textAnchor="middle">Humor vítreo</text>
+      <text x={cx - rx + 8} y={cy + 55} fontSize="8" className={styles.svgAzul} textAnchor="middle">H. acuoso</text>
 
       {/* Retina label */}
-      <text x={cx + rx - 50} y={cy - ry + 25} fontSize="9" fill="#E74C3C" fontWeight="600">Retina</text>
+      <text x={cx + rx - 50} y={cy - ry + 25} fontSize="9" className={styles.svgRojo} fontWeight="600">Retina</text>
     </svg>
   );
 }
@@ -310,11 +310,11 @@ function DefectoSVG({ defectoId }: { defectoId: string }) {
           <line x1={60} y1={eyeCy + 20} x2={eyeCx + 30} y2={eyeCy} stroke="#E74C3C" strokeWidth="2" />
           {/* Punto de enfoque (antes de retina) */}
           <circle cx={eyeCx + 30} cy={eyeCy} r={5} fill="#E74C3C" opacity="0.7" />
-          <text x={eyeCx + 30} y={eyeCy + 22} fontSize="9" fill="#E74C3C" textAnchor="middle" fontWeight="600">
+          <text x={eyeCx + 30} y={eyeCy + 22} fontSize="9" className={styles.svgRojo} textAnchor="middle" fontWeight="600">
             Foco antes de retina
           </text>
           {/* Lente correctora */}
-          <text x={eyeCx} y={h - 10} fontSize="10" fill="var(--primary, #2E86AB)" textAnchor="middle" fontWeight="600">
+          <text x={eyeCx} y={h - 10} fontSize="10" className={styles.svgMarca} textAnchor="middle" fontWeight="600">
             Corrección: lente divergente (-)
           </text>
         </>
@@ -329,10 +329,10 @@ function DefectoSVG({ defectoId }: { defectoId: string }) {
           <line x1={60} y1={eyeCy - 20} x2={eyeCx + eyeRx + 30} y2={eyeCy} stroke="#3498db" strokeWidth="2" />
           <line x1={60} y1={eyeCy + 20} x2={eyeCx + eyeRx + 30} y2={eyeCy} stroke="#3498db" strokeWidth="2" />
           <circle cx={eyeCx + eyeRx + 30} cy={eyeCy} r={5} fill="#3498db" opacity="0.7" />
-          <text x={eyeCx + eyeRx + 30} y={eyeCy + 22} fontSize="9" fill="#3498db" textAnchor="middle" fontWeight="600">
+          <text x={eyeCx + eyeRx + 30} y={eyeCy + 22} fontSize="9" className={styles.svgAzul} textAnchor="middle" fontWeight="600">
             Foco detrás
           </text>
-          <text x={eyeCx} y={h - 10} fontSize="10" fill="var(--primary, #2E86AB)" textAnchor="middle" fontWeight="600">
+          <text x={eyeCx} y={h - 10} fontSize="10" className={styles.svgMarca} textAnchor="middle" fontWeight="600">
             Corrección: lente convergente (+)
           </text>
         </>
@@ -350,10 +350,10 @@ function DefectoSVG({ defectoId }: { defectoId: string }) {
           <circle cx={eyeCx + 20} cy={eyeCy - 10} r={4} fill="#F39C12" opacity="0.7" />
           <circle cx={eyeCx + 50} cy={eyeCy} r={4} fill="#F39C12" opacity="0.7" />
           <circle cx={eyeCx + 35} cy={eyeCy + 8} r={4} fill="#F39C12" opacity="0.7" />
-          <text x={eyeCx + 35} y={eyeCy + 30} fontSize="9" fill="#F39C12" textAnchor="middle" fontWeight="600">
+          <text x={eyeCx + 35} y={eyeCy + 30} fontSize="9" className={styles.svgNaranja} textAnchor="middle" fontWeight="600">
             Varios focos
           </text>
-          <text x={eyeCx} y={h - 10} fontSize="10" fill="var(--primary, #2E86AB)" textAnchor="middle" fontWeight="600">
+          <text x={eyeCx} y={h - 10} fontSize="10" className={styles.svgMarca} textAnchor="middle" fontWeight="600">
             Corrección: lente cilíndrica o tórica
           </text>
         </>
@@ -367,10 +367,10 @@ function DefectoSVG({ defectoId }: { defectoId: string }) {
           <line x1={60} y1={eyeCy - 15} x2={eyeCx + eyeRx + 10} y2={eyeCy} stroke="#27AE60" strokeWidth="2" />
           <line x1={60} y1={eyeCy + 15} x2={eyeCx + eyeRx + 10} y2={eyeCy} stroke="#27AE60" strokeWidth="2" />
           <circle cx={eyeCx + eyeRx + 10} cy={eyeCy} r={4} fill="#27AE60" opacity="0.7" />
-          <text x={eyeCx + eyeRx + 10} y={eyeCy + 20} fontSize="9" fill="#27AE60" textAnchor="middle" fontWeight="600">
+          <text x={eyeCx + eyeRx + 10} y={eyeCy + 20} fontSize="9" className={styles.svgVerde} textAnchor="middle" fontWeight="600">
             No enfoca de cerca
           </text>
-          <text x={eyeCx} y={h - 10} fontSize="10" fill="var(--primary, #2E86AB)" textAnchor="middle" fontWeight="600">
+          <text x={eyeCx} y={h - 10} fontSize="10" className={styles.svgMarca} textAnchor="middle" fontWeight="600">
             Corrección: gafas de lectura o progresivas
           </text>
         </>
@@ -382,17 +382,18 @@ function DefectoSVG({ defectoId }: { defectoId: string }) {
             Daltonismo: falta 1 tipo de cono
           </text>
           {/* 3 conos, uno tachado */}
-          <circle cx={eyeCx - 40} cy={eyeCy} r={15} fill="#3498db" opacity="0.8" />
+          {/* Conos opacos y oscurecidos bajo el blanco (al 80 % daban 2,4-3,4:1); el L ausente, gris claro con tinta oscura en los dos temas */}
+          <circle cx={eyeCx - 40} cy={eyeCy} r={15} fill="#1F6F9F" />
           <text x={eyeCx - 40} y={eyeCy + 4} fontSize="9" fill="white" textAnchor="middle" fontWeight="700">S</text>
-          <circle cx={eyeCx} cy={eyeCy} r={15} fill="#27AE60" opacity="0.8" />
+          <circle cx={eyeCx} cy={eyeCy} r={15} fill="#1E7E45" />
           <text x={eyeCx} y={eyeCy + 4} fontSize="9" fill="white" textAnchor="middle" fontWeight="700">M</text>
-          <circle cx={eyeCx + 40} cy={eyeCy} r={15} fill="#ccc" opacity="0.6" />
-          <text x={eyeCx + 40} y={eyeCy + 4} fontSize="9" fill="#999" textAnchor="middle" fontWeight="700">L</text>
+          <circle cx={eyeCx + 40} cy={eyeCy} r={15} fill="#D0D0D0" />
+          <text x={eyeCx + 40} y={eyeCy + 4} fontSize="9" fill="#4A4A4A" textAnchor="middle" fontWeight="700">L</text>
           <line x1={eyeCx + 28} y1={eyeCy - 12} x2={eyeCx + 52} y2={eyeCy + 12} stroke="#E74C3C" strokeWidth="3" />
-          <text x={eyeCx} y={eyeCy + 40} fontSize="9" fill="var(--text-secondary, #666)" textAnchor="middle">
+          <text x={eyeCx} y={eyeCy + 40} fontSize="9" className={styles.svgTenue} textAnchor="middle">
             8% hombres / 0,5% mujeres (cromosoma X)
           </text>
-          <text x={eyeCx} y={h - 10} fontSize="10" fill="var(--primary, #2E86AB)" textAnchor="middle" fontWeight="600">
+          <text x={eyeCx} y={h - 10} fontSize="10" className={styles.svgMarca} textAnchor="middle" fontWeight="600">
             Sin corrección óptica. Gafas con filtros especiales.
           </text>
         </>
@@ -408,10 +409,10 @@ function DefectoSVG({ defectoId }: { defectoId: string }) {
             fill="rgba(150,150,150,0.6)" stroke="#999" strokeWidth="2" />
           <line x1={60} y1={eyeCy - 15} x2={eyeCx - eyeRx + 28} y2={eyeCy - 5} stroke="#FFD700" strokeWidth="2" opacity="0.5" />
           <line x1={60} y1={eyeCy + 15} x2={eyeCx - eyeRx + 28} y2={eyeCy + 5} stroke="#FFD700" strokeWidth="2" opacity="0.5" />
-          <text x={eyeCx} y={eyeCy + 50} fontSize="9" fill="var(--text-secondary, #666)" textAnchor="middle">
+          <text x={eyeCx} y={eyeCy + 50} fontSize="9" className={styles.svgTenue} textAnchor="middle">
             La luz no pasa bien → visión borrosa
           </text>
-          <text x={eyeCx} y={h - 10} fontSize="10" fill="var(--primary, #2E86AB)" textAnchor="middle" fontWeight="600">
+          <text x={eyeCx} y={h - 10} fontSize="10" className={styles.svgMarca} textAnchor="middle" fontWeight="600">
             Corrección: cirugía (la más frecuente del mundo)
           </text>
         </>

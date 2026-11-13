@@ -240,6 +240,15 @@ const APPS: App[] = [
   // (2,65), el blanco sobre el gRNA translúcido (3,51) y sobre el indicador de paso (4,11), y en los
   // pasos 2-6 el blanco sobre Cas9 y el indicador en el color de cada paso. Los seis pasos
   { slug: 'visualizador-crispr-cas9', subestados: "button[class*='pasoBtn']" },
+  // 13/11/2026: los rótulos del corte del ojo en el color de su parte (el cristalino en #F1C40F
+  // 1,59:1 y la luz en oro 1,39 en claro; el nervio óptico en morado 2,45 en oscuro), y en los
+  // defectos los focos de color, «Corrección…» en la marca y el blanco sobre los conos al 80 %.
+  // Las dos secciones con diagrama; cada parte del ojo y cada defecto abierto
+  {
+    slug: 'visualizador-ojo-humano-vision',
+    secciones: "[role='tablist'] [role='tab']",
+    subestados: "button[class*='parteCard'], button[class*='defectoCard']",
+  },
 ];
 
 interface TextoSvg {
