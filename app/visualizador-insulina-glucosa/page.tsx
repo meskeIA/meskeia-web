@@ -9,6 +9,7 @@ import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
 import DisclaimerCard from '@/components/DisclaimerCard';
+import { rellenoConTinta } from '@/lib/tintaLegible';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -125,18 +126,24 @@ const PASOS_ANIMACION: { titulo: string; texto: string }[] = [
 // Componente SVG por paso
 // ─────────────────────────────────────────────
 
+// Rellenos opacos con la tinta que les llega (cabo C0297, 13/11/2026): el blanco daba 2,8:1 sobre el
+// teal del páncreas y 2,2 sobre el oro de la insulina; los rótulos sueltos iban en #666 fijo (2,37
+// en oscuro) y ahora en --text-secondary.
+const PANCREAS = rellenoConTinta('#48A9A6');
+const INSULINA = rellenoConTinta('#F59E0B');
+
 function SvgPaso({ paso }: { paso: PasoAnimacion }) {
   if (paso === 0) {
     return (
       <svg viewBox="0 0 300 140" className={styles.svgCelula} aria-label="Glucosa en el torrente sanguíneo">
         {/* Vaso sanguíneo */}
         <rect x="10" y="50" width="280" height="60" rx="30" fill="#FFEAEA" stroke="#E07B39" strokeWidth="2" />
-        <text x="150" y="38" textAnchor="middle" fontSize="11" fill="#666">Torrente sanguíneo</text>
+        <text x="150" y="38" textAnchor="middle" fontSize="11" fill="var(--text-secondary)">Torrente sanguíneo</text>
         {/* Círculos glucosa */}
         {[40, 80, 120, 160, 200, 240].map((cx, i) => (
           <circle key={i} cx={cx} cy="80" r="12" fill="#2E86AB" opacity="0.85" />
         ))}
-        <text x="150" y="125" textAnchor="middle" fontSize="10" fill="#666">Glucosa (círculos azules)</text>
+        <text x="150" y="125" textAnchor="middle" fontSize="10" fill="var(--text-secondary)">Glucosa (círculos azules)</text>
       </svg>
     );
   }
@@ -151,15 +158,15 @@ function SvgPaso({ paso }: { paso: PasoAnimacion }) {
           <circle key={i} cx={cx} cy="95" r="10" fill="#2E86AB" opacity="0.8" />
         ))}
         {/* Páncreas */}
-        <ellipse cx="150" cy="22" rx="50" ry="16" fill="#48A9A6" opacity="0.9" />
-        <text x="150" y="26" textAnchor="middle" fontSize="10" fill="white" fontWeight="bold">Páncreas</text>
+        <ellipse cx="150" cy="22" rx="50" ry="16" fill={PANCREAS.relleno} />
+        <text x="150" y="26" textAnchor="middle" fontSize="10" fill={PANCREAS.tinta} fontWeight="bold">Páncreas</text>
         {/* Flecha */}
         <line x1="150" y1="38" x2="150" y2="62" stroke="#F59E0B" strokeWidth="2" strokeDasharray="4,2" />
         <polygon points="145,60 155,60 150,70" fill="#F59E0B" />
         {/* Insulina */}
-        <circle cx="150" cy="52" r="9" fill="#F59E0B" opacity="0.95" />
-        <text x="150" y="56" textAnchor="middle" fontSize="8" fill="white" fontWeight="bold">I</text>
-        <text x="150" y="148" textAnchor="middle" fontSize="10" fill="#666">Insulina (círculo dorado) viajando al torrente</text>
+        <circle cx="150" cy="52" r="9" fill={INSULINA.relleno} />
+        <text x="150" y="56" textAnchor="middle" fontSize="8" fill={INSULINA.tinta} fontWeight="bold">I</text>
+        <text x="150" y="148" textAnchor="middle" fontSize="10" fill="var(--text-secondary)">Insulina (círculo dorado) viajando al torrente</text>
       </svg>
     );
   }
@@ -178,17 +185,17 @@ function SvgPaso({ paso }: { paso: PasoAnimacion }) {
       <polygon points="155,38 165,43 155,48" fill="#2E86AB" />
       {/* Célula */}
       <rect x="165" y="15" width="110" height="110" rx="12" fill="#E8F5E9" stroke="#48A9A6" strokeWidth="2.5" />
-      <text x="220" y="11" textAnchor="middle" fontSize="10" fill="#666">Célula</text>
+      <text x="220" y="11" textAnchor="middle" fontSize="10" fill="var(--text-secondary)">Célula</text>
       {/* Puerta abierta */}
       <rect x="160" y="30" width="12" height="40" rx="2" fill="#48A9A6" opacity="0.7" transform="rotate(-60 160 50)" />
       {/* Receptor + insulina */}
-      <circle cx="166" cy="43" r="8" fill="#F59E0B" opacity="0.9" />
-      <text x="166" y="47" textAnchor="middle" fontSize="7" fill="white" fontWeight="bold">I</text>
+      <circle cx="166" cy="43" r="8" fill={INSULINA.relleno} />
+      <text x="166" y="47" textAnchor="middle" fontSize="7" fill={INSULINA.tinta} fontWeight="bold">I</text>
       {/* Glucosa dentro */}
       {[195, 225, 255].map((cx, i) => (
         <circle key={i} cx={cx} cy="70" r="9" fill="#2E86AB" opacity="0.7" />
       ))}
-      <text x="150" y="148" textAnchor="middle" fontSize="10" fill="#666">La glucosa entra en la célula</text>
+      <text x="150" y="148" textAnchor="middle" fontSize="10" fill="var(--text-secondary)">La glucosa entra en la célula</text>
     </svg>
   );
 }

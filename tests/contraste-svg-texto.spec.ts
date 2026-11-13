@@ -33,6 +33,11 @@ interface App {
    * visualizador-terremotos-tsunamis): en cada sección donde se vean, se pulsan uno a uno y se mide.
    */
   subestados?: string;
+  /**
+   * Un botón que avanza el SVG paso a paso (el «Siguiente» de visualizador-insulina-glucosa): se pulsa
+   * `veces` veces y se mide tras cada pulsación.
+   */
+  avanzar?: { boton: string; veces: number };
 }
 
 const SECCIONES = "nav[aria-label*='ecciones'] button";
@@ -376,6 +381,12 @@ const APPS: App[] = [
   // los otros ejemplos, los rótulos en el color del ejemplo sobre su fondo teñido. Cada ejemplo de
   // convección, como subestado
   { slug: 'visualizador-termodinamica', secciones: SECCIONES, extremos: true, subestados: "button[class*='conveccionBtn']" },
+  // 13/11/2026: los rótulos sueltos en #666 fijo (2,37:1 en oscuro), el blanco de «Páncreas» sobre el
+  // teal al 90 % (2,8) y el de la «I» sobre el oro de la insulina (2,2). Los tres pasos del mecanismo
+  {
+    slug: 'visualizador-insulina-glucosa',
+    avanzar: { boton: "button[aria-label='Siguiente paso']", veces: 2 },
+  },
 ];
 
 interface TextoSvg {
@@ -557,8 +568,20 @@ async function soltarScroll(page: Page): Promise<void> {
 }
 
 /** Mide la sección tal cual y, si tiene `subestados` visibles, cada uno de ellos. */
-async function medirConSubestados(page: Page, donde: string, extremos: boolean, subestados?: string): Promise<string[]> {
+async function medirConSubestados(
+  page: Page,
+  donde: string,
+  extremos: boolean,
+  subestados?: string,
+  avanzar?: App['avanzar'],
+): Promise<string[]> {
   const todo = await medirAqui(page, donde, extremos);
+  if (avanzar) {
+    for (let k = 1; k <= avanzar.veces; k++) {
+      await page.locator(avanzar.boton).first().click();
+      todo.push(...(await medirAqui(page, `${donde}, paso ${k + 1}`, extremos)));
+    }
+  }
   if (!subestados) return todo;
   const subs = page.locator(`${subestados}:visible`);
   const m = await subs.count();
@@ -569,13 +592,20 @@ async function medirConSubestados(page: Page, donde: string, extremos: boolean, 
   return todo;
 }
 
-async function recorrer(page: Page, secciones?: string, extremos = false, soltar = false, subestados?: string): Promise<string[]> {
+async function recorrer(
+  page: Page,
+  secciones?: string,
+  extremos = false,
+  soltar = false,
+  subestados?: string,
+  avanzar?: App['avanzar'],
+): Promise<string[]> {
   const todo: string[] = [];
   const botones = secciones ? page.locator(secciones) : null;
   const n = botones ? await botones.count() : 0;
   await desplegarTodo(page);
   if (soltar) await soltarScroll(page);
-  if (!n) return medirConSubestados(page, 'carga', extremos, subestados);
+  if (!n) return medirConSubestados(page, 'carga', extremos, subestados, avanzar);
   for (let i = 0; i < n; i++) {
     await botones!.nth(i).click();
     await desplegarTodo(page);
@@ -585,15 +615,20 @@ async function recorrer(page: Page, secciones?: string, extremos = false, soltar
   return Array.from(new Set(todo));
 }
 
-for (const { slug, secciones, extremos, ancho, subestados } of APPS) {
+for (const { slug, secciones, extremos, ancho, subestados, avanzar } of APPS) {
   test(`${slug}: el texto de sus SVG se lee contra lo que tiene detrás, en claro y en oscuro (C0297)`, async ({ page }) => {
     test.setTimeout(120_000);
     if (ancho) await page.setViewportSize({ width: ancho, height: 900 });
     await page.goto(`/${slug}/`);
     await prepararParaMedir(page);
     if (secciones) await expect(page.locator(secciones).first()).toBeVisible();
-    expect.soft(await recorrer(page, secciones, extremos, Boolean(ancho), subestados), 'claro').toEqual([]);
+    expect.soft(await recorrer(page, secciones, extremos, Boolean(ancho), subestados, avanzar), 'claro').toEqual([]);
+    if (avanzar) {
+      // De vuelta al primer paso antes de medir el oscuro
+      await page.reload();
+      await prepararParaMedir(page);
+    }
     await activarTemaOscuro(page);
-    expect.soft(await recorrer(page, secciones, extremos, Boolean(ancho), subestados), 'oscuro').toEqual([]);
+    expect.soft(await recorrer(page, secciones, extremos, Boolean(ancho), subestados, avanzar), 'oscuro').toEqual([]);
   });
 }
