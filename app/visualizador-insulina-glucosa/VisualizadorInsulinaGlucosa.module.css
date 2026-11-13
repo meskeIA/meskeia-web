@@ -530,6 +530,11 @@
   color: var(--text-primary, #E5E5E5);
 }
 
+/* «Nota importante» en --primary-texto sobre ese fondo aclarado daba 3,70:1 (C0278, 13/11/2026) */
+[data-theme='dark'] .warningBox strong {
+  color: #7FC4E3;
+}
+
 [data-theme='dark'] .textoResistencia {
   background: rgba(46, 134, 171, 0.1);
 }

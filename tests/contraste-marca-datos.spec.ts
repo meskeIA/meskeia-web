@@ -223,6 +223,8 @@ const APPS: App[] = [
   // con style (la conducción en rojo 3,76:1, la convección en azul 3,68, la radiación en ámbar 2,15, la
   // brisa en azul cielo 2,77 en claro; 3,81-3,90 en oscuro) y «Caliente» y «Frío» de la animación
   { slug: 'visualizador-termodinamica', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
+  // 13/11/2026: en oscuro, «Nota importante» en --primary-texto sobre el fondo aclarado del aviso (3,70:1)
+  { slug: 'visualizador-insulina-glucosa', todo: true },
 ];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {
