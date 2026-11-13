@@ -794,7 +794,7 @@ export default function CalculadoraInflacionPage() {
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>💰</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">💰</span>
                 <h3>Ahorros en cuenta corriente</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -805,7 +805,7 @@ export default function CalculadoraInflacionPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🏠</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏠</span>
                 <h3>Hipoteca a tipo variable (euríbor)</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -816,7 +816,7 @@ export default function CalculadoraInflacionPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>👔</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">👔</span>
                 <h3>Salario sin revisión anual</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -827,7 +827,7 @@ export default function CalculadoraInflacionPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>📈</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">📈</span>
                 <h3>Inversión en bolsa diversificada</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -838,7 +838,7 @@ export default function CalculadoraInflacionPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🏘️</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏘️</span>
                 <h3>Compra de vivienda como inversión</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -849,7 +849,7 @@ export default function CalculadoraInflacionPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>👴</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">👴</span>
                 <h3>Pensión de jubilación</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -978,32 +978,32 @@ export default function CalculadoraInflacionPage() {
           <h2><span aria-hidden="true">✅</span> Claves para interpretar y usar los datos de inflación</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📅</span>
+              <span className={styles.tipIcon} aria-hidden="true">📅</span>
               <h4>Usa periodos relevantes para ti</h4>
               <p>No te limites a &quot;el último año&quot;. Compara desde cuando compraste tu casa, empezaste a trabajar o comenzaste a ahorrar. Los datos del INE desde 1961 te dan una perspectiva completa.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔢</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔢</span>
               <h4>Distingue nominal de real</h4>
               <p>Si alguien te dice &quot;mi sueldo ha subido un 5%&quot;, pregunta si es nominal o real. Si la inflación fue 4%, la subida real fue solo el 1%. Los datos nominales siempre engañan sin el contexto inflacionario.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🌍</span>
+              <span className={styles.tipIcon} aria-hidden="true">🌍</span>
               <h4>Compara con la inflación europea</h4>
               <p>El IPCA armonizado permite comparar España con la eurozona. Si España tiene más inflación que Alemania, nuestra competitividad exportadora se deteriora. Afecta al empleo y al crecimiento.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📊</span>
+              <span className={styles.tipIcon} aria-hidden="true">📊</span>
               <h4>IPC ≠ tu inflación personal</h4>
               <p>El IPC es una media nacional. Si eres inquilino en Madrid o Barcelona, tu inflación real puede superar en 3-5 puntos la media. Calcula tu cesta personalizada para tener datos más útiles.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>⚡</span>
+              <span className={styles.tipIcon} aria-hidden="true">⚡</span>
               <h4>La energía amplifica la volatilidad</h4>
               <p>El IPC subyacente (sin energía) es mucho más estable. Cuando el petróleo o el gas sube bruscamente, el IPC general se dispara. Mira el subyacente para entender la tendencia real de la economía.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔄</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔄</span>
               <h4>Inflación y tipos de interés van juntos</h4>
               <p>Inflación alta → BCE sube el tipo de interés (también llamado tasa de interés) → euríbor sube → hipotecas variables más caras. Inflación baja → BCE baja tipos → mejores condiciones de crédito. El ciclo inflacionario impacta directamente en el coste de tu deuda.</p>
             </div>

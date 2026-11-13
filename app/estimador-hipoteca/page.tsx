@@ -873,7 +873,7 @@ export default function SimuladorHipotecaPage() {
 
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
-            <div className={styles.escenarioIcon}>🏠</div>
+            <div className={styles.escenarioIcon} aria-hidden="true">🏠</div>
             <h3>Primera vivienda (joven)</h3>
             <div className={styles.escenarioData}>
               <div className={styles.escenarioDato}>
@@ -898,7 +898,7 @@ export default function SimuladorHipotecaPage() {
           </div>
 
           <div className={styles.escenarioCard}>
-            <div className={styles.escenarioIcon}>🏘️</div>
+            <div className={styles.escenarioIcon} aria-hidden="true">🏘️</div>
             <h3>Segunda residencia (familiar)</h3>
             <div className={styles.escenarioData}>
               <div className={styles.escenarioDato}>
@@ -923,7 +923,7 @@ export default function SimuladorHipotecaPage() {
           </div>
 
           <div className={styles.escenarioCard}>
-            <div className={styles.escenarioIcon}>🏢</div>
+            <div className={styles.escenarioIcon} aria-hidden="true">🏢</div>
             <h3>Inversión (alquiler)</h3>
             <div className={styles.escenarioData}>
               <div className={styles.escenarioDato}>
@@ -948,7 +948,7 @@ export default function SimuladorHipotecaPage() {
           </div>
 
           <div className={styles.escenarioCard}>
-            <div className={styles.escenarioIcon}>🏢</div>
+            <div className={styles.escenarioIcon} aria-hidden="true">🏢</div>
             <h3>Hipoteca mixta (joven profesional)</h3>
             <div className={styles.escenarioData}>
               <div className={styles.escenarioDato}>
@@ -973,7 +973,7 @@ export default function SimuladorHipotecaPage() {
           </div>
 
           <div className={styles.escenarioCard}>
-            <div className={styles.escenarioIcon}>👴</div>
+            <div className={styles.escenarioIcon} aria-hidden="true">👴</div>
             <h3>Hipoteca con entrada alta (55 años)</h3>
             <div className={styles.escenarioData}>
               <div className={styles.escenarioDato}>
@@ -998,7 +998,7 @@ export default function SimuladorHipotecaPage() {
           </div>
 
           <div className={styles.escenarioCard}>
-            <div className={styles.escenarioIcon}>🌍</div>
+            <div className={styles.escenarioIcon} aria-hidden="true">🌍</div>
             <h3>No residente (español en el extranjero)</h3>
             <div className={styles.escenarioData}>
               <div className={styles.escenarioDato}>
@@ -1312,32 +1312,32 @@ export default function SimuladorHipotecaPage() {
           <h2>Mejores prácticas para tu hipoteca</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <h4>Simula antes de buscar piso</h4>
               <p>Calcula tu capacidad de compra ANTES de enamorarte de un piso. Evitarás decepciones y negociarás mejor sabiendo tu límite.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <h4>Compara TAE, no TIN</h4>
               <p>La TAE incluye comisiones y seguros. Un TIN de 3% con TAE 3.8% puede ser peor que un TIN 3.2% con TAE 3.5%.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <h4>Negocia productos vinculados</h4>
               <p>No aceptes todo el "pack". Calcula si los seguros obligatorios compensan el diferencial reducido. A veces es mejor pagar 0.2% más sin vinculaciones.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <h4>Lee cláusulas de penalización</h4>
               <p>Verifica la comisión por amortización anticipada (máximo 0.15% en fijas, gratis en variables tras 5 años). Evita cláusulas suelo abusivas.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <h4>Mantén un fondo de emergencia</h4>
               <p>Tras pagar entrada y gastos, conserva 3-6 meses de gastos en ahorro líquido. Imprevistos (paro, reparaciones) no deben ponerte en riesgo de impago.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <h4>Revisa tu hipoteca cada 2 años</h4>
               <p>Compara ofertas del mercado. Si encuentras mejores condiciones, negocia con tu banco o subroga. El ahorro acumulado puede superar los 20.000 €.</p>
             </div>

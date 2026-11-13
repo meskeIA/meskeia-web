@@ -882,7 +882,7 @@ export default function CreadorFlashcardsPage() {
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>⚖️</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">⚖️</span>
                 <h4>Opositor</h4>
               </div>
               <p>Memoriza conceptos legales, artículos de ley, procedimientos administrativos y temarios extensos de acceso a la función pública.</p>
@@ -891,7 +891,7 @@ export default function CreadorFlashcardsPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🌍</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🌍</span>
                 <h4>Aprendiz de idiomas</h4>
               </div>
               <p>Amplía vocabulario, estudia conjugaciones verbales, aprende expresiones idiomáticas y reglas gramaticales de cualquier idioma.</p>
@@ -900,7 +900,7 @@ export default function CreadorFlashcardsPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🩺</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🩺</span>
                 <h4>Estudiante universitario</h4>
               </div>
               <p>Domina la terminología médica, jurídica o científica de carreras con alta carga memorística como Medicina, Derecho o Farmacia.</p>
@@ -909,7 +909,7 @@ export default function CreadorFlashcardsPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>💼</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">💼</span>
                 <h4>Profesional en formación</h4>
               </div>
               <p>Aprende terminología técnica de nuevas áreas, acrónimos del sector, protocolos de empresa o conceptos de certificaciones profesionales.</p>
@@ -1059,32 +1059,32 @@ export default function CreadorFlashcardsPage() {
           <h2>Mejores prácticas para maximizar tu aprendizaje</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🎯</span>
+              <span className={styles.tipIcon} aria-hidden="true">🎯</span>
               <h4>Una sola idea por tarjeta (regla de oro)</h4>
               <p>La regla más importante del método flashcard. Cada tarjeta debe cubrir exactamente un concepto, un dato o una relación. Si intentas meter más, la tarjeta se vuelve difícil de responder y la memorización falla.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>❓</span>
+              <span className={styles.tipIcon} aria-hidden="true">❓</span>
               <h4>Preguntas activas, no definiciones pasivas</h4>
               <p>En lugar de «Fotosíntesis: proceso por el cual...», escribe «¿Qué proceso usan las plantas para convertir luz en energía?». La formulación activa obliga al cerebro a recuperar la información, no solo a reconocerla.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📈</span>
+              <span className={styles.tipIcon} aria-hidden="true">📈</span>
               <h4>Repasar justo antes de olvidar (curva de Ebbinghaus)</h4>
               <p>El momento óptimo de repaso es justo antes de que empieces a olvidar la información. Repasar demasiado pronto desperdicia tiempo; repasar demasiado tarde obliga a reaprender desde cero.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✍️</span>
+              <span className={styles.tipIcon} aria-hidden="true">✍️</span>
               <h4>Crear las tarjetas tú mismo (el proceso enseña)</h4>
               <p>El acto de formular una pregunta, sintetizar la respuesta y escribirla ya es aprendizaje activo. Cuando creas tus propias tarjetas, procesas la información con más profundidad que al releer un apunte.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>⏱️</span>
+              <span className={styles.tipIcon} aria-hidden="true">⏱️</span>
               <h4>Sesiones cortas y frecuentes mejor que largas y espaciadas</h4>
               <p>20 minutos al día durante 7 días es mucho más eficaz que 2 horas y media el domingo. La distribución temporal del aprendizaje (efecto de espaciado) es uno de los hallazgos más sólidos de la psicología cognitiva.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔄</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔄</span>
               <h4>Revisar las tarjetas «difíciles» más a menudo</h4>
               <p>No todas las tarjetas son igual de difíciles. Presta atención especial a las que te cuestan más: son las que necesitan más repeticiones para consolidarse. No pases página sin haber respondido correctamente.</p>
             </div>

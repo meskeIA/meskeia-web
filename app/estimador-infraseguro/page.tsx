@@ -533,37 +533,37 @@ export default function CalculadoraInfraseguroPage() {
           <h2>Buenas prácticas para evitar el infraseguro</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📸</span>
+              <span className={styles.tipIcon} aria-hidden="true">📸</span>
               <strong>Inventario fotográfico del contenido</strong>
               <p>Fotografía habitación por habitación y guarda las fotos en la nube. Facilita la valoración del contenido
               y la reclamación de siniestros.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🗂️</span>
+              <span className={styles.tipIcon} aria-hidden="true">🗂️</span>
               <strong>Guarda facturas de bienes valiosos</strong>
               <p>Electrodomésticos, muebles, joyas y electrónica. Sin factura, la aseguradora puede aplicar
               depreciación agresiva en la valoración del siniestro.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📅</span>
+              <span className={styles.tipIcon} aria-hidden="true">📅</span>
               <strong>Revisión anual en la renovación</strong>
               <p>Aprovecha la renovación para revisar el capital asegurado. Añade el coste de adquisiciones del año
               y un 3-5% por inflación general.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🏗️</span>
+              <span className={styles.tipIcon} aria-hidden="true">🏗️</span>
               <strong>Comunica reformas antes de iniciarlas</strong>
               <p>Avisa a la aseguradora antes de empezar obras. Algunas pólizas excluyen daños ocurridos durante
               las reformas si no se ha notificado previamente.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔄</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔄</span>
               <strong>Solicita cláusula de actualización automática</strong>
               <p>Muchas aseguradoras ofrecen actualización anual por IPC. Actívala para que el capital se ajuste
               automáticamente sin gestiones manuales.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>👨‍💼</span>
+              <span className={styles.tipIcon} aria-hidden="true">👨‍💼</span>
               <strong>Pide una valoración profesional</strong>
               <p>Para inmuebles de valor o contenido muy específico (joyas, obras de arte, instrumentos), solicita
               un peritaje profesional que justifique el capital asegurado.</p>

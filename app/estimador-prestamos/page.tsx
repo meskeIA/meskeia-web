@@ -1527,7 +1527,7 @@ export default function SimuladorPrestamosPage() {
 
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <div className={styles.tipIcon}>🎯</div>
+            <div className={styles.tipIcon} aria-hidden="true">🎯</div>
             <h3>Define el propósito claramente</h3>
             <p>
               Los préstamos <strong>con propósito definido</strong> (coche, reforma, estudios)
@@ -1539,7 +1539,7 @@ export default function SimuladorPrestamosPage() {
           </div>
 
           <div className={styles.tipCard}>
-            <div className={styles.tipIcon}>💬</div>
+            <div className={styles.tipIcon} aria-hidden="true">💬</div>
             <h3>Negocia las condiciones</h3>
             <p>
               <strong>Todo es negociable:</strong> TAE, comisión de apertura, seguros vinculados.
@@ -1551,7 +1551,7 @@ export default function SimuladorPrestamosPage() {
           </div>
 
           <div className={styles.tipCard}>
-            <div className={styles.tipIcon}>⏱️</div>
+            <div className={styles.tipIcon} aria-hidden="true">⏱️</div>
             <h3>Elige el plazo con cabeza</h3>
             <p>
               <strong>Plazo corto:</strong> Cuotas altas, menos intereses totales<br />
@@ -1564,7 +1564,7 @@ export default function SimuladorPrestamosPage() {
           </div>
 
           <div className={styles.tipCard}>
-            <div className={styles.tipIcon}>🛡️</div>
+            <div className={styles.tipIcon} aria-hidden="true">🛡️</div>
             <h3>Evalúa los seguros vinculados</h3>
             <p>
               Algunos bancos exigen seguros (vida, paro, hogar) para aprobar el préstamo.
@@ -1577,7 +1577,7 @@ export default function SimuladorPrestamosPage() {
           </div>
 
           <div className={styles.tipCard}>
-            <div className={styles.tipIcon}>📉</div>
+            <div className={styles.tipIcon} aria-hidden="true">📉</div>
             <h3>Evita el sobreendeudamiento</h3>
             <p>
               <strong>Regla del 35%:</strong> Tus deudas totales (préstamos + tarjetas + alquiler/hipoteca)
@@ -1590,7 +1590,7 @@ export default function SimuladorPrestamosPage() {
           </div>
 
           <div className={styles.tipCard}>
-            <div className={styles.tipIcon}>🔍</div>
+            <div className={styles.tipIcon} aria-hidden="true">🔍</div>
             <h3>Revisa tu historial crediticio</h3>
             <p>
               Antes de solicitar, consulta tu situación en:

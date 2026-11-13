@@ -413,7 +413,7 @@ export default function EstimadorLegitimas() {
       <div className={styles.escenariosGrid}>
         <div className={styles.escenarioCard}>
           <div className={styles.escenarioHeader}>
-            <span className={styles.escenarioIcon}>👨‍👩‍👧</span>
+            <span className={styles.escenarioIcon} aria-hidden="true">👨‍👩‍👧</span>
             <strong>Matrimonio con hijos en Derecho Común</strong>
           </div>
           <p>Herencia de 300.000 €. Los hijos tienen derecho a 2/3 (200.000 €). Solo 100.000 € pueden distribuirse libremente. El tercio de mejora puede concentrarse en un hijo.</p>
@@ -422,7 +422,7 @@ export default function EstimadorLegitimas() {
         </div>
         <div className={styles.escenarioCard}>
           <div className={styles.escenarioHeader}>
-            <span className={styles.escenarioIcon}>🏘️</span>
+            <span className={styles.escenarioIcon} aria-hidden="true">🏘️</span>
             <strong>Residente en Cataluña con patrimonio inmobiliario</strong>
           </div>
           <p>La legítima catalana (1/4) se paga en metálico, no necesariamente con el inmueble. Más libertad para transmitir la vivienda familiar íntegra a quien el testador quiera.</p>
@@ -431,7 +431,7 @@ export default function EstimadorLegitimas() {
         </div>
         <div className={styles.escenarioCard}>
           <div className={styles.escenarioHeader}>
-            <span className={styles.escenarioIcon}>🤝</span>
+            <span className={styles.escenarioIcon} aria-hidden="true">🤝</span>
             <strong>Sin hijos, con cónyuge y padres</strong>
           </div>
           <p>En derecho común, si no hay descendientes, los ascendientes tienen legítima (1/2 del caudal) y el cónyuge tiene derecho al usufructo del tercio libre.</p>
@@ -440,7 +440,7 @@ export default function EstimadorLegitimas() {
         </div>
         <div className={styles.escenarioCard}>
           <div className={styles.escenarioHeader}>
-            <span className={styles.escenarioIcon}>📜</span>
+            <span className={styles.escenarioIcon} aria-hidden="true">📜</span>
             <strong>Herencia con donaciones en vida previas</strong>
           </div>
           <p>Se hacen donaciones en vida a un hijo. Estas donaciones se imputan a la legítima del donatario (&quot;colación&quot;). Si superan la legítima, el beneficiado deberá compensar a sus hermanos.</p>
@@ -537,32 +537,32 @@ export default function EstimadorLegitimas() {
       {/* 5. Mejores Prácticas */}
       <div className={styles.tipsGrid}>
         <div className={styles.tipCard}>
-          <div className={styles.tipIcon}>📜</div>
+          <div className={styles.tipIcon} aria-hidden="true">📜</div>
           <strong>Haz testamento cuanto antes</strong>
           <p>Sin testamento, se aplica la herencia intestada. Puede diferir mucho de lo que se desea. Un testamento notarial cuesta entre 50-150 € y da total seguridad jurídica.</p>
         </div>
         <div className={styles.tipCard}>
-          <div className={styles.tipIcon}>🔄</div>
+          <div className={styles.tipIcon} aria-hidden="true">🔄</div>
           <strong>Actualiza el testamento ante cambios</strong>
           <p>Nacimiento de nuevos herederos, fallecimiento de beneficiarios, cambios patrimoniales significativos o divorcio son razones para revisar y actualizar el testamento.</p>
         </div>
         <div className={styles.tipCard}>
-          <div className={styles.tipIcon}>💡</div>
+          <div className={styles.tipIcon} aria-hidden="true">💡</div>
           <strong>Aprovecha el tercio de mejora</strong>
           <p>En derecho común, el tercio de mejora permite al testador asignar una porción adicional a uno o varios descendientes —típicamente para compensar situaciones como discapacidad, dedicación al cuidado o circunstancias particulares— dentro de los límites legales. La conveniencia depende de cada caso familiar.</p>
         </div>
         <div className={styles.tipCard}>
-          <div className={styles.tipIcon}>🏦</div>
+          <div className={styles.tipIcon} aria-hidden="true">🏦</div>
           <strong>Usa seguros de vida para beneficiar al cónyuge</strong>
           <p>El seguro de vida no forma parte de la herencia. Es una herramienta eficiente para dejar capital al cónyuge sin afectar a las legítimas de los hijos.</p>
         </div>
         <div className={styles.tipCard}>
-          <div className={styles.tipIcon}>⚖️</div>
+          <div className={styles.tipIcon} aria-hidden="true">⚖️</div>
           <strong>Consulta la normativa de tu CCAA</strong>
           <p>Las diferencias entre territorios forales y comunes son enormes. Un abogado o notario especializado en derecho sucesorio de tu CCAA es imprescindible para una planificación correcta.</p>
         </div>
         <div className={styles.tipCard}>
-          <div className={styles.tipIcon}>📊</div>
+          <div className={styles.tipIcon} aria-hidden="true">📊</div>
           <strong>Planifica con antelación las donaciones</strong>
           <p>Las donaciones en vida a herederos forzosos se imputan a la legítima. Planificar bien evita que un hijo reciba doblemente o que otro se sienta perjudicado.</p>
         </div>

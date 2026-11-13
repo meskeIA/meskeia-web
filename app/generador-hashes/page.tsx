@@ -676,28 +676,28 @@ export default function GeneradorHashesPage() {
           <h2><span aria-hidden="true">💡</span> Cuándo usar cada algoritmo</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📦</span>
+              <span className={styles.tipIcon} aria-hidden="true">📦</span>
               <div>
                 <strong>SHA-256 para verificación de descargas</strong>
                 <p>Cuando descargas software, compara el SHA-256 publicado en la web oficial con el hash del archivo descargado. Si coinciden, el archivo no ha sido modificado.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔒</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔒</span>
               <div>
                 <strong>SHA-512 para datos muy sensibles</strong>
                 <p>Documentos legales, datos médicos o claves criptográficas merecen el mayor nivel de seguridad disponible. SHA-512 ofrece 512 bits de resistencia a colisiones.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📝</span>
+              <span className={styles.tipIcon} aria-hidden="true">📝</span>
               <div>
                 <strong>MD5 solo para checksums rápidos</strong>
                 <p>Si simplemente necesitas detectar corrupción accidental de archivos (no ataques intencionados), MD5 sigue siendo útil por su velocidad y amplia compatibilidad.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔏</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔏</span>
               <div>
                 <strong>Git usa SHA-1 (migra a SHA-256)</strong>
                 <p>Los repositorios Git identifican cada commit por su SHA-1. GitHub y Git 2.29+ ya soportan SHA-256. Si trabajas en proyectos de seguridad, considera migrar a SHA-256.</p>

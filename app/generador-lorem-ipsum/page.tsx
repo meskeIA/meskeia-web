@@ -351,22 +351,22 @@ export default function GeneradorLoremIpsumPage() {
             <h3><span aria-hidden="true">💡</span> Tips para Usar Texto de Relleno Eficientemente</h3>
             <div className={styles.tipsGrid}>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>🔍</span>
+                <span className={styles.tipIcon} aria-hidden="true">🔍</span>
                 <h4>Busca Lorem antes de publicar</h4>
                 <p>Antes de cada deploy, haz una búsqueda global de &quot;lorem&quot; en tu proyecto. En VSCode: Ctrl+Shift+F. Configura un linter o hook de pre-commit que detecte automáticamente texto de relleno.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>📏</span>
+                <span className={styles.tipIcon} aria-hidden="true">📏</span>
                 <h4>Pide la cantidad correcta</h4>
                 <p>Para una tarjeta de producto pide 1-2 frases. Para un artículo de blog, 3-5 párrafos. Para un textarea de formulario, 50-100 caracteres. Usar más de lo necesario da una falsa sensación de diseño espacioso.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>🌐</span>
+                <span className={styles.tipIcon} aria-hidden="true">🌐</span>
                 <h4>Usa placeholder real cuando puedas</h4>
                 <p>Si ya tienes algún fragmento del contenido real, úsalo en lugar de Lorem Ipsum. Detectarás antes problemas de longitud de texto, caracteres especiales o idioma que el Lorem Ipsum no revelaría.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>⚡</span>
+                <span className={styles.tipIcon} aria-hidden="true">⚡</span>
                 <h4>Shortcut en editores</h4>
                 <p>En VSCode y muchos editores: escribe <code>lorem</code> y pulsa Tab para generar un párrafo. En Emmet: <code>lorem30</code> genera 30 palabras. En WordPress Gutenberg: el bloque de texto tiene generador integrado.</p>
               </div>
@@ -376,7 +376,7 @@ export default function GeneradorLoremIpsumPage() {
           {/* SECCIÓN 6: Warning Box */}
           <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
-              <span className={styles.warningIcon}>⚠️</span>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               <h3>Errores Comunes con el Texto de Relleno</h3>
             </div>
             <ul className={styles.warningList}>

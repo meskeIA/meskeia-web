@@ -631,7 +631,7 @@ export default function EstimadorCuotaAutonomoPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🎨</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🎨</span>
                 <div>
                   <strong>Freelance diseñador gráfico</strong>
                   <span>18.000 € rendimiento neto/año</span>
@@ -650,7 +650,7 @@ export default function EstimadorCuotaAutonomoPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>💼</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">💼</span>
                 <div>
                   <strong>Consultora independiente</strong>
                   <span>48.000 € rendimiento neto/año</span>
@@ -669,7 +669,7 @@ export default function EstimadorCuotaAutonomoPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🏢</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏢</span>
                 <div>
                   <strong>Autónomo societario</strong>
                   <span>&gt; 6.000 €/mes de rendimiento computable</span>
@@ -688,7 +688,7 @@ export default function EstimadorCuotaAutonomoPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🆕</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🆕</span>
                 <div>
                   <strong>Nuevo autónomo con tarifa plana</strong>
                   <span>Primer alta en el RETA</span>
@@ -906,7 +906,7 @@ export default function EstimadorCuotaAutonomoPage() {
           <div className={styles.tipsGrid}>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📅</span>
+              <span className={styles.tipIcon} aria-hidden="true">📅</span>
               <h4>Lleva contabilidad mensual</h4>
               <p>
                 Registra ingresos y gastos cada mes, no al final del año. Así puedes ajustar la base a tiempo
@@ -916,7 +916,7 @@ export default function EstimadorCuotaAutonomoPage() {
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>⏰</span>
+              <span className={styles.tipIcon} aria-hidden="true">⏰</span>
               <h4>No esperes a diciembre para ajustar</h4>
               <p>
                 Si en octubre ves que has ingresado el doble de lo previsto, ajusta la base en noviembre.
@@ -926,7 +926,7 @@ export default function EstimadorCuotaAutonomoPage() {
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🧾</span>
+              <span className={styles.tipIcon} aria-hidden="true">🧾</span>
               <h4>Guarda todas las facturas de gastos</h4>
               <p>
                 Los gastos deducibles reducen el rendimiento neto y, por tanto, el tramo de cotización.
@@ -936,7 +936,7 @@ export default function EstimadorCuotaAutonomoPage() {
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>👶</span>
+              <span className={styles.tipIcon} aria-hidden="true">👶</span>
               <h4>Sube la base antes de pedir maternidad/paternidad</h4>
               <p>
                 La prestación por nacimiento se calcula sobre la <strong>base reguladora de los 6 meses anteriores</strong>.
@@ -946,7 +946,7 @@ export default function EstimadorCuotaAutonomoPage() {
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔍</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔍</span>
               <h4>Consulta tu historial en la sede de la SS</h4>
               <p>
                 En <strong>sede.seg-social.gob.es</strong> puedes consultar tu vida laboral, bases cotizadas históricas
@@ -956,7 +956,7 @@ export default function EstimadorCuotaAutonomoPage() {
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔄</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔄</span>
               <h4>Si tienes pluriactividad, revisa la bonificación</h4>
               <p>
                 Si cotizas al mismo tiempo como asalariado y como autónomo, puede aplicar la

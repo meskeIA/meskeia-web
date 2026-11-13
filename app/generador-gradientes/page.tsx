@@ -448,7 +448,7 @@ export default function GeneradorGradientesPage() {
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>🖥️</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🖥️</span>
               <strong>Diseñador Web</strong>
             </div>
             <p>Crea gradientes para fondos de hero sections, botones call-to-action y separadores de secciones que combinen con la paleta de marca.</p>
@@ -456,7 +456,7 @@ export default function GeneradorGradientesPage() {
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>📱</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">📱</span>
               <strong>Desarrollador Frontend</strong>
             </div>
             <p>Genera código CSS listo para copiar y pegar en proyectos React, Vue o Angular. Compatibilidad garantizada con navegadores modernos.</p>
@@ -464,7 +464,7 @@ export default function GeneradorGradientesPage() {
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>🎓</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🎓</span>
               <strong>Estudiante de Diseño</strong>
             </div>
             <p>Experimenta con teoría del color y transiciones para entender cómo los gradientes afectan la percepción visual y la jerarquía de la información.</p>
@@ -472,7 +472,7 @@ export default function GeneradorGradientesPage() {
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>🛍️</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🛍️</span>
               <strong>Emprendedor / Marketing</strong>
             </div>
             <p>Diseña gradientes para banners de redes sociales, fondos de presentaciones y materiales de marca con aspecto profesional sin contratar diseñador.</p>
@@ -550,32 +550,32 @@ export default function GeneradorGradientesPage() {
         {/* 5. TIPS GRID */}
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcono}>🎯</span>
+            <span className={styles.tipIcono} aria-hidden="true">🎯</span>
             <strong>Regla 60-30-10</strong>
             <p>Aplica el color dominante al 60%, el secundario al 30% y el de acento al 10%. Esta proporción crea gradientes equilibrados.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcono}>🌡️</span>
+            <span className={styles.tipIcono} aria-hidden="true">🌡️</span>
             <strong>Temperatura de color</strong>
             <p>Los gradientes cálidos (naranja→amarillo) transmiten energía y urgencia. Los fríos (azul→violeta) comunican calma y profesionalidad.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcono}>📐</span>
+            <span className={styles.tipIcono} aria-hidden="true">📐</span>
             <strong>Ángulos que funcionan</strong>
             <p>Los ángulos 45°, 135° y 160° son los más usados en diseño profesional. Evita 0° y 90° exactos salvo en diseños muy geométricos.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcono}>🔁</span>
+            <span className={styles.tipIcono} aria-hidden="true">🔁</span>
             <strong>Gradientes repetitivos</strong>
             <p>Con <code>repeating-linear-gradient</code> puedes crear patrones de rayas sin imágenes. Ideal para texturas de fondo sutiles.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcono}>🌓</span>
+            <span className={styles.tipIcono} aria-hidden="true">🌓</span>
             <strong>Dark mode</strong>
             <p>Los gradientes oscuros deben tener menos saturación que sus equivalentes en modo claro. Un azul vibrante en claro se convierte en un azul apagado en oscuro.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcono}>💾</span>
+            <span className={styles.tipIcono} aria-hidden="true">💾</span>
             <strong>Variables CSS</strong>
             <p>Define tus colores de gradiente como custom properties: <code>--grad-start</code> y <code>--grad-end</code>. Así puedes cambiar el tema sin reescribir todos los gradientes.</p>
           </div>

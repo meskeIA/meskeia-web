@@ -538,7 +538,7 @@ export default function GeneradorContrasenas() {
             <div className={styles.escenariosGrid}>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>🏦</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">🏦</span>
                   <h3>Cuenta bancaria online</h3>
                 </div>
                 <p className={styles.escenarioExample}>
@@ -549,7 +549,7 @@ export default function GeneradorContrasenas() {
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>📧</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">📧</span>
                   <h3>Email principal (cuenta maestra)</h3>
                 </div>
                 <p className={styles.escenarioExample}>
@@ -560,7 +560,7 @@ export default function GeneradorContrasenas() {
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>🎮</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">🎮</span>
                   <h3>Cuenta de videojuegos / streaming</h3>
                 </div>
                 <p className={styles.escenarioExample}>
@@ -571,7 +571,7 @@ export default function GeneradorContrasenas() {
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>💼</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">💼</span>
                   <h3>Acceso VPN / cuentas corporativas</h3>
                 </div>
                 <p className={styles.escenarioExample}>
@@ -582,7 +582,7 @@ export default function GeneradorContrasenas() {
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>☁️</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">☁️</span>
                   <h3>Servicios cloud (AWS, Google Cloud)</h3>
                 </div>
                 <p className={styles.escenarioExample}>
@@ -593,7 +593,7 @@ export default function GeneradorContrasenas() {
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>🏠</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">🏠</span>
                   <h3>WiFi doméstica y router</h3>
                 </div>
                 <p className={styles.escenarioExample}>
@@ -729,32 +729,32 @@ export default function GeneradorContrasenas() {
             <h2><span aria-hidden="true">✅</span> Mejores prácticas de seguridad digital</h2>
             <div className={styles.tipsGrid}>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>🔑</span>
+                <span className={styles.tipIcon} aria-hidden="true">🔑</span>
                 <h4>Una contraseña por servicio</h4>
                 <p>Nunca reutilices. Si un sitio sufre una brecha, solo esa cuenta se ve comprometida. Con un gestor, reutilizar no tiene ningún sentido ni ventaja.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>📱</span>
+                <span className={styles.tipIcon} aria-hidden="true">📱</span>
                 <h4>2FA siempre que sea posible</h4>
                 <p>Actívalo en cada servicio que lo ofrezca. Incluso un 2FA por SMS es infinitamente mejor que ninguno. La app TOTP (Authy) es la mejor opción gratuita.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>🎯</span>
+                <span className={styles.tipIcon} aria-hidden="true">🎯</span>
                 <h4>Longitud &gt; Complejidad</h4>
                 <p>&quot;x#Km!&quot; (5 chars) es infinitamente más débil que &quot;correctocaballobateria&quot; (21 chars). La longitud es el factor más importante en la entropía de una contraseña.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>🚨</span>
+                <span className={styles.tipIcon} aria-hidden="true">🚨</span>
                 <h4>Desconfía del phishing</h4>
                 <p>El 80% de robos de cuentas son por phishing, no por fuerza bruta. Verifica siempre la URL antes de introducir credenciales. Los gestores no autocompletarán en dominios falsos.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>📋</span>
+                <span className={styles.tipIcon} aria-hidden="true">📋</span>
                 <h4>Backup de los códigos 2FA</h4>
                 <p>Guarda los códigos de recuperación de cada servicio 2FA en el gestor de contraseñas. Si pierdes el móvil sin estos códigos, perderás acceso permanente a esas cuentas.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>🔍</span>
+                <span className={styles.tipIcon} aria-hidden="true">🔍</span>
                 <h4>Monitorea las filtraciones</h4>
                 <p>Comprueba haveibeenpwned.com mensualmente o activa las alertas de Firefox Monitor. Actuar rápido tras una filtración limita el daño al mínimo.</p>
               </div>

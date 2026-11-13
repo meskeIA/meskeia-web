@@ -1104,7 +1104,7 @@ export default function GuiaHierbasAromaticasPage() {
             <div className={styles.escenariosGrid}>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>🍳</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">🍳</span>
                   <h3>Cocinero casero que quiere ampliar sabores</h3>
                 </div>
                 <div className={styles.escenarioExample}>
@@ -1116,7 +1116,7 @@ export default function GuiaHierbasAromaticasPage() {
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>🪴</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">🪴</span>
                   <h3>Jardinero principiante con balcón o jardín</h3>
                 </div>
                 <div className={styles.escenarioExample}>
@@ -1128,7 +1128,7 @@ export default function GuiaHierbasAromaticasPage() {
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>🌿</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">🌿</span>
                   <h3>Preparar un bouquet garni o ramillete</h3>
                 </div>
                 <div className={styles.escenarioExample}>
@@ -1140,7 +1140,7 @@ export default function GuiaHierbasAromaticasPage() {
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>🍵</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">🍵</span>
                   <h3>Aficionado a infusiones y tés caseros</h3>
                 </div>
                 <div className={styles.escenarioExample}>

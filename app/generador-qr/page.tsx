@@ -1392,32 +1392,32 @@ export default function GeneradorQRPage() {
           <h2>Mejores prácticas y consejos profesionales</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <h4>Contraste alto</h4>
               <p>Usa colores oscuros sobre fondo claro (o viceversa). El contraste mínimo debe ser 40:1 para garantizar legibilidad.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <h4>Margen blanco</h4>
               <p>Deja al menos 4 módulos (cuadrados del QR) de margen blanco alrededor. Esto mejora el reconocimiento de la cámara.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <h4>Superficie plana</h4>
               <p>Evita imprimir QR en superficies curvas o rugosas. Si es inevitable, aumenta el tamaño del QR al menos 30%.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <h4>Prueba antes</h4>
               <p>Siempre prueba el QR con múltiples dispositivos (iOS, Android) y en diferentes condiciones de luz antes de producción masiva.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <h4>CTA claro</h4>
               <p>Incluye texto como &quot;Escanea para...&quot; junto al QR. Los usuarios necesitan saber qué esperar al escanear.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <h4>URLs cortas</h4>
               <p>Usa acortadores (bit.ly, QR.io) para URLs largas. Un QR simple es más rápido de escanear y funciona desde mayor distancia.</p>
             </div>

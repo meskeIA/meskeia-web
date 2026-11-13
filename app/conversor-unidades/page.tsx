@@ -648,7 +648,7 @@ export default function ConversorUnidadesPage() {
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🍳</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🍳</span>
                 <h3>Recetas Internacionales</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -665,7 +665,7 @@ export default function ConversorUnidadesPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>✈️</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">✈️</span>
                 <h3>Viajes a Estados Unidos</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -682,7 +682,7 @@ export default function ConversorUnidadesPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🔬</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🔬</span>
                 <h3>Laboratorio Científico</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -699,7 +699,7 @@ Pipeta solo marca mL
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🏗️</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏗️</span>
                 <h3>Construcción y Arquitectura</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -716,7 +716,7 @@ Pipeta solo marca mL
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🏃</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏃</span>
                 <h3>Deportes y Fitness</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -994,7 +994,7 @@ Cinta USA marca millas
 
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🧠</span>
+              <span className={styles.tipIcon} aria-hidden="true">🧠</span>
               <h3>Memoriza Factores Comunes</h3>
               <p>
                 Algunos factores de conversión aparecen constantemente. Memoriza los más útiles:
@@ -1012,7 +1012,7 @@ Cinta USA marca millas
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔢</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔢</span>
               <h3>Usa Calculadora Científica</h3>
               <p>
                 Para magnitudes derivadas (m², m³, m/s²), necesitas potencias:
@@ -1027,7 +1027,7 @@ Cinta USA marca millas
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🌡️</span>
+              <span className={styles.tipIcon} aria-hidden="true">🌡️</span>
               <h3>Temperatura es Especial</h3>
               <p>
                 Temperatura NO se convierte multiplicando. Necesitas fórmulas:
@@ -1043,7 +1043,7 @@ Cinta USA marca millas
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📏</span>
+              <span className={styles.tipIcon} aria-hidden="true">📏</span>
               <h3>Cuidado con Dimensiones Múltiples</h3>
               <p>
                 Para área (m²) y volumen (m³), el factor se eleva al cuadrado o cubo:
@@ -1058,7 +1058,7 @@ Cinta USA marca millas
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🎯</span>
+              <span className={styles.tipIcon} aria-hidden="true">🎯</span>
               <h3>Redondeo Apropiado por Contexto</h3>
               <p>
                 No uses 10 decimales si no aportan información:
@@ -1074,7 +1074,7 @@ Cinta USA marca millas
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🏢</span>
+              <span className={styles.tipIcon} aria-hidden="true">🏢</span>
               <h3>Respeta el Contexto Profesional</h3>
               <p>
                 Cada industria tiene preferencias:

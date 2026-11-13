@@ -880,7 +880,7 @@ export default function GeneradorAvataresPage() {
             <div className={styles.escenariosGrid}>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>🧑‍💻</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">🧑‍💻</span>
                   <h4>Freelance con presencia online</h4>
                 </div>
                 <p>Un profesional independiente necesita un avatar consistente en LinkedIn, GitHub, Twitter y Behance.</p>
@@ -889,7 +889,7 @@ export default function GeneradorAvataresPage() {
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>🏢</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">🏢</span>
                   <h4>Empresa asignando avatares corporativos</h4>
                 </div>
                 <p>Una empresa quiere que todos sus empleados tengan avatares de perfil coherentes con el branding corporativo.</p>
@@ -898,7 +898,7 @@ export default function GeneradorAvataresPage() {
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>🌐</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">🌐</span>
                   <h4>Comunidad online con identidades anónimas</h4>
                 </div>
                 <p>Foros, comunidades y plataformas donde los usuarios quieren mantener privacidad pero tener identidad visual propia.</p>
@@ -907,7 +907,7 @@ export default function GeneradorAvataresPage() {
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>⚙️</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">⚙️</span>
                   <h4>Desarrollador creando avatares para su plataforma</h4>
                 </div>
                 <p>Un desarrollador necesita avatares por defecto para los usuarios de su app que aún no han subido foto de perfil.</p>
@@ -1018,32 +1018,32 @@ export default function GeneradorAvataresPage() {
             <h2>Mejores prácticas para avatares efectivos</h2>
             <div className={styles.tipsGrid}>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>📐</span>
+                <span className={styles.tipIcon} aria-hidden="true">📐</span>
                 <h4>Tamaño mínimo 400×400px</h4>
                 <p>Por debajo de 400×400 píxeles el avatar se pixela en plataformas que lo muestran ampliado. Genera siempre en 512×512 como mínimo.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>🖼️</span>
+                <span className={styles.tipIcon} aria-hidden="true">🖼️</span>
                 <h4>PNG transparente = máxima versatilidad</h4>
                 <p>El fondo transparente permite usar el avatar sobre cualquier color sin crear un recuadro antiestético. Es el estándar para avatares profesionales.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>📅</span>
+                <span className={styles.tipIcon} aria-hidden="true">📅</span>
                 <h4>Mantén el avatar 6-12 meses mínimo</h4>
                 <p>El reconocimiento de marca se construye con consistencia temporal. Cambiar de avatar con frecuencia confunde a tu audiencia y dificulta que te identifiquen.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>🔄</span>
+                <span className={styles.tipIcon} aria-hidden="true">🔄</span>
                 <h4>Crea versión con y sin fondo</h4>
                 <p>Tener ambas versiones te da flexibilidad para diferentes contextos: fondo blanco para documentos, transparente para redes sociales.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>🌓</span>
+                <span className={styles.tipIcon} aria-hidden="true">🌓</span>
                 <h4>Prueba en fondo claro y oscuro</h4>
                 <p>Las plataformas tienen modo claro y oscuro. Verifica que tu avatar tiene suficiente contraste y es visible en ambos fondos antes de publicarlo.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>🎭</span>
+                <span className={styles.tipIcon} aria-hidden="true">🎭</span>
                 <h4>Adapta el estilo al tono de la plataforma</h4>
                 <p>LinkedIn requiere un tono profesional (foto real o avatar sobrio). Twitter admite más creatividad. Discord y Twitch premian los avatares llamativos y únicos.</p>
               </div>

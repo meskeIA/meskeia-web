@@ -442,7 +442,7 @@ export default function GlosarioFisicaQuimicaPage() {
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🎒</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🎒</span>
                 <h4>Estudiante de secundaria o preparatoria</h4>
               </div>
               <p className={styles.escenarioExample}>
@@ -455,7 +455,7 @@ export default function GlosarioFisicaQuimicaPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🏛️</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏛️</span>
                 <h4>Estudiante universitario de ingeniería</h4>
               </div>
               <p className={styles.escenarioExample}>
@@ -468,7 +468,7 @@ export default function GlosarioFisicaQuimicaPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>📝</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">📝</span>
                 <h4>Opositor / Docente</h4>
               </div>
               <p className={styles.escenarioExample}>
@@ -481,7 +481,7 @@ export default function GlosarioFisicaQuimicaPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🔬</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🔬</span>
                 <h4>Profesional de investigación</h4>
               </div>
               <p className={styles.escenarioExample}>
@@ -628,37 +628,37 @@ export default function GlosarioFisicaQuimicaPage() {
           <h2>6 claves para estudiar ciencias exactas con eficacia</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>⏱️</span>
+              <span className={styles.tipIcon} aria-hidden="true">⏱️</span>
               <h4>Bloques de 45 minutos</h4>
               <p>El cerebro mantiene concentración óptima en física/química durante 45-50 minutos. Estudia en bloques de 45 min + 10 min de pausa activa. Estudiar 3×45 min rinde más que 3 horas continuas con rendimiento decreciente.</p>
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✍️</span>
+              <span className={styles.tipIcon} aria-hidden="true">✍️</span>
               <h4>Escribe las fórmulas a mano</h4>
               <p>Escribir F = m × a o ΔS = Q/T a mano activa áreas motoras del cerebro que refuerzan la memoria. Los estudiantes que copian fórmulas a mano retienen un 30% más que los que solo las leen, según estudios de aprendizaje motor.</p>
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔗</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔗</span>
               <h4>Conecta con la vida real</h4>
               <p>El principio de Arquímedes explica por qué flota un barco de acero de 200.000 toneladas. La ley de Ohm está detrás del fusible de tu casa. La presión osmótica es por qué la lechuga se mustia con sal. Los ejemplos cotidianos multiplican la retención.</p>
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>👥</span>
+              <span className={styles.tipIcon} aria-hidden="true">👥</span>
               <h4>Explica en voz alta</h4>
               <p>La técnica Feynman: intenta explicar un concepto como si se lo contaras a alguien de 12 años. Si no puedes explicar la entropía sin fórmulas, todavía no la has entendido. Los estudiantes que enseñan a otros retienen el 90% del contenido frente al 10% de solo leer.</p>
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📐</span>
+              <span className={styles.tipIcon} aria-hidden="true">📐</span>
               <h4>Usa análisis dimensional siempre</h4>
               <p>Antes de calcular, comprueba que las unidades son coherentes. Si quieres obtener velocidad (m/s) y el resultado te da kg·m, hay un error. Este hábito, aplicado en todos los problemas, detecta el 40% de los errores sin resolver la ecuación completa.</p>
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🗓️</span>
+              <span className={styles.tipIcon} aria-hidden="true">🗓️</span>
               <h4>Repaso espaciado (curva del olvido)</h4>
               <p>Repasa cada concepto nuevo al día siguiente, a los 3 días, a los 7 días y a los 21 días. Este patrón (basado en la curva de Ebbinghaus) mantiene el 80% de la información en la memoria a largo plazo frente al 20% sin repaso. Usa el glosario para los repasos breves de 5 minutos.</p>
             </div>

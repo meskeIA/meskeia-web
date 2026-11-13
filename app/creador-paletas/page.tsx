@@ -501,7 +501,7 @@ export default function CreadorPaletasPage() {
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🌐</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🌐</span>
                 <h3>Diseñador / Desarrollador web</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -514,7 +514,7 @@ export default function CreadorPaletasPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🎨</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🎨</span>
                 <h3>Diseñador de identidad de marca</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -527,7 +527,7 @@ export default function CreadorPaletasPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>📱</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">📱</span>
                 <h3>Community Manager / Creador de contenido</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -540,7 +540,7 @@ export default function CreadorPaletasPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🧑‍💻</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🧑‍💻</span>
                 <h3>Desarrollador frontend con proyecto propio</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -702,32 +702,32 @@ export default function CreadorPaletasPage() {
           <h2><span aria-hidden="true">✅</span> Mejores Prácticas de Diseño de Paletas</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📐</span>
+              <span className={styles.tipIcon} aria-hidden="true">📐</span>
               <h4>Aplica la regla 60-30-10</h4>
               <p>60% color dominante (fondos), 30% secundario (secciones, cards), 10% de acento (botones, highlights). Esta proporción garantiza jerarquía visual sin saturar al usuario.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>♿</span>
+              <span className={styles.tipIcon} aria-hidden="true">♿</span>
               <h4>Comprueba WCAG antes de publicar</h4>
               <p>Ratio mínimo 4.5:1 para texto normal, 3:1 para texto grande (+18px). Las normativas de accesibilidad de muchos países lo exigen en webs públicas. Es también buen diseño.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🌓</span>
+              <span className={styles.tipIcon} aria-hidden="true">🌓</span>
               <h4>Diseña siempre el dark mode desde el principio</h4>
               <p>Añadir dark mode después es costoso. Define desde el inicio los valores para fondo oscuro, texto sobre oscuro y primario en oscuro. Los tonos 600-700 suelen funcionar bien en ambos modos.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🎯</span>
+              <span className={styles.tipIcon} aria-hidden="true">🎯</span>
               <h4>Un color = un significado semántico</h4>
               <p>El rojo es error, el verde es éxito, el amarillo es advertencia. No uses el rojo de tu marca para mensajes de error si tu marca es roja. Distingue colores de marca de colores funcionales.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔢</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔢</span>
               <h4>Usa la escala 100-900 en código, no HEX directos</h4>
               <p>Referencia <code>--color-primary-700</code> en lugar de <code>#2E86AB</code> directamente. Si el cliente cambia de azul a verde, solo editas la paleta, no todos los componentes.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🖨️</span>
+              <span className={styles.tipIcon} aria-hidden="true">🖨️</span>
               <h4>Prueba la paleta en gris antes de aprobarla</h4>
               <p>Desatura la paleta al 100% gris y verifica que el diseño sigue siendo legible y con jerarquía clara. Si funciona en gris, funcionará en color y será accesible para daltónicos.</p>
             </div>

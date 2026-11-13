@@ -161,7 +161,7 @@ export default function GuiaInvertirPage() {
               <h3 className={styles.journeyTitle}>{step.title}</h3>
               <p className={styles.journeyDescription}>{step.description}</p>
               <div className={styles.journeyTip}>
-                <span className={styles.tipIcon}>💡</span>
+                <span className={styles.tipIcon} aria-hidden="true">💡</span>
                 <span>{step.tip}</span>
               </div>
             </div>

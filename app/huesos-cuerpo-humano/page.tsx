@@ -482,7 +482,7 @@ export default function HuesosCuerpoHumanoPage() {
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🎓</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🎓</span>
                 <h3>Estudiante de secundaria o preparatoria</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -495,7 +495,7 @@ export default function HuesosCuerpoHumanoPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🩺</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🩺</span>
                 <h3>Estudiante de Medicina o Fisioterapia</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -508,7 +508,7 @@ export default function HuesosCuerpoHumanoPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>💪</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">💪</span>
                 <h3>Entrenador personal o deportista</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -521,7 +521,7 @@ export default function HuesosCuerpoHumanoPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>👨‍🏫</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">👨‍🏫</span>
                 <h3>Docente de Biología</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -692,32 +692,32 @@ export default function HuesosCuerpoHumanoPage() {
           <h2><span aria-hidden="true">✅</span> Mejores Prácticas para Estudiar Anatomía Ósea</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔗</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔗</span>
               <h4>Aprende huesos en contexto, no en listas</h4>
               <p>Estudia el húmero junto con el hombro y el codo, no de forma aislada. El contexto anatómico facilita la comprensión y la retención.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>↔️</span>
+              <span className={styles.tipIcon} aria-hidden="true">↔️</span>
               <h4>Usa el par/impar para recordar cantidades</h4>
               <p>Huesos pares (×2): costillas, clavículas, radios, cúbitos, fémures. Impares: esternón, hioides, sacro, cóccix. Reduce los errores de conteo en exámenes.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🎯</span>
+              <span className={styles.tipIcon} aria-hidden="true">🎯</span>
               <h4>Asocia la función al tipo antes de memorizar</h4>
               <p>Si sabes que los huesos planos protegen órganos, recordarás que el cráneo, el esternón y las costillas son planos sin memorizarlo. La lógica supera la memoria.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🩹</span>
+              <span className={styles.tipIcon} aria-hidden="true">🩹</span>
               <h4>Relaciona cada hueso con su fractura típica</h4>
               <p>Caída con mano extendida → radio distal. Caída lateral en deporte → clavícula. Osteoporosis → cuello femoral y vértebras. Esto fija el hueso en la memoria a largo plazo.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🧠</span>
+              <span className={styles.tipIcon} aria-hidden="true">🧠</span>
               <h4>Usa la regla 7-12-5 para la columna</h4>
               <p>7 cervicales (hora del desayuno), 12 torácicas (hora de la comida), 5 lumbares (hora de la cena). Mnemotécnica clásica que ningún estudiante de medicina olvida.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📱</span>
+              <span className={styles.tipIcon} aria-hidden="true">📱</span>
               <h4>Repaso activo con los filtros de la app</h4>
               <p>Filtra por región, tapa los nombres con el dedo y recítalos de memoria. El repaso activo retiene 3 veces más que la relectura pasiva según estudios de aprendizaje.</p>
             </div>
