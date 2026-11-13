@@ -513,3 +513,16 @@ test('pie de la comparativa: «a un particular, con IVA español» salva los ser
   expect(jsonLd).toContain('IVA español');
   expect(jsonLd).toMatch(/servicios electr[óo]nicos/);
 });
+
+// C0570 (13/11/2026): «¿Quién está exento de aplicar IVA?» estaba en las dos FAQ con otra redacción
+// («en España» de más en el FAQPage) y dos respuestas: la del FAQPage escribía la lista a mano. Ahora
+// una constante de metadata.ts con la lista de EXENCIONES_ART20 (art. 20 LIVA).
+test('C0570 · los exentos del art. 20 se contestan igual en la FAQ visible y en el FAQPage', async ({ page }) => {
+  const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+  const faq = JSON.parse(bloques.find((t) => t.includes('"FAQPage"')) ?? '{}') as { mainEntity?: { name: string; acceptedAnswer: { text: string } }[] };
+  const enLd = faq.mainEntity?.find((q) => /exento de aplicar IVA/.test(q.name))?.acceptedAnswer.text ?? '';
+  const visible = (await page.locator('dt', { hasText: '¿Quién está exento de aplicar IVA?' }).locator('xpath=following-sibling::dd[1]').textContent()) ?? '';
+  expect(enLd).not.toBe('');
+  expect(limpiar(visible)).toBe(limpiar(enLd));
+  expect(enLd).toContain('sanidad, educación reglada, operaciones financieras, seguros, alquiler de vivienda y servicios postales');
+});

@@ -421,6 +421,20 @@ test('CASO 16 · hallazgo 1316: el FAQPage publica la escala que aplica la app, 
   expect(faq).toContain('23,62 %');
 });
 
+test('C0570 (13/11/2026) · «tipo marginal y tipo efectivo» se contesta igual en la FAQ visible y en el FAQPage', async ({ page }) => {
+  // Antes cada una tenía su ejemplo: 40.000 € en el FAQPage y 35.200 € (el corte de un tramo) en
+  // la visible. Ahora una constante de metadata.ts: 40.000 €, marginal 37 %, efectivo 23,62 % y
+  // cuota 10.501,50 − 1.054,50 = 9447 € (escala con el mínimo a tipo cero, art. 63.1.2.º LIRPF).
+  const bloques = await page.locator('script[type="application/ld+json"]').allTextContents();
+  const faq = JSON.parse(bloques.find((t) => t.includes('"FAQPage"')) ?? '{}') as { mainEntity?: { name: string; acceptedAnswer: { text: string } }[] };
+  const enLd = faq.mainEntity?.find((q) => /tipo marginal y tipo efectivo/.test(q.name))?.acceptedAnswer.text ?? '';
+  const visible = (await page.locator('h4', { hasText: '¿Qué diferencia hay entre tipo marginal y tipo efectivo?' }).locator('xpath=following-sibling::p[1]').textContent()) ?? '';
+  expect(enLd).not.toBe('');
+  expect(visible.replace(/\s+/g, ' ').trim()).toBe(enLd.replace(/\s+/g, ' ').trim());
+  // Con cuatro cifras no se agrupa (RAE 2010, como Intl en es-ES): 9447, no 9.447
+  expect(visible).toContain('9447 € de cuota');
+});
+
 test('CASO 17 · hallazgo 1317: la tabla educativa de tramos sale de TRAMOS_IRPF_2025', async ({ page }) => {
   const tabla = page.locator('table[class*="tramosOrientativos"]').first();
   const filas = tabla.locator('tbody tr');

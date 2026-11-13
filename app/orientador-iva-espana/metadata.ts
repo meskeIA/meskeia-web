@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
-import { PORCENTAJES_IVA } from '@/data/fiscal';
+import { PORCENTAJES_IVA, EXENCIONES_ART20 } from '@/data/fiscal';
 
 export const metadata: Metadata = {
   title: 'Orientador del IVA en España: qué IVA aplicar en cada operación - meskeIA',
@@ -71,6 +71,14 @@ export const RESPUESTA_FAQ_EXPORTACIONES =
 export const RESPUESTA_FAQ_INVERSION =
   'Es un mecanismo por el que quien declara el IVA no es el vendedor, sino el comprador. El vendedor factura sin IVA y el comprador lo «autorrepercute»: lo declara a la vez como IVA devengado y soportado, con efecto neto cero si es deducible. Se aplica en adquisiciones intracomunitarias, servicios recibidos de empresas extranjeras y algunas operaciones interiores como ejecuciones de obra inmobiliaria o entregas de chatarra.';
 
+// La cuarta, «¿Quién está exento de aplicar IVA?» (C0570, 13/11/2026, con otra redacción en cada
+// sitio): el JSON-LD escribía la lista a mano y la visible la sacaba de EXENCIONES_ART20; ahora las
+// dos de data/fiscal, con la misma enumeración que page.tsx.
+const ACTIVIDADES_EXENTAS = EXENCIONES_ART20.map((e) => e.actividad.charAt(0).toLowerCase() + e.actividad.slice(1));
+const LISTA_EXENTAS = `${ACTIVIDADES_EXENTAS.slice(0, -1).join(', ')} y ${ACTIVIDADES_EXENTAS[ACTIVIDADES_EXENTAS.length - 1]}`;
+export const RESPUESTA_FAQ_EXENTOS =
+  `Determinadas actividades están exentas por el art. 20 de la Ley del IVA: ${LISTA_EXENTAS}. Es una exención limitada: no se repercute IVA, pero tampoco se puede deducir el IVA soportado. No debe confundirse con las exportaciones, que sí permiten deducir.`;
+
 // FAQPage JSON-LD — mejora visibilidad en Bing Copilot, ChatGPT, Perplexity y Gemini
 export const faqJsonLd = {
   '@context': 'https://schema.org',
@@ -113,7 +121,7 @@ export const faqJsonLd = {
       name: '¿Quién está exento de aplicar IVA en España?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Determinadas actividades están exentas por el art. 20 de la Ley del IVA: sanidad, educación reglada, operaciones financieras y de seguros, alquiler de vivienda habitual y servicios postales. Es una exención limitada: no se repercute IVA pero tampoco se puede deducir el IVA soportado. No debe confundirse con las exportaciones, que sí permiten deducir.',
+        text: RESPUESTA_FAQ_EXENTOS,
       },
     },
   ],

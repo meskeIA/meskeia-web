@@ -22,7 +22,7 @@ import {
   UMBRAL_OSS,
   FISCAL_IVA_META,
 } from '@/data/fiscal';
-import { RESPUESTA_FAQ_EXPORTACIONES, RESPUESTA_FAQ_INVERSION, RESPUESTA_FAQ_UE } from './metadata';
+import { RESPUESTA_FAQ_EXENTOS, RESPUESTA_FAQ_EXPORTACIONES, RESPUESTA_FAQ_INVERSION, RESPUESTA_FAQ_UE } from './metadata';
 
 // ─── Tipos del selector ────────────────────────────────────────────────────────
 
@@ -946,8 +946,7 @@ export default function OrientadorIvaEspanaPage() {
             <div className={styles.faqItem}>
               <dt>¿Quién está exento de aplicar IVA?</dt>
               <dd>
-                Ciertas actividades del art. 20 LIVA: {LISTA_EXENCIONES}. Es una exención <strong>limitada</strong>: no se repercute IVA, pero tampoco se puede deducir el soportado. No se
-                debe confundir con las exportaciones, que sí permiten deducir.
+                {RESPUESTA_FAQ_EXENTOS}
               </dd>
             </div>
             <div className={styles.faqItem}>

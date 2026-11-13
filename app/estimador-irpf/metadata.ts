@@ -66,7 +66,14 @@ function describirEscala(escala: { hasta: number; tipo: number }[]): string {
 
 const BASE_EJEMPLO = 40000;
 const MARGINAL_EJEMPLO = TRAMOS_IRPF_2025.find((t) => BASE_EJEMPLO <= t.hasta)?.tipo ?? 0;
-const EFECTIVO_EJEMPLO = (calcularCuotaIntegraGeneral(BASE_EJEMPLO, MINIMOS_IRPF_2025.personal) / BASE_EJEMPLO) * 100;
+const CUOTA_EJEMPLO = calcularCuotaIntegraGeneral(BASE_EJEMPLO, MINIMOS_IRPF_2025.personal);
+const EFECTIVO_EJEMPLO = (CUOTA_EJEMPLO / BASE_EJEMPLO) * 100;
+
+// La pregunta está también en la FAQ visible («¿Qué diferencia hay entre tipo marginal y tipo
+// efectivo?»): una sola respuesta para las dos (check:faq-unica, C0570, 13/11/2026). Cada una
+// tenía su propio ejemplo (40.000 € aquí y 35.200 € en page.tsx, justo en el corte de un tramo);
+// se queda este, calculado igual con la escala y el mínimo de data/fiscal, y la cuota de la visible.
+export const RESPUESTA_FAQ_MARGINAL_EFECTIVO = `El tipo marginal es el porcentaje que se aplica al último euro de renta (el del tramo más alto en el que entras). El tipo efectivo es el porcentaje real que pagas sobre toda la base imponible: siempre es inferior al marginal porque los primeros tramos tributan a tipos menores y el mínimo personal tributa a tipo cero. Por ejemplo, con ${eur(BASE_EJEMPLO)} de base el marginal es el ${pct(MARGINAL_EJEMPLO)} y el efectivo, con el mínimo personal de ${eur(MINIMOS_IRPF_2025.personal)}, el ${pct(EFECTIVO_EJEMPLO)} (${eur(CUOTA_EJEMPLO)} de cuota).`;
 const OBLIGACION = OBLIGACION_DECLARAR_2025;
 
 export const faqJsonLd = {
@@ -102,7 +109,7 @@ export const faqJsonLd = {
       name: '¿Qué diferencia hay entre tipo marginal y tipo efectivo del IRPF?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: `El tipo marginal es el porcentaje que se aplica al último euro de renta (el del tramo en que te encuentras). El tipo efectivo es el porcentaje real de impuestos pagados sobre el total de la base: siempre es inferior al marginal porque los primeros tramos tributan a tipos menores y el mínimo personal tributa a tipo cero. Con ${eur(BASE_EJEMPLO)} de base, el marginal es el ${pct(MARGINAL_EJEMPLO)} y el efectivo, con el mínimo de ${eur(MINIMOS_IRPF_2025.personal)}, el ${pct(EFECTIVO_EJEMPLO)}.`,
+        text: RESPUESTA_FAQ_MARGINAL_EFECTIVO,
       },
     },
     {

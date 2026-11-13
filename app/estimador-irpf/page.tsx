@@ -28,6 +28,7 @@ import {
   FRACCIONAMIENTO_IRPF,
 } from '@/data/fiscal';
 import { EJERCICIO, estimarIRPF, type EntradaIRPF, type ResultadoIRPF, type SituacionFamiliar } from './motor';
+import { RESPUESTA_FAQ_MARGINAL_EFECTIVO } from './metadata';
 
 // ─── Ejemplos del bloque educativo ────────────────────────────────────────────
 //
@@ -70,11 +71,6 @@ const NOMBRES_CON_RETENCION = SECCIONES_CON_RETENCION
   .map((s) => s.nombre.replace(/^Actividades /, '').toLowerCase())
   .join(' o ');
 const SECCIONES_CON_RETENCION_TEXTO = SECCIONES_CON_RETENCION.map((s) => s.seccion.replace('ª', '.ª')).join(' y ');
-
-// FAQ del tipo marginal frente al efectivo
-const FAQ_BASE = 35200;
-const FAQ_CUOTA = calcularCuotaIntegraGeneral(FAQ_BASE, MINIMOS_IRPF_2025.personal);
-const FAQ_MARGINAL = TRAMOS_IRPF_2025.find((t) => FAQ_BASE <= t.hasta)?.tipo ?? 0;
 
 // Consejo del plan de pensiones: ahorro de una aportación al tipo marginal de un tramo real
 // de la escala (el tercero, el de las rentas medias), no a un tipo escrito a mano.
@@ -861,7 +857,7 @@ export default function EstimadorIRPFPage() {
             <div className={styles.faqItem}>
               <h4>¿Qué diferencia hay entre tipo marginal y tipo efectivo?</h4>
               <p>
-                El <strong>tipo marginal</strong> es el porcentaje que se aplica al último euro que ganas (el del tramo más alto en el que entras). El <strong>tipo efectivo</strong> es el porcentaje real que pagas sobre toda tu base imponible. Por ejemplo, con una base de {eur0(FAQ_BASE)} tu tipo marginal es el {tipoPct(FAQ_MARGINAL)}, pero tu tipo efectivo es el {pct((FAQ_CUOTA / FAQ_BASE) * 100)} ({eur(FAQ_CUOTA)} de cuota, con el mínimo personal a tipo cero), porque los primeros tramos tributan a tipos menores.
+                {RESPUESTA_FAQ_MARGINAL_EFECTIVO}
               </p>
             </div>
 
