@@ -168,6 +168,11 @@
   font-size: 1.2rem;
   font-weight: 700;
   margin-bottom: var(--spacing-sm);
+  /* Tono de texto de la capa por tema (C0645, 13/11/2026); el color de la capa, en el borde */
+  color: var(--capa-texto, var(--text-primary));
+}
+[data-theme='dark'] .capaPanelTitulo {
+  color: var(--capa-texto-oscuro, var(--text-primary));
 }
 .capaDatos {
   display: grid;
@@ -234,6 +239,21 @@
   height: auto;
   max-height: 280px;
 }
+
+/* Rótulos de las ondas y del campo magnético — cabo C0297 (13/11/2026). Iban en el color puro de su
+   dato: la Onda P en la marca 3,93:1, la S en teal 1,88 sobre el tinte del manto, «Se detiene» en
+   rojo 1,57 sobre el del núcleo, «Zona de sombra» en --text-muted 3,43, el viento solar en ámbar
+   2,06 y las auroras en teal 2,46. Un tono de texto por dato y tema; el color de dato se queda en
+   trazos y formas. El fill por CSS manda sobre el atributo. Medido en
+   tests/contraste-svg-texto.spec.ts. */
+.svgMarca { fill: var(--primary-texto, #26718F); }
+.svgTeal { fill: #1F5F5C; }
+.svgRojo { fill: #6B1515; }
+.svgAmbar { fill: var(--ambar-texto, #8A5A00); }
+.svgTinta { fill: var(--text-primary); }
+[data-theme='dark'] .svgTeal { fill: var(--secondary-texto, #5ABDB9); }
+[data-theme='dark'] .svgRojo { fill: #FCA5A5; }
+[data-theme='dark'] .svgAmbar { fill: #F59E0B; }
 
 .ondasGrid {
   display: grid;

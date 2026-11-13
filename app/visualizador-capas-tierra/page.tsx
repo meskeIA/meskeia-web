@@ -11,6 +11,7 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
+import { rellenoConTinta } from '@/lib/tintaLegible';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -27,7 +28,9 @@ interface CapaInfo {
   estado: string;
   presion: string;
   color: string;
-  colorOscuro: string;
+  /** Tono del título del panel en cada tema (cabo C0645): el color de la capa como texto daba 1,73:1 en el núcleo interno */
+  texto: string;
+  textoOscuro: string;
   detalle: string;
 }
 
@@ -66,7 +69,8 @@ const CAPAS: CapaInfo[] = [
     estado: 'Sólido rígido',
     presion: '0–1 GPa',
     color: '#8B6914',
-    colorOscuro: '#A07D1A',
+    texto: '#6E5310',
+    textoOscuro: '#D4B060',
     detalle: 'La corteza es la capa más fina y la única que hemos podido explorar directamente. Se divide en corteza oceánica (más densa y delgada, formada por basalto) y corteza continental (menos densa y más gruesa, formada por granito). Juntas forman las placas tectónicas.',
   },
   {
@@ -78,7 +82,8 @@ const CAPAS: CapaInfo[] = [
     estado: 'Manto superior rígido + manto inferior viscoso (plástico)',
     presion: '1–140 GPa',
     color: '#D2691E',
-    colorOscuro: '#E8842A',
+    texto: '#9A4A12',
+    textoOscuro: '#F0A060',
     detalle: 'El manto representa el 84% del volumen terrestre. El manto superior es rígido y junto con la corteza forma la litosfera. Debajo, la astenosfera es parcialmente fundida y permite el movimiento de las placas tectónicas. El manto inferior es más viscoso por la enorme presión, y convecciona lentamente a ~2 cm/año.',
   },
   {
@@ -90,7 +95,8 @@ const CAPAS: CapaInfo[] = [
     estado: 'Líquido',
     presion: '140–330 GPa',
     color: '#CC0000',
-    colorOscuro: '#E03030',
+    texto: '#B00000',
+    textoOscuro: '#FF8A80',
     detalle: 'El núcleo externo es la única capa completamente líquida. Su hierro-níquel fundido, al circular por convección, genera corrientes eléctricas que producen el campo magnético terrestre (efecto dinamo). Sin esta capa líquida, la Tierra no tendría campo magnético y sería vulnerable al viento solar.',
   },
   {
@@ -102,7 +108,8 @@ const CAPAS: CapaInfo[] = [
     estado: 'Sólido (por la enorme presión)',
     presion: '330–360 GPa',
     color: '#FFB800',
-    colorOscuro: '#FFCC33',
+    texto: '#8A5A00',
+    textoOscuro: '#FFCC33',
     detalle: 'El núcleo interno está tan caliente como la superficie del Sol (~5.400 °C), pero la presión es tan inmensa (3,6 millones de atmósferas) que el hierro se mantiene sólido. Se descubrió en 1936 por la sismóloga danesa Inge Lehmann al analizar ondas sísmicas que no deberían haber llegado a ciertas estaciones.',
   },
 ];
@@ -201,6 +208,14 @@ function SvgCapasTierra({ capaActiva, onCapaClick }: { capaActiva: string | null
     { id: 'nucleo-interno', r: 38, color: '#FFB800', hoverColor: '#FFD040' },
   ];
 
+  // Cada capa con la tinta que le llega a su rótulo (cabo C0297, 13/11/2026): el blanco daba 1,45:1
+  // sobre el oro del núcleo interno y 3,61 sobre el manto; rellenoConTinta oscurece el relleno solo
+  // si ninguna tinta llega a 4,5 (el rojo claro del núcleo externo activo).
+  const pintura = (id: string) => {
+    const capa = capas.find(c => c.id === id)!;
+    return rellenoConTinta(capaActiva === id ? capa.hoverColor : capa.color);
+  };
+
   return (
     <svg viewBox="0 0 400 220" className={styles.svgCapas} role="img" aria-label="Sección transversal de las capas de la Tierra">
       {/* Arcos semicirculares de fuera a dentro */}
@@ -210,7 +225,7 @@ function SvgCapasTierra({ capaActiva, onCapaClick }: { capaActiva: string | null
           <path
             key={capa.id}
             d={`M ${cx - capa.r} ${cy} A ${capa.r} ${capa.r} 0 0 1 ${cx + capa.r} ${cy} L ${cx - capa.r} ${cy} Z`}
-            fill={activa ? capa.hoverColor : capa.color}
+            fill={pintura(capa.id).relleno}
             stroke={activa ? '#FFFFFF' : 'rgba(255,255,255,0.3)'}
             strokeWidth={activa ? 3 : 1}
             style={{ cursor: 'pointer', transition: 'fill 0.2s' }}
@@ -223,11 +238,12 @@ function SvgCapasTierra({ capaActiva, onCapaClick }: { capaActiva: string | null
         );
       })}
       {/* Etiquetas */}
-      <text x={cx} y={cy - 8} textAnchor="middle" fill="white" fontSize="9" fontWeight="700">Núcleo</text>
-      <text x={cx} y={cy + 3} textAnchor="middle" fill="white" fontSize="8">interno</text>
-      <text x={cx} y={cy - 50} textAnchor="middle" fill="white" fontSize="9" fontWeight="600">Núcleo ext.</text>
-      <text x={cx} y={cy - 120} textAnchor="middle" fill="white" fontSize="10" fontWeight="600">Manto</text>
-      <text x={cx} y={cy - 185} textAnchor="middle" fill="white" fontSize="9" fontWeight="600">Corteza</text>
+      {/* Etiquetas: «Corteza» cae sobre el manto (la corteza es el borde fino de 2 unidades) */}
+      <text x={cx} y={cy - 8} textAnchor="middle" fill={pintura('nucleo-interno').tinta} fontSize="9" fontWeight="700">Núcleo</text>
+      <text x={cx} y={cy + 3} textAnchor="middle" fill={pintura('nucleo-interno').tinta} fontSize="8">interno</text>
+      <text x={cx} y={cy - 50} textAnchor="middle" fill={pintura('nucleo-externo').tinta} fontSize="9" fontWeight="600">Núcleo ext.</text>
+      <text x={cx} y={cy - 120} textAnchor="middle" fill={pintura('manto').tinta} fontSize="10" fontWeight="600">Manto</text>
+      <text x={cx} y={cy - 185} textAnchor="middle" fill={pintura('manto').tinta} fontSize="9" fontWeight="600">Corteza</text>
     </svg>
   );
 }
@@ -246,19 +262,19 @@ function SvgOndasSismicas() {
 
       {/* Onda P (atraviesa todo) */}
       <path d="M 68 55 Q 150 180 200 200 Q 250 180 340 70" fill="none" stroke="#2E86AB" strokeWidth="2.5" strokeDasharray="6,3" />
-      <text x="320" y="55" fill="#2E86AB" fontSize="9" fontWeight="700">Onda P</text>
-      <text x="320" y="67" fill="#2E86AB" fontSize="7">Atraviesa todo</text>
+      <text x="320" y="55" className={styles.svgMarca} fontSize="9" fontWeight="700">Onda P</text>
+      <text x="320" y="67" className={styles.svgMarca} fontSize="7">Atraviesa todo</text>
 
       {/* Onda S (se detiene en núcleo externo) */}
       <path d="M 68 58 Q 130 150 160 170" fill="none" stroke="#48A9A6" strokeWidth="2.5" />
       <circle cx="160" cy="170" r="5" fill="#E74C3C" />
-      <text x="100" y="185" fill="#48A9A6" fontSize="9" fontWeight="700">Onda S</text>
-      <text x="85" y="197" fill="#E74C3C" fontSize="7">Se detiene (líquido)</text>
+      <text x="100" y="185" className={styles.svgTeal} fontSize="9" fontWeight="700">Onda S</text>
+      <text x="85" y="197" className={styles.svgRojo} fontSize="7">Se detiene (líquido)</text>
 
       {/* Zona de sombra */}
       <path d="M 270 55 A 200 200 0 0 0 330 80" fill="none" stroke="#999" strokeWidth="1.5" strokeDasharray="3,3" />
-      <text x="310" y="100" fill="var(--text-muted)" fontSize="8">Zona de</text>
-      <text x="310" y="112" fill="var(--text-muted)" fontSize="8">sombra</text>
+      <text x="310" y="100" className={styles.svgTinta} fontSize="8">Zona de</text>
+      <text x="310" y="112" className={styles.svgTinta} fontSize="8">sombra</text>
 
       {/* Estación sísmica */}
       <rect x="335" y="42" width="12" height="16" fill="var(--text-secondary)" rx="2" />
@@ -298,12 +314,12 @@ function SvgCampoMagnetico() {
           <polygon points="0 0, 6 2, 0 4" fill="#F59E0B" />
         </marker>
       </defs>
-      <text x="380" y="260" textAnchor="middle" fill="#F59E0B" fontSize="9" fontWeight="600">Viento solar</text>
+      <text x="380" y="260" textAnchor="middle" className={styles.svgAmbar} fontSize="9" fontWeight="600">Viento solar</text>
 
       {/* Aurora */}
       <ellipse cx="155" cy="102" rx="12" ry="4" fill="#48A9A6" opacity="0.5" />
       <ellipse cx="205" cy="102" rx="12" ry="4" fill="#48A9A6" opacity="0.5" />
-      <text x="180" y="72" textAnchor="middle" fill="#48A9A6" fontSize="7">Auroras</text>
+      <text x="180" y="72" textAnchor="middle" className={styles.svgTeal} fontSize="7">Auroras</text>
     </svg>
   );
 }
@@ -410,7 +426,10 @@ export default function VisualizadorCapasTierraPage() {
                 role="region"
                 aria-label={`Información de ${capaSeleccionada.nombre}`}
               >
-                <h3 className={styles.capaPanelTitulo} style={{ color: capaSeleccionada.color }}>
+                <h3
+                  className={styles.capaPanelTitulo}
+                  style={{ '--capa-texto': capaSeleccionada.texto, '--capa-texto-oscuro': capaSeleccionada.textoOscuro } as CSSProperties}
+                >
                   {capaSeleccionada.nombre}
                 </h3>
                 <div className={styles.capaDatos}>

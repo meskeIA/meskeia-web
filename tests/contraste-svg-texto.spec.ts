@@ -338,6 +338,11 @@ const APPS: App[] = [
   // #555 (1,73 en oscuro); en la CDN, el blanco sobre los nodos rojos (3,80) y naranjas (2,05) y
   // «España» en #ddd sobre la marca (3,03)
   { slug: 'visualizador-redes-computadoras', secciones: SECCIONES, extremos: true },
+  // 13/11/2026: el blanco sobre el oro del núcleo interno (1,45:1) y sobre el manto (3,61); la Onda P
+  // en la marca (3,93), la S en teal sobre el tinte del manto (1,88), «Se detiene» en rojo sobre el
+  // del núcleo (1,57), «Zona de sombra» en --text-muted (3,43), el viento solar en ámbar (2,06) y
+  // las auroras en teal (2,46) en claro; en oscuro, la Onda P 4,24 y la S 4,10
+  { slug: 'visualizador-capas-tierra', secciones: SECCIONES, subestados: "button[aria-pressed]:not(nav button)" },
 ];
 
 interface TextoSvg {

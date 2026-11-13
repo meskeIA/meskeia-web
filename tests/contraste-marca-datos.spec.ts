@@ -201,6 +201,8 @@ const APPS: App[] = [
   // propio fondo, 1,00:1), el blanco sobre el color de cada capa TCP/IP, de cada paso DNS y de las
   // insignias de registro (el verde claro 1,63, el acento 2,26, el teal 2,80, la marca 4,11)
   { slug: 'visualizador-redes-computadoras', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
+  // 13/11/2026: el título del panel de la capa en su color con style (el núcleo interno en oro, 1,73:1)
+  { slug: 'visualizador-capas-tierra', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
 ];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {
