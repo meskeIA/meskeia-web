@@ -9,6 +9,7 @@ import LegalNotice from '@/components/LegalNotice';
 import RelatedApps from '@/components/RelatedApps';
 import ShareCard from '@/components/ShareCard';
 import EducationalSection from '@/components/EducationalSection';
+import { contraste, rellenoConTinta, rgbDeHex } from '@/lib/tintaLegible';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -167,9 +168,29 @@ const APLICACIONES: AplicacionTerapeutica[] = [
 // SVG: Diagrama mecanismo CRISPR por paso
 // ─────────────────────────────────────────────
 
+// El diagrama tiene su propio fondo claro, igual en los dos temas. Cabo C0297 (13/11/2026): los
+// rótulos en el color de su dato sobre ese fondo (5' y gRNA en #2E86AB 3,89:1, 3' en #48A9A6
+// 2,65:1, PAM y DSB) y el blanco sobre los rellenos de la marca (gRNA 3,51:1, «Paso 1/6» 4,11:1)
+// no llegaban a 4,5:1. El rótulo va en el tono del dato oscurecido lo justo para llegar; el
+// relleno con texto encima, opaco y con la tinta que le llega (rellenoConTinta).
+const FONDO_DIAGRAMA = '#F0F8FC';
+
+function tonoTexto(color: string): string {
+  const rgb = rgbDeHex(color);
+  if (!rgb) return color;
+  for (let k = 0; k <= 1.0001; k += 0.05) {
+    const tono = '#' + rgb.map((c) => Math.round(c * (1 - k)).toString(16).padStart(2, '0')).join('');
+    if (contraste(tono, FONDO_DIAGRAMA) >= 4.6) return tono;
+  }
+  return '#000000';
+}
+
 function SvgMecanismo({ paso }: { paso: number }) {
   // Colores por paso
   const colorActivo = PASOS_CRISPR[paso - 1]?.color ?? '#2E86AB';
+  const activo = rellenoConTinta(colorActivo);
+  const grna = rellenoConTinta(paso === 1 ? '#2E86AB' : '#48A9A6');
+  const pam = rellenoConTinta('#E67E22');
 
   return (
     <svg
@@ -180,7 +201,7 @@ function SvgMecanismo({ paso }: { paso: number }) {
       className={styles.mecanismoSvg}
     >
       {/* Fondo */}
-      <rect width="520" height="300" fill="#f0f8fc" rx="14" />
+      <rect width="520" height="300" fill={FONDO_DIAGRAMA} rx="14" />
 
       {/* ── ADN doble hélice (siempre visible) ── */}
       <path
@@ -202,15 +223,15 @@ function SvgMecanismo({ paso }: { paso: number }) {
       ))}
 
       {/* ── Etiquetas fijas de cadenas ── */}
-      <text x="18" y="78" fontSize="9" fill="#2E86AB" fontWeight="700">5'</text>
-      <text x="18" y="115" fontSize="9" fill="#48A9A6" fontWeight="700">3'</text>
+      <text x="18" y="78" fontSize="9" fill={tonoTexto('#2E86AB')} fontWeight="700">5'</text>
+      <text x="18" y="115" fontSize="9" fill={tonoTexto('#48A9A6')} fontWeight="700">3'</text>
 
       {/* ── Secuencia PAM (visible desde paso 3) ── */}
       {paso >= 3 && (
         <g>
-          <rect x="340" y="60" width="60" height="20" rx="5" fill="#E67E22" opacity={paso === 3 ? 1 : 0.6} />
-          <text x="370" y="74" textAnchor="middle" fontSize="10" fontWeight="800" fill="white">NGG</text>
-          <text x="370" y="55" textAnchor="middle" fontSize="8" fill="#E67E22" fontWeight="700">PAM</text>
+          <rect x="340" y="60" width="60" height="20" rx="5" fill={pam.relleno} opacity={paso === 3 ? 1 : 0.6} />
+          <text x="370" y="74" textAnchor="middle" fontSize="10" fontWeight="800" fill={pam.tinta}>NGG</text>
+          <text x="370" y="55" textAnchor="middle" fontSize="8" fill={tonoTexto('#E67E22')} fontWeight="700">PAM</text>
         </g>
       )}
 
@@ -219,12 +240,12 @@ function SvgMecanismo({ paso }: { paso: number }) {
         <g>
           <rect
             x="80" y="145" width="200" height="28" rx="8"
-            fill={paso === 1 ? '#2E86AB' : '#48A9A6'} opacity="0.9"
+            fill={grna.relleno}
           />
-          <text x="180" y="163" textAnchor="middle" fontSize="11" fontWeight="700" fill="white">
+          <text x="180" y="163" textAnchor="middle" fontSize="11" fontWeight="700" fill={grna.tinta}>
             gRNA — 5'-NNNNNNNNNNNNNNNNNNNN-3'
           </text>
-          <text x="30" y="163" fontSize="9" fill="#2E86AB" fontWeight="600">gRNA</text>
+          <text x="30" y="163" fontSize="9" fill={tonoTexto('#2E86AB')} fontWeight="600">gRNA</text>
         </g>
       )}
 
@@ -232,10 +253,10 @@ function SvgMecanismo({ paso }: { paso: number }) {
       {paso >= 2 && (
         <g>
           <ellipse cx="260" cy="210" rx="75" ry="48"
-            fill={colorActivo} opacity="0.85"
+            fill={activo.relleno}
           />
-          <text x="260" y="206" textAnchor="middle" fontSize="12" fontWeight="800" fill="white">Cas9</text>
-          <text x="260" y="222" textAnchor="middle" fontSize="9" fill="white" opacity="0.9">
+          <text x="260" y="206" textAnchor="middle" fontSize="12" fontWeight="800" fill={activo.tinta}>Cas9</text>
+          <text x="260" y="222" textAnchor="middle" fontSize="9" fill={activo.tinta}>
             {paso === 2 ? 'Complejo RNP activo' :
              paso === 3 ? 'Buscando PAM...' :
              paso === 4 ? 'Reconociendo diana' :
@@ -258,7 +279,7 @@ function SvgMecanismo({ paso }: { paso: number }) {
       {paso >= 5 && (
         <g>
           <line x1="310" y1="60" x2="310" y2="130" stroke="#E74C3C" strokeWidth="3" strokeDasharray="6 3" />
-          <text x="318" y="78" fontSize="9" fill="#E74C3C" fontWeight="700">DSB</text>
+          <text x="318" y="78" fontSize="9" fill={tonoTexto('#E74C3C')} fontWeight="700">DSB</text>
           <polygon points="302,75 310,65 318,75" fill="#E74C3C" />
           <polygon points="302,115 310,125 318,115" fill="#E74C3C" />
         </g>
@@ -268,19 +289,20 @@ function SvgMecanismo({ paso }: { paso: number }) {
       {paso === 6 && (
         <g>
           <rect x="30" y="245" width="180" height="40" rx="8" fill="rgba(231,76,60,0.12)" stroke="#E74C3C" strokeWidth="1.5" />
-          <text x="120" y="263" textAnchor="middle" fontSize="10" fontWeight="700" fill="#c0392b">NHEJ</text>
-          <text x="120" y="277" textAnchor="middle" fontSize="9" fill="#c0392b">Indels → Knockout</text>
+          {/* Sobre el tinte de su caja, #c0392b y #1a7a46 se quedaban en 4,31 y 4,41:1 */}
+          <text x="120" y="263" textAnchor="middle" fontSize="10" fontWeight="700" fill="#A93226">NHEJ</text>
+          <text x="120" y="277" textAnchor="middle" fontSize="9" fill="#A93226">Indels → Knockout</text>
 
           <rect x="230" y="245" width="180" height="40" rx="8" fill="rgba(39,174,96,0.12)" stroke="#27AE60" strokeWidth="1.5" />
-          <text x="320" y="263" textAnchor="middle" fontSize="10" fontWeight="700" fill="#1a7a46">HDR</text>
-          <text x="320" y="277" textAnchor="middle" fontSize="9" fill="#1a7a46">Precisión → Corrección</text>
+          <text x="320" y="263" textAnchor="middle" fontSize="10" fontWeight="700" fill="#156B3D">HDR</text>
+          <text x="320" y="277" textAnchor="middle" fontSize="9" fill="#156B3D">Precisión → Corrección</text>
         </g>
       )}
 
       {/* ── Indicador de paso ── */}
-      <rect x="10" y="268" width="65" height="22" rx="6" fill={colorActivo} opacity={paso < 6 ? 1 : 0} />
+      <rect x="10" y="268" width="65" height="22" rx="6" fill={activo.relleno} opacity={paso < 6 ? 1 : 0} />
       {paso < 6 && (
-        <text x="42" y="283" textAnchor="middle" fontSize="10" fontWeight="700" fill="white">Paso {paso}/6</text>
+        <text x="42" y="283" textAnchor="middle" fontSize="10" fontWeight="700" fill={activo.tinta}>Paso {paso}/6</text>
       )}
     </svg>
   );

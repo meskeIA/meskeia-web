@@ -236,6 +236,10 @@ const APPS: App[] = [
   // grises #999 y #888 (2,82-3,24) y, en el embudo, «cadena desplegada», «intermedios» y «nativa»
   // sobre el degradado (2,19-2,58). Las cuatro pestañas de estructura
   { slug: 'visualizador-proteinas-plegamiento', secciones: "[role='tab']", extremos: true },
+  // 13/11/2026: 5' y gRNA en la marca sobre el fondo claro fijo del diagrama (3,89:1), 3' en teal
+  // (2,65), el blanco sobre el gRNA translúcido (3,51) y sobre el indicador de paso (4,11), y en los
+  // pasos 2-6 el blanco sobre Cas9 y el indicador en el color de cada paso. Los seis pasos
+  { slug: 'visualizador-crispr-cas9', subestados: "button[class*='pasoBtn']" },
 ];
 
 interface TextoSvg {
