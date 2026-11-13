@@ -213,9 +213,11 @@
   transition: background 0.2s, color 0.2s;
 }
 
+/* Con el tono de texto del estado (abajo), en oscuro currentColor es claro: encima, el color de la
+   tarjeta y no el blanco (C0645, 13/11/2026) */
 .btnTransicion:hover {
   background: currentColor;
-  color: #fff !important;
+  color: var(--bg-card, #fff) !important;
 }
 
 .btnTransicion:focus-visible {
@@ -880,10 +882,24 @@
   border-color: rgba(72, 169, 166, 0.3);
 }
 
+/* --text-muted sobre el tinte daba 3,94:1 en el «–» de cada bit apagado (C0645, 13/11/2026) */
 [data-theme='dark'] .permisoBit {
   background: rgba(127, 179, 211, 0.12);
-  color: var(--text-muted, #999);
+  color: var(--text-secondary, #B0B0B0);
 }
+
+/* Tono de TEXTO de cada color de dato, para el HTML (color) y los <text> de los SVG (fill, que por
+   CSS manda sobre el atributo) — cabos C0297 y C0645 (13/11/2026). En su color puro, el botón de la
+   transición siguiente (→ LISTO en la marca 3,93:1) y las curvas de page faults (FIFO en ámbar 2,06,
+   LRU en teal 2,78, OPT en la marca 4,07 en claro y 3,31 en oscuro) no se leían, ni los ejes en #999
+   (2,82) ni las transiciones del diagrama en #666 en oscuro (2,37). */
+.tonoMarca { color: var(--primary-texto, #26718F); fill: var(--primary-texto, #26718F); }
+.tonoTeal { color: var(--secondary-texto, #327874); fill: var(--secondary-texto, #327874); }
+.tonoVerde { color: var(--verde-texto, #136E35); fill: var(--verde-texto, #136E35); }
+.tonoAmbar { color: var(--ambar-texto, #8A5A00); fill: var(--ambar-texto, #8A5A00); }
+.tonoGris { color: var(--text-secondary, #666666); fill: var(--text-secondary, #666666); }
+[data-theme='dark'] .tonoVerde { color: #58D68D; fill: #58D68D; }
+[data-theme='dark'] .tonoAmbar { color: #E8A838; fill: #E8A838; }
 
 [data-theme='dark'] .permisoActivo {
   background: var(--secondary-boton);

@@ -192,6 +192,11 @@ const APPS: App[] = [
   // 13/11/2026 (C0645): la fase del potencial de acción en su color con style (el título «Reposo» en
   // #3498db, 3,15:1) y el blanco encima en el botón activo y en el voltaje (3,15 en los dos temas)
   { slug: 'visualizador-sistema-nervioso', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
+  // 13/11/2026 (C0645): el blanco sobre la insignia del estado (NUEVO en teal, 2,80:1) y sobre los
+  // segmentos del mapa de memoria en su color (la marca 4,11, el teal 2,80, el acento 2,26), «→ LISTO»
+  // en la marca (3,93 en claro), el segmento libre en #999 y #666 (2,61 en claro, 2,80 en oscuro) y,
+  // en oscuro, el «–» de los permisos en --text-muted sobre su tinte (3,94)
+  { slug: 'visualizador-sistemas-operativos', todo: true, secciones: "[role='tablist'][aria-label*='ecciones'] [role='tab']" },
 ];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {

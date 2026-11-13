@@ -3,6 +3,20 @@
 
 import { useState, useCallback } from 'react';
 import styles from './SistemasOperativos.module.css';
+import { rellenoConTinta } from '@/lib/tintaLegible';
+import { formatNumber } from '@/lib';
+
+/**
+ * Tono de TEXTO de cada color de dato (cabos C0297 y C0645, 13/11/2026): en el color puro no se
+ * leía ni en el HTML ni en los SVG. El color de dato se queda en bordes, curvas y trazos.
+ */
+const TONO: Record<string, string> = {
+  '#2e86ab': 'tonoMarca',
+  '#48a9a6': 'tonoTeal',
+  '#27ae60': 'tonoVerde',
+  '#e8a838': 'tonoAmbar',
+};
+const tono = (color: string): string => styles[TONO[color.toLowerCase()] ?? 'tonoGris'];
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import LegalNotice from '@/components/LegalNotice';
@@ -182,9 +196,13 @@ function calcularRR(procesos: ProcesoGantt[], quantum: number): { bloques: Bloqu
   const tiemposEspera: number[] = new Array(procesos.length).fill(0);
   const tiemposFinalizacion: number[] = new Array(procesos.length).fill(0);
 
-  const agregarLlegados = () => {
+  // Encola los que ya han llegado, SIN el proceso que acaba de usar la CPU: ese vuelve a la cola
+  // después, detrás de los recién llegados. Hasta el 13/11/2026 entraba aquí y otra vez en el
+  // `else`, así que quedaba dos veces en la cola, se repetía (P1 0-2 y 2-4 con quantum 2), dejaba
+  // bloques de duración cero y contaba dos veces su final: el Gantt acababa antes de 22 ms.
+  const agregarLlegados = (enCurso?: (typeof restantes)[number]) => {
     for (const p of restantes) {
-      if (p.llegadaReal <= tiempo && p.restante > 0 && !cola.includes(p)) {
+      if (p !== enCurso && p.llegadaReal <= tiempo && p.restante > 0 && !cola.includes(p)) {
         cola.push(p);
       }
     }
@@ -203,7 +221,7 @@ function calcularRR(procesos: ProcesoGantt[], quantum: number): { bloques: Bloqu
     bloques.push({ proceso: actual.nombre, inicio: tiempo, fin: tiempo + ejecutar, color: COLORES_PROCESO[actual.id] });
     tiempo += ejecutar;
     actual.restante -= ejecutar;
-    agregarLlegados();
+    agregarLlegados(actual);
     if (actual.restante === 0) {
       completados++;
       const idx = procesos.findIndex(p => p.id === actual.id);
@@ -394,7 +412,9 @@ export default function VisualizadorSistemasOperativos() {
                       cy={nodo.y}
                       rx={nodo.id === 'ejecucion' ? 72 : 55}
                       ry={22}
-                      fill={estadoProceso === nodo.id ? colorEstado[nodo.id] : '#e8f4f8'}
+                      // El estado activo, opaco con la tinta que le llega: el blanco sobre el
+                      // color puro daba 2,77:1 en NUEVO (C0297)
+                      fill={estadoProceso === nodo.id ? rellenoConTinta(colorEstado[nodo.id]).relleno : '#e8f4f8'}
                       stroke={colorEstado[nodo.id]}
                       strokeWidth={estadoProceso === nodo.id ? 3 : 1.5}
                     />
@@ -404,7 +424,7 @@ export default function VisualizadorSistemasOperativos() {
                       textAnchor="middle"
                       fontSize={nodo.id === 'ejecucion' ? 9 : 10}
                       fontWeight="600"
-                      fill={estadoProceso === nodo.id ? '#fff' : '#333'}
+                      fill={estadoProceso === nodo.id ? rellenoConTinta(colorEstado[nodo.id]).tinta : '#333'}
                     >
                       {nodo.label}
                     </text>
@@ -419,22 +439,22 @@ export default function VisualizadorSistemasOperativos() {
                 </defs>
                 {/* nuevo → listo */}
                 <line x1="115" y1="90" x2="155" y2="68" stroke="#2E86AB" strokeWidth="1.5" markerEnd="url(#arrow)" />
-                <text x="120" y="72" fontSize="8" fill="#666">admit</text>
+                <text x="120" y="72" fontSize="8" className={styles.tonoGris}>admit</text>
                 {/* listo → ejecucion */}
                 <line x1="265" y1="50" x2="308" y2="50" stroke="#2E86AB" strokeWidth="1.5" markerEnd="url(#arrow)" />
-                <text x="270" y="45" fontSize="8" fill="#666">dispatch</text>
+                <text x="270" y="45" fontSize="8" className={styles.tonoGris}>dispatch</text>
                 {/* ejecucion → listo */}
                 <path d="M380,28 Q295,10 210,28" stroke="#E8A838" strokeWidth="1.5" fill="none" markerEnd="url(#arrow)" />
-                <text x="285" y="12" fontSize="8" fill="#666">timeout</text>
+                <text x="285" y="12" fontSize="8" className={styles.tonoGris}>timeout</text>
                 {/* ejecucion → bloqueado */}
                 <line x1="380" y1="72" x2="380" y2="128" stroke="#E8A838" strokeWidth="1.5" markerEnd="url(#arrow)" />
-                <text x="386" y="105" fontSize="8" fill="#666">I/O wait</text>
+                <text x="386" y="105" fontSize="8" className={styles.tonoGris}>I/O wait</text>
                 {/* bloqueado → listo */}
                 <path d="M330,150 Q250,175 210,72" stroke="#48A9A6" strokeWidth="1.5" fill="none" markerEnd="url(#arrow)" />
-                <text x="248" y="175" fontSize="8" fill="#666">I/O complete</text>
+                <text x="248" y="175" fontSize="8" className={styles.tonoGris}>I/O complete</text>
                 {/* ejecucion → terminado */}
                 <line x1="452" y1="65" x2="515" y2="88" stroke="#999" strokeWidth="1.5" markerEnd="url(#arrow)" />
-                <text x="468" y="72" fontSize="8" fill="#666">exit</text>
+                <text x="468" y="72" fontSize="8" className={styles.tonoGris}>exit</text>
               </svg>
             </div>
 
@@ -442,7 +462,13 @@ export default function VisualizadorSistemasOperativos() {
             <div className={styles.estadoControl}>
               <div className={styles.estadoActual} style={{ borderColor: colorEstado[estadoProceso] }}>
                 <span className={styles.estadoLabel}>Estado actual:</span>
-                <span className={styles.estadoBadge} style={{ background: colorEstado[estadoProceso] }}>
+                <span
+                  className={styles.estadoBadge}
+                  style={{
+                    background: rellenoConTinta(colorEstado[estadoProceso]).relleno,
+                    color: rellenoConTinta(colorEstado[estadoProceso]).tinta,
+                  }}
+                >
                   {etiquetaEstado[estadoProceso]}
                 </span>
               </div>
@@ -451,9 +477,9 @@ export default function VisualizadorSistemasOperativos() {
                   <button
                     key={siguiente}
                     type="button"
-                    className={styles.btnTransicion}
+                    className={`${styles.btnTransicion} ${tono(colorEstado[siguiente])}`}
                     onClick={() => setEstadoProceso(siguiente)}
-                    style={{ borderColor: colorEstado[siguiente], color: colorEstado[siguiente] }}
+                    style={{ borderColor: colorEstado[siguiente] }}
                   >
                     → {etiquetaEstado[siguiente]}
                   </button>
@@ -607,17 +633,18 @@ export default function VisualizadorSistemasOperativos() {
                   const ancho = (bloque.fin - bloque.inicio) * 28;
                   return (
                     <g key={i}>
-                      <rect x={x} y={10} width={ancho} height={30} fill={bloque.color} rx={3} />
-                      <text x={x + ancho / 2} y={29} textAnchor="middle" fontSize={10} fill="#fff" fontWeight="600">
+                      {/* Opaco con la tinta que le llega: el blanco sobre el color del proceso daba 2,04-4,11:1 (C0297) */}
+                      <rect x={x} y={10} width={ancho} height={30} fill={rellenoConTinta(bloque.color).relleno} rx={3} />
+                      <text x={x + ancho / 2} y={29} textAnchor="middle" fontSize={10} fill={rellenoConTinta(bloque.color).tinta} fontWeight="600">
                         {bloque.proceso}
                       </text>
-                      <text x={x} y={52} textAnchor="middle" fontSize={8} fill="#666">
+                      <text x={x} y={52} textAnchor="middle" fontSize={8} className={styles.tonoGris}>
                         {bloque.inicio}
                       </text>
                     </g>
                   );
                 })}
-                <text x={tiempoTotal * 28 + 30} y={52} textAnchor="middle" fontSize={8} fill="#666">
+                <text x={tiempoTotal * 28 + 30} y={52} textAnchor="middle" fontSize={8} className={styles.tonoGris}>
                   {tiempoTotal}
                 </text>
               </svg>
@@ -626,15 +653,15 @@ export default function VisualizadorSistemasOperativos() {
             {/* Métricas */}
             <div className={styles.metricasGrid}>
               <div className={styles.metricaCard}>
-                <span className={styles.metricaValor}>{metricas.esperaPromedio.toFixed(1)} ms</span>
+                <span className={styles.metricaValor}>{`${formatNumber(metricas.esperaPromedio, 1)} ms`}</span>
                 <span className={styles.metricaLabel}>Espera promedio</span>
               </div>
               <div className={styles.metricaCard}>
-                <span className={styles.metricaValor}>{metricas.turnaroundPromedio.toFixed(1)} ms</span>
+                <span className={styles.metricaValor}>{`${formatNumber(metricas.turnaroundPromedio, 1)} ms`}</span>
                 <span className={styles.metricaLabel}>Turnaround promedio</span>
               </div>
               <div className={styles.metricaCard}>
-                <span className={styles.metricaValor}>{(metricas.throughput * 10).toFixed(2)}</span>
+                <span className={styles.metricaValor}>{formatNumber(metricas.throughput * 10, 2)}</span>
                 <span className={styles.metricaLabel}>Throughput (proc/10ms)</span>
               </div>
             </div>
@@ -724,19 +751,27 @@ export default function VisualizadorSistemasOperativos() {
                 { label: 'Heap (montón)', color: '#48A9A6', desde: '0.5 GB', hasta: '1.2 GB', desc: 'malloc/new — crece hacia arriba' },
                 { label: 'Datos + BSS', color: '#7FB3D3', desde: '0.2 GB', hasta: '0.5 GB', desc: 'Variables globales e inicializadas' },
                 { label: 'Código (Text)', color: '#6B4FBB', desde: '0.0 GB', hasta: '0.2 GB', desc: 'Instrucciones del programa — solo lectura' },
-              ].map(seg => (
-                <div key={seg.label} className={styles.segmentoMemoria} style={{ background: seg.color === '#e8f4f8' ? undefined : seg.color }}>
-                  <span className={styles.segLabel} style={{ color: seg.color === '#e8f4f8' ? '#666' : '#fff' }}>
-                    {seg.label}
-                  </span>
-                  <span className={styles.segRango} style={{ color: seg.color === '#e8f4f8' ? '#999' : 'rgba(255,255,255,0.8)' }}>
-                    {seg.desde} – {seg.hasta}
-                  </span>
-                  <span className={styles.segDesc} style={{ color: seg.color === '#e8f4f8' ? '#666' : 'rgba(255,255,255,0.85)' }}>
-                    {seg.desc}
-                  </span>
-                </div>
-              ))}
+              ].map(seg => {
+                // El blanco (y el blanco al 80-85 %) sobre el color puro del segmento daba 2,26-4,11:1,
+                // y el libre, #999 y #666 sobre su fondo (2,61 en claro, 2,80 en oscuro) (C0645)
+                const libre = seg.color === '#e8f4f8';
+                const { relleno, tinta } = rellenoConTinta(seg.color);
+                const claseTexto = libre ? styles.tonoGris : '';
+                const estiloTexto = libre ? undefined : { color: tinta };
+                return (
+                  <div key={seg.label} className={styles.segmentoMemoria} style={{ background: libre ? undefined : relleno }}>
+                    <span className={`${styles.segLabel} ${claseTexto}`} style={estiloTexto}>
+                      {seg.label}
+                    </span>
+                    <span className={`${styles.segRango} ${claseTexto}`} style={estiloTexto}>
+                      {seg.desde} – {seg.hasta}
+                    </span>
+                    <span className={`${styles.segDesc} ${claseTexto}`} style={estiloTexto}>
+                      {seg.desc}
+                    </span>
+                  </div>
+                );
+              })}
             </div>
 
             {/* Tabla de páginas simplificada */}
@@ -780,15 +815,15 @@ export default function VisualizadorSistemasOperativos() {
                 {/* Ejes */}
                 <line x1="50" y1="10" x2="50" y2="150" stroke="#ccc" strokeWidth="1.5" />
                 <line x1="50" y1="150" x2="480" y2="150" stroke="#ccc" strokeWidth="1.5" />
-                <text x="25" y="155" fontSize="9" fill="#999">0</text>
-                <text x="10" y="15" fontSize="9" fill="#999" transform="rotate(-90, 10, 80)">Page faults</text>
-                <text x="250" y="168" fontSize="9" fill="#999" textAnchor="middle">Tamaño de RAM (MB)</text>
+                <text x="25" y="155" fontSize="9" className={styles.tonoGris}>0</text>
+                <text x="10" y="15" fontSize="9" className={styles.tonoGris} transform="rotate(-90, 10, 80)">Page faults</text>
+                <text x="250" y="168" fontSize="9" className={styles.tonoGris} textAnchor="middle">Tamaño de RAM (MB)</text>
 
                 {/* Etiquetas eje X */}
                 {[128, 1024, 2048, 4096, 8192].map((ram, i) => {
                   const x = 50 + (i / 4) * 430;
                   return (
-                    <text key={ram} x={x} y={162} fontSize="8" fill="#999" textAnchor="middle">
+                    <text key={ram} x={x} y={162} fontSize="8" className={styles.tonoGris} textAnchor="middle">
                       {ram >= 1024 ? `${ram / 1024}G` : `${ram}M`}
                     </text>
                   );
@@ -808,7 +843,7 @@ export default function VisualizadorSistemasOperativos() {
                   return (
                     <g key={alg}>
                       <polyline points={puntos.join(' ')} fill="none" stroke={colores[algIdx]} strokeWidth="2" />
-                      <text x={460} y={150 - (calcularPageFaults(8192, alg) / maxFaults) * 130} fontSize="9" fill={colores[algIdx]}>
+                      <text x={460} y={150 - (calcularPageFaults(8192, alg) / maxFaults) * 130} fontSize="9" className={tono(colores[algIdx])}>
                         {alg === 'FIFO_MEM' ? 'FIFO' : alg}
                       </text>
                     </g>

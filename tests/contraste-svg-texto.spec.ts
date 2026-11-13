@@ -322,6 +322,16 @@ const APPS: App[] = [
   // potencial de acción, umbral, Despol., Repol. y Refract. en su color (2,17-3,79). Las partes de la
   // neurona, como subestados
   { slug: 'visualizador-sistema-nervioso', secciones: SECCIONES, subestados: "button[aria-pressed]:not(nav button)" },
+  // 13/11/2026: el blanco sobre el estado activo del diagrama (NUEVO en teal, 2,77:1) y sobre los
+  // bloques del Gantt en el color de cada proceso (el ámbar 2,04, el acento 2,29, el teal 2,77, la
+  // marca 4,11), las transiciones y los tiempos en #666 (2,37 en oscuro), los ejes de page faults en
+  // #999 (2,82) y cada curva en su color (FIFO 2,06, LRU 2,78, OPT 4,07 en claro y 3,31 en oscuro)
+  {
+    slug: 'visualizador-sistemas-operativos',
+    secciones: "[role='tablist'][aria-label*='ecciones'] [role='tab']",
+    extremos: true,
+    subestados: "button[class*='btnTransicion']",
+  },
 ];
 
 interface TextoSvg {
