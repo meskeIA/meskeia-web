@@ -290,6 +290,12 @@ const APPS: App[] = [
   // verde 2,03, el azul 2,95, el rojo 3,13) y sobre el nodo elegido del árbol en la marca (4,11).
   // Cada clase y cada filo, como subestados
   { slug: 'visualizador-reino-animal', secciones: SECCIONES, subestados: "button[aria-pressed]:not(nav button)" },
+  // 13/11/2026: las cifras de las barras, las curvas de SNR, «Tú», los bits de las aristas del árbol
+  // y los tamaños de la compresión en el color puro de su dato (el ámbar 2,06:1, el teal 2,58-2,78,
+  // el rojo 3,73 y la marca 4,07 en claro; la marca 3,50 y el rojo 3,81 en oscuro), los ejes en
+  // #999 (2,62-2,82) y los nombres en #666 (2,50 en oscuro), el blanco sobre las hojas de Huffman en
+  // la marca (4,11) y, con una barra alta, su cifra encima de la propia barra (1,24-1,37)
+  { slug: 'visualizador-teoria-informacion', secciones: SECCIONES, extremos: true },
 ];
 
 interface TextoSvg {

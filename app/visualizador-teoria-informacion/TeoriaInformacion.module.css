@@ -350,6 +350,24 @@
   .warningBoxEdu { flex-direction: column; gap: var(--spacing-sm); }
 }
 
+/* Tono de TEXTO de cada color de dato, para el HTML (color) y los <text> de los SVG (fill, que
+   por CSS manda sobre el atributo) — cabos C0297 y C0645 (13/11/2026). En su color puro daban
+   en claro la marca 4,07-4,11:1, el teal 2,58-2,80, el ámbar E8A838 1,99-2,08, el rojo E84A5F
+   3,61-3,77 y los grises #999 2,62-2,82; en oscuro la marca 3,50, el rojo 3,81 y #666 2,50. El
+   color de dato se queda en barras, curvas y aristas. Medido en tests/contraste-svg-texto.spec.ts
+   y tests/contraste-marca-datos.spec.ts. */
+.tonoMarca { color: var(--primary-texto, #26718F); fill: var(--primary-texto, #26718F); }
+.tonoTeal { color: var(--secondary-texto, #327874); fill: var(--secondary-texto, #327874); }
+.tonoAcento { color: #4A6F85; fill: #4A6F85; }
+.tonoAmbar { color: var(--ambar-texto, #8A5A00); fill: var(--ambar-texto, #8A5A00); }
+.tonoRojo { color: var(--rojo-texto, #B91C1C); fill: var(--rojo-texto, #B91C1C); }
+.tonoTenue { color: var(--text-secondary); fill: var(--text-secondary); }
+[data-theme='dark'] .tonoAcento { color: #A9CCE3; fill: #A9CCE3; }
+[data-theme='dark'] .tonoAmbar { color: #E8A838; fill: #E8A838; }
+[data-theme='dark'] .tonoRojo { color: #F1948A; fill: #F1948A; }
+/* Hoja del árbol de Huffman: el blanco sobre la marca pura daba 4,11:1 */
+.hojaHuffman { fill: var(--primary-boton, #26718F); stroke: var(--primary-boton, #26718F); }
+
 /* Dark mode overrides */
 [data-theme='dark'] .svgArbol { border-color: #404040; background: #2A2A2A; }
 [data-theme='dark'] .codigo { background: #333; color: #7FB3D3; }

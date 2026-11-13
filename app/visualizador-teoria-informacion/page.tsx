@@ -11,6 +11,22 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
+import { formatNumber } from '@/lib';
+import { rellenoConTinta } from '@/lib/tintaLegible';
+
+/**
+ * Tono de TEXTO de cada color de dato (cabos C0297 y C0645, 13/11/2026): en su color puro no se
+ * leían ni en el HTML ni en los SVG. El color de dato se queda en barras, curvas y aristas.
+ */
+const TONO: Record<string, 'tonoMarca' | 'tonoTeal' | 'tonoAcento' | 'tonoAmbar' | 'tonoRojo' | 'tonoTenue'> = {
+  '#2E86AB': 'tonoMarca',
+  '#48A9A6': 'tonoTeal',
+  '#7FB3D3': 'tonoAcento',
+  '#E8A838': 'tonoAmbar',
+  '#E84A5F': 'tonoRojo',
+  '#999': 'tonoTenue',
+};
+const tono = (color: string): string => styles[TONO[color] ?? 'tonoTenue'];
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -132,8 +148,8 @@ function TabEntropia({
           { etiqueta: 'C', valor: probC, setter: setProbC, color: colores[2] },
         ].map(({ etiqueta, valor, setter, color }) => (
           <div key={etiqueta} className={styles.sliderFila}>
-            <label htmlFor={`${baseId}-${etiqueta}`} className={styles.sliderLabel} style={{ color }}>
-              <strong>P({etiqueta})</strong> = {valor.toFixed(2)}
+            <label htmlFor={`${baseId}-${etiqueta}`} className={`${styles.sliderLabel} ${tono(color)}`}>
+              <strong>P({etiqueta})</strong> = {formatNumber(valor, 2)}
             </label>
             <input
               id={`${baseId}-${etiqueta}`}
@@ -150,8 +166,8 @@ function TabEntropia({
           </div>
         ))}
         <div className={styles.sliderFila}>
-          <span className={styles.sliderLabel} style={{ color: colores[3] }}>
-            <strong>P(D)</strong> = {probD.toFixed(2)}
+          <span className={`${styles.sliderLabel} ${tono(colores[3])}`}>
+            <strong>P(D)</strong> = {formatNumber(probD, 2)}
             <small className={styles.derivado}> (1 − A − B − C)</small>
           </span>
         </div>
@@ -160,7 +176,7 @@ function TabEntropia({
       {/* Resultado entropía */}
       <div className={styles.resultadoEntropia}>
         <div className={styles.resultadoValor}>
-          <span className={styles.resultadoNumero}>{H.toFixed(3)}</span>
+          <span className={styles.resultadoNumero}>{formatNumber(H, 3)}</span>
           <span className={styles.resultadoUnidad}>bits / símbolo</span>
         </div>
         <div className={styles.resultadoBarraFondo}>
@@ -192,20 +208,27 @@ function TabEntropia({
           aria-label="Gráfica de barras de probabilidades de los 4 símbolos">
           <line x1={padL} y1={padT} x2={padL} y2={barH - padB} stroke="#CCC" strokeWidth="1" />
           <line x1={padL} y1={barH - padB} x2={barW - 8} y2={barH - padB} stroke="#CCC" strokeWidth="1" />
-          <text x={8} y={barH / 2} fontSize="7" fill="#999" textAnchor="middle"
+          <text x={8} y={barH / 2} fontSize="7" className={styles.tonoTenue} textAnchor="middle"
             transform={`rotate(-90, 10, ${barH / 2})`}>Prob.</text>
           {probs.map((p, i) => {
             const bh = p * graphH;
             const bx = padL + i * (graphW / 4) + 4;
             const by = barH - padB - bh;
+            // Sin sitio encima de una barra alta, la cifra va DENTRO, sobre la barra opaca con la
+            // tinta que le llega (C0297: «0,97» caía sobre su propia barra a 1,24-1,37:1)
+            const dentro = by - 2 < padT + 8;
+            const { relleno, tinta } = rellenoConTinta(colores[i]);
             return (
               <g key={etiquetas[i]}>
                 <rect x={bx} y={by} width={bw} height={bh}
-                  fill={colores[i]} opacity={0.82} rx={3} />
+                  fill={dentro ? relleno : colores[i]} rx={3} />
                 <text x={bx + bw / 2} y={barH - padB + 11} textAnchor="middle"
-                  fontSize="8" fill="#666">{etiquetas[i]}</text>
-                <text x={bx + bw / 2} y={Math.max(by - 2, padT + 8)} textAnchor="middle"
-                  fontSize="7" fill={colores[i]} fontWeight="600">{p.toFixed(2)}</text>
+                  fontSize="8" className={styles.tonoTenue}>{etiquetas[i]}</text>
+                <text x={bx + bw / 2} y={dentro ? by + 9 : by - 2} textAnchor="middle"
+                  fontSize="7" fontWeight="600"
+                  {...(dentro ? { fill: tinta } : { className: tono(colores[i]) })}>
+                  {formatNumber(p, 2)}
+                </text>
               </g>
             );
           })}
@@ -226,13 +249,13 @@ function TabEntropia({
         </div>
         <div className={styles.comparativaItem}>
           <span className={styles.comparativaLabel}>Máximo (4 símbolos)</span>
-          <span className={styles.comparativaValor} style={{ color: '#E8A838' }}>H = 2 bits</span>
+          <span className={`${styles.comparativaValor} ${styles.tonoAmbar}`}>H = 2 bits</span>
           <span className={styles.comparativaDesc}>p = 0,25 para cada símbolo</span>
         </div>
         <div className={styles.comparativaItem}>
           <span className={styles.comparativaLabel}>Tu configuración</span>
-          <span className={styles.comparativaValor} style={{ color: '#E84A5F' }}>H = {H.toFixed(3)} bits</span>
-          <span className={styles.comparativaDesc}>{((H / Hmax) * 100).toFixed(1)}% del máximo posible</span>
+          <span className={`${styles.comparativaValor} ${styles.tonoRojo}`}>H = {formatNumber(H, 3)} bits</span>
+          <span className={styles.comparativaDesc}>{`${formatNumber((H / Hmax) * 100, 1)} % del máximo posible`}</span>
         </div>
       </div>
 
@@ -247,11 +270,11 @@ function TabEntropia({
           {/* Punto máximo p=0.5 */}
           <circle cx={padL + ((curvaW - padL - 10) / 2)} cy={padT} r={3} fill="#48A9A6" />
           <text x={padL + ((curvaW - padL - 10) / 2)} y={padT - 3}
-            textAnchor="middle" fontSize="7" fill="#48A9A6">H=1 bit (máx)</text>
+            textAnchor="middle" fontSize="7" className={styles.tonoTeal}>H=1 bit (máx)</text>
           <text x={padL + (curvaW - padL - 10) / 2} y={curvaH - 4}
-            textAnchor="middle" fontSize="7" fill="#999">p = 0,50</text>
-          <text x={padL - 2} y={curvaH - padB + 9} fontSize="7" fill="#999">0</text>
-          <text x={curvaW - 10} y={curvaH - padB + 9} fontSize="7" fill="#999">1</text>
+            textAnchor="middle" fontSize="7" className={styles.tonoTenue}>p = 0,50</text>
+          <text x={padL - 2} y={curvaH - padB + 9} fontSize="7" className={styles.tonoTenue}>0</text>
+          <text x={curvaW - 10} y={curvaH - padB + 9} fontSize="7" className={styles.tonoTenue}>1</text>
         </svg>
       </div>
     </div>
@@ -340,7 +363,7 @@ function TabHuffman() {
                   <line x1={desde.x} y1={desde.y + 7} x2={hasta.x} y2={hasta.y - 7}
                     stroke={a.etiqueta === '0' ? '#2E86AB' : '#48A9A6'} strokeWidth="1.5" />
                   <text x={mx} y={my} textAnchor="middle" fontSize="7"
-                    fill={a.etiqueta === '0' ? '#2E86AB' : '#48A9A6'} fontWeight="700">
+                    className={a.etiqueta === '0' ? styles.tonoMarca : styles.tonoTeal} fontWeight="700">
                     {a.etiqueta}
                   </text>
                 </g>
@@ -349,8 +372,9 @@ function TabHuffman() {
             {nodos.map((n) => (
               <g key={n.id}>
                 <circle cx={n.x} cy={n.y} r={esHoja(n.id) ? 10 : 8}
-                  fill={esHoja(n.id) ? '#2E86AB' : '#FAFAFA'}
-                  stroke={esHoja(n.id) ? '#2E86AB' : '#AAAAAA'} strokeWidth="1.5" />
+                  fill={esHoja(n.id) ? '#26718F' : '#FAFAFA'}
+                  className={esHoja(n.id) ? styles.hojaHuffman : undefined}
+                  stroke={esHoja(n.id) ? '#26718F' : '#AAAAAA'} strokeWidth="1.5" />
                 <text x={n.x} y={n.y + 3} textAnchor="middle"
                   fontSize={esHoja(n.id) ? '6' : '6'} fontWeight="700"
                   fill={esHoja(n.id) ? '#FFFFFF' : '#444444'}>
@@ -383,7 +407,7 @@ function TabHuffman() {
                 <tr key={s.simbolo}>
                   <td className={styles.tablaSimbolo}>{s.simbolo}</td>
                   <td>{s.frecuencia}</td>
-                  <td>{(s.frecuencia / totalFreq * 100).toFixed(1)}%</td>
+                  <td>{`${formatNumber(s.frecuencia / totalFreq * 100, 1)} %`}</td>
                   <td><code className={styles.codigo}>{s.codigo}</code></td>
                   <td>{s.longitud} bits</td>
                 </tr>
@@ -397,31 +421,31 @@ function TabHuffman() {
       <div className={styles.eficienciaGrid}>
         <div className={styles.eficienciaItem}>
           <span className={styles.eficienciaLabel}>Entropía teórica mínima</span>
-          <span className={styles.eficienciaValor} style={{ color: '#E8A838' }}>
-            {entropiaT.toFixed(3)} bits/símbolo
+          <span className={`${styles.eficienciaValor} ${styles.tonoAmbar}`}>
+            {formatNumber(entropiaT, 3)} bits/símbolo
           </span>
           <span className={styles.eficienciaDesc}>Límite inferior teórico de Shannon</span>
         </div>
         <div className={styles.eficienciaItem}>
           <span className={styles.eficienciaLabel}>Longitud media Huffman</span>
           <span className={styles.eficienciaValor} style={{ color: 'var(--primary-texto)' }}>
-            {longitudMediaHuffman.toFixed(3)} bits/símbolo
+            {formatNumber(longitudMediaHuffman, 3)} bits/símbolo
           </span>
           <span className={styles.eficienciaDesc}>
-            {((longitudMediaHuffman - entropiaT) / entropiaT * 100).toFixed(1)}% sobre el óptimo teórico
+            {`${formatNumber((longitudMediaHuffman - entropiaT) / entropiaT * 100, 1)} % sobre el óptimo teórico`}
           </span>
         </div>
         <div className={styles.eficienciaItem}>
           <span className={styles.eficienciaLabel}>ASCII (código fijo)</span>
-          <span className={styles.eficienciaValor} style={{ color: '#999' }}>
+          <span className={`${styles.eficienciaValor} ${styles.tonoTenue}`}>
             {longitudMediaASCII} bits/símbolo
           </span>
           <span className={styles.eficienciaDesc}>Sin aprovechar las frecuencias</span>
         </div>
         <div className={styles.eficienciaItem}>
           <span className={styles.eficienciaLabel}>Ahorro vs ASCII</span>
-          <span className={styles.eficienciaValor} style={{ color: '#E84A5F' }}>
-            {ahorroPct.toFixed(1)}%
+          <span className={`${styles.eficienciaValor} ${styles.tonoRojo}`}>
+            {`${formatNumber(ahorroPct, 1)} %`}
           </span>
           <span className={styles.eficienciaDesc}>Compresión sin pérdida de información</span>
         </div>
@@ -518,7 +542,7 @@ function TabCanal({
         <div className={styles.sliderFila}>
           <label htmlFor="snr-db" className={styles.sliderLabel}>
             <strong>SNR (relación señal/ruido)</strong> = {snrDb} dB
-            <small className={styles.derivado}> ({Math.pow(10, snrDb / 10).toFixed(0)}:1 lineal)</small>
+            <small className={styles.derivado}> ({formatNumber(Math.pow(10, snrDb / 10), 0)}:1 lineal)</small>
           </label>
           <input
             id="snr-db"
@@ -536,13 +560,13 @@ function TabCanal({
         <span className={styles.resultadoCanalLabel}>Capacidad máxima del canal</span>
         <span className={styles.resultadoCanalValor}>
           {capacidad >= 1000
-            ? `${(capacidad / 1000).toFixed(2)} Gbps`
+            ? `${formatNumber(capacidad / 1000, 2)} Gbps`
             : capacidad >= 1
-            ? `${capacidad.toFixed(2)} Mbps`
-            : `${(capacidad * 1000).toFixed(0)} kbps`}
+            ? `${formatNumber(capacidad, 2)} Mbps`
+            : `${formatNumber(capacidad * 1000, 0)} kbps`}
         </span>
         <span className={styles.resultadoCanalDesc}>
-          C = {anchoBanda} × log₂(1 + {Math.pow(10, snrDb / 10).toFixed(0)}) = {capacidad.toFixed(2)} Mbps
+          C = {anchoBanda} × log₂(1 + {formatNumber(Math.pow(10, snrDb / 10), 0)}) = {formatNumber(capacidad, 2)} Mbps
         </span>
       </div>
 
@@ -552,28 +576,28 @@ function TabCanal({
           aria-label="Curva de capacidad del canal vs ancho de banda para distintos valores de SNR">
           <line x1={padL} y1={padT} x2={padL} y2={svgH - padB} stroke="#CCC" strokeWidth="1" />
           <line x1={padL} y1={svgH - padB} x2={svgW - 10} y2={svgH - padB} stroke="#CCC" strokeWidth="1" />
-          <text x={8} y={svgH / 2} fontSize="7" fill="#999" textAnchor="middle"
+          <text x={8} y={svgH / 2} fontSize="7" className={styles.tonoTenue} textAnchor="middle"
             transform={`rotate(-90, 10, ${svgH / 2})`}>C (Mbps)</text>
-          <text x={(svgW + padL) / 2} y={svgH - 4} fontSize="7" fill="#999" textAnchor="middle">B (MHz)</text>
+          <text x={(svgW + padL) / 2} y={svgH - 4} fontSize="7" className={styles.tonoTenue} textAnchor="middle">B (MHz)</text>
 
           {/* Curvas para diferentes SNR */}
           {snrCurvas.map((snr, i) => (
             <g key={snr}>
               <path d={generarCurva(snr)} stroke={coloresCurvas[i]} strokeWidth="1.8" fill="none" />
               <text x={svgW - 10} y={svgH - padB - (calcularCapacidadCanal(maxB, snr) / maxC) * graphH}
-                fontSize="6.5" fill={coloresCurvas[i]} textAnchor="end">{snr} dB</text>
+                fontSize="6.5" className={tono(coloresCurvas[i])} textAnchor="end">{snr} dB</text>
             </g>
           ))}
 
           {/* Punto del usuario */}
           <circle cx={puntX} cy={Math.max(padT + 2, puntY)} r={4} fill="#E84A5F" />
-          <text x={puntX + 6} y={Math.max(padT + 8, puntY + 4)} fontSize="7" fill="#E84A5F">
+          <text x={puntX + 6} y={Math.max(padT + 8, puntY + 4)} fontSize="7" className={styles.tonoRojo}>
             Tú
           </text>
 
           {/* Etiquetas eje */}
-          <text x={padL} y={svgH - padB + 10} fontSize="7" fill="#999">0</text>
-          <text x={svgW - 10} y={svgH - padB + 10} fontSize="7" fill="#999" textAnchor="end">100</text>
+          <text x={padL} y={svgH - padB + 10} fontSize="7" className={styles.tonoTenue}>0</text>
+          <text x={svgW - 10} y={svgH - padB + 10} fontSize="7" className={styles.tonoTenue} textAnchor="end">100</text>
         </svg>
       </div>
 
@@ -620,7 +644,7 @@ function TabCompresion() {
   const maxTam = Math.max(tamWav, tamBmp);
 
   const formatoMB = (mb: number) =>
-    mb < 0.1 ? `${(mb * 1024).toFixed(0)} KB` : `${mb.toFixed(2)} MB`;
+    mb < 0.1 ? `${formatNumber(mb * 1024, 0)} KB` : `${formatNumber(mb, 2)} MB`;
 
   const bloques = [
     { nombre: 'WAV (sin comprimir)', tam: tamWav, color: '#999', grupo: 'audio' },
@@ -672,17 +696,17 @@ function TabCompresion() {
             return (
               <g key={b.nombre}>
                 <text x={padL - 4} y={y + barH / 2 + 3} textAnchor="end"
-                  fontSize="7.5" fill="#666">{b.nombre}</text>
+                  fontSize="7.5" className={styles.tonoTenue}>{b.nombre}</text>
                 <rect x={padL} y={y} width={anchoBarra} height={barH}
                   fill={b.color} opacity={0.85} rx={3} />
                 <text x={padL + anchoBarra + 4} y={y + barH / 2 + 3}
-                  fontSize="7.5" fill={b.color} fontWeight="700">
+                  fontSize="7.5" className={tono(b.color)} fontWeight="700">
                   {formatoMB(b.tam)}
                 </text>
               </g>
             );
           })}
-          <text x={padL} y={15} fontSize="7" fill="#999">Tamaño relativo del archivo</text>
+          <text x={padL} y={15} fontSize="7" className={styles.tonoTenue}>Tamaño relativo del archivo</text>
         </svg>
       </div>
 
@@ -710,7 +734,7 @@ function TabCompresion() {
               <td><strong>MP3</strong></td>
               <td>Audio</td>
               <td>{formatoMB(tamMp3)}</td>
-              <td className={styles.reduccion}>{((1 - tamMp3 / tamWav) * 100).toFixed(1)}%</td>
+              <td className={styles.reduccion}>{`${formatNumber((1 - tamMp3 / tamWav) * 100, 1)} %`}</td>
               <td>Perceptual</td>
             </tr>
             <tr>
@@ -724,14 +748,14 @@ function TabCompresion() {
               <td><strong>PNG</strong></td>
               <td>Imagen</td>
               <td>{formatoMB(tamPng)}</td>
-              <td className={styles.reduccion}>{((1 - tamPng / tamBmp) * 100).toFixed(1)}%</td>
+              <td className={styles.reduccion}>{`${formatNumber((1 - tamPng / tamBmp) * 100, 1)} %`}</td>
               <td>Sin pérdida</td>
             </tr>
             <tr>
               <td><strong>JPEG {calidadJpeg}%</strong></td>
               <td>Imagen</td>
               <td>{formatoMB(tamJpeg)}</td>
-              <td className={styles.reduccion}>{((1 - tamJpeg / tamBmp) * 100).toFixed(1)}%</td>
+              <td className={styles.reduccion}>{`${formatNumber((1 - tamJpeg / tamBmp) * 100, 1)} %`}</td>
               <td>DCT + cuantización</td>
             </tr>
           </tbody>

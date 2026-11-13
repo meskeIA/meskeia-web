@@ -176,6 +176,10 @@ const APPS: App[] = [
   // en oscuro, las especies en --text-muted sobre la tarjeta elegida (4,29) y «Endotermo» en la
   // reserva roja de la receta (3,93)
   { slug: 'visualizador-reino-animal', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
+  // 13/11/2026 (C0645): las probabilidades de los deslizadores y las cifras de las comparativas y de
+  // la eficiencia de Huffman en el color de su dato (el ámbar 1,99-2,08:1, el teal 2,80, el rojo
+  // 3,61-3,77, la marca 4,11 y #999 2,73 en claro; la marca 3,50 y el rojo 3,81 en oscuro)
+  { slug: 'visualizador-teoria-informacion', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
 ];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {
