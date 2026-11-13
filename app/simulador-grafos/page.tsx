@@ -12,6 +12,7 @@ import {
 } from '@/components';
 import { formatNumber } from '@/lib';
 import styles from './SimuladorGrafos.module.css';
+import { RESPUESTA_FAQ_BFS_DFS } from './metadata';
 
 type Algoritmo = 'bfs' | 'dfs' | 'dijkstra' | 'astar';
 type ModoEditor = 'add-node' | 'add-edge' | 'move' | 'delete';
@@ -2111,7 +2112,7 @@ export default function SimuladorGrafosPage() {
           <div className={styles.faqItem}>
             <h4>¿Cuál es la diferencia entre BFS y DFS?</h4>
             <p>
-              BFS explora &laquo;por niveles&raquo;: visita primero todos los vecinos directos, luego los vecinos de los vecinos, y así sucesivamente. Usa una cola FIFO. DFS explora &laquo;a fondo&raquo;: sigue un camino hasta agotarlo y vuelve hacia atrás (backtracking) cuando no puede avanzar. Usa una pila LIFO (o recursión).
+              {RESPUESTA_FAQ_BFS_DFS}
             </p>
             <p className={styles.faqTip}>
               <span aria-hidden="true">💡</span> BFS encuentra el camino más corto en número de aristas. DFS no garantiza camino óptimo, pero usa menos memoria en grafos profundos.

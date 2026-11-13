@@ -6,6 +6,7 @@ import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, Shar
   DisclaimerCard,
 } from '@/components';
 import { formatDate as formatDateCorto, hoyISOLocal, parseISODateLocal } from '@/lib';
+import { RESPUESTA_FAQ_ACTA_MINUTA } from './metadata';
 
 // Tipos
 interface Asistente {
@@ -1321,9 +1322,7 @@ export default function GeneradorActasPage() {
             <div className={styles.faqItem}>
               <h4>¿Cuál es la diferencia entre un acta y una minuta?</h4>
               <p>
-                El acta es el documento formal y definitivo que recoge los acuerdos adoptados; tiene valor
-                probatorio. La minuta es el borrador previo, un resumen informal de lo tratado que se
-                circula para revisión antes de aprobar el acta oficial.
+                {RESPUESTA_FAQ_ACTA_MINUTA}
               </p>
             </div>
             <div className={styles.faqItem}>

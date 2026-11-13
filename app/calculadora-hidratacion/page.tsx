@@ -4,6 +4,7 @@ import { useState } from 'react';
 import styles from './CalculadoraHidratacion.module.css';
 import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
+import { RESPUESTA_FAQ_EXCESO_AGUA } from './metadata';
 
 type NivelActividad = 'sedentario' | 'ligero' | 'moderado' | 'activo' | 'muy_activo';
 type Clima = 'frio' | 'templado' | 'calido' | 'muy_calido';
@@ -382,7 +383,7 @@ export default function CalculadoraHidratacionPage() {
             <div className={styles.faqItem}><h4>¿El café y el té deshidratan?</h4><p>Mito desmentido. Aunque la cafeína tiene efecto diurético leve, el agua que contienen el café y el té compensa con creces. Contribuyen positivamente a la hidratación diaria. Solo dosis muy altas de cafeína (&gt;500 mg/día) tienen efecto neto deshidratante.</p></div>
             <div className={styles.faqItem}><h4>¿Cuánta agua debo beber exactamente?</h4><p>La recomendación de "8 vasos al día" es un mito simplificado. Las necesidades varían según peso corporal, actividad, clima y dieta. Una guía práctica: 35 ml/kg de peso corporal. Además, el 20–30% de la hidratación proviene de los alimentos.</p></div>
             <div className={styles.faqItem}><h4>¿Cómo sé si estoy bien hidratado?</h4><p>El mejor indicador gratuito es el color de la orina: amarillo pálido (paja) = bien hidratado. Amarillo oscuro o ámbar = bebe más agua. Incolora = posible sobrehidratación. También: no sentir sed intensa, orina 4–6 veces al día.</p></div>
-            <div className={styles.faqItem}><h4>¿Es posible beber demasiada agua?</h4><p>Sí. La hiponatremia (exceso de agua que diluye el sodio) puede ser peligrosa o mortal. Ocurre principalmente en deportistas de resistencia que beben solo agua sin reponer sales. En personas sanas con actividad normal, los riñones regulan el exceso eficientemente.</p></div>
+            <div className={styles.faqItem}><h4>¿Es posible beber demasiada agua?</h4><p>{RESPUESTA_FAQ_EXCESO_AGUA}</p></div>
             <div className={styles.faqItem}><h4>¿Las bebidas isotónicas son necesarias?</h4><p>Solo en ejercicio intenso de más de 60–90 minutos o en condiciones de calor extremo. Para actividad moderada o hidratación diaria, el agua es suficiente. Las bebidas isotónicas contienen azúcares y calorías que en ejercicio ligero son innecesarias.</p></div>
             <div className={styles.faqItem}><h4>¿Contar el agua de los alimentos?</h4><p>Sí. La fruta y verdura aportan mucha agua: sandía (92% agua), pepino (97%), tomate (95%), lechuga (96%). Una dieta rica en frutas y verduras puede aportar 0,5–1 L de agua al día. Por eso la recomendación de "2 L de agua pura" ya incluye este aporte en algunas guías.</p></div>
             <div className={styles.faqItem}><h4>¿La hidratación afecta al rendimiento cognitivo?</h4><p>Sí, significativamente. Una deshidratación del 1–2% del peso corporal ya deteriora la atención, la memoria a corto plazo y el tiempo de reacción. En oficinas con AC, donde no se siente calor ni sed, la deshidratación leve crónica es muy común y reduce la productividad.</p></div>

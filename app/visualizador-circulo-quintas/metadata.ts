@@ -64,6 +64,12 @@ export const jsonLd = generateWebAppSchema({
   ],
 });
 
+// La pregunta está también en la FAQ visible («¿Qué es el círculo de quintas?»): una sola respuesta
+// para las dos (check:faq-unica, C0570, 13/11/2026). Se juntan las dos; «difiere en una sola nota»
+// pasa a «una sola alteración», que es lo exacto (Do y Sol difieren en el Fa/Fa#).
+export const RESPUESTA_FAQ_QUE_ES_CIRCULO =
+  'Es una representación visual que ordena las 12 tonalidades en un círculo, de modo que cada tonalidad vecina difiere en una sola alteración (un sostenido o un bemol). Sirve para entender las relaciones armónicas entre tonalidades, saber cuántos sostenidos o bemoles lleva la armadura de cada una, identificar su relativa menor y construir progresiones de acordes que suenen coherentes, tanto para componer como para improvisar. Johann David Heinichen lo publicó en 1711 y sigue siendo una de las herramientas más útiles de la teoría musical occidental.';
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -73,7 +79,7 @@ export const faqJsonLd = {
       name: '¿Qué es el círculo de quintas y para qué sirve?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El círculo de quintas es una representación visual de las 12 tonalidades musicales ordenadas de forma que cada tonalidad vecina difiere en una sola nota. Sirve para entender las relaciones armónicas entre tonalidades, saber cuántos sostenidos o bemoles tiene la armadura de clave de cada una, identificar la relativa menor, y construir progresiones de acordes que suenen coherentes. Es una herramienta fundamental tanto para composición como para improvisación.',
+        text: RESPUESTA_FAQ_QUE_ES_CIRCULO,
       },
     },
     {

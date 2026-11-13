@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react';
 import styles from './HuesosCuerpoHumano.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard, DisclaimerCard } from '@/components';
+import { RESPUESTA_FAQ_HUESOS_COLUMNA } from './metadata';
 import {
   BONES,
   REGIONES,
@@ -604,7 +605,7 @@ export default function HuesosCuerpoHumanoPage() {
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿Cuántos huesos tiene la columna vertebral exactamente?</h4>
               <p>
-                La columna vertebral tiene 33-34 vértebras en el nacimiento, que se reducen a 26 huesos en el adulto: 7 cervicales (C1-C7), 12 torácicas (T1-T12), 5 lumbares (L1-L5), 1 sacro (5 vértebras fusionadas) y 1 cóccix (3-5 vértebras fusionadas). La regla mnemotécnica clásica: 7-12-5 son las horas de las comidas (desayuno a las 7, comida a las 12, cena a las 5).
+                {RESPUESTA_FAQ_HUESOS_COLUMNA}
               </p>
               <p className={styles.faqTip}>
                 💡 <strong>Para el examen:</strong> 7+12+5+1+1 = 26 huesos. Las cervicales son las únicas con agujero transverso para la arteria vertebral.

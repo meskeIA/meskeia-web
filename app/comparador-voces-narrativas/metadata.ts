@@ -50,6 +50,11 @@ export const jsonLd = generateWebAppSchema({
   ],
 });
 
+// La pregunta está también en la FAQ visible («¿Qué es el estilo indirecto libre?»): una sola
+// respuesta para las dos (check:faq-unica, C0570, 13/11/2026). Se juntan las dos.
+export const RESPUESTA_FAQ_INDIRECTO_LIBRE =
+  'El estilo indirecto libre mezcla la voz del narrador con los pensamientos o sentimientos del personaje sin verbos de reporte («pensó que», «se dijo»). Una frase como «Era demasiado tarde para arrepentirse» puede ser del narrador o del personaje, y esa ambigüedad es el efecto buscado. Jane Austen ya lo usaba; Flaubert lo sistematizó en «Madame Bovary», y es una de las técnicas más imitadas de la narrativa realista moderna.';
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -75,7 +80,7 @@ export const faqJsonLd = {
       name: '¿Qué es el estilo indirecto libre en narrativa?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El estilo indirecto libre mezcla la voz del narrador con los pensamientos o sentimientos del personaje sin usar verbos de reporte ("pensó que", "se dijo"). El lector accede a la interioridad del personaje sin que el narrador señale explícitamente el cambio. Flaubert lo popularizó en "Madame Bovary" y es una de las técnicas más imitadas en la narrativa realista moderna.',
+        text: RESPUESTA_FAQ_INDIRECTO_LIBRE,
       },
     },
     {

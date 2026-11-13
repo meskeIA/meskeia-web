@@ -70,6 +70,12 @@ export const jsonLd = generateWebAppSchema({
 });
 
 // FAQPage JSON-LD — mejora visibilidad en Bing Copilot, ChatGPT, Perplexity y Gemini
+// La pregunta está también en la FAQ visible («¿Cuántos píxeles tiene un A4 exactamente?»): una sola
+// respuesta para las dos (check:faq-unica, C0570, 13/11/2026). Mismas cifras en las dos, comprobadas:
+// 210 × 297 mm ÷ 25,4 × DPI = 595 × 842 (72), 1.240 × 1.754 (150), 2.480 × 3.508 (300), 4.961 × 7.016 (600).
+export const RESPUESTA_FAQ_PIXELES_A4 =
+  'Depende de la resolución, porque el píxel es una unidad relativa, no física: solo se convierte en milímetros cuando decides a qué densidad vas a imprimir o mostrar la imagen. Un A4 (210 × 297 mm) son 595 × 842 px a 72 DPI (pantalla), 1.240 × 1.754 px a 150 DPI, 2.480 × 3.508 px a 300 DPI (calidad de imprenta) y 4.961 × 7.016 px a 600 DPI. La fórmula es: píxeles = milímetros ÷ 25,4 × DPI.';
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -103,7 +109,7 @@ export const faqJsonLd = {
       name: '¿Cuántos píxeles tiene un A4?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Depende de los DPI, porque el píxel no es una unidad física. Un A4 son 595 × 842 píxeles a 72 DPI (pantalla), 1.240 × 1.754 a 150 DPI, 2.480 × 3.508 a 300 DPI (calidad de imprenta) y 4.961 × 7.016 a 600 DPI. La fórmula es: píxeles = milímetros ÷ 25,4 × DPI.',
+        text: RESPUESTA_FAQ_PIXELES_A4,
       },
     },
     {

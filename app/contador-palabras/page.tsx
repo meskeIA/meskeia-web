@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react';
 import styles from './ContadorPalabras.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { formatNumber } from '@/lib';
+import { RESPUESTA_FAQ_TIEMPO_LECTURA } from './metadata';
 
 // ==================== TIPOS ====================
 
@@ -443,7 +444,7 @@ export default function ContadorPalabrasPage() {
           </div>
           <div className={styles.faqItem}>
             <strong>¿Cómo se calcula el tiempo de lectura?</strong>
-            <p>La velocidad media de lectura en adultos es de 200-250 palabras por minuto. Esta herramienta usa 200 ppm como referencia conservadora. El tiempo hablado usa 150 ppm, el promedio para discursos formales.</p>
+            <p>{RESPUESTA_FAQ_TIEMPO_LECTURA}</p>
           </div>
           <div className={styles.faqItem}>
             <strong>¿Qué es la densidad de palabras clave y cuál es el valor ideal?</strong>

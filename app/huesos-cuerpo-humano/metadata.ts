@@ -49,6 +49,12 @@ export const jsonLd = generateWebAppSchema({
   ],
 });
 
+// La pregunta está también en la FAQ visible («¿Cuántos huesos tiene la columna vertebral exactamente?»):
+// una sola respuesta para las dos (check:faq-unica, C0570, 13/11/2026). El JSON-LD fijaba 4 coccígeas
+// y 33 vértebras; la visible, de 3 a 5 y 33-34, que es la variación anatómica real: se queda esa.
+export const RESPUESTA_FAQ_HUESOS_COLUMNA =
+  'Al nacer, la columna vertebral tiene 33 o 34 vértebras: 7 cervicales (C1-C7), 12 torácicas (T1-T12), 5 lumbares (L1-L5), 5 sacras y de 3 a 5 coccígeas. En el adulto, las sacras se fusionan en el sacro y las coccígeas en el cóccix, así que quedan 26 huesos independientes. La regla mnemotécnica clásica: 7-12-5 son las horas de las comidas (desayuno a las 7, comida a las 12, cena a las 5).';
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -90,7 +96,7 @@ export const faqJsonLd = {
       name: '¿Cuántos huesos tiene la columna vertebral?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La columna vertebral está formada por 33 vértebras distribuidas en cinco regiones: 7 cervicales, 12 torácicas, 5 lumbares, 5 sacras (fusionadas en el sacro) y 4 coccígeas (fusionadas en el cóccix). En el adulto, las vértebras sacras y coccígeas fusionadas reducen el número de piezas independientes a 26.',
+        text: RESPUESTA_FAQ_HUESOS_COLUMNA,
       },
     },
   ],

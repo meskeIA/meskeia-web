@@ -13,6 +13,7 @@ import {
 } from '@/components';
 import { normalizarBusqueda } from '@/lib/buscadorTablas';
 import { rellenoConTinta } from '@/lib/tintaLegible';
+import { RESPUESTA_FAQ_CUANTAS_REVOLUCIONES } from './metadata';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -650,7 +651,7 @@ export default function RevolucionesIndustriales() {
         <ul className={styles.faqList}>
           <li className={styles.faqItem}>
             <strong>¿Cuántas revoluciones industriales ha habido?</strong>
-            <p>Los historiadores suelen distinguir cuatro: la 1ª (vapor y textil, 1760), la 2ª (electricidad y acero, 1870), la 3ª (electrónica y automatización, 1945) y la 4ª o Industria 4.0 (IoT e IA, 2011). La "Industria 5.0" es un marco más reciente que enfatiza la colaboración humano-robot y la sostenibilidad, aunque no todos los expertos la reconocen como revolución plena.</p>
+            <p>{RESPUESTA_FAQ_CUANTAS_REVOLUCIONES}</p>
             <span className={styles.faqTip}>El Foro Económico Mundial popularizó el término "Cuarta Revolución Industrial" a partir de Davos 2016, aunque la estrategia Industrie 4.0 alemana data de 2011.</span>
           </li>
           <li className={styles.faqItem}>

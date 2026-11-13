@@ -42,6 +42,12 @@ export const jsonLd = generateWebAppSchema({
   features: [],
 });
 
+// La pregunta está también en la FAQ visible («¿Cuál es la diferencia entre un acta y una minuta?»):
+// una sola respuesta para las dos (check:faq-unica, C0570, 13/11/2026). Cada una daba un sentido de
+// «minuta» (registro interno de trabajo / borrador previo al acta); se juntan los dos.
+export const RESPUESTA_FAQ_ACTA_MINUTA =
+  'En el uso habitual se emplean a menudo como sinónimos, sobre todo en buena parte de Latinoamérica. En sentido estricto, el acta es el documento formal y definitivo que recoge los acuerdos adoptados y tiene valor probatorio (por ejemplo, en juntas de socios o comunidades de propietarios). La minuta es más informal: un borrador o resumen de lo tratado que se circula para revisión antes de aprobar el acta, o un registro interno orientado al seguimiento de tareas. Los dos recogen los acuerdos y compromisos de la reunión.';
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -75,7 +81,7 @@ export const faqJsonLd = {
       name: '¿Cuál es la diferencia entre un acta y una minuta de reunión?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'En la práctica profesional hispanohablante los términos se usan con frecuencia como sinónimos. Técnicamente, el acta tiene valor más formal y puede tener validez legal (por ejemplo, en juntas de socios o comunidades de propietarios), mientras que la minuta es un registro interno de trabajo más informal y orientado al seguimiento de tareas. Ambos documentos recogen los acuerdos y compromisos de la reunión.',
+        text: RESPUESTA_FAQ_ACTA_MINUTA,
       },
     },
     {

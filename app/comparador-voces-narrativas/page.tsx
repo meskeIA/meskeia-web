@@ -11,6 +11,7 @@ import {
   EducationalSection,
 } from '@/components';
 import styles from './ComparadorVocesNarrativas.module.css';
+import { RESPUESTA_FAQ_INDIRECTO_LIBRE } from './metadata';
 
 interface Dimensiones {
   densidad: number;
@@ -698,7 +699,7 @@ export default function ComparadorVocesNarrativas() {
               </div>
               <div className={styles.faqItem}>
                 <h4>¿Qué es el estilo indirecto libre?</h4>
-                <p>Técnica donde el narrador reproduce el pensamiento del personaje sin verbos introductorios («pensó que», «se dijo»). La frase «Era demasiado tarde para arrepentirse» puede ser del narrador o del personaje: la ambigüedad es el efecto buscado. Flaubert la sistematizó; Austen ya la usaba antes.</p>
+                <p>{RESPUESTA_FAQ_INDIRECTO_LIBRE}</p>
               </div>
               <div className={styles.faqItem}>
                 <h4>¿Qué es el flujo de conciencia?</h4>

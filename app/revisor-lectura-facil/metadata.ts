@@ -56,6 +56,11 @@ export const jsonLd = generateWebAppSchema({
 });
 
 // FAQPage JSON-LD — mejora visibilidad en Bing Copilot, ChatGPT, Perplexity y Gemini
+// La pregunta está también en la FAQ visible («¿Por qué se desaconseja la voz pasiva?»): una sola
+// respuesta para las dos (check:faq-unica, C0570, 13/11/2026). Decían lo mismo; se queda la del JSON-LD.
+export const RESPUESTA_FAQ_VOZ_PASIVA =
+  'Porque invierte el orden natural de la frase y esconde quién hace la acción. «La solicitud será revisada por el departamento» obliga al lector a reconstruir que es el departamento quien revisa. En voz activa —«el departamento revisa tu solicitud»— el sujeto aparece primero y la frase se entiende de una pasada. La pasiva refleja, del tipo «se revisarán las solicitudes», tiene el mismo problema y además borra al responsable.';
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -81,7 +86,7 @@ export const faqJsonLd = {
       name: '¿Por qué se desaconseja la voz pasiva en lectura fácil?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Porque invierte el orden natural de la frase y esconde quién hace la acción. «La solicitud será revisada por el departamento» obliga al lector a reconstruir que es el departamento quien revisa. En voz activa —«el departamento revisa tu solicitud»— el sujeto aparece primero y la frase se entiende de una pasada. La pasiva refleja, del tipo «se revisarán las solicitudes», tiene el mismo problema y además borra al responsable.',
+        text: RESPUESTA_FAQ_VOZ_PASIVA,
       },
     },
     {

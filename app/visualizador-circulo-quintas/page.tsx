@@ -3,6 +3,7 @@
 
 import { useState } from 'react';
 import styles from './VisualizadorCirculoQuintas.module.css';
+import { RESPUESTA_FAQ_QUE_ES_CIRCULO } from './metadata';
 import {
   MeskeiaLogo,
   Footer,
@@ -666,7 +667,7 @@ export default function VisualizadorCirculoQuintasPage() {
           <div className={styles.faqList}>
             <details className={styles.faqItem}>
               <summary className={styles.faqPregunta}>¿Qué es el círculo de quintas?</summary>
-              <p className={styles.faqRespuesta}>Es una representación visual que organiza las 12 tonalidades musicales en un círculo, de modo que cada tonalidad adyacente difiere en exactamente una alteración (sostenido o bemol). Fue formalizado por Johann David Heinichen en 1711 y sigue siendo una de las herramientas más útiles de la teoría musical occidental.</p>
+              <p className={styles.faqRespuesta}>{RESPUESTA_FAQ_QUE_ES_CIRCULO}</p>
             </details>
             <details className={styles.faqItem}>
               <summary className={styles.faqPregunta}>¿Por qué se llama "de quintas"?</summary>

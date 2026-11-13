@@ -21,7 +21,7 @@ import {
   FISCAL_AMORTIZACION_META,
   type TipoActivoAmortizable,
 } from '@/data/fiscal';
-import { RESPUESTA_FAQ_QUE_ES } from './metadata';
+import { RESPUESTA_FAQ_QUE_ES, RESPUESTA_FAQ_TOTAL_SEGUN_METODO } from './metadata';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -576,7 +576,7 @@ export default function CalculadoraAmortizacionInmovilizado() {
             </div>
             <div className={styles.faqItem}>
               <dt>¿Cambia el total amortizado según el método?</dt>
-              <dd>No. Los tres métodos amortizan exactamente la misma cantidad total (el valor de adquisición menos el residual) a lo largo de la vida útil. Lo único que cambia es la distribución temporal: cuánto se reconoce cada año. Por eso la decisión entre métodos es una cuestión de momento del gasto y de tesorería fiscal, no de cuantía total.</dd>
+              <dd>{RESPUESTA_FAQ_TOTAL_SEGUN_METODO}</dd>
             </div>
           </dl>
         </div>

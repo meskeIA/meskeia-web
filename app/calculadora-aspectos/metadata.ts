@@ -41,6 +41,12 @@ export const jsonLd = generateWebAppSchema({
   ],
 });
 
+// La pregunta está también en la FAQ visible («¿Qué es la relación de aspecto?»): una sola respuesta
+// para las dos (check:faq-unica, C0570, 13/11/2026). Se juntan las dos; el 4:3 se describe como el
+// formato de la televisión antigua y de muchas cámaras de móvil (la «fotografía clásica» de 35 mm es 3:2).
+export const RESPUESTA_FAQ_RELACION_ASPECTO =
+  'La relación de aspecto (aspect ratio) es la proporción entre el ancho y el alto de una imagen o pantalla, expresada como dos números separados por dos puntos. Por ejemplo, 16:9 significa que por cada 16 píxeles de ancho hay 9 de alto. No indica el tamaño real en píxeles, sino la forma del rectángulo. Las relaciones más comunes son 16:9 (pantallas y vídeos), 4:3 (televisión antigua y muchas cámaras de móvil), 1:1 (cuadrado, Instagram) y 9:16 (vídeo vertical, Stories).';
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -50,7 +56,7 @@ export const faqJsonLd = {
       name: '¿Qué es la relación de aspecto de una imagen?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La relación de aspecto (aspect ratio) es la proporción entre el ancho y el alto de una imagen o pantalla, expresada como dos números separados por dos puntos. Por ejemplo, 16:9 significa que por cada 16 píxeles de ancho hay 9 de alto. Las relaciones más comunes son 16:9 (pantallas y vídeos), 4:3 (fotografía clásica), 1:1 (cuadrado, Instagram) y 9:16 (vídeo vertical, Stories).',
+        text: RESPUESTA_FAQ_RELACION_ASPECTO,
       },
     },
     {

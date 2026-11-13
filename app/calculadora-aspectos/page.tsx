@@ -7,6 +7,7 @@ import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { formatNumber } from '@/lib';
+import { RESPUESTA_FAQ_RELACION_ASPECTO } from './metadata';
 
 interface AspectPreset {
   name: string;
@@ -469,7 +470,7 @@ export default function CalculadoraAspectosPage() {
           <dl className={styles.faqList}>
             <div className={styles.faqItem}>
               <dt>¿Qué es la relación de aspecto?</dt>
-              <dd>Es la proporción entre el ancho y el alto de una imagen o vídeo, expresada como dos números separados por dos puntos (ej: 16:9). No indica el tamaño real en píxeles, sino la forma del rectángulo.</dd>
+              <dd>{RESPUESTA_FAQ_RELACION_ASPECTO}</dd>
             </div>
             <div className={styles.faqItem}>
               <dt>¿Por qué 16:9 es el estándar en vídeo?</dt>

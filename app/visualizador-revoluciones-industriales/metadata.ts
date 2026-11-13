@@ -33,6 +33,13 @@ export const jsonLd = {
   offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR' },
 };
 
+// La pregunta está también en la FAQ visible («¿Cuántas revoluciones industriales ha habido?»): una
+// sola respuesta para las dos (check:faq-unica, C0570, 13/11/2026). Las fechas de la 3ª (1970 frente a
+// 1945) y la 4ª (2010 frente a 2011) no casaban: quedan las de la cronología de esta página (1945 y la
+// estrategia Industrie 4.0 de 2011), y se dice que la de la 3ª varía según el autor.
+export const RESPUESTA_FAQ_CUANTAS_REVOLUCIONES =
+  'Los historiadores suelen distinguir cuatro. La primera (hacia 1760-1840) introdujo la máquina de vapor y la producción textil mecanizada en el Reino Unido. La segunda (1870-1914) trajo la electricidad, el acero y la producción en masa. La tercera, desde mediados del siglo XX (1945 en esta cronología; hay autores que la sitúan hacia 1970), impulsó la electrónica y la automatización. La cuarta o Industria 4.0, desde 2011, integra inteligencia artificial, robótica avanzada e Internet de las Cosas. La «Industria 5.0» es un marco más reciente que pone el acento en la colaboración humano-robot y la sostenibilidad, aunque no todos los expertos la reconocen como revolución plena.';
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -42,7 +49,7 @@ export const faqJsonLd = {
       name: '¿Cuántas revoluciones industriales ha habido y cuáles son?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Se identifican cuatro revoluciones industriales. La primera (1760-1840) introdujo la máquina de vapor y la producción textil mecanizada en Reino Unido. La segunda (1870-1914) trajo la electricidad, el acero y la producción en masa. La tercera (desde 1970) impulsó la electrónica y la automatización. La cuarta o Industria 4.0 (desde 2010) integra inteligencia artificial, robótica avanzada e Internet de las Cosas.',
+        text: RESPUESTA_FAQ_CUANTAS_REVOLUCIONES,
       },
     },
     {

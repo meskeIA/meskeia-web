@@ -50,6 +50,12 @@ export const jsonLd = generateWebAppSchema({
   ],
 });
 
+// La pregunta está también en la FAQ visible («¿Cómo se calcula el tiempo de lectura?»): una sola
+// respuesta para las dos (check:faq-unica, C0570, 13/11/2026). Se juntan las dos; las 200 y 150 ppm
+// son las que usa el cálculo de page.tsx, así que 1.000 palabras dan 5 minutos.
+export const RESPUESTA_FAQ_TIEMPO_LECTURA =
+  'Se divide el número de palabras entre la velocidad lectora media. Para adultos en lectura silenciosa se suele usar entre 200 y 250 palabras por minuto (ppm), aunque la velocidad varía según el tipo de texto: un artículo técnico se lee más despacio que una novela. Esta herramienta usa 200 ppm como referencia conservadora, así que un texto de 1.000 palabras da 5 minutos, y lo calcula en tiempo real mientras escribes o pegas el texto. El tiempo hablado usa 150 ppm, el promedio habitual para discursos formales.';
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -59,7 +65,7 @@ export const faqJsonLd = {
       name: '¿Cómo se calcula el tiempo de lectura de un texto?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El tiempo de lectura se estima dividiendo el número de palabras entre la velocidad lectora media. Para adultos en lectura silenciosa se suele usar entre 200 y 250 palabras por minuto (ppm), aunque la velocidad varía según el tipo de texto: un artículo técnico se lee más despacio que una novela. Un texto de 1.000 palabras tardaría unos 4-5 minutos en condiciones normales. La herramienta calcula automáticamente este dato en tiempo real mientras escribes o pegas el texto.',
+        text: RESPUESTA_FAQ_TIEMPO_LECTURA,
       },
     },
     {

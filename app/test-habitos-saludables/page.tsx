@@ -5,6 +5,7 @@ import styles from './TestHabitos.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, DisclaimerCard, LegalNotice, ShareCard, EducationalSection } from '@/components';
+import { RESPUESTA_FAQ_HORAS_SUENO } from './metadata';
 
 interface Question {
   id: string;
@@ -719,7 +720,7 @@ export default function TestHabitosPage() {
           </div>
           <div className={styles.eduFaqItem}>
             <dt className={styles.eduFaqPregunta}>¿Cuántas horas de sueño son suficientes?</dt>
-            <dd className={styles.eduFaqRespuesta}>La OMS y la NSF recomiendan 7-9 horas para adultos. Menos de 6 horas crónicas se asocia con obesidad, diabetes tipo 2, deterioro cognitivo y mayor mortalidad.</dd>
+            <dd className={styles.eduFaqRespuesta}>{RESPUESTA_FAQ_HORAS_SUENO}</dd>
           </div>
           <div className={styles.eduFaqItem}>
             <dt className={styles.eduFaqPregunta}>¿Realmente importa cuándo como, no solo qué como?</dt>

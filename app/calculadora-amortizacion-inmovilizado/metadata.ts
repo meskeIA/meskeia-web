@@ -57,6 +57,11 @@ export const jsonLd = generateWebAppSchema({
 export const RESPUESTA_FAQ_QUE_ES =
   'Es el reparto del coste de un activo duradero (maquinaria, vehículos, equipos, edificios) a lo largo de los años en que se usa, en lugar de imputarlo todo en el año de compra. Refleja contablemente que el activo pierde valor con el tiempo y permite deducir ese gasto de forma escalonada. La base que se amortiza es el valor de adquisición menos el valor residual estimado al final de su vida útil.';
 
+// La visible la preguntaba «¿Cambia el total amortizado según el método?», con otra redacción y la
+// misma respuesta (C0570, 13/11/2026): se queda la del JSON-LD.
+export const RESPUESTA_FAQ_TOTAL_SEGUN_METODO =
+  'No. Los tres métodos amortizan exactamente la misma cantidad total a lo largo de la vida útil del activo: el valor de adquisición menos el valor residual. Lo único que cambia es la distribución temporal, es decir, cuánto gasto se reconoce cada año. Por eso elegir entre lineal, degresivo o suma de dígitos es una decisión sobre el momento del gasto y la tesorería fiscal, no sobre la cuantía total.';
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -82,7 +87,7 @@ export const faqJsonLd = {
       name: '¿Cambia el total amortizado según el método elegido?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'No. Los tres métodos amortizan exactamente la misma cantidad total a lo largo de la vida útil del activo: el valor de adquisición menos el valor residual. Lo único que cambia es la distribución temporal, es decir, cuánto gasto se reconoce cada año. Por eso elegir entre lineal, degresivo o suma de dígitos es una decisión sobre el momento del gasto y la tesorería fiscal, no sobre la cuantía total.',
+        text: RESPUESTA_FAQ_TOTAL_SEGUN_METODO,
       },
     },
     {

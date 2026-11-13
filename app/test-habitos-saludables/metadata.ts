@@ -39,6 +39,12 @@ export const jsonLd = generateWebAppSchema({
   features: [],
 });
 
+// La pregunta está también en la FAQ visible («¿Cuántas horas de sueño son suficientes?»): una sola
+// respuesta para las dos (check:faq-unica, C0570, 13/11/2026). Se juntan las dos. La visible atribuía
+// las 7-9 h también a la OMS, que no publica esa cifra para adultos: queda la National Sleep Foundation.
+export const RESPUESTA_FAQ_HORAS_SUENO =
+  'La mayoría de los adultos necesitan entre 7 y 9 horas de sueño por noche, según las recomendaciones de la National Sleep Foundation. Dormir de forma consistente en ese rango se asocia con mejor memoria, regulación del estado de ánimo, control del peso y salud cardiovascular, y dormir menos de 6 horas de forma crónica se asocia con obesidad, diabetes tipo 2, deterioro cognitivo y mayor mortalidad. Las necesidades individuales varían: algunas personas se recuperan bien con 7 horas y otras necesitan 9.';
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -72,7 +78,7 @@ export const faqJsonLd = {
       name: '¿Cuántas horas de sueño son suficientes para un adulto?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La mayoría de los adultos necesitan entre 7 y 9 horas de sueño por noche según las recomendaciones de la National Sleep Foundation. Dormir de forma consistente en ese rango se asocia con mejor memoria, regulación del estado de ánimo, control del peso y salud cardiovascular. Las necesidades individuales varían: algunas personas se recuperan bien con 7 horas y otras necesitan 9.',
+        text: RESPUESTA_FAQ_HORAS_SUENO,
       },
     },
     {

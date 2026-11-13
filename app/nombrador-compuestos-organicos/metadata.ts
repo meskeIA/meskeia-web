@@ -56,6 +56,12 @@ export const jsonLd = generateWebAppSchema({
 });
 
 // FAQPage JSON-LD — mejora visibilidad en Bing Copilot, ChatGPT, Perplexity y Gemini
+// La pregunta está también en la FAQ visible («¿Hexan-2-ol o 2-hexanol?»): una sola respuesta para
+// las dos (check:faq-unica, C0570, 13/11/2026). Decían lo mismo; se queda la del JSON-LD con la
+// última frase de la visible.
+export const RESPUESTA_FAQ_HEXAN_2_OL =
+  'Las dos formas designan el mismo compuesto y se entienden igual. Hexan-2-ol es la forma recomendada por la IUPAC desde 2013: el localizador se coloca justo delante del sufijo al que se refiere, lo que evita ambigüedades en moléculas con varios grupos. La forma 2-hexanol es la clásica, agrupa todos los localizadores al principio y sigue siendo mayoritaria en muchos libros de texto de España y América Latina, así que conviene reconocer ambas. Esta herramienta muestra las dos cuando existen.';
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -81,7 +87,7 @@ export const faqJsonLd = {
       name: '¿Se dice hexan-2-ol o 2-hexanol?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Las dos formas designan el mismo compuesto y se entienden igual. Hexan-2-ol es la forma recomendada por la IUPAC desde 2013: el localizador se coloca justo delante del sufijo al que se refiere, lo que evita ambigüedades en moléculas con varios grupos. La forma 2-hexanol es la clásica, agrupa todos los localizadores al principio y sigue siendo mayoritaria en muchos libros de texto de España y América Latina, así que conviene reconocer ambas.',
+        text: RESPUESTA_FAQ_HEXAN_2_OL,
       },
     },
     {

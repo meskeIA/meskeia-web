@@ -3,6 +3,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './NombradorCompuestosOrganicos.module.css';
+import { RESPUESTA_FAQ_HEXAN_2_OL } from './metadata';
 import {
   MeskeiaLogo,
   Footer,
@@ -1442,10 +1443,7 @@ export default function NombradorCompuestosOrganicosPage() {
             <div className={styles.faqItem}>
               <p className={styles.faqQuestion}>¿Hexan-2-ol o 2-hexanol?</p>
               <p className={styles.faqAnswer}>
-                Ambos designan el mismo compuesto. Hexan-2-ol es la forma que recomienda la IUPAC
-                desde 2013, con el localizador pegado al sufijo al que se refiere. 2-hexanol es la
-                clásica y sigue siendo mayoritaria en muchos libros, así que conviene reconocer las
-                dos. Esta herramienta muestra ambas cuando existen.
+                {RESPUESTA_FAQ_HEXAN_2_OL}
               </p>
             </div>
             <div className={styles.faqItem}>

@@ -48,6 +48,12 @@ export const jsonLd = generateWebAppSchema({
   keywords: ['grafos', 'BFS DFS Dijkstra', 'algoritmia', 'informática universidad'],
 });
 
+// La pregunta está también en la FAQ visible («¿Cuál es la diferencia entre BFS y DFS?»): una sola
+// respuesta para las dos (check:faq-unica, C0570, 13/11/2026). Se juntan las dos; la nota de la
+// visible (faqTip) se queda donde está.
+export const RESPUESTA_FAQ_BFS_DFS =
+  'BFS (Breadth-First Search) explora por niveles: usa una cola FIFO y visita todos los vecinos de un nodo antes de pasar a los vecinos de los vecinos, así que garantiza el camino mínimo en número de aristas en grafos no ponderados. DFS (Depth-First Search) explora a fondo: usa una pila LIFO (o recursión), sigue una rama hasta agotarla y vuelve atrás (backtracking); consume menos memoria en grafos profundos, pero no garantiza el camino más corto. La complejidad de ambos es O(V + E), donde V son los vértices y E las aristas.';
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -65,7 +71,7 @@ export const faqJsonLd = {
       name: '¿Cuál es la diferencia entre BFS y DFS en un grafo?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'BFS (Breadth-First Search) usa una cola y explora todos los vecinos de un nodo antes de avanzar al siguiente nivel; garantiza el camino mínimo en grafos no ponderados. DFS (Depth-First Search) usa una pila y se adentra lo máximo posible por una rama antes de retroceder; consume menos memoria pero no garantiza el camino más corto. La complejidad de ambos es O(V + E) donde V son vértices y E aristas.',
+        text: RESPUESTA_FAQ_BFS_DFS,
       },
     },
     {

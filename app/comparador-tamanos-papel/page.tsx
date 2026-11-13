@@ -12,6 +12,7 @@ import {
   EducationalSection,
 } from '@/components';
 import { formatNumber, parseSpanishNumber } from '@/lib';
+import { RESPUESTA_FAQ_PIXELES_A4 } from './metadata';
 
 // ─────────────────────────────────────────────────────────────────────────
 // DATOS: catálogo de formatos de papel (medidas en milímetros)
@@ -1243,10 +1244,7 @@ export default function ComparadorTamanosPapelPage() {
                   ¿Cuántos píxeles tiene un A4 exactamente?
                 </summary>
                 <p className={styles.eduFaqRespuesta}>
-                  No tiene «unos» píxeles: depende de la resolución. Son 595 × 842 px a 72 DPI,
-                  1.240 × 1.754 px a 150 DPI, 2.480 × 3.508 px a 300 DPI y 4.961 × 7.016 px a 600
-                  DPI. El píxel es una unidad relativa, no física: solo se convierte en milímetros
-                  cuando decides a qué densidad vas a imprimir o mostrar la imagen.
+                  {RESPUESTA_FAQ_PIXELES_A4}
                 </p>
               </details>
               <details className={styles.eduFaqItem}>

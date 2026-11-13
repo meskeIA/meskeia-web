@@ -12,6 +12,7 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
+import { RESPUESTA_FAQ_VOZ_PASIVA } from './metadata';
 
 // ═══════════════════════════════════════════════════════════════════════
 // TIPOS
@@ -1162,10 +1163,7 @@ export default function RevisorLecturaFacilPage() {
             <div className={styles.faqItem}>
               <p className={styles.faqQuestion}>¿Por qué se desaconseja la voz pasiva?</p>
               <p className={styles.faqAnswer}>
-                Porque invierte el orden natural y esconde quién actúa. «La solicitud será revisada
-                por el departamento» obliga a reconstruir quién revisa. En activa —«el departamento
-                revisa tu solicitud»— se entiende de una pasada. La pasiva refleja («se revisarán las
-                solicitudes») tiene el mismo problema y además borra al responsable.
+                {RESPUESTA_FAQ_VOZ_PASIVA}
               </p>
             </div>
             <div className={styles.faqItem}>

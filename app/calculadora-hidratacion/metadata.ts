@@ -39,6 +39,11 @@ export const jsonLd = generateWebAppSchema({
   features: [],
 });
 
+// La pregunta está también en la FAQ visible («¿Es posible beber demasiada agua?»): una sola respuesta
+// para las dos (check:faq-unica, C0570, 13/11/2026). Se juntan las dos, sin cifras nuevas.
+export const RESPUESTA_FAQ_EXCESO_AGUA =
+  'Sí, aunque es poco frecuente fuera del deporte de resistencia. El exceso de agua puede causar hiponatremia (dilución del sodio en sangre), con síntomas como náuseas, confusión y, en casos graves, convulsiones; puede llegar a ser mortal. Ocurre sobre todo en deportistas de resistencia que beben solo agua sin reponer sales. En personas sanas con actividad normal, los riñones regulan bien el exceso, así que no hace falta forzar cantidades muy por encima de las recomendadas.';
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -80,7 +85,7 @@ export const faqJsonLd = {
       name: '¿Es posible beber demasiada agua y qué efectos tiene?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Sí, aunque es poco frecuente fuera del deporte de resistencia extrema. El exceso de agua puede causar hiponatremia (dilución del sodio en sangre), con síntomas como náuseas, confusión y en casos graves convulsiones. Para la población general, el organismo regula bien el exceso a través de los riñones, pero no es necesario forzar cantidades muy por encima de las recomendadas.',
+        text: RESPUESTA_FAQ_EXCESO_AGUA,
       },
     },
   ],
