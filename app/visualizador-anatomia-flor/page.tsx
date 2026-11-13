@@ -152,6 +152,34 @@ interface FlorDiagramaProps {
   onSelectParte: (id: string) => void;
 }
 
+interface RotuloFlorProps {
+  x: number;
+  y: number;
+  texto: string;
+  tamano: number;
+  clase: string;
+  negrita?: boolean;
+  centrado?: boolean;
+}
+
+/**
+ * Rótulo sobre una placa opaca del color de la tarjeta (cabo C0297, 13/11/2026): varios caían encima de
+ * las formas (el tallo, los pétalos) y ningún color de texto se lee igual sobre la tarjeta y sobre el
+ * rosa de un pétalo. El ancho de la placa se estima por el número de caracteres.
+ */
+function RotuloFlor({ x, y, texto, tamano, clase, negrita = false, centrado = false }: RotuloFlorProps) {
+  const ancho = texto.length * tamano * 0.58 + 6;
+  const x0 = centrado ? x - ancho / 2 : x - 3;
+  return (
+    <g className={styles.rotulo}>
+      <rect x={x0} y={y - tamano} width={ancho} height={tamano + 4} rx={3} className={styles.placa} />
+      <text x={x} y={y} textAnchor={centrado ? 'middle' : 'start'} fontSize={tamano} className={clase} fontWeight={negrita ? 600 : undefined}>
+        {texto}
+      </text>
+    </g>
+  );
+}
+
 function FlorDiagrama({ parteSeleccionada, onSelectParte }: FlorDiagramaProps) {
   return (
     <svg viewBox="0 0 400 400" className={styles.florSvg} role="img" aria-label="Diagrama de sección transversal de una flor con partes clickables">
@@ -165,7 +193,7 @@ function FlorDiagrama({ parteSeleccionada, onSelectParte }: FlorDiagramaProps) {
         onKeyDown={(e) => e.key === 'Enter' && onSelectParte('pedunculo')}
       >
         <rect x="188" y="320" width="24" height="80" rx="6" fill="#607D8B" />
-        <text x="200" y="390" textAnchor="middle" fontSize="10" fill="#607D8B" fontWeight="600">Pedúnculo</text>
+        <RotuloFlor x={222} y={385} texto="Pedúnculo" tamano={10} clase={styles.tPedunculo} negrita />
       </g>
 
       {/* Receptáculo */}
@@ -178,7 +206,7 @@ function FlorDiagrama({ parteSeleccionada, onSelectParte }: FlorDiagramaProps) {
         onKeyDown={(e) => e.key === 'Enter' && onSelectParte('receptaculo')}
       >
         <ellipse cx="200" cy="310" rx="60" ry="18" fill="#795548" />
-        <text x="200" y="340" textAnchor="middle" fontSize="10" fill="#795548" fontWeight="600">Receptáculo</text>
+        <RotuloFlor x={200} y={342} texto="Receptáculo" tamano={10} clase={styles.tReceptaculo} negrita centrado />
       </g>
 
       {/* Sépalos */}
@@ -192,7 +220,7 @@ function FlorDiagrama({ parteSeleccionada, onSelectParte }: FlorDiagramaProps) {
       >
         <ellipse cx="120" cy="280" rx="30" ry="12" fill="#4CAF50" transform="rotate(-30 120 280)" />
         <ellipse cx="280" cy="280" rx="30" ry="12" fill="#4CAF50" transform="rotate(30 280 280)" />
-        <text x="80" y="290" fontSize="10" fill="#4CAF50" fontWeight="600">Sépalos</text>
+        <RotuloFlor x={52} y={300} texto="Sépalos" tamano={10} clase={styles.tSepalos} negrita />
       </g>
 
       {/* Pétalos */}
@@ -209,7 +237,7 @@ function FlorDiagrama({ parteSeleccionada, onSelectParte }: FlorDiagramaProps) {
         <ellipse cx="270" cy="200" rx="28" ry="55" fill="#E91E63" opacity="0.85" transform="rotate(60 270 200)" />
         <ellipse cx="145" cy="270" rx="28" ry="55" fill="#E91E63" opacity="0.75" transform="rotate(-120 145 270)" />
         <ellipse cx="255" cy="270" rx="28" ry="55" fill="#E91E63" opacity="0.75" transform="rotate(120 255 270)" />
-        <text x="200" y="90" textAnchor="middle" fontSize="10" fill="#E91E63" fontWeight="600">Pétalos</text>
+        <RotuloFlor x={200} y={78} texto="Pétalos" tamano={10} clase={styles.tPetalos} negrita centrado />
       </g>
 
       {/* Estambres */}
@@ -229,8 +257,8 @@ function FlorDiagrama({ parteSeleccionada, onSelectParte }: FlorDiagramaProps) {
         <circle cx="225" cy="160" r="8" fill="#FF9800" />
         <line x1="230" y1="290" x2="245" y2="180" stroke="#FF9800" strokeWidth="3" />
         <circle cx="245" cy="175" r="8" fill="#FF9800" />
-        <text x="270" y="150" fontSize="10" fill="#FF9800" fontWeight="600">Estambres</text>
-        <text x="270" y="162" fontSize="8" fill="#FF9800">(antera + filamento)</text>
+        <RotuloFlor x={270} y={150} texto="Estambres" tamano={10} clase={styles.tEstambres} negrita />
+        <RotuloFlor x={270} y={162} texto="(antera + filamento)" tamano={8} clase={styles.tEstambres} />
       </g>
 
       {/* Pistilo / Carpelo */}
@@ -251,8 +279,8 @@ function FlorDiagrama({ parteSeleccionada, onSelectParte }: FlorDiagramaProps) {
         <line x1="200" y1="267" x2="200" y2="210" stroke="#9C27B0" strokeWidth="4" />
         {/* Estigma */}
         <ellipse cx="200" cy="205" rx="12" ry="6" fill="#9C27B0" />
-        <text x="125" y="210" fontSize="10" fill="#9C27B0" fontWeight="600">Pistilo</text>
-        <text x="110" y="222" fontSize="8" fill="#9C27B0">estigma + estilo + ovario</text>
+        <RotuloFlor x={125} y={210} texto="Pistilo" tamano={10} clase={styles.tPistilo} negrita />
+        <RotuloFlor x={110} y={222} texto="estigma + estilo + ovario" tamano={8} clase={styles.tPistilo} />
       </g>
     </svg>
   );

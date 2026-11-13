@@ -32,9 +32,32 @@
 .florContainer { position: relative; width: 100%; max-width: 480px; aspect-ratio: 1; margin: 0 auto var(--spacing-lg); background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-large); overflow: hidden; }
 .florSvg { width: 100%; height: 100%; }
 
-.parteBtn { cursor: pointer; transition: opacity 0.2s, filter 0.2s; }
-.parteBtn:hover { opacity: 0.85; filter: brightness(1.1); }
-.parteBtnSelected { filter: brightness(1.2); stroke-width: 2; }
+.parteBtn { cursor: pointer; }
+.parteBtn > * { transition: opacity 0.2s, filter 0.2s; }
+/* El brillo y la opacidad, solo en las formas: sobre el rótulo aclaraban la tinta y la placa
+   (cabo C0297, 13/11/2026) */
+.parteBtn:hover > :not(.rotulo) { opacity: 0.85; filter: brightness(1.1); }
+.parteBtnSelected { stroke-width: 2; }
+.parteBtnSelected > :not(.rotulo) { filter: brightness(1.2); }
+
+/* Rótulos del diagrama sobre una placa opaca del color de la tarjeta, con un tono de texto por parte
+   y tema — cabo C0297 (13/11/2026). Iban en el color puro de la parte encima de las propias formas:
+   «Pedúnculo» sobre el tallo 1,01:1, «Sépalos» y «Pistilo» sobre los pétalos 1,20-1,94, «Estambres»
+   2,14, «Pétalos» 4,31 en claro y 3,30 en oscuro, «Receptáculo» 2,19 en oscuro. Medido en
+   tests/contraste-svg-texto.spec.ts. */
+.placa { fill: var(--bg-card); }
+.tPedunculo { fill: #455A64; }
+.tReceptaculo { fill: #6D4C41; }
+.tSepalos { fill: #2E7D32; }
+.tPetalos { fill: #AD1457; }
+.tEstambres { fill: var(--ambar-texto, #8A5A00); }
+.tPistilo { fill: #7B1FA2; }
+[data-theme='dark'] .tPedunculo { fill: #B0BEC5; }
+[data-theme='dark'] .tReceptaculo { fill: #BCAAA4; }
+[data-theme='dark'] .tSepalos { fill: #81C784; }
+[data-theme='dark'] .tPetalos { fill: #F48FB1; }
+[data-theme='dark'] .tEstambres { fill: #FFB74D; }
+[data-theme='dark'] .tPistilo { fill: #CE93D8; }
 
 /* Panel info de parte */
 .parteInfo { background: var(--bg-card); border: 2px solid var(--border); border-radius: var(--radius); padding: var(--spacing-md) var(--spacing-lg); margin-bottom: var(--spacing-lg); animation: fadeIn 0.25s ease; }
@@ -141,6 +164,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .parteCard, .tipoCard, .frutoCard, .datoCard, .navBtn, .parteBtn { transition-duration: 0.01ms !important; }
+  .parteCard, .tipoCard, .frutoCard, .datoCard, .navBtn, .parteBtn, .parteBtn > * { transition-duration: 0.01ms !important; }
   .parteInfo { animation-duration: 0.01ms !important; }
 }

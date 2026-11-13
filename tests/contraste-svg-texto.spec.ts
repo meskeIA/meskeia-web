@@ -361,6 +361,11 @@ const APPS: App[] = [
     extremos: true,
     subestados: "svg circle[role='button']",
   },
+  // 13/11/2026: los rótulos de la flor en el color puro de su parte y encima de las formas: «Pedúnculo»
+  // sobre el tallo (1,01:1), «Sépalos» y «Pistilo» sobre los pétalos (1,20-1,94), «Estambres» en
+  // naranja (2,14), «Pétalos» (4,31 en claro, 3,30 en oscuro) y «Receptáculo» en marrón (2,19 en
+  // oscuro). Cada parte elegida, como subestado (su brillo aclaraba también el rótulo)
+  { slug: 'visualizador-anatomia-flor', secciones: SECCIONES, subestados: "button[aria-pressed]:not(nav button)" },
 ];
 
 interface TextoSvg {
