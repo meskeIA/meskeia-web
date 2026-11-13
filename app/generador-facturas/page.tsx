@@ -6,6 +6,7 @@ import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
 import { RelatedApps, DisclaimerCard, LegalNotice, EducationalSection, ShareCard, CampoNumerico } from '@/components';
 import { formatCurrency, formatDate, parseISODateLocal, hoyISOLocal } from '@/lib';
+import { RESPUESTA_FAQ_CONSERVAR_FACTURAS } from './metadata';
 
 // Tipos
 interface DatosEmisor {
@@ -1330,7 +1331,7 @@ export default function GeneradorFacturasPage() {
             <div className={styles.faqItem}>
               <h4><span aria-hidden="true">❓</span> ¿Cuánto tiempo debo conservar las facturas?</h4>
               <p>
-                Mínimo <strong>4 años</strong> según la Ley General Tributaria (prescripción tributaria). Sin embargo, el Código de Comercio exige <strong>6 años</strong> para documentos contables. La recomendación práctica es guardar todo durante <strong>6 años</strong>. Si tienes pérdidas que compensar en ejercicios futuros, conserva la documentación hasta que se hayan compensado completamente.
+                {RESPUESTA_FAQ_CONSERVAR_FACTURAS}
               </p>
               <p className={styles.faqTip}>💡 <strong>Tip:</strong> Desde el 1 de julio de 2025, la obligación de factura electrónica (Ley Crea y Crece) se está implementando gradualmente. Prepárate para adoptar software certificado.</p>
             </div>

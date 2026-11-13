@@ -39,6 +39,15 @@ export const jsonLd = generateWebAppSchema({
   features: [],
 });
 
+// La pregunta está también en la FAQ visible («¿Cuánto tiempo debo conservar las facturas?»): una sola
+// respuesta para las dos (check:faq-unica, C0570, 13/11/2026). El JSON-LD callaba los 6 años del Código
+// de Comercio y atribuía los 10 años al Impuesto sobre Sociedades «si hay activos amortizables»; la
+// visible callaba los 10. Cotejado en el BOE el 13/11/2026: LGT art. 66 (prescripción, cuatro años),
+// art. 66 bis.2 (comprobar bases o cuotas compensadas o pendientes y deducciones pendientes, diez años)
+// y Código de Comercio art. 30.1 (seis años a partir del último asiento realizado en los libros).
+export const RESPUESTA_FAQ_CONSERVAR_FACTURAS =
+  'En España, como mínimo 4 años, que es el plazo de prescripción tributaria de la Ley General Tributaria (art. 66). El Código de Comercio (art. 30) obliga además a los empresarios a conservar la documentación y los justificantes de su negocio durante 6 años desde el último asiento de los libros, así que la recomendación práctica es guardarlas 6 años. Si una factura sirve para justificar bases imponibles negativas, cuotas pendientes de compensar o deducciones pendientes de aplicar, la Administración puede comprobarlas durante 10 años (art. 66 bis de la LGT), así que conviene conservarla hasta entonces. Guarda siempre tanto la factura como el justificante de pago.';
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -72,7 +81,7 @@ export const faqJsonLd = {
       name: '¿Cuánto tiempo debo conservar las facturas emitidas?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'En España la normativa fiscal obliga a conservar las facturas durante un mínimo de 4 años, que es el plazo de prescripción tributaria general. Sin embargo, para el Impuesto de Sociedades el plazo puede extenderse hasta 10 años si las facturas están relacionadas con activos amortizables. Se recomienda guardar siempre tanto la factura original como el justificante de pago.',
+        text: RESPUESTA_FAQ_CONSERVAR_FACTURAS,
       },
     },
     {
