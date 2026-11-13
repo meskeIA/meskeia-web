@@ -208,6 +208,26 @@
 .faseVoltaje { font-size: 0.82rem; font-weight: 700; color: white; padding: 0.2rem 0.6rem; border-radius: 20px; }
 .faseDesc { font-size: 0.92rem; color: var(--text-primary); line-height: 1.5; margin: 0; }
 
+/* Tono de TEXTO de cada color de dato, para el HTML (color) y los <text> de los SVG (fill, que por
+   CSS manda sobre el atributo) — cabos C0297 y C0645 (13/11/2026). En su color puro, el título de
+   la parte, el de la fase y los rótulos de la neurona y del potencial daban en claro el verde 2,85:1,
+   el ámbar 2,17, el teal 2,78, el azul 3,15, el rojo 3,79, la marca 4,07 y el gris 2,54; en oscuro,
+   la marca 3,50 y el rojo 3,76. El color de dato se queda en bordes, formas y curvas. Medido en
+   tests/contraste-svg-texto.spec.ts y tests/contraste-marca-datos.spec.ts. */
+.tonoMarca { color: var(--primary-texto, #26718F); fill: var(--primary-texto, #26718F); }
+.tonoTeal { color: var(--secondary-texto, #327874); fill: var(--secondary-texto, #327874); }
+.tonoVerde { color: var(--verde-texto, #136E35); fill: var(--verde-texto, #136E35); }
+.tonoAmbar { color: var(--ambar-texto, #8A5A00); fill: var(--ambar-texto, #8A5A00); }
+.tonoRojo { color: var(--rojo-texto, #B91C1C); fill: var(--rojo-texto, #B91C1C); }
+.tonoAzul { color: #1F6391; fill: #1F6391; }
+.tonoVioleta { color: #8E44AD; fill: #8E44AD; }
+.tonoGris { color: var(--text-secondary); fill: var(--text-secondary); }
+[data-theme='dark'] .tonoVerde { color: #58D68D; fill: #58D68D; }
+[data-theme='dark'] .tonoAmbar { color: #F39C12; fill: #F39C12; }
+[data-theme='dark'] .tonoRojo { color: #F1948A; fill: #F1948A; }
+[data-theme='dark'] .tonoAzul { color: #5DADE2; fill: #5DADE2; }
+[data-theme='dark'] .tonoVioleta { color: #C39BD3; fill: #C39BD3; }
+
 /* ============================================================
    GRÁFICO POTENCIAL DE ACCIÓN
    ============================================================ */

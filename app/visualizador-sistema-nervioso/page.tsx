@@ -12,6 +12,25 @@ import {
   DisclaimerCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
+import { rellenoConTinta } from '@/lib/tintaLegible';
+
+/**
+ * Tono de TEXTO de cada color de dato (cabos C0297 y C0645, 13/11/2026): el título de la parte y
+ * el de la fase, y los rótulos de los SVG, en el color puro no se leían. El color de dato se queda
+ * en bordes, formas y curvas.
+ */
+const TONO: Record<string, string> = {
+  '#2e86ab': 'tonoMarca',
+  '#48a9a6': 'tonoTeal',
+  '#27ae60': 'tonoVerde',
+  '#f39c12': 'tonoAmbar',
+  '#e74c3c': 'tonoRojo',
+  '#3498db': 'tonoAzul',
+  '#8e44ad': 'tonoVioleta',
+  '#95a5a6': 'tonoGris',
+  '#999': 'tonoGris',
+};
+const tono = (color: string): string => styles[TONO[color.toLowerCase()] ?? 'tonoGris'];
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -367,7 +386,7 @@ function SeccionNeurona() {
             <line x1="15" y1="115" x2="30" y2="120" stroke="#27ae60" strokeWidth="2" strokeLinecap="round" />
             <line x1="10" y1="175" x2="30" y2="170" stroke="#27ae60" strokeWidth="2" strokeLinecap="round" />
             <line x1="20" y1="210" x2="40" y2="200" stroke="#27ae60" strokeWidth="2" strokeLinecap="round" />
-            <text x="15" y="70" fill="#27ae60" fontSize="12" fontWeight="600">Dendritas</text>
+            <text x="15" y="70" className={styles.tonoVerde} fontSize="12" fontWeight="600">Dendritas</text>
           </g>
 
           {/* Soma */}
@@ -380,7 +399,8 @@ function SeccionNeurona() {
             aria-label="Soma: cuerpo celular"
             onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setParteActiva(parteActiva === 'soma' ? null : 'soma'); } }}
           >
-            <ellipse cx="130" cy="150" rx="45" ry="40" fill="#8e44ad" opacity="0.85" />
+            {/* Opaco: al 85 % el blanco de «Soma» encima daba 4,40:1 (C0297) */}
+            <ellipse cx="130" cy="150" rx="45" ry="40" fill="#8e44ad" />
             <ellipse cx="130" cy="150" rx="20" ry="18" fill="#6c3483" opacity="0.7" />
             <text x="130" y="145" textAnchor="middle" fill="#fff" fontSize="10" fontWeight="600">Soma</text>
             <text x="130" y="158" textAnchor="middle" fill="#fff" fontSize="8">(núcleo)</text>
@@ -397,7 +417,7 @@ function SeccionNeurona() {
             onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setParteActiva(parteActiva === 'axon' ? null : 'axon'); } }}
           >
             <line x1="175" y1="150" x2="220" y2="150" stroke="#2E86AB" strokeWidth="6" strokeLinecap="round" />
-            <text x="197" y="140" textAnchor="middle" fill="#2E86AB" fontSize="10" fontWeight="600">Axón</text>
+            <text x="197" y="140" textAnchor="middle" className={styles.tonoMarca} fontSize="10" fontWeight="600">Axón</text>
           </g>
 
           {/* Vaina de mielina (segmentos) */}
@@ -416,7 +436,7 @@ function SeccionNeurona() {
             <rect x="490" y="135" width="70" height="30" rx="15" fill="#f39c12" opacity="0.8" />
             {/* Línea del axón a través de mielina */}
             <line x1="220" y1="150" x2="560" y2="150" stroke="#2E86AB" strokeWidth="4" />
-            <text x="390" y="125" textAnchor="middle" fill="#f39c12" fontSize="11" fontWeight="600">Vaina de mielina</text>
+            <text x="390" y="125" textAnchor="middle" className={styles.tonoAmbar} fontSize="11" fontWeight="600">Vaina de mielina</text>
           </g>
 
           {/* Nodos de Ranvier */}
@@ -432,7 +452,7 @@ function SeccionNeurona() {
             <circle cx="295" cy="150" r="6" fill="#e74c3c" />
             <circle cx="385" cy="150" r="6" fill="#e74c3c" />
             <circle cx="475" cy="150" r="6" fill="#e74c3c" />
-            <text x="385" y="185" textAnchor="middle" fill="#e74c3c" fontSize="10" fontWeight="600">Nodos de Ranvier</text>
+            <text x="385" y="185" textAnchor="middle" className={styles.tonoRojo} fontSize="10" fontWeight="600">Nodos de Ranvier</text>
           </g>
 
           {/* Terminal sináptico */}
@@ -458,14 +478,14 @@ function SeccionNeurona() {
             <circle cx="628" cy="154" r="3" fill="#fff" opacity="0.6" />
             <circle cx="612" cy="184" r="3" fill="#fff" opacity="0.6" />
             <circle cx="618" cy="192" r="3" fill="#fff" opacity="0.6" />
-            <text x="620" y="220" textAnchor="middle" fill="#48A9A6" fontSize="10" fontWeight="600">Terminal</text>
-            <text x="620" y="232" textAnchor="middle" fill="#48A9A6" fontSize="10" fontWeight="600">sináptico</text>
+            <text x="620" y="220" textAnchor="middle" className={styles.tonoTeal} fontSize="10" fontWeight="600">Terminal</text>
+            <text x="620" y="232" textAnchor="middle" className={styles.tonoTeal} fontSize="10" fontWeight="600">sináptico</text>
           </g>
 
           {/* Flecha de dirección */}
           <line x1="130" y1="250" x2="600" y2="250" stroke="#999" strokeWidth="1.5" strokeDasharray="6,4" />
           <polygon points="600,245 615,250 600,255" fill="#999" />
-          <text x="365" y="270" textAnchor="middle" fill="#999" fontSize="10">Dirección del impulso nervioso →</text>
+          <text x="365" y="270" textAnchor="middle" className={styles.tonoGris} fontSize="10">Dirección del impulso nervioso →</text>
         </svg>
       </div>
 
@@ -476,7 +496,7 @@ function SeccionNeurona() {
         <div className={styles.parteDetalle} style={{ borderLeftColor: parte.color }}>
           <div className={styles.parteHeader}>
             <span aria-hidden="true">{parte.icono}</span>
-            <h3 className={styles.parteTitulo} style={{ color: parte.color }}>{parte.nombre}</h3>
+            <h3 className={`${styles.parteTitulo} ${tono(parte.color)}`}>{parte.nombre}</h3>
           </div>
           <p className={styles.parteDesc}>{parte.descripcion}</p>
           <p className={styles.parteDato}><strong>Dato:</strong> {parte.dato}</p>
@@ -646,11 +666,16 @@ function SeccionSinapsis() {
             key={i}
             type="button"
             className={`${styles.faseBtn} ${faseActiva === i ? styles.faseBtnActiva : ''}`}
-            style={{
-              borderColor: faseActiva === i ? f.color : undefined,
-              background: faseActiva === i ? f.color : undefined,
-              color: faseActiva === i ? '#fff' : undefined,
-            }}
+            style={
+              faseActiva === i
+                ? {
+                    // El blanco sobre el color puro de la fase daba 2,17-3,79:1 (C0645)
+                    borderColor: rellenoConTinta(f.color).relleno,
+                    background: rellenoConTinta(f.color).relleno,
+                    color: rellenoConTinta(f.color).tinta,
+                  }
+                : undefined
+            }
             onClick={() => setFaseActiva(i)}
             aria-pressed={faseActiva === i}
             aria-label={`Fase ${i + 1}: ${f.nombre}`}
@@ -663,10 +688,15 @@ function SeccionSinapsis() {
 
       <div className={styles.faseDetalle} style={{ borderLeftColor: fase.color }}>
         <div className={styles.faseHeader}>
-          <h4 className={styles.faseTitulo} style={{ color: fase.color }}>
+          <h4 className={`${styles.faseTitulo} ${tono(fase.color)}`}>
             <span aria-hidden="true">{fase.icono}</span> {fase.nombre}
           </h4>
-          <span className={styles.faseVoltaje} style={{ background: fase.color }}>{fase.voltaje}</span>
+          <span
+            className={styles.faseVoltaje}
+            style={{ background: rellenoConTinta(fase.color).relleno, color: rellenoConTinta(fase.color).tinta }}
+          >
+            {fase.voltaje}
+          </span>
         </div>
         <p className={styles.faseDesc}>{fase.descripcion}</p>
       </div>
@@ -683,7 +713,7 @@ function SeccionSinapsis() {
           <text x="45" y="150" textAnchor="end" fill="currentColor" fontSize="9">-70 mV</text>
           {/* Línea umbral */}
           <line x1="50" y1="100" x2="380" y2="100" stroke="#f39c12" strokeWidth="1" strokeDasharray="4,4" opacity="0.5" />
-          <text x="385" y="103" fill="#f39c12" fontSize="8">umbral</text>
+          <text x="385" y="103" className={styles.tonoAmbar} fontSize="8">umbral</text>
           {/* Línea reposo */}
           <line x1="50" y1="150" x2="380" y2="150" stroke="#3498db" strokeWidth="1" strokeDasharray="4,4" opacity="0.3" />
           {/* Curva del potencial */}
@@ -696,9 +726,9 @@ function SeccionSinapsis() {
           />
           {/* Etiquetas */}
           <text x="85" y="170" textAnchor="middle" fill="currentColor" fontSize="8">Reposo</text>
-          <text x="160" y="15" textAnchor="middle" fill="#e74c3c" fontSize="8" fontWeight="600">Despol.</text>
-          <text x="220" y="170" textAnchor="middle" fill="#27ae60" fontSize="8">Repol.</text>
-          <text x="270" y="175" textAnchor="middle" fill="#95a5a6" fontSize="7">Refract.</text>
+          <text x="160" y="15" textAnchor="middle" className={styles.tonoRojo} fontSize="8" fontWeight="600">Despol.</text>
+          <text x="220" y="170" textAnchor="middle" className={styles.tonoVerde} fontSize="8">Repol.</text>
+          <text x="270" y="175" textAnchor="middle" className={styles.tonoGris} fontSize="7">Refract.</text>
         </svg>
       </div>
 

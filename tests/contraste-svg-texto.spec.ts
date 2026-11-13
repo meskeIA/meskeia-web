@@ -316,6 +316,12 @@ const APPS: App[] = [
   // en naranja E67E22 (2,82), Re e Im en #888 (3,51) y las marcas de los ejes en #aaa y #bbb
   // (1,90-2,30). Las cuatro operaciones, como subestados, y los deslizadores en sus extremos
   { slug: 'visualizador-numeros-complejos', extremos: true, subestados: 'button[aria-pressed]' },
+  // 13/11/2026: los rótulos de la neurona en el color de su parte (Dendritas en verde 2,85:1, la
+  // mielina en ámbar 2,17, el terminal en teal 2,78, Ranvier en rojo 3,79 y el axón en la marca 4,07
+  // en claro; 3,50-3,76 en oscuro), «Soma» en blanco sobre su violeta al 85 % (4,40) y, en el
+  // potencial de acción, umbral, Despol., Repol. y Refract. en su color (2,17-3,79). Las partes de la
+  // neurona, como subestados
+  { slug: 'visualizador-sistema-nervioso', secciones: SECCIONES, subestados: "button[aria-pressed]:not(nav button)" },
 ];
 
 interface TextoSvg {

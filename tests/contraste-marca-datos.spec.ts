@@ -189,6 +189,9 @@ const APPS: App[] = [
   { slug: 'visualizador-evolucion-molecular', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
   // 13/11/2026 (C0278): en oscuro, «Nota:» en --primary-texto sobre el tinte de marca al 8 % (4,33:1)
   { slug: 'visualizador-numeros-complejos', todo: true, secciones: 'button[aria-pressed]' },
+  // 13/11/2026 (C0645): la fase del potencial de acción en su color con style (el título «Reposo» en
+  // #3498db, 3,15:1) y el blanco encima en el botón activo y en el voltaje (3,15 en los dos temas)
+  { slug: 'visualizador-sistema-nervioso', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
 ];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {

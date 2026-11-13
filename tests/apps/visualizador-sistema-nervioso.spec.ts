@@ -390,8 +390,10 @@ test.describe('Contenido: cifras y afirmaciones contra la propia app', () => {
 });
 
 test.describe('Accesibilidad: contraste del texto en color de datos (C0645)', () => {
-  test('ABIERTO · fases, voltaje, títulos de las partes y rótulos de los SVG llegan a 4,5:1 en claro y en oscuro', async ({ page }) => {
-    // Medido el 08/11/2026 (texto < 18,66 px negrita, umbral 4,5:1). Claro: blanco sobre el color
+  test('REPARADO · fases, voltaje, títulos de las partes y rótulos de los SVG llegan a 4,5:1 en claro y en oscuro', async ({ page }) => {
+    // Hallazgo 4217, REPARADO el 13/11/2026: un tono de texto por color de dato y tema en el módulo
+    // para títulos y rótulos, rellenoConTinta en el botón de la fase y en el voltaje, y la elipse del
+    // soma opaca. Medido el 08/11/2026 (texto < 18,66 px negrita, umbral 4,5:1). Claro: blanco sobre el color
     // de cada fase 2,19-3,82 (botón activo y píldora de voltaje), el título de la fase 2,19-3,82,
     // los títulos de Dendritas 2,87, Axón 4,11, Mielina 2,19, Ranvier 3,82 y Terminal 2,80, y en
     // los SVG «umbral» 2,19, «Repol.» 2,87, «Vaina de mielina» 2,19, «Dirección del impulso» 2,85.
@@ -439,7 +441,6 @@ test.describe('Accesibilidad: contraste del texto en color de datos (C0645)', ()
     // 6 títulos de parte + 7 rótulos del diagrama (sin los dos blancos del soma) + 5 × 3 de las
     // fases + 8 rótulos del gráfico = 36 medidas por tema.
     expect(medidos).toBe(72);
-    test.fail();
     expect([...claro, ...oscuro]).toEqual([]);
   });
 });
