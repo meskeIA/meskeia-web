@@ -371,6 +371,11 @@ const APPS: App[] = [
   // teal (2,78), el empuje en la marca (3,93 y 4,24), el peso en marrón (1,92 en oscuro) y la
   // resistencia en rojo (3,60 en oscuro)
   { slug: 'visualizador-vuelo-avion', secciones: SECCIONES, extremos: true },
+  // 13/11/2026: en la brisa, el blanco de «Mar» sobre el azul translúcido (2,07:1 en claro), «Sube» en
+  // rojo (2,63) y la brisa en azul cielo (1,93) sobre el cielo claro de día, igual en los dos temas; en
+  // los otros ejemplos, los rótulos en el color del ejemplo sobre su fondo teñido. Cada ejemplo de
+  // convección, como subestado
+  { slug: 'visualizador-termodinamica', secciones: SECCIONES, extremos: true, subestados: "button[class*='conveccionBtn']" },
 ];
 
 interface TextoSvg {

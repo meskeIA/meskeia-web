@@ -1,7 +1,7 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState } from 'react';
+import { useState, type CSSProperties } from 'react';
 import styles from './Termodinamica.module.css';
 import {
   MeskeiaLogo,
@@ -12,6 +12,26 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
+import { rellenoConTinta } from '@/lib/tintaLegible';
+
+/**
+ * Tono de TEXTO de cada color de datos, en claro y en oscuro (cabo C0645, 13/11/2026), para la clase
+ * `tonoDato` del módulo. El color de dato se queda en bordes, flechas y formas.
+ */
+const TONOS_TEXTO: Record<string, [string, string]> = {
+  '#EF4444': ['#B91C1C', '#F1948A'],
+  '#DC2626': ['#B91C1C', '#F1948A'],
+  '#3B82F6': ['#1D4ED8', '#93C5FD'],
+  '#2563EB': ['#1D4ED8', '#93C5FD'],
+  '#F59E0B': ['#8A5A00', '#FCD34D'],
+  '#0EA5E9': ['#075985', '#7DD3FC'],
+  '#6366F1': ['#4338CA', '#A5B4FC'],
+};
+
+function tono(color: string): CSSProperties {
+  const [claro, oscuro] = TONOS_TEXTO[color.toUpperCase()] ?? ['var(--text-primary)', 'var(--text-primary)'];
+  return { '--tono-claro': claro, '--tono-oscuro': oscuro } as CSSProperties;
+}
 
 // ─────────────────────────────────────────────
 // Tipos y constantes
@@ -269,7 +289,12 @@ function SeccionFormas() {
             style={{ borderColor: tipoActivo === f.id ? f.color : undefined }}
           >
             <span className={styles.formaIcono} aria-hidden="true">{f.icono}</span>
-            <span className={styles.formaNombre} style={{ color: tipoActivo === f.id ? f.color : undefined }}>{f.nombre}</span>
+            <span
+              className={tipoActivo === f.id ? `${styles.formaNombre} ${styles.tonoDato}` : styles.formaNombre}
+              style={tipoActivo === f.id ? tono(f.color) : undefined}
+            >
+              {f.nombre}
+            </span>
             <span className={styles.formaDesc}>{f.descripcionCorta}</span>
           </button>
         ))}
@@ -284,7 +309,7 @@ function SeccionFormas() {
 
       {/* Panel de detalles */}
       <div className={styles.detallePanel} style={{ borderLeftColor: forma.color }}>
-        <h3 className={styles.detalleTitulo} style={{ color: forma.color }}>
+        <h3 className={`${styles.detalleTitulo} ${styles.tonoDato}`} style={tono(forma.color)}>
           {forma.icono} {forma.nombre}
         </h3>
 
@@ -410,6 +435,12 @@ function SeccionConductividad() {
 // ─────────────────────────────────────────────
 
 function DiagramaBrisa({ esNoche }: { esNoche: boolean }) {
+  // El cielo es fijo por la hora, no por el tema (claro de día, azul noche de noche): los rótulos
+  // sobre él toman su tono de la hora. De día «Sube» en rojo daba 2,63:1 y la brisa en azul 1,93.
+  const mar = rellenoConTinta('#3B82F6');
+  const tierra = rellenoConTinta(esNoche ? '#374151' : '#92400E');
+  const tintaSube = esNoche ? '#FCA5A5' : '#991B1B';
+  const tintaBrisa = esNoche ? '#7DD3FC' : '#075985';
   return (
     <svg viewBox="0 0 400 200" className={styles.diagramaSvg} aria-label={esNoche ? 'Brisa terrestre nocturna' : 'Brisa marina diurna'}>
       {/* Cielo */}
@@ -420,30 +451,31 @@ function DiagramaBrisa({ esNoche }: { esNoche: boolean }) {
         <text x="350" y="30" fontSize="22">☀️</text>
       )}
 
-      {/* Mar */}
-      <rect x="0" y="130" width="200" height="70" fill="#3B82F6" opacity="0.6" />
-      <text x="100" y="170" fill="white" fontSize="12" textAnchor="middle" fontWeight="600">Mar</text>
+      {/* Mar y tierra opacos, con la tinta que les llega: translúcidos sobre el fondo claro, el
+          blanco de «Mar» daba 2,07:1 (cabo C0297, 13/11/2026) */}
+      <rect x="0" y="130" width="200" height="70" fill={mar.relleno} />
+      <text x="100" y="170" fill={mar.tinta} fontSize="12" textAnchor="middle" fontWeight="600">Mar</text>
 
       {/* Tierra */}
-      <rect x="200" y="130" width="200" height="70" fill={esNoche ? '#374151' : '#92400E'} opacity="0.7" />
-      <text x="300" y="170" fill="white" fontSize="12" textAnchor="middle" fontWeight="600">Tierra</text>
+      <rect x="200" y="130" width="200" height="70" fill={tierra.relleno} />
+      <text x="300" y="170" fill={tierra.tinta} fontSize="12" textAnchor="middle" fontWeight="600">Tierra</text>
 
       {/* Flechas de convección */}
       {!esNoche ? (
         <>
           {/* Día: brisa del mar a tierra */}
           <line x1="280" y1="110" x2="280" y2="50" stroke="#EF4444" strokeWidth="2.5" markerEnd="url(#arrowUp)" className={styles.flechaAnimada} />
-          <text x="280" y="42" fill="#EF4444" fontSize="8" textAnchor="middle">Sube</text>
+          <text x="280" y="42" fill={tintaSube} fontSize="8" textAnchor="middle">Sube</text>
           <line x1="160" y1="70" x2="250" y2="70" stroke="#0EA5E9" strokeWidth="2.5" markerEnd="url(#arrowRight)" className={styles.flechaAnimada} />
-          <text x="205" y="64" fill="#0EA5E9" fontSize="9" textAnchor="middle" fontWeight="600">Brisa marina</text>
+          <text x="205" y="64" fill={tintaBrisa} fontSize="9" textAnchor="middle" fontWeight="600">Brisa marina</text>
         </>
       ) : (
         <>
           {/* Noche: brisa de tierra a mar */}
           <line x1="120" y1="110" x2="120" y2="50" stroke="#EF4444" strokeWidth="2.5" markerEnd="url(#arrowUp)" className={styles.flechaAnimada} />
-          <text x="120" y="42" fill="#EF4444" fontSize="8" textAnchor="middle">Sube</text>
+          <text x="120" y="42" fill={tintaSube} fontSize="8" textAnchor="middle">Sube</text>
           <line x1="240" y1="70" x2="150" y2="70" stroke="#0EA5E9" strokeWidth="2.5" markerEnd="url(#arrowRight)" className={styles.flechaAnimada} />
-          <text x="195" y="64" fill="#0EA5E9" fontSize="9" textAnchor="middle" fontWeight="600">Brisa terrestre</text>
+          <text x="195" y="64" fill={tintaBrisa} fontSize="9" textAnchor="middle" fontWeight="600">Brisa terrestre</text>
         </>
       )}
 
@@ -516,7 +548,7 @@ function SeccionConveccionNaturaleza() {
       {ej.id !== 'brisa' && (
         <div className={styles.diagramaContainer}>
           <svg viewBox="0 0 400 200" className={styles.diagramaSvg} aria-label={`Diagrama de convección: ${ej.nombre}`}>
-            <rect x="0" y="0" width="400" height="200" fill={ej.id === 'manto' ? '#7F1D1D' : ej.id === 'oceanicas' ? '#1E3A5F' : '#E0F2FE'} rx="8" opacity="0.3" />
+            <rect x="0" y="0" width="400" height="200" fill={ej.id === 'manto' ? '#7F1D1D' : ej.id === 'oceanicas' ? '#1E3A5F' : '#E0F2FE'} rx="8" opacity="0.2" />
 
             {/* Flechas circulares de convección */}
             <path
@@ -539,14 +571,16 @@ function SeccionConveccionNaturaleza() {
             <line x1="200" y1="160" x2="200" y2="50" stroke={ej.color} strokeWidth="3" markerEnd="url(#arrowConv)" className={styles.flechaAnimada} />
 
             {/* Labels */}
-            <text x="200" y="180" fill={ej.color} fontSize="11" textAnchor="middle" fontWeight="700">
+            {/* Rótulos en el tono del tema (C0297): en el color del ejemplo, sobre su fondo teñido, el
+                azul y el rojo no llegaban a 4,5 en los dos temas */}
+            <text x="200" y="180" className={styles.svgTinta} fontSize="11" textAnchor="middle" fontWeight="700">
               {ej.id === 'manto' ? <><tspan aria-hidden="true">🔥</tspan> Calor del núcleo</> : ej.id === 'oceanicas' ? <><tspan aria-hidden="true">🌊</tspan> Agua densa se hunde</> : <><tspan aria-hidden="true">☀️</tspan> Suelo caliente</>}
             </text>
-            <text x="200" y="30" fill={ej.color} fontSize="10" textAnchor="middle" fontWeight="600">
+            <text x="200" y="30" className={styles.svgTinta} fontSize="10" textAnchor="middle" fontWeight="600">
               {ej.id === 'manto' ? 'Roca caliente sube' : ej.id === 'oceanicas' ? 'Agua caliente en superficie' : 'Aire caliente sube'}
             </text>
-            <text x="100" y="100" fill={ej.color} fontSize="9" textAnchor="middle" opacity="0.7">Frío ↓</text>
-            <text x="300" y="100" fill={ej.color} fontSize="9" textAnchor="middle" opacity="0.7">Frío ↓</text>
+            <text x="100" y="100" className={styles.svgTinta} fontSize="9" textAnchor="middle">Frío ↓</text>
+            <text x="300" y="100" className={styles.svgTinta} fontSize="9" textAnchor="middle">Frío ↓</text>
 
             <defs>
               <marker id="arrowConv" markerWidth="8" markerHeight="6" refX="4" refY="6" orient="auto">
@@ -559,7 +593,7 @@ function SeccionConveccionNaturaleza() {
 
       {/* Detalle del ejemplo */}
       <div className={styles.detallePanel} style={{ borderLeftColor: ej.color }}>
-        <h3 className={styles.detalleTitulo} style={{ color: ej.color }}>
+        <h3 className={`${styles.detalleTitulo} ${styles.tonoDato}`} style={tono(ej.color)}>
           {ej.icono} {ej.nombre}
         </h3>
         <p className={styles.detalleDesc}>{ej.descripcion}</p>
@@ -602,15 +636,15 @@ function SeccionDatos() {
         <h3 className={styles.termoTitulo}><span aria-hidden="true">☕</span> El termo: combate las 3 formas</h3>
         <div className={styles.termoGrid}>
           <div className={styles.termoItem}>
-            <span className={styles.termoForma} style={{ color: '#EF4444' }}>Anti-conducción</span>
+            <span className={`${styles.termoForma} ${styles.tonoDato}`} style={tono('#EF4444')}>Anti-conducción</span>
             <p className={styles.termoDesc}>Vacío entre paredes dobles — sin materia, no hay conducción</p>
           </div>
           <div className={styles.termoItem}>
-            <span className={styles.termoForma} style={{ color: '#3B82F6' }}>Anti-convección</span>
+            <span className={`${styles.termoForma} ${styles.tonoDato}`} style={tono('#3B82F6')}>Anti-convección</span>
             <p className={styles.termoDesc}>El vacío también impide corrientes de aire — sin fluido, no hay convección</p>
           </div>
           <div className={styles.termoItem}>
-            <span className={styles.termoForma} style={{ color: '#F59E0B' }}>Anti-radiación</span>
+            <span className={`${styles.termoForma} ${styles.tonoDato}`} style={tono('#F59E0B')}>Anti-radiación</span>
             <p className={styles.termoDesc}>Paredes internas reflectantes (espejo) — devuelven la radiación infrarroja</p>
           </div>
         </div>

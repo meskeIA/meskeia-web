@@ -56,7 +56,20 @@
 }
 .animacionLabels { display: flex; justify-content: space-between; width: 100%; max-width: 320px; }
 .animLabelCaliente { font-size: 0.82rem; font-weight: 600; color: var(--rojo-texto, #EF4444); }
-.animLabelFrio { font-size: 0.82rem; font-weight: 600; color: #3B82F6; }
+.animLabelFrio { font-size: 0.82rem; font-weight: 600; color: #1D4ED8; }
+/* En oscuro, «Caliente» caía a la reserva #EF4444 (3,81:1) y «Frío» iba en #3B82F6 (3,68 en claro,
+   3,90 en oscuro): cabo C0681, 13/11/2026 */
+[data-theme='dark'] .animLabelCaliente { color: #F1948A; }
+[data-theme='dark'] .animLabelFrio { color: #93C5FD; }
+
+/* Tono de texto de un color de datos por tema (C0645, 13/11/2026): las variables las pone tono() del
+   page.tsx. El color puro como texto daba la conducción en rojo 3,76:1, la convección en azul 3,68,
+   la radiación en ámbar 2,15 y la brisa en azul cielo 2,77 en claro. */
+.tonoDato { color: var(--tono-claro, var(--text-primary)); }
+[data-theme='dark'] .tonoDato { color: var(--tono-oscuro, var(--text-primary)); }
+
+/* Rótulos del diagrama genérico de convección (C0297): en el tono del tema, sobre un fondo al 20 % */
+.svgTinta { fill: var(--text-primary); }
 .animNota { font-size: 0.82rem; color: var(--text-muted); text-align: center; margin: 0; }
 
 /* Convección: flechas circulares */

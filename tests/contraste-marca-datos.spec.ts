@@ -219,6 +219,10 @@ const APPS: App[] = [
   // en claro y 4,18 en oscuro) y, en oscuro, «El mito» y la respuesta de los casos cayendo a la
   // reserva de su receta (#DC2626 a 2,85, #16A34A a 4,18)
   { slug: 'visualizador-vuelo-avion', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
+  // 13/11/2026: el nombre y el título de cada forma de calor y las tres «anti-» del termo en su color
+  // con style (la conducción en rojo 3,76:1, la convección en azul 3,68, la radiación en ámbar 2,15, la
+  // brisa en azul cielo 2,77 en claro; 3,81-3,90 en oscuro) y «Caliente» y «Frío» de la animación
+  { slug: 'visualizador-termodinamica', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
 ];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {
