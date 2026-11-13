@@ -282,6 +282,10 @@ const APPS: App[] = [
   // diagrama de pérdidas, el blanco sobre la marca (4,11), el verde (3,33) y el naranja (2,85), y
   // «Otto 4T» en #9CA3AF sobre el motor (4,02). Los cuatro tiempos, como subestados
   { slug: 'visualizador-motor-combustion', secciones: SECCIONES, extremos: true, subestados: "button[aria-pressed]:not(nav button)" },
+  // 13/11/2026: los rótulos del diagrama de nubes en blanco directamente sobre el degradado del cielo
+  // y sobre las nubes (Stratus 1,42:1, «Suelo» 1,35, Altostratus 1,96, Cirrostratus 3,75), igual en
+  // los dos temas. Cada nube, como subestado
+  { slug: 'visualizador-fenomenos-meteorologicos', secciones: SECCIONES, subestados: "button[aria-pressed]:not(nav button)" },
 ];
 
 interface TextoSvg {

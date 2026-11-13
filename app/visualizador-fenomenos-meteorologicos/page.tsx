@@ -227,6 +227,52 @@ const DATOS_CURIOSOS: DatoCurioso[] = [
 // Seccion 1: Tipos de Nubes
 // ─────────────────────────────────────────────
 
+interface RotuloCieloProps {
+  x: number;
+  y: number;
+  texto: string;
+  tamano: number;
+  anchor?: 'start' | 'middle';
+}
+
+/**
+ * Rótulos del diagrama de nubes — cabo C0297 (13/11/2026). Iban en blanco directamente sobre el
+ * degradado del cielo y sobre las nubes (claras o grises): 1,35-3,75:1 en los dos temas (Stratus
+ * 1,42 sobre el celeste, «Suelo» 1,35), y las altitudes además al 50-70 % de opacidad. Ahora cada
+ * uno va sobre una placa opaca del azul noche de lo alto del cielo, igual en los dos temas porque
+ * el cielo también lo es, y fuera de los grupos con opacidad.
+ */
+const ROTULOS_CIELO: RotuloCieloProps[] = [
+  { x: 10, y: 35, texto: 'Altas >6 km', tamano: 11 },
+  { x: 10, y: 140, texto: 'Medias 2-6 km', tamano: 11 },
+  { x: 10, y: 235, texto: 'Bajas <2 km', tamano: 11 },
+  { x: 10, y: 300, texto: 'Suelo', tamano: 11 },
+  { x: 215, y: 58, texto: 'Cirrus', tamano: 10, anchor: 'middle' },
+  { x: 400, y: 82, texto: 'Cirrocumulus', tamano: 10, anchor: 'middle' },
+  { x: 630, y: 82, texto: 'Cirrostratus', tamano: 10, anchor: 'middle' },
+  { x: 225, y: 162, texto: 'Altocumulus', tamano: 10, anchor: 'middle' },
+  { x: 525, y: 185, texto: 'Altostratus', tamano: 10, anchor: 'middle' },
+  { x: 170, y: 242, texto: 'Stratocumulus', tamano: 10, anchor: 'middle' },
+  { x: 370, y: 266, texto: 'Stratus', tamano: 10, anchor: 'middle' },
+  { x: 590, y: 295, texto: 'Nimbostratus', tamano: 10, anchor: 'middle' },
+  { x: 700, y: 234, texto: 'Cumulus', tamano: 10, anchor: 'middle' },
+  { x: 80, y: 310, texto: 'Cumulonimbus', tamano: 10, anchor: 'middle' },
+];
+
+function RotuloCielo({ x, y, texto, tamano, anchor = 'start' }: RotuloCieloProps) {
+  // El ancho se estima por el número de letras (sobra un poco, mejor que falte)
+  const ancho = Array.from(texto).length * tamano * 0.6 + tamano * 0.8;
+  const x0 = anchor === 'middle' ? x - ancho / 2 : x - tamano * 0.4;
+  return (
+    <g>
+      <rect x={x0} y={y - tamano * 1.05} width={ancho} height={tamano * 1.4} rx={3} fill="#0D1B4A" />
+      <text x={x} y={y} textAnchor={anchor} fontSize={tamano} fontWeight={600} fill="#FFFFFF">
+        {texto}
+      </text>
+    </g>
+  );
+}
+
 function SeccionNubes() {
   const [nubeIdx, setNubeIdx] = useState<number | null>(null);
 
@@ -255,17 +301,10 @@ function SeccionNubes() {
           <line x1="0" y1="195" x2="800" y2="195" stroke="white" strokeOpacity="0.3" strokeDasharray="8,4" />
           <line x1="0" y1="280" x2="800" y2="280" stroke="white" strokeOpacity="0.2" strokeDasharray="4,4" />
 
-          {/* Etiquetas de altitud */}
-          <text x="10" y="35" fontSize="11" fill="white" opacity="0.7" fontWeight="600">Altas &gt;6 km</text>
-          <text x="10" y="140" fontSize="11" fill="white" opacity="0.7" fontWeight="600">Medias 2-6 km</text>
-          <text x="10" y="235" fontSize="11" fill="white" opacity="0.7" fontWeight="600">Bajas &lt;2 km</text>
-          <text x="10" y="300" fontSize="11" fill="white" opacity="0.5" fontWeight="600">Suelo</text>
-
           {/* Nubes altas — Cirrus */}
           <g opacity="0.9">
             <path d="M180,42 Q200,38 220,42 Q230,36 250,40" fill="none" stroke="white" strokeWidth="2" />
             <path d="M200,48 Q220,44 240,48" fill="none" stroke="white" strokeWidth="1.5" />
-            <text x="215" y="58" fontSize="10" fill="white" fontWeight="600" textAnchor="middle">Cirrus</text>
           </g>
 
           {/* Cirrocumulus */}
@@ -276,7 +315,6 @@ function SeccionNubes() {
             {[378,393,408,423].map(x => (
               <circle key={x} cx={x} cy={66} r={5} fill="white" fillOpacity="0.8" />
             ))}
-            <text x="400" y="82" fontSize="10" fill="white" fontWeight="600" textAnchor="middle">Cirrocumulus</text>
           </g>
 
           {/* Cirrostratus */}
@@ -284,7 +322,6 @@ function SeccionNubes() {
             <rect x="530" y="50" width="200" height="18" rx="9" fill="white" fillOpacity="0.35" />
             <circle cx="630" cy="38" r="12" fill="#f1c40f" opacity="0.6" />
             <circle cx="630" cy="38" r="18" fill="none" stroke="white" strokeWidth="1" opacity="0.4" />
-            <text x="630" y="82" fontSize="10" fill="white" fontWeight="600" textAnchor="middle">Cirrostratus</text>
           </g>
 
           {/* Nubes medias — Altocumulus */}
@@ -292,13 +329,11 @@ function SeccionNubes() {
             <ellipse cx="220" cy="138" rx="25" ry="12" fill="white" fillOpacity="0.9" />
             <ellipse cx="260" cy="135" rx="22" ry="10" fill="white" fillOpacity="0.85" />
             <ellipse cx="195" cy="142" rx="18" ry="9" fill="white" fillOpacity="0.8" />
-            <text x="225" y="162" fontSize="10" fill="white" fontWeight="600" textAnchor="middle">Altocumulus</text>
           </g>
 
           {/* Altostratus */}
           <g opacity="0.75">
             <rect x="400" y="148" width="250" height="22" rx="11" fill="#bdc3c7" fillOpacity="0.7" />
-            <text x="525" y="185" fontSize="10" fill="white" fontWeight="600" textAnchor="middle">Altostratus</text>
           </g>
 
           {/* Nubes bajas — Stratocumulus */}
@@ -306,13 +341,11 @@ function SeccionNubes() {
             <ellipse cx="160" cy="218" rx="35" ry="14" fill="#bdc3c7" fillOpacity="0.85" />
             <ellipse cx="210" cy="215" rx="30" ry="12" fill="#ccc" fillOpacity="0.8" />
             <ellipse cx="130" cy="222" rx="25" ry="10" fill="#bdc3c7" fillOpacity="0.75" />
-            <text x="170" y="242" fontSize="10" fill="white" fontWeight="600" textAnchor="middle">Stratocumulus</text>
           </g>
 
           {/* Stratus */}
           <g opacity="0.7">
             <rect x="280" y="238" width="180" height="16" rx="8" fill="#aaa" fillOpacity="0.6" />
-            <text x="370" y="266" fontSize="10" fill="white" fontWeight="600" textAnchor="middle">Stratus</text>
           </g>
 
           {/* Nimbostratus */}
@@ -323,7 +356,6 @@ function SeccionNubes() {
             <line x1="570" y1="262" x2="568" y2="277" stroke="#3498db" strokeWidth="1.5" opacity="0.7" />
             <line x1="600" y1="258" x2="598" y2="273" stroke="#3498db" strokeWidth="1.5" opacity="0.7" />
             <line x1="630" y1="261" x2="628" y2="276" stroke="#3498db" strokeWidth="1.5" opacity="0.7" />
-            <text x="590" y="295" fontSize="10" fill="white" fontWeight="600" textAnchor="middle">Nimbostratus</text>
           </g>
 
           {/* Desarrollo vertical — Cumulus */}
@@ -332,7 +364,6 @@ function SeccionNubes() {
             <ellipse cx="720" cy="190" rx="22" ry="16" fill="white" />
             <ellipse cx="685" cy="195" rx="18" ry="14" fill="white" />
             <ellipse cx="700" cy="212" rx="32" ry="10" fill="#f0f0f0" />
-            <text x="700" y="234" fontSize="10" fill="white" fontWeight="600" textAnchor="middle">Cumulus</text>
           </g>
 
           {/* Cumulonimbus — torre gigante */}
@@ -344,11 +375,15 @@ function SeccionNubes() {
             <rect x="30" y="78" width="100" height="12" rx="6" fill="#888" fillOpacity="0.6" />
             {/* Rayo */}
             <polyline points="75,260 70,272 80,272 72,290" fill="none" stroke="#f1c40f" strokeWidth="2" />
-            <text x="80" y="310" fontSize="10" fill="white" fontWeight="600" textAnchor="middle">Cumulonimbus</text>
           </g>
 
           {/* Superficie terrestre */}
           <rect x="0" y="280" width="800" height="40" fill="#4a7c59" opacity="0.3" />
+
+          {/* Rótulos, encima de todo y fuera de los grupos con opacidad */}
+          {ROTULOS_CIELO.map((r) => (
+            <RotuloCielo key={r.texto} {...r} />
+          ))}
         </svg>
       </div>
 
