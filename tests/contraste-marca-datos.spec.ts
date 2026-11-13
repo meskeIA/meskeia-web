@@ -197,6 +197,10 @@ const APPS: App[] = [
   // en la marca (3,93 en claro), el segmento libre en #999 y #666 (2,61 en claro, 2,80 en oscuro) y,
   // en oscuro, el «–» de los permisos en --text-muted sobre su tinte (3,94)
   { slug: 'visualizador-sistemas-operativos', todo: true, secciones: "[role='tablist'][aria-label*='ecciones'] [role='tab']" },
+  // 13/11/2026 (C0645): la pestaña activa con el ratón encima (su texto en --primary-texto sobre su
+  // propio fondo, 1,00:1), el blanco sobre el color de cada capa TCP/IP, de cada paso DNS y de las
+  // insignias de registro (el verde claro 1,63, el acento 2,26, el teal 2,80, la marca 4,11)
+  { slug: 'visualizador-redes-computadoras', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
 ];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {

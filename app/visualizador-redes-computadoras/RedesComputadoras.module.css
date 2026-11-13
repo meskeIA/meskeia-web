@@ -67,6 +67,28 @@
   font-weight: 700;
 }
 
+/* La activa con el ratón encima: .tab:hover pesa más que .tabActiva y le ponía el texto en
+   --primary-texto sobre su propio fondo, 1,00:1 (C0645, 13/11/2026) */
+.tab.tabActiva:hover,
+[data-theme='dark'] .tab.tabActiva:hover {
+  color: #ffffff;
+  border-color: var(--primary-boton);
+}
+
+/* Tono de TEXTO de cada color de dato, para el HTML (color) y los <text> de los SVG (fill) — cabos
+   C0297 y C0645 (13/11/2026): el título de la capa elegida y los rótulos del routing BGP en el color
+   puro de su dato (AS 1 en la marca 3,78:1, AS 2 en teal 2,64, AS 3 en el acento 2,05, los costes
+   en naranja F4A261 1,90-2,04 y en #999 2,62), y «Origen»/«Destino» en #555 a 1,73 en oscuro. */
+.tonoMarca { color: var(--primary-texto, #26718F); fill: var(--primary-texto, #26718F); }
+.tonoTeal { color: var(--secondary-texto, #327874); fill: var(--secondary-texto, #327874); }
+.tonoAcento { color: #4A6F85; fill: #4A6F85; }
+.tonoVerde { color: #2F6B47; fill: #2F6B47; }
+.tonoNaranja { color: var(--naranja-texto, #B93E0B); fill: var(--naranja-texto, #B93E0B); }
+.tonoGris { color: var(--text-secondary, #666666); fill: var(--text-secondary, #666666); }
+[data-theme='dark'] .tonoAcento { color: #A9CCE3; fill: #A9CCE3; }
+[data-theme='dark'] .tonoVerde { color: #A8D5BA; fill: #A8D5BA; }
+[data-theme='dark'] .tonoNaranja { color: #F4A261; fill: #F4A261; }
+
 /* ── Sección ── */
 .seccion {
   max-width: 900px;
@@ -122,19 +144,21 @@
   border: none;
   cursor: pointer;
   text-align: left;
-  transition: filter 0.2s, transform 0.1s;
-  color: #fff;
+  transition: box-shadow 0.2s, transform 0.1s;
+  /* La tinta que contrasta con el relleno de la capa (rellenoConTinta en page.tsx): el blanco
+     sobre el color puro daba 1,63-4,11:1 (C0645, 13/11/2026) */
+  color: var(--tinta-capa, #fff);
   width: 100%;
 }
 
+/* Sin aclarar el fondo: brightness bajaba el contraste del blanco (C0645) */
 .capaBtn:hover {
-  filter: brightness(1.08);
+  box-shadow: inset 0 0 0 2px currentColor;
 }
 
 .capaActiva {
   transform: scaleX(1.02);
-  filter: brightness(1.12);
-  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15), inset 0 0 0 2px currentColor;
   z-index: 1;
   position: relative;
 }
@@ -142,7 +166,6 @@
 .capaNumero {
   font-size: 1.6rem;
   font-weight: 800;
-  opacity: 0.9;
   min-width: 2rem;
 }
 
@@ -154,7 +177,6 @@
 
 .capaPdu {
   font-size: 0.85rem;
-  opacity: 0.85;
   font-style: italic;
 }
 
@@ -443,8 +465,10 @@
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  background: var(--color-dns, var(--primary-boton));
-  color: #fff;
+  background: var(--relleno-dns, var(--primary-boton));
+  /* La tinta que contrasta con el relleno del paso (rellenoConTinta en page.tsx): el blanco sobre
+     el color puro daba 1,63-4,11:1 (C0645, 13/11/2026) */
+  color: var(--tinta-dns, #fff);
   font-size: 0.75rem;
   font-weight: 800;
   flex-shrink: 0;

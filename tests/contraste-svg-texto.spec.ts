@@ -332,6 +332,12 @@ const APPS: App[] = [
     extremos: true,
     subestados: "button[class*='btnTransicion']",
   },
+  // 13/11/2026: en el routing BGP, AS 1, AS 2 y AS 3 en su color sobre el tinte de su sistema (la
+  // marca 3,78:1, el teal 2,64, el acento 2,05), los costes en naranja F4A261 (1,90-2,04) y #999
+  // (2,62), el blanco sobre los routers del camino (2,05) y del teal (2,77), y «Origen» y «Destino» en
+  // #555 (1,73 en oscuro); en la CDN, el blanco sobre los nodos rojos (3,80) y naranjas (2,05) y
+  // «España» en #ddd sobre la marca (3,03)
+  { slug: 'visualizador-redes-computadoras', secciones: SECCIONES, extremos: true },
 ];
 
 interface TextoSvg {

@@ -3,6 +3,26 @@
 
 import { useState, useCallback } from 'react';
 import styles from './RedesComputadoras.module.css';
+import { rellenoConTinta } from '@/lib/tintaLegible';
+
+/**
+ * Tono de TEXTO de cada color de dato (cabos C0297 y C0645, 13/11/2026): en el color puro no se
+ * leía ni en el HTML ni en los SVG. El color de dato se queda en bordes, formas y enlaces.
+ */
+const TONO: Record<string, string> = {
+  '#2e86ab': 'tonoMarca',
+  '#48a9a6': 'tonoTeal',
+  '#7fb3d3': 'tonoAcento',
+  '#a8d5ba': 'tonoVerde',
+  '#f4a261': 'tonoNaranja',
+};
+const tono = (color: string): string => styles[TONO[color.toLowerCase()] ?? 'tonoGris'];
+
+/** Fondo opaco y tinta legible para un texto sobre un color de dato (C0645). */
+const sobre = (color: string): React.CSSProperties => {
+  const { relleno, tinta } = rellenoConTinta(color);
+  return { backgroundColor: relleno, color: tinta };
+};
 import {
   MeskeiaLogo,
   Footer,
@@ -295,7 +315,10 @@ export default function VisualizadorRedesComputadoras() {
                 key={capa.id}
                 type="button"
                 className={`${styles.capaBtn} ${capaSeleccionada === capa.id ? styles.capaActiva : ''}`}
-                style={{ '--color-capa': capa.color } as React.CSSProperties}
+                style={{
+                  '--color-capa': rellenoConTinta(capa.color).relleno,
+                  '--tinta-capa': rellenoConTinta(capa.color).tinta,
+                } as React.CSSProperties}
                 onClick={() => setCapaSeleccionada(capaSeleccionada === capa.id ? null : capa.id)}
                 aria-pressed={capaSeleccionada === capa.id}
               >
@@ -313,13 +336,13 @@ export default function VisualizadorRedesComputadoras() {
             if (!capa) return null;
             return (
               <div className={styles.capaDetalle} style={{ borderLeftColor: capa.color }}>
-                <h3 style={{ color: capa.color }}>Capa {capa.id}: {capa.nombre}</h3>
+                <h3 className={tono(capa.color)}>Capa {capa.id}: {capa.nombre}</h3>
                 <p><strong>PDU:</strong> {capa.pdu}</p>
                 <p><strong>Función:</strong> {capa.funcion}</p>
                 <div className={styles.protocolosLista}>
                   <strong>Protocolos:</strong>
                   {capa.protocolos.map(p => (
-                    <span key={p} className={styles.protocoloBadge} style={{ backgroundColor: capa.color }}>{p}</span>
+                    <span key={p} className={styles.protocoloBadge} style={sobre(capa.color)}>{p}</span>
                   ))}
                 </div>
                 <p className={styles.osiRelacion}><strong>Equivalencia OSI:</strong> {capa.osiCapas}</p>
@@ -419,7 +442,11 @@ export default function VisualizadorRedesComputadoras() {
                 <div
                   key={idx}
                   className={`${styles.dnsPaso} ${idx <= pasoDns ? styles.dnsPasoActivo : ''} ${idx === pasoDns ? styles.dnsPasoActual : ''}`}
-                  style={{ '--color-dns': paso.color } as React.CSSProperties}
+                  style={{
+                    '--color-dns': paso.color,
+                    '--relleno-dns': rellenoConTinta(paso.color).relleno,
+                    '--tinta-dns': rellenoConTinta(paso.color).tinta,
+                  } as React.CSSProperties}
                 >
                   <div className={styles.dnsActor}>
                     <span className={styles.dnsNum}>{idx + 1}</span>
@@ -469,25 +496,25 @@ export default function VisualizadorRedesComputadoras() {
               </thead>
               <tbody>
                 <tr>
-                  <td><span className={styles.badge} style={{ backgroundColor: '#2E86AB' }}>A</span></td>
+                  <td><span className={styles.badge} style={sobre('#2E86AB')}>A</span></td>
                   <td>Address</td>
                   <td>Nombre → IPv4</td>
                   <td>meskeia.com → 185.199.110.153</td>
                 </tr>
                 <tr>
-                  <td><span className={styles.badge} style={{ backgroundColor: '#48A9A6' }}>AAAA</span></td>
+                  <td><span className={styles.badge} style={sobre('#48A9A6')}>AAAA</span></td>
                   <td>IPv6 Address</td>
                   <td>Nombre → IPv6</td>
                   <td>meskeia.com → 2606:50c0::153</td>
                 </tr>
                 <tr>
-                  <td><span className={styles.badge} style={{ backgroundColor: '#7FB3D3' }}>CNAME</span></td>
+                  <td><span className={styles.badge} style={sobre('#7FB3D3')}>CNAME</span></td>
                   <td>Canonical Name</td>
                   <td>Alias → nombre canónico</td>
                   <td>www.meskeia.com → meskeia.com</td>
                 </tr>
                 <tr>
-                  <td><span className={styles.badge} style={{ backgroundColor: '#A8D5BA' }}>MX</span></td>
+                  <td><span className={styles.badge} style={sobre('#A8D5BA')}>MX</span></td>
                   <td>Mail Exchange</td>
                   <td>Servidor de correo</td>
                   <td>meskeia.com → mail.proton.me (prioridad 10)</td>
@@ -570,9 +597,9 @@ export default function VisualizadorRedesComputadoras() {
               <rect x="20"  y="20"  width="260" height="260" rx="16" fill="#2E86AB11" stroke="#2E86AB" strokeWidth="1.5" strokeDasharray="6 4" />
               <rect x="300" y="20"  width="180" height="260" rx="16" fill="#48A9A611" stroke="#48A9A6" strokeWidth="1.5" strokeDasharray="6 4" />
               <rect x="450" y="60"  width="110" height="180" rx="16" fill="#7FB3D311" stroke="#7FB3D3" strokeWidth="1.5" strokeDasharray="6 4" />
-              <text x="30"  y="42"  fontSize="11" fill="#2E86AB" fontWeight="bold">AS 1</text>
-              <text x="310" y="42"  fontSize="11" fill="#48A9A6" fontWeight="bold">AS 2</text>
-              <text x="460" y="82"  fontSize="11" fill="#7FB3D3" fontWeight="bold">AS 3</text>
+              <text x="30"  y="42"  fontSize="11" className={styles.tonoMarca} fontWeight="bold">AS 1</text>
+              <text x="310" y="42"  fontSize="11" className={styles.tonoTeal} fontWeight="bold">AS 2</text>
+              <text x="460" y="82"  fontSize="11" className={styles.tonoAcento} fontWeight="bold">AS 3</text>
 
               {/* Enlaces */}
               {ENLACES.map(e => {
@@ -591,7 +618,7 @@ export default function VisualizadorRedesComputadoras() {
                       x={(desde.x + hasta.x) / 2}
                       y={(desde.y + hasta.y) / 2 - 6}
                       fontSize="10"
-                      fill={activo ? '#F4A261' : '#999'}
+                      className={activo ? styles.tonoNaranja : styles.tonoGris}
                       textAnchor="middle"
                       fontWeight={activo ? 'bold' : 'normal'}
                     >
@@ -609,16 +636,18 @@ export default function VisualizadorRedesComputadoras() {
                 const color = r.as === 1 ? '#2E86AB' : r.as === 2 ? '#48A9A6' : '#7FB3D3';
                 return (
                   <g key={r.id}>
+                    {/* Opaco con la tinta que le llega: el blanco sobre el naranja del camino daba
+                        2,05:1 y sobre el teal 2,77 (C0297) */}
                     <circle
                       cx={r.x} cy={r.y} r={24}
-                      fill={enRuta ? '#F4A261' : color}
+                      fill={rellenoConTinta(enRuta ? '#F4A261' : color).relleno}
                       stroke={esOrigen || esDestino ? '#fff' : color}
                       strokeWidth={esOrigen || esDestino ? 3 : 1}
                     />
-                    <text x={r.x} y={r.y + 5} fontSize="12" textAnchor="middle" fill="#fff" fontWeight="bold">
+                    <text x={r.x} y={r.y + 5} fontSize="12" textAnchor="middle" fill={rellenoConTinta(enRuta ? '#F4A261' : color).tinta} fontWeight="bold">
                       {r.id}
                     </text>
-                    <text x={r.x} y={r.y + 38} fontSize="10" textAnchor="middle" fill="#555">
+                    <text x={r.x} y={r.y + 38} fontSize="10" textAnchor="middle" className={styles.tonoGris}>
                       <tspan>{esOrigen ? <tspan key="a"><tspan aria-hidden="true">🟢</tspan> Origen</tspan> : esDestino ? <tspan key="b"><tspan aria-hidden="true">🔴</tspan> Destino</tspan> : ''}</tspan>
                     </text>
                   </g>
@@ -782,8 +811,9 @@ export default function VisualizadorRedesComputadoras() {
                 const colorLatencia = latencia < 50 ? '#2E86AB' : latencia < 100 ? '#F4A261' : '#E74C3C';
                 return (
                   <g key={nodo.id}>
-                    <circle cx={nodo.x} cy={nodo.y} r={18} fill={colorLatencia} stroke="#fff" strokeWidth={2} />
-                    <text x={nodo.x} y={nodo.y + 5} fontSize="10" textAnchor="middle" fill="#fff" fontWeight="bold">
+                    {/* Opaco con la tinta que le llega: el blanco sobre el rojo daba 3,80:1 (C0297) */}
+                    <circle cx={nodo.x} cy={nodo.y} r={18} fill={rellenoConTinta(colorLatencia).relleno} stroke="#fff" strokeWidth={2} />
+                    <text x={nodo.x} y={nodo.y + 5} fontSize="10" textAnchor="middle" fill={rellenoConTinta(colorLatencia).tinta} fontWeight="bold">
                       {latencia}ms
                     </text>
                     <text x={nodo.x} y={nodo.y + 28} fontSize="9" textAnchor="middle" fill="#555">
@@ -798,12 +828,12 @@ export default function VisualizadorRedesComputadoras() {
                 <rect
                   x={ORIGEN_SERVIDOR.x - 30} y={ORIGEN_SERVIDOR.y - 18}
                   width={60} height={36}
-                  rx={8} fill="#2E86AB" stroke="#fff" strokeWidth={2}
+                  rx={8} fill="#26718F" stroke="#fff" strokeWidth={2}
                 />
                 <text x={ORIGEN_SERVIDOR.x} y={ORIGEN_SERVIDOR.y - 2} fontSize="9" textAnchor="middle" fill="#fff" fontWeight="bold">
                   <tspan aria-hidden="true">🖥️</tspan> Origen
                 </text>
-                <text x={ORIGEN_SERVIDOR.x} y={ORIGEN_SERVIDOR.y + 11} fontSize="8" textAnchor="middle" fill="#ddd">
+                <text x={ORIGEN_SERVIDOR.x} y={ORIGEN_SERVIDOR.y + 11} fontSize="8" textAnchor="middle" fill="#fff">
                   España
                 </text>
               </g>
