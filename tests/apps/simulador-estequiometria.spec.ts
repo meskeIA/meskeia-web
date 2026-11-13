@@ -284,6 +284,29 @@ test.describe('cálculo — escritorio', () => {
     await expect(tarjeta(page, 'Reactivo en exceso')).toContainText('Sobran 0,100 g (0,0027 mol)');
   });
 
+  // REPARADO (cabo C0732, 13/11/2026; la forma del hallazgo 4543 de simulador-reacciones-quimicas)
+  // — con pocos gramos, ajustar la mezcla con la cifra que la propia app enseña volvía a dar
+  // «limita X, sobran 0,000 g». A mano:
+  //   0,5 g HCl (36,46) y 1 g NaOH (39,997): n(HCl) = 0,0137137 → consume 0,548505 g de NaOH →
+  //   «Sobran 0,451 g». Con 1 − 0,451 = 0,549 g de NaOH las razones difieren
+  //   (0,549 − 0,548505) / 0,549 = 9,0·10⁻⁴; la tolerancia de las masas molares sola es
+  //   0,005/36,46 + 0,0005/39,997 = 1,5·10⁻⁴, y la app decía «limita el HCl, sobran 0,000 g». Con
+  //   el redondeo de los gramos mostrados (0,0005/0,5 + 0,0005/0,549 = 1,9·10⁻³) es estequiométrico.
+  test('C0732 · 0,5 g de HCl y los 0,549 g de NaOH que salen de su «Sobran 0,451 g» → estequiométrico', async ({ page }) => {
+    await abrir(page);
+    await elegir(page, /Neutralización ácido-base/);
+    await escribir(page, '#inputA', '0.5');
+    await escribir(page, '#inputB', '1');
+    await expect(tarjeta(page, 'Reactivo en exceso')).toContainText('Sobran 0,451 g');
+    await escribir(page, '#inputB', '0.549');
+    await expect(tarjeta(page, 'Reactivo en exceso')).toContainText('Ninguno (estequiométrico)');
+    await expect(tarjeta(page, 'Reactivo en exceso')).not.toContainText('0,000 g');
+    // y sigue distinguiendo una diferencia que se ve en los gramos: 0,560 g ya deja 0,011 g
+    await escribir(page, '#inputB', '0.56');
+    await expect(tarjeta(page, 'Reactivo limitante')).toContainText('Ácido clorhídrico');
+    await expect(tarjeta(page, 'Reactivo en exceso')).toContainText('Sobran 0,011 g');
+  });
+
   // LÍMITE — reacción con catalizador: fermentación, 90 g de glucosa (valor por defecto al elegirla)
   //   n(glucosa) = 90 / 180,16 = 0,499556 mol → etanol 2 × 0,499556 = 0,999112 mol → «0,9991 mol»
   //   masa = 0,999112 × 46,07 = 46,029 g → «46,029 g». Sin campo B ni tarjeta de exceso.

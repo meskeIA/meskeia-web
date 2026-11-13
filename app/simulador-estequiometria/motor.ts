@@ -198,6 +198,17 @@ export function esReaccionConCatalizador(reaccion: Reaccion): boolean {
  */
 const incertidumbreRelativa = (s: Sustancia): number => (0.5 * 10 ** -s.decimalesM) / s.masaMolar;
 
+/**
+ * Redondeo con que la app ENSEÑA los gramos (tres decimales: «Sobran 0,451 g»), que es de donde
+ * los copia quien ajusta la mezcla. Medio milésimo, relativo a la masa tecleada. La misma
+ * receta que simulador-reacciones-quimicas (`redondeoMostrado`, hallazgo 4543).
+ *
+ * ⚠️ Nace el 13/11/2026 por el cabo C0732: 0,5 g de HCl con 1 g de NaOH dan «sobran 0,451 g»;
+ * con los 1 − 0,451 = 0,549 g de NaOH las dos razones difieren 9,0·10⁻⁴, y la tolerancia de
+ * las masas molares (1,5·10⁻⁴) declaraba «limita el HCl, sobran 0,000 g de NaOH».
+ */
+const redondeoMostrado = (gramos: number): number => 0.0005 / gramos;
+
 export function calcular(reaccion: Reaccion, gramosA: number, gramosB: number, rendimiento: number): ResultadoCalculo {
   const rA = reaccion.reactivos[0];
   const rB = reaccion.reactivos[1];
@@ -231,7 +242,9 @@ export function calcular(reaccion: Reaccion, gramosA: number, gramosB: number, r
   // de redondeo de las propias masas molares no se pueden distinguir con estos datos, así que
   // no hay limitante ni exceso. Con `<=` exacto la rama «Ninguno» que promete la FAQ era
   // inalcanzable: 36,46 g HCl + 40 g NaOH salía «HCl limitante, sobran 0,000 g de NaOH».
-  const tolerancia = incertidumbreRelativa(rA) + incertidumbreRelativa(rB);
+  // A eso se suma el redondeo con que la app enseña los gramos (cabo C0732).
+  const tolerancia = incertidumbreRelativa(rA) + incertidumbreRelativa(rB)
+    + redondeoMostrado(gramosA) + redondeoMostrado(gramosB);
   const diferenciaRelativa = Math.abs(ratioA - ratioB) / Math.max(ratioA, ratioB);
   const limitante: Limitante = diferenciaRelativa <= tolerancia ? 'ambos' : ratioA < ratioB ? 'A' : 'B';
 
