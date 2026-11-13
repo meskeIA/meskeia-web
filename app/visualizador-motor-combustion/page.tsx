@@ -4,14 +4,18 @@
 import { useState } from 'react';
 import styles from './MotorCombustion.module.css';
 import { MeskeiaLogo, Footer, EducationalSection, RelatedApps, LegalNotice, ShareCard } from '@/components';
+import { rellenoConTinta } from '@/lib/tintaLegible';
 
 type TabId = 'ciclo' | 'eficiencia' | 'perdidas' | 'comparativa';
+/** Clase del módulo con el tono de TEXTO de cada color de dato, por tema (C0297, C0645) */
+type Tono = 'tonoMarca' | 'tonoTeal' | 'tonoAmbar' | 'tonoRojo' | 'tonoVerde' | 'tonoNaranja' | 'tonoMarron' | 'tonoGris';
 
 interface TiempoOtto {
   numero: number;
   nombre: string;
   icono: string;
   color: string;
+  tono: Tono;
   valvulas: string;
   piston: string;
   quePasa: string;
@@ -22,6 +26,7 @@ interface PerdidasEnergia {
   nombre: string;
   porcentaje: number;
   color: string;
+  tono: Tono;
   descripcion: string;
 }
 
@@ -38,6 +43,7 @@ const TIEMPOS_OTTO: TiempoOtto[] = [
     nombre: 'Admisión',
     icono: '⬇️',
     color: '#2E86AB',
+    tono: 'tonoMarca',
     valvulas: 'Admisión abierta · Escape cerrada',
     piston: 'Desciende (PMI a PMS)',
     quePasa: 'El pistón baja y crea vacío. La mezcla aire+gasolina entra por la válvula de admisión.',
@@ -48,6 +54,7 @@ const TIEMPOS_OTTO: TiempoOtto[] = [
     nombre: 'Compresión',
     icono: '⬆️',
     color: '#D97706',
+    tono: 'tonoAmbar',
     valvulas: 'Ambas cerradas',
     piston: 'Sube (PMS a PMI)',
     quePasa: 'El pistón sube y comprime la mezcla. La temperatura y presión aumentan drásticamente.',
@@ -58,6 +65,7 @@ const TIEMPOS_OTTO: TiempoOtto[] = [
     nombre: 'Expansión (explosión)',
     icono: '💥',
     color: '#DC2626',
+    tono: 'tonoRojo',
     valvulas: 'Ambas cerradas',
     piston: 'Desciende bruscamente',
     quePasa: 'La bujía produce la chispa. La mezcla se inflama y los gases se expanden empujando el pistón con fuerza hacia abajo. Este es el único tiempo motor.',
@@ -68,6 +76,7 @@ const TIEMPOS_OTTO: TiempoOtto[] = [
     nombre: 'Escape',
     icono: '💨',
     color: '#48A9A6',
+    tono: 'tonoTeal',
     valvulas: 'Escape abierta · Admisión cerrada',
     piston: 'Sube empujando los gases',
     quePasa: 'El pistón sube y expulsa los gases quemados por la válvula de escape. El ciclo se reinicia.',
@@ -76,12 +85,21 @@ const TIEMPOS_OTTO: TiempoOtto[] = [
 ];
 
 const PERDIDAS_ENERGIA: PerdidasEnergia[] = [
-  { nombre: 'Trabajo útil (ruedas)', porcentaje: 20, color: '#16A34A', descripcion: 'Solo el 20% de la energía del combustible llega realmente a mover las ruedas en conducción urbana. En autopista mejora hasta ~30%.' },
-  { nombre: 'Calor del escape', porcentaje: 35, color: '#DC2626', descripcion: 'Los gases de escape salen a 500-600°C. Esta energía se pierde al ambiente. Los turbos recuperan parte, pero no toda.' },
-  { nombre: 'Calor al refrigerante', porcentaje: 30, color: '#E67E22', descripcion: 'El bloque del motor absorbe calor para no fundirse. El radiador lo disipa al aire exterior. Este calor es "puro desperdicio".' },
-  { nombre: 'Fricción interna', porcentaje: 10, color: '#8B5E3C', descripcion: 'Pistones, cigüeñal, árbol de levas, bomba de aceite... cada pieza móvil roba energía. Más pronunciado en frío (sin lubricación óptima).' },
-  { nombre: 'Auxiliares (alternador, A/C...)', porcentaje: 5, color: '#6B7280', descripcion: 'El alternador, la bomba de dirección asistida, el compresor del aire acondicionado y la bomba de agua consumen potencia del motor.' },
+  { nombre: 'Trabajo útil (ruedas)', porcentaje: 20, color: '#16A34A', tono: 'tonoVerde', descripcion: 'Solo el 20% de la energía del combustible llega realmente a mover las ruedas en conducción urbana. En autopista mejora hasta ~30%.' },
+  { nombre: 'Calor del escape', porcentaje: 35, color: '#DC2626', tono: 'tonoRojo', descripcion: 'Los gases de escape salen a 500-600°C. Esta energía se pierde al ambiente. Los turbos recuperan parte, pero no toda.' },
+  { nombre: 'Calor al refrigerante', porcentaje: 30, color: '#E67E22', tono: 'tonoNaranja', descripcion: 'El bloque del motor absorbe calor para no fundirse. El radiador lo disipa al aire exterior. Este calor es "puro desperdicio".' },
+  { nombre: 'Fricción interna', porcentaje: 10, color: '#8B5E3C', tono: 'tonoMarron', descripcion: 'Pistones, cigüeñal, árbol de levas, bomba de aceite... cada pieza móvil roba energía. Más pronunciado en frío (sin lubricación óptima).' },
+  { nombre: 'Auxiliares (alternador, A/C...)', porcentaje: 5, color: '#6B7280', tono: 'tonoGris', descripcion: 'El alternador, la bomba de dirección asistida, el compresor del aire acondicionado y la bomba de agua consumen potencia del motor.' },
 ];
+
+/**
+ * Cajas del diagrama de pérdidas con rótulo blanco encima: la marca daba 4,11:1, el verde 3,33 y el
+ * naranja 2,85 (C0297, 13/11/2026). rellenoConTinta oscurece el relleno lo justo para que su tinta
+ * llegue a 4,5:1; son iguales en los dos temas.
+ */
+const CAJA_COMBUSTIBLE = rellenoConTinta('#2E86AB');
+const CAJA_RUEDAS = rellenoConTinta('#16A34A');
+const CAJA_CALOR = rellenoConTinta('#E67E22');
 
 const COMPARATIVA: ComparativaItem[] = [
   { aspecto: 'Eficiencia energética', combustion: '20-35%', electrico: '85-95%', ganador: 'electrico' },
@@ -151,7 +169,7 @@ export default function MotorCombustionPage() {
                 style={tiempoActivo === t.numero ? { borderColor: t.color, backgroundColor: t.color + '18' } : {}}
                 onClick={() => setTiempoActivo(t.numero)}
                 aria-pressed={tiempoActivo === t.numero}>
-                <span className={styles.tiempoNum} style={tiempoActivo === t.numero ? { color: t.color } : {}}>{t.numero}°</span>
+                <span className={`${styles.tiempoNum} ${tiempoActivo === t.numero ? styles[t.tono] : ''}`}>{t.numero}°</span>
                 <span aria-hidden="true">{t.icono}</span>
                 <span>{t.nombre}</span>
               </button>
@@ -167,12 +185,12 @@ export default function MotorCombustionPage() {
               {/* Válvula admisión */}
               <rect x="65" y="25" width="15" height="10" rx="2"
                 fill={tiempoActual.valvulas.includes('Admisión abierta') ? '#16A34A' : '#6B7280'} />
-              <text x="83" y="20" fontSize="8" fill="#6B7280">Admisión</text>
+              <text x="83" y="20" fontSize="8" className={styles.tonoGris}>Admisión</text>
 
               {/* Válvula escape */}
               <rect x="120" y="25" width="15" height="10" rx="2"
                 fill={tiempoActual.valvulas.includes('Escape abierta') ? '#16A34A' : '#6B7280'} />
-              <text x="115" y="20" fontSize="8" fill="#6B7280">Escape</text>
+              <text x="115" y="20" fontSize="8" className={styles.tonoGris}>Escape</text>
 
               {/* Bujía */}
               <circle cx="100" cy="38" r="6" fill={tiempoActual.numero === 3 ? '#FBBF24' : '#9CA3AF'} />
@@ -211,7 +229,7 @@ export default function MotorCombustionPage() {
                 r="5" fill="#2E86AB" />
 
               {/* Label tiempo */}
-              <text x="100" y="258" textAnchor="middle" fontSize="10" fill={tiempoActual.color} fontWeight="bold">
+              <text x="100" y="258" textAnchor="middle" fontSize="10" className={styles[tiempoActual.tono]} fontWeight="bold">
                 {tiempoActual.numero}° {tiempoActual.nombre}
               </text>
             </svg>
@@ -284,7 +302,7 @@ export default function MotorCombustionPage() {
                 <div className={styles.eficienciaBarra}>
                   <div className={styles.eficienciaBarraFill} style={{ width: `${eficienciaReal}%`, background: '#16A34A' }} />
                 </div>
-                <span className={styles.eficienciaValor} style={{ color: '#16A34A' }}>{eficienciaReal}%</span>
+                <span className={`${styles.eficienciaValor} ${styles.tonoVerde}`}>{eficienciaReal}%</span>
               </div>
             </div>
           </div>
@@ -292,17 +310,17 @@ export default function MotorCombustionPage() {
           <div className={styles.eficienciaGrid}>
             <div className={styles.eficienciaCard}>
               <h3>Motor gasolina convencional</h3>
-              <div className={styles.bigNumber} style={{ color: '#DC2626' }}>~30%</div>
+              <div className={`${styles.bigNumber} ${styles.tonoRojo}`}>~30%</div>
               <p>Eficiencia típica en conducción real (ciclo WLTP). En ciudad baja al 15-20% por los ciclos cortos y el arranque en frío.</p>
             </div>
             <div className={styles.eficienciaCard}>
               <h3>Motor diésel</h3>
-              <div className={styles.bigNumber} style={{ color: '#D97706' }}>~40%</div>
+              <div className={`${styles.bigNumber} ${styles.tonoAmbar}`}>~40%</div>
               <p>Mayor relación de compresión (16:1-22:1) y sin bomba de encendido mejora la eficiencia. Mejor en largas distancias.</p>
             </div>
             <div className={styles.eficienciaCard}>
               <h3>Motor Atkinson/Miller</h3>
-              <div className={styles.bigNumber} style={{ color: '#16A34A' }}>~38%</div>
+              <div className={`${styles.bigNumber} ${styles.tonoVerde}`}>~38%</div>
               <p>Variante del ciclo Otto que cierra la válvula de admisión tarde, efectivamente reduciendo la fase de compresión. Usado en híbridos (Toyota).</p>
             </div>
             <div className={styles.eficienciaCard}>
@@ -324,9 +342,9 @@ export default function MotorCombustionPage() {
           <div className={styles.sankeyWrapper} role="img" aria-label="Diagrama de pérdidas de energía del motor">
             <svg viewBox="0 0 500 220" className={styles.sankeyDiagrama}>
               {/* Entrada: 100% combustible */}
-              <rect x="10" y="80" width="60" height="60" rx="6" fill="#2E86AB" />
-              <text x="40" y="105" textAnchor="middle" fontSize="11" fill="#fff" fontWeight="bold">100%</text>
-              <text x="40" y="118" textAnchor="middle" fontSize="9" fill="#fff">Combustible</text>
+              <rect x="10" y="80" width="60" height="60" rx="6" fill={CAJA_COMBUSTIBLE.relleno} />
+              <text x="40" y="105" textAnchor="middle" fontSize="11" fill={CAJA_COMBUSTIBLE.tinta} fontWeight="bold">100%</text>
+              <text x="40" y="118" textAnchor="middle" fontSize="9" fill={CAJA_COMBUSTIBLE.tinta}>Combustible</text>
 
               {/* Línea principal */}
               <line x1="70" y1="110" x2="140" y2="110" stroke="#2E86AB" strokeWidth="4" />
@@ -334,13 +352,13 @@ export default function MotorCombustionPage() {
               {/* Motor */}
               <rect x="140" y="70" width="80" height="80" rx="6" fill="#374151" />
               <text x="180" y="105" textAnchor="middle" fontSize="11" fill="#fff" fontWeight="bold">Motor</text>
-              <text x="180" y="118" textAnchor="middle" fontSize="9" fill="#9CA3AF">Otto 4T</text>
+              <text x="180" y="118" textAnchor="middle" fontSize="9" fill="#D1D5DB">Otto 4T</text>
 
               {/* Salida: trabajo útil */}
               <line x1="220" y1="110" x2="340" y2="110" stroke="#16A34A" strokeWidth="3" />
-              <rect x="340" y="87" width="70" height="46" rx="6" fill="#16A34A" />
-              <text x="375" y="107" textAnchor="middle" fontSize="11" fill="#fff" fontWeight="bold">~20%</text>
-              <text x="375" y="120" textAnchor="middle" fontSize="9" fill="#fff">Ruedas</text>
+              <rect x="340" y="87" width="70" height="46" rx="6" fill={CAJA_RUEDAS.relleno} />
+              <text x="375" y="107" textAnchor="middle" fontSize="11" fill={CAJA_RUEDAS.tinta} fontWeight="bold">~20%</text>
+              <text x="375" y="120" textAnchor="middle" fontSize="9" fill={CAJA_RUEDAS.tinta}>Ruedas</text>
 
               {/* Pérdida escape */}
               <line x1="180" y1="70" x2="180" y2="20" stroke="#DC2626" strokeWidth="3" />
@@ -349,8 +367,8 @@ export default function MotorCombustionPage() {
 
               {/* Pérdida refrigeración */}
               <line x1="165" y1="90" x2="80" y2="40" stroke="#E67E22" strokeWidth="2.5" />
-              <rect x="20" y="28" width="65" height="20" rx="4" fill="#E67E22" />
-              <text x="52" y="41" textAnchor="middle" fontSize="9" fill="#fff" fontWeight="bold">30% calor</text>
+              <rect x="20" y="28" width="65" height="20" rx="4" fill={CAJA_CALOR.relleno} />
+              <text x="52" y="41" textAnchor="middle" fontSize="9" fill={CAJA_CALOR.tinta} fontWeight="bold">30% calor</text>
 
               {/* Pérdida fricción */}
               <line x1="165" y1="140" x2="80" y2="185" stroke="#78350F" strokeWidth="2" />
@@ -369,7 +387,7 @@ export default function MotorCombustionPage() {
               <div key={perdida.nombre} className={styles.perdidaCard}>
                 <div className={styles.perdidaHeader}>
                   <div className={styles.perdidaBar} style={{ backgroundColor: perdida.color, width: `${perdida.porcentaje * 3}px` }} />
-                  <span className={styles.perdidaPorcentaje} style={{ color: perdida.color }}>{perdida.porcentaje}%</span>
+                  <span className={`${styles.perdidaPorcentaje} ${styles[perdida.tono]}`}>{perdida.porcentaje}%</span>
                   <span className={styles.perdidaNombre}>{perdida.nombre}</span>
                 </div>
                 <p className={styles.perdidaDesc}>{perdida.descripcion}</p>

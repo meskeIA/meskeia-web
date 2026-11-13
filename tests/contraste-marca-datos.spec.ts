@@ -169,6 +169,9 @@ const APPS: App[] = [
   // claro; Ígneas 2,97 y Metamórficas 2,52 en oscuro) y el blanco sobre las barras verdes y ámbar de
   // la escala de Mohs (1,28-3,76)
   { slug: 'visualizador-tipos-rocas', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
+  // 13/11/2026 (C0645): el número del tiempo elegido en su color sobre su tinte, la eficiencia real en
+  // #16A34A (3,3:1) y los porcentajes de las pérdidas en su color (el naranja 2,85 en claro)
+  { slug: 'visualizador-motor-combustion', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
 ];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {

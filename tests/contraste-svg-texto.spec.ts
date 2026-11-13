@@ -277,6 +277,11 @@ const APPS: App[] = [
   // metamórficas 2,27 y el rojo 2,72 en oscuro), los procesos en la marca (4,07 y 3,50) y los atajos
   // en #999 (2,82). Los procesos, como subestados
   { slug: 'visualizador-tipos-rocas', secciones: SECCIONES, subestados: "button[aria-pressed]:not(nav button)" },
+  // 13/11/2026: el rótulo de cada tiempo del ciclo Otto en su color (el teal del escape 2,78:1 y el
+  // ámbar 3,16 en claro, el rojo 2,81 en oscuro), las válvulas en #6B7280 (2,81 en oscuro) y, en el
+  // diagrama de pérdidas, el blanco sobre la marca (4,11), el verde (3,33) y el naranja (2,85), y
+  // «Otto 4T» en #9CA3AF sobre el motor (4,02). Los cuatro tiempos, como subestados
+  { slug: 'visualizador-motor-combustion', secciones: SECCIONES, extremos: true, subestados: "button[aria-pressed]:not(nav button)" },
 ];
 
 interface TextoSvg {

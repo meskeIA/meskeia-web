@@ -90,3 +90,24 @@
   .eficienciaLabel { min-width: unset; }
   .tiemposNav { flex-direction: column; }
 }
+
+/* Tonos de TEXTO por color de dato y tema — cabos C0297 y C0645 (13/11/2026). Los rótulos del
+   cilindro y las cifras iban en el color puro de su dato: el teal del escape 2,78:1 y el ámbar de
+   la compresión 3,16 en claro, el rojo de la expansión 2,81 en oscuro, las válvulas en #6B7280 a
+   2,81 en oscuro, y el verde, el naranja y el marrón de las pérdidas como texto. El color de dato
+   se queda en barras, bordes y rellenos. Cada clase pone `color` (HTML) y `fill` (SVG: el fill
+   por CSS manda sobre el atributo). Al final del fichero para mandar sobre la clase base.
+   Medido en tests/contraste-svg-texto.spec.ts y tests/contraste-marca-datos.spec.ts. */
+.tonoMarca { color: var(--primary-texto, #26718F); fill: var(--primary-texto, #26718F); }
+.tonoTeal { color: var(--secondary-texto, #327874); fill: var(--secondary-texto, #327874); }
+.tonoAmbar { color: #8A5A00; fill: #8A5A00; }
+.tonoRojo { color: #B91C1C; fill: #B91C1C; }
+.tonoVerde { color: #136E35; fill: #136E35; }
+.tonoNaranja { color: #A8500F; fill: #A8500F; }
+.tonoMarron { color: #78350F; fill: #78350F; }
+.tonoGris { color: var(--text-secondary, #666666); fill: var(--text-secondary, #666666); }
+[data-theme='dark'] .tonoAmbar { color: #F0B84A; fill: #F0B84A; }
+[data-theme='dark'] .tonoRojo { color: #F1948A; fill: #F1948A; }
+[data-theme='dark'] .tonoVerde { color: #58D68D; fill: #58D68D; }
+[data-theme='dark'] .tonoNaranja { color: #F5A65B; fill: #F5A65B; }
+[data-theme='dark'] .tonoMarron { color: #D7A27A; fill: #D7A27A; }
