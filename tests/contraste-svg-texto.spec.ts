@@ -300,6 +300,14 @@ const APPS: App[] = [
   // la D de la demanda en rojo puro (3,54 en claro, 3,36 en oscuro), O y P₂ en la marca (3,80 y
   // 3,12) y la E del equilibrio en teal (2,59). Los botones de elasticidad y estructura, como subestados
   { slug: 'visualizador-microeconomia', extremos: true, subestados: 'button[aria-pressed]' },
+  // 13/11/2026: los ejes de sus cinco gráficos en #888 (3,40:1 en claro, 4,49 en oscuro) y Tamb y τ en
+  // teal puro (2,68 en claro). Las cuatro pestañas, y Newton y RC como subestados
+  {
+    slug: 'visualizador-ecuaciones-diferenciales',
+    secciones: "[role='tablist'][aria-label*='ecciones'] [role='tab']",
+    extremos: true,
+    subestados: "[role='tablist'][aria-label='Aplicaciones'] [role='tab']",
+  },
 ];
 
 interface TextoSvg {

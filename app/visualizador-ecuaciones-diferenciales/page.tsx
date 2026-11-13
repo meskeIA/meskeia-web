@@ -328,8 +328,8 @@ function TabCampo() {
             />
           )}
           {/* Etiquetas de ejes */}
-          <text x={toSvgX(XMAX) - 15} y={toSvgY(0) + 15} fontSize={11} fill="#888">x</text>
-          <text x={toSvgX(0) + 5} y={toSvgY(YMAX) + 5} fontSize={11} fill="#888">y</text>
+          <text x={toSvgX(XMAX) - 15} y={toSvgY(0) + 15} fontSize={11} className={styles.svgTenue}>x</text>
+          <text x={toSvgX(0) + 5} y={toSvgY(YMAX) + 5} fontSize={11} className={styles.svgTenue}>y</text>
         </svg>
       </div>
 
@@ -494,8 +494,8 @@ function TabLotkaVolterra() {
             {/* Ejes */}
             <line x1={LV_PAD} y1={LV_PAD} x2={LV_PAD} y2={LV_H - LV_PAD} stroke="#ccc" strokeWidth={1} />
             <line x1={LV_PAD} y1={LV_H - LV_PAD} x2={LV_W - LV_PAD} y2={LV_H - LV_PAD} stroke="#ccc" strokeWidth={1} />
-            <text x={LV_PAD + 4} y={LV_PAD + 10} fontSize={10} fill="#888">Población</text>
-            <text x={LV_W - LV_PAD - 10} y={LV_H - LV_PAD + 14} fontSize={10} fill="#888">t</text>
+            <text x={LV_PAD + 4} y={LV_PAD + 10} fontSize={10} className={styles.svgTenue}>Población</text>
+            <text x={LV_W - LV_PAD - 10} y={LV_H - LV_PAD + 14} fontSize={10} className={styles.svgTenue}>t</text>
             {/* Líneas */}
             {serieR.puntos && <polyline points={serieR.puntos} fill="none" stroke="#2E86AB" strokeWidth={2} />}
             {serieL.puntos && <polyline points={serieL.puntos} fill="none" stroke="#E84A5F" strokeWidth={2} />}
@@ -510,8 +510,8 @@ function TabLotkaVolterra() {
           <svg width={FASE_W} height={FASE_H} className={styles.svgFase} aria-label="Diagrama de fase conejos vs lobos">
             <line x1={FASE_PAD} y1={FASE_PAD} x2={FASE_PAD} y2={FASE_H - FASE_PAD} stroke="#ccc" strokeWidth={1} />
             <line x1={FASE_PAD} y1={FASE_H - FASE_PAD} x2={FASE_W - FASE_PAD} y2={FASE_H - FASE_PAD} stroke="#ccc" strokeWidth={1} />
-            <text x={FASE_PAD + 4} y={FASE_PAD + 10} fontSize={10} fill="#888">L (lobos)</text>
-            <text x={FASE_W - FASE_PAD - 20} y={FASE_H - FASE_PAD + 14} fontSize={10} fill="#888">R (conejos)</text>
+            <text x={FASE_PAD + 4} y={FASE_PAD + 10} fontSize={10} className={styles.svgTenue}>L (lobos)</text>
+            <text x={FASE_W - FASE_PAD - 20} y={FASE_H - FASE_PAD + 14} fontSize={10} className={styles.svgTenue}>R (conejos)</text>
             <polyline points={fase} fill="none" stroke="#48A9A6" strokeWidth={2} />
             {/* Punto de equilibrio */}
             {delta > 0 && beta > 0 && (
@@ -642,10 +642,10 @@ function TabAplicaciones() {
             {/* Línea T_amb */}
             <line x1={APL_PAD} y1={toSvgEnfY(tAmb)} x2={APL_W - APL_PAD} y2={toSvgEnfY(tAmb)}
               stroke="#48A9A6" strokeWidth={1} strokeDasharray="4,3" />
-            <text x={APL_W - APL_PAD + 4} y={toSvgEnfY(tAmb) + 4} fontSize={10} fill="#48A9A6">T<tspan dy={3}>amb</tspan></text>
+            <text x={APL_W - APL_PAD + 4} y={toSvgEnfY(tAmb) + 4} fontSize={10} className={styles.svgTeal}>T<tspan dy={3}>amb</tspan></text>
             <polyline points={polyEnf} fill="none" stroke="#2E86AB" strokeWidth={2.5} />
-            <text x={APL_PAD + 4} y={APL_PAD + 12} fontSize={10} fill="#888">T (°C)</text>
-            <text x={APL_W - APL_PAD - 8} y={APL_H - APL_PAD + 14} fontSize={10} fill="#888">t (s)</text>
+            <text x={APL_PAD + 4} y={APL_PAD + 12} fontSize={10} className={styles.svgTenue}>T (°C)</text>
+            <text x={APL_W - APL_PAD - 8} y={APL_H - APL_PAD + 14} fontSize={10} className={styles.svgTenue}>t (s)</text>
           </svg>
           <div className={styles.resultadosGrid}>
             <div className={styles.resultBox}>
@@ -708,10 +708,10 @@ function TabAplicaciones() {
             {/* Línea τ */}
             <line x1={toSvgRCx(t63)} y1={APL_PAD} x2={toSvgRCx(t63)} y2={APL_H - APL_PAD}
               stroke="#48A9A6" strokeWidth={1} strokeDasharray="4,3" />
-            <text x={toSvgRCx(t63) + 3} y={APL_PAD + 12} fontSize={10} fill="#48A9A6">τ</text>
+            <text x={toSvgRCx(t63) + 3} y={APL_PAD + 12} fontSize={10} className={styles.svgTeal}>τ</text>
             <polyline points={polyRC} fill="none" stroke="#2E86AB" strokeWidth={2.5} />
-            <text x={APL_PAD + 4} y={APL_PAD + 12} fontSize={10} fill="#888">V (V)</text>
-            <text x={APL_W - APL_PAD - 8} y={APL_H - APL_PAD + 14} fontSize={10} fill="#888">t (s)</text>
+            <text x={APL_PAD + 4} y={APL_PAD + 12} fontSize={10} className={styles.svgTenue}>V (V)</text>
+            <text x={APL_W - APL_PAD - 8} y={APL_H - APL_PAD + 14} fontSize={10} className={styles.svgTenue}>t (s)</text>
           </svg>
           <div className={styles.resultadosGrid}>
             <div className={styles.resultBox}>

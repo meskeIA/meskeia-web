@@ -33,6 +33,12 @@
   --hover: #333333;
 }
 
+/* Rótulos de los gráficos — cabo C0297 (13/11/2026). Los ejes en #888 daban 3,40:1 en claro y
+   4,49 en oscuro, y Tamb y τ en teal puro 2,68 en claro. El color de dato se queda en las curvas.
+   El fill por CSS manda sobre el atributo. Medido en tests/contraste-svg-texto.spec.ts. */
+.svgTenue { fill: var(--text-secondary); }
+.svgTeal { fill: var(--secondary-texto, #327874); }
+
 /* ── Hero ── */
 .hero {
   text-align: center;
