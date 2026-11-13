@@ -452,6 +452,18 @@ pasivo (2,5 s, no rompe) y `node scripts/check-a11y-jsx.mjs <fichero>` audita un
 > mismas reglas. Crónica y pasivo: cabecera de `scripts/check-a11y-jsx.mjs` · casos:
 > `scripts/pruebas/a11y-regla5.tsx`.
 
+### Candado de los iconos de tarjeta
+
+`npm run check:iconos-tarjeta` — en el build, y **rompe el build** si un `span`/`div` con clase de
+icono de tarjeta o de aviso (`escenarioIcon`, `tipIcon`, `tipIcono`, `warningIcon` y sus variantes
+`edu…`; lista cerrada en el script) no lleva `aria-hidden="true"`: el lector lo lee pegado al título.
+Barre `app/` y `components/`, **sin pasivo** · Escape: `iconos-tarjeta-ok: <razón>`, razón
+obligatoria. El tema C del turno de noche importa de aquí su detector.
+⚠️ Una clase de icono con otro nombre no la ve: se añade a `CLASES_ICONO` con su caso.
+> Salió del cabo C0723 (hallazgo 4556, calculadora-notas): el detector del turno no veía las
+> clases sin `edu`, 659 nodos en 78 ficheros. Crónica: cabecera de `scripts/check-iconos-tarjeta.mjs`
+> · pruebas: `npm run iconos-tarjeta:probar-candado`.
+
 ### Candado del aviso legal
 
 `npm run check:legal` — en el build, y **rompe el build** si una app de `implementedAppsUrls` no
