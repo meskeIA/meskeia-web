@@ -253,6 +253,17 @@ const APPS: App[] = [
   // rótulos de materiales, espesores y ejes en grises fijos, 1,8-2,5 en oscuro. Cada pestaña y cada
   // tipo de radiación (el rayo cambia lo que hay detrás)
   { slug: 'visualizador-radioactividad', secciones: SECCIONES, subestados: "button[aria-pressed]:not(nav button)" },
+  // 13/11/2026: el centro del donut en el color del componente (el ámbar de la energía oscura 2,20:1
+  // en claro) y «haz click» en #888 (3,51); en la historia, los eventos en #666 (3,03 en oscuro) y
+  // el elegido, t=0 y 13.800 Ma en la marca (3,93 en claro); los ejes en #888, «hoy» en teal y
+  // «Energía oscura domina» en ámbar al 80 %; las geometrías en su color (morado 1,51 en oscuro).
+  // Cada componente, cada evento de la historia y cada geometría, como subestados
+  {
+    slug: 'visualizador-cosmologia',
+    secciones: SECCIONES,
+    extremos: true,
+    subestados: "button[aria-pressed]:not(nav button), svg circle[role='button']",
+  },
 ];
 
 interface TextoSvg {

@@ -11,6 +11,7 @@ import {
   LegalNotice,
   ShareCard,
 } from '@/components';
+import { formatNumber } from '@/lib';
 
 // ─────────────────────────────────────────────
 // Tipos
@@ -19,12 +20,15 @@ import {
 type ComponenteUniverso = 'barionica' | 'oscura' | 'energia';
 type GeometriaUniverso = 'plana' | 'abierta' | 'cerrada';
 type SeccionActiva = 'tarta' | 'timeline' | 'expansion' | 'geometria' | 'destinos';
+/** Clase del módulo con el tono de TEXTO de cada color de dato, por tema (C0297, C0645) */
+type Tono = 'tonoMarca' | 'tonoAzul' | 'tonoTeal' | 'tonoMorado' | 'tonoAmbar' | 'tonoVerde' | 'tonoRojo' | 'tonoTenue';
 
 interface ComponenteInfo {
   id: ComponenteUniverso;
   nombre: string;
   porcentaje: number;
   color: string;
+  tono: Tono;
   descripcion: string;
   comoLoSabemos: string;
 }
@@ -44,6 +48,7 @@ interface DestinoUniverso {
   icono: string;
   probabilidad: string;
   colorProbabilidad: string;
+  tonoProbabilidad: Tono;
   colorBorde: string;
   descripcion: string;
 }
@@ -66,6 +71,7 @@ const COMPONENTES: ComponenteInfo[] = [
     nombre: 'Materia bariónica',
     porcentaje: 5,
     color: '#2E86AB',
+    tono: 'tonoMarca',
     descripcion: 'Todo lo que conocemos: estrellas, planetas, gas, polvo, y nosotros mismos. Protones, neutrones y electrones. A pesar de ser lo único que podemos ver y tocar directamente, representa solo el 5% del contenido energético total del universo.',
     comoLoSabemos: 'Lo medimos a través de la emisión y absorción de luz (espectroscopía), el fondo cósmico de microondas (CMB), la nucleosíntesis primordial y el censo de galaxias y gas intergaláctico.',
   },
@@ -74,6 +80,7 @@ const COMPONENTES: ComponenteInfo[] = [
     nombre: 'Materia oscura',
     porcentaje: 27,
     color: '#5B2D8E',
+    tono: 'tonoMorado',
     descripcion: 'Materia que no emite, absorbe ni refleja luz, pero sí tiene masa y por tanto ejerce gravedad. Su existencia se infiere de las curvas de rotación de galaxias (rotan demasiado rápido para la masa visible), el lente gravitacional y la estructura a gran escala del universo.',
     comoLoSabemos: 'Curvas de rotación de galaxias (Vera Rubin, años 70), lentes gravitacionales (el Anillo de Einstein), estructura de la red cósmica, el CMB y simulaciones cosmológicas como el Millennium.',
   },
@@ -82,6 +89,7 @@ const COMPONENTES: ComponenteInfo[] = [
     nombre: 'Energía oscura',
     porcentaje: 68,
     color: '#E8A020',
+    tono: 'tonoAmbar',
     descripcion: 'Una forma de energía distribuida uniformemente en el espacio que causa la expansión acelerada del universo. Corresponde a la constante cosmológica Λ que Einstein introdujo (y luego llamó su «mayor error»). Su naturaleza fundamental es desconocida.',
     comoLoSabemos: 'Descubierta en 1998 por los equipos de Perlmutter, Schmidt y Riess (Premio Nobel 2011) al observar que las supernovas de tipo Ia lejanas son más tenues de lo esperado — el universo se expande cada vez más rápido, no más lento.',
   },
@@ -132,6 +140,7 @@ const DESTINOS: DestinoUniverso[] = [
     icono: '❄️',
     probabilidad: 'Muy probable',
     colorProbabilidad: '#27ae60',
+    tonoProbabilidad: 'tonoVerde',
     colorBorde: '#2E86AB',
     descripcion: 'Destino más probable si la energía oscura es una constante cosmológica. Las estrellas agotan su combustible, las galaxias se disipan, los agujeros negros se evaporan por radiación Hawking en ~10¹⁰⁰ años. El universo alcanza la entropía máxima: equilibrio termodinámico perfecto, silencio absoluto.',
   },
@@ -141,6 +150,7 @@ const DESTINOS: DestinoUniverso[] = [
     icono: '💥',
     probabilidad: 'Posible',
     colorProbabilidad: '#E8A020',
+    tonoProbabilidad: 'tonoAmbar',
     colorBorde: '#E8A020',
     descripcion: 'Si la energía oscura es una "energía fantasma" (w < −1) que se intensifica con el tiempo, la expansión se acelera hasta desgarrar toda la estructura del universo. En ~22.000 Ma: galaxias, después sistemas solares, planetas, y finalmente los propios átomos se separan.',
   },
@@ -150,6 +160,7 @@ const DESTINOS: DestinoUniverso[] = [
     icono: '🌑',
     probabilidad: 'Descartado',
     colorProbabilidad: '#e74c3c',
+    tonoProbabilidad: 'tonoRojo',
     colorBorde: '#e74c3c',
     descripcion: 'Si Ω > 1 (universo cerrado), la gravedad frenaba y revertía la expansión. El universo colapsaría en una nueva singularidad. Los datos actuales de CMB (Ω ≈ 1) y la expansión acelerada lo descartan prácticamente.',
   },
@@ -159,6 +170,7 @@ const DESTINOS: DestinoUniverso[] = [
     icono: '🔄',
     probabilidad: 'Especulativo',
     colorProbabilidad: '#7FB3D3',
+    tonoProbabilidad: 'tonoAzul',
     colorBorde: '#48A9A6',
     descripcion: 'Hipótesis cosmológica cíclica: tras un Big Crunch, el universo "rebota" en un nuevo Big Bang. Hay versiones en cosmología cuántica de bucles (LQC) y en teoría de cuerdas (universo ekpirótico). Sin evidencia observacional directa por ahora.',
   },
@@ -222,10 +234,10 @@ function TartaUniverso() {
               );
             })}
             {/* Centro del donut */}
-            <text x="110" y="104" textAnchor="middle" fontSize="13" fontWeight="700" fill={seleccionado ? COMPONENTES.find(c => c.id === seleccionado)?.color ?? '#2E86AB' : '#2E86AB'}>
+            <text x="110" y="104" textAnchor="middle" fontSize="13" fontWeight="700" className={styles[componenteActual?.tono ?? 'tonoMarca']}>
               {seleccionado ? `${COMPONENTES.find(c => c.id === seleccionado)?.porcentaje}%` : 'Universo'}
             </text>
-            <text x="110" y="120" textAnchor="middle" fontSize="9" fill="#888">
+            <text x="110" y="120" textAnchor="middle" fontSize="9" className={styles.tonoTenue}>
               {seleccionado ? COMPONENTES.find(c => c.id === seleccionado)?.nombre : 'haz click'}
             </text>
           </svg>
@@ -242,7 +254,7 @@ function TartaUniverso() {
             >
               <span className={styles.tartaLeyendaColor} style={{ backgroundColor: comp.color }} aria-hidden="true" />
               <span className={styles.tartaLeyendaLabel}>{comp.nombre}</span>
-              <span className={styles.tartaLeyendaPct} style={{ color: comp.color }}>{comp.porcentaje}%</span>
+              <span className={`${styles.tartaLeyendaPct} ${styles[comp.tono]}`}>{comp.porcentaje}%</span>
             </button>
           ))}
 
@@ -255,11 +267,11 @@ function TartaUniverso() {
 
       {componenteActual && (
         <div className={styles.componentePanel} style={{ borderLeftColor: componenteActual.color }}>
-          <h3 className={styles.componentePanelTitulo} style={{ color: componenteActual.color }}>
+          <h3 className={`${styles.componentePanelTitulo} ${styles[componenteActual.tono]}`}>
             {componenteActual.nombre} — {componenteActual.porcentaje}% del universo
           </h3>
           <p className={styles.componentePanelTexto}>{componenteActual.descripcion}</p>
-          <p className={styles.componentePanelTexto} style={{ marginTop: '0.7rem', color: '#666', fontStyle: 'italic' }}>
+          <p className={`${styles.componentePanelTexto} ${styles.tonoTenue}`} style={{ marginTop: '0.7rem', fontStyle: 'italic' }}>
             <strong>¿Cómo lo sabemos?</strong> {componenteActual.comoLoSabemos}
           </p>
         </div>
@@ -306,7 +318,7 @@ function TimelineCosmica() {
                 textAnchor="middle"
                 fontSize="8"
                 fontWeight={eventoActivo === ev.id ? '700' : '500'}
-                fill={eventoActivo === ev.id ? '#2E86AB' : '#666'}
+                className={eventoActivo === ev.id ? styles.tonoMarca : styles.tonoTenue}
                 style={{ pointerEvents: 'none' }}
               >
                 {ev.nombre.split(' ')[0]}
@@ -315,12 +327,12 @@ function TimelineCosmica() {
           ))}
 
           {/* Etiqueta inicio / fin */}
-          <text x="20" y="90" textAnchor="middle" fontSize="8" fill="#2E86AB" fontWeight="700">t=0</text>
-          <text x="800" y="90" textAnchor="middle" fontSize="8" fill="#2E86AB" fontWeight="700">13.800 Ma</text>
+          <text x="20" y="90" textAnchor="middle" fontSize="8" className={styles.tonoMarca} fontWeight="700">t=0</text>
+          <text x="800" y="90" textAnchor="middle" fontSize="8" className={styles.tonoMarca} fontWeight="700">13.800 Ma</text>
         </svg>
       </div>
 
-      <p style={{ fontSize: '0.82rem', color: '#999', textAlign: 'center', marginBottom: '0.5rem' }}>
+      <p style={{ fontSize: '0.82rem', color: 'var(--text-muted)', textAlign: 'center', marginBottom: '0.5rem' }}>
         Haz click en un punto para ver el evento. Los eventos no están a escala logarítmica completa — se priorizan los más recientes para visibilidad.
       </p>
 
@@ -371,7 +383,7 @@ function ExpansionAcelerada() {
     <div>
       <div className={styles.sliderWrap}>
         <p className={styles.sliderLabel}>
-          Mover el presente: <strong style={{ color: 'var(--primary-texto)' }}>t = {tPresente.toFixed(1)} Ga</strong>
+          Mover el presente: <strong style={{ color: 'var(--primary-texto)' }}>{`t = ${formatNumber(tPresente, 1)} Ga`}</strong>
           {tPresente <= 9.8 ? ' — Expansión desacelerada (domina la materia)' : ' — Expansión acelerada (domina la energía oscura)'}
         </p>
         <input
@@ -396,12 +408,12 @@ function ExpansionAcelerada() {
           {/* Ejes */}
           <line x1="30" y1="10" x2="30" y2={H - 10} stroke="#ccc" strokeWidth="1" />
           <line x1="25" y1={H - 20} x2={W - 10} y2={H - 20} stroke="#ccc" strokeWidth="1" />
-          <text x="16" y="14" fontSize="9" fill="#888" textAnchor="middle">a(t)</text>
-          <text x={W - 10} y={H - 8} fontSize="9" fill="#888" textAnchor="end">t (Ga)</text>
+          <text x="16" y="14" fontSize="9" className={styles.tonoTenue} textAnchor="middle">a(t)</text>
+          <text x={W - 10} y={H - 8} fontSize="9" className={styles.tonoTenue} textAnchor="end">t (Ga)</text>
 
           {/* Zona energía oscura */}
           <rect x={30 + (9.8 / tMax) * (W - 60)} y="10" width={(W - 60) * (1 - 9.8 / tMax)} height={H - 30} fill="rgba(232,160,32,0.07)" />
-          <text x={30 + (9.8 / tMax) * (W - 60) + 10} y="22" fontSize="8" fill="#E8A020" opacity="0.8">Energía oscura domina</text>
+          <text x={30 + (9.8 / tMax) * (W - 60) + 10} y="22" fontSize="8" className={styles.tonoAmbar}>Energía oscura domina</text>
 
           {/* Curva */}
           <polyline points={polyline} fill="none" stroke="#2E86AB" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -409,8 +421,8 @@ function ExpansionAcelerada() {
           {/* Punto del presente */}
           <circle cx={presenteX} cy={presenteY} r="6" fill="#48A9A6" stroke="#fff" strokeWidth="2" />
           <line x1={presenteX} y1={presenteY} x2={presenteX} y2={H - 20} stroke="#48A9A6" strokeWidth="1.5" strokeDasharray="4,3" />
-          <text x={presenteX} y={presenteY - 10} textAnchor="middle" fontSize="9" fill="#48A9A6" fontWeight="700">hoy</text>
-          <text x={presenteX} y={H - 8} textAnchor="middle" fontSize="8" fill="#48A9A6">{tPresente.toFixed(1)} Ga</text>
+          <text x={presenteX} y={presenteY - 10} textAnchor="middle" fontSize="9" className={styles.tonoTeal} fontWeight="700">hoy</text>
+          <text x={presenteX} y={H - 8} textAnchor="middle" fontSize="8" className={styles.tonoTeal}>{`${formatNumber(tPresente, 1)} Ga`}</text>
         </svg>
       </div>
 
@@ -423,7 +435,7 @@ function ExpansionAcelerada() {
           </div>
         </div>
         <div className={styles.hubbleCard} style={{ borderLeftColor: '#E8A020' }}>
-          <div className={styles.hubbleCardValor} style={{ color: '#E8A020' }}>73,0 km/s/Mpc</div>
+          <div className={`${styles.hubbleCardValor} ${styles.tonoAmbar}`}>73,0 km/s/Mpc</div>
           <div className={styles.hubbleCardLabel}>
             <strong>H₀ (escalera de distancias cósmicas — Riess)</strong><br />
             Medido con Cefeidas y supernovas Ia. Significativamente mayor que Planck. La diferencia (&gt;5σ) es la «tensión de Hubble».
@@ -467,17 +479,17 @@ function GeometriaUniversoComp() {
         <svg viewBox="0 0 600 200" className={styles.diagramaSvg} role="img" aria-label={`Geometría ${geo.nombre} del universo: visualización de líneas paralelas y triángulo`}>
           {geometria === 'plana' && (
             <g>
-              <text x="300" y="24" textAnchor="middle" fontSize="14" fontWeight="700" fill="#2E86AB">Geometría Plana (Euclidiana) — Ω = 1</text>
+              <text x="300" y="24" textAnchor="middle" fontSize="14" fontWeight="700" className={styles.tonoMarca}>Geometría Plana (Euclidiana) — Ω = 1</text>
               {/* Líneas paralelas horizontales */}
               <line x1="60" y1="70" x2="540" y2="70" stroke="#2E86AB" strokeWidth="2.5" />
               <line x1="60" y1="110" x2="540" y2="110" stroke="#2E86AB" strokeWidth="2.5" />
               <line x1="60" y1="150" x2="540" y2="150" stroke="#2E86AB" strokeWidth="2.5" />
-              <text x="300" y="185" textAnchor="middle" fontSize="11" fill="#48A9A6">Las líneas paralelas nunca se encuentran • Triángulo = 180°</text>
+              <text x="300" y="185" textAnchor="middle" fontSize="11" className={styles.tonoTeal}>Las líneas paralelas nunca se encuentran • Triángulo = 180°</text>
             </g>
           )}
           {geometria === 'abierta' && (
             <g>
-              <text x="300" y="24" textAnchor="middle" fontSize="14" fontWeight="700" fill="#5B2D8E">Geometría Hiperbólica (Silla) — Ω &lt; 1</text>
+              <text x="300" y="24" textAnchor="middle" fontSize="14" fontWeight="700" className={styles.tonoMorado}>Geometría Hiperbólica (Silla) — Ω &lt; 1</text>
               {/* Líneas que divergen */}
               <line x1="200" y1="90" x2="80" y2="60" stroke="#5B2D8E" strokeWidth="2.5" />
               <line x1="200" y1="90" x2="80" y2="150" stroke="#5B2D8E" strokeWidth="2.5" />
@@ -485,12 +497,12 @@ function GeometriaUniversoComp() {
               <line x1="200" y1="90" x2="520" y2="170" stroke="#5B2D8E" strokeWidth="2" strokeDasharray="5,3" />
               {/* Silla de montar simplificada */}
               <path d="M 380 80 Q 420 110 460 80 Q 440 130 460 160 Q 420 140 380 160 Q 400 130 380 80" fill="none" stroke="#5B2D8E" strokeWidth="1.5" opacity="0.5" />
-              <text x="300" y="185" textAnchor="middle" fontSize="11" fill="#5B2D8E">Las paralelas divergen • Triángulo &lt; 180°</text>
+              <text x="300" y="185" textAnchor="middle" fontSize="11" className={styles.tonoMorado}>Las paralelas divergen • Triángulo &lt; 180°</text>
             </g>
           )}
           {geometria === 'cerrada' && (
             <g>
-              <text x="300" y="24" textAnchor="middle" fontSize="14" fontWeight="700" fill="#E8A020">Geometría Esférica — Ω &gt; 1</text>
+              <text x="300" y="24" textAnchor="middle" fontSize="14" fontWeight="700" className={styles.tonoAmbar}>Geometría Esférica — Ω &gt; 1</text>
               {/* Esfera */}
               <ellipse cx="200" cy="110" rx="70" ry="70" fill="none" stroke="#E8A020" strokeWidth="2.5" />
               <ellipse cx="200" cy="110" rx="70" ry="25" fill="none" stroke="#E8A020" strokeWidth="1.5" strokeDasharray="5,3" />
@@ -499,8 +511,8 @@ function GeometriaUniversoComp() {
               {/* Líneas meridiano convergentes */}
               <line x1="380" y1="55" x2="480" y2="110" stroke="#E8A020" strokeWidth="2" />
               <line x1="420" y1="55" x2="480" y2="110" stroke="#E8A020" strokeWidth="2" />
-              <text x="430" y="50" fontSize="9" fill="#E8A020">paralelas se unen en los polos</text>
-              <text x="300" y="185" textAnchor="middle" fontSize="11" fill="#E8A020">Las paralelas convergen • Triángulo &gt; 180°</text>
+              <text x="430" y="50" fontSize="9" className={styles.tonoAmbar}>paralelas se unen en los polos</text>
+              <text x="300" y="185" textAnchor="middle" fontSize="11" className={styles.tonoAmbar}>Las paralelas convergen • Triángulo &gt; 180°</text>
             </g>
           )}
         </svg>
@@ -531,8 +543,8 @@ function DestinosUniverso() {
           <div className={styles.destinoIcono} aria-hidden="true">{dest.icono}</div>
           <h3 className={styles.destinoNombre}>{dest.nombre}</h3>
           <span
-            className={styles.destinoProbabilidad}
-            style={{ backgroundColor: `${dest.colorProbabilidad}22`, color: dest.colorProbabilidad }}
+            className={`${styles.destinoProbabilidad} ${styles[dest.tonoProbabilidad]}`}
+            style={{ backgroundColor: `${dest.colorProbabilidad}22` }}
           >
             {dest.probabilidad}
           </span>

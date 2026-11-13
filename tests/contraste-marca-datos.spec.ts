@@ -153,6 +153,11 @@ const APPS: App[] = [
   // y en oscuro los títulos sobre el tinte de marca al 9-12 % (4,30-4,32, forma de C0278). El
   // proceso elegido toma su fondo de rellenoConTinta, que garantiza 4,5:1 por construcción
   { slug: 'visualizador-ciclo-nitrogeno', todo: true, secciones: "[role='tablist'][aria-label*='ecciones'] [role='tab']" },
+  // 13/11/2026 (C0297, C0645): los porcentajes de la leyenda en el color de su componente (el ámbar
+  // 2,22:1 en claro, el morado 1,51 en oscuro), «73,0 km/s/Mpc» en ámbar, la nota de la historia en
+  // #999 (2,73), las insignias de los destinos en su color sobre su tinte (2,00-3,22 en claro,
+  // 3,28-4,12 en oscuro) y el strong del aviso en la reserva roja de la receta en oscuro (3,21)
+  { slug: 'visualizador-cosmologia', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
 ];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {
