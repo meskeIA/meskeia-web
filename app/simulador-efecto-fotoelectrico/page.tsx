@@ -633,8 +633,8 @@ export default function SimuladorEfectoFotoelectricoPage() {
             )}
           </div>
           <p className={styles.fuente}>
-            Constantes CODATA 2018: h = 6,62607015 × 10⁻³⁴ J·s, e = 1,602176634 × 10⁻¹⁹ C y
-            c = 299.792.458 m/s (exactas) · mₑ = 9,1093837015 × 10⁻³¹ kg. Velocidad calculada sin
+            Constantes CODATA 2022: h = 6,62607015 × 10⁻³⁴ J·s, e = 1,602176634 × 10⁻¹⁹ C y
+            c = 299.792.458 m/s (exactas) · mₑ = 9,1093837139 × 10⁻³¹ kg. Velocidad calculada sin
             relatividad: con energías de unos pocos eV frente a los 511 keV del electrón en reposo, la
             corrección no se ve en ninguna cifra.
           </p>
@@ -697,7 +697,7 @@ export default function SimuladorEfectoFotoelectricoPage() {
           </div>
           <p className={styles.eduNota}>
             Fuente de φ: Serway y Jewett, <em>Física para ciencias e ingeniería</em>, tabla 40.1. λ₀ y f₀
-            calculados con las constantes CODATA 2018. Los valores de φ dependen del estado de la superficie
+            calculados con las constantes CODATA 2022. Los valores de φ dependen del estado de la superficie
             y varían unas décimas de eV entre tablas.
           </p>
 

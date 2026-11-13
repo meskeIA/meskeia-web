@@ -15,7 +15,7 @@
  *
  * ── EL CONVENIO: DOS JUEGOS DE CONSTANTES ────────────────────────────────────
  *
- * ⚠️ El motor usa E_ion = 13,598 eV y R_H = 1,09678·10⁷ m⁻¹ (masa reducida, CODATA 2018); el
+ * ⚠️ El motor usa E_ion = 13,598 eV y R_H = 1,09678·10⁷ m⁻¹ (masa reducida, CODATA 2022); el
  *    libro de texto, 13,6 eV y R = 1,097·10⁷ m⁻¹, con c = 3,00·10⁸ m/s, e = 1,602·10⁻¹⁹ C y
  *    a₀ = 0,0529 nm. Difieren en la cuarta cifra (Hα: 656,47 frente a 656,34 nm).
  *

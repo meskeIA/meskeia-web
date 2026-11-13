@@ -21,18 +21,20 @@
  * tests/efecto-fotoelectrico-motor.spec.ts.
  */
 
-// ─── Constantes físicas (CODATA 2018) ────────────────────────────────────────
-// h, e y c son EXACTAS desde la redefinición del SI de 2019 (CODATA 2018 las recoge así).
-// mₑ es medida: valor recomendado CODATA 2018, incertidumbre relativa 3,0·10⁻¹⁰.
+// ─── Constantes físicas (CODATA 2022) ────────────────────────────────────────
+// h, e y c son EXACTAS desde la redefinición del SI de 2019: no cambian de un ajuste a otro.
+// mₑ es medida: valor recomendado CODATA 2022, 9,109 383 7139(28)·10⁻³¹ kg, leído en
+// physics.nist.gov/cgi-bin/cuu/Value?me el 13/11/2026 (cabo C0726; la de 2018 era
+// 9,1093837015·10⁻³¹). La diferencia, 1,4·10⁻¹⁰ relativa, no mueve ninguna cifra en pantalla.
 
-/** Constante de Planck h (J·s). Exacta. CODATA 2018. */
+/** Constante de Planck h (J·s). Exacta (SI de 2019). */
 export const H_PLANCK = 6.62607015e-34;
-/** Carga elemental e (C). Exacta. CODATA 2018. También el factor J ↔ eV. */
+/** Carga elemental e (C). Exacta (SI de 2019). También el factor J ↔ eV. */
 export const CARGA_ELEMENTAL = 1.602176634e-19;
-/** Velocidad de la luz en el vacío c (m/s). Exacta. CODATA 2018. */
+/** Velocidad de la luz en el vacío c (m/s). Exacta (SI de 2019). */
 export const VELOCIDAD_LUZ = 299_792_458;
-/** Masa del electrón mₑ (kg). CODATA 2018. */
-export const MASA_ELECTRON = 9.1093837015e-31;
+/** Masa del electrón mₑ (kg). CODATA 2022. */
+export const MASA_ELECTRON = 9.1093837139e-31;
 
 /** h·c expresado en eV·nm: 1.239,8419843… Permite E (eV) = HC_EV_NM / λ (nm). */
 export const HC_EV_NM = ((H_PLANCK * VELOCIDAD_LUZ) / CARGA_ELEMENTAL) * 1e9;

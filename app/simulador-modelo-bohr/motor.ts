@@ -28,7 +28,7 @@
  * de un salto valga exactamente la diferencia de energía de los dos niveles que se muestran.
  *
  * Las constantes h, c y el factor eV ↔ J se importan del motor de `simulador-efecto-fotoelectrico`
- * (CODATA 2018), igual que la región del espectro: una sola definición del visible para las dos
+ * (CODATA 2022), igual que la región del espectro: una sola definición del visible para las dos
  * apps de física cuántica.
  */
 
@@ -40,16 +40,19 @@ import {
   type RegionEspectro,
 } from '../simulador-efecto-fotoelectrico/motor';
 
-// ─── Constantes (CODATA 2018) ────────────────────────────────────────────────
+// ─── Constantes (CODATA 2022) ────────────────────────────────────────────────
+// Leídas en physics.nist.gov/cgi-bin/cuu/Value?ryd, ?mpsme y ?bohrrada0 el 13/11/2026 (cabo
+// C0726). Las tres son medidas y cambiaron en las últimas cifras desde CODATA 2018
+// (10.973.731,568160 · 1836,15267343 · 5,29177210903·10⁻¹¹); ninguna cifra en pantalla se mueve.
 
-/** Constante de Rydberg para núcleo infinito, R∞ (m⁻¹). CODATA 2018. */
-export const R_INFINITO = 10_973_731.568_16;
+/** Constante de Rydberg para núcleo infinito, R∞ (m⁻¹). CODATA 2022: 10 973 731,568 157(12). */
+export const R_INFINITO = 10_973_731.568_157;
 
-/** Cociente de masas protón/electrón, mₚ/mₑ. CODATA 2018. */
-export const MASA_PROTON_ENTRE_ELECTRON = 1836.152_673_43;
+/** Cociente de masas protón/electrón, mₚ/mₑ. CODATA 2022: 1836,152 673 426(32). */
+export const MASA_PROTON_ENTRE_ELECTRON = 1836.152_673_426;
 
-/** Radio de Bohr a₀ (m). CODATA 2018. */
-export const RADIO_BOHR = 5.291_772_109_03e-11;
+/** Radio de Bohr a₀ (m). CODATA 2022: 5,291 772 105 44(82)·10⁻¹¹. */
+export const RADIO_BOHR = 5.291_772_105_44e-11;
 
 /** Constante de Rydberg del hidrógeno, con la masa reducida: R_H = R∞/(1 + mₑ/mₚ) ≈ 1,09678·10⁷ m⁻¹. */
 export const R_HIDROGENO = R_INFINITO / (1 + 1 / MASA_PROTON_ENTRE_ELECTRON);

@@ -41,7 +41,7 @@ export const jsonLd = generateWebAppSchema({
     'Energía cinética máxima, velocidad máxima de los electrones y potencial de frenado',
     'Animación de la placa con electrones cuyo número sigue a la intensidad y cuya velocidad sigue a la energía',
     'Gráfica de la energía cinética frente a la frecuencia: recta de pendiente h que corta el eje en f₀',
-    'Constantes CODATA 2018',
+    'Constantes CODATA 2022',
   ],
   keywords: ['efecto fotoeléctrico', 'frecuencia umbral', 'función de trabajo', 'potencial de frenado', 'Einstein', 'física cuántica', 'simulador'],
 });

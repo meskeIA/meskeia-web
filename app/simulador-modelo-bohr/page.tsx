@@ -589,7 +589,7 @@ export default function SimuladorModeloBohrPage() {
           </div>
           <p className={styles.fuente}>
             Calculado con la constante de Rydberg del hidrógeno, R_H = R∞/(1 + mₑ/mₚ), y las
-            constantes CODATA 2018. Las longitudes de onda son en el vacío y coinciden con las medidas
+            constantes CODATA 2022. Las longitudes de onda son en el vacío y coinciden con las medidas
             (NIST Atomic Spectra Database) en unas centésimas de nanómetro. En el aire salen un
             0,03&nbsp;% más cortas: muchas tablas dan para Hα 656,28 nm, la medida en aire.
           </p>

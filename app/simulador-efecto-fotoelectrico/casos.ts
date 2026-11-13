@@ -31,7 +31,7 @@
  *
  * ── LAS CONSTANTES: «TODOS LOS MÉTODOS COINCIDEN» ────────────────────────────
  *
- * ⚠️ El motor usa CODATA 2018 (h·c = 1.239,84 eV·nm). En clase se usan valores de libro, y con
+ * ⚠️ El motor usa CODATA 2022 (h·c = 1.239,84 eV·nm). En clase se usan valores de libro, y con
  *    h = 6,63 × 10⁻³⁴, c = 3,00 × 10⁸ y e = 1,60 × 10⁻¹⁹ sale h·c = 1.243,1 eV·nm: un 0,26 % más,
  *    que a dos decimales de una energía de 4 eV ya cambia la cifra. Por eso CADA ENUNCIADO
  *    DECLARA las constantes que hay que usar (`constantesDeclaradas`, que se añade sola al
@@ -89,7 +89,7 @@ const NBSP = ' ';
 
 /**
  * Las constantes que declaran los enunciados. Son las de los libros de secundaria; el motor usa
- * CODATA 2018. Ver la cabecera: los datos están elegidos para que las dos den la misma cifra.
+ * CODATA 2022. Ver la cabecera: los datos están elegidos para que las dos den la misma cifra.
  */
 export const CONSTANTES_LIBRO = {
   /** h·c en eV·nm. */
@@ -617,13 +617,13 @@ export function resolverCaso(datos: DatosCaso): Resolucion {
     return { ok: false, valor: NaN, pasos, error: 'El resultado no es un número finito.' };
   }
 
-  // La cifra del motor (CODATA 2018), que es la que se corrige, frente a la de libro.
+  // La cifra del motor (CODATA 2022), que es la que se corrige, frente a la de libro.
   const libro = valorConConstantesDeLibro(datos);
   const unidad = unidadDeMagnitud(datos.magnitud);
   pasos.push(
     coinciden(valor, libro, decimales)
-      ? `El simulador calcula con las constantes exactas (CODATA 2018, h·c = ${numero(HC_EV_NM, 2)} eV·nm) y le sale ${numero(valor)} ${unidad}: redondeando como pide el enunciado, la misma cifra.`
-      : `El simulador calcula con las constantes exactas (CODATA 2018, h·c = ${numero(HC_EV_NM, 2)} eV·nm) y le sale ${numero(valor)} ${unidad}; la respuesta que se corrige es esa.`,
+      ? `El simulador calcula con las constantes exactas (CODATA 2022, h·c = ${numero(HC_EV_NM, 2)} eV·nm) y le sale ${numero(valor)} ${unidad}: redondeando como pide el enunciado, la misma cifra.`
+      : `El simulador calcula con las constantes exactas (CODATA 2022, h·c = ${numero(HC_EV_NM, 2)} eV·nm) y le sale ${numero(valor)} ${unidad}; la respuesta que se corrige es esa.`,
   );
 
   // El último paso muestra la cifra con los MISMOS decimales que pide el enunciado.

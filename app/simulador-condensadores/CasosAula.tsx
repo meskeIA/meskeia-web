@@ -96,7 +96,7 @@ export default function CasosAula() {
           dieléctrico llena todo el hueco de un condensador que estaba en vacío y cargado a la
           tensión de la batería, y en el circuito RC la carga parte del condensador descargado y la
           descarga, del cargado. Los enunciados dicen ε₀ = 8,85·10⁻¹² F/m; el simulador usa el valor
-          completo, 8,8541878128·10⁻¹² F/m, y los datos están elegidos para que con los dos salga
+          completo, 8,8541878188·10⁻¹² F/m, y los datos están elegidos para que con los dos salga
           la misma cifra redondeada. Los datos son exactos, así que no hay más margen que el
           redondeo: vale la cifra exacta o, si el enunciado pide redondear, la redondeada como
           pide. Pasa todo al SI antes de empezar, usa la tecla eˣ de la calculadora y redondea solo

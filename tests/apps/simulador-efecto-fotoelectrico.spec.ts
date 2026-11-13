@@ -281,7 +281,7 @@ const CODATA: Constantes = {
   hc: ((H_CODATA * 299_792_458) / E_CODATA) * 1e9,
   h: H_CODATA,
   e: E_CODATA,
-  me: 9.1093837015e-31,
+  me: 9.1093837139e-31, // CODATA 2022 (NIST Value?me); hasta el 13/11/2026, la de 2018 (cabo C0726)
 };
 
 /** Cada caso, escrito desde la definición para unas constantes cualesquiera. */

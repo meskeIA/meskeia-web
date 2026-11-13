@@ -680,14 +680,14 @@ test.describe('Inspector 12/11/2026 · primera inspección', () => {
     await expect(page.locator('#casos-resultado')).toHaveText('Respuesta: 2,42 s');
   });
 
-  test('HALLAZGO (12/11/2026, ABIERTO) · ε₀ es el de CODATA 2018; el recomendado vigente (CODATA 2022) es 8,8541878188·10⁻¹² F/m', async ({ page }) => {
+  test('HALLAZGO 4576 (12/11/2026, REPARADO 13/11) · ε₀ es el recomendado vigente (CODATA 2022), 8,8541878188·10⁻¹² F/m', async ({ page }) => {
     // Fuente: NIST, physics.nist.gov/cgi-bin/cuu/Value?ep0 — «8.854 187 8188 x 10⁻¹² F m⁻¹»,
-    // incertidumbre típica 0.000 000 0014·10⁻¹², ajuste CODATA 2022. La app escribe y usa
-    // 8,8541878128·10⁻¹² (CODATA 2018) en la fórmula, en EPSILON_0 del motor, en la intro de los
-    // casos y en los pasos de su solución; tabla-constantes-fisicas ya publica 8,854187818·10⁻¹².
+    // incertidumbre típica 0.000 000 0014·10⁻¹², ajuste CODATA 2022 (releída en /reparar el
+    // 13/11/2026). La app escribía y usaba 8,8541878128·10⁻¹² (CODATA 2018) en la fórmula, en
+    // EPSILON_0 del motor, en la intro de los casos y en los pasos de su solución.
     // Ninguna cifra impresa cambia (diferencia relativa 6,8·10⁻¹⁰): es el dato y su rótulo.
-    test.fail();
     expect(EPSILON_0).toBe(8.8541878188e-12);
+    await expect(page.locator('main')).not.toContainText('CODATA 2018');
     await expect(page.locator('main')).not.toContainText('8,8541878128');
     await expect(page.locator('main')).toContainText('8,8541878188·10⁻¹² F/m');
   });

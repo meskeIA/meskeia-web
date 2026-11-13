@@ -96,7 +96,7 @@ export default function CasosAula() {
           frenado en voltios es el mismo número que E<sub>c,máx</sub> en eV y la velocidad se calcula
           sin relatividad. Cada enunciado dice qué constantes usar (h·c = 1240 eV·nm o, para
           frecuencias y velocidades, h = 6,63 × 10⁻³⁴ J·s, e = 1,60 × 10⁻¹⁹ C y
-          mₑ = 9,11 × 10⁻³¹ kg). El simulador usa los valores exactos de CODATA 2018, y los datos
+          mₑ = 9,11 × 10⁻³¹ kg). El simulador usa los valores exactos de CODATA 2022, y los datos
           están elegidos para que, redondeando como pide el enunciado, las dos cuentas den la misma
           cifra. Vale la cifra exacta o la redondeada como se pide; redondea solo al final, nunca un
           resultado intermedio.

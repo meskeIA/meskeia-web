@@ -3,10 +3,12 @@
  *
  * Ejecutar: npx playwright test --config playwright.calc.config.ts tests/condensadores-motor.spec.ts
  *
- * Constante: ε₀ = 8,8541878128·10⁻¹² F/m (CODATA 2018). Casos resueltos a mano:
+ * Constante: ε₀ = 8,8541878188·10⁻¹² F/m (CODATA 2022; hasta el 13/11/2026, la de 2018,
+ * 8,8541878128, hallazgo 4576). Casos resueltos a mano (las cifras de abajo se hicieron con la
+ * de 2018; la diferencia, 6,8·10⁻¹⁰ relativa, cabe en la tolerancia 10⁻⁶ de cercaRelativo):
  *
  *   Condensador de vacío, A = 100 cm² = 0,01 m², d = 1 mm = 0,001 m
- *     C = ε₀·A/d = 8,8541878128·10⁻¹² · 0,01 / 0,001 = 8,8541878128·10⁻¹¹ F  (88,54 pF)
+ *     C = ε₀·A/d = 8,8541878188·10⁻¹² · 0,01 / 0,001 = 8,8541878188·10⁻¹¹ F  (88,54 pF)
  *   Con V = 12 V
  *     Q = C·V  = 12 · 8,8541878128·10⁻¹¹   = 1,06250254·10⁻⁹ C   (1,0625 nC)
  *     E = V/d  = 12 / 0,001                = 12.000 V/m
@@ -49,8 +51,8 @@ function cercaRelativo(real: number, esperado: number, tolerancia = 1e-6): void 
 const VACIO_12V = { area: 0.01, separacion: 0.001, tension: 12, er: 1 };
 
 test.describe('ε₀ y los dieléctricos de la tabla', () => {
-  test('ε₀ es el valor CODATA 2018', () => {
-    expect(EPSILON_0).toBe(8.8541878128e-12);
+  test('ε₀ es el valor CODATA 2022 (NIST, Value?ep0)', () => {
+    expect(EPSILON_0).toBe(8.8541878188e-12);
   });
 
   test('los presets son los de Serway y Jewett, tabla 26.1', () => {
@@ -63,7 +65,7 @@ test.describe('Parte 1 — condensador de placas paralelas', () => {
   test('A = 100 cm², d = 1 mm, vacío: C = 88,54 pF', () => {
     const r = calcularCondensador(VACIO_12V);
     expect(r).not.toBeNull();
-    cercaRelativo(r!.capacidad, 8.8541878128e-11, 1e-12);
+    cercaRelativo(r!.capacidad, 8.8541878188e-11, 1e-12);
   });
 
   test('con V = 12 V: Q = 1,0625 nC, E = 12.000 V/m, U = 6,375 nJ', () => {
@@ -87,7 +89,7 @@ test.describe('Parte 1 — condensador de placas paralelas', () => {
 
   test('con V = 0 es válido: C existe y Q, E, U son 0', () => {
     const r = calcularCondensador({ ...VACIO_12V, tension: 0 })!;
-    cercaRelativo(r.capacidad, 8.8541878128e-11, 1e-12);
+    cercaRelativo(r.capacidad, 8.8541878188e-11, 1e-12);
     expect(r.carga).toBe(0);
     expect(r.campo).toBe(0);
     expect(r.energia).toBe(0);

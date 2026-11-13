@@ -32,7 +32,10 @@
 // ============================================================
 // Constantes físicas
 // ============================================================
-export const G = 6.674e-11; // m³/(kg·s²) — constante de gravitación universal (CODATA 2018)
+// m³/(kg·s²) — constante de gravitación universal. CODATA 2022: 6,674 30(15)·10⁻¹¹, igual que
+// en 2018 (physics.nist.gov/cgi-bin/cuu/Value?bg, leída el 13/11/2026, cabo C0726); aquí
+// redondeada a cuatro cifras.
+export const G = 6.674e-11;
 export const UA = 1.495978707e11; // m — unidad astronómica (definición IAU 2012)
 export const DIA = 86400; // s
 export const ANIO = 365.25 * DIA; // s — año juliano

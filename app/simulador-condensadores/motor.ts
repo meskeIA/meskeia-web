@@ -22,9 +22,11 @@
 
 /**
  * Permitividad del vacío ε₀ en F/m.
- * Fuente: CODATA 2018 (NIST, «Fundamental Physical Constants»), 8,8541878128(13)·10⁻¹² F/m.
+ * Fuente: CODATA 2022 (NIST, physics.nist.gov/cgi-bin/cuu/Value?ep0, leída el 13/11/2026),
+ * 8,854 187 8188(14)·10⁻¹² F/m. Hasta el 13/11/2026 era la de CODATA 2018, 8,8541878128
+ * (hallazgo 4576): la diferencia, 6,8·10⁻¹⁰ relativa, no mueve ninguna cifra en pantalla.
  */
-export const EPSILON_0 = 8.8541878128e-12;
+export const EPSILON_0 = 8.8541878188e-12;
 
 export interface Dielectrico {
   id: string;

@@ -410,8 +410,8 @@ test.describe('simulador-modelo-bohr · la sección de casos en el navegador', (
  *
  * Esperados calculados APARTE del motor (sin importarlo), con las constantes CODATA de
  * physics.nist.gov/cuu: R∞ = 10.973.731,568 m⁻¹, mₚ/mₑ = 1836,152673, a₀ = 5,291772·10⁻¹¹ m, y
- * h, c y e exactas. Con CODATA 2018 (la que declara la app) y con CODATA 2022 sale lo mismo en
- * todas las cifras que se pintan.
+ * h, c y e exactas. Con CODATA 2018 y con CODATA 2022 (la que usa la app desde el 13/11/2026,
+ * cabo C0726) sale lo mismo en todas las cifras que se pintan.
  *   R_H = R∞/(1 + mₑ/mₚ) = 10.967.758,34 m⁻¹ · E_ion = h·c·R_H/e = 13,598287 eV
  *
  *   A · 5 → 2, Hγ (normal). Factor 1/4 − 1/25 = 0,21

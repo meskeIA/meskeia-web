@@ -35,7 +35,7 @@
  *
  * ── LOS CONVENIOS, POR ESCRITO ───────────────────────────────────────────────
  *
- * ⚠️ **ε₀**: el motor usa CODATA 2018, 8,8541878128·10⁻¹² F/m; en clase se usa 8,85·10⁻¹² F/m.
+ * ⚠️ **ε₀**: el motor usa CODATA 2022, 8,8541878188·10⁻¹² F/m; en clase se usa 8,85·10⁻¹² F/m.
  *    Técnica de «todos los métodos coinciden» (la de los cuartiles de calculadora-estadistica):
  *    los enunciados que usan ε₀ dicen «toma ε₀ = 8,85·10⁻¹² F/m», y los datos y el redondeo
  *    pedido están elegidos para que con los DOS valores salga la misma cifra redondeada, y que
@@ -296,7 +296,7 @@ function pasoPlacas(areaCm2: number, separacionMm: number, area: number, separac
 function pasoCapacidad(material: Dielectrico, area: number, separacion: number, capacidad: number): string {
   const conMaterial =
     material.er === 1 ? 'en vacío, εr = 1' : `con ${minusculaInicial(material.nombre)}, εr = ${numero(material.er, 5)}`;
-  return `C = ε₀·εr·A/d (${conMaterial}) = 8,8541878128·10⁻¹² · ${numero(material.er, 5)} · ${numero(area, 8)} / ${numero(separacion, 8)} = ${cientifico(capacidad)} F.`;
+  return `C = ε₀·εr·A/d (${conMaterial}) = 8,8541878188·10⁻¹² · ${numero(material.er, 5)} · ${numero(area, 8)} / ${numero(separacion, 8)} = ${cientifico(capacidad)} F.`;
 }
 
 /**
@@ -370,7 +370,7 @@ export function resolverCaso(datos: DatosCaso): Resolucion {
       const separacion = (EPSILON_0 * material.er * area) / objetivo;
       valor = separacion / 1e-3;
       pasos.push(
-        `De C = ε₀·εr·A/d se despeja d = ε₀·εr·A/C = 8,8541878128·10⁻¹² · ${numero(material.er, 5)} · ${numero(area, 8)} / ${cientifico(objetivo)} = ${cientifico(separacion)} m = ${numero(valor, 4)} mm.`,
+        `De C = ε₀·εr·A/d se despeja d = ε₀·εr·A/C = 8,8541878188·10⁻¹² · ${numero(material.er, 5)} · ${numero(area, 8)} / ${cientifico(objetivo)} = ${cientifico(separacion)} m = ${numero(valor, 4)} mm.`,
       );
       const comprobacion = calcularCondensador({ area, separacion, tension: 0, er: material.er });
       if (!comprobacion || Math.abs(comprobacion.capacidad - objetivo) > HOLGURA_INVERSION * objetivo) {

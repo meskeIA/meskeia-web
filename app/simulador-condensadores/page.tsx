@@ -491,7 +491,7 @@ export default function SimuladorCondensadoresPage() {
 
           <div className={styles.formulaBox}>
             <code>C = ε₀·εr·A/d</code> &nbsp;·&nbsp; <code>Q = C·V</code> &nbsp;·&nbsp; <code>E = V/d</code>{' '}
-            &nbsp;·&nbsp; <code>U = ½·C·V²</code> &nbsp;·&nbsp; ε₀ = 8,8541878128·10⁻¹² F/m (CODATA 2018)
+            &nbsp;·&nbsp; <code>U = ½·C·V²</code> &nbsp;·&nbsp; ε₀ = 8,8541878188·10⁻¹² F/m (CODATA 2022)
           </div>
 
           <div role="status" aria-live="polite">
