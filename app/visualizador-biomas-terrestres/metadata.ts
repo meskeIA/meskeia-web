@@ -66,6 +66,14 @@ export const jsonLd = generateWebAppSchema({
   features: [],
 });
 
+// La pregunta está también en la FAQ visible («¿Cómo afecta el cambio climático a los biomas?»): una
+// sola respuesta para las dos (check:faq-unica, C0570, 13/11/2026). Se juntan las dos. Cada una traía
+// una cifra sin fuente (6–11 km por década en la visible; del 30 al 50 % de los hábitats con más de
+// 2 °C en el JSON-LD) y no se ha podido cotejar ninguna en una fuente oficial: se quedan fuera
+// (neutralidad editorial, punto 1). Si se atribuyen con su estudio y año, pueden volver.
+export const RESPUESTA_FAQ_CAMBIO_CLIMATICO =
+  'El calentamiento global está desplazando los límites de los biomas hacia los polos y hacia mayor altitud, fragmentando hábitats e interrumpiendo los ciclos fenológicos (floraciones, migraciones). La tundra retrocede ante la taiga, que avanza hacia el norte; el bioma mediterráneo se expande hacia el norte de Europa y los desiertos subtropicales se amplían. El impacto más grave es el deshielo del permafrost, que libera metano (CH₄) y CO₂ almacenados durante miles de años y crea un bucle de retroalimentación positiva.';
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -99,7 +107,7 @@ export const faqJsonLd = {
       name: '¿Cómo afecta el cambio climático a los biomas terrestres?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El cambio climático está desplazando los límites de los biomas hacia los polos y mayor altitud, fragmentando hábitats e interrumpiendo los ciclos fenológicos (floraciones, migraciones). La tundra ártica es especialmente vulnerable: el permafrost deshelado libera CO₂ y metano, creando un bucle de retroalimentación positiva. Se estima que entre el 30 y el 50% de los hábitats actuales podrían quedar fuera del rango climático óptimo de sus especies si el calentamiento supera 2 °C.',
+        text: RESPUESTA_FAQ_CAMBIO_CLIMATICO,
       },
     },
     {

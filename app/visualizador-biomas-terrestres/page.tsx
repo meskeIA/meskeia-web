@@ -3,6 +3,7 @@
 
 import { useState } from 'react';
 import styles from './BiomasTerrestres.module.css';
+import { RESPUESTA_FAQ_CAMBIO_CLIMATICO } from './metadata';
 import {
   MeskeiaLogo,
   Footer,
@@ -1258,12 +1259,7 @@ export default function VisualizadorBiomasTerrestres() {
           <div className={styles.faqItem}>
             <h4>¿Cómo afecta el cambio climático a los biomas?</h4>
             <p>
-              El calentamiento global está desplazando los biomas hacia los polos y en altitud a
-              una velocidad de 6–11 km por década. La tundra retrocede ante la taiga, que avanza
-              hacia el norte. El bioma mediterráneo se expande hacia el norte de Europa. Los
-              desiertos subtropicales se amplían. El impacto más grave es el deshielo del
-              permafrost, que libera metano (CH₄) y CO₂ almacenados durante miles de años,
-              creando un bucle de retroalimentación positiva.
+              {RESPUESTA_FAQ_CAMBIO_CLIMATICO}
             </p>
           </div>
           <div className={styles.faqItem}>
