@@ -577,7 +577,7 @@ export default function OrientadorTarifaFreelancePage() {
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🎨</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🎨</span>
                 <h3>Diseñador UX/UI (5 años)</h3>
               </div>
               <p className={styles.escenarioExample}>Tarifa hora: 45-65 €. Day rate: 360-520 €. Portfolio con casos de impacto medible.</p>
@@ -585,7 +585,7 @@ export default function OrientadorTarifaFreelancePage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>💻</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">💻</span>
                 <h3>Desarrollador Full Stack senior</h3>
               </div>
               <p className={styles.escenarioExample}>Tarifa hora: 65-95 €. Day rate: 520-760 €. GitHub activo con proyectos propios.</p>
@@ -593,7 +593,7 @@ export default function OrientadorTarifaFreelancePage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>✍️</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">✍️</span>
                 <h3>Copywriter especializado</h3>
               </div>
               <p className={styles.escenarioExample}>Tarifa hora: 35-55 €. Por proyecto según entregable. Nicho definido = premium.</p>
@@ -601,7 +601,7 @@ export default function OrientadorTarifaFreelancePage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>📈</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">📈</span>
                 <h3>Consultor de marketing digital</h3>
               </div>
               <p className={styles.escenarioExample}>Tarifa hora: 55-80 €. Retainer mensual: 1.500-3.000 €. Ingresos recurrentes estables.</p>
@@ -609,7 +609,7 @@ export default function OrientadorTarifaFreelancePage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>📷</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">📷</span>
                 <h3>Fotógrafo/Videógrafo</h3>
               </div>
               <p className={styles.escenarioExample}>Por proyecto: 300-2.500 €. Licencias de uso añaden valor significativo al precio base.</p>
@@ -617,7 +617,7 @@ export default function OrientadorTarifaFreelancePage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>⚖️</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">⚖️</span>
                 <h3>Abogado/Asesor legal</h3>
               </div>
               <p className={styles.escenarioExample}>Tarifa hora: 90-150 €. Por consulta o proyecto. Prestigio justifica tarifas premium.</p>
@@ -726,32 +726,32 @@ export default function OrientadorTarifaFreelancePage() {
           <h2>Consejos para negociar tu tarifa</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>💼</span>
+              <span className={styles.tipIcon} aria-hidden="true">💼</span>
               <strong>Especialízate para cobrar más</strong>
               <p>Los generalistas compiten por precio; los especialistas compiten por valor. Define tu nicho y domínalo.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📊</span>
+              <span className={styles.tipIcon} aria-hidden="true">📊</span>
               <strong>Documenta tus resultados</strong>
               <p>Casos de éxito con números ("aumenté conversiones un 40%") justifican tarifas altas mejor que cualquier argumento.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🤝</span>
+              <span className={styles.tipIcon} aria-hidden="true">🤝</span>
               <strong>Negocia el alcance, no el precio</strong>
               <p>Si piden descuento, reduce entregables. Mantén tu tarifa hora intacta para no devaluar tu trabajo.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📅</span>
+              <span className={styles.tipIcon} aria-hidden="true">📅</span>
               <strong>Ofrece pago anticipado con descuento</strong>
               <p>Un 5% de descuento por pago 100% adelantado mejora tu cashflow y reduce riesgo de impago.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🌍</span>
+              <span className={styles.tipIcon} aria-hidden="true">🌍</span>
               <strong>Trabaja con clientes internacionales</strong>
               <p>Mismo trabajo, tarifas 2-3x más altas en mercados como UK, DACH o USA. El remoto lo hace posible.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📝</span>
+              <span className={styles.tipIcon} aria-hidden="true">📝</span>
               <strong>Contrato siempre, sin excepción</strong>
               <p>Acuerdo escrito con scope, tarifa, revisiones y condiciones de pago protege tu tarifa y tu negocio.</p>
             </div>

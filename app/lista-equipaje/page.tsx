@@ -594,7 +594,7 @@ export default function ListaEquipajePage() {
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>💼</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">💼</span>
               <strong>Viaje de negocios de 2-3 días</strong>
             </div>
             <p className={styles.escenarioDesc}>
@@ -603,7 +603,7 @@ export default function ListaEquipajePage() {
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>🏖️</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🏖️</span>
               <strong>Escapada de fin de semana a playa</strong>
             </div>
             <p className={styles.escenarioDesc}>
@@ -612,7 +612,7 @@ export default function ListaEquipajePage() {
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>🎒</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🎒</span>
               <strong>Mochilero por Europa</strong>
             </div>
             <p className={styles.escenarioDesc}>
@@ -621,7 +621,7 @@ export default function ListaEquipajePage() {
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>👨‍👩‍👧</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">👨‍👩‍👧</span>
               <strong>Viaje familiar con niños</strong>
             </div>
             <p className={styles.escenarioDesc}>
@@ -700,32 +700,32 @@ export default function ListaEquipajePage() {
         <h3 className={styles.eduTitle}>Trucos para empacar de forma inteligente</h3>
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🌀</span>
+            <span className={styles.tipIcon} aria-hidden="true">🌀</span>
             <strong>Enrolla la ropa</strong>
             <p>Enrollar camisetas y pantalones en lugar de doblarlos ocupa hasta un 30% menos de espacio y reduce las arrugas.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🫙</span>
+            <span className={styles.tipIcon} aria-hidden="true">🫙</span>
             <strong>Bolsas de compresión</strong>
             <p>Ideal para ropa de abrigo o de cama. Una bolsa de compresión puede reducir el volumen a la mitad sin aumentar el peso.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>👟</span>
+            <span className={styles.tipIcon} aria-hidden="true">👟</span>
             <strong>Aprovecha el interior</strong>
             <p>Mete calcetines y objetos pequeños dentro de los zapatos para aprovechar el espacio muerto y proteger la forma del calzado.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>⚖️</span>
+            <span className={styles.tipIcon} aria-hidden="true">⚖️</span>
             <strong>Lo pesado abajo</strong>
             <p>Coloca los objetos más pesados (zapatos, portátil, libros) cerca de las ruedas para que la maleta sea más estable al desplazarla.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🔢</span>
+            <span className={styles.tipIcon} aria-hidden="true">🔢</span>
             <strong>La regla del 3</strong>
             <p>Solo lleva ropa que puedas combinar al menos 3 veces. Un pantalón neutro + 3 camisetas = 9 combinaciones distintas.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>📸</span>
+            <span className={styles.tipIcon} aria-hidden="true">📸</span>
             <strong>Fotografía la lista</strong>
             <p>Antes de cerrar la maleta, haz una foto de la lista completa. Si en el destino dudas sobre si llevaste algo, tienes la referencia.</p>
           </div>

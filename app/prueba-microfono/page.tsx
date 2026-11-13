@@ -604,22 +604,22 @@ export default function PruebaMicrofonoPage() {
         <h3><span aria-hidden="true">💡</span> Consejos para un buen audio</h3>
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🎯</span>
+            <span className={styles.tipIcon} aria-hidden="true">🎯</span>
             <h4>Distancia</h4>
             <p>Mantén una distancia de 15-30 cm del micrófono para evitar distorsión.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🔇</span>
+            <span className={styles.tipIcon} aria-hidden="true">🔇</span>
             <h4>Ruido ambiente</h4>
             <p>Busca un lugar tranquilo. Cierra ventanas y apaga ventiladores.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>📊</span>
+            <span className={styles.tipIcon} aria-hidden="true">📊</span>
             <h4>Nivel óptimo</h4>
             <p>El medidor debe estar entre 30-70% cuando hablas normalmente.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🎧</span>
+            <span className={styles.tipIcon} aria-hidden="true">🎧</span>
             <h4>Auriculares</h4>
             <p>Usa auriculares para evitar eco y feedback durante llamadas.</p>
           </div>

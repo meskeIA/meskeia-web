@@ -340,22 +340,22 @@ export default function TranspositorAcordesPage() {
         {/* 2. Casos de uso */}
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
-            <div className={styles.escenarioIcon}>🎸</div>
+            <div className={styles.escenarioIcon} aria-hidden="true">🎸</div>
             <h3>Guitarrista con cejilla</h3>
             <p>Prefieres tocar con cejilla en el traste 2 (sube 2 semitonos). Transpón la partitura original 2 semitonos hacia abajo para que suene en el tono correcto con la cejilla puesta.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <div className={styles.escenarioIcon}>🎤</div>
+            <div className={styles.escenarioIcon} aria-hidden="true">🎤</div>
             <h3>Cantante ajusta su rango</h3>
             <p>Una canción está en La pero es demasiado aguda. Transpónla a Fa o Sol para adaptarla a tu tesitura sin cambiar la relación entre los acordes.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <div className={styles.escenarioIcon}>🎹</div>
+            <div className={styles.escenarioIcon} aria-hidden="true">🎹</div>
             <h3>Músico transporta partitura</h3>
             <p>Una partitura para violín en Re mayor necesita ser transportada a Do mayor para un instrumento transpositor como la flauta. El transpositor calcula los acordes al instante.</p>
           </div>
           <div className={styles.escenarioCard}>
-            <div className={styles.escenarioIcon}>🥁</div>
+            <div className={styles.escenarioIcon} aria-hidden="true">🥁</div>
             <h3>Banda ensaya en otro tono</h3>
             <p>El bajista prefiere que la canción esté en Mi por la resonancia de las cuerdas abiertas. Transpón la partitura completa y comparte los acordes actualizados con el resto de la banda.</p>
           </div>
@@ -413,22 +413,22 @@ export default function TranspositorAcordesPage() {
         {/* 5. Tips */}
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <div className={styles.tipIcon}>🔤</div>
+            <div className={styles.tipIcon} aria-hidden="true">🔤</div>
             <h4>Conserva los sufijos</h4>
             <p>El transpositor mantiene automáticamente el sufijo del acorde (m, 7, maj7, etc.). Am transpuesto 2 semitonos se convierte en Bm, no en B.</p>
           </div>
           <div className={styles.tipCard}>
-            <div className={styles.tipIcon}>↔️</div>
+            <div className={styles.tipIcon} aria-hidden="true">↔️</div>
             <h4>Dirección de transposición</h4>
             <p>Para bajar el tono: selecciona un destino que esté a la izquierda en la escala (menos posición). Para subir: elige uno a la derecha. 6 semitonos sube o baja según lo que prefieras.</p>
           </div>
           <div className={styles.tipCard}>
-            <div className={styles.tipIcon}>🎯</div>
+            <div className={styles.tipIcon} aria-hidden="true">🎯</div>
             <h4>Usa la tabla de grados</h4>
             <p>La tabla de grados (I–VII) te muestra qué acordes son la tónica, subdominante y dominante en ambas tonalidades. Útil para improvisación y composición.</p>
           </div>
           <div className={styles.tipCard}>
-            <div className={styles.tipIcon}>🎵</div>
+            <div className={styles.tipIcon} aria-hidden="true">🎵</div>
             <h4>Prueba progresiones populares</h4>
             <p>Usa los botones de progresiones para cargar automáticamente I-V-vi-IV o ii-V-I en el tono que hayas seleccionado. Perfecto para practicar o componer.</p>
           </div>

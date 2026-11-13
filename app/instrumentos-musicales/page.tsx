@@ -391,7 +391,7 @@ export default function InstrumentosMusicalesPage() {
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🎓</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🎓</span>
                 <h3>Estudiante de conservatorio o solfeo</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -404,7 +404,7 @@ export default function InstrumentosMusicalesPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🎧</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🎧</span>
                 <h3>Melómano o aficionado a la música clásica</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -417,7 +417,7 @@ export default function InstrumentosMusicalesPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>👨‍🏫</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">👨‍🏫</span>
                 <h3>Docente de música en primaria o secundaria</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -430,7 +430,7 @@ export default function InstrumentosMusicalesPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🎼</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🎼</span>
                 <h3>Compositor o productor musical</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -592,32 +592,32 @@ export default function InstrumentosMusicalesPage() {
           <h2><span aria-hidden="true">✅</span> Mejores Prácticas para Aprender Música e Instrumentos</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🎵</span>
+              <span className={styles.tipIcon} aria-hidden="true">🎵</span>
               <h4>Aprende por familias, no todos a la vez</h4>
               <p>Domina el timbre de la familia antes de distinguir instrumentos individuales. La cuerda antes que violín/viola/cello. Reduce la carga cognitiva inicial.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🎬</span>
+              <span className={styles.tipIcon} aria-hidden="true">🎬</span>
               <h4>Asocia cada instrumento con una obra famosa</h4>
               <p>El oboe con Aranjuez, el cello con Bach, la trompeta con Miles Davis. El contexto emocional fija el timbre mucho mejor que estudiar las características técnicas.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔊</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔊</span>
               <h4>Practica el reconocimiento auditivo activo</h4>
               <p>No basta con leer sobre los instrumentos: escúchalos. 10 minutos de escucha activa diaria (intentando identificar instrumentos) equivalen a horas de estudio teórico.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📍</span>
+              <span className={styles.tipIcon} aria-hidden="true">📍</span>
               <h4>Relaciona cada familia con su posición en la orquesta</h4>
               <p>Las cuerdas al frente, maderas detrás, metales más atrás, percusión al fondo. Esta disposición física se refleja en la mezcla sonora: las cuerdas son la "base" siempre presente.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🌍</span>
+              <span className={styles.tipIcon} aria-hidden="true">🌍</span>
               <h4>Explora instrumentos de otras culturas</h4>
               <p>El koto japonés, el sitar indio, la kora africana, el charango andino. Ampliar más allá de la orquesta occidental enriquece la comprensión musical y cultural.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📝</span>
+              <span className={styles.tipIcon} aria-hidden="true">📝</span>
               <h4>Aprende los instrumentos más comunes por género</h4>
               <p>Jazz: trompeta, saxo, piano, contrabajo. Rock: guitarra, bajo, batería. Clásica: cuerdas, viento, percusión. Esto permite anticipar qué escucharás antes de oír una nota.</p>
             </div>

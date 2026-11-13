@@ -1130,7 +1130,7 @@ export default function TablaPerodicaPage() {
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🧑‍🔬</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🧑‍🔬</span>
                 <h3>Estudiante de química (preuniversitario)</h3>
               </div>
               <p className={styles.escenarioDesc}>
@@ -1143,7 +1143,7 @@ export default function TablaPerodicaPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>💊</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">💊</span>
                 <h3>Farmacéutico/bioquímico</h3>
               </div>
               <p className={styles.escenarioDesc}>
@@ -1156,7 +1156,7 @@ export default function TablaPerodicaPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🏗️</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏗️</span>
                 <h3>Ingeniero de materiales</h3>
               </div>
               <p className={styles.escenarioDesc}>
@@ -1169,7 +1169,7 @@ export default function TablaPerodicaPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>⚛️</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">⚛️</span>
                 <h3>Físico nuclear</h3>
               </div>
               <p className={styles.escenarioDesc}>
@@ -1354,7 +1354,7 @@ export default function TablaPerodicaPage() {
 
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <div className={styles.tipIcon}>📊</div>
+              <div className={styles.tipIcon} aria-hidden="true">📊</div>
               <h3>Aprende los grupos, no los elementos</h3>
               <p>
                 Conocer las propiedades del Grupo 1 te permite predecir el comportamiento de Li, Na, K, Rb, Cs, Fr. Más eficiente que memorizar 118 elementos.
@@ -1362,7 +1362,7 @@ export default function TablaPerodicaPage() {
             </div>
 
             <div className={styles.tipCard}>
-              <div className={styles.tipIcon}>🎯</div>
+              <div className={styles.tipIcon} aria-hidden="true">🎯</div>
               <h3>Metales de transición: la excepción es la regla</h3>
               <p>
                 Cr([Ar]3d⁵4s¹) y Cu([Ar]3d¹⁰4s¹) son las excepciones más importantes. Recuérdalas: salen en exámenes preuniversitarios y oposiciones.
@@ -1370,7 +1370,7 @@ export default function TablaPerodicaPage() {
             </div>
 
             <div className={styles.tipCard}>
-              <div className={styles.tipIcon}>⚗️</div>
+              <div className={styles.tipIcon} aria-hidden="true">⚗️</div>
               <h3>Usa la electronegatividad para predecir enlaces</h3>
               <p>
                 Diferencia &gt;1,7 → enlace iónico. 0,5-1,7 → polar covalente. &lt;0,5 → covalente puro. NaCl: Cl(3,16)-Na(0,93)=2,23 → iónico.
@@ -1378,7 +1378,7 @@ export default function TablaPerodicaPage() {
             </div>
 
             <div className={styles.tipCard}>
-              <div className={styles.tipIcon}>🔬</div>
+              <div className={styles.tipIcon} aria-hidden="true">🔬</div>
               <h3>Energía de ionización para predecir oxidación</h3>
               <p>
                 Saltos bruscos en energía de ionización revelan cuántos electrones puede perder un elemento. Na: I₁=496, I₂=4.562 kJ/mol → salto ×9 → solo pierde 1 electrón (Na⁺).
@@ -1386,7 +1386,7 @@ export default function TablaPerodicaPage() {
             </div>
 
             <div className={styles.tipCard}>
-              <div className={styles.tipIcon}>📚</div>
+              <div className={styles.tipIcon} aria-hidden="true">📚</div>
               <h3>Mnemotecnias para períodos</h3>
               <p>
                 Período 2: Li Be B C N O F Ne → &quot;LiBe BorCaNOFNe&quot;. Período 3: Na Mg Al Si P S Cl Ar → &quot;Na Mg Al SiPSClAr&quot;.
@@ -1394,7 +1394,7 @@ export default function TablaPerodicaPage() {
             </div>
 
             <div className={styles.tipCard}>
-              <div className={styles.tipIcon}>🌡️</div>
+              <div className={styles.tipIcon} aria-hidden="true">🌡️</div>
               <h3>Punto de fusión: W es el campeón</h3>
               <p>
                 Wolframio/Tungsteno (W, Z=74): punto de fusión 3.422&nbsp;°C, el más alto de todos los elementos. Por eso se usa en filamentos de bombillas y electrodos de soldadura TIG.

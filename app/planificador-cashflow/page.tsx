@@ -661,7 +661,7 @@ export default function PlanificadorCashFlowPage() {
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🛍️</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🛍️</span>
                 <h3>Comercio minorista con estacionalidad</h3>
               </div>
               <p className={styles.escenarioExample}>
@@ -672,7 +672,7 @@ export default function PlanificadorCashFlowPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🏗️</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏗️</span>
                 <h3>Constructora o instaladora con proyectos largos</h3>
               </div>
               <p className={styles.escenarioExample}>
@@ -683,7 +683,7 @@ export default function PlanificadorCashFlowPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>💻</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">💻</span>
                 <h3>Agencia digital / consultora B2B</h3>
               </div>
               <p className={styles.escenarioExample}>
@@ -694,7 +694,7 @@ export default function PlanificadorCashFlowPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🛒</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🛒</span>
                 <h3>E-commerce con stock propio</h3>
               </div>
               <p className={styles.escenarioExample}>
@@ -705,7 +705,7 @@ export default function PlanificadorCashFlowPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🚨</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🚨</span>
                 <h3>Startup en fase de crecimiento acelerado</h3>
               </div>
               <p className={styles.escenarioExample}>
@@ -716,7 +716,7 @@ export default function PlanificadorCashFlowPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>✅</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">✅</span>
                 <h3>Freelance con ingresos irregulares</h3>
               </div>
               <p className={styles.escenarioExample}>
@@ -845,32 +845,32 @@ export default function PlanificadorCashFlowPage() {
           <h2><span aria-hidden="true">✅</span> Mejores prácticas de gestión de tesorería</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🏦</span>
+              <span className={styles.tipIcon} aria-hidden="true">🏦</span>
               <h4>Separa cuenta empresa y personal</h4>
               <p>Nunca mezcles fondos personales y empresariales. Dos cuentas separadas (operativa + colchón) te dan visibilidad real de la situación financiera.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📅</span>
+              <span className={styles.tipIcon} aria-hidden="true">📅</span>
               <h4>Concentra pagos en 1-2 días fijos</h4>
               <p>Paga proveedores en días fijos (por ejemplo, 15 y último de mes). Simplifica la gestión, facilita la previsión y mejora tu reputación de pagador puntual.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>⏰</span>
+              <span className={styles.tipIcon} aria-hidden="true">⏰</span>
               <h4>Cobra en 30 días, paga en 60</h4>
               <p>Esta diferencia de 30 días financia parte de tu circulante sin coste. Negocia siempre esta ventana con nuevos clientes y proveedores desde el inicio de la relación.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔔</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔔</span>
               <h4>Automatiza recordatorios de cobro</h4>
               <p>Envía recordatorio 5 días antes del vencimiento, el día del vencimiento y 5 días después. El 70% de los retrasos se resuelven con un simple recordatorio amable.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📊</span>
+              <span className={styles.tipIcon} aria-hidden="true">📊</span>
               <h4>Revisa el ratio de liquidez mensualmente</h4>
               <p>Liquidez = Activo corriente / Pasivo corriente. Si es menor a 1, tienes más obligaciones a corto plazo que recursos disponibles. Señal de alerta urgente.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🤝</span>
+              <span className={styles.tipIcon} aria-hidden="true">🤝</span>
               <h4>Habla con tu banco antes de necesitarlo</h4>
               <p>Negocia la línea de crédito cuando no la necesites. Los bancos prestan cuando no lo necesitas y niegan cuando sí. Mantén la línea activa aunque no la uses.</p>
             </div>

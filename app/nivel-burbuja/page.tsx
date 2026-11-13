@@ -430,28 +430,28 @@ export default function NivelBurbujaPage() {
           </h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🎯</span>
+              <span className={styles.tipIcon} aria-hidden="true">🎯</span>
               <div className={styles.tipContent}>
                 <h4>Calibración</h4>
                 <p>Usa el botón &quot;Calibrar&quot; para establecer la posición actual como referencia 0°.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📱</span>
+              <span className={styles.tipIcon} aria-hidden="true">📱</span>
               <div className={styles.tipContent}>
                 <h4>Posición del móvil</h4>
                 <p>Para mejores resultados, coloca el móvil sobre una superficie plana y estable.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🖼️</span>
+              <span className={styles.tipIcon} aria-hidden="true">🖼️</span>
               <div className={styles.tipContent}>
                 <h4>Colgar cuadros</h4>
                 <p>Usa el modo burbuja y bloquea el eje Y para nivelar horizontalmente.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📐</span>
+              <span className={styles.tipIcon} aria-hidden="true">📐</span>
               <div className={styles.tipContent}>
                 <h4>Medir pendientes</h4>
                 <p>Usa el modo inclinómetro para medir rampas, tejados o pendientes del terreno.</p>
@@ -624,7 +624,7 @@ export default function NivelBurbujaPage() {
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🖼️</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🖼️</span>
                 <h4>Bricolaje doméstico</h4>
               </div>
               <p className={styles.escenarioExample}>Colgar estantes y cuadros perfectamente rectos sin necesidad de herramientas adicionales.</p>
@@ -632,7 +632,7 @@ export default function NivelBurbujaPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🪑</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🪑</span>
                 <h4>Instalación de muebles</h4>
               </div>
               <p className={styles.escenarioExample}>Asegurarte de que los muebles de cocina o baño quedan nivelados antes de fijarlos definitivamente.</p>
@@ -640,7 +640,7 @@ export default function NivelBurbujaPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🏃</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏃</span>
                 <h4>Verificación rápida</h4>
               </div>
               <p className={styles.escenarioExample}>Comprobar si algo está nivelado cuando no tienes a mano un nivel físico.</p>
@@ -714,28 +714,28 @@ export default function NivelBurbujaPage() {
           <h2>Mejores prácticas para mayor precisión</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🎯</span>
+              <span className={styles.tipIcon} aria-hidden="true">🎯</span>
               <div>
                 <h4>Calibrar siempre antes de usar</h4>
                 <p>Un sensor sin calibrar puede acumular desviaciones de hasta 2°. Calibra sobre una superficie de referencia fiable cada vez que vayas a usar la herramienta.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📱</span>
+              <span className={styles.tipIcon} aria-hidden="true">📱</span>
               <div>
                 <h4>Usa funda plana para mayor precisión</h4>
                 <p>Las fundas con relieve, textura o bordes curvos elevan el teléfono de forma irregular y desplazan el sensor. Una funda fina y plana minimiza el error.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔄</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔄</span>
               <div>
                 <h4>Verifica en dos ejes</h4>
                 <p>No basta con nivelar solo en horizontal. Gira el teléfono 90° y comprueba también el eje perpendicular para garantizar una nivelación completa.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔧</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔧</span>
               <div>
                 <h4>Confirma con nivel profesional en obras</h4>
                 <p>Para reformas, alicatados o cualquier trabajo donde el error acumulado pueda ser costoso, usa el móvil solo como guía y confirma con un nivel de burbuja o láser profesional.</p>
@@ -747,7 +747,7 @@ export default function NivelBurbujaPage() {
         {/* Warning Box */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <strong>Errores frecuentes que debes evitar</strong>
           </div>
           <ul className={styles.warningList}>

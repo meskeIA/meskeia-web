@@ -592,7 +592,7 @@ export default function PlanificadorItinerario() {
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>💑</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">💑</span>
               <strong>Pareja en Roma · 3 días</strong>
             </div>
             <p className={styles.escenarioExample}>
@@ -605,7 +605,7 @@ export default function PlanificadorItinerario() {
 
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>👨‍👩‍👧‍👦</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">👨‍👩‍👧‍👦</span>
               <strong>Familia con niños en París · 5 días</strong>
             </div>
             <p className={styles.escenarioExample}>
@@ -618,7 +618,7 @@ export default function PlanificadorItinerario() {
 
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>🎒</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🎒</span>
               <strong>Mochilero en Japón · 15 días</strong>
             </div>
             <p className={styles.escenarioExample}>
@@ -631,7 +631,7 @@ export default function PlanificadorItinerario() {
 
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>💼</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">💼</span>
               <strong>Viajero de negocios · Turismo añadido</strong>
             </div>
             <p className={styles.escenarioExample}>
@@ -781,32 +781,32 @@ export default function PlanificadorItinerario() {
         <h3>Mejores prácticas para itinerarios perfectos</h3>
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🗺️</span>
+            <span className={styles.tipIcon} aria-hidden="true">🗺️</span>
             <strong>Agrupa por zonas</strong>
             <p>Planifica cada día en un área geográfica concreta. Cruzar la ciudad dos veces al día es el mayor ladrón de tiempo y energía en un viaje.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🎟️</span>
+            <span className={styles.tipIcon} aria-hidden="true">🎟️</span>
             <strong>Reserva solo lo imprescindible</strong>
             <p>Sobrereservar crea rigidez. Solo bloquea con anticipación lo que tiene aforo limitado o lo que se agota (Alhambra de Granada: entradas 3 meses antes).</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>⏰</span>
+            <span className={styles.tipIcon} aria-hidden="true">⏰</span>
             <strong>Deja tiempo libre real</strong>
             <p>Incluye al menos 1,5–2h de margen por día sin actividad asignada. Los mejores momentos de un viaje suelen ser los no planificados.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🔍</span>
+            <span className={styles.tipIcon} aria-hidden="true">🔍</span>
             <strong>Investiga horarios antes de ir</strong>
             <p>Comprueba siempre la web oficial del lugar. Los horarios de Google Maps se desactualizan. Festivos locales pueden cerrar toda una zona un día entero.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>📵</span>
+            <span className={styles.tipIcon} aria-hidden="true">📵</span>
             <strong>Google Maps offline es obligatorio</strong>
             <p>Descarga el mapa de cada ciudad antes de llegar. El roaming en países fuera de la UE puede costar 10–30 €/día; una eSIM local (Airalo) suele ser 5–8 € por semana.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🌅</span>
+            <span className={styles.tipIcon} aria-hidden="true">🌅</span>
             <strong>Llega temprano a las atracciones icónicas</strong>
             <p>Los 30 primeros minutos tras la apertura tienen un 60–70% menos de gente que a media mañana. En la Fontana di Trevi o el Coliseo, la diferencia es abismal.</p>
           </div>

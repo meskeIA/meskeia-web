@@ -611,7 +611,7 @@ export default function TiradorDadosPage() {
             <div className={styles.escenariosGrid}>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>🎲</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">🎲</span>
                   <strong>Juegos de mesa clásicos</strong>
                 </div>
                 <p className={styles.escenarioExample}>
@@ -625,7 +625,7 @@ export default function TiradorDadosPage() {
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>⚔️</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">⚔️</span>
                   <strong>Rol y RPG</strong>
                 </div>
                 <p className={styles.escenarioExample}>
@@ -639,7 +639,7 @@ export default function TiradorDadosPage() {
               </div>
               <div className={styles.escenarioCard}>
                 <div className={styles.escenarioHeader}>
-                  <span className={styles.escenarioIcon}>🤔</span>
+                  <span className={styles.escenarioIcon} aria-hidden="true">🤔</span>
                   <strong>Decisiones neutras</strong>
                 </div>
                 <p className={styles.escenarioExample}>
@@ -754,25 +754,25 @@ export default function TiradorDadosPage() {
             <h3><span aria-hidden="true">💡</span> Mejores prácticas con dados</h3>
             <div className={styles.tipsGrid}>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>🎯</span>
+                <span className={styles.tipIcon} aria-hidden="true">🎯</span>
                 <strong>Usa el dado correcto para cada juego</strong>
                 <p>Consultar el reglamento evita errores que desequilibran las mecánicas
                 de juego diseñadas por los autores.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>📊</span>
+                <span className={styles.tipIcon} aria-hidden="true">📊</span>
                 <strong>Aprende las probabilidades básicas del D6 para Risk</strong>
                 <p>El atacante con 3D6 gana en promedio un 37 % de los combates
                 individuales; el defensor tiene ligera ventaja en empates.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>⚔️</span>
+                <span className={styles.tipIcon} aria-hidden="true">⚔️</span>
                 <strong>En rol RPG, ten dados de todos los tipos</strong>
                 <p>D4, D6, D8, D10, D12 y D20 cubren todas las situaciones de D&amp;D y
                 sistemas derivados sin improvisar sustituciones.</p>
               </div>
               <div className={styles.tipCard}>
-                <span className={styles.tipIcon}>🧮</span>
+                <span className={styles.tipIcon} aria-hidden="true">🧮</span>
                 <strong>El promedio de 2D6 es 7 (la suma más probable)</strong>
                 <p>En Catan, Monopoly y Risk, planificar alrededor del 7 maximiza
                 la eficiencia de recursos y posicionamiento en el tablero.</p>

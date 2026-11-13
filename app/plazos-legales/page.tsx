@@ -341,7 +341,7 @@ export default function PlazosLegalesPage() {
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🛒</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🛒</span>
                 <h4>Consumidor con producto defectuoso comprado online</h4>
               </div>
               <p className={styles.escenarioExample}>
@@ -357,7 +357,7 @@ export default function PlazosLegalesPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>👷</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">👷</span>
                 <h4>Trabajador despedido</h4>
               </div>
               <p className={styles.escenarioExample}>
@@ -374,7 +374,7 @@ export default function PlazosLegalesPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>📄</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">📄</span>
                 <h4>Autónomo con factura impagada de hace 2 años</h4>
               </div>
               <p className={styles.escenarioExample}>
@@ -391,7 +391,7 @@ export default function PlazosLegalesPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🏠</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏠</span>
                 <h4>Propietario que descubre vicio oculto en vivienda</h4>
               </div>
               <p className={styles.escenarioExample}>
@@ -580,7 +580,7 @@ export default function PlazosLegalesPage() {
           <h2>Mejores prácticas para no perder tus derechos</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📮</span>
+              <span className={styles.tipIcon} aria-hidden="true">📮</span>
               <p>
                 Usa <strong>burofax con certificación de contenido</strong> para interrumpir prescripciones civiles o
                 mercantiles. El email simple puede no ser admitido como prueba fehaciente si el deudor niega haberlo recibido.
@@ -588,7 +588,7 @@ export default function PlazosLegalesPage() {
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🤝</span>
+              <span className={styles.tipIcon} aria-hidden="true">🤝</span>
               <p>
                 En plazos laborales por despido, acude al <strong>SMAC (Servicio de Mediación)</strong> antes de demandar.
                 Es gratuito, obligatorio y suspende el plazo de caducidad mientras dura la conciliación.
@@ -596,7 +596,7 @@ export default function PlazosLegalesPage() {
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📰</span>
+              <span className={styles.tipIcon} aria-hidden="true">📰</span>
               <p>
                 Revisa periódicamente el <strong>BOE</strong> si tienes procesos abiertos: las suspensiones de plazos
                 por estado de alarma u otras circunstancias excepcionales se publican allí y pueden ampliar tus opciones.
@@ -604,7 +604,7 @@ export default function PlazosLegalesPage() {
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🧾</span>
+              <span className={styles.tipIcon} aria-hidden="true">🧾</span>
               <p>
                 En garantías de consumo, conserva siempre el <strong>tique o factura de compra</strong> — es la prueba
                 de la fecha de adquisición. Sin ella, el vendedor puede negar la garantía o reducir el plazo aplicable.
@@ -612,7 +612,7 @@ export default function PlazosLegalesPage() {
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📊</span>
+              <span className={styles.tipIcon} aria-hidden="true">📊</span>
               <p>
                 Para plazos fiscales, recuerda que los 4 años de Hacienda se computan desde el <strong>último día del
                 periodo voluntario de presentación</strong>, no desde la fecha de devengo del impuesto.
@@ -620,7 +620,7 @@ export default function PlazosLegalesPage() {
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>⚖️</span>
+              <span className={styles.tipIcon} aria-hidden="true">⚖️</span>
               <p>
                 Consulta la <strong>jurisprudencia reciente</strong> antes de dar un plazo por expirado: el TS ha ampliado
                 plazos en supuestos de hipotecas con cláusulas abusivas, préstamos usurarios y otras materias de consumo.

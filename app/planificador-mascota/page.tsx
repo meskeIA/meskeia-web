@@ -1181,37 +1181,37 @@ export default function PlanificadorMascotaPage() {
           <h2>Consejos esenciales para el cuidado de tu mascota</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🦷</span>
+              <span className={styles.tipIcon} aria-hidden="true">🦷</span>
               <strong>Higiene dental desde pequeño</strong>
               <p>La enfermedad dental es la más frecuente en perros y gatos. Empieza a limpiar los dientes
               desde cachorro para que se acostumbre. Hay premios dentales como complemento, no como sustituto.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>💉</span>
+              <span className={styles.tipIcon} aria-hidden="true">💉</span>
               <strong>Cumple el calendario vacunal</strong>
               <p>Las vacunas protegen contra enfermedades potencialmente mortales. No te saltes las revacunaciones
               anuales aunque la mascota parezca perfectamente sana.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🐛</span>
+              <span className={styles.tipIcon} aria-hidden="true">🐛</span>
               <strong>Desparasitación regular</strong>
               <p>Tanto la desparasitación interna (parásitos intestinales) como la externa (pulgas, garrapatas)
               son esenciales. Usa productos específicos para cada especie: los de perros pueden ser tóxicos para gatos.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🛡️</span>
+              <span className={styles.tipIcon} aria-hidden="true">🛡️</span>
               <strong>Seguro de mascotas para imprevistos</strong>
               <p>Una operación de urgencias puede costar 2.000-5.000 €. Un seguro básico de 15-30 €/mes
               puede cubrir la mayoría de imprevistos veterinarios significativos.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🎾</span>
+              <span className={styles.tipIcon} aria-hidden="true">🎾</span>
               <strong>Enriquecimiento ambiental</strong>
               <p>Los animales necesitan estimulación mental además de física. Juguetes de inteligencia, esconder
               comida, nuevos olores y actividades variadas previenen el aburrimiento y los problemas de conducta.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🩺</span>
+              <span className={styles.tipIcon} aria-hidden="true">🩺</span>
               <strong>Revisiones preventivas anuales</strong>
               <p>Aunque tu mascota parezca sana, la revisión anual permite detectar enfermedades en fases
               tempranas. En animales senior (7+ años), se recomiendan 2 visitas al año.</p>

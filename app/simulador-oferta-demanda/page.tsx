@@ -1171,7 +1171,7 @@ export default function SimuladorOfertaDemandaPage() {
           <h3>4 claves para dominar el análisis de mercado</h3>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🎯</span>
+              <span className={styles.tipIcon} aria-hidden="true">🎯</span>
               <strong>Piensa en desplazamientos, no en movimientos</strong>
               <p>
                 El error más frecuente en exámenes (selectividad o EBAU en España, examen de
@@ -1182,7 +1182,7 @@ export default function SimuladorOfertaDemandaPage() {
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📊</span>
+              <span className={styles.tipIcon} aria-hidden="true">📊</span>
               <strong>Usa el excedente para evaluar políticas</strong>
               <p>
                 El bienestar total (EC + EP) mide la eficiencia del mercado. Una política que
@@ -1191,7 +1191,7 @@ export default function SimuladorOfertaDemandaPage() {
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔄</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔄</span>
               <strong>Desplazamientos simultáneos: razona por separado</strong>
               <p>
                 Cuando D y O se desplazan a la vez, analiza cada uno por separado y luego combina.
@@ -1200,7 +1200,7 @@ export default function SimuladorOfertaDemandaPage() {
               </p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>⚠️</span>
+              <span className={styles.tipIcon} aria-hidden="true">⚠️</span>
               <strong>El largo plazo cambia las conclusiones</strong>
               <p>
                 A corto plazo la oferta es rígida (no se puede construir más capacidad productiva

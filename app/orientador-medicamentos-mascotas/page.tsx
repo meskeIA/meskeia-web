@@ -727,37 +727,37 @@ export default function CalculadoraMedicamentosMascotasPage() {
           <h2>Consejos de prevención antiparasitaria</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🚫</span>
+              <span className={styles.tipIcon} aria-hidden="true">🚫</span>
               <strong>Nunca productos de perro en gatos</strong>
               <p>La permetrina, presente en muchos antiparasitarios caninos, es extremadamente tóxica para
               los gatos. Puede causar convulsiones y la muerte. Siempre verifica la especie en la etiqueta.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🌡️</span>
+              <span className={styles.tipIcon} aria-hidden="true">🌡️</span>
               <strong>Protección en meses cálidos</strong>
               <p>Las pulgas y garrapatas son más activas de primavera a otoño, pero en climas templados
               pueden estar presentes todo el año. No abandones la protección en invierno en zonas costeras.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🏠</span>
+              <span className={styles.tipIcon} aria-hidden="true">🏠</span>
               <strong>Trata el entorno en infestaciones</strong>
               <p>El 95% de las pulgas viven en el hogar. Si hay infestación activa, lava ropa de cama,
               aspira a fondo y usa un spray ambiental con IGR (inhibidor de crecimiento de insectos).</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔍</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔍</span>
               <strong>Revisión completa tras salidas al campo</strong>
               <p>Tras cada paseo por zonas de hierba alta, revisa todo el cuerpo del animal: entre los dedos,
               orejas, axilas, ingles y zona del cuello. Extrae las garrapatas con un quitagarrapatas, no con las manos.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>💉</span>
+              <span className={styles.tipIcon} aria-hidden="true">💉</span>
               <strong>Vacuna antiparasitaria en zonas endémicas</strong>
               <p>En zonas mediterráneas, la vacuna contra la leishmaniasis es muy recomendable. Consulta con
               el veterinario si tu zona tiene riesgo de filariosis cardiaca (gusano del corazón).</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🐱</span>
+              <span className={styles.tipIcon} aria-hidden="true">🐱</span>
               <strong>Los gatos de interior también necesitan protección</strong>
               <p>Las pulgas pueden entrar en casa en ropa, calzado o mascotas visitantes. Incluso los gatos
               de interior deben tener un mínimo de protección durante los meses de mayor riesgo.</p>

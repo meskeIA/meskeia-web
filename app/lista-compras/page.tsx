@@ -537,7 +537,7 @@ export default function ListaComprasPage() {
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>👨‍👩‍👧‍👦</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">👨‍👩‍👧‍👦</span>
                 <strong>Familia con niños — compra semanal</strong>
               </div>
               <p className={styles.escenarioExample}>
@@ -549,7 +549,7 @@ export default function ListaComprasPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🧑‍💼</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🧑‍💼</span>
                 <strong>Persona sola — compra cada 2-3 días</strong>
               </div>
               <p className={styles.escenarioExample}>
@@ -561,7 +561,7 @@ export default function ListaComprasPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🌿</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🌿</span>
                 <strong>Dieta especial (celíaco, vegano)</strong>
               </div>
               <p className={styles.escenarioExample}>
@@ -573,7 +573,7 @@ export default function ListaComprasPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🍳</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🍳</span>
                 <strong>Batch cooking dominical</strong>
               </div>
               <p className={styles.escenarioExample}>
@@ -687,32 +687,32 @@ export default function ListaComprasPage() {
           <h3>6 trucos para ahorrar tiempo y dinero en el supermercado</h3>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>⏰</span>
+              <span className={styles.tipIcon} aria-hidden="true">⏰</span>
               <strong>Compra una vez a la semana</strong>
               <p>Cada visita al supermercado no planificada cuesta de media 22 € en compras impulsivas (dato Kantar 2024). Concentrar la compra en una o dos visitas semanales es la palanca de ahorro más potente.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📊</span>
+              <span className={styles.tipIcon} aria-hidden="true">📊</span>
               <strong>Compara el precio por kilo o litro</strong>
               <p>El precio del envase engaña. El precio por unidad de medida (kg, L) siempre está indicado en la etiqueta del lineal. El envase grande es más barato por kilo en el 80% de los casos, pero solo si lo vas a consumir antes de que caduque.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🌱</span>
+              <span className={styles.tipIcon} aria-hidden="true">🌱</span>
               <strong>Prioriza productos de temporada</strong>
               <p>Las frutas y verduras de temporada cuestan entre un 30% y un 50% menos que las de fuera de temporada. Además tienen mejor sabor y mayor valor nutricional al recorrer menos kilómetros.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🏷️</span>
+              <span className={styles.tipIcon} aria-hidden="true">🏷️</span>
               <strong>Marca blanca sin miedo</strong>
               <p>El 75% de los productos de marca de distribuidor están fabricados por las mismas empresas que las marcas líderes, según la OCU. La diferencia media de precio es del 35%. Prueba la marca blanca en conservas, lácteos y pasta primero.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🚫</span>
+              <span className={styles.tipIcon} aria-hidden="true">🚫</span>
               <strong>Ignora los productos a la altura de los ojos</strong>
               <p>Los supermercados colocan los productos más caros a la altura de la vista. Los equivalentes más baratos suelen estar en los estantes inferiores o superiores. Mira siempre toda la estantería antes de elegir.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🧊</span>
+              <span className={styles.tipIcon} aria-hidden="true">🧊</span>
               <strong>Congela el excedente inmediatamente</strong>
               <p>Si compras en oferta o en formato grande, congela la cantidad que no vayas a consumir en 2 días. Pan, carne, pescado y muchas verduras blanqueadas aguantan entre 3 y 6 meses en el congelador sin perder calidad.</p>
             </div>

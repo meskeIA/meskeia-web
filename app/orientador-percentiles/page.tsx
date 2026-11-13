@@ -430,7 +430,7 @@ export default function CalculadoraPercentilesPage() {
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>📋</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">📋</span>
                 <h3>Revisión rutinaria del niño sano</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -444,7 +444,7 @@ export default function CalculadoraPercentilesPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🍼</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🍼</span>
                 <h3>Bebé prematuro (edad corregida)</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -458,7 +458,7 @@ export default function CalculadoraPercentilesPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>📉</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">📉</span>
                 <h3>Caída de percentil entre revisiones</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -472,7 +472,7 @@ export default function CalculadoraPercentilesPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>👨‍👩‍👧</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">👨‍👩‍👧</span>
                 <h3>Comparar con hermanos mayores</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -486,7 +486,7 @@ export default function CalculadoraPercentilesPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>⚖️</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">⚖️</span>
                 <h3>Diferencia grande entre talla y peso</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -500,7 +500,7 @@ export default function CalculadoraPercentilesPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🏥</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏥</span>
                 <h3>Seguimiento tras enfermedad</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -666,32 +666,32 @@ export default function CalculadoraPercentilesPage() {
           <h2><span aria-hidden="true">✅</span> 6 claves para interpretar correctamente los percentiles</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <h4>La curva importa más que el punto</h4>
               <p>Un niño en P5 estable es más sano que uno que baja de P60 a P20. La tendencia es el indicador clave, no el percentil absoluto.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <h4>Corrige la edad en prematuros</h4>
               <p>Hasta los 2 años, los prematuros deben compararse con su edad corregida. No hacerlo genera alarma innecesaria en padres y falsos positivos de retraso.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <h4>Un dato no hace diagnóstico</h4>
               <p>El percentil es una fotografía. El diagnóstico de alteración del crecimiento requiere al menos 3-4 mediciones en el tiempo más valoración clínica completa del pediatra.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <h4>La genética familiar es determinante</h4>
               <p>El 80% de la variación de talla entre individuos tiene base genética. Contextualizar el percentil del niño con la talla de los padres es fundamental para una interpretación correcta.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <h4>Mide siempre en las mismas condiciones</h4>
               <p>Sin ropa, misma báscula, misma hora del día. Las variaciones por ropa (hasta 1 kg) y hidratación pueden cambiar el percentil calculado sin que haya ningún cambio real en el niño.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <h4>Consulta ante la duda, no ante el número</h4>
               <p>Si el percentil te preocupa pero tu hijo come bien, tiene energía y está activo, probablemente esté perfectamente. Consulta al pediatra si hay cambios en comportamiento o alimentación, no solo por el número.</p>
             </div>

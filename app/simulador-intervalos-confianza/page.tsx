@@ -935,22 +935,22 @@ export default function SimuladorIntervalosConfianzaPage() {
           <h3>4 buenas prácticas con intervalos de confianza</h3>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📐</span>
+              <span className={styles.tipIcon} aria-hidden="true">📐</span>
               <strong>Reporta SIEMPRE el IC junto al estimador</strong>
               <p>Una media sin su IC es información incompleta: no se puede juzgar la incertidumbre. &quot;15 ± 3 al 95 % CI&quot; vale infinitamente más que &quot;15&quot;.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🎯</span>
+              <span className={styles.tipIcon} aria-hidden="true">🎯</span>
               <strong>Elige n antes, no después</strong>
               <p>Decide el tamaño muestral en el diseño del estudio, basándote en la precisión que necesitas. Subir n después de ver los datos para &quot;empujar la significancia&quot; es mala práctica (p-hacking).</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔍</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔍</span>
               <strong>Usa siempre t cuando estimes σ con la muestra</strong>
               <p>Aunque para n grande t ≈ z, usar t por defecto es más conservador y matemáticamente correcto. No supone esfuerzo extra y evita errores en n pequeño.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <strong>Verifica los supuestos antes</strong>
               <p>Los IC para μ asumen muestreo aleatorio simple (independencia). Si tu muestra es por conveniencia o tiene clusters, el IC nominal será optimista. Considera bootstrap o IC robustos.</p>
             </div>

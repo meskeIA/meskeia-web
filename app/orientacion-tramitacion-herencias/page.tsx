@@ -801,7 +801,7 @@ export default function OrientacionTramitacionHerenciasPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>👨‍👩‍👧‍👦</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">👨‍👩‍👧‍👦</span>
                 <h4>Familia con testamento claro, 2 hijos, sin deudas</h4>
               </div>
               <p className={styles.escenarioExample}>
@@ -815,7 +815,7 @@ export default function OrientacionTramitacionHerenciasPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>👥</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">👥</span>
                 <h4>Herencia sin testamento, 3 hermanos y un piso</h4>
               </div>
               <p className={styles.escenarioExample}>
@@ -829,7 +829,7 @@ export default function OrientacionTramitacionHerenciasPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>⚠️</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">⚠️</span>
                 <h4>Herencia con deudas desconocidas</h4>
               </div>
               <p className={styles.escenarioExample}>
@@ -843,7 +843,7 @@ export default function OrientacionTramitacionHerenciasPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>✈️</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">✈️</span>
                 <h4>Heredero que vive en el extranjero</h4>
               </div>
               <p className={styles.escenarioExample}>
@@ -985,37 +985,37 @@ export default function OrientacionTramitacionHerenciasPage() {
           <div className={styles.tipsGrid}>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📅</span>
+              <span className={styles.tipIcon} aria-hidden="true">📅</span>
               <h4>Solicita la prórroga del IS {PLAZO_PEDIR_PRORROGA}</h4>
               <p>Si no puedes liquidar el Impuesto de Sucesiones en {PLAZO_ISD.mesesPresentacion} meses (por inventario incompleto, desacuerdos entre herederos o trámites pendientes), presenta la solicitud de prórroga antes de que se cumplan {PLAZO_ISD.mesesParaPedirProrroga} meses desde el fallecimiento. Obtienes {PLAZO_ISD.mesesProrroga} meses adicionales sin el recargo por presentación extemporánea, pero CON intereses de demora desde que vencen los {PLAZO_ISD.mesesPresentacion} primeros (art. 68.3 del Reglamento del ISD). Cumplidos esos {PLAZO_ISD.mesesParaPedirProrroga} meses, la prórroga ya no es posible.</p>
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📁</span>
+              <span className={styles.tipIcon} aria-hidden="true">📁</span>
               <h4>Reúne toda la documentación antes de ir al notario</h4>
               <p>Los honorarios notariales se cobran también por el tiempo de gestión. Llegar a la notaría con toda la documentación organizada (escrituras, saldos bancarios certificados, recibos del IBI, nota simple del Registro) puede reducir el número de visitas necesarias y, con ello, los honorarios totales. Pide al notario de antemano la lista completa de documentos necesarios.</p>
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔍</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔍</span>
               <h4>Valora el beneficio de inventario cuando hay deudas desconocidas</h4>
               <p>Si el fallecido tenía actividad empresarial, era autónomo o había avalado préstamos de terceros, es posible que existan deudas que no conoces. La aceptación a beneficio de inventario te protege: solo responderás con los bienes heredados, nunca con tu patrimonio personal. Tiene un coste adicional (acta notarial de inventario) pero puede evitar sorpresas muy costosas.</p>
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🏦</span>
+              <span className={styles.tipIcon} aria-hidden="true">🏦</span>
               <h4>Comunica el fallecimiento al banco inmediatamente</h4>
               <p>Informa al banco en cuanto tengas el certificado de defunción. Esto bloquea las cuentas oficialmente y evita que se produzcan cargos indebidos (recibos domiciliados, tarjetas activas) o, peor, que alguien con acceso retire fondos. Solicita al banco el certificado de saldos a fecha de fallecimiento y la lista completa de productos financieros a nombre del fallecido.</p>
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🏢</span>
+              <span className={styles.tipIcon} aria-hidden="true">🏢</span>
               <h4>Si hay empresa familiar, consulta la reducción del 95%</h4>
               <p>La mayoría de CCAA aplican una reducción del 95% en la base imponible del IS cuando la herencia incluye participaciones en una empresa familiar o negocio profesional, siempre que se cumplan requisitos de mantenimiento (normalmente 5 o 10 años). Esta reducción puede suponer un ahorro fiscal muy significativo. Consulta con un asesor fiscal antes de firmar la escritura.</p>
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🧾</span>
+              <span className={styles.tipIcon} aria-hidden="true">🧾</span>
               <h4>Guarda todos los justificantes de gastos de la herencia</h4>
               <p>Los gastos deducibles en el Impuesto de Sucesiones incluyen: gastos de entierro y funeral (con límite según CCAA), honorarios del notario, tasas del Registro de la Propiedad y, en algunas CCAA, honorarios de abogado y procurador. Guarda todas las facturas originales. Estos gastos reducen la base imponible y, por tanto, el impuesto a pagar.</p>
             </div>

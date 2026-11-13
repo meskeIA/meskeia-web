@@ -653,19 +653,19 @@ export default function QuizMitosCiencia() {
         <h3>Datos científicos que sorprenden</h3>
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🔬</span>
+            <span className={styles.tipIcon} aria-hidden="true">🔬</span>
             <p>La neuroimagen funcional (fMRI) puede detectar qué zona del cerebro está activa en tiempo real. Ningún estudio ha mostrado jamás que el 90% permanezca inactivo: incluso dormidos usamos amplias regiones cerebrales.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🐨</span>
+            <span className={styles.tipIcon} aria-hidden="true">🐨</span>
             <p>Las huellas de koalas son tan similares a las humanas por evolución convergente: dos ramas del árbol de la vida muy distantes llegaron a la misma solución (huellas para mejorar el agarre en superficies) de forma completamente independiente.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🍯</span>
+            <span className={styles.tipIcon} aria-hidden="true">🍯</span>
             <p>La miel de tumba egipcia de 3.300 años fue analizada y resultó todavía comestible. La concentración de azúcar deshidrata las bacterias por ósmosis: sin agua, no pueden sobrevivir ni reproducirse.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>⚛️</span>
+            <span className={styles.tipIcon} aria-hidden="true">⚛️</span>
             {/* Hallazgo 3791: la canica en el centro y el electrón «en las gradas» daban un átomo 3-4
                 veces menos vacío que la naranja a 2,5 km de la explicación 17. Las dos escalas salen
                 del mismo cociente: radio de Bohr (52,9 pm) entre el diámetro del protón (1,68 fm),

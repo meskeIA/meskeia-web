@@ -369,7 +369,7 @@ export default function MetronomoPage() {
         <div className={styles.escenariosGrid}>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>🎸</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🎸</span>
               <strong>Guitarrista / Bajista</strong>
             </div>
             <p>Practica escalas, arpegios y riffs a tempo controlado, comenzando lento (50-60% del tempo objetivo) y aumentando gradualmente 5 BPM cada vez que dominas el pasaje sin errores.</p>
@@ -377,7 +377,7 @@ export default function MetronomoPage() {
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>🥁</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🥁</span>
               <strong>Baterista / Percusionista</strong>
             </div>
             <p>Desarrolla el tiempo interno y reduce el rusheo (acelerar inconscientemente) y el dragging (ralentizar) practicando con metrónomo en tiempos 2 y 4 para el estilo funk y jazz.</p>
@@ -385,7 +385,7 @@ export default function MetronomoPage() {
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>🎹</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🎹</span>
               <strong>Pianista / Instrumentista</strong>
             </div>
             <p>Trabaja pasajes técnicos complejos (octavas, tresillos, polirritmia) garantizando que ambas manos estén perfectamente sincronizadas antes de subir el tempo.</p>
@@ -393,7 +393,7 @@ export default function MetronomoPage() {
           </div>
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
-              <span className={styles.escenarioIcon}>🎤</span>
+              <span className={styles.escenarioIcon} aria-hidden="true">🎤</span>
               <strong>Cantante / Compositor</strong>
             </div>
             <p>Fija el tempo exacto de una canción original para grabarla o para ensayar con la banda. Mide el BPM de canciones de referencia para adaptarlas a tu rango de voz o instrumento.</p>
@@ -471,32 +471,32 @@ export default function MetronomoPage() {
         {/* 5. TIPS GRID */}
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcono}>🦶</span>
+            <span className={styles.tipIcono} aria-hidden="true">🦶</span>
             <strong>Mueve el cuerpo</strong>
             <p>Marca el pulso con el pie o asiente con la cabeza. El tiempo interno se desarrolla mejor cuando lo sientes físicamente, no solo cuando lo escuchas.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcono}>🎯</span>
+            <span className={styles.tipIcono} aria-hidden="true">🎯</span>
             <strong>Regla del 90%</strong>
             <p>El tempo correcto de práctica es aquel al que ejecutas bien el 90% de las notas. Si cometes más errores, baja el BPM. No hay prisa en el aprendizaje.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcono}>📻</span>
+            <span className={styles.tipIcono} aria-hidden="true">📻</span>
             <strong>Subdivide</strong>
             <p>Para pasajes con figuras pequeñas (semicorcheas, tresillos), programa el click en la subdivisión (corchea) en lugar de la negra. Más información rítmica, más precisión.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcono}>🔇</span>
+            <span className={styles.tipIcono} aria-hidden="true">🔇</span>
             <strong>Practica sin click</strong>
             <p>Alterna sesiones con y sin metrónomo. Toca con click, luego apágalo e intenta mantener el mismo tempo. Eso desarrolla el tiempo interno verdadero.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcono}>🎚️</span>
+            <span className={styles.tipIcono} aria-hidden="true">🎚️</span>
             <strong>Volumen adecuado</strong>
             <p>El click debe ser audible pero no dominante. Si el metrónomo &quot;tapa&quot; tu instrumento, reduces la atención a los matices musicales que también hay que trabajar.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcono}>📈</span>
+            <span className={styles.tipIcono} aria-hidden="true">📈</span>
             <strong>Registro de tempos</strong>
             <p>Apunta el BPM máximo al que dominas cada pasaje. En la siguiente sesión empieza 10 BPM por debajo para calentar. Es la forma más fiable de medir el progreso.</p>
           </div>

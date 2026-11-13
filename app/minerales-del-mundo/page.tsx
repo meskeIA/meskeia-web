@@ -484,7 +484,7 @@ export default function MineralesDelMundoPage() {
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🎓</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🎓</span>
                 <h4>Estudiante de ESO / Bachillerato</h4>
               </div>
               <p className={styles.escenarioExample}>
@@ -496,7 +496,7 @@ export default function MineralesDelMundoPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🪨</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🪨</span>
                 <h4>Geólogo amateur</h4>
               </div>
               <p className={styles.escenarioExample}>
@@ -508,7 +508,7 @@ export default function MineralesDelMundoPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>💍</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">💍</span>
                 <h4>Joyero con piedras preciosas</h4>
               </div>
               <p className={styles.escenarioExample}>
@@ -520,7 +520,7 @@ export default function MineralesDelMundoPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>⚙️</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">⚙️</span>
                 <h4>Ingeniero de materiales</h4>
               </div>
               <p className={styles.escenarioExample}>
@@ -638,42 +638,42 @@ export default function MineralesDelMundoPage() {
           <h2><span aria-hidden="true">✅</span> Mejores prácticas para identificar y coleccionar minerales</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🧱</span>
+              <span className={styles.tipIcon} aria-hidden="true">🧱</span>
               <div>
                 <strong>Usa siempre porcelana sin vidriar para la raya</strong>
                 <p>El reverso de un azulejo de cerámica o de un plato de porcelana sin esmalte es el soporte estándar. Si la baldosa tiene esmalte, el resultado no es fiable porque el esmalte puede ser más duro que el mineral y dejar una raya del esmalte, no del mineral.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📏</span>
+              <span className={styles.tipIcon} aria-hidden="true">📏</span>
               <div>
                 <strong>Prueba la dureza con minerales de referencia, no solo con objetos</strong>
                 <p>Los objetos cotidianos tienen rangos de dureza variables según el material y el fabricante. Para mayor precisión, compra un juego básico de minerales de referencia (talco, yeso, calcita, fluorita, ortosa, cuarzo) que te permitirá acotar la dureza con precisión de ±0,5 unidades.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✨</span>
+              <span className={styles.tipIcon} aria-hidden="true">✨</span>
               <div>
                 <strong>Observa el brillo siempre en superficie fresca</strong>
                 <p>La meteorización y la oxidación cambian el brillo superficial de forma drástica. Un sulfuro brillante y metálico puede parecer opaco y terroso tras años de exposición. Rompe un ángulo del espécimen para ver el brillo real en la superficie de rotura.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🎨</span>
+              <span className={styles.tipIcon} aria-hidden="true">🎨</span>
               <div>
                 <strong>No te fíes del color como prueba principal</strong>
                 <p>El color es la propiedad más variable de los minerales. El cuarzo puede ser incoloro, rosa, morado (amatista), amarillo (citrino), negro (cuarzo ahumado) o verde. Úsalo como primer filtro orientativo, pero confirma siempre con dureza, raya y brillo antes de llegar a una conclusión.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔍</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔍</span>
               <div>
                 <strong>Trabaja con fragmentos pequeños y superficies limpias</strong>
                 <p>Limpia la muestra con agua y un cepillo suave antes de hacer pruebas. La suciedad, el polvo o los recubrimientos de óxido alteran el color de la raya, el brillo y hasta la dureza aparente. Si la muestra es valiosa, trabaja en una zona discreta o con un fragmento desprendido.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📓</span>
+              <span className={styles.tipIcon} aria-hidden="true">📓</span>
               <div>
                 <strong>Registra tus observaciones en orden y de forma sistemática</strong>
                 <p>Anota: color, brillo, dureza (límites inferior y superior), color de raya, tipo de fractura/exfoliación, densidad relativa y cualquier propiedad especial. Con esta ficha de campo podrás consultar catálogos y esta herramienta de forma mucho más eficiente que intentando recordarlo todo al llegar a casa.</p>
@@ -687,7 +687,7 @@ export default function MineralesDelMundoPage() {
           <h2><span aria-hidden="true">⚠️</span> Errores frecuentes al identificar minerales</h2>
           <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
-              <span className={styles.warningIcon}>⚠️</span>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               <strong>Confusiones típicas que debes evitar</strong>
             </div>
             <ul className={styles.warningList}>

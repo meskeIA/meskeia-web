@@ -1384,7 +1384,7 @@ export default function Page() {
           <h3 className={styles.eduSubtitle}>Mejores Prácticas</h3>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📐</span>
+              <span className={styles.tipIcon} aria-hidden="true">📐</span>
               <div>
                 <strong>Trabaja en radianes</strong>
                 <p>
@@ -1394,7 +1394,7 @@ export default function Page() {
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🎯</span>
+              <span className={styles.tipIcon} aria-hidden="true">🎯</span>
               <div>
                 <strong>Distingue v, λ y f</strong>
                 <p>
@@ -1404,7 +1404,7 @@ export default function Page() {
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔁</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔁</span>
               <div>
                 <strong>Verifica simetrías</strong>
                 <p>
@@ -1414,7 +1414,7 @@ export default function Page() {
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🪕</span>
+              <span className={styles.tipIcon} aria-hidden="true">🪕</span>
               <div>
                 <strong>Visualiza nodos y antinodos</strong>
                 <p>
@@ -1424,7 +1424,7 @@ export default function Page() {
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>⚖️</span>
+              <span className={styles.tipIcon} aria-hidden="true">⚖️</span>
               <div>
                 <strong>Cuida las unidades</strong>
                 <p>
@@ -1434,7 +1434,7 @@ export default function Page() {
               </div>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🧪</span>
+              <span className={styles.tipIcon} aria-hidden="true">🧪</span>
               <div>
                 <strong>Experimenta con presets primero</strong>
                 <p>

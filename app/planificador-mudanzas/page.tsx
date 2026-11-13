@@ -1031,7 +1031,7 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🎓</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🎓</span>
                 <h3>Estudiante (piso compartido)</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -1045,7 +1045,7 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>👔</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">👔</span>
                 <h3>Profesional soltero (cambio de ciudad)</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -1059,7 +1059,7 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>👨‍👩‍👧‍👦</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">👨‍👩‍👧‍👦</span>
                 <h3>Familia con niños (primera vivienda)</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -1073,7 +1073,7 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>👴</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">👴</span>
                 <h3>Persona mayor (vaciado de vivienda)</h3>
               </div>
               <div className={styles.escenarioExample}>
@@ -1248,32 +1248,32 @@ ${datos.fechaMudanza ? `📅 Fecha: ${datos.fechaMudanza}` : ''}
           <h2><span aria-hidden="true">✅</span> 6 hábitos del mudador inteligente</h2>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <h4>Etiqueta con colores por habitación</h4>
               <p>Asigna un color de cinta adhesiva a cada habitación destino. Los mozos de mudanza sabrán exactamente dónde colocar cada caja sin tener que preguntar. Ahorra 1-2 horas en la descarga.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <h4>Fotografía el interior de cada caja</h4>
               <p>Antes de cerrar cada caja, fotografía el contenido. Si algo llega roto, tienes prueba del estado original para reclamar al seguro o a la empresa. También ayuda a encontrar objetos sin abrir todas las cajas.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <h4>Crea una "caja de primer día"</h4>
               <p>Una caja especial (color diferente, marcada como urgente) con: cafetera, tazas, sábanas, toallas, jabón, papel higiénico, servilletas, snacks y cargadores. Ábrela primero. El resto puede esperar días.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <h4>Pesa las cajas antes de cerrarlas</h4>
               <p>Las cajas no deben superar los 20kg (para poder manejarlas con seguridad). Cajas muy pesadas aumentan el riesgo de rotura y lesiones. Si supera 20kg, divide el contenido en dos cajas.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <h4>Negocia el precio con flexibilidad de fecha</h4>
               <p>Las mudanzas de lunes a jueves cuestan un 15-25% menos que los fines de semana. Si puedes elegir la fecha, ahorra en este concepto. Algunas empresas también ofrecen descuento por pago al contado.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✅</span>
+              <span className={styles.tipIcon} aria-hidden="true">✅</span>
               <h4>Guarda todos los recibos de gastos</h4>
               <p>Si cambias de ciudad por motivos laborales, muchos gastos de mudanza son deducibles en el IRPF. Guarda facturas de: empresa de mudanzas, alquiler de furgoneta, material de embalaje, viaje, alojamiento temporal.</p>
             </div>

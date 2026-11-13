@@ -682,7 +682,7 @@ export default function PaisesDelMundoPage() {
           <div className={styles.escenariosGrid}>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🎓</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🎓</span>
                 <h4>Estudiante — Preparando examen de geografía</h4>
               </div>
               <p className={styles.escenarioExample}>
@@ -694,7 +694,7 @@ export default function PaisesDelMundoPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>✈️</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">✈️</span>
                 <h4>Viajero — Investigando destinos antes del viaje</h4>
               </div>
               <p className={styles.escenarioExample}>
@@ -706,7 +706,7 @@ export default function PaisesDelMundoPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>📰</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">📰</span>
                 <h4>Periodista — Contextualizando noticias internacionales</h4>
               </div>
               <p className={styles.escenarioExample}>
@@ -718,7 +718,7 @@ export default function PaisesDelMundoPage() {
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🏆</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏆</span>
                 <h4>Concursante de trivial — Mejorar cultura general</h4>
               </div>
               <p className={styles.escenarioExample}>
@@ -840,32 +840,32 @@ export default function PaisesDelMundoPage() {
           <h3><span aria-hidden="true">💡</span> 6 Técnicas para Memorizar Países y Capitales</h3>
           <div className={styles.tipsGrid}>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🏠</span>
+              <span className={styles.tipIcon} aria-hidden="true">🏠</span>
               <h4>Empieza por tu continente</h4>
               <p>El aprendizaje parte de lo conocido. Si eres de España, dominas Europa antes que África o Asia. Ese éxito inicial genera motivación para continuar. Reserva los continentes más complejos (África, Asia) para cuando tengas el método consolidado.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🗺️</span>
+              <span className={styles.tipIcon} aria-hidden="true">🗺️</span>
               <h4>Aprende los países por sus fronteras comunes</h4>
               <p>Los países se memorizan mejor en grupo que de forma aislada. Si sabes que Uganda limita con Kenia, Tanzania, Ruanda, RDC y Sudán del Sur, ubicas automáticamente a 5 países con un solo esfuerzo. Estudia siempre los países limítrofes juntos.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🏛️</span>
+              <span className={styles.tipIcon} aria-hidden="true">🏛️</span>
               <h4>Asocia capitales con características únicas</h4>
               <p>Nairobi (Kenia) = «La ciudad safari de África». Reikiavik (Islandia) = «La capital más septentrional del mundo». Camberra (Australia) = «No es ni Sídney ni Melbourne, es la capital de compromiso». Las historias y anécdotas fijan los datos mejor que la repetición pura.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>✏️</span>
+              <span className={styles.tipIcon} aria-hidden="true">✏️</span>
               <h4>Usa mapas mudos para práctica activa</h4>
               <p>Escribir activa la memoria mucho más que leer o escuchar. Imprime mapas mudos por continente e intenta completarlos sin mirar. Este sistema, llamado «práctica de recuperación activa», es el método de estudio con más evidencia científica para la retención a largo plazo.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📰</span>
+              <span className={styles.tipIcon} aria-hidden="true">📰</span>
               <h4>Relaciona países con eventos históricos recientes</h4>
               <p>Sudán del Sur (independencia 2011), Kosovo (independencia 2008), Timor-Leste (independencia 2002). Los países más jóvenes tienen historias de independencia recientes que los hacen fácilmente memorables. Conectar geografía con historia convierte datos en narrativas.</p>
             </div>
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🎮</span>
+              <span className={styles.tipIcon} aria-hidden="true">🎮</span>
               <h4>Practica con apps y juegos de geografía</h4>
               <p>La gamificación acelera el aprendizaje. Juegos como GeoGuessr o quizzes de capitales en línea consolidan la memoria de forma lúdica. Dedica 10 minutos diarios a estos juegos durante 30 días: el efecto acumulado supera sesiones intensivas esporádicas.</p>
             </div>

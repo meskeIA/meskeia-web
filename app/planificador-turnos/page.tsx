@@ -1099,7 +1099,7 @@ export default function PlanificadorTurnosPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🏥</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏥</span>
                 <h3>Enfermero/a con turnos rotativos de 12h</h3>
               </div>
               <p className={styles.escenarioExample}>
@@ -1117,7 +1117,7 @@ export default function PlanificadorTurnosPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🏭</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🏭</span>
                 <h3>Trabajador de fábrica con turno fijo de noche</h3>
               </div>
               <p className={styles.escenarioExample}>
@@ -1134,7 +1134,7 @@ export default function PlanificadorTurnosPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>🛍️</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">🛍️</span>
                 <h3>Empleado de comercio con turno partido</h3>
               </div>
               <p className={styles.escenarioExample}>
@@ -1152,7 +1152,7 @@ export default function PlanificadorTurnosPage() {
 
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
-                <span className={styles.escenarioIcon}>📋</span>
+                <span className={styles.escenarioIcon} aria-hidden="true">📋</span>
                 <h3>Responsable de RRHH con 20 personas</h3>
               </div>
               <p className={styles.escenarioExample}>
@@ -1390,7 +1390,7 @@ export default function PlanificadorTurnosPage() {
           <div className={styles.tipsGrid}>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📅</span>
+              <span className={styles.tipIcon} aria-hidden="true">📅</span>
               <h3>Publica con 5+ días de antelación</h3>
               <p>
                 Publicar el cuadrante con al menos 5 días de antelación permite a los empleados
@@ -1402,7 +1402,7 @@ export default function PlanificadorTurnosPage() {
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>⏱️</span>
+              <span className={styles.tipIcon} aria-hidden="true">⏱️</span>
               <h3>Respeta siempre las 12h de descanso mínimo</h3>
               <p>
                 El descanso entre jornadas (ET art. 34.3) es un derecho inderogable. No asignes
@@ -1413,7 +1413,7 @@ export default function PlanificadorTurnosPage() {
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🎉</span>
+              <span className={styles.tipIcon} aria-hidden="true">🎉</span>
               <h3>Distribuye festivos de forma equitativa</h3>
               <p>
                 Lleva un registro acumulado anual de festivos trabajados por cada empleado y
@@ -1425,7 +1425,7 @@ export default function PlanificadorTurnosPage() {
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🎨</span>
+              <span className={styles.tipIcon} aria-hidden="true">🎨</span>
               <h3>Usa colores por tipo de turno</h3>
               <p>
                 Asigna colores distintivos a cada franja horaria: verde para mañana, naranja para
@@ -1436,7 +1436,7 @@ export default function PlanificadorTurnosPage() {
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>🔄</span>
+              <span className={styles.tipIcon} aria-hidden="true">🔄</span>
               <h3>Planifica rotaciones en sentido horario</h3>
               <p>
                 Desde la perspectiva de la salud laboral, el orden mañana → tarde → noche es
@@ -1447,7 +1447,7 @@ export default function PlanificadorTurnosPage() {
             </div>
 
             <div className={styles.tipCard}>
-              <span className={styles.tipIcon}>📊</span>
+              <span className={styles.tipIcon} aria-hidden="true">📊</span>
               <h3>Revisa las estadísticas semanales antes de cerrar</h3>
               <p>
                 Antes de dar por cerrado el cuadrante, verifica que la cobertura de turnos es

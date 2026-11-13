@@ -492,22 +492,22 @@ export default function PruebaCamaraPage() {
         <h3><span aria-hidden="true">💡</span> Consejos para una buena imagen</h3>
         <div className={styles.tipsGrid}>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>💡</span>
+            <span className={styles.tipIcon} aria-hidden="true">💡</span>
             <h4>Iluminación</h4>
             <p>Sitúate frente a una fuente de luz natural o lámpara. Evita contraluz.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>👁️</span>
+            <span className={styles.tipIcon} aria-hidden="true">👁️</span>
             <h4>Altura</h4>
             <p>La cámara debe estar a la altura de tus ojos para un ángulo favorecedor.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🖼️</span>
+            <span className={styles.tipIcon} aria-hidden="true">🖼️</span>
             <h4>Fondo</h4>
             <p>Elige un fondo limpio y ordenado para transmitir profesionalidad.</p>
           </div>
           <div className={styles.tipCard}>
-            <span className={styles.tipIcon}>🔇</span>
+            <span className={styles.tipIcon} aria-hidden="true">🔇</span>
             <h4>Antes de llamar</h4>
             <p>Prueba el micrófono aquí mismo y graba unos segundos para escuchar cómo te oirán.</p>
           </div>
