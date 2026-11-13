@@ -25,7 +25,7 @@ import {
   gravamenPremio,
   type TramoIRPF,
 } from '@/data/fiscal';
-import { RESPUESTA_FAQ_WALLAPOP } from './metadata';
+import { RESPUESTA_FAQ_CRIPTOMONEDAS, RESPUESTA_FAQ_WALLAPOP } from './metadata';
 
 // Escala de la base del ahorro (capital mobiliario + ganancias por transmisión)
 const TRAMOS_AHORRO_IRPF_2025 = TRAMOS_GANANCIAS_PATRIMONIALES_2025;
@@ -567,9 +567,7 @@ export default function OrientadorTiposRentaIrpfPage() {
             <div className={styles.faqItem}>
               <dt>¿Cómo tributan las criptomonedas?</dt>
               <dd>
-                Vender o permutar criptos genera una <strong>ganancia o pérdida patrimonial</strong> (base del ahorro). Las recompensas por{' '}
-                <strong>staking</strong> o por prestar criptoactivos son <strong>rendimientos del capital mobiliario</strong> (también base del ahorro).
-                Y minar de forma habitual sería <strong>actividad económica</strong> (base general). Tres regímenes para una misma "moneda".
+                {RESPUESTA_FAQ_CRIPTOMONEDAS}
               </dd>
             </div>
             <div className={styles.faqItem}>

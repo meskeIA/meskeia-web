@@ -66,6 +66,14 @@ export const jsonLd = generateWebAppSchema({
 export const RESPUESTA_FAQ_WALLAPOP =
   'Normalmente no. Vender objetos usados de segunda mano por debajo de su precio de compra genera una pérdida patrimonial que no se computa. Solo si vendes algo por más de lo que te costó (por ejemplo, un objeto de colección revalorizado) se genera una ganancia patrimonial, que tributa en la base del ahorro. Vender de forma habitual con ánimo de lucro, en cambio, sería actividad económica.';
 
+// «¿Cómo tributan las criptomonedas?» está también en la FAQ visible (C0570, 13/11/2026, con
+// «en el IRPF» de más aquí). El FAQPage daba la base del ahorro del 19 al 28 % «en 2025», y desde el
+// 01/01/2025 el tramo de más de 300.000 € es del 30 % (15 estatal + 15 autonómico: Ley 7/2024,
+// disposición final séptima, que modifica los arts. 66 y 76 de la Ley 35/2006; cotejado en el BOE
+// el 13/11/2026), que es lo que dice el resto de la app y TRAMOS_GANANCIAS_PATRIMONIALES_2025.
+export const RESPUESTA_FAQ_CRIPTOMONEDAS =
+  'La venta o permuta de criptomonedas genera una ganancia o pérdida patrimonial que tributa en la base del ahorro (del 19 % al 30 % en 2025). En cambio, las recompensas por staking o por prestar criptoactivos se consideran rendimientos del capital mobiliario, también en la base del ahorro. Y minar de forma habitual es una actividad económica, que tributa en la base general: tres regímenes para una misma «moneda».';
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -83,7 +91,7 @@ export const faqJsonLd = {
       name: '¿Cómo tributan las criptomonedas en el IRPF?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'La venta o permuta de criptomonedas genera una ganancia o pérdida patrimonial que tributa en la base del ahorro (19% a 28% en 2025). En cambio, las recompensas por staking o por prestar criptoactivos se consideran rendimientos del capital mobiliario, también en la base del ahorro. Minar de forma habitual se considera actividad económica.',
+        text: RESPUESTA_FAQ_CRIPTOMONEDAS,
       },
     },
     {
