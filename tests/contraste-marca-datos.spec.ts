@@ -161,6 +161,10 @@ const APPS: App[] = [
   // 13/11/2026 (C0645): el año de cada reforma en el color de su punto (la marca 4,11:1, el teal 2,80
   // y el acento 2,26 en claro; la marca 3,50 en oscuro)
   { slug: 'visualizador-sistema-pensiones', todo: true, secciones: "[role='tablist'] [role='tab']" },
+  // 13/11/2026 (C0645, C0278): en oscuro, el estado de la circulación y el porcentaje del AMOC en
+  // --primary-texto y las marcas del deslizador en --text-muted sobre el tinte de marca al 10-12 %
+  // (4,32-4,42:1), y el enfriamiento «-1.5°C» en #c0392b fijo (2,26)
+  { slug: 'visualizador-oceanos-corrientes', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
 ];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {

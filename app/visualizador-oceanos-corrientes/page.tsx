@@ -403,7 +403,9 @@ export default function VisualizadorOceanosCorreintes() {
 
                 {/* Etiqueta tiempo */}
                 <rect x="260" y="170" width="200" height="28" rx="6" fill="rgba(255,255,255,0.85)" />
-                <text x="360" y="189" fontSize="10" fill="#2E86AB" textAnchor="middle" fontWeight="700">
+                {/* Los mapas son claros en los dos temas: rótulos en tintas oscuras fijas (C0297, 13/11/2026;
+                    la marca daba 3,92:1, el rojo 3,27-4,01 y el #666 de las latitudes 4,20 sobre el agua) */}
+                <text x="360" y="189" fontSize="10" fill="#1F5F7A" textAnchor="middle" fontWeight="700">
                   ~1.000 años por circuito completo
                 </text>
               </svg>
@@ -508,17 +510,17 @@ export default function VisualizadorOceanosCorreintes() {
                 />
 
                 {/* Etiqueta Corriente del Golfo */}
-                <text x="340" y="105" fontSize="11" fill="#c0390a" fontWeight="700" textAnchor="middle">
+                <text x="340" y="105" fontSize="11" fill="#962D08" fontWeight="700" textAnchor="middle">
                   Corriente del Golfo
                 </text>
 
                 {/* Etiquetas latitudes */}
                 <line x1="30" y1="110" x2="690" y2="110" stroke="#999" strokeWidth="0.7" strokeDasharray="4 4" />
-                <text x="660" y="106" fontSize="9" fill="#666">51°N</text>
+                <text x="660" y="106" fontSize="9" fill="#4A4A4A">51°N</text>
                 <line x1="30" y1="70" x2="690" y2="70" stroke="#999" strokeWidth="0.7" strokeDasharray="4 4" />
-                <text x="660" y="66" fontSize="9" fill="#666">60°N</text>
+                <text x="660" y="66" fontSize="9" fill="#4A4A4A">60°N</text>
                 <line x1="30" y1="148" x2="690" y2="148" stroke="#999" strokeWidth="0.7" strokeDasharray="4 4" />
-                <text x="660" y="144" fontSize="9" fill="#666">45°N</text>
+                <text x="660" y="144" fontSize="9" fill="#4A4A4A">45°N</text>
 
                 {/* Puntos ciudades */}
                 <circle cx="490" cy="108" r="5" fill="#e74c3c" />
@@ -532,7 +534,7 @@ export default function VisualizadorOceanosCorreintes() {
                   <rect x="230" y="180" width="260" height="36" rx="6" fill="rgba(192,57,43,0.12)" stroke="#c0392b" strokeWidth="1.5" />
                 )}
                 {sinCorriente && (
-                  <text x="360" y="199" fontSize="10" fill="#c0392b" textAnchor="middle" fontWeight="700">
+                  <text x="360" y="199" fontSize="10" fill="#8B1E14" textAnchor="middle" fontWeight="700">
                     <tspan aria-hidden="true">⚠</tspan> Sin corriente: Europa -5 a -10°C
                   </text>
                 )}

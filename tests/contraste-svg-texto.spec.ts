@@ -268,6 +268,10 @@ const APPS: App[] = [
   // puros sobre el tinte de su caja (2,53-3,75:1) y «flujo», «Sin fondo propio» e «invertido en
   // mercados» en #888 (3,21-3,51). En oscuro ya mandaba #E5E5E5. Los dos modelos, como secciones
   { slug: 'visualizador-sistema-pensiones', secciones: "[role='tablist'] [role='tab']", extremos: true },
+  // 13/11/2026: sobre los mapas, claros en los dos temas, «~1.000 años por circuito» en la marca
+  // (3,92:1), «Corriente del Golfo» en #c0390a (4,01), las latitudes en #666 (4,20) y el aviso «Sin
+  // corriente» en #c0392b sobre su tinte (3,27). Los escenarios del AMOC y del Golfo, como subestados
+  { slug: 'visualizador-oceanos-corrientes', secciones: SECCIONES, extremos: true, subestados: "button[aria-pressed]:not(nav button)" },
 ];
 
 interface TextoSvg {

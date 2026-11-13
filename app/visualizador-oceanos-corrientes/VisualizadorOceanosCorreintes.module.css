@@ -1170,12 +1170,26 @@
   background: var(--bg-card);
 }
 
+/* En oscuro el tinte de marca al 10-12 % dejaba encima el título y el porcentaje en --primary-texto
+   a 4,32-4,40:1 y --text-muted a 4,42 (C0278, 13/11/2026): al 4 % */
 [data-theme='dark'] .conveyorInfo {
-  background: rgba(46, 134, 171, 0.12);
+  background: rgba(46, 134, 171, 0.04);
 }
 
 [data-theme='dark'] .amocSlider {
-  background: rgba(46, 134, 171, 0.1);
+  background: rgba(46, 134, 171, 0.04);
+}
+
+/* El rojo #c0392b y el azul #1a6b8e fijos, sobre la tarjeta oscura: 2,26:1 el enfriamiento del
+   AMOC (C0645, 13/11/2026) */
+[data-theme='dark'] .amocImpactoNum,
+[data-theme='dark'] .tempSinCorriente,
+[data-theme='dark'] .phEspecieEstadoBad {
+  color: #F1948A;
+}
+
+[data-theme='dark'] .tempValorFrio {
+  color: #85C1E9;
 }
 
 [data-theme='dark'] .zonaDetalle {
