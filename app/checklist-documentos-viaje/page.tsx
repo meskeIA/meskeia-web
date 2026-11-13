@@ -608,7 +608,7 @@ export default function ChecklistDocumentosViajePage() {
         <section className={styles.eduSection}>
           <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
-              <span className={styles.warningIcon}>⚠️</span>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               <strong>6 errores que te impiden embarcar</strong>
             </div>
             <ul className={styles.warningList}>

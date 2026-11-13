@@ -1013,7 +1013,7 @@ export default function CalculadoraInflacionPage() {
         {/* WARNING BOX */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <h3>Errores frecuentes al interpretar la inflación que te cuestan dinero</h3>
           </div>
           <ul className={styles.warningList}>

@@ -657,7 +657,7 @@ export default function CalculadoraRentabilidadAlquilerPage() {
         {/* 6. WARNING BOX */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <strong>Errores que destruyen la rentabilidad del alquiler</strong>
           </div>
           <ul className={styles.warningList}>

@@ -1466,7 +1466,7 @@ export default function PlanificadorTurnosPage() {
           <h2>Errores frecuentes al planificar turnos (y cómo evitarlos)</h2>
           <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
-              <span className={styles.warningIcon}>⚠️</span>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               <h3>Errores legales y de gestión que debes conocer</h3>
             </div>
             <ul className={styles.warningList}>

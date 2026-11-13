@@ -584,7 +584,7 @@ export default function ChecklistCoberturasSeguroPage() {
         {/* Warning Box */}
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <strong>Errores graves al gestionar tus coberturas de seguros</strong>
           </div>
           <ul className={styles.warningList}>

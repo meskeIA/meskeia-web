@@ -385,22 +385,22 @@ export default function TestVelocidadEscrituraPage() {
           <h3><span aria-hidden="true">🎯</span> ¿Para Qué Importa la Velocidad de Escritura?</h3>
           <div className={styles.eduEscenariosGrid}>
             <div className={styles.eduEscenarioCard}>
-              <span className={styles.eduEscenarioIcon}>💼</span>
+              <span className={styles.eduEscenarioIcon} aria-hidden="true">💼</span>
               <h4>Productividad Laboral</h4>
               <p>Un profesional que escribe 60 PPM en lugar de 30 PPM produce el doble de texto en el mismo tiempo. Para roles como redactor, analista, consultor o administrativo, la velocidad de escritura impacta directamente en cuánto trabajo puedes completar. Muchas empresas exigen mínimo 40-50 PPM como requisito para puestos de backoffice.</p>
             </div>
             <div className={styles.eduEscenarioCard}>
-              <span className={styles.eduEscenarioIcon}>🎓</span>
+              <span className={styles.eduEscenarioIcon} aria-hidden="true">🎓</span>
               <h4>Oposiciones y Exámenes</h4>
               <p>Muchos exámenes de acceso a la administración pública incluyen una prueba de mecanografía con un mínimo de pulsaciones por minuto exigido, que varía según el país y el tipo de plaza. En exámenes universitarios con entrega digital, una mayor velocidad permite dedicar más tiempo a pensar y menos a teclear.</p>
             </div>
             <div className={styles.eduEscenarioCard}>
-              <span className={styles.eduEscenarioIcon}>💻</span>
+              <span className={styles.eduEscenarioIcon} aria-hidden="true">💻</span>
               <h4>Programación y Desarrollo</h4>
               <p>Los programadores no solo escriben código: también documentan, responden issues, hacen code review y comunican en Slack/email. Aunque la velocidad de escritura no es la limitación principal en programación (lo es el pensamiento), pasar de 30 a 60 PPM reduce la fricción mental y permite mantener mejor el flujo (estado &quot;flow&quot;) mientras se programa.</p>
             </div>
             <div className={styles.eduEscenarioCard}>
-              <span className={styles.eduEscenarioIcon}>🎤</span>
+              <span className={styles.eduEscenarioIcon} aria-hidden="true">🎤</span>
               <h4>Transcripción y Periodismo</h4>
               <p>Los transcriptores profesionales y periodistas necesitan 80+ PPM para transcribir audio en tiempo real o tomar notas de rueda de prensa. La estenografía digital (taquigrafía con teclado) puede alcanzar 200+ PPM. Aplicaciones como el subtitulado en directo para televisión requieren velocidades de 300+ PPM con precisión casi perfecta.</p>
             </div>
@@ -497,32 +497,32 @@ export default function TestVelocidadEscrituraPage() {
           <h3><span aria-hidden="true">💡</span> Consejos para Mejorar Más Rápido</h3>
           <div className={styles.eduTipsGrid}>
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcono}>🎯</span>
+              <span className={styles.eduTipIcono} aria-hidden="true">🎯</span>
               <h4>Precisión antes que velocidad</h4>
               <p>Si cometes más del 5% de errores, reduce la velocidad. Los errores refuerzan los patrones incorrectos. Configura tu herramienta de práctica para que no te permita continuar si hay errores sin corregir.</p>
             </div>
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcono}>⏱️</span>
+              <span className={styles.eduTipIcono} aria-hidden="true">⏱️</span>
               <h4>15 minutos diarios &gt; 2 horas semanales</h4>
               <p>La memoria muscular se consolida mejor con práctica distribuida. 15 minutos cada día durante 30 días supera enormemente a una sesión de 2 horas el fin de semana. La consistencia es más importante que la intensidad.</p>
             </div>
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcono}>🚫</span>
+              <span className={styles.eduTipIcono} aria-hidden="true">🚫</span>
               <h4>Nunca mires el teclado</h4>
               <p>Tapar el teclado con un trapo o usar una cubierta ciega acelera el aprendizaje táctil. Mirar las teclas es un hábito que frena el automatismo. El dolor de ir lento sin mirar es temporal; el beneficio de no mirar es permanente.</p>
             </div>
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcono}>💆</span>
+              <span className={styles.eduTipIcono} aria-hidden="true">💆</span>
               <h4>Postura y ergonomía desde el día 1</h4>
               <p>Espalda recta, pies apoyados en el suelo, codos a 90°, muñecas rectas (no dobladas hacia arriba). Una postura correcta desde el principio evita lesiones y también mejora la velocidad: la tensión corporal ralentiza los dedos.</p>
             </div>
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcono}>📊</span>
+              <span className={styles.eduTipIcono} aria-hidden="true">📊</span>
               <h4>Haz tests regulares para ver el progreso</h4>
               <p>Usa este test una vez por semana, siempre bajo las mismas condiciones (misma hora, mismo estado de ánimo, teclado habitual). Ver el progreso en una gráfica es motivador. La velocidad crece lentamente pero de forma constante con práctica diaria.</p>
             </div>
             <div className={styles.eduTipCard}>
-              <span className={styles.eduTipIcono}>🔧</span>
+              <span className={styles.eduTipIcono} aria-hidden="true">🔧</span>
               <h4>Usa aceleradores de texto (snippets)</h4>
               <p>Herramientas como TextExpander, AutoHotkey o el autocompletado del IDE expanden abreviaturas en texto completo. Escribir &quot;dir&quot; y obtener &quot;Estimado/a Sr./Sra.&quot; automáticamente multiplica tu velocidad efectiva. Combina buena mecanografía con automatización para productividad máxima.</p>
             </div>
@@ -531,7 +531,7 @@ export default function TestVelocidadEscrituraPage() {
 
         <section>
           <div className={styles.warningBox}>
-            <span className={styles.warningIcono}>⚠️</span>
+            <span className={styles.warningIcono} aria-hidden="true">⚠️</span>
             <div>
               <strong>Precauciones importantes sobre velocidad de escritura</strong>
               <ul>

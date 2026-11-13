@@ -783,7 +783,7 @@ export default function TiradorDadosPage() {
           {/* Warning Box */}
           <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
-              <span className={styles.warningIcon}>⚠️</span>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               <strong>Errores comunes al usar dados</strong>
             </div>
             <ul className={styles.warningList}>

@@ -1095,7 +1095,7 @@ export default function CreadorFlashcardsPage() {
         <section className={styles.guideSection}>
           <div className={styles.warningBox}>
             <div className={styles.warningHeader}>
-              <span className={styles.warningIcon}>⚠️</span>
+              <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
               <h3>Errores frecuentes que reducen la efectividad</h3>
             </div>
             <ul className={styles.warningList}>

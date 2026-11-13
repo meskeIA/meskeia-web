@@ -1095,7 +1095,7 @@ Cinta USA marca millas
         {/* 6. Warning Box - Errores Comunes */}
         <section className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <h2>Errores Comunes al Convertir Unidades</h2>
           </div>
 

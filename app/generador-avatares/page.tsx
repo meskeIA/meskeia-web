@@ -1054,7 +1054,7 @@ export default function GeneradorAvataresPage() {
           <section className={styles.guideSection}>
             <div className={styles.warningBox}>
               <div className={styles.warningHeader}>
-                <span className={styles.warningIcon}>⚠️</span>
+                <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
                 <h3>Errores frecuentes que debes evitar</h3>
               </div>
               <ul className={styles.warningList}>

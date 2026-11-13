@@ -733,7 +733,7 @@ export default function ListaEquipajePage() {
 
         <div className={styles.warningBox}>
           <div className={styles.warningHeader}>
-            <span className={styles.warningIcon}>⚠️</span>
+            <span className={styles.warningIcon} aria-hidden="true">⚠️</span>
             <strong>Errores que pueden hacerte perder el vuelo o el equipaje</strong>
           </div>
           <ul className={styles.warningList}>
