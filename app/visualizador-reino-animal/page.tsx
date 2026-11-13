@@ -11,6 +11,7 @@ import {
   ShareCard,
 } from '@/components';
 import styles from './ReinoAnimal.module.css';
+import { rellenoConTinta } from '@/lib/tintaLegible';
 import { RESPUESTA_FAQ_VERTEBRADOS } from './metadata';
 
 // ─────────────────────────────────────────────
@@ -300,16 +301,25 @@ const CONEXIONES_ARBOL: [string, string][] = [
 // Componente: SVG del corazón
 // ─────────────────────────────────────────────
 
+/**
+ * Cámaras del corazón con su rótulo encima — cabo C0297 (13/11/2026). El blanco sobre cada color al
+ * 85 % daba 1,91-3,13:1 (el ámbar 1,91, el verde 2,03, el azul 2,95, el rojo 3,13). rellenoConTinta
+ * oscurece o aclara cada relleno lo justo para que su tinta llegue a 4,5:1; opacos e iguales en los
+ * dos temas.
+ */
+const CAMARAS = ['#EF4444', '#F59E0B', '#3B82F6', '#22C55E'].map((c) => rellenoConTinta(c));
+
 function CorazonSvg({ camaras }: { camaras: number }) {
-  const colores = ['#EF4444', '#F59E0B', '#3B82F6'];
+  const colores = CAMARAS.map((c) => c.relleno);
+  const tinta = CAMARAS.map((c) => c.tinta);
 
   if (camaras === 2) {
     return (
       <svg viewBox="0 0 200 120" className={styles.corazonSvg} aria-label="Corazón de 2 cámaras">
-        <ellipse cx="70" cy="60" rx="45" ry="45" fill={colores[0]} opacity="0.85" />
-        <ellipse cx="130" cy="60" rx="45" ry="45" fill={colores[1]} opacity="0.85" />
-        <text x="70" y="65" textAnchor="middle" fill="#fff" fontSize="11" fontWeight="600">Aurícula</text>
-        <text x="130" y="65" textAnchor="middle" fill="#fff" fontSize="11" fontWeight="600">Ventrículo</text>
+        <ellipse cx="70" cy="60" rx="45" ry="45" fill={colores[0]} />
+        <ellipse cx="130" cy="60" rx="45" ry="45" fill={colores[1]} />
+        <text x="70" y="65" textAnchor="middle" fill={tinta[0]} fontSize="11" fontWeight="600">Aurícula</text>
+        <text x="130" y="65" textAnchor="middle" fill={tinta[1]} fontSize="11" fontWeight="600">Ventrículo</text>
         <text x="100" y="112" textAnchor="middle" fill="var(--text-secondary)" fontSize="10">2 cámaras</text>
       </svg>
     );
@@ -318,15 +328,15 @@ function CorazonSvg({ camaras }: { camaras: number }) {
   if (camaras === 3) {
     return (
       <svg viewBox="0 0 260 130" className={styles.corazonSvg} aria-label="Corazón de 3 cámaras">
-        <ellipse cx="60" cy="60" rx="42" ry="42" fill={colores[0]} opacity="0.85" />
-        <ellipse cx="150" cy="60" rx="42" ry="42" fill={colores[1]} opacity="0.85" />
-        <ellipse cx="210" cy="60" rx="38" ry="38" fill={colores[2]} opacity="0.85" />
-        <text x="60" y="57" textAnchor="middle" fill="#fff" fontSize="9" fontWeight="600">Aurícula</text>
-        <text x="60" y="69" textAnchor="middle" fill="#fff" fontSize="9">D</text>
-        <text x="150" y="57" textAnchor="middle" fill="#fff" fontSize="9" fontWeight="600">Aurícula</text>
-        <text x="150" y="69" textAnchor="middle" fill="#fff" fontSize="9">I</text>
-        <text x="210" y="57" textAnchor="middle" fill="#fff" fontSize="9" fontWeight="600">Ventrículo</text>
-        <text x="210" y="69" textAnchor="middle" fill="#fff" fontSize="9">(único)</text>
+        <ellipse cx="60" cy="60" rx="42" ry="42" fill={colores[0]} />
+        <ellipse cx="150" cy="60" rx="42" ry="42" fill={colores[1]} />
+        <ellipse cx="210" cy="60" rx="38" ry="38" fill={colores[2]} />
+        <text x="60" y="57" textAnchor="middle" fill={tinta[0]} fontSize="9" fontWeight="600">Aurícula</text>
+        <text x="60" y="69" textAnchor="middle" fill={tinta[0]} fontSize="9">D</text>
+        <text x="150" y="57" textAnchor="middle" fill={tinta[1]} fontSize="9" fontWeight="600">Aurícula</text>
+        <text x="150" y="69" textAnchor="middle" fill={tinta[1]} fontSize="9">I</text>
+        <text x="210" y="57" textAnchor="middle" fill={tinta[2]} fontSize="9" fontWeight="600">Ventrículo</text>
+        <text x="210" y="69" textAnchor="middle" fill={tinta[2]} fontSize="9">(único)</text>
         <text x="130" y="118" textAnchor="middle" fill="var(--text-secondary)" fontSize="10">3 cámaras — mezcla parcial O₂/CO₂</text>
       </svg>
     );
@@ -334,16 +344,16 @@ function CorazonSvg({ camaras }: { camaras: number }) {
 
   return (
     <svg viewBox="0 0 300 130" className={styles.corazonSvg} aria-label="Corazón de 4 cámaras">
-      <ellipse cx="60" cy="55" rx="42" ry="42" fill={colores[0]} opacity="0.85" />
-      <ellipse cx="145" cy="55" rx="42" ry="42" fill={colores[1]} opacity="0.85" />
-      <ellipse cx="215" cy="55" rx="42" ry="42" fill={colores[2]} opacity="0.85" />
-      <ellipse cx="260" cy="75" rx="28" ry="30" fill="#22C55E" opacity="0.85" />
-      <text x="60" y="52" textAnchor="middle" fill="#fff" fontSize="9" fontWeight="600">A. Der.</text>
-      <text x="60" y="64" textAnchor="middle" fill="#fff" fontSize="8">venosa</text>
-      <text x="145" y="52" textAnchor="middle" fill="#fff" fontSize="9" fontWeight="600">A. Izq.</text>
-      <text x="145" y="64" textAnchor="middle" fill="#fff" fontSize="8">arterial</text>
-      <text x="215" y="52" textAnchor="middle" fill="#fff" fontSize="9" fontWeight="600">V. Der.</text>
-      <text x="260" y="72" textAnchor="middle" fill="#fff" fontSize="9" fontWeight="600">V. Izq.</text>
+      <ellipse cx="60" cy="55" rx="42" ry="42" fill={colores[0]} />
+      <ellipse cx="145" cy="55" rx="42" ry="42" fill={colores[1]} />
+      <ellipse cx="215" cy="55" rx="42" ry="42" fill={colores[2]} />
+      <ellipse cx="260" cy="75" rx="28" ry="30" fill={colores[3]} />
+      <text x="60" y="52" textAnchor="middle" fill={tinta[0]} fontSize="9" fontWeight="600">A. Der.</text>
+      <text x="60" y="64" textAnchor="middle" fill={tinta[0]} fontSize="8">venosa</text>
+      <text x="145" y="52" textAnchor="middle" fill={tinta[1]} fontSize="9" fontWeight="600">A. Izq.</text>
+      <text x="145" y="64" textAnchor="middle" fill={tinta[1]} fontSize="8">arterial</text>
+      <text x="215" y="52" textAnchor="middle" fill={tinta[2]} fontSize="9" fontWeight="600">V. Der.</text>
+      <text x="260" y="72" textAnchor="middle" fill={tinta[3]} fontSize="9" fontWeight="600">V. Izq.</text>
       <text x="160" y="118" textAnchor="middle" fill="var(--text-secondary)" fontSize="10">4 cámaras — separación completa</text>
     </svg>
   );
@@ -654,7 +664,7 @@ function TabFilogenia() {
                 <circle
                   cx={n.x} cy={n.y}
                   r={radio}
-                  fill={isActive ? 'var(--primary)' : 'var(--bg-card)'}
+                  fill={isActive ? 'var(--primary-boton)' : 'var(--bg-card)'}
                   stroke={isActive ? 'var(--secondary)' : 'var(--accent)'}
                   strokeWidth={isActive ? 3 : 1.5}
                 />

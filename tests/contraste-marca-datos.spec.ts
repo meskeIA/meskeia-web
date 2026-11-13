@@ -172,6 +172,10 @@ const APPS: App[] = [
   // 13/11/2026 (C0645): el número del tiempo elegido en su color sobre su tinte, la eficiencia real en
   // #16A34A (3,3:1) y los porcentajes de las pérdidas en su color (el naranja 2,85 en claro)
   { slug: 'visualizador-motor-combustion', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
+  // 13/11/2026 (C0278, C0681): «Clase» en --primary-texto sobre el tinte al 12 % (4,36:1 en claro) y,
+  // en oscuro, las especies en --text-muted sobre la tarjeta elegida (4,29) y «Endotermo» en la
+  // reserva roja de la receta (3,93)
+  { slug: 'visualizador-reino-animal', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
 ];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {

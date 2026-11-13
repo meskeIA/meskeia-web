@@ -286,6 +286,10 @@ const APPS: App[] = [
   // y sobre las nubes (Stratus 1,42:1, «Suelo» 1,35, Altostratus 1,96, Cirrostratus 3,75), igual en
   // los dos temas. Cada nube, como subestado
   { slug: 'visualizador-fenomenos-meteorologicos', secciones: SECCIONES, subestados: "button[aria-pressed]:not(nav button)" },
+  // 13/11/2026: el blanco sobre las cámaras del corazón en su color al 85 % (el ámbar 1,91:1, el
+  // verde 2,03, el azul 2,95, el rojo 3,13) y sobre el nodo elegido del árbol en la marca (4,11).
+  // Cada clase y cada filo, como subestados
+  { slug: 'visualizador-reino-animal', secciones: SECCIONES, subestados: "button[aria-pressed]:not(nav button)" },
 ];
 
 interface TextoSvg {
