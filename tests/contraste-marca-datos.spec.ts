@@ -158,6 +158,9 @@ const APPS: App[] = [
   // #999 (2,73), las insignias de los destinos en su color sobre su tinte (2,00-3,22 en claro,
   // 3,28-4,12 en oscuro) y el strong del aviso en la reserva roja de la receta en oscuro (3,21)
   { slug: 'visualizador-cosmologia', todo: true, secciones: "nav[aria-label*='ecciones'] button" },
+  // 13/11/2026 (C0645): el año de cada reforma en el color de su punto (la marca 4,11:1, el teal 2,80
+  // y el acento 2,26 en claro; la marca 3,50 en oscuro)
+  { slug: 'visualizador-sistema-pensiones', todo: true, secciones: "[role='tablist'] [role='tab']" },
 ];
 
 async function suspensos(page: Page, todo = false): Promise<string[]> {

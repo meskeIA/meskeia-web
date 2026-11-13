@@ -264,6 +264,10 @@ const APPS: App[] = [
     extremos: true,
     subestados: "button[aria-pressed]:not(nav button), svg circle[role='button']",
   },
+  // 13/11/2026: en claro, los títulos de las cajas de reparto y capitalización en la marca y el teal
+  // puros sobre el tinte de su caja (2,53-3,75:1) y «flujo», «Sin fondo propio» e «invertido en
+  // mercados» en #888 (3,21-3,51). En oscuro ya mandaba #E5E5E5. Los dos modelos, como secciones
+  { slug: 'visualizador-sistema-pensiones', secciones: "[role='tablist'] [role='tab']", extremos: true },
 ];
 
 interface TextoSvg {

@@ -87,6 +87,13 @@ const REFORMAS = [
   },
 ];
 
+/** Tono de TEXTO del año de cada reforma según el color de su punto (C0645, 13/11/2026) */
+const TONO_ANO: Record<string, 'anoMarca' | 'anoTeal' | 'anoAcento'> = {
+  '#2E86AB': 'anoMarca',
+  '#48A9A6': 'anoTeal',
+  '#7FB3D3': 'anoAcento',
+};
+
 // ─────────────────────────────────────────────
 // Datos del Fondo de Reserva
 // ─────────────────────────────────────────────
@@ -177,26 +184,26 @@ export default function VisualizadorSistemaPensiones() {
             >
               {/* Trabajadores activos */}
               <rect x="0" y="20" width="140" height="80" rx="10" fill="rgba(46,134,171,0.12)" stroke="#2E86AB" strokeWidth="1.5" />
-              <text x="70" y="45" textAnchor="middle" fontSize="11" fontWeight="600" fill="#2E86AB">Trabajadores</text>
+              <text x="70" y="45" textAnchor="middle" fontSize="11" fontWeight="600" className={styles.svgMarca}>Trabajadores</text>
               <text x="70" y="62" textAnchor="middle" fontSize="22">👷</text>
               <text x="70" y="90" textAnchor="middle" fontSize="10" fill="#666">Cotizaciones HOY</text>
 
               {/* Flecha → Caja SS */}
               <path d="M 142 60 L 188 60" stroke="#2E86AB" strokeWidth="2" markerEnd="url(#arr)" />
-              <text x="165" y="52" textAnchor="middle" fontSize="9" fill="#888">flujo</text>
+              <text x="165" y="52" textAnchor="middle" fontSize="9" className={styles.svgTenue}>flujo</text>
 
               {/* Caja SS */}
               <rect x="190" y="20" width="140" height="80" rx="10" fill="rgba(72,169,166,0.12)" stroke="#48A9A6" strokeWidth="1.5" />
-              <text x="260" y="45" textAnchor="middle" fontSize="11" fontWeight="600" fill="#48A9A6">Tesorería SS</text>
+              <text x="260" y="45" textAnchor="middle" fontSize="11" fontWeight="600" className={styles.svgTeal}>Tesorería SS</text>
               <text x="260" y="65" textAnchor="middle" fontSize="11" fill="#555">Redistribuye</text>
-              <text x="260" y="88" textAnchor="middle" fontSize="9" fill="#888">Sin fondo propio</text>
+              <text x="260" y="88" textAnchor="middle" fontSize="9" className={styles.svgTenue}>Sin fondo propio</text>
 
               {/* Flecha → Pensionistas */}
               <path d="M 332 60 L 378 60" stroke="#48A9A6" strokeWidth="2" markerEnd="url(#arr2)" />
 
               {/* Pensionistas */}
               <rect x="380" y="20" width="140" height="80" rx="10" fill="rgba(46,134,171,0.08)" stroke="#2E86AB" strokeWidth="1.5" />
-              <text x="450" y="45" textAnchor="middle" fontSize="11" fontWeight="600" fill="#2E86AB">Pensionistas</text>
+              <text x="450" y="45" textAnchor="middle" fontSize="11" fontWeight="600" className={styles.svgMarca}>Pensionistas</text>
               <text x="450" y="62" textAnchor="middle" fontSize="22">🧓</text>
               <text x="450" y="90" textAnchor="middle" fontSize="10" fill="#666">Pensión mensual</text>
 
@@ -253,7 +260,7 @@ export default function VisualizadorSistemaPensiones() {
             >
               {/* Trabajador joven */}
               <rect x="0" y="20" width="130" height="80" rx="10" fill="rgba(46,134,171,0.12)" stroke="#2E86AB" strokeWidth="1.5" />
-              <text x="65" y="45" textAnchor="middle" fontSize="11" fontWeight="600" fill="#2E86AB">Trabajador</text>
+              <text x="65" y="45" textAnchor="middle" fontSize="11" fontWeight="600" className={styles.svgMarca}>Trabajador</text>
               <text x="65" y="62" textAnchor="middle" fontSize="22">🧑‍💼</text>
               <text x="65" y="90" textAnchor="middle" fontSize="10" fill="#666">Cotiza en activo</text>
 
@@ -262,18 +269,18 @@ export default function VisualizadorSistemaPensiones() {
 
               {/* Fondo individual */}
               <rect x="180" y="20" width="160" height="80" rx="10" fill="rgba(72,169,166,0.12)" stroke="#48A9A6" strokeWidth="1.5" />
-              <text x="260" y="42" textAnchor="middle" fontSize="11" fontWeight="600" fill="#48A9A6">Fondo Individual</text>
+              <text x="260" y="42" textAnchor="middle" fontSize="11" fontWeight="600" className={styles.svgTeal}>Fondo Individual</text>
               <text x="260" y="60" textAnchor="middle" fontSize="10" fill="#555">Acumula con intereses</text>
               <text x="260" y="76" textAnchor="middle" fontSize="10" fill="#555">durante 40 años</text>
               {/* a11y-ok: <text> de un <svg role="img"> con su aria-label: el lector no entra en el dibujo */}
-              <text x="260" y="92" textAnchor="middle" fontSize="9" fill="#888">📈 invertido en mercados</text>
+              <text x="260" y="92" textAnchor="middle" fontSize="9" className={styles.svgTenue}>📈 invertido en mercados</text>
 
               {/* Flecha → Jubilado */}
               <path d="M 342 60 L 388 60" stroke="#48A9A6" strokeWidth="2" markerEnd="url(#arr4)" />
 
               {/* Jubilado (mismo trabajador) */}
               <rect x="390" y="20" width="130" height="80" rx="10" fill="rgba(46,134,171,0.08)" stroke="#2E86AB" strokeWidth="1.5" />
-              <text x="455" y="42" textAnchor="middle" fontSize="11" fontWeight="600" fill="#2E86AB">Jubilado</text>
+              <text x="455" y="42" textAnchor="middle" fontSize="11" fontWeight="600" className={styles.svgMarca}>Jubilado</text>
               <text x="455" y="59" textAnchor="middle" fontSize="22">🧓</text>
               <text x="455" y="90" textAnchor="middle" fontSize="10" fill="#666">Mismo trabajador</text>
 
@@ -460,7 +467,7 @@ export default function VisualizadorSistemaPensiones() {
                 {idx < REFORMAS.length - 1 && <div className={styles.timelineLinea} />}
               </div>
               <div className={styles.timelineContenido}>
-                <div className={styles.timelineAno} style={{ color: reforma.color }}>
+                <div className={`${styles.timelineAno} ${styles[TONO_ANO[reforma.color]]}`}>
                   {reforma.ano}
                 </div>
                 <h3 className={styles.timelineTitulo}>{reforma.titulo}</h3>
