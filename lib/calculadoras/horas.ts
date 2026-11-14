@@ -52,7 +52,7 @@ function parsearSinUnidad(cuerpo: string): number | null {
 
 /**
  * Una cifra en el formato del proyecto, con parseSpanishNumber (hallazgo 4596, 14/11/2026). Hasta
- * entonces se leía con `Number(x.replace(',', '.'))` y el punto de millares pasaba por decimal:
+ * entonces se cambiaba la coma por punto y se leía con Number, y el punto de millares pasaba por decimal:
  * «1.780» (la jornada anual de un convenio) eran 1,78 h y «1.500 min», 1,5 min. El punto con una o
  * dos cifras detrás sigue siendo decimal («7.75», «1.5»), y la coma siempre lo es.
  */
