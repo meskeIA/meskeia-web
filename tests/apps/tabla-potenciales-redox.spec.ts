@@ -57,6 +57,22 @@ test.describe('Buscador (cabo C0607)', () => {
     expect([...posiciones].sort((a, b) => a - b)).toEqual(posiciones);
   });
 
+  test('CABO C0747 (14/11/2026) · «de» y «del» no se buscan: la consulta natural da lo mismo que sin ellas', async ({ page }) => {
+    // Hallazgo 4656 de tabla-solubilidad, en el modo fórmulas que comparte esta tabla: cada
+    // palabra se buscaba como subcadena, también «de», y una fila cuyo texto no la lleva salía.
+    await cargar(page);
+    for (const [conDe, sinDe] of [
+      ['electrodo de platino', 'electrodo platino'],
+      ['pila del zinc aire', 'pila zinc aire'],
+    ]) {
+      await buscar(page, sinDe);
+      const esperadas = await idsDeFilas(page);
+      expect.soft(esperadas.length, sinDe).toBeGreaterThan(0);
+      await buscar(page, conDe);
+      expect.soft(await idsDeFilas(page), conDe).toEqual(esperadas);
+    }
+  });
+
   test('sigue casando dentro de una fórmula: «Cl» encuentra el clorato y el cloro', async ({ page }) => {
     await cargar(page);
     await buscar(page, 'Cl');

@@ -393,15 +393,22 @@ test.describe('Buscador y filtros (inspector 14/11/2026)', () => {
     await expect(fila).toHaveAttribute('aria-expanded', 'false');
   });
 
-  test('HALLAZGO (14/11/2026, ABIERTO) · «sulfato de bario» pierde la regla Sulfatos que «sulfato bario» sí muestra', async ({ page }) => {
-    // El modo fórmulas busca cada palabra como subcadena, también «de»: el texto indexado de la
+  test('HALLAZGO 4656 (14/11/2026, REPARADO) · «sulfato de bario» da lo mismo que «sulfato bario», con la regla Sulfatos', async ({ page }) => {
+    // El modo fórmulas buscaba cada palabra como subcadena, también «de»: el texto indexado de la
     // regla Sulfatos y de la ficha del ion sulfato no contiene «de», así que la preposición los
-    // saca. Hoy: «sulfato bario» → sulfatos, ion-sulfato, kps-baso4; «sulfato de bario» → solo
-    // kps-baso4. Igual con «sulfato de calcio» (la regla que dice «Poco solubles: CaSO₄»).
-    test.fail();
-    for (const termino of ['sulfato de bario', 'sulfato de calcio']) {
-      await buscar(page, termino);
-      expect.soft(await fichas(page), termino).toContain('sulfatos');
+    // sacaba («sulfato de bario» → solo kps-baso4). Ahora «de», «del», «el», «los» y «las» no se
+    // buscan en lib/buscadorTablas.ts. Igual con «sulfato de calcio» (la regla que dice «Poco
+    // solubles: CaSO₄»).
+    for (const [conDe, sinDe] of [
+      ['sulfato de bario', 'sulfato bario'],
+      ['sulfato de calcio', 'sulfato calcio'],
+    ]) {
+      await buscar(page, sinDe);
+      const esperadas = await fichas(page);
+      await buscar(page, conDe);
+      const obtenidas = await fichas(page);
+      expect.soft(obtenidas, conDe).toContain('sulfatos');
+      expect.soft(obtenidas, conDe).toEqual(esperadas);
     }
   });
 

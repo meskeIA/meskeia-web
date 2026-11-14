@@ -142,9 +142,22 @@ export function prepararFormulas(texto: string): string {
     .replace(/\s+/g, ' ');
 }
 
-/** Las palabras de una consulta en modo fórmulas: lo que separan los espacios. */
+/**
+ * Palabras de una consulta en modo fórmulas que no se buscan (hallazgo 4656 y cabo C0747,
+ * 14/11/2026): como subcadena, «de» sacaba de «sulfato de bario» la regla Sulfatos y la ficha del
+ * ion sulfato, cuyo texto no lleva la preposición. Solo palabras que no son un símbolo químico:
+ * «la» (lantano), «y» (itrio) y «al» (aluminio) se siguen buscando.
+ */
+const VACIAS_FORMULAS: ReadonlySet<string> = new Set(['de', 'del', 'el', 'los', 'las']);
+
+/**
+ * Las palabras de una consulta en modo fórmulas: lo que separan los espacios, sin las vacías
+ * salvo que la consulta no tenga otra cosa.
+ */
 export function tokensFormulas(consulta: string): string[] {
-  return prepararFormulas(consulta).split(' ').filter(Boolean);
+  const todas = prepararFormulas(consulta).split(' ').filter(Boolean);
+  const significativas = todas.filter((t) => !VACIAS_FORMULAS.has(t));
+  return significativas.length > 0 ? significativas : todas;
 }
 
 /** El índice de una entrada en modo fórmulas: todo su texto como UNA palabra. */

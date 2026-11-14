@@ -113,6 +113,22 @@ async function buscar(page: Page, termino: string): Promise<void> {
   await esperarValorEnReact(page, '#buscador-kakb', termino);
 }
 
+test('CABO C0747 (14/11/2026) · «de» y «del» no se buscan: «ácido del limón» da lo mismo que «ácido limón»', async ({ page }) => {
+  // Hallazgo 4656 de tabla-solubilidad, en el modo fórmulas que comparte esta tabla: cada palabra
+  // se buscaba como subcadena, también «del», y las fichas del cítrico y del tartárico no la llevan.
+  await cargar(page);
+  for (const [conDe, sinDe] of [
+    ['ácido del limón', 'ácido limón'],
+    ['ácido del vino', 'ácido vino'],
+  ]) {
+    await buscar(page, sinDe);
+    const esperadas = await idsVisibles(page);
+    expect.soft(esperadas.length, sinDe).toBeGreaterThan(0);
+    await buscar(page, conDe);
+    expect.soft(await idsVisibles(page), conDe).toEqual(esperadas);
+  }
+});
+
 test.describe('Inspección del 05/11/2026', () => {
   test.beforeEach(async ({ page }) => {
     await cargar(page);
