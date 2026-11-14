@@ -4,13 +4,52 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import styles from './AmplificadorSonido.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, EducationalSection, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { formatNumber } from '@/lib';
-import { RESPUESTA_FAQ_SEGURO_OIDO } from './metadata';
+import { mantenerAudioEnMarcha } from '@/lib/useEntradaAudio';
+import {
+  PREGUNTA_FAQ_AUDIFONO,
+  PREGUNTA_FAQ_AURICULARES,
+  RESPUESTA_FAQ_AUDIFONO,
+  RESPUESTA_FAQ_AURICULARES,
+  RESPUESTA_FAQ_SEGURO_OIDO,
+} from './metadata';
 
 // Parámetros del amplificador
 const GAIN_MAX = 12;        // ganancia máxima (×12 sobre la señal del micrófono)
 const VOICE_FREQ = 1800;    // Hz — centro del realce de voz (banda de inteligibilidad del habla)
 const VOICE_Q = 0.9;        // anchura del filtro peaking
 const VOICE_BOOST_DB = 9;   // realce aplicado a la banda de voz cuando está activo
+
+// Aviso de nivel alto con histéresis y retención (hallazgo 4688): el texto de la región viva
+// alternaba varias veces por segundo con un sonido que rondaba el umbral, y un lector de pantalla
+// lo anunciaba sin parar. Entra por encima de 80, sale por debajo de 70, y cada estado dura al
+// menos 1,5 s.
+const NIVEL_ALTO_ENTRA = 80;
+const NIVEL_ALTO_SALE = 70;
+const RETENCION_AVISO_MS = 1500;
+
+const AVISO_AUDIO_PARADO =
+  'El navegador no ha arrancado el audio, así que no llega sonido a los auriculares. Pulsa «Detener» y vuelve a «Iniciar amplificación».';
+
+/**
+ * Texto en español para cada fallo al abrir el micrófono (hallazgo 4687: fuera de «permiso
+ * denegado» y «sin micrófono» se enseñaba el mensaje técnico del navegador en inglés).
+ */
+function mensajeDeError(err: unknown): string {
+  const nombre = err instanceof Error ? err.name : '';
+  if (nombre === 'NotAllowedError' || nombre === 'SecurityError') {
+    return 'Permiso de micrófono denegado. Permite el acceso al micrófono en tu navegador para usar el amplificador.';
+  }
+  if (nombre === 'NotFoundError' || nombre === 'OverconstrainedError') {
+    return 'No se detecta ningún micrófono. Conecta o activa uno e inténtalo de nuevo.';
+  }
+  if (nombre === 'NotReadableError' || nombre === 'AbortError') {
+    return 'El micrófono está ocupado por otra aplicación o por una llamada. Ciérrala y vuelve a pulsar «Iniciar amplificación».';
+  }
+  return 'No se pudo iniciar el audio. Comprueba que el micrófono funciona, recarga la página y vuelve a intentarlo.';
+}
+
+const MENSAJE_SIN_MICROFONO_EN_NAVEGADOR =
+  'Este navegador no deja usar el micrófono en esta página. Ábrela con una dirección https en un navegador actualizado (Chrome, Edge, Firefox o Safari).';
 
 export default function AmplificadorSonidoPage() {
   const [isActive, setIsActive] = useState(false);
@@ -19,6 +58,10 @@ export default function AmplificadorSonidoPage() {
   const [voiceBoost, setVoiceBoost] = useState(true);
   const [noiseSuppress, setNoiseSuppress] = useState(false);
   const [level, setLevel] = useState(0);
+  const [nivelAlto, setNivelAlto] = useState(false);
+  const [audioEnMarcha, setAudioEnMarcha] = useState(true);
+  const nivelAltoRef = useRef(false);
+  const ultimoCambioAvisoRef = useRef(0);
 
   const audioContextRef = useRef<AudioContext | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -60,6 +103,9 @@ export default function AmplificadorSonidoPage() {
     filterRef.current = null;
     compressorRef.current = null;
     analyserRef.current = null;
+    nivelAltoRef.current = false;
+    setNivelAlto(false);
+    setAudioEnMarcha(true);
     setLevel(0);
     setIsActive(false);
   }, []);
@@ -80,22 +126,38 @@ export default function AmplificadorSonidoPage() {
       suma += n * n;
     }
     const rms = Math.sqrt(suma / datos.length);
-    setLevel(Math.min(100, Math.round(rms * 300)));
+    const nivel = Math.min(100, Math.round(rms * 300));
+    setLevel(nivel);
+    const ahora = performance.now();
+    if (ahora - ultimoCambioAvisoRef.current >= RETENCION_AVISO_MS) {
+      const alto = nivelAltoRef.current ? nivel >= NIVEL_ALTO_SALE : nivel > NIVEL_ALTO_ENTRA;
+      if (alto !== nivelAltoRef.current) {
+        nivelAltoRef.current = alto;
+        ultimoCambioAvisoRef.current = ahora;
+        setNivelAlto(alto);
+      }
+    }
     animationRef.current = requestAnimationFrame(medirNivel);
   }, []);
 
-  // Iniciar la escucha amplificada
-  const iniciar = async () => {
+  // Iniciar la escucha amplificada. `supresion` permite reabrir con el valor recién elegido de
+  // «Reducir ruido», que el estado aún no refleja en este render.
+  const iniciar = async (supresion: boolean = noiseSuppress) => {
     if (abriendoRef.current) return;
     abriendoRef.current = true;
     const generacion = ++generacionRef.current;
     try {
       setError(null);
 
+      if (!navigator.mediaDevices?.getUserMedia) {
+        setError(MENSAJE_SIN_MICROFONO_EN_NAVEGADOR);
+        return;
+      }
+
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: {
           echoCancellation: false, // audio crudo: sin cancelación que atenúe el ambiente
-          noiseSuppression: noiseSuppress, // off por defecto: no silenciar la tele de fondo
+          noiseSuppression: supresion, // off por defecto: no silenciar la tele de fondo
           autoGainControl: false, // la ganancia la controla el usuario, no el navegador
         },
       });
@@ -107,7 +169,19 @@ export default function AmplificadorSonidoPage() {
 
       const ctx = new AudioContext();
       audioContextRef.current = ctx;
-      await ctx.resume();
+      // Se reanuda al crearlo y cada vez que deja de correr (Safari de iOS lo crea suspendido tras
+      // el await de getUserMedia; una llamada lo deja 'interrupted'), y si el navegador no lo
+      // arranca se avisa. Hasta el 14/11/2026 se hacía `await ctx.resume()` sin mirar el estado, y
+      // la pantalla decía «Amplificando» sin sonido (hallazgo 4686). Receta de la familia:
+      // mantenerAudioEnMarcha (lib/useEntradaAudio.ts), testigo tests/familias/entrada-microfono.spec.ts.
+      await mantenerAudioEnMarcha(
+        ctx,
+        (enMarcha) => {
+          setAudioEnMarcha(enMarcha);
+          setError(enMarcha ? null : AVISO_AUDIO_PARADO);
+        },
+        () => audioContextRef.current === ctx && generacion === generacionRef.current,
+      );
       // «Detener» durante el resume ya cerró este contexto y el flujo
       if (generacion !== generacionRef.current) return;
 
@@ -151,17 +225,23 @@ export default function AmplificadorSonidoPage() {
     } catch (err) {
       if (generacion !== generacionRef.current) return;
       console.error('Error al acceder al micrófono:', err);
-      if (err instanceof Error) {
-        if (err.name === 'NotAllowedError') {
-          setError('Permiso de micrófono denegado. Permite el acceso al micrófono en tu navegador para usar el amplificador.');
-        } else if (err.name === 'NotFoundError') {
-          setError('No se detecta ningún micrófono. Conecta o activa uno e inténtalo de nuevo.');
-        } else {
-          setError(`No se pudo iniciar el audio: ${err.message}`);
-        }
-      }
+      setError(mensajeDeError(err));
     } finally {
       if (generacion === generacionRef.current) abriendoRef.current = false;
+    }
+  };
+
+  /**
+   * «Reducir ruido» con la amplificación en marcha reabre el micrófono con la restricción nueva
+   * (hallazgo 4685): en Chromium, applyConstraints({ noiseSuppression }) resuelve pero la pista
+   * viva sigue sin supresión hasta abrirla de nuevo, y el botón decía «pulsado» sin efecto.
+   */
+  const alternarReduccionRuido = () => {
+    const nuevo = !noiseSuppress;
+    setNoiseSuppress(nuevo);
+    if (streamRef.current) {
+      detener();
+      void iniciar(nuevo);
     }
   };
 
@@ -174,16 +254,6 @@ export default function AmplificadorSonidoPage() {
   useEffect(() => {
     if (filterRef.current) filterRef.current.gain.value = voiceBoost ? VOICE_BOOST_DB : 0;
   }, [voiceBoost]);
-
-  // Aplicar la reducción de ruido en vivo (si el navegador lo permite)
-  useEffect(() => {
-    const track = streamRef.current?.getAudioTracks?.()[0];
-    if (track) {
-      track.applyConstraints({ noiseSuppression: noiseSuppress }).catch(() => {
-        /* algunos navegadores no permiten cambiarlo en caliente; se aplicará al reiniciar */
-      });
-    }
-  }, [noiseSuppress]);
 
   // Color del medidor según nivel (verde → ámbar → rojo, aviso de volumen alto)
   const nivelColor = level > 80 ? '#ef4444' : level > 55 ? '#eab308' : '#22c55e';
@@ -225,17 +295,19 @@ export default function AmplificadorSonidoPage() {
             </div>
           </div>
           <div className={styles.levelLabel} role="status" aria-live="polite">
-            {isActive
-              ? level > 80
-                ? 'Nivel alto — considera bajar el volumen'
-                : 'Amplificando sonido en directo'
-              : 'Detenido'}
+            {!isActive
+              ? 'Detenido'
+              : !audioEnMarcha
+                ? 'Sin sonido: el audio no ha arrancado'
+                : nivelAlto
+                  ? 'Nivel alto — considera bajar el volumen'
+                  : 'Amplificando sonido en directo'}
           </div>
 
           {/* Botón principal */}
           <div className={styles.controls}>
             {!isActive ? (
-              <button type="button" onClick={iniciar} className={styles.btnStart}>
+              <button type="button" onClick={() => void iniciar()} className={styles.btnStart}>
                 <span aria-hidden="true">🎤</span> Iniciar amplificación
               </button>
             ) : (
@@ -278,7 +350,7 @@ export default function AmplificadorSonidoPage() {
                 type="button"
                 className={`${styles.toggleBtn} ${noiseSuppress ? styles.toggleOn : ''}`}
                 aria-pressed={noiseSuppress}
-                onClick={() => setNoiseSuppress((v) => !v)}
+                onClick={alternarReduccionRuido}
               >
                 <span aria-hidden="true">🌫️</span> Reducir ruido
               </button>
@@ -483,21 +555,12 @@ export default function AmplificadorSonidoPage() {
           <h2>Preguntas frecuentes</h2>
           <ul className={styles.faqList}>
             <li className={styles.faqItem}>
-              <strong>¿Necesito auriculares de verdad?</strong>
-              <p>
-                Sí, son imprescindibles. Sin auriculares el micrófono vuelve a captar el sonido que
-                sale por el altavoz y se genera un acople: un pitido agudo (efecto Larsen). Sirven
-                auriculares con cable o Bluetooth; los de cable tienen menos retardo y la escucha
-                resulta más natural.
-              </p>
+              <strong>{PREGUNTA_FAQ_AURICULARES}</strong>
+              <p>{RESPUESTA_FAQ_AURICULARES}</p>
             </li>
             <li className={styles.faqItem}>
-              <strong>¿Sustituye a un audífono?</strong>
-              <p>
-                No. Es una ayuda de escucha puntual, no un producto sanitario. No sustituye a un
-                audífono (aparato auditivo) ni a una evaluación audiológica. Un audífono se adapta a
-                tu pérdida auditiva concreta; esta herramienta amplifica por igual todo el sonido.
-              </p>
+              <strong>{PREGUNTA_FAQ_AUDIFONO}</strong>
+              <p>{RESPUESTA_FAQ_AUDIFONO}</p>
               <p className={styles.faqTip}>
                 Si notas que oyes peor de forma habitual, consulta con un otorrinolaringólogo o
                 audioprotesista.

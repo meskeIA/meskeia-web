@@ -57,10 +57,20 @@ export const jsonLd = generateWebAppSchema({
   ],
 });
 
-// La única pregunta que está también en la FAQ visible de page.tsx: una sola respuesta para
-// las dos (check:faq-unica, cabo C0570). Se quedó la del JSON-LD, que añadía qué hacer si molesta.
+// Las tres preguntas que están también en la FAQ visible de page.tsx: una sola pregunta y una
+// sola respuesta para las dos (check:faq-unica, cabo C0570; las de auriculares y audífono, hallazgo
+// 4689: el enunciado difería y la visible decía que la herramienta «amplifica por igual todo el
+// sonido», con el realce de voz de +9 dB activo por defecto). Se quedaron las del JSON-LD.
 export const RESPUESTA_FAQ_SEGURO_OIDO =
   'Siempre que mantengas el volumen moderado. Una amplificación excesiva y prolongada puede dañar la audición, igual que escuchar música muy alta. Empieza con la ganancia baja y súbela poco a poco hasta oír con comodidad; si notas molestia o pitidos, baja el volumen.';
+
+export const PREGUNTA_FAQ_AURICULARES = '¿Necesito auriculares para usarlo?';
+export const RESPUESTA_FAQ_AURICULARES =
+  'Sí, son imprescindibles. Sin auriculares el micrófono vuelve a captar el sonido que sale por el altavoz y se produce un acople (un pitido agudo llamado efecto Larsen). Valen auriculares con cable o Bluetooth; con cable la latencia es menor y la escucha resulta más natural.';
+
+export const PREGUNTA_FAQ_AUDIFONO = '¿Sustituye a un audífono o aparato auditivo?';
+export const RESPUESTA_FAQ_AUDIFONO =
+  'No. Es una ayuda puntual de escucha, no un producto sanitario. No sustituye a un audífono (aparato auditivo) ni a una evaluación audiológica. Si notas pérdida de audición, consulta con un profesional: un audífono se adapta a tu pérdida concreta y esta herramienta no.';
 
 // FAQPage JSON-LD — visibilidad en Bing Copilot, ChatGPT, Perplexity y Gemini
 export const faqJsonLd = {
@@ -77,18 +87,18 @@ export const faqJsonLd = {
     },
     {
       '@type': 'Question',
-      name: '¿Necesito auriculares para usarlo?',
+      name: PREGUNTA_FAQ_AURICULARES,
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Sí, son imprescindibles. Sin auriculares el micrófono vuelve a captar el sonido que sale por el altavoz y se produce un acople (un pitido agudo llamado efecto Larsen). Valen auriculares con cable o Bluetooth; con cable la latencia es menor y la escucha resulta más natural.',
+        text: RESPUESTA_FAQ_AURICULARES,
       },
     },
     {
       '@type': 'Question',
-      name: '¿Sustituye a un audífono o aparato auditivo?',
+      name: PREGUNTA_FAQ_AUDIFONO,
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'No. Es una ayuda puntual de escucha, no un producto sanitario. No sustituye a un audífono (aparato auditivo) ni a una evaluación audiológica. Si notas pérdida de audición, consulta con un profesional: un audífono se adapta a tu pérdida concreta y esta herramienta no.',
+        text: RESPUESTA_FAQ_AUDIFONO,
       },
     },
     {

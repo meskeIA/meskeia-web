@@ -11,6 +11,7 @@ import {
   DisclaimerCard,
   ShareCard,
 } from '@/components';
+import { mantenerAudioEnMarcha } from '@/lib/useEntradaAudio';
 
 // ============================================
 // Constantes
@@ -44,6 +45,7 @@ export default function DafRetroalimentacionPage() {
   const [auricularesOk, setAuricularesOk] = useState(false);
   const [activo, setActivo] = useState(false);
   const [errorMic, setErrorMic] = useState<string | null>(null);
+  const [audioEnMarcha, setAudioEnMarcha] = useState(true);
   const [retardoMs, setRetardoMs] = useState(RETARDO_DEFECTO);
   const [enmascaramiento, setEnmascaramiento] = useState(false);
   const [nivelEntrada, setNivelEntrada] = useState(0);
@@ -128,7 +130,15 @@ export default function DafRetroalimentacionPage() {
       streamRef.current = stream;
       const ctx = new AudioContext();
       ctxRef.current = ctx;
-      if (ctx.state === 'suspended') await ctx.resume();
+      // Se reanuda al crearlo y cada vez que deja de correr, y si el navegador no lo arranca se
+      // avisa: antes, un resume() que no arrancaba el contexto dejaba la herramienta «activa» sin
+      // sonido en los auriculares (alcance del hallazgo 4686 de amplificador-sonido, 14/11/2026).
+      // Receta: mantenerAudioEnMarcha; testigo tests/familias/entrada-microfono.spec.ts.
+      await mantenerAudioEnMarcha(
+        ctx,
+        (enMarcha) => setAudioEnMarcha(enMarcha),
+        () => ctxRef.current === ctx && generacion === generacionRef.current,
+      );
       // Detenida durante el resume: el flujo y el contexto ya se cerraron
       if (generacion !== generacionRef.current) return;
 
@@ -187,6 +197,7 @@ export default function DafRetroalimentacionPage() {
     ctxRef.current = null;
     streamRef.current = null;
     setActivo(false);
+    setAudioEnMarcha(true);
     setNivelEntrada(0);
   }, [detenerRuido]);
 
@@ -291,6 +302,11 @@ export default function DafRetroalimentacionPage() {
           </div>
         ) : (
           <div className={styles.panelActivo}>
+            <p className={styles.errorMic} role="alert">
+              {audioEnMarcha
+                ? ''
+                : 'El navegador no ha arrancado el audio, así que no llega tu voz a los auriculares. Pulsa «Detener» y vuelve a «Empezar».'}
+            </p>
             {/* Medidor de entrada */}
             <div className={styles.medidorWrapper} aria-label={`Nivel de tu voz: ${nivelEntrada}%`}>
               <div className={styles.medidorLabel}>Nivel de tu voz</div>

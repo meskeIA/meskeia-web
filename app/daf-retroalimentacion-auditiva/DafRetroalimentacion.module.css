@@ -145,6 +145,11 @@
   width: 100%;
 }
 
+/* El aviso de audio parado vive montado y vacío mientras el audio corre: sin caja */
+.errorMic:empty {
+  display: none;
+}
+
 [data-theme='dark'] .errorMic {
   background: rgba(239, 68, 68, 0.12);
   color: #FCA5A5;

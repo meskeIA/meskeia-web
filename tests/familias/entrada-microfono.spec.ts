@@ -12,8 +12,9 @@ import { test, expect, devices, type Page } from '@playwright/test';
  * y nadie llamaba a resume(): «Detener» a la vista, «-- Hz» y ningún aviso. Al repararlo se vio que
  * sonometro, afinador-instrumentos, prueba-microfono y ejercicios-vocalizacion tampoco lo
  * reanudaban (las cinco que hacen createMediaStreamSource sin resume, por grep del 05/11/2026;
- * amplificador-sonido, daf-retroalimentacion-auditiva y generador-tonos ya lo reanudaban). La
- * receta vive en `mantenerAudioEnMarcha` de lib/useEntradaAudio.ts.
+ * amplificador-sonido, daf-retroalimentacion-auditiva y generador-tonos ya lo reanudaban, pero sin
+ * mirar si arrancaba: hallazgo 4686, 14/11/2026, y las dos primeras entran aquí). La receta vive
+ * en `mantenerAudioEnMarcha` de lib/useEntradaAudio.ts.
  *
  * ES UNA EMULACIÓN, NO SAFARI (el WebKit de Playwright no está en esta máquina): un addInitScript
  * envuelve el constructor de AudioContext para que cada instancia llame a suspend() al nacer. Dos
@@ -30,6 +31,8 @@ interface AppMicrofono {
   slug: string;
   /** Nombre accesible del botón que abre el micrófono */
   boton: RegExp;
+  /** Casilla que hay que marcar antes de que el botón se habilite (por su texto) */
+  casilla?: RegExp;
 }
 
 const APPS: AppMicrofono[] = [
@@ -40,6 +43,11 @@ const APPS: AppMicrofono[] = [
   { slug: 'ejercicios-vocalizacion', boton: /Activar micrófono/ },
   // S0260 (08/11/2026): la prueba de micrófono dentro de la de cámara
   { slug: 'prueba-camara', boton: /Probar micrófono/ },
+  // Hallazgo 4686 (14/11/2026): «ya reanudaban» era cierto, pero ninguna miraba si resume() había
+  // arrancado el contexto, y la mitad del aviso no se comprobó nunca. Amplificador y DAF reparados
+  // con la receta; generador-tonos sigue fuera (cabo de destino reparar, ver el acta del 14/11).
+  { slug: 'amplificador-sonido', boton: /Iniciar amplificación/ },
+  { slug: 'daf-retroalimentacion-auditiva', boton: /Activar la retroalimentación auditiva/, casilla: /Tengo puestos los auriculares/ },
 ];
 
 test.use({
@@ -106,6 +114,14 @@ async function arrancar(page: Page, app: AppMicrofono): Promise<void> {
   await page.goto(`/${app.slug}/`);
   const boton = page.getByRole('button', { name: app.boton }).first();
   await expect(boton).toBeVisible();
+  if (app.casilla) {
+    const casilla = page.getByRole('checkbox', { name: app.casilla });
+    await expect
+      .poll(() => casilla.evaluate((el) => Object.keys(el).some((k) => k.startsWith('__reactProps$'))))
+      .toBe(true);
+    await casilla.check();
+    await expect(boton).toBeEnabled();
+  }
   await expect
     .poll(() =>
       boton.evaluate((el) => Object.keys(el).some((k) => k.startsWith('__reactProps$'))),

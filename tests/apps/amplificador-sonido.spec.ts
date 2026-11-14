@@ -329,34 +329,31 @@ test.describe('en móvil (Pixel 7)', () => {
     await expect.poll(async () => (await lectura(page)).contextos).toEqual(['closed']);
   });
 
-  test('HALLAZGO (14/11/2026, ABIERTO) · si el navegador no arranca el AudioContext, la app dice «Amplificando» sin sonido y sin aviso', async ({
+  test('HALLAZGO 4686 (14/11/2026, REPARADO) · si el navegador no arranca el AudioContext, la app lo dice en vez de «Amplificando»', async ({
     page,
   }) => {
     // Emulación del testigo tests/familias/entrada-microfono.spec.ts («resume no arranca»): el
     // contexto nace suspendido y resume() resuelve sin arrancarlo (Safari de iOS, o el contexto
-    // 'interrupted' tras una llamada). La app hace `await ctx.resume()` y no mira el estado:
-    // hoy, pista 'live', contexto 'suspended', «Amplificando sonido en directo» y ningún aviso.
-    // La receta de la familia es mantenerAudioEnMarcha (lib/useEntradaAudio.ts), que avisa
-    // «El navegador no ha arrancado el audio…»; el testigo no lista esta app.
-    test.fail();
+    // 'interrupted' tras una llamada). Antes: `await ctx.resume()` sin mirar el estado → pista
+    // 'live', contexto 'suspended', «Amplificando sonido en directo» y ningún aviso. Ahora la app
+    // usa mantenerAudioEnMarcha (lib/useEntradaAudio.ts) y entra en el testigo de la familia.
     await espiar(page, true);
     await abrir(page);
     await page.getByRole('button', { name: /Iniciar amplificación/ }).tap();
     await expect.poll(async () => (await lectura(page)).pistas).toEqual(['live']);
     expect((await lectura(page)).contextos).toEqual(['suspended']);
     await expect(avisoApp(page)).toHaveText(/no ha arrancado el audio/, { timeout: 4000 });
+    await expect(estado(page)).not.toHaveText(/Amplificando/);
   });
 });
 
-test('HALLAZGO (14/11/2026, ABIERTO) · «Reducir ruido» pulsado con la amplificación en marcha no reduce nada en Chromium', async ({
+test('HALLAZGO 4685 (14/11/2026, REPARADO) · «Reducir ruido» pulsado con la amplificación en marcha reabre el micrófono con la supresión puesta', async ({
   page,
 }) => {
-  // La app llama a track.applyConstraints({ noiseSuppression: true }): resuelve, getConstraints()
-  // lo refleja, pero getSettings().noiseSuppression sigue en false hasta que se detiene y se vuelve
-  // a iniciar (el CASO 2 comprueba que al reabrir sí se aplica). El botón queda aria-pressed=true
-  // y la app no dice que haga falta reiniciar. La guía (paso 5, después de iniciar en el paso 2)
-  // y el caso «Restaurante» mandan activarlo con la amplificación en marcha.
-  test.fail();
+  // Antes: track.applyConstraints({ noiseSuppression: true }) resolvía y getConstraints() lo
+  // reflejaba, pero getSettings().noiseSuppression seguía en false hasta detener e iniciar, con el
+  // botón en aria-pressed=true. La guía (paso 5) y el caso «Restaurante» mandan activarlo con la
+  // amplificación en marcha. Ahora se reabre el micrófono con la restricción nueva.
   await espiar(page);
   await abrir(page);
   await page.getByRole('button', { name: /Iniciar amplificación/ }).click();
@@ -364,18 +361,21 @@ test('HALLAZGO (14/11/2026, ABIERTO) · «Reducir ruido» pulsado con la amplifi
   expect((await lectura(page)).supresionRuido).toBe(false);
   await page.getByRole('button', { name: /Reducir ruido/ }).click();
   await expect(page.getByRole('button', { name: /Reducir ruido/ })).toHaveAttribute('aria-pressed', 'true');
-  // La pista viva (la de ahora o la de un micrófono reabierto) debe llevar la supresión puesta
+  // La pista viva (la del micrófono reabierto) lleva la supresión puesta, y la amplificación sigue
   await expect.poll(async () => (await lectura(page)).supresionRuido, { timeout: 3000 }).toBe(true);
+  await expect(page.getByRole('button', { name: /Detener/ })).toBeVisible();
+  const l = await lectura(page);
+  expect(l.pistas, 'la pista vieja se cerró y solo queda viva la nueva').toEqual(['ended', 'live']);
+  expect(l.ganancia).toBeCloseTo(6, 3);
 });
 
-test('HALLAZGO (14/11/2026, ABIERTO) · fuera de «permiso denegado» y «sin micrófono», el aviso es el mensaje técnico del navegador en inglés', async ({
+test('HALLAZGO 4687 (14/11/2026, REPARADO) · fuera de «permiso denegado» y «sin micrófono», el aviso es un texto en español que dice qué hacer', async ({
   page,
 }) => {
-  // Hoy: micrófono ocupado por otra app o una llamada (NotReadableError) → «No se pudo iniciar el
+  // Antes: micrófono ocupado por otra app o una llamada (NotReadableError) → «No se pudo iniciar el
   // audio: Could not start audio source»; navegador sin navigator.mediaDevices (contexto no
   // seguro, navegador antiguo) → «No se pudo iniciar el audio: Cannot read properties of
   // undefined (reading 'getUserMedia')».
-  test.fail();
   await page.addInitScript(() => {
     MediaDevices.prototype.getUserMedia = () =>
       Promise.reject(new DOMException('Could not start audio source', 'NotReadableError'));
@@ -384,6 +384,7 @@ test('HALLAZGO (14/11/2026, ABIERTO) · fuera de «permiso denegado» y «sin mi
   await page.getByRole('button', { name: /Iniciar amplificación/ }).click();
   await expect(avisoApp(page)).toBeVisible();
   await expect(avisoApp(page)).not.toHaveText(/Could not start|Cannot read|undefined/);
+  await expect(avisoApp(page)).toContainText('ocupado por otra aplicación o por una llamada');
 
   await page.addInitScript(() => {
     Object.defineProperty(Navigator.prototype, 'mediaDevices', { get: () => undefined, configurable: true });
@@ -392,15 +393,16 @@ test('HALLAZGO (14/11/2026, ABIERTO) · fuera de «permiso denegado» y «sin mi
   await page.getByRole('button', { name: /Iniciar amplificación/ }).click();
   await expect(avisoApp(page)).toBeVisible();
   await expect(avisoApp(page)).not.toHaveText(/Could not start|Cannot read|undefined/);
+  await expect(avisoApp(page)).toContainText('no deja usar el micrófono en esta página');
 });
 
-test('HALLAZGO (14/11/2026, ABIERTO) · la región viva role="status" alterna «Nivel alto» y «Amplificando» al ritmo del sonido', async ({
+test('HALLAZGO 4688 (14/11/2026, REPARADO) · la región viva role="status" no alterna «Nivel alto» y «Amplificando» al ritmo del sonido', async ({
   page,
 }) => {
-  // Con el pitido simulado y la ganancia por defecto (×6), el texto de la región aria-live
-  // cambió 18 veces en 5 s (medido el 14/11/2026): un lector de pantalla lo anunciaría sin parar
-  // encima del sonido amplificado. Esperado: como mucho un cambio por segundo (4 en 4 s).
-  test.fail();
+  // Antes: con el pitido simulado y la ganancia por defecto (×6), el texto de la región aria-live
+  // cambió 18 veces en 5 s (medido el 14/11/2026). Ahora el aviso tiene histéresis (entra por
+  // encima de 80, sale por debajo de 70) y cada estado dura al menos 1,5 s. Esperado: como mucho un
+  // cambio por segundo (4 en 4 s).
   await espiar(page);
   await abrir(page);
   await page.getByRole('button', { name: /Iniciar amplificación/ }).click();
@@ -423,15 +425,30 @@ test('HALLAZGO (14/11/2026, ABIERTO) · la región viva role="status" alterna «
   expect(cambios).toBeLessThanOrEqual(4);
 });
 
-test('HALLAZGO (14/11/2026, ABIERTO) · la FAQ visible dice que «amplifica por igual todo el sonido», con el realce de voz de +9 dB activo por defecto', async ({
+test('HALLAZGO 4689 (14/11/2026, REPARADO) · la FAQ visible no dice que «amplifica por igual todo el sonido» y comparte pregunta y respuesta con el FAQPage', async ({
   page,
 }) => {
-  // «¿Sustituye a un audífono?» (visible) y «¿Sustituye a un audífono o aparato auditivo?»
-  // (faqJsonLd) son la misma pregunta con dos respuestas; igual «¿Necesito auriculares de
-  // verdad?» frente a «¿Necesito auriculares para usarlo?». Solo la visible afirma que la
+  // Antes: «¿Sustituye a un audífono?» (visible) y «¿Sustituye a un audífono o aparato auditivo?»
+  // (faqJsonLd) eran la misma pregunta con dos respuestas; igual «¿Necesito auriculares de
+  // verdad?» frente a «¿Necesito auriculares para usarlo?». Solo la visible afirmaba que la
   // herramienta amplifica por igual todo el sonido, y el peaking de 1.800 Hz (+9 dB) y el
-  // compresor dicen lo contrario.
-  test.fail();
+  // compresor dicen lo contrario. Ahora las dos FAQ leen las mismas constantes de metadata.ts.
   await abrir(page);
   await expect(page.getByText('amplifica por igual todo el sonido')).toHaveCount(0);
+  const faqPage = await page.evaluate(() => {
+    const salida: { q: string; a: string }[] = [];
+    for (const s of Array.from(document.querySelectorAll('script[type="application/ld+json"]'))) {
+      const j = JSON.parse(s.textContent ?? '{}') as { '@type'?: string; mainEntity?: { name: string; acceptedAnswer: { text: string } }[] };
+      if (j['@type'] !== 'FAQPage') continue;
+      for (const e of j.mainEntity ?? []) salida.push({ q: e.name, a: e.acceptedAnswer.text });
+    }
+    return salida;
+  });
+  for (const patron of [/auriculares/, /audífono/]) {
+    const enJsonLd = faqPage.find((p) => patron.test(p.q));
+    expect(enJsonLd, `la pregunta ${patron} sigue en el FAQPage`).toBeTruthy();
+    const item = page.locator('li', { has: page.locator('strong', { hasText: enJsonLd!.q }) });
+    await expect(item).toHaveCount(1);
+    await expect(item.locator('p').first()).toHaveText(enJsonLd!.a);
+  }
 });
