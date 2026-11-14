@@ -415,3 +415,132 @@ test.describe('Inspector 02/11/2026 · FAQ visible y FAQPage', () => {
     expect(normal(ld?.acceptedAnswer.text ?? '')).toBe(visible);
   });
 });
+
+/* ══════════════════════════════════════════════════════════════════════════════════════════
+ * Inspector — modo cambio, 14/11/2026. El diff (911b7cee..a4743803f) solo añade tres
+ * comentarios `parser-ok` sobre los tres `Number(texto.replace(',', '.'))` de
+ * lib/calculadoras/horas.ts. Se recorren los tres caminos; esperados resueltos A MANO antes de
+ * abrir la app (1 h = 60 min, y cada línea se redondea al segundo):
+ *
+ *   Camino A · parsearSinUnidad, Number(decimal) — cifra sin unidad o con «h» pegada
+ *     «1,5»            1,5 × 60 = 90 min → 1:30 · línea «1,50 h»
+ *     «23,5» + «0,5»   1410 + 30 = 1440 min → 24:00 (no vuelve a 0:00) · «24,00 h» · «1440 min»
+ *     «0,0»            0 min → 0:00, cuenta como tiempo (Tiempos contados 1) y sin aviso
+ *     «1.5»            1,5 h → 1:30: el punto decimal está admitido a propósito («7.75» en la
+ *                      cabecera del motor y en tests/horas-motor.spec.ts)
+ *   Camino B · parsearConUnidad, las horas — «horas», «hora», «hr»
+ *     «1,5 horas»                  90 min → 1:30
+ *     «23,5 horas» + «media hora»  1410 + 30 = 1440 → 24:00
+ *   Camino C · parsearConUnidad, los minutos
+ *     «1,5 min»                    90 s → 0:01:30 · «1,50 min» · línea 1,5 ÷ 60 = 0,025 → «0,03 h»
+ *     «1 h 59,5 min»               60 + 59,5 = 119,5 min → 1:59:30 (59,5 < 60: se admite)
+ *     «23 h 59,5 min» + «0,5 min»  1380 + 59,5 + 0,5 = 1440 → 24:00
+ *   Rechazo (aviso, aria-invalid, nada cuenta): «1,5,5» y «1.5.5» (dos separadores), «12abc» y
+ *     «1e3» (lo que parseFloat sí aceptaba), «1,5 horas 20 min» (decimales en las horas junto a
+ *     minutos), «1 h 60 min» (60 o más junto a horas), «45,5,5 min».
+ *
+ *   HALLAZGO (14/11/2026, ABIERTO) · el punto de millares se lee como decimal en los tres caminos.
+ *     El parser-ok de a4743803f dice «no hay millares que leer», pero los dos regex dejan pasar un
+ *     punto seguido de exactamente tres cifras, que en el formato del proyecto es el de millares
+ *     (CLAUDE.md global §2: «1.234,56»; parseSpanishNumber, lib/formatters.ts: «el punto solo
+ *     agrupa millares cuando parte el número en grupos de exactamente tres cifras»):
+ *       «1.780» (jornada anual de convenio)  1780 h → 1780:00 · la app da 1:46:48 (1,78 h)
+ *       «2.000 horas»                        2000 h → 2000:00 · la app da 2:00
+ *       «1.500 min»                          1500 min = 25 h → 25:00 · la app da 0:01:30
+ *     Ninguno lleva aviso ni aria-invalid. Es el defecto que vigila check:parser
+ *     («lee "1.500" como 1,5»), callado por los tres parser-ok.
+ * ══════════════════════════════════════════════════════════════════════════════════════════ */
+
+/** La equivalencia en horas decimales que la app pinta a la derecha de la línea n. */
+const equivalenciaDe = (page: Page, n: number): Locator =>
+  page.locator('li').filter({ has: page.locator(LINEA(n)) }).locator('[class*="equivalencia"]');
+
+const avisoLista = (page: Page): Locator =>
+  page.getByRole('alert').filter({ hasText: 'Hay alguna línea que no se entiende' });
+
+test.describe('Inspector 14/11/2026 · los tres Number con la coma cambiada (a4743803f)', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/calculadora-horas/');
+    await esperarHidratacion(page, [LINEA(1), FACTOR_POR]);
+  });
+
+  test('Camino A (normal) · «1,5» = 1:30 y «1.5» también (el punto decimal está admitido)', async ({ page }) => {
+    await escribir(page, LINEA(1), '1,5');
+    await expect(TOTAL(page)).toHaveText('1:30');
+    await expect(equivalenciaDe(page, 1)).toHaveText('1,50 h');
+    await expect(valorDe(page, PANEL_LISTA, 'En minutos')).toHaveText('90 min');
+
+    await escribir(page, LINEA(1), '1.5');
+    await expect(TOTAL(page)).toHaveText('1:30');
+    await expect(avisoLista(page)).toHaveCount(0);
+  });
+
+  test('Camino A (límite) · «23,5» + «0,5» = 24:00 y «0,0» cuenta como 0:00', async ({ page }) => {
+    await escribir(page, LINEA(1), '23,5');
+    await escribir(page, LINEA(2), '0,5');
+    await expect(TOTAL(page)).toHaveText('24:00');
+    await expect(valorDe(page, PANEL_LISTA, 'En horas decimales')).toHaveText('24,00 h');
+    await expect(valorDe(page, PANEL_LISTA, 'En minutos')).toHaveText('1440 min');
+
+    await escribir(page, LINEA(1), '0,0');
+    await escribir(page, LINEA(2), '');
+    await expect(TOTAL(page)).toHaveText('0:00');
+    await expect(valorDe(page, PANEL_LISTA, 'Tiempos contados')).toHaveText('1');
+    await expect(page.locator(LINEA(1))).toHaveAttribute('aria-invalid', 'false');
+    await expect(avisoLista(page)).toHaveCount(0);
+  });
+
+  test('Camino B · «1,5 horas» = 1:30 y «23,5 horas» + «media hora» = 24:00', async ({ page }) => {
+    await escribir(page, LINEA(1), '1,5 horas');
+    await expect(TOTAL(page)).toHaveText('1:30');
+    await expect(equivalenciaDe(page, 1)).toHaveText('1,50 h');
+
+    await escribir(page, LINEA(1), '23,5 horas');
+    await escribir(page, LINEA(2), 'media hora');
+    await expect(TOTAL(page)).toHaveText('24:00');
+    await expect(valorDe(page, PANEL_LISTA, 'En minutos')).toHaveText('1440 min');
+  });
+
+  test('Camino C · «1,5 min» = 0:01:30, «1 h 59,5 min» = 1:59:30 y suman 24:00 en el límite', async ({ page }) => {
+    await escribir(page, LINEA(1), '1,5 min');
+    await expect(TOTAL(page)).toHaveText('0:01:30');
+    await expect(valorDe(page, PANEL_LISTA, 'En minutos')).toHaveText('1,50 min');
+    await expect(equivalenciaDe(page, 1)).toHaveText('0,03 h');
+
+    await escribir(page, LINEA(1), '1 h 59,5 min');
+    await expect(TOTAL(page)).toHaveText('1:59:30');
+    await expect(valorDe(page, PANEL_LISTA, 'En minutos')).toHaveText('119,50 min');
+
+    await escribir(page, LINEA(1), '23 h 59,5 min');
+    await escribir(page, LINEA(2), '0,5 min');
+    await expect(TOTAL(page)).toHaveText('24:00');
+    await expect(valorDe(page, PANEL_LISTA, 'En minutos')).toHaveText('1440 min');
+  });
+
+  test('Rechazo · dos separadores, texto pegado, notación científica y minutos de reloj ≥ 60', async ({ page }) => {
+    for (const malo of ['1,5,5', '1.5.5', '12abc', '1e3', '1,5 horas 20 min', '1 h 60 min', '45,5,5 min']) {
+      await escribir(page, LINEA(1), malo);
+      await expect(page.locator(LINEA(1)), malo).toHaveAttribute('aria-invalid', 'true');
+      await expect(avisoLista(page), malo).toBeVisible();
+      await expect(TOTAL(page), malo).toHaveText('0:00');
+      await expect(valorDe(page, PANEL_LISTA, 'Tiempos contados'), malo).toHaveText('0');
+      await expect(equivalenciaDe(page, 1), malo).toHaveText('');
+    }
+  });
+
+  // HALLAZGO (14/11/2026, ABIERTO): uno por camino, para que una reparación a medias se vea.
+  const MILLARES: Array<{ camino: string; texto: string; esperado: string; hoy: string }> = [
+    { camino: 'A (sin unidad)', texto: '1.780', esperado: '1780:00', hoy: '1:46:48' },
+    { camino: 'B (horas)', texto: '2.000 horas', esperado: '2000:00', hoy: '2:00' },
+    { camino: 'C (minutos)', texto: '1.500 min', esperado: '25:00', hoy: '0:01:30' },
+  ];
+  for (const { camino, texto, esperado, hoy } of MILLARES) {
+    test(`HALLAZGO (14/11/2026, ABIERTO) · camino ${camino}: «${texto}» es ${esperado}, no ${hoy}`, async ({ page }) => {
+      // El punto seguido de exactamente tres cifras agrupa millares (parseSpanishNumber); hoy
+      // Number(texto.replace(',', '.')) lo lee como decimal y no avisa.
+      test.fail();
+      await escribir(page, LINEA(1), texto);
+      await expect(TOTAL(page)).toHaveText(esperado, { timeout: 2000 });
+    });
+  }
+});

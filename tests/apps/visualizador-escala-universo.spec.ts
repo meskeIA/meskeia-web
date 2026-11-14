@@ -453,3 +453,72 @@ test.describe('visualizador-escala-universo — lo que leen buscadores y asisten
     expect(atomo.dato).not.toMatch(/naranja[^.]*campo de fútbol/);
   });
 });
+
+/**
+ * Cabo C0729 (Inspector, 14/11/2026): tres afirmaciones de los niveles Átomo y Sistema Solar que
+ * la inspección del 12/11 no pudo anclar porque la NASA no estaba en la red de fuentes (C0728).
+ *
+ * ESPERADOS FIJADOS CON SU FUENTE ANTES DE MIRAR LA APP
+ *   (1) Órbita de Plutón. NSSDCA, Pluto Fact Sheet (nssdc.gsfc.nasa.gov/planetary/factsheet/
+ *       plutofact.html): semieje mayor 5.869,656 × 10⁶ km = 39,48168677 UA (elementos medios
+ *       J2000); perihelio 4.434,987 y afelio 7.304,326 × 10⁶ km. Diámetro medio de la órbita:
+ *       2 × 39,48 = 78,96 UA ≈ 1,18 × 10¹³ m. Neptune Fact Sheet (neptunefact.html): semieje
+ *       4.514,953 × 10⁶ km = 30,06896348 UA → diámetro 60,14 UA ≈ 9,03 × 10¹² m.
+ *       9 × 10¹² m ÷ 149.597.870.700 m = 60,16 UA: es el diámetro de la órbita de NEPTUNO. Para
+ *       Plutón no casa ni con el diámetro (79 UA) ni con el radio (39,5 UA) ni con el afelio (48,8).
+ *       Como el resto de niveles dan un diámetro («Diámetro del Sol», «Diámetro de la Tierra»),
+ *       el tamaño del nivel se lee como diámetro de la órbita.
+ *   (2) Voyager 1 «acaba de salir del sistema solar». La ficha NSSDCA de la misión (id 1977-084A,
+ *       nmc/spacecraft/display.action?id=1977-084A) y la página Voyager de NSSDCA
+ *       (planetary/voyager.html) no dan la fecha del cruce de la heliopausa: solo «while searching
+ *       for the heliopause». No se puede anclar en la red: se propone matizar o retirar
+ *       «acaba de salir», como en C0203. Además, «acaba de» envejece con el calendario.
+ *   (3) Hidrógeno «el más pequeño». PubChem, fichas de elemento 1 y 2 (pug_view, «Atomic Radius»):
+ *       van der Waals (Los Alamos National Laboratory) H 120 pm < He 140 pm; covalente (Cordero
+ *       et al., Dalton Trans. 2008) He 28 pm < H 31(5) pm. El orden depende del radio que se use,
+ *       y la app no dice cuál: «el más pequeño» a secas no lo respalda la fuente. «El más ligero»
+ *       o «el más sencillo» sí son ciertos sin matiz.
+ */
+const PLUTON_SEMIEJE_UA = 39.48168677; // NSSDCA, Pluto Fact Sheet
+const NEPTUNO_SEMIEJE_UA = 30.06896348; // NSSDCA, Neptune Fact Sheet
+
+test.describe('visualizador-escala-universo — cabo C0729: Plutón, Voyager 1 y el hidrógeno', () => {
+  test.beforeEach(async ({ page }) => {
+    await abrir(page);
+  });
+
+  test.fail('HALLAZGO (14/11/2026, ABIERTO) · «Órbita de Plutón (~60 UA)» con 9 × 10¹² m: 60 UA es el diámetro de la órbita de Neptuno', async ({ page }) => {
+    // Esperado: si el objeto es Plutón, ~78,96 UA de diámetro (2 × 39,48); si es Neptuno, ~60,14
+    // (2 × 30,07); si el texto dice «radio» o «semieje», el semieje del que nombre. Obtenido:
+    // «Órbita de Plutón (~60 UA)» y tamaño «9 × 10¹² m» = 60,16 UA.
+    // Si se repara conservando Plutón (≈ 1,18 × 10¹³ m), cambian con él la tabla NIVELES de arriba,
+    // la notación «60 UA» del CASO 1 y la comparación de la Vía Láctea con el sistema solar.
+    const t = await elegirNivel(page, 'Sistema Solar');
+    const semieje = /Neptuno/.test(t.objeto) ? NEPTUNO_SEMIEJE_UA : PLUTON_SEMIEJE_UA;
+    const esperadoUA = /radio|semieje/i.test(t.objeto) ? semieje : 2 * semieje;
+    const tamanoUA = aMetros(t.tamano) / UA_M;
+    expect(errorRelativo(tamanoUA, esperadoUA), `«${t.objeto}» con «${t.tamano}» (${tamanoUA.toFixed(2)} UA) frente a ${esperadoUA.toFixed(2)} UA`).toBeLessThan(0.1);
+    const enObjeto = t.objeto.match(/([\d.,]+)\s*UA/);
+    if (enObjeto) {
+      expect(errorRelativo(leerCifra(enObjeto[1]), esperadoUA), `«${t.objeto}» frente a ${esperadoUA.toFixed(2)} UA`).toBeLessThan(0.1);
+    }
+  });
+
+  test.fail('HALLAZGO (14/11/2026, ABIERTO) · «Voyager 1 […] acaba de salir del sistema solar» no se puede anclar en la red de fuentes', async ({ page }) => {
+    // La ficha NSSDCA de Voyager 1 (1977-084A) no fecha el cruce de la heliopausa. Se propone
+    // matizar o retirar «acaba de salir» (C0203). Obtenido: «La sonda Voyager 1 lleva viajando
+    // desde 1977 y acaba de salir del sistema solar.»
+    const t = await elegirNivel(page, 'Sistema Solar');
+    expect(t.dato).not.toMatch(/acaba de salir/);
+  });
+
+  test.fail('HALLAZGO (14/11/2026, ABIERTO) · «Átomo de hidrógeno (el más pequeño)»: por radio covalente el helio es menor', async ({ page }) => {
+    // PubChem: covalente He 28 pm < H 31 pm; van der Waals H 120 pm < He 140 pm. Sin decir qué
+    // radio, «el más pequeño» no lo respalda la fuente. Vale nombrar el radio o decir «el más ligero».
+    const t = await elegirNivel(page, 'Átomo');
+    const absoluto = (texto: string): boolean => /el más pequeño/.test(texto) && !/van der Waals/i.test(texto);
+    expect(absoluto(t.objeto), `tarjeta: «${t.objeto}»`).toBe(false);
+    const fila = (await page.locator('table tbody tr').allTextContents()).find((f) => f.includes('Átomo')) ?? '';
+    expect(absoluto(fila), `tabla: «${fila}»`).toBe(false);
+  });
+});

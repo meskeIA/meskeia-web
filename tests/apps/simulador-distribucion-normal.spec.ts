@@ -2,6 +2,7 @@ import { test, expect, Page, Locator } from '@playwright/test';
 import { esperarHidratacion, sembrarValor } from './_hidratacion';
 import { activarTema, prepararParaMedir } from '../contraste-text-muted-auxiliares';
 import { parseSpanishNumber } from '../../lib/formatters';
+import { leerRespuestaAula } from '../../lib/calculadoras/correctorCasosAula';
 import {
   CASOS,
   TOTAL_CASOS,
@@ -27,7 +28,8 @@ test.use({ launchOptions: { args: [`--host-resolver-rules=MAP stemum.com 127.0.0
  * Inspector — simulador-distribucion-normal (segmento cálculo, riesgo 3)
  *
  * Primera inspección: 31/08/2026. Re-inspección: 29/09/2026 (tras los casos para clase,
- * 9e9c2894), al final del fichero.
+ * 9e9c2894), al final del fichero. Inspección de cambio: 14/11/2026 (motor compartido del
+ * corrector, lectura con punto C0558/C0724 y colores del lienzo), en el último bloque.
  *
  * QUÉ PROMETE
  *   <h1>: «📊 Simulador de Distribución Normal»
@@ -1326,5 +1328,155 @@ test.describe('cabo C0610 · las líneas a/b del lienzo y sus letras', () => {
       if (r < 4.5) fallos.push(`${tema} · rótulo N(0,1): ${hexC0367(rotulo.color)} sobre ${hexC0367(fondo)} = ${r}:1 < 4,5`);
     }
     expect(fallos).toEqual([]);
+  });
+
+  test('inspección de cambio 14/11/2026 · el color de los límites se relee al ir y volver de tema sin recargar', async ({
+    page,
+  }) => {
+    // colorLimite sale de getComputedStyle(canvas) en cada repintado (el MutationObserver de
+    // data-theme). ESPERADO a mano: claro → --naranja-texto #B93E0B (globals.css) · oscuro → el
+    // token es `initial` y queda la reserva #E07A1F · otra vez claro → #B93E0B. Si el valor se
+    // leyera una sola vez al montar, la vuelta al claro se quedaría en el naranja del oscuro.
+    test.setTimeout(60_000);
+    await abrirC0367(page, RUTA, 'light');
+    const vistos: string[] = [];
+    for (const tema of ['light', 'dark', 'light'] as const) {
+      await activarTema(page, tema);
+      await page.evaluate(() => new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r))));
+      const { limites } = await lienzoC0610(page);
+      vistos.push(`${tema} ${hexC0367(limites[0].letra.color)}`);
+    }
+    expect(vistos).toEqual(['light #b93e0b', 'dark #e07a1f', 'light #b93e0b']);
+  });
+});
+
+/*
+ * ═════════════════════════════════════════════════════════════════════════════════════════
+ * INSPECCIÓN DE CAMBIO 14/11/2026 — el corrector de «Casos para clase» tras el motor compartido
+ * (lib/calculadoras/correctorCasosAula.ts: 2221d3155, 03ec46007, cd6270a91, 447183ded y a6f65b119)
+ *
+ * Lo que cambió: la casilla se lee con leerRespuestaAula («X.YYY» es 2,493 o 2493: gana la lectura
+ * decimal solo si queda a ≤ 10 % de la clave, C0558 y C0724), y corregirNumero rechaza lo IMPOSIBLE
+ * según la magnitud de la pregunta (porcentaje 0-100, recuento entero ≥ 0) antes de la tolerancia.
+ *
+ * RESUELTO A MANO ANTES DE ABRIR EL NAVEGADOR (claves de la cabecera de los casos, más arriba)
+ *   Caso 4  z = −1,50 · «-1.500»: decimal −1,5 a 0 de la clave → ¡Correcto!
+ *   Caso 1  89,44 · «89.440» → 89,44 → ¡Correcto! (la española, 89.440, pasaría del 100 %)
+ *   Caso 12 σ = 16,0 · «16.000» → 16 → ¡Correcto!
+ *   Caso 10 493,4 · «492.160» (z = −1,96, el bilateral: 500 − 7,84) → decimal 492,16, a 1,24 de la
+ *           clave (dentro del 10 %: 49,34) → «No es correcto. Te has desviado 1,24 de la respuesta.»
+ *   Caso 11 91 · «1.909» (2000 · 0,9545: los ACEPTADOS en vez de los rechazados) → la decimal 1,909
+ *           queda a 89,09 de 91, fuera de la banda (9,1), así que manda la española: 1909 →
+ *           «No es correcto. Te has desviado 1818 de la respuesta.» (cuatro cifras sin agrupar, RAE).
+ *           Antes de a6f65b119 se leía 1,909 y salía el aviso del recuento con decimales.
+ *   Caso 9  628 · «13.300» (σ² = 10.000 en vez de σ: 500 + 1,28 · 10.000) → la decimal 13,3 queda a
+ *           614,7, fuera de la banda (62,8) → 13300 → «No es correcto. Te has desviado 12.672 de la respuesta.»
+ *   Caso 11 «91,4» → recuento con decimales → «Es un recuento: la respuesta es un número entero, sin decimales.»
+ *   Caso 5  «110» → «Un porcentaje no puede pasar del 100 %: repasa la cuenta.» (con espacio duro) ·
+ *           «−10,56» → «Un porcentaje no puede ser negativo.»
+ * Las catorce, medidas en el navegador el 14/11/2026, dieron exactamente eso.
+ *
+ * Visto y NO registrado (es la regla que a6f65b119 fija a propósito, «cuando ninguna lectura es
+ * buena, manda la española»): en el caso 4, «1.500» (signo olvidado y tres decimales con punto)
+ * se lee 1500 y dice «Te has desviado 1501,5»; con los dos decimales que pide el enunciado,
+ * «1.50», se lee 1,5 y dice «Te has desviado 3».
+ * ═════════════════════════════════════════════════════════════════════════════════════════
+ */
+
+test.describe('inspección de cambio 14/11/2026 · lectura con punto y dominio de la magnitud', () => {
+  test('leerRespuestaAula y comprobarRespuesta con las respuestas resueltas a mano', () => {
+    // Lectura decimal cuando queda cerca de la clave
+    expect(leerRespuestaAula('-1.500', CASOS[3].respuesta)).toBe(-1.5);
+    expect(leerRespuestaAula('89.440', CASOS[0].respuesta)).toBe(89.44);
+    expect(leerRespuestaAula('16.000', CASOS[11].respuesta)).toBe(16);
+    expect(leerRespuestaAula('492.160', CASOS[9].respuesta)).toBe(492.16);
+    // Lectura española cuando la decimal también está lejos (C0724)
+    expect(leerRespuestaAula('1.909', CASOS[10].respuesta)).toBe(1909);
+    expect(leerRespuestaAula('13.300', CASOS[8].respuesta)).toBe(13300);
+
+    expect(comprobarRespuesta(1909, CASOS[10].respuesta, CASOS[10].datos)).toMatchObject({
+      correcto: false,
+      motivo: 'No es correcto. Te has desviado 1818 de la respuesta.',
+    });
+    expect(comprobarRespuesta(13300, CASOS[8].respuesta, CASOS[8].datos).motivo).toBe(
+      'No es correcto. Te has desviado 12.672 de la respuesta.',
+    );
+    expect(comprobarRespuesta(91.4, CASOS[10].respuesta, CASOS[10].datos).motivo).toBe(
+      'Es un recuento: la respuesta es un número entero, sin decimales.',
+    );
+    expect(comprobarRespuesta(110, CASOS[4].respuesta, CASOS[4].datos).motivo).toBe(
+      'Un porcentaje no puede pasar del 100 %: repasa la cuenta.',
+    );
+    expect(comprobarRespuesta(-10.56, CASOS[4].respuesta, CASOS[4].datos).motivo).toBe(
+      'Un porcentaje no puede ser negativo.',
+    );
+    // El tanto por uno sigue teniendo su aviso: 0,1056 está dentro de 0-100
+    expect(comprobarRespuesta(0.1056, CASOS[4].respuesta, CASOS[4].datos).motivo).toContain('tanto por uno');
+  });
+
+  test('en la casilla: aciertos con punto, fallos con punto de millares y respuestas imposibles', async ({ page }) => {
+    const aciertos: [string, string][] = [
+      ['Caso 4: Tipificar una puntuación', '-1.500'],
+      ['Caso 1: El área a la izquierda', '89.440'],
+      ['Caso 12: Averiguar la desviación estándar', '16.000'],
+    ];
+    for (const [caso, respuesta] of aciertos) {
+      await responderCaso(page, caso, respuesta);
+      await expect(avisoCasos(page), `${caso} · «${respuesta}»`).toContainText('¡Correcto!');
+    }
+    const fallos: [string, string, string][] = [
+      ['Caso 10: Las botellas con menos líquido', '492.160', 'No es correcto. Te has desviado 1,24 de la respuesta.'],
+      ['Caso 11: Tornillos rechazados en un lote', '1.909', 'No es correcto. Te has desviado 1818 de la respuesta.'],
+      ['Caso 9: La nota de corte de una beca', '13.300', 'No es correcto. Te has desviado 12.672 de la respuesta.'],
+      ['Caso 11: Tornillos rechazados en un lote', '91,4', 'Es un recuento: la respuesta es un número entero, sin decimales.'],
+      ['Caso 5: Paquetes que pesan de menos', '−10,56', 'Un porcentaje no puede ser negativo.'],
+    ];
+    for (const [caso, respuesta, motivo] of fallos) {
+      await responderCaso(page, caso, respuesta);
+      await expect(avisoCasos(page), `${caso} · «${respuesta}»`).toContainText(motivo);
+    }
+    // El % del aviso va tras un espacio duro (toContainText normaliza los espacios: se lee el texto crudo)
+    await responderCaso(page, 'Caso 5: Paquetes que pesan de menos', '110');
+    await expect(avisoCasos(page)).toContainText('Un porcentaje no puede pasar del 100');
+    expect(await avisoCasos(page).textContent()).toContain('100 %: repasa la cuenta.');
+  });
+
+  test('con la página traducida, Ver/Ocultar y la etiqueta de la probabilidad cambian de rama sin caer', async ({ page }) => {
+    // 4fc83bcd8 y 48639006b: el texto condicional va en un <span> siempre montado. Se simula el
+    // traductor de Chrome (cada nodo de texto → <font><font>) y se alterna. ESPERADO: ningún
+    // error de página, el botón dice «Ocultar …» abierto y «Ver …» cerrado, y la etiqueta da
+    // P(X < -1,00), P(X > -1,00) y P(-1,00 < X < 1,00) con el estado de partida (a = −1, b = 1).
+    const errores: string[] = [];
+    page.on('pageerror', (e) => errores.push(e.message));
+    await seccionCasos(page).getByRole('button', { name: 'Caso 3: Entre dos valores de Z' }).click();
+    await page.evaluate(() => {
+      const recorrido = document.createTreeWalker(document.querySelector('main') ?? document.body, NodeFilter.SHOW_TEXT);
+      const nodos: Text[] = [];
+      for (let n = recorrido.nextNode(); n; n = recorrido.nextNode()) {
+        if (n.nodeValue?.trim() && !n.parentElement?.closest('script,style')) nodos.push(n as Text);
+      }
+      for (const n of nodos) {
+        const fuera = document.createElement('font');
+        const dentro = document.createElement('font');
+        dentro.textContent = n.nodeValue;
+        fuera.appendChild(dentro);
+        n.parentNode?.replaceChild(fuera, n);
+      }
+    });
+    for (const que of ['pista', 'solución']) {
+      await seccionCasos(page).getByRole('button', { name: `Ver ${que}` }).click();
+      const abierto = seccionCasos(page).getByRole('button', { name: `Ocultar ${que}` });
+      await expect(abierto).toHaveAttribute('aria-expanded', 'true');
+      await abierto.click();
+      await expect(seccionCasos(page).getByRole('button', { name: `Ver ${que}` })).toHaveAttribute('aria-expanded', 'false');
+    }
+    const tipos = page.locator('[class*="tipoBtn"]');
+    await tipos.filter({ hasText: 'P(X < a)' }).click();
+    await expect(probLabel(page)).toHaveText('P(X < -1,00)');
+    await tipos.filter({ hasText: 'P(X > a)' }).click();
+    await expect(probLabel(page)).toHaveText('P(X > -1,00)');
+    await tipos.filter({ hasText: 'P(a < X < b)' }).click();
+    await expect(probLabel(page)).toHaveText('P(-1,00 < X < 1,00)');
+    expect(errores).toEqual([]);
   });
 });
