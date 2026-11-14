@@ -22,7 +22,9 @@
  *   ROMPE   1. <button> sin type=            → la corrección es unívoca: type="button"
  *   ROMPE   2. emoji JUNTO A TEXTO sin aria-hidden, también dentro de una cadena que se pinta
  *              ({x ? '⏹️ Detener' : '▶️ Iniciar'}) desde el 14/10/2026: ver `cadenaPintada`;
- *              y las banderas (🇪🇸), desde el mismo día: ver `BANDERA`
+ *              y las banderas (🇪🇸), desde el mismo día: ver `BANDERA`; y el emoji solo
+ *              DELANTE de una etiqueta con texto (`💡 <strong>Clave:</strong>`), desde el
+ *              14/11/2026: ver `pegadoAEtiqueta`
  *   AVISA   3. botón con onClick + className condicional y sin ningún aria-* ni role
  *   AVISA   4. emoji en nodo propio, sin aria-hidden y sin aria-label
  *   AVISA   5. aria-pressed en un botón que al pulsarlo se deshabilita (no se despulsa)
@@ -246,6 +248,46 @@ function cadenaPintada(n) {
   return texto;
 }
 
+/** Texto que se lee de un elemento JSX: sus JsxText, sin emojis ni espacios. */
+function textoLeido(el) {
+  let t = '';
+  const rec = (h) => {
+    if (ts.isJsxText(h)) t += h.text;
+    else if (ts.isJsxElement(h) && atributos(h.openingElement).m.has('aria-hidden')) return;
+    ts.forEachChild(h, rec);
+  };
+  el.children.forEach(rec);
+  return t.replace(SOLO_EMOJI, '');
+}
+
+/**
+ * La etiqueta que va pegada DETRÁS de un nodo de texto que es solo emoji, o `null`.
+ *
+ * `<p>💡 <strong>Consejo:</strong> …</p>`: el JsxText es «💡 » y nada más, así que la regla 4 lo
+ * tomaba por un emoji en nodo propio, cuando el lector de pantalla lo lee pegado a «Consejo»
+ * igual que en `<p>💡 Consejo</p>`. Cuenta como pegada la etiqueta que va justo detrás, en la
+ * MISMA línea (entre el emoji y ella, espacios sin salto), que no está oculta y que tiene texto
+ * con letras o cifras. Un `<br />`, una etiqueta con solo otro emoji, una expresión (`🔥 {n}`) o
+ * la etiqueta en la línea siguiente no cuentan: ahí el emoji puede ser un icono de bloque o el
+ * dato, y sigue pidiendo criterio.
+ *
+ * DE DÓNDE SALE (14/11/2026): el turno de noche del 04/10 lo anotó en su acta
+ * (`conversor-colores` L1125 y L1190, «se queda sin arreglar») y el 14/10 se dejó como aviso
+ * «por ahora», con el tema A activo. Al terminar el tema C, el usuario lo eligió como tema
+ * siguiente del turno: 163 casos en 25 ficheros de apps nunca inspeccionadas (137 son 💡).
+ * Casos: `scripts/pruebas/a11y-emoji-etiqueta.tsx`.
+ */
+function pegadoAEtiqueta(n) {
+  if (n.text.match(/\s*$/)[0].includes('\n')) return null;   // la etiqueta, en otra línea
+  const padre = n.parent;
+  if (!padre || !(ts.isJsxElement(padre) || ts.isJsxFragment(padre))) return null;
+  const hermanos = padre.children;
+  const sig = hermanos[hermanos.indexOf(n) + 1];
+  if (!sig || !ts.isJsxElement(sig)) return null;
+  if (atributos(sig.openingElement).m.has('aria-hidden')) return null;
+  return /[\p{L}\p{N}]/u.test(textoLeido(sig)) ? sig.openingElement.tagName.getText() : null;
+}
+
 // ─── Qué ficheros mirar ───────────────────────────────────────────────────────
 
 const relevante = (f) => f.endsWith('.tsx') && (f.startsWith('app/') || f.startsWith('components/'));
@@ -429,7 +471,10 @@ for (const rel of objetivos()) {
       if (!at.has('aria-hidden')) {
         const soloEmoji = n.text.replace(SOLO_EMOJI, '') === '';
         const txt = n.text.trim().replace(/\s+/g, ' ').slice(0, 45);
-        if (soloEmoji) {
+        const etiqueta = soloEmoji && !at.has('aria-label') ? pegadoAEtiqueta(n) : null;
+        if (etiqueta) {
+          apuntar(errores, n, 'emoji junto a texto', '«' + txt + '» delante de <' + etiqueta + '> → <span aria-hidden="true">');
+        } else if (soloEmoji) {
           // Excepción del CLAUDE.md: un emoji solo que YA tiene aria-label no se envuelve
           if (!at.has('aria-label'))
             apuntar(avisos, n, 'emoji en nodo propio',
