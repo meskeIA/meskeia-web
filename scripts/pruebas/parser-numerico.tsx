@@ -7,7 +7,7 @@
  * verde porque no mira nada — que es exactamente el hallazgo 355 de esta misma ronda.
  *
  * Se ejecuta con:  node scripts/check-parser-numerico.mjs scripts/pruebas/parser-numerico.tsx
- * Debe encontrar los CINCO primeros y ninguno de los cinco últimos.
+ * Debe encontrar los SEIS primeros y ninguno de los seis últimos.
  *
  * Este fichero queda fuera del análisis normal del candado, que solo mira `app/`,
  * `components/` y `lib/`.
@@ -48,6 +48,16 @@ export function debeCazar4(entrada: string): number {
 export function debeCazar5(entrada: string): number {
   const normalizado = entrada.replace(',', '.');
   return parseFloat(normalizado);
+}
+
+/**
+ * 6. Lo tecleado, sin nada que no sea cifra: la forma de `calculadora-ganache` (hallazgo 4597,
+ * cabo C0741). «250,5» se guardaba como «2505» y «-100» como «100», y un `parseInt` del estado,
+ * muchas líneas más abajo, calculaba con eso.
+ */
+export function debeCazar6(e: { target: { value: string } }, guardar: (v: string) => void): void {
+  const val = e.target.value.replace(/[^0-9]/g, '');
+  guardar(val);
 }
 
 // ─── DEBE DEJAR PASAR ─────────────────────────────────────────────────────────
@@ -92,4 +102,12 @@ export function debePasar5(texto: string, cantidadDelSlider: string): string {
   const conPunto = texto.replace(',', '.');
   const cantidad = Number(cantidadDelSlider);
   return `${conPunto} x${cantidad}`;
+}
+
+/**
+ * 10. La misma limpieza sobre algo que no se teclea como cantidad: una semilla de generador o
+ * los dígitos de un IBAN. Quitar lo que no es cifra es aquí lo correcto, y no lleva `.value`.
+ */
+export function debePasar6(semillaManual: string): number {
+  return Number(semillaManual.replace(/\D/g, ''));
 }

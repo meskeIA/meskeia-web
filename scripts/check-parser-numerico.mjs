@@ -123,6 +123,21 @@ const ASIGNA_LA_CONVERSION = /(?:const|let|var)\s+([A-Za-z_$][\w$]*)\s*=/;
 /** Hasta dónde vale la pista. Lo bastante para el patrón real, no tanto como para inventar. */
 const VENTANA_CONVERSION = 5;
 
+/**
+ * Lo que se teclea, limpiado de TODO lo que no es cifra: `e.target.value.replace(/[^0-9]/g, '')`.
+ *
+ * ── De dónde sale (cabo C0741, 14/11/2026) ──
+ * calculadora-ganache leía la cantidad así y la guardaba para un `parseInt` más abajo (hallazgo
+ * 4597): la coma decimal y el signo desaparecían y el campo se reescribía sin ellos, así que
+ * «250,5» g se calculaba como 2505 g y «-100» como 100 g, sin aviso. Este candado solo buscaba
+ * la conversión de la coma (`.replace(',', '.')`) y no lo veía.
+ *
+ * Se exige `.value` delante: la misma limpieza sobre una semilla o un IBAN (`semilla.replace(/\D/g,
+ * '')`, `texto.replace(/\D/g, '')`) es correcta, y no la toca. Un campo que de verdad solo admite
+ * cifras (un código postal, un PIN) lleva el escape.
+ */
+const LIMPIA_LO_TECLEADO = /\.value\s*\.replace\s*\(\s*\/(?:\[\^0-9\]|\[\^\\d\]|\\D)\+?\/g?\s*,\s*(['"])\1\s*\)/;
+
 const ESCAPE = /parser-ok:/;
 
 const relevante = (f) =>
@@ -201,6 +216,24 @@ for (const rel of objetivos()) {
   const convertidas = new Map();
 
   lineas.forEach((texto, i) => {
+    // Forma 3 (C0741): lo tecleado, sin nada que no sea cifra. Basta con la limpieza: el parseo
+    // puede venir muchas líneas después (en ganache, del estado).
+    if (
+      LIMPIA_LO_TECLEADO.test(texto) &&
+      !ESCAPE.test(texto) &&
+      !(i > 0 && ESCAPE.test(lineas[i - 1]))
+    ) {
+      const n = i + 1;
+      const caso = {
+        rel,
+        n,
+        queja: 'lo tecleado pierde la coma decimal y el signo (replace de lo que no es cifra)',
+        texto: texto.trim().slice(0, 90),
+      };
+      const esDelCommit = barrido ? false : tocadas === null || tocadas.has(n);
+      (esDelCommit ? rompen : pasivo).push(caso);
+    }
+
     // Apuntar la conversión que se guarda en una variable, para la forma partida en dos.
     if (REPLACE_DE_LA_COMA.test(texto)) {
       const asignacion = texto.match(ASIGNA_LA_CONVERSION);
