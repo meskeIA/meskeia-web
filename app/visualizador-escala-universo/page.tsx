@@ -64,7 +64,9 @@ const NIVELES: NivelEscala[] = [
     icono: '💠',
     metros: 1e-10,
     notacion: '10⁻¹⁰ m',
-    objeto: 'Átomo de hidrógeno (el más pequeño)',
+    // «El más pequeño» depende del radio (PubChem: covalente He 28 pm < H 31 pm; van der Waals
+    // H 120 pm < He 140 pm); «el más ligero» es cierto sin matiz (hallazgo 4609).
+    objeto: 'Átomo de hidrógeno (el más ligero)',
     comparacion: '100.000 veces más grande que un protón',
     datoCurioso: 'El átomo es casi todo espacio vacío: si el átomo fuera un campo de fútbol de 100 m, su núcleo sería una cabeza de alfiler de 1 mm en el centro, y los electrones se moverían por todo el campo.',
     color: '#3498db',
@@ -174,9 +176,12 @@ const NIVELES: NivelEscala[] = [
     icono: '🪐',
     metros: 9e12,
     notacion: '9 × 10¹² m (60 UA)',
-    objeto: 'Órbita de Plutón (~60 UA)',
+    // 60 UA es el DIÁMETRO de la órbita de Neptuno (NSSDCA, Neptune Fact Sheet: semieje 30,07 UA);
+    // la de Plutón mide unas 79 UA (hallazgo 4607). Voyager 1: sin fecha de salida anclable en la
+    // red de fuentes y «acaba de» envejece (hallazgo 4608); 17 km/s × 45 años ≈ 161 UA ≈ 22 h luz.
+    objeto: 'Órbita de Neptuno (~60 UA de diámetro)',
     comparacion: '6.500 veces el diámetro del Sol',
-    datoCurioso: 'La sonda Voyager 1 lleva viajando desde 1977 y acaba de salir del sistema solar. A 17 km/s, tardó 45 años en recorrer lo que la luz cruza en 22 horas.',
+    datoCurioso: 'La sonda Voyager 1, lanzada en 1977, viaja a unos 17 km/s: en sus primeros 45 años recorrió lo que la luz cruza en unas 22 horas, casi tres veces el diámetro de la órbita de Neptuno.',
     color: '#8E24AA',
   },
   {

@@ -487,13 +487,13 @@ test.describe('visualizador-escala-universo — cabo C0729: Plutón, Voyager 1 y
     await abrir(page);
   });
 
-  test.fail('HALLAZGO (14/11/2026, ABIERTO) · «Órbita de Plutón (~60 UA)» con 9 × 10¹² m: 60 UA es el diámetro de la órbita de Neptuno', async ({ page }) => {
-    // Esperado: si el objeto es Plutón, ~78,96 UA de diámetro (2 × 39,48); si es Neptuno, ~60,14
-    // (2 × 30,07); si el texto dice «radio» o «semieje», el semieje del que nombre. Obtenido:
-    // «Órbita de Plutón (~60 UA)» y tamaño «9 × 10¹² m» = 60,16 UA.
-    // Si se repara conservando Plutón (≈ 1,18 × 10¹³ m), cambian con él la tabla NIVELES de arriba,
-    // la notación «60 UA» del CASO 1 y la comparación de la Vía Láctea con el sistema solar.
+  test('HALLAZGO 4607 (14/11/2026, REPARADO) · el objeto de 60 UA y 9 × 10¹² m es la órbita de Neptuno, no la de Plutón', async ({ page }) => {
+    // Antes: «Órbita de Plutón (~60 UA)» con 9 × 10¹² m = 60,16 UA, que es el diámetro de la órbita
+    // de Neptuno (2 × 30,07). Reparado conservando el tamaño: «Órbita de Neptuno (~60 UA de
+    // diámetro)». Si el objeto es Plutón, ~78,96 UA de diámetro (2 × 39,48); si es Neptuno, ~60,14;
+    // si el texto dice «radio» o «semieje», el semieje del que nombre.
     const t = await elegirNivel(page, 'Sistema Solar');
+    expect(t.objeto).toBe('Órbita de Neptuno (~60 UA de diámetro)');
     const semieje = /Neptuno/.test(t.objeto) ? NEPTUNO_SEMIEJE_UA : PLUTON_SEMIEJE_UA;
     const esperadoUA = /radio|semieje/i.test(t.objeto) ? semieje : 2 * semieje;
     const tamanoUA = aMetros(t.tamano) / UA_M;
@@ -504,21 +504,28 @@ test.describe('visualizador-escala-universo — cabo C0729: Plutón, Voyager 1 y
     }
   });
 
-  test.fail('HALLAZGO (14/11/2026, ABIERTO) · «Voyager 1 […] acaba de salir del sistema solar» no se puede anclar en la red de fuentes', async ({ page }) => {
-    // La ficha NSSDCA de Voyager 1 (1977-084A) no fecha el cruce de la heliopausa. Se propone
-    // matizar o retirar «acaba de salir» (C0203). Obtenido: «La sonda Voyager 1 lleva viajando
-    // desde 1977 y acaba de salir del sistema solar.»
+  test('HALLAZGO 4608 (14/11/2026, REPARADO) · la Voyager 1 ya no «acaba de salir del sistema solar»', async ({ page }) => {
+    // La ficha NSSDCA de Voyager 1 (1977-084A) no fecha el cruce de la heliopausa, y «acaba de»
+    // envejece. Antes: «La sonda Voyager 1 lleva viajando desde 1977 y acaba de salir del sistema
+    // solar.» Ahora el dato dice lo que se puede calcular: 17 km/s × 45 años ≈ 2,41 × 10¹³ m ≈ 161 UA
+    // ≈ 22 h luz, casi tres veces los 60 UA del nivel.
     const t = await elegirNivel(page, 'Sistema Solar');
     expect(t.dato).not.toMatch(/acaba de salir/);
+    expect(t.dato).toContain('casi tres veces el diámetro de la órbita de Neptuno');
+    const recorridoUA = (17e3 * 45 * 365.25 * 86400) / UA_M;
+    expect(recorridoUA / 60.14).toBeGreaterThan(2.5);
+    expect(recorridoUA / 60.14).toBeLessThan(3);
   });
 
-  test.fail('HALLAZGO (14/11/2026, ABIERTO) · «Átomo de hidrógeno (el más pequeño)»: por radio covalente el helio es menor', async ({ page }) => {
+  test('HALLAZGO 4609 (14/11/2026, REPARADO) · el hidrógeno es «el más ligero», no «el más pequeño» sin decir el radio', async ({ page }) => {
     // PubChem: covalente He 28 pm < H 31 pm; van der Waals H 120 pm < He 140 pm. Sin decir qué
-    // radio, «el más pequeño» no lo respalda la fuente. Vale nombrar el radio o decir «el más ligero».
+    // radio, «el más pequeño» no lo respalda la fuente; «el más ligero» es cierto sin matiz.
     const t = await elegirNivel(page, 'Átomo');
     const absoluto = (texto: string): boolean => /el más pequeño/.test(texto) && !/van der Waals/i.test(texto);
     expect(absoluto(t.objeto), `tarjeta: «${t.objeto}»`).toBe(false);
+    expect(t.objeto).toBe('Átomo de hidrógeno (el más ligero)');
     const fila = (await page.locator('table tbody tr').allTextContents()).find((f) => f.includes('Átomo')) ?? '';
     expect(absoluto(fila), `tabla: «${fila}»`).toBe(false);
+    expect(fila).toContain('el más ligero');
   });
 });
