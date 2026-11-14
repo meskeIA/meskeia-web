@@ -24,6 +24,7 @@ const MULTA = SANCION_PRESENTACION_TARDIA_SIN_PERJUICIO;
 const FR = FRACCIONAMIENTO_IRPF;
 
 export const metadata: Metadata = {
+  // anio-ok: «Renta 2026» es el año de la CAMPAÑA, no la vigencia del dato; cambia con la campaña junto a las fechas fijas del cuerpo
   title: 'Checklist Declaración de la Renta 2026 — Documentos y Fechas | meskeIA',
   description: 'Lista de documentos para hacer la renta 2026 (ejercicio 2025). Adaptada a tu perfil: asalariado, autónomo, pensionista, inversor o arrendador. Fechas clave, deducciones y guía paso a paso.',
   keywords: 'checklist declaración renta 2026, documentos renta 2025, qué documentos necesito para la renta, fechas declaración renta, deducciones irpf, borrador renta, renta web',
@@ -33,6 +34,7 @@ export const metadata: Metadata = {
   robots: 'index, follow',
   openGraph: {
     type: 'website',
+    // anio-ok: el año de la campaña, como el title de arriba
     title: 'Checklist Declaración de la Renta 2026 | meskeIA',
     description: 'Todos los documentos que necesitas para hacer la renta, organizados por perfil: asalariado, autónomo, pensionista, inversor y propietario.',
     url: 'https://meskeia.com/checklist-declaracion-renta/',
@@ -47,6 +49,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
+    // anio-ok: el año de la campaña, como el title de arriba
     title: 'Checklist Declaración Renta 2026 | meskeIA',
     description: 'Todos los documentos que necesitas para la renta, por perfil. Asalariado, autónomo, pensionista, inversor, arrendador.',
     images: ['https://meskeia.com/og-image.png']
