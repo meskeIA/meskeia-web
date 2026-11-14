@@ -76,6 +76,28 @@ test.describe('parsearTiempo — minutos y horas con unidad', () => {
   }
 });
 
+/**
+ * Hallazgo 4596 (14/11/2026): el punto seguido de exactamente tres cifras agrupa millares, como en
+ * parseSpanishNumber; con una o dos cifras sigue siendo decimal («7.75» de arriba). A mano:
+ *   «1.780»        = 1780 h × 60 = 106.800 min (antes 1,78 h = 106,8 min)
+ *   «2.000 horas»  = 2000 × 60   = 120.000 min (antes 120)
+ *   «1.500 min»    = 1500 min    (antes 1,5)
+ *   «1.780,5»      = 1780,5 h × 60 = 106.830 min
+ */
+test.describe('parsearTiempo — el punto de millares (hallazgo 4596)', () => {
+  const CASOS: [string, number][] = [
+    ['1.780', 106800],
+    ['2.000 horas', 120000],
+    ['1.500 min', 1500],
+    ['1.780,5', 106830],
+  ];
+  for (const [texto, minutos] of CASOS) {
+    test(`«${texto}» → ${minutos} min`, () => {
+      expect(parsearTiempo(texto)).toBe(minutos);
+    });
+  }
+});
+
 test.describe('parsearTiempo — con palabras', () => {
   const CASOS: [string, number][] = [
     ['media hora', 30],

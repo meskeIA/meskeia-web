@@ -26,6 +26,8 @@
  * «1:75»); solos, sí («90 min» = 1:30).
  */
 
+import { parseSpanishNumber } from '@/lib/formatters';
+
 const MIN_POR_HORA = 60;
 
 /** Horas y minutos sin unidad: «7:45», «7h45», «1:20:30», «7,75», «7». */
@@ -44,10 +46,20 @@ function parsearSinUnidad(cuerpo: string): number | null {
     return Number(h || 0) * MIN_POR_HORA + mins + segs / 60;
   }
 
-  const decimal = normal.replace(',', '.');
-  if (!/^\d*\.?\d*$/.test(decimal) || decimal === '.') return null;
-  // parser-ok: el regex de arriba ya solo deja cifras con un punto decimal («7,75» o «7.75» horas): no hay millares que leer
-  return Number(decimal) * MIN_POR_HORA;
+  const horas = leerCifra(normal);
+  return horas === null ? null : horas * MIN_POR_HORA;
+}
+
+/**
+ * Una cifra en el formato del proyecto, con parseSpanishNumber (hallazgo 4596, 14/11/2026). Hasta
+ * entonces se leía con `Number(x.replace(',', '.'))` y el punto de millares pasaba por decimal:
+ * «1.780» (la jornada anual de un convenio) eran 1,78 h y «1.500 min», 1,5 min. El punto con una o
+ * dos cifras detrás sigue siendo decimal («7.75», «1.5»), y la coma siempre lo es.
+ */
+function leerCifra(texto: string): number | null {
+  if (!/\d/.test(texto)) return null;
+  const n = parseSpanishNumber(texto);
+  return Number.isFinite(n) && n >= 0 ? n : null;
 }
 
 /** Las expresiones con palabras pasan a cifra y unidad antes de leerlas. */
@@ -63,8 +75,9 @@ function traducirPalabras(texto: string): string {
     .replace(/\by\b/g, ' ');
 }
 
+// Las cifras admiten punto de millares («2.000 horas», «1.500 min»): las valida leerCifra.
 const CON_UNIDAD =
-  /^(?:(\d+(?:[.,]\d+)?)\s*(?:h|hr|hrs|horas?))?\s*(?:(\d+(?:[.,]\d+)?)\s*(min|mins|minutos?|m)?)?$/;
+  /^(?:(\d+(?:[.,]\d+)*)\s*(?:h|hr|hrs|horas?))?\s*(?:(\d+(?:[.,]\d+)*)\s*(min|mins|minutos?|m)?)?$/;
 
 /** Cantidades con unidad: «45 min», «1 h 20», «2 horas», «1h20m». */
 function parsearConUnidad(texto: string): number | null {
@@ -75,10 +88,9 @@ function parsearConUnidad(texto: string): number | null {
   // Una cifra suelta sin unidad no llega aquí (es horas), y «7 45» tampoco es una cantidad.
   if (horasTxt === undefined && unidadMin === undefined) return null;
 
-  // parser-ok: CON_UNIDAD solo captura \d+ con un decimal opcional ([.,]\d+): no hay millares ni texto que leer
-  const horas = horasTxt === undefined ? 0 : Number(horasTxt.replace(',', '.'));
-  // parser-ok: CON_UNIDAD solo captura \d+ con un decimal opcional ([.,]\d+): no hay millares ni texto que leer
-  const minutos = minutosTxt === undefined ? 0 : Number(minutosTxt.replace(',', '.'));
+  const horas = horasTxt === undefined ? 0 : leerCifra(horasTxt);
+  const minutos = minutosTxt === undefined ? 0 : leerCifra(minutosTxt);
+  if (horas === null || minutos === null) return null;
   if (horasTxt !== undefined && minutosTxt !== undefined) {
     // Junto a unas horas, los minutos son los del reloj: ni decimales en las horas ni 60 o más.
     if (!Number.isInteger(horas) || minutos >= 60) return null;

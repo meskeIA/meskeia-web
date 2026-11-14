@@ -439,7 +439,7 @@ test.describe('Inspector 02/11/2026 · FAQ visible y FAQPage', () => {
  *     «1e3» (lo que parseFloat sí aceptaba), «1,5 horas 20 min» (decimales en las horas junto a
  *     minutos), «1 h 60 min» (60 o más junto a horas), «45,5,5 min».
  *
- *   HALLAZGO (14/11/2026, ABIERTO) · el punto de millares se lee como decimal en los tres caminos.
+ *   HALLAZGO 4596 (14/11/2026, REPARADO el mismo día) · el punto de millares se leía como decimal en los tres caminos.
  *     El parser-ok de a4743803f dice «no hay millares que leer», pero los dos regex dejan pasar un
  *     punto seguido de exactamente tres cifras, que en el formato del proyecto es el de millares
  *     (CLAUDE.md global §2: «1.234,56»; parseSpanishNumber, lib/formatters.ts: «el punto solo
@@ -528,17 +528,18 @@ test.describe('Inspector 14/11/2026 · los tres Number con la coma cambiada (a47
     }
   });
 
-  // HALLAZGO (14/11/2026, ABIERTO): uno por camino, para que una reparación a medias se vea.
+  // HALLAZGO 4596 (14/11/2026, REPARADO en /reparar el mismo día: leerCifra con
+  // parseSpanishNumber en lib/calculadoras/horas.ts). Uno por camino, para que una reparación a
+  // medias se vea.
   const MILLARES: Array<{ camino: string; texto: string; esperado: string; hoy: string }> = [
     { camino: 'A (sin unidad)', texto: '1.780', esperado: '1780:00', hoy: '1:46:48' },
     { camino: 'B (horas)', texto: '2.000 horas', esperado: '2000:00', hoy: '2:00' },
     { camino: 'C (minutos)', texto: '1.500 min', esperado: '25:00', hoy: '0:01:30' },
   ];
   for (const { camino, texto, esperado, hoy } of MILLARES) {
-    test(`HALLAZGO (14/11/2026, ABIERTO) · camino ${camino}: «${texto}» es ${esperado}, no ${hoy}`, async ({ page }) => {
-      // El punto seguido de exactamente tres cifras agrupa millares (parseSpanishNumber); hoy
-      // Number(texto.replace(',', '.')) lo lee como decimal y no avisa.
-      test.fail();
+    test(`HALLAZGO 4596 (14/11/2026, REPARADO) · camino ${camino}: «${texto}» es ${esperado}, no ${hoy}`, async ({ page }) => {
+      // El punto seguido de exactamente tres cifras agrupa millares (parseSpanishNumber); antes
+      // Number(texto.replace(',', '.')) lo leía como decimal y no avisaba.
       await escribir(page, LINEA(1), texto);
       await expect(TOTAL(page)).toHaveText(esperado, { timeout: 2000 });
     });

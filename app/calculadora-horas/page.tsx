@@ -203,13 +203,14 @@ export default function CalculadoraHorasPage() {
   const factorErroneo = factorNumero !== null && segundosOperados === null;
 
   // ── Modo 2 ────────────────────────────────────────────────
-  const pausaMinutos = pausa.trim() === '' ? 0 : Number(pausa.replace(',', '.'));
+  // parseSpanishNumber, como el motor (hallazgo 4596): «1.000» son mil, no 1,0.
+  const pausaMinutos = pausa.trim() === '' ? 0 : parseSpanishNumber(pausa);
   const pausaValida = Number.isFinite(pausaMinutos) && pausaMinutos >= 0;
   const turno = pausaValida ? duracionTurno(entrada, salida, Math.round(pausaMinutos)) : null;
 
   // ── Modo 3 ────────────────────────────────────────────────
   const turnosSemana = dias.map((dia) => {
-    const pausaDia = dia.pausa.trim() === '' ? 0 : Number(dia.pausa.replace(',', '.'));
+    const pausaDia = dia.pausa.trim() === '' ? 0 : parseSpanishNumber(dia.pausa);
     if (!Number.isFinite(pausaDia) || pausaDia < 0) return null;
     return duracionTurno(dia.entrada, dia.salida, Math.round(pausaDia));
   });
@@ -221,7 +222,7 @@ export default function CalculadoraHorasPage() {
   const diasConDatos = turnosSemana.filter((t) => t !== null && t.minutos > 0).length;
 
   const jornadaMinutos = (() => {
-    const valor = Number(jornadaPactada.replace(',', '.'));
+    const valor = parseSpanishNumber(jornadaPactada);
     return Number.isFinite(valor) && valor > 0 ? Math.round(valor * 60) : null;
   })();
   const diferencia = jornadaMinutos !== null ? totalSemana - jornadaMinutos : null;
