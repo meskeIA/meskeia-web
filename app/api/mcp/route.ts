@@ -2257,7 +2257,6 @@ function crearServidorMCP(): McpServer {
         `🌡️ Temperatura de trabajo: ${r.temperatura_trabajo_c}`,
         ``,
         `✨ Usos: ${r.usos.join(' · ')}`,
-        `📝 Nota: ${r.nota}`,
       ].join('\n');
 
       return { content: [{ type: 'text', text: lineas }] };

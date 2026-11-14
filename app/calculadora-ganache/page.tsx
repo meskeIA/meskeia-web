@@ -254,12 +254,6 @@ export default function CalculadoraGanachePage() {
               </ul>
             </div>
 
-            {resultado.nota && (
-              <div className={styles.notaBox}>
-                <span aria-hidden="true">💡</span>
-                <span><strong>Marcas de referencia:</strong> {resultado.nota}</span>
-              </div>
-            )}
           </section>
         )}
 

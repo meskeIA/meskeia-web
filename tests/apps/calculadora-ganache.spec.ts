@@ -48,6 +48,7 @@ import { comprobarFaqPageUnico } from './_faqpage-unico';
  *      de cacao se solapan (70 % es Negro Extra y Negro a la vez).
  *   E. Formato: «2.2:1» con punto decimal, «%» pegado y «109g» sin espacio en la tabla.
  *   F. «Marcas de referencia»: Callebaut W2 sale como chocolate con leche y como blanco.
+ *      RESUELTO (C0742): el bloque se retiró de la app y del MCP.
  *   G. «0% cacao» para el blanco, que por el RD 1055/2003 lleva al menos un 20 % de manteca de cacao.
  *   H. «Los bombones con relleno de trufa duran 2–3 semanas en nevera», sin fuente.
  *   I. La región aria-live del resultado nace con el resultado dentro.
@@ -365,20 +366,17 @@ test.describe('calculadora-ganache — Inspector 14/11/2026', () => {
     expect(leche[1]).toBeLessThan(semi[0]);
   });
 
-  // HALLAZGO (14/11/2026, ABIERTO) — F: el mismo producto como chocolate con leche y como blanco.
-  test('Marcas · el chocolate con leche y el blanco no citan el mismo producto', async ({ page }) => {
-    test.fail();
-    const nota = async (tipo: Tipo): Promise<string[]> => {
+  // HALLAZGO F (14/11/2026) — RESUELTO por decisión del usuario (C0742): el bloque se RETIRA, no se
+  // corrige. Antes: con leche «Valrhona Jivara, Callebaut W2» · blanco «Callebaut W2, Valrhona Ivoire».
+  test('Marcas · el resultado no cita marcas comerciales', async ({ page }) => {
+    for (const tipo of ['negro_extra', 'negro', 'semi_fondant', 'con_leche', 'blanco'] as Tipo[]) {
       await elegir(page, tipo, 'trufa');
       await pulsarCalcular(page);
       const texto = ((await zonaResultado(page).textContent()) ?? '').replace(/\s+/g, ' ');
-      const m = texto.match(/Marcas de referencia:\s*(.+)$/);
-      return m ? m[1].split(',').map((s) => s.trim()) : [];
-    };
-    const leche = await nota('con_leche');
-    const blanco = await nota('blanco');
-    // Obtenido el 14/11/2026: con leche «Valrhona Jivara, Callebaut W2» · blanco «Callebaut W2, Valrhona Ivoire»
-    expect(leche.filter((p) => blanco.includes(p))).toEqual([]);
+      // Control: el resultado está pintado (el rango de cacao se queda)
+      expect(texto, tipo).toMatch(/cacao/);
+      expect(texto, tipo).not.toMatch(/Marcas de referencia|Callebaut|Valrhona|Lindt|Nestlé/);
+    }
   });
 
   // HALLAZGO (14/11/2026, ABIERTO) — G: RD 1055/2003, anexo 1.9: el blanco lleva ≥ 20 % de manteca de cacao.

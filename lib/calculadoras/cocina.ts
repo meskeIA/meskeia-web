@@ -686,7 +686,6 @@ export interface ResultadoGanache {
   ratio_texto: string;
   temperatura_trabajo_c: string;
   usos: string[];
-  nota: string;
 }
 
 const RATIOS_GANACHE: Record<TipoChocolate, Record<TexturaGanache, number>> = {
@@ -698,12 +697,14 @@ const RATIOS_GANACHE: Record<TipoChocolate, Record<TexturaGanache, number>> = {
   blanco:        { glaseado: 3.0, trufa: 4.0, firme: 5.0 },
 };
 
-const INFO_CHOCOLATE: Record<TipoChocolate, { rango: string; notas: string }> = {
-  negro_extra:  { rango: '70–99% cacao', notas: 'Valrhona Guanaja, Lindt 70%+' },
-  negro:        { rango: '55–70% cacao', notas: 'Callebaut 811, Nestlé Postres' },
-  semi_fondant: { rango: '40–55% cacao', notas: 'Chocolates de cobertura medios' },
-  con_leche:    { rango: '28–40% cacao', notas: 'Valrhona Jivara, Callebaut W2' },
-  blanco:       { rango: '0% cacao (manteca)', notas: 'Callebaut W2, Valrhona Ivoire' },
+// Sin marcas comerciales (C0742, 14/11/2026): caducan, se leen como recomendación de compra y
+// no hay fuente oficial con la que verificarlas.
+const INFO_CHOCOLATE: Record<TipoChocolate, { rango: string }> = {
+  negro_extra:  { rango: '70–99% cacao' },
+  negro:        { rango: '55–70% cacao' },
+  semi_fondant: { rango: '40–55% cacao' },
+  con_leche:    { rango: '28–40% cacao' },
+  blanco:       { rango: '0% cacao (manteca)' },
 };
 
 const USOS_GANACHE: Record<TexturaGanache, string[]> = {
@@ -743,7 +744,6 @@ export function calcularGanache(
     ratio_texto: `Chocolate:Nata = ${ratioSimplificado} (${ratio} partes chocolate : 1 parte nata)`,
     temperatura_trabajo_c: TEMPERATURA_TRABAJO[textura],
     usos: USOS_GANACHE[textura],
-    nota: INFO_CHOCOLATE[tipo_chocolate].notas,
   };
 }
 

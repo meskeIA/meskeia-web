@@ -57,7 +57,6 @@ export async function POST(req: NextRequest) {
       ratio: r.ratio_texto,
       temperatura_trabajo: r.temperatura_trabajo_c,
       usos: r.usos,
-      nota_chocolate: r.nota,
     }, { headers: corsHeaders(origin) });
 
   } catch {
