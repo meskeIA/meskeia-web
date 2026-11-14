@@ -1,5 +1,13 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
+import { PORCENTAJES_IVA, SECCIONES_IAE, TRAMOS_RETA_2025 } from '@/data/fiscal';
+import { formatCurrency } from '@/lib/formatters';
+
+// Datos del FAQPage tomados de data/fiscal (hallazgos 4695 y 4696): la retención de las
+// actividades profesionales (cnae-iae.ts) y la cuota mínima de la tabla del RETA.
+const PROFESIONAL = SECCIONES_IAE.find((s) => s.seccion === '2ª');
+const CUOTA_MINIMA = formatCurrency(Math.min(...TRAMOS_RETA_2025.map((t) => t.cuotaMinima)));
+const pct = (n: number | null | undefined): string => `${n ?? 0} %`;
 
 export const metadata: Metadata = {
   title: 'Orientador Tarifa Freelance - Calcula tu Precio por Hora | meskeIA',
@@ -12,7 +20,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     title: 'Orientador Tarifa Freelance | meskeIA',
-    description: 'Descubre cuánto deberías cobrar como freelance. Calcula tu tarifa hora/día/proyecto considerando todos los gastos e impuestos.',
+    description: 'Descubre cuánto deberías cobrar como freelance. Calcula tu tarifa por hora, día y semana con tus gastos, la cuota de autónomos y el IRPF.',
     url: 'https://meskeia.com/orientador-tarifa-freelance/',
     siteName: 'meskeIA',
     locale: 'es_ES',
@@ -39,11 +47,12 @@ export const jsonLd = generateWebAppSchema({
   features: [
     'Cálculo de tarifa por hora, día y semana según ingresos objetivo',
     'Desglose completo de gastos fijos y variables personalizables',
-    'Estimación de IRPF con fórmula correcta sobre rendimiento neto',
+    'IRPF estimado con la escala por tramos y el mínimo personal sobre el rendimiento neto',
+    'Cuota de autónomos según el tramo de rendimiento de la tabla de cotización',
     'Proyección anual de facturación, gastos y beneficio neto',
     'Cálculo de horas y días facturables descontando vacaciones y festivos',
     'Margen de beneficio configurable para imprevistos',
-    'Comparativa de tarifa con y sin IVA (21%)',
+    'Tarifa con y sin IVA (general, reducido, superreducido o exento)',
   ],
 });
 
@@ -80,7 +89,7 @@ export const faqJsonLd = {
       name: '¿Por qué los freelances deben cobrar más que un empleado con el mismo sueldo?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Un freelance asume costes que en una relación laboral paga la empresa: cuota de autónomo (desde 200 € al mes), herramientas, seguros, formación, gestión contable y los periodos sin facturar. Además, no cobra vacaciones pagadas ni tiene derecho a prestación por desempleo en condiciones estándar. Por eso es habitual que la tarifa freelance supere en un 40-70% el equivalente salarial.',
+        text: `Un freelance asume costes que en una relación laboral paga la empresa: cuota de autónomo (desde ${CUOTA_MINIMA} al mes en la tabla de cotización vigente), herramientas, seguros, formación, gestión contable y los periodos sin facturar. Además, no cobra vacaciones pagadas ni tiene derecho a prestación por desempleo en condiciones estándar. Por eso es habitual que la tarifa freelance supere en un 40-70 % el equivalente salarial.`,
       },
     },
     {
@@ -88,7 +97,7 @@ export const faqJsonLd = {
       name: '¿Cómo afecta el IVA y el IRPF a la tarifa que cobro como autónomo?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El IVA (generalmente 21% en servicios profesionales) se añade a tu tarifa neta y lo repercutes al cliente; no es un ingreso tuyo, sino que lo ingresas trimestralmente a Hacienda. El IRPF se retiene en la factura (habitualmente 15% para autónomos con más de dos años de actividad) y actúa como pago a cuenta del impuesto anual. Ambos conceptos deben tenerse en cuenta al negociar tarifas para no confundir ingresos brutos con ingresos reales.',
+        text: `El IVA (generalmente el ${pct(PORCENTAJES_IVA.general)} en servicios profesionales) se añade a tu tarifa y lo repercutes al cliente; no es un ingreso tuyo, sino que lo ingresas trimestralmente a Hacienda. En las actividades profesionales, las facturas a empresas y a otros profesionales llevan retención de IRPF: el ${pct(PROFESIONAL?.tipoRetencion)} con carácter general y el ${pct(PROFESIONAL?.tipoRetencionInicio)} durante el año de inicio de la actividad y los dos siguientes. Es un pago a cuenta del impuesto anual, que se calcula por tramos sobre el rendimiento neto. Ambos conceptos deben tenerse en cuenta al negociar tarifas para no confundir ingresos brutos con ingresos reales.`,
       },
     },
   ],

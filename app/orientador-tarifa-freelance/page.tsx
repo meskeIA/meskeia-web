@@ -4,8 +4,9 @@ import { useState, useMemo } from 'react';
 import styles from './OrientadorTarifaFreelance.module.css';
 import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard, RegionBadge } from '@/components';
 import DataReference from '@/components/DataReference';
-import { FISCAL_AUTONOMOS_META } from '@/data/fiscal';
+import { FISCAL_AUTONOMOS_META, PORCENTAJES_IVA, SECCIONES_IAE, TRAMOS_RETA_2025 } from '@/data/fiscal';
 import { formatCurrency, formatNumber, parseSpanishNumber } from '@/lib';
+import { calcularTarifa } from './motor';
 
 interface GastoItem {
   id: string;
@@ -13,13 +14,43 @@ interface GastoItem {
   importe: string;
 }
 
+/** «21 %» con espacio duro (CLAUDE.md §2). */
+const pct = (n: number): string => `${formatNumber(n, Number.isInteger(n) ? 0 : 1)} %`;
+
+// Retenciones de las actividades profesionales, de data/fiscal/cnae-iae.ts (sección 2.ª del IAE):
+// general (art. 101.5.a LIRPF) y del año de inicio y los dos siguientes (art. 95.1 RIRPF).
+const SECCION_PROFESIONAL = SECCIONES_IAE.find((s) => s.seccion === '2ª');
+const RETENCION_GENERAL = SECCION_PROFESIONAL?.tipoRetencion ?? 0;
+const RETENCION_INICIO = SECCION_PROFESIONAL?.tipoRetencionInicio ?? 0;
+
+// Horquilla de cuotas de la tabla de cotización del RETA (TRAMOS_RETA_2025).
+const CUOTA_RETA_MINIMA = Math.min(...TRAMOS_RETA_2025.map((t) => t.cuotaMinima));
+const CUOTA_RETA_MAXIMA = Math.max(...TRAMOS_RETA_2025.map((t) => t.cuotaMaxima));
+
+/** Lee un campo: NaN si está vacío o no es un número (un 0 es un 0, no el valor por defecto). */
+const leer = (texto: string): number => parseSpanishNumber(texto);
+
+/**
+ * Un importe de gasto vacío cuenta como 0; uno que no es un número o es negativo no se suma y se
+ * avisa (hallazgo 4698: un −200 restaba del total en silencio).
+ */
+function importeInvalido(g: GastoItem): boolean {
+  if (g.importe.trim() === '') return false;
+  const v = leer(g.importe);
+  return Number.isNaN(v) || v < 0;
+}
+
+function importeValido(g: GastoItem): number {
+  return importeInvalido(g) || g.importe.trim() === '' ? 0 : leer(g.importe);
+}
+
 export default function OrientadorTarifaFreelancePage() {
   // Estado: Ingresos objetivo
   const [ingresoNetoDeseado, setIngresoNetoDeseado] = useState('2000');
 
-  // Estado: Gastos fijos mensuales
+  // Estado: Gastos fijos mensuales. La cuota de autónomos no va aquí: la calcula el motor con la
+  // tabla de cotización según el rendimiento (hallazgo 4693: era un literal de 300 €).
   const [gastosFijos, setGastosFijos] = useState<GastoItem[]>([
-    { id: '1', concepto: 'Cuota autónomos', importe: '300' },
     { id: '2', concepto: 'Alquiler oficina/coworking', importe: '0' },
     { id: '3', concepto: 'Internet y teléfono', importe: '50' },
     { id: '4', concepto: 'Software y herramientas', importe: '30' },
@@ -40,9 +71,10 @@ export default function OrientadorTarifaFreelancePage() {
   const [diasEnfermedad, setDiasEnfermedad] = useState('5');
   const [porcentajeOcupacion, setPorcentajeOcupacion] = useState('70');
 
-  // Estado: Impuestos
-  const [tipoIRPF, setTipoIRPF] = useState('21');
-  const [tipoIVA, setTipoIVA] = useState('21');
+  // Estado: Impuestos. La retención solo es el pago a cuenta que adelanta el cliente: el IRPF lo
+  // calcula el motor con la escala (hallazgo 4690).
+  const [tipoRetencion, setTipoRetencion] = useState(String(RETENCION_GENERAL));
+  const [tipoIVA, setTipoIVA] = useState(String(PORCENTAJES_IVA.general));
 
   // Estado: Margen
   const [margenBeneficio, setMargenBeneficio] = useState('15');
@@ -75,78 +107,59 @@ export default function OrientadorTarifaFreelancePage() {
   };
 
   // Cálculos
+  // Cálculos. Cada campo se lee con NaN si está vacío: un 0 legítimo es 0 (hallazgos 4691 y 4692:
+  // `|| defecto` cambiaba el margen 0 por 15 % y el IVA exento por el 21 %).
   const calculos = useMemo(() => {
-    const ingresoNeto = parseSpanishNumber(ingresoNetoDeseado) || 0;
-    const horas = parseSpanishNumber(horasSemanales) || 40;
-    const vacaciones = parseSpanishNumber(diasVacaciones) || 22;
-    const festivos = parseSpanishNumber(diasFestivos) || 14;
-    const enfermedad = parseSpanishNumber(diasEnfermedad) || 5;
-    const ocupacion = (parseSpanishNumber(porcentajeOcupacion) || 70) / 100;
-    const irpf = (parseSpanishNumber(tipoIRPF) || 21) / 100;
-    const iva = (parseSpanishNumber(tipoIVA) || 21) / 100;
-    const margen = (parseSpanishNumber(margenBeneficio) || 15) / 100;
+    const ingresoNeto = leer(ingresoNetoDeseado);
+    const horas = leer(horasSemanales);
+    const vacaciones = leer(diasVacaciones);
+    const festivos = leer(diasFestivos);
+    const enfermedad = leer(diasEnfermedad);
+    const ocupacion = leer(porcentajeOcupacion);
+    const retencion = leer(tipoRetencion);
+    const iva = leer(tipoIVA);
+    const margen = leer(margenBeneficio);
 
-    // Total gastos mensuales
-    const totalGastosFijos = gastosFijos.reduce((sum, g) => sum + (parseSpanishNumber(g.importe) || 0), 0);
-    const totalGastosVariables = gastosVariables.reduce((sum, g) => sum + (parseSpanishNumber(g.importe) || 0), 0);
+    const totalGastosFijos = gastosFijos.reduce((sum, g) => sum + importeValido(g), 0);
+    const totalGastosVariables = gastosVariables.reduce((sum, g) => sum + importeValido(g), 0);
     const totalGastosMensuales = totalGastosFijos + totalGastosVariables;
+    const hayGastoInvalido = [...gastosFijos, ...gastosVariables].some(importeInvalido);
 
-    // Días laborables reales al año
-    const diasLaborablesAno = 365 - (52 * 2) - vacaciones - festivos - enfermedad; // 365 - fines de semana - vacaciones - festivos - enfermedad
-    const diasFacturablesAno = diasLaborablesAno * ocupacion;
-    const diasFacturablesMes = diasFacturablesAno / 12;
+    const problemas: string[] = [];
+    if (Number.isNaN(ingresoNeto) || ingresoNeto < 0) problemas.push('el ingreso neto mensual');
+    if (Number.isNaN(horas) || horas <= 0) problemas.push('las horas semanales (al menos 1)');
+    if ([vacaciones, festivos, enfermedad].some((d) => Number.isNaN(d) || d < 0)) problemas.push('los días de vacaciones, festivos y enfermedad');
+    if (Number.isNaN(ocupacion) || ocupacion <= 0) problemas.push('el porcentaje de ocupación facturable');
+    if (Number.isNaN(margen) || margen < 0) problemas.push('el margen de seguridad');
+    if (problemas.length === 0 && 365 - 104 - vacaciones - festivos - enfermedad <= 0) {
+      problemas.push('los días libres (dejan el año sin días laborables)');
+    }
 
-    // Horas facturables
-    const horasDia = horas / 5; // Horas por día laboral
-    const horasFacturablesAno = diasFacturablesAno * horasDia;
-    const horasFacturablesMes = horasFacturablesAno / 12;
+    const resultado = problemas.length === 0
+      ? calcularTarifa({
+          netoMensual: ingresoNeto,
+          gastosMensuales: totalGastosMensuales,
+          horasSemanales: horas,
+          diasVacaciones: vacaciones,
+          diasFestivos: festivos,
+          diasEnfermedad: enfermedad,
+          ocupacion,
+          iva: Number.isNaN(iva) ? 0 : iva,
+          margen,
+          retencion: Number.isNaN(retencion) ? 0 : retencion,
+        })
+      : null;
 
-    // Ingresos brutos necesarios (antes de IRPF)
-    // El IRPF recae sobre el rendimiento neto (facturación - gastos), no sobre los gastos.
-    // Facturación = ingresoNeto / (1 - irpf) + gastos
-    const brutoAntesIRPFMensual = ingresoNeto / (1 - irpf) + totalGastosMensuales;
-    const brutoConMargenMensual = brutoAntesIRPFMensual * (1 + margen);
+    return { totalGastosFijos, totalGastosVariables, totalGastosMensuales, hayGastoInvalido, problemas, resultado };
+  }, [ingresoNetoDeseado, gastosFijos, gastosVariables, horasSemanales, diasVacaciones, diasFestivos, diasEnfermedad, porcentajeOcupacion, tipoRetencion, tipoIVA, margenBeneficio]);
 
-    // Tarifas
-    const tarifaHora = horasFacturablesMes > 0 ? brutoConMargenMensual / horasFacturablesMes : 0;
-    const tarifaDia = diasFacturablesMes > 0 ? brutoConMargenMensual / diasFacturablesMes : 0;
-    const tarifaSemana = tarifaDia * 5;
-
-    // Con IVA
-    const tarifaHoraConIVA = tarifaHora * (1 + iva);
-    const tarifaDiaConIVA = tarifaDia * (1 + iva);
-    const tarifaSemanaConIVA = tarifaSemana * (1 + iva);
-
-    // Anuales
-    const facturacionAnual = brutoConMargenMensual * 12;
-    const gastosAnuales = totalGastosMensuales * 12;
-    // IRPF se aplica sobre el rendimiento neto (facturación - gastos deducibles), no sobre la facturación bruta
-    const rendimientoNetoAnual = facturacionAnual - gastosAnuales;
-    const irpfAnual = rendimientoNetoAnual * irpf;
-    const beneficioNetoAnual = facturacionAnual - gastosAnuales - irpfAnual;
-
-    return {
-      totalGastosFijos,
-      totalGastosVariables,
-      totalGastosMensuales,
-      diasLaborablesAno,
-      diasFacturablesAno,
-      diasFacturablesMes,
-      horasFacturablesAno,
-      horasFacturablesMes,
-      brutoConMargenMensual,
-      tarifaHora,
-      tarifaDia,
-      tarifaSemana,
-      tarifaHoraConIVA,
-      tarifaDiaConIVA,
-      tarifaSemanaConIVA,
-      facturacionAnual,
-      gastosAnuales,
-      irpfAnual,
-      beneficioNetoAnual,
-    };
-  }, [ingresoNetoDeseado, gastosFijos, gastosVariables, horasSemanales, diasVacaciones, diasFestivos, diasEnfermedad, porcentajeOcupacion, tipoIRPF, tipoIVA, margenBeneficio]);
+  const r = calculos.resultado;
+  /** Cifra para una tarjeta, o «—» si faltan datos. */
+  const cifra = (valor: number | undefined, decimales: number): string => (valor === undefined ? '—' : formatNumber(valor, decimales));
+  const euros = (valor: number | undefined): string => (valor === undefined ? '—' : formatCurrency(valor));
+  const resumenVivo = r
+    ? `Tarifa recomendada: ${formatCurrency(r.tarifaHora)} por hora, ${formatCurrency(r.tarifaDia)} por día, sin IVA.`
+    : `Sin tarifa: revisa ${calculos.problemas.join(', ')}.`;
 
   return (
     <div className={styles.container}>
@@ -155,7 +168,7 @@ export default function OrientadorTarifaFreelancePage() {
       <header className={styles.hero}>
         <h1 className={styles.title}><span aria-hidden="true">💼</span> Orientador Tarifa Freelance</h1>
         <p className={styles.subtitle}>
-          Calcula tu tarifa por hora, día y proyecto considerando todos tus gastos, impuestos y vacaciones. Evita cobrar de menos.
+          Calcula tu tarifa por hora, día y semana considerando tus gastos, la cuota de autónomos, el IRPF y las vacaciones. Evita cobrar de menos.
         </p>
       </header>
 
@@ -185,6 +198,10 @@ export default function OrientadorTarifaFreelancePage() {
           <section className={styles.section}>
             <h2 className={styles.sectionTitle}><span aria-hidden="true">📋</span> Gastos Fijos Mensuales</h2>
             <p className={styles.sectionDesc}>Gastos que pagas cada mes independientemente de tu facturación</p>
+            <p className={styles.notaCuota}>
+              La cuota de autónomos no se escribe aquí: la calcula la herramienta con la tabla de cotización según el
+              rendimiento que sale de tu tarifa (base mínima de su tramo). Con tarifa plana o una base más alta pagarías otra cuota.
+            </p>
 
             <div className={styles.gastosLista}>
               {gastosFijos.map((gasto, index) => (
@@ -206,6 +223,8 @@ export default function OrientadorTarifaFreelancePage() {
                       onChange={(e) => actualizarGastoFijo(gasto.id, 'importe', e.target.value)}
                       placeholder="0"
                       aria-label={`Importe del gasto fijo ${index + 1} en euros`}
+                      aria-invalid={importeInvalido(gasto)}
+                      aria-describedby={importeInvalido(gasto) ? 'aviso-gastos-fijos' : undefined}
                     />
                     <span className={styles.gastoSuffix}>€</span>
                   </div>
@@ -223,6 +242,9 @@ export default function OrientadorTarifaFreelancePage() {
             <button type="button" className={styles.btnAgregar} onClick={agregarGastoFijo}>
               + Añadir gasto fijo
             </button>
+            <p id="aviso-gastos-fijos" className={styles.avisoGasto} role="alert">
+              {gastosFijos.some(importeInvalido) ? 'Un gasto no puede ser negativo ni llevar letras: ese importe no se suma.' : ''}
+            </p>
             <div className={styles.subtotal}>
               Subtotal gastos fijos: <strong>{formatCurrency(calculos.totalGastosFijos)}</strong>/mes
             </div>
@@ -253,6 +275,8 @@ export default function OrientadorTarifaFreelancePage() {
                       onChange={(e) => actualizarGastoVariable(gasto.id, 'importe', e.target.value)}
                       placeholder="0"
                       aria-label={`Importe del gasto variable ${index + 1} en euros`}
+                      aria-invalid={importeInvalido(gasto)}
+                      aria-describedby={importeInvalido(gasto) ? 'aviso-gastos-variables' : undefined}
                     />
                     <span className={styles.gastoSuffix}>€</span>
                   </div>
@@ -270,6 +294,9 @@ export default function OrientadorTarifaFreelancePage() {
             <button type="button" className={styles.btnAgregar} onClick={agregarGastoVariable}>
               + Añadir gasto variable
             </button>
+            <p id="aviso-gastos-variables" className={styles.avisoGasto} role="alert">
+              {gastosVariables.some(importeInvalido) ? 'Un gasto no puede ser negativo ni llevar letras: ese importe no se suma.' : ''}
+            </p>
             <div className={styles.subtotal}>
               Subtotal gastos variables: <strong>{formatCurrency(calculos.totalGastosVariables)}</strong>/mes
             </div>
@@ -334,16 +361,17 @@ export default function OrientadorTarifaFreelancePage() {
 
             <div className={styles.configGrid}>
               <div className={styles.selectGroup}>
-                <label htmlFor="tipo-irpf" className={styles.selectLabel}>IRPF estimado</label>
+                <label htmlFor="tipo-retencion" className={styles.selectLabel}>Retención de IRPF en tus facturas</label>
                 <select
-                  id="tipo-irpf"
+                  id="tipo-retencion"
                   className={styles.select}
-                  value={tipoIRPF}
-                  onChange={(e) => setTipoIRPF(e.target.value)}
+                  value={tipoRetencion}
+                  onChange={(e) => setTipoRetencion(e.target.value)}
+                  aria-describedby="nota-retencion"
                 >
-                  <option value="7">7% (Nuevos autónomos - retención reducida)</option>
-                  <option value="15">15% (Retención estándar en factura)</option>
-                  <option value="21">21% (Estimación para rendimientos en tramos altos)</option>
+                  <option value={String(RETENCION_GENERAL)}>{pct(RETENCION_GENERAL)} (actividad profesional, con carácter general)</option>
+                  <option value={String(RETENCION_INICIO)}>{pct(RETENCION_INICIO)} (año de inicio de la actividad y los dos siguientes)</option>
+                  <option value="0">{pct(0)} (sin retención: actividad empresarial o clientes particulares)</option>
                 </select>
               </div>
               <div className={styles.selectGroup}>
@@ -354,13 +382,18 @@ export default function OrientadorTarifaFreelancePage() {
                   value={tipoIVA}
                   onChange={(e) => setTipoIVA(e.target.value)}
                 >
-                  <option value="21">21% (General)</option>
-                  <option value="10">10% (Reducido)</option>
-                  <option value="4">4% (Superreducido)</option>
-                  <option value="0">0% (Exento)</option>
+                  <option value={String(PORCENTAJES_IVA.general)}>{pct(PORCENTAJES_IVA.general)} (General)</option>
+                  <option value={String(PORCENTAJES_IVA.reducido)}>{pct(PORCENTAJES_IVA.reducido)} (Reducido)</option>
+                  <option value={String(PORCENTAJES_IVA.superreducido)}>{pct(PORCENTAJES_IVA.superreducido)} (Superreducido)</option>
+                  <option value="0">{pct(0)} (Exento)</option>
                 </select>
               </div>
             </div>
+            <p id="nota-retencion" className={styles.notaCuota}>
+              La retención es un pago a cuenta: el cliente adelanta ese IRPF a Hacienda y se descuenta en tu declaración.
+              No cambia la tarifa. El IRPF del año lo calcula la herramienta con la escala por tramos y el mínimo personal
+              (estimación directa simplificada), sin la reducción por inicio de actividad, mínimos familiares ni deducciones.
+            </p>
           </section>
 
           {/* Margen */}
@@ -375,40 +408,43 @@ export default function OrientadorTarifaFreelancePage() {
               suffix="%"
               min={0}
               max={100}
-              helperText="Recomendado: 10-20% para imprevistos"
+              helperText={'Recomendado: 10-20 % para imprevistos'}
             />
           </section>
         </div>
 
         {/* Panel de resultados */}
-        <div className={styles.resultsPanel} role="status" aria-live="polite" aria-atomic="true">
-          <h2 className={styles.resultsTitleMain}><span aria-hidden="true">📊</span> Tu Tarifa Recomendada</h2>
+        {/* La región viva es solo el resumen de una línea: el panel entero (unos 500 caracteres)
+            se releía en cada pulsación (hallazgo 4699). */}
+        <section className={styles.resultsPanel} aria-labelledby="titulo-resultados">
+          <h2 id="titulo-resultados" className={styles.resultsTitleMain}><span aria-hidden="true">📊</span> Tu Tarifa Recomendada</h2>
+          <p className={styles.resumenVivo} role="status" aria-live="polite">{resumenVivo}</p>
 
           {/* Tarifas principales */}
           <div className={styles.tarifasPrincipales}>
             <ResultCard
               title="Tarifa por Hora"
-              value={formatNumber(calculos.tarifaHora, 2)}
-              unit="€/h"
+              value={cifra(r?.tarifaHora, 2)}
+              unit={r ? '€/h' : ''}
               variant="highlight"
               icon="⏱️"
-              description={`Con IVA: ${formatCurrency(calculos.tarifaHoraConIVA)}/h`}
+              description={`Con IVA: ${euros(r?.tarifaHoraConIVA)}/h`}
             />
             <ResultCard
               title="Tarifa por Día"
-              value={formatNumber(calculos.tarifaDia, 2)}
-              unit="€/día"
+              value={cifra(r?.tarifaDia, 2)}
+              unit={r ? '€/día' : ''}
               variant="highlight"
               icon="📅"
-              description={`Con IVA: ${formatCurrency(calculos.tarifaDiaConIVA)}/día`}
+              description={`Con IVA: ${euros(r?.tarifaDiaConIVA)}/día`}
             />
             <ResultCard
               title="Tarifa por Semana"
-              value={formatNumber(calculos.tarifaSemana, 2)}
-              unit="€/sem"
+              value={cifra(r?.tarifaSemana, 2)}
+              unit={r ? '€/sem' : ''}
               variant="info"
               icon="📆"
-              description={`Con IVA: ${formatCurrency(calculos.tarifaSemanaConIVA)}/sem`}
+              description={`Con IVA: ${euros(r?.tarifaSemanaConIVA)}/sem`}
             />
           </div>
 
@@ -418,19 +454,31 @@ export default function OrientadorTarifaFreelancePage() {
             <div className={styles.desgloseGrid}>
               <div className={styles.desgloseItem}>
                 <span className={styles.desgloseLabel}>Facturación necesaria</span>
-                <span className={styles.desgloseValue}>{formatCurrency(calculos.brutoConMargenMensual)}</span>
+                <span className={styles.desgloseValue}>{euros(r?.facturacionMensual)}</span>
               </div>
               <div className={styles.desgloseItem}>
-                <span className={styles.desgloseLabel}>Total gastos</span>
+                <span className={styles.desgloseLabel}>Gastos de la actividad</span>
                 <span className={styles.desgloseValue}>-{formatCurrency(calculos.totalGastosMensuales)}</span>
               </div>
               <div className={styles.desgloseItem}>
+                <span className={styles.desgloseLabel}>Cuota de autónomos</span>
+                <span className={styles.desgloseValue}>-{euros(r?.cuotaMensual)}</span>
+              </div>
+              <div className={styles.desgloseItem}>
+                <span className={styles.desgloseLabel}>IRPF (promedio mensual)</span>
+                <span className={styles.desgloseValue}>-{euros(r ? r.irpfAnual / 12 : undefined)}</span>
+              </div>
+              <div className={styles.desgloseItem}>
+                <span className={styles.desgloseLabel}>Retención que adelanta el cliente</span>
+                <span className={styles.desgloseValue}>{euros(r?.retencionMensual)}</span>
+              </div>
+              <div className={styles.desgloseItem}>
                 <span className={styles.desgloseLabel}>Horas facturables/mes</span>
-                <span className={styles.desgloseValue}>{formatNumber(calculos.horasFacturablesMes, 1)} h</span>
+                <span className={styles.desgloseValue}>{cifra(r?.horasFacturablesMes, 1)} h</span>
               </div>
               <div className={styles.desgloseItem}>
                 <span className={styles.desgloseLabel}>Días facturables/mes</span>
-                <span className={styles.desgloseValue}>{formatNumber(calculos.diasFacturablesMes, 1)} días</span>
+                <span className={styles.desgloseValue}>{cifra(r?.diasFacturablesMes, 1)} días</span>
               </div>
             </div>
           </div>
@@ -441,32 +489,33 @@ export default function OrientadorTarifaFreelancePage() {
             <div className={styles.resumenGrid}>
               <ResultCard
                 title="Facturación Anual"
-                value={formatNumber(calculos.facturacionAnual, 0)}
-                unit="€"
+                value={cifra(r?.facturacionAnual, 0)}
+                unit={r ? '€' : ''}
                 variant="default"
                 icon="💵"
               />
               <ResultCard
-                title="Gastos Anuales"
-                value={formatNumber(calculos.gastosAnuales, 0)}
-                unit="€"
+                title="Gastos y Cuota Anuales"
+                value={cifra(r ? (calculos.totalGastosMensuales + r.cuotaMensual) * 12 : undefined, 0)}
+                unit={r ? '€' : ''}
                 variant="warning"
                 icon="📉"
               />
               <ResultCard
                 title="IRPF Estimado"
-                value={formatNumber(calculos.irpfAnual, 0)}
-                unit="€"
+                value={cifra(r?.irpfAnual, 0)}
+                unit={r ? '€' : ''}
                 variant="warning"
                 icon="🏛️"
+                description="Escala por tramos con el mínimo personal"
               />
               <ResultCard
                 title="Beneficio Neto"
-                value={formatNumber(calculos.beneficioNetoAnual, 0)}
-                unit="€"
+                value={cifra(r?.netoAnual, 0)}
+                unit={r ? '€' : ''}
                 variant="success"
                 icon="✅"
-                description={`${formatCurrency(calculos.beneficioNetoAnual / 12)}/mes`}
+                description={`${euros(r ? r.netoAnual / 12 : undefined)}/mes`}
               />
             </div>
           </div>
@@ -476,25 +525,25 @@ export default function OrientadorTarifaFreelancePage() {
             <h3 className={styles.desgloseTitle}><span aria-hidden="true">📅</span> Días de Trabajo al Año</h3>
             <div className={styles.diasGrid}>
               <div className={styles.diaItem}>
-                <span className={styles.diaNumero}>{formatNumber(calculos.diasLaborablesAno, 0)}</span>
+                <span className={styles.diaNumero}>{cifra(r?.diasLaborablesAno, 0)}</span>
                 <span className={styles.diaLabel}>Días laborables</span>
               </div>
               <div className={styles.diaItem}>
-                <span className={styles.diaNumero}>{formatNumber(calculos.diasFacturablesAno, 0)}</span>
+                <span className={styles.diaNumero}>{cifra(r?.diasFacturablesAno, 0)}</span>
                 <span className={styles.diaLabel}>Días facturables</span>
               </div>
               <div className={styles.diaItem}>
-                <span className={styles.diaNumero}>{formatNumber(calculos.horasFacturablesAno, 0)}</span>
+                <span className={styles.diaNumero}>{cifra(r?.horasFacturablesAno, 0)}</span>
                 <span className={styles.diaLabel}>Horas facturables</span>
               </div>
             </div>
           </div>
-        </div>
+        </section>
       </div>
 
       <DisclaimerCard
         variant="financial"
-        severity="high"
+        severity="critical"
         context="orientador-tarifa-freelance"
         collapsible={false}
       />
@@ -636,15 +685,15 @@ export default function OrientadorTarifaFreelancePage() {
             </div>
             <div className={styles.faqItem}>
               <h4>¿Debo incluir impuestos en mi tarifa?</h4>
-              <p>Trabaja siempre con tarifas netas. El IVA (21%) es un impuesto del cliente, no tu ingreso. Preséntalo siempre por separado en tus presupuestos.</p>
+              <p>Trabaja siempre con tarifas sin IVA. El IVA (normalmente el {pct(PORCENTAJES_IVA.general)}) lo paga el cliente y tú lo ingresas en Hacienda: no es tu ingreso. Preséntalo siempre por separado en tus presupuestos.</p>
             </div>
             <div className={styles.faqItem}>
               <h4>¿Cuál es la diferencia entre tarifa bruta y neta?</h4>
-              <p>La bruta incluye IRPF (~15-20%) y cotización autónomo (cuota variable según ingresos reales: 206-1.607 €/mes en 2026). La neta es lo que realmente ingresas tras pagar impuestos y cuota de autónomo.</p>
+              <p>La bruta incluye el IRPF (por tramos, según tu rendimiento) y la cuota de autónomo (variable según los rendimientos reales: de {formatCurrency(CUOTA_RETA_MINIMA)} a {formatCurrency(CUOTA_RETA_MAXIMA)} al mes en la tabla de cotización vigente). La neta es lo que realmente ingresas tras pagar impuestos y cuota de autónomo.</p>
             </div>
             <div className={styles.faqItem}>
               <h4>¿Cuándo y cuánto debo subir mi tarifa?</h4>
-              <p>Cada 12-18 meses o tras certificaciones y casos de éxito. Subidas graduales del 10-20% son más fáciles de aceptar que incrementos bruscos.</p>
+              <p>Cada 12-18 meses o tras certificaciones y casos de éxito. Subidas graduales del 10-20&nbsp;% son más fáciles de aceptar que incrementos bruscos.</p>
             </div>
             <div className={styles.faqItem}>
               <h4>¿Cómo facturo a clientes en el extranjero?</h4>
@@ -652,11 +701,11 @@ export default function OrientadorTarifaFreelancePage() {
             </div>
             <div className={styles.faqItem}>
               <h4>¿Qué costes debo incluir en mi tarifa?</h4>
-              <p>Cuota autónomo, IRPF estimado, material, formación, software, seguros, y también el tiempo de ventas y administración (20-30% de tu jornada).</p>
+              <p>Cuota autónomo, IRPF estimado, material, formación, software, seguros, y también el tiempo de ventas y administración (20-30&nbsp;% de tu jornada).</p>
             </div>
             <div className={styles.faqItem}>
               <h4>¿Bajo la tarifa para conseguir el primer cliente?</h4>
-              <p>Una vez, máximo 20%, con fecha de revisión acordada por escrito. Nunca como norma habitual: devalúa tu trabajo y crea expectativas incorrectas.</p>
+              <p>Una vez, máximo 20&nbsp;%, con fecha de revisión acordada por escrito. Nunca como norma habitual: devalúa tu trabajo y crea expectativas incorrectas.</p>
             </div>
             <div className={styles.faqItem}>
               <h4>¿Qué tarifa cobran otros en mi sector?</h4>
@@ -680,14 +729,14 @@ export default function OrientadorTarifaFreelancePage() {
               <div className={styles.stepNumber}>2</div>
               <div className={styles.stepContent}>
                 <strong>Añade costes de autónomo</strong>
-                <p>Cuota de Seguridad Social (mínimo ~206 €/mes en 2026, variable según ingresos reales), IRPF estimado (15-20% los primeros años) y gestoría (~100 €/mes). Son gastos inevitables.</p>
+                <p>Cuota de Seguridad Social (desde {formatCurrency(CUOTA_RETA_MINIMA)} al mes en la tabla de cotización vigente, variable según los rendimientos reales), el IRPF que corresponda a tu rendimiento y la gestoría (unos 100 €/mes). Son gastos inevitables.</p>
               </div>
             </div>
             <div className={styles.eduStep}>
               <div className={styles.stepNumber}>3</div>
               <div className={styles.stepContent}>
                 <strong>Determina horas facturables reales</strong>
-                <p>De 160 h/mes, solo el 60-80% son facturables. El resto se va en ventas, administración, formación y comunicación con clientes.</p>
+                <p>De 160 h/mes, solo el 60-80&nbsp;% son facturables. El resto se va en ventas, administración, formación y comunicación con clientes.</p>
               </div>
             </div>
             <div className={styles.eduStep}>
@@ -708,7 +757,7 @@ export default function OrientadorTarifaFreelancePage() {
               <div className={styles.stepNumber}>6</div>
               <div className={styles.stepContent}>
                 <strong>Añade margen de beneficio</strong>
-                <p>Suma un 30-50% sobre tu mínimo para reinversión, ahorro a largo plazo, vacaciones e imprevistos. No es lujo, es gestión empresarial.</p>
+                <p>Suma un 30-50&nbsp;% sobre tu mínimo para reinversión, ahorro a largo plazo, vacaciones e imprevistos. No es lujo, es gestión empresarial.</p>
               </div>
             </div>
             <div className={styles.eduStep}>
@@ -733,7 +782,7 @@ export default function OrientadorTarifaFreelancePage() {
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">📊</span>
               <strong>Documenta tus resultados</strong>
-              <p>Casos de éxito con números ("aumenté conversiones un 40%") justifican tarifas altas mejor que cualquier argumento.</p>
+              <p>Casos de éxito con números ("aumenté conversiones un 40&nbsp;%") justifican tarifas altas mejor que cualquier argumento.</p>
             </div>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">🤝</span>
@@ -743,7 +792,7 @@ export default function OrientadorTarifaFreelancePage() {
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">📅</span>
               <strong>Ofrece pago anticipado con descuento</strong>
-              <p>Un 5% de descuento por pago 100% adelantado mejora tu cashflow y reduce riesgo de impago.</p>
+              <p>Un 5&nbsp;% de descuento por pago 100&nbsp;% adelantado mejora tu cashflow y reduce riesgo de impago.</p>
             </div>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">🌍</span>
@@ -765,7 +814,7 @@ export default function OrientadorTarifaFreelancePage() {
             <strong>Errores críticos al fijar tu tarifa freelance</strong>
           </div>
           <ul className={styles.warningList}>
-            <li>Calcular solo las horas de trabajo directo e ignorar tiempo de ventas, reuniones y administración (20-30% del tiempo real).</li>
+            <li>Calcular solo las horas de trabajo directo e ignorar tiempo de ventas, reuniones y administración (20-30&nbsp;% del tiempo real).</li>
             <li>No actualizar la tarifa durante años mientras tus gastos e inflación aumentan cada ejercicio.</li>
             <li>Aceptar pagos sin contrato "para no complicarlo": imposible reclamar si el cliente no paga.</li>
             <li>Dar descuentos como norma sin reducir el alcance del proyecto: devalúa tu trabajo ante el cliente.</li>

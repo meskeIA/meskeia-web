@@ -221,6 +221,35 @@
   color: var(--primary-texto);
 }
 
+/* Nota sobre la cuota de autónomos y la retención (hallazgos 4690 y 4693) */
+.notaCuota {
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  margin: 0 0 var(--spacing-md);
+}
+
+/* Aviso de un gasto negativo o que no es un número (hallazgo 4698); vacío no ocupa sitio */
+.avisoGasto {
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  margin: 0 0 var(--spacing-sm);
+}
+
+.avisoGasto:not(:empty) {
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-left: 4px solid var(--primary);
+  background: var(--hover);
+  border-radius: var(--radius);
+}
+
+/* Resumen de una línea: la única región viva del panel (hallazgo 4699) */
+.resumenVivo {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 0 0 var(--spacing-md);
+}
+
 /* Config Grid */
 .configGrid {
   display: grid;
