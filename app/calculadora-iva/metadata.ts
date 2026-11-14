@@ -109,7 +109,7 @@ export const PREGUNTAS_FRECUENTES: FAQItem[] = [
   },
   {
     question: '¿El IVA afecta al IRPF?',
-    answer: 'No directamente. El IVA es un impuesto de gestión: cobras el de tus clientes y pagas el de tus proveedores; la diferencia va a Hacienda. No es un ingreso ni un gasto propio. El IRPF se calcula sobre la base imponible (sin IVA). Sin embargo, el IVA no deducible (gastos personales) sí es gasto deducible en IRPF.',
+    answer: 'No directamente. El IVA es un impuesto de gestión: cobras el de tus clientes y pagas el de tus proveedores; la diferencia va a Hacienda. No es un ingreso ni un gasto propio. El IRPF se calcula sobre la base imponible (sin IVA). Un gasto de uso particular no es de la actividad, así que ni él ni su IVA restan en el IRPF. Lo que sí entra como gasto deducible en el IRPF es el IVA soportado que no puedes deducirte en un gasto afecto a la actividad (por ejemplo, si tu actividad está exenta de IVA): forma parte del coste de ese gasto.',
   },
 ];
 

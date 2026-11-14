@@ -69,7 +69,7 @@ import { TIPOS_IVA, RECARGO_EQUIVALENCIA, RECARGO_EQUIVALENCIA_TABACO, FISCAL_IV
  *   L. «¿Tengo que cobrar IVA si soy autónomo?» (visible) y «¿Están los autónomos y empresas
  *      obligados a cobrar IVA?» (FAQPage): la misma pregunta con dos respuestas.
  *
- * CABO C0748 (14/11/2026, ABIERTO, con test.fail()): «¿El IVA afecta al IRPF?» dice que el IVA no
+ * CABO C0748 (14/11/2026, REPARADO el mismo día, hallazgo 4701): «¿El IVA afecta al IRPF?» dice que el IVA no
  * deducible «(gastos personales) sí es gasto deducible en IRPF». Un gasto personal no es gasto de
  * la actividad (arts. 28.1 y 29.1.b LIRPF); el IVA soportado no deducible entra como coste solo en
  * un gasto afecto (art. 95.Uno LIVA y NRV 12.ª del PGC). Fuentes literales, en el caso del final.
@@ -346,8 +346,8 @@ test.describe('calculadora-iva — Inspector 14/11/2026', () => {
     expect(enFaqPage).toEqual([{ name: preguntaVisible, text: respuestaVisible }]);
   });
 
-  // ABIERTO — hallazgo de C0748 (Inspector, 14/11/2026, modo cabo).
-  // Hoy, en la FAQ visible y en el FAQPage (PREGUNTAS_FRECUENTES de metadata.ts): «Sin embargo, el
+  // REPARADO (14/11/2026) — hallazgo 4701 de C0748 (Inspector, 14/11/2026, modo cabo).
+  // Antes, en la FAQ visible y en el FAQPage (PREGUNTAS_FRECUENTES de metadata.ts): «Sin embargo, el
   // IVA no deducible (gastos personales) sí es gasto deducible en IRPF.»
   // ESPERADO: el IVA de un gasto personal NO es gasto deducible en el IRPF; lo que entra como gasto
   // es el IVA soportado no deducible de un gasto AFECTO a la actividad, como parte de su coste.
@@ -365,7 +365,6 @@ test.describe('calculadora-iva — Inspector 14/11/2026', () => {
   // un gasto personal, y la que diga que el IVA no deducible es gasto en el IRPF lo ata a la
   // actividad (afecto). Se mira en la página y en el JSON-LD servido, que comparten constante.
   test('FAQ · «¿El IVA afecta al IRPF?» no da por deducible en el IRPF el IVA de un gasto personal', async ({ page }) => {
-    test.fail();
     await page.getByRole('button', { name: /Ver guía educativa/ }).click();
     const visible = page.getByRole('heading', { level: 4, name: /El IVA afecta al IRPF/ });
     const respuestaVisible = ((await visible.locator('xpath=following-sibling::p[1]').textContent()) ?? '').trim();
