@@ -933,7 +933,7 @@ const IONES: IonPoliatomico[] = [
     nombreIupac: 'etanoato, acetato',
     nombreTradicional: 'acetato',
     familia: 'Orgánicos',
-    nota: 'Base conjugada del ácido acético (vinagre). También se escribe C₂H₃O₂⁻. Sus sales son solubles salvo la de plata.',
+    nota: 'Base conjugada del ácido acético (vinagre). También se escribe C₂H₃O₂⁻. Sus sales son solubles salvo la de plata y la de mercurio(I), poco solubles.',
     busqueda: 'acetato etanoato CH3COO C2H3O2 vinagre acido acetico soluble tampon',
   },
   {
@@ -1458,7 +1458,9 @@ const ANIONES: IonComprobador[] = [
 const CATIONES_ALCALINOS = ['Li', 'Na', 'K', 'Rb', 'Cs', 'NH4'];
 const ANIONES_SIEMPRE_SOLUBLES = ['NO3', 'NO2', 'CH3COO', 'ClO3', 'ClO4', 'MnO4', 'HCO3', 'Cr2O7'];
 const HALOGENUROS = ['Cl', 'Br', 'I'];
-const ANIONES_INSOLUBLES = ['CO3', 'PO4', 'CrO4', 'S', 'OH', 'SO3', 'C2O4', 'F', 'SiO3', 'SCN'];
+// El tiocianato NO es de esta lista (hallazgo 4651): ninguna regla de la tabla dice que precipite y
+// con Fe³⁺ da el complejo rojo soluble del ensayo del hierro. Tiene su regla propia más abajo.
+const ANIONES_INSOLUBLES = ['CO3', 'PO4', 'CrO4', 'S', 'OH', 'SO3', 'C2O4', 'F', 'SiO3'];
 
 interface Veredicto {
   estado: Estado;
@@ -1599,13 +1601,39 @@ const EXCEPCIONES: Record<string, Veredicto> = {
     estado: 'poco',
     regla: 'Excepción de los cromatos: CaCrO₄ es solo poco soluble.',
   },
+  // La tarjeta Cromatos lo enuncia: «CaCrO₄ y SrCrO₄ son poco solubles» (hallazgo 4652).
+  'Sr|CrO4': {
+    estado: 'poco',
+    regla: 'Excepción de los cromatos: SrCrO₄, como CaCrO₄, es solo poco soluble.',
+  },
+  // La tarjeta Acetatos lo enuncia: «El acetato de mercurio(I) también es poco soluble» (hallazgo 4653).
+  'Hg2|CH3COO': {
+    estado: 'poco',
+    regla: 'Excepción de los acetatos: el acetato de mercurio(I), como el de plata, es poco soluble.',
+  },
   'Ag|Cr2O7': {
     estado: 'poco',
     regla: 'Excepción de los dicromatos: Ag₂Cr₂O₇ es poco soluble.',
   },
   'Ag|SCN': {
     estado: 'insoluble',
-    regla: 'AgSCN es insoluble (Kps 1,0×10⁻¹²): es la base del método de Volhard para valorar plata.',
+    regla: 'Excepción de los tiocianatos: AgSCN es insoluble (Kps 1,0×10⁻¹²): es la base del método de Volhard para valorar plata.',
+  },
+  // CRC Handbook (88.ª ed., p. 4-71): 0,05 g/100 mL a 20 °C; Merck Index: «soluble en 200 partes de
+  // agua fría»; Hawley: «ligeramente soluble en agua fría». Vía PubChem, CID 11616, 14/11/2026.
+  'Pb|SCN': {
+    estado: 'poco',
+    regla: 'Excepción de los tiocianatos: Pb(SCN)₂ es solo ligeramente soluble en agua fría (entre 0,5 y 5 g/L según la fuente).',
+  },
+  // Veredicto anterior al 14/11/2026 conservado, sin fuente leída en la reparación: cabo para
+  // cotejarlo (hallazgo 4651 pedía decidir Hg₂²⁺ con fuente).
+  'Hg2|SCN': {
+    estado: 'insoluble',
+    regla: 'Excepción de los tiocianatos: el de mercurio(I), como sus halogenuros, precipita.',
+  },
+  'Cu|SCN': {
+    estado: 'insoluble',
+    regla: 'Excepción de los tiocianatos: con Cu²⁺ se forma un precipitado.',
   },
 };
 
@@ -1639,6 +1667,13 @@ function resolverSolubilidad(cation: IonComprobador, anion: IonComprobador): Ver
     return {
       estado: 'soluble',
       regla: 'Los sulfatos son solubles salvo los de Ba²⁺, Sr²⁺, Pb²⁺ y Hg₂²⁺ (insolubles) y los de Ca²⁺ y Ag⁺ (poco solubles). Este catión no está en la lista.',
+    };
+  }
+
+  if (anion.id === 'SCN') {
+    return {
+      estado: 'soluble',
+      regla: 'Los tiocianatos son solubles en general: con Fe³⁺ forman el complejo rojo sangre del ensayo del hierro(III), que queda disuelto. Las excepciones son los de Ag⁺, Hg₂²⁺ y Cu²⁺ (precipitan) y el de Pb²⁺ (poco soluble). Este catión no está entre ellas.',
     };
   }
 

@@ -233,14 +233,15 @@ test.describe('Comprobador de precipitación (inspector 14/11/2026)', () => {
     }
   });
 
-  test('HALLAZGO (14/11/2026, ABIERTO) · el tiocianato «precipita» con cualquier catión: Fe³⁺ + SCN⁻ da «Fe(SCN)₃(s)↓»', async ({ page }) => {
+  // REPARADO (4651): SCN fuera de ANIONES_INSOLUBLES, con regla propia; AgSCN insoluble y Pb(SCN)₂
+  // poco soluble (CRC/Merck vía PubChem) como excepciones.
+  test('HALLAZGO 4651 (REPARADO) · el tiocianato «precipitaba» con cualquier catión: Fe³⁺ + SCN⁻ daba «Fe(SCN)₃(s)↓»', async ({ page }) => {
     // SCN está en ANIONES_INSOLUBLES, pero ninguna de las 21 reglas de la tabla dice que los
     // tiocianatos sean insolubles, y la regla que imprime el comprobador («Los carbonatos,
     // fosfatos, cromatos, sulfuros, sulfitos, oxalatos, fluoruros, silicatos e hidróxidos…») no
     // los nombra. La propia ficha del ion tiocianato dice: «Con Fe³⁺ da un complejo rojo sangre
     // intenso: es el ensayo clásico para detectar hierro(III)», y la del Kps de AgSCN usa Fe³⁺
-    // como indicador del método de Volhard. Hoy: 16 de los 22 cationes «precipitan» con SCN⁻.
-    test.fail();
+    // como indicador del método de Volhard. Antes: 16 de los 22 cationes «precipitaban» con SCN⁻.
     await elegirPar(page, 'Fe3', 'SCN');
     let r = await resultado(page);
     expect.soft(categoria(r.estado), 'Fe³⁺ + SCN⁻: complejo soluble según la ficha del ion').toBe('soluble');
@@ -248,20 +249,29 @@ test.describe('Comprobador de precipitación (inspector 14/11/2026)', () => {
     await elegirPar(page, 'Mg', 'SCN');
     r = await resultado(page);
     expect.soft(categoria(r.estado) === 'soluble' || /tiocianat/i.test(r.regla), `Mg²⁺ + SCN⁻: «${r.regla}»`).toBe(true);
+    for (const cation of ['Ba', 'Co', 'Zn', 'Al']) {
+      await elegirPar(page, cation, 'SCN');
+      r = await resultado(page);
+      expect.soft(categoria(r.estado), `${cation} + SCN⁻`).toBe('soluble');
+      expect.soft(r.regla, `${cation} + SCN⁻: la regla nombra a los tiocianatos`).toMatch(/tiocianat/i);
+    }
+    // Las excepciones: AgSCN (Kps 1,0×10⁻¹²) y Pb(SCN)₂ (CRC 88.ª ed.: 0,05 g/100 mL a 20 °C).
+    await elegirPar(page, 'Ag', 'SCN');
+    expect.soft(categoria((await resultado(page)).estado), 'Ag + SCN⁻').toBe('insoluble');
+    await elegirPar(page, 'Pb', 'SCN');
+    expect.soft(categoria((await resultado(page)).estado), 'Pb + SCN⁻').toBe('poco');
   });
 
-  test('HALLAZGO (14/11/2026, ABIERTO) · Sr²⁺ + CrO₄²⁻ sale «Insoluble», y la tarjeta Cromatos dice «poco soluble»', async ({ page }) => {
-    // Tarjeta «Cromatos», excepciones: «CaCrO₄ y SrCrO₄ son poco solubles». EXCEPCIONES tiene
-    // 'Ca|CrO4' y no 'Sr|CrO4'. Hoy: «✕ Insoluble — precipita».
-    test.fail();
+  test('HALLAZGO 4652 (REPARADO) · Sr²⁺ + CrO₄²⁻ salía «Insoluble», y la tarjeta Cromatos dice «poco soluble»', async ({ page }) => {
+    // Tarjeta «Cromatos», excepciones: «CaCrO₄ y SrCrO₄ son poco solubles». EXCEPCIONES tenía
+    // 'Ca|CrO4' y no 'Sr|CrO4'.
     await elegirPar(page, 'Sr', 'CrO4');
     expect(categoria((await resultado(page)).estado)).toBe('poco');
   });
 
-  test('HALLAZGO (14/11/2026, ABIERTO) · Hg₂²⁺ + CH₃COO⁻ sale «Soluble», y la tarjeta Acetatos dice «poco soluble»', async ({ page }) => {
+  test('HALLAZGO 4653 (REPARADO) · Hg₂²⁺ + CH₃COO⁻ salía «Soluble», y la tarjeta Acetatos dice «poco soluble»', async ({ page }) => {
     // Tarjeta «Acetatos», excepciones: «El acetato de mercurio(I) también es poco soluble».
-    // EXCEPCIONES no tiene 'Hg2|CH3COO'. Hoy: «✔ Soluble — no precipita».
-    test.fail();
+    // EXCEPCIONES no tenía 'Hg2|CH3COO'.
     await elegirPar(page, 'Hg2', 'CH3COO');
     expect(categoria((await resultado(page)).estado)).toBe('poco');
   });
