@@ -517,6 +517,25 @@ test.describe('Inspector 14/11/2026 · los tres Number con la coma cambiada (a47
     await expect(valorDe(page, PANEL_LISTA, 'En minutos')).toHaveText('1440 min');
   });
 
+  test('CABO C0739 (14/11/2026, REPARADO) · con segundos en las líneas, la media va al segundo', async ({ page }) => {
+    // Con una sola línea la media ES el total. formatearHM(minutos) la redondeaba al minuto:
+    // «1,5 min» daba total 0:01:30 y media 0:02; «1 h 59,5 min», 1:59:30 y 2:00.
+    await escribir(page, LINEA(1), '1,5 min');
+    await expect(TOTAL(page)).toHaveText('0:01:30');
+    await expect(valorDe(page, PANEL_LISTA, 'Media por tiempo')).toHaveText('0:01:30');
+
+    await escribir(page, LINEA(1), '1 h 59,5 min');
+    await expect(TOTAL(page)).toHaveText('1:59:30');
+    await expect(valorDe(page, PANEL_LISTA, 'Media por tiempo')).toHaveText('1:59:30');
+
+    // Dos líneas con segundos: 0:00:30 + 0:01:30 = 0:02, media 0:01 exacta.
+    await escribir(page, LINEA(1), '0:00:30');
+    await escribir(page, LINEA(2), '0:01:30');
+    await expect(TOTAL(page)).toHaveText('0:02');
+    await expect(valorDe(page, PANEL_LISTA, 'Media por tiempo')).toHaveText('0:01');
+    // Sin segundos en ninguna línea, la media sigue al minuto (CASO 1 del 02/11: 4:55 / 3 = 1:38).
+  });
+
   test('Rechazo · dos separadores, texto pegado, notación científica y minutos de reloj ≥ 60', async ({ page }) => {
     for (const malo of ['1,5,5', '1.5.5', '12abc', '1e3', '1,5 horas 20 min', '1 h 60 min', '45,5,5 min']) {
       await escribir(page, LINEA(1), malo);

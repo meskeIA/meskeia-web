@@ -186,7 +186,13 @@ export default function CalculadoraHorasPage() {
   // Las líneas llegan redondeadas al segundo; el total se pinta en h:mm:ss si le quedan segundos.
   const totalSegundosLista = Math.round(totalLista * 60);
   const hayErrorLista = lineas.some((l) => l.texto.trim() !== '' && parsearTiempo(l.texto) === null);
-  const mediaLista = lineasValidas.length > 0 ? totalLista / lineasValidas.length : 0;
+  // La media, con la resolución de las líneas (cabo C0739): al segundo si alguna lleva segundos
+  // (con «1,5 min» daba 0:02 frente a un total de 0:01:30), al minuto si ninguna (4:55 / 3 = 1:38).
+  const lineasConSegundos = lineasValidas.some((x) => Math.round(x.minutos * 60) % 60 !== 0);
+  const mediaMinutosLista = lineasValidas.length > 0 ? totalLista / lineasValidas.length : 0;
+  const mediaSegundosLista = lineasConSegundos
+    ? Math.round(mediaMinutosLista * 60)
+    : Math.round(mediaMinutosLista) * 60;
 
   // Una cifra sola se lee como horas: «45» son 45:00, no 45 minutos. Se avisa a partir de 10,
   // donde ya no suele ser una jornada, para que quien quería minutos sepa cómo escribirlos.
@@ -414,7 +420,7 @@ export default function CalculadoraHorasPage() {
               </div>
               <div>
                 <span className={styles.etiquetaResultado}>Media por tiempo</span>
-                <strong className={styles.valorResultado}>{formatearHM(mediaLista)}</strong>
+                <strong className={styles.valorResultado}>{formatearHMS(mediaSegundosLista)}</strong>
               </div>
             </div>
 
