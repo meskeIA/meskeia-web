@@ -1,7 +1,7 @@
 'use client';
 // @disclaimer: exempt
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type KeyboardEvent } from 'react';
 import styles from './ConversorOnzas.module.css';
 import {
   MeskeiaLogo,
@@ -18,15 +18,38 @@ import {
   ONZAS_META,
   type SistemaLiquido,
 } from '@/lib/calculadoras/onzas';
-import { formatNumber } from '@/lib/formatters';
+import { formatNumber, parseSpanishNumber } from '@/lib/formatters';
 
 type Modo = 'peso' | 'volumen';
 
-// Decimales según magnitud, para no mostrar «226,7959…» ni «0» de más.
+const MODOS: Modo[] = ['peso', 'volumen'];
+
+// Decimales según magnitud, para no mostrar «226,7959…» ni «0» de más. Por debajo de 1 se
+// garantizan al menos dos cifras significativas (hallazgo 4591): con dos decimales fijos, 1 g
+// salía «0,04 oz» (+13 %) y «0,00 lb», un cero exacto para una cantidad que no lo es. Los
+// ceros finales que pasan de dos decimales se quitan («0,0010» → «0,001»).
 function fmt(v: number): string {
   const abs = Math.abs(v);
-  const dec = abs >= 100 ? 0 : abs >= 10 ? 1 : 2;
-  return formatNumber(v, dec);
+  if (abs >= 100) return formatNumber(v, 0);
+  if (abs >= 10) return formatNumber(v, 1);
+  if (abs >= 0.1 || abs === 0) return formatNumber(v, 2);
+  const dec = Math.min(10, Math.max(2, 1 - Math.floor(Math.log10(abs))));
+  return formatNumber(v, dec).replace(/(,\d\d\d*?)0+$/, '$1');
+}
+
+// Cantidad tecleada: formato español con parseSpanishNumber (hallazgo 4590: «1.500» g son mil
+// quinientos, no 1,5; «12abc» y «1e3» no son cantidades). Un negativo no es una cantidad de
+// ingrediente (hallazgo 4592).
+function leerCantidad(texto: string): { valor: number; negativo: boolean } {
+  const n = parseSpanishNumber(texto);
+  if (Number.isFinite(n) && n < 0) return { valor: NaN, negativo: true };
+  return { valor: n, negativo: false };
+}
+
+// «2026-07» → «07/2026» (formato español, hallazgo 4593).
+function mesEspanol(isoMes: string): string {
+  const [anio, mes] = isoMes.split('-');
+  return mes ? `${mes}/${anio}` : isoMes;
 }
 
 export default function ConversorOnzasPage() {
@@ -40,16 +63,34 @@ export default function ConversorOnzasPage() {
 
   const unidadesVol = useMemo(() => volUnidades(sistema), [sistema]);
 
+  const lecturaPeso = useMemo(() => leerCantidad(pesoValor), [pesoValor]);
+  const lecturaVol = useMemo(() => leerCantidad(volValor), [volValor]);
+
   const resultadoPeso = useMemo(
-    () => convertir(parseFloat(pesoValor.replace(',', '.')), pesoFrom, PESO_UNIDADES),
-    [pesoValor, pesoFrom],
+    () => convertir(lecturaPeso.valor, pesoFrom, PESO_UNIDADES),
+    [lecturaPeso, pesoFrom],
   );
   const resultadoVol = useMemo(
-    () => convertir(parseFloat(volValor.replace(',', '.')), volFrom, unidadesVol),
-    [volValor, volFrom, unidadesVol],
+    () => convertir(lecturaVol.valor, volFrom, unidadesVol),
+    [lecturaVol, volFrom, unidadesVol],
   );
 
   const resultado = modo === 'peso' ? resultadoPeso : resultadoVol;
+  const negativo = (modo === 'peso' ? lecturaPeso : lecturaVol).negativo;
+
+  // Pestañas con el patrón ARIA (hallazgo 4594): flechas, Inicio y Fin mueven el foco y activan.
+  const alTeclearPestana = (e: KeyboardEvent<HTMLButtonElement>) => {
+    const i = MODOS.indexOf(modo);
+    let siguiente: number | null = null;
+    if (e.key === 'ArrowRight') siguiente = (i + 1) % MODOS.length;
+    else if (e.key === 'ArrowLeft') siguiente = (i - 1 + MODOS.length) % MODOS.length;
+    else if (e.key === 'Home') siguiente = 0;
+    else if (e.key === 'End') siguiente = MODOS.length - 1;
+    if (siguiente === null) return;
+    e.preventDefault();
+    setModo(MODOS[siguiente]);
+    document.getElementById(`pestana-${MODOS[siguiente]}`)?.focus();
+  };
 
   return (
     <div className={styles.container}>
@@ -71,24 +112,37 @@ export default function ConversorOnzasPage() {
           <button
             type="button"
             role="tab"
+            id="pestana-peso"
             aria-selected={modo === 'peso'}
+            aria-controls="panel-onzas"
+            tabIndex={modo === 'peso' ? 0 : -1}
             className={`${styles.modoTab} ${modo === 'peso' ? styles.modoTabActivo : ''}`}
             onClick={() => setModo('peso')}
+            onKeyDown={alTeclearPestana}
           >
             <span aria-hidden="true">⚖️</span> Onzas de peso
           </button>
           <button
             type="button"
             role="tab"
+            id="pestana-volumen"
             aria-selected={modo === 'volumen'}
+            aria-controls="panel-onzas"
+            tabIndex={modo === 'volumen' ? 0 : -1}
             className={`${styles.modoTab} ${modo === 'volumen' ? styles.modoTabActivo : ''}`}
             onClick={() => setModo('volumen')}
+            onKeyDown={alTeclearPestana}
           >
             <span aria-hidden="true">🥤</span> Onzas líquidas
           </button>
         </div>
 
-        <section className={styles.panel} aria-label="Conversor de onzas">
+        <section
+          className={styles.panel}
+          id="panel-onzas"
+          role="tabpanel"
+          aria-labelledby={`pestana-${modo}`}
+        >
           {modo === 'volumen' && (
             <div className={styles.campo}>
               <span className={styles.label} id="sistema-label">
@@ -128,6 +182,7 @@ export default function ConversorOnzasPage() {
                 id="cantidad"
                 type="text"
                 inputMode="decimal"
+                aria-invalid={negativo || undefined}
                 className={styles.input}
                 value={modo === 'peso' ? pesoValor : volValor}
                 onChange={(e) =>
@@ -170,7 +225,9 @@ export default function ConversorOnzasPage() {
               </div>
             ) : (
               <span className={styles.resultadoPlaceholder}>
-                Introduce una cantidad para ver la conversión
+                {negativo
+                  ? 'La cantidad no puede ser negativa'
+                  : 'Introduce una cantidad para ver la conversión'}
               </span>
             )}
           </div>
@@ -178,7 +235,7 @@ export default function ConversorOnzasPage() {
           <p className={styles.fuenteNota}>
             Onza de peso (avoirdupois): 1 oz = 28,35 g. Onza líquida: 1 fl oz ={' '}
             {sistema === 'us' ? '29,57 ml (EE. UU.)' : '28,41 ml (Reino Unido)'}. Fuente:{' '}
-            {ONZAS_META.fuente}. Verificado {ONZAS_META.verificado}.
+            {ONZAS_META.fuente}. Verificado {mesEspanol(ONZAS_META.verificado)}.
           </p>
         </section>
 
@@ -353,6 +410,11 @@ export default function ConversorOnzasPage() {
                 <li>
                   <strong>Mezclar la onza con la libra.</strong> 16 onzas de peso hacen 1 libra
                   (454 g), no 100 gramos ni un kilo. Un error de este tipo arruina las proporciones.
+                </li>
+                <li>
+                  <strong>Usar la onza de cocina para el oro o la plata.</strong> Los metales
+                  preciosos se pesan en onzas troy, otra unidad: 1 onza troy son 31,1034768 g, un
+                  9,7&nbsp;% más que la onza avoirdupois (28,35 g) de este conversor.
                 </li>
               </ul>
             </div>

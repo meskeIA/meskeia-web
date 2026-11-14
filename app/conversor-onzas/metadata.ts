@@ -54,7 +54,7 @@ export const jsonLd = generateWebAppSchema({
     'Diferencia entre onza líquida de EE. UU. y de Reino Unido',
     'Conversión en ambos sentidos',
     'Tabla de equivalencias de cocina más habituales',
-    'Funciona 100% en el navegador, sin registro',
+    'Funciona 100 % en el navegador, sin registro',
     'Gratuito, sin publicidad y en español',
   ],
 });
@@ -69,7 +69,7 @@ export const faqJsonLd = {
       name: '¿Cuánto es una onza en gramos?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Una onza de peso (la onza avoirdupois) equivale a 28,35 gramos. Es la que se usa para ingredientes sólidos como carne, chocolate o harina. Así, 4 onzas son 113 gramos, 8 onzas son 227 gramos y 16 onzas hacen una libra, es decir, 454 gramos.',
+        text: 'Una onza de peso (la onza avoirdupois) equivale a 28,35 gramos. Es la que se usa para ingredientes sólidos como carne, chocolate o harina. Así, 4 onzas son 113 gramos, 8 onzas son 227 gramos y 16 onzas hacen una libra, es decir, 454 gramos. Ojo con el oro y la plata: los metales preciosos se pesan en onzas troy, otra unidad, de 31,1034768 gramos.',
       },
     },
     {

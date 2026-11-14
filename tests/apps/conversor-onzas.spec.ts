@@ -36,7 +36,10 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
  *     Ida y vuelta: 1500 oz → la app escribe «42.524» g; ese mismo «42.524» en gramos debe volver
  *     a 1499,99 oz «1500».
  *
- * HALLAZGOS del 14/11/2026 (ABIERTOS: sus tests afirman lo correcto y llevan test.fail())
+ * HALLAZGOS del 14/11/2026 (REPARADOS el mismo día en /reparar: 4590-4595)
+ *   La lectura va con parseSpanishNumber; por debajo de 0,1 se escriben al menos dos cifras
+ *   significativas (por eso «2,5» oz da «0,071 kg» y no «0,07»); un negativo deja el aviso «La
+ *   cantidad no puede ser negativa»; el panel es un role="tabpanel" y las flechas mueven el foco.
  *   A. Parser casero: «1.500» g se lee 1,5 g (0,05 oz), «42.524» g vuelve como 1,50 oz, «12abc»
  *      se lee 12 y «1e3» se lee 1000.
  *   B. Dos decimales fijos por debajo de 10: 1 g → «0,04 oz» (+13 %), «0,00 lb» y «0,00 kg».
@@ -51,9 +54,9 @@ import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
 const RUTA = '/conversor-onzas/';
 const ESPERA = 'Introduce una cantidad para ver la conversión';
 
-/** La zona de resultado de la app (no el anunciador de rutas de Next). */
+/** La zona de resultado de la app (no el anunciador de rutas de Next), dentro del panel. */
 function zonaResultado(page: Page): Locator {
-  return page.getByRole('region', { name: 'Conversor de onzas' }).getByRole('status');
+  return page.getByRole('tabpanel').getByRole('status');
 }
 
 /** Cifras pintadas, por abreviatura de unidad: { g: '227', lb: '0,50', kg: '0,23' }. */
@@ -98,10 +101,11 @@ test.describe('conversor-onzas — Inspector 14/11/2026', () => {
     await expect.poll(() => leerResultado(page)).toEqual({ g: '227', lb: '0,50', kg: '0,23' });
   });
 
-  test('CASO 1 · «2,5» oz se lee con la coma: 70,9 g, 0,16 lb, 0,07 kg', async ({ page }) => {
-    // 2,5 × 28,349523125 = 70,8738 g; 2,5/16 = 0,15625 lb; 0,0709 kg
+  test('CASO 1 · «2,5» oz se lee con la coma: 70,9 g, 0,16 lb, 0,071 kg', async ({ page }) => {
+    // 2,5 × 28,349523125 = 70,8738 g; 2,5/16 = 0,15625 lb; 0,0709 kg. Por debajo de 0,1, dos
+    // cifras significativas (hallazgo 4591): «0,071», no el «0,07» de dos decimales fijos (−1 %).
     await teclear(page, '2,5');
-    await expect.poll(() => leerResultado(page)).toEqual({ g: '70,9', lb: '0,16', kg: '0,07' });
+    await expect.poll(() => leerResultado(page)).toEqual({ g: '70,9', lb: '0,16', kg: '0,071' });
   });
 
   test('CASO 1 · 1000 lb: punto de millares desde cinco cifras enteras', async ({ page }) => {
@@ -137,12 +141,11 @@ test.describe('conversor-onzas — Inspector 14/11/2026', () => {
     await expect.poll(() => leerResultado(page)).toEqual({ espera: ESPERA });
   });
 
-  test('HALLAZGO (14/11/2026, ABIERTO) · B · 1 g no se pinta como 0,04 oz ni como 0,00 lb/kg', async ({ page }) => {
+  test('HALLAZGO 4591 (14/11/2026, REPARADO) · B · 1 g no se pinta como 0,04 oz ni como 0,00 lb/kg', async ({ page }) => {
     // 1 / 28,349523125 = 0,035274 oz; 1 / 453,59237 = 0,0022046 lb; 0,001 kg.
-    // Hoy: «0,04 oz» (+13 %), «0,00 lb» y «0,00 kg», un cero exacto para una cantidad que no lo es.
-    // Tolerancias por el tamaño del defecto: 5 % en las onzas (el error es 13 %) y 10 % en lb y kg
-    // (el error es del 100 %); «0,035», «0,0353», «0,002» o «0,0022» pasan.
-    test.fail();
+    // Antes: «0,04 oz» (+13 %), «0,00 lb» y «0,00 kg», un cero exacto para una cantidad que no lo es.
+    // Tolerancias por el tamaño del defecto: 5 % en las onzas (el error era 13 %) y 10 % en lb y kg
+    // (el error era del 100 %); hoy sale «0,035», «0,0022» y «0,001».
     await elegirUnidad(page, 'g');
     await teclear(page, '1');
     await expect.poll(async () => (await leerResultado(page)).oz).toBeDefined();
@@ -152,28 +155,26 @@ test.describe('conversor-onzas — Inspector 14/11/2026', () => {
     expect(Math.abs(aNumero(r.kg) / 0.001 - 1)).toBeLessThan(0.1);
   });
 
-  test('HALLAZGO (14/11/2026, ABIERTO) · C · −8 oz no da «−227 g»', async ({ page }) => {
-    // Una cantidad negativa de un ingrediente no existe; hoy pinta «-227 g | -0,50 lb | -0,23 kg»
-    // sin aviso, cuando «abc» sí se queda sin cifras.
-    test.fail();
+  test('HALLAZGO 4592 (14/11/2026, REPARADO) · C · −8 oz no da «−227 g»: avisa', async ({ page }) => {
+    // Una cantidad negativa de un ingrediente no existe; antes pintaba «-227 g | -0,50 lb | -0,23 kg»
+    // sin aviso, cuando «abc» sí se quedaba sin cifras.
     await teclear(page, '-8');
-    await expect(zonaResultado(page)).not.toContainText('227', { timeout: 3000 });
+    await expect.poll(() => leerResultado(page)).toEqual({ espera: 'La cantidad no puede ser negativa' });
+    await expect(page.locator('#cantidad')).toHaveAttribute('aria-invalid', 'true');
   });
 
   // ── CASO 3 · rechazo y lectura en formato español ──────────────────────────
-  test('HALLAZGO (14/11/2026, ABIERTO) · A · «1.500» g son mil quinientos: 52,9 oz, 3,31 lb, 1,50 kg', async ({ page }) => {
+  test('HALLAZGO 4590 (14/11/2026, REPARADO) · A · «1.500» g son mil quinientos: 52,9 oz, 3,31 lb, 1,50 kg', async ({ page }) => {
     // 1500 / 28,349523125 = 52,9109 oz; 1500 / 453,59237 = 3,30693 lb; 1,5 kg.
-    // Hoy parseFloat('1.500') = 1,5 g → «0,05 oz | 0,00 lb | 0,00 kg».
-    test.fail();
+    // Antes parseFloat('1.500') = 1,5 g → «0,05 oz | 0,00 lb | 0,00 kg».
     await elegirUnidad(page, 'g');
     await teclear(page, '1.500');
     await expect.poll(() => leerResultado(page), { timeout: 3000 }).toEqual({ oz: '52,9', lb: '3,31', kg: '1,50' });
   });
 
-  test('HALLAZGO (14/11/2026, ABIERTO) · A · «1.234,5» g: 43,5 oz y 2,72 lb', async ({ page }) => {
+  test('HALLAZGO 4590 (14/11/2026, REPARADO) · A · «1.234,5» g: 43,5 oz y 2,72 lb', async ({ page }) => {
     // 1234,5 / 28,349523125 = 43,5457 oz; 1234,5 / 453,59237 = 2,72162 lb.
-    // Hoy '1.234,5'.replace(',', '.') = '1.234.5' → parseFloat = 1,234 g → «0,04 oz».
-    test.fail();
+    // Antes '1.234,5'.replace(',', '.') = '1.234.5' → parseFloat = 1,234 g → «0,04 oz».
     await elegirUnidad(page, 'g');
     await teclear(page, '1.234,5');
     await expect.poll(async () => {
@@ -182,10 +183,9 @@ test.describe('conversor-onzas — Inspector 14/11/2026', () => {
     }, { timeout: 3000 }).toEqual(['43,5', '2,72']);
   });
 
-  test('HALLAZGO (14/11/2026, ABIERTO) · A · la cifra que escribe la app no se puede volver a teclear', async ({ page }) => {
+  test('HALLAZGO 4590 (14/11/2026, REPARADO) · A · la cifra que escribe la app se puede volver a teclear', async ({ page }) => {
     // 1500 oz × 28,349523125 = 42 524,28 g → la app escribe «42.524». Ese mismo texto en gramos
-    // es 42 524 g = 1499,99 oz → «1500». Hoy lo lee 42,524 g → «1,50 oz»: mil veces menos.
-    test.fail();
+    // es 42 524 g = 1499,99 oz → «1500». Antes lo leía 42,524 g → «1,50 oz»: mil veces menos.
     await teclear(page, '1500');
     await expect.poll(async () => (await leerResultado(page)).g).toBe('42.524');
     const gramos = (await leerResultado(page)).g;
@@ -194,32 +194,30 @@ test.describe('conversor-onzas — Inspector 14/11/2026', () => {
     await expect.poll(async () => (await leerResultado(page)).oz, { timeout: 3000 }).toBe('1500');
   });
 
-  test('HALLAZGO (14/11/2026, ABIERTO) · A · «12abc» y «1e3» no son cantidades', async ({ page }) => {
-    // parseSpanishNumber (lib/formatters) devuelve NaN para los dos. Hoy «12abc» = 12 oz → «340 g»
+  test('HALLAZGO 4590 (14/11/2026, REPARADO) · A · «12abc» y «1e3» no son cantidades', async ({ page }) => {
+    // parseSpanishNumber (lib/formatters) devuelve NaN para los dos. Antes «12abc» = 12 oz → «340 g»
     // y «1e3» = 1000 oz → «28.350 g».
-    test.fail();
     await teclear(page, '12abc');
-    await expect(zonaResultado(page)).not.toContainText('340', { timeout: 3000 });
+    await expect.poll(() => leerResultado(page)).toEqual({ espera: ESPERA });
     await teclear(page, '1e3');
-    await expect(zonaResultado(page)).not.toContainText('28.350', { timeout: 3000 });
+    await expect.poll(() => leerResultado(page)).toEqual({ espera: ESPERA });
   });
 
   // ── Contenido, formato y accesibilidad ─────────────────────────────────────
-  test('HALLAZGO (14/11/2026, ABIERTO) · D · fecha de verificación en formato español y «%» con espacio duro', async ({ page }) => {
-    // CLAUDE.md global §2: fechas DD/MM/AAAA (para un mes, «07/2026» o «julio de 2026») y «100 %»
-    // con U+00A0. Hoy la nota dice «Verificado 2026-07» y featureList, «Funciona 100% en el navegador».
-    test.fail();
+  test('HALLAZGO 4593 (14/11/2026, REPARADO) · D · fecha de verificación en formato español y «%» con espacio duro', async ({ page }) => {
+    // CLAUDE.md global §2: fechas DD/MM/AAAA (para un mes, «07/2026») y «100 %» con U+00A0.
+    // Antes la nota decía «Verificado 2026-07» y featureList, «Funciona 100% en el navegador».
     const nota = page.locator('p').filter({ hasText: 'Verificado' }).first();
-    await expect(nota).not.toHaveText(/\d{4}-\d{2}/, { timeout: 3000 });
+    await expect(nota).toContainText('Verificado 07/2026.');
     const app = await ldDeTipo(page, 'WebApplication');
     const features = (app.featureList ?? []) as string[];
+    expect(features).toContain('Funciona 100 % en el navegador, sin registro');
     for (const f of features) expect(f).not.toMatch(/\d%/);
   });
 
-  test('HALLAZGO (14/11/2026, ABIERTO) · E · cada pestaña controla un role="tabpanel"', async ({ page }) => {
-    // Patrón ARIA de pestañas: role="tab" con aria-controls hacia su role="tabpanel". Hoy ninguna
-    // pestaña lleva aria-controls y no hay ningún tabpanel en la página.
-    test.fail();
+  test('HALLAZGO 4594 (14/11/2026, REPARADO) · E · cada pestaña controla un role="tabpanel" y las flechas mueven el foco', async ({ page }) => {
+    // Patrón ARIA de pestañas: role="tab" con aria-controls hacia su role="tabpanel", y flechas
+    // entre pestañas. Antes ninguna pestaña llevaba aria-controls ni había tabpanel.
     const pestanas = page.getByRole('tab');
     await expect(pestanas).toHaveCount(2);
     for (const p of await pestanas.all()) {
@@ -227,15 +225,23 @@ test.describe('conversor-onzas — Inspector 14/11/2026', () => {
       expect(id).not.toBeNull();
       await expect(page.locator(`[id="${id}"]`)).toHaveAttribute('role', 'tabpanel', { timeout: 3000 });
     }
+    const peso = page.getByRole('tab', { name: /Onzas de peso/ });
+    const liquidas = page.getByRole('tab', { name: /Onzas líquidas/ });
+    await peso.focus();
+    await page.keyboard.press('ArrowRight');
+    await expect(liquidas).toBeFocused();
+    await expect(liquidas).toHaveAttribute('aria-selected', 'true');
+    await page.keyboard.press('ArrowLeft');
+    await expect(peso).toBeFocused();
+    await expect(peso).toHaveAttribute('aria-selected', 'true');
   });
 
-  test('HALLAZGO (14/11/2026, ABIERTO) · F · la FAQ advierte de que la onza troy (31,10 g) es otra', async ({ page }) => {
-    // «¿Cuánto es una onza en gramos?» responde 28,35 g sin decir que la onza de los metales
-    // preciosos (troy) es otra unidad: 31,1034768 g exactos, un 9,7 % más. Ni la FAQ ni la página
-    // la nombran, y quien pregunte por una onza de oro o de plata se lleva 28,35 g.
-    test.fail();
+  test('HALLAZGO 4595 (14/11/2026, REPARADO) · F · la FAQ y la página advierten de que la onza troy (31,10 g) es otra', async ({ page }) => {
+    // «¿Cuánto es una onza en gramos?» respondía 28,35 g sin decir que la onza de los metales
+    // preciosos (troy) es otra unidad: 31,1034768 g exactos, un 9,7 % más.
     const faq = JSON.stringify(await ldDeTipo(page, 'FAQPage'));
-    expect(faq).toMatch(/troy/i);
+    expect(faq).toMatch(/troy[^"]*31,1034768/i);
+    await expect(page.locator('main')).toContainText('1 onza troy son 31,1034768 g');
   });
 
   test('las cifras fijas del texto cuadran con las definiciones', async ({ page }) => {
