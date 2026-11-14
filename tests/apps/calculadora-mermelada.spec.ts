@@ -32,7 +32,7 @@ import { comprobarFaqPageUnico } from './_faqpage-unico';
  *     (parseSpanishNumber da NaN en «12abc» y «1e3», CLAUDE.md §1.bis)
  *   La física cuadra: la app solo da cantidades a añadir, proporcionales a la fruta.
  *
- * HALLAZGOS del 14/11/2026 (los ABIERTOS llevan test.fail(); /reparar del 14/11 reparó A, B, C, E y F)
+ * HALLAZGOS del 14/11/2026 (los ABIERTOS llevan test.fail(); /reparar del 14/11 reparó A, B, C, E y F; D, con la decisión del usuario)
  *   A. REPARADO (4645) · El campo se leía con el parseo casero: «1.500» → 2 g de fruta, 1 g de
  *      azúcar y 0 ml de limón; «12.000» → 12 g; «12abc» → 12 g y «1e3» → 1000 g. Ahora
  *      parseSpanishNumber.
@@ -42,9 +42,10 @@ import { comprobarFaqPageUnico } from './_faqpage-unico';
  *   C. REPARADO (4647, tipo promesa) · Prometía «según la fruta» sin preguntar la fruta, y la
  *      Tradicional «cuaja sola» con cualquiera. Ahora «según el peso de la fruta» y «cuaja con
  *      facilidad si la fruta tiene pectina». Ampliar con un selector de fruta lo decide el usuario.
- *   D. ABIERTO (4648) · Consejos de conservación fuera de la nevera con `// @disclaimer: exempt`, sin
+ *   D. REPARADO (4648) · Consejos de conservación fuera de la nevera con `// @disclaimer: exempt`, sin
  *      DisclaimerCard ni el criterio de AESAN de desechar conservas abombadas («Botulismo»,
- *      30/08/2019, §10). El nivel y el texto del aviso los decide el usuario.
+ *      30/08/2019, §10). El usuario eligió el 14/11/2026 una DisclaimerCard de nivel 3 MEDIO con esa
+ *      frase literal.
  *   E. REPARADO (4649) · La región aria-live desaparecía con una entrada no válida y renacía llena.
  *   F. REPARADO (4650) · «100% de la fruta», «70%», «50%» sin espacio duro (CLAUDE.md §2, 25/09/2026).
  */
@@ -214,22 +215,24 @@ test.describe('calculadora-mermelada — Inspector 14/11/2026', () => {
     );
   });
 
-  // HALLAZGO D (14/11/2026, ABIERTO) — consejos de conservación con `// @disclaimer: exempt`.
+  // HALLAZGO D (14/11/2026, REPARADO) — consejos de conservación con `// @disclaimer: exempt`.
   test('Aviso · los consejos de conservación van con un DisclaimerCard', async ({ page }) => {
-    // calculadora-caducidad, del mismo tema, lleva DisclaimerCard (role="note"). Hoy: ninguno.
-    test.fail();
-    await expect(page.getByRole('note').first()).toBeAttached();
+    // calculadora-caducidad, del mismo tema, lleva DisclaimerCard (role="note"). Antes: ninguno.
+    const aviso = page.getByRole('note').filter({ hasText: 'Conservas caseras' });
+    await expect(aviso).toHaveCount(1);
+    // Nivel 3 MEDIO: plegable, y desplegado al entrar (sessionStorage)
+    await expect(aviso.getByRole('button', { name: 'Ocultar aviso' })).toHaveAttribute('aria-expanded', 'true');
   });
 
-  // HALLAZGO D (14/11/2026, ABIERTO) — AESAN, «Botulismo» (30/08/2019), §10: «se recomienda a los
+  // HALLAZGO D (14/11/2026, REPARADO) — AESAN, «Botulismo» (30/08/2019), §10: «se recomienda a los
   // consumidores desechar conservas (caseras e industriales) que presenten abombamiento, óxido,
   // pérdidas de líquido u olores anómalos».
   test('Aviso · la conservación fuera de la nevera dice cuándo desechar un tarro', async ({ page }) => {
     const cuerpo = await textoDelCuerpo(page);
     // Control: el consejo de guardarla fuera de la nevera está en la página
     expect(cuerpo).toContain('Para guardarla fuera de la nevera');
-    test.fail();
-    expect(cuerpo).toMatch(/abomba/i);
+    // Antes: ninguna mención de cuándo desechar un tarro
+    expect(cuerpo).toContain('desechar conservas (caseras e industriales) que presenten abombamiento');
   });
 
   // ── Accesibilidad ──────────────────────────────────────────────────────────

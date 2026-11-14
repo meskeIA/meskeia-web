@@ -1,9 +1,9 @@
 'use client';
-// @disclaimer: exempt
 
 import { useMemo, useState } from 'react';
 import styles from './CalculadoraMermelada.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard } from '@/components';
+import DisclaimerCard from '@/components/DisclaimerCard';
 import { NIVELES_MERMELADA, calcularMermelada } from '@/lib/calculadoras/mermelada';
 import { formatNumber, parseSpanishNumber } from '@/lib';
 import { PREGUNTAS_FRECUENTES } from './metadata';
@@ -66,6 +66,16 @@ export default function CalculadoraMermeladaPage() {
             )}
           </div>
         </section>
+
+        {/* Nivel 3 MEDIO (decidido por el usuario el 14/11/2026, hallazgo 4648): la app da consejos de
+            conserva casera fuera de la nevera. Texto de AESAN, «Botulismo» (30/08/2019), apartado 10. */}
+        <DisclaimerCard variant="general" severity="medium" collapsible context="calculadora-mermelada" title="Conservas caseras">
+          <p>
+            Las cantidades son orientativas. La autoridad española de seguridad alimentaria (AESAN)
+            recomienda «desechar conservas (caseras e industriales) que presenten abombamiento, óxido,
+            pérdidas de líquido u olores anómalos». Ante la duda, no la consumas.
+          </p>
+        </DisclaimerCard>
 
         <EducationalSection title="Mermelada casera" subtitle="El papel del azúcar, el limón y el punto de cuajado">
           <div className={styles.educationalContent}>
