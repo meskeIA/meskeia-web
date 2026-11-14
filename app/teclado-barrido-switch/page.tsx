@@ -12,6 +12,7 @@ import {
   ShareCard,
 } from '@/components';
 import { formatNumber } from '@/lib';
+import { ponerVoz } from '@/lib/vozSintesis';
 import {
   construirFilas,
   nombreTecla,
@@ -76,7 +77,8 @@ export default function TecladoBarridoSwitchPage() {
     if (typeof window === 'undefined' || !window.speechSynthesis || !texto.trim()) return;
     window.speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(texto);
-    utterance.lang = 'es-ES';
+    // Una voz española que sintetice en el dispositivo antes que una en línea (cabo C0738)
+    ponerVoz(utterance, 'es-ES');
     window.speechSynthesis.speak(utterance);
   }, [texto]);
 
@@ -87,7 +89,7 @@ export default function TecladoBarridoSwitchPage() {
       if (!avisoVoz || typeof window === 'undefined' || !window.speechSynthesis) return;
       window.speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(mensaje);
-      utterance.lang = 'es-ES';
+      ponerVoz(utterance, 'es-ES');
       window.speechSynthesis.speak(utterance);
     },
     [avisoVoz]

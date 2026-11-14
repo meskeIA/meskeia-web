@@ -11,6 +11,7 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
+import { ponerVoz } from '@/lib/vozSintesis';
 
 // Tipos
 type CategoriaId = 'favoritos' | 'necesidades' | 'emociones' | 'comida' | 'acciones' | 'personas' | 'lugares';
@@ -141,13 +142,10 @@ function leerTexto(texto: string) {
   if (typeof window === 'undefined' || !window.speechSynthesis) return;
   window.speechSynthesis.cancel();
   const utt = new SpeechSynthesisUtterance(texto);
-  utt.lang = 'es-ES';
   utt.rate = 0.9;
   utt.pitch = 1.1;
-  // Preferir voz española si hay
-  const voces = window.speechSynthesis.getVoices();
-  const vozEs = voces.find(v => v.lang.startsWith('es'));
-  if (vozEs) utt.voice = vozEs;
+  // Una voz española que sintetice en el dispositivo antes que una en línea (cabo C0738)
+  ponerVoz(utt, 'es-ES');
   window.speechSynthesis.speak(utt);
 }
 
@@ -504,7 +502,7 @@ export default function TableroComunicacionPage() {
             </div>
             <div className={styles.faqItem}>
               <dt>¿Funciona sin conexión a internet?</dt>
-              <dd>Sí, una vez que la página está cargada. La síntesis de voz usa el motor del navegador, que funciona localmente. Útil en entornos con conectividad limitada como centros de día o domicilios rurales.</dd>
+              <dd>Sí, una vez que la página está cargada, si el dispositivo tiene una voz española instalada: el tablero elige siempre una voz que sintetiza en el propio equipo, y así las frases no salen de él. Si el sistema solo ofrece voces en línea (en algunos navegadores, «Google español»), la frase se envía a ese servicio para convertirla en voz y sin conexión no sonará; se puede instalar una voz española en los ajustes de idioma o de voz del sistema. Útil en entornos con conectividad limitada como centros de día o domicilios rurales.</dd>
             </div>
             <div className={styles.faqItem}>
               <dt>¿Los símbolos se pueden usar con un pulsador o teclado?</dt>

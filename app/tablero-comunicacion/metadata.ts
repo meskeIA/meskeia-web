@@ -70,7 +70,7 @@ export const faqJsonLd = {
       name: '¿Cómo funciona la síntesis de voz en el tablero de comunicación?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Al pulsar un símbolo en el tablero, la aplicación convierte el texto asociado en voz usando la API de síntesis de voz del navegador (Web Speech API). Esta tecnología genera habla natural sin necesidad de archivos de audio grabados. En español hay varias voces disponibles según el navegador y sistema operativo. La síntesis de voz funciona sin conexión en la mayoría de dispositivos modernos, lo que garantiza disponibilidad en cualquier momento.',
+        text: 'Al pulsar un símbolo en el tablero, la aplicación convierte el texto asociado en voz usando la API de síntesis de voz del navegador (Web Speech API). Esta tecnología genera habla natural sin necesidad de archivos de audio grabados. En español hay varias voces disponibles según el navegador y sistema operativo, y el tablero elige primero una que sintetiza en el propio dispositivo: con ella funciona sin conexión y las frases no salen del equipo. Si el sistema solo tiene voces en línea, la frase se envía a ese servicio para convertirla en voz y hace falta conexión.',
       },
     },
     {

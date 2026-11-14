@@ -11,6 +11,7 @@ import {
   EducationalSection,
   ShareCard,
 } from '@/components';
+import { ponerVoz } from '@/lib/vozSintesis';
 
 // Fases del ciclo de respiración
 type Fase = 'parado' | 'inhala' | 'reten1' | 'exhala' | 'reten2';
@@ -122,7 +123,8 @@ export default function GuiaRespiracionPage() {
     if (!vozActiva || typeof window === 'undefined' || !window.speechSynthesis) return;
     window.speechSynthesis.cancel();
     const utt = new SpeechSynthesisUtterance(texto);
-    utt.lang = 'es-ES';
+    // Una voz española que sintetice en el dispositivo antes que una en línea (cabo C0738)
+    ponerVoz(utt, 'es-ES');
     utt.rate = 0.85;
     utt.pitch = 1;
     window.speechSynthesis.speak(utt);

@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef, RefObject } from 'react';
 import styles from './TextToSpeech.module.css';
+import { elegirVoz } from '@/lib/vozSintesis';
 
 interface TextToSpeechProps {
   /** Referencia al elemento HTML cuyo contenido de texto se leerá */
@@ -144,8 +145,9 @@ export default function TextToSpeech({
         ? voicesRef.current
         : window.speechSynthesis.getVoices();
 
-      const langPrefix = lang.split('-')[0];
-      const matchingVoice = voices.find(v => v.lang.startsWith(langPrefix)) || voices[0];
+      // Una voz del idioma que sintetice en el dispositivo antes que una en línea (cabo C0738);
+      // sin ninguna del idioma, elige el navegador por `lang` (antes, voices[0]: otro idioma)
+      const matchingVoice = elegirVoz(voices, lang);
       if (matchingVoice) {
         utterance.voice = matchingVoice;
       }
