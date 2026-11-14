@@ -292,8 +292,9 @@ test.describe('visualizador-corazon-ciclo-cardiaco', () => {
     expect(sistole / (sistole + diastole)).toBeLessThan(0.42);
   });
 
-  test('HALLAZGO ABIERTO [contenido/medio]: la interpretación del gasto contradice las tarjetas de referencia y la FAQ', async ({ page }) => {
-    test.fail(); // HALLAZGO ABIERTO (inspector 14/11/2026) [contenido/medio]
+  test('HALLAZGO 4662 REPARADO [contenido/medio]: la interpretación del gasto dice lo mismo que las tarjetas de referencia y la FAQ', async ({ page }) => {
+    // REPARADO (/reparar 14/11/2026): tramos cortados a medio camino entre las tarjetas (~5, ~8,
+    // ~15, ~25 L/min), 7 L/min aún reposo, y sin sugerir ninguna enfermedad por debajo de 4.
     // ENTRADA  FC 100 × VS 80 = 8 L/min · FC 150 × VS 100 = 15 L/min · FC 100 × VS 70 = 7 L/min ·
     //          FC 150 × VS 120 = 18 L/min
     // ESPERADO el texto de interpretación dice lo mismo que la tarjeta de su cifra («~8 L/min
@@ -327,11 +328,20 @@ test.describe('visualizador-corazon-ciclo-cardiaco', () => {
     const paginaElite = /Solo atletas de élite/.test(await frasePorTramo(page));
     lecturas['18 L/min: FAQ y página no se contradicen'] = !(faqIntenso && paginaElite);
 
+    // 55 × 70 = 3,85: la guía llama «bradicardia fisiológica» a 35-40 lpm; el texto no orienta
+    // hacia una enfermedad (cabo C0754: la app va con @disclaimer: exempt)
+    await fijarGasto(page, 55, 70);
+    await expect(valorGasto(page)).toHaveText('3,85');
+    lecturas['3,85 L/min sin sugerir enfermedad'] = !/insuficiencia|bradicardia severa|podría indicar/i.test(
+      await frasePorTramo(page),
+    );
+
     expect(lecturas).toEqual({
       '8 L/min coincide con su tarjeta': true,
       '15 L/min coincide con su tarjeta': true,
       '7 L/min con FC y VS normales es reposo': true,
       '18 L/min: FAQ y página no se contradicen': true,
+      '3,85 L/min sin sugerir enfermedad': true,
     });
   });
 

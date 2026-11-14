@@ -425,12 +425,19 @@ function SeccionGastoCardiaco(): React.ReactNode {
     { icono: '🏋️', valor: '~25 L/min', label: 'Esfuerzo máximo' },
   ];
 
+  /*
+   * Los tramos siguen a las tarjetas de referencia de debajo (~5, ~8, ~15 y ~25 L/min), con el corte
+   * a medio camino entre una y la siguiente, y a los rangos de la propia app: 100 lpm y 70 ml, los dos
+   * «normales» (botón «Normal (60-100)» y la FAQ), dan 7 L/min y son reposo (hallazgo 4662). El
+   * texto no sugiere ninguna enfermedad: es un visualizador educativo, y con 55 lpm la guía habla de
+   * bradicardia fisiológica.
+   */
   function getComparacion(): string {
-    if (gc < 4) return 'Muy bajo — podría indicar bradicardia severa o insuficiencia cardíaca.';
-    if (gc < 6) return 'Rango de reposo normal (4-6 L/min). Típico en adulto sano sentado.';
-    if (gc < 10) return 'Actividad moderada — el corazón trabaja más para cubrir la demanda muscular.';
-    if (gc < 18) return 'Ejercicio intenso — el corazón de una persona entrenada responde aumentando FC y VS.';
-    return '¡Esfuerzo máximo! Solo atletas de élite con corazones muy entrenados alcanzan estos valores.';
+    if (gc < 4) return 'Por debajo del gasto de reposo típico de un adulto (~5 L/min). En un corazón entrenado, la frecuencia baja va con un volumen sistólico mayor que lo compensa: prueba a subir el VS.';
+    if (gc <= 7) return 'Rango de reposo normal (~5 L/min): lo típico de un adulto sentado.';
+    if (gc < 11.5) return 'Actividad ligera (~8 L/min) — el corazón trabaja más para cubrir la demanda muscular.';
+    if (gc < 20) return 'Ejercicio moderado (~15 L/min) — el corazón responde aumentando FC y VS.';
+    return 'Esfuerzo máximo (~25 L/min) — en ejercicio intenso el gasto puede superar los 20-25 litros por minuto.';
   }
 
   return (
