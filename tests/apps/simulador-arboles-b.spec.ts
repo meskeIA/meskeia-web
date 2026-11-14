@@ -604,7 +604,8 @@ test.describe('Inspección de cambio 14/11/2026 · recuento de divisiones (242a8
       expect(await leerArbol(page)).toEqual([]);
     });
 
-    // HALLAZGO (14/11/2026, ABIERTO) · operativa/medio — 7f04b0f92 añadió `justify-content:
+    // HALLAZGO 4606 (14/11/2026, REPARADO el mismo día: `.arbolSvg` con `max-width: none` y
+    // `flex-shrink: 0`, como la hermana) · operativa/medio — 7f04b0f92 añadió `justify-content:
     // safe center` para que, si el árbol desborda, su borde izquierdo se alcance con el scroll
     // (cabo C0060, hallazgo 2298 de la hermana). Aquí no llega a actuar: `.arbolSvg` sigue con
     // `max-width: 100%` (la hermana simulador-arboles-bst-avl lo quitó en su hallazgo [3]), así que
@@ -613,10 +614,9 @@ test.describe('Inspección de cambio 14/11/2026 · recuento de divisiones (242a8
     // de datos» (552) al 36 % y «Árbol de tres niveles» (864) al 23 %: las claves de 14 px salen a
     // unos 3-5 px, ilegibles, y el panel no se desplaza (scrollWidth 246 = clientWidth 246).
     // Esperado: el árbol a tamaño real (ancho pintado ≥ viewBox) con desplazamiento en su panel.
-    test('HALLAZGO · el «Árbol de tres niveles» se dibuja a tamaño real y se desplaza en su panel', async ({
+    test('HALLAZGO 4606 · el «Árbol de tres niveles» se dibuja a tamaño real y se desplaza en su panel', async ({
       page,
     }) => {
-      test.fail();
       await page.getByRole('button', { name: /^Árbol de tres niveles/ }).tap();
       await expect(mensajeEstado(page)).toContainText('Claves: 15. Divisiones: 6.');
       const lienzo = await page.evaluate(() => {

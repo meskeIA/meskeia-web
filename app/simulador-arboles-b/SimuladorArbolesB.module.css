@@ -302,10 +302,16 @@
   text-align: center;
 }
 
+/*
+ * El SVG se DESPLAZA, no se encoge (hallazgo 4606, el [3] de la hermana arboles-bst-avl):
+ * con `max-width: 100%` el panel nunca desbordaba, el «safe center» no llegaba a actuar y en un
+ * móvil de 390 px el «Árbol de tres niveles» (864 px de viewBox) se pintaba a 198 px, con las
+ * claves de 14 px a unos 3 px.
+ */
 .arbolSvg {
   display: block;
-  max-width: 100%;
-  height: auto;
+  max-width: none;
+  flex-shrink: 0;
   font-family: 'SF Mono', Monaco, monospace;
 }
 
