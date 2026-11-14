@@ -920,3 +920,86 @@
   color: var(--text-secondary);
   font-weight: 600;
 }
+
+/* ── Guía de lectura (S0275) ──
+   Va sobre la imagen de la cámara, que es la misma en los dos temas: por eso sus colores no
+   cambian con el tema. Amarillo con halo oscuro, como en las lupas electrónicas, para que se
+   vea sobre papel blanco, sobre la imagen invertida y sobre fotos. Ninguna pieza recibe gestos
+   salvo el asa: con la imagen congelada se arrastra la imagen bajo la ventana, y en directo el
+   gesto vertical sigue desplazando la página (C0067). */
+.guiaCapa {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.guiaVelo {
+  position: absolute;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.82);
+}
+
+.guiaBorde,
+.guiaLinea {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 0;
+}
+
+.guiaBorde {
+  border-top: 2px solid #ffd60a;
+  transform: translateY(-1px);
+}
+
+.guiaLinea {
+  border-top: 3px solid #ffd60a;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.75);
+  transform: translateY(-1.5px);
+}
+
+.guiaAsa {
+  position: absolute;
+  left: 8px;
+  width: 44px;
+  height: 44px;
+  transform: translateY(-50%);
+  border-radius: 50%;
+  background: #ffd60a;
+  color: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.4rem;
+  font-weight: 700;
+  line-height: 1;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
+  pointer-events: auto;
+  touch-action: none;
+  cursor: ns-resize;
+  user-select: none;
+}
+
+.guiaAsa:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 2px;
+}
+
+.guiaAjustes {
+  margin-top: 20px;
+}
+
+.guiaPista {
+  margin: 0;
+  padding: 10px 14px;
+  background: rgba(46, 134, 171, 0.08);
+  border-left: 3px solid var(--primary);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+[data-theme='dark'] .guiaPista {
+  background: rgba(46, 134, 171, 0.18);
+}

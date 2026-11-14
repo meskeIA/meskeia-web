@@ -6,7 +6,8 @@ import styles from './LupaDigital.module.css';
 import { MeskeiaLogo, Footer, RelatedApps, LegalNotice, ShareCard, EducationalSection } from '@/components';
 import { formatNumber, formatPercentage } from '@/lib';
 import { leerRangoZoom, repartirZoom, type RangoZoomCamara } from './zoom';
-import { PREGUNTA_IMAGEN_FIJA, RESPUESTA_IMAGEN_FIJA } from './metadata';
+import { acotarGuia, bordesVentana, ALTO_VENTANA_MIN, ALTO_VENTANA_MAX, type GuiaLectura } from './guia';
+import { PREGUNTA_IMAGEN_FIJA, RESPUESTA_IMAGEN_FIJA, PREGUNTA_GUIA_LECTURA, RESPUESTA_GUIA_LECTURA } from './metadata';
 
 /** Ni `zoom` ni `torch` están aún en los tipos de DOM de TypeScript. */
 type CapacidadesCamara = MediaTrackCapabilities & { torch?: boolean; zoom?: Partial<RangoZoomCamara> };
@@ -74,6 +75,11 @@ export default function LupaDigitalPage() {
   // Zoom de cámara con el que se tomó la imagen congelada: la imagen quieta ya viene
   // ampliada en esa medida y solo puede seguir ampliándose en pantalla.
   const [zoomCamaraCongelado, setZoomCamaraCongelado] = useState(1);
+  // Guía de lectura (S0275): modo, centro y alto de la ventana, en % de la altura del visor
+  const [guia, setGuia] = useState<GuiaLectura>('ninguna');
+  const [posGuia, setPosGuia] = useState(50);
+  const [altoVentana, setAltoVentana] = useState(20);
+  const arrastreGuiaRef = useRef(false);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -401,6 +407,69 @@ export default function LupaDigitalPage() {
     return () => observador.disconnect();
   }, [congelado, escalaCongelada]);
 
+  const cambiarGuia = (modo: GuiaLectura) => {
+    setGuia(modo);
+    setPosGuia((p) => acotarGuia(p, modo, altoVentana));
+  };
+
+  const cambiarAltoVentana = (alto: number) => {
+    setAltoVentana(alto);
+    setPosGuia((p) => acotarGuia(p, guia, alto));
+  };
+
+  /**
+   * La guía solo se mueve desde su asa: la banda y los velos dejan pasar los gestos, porque
+   * con la imagen congelada lo natural es arrastrar la IMAGEN bajo la ventana para ir pasando
+   * el texto, y en directo el gesto vertical tiene que seguir desplazando la página (C0067).
+   */
+  const moverGuiaA = (clientY: number) => {
+    const visor = visorRef.current;
+    if (!visor) return;
+    const caja = visor.getBoundingClientRect();
+    if (!caja.height) return;
+    setPosGuia(acotarGuia(((clientY - caja.top) / caja.height) * 100, guia, altoVentana));
+  };
+
+  const iniciarArrastreGuia = (e: React.PointerEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    arrastreGuiaRef.current = true;
+    e.currentTarget.setPointerCapture(e.pointerId);
+  };
+
+  const moverArrastreGuia = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (arrastreGuiaRef.current) moverGuiaA(e.clientY);
+  };
+
+  const terminarArrastreGuia = (e: React.PointerEvent<HTMLDivElement>) => {
+    arrastreGuiaRef.current = false;
+    if (e.currentTarget.hasPointerCapture(e.pointerId)) {
+      e.currentTarget.releasePointerCapture(e.pointerId);
+    }
+  };
+
+  /** Teclado del asa, como cualquier deslizador: flechas, Re Pág / Av Pág, Inicio y Fin. */
+  const moverGuiaConTeclado = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    const paso = e.shiftKey ? 10 : 2;
+    const destinos: Record<string, number> = {
+      ArrowUp: posGuia - paso,
+      ArrowLeft: posGuia - paso,
+      ArrowDown: posGuia + paso,
+      ArrowRight: posGuia + paso,
+      PageUp: posGuia - 10,
+      PageDown: posGuia + 10,
+      Home: 0,
+      End: 100,
+    };
+    const destino = destinos[e.key];
+    if (destino === undefined) return;
+    e.preventDefault();
+    setPosGuia(acotarGuia(destino, guia, altoVentana));
+  };
+
+  const ventana = bordesVentana(posGuia, altoVentana);
+  const posMin = acotarGuia(0, guia, altoVentana);
+  const posMax = acotarGuia(100, guia, altoVentana);
+
   const getFiltroStyle = (): string => {
     const filtros: string[] = [];
 
@@ -497,6 +566,41 @@ export default function LupaDigitalPage() {
           onPointerCancel={terminarArrastre}
           onKeyDown={moverConTeclado}
         />
+
+        {/* Guía de lectura (S0275): va por encima de la imagen y no recibe gestos salvo en su asa */}
+        {activo && guia !== 'ninguna' && (
+          <div className={styles.guiaCapa} data-guia={guia}>
+            {guia === 'mascara' ? (
+              <div className={styles.guiaCapa}>
+                <div className={styles.guiaVelo} data-guia-parte="velo-arriba" style={{ top: 0, height: `${ventana.arriba}%` }} />
+                <div className={styles.guiaVelo} data-guia-parte="velo-abajo" style={{ top: `${ventana.abajo}%`, bottom: 0 }} />
+                <div className={styles.guiaBorde} style={{ top: `${ventana.arriba}%` }} />
+                <div className={styles.guiaBorde} style={{ top: `${ventana.abajo}%` }} />
+              </div>
+            ) : (
+              <div className={styles.guiaLinea} data-guia-parte="linea" style={{ top: `${posGuia}%` }} />
+            )}
+            <div
+              role="slider"
+              tabIndex={0}
+              aria-label="Posición de la guía de lectura"
+              aria-orientation="vertical"
+              aria-valuemin={posMin}
+              aria-valuemax={posMax}
+              aria-valuenow={posGuia}
+              aria-valuetext={`${formatPercentage(posGuia / 100, 0)} de la altura del visor, desde arriba`}
+              className={styles.guiaAsa}
+              style={{ top: `${posGuia}%` }}
+              onPointerDown={iniciarArrastreGuia}
+              onPointerMove={moverArrastreGuia}
+              onPointerUp={terminarArrastreGuia}
+              onPointerCancel={terminarArrastreGuia}
+              onKeyDown={moverGuiaConTeclado}
+            >
+              <span aria-hidden="true">⇕</span>
+            </div>
+          </div>
+        )}
 
         {/* Controles sobre el video */}
         {activo && (
@@ -730,6 +834,73 @@ export default function LupaDigitalPage() {
         </button>
       </div>
 
+      {/* Guía de lectura (S0275): línea guía y máscara, como en las lupas electrónicas */}
+      <div className={styles.section}>
+        <h3 className={styles.sectionTitle}>Guía de lectura</h3>
+        <div className={styles.filtrosGrid}>
+          {[
+            { id: 'ninguna' as GuiaLectura, nombre: 'Sin guía', icono: '⬜' },
+            { id: 'linea' as GuiaLectura, nombre: 'Línea guía', icono: '➖' },
+            { id: 'mascara' as GuiaLectura, nombre: 'Máscara', icono: '▬' },
+          ].map(g => (
+            <button
+              type="button"
+              key={g.id}
+              className={`${styles.filtroBtn} ${guia === g.id ? styles.filtroActivo : ''}`}
+              onClick={() => cambiarGuia(g.id)}
+              aria-pressed={guia === g.id}
+            >
+              <span aria-hidden="true" className={styles.filtroIcono}>{g.icono}</span>
+              <span className={styles.filtroNombre}>{g.nombre}</span>
+            </button>
+          ))}
+        </div>
+
+        {guia !== 'ninguna' && (
+          <div className={styles.guiaAjustes}>
+            <div className={styles.ajuste}>
+              <label htmlFor="control-guia-posicion">
+                Altura de la guía en el visor: {formatPercentage(posGuia / 100, 0)}
+              </label>
+              <input
+                id="control-guia-posicion"
+                type="range"
+                min={posMin}
+                max={posMax}
+                step="1"
+                value={posGuia}
+                onChange={(e) => setPosGuia(acotarGuia(parseInt(e.target.value, 10), guia, altoVentana))}
+                className={styles.ajusteSlider}
+              />
+            </div>
+
+            {guia === 'mascara' && (
+              <div className={styles.ajuste}>
+                <label htmlFor="control-guia-alto">
+                  Alto de la ventana: {formatPercentage(altoVentana / 100, 0)} del visor
+                </label>
+                <input
+                  id="control-guia-alto"
+                  type="range"
+                  min={ALTO_VENTANA_MIN}
+                  max={ALTO_VENTANA_MAX}
+                  step="2"
+                  value={altoVentana}
+                  onChange={(e) => cambiarAltoVentana(parseInt(e.target.value, 10))}
+                  className={styles.ajusteSlider}
+                />
+              </div>
+            )}
+
+            <p className={styles.guiaPista}>
+              La guía se mueve con el asa amarilla del borde izquierdo del visor, o con este control.
+              Con la imagen fija, deja la guía quieta y arrastra la imagen para ir pasando el
+              renglón por debajo.
+            </p>
+          </div>
+        )}
+      </div>
+
       {/* Usos */}
       <div className={styles.usosSection}>
         <h3>Usos comunes</h3>
@@ -885,6 +1056,12 @@ export default function LupaDigitalPage() {
                 <summary>{PREGUNTA_IMAGEN_FIJA}</summary>
                 {/* Hallazgo 3276: la misma respuesta que el FAQPage, de una sola constante */}
                 <p>{RESPUESTA_IMAGEN_FIJA}</p>
+              </details>
+            </li>
+            <li className={styles.faqItem}>
+              <details>
+                <summary>{PREGUNTA_GUIA_LECTURA}</summary>
+                <p>{RESPUESTA_GUIA_LECTURA}</p>
               </details>
             </li>
             <li className={styles.faqItem}>

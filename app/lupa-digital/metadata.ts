@@ -40,6 +40,7 @@ export const jsonLd = generateWebAppSchema({
     'Ampliación de 1× a 5× con la cámara del móvil o celular, usando el zoom de la propia cámara cuando el navegador lo permite',
     'Congelar la imagen para leerla sin sostener el teléfono, recorriéndola con el dedo o el teclado',
     'Filtros de accesibilidad: alto contraste, inversión, escala de grises y sepia',
+    'Guía de lectura: línea guía o máscara que deja ver solo el renglón, en directo y sobre la imagen congelada',
     'Ajuste independiente de brillo y contraste en tiempo real',
     'Restablecer todos los ajustes de un toque',
     'Compatibilidad con cámara frontal y trasera',
@@ -56,6 +57,11 @@ export const jsonLd = generateWebAppSchema({
 export const PREGUNTA_IMAGEN_FIJA = '¿Puedo dejar la imagen fija para leerla con calma?';
 export const RESPUESTA_IMAGEN_FIJA =
   'Sí. El botón «Congelar» detiene la imagen en el fotograma que estés viendo y a partir de ahí puedes apoyar o soltar el teléfono. Sobre la imagen quieta siguen funcionando el zoom, los filtros de contraste y el brillo, y se recorre arrastrándola con el dedo o con las flechas del teclado. La captura se hace a la resolución de la cámara y no a la de la pantalla, así que ampliar después de congelar conserva el detalle. Es la forma más cómoda de leer un prospecto entero, porque con mucho aumento cualquier temblor de la mano mueve la imagen. Si además quieres guardarla, haz una captura de pantalla.';
+
+/** S0275 (14/11/2026): la guía de lectura, con la misma regla de una sola constante para las dos bocas. */
+export const PREGUNTA_GUIA_LECTURA = '¿Cómo sigo el renglón sin perderme al leer con mucho aumento?';
+export const RESPUESTA_GUIA_LECTURA =
+  'Con la guía de lectura, la misma ayuda que traen las lupas electrónicas de sobremesa. La «Línea guía» pone una raya horizontal bajo el renglón que estás leyendo; la «Máscara» deja ver solo una franja del visor y oscurece lo de arriba y lo de abajo, para que la vista no salte a otra línea. Las dos se suben o bajan con el asa del borde izquierdo del visor (también con las flechas del teclado) o con su control bajo la imagen, y en la máscara se elige además el alto de la ventana. Funciona en directo y con la imagen fija: con la imagen quieta, deja la guía en su sitio y arrastra la imagen para ir pasando el texto por la ventana. Se combina con los filtros: con «Invertir», por ejemplo, queda texto claro sobre fondo oscuro dentro de una ventana rodeada de negro.';
 
 export const faqJsonLd = {
   '@context': 'https://schema.org',
@@ -99,6 +105,14 @@ export const faqJsonLd = {
       acceptedAnswer: {
         '@type': 'Answer',
         text: RESPUESTA_IMAGEN_FIJA,
+      },
+    },
+    {
+      '@type': 'Question',
+      name: PREGUNTA_GUIA_LECTURA,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: RESPUESTA_GUIA_LECTURA,
       },
     },
     {
