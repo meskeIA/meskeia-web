@@ -20,8 +20,9 @@
  *      ignorados por git (`scripts/digest-diario.mjs`, `_private/`).
  *   4. Cada «### Candado de…» afirma que rompe el build: su `npm run check:x` tiene que estar
  *      de verdad en la cadena de `npm run build`.
- *   5. MOLDE, solo aviso: una sección «### Candado de…» de más de 1.200 B, o sin la línea
- *      «Salió de…» que nombra su caso de origen (candado de juicio nº 2).
+ *   5. MOLDE, solo aviso: una sección «### Candado de…» de más de 800 B, o que vuelve a cargar
+ *      lo que vive solo en la cabecera de su script: el escape, lo que barre, el pasivo
+ *      (`-- --todo`), las pruebas o el «Salió de…» (SOLO_EN_CABECERA).
  *
  * DE DÓNDE SALE (24/09/2026)
  * ──────────────────────────
@@ -33,6 +34,16 @@
  * justo la que se lleva las líneas largas, que son las que explican una obligación. La lista
  * se escribió leyendo el fichero de ANTES de la poda del 24/09, para que la poda tuviera algo
  * contra lo que medirse.
+ *
+ * PODA DEL 14/11/2026 (informe de /doctor). El fichero había vuelto a 74.881 B: las secciones
+ * de candado eran 31 y sumaban ~28 KB con el molde del 24/09 (qué rompe, qué barre, el escape,
+ * lo que NO mira y «Salió de…»). El usuario decidió quitar lo que Claude ya ve en el código:
+ * cada candado queda en una línea con qué rompe, la receta y lo que NO mira, y el escape, el
+ * alcance, el `--todo`, las pruebas y el caso de origen viven solo en la cabecera de su script,
+ * donde se comprobaron uno a uno antes de quitarlos (16 traslados en 16 cabeceras). El nombrar el
+ * caso de origen del candado de juicio nº 2 se cumple abriendo esa cabecera. El molde pasó de
+ * pedir la línea «Salió de…» a avisar si vuelve, y la sección 3 (apps en paralelo) se fue a
+ * /nueva-app-meskeia. Acta: _private/memoria-refactor/2026-11-14-claude-md/.
  *
  * La lista vive AQUÍ y no en _private/, al revés que la de frenos de memoria: el CLAUDE.md es
  * público, así que su lista puede serlo, y el candado corre también en Vercel.
@@ -79,7 +90,21 @@ const VERBOSE = args.includes('--verbose');
 const iFichero = args.indexOf('--fichero');
 const FICHERO = iFichero >= 0 ? path.resolve(args[iFichero + 1]) : path.join(REPO, 'CLAUDE.md');
 
-const MOLDE_MAX_BYTES = 1200;
+// Una línea de qué rompe, receta y lo que NO mira. El 14/11/2026 la mayor es la tarjeta social,
+// ~800 B por la excepción de Delegum, y la mediana ~470 B. Pasar de aquí es la señal de que
+// vuelve la crónica, no una cota a defender.
+const MOLDE_MAX_BYTES = 800;
+
+// Lo que desde el 14/11/2026 vive SOLO en la cabecera del script de cada candado. Que reaparezca
+// en su sección es la señal de que la poda se está deshaciendo (el CLAUDE.md crecía así).
+const SOLO_EN_CABECERA = [
+  [/\b[a-z][\w-]*-ok:/, 'su escape'],
+  [/\bSalió del? /i, 'su caso de origen («Salió de…»)'],
+  [/-- --todo/, 'la medida del pasivo (-- --todo)'],
+  [/\bBarre\b/, 'lo que barre'],
+  [/\bsin pasivo\b/i, 'su pasivo'],
+  [/probar-candado/, 'sus pruebas'],
+];
 
 // ── La lista de obligaciones ────────────────────────────────────────────────────────────────
 // [clave de la sección, [frases]]. La clave casa con el texto del encabezado (sin mayúsculas ni
@@ -186,22 +211,21 @@ const OBLIGACIONES = [
     'Cursos (/curso-*) y Guías (/guia/*) están excluidos del patrón v2.0',
     'Juegos y ocio → patrón lite',
   ]],
+  // El procedimiento y las reglas literales de los agentes viven en /nueva-app-meskeia desde el
+  // 14/11/2026; aquí queda el puntero, que es lo que una sesión necesita para saber que existen.
   ['3. Creación de múltiples apps en paralelo', [
-    '3 o más apps', 'Fase secuencial ANTES', 'Fase paralela',
-    'Cada agente DEBE incluir estas instrucciones EXACTAS en su prompt',
-    '## REGLAS CRÍTICAS PARA ESTE AGENTE',
-    'Crea SOLO los 3 archivos de tu app (metadata.ts, page.tsx, .module.css)',
-    'npm run check:tipos UNA SOLA VEZ. Si falla, reporta el error y TERMINA — no reintentes',
-    'PROHIBIDO: npm run build (lock entre agentes) · modificar compartidos (applications.ts, implemented-apps.ts, app-relations.ts) · reintentar en bucle (sleep + retry) · run_in_background',
-    'TERMINAR INMEDIATAMENTE tras crear los ficheros y verificar TS una vez',
-    'No usar JSX.Element ni React.JSX.Element como tipo de retorno (causa error TS)',
-    'Fase secuencial DESPUÉS', 'CSS: no usar * puro, TS: no usar JSX.Element',
+    '3 o más apps', 'fase secuencial antes', '/nueva-app-meskeia', 'literales',
   ]],
   ['4. Modificar una app existente', [
     'npx playwright test tests/apps/<slug>.spec.ts', 'crear el fichero si no existe',
     'Una calculadora normal no lo necesita',
   ]],
   ['Stack Tecnológico: tRPC', ['/trpc-meskeia', 'no se migran']],
+  ['Seguridad y Calidad del Código', [
+    'está en la cadena de npm run build y dice qué rompe, la receta y lo que NO mira',
+    'Su escape', 'lo que barre', 'su pasivo (-- --todo)', 'el caso del que salió',
+    'están en la cabecera de su script',
+  ]],
   ['Lo que vigila el pre-commit', [
     'los goldens (test:calc', '_backups/, .credentials/, scratch/, digests/',
     'npm run check:secrets', 'npm run audit:secrets', 'pragma: allowlist-secret',
@@ -228,138 +252,161 @@ const OBLIGACIONES = [
     'restauracion-turso-semestral', 'uso_aplicaciones.timestamp es TEXT en formato español',
     'Usar created_at (ISO)',
   ]],
+  // Desde la poda del 14/11/2026, cada sección de candado es UNA línea: qué rompe, la receta y lo
+  // que NO mira. El escape, el alcance, el pasivo, las pruebas y el caso de origen viven en la
+  // cabecera de su script, y por eso ya no están en esta lista: se comprobaron allí antes de
+  // quitarlos (acta en _private/memoria-refactor/2026-11-14-claude-md/).
   ['Candado de accesibilidad JSX', [
-    'npm run check:a11y-jsx', 'rompe el build', '<button> sin type=',
-    'emoji junto a texto sin aria-hidden', 'aria-pressed que falta en un toggle',
-    'aria-pressed que sobra', 'emoji en nodo propio', 'solo avisan',
-    'un aria-pressed en un botón de acción es una regresión', 'las líneas que el commit añade',
-    'a11y-ok: <razón>', 'npm run check:a11y-jsx -- --todo', 'node scripts/check-a11y-jsx.mjs <fichero>',
+    'npm run check:a11y-jsx', 'rompe', '<button> sin type=', 'emoji junto a texto sin aria-hidden',
+    'también en una cadena que se pinta', 'delante de una etiqueta', 'aria-pressed que falta en un toggle',
+    'aria-pressed que sobra', 'emoji en nodo propio', '<label> sin control', 'solo avisan',
+    'un aria-pressed en un botón de acción es una regresión',
+  ]],
+  ['Candado de los iconos de tarjeta', [
+    'npm run check:iconos-tarjeta', 'rompe', 'no lleva aria-hidden="true"', 'el lector lo lee pegado al título',
+    'Una clase de icono con otro nombre no la ve', 'CLASES_ICONO',
   ]],
   ['Candado del aviso legal', [
-    'npm run check:legal', 'rompe el build', 'no monta <LegalNotice />',
-    'se monte y no solo se importe', 'no viva dentro de <EducationalSection>', 'Sin pasivo',
-    'legal-ok: <razón>', 'razón es obligatoria', 'npm run legal:probar-candado',
+    'npm run check:legal', 'rompe', 'no monta <LegalNotice />', 'importarlo no basta',
+    'dentro de <EducationalSection>, que nace colapsada',
   ]],
   ['Candado del catálogo en el cliente', [
-    'npm run check:catalogo-cliente', 'rompe el build', "un fichero 'use client' alcanza data/app-relations.ts",
-    'el barrel @/components alcanza data/applications.ts', 'Sin pasivo',
-    'catalogo-ok: <razón>', 'razón obligatoria', 'npm run catalogo:probar-candado',
+    'npm run check:catalogo-cliente', 'rompe', "un fichero 'use client' alcanza data/app-relations.ts",
+    'el barrel @/components alcanza data/applications.ts', 'siguiendo los imports en cadena',
+    '<ConRelacionadas slug>', '<RelatedApps /> sin prop',
   ]],
   ['Candado de las celdas braille', [
-    'npm run check:braille', 'rompe el build',
-    'dejan de dibujar con puntosDeCelda', 'caída a vacío', 'una celda emitible sale sin puntos',
-    'no cuadra con el código Unicode', 'Sin pasivo', 'sin escape, a propósito',
-    'npm run braille:probar-candado',
+    'npm run check:braille', 'rompe', 'dejan de dibujar con puntosDeCelda', 'caída a vacío',
+    'una celda emitible sale sin puntos', 'no cuadra con el código Unicode',
+    'No mira si la celda es la CORRECTA para su carácter en tinta',
   ]],
   ['Candado del mínimo personal del IRPF', [
-    'npm run check:minimo-irpf', 'rompe el build', 'una resta cuyo sustraendo es un mínimo',
+    'npm run check:minimo-irpf', 'rompe', 'una resta cuyo sustraendo es un mínimo',
     'art. 63.1.2.º LIRPF', 'no reduce la renta', 'a TIPO CERO', 'calcularCuotaIntegraGeneral',
-    'cuotaEscalaGeneral', 'desglosarEscalaGeneral', 'Sin pasivo', 'minimo-ok: <razón>',
+    'cuotaEscalaGeneral', 'desglosarEscalaGeneral', 'suman más que la cuota',
     'art. 84.2 (3.400 / 2.150 €)', 'sí se resta de la base y no lo dispara',
-    'npm run minimo:probar-candado',
   ]],
   ['Candado del contraste de las cabeceras de tabla', [
-    'npm run check:contraste-cabeceras', 'rompe el build',
-    'texto blanco sobre var(--primary) o var(--secondary)', 'app/ y components/',
-    'un token -texto no se use como FONDO', '--primary-texto/--secondary-texto son para color:',
-    '--primary-boton', '--secondary-boton', 'iguales en ambos temas',
-    'var(--hero-bg) (8,33:1) no lo enciende', 'exige 4,5:1', '4,11:1 el azul y 2,80:1 el teal',
-    'Sin pasivo', 'contraste-ok: <razón>',
-    'razón es obligatoria', 'Lo que NO mira', 'el color de marca como TEXTO sobre fondo claro',
-    'se resuelve con --primary-texto', 'con fondo de marca (check:contraste-marca)', 'npm run contraste:probar-candado',
-    'tests/contraste-cabeceras-tabla.spec.ts',
+    'npm run check:contraste-cabeceras', 'rompe', 'texto blanco sobre var(--primary) o var(--secondary)',
+    'token -texto se usa como FONDO', '--primary-boton', '--secondary-boton', 'iguales en ambos temas',
+    'var(--hero-bg) no lo enciende', 'No mira la marca como TEXTO sobre fondo claro',
+    'con fondo de marca (check:contraste-marca)',
   ]],
   ['Candado del contraste de la marca', [
-    'npm run check:contraste-marca', 'rompe el build', 'texto blanco sobre la marca',
+    'npm run check:contraste-marca', 'rompe', 'texto blanco sobre la marca',
     'también el que un hover hereda de su estado base', '--primary-boton / --secondary-boton',
     'la marca como color de texto', '--primary-texto / --secondary-texto',
-    'o -boton sobre un fondo claro que no cambia con el tema', 'Comparte criterio con scripts/contraste-marca/campana.mjs',
-    'Barre app/, components/ y styles/, sin pasivo', 'marca-ok: <razón>', 'razón obligatoria',
+    'o -boton sobre un fondo claro que no cambia con el tema', 'dentro de @media print',
     'No mira el texto de un <canvas>', 'tests/contraste-marca-botones.spec.ts',
-    'npm run contraste-marca:probar-candado',
   ]],
   ['Candado del token sin variante oscura', [
-    'npm run check:token-oscuro', 'rompe el build',
+    'npm run check:token-oscuro', 'rompe',
     'declara con color literal un token que globals.css define distinto en cada tema',
-    'sin redeclararlo en la variante oscura de ese mismo selector', 'se planta si no la encuentra',
-    ':root de módulo', 'Al drenar un token en un tema, medir el otro', 'Sin pasivo',
-    'Fuera, a propósito: --primary y --secondary', 'solo rompen si pintan texto por debajo de 4,5:1 en oscuro',
-    'oscuro-ok: <razón>', 'razón obligatoria',
-    'Exige que la variante EXISTA', 'tests/contraste-text-muted-*.spec.ts',
-    'un valor se decide midiendo contra el fondo REAL', 'npm run oscuro:probar-candado',
+    'sin redeclararlo en la variante oscura de ese mismo selector', ':root de módulo',
+    'Al drenar un token en un tema, medir el otro', 'Fuera: --primary y --secondary',
+    'solo rompen si pintan texto por debajo de 4,5:1 en oscuro', 'Exige que la variante EXISTA',
+    'tests/contraste-text-muted-*.spec.ts', 'un valor se decide midiendo contra el fondo REAL',
   ]],
   ['Candado del texto semántico en claro', [
-    'npm run check:semanticos-claro', 'rompe el build', 'texto rojo, naranja, ámbar o verde',
+    'npm run check:semanticos-claro', 'rompe', 'texto rojo, naranja, ámbar o verde',
     'var(--rojo-texto, <color de antes>)', 'solo existen en claro, en oscuro manda la reserva',
-    'Rompe también sin reserva', 'sin pasivo', 'fuera, cursos y portales',
-    'semanticos-ok: <razón>', 'razón obligatoria', 'No ve un fondo oscuro que pone el TSX',
-    'npm run semanticos-claro:probar-candado',
+    'Rompe también sin reserva', 'No ve un fondo oscuro que pone el TSX',
+  ]],
+  ['Candado del blanco sobre fondo semántico', [
+    'npm run check:blanco-semantico', 'rompe', 'el color blanco o el background literal rojo, naranja, ámbar o verde',
+    'No ve los fondos por var()',
+  ]],
+  ['Candado de los colores prohibidos', [
+    'npm run check:colores-prohibidos', 'rompe', '#7C3AED o #2DD4BF (también con alfa)',
+  ]],
+  ['Candado del alfa pegado a un color de tres cifras', [
+    'npm run check:alfa-tres-cifras', 'rompe', "'#666' + 'CC' no es un color",
+    'No ve el alfa pegado a una variable suelta',
+  ]],
+  ['Candado de la variable CSS que no existe', [
+    'npm run check:var-css', 'rompe', 'sin reserva', 'la declaración entera se anula',
   ]],
   ['Candado de la clase que el módulo CSS no declara', [
-    'npm run check:clases-css', 'rompe el build', 'el .module.css importado no declara .x',
-    'las líneas que el commit añade', 'que el commit quita de su módulo',
-    'clases-ok: <razón>', 'razón obligatoria', 'npm run check:clases-css -- --todo',
-    'node scripts/check-clases-css.mjs <fichero>', 'Drenar el pasivo en bloque NO',
-    'npm run clases-css:probar-candado',
+    'npm run check:clases-css', 'rompe', 'el .module.css importado no declara .x',
+    'quita de su módulo una clase que se sigue usando', 'Drenar el pasivo en bloque NO',
+  ]],
+  ['Candado del pie que cuenta dos veces', [
+    'npm run check:footer-tracker', 'rompe', 'sin la misma key en todos',
+    'un AnalyticsTracker suelto junto a un <Footer appName>', 'tests/apps/footer-una-visita-por-carga.spec.ts',
+  ]],
+  ['Candado de la guarda de doble toque copiada', [
+    'npm run check:guarda-rafaga', 'rompe', 'useGuardaRafaga', 'No ve una guarda escrita con un temporizador',
+  ]],
+  ['Candado de los ayudantes del cromo fijo copiados', [
+    'npm run check:cromo-fijo', 'rompe', 'lib/cromoFijo.ts', 'se importan de @/lib', 'No ve una copia renombrada',
+  ]],
+  ['Candado del ternario que tumba la página traducida', [
+    'npm run check:ternario-traducido', 'rompe', 'alterna texto suelto y JSX', 'cada rama en su <span key>',
+    'aparece y desaparece', '<span>{condición}</span> siempre montado', '{x && <span>} NO basta',
+    'tests/apps/*-traducido-familia.spec.ts',
   ]],
   ['Candado del parser numérico', [
-    'npm run check:parser', 'rompe el build', "parseFloat(x.replace(',', '.'))",
-    'parseSpanishNumber', 'las líneas que el commit añade', 'Sustituirlos en bloque',
-    'El pasivo lo drena el Inspector app por app', 'parser-ok: <razón>',
-    'npm run check:parser -- --todo', 'node scripts/check-parser-numerico.mjs <fichero>',
+    'npm run check:parser', 'rompe', "parseFloat(x.replace(',', '.'))", 'parseSpanishNumber',
+    'Sustituirlos en bloque NO', 'El pasivo lo drena el Inspector app por app',
+  ]],
+  ['Candado de la respuesta de aula', [
+    'npm run check:respuesta-aula', 'rompe', 'leerRespuestaAula(texto, esperado)',
+    'No ve una tarea de aula que lea en su page.tsx',
+  ]],
+  ['Candado del reloj y el azar en el render', [
+    'npm run check:reloj-azar', 'rompe', 'Math.random', 'hoyISOLocal()', 'el min/max de un <input> de fecha',
+    'React 19 no corrige el atributo al hidratar', 'el valor al montar, en un efecto',
   ]],
   ['Candado de las características del JSON-LD', [
-    'npm run check:features', 'rompe el build', 'menos de 4', 'las listas cuyas líneas toca el commit',
-    'features-ok: <razón>', 'razón obligatoria', 'npm run check:features -- --todo',
-    'Rellenar las 297 vacías en bloque NO', 'npm run features:probar-candado',
+    'npm run check:features', 'rompe', 'menos de 4', 'Rellenar las vacías en bloque NO',
+  ]],
+  ['Candado de la FAQ única', [
+    'npm run check:faq-unica', 'rompe', 'PREGUNTAS_FRECUENTES',
+    'Dos FAQ con preguntas distintas, lo normal, no rompen',
   ]],
   ['Candado del bailout en el prerender', [
-    'npm run check:bailout', 'después de next build', 'rompe el build', 'BAILOUT_TO_CLIENT_SIDE_RENDERING',
-    'ACEPTADOS', 'next dev no genera el bailout', 'Se planta si no ve un build completo',
-    'npm run bailout:probar-candado',
+    'npm run check:bailout', 'después de next build', 'rompe', '<!--$!-->', 'ACEPTADOS',
+    'next dev no genera el bailout',
   ]],
   ['Candado de la hidratación en los tests', [
-    'npm run check:hidratacion', 'rompe el build', 'con el setter nativo',
+    'npm run check:hidratacion', 'rompe', 'con el setter nativo',
     'HTMLInputElement.prototype', 'tests/apps/_hidratacion.ts', 'sembrarValor',
     'sembrarValorAcotado', 'esperarValorEnReact', 'no que React los haya ejecutado',
-    'Sin pasivo', 'hidratacion-ok: <razón>', 'No mira los fill() ni los clics',
-    'hay que esperar antes', 'sembrar el valor que el input YA tiene',
+    'No mira los fill() ni los clics', 'hay que esperar antes', 'sembrar el valor que el input YA tiene',
     // Atada a «eso lo audita»: SIEMBRA_ESTRICTA NO audita los fill() ni los clics
     'eso lo audita SIEMBRA_ESTRICTA=1 npx playwright test tests/apps',
-    'npm run hidratacion:probar-candado', 'tests/hidratacion-carrera.spec.ts',
   ]],
   ['Candado de los specs que solo pasan en next dev', [
-    'npm run check:specs-produccion', 'rompe el build', 'el commit añade a tests/',
+    'npm run check:specs-produccion', 'rompe', 'el commit añade a tests/',
     'el nombre de clase de un módulo CSS', 'selectorDelModulo', 'tests/apps/_modulo-css.ts',
-    "una espera a 'networkidle'", 'esperarPaginaAsentada', 'Mira los literales, no los comentarios',
-    'las líneas que el commit añade', 'produccion-ok: <razón>', 'razón obligatoria',
-    'npm run check:specs-produccion -- --todo', 'npm run specs-produccion:probar-candado',
+    "una espera a 'networkidle'", 'esperarPaginaAsentada',
   ]],
   ['Candado de las familias de apps', [
-    'npm run check:familias', 'rompe el build', 'el testigo de una familia no está en verde',
+    'npm run check:familias', 'rompe', 'el testigo de una familia no está en verde',
     'si su tabla no cubre cada <NumberInput> de cada hermana', 'scripts/inspector/familias.mjs',
-    'una familia nueva entra en el build con declararla allí', 'ejecuta en vez de leer',
-    'Sin pasivo', "falla: '<razón>'", 'ANTES de repararlo', 'se imprime con su cuenta',
-    'una marca cuyo caso ya pasa sí rompe',
-    'familia-ok: <razón>', 'razón obligatoria', 'En Vercel se omite la ejecución',
-    'npm run familias:probar-candado',
+    'una familia nueva entra en el build con declararla allí', "falla: '<razón>'", 'ANTES de repararlo',
+    'se imprime con su cuenta', 'una marca cuyo caso ya pasa sí rompe',
   ]],
   ['Candado de la tarjeta social', [
-    'npm run check:og-image', 'Rompe el build',
+    'npm run check:og-image', 'rompe',
     'no declara la og de SU portal en openGraph y en twitter', 'si la imagen no existe en public/',
-    'cae bajo un redirect de next.config.ts', 'Next NO hereda la imagen del layout raíz',
+    'cae bajo un redirect de next.config.ts', 'declara openGraph sin images',
+    'Next NO hereda la imagen del layout raíz',
     'declarar openGraph en la página reemplaza entero el del padre',
-    'templates/app-base/ ya trae images', 'Sin pasivo', 'declara openGraph sin images',
-    'og-ok: <razón>', 'PORTALES', 'Delegum es la excepción: sus apps NO llevan la og del portal',
+    'templates/app-base/ ya trae images', 'Las apps de Delegum NO llevan la og del portal',
     'Delegum no sirve apps bajo su dominio', 'no hace passthrough',
     'delegum.com/estimador-irpf/ da 404', 'DELEGUM_APP_SLUGS alimenta Soluciones, no pertenencia',
-    'home, /datos-fiscales/, asistente y blog', 'el árbol de cada portal',
-    'npm run og:probar-candado',
+    'home, /datos-fiscales/, asistente y blog',
+  ]],
+  ['Candado de los consumidores de data/', [
+    'npm run check:consumidores', 'rompe', 'scripts/parsers-catalogo.mjs',
+    'importan su parser de ahí, no copian el regex', 'la copia queda fuera del candado',
+    'el generador de posts para X',
   ]],
   ['Candado de las obligaciones del CLAUDE.md', [
-    'npm run check:claude-md', 'rompe el build', 'desaparece o cambia de sección',
-    'Sin escape, a propósito', 'retirar una obligación es quitarla de la lista',
-    'Avisa (no rompe)', 'npm run claude-md:probar-candado',
+    'npm run check:claude-md', 'rompe', 'desaparece o cambia de sección',
+    'retirar una obligación es quitarla de la lista', 'Avisa (no rompe)',
+    'vuelve a cargar lo que va en la cabecera de su script',
   ]],
   ['TypeScript', [
     'ignoreBuildErrors: true', 'el build de producción NO type-chequea',
@@ -555,10 +602,10 @@ for (const s of candados) {
   const bytes = Buffer.byteLength(s.propio, 'utf8');
   if (bytes > MOLDE_MAX_BYTES) {
     avisos.push(`Molde: «${s.titulo}» ocupa ${miles(bytes)} B (más de ${miles(MOLDE_MAX_BYTES)}). ` +
-      'La crónica va a la cabecera de su script; aquí, qué rompe, qué barre, el escape y el caso de origen');
+      'Aquí va una línea: qué rompe, la receta y lo que NO mira; lo demás, a la cabecera de su script');
   }
-  if (!/salió del? /i.test(s.propio)) {
-    avisos.push(`Molde: «${s.titulo}» no nombra su caso de origen con una línea «Salió de…»`);
+  for (const [re, que] of SOLO_EN_CABECERA) {
+    if (re.test(s.propio)) avisos.push(`Molde: «${s.titulo}» vuelve a cargar ${que}, que va en la cabecera de su script`);
   }
 }
 

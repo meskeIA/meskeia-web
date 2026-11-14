@@ -39,6 +39,8 @@
  * hasta que alguien abrió el generador de posts por casualidad. Detalle: scripts/CLAUDE.md.
  *
  * Opción `--raiz <dir>`: lee `data/` de otra carpeta. La usa la prueba, sobre copias.
+ *
+ * Sin pasivo: hoy todos los parsers sacan lo mismo que su catálogo, por eso rompe y no avisa.
  */
 
 import fs from 'node:fs';

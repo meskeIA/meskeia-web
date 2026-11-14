@@ -28,6 +28,10 @@
  * tests/contraste-svg-texto.spec.ts.
  *
  * Escape: «alfa-ok: <razón>» en la línea del literal o en la anterior.
+ * La razón es obligatoria: `escapada()` de lineas-anadidas.mjs exige al menos tres caracteres
+ * tras «alfa-ok:», así que la marca a secas también rompe el build.
+ *
+ * Pruebas: `npm run alfa-tres-cifras:probar-candado`.
  */
 import fs from 'node:fs';
 import path from 'node:path';

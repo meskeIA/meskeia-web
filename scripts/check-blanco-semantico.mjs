@@ -27,6 +27,8 @@
  *
  * Escape: «blanco-ok: <razón>» en un comentario dentro de la regla o en la línea anterior a ella
  * (texto grande a 3:1, un fondo que no se ve con texto encima). La marca a secas no vale.
+ *
+ * Pruebas: `npm run blanco-semantico:probar-candado`.
  */
 import fs from 'node:fs';
 import path from 'node:path';

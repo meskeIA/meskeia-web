@@ -53,6 +53,8 @@
  * Escape para el falso positivo: «parser-ok: <razón>» en la línea o en la anterior.
  * Los hay de verdad: parsear un valor que genera la propia app —un `dataset`, el `value` de
  * un `<input type="range">`, una cadena de una constante propia— no es entrada de usuario.
+ *
+ * Auditar un fichero entero: `node scripts/check-parser-numerico.mjs <fichero>`.
  */
 
 import { execFileSync } from 'node:child_process';

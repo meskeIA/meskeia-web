@@ -49,6 +49,8 @@
  * Escape: «faq-ok: <razón>» en `metadata.ts`, `layout.tsx` o `page.tsx` de la app (p. ej. una
  * app que comparte cada respuesta con constantes propias, como garaje). La razón es obligatoria.
  * Pruebas: npm run faq-unica:probar-candado (reinyecta la reparación a medias del hallazgo 624).
+ *
+ * `npm run check:faq-unica -- --todo --lista` mide el pasivo y nombra cada app (no rompe).
  */
 
 import { execFileSync } from 'node:child_process';

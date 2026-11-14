@@ -319,44 +319,10 @@ tener estructura propia. Juegos y ocio → patrón lite.
 
 ### 3. Creación de múltiples apps en paralelo (agentes)
 
-Cuando se crean **3 o más apps** en una misma sesión, usar agentes en paralelo para maximizar velocidad. Reglas OBLIGATORIAS:
-
-**Fase secuencial ANTES (archivos compartidos):**
-```
-1. Crear/actualizar data/fiscal/*.ts si se necesitan datos normativos
-2. Actualizar data/fiscal/index.ts con el nuevo export
-3. Verificar que compila: npm run check:tipos
-```
-
-⚠️ Nunca `npx tsc --noEmit data/fiscal/index.ts`: con un fichero, tsc ignora el `tsconfig.json`
-y da error siempre (§TypeScript).
-
-**Fase paralela (agentes crean apps):**
-
-Cada agente DEBE incluir estas instrucciones EXACTAS en su prompt:
-
-```
-## REGLAS CRÍTICAS PARA ESTE AGENTE
-- ✅ Crea SOLO los 3 archivos de tu app (metadata.ts, page.tsx, .module.css)
-- ✅ `npm run check:tipos` UNA SOLA VEZ. Si falla, reporta el error y TERMINA — no reintentes
-- ❌ PROHIBIDO: `npm run build` (lock entre agentes) · modificar compartidos (applications.ts,
-  implemented-apps.ts, app-relations.ts) · reintentar en bucle (sleep + retry) · run_in_background
-- ⚠️ TERMINAR INMEDIATAMENTE tras crear los ficheros y verificar TS una vez
-- ⚠️ No usar JSX.Element ni React.JSX.Element como tipo de retorno (causa error TS)
-
-```
-
-**Fase secuencial DESPUÉS (registros + build):**
-```
-1. Actualizar data/applications.ts (añadir todas las apps nuevas)
-2. Actualizar data/implemented-apps.ts (añadir URLs)
-3. Actualizar data/app-relations.ts (añadir relaciones)
-4. npm run build (una sola vez, verificar 0 errores) — genera ai-index.json automáticamente
-5. Corregir errores si los hay (CSS: no usar `*` puro, TS: no usar JSX.Element)
-6. Commit — el push va en el lote de `/push` («Flujo de Despliegue»)
-```
-
-**Razón**: Los agentes que no terminan limpiamente producen procesos zombie, locks de build, reintentos en cadena y docenas de notificaciones residuales. La clave es que cada agente cree sus archivos, verifique UNA vez, y termine inmediatamente.
+Con **3 o más apps** en una misma sesión, agentes en paralelo entre una fase secuencial antes
+(datos compartidos) y otra después (registros, build y commit). El procedimiento, con las reglas
+que cada agente lleva **literales** en su prompt, está en **`/nueva-app-meskeia`** («Varias apps
+a la vez»).
 
 ### 4. Modificar una app existente (bug o función nueva)
 
@@ -371,6 +337,11 @@ Criterio de uso, ubicación de cada pieza y plantilla de router: skill **`/trpc-
 ---
 
 ## Seguridad y Calidad del Código
+
+Cada «### Candado de…» de abajo está en la cadena de `npm run build` y dice qué rompe, la receta
+y lo que NO mira. **Su escape** (casi siempre `<x>-ok: <razón>`, y si la razón es obligatoria),
+**lo que barre**, su pasivo (`-- --todo`), sus pruebas y **el caso del que salió** están en la
+cabecera de su script, al que apunta su comando en `package.json`.
 
 ### Lo que vigila el `pre-commit`
 
@@ -439,407 +410,248 @@ la Agenda Operativa del Centro de Mando (`restauracion-turso-semestral`).
 
 ### Candado de accesibilidad JSX
 
-`npm run check:a11y-jsx` — en el build, y **rompe el build** si el commit escribe un `<button>`
-sin `type=` o un emoji junto a texto sin `aria-hidden`, también en una cadena que se pinta
-(`{x ? '⏹️ Detener' : …}`, cabo C0249) o delante de una etiqueta (`💡 <strong>`) (las dos reglas del CLAUDE.md global §5
-cuya corrección es unívoca). Las otras cuatro —`aria-pressed` que falta en un toggle,
-`aria-pressed` que **sobra**, emoji en nodo propio y `<label>` sin control— **solo avisan**: un `aria-pressed` en un
-botón de acción es una regresión, no una mejora.
-Juzga **las líneas que el commit añade** (el catálogo arrastra miles) · Escape:
-`a11y-ok: <razón>` en esa línea o en la anterior · `npm run check:a11y-jsx -- --todo` mide el
-pasivo (2,5 s, no rompe) y `node scripts/check-a11y-jsx.mjs <fichero>` audita uno.
-> Salió de la tanda del Inspector del 21/08/2026: 15 hallazgos en 10 de 10 apps, siempre las
-> mismas reglas. Crónica y pasivo: cabecera de `scripts/check-a11y-jsx.mjs` · casos:
-> `scripts/pruebas/a11y-regla5.tsx`.
+`npm run check:a11y-jsx` — **rompe** con un `<button>` sin `type=` o un emoji junto a texto sin
+`aria-hidden`, también en una cadena que se pinta (`{x ? '⏹️ Detener' : …}`) o delante de una
+etiqueta (`💡 <strong>`). Las otras cuatro —`aria-pressed` que falta en un toggle, `aria-pressed`
+que **sobra**, emoji en nodo propio y `<label>` sin control— **solo avisan**: un `aria-pressed` en
+un botón de acción es una regresión, no una mejora.
 
 ### Candado de los iconos de tarjeta
 
-`npm run check:iconos-tarjeta` — en el build, y **rompe el build** si un `span`/`div` con clase de
-icono de tarjeta o de aviso (`escenarioIcon`, `tipIcon`, `tipIcono`, `warningIcon` y sus variantes
-`edu…`; lista cerrada en el script) no lleva `aria-hidden="true"`: el lector lo lee pegado al título.
-Barre `app/` y `components/`, **sin pasivo** · Escape: `iconos-tarjeta-ok: <razón>`, razón
-obligatoria. El tema C del turno de noche importa de aquí su detector.
-⚠️ Una clase de icono con otro nombre no la ve: se añade a `CLASES_ICONO` con su caso.
-> Salió del cabo C0723 (hallazgo 4556, calculadora-notas): el detector del turno no veía las
-> clases sin `edu`, 659 nodos en 78 ficheros. Crónica: cabecera de `scripts/check-iconos-tarjeta.mjs`
-> · pruebas: `npm run iconos-tarjeta:probar-candado`.
+`npm run check:iconos-tarjeta` — **rompe** si un `span`/`div` con clase de icono de tarjeta o de
+aviso (`escenarioIcon`, `tipIcon`, `warningIcon`… y sus `edu…`) no lleva `aria-hidden="true"`: el
+lector lo lee pegado al título. ⚠️ Una clase de icono con otro nombre no la ve: se añade a
+`CLASES_ICONO` con su caso.
 
 ### Candado del aviso legal
 
-`npm run check:legal` — en el build, y **rompe el build** si una app de `implementedAppsUrls` no
-monta `<LegalNotice />`. Exige que se **monte** y no solo se importe, y que **no viva dentro de
-`<EducationalSection>`**, que nace colapsada (la prohibición de «Estructura estándar»).
-**Sin pasivo** · Escape: `legal-ok: <razón>` en el `page.tsx` de la app, y la razón es
-obligatoria: la marca a secas también rompe.
-> Salió del Inspector el 18/09/2026: `test-fragilidad` (escala FRAIL, riesgo 1) era la única de
-> las 21 apps `app/test-*` sin aviso legal. Crónica y barrido: cabecera de
-> `scripts/check-legal-notice.mjs` · pruebas: `npm run legal:probar-candado`.
+`npm run check:legal` — **rompe** si una app de `implementedAppsUrls` no **monta**
+`<LegalNotice />` (importarlo no basta) o lo pone dentro de `<EducationalSection>`, que nace
+colapsada.
 
 ### Candado del catálogo en el cliente
 
-`npm run check:catalogo-cliente` — en el build, y **rompe el build** si un fichero `'use client'`
-alcanza `data/app-relations.ts` o si el barrel `@/components` alcanza `data/applications.ts`,
-siguiendo los imports en cadena. Turbopack funde el barrel en un módulo: lo que alcanza uno de sus
-componentes lo descargan todas las apps. Las relacionadas se resuelven en el layout
-(`<ConRelacionadas slug>`) y la página pinta `<RelatedApps />` sin prop.
-**Sin pasivo** · Escape: `catalogo-ok: <razón>` en la línea del import, razón obligatoria.
-> Salió de la P1 del digest del 08/10/2026: el catálogo (692 KB) en 925 páginas y las
-> relacionadas (733 KB) en 1.005, el 52 % del JS de una app. Crónica: cabecera de
-> `scripts/check-catalogo-cliente.mjs` · pruebas: `npm run catalogo:probar-candado`.
+`npm run check:catalogo-cliente` — **rompe** si un fichero `'use client'` alcanza
+`data/app-relations.ts` o el barrel `@/components` alcanza `data/applications.ts`, siguiendo los
+imports en cadena: lo que alcanza un componente del barrel lo descargan todas las apps. Las
+relacionadas se resuelven en el layout (`<ConRelacionadas slug>`) y la página pinta
+`<RelatedApps />` sin prop.
 
 ### Candado de las celdas braille
 
-`npm run check:braille` — en el build, y **rompe el build** si la vista de celdas o la hoja de
-`conversor-braille` dejan de dibujar con `puntosDeCelda` (los bits del código Unicode) o buscan
-en una tabla con caída a vacío (`tabla[c] ?? []`): se dibujaría en blanco, y en la hoja punzada
-es un espacio. También si una celda emitible sale sin puntos, o si `puntosDeCelda` no cuadra con
-el código Unicode en las 256 celdas.
-**Sin pasivo** · **sin escape**, a propósito: no hay falso positivo posible.
-⚠️ No mira si la celda es la CORRECTA para su carácter en tinta (B 2 de la Comisión Braille
-Española, trabajo del Inspector) ni los puntos 7 y 8, que la vista no dibuja.
-> Salió del mismo defecto tres veces: el 21/08/2026, el 22/09 (hallazgo 1183) y el 24/10
-> (hallazgo 3456: el candado de la tabla `brailleDots` falló). Crónica y trampas: cabecera de
-> `scripts/check-celdas-braille.mjs` · pruebas: `npm run braille:probar-candado`.
+`npm run check:braille` — **rompe** si la vista de celdas o la hoja de `conversor-braille` dejan
+de dibujar con `puntosDeCelda` (los bits del código Unicode) o buscan en una tabla con caída a
+vacío (`tabla[c] ?? []`): en la hoja punzada sería un espacio. También si una celda emitible sale
+sin puntos o `puntosDeCelda` no cuadra con el código Unicode. ⚠️ No mira si la celda es la
+CORRECTA para su carácter en tinta (trabajo del Inspector) ni los puntos 7 y 8.
 
 ### Candado del mínimo personal del IRPF
 
-`npm run check:minimo-irpf` — en el build, y **rompe el build** si en un fichero que calcula IRPF
-aparece una resta cuyo sustraendo es un mínimo. El mínimo **no reduce la renta**
-(art. 63.1.2.º LIRPF): se grava a TIPO CERO aplicando la escala dos veces y restando las cuotas;
-restarlo de la base subestima la cuota. Fórmula canónica: **`calcularCuotaIntegraGeneral`** de
-`@/data/fiscal`, con `cuotaEscalaGeneral` y `desglosarEscalaGeneral` (para los desgloses en
-pantalla, que son los de la PRIMERA aplicación y por eso suman más que la cuota).
-Barre el árbol entero, **sin pasivo** · Escape: `minimo-ok: <razón>` en esa línea o la anterior.
-⚠️ La reducción por tributación conjunta del art. 84.2 (3.400 / 2.150 €) **sí** se resta de la base
-y no lo dispara.
-> Salió de tres reparaciones del mismo defecto en cuatro días (09-12/09/2026). Crónica y
-> cifras: cabecera de `scripts/check-minimo-irpf.mjs` · pruebas: `npm run minimo:probar-candado`.
+`npm run check:minimo-irpf` — **rompe** si en un fichero que calcula IRPF aparece una resta cuyo
+sustraendo es un mínimo: el mínimo **no reduce la renta** (art. 63.1.2.º LIRPF), se grava a TIPO
+CERO. Fórmula canónica: **`calcularCuotaIntegraGeneral`** de `@/data/fiscal`, con
+`cuotaEscalaGeneral` y `desglosarEscalaGeneral` para los desgloses en pantalla (los de la PRIMERA
+aplicación: suman más que la cuota). ⚠️ La reducción por tributación conjunta del art. 84.2
+(3.400 / 2.150 €) **sí** se resta de la base y no lo dispara.
 
 ### Candado del contraste de las cabeceras de tabla
 
-`npm run check:contraste-cabeceras` — en el build, y **rompe el build** si un `<th>`, `<thead>`
-o `.th` pone **texto blanco sobre `var(--primary)` o `var(--secondary)`**, o su hexadecimal (en CSS o en
-`style={{…}}`): es texto pequeño, exige 4,5:1, y con blanco la marca da 4,11:1 el azul y 2,80:1
-el teal (menos en oscuro). Vigila además que **un token
-`-texto` no se use como FONDO** con blanco encima: `--primary-texto`/`--secondary-texto` son para
-`color:`. Usar **`--primary-boton`** y **`--secondary-boton`**, iguales en **ambos temas**;
-`var(--hero-bg)` (8,33:1) no lo enciende.
-Barre **`app/` y `components/`**, **sin pasivo** · Escape: `contraste-ok: <razón>`, y la razón es
-obligatoria.
-⚠️ **Lo que NO mira**: el color de marca como TEXTO sobre fondo claro (se resuelve con
-`--primary-texto`), ni botones y badges con fondo de marca (`check:contraste-marca`).
-> Salió del hallazgo 1175 (21/09/2026): el color del `<thead>` estaba en el FONDO. Crónica:
-> cabecera de `scripts/check-contraste-cabeceras.mjs` · pruebas: `npm run contraste:probar-candado`
-> · por píxel: `tests/contraste-cabeceras-tabla.spec.ts`.
+`npm run check:contraste-cabeceras` — **rompe** si un `<th>`, `<thead>` o `.th` pone texto blanco
+sobre `var(--primary)` o `var(--secondary)` (o su hexadecimal, en CSS o en `style={{…}}`), o si un
+token `-texto` se usa como FONDO con blanco encima: usar **`--primary-boton`** /
+**`--secondary-boton`**, iguales en ambos temas; `var(--hero-bg)` no lo enciende. ⚠️ No mira la
+marca como TEXTO sobre fondo claro (`--primary-texto`) ni los botones y badges con fondo de marca
+(`check:contraste-marca`).
 
 ### Candado del contraste de la marca
 
-`npm run check:contraste-marca` — en el build, y **rompe el build** si un `.module.css` o un
-`style={{…}}` pone **texto blanco sobre la marca** (`var(--primary)`, `var(--secondary)`, su
-hexadecimal o su `rgb()`), también el que un hover hereda de su estado base: usar
-`--primary-boton` / `--secondary-boton`; o si usa **la marca como color de texto**: usar
-`--primary-texto` / `--secondary-texto`, o `-boton` sobre un fondo claro que no cambia con el
-tema; o `-texto` dentro de `@media print`, donde el papel es blanco en los dos temas: `-boton`
-(C0483). Comparte criterio con `scripts/contraste-marca/campana.mjs`.
-Barre `app/`, `components/` y `styles/`, **sin pasivo** · Escape: `marca-ok: <razón>`, razón obligatoria.
-⚠️ No mira el texto de un `<canvas>`, el `fill` de un SVG ni un fondo de marca sin texto blanco a
-la vista; que el sustituto cumpla lo mide `tests/contraste-marca-botones.spec.ts`.
-> Salió del cabo C0070 (movimiento-circular, 8f5eb9b7): el censo del 12/10/2026 dio el patrón en
-> 891 apps. Crónica: cabecera de `scripts/check-contraste-marca.mjs` · pruebas:
-> `npm run contraste-marca:probar-candado`.
+`npm run check:contraste-marca` — **rompe** con texto blanco sobre la marca (`var(--primary)`,
+`var(--secondary)`, su hexadecimal o su `rgb()`) en un `.module.css` o un `style={{…}}`, también el
+que un hover hereda de su estado base: `--primary-boton` / `--secondary-boton`; con la marca como
+color de texto: `--primary-texto` / `--secondary-texto`, o `-boton` sobre un fondo claro que no
+cambia con el tema; y con `-texto` dentro de `@media print`, donde el papel es blanco en los dos
+temas: `-boton`. ⚠️ No mira el texto de un `<canvas>`, el `fill` de un SVG ni un fondo de marca sin
+texto blanco a la vista; que el sustituto cumpla lo mide `tests/contraste-marca-botones.spec.ts`.
 
 ### Candado del token sin variante oscura
 
-`npm run check:token-oscuro` — en el build, y **rompe el build** si un `.module.css` declara con
-color literal un token que `globals.css` define distinto en cada tema (`--text-muted`,
-`--bg-card`…) sin redeclararlo en la variante oscura de ese mismo selector, también en un
-`:root` de módulo. Saca la lista de tokens de globals y se planta si no la encuentra.
-**Al drenar un token en un tema, medir el otro.**
-**Sin pasivo** · Fuera, a propósito: `--primary` y `--secondary`; los semánticos (`--danger`,
-`--error`, `--success`, `--warning`) solo rompen si pintan texto por debajo de 4,5:1 en oscuro
-(C0226) · Escape: `oscuro-ok: <razón>`, razón obligatoria.
-⚠️ Exige que la variante EXISTA, no que cumpla: eso lo miden `tests/contraste-text-muted-*.spec.ts`,
-porque un valor se decide midiendo contra el fondo REAL.
-> Salió del drenaje del claro del 22/09/2026 (`dd66add0`): en 4 módulos el oscuro cayó a
-> 2,48–2,81:1. Crónica: cabecera de `scripts/check-token-oscuro.mjs` · pruebas:
-> `npm run oscuro:probar-candado`.
+`npm run check:token-oscuro` — **rompe** si un `.module.css` declara con color literal un token que
+`globals.css` define distinto en cada tema (`--text-muted`, `--bg-card`…) sin redeclararlo en la
+variante oscura de ese mismo selector, también en un `:root` de módulo. **Al drenar un token en un
+tema, medir el otro.** Fuera: `--primary` y `--secondary`; los semánticos (`--danger`, `--error`,
+`--success`, `--warning`) solo rompen si pintan texto por debajo de 4,5:1 en oscuro. ⚠️ Exige que
+la variante EXISTA, no que cumpla: eso lo miden `tests/contraste-text-muted-*.spec.ts`, porque un
+valor se decide midiendo contra el fondo REAL.
 
 ### Candado del texto semántico en claro
 
-`npm run check:semanticos-claro` — en el build, y **rompe el build** si un `.module.css` pinta
-texto rojo, naranja, ámbar o verde (literal, token del módulo o `var(--error)`) por debajo de
-4,5:1 en claro (3:1 si es grande o `::before`) contra el fondo de su regla o, sin él, el blanco.
-Receta: **`var(--rojo-texto, <color de antes>)`**, igual con `--naranja-`, `--ambar-` y
-`--verde-texto`: solo existen en claro, en oscuro manda la reserva. Rompe también sin reserva.
-Barre `app/`, `components/` y `styles/`, **sin pasivo**; fuera, cursos y portales · Escape:
-`semanticos-ok: <razón>`, razón obligatoria.
-⚠️ No ve un fondo oscuro que pone el TSX: lo mide el píxel.
-> Salió del cabo C0296 (mi-ip y adaptacion-hogar, f9af2556): 1.062 reglas en 478 hojas.
-> Crónica: cabecera de `scripts/check-semanticos-claro.mjs` · pruebas:
-> `npm run semanticos-claro:probar-candado`.
+`npm run check:semanticos-claro` — **rompe** si un `.module.css` pinta texto rojo, naranja, ámbar o
+verde (literal, token del módulo o `var(--error)`) por debajo de 4,5:1 en claro (3:1 si es grande o
+`::before`) contra el fondo de su regla o, sin él, el blanco. Receta:
+**`var(--rojo-texto, <color de antes>)`**, igual con `--naranja-`, `--ambar-` y `--verde-texto`:
+solo existen en claro, en oscuro manda la reserva. Rompe también sin reserva. ⚠️ No ve un fondo
+oscuro que pone el TSX: lo mide el píxel.
 
 ### Candado del blanco sobre fondo semántico
 
-`npm run check:blanco-semantico` — en el build, y **rompe el build** si el commit añade o toca, en
-un `.module.css`, el `color` blanco o el `background` literal rojo, naranja, ámbar o verde de una
-regla que da menos de 4,5:1. Juzga **las líneas que el commit añade** (`--desde <ref>` y `--todo`) ·
-Escape: `blanco-ok: <razón>` dentro de la regla o en la línea anterior (texto grande a 3:1).
-⚠️ No ve los fondos por `var()` ni de otra regla: lo mide el píxel. El pasivo, el Inspector app por app.
-> Salió del cabo C0659 (cronometro, Pausar a 2,15:1). Crónica: cabecera de
-> `scripts/check-blanco-semantico.mjs` · pruebas: `npm run blanco-semantico:probar-candado`.
+`npm run check:blanco-semantico` — **rompe** si el commit añade o toca, en un `.module.css`, el
+`color` blanco o el `background` literal rojo, naranja, ámbar o verde de una regla que da menos de
+4,5:1. ⚠️ No ve los fondos por `var()` ni los de otra regla: lo mide el píxel.
 
 ### Candado de los colores prohibidos
 
-`npm run check:colores-prohibidos` — en el build, y **rompe el build** si el commit añade
-`#7C3AED` o `#2DD4BF` (también con alfa) en un `.ts`, `.tsx` o `.css` de `app/`, `components/` o
-`styles/`. Juzga **las líneas que el commit añade** (`--desde <ref>` y `--todo`) · Escape:
-`colores-ok: <razón>` (un color de datos de un gráfico), razón obligatoria.
-> Salió del cabo C0635 (tablero-comunicacion, «Personas» en violeta por datos). Crónica: cabecera
-> de `scripts/check-colores-prohibidos.mjs` · pruebas: `npm run colores-prohibidos:probar-candado`.
+`npm run check:colores-prohibidos` — **rompe** si el commit añade `#7C3AED` o `#2DD4BF` (también
+con alfa) en un `.ts`, `.tsx` o `.css`.
 
 ### Candado del alfa pegado a un color de tres cifras
 
-`npm run check:alfa-tres-cifras` — en el build, y **rompe el build** si un fichero pega un alfa de
-dos cifras a `obj.prop` (`b.color + 'CC'`, `${b.color}55`) y la tabla de la que sale `obj` da a
-`prop` un literal de tres cifras: `'#666' + 'CC'` no es un color (en SVG, negro). Barre el árbol
-entero, **sin pasivo** · Escape: `alfa-ok: <razón>`, razón obligatoria.
-⚠️ No ve el alfa pegado a una variable suelta ni a una reserva (`?? '#999'`).
-> Salió del cabo C0684 (a2c0f1324 y 2c2af478a). Crónica: cabecera de
-> `scripts/check-alfa-tres-cifras.mjs` · pruebas: `npm run alfa-tres-cifras:probar-candado`.
+`npm run check:alfa-tres-cifras` — **rompe** si se pega un alfa de dos cifras a `obj.prop`
+(`b.color + 'CC'`, `${b.color}55`) y la tabla de la que sale `obj` da a `prop` un literal de tres
+cifras: `'#666' + 'CC'` no es un color (en SVG, negro). ⚠️ No ve el alfa pegado a una variable
+suelta ni a una reserva (`?? '#999'`).
 
 ### Candado de la variable CSS que no existe
 
-`npm run check:var-css` — en el build, y **rompe el build** si un `.module.css` usa `var(--x)`
-**sin reserva** y `--x` no se declara en globals, en el módulo, en el TSX de su app ni en un
-`layout.tsx`: la declaración entera se anula (tarjeta sin fondo, esquina en ángulo recto) y
-nada avisa. Barre `app/` y `components/`, **sin pasivo** · Escape: `var-ok: <razón>`, razón
-obligatoria.
-> Salió del hallazgo 2367 y el cabo C0052: `--card-bg` de transportador-angulos (48c24779,
-> 12/10/2026) fue el último. Crónica: cabecera de `scripts/check-var-css.mjs` · pruebas:
-> `npm run var-css:probar-candado`.
+`npm run check:var-css` — **rompe** si un `.module.css` usa `var(--x)` **sin reserva** y `--x` no
+se declara en globals, en el módulo, en el TSX de su app ni en un `layout.tsx`: la declaración
+entera se anula (tarjeta sin fondo, esquina en ángulo recto) y nada avisa.
 
 ### Candado de la clase que el módulo CSS no declara
 
-`npm run check:clases-css` — en el build, y **rompe el build** si el commit escribe `styles.x`
-o `styles['x']` y el `.module.css` importado no declara `.x`: el elemento sale sin `class` y sin
-maquetar. Juzga **las líneas que el commit añade**, y todos los usos de una clase que el commit
-quita de su módulo · liga cada uso a SU import, no al nombre `styles` · Escape:
-`clases-ok: <razón>`, razón obligatoria · `npm run check:clases-css -- --todo` mide el pasivo y
-`node scripts/check-clases-css.mjs <fichero>` audita uno.
-⚠️ Drenar el pasivo en bloque NO: cada clase es hallazgo de su app (cabo C0386).
-> Salió del cabo C0157: 28 clases de estimador-cartera-inversion sin declarar (reparado en
-> c465b811). Crónica: cabecera de `scripts/check-clases-css.mjs` · pruebas:
-> `npm run clases-css:probar-candado`.
+`npm run check:clases-css` — **rompe** si el commit escribe `styles.x` o `styles['x']` y el
+`.module.css` importado no declara `.x` (el elemento sale sin `class` y sin maquetar), o quita de
+su módulo una clase que se sigue usando. ⚠️ Drenar el pasivo en bloque NO: cada clase es hallazgo
+de su app.
 
 ### Candado del pie que cuenta dos veces
 
-`npm run check:footer-tracker` — en el build, y **rompe el build** si un `.tsx` de `app/` monta
-más de un `<Footer appName>` (un `return` por fase) sin la **misma** `key` en todos: React lo
-remonta al cambiar de fase y su `AnalyticsTracker` registra otra visita; o un `AnalyticsTracker`
-suelto junto a un `<Footer appName>`, que ya trae el suyo (C0472). **Sin pasivo** ·
-Escape: `footer-ok: <razón>`, razón obligatoria.
-⚠️ No ve un pie que DESAPARECE en una fase (quiz-tipos-plantas): eso lo mide
+`npm run check:footer-tracker` — **rompe** si un `.tsx` de `app/` monta más de un
+`<Footer appName>` (un `return` por fase) sin la **misma** `key` en todos: React lo remonta al
+cambiar de fase y su `AnalyticsTracker` registra otra visita; o un `AnalyticsTracker` suelto junto a
+un `<Footer appName>`, que ya trae el suyo. ⚠️ No ve un pie que DESAPARECE en una fase: eso lo mide
 `tests/apps/footer-una-visita-por-carga.spec.ts`.
-> Salió de los hallazgos 2175/2176 de test-perfil-inversor (6 visitas por carga) y el cabo
-> C0042. Crónica: cabecera de `scripts/check-footer-tracker.mjs` · pruebas:
-> `npm run footer-tracker:probar-candado`.
 
 ### Candado de la guarda de doble toque copiada
 
-`npm run check:guarda-rafaga` — en el build, y **rompe el build** si un `.tsx` de `app/` o
-`components/` escribe a mano la guarda de doble toque (`.detail > 1` o `>= 2`): va en
-**`useGuardaRafaga`** de `@/lib/useGuardaRafaga`, que llevan los quizzes y los selectores.
-Barre el árbol entero, **sin pasivo** · Escape: `rafaga-ok: <razón>`, razón obligatoria.
-⚠️ No ve una guarda escrita con un temporizador: eso lo mide el caso «doble toque» de los
-testigos `tests/familias/selectores.spec.ts` y `quizzes.spec.ts`.
-> Salió del cabo C0317: 16 selectores con su copia, que no tenían lo que la receta aprendió
-> después (3768, C0514). Crónica: cabecera de `scripts/check-guarda-rafaga.mjs` · pruebas:
-> `npm run guarda-rafaga:probar-candado`.
+`npm run check:guarda-rafaga` — **rompe** si un `.tsx` escribe a mano la guarda de doble toque
+(`.detail > 1` o `>= 2`): va en **`useGuardaRafaga`** de `@/lib/useGuardaRafaga`. ⚠️ No ve una
+guarda escrita con un temporizador: la mide el caso «doble toque» de los testigos
+`tests/familias/selectores.spec.ts` y `quizzes.spec.ts`.
 
 ### Candado de los ayudantes del cromo fijo copiados
 
-`npm run check:cromo-fijo` — en el build, y **rompe el build** si un `.tsx` de `app/` o
-`components/` declara una función o constante con el nombre de un ayudante de `lib/cromoFijo.ts`
-(`traerALaVista`, `traerTramoALaVista`, `enfocarALaVista`, `enfocarSinCentrar`…): es una copia, y
-se importan de `@/lib`. Lee los nombres de los `export function` del fichero: uno nuevo queda
-cubierto solo. Barre el árbol entero, **sin pasivo** · Escape: `cromo-ok: <razón>`, razón obligatoria.
-⚠️ No ve una copia renombrada: medir la barra con `margenBarraLogo()` para decidir otra cosa es
-legítimo (simulador-teorema-central-limite).
-> Salió del cabo C0546: diez copias de `traerALaVista` en quizzes y selectores, traídas de la app
-> hermana. Crónica: cabecera de `scripts/check-cromo-fijo-copiado.mjs` · pruebas:
-> `npm run cromo-fijo:probar-candado`.
+`npm run check:cromo-fijo` — **rompe** si un `.tsx` declara una función o constante con el nombre
+de un ayudante de `lib/cromoFijo.ts` (`traerALaVista`, `enfocarALaVista`…): es una copia, y se
+importan de `@/lib`. ⚠️ No ve una copia renombrada: medir la barra con `margenBarraLogo()` para
+decidir otra cosa es legítimo.
 
 ### Candado del ternario que tumba la página traducida
 
-`npm run check:ternario-traducido` — en el build, y **rompe el build** si un ternario hijo de JSX
-alterna **texto suelto y JSX** (`{c ? '✓ Copiado' : <>…</>}`, también con plantilla o anidado):
-con la página traducida, al cambiar de rama React retira un nodo de texto que el traductor ya
-cambió por `<font>` y la app cae. Receta: cada rama en su `<span key>`. También si un texto
-**aparece y desaparece** junto a hermanos (`{n !== 1 ? 's' : ''}`, `{x && <>…</>}`): cae al
-retirarlo y al añadirlo. Receta: `<span>{condición}</span>` siempre montado; `{x && <span>}` NO
-basta. Barre `app/` y `components/`, **sin pasivo** · Escape: `traduccion-ok: <razón>`, razón obligatoria.
-⚠️ No ve una hoja que sea variable: eso lo miden los testigos `tests/apps/*-traducido-familia.spec.ts`.
-> Salió del hallazgo 3314 (ShareCard) y los cabos C0262 y C0312. Crónica: cabecera de
-> `scripts/check-ternario-traducido.mjs` · pruebas: `npm run ternario:probar-candado`.
+`npm run check:ternario-traducido` — **rompe** si un ternario hijo de JSX alterna **texto suelto y
+JSX** (`{c ? '✓ Copiado' : <>…</>}`): con la página traducida, al cambiar de rama React retira un
+nodo de texto que el traductor ya cambió por `<font>` y la app cae. Receta: cada rama en su
+`<span key>`. También si un texto **aparece y desaparece** junto a hermanos
+(`{n !== 1 ? 's' : ''}`, `{x && <>…</>}`). Receta: `<span>{condición}</span>` siempre montado;
+`{x && <span>}` NO basta. ⚠️ No ve una hoja que sea variable: la miden los testigos
+`tests/apps/*-traducido-familia.spec.ts`.
 
 ### Candado del parser numérico
 
-`npm run check:parser` — en el build, y **rompe el build** si el commit escribe
-`parseFloat(x.replace(',', '.'))` o una variante del parseo casero, que lee «1.500» como 1,5 y
-acepta `'12abc'` como 12. El canónico es **`parseSpanishNumber`** de `@/lib`.
-Juzga **las líneas que el commit añade** · Escape: `parser-ok: <razón>` en esa línea o la
-anterior (los hay: un `dataset` que escribe la propia app) · `npm run check:parser -- --todo`
-mide el pasivo y `node scripts/check-parser-numerico.mjs <fichero>` audita uno.
-⚠️ Sustituirlos en bloque NO: `parseSpanishNumber` devuelve NaN donde `parseFloat` daba un número,
-y buena parte del pasivo no valida el resultado. El pasivo lo drena el Inspector app por app.
-> Salió de `conversor-numeros-letras` (24/08/2026) y `calculadora-masa-madre` (25/08). Crónica y
-> pasivo: cabecera de `scripts/check-parser-numerico.mjs` · casos: `scripts/pruebas/parser-numerico.tsx`.
+`npm run check:parser` — **rompe** si el commit escribe `parseFloat(x.replace(',', '.'))` o una
+variante del parseo casero, que lee «1.500» como 1,5 y acepta `'12abc'` como 12: el canónico es
+**`parseSpanishNumber`** de `@/lib`. ⚠️ Sustituirlos en bloque NO: `parseSpanishNumber` devuelve NaN
+donde `parseFloat` daba un número, y buena parte del pasivo no valida el resultado. El pasivo lo
+drena el Inspector app por app.
 
 ### Candado de la respuesta de aula
 
-`npm run check:respuesta-aula` — en el build, y **rompe el build** si un `CasosAula.tsx` de `app/`
-lee la respuesta con `parseSpanishNumber(…)`, que toma «2.493» por 2493. Se lee con
-**`leerRespuestaAula(texto, esperado)`** de `@/lib/calculadoras/correctorCasosAula`: de las dos
-lecturas de un punto con tres cifras detrás se queda la más cercana a la respuesta.
-Barre todos los `CasosAula.tsx`, **sin pasivo** · Escape: `respuesta-aula-ok: <razón>`, razón obligatoria.
-⚠️ No ve una tarea de aula que lea en su `page.tsx` o en `casos.ts`.
-> Salió del hallazgo 3866 (simulador-estequiometria) y el cabo C0558: 27 copias. Crónica: cabecera
-> de `scripts/check-respuesta-aula.mjs` · pruebas: `npm run respuesta-aula:probar-candado`.
+`npm run check:respuesta-aula` — **rompe** si un `CasosAula.tsx` lee la respuesta con
+`parseSpanishNumber(…)`, que toma «2.493» por 2493: se lee con
+**`leerRespuestaAula(texto, esperado)`** de `@/lib/calculadoras/correctorCasosAula`, que se queda con
+la lectura más cercana a la respuesta. ⚠️ No ve una tarea de aula que lea en su `page.tsx` o en
+`casos.ts`.
 
 ### Candado del reloj y el azar en el render
 
-`npm run check:reloj-azar` — en el build, y **rompe el build** si el commit escribe un `useState`
-cuyo valor inicial llega a `Math.random`, `crypto.randomUUID`, `Date.now`, `new Date()` o
-`hoyISOLocal()` (también por una variable o función del mismo fichero), o el `min`/`max` de un
-`<input>` de fecha calculado en el render: el HTML prerenderizado lleva el valor del build y
-React 19 no corrige el atributo al hidratar. Receta: el valor al montar, en un efecto.
-Juzga **las líneas que el commit añade** · Escape: `reloj-ok: <razón>`, razón obligatoria ·
-`npm run check:reloj-azar -- --todo` mide el pasivo, que decide el Inspector app por app.
-> Salió del cabo C0074: simulador-kmeans (a59e60ca) y control-gastos (8a4c1c03). Crónica:
-> cabecera de `scripts/check-reloj-azar.mjs` · pruebas: `npm run reloj-azar:probar-candado`.
+`npm run check:reloj-azar` — **rompe** si el commit escribe un `useState` cuyo valor inicial llega
+a `Math.random`, `crypto.randomUUID`, `Date.now`, `new Date()` o `hoyISOLocal()` (también por una
+variable o función del mismo fichero), o el `min`/`max` de un `<input>` de fecha calculado en el
+render: el HTML prerenderizado lleva el valor del build y React 19 no corrige el atributo al
+hidratar. Receta: el valor al montar, en un efecto.
 
 ### Candado de las características del JSON-LD
 
-`npm run check:features` — en el build, y **rompe el build** si un `metadata.ts` o `layout.tsx`
-de `app/` añade o retoca una lista `features`/`featureList` con **menos de 4** literales (§1.ter).
-Juzga **las listas cuyas líneas toca el commit**: tocar el title de una app vieja no obliga ·
-Escape: `features-ok: <razón>`, razón obligatoria · `npm run check:features -- --todo` mide el pasivo.
-⚠️ Rellenar las 297 vacías en bloque NO: escritas a ciegas son promesas. El pasivo lo rellena
-el Inspector app por app, que comprueba qué hace la app.
-> Salió del cabo C0137 (etiqueta-dgt, 04/10/2026, reparado en a97f92ab). Crónica: cabecera de
-> `scripts/check-features-jsonld.mjs` · pruebas: `npm run features:probar-candado`.
+`npm run check:features` — **rompe** si un `metadata.ts` o `layout.tsx` añade o retoca una lista
+`features`/`featureList` con **menos de 4** literales (§1.ter). ⚠️ Rellenar las vacías en bloque NO:
+escritas a ciegas son promesas; las rellena el Inspector app por app, que comprueba qué hace la app.
 
 ### Candado de la FAQ única
 
-`npm run check:faq-unica` — en el build, y **rompe el build** si el commit cambia el texto de la
-FAQ de una app (su `faqJsonLd` o la FAQ visible de `page.tsx`) y una pregunta que está en las dos
-sigue con la respuesta escrita dos veces: va en `PREGUNTAS_FRECUENTES` (§1.ter) o en una constante
-que importen las dos. Dos FAQ con preguntas distintas, lo normal, no rompen. Juzga **la FAQ cuyas
-líneas toca el commit**; un arreglo de accesibilidad no cuenta · `-- --desde <ref>` juzga también
-lo commiteado (la tarea de `/reparar`) · `-- --todo --lista` nombra el pasivo · Escape:
-`faq-ok: <razón>`, razón obligatoria.
-> Salió del hallazgo 624 de garaje (07/09/2026) y de la auditoría del 01/11/2026. Crónica: cabecera
-> de `scripts/check-faq-unica.mjs` · pruebas: `npm run faq-unica:probar-candado`.
+`npm run check:faq-unica` — **rompe** si el commit cambia el texto de la FAQ de una app y una
+pregunta que está en `faqJsonLd` y en la FAQ visible sigue con la respuesta escrita dos veces: va en
+`PREGUNTAS_FRECUENTES` (§1.ter) o en una constante que importen las dos. Dos FAQ con preguntas
+distintas, lo normal, no rompen.
 
 ### Candado del bailout en el prerender
 
-`npm run check:bailout` — en el build, **después** de `next build`, y **rompe el build** si un HTML
-de `.next/server/app/` lleva una frontera de Suspense pintada en cliente (`<!--$!-->`; desde
-Next 16.4 el digest `BAILOUT_TO_CLIENT_SIDE_RENDERING` sale vacío) y su página no está
-en `ACEPTADOS` del script con su razón: lo de dentro no está en el HTML servido.
-⚠️ `next dev` no genera el bailout: un spec de «está en el HTML servido» pasa en dev y falla en
-producción. Por eso se mira aquí, el único momento con el HTML de producción, y no en los tests.
-Se planta si no ve un build completo · en Vercel se omite (allí no hay .html) · sin escape en la
-app: se decide en `ACEPTADOS`.
-> Salió del cabo C0160 (CASO 15 de estimador-cartera-inversion, 08/10/2026). Crónica: cabecera de
-> `scripts/check-bailout-prerender.mjs` · pruebas: `npm run bailout:probar-candado`.
+`npm run check:bailout` — **después** de `next build`, **rompe** si un HTML de `.next/server/app/`
+lleva una frontera de Suspense pintada en cliente (`<!--$!-->`) y su página no está en `ACEPTADOS`
+del script con su razón: lo de dentro no está en el HTML servido. ⚠️ `next dev` no genera el
+bailout: un spec de «está en el HTML servido» pasa en dev y falla en producción. Por eso se mira
+aquí, con el HTML de producción, y no en los tests.
 
 ### Candado de la hidratación en los tests
 
-`npm run check:hidratacion` — en el build, y **rompe el build** si un test escribe en un input
-con el setter nativo (`HTMLInputElement.prototype`) fuera de **`tests/apps/_hidratacion.ts`**,
-que lo hace con sus esperas: `sembrarValor`, `sembrarValorAcotado` (si el control capa el valor)
-y `esperarValorEnReact` (para los `fill()`).
-`page.goto()` garantiza los chunks descargados, no que React los haya ejecutado: sembrar antes
-cambia el DOM y no el estado, y el test pasa en verde midiendo otro escenario.
-**Sin pasivo** · Escape: `hidratacion-ok: <razón>` en esa línea o la anterior (lo usa
-`tests/hidratacion-carrera.spec.ts`, que reproduce la carrera).
-⚠️ **No mira los `fill()` ni los clics** previos a la hidratación, que corren el mismo riesgo: por
-la forma del código no admiten candado, así que hay que esperar antes. Tampoco ve sembrar el valor
-que el input YA tiene (el caso pasa aunque la app esté sorda): eso lo audita
-`SIEMBRA_ESTRICTA=1 npx playwright test tests/apps`.
-> Salió de dos specs en rojo el 12/09/2026. Crónica: cabecera de
-> `scripts/check-hidratacion-tests.mjs` · pruebas: `npm run hidratacion:probar-candado`.
+`npm run check:hidratacion` — **rompe** si un test escribe en un input con el setter nativo
+(`HTMLInputElement.prototype`) fuera de **`tests/apps/_hidratacion.ts`**, que lo hace con sus
+esperas: `sembrarValor`, `sembrarValorAcotado` (si el control capa el valor) y
+`esperarValorEnReact` (para los `fill()`). `page.goto()` garantiza los chunks descargados, no que
+React los haya ejecutado. ⚠️ **No mira los `fill()` ni los clics** previos a la hidratación, que
+corren el mismo riesgo: hay que esperar antes. Tampoco ve sembrar el valor que el input YA tiene
+(el caso pasa aunque la app esté sorda): eso lo audita `SIEMBRA_ESTRICTA=1 npx playwright test tests/apps`.
 
 ### Candado de los specs que solo pasan en next dev
 
-`npm run check:specs-produccion` — en el build, y **rompe el build** si el commit añade a `tests/`
-un localizador por el nombre de clase de un módulo CSS («-module», «__x» o `[class*="Foo"]` con
-`Foo.module.css`), que el build compila como «hash_x»: usar **`selectorDelModulo`** de
-`tests/apps/_modulo-css.ts`, o rol o texto; o una espera a `'networkidle'`, que en producción no
-llega nunca: **`esperarPaginaAsentada`**. Mira los literales, no los comentarios.
-Juzga **las líneas que el commit añade** · Escape: `produccion-ok: <razón>`, razón obligatoria ·
-`npm run check:specs-produccion -- --todo` mide el pasivo.
-> Salió de C0457/C0487, cerrados el 27/10/2026 sin candado y vueltos el 03/11 (a57337a0c) y el
-> 07/11 (c0f8ad3b9, 10b6d8a2d): tres recogidas paradas (P004). Crónica: cabecera de
-> `scripts/check-specs-produccion.mjs` · pruebas: `npm run specs-produccion:probar-candado`.
+`npm run check:specs-produccion` — **rompe** si el commit añade a `tests/` un localizador por el
+nombre de clase de un módulo CSS («-module», «__x» o `[class*="Foo"]` con `Foo.module.css`), que el
+build compila como «hash_x»: usar **`selectorDelModulo`** de `tests/apps/_modulo-css.ts`, o rol o
+texto; o una espera a `'networkidle'`, que en producción no llega nunca: **`esperarPaginaAsentada`**.
 
 ### Candado de las familias de apps
 
-`npm run check:familias` — en el build, **tras `next build`** contra un `next start` propio en el
-3054 (~2,5 min), y **rompe el build** si el testigo de una familia
-no está en verde o si su tabla no cubre cada `<NumberInput>` de cada hermana. Lee
-`scripts/inspector/familias.mjs`: una familia nueva entra en el build con declararla allí. Es
-el único que **ejecuta** en vez de leer, porque un aviso que dice lo contrario de lo que pasa no
-lo delata ninguna forma del código.
-**Sin pasivo** · Un hueco se escribe con `falla: '<razón>'` en su fila ANTES de repararlo (no
-rompe y se imprime con su cuenta; una marca cuyo caso ya pasa **sí** rompe) · Escape:
-`familia-ok: <razón>` en un campo que
-no mueve ninguna cifra, razón obligatoria · En Vercel se omite la ejecución.
-> Salió del hueco A1 de compraventa (23/09/2026). Crónica: cabecera de
-> `scripts/check-familias.mjs` · pruebas: `npm run familias:probar-candado`.
+`npm run check:familias` — tras `next build`, contra un `next start` propio en el 3054 (~2,5 min),
+**rompe** si el testigo de una familia no está en verde o si su tabla no cubre cada
+`<NumberInput>` de cada hermana. Lee `scripts/inspector/familias.mjs`: una familia nueva entra en
+el build con declararla allí. Un hueco se escribe con `falla: '<razón>'` en su fila ANTES de
+repararlo (no rompe y se imprime con su cuenta); una marca cuyo caso ya pasa **sí** rompe.
 
 ### Candado de la tarjeta social
 
-`npm run check:og-image` — en el build. **Rompe el build** si una app de portal no declara la og
-de SU portal en `openGraph` y en `twitter`, si una página de portal se queda sin ella, si la
-imagen no existe en `public/` o si cae bajo un redirect de `next.config.ts`; y, **sin pasivo**,
-si cualquier app declara `openGraph` sin `images`.
-⚠️ **Next NO hereda la imagen del layout raíz**: declarar `openGraph` en la página reemplaza
-entero el del padre. Por eso `templates/app-base/` ya trae `images`.
-Recorre el árbol de cada portal (uno nuevo, a `PORTALES`) · Escape: `og-ok: <razón>` en el
-`metadata.ts`.
-⚠️ **Delegum es la excepción: sus apps NO llevan la og del portal**, porque Delegum no sirve apps
-bajo su dominio: su proxy no hace passthrough (`delegum.com/estimador-irpf/` da 404) y solo se ven
-en meskeia.com. `DELEGUM_APP_SLUGS` alimenta Soluciones, no pertenencia. Sí la llevan las páginas
-de su árbol (home, `/datos-fiscales/`, asistente y blog).
-> Salió del 29/08/2026: tarjetas de Coquinum y Cronicum sin imagen. Crónica: cabecera de
-> `scripts/check-og-image.mjs` · pruebas: `npm run og:probar-candado`.
+`npm run check:og-image` — **rompe** si una app de portal no declara la og de SU portal en
+`openGraph` y en `twitter`, si una página de portal se queda sin ella, si la imagen no existe en
+`public/` o cae bajo un redirect de `next.config.ts`, y si cualquier app declara `openGraph` sin
+`images`. ⚠️ **Next NO hereda la imagen del layout raíz**: declarar `openGraph` en la página
+reemplaza entero el del padre (`templates/app-base/` ya trae `images`). **Las apps de Delegum NO
+llevan la og del portal**: Delegum no sirve apps bajo su dominio, su proxy no hace passthrough
+(`delegum.com/estimador-irpf/` da 404), y `DELEGUM_APP_SLUGS` alimenta Soluciones, no pertenencia.
+Sí la llevan las páginas de su árbol (home, `/datos-fiscales/`, asistente y blog).
 
 ### Candado de los consumidores de data/
 
-`npm run check:consumidores` — en el build, y **rompe el build** si un parser por regex de
-`scripts/parsers-catalogo.mjs` no saca exactamente lo que contiene el catálogo importado
-(`STEMUM_APPS`, `COQUINUM_APPS`, `applicationsDatabase`…): ni uno de menos ni un campo distinto.
-Los scripts que leen `data/*.ts` como texto **importan su parser de ahí, no copian el regex**: la
-copia queda fuera del candado. Fuera, a propósito: el generador de posts para X (otro repo).
-**Sin pasivo** · **sin escape**: si no coincide, el parser está mal · Se omite si Node no carga .ts.
-> Salió del 28/07/2026: el refactor de verticales dejó mudos a tres consumidores sin un error.
-> Crónica: cabecera de `scripts/check-consumidores.mjs` y `scripts/CLAUDE.md` · pruebas:
-> `npm run consumidores:probar-candado`.
+`npm run check:consumidores` — **rompe** si un parser por regex de `scripts/parsers-catalogo.mjs`
+no saca exactamente lo que contiene el catálogo importado (`STEMUM_APPS`, `COQUINUM_APPS`,
+`applicationsDatabase`…). Los scripts que leen `data/*.ts` como texto **importan su parser de ahí,
+no copian el regex**: la copia queda fuera del candado. ⚠️ Fuera, a propósito: el generador de
+posts para X (otro repo).
 
 ### Candado de las obligaciones del CLAUDE.md
 
-`npm run check:claude-md` — en el build, y **rompe el build** si una obligación de este fichero
-desaparece o cambia de sección (la lista vive en el script), si cita un `npm run` o una ruta que
-no existen, o si un «### Candado de…» no está de verdad en la cadena del build. Compara sin
-mayúsculas, negritas ni saltos de línea: reformatear calla.
-Sin escape, a propósito: retirar una obligación es quitarla de la lista, en el mismo commit ·
-**Avisa** (no rompe) si una sección de candado pasa de 1.200 B o no nombra su caso de origen: la
-crónica va a la cabecera de su script, y aquí queda qué rompe, qué barre, el escape y el origen.
-> Salió del 24/09/2026: la poda con prisa del índice de memoria del 23/09 se llevó sus frenos sin
-> que nada diera error, y este fichero crecía ~1.000 B/día. Crónica: cabecera de
-> `scripts/check-claude-md.mjs` · pruebas: `npm run claude-md:probar-candado`.
+`npm run check:claude-md` — **rompe** si una obligación de este fichero desaparece o cambia de
+sección (la lista vive en el script), si cita un `npm run` o una ruta que no existen, o si un
+«### Candado de…» no está de verdad en la cadena del build. Retirar una obligación es quitarla de
+la lista, en el mismo commit. **Avisa** (no rompe) si una sección de candado pasa de 800 B o vuelve
+a cargar lo que va en la cabecera de su script: el escape, lo que barre, el `--todo` o el caso de
+origen.
 
 ### TypeScript
 

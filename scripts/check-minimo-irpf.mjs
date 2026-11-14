@@ -68,6 +68,8 @@
  * FALSO POSITIVO
  * ──────────────
  * `minimo-ok: <razón>` en esa línea o en la anterior.
+ *
+ * ALCANCE: barre el árbol entero, sin pasivo.
  */
 
 import fs from 'node:fs';

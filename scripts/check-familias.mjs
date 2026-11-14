@@ -83,6 +83,8 @@
  * huérfano de C0530: aquel servía el build de la víspera en el 3050; este es propio, en su
  * puerto, con el BUILD_ID de hace unos segundos, y si el puerto ya está ocupado se planta.
  * Sin bandera, contra `next dev` como siempre: para lanzarlo a mano sin construir.
+ *
+ * Pruebas: `npm run familias:probar-candado`.
  */
 
 import fs from 'node:fs';

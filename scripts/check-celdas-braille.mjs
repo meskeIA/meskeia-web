@@ -54,6 +54,8 @@
  * ⚠️ PARSEA UN .tsx CON REGEX, con las dos defensas que `scripts/CLAUDE.md` exige: retira las
  * líneas de comentario antes de buscar (el fichero CITA celdas y `brailleDots[c] ?? []` en su
  * prosa) y SE PLANTA si lo que extrae sale absurdo, en vez de dar verde por no haber mirado.
+ *
+ * Pruebas: `npm run braille:probar-candado`.
  */
 
 import { readFileSync } from 'node:fs';

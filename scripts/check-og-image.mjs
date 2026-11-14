@@ -38,6 +38,10 @@
  * Delegum es la excepción: sus apps NO llevan la og del portal (ver `PORTALES`).
  *
  * `--todo` lista el pasivo entero en vez de una muestra.
+ *
+ * ESCAPE: `og-ok: <razón>` en el `metadata.ts` de la app. Solo exime de la regla D (una app
+ * fuera de los portales que declara `openGraph` sin `images`); las reglas de portal no lo tienen.
+ * Pruebas: `npm run og:probar-candado`.
  */
 
 import fs from 'node:fs';

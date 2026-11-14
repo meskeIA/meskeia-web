@@ -61,6 +61,8 @@
  * **La razón es obligatoria**: la marca a secas también rompe el build.
  *
  * Sus casos se le reinyectan con `npm run clases-css:probar-candado`.
+ *
+ * Auditar un fichero entero: `node scripts/check-clases-css.mjs <fichero>`.
  */
 
 import fs from 'node:fs';

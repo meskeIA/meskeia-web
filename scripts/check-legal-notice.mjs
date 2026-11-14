@@ -67,6 +67,8 @@
  * Tampoco juzga el DISCLAIMER (nivel de riesgo, severidad, colapsabilidad): eso exige criterio
  * y vive en `_private/DISCLAIMER-POLICY.md`; aquí solo se comprueba lo que tiene una única
  * respuesta correcta.
+ *
+ * Pruebas: `npm run legal:probar-candado`.
  */
 
 import fs from 'fs';

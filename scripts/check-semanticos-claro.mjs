@@ -68,6 +68,8 @@
  *
  * Sin pasivo: barre el árbol entero. Escape: «semanticos-ok: <razón>» en la línea del color o
  * en la anterior, con la razón obligatoria (la marca a secas también rompe).
+ *
+ * Pruebas: `npm run semanticos-claro:probar-candado`.
  */
 
 import fs from 'node:fs';

@@ -37,6 +37,9 @@
  *
  * Sin escape en el código de la app: el sitio para decidirlo es ACEPTADOS.
  * Pruebas: npm run bailout:probar-candado.
+ *
+ * Se planta si no ve un build completo (pocos HTML en .next/server/app: callar sería mentir) y
+ * se omite en Vercel, donde `next build` no deja esos .html; lo valida el build local de /push.
  */
 
 import fs from 'node:fs';

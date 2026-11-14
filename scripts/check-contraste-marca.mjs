@@ -94,6 +94,9 @@
  *
  * Opciones: `--tanda 1|2` (por defecto, las dos) · `--todo` (todas las líneas, no 12) ·
  * `--raiz <dir>` (otro árbol; lo usa la prueba) · `--sin-congelados` (fuera los cursos).
+ *
+ * Comparte criterio con `scripts/contraste-marca/campana.mjs`, la migración mecánica por tandas
+ * (`--tanda N` simula; `--aplicar` escribe).
  */
 
 import fs from 'node:fs';

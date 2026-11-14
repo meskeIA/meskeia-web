@@ -79,6 +79,8 @@
  *
  * Es la regla del CLAUDE.md aplicada a sí misma: si la invariante puede repetirse, deja de
  * ser un recordatorio y se convierte en un check-*.mjs que rompe el build.
+ *
+ * Auditar un fichero entero: `node scripts/check-a11y-jsx.mjs <fichero>`.
  */
 
 import fs from 'fs';

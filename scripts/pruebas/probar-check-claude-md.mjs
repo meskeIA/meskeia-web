@@ -24,8 +24,11 @@
  *   7. UN CANDADO QUE NO ESTÁ EN EL BUILD — una sección «### Candado de…» cuyo comando existe
  *      pero no está en la cadena de `npm run build`. Tiene que FALLAR.
  *   8. UNA SECCIÓN QUE DESAPARECE — «### Regla multi-suite» cambia de nombre. Tiene que FALLAR.
- *   9. MOLDE ROTO — una sección de candado engordada por encima de 1.200 B. Tiene que AVISAR
+ *   9. MOLDE ROTO — una sección de candado engordada por encima de 800 B. Tiene que AVISAR
  *      y CALLAR: el molde es aviso, no candado.
+ *  10. VUELVE LA CRÓNICA — a la línea del mínimo del IRPF le vuelven su escape y un «Salió de…»,
+ *      que desde el 14/11/2026 viven solo en la cabecera del script. Tiene que AVISAR de los
+ *      dos y CALLAR, aunque la sección siga por debajo de 800 B.
  *
  * Trabaja sobre copias en un directorio temporal: no escribe NADA en el repositorio.
  */
@@ -87,7 +90,11 @@ const CASOS = [
   {
     n: 2, nombre: 'quitar una obligación (la prohibición del violeta #7C3AED)', debeFallar: true,
     texto: () => sustituir(ORIGINAL, '`#7C3AED` (violeta) y ', ''),
-    esperado: /Obligación perdida: «#7C3AED»/,
+    // «perdida» o «fuera de su sección»: desde que existe el candado de los colores prohibidos
+    // (C0635) el hexadecimal sigue en el fichero, en su línea, y el candado dice dónde quedó.
+    // Las dos salidas nombran lo mismo: la prohibición ya no está en «Identidad visual». El
+    // caso estuvo en rojo por eso hasta el 14/11/2026 sin que nadie lo ejecutara.
+    esperado: /(Obligación perdida|Obligación fuera de su sección): «#7C3AED»/,
   },
   {
     n: 3, nombre: 'mover el --no-verify PROHIBIDO a otra sección', debeFallar: true,
@@ -134,6 +141,14 @@ const CASOS = [
     // Y que el aviso lo encienda la trampa, no un tamaño que ya traía el fichero real: el
     // tamaño avisado tiene que ser mayor que el que avisaba (o no) el caso 1
     comprobarSalida: (salida, salidas) => bytesAvisados(salida) > (bytesAvisados(salidas[1]) ?? 0),
+  },
+  {
+    n: 10, nombre: 'vuelven el escape y el «Salió de…» a una sección de candado (avisa y no rompe)', debeFallar: false,
+    texto: () => sustituir(ORIGINAL, 'sí** se resta de la base y no lo dispara.',
+      'sí** se resta de la base y no lo dispara. Escape: `minimo-ok: <razón>`.\nSalió de tres reparaciones.'),
+    esperado: /«Candado del mínimo personal del IRPF» vuelve a cargar su escape[\s\S]*«Candado del mínimo personal del IRPF» vuelve a cargar su caso de origen/,
+    // Que los avisos los encienda la trampa: el fichero real no tiene ninguno de los dos
+    comprobarSalida: (salida, salidas) => !/vuelve a cargar/.test(salidas[1] ?? ''),
   },
 ];
 

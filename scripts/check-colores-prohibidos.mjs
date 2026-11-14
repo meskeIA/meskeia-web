@@ -25,6 +25,10 @@
  *
  * Escape: «colores-ok: <razón>» en la línea o en la anterior (un color de datos de un gráfico).
  * La marca a secas no vale.
+ * La razón es obligatoria: `escapada()` de lineas-anadidas.mjs exige al menos tres caracteres
+ * tras «colores-ok:», así que la marca a secas también rompe el build.
+ *
+ * Pruebas: `npm run colores-prohibidos:probar-candado`.
  */
 import fs from 'node:fs';
 import path from 'node:path';
