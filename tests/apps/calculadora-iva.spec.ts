@@ -68,6 +68,11 @@ import { TIPOS_IVA, RECARGO_EQUIVALENCIA, RECARGO_EQUIVALENCIA_TABACO, FISCAL_IV
  *   K. features del JSON-LD vacía.
  *   L. «¿Tengo que cobrar IVA si soy autónomo?» (visible) y «¿Están los autónomos y empresas
  *      obligados a cobrar IVA?» (FAQPage): la misma pregunta con dos respuestas.
+ *
+ * CABO C0748 (14/11/2026, ABIERTO, con test.fail()): «¿El IVA afecta al IRPF?» dice que el IVA no
+ * deducible «(gastos personales) sí es gasto deducible en IRPF». Un gasto personal no es gasto de
+ * la actividad (arts. 28.1 y 29.1.b LIRPF); el IVA soportado no deducible entra como coste solo en
+ * un gasto afecto (art. 95.Uno LIVA y NRV 12.ª del PGC). Fuentes literales, en el caso del final.
  */
 
 const RUTA = '/calculadora-iva/';
@@ -339,5 +344,46 @@ test.describe('calculadora-iva — Inspector 14/11/2026', () => {
     const respuestaVisible = ((await visible.locator('xpath=following-sibling::p[1]').textContent()) ?? '').trim();
     const enFaqPage = (await faqPage(page)).filter((q) => /autónomo/i.test(q.name) && /cobrar IVA/i.test(q.name));
     expect(enFaqPage).toEqual([{ name: preguntaVisible, text: respuestaVisible }]);
+  });
+
+  // ABIERTO — hallazgo de C0748 (Inspector, 14/11/2026, modo cabo).
+  // Hoy, en la FAQ visible y en el FAQPage (PREGUNTAS_FRECUENTES de metadata.ts): «Sin embargo, el
+  // IVA no deducible (gastos personales) sí es gasto deducible en IRPF.»
+  // ESPERADO: el IVA de un gasto personal NO es gasto deducible en el IRPF; lo que entra como gasto
+  // es el IVA soportado no deducible de un gasto AFECTO a la actividad, como parte de su coste.
+  // FUENTES (BOE, leídas el 14/11/2026):
+  //   · Ley 35/2006 (IRPF), art. 28.1: «El rendimiento neto de las actividades económicas se
+  //     determinará según las normas del Impuesto sobre Sociedades».
+  //   · Ley 35/2006, art. 29.1.b): «No se consideran afectos los bienes de esparcimiento y recreo
+  //     o, en general, de uso particular del titular de la actividad económica».
+  //   · Ley 37/1992 (IVA), art. 95.Uno: no se deducen las cuotas de bienes o servicios «que no se
+  //     afecten, directa y exclusivamente, a su actividad empresarial o profesional».
+  //   · RD 1514/2007 (PGC), norma de registro y valoración 12.ª: «El IVA soportado no deducible
+  //     formará parte del precio de adquisición de los activos corrientes y no corrientes», y de
+  //     los servicios, objeto de las operaciones gravadas.
+  // El caso afirma lo correcto: ninguna frase de la respuesta da por deducible en el IRPF el IVA de
+  // un gasto personal, y la que diga que el IVA no deducible es gasto en el IRPF lo ata a la
+  // actividad (afecto). Se mira en la página y en el JSON-LD servido, que comparten constante.
+  test('FAQ · «¿El IVA afecta al IRPF?» no da por deducible en el IRPF el IVA de un gasto personal', async ({ page }) => {
+    test.fail();
+    await page.getByRole('button', { name: /Ver guía educativa/ }).click();
+    const visible = page.getByRole('heading', { level: 4, name: /El IVA afecta al IRPF/ });
+    const respuestaVisible = ((await visible.locator('xpath=following-sibling::p[1]').textContent()) ?? '').trim();
+    const enFaqPage = (await faqPage(page)).find((q) => /El IVA afecta al IRPF/.test(q.name));
+    expect(enFaqPage, 'la pregunta sigue en el FAQPage').toBeTruthy();
+
+    for (const [donde, respuesta] of [
+      ['FAQ visible', respuestaVisible],
+      ['FAQPage', enFaqPage!.text],
+    ] as const) {
+      expect(respuesta, `${donde}: hay respuesta`).not.toBe('');
+      const frasesDeGastoIrpf = respuesta
+        .split(/(?<=\.)\s+/)
+        .filter((f) => /IRPF/.test(f) && /gasto/i.test(f) && /deducible/i.test(f));
+      for (const frase of frasesDeGastoIrpf) {
+        expect(frase, `${donde}: el IVA de un gasto personal no es gasto del IRPF (art. 29.1.b LIRPF)`).not.toMatch(/personal/i);
+        expect(frase, `${donde}: el IVA no deducible cuenta en el IRPF solo si el gasto es afecto`).toMatch(/afect|actividad/i);
+      }
+    }
   });
 });

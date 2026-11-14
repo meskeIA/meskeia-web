@@ -286,6 +286,110 @@ test.describe('checklist-declaracion-renta — CASO 3 (móvil, Pixel 7)', () => 
 });
 
 // ──────────────────────────────────────────────────────────────────────────────
+/**
+ * Comprobación de cabos del 14/11/2026 (modo cabo: solo sus preguntas, no revalida la app).
+ *
+ * FUENTES LEÍDAS (nunca la memoria)
+ *   · Ley 35/2006 (LIRPF), texto consolidado del BOE (BOE-A-2006-20764, actualizado el 11/11/2026):
+ *     art. 49.1.b «Si tras dicha compensación quedase saldo negativo, su importe se compensará en
+ *     los cuatro años siguientes»; art. 33.1, igual que en el texto original publicado el
+ *     29/11/2006; art. 7.e «El importe de la indemnización exenta a que se refiere esta letra
+ *     tendrá como límite la cantidad de 180.000 euros»; art. 85.1, redacción anterior a la del
+ *     RDL 29/2026 (que solo rige desde el 01/01/2027): «el 2 por ciento al valor catastral».
+ *   · Manual práctico de Renta 2025 de la AEAT: imputación de rentas inmobiliarias en 2025, «El 2
+ *     por 100, con carácter general» y el 1,1 % solo en municipios con valores catastrales
+ *     revisados que «hubieran entrado en vigor a partir de 1 de enero de 2012» (DA 55.ª LIRPF);
+ *     monedas virtuales como ganancia o pérdida patrimonial por los arts. 35, 37.1.h, 14 y 46.b,
+ *     sin fecha de inicio; alquiler de vivienda: solo el régimen transitorio (contrato anterior al
+ *     01/01/2015) y las deducciones autonómicas.
+ *   · Estatuto de los Trabajadores (RDLeg 2/2015, BOE-A-2015-11430), DT 11.ª.2: contratos
+ *     anteriores al 12/02/2012, 45 días por año por el tiempo ANTERIOR a esa fecha y 33 por el
+ *     posterior; tope de 720 días salvo que el periodo anterior dé más, sin pasar de 42
+ *     mensualidades.
+ *   · RDL 29/2026, de 6 de octubre (BOE-A-2026-20823, convalidado por Resolución de 12/11/2026),
+ *     art. 6, apartado Segundo, «Con efectos desde la entrada en vigor de este real decreto-ley»
+ *     (08/10/2026), número «Cuatro. Se añade un apartado 6 artículo 68»: deducción estatal del 10 %
+ *     por alquiler de la vivienda habitual con base imponible inferior a 33.007,20 €.
+ */
+test.describe('checklist-declaracion-renta — cabos C0745 y C0750 (fuente: BOE y manual de Renta 2025)', () => {
+  test.beforeEach(async ({ page }) => {
+    await abrir(page);
+  });
+
+  // ABIERTO — hallazgo de C0745 (a). Esperado: las pérdidas se compensan en los cuatro años
+  // SIGUIENTES (art. 49.1.b LIRPF). La nota del checklist y la tarjeta de consejos lo dicen bien;
+  // la tarjeta del inversor dice «hasta 4 ejercicios anteriores».
+  test('C0745 (a) — las pérdidas compensan ganancias de los 4 años siguientes, no de los anteriores', async ({ page }) => {
+    test.fail();
+    await perfil(page, /^Inversor/).click();
+    const nota = await texto(item(page, /^Declaraciones de años anteriores si tienes pérdidas/));
+    expect(nota).toContain('4 años siguientes');
+    const tip = await texto(page.getByText(/pueden usarse para reducir las ganancias de este año/));
+    expect(tip).toContain('hasta 4 ejercicios');
+    const escenario = await texto(page.locator('li', { hasText: 'Las pérdidas de acciones compensan ganancias' }));
+    expect(escenario).not.toContain('anteriores');
+    expect(escenario).toMatch(/siguientes/);
+  });
+
+  // ABIERTO — hallazgo de C0745 (b). Esperado: la transmisión o permuta de criptomonedas es
+  // ganancia o pérdida patrimonial por los arts. 33.1, 35, 37.1.h y 46.b LIRPF (manual de Renta
+  // 2025 de la AEAT); el art. 33.1 está igual desde el texto original de 2006. Nada lo fecha en
+  // 2023: «desde 2023» da a entender que las ventas de 2021 o 2022 no tributaban.
+  test('C0745 (b) — las criptomonedas no tributan «desde 2023»: es el régimen general de ganancias', async ({ page }) => {
+    test.fail();
+    await perfil(page, /^Inversor/).click();
+    const escenario = await texto(page.locator('li', { hasText: 'Las criptomonedas tributan' }));
+    expect(escenario).not.toMatch(/desde 2023/i);
+    const nota = await texto(item(page, /^Registros de operaciones con criptomonedas/));
+    expect(nota).not.toMatch(/desde 2023/i);
+  });
+
+  // ABIERTO — hallazgo de C0745 (c), el cálculo. Esperado (ET, DT 11.ª.2): en un contrato anterior
+  // al 12/02/2012 los 45 días solo cuentan por el tiempo trabajado antes de esa fecha; lo posterior,
+  // a 33 días. Caso: contrato del 12/02/2007, despido improcedente el 12/02/2025, 100 €/día:
+  // 5 × 45 + 13 × 33 = 654 días → 65.400 € exentos; la FAQ da 45 × 18 = 810 días → 81.000 €.
+  test('C0745 (c) — despido: los 45 días solo por el tiempo anterior al 12/02/2012', async ({ page }) => {
+    test.fail();
+    const faq = await respuestaFaqVisible(page, '¿Cómo tributan las indemnizaciones por despido?');
+    expect(faq).toMatch(/12 de febrero de 2012|12\/02\/2012/);
+    expect(faq).not.toContain('para contratos anteriores a 2012');
+  });
+
+  // ABIERTO — hallazgo de C0745 (c), el tope. Esperado (art. 7.e LIRPF): la indemnización exenta
+  // «tendrá como límite la cantidad de 180.000 euros». Caso: contrato de 2015, 10 años, 600 €/día:
+  // 33 × 10 × 600 = 198.000 € → exentos 180.000 € y tributan 18.000 €; la FAQ los da exentos todos.
+  test('C0745 (c) — despido: la exención tiene un tope de 180.000 € (art. 7.e)', async ({ page }) => {
+    test.fail();
+    const faq = await respuestaFaqVisible(page, '¿Cómo tributan las indemnizaciones por despido?');
+    expect(faq).toMatch(/180\.?000/);
+  });
+
+  // ABIERTO — hallazgo de C0745 (d). Esperado para 2025 (manual de Renta 2025; art. 85.1 LIRPF en la
+  // redacción anterior al RDL 29/2026): 2 % del valor catastral con carácter general y 1,1 % solo si
+  // los valores revisados entraron en vigor desde el 01/01/2012. Caso: piso vacío todo 2025, valor
+  // catastral 80.000 €, última revisión en vigor en 2008 → 1.600 € imputados; la app dice 1,1 % (880 €).
+  test('C0745 (d) — imputación de rentas: 2 % general, 1,1 % solo con revisión catastral desde 2012', async ({ page }) => {
+    test.fail();
+    const linea = await texto(page.locator('li', { hasText: 'Los períodos en que el inmueble estuvo vacío' }));
+    expect(linea).toMatch(/1,1[\s ]?%/);
+    expect(linea).toMatch(/(^|[^\d,])2[\s ]?%/);
+  });
+
+  // C0750 — correcto para el ejercicio que presenta la app. El art. 68.6 (deducción estatal del 10 %)
+  // lo añadió el RDL 29/2026 con efectos desde su entrada en vigor, el 08/10/2026: rige desde el
+  // ejercicio 2026, no en el 2025. Para el 2025 solo quedan el régimen transitorio (contrato
+  // anterior al 01/01/2015, DT 15.ª LIRPF) y las deducciones autonómicas, que es lo que dice la
+  // nota. Si la app pasa a presentar el ejercicio 2026, este caso cae y la nota debe añadir el
+  // art. 68.6 (y la DT 15.ª.3 nueva: el transitorio no se aplica si se aplica el 68.6).
+  test('C0750 — alquiler de vivienda habitual (ejercicio 2025): autonómica o contrato anterior a 2015', async ({ page }) => {
+    await expect(page.getByText('campaña del ejercicio 2025')).toBeVisible();
+    const nota = await texto(item(page, /^Recibos de alquiler pagados y NIF del arrendador/));
+    expect(nota).toContain('deducción autonómica');
+    expect(nota).toContain('contrato anterior a 2015');
+  });
+});
+
+// ──────────────────────────────────────────────────────────────────────────────
 test.describe('checklist-declaracion-renta — lo normativo (fuente: Orden HAC/277/2026 y data/fiscal)', () => {
   test.beforeEach(async ({ page }) => {
     await abrir(page);

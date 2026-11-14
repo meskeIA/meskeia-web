@@ -539,3 +539,115 @@ test.describe('móvil · Pixel 7 (inspector 14/11/2026)', () => {
     expect(tabla!.paginaScroll).toBeLessThanOrEqual(tabla!.paginaAncho);
   });
 });
+
+/* ════════════════════════════════════════════════════════════════════════════════════════════
+ * Cabos C0746 y C0751 (inspector 14/11/2026, modo cabo)
+ *
+ * C0746 traía cinco sospechas sin fuente de la primera inspección; C0751, los dos veredictos de
+ * tiocianato que la reparación 4651 conservó sin fuente. Fuentes leídas (red de fuentes oficiales):
+ *   · PubChem CID 159369 (sulfuro de aluminio), Hazards Summary vía Haz-Map: «Hydrolyzes in water
+ *     forming aluminum hydroxide and hydrogen sulfide; [Merck Index]».
+ *   · PubChem CID 82824 (sulfuro de magnesio), Hazards Summary vía Haz-Map: «Reacts with water
+ *     producing toxic and extremely flammable gas; … [Alfa Aesar MSDS] … See Magnesium and
+ *     Hydrogen sulfide».
+ *   · PubChem, elemento 12 (magnesio), Element Group Number: «2 - Alkaline Earth Metal»
+ *     (Jefferson Lab, U.S. DOE).
+ *   · PubChem CID 14798 (NaOH), Solubility: «Solubility in water, g/100ml at 20 °C: 109» (ICSC).
+ *   · CIAAW, pesos atómicos abreviados: Na 22,990 · O 15,999 · H 1,0080 → M(NaOH) = 39,997 g/mol.
+ * SIN fuente en la red, y por eso SIN caso aquí: Al₂(CO₃)₃ (CID 10353966) y Fe₂(CO₃)₃ (CID 165855)
+ * no traen en PubChem ninguna frase sobre agua o hidrólisis; Cu(SCN)₂ (CID 10103751) solo trae
+ * propiedades calculadas y CuSCN (CID 61264) no tiene sección de solubilidad; Hg₂(SCN)₂ no está en
+ * PubChem (ni por nombre ni por fórmula C2Hg2N2S2). La IUPAC-NIST Solubility Data Series no tiene
+ * volumen para ninguno de los cuatro (el 65, haluros y pseudohaluros de cobre(I), pasa de los
+ * 10 MB que admite WebFetch y trata Cu⁺, no el Cu²⁺ que usa el comprobador).
+ * ════════════════════════════════════════════════════════════════════════════════════════════ */
+
+/** Abre una ficha (regla, ion o Kps) y devuelve el texto de su detalle. */
+async function detalle(page: Page, id: string): Promise<string> {
+  const boton = page.locator(`button[aria-controls="detalle-${id}"]`);
+  if ((await boton.getAttribute('aria-expanded')) !== 'true') await boton.click();
+  await expect(boton).toHaveAttribute('aria-expanded', 'true');
+  return ((await page.locator(`#detalle-${id}`).textContent()) ?? '').replace(/\s+/g, ' ');
+}
+
+test.describe('Cabos C0746 y C0751 (inspector 14/11/2026)', () => {
+  test.beforeEach(async ({ page }) => {
+    await cargar(page);
+  });
+
+  // ABIERTO — hallazgo de C0746 (a). Esperado: Al³⁺ + S²⁻ no da Al₂S₃(s), que en agua se hidroliza
+  // a hidróxido de aluminio y sulfuro de hidrógeno (Merck Index, vía PubChem CID 159369); lo que
+  // precipita es Al(OH)₃. Hoy: «Al₂S₃ ✕ Insoluble — precipita» y «2 Al³⁺ + 3 S²⁻ → Al₂S₃(s)↓».
+  test('HALLAZGO C0746 (a) (14/11/2026, ABIERTO) · Al³⁺ + S²⁻ escribe «Al₂S₃(s)↓», que en agua se hidroliza a Al(OH)₃ y H₂S', async ({ page }) => {
+    test.fail();
+    await elegirPar(page, 'Al', 'S');
+    const r = await resultado(page);
+    expect.soft(r.texto, 'el precipitado no es Al₂S₃').not.toContain('Al₂S₃(s)');
+    expect.soft(r.texto, 'lo que precipita es el hidróxido').toContain('Al(OH)₃');
+  });
+
+  // ABIERTO — hallazgo de C0746 (b). Esperado: si la tarjeta Hidróxidos dice «NH₄OH no existe como
+  // tal: es amoníaco disuelto, NH₃(ac), en equilibrio con NH₄⁺ y OH⁻», el comprobador no puede dar
+  // «NH₄OH» como una sal de amonio soluble con los cuatro iones libres: tiene que hablar del NH₃.
+  // Hoy: «NH₄OH ✔ Soluble — no precipita · Todas las sales … y del ion amonio son solubles en agua».
+  test('HALLAZGO C0746 (b) (14/11/2026, ABIERTO) · NH₄⁺ + OH⁻ da «NH₄OH Soluble» como sal de amonio, y la tarjeta Hidróxidos dice que el NH₄OH no existe', async ({ page }) => {
+    test.fail();
+    const tarjeta = await detalle(page, 'hidroxidos');
+    await elegirPar(page, 'NH4', 'OH');
+    const r = await resultado(page);
+    if (/NH₄OH no existe/.test(tarjeta) && r.formula === 'NH₄OH') {
+      expect(r.texto, 'el comprobador habla del amoníaco disuelto, como la tarjeta').toMatch(/NH₃/);
+    }
+  });
+
+  // ABIERTO — hallazgo de C0746 (c). La tarjeta Hidróxidos compara la solubilidad del NaOH con el
+  // Kps del Fe(OH)₃ («casi cuarenta órdenes de magnitud»), y la FAQ de la propia app dice «Para
+  // comparar hay que pasar siempre a solubilidad molar». Solubilidad con solubilidad, a mano:
+  //   NaOH: 109 g/100 mL a 20 °C (ICSC) → 1090 g/L ÷ 39,997 g/mol = 27,3 mol por litro de agua.
+  //   Fe(OH)₃: s = 1,0×10⁻¹⁰ mol/L (su ficha de Kps: ⁴√(2,8×10⁻³⁹/27) = 1,009×10⁻¹⁰).
+  //   log₁₀(27,3 / 1,0×10⁻¹⁰) = 11,4 → unos ONCE órdenes, no cuarenta.
+  // Si se cambia la forma de la frase, el caso deja de poder medirla y pasa: revisarlo.
+  test('HALLAZGO C0746 (c) (14/11/2026, ABIERTO) · «casi cuarenta órdenes de magnitud» entre NaOH y Fe(OH)₃: en solubilidad molar son unos once', async ({ page }) => {
+    test.fail();
+    const tarjeta = await detalle(page, 'hidroxidos');
+    const fila = (await page.locator('button[aria-controls="detalle-kps-feoh3"]').textContent()) ?? '';
+    const sFeOH3 = solubilidadMolar(fila);
+    const sNaOH = 1090 / 39.997;
+    const ordenes = Math.log10(sNaOH / sFeOH3);
+    expect(ordenes).toBeCloseTo(11.4, 0);
+    const m = tarjeta.match(/(\d+|\p{L}+) órdenes de magnitud/u);
+    if (!m) return;
+    const palabras: Record<string, number> = {
+      diez: 10, once: 11, doce: 12, trece: 13, catorce: 14, quince: 15, veinte: 20, treinta: 30, cuarenta: 40,
+    };
+    const dice = /^\d+$/.test(m[1]) ? Number(m[1]) : palabras[m[1]];
+    expect(Math.abs(dice - ordenes), `la tarjeta dice «${m[0]}»; en solubilidad molar son ${ordenes.toFixed(1)}`).toBeLessThan(1.5);
+  });
+
+  // ABIERTO — hallazgo de C0746 (d). Esperado: la ficha del ion sulfato («Soluble salvo con Ba²⁺,
+  // Sr²⁺, Pb²⁺ (insolubles) y Ca²⁺, Ag⁺ (poco solubles)») nombra el Hg₂²⁺, que la tarjeta Sulfatos
+  // («Insolubles: BaSO₄, SrSO₄, PbSO₄ y Hg₂SO₄») y el comprobador («Hg₂SO₄ ✕ Insoluble») dan por
+  // insoluble. Hoy la omite, y su lista cerrada lo deja como soluble.
+  test('HALLAZGO C0746 (d) (14/11/2026, ABIERTO) · la ficha del ion sulfato no cita el Hg₂²⁺ que la tabla da por insoluble', async ({ page }) => {
+    test.fail();
+    await elegirPar(page, 'Hg2', 'SO4');
+    const estado = categoria((await resultado(page)).estado);
+    const ficha = await detalle(page, 'ion-sulfato');
+    if (estado !== 'soluble') expect(ficha, `Hg₂SO₄ sale «${estado}» en el comprobador`).toContain('Hg₂²⁺');
+  });
+
+  // ABIERTO — hallazgo de C0746 (e). Esperado: el comprobador no escribe «MgS(s)↓». El magnesio es
+  // alcalinotérreo (PubChem, elemento 12: «2 - Alkaline Earth Metal»), la tarjeta Sulfuros dice
+  // «Los de alcalinotérreos (CaS, SrS, BaS) se disuelven, aunque hidrolizándose y liberando H₂S»
+  // y el MgS «Reacts with water producing toxic and extremely flammable gas» (PubChem CID 82824).
+  // Hoy: «MgS ✕ Insoluble — precipita» con la regla «salvo los de metales alcalinos y amonio» y
+  // «Mg²⁺ + S²⁻ → MgS(s)↓», mientras Ca²⁺ + S²⁻ sale «Soluble» por la excepción de alcalinotérreos.
+  test('HALLAZGO C0746 (e) (14/11/2026, ABIERTO) · Mg²⁺ + S²⁻ escribe «MgS(s)↓» fuera de la excepción de los alcalinotérreos', async ({ page }) => {
+    test.fail();
+    const tarjeta = await detalle(page, 'sulfuros');
+    expect(tarjeta).toMatch(/alcalinotérreos/);
+    await elegirPar(page, 'Mg', 'S');
+    const r = await resultado(page);
+    expect(r.texto, 'el MgS reacciona con el agua: no es el precipitado').not.toContain('MgS(s)');
+  });
+});

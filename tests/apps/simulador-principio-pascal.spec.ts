@@ -418,3 +418,283 @@ test.describe('simulador-principio-pascal · la sección de casos en el navegado
     await expect(page.locator('#casos-resultado')).toContainText('7200 N');
   });
 });
+
+/* ═══════════════════════════════════════════════════════════════════════════════════════════
+ * INSPECTOR · primera inspección (14/11/2026)
+ *
+ * Cada esperado, resuelto a mano ANTES de ejecutar la app (g = 9,81 m/s², P₀ = 101.325 Pa,
+ * densidades de simulador-flotabilidad/materiales.ts: alcohol 789, mar 1025, glicerina 1260):
+ *
+ *   N1 · prensa: F₁ = 200 N, d₁ = 5 cm, d₂ = 30 cm, x₁ = 18 cm
+ *        A₁ = π·5²/4 = 19,635 cm² → «19,63 cm²» · A₂ = π·30²/4 = 706,86 cm² → «706,9 cm²»
+ *        A₂/A₁ = (30/5)² = 36 → «×36» · F₂ = 200·36 = 7200 N → «7200 N»
+ *        m = 7200/9,81 = 733,94 kg → «sostiene 733,9 kg»
+ *        P = 200/(19,635·10⁻⁴ m²) = 101.859,2 Pa → «101.859 Pa»
+ *        x₂ = 18/36 = 0,5 cm = 5 mm → «5 mm» (A₁·x₁ = 353,4 cm³ = A₂·x₂)
+ *        W = 200·0,18 = 36 J = 7200·0,005 → «36 J»
+ *   N2 · alcohol etílico a 25 m: ρgh = 789·9,81·25 = 193.502,25 Pa → «193.502 Pa»
+ *        P = 294.827,25 Pa → «294.827 Pa» · 294.827,25/101.325 = 2,90972 → «2,910 atm»
+ *        193.502,25/101.325 = 1,90972 → «1,910 atm» · 101.325/(789·9,81) = 13,091 → «13,09 m»
+ *   L1 · agua de mar a 11.000 m (el tope del control): ρgh = 1025·9,81·11.000 = 110.607.750 Pa
+ *        P = 110.709.075 Pa · /101.325 = 1092,6136 → «1092,614 atm» (cuatro cifras: sin punto)
+ *        añade 1091,6136 → «1091,614 atm» · 101.325/(1025·9,81) = 10,077 → «10,08 m»
+ *        11.000,5 m queda fuera del tope → «Faltan datos»
+ *   L2 · agua dulce a 0 m: P = P₀ = «101.325 Pa», «1,000 atm» · ρgh = «0,00 Pa», «0,000 atm»
+ *   L3 · prensa inicial con x₁ = 0: x₂ = «0 m», W = «0 J», F₂ sigue en «10.000 N»
+ *        prensa invertida d₁ = 20, d₂ = 2: A₂/A₁ = 0,01 → «×0,01» · F₂ = 100·0,01 = «1 N»
+ *        m = 1/9,81 = 0,10194 → «sostiene 0,1019 kg» · x₂ = 10 cm/0,01 = 1000 cm → «10 m»
+ *   R  · diámetro 0, fuerza −50 o altura del tubo 0 → «Faltan datos» y nombra el dato, sin cifra
+ *   N3 · tubo: glicerina en el fondo, alcohol añadido, h_B = 15 cm
+ *        h_A = 789·15/1260 = 9,3929 → «9,393 cm» · desnivel 15 − 9,3929 = 5,6071 → «5,607 cm»
+ *        P = 789·9,81·0,15 = 1161,01 → «1161 Pa»
+ *   N4 · «Otra densidad» 998,2 kg/m³ a 10 m: ρgh = 998,2·98,1 = 97.923,42 → «97.923 Pa»
+ *        P = 199.248,42 → «199.248 Pa» · /101.325 = 1,96643 → «1,966 atm»
+ *
+ * HALLAZGOS ABIERTOS de esta inspección (llevan test.fail()):
+ *   · la fórmula escribe la densidad redondeada a unidades: «998 · 9,81 · 10 = 97.923 Pa»
+ *     (998·9,81·10 = 97.903,8) y, con 1,03, «1 · 9,81 · 10 = 101 Pa»; igual en el tubo en U.
+ *   · el caso 8 de aula dice que la tarjeta «Sube el émbolo 2» «marca la cifra» (0,5 cm), y la
+ *     tarjeta marca «5 mm»: quien teclea 5 suspende.
+ *   · tres preguntas del FAQPage están también en la FAQ visible, con otra redacción.
+ * ═══════════════════════════════════════════════════════════════════════════════════════════ */
+
+/** Escribe en un campo dentro de un ámbito (dos «Densidad del líquido» pueden convivir). */
+async function escribirEn(page: Page, ambito: Locator, etiqueta: string, valor: string): Promise<void> {
+  const caja = ambito.getByRole('textbox', { name: etiqueta, exact: true });
+  await caja.fill(valor);
+  await esperarValorEnReact(page, caja, valor);
+}
+
+/** Las líneas de fórmula (`<code>`) de una sección, ya pintadas. */
+async function formulasDe(page: Page, titulo: RegExp): Promise<string[]> {
+  return (await seccion(page, titulo).locator('code').allTextContents()).map((t) => t.replace(/\s+/g, ' ').trim());
+}
+
+interface PreguntaLd {
+  name: string;
+  acceptedAnswer: { text: string };
+}
+
+test.describe('simulador-principio-pascal · Inspector 14/11/2026', () => {
+  test('N1 · prensa: 200 N con émbolos de 5 y 30 cm → ×36, 7200 N, 5 mm y 36 J', async ({ page }) => {
+    await escribir(page, 'Fuerza sobre el émbolo 1 (F₁)', '200');
+    await escribir(page, 'Diámetro del émbolo 1', '5');
+    await escribir(page, 'Diámetro del émbolo 2', '30');
+    await escribir(page, 'Cuánto baja el émbolo 1 (x₁)', '18');
+
+    const zona = estado(page, PRENSA);
+    await expect(zona).toContainText('7200 N');
+    await expect(zona).toContainText('sostiene 733,9 kg');
+    expect(await leerTarjeta(page, 'Multiplica la fuerza (A₂/A₁)')).toBe('×36');
+    expect(await leerTarjeta(page, 'Presión transmitida P = F₁/A₁')).toBe('101.859 Pa');
+    expect(await leerTarjeta(page, 'Área del émbolo 1')).toBe('19,63 cm²');
+    expect(await leerTarjeta(page, 'Área del émbolo 2')).toBe('706,9 cm²');
+    expect(await leerTarjeta(page, 'Sube el émbolo 2, x₂ = x₁·A₁/A₂')).toBe('5 mm');
+    expect(await leerTarjeta(page, 'Trabajo F₁·x₁ = F₂·x₂')).toBe('36 J');
+  });
+
+  test('N2 · alcohol etílico a 25 m: 193.502 Pa del líquido y 294.827 Pa absolutos', async ({ page }) => {
+    await boton(page, 'Líquido (ρ)', /^Alcohol etílico/).click();
+    await escribir(page, 'Profundidad bajo la superficie', '25');
+
+    const zona = estado(page, PROFUNDIDAD);
+    await expect(zona).toContainText('294.827 Pa');
+    await expect(zona).toContainText('2,910 atm');
+    expect(await leerTarjeta(page, 'Del líquido ρ·g·h (manométrica)')).toBe('193.502 Pa');
+    expect(await leerTarjeta(page, 'Atmósferas que añade el líquido')).toBe('1,910 atm');
+    expect(await leerTarjeta(page, 'Profundidad que añade 1 atm')).toBe('13,09 m');
+  });
+
+  test('L1 · tope del control: agua de mar a 11.000 m → 110.709.075 Pa y 1092,614 atm; 11.000,5 se rechaza', async ({ page }) => {
+    await boton(page, 'Líquido (ρ)', /^Agua de mar/).click();
+    await escribir(page, 'Profundidad bajo la superficie', '11000');
+
+    const zona = estado(page, PROFUNDIDAD);
+    await expect(zona).toContainText('110.709.075 Pa');
+    await expect(zona).toContainText('1092,614 atm');
+    expect(await leerTarjeta(page, 'Del líquido ρ·g·h (manométrica)')).toBe('110.607.750 Pa');
+    expect(await leerTarjeta(page, 'Atmósferas que añade el líquido')).toBe('1091,614 atm');
+    expect(await leerTarjeta(page, 'Profundidad que añade 1 atm')).toBe('10,08 m');
+    await expect(page.locator('#deslizador-profundidad')).toHaveAttribute('aria-valuetext', '11.000 metros');
+
+    // Con el punto de millar español es el mismo dato
+    await escribir(page, 'Profundidad bajo la superficie', '11.000');
+    await expect(zona).toContainText('110.709.075 Pa');
+
+    // Medio metro por encima del tope: se rechaza y no publica presión
+    await escribir(page, 'Profundidad bajo la superficie', '11000,5');
+    await expect(zona).toContainText('Faltan datos para calcular');
+    await expect(zona).toContainText('de 0 a 11.000');
+    expect((await zona.textContent()) ?? '').not.toMatch(/\d\s*(Pa|atm)\b/);
+  });
+
+  test('L2 · agua dulce a 0 m: solo la atmósfera, 101.325 Pa y 1,000 atm', async ({ page }) => {
+    await escribir(page, 'Profundidad bajo la superficie', '0');
+    const zona = estado(page, PROFUNDIDAD);
+    await expect(zona).toContainText('101.325 Pa');
+    await expect(zona).toContainText('1,000 atm');
+    expect(await leerTarjeta(page, 'Del líquido ρ·g·h (manométrica)')).toBe('0,00 Pa');
+    expect(await leerTarjeta(page, 'Atmósferas que añade el líquido')).toBe('0,000 atm');
+  });
+
+  test('L3 · prensa con x₁ = 0 (sin trabajo) y prensa invertida (×0,01, 1 N, 10 m)', async ({ page }) => {
+    await escribir(page, 'Cuánto baja el émbolo 1 (x₁)', '0');
+    const zona = estado(page, PRENSA);
+    await expect(zona).toContainText('10.000 N');
+    expect(await leerTarjeta(page, 'Sube el émbolo 2, x₂ = x₁·A₁/A₂')).toBe('0 m');
+    expect(await leerTarjeta(page, 'Trabajo F₁·x₁ = F₂·x₂')).toBe('0 J');
+
+    await escribir(page, 'Cuánto baja el émbolo 1 (x₁)', '10');
+    await escribir(page, 'Diámetro del émbolo 1', '20');
+    await escribir(page, 'Diámetro del émbolo 2', '2');
+    await expect(zona).toContainText('sostiene 0,1019 kg');
+    await expect(zona).toContainText('El émbolo 2 es el pequeño');
+    expect(await leerTarjeta(page, 'Multiplica la fuerza (A₂/A₁)')).toBe('×0,01');
+    expect(await leerTarjeta(page, 'Sube el émbolo 2, x₂ = x₁·A₁/A₂')).toBe('10 m');
+    expect(await leerTarjeta(page, 'Trabajo F₁·x₁ = F₂·x₂')).toBe('10 J');
+    await expect(zona.locator('span').filter({ hasText: /^1 N$/ })).toHaveCount(1);
+  });
+
+  test('R · diámetro 0, fuerza negativa o altura 0: dice qué falta y no publica cifra', async ({ page }) => {
+    const prensa = estado(page, PRENSA);
+    await escribir(page, 'Diámetro del émbolo 1', '0');
+    await expect(prensa).toContainText('Faltan datos para calcular');
+    await expect(prensa).toContainText('el diámetro del émbolo 1 (en cm, mayor que 0)');
+    let texto = (await prensa.textContent()) ?? '';
+    expect(texto).not.toMatch(/\d\s*(N|kg|Pa)\b/);
+    expect(texto).not.toMatch(/NaN|∞|Infinity/);
+
+    await escribir(page, 'Diámetro del émbolo 1', '2');
+    await escribir(page, 'Fuerza sobre el émbolo 1 (F₁)', '-50');
+    await expect(prensa).toContainText('la fuerza sobre el émbolo 1 (en N, mayor que 0)');
+    texto = (await prensa.textContent()) ?? '';
+    expect(texto).not.toMatch(/\d\s*(N|kg|Pa)\b/);
+
+    const tubo = estado(page, TUBO);
+    await escribir(page, 'Altura de la columna de B (h_B)', '0');
+    await expect(tubo).toContainText('la altura del líquido añadido (en cm, mayor que 0)');
+    expect((await tubo.textContent()) ?? '').not.toMatch(/\d\s*(cm|Pa)\b/);
+  });
+
+  test('N3 · tubo en U: 15 cm de alcohol sobre glicerina equilibran 9,393 cm', async ({ page }) => {
+    await boton(page, 'Líquido del fondo del tubo (A)', /^Glicerina/).click();
+    await boton(page, 'Líquido añadido en la rama derecha (B)', /^Alcohol etílico/).click();
+    await escribir(page, 'Altura de la columna de B (h_B)', '15');
+
+    await expect(estado(page, TUBO)).toContainText('9,393 cm');
+    expect(await leerTarjeta(page, 'Desnivel entre superficies h_B − h_A')).toBe('5,607 cm');
+    expect(await leerTarjeta(page, 'Presión de cada columna en la separación')).toBe('1161 Pa');
+  });
+
+  test('N4 · «Otra densidad» 998,2 kg/m³ a 10 m: 97.923 Pa del líquido y 1,966 atm', async ({ page }) => {
+    await boton(page, 'Líquido (ρ)', /^Otra densidad/).click();
+    await escribirEn(page, seccion(page, PROFUNDIDAD), 'Densidad del líquido', '998,2');
+    const zona = estado(page, PROFUNDIDAD);
+    await expect(zona).toContainText('199.248 Pa');
+    await expect(zona).toContainText('1,966 atm');
+    expect(await leerTarjeta(page, 'Del líquido ρ·g·h (manométrica)')).toBe('97.923 Pa');
+  });
+
+  test('HALLAZGO (14/11/2026, ABIERTO) · la fórmula escribe la densidad redondeada y su cuenta no cuadra', async ({ page }) => {
+    // formatNumber(densidad, 0) en las líneas de fórmula de las secciones 1 y 3: con 998,2 kg/m³
+    // la línea dice «998 · 9,81 · 10 = 97.923 Pa», y 998·9,81·10 = 97.903,8; con 1,03 dice
+    // «1 · 9,81 · 10 = 101 Pa». En el tubo, B = 850,6 y h_B = 10 cm: h_A = 850,6·10/1000 = 8,506,
+    // y la línea dice «851 · 10/1000 = 8,506 cm».
+    test.fail();
+    await boton(page, 'Líquido (ρ)', /^Otra densidad/).click();
+    await escribirEn(page, seccion(page, PROFUNDIDAD), 'Densidad del líquido', '998,2');
+    await expect(estado(page, PROFUNDIDAD)).toContainText('199.248 Pa');
+    const linea1 = (await formulasDe(page, PROFUNDIDAD))[0];
+
+    await boton(page, 'Líquido añadido en la rama derecha (B)', /^Otra densidad/).click();
+    await escribirEn(page, seccion(page, TUBO), 'Densidad del líquido', '850,6');
+    await expect(estado(page, TUBO)).toContainText('8,506 cm');
+    const linea3 = (await formulasDe(page, TUBO))[1];
+
+    expect([linea1, linea3]).toEqual([
+      'ρ·g·h = 998,2 · 9,81 · 10 = 97.923 Pa',
+      'h_A = 850,6 · 10/1000 = 8,506 cm',
+    ]);
+  });
+
+  test('caso 8 de aula: con áreas 10 y 400 y x₁ = 20 la tarjeta enseña la clave, 0,5 cm', async ({ page }) => {
+    // x₂ = 20·10/400 = 0,5 cm = 5 mm: vale cualquiera de las dos escrituras.
+    await page.getByRole('button', { name: 'Área (cm²)' }).click();
+    await escribir(page, 'Área del émbolo 1', '10');
+    await escribir(page, 'Área del émbolo 2', '400');
+    await escribir(page, 'Cuánto baja el émbolo 1 (x₁)', '20');
+    await expect(estado(page, PRENSA)).toContainText('4000 N');
+    expect(['5 mm', '0,5 cm']).toContain(await leerTarjeta(page, 'Sube el émbolo 2, x₂ = x₁·A₁/A₂'));
+  });
+
+  test('HALLAZGO (14/11/2026, ABIERTO) · el caso 8 dice que la tarjeta «marca la cifra» y marca 5 mm, no 0,5 cm', async ({ page }) => {
+    // «Verlo en el simulador» del caso 8: «la tarjeta «Sube el émbolo 2» marca la cifra». La
+    // clave es 0,5 cm y la tarjeta escribe «5 mm» (textoLongitud pasa a mm por debajo de 1 cm);
+    // quien teclea el 5 que ve suspende con «Te has desviado 4,5». Se cierra si la tarjeta dice
+    // 0,5 cm o si el texto avisa de los milímetros.
+    test.fail();
+    await page.getByRole('button', { name: 'Área (cm²)' }).click();
+    await escribir(page, 'Área del émbolo 1', '10');
+    await escribir(page, 'Área del émbolo 2', '400');
+    await escribir(page, 'Cuánto baja el émbolo 1 (x₁)', '20');
+    await expect(estado(page, PRENSA)).toContainText('4000 N');
+    const tarjeta = await leerTarjeta(page, 'Sube el émbolo 2, x₂ = x₁·A₁/A₂');
+
+    const aula = page.locator('#casos-aula');
+    await aula.getByRole('button', { name: /^Caso 8:/ }).click();
+    await aula.getByRole('button', { name: /Verlo en el simulador/ }).click();
+    const comoComprobar = (await page.locator('#casos-como-comprobar').textContent()) ?? '';
+
+    expect(tarjeta === '0,5 cm' || /\bmm\b|milímetro/.test(comoComprobar), `tarjeta «${tarjeta}» · texto «${comoComprobar}»`).toBe(true);
+  });
+
+  test('el FAQPage del HTML servido tiene sus 5 preguntas y la FAQ visible también 5', async ({ page }) => {
+    const ld = await page.evaluate(() => {
+      for (const s of Array.from(document.querySelectorAll('script[type="application/ld+json"]'))) {
+        try {
+          const j = JSON.parse(s.textContent ?? '');
+          if (j['@type'] === 'FAQPage') return (j.mainEntity as { name: string }[]).length;
+        } catch {
+          /* otro bloque */
+        }
+      }
+      return 0;
+    });
+    expect(ld).toBe(5);
+    const visibles = await page.evaluate(() => {
+      const h3 = Array.from(document.querySelectorAll('h3')).find((h) => h.textContent?.trim() === 'Preguntas frecuentes');
+      return h3?.nextElementSibling?.children.length ?? 0;
+    });
+    expect(visibles).toBe(5);
+  });
+
+  test('HALLAZGO (14/11/2026, ABIERTO) · tres preguntas del FAQPage están en la FAQ visible con otra respuesta', async ({ page }) => {
+    // «¿Una/La prensa hidráulica crea energía?», «¿La presión (del agua) depende de la forma del
+    // recipiente?» y la del tubo en U con dos líquidos: misma pregunta, dos redacciones. Se cierra
+    // con UNA constante (PREGUNTAS_FRECUENTES) que lean las dos FAQ: entonces cada respuesta del
+    // FAQPage aparece literal en la visible.
+    test.fail();
+    const ld = await page.evaluate(() => {
+      for (const s of Array.from(document.querySelectorAll('script[type="application/ld+json"]'))) {
+        try {
+          const j = JSON.parse(s.textContent ?? '');
+          if (j['@type'] === 'FAQPage') return j.mainEntity as PreguntaLd[];
+        } catch {
+          /* otro bloque */
+        }
+      }
+      return [] as PreguntaLd[];
+    });
+    const visibles = await page.evaluate(() => {
+      const h3 = Array.from(document.querySelectorAll('h3')).find((h) => h.textContent?.trim() === 'Preguntas frecuentes');
+      const lista = h3?.nextElementSibling;
+      return lista ? Array.from(lista.children).map((item) => (item.textContent ?? '').replace(/\s+/g, ' ')) : [];
+    });
+    const repetidas = ld.filter((p) => /crea energía|forma del recipiente|tubo en U/.test(p.name));
+    expect(repetidas).toHaveLength(3);
+    const sinCopia = repetidas
+      .filter((p) => !visibles.some((v) => v.includes(p.acceptedAnswer.text.replace(/\s+/g, ' '))))
+      .map((p) => p.name);
+    expect(sinCopia).toEqual([]);
+  });
+});
