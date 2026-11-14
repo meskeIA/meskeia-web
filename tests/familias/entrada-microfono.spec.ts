@@ -33,6 +33,13 @@ interface AppMicrofono {
   boton: RegExp;
   /** Casilla que hay que marcar antes de que el botón se habilite (por su texto) */
   casilla?: RegExp;
+  /** Para distinguir dos flujos de la misma app en el título del test */
+  flujo?: string;
+  /**
+   * La app no conecta el micrófono si el audio no arranca (avisa y suelta todo): en el caso
+   * «resume no arranca» no hay contexto de la app que leer, y basta con que ninguno corra.
+   */
+  sueltaSiNoArranca?: boolean;
 }
 
 const APPS: AppMicrofono[] = [
@@ -45,9 +52,14 @@ const APPS: AppMicrofono[] = [
   { slug: 'prueba-camara', boton: /Probar micrófono/ },
   // Hallazgo 4686 (14/11/2026): «ya reanudaban» era cierto, pero ninguna miraba si resume() había
   // arrancado el contexto, y la mitad del aviso no se comprobó nunca. Amplificador y DAF reparados
-  // con la receta; generador-tonos sigue fuera (cabo de destino reparar, ver el acta del 14/11).
+  // con la receta.
   { slug: 'amplificador-sonido', boton: /Iniciar amplificación/ },
   { slug: 'daf-retroalimentacion-auditiva', boton: /Activar la retroalimentación auditiva/, casilla: /Tengo puestos los auriculares/ },
+  // Cabo C0755 (14/11/2026): generador-tonos abre el micrófono en dos sitios. El medidor se quedaba
+  // en «— Hz» sin aviso (su reloj de audio no avanzaba); la medida de respuesta lo daba por
+  // «interrumpida». Ahora el medidor usa mantenerAudioEnMarcha y la medida dice que no arrancó.
+  { slug: 'generador-tonos', boton: /Medir la frecuencia/, flujo: 'medidor' },
+  { slug: 'generador-tonos', boton: /^\s*Medir A\s*$/, flujo: 'respuesta', sueltaSiNoArranca: true },
 ];
 
 test.use({
@@ -131,7 +143,7 @@ async function arrancar(page: Page, app: AppMicrofono): Promise<void> {
 }
 
 for (const app of APPS) {
-  test.describe(`${app.slug} · AudioContext que nace suspendido (EMULACIÓN de Safari)`, () => {
+  test.describe(`${app.slug}${app.flujo ? ` (${app.flujo})` : ''} · AudioContext que nace suspendido (EMULACIÓN de Safari)`, () => {
     test('resume arranca: la app lo reanuda y el contexto corre, sin aviso de audio', async ({ page }) => {
       await espiar(page, true);
       await arrancar(page, app);
@@ -152,9 +164,14 @@ for (const app of APPS) {
           message: 'el contexto sigue suspendido y la app no avisa',
         })
         .toBe(true);
-      // poll: prueba-microfono reabre el micrófono a los 100 ms de conocer la lista de
-      // dispositivos, y entre medias el último contexto es el viejo, ya cerrado
-      await expect.poll(() => estadoContexto(page), { timeout: 8000 }).toBe('suspended');
+      if (app.sueltaSiNoArranca) {
+        // No llegó a conectar el micrófono: ningún contexto de la app corriendo
+        expect(await estadoContexto(page)).not.toBe('running');
+      } else {
+        // poll: prueba-microfono reabre el micrófono a los 100 ms de conocer la lista de
+        // dispositivos, y entre medias el último contexto es el viejo, ya cerrado
+        await expect.poll(() => estadoContexto(page), { timeout: 8000 }).toBe('suspended');
+      }
       await expect
         .poll(async () => (await lectura(page)).avisos.some((t) => /no ha arrancado el audio/.test(t)))
         .toBe(true);

@@ -23,6 +23,7 @@ import {
   RANGO_DINAMICO_BLACKMAN_DB,
 } from '@/lib/calculadoras/frecuenciaDominante';
 import { notaMasCercana, nombreNota } from '@/lib/calculadoras/afinacionInstrumentos';
+import { mantenerAudioEnMarcha } from '@/lib/useEntradaAudio';
 import { lecturaSostenida, LECTURAS_ESTABLES, type LecturaMedidor } from './motor-medidor';
 import { FAQ_MEDIR_HERCIOS, FAQ_TIPOS_ONDA } from './metadata';
 
@@ -574,6 +575,9 @@ export default function GeneradorTonosPage() {
   /** Tras un silencio dentro de la medida, el primer anuncio espera MS_ASENTAR_ANUNCIO (3318). */
   const asentarAnuncioRef = useRef(false);
   const [avisoMedidor, setAvisoMedidor] = useState<string | null>(null);
+  // El AudioContext del medidor no corre (cabo C0755): sin esto, el reloj de audio parado deja
+  // «— Hz» para siempre sin decir por qué
+  const [audioMedidorParado, setAudioMedidorParado] = useState(false);
   /** Aviso que NO impide medir (procesados del micrófono que el navegador no deja apagar). */
   const [notaMedidor, setNotaMedidor] = useState<string | null>(null);
   const [anuncioMedidor, setAnuncioMedidor] = useState('');
@@ -596,6 +600,7 @@ export default function GeneradorTonosPage() {
       m.ctx.close().catch(() => {});
     }
     setMedidorActivo(false);
+    setAudioMedidorParado(false);
     setLecturaHz(null);
     setLecturaEsEstable(false);
     // Con el medidor parado no queda ninguna lectura en la región viva (3307)
@@ -844,7 +849,22 @@ export default function GeneradorTonosPage() {
         audioContextRef.current = new (window.AudioContext || (window as typeof window & { webkitAudioContext: typeof AudioContext }).webkitAudioContext)();
       }
       ctx = audioContextRef.current;
-      if (ctx.state === 'suspended') await ctx.resume();
+      if (ctx.state !== 'running') {
+        try {
+          await ctx.resume();
+        } catch {
+          // se avisa abajo
+        }
+      }
+      // Hallazgo 4686 / cabo C0755: resume() puede resolver sin arrancar el contexto, y entonces
+      // el reloj de audio no avanza y no se emite ni se escucha nada. Se dice en vez de dar la
+      // medida por «interrumpida».
+      if (ctx.state !== 'running') {
+        setAvisoMedida(
+          `El navegador no ha arrancado el audio, así que no se puede emitir ni escuchar la medida. Vuelve a pulsar «Medir ${ranura}».`,
+        );
+        return;
+      }
 
       const analizador = ctx.createAnalyser();
       analizador.fftSize = FFT_MEDIDA;
@@ -1172,6 +1192,13 @@ export default function GeneradorTonosPage() {
     abriendoMedidorRef.current = false;
     setMedidorActivo(true);
     void solicitarWakeLock();
+    // Hallazgo 4686 / cabo C0755: resume() puede resolver sin arrancar el contexto; se reanuda
+    // cada vez que deja de correr y se avisa mientras no corra.
+    void mantenerAudioEnMarcha(
+      ctx,
+      (enMarcha) => setAudioMedidorParado(!enMarcha),
+      () => medidorRef.current?.ctx === ctx,
+    );
   }, [midiendo, reproduciendo, detenerAudio, solicitarWakeLock]);
 
   /** Lleva la última lectura estable al generador, para oír (o comparar) el tono medido. */
@@ -1593,6 +1620,12 @@ export default function GeneradorTonosPage() {
         {avisoMedidor && (
           <div className={styles.medidaAviso} role="alert">
             <span aria-hidden="true">⚠️</span> {avisoMedidor}
+          </div>
+        )}
+        {medidorActivo && audioMedidorParado && (
+          <div className={styles.medidaAviso} role="alert">
+            <span aria-hidden="true">⚠️</span>{' '}
+            <span>El navegador no ha arrancado el audio, así que no llega sonido al medidor. Pulsa «Dejar de medir» y vuelve a «Medir la frecuencia».</span>
           </div>
         )}
         {notaMedidor && (
