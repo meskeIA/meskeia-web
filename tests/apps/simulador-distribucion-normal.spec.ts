@@ -1,5 +1,5 @@
 import { test, expect, Page, Locator } from '@playwright/test';
-import { esperarHidratacion, sembrarValor } from './_hidratacion';
+import { asentarAntesDeTraducir, esperarHidratacion, sembrarValor } from './_hidratacion';
 import { activarTema, prepararParaMedir } from '../contraste-text-muted-auxiliares';
 import { parseSpanishNumber } from '../../lib/formatters';
 import { leerRespuestaAula } from '../../lib/calculadoras/correctorCasosAula';
@@ -1449,6 +1449,7 @@ test.describe('inspección de cambio 14/11/2026 · lectura con punto y dominio d
     const errores: string[] = [];
     page.on('pageerror', (e) => errores.push(e.message));
     await seccionCasos(page).getByRole('button', { name: 'Caso 3: Entre dos valores de Z' }).click();
+    await asentarAntesDeTraducir(page);
     await page.evaluate(() => {
       const recorrido = document.createTreeWalker(document.querySelector('main') ?? document.body, NodeFilter.SHOW_TEXT);
       const nodos: Text[] = [];
