@@ -13,8 +13,17 @@ export interface NivelMermelada {
   nota: string;
 }
 
+/**
+ * Por debajo de esta proporción de azúcar el motor avisa de añadir pectina. La Ligera (0,5) ya
+ * avisa. Exportado para que el FAQPage diga el mismo umbral (hallazgo 4646: decía «por debajo
+ * del 50 %» y la app avisaba al 50 %).
+ */
+export const UMBRAL_PECTINA = 0.6;
+
+// La Tradicional no «cuaja sola» con cualquier fruta: el gel lo hacen la acidez y la pectina, y la
+// app no pregunta qué fruta es (hallazgo 4647, 14/11/2026).
 export const NIVELES_MERMELADA: NivelMermelada[] = [
-  { id: 'tradicional', nombre: 'Tradicional (1:1)', ratioAzucar: 1, nota: 'Mucho azúcar: cuaja sola y se conserva más. Muy dulce.' },
+  { id: 'tradicional', nombre: 'Tradicional (1:1)', ratioAzucar: 1, nota: 'Mucho azúcar: se conserva más y cuaja con facilidad si la fruta tiene pectina. Muy dulce.' },
   { id: 'equilibrada', nombre: 'Equilibrada (1:0,7)', ratioAzucar: 0.7, nota: 'El punto más usado hoy: sabor a fruta sin empalagar.' },
   { id: 'ligera', nombre: 'Ligera (1:0,5)', ratioAzucar: 0.5, nota: 'Poco azúcar: necesita pectina añadida y se conserva menos.' },
 ];
@@ -38,6 +47,6 @@ export function calcularMermelada(nivelId: string, frutaG: number): ResultadoMer
     azucar_g: Math.round(frutaG * n.ratioAzucar),
     // ~el zumo de medio limón (≈ 15 ml) por cada 500 g de fruta.
     limon_ml: Math.round((frutaG / 500) * 15),
-    necesitaPectina: n.ratioAzucar < 0.6,
+    necesitaPectina: n.ratioAzucar < UMBRAL_PECTINA,
   };
 }

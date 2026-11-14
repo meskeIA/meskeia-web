@@ -32,19 +32,21 @@ import { comprobarFaqPageUnico } from './_faqpage-unico';
  *     (parseSpanishNumber da NaN en «12abc» y «1e3», CLAUDE.md §1.bis)
  *   La física cuadra: la app solo da cantidades a añadir, proporcionales a la fruta.
  *
- * HALLAZGOS del 14/11/2026 (los ABIERTOS llevan test.fail())
- *   A. ABIERTO · El campo se lee con el parseo casero: «1.500» → 2 g de fruta, 1 g de azúcar y
- *      0 ml de limón; «12.000» → 12 g; «12abc» → 12 g y «1e3» → 1000 g, con cifras.
- *   B. ABIERTO · FAQPage: «Por debajo del 50% se necesita pectina añadida», pero el motor y la
- *      página ya avisan al 50 % (Ligera); y ninguna de sus cinco preguntas se ve en la página.
- *   C. ABIERTO · Promete «según la fruta» (subtítulo y features) sin preguntar la fruta, y la
- *      Tradicional «cuaja sola» con cualquiera, aunque la propia página dice que cuaja con la
- *      pectina de la fruta o añadida.
- *   D. ABIERTO · Consejos de conservación fuera de la nevera con `// @disclaimer: exempt`, sin
+ * HALLAZGOS del 14/11/2026 (los ABIERTOS llevan test.fail(); /reparar del 14/11 reparó A, B, C, E y F)
+ *   A. REPARADO (4645) · El campo se leía con el parseo casero: «1.500» → 2 g de fruta, 1 g de
+ *      azúcar y 0 ml de limón; «12.000» → 12 g; «12abc» → 12 g y «1e3» → 1000 g. Ahora
+ *      parseSpanishNumber.
+ *   B. REPARADO (4646) · FAQPage: «Por debajo del 50% se necesita pectina añadida», pero el motor
+ *      avisa al 50 % (Ligera); y ninguna de sus cinco preguntas se veía en la página. Ahora
+ *      PREGUNTAS_FRECUENTES pinta las dos y el umbral sale de UMBRAL_PECTINA del motor (60 %).
+ *   C. REPARADO (4647, tipo promesa) · Prometía «según la fruta» sin preguntar la fruta, y la
+ *      Tradicional «cuaja sola» con cualquiera. Ahora «según el peso de la fruta» y «cuaja con
+ *      facilidad si la fruta tiene pectina». Ampliar con un selector de fruta lo decide el usuario.
+ *   D. ABIERTO (4648) · Consejos de conservación fuera de la nevera con `// @disclaimer: exempt`, sin
  *      DisclaimerCard ni el criterio de AESAN de desechar conservas abombadas («Botulismo»,
- *      30/08/2019, §10).
- *   E. ABIERTO · La región aria-live desaparece con una entrada no válida y renace llena.
- *   F. ABIERTO · «100% de la fruta», «70%», «50%» sin espacio duro (CLAUDE.md §2, 25/09/2026).
+ *      30/08/2019, §10). El nivel y el texto del aviso los decide el usuario.
+ *   E. REPARADO (4649) · La región aria-live desaparecía con una entrada no válida y renacía llena.
+ *   F. REPARADO (4650) · «100% de la fruta», «70%», «50%» sin espacio duro (CLAUDE.md §2, 25/09/2026).
  */
 
 const RUTA = '/calculadora-mermelada/';
@@ -144,19 +146,17 @@ test.describe('calculadora-mermelada — Inspector 14/11/2026', () => {
     await expect.poll(() => cifras(page)).toEqual(['751 g', '525 g', '23 ml']);
   });
 
-  // HALLAZGO A (14/11/2026, ABIERTO) — parseFloat(v.replace(',', '.')) lee el punto de millar como decimal.
+  // HALLAZGO A (14/11/2026, REPARADO) — parseFloat(v.replace(',', '.')) leía el punto de millar como decimal.
   test('CASO 2 · «1.500» se lee mil quinientos: 1050 g de azúcar y 45 ml de limón', async ({ page }) => {
-    // 1500 × 0,7 = 1050 · 1500 / 500 × 15 = 45. Hoy: «2 g» de fruta, «1 g» de azúcar, «0 ml» de limón
+    // 1500 × 0,7 = 1050 · 1500 / 500 × 15 = 45. Antes: «2 g» de fruta, «1 g» de azúcar, «0 ml» de limón
     await escribir(page, '1.500');
-    test.fail();
     await expect.poll(() => cifras(page)).toEqual(['1500 g', '1050 g', '45 ml']);
   });
 
-  // HALLAZGO A (14/11/2026, ABIERTO)
+  // HALLAZGO A (14/11/2026, REPARADO)
   test('CASO 2 · «12.000» se lee doce mil, no 12 g', async ({ page }) => {
-    // 12000 × 0,7 = 8400 · 360 ml. Hoy: «12 g», «8 g», «0 ml»
+    // 12000 × 0,7 = 8400 · 360 ml. Antes: «12 g», «8 g», «0 ml»
     await escribir(page, '12.000');
-    test.fail();
     await expect.poll(() => cifras(page)).toEqual(['12.000 g', '8400 g', '360 ml']);
   });
 
@@ -171,42 +171,41 @@ test.describe('calculadora-mermelada — Inspector 14/11/2026', () => {
     await expect.poll(() => cifras(page)).toEqual(['500 g', '350 g', '15 ml']);
   });
 
-  // HALLAZGO A (14/11/2026, ABIERTO) — parseFloat acepta la basura del final y la notación científica.
+  // HALLAZGO A (14/11/2026, REPARADO) — parseFloat aceptaba la basura del final y la notación científica.
   test('CASO 3 · «12abc» y «1e3» se rechazan en vez de calcularse', async ({ page }) => {
-    // parseSpanishNumber da NaN en los dos. Hoy: «12abc» → 12 g / 8 g / 0 ml; «1e3» → 1000 g / 700 g / 30 ml
+    // parseSpanishNumber da NaN en los dos. Antes: «12abc» → 12 g / 8 g / 0 ml; «1e3» → 1000 g / 700 g / 30 ml
     await escribir(page, '12abc');
-    test.fail();
     await expect.poll(() => cifras(page)).toEqual([]);
+    await expect(page.locator('main [role="status"]')).toContainText('en gramos, mayor que cero');
     await escribir(page, '1e3');
     await expect.poll(() => cifras(page)).toEqual([]);
   });
 
   // ── Contenido ──────────────────────────────────────────────────────────────
-  // HALLAZGO B (14/11/2026, ABIERTO) — el FAQPage da otro umbral de pectina que el motor.
+  // HALLAZGO B (14/11/2026, REPARADO) — el FAQPage daba otro umbral de pectina que el motor.
   test('FAQPage · el umbral de pectina cuadra con el motor (la Ligera, al 50 %, ya avisa)', async ({ page }) => {
     // Motor: necesitaPectina = ratioAzucar < 0,6; nota de la Ligera: «necesita pectina añadida».
-    // Hoy el FAQPage: «Por debajo del 50% se necesita pectina añadida» (al 50 % no haría falta).
+    // Antes el FAQPage: «Por debajo del 50% se necesita pectina añadida» (al 50 % no haría falta).
     await elegir(page, 'ligera');
     await expect(page.getByText(AVISO_PECTINA)).toHaveCount(1);
     const azucar = (await respuestasFaq(page)).find((q) => /Cuánta azúcar/.test(q.name));
     expect(azucar, 'el FAQPage trae la pregunta del azúcar').toBeDefined();
-    test.fail();
     expect(azucar!.text).not.toContain('Por debajo del 50% se necesita pectina');
+    expect(azucar!.text.replace(/ /g, ' ')).toContain('Por debajo del 60 %, como en la ligera (50 %)');
   });
 
-  // HALLAZGO B (14/11/2026, ABIERTO) — ninguna de las cinco preguntas del FAQPage se ve en la página.
+  // HALLAZGO B (14/11/2026, REPARADO) — ninguna de las cinco preguntas del FAQPage se veía en la página.
   test('FAQPage · un solo bloque y sus preguntas están en la página', async ({ page }) => {
-    test.fail();
     await comprobarFaqPageUnico(page);
   });
 
-  // HALLAZGO C (14/11/2026, ABIERTO) — la app no pregunta la fruta, solo su peso.
+  // HALLAZGO C (14/11/2026, REPARADO) — la app no pregunta la fruta, solo su peso.
   test('Promesa · no dice «según la fruta» ni que la Tradicional «cuaja sola» con cualquiera', async ({ page }) => {
     // La propia página: «la acidez (el limón) y la pectina (natural de la fruta o añadida) son las
-    // que hacen que el conjunto gelifique». Hoy el subtítulo y la nota de la Tradicional son estos:
+    // que hacen que el conjunto gelifique». Antes el subtítulo y la nota de la Tradicional eran estos:
     // Control: el subtítulo es el párrafo que sigue al <h1>
     await expect(page.locator('h1 + p')).toHaveCount(1);
-    test.fail();
+    await expect(page.locator('h1 + p')).toContainText('según el peso de la fruta');
     await expect(page.locator('h1 + p')).not.toHaveText(
       'Azúcar y limón para tu mermelada según la fruta y el dulzor que quieras',
     );
@@ -234,29 +233,29 @@ test.describe('calculadora-mermelada — Inspector 14/11/2026', () => {
   });
 
   // ── Accesibilidad ──────────────────────────────────────────────────────────
-  // HALLAZGO E (14/11/2026, ABIERTO) — {resultado ? <div role="status" aria-live> : <p>}: la región se desmonta.
+  // HALLAZGO E (14/11/2026, REPARADO) — {resultado ? <div role="status" aria-live> : <p>}: la región se desmontaba.
   test('A11y · la región aria-live sigue montada con una entrada no válida', async ({ page }) => {
     const region = page.locator('main [aria-live]');
     await expect(region).toHaveCount(1);
-    // Hoy: al vaciar el campo hay 0 regiones vivas en <main>; al escribir 500 renace ya con la cifra
+    // Antes: al vaciar el campo había 0 regiones vivas en <main>; al escribir 500 renacía ya con la cifra
     await escribir(page, '');
-    test.fail();
     await expect(region).toHaveCount(1);
+    await expect(region).toContainText('Introduce el peso de la fruta.');
     await escribir(page, '500');
     await expect(region).toHaveCount(1);
     await expect(region).toContainText('350 g');
   });
 
   // ── Formato ────────────────────────────────────────────────────────────────
-  // HALLAZGO F (14/11/2026, ABIERTO) — el «%» va separado con espacio duro (CLAUDE.md §2, 25/09/2026).
+  // HALLAZGO F (14/11/2026, REPARADO) — el «%» va separado con espacio duro (CLAUDE.md §2, 25/09/2026).
   test('Formato · los porcentajes de la tabla y del FAQPage llevan espacio antes del «%»', async ({ page }) => {
     // La tabla vive en la guía plegada (EducationalSection): por CSS, que getByRole no ve lo oculto
     const tabla = ((await page.locator('table').first().textContent()) ?? '').trim();
     // Control: la tabla de niveles está en el DOM
     expect(tabla).toContain('Equilibrada');
-    test.fail();
-    // Hoy: «100% de la fruta», «70%», «50%»
+    // Antes: «100% de la fruta», «70%», «50%»
     expect(tabla).not.toMatch(/\d%/);
+    expect(tabla).toContain('70 %');
     for (const q of await respuestasFaq(page)) expect(q.text, q.name).not.toMatch(/\d%/);
   });
 

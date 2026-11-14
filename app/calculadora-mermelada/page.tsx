@@ -5,21 +5,26 @@ import { useMemo, useState } from 'react';
 import styles from './CalculadoraMermelada.module.css';
 import { MeskeiaLogo, Footer, LegalNotice, RelatedApps, EducationalSection, ShareCard } from '@/components';
 import { NIVELES_MERMELADA, calcularMermelada } from '@/lib/calculadoras/mermelada';
-import { formatNumber } from '@/lib/formatters';
+import { formatNumber, parseSpanishNumber } from '@/lib';
+import { PREGUNTAS_FRECUENTES } from './metadata';
 
 export default function CalculadoraMermeladaPage() {
   const [nivelId, setNivelId] = useState('equilibrada');
   const [fruta, setFruta] = useState('1000');
 
-  const num = (v: string) => parseFloat(v.replace(',', '.')) || 0;
-  const resultado = useMemo(() => calcularMermelada(nivelId, num(fruta)), [nivelId, fruta]);
+  // parseSpanishNumber (hallazgo 4645): el parseo casero leía «1.500» como 1,5 g y aceptaba
+  // «12abc» y «1e3». Lo que no es un número da NaN y el motor no da cifras.
+  const resultado = useMemo(() => calcularMermelada(nivelId, parseSpanishNumber(fruta)), [nivelId, fruta]);
+  const avisoEntrada = fruta.trim() === ''
+    ? 'Introduce el peso de la fruta.'
+    : 'Escribe el peso de la fruta en gramos, mayor que cero (por ejemplo, 1.500).';
 
   return (
     <div className={styles.container}>
       <MeskeiaLogo />
       <header className={styles.hero}>
         <h1 className={styles.title}>Calculadora de mermelada</h1>
-        <p className={styles.subtitle}>Azúcar y limón para tu mermelada según la fruta y el dulzor que quieras</p>
+        <p className={styles.subtitle}>Azúcar y limón para tu mermelada según el peso de la fruta y el dulzor que quieras</p>
       </header>
       <LegalNotice />
 
@@ -42,20 +47,24 @@ export default function CalculadoraMermeladaPage() {
               value={fruta} onChange={(e) => setFruta(e.target.value)} />
           </div>
 
-          {resultado ? (
-            <>
-              <div className={styles.resultadoGrid} role="status" aria-live="polite">
-                <div className={styles.resCard}><span className={styles.resValor}>{formatNumber(resultado.fruta_g, 0)} g</span><span className={styles.resLabel}>fruta</span></div>
-                <div className={`${styles.resCard} ${styles.resCardDestacado}`}><span className={styles.resValor}>{formatNumber(resultado.azucar_g, 0)} g</span><span className={styles.resLabel}>azúcar</span></div>
-                <div className={styles.resCard}><span className={styles.resValor}>{formatNumber(resultado.limon_ml, 0)} ml</span><span className={styles.resLabel}>zumo de limón</span></div>
+          {/* La región viva queda montada siempre y cambia solo su contenido (hallazgo 4649: se
+              desmontaba con una entrada no válida y renacía ya con las cifras). */}
+          <div role="status" aria-live="polite">
+            {resultado ? (
+              <div key="cifras">
+                <div className={styles.resultadoGrid}>
+                  <div className={styles.resCard}><span className={styles.resValor}>{formatNumber(resultado.fruta_g, 0)} g</span><span className={styles.resLabel}>fruta</span></div>
+                  <div className={`${styles.resCard} ${styles.resCardDestacado}`}><span className={styles.resValor}>{formatNumber(resultado.azucar_g, 0)} g</span><span className={styles.resLabel}>azúcar</span></div>
+                  <div className={styles.resCard}><span className={styles.resValor}>{formatNumber(resultado.limon_ml, 0)} ml</span><span className={styles.resLabel}>zumo de limón</span></div>
+                </div>
+                {resultado.necesitaPectina && (
+                  <p className={styles.notaBox}><span aria-hidden="true">💡</span> Con tan poca azúcar conviene añadir pectina (o usar fruta rica en ella, como manzana o cítricos) para que cuaje, y guardarla en la nevera.</p>
+                )}
               </div>
-              {resultado.necesitaPectina && (
-                <p className={styles.notaBox}><span aria-hidden="true">💡</span> Con tan poca azúcar conviene añadir pectina (o usar fruta rica en ella, como manzana o cítricos) para que cuaje, y guardarla en la nevera.</p>
-              )}
-            </>
-          ) : (
-            <p className={styles.placeholder}>Introduce el peso de la fruta.</p>
-          )}
+            ) : (
+              <p key="aviso" className={styles.placeholder}>{avisoEntrada}</p>
+            )}
+          </div>
         </section>
 
         <EducationalSection title="Mermelada casera" subtitle="El papel del azúcar, el limón y el punto de cuajado">
@@ -76,9 +85,9 @@ export default function CalculadoraMermeladaPage() {
               <table className={styles.comparativaTable}>
                 <thead><tr><th scope="col">Nivel</th><th scope="col">Azúcar</th><th scope="col">Conservación</th></tr></thead>
                 <tbody>
-                  <tr><td>Tradicional</td><td>100% de la fruta</td><td>Larga; cuaja sola</td></tr>
-                  <tr><td>Equilibrada</td><td>70%</td><td>Media; sabor a fruta</td></tr>
-                  <tr><td>Ligera</td><td>50%</td><td>Corta; necesita pectina</td></tr>
+                  <tr><td>Tradicional</td><td>100&nbsp;% de la fruta</td><td>Larga; cuaja con facilidad si la fruta tiene pectina</td></tr>
+                  <tr><td>Equilibrada</td><td>70&nbsp;%</td><td>Media; sabor a fruta</td></tr>
+                  <tr><td>Ligera</td><td>50&nbsp;%</td><td>Corta; necesita pectina</td></tr>
                 </tbody>
               </table>
             </div>
@@ -90,6 +99,15 @@ export default function CalculadoraMermeladaPage() {
                 <li><strong>Poca azúcar, a la nevera.</strong> Las mermeladas ligeras duran menos; refrigéralas o congélalas.</li>
                 <li><strong>No la dejes sin remover.</strong> Espesa rápido al final y se pega con facilidad.</li>
               </ul>
+            </div>
+            <div className={styles.conceptoSection}>
+              <h2>Preguntas frecuentes</h2>
+              {PREGUNTAS_FRECUENTES.map((p) => (
+                <div key={p.pregunta}>
+                  <h3>{p.pregunta}</h3>
+                  <p>{p.respuesta}</p>
+                </div>
+              ))}
             </div>
           </div>
         </EducationalSection>

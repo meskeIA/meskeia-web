@@ -441,7 +441,7 @@ export const COQUINUM_APPS: CoquinumApp[] = [
     slug: 'calculadora-mermelada',
     icon: '🍓',
     titulo: 'Mermelada',
-    desc: 'Azúcar y limón para tu mermelada según la fruta y el dulzor, con aviso de cuándo necesita pectina.',
+    desc: 'Azúcar y limón para tu mermelada según el peso de la fruta y el dulzor, con aviso de cuándo necesita pectina.',
     categoria: 'coccion',
   },
   {
