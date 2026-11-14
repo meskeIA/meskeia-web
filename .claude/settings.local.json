@@ -6,5 +6,9 @@
     ],
     "deny": [],
     "ask": []
+  },
+  "skillOverrides": {
+    "fix-build": "off",
+    "audit-accesibilidad-jsx": "off"
   }
 }
