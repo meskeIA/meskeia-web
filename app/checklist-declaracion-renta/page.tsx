@@ -1,11 +1,30 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import styles from './ChecklistDeclaracionRenta.module.css';
 import MeskeiaLogo from '@/components/MeskeiaLogo';
 import Footer from '@/components/Footer';
-import { RelatedApps, LegalNotice, ShareCard, EducationalSection, DisclaimerCard } from '@/components';
-import { formatDate } from '@/lib';
+import { RelatedApps, LegalNotice, ShareCard, EducationalSection, DisclaimerCard, DataReference } from '@/components';
+import { formatDate, formatNumber } from '@/lib';
+import { FISCAL_IRPF_META } from '@/data/fiscal/irpf';
+import { LIMITES_PLAN_PENSIONES_2025 } from '@/data/fiscal/pensiones';
+import { DEDUCCION_MATERNIDAD_IRPF } from '@/data/fiscal/maternidad';
+import { ESCALA_RECARGO_EXTEMPORANEO, MODELO_720, SANCION_PRESENTACION_TARDIA_SIN_PERJUICIO } from '@/data/fiscal/recargos-sanciones';
+import { PREGUNTAS_FRECUENTES } from './metadata';
+
+/** «1.200 €» · «24 %» con el espacio duro del formato español (CLAUDE.md global §2). */
+const eur = (n: number): string => `${formatNumber(n, 0)} €`;
+const pct = (n: number): string => `${formatNumber(n, 0)} %`;
+
+// ──────────────────────────────────────────
+// CAMPAÑA (Orden HAC/277/2026, BOE-A-2026-7041, leída el 14/11/2026)
+//   art. 7.1: presentación del 8 de abril al 30 de junio de 2026, cualquiera que sea el resultado
+//   art. 12.3: domiciliación del PAGO (único o primer plazo) hasta el 25 de junio de 2026
+//   art. 11.5: segundo plazo del 40 % hasta el 5 de noviembre de 2026
+// Las fechas llevan año: sin él, pasada la campaña, la app las presentaba como futuras (4625).
+// ──────────────────────────────────────────
+const FIN_PLAZO_ISO = '2026-06-30';
+const FIN_PLAZO_TEXTO = '30/06/2026';
 
 // ──────────────────────────────────────────
 // TIPOS
@@ -31,11 +50,11 @@ interface CategoriaConfig {
 // FECHAS CLAVE
 // ──────────────────────────────────────────
 const FECHAS_CLAVE = [
-  { fecha: '8 abr', evento: 'Apertura Renta Web (presentación online)', icono: '💻' },
-  { fecha: '6 may', evento: 'Inicio cita telefónica con Agencia Tributaria', icono: '📞' },
-  { fecha: '1 jun', evento: 'Inicio presentación presencial en oficinas', icono: '🏢' },
-  { fecha: '25 jun', evento: 'Último día para domiciliar devoluciones', icono: '🏦' },
-  { fecha: '30 jun', evento: 'Fin del plazo — cierre de la campaña', icono: '🔔' },
+  { fecha: '8 abr 2026', evento: 'Apertura Renta Web (presentación online)', icono: '💻' },
+  { fecha: '6 may 2026', evento: 'Inicio cita telefónica con Agencia Tributaria', icono: '📞' },
+  { fecha: '1 jun 2026', evento: 'Inicio presentación presencial en oficinas', icono: '🏢' },
+  { fecha: '25 jun 2026', evento: 'Último día para domiciliar el pago (único o primer plazo)', icono: '🏦' },
+  { fecha: '30 jun 2026', evento: 'Fin del plazo — cierre de la campaña', icono: '🔔' },
 ];
 
 // ──────────────────────────────────────────
@@ -89,7 +108,7 @@ const CATEGORIAS: CategoriaConfig[] = [
       { id: 'libros-ingresos', nombre: 'Libro de registro de ingresos (facturas emitidas 2025)', nota: 'Obligatorio para actividades en estimación directa', perfiles: ['autonomo'], obligatorio: true },
       { id: 'libros-gastos', nombre: 'Libro de registro de gastos (facturas recibidas 2025)', nota: 'Guarda las facturas originales, no solo el libro', perfiles: ['autonomo'], obligatorio: true },
       { id: 'pagos-fraccionados', nombre: 'Justificantes de pagos fraccionados (Modelo 130 de cada trimestre)', nota: 'Disponibles en tu área de sede.agenciatributaria.gob.es', perfiles: ['autonomo'], obligatorio: true },
-      { id: 'retenciones-soportadas', nombre: 'Resumen de retenciones soportadas en facturas emitidas', nota: 'Las facturas con IRPF del 7% o 15% generan retenciones a tu favor', perfiles: ['autonomo'] },
+      { id: 'retenciones-soportadas', nombre: 'Resumen de retenciones soportadas en facturas emitidas', nota: 'Las facturas con IRPF del 7 % o 15 % generan retenciones a tu favor', perfiles: ['autonomo'] },
       { id: 'cuota-ss', nombre: 'Certificado de cotizaciones pagadas a la Seguridad Social (cuota autónomos)', nota: 'Descargable desde importass.seg-social.es', perfiles: ['autonomo'], obligatorio: true },
       { id: 'amortizaciones', nombre: 'Fichas de amortización de activos fijos (equipos, vehículos, local)', nota: 'Si tienes bienes de inversión en tu actividad', perfiles: ['autonomo'] },
       { id: 'gastos-local', nombre: 'Justificante del alquiler del local u oficina si es gasto de la actividad', perfiles: ['autonomo'] },
@@ -139,13 +158,14 @@ const CATEGORIAS: CategoriaConfig[] = [
     icono: '🎁',
     perfilesRelevantes: [],
     items: [
-      { id: 'plan-pensiones', nombre: 'Certificado de aportaciones al plan de pensiones privado en 2025', nota: 'Máximo deducible: 1.500 € (individual) + 8.500 € (empresa)', perfiles: [] },
-      { id: 'donaciones', nombre: 'Justificantes de donaciones a ONGs, iglesia o partidos políticos', nota: 'Donaciones a ONGs: deducción del 80% (primeros 150 €) y 35% el resto', perfiles: [] },
+      { id: 'plan-pensiones', nombre: 'Certificado de aportaciones al plan de pensiones privado en 2025', nota: `Máximo deducible: ${eur(LIMITES_PLAN_PENSIONES_2025.limiteIndividualAnual)} (individual) + ${eur(LIMITES_PLAN_PENSIONES_2025.limiteEmpresaAnual)} (empresa)`, perfiles: [] },
+      // Ley 49/2002, art. 19 (RDL 6/2023, desde 2024) y DA 9.ª.3, leídos en el BOE el 14/11/2026 (4621).
+      { id: 'donaciones', nombre: 'Justificantes de donaciones a ONGs, iglesia o partidos políticos', nota: 'Donativos a ONGs y a la Iglesia Católica (Ley 49/2002): deducción del 80 % sobre los primeros 250 € y del 40 % sobre el resto (45 % si donas a la misma entidad por tercer año seguido sin bajar el importe)', perfiles: [] },
       { id: 'sindicatos', nombre: 'Justificante de cuotas a sindicatos o colegios profesionales', nota: 'Son deducibles en el apartado de gastos de trabajo', perfiles: ['asalariado', 'autonomo'] },
       { id: 'alquiler-habitual', nombre: 'Recibos de alquiler pagados y NIF del arrendador (vivienda habitual)', nota: 'Solo si tienes derecho a deducción autonómica o contrato anterior a 2015', perfiles: ['asalariado', 'autonomo', 'pensionista'] },
       { id: 'hipoteca-habitual', nombre: 'Certificado hipotecario anual si tienes derecho a deducción por hipoteca anterior a 2013', nota: 'Este derecho transitorio se extinguió para nuevas hipotecas desde 2013', perfiles: [] },
-      { id: 'eficiencia-energetica', nombre: 'Certificado energético pre y post reforma + facturas si hiciste mejoras energéticas', nota: 'Deducciones del 20%, 40% o 60% según el nivel de mejora conseguido', perfiles: [] },
-      { id: 'guarderia', nombre: 'Recibos de guardería o centros de primer ciclo de infantil', nota: 'Deducción por maternidad ampliada: hasta 1.000 € adicionales', perfiles: [] },
+      { id: 'eficiencia-energetica', nombre: 'Certificado energético pre y post reforma + facturas si hiciste mejoras energéticas', nota: 'Deducciones del 20 %, 40 % o 60 % según el nivel de mejora conseguido', perfiles: [] },
+      { id: 'guarderia', nombre: 'Recibos de guardería o centros de primer ciclo de infantil', nota: `Deducción por maternidad ampliada: hasta ${eur(DEDUCCION_MATERNIDAD_IRPF.incrementoGuarderia.importeMaximoAnual)} adicionales`, perfiles: [] },
       { id: 'ce-autonomo', nombre: 'Aportaciones a mutualidades de previsión social alternativas a la SS', nota: 'Solo autónomos colegiados que cotizan a mutualidad propia', perfiles: ['autonomo'] },
     ],
   },
@@ -157,6 +177,14 @@ const CATEGORIAS: CategoriaConfig[] = [
 export default function ChecklistDeclaracionRentaPage() {
   const [perfilesSeleccionados, setPerfilesSeleccionados] = useState<Set<Perfil>>(new Set(['asalariado']));
   const [itemsChecked, setItemsChecked] = useState<Record<string, boolean>>({});
+  // Se decide al montar, no en el render: el HTML prerenderizado llevaría la fecha del build.
+  const [campanaCerrada, setCampanaCerrada] = useState(false);
+
+  useEffect(() => {
+    const hoy = new Date();
+    const hoyIso = `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}-${String(hoy.getDate()).padStart(2, '0')}`;
+    setCampanaCerrada(hoyIso > FIN_PLAZO_ISO);
+  }, []);
 
   const togglePerfil = (perfil: Perfil) => {
     setPerfilesSeleccionados(prev => {
@@ -206,15 +234,12 @@ export default function ChecklistDeclaracionRentaPage() {
     const lineas: string[] = [
       'CHECKLIST DECLARACIÓN DE LA RENTA 2026 (ejercicio 2025)',
       `Perfil: ${perfilesTxt}`,
-      `Progreso: ${itemsCompletados}/${totalItems} (${porcentaje}%)`,
+      `Progreso: ${itemsCompletados}/${totalItems} (${pct(porcentaje)})`,
       `Generado el: ${formatDate(new Date())}`,
       '',
-      'FECHAS CLAVE:',
-      '  8 de abril    → Apertura presentación online (Renta Web)',
-      '  6 de mayo     → Inicio cita telefónica AEAT',
-      '  1 de junio    → Inicio presentación presencial',
-      ' 25 de junio    → Último día para domiciliar devoluciones',
-      ' 30 de junio    → Fin del plazo (cierre de campaña)',
+      'FECHAS CLAVE (campaña 2026):',
+      ...FECHAS_CLAVE.map(f => `  ${f.fecha.padEnd(12)} → ${f.evento}`),
+      ...(campanaCerrada ? [`  El plazo voluntario terminó el ${FIN_PLAZO_TEXTO}.`] : []),
       '',
     ];
 
@@ -257,10 +282,22 @@ export default function ChecklistDeclaracionRentaPage() {
         severity="critical"
         collapsible={false}
       />
+      <DataReference
+        normativa="IRPF, campaña 2026 (ejercicio 2025)"
+        fuente={FISCAL_IRPF_META.fuente}
+        verificado={FISCAL_IRPF_META.verificado}
+        urlOficial={FISCAL_IRPF_META.urlOficial}
+      />
 
       {/* Fechas clave */}
       <div className={styles.fechasWrapper}>
-        <h2 className={styles.fechasTitulo}><span aria-hidden="true">📅</span> Fechas clave campaña 2026</h2>
+        <h2 className={styles.fechasTitulo}><span aria-hidden="true">📅</span> Fechas clave campaña 2026 (Renta 2025)</h2>
+        {/* Pasado el 30/06/2026 la campaña está cerrada y se dice (hallazgo 4625). */}
+        {campanaCerrada && (
+          <p className={styles.avisoCampana} role="note">
+            El plazo voluntario de la Renta 2025 terminó el {FIN_PLAZO_TEXTO} (Orden HAC/277/2026, art. 7.1). Si estabas obligado a declarar y no lo hiciste, aún puedes presentarla en Renta Web: será fuera de plazo, con las consecuencias que explica la guía.
+          </p>
+        )}
         <div className={styles.fechasGrid}>
           {FECHAS_CLAVE.map(f => (
             <div key={f.fecha} className={styles.fechaItem}>
@@ -301,9 +338,9 @@ export default function ChecklistDeclaracionRentaPage() {
               ? <span key="completo"><span aria-hidden="true">✅</span> ¡Tienes todo preparado para hacer la renta!</span>
               : <span key="progreso">{`${itemsCompletados} de ${totalItems} documentos verificados`}</span>}
           </span>
-          <span className={styles.progresoPorcentaje}>{porcentaje}%</span>
+          <span className={styles.progresoPorcentaje}>{pct(porcentaje)}</span>
         </div>
-        <div className={styles.progresoBar} role="progressbar" aria-valuenow={porcentaje} aria-valuemin={0} aria-valuemax={100}>
+        <div className={styles.progresoBar} role="progressbar" aria-label="Documentos verificados" aria-valuenow={porcentaje} aria-valuemin={0} aria-valuemax={100}>
           <div className={styles.progresoFill} style={{ width: `${porcentaje}%` }} />
         </div>
       </div>
@@ -325,7 +362,7 @@ export default function ChecklistDeclaracionRentaPage() {
       {todoCompleto && (
         <div className={styles.mensajeCompleto} role="alert" aria-live="polite">
           <h2><span aria-hidden="true">🎉</span> ¡Todo en orden!</h2>
-          <p>Tienes todos los documentos preparados. Ya puedes acceder a Renta Web desde el 8 de abril para presentar tu declaración.</p>
+          <p>Tienes todos los documentos preparados para presentar la declaración en Renta Web. El plazo voluntario de la Renta 2025 fue del 8 de abril al {FIN_PLAZO_TEXTO}.</p>
           <a
             href="https://sede.agenciatributaria.gob.es"
             target="_blank"
@@ -350,30 +387,33 @@ export default function ChecklistDeclaracionRentaPage() {
                 <span className={styles.categoriaProgreso}>{completadosCat}/{todosCat}</span>
               </div>
               <ul className={styles.itemsLista}>
+                {/* El checkbox va DENTRO del <li>: con role="checkbox" en el propio <li>, la lista
+                    perdía sus elementos y el lector no decía «lista de 6» (hallazgo 4631). */}
                 {cat.items.map(item => (
-                  <li
-                    key={item.id}
-                    className={`${styles.item} ${itemsChecked[item.id] ? styles.itemChecked : ''}`}
-                    onClick={() => toggleItem(item.id)}
-                    role="checkbox"
-                    aria-checked={!!itemsChecked[item.id]}
-                    tabIndex={0}
-                    onKeyDown={e => {
-                      if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        toggleItem(item.id);
-                      }
-                    }}
-                  >
-                    <span className={styles.checkbox} aria-hidden="true">
-                      {itemsChecked[item.id] ? '✓' : ''}
-                    </span>
-                    <div className={styles.itemInfo}>
-                      <span className={styles.itemNombre}>
-                        {item.nombre}
-                        {item.obligatorio && <span className={styles.badgeObligatorio}>Imprescindible</span>}
+                  <li key={item.id} className={styles.itemFila}>
+                    <div
+                      className={`${styles.item} ${itemsChecked[item.id] ? styles.itemChecked : ''}`}
+                      onClick={() => toggleItem(item.id)}
+                      role="checkbox"
+                      aria-checked={!!itemsChecked[item.id]}
+                      tabIndex={0}
+                      onKeyDown={e => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault();
+                          toggleItem(item.id);
+                        }
+                      }}
+                    >
+                      <span className={styles.checkbox} aria-hidden="true">
+                        {itemsChecked[item.id] ? '✓' : ''}
                       </span>
-                      {item.nota && <p className={styles.itemNota}>{item.nota}</p>}
+                      <div className={styles.itemInfo}>
+                        <span className={styles.itemNombre}>
+                          {item.nombre}
+                          {item.obligatorio && <span className={styles.badgeObligatorio}>Imprescindible</span>}
+                        </span>
+                        {item.nota && <p className={styles.itemNota}>{item.nota}</p>}
+                      </div>
                     </div>
                   </li>
                 ))}
@@ -514,7 +554,7 @@ export default function ChecklistDeclaracionRentaPage() {
                 <li>El borrador estará muy incompleto: la AEAT no tiene tus libros de gastos.</li>
                 <li>Es imprescindible que tú mismo declares ingresos, gastos deducibles y pagos a cuenta (Mod. 130).</li>
                 <li>La cuota de autónomos (SS) es gasto deducible íntegro de la actividad.</li>
-                <li>No olvides los gastos de suministros del hogar si trabajas desde casa (30% de la parte afecta).</li>
+                <li>No olvides los gastos de suministros del hogar si trabajas desde casa (30&nbsp;% de la parte afecta).</li>
               </ul>
               <p className={styles.escenarioTip}>Consejo: Usa el certificado de la Sede de la SS para verificar las cotizaciones del año, ya que a veces hay regularizaciones retroactivas.</p>
             </div>
@@ -528,8 +568,11 @@ export default function ChecklistDeclaracionRentaPage() {
               <ul>
                 <li>Debe declarar los ingresos íntegros del alquiler (no solo el neto).</li>
                 <li>Los gastos deducibles más comunes: IBI, comunidad, seguro, amortización, intereses hipoteca, reparaciones.</li>
-                <li>Si es vivienda habitual para el inquilino, aplica la reducción del 60% sobre el rendimiento neto.</li>
-                <li>Los períodos en que el inmueble estuvo vacío tributan como imputación de rentas (1,1% del valor catastral).</li>
+                {/* Art. 23.2 LIRPF (BOE consolidado leído el 14/11/2026): el porcentaje depende de la
+                    fecha del contrato, la zona, la renta pactada y la edad del inquilino, y la
+                    escala ha cambiado más de una vez; un «60 %» sin condiciones era falso (4624). */}
+                <li>Si es vivienda habitual para el inquilino, el rendimiento neto positivo puede tener una reducción (art. 23.2 de la Ley del IRPF) cuyo porcentaje depende de la fecha del contrato, de la zona, de la renta pactada y de la edad del inquilino: compruébalo con los datos de tu contrato en Renta Web.</li>
+                <li>Los períodos en que el inmueble estuvo vacío tributan como imputación de rentas (1,1&nbsp;% del valor catastral).</li>
               </ul>
               <p className={styles.escenarioTip}>Consejo: Guarda TODAS las facturas de reparaciones. El IBI puede ser el gasto olvidado más frecuente que la gente no deduce.</p>
             </div>
@@ -554,58 +597,16 @@ export default function ChecklistDeclaracionRentaPage() {
         {/* 3. FAQ */}
         <section className={styles.eduSection}>
           <h4 className={styles.eduSectionTitle}>Preguntas frecuentes</h4>
+          {/* Sale de PREGUNTAS_FRECUENTES, la misma constante que alimenta el FAQPage (4627). */}
           <dl className={styles.faqList}>
-            <div className={styles.faqItem}>
-              <dt>¿Estoy obligado a hacer la declaración de la renta?</dt>
-              <dd>
-                No siempre. Están <strong>exentos de declarar</strong> los trabajadores con un único pagador cuyos ingresos no superen los <strong>22.000 € brutos anuales</strong> (o 15.000 € si tienen dos o más pagadores y el segundo supera 1.500 €). Los autónomos con actividad económica siempre están obligados, independientemente de sus ingresos. Si tienes dudas, la propia herramienta Renta Web te indica si estás obligado al acceder con tus datos.
-              </dd>
-            </div>
-            <div className={styles.faqItem}>
-              <dt>¿Qué pasa si no presento la declaración estando obligado?</dt>
-              <dd>
-                Si la declaración sale a pagar y no la presentas, la AEAT puede imponerte una sanción de entre el <strong>50% y el 150%</strong> de la cuota, más recargos e intereses de demora. Si sale a devolver y no la presentas, simplemente pierdes la devolución. En todo caso, Hacienda tiene 4 años para reclamar (plazo de prescripción).
-              </dd>
-            </div>
-            <div className={styles.faqItem}>
-              <dt>¿Puedo confirmar el borrador sin revisarlo?</dt>
-              <dd>
-                Técnicamente sí, pero <strong>no es recomendable</strong>. La AEAT solo incluye en el borrador los datos que conoce (salarios, retenciones, inmuebles por catastro). No incluye deducciones por plan de pensiones, donaciones, gastos de autónomos, mejoras de eficiencia energética o deducciones autonómicas. Confirmar el borrador sin revisarlo puede suponer pagar más de lo necesario.
-              </dd>
-            </div>
-            <div className={styles.faqItem}>
-              <dt>¿Sale mejor la declaración individual o conjunta?</dt>
-              <dd>
-                Depende de la diferencia de ingresos entre los cónyuges. En general, la <strong>declaración conjunta es más ventajosa</strong> cuando uno de los cónyuges no tiene ingresos o son muy bajos, ya que se aplica una reducción adicional de 3.400 € (o 2.150 € en otros casos). Si ambos trabajan con sueldos similares, suele salir mejor por separado. Renta Web permite simular ambas opciones.
-              </dd>
-            </div>
-            <div className={styles.faqItem}>
-              <dt>¿Qué es el borrador y cuándo estará disponible?</dt>
-              <dd>
-                El borrador es el proyecto de declaración que la AEAT elabora con los datos que ya tiene de ti (nóminas, pensiones, compras de inmuebles, ventas de fondos, etc.). Estará disponible desde el <strong>8 de abril de 2026</strong> en Renta Web, accediendo con Cl@ve PIN, DNI electrónico o certificado digital. Solo es un punto de partida: debes revisarlo y completarlo con tus propios datos.
-              </dd>
-            </div>
-            <div className={styles.faqItem}>
-              <dt>¿Cómo funciona la deducción por donaciones a ONGs?</dt>
-              <dd>
-                Las donaciones a entidades acogidas a la Ley 49/2002 (Cruz Roja, UNICEF, Cáritas, etc.) tienen una deducción del <strong>80% para los primeros 150 €</strong> y del <strong>35%</strong> para el resto (40% si llevas más de 3 años donando a la misma entidad). El límite es el 10% de la base liquidable. Para los donativos a la Iglesia Católica, la deducción es del 25%.
-              </dd>
-            </div>
-            <div className={styles.faqItem}>
-              <dt>¿Puedo aplazar el pago si la declaración sale a pagar?</dt>
-              <dd>
-                Sí. Al presentar la declaración, puedes domiciliar el pago en dos plazos: el <strong>60%</strong> al presentar la declaración y el <strong>40%</strong> restante el 5 de noviembre de 2026, sin recargos ni intereses. También puedes solicitar un aplazamiento ordinario con intereses si necesitas más tiempo, aunque Hacienda no siempre lo concede automáticamente.
-              </dd>
-            </div>
-            <div className={styles.faqItem}>
-              <dt>¿Cómo tributan las indemnizaciones por despido?</dt>
-              <dd>
-                La indemnización mínima legal por despido improcedente está <strong>exenta de IRPF</strong> hasta los límites legales (45 días por año trabajado con máximo 42 mensualidades, para contratos anteriores a 2012; o 33 días con máximo 24 mensualidades para los posteriores). La parte que supere esos límites tributa íntegramente como rendimiento del trabajo. El finiquito (salario pendiente, vacaciones no disfrutadas) siempre tributa.
-              </dd>
-            </div>
+            {PREGUNTAS_FRECUENTES.map(f => (
+              <div key={f.question} className={styles.faqItem}>
+                <dt>{f.question}</dt>
+                <dd>{f.answer}</dd>
+              </div>
+            ))}
           </dl>
         </section>
-
         {/* 4. Guía paso a paso */}
         <section className={styles.eduSection}>
           <h4 className={styles.eduSectionTitle}>Cómo presentar la renta paso a paso</h4>
@@ -642,7 +643,7 @@ export default function ChecklistDeclaracionRentaPage() {
               <span className={styles.stepNumber}>5</span>
               <div className={styles.stepContent}>
                 <strong>Presenta la declaración antes del 30 de junio</strong>
-                <p>Si sale a devolver, preséntala cuanto antes (la AEAT tiene hasta 6 meses para abonártela). Si sale a pagar, puedes domiciliar el pago el 25 de junio (60% ahora + 40% el 5 de noviembre). Guarda el justificante de presentación (número de referencia PDF).</p>
+                <p>Si sale a devolver, preséntala cuanto antes (la AEAT tiene hasta 6 meses para abonártela). Si sale a pagar, puedes domiciliar el pago del 8 de abril al 25 de junio (60&nbsp;% al presentar + 40&nbsp;% hasta el 5 de noviembre). Guarda el justificante de presentación (número de referencia PDF).</p>
               </div>
             </li>
             <li className={styles.step}>
@@ -663,7 +664,7 @@ export default function ChecklistDeclaracionRentaPage() {
               <span className={styles.tipIcon} aria-hidden="true">🎁</span>
               <div>
                 <strong>Donaciones a ONGs</strong>
-                <p>Las donaciones a entidades acogidas a la Ley 49/2002 tienen una deducción del 80 % en los primeros 150 € y del 35 % en el resto. Si donaste a ONGs en 2025, consérvalos justificantes: la deducción se aplica automáticamente si la entidad ha informado a la AEAT, pero conviene revisar el borrador.</p>
+                <p>Las donaciones a entidades acogidas a la Ley 49/2002 tienen una deducción del 80&nbsp;% en los primeros 250&nbsp;€ y del 40&nbsp;% en el resto (45&nbsp;% si repites con la misma entidad). Si donaste a ONGs en 2025, consérvalos justificantes: la deducción se aplica automáticamente si la entidad ha informado a la AEAT, pero conviene revisar el borrador.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
@@ -677,7 +678,7 @@ export default function ChecklistDeclaracionRentaPage() {
               <span className={styles.tipIcon} aria-hidden="true">🏗️</span>
               <div>
                 <strong>Deducción por mejoras de eficiencia energética</strong>
-                <p>Si hiciste obras en tu vivienda habitual para mejorar la eficiencia energética (caldera, aislamientos, ventanas…), puedes deducir entre el 20% y el 60% de la inversión, según el nivel de mejora. Necesitas el certificado energético pre y post obra.</p>
+                <p>Si hiciste obras en tu vivienda habitual para mejorar la eficiencia energética (caldera, aislamientos, ventanas…), puedes deducir entre el 20&nbsp;% y el 60&nbsp;% de la inversión, según el nivel de mejora. Necesitas el certificado energético pre y post obra.</p>
               </div>
             </div>
             <div className={styles.tipCard}>
@@ -698,7 +699,9 @@ export default function ChecklistDeclaracionRentaPage() {
               <span className={styles.tipIcon} aria-hidden="true">👶</span>
               <div>
                 <strong>Deducciones por guardería y maternidad</strong>
-                <p>Las madres trabajadoras con hijos menores de 3 años tienen derecho a la deducción por maternidad (hasta 1.200 € al año) y hasta 1.000 € adicionales por gastos de guardería. Se solicita en Renta Web pero no siempre aparece en el borrador.</p>
+                {/* Art. 81 LIRPF (DEDUCCION_MATERNIDAD_IRPF.situacionesConDerecho): también con
+                    prestación o subsidio de desempleo al nacer el menor (4629). */}
+                <p>Las madres con hijos menores de 3 años que trabajan (de alta en la Seguridad Social o mutualidad) o que cobraban prestación o subsidio de desempleo al nacer el hijo tienen derecho a la deducción por maternidad (hasta {eur(DEDUCCION_MATERNIDAD_IRPF.importeAnualPorHijo)} al año) y hasta {eur(DEDUCCION_MATERNIDAD_IRPF.incrementoGuarderia.importeMaximoAnual)} adicionales por gastos de guardería. Se solicita en Renta Web pero no siempre aparece en el borrador.</p>
               </div>
             </div>
           </div>
@@ -719,13 +722,15 @@ export default function ChecklistDeclaracionRentaPage() {
                 <strong>No declarar las rentas del alquiler.</strong> La AEAT cruza información del catastro, los depósitos de fianza autonómicos y las declaraciones de los inquilinos. La regularización posterior incluye cuota, intereses de demora y, en su caso, sanciones.
               </li>
               <li>
-                <strong>Olvidar declarar las cuentas en el extranjero (Modelo 720).</strong> Si en algún momento del año tuviste activos en el extranjero superiores a 50.000 €, estás obligado a presentar el Modelo 720. Las sanciones son de hasta el 150% del valor no declarado. (NOTA: las sanciones del régimen del Modelo 720 fueron declaradas contrarias al Derecho de la UE por la STJUE de 27/01/2022 y modificadas por la Ley 5/2022; consulta el régimen vigente en la AEAT.)
+                <strong>Olvidar declarar las cuentas en el extranjero (Modelo 720).</strong> Si en algún momento del año tuviste activos en el extranjero superiores a {eur(MODELO_720.umbralPorBloque)}, estás obligado a presentar el Modelo 720. Desde la Ley 5/2022, tras la sentencia del TJUE de 27/01/2022, ya no tiene un régimen sancionador propio: su incumplimiento se sanciona por el régimen general de la Ley General Tributaria.
               </li>
               <li>
                 <strong>Deducir gastos del alquiler que no son deducibles.</strong> Solo son deducibles los gastos vinculados directamente al inmueble alquilado. Los gastos de reformas de mejora (no reparación) no son deducibles directamente — se amortizan. Las multas de la comunidad de propietarios tampoco lo son.
               </li>
               <li>
-                <strong>Presentar fuera de plazo la declaración que sale a devolver.</strong> Si presentas la declaración después del 30 de junio, Hacienda aplica un recargo del 1% mensual sobre la cuota, aunque salga a devolver. Y si sale a pagar, el recargo puede llegar al 20% más intereses.
+                {/* LGT arts. 27.2 y 198 (ESCALA_RECARGO_EXTEMPORANEO, leídos en el BOE el 14/11/2026): el 20 % era la
+                    escala anterior a la Ley 11/2021, y a devolver no hay cuota que recargar (4623). */}
+                <strong>Presentar fuera de plazo la declaración que sale a devolver.</strong> Si la presentas después del 30 de junio sin requerimiento, no hay recargo, porque no hay cuota que recargar, pero la AEAT puede imponer una multa fija de {eur(SANCION_PRESENTACION_TARDIA_SIN_PERJUICIO.multaSinRequerimiento)}. Si sale a pagar, el recargo es del {pct(ESCALA_RECARGO_EXTEMPORANEO.porcentajeBase)} más otro {pct(ESCALA_RECARGO_EXTEMPORANEO.porcentajePorMes)} por cada mes completo de retraso, y del {pct(ESCALA_RECARGO_EXTEMPORANEO.porcentajeMas12Meses)} pasados {ESCALA_RECARGO_EXTEMPORANEO.mesesEscalaProporcional} meses, más intereses de demora desde entonces.
               </li>
               <li>
                 <strong>No guardar los justificantes durante 4 años.</strong> Si la AEAT te inspecciona y no puedes justificar las deducciones aplicadas, las anulará y añadirá sanción, aunque tuvieras razón. Guarda todo: contratos, facturas, certificados y recibos en papel o escaneados.

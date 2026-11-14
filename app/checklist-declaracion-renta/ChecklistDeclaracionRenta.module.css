@@ -391,8 +391,25 @@
   user-select: none;
 }
 
-.item:last-child {
+/* El <li> envuelve al checkbox (hallazgo 4631): la última fila es la del último <li>. */
+.itemFila {
+  margin: 0;
+  padding: 0;
+}
+
+.itemFila:last-child .item {
   border-bottom: none;
+}
+
+.avisoCampana {
+  margin: 0 0 var(--spacing-md);
+  padding: var(--spacing-sm) var(--spacing-md);
+  border-left: 4px solid var(--hero-bg);
+  background: var(--bg-card);
+  color: var(--text-primary);
+  border-radius: var(--radius);
+  font-size: 0.92rem;
+  line-height: 1.5;
 }
 
 .item:hover {

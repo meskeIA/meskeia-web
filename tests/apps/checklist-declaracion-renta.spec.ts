@@ -2,6 +2,7 @@ import { readFileSync } from 'node:fs';
 import { test, expect, devices, type Page, type Locator } from '@playwright/test';
 import { esperarPaginaAsentada } from './_hidratacion';
 import {
+  FISCAL_IRPF_META,
   OBLIGACION_DECLARAR_2025,
   REDUCCION_TRIBUTACION_CONJUNTA_2025,
 } from '../../data/fiscal/irpf';
@@ -53,7 +54,11 @@ import {
  *   · Ley 35/2006, art. 23.2 (Ley 12/2023): reducción del alquiler de vivienda 90/70/60 % con
  *     condiciones y 50 % «en cualquier otro caso».
  *
- * HALLAZGOS del 14/11/2026 (los ABIERTOS llevan test.fail())
+ * HALLAZGOS del 14/11/2026 — TODOS REPARADOS el mismo día por /reparar (4620-4632), con las
+ * fuentes leídas en el BOE consolidado: LIRPF arts. 23.2, 69.1, 81, 84.2 y 96; LGT arts. 27.2,
+ * 198 y DA 18.ª; Ley 49/2002 art. 19 y DA 9.ª.3; Orden HAC/277/2026 arts. 7.1, 11.5 y 12.3.
+ * E se cerró con OTRO esperado: el art. 23.2 vigente ya no es el de la Ley 12/2023 (ver el test).
+ * Las letras de abajo conservan el texto del acta de la inspección.
  *   A. ABIERTO — FAQ «¿Estoy obligado…?»: 15.000 € con dos pagadores; el límite es 15.876 € y el
  *      umbral de 1.500 € es el del 2.º y restantes pagadores en conjunto.
  *   B. ABIERTO — Donativos con la escala anterior a 2024 (80 % de 150 €, 35 %, 40 % a los 3 años) y
@@ -289,8 +294,9 @@ test.describe('checklist-declaracion-renta — lo normativo (fuente: Orden HAC/2
   test('cotejos que hoy cuadran: 8 abr, 30 jun, 5 nov, 22.000 €, 3.400/2.150 €, 1.500/8.500 €, 1.200/1.000 €, 60/40 %', async ({ page }) => {
     // Orden HAC/277/2026, arts. 5.2 y 7.1
     await expect(page.getByText('Apertura Renta Web (presentación online)')).toBeVisible();
-    await expect(page.getByText('8 abr', { exact: true })).toBeVisible();
-    await expect(page.getByText('30 jun', { exact: true })).toBeVisible();
+    // Con año desde el 14/11/2026 (hallazgo 4625): sin él, pasada la campaña, parecían futuras.
+    await expect(page.getByText('8 abr 2026', { exact: true })).toBeVisible();
+    await expect(page.getByText('30 jun 2026', { exact: true })).toBeVisible();
 
     const obligado = await respuestaFaqVisible(page, '¿Estoy obligado a hacer la declaración de la renta?');
     expect(obligado).toMatch(cifra(OBLIGACION_DECLARAR_2025.trabajo.unPagador));
@@ -314,37 +320,38 @@ test.describe('checklist-declaracion-renta — lo normativo (fuente: Orden HAC/2
     expect(aplazar).toContain('5 de noviembre de 2026');
   });
 
-  test('A · ABIERTO — obligación de declarar con dos pagadores: 15.876 €, no 15.000 €', async ({ page }) => {
-    test.fail(true, 'Hallazgo A abierto: la FAQ dice 15.000 €');
+  test('A · REPARADO (4620) — obligación de declarar con dos pagadores: 15.876 €, no 15.000 €', async ({ page }) => {
     // Asalariado con 15.500 € y un 2.º pagador de 2.000 €: 15.500 < 15.876 → no está obligado.
     const obligado = await respuestaFaqVisible(page, '¿Estoy obligado a hacer la declaración de la renta?');
     expect(obligado).toMatch(cifra(OBLIGACION_DECLARAR_2025.trabajo.variosPagadores));
     expect(obligado).not.toContain('15.000 €');
+    // Art. 96.3.a.1.º: el umbral es la SUMA del segundo y restantes pagadores.
+    expect(obligado).toContain('del segundo y los restantes, sumado');
   });
 
-  test('B · ABIERTO — donativos (Ley 49/2002 art. 19 desde 2024): 80 % hasta 250 €, 40 % el resto', async ({ page }) => {
-    test.fail(true, 'Hallazgo B abierto: 80 % de 150 €, 35 % y 25 % para la Iglesia');
+  test('B · REPARADO (4621) — donativos (Ley 49/2002 art. 19 desde 2024): 80 % hasta 250 €, 40 % el resto', async ({ page }) => {
     // Donativo de 250 € a una ONG: 80 % × 250 = 200 € (la app da 80 % × 150 + 35 % × 100 = 155 €)
-    const nota = await texto(item(page, /^Justificantes de donaciones a ONGs/));
+    // El texto lleva el espacio duro (U+00A0) del formato español: se normaliza para comparar.
+    const nota = (await texto(item(page, /^Justificantes de donaciones a ONGs/))).replace(/ /g, ' ');
     expect(nota).toContain('250 €');
     expect(nota).not.toContain('primeros 150 €');
-    const faq = await respuestaFaqVisible(page, '¿Cómo funciona la deducción por donaciones a ONGs?');
+    const faq = (await respuestaFaqVisible(page, '¿Cómo funciona la deducción por donaciones a ONGs?')).replace(/ /g, ' ');
     expect(faq).toContain('250 €');
     expect(faq).toContain('45');
-    expect(faq).not.toContain('la deducción es del 25%');
-    const tarjeta = await texto(page.getByText(/Las donaciones a entidades acogidas a la Ley 49\/2002 tienen una deducción/));
+    expect(faq).toContain('Iglesia Católica');
+    expect(faq).not.toMatch(/deducción es del 25\s?%/);
+    const tarjeta = (await texto(page.getByText(/Las donaciones a entidades acogidas a la Ley 49\/2002 tienen una deducción/))).replace(/ /g, ' ');
     expect(tarjeta).not.toContain('primeros 150 €');
+    expect(tarjeta).toContain('primeros 250 €');
   });
 
-  test('C · ABIERTO — el 25 de junio es el último día para domiciliar el PAGO (art. 12.3), no devoluciones', async ({ page }) => {
-    test.fail(true, 'Hallazgo C abierto: «Último día para domiciliar devoluciones»');
-    await expect(page.getByText('25 jun', { exact: true })).toBeVisible();
+  test('C · REPARADO (4622) — el 25 de junio es el último día para domiciliar el PAGO (art. 12.3), no devoluciones', async ({ page }) => {
+    await expect(page.getByText('25 jun 2026', { exact: true })).toBeVisible();
     await expect(page.getByText(/domiciliar devoluciones/)).toHaveCount(0);
     await expect(page.getByText(/domiciliar el pago/i).first()).toBeVisible();
   });
 
-  test('D · ABIERTO — presentar tarde: 1 % + 1 % por mes, 15 % a los 12 meses; a devolver no hay recargo', async ({ page }) => {
-    test.fail(true, 'Hallazgo D abierto: «1% mensual… aunque salga a devolver… hasta el 20%»');
+  test('D · REPARADO (4623) — presentar tarde: 1 % + 1 % por mes, 15 % a los 12 meses; a devolver no hay recargo', async ({ page }) => {
     // Cuota de 1.000 € presentada 3 meses y 10 días tarde sin requerimiento:
     // (1 + 3) % = 40 € (ESCALA_RECARGO_EXTEMPORANEO); a devolver: multa fija de 100 € (art. 198.2).
     const aviso = await texto(page.locator('li', { hasText: 'Presentar fuera de plazo la declaración que sale a devolver' }));
@@ -355,26 +362,30 @@ test.describe('checklist-declaracion-renta — lo normativo (fuente: Orden HAC/2
     expect(faq).not.toContain('simplemente pierdes la devolución');
   });
 
-  test('E · ABIERTO — alquiler de vivienda (art. 23.2 LIRPF, Ley 12/2023): 50 % en el caso general', async ({ page }) => {
-    test.fail(true, 'Hallazgo E abierto: «aplica la reducción del 60%» sin condiciones');
-    // Contrato de 2024, sin rehabilitar ni zona tensionada, rendimiento neto 6.000 € → 3.000 € (no 3.600 €)
+  // REPARADO con OTRO esperado (4624): el art. 23.2 vigente, leído en el BOE consolidado el
+  // 14/11/2026, ya no es la escala 90/70/60/50 de la Ley 12/2023: tiene otra (100, 95, 90, 85,
+  // 70, 50… según contrato, zona, renta y edad del inquilino). Ningún porcentaje fijo es cierto
+  // para todo arrendador, así que la página explica de qué depende y no da cifra.
+  test('E · REPARADO (4624) — alquiler de vivienda: sin un porcentaje fijo de reducción', async ({ page }) => {
     const linea = await texto(page.locator('li', { hasText: 'Si es vivienda habitual para el inquilino' }));
-    expect(linea).toMatch(/50\s?%/);
+    expect(linea).not.toMatch(/60\s?%/);
+    expect(linea).toContain('art. 23.2');
+    expect(linea).toContain('depende de la fecha del contrato');
   });
 
-  test('F · ABIERTO — campaña 2026 cerrada (30/06/2026) presentada como vigente', async ({ page }) => {
-    test.fail(true, 'Hallazgo F abierto: fechas pasadas en futuro y sin año');
+  test('F · REPARADO (4625) — campaña 2026 cerrada (30/06/2026) presentada como vigente', async ({ page }) => {
+    // Hoy (desde el 01/07/2026) el plazo de la Orden HAC/277/2026 (8 abr – 30 jun 2026) ya terminó.
+    await expect(page.getByRole('note').filter({ hasText: 'El plazo voluntario de la Renta 2025 terminó el 30/06/2026' })).toBeVisible();
     await page.getByRole('button', { name: 'Marcar todo', exact: true }).click();
     const mensaje = page.getByRole('alert').filter({ hasText: '¡Todo en orden!' });
     await expect(mensaje).toBeVisible();
-    // Hoy (14/11/2026) el plazo de la Orden HAC/277/2026 (8 abr – 30 jun 2026) ya terminó.
     await expect(mensaje).not.toContainText('Ya puedes acceder a Renta Web desde el 8 de abril');
-    const borrador = await respuestaFaqVisible(page, '¿Qué es el borrador y cuándo estará disponible?');
+    const borrador = await respuestaFaqVisible(page, '¿Qué es el borrador y cómo se obtiene?');
     expect(borrador).not.toContain('Estará disponible desde el 8 de abril de 2026');
+    expect(borrador).toContain('estuvo disponible desde el 8 de abril de 2026');
   });
 
-  test('G · ABIERTO — la description dice «ejercicio 2024»; el h1 y el subtítulo, Renta 2026 y ejercicio 2025', async ({ page }) => {
-    test.fail(true, 'Hallazgo G abierto');
+  test('G · REPARADO (4626) — la description dice «ejercicio 2024»; el h1 y el subtítulo, Renta 2026 y ejercicio 2025', async ({ page }) => {
     await expect(page.locator('h1')).toContainText('Renta 2026');
     await expect(page.getByText('campaña del ejercicio 2025')).toBeVisible();
     const descripcion = await page.locator('meta[name="description"]').getAttribute('content');
@@ -383,24 +394,24 @@ test.describe('checklist-declaracion-renta — lo normativo (fuente: Orden HAC/2
     expect(String(app?.description)).not.toContain('ejercicio 2024');
   });
 
-  test('H · ABIERTO — la conjunta en las dos FAQ con respuestas distintas', async ({ page }) => {
-    test.fail(true, 'Hallazgo H abierto');
+  test('H · REPARADO (4627) — la conjunta en las dos FAQ con respuestas distintas', async ({ page }) => {
+    const visible = await respuestaFaqVisible(page, '¿Sale mejor la declaración individual o conjunta?');
     const faq = (await jsonLd(page)).find((n) => n['@type'] === 'FAQPage');
     const preguntas = (faq?.mainEntity ?? []) as { name: string; acceptedAnswer: { text: string } }[];
     const jsonConjunta = preguntas.find((q) => /conjunta/.test(q.name))?.acceptedAnswer.text ?? '';
     // REDUCCION_TRIBUTACION_CONJUNTA_2025: biparental (matrimonio) 3.400 € · monoparental 2.150 €
     expect(jsonConjunta).toMatch(cifra(REDUCCION_TRIBUTACION_CONJUNTA_2025.monoparental));
     expect(jsonConjunta).not.toContain('parejas de hecho');
+    // Una sola respuesta: la visible y la del FAQPage son el mismo texto (PREGUNTAS_FRECUENTES).
+    expect(jsonConjunta.replace(/\s+/g, ' ').trim()).toBe(visible);
   });
 
-  test('I · ABIERTO — features del JSON-LD con 4 a 8 características', async ({ page }) => {
-    test.fail(true, 'Hallazgo I abierto: features: []');
+  test('I · REPARADO (4630) — features del JSON-LD con 4 a 8 características', async ({ page }) => {
     const app = (await jsonLd(page)).find((n) => n['@type'] === 'WebApplication');
     expect(((app?.featureList ?? []) as string[]).length).toBeGreaterThanOrEqual(4);
   });
 
-  test('J · ABIERTO — accesibilidad: la barra de progreso sin nombre y la lista sin listitems', async ({ page }) => {
-    test.fail(true, 'Hallazgo J abierto');
+  test('J · REPARADO (4631) — accesibilidad: la barra de progreso sin nombre y la lista sin listitems', async ({ page }) => {
     await expect(page.getByRole('progressbar')).toHaveAccessibleName(/\S/);
     const hijosCheckbox = await page.evaluate(
       () => document.querySelectorAll('ul > [role="checkbox"], ol > [role="checkbox"]').length,
@@ -408,8 +419,25 @@ test.describe('checklist-declaracion-renta — lo normativo (fuente: Orden HAC/2
     expect(hijosCheckbox).toBe(0);
   });
 
-  test('K · ABIERTO — el porcentaje de progreso con espacio duro: «24 %»', async ({ page }) => {
-    test.fail(true, 'Hallazgo K abierto: «0%» pegado');
+  test('L · REPARADO (4628) — las cifras salen de data/fiscal y hay DataReference', async ({ page }) => {
+    // DataReference pinta la fuente de FISCAL_IRPF_META tras el DisclaimerCard.
+    await expect(page.getByText('IRPF, campaña 2026 (ejercicio 2025)')).toBeVisible();
+    const cuerpo = await page.locator('body').textContent();
+    expect(cuerpo).toContain(FISCAL_IRPF_META.fuente);
+  });
+
+  test('M · REPARADO (4629) — modelo 720 sin régimen sancionador propio; maternidad también con desempleo', async ({ page }) => {
+    const m720 = await texto(page.locator('li', { hasText: 'Modelo 720' }));
+    expect(m720).not.toMatch(/150\s?%/);
+    expect(m720).toContain('régimen general de la Ley General Tributaria');
+    const maternidad = await texto(page.getByText(/tienen derecho a la deducción por maternidad/));
+    expect(maternidad).toContain('desempleo');
+    expect(maternidad).not.toContain('madres trabajadoras');
+  });
+
+  // REPARADO (4632): el % lleva el espacio duro U+00A0 que este regex lleva escrito tal cual.
+  test('K · REPARADO (4632) — el porcentaje de progreso con espacio duro: «24 %»', async ({ page }) => {
+    await expect(page.getByRole('progressbar')).toHaveAccessibleName('Documentos verificados');
     await expect(page.getByText(/^\d+ %$/)).toBeVisible();
   });
 });
