@@ -1,7 +1,7 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState } from 'react';
+import { useState, type ChangeEvent } from 'react';
 import styles from './CalculadoraGanache.module.css';
 import {
   MeskeiaLogo,
@@ -16,6 +16,33 @@ import {
   type TipoChocolate,
   type TexturaGanache,
 } from '@/lib/calculadoras/cocina';
+import { formatNumber, parseSpanishNumber } from '@/lib/formatters';
+import { PREGUNTAS_FRECUENTES } from './metadata';
+
+// Rango que admite la app: el que declara el campo («mínimo 50 g», max 5000).
+const MIN_G = 50;
+const MAX_G = 5000;
+
+/** Gramos con decimal solo si lo tienen: 250,5 g, 138 g. */
+function gramos(n: number): string {
+  return formatNumber(n, Number.isInteger(n) ? 0 : 1);
+}
+
+/**
+ * Lee la cantidad tecleada (hallazgos 4597 y 4598). Antes se borraba todo lo que no era cifra
+ * («250,5» → 2505 g, «-100» → 100 g, «1e3» → 13 g) y `|| 200` convertía el 0 en 200 g; el
+ * rango declarado no se aplicaba. Ahora formato español y, fuera de rango, aviso sin cifras.
+ */
+function leerCantidad(texto: string): { valor: number | null; aviso: string | null } {
+  const n = parseSpanishNumber(texto);
+  if (!Number.isFinite(n) || n <= 0) {
+    return { valor: null, aviso: 'Escribe una cantidad válida en gramos, por ejemplo 200 o 250,5.' };
+  }
+  if (n < MIN_G || n > MAX_G) {
+    return { valor: null, aviso: `La cantidad tiene que estar entre ${MIN_G} y ${MAX_G} g.` };
+  }
+  return { valor: n, aviso: null };
+}
 
 // ─── Datos descriptivos para la UI ───────────────────────────────────────────
 
@@ -31,36 +58,37 @@ const TIPOS_CHOCOLATE: InfoTipoChocolate[] = [
   {
     id: 'negro_extra',
     nombre: 'Negro Extra',
-    rango: '70–99% cacao',
+    rango: '70–99 % cacao',
     descripcion: 'Intenso y amargo. Mayor contenido en manteca de cacao.',
     emoji: '🍫',
   },
   {
     id: 'negro',
     nombre: 'Negro',
-    rango: '55–70% cacao',
+    rango: '55–69 % cacao',
     descripcion: 'El más versátil para repostería. Equilibrio sabor-dulzor.',
     emoji: '🟫',
   },
   {
     id: 'semi_fondant',
     nombre: 'Semi-fondant',
-    rango: '40–55% cacao',
+    rango: '40–54 % cacao',
     descripcion: 'Intermedio. Buena cobertura y sabor más suave.',
     emoji: '🟤',
   },
   {
     id: 'con_leche',
     nombre: 'Con Leche',
-    rango: '28–40% cacao',
+    rango: '28–39 % cacao',
     descripcion: 'Dulce y cremoso. Requiere más chocolate para la misma firmeza.',
     emoji: '🥛',
   },
   {
     id: 'blanco',
     nombre: 'Blanco',
-    rango: '0% cacao (manteca)',
-    descripcion: 'Sin sólidos de cacao. Muy dulce y delicado.',
+    // RD 1055/2003 (BOE-A-2003-15599), anexo 1.9: al menos un 20 % de manteca de cacao (hallazgo 4603)
+    rango: 'sin pasta de cacao · ≥ 20 % de manteca',
+    descripcion: 'Sin pasta de cacao, solo su manteca. Muy dulce y delicado.',
     emoji: '⬜',
   },
 ];
@@ -101,16 +129,16 @@ export default function CalculadoraGanachePage() {
   const [totalGStr, setTotalGStr] = useState('200');
   const [calculado, setCalculado] = useState(false);
 
-  const totalG = parseInt(totalGStr, 10) || 200;
-  const resultado = calcularGanache(tipoChocolate, textura, totalG);
+  const lectura = leerCantidad(totalGStr);
+  const resultado = lectura.valor !== null ? calcularGanache(tipoChocolate, textura, lectura.valor) : null;
+  const avisoVisible = calculado && lectura.aviso !== null;
 
   const handleCalcular = () => {
     setCalculado(true);
   };
 
-  const handleTotalChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value.replace(/[^0-9]/g, '');
-    setTotalGStr(val);
+  const handleTotalChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setTotalGStr(e.target.value);
     setCalculado(false);
   };
 
@@ -185,20 +213,20 @@ export default function CalculadoraGanachePage() {
           <div className={styles.cantidadRow}>
             <div className={styles.inputWrapper}>
               <input
-                type="number"
+                type="text"
+                inputMode="decimal"
                 id="totalGanache"
                 value={totalGStr}
                 onChange={handleTotalChange}
-                min={50}
-                max={5000}
-                step={50}
                 className={styles.inputCantidad}
                 aria-label="Gramos totales de ganache a preparar"
+                aria-describedby="totalGanacheHint"
+                aria-invalid={avisoVisible || undefined}
               />
               <span className={styles.inputUnidad}>g</span>
             </div>
-            <p className={styles.cantidadHint}>
-              Gramos totales de ganache a preparar (mínimo 50 g)
+            <p className={styles.cantidadHint} id="totalGanacheHint">
+              Gramos totales de ganache a preparar (de {MIN_G} a {MAX_G} g)
             </p>
           </div>
         </section>
@@ -208,27 +236,32 @@ export default function CalculadoraGanachePage() {
           Calcular proporciones
         </button>
 
-        {/* Resultado */}
-        {calculado && (
-          <section className={styles.resultadoSection} role="region" aria-label="Resultado del cálculo" aria-live="polite">
-            <h2 className={styles.resultadoTitulo}>Proporciones para {resultado.total_g} g de ganache</h2>
+        {/* Resultado: la región viva está montada desde el principio y solo cambia su
+            contenido (hallazgo 4605: nacía ya llena y el lector no la anunciaba). */}
+        <div role="region" aria-label="Resultado del cálculo" aria-live="polite">
+        {avisoVisible && (
+          <p className={styles.avisoCantidad}>{lectura.aviso}</p>
+        )}
+        {calculado && resultado && (
+          <section className={styles.resultadoSection}>
+            <h2 className={styles.resultadoTitulo}>Proporciones para {gramos(resultado.total_g)} g de ganache</h2>
 
             <div className={styles.propGrid}>
               <div className={styles.propCard}>
                 <span className={styles.propLabel}>Chocolate</span>
-                <span className={styles.propValor}>{resultado.chocolate_g} g</span>
+                <span className={styles.propValor}>{gramos(resultado.chocolate_g)} g</span>
                 <span className={styles.propSub}>{resultado.porcentaje_cacao}</span>
               </div>
               <div className={styles.propSeparador} aria-hidden="true">+</div>
               <div className={styles.propCard}>
-                <span className={styles.propLabel}>Nata (35% m.g.)</span>
-                <span className={styles.propValor}>{resultado.nata_g} g</span>
+                <span className={styles.propLabel}>Nata (35&nbsp;% m.g.)</span>
+                <span className={styles.propValor}>{gramos(resultado.nata_g)} g</span>
                 <span className={styles.propSub}>Nata para montar</span>
               </div>
               <div className={styles.propSeparador} aria-hidden="true">=</div>
               <div className={`${styles.propCard} ${styles.propCardTotal}`}>
                 <span className={styles.propLabel}>Total</span>
-                <span className={styles.propValor}>{resultado.total_g} g</span>
+                <span className={styles.propValor}>{gramos(resultado.total_g)} g</span>
                 <span className={styles.propSub}>Ganache</span>
               </div>
             </div>
@@ -256,6 +289,7 @@ export default function CalculadoraGanachePage() {
 
           </section>
         )}
+        </div>
 
         {/* Tabla de referencia rápida de ratios */}
         <section className={styles.tablaReferencia}>
@@ -280,15 +314,14 @@ export default function CalculadoraGanachePage() {
                       <span aria-hidden="true">{tipo.emoji}</span> {tipo.nombre}
                       <span className={styles.celdaRango}>{tipo.rango}</span>
                     </td>
-                    <td className={textura === 'glaseado' ? styles.celdaActiva : ''}>
-                      {calcularGanache(tipo.id, 'glaseado', 200).chocolate_g}g / {calcularGanache(tipo.id, 'glaseado', 200).nata_g}g
-                    </td>
-                    <td className={textura === 'trufa' ? styles.celdaActiva : ''}>
-                      {calcularGanache(tipo.id, 'trufa', 200).chocolate_g}g / {calcularGanache(tipo.id, 'trufa', 200).nata_g}g
-                    </td>
-                    <td className={textura === 'firme' ? styles.celdaActiva : ''}>
-                      {calcularGanache(tipo.id, 'firme', 200).chocolate_g}g / {calcularGanache(tipo.id, 'firme', 200).nata_g}g
-                    </td>
+                    {(['glaseado', 'trufa', 'firme'] as const).map((tex) => {
+                      const celda = calcularGanache(tipo.id, tex, 200);
+                      return (
+                        <td key={tex} className={textura === tex ? styles.celdaActiva : ''}>
+                          {celda.chocolate_g}&nbsp;g / {celda.nata_g}&nbsp;g
+                        </td>
+                      );
+                    })}
                   </tr>
                 ))}
               </tbody>
@@ -318,14 +351,16 @@ export default function CalculadoraGanachePage() {
             <p>
               El ganache es una emulsión de chocolate y nata (o un líquido graso) que forma una mezcla
               homogénea. Su textura depende principalmente del ratio chocolate:nata y de la temperatura
-              a la que se usa:
+              a la que se usa. Los ratios de estas tarjetas son los del chocolate negro; el de
+              leche y el blanco necesitan más chocolate para la misma textura (tabla completa más abajo):
             </p>
             <div className={styles.tipsGrid}>
               <div className={styles.tipCard}>
                 <span className={styles.tipIcon} aria-hidden="true">🍰</span>
                 <h4>Glaseado (ratio bajo)</h4>
                 <p>
-                  Ratio 1:1 a 2:1. Fluido y brillante a temperatura ambiente o ligeramente tibio.
+                  Con chocolate negro, ratio 1:1 a 1,5:1 según el cacao (con leche 2:1, blanco 3:1).
+                  Fluido y brillante a temperatura ambiente o ligeramente tibio.
                   Ideal para cubrir tartas, hacer drip cakes o glasear eclairs. Se cristaliza con
                   una capa brillante.
                 </p>
@@ -334,7 +369,8 @@ export default function CalculadoraGanachePage() {
                 <span className={styles.tipIcon} aria-hidden="true">🍫</span>
                 <h4>Trufa (ratio medio)</h4>
                 <p>
-                  Ratio 2:1 a 3:1. Cremoso tras 2–4 horas en nevera. Permite bolearlo a mano
+                  Con chocolate negro, ratio 2:1 a 2,5:1 (con leche 3:1, blanco 4:1). Cremoso tras
+                  2–4 horas en nevera. Permite bolearlo a mano
                   para hacer trufas, o usarlo como relleno de bombones y macarons. La base clásica
                   de los chocolates artesanos.
                 </p>
@@ -343,7 +379,8 @@ export default function CalculadoraGanachePage() {
                 <span className={styles.tipIcon} aria-hidden="true">💎</span>
                 <h4>Firme (ratio alto)</h4>
                 <p>
-                  Ratio 3:1 o superior. Muy denso incluso a temperatura ambiente. Permite
+                  Con chocolate negro, ratio 3:1 a 3,5:1 (con leche 4:1, blanco 5:1). Muy denso
+                  incluso a temperatura ambiente. Permite
                   modelar formas, recubrir pralinés con capa muy delgada o usarlo como base
                   de bombones con cáscara ultrafina.
                 </p>
@@ -354,12 +391,12 @@ export default function CalculadoraGanachePage() {
           <section className={styles.conceptoSection}>
             <h2>Por qué el % de cacao cambia el ratio</h2>
             <p>
-              El chocolate negro extra (70–99%) tiene alta proporción de manteca de cacao y sólidos de cacao,
+              El chocolate negro extra (70–99&nbsp;%) tiene alta proporción de manteca de cacao y sólidos de cacao,
               que son los que aportan estructura. Al mezclar con nata, la manteca de cacao forma una red
               cristalina estable con relativa poca cantidad de chocolate.
             </p>
             <p style={{ marginTop: '12px' }}>
-              El chocolate con leche (28–40%) y el blanco tienen muchos más sólidos de leche, azúcar y menos
+              El chocolate con leche (28–39&nbsp;%) y el blanco tienen muchos más sólidos de leche, azúcar y menos
               manteca de cacao. Esto los hace menos estables y requieren más chocolate por cada parte
               de nata para conseguir la misma firmeza. Es por eso que el ratio para chocolate blanco
               en ganache firme llega a ser 5:1.
@@ -370,8 +407,9 @@ export default function CalculadoraGanachePage() {
                 <strong>El chocolate blanco no es idéntico al negro</strong>
               </div>
               <p>
-                El chocolate blanco no contiene sólidos de cacao (teobromina, polifenoles),
-                solo manteca de cacao, azúcar y leche. Su comportamiento térmico y su punto de
+                El chocolate blanco no lleva pasta de cacao (los sólidos magros, donde están la
+                teobromina y los polifenoles): solo manteca de cacao —al menos un 20&nbsp;%, según el
+                Real Decreto 1055/2003—, azúcar y leche. Su comportamiento térmico y su punto de
                 fusión son distintos. Los ganaches de chocolate blanco son más delicados y
                 propensos a separarse; se recomienda añadir la nata caliente en tres tandas y
                 emulsionar bien con una espátula o túrmix de inmersión.
@@ -388,7 +426,7 @@ export default function CalculadoraGanachePage() {
                   <strong>Trocea el chocolate finamente</strong>
                   <p>
                     Cuanto más pequeños sean los trozos, más rápido se derretirá y más homogénea
-                    quedará la emulsión. Para chocolate con más del 60% de cacao, usar un cuchillo
+                    quedará la emulsión. Para chocolate con más del 60&nbsp;% de cacao, usar un cuchillo
                     de sierra es más eficiente.
                   </p>
                 </div>
@@ -396,9 +434,9 @@ export default function CalculadoraGanachePage() {
               <li className={styles.step}>
                 <span className={styles.stepNumber} aria-hidden="true">2</span>
                 <div className={styles.stepContent}>
-                  <strong>Calienta la nata hasta casi hervir (85–90°C)</strong>
+                  <strong>Calienta la nata hasta casi hervir (85–90&nbsp;°C)</strong>
                   <p>
-                    No hace falta que hierva. Con 85–90°C es suficiente para fundir el chocolate
+                    No hace falta que hierva. Con 85–90&nbsp;°C es suficiente para fundir el chocolate
                     y pasteurizar la nata. Si la nata hierve puede perder parte de su grasa y
                     el ganache quedará menos brillante.
                   </p>
@@ -432,9 +470,9 @@ export default function CalculadoraGanachePage() {
                 <div className={styles.stepContent}>
                   <strong>Respeta los tiempos de reposo</strong>
                   <p>
-                    Para glaseado: usar a 30–32°C inmediatamente o dejar cristalizar 1–2h a
-                    temperatura ambiente. Para trufa: refrigerar 2–4h antes de bolearlo.
-                    Para ganache firme: refrigerar 4–6h.
+                    Para glaseado: usar a 30–32&nbsp;°C inmediatamente o dejar cristalizar 1–2&nbsp;h a
+                    temperatura ambiente. Para trufa: refrigerar 2–4&nbsp;h antes de bolearlo.
+                    Para ganache firme: refrigerar 4–6&nbsp;h.
                   </p>
                 </div>
               </li>
@@ -457,35 +495,35 @@ export default function CalculadoraGanachePage() {
                 <tbody>
                   <tr>
                     <td><strong>Negro Extra</strong></td>
-                    <td>70–99%</td>
+                    <td>70–99&nbsp;%</td>
                     <td>1:1</td>
                     <td>2:1</td>
                     <td>3:1</td>
                   </tr>
                   <tr>
                     <td><strong>Negro</strong></td>
-                    <td>55–70%</td>
+                    <td>55–69&nbsp;%</td>
                     <td>1,2:1</td>
                     <td>2,2:1</td>
                     <td>3:1</td>
                   </tr>
                   <tr>
                     <td><strong>Semi-fondant</strong></td>
-                    <td>40–55%</td>
+                    <td>40–54&nbsp;%</td>
                     <td>1,5:1</td>
                     <td>2,5:1</td>
                     <td>3,5:1</td>
                   </tr>
                   <tr>
                     <td><strong>Con Leche</strong></td>
-                    <td>28–40%</td>
+                    <td>28–39&nbsp;%</td>
                     <td>2:1</td>
                     <td>3:1</td>
                     <td>4:1</td>
                   </tr>
                   <tr>
                     <td><strong>Blanco</strong></td>
-                    <td>0% (manteca)</td>
+                    <td>Sin pasta; ≥&nbsp;20&nbsp;% de manteca</td>
                     <td>3:1</td>
                     <td>4:1</td>
                     <td>5:1</td>
@@ -512,7 +550,8 @@ export default function CalculadoraGanachePage() {
                   Se bolea a mano y se reboza en cacao en polvo, fideos de chocolate o frutos secos.
                 </p>
                 <p className={styles.escenarioTip}>
-                  Ratio recomendado: 2:1 (negro) — 400g chocolate / 200g nata para 20–25 trufas.
+                  Para 600&nbsp;g de ganache: con negro, 2,2:1 (413&nbsp;g de chocolate y 187&nbsp;g
+                  de nata); con negro extra, 2:1 (400&nbsp;g y 200&nbsp;g).
                 </p>
               </div>
               <div className={styles.escenarioCard}>
@@ -521,12 +560,12 @@ export default function CalculadoraGanachePage() {
                   <strong>Tarta de chocolate</strong>
                 </div>
                 <p className={styles.escenarioExample}>
-                  Ganache glaseado para cubrir la tarta una vez atemperado a 30–32°C. Se vierte
+                  Ganache glaseado para cubrir la tarta una vez atemperado a 30–32&nbsp;°C. Se vierte
                   por el centro y se extiende con espátula o dejando caer por los laterales
                   (drip cake).
                 </p>
                 <p className={styles.escenarioTip}>
-                  Para una tarta de 20 cm: unos 300–400g de ganache total.
+                  Para una tarta de 20&nbsp;cm: unos 300–400&nbsp;g de ganache total.
                 </p>
               </div>
               <div className={styles.escenarioCard}>
@@ -540,7 +579,7 @@ export default function CalculadoraGanachePage() {
                   en nevera 24h para mejorar la textura (maduración).
                 </p>
                 <p className={styles.escenarioTip}>
-                  Para 20 macarons: unos 150–200g de ganache son suficientes.
+                  Para 20 macarons: unos 150–200&nbsp;g de ganache son suficientes.
                 </p>
               </div>
               <div className={styles.escenarioCard}>
@@ -555,7 +594,9 @@ export default function CalculadoraGanachePage() {
                   con cáscara atemperada.
                 </p>
                 <p className={styles.escenarioTip}>
-                  Los bombones con relleno de trufa duran 2–3 semanas en nevera bien tapados.
+                  Como la ganache lleva nata fresca, los bombones se guardan en nevera y bien
+                  tapados. Cuánto duran depende de la proporción, del azúcar y de la higiene al
+                  prepararlos: no hay una cifra que valga para todas las recetas.
                 </p>
               </div>
             </div>
@@ -574,13 +615,13 @@ export default function CalculadoraGanachePage() {
               </li>
               <li>
                 <strong>El ganache queda granuloso.</strong> El chocolate se ha recristalizado por un
-                choque térmico. Asegúrate de que la nata esté a 85–90°C y vierte en tres tandas.
+                choque térmico. Asegúrate de que la nata esté a 85–90&nbsp;°C y vierte en tres tandas.
                 Si ya está granuloso, caliéntalo suavemente al baño maría.
               </li>
               <li>
                 <strong>El ganache no solidifica.</strong> Probablemente el ratio tiene más nata
                 de la cuenta o usaste nata de bajo contenido graso. Usa siempre nata con
-                mínimo 35% de materia grasa. Para corregirlo, derrite más chocolate y
+                mínimo 35&nbsp;% de materia grasa. Para corregirlo, derrite más chocolate y
                 mézclalo con el ganache flojo.
               </li>
               <li>
@@ -596,6 +637,17 @@ export default function CalculadoraGanachePage() {
               </li>
             </ul>
           </div>
+
+          {/* FAQ visible: del MISMO array que el FAQPage JSON-LD (metadata.ts, hallazgo 4599). */}
+          <section className={styles.conceptoSection}>
+            <h2>Preguntas frecuentes</h2>
+            {PREGUNTAS_FRECUENTES.map((f) => (
+              <div key={f.question}>
+                <h3>{f.question}</h3>
+                <p>{f.answer}</p>
+              </div>
+            ))}
+          </section>
 
         </div>
       </EducationalSection>

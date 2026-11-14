@@ -699,12 +699,16 @@ const RATIOS_GANACHE: Record<TipoChocolate, Record<TexturaGanache, number>> = {
 
 // Sin marcas comerciales (C0742, 14/11/2026): caducan, se leen como recomendación de compra y
 // no hay fuente oficial con la que verificarlas.
+// Rangos de cacao sin solapes (hallazgo 4600: una tableta del 70 % caía en dos tipos con ratios
+// distintos; cada extremo pertenece ahora a un solo tipo). «%» con espacio duro (CLAUDE.md §2).
+// El blanco NO es «0 % cacao»: el RD 1055/2003 (BOE-A-2003-15599, anexo 1.9) le exige como
+// mínimo un 20 % de manteca de cacao; lo que no lleva es pasta de cacao (hallazgo 4603).
 const INFO_CHOCOLATE: Record<TipoChocolate, { rango: string }> = {
-  negro_extra:  { rango: '70–99% cacao' },
-  negro:        { rango: '55–70% cacao' },
-  semi_fondant: { rango: '40–55% cacao' },
-  con_leche:    { rango: '28–40% cacao' },
-  blanco:       { rango: '0% cacao (manteca)' },
+  negro_extra:  { rango: '70–99 % cacao' },
+  negro:        { rango: '55–69 % cacao' },
+  semi_fondant: { rango: '40–54 % cacao' },
+  con_leche:    { rango: '28–39 % cacao' },
+  blanco:       { rango: 'sin pasta de cacao · ≥ 20 % de manteca' },
 };
 
 const USOS_GANACHE: Record<TexturaGanache, string[]> = {
@@ -714,10 +718,15 @@ const USOS_GANACHE: Record<TexturaGanache, string[]> = {
 };
 
 const TEMPERATURA_TRABAJO: Record<TexturaGanache, string> = {
-  glaseado: '30–32°C para uso inmediato. Deja enfriar a temperatura ambiente si quieres efecto goteo.',
-  trufa:    'Refrigerar 2–4h. Trabajar a 17–20°C para bolear las trufas.',
-  firme:    'Refrigerar 4–6h. Trabajar a temperatura ambiente 5 min antes de manipular.',
+  glaseado: '30–32 °C para uso inmediato. Deja enfriar a temperatura ambiente si quieres efecto goteo.',
+  trufa:    'Refrigerar 2–4 h. Trabajar a 17–20 °C para bolear las trufas.',
+  firme:    'Refrigerar 4–6 h. Trabajar a temperatura ambiente 5 min antes de manipular.',
 };
+
+/** El ratio con coma decimal: 2.2 → «2,2» (hallazgo 4601; antes salía «2.2:1»). */
+function ratioEspanol(ratio: number): string {
+  return formatNumber(ratio, Number.isInteger(ratio) ? 0 : 1);
+}
 
 export function calcularGanache(
   tipo_chocolate: TipoChocolate,
@@ -730,9 +739,7 @@ export function calcularGanache(
   const chocolate_g = Math.round(total_g * ratio / (ratio + 1));
   const nata_g = total_g - chocolate_g;
 
-  const ratioSimplificado = ratio === Math.floor(ratio)
-    ? `${ratio}:1`
-    : `${ratio}:1`;
+  const r = ratioEspanol(ratio);
 
   return {
     tipo_chocolate,
@@ -741,7 +748,7 @@ export function calcularGanache(
     chocolate_g,
     nata_g,
     total_g,
-    ratio_texto: `Chocolate:Nata = ${ratioSimplificado} (${ratio} partes chocolate : 1 parte nata)`,
+    ratio_texto: `Chocolate:Nata = ${r}:1 (${r} partes chocolate : 1 parte nata)`,
     temperatura_trabajo_c: TEMPERATURA_TRABAJO[textura],
     usos: USOS_GANACHE[textura],
   };

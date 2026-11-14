@@ -38,7 +38,12 @@ import { comprobarFaqPageUnico } from './_faqpage-unico';
  *     «250,5» → 250,5 g (137 g / 113,5 g) o un aviso; nunca 2505 g
  *     «-100» y «1e3» → aviso; nunca 100 g ni 13 g
  *
- * HALLAZGOS del 14/11/2026 (ABIERTOS: sus tests afirman lo correcto y llevan test.fail())
+ * REPARADOS en /reparar el 14/11/2026: A (4597), B (4598), C (4599), D (4600), E (4601), G (4603),
+ * H (4604) e I (4605). El campo es de texto y se lee con parseSpanishNumber; fuera de [50, 5000]
+ * o ilegible, aviso y ninguna cifra. Los rangos de cacao pasan a 70–99 / 55–69 / 40–54 / 28–39.
+ * SIGUE ABIERTO F (4602, marcas): corregir o retirar las marcas lo decide el usuario.
+ *
+ * HALLAZGOS del 14/11/2026 (los abiertos llevan test.fail())
  *   A. La cantidad se lee borrando todo lo que no es cifra: «250,5» → 2505 g, «-100» → 100 g,
  *      «1e3» → 13 g.
  *   B. Sin validación de rango: 0 g da proporciones para 200 g, 30 g y 12000 g se calculan sin aviso.
@@ -229,127 +234,145 @@ test.describe('calculadora-ganache — Inspector 14/11/2026', () => {
     expect([c.chocolate, c.nata, c.total]).toEqual(['200 g', '100 g', '300 g']);
   });
 
-  // HALLAZGO (14/11/2026, ABIERTO) — B: parseInt(…) || 200 convierte el 0 en 200 g sin aviso.
-  test('CASO 2 · 0 g no da las proporciones de 200 g', async ({ page }) => {
-    test.fail();
+  // HALLAZGO 4598 (14/11/2026, REPARADO) — B: parseInt(…) || 200 convertía el 0 en 200 g sin aviso.
+  test('CASO 2 · 0 g no da las proporciones de 200 g: avisa', async ({ page }) => {
     await elegir(page, 'blanco', 'firme');
     await escribir(page, '0');
     await pulsarCalcular(page);
-    // Obtenido el 14/11/2026: «Proporciones para 200 g de ganache», 167 g / 33 g, con un 0 en el campo
+    // Antes: «Proporciones para 200 g de ganache», 167 g / 33 g, con un 0 en el campo
+    await expect(zonaResultado(page)).toContainText('Escribe una cantidad válida en gramos');
     await expect(page.getByText('Proporciones para 200 g de ganache')).toHaveCount(0);
+    await expect(page.locator(INPUT)).toHaveAttribute('aria-invalid', 'true');
   });
 
-  // HALLAZGO (14/11/2026, ABIERTO) — B: el campo dice «mínimo 50 g» (min=50, max=5000) y nadie lo aplica.
-  test('CASO 2 · fuera del rango declarado (30 g, 12000 g) no se calcula sin aviso', async ({ page }) => {
-    test.fail();
+  // HALLAZGO 4598 (14/11/2026, REPARADO) — B: el campo decía «mínimo 50 g» (min=50, max=5000) y nadie lo aplicaba.
+  test('CASO 2 · fuera del rango declarado (30 g, 12000 g) avisa y no calcula', async ({ page }) => {
     await elegir(page, 'blanco', 'firme');
     await escribir(page, '30');
     await pulsarCalcular(page);
-    // Obtenido el 14/11/2026: «Proporciones para 30 g de ganache», 25 g / 5 g
+    // Antes: «Proporciones para 30 g de ganache», 25 g / 5 g
+    await expect(zonaResultado(page)).toContainText('La cantidad tiene que estar entre 50 y 5000 g.');
     await expect(page.getByText('Proporciones para 30 g de ganache')).toHaveCount(0);
     await escribir(page, '12000');
     await pulsarCalcular(page);
-    // Obtenido el 14/11/2026: «Proporciones para 12000 g de ganache», 10000 g / 2000 g
+    // Antes: «Proporciones para 12000 g de ganache», 10000 g / 2000 g
+    await expect(zonaResultado(page)).toContainText('La cantidad tiene que estar entre 50 y 5000 g.');
     await expect(page.getByText('Proporciones para 12000 g de ganache')).toHaveCount(0);
   });
 
   // ── CASO 3 · rechazo y lectura en español ─────────────────────────────────
   test('CASO 3 · «1.500» tecleado se lee mil quinientos: 818 g y 682 g', async ({ page }) => {
-    // 1500 × 1,2 / 2,2 = 818,18 → 818; nata 682 (sale bien porque el punto se borra)
+    // 1500 × 1,2 / 2,2 = 818,18 → 818; nata 682. Desde el 14/11/2026 el campo conserva lo
+    // tecleado («1.500») y lo lee parseSpanishNumber.
     await elegir(page, 'negro', 'glaseado');
     await teclear(page, '1.500');
-    await esperarValorEnReact(page, INPUT, '1500');
+    await esperarValorEnReact(page, INPUT, '1.500');
     await pulsarCalcular(page);
     const c = await leerCifras(page);
     expect([c.chocolate, c.nata, c.total]).toEqual(['818 g', '682 g', '1500 g']);
   });
 
-  // HALLAZGO (14/11/2026, ABIERTO) — A: replace(/[^0-9]/g, '') borra la coma decimal.
-  test('CASO 3 · «250,5» no se convierte en 2505 g', async ({ page }) => {
-    test.fail();
+  // HALLAZGO 4597 (14/11/2026, REPARADO) — A: replace(/[^0-9]/g, '') borraba la coma decimal.
+  test('CASO 3 · «250,5» se lee 250,5 g, no 2505 g', async ({ page }) => {
     await elegir(page, 'negro', 'glaseado');
     await teclear(page, '250,5');
     await pulsarCalcular(page);
-    // Esperado: 250,5 g (137 g / 113,5 g) o un aviso. Obtenido el 14/11/2026: el campo pasa a
-    // «2505» y sale «Proporciones para 2505 g de ganache», 1366 g / 1139 g
-    await expect(page.getByText('Proporciones para 2505 g de ganache')).toHaveCount(0);
+    // 250,5 × 1,2 / 2,2 = 136,64 → 137 g; nata 250,5 − 137 = 113,5 g. Antes: el campo pasaba a
+    // «2505» y salía «Proporciones para 2505 g de ganache», 1366 g / 1139 g
+    const c = await leerCifras(page);
+    expect(c.titulo).toBe('Proporciones para 250,5 g de ganache');
+    expect([c.chocolate, c.nata, c.total]).toEqual(['137 g', '113,5 g', '250,5 g']);
   });
 
-  // HALLAZGO (14/11/2026, ABIERTO) — A: el signo menos se borra y «-100» se calcula como 100 g.
-  test('CASO 3 · «-100» se rechaza en vez de calcularse como 100 g', async ({ page }) => {
-    test.fail();
+  // HALLAZGO 4597 (14/11/2026, REPARADO) — A: el signo menos se borraba y «-100» se calculaba como 100 g.
+  test('CASO 3 · «-100» se rechaza con aviso en vez de calcularse como 100 g', async ({ page }) => {
     await elegir(page, 'negro', 'glaseado');
     await teclear(page, '-100');
     await pulsarCalcular(page);
-    // Obtenido el 14/11/2026: «Proporciones para 100 g de ganache», 55 g / 45 g
+    // Antes: «Proporciones para 100 g de ganache», 55 g / 45 g
+    await expect(zonaResultado(page)).toContainText('Escribe una cantidad válida en gramos');
     await expect(page.getByText('Proporciones para 100 g de ganache')).toHaveCount(0);
   });
 
-  // HALLAZGO (14/11/2026, ABIERTO) — A: «1e3» (mil para el input numérico) pierde la «e» y queda en 13.
-  test('CASO 3 · «1e3» no se convierte en 13 g', async ({ page }) => {
-    test.fail();
+  // HALLAZGO 4597 (14/11/2026, REPARADO) — A: «1e3» perdía la «e» y quedaba en 13.
+  test('CASO 3 · «1e3» se rechaza con aviso, no se convierte en 13 g', async ({ page }) => {
     await elegir(page, 'negro', 'glaseado');
     await teclear(page, '1e3');
     await pulsarCalcular(page);
-    // Obtenido el 14/11/2026: «Proporciones para 13 g de ganache», 7 g / 6 g
+    // Antes: «Proporciones para 13 g de ganache», 7 g / 6 g
+    await expect(zonaResultado(page)).toContainText('Escribe una cantidad válida en gramos');
     await expect(page.getByText('Proporciones para 13 g de ganache')).toHaveCount(0);
   });
 
   // ── Formato español ────────────────────────────────────────────────────────
-  // HALLAZGO (14/11/2026, ABIERTO) — E: ratio_texto interpola el número de JS («2.2»).
+  // HALLAZGO 4601 (14/11/2026, REPARADO) — E: ratio_texto interpolaba el número de JS («2.2»).
   test('Formato · el ratio del resultado lleva coma decimal («2,2:1»)', async ({ page }) => {
-    test.fail();
     await pulsarCalcular(page);
-    // Obtenido el 14/11/2026: «Chocolate:Nata = 2.2:1 (2.2 partes chocolate : 1 parte nata)»
-    await expect(zonaResultado(page)).toContainText('2,2:1');
+    // Antes: «Chocolate:Nata = 2.2:1 (2.2 partes chocolate : 1 parte nata)»
+    await expect(zonaResultado(page)).toContainText('Chocolate:Nata = 2,2:1 (2,2 partes chocolate : 1 parte nata)');
     await expect(zonaResultado(page)).not.toContainText('2.2');
   });
 
-  // HALLAZGO (14/11/2026, ABIERTO) — E: «%» pegado a la cifra (CLAUDE.md global §2, 25/09/2026).
-  test('Formato · el porcentaje de cacao va con espacio duro («55–70 % cacao»)', async ({ page }) => {
-    test.fail();
+  // HALLAZGO 4601 (14/11/2026, REPARADO) — E: «%» pegado a la cifra (CLAUDE.md global §2, 25/09/2026)
+  // y «109g» sin espacio en la tabla. El rango del Negro es 55–69 desde el hallazgo 4600.
+  test('Formato · el porcentaje de cacao va con espacio duro y la tabla separa la «g»', async ({ page }) => {
     await pulsarCalcular(page);
     const c = await leerCifras(page);
-    // Obtenido el 14/11/2026: «55–70% cacao»
-    expect(c.cacao).toBe('55–70 % cacao');
+    // Antes: «55–70% cacao»
+    expect(c.cacao).toBe('55–69 % cacao');
+    await expect(zonaResultado(page)).toContainText('Nata (35 % m.g.)');
+    // Antes: «109g / 91g»
+    await expect(page.getByRole('table').first().locator('tbody tr').nth(1).locator('td').nth(1))
+      .toHaveText('109 g / 91 g');
   });
 
   // ── Contenido ──────────────────────────────────────────────────────────────
-  // HALLAZGO (14/11/2026, ABIERTO) — C: el FAQPage pregunta cinco cosas que la página no muestra.
+  // HALLAZGO 4599 (14/11/2026, REPARADO) — C: el FAQPage preguntaba cinco cosas que la página no mostraba.
   test('FAQPage · un solo bloque y sus preguntas están en la página', async ({ page }) => {
-    test.fail();
     await comprobarFaqPageUnico(page);
   });
 
-  // HALLAZGO (14/11/2026, ABIERTO) — C: el FAQPage da otras cifras que el motor.
+  // HALLAZGO 4599 (14/11/2026, REPARADO) — C: el FAQPage daba otras cifras que el motor.
   test('FAQPage · los ratios y la temperatura de la trufa cuadran con el motor', async ({ page }) => {
-    test.fail();
-    // Motor: Con Leche 2 / 3 / 4 y Blanco 3 / 4 / 5; ninguno de los dos usa 2,5:1.
-    // Obtenido el 14/11/2026: «…ratios de 2,5:1 o incluso 3:1 para lograr la misma textura».
+    // Motor: Negro 1,2 / 2,2 / 3, Con Leche 2 / 3 / 4 y Blanco 3 / 4 / 5.
+    // Antes: «…ratios de 2,5:1 o incluso 3:1 para lograr la misma textura».
     const proporcion = await respuestaFaq(page, /proporción/i);
     expect(proporcion).not.toContain('2,5:1');
-    // Motor (textura trufa): «Refrigerar 2–4h. Trabajar a 17–20°C para bolear las trufas».
-    // Obtenido el 14/11/2026: «…se deja enfriar a temperatura ambiente … (unos 25–28 °C)».
+    expect(proporcion).toContain('1,2:1 para glaseado, 2,2:1 para trufa');
+    expect(proporcion).toContain('blanco, 3:1, 4:1 y 5:1');
+    // Motor (textura trufa): «Refrigerar 2–4 h. Trabajar a 17–20 °C para bolear las trufas».
+    // Antes: «…se deja enfriar a temperatura ambiente … (unos 25–28 °C)».
     const temperatura = await respuestaFaq(page, /temperatura/i);
     expect(temperatura).toContain('17–20');
+    expect(temperatura).not.toContain('25–28');
   });
 
-  // HALLAZGO (14/11/2026, ABIERTO) — D: el escenario de trufas no usa el ratio del motor para «Negro».
+  // HALLAZGO 4600 (14/11/2026, REPARADO) — D: el escenario de trufas no usaba el ratio del motor para «Negro».
   test('Educativo · las trufas de chocolate negro llevan el ratio que calcula la app', async ({ page }) => {
-    test.fail();
     // La app, Negro + Trufa, 600 g: 600 × 2,2 / 3,2 = 412,5 → 413 g y 187 g (ratio 2,2:1)
     await elegir(page, 'negro', 'trufa');
     await escribir(page, '600');
     await pulsarCalcular(page);
     const c = await leerCifras(page);
     expect([c.chocolate, c.nata]).toEqual(['413 g', '187 g']);
-    // Obtenido el 14/11/2026: «Ratio recomendado: 2:1 (negro) — 400g chocolate / 200g nata»
-    expect(await textoDelCuerpo(page)).not.toContain('Ratio recomendado: 2:1 (negro)');
+    // Antes: «Ratio recomendado: 2:1 (negro) — 400g chocolate / 200g nata»
+    const cuerpo = await textoDelCuerpo(page);
+    expect(cuerpo).not.toContain('Ratio recomendado: 2:1 (negro)');
+    // textoDelCuerpo normaliza los espacios, también el duro
+    expect(cuerpo).toContain('con negro, 2,2:1 (413 g de chocolate y 187 g de nata)');
   });
 
-  // HALLAZGO (14/11/2026, ABIERTO) — D: 70 % cae en «Negro Extra 70–99%» y en «Negro 55–70%».
+  // HALLAZGO 4600 (14/11/2026, REPARADO) — D: las tarjetas de textura no decían que sus ratios son del negro.
+  test('Educativo · las tarjetas de textura dicen que sus ratios son del chocolate negro', async ({ page }) => {
+    // Antes: «Ratio 1:1 a 2:1» (glaseado) y «Ratio 3:1 o superior» (firme): el glaseado de blanco
+    // que calcula la app (3:1) caía en «Firme».
+    const cuerpo = await textoDelCuerpo(page);
+    expect(cuerpo).toContain('Con chocolate negro, ratio 1:1 a 1,5:1 según el cacao (con leche 2:1, blanco 3:1)');
+    expect(cuerpo).not.toContain('Ratio 3:1 o superior');
+  });
+
+  // HALLAZGO 4600 (14/11/2026, REPARADO) — D: 70 % caía en «Negro Extra 70–99%» y en «Negro 55–70%».
   test('Educativo · los rangos de cacao de los tipos no se solapan', async ({ page }) => {
-    test.fail();
     const rango = async (tipo: Tipo): Promise<[number, number]> => {
       const nombre = (await page.getByRole('button', { name: BOTON_TIPO[tipo] }).textContent()) ?? '';
       const m = nombre.match(/(\d+)–(\d+)/);
@@ -360,7 +383,7 @@ test.describe('calculadora-ganache — Inspector 14/11/2026', () => {
     const negro = await rango('negro');
     const semi = await rango('semi_fondant');
     const leche = await rango('con_leche');
-    // Obtenido el 14/11/2026: 70–99 / 55–70 / 40–55 / 28–40 → 70, 55 y 40 en dos tipos cada uno
+    // Antes: 70–99 / 55–70 / 40–55 / 28–40 → 70, 55 y 40 en dos tipos cada uno
     expect(negro[1]).toBeLessThan(extra[0]);
     expect(semi[1]).toBeLessThan(negro[0]);
     expect(leche[1]).toBeLessThan(semi[0]);
@@ -379,29 +402,35 @@ test.describe('calculadora-ganache — Inspector 14/11/2026', () => {
     }
   });
 
-  // HALLAZGO (14/11/2026, ABIERTO) — G: RD 1055/2003, anexo 1.9: el blanco lleva ≥ 20 % de manteca de cacao.
+  // HALLAZGO 4603 (14/11/2026, REPARADO) — G: RD 1055/2003 (BOE-A-2003-15599), anexo 1.9: el blanco
+  // lleva como mínimo un 20 % de manteca de cacao. Lo que no lleva es pasta de cacao.
   test('Dato · el chocolate blanco no se etiqueta como «0% cacao»', async ({ page }) => {
-    test.fail();
     await elegir(page, 'blanco', 'trufa');
     await pulsarCalcular(page);
     const c = await leerCifras(page);
-    // Obtenido el 14/11/2026: «0% cacao (manteca)»
+    // Antes: «0% cacao (manteca)»
     expect(c.cacao).not.toMatch(/^0\s*%/);
+    expect(c.cacao).toBe('sin pasta de cacao · ≥ 20 % de manteca');
   });
 
-  // HALLAZGO (14/11/2026, ABIERTO) — H: vida útil sin fuente (§1.quinquies, cifras sin fuente).
+  // HALLAZGO 4604 (14/11/2026, REPARADO) — H: vida útil sin fuente (§1.quinquies, cifras sin fuente).
   test('Educativo · la vida útil de los bombones no se da sin fuente', async ({ page }) => {
-    test.fail();
-    // Obtenido el 14/11/2026: «Los bombones con relleno de trufa duran 2–3 semanas en nevera bien tapados.»
-    expect(await textoDelCuerpo(page)).not.toContain('duran 2–3 semanas en nevera bien tapados');
+    // Antes: «Los bombones con relleno de trufa duran 2–3 semanas en nevera bien tapados.»
+    const cuerpo = await textoDelCuerpo(page);
+    expect(cuerpo).not.toContain('duran 2–3 semanas en nevera bien tapados');
+    expect(cuerpo).toContain('no hay una cifra que valga para todas las recetas');
   });
 
   // ── Accesibilidad ──────────────────────────────────────────────────────────
-  // HALLAZGO (14/11/2026, ABIERTO) — I: {calculado && <section aria-live>}: la región nace llena.
+  // HALLAZGO 4605 (14/11/2026, REPARADO) — I: {calculado && <section aria-live>}: la región nacía llena.
   test('A11y · la región aria-live existe antes de que llegue el resultado', async ({ page }) => {
-    test.fail();
-    // Obtenido el 14/11/2026: 0 regiones aria-live en <main> antes de calcular, 1 después
-    expect(await page.locator('main [aria-live]').count()).toBeGreaterThan(0);
+    // Antes: 0 regiones aria-live en <main> antes de calcular, 1 después
+    const region = page.locator('main [aria-live]');
+    await expect(region).toHaveCount(1);
+    await expect(region).toHaveAttribute('aria-label', 'Resultado del cálculo');
+    await pulsarCalcular(page);
+    await expect(region).toHaveCount(1);
+    await expect(region).toContainText('Proporciones para 200 g de ganache');
   });
 
   // ── JSON-LD ────────────────────────────────────────────────────────────────

@@ -2229,7 +2229,7 @@ function crearServidorMCP(): McpServer {
     'El ratio se ajusta automáticamente al porcentaje de cacao.',
     {
       tipo_chocolate: z.enum(['negro_extra', 'negro', 'semi_fondant', 'con_leche', 'blanco']).optional()
-        .describe('negro_extra >70% | negro 55-70% | semi_fondant 40-55% | con_leche 28-40% | blanco 0% cacao. Por defecto negro.'),
+        .describe('negro_extra 70-99% | negro 55-69% | semi_fondant 40-54% | con_leche 28-39% | blanco sin pasta de cacao (al menos 20% de manteca). Por defecto negro.'),
       textura: z.enum(['glaseado', 'trufa', 'firme']).optional()
         .describe('glaseado: fluido para tartas/eclairs | trufa: para bolear trufas y rellenar bombones | firme: muy denso para modelar. Por defecto trufa.'),
       total_g: z.number().positive().optional()

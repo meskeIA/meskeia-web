@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { generateWebAppSchema } from '@/lib/schema-templates';
+import { generateWebAppSchema, type FAQItem } from '@/lib/schema-templates';
 
 export const metadata: Metadata = {
   title: 'Calculadora de Ganache — Proporciones de Chocolate y Nata según Textura | meskeIA',
@@ -53,49 +53,39 @@ export const jsonLd = generateWebAppSchema({
   keywords: ['ganache', 'proporciones chocolate', 'nata ganache', 'repostería', 'trufas chocolate'],
 });
 
+// ❓ FAQ — FUENTE ÚNICA: la pinta page.tsx (FAQ visible) y de aquí sale el FAQPage (§1.ter).
+// Hallazgo 4599 (14/11/2026): el FAQPage daba otros ratios y otra temperatura de la trufa que el
+// motor (RATIOS_GANACHE y TEMPERATURA_TRABAJO de lib/calculadoras/cocina.ts) y no se veía en la
+// página. Las cifras de aquí son las del motor: si cambian allí, cambian aquí.
+export const PREGUNTAS_FRECUENTES: FAQItem[] = [
+  {
+    question: '¿Qué es el ganache y para qué se usa en repostería?',
+    answer: 'El ganache es una mezcla emulsionada de chocolate y nata caliente que, según la proporción y el tipo de chocolate, resulta en una textura fluida, cremosa o firme. Se usa como glaseado para tartas, relleno de bombones y trufas, cobertura de pasteles o base para mousses.',
+  },
+  {
+    question: '¿Cuál es la proporción de chocolate y nata para hacer ganache?',
+    answer: 'Depende del chocolate y del uso. Con chocolate negro (55–69 % de cacao), la calculadora usa 1,2:1 para glaseado, 2,2:1 para trufa y 3:1 para firme; con negro extra (70 % o más), 1:1, 2:1 y 3:1. El chocolate con leche y el blanco necesitan más chocolate por cada parte de nata para la misma textura: con leche, 2:1, 3:1 y 4:1; blanco, 3:1, 4:1 y 5:1.',
+  },
+  {
+    question: '¿Por qué el ganache de chocolate blanco necesita más chocolate que el negro?',
+    answer: 'El chocolate blanco no lleva pasta de cacao: se hace con manteca de cacao (al menos un 20 %, según la normativa española), leche y azúcar. Esa composición lo hace más blando a temperatura ambiente y con menor capacidad de cuajar. Para lograr una textura equivalente a la del chocolate negro hay que subir la proporción de chocolate respecto a la nata.',
+  },
+  {
+    question: '¿A qué temperatura se trabaja el ganache según su uso?',
+    answer: 'Para glasear tartas se usa a 30–32 °C, cuando está fluido pero empieza a espesar. Para trufas se refrigera 2–4 horas y se trabaja a 17–20 °C para bolearlas. El ganache firme se refrigera 4–6 horas y se deja unos 5 minutos a temperatura ambiente antes de manipularlo.',
+  },
+  {
+    question: '¿Por qué el ganache se corta o queda grumoso y cómo se arregla?',
+    answer: 'El ganache se corta cuando la emulsión entre la grasa del chocolate y el agua de la nata se rompe, generalmente por una diferencia de temperatura brusca o por un ratio incorrecto. Para recuperarlo, calienta ligeramente la mezcla a 40–45 °C y bate con un batidor de mano o túrmix hasta que vuelva a emulsionar. Añadir una cucharada de nata tibia también puede ayudar.',
+  },
+];
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
-  mainEntity: [
-    {
-      '@type': 'Question',
-      name: '¿Qué es el ganache y para qué se usa en repostería?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'El ganache es una mezcla emulsionada de chocolate y nata caliente que, según la proporción y el tipo de chocolate, resulta en una textura fluida, cremosa o firme. Se usa como glaseado para tartas, relleno de bombones y trufas, cobertura de pasteles o base para mousses.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: '¿Cuál es la proporción de chocolate y nata para hacer ganache?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'Depende del uso. Para un glaseado fluido de chocolate negro, la proporción habitual es 1:1 (igual peso de chocolate y nata). Para trufas más firmes, se sube a 2:1 (el doble de chocolate). El chocolate con leche y el blanco tienen más azúcar y grasa láctea, por lo que necesitan menos nata: ratios de 2,5:1 o incluso 3:1 para lograr la misma textura.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: '¿Por qué el ganache de chocolate blanco necesita más chocolate que el negro?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'El chocolate blanco no contiene sólidos de cacao, sino manteca de cacao, azúcar y leche. Esta composición lo hace más blando a temperatura ambiente y con menor capacidad de gelificar. Para compensar y lograr una textura equivalente a la del chocolate negro, hay que aumentar la proporción de chocolate respecto a la nata.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: '¿A qué temperatura se trabaja el ganache según su uso?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'Para glasear tartas se vierte el ganache entre 30 y 32 °C, cuando está fluido pero empieza a espesar. Para rellenar bombones o picar como trufa se deja enfriar a temperatura ambiente hasta que esté manejable (unos 25–28 °C). Para montar el ganache con varillas es necesario que esté completamente frío, idealmente tras reposar en nevera unas horas.',
-      },
-    },
-    {
-      '@type': 'Question',
-      name: '¿Por qué el ganache se corta o queda grumoso y cómo se arregla?',
-      acceptedAnswer: {
-        '@type': 'Answer',
-        text: 'El ganache se corta cuando la emulsión entre la grasa del chocolate y el agua de la nata se rompe, generalmente por una diferencia de temperatura brusca o por un ratio incorrecto. Para recuperarlo, calienta ligeramente la mezcla a 40–45 °C y bate con un batidor de mano o túrmix hasta que vuelva a emulsionar. Añadir una cucharada de nata tibia también puede ayudar.',
-      },
-    },
-  ],
+  mainEntity: PREGUNTAS_FRECUENTES.map((f) => ({
+    '@type': 'Question',
+    name: f.question,
+    acceptedAnswer: { '@type': 'Answer', text: f.answer },
+  })),
 };

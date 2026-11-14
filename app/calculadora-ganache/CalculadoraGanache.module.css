@@ -214,6 +214,17 @@
   color: var(--text-muted);
 }
 
+/* Aviso de cantidad no válida (hallazgos 4597 y 4598) */
+.avisoCantidad {
+  margin-top: 24px;
+  padding: 14px 18px;
+  border: 2px solid var(--rojo-texto, #f87171);
+  border-radius: 12px;
+  background: var(--bg-card);
+  color: var(--rojo-texto, #f87171);
+  font-weight: 600;
+}
+
 /* Botón calcular */
 .btnCalcular {
   display: block;
