@@ -247,6 +247,14 @@
   line-height: 1.5;
 }
 
+.infoNota {
+  margin-top: var(--spacing-lg);
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  text-align: center;
+  line-height: 1.5;
+}
+
 @media (max-width: 1024px) {
   .mainContent {
     grid-template-columns: 1fr;

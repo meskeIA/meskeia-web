@@ -2,62 +2,115 @@
 
 import { useState, useCallback, useEffect } from 'react';
 import styles from './CalculadoraIVA.module.css';
-import { MeskeiaLogo, Footer, NumberInput, ResultCard, RelatedApps, DisclaimerCard, LegalNotice, EducationalSection, ShareCard } from '@/components';
-import { formatNumber, formatCurrency, parseSpanishNumber } from '@/lib';
+import { MeskeiaLogo, Footer, NumberInput, ResultCard, RelatedApps, DisclaimerCard, DataReference, LegalNotice, EducationalSection, ShareCard, RegionBadge } from '@/components';
+import { formatCurrency, formatNumber, formatTipoNominal, parseSpanishNumber } from '@/lib';
+import {
+  FISCAL_IVA_META,
+  PORCENTAJES_IVA,
+  RECARGO_EQUIVALENCIA,
+  RECARGO_EQUIVALENCIA_TABACO,
+  UMBRAL_OSS,
+} from '@/data/fiscal/iva';
+import { ESCALA_RECARGO_EXTEMPORANEO } from '@/data/fiscal/recargos-sanciones';
+import { PREGUNTAS_FRECUENTES } from './metadata';
 
 type OperationType = 'add' | 'remove';
 
+/**
+ * El resultado guarda el tipo y la operación con los que se calculó: el rótulo de la cuota y el
+ * HTML exportable leen de aquí, no del selector (hallazgo 4633: tras pulsar «10 %» quedaba la
+ * cuota del 21 % bajo el rótulo «Cuota IVA (10 %)»).
+ */
 interface IvaResult {
   baseImponible: number;
   cuotaIva: number;
   total: number;
+  tipo: number;
+  operacion: OperationType;
 }
 
+/** «21 %» con el espacio duro que pide el formato español. */
+const pct = (n: number): string => `${formatTipoNominal(n)} %`;
+
 const IVA_RATES = [
-  { value: 21, label: 'General (21%)', description: 'Tipo general' },
-  { value: 10, label: 'Reducido (10%)', description: 'Alimentación, transporte, hostelería' },
-  { value: 4, label: 'Superreducido (4%)', description: 'Pan, leche, libros, medicamentos' },
+  { value: PORCENTAJES_IVA.general, nombre: 'General', description: 'Tipo general' },
+  { value: PORCENTAJES_IVA.reducido, nombre: 'Reducido', description: 'Alimentación, transporte, hostelería' },
+  { value: PORCENTAJES_IVA.superreducido, nombre: 'Superreducido', description: 'Pan, leche, libros, medicamentos' },
 ];
+
+const RECARGOS_TEXTO = RECARGO_EQUIVALENCIA.map((r) => `+${pct(r.recargo)}`).join(' / ');
+
+const E = ESCALA_RECARGO_EXTEMPORANEO;
+const RECARGO_TARDIO_TEXTO = `si lo presentas tarde sin requerimiento, recargo del ${pct(E.porcentajeBase)} más otro ${pct(E.porcentajePorMes)} por cada mes completo de retraso; pasados ${E.mesesEscalaProporcional} meses, del ${pct(E.porcentajeMas12Meses)} más intereses de demora`;
+
+/** Redondeo al entero limpiando antes el error de coma flotante (312,4999… de 3,25 / 1,04 → 313). */
+function redondear(x: number): number {
+  return Math.round(Number(x.toPrecision(12)));
+}
+
+/**
+ * Desglose al céntimo, en céntimos enteros. Al quitar el IVA se redondea primero la base y la
+ * cuota es la diferencia, para que base + cuota sumen el total (hallazgo 4634: 3,25 € al 4 %
+ * daba 3,13 € + 0,13 €). Al añadirlo, la cuota se redondea y el total es la suma.
+ */
+function desglosar(valor: number, tipo: number, operacion: OperationType): IvaResult {
+  if (operacion === 'add') {
+    const base = redondear(valor * 100);
+    const cuota = redondear((base * tipo) / 100);
+    return { baseImponible: base / 100, cuotaIva: cuota / 100, total: (base + cuota) / 100, tipo, operacion };
+  }
+  const total = redondear(valor * 100);
+  const base = redondear(total / (1 + tipo / 100));
+  return { baseImponible: base / 100, cuotaIva: (total - base) / 100, total: total / 100, tipo, operacion };
+}
+
+const AVISO_IMPORTE = 'Escribe un importe mayor que 0 para calcular el IVA.';
 
 export default function CalculadoraIvaPage() {
   const [cantidad, setCantidad] = useState('');
-  const [tipoIva, setTipoIva] = useState(21);
+  const [tipoIva, setTipoIva] = useState<number>(PORCENTAJES_IVA.general);
   const [operacion, setOperacion] = useState<OperationType>('add');
   const [resultado, setResultado] = useState<IvaResult | null>(null);
+  const [error, setError] = useState('');
 
   // Estados para HTML code
   const [htmlCode, setHtmlCode] = useState<string>('');
   const [htmlExpanded, setHtmlExpanded] = useState(false);
 
-  const calcular = () => {
-    const valor = parseSpanishNumber(cantidad);
+  const recalcular = (texto: string, tipo: number, op: OperationType, avisar: boolean) => {
+    const valor = parseSpanishNumber(texto);
     if (isNaN(valor) || valor <= 0) {
       setResultado(null);
+      setError(avisar ? AVISO_IMPORTE : '');
       return;
     }
+    setError('');
+    setResultado(desglosar(valor, tipo, op));
+  };
 
-    let baseImponible: number;
-    let cuotaIva: number;
-    let total: number;
+  const calcular = () => recalcular(cantidad, tipoIva, operacion, true);
 
-    if (operacion === 'add') {
-      // Añadir IVA: el valor es la base imponible
-      baseImponible = valor;
-      cuotaIva = valor * (tipoIva / 100);
-      total = baseImponible + cuotaIva;
-    } else {
-      // Quitar IVA: el valor es el total con IVA
-      total = valor;
-      baseImponible = valor / (1 + tipoIva / 100);
-      cuotaIva = total - baseImponible;
-    }
+  // Cambiar el tipo o la operación con un resultado a la vista lo recalcula: nunca se queda una
+  // cifra de otro tipo bajo el rótulo nuevo (hallazgo 4633).
+  const elegirTipo = (tipo: number) => {
+    setTipoIva(tipo);
+    if (resultado) recalcular(cantidad, tipo, operacion, false);
+  };
 
-    setResultado({ baseImponible, cuotaIva, total });
+  const elegirOperacion = (op: OperationType) => {
+    setOperacion(op);
+    if (resultado) recalcular(cantidad, tipoIva, op, false);
+  };
+
+  const cambiarCantidad = (texto: string) => {
+    setCantidad(texto);
+    if (error) setError('');
   };
 
   const limpiar = () => {
     setCantidad('');
     setResultado(null);
+    setError('');
   };
 
   // Generar código HTML exportable
@@ -67,12 +120,13 @@ export default function CalculadoraIvaPage() {
       return;
     }
 
-    const tipoOperacion = operacion === 'add' ? 'Añadir' : 'Quitar';
-    const tipoIvaTexto = IVA_RATES.find(r => r.value === tipoIva)?.label || `${tipoIva}%`;
+    const tipoOperacion = resultado.operacion === 'add' ? 'Añadir' : 'Quitar';
+    const rate = IVA_RATES.find(r => r.value === resultado.tipo);
+    const tipoIvaTexto = rate ? `${rate.nombre} (${pct(rate.value)})` : pct(resultado.tipo);
 
     let codigo = '<!-- Cálculo de IVA generado con meskeIA -->\n\n';
     codigo += '<div class="calculadora-iva">\n';
-    codigo += `  <h3>Resultado del cálculo (${tipoOperacion} IVA ${tipoIva}%)</h3>\n\n`;
+    codigo += `  <h3>Resultado del cálculo (${tipoOperacion} IVA ${pct(resultado.tipo)})</h3>\n\n`;
     codigo += '  <table>\n';
     codigo += '    <thead>\n';
     codigo += '      <tr>\n';
@@ -106,7 +160,7 @@ export default function CalculadoraIvaPage() {
     codigo += '</div>';
 
     setHtmlCode(codigo);
-  }, [resultado, operacion, tipoIva]);
+  }, [resultado]);
 
   // Auto-generar HTML cuando cambia el resultado
   useEffect(() => {
@@ -125,9 +179,11 @@ export default function CalculadoraIvaPage() {
       <header className={styles.hero}>
         <h1 className={styles.title}>Calculadora de IVA</h1>
         <p className={styles.subtitle}>
-          Calcula el IVA español al 21%, 10% o 4%. Añade o quita IVA al instante.
+          Calcula el IVA español al {pct(PORCENTAJES_IVA.general)}, {pct(PORCENTAJES_IVA.reducido)} o {pct(PORCENTAJES_IVA.superreducido)}. Añade o quita IVA al instante.
         </p>
       </header>
+
+      <RegionBadge variant="es-only" />
 
       <LegalNotice lastUpdated="2026-02-02" />
 
@@ -137,14 +193,16 @@ export default function CalculadoraIvaPage() {
             <button
               type="button"
               className={`${styles.toggleBtn} ${operacion === 'add' ? styles.active : ''}`}
-              onClick={() => setOperacion('add')}
+              aria-pressed={operacion === 'add'}
+              onClick={() => elegirOperacion('add')}
             >
               + Añadir IVA
             </button>
             <button
               type="button"
               className={`${styles.toggleBtn} ${operacion === 'remove' ? styles.active : ''}`}
-              onClick={() => setOperacion('remove')}
+              aria-pressed={operacion === 'remove'}
+              onClick={() => elegirOperacion('remove')}
             >
               − Quitar IVA
             </button>
@@ -152,24 +210,27 @@ export default function CalculadoraIvaPage() {
 
           <NumberInput
             value={cantidad}
-            onChange={setCantidad}
+            onChange={cambiarCantidad}
             label={operacion === 'add' ? 'Base imponible (sin IVA)' : 'Precio con IVA incluido'}
             placeholder="100"
             helperText="Introduce el importe en euros"
+            error={error || undefined}
             min={0}
+            acotarAlSalir={false}
           />
 
           <div className={styles.ivaSelector}>
-            <label id="tipo-iva-label" className={styles.label}>Tipo de IVA</label>
+            <span id="tipo-iva-label" className={styles.label}>Tipo de IVA</span>
             <div role="group" aria-labelledby="tipo-iva-label" className={styles.ivaOptions}>
               {IVA_RATES.map((rate) => (
                 <button
                   type="button"
                   key={rate.value}
                   className={`${styles.ivaBtn} ${tipoIva === rate.value ? styles.active : ''}`}
-                  onClick={() => setTipoIva(rate.value)}
+                  aria-pressed={tipoIva === rate.value}
+                  onClick={() => elegirTipo(rate.value)}
                 >
-                  <span className={styles.ivaPercent}>{rate.value}%</span>
+                  <span className={styles.ivaPercent}>{pct(rate.value)}</span>
                   <span className={styles.ivaDesc}>{rate.description}</span>
                 </button>
               ))}
@@ -186,7 +247,8 @@ export default function CalculadoraIvaPage() {
           </div>
         </div>
 
-        <div className={styles.resultsPanel}>
+        {/* Región viva montada desde la carga: al calcular, el lector anuncia el desglose (hallazgo 4641). */}
+        <div className={styles.resultsPanel} role="status" aria-live="polite">
           {resultado ? (
             <>
               <ResultCard
@@ -197,7 +259,7 @@ export default function CalculadoraIvaPage() {
                 description="Importe sin IVA"
               />
               <ResultCard
-                title={`Cuota IVA (${tipoIva}%)`}
+                title={`Cuota IVA (${pct(resultado.tipo)})`}
                 value={formatCurrency(resultado.cuotaIva)}
                 variant="info"
                 icon="📊"
@@ -213,7 +275,7 @@ export default function CalculadoraIvaPage() {
             </>
           ) : (
             <div className={styles.placeholder}>
-              <span className={styles.placeholderIcon}>🧮</span>
+              <span className={styles.placeholderIcon} aria-hidden="true">🧮</span>
               <p>Introduce un importe y pulsa &quot;Calcular IVA&quot;</p>
             </div>
           )}
@@ -224,18 +286,21 @@ export default function CalculadoraIvaPage() {
         <h2>Tipos de IVA en España (2026)</h2>
         <div className={styles.infoGrid}>
           <div className={styles.infoCard}>
-            <h3>21% - General</h3>
+            <h3>{pct(PORCENTAJES_IVA.general)} - General</h3>
             <p>Electrónica, ropa, servicios profesionales, combustible, automóviles...</p>
           </div>
           <div className={styles.infoCard}>
-            <h3>10% - Reducido</h3>
+            <h3>{pct(PORCENTAJES_IVA.reducido)} - Reducido</h3>
             <p>Alimentación (excepto básicos), transporte, hostelería, espectáculos, vivienda nueva...</p>
           </div>
           <div className={styles.infoCard}>
-            <h3>4% - Superreducido</h3>
-            <p>Pan, leche, huevos, frutas, verduras, libros, medicamentos, prótesis...</p>
+            <h3>{pct(PORCENTAJES_IVA.superreducido)} - Superreducido</h3>
+            <p>Pan, leche, huevos, frutas, verduras, aceite de oliva, libros, medicamentos, prótesis...</p>
           </div>
         </div>
+        <p className={styles.infoNota}>
+          Estos tipos rigen en la Península y Baleares. En Canarias se aplica el IGIC, y en Ceuta y Melilla el IPSI: allí no se aplica el IVA (art. 3 de la Ley 37/1992).
+        </p>
       </section>
 
       <DisclaimerCard
@@ -243,6 +308,13 @@ export default function CalculadoraIvaPage() {
         severity="critical"
         context="calculadora-iva"
         collapsible={false}
+      />
+      <DataReference
+        normativa="Tipos de IVA (Ley 37/1992)"
+        fuente={FISCAL_IVA_META.fuente}
+        verificado={FISCAL_IVA_META.verificado}
+        urlOficial={FISCAL_IVA_META.urlOficial}
+        nota={FISCAL_IVA_META.nota}
       />
 
       {/* ========== SECCIÓN 1: HTML CODE EXPORTABLE ========== */}
@@ -303,31 +375,31 @@ export default function CalculadoraIvaPage() {
               <tbody>
                 <tr>
                   <td><strong>Tipo superreducido</strong></td>
-                  <td>4%</td>
+                  <td>{pct(PORCENTAJES_IVA.superreducido)}</td>
                   <td>Bienes de primera necesidad</td>
-                  <td>Pan, leche, frutas, verduras, libros, medicamentos, vivienda VPO</td>
+                  <td>Pan, leche, frutas, verduras, aceite de oliva, libros, medicamentos, vivienda VPO</td>
                 </tr>
                 <tr>
                   <td><strong>Tipo reducido</strong></td>
-                  <td>10%</td>
+                  <td>{pct(PORCENTAJES_IVA.reducido)}</td>
                   <td>Bienes básicos y servicios esenciales</td>
                   <td>Hostelería, transporte, entradas eventos, flores, obras en vivienda habitual</td>
                 </tr>
                 <tr>
                   <td><strong>Tipo general</strong></td>
-                  <td>21%</td>
+                  <td>{pct(PORCENTAJES_IVA.general)}</td>
                   <td>Resto de bienes y servicios</td>
                   <td>Electrónica, ropa, servicios profesionales, vehículos, telecomunicaciones</td>
                 </tr>
                 <tr>
                   <td><strong>Exento de IVA</strong></td>
-                  <td>0%</td>
+                  <td>Sin IVA</td>
                   <td>Actividades específicas exentas</td>
                   <td>Servicios médicos, seguros, educación reglada, alquiler de vivienda habitual</td>
                 </tr>
                 <tr>
                   <td><strong>Recargo equivalencia</strong></td>
-                  <td>+0,5% / +1,4% / +5,2%</td>
+                  <td>{RECARGOS_TEXTO} (tabaco: +{pct(RECARGO_EQUIVALENCIA_TABACO)})</td>
                   <td>Comerciantes minoristas personas físicas</td>
                   <td>Tiendas al por menor (autónomos en RE no gestionan IVA propio)</td>
                 </tr>
@@ -345,8 +417,8 @@ export default function CalculadoraIvaPage() {
                 <span className={styles.escenarioIcon} aria-hidden="true">💻</span>
                 <strong>Freelance con clientes en España</strong>
               </div>
-              <p className={styles.escenarioExample}>Factura diseño web a empresa española: base 2.000 € + 21% IVA = 2.420 €. Presenta el IVA cobrado (repercutido) menos el IVA pagado en compras (soportado) en el modelo 303 trimestral.</p>
-              <span className={styles.escenarioTip}>IVA general 21% + modelo 303</span>
+              <p className={styles.escenarioExample}>Factura diseño web a empresa española: base 2.000 € + {pct(PORCENTAJES_IVA.general)} IVA = 2.420 €. Presenta el IVA cobrado (repercutido) menos el IVA pagado en compras (soportado) en el modelo 303 trimestral.</p>
+              <span className={styles.escenarioTip}>IVA general {pct(PORCENTAJES_IVA.general)} + modelo 303</span>
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
@@ -354,79 +426,56 @@ export default function CalculadoraIvaPage() {
                 <strong>Freelance con clientes en la UE</strong>
               </div>
               <p className={styles.escenarioExample}>Si el cliente UE tiene NIF intracomunitario, la factura va sin IVA (inversión del sujeto pasivo). Si es particular sin NIF, aplica el IVA del país de destino (OSS). Requiere registro previo.</p>
-              <span className={styles.escenarioTip}>Factura 0% IVA + NIF UE cliente</span>
+              <span className={styles.escenarioTip}>Factura sin IVA + NIF UE cliente</span>
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
                 <span className={styles.escenarioIcon} aria-hidden="true">🏪</span>
                 <strong>Restaurante o bar (hostelería)</strong>
               </div>
-              <p className={styles.escenarioExample}>Comida en local: 10% IVA. Bebidas alcohólicas: 21% IVA. Comida para llevar: 10%. El ticket debe desglosar IVA por tipo. El IVA soportado en compras (alimentos, suministros) lo pueden deducir.</p>
-              <span className={styles.escenarioTip}>Hostelería: 10% + 21% en alcohol</span>
+              {/* AEAT, Tipos IVA 2026, art. 91.Uno.2.2.º: «el suministro de comidas y bebidas para
+                  consumir en el acto» al 10 %, también las alcohólicas (hallazgo 4637). El 21 % del
+                  alcohol es el de su entrega como producto (art. 91.Uno.1.1.º). */}
+              <p className={styles.escenarioExample}>Comida y bebida servidas para consumir en el acto, también las bebidas alcohólicas: {pct(PORCENTAJES_IVA.reducido)} (servicio de hostelería). Lo que se vende como producto para llevar va al tipo de cada producto: la comida al {pct(PORCENTAJES_IVA.reducido)} o al {pct(PORCENTAJES_IVA.superreducido)}, y las bebidas alcohólicas y los refrescos azucarados al {pct(PORCENTAJES_IVA.general)}. El ticket debe desglosar el IVA por tipo. El IVA soportado en compras (alimentos, suministros) lo pueden deducir.</p>
+              <span className={styles.escenarioTip}>Hostelería: {pct(PORCENTAJES_IVA.reducido)}, también la bebida servida</span>
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
                 <span className={styles.escenarioIcon} aria-hidden="true">🏠</span>
                 <strong>Alquiler de inmueble</strong>
               </div>
-              <p className={styles.escenarioExample}>Alquiler vivienda habitual: exento de IVA. Alquiler de local comercial u oficina: sujeto a 21% IVA. El arrendador deberá darse de alta como autónomo y presentar modelo 303.</p>
-              <span className={styles.escenarioTip}>Vivienda exento / Local 21% IVA</span>
+              <p className={styles.escenarioExample}>Alquiler vivienda habitual: exento de IVA. Alquiler de local comercial u oficina: sujeto a {pct(PORCENTAJES_IVA.general)} IVA. El arrendador deberá darse de alta como autónomo y presentar modelo 303.</p>
+              <span className={styles.escenarioTip}>Vivienda exento / Local {pct(PORCENTAJES_IVA.general)} IVA</span>
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
                 <span className={styles.escenarioIcon} aria-hidden="true">🛒</span>
                 <strong>E-commerce con ventas a particulares UE</strong>
               </div>
-              <p className={styles.escenarioExample}>Desde julio 2021, si superas 10.000 € en ventas a particulares de la UE, debes aplicar el IVA del país del comprador. El sistema OSS (One-Stop-Shop) simplifica la declaración desde España.</p>
-              <span className={styles.escenarioTip}>OSS si ventas UE &gt; 10.000 €/año</span>
+              <p className={styles.escenarioExample}>Desde julio 2021, si superas {formatNumber(UMBRAL_OSS.importe, 0)} € en ventas a particulares de la UE, debes aplicar el IVA del país del comprador. El sistema OSS (One-Stop-Shop) simplifica la declaración desde España.</p>
+              <span className={styles.escenarioTip}>OSS si ventas UE &gt; {formatNumber(UMBRAL_OSS.importe, 0)} €/año</span>
             </div>
             <div className={styles.escenarioCard}>
               <div className={styles.escenarioHeader}>
                 <span className={styles.escenarioIcon} aria-hidden="true">🔨</span>
                 <strong>Reforma o construcción en vivienda</strong>
               </div>
-              <p className={styles.escenarioExample}>Obras de reforma en vivienda habitual: 10% IVA si son obras de renovación/reparación. Obra nueva o primera entrega de edificios: 10% (vivienda) o 4% (VPO). Importante distinguir el tipo de obra para no aplicar mal el 21%.</p>
-              <span className={styles.escenarioTip}>Reforma vivienda habitual: 10%</span>
+              <p className={styles.escenarioExample}>Obras de reforma en vivienda habitual: {pct(PORCENTAJES_IVA.reducido)} IVA si son obras de renovación/reparación. Obra nueva o primera entrega de edificios: {pct(PORCENTAJES_IVA.reducido)} (vivienda) o {pct(PORCENTAJES_IVA.superreducido)} (VPO). Importante distinguir el tipo de obra para no aplicar mal el {pct(PORCENTAJES_IVA.general)}.</p>
+              <span className={styles.escenarioTip}>Reforma vivienda habitual: {pct(PORCENTAJES_IVA.reducido)}</span>
             </div>
           </div>
         </section>
 
-        {/* FAQ */}
+        {/* FAQ — sale de PREGUNTAS_FRECUENTES, la misma constante que alimenta el FAQPage (hallazgo 4644). */}
         <section className={styles.eduFaq}>
           <h2>Preguntas frecuentes sobre el IVA</h2>
           <div className={styles.faqList}>
-            <div className={styles.faqItem}>
-              <h4>¿Tengo que cobrar IVA si soy autónomo?</h4>
-              <p>Depende de tu actividad. La mayoría de autónomos deben cobrar IVA (21%, 10% o 4% según el servicio). Hay actividades exentas: médicos, profesores, seguros, arrendamiento de vivienda. Si estás exento, no cobras ni deduces IVA.</p>
-            </div>
-            <div className={styles.faqItem}>
-              <h4>¿Qué diferencia hay entre IVA repercutido y soportado?</h4>
-              <p>IVA repercutido: el que cobras tú a tus clientes en tus facturas (lo debes ingresar a Hacienda). IVA soportado: el que pagas tú a tus proveedores en tus compras (lo puedes deducir). En el modelo 303 pagas la diferencia: repercutido - soportado.</p>
-            </div>
-            <div className={styles.faqItem}>
-              <h4>¿Cuándo se presenta el modelo 303?</h4>
-              <p>Trimestralmente: 1T (1-20 abril), 2T (1-20 julio), 3T (1-20 octubre), 4T (1-30 enero del año siguiente). También hay una declaración resumen anual con el modelo 390 (hasta 30 de enero). Grandes empresas presentan mensualmente.</p>
-            </div>
-            <div className={styles.faqItem}>
-              <h4>¿Qué es el recargo de equivalencia y a quién afecta?</h4>
-              <p>Es un régimen especial para comerciantes minoristas personas físicas que venden a consumidores finales (no a empresas). No gestionan el IVA ellos mismos: su proveedor les repercute el IVA normal más el recargo. A cambio no presentan modelo 303.</p>
-            </div>
-            <div className={styles.faqItem}>
-              <h4>¿Puedo deducir el IVA de cualquier gasto?</h4>
-              <p>Solo el IVA de gastos afectos a tu actividad económica. No puedes deducir el IVA de gastos personales, de vehículos que no sean 100% profesionales (la norma general es 50% deducible), ni de facturas sin tus datos o con datos incorrectos.</p>
-            </div>
-            <div className={styles.faqItem}>
-              <h4>¿Qué pasa si no cobro IVA cuando debería?</h4>
-              <p>Hacienda puede considerar que el IVA estaba incluido en el precio y reclamarte la parte proporcional. Tendrás que ingresarlo de tu bolsillo. Además, puede imponerte recargos e intereses. Siempre es mejor facturar correctamente desde el inicio.</p>
-            </div>
-            <div className={styles.faqItem}>
-              <h4>¿Cómo funciona el IVA en facturas a clientes fuera de España?</h4>
-              <p>Clientes en la UE con NIF intracomunitario (empresa o autónomo): factura sin IVA, el cliente lo autorepercute. Clientes particulares UE sin NIF: IVA del país destino (sistema OSS). Clientes fuera de la UE: factura exenta de IVA (exportación).</p>
-            </div>
-            <div className={styles.faqItem}>
-              <h4>¿El IVA afecta al IRPF?</h4>
-              <p className={styles.faqTip}>No directamente. El IVA es un impuesto de gestión: cobras el de tus clientes y pagas el de tus proveedores; la diferencia va a Hacienda. No es un ingreso ni un gasto propio. El IRPF se calcula sobre la base imponible (sin IVA). Sin embargo, el IVA no deducible (gastos personales) sí es gasto deducible en IRPF.</p>
-            </div>
+            {PREGUNTAS_FRECUENTES.map((f) => (
+              <div key={f.question} className={styles.faqItem}>
+                <h4>{f.question}</h4>
+                <p>{f.answer}</p>
+              </div>
+            ))}
           </div>
         </section>
 
@@ -438,7 +487,7 @@ export default function CalculadoraIvaPage() {
               <span className={styles.stepNumber}>1</span>
               <div className={styles.stepContent}>
                 <strong>Identifica el tipo de IVA de tu actividad</strong>
-                <p>Consulta en la web de la AEAT o con un asesor qué tipo de IVA aplica a tus servicios o productos. La mayoría de servicios profesionales llevan 21%, pero puede haber excepciones según el epígrafe IAE.</p>
+                <p>Consulta en la web de la AEAT o con un asesor qué tipo de IVA aplica a tus servicios o productos. La mayoría de servicios profesionales llevan {pct(PORCENTAJES_IVA.general)}, pero puede haber excepciones según el epígrafe IAE.</p>
               </div>
             </div>
             <div className={styles.step}>
@@ -503,7 +552,7 @@ export default function CalculadoraIvaPage() {
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">💰</span>
               <strong>Separa el IVA desde el primer día</strong>
-              <p>Cuando cobres una factura, transfiere el 21% (o el tipo aplicable) a una cuenta de reserva para Hacienda.</p>
+              <p>Cuando cobres una factura, transfiere el {pct(PORCENTAJES_IVA.general)} (o el tipo aplicable) a una cuenta de reserva para Hacienda.</p>
             </div>
             <div className={styles.tipCard}>
               <span className={styles.tipIcon} aria-hidden="true">🧾</span>
@@ -530,10 +579,12 @@ export default function CalculadoraIvaPage() {
             <strong>Errores frecuentes con el IVA que puedes evitar</strong>
           </div>
           <ul className={styles.warningList}>
-            <li>Aplicar el tipo de IVA incorrecto (21% donde corresponde 10% o viceversa)</li>
+            <li>Aplicar el tipo de IVA incorrecto ({pct(PORCENTAJES_IVA.general)} donde corresponde {pct(PORCENTAJES_IVA.reducido)} o viceversa)</li>
             <li>No incluir el IVA en las facturas o emitirlas sin los datos fiscales obligatorios</li>
             <li>Deducir el IVA de gastos personales o de facturas sin tus datos fiscales</li>
-            <li>Olvidar presentar el modelo 303 en plazo (recargo mínimo del 5% si pagas fuera de plazo)</li>
+            {/* Art. 27.2 LGT (ESCALA_RECARGO_EXTEMPORANEO): parte del 1 %; el 5 % era el recargo
+                ejecutivo del art. 28, que es presentar sin pagar (hallazgo 4638). */}
+            <li>Olvidar presentar el modelo 303 en plazo ({RECARGO_TARDIO_TEXTO})</li>
             <li>No verificar el NIF intracomunitario del cliente UE antes de emitir factura sin IVA</li>
             <li>Gastar el IVA cobrado antes de ingresarlo a Hacienda (ese dinero nunca fue tuyo)</li>
             <li>No conservar facturas durante 4 años (plazo de prescripción de Hacienda para revisarlas)</li>

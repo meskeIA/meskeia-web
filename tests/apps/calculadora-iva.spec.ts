@@ -1,6 +1,6 @@
 import { test, expect, type Page } from '@playwright/test';
 import { esperarHidratacion, esperarValorEnReact } from './_hidratacion';
-import { TIPOS_IVA, RECARGO_EQUIVALENCIA } from '../../data/fiscal/iva';
+import { TIPOS_IVA, RECARGO_EQUIVALENCIA, RECARGO_EQUIVALENCIA_TABACO, FISCAL_IVA_META } from '../../data/fiscal/iva';
 
 /**
  * Inspector — calculadora-iva (segmento cálculo, riesgo 2)
@@ -41,7 +41,13 @@ import { TIPOS_IVA, RECARGO_EQUIVALENCIA } from '../../data/fiscal/iva';
  *   CASO 3 (rechazo)
  *     «-50», vacío y «0» → ninguna cifra y un aviso que diga por qué
  *
- * HALLAZGOS del 14/11/2026 (los abiertos llevan test.fail())
+ * HALLAZGOS del 14/11/2026 — TODOS REPARADOS el mismo día por /reparar (4633-4644): el resultado
+ * guarda su tipo y operación y se recalcula al cambiarlos; desglose en céntimos enteros con la
+ * cuota como diferencia; aviso role="alert" por NumberInput; tipos, recargo y umbral OSS desde
+ * data/fiscal/iva.ts; texto de hostelería, recargo y FAQ del 10 % contra el PDF de la AEAT
+ * «Tipos impositivos en el IVA 2026» y el art. 27.2 LGT; RegionBadge, DataReference y la nota de
+ * Canarias, Ceuta y Melilla; aria-pressed y región viva; «%» con espacio duro; features; y una
+ * sola FAQ (PREGUNTAS_FRECUENTES de metadata.ts).
  *   A. Cambiar el tipo (o la operación) tras calcular deja las cifras viejas bajo el rótulo nuevo:
  *      «Cuota IVA (10%)» = 21,00 €, y el HTML exportable dice «Quitar IVA 10%» con esas cifras.
  *   B. Desglose inverso al 4 %: base y cuota redondeadas por separado no suman el total
@@ -169,9 +175,8 @@ test.describe('calculadora-iva — Inspector 14/11/2026', () => {
   });
 
   // ── CASO 2 · límite ────────────────────────────────────────────────────────
-  // HALLAZGO (14/11/2026, ABIERTO) — B: base y cuota se redondean por separado y no suman el total.
+  // HALLAZGO 4634 (14/11/2026, REPARADO) — B: base y cuota se redondeaban por separado y no sumaban el total.
   test('CASO 2 · quitar IVA al 4 %: la base y la cuota mostradas suman el total (3,25 € y 10,53 €)', async ({ page }) => {
-    test.fail();
     await quitarIva(page);
     await elegirTipo(page, 4);
     for (const [precio, baseEsperada, cuotaEsperada] of [
@@ -187,20 +192,29 @@ test.describe('calculadora-iva — Inspector 14/11/2026', () => {
     }
   });
 
-  // HALLAZGO (14/11/2026, ABIERTO) — A: la cuota del 21 % se queda bajo el rótulo del 10 %.
+  // HALLAZGO 4633 (14/11/2026, REPARADO) — A: la cuota del 21 % se quedaba bajo el rótulo del 10 %.
+  // La app recalcula al cambiar el tipo o la operación.
   test('CASO 2 · cambiar el tipo tras calcular no deja la cuota del 21 % bajo el rótulo del 10 %', async ({ page }) => {
-    test.fail();
     await escribir(page, '100');
     await calcular(page);
     expect(await desglose(page)).toEqual([EUR('100,00'), EUR('21,00'), EUR('121,00')]);
 
     await elegirTipo(page, 10);
     const rotulo = page.getByRole('heading', { level: 3, name: /^Cuota IVA/ });
-    // Retirar el resultado también es una respuesta correcta: lo que no vale es la cifra vieja.
-    if ((await rotulo.count()) > 0) {
-      await expect(rotulo).toHaveText(/10\s*%/);
-      expect(await desglose(page)).toEqual([EUR('100,00'), EUR('10,00'), EUR('110,00')]);
-    }
+    await expect(rotulo).toHaveText(/10\s*%/);
+    expect(await desglose(page)).toEqual([EUR('100,00'), EUR('10,00'), EUR('110,00')]);
+
+    // Pasar a «Quitar IVA»: los 100 son ahora el precio con IVA al 10 %.
+    // 100 / 1,10 = 90,909… → 90,91 · cuota 100 − 90,91 = 9,09
+    await quitarIva(page);
+    expect(await desglose(page)).toEqual([EUR('90,91'), EUR('9,09'), EUR('100,00')]);
+
+    // El HTML exportable dice la operación y el tipo de las cifras que lleva.
+    await page.getByRole('button', { name: 'Ver código HTML' }).click();
+    const codigo = (await page.locator('pre').textContent()) ?? '';
+    expect(codigo).toMatch(/Quitar IVA 10\s%/);
+    expect(codigo).toContain('9,09');
+    expect(codigo).not.toContain('21,00');
   });
 
   // ── CASO 3 · rechazo ───────────────────────────────────────────────────────
@@ -212,9 +226,8 @@ test.describe('calculadora-iva — Inspector 14/11/2026', () => {
     }
   });
 
-  // HALLAZGO (14/11/2026, ABIERTO) — C: se rechaza en silencio, sin decir por qué.
+  // HALLAZGO 4635 (14/11/2026, REPARADO) — C: se rechazaba en silencio, sin decir por qué.
   test('CASO 3 · un importe negativo, vacío o cero avisa de por qué no hay cifras', async ({ page }) => {
-    test.fail();
     for (const texto of ['-50', '', '0']) {
       await escribir(page, texto);
       await calcular(page);
@@ -236,9 +249,14 @@ test.describe('calculadora-iva — Inspector 14/11/2026', () => {
     }
   });
 
-  // HALLAZGO (14/11/2026, ABIERTO) — E: las bebidas alcohólicas servidas en el bar no van al 21 %.
+  // HALLAZGO 4636 (14/11/2026, REPARADO) — D: tipos, recargo y umbral OSS importados de data/fiscal,
+  // con el recargo del tabaco (art. 161.4.º LIVA, 1,75 %) que la tabla omitía.
+  test('Datos · la tabla del recargo de equivalencia incluye el del tabaco', async ({ page }) => {
+    expect(await textoDelCuerpo(page)).toMatch(new RegExp(`tabaco: \\+${String(RECARGO_EQUIVALENCIA_TABACO).replace('.', ',')}\\s%`));
+  });
+
+  // HALLAZGO 4637 (14/11/2026, REPARADO) — E: las bebidas alcohólicas servidas en el bar no van al 21 %.
   test('Datos · hostelería: las bebidas servidas para consumir en el acto no se dan al 21 %', async ({ page }) => {
-    test.fail();
     // AEAT, Tipos IVA 2026, art. 91.Uno.2.2.º: «el suministro de comidas y bebidas para consumir en
     // el acto» → 10 %. El 21 % de las bebidas alcohólicas es el de su ENTREGA como producto.
     const texto = await textoDelCuerpo(page);
@@ -246,35 +264,38 @@ test.describe('calculadora-iva — Inspector 14/11/2026', () => {
     expect(texto).not.toMatch(/21\s*%\s*en alcohol/);
   });
 
-  // HALLAZGO (14/11/2026, ABIERTO) — F: el recargo por presentar tarde parte del 1 %, no del 5 %.
+  // HALLAZGO 4638 (14/11/2026, REPARADO) — F: el recargo por presentar tarde parte del 1 %, no del 5 %.
   test('Datos · presentar el 303 fuera de plazo: el recargo no es «mínimo del 5 %»', async ({ page }) => {
-    test.fail();
     // ESCALA_RECARGO_EXTEMPORANEO (art. 27.2 LGT): 1 % más 1 % por cada mes completo de retraso.
-    expect(await textoDelCuerpo(page)).not.toMatch(/recargo mínimo del 5\s*%/);
+    const texto = await textoDelCuerpo(page);
+    expect(texto).not.toMatch(/recargo mínimo del 5\s*%/);
+    expect(texto).toMatch(/recargo del 1\s% más otro 1\s% por cada mes completo de retraso/);
   });
 
-  // HALLAZGO (14/11/2026, ABIERTO) — G: el FAQPage pone al 10 % lo que va al 21 %.
+  // HALLAZGO 4639 (14/11/2026, REPARADO) — G: el FAQPage ponía al 10 % lo que va al 21 % o al 4 %.
   test('FAQPage · «IVA al 10 %» no incluye la asistencia sanitaria ni los zoológicos (21 %)', async ({ page }) => {
-    test.fail();
     const pregunta = (await faqPage(page)).find((q) => /IVA al 10/.test(q.name));
     expect(pregunta, 'la pregunta del 10 % sigue en el FAQPage').toBeTruthy();
-    // AEAT, Tipos IVA 2026: asistencia sanitaria no exenta 21 %; entrada a zoológicos 21 %.
+    // AEAT, Tipos IVA 2026: asistencia sanitaria no exenta 21 %; entrada a zoológicos 21 %;
+    // aceites de oliva 4 % (art. 91.Dos.1.1.º).
     expect(pregunta!.text).not.toMatch(/asistencia sanitaria/i);
     expect(pregunta!.text).not.toMatch(/zool[óo]gicos/i);
+    expect(pregunta!.text).toMatch(/aceite de oliva va al 4\s%/);
   });
 
-  // HALLAZGO (14/11/2026, ABIERTO) — H: el IVA no se aplica en Canarias, Ceuta y Melilla.
+  // HALLAZGO 4640 (14/11/2026, REPARADO) — H: el IVA no se aplica en Canarias, Ceuta y Melilla.
   test('Datos · la página dice que en Canarias, Ceuta y Melilla no se aplica el IVA', async ({ page }) => {
-    test.fail();
     const texto = await textoDelCuerpo(page);
     expect(texto).toMatch(/Canarias/);
     expect(texto).toMatch(/Ceuta/);
+    const primera = (await faqPage(page))[0];
+    expect(primera.text).toMatch(/Canarias se aplica el IGIC, y en Ceuta y Melilla el IPSI/);
+    expect(texto).toContain(FISCAL_IVA_META.fuente);
   });
 
   // ── Accesibilidad ──────────────────────────────────────────────────────────
-  // HALLAZGO (14/11/2026, ABIERTO) — I: el estado de los botones solo se ve por el color.
+  // HALLAZGO 4641 (14/11/2026, REPARADO) — I: el estado de los botones solo se veía por el color.
   test('A11y · los botones de operación y de tipo dicen cuál está activo (aria-pressed)', async ({ page }) => {
-    test.fail();
     await expect(page.getByRole('button', { name: /Añadir IVA/ })).toHaveAttribute('aria-pressed', 'true');
     await expect(page.getByRole('button', { name: /Quitar IVA/ })).toHaveAttribute('aria-pressed', 'false');
     await expect(page.getByRole('button', { name: /^21\s*%/ })).toHaveAttribute('aria-pressed', 'true');
@@ -283,9 +304,8 @@ test.describe('calculadora-iva — Inspector 14/11/2026', () => {
     await expect(page.getByRole('button', { name: /^21\s*%/ })).toHaveAttribute('aria-pressed', 'false');
   });
 
-  // HALLAZGO (14/11/2026, ABIERTO) — I: el resultado aparece sin que el lector de pantalla lo anuncie.
+  // HALLAZGO 4641 (14/11/2026, REPARADO) — I: el resultado aparecía sin que el lector de pantalla lo anunciara.
   test('A11y · el resultado se pinta dentro de una región aria-live montada desde el principio', async ({ page }) => {
-    test.fail();
     const region = page.locator('[aria-live]').filter({ has: page.getByText(/Introduce un importe/) });
     await expect(region).toHaveCount(1);
     await escribir(page, '100');
@@ -294,24 +314,25 @@ test.describe('calculadora-iva — Inspector 14/11/2026', () => {
   });
 
   // ── Formato y contenido ────────────────────────────────────────────────────
-  // HALLAZGO (14/11/2026, ABIERTO) — J: «21%» pegado; la norma es «21 %» con espacio duro.
+  // HALLAZGO 4642 (14/11/2026, REPARADO) — J: «21%» pegado; la norma es «21 %» con espacio duro.
   test('Formato · el rótulo de la cuota separa el «%» con espacio duro', async ({ page }) => {
-    test.fail();
     await escribir(page, '100');
     await calcular(page);
+    const rotulo = (await page.getByRole('heading', { level: 3, name: /^Cuota IVA/ }).textContent()) ?? '';
+    expect(rotulo).toBe('Cuota IVA (21 %)');
+    await expect(page.getByRole('button', { name: /^4\s*%/ })).toContainText('4 %');
+    expect(await page.title()).toContain('21 %');
     await expect(page.getByRole('heading', { level: 3, name: /^Cuota IVA/ })).toHaveText('Cuota IVA (21 %)');
   });
 
-  // HALLAZGO (14/11/2026, ABIERTO) — K: features vacía.
+  // HALLAZGO 4643 (14/11/2026, REPARADO) — K: features vacía.
   test('JSON-LD · features con al menos 4 características', async ({ page }) => {
-    test.fail();
     const app = await ldDeTipo(page, 'WebApplication');
     expect((app.featureList as string[] | undefined)?.length ?? 0).toBeGreaterThanOrEqual(4);
   });
 
-  // HALLAZGO (14/11/2026, ABIERTO) — L: la misma pregunta, redactada dos veces y con dos respuestas.
+  // HALLAZGO 4644 (14/11/2026, REPARADO) — L: la misma pregunta, redactada dos veces y con dos respuestas.
   test('FAQ · la pregunta de si el autónomo cobra IVA tiene UNA respuesta en la página y en el FAQPage', async ({ page }) => {
-    test.fail();
     await page.getByRole('button', { name: /Ver guía educativa/ }).click();
     const visible = page.getByRole('heading', { level: 4, name: /cobrar IVA si soy autónomo/ });
     const preguntaVisible = ((await visible.textContent()) ?? '').trim();
