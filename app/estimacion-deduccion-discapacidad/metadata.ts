@@ -1,5 +1,12 @@
 import { Metadata } from 'next';
 import { generateWebAppSchema } from '@/lib/schema-templates';
+import { formatCurrency } from '@/lib/formatters';
+import { MINIMOS_IRPF_2025 } from '@/data/fiscal/irpf';
+import { calcularDeduccionDiscapacidadIRPF } from '@/lib/calculadoras/deduccionDiscapacidadIRPF';
+
+// Hallazgo 4780 (15/11/2026): la respuesta del ahorro sale del motor, no de un tipo marginal.
+const MAXIMO = calcularDeduccionDiscapacidadIRPF({ titular: 'contribuyente', grado: '65oMas' });
+const BASE_MINIMA = MINIMOS_IRPF_2025.personal + MAXIMO.totalMinimo;
 
 export const metadata: Metadata = {
   title: 'Estimación de Deducción IRPF por Discapacidad - Mínimos Personales | meskeIA',
@@ -40,7 +47,8 @@ export const jsonLd = generateWebAppSchema({
     'Mínimos por discapacidad del contribuyente',
     'Mínimos por discapacidad de ascendientes y descendientes',
     'Gastos de asistencia adicionales',
-    'Estimación del ahorro fiscal según tipo marginal',
+    'Ahorro en cuota con el mínimo gravado a tipo cero (art. 63.1.2.º LIRPF)',
+    'Incremento por asistencia automático con grado igual o superior al 65 %',
     'Datos actualizados IRPF 2025',
   ],
 });
@@ -70,7 +78,7 @@ export const faqJsonLd = {
       name: '¿Se puede aplicar el mínimo por discapacidad de un familiar a cargo?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'Sí. La deducción se puede aplicar también por ascendientes (padres, abuelos) o descendientes (hijos, nietos) con discapacidad reconocida que convivan con el contribuyente y no tengan rentas anuales superiores a 8.000 €. Los importes son los mismos que para el contribuyente: 3.000 € o 9.000 € según el grado, más 3.000 € si necesitan asistencia.',
+        text: 'Sí. La deducción se puede aplicar también por ascendientes (padres, abuelos) o descendientes (hijos, nietos) con discapacidad reconocida que convivan con el contribuyente y no tengan rentas anuales superiores a 8.000 €, y siempre que no presenten declaración con rentas de más de 1.800 € (art. 61.2.ª LIRPF). No es una deducción en la cuota sino un mínimo, que se grava a tipo cero. Los importes son los mismos que para el contribuyente: 3.000 € con un grado del 33 % al 64 %, o 9.000 € con un grado del 65 % o más; a eso se suman 3.000 € por gastos de asistencia si acreditan ayuda de terceras personas o movilidad reducida, y siempre con un grado del 65 % o más, que da derecho por sí solo (art. 60.2).',
       },
     },
     {
@@ -78,7 +86,7 @@ export const faqJsonLd = {
       name: '¿Cuánto dinero me puedo ahorrar en la declaración de la renta por discapacidad?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El ahorro real depende del tipo marginal del IRPF que te corresponda. Si tienes discapacidad del 65 % con necesidad de asistencia, el mínimo total es de 12.000 €. Con un tipo marginal del 30 %, el ahorro fiscal sería de 3.600 € aproximadamente. La herramienta calcula este ahorro estimado de forma automática en función de tu situación.',
+        text: `El ahorro no depende de tu tipo marginal: el mínimo se grava a tipo cero (art. 63.1.2.º LIRPF) y se valora en los tramos bajos de la escala, encima del mínimo personal. Con un grado del 65 % o más, el mínimo total es de ${formatCurrency(MAXIMO.totalMinimo)} (incluidos los gastos de asistencia) y ahorra ${formatCurrency(MAXIMO.ahorroEstimado)} en la cuota, siempre que tu base liquidable general llegue al menos a ${formatCurrency(BASE_MINIMA)}; con menos base el ahorro es menor. La herramienta calcula el ahorro de tu caso según el grado y quién tiene la discapacidad.`,
       },
     },
     {

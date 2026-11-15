@@ -15,7 +15,9 @@ import {
 import { formatCurrency, formatNumber } from '@/lib';
 import {
   DEDUCCIONES_IRPF_DISCAPACIDAD_2025,
-  FISCAL_DEPENDENCIA_META,
+  FISCAL_IRPF_META,
+  MINIMOS_IRPF_2025,
+  NORMAS_MINIMOS_FAMILIARES_IRPF,
 } from '@/data/fiscal';
 
 import {
@@ -24,6 +26,24 @@ import {
   type GradoDiscapacidad,
   type ResultadoDeduccionDiscapacidad,
 } from '@/lib/calculadoras/deduccionDiscapacidadIRPF';
+
+// ─── Datos de la guía, calculados con el mismo motor ─────────────────────────
+// Hallazgo 4790 (15/11/2026): las cifras de la tabla y de los ejemplos iban escritas a mano.
+// Ahora salen de data/fiscal y del motor, así que se mueven con ellos.
+
+const D = DEDUCCIONES_IRPF_DISCAPACIDAD_2025.contribuyente;
+const MINIMO_PERSONAL = MINIMOS_IRPF_2025.personal;
+const AHORRO_33 = calcularDeduccionDiscapacidadIRPF({ titular: 'contribuyente', grado: '33a65' }).ahorroEstimado;
+const AHORRO_33_ASISTENCIA = calcularDeduccionDiscapacidadIRPF({
+  titular: 'contribuyente', grado: '33a65', necesitaAsistencia: true,
+}).ahorroEstimado;
+const AHORRO_65 = calcularDeduccionDiscapacidadIRPF({ titular: 'contribuyente', grado: '65oMas' }).ahorroEstimado;
+/** Rentas máximas del descendiente (art. 58.1 LIRPF, BOE-A-2006-20764, leído el 15/11/2026):
+ * el mismo límite de 8.000 € que el art. 59.1 fija para el ascendiente. data/fiscal solo lo
+ * declara con el nombre del ascendiente. */
+const RENTAS_MAX_FAMILIAR = NORMAS_MINIMOS_FAMILIARES_IRPF.rentasMaximasAscendiente;
+/** Porcentaje con espacio duro (U+00A0), como manda el formato español del proyecto. */
+const PCT = ' %';
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -83,10 +103,10 @@ export default function EstimacionDeduccionDiscapacidadPage() {
       </DisclaimerCard>
 
       <DataReference
-        normativa="Mínimos por discapacidad IRPF 2025"
-        fuente={FISCAL_DEPENDENCIA_META.fuente}
-        verificado={FISCAL_DEPENDENCIA_META.verificado}
-        urlOficial={FISCAL_DEPENDENCIA_META.urlOficial}
+        normativa="Mínimos por discapacidad IRPF (arts. 60 y 61 de la Ley 35/2006)"
+        fuente={FISCAL_IRPF_META.fuente}
+        verificado={FISCAL_IRPF_META.verificado}
+        urlOficial={FISCAL_IRPF_META.urlOficial}
       />
 
       {/* ── Formulario ───────────────────────────────────────────────────── */}
@@ -127,9 +147,14 @@ export default function EstimacionDeduccionDiscapacidadPage() {
               <div>
                 <strong>Requisitos para aplicar el mínimo por ascendiente:</strong>
                 <ul>
-                  <li>Edad ≥ 65 años o discapacidad reconocida ≥ 33%</li>
-                  <li>Rentas del ascendiente ≤ {formatCurrency(DEDUCCIONES_IRPF_DISCAPACIDAD_2025.requisitosAscendiente.rentaMaxima)} anuales (excluidas las exentas)</li>
-                  <li>Convivencia con el contribuyente o dependencia económica</li>
+                  <li>Edad ≥ 65 años o discapacidad reconocida ≥ 33{PCT}</li>
+                  <li>Rentas del ascendiente ≤ {formatCurrency(NORMAS_MINIMOS_FAMILIARES_IRPF.rentasMaximasAscendiente)} anuales (excluidas las exentas)</li>
+                  <li>Convivencia con el contribuyente al menos {NORMAS_MINIMOS_FAMILIARES_IRPF.convivenciaMinima}.
+                    Solo se asimila a la convivencia el ascendiente con discapacidad que, dependiendo
+                    de ti, esté internado en un centro especializado (art. 59.1 LIRPF)</li>
+                  <li>Si el ascendiente presenta declaración con rentas de más
+                    de {formatCurrency(NORMAS_MINIMOS_FAMILIARES_IRPF.rentasMaximasDeclaracion)}, no hay
+                    mínimo (art. 61.2.ª)</li>
                 </ul>
               </div>
             </div>
@@ -142,9 +167,12 @@ export default function EstimacionDeduccionDiscapacidadPage() {
               <div>
                 <strong>Requisitos para aplicar el mínimo por descendiente:</strong>
                 <ul>
-                  <li>Menor de 25 años o discapacidad reconocida ≥ 33% (sin límite de edad)</li>
-                  <li>Rentas del descendiente ≤ {formatCurrency(8000)} anuales (excluidas las exentas)</li>
-                  <li>Convivencia con el contribuyente</li>
+                  <li>Menor de 25 años o discapacidad reconocida ≥ 33{PCT} (sin límite de edad)</li>
+                  <li>Rentas del descendiente ≤ {formatCurrency(RENTAS_MAX_FAMILIAR)} anuales (excluidas las exentas)</li>
+                  <li>Convivencia con el contribuyente (se asimila la dependencia económica, art. 58.1)</li>
+                  <li>Si el descendiente presenta declaración con rentas de más
+                    de {formatCurrency(NORMAS_MINIMOS_FAMILIARES_IRPF.rentasMaximasDeclaracion)}, no hay
+                    mínimo (art. 61.2.ª)</li>
                 </ul>
               </div>
             </div>
@@ -163,7 +191,7 @@ export default function EstimacionDeduccionDiscapacidadPage() {
                   onChange={() => setGrado('33a65')}
                   className={styles.radioInput}
                 />
-                <span className={styles.radioText}>Del 33% al 64%</span>
+                <span className={styles.radioText}>Del 33{PCT} al 64{PCT}</span>
               </label>
               <label className={styles.radioLabel}>
                 <input
@@ -174,7 +202,7 @@ export default function EstimacionDeduccionDiscapacidadPage() {
                   onChange={() => setGrado('65oMas')}
                   className={styles.radioInput}
                 />
-                <span className={styles.radioText}>65% o superior</span>
+                <span className={styles.radioText}>65{PCT} o superior</span>
               </label>
             </div>
           </fieldset>
@@ -193,10 +221,10 @@ export default function EstimacionDeduccionDiscapacidadPage() {
               </span>
             </label>
             <p className={styles.helpText}>
-              Añade {formatCurrency(3000)} adicionales al mínimo si se acredita la necesidad de ayuda
+              Añade {formatCurrency(D.gastosAsistencia33a65)} adicionales al mínimo si se acredita la necesidad de ayuda
               de terceros o movilidad reducida (certificado oficial).
               <span>{grado === '65oMas' && (
-                <span> Con un grado igual o superior al 65 % estos {formatCurrency(3000)} se aplican
+                <span> Con un grado igual o superior al 65{PCT} estos {formatCurrency(D.gastosAsistencia65oMas)} se aplican
                   igualmente, aunque no marques la casilla: el grado es por sí solo uno de los tres
                   supuestos del artículo 60 de la Ley del IRPF.</span>
               )}</span>
@@ -230,6 +258,8 @@ export default function EstimacionDeduccionDiscapacidadPage() {
             <span aria-hidden="true">📊</span> Resultado estimado
           </h2>
 
+          {/* Hallazgo 4788: región viva siempre montada, para que el lector anuncie el resultado. */}
+          <div aria-live="polite">
           {!resultado ? (
             <div className={styles.placeholder}>
               <span className={styles.placeholderIcon} aria-hidden="true">♿</span>
@@ -252,7 +282,7 @@ export default function EstimacionDeduccionDiscapacidadPage() {
                 </div>
                 <div className={styles.resultItem}>
                   <span className={styles.resultLabel}>Tipo al que se valora el mínimo</span>
-                  <span className={styles.resultValue}>{formatNumber(resultado.tipoEfectivoAhorro, 2)} %</span>
+                  <span className={styles.resultValue}>{formatNumber(resultado.tipoEfectivoAhorro, 2)}{PCT}</span>
                 </div>
               </div>
 
@@ -264,18 +294,29 @@ export default function EstimacionDeduccionDiscapacidadPage() {
 
               <div className={styles.resultNote} role="note">
                 <span aria-hidden="true">💡</span>
+                <div>
                 <p>
                   El mínimo por discapacidad <strong>no reduce la base liquidable</strong>: forma parte de
                   ella y se grava a <strong>tipo cero</strong>, aplicando la escala a la base completa y
                   restando de la cuota la misma escala aplicada al mínimo (art. 63.1.2.º LIRPF). Por eso el
                   ahorro <strong>no depende de tu tipo marginal</strong>: el mínimo se valora siempre a los
-                  tipos bajos de la escala. Esta cifra es una <strong>cota inferior</strong>: si además
-                  tienes mínimos por descendientes o ascendientes, estos se apilan debajo y el de
-                  discapacidad cae en tramos algo más altos.
+                  tipos bajos de la escala.
                 </p>
+                <p>
+                  {/* Hallazgo 4783: la cifra solo es cierta si la base da cabida al mínimo entero. */}
+                  La cifra supone que tu <strong>base liquidable general</strong> llega al menos
+                  a <strong>{formatCurrency(MINIMO_PERSONAL + resultado.totalMinimo)}</strong> (el
+                  mínimo personal de {formatCurrency(MINIMO_PERSONAL)} más este mínimo). Con una base
+                  menor el mínimo no cabe entero y el ahorro es <strong>menor</strong>, hasta cero si
+                  la base no pasa de {formatCurrency(MINIMO_PERSONAL)}. Con esa base o más, es una cota
+                  inferior: si además tienes mínimos por descendientes o ascendientes, estos se apilan
+                  debajo y el de discapacidad cae en tramos algo más altos.
+                </p>
+                </div>
               </div>
             </>
           )}
+          </div>
         </div>
       </div>
 
@@ -295,7 +336,7 @@ export default function EstimacionDeduccionDiscapacidadPage() {
         <p>
           El certificado de discapacidad debe estar emitido por el organismo competente de tu
           Comunidad Autónoma (IMSERSO o equivalente autonómico) con un grado reconocido igual
-          o superior al 33%.
+          o superior al 33{PCT}.
         </p>
 
         <h3>Diferencia entre &quot;deducción&quot; y &quot;mínimo personal&quot;</h3>
@@ -304,8 +345,9 @@ export default function EstimacionDeduccionDiscapacidadPage() {
           de la cuota del IRPF (euro por euro). Un <strong>mínimo personal o familiar</strong> no resta
           ni de la cuota ni de la base: se grava a tipo cero por la vía del art. 63.1.2.º, de modo que
           ahorra lo que la escala le aplicaría en los tramos donde cae, que son los bajos. Un mínimo
-          de {formatCurrency(3000)} encima del mínimo personal no ahorra {formatCurrency(3000)}, sino
-          {formatCurrency(570)} — el 19 %, tanto si ganas 20.000 € como si ganas 200.000 €.
+          de {formatCurrency(D.discapacidad33a65)} encima del mínimo personal no
+          ahorra {formatCurrency(D.discapacidad33a65)}, sino {formatCurrency(AHORRO_33)} — el
+          19{PCT}, tanto si ganas 20.000 € como si ganas 200.000 €.
         </p>
 
         <h3>Requisitos para ascendientes y descendientes</h3>
@@ -314,21 +356,27 @@ export default function EstimacionDeduccionDiscapacidadPage() {
           generales del mínimo por ascendiente o descendiente:
         </p>
         <ul>
-          <li><strong>Ascendiente:</strong> edad ≥ 65 años (o cualquier edad si tiene discapacidad ≥ 33%),
-            rentas ≤ {formatCurrency(8000)}/año, convivencia con el contribuyente.</li>
-          <li><strong>Descendiente:</strong> menor de 25 años (o cualquier edad si tiene discapacidad ≥ 33%),
-            rentas ≤ {formatCurrency(8000)}/año, convivencia con el contribuyente.</li>
+          <li><strong>Ascendiente:</strong> edad ≥ 65 años (o cualquier edad si tiene discapacidad ≥ 33{PCT}),
+            rentas ≤ {formatCurrency(NORMAS_MINIMOS_FAMILIARES_IRPF.rentasMaximasAscendiente)}/año y
+            convivencia con el contribuyente al menos {NORMAS_MINIMOS_FAMILIARES_IRPF.convivenciaMinima}.
+            Solo se asimila a la convivencia el internamiento en un centro especializado del
+            ascendiente con discapacidad que dependa de ti (art. 59.1).</li>
+          <li><strong>Descendiente:</strong> menor de 25 años (o cualquier edad si tiene discapacidad ≥ 33{PCT}),
+            rentas ≤ {formatCurrency(RENTAS_MAX_FAMILIAR)}/año, convivencia con el contribuyente o
+            dependencia económica de él (art. 58.1).</li>
+          <li>En los dos casos, no hay mínimo si el familiar presenta declaración con rentas de más
+            de {formatCurrency(NORMAS_MINIMOS_FAMILIARES_IRPF.rentasMaximasDeclaracion)} (art. 61.2.ª).</li>
           <li>Si dos contribuyentes tienen derecho (ej. ambos padres), el mínimo se reparte a partes iguales.</li>
         </ul>
 
         <h3>¿Qué cuenta como &quot;gastos de asistencia&quot;?</h3>
         <p>
-          Los {formatCurrency(3000)} adicionales por gastos de asistencia se aplican ante cualquiera de
+          Los {formatCurrency(D.gastosAsistencia33a65)} adicionales por gastos de asistencia se aplican ante cualquiera de
           estos <strong>tres supuestos alternativos</strong> (basta uno): acreditar
           <strong> necesidad de ayuda de terceras personas</strong>, acreditar
           <strong> movilidad reducida</strong>, o tener un <strong>grado de discapacidad igual o
-          superior al 65 %</strong>. No es necesario justificar gastos concretos: basta con que el
-          certificado de discapacidad recoja la circunstancia, y con el grado ≥ 65 % el propio grado
+          superior al 65{PCT}</strong>. No es necesario justificar gastos concretos: basta con que el
+          certificado de discapacidad recoja la circunstancia, y con el grado ≥ 65{PCT} el propio grado
           da derecho al incremento sin acreditar nada más.
         </p>
 
@@ -339,44 +387,41 @@ export default function EstimacionDeduccionDiscapacidadPage() {
             <thead>
               <tr>
                 <th>Concepto</th>
-                <th>33% – 64%</th>
-                <th>≥ 65%</th>
+                <th>33{PCT} – 64{PCT}</th>
+                <th>≥ 65{PCT}</th>
               </tr>
             </thead>
             <tbody>
               <tr>
                 <td>Mínimo por discapacidad</td>
-                <td>{formatCurrency(3000)}</td>
-                <td>{formatCurrency(9000)}</td>
+                <td>{formatCurrency(D.discapacidad33a65)}</td>
+                <td>{formatCurrency(D.discapacidad65oMas)}</td>
               </tr>
               <tr>
                 <td>Gastos de asistencia (si procede)</td>
-                <td>{formatCurrency(3000)}</td>
-                <td>{formatCurrency(3000)}</td>
+                <td>{formatCurrency(D.gastosAsistencia33a65)}</td>
+                <td>{formatCurrency(D.gastosAsistencia65oMas)}</td>
               </tr>
               <tr>
                 <td>Total máximo</td>
-                <td><strong>{formatCurrency(6000)}</strong></td>
-                <td><strong>{formatCurrency(12000)}</strong></td>
+                <td><strong>{formatCurrency(D.discapacidad33a65 + D.gastosAsistencia33a65)}</strong></td>
+                <td><strong>{formatCurrency(D.discapacidad65oMas + D.gastosAsistencia65oMas)}</strong></td>
               </tr>
+              {/* Hallazgo 4781: el mínimo se grava a tipo cero (art. 63.1.2.º), así que hay UN
+                  ahorro por columna, no uno por tipo marginal. */}
               <tr>
-                <td>Ahorro al 19%</td>
-                <td>{formatCurrency(1140)}</td>
-                <td>{formatCurrency(2280)}</td>
-              </tr>
-              <tr>
-                <td>Ahorro al 30%</td>
-                <td>{formatCurrency(1800)}</td>
-                <td>{formatCurrency(3600)}</td>
-              </tr>
-              <tr>
-                <td>Ahorro al 45%</td>
-                <td>{formatCurrency(2700)}</td>
-                <td>{formatCurrency(5400)}</td>
+                <td>Ahorro en cuota con el total máximo (cualquier marginal)</td>
+                <td>{formatCurrency(AHORRO_33_ASISTENCIA)}</td>
+                <td>{formatCurrency(AHORRO_65)}</td>
               </tr>
             </tbody>
           </table>
         </div>
+        <p>
+          El ahorro es el mismo para cualquier tipo marginal porque el mínimo se valora en los tramos
+          bajos de la escala, encima del mínimo personal. Supone una base liquidable general de al
+          menos {formatCurrency(MINIMO_PERSONAL)} más el mínimo; con menos base, el ahorro es menor.
+        </p>
 
         {/* Casos de uso */}
         <h3>Ejemplos prácticos</h3>
@@ -384,60 +429,63 @@ export default function EstimacionDeduccionDiscapacidadPage() {
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
               <span className={styles.escenarioIcon} aria-hidden="true">👨‍💼</span>
-              <h4>Trabajador con discapacidad del 40%</h4>
+              <h4>Trabajador con discapacidad del 40{PCT}</h4>
             </div>
             <div className={styles.escenarioExample}>
               <p>Salario bruto: {formatCurrency(28000)}/año.</p>
-              <p>Mínimo: {formatCurrency(3000)}. Sin asistencia de terceros.</p>
-              <p><strong>Ahorro: {formatCurrency(570)}/año</strong> (el mínimo cae entero en el tramo del 19 %)</p>
+              <p>Mínimo: {formatCurrency(D.discapacidad33a65)}. Sin asistencia de terceros.</p>
+              <p><strong>Ahorro por el mínimo: {formatCurrency(AHORRO_33)}/año</strong> (el mínimo cae entero en el tramo del 19{PCT})</p>
             </div>
             <div className={styles.escenarioTip}>
-              Revisa si tu CCAA tiene deducciones autonómicas adicionales por discapacidad.
+              Esta herramienta solo calcula el mínimo. Como trabajador activo con discapacidad,
+              el art. 19.2.f LIRPF le sube además los gastos deducibles del trabajo (más aún con
+              ayuda de terceros, movilidad reducida o grado ≥ 65{PCT}), y ese incremento sí reduce
+              la base y se valora a su tipo marginal. Revisa también las deducciones autonómicas.
             </div>
           </div>
 
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
               <span className={styles.escenarioIcon} aria-hidden="true">👵</span>
-              <h4>Madre con discapacidad del 70% que convive contigo</h4>
+              <h4>Madre con discapacidad del 70{PCT} que convive contigo</h4>
             </div>
             <div className={styles.escenarioExample}>
               <p>Tu base imponible: {formatCurrency(40000)}.</p>
-              <p>Mínimo: {formatCurrency(9000)} + {formatCurrency(3000)} asistencia = {formatCurrency(12000)}.</p>
-              <p><strong>Ahorro: {formatCurrency(2535)}/año</strong> (parte al 19 % y parte al 24 %, no a tu marginal)</p>
+              <p>Mínimo: {formatCurrency(D.discapacidad65oMas)} + {formatCurrency(D.gastosAsistencia65oMas)} asistencia = {formatCurrency(D.discapacidad65oMas + D.gastosAsistencia65oMas)}.</p>
+              <p><strong>Ahorro: {formatCurrency(AHORRO_65)}/año</strong> (parte al 19{PCT} y parte al 24{PCT}, no a tu marginal)</p>
             </div>
             <div className={styles.escenarioTip}>
-              Recuerda: la madre debe tener rentas propias ≤ {formatCurrency(8000)}/año.
+              Recuerda: la madre debe tener rentas propias ≤ {formatCurrency(NORMAS_MINIMOS_FAMILIARES_IRPF.rentasMaximasAscendiente)}/año.
             </div>
           </div>
 
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
               <span className={styles.escenarioIcon} aria-hidden="true">👧</span>
-              <h4>Hija con discapacidad del 50% y movilidad reducida</h4>
+              <h4>Hija con discapacidad del 50{PCT} y movilidad reducida</h4>
             </div>
             <div className={styles.escenarioExample}>
               <p>Tu base imponible: {formatCurrency(22000)}.</p>
-              <p>Mínimo: {formatCurrency(3000)} + {formatCurrency(3000)} asistencia = {formatCurrency(6000)}.</p>
-              <p><strong>Ahorro: {formatCurrency(1140)}/año</strong> (el mínimo cae entero en el tramo del 19 %)</p>
+              <p>Mínimo: {formatCurrency(D.discapacidad33a65)} + {formatCurrency(D.gastosAsistencia33a65)} asistencia = {formatCurrency(D.discapacidad33a65 + D.gastosAsistencia33a65)}.</p>
+              <p><strong>Ahorro: {formatCurrency(AHORRO_33_ASISTENCIA)}/año</strong> (el mínimo cae entero en el tramo del 19{PCT})</p>
             </div>
             <div className={styles.escenarioTip}>
-              Si ambos padres declaran, el mínimo se reparte al 50% cada uno.
+              Si ambos padres declaran, el mínimo se reparte al 50{PCT} cada uno.
             </div>
           </div>
 
           <div className={styles.escenarioCard}>
             <div className={styles.escenarioHeader}>
               <span className={styles.escenarioIcon} aria-hidden="true">🧑‍🦽</span>
-              <h4>Contribuyente con discapacidad ≥ 65%</h4>
+              <h4>Contribuyente con discapacidad ≥ 65{PCT}</h4>
             </div>
             <div className={styles.escenarioExample}>
               <p>Base imponible: {formatCurrency(50000)}.</p>
-              <p>Mínimo: {formatCurrency(9000)} + {formatCurrency(3000)} asistencia = {formatCurrency(12000)}.</p>
-              <p><strong>Ahorro: {formatCurrency(2535)}/año</strong> — el mismo que con 40.000 € de base: el mínimo no se valora a tu marginal</p>
+              <p>Mínimo: {formatCurrency(D.discapacidad65oMas)} + {formatCurrency(D.gastosAsistencia65oMas)} asistencia = {formatCurrency(D.discapacidad65oMas + D.gastosAsistencia65oMas)}.</p>
+              <p><strong>Ahorro: {formatCurrency(AHORRO_65)}/año</strong> — el mismo que con 40.000 € de base: el mínimo no se valora a tu marginal</p>
             </div>
             <div className={styles.escenarioTip}>
-              Los {formatCurrency(3000)} de asistencia salen aquí del propio grado ≥ 65 %: no hace falta
+              Los {formatCurrency(D.gastosAsistencia65oMas)} de asistencia salen aquí del propio grado ≥ 65{PCT}: no hace falta
               acreditar además ayuda de terceros ni movilidad reducida. Comprueba también las deducciones
               autonómicas por discapacidad propia.
             </div>
@@ -466,18 +514,20 @@ export default function EstimacionDeduccionDiscapacidadPage() {
           <div className={styles.faqItem}>
             <h4>¿Qué pasa si la discapacidad se reconoce a mitad de año?</h4>
             <p>
-              El mínimo se aplica proporcionalmente al período del año en que se tenga
-              reconocida la discapacidad, excepto si es sobrevenida, en cuyo caso se puede
-              aplicar por el ejercicio completo si la resolución tiene efectos retroactivos.
+              No se prorratea. Las circunstancias personales y familiares se miran en la fecha de
+              devengo del impuesto, normalmente el 31 de diciembre (art. 61.3.ª LIRPF): si a esa
+              fecha tienes el grado reconocido, te corresponde el mínimo del año entero.
             </p>
           </div>
           <div className={styles.faqItem}>
             <h4>¿La incapacidad permanente equivale a discapacidad a efectos del IRPF?</h4>
             <p>
-              La incapacidad permanente total, absoluta o gran invalidez reconocida por la
-              Seguridad Social se asimila a un grado de discapacidad ≥ 33% (total) o ≥ 65%
-              (absoluta/gran invalidez) a efectos del IRPF, sin necesidad de certificado
-              adicional de discapacidad.
+              Los pensionistas de la Seguridad Social con incapacidad permanente total, absoluta
+              o gran invalidez tienen acreditado un grado de discapacidad igual o superior al
+              33{PCT} a efectos del IRPF, sin certificado adicional (art. 60.3 LIRPF): en la
+              herramienta, «Del 33{PCT} al 64{PCT}». El grado igual o superior al 65{PCT} solo se
+              presume cuando la incapacidad se declara judicialmente; para aplicarlo por otra vía
+              hace falta el certificado con ese grado.
             </p>
             <div className={styles.faqTip}>
               Conserva la resolución del INSS como justificante.
@@ -494,9 +544,12 @@ export default function EstimacionDeduccionDiscapacidadPage() {
           <div className={styles.faqItem}>
             <h4>¿Puedo aplicar el mínimo si mi familiar vive en una residencia?</h4>
             <p>
-              Depende. Si el familiar depende económicamente de ti y no tiene rentas superiores
-              a {formatCurrency(8000)}/año, puede considerarse que existe dependencia a efectos
-              del mínimo, aunque no haya convivencia física. Consulta con tu asesor fiscal.
+              Si es un ascendiente con discapacidad que depende de ti y está internado en un
+              centro especializado, la ley lo considera conviviente (art. 59.1 LIRPF). Fuera de ese
+              caso, el ascendiente que vive en otro sitio no genera el mínimo aunque dependa
+              económicamente de ti. Un descendiente sí puede: el art. 58.1 asimila a la convivencia
+              su dependencia económica. En los dos casos sus rentas no pueden pasar
+              de {formatCurrency(NORMAS_MINIMOS_FAMILIARES_IRPF.rentasMaximasAscendiente)}/año.
             </p>
           </div>
         </div>
@@ -535,8 +588,8 @@ export default function EstimacionDeduccionDiscapacidadPage() {
             <h4>Solicita la revisión de grado</h4>
             <p>
               Si tu situación funcional ha empeorado significativamente, tienes derecho a solicitar
-              la revisión del grado. Si pasaras del tramo 33-64% al ≥65%, el mínimo fiscal aplicable
-              pasa de {formatCurrency(3000)} a {formatCurrency(9000)}.
+              la revisión del grado. Si pasaras del tramo 33-64{PCT} al ≥ 65{PCT}, el mínimo fiscal aplicable
+              pasa de {formatCurrency(D.discapacidad33a65)} a {formatCurrency(D.discapacidad65oMas)}.
             </p>
           </div>
         </div>
@@ -553,12 +606,16 @@ export default function EstimacionDeduccionDiscapacidadPage() {
               completa (otros mínimos, reducciones, deducciones autonómicas y situación familiar).
             </li>
             <li>
-              <strong>Solo mínimos estatales:</strong> no incluye las deducciones autonómicas
-              por discapacidad que varían según la CCAA.
+              <strong>Solo el mínimo por discapacidad:</strong> no incluye el incremento de gastos
+              deducibles para trabajadores activos con discapacidad (art. 19.2.f LIRPF), la
+              deducción por descendiente o ascendiente con discapacidad a cargo (art. 81 bis), ni
+              las deducciones autonómicas por discapacidad, que varían según la CCAA.
             </li>
             <li>
-              <strong>Cota inferior:</strong> el ahorro se calcula apilando este mínimo sobre el
-              mínimo personal de {formatCurrency(5550)}. Si además tienes mínimos por descendientes
+              <strong>Base suficiente:</strong> el ahorro se calcula apilando este mínimo sobre el
+              mínimo personal de {formatCurrency(MINIMO_PERSONAL)}, y supone que tu base liquidable
+              general da cabida a los dos. Con una base menor el ahorro es menor, hasta cero. Con
+              base suficiente es una cota inferior: si además tienes mínimos por descendientes
               o ascendientes, estos se apilan debajo y el de discapacidad cae en tramos algo más
               altos, con lo que ahorrarías un poco más.
             </li>
