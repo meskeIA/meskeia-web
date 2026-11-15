@@ -300,25 +300,24 @@ test.describe('Hallazgos de cálculo y operativa', () => {
 });
 
 test.describe('Hallazgos de accesibilidad', () => {
-  // HALLAZGO (15/11/2026, ABIERTO) · el botón deshabilitado dice «Responde las 10 preguntas
-  // restantes» pero su aria-label fijo es «Ver mi diagnóstico»: el lector anuncia «Ver mi
-  // diagnóstico, no disponible» sin decir cuántas faltan (y el nombre no contiene el texto visible).
+  // HALLAZGO 4720 (15/11/2026, REPARADO) · el botón deshabilitado decía «Responde las 10 preguntas
+  // restantes» pero su aria-label fijo era «Ver mi diagnóstico»: el lector anunciaba «Ver mi
+  // diagnóstico, no disponible» sin decir cuántas faltan (y el nombre no contenía el texto visible).
   test('el nombre accesible del botón deshabilitado dice cuántas preguntas faltan', async ({ page }) => {
-    test.fail();
     await abrir(page);
     await expect(botonVer(page)).toHaveAccessibleName(/10 preguntas/);
   });
 
-  // HALLAZGO (15/11/2026, ABIERTO) · «Repetir diagnóstico» desmonta su propia sección y el foco cae a
-  // <body>: quien va con teclado vuelve al principio del documento sin aviso.
+  // HALLAZGO 4721 (15/11/2026, REPARADO) · «Repetir diagnóstico» desmonta su propia sección y el foco
+  // caía a <body>: quien va con teclado volvía al principio del documento sin aviso.
   test('tras «Repetir diagnóstico» con teclado el foco no se pierde en <body>', async ({ page }) => {
-    test.fail();
     await abrir(page);
     await verResultado(page, MIXTO);
     await page.getByRole('button', { name: 'Repetir diagnóstico' }).focus();
     await page.keyboard.press('Enter');
     await expect(perfil(page)).toHaveCount(0);
     expect(await page.evaluate(() => document.activeElement === document.body)).toBe(false);
+    await expect(page.getByRole('heading', { name: /Piensa en cómo delegas/ })).toBeFocused();
   });
 
   // HALLAZGO (15/11/2026, ABIERTO) · las opciones son role="radio" dentro de role="radiogroup", pero
@@ -332,10 +331,9 @@ test.describe('Hallazgos de accesibilidad', () => {
     await expect(opcion(page, 0, 2)).toBeFocused();
   });
 
-  // HALLAZGO (15/11/2026, ABIERTO) · el emoji grande del perfil (🔍, 🎯…) va en su propio <span> sin
-  // aria-hidden junto al <h3>, y el lector lo lee antes del nombre del perfil.
+  // HALLAZGO 4723 (15/11/2026, REPARADO) · el emoji grande del perfil (🔍, 🎯…) iba en su propio
+  // <span> sin aria-hidden junto al <h3>, y el lector lo leía antes del nombre del perfil.
   test('el emoji del perfil va oculto al lector de pantalla', async ({ page }) => {
-    test.fail();
     await abrir(page);
     await verResultado(page, MIXTO);
     const oculto = await page
@@ -344,11 +342,10 @@ test.describe('Hallazgos de accesibilidad', () => {
     expect(oculto).toBe(true);
   });
 
-  // HALLAZGO (15/11/2026, ABIERTO, el mismo) · el aria-label del punto («Tu posición: …») va en un
-  // <div> sin rol: el árbol de accesibilidad no lo expone y el mapa se lee «Microgestión con Cariño
-  // Delegación Efectiva Retención Total Soltar y Rezar Tú», sin decir dónde está «Tú».
+  // HALLAZGO 4723 (15/11/2026, REPARADO, el mismo) · el aria-label del punto («Tu posición: …») iba
+  // en un <div> sin rol: el árbol de accesibilidad no lo exponía y el mapa se leía «Microgestión con
+  // Cariño Delegación Efectiva Retención Total Soltar y Rezar Tú», sin decir dónde está «Tú».
   test('el mapa expone al lector la posición del punto', async ({ page }) => {
-    test.fail();
     await abrir(page);
     await verResultado(page, MIXTO);
     expect(await page.locator('[class*="_mapContainer"]').ariaSnapshot()).toContain('Tu posición');
@@ -387,13 +384,12 @@ test.describe('Hallazgos de contenido', () => {
     await expect(page.getByText(/Hersey y Blanchard demostraron/)).toHaveCount(0);
   });
 
-  // HALLAZGO (15/11/2026, ABIERTO) · con una pregunta pendiente el botón dice «Responde las 1
+  // HALLAZGO 4719 (15/11/2026, REPARADO) · con una pregunta pendiente el botón decía «Responde las 1
   // preguntas restantes».
   test('con 9 respuestas el botón concuerda en singular', async ({ page }) => {
-    test.fail();
     await abrir(page);
     await responder(page, MIXTO, 9);
-    await expect(botonVer(page)).not.toHaveText('Responde las 1 preguntas restantes');
+    await expect(botonVer(page)).toHaveText('Responde la pregunta que falta');
   });
 
   // HALLAZGO (15/11/2026, ABIERTO) · §1.quinquies 2: la entradilla abre el test a «autónomos que

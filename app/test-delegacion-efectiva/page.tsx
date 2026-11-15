@@ -1,7 +1,7 @@
 'use client';
 // @disclaimer: exempt
 
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import styles from './TestDelegacionEfectiva.module.css';
 import {
   MeskeiaLogo,
@@ -224,6 +224,8 @@ export default function TestDelegacionEfectivaPage() {
   const [mostrarResultado, setMostrarResultado] = useState(false);
 
   const todasRespondidas = PREGUNTAS.every((p) => respuestas[p.id] !== undefined);
+  const faltan = PREGUNTAS.length - Object.keys(respuestas).length;
+  const tituloPreguntas = useRef<HTMLHeadingElement>(null);
 
   const handleRespuesta = (preguntaId: number, valor: number) => {
     setRespuestas((prev) => ({ ...prev, [preguntaId]: valor }));
@@ -240,7 +242,10 @@ export default function TestDelegacionEfectivaPage() {
   const reiniciar = () => {
     setRespuestas({});
     setMostrarResultado(false);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // El botón desmonta su propia sección: sin mover el foco, caía a <body> y quien va con
+    // teclado volvía al principio sin aviso (hallazgo 4721). Va al título de las preguntas.
+    tituloPreguntas.current?.focus({ preventScroll: true });
+    tituloPreguntas.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
   // Cálculos
@@ -304,7 +309,7 @@ export default function TestDelegacionEfectivaPage() {
 
         {/* Preguntas */}
         <section className={styles.questionsSection}>
-          <h2 className={styles.sectionTitle}>
+          <h2 className={styles.sectionTitle} ref={tituloPreguntas} tabIndex={-1}>
             Piensa en cómo delegas habitualmente en tu equipo o entorno de trabajo
           </h2>
           <p className={styles.sectionSubtitle}>
@@ -340,14 +345,19 @@ export default function TestDelegacionEfectivaPage() {
             {Object.keys(respuestas).length} de {PREGUNTAS.length} respondidas
           </div>
 
+          {/* Sin aria-label: tapaba el texto visible y el lector no decía cuántas faltan
+              (hallazgo 4720). Con una sola, en singular (hallazgo 4719). */}
           <button
             type="button"
             className={styles.btnPrimary}
             onClick={calcularResultado}
             disabled={!todasRespondidas}
-            aria-label="Ver mi diagnóstico"
           >
-            {todasRespondidas ? 'Ver mi diagnóstico' : `Responde las ${PREGUNTAS.length - Object.keys(respuestas).length} preguntas restantes`}
+            {todasRespondidas
+              ? 'Ver mi diagnóstico'
+              : faltan === 1
+                ? 'Responde la pregunta que falta'
+                : `Responde las ${faltan} preguntas restantes`}
           </button>
         </section>
 
@@ -384,9 +394,12 @@ export default function TestDelegacionEfectivaPage() {
                 <div className={styles.thresholdLineH} style={{ top: `${100 - aPorcentaje(17.5)}%` }} aria-hidden="true" />
                 <div className={styles.thresholdLineH} style={{ top: `${100 - aPorcentaje(13.5)}%` }} aria-hidden="true" />
                 {/* Punto de posición */}
+                {/* role="img": sin rol, el aria-label de un <div> no se expone y el mapa no decía
+                    dónde está «Tú» (hallazgo 4723). */}
                 <div
                   className={styles.mapDot}
                   style={{ left: `${posX}%`, top: `${posY}%` }}
+                  role="img"
                   aria-label={`Tu posición: Acompañamiento ${puntuacionAcompanamiento}/25, Autonomía ${puntuacionAutonomia}/25`}
                 >
                   <span className={styles.mapDotLabel}>Tú</span>
@@ -425,7 +438,7 @@ export default function TestDelegacionEfectivaPage() {
             {/* Perfil */}
             <div className={styles.profileCard}>
               <div className={styles.profileHeader}>
-                <span className={styles.profileEmoji}>{perfil.emoji}</span>
+                <span className={styles.profileEmoji} aria-hidden="true">{perfil.emoji}</span>
                 <h3 className={styles.profileName}>{perfil.nombre}</h3>
               </div>
               <p className={styles.profileDescription}>{perfil.descripcion}</p>
