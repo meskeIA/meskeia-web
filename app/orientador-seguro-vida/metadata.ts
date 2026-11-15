@@ -42,6 +42,13 @@ export const jsonLd = generateWebAppSchema({
   features: [],
 });
 
+// Cabo C0570 (15/11/2026): el JSON-LD daba 150.000 € por 15-35 € al mes a los 35 años y la visible
+// 200.000 € por 15-25 €, sin fuente ninguna de las dos. No hay precios públicos por perfil (UNESPA e
+// ICEA publican volúmenes del sector, no primas por edad y capital) y la app no calcula primas: o se
+// calcula o no hay cifra. Quedan los factores que mueven la prima, que es lo que la app explica.
+export const RESPUESTA_FAQ_COSTE =
+  'Depende sobre todo de la edad al contratar, del capital asegurado, del plazo de cobertura, del estado de salud y de si fumas: la prima sube con cada uno de ellos, y por eso contratar antes suele salir más barato. No hay un precio público de referencia por perfil, así que la forma fiable de saberlo es pedir presupuesto a varias aseguradoras con el mismo capital, plazo y coberturas, y comparar también las exclusiones.';
+
 export const faqJsonLd = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
@@ -75,7 +82,7 @@ export const faqJsonLd = {
       name: '¿Cuánto cuesta un seguro de vida al mes?',
       acceptedAnswer: {
         '@type': 'Answer',
-        text: 'El coste varía según edad, capital asegurado, estado de salud y coberturas. Para una persona de 35 años, no fumadora y con buena salud, un seguro de vida de 150.000 € de capital puede rondar entre 15 y 35 € mensuales. La prima aumenta con la edad y el capital contratado. Contratar a edades tempranas permite fijar primas más bajas durante toda la vigencia de la póliza.',
+        text: RESPUESTA_FAQ_COSTE,
       },
     },
     {

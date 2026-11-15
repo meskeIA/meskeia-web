@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react';
 import styles from './OrientadorSeguroVida.module.css';
+import { RESPUESTA_FAQ_COSTE } from './metadata';
 import { MeskeiaLogo, Footer, NumberInput, ResultCard, EducationalSection, RelatedApps, DisclaimerCard, LegalNotice, ShareCard } from '@/components';
 import { formatCurrency, parseSpanishNumber } from '@/lib';
 
@@ -586,10 +587,7 @@ export default function CalculadoraSeguroVidaPage() {
             </div>
             <div className={styles.faqItem}>
               <h4>¿Cuánto cuesta un seguro de vida?</h4>
-              <p>
-                Orientativamente: una persona de 35 años, no fumadora, puede asegurar 200.000€ a 20 años
-                por unos 15-25€/mes. A los 45 años, la misma cobertura puede costar 30-50€/mes.
-              </p>
+              <p>{RESPUESTA_FAQ_COSTE}</p>
             </div>
             <div className={styles.faqItem}>
               <h4>¿El seguro de vida desgrava en la declaración?</h4>
