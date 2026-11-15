@@ -235,7 +235,7 @@
 
 .btnLimpiar:hover {
   border-color: #DC2626;
-  color: #DC2626;
+  color: var(--rojo-texto, #DC2626);
 }
 
 .historialLista {

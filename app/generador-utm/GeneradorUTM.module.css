@@ -897,7 +897,7 @@
 .warningList li code {
   font-family: 'Consolas', 'Monaco', monospace;
   font-size: 0.82rem;
-  color: #c0392b;
+  color: var(--rojo-texto, #c0392b);
   background: rgba(231, 76, 60, 0.08);
   padding: 1px 5px;
   border-radius: 3px;

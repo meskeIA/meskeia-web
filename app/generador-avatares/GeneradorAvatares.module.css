@@ -815,7 +815,7 @@
   content: '✗';
   position: absolute;
   left: 0;
-  color: #e53935;
+  color: var(--rojo-texto, #e53935);
   font-weight: bold;
   font-size: 1rem;
 }

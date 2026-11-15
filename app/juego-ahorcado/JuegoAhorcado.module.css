@@ -179,12 +179,12 @@
 
 .estadoGanado {
   background: #F0FFF4;
-  color: #276749;
+  color: var(--verde-texto, #276749);
 }
 
 .estadoPerdido {
   background: #FFF5F5;
-  color: #9B2335;
+  color: var(--rojo-texto, #9B2335);
 }
 
 [data-theme='dark'] .estadoJugando {

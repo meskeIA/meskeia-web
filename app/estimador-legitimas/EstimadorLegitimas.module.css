@@ -245,7 +245,7 @@
 .bloqueEstricta {
   background: rgba(231, 76, 60, 0.06);
   border-color: rgba(231, 76, 60, 0.35);
-  color: #C0392B;
+  color: var(--rojo-texto, #C0392B);
 }
 [data-theme='dark'] .bloqueEstricta { background: rgba(231, 76, 60, 0.1); }
 

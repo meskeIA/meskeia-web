@@ -194,7 +194,7 @@
 
 .colorVerde .resultadoPorcentaje   { color: var(--verde-texto, #28a745); }
 .colorNaranja .resultadoPorcentaje { color: var(--naranja-texto, #fd7e14); }
-.colorRojo .resultadoPorcentaje    { color: #dc3545; }
+.colorRojo .resultadoPorcentaje    { color: var(--rojo-texto, #dc3545); }
 .colorGris .resultadoPorcentaje    { color: #6c757d; }
 
 .resultadoTitulo {

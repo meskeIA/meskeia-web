@@ -573,12 +573,12 @@
 }
 
 .errorRespuestaUsuario {
-  color: #c62828;
+  color: var(--rojo-texto, #c62828);
   font-weight: 600;
 }
 
 .errorRespuestaCorrecta {
-  color: #2e7d32;
+  color: var(--verde-texto, #2e7d32);
   font-weight: 600;
 }
 

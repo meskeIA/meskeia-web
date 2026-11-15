@@ -154,7 +154,7 @@
 /* Avisos del resultado: lo que ha apartado a la opción por estilo de vida, y los empates */
 .avisoRecorte, .avisoEmpate {
   margin: 0 0 1.25rem; padding: 0.85rem 1rem; border: 1px solid #f59e0b; border-left-width: 4px;
-  border-radius: 8px; background: #fef3c7; color: #78350f; font-size: 0.93rem; line-height: 1.5;
+  border-radius: 8px; background: #fef3c7; color: var(--naranja-texto, #78350f); font-size: 0.93rem; line-height: 1.5;
 }
 .avisoEmpate { border-color: var(--primary-texto); background: rgba(46,134,171,0.08); color: var(--text-primary); }
 

@@ -185,7 +185,7 @@
 
 .btnLimpiar:hover {
   border-color: #dc2626;
-  color: #dc2626;
+  color: var(--rojo-texto, #dc2626);
 }
 
 .btnLimpiar:focus-visible {

@@ -128,7 +128,7 @@
 
 .error {
   font-size: 0.8rem;
-  color: #DC2626;
+  color: var(--rojo-texto, #DC2626);
   font-weight: 500;
 }
 
@@ -186,7 +186,7 @@
 .btnPeligro {
   padding: 0.45rem 1rem;
   background: transparent;
-  color: #DC2626;
+  color: var(--rojo-texto, #DC2626);
   border: 1.5px solid #DC2626;
   border-radius: 8px;
   font-size: 0.85rem;

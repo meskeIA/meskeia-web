@@ -388,7 +388,7 @@
 
 .removeBtn {
   background: transparent;
-  color: #dc2626;
+  color: var(--rojo-texto, #dc2626);
   border: none;
   font-size: 1.1rem;
   cursor: pointer;
@@ -397,7 +397,7 @@
 }
 
 .removeBtn:hover {
-  color: #991b1b;
+  color: var(--rojo-texto, #991b1b);
 }
 
 /* Fórmulas */

@@ -107,7 +107,7 @@
 .btn:hover { opacity: 0.9; }
 .btn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 
-.errorMsg { color: #c0392b; margin-bottom: 1rem; font-size: 0.9rem; }
+.errorMsg { color: var(--rojo-texto, #c0392b); margin-bottom: 1rem; font-size: 0.9rem; }
 
 .resultados { display: flex; flex-direction: column; gap: var(--spacing-md); }
 

@@ -294,7 +294,7 @@
 }
 
 .itemBorrar:hover {
-  color: #DC2626;
+  color: var(--rojo-texto, #DC2626);
 }
 
 /* En táctil: siempre visible */
@@ -386,7 +386,7 @@
   border: 2px solid #DC2626;
   border-radius: 6px;
   background: transparent;
-  color: #DC2626;
+  color: var(--rojo-texto, #DC2626);
   cursor: pointer;
   transition: all 0.2s;
   margin-left: auto;

@@ -123,7 +123,7 @@
 .btn:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
 
 .errorMsg {
-  color: #c0392b;
+  color: var(--rojo-texto, #c0392b);
   margin-bottom: 1rem;
   font-size: 0.9rem;
 }

@@ -187,9 +187,9 @@
   border-color: var(--primary-boton);
 }
 
-.sosAltaBtn  { border-color: rgba(76,175,80,0.3);  color: #2e7d32; }
+.sosAltaBtn  { border-color: rgba(76,175,80,0.3);  color: var(--verde-texto, #2e7d32); }
 .sosMediaBtn { border-color: rgba(255,152,0,0.3);  color: var(--naranja-texto, #e65100); }
-.sosBajaBtn  { border-color: rgba(244,67,54,0.3);  color: #c62828; }
+.sosBajaBtn  { border-color: rgba(244,67,54,0.3);  color: var(--rojo-texto, #c62828); }
 
 /* ── Resultados ── */
 .resultadosHeader { margin-bottom: 1rem; }

@@ -273,7 +273,7 @@
 .calcBtn:hover { opacity: 0.88; }
 
 .errorMsg {
-  color: #dc2626;
+  color: var(--rojo-texto, #dc2626);
   font-size: 0.85rem;
   margin-bottom: 0.75rem;
 }
@@ -304,7 +304,7 @@
 .rowBase { font-weight: 700; }
 .rowBase td:first-child { color: var(--primary-texto); }
 
-.tagR { color: #dc2626; font-size: 0.75rem; font-weight: 700; }
+.tagR { color: var(--rojo-texto, #dc2626); font-size: 0.75rem; font-weight: 700; }
 .tagP { color: var(--verde-texto, #059669); font-size: 0.75rem; font-weight: 700; }
 .tagLimite { color: var(--ambar-texto, #f59e0b); font-size: 0.75rem; font-weight: 700; }
 
@@ -369,7 +369,7 @@
 .reactivoFormula {
   font-size: 0.85rem;
   font-weight: 700;
-  color: #dc2626;
+  color: var(--rojo-texto, #dc2626);
   font-family: 'Courier New', monospace;
 }
 

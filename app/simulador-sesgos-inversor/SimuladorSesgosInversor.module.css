@@ -426,7 +426,7 @@
 
 .nivelBadgeModerado {
   background: rgba(202, 138, 4, 0.1);
-  color: #92400e;
+  color: var(--naranja-texto, #92400e);
 }
 
 .sesgoDesc {
