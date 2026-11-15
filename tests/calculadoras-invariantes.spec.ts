@@ -4956,6 +4956,29 @@ test.describe('Motores 09/09 — legítimas: sí distingue los siete regímenes,
     expect(sinAsc.descripcionDerechoConyuge).not.toContain('834');
   });
 
+  test('CABO C0776: sin descendientes, el mensaje foral no manda la legítima a los ascendientes donde no la tienen', () => {
+    // REPARADO EL 15/11/2026. Hasta entonces, sin hijos, los seis forales decían que la legítima
+    // «pasa a los ascendientes». En Aragón (art. 486.1 CDFA: los descendientes «son los únicos
+    // legitimarios»), Galicia (art. 238 Ley 2/2006) y el País Vasco (art. 47 Ley 5/2015) los
+    // padres no son legitimarios: sin descendientes no hay legítima. En Cataluña (arts. 451-3 y
+    // 451-4 CCCat) y Baleares (art. 41 Compilació) sí la tienen. Lo lee también el MCP de Delegum.
+    const sinHijos = (regimen: RegimenId) => () =>
+      calcularLegitimas({ patrimonioNeto: 300000, regimen, numHijos: 0, tieneConyuge: true });
+    const citas: Array<[RegimenId, RegExp]> = [
+      ['aragon', /486\.1 CDFA/],
+      ['galicia', /238 Ley 2\/2006/],
+      ['pais-vasco', /47 Ley 5\/2015/],
+    ];
+    for (const [regimen, cita] of citas) {
+      expect(sinHijos(regimen)).toThrow(/no hay legítima/);
+      expect(sinHijos(regimen)).toThrow(cita);
+      expect(sinHijos(regimen)).not.toThrow(/pasa a los ascendientes/);
+    }
+    for (const regimen of ['cataluna', 'baleares'] as RegimenId[]) {
+      expect(sinHijos(regimen)).toThrow(/pasa a los ascendientes/);
+    }
+  });
+
   test('ALTO: una clave heredada de Object.prototype no puede pasar por régimen', () => {
     // `if (!REGIMENES[p.regimen]) throw` no protege: REGIMENES es un literal con prototipo, así
     // que REGIMENES['constructor'] es truthy, el switch no casa ningún caso y todo se queda en

@@ -167,6 +167,18 @@ export function esRegimenValido(v: unknown): v is RegimenId {
   return typeof v === 'string' && Object.hasOwn(REGIMENES, v);
 }
 
+/**
+ * Regímenes forales en los que solo los descendientes (y el viudo) son legitimarios: sin
+ * descendientes no hay legítima que pase a los ascendientes. Texto leído en el BOE/BOA el
+ * 15/11/2026 (cabo C0776). En Cataluña (arts. 451-3 y 451-4 CCCat) y Baleares (art. 41
+ * Compilació: «Los padres») sí la hay, y el motor los rechaza con su propio mensaje.
+ */
+const SOLO_DESCENDIENTES_LEGITIMARIOS: Partial<Record<RegimenId, string>> = {
+  aragon: 'los descendientes «son los únicos legitimarios» (art. 486.1 CDFA)',
+  galicia: 'solo son legitimarios los descendientes y el cónyuge viudo (art. 238 Ley 2/2006)',
+  'pais-vasco': 'solo son legitimarios los descendientes y el cónyuge viudo o pareja de hecho (art. 47 Ley 5/2015)',
+};
+
 // ─── Función principal ─────────────────────────────────────────────────────────
 
 export function calcularLegitimas(p: ParametrosLegitimas): ResultadoLegitimas {
@@ -193,6 +205,18 @@ export function calcularLegitimas(p: ParametrosLegitimas): ResultadoLegitimas {
   // descendientes excluyen a los ascendientes, y a falta de ambos no hay heredero forzoso
   // salvo el viudo). Navarra queda fuera: su legítima es formal, 0 € haya o no descendientes.
   if (sinDescendientes && p.regimen !== 'navarra') {
+    const soloDescendientes = SOLO_DESCENDIENTES_LEGITIMARIOS[p.regimen];
+    if (soloDescendientes) {
+      // Aragón, Galicia y el País Vasco no tienen legítima de ascendientes: hasta el 15/11/2026
+      // este mensaje decía que «pasa a los ascendientes», que solo es cierto en Cataluña y
+      // Baleares (cabo C0776). Sin descendientes no hay legítima; el viudo conserva su usufructo.
+      throw new Error(
+        `Sin descendientes no hay legítima en el derecho foral de ${datos.nombre}: ${soloDescendientes}. ` +
+        `El cónyuge viudo, si lo hay, conserva su usufructo, que esta herramienta no calcula sin ` +
+        `descendientes — solo calcula la legítima de descendientes en los regímenes forales. ` +
+        `Consulta con notaría.`
+      );
+    }
     if (p.regimen !== 'comun') {
       throw new Error(
         `Sin descendientes, la legítima ya no es la de los hijos: pasa a los ascendientes conforme al ` +
