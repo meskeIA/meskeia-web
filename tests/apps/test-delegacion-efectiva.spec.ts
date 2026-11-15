@@ -274,7 +274,8 @@ test.describe('JSON-LD', () => {
 /* ─────────────────────── Hallazgos abiertos (inspector 15/11/2026) ─────────────────────── */
 
 test.describe('Hallazgos de cálculo y operativa', () => {
-  // HALLAZGO (15/11/2026, ABIERTO) · el mapa pinta los cuatro cuadrantes partidos al 50 % (grid
+  // HALLAZGO 4713 (15/11/2026, REPARADO en las seis hermanas; testigo cuadrante-tests-dos-ejes) · el
+  // mapa pintaba los cuatro cuadrantes partidos al 50 % (grid
   // 1fr 1fr, que equivale a 15 puntos), pero los perfiles se deciden con 14 y 18 (45,5 % y 63,5 %).
   // En la zona media el punto cae dentro de un cuadrante rotulado con OTRO perfil: medido, A 18 /
   // B 16 «Tendencia al Control» y A 17 / B 17 «Sin tendencia predominante» (cuyo texto dice «el test
@@ -282,7 +283,6 @@ test.describe('Hallazgos de cálculo y operativa', () => {
   // dentro de «🔒 Retención Total». Por cuenta de combinaciones (5^10), el 47,7 % de las respuestas
   // posibles deja el punto en un cuadrante con otro nombre; el 14,4 %, en «Delegación Efectiva».
   test('en la zona media el punto no cae en un cuadrante rotulado con otro perfil', async ({ page }) => {
-    test.fail();
     const casos: [number[], string][] = [
       [A18_B16, 'Tendencia al Control'],
       [A17_B17, 'Sin tendencia predominante'],

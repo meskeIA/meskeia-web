@@ -253,7 +253,7 @@ export default function TestDependenciaTecnologicaPage() {
 
   // Posición en el mapa — X: adaptabilidad, Y: autonomía. De 5 % a 95 % (5 → 5 %, 15 → 50 %,
   // 25 → 95 %): en 0 % y 100 % el punto quedaba centrado en la esquina y el mapa lo recortaba
-  // (cabo C0712). Las líneas de umbral (14 y 18) se colocan con la misma escala.
+  // (cabo C0712). Las líneas de umbral van a medio punto de 14 y 18 (13,5 y 17,5), en el borde de los cuadrantes (hallazgo 4713).
   const aPorcentaje = (puntos: number) => 5 + ((puntos - 5) / 20) * 90;
   const posX = aPorcentaje(puntuacionAdaptabilidad);
   const posY = 100 - aPorcentaje(puntuacionAutonomia);
@@ -365,10 +365,10 @@ export default function TestDependenciaTecnologicaPage() {
                 <div className={`${styles.quadrant} ${styles.quadrantBR}`}>
                   <span><span aria-hidden="true">🏄</span> Surfista Digital</span>
                 </div>
-                <div className={styles.thresholdLineV} style={{ left: `${aPorcentaje(14)}%` }} aria-hidden="true" />
-                <div className={styles.thresholdLineV} style={{ left: `${aPorcentaje(18)}%` }} aria-hidden="true" />
-                <div className={styles.thresholdLineH} style={{ top: `${100 - aPorcentaje(18)}%` }} aria-hidden="true" />
-                <div className={styles.thresholdLineH} style={{ top: `${100 - aPorcentaje(14)}%` }} aria-hidden="true" />
+                <div className={styles.thresholdLineV} style={{ left: `${aPorcentaje(13.5)}%` }} aria-hidden="true" />
+                <div className={styles.thresholdLineV} style={{ left: `${aPorcentaje(17.5)}%` }} aria-hidden="true" />
+                <div className={styles.thresholdLineH} style={{ top: `${100 - aPorcentaje(17.5)}%` }} aria-hidden="true" />
+                <div className={styles.thresholdLineH} style={{ top: `${100 - aPorcentaje(13.5)}%` }} aria-hidden="true" />
                 <div
                   className={styles.mapDot}
                   style={{ left: `${posX}%`, top: `${posY}%` }}

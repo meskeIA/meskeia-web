@@ -109,6 +109,17 @@ async function contestar(page: Page, a: number, b: number): Promise<void> {
   await expect(encabezado(page)).toBeVisible();
 }
 
+/** Contesta las diez con la lista dada (posición i = pregunta i + 1) y pide el resultado. */
+async function contestarLista(page: Page, respuestas: number[]): Promise<void> {
+  const grupos = page.getByRole('radiogroup');
+  await expect(grupos).toHaveCount(10);
+  for (let i = 0; i < 10; i++) {
+    await grupos.nth(i).getByRole('radio', { name: new RegExp(`\\(${respuestas[i]} de 5\\)`) }).click();
+  }
+  await page.locator('button[class*="btnPrimary"]').click();
+  await expect(encabezado(page)).toBeVisible();
+}
+
 /** Rótulos de los cuadrantes que contienen el centro del punto «Tú». */
 async function cuadranteDelPunto(page: Page): Promise<string[]> {
   return page.evaluate(() => {
@@ -195,6 +206,34 @@ for (const app of APPS) {
         expect(rotulos.length, `A=${polo.a}, B=${polo.b}: el punto cae en un cuadrante`).toBe(1);
         expect(rotulos[0], `A=${polo.a}, B=${polo.b}`).toContain(polo.cuadrante);
       }
+    });
+
+    // Hallazgo 4713 (test-delegacion-efectiva, 15/11/2026): la rejilla 1fr 1fr partía el mapa al
+    // 50 % (15 puntos) y el perfil se decide con 14 y 18, así que con una dimensión entre 14 y 17
+    // el punto caía en un cuadrante rotulado con otro perfil (47,7 % de las 5^10 respuestas). Las
+    // seis comparten umbrales y rejilla. En la zona media el punto no cae en ningún cuadrante.
+    test('en la zona media (una dimensión entre 14 y 17) el punto no cae en un cuadrante rotulado', async ({ page }) => {
+      const casos: { respuestas: number[]; nota: string }[] = [
+        { respuestas: [4, 3, 4, 3, 3, 4, 4, 3, 3, 3], nota: 'A 18, B 16' },
+        { respuestas: [4, 4, 4, 4, 3, 3, 3, 3, 3, 3], nota: 'A 17, B 17' },
+        { respuestas: [3, 3, 3, 3, 3, 3, 3, 3, 2, 2], nota: 'A 14, B 14' },
+        { respuestas: [3, 4, 3, 4, 3, 4, 3, 3, 2, 3], nota: 'A 14, B 18' },
+      ];
+      for (const caso of casos) {
+        await page.goto(`/${app.slug}/`);
+        await esperarPaginaAsentada(page);
+        await contestarLista(page, caso.respuestas);
+        expect(await cuadranteDelPunto(page), caso.nota).toEqual([]);
+      }
+      // Y el borde: con 18 y 13 el punto SÍ cae en el cuadrante de su perfil.
+      await page.goto(`/${app.slug}/`);
+      await esperarPaginaAsentada(page);
+      await contestarLista(page, [4, 3, 4, 3, 3, 3, 4, 2, 3, 2]); // A 18, B 13
+      const rotulos = await cuadranteDelPunto(page);
+      const alto = app.polos.find((p) => p.a === 5 && p.b === 1)!;
+      expect(rotulos.length, 'A 18, B 13').toBe(1);
+      expect(rotulos[0]).toContain(alto.cuadrante);
+      await expect(encabezado(page)).toHaveText(alto.perfil);
     });
 
     test('contestar lo mismo a las diez (todo 3, las dos dimensiones a 15) no atribuye tendencia', async ({ page }) => {

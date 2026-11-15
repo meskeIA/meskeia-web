@@ -151,3 +151,17 @@
 @media (prefers-reduced-motion: reduce) {
   .mapDot, .barFill, .btnPrimary, .btnSecondary, .questionCard, .scaleButton { transition: none; }
 }
+
+/* ─── Cada cuadrante, del tamaño de su zona (hallazgo 4713, 15/11/2026) ───
+   La rejilla 1fr 1fr partía el mapa al 50 % (15 puntos), pero el perfil se decide con 14 y 18:
+   con una dimensión entre 14 y 17 el punto caía en un cuadrante rotulado con OTRO perfil (el
+   47,7 % de las respuestas posibles). Ahora cada cuadrante ocupa solo la zona de su perfil, con el
+   borde a medio punto del umbral en la escala del punto (5 → 5 %, 25 → 95 %): por debajo de 13,5
+   (43,25 %) es bajo y por encima de 17,5 (61,25 %) alto, igual en los dos ejes. La franja central
+   queda sin rótulo: es la de los perfiles intermedios. */
+.map { display: block; }
+.quadrant { position: absolute; }
+.quadrantTL { left: 0; top: 0; width: 43.25%; height: 38.75%; }
+.quadrantTR { right: 0; top: 0; width: 38.75%; height: 38.75%; }
+.quadrantBL { left: 0; bottom: 0; width: 43.25%; height: 43.25%; }
+.quadrantBR { right: 0; bottom: 0; width: 38.75%; height: 43.25%; }

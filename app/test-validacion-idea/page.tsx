@@ -195,10 +195,10 @@ export default function TestValidacionIdeaPage() {
                 <div className={`${styles.quadrant} ${styles.quadrantTR}`}><span><span aria-hidden="true">🔀</span> En Conflicto</span></div>
                 <div className={`${styles.quadrant} ${styles.quadrantBL}`}><span><span aria-hidden="true">🌱</span> Fase Exploración</span></div>
                 <div className={`${styles.quadrant} ${styles.quadrantBR}`}><span><span aria-hidden="true">💘</span> Enamorado de la Idea</span></div>
-                <div className={styles.thresholdLineV} style={{ left: `${aPorcentaje(14)}%` }} aria-hidden="true" />
-                <div className={styles.thresholdLineV} style={{ left: `${aPorcentaje(18)}%` }} aria-hidden="true" />
-                <div className={styles.thresholdLineH} style={{ top: `${100 - aPorcentaje(18)}%` }} aria-hidden="true" />
-                <div className={styles.thresholdLineH} style={{ top: `${100 - aPorcentaje(14)}%` }} aria-hidden="true" />
+                <div className={styles.thresholdLineV} style={{ left: `${aPorcentaje(13.5)}%` }} aria-hidden="true" />
+                <div className={styles.thresholdLineV} style={{ left: `${aPorcentaje(17.5)}%` }} aria-hidden="true" />
+                <div className={styles.thresholdLineH} style={{ top: `${100 - aPorcentaje(17.5)}%` }} aria-hidden="true" />
+                <div className={styles.thresholdLineH} style={{ top: `${100 - aPorcentaje(13.5)}%` }} aria-hidden="true" />
                 <div className={styles.mapDot} style={{ left: `${posX}%`, top: `${posY}%` }} aria-label={`Tu posición: Asunción ${puntuacionAsuncion}/25, Validación ${puntuacionValidacion}/25`}>
                   <span className={styles.mapDotLabel}>Tú</span>
                 </div>
