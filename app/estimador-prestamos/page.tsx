@@ -1433,7 +1433,7 @@ export default function SimuladorPrestamosPage() {
                 <li><strong>Cooperativas de crédito:</strong> Cajamar, Laboral Kutxa (buenas TAE locales)</li>
               </ul>
               <div className={styles.stepWarning}>
-                ⚠️ <strong>Fíjate en la TAE, no solo en el TIN.</strong> La TAE incluye todos los costes reales.
+                <span aria-hidden="true">⚠️</span> <strong>Fíjate en la TAE, no solo en el TIN.</strong> La TAE incluye todos los costes reales.
               </div>
             </div>
           </div>
@@ -1453,7 +1453,7 @@ export default function SimuladorPrestamosPage() {
                 <li>Contrato de trabajo o certificado de empresa</li>
               </ul>
               <div className={styles.stepTip}>
-                💡 <strong>Tip:</strong> Si eres autónomo, presenta también tu modelo 036/037 y cuentas anuales.
+                <span aria-hidden="true">💡</span> <strong>Tip:</strong> Si eres autónomo, presenta también tu modelo 036/037 y cuentas anuales.
               </div>
             </div>
           </div>
@@ -1492,7 +1492,7 @@ export default function SimuladorPrestamosPage() {
                 <li>Guarda una <strong>copia del contrato y del cuadro de amortización</strong> para futuras referencias</li>
               </ul>
               <div className={styles.stepTip}>
-                💡 <strong>Tip:</strong> Activa domiciliación bancaria para no olvidar ninguna cuota.
+                <span aria-hidden="true">💡</span> <strong>Tip:</strong> Activa domiciliación bancaria para no olvidar ninguna cuota.
               </div>
             </div>
           </div>
@@ -1645,7 +1645,7 @@ export default function SimuladorPrestamosPage() {
                   siendo <strong>"TAE 8%"</strong> tras sumar todos los costes.
                 </p>
                 <p className={styles.warningSolution}>
-                  ✅ <strong>Solución:</strong> Compara siempre por TAE (es el coste real total).
+                  <span aria-hidden="true">✅</span> <strong>Solución:</strong> Compara siempre por TAE (es el coste real total).
                 </p>
               </div>
 
@@ -1659,7 +1659,7 @@ export default function SimuladorPrestamosPage() {
                   innecesarios</strong>. Además, aumenta tu ratio de endeudamiento.
                 </p>
                 <p className={styles.warningSolution}>
-                  ✅ <strong>Solución:</strong> Calcula exactamente cuánto necesitas (presupuestos reales + margen 10%).
+                  <span aria-hidden="true">✅</span> <strong>Solución:</strong> Calcula exactamente cuánto necesitas (presupuestos reales + margen 10%).
                 </p>
               </div>
 
@@ -1673,7 +1673,7 @@ export default function SimuladorPrestamosPage() {
                   Un préstamo de 10.000 € al 7%: 3 años = 1.115 € intereses | 5 años = 1.875 € intereses.
                 </p>
                 <p className={styles.warningSolution}>
-                  ✅ <strong>Solución:</strong> Elige el plazo más corto que puedas pagar cómodamente.
+                  <span aria-hidden="true">✅</span> <strong>Solución:</strong> Elige el plazo más corto que puedas pagar cómodamente.
                 </p>
               </div>
 
@@ -1687,7 +1687,7 @@ export default function SimuladorPrestamosPage() {
                   penalizaciones por impago, condiciones de amortización anticipada.
                 </p>
                 <p className={styles.warningSolution}>
-                  ✅ <strong>Solución:</strong> Lee el FIPER completo. Si algo no queda claro, pregunta ANTES de firmar.
+                  <span aria-hidden="true">✅</span> <strong>Solución:</strong> Lee el FIPER completo. Si algo no queda claro, pregunta ANTES de firmar.
                 </p>
               </div>
 
@@ -1701,7 +1701,7 @@ export default function SimuladorPrestamosPage() {
                   por tu cuenta. Legalmente, puedes contratar el seguro en otra aseguradora.
                 </p>
                 <p className={styles.warningSolution}>
-                  ✅ <strong>Solución:</strong> Compara el seguro del banco con Rastreator, Acierto.com, etc.
+                  <span aria-hidden="true">✅</span> <strong>Solución:</strong> Compara el seguro del banco con Rastreator, Acierto.com, etc.
                 </p>
               </div>
 
@@ -1715,7 +1715,7 @@ export default function SimuladorPrestamosPage() {
                   financiar tu día a día (vacaciones, ropa, restaurantes). Eso indica un problema de ingresos.
                 </p>
                 <p className={styles.warningSolution}>
-                  ✅ <strong>Solución:</strong> Si necesitas crédito para gastos corrientes, revisa tu presupuesto primero.
+                  <span aria-hidden="true">✅</span> <strong>Solución:</strong> Si necesitas crédito para gastos corrientes, revisa tu presupuesto primero.
                 </p>
               </div>
 
@@ -1729,7 +1729,7 @@ export default function SimuladorPrestamosPage() {
                   en impago, las consecuencias son graves (ASNEF, demanda judicial, embargo).
                 </p>
                 <p className={styles.warningSolution}>
-                  ✅ <strong>Solución:</strong> Mantén un fondo de emergencia equivalente a 3-6 cuotas del préstamo.
+                  <span aria-hidden="true">✅</span> <strong>Solución:</strong> Mantén un fondo de emergencia equivalente a 3-6 cuotas del préstamo.
                   Si tienes problemas, <strong>contacta con el banco ANTES de dejar de pagar</strong> (pueden renegociar).
                 </p>
               </div>

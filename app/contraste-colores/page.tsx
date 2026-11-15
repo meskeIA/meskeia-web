@@ -682,7 +682,7 @@ export default function ContrasteColoresPage() {
                 <li>Lectura prolongada (blogs, documentación técnica, e-learning)</li>
               </ul>
               <p className={styles.faqTip}>
-                💡 <strong>Consejo práctico:</strong> Si es tu primera auditoría de accesibilidad, apunta a AA. Una vez conseguido, mejora gradualmente los elementos más críticos (títulos, formularios, CTAs) a AAA.
+                <span aria-hidden="true">💡</span> <strong>Consejo práctico:</strong> Si es tu primera auditoría de accesibilidad, apunta a AA. Una vez conseguido, mejora gradualmente los elementos más críticos (títulos, formularios, CTAs) a AAA.
               </p>
             </div>
 
@@ -707,7 +707,7 @@ export default function ContrasteColoresPage() {
                 En <strong>España</strong>, el RD 1112/2018 exige cumplimiento total desde septiembre 2020 para webs públicas.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Consejo práctico:</strong> Aunque tu proyecto no sea legalmente obligado, cumplir AA mejora el SEO (Google penaliza mala accesibilidad desde 2021) y amplía tu audiencia potencial en +15% (personas con discapacidad visual).
+                <span aria-hidden="true">💡</span> <strong>Consejo práctico:</strong> Aunque tu proyecto no sea legalmente obligado, cumplir AA mejora el SEO (Google penaliza mala accesibilidad desde 2021) y amplía tu audiencia potencial en +15% (personas con discapacidad visual).
               </p>
             </div>
 
@@ -729,7 +729,7 @@ export default function ContrasteColoresPage() {
                 <li>Verifica enlaces y botones: Los azules que funcionan en claro pueden necesitar tintes más claros en oscuro</li>
               </ul>
               <p className={styles.faqTip}>
-                💡 <strong>Consejo práctico:</strong> Crea un toggle en tu design system y verifica TODOS los pares de color en ambos modos antes de lanzar. Herramientas como Figma permiten plugins de verificación automática (Stark, A11y).
+                <span aria-hidden="true">💡</span> <strong>Consejo práctico:</strong> Crea un toggle en tu design system y verifica TODOS los pares de color en ambos modos antes de lanzar. Herramientas como Figma permiten plugins de verificación automática (Stark, A11y).
               </p>
             </div>
 
@@ -753,7 +753,7 @@ export default function ContrasteColoresPage() {
                 <li>Quieres destacar en certificaciones de accesibilidad (ISO 30071-1)</li>
               </ul>
               <p className={styles.faqTip}>
-                💡 <strong>Consejo práctico:</strong> Prioriza AAA en elementos críticos (formularios, mensajes de error, CTAs) aunque el resto sea AA. Esto te da un balance óptimo entre usabilidad y esfuerzo de diseño.
+                <span aria-hidden="true">💡</span> <strong>Consejo práctico:</strong> Prioriza AAA en elementos críticos (formularios, mensajes de error, CTAs) aunque el resto sea AA. Esto te da un balance óptimo entre usabilidad y esfuerzo de diseño.
               </p>
             </div>
 
@@ -775,7 +775,7 @@ export default function ContrasteColoresPage() {
                 <strong>Datos concretos:</strong> Sitios con Lighthouse Accessibility Score &gt;90 tienen un 23% más de tráfico orgánico que aquellos con &lt;50 (estudio de HTTPArchive 2023).
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Consejo práctico:</strong> Ejecuta Google Lighthouse en Chrome DevTools (F12 → Lighthouse → Accessibility). Corrige TODOS los errores de contraste que detecte para maximizar tu score.
+                <span aria-hidden="true">💡</span> <strong>Consejo práctico:</strong> Ejecuta Google Lighthouse en Chrome DevTools (F12 → Lighthouse → Accessibility). Corrige TODOS los errores de contraste que detecte para maximizar tu score.
               </p>
             </div>
 
@@ -801,7 +801,7 @@ export default function ContrasteColoresPage() {
                 <li><strong>Chrome DevTools:</strong> Inspecciona elemento → pestaña "Accessibility" → muestra contraste detectado</li>
               </ul>
               <p className={styles.faqTip}>
-                💡 <strong>Consejo práctico:</strong> Si el texto es crítico (CTA, títulos hero), usa SIEMPRE overlay o fondo sólido. Las imágenes pueden cambiar (CMS dinámico) y romper tu contraste inicial.
+                <span aria-hidden="true">💡</span> <strong>Consejo práctico:</strong> Si el texto es crítico (CTA, títulos hero), usa SIEMPRE overlay o fondo sólido. Las imágenes pueden cambiar (CMS dinámico) y romper tu contraste inicial.
               </p>
             </div>
 
@@ -834,7 +834,7 @@ export default function ContrasteColoresPage() {
                 <li><strong>axe-core (librería npm):</strong> Integra tests de accesibilidad en Jest/Cypress. Detecta fallos antes de desplegar.</li>
               </ul>
               <p className={styles.faqTip}>
-                💡 <strong>Consejo práctico:</strong> Workflow recomendado: Diseña con Stark en Figma → Verifica con esta herramienta → Audita con WAVE antes de lanzar → Automatiza con Pa11y en producción.
+                <span aria-hidden="true">💡</span> <strong>Consejo práctico:</strong> Workflow recomendado: Diseña con Stark en Figma → Verifica con esta herramienta → Audita con WAVE antes de lanzar → Automatiza con Pa11y en producción.
               </p>
             </div>
 
@@ -871,7 +871,7 @@ export default function ContrasteColoresPage() {
                 <li><strong>ColorBox by Lyft:</strong> colorbox.io - Genera paletas accesibles manteniendo el tono base</li>
               </ul>
               <p className={styles.faqTip}>
-                💡 <strong>Consejo práctico:</strong> Documenta en tu design system: "Color primario: #5A9FD4 (solo elementos grandes). Texto primario: #2E7DB3 (AA compliant)". Esto evita confusión en el equipo de diseño.
+                <span aria-hidden="true">💡</span> <strong>Consejo práctico:</strong> Documenta en tu design system: "Color primario: #5A9FD4 (solo elementos grandes). Texto primario: #2E7DB3 (AA compliant)". Esto evita confusión en el equipo de diseño.
               </p>
             </div>
           </div>

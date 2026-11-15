@@ -545,7 +545,7 @@ export default function HuesosCuerpoHumanoPage() {
                 Los recién nacidos tienen aproximadamente 270-300 huesos, muchos de ellos en forma de cartílago o separados. Con el crecimiento, huesos adyacentes se fusionan progresivamente. El proceso se completa alrededor de los 25 años. El cráneo, por ejemplo, nace en varias piezas separadas (fontanelas) para facilitar el parto y el desarrollo cerebral.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Para el examen:</strong> Los 270 huesos al nacer se fusionan hasta los 206 del adulto. Las fontanelas del cráneo se cierran entre los 18 meses y los 2 años.
+                <span aria-hidden="true">💡</span> <strong>Para el examen:</strong> Los 270 huesos al nacer se fusionan hasta los 206 del adulto. Las fontanelas del cráneo se cierran entre los 18 meses y los 2 años.
               </p>
             </div>
             <div className={styles.faqItem}>
@@ -554,7 +554,7 @@ export default function HuesosCuerpoHumanoPage() {
                 Depende del hueso y la edad del paciente. Huesos pequeños (falanges, costillas): 3-6 semanas. Huesos medianos (radio, cúbito): 6-12 semanas. Huesos grandes (fémur, tibia): 3-6 meses. Los niños curan más rápido que los adultos gracias a mayor actividad osteoblástica. Los fumadores y diabéticos tienen consolidación más lenta.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Dato clínico:</strong> El fémur proximal en ancianos con osteoporosis puede tardar 4-6 meses y tiene mortalidad asociada del 15-20% en el primer año.
+                <span aria-hidden="true">💡</span> <strong>Dato clínico:</strong> El fémur proximal en ancianos con osteoporosis puede tardar 4-6 meses y tiene mortalidad asociada del 15-20% en el primer año.
               </p>
             </div>
             <div className={styles.faqItem}>
@@ -563,7 +563,7 @@ export default function HuesosCuerpoHumanoPage() {
                 206 es el número estándar del adulto, pero existe variabilidad anatómica normal. Algunas personas tienen costillas cervicales (costilla extra en C7, 0,5-1% de la población), huesos suturales adicionales en el cráneo, o el hueso trígono en el tobillo. También la fusión de vértebras sacras puede variar. La cifra de 206 es la media estadística, no una constante biológica.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Curiosidad:</strong> La costilla cervical es famosa porque puede comprimir el plexo braquial, causando el síndrome del opérculo torácico.
+                <span aria-hidden="true">💡</span> <strong>Curiosidad:</strong> La costilla cervical es famosa porque puede comprimir el plexo braquial, causando el síndrome del opérculo torácico.
               </p>
             </div>
             <div className={styles.faqItem}>
@@ -572,7 +572,7 @@ export default function HuesosCuerpoHumanoPage() {
                 La osteoporosis es la pérdida de densidad mineral ósea por debajo de 2,5 desviaciones estándar de la media (T-score ≤ -2,5 en densitometría DEXA). Afecta al 30% de mujeres postmenopáusicas. Las zonas más vulnerables son la columna lumbar, el cuello del fémur y el radio distal. El riesgo de fractura se multiplica por 2-4 en pacientes con osteoporosis.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Prevención:</strong> 1.000-1.200 mg de calcio/día, 800 UI de vitamina D, ejercicio de impacto y evitar tabaco y alcohol desde los 30 años.
+                <span aria-hidden="true">💡</span> <strong>Prevención:</strong> 1.000-1.200 mg de calcio/día, 800 UI de vitamina D, ejercicio de impacto y evitar tabaco y alcohol desde los 30 años.
               </p>
             </div>
             <div className={styles.faqItem}>
@@ -581,7 +581,7 @@ export default function HuesosCuerpoHumanoPage() {
                 Las fracturas más comunes en adultos son: 1) Radio distal (fractura de Colles, caída con la mano extendida), 2) Vértebras lumbares (osteoporosis), 3) Cuello del fémur (caídas en mayores), 4) Tobillo (maleolo), 5) Clavícula (caídas laterales en deportes). En niños, las fracturas de clavícula y antebrazo son las más frecuentes. Las costillas se fracturan frecuentemente en accidentes de tráfico.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Regla mnemotécnica:</strong> Las 5 "C" más fracturadas: Colles (radio), Cuello femoral, Clavícula, Costillas, Columna.
+                <span aria-hidden="true">💡</span> <strong>Regla mnemotécnica:</strong> Las 5 "C" más fracturadas: Colles (radio), Cuello femoral, Clavícula, Costillas, Columna.
               </p>
             </div>
             <div className={styles.faqItem}>
@@ -590,7 +590,7 @@ export default function HuesosCuerpoHumanoPage() {
                 Hay dos tipos: médula roja (hematopoyética) y médula amarilla (grasa). La médula roja produce 200.000 millones de glóbulos rojos diarios. En adultos, está activa principalmente en vértebras, esternón, costillas, cráneo, crestas ilíacas y epífisis de huesos largos. La médula amarilla ocupa la diáfisis de huesos largos y puede convertirse en roja si hay necesidad aumentada (hemorragia severa, anemia).
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Clínica:</strong> El trasplante de médula ósea se realiza aspirando células del ilion (cresta ilíaca) o del esternón. La cresta ilíaca es la fuente principal.
+                <span aria-hidden="true">💡</span> <strong>Clínica:</strong> El trasplante de médula ósea se realiza aspirando células del ilion (cresta ilíaca) o del esternón. La cresta ilíaca es la fuente principal.
               </p>
             </div>
             <div className={styles.faqItem}>
@@ -599,7 +599,7 @@ export default function HuesosCuerpoHumanoPage() {
                 El chasquido articular tiene varias causas: 1) Cavitación del líquido sinovial (burbujas de CO₂ que estallan, el chasquido de nudillos), 2) Tendones que se deslizan sobre prominencias óseas, 3) Degeneración cartilaginosa (artrosis, crepitación). El chasquido de nudillos no causa artritis, pero puede inflamar ligeramente la cápsula articular con el tiempo.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Mito derribado:</strong> Un estudio de 60 años de seguimiento (Donald Unger, Premio IgNobel 2009) demostró que chasquear los nudillos de una mano durante décadas no produce artritis.
+                <span aria-hidden="true">💡</span> <strong>Mito derribado:</strong> Un estudio de 60 años de seguimiento (Donald Unger, Premio IgNobel 2009) demostró que chasquear los nudillos de una mano durante décadas no produce artritis.
               </p>
             </div>
             <div className={styles.faqItem}>
@@ -608,7 +608,7 @@ export default function HuesosCuerpoHumanoPage() {
                 {RESPUESTA_FAQ_HUESOS_COLUMNA}
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Para el examen:</strong> 7+12+5+1+1 = 26 huesos. Las cervicales son las únicas con agujero transverso para la arteria vertebral.
+                <span aria-hidden="true">💡</span> <strong>Para el examen:</strong> 7+12+5+1+1 = 26 huesos. Las cervicales son las únicas con agujero transverso para la arteria vertebral.
               </p>
             </div>
           </div>

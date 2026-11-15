@@ -322,7 +322,7 @@ export default function CalculadoraPercentilesPage() {
 
       {/* Enlace relacionado */}
       <div className={styles.enlaceRelacionado}>
-        <p>🤰 <strong>¿Esperando un bebé?</strong> Planifica todo con el{' '}
+        <p><span aria-hidden="true">🤰</span> <strong>¿Esperando un bebé?</strong> Planifica todo con el{' '}
           <a href="/planificador-embarazo/">Planificador de Embarazo y Bebé</a>
           {' '}(calculadora FPP, checklist, lista de compras y vacunas)
         </p>
@@ -358,7 +358,7 @@ export default function CalculadoraPercentilesPage() {
         </p>
 
         <p className={styles.emergency}>
-          🚨 <strong>Si tu bebé/niño presenta pérdida de peso, rechazo del alimento, vómitos persistentes,
+          <span aria-hidden="true">🚨</span> <strong>Si tu bebé/niño presenta pérdida de peso, rechazo del alimento, vómitos persistentes,
           diarrea grave o decaimiento importante, acude a urgencias pediátricas inmediatamente.</strong>
         </p>
       </DisclaimerCard>
@@ -524,7 +524,7 @@ export default function CalculadoraPercentilesPage() {
                 No necesariamente. El percentil 10 significa que tu hijo tiene más peso que el 10% de los niños de su edad y sexo. El rango considerado normal va de P3 a P97. Si siempre ha estado en P10 y su curva es estable, es simplemente un niño &quot;pequeño de constitución&quot;. Si hay una caída reciente de percentil, sí merece atención pediátrica. Recuerda que la genética familiar es el factor más importante: padres delgados/bajos suelen tener hijos en percentiles bajos y es completamente normal.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Consejo práctico:</strong> Lo más importante es la tendencia (que la curva sea estable), no el percentil absoluto. Un niño en P10 que siempre ha estado en P10 está perfectamente.
+                <span aria-hidden="true">💡</span> <strong>Consejo práctico:</strong> Lo más importante es la tendencia (que la curva sea estable), no el percentil absoluto. Un niño en P10 que siempre ha estado en P10 está perfectamente.
               </p>
             </div>
 
@@ -534,7 +534,7 @@ export default function CalculadoraPercentilesPage() {
                 La Organización Mundial de la Salud desarrolló sus tablas de crecimiento entre 2003-2006 con datos de 8.500 niños de 6 países (Brasil, Ghana, India, Noruega, Omán y EEUU) en condiciones óptimas de salud (lactancia materna, sin tabaco, entorno socioeconómico favorable). Estas tablas representan cómo <strong>deberían crecer</strong> los niños en condiciones ideales, no cómo crecen de media. España adoptó las tablas OMS como referencia oficial en 2010. Esta herramienta usa datos OMS simplificados para edades clave de 0 a 60 meses.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Consejo práctico:</strong> Para una valoración precisa, tu pediatra usará las tablas OMS completas con curvas de crecimiento continuas, no solo los percentiles de edades clave como esta herramienta.
+                <span aria-hidden="true">💡</span> <strong>Consejo práctico:</strong> Para una valoración precisa, tu pediatra usará las tablas OMS completas con curvas de crecimiento continuas, no solo los percentiles de edades clave como esta herramienta.
               </p>
             </div>
 
@@ -544,7 +544,7 @@ export default function CalculadoraPercentilesPage() {
                 Los bebés con lactancia materna exclusiva suelen crecer más rápido los primeros 3-4 meses y después más despacio que los de lactancia artificial. Esto es completamente normal. Las tablas OMS se diseñaron precisamente con bebés de lactancia materna porque es el patrón de crecimiento saludable de referencia. Si tu bebé tiene lactancia artificial y está en percentiles más altos, puede ser normal también; el pediatra evaluará la velocidad de ganancia de peso.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Consejo práctico:</strong> No cambies el tipo de alimentación de tu bebé basándote en los percentiles. Esta decisión debe tomarse siempre con el pediatra o enfermera pediátrica.
+                <span aria-hidden="true">💡</span> <strong>Consejo práctico:</strong> No cambies el tipo de alimentación de tu bebé basándote en los percentiles. Esta decisión debe tomarse siempre con el pediatra o enfermera pediátrica.
               </p>
             </div>
 
@@ -554,7 +554,7 @@ export default function CalculadoraPercentilesPage() {
                 Una caída de 2 o más canales percentiles (especialmente si es rápida) merece atención, aunque el niño siga en rango &quot;normal&quot;. Las causas más frecuentes son: enfermedad reciente, cambio de alimentación, periodo de menor ingesta (destete, introducción de sólidos), o simplemente que el punto anterior fue medido en un mal momento (enfermo, recién comido). Si la caída se confirma en dos mediciones consecutivas sin causa aparente, consúltalo con el pediatra.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Consejo práctico:</strong> Anota siempre el contexto de cada medición (¿estaba enfermo?, ¿recién comido?, ¿con ropa?). Un solo dato sin contexto tiene poco valor diagnóstico.
+                <span aria-hidden="true">💡</span> <strong>Consejo práctico:</strong> Anota siempre el contexto de cada medición (¿estaba enfermo?, ¿recién comido?, ¿con ropa?). Un solo dato sin contexto tiene poco valor diagnóstico.
               </p>
             </div>
 
@@ -564,7 +564,7 @@ export default function CalculadoraPercentilesPage() {
                 Esta calculadora está diseñada para el rango de edad de 0 a 60 meses (5 años), que corresponde a las tablas OMS de crecimiento infantil. Para niños mayores (5-18 años), se usan otras referencias (OMS para 5-19 años, o tablas de la Fundación Orbegozo en España). Las herramientas de percentil para escolares y adolescentes incluyen también el IMC-para-edad, que es diferente al IMC del adulto.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Consejo práctico:</strong> Para niños mayores de 5 años, consulta directamente con el pediatra o enfermera pediátrica, que tienen acceso a las tablas adecuadas para esa edad.
+                <span aria-hidden="true">💡</span> <strong>Consejo práctico:</strong> Para niños mayores de 5 años, consulta directamente con el pediatra o enfermera pediátrica, que tienen acceso a las tablas adecuadas para esa edad.
               </p>
             </div>
 
@@ -574,7 +574,7 @@ export default function CalculadoraPercentilesPage() {
                 Las revisiones del pediatra ya incluyen peso y talla en los momentos clave (1, 2, 4, 6, 9, 12, 15, 18, 24 meses y luego anuales). No es necesario pesar al bebé en casa con más frecuencia, salvo indicación del pediatra. El peso excesivamente frecuente genera ansiedad en los padres y la variación diaria (por agua, deposiciones, alimentación) no tiene significado clínico. En caso de preocupación, una báscula de farmacia da mediciones más fiables que las domésticas.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Consejo práctico:</strong> Si tu bebé está ganando peso adecuadamente, el pediatra te lo dirá en cada revisión. No necesitas controles domésticos frecuentes salvo indicación médica.
+                <span aria-hidden="true">💡</span> <strong>Consejo práctico:</strong> Si tu bebé está ganando peso adecuadamente, el pediatra te lo dirá en cada revisión. No necesitas controles domésticos frecuentes salvo indicación médica.
               </p>
             </div>
 
@@ -584,7 +584,7 @@ export default function CalculadoraPercentilesPage() {
                 Tiene correlación pero no es determinista. La <strong>talla diana familiar</strong> (calculada como la media de la talla de los padres ± 6,5cm según el sexo) predice mejor la talla adulta que los percentiles infantiles. Los niños en P5 de talla no necesariamente serán adultos bajos si sus padres son de talla media. El crecimiento acelerado en la pubertad puede cambiar significativamente el percentil. El período crítico de mayor influencia sobre la talla adulta es entre 0-3 años y la pubertad.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Consejo práctico:</strong> La fórmula aproximada de talla diana: Para niños: (talla papá + talla mamá + 13cm) ÷ 2 ± 8,5cm. Para niñas: (talla papá + talla mamá - 13cm) ÷ 2 ± 8,5cm.
+                <span aria-hidden="true">💡</span> <strong>Consejo práctico:</strong> La fórmula aproximada de talla diana: Para niños: (talla papá + talla mamá + 13cm) ÷ 2 ± 8,5cm. Para niñas: (talla papá + talla mamá - 13cm) ÷ 2 ± 8,5cm.
               </p>
             </div>
 
@@ -594,7 +594,7 @@ export default function CalculadoraPercentilesPage() {
                 Las tablas completas de la OMS incluyen hasta 9 líneas de percentiles (P3, P5, P10, P15, P25, P50, P75, P85, P90, P97). Esta herramienta usa 5 puntos de referencia, lo que permite calcular el rango percentil de forma simplificada. Para una valoración precisa, el pediatra utiliza las tablas gráficas completas donde se puede ver exactamente en qué percentil está el niño con mayor resolución. Esta herramienta es una orientación, no un diagnóstico.
               </p>
               <p className={styles.faqTip}>
-                💡 <strong>Consejo práctico:</strong> Si quieres ver la curva completa, pide a tu pediatra que te muestre la gráfica de crecimiento de tu hijo en cada revisión. Es tu derecho y ayuda a entender la evolución.
+                <span aria-hidden="true">💡</span> <strong>Consejo práctico:</strong> Si quieres ver la curva completa, pide a tu pediatra que te muestre la gráfica de crecimiento de tu hijo en cada revisión. Es tu derecho y ayuda a entender la evolución.
               </p>
             </div>
           </div>

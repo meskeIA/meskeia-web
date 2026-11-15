@@ -497,7 +497,7 @@ export default function OrientacionTramitacionHerenciasPage() {
                       {item.ayuda && <p className={styles.itemAyuda}><span aria-hidden="true">💡</span> {item.ayuda}</p>}
                       {item.donde && (
                         <p className={styles.itemDonde}>
-                          📍 <strong>Dónde obtenerlo:</strong> {item.donde}
+                          <span aria-hidden="true">📍</span> <strong>Dónde obtenerlo:</strong> {item.donde}
                         </p>
                       )}
                     </div>
